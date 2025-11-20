@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_l2scanlist   Scan List - List of wireless access points
  * @ingroup     net
@@ -18,9 +20,6 @@
  *
  * @author      Fabian Hüßler <fabian.huessler@ml-pa.com>
  */
-
-#ifndef NET_L2SCAN_LIST_H
-#define NET_L2SCAN_LIST_H
 
 #include <stdlib.h>
 
@@ -83,5 +82,4 @@ unsigned l2scan_list_to_array(const l2scan_list_t *list,
 }
 #endif
 
-#endif /* NET_L2SCAN_LIST_H */
 /** @} */

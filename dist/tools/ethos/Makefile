@@ -5,3 +5,5 @@ ethos: ethos.c
 
 clean:
 	rm -f ethos
+
+distclean: clean

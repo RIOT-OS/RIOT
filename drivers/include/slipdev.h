@@ -6,10 +6,16 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_slipdev_stdio   STDIO via SLIP
  * @ingroup     sys_stdio
  * @brief       Standard input/output backend multiplexed via SLIP
+ * @see         [draft-bormann-t2trg-slipmux-03](https://datatracker.ietf.org/doc/html/draft-bormann-t2trg-slipmux-03)
+ *
+ * This extension is part of the [Slipmux draft](https://datatracker.ietf.org/doc/html/draft-bormann-t2trg-slipmux-03).
+ * @warning This module is under development for optimizations and module names might change!
  *
  * This will multiplex STDIO via the Serial Line Internet Protocol.
  * The shell can be accessed via the `sliptty` tool.
@@ -22,10 +28,31 @@
  */
 
 /**
+ * @defgroup    drivers_slipdev_configuration CoAP via SLIP
+ * @ingroup     drivers_slipdev
+ * @brief       Exchange CoAP requests and responses via SLIP
+ * @see         [draft-bormann-t2trg-slipmux-03](https://datatracker.ietf.org/doc/html/draft-bormann-t2trg-slipmux-03)
+ *
+ * This extension is part of the [Slipmux draft](https://datatracker.ietf.org/doc/html/draft-bormann-t2trg-slipmux-03).
+ * @warning This module is under development for optimizations and module names might change!
+ *
+ * This will multiplex CoAP messages via the Serial Line Internet Protocol.
+ * It spawns an extra thread as a CoAP server. The incoming requests are handled with `nanocoap`
+ * according to any `NANOCOAP_RESOURCE`s present in the binary. See @ref net_nanocoap for more.
+ *
+ * To enable this implementation, select
+ *
+ *     USEMODULE += slipdev_config
+ *
+ * @see         drivers_slipdev
+ */
+
+/**
  * @defgroup    drivers_slipdev SLIP network device
  * @ingroup     drivers_netdev
  * @brief       SLIP network device over @ref drivers_periph_uart
- * @see         [RFC 1055](https://github.com/RIOT-OS/RIOT/pull/6487)
+ * @see         [RFC 1055](https://datatracker.ietf.org/doc/html/rfc1055)
+ *
  * @{
  *
  * @file
@@ -33,8 +60,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef SLIPDEV_H
-#define SLIPDEV_H
 
 #include <stdint.h>
 
@@ -42,6 +67,7 @@
 #include "net/netdev.h"
 #include "periph/uart.h"
 #include "chunked_ringbuffer.h"
+#include "sched.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -94,6 +120,14 @@ enum {
      */
     SLIPDEV_STATE_STDIN_ESC,
     /**
+     * @brief   Device writes received data as CoAP message
+     */
+    SLIPDEV_STATE_CONFIG,
+    /**
+     * @brief   Device writes received data as CoAP message, next byte is escaped
+     */
+    SLIPDEV_STATE_CONFIG_ESC,
+    /**
      * @brief   Device is in standby, will wake up when sending data
      */
     SLIPDEV_STATE_STANDBY,
@@ -120,13 +154,19 @@ typedef struct {
 typedef struct {
     netdev_t netdev;                        /**< parent class */
     slipdev_params_t config;                /**< configuration parameters */
-    chunk_ringbuf_t rb;                     /**< Ringbuffer to store received frames.       */
+    chunk_ringbuf_t rb;                     /**< Ringbuffer to store received networking frames.*/
                                             /* Written to from interrupts (with irq_disable */
                                             /* to prevent any simultaneous writes),         */
                                             /* consumed exclusively in the network stack's  */
                                             /* loop at _isr.                                */
 
     uint8_t rxmem[CONFIG_SLIPDEV_BUFSIZE];  /**< memory used by RX buffer */
+
+#if IS_USED(MODULE_SLIPDEV_CONFIG)
+    chunk_ringbuf_t rb_config;              /**< Ringbuffer stores received configuration frames */
+    uint8_t rxmem_config[CONFIG_SLIPDEV_BUFSIZE]; /**< memory used by RX buffer */
+    kernel_pid_t coap_server_pid;           /**< The PID of the CoAP server */
+#endif
     /**
      * @brief   Device state
      * @see     [Device state definitions](@ref drivers_slipdev_states)
@@ -148,5 +188,4 @@ void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index
 }
 #endif
 
-#endif /* SLIPDEV_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_apds99xx APDS99XX proximity and ambient light sensors
  * @ingroup     drivers_sensors
@@ -198,9 +200,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @file
  */
-
-#ifndef APDS99XX_H
-#define APDS99XX_H
 
 #ifdef __cplusplus
 extern "C"
@@ -683,5 +682,4 @@ int apds99xx_int_source(apds99xx_t *dev, apds99xx_int_source_t* src);
 }
 #endif
 
-#endif /* APDS99XX_H */
 /** @} */

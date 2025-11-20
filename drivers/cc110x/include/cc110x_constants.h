@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_cc110x
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef CC110X_CONSTANTS_H
-#define CC110X_CONSTANTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -578,5 +577,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CC110X_CONSTANTS_H */
 /** @} */

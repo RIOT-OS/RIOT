@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_grove_ledbar Grove ledbar
  * @ingroup     drivers_actuators
@@ -20,9 +22,6 @@
  *
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef GROVE_LEDBAR_H
-#define GROVE_LEDBAR_H
 
 #include <stdint.h>
 
@@ -90,5 +89,4 @@ void grove_ledbar_clear(grove_ledbar_t *dev);
 }
 #endif
 
-#endif /* GROVE_LEDBAR_H */
 /** @} */

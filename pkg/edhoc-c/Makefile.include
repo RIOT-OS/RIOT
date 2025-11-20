@@ -1,6 +1,7 @@
-INCLUDES += -I$(PKGDIRBASE)/EDHOC-C/include \
-            -I$(PKGDIRBASE)/EDHOC-C/src \
-            -I$(RIOTBASE)/pkg/edhoc-c/include \
+# Using -isystem instead of -I to prevent warnings for the following headers
+INCLUDES += -isystem$(PKGDIRBASE)/EDHOC-C/include \
+            -isystem$(PKGDIRBASE)/EDHOC-C/src \
+            -isystem$(RIOTBASE)/pkg/edhoc-c/include \
             #
 
 ifneq (,$(filter edhoc-c_crypto_wolfssl,$(USEMODULE)))

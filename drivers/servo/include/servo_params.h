@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_servo
  *
@@ -15,9 +17,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef SERVO_PARAMS_H
-#define SERVO_PARAMS_H
 
 #include "board.h"
 #include "macros/units.h"
@@ -269,5 +268,4 @@ static const saul_reg_info_t servo_saul_info[] =
 }
 #endif
 
-#endif /* SERVO_PARAMS_H */
 /** @} */

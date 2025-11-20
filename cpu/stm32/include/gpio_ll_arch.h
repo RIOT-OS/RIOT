@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
- *               2017 OTA keys S.A.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2017 OTA keys S.A.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_stm32
@@ -19,11 +18,7 @@
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
 
-#ifndef GPIO_LL_ARCH_H
-#define GPIO_LL_ARCH_H
-
 #include "architecture.h"
-#include "periph/gpio_ll.h"
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
@@ -32,23 +27,69 @@ extern "C" {
 
 #ifndef DOXYGEN /* hide implementation specific details from Doxygen */
 
-/**
- * @brief   Get a GPIO port by number
- */
-#if defined(CPU_FAM_STM32MP1)
-#define GPIO_PORT(num)      (GPIOA_BASE + ((num) << 12))
-#else
-#define GPIO_PORT(num)      (GPIOA_BASE + ((num) << 10))
+#define GPIO_PORT_NUMBERING_ALPHABETIC  1
+
+#ifdef GPIOA_BASE
+#  define GPIO_PORT_0       GPIOA_BASE
 #endif
 
-/**
- * @brief   Get a GPIO port number by gpio_t value
- */
-#if defined(CPU_FAM_STM32MP1)
-#define GPIO_PORT_NUM(port) (((port) - GPIOA_BASE) >> 12)
-#else
-#define GPIO_PORT_NUM(port) (((port) - GPIOA_BASE) >> 10)
+#ifdef GPIOB_BASE
+#  define GPIO_PORT_1       GPIOB_BASE
 #endif
+
+#ifdef GPIOC_BASE
+#  define GPIO_PORT_2       GPIOC_BASE
+#endif
+
+#ifdef GPIOD_BASE
+#  define GPIO_PORT_3       GPIOD_BASE
+#endif
+
+#ifdef GPIOE_BASE
+#  define GPIO_PORT_4       GPIOE_BASE
+#endif
+
+#ifdef GPIOF_BASE
+#  define GPIO_PORT_5       GPIOF_BASE
+#endif
+
+#ifdef GPIOG_BASE
+#  define GPIO_PORT_6       GPIOG_BASE
+#endif
+
+#ifdef GPIOH_BASE
+#  define GPIO_PORT_7       GPIOH_BASE
+#endif
+
+#ifdef GPIOI_BASE
+#  define GPIO_PORT_8       GPIOI_BASE
+#endif
+
+#ifdef GPIOJ_BASE
+#  define GPIO_PORT_9       GPIOJ_BASE
+#endif
+
+#ifdef GPIOK_BASE
+#  define GPIO_PORT_10      GPIOK_BASE
+#endif
+
+static inline gpio_port_t gpio_port(uword_t num)
+{
+#if defined(CPU_FAM_STM32MP1)
+    return GPIOA_BASE + (num << 12);
+#else
+    return GPIOA_BASE + (num << 10);
+#endif
+}
+
+static inline uword_t gpio_port_num(gpio_port_t port)
+{
+#if defined(CPU_FAM_STM32MP1)
+    return (port - GPIOA_BASE) >> 12;
+#else
+    return (port - GPIOA_BASE) >> 10;
+#endif
+}
 
 static inline uword_t gpio_ll_read(gpio_port_t port)
 {
@@ -96,6 +137,31 @@ static inline void gpio_ll_write(gpio_port_t port, uword_t value)
     GPIO_TypeDef *p = (GPIO_TypeDef *)port;
     p->ODR = value;
 }
+
+#ifdef MODULE_PERIPH_GPIO_LL_SWITCH_DIR
+static inline uword_t gpio_ll_prepare_switch_dir(uword_t mask)
+{
+    /* implementation too large to always inline */
+    extern uword_t gpio_ll_prepare_switch_dir_impl(uword_t mask);
+    return gpio_ll_prepare_switch_dir_impl(mask);
+}
+
+static inline void gpio_ll_switch_dir_output(gpio_port_t port, uword_t pins)
+{
+    GPIO_TypeDef *p = (GPIO_TypeDef *)port;
+    unsigned irq_state = irq_disable();
+    p->MODER |= pins;
+    irq_restore(irq_state);
+}
+
+static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t pins)
+{
+    GPIO_TypeDef *p = (GPIO_TypeDef *)port;
+    unsigned irq_state = irq_disable();
+    p->MODER &= ~pins;
+    irq_restore(irq_state);
+}
+#endif
 
 static inline gpio_port_t gpio_get_port(gpio_t pin)
 {
@@ -213,5 +279,4 @@ static inline bool is_gpio_port_num_valid(uint_fast8_t num)
 }
 #endif
 
-#endif /* GPIO_LL_ARCH_H */
 /** @} */

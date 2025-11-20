@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_lsm303dlhc
  *
@@ -16,9 +18,6 @@
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
-
-#ifndef LSM303DLHC_INTERNAL_H
-#define LSM303DLHC_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -174,5 +173,4 @@ extern "C" {
 }
 #endif
 
-#endif /* LSM303DLHC_INTERNAL_H */
 /** @} */

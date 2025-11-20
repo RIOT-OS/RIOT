@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_veml6070
  *
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef VEML6070_PARAMS_H
-#define VEML6070_PARAMS_H
 
 #include "board.h"
 #include "veml6070.h"
@@ -67,5 +66,4 @@ static const saul_reg_info_t veml6070_saul_info[] =
 }
 #endif
 
-#endif /* VEML6070_PARAMS_H */
 /** @} */

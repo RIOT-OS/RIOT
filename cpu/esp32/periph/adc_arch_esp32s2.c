@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2022 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2022 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -38,7 +35,7 @@
  */
 const _adc_hw_desc_t _adc_hw[] = {
     /* rtcio,          gpio,                    adc_ctrl,   adc_channel,   pad_name */
-    {  RTCIO_GPIO(0),  GPIO0,                   ADC_UNIT_MAX, ADC_CHANNEL_MAX, "GPIO0" },
+    {  RTCIO_GPIO(0),  GPIO0,                   ADC_UNIT_INV, ADC_CHANNEL_INV, "GPIO0" },
     {  RTCIO_GPIO(1),  ADC1_CHANNEL_0_GPIO_NUM, ADC_UNIT_1,   ADC_CHANNEL_0,   "TOUCH1" },
     {  RTCIO_GPIO(2),  ADC1_CHANNEL_1_GPIO_NUM, ADC_UNIT_1,   ADC_CHANNEL_1,   "TOUCH2" },
     {  RTCIO_GPIO(3),  ADC1_CHANNEL_2_GPIO_NUM, ADC_UNIT_1,   ADC_CHANNEL_2,   "TOUCH3" },
@@ -59,7 +56,7 @@ const _adc_hw_desc_t _adc_hw[] = {
     {  RTCIO_GPIO(18), ADC2_CHANNEL_7_GPIO_NUM, ADC_UNIT_2,   ADC_CHANNEL_7,   "DAC2" },
     {  RTCIO_GPIO(19), ADC2_CHANNEL_8_GPIO_NUM, ADC_UNIT_2,   ADC_CHANNEL_8,   "USB_D-" },
     {  RTCIO_GPIO(20), ADC2_CHANNEL_9_GPIO_NUM, ADC_UNIT_2,   ADC_CHANNEL_9,   "USB_D+" },
-    {  RTCIO_GPIO(21), GPIO21,                  ADC_UNIT_MAX, ADC_CHANNEL_MAX, "GPIO21" },
+    {  RTCIO_GPIO(21), GPIO21,                  ADC_UNIT_INV, ADC_CHANNEL_INV, "GPIO21" },
 };
 
 /**
@@ -118,7 +115,23 @@ const gpio_t _gpio_rtcio_map[] = {
     RTCIO_NA,           /* GPIO46 */
 };
 
+/**
+ * @brief   Default voltage range of ADC results for different attenuations
+ *
+ * These values are used by function adc_get_vrange_min_max if software
+ * calibration doesn't work for any reason and the voltage range can't be
+ * determined by software.
+ */
+const int _adc_vrange_min_max[] = {
+    0, 750,    /* min, max @ ADC_ATTEN_DB_0   */
+    0, 1050,   /* min, max @ ADC_ATTEN_DB_2_5 */
+    0, 1300,   /* min, max @ ADC_ATTEN_DB_6   */
+    0, 2500,   /* min, max @ ADC_ATTEN_DB_12  */
+};
+
 _Static_assert(ARRAY_SIZE(_adc_hw) == SOC_RTCIO_PIN_COUNT,
                "size of _adc_hw does not match SOC_RTCIO_PIN_COUNT");
 _Static_assert(ARRAY_SIZE(_gpio_rtcio_map) == SOC_GPIO_PIN_COUNT,
                "size of _gpio_rtcio_map does not match SOC_GPIO_PIN_COUNT");
+_Static_assert(ARRAY_SIZE(_adc_vrange_min_max) == (SOC_ADC_ATTEN_NUM * 2),
+               "size of _adc_vrange_min_max does not match SOC_ADC_ATTEN_NUM");

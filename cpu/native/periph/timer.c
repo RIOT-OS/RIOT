@@ -1,27 +1,24 @@
-/**
- * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- *               2015 Kaspar Schleiser <kaspar@schleiser.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+/*
+ * SPDX-FileCopyrightText: 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     cpu_native
- * @ingroup     drivers_periph_timer
+ * @file
+ * @ingroup cpu_native
+ * @ingroup drivers_periph_timer
+ * @brief   Native CPU periph/timer.h implementation
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @{
  *
- * @file
- * @brief       Native CPU periph/timer.h implementation
- *
  * Uses POSIX realtime clock and POSIX itimer to mimic hardware.
+ * This is done with the timer_settime(3), timer_create(3)  interfaces, which are
+ * sometimes found only in the -lrt library, and not in glibc.
  *
  * This is based on native's hwtimer implementation by Ludwig Knüpfer.
  * I removed the multiplexing, as ztimer does the same. (kaspar)
- *
- * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */
@@ -119,7 +116,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
         return -1;
     }
 
-    if (register_interrupt(SIGALRM, native_isr_timer) != 0) {
+    if (native_register_interrupt(SIGALRM, native_isr_timer) != 0) {
         DEBUG_PUTS("Failed to register SIGALRM handler");
         timer_delete(itimer_monotonic);
         return -1;

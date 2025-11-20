@@ -79,7 +79,7 @@ int _send_pkt(can_pkt_t *pkt)
     return handle;
 }
 
-int raw_can_send(int ifnum, const struct can_frame *frame, kernel_pid_t pid)
+int raw_can_send(int ifnum, const can_frame_t *frame, kernel_pid_t pid)
 {
     can_pkt_t *pkt;
 
@@ -102,7 +102,7 @@ int raw_can_send(int ifnum, const struct can_frame *frame, kernel_pid_t pid)
 }
 
 #ifdef MODULE_CAN_MBOX
-int raw_can_send_mbox(int ifnum, const struct can_frame *frame, mbox_t *mbox)
+int raw_can_send_mbox(int ifnum, const can_frame_t *frame, mbox_t *mbox)
 {
     can_pkt_t *pkt;
 
@@ -288,7 +288,7 @@ int raw_can_free_frame(can_rx_data_t *frame)
     if (!frame) {
         return 0;
     }
-    int ret = can_router_free_frame((struct can_frame *)frame->data.iov_base);
+    int ret = can_router_free_frame((can_frame_t *)frame->data.iov_base);
 
     can_pkt_free_rx_data(frame);
 
@@ -351,7 +351,7 @@ int can_dll_register_candev(candev_dev_t *candev)
     return candev_nb++;
 }
 
-int can_dll_dispatch_rx_frame(struct can_frame *frame, kernel_pid_t pid)
+int can_dll_dispatch_rx_frame(can_frame_t *frame, kernel_pid_t pid)
 {
     can_pkt_t *pkt = can_pkt_alloc_rx(_get_ifnum(pid), frame);
 

@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_si1133
  *
@@ -15,9 +17,6 @@
  *
  * @author      iosabi <iosabi@protonmail.com>
  */
-
-#ifndef SI1133_PARAMS_H
-#define SI1133_PARAMS_H
 
 #include "board.h"
 #include "si1133.h"
@@ -70,5 +69,4 @@ saul_reg_t si1133_saul_reg_info[] =
 }
 #endif
 
-#endif /* SI1133_PARAMS_H */
 /** @} */

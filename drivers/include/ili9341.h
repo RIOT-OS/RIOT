@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_ili9341 ILI9341 display driver
  * @ingroup     drivers_display
@@ -28,9 +30,6 @@
  * certainly can't use DMA anymore, every short has to be converted before
  * transfer.
  */
-
-#ifndef ILI9341_H
-#define ILI9341_H
 
 #include "lcd.h"
 
@@ -76,7 +75,6 @@ extern "C" {
 #define CONFIG_ILI9341_VCOML            -2000
 #endif
 
-
 /**
  * @name    ILI9341 display rotation modes
  * @{
@@ -104,5 +102,4 @@ extern const lcd_driver_t lcd_ili9341_driver;
 #ifdef __cplusplus
 }
 #endif
-#endif /* ILI9341_H */
 /** @} */

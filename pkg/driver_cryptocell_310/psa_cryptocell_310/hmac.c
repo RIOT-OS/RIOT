@@ -21,6 +21,7 @@
 #include "psa/crypto.h"
 #include "psa_error.h"
 
+#include "cryptocell_310_util.h"
 #include "crys_hmac.h"
 #include "crys_hmac_error.h"
 
@@ -40,6 +41,12 @@ psa_status_t psa_mac_compute_hmac_sha256(const psa_key_attributes_t *attributes,
     size_t required_mac_length =
         PSA_MAC_LENGTH(attributes->type, attributes->bits, PSA_ALG_SHA_256);
 
+    if (!cryptocell_310_data_within_ram(key_buffer) ||
+        !cryptocell_310_data_within_ram(input)) {
+        DEBUG("%s : cryptocell_310 data required to be in RAM.\n", __FILE__);
+        return PSA_ERROR_DATA_INVALID;
+    }
+
     if (mac_size < required_mac_length) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
@@ -55,4 +62,91 @@ psa_status_t psa_mac_compute_hmac_sha256(const psa_key_attributes_t *attributes,
 
     (void)mac_size;
     return PSA_SUCCESS;
+}
+
+psa_status_t psa_mac_verify_hmac_sha256(const psa_key_attributes_t *attributes,
+                                        const uint8_t *key_buffer,
+                                        size_t key_buffer_size,
+                                        const uint8_t *input,
+                                        size_t input_length,
+                                        const uint8_t *mac,
+                                        size_t mac_length)
+{
+    (void)attributes;
+    (void)key_buffer;
+    (void)key_buffer_size;
+    (void)input;
+    (void)input_length;
+    (void)mac;
+    (void)mac_length;
+
+    return PSA_ERROR_NOT_SUPPORTED;
+}
+
+psa_status_t psa_mac_sign_setup_hmac_sha256(psa_mac_operation_t *operation,
+                                            const psa_key_attributes_t *attributes,
+                                            const uint8_t *key_buffer,
+                                            size_t key_buffer_size)
+{
+    (void)operation;
+    (void)attributes;
+    (void)key_buffer;
+    (void)key_buffer_size;
+
+    return PSA_ERROR_NOT_SUPPORTED;
+}
+
+psa_status_t psa_mac_verify_setup_hmac_sha256(psa_mac_operation_t *operation,
+                                              const psa_key_attributes_t *attributes,
+                                              const uint8_t *key_buffer,
+                                              size_t key_buffer_size)
+{
+    (void)operation;
+    (void)attributes;
+    (void)key_buffer;
+    (void)key_buffer_size;
+
+    return PSA_ERROR_NOT_SUPPORTED;
+}
+
+psa_status_t psa_mac_update_hmac_sha256(psa_mac_operation_t *operation,
+                                        const uint8_t *input,
+                                        size_t input_length)
+{
+    (void)operation;
+    (void)input;
+    (void)input_length;
+
+    return PSA_ERROR_NOT_SUPPORTED;
+}
+
+psa_status_t psa_mac_sign_finish_hmac_sha256(psa_mac_operation_t *operation,
+                                             uint8_t *mac,
+                                             size_t mac_size,
+                                             size_t *mac_length)
+{
+    (void)operation;
+    (void)mac;
+    (void)mac_size;
+    (void)mac_length;
+
+    return PSA_ERROR_NOT_SUPPORTED;
+}
+
+psa_status_t psa_mac_verify_finish_hmac_sha256(psa_mac_operation_t *operation,
+                                               const uint8_t *mac,
+                                               size_t mac_length)
+{
+    (void)operation;
+    (void)mac;
+    (void)mac_length;
+
+    return PSA_ERROR_NOT_SUPPORTED;
+}
+
+psa_status_t psa_mac_abort_hmac_sha256(psa_mac_operation_t *operation)
+{
+    (void)operation;
+
+    return PSA_ERROR_NOT_SUPPORTED;
 }

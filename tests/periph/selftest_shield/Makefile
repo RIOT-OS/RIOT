@@ -18,6 +18,7 @@ FEATURES_OPTIONAL += periph_i2c
 FEATURES_OPTIONAL += periph_pwm
 FEATURES_OPTIONAL += periph_spi
 FEATURES_OPTIONAL += periph_timer
+FEATURES_OPTIONAL += periph_timer_query_freqs
 FEATURES_OPTIONAL += periph_uart
 
 USEMODULE += tiny_strerror

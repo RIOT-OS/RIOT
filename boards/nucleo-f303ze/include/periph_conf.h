@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2017 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_nucleo-f303ze
@@ -15,9 +14,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 /* This board provides an LSE */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -180,12 +176,12 @@ static const stm32_usbdev_fs_config_t stm32_usbdev_fs_config[] = {
     {
         .base_addr  = (uintptr_t)USB,
         .rcc_mask   = RCC_APB1ENR_USBEN,
-        .irqn       = USB_LP_CAN_RX0_IRQn,
-        .apb        = APB1,
         .dm         = GPIO_PIN(PORT_A, 11),
         .dp         = GPIO_PIN(PORT_A, 12),
         .af         = GPIO_AF14,
         .disconn    = GPIO_PIN(PORT_G, 6),
+        .irqn       = USB_LP_CAN_RX0_IRQn,
+        .apb        = APB1,
     },
 };
 
@@ -203,5 +199,4 @@ static const stm32_usbdev_fs_config_t stm32_usbdev_fs_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

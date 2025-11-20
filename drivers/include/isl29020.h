@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_isl29020 ISL29020 light sensor
  * @ingroup     drivers_sensors
@@ -20,9 +22,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef ISL29020_H
-#define ISL29020_H
 
 #include <stdint.h>
 #include "periph/i2c.h"
@@ -129,5 +128,4 @@ int isl29020_disable(const isl29020_t *dev);
 }
 #endif
 
-#endif /* ISL29020_H */
 /** @} */

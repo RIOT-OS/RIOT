@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_rpl  RPL
  * @ingroup     net_gnrc
@@ -137,9 +139,6 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
-
-#ifndef NET_GNRC_RPL_H
-#define NET_GNRC_RPL_H
 
 #include <string.h>
 #include <stdint.h>
@@ -440,17 +439,83 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
  *      </a>
  * @{
  */
+/**
+ * @brief   Type ID of the Pad1 option.
+ */
 #define GNRC_RPL_OPT_PAD1                 (0)
+/**
+ * @brief   Type ID of the PadN option.
+ */
 #define GNRC_RPL_OPT_PADN                 (1)
+/**
+ * @brief   Type ID of the DAG Metric Container option.
+ */
 #define GNRC_RPL_OPT_DAG_METRIC_CONTAINER (2)
+/**
+ * @brief   Type ID of the Route Information option.
+ */
 #define GNRC_RPL_OPT_ROUTE_INFO           (3)
+/**
+ * @brief   Type ID of the DODAG Configuration option.
+ */
 #define GNRC_RPL_OPT_DODAG_CONF           (4)
+/**
+ * @brief   Type ID of the RPL Target option.
+ */
 #define GNRC_RPL_OPT_TARGET               (5)
+/**
+ * @brief   Type ID of the Transit Information option.
+ */
 #define GNRC_RPL_OPT_TRANSIT              (6)
+/**
+ * @brief   Shift of the External 'E' flag in the Transit
+ *          Information flags.
+ */
+#define GNRC_RPL_OPT_TRANSIT_E_FLAG_SHIFT (7)
+/**
+ * @brief   Type ID of the Solocited option.
+ */
 #define GNRC_RPL_OPT_SOLICITED_INFO       (7)
+/**
+ * @brief   Type ID of the Prefix Information option.
+ */
 #define GNRC_RPL_OPT_PREFIX_INFO          (8)
+/**
+ * @brief   Shift of the autnomous address-configuration
+ *          'A' flag in the Prefix Information option.
+ */
+#define GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT  (1 << 6)
+/**
+ * @brief   Type ID of the RPL Target Descriptor option.
+ */
 #define GNRC_RPL_OPT_TARGET_DESC          (9)
 /** @} */
+
+/**
+ * @name RPL DIO Base Object fields
+ *  @see <a href="https://tools.ietf.org/html/rfc6550#section-6.3">
+ *          DODAG Information Object (DIO)
+ *      </a>
+ * @{
+ */
+/**
+ * @brief   Shift of the Grounded 'G' flag in the DIO.
+ */
+#define GNRC_RPL_GROUNDED_SHIFT             (7)
+/**
+ * @brief   Shift of the Mode of Operation (MOP) field in the DIO.
+ */
+#define GNRC_RPL_MOP_SHIFT                  (3)
+/**
+ * @brief   Mask for the 3 MOP bits.
+ */
+#define GNRC_RPL_SHIFTED_MOP_MASK           (0x7)
+/**
+ * @brief   Mask for the 3 PRF bits.
+ */
+#define GNRC_RPL_PRF_MASK                   (0x7)
+/** @} */
+
 
 /**
  * @brief Rank of the root node
@@ -534,7 +599,7 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 extern kernel_pid_t gnrc_rpl_pid;
 
 /**
- * @brief @see @ref GNRC_RPL_ALL_NODES_ADDR
+ * @brief   See @ref GNRC_RPL_ALL_NODES_ADDR
  */
 extern const ipv6_addr_t ipv6_addr_all_rpl_nodes;
 
@@ -761,5 +826,4 @@ void gnrc_rpl_configure_root(gnrc_netif_t *netif, const ipv6_addr_t *dodag_id);
 }
 #endif
 
-#endif /* NET_GNRC_RPL_H */
 /** @} */

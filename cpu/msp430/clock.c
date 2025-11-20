@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2014 INRIA
- *               2023 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014 INRIA
+ * SPDX-FileCopyrightText: 2023 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -410,9 +407,13 @@ void pm_set_lowest(void)
         state |= OSCOFF;
     }
 
-    /* write new state */
+    /* Write new state. This should not need NOPs before and after, but the
+     * assembler warning about possibly disabled IRQs cannot be disabled, so
+     * let's waste two instructions for less noise. */
     __asm__ volatile(
+        "nop"                               "\n\t"
         "mov.w %[state], SR"                "\n\t"
+        "nop"                               "\n\t"
         : /* no outputs */
         : [state]   "r"(state)
         : "memory"

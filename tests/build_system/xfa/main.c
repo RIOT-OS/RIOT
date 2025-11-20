@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -19,7 +16,6 @@
  */
 
 #include <stdio.h>
-#include <stdint.h>
 
 #include "xfa.h"
 
@@ -35,12 +31,14 @@ int main(void)
     unsigned n = XFA_LEN(xfatest_t, xfatest);
     printf("xfatest[%u]:\n", n);
     for (unsigned i = 0; i < n; i++) {
-        printf("[%u] = %u, \"%s\"\n", i, xfatest[i].val, xfatest[i].text);
+        printf("[%u] = %u, \"%s\", '%c'\n",
+                i, xfatest[i].val, xfatest[i].text, xfatest[i].letter);
     }
     n = XFA_LEN(xfatest_t, xfatest_const);
     printf("xfatest_const[%u]:\n", n);
     for (unsigned i = 0; i < n; i++) {
-        printf("[%u] = %u, \"%s\"\n", i, xfatest_const[i].val, xfatest_const[i].text);
+        printf("[%u] = %u, \"%s\", '%c'\n",
+                i, xfatest_const[i].val, xfatest_const[i].text, xfatest_const[i].letter);
     }
 
     return 0;

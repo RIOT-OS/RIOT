@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2019-2021 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019-2021 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -801,6 +798,10 @@ static Test *tests_gnrc_sixlowpan_frag_sfr_congure_integration(void)
 int main(void)
 {
     _tests_init();
+
+    /* work around issue in _check_congure_snd_msg(): the assert for
+     * time > o will not work when the time is 0 */
+    while (xtimer_now_usec() / US_PER_MS == 0) { }
 
     TESTS_START();
     TESTS_RUN(tests_gnrc_sixlowpan_frag_sfr_congure_integration());

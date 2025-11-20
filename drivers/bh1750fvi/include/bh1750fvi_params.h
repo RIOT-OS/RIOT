@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_bh1750fvi
  *
@@ -15,9 +17,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef BH1750FVI_PARAMS_H
-#define BH1750FVI_PARAMS_H
 
 #include "board.h"
 #include "bh1750fvi.h"
@@ -55,5 +54,4 @@ static const bh1750fvi_params_t bh1750fvi_params[] =
 }
 #endif
 
-#endif /* BH1750FVI_PARAMS_H */
 /** @} */

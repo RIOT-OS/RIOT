@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2020 Locha Inc
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Locha Inc
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_cc26xx_cc13xx_definitions
@@ -15,9 +14,6 @@
  *
  * @author          Jean Pierre Dudey <jeandudey@hotmail.com>
  */
-
-#ifndef CC26XX_CC13XX_HARD_API_H
-#define CC26XX_CC13XX_HARD_API_H
 
 #include "cc26xx_cc13xx.h"
 
@@ -93,5 +89,4 @@ typedef struct {
 }
 #endif
 
-#endif /* CC26XX_CC13XX_HARD_API_H */
 /** @} */

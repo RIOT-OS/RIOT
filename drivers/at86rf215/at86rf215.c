@@ -226,6 +226,9 @@ void at86rf215_tx_done(at86rf215_t *dev)
     }
 
     at86rf215_reg_write(dev, dev->BBC->RG_AMCS, amcs);
+
+    /* re-enable reduced power consumption */
+    at86rf215_enable_rpc(dev);
 }
 
 static bool _tx_ongoing(at86rf215_t *dev)
@@ -247,7 +250,7 @@ static bool _tx_ongoing(at86rf215_t *dev)
 int at86rf215_tx_prepare(at86rf215_t *dev)
 {
     if (dev->state == AT86RF215_STATE_SLEEP) {
-        return -EAGAIN;
+        return -ENETDOWN;
     }
 
     if (_tx_ongoing(dev)) {

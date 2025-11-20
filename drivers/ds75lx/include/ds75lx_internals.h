@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ds75lx
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef DS75LX_INTERNALS_H
-#define DS75LX_INTERNALS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,5 +59,4 @@ extern "C" {
 }
 #endif
 
-#endif /* DS75LX_INTERNALS_H */
 /** @} */

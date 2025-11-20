@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_pir PIR Motion Sensor
  * @ingroup     drivers_sensors
@@ -18,9 +20,6 @@
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  * @author      Hyung-Sin Kim <hs.kim@cs.berkeley.edu>
  */
-
-#ifndef PIR_H
-#define PIR_H
 
 #include "sched.h"
 #include "periph/gpio.h"
@@ -141,5 +140,4 @@ int pir_register_thread(pir_t *dev);
 }
 #endif
 
-#endif /* PIR_H */
 /** @} */

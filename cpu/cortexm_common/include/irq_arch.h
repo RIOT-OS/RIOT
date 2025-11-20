@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2014-2019 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2014-2019 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_cortexm_common
@@ -15,9 +14,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef IRQ_ARCH_H
-#define IRQ_ARCH_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -129,5 +125,4 @@ bool irq_is_in(void)
 }
 #endif
 
-#endif /* IRQ_ARCH_H */
 /** @} */

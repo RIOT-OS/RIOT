@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_fxos8700
  *
@@ -15,9 +17,6 @@
  *
  * @author      Hyung-Sin Kim <hs.kim@cs.berkeley.edu>
  */
-
-#ifndef FXOS8700_PARAMS_H
-#define FXOS8700_PARAMS_H
 
 #include "board.h"
 #include "fxos8700.h"
@@ -99,5 +98,4 @@ static const saul_reg_info_t fxos8700_saul_info[] =
 }
 #endif
 
-#endif /* FXOS8700_PARAMS_H */
 /** @} */

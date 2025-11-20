@@ -65,8 +65,8 @@
  * @brief Creates a new connection object based on the security instance
  *        represented by @p instance_id.
  *
- * @param[in] instance_id ID number of the instance of security object
- * @param[in, out] client_data LwM2M client data
+ * @param[in]     sec_obj_inst_id   ID number of the instance of security object
+ * @param[in,out] client_data       LwM2M client data
  *
  * @return Pointer to the new connection
  */
@@ -97,7 +97,7 @@ static int _connection_send(lwm2m_client_connection_t *conn, uint8_t *buffer,
  * @return  pointer to the interface to use on success
  * @retval  NULL on error
  */
-static netif_t *_get_interface(const char *iface, size_t len);
+static netif_t *_get_interface(const char *iface, size_t iface_len);
 
 void *lwm2m_connect_server(uint16_t sec_obj_inst_id, void *user_data)
 {
@@ -280,12 +280,11 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
     DEBUG("Creating connection\n");
 
     /* prepare Server URI query */
-    lwm2m_uri_t resource_uri = {
-        .objectId = LWM2M_SECURITY_URI_ID,
-        .instanceId = sec_obj_inst_id,
-        .resourceId = LWM2M_SECURITY_URI_ID,
-        .flag = LWM2M_URI_FLAG_OBJECT_ID | LWM2M_URI_FLAG_INSTANCE_ID | LWM2M_URI_FLAG_RESOURCE_ID
-    };
+    lwm2m_uri_t resource_uri;
+    LWM2M_URI_RESET(&resource_uri);
+    resource_uri.objectId = LWM2M_SECURITY_URI_ID;
+    resource_uri.instanceId = sec_obj_inst_id;
+    resource_uri.resourceId = LWM2M_SECURITY_URI_ID;
 
     int res = lwm2m_get_string(client_data, &resource_uri, uri, &uri_len);
     if (res < 0) {
@@ -383,6 +382,7 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
         res = sock_dtls_session_init(&client_data->dtls_sock, &conn->remote, &conn->session);
         if (res <= 0) {
             DEBUG("[lwm2m:client] could not initiate DTLS session\n");
+            sock_dtls_session_destroy(&client_data->dtls_sock, &conn->session);
             goto free_out;
         }
 
@@ -390,6 +390,7 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
         res = sock_dtls_recv(&client_data->dtls_sock, &conn->session, buf, sizeof(buf), US_PER_SEC);
         if (res != -SOCK_DTLS_HANDSHAKE) {
             DEBUG("[lwm2m:client] error creating session: %i\n", res);
+            sock_dtls_session_destroy(&client_data->dtls_sock, &conn->session);
             goto free_out;
         }
         DEBUG("[lwm2m:client] connection to server successful\n");

@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_dynamixel
  *
@@ -16,9 +18,6 @@
  *
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
-
-#ifndef DYNAMIXEL_PROTOCOL_H
-#define DYNAMIXEL_PROTOCOL_H
 
 #include <stdint.h>
 
@@ -91,5 +90,4 @@ typedef enum {
 }
 #endif
 
-#endif /* DYNAMIXEL_PROTOCOL_H */
 /** @} */

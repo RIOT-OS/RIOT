@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_periph_pio_i2c PIO I2C program
  * @ingroup     drivers_periph
@@ -19,9 +21,6 @@
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
-
-#ifndef PERIPH_PIO_I2C_H
-#define PERIPH_PIO_I2C_H
 
 #include "periph/i2c.h"
 #include "periph/pio.h"
@@ -314,5 +313,4 @@ static inline int pio_i2c_write_reg(pio_t pio, pio_sm_t sm, uint16_t addr,
 #ifdef __cplusplus
 }
 #endif
-#endif /* PERIPH_PIO_I2C_H */
 /** @} */

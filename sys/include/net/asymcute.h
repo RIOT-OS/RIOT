@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_asymcute MQTT-SN Client (Asymcute)
  * @ingroup     net
@@ -41,9 +43,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NET_ASYMCUTE_H
-#define NET_ASYMCUTE_H
-
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -71,7 +70,7 @@ extern "C" {
  */
 /**
  * @brief   Default UDP port to listen on. Usage can be found in
- *          examples/asymcute_mqttsn. Application code is expected to use this
+ *          examples/networking/mqtt/asymcute_mqttsn. Application code is expected to use this
  *          macro to assign the default port.
  */
 #ifndef CONFIG_ASYMCUTE_DEFAULT_PORT
@@ -574,5 +573,4 @@ int asymcute_unsubscribe(asymcute_con_t *con, asymcute_req_t *req,
 }
 #endif
 
-#endif /* NET_ASYMCUTE_H */
 /** @} */

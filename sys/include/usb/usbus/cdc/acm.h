@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    usbus_cdc_acm_stdio  STDIO over CDC ACM (usbus)
  * @ingroup     sys_stdio
@@ -37,9 +39,6 @@
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef USB_USBUS_CDC_ACM_H
-#define USB_USBUS_CDC_ACM_H
 
 #include <stdint.h>
 #include "usb/cdc.h"
@@ -226,5 +225,4 @@ void usbus_cdc_acm_set_coding_cb(usbus_cdcacm_device_t *cdcacm,
 }
 #endif
 
-#endif /* USB_USBUS_CDC_ACM_H */
 /** @} */

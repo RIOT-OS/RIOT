@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_util
  * @{
@@ -21,9 +23,6 @@
  * buffer, see @ref sys_tsrb in the System library.
  * @}
  */
-
-#ifndef RINGBUFFER_H
-#define RINGBUFFER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -163,5 +162,3 @@ unsigned ringbuffer_peek(const ringbuffer_t *__restrict rb, char *buf,
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* RINGBUFFER_H */

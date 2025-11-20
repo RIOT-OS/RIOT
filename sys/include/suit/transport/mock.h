@@ -6,6 +6,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /**
  * @defgroup    sys_suit_transport_mock SUIT secure firmware OTA mock transport
  * @ingroup     sys_suit
@@ -22,9 +25,6 @@
  * Both the array of payloads named `payloads` and the size with name
  * `num_payloads` must be provided.
  */
-
-#ifndef SUIT_TRANSPORT_MOCK_H
-#define SUIT_TRANSPORT_MOCK_H
 
 #include "suit.h"
 
@@ -57,5 +57,4 @@ int suit_transport_mock_fetch(const suit_manifest_t *manifest);
 }
 #endif
 
-#endif /* SUIT_TRANSPORT_MOCK_H */
 /** @} */

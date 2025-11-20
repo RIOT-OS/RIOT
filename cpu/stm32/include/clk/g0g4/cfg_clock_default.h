@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2020 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_stm32
@@ -19,9 +18,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef CLK_G0G4_CFG_CLOCK_DEFAULT_H
-#define CLK_G0G4_CFG_CLOCK_DEFAULT_H
 
 #include "cfg_clock_common_fx_gx_mp1_c0.h"
 #include "kernel_defines.h"
@@ -120,5 +116,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_G0G4_CFG_CLOCK_DEFAULT_H */
 /** @} */

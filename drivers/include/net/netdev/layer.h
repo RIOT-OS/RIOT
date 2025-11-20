@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_netdev_api
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef NET_NETDEV_LAYER_H
-#define NET_NETDEV_LAYER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -140,5 +139,4 @@ void netdev_event_cb_pass(netdev_t *dev, netdev_event_t event);
 }
 #endif
 
-#endif /* NET_NETDEV_LAYER_H */
 /** @} */

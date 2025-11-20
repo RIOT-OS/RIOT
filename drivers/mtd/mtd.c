@@ -76,9 +76,11 @@ int mtd_init(mtd_dev_t *mtd)
 
 #ifdef MODULE_MTD_WRITE_PAGE
     if ((mtd->driver->flags & MTD_DRIVER_FLAG_DIRECT_WRITE) == 0) {
-        mtd->work_area = malloc(mtd->pages_per_sector * mtd->page_size);
-        if (mtd->work_area == NULL) {
-            res = -ENOMEM;
+        if (!mtd->work_area) {
+            mtd->work_area = malloc(mtd->pages_per_sector * mtd->page_size);
+            if (mtd->work_area == NULL) {
+                res = -ENOMEM;
+            }
         }
     }
 #endif
@@ -188,7 +190,7 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count)
  * @param[in]  data     Pointer to the data to be written
  * @param[in]  sector   Sector to write
  * @param[in]  offset   Byte offset from the start of the sector
- * @param[in]  size     Number of bytes
+ * @param[in]  len      Number of bytes
  *
  * @return bytes written on success
  * @return < 0 value on error

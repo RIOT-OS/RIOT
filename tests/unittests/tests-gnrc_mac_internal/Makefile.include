@@ -1,5 +1,0 @@
-USEMODULE += gnrc_priority_pktqueue
-USEMODULE += gnrc_mac
-
-# Set CFLAGS if not being set via Kconfig
-CFLAGS += $(if $(CONFIG_KCONFIG_MODULE_GNRC_MAC),,-DGNRC_MAC_TX_QUEUE_SIZE=4 -DCONFIG_GNRC_MAC_NEIGHBOR_COUNT=4)

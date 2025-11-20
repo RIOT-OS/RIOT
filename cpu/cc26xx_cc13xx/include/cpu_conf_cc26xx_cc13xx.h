@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2016 Leon George
- * Copyright (C) 2020 Locha Inc
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Leon George
+ * SPDX-FileCopyrightText: 2020 Locha Inc
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @addtogroup      cpu_cc26xx_cc13xx
@@ -17,9 +16,6 @@
  * @author          Leon M. George <leon@georgemail.eu>
  * @author          Jean Pierre Dudey <jeandudey@hotmail.com>
  */
-
-#ifndef CPU_CONF_CC26XX_CC13XX_H
-#define CPU_CONF_CC26XX_CC13XX_H
 
 #include "kernel_defines.h"
 
@@ -534,5 +530,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_CC26XX_CC13XX_H */
 /** @} */

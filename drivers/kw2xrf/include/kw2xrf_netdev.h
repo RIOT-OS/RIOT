@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_kw2xrf
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
  */
-
-#ifndef KW2XRF_NETDEV_H
-#define KW2XRF_NETDEV_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,5 +31,4 @@ extern const netdev_driver_t kw2xrf_driver;
 }
 #endif
 
-#endif /* KW2XRF_NETDEV_H */
 /** @} */

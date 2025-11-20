@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2020 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2020 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_stm32
@@ -15,9 +14,6 @@
  *
  * @author          Alexandre Abadie <alexandre.abadie@inria.fr>
 */
-
-#ifndef CLK_CLK_CONF_H
-#define CLK_CLK_CONF_H
 
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
     defined(CPU_FAM_STM32F3)
@@ -50,5 +46,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_CLK_CONF_H */
 /** @} */

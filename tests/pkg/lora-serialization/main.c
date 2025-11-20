@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2018 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -23,7 +20,7 @@
 #include <stdio.h>
 #include "lora_serialization.h"
 
-#if defined(BOARD_NATIVE)
+#if defined(BOARD_NATIVE32)
 #define TEST_01_EXPECTED    { 0x1f, 0x4c, 0x0e, 0x27 }
 #define TEST_02_EXPECTED    { 0x65, 0xa6, 0xfa, 0xfd, \
                               0x6a, 0x24, 0x04, 0x09, \

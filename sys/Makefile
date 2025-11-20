@@ -77,6 +77,9 @@ endif
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
   DIRS += net/gnrc/application_layer/uhcpc
 endif
+ifneq (,$(filter hosts,$(USEMODULE)))
+  DIRS += net/application_layer/hosts
+endif
 ifneq (,$(filter icmpv6,$(USEMODULE)))
   DIRS += net/network_layer/icmpv6
 endif
@@ -223,6 +226,9 @@ ifneq (,$(filter udp,$(USEMODULE)))
 endif
 ifneq (,$(filter uhcpc,$(USEMODULE)))
   DIRS += net/application_layer/uhcp
+endif
+ifneq (,$(filter unicoap,$(USEMODULE)))
+  DIRS += net/application_layer/unicoap
 endif
 ifneq (,$(filter usbus usbus_%,$(USEMODULE)))
     DIRS += usb/usbus

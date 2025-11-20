@@ -1,13 +1,12 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
- *               2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
- *               2020 Otto-von-Guericke-Universität Magdeburg
- *               2021-2023 Gerson Fernando Budke
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
+ * SPDX-FileCopyrightText: 2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
+ * SPDX-FileCopyrightText: 2020 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-FileCopyrightText: 2021-2023 Gerson Fernando Budke
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_avr8_common
@@ -23,9 +22,6 @@
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  */
-
-#ifndef IRQ_ARCH_H
-#define IRQ_ARCH_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -158,4 +154,3 @@ __attribute__((always_inline)) static inline bool irq_is_enabled(void)
 #endif
 
 /** @} */
-#endif /* IRQ_ARCH_H */

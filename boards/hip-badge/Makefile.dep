@@ -1,4 +1,4 @@
-ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+ifneq (,$(filter stdio_default,$(USEMODULE)))
   USEMODULE += stdio_usb_serial_jtag
 endif
 

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup unittests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef TESTS_GNRC_NETIF_PKTQ_H
-#define TESTS_GNRC_NETIF_PKTQ_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,5 +31,4 @@ void tests_pktqueue(void);
 }
 #endif
 
-#endif /* TESTS_GNRC_NETIF_PKTQ_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ir_nec
  *
@@ -15,9 +17,6 @@
  *
  * @author      Dario Petrillo <dario.pk1@gmail.com>
  */
-
-#ifndef IR_NEC_PARAMS_H
-#define IR_NEC_PARAMS_H
 
 #include "board.h"
 #include "ir_nec.h"
@@ -52,5 +51,4 @@ static const ir_nec_params_t ir_nec_params[] =
 }
 #endif
 
-#endif /* IR_NEC_PARAMS_H */
 /** @} */

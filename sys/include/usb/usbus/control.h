@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     usb_usbus
  * @brief       USBUS control endpoint module
@@ -17,9 +19,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef USB_USBUS_CONTROL_H
-#define USB_USBUS_CONTROL_H
 
 /**
  * @brief   Number of IN EPs required for the control interface
@@ -162,5 +161,4 @@ uint8_t *usbus_control_get_out_data(usbus_t *usbus, size_t *len);
 #ifdef __cplusplus
 }
 #endif
-#endif /* USB_USBUS_CONTROL_H */
 /** @} */

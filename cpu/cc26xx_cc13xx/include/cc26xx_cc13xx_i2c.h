@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2016 Leon George
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Leon George
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_cc26xx_cc13xx_definitions
@@ -15,9 +14,6 @@
  *
  * @author          Leon George <leon@georgemail.eu>
  */
-
-#ifndef CC26XX_CC13XX_I2C_H
-#define CC26XX_CC13XX_I2C_H
 
 #include "cc26xx_cc13xx.h"
 
@@ -198,5 +194,4 @@ cycle or continues on to a repeated START condition
 }
 #endif
 
-#endif /* CC26XX_CC13XX_I2C_H */
 /** @} */

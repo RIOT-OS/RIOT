@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_rtc_utils RTC helpers
  * @ingroup     sys
@@ -15,9 +17,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef RTC_UTILS_H
-#define RTC_UTILS_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -69,7 +68,7 @@ int rtc_tm_compare(const struct tm *a, const struct tm *b);
  *
  * @return            elapsed seconds since `RIOT_EPOCH`
  */
-uint32_t rtc_mktime(struct tm *t);
+uint32_t rtc_mktime(const struct tm *t);
 
 /**
  * @brief Converts an RTC timestamp into a  time struct.
@@ -96,5 +95,4 @@ bool rtc_tm_valid(const struct tm *t);
 }
 #endif
 
-#endif /* RTC_UTILS_H */
 /** @} */

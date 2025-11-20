@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_hashes_non_crypto
  * @{
@@ -16,9 +18,6 @@
  * @author      Jason Linehan <patientulysses@gmail.com>
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
-
-#ifndef HASHES_H
-#define HASHES_H
 
 #include <stddef.h>
 #include <inttypes.h>
@@ -175,4 +174,3 @@ uint32_t one_at_a_time_hash(const uint8_t *buf, size_t len);
 #endif
 
 /** @} */
-#endif /* HASHES_H */

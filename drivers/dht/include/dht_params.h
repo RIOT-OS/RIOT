@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_dht
  *
@@ -15,9 +17,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef DHT_PARAMS_H
-#define DHT_PARAMS_H
 
 #include "board.h"
 #include "dht.h"
@@ -70,5 +69,4 @@ static const saul_reg_info_t dht_saul_info[] =
 }
 #endif
 
-#endif /* DHT_PARAMS_H */
 /** @} */

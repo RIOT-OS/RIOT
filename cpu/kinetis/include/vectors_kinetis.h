@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2017 Eistec AB
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2017 Eistec AB
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_kinetis
@@ -17,9 +16,6 @@
  *
  * @}
  */
-
-#ifndef VECTORS_KINETIS_H
-#define VECTORS_KINETIS_H
 
 #include <stdint.h>
 #include "vectors_cortexm.h"
@@ -178,5 +174,3 @@ void isr_wdog_ewm(void);     /**< WDOG interrupt handler */
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
-
-#endif /* VECTORS_KINETIS_H */

@@ -1,22 +1,14 @@
 /*
- * Copyright (C) 2017 Gilles DOFFE <g.doffe@gmail.com>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Gilles DOFFE <g.doffe@gmail.com>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     cpu_native
- * @ingroup     drivers_periph_qdec
- * @{
- *
  * @file
- * @brief       Low-level QDEC driver implementation
- *
- * @author      Gilles DOFFE <g.doffe@gmail.com>
- *
- * @}
+ * @ingroup cpu_native
+ * @ingroup drivers_periph_qdec
+ * @brief   Low-level QDEC driver implementation
+ * @author  Gilles DOFFE <g.doffe@gmail.com>
  */
 
 #include <time.h>

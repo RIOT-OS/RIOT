@@ -29,17 +29,21 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "compiler_hints.h"
 #include "shell.h"
 #include "tm.h"
 
+NONSTRING
 static const char MON_NAMES[12][3] = {
     "JAN", "FEB", "MAR", "APR",
     "MAY", "JUN", "JUL", "AUG",
     "SEP", "OCT", "NOV", "DEC",
 };
+NONSTRING
 static const char DAY_NAMES[7][3] = {
     "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"
 };
+NONSTRING
 static const char BOOL_NAMES[2][3] = { "NO", "YES" };
 
 bool proper_atoi(const char *a, int *i)
@@ -65,6 +69,8 @@ static int cmd_days_in(int argc, char **argv)
     }
 }
 
+SHELL_COMMAND(days_in, "Tells you the number of days in a month.", cmd_days_in);
+
 static int cmd_leap_year(int argc, char **argv)
 {
     int year;
@@ -81,6 +87,8 @@ static int cmd_leap_year(int argc, char **argv)
     }
 }
 
+SHELL_COMMAND(leap_year, "Tells you if a supplied year is a leap year.", cmd_leap_year);
+
 static int cmd_doomsday(int argc, char **argv)
 {
     int year;
@@ -96,6 +104,8 @@ static int cmd_doomsday(int argc, char **argv)
         return 0;
     }
 }
+
+SHELL_COMMAND(doomsday, "Tells you the wday Doomsday of the supplied year.", cmd_doomsday);
 
 static int cmd_day(int argc, char **argv)
 {
@@ -127,20 +137,14 @@ static int cmd_day(int argc, char **argv)
     }
 }
 
-static const shell_command_t shell_commands[] = {
-    { "days_in", "Tells you the number of days in a month.", cmd_days_in },
-    { "leap_year", "Tells you if a supplied year is a leap year.", cmd_leap_year },
-    { "doomsday", "Tells you the wday Doomsday of the supplied year.", cmd_doomsday },
-    { "day", "Tells you the day of the supplied date.", cmd_day },
-    { NULL, NULL, NULL }
-};
+SHELL_COMMAND(day, "Tells you the day of the supplied date.", cmd_day);
 
 int main(void)
 {
     puts("`struct tm` utility shell.");
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

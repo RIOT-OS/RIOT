@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_mrf24j40
  *
@@ -17,9 +19,6 @@
  * @author      Neo Nenaco <neo@nenaco.de>
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef MRF24J40_PARAMS_H
-#define MRF24J40_PARAMS_H
 
 #include "board.h"
 #include "mrf24j40.h"
@@ -69,5 +68,4 @@ static const mrf24j40_params_t mrf24j40_params[] =
 }
 #endif
 
-#endif /* MRF24J40_PARAMS_H */
 /** @} */

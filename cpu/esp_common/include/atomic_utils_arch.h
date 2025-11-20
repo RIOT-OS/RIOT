@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2020 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_esp_common
@@ -16,8 +15,6 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-#ifndef ATOMIC_UTILS_ARCH_H
-#define ATOMIC_UTILS_ARCH_H
 #ifndef DOXYGEN
 
 #include "periph_cpu.h"
@@ -72,5 +69,4 @@ static inline void atomic_store_u32(volatile uint32_t *dest, uint32_t val)
 #endif
 
 #endif /* DOXYGEN */
-#endif /* ATOMIC_UTILS_ARCH_H */
 /** @} */

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gcoap  GCoAP
  * @ingroup     net
@@ -65,7 +67,7 @@
  * reading the request, the callback must use functions provided by gcoap to
  * format the response, as described below. The callback *must* read the request
  * thoroughly before calling the functions, because the response buffer likely
- * reuses the request buffer. See `examples/gcoap/client.c` for a simple
+ * reuses the request buffer. See `examples/networking/coap/gcoap/client.c` for a simple
  * example of a callback.
  *
  * Here is the expected sequence for a callback function:
@@ -105,7 +107,7 @@
  *
  * Client operation includes two phases: creating and sending a request, and
  * handling the response asynchronously in a client supplied callback. See
- * `examples/gcoap/client.c` for a simple example of sending a request and
+ * `examples/networking/coap/gcoap/client.c` for a simple example of sending a request and
  * reading the response.
  *
  * ### Creating a request ###
@@ -260,7 +262,7 @@
  *
  * The client requests a specific blockwise payload from the overall body by
  * writing a Block2 option in the request. See _resp_handler() in the
- * [gcoap](https://github.com/RIOT-OS/RIOT/blob/master/examples/gcoap/client.c)
+ * [gcoap](https://github.com/RIOT-OS/RIOT/blob/master/examples/networking/coap/gcoap/client.c)
  * example in the RIOT distribution, which implements the sequence described
  * below.
  *
@@ -393,9 +395,6 @@
  * @author      Ken Bannister <kb2ma@runbox.com>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NET_GCOAP_H
-#define NET_GCOAP_H
 
 #include <stdint.h>
 
@@ -552,6 +551,10 @@ extern "C" {
 /**
  * @ingroup net_gcoap_conf
  * @brief   Maximum number of Observe clients
+ *
+ * @note As documented in this file, the implementation is limited to one observer per resource.
+ *       Therefore, every stored observer is associated with a different resource.
+ *       If you have only one observable resource, you could set this value to 1.
  */
 #ifndef CONFIG_GCOAP_OBS_CLIENTS_MAX
 #define CONFIG_GCOAP_OBS_CLIENTS_MAX   (2)
@@ -559,7 +562,24 @@ extern "C" {
 
 /**
  * @ingroup net_gcoap_conf
+ * @brief   Maximum number of local notifying endpoint addresses
+ *
+ * @note As documented in this file, the implementation is limited to one observer per resource.
+ *       Therefore, every stored local endpoint alias is associated with an observation context
+ *       of a different resource.
+ *       If you have only one observable resource, you could set this value to 1.
+ */
+#ifndef CONFIG_GCOAP_OBS_NOTIFIERS_MAX
+#define CONFIG_GCOAP_OBS_NOTIFIERS_MAX  (2)
+#endif
+
+/**
+ * @ingroup net_gcoap_conf
  * @brief   Maximum number of registrations for Observable resources
+ *
+ * @note As documented in this file, the implementation is limited to one observer per resource.
+ *       Therefore, every stored observation context is associated with a different resource.
+ *       If you have only one observable resource, you could set this value to 1.
  */
 #ifndef CONFIG_GCOAP_OBS_REGISTRATIONS_MAX
 #define CONFIG_GCOAP_OBS_REGISTRATIONS_MAX     (2)
@@ -839,6 +859,7 @@ struct gcoap_request_memo {
  */
 typedef struct {
     sock_udp_ep_t *observer;            /**< Client endpoint; unused if null */
+    sock_udp_ep_t *notifier;            /**< Local endpoint to send notifications */
     const coap_resource_t *resource;    /**< Entity being observed */
     uint8_t token[GCOAP_TOKENLEN_MAX];  /**< Client token for notifications */
     uint16_t last_msgid;                /**< Message ID of last notification */
@@ -875,16 +896,32 @@ kernel_pid_t gcoap_init(void);
 void gcoap_register_listener(gcoap_listener_t *listener);
 
 /**
+ * @brief   Iterate through all registered listeners and check for a resource, matching by @p uri_path
+ *
+ *  This functions returns resources matching a subpath @see COAP_MATCH_SUBTREE.
+ *  If an exact match is required, check with `strncmp()`.
+ *
+ * @param[in, out]  last_listener       A pointer to NULL for the first call, otherwise the last returned listener
+ * @param[in]       last_resource       NULL for the first call, otherwise the last returned resource
+ * @param[in]       uri_path            The URI path to search for
+ *
+ * @return  The resource that matches the URI path
+ */
+const coap_resource_t *gcoap_get_resource_by_path_iterator(const gcoap_listener_t **last_listener,
+                                                           const coap_resource_t *last_resource,
+                                                           const char *uri_path);
+
+/**
  * @brief   Initializes a CoAP request PDU on a buffer.
  *
  * If @p code is COAP_CODE_EMPTY, prepares a complete "CoAP ping" 4 byte empty
  * message request, ready to send.
  *
  * With module module [`nanocoap_cache`](@ref net_nanocoap_cache) an all-zero ETag option of
- * length 8 which is updated with a value or removed in @ref gcoap_req_send() /
- * @ref gcoap_req_send_tl() depending on existing cache entries for cache (re-)validation. If you do
- * not use the given send functions or do not want cache entries to revalidated for any reason,
- * remove that empty option using @ref coap_opt_remove().
+ * length 8 which is updated with a value or removed in @ref gcoap_req_send() depending on
+ * existing cache entries for cache (re-)validation. If you do not use the given send functions
+ * or do not want cache entries to revalidated for any reason, remove that empty option using
+ * @ref coap_opt_remove().
  *
  * @param[out] pdu      Request metadata
  * @param[out] buf      Buffer containing the PDU
@@ -911,10 +948,10 @@ int gcoap_req_init_path_buffer(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * message request, ready to send.
  *
  * With module module [`nanocoap_cache`](@ref net_nanocoap_cache) an all-zero ETag option of
- * length 8 which is updated with a value or removed in @ref gcoap_req_send() /
- * @ref gcoap_req_send_tl() depending on existing cache entries for cache (re-)validation. If you do
- * not use the given send functions or do not want cache entries to revalidated for any reason,
- * remove that empty option using @ref coap_opt_remove().
+ * length 8 which is updated with a value or removed in @ref gcoap_req_send() depending on
+ * existing cache entries for cache (re-)validation. If you do not use the given send functions
+ * or do not want cache entries to revalidated for any reason, remove that empty option using
+ * @ref coap_opt_remove().
  *
  * @param[out] pdu      Request metadata
  * @param[out] buf      Buffer containing the PDU
@@ -988,34 +1025,6 @@ ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
                        gcoap_socket_type_t tl_type);
 
 /**
- * @brief   Sends a buffer containing a CoAP request to the provided endpoint
- *
- * @deprecated Will be removed after the 2023.10 release. Use alias @ref gcoap_req_send() instead.
- *
- * @param[in] buf           Buffer containing the PDU
- * @param[in] len           Length of the buffer
- * @param[in] remote        Destination for the packet
- * @param[in] resp_handler  Callback when response received, may be NULL
- * @param[in] context       User defined context passed to the response handler
- * @param[in] tl_type       The transport type to use for send. When
- *                          @ref GCOAP_SOCKET_TYPE_UNDEF is selected, the highest
- *                          available (by value) will be selected. Only single
- *                          types are allowed, not a combination of them.
- *
- * @return  length of the packet
- * @return -ENOTCONN, if DTLS was used and session establishment failed
- * @return -EINVAL, if @p tl_type is is not supported
- * @return  0 if cannot send
- */
-static inline ssize_t gcoap_req_send_tl(const uint8_t *buf, size_t len,
-                                        const sock_udp_ep_t *remote,
-                                        gcoap_resp_handler_t resp_handler, void *context,
-                                        gcoap_socket_type_t tl_type)
-{
-    return gcoap_req_send(buf, len, remote, NULL, resp_handler, context, tl_type);
-}
-
-/**
  * @brief   Initializes a CoAP response packet on a buffer
  *
  * Initializes payload location within the buffer based on packet setup.
@@ -1054,6 +1063,9 @@ static inline ssize_t gcoap_response(coap_pkt_t *pdu, uint8_t *buf,
  *          observer registered for a resource
  *
  * First verifies that an observer has been registered for the resource.
+ *
+ * @post    If this function returns @see GCOAP_OBS_INIT_OK you have to call
+ *          @ref gcoap_obs_send() afterwards to release a mutex.
  *
  * @param[out] pdu      Notification metadata
  * @param[out] buf      Buffer containing the PDU
@@ -1196,5 +1208,4 @@ static inline coap_hdr_t *gcoap_request_memo_get_hdr(const gcoap_request_memo_t 
 }
 #endif
 
-#endif /* NET_GCOAP_H */
 /** @} */

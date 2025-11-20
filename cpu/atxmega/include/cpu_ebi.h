@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021 Gerson Fernando Budke
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Gerson Fernando Budke
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_atxmega
@@ -17,9 +16,6 @@
  */
 
 #include "periph_cpu.h"
-
-#ifndef CPU_EBI_H
-#define CPU_EBI_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -150,5 +146,4 @@ void hugemem_write_block(hugemem_ptr_t to, const void *from, size_t size);
 }
 #endif
 
-#endif /* CPU_EBI_H */
 /** @} */

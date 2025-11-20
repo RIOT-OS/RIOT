@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_lora-e5-dev
@@ -16,9 +15,6 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.yyfr>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "kernel_defines.h"
 #if IS_USED(MODULE_SX126X_STM32WL)
@@ -46,6 +42,7 @@ extern void lora_e5_dev_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mo
  * @name    LED pin definitions and handlers
  * @{
  */
+#define LED0_PORT           GPIO_PORT_B /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_B
 #define LED0_PIN_NUM        5
 /** @} */
@@ -97,5 +94,4 @@ extern void lora_e5_dev_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mo
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

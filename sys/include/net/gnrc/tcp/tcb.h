@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     net_gnrc_tcp
  *
@@ -16,9 +18,6 @@
  *
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
-
-#ifndef NET_GNRC_TCP_TCB_H
-#define NET_GNRC_TCP_TCB_H
 
 #include <stdint.h>
 #include "ringbuffer.h"
@@ -96,5 +95,4 @@ typedef struct sock_tcp_queue {
 #ifdef __cplusplus
 }
 #endif
-#endif /* NET_GNRC_TCP_TCB_H */
 /** @} */

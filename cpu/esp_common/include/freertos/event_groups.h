@@ -1,15 +1,13 @@
 /*
- * Copyright (C) 2019 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- *
+ * SPDX-FileCopyrightText: 2019 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+/*
  * FreeRTOS to RIOT-OS adaption module for source code compatibility
  */
 
-#ifndef FREERTOS_EVENT_GROUPS_H
-#define FREERTOS_EVENT_GROUPS_H
+#pragma once
 
 #ifndef DOXYGEN
 
@@ -43,4 +41,3 @@ EventBits_t xEventGroupWaitBits (const EventGroupHandle_t xEventGroup,
 #endif
 
 #endif /* DOXYGEN */
-#endif /* FREERTOS_EVENT_GROUPS_H */

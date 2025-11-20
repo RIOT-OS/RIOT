@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_diskio Disk IO Driver
  * @ingroup     drivers_storage
@@ -18,9 +20,6 @@
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
-
-#ifndef DISKIO_H
-#define DISKIO_H
 
 #include <stdint.h>
 
@@ -158,5 +157,4 @@ diskio_result_t mci_ioctl(unsigned char ctrl, void *buff);
 }
 #endif
 
-#endif /* DISKIO_H */
 /** @} */

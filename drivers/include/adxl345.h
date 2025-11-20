@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_adxl345 ADXL345 3-Axis accelerometer
  * @ingroup     drivers_sensors
@@ -20,9 +22,6 @@
  *
  * @author     Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifndef ADXL345_H
-#define ADXL345_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -245,5 +244,4 @@ void adxl345_set_fifo_mode(const adxl345_t *dev, uint8_t mode,
 }
 #endif
 
-#endif /* ADXL345_H */
 /** @} */

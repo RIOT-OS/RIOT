@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @file
  * @brief   POSIX compatible sys/statvfs.h definitions
@@ -19,8 +21,6 @@
 /* without the GCC pragma above #include_next will trigger a pedantic error */
 #include_next <sys/statvfs.h>
 #else
-#ifndef SYS_STATVFS_H
-#define SYS_STATVFS_H
 
 #include <sys/types.h> /* for fsblkcnt_t, fsfilcnt_t */
 #if MODULE_NEWLIB
@@ -69,8 +69,6 @@ enum {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SYS_STATVFS_H */
 
 #endif /* CPU_NATIVE */
 

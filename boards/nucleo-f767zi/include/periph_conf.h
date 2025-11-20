@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2017 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_nucleo-f767zi
@@ -15,9 +14,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 /* This board provides an LSE */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -252,5 +248,4 @@ static const pwm_conf_t pwm_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2015-2017 Freie Universität Berlin
- *               2017 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015-2017 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2017 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_stm32
@@ -18,9 +17,6 @@
  * @author          Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  */
-
-#ifndef PERIPH_L0_PERIPH_CPU_H
-#define PERIPH_L0_PERIPH_CPU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,12 +36,12 @@ extern "C" {
  */
 #define HAVE_ADC_RES_T
 typedef enum {
-    ADC_RES_6BIT  = (0x3 << 3),     /**< ADC resolution: 6 bit */
-    ADC_RES_8BIT  = (0x2 << 3),     /**< ADC resolution: 8 bit */
-    ADC_RES_10BIT = (0x1 << 3),     /**< ADC resolution: 10 bit */
-    ADC_RES_12BIT = (0x0 << 3),     /**< ADC resolution: 12 bit */
-    ADC_RES_14BIT = (0xfe),         /**< not applicable */
-    ADC_RES_16BIT = (0xff)          /**< not applicable */
+    ADC_RES_6BIT  = (ADC_CFGR1_RES),    /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT  = (ADC_CFGR1_RES_1),  /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = (ADC_CFGR1_RES_0),  /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = (0x00),             /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = (0xfe),     /**< ADC resolution: 14 bit (not supported)*/
+    ADC_RES_16BIT = (0xff)      /**< ADC resolution: 16 bit (not supported)*/
 } adc_res_t;
 /** @} */
 #endif /* ndef DOXYGEN */
@@ -77,5 +73,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_L0_PERIPH_CPU_H */
 /** @} */

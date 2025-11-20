@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2017 Eistec AB
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2017 Eistec AB
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_kinetis
@@ -17,9 +16,6 @@
  *
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef CPU_CONF_KINETIS_K_H
-#define CPU_CONF_KINETIS_K_H
 
 #if (KINETIS_FAMILY == 2)
 #if (KINETIS_SUBFAMILY == 2)
@@ -123,7 +119,7 @@
 /**
  * @name Hardware random number generator module configuration
  *
- *       For K64F SCG3 or SCG6 can be used depending on if the the
+ *       For K64F SCG3 or SCG6 can be used depending on if the
  *       peripheral is accessed through AIPS-lite0 or AIPS-lite1.
  *       For K64F RNGA is only mapped to SCG6.
  * @{
@@ -163,5 +159,4 @@ extern "C"
 }
 #endif
 
-#endif /* CPU_CONF_KINETIS_K_H */
 /** @} */

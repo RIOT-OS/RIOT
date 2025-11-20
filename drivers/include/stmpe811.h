@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_stmpe811 STMPE811 Touchscreen Controller
  * @ingroup     drivers_sensors
@@ -17,9 +19,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef STMPE811_H
-#define STMPE811_H
 
 #include "saul.h"
 #include "periph/gpio.h"
@@ -123,10 +122,10 @@ typedef struct {
 /**
  * @brief   Initialize the given STMPE811 device
  *
- * @param[inout] dev        Device descriptor of the STMPE811
- * @param[in] params        Initialization parameters of the STMPE811 device
- * @param[in] cb            Callback function called on touch interrupts
- * @param[in] arg           Context argument used in callback function
+ * @param[in,out] dev       Device descriptor of the STMPE811
+ * @param[in]     params    Initialization parameters of the STMPE811 device
+ * @param[in]     cb        Callback function called on touch interrupts
+ * @param[in]     arg       Context argument used in callback function
  *
  * @return                  0 on success
  * @return                  -ENODEV when no valid device
@@ -162,5 +161,4 @@ int stmpe811_read_touch_state(const stmpe811_t *dev, stmpe811_touch_state_t *sta
 }
 #endif
 
-#endif /* STMPE811_H */
 /** @} */

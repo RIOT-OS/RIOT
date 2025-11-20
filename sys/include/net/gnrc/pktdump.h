@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_pktdump Dump Network Packets
  * @ingroup     net_gnrc
@@ -18,9 +20,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NET_GNRC_PKTDUMP_H
-#define NET_GNRC_PKTDUMP_H
 
 #include "sched.h"
 
@@ -88,5 +87,4 @@ kernel_pid_t gnrc_pktdump_init(void);
 }
 #endif
 
-#endif /* NET_GNRC_PKTDUMP_H */
 /** @} */

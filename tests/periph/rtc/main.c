@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Lari Lehtomäki
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2015 Lari Lehtomäki
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -25,6 +22,7 @@
 #include <time.h>
 #include <string.h>
 
+#include "fmt.h"
 #include "mutex.h"
 #include "periph_conf.h"
 #include "periph/rtc.h"
@@ -34,31 +32,20 @@
 #define PERIOD              (2U)
 #define REPEAT              (4U)
 
-#define TM_YEAR_OFFSET      (1900)
-
 static unsigned cnt = 0;
 
 static void print_time(const char *label, const struct tm *time)
 {
-    printf("%s  %04d-%02d-%02d %02d:%02d:%02d\n", label,
-            time->tm_year + TM_YEAR_OFFSET,
-            time->tm_mon + 1,
-            time->tm_mday,
-            time->tm_hour,
-            time->tm_min,
-            time->tm_sec);
+    char tm_buf[20];
+    fmt_time_tm_iso8601(tm_buf, time, ' ');
+    printf("%s  %s\n", label, tm_buf);
 }
 
 static void print_time_ms(const char *label, const struct tm *time, uint16_t ms)
 {
-    printf("%s  %04d-%02d-%02d %02d:%02d:%02d.%03d\n", label,
-            time->tm_year + TM_YEAR_OFFSET,
-            time->tm_mon + 1,
-            time->tm_mday,
-            time->tm_hour,
-            time->tm_min,
-            time->tm_sec,
-            ms);
+    char tm_buf[20];
+    fmt_time_tm_iso8601(tm_buf, time, ' ');
+    printf("%s  %s.%03d\n", label, tm_buf, ms);
 }
 
 static void inc_secs(struct tm *time, unsigned val)
@@ -115,7 +102,6 @@ static void _get_rtc_mem(void)
         }
     }
 
-
     puts("RTC mem OK");
 }
 #else
@@ -149,8 +135,8 @@ int main(void)
     }
 
     time = (struct tm){
-        .tm_year = 2020 - TM_YEAR_OFFSET,   /* years are counted from 1900 */
-        .tm_mon  =  1,                      /* 0 = January, 11 = December */
+        .tm_year = 2025 - 1900,   /* years are counted from 1900 */
+        .tm_mon  =  1,            /* 0 = January, 11 = December */
         .tm_mday = 28,
         .tm_hour = 23,
         .tm_min  = 59,
@@ -224,7 +210,7 @@ int main(void)
 
     /* set alarm */
     rtc_get_time(&time);
-    inc_secs(&time, PERIOD);
+    inc_secs(&time, PERIOD); /* note that this increments the seconds above 60! */
     rtc_set_alarm(&time, cb, &rtc_mtx);
     print_time("  Setting alarm to ", &time);
     puts("");

@@ -1,0 +1,57 @@
+@defgroup    boards_stm32f750n8-dk STM32F750N8-DK
+@ingroup     boards
+@brief       Support for the STM32F750N8-DK board.
+
+## Overview
+
+The ST [STM32F750N8-DK](https://www.st.com/en/evaluation-tools/stm32f7508-dk.html)
+is an evaluation board supporting a ARM Cortex-M7 STM32750N8 microcontroller
+with 340KB of RAM and 64KB of ROM Flash. This board is just a clone of the
+STM32F746G-DISCO board with a different microcontroller. The pinout
+is identical.
+
+As a result, the main features available on this board are shared with the ones
+provided by the STM32F746G-DISCO:
+- a 4.3\" RGB 480×272 color LCD-TFT with capacitive touch screen,
+- an ethernet port
+- 2 user USB ports (FS and HS)
+- 2 user digital microphones
+- 128M-bit external Quas-SPI flash
+- 128M-bit external SDRAM
+
+Current hardware support:
+
+| Feature        | Support     |  Configuration     |
+| ------------- | :---------------------: | --------------------- |
+| UART |  X  | USART1 on PB7/PA9 (stdio) and USART6 on PC6/PC7    |
+| SPI |  X  | SPI2 on PB15/PB14/PI1    |
+| I2C |  X | I2C1 on PB8/PB9    |
+| Ethernet | X |  |
+| USB OTG FS | X |  |
+| USB OTG HS | - |  |
+| TFT LCD | X |  |
+| Capacitive touch screen | X | |
+| User microphones | - | |
+| External Quad-SPI Flash | - | |
+| External SDRAM | - | |
+
+## Flashing the device
+
+The STM32F750N8-DK board includes an on-board ST-LINK programmer and can be
+flashed using OpenOCD.
+The board can be flashed with:
+
+```
+make BOARD=stm32f750n8-dk flash
+```
+
+and debug via GDB with
+```
+make BOARD=stm32f750n8-dk debug
+```
+
+## Supported Toolchains
+
+For using the STM32F750N8-DK board we recommend the usage of the
+[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
+toolchain.

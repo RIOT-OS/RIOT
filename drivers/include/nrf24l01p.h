@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_nrf24l01p NRF24L01+ driver interface
  * @ingroup     drivers_netdev
@@ -19,9 +21,6 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  *
  */
-
-#ifndef NRF24L01P_H
-#define NRF24L01P_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -625,5 +624,4 @@ void nrf24l01p_rx_cb(void *arg);
 }
 #endif
 
-#endif /* NRF24L01P_H */
 /** @} */

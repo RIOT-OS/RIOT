@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @defgroup    sys_psa_crypto_slot_mgmt    PSA Crypto Key Slot Management
@@ -17,9 +19,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
-
-#ifndef PSA_CRYPTO_SLOT_MANAGEMENT_H
-#define PSA_CRYPTO_SLOT_MANAGEMENT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -313,5 +312,4 @@ void psa_get_public_key_data_from_key_slot( const psa_key_slot_t *slot,
 }
 #endif
 
-#endif /* PSA_CRYPTO_SLOT_MANAGEMENT_H */
 /**@}*/

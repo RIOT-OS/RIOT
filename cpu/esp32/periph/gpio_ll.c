@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -24,23 +21,21 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
-#include <string.h>
 
-#include "log.h"
 #include "irq.h"
 #include "periph/gpio_ll.h"
 
+#include "driver/gpio.h"
 #include "esp/common_macros.h"
 #include "hal/gpio_hal.h"
 #include "hal/gpio_types.h"
 #include "gpio_ll_arch.h"
 #include "soc/gpio_struct.h"
 
-#include "esp_idf_api/gpio.h"
-
 #ifdef MODULE_FMT
-#include "fmt.h"
+#  include "fmt.h"
 #else
+#  include <stdio.h>
 static inline void print_str(const char *str)
 {
     fputs(str, stdout);
@@ -60,7 +55,7 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
     assert(is_gpio_port_num_valid(port));
     assert(pin < GPIO_PORT_PIN_NUMOF(port));
 
-    gpio_t gpio = GPIO_PIN(GPIO_PORT_NUM(port), pin);
+    gpio_t gpio = GPIO_PIN(gpio_port_num(port), pin);
 
     gpio_config_t cfg = {
         .pin_bit_mask = (1ULL << gpio),
@@ -111,7 +106,7 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
     }
 
 #ifdef ESP_PM_WUP_PINS
-/* for saving the pullup/pulldown settings of wakeup pins in deep sleep mode */
+    /* for saving the pullup/pulldown settings of wakeup pins in deep sleep mode */
     _gpio_pin_pu[pin] = cfg.pull_up_en;
     _gpio_pin_pd[pin] = cfg.pull_down_en;
 #endif
@@ -119,13 +114,13 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
     if (conf.state == GPIO_DISCONNECT) {
         /* reset the pin to disconnects any other peripheral output configured
            via GPIO Matrix, the pin is reconfigured according to given conf */
-        esp_idf_gpio_reset_pin(gpio);
+        gpio_reset_pin(gpio);
     }
 
     /* since we can't read back the configuration, we have to save it */
     _gpio_conf[gpio] = conf;
 
-    if (esp_idf_gpio_config(&cfg) != ESP_OK) {
+    if (gpio_config(&cfg) != ESP_OK) {
         return -ENOTSUP;
     }
 
@@ -148,7 +143,7 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
         strength = GPIO_DRIVE_CAP_DEFAULT;
     }
     if ((cfg.pin_bit_mask & SOC_GPIO_VALID_OUTPUT_GPIO_MASK) &&
-        (esp_idf_gpio_set_drive_capability(gpio, strength) != ESP_OK)) {
+        (gpio_set_drive_capability(gpio, strength) != ESP_OK)) {
         return -ENOTSUP;
     }
 
@@ -168,7 +163,7 @@ gpio_conf_t gpio_ll_query_conf(gpio_port_t port, uint8_t pin)
 
     unsigned state = irq_disable();
 
-    result = _gpio_conf[GPIO_PIN(GPIO_PORT_NUM(port), pin)];
+    result = _gpio_conf[GPIO_PIN(gpio_port_num(port), pin)];
     if (result.state == GPIO_INPUT) {
         result.initial_value = (gpio_ll_read(port) >> pin) & 1UL;
     }

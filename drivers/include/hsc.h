@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_hsc HSC temperature and pressure sensor
  * @ingroup     drivers_sensors
@@ -20,9 +22,6 @@
  *
  * @author      Quang Pham <phhr_quang@live.com>
  */
-
-#ifndef HSC_H
-#define HSC_H
 
 #include "saul.h"
 #include "periph/i2c.h"
@@ -99,5 +98,4 @@ int hsc_read_pressure(const hsc_t *dev, int32_t *dest);
 }
 #endif
 
-#endif /* HSC_H */
 /** @} */

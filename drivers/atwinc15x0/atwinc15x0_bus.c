@@ -40,8 +40,7 @@ sint8 nm_bus_init(void *arg)
     assert(atwinc15x0);
     assert(gpio_is_valid(atwinc15x0->params.ssn_pin));
 
-    gpio_init(atwinc15x0->params.ssn_pin, GPIO_OUT);
-    gpio_set(atwinc15x0->params.ssn_pin);
+    spi_init_cs(atwinc15x0->params.spi, atwinc15x0->params.ssn_pin);
 
     nm_bsp_reset();
     nm_bsp_sleep(1);

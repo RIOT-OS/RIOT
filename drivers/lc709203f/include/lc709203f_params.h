@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_lc709203f
  * @name        Default parameters for the SHTC1 Temperature and humidity sensor
@@ -17,8 +19,6 @@
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
-#ifndef LC709203F_PARAMS_H
-#define LC709203F_PARAMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,5 +62,4 @@ static const lc709203f_params_t params_default[] = {
 #ifdef __cplusplus
 }
 #endif
-#endif /* LC709203F_PARAMS_H */
 /** @} */

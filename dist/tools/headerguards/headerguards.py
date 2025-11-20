@@ -43,14 +43,27 @@ def fix_headerguard(filename):
     tmp.seek(0)
 
     guard_found = 0
+    pragma_once_found = 0
     guard_name = ""
     ifstack = 0
     for line in inlines:
+        if line.startswith("#pragma once"):
+            pragma_once_found += 1
+        elif line.lstrip().startswith("#pragma once"):
+            # check for lines that have leading whitespaces and add a correction
+            pragma_once_found += 1
+            line = "#pragma once\n"
         if guard_found == 0:
-            if line.startswith("#ifndef"):
+            if pragma_once_found == 0 and line.startswith("#ifndef"):
                 guard_found += 1
                 guard_name = line[8:].rstrip()
                 line = "#ifndef %s\n" % (supposed)
+            elif pragma_once_found != 0 and line.startswith("#ifndef %s" % supposed):
+                # check if there is pragma once *and* headerguards, but avoid false
+                # positives by narrowing in on the to-be-expected guard
+                guard_found += 1
+                guard_name = line[8:].rstrip()
+                line = ""
         elif guard_found == 1:
             if line.startswith("#define") and line[8:].rstrip() == guard_name:
                 line = "#define %s\n" % (supposed)
@@ -70,12 +83,27 @@ def fix_headerguard(filename):
         tmp.write(line)
 
     tmp.seek(0)
-    if guard_found == 3:
+    if (pragma_once_found == 0 and guard_found == 3) or \
+       (pragma_once_found == 1 and guard_found == 0):
+        # Valid cases:
+        #  - no #pragma once, classic headerguards (#ifndef, #define, #endif)
+        #  - one #pragma once, no classic headerguards
         for line in difflib.unified_diff(inlines, tmp.readlines(),
                                          "%s" % filename, "%s" % filename):
             sys.stdout.write(line)
+    elif (pragma_once_found == 0 and guard_found == 0):
+        print("%s: no header guards found" % filename, file=sys.stderr)
+        return False
+    elif (pragma_once_found == 1 and guard_found != 0):
+        print("%s: #pragma once and classic header guards used in the same file" %
+              filename, file=sys.stderr)
+        return False
+    elif (pragma_once_found > 1):
+        print("%s: More than one #pragma once in the same file" %
+              filename, file=sys.stderr)
+        return False
     else:
-        print("%s: no / broken header guard" % filename, file=sys.stderr)
+        print("%s: broken header guard" % filename, file=sys.stderr)
         return False
 
 

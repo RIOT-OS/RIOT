@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2023 Benjamin Valentin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2023 Benjamin Valentin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -26,11 +23,12 @@
 
 #include "irq_arch.h"
 #include "esp_attr.h"
-#include "hal/interrupt_controller_types.h"
-#include "hal/interrupt_controller_ll.h"
+#include "esp_cpu.h"
 #include "hal/usb_serial_jtag_ll.h"
 #include "soc/periph_defs.h"
 #include "rom/ets_sys.h"
+
+#define USB_SERIAL_JTAG_PACKET_SZ_BYTES 64
 
 static tsrb_t serial_tx_rb;
 static uint8_t serial_tx_rb_buf[USB_SERIAL_JTAG_PACKET_SZ_BYTES];
@@ -73,11 +71,11 @@ static void _serial_intr_handler(void *arg)
             }
             USB_SERIAL_JTAG.ep1.rdwr_byte = c;
         }
-        usb_serial_jtag_ll_txfifo_flush();
     }
 
     /* clear all interrupt flags */
-    usb_serial_jtag_ll_clr_intsts_mask(mask);
+    usb_serial_jtag_ll_clr_intsts_mask(USB_SERIAL_JTAG_LL_INTR_MASK);
+    usb_serial_jtag_ll_txfifo_flush();
 
     irq_isr_exit();
 }
@@ -98,18 +96,18 @@ static void _init(void)
     intr_matrix_set(PRO_CPU_NUM, ETS_USB_SERIAL_JTAG_INTR_SOURCE, CPU_INUM_SERIAL_JTAG);
 
     /* enable the CPU interrupt */
-    intr_cntrl_ll_set_int_handler(CPU_INUM_SERIAL_JTAG, _serial_intr_handler, NULL);
-    intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_SERIAL_JTAG));
+    esp_cpu_intr_set_handler(CPU_INUM_SERIAL_JTAG, _serial_intr_handler, NULL);
+    esp_cpu_intr_enable(BIT(CPU_INUM_SERIAL_JTAG));
 
 #ifdef SOC_CPU_HAS_FLEXIBLE_INTC
     /* set interrupt level */
-    intr_cntrl_ll_set_int_level(CPU_INUM_SERIAL_JTAG, 1);
+    esp_cpu_intr_set_priority(CPU_INUM_SERIAL_JTAG, 1);
 #endif
 }
 
 static void _detach(void)
 {
-    intr_cntrl_ll_disable_interrupts(BIT(CPU_INUM_SERIAL_JTAG));
+    esp_cpu_intr_disable(BIT(CPU_INUM_SERIAL_JTAG));
 }
 
 STDIO_PROVIDER(STDIO_ESP32_SERIAL_JTAG, _init, _detach, _write)

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_cc110x
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef CC110X_CALIBRATION_H
-#define CC110X_CALIBRATION_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,5 +43,4 @@ int cc110x_recalibrate(cc110x_t *dev);
 }
 #endif
 
-#endif /* CC110X_CALIBRATION_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ir_nec
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Dario Petrillo <dario.pk1@gmail.com>
  */
-
-#ifndef IR_NEC_CONSTANTS_H
-#define IR_NEC_CONSTANTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,5 +31,4 @@ extern "C" {
 }
 #endif
 
-#endif /* IR_NEC_CONSTANTS_H */
 /** @} */

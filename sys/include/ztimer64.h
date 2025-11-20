@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_ztimer
  * @defgroup    sys_ztimer64 ztimer 64bit version
@@ -60,9 +62,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef ZTIMER64_H
-#define ZTIMER64_H
 
 #include <stdint.h>
 
@@ -531,5 +530,4 @@ int64_t ztimer64_overhead(ztimer64_clock_t *clock, uint64_t base);
 }
 #endif
 
-#endif /* ZTIMER64_H */
 /** @} */

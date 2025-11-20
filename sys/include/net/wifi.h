@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_wifi Wi-Fi
  * @ingroup     net
@@ -17,9 +19,6 @@
  *
  * @author      Fabian Hüßler <fabian.huessler@ml-pa.com>
  */
-
-#ifndef NET_WIFI_H
-#define NET_WIFI_H
 
 #include <inttypes.h>
 
@@ -163,5 +162,4 @@ typedef struct wifi_security_wpa_enterprise {
 }
 #endif
 
-#endif /* NET_WIFI_H */
 /** @} */

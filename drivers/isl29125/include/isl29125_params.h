@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_isl29125
  *
@@ -17,9 +19,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
-
-#ifndef ISL29125_PARAMS_H
-#define ISL29125_PARAMS_H
 
 #include "board.h"
 #include "isl29125.h"
@@ -69,5 +68,4 @@ static const isl29125_params_t isl29125_params[] =
 }
 #endif
 
-#endif /* ISL29125_PARAMS_H */
 /** @} */

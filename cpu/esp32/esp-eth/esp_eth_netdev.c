@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -24,6 +21,7 @@
 #include <string.h>
 #include <assert.h>
 #include <errno.h>
+#include <stdarg.h>
 
 #include "net/gnrc/netif/ethernet.h"
 #include "net/gnrc.h"
@@ -32,7 +30,6 @@
 
 #include "od.h"
 #include "timex.h"
-#include "ztimer.h"
 
 #include "esp_common.h"
 #include "esp_attr.h"
@@ -44,7 +41,9 @@
 #include "esp_eth.h"
 #include "esp_eth_phy.h"
 #include "esp_eth_mac.h"
+#include "esp_eth_mac_esp.h"
 #include "esp_event.h"
+#include "esp_event_legacy.h"
 
 #include "board.h"
 
@@ -73,6 +72,10 @@
 #define esp_eth_phy_new_xxxxx(cfg)  esp_eth_phy_new_ksz8081(cfg)
 #elif defined(EMAC_PHY_RTL8201)
 #define esp_eth_phy_new_xxxxx(cfg)  esp_eth_phy_new_rtl8201(cfg)
+#elif defined(EMAC_PHY_GENERIC)
+#define esp_eth_phy_new_xxxxx(cfg)  esp_eth_phy_new_generic(cfg)
+#else
+#error "Physiscal layer transceiver not defined"
 #endif
 
 /* for source code compatibility of board definitions from ESP-IDF 3.1 */
@@ -164,31 +167,36 @@ static int _esp_eth_init(netdev_t *netdev)
     phy_config.phy_addr = EMAC_PHY_ADDRESS;
     phy_config.reset_gpio_num = EMAC_PHY_POWER_PIN;
 
-    /* set MAC configuration */
+    /* set EMAC configuration */
     eth_mac_config_t mac_config = ETH_MAC_DEFAULT_CONFIG();
 
     mac_config.sw_reset_timeout_ms = 500;
-    mac_config.smi_mdc_gpio_num = EMAC_PHY_SMI_MDC_PIN;
-    mac_config.smi_mdio_gpio_num = EMAC_PHY_SMI_MDIO_PIN;
+    mac_config.rx_task_prio = 20;
+
+    /* set EMAC configuration */
+    eth_esp32_emac_config_t emac_config = ETH_ESP32_EMAC_DEFAULT_CONFIG();
+
+    emac_config.smi_gpio.mdc_num = EMAC_PHY_SMI_MDC_PIN;
+    emac_config.smi_gpio.mdio_num = EMAC_PHY_SMI_MDIO_PIN;
 
     if (EMAC_PHY_CLOCK_MODE == ETH_CLOCK_GPIO0_IN) {
-        mac_config.clock_config.rmii.clock_mode = EMAC_CLK_EXT_IN;
-        mac_config.clock_config.rmii.clock_gpio = EMAC_CLK_IN_GPIO;
+        emac_config.clock_config.rmii.clock_mode = EMAC_CLK_EXT_IN;
+        emac_config.clock_config.rmii.clock_gpio = EMAC_CLK_IN_GPIO;
     }
     else if (EMAC_PHY_CLOCK_MODE == ETH_CLOCK_GPIO0_OUT) {
-        mac_config.clock_config.rmii.clock_mode = EMAC_CLK_OUT;
-        mac_config.clock_config.rmii.clock_gpio = EMAC_APPL_CLK_OUT_GPIO;
+        emac_config.clock_config.rmii.clock_mode = EMAC_CLK_OUT;
+        emac_config.clock_config.rmii.clock_gpio = EMAC_APPL_CLK_OUT_GPIO;
     }
     else if (EMAC_PHY_CLOCK_MODE == ETH_CLOCK_GPIO16_OUT) {
-        mac_config.clock_config.rmii.clock_mode = EMAC_CLK_OUT;
-        mac_config.clock_config.rmii.clock_gpio = EMAC_CLK_OUT_GPIO;
+        emac_config.clock_config.rmii.clock_mode = EMAC_CLK_OUT;
+        emac_config.clock_config.rmii.clock_gpio = EMAC_CLK_OUT_GPIO;
     }
     else if (EMAC_PHY_CLOCK_MODE == ETH_CLOCK_GPIO17_OUT) {
-        mac_config.clock_config.rmii.clock_mode = EMAC_CLK_OUT;
-        mac_config.clock_config.rmii.clock_gpio = EMAC_CLK_OUT_180_GPIO;
+        emac_config.clock_config.rmii.clock_mode = EMAC_CLK_OUT;
+        emac_config.clock_config.rmii.clock_gpio = EMAC_CLK_OUT_180_GPIO;
     }
 
-    esp_eth_mac_t *mac = esp_eth_mac_new_esp32(&mac_config);
+    esp_eth_mac_t *mac = esp_eth_mac_new_esp32(&emac_config, &mac_config);
     esp_eth_phy_t *phy = esp_eth_phy_new_xxxxx(&phy_config);
 
     /* generate Ethernet driver configuration */
@@ -256,7 +264,7 @@ static int _esp_eth_send(netdev_t *netdev, const iolist_t *iolist)
 
     int ret = 0;
 
-    /* send the the packet to the peer(s) mac address */
+    /* send the packet to the peer(s) mac address */
     if (esp_eth_transmit(dev->eth_driver, dev->tx_buf, dev->tx_len) == ESP_OK) {
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     }
@@ -301,7 +309,7 @@ static int _esp_eth_recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         printf ("%s: received %d byte\n", __func__, dev->rx_len);
-        if (IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_OD)) {
+        if (IS_ACTIVE(ENABLE_DEBUG_HEXDUMP) && IS_USED(MODULE_OD)) {
             od_hex_dump(dev->rx_buf, dev->rx_len, OD_WIDTH_DEFAULT);
         }
     }

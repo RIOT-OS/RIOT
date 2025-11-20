@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_sgp30
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
-
-#ifndef SGP30_CONSTANTS_H
-#define SGP30_CONSTANTS_H
 
 #include "timex.h"
 
@@ -54,5 +53,4 @@ extern "C" {
 }
 #endif
 
-#endif /* SGP30_CONSTANTS_H */
 /** @} */

@@ -1,13 +1,9 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#ifndef SYS_TIME_H
-#define SYS_TIME_H
+#pragma once
 
 #include <sys/types.h>
 #include <time.h>
@@ -28,5 +24,3 @@ struct timeval {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SYS_TIME_H */

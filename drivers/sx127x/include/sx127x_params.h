@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_sx127x
  * @{
@@ -16,9 +18,6 @@
  * @author      José Ignacio Alamos <jose.alamos@inria.cl>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef SX127X_PARAMS_H
-#define SX127X_PARAMS_H
 
 #include "board.h"
 #include "sx127x.h"
@@ -109,5 +108,4 @@ static const sx127x_params_t sx127x_params[] =
 }
 #endif
 
-#endif /* SX127X_PARAMS_H */
 /** @} */

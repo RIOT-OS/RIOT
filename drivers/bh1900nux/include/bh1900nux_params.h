@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_bh1900nux
  *
@@ -15,9 +17,6 @@
  *
  * @author      Wouter Symons <wsymons@nalys-group.com>
  */
-
-#ifndef BH1900NUX_PARAMS_H
-#define BH1900NUX_PARAMS_H
 
 #include "board.h"
 #include "bh1900nux.h"
@@ -55,5 +54,4 @@ static const bh1900nux_params_t bh1900nux_params[] =
 }
 #endif
 
-#endif /* BH1900NUX_PARAMS_H */
 /** @} */

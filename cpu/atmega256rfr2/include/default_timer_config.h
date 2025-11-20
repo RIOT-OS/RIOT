@@ -1,10 +1,9 @@
 /*
- * Copyright (C) Josua Arndt, Steffen Robertz 2017 RWTH Aachen
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Josua Arndt, Steffen Robertz, RWTH Aachen
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_atmega256rfr2
@@ -16,9 +15,6 @@
  * @author          Josua Arndt <jarndt@ias.rwth-aachen.de>
  * @author          Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
-
-#ifndef DEFAULT_TIMER_CONFIG_H
-#define DEFAULT_TIMER_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,5 +50,4 @@ extern "C" {
 }
 #endif
 
-#endif /* DEFAULT_TIMER_CONFIG_H */
 /** @} */

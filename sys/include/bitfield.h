@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_bitfield Bitfields
  * @ingroup     sys
@@ -25,9 +27,6 @@
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
-
-#ifndef BITFIELD_H
-#define BITFIELD_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -395,4 +394,3 @@ unsigned bf_popcnt(const uint8_t field[], size_t size);
 #endif
 
 /** @} */
-#endif /* BITFIELD_H */

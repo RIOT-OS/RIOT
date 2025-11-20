@@ -67,7 +67,7 @@
  *    obj_list[1] = lwm2m_client_get_server_object(&client_data, CONFIG_LWM2M_SERVER_SHORT_ID);
  *
  *    // device object has a single instance. All the information for now is defined at compile-time
- *    obj_list[2] = lwm2m_object_device_get();
+ *    obj_list[2] = lwm2m_object_device_init(&client_data);
  *
  *    // run the LwM2M client
  *    lwm2m_client_run(&client_data, obj_list, ARRAY_SIZE(obj_list);

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  posix_sockets
  * @{
@@ -20,8 +22,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef ARPA_INET_H
-#define ARPA_INET_H
 
 #include "net/af.h"
 #include "sys/bytes.h"
@@ -85,4 +85,3 @@ int inet_pton(int af, const char *src, void *dst);
 /**
  * @}
  */
-#endif /* ARPA_INET_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_dac_dds DAC Direct Digital Synthesis
  * @ingroup     drivers_periph_dac
@@ -35,9 +37,6 @@
  *
  * @author      Benjamin Valentin <benpicco@beuth-hochschule.de>
  */
-
-#ifndef DAC_DDS_H
-#define DAC_DDS_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -160,5 +159,4 @@ void dac_dds_stop(dac_dds_t dac);
 }
 #endif
 
-#endif /* DAC_DDS_H */
 /** @} */

@@ -1,10 +1,9 @@
 /*
- * Copyright (C)  2018 Federico Pellegrin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Federico Pellegrin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_saml21-xpro
@@ -13,9 +12,6 @@
  * @author      Federico Pellegrin <fede@evolware.org>
  * @{
  */
-
-#ifndef ARDUINO_IOMAP_H
-#define ARDUINO_IOMAP_H
 
 #include "board.h"
 #include "periph/adc.h"
@@ -58,5 +54,4 @@ extern "C" {
 }
 #endif
 
-#endif /* ARDUINO_IOMAP_H */
 /** @} */

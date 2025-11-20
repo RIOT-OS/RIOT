@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /*
  * bloom.c
  *
@@ -120,9 +122,6 @@
  * @author Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
 
-#ifndef BLOOM_H
-#define BLOOM_H
-
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -169,8 +168,6 @@ void bloom_init(bloom_t *bloom, size_t size, uint8_t *bitfield, hashfp_t *hashes
  * @brief Delete a Bloom filter.
  *
  * @param bloom The condemned
- * @return nothing
- *
  */
 void bloom_del(bloom_t *bloom);
 
@@ -183,8 +180,6 @@ void bloom_del(bloom_t *bloom);
  * @param bloom  Bloom filter
  * @param buf    string to add
  * @param len    the length of the string @p buf
- * @return       nothing
- *
  */
 void bloom_add(bloom_t *bloom, const uint8_t *buf, size_t len);
 
@@ -233,4 +228,3 @@ bool bloom_check(bloom_t *bloom, const uint8_t *buf, size_t len);
 #endif
 
 /** @} */
-#endif /* BLOOM_H */

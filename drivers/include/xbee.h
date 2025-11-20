@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_xbee XBee driver
  * @ingroup     drivers_netdev
@@ -19,9 +21,6 @@
  * @author      Kévin Roussel <kevin.roussel@inria.fr>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef XBEE_H
-#define XBEE_H
 
 #include <stdint.h>
 
@@ -178,10 +177,6 @@ extern const netdev_driver_t xbee_driver;
  *
  * @param[out] dev          Xbee device to initialize
  * @param[in]  params       parameters for device initialization
- *
- * @return                  0 on success
- * @return                  -ENODEV on invalid device descriptor
- * @return                  -ENXIO on invalid UART or GPIO pins
  */
 void xbee_setup(xbee_t *dev, const xbee_params_t *params);
 
@@ -218,5 +213,4 @@ int xbee_parse_hdr(xbee_t *dev, const uint8_t *xhdr, xbee_l2hdr_t *l2hdr);
 }
 #endif
 
-#endif /* XBEE_H */
 /** @} */

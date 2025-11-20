@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      Nils Ollrogge <nils-ollrogge@outlook.de>
  */
-#ifndef TESTS_CRYPTO_H
-#define TESTS_CRYPTO_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -46,5 +46,4 @@ Test *tests_crypto_modes_ccm_tests_256(void);
 }
 #endif
 
-#endif /* TESTS_CRYPTO_H */
 /** @} */

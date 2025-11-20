@@ -1,24 +1,26 @@
 /*
- * Copyright (C) 2013 - 2016 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * SPDX-FileCopyrightText: 2013-2016 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+#pragma once
+
+/**
+ * @defgroup cpu_native  Native CPU
+ * @ingroup  cpu
+ * @brief    CPU implementation for running RIOT on a Linux and BSD
+ * @author   Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * The native CPU uses system calls to simulate hardware access.
+ *
+ * @{
  */
 
 /**
- * @ingroup cpu
- * @defgroup    cpu_native  Native
- * @brief       Native CPU specific code
- * @details     The native CPU uses system calls to simulate hardware access.
- * @ingroup     cpu
- * @brief       CPU abstraction for the native port
- * @{
- * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @file
+ * @brief Native CPU header
+ * @author Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
-
-#ifndef CPU_H
-#define CPU_H
 
 #include <stdint.h>
 #include <stdio.h>
@@ -28,6 +30,11 @@
 extern "C" {
 #endif
 
+/* MARK: - Basics */
+/**
+ * @name
+ * @{
+ */
 /**
  * @brief   The CPU supports unaligned memory access.
  *          Even if the underlying architecture does not support it, the kernel will take care of it.
@@ -44,10 +51,10 @@ __attribute__((always_inline)) static inline uintptr_t cpu_get_caller_pc(void)
      * it is the return address of the user of this function */
     return (uintptr_t)__builtin_return_address(0);
 }
+/** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
 /** @} */
-#endif /* CPU_H */

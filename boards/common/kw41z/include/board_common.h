@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2017 Eistec AB
- *               2019 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2017 Eistec AB
+ * SPDX-FileCopyrightText: 2019 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup    boards_common_kw41z KW41Z common
@@ -20,9 +19,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
-
 #include "cpu.h"
 #include "periph_conf.h"
 
@@ -35,5 +31,4 @@ extern "C"
 }
 #endif
 
-#endif /* BOARD_COMMON_H */
 /** @} */

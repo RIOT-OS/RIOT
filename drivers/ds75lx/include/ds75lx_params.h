@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ds75lx
  *
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef DS75LX_PARAMS_H
-#define DS75LX_PARAMS_H
 
 #include "board.h"
 #include "ds75lx.h"
@@ -72,5 +71,4 @@ static const saul_reg_info_t ds75lx_saul_info[] =
 }
 #endif
 
-#endif /* DS75LX_PARAMS_H */
 /** @} */

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_lpsxxx
  * @{
@@ -17,9 +19,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef LPSXXX_INTERNAL_H
-#define LPSXXX_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -224,5 +223,4 @@ extern "C" {
 }
 #endif
 
-#endif /* LPSXXX_INTERNAL_H */
 /** @} */

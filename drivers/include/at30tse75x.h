@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_at30tse75x AT30TSE75x temperature sensor with EEPROM
  * @ingroup     drivers_sensors
@@ -21,9 +23,6 @@
  *
  * @author      Daniel Krebs <github@daniel-krebs.net>
  */
-
-#ifndef AT30TSE75X_H
-#define AT30TSE75X_H
 
 #include <stdint.h>
 #include "periph/i2c.h"
@@ -300,5 +299,4 @@ int at30tse75x_get_temperature(const at30tse75x_t* dev, float* temperature);
 }
 #endif
 
-#endif /* AT30TSE75X_H */
 /** @} */

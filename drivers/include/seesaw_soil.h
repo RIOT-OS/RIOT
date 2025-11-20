@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_seesaw_soil Adafruit Seesaw Soil Moisture and Temperature Sensor
  * @ingroup     drivers_sensors
@@ -22,9 +24,6 @@
  *
  * @author      Viktor Gal <viktor.gal@maeth.com>
  */
-
-#ifndef SEESAW_SOIL_H
-#define SEESAW_SOIL_H
 
 #include <stdint.h>
 
@@ -115,5 +114,4 @@ int seesaw_soil_moisture(const seesaw_soil_t *dev, uint16_t *moist);
 }
 #endif
 
-#endif /* SEESAW_SOIL_H */
 /** @} */

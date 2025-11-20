@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2022 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2022 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_esp32
@@ -18,9 +17,6 @@
  * This file is a wrapper for sys/features.h to revert default definitions that
  * lead to compilation problems with newer GCC/newlib versions, see below.
  */
-
-#ifndef SYS_FEATURES_H
-#define SYS_FEATURES_H
 
 #ifndef DOXYGEN
 
@@ -41,10 +37,16 @@ extern "C" {
  */
 #undef _POSIX_THREADS
 
+/*
+ * To avoid type conflicts between the `pthread_rwlockattr_t` definition
+ * in RIOT's `pthread` implementation and newlibc's `sys/_pthreadtypes.h`,
+ * the macro `_POSIX_READER_WRITER_LOCKS` must be undefined.
+ */
+#undef _POSIX_READER_WRITER_LOCKS
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* DOXYGEN */
-#endif /* SYS_FEATURES_H */
 /** @} */

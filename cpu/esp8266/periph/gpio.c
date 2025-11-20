@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2019 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -237,7 +234,7 @@ void gpio_irq_disable (gpio_t pin)
 }
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
-int gpio_read (gpio_t pin)
+bool gpio_read (gpio_t pin)
 {
     CHECK_PARAM_RET(pin < GPIO_PIN_NUMOF, -1);
 
@@ -249,7 +246,7 @@ int gpio_read (gpio_t pin)
     return (GPIO.IN & BIT(pin)) ? 1 : 0;
 }
 
-void gpio_write (gpio_t pin, int value)
+void gpio_write (gpio_t pin, bool value)
 {
     DEBUG("%s: %d %d\n", __func__, pin, value);
 

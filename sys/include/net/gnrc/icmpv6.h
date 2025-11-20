@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_icmpv6  ICMPv6
  * @ingroup     net_gnrc_ipv6
@@ -23,9 +25,6 @@
  *
  * @todo build error messages
  */
-
-#ifndef NET_GNRC_ICMPV6_H
-#define NET_GNRC_ICMPV6_H
 
 #include "net/icmpv6.h"
 #include "net/gnrc/netif.h"
@@ -79,7 +78,6 @@ int gnrc_icmpv6_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr);
 }
 #endif
 
-#endif /* NET_GNRC_ICMPV6_H */
 /**
  * @}
  */

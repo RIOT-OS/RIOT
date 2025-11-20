@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2014 Loci Controls Inc.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014 Loci Controls Inc.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -121,6 +118,9 @@ static inline void _irq_enable(tim_t tim)
             case 3:
                 irqn = GPTIMER_3A_IRQn;
                 break;
+            default:
+                assume(0);
+                return;
         }
         NVIC_SetPriority(irqn, TIMER_IRQ_PRIO);
         NVIC_EnableIRQ(irqn);

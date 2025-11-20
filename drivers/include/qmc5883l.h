@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_qmc5883l QMC5883L 3-Axis Digital Magnetic Sensor
  * @ingroup     drivers_sensors
@@ -51,9 +53,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef QMC5883L_H
-#define QMC5883L_H
 
 #ifdef __cplusplus
 extern "C"
@@ -303,5 +302,4 @@ int qmc5883l_irq_disable(const qmc5883l_t *dev);
 }
 #endif
 
-#endif /* QMC5883L_H */
 /** @} */

@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2020 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "adafruit-feather-nrf52840-express" if BOARD_ADAFRUIT_FEATHER_NRF52840_EXPRESS
+
+config BOARD_ADAFRUIT_FEATHER_NRF52840_EXPRESS
+    bool
+    default y
+    select BOARD_COMMON_NRF52
+    select CPU_MODEL_NRF52840XXAA
+
+source "$(RIOTBOARD)/common/nrf52/Kconfig"

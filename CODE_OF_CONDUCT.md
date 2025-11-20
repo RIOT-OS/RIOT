@@ -15,14 +15,14 @@ We rather would like you to think of it as a guide to enrich our community and
 the technical community in general with new knowledge and perspectives by
 allowing everyone to participate.
 
-This code of conduct applies to all spaces managed by the RIOT community. This
+This Code of Conduct applies to all spaces managed by the RIOT community. This
 includes any communication within the RIOT community, both online and face to
 face. In addition, violations of this code outside these spaces may also
 affect a person's ability to participate within them.
 
-If you believe someone is violating the code of conduct, we ask that you report
+If you believe someone is violating the Code of Conduct, we ask that you report
 it by emailing <conduct@riot-os.org>. For more details please see our [Reporting
-Guidelines](https://github.com/RIOT-OS/RIOT/wiki/CoC:-Reporting-Guidelines).
+Guidelines][reporting-guidelines].
 
 -   **Be friendly and patient.**
 -   **Be welcoming.** We strive to be a community that welcomes and supports
@@ -39,7 +39,7 @@ Guidelines](https://github.com/RIOT-OS/RIOT/wiki/CoC:-Reporting-Guidelines).
 -   **Be respectful.** Not all of us will agree all the time, but disagreement
     is no excuse for poor behavior and poor manners. We might all experience
     some frustration now and then, but we cannot allow that frustration to turn
-    into a personal attack. It’s important to remember that a community where
+    into a personal attack. It's important to remember that a community where
     people feel uncomfortable or threatened is not a productive one. Members of
     the RIOT community should be respectful when dealing with other members as
     well as with people outside the RIOT community.
@@ -61,18 +61,23 @@ Guidelines](https://github.com/RIOT-OS/RIOT/wiki/CoC:-Reporting-Guidelines).
 -   **When we disagree, try to understand why.** Disagreements, both social and
     technical, happen all the time and RIOT is no exception. It is important
     that we resolve disagreements and differing views constructively. Remember
-    that we’re different. The strength of RIOT comes from its varied community,
+    that we're different. The strength of RIOT comes from its varied community,
     people from a wide range of backgrounds. Different people have different
     perspectives on issues. Being unable to understand why someone holds a
-    viewpoint doesn’t mean that they’re wrong. Don’t forget that it is human to
-    err and blaming each other doesn’t get us anywhere. Instead, focus on
+    viewpoint doesn't mean that they're wrong. Don't forget that it is human to
+    err and blaming each other doesn't get us anywhere. Instead, focus on
     helping to resolve issues and learning from mistakes.
 
 Text based on the Code of Conduct of the [Django
-community](https://www.djangoproject.com/conduct/).
+community][django-community].
 
 Questions?
 ----------
 
-If you have questions, please see [the FAQ](https://github.com/RIOT-OS/RIOT/wiki/CoC:-FAQ).
-If that doesn't answer your questions, feel free to [contact us](mailto:conduct@riot-os.org).
+If you have questions, please see [the FAQ][faq].
+If that doesn't answer your questions, feel free to [contact us][contact-us].
+
+[reporting-guidelines]: https://guide.riot-os.org/general/code_of_conduct/reporting/
+[django-community]: https://www.djangoproject.com/conduct/
+[faq]: https://guide.riot-os.org/general/code_of_conduct/faq/
+[contact-us]: mailto:conduct@riot-os.org

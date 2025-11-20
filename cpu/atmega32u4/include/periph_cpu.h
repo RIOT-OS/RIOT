@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2017 Thomas Perrot <thomas.perrot@tupi.fr>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Thomas Perrot <thomas.perrot@tupi.fr>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_atmega32u4
@@ -16,9 +15,6 @@
  * @author          Thomas Perrot <thomas.perrot@tupi.fr>
  *
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include "periph_cpu_common.h"
 
@@ -97,5 +93,4 @@ static inline bool atmega_has_pin_exti(uint8_t port_num, uint8_t pin_num)
 #include "periph_conf.h"
 #include "default_timer_config.h"
 
-#endif /* PERIPH_CPU_H */
 /** @} */

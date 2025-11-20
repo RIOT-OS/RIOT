@@ -12,8 +12,6 @@
 #include "senml.h"
 #include "senml/phydat.h"
 
-
-
 static uint8_t phydat_unit_to_senml_unit(uint8_t unit)
 {
     switch (unit) {

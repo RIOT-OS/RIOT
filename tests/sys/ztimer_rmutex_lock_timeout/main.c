@@ -34,42 +34,10 @@
 /* timeout set to 1us */
 #define SHORT_RMUTEX_TIMEOUT (1)
 
-/**
- * Forward declarations
- */
-static int cmd_test_ztimer_rmutex_lock_timeout_long_unlocked(int argc,
-                                                             char **argv);
-static int cmd_test_ztimer_rmutex_lock_timeout_long_locked(int argc,
-                                                           char **argv);
-static int cmd_test_ztimer_rmutex_lock_timeout_low_prio_thread(
-    int argc, char **argv);
-
-static int cmd_test_ztimer_rmutex_lock_timeout_short_unlocked(int argc,
-                                                              char **argv);
-static int cmd_test_ztimer_rmutex_lock_timeout_short_locked(int argc,
-                                                            char **argv);
-
 #define error_wrong_variables "Error: rmutex wrong variables in struct"
 #define error_rmutex_taken "Error: rmutex taken"
 #define error_timeout "Error: rmutex timed out"
 #define shell_help_output "See main.c"
-
-/**
- * @brief   List of command for this application.
- */
-static const shell_command_t shell_commands[] = {
-    { "t1", shell_help_output,
-      cmd_test_ztimer_rmutex_lock_timeout_long_unlocked, },
-    { "t2", shell_help_output,
-      cmd_test_ztimer_rmutex_lock_timeout_long_locked, },
-    { "t3", shell_help_output,
-      cmd_test_ztimer_rmutex_lock_timeout_low_prio_thread, },
-    { "t4", shell_help_output,
-      cmd_test_ztimer_rmutex_lock_timeout_short_unlocked, },
-    { "t5", shell_help_output,
-      cmd_test_ztimer_rmutex_lock_timeout_short_locked, },
-    { NULL, NULL, NULL }
-};
 
 /* main Thread PID */
 static kernel_pid_t main_thread_pid;
@@ -168,6 +136,8 @@ static int cmd_test_ztimer_rmutex_lock_timeout_long_unlocked(int argc,
     return 0;
 }
 
+SHELL_COMMAND(t1, shell_help_output, cmd_test_ztimer_rmutex_lock_timeout_long_unlocked);
+
 /**
  * @brief   shell command to test ztimer_rmutex_lock_timeout
  *
@@ -217,6 +187,8 @@ static int cmd_test_ztimer_rmutex_lock_timeout_long_locked(int argc,
 
     return 0;
 }
+
+SHELL_COMMAND(t2, shell_help_output, cmd_test_ztimer_rmutex_lock_timeout_long_locked);
 
 /**
  * @brief   shell command to test ztimer_rmutex_lock_timeout
@@ -277,6 +249,8 @@ static int cmd_test_ztimer_rmutex_lock_timeout_low_prio_thread(
     return 0;
 }
 
+SHELL_COMMAND(t3, shell_help_output, cmd_test_ztimer_rmutex_lock_timeout_low_prio_thread);
+
 /**
  * @brief   shell command to test ztimer_rmutex_lock_timeout when spinning
  *
@@ -324,6 +298,8 @@ static int cmd_test_ztimer_rmutex_lock_timeout_short_locked(int argc,
     return 0;
 }
 
+SHELL_COMMAND(t5, shell_help_output, cmd_test_ztimer_rmutex_lock_timeout_short_locked);
+
 /**
  * @brief   shell command to test ztimer_rmutex_lock_timeout when spinning
  *
@@ -364,6 +340,8 @@ static int cmd_test_ztimer_rmutex_lock_timeout_short_unlocked(int argc,
     return 0;
 }
 
+SHELL_COMMAND(t4, shell_help_output, cmd_test_ztimer_rmutex_lock_timeout_short_unlocked);
+
 /**
  * @brief   main function starting shell
  *
@@ -372,7 +350,7 @@ static int cmd_test_ztimer_rmutex_lock_timeout_short_unlocked(int argc,
 int main(void)
 {
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

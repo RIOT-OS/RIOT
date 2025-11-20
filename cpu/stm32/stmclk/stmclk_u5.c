@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -20,7 +17,6 @@
 #include "cpu.h"
 #include "stmclk.h"
 #include "periph_conf.h"
-
 
 #define RCC_CFGR1_SW_MSI            (0x00000000U)
 #define RCC_CFGR1_SW_HSI            (RCC_CFGR1_SW_0)

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2020 Koen Zandberg <koen@bergzand.net>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Koen Zandberg <koen@bergzand.net>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -170,7 +167,7 @@ void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, bool irq)
 }
 
 void dma_prepare(dma_t dma, uint8_t width, const void *src, void *dst,
-                 size_t num, uint8_t incr)
+                 size_t num, dma_incr_t incr)
 {
     DEBUG("[DMA]: Prepare %u, num: %u\n", dma, (unsigned)num);
     DmacDescriptor *descr = &descriptors[dma];

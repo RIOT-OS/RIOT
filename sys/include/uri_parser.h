@@ -5,6 +5,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /**
  * @defgroup    sys_uri_parser A minimal, non-destructive URI parser
  * @ingroup     sys
@@ -23,9 +26,6 @@
  * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  *
  */
-
-#ifndef URI_PARSER_H
-#define URI_PARSER_H
 
 #include <string.h>
 #include <stdint.h>
@@ -178,5 +178,4 @@ int uri_parser_split_query(const uri_parser_result_t *uri_parsed,
 }
 #endif
 
-#endif /* URI_PARSER_H */
 /** @} */

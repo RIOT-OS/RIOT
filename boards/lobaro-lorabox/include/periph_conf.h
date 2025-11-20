@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2014-2016 Freie Universität Berlin
- *               2018 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014-2016 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2018 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_lobaro_lorabox
@@ -20,9 +19,6 @@
  * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 /*
  * This board provides an LSE, so enable it before including the default clock config
@@ -143,5 +139,4 @@ static const i2c_conf_t i2c_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

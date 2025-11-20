@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_ptrtag          Helpers for pointer tagging
  * @ingroup     sys
@@ -57,9 +59,6 @@
  * @brief       Pointer Tagging Helpers
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef PTRTAG_H
-#define PTRTAG_H
 
 #include <assert.h>
 #include <inttypes.h>
@@ -122,5 +121,4 @@ static inline uint8_t ptrtag_tag(void *tagged_ptr)
 }
 #endif
 
-#endif /* PTRTAG_H */
 /** @} */

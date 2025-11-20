@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,7 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-#ifndef TESTS_CLIF_H
-#define TESTS_CLIF_H
+
 #include "embUnit/embUnit.h"
 
 #ifdef __cplusplus
@@ -39,5 +40,4 @@ Test *tests_clif_tests(void);
 }
 #endif
 
-#endif /* TESTS_CLIF_H */
 /** @} */

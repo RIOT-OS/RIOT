@@ -62,6 +62,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     uint8_t *buf = cdcecm->data_in;
     const iolist_t *iolist_start = iolist;
     size_t len = iolist_size(iolist);
+    size_t res = len;
     /* interface with alternative function ID 1 is the interface containing the
      * data endpoints, no sense trying to transmit data if it is not active */
     if (cdcecm->active_iface != 1) {
@@ -124,7 +125,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         cdcecm->tx_len = 0;
         _signal_tx_xmit(cdcecm);
     }
-    return len;
+    return res;
 }
 
 static int _recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
@@ -204,6 +205,14 @@ static void _isr(netdev_t *dev)
     }
 }
 
+static int _confirm_send(netdev_t *netdev, void *info)
+{
+    (void)netdev;
+    (void)info;
+
+    return -EOPNOTSUPP;
+}
+
 static const netdev_driver_t netdev_driver_cdcecm = {
     .send = _send,
     .recv = _recv,
@@ -211,4 +220,5 @@ static const netdev_driver_t netdev_driver_cdcecm = {
     .isr = _isr,
     .get = _get,
     .set = _set,
+    .confirm_send = _confirm_send,
 };

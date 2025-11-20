@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup    sys_can_dll
  * @{
@@ -16,9 +18,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
-
-#ifndef CAN_PKT_H
-#define CAN_PKT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,7 +41,7 @@ typedef struct {
     can_reg_entry_t entry;   /**< entry containing ifnum and upper layer info */
     atomic_uint ref_count;   /**< Reference counter (for rx frames) */
     int handle;              /**< handle (for tx frames */
-    struct can_frame frame;  /**< CAN Frame */
+    can_frame_t frame;  /**< CAN Frame */
 } can_pkt_t;
 
 /**
@@ -64,7 +63,7 @@ void can_pkt_init(void);
  *
  * @return an allocated CAN packet, NULL if an error occurred
  */
-can_pkt_t *can_pkt_alloc_tx(int ifnum, const struct can_frame *frame, kernel_pid_t tx_pid);
+can_pkt_t *can_pkt_alloc_tx(int ifnum, const can_frame_t *frame, kernel_pid_t tx_pid);
 
 /**
  * @brief Allocate an incoming CAN packet
@@ -74,7 +73,7 @@ can_pkt_t *can_pkt_alloc_tx(int ifnum, const struct can_frame *frame, kernel_pid
  *
  * @return an allocated CAN packet, NULL if an error occurred
  */
-can_pkt_t *can_pkt_alloc_rx(int ifnum, const struct can_frame *frame);
+can_pkt_t *can_pkt_alloc_rx(int ifnum, const can_frame_t *frame);
 
 #if defined(MODULE_CAN_MBOX) || defined(DOXYGEN)
 /**
@@ -89,7 +88,7 @@ can_pkt_t *can_pkt_alloc_rx(int ifnum, const struct can_frame *frame);
  *
  * @return an allocated CAN packet, NULL if an error occurred
  */
-can_pkt_t *can_pkt_alloc_mbox_tx(int ifnum, const struct can_frame *frame, mbox_t *mbox);
+can_pkt_t *can_pkt_alloc_mbox_tx(int ifnum, const can_frame_t *frame, mbox_t *mbox);
 #endif
 
 /**
@@ -143,5 +142,4 @@ void can_pkt_buf_free(void *data, size_t size);
 }
 #endif
 
-#endif /* CAN_PKT_H */
 /** @} */

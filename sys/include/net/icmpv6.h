@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_icmpv6  ICMPV6
  * @ingroup     net_ipv6
@@ -20,8 +22,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_ICMPV6_H
-#define NET_ICMPV6_H
 
 #include <stdint.h>
 
@@ -231,5 +231,4 @@ void icmpv6_hdr_print(icmpv6_hdr_t *hdr);
 }
 #endif
 
-#endif /* NET_ICMPV6_H */
 /** @} */

@@ -1,0 +1,12 @@
+^[0-9a-f]\+ SQUASH
+^[0-9a-f]\+ FIX
+^[0-9a-f]\+ REMOVE *ME
+^[0-9a-f]\+ Update
+^[0-9a-f]\+ \<DONOTMERGE\>
+^[0-9a-f]\+ \<DO NOT MERGE\>
+^[0-9a-f]\+ \<DON'T MERGE\>
+^[0-9a-f]\+ \<NO MERGE\>
+^[0-9a-f]\+ \<DELETE ME\>
+^[0-9a-f]\+ \<DELETEME\>
+^[0-9a-f]\+ \<WIP\>
+^[0-9a-f]\+ \<TEMP\>

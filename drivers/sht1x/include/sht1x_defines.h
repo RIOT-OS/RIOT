@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_sht1x
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef SHT1X_DEFINES_H
-#define SHT1X_DEFINES_H
 
 #include <stdint.h>
 #include <periph/gpio.h>
@@ -68,5 +67,4 @@ extern "C" {
 }
 #endif
 
-#endif /* SHT1X_DEFINES_H */
 /** @} */

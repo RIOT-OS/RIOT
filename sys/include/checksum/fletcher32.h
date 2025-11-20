@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_checksum_fletcher32 Fletcher32
  * @ingroup     sys_checksum
@@ -17,9 +19,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef CHECKSUM_FLETCHER32_H
-#define CHECKSUM_FLETCHER32_H
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -85,7 +84,5 @@ uint32_t fletcher32_finish(fletcher32_ctx_t *ctx);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* CHECKSUM_FLETCHER32_H */
 
 /** @} */

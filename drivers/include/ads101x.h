@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup   drivers_ads101x ADS101x/111x ADC device driver
  * @ingroup    drivers_sensors
@@ -27,9 +29,6 @@
  * @author     Vincent Dupont <vincent@otakeys.com>
  * @author     Matthew Blue <matthew.blue.neuro@gmail.com>
  */
-
-#ifndef ADS101X_H
-#define ADS101X_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -181,5 +180,4 @@ int ads101x_set_alert_parameters(const ads101x_alert_t *dev,
 }
 #endif
 
-#endif /* ADS101X_H */
 /** @} */

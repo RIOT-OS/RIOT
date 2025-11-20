@@ -6,6 +6,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /**
  * @defgroup    sys_suit SUIT secure firmware OTA upgrade infrastructure
  * @ingroup     sys
@@ -26,9 +29,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  */
-
-#ifndef SUIT_H
-#define SUIT_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -325,9 +325,19 @@ static inline bool suit_component_check_flag(suit_component_t *component,
 int suit_component_name_to_string(const suit_manifest_t *manifest,
                                   const suit_component_t *component,
                                   char separator, char *buf, size_t buf_len);
+
+/**
+ * @brief Get public key accepted by SUIT
+ *
+ * @param[in] idx   Index of the key to query
+ * @param[out] key  The public key used to verify the signature
+ *
+ * @returns         True if a key at that index exists
+ */
+bool suit_get_public_key(uint8_t idx, cose_key_t *key);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* SUIT_H */
 /** @} */

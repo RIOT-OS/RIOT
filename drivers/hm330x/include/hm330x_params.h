@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_hm330x
  *
@@ -15,9 +17,6 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
-
-#ifndef HM330X_PARAMS_H
-#define HM330X_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -93,10 +92,8 @@ static const saul_reg_info_t hm330x_saul_info[] =
  */
 #define HM330X_INFO_NUM ARRAY_SIZE(hm330x_saul_info)
 
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* HM330X_PARAMS_H */
 /** @} */

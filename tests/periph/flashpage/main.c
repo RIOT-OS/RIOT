@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -18,7 +15,6 @@
  * @}
  */
 
-#include <assert.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
@@ -31,6 +27,7 @@
 #include "periph/flashpage.h"
 #include "unaligned.h"
 #include "fmt.h"
+#include "test_utils/expect.h"
 
 #define LINE_LEN            (16)
 
@@ -372,7 +369,7 @@ static int cmd_test_reserved(int argc, char **argv)
      * Arrays created by the FLASH_WRITABLE_INIT macro should be sorted in
      * ascending order by name.
      */
-    assert(&_abacking_memory < &_backing_memory);
+    expect(&_abacking_memory < &_backing_memory);
 
     char fill = 'a';
     const char sig[] = {"RIOT"};
@@ -631,7 +628,7 @@ static int cmd_test_config(int argc, char **argv)
     const uint16_t single_data = 0x1234;
     const uint8_t test_data[] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE };
 
-    assert(((int32_t)FLASH_USER_PAGE_AUX_SIZE - (int32_t)(sizeof(test_data) + 2 + 3)) > 0);
+    expect(((int32_t)FLASH_USER_PAGE_AUX_SIZE - (int32_t)(sizeof(test_data) + 2 + 3)) > 0);
 
     puts("[START]");
 

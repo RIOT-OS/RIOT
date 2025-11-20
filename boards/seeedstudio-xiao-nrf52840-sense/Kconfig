@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2024 TU Dresden
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "seeedstudio-xiao-nrf52840-sense" if BOARD_SEEEDSTUDIO_XIAO_NRF52840_SENSE
+
+config BOARD_SEEEDSTUDIO_XIAO_NRF52840_SENSE
+    bool
+    default y
+    select BOARD_COMMON_NRF52
+    select CPU_MODEL_NRF52840XXAA
+
+source "$(RIOTBOARD)/common/nrf52/Kconfig"

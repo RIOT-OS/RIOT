@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_io1_xplained
  * @brief       Internal addresses, constants for the IO1 Xplained extension.
@@ -16,9 +18,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef IO1_XPLAINED_INTERNALS_H
-#define IO1_XPLAINED_INTERNALS_H
 
 #include "cpu.h"
 #include "periph_cpu.h"
@@ -79,5 +78,4 @@ extern "C" {
 }
 #endif
 
-#endif /* IO1_XPLAINED_INTERNALS_H */
 /** @} */

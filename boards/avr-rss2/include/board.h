@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2019 Robert Olsson <roolss@kth.se>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Robert Olsson <roolss@kth.se>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_avr-rss2
@@ -16,9 +15,6 @@
  * @author      Robert Olsson <roolss@kth.se>
  *
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -114,5 +110,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

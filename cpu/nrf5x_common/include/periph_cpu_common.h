@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2015-2018 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015-2018 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_nrf5x_common
@@ -15,9 +14,6 @@
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_CPU_COMMON_H
-#define PERIPH_CPU_COMMON_H
 
 #include "cpu.h"
 
@@ -197,7 +193,7 @@ union gpio_conf_nrf5x {
          * consulted.
          */
         bool initial_value                      : 1;
-        uint8_t                                 : 1; /*< padding */
+        uint8_t                                 : 1; /**< padding */
     };
 };
 /* END: GPIO LL overwrites */
@@ -622,5 +618,4 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_COMMON_H */
 /** @} */

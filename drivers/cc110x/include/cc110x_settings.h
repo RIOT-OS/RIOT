@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_cc110x
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef CC110X_SETTINGS_H
-#define CC110X_SETTINGS_H
 
 #include <stdint.h>
 
@@ -165,5 +164,4 @@ extern const cc110x_config_t cc110x_config_868mhz_250kbps_300khz;
 }
 #endif
 
-#endif /* CC110X_SETTINGS_H */
 /** @} */

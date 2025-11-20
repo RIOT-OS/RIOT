@@ -48,54 +48,59 @@
 
 #if defined(CPU_SAMD5X) || defined(CPU_SAME5X)
 
-#ifndef SDHC_CLOCK
-#define SDHC_CLOCK          SAM0_GCLK_MAIN
-#endif
+#  ifndef SDHC_CLOCK
+#    define SDHC_CLOCK          SAM0_GCLK_MAIN
+#  endif
 
-#ifndef SDHC_CLOCK_SLOW
-#define SDHC_CLOCK_SLOW     SAM0_GCLK_TIMER
-#endif
+#  ifndef SDHC_CLOCK_SLOW
+#    define SDHC_CLOCK_SLOW     SAM0_GCLK_TIMER
+#  endif
 
 #else
-#error "CPU not supported"
+#  error "CPU not supported"
 #endif
 
 /* limit the Default and High Speed clock rates for debugging */
 #if CONFIG_SDMMC_CLK_MAX_400KHZ
-#define CONFIG_SDMMC_CLK_MAX        KHZ(400)
+#  define CONFIG_SDMMC_CLK_MAX        KHZ(400)
 #elif CONFIG_SDMMC_CLK_MAX_1MHZ
-#define CONFIG_SDMMC_CLK_MAX        MHZ(1)
+#  define CONFIG_SDMMC_CLK_MAX        MHZ(1)
 #elif CONFIG_SDMMC_CLK_MAX_4MHZ
-#define CONFIG_SDMMC_CLK_MAX        MHZ(4)
+#  define CONFIG_SDMMC_CLK_MAX        MHZ(4)
 #elif CONFIG_SDMMC_CLK_MAX_10MHZ
-#define CONFIG_SDMMC_CLK_MAX        MHZ(10)
+#  define CONFIG_SDMMC_CLK_MAX        MHZ(10)
 #elif CONFIG_SDMMC_CLK_MAX_20MHZ
-#define CONFIG_SDMMC_CLK_MAX        MHZ(20)
+#  define CONFIG_SDMMC_CLK_MAX        MHZ(20)
 #elif CONFIG_SDMMC_CLK_MAX_25MHZ
-#define CONFIG_SDMMC_CLK_MAX        MHZ(25)
+#  define CONFIG_SDMMC_CLK_MAX        MHZ(25)
 #else
-#define CONFIG_SDMMC_CLK_MAX        MHZ(50)
+#  define CONFIG_SDMMC_CLK_MAX        MHZ(50)
 #endif
 
 /* millisecond timer definitions dependent on active ztimer backend */
 #if IS_USED(MODULE_ZTIMER_MSEC)
-#define _ZTIMER_ACQUIRE()       ztimer_acquire(ZTIMER_MSEC)
-#define _ZTIMER_RELEASE()       ztimer_release(ZTIMER_MSEC)
-#define _ZTIMER_NOW()           ztimer_now(ZTIMER_MSEC)
-#define _ZTIMER_SLEEP_MS(n)     ztimer_sleep(ZTIMER_MSEC, n)
+#  define _ZTIMER_CLOCK           ZTIMER_MSEC
+#  define _ZTIMER_TICKS_PER_MS    1
+
 #elif IS_USED(MODULE_ZTIMER_USEC)
-#define _ZTIMER_ACQUIRE()       ztimer_acquire(ZTIMER_USEC)
-#define _ZTIMER_RELEASE()       ztimer_release(ZTIMER_USEC)
-#define _ZTIMER_NOW()           ztimer_now(ZTIMER_USEC) / US_PER_MS
-#define _ZTIMER_SLEEP_MS(n)     ztimer_sleep(ZTIMER_USEC, n * US_PER_MS)
+#  define _ZTIMER_CLOCK           ZTIMER_USEC
+#  define _ZTIMER_TICKS_PER_MS    US_PER_MS
 #else
-#error "Either module ztimer_msec or ztimer_usec is needed"
+#  error "Either module ztimer_msec or ztimer_usec is needed"
 #endif
+
+#define _ZTIMER_ACQUIRE()       ztimer_acquire(_ZTIMER_CLOCK)
+#define _ZTIMER_RELEASE()       ztimer_release(_ZTIMER_CLOCK)
+#define _ZTIMER_NOW()           (ztimer_now(_ZTIMER_CLOCK) / _ZTIMER_TICKS_PER_MS)
+#define _ZTIMER_SLEEP_MS(n)     ztimer_sleep(_ZTIMER_CLOCK, n * _ZTIMER_TICKS_PER_MS)
 
 /* Monitor card insertion and removal */
 #define SDHC_NISTR_CARD_DETECT   (SDHC_NISTR_CREM | SDHC_NISTR_CINS)
 #define SDHC_NISTER_CARD_DETECT  (SDHC_NISTER_CREM | SDHC_NISTER_CINS)
 #define SDHC_NISIER_CARD_DETECT  (SDHC_NISIER_CREM | SDHC_NISIER_CINS)
+
+  /* 2s timeout for IRQ wait */
+#define SDHC_IRQ_TIMEOUT_MS     (2000 * _ZTIMER_TICKS_PER_MS)
 
 #include "board.h"
 
@@ -144,9 +149,9 @@ static_assert(SDHC_CONFIG_NUMOF < 3, "MCU supports only 2 SDHC peripherals");
 static_assert(SDHC_CONFIG_NUMOF < 2, "MCU supports only 1 SDHC peripheral");
 #endif
 
-XFA_CONST(sdmmc_devs, 0) sdmmc_dev_t * const _sdmmc_0 = (sdmmc_dev_t * const)&_sdhc_devs[0];
+XFA_CONST(sdmmc_dev_t * const, sdmmc_devs, 0) _sdmmc_0 = (sdmmc_dev_t * const)&_sdhc_devs[0];
 #if SDHC_CONFIG_NUMOF > 1
-XFA_CONST(sdmmc_devs, 0) sdmmc_dev_t * const _sdmmc_1 = (sdmmc_dev_t * const)&_sdhc_devs[1];
+XFA_CONST(sdmmc_dev_t * const, sdmmc_devs, 0) _sdmmc_1 = (sdmmc_dev_t * const)&_sdhc_devs[1];
 #endif
 
 static int _set_clock_rate(sdmmc_dev_t *dev, sdmmc_clock_rate_t rate);
@@ -484,7 +489,7 @@ static int _xfer_prepare(sdmmc_dev_t *dev, sdmmc_xfer_desc_t *xfer)
     /* TODO: at the moment only 32-bit words supported */
     assert((xfer->block_size % sizeof(uint32_t)) == 0);
 
-    /* indicate that a data transfer is perpared */
+    /* indicate that a data transfer is prepared */
     sdhc_dev->data_transfer = true;
 
     uint32_t tmr;
@@ -512,10 +517,6 @@ static int _xfer_execute(sdmmc_dev_t *dev, sdmmc_xfer_desc_t *xfer,
 {
     assert(xfer);
     assert((xfer->write && data_wr) || (!xfer->write && data_rd));
-
-    /* check the alignment required for the buffers */
-    assert(HAS_ALIGNMENT_OF(data_wr, SDMMC_CPU_DMA_ALIGNMENT));
-    assert(HAS_ALIGNMENT_OF(data_rd, SDMMC_CPU_DMA_ALIGNMENT));
 
     sdhc_dev_t *sdhc_dev = container_of(dev, sdhc_dev_t, sdmmc_dev);
 
@@ -722,7 +723,7 @@ static int _wait_sdhc_busy(sdhc_t *sdhc)
 /**
  * @brief   Wait for a given event while checking for errors
  *
- * @param   state       SDHC device context
+ * @param   sdhc_dev    SDHC device generating the event
  * @param   event       Event to wait for [SDHC_NISTR_*]
  * @param   error_mask  Mask of errors to be checked [SDHC_EISTR_*]
  * @param   reset       Reset type in case of errors
@@ -738,7 +739,6 @@ static bool _wait_for_event(sdhc_dev_t *sdhc_dev,
 
     sdhc_dev->error = 0;
 
-    /* TODO: timeout */
     sdhc->NISIER.reg |= event;
     sdhc->EISIER.reg |= error_mask;
 
@@ -747,7 +747,8 @@ static bool _wait_for_event(sdhc_dev_t *sdhc_dev,
 #if defined(CPU_SAMD5X) || defined(CPU_SAME5X)
     pm_block(SAM0_PM_IDLE);
 #endif
-    mutex_lock(&sdhc_dev->irq_wait);
+    bool timeout = ztimer_mutex_lock_timeout(_ZTIMER_CLOCK, &sdhc_dev->irq_wait,
+                                             SDHC_IRQ_TIMEOUT_MS) < 0;
 #if defined(CPU_SAMD5X) || defined(CPU_SAME5X)
     pm_unblock(SAM0_PM_IDLE);
 #endif
@@ -755,9 +756,14 @@ static bool _wait_for_event(sdhc_dev_t *sdhc_dev,
     sdhc->NISIER.reg &= ~event;
     sdhc->EISIER.reg &= ~error_mask;
 
-    if (sdhc_dev->error & error_mask) {
+    if (timeout || (sdhc_dev->error & error_mask)) {
         if (IS_USED(ENABLE_DEBUG)) {
-            DEBUG("[sdmmc] SDHC error: EISTR=%04x, ", sdhc_dev->error);
+            if (timeout) {
+                DEBUG("[sdmmc] IRQ wait timeout\n");
+            }
+            else {
+                DEBUG("[sdmmc] SDHC error: EISTR=%04x, ", sdhc_dev->error);
+            }
             switch (reset) {
             case SDHC_SRR_SWRSTCMD:
                 DEBUG("reset CMD\n");

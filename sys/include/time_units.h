@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_time_units Time unit representations
  * @brief       Timestamp representation, computation, and conversion
@@ -16,9 +18,6 @@
  * @file
  * @brief       Utility header providing time unit defines
  */
-
-#ifndef TIME_UNITS_H
-#define TIME_UNITS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -114,4 +113,3 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* TIME_UNITS_H */

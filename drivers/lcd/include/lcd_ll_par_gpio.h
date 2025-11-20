@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 #if !DOXYGEN    /* hide from documentation */
 
 /**
@@ -17,9 +19,6 @@
  * @file
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef LCD_LL_PAR_GPIO_H
-#define LCD_LL_PAR_GPIO_H
 
 #include <assert.h>
 
@@ -95,6 +94,5 @@ uint16_t lcd_ll_par_gpio_read_word(lcd_t *dev, bool cont);
 #ifdef __cplusplus
 }
 #endif
-#endif /* LCD_LL_PAR_GPIO_H */
 /** @} */
 #endif /* !DOXYGEN */

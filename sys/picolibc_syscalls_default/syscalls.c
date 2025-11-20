@@ -238,7 +238,9 @@ static int picolibc_get(FILE *file)
 FILE picolibc_stdio =
     FDEV_SETUP_STREAM(picolibc_put, picolibc_get, picolibc_flush, _FDEV_SETUP_RW);
 
-#ifdef PICOLIBC_STDIO_GLOBALS
+/* Since picolibc 1.8.10, PICOLIBC_STDIO_GLOBALS is prefixed with two leading
+ * underscores. We just test for both to remain backwards compatible */
+#if defined(PICOLIBC_STDIO_GLOBALS) || defined(__PICOLIBC_STDIO_GLOBALS)
 #ifdef __strong_reference
 /* This saves two const pointers.
  * See https://github.com/RIOT-OS/RIOT/pull/17001#issuecomment-945936918
@@ -493,7 +495,7 @@ off_t lseek(int fd, _off_t off, int whence)
 }
 
 /**
- * @brief Sets the file position indicator to the the beginning of the file.
+ * @brief Sets the file position indicator to the beginning of the file.
  *
  * @param[in]  stream   open file descriptor obtained from @c fopen()
  */

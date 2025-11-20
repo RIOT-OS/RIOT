@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup     sys_bhp_event Event based implementation of Bottom Half Processor
  * @ingroup      sys_bhp
@@ -15,9 +17,6 @@
  *
  * @author       José I. Alamos <jose.alamos@haw-hamburg.de>
  */
-
-#ifndef BHP_EVENT_H
-#define BHP_EVENT_H
 
 #include "bhp.h"
 #include <event.h>
@@ -58,5 +57,4 @@ void bhp_event_isr_cb(void *bhp_event_ctx);
 }
 #endif
 
-#endif /* BHP_EVENT_H */
 /** @} */

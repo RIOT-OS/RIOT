@@ -338,6 +338,8 @@ int sdmmc_card_init(sdmmc_dev_t *dev)
     assert(dev);
     assert(dev->driver);
 
+    dev->init_done = false;
+
     /* use driver's card_init function if it defines its own */
     if (dev->driver->card_init) {
         return dev->driver->card_init(dev);
@@ -460,7 +462,12 @@ int sdmmc_card_init(sdmmc_dev_t *dev)
 
     /* the card is either SD card, Combo card or MMC */
     do {
-        _ZTIMER_SLEEP_MS(100);
+        /* According to the Physical Layer Simplified Specification
+         * Version 9.00 [[sdcard.org](https://www.sdcard.org)] section 4.4
+         * "Clock Control", the polling interval for ACMD41 must be less than
+         * 50 ms, if the clock is stopped by the host and not continuous
+         * during ACMD41 polling until the card becomes ready. */
+        _ZTIMER_SLEEP_MS(10);
         DEBUG("[sdmmc] send %s %s to test whether card is SDSC/SDXC or MMC card\n",
               cmd == SDMMC_ACMD41 ? "ACMD41" : "CMD1",
               arg & SDMMC_ACMD41_HCS ? "HCS=1" : "HCS=0");
@@ -538,8 +545,8 @@ int sdmmc_card_init(sdmmc_dev_t *dev)
     }
     else {
         DEBUG("[sdmmc] send CMD3 to get RCA\n");
-        /* for SD cards, the card selects RCA and sends it back in R3 */
-        res = _send_cmd(dev, SDMMC_CMD3, SDMMC_CMD_NO_ARG, SDMMC_R3, response);
+        /* for SD cards, the card selects RCA and sends it back in R6 */
+        res = _send_cmd(dev, SDMMC_CMD3, SDMMC_CMD_NO_ARG, SDMMC_R6, response);
         dev->rca = response[0] >> 16;
     }
     if (res) {
@@ -915,7 +922,7 @@ int sdmmc_read_sds(sdmmc_dev_t *dev, sdmmc_sd_status_t *sds)
 static int _send_cmd(sdmmc_dev_t *dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
                      sdmmc_resp_t resp_type, uint32_t *resp)
 {
-    DEBUG("[sdmmc] %s dev=%p cmd_idx=%u arg=%"PRIu32" resp_type=%u resp=%p\n",
+    DEBUG("[sdmmc] %s dev=%p cmd_idx=%u arg=0x%"PRIx32" resp_type=0x%x resp=%p\n",
           __func__, dev, cmd_idx, arg, resp_type, resp);
 
 #if !IS_USED(MODULE_PERIPH_SDMMC_AUTO_CLK)
@@ -926,7 +933,25 @@ static int _send_cmd(sdmmc_dev_t *dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
     }
 #endif
 
-    return dev->driver->send_cmd(dev, cmd_idx, arg, resp_type, resp);
+    int res = dev->driver->send_cmd(dev, cmd_idx, arg, resp_type, resp);
+
+#if ENABLE_DEBUG
+    if (!resp) {
+        return res;
+    }
+
+    if (resp_type == SDMMC_R2) {
+        DEBUG("[sdmmc] %s dev=%p cmd_idx=%u "
+              "r[0]=0x%08"PRIx32" r[2]=0x%08"PRIx32" r[1]=0x%08"PRIx32" r[3]=0x%08"PRIx32"\n",
+              __func__, dev, cmd_idx, resp[0], resp[1], resp[2], resp[3]);
+    }
+    else if (resp_type != SDMMC_NO_R) {
+        DEBUG("[sdmmc] %s dev=%p cmd_idx=%u r=0x%08"PRIx32"\n",
+              __func__, dev, cmd_idx, *resp);
+    }
+#endif
+
+    return res;
 }
 
 static int _send_acmd(sdmmc_dev_t *dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
@@ -935,7 +960,7 @@ static int _send_acmd(sdmmc_dev_t *dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
     uint32_t response;
     int res;
 
-    DEBUG("[sdmmc] %s dev=%p cmd_idx=%u arg=%"PRIu32" resp_type=%u resp=%p\n",
+    DEBUG("[sdmmc] %s dev=%p cmd_idx=%u arg=0x%"PRIx32" resp_type=0x%x resp=%p\n",
           __func__, dev, cmd_idx, arg, resp_type, resp);
 
     assert(cmd_idx & SDMMC_ACMD_PREFIX);
@@ -1132,7 +1157,7 @@ static int _assert_card(sdmmc_dev_t *dev)
  * are deselected by this and go into the state `stby`.
  *
  * @param[in]   dev     SDIO/SD/MMC device to be used
- * @param[in]   card    Card or embedded device to be selected or deselected
+ * @param[in]   select  If `true`, card will be selected, otherwise deselected
  *
  * @return 0 on success or negative error code on error
  */
@@ -1285,7 +1310,6 @@ out:
  *      the `stby` state (deselected) when CMD10 is used to read the CID.
  *
  * @param[in]   dev     SD/MMC device to be used
- * @param[in]   card    Card or embedded device
  * @param[in]   cmd     Command to be used
  *                      (CMD2 in state `ready` or CMD10 in state `stdby')
  *
@@ -1346,7 +1370,6 @@ static int _read_cid(sdmmc_dev_t *dev, uint8_t cmd)
  *      state to read the CSD (deselected).
  *
  * @param[in]   dev     SD/MMC device to be used
- * @param[in]   card    Card or embedded device
  *
  * @return 0 on success or negative error code on error
  */

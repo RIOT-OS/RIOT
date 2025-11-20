@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2023 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2023 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -111,9 +108,9 @@ static_assert(SDMMC_CONFIG_NUMOF == ARRAY_SIZE(_sdmmc_devs),
 static_assert(SDMMC_CONFIG_NUMOF <= SOC_SDMMC_NUM_SLOTS,
               "SDMMC_CONFIG_NUMOF is greater than the supported number of slots");
 
-XFA_CONST(sdmmc_devs, 0) sdmmc_dev_t * const _sdmmc_0 = (sdmmc_dev_t * const)&_sdmmc_devs[0];
+XFA_CONST(sdmmc_dev_t * const, sdmmc_devs, 0) _sdmmc_0 = (sdmmc_dev_t * const)&_sdmmc_devs[0];
 #if SDMMC_CONFIG_NUMOF > 1
-XFA_CONST(sdmmc_devs, 0) sdmmc_dev_t * const _sdmmc_1 = (sdmmc_dev_t * const)&_sdmmc_devs[1];
+XFA_CONST(sdmmc_dev_t * const, sdmmc_devs, 0) _sdmmc_1 = (sdmmc_dev_t * const)&_sdmmc_devs[1];
 #endif
 
 /* forward declaration of internal functions */
@@ -122,6 +119,8 @@ static void _isr_cd_pin(void *arg);
 
 static void _init(sdmmc_dev_t *sdmmc_dev)
 {
+    DEBUG("[sdmmc] %s", __func__);
+
     esp32_sdmmc_dev_t *dev = container_of(sdmmc_dev, esp32_sdmmc_dev_t, sdmmc_dev);
     assert(dev);
 
@@ -217,8 +216,6 @@ static void _init(sdmmc_dev_t *sdmmc_dev)
     else {
         sdmmc_dev->present = true;
     }
-
-    sdmmc_dev->bus_width = SDMMC_BUS_WIDTH_1BIT; // SDMMC_BUS_WIDTH_4BIT;
 }
 
 static int _send_cmd(sdmmc_dev_t *sdmmc_dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
@@ -245,7 +242,7 @@ static int _send_cmd(sdmmc_dev_t *sdmmc_dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
         .data = 0,
         .datalen = 0,
         .blklen = 0,
-        .timeout_ms = 100,
+        .timeout_ms = 1000,
     };
 
     switch (resp_type) {
@@ -268,7 +265,7 @@ static int _send_cmd(sdmmc_dev_t *sdmmc_dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
         cmd.flags |= SCF_RSP_R5;
         break;
     case SDMMC_R6:
-        cmd.flags |= SCF_RSP_R7;
+        cmd.flags |= SCF_RSP_R6;
         break;
     case SDMMC_R7:
         cmd.flags |= SCF_RSP_R7;
@@ -277,12 +274,12 @@ static int _send_cmd(sdmmc_dev_t *sdmmc_dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
         break;
     }
 
+    DEBUG("[sdmmc] %s dev=%p slot=%d op=%" PRIu32 " arg=%" PRIx32 " flags=%x\n",
+          __func__, dev, dev->config->slot, cmd.opcode, cmd.arg, cmd.flags);
+
     esp_err_t res = sdmmc_host_do_transaction(dev->config->slot, &cmd);
     if (res) {
         return _esp_err_to_sdmmc_err_code(res);
-    }
-    else if (cmd.error) {
-        return _esp_err_to_sdmmc_err_code(cmd.error);
     }
 
     if ((resp_type == SDMMC_R1) || (resp_type == SDMMC_R1B)) {
@@ -299,6 +296,28 @@ static int _send_cmd(sdmmc_dev_t *sdmmc_dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
         else if (resp_type != SDMMC_NO_R) {
             resp[0] = cmd.response[0];
         }
+    }
+
+    if (cmd.error) {
+#if CPU_FAM_ESP32S3
+        /*
+         * FIXME:
+         * The host controller triggers an invalid response error on ESP32-S3,
+         * although the response from the card is completely correct and is
+         * received completely by the host controller. The reason for this is
+         * not yet clear. The sequence of commands including all parameters
+         * sent to the host controller as well as the timing are exactly the
+         * same as in the IDF code. The initialization of the host controller
+         * is also exactly the same as in the IDF code. The problem only
+         * occurs with the ESP32-S3, but not with the ESP32. As a workaround,
+         * we ignore invalid response errors on ESP32-S3.
+         */
+        if (cmd.error != ESP_ERR_INVALID_RESPONSE) {
+            return _esp_err_to_sdmmc_err_code(cmd.error);
+        }
+#else
+        return _esp_err_to_sdmmc_err_code(cmd.error);
+#endif
     }
 
     return 0;
@@ -387,7 +406,7 @@ static int _xfer_execute(sdmmc_dev_t *sdmmc_dev, sdmmc_xfer_desc_t *xfer,
         .data = xfer->write ? (void *)data_wr : data_rd,
         .datalen = xfer->block_num * xfer->block_size,
         .blklen = xfer->block_size,
-        .timeout_ms = xfer->write ? 2500 : 1000, // TODO
+        .timeout_ms = xfer->write ? 2500 : 1000, /* TODO */
     };
 
     if (done) {
@@ -399,7 +418,25 @@ static int _xfer_execute(sdmmc_dev_t *sdmmc_dev, sdmmc_xfer_desc_t *xfer,
         return _esp_err_to_sdmmc_err_code(res);
     }
     else if (cmd.error) {
+#ifdef CPU_FAM_ESP32S3
+        /*
+         * FIXME:
+         * The host controller triggers an invalid response error on ESP32-S3,
+         * although the response from the card is completely correct and is
+         * received completely by the host controller. The reason for this is
+         * not yet clear. The sequence of commands including all parameters
+         * sent to the host controller as well as the timing are exactly the
+         * same as in the IDF code. The initialization of the host controller
+         * is also exactly the same as in the IDF code. The problem only
+         * occurs with the ESP32-S3, but not with the ESP32. As a workaround,
+         * we ignore invalid response errors on ESP32-S3.
+         */
+        if (cmd.error != ESP_ERR_INVALID_RESPONSE) {
+            return _esp_err_to_sdmmc_err_code(cmd.error);
+        }
+#else
         return _esp_err_to_sdmmc_err_code(cmd.error);
+#endif
     }
 
     if (done) {

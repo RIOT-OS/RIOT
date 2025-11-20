@@ -1,4 +1,3 @@
 BOARD_INSUFFICIENT_MEMORY := \
-    samd10-xmini \
     stm32f030f4-demo \
     #

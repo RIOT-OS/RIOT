@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
- * Copyright (C) 2018 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2014 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2018 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_openmote-b
@@ -18,9 +17,6 @@
  * @author      Sebastian Meiling <s@mlng.net>
  * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "cc2538_gpio.h"
 #include "periph_cpu.h"
@@ -112,5 +108,4 @@ static const spi_conf_t spi_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

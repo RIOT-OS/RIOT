@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_senml_cbor SenML CBOR
  * @ingroup     sys_senml
@@ -21,9 +23,6 @@
  *
  * @author      Silke Hofstra <silke@slxh.eu>
  */
-
-#ifndef SENML_CBOR_H
-#define SENML_CBOR_H
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -117,5 +116,4 @@ int senml_encode_data_cbor(nanocbor_encoder_t *enc, const senml_data_value_t *va
 }
 #endif
 
-#endif /* SENML_CBOR_H */
 /** @} */

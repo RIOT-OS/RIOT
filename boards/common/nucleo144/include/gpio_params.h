@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2017 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_common_nucleo144
@@ -16,9 +15,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef GPIO_PARAMS_H
-#define GPIO_PARAMS_H
 
 #include "board.h"
 #include "saul/periph.h"
@@ -58,5 +54,4 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 }
 #endif
 
-#endif /* GPIO_PARAMS_H */
 /** @} */

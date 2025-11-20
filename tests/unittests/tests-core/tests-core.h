@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef TESTS_CORE_H
-#define TESTS_CORE_H
 
 #include "embUnit.h"
 
@@ -110,5 +110,4 @@ Test *tests_core_macros_tests(void);
 }
 #endif
 
-#endif /* TESTS_CORE_H */
 /** @} */

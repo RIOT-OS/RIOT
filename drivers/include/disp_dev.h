@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_disp_dev Display device generic API
  * @ingroup     drivers_display
@@ -16,9 +18,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef DISP_DEV_H
-#define DISP_DEV_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -95,7 +94,7 @@ typedef struct {
     /**
      * @brief   Invert the display device colors
      *
-     * @param[in] dev       Network device descriptor
+     * @param[in] dev       Pointer to the display device
      * @param[in] invert    Invert mode (true if invert, false otherwise)
      */
     void (*set_invert)(const disp_dev_t *dev, bool invert);
@@ -206,5 +205,4 @@ static inline void disp_dev_backlight_off(void)
 }
 #endif
 
-#endif /* DISP_DEV_H */
 /** @} */

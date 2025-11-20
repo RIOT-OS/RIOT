@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_bh1750fvi
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef BH1750FVI_INTERNAL_H
-#define BH1750FVI_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,5 +60,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BH1750FVI_INTERNAL_H */
 /** @} */

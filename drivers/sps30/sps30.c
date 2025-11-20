@@ -129,7 +129,7 @@ static inline bool _cpy_check_crc(uint8_t *data, size_t len, const uint8_t *crcd
  *
  * @param[in]      dev        Pointer to SPS30 device handle
  * @param[in]      ptr_addr   16 bit pointer address used as command
- * @param[in/out]  data       Pre-allocated memory pointing to either the data
+ * @param[in,out]  data       Pre-allocated memory pointing to either the data
  *                            that will be sent to the device or to memory that
  *                            will hold the response. For type (1) transfers
  *                            this parameter will be ignored.

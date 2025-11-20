@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2016 Leon George
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Leon George
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_cc26xx_cc13xx_definitions
@@ -13,9 +12,6 @@
  * @file
  * @brief           CC26xx/CC13xx VIMS register definitions
  */
-
-#ifndef CC26XX_CC13XX_VIMS_H
-#define CC26XX_CC13XX_VIMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -258,5 +254,4 @@ typedef struct {
 }
 #endif
 
-#endif /* CC26XX_CC13XX_VIMS_H */
 /** @} */

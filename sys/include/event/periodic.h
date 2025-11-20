@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_event
  * @brief       Provides functionality to trigger periodic events
@@ -32,9 +34,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  *
  */
-
-#ifndef EVENT_PERIODIC_H
-#define EVENT_PERIODIC_H
 
 #include "event.h"
 #include "ztimer/periodic.h"
@@ -71,6 +70,28 @@ typedef struct {
  */
 void event_periodic_init(event_periodic_t *event_periodic, ztimer_clock_t *clock,
                          event_queue_t *queue, event_t *event);
+
+/**
+ * @brief   Starts a periodic timeout without delay for the first occurrence
+ *
+ * This will make the event as configured in @p event_periodic be triggered
+ * at every interval ticks (based on event_periodic->clock).
+ *
+ * @note: the used event_periodic struct must stay valid until after the timeout
+ *        event has been processed!
+ *
+ * @note: this function does not touch the current count value.
+ *
+ * @note: the periodic event will start without delay.
+ *
+ * @param[in]   event_periodic   event_timout context object to use
+ * @param[in]   interval         period length for the event
+ */
+static inline void event_periodic_start_now(event_periodic_t *event_periodic, uint32_t interval)
+{
+    event_periodic->timer.interval = interval;
+    ztimer_periodic_start_now(&event_periodic->timer);
+}
 
 /**
  * @brief   Starts a periodic timeout
@@ -129,5 +150,4 @@ static inline void event_periodic_stop(event_periodic_t *event_periodic)
 #ifdef __cplusplus
 }
 #endif
-#endif /* EVENT_PERIODIC_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 #if !DOXYGEN
 
 /**
@@ -17,9 +19,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef BSP_INCLUDE_NM_BSP_INTERNAL_H
-#define BSP_INCLUDE_NM_BSP_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,5 +45,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BSP_INCLUDE_NM_BSP_INTERNAL_H */
 #endif /* DOXYGEN */

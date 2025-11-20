@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_msp430_x1xx
@@ -20,9 +19,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef X1XX_MSP430_REGS_H
-#define X1XX_MSP430_REGS_H
-
 #include <stdint.h>
 
 #include "msp430_regs_common.h"
@@ -30,6 +26,17 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   GPIO Port 1/2 (with interrupt functionality)
+ */
+typedef struct {
+    msp430_port_t base; /**< common GPIO port registers */
+    REG8    IFG;        /**< interrupt flag */
+    REG8    IES;        /**< interrupt edge select */
+    REG8    IE;         /**< interrupt enable */
+    REG8    SEL;        /**< alternative function select */
+} msp430_port_p1_p2_t;
 
 /**
  * @brief   USART (UART, SPI and I2C) Registers
@@ -109,5 +116,4 @@ extern msp430_usart_t USART_1;
 }
 #endif
 
-#endif /* X1XX_MSP430_REGS_H */
 /** @} */

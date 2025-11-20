@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_at86rf215 AT86RF215 based drivers
  * @ingroup     drivers_netdev
@@ -19,9 +21,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef AT86RF215_H
-#define AT86RF215_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -682,5 +681,4 @@ void at86rf215_disable_batmon(at86rf215_t *dev);
 }
 #endif
 
-#endif /* AT86RF215_H */
 /** @} */

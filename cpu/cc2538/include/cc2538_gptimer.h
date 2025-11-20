@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2014 Loci Controls Inc.
- *               2018 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014 Loci Controls Inc.
+ * SPDX-FileCopyrightText: 2018 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup        cpu_cc2538_gptimer CC2538 General Purpose Timer
@@ -18,9 +17,6 @@
  * @author          Ian Martin <ian@locicontrols.com>
  * @author          Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef CC2538_GPTIMER_H
-#define CC2538_GPTIMER_H
 
 #include <stdint.h>
 
@@ -88,5 +84,4 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC2538_GPTIMER_H */
 /** @} */

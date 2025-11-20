@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2019 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_esp8266_sdk
@@ -16,9 +15,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}
  */
-
-#ifndef PHY_H
-#define PHY_H
 
 #ifndef DOXYGEN
 
@@ -36,4 +32,3 @@ extern uint32_t phy_get_mactime(void);
 #endif
 
 #endif /* DOXYGEN */
-#endif /* PHY_H */

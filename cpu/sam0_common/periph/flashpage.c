@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -73,7 +70,12 @@ static unsigned _unlock(void)
     PAC1->WPCLR.reg = PAC1_WPROT_DEFAULT_VAL;
 #endif
 
+    /* NVM reads could be corrupted when mixing NVM reads with Page Buffer writes. */
     return irq_disable();
+#ifdef NVMCTRL_CTRLA_CACHEDIS1
+    _NVMCTRL->CTRLA.reg |= NVMCTRL_CTRLA_CACHEDIS0
+                        |  NVMCTRL_CTRLA_CACHEDIS1;
+#endif
 }
 
 static void _lock(unsigned state)
@@ -85,6 +87,11 @@ static void _lock(unsigned state)
     PAC->WRCTRL.reg = (PAC_WRCTRL_KEY_SET | ID_NVMCTRL);
 #else
     PAC1->WPSET.reg = PAC1_WPROT_DEFAULT_VAL;
+#endif
+
+#ifdef NVMCTRL_CTRLA_CACHEDIS1
+    _NVMCTRL->CTRLA.reg &= ~NVMCTRL_CTRLA_CACHEDIS0
+                        &  ~NVMCTRL_CTRLA_CACHEDIS1;
 #endif
 
     /* cached flash contents may have changed - invalidate cache */

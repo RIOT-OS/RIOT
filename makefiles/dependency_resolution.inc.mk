@@ -17,6 +17,10 @@ OLD_STATE := $(USEMODULE) $(USEPKG) $(FEATURES_USED)
 # pull in dependencies of the currently used modules and pkgs
 include $(RIOTBASE)/Makefile.dep
 
+# include the global board features before the feature check as they depend
+# on the USEMODULE, which is present after the `Makefile.dep` resolution
+include $(RIOTBOARD)/Makefile.features
+
 # check if required features are provided and update $(FEATURES_USED)
 include $(RIOTMAKE)/features_check.inc.mk
 
@@ -90,37 +94,40 @@ else
     $(error "The following non-existing features are listed in FEATURES_OPTIONAL: $(FEATURES_NONEXISTING)")
   endif
 
-  # Warn about telnet
-  ifneq (,$(filter auto_init_telnet,$(USEMODULE)))
-    ifneq (1,$(I_UNDERSTAND_THAT_TELNET_IS_INSECURE))
-      $(shell $(COLOR_ECHO) "$(COLOR_RED)Telnet will be started automatically, "\
-                            "make sure you understand why this almost certainly "\
-                            "is a REALLY BAD idea before proceeding!$(COLOR_RESET)" 1>&2)
-      $(error I_UNDERSTAND_THAT_TELNET_IS_INSECURE must be set to 1 to proceed)
-    else
-      $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)Telnet will be started automatically,"\
-                            "don't run this on public networks!$(COLOR_RESET)" 1>&2)
+  # Don't show warnings for info targets
+  ifeq (,$(filter info-%,$(MAKECMDGOALS)))
+    # Warn about telnet
+    ifneq (,$(filter auto_init_telnet,$(USEMODULE)))
+      ifneq (1,$(I_UNDERSTAND_THAT_TELNET_IS_INSECURE))
+        $(shell $(COLOR_ECHO) "$(COLOR_RED)Telnet will be started automatically, "\
+                              "make sure you understand why this almost certainly "\
+                              "is a REALLY BAD idea before proceeding!$(COLOR_RESET)" 1>&2)
+        $(error I_UNDERSTAND_THAT_TELNET_IS_INSECURE must be set to 1 to proceed)
+      else
+        $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)Telnet will be started automatically,"\
+                              "don't run this on public networks!$(COLOR_RESET)" 1>&2)
+      endif
     endif
-  endif
 
-  # Warn about STDIO UDP
-  ifneq (,$(filter stdio_udp,$(USEMODULE)))
-    ifneq (1,$(I_UNDERSTAND_THAT_STDIO_UDP_IS_INSECURE))
-      $(shell $(COLOR_ECHO) "$(COLOR_RED)stdio via UDP will be started automatically,"\
-                            "make sure you understand why this almost certainly"\
-                            "is a REALLY BAD idea before proceeding!$(COLOR_RESET)" 1>&2)
-      $(error I_UNDERSTAND_THAT_STDIO_UDP_IS_INSECURE must be set to 1 to proceed)
-    else
-      $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)stdio via UDP will be started automatically,"\
-                            "don't run this on public networks!$(COLOR_RESET)" 1>&2)
+    # Warn about STDIO UDP
+    ifneq (,$(filter stdio_udp,$(USEMODULE)))
+      ifneq (1,$(I_UNDERSTAND_THAT_STDIO_UDP_IS_INSECURE))
+        $(shell $(COLOR_ECHO) "$(COLOR_RED)stdio via UDP will be started automatically,"\
+                              "make sure you understand why this almost certainly"\
+                              "is a REALLY BAD idea before proceeding!$(COLOR_RESET)" 1>&2)
+        $(error I_UNDERSTAND_THAT_STDIO_UDP_IS_INSECURE must be set to 1 to proceed)
+      else
+        $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)stdio via UDP will be started automatically,"\
+                              "don't run this on public networks!$(COLOR_RESET)" 1>&2)
+      endif
     endif
-  endif
 
-  # Warn about PSA Crypto
-  ifneq (,$(filter psa_crypto,$(USEMODULE)))
-    $(shell $(COLOR_ECHO) "$(COLOR_YELLOW) You are going to use the PSA Crypto module,"\
-                          "which is only partly implemented and not yet thouroughly tested.\n"\
-                          "Please do not use this module in production, as it may introduce"\
-                          "security issues!$(COLOR_RESET)" 1>&2)
+    # Warn about PSA Crypto
+    ifneq (,$(filter psa_crypto,$(USEMODULE)))
+      $(shell $(COLOR_ECHO) "$(COLOR_YELLOW) You are going to use the PSA Crypto module,"\
+                            "which is only partly implemented and not yet thouroughly tested.\n"\
+                            "Please do not use this module in production, as it may introduce"\
+                            "security issues!$(COLOR_RESET)" 1>&2)
+    endif
   endif
 endif

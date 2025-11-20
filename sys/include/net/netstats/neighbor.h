@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     net_netstats
  * @brief       Records statistics about link layer neighbors
@@ -16,8 +18,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-#ifndef NET_NETSTATS_NEIGHBOR_H
-#define NET_NETSTATS_NEIGHBOR_H
 
 #include <string.h>
 #include "net/netif.h"
@@ -32,9 +32,9 @@ extern "C" {
  * @{
  */
 typedef enum {
-    NETSTATS_NB_BUSY,       /**< Failed due to medium busy */
-    NETSTATS_NB_NOACK,      /**< Failed due to no ack received */
-    NETSTATS_NB_SUCCESS,    /**< Successful transmission */
+    NETSTATS_NB_SUCCESS = 0,    /**< Successful transmission */
+    NETSTATS_NB_NOACK,          /**< Failed due to no ack received */
+    NETSTATS_NB_BUSY,           /**< Failed due to medium busy */
 } netstats_nb_result_t;
 /** @} */
 
@@ -187,7 +187,6 @@ bool netstats_nb_isfresh(netif_t *netif, netstats_nb_t *stats);
 }
 #endif
 
-#endif /* NET_NETSTATS_NEIGHBOR_H */
 /**
  * @}
  */

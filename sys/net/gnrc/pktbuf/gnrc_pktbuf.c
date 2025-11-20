@@ -93,6 +93,14 @@ void gnrc_pktbuf_release_error(gnrc_pktsnip_t *pkt, uint32_t err)
         assert(gnrc_pktbuf_contains(pkt));
         assert(pkt->users > 0);
         tmp = pkt->next;
+
+        /* if the memory was freed, memory has been overwritten by CANARY */
+        if (CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE &&
+            pkt->users == GNRC_PKTBUF_CANARY) {
+            puts("gnrc_pktbuf: double free detected\n");
+            DEBUG_BREAKPOINT(3);
+        }
+
         if (pkt->users == 1) {
             pkt->users = 0; /* not necessary but to be on the safe side */
             if (!IS_USED(MODULE_GNRC_TX_SYNC)

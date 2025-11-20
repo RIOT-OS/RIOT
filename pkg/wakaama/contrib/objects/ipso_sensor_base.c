@@ -29,6 +29,7 @@
 /**
  * @brief 'Read' callback for the LwM2M Illuminance Sensor object implementation.
  *
+ * @param[in] context           LWM2M Context
  * @param[in] instance_id       ID of the instance to read resource from.
  * @param[in] num_data          Number of elements in @p data_array.
  * @param[in, out] data_array   IDs of resources to read. Array of data structures to place values.
@@ -38,12 +39,13 @@
  * @return COAP_404_NOT_FOUND if the instance was not found
  * @return COAP_500_INTERNAL_SERVER_ERROR otherwise
  */
-static uint8_t _read_cb(uint16_t instance_id, int *num_data, lwm2m_data_t **data_array,
-                        lwm2m_object_t *object);
+static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data,
+                        lwm2m_data_t ** data_array, lwm2m_object_t * object);
 
 /**
  * @brief 'Execute' callback for the LwM2M Illuminance Sensor object implementation.
  *
+ * @param[in] context           LWM2M Context
  * @param[in] instance_id       ID of the instance to execute resource from.
  * @param[in] resource_id       ID of the resource to execute.
  * @param[in] buffer            Pointer to the buffer containing the payload.
@@ -54,8 +56,8 @@ static uint8_t _read_cb(uint16_t instance_id, int *num_data, lwm2m_data_t **data
  * @return COAP_404_NOT_FOUND if the instance was not found
  * @return COAP_405_METHOD_NOT_ALLOWED if the resource is not executable
  */
-static uint8_t _exec_cb(uint16_t instance_id, uint16_t resource_id, uint8_t *buffer, int length,
-                        lwm2m_object_t *object);
+static uint8_t _exec_cb(lwm2m_context_t * context, uint16_t instance_id, uint16_t resource_id,
+                        uint8_t * buffer, int length, lwm2m_object_t * object);
 
 /**
  * @brief Gets the current value of a given @p instance.
@@ -193,9 +195,11 @@ static uint8_t _get_value(lwm2m_data_t *data, lwm2m_obj_ipso_sensor_base_inst_t 
     return COAP_205_CONTENT;
 }
 
-static uint8_t _read_cb(uint16_t instance_id, int *num_data, lwm2m_data_t **data_array,
-                        lwm2m_object_t *object)
+static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data,
+                        lwm2m_data_t ** data_array, lwm2m_object_t * object)
 {
+    (void)context;
+
     lwm2m_obj_ipso_sensor_base_inst_t *instance;
     uint8_t result;
     int i = 0;
@@ -252,9 +256,10 @@ out:
     return result;
 }
 
-static uint8_t _exec_cb(uint16_t instance_id, uint16_t resource_id, uint8_t *buffer, int length,
-                        lwm2m_object_t *object)
+static uint8_t _exec_cb(lwm2m_context_t * context, uint16_t instance_id, uint16_t resource_id,
+                        uint8_t * buffer, int length, lwm2m_object_t * object)
 {
+    (void)context;
     (void)buffer;
     (void)length;
 
@@ -375,12 +380,11 @@ static void _mark_resource_as_changed(const lwm2m_object_t *object, uint16_t ins
                                       uint16_t resource_id)
 {
     lwm2m_uri_t uri;
+    LWM2M_URI_RESET(&uri);
 
     uri.objectId = object->objID;
     uri.instanceId = instance_id;
     uri.resourceId = resource_id;
-
-    uri.flag = LWM2M_URI_FLAG_OBJECT_ID | LWM2M_URI_FLAG_INSTANCE_ID | LWM2M_URI_FLAG_RESOURCE_ID;
 
     lwm2m_resource_value_changed(lwm2m_client_get_ctx(object->userData), &uri);
 }

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_sx1280
  * @{
@@ -17,9 +19,6 @@
  * @author      Aymeric Brochier <aymeric.brochier@univ-grenoble-alpes.fr>
  *
  */
-
-#ifndef SX1280_NETDEV_H
-#define SX1280_NETDEV_H
 
 #include "net/netdev.h"
 
@@ -36,5 +35,4 @@ extern const netdev_driver_t sx1280_driver;
 }
 #endif
 
-#endif /* SX1280_NETDEV_H */
 /** @} */

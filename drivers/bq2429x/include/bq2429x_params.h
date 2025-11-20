@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_bq2429x
  *
@@ -15,9 +17,6 @@
  *
  * @author      Jean Pierre Dudey <jeandudey@hotmail.com>
  */
-
-#ifndef BQ2429X_PARAMS_H
-#define BQ2429X_PARAMS_H
 
 #include "board.h"
 #include "bq2429x.h"
@@ -99,5 +98,4 @@ static bq2429x_params_t bq2429x_params[] = {
 }
 #endif
 
-#endif /* BQ2429X_PARAMS_H */
 /** @} */

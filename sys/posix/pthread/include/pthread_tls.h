@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup pthread
  * @{
@@ -14,9 +16,6 @@
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
-
-#ifndef PTHREAD_TLS_H
-#define PTHREAD_TLS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -86,8 +85,6 @@ struct __pthread_tls_datum **__pthread_get_tls_head(int self_id) PURE;
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* PTHREAD_TLS_H */
 
 /**
  * @}

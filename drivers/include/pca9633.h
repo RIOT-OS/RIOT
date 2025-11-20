@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_pca9633 PCA9633 I2C PWM controller
  * @ingroup     drivers_actuators
@@ -16,9 +18,6 @@
  * @author      Hendrik van Essen <hendrik.ve@fu-berlin.de>
  * @file
  */
-
-#ifndef PCA9633_H
-#define PCA9633_H
 
 #ifdef __cplusplus
 extern "C"
@@ -333,5 +332,4 @@ void pca9633_set_group_control_mode(pca9633_t* dev,
 }
 #endif
 
-#endif /* PCA9633_H */
 /** @} */

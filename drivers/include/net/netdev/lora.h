@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_netdev_lora LoRa drivers
  * @ingroup     drivers_netdev_api
@@ -16,9 +18,6 @@
  *
  * @author      José Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
-
-#ifndef NET_NETDEV_LORA_H
-#define NET_NETDEV_LORA_H
 
 #include <stdint.h>
 
@@ -40,5 +39,4 @@ typedef struct {
 }
 #endif
 
-#endif /* NET_NETDEV_LORA_H */
 /** @} */

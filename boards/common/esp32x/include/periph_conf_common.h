@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2023 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2023 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_common_esp32x
@@ -21,19 +20,20 @@
  * @{
  */
 
-#ifndef PERIPH_CONF_COMMON_H
-#define PERIPH_CONF_COMMON_H
-
 #if defined(CPU_FAM_ESP32)
-#include "periph_conf_common_esp32.h"
+#  include "periph_conf_common_esp32.h"
 #elif defined(CPU_FAM_ESP32C3)
-#include "periph_conf_common_esp32c3.h"
+#  include "periph_conf_common_esp32c3.h"
+#elif defined(CPU_FAM_ESP32C6)
+#  include "periph_conf_common_esp32c6.h"
+#elif defined(CPU_FAM_ESP32H2)
+#  include "periph_conf_common_esp32h2.h"
 #elif defined(CPU_FAM_ESP32S2)
-#include "periph_conf_common_esp32s2.h"
+#  include "periph_conf_common_esp32s2.h"
 #elif defined(CPU_FAM_ESP32S3)
-#include "periph_conf_common_esp32s3.h"
+#  include "periph_conf_common_esp32s3.h"
 #else
-#error "ESP32x SoC family not supported"
+#  error "ESP32x SoC family not supported"
 #endif
 
 /* include periph_cpu.h to make it visible in any case */
@@ -413,5 +413,4 @@ static const dwc2_usb_otg_fshs_config_t dwc2_usb_otg_fshs_config[] = {
 } /* end extern "C" */
 #endif
 
-#endif /* PERIPH_CONF_COMMON_H */
 /** @} */

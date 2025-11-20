@@ -22,12 +22,6 @@
 #include "log.h"
 #include "board.h"
 #include "net/gnrc/netif/ieee802154.h"
-#ifdef MODULE_GNRC_LWMAC
-#include "net/gnrc/lwmac/lwmac.h"
-#endif
-#ifdef MODULE_GNRC_GOMACH
-#include "net/gnrc/gomach/gomach.h"
-#endif
 #include "net/gnrc.h"
 #include "include/init_devs.h"
 
@@ -58,20 +52,7 @@ static inline void _setup_netif(gnrc_netif_t *netif, void* netdev, void* stack,
     if (netif == NULL || netdev == NULL) {
         return;
     }
-
-#if defined(MODULE_GNRC_GOMACH)
-        gnrc_netif_gomach_create(netif, stack,
-                                 AT86RF215_MAC_STACKSIZE,
-                                 prio, name, netdev);
-#elif defined(MODULE_GNRC_LWMAC)
-        gnrc_netif_lwmac_create(netif, stack,
-                                AT86RF215_MAC_STACKSIZE,
-                                prio, name, netdev);
-#else
-        gnrc_netif_ieee802154_create(netif, stack,
-                                     AT86RF215_MAC_STACKSIZE,
-                                     prio, name, netdev);
-#endif
+    gnrc_netif_ieee802154_create(netif, stack, AT86RF215_MAC_STACKSIZE, prio, name, netdev);
 }
 
 void auto_init_at86rf215(void)

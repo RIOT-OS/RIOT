@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_arduino
  * @{
@@ -19,9 +21,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef ARDUINO_BOARD_PWM_H
-#define ARDUINO_BOARD_PWM_H
 
 #include "arduino_iomap.h"
 #include "periph/pwm.h"
@@ -160,5 +159,4 @@ static const arduino_pwm_t arduino_pwm_list[] = {
 }
 #endif
 
-#endif /* ARDUINO_BOARD_PWM_H */
 /** @} */

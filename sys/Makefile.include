@@ -98,9 +98,18 @@ ifneq (,$(filter arduino,$(USEMODULE)))
   include $(RIOTBASE)/sys/arduino/Makefile.include
 endif
 
+# Add linker flags needed to enable printing of floats
 ifneq (,$(filter printf_float,$(USEMODULE)))
+  # newlib_nano does not enable printing of floats by default, so we need
+  # to add -u _printf_float to enable it (at the cost of increased ROM size)
+  # ...
   ifneq (,$(filter newlib_nano,$(USEMODULE)))
-    LINKFLAGS += -u _printf_float
+    # ... unless we are not actually using newlib's stdio, in which case we
+    # rather not add linker flags but let the custom stdio implementation
+    # (currently only mpaland-printf) handle that.
+    ifeq (,$(filter mpaland-printf,$(USEPKG)))
+      LINKFLAGS += -u _printf_float
+    endif
   endif
 endif
 
@@ -198,4 +207,8 @@ endif
 
 ifneq (,$(filter nanocoap,$(USEMODULE)))
   include $(RIOTBASE)/sys/net/application_layer/nanocoap/Makefile.include
+endif
+
+ifneq (,$(filter unicoap,$(USEMODULE)))
+  include $(RIOTBASE)/sys/net/application_layer/unicoap/Makefile.include
 endif

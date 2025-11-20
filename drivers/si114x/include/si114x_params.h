@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_si114x
  *
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef SI114X_PARAMS_H
-#define SI114X_PARAMS_H
 
 #include "board.h"
 #include "si114x.h"
@@ -65,5 +64,4 @@ saul_reg_t si114x_saul_reg_info[] =
 }
 #endif
 
-#endif /* SI114X_PARAMS_H */
 /** @} */

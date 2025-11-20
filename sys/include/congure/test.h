@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_congure_test    CongURE test framework shell commands
  * @ingroup     sys_congure
@@ -32,9 +34,6 @@
  *
  * @author  Martine S Lenders <m.lenders@fu-berlin.de>
  */
-
-#ifndef CONGURE_TEST_H
-#define CONGURE_TEST_H
 
 #include "congure_impl.h"
 
@@ -224,7 +223,7 @@ int congure_test_call_inter_msg_interval(int argc, char **argv);
 int congure_test_add_msg(int argc, char **argv);
 
 /**
- * @brief   Resets the the message pool and messages list for
+ * @brief   Resets the message pool and messages list for
  *          `cong_report msgs_lost` and `cong_report msgs_timeout`.
  *
  * @param[in] argc  Number of @p argv. Needs to be at least 1.
@@ -328,5 +327,4 @@ int congure_test_call_report(int argc, char **argv);
 }
 #endif
 
-#endif /* CONGURE_TEST_H */
 /** @} */

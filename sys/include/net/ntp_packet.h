@@ -6,11 +6,15 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_ntp_packet NTP Packet
  * @ingroup     net
  * @brief       The NTP packet module provides functionality to manipulate the NTP header
  * @{
+ *
+ * @see         An implementation of Simple NTP can be found in @ref net_sntp.
  *
  * @file
  * @brief       NTP packet definitions
@@ -18,9 +22,6 @@
  * @author      Luminița Lăzărescu <cluminita.lazarescu@gmail.com>
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
-
-#ifndef NET_NTP_PACKET_H
-#define NET_NTP_PACKET_H
 
 #include <stdint.h>
 #include "byteorder.h"
@@ -47,7 +48,7 @@ extern "C" {
 #define NTP_PORT             (123U)     /**< NTP port number */
 
 /**
- * @brief   Offset in seconds of NTP timestamp (seconds from 1990-01-01 00:00:00 UTC)
+ * @brief   Offset in seconds of NTP timestamp (seconds from 1900-01-01 00:00:00 UTC)
  *          to UNIX timestamp (seconds from 1970-01-01 00:00:00 UTC).
  */
 #define NTP_UNIX_OFFSET      (2208988800)
@@ -169,5 +170,4 @@ static inline ntp_mode_t ntp_packet_get_mode(ntp_packet_t *packet)
 }
 #endif
 
-#endif /* NET_NTP_PACKET_H */
 /** @} */

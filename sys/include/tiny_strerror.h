@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_tiny_strerror   Tiny strerror() implementation
  * @ingroup     sys
@@ -40,9 +42,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef TINY_STRERROR_H
-#define TINY_STRERROR_H
 
 #include <errno.h>
 #include <string.h>
@@ -79,5 +78,4 @@ const char *tiny_strerror(int errnum);
 }
 #endif
 
-#endif /* TINY_STRERROR_H */
 /** @} */

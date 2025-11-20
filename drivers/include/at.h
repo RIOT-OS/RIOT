@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_at AT (Hayes) command set library
  * @ingroup     drivers_misc
@@ -110,9 +112,6 @@
  * @brief       AT (Hayes) library interface
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef AT_H
-#define AT_H
 
 #include <stdint.h>
 #include <unistd.h>
@@ -662,5 +661,4 @@ void at_postprocess_urc_all(at_dev_t *dev, char *buf);
 }
 #endif
 
-#endif /* AT_H */
 /** @} */

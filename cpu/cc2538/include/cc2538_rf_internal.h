@@ -1,11 +1,9 @@
 /*
- * Copyright (C) 2016 MUTEX NZ Ltd.
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
- *
+ * SPDX-FileCopyrightText: 2016 MUTEX NZ Ltd.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_cc2538
@@ -16,9 +14,6 @@
  *
  * @author      Aaron Sowry <aaron@mutex.nz>
  */
-
-#ifndef CC2538_RF_INTERNAL_H
-#define CC2538_RF_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -100,5 +95,4 @@ bool RFCORE_ASSERT_failure(const char *expr, const char *func, int line);
 }
 #endif
 
-#endif /* CC2538_RF_INTERNAL_H */
 /** @} */

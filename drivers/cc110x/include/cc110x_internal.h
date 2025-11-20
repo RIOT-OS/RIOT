@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_cc110x
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef CC110X_INTERNAL_H
-#define CC110X_INTERNAL_H
 
 #include "cc110x_calibration.h"
 #include "cc110x_communication.h"
@@ -78,5 +77,4 @@ static inline int cc110x_is_ready_from_status(uint8_t status)
 }
 #endif
 
-#endif /* CC110X_INTERNAL_H */
 /** @} */

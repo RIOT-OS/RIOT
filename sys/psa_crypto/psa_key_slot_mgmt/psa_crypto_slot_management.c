@@ -96,7 +96,6 @@ static psa_key_id_t key_id_count = PSA_KEY_ID_VOLATILE_MIN;
 /**
  * @brief   Get the correct empty slot list, depending on the key type
  *
- * @param   attr
  * @return  clist_node_t*   Pointer to the list the key is supposed to be stored in,
  *                          according to its attributes
  */
@@ -313,7 +312,8 @@ static psa_status_t psa_get_persisted_key_slot_from_storage(psa_key_id_t id,
     size_t cbor_encoded_len;
     psa_key_attributes_t attr = psa_key_attributes_init();
 
-    psa_status_t status = psa_read_encoded_key_slot_from_file(id, cbor_buf, sizeof(cbor_buf), &cbor_encoded_len);
+    psa_status_t status = psa_read_encoded_key_slot_from_file(id, cbor_buf, sizeof(cbor_buf),
+                                                              &cbor_encoded_len);
     if (status != PSA_SUCCESS) {
         return status;
     }
@@ -573,7 +573,6 @@ size_t psa_get_key_data_from_key_slot(const psa_key_slot_t *slot, uint8_t **key_
 
     *key_data = NULL;
     *key_bytes = NULL;
-
 
     if (!psa_key_lifetime_is_external(attr.lifetime)) {
         if (!PSA_KEY_TYPE_IS_KEY_PAIR(attr.type)) {

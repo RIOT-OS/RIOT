@@ -1,0 +1,767 @@
+/*
+ * SPDX-FileCopyrightText: 2021 Espressif Systems (Shanghai) CO LTD
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include "ld.common"
+
+/**
+ * Added to maintain compatibility: there is no iram0 data section to place
+ * _coredump_iram_XXX symbols that are defined in espcoredump's linker.lf
+ */
+_coredump_iram_start = 0;
+_coredump_iram_end = 0;
+
+/* Default entry point */
+ENTRY(call_start_cpu0);
+
+SECTIONS
+{
+  /**
+   * RTC fast memory holds RTC wake stub code,
+   * including from any source file named rtc_wake_stub*.c
+   */
+  .rtc.text :
+  {
+    ALIGNED_SYMBOL(4, _rtc_text_start)
+
+    *(.rtc.literal .rtc.text .rtc.text.*)
+
+    *rtc_wake_stub*.*(.literal .text .literal.* .text.*)
+
+    /* Padding for possible CPU prefetch + alignment for PMS split lines */
+    . += _esp_memprot_prefetch_pad_size;
+    . = ALIGN(_esp_memprot_align_size);
+
+    _rtc_text_end = ABSOLUTE(.);
+  } > rtc_iram_seg
+
+  /**
+   * This section is required to skip rtc.text area because rtc_iram_seg and
+   * rtc_data_seg are reflect the same address space on different buses.
+   */
+  .rtc.dummy :
+  {
+    _rtc_dummy_start = ABSOLUTE(.);
+    _rtc_fast_start = ABSOLUTE(.);
+
+    . = SIZEOF(.rtc.text);
+
+    _rtc_dummy_end = ABSOLUTE(.);
+  } > rtc_data_seg
+
+  /**
+   * This section located in RTC FAST Memory area.
+   * It holds data marked with RTC_FAST_ATTR attribute.
+   * See the file "esp_attr.h" for more information.
+   */
+  .rtc.force_fast :
+  {
+    ALIGNED_SYMBOL(4, _rtc_force_fast_start)
+
+    _coredump_rtc_fast_start = ABSOLUTE(.);
+    *(.rtc.fast.coredump .rtc.fast.coredump.*)
+    _coredump_rtc_fast_end = ABSOLUTE(.);
+
+    *(.rtc.force_fast .rtc.force_fast.*)
+
+    ALIGNED_SYMBOL(4, _rtc_force_fast_end)
+  } > rtc_data_seg
+
+  /**
+   * RTC data section holds RTC wake stub
+   * data/rodata, including from any source file
+   * named rtc_wake_stub*.c and the data marked with
+   * RTC_DATA_ATTR, RTC_RODATA_ATTR attributes.
+   * The memory location of the data is dependent on
+   * CONFIG_ESP32S2_RTCDATA_IN_FAST_MEM option.
+   */
+  .rtc.data :
+  {
+    _rtc_data_start = ABSOLUTE(.);
+
+    _coredump_rtc_start = ABSOLUTE(.);
+    *(.rtc.coredump .rtc.coredump.*)
+    _coredump_rtc_end = ABSOLUTE(.);
+    *(.rtc.data .rtc.data.*)
+    *(.rtc.rodata .rtc.rodata.*)
+
+    *rtc_wake_stub*.*(.data .rodata .data.* .rodata.*)
+
+    _rtc_data_end = ABSOLUTE(.);
+  } > rtc_data_location
+
+  /* RTC bss, from any source file named rtc_wake_stub*.c */
+  .rtc.bss (NOLOAD) :
+  {
+    _rtc_bss_start = ABSOLUTE(.);
+
+    *rtc_wake_stub*.*(.bss .bss.*)
+    *rtc_wake_stub*.*(COMMON)
+
+    /* part that saves some data for rtc periph module, this part is
+       only initialized at power on reset */
+    _rtc_bss_rtc_start = ABSOLUTE(.);
+    *(.rtc.bss .rtc.bss.*)
+    _rtc_bss_rtc_end = ABSOLUTE(.);
+
+    _rtc_bss_end = ABSOLUTE(.);
+  } > rtc_data_location
+
+  /**
+   * This section holds data that should not be initialized at power up
+   * and will be retained during deep sleep.
+   * User data marked with RTC_NOINIT_ATTR will be placed
+   * into this section. See the file "esp_attr.h" for more information.
+   * The memory location of the data is dependent on
+   * CONFIG_ESP32S2_RTCDATA_IN_FAST_MEM option.
+   */
+  .rtc_noinit (NOLOAD):
+  {
+    ALIGNED_SYMBOL(4, _rtc_noinit_start)
+
+    *(.rtc_noinit .rtc_noinit.*)
+
+    ALIGNED_SYMBOL(4, _rtc_noinit_end)
+  } > rtc_data_location
+
+  /**
+   * This section located in RTC SLOW Memory area.
+   * It holds data marked with RTC_SLOW_ATTR attribute.
+   * See the file "esp_attr.h" for more information.
+   */
+  .rtc.force_slow :
+  {
+    ALIGNED_SYMBOL(4, _rtc_force_slow_start)
+
+    *(.rtc.force_slow .rtc.force_slow.*)
+
+    ALIGNED_SYMBOL(4, _rtc_force_slow_end)
+  } > rtc_slow_seg
+
+  /**
+   * This section holds RTC data that should have fixed addresses.
+   * The data are not initialized at power-up and are retained during deep
+   * sleep.
+   */
+  .rtc_reserved (NOLOAD):
+  {
+    ALIGNED_SYMBOL(4, _rtc_reserved_start)
+
+    /**
+     * New data can only be added here to ensure existing data are not moved.
+     * Because data have adhered to the end of the segment and code is relied
+     * on it.
+     * >> put new data here <<
+     */
+
+    *(.rtc_timer_data_in_rtc_mem .rtc_timer_data_in_rtc_mem.*)
+    KEEP(*(.bootloader_data_rtc_mem .bootloader_data_rtc_mem.*))
+
+    _rtc_reserved_end = ABSOLUTE(.);
+  } > rtc_reserved_seg
+
+  _rtc_reserved_length = _rtc_reserved_end - _rtc_reserved_start;
+  ASSERT((_rtc_reserved_length <= LENGTH(rtc_reserved_seg)),
+          "RTC reserved segment data does not fit.")
+
+  /* Get size of rtc slow data based on rtc_data_location alias */
+  _rtc_slow_length = (ORIGIN(rtc_slow_seg) == ORIGIN(rtc_data_location))
+                        ? (_rtc_force_slow_end - _rtc_data_start)
+                        : (_rtc_force_slow_end - _rtc_force_slow_start);
+
+  _rtc_fast_length = (ORIGIN(rtc_slow_seg) == ORIGIN(rtc_data_location))
+                        ? (_rtc_force_fast_end - _rtc_fast_start)
+                        : (_rtc_noinit_end - _rtc_fast_start);
+
+  ASSERT((_rtc_slow_length <= LENGTH(rtc_slow_seg)),
+          "RTC_SLOW segment data does not fit.")
+
+  ASSERT((_rtc_fast_length <= LENGTH(rtc_data_seg)),
+          "RTC_FAST segment data does not fit.")
+
+  /* Send .iram0 code to iram */
+  .iram0.vectors :
+  {
+    _iram_start = ABSOLUTE(.);
+    /* Vectors go to IRAM */
+    _vector_table = ABSOLUTE(.);
+    . = 0x0;
+    KEEP(*(.WindowVectors.text));
+    . = 0x180;
+    KEEP(*(.Level2InterruptVector.text));
+    . = 0x1c0;
+    KEEP(*(.Level3InterruptVector.text));
+    . = 0x200;
+    KEEP(*(.Level4InterruptVector.text));
+    . = 0x240;
+    KEEP(*(.Level5InterruptVector.text));
+    . = 0x280;
+    KEEP(*(.DebugExceptionVector.text));
+    . = 0x2c0;
+    KEEP(*(.NMIExceptionVector.text));
+    . = 0x300;
+    KEEP(*(.KernelExceptionVector.text));
+    . = 0x340;
+    KEEP(*(.UserExceptionVector.text));
+    . = 0x3C0;
+    KEEP(*(.DoubleExceptionVector.text));
+    . = 0x400;
+    _invalid_pc_placeholder = ABSOLUTE(.);
+    *(.*Vector.literal)
+
+    *(.UserEnter.literal);
+    *(.UserEnter.text);
+    . = ALIGN (16);
+    *(.entry.literal)
+    *(.entry.text)
+    *(.init.literal)
+    *(.init)
+
+    _init_end = ABSOLUTE(.);
+  } > iram0_0_seg
+
+  .iram0.text :
+  {
+    /* Code marked as running out of IRAM */
+    _iram_text_start = ABSOLUTE(.);
+
+    *(.iram1 .iram1.*)
+
+    /* Xtensa basic functionality written in assembler should be placed in IRAM */
+    *xtensa/*(.literal .text .literal.* .text.*)
+
+    /* parts of RIOT that should run in IRAM */
+    *core/*(.literal .text .literal.* .text.*)
+    *core_lib/*(.literal .text .literal.* .text.*)
+    *esp_common_periph/flash.*(.literal .text .literal.* .text.*)
+    *esp_common/thread_arch.*(.literal .text .literal.* .text.*)
+    *esp_freertos_common/*(.literal .text .literal.* .text.*)
+    *isrpipe/*(.literal .text .literal.* .text.*)
+    *stdio/stdio.*(.literal .text .literal.* .text.*) 
+    *stdio_*/stdio*(.literal .text .literal.* .text.*) 
+    *syscalls.*(.literal .text .literal.* .text.*)
+    *tsrb/*(.literal .text .literal.* .text.*)
+
+    /* parts of ESP-IDF that should run in IRAM */
+    /* find components/ -type f -name linker.lf -exec grep "(noflash)" {} \; -print */
+    /* find components/ -type f -name linker.lf -exec grep "(noflash_text)" {} \; -print */
+    *components/app_trace/app_trace.*(.literal .literal.* .text .text.*)
+    *components/app_trace/app_trace_util.*(.literal .literal.* .text .text.*)
+    *components/app_trace/port/port_uart.*(.literal .literal.* .text .text.*)
+    *components/esp_driver_gptimer/src/gptimer.*(.literal.gptimer_default_isr .text.gptimer_default_isr)
+    *components/esp_driver_spi/src/spi_dma.*(.literal.spi_dma_get_eof_desc .text.spi_dma_get_eof_desc)
+    *components/esp_driver_spi/src/spi_dma.*(.literal.spi_dma_reset .text.spi_dma_reset)
+    *components/esp_driver_spi/src/spi_dma.*(.literal.spi_dma_start .text.spi_dma_start)
+    *components/esp_event/default_event_loop.*(.literal.esp_event_isr_post .text.esp_event_isr_post)
+    *components/esp_event/esp_event.*(.literal.esp_event_isr_post_to .text.esp_event_isr_post_to)
+    *components/esp_hw_support/cpu.*(.literal.esp_cpu_compare_and_set .text.esp_cpu_compare_and_set)
+    *components/esp_hw_support/cpu.*(.literal.esp_cpu_reset .text.esp_cpu_reset)
+    *components/esp_hw_support/cpu.*(.literal.esp_cpu_stall .text.esp_cpu_stall)
+    *components/esp_hw_support/cpu.*(.literal.esp_cpu_unstall .text.esp_cpu_unstall)
+    *components/esp_hw_support/cpu.*(.literal.esp_cpu_wait_for_intr .text.esp_cpu_wait_for_intr)
+    *components/esp_hw_support/esp_memory_utils.*(.literal .literal.* .text .text.*)
+    *components/esp_hw_support/mspi_timing_tuning.*(.literal .literal.* .text .text.*)
+    *components/esp_hw_support/periph_ctrl.*(.literal.periph_module_reset .text.periph_module_reset)
+    *components/esp_hw_support/periph_ctrl.*(.literal.wifi_module_disable .text.wifi_module_disable)
+    *components/esp_hw_support/periph_ctrl.*(.literal.wifi_module_enable .text.wifi_module_enable)
+    *components/esp_hw_support/*/rtc_clk.*(.literal .literal.* .text .text.*)
+    *components/esp_hw_support/*/rtc_init.*(.literal.rtc_vddsdio_get_config .text.rtc_vddsdio_get_config)
+    *components/esp_hw_support/*/rtc_init.*(.literal.rtc_vddsdio_set_config .text.rtc_vddsdio_set_config)
+    *components/esp_hw_support/*/rtc_sleep.*(.literal .literal.* .text .text.*)
+    *components/esp_hw_support/*/rtc_time.*(.literal .literal.* .text .text.*)
+    *components/esp_hw_support/rtc_wdt.*(.literal .literal.* .text .text.*)
+    *components/esp_hw_support/*/sar_periph_ctrl.*(.literal.sar_periph_ctrl_power_enable .text.sar_periph_ctrl_power_enable)
+    *components/esp_hw_support/*/systimer.*(.literal .literal.* .text .text.*)
+    *components/esp_mm/esp_cache.*(.literal .literal.* .text .text.*)
+    *components/esp_psram/*/esp_psram_impl_*(.literal .literal.* .text .text.*)
+    *components/esp_psram/mmu_psram_flash*(.literal .literal.* .text .text.*)
+    *components/esp_ringbuf/*(.literal .literal.* .text .text.*)
+    *components/esp_rom/patches/esp_rom_cache_esp32s2_esp32s3.*(.literal .literal.* .text .text.*)
+    *components/esp_rom/patches/esp_rom_print.*(.literal .literal.* .text .text.*)
+    *components/esp_rom/patches/esp_rom_spiflash.*(.literal .literal.* .text .text.*)
+    *components/esp_rom/patches/esp_rom_sys.*(.literal .literal.* .text .text.*)
+    *components/esp_rom/patches/esp_rom_systimer.*(.literal .literal.* .text .text.*)
+    *components/esp_system/esp_err.*(.literal .literal.* .text .text.*)
+    *components/esp_system/port/esp_system_chip.*(.literal.esp_system_abort .text.esp_system_abort)
+    *components/esp_system/port/image_process.*(.literal .literal.* .text .text.*)
+    *components/esp_system/ubsan.*(.literal .literal.* .text .text.*)
+    *components/esp_wifi/*/esp_adapter.*(.literal.coex_pti_get_wrapper .text.coex_pti_get_wrapper)
+    *components/esp_wifi/src/wifi_netif.*(.literal.wifi_sta_receive .text.wifi_sta_receive)
+    *components/esp_wifi/src/wifi_netif.*(.literal.wifi_transmit_wrap .text.wifi_transmit_wrap)
+
+    *libclang_rt.builtins.a:_divsf3.*(.literal .literal.* .text .text.*)
+    *libgcc.a:_divsf3.*(.literal .literal.* .text .text.*)
+    *libgcc.a:lib2funcs.*(.literal .literal.* .text .text.*)
+    *libgcov.a:(.literal .literal.* .text .text.*)
+    *libg_nano.a:libc_a-mem*(.literal .literal.* .text .text.*)
+
+    *components/hal/cache_hal.*(.literal .literal.* .text .text.*)
+    *components/hal/gpio_hal.*(.literal.gpio_hal_isolate_in_sleep .text.gpio_hal_isolate_in_sleep)
+    *components/hal/i2c_hal_iram.*(.literal .literal.* .text .text.*)
+    *components/hal/ledc_hal_iram.*(.literal .literal.* .text .text.*)
+    *components/hal/mmu_hal.*(.literal .literal.* .text .text.*)
+    *components/hal/spi_flash_encrypt_hal_iram.*(.literal .literal.* .text .text.*)
+    *components/hal/spi_flash_hal_gpspi.*(.literal .literal.* .text .text.*)
+    *components/hal/spi_flash_hal_iram.*(.literal .literal.* .text .text.*)
+    *components/hal/spi_hal_iram.*(.literal .literal.* .text .text.*)
+    *components/hal/spi_slave_hal_iram.*(.literal .literal.* .text .text.*)
+    *components/hal/systimer_hal.*(.literal .literal.* .text .text.*)
+    *components/hal/timer_hal.*(.literal.timer_hal_capture_and_get_counter_value .text.timer_hal_capture_and_get_counter_value)
+    *components/hal/wdt_hal_iram.*(.literal .literal.* .text .text.*)
+    *components/heap/multi_heap.*(.literal.assert_valid_block .text.assert_valid_block)
+    *components/heap/multi_heap.*(.literal.multi_heap_aligned_alloc_impl .text.multi_heap_aligned_alloc_impl)
+    *components/heap/multi_heap.*(.literal.multi_heap_aligned_alloc_impl_offs .text.multi_heap_aligned_alloc_impl_offs)
+    *components/heap/multi_heap.*(.literal.multi_heap_aligned_alloc_offs .text.multi_heap_aligned_alloc_offs)
+    *components/heap/multi_heap.*(.literal.multi_heap_free_impl .text.multi_heap_free_impl)
+    *components/heap/multi_heap.*(.literal.multi_heap_get_allocated_size_impl .text.multi_heap_get_allocated_size_impl)
+    *components/heap/multi_heap.*(.literal.multi_heap_get_block_address_impl .text.multi_heap_get_block_address_impl)
+    *components/heap/multi_heap.*(.literal.multi_heap_get_first_block .text.multi_heap_get_first_block)
+    *components/heap/multi_heap.*(.literal.multi_heap_get_next_block .text.multi_heap_get_next_block)
+    *components/heap/multi_heap.*(.literal.multi_heap_internal_lock .text.multi_heap_internal_lock)
+    *components/heap/multi_heap.*(.literal.multi_heap_internal_unlock .text.multi_heap_internal_unlock)
+    *components/heap/multi_heap.*(.literal.multi_heap_is_free .text.multi_heap_is_free)
+    *components/heap/multi_heap.*(.literal.multi_heap_malloc_impl .text.multi_heap_malloc_impl)
+    *components/heap/multi_heap.*(.literal.multi_heap_realloc_impl .text.multi_heap_realloc_impl)
+    *components/heap/multi_heap.*(.literal.multi_heap_set_lock .text.multi_heap_set_lock)
+    *tlsf/tlsf.*(.literal.tlsf_alloc_overhead .text.tlsf_alloc_overhead)
+    *tlsf/tlsf.*(.literal.tlsf_block_size .text.tlsf_block_size)
+    *tlsf/tlsf.*(.literal.tlsf_free .text.tlsf_free)
+    *tlsf/tlsf.*(.literal.tlsf_get_pool .text.tlsf_get_pool)
+    *tlsf/tlsf.*(.literal.tlsf_malloc .text.tlsf_malloc)
+    *tlsf/tlsf.*(.literal.tlsf_memalign .text.tlsf_memalign)
+    *tlsf/tlsf.*(.literal.tlsf_memalign_offs .text.tlsf_memalign_offs)
+    *tlsf/tlsf.*(.literal.tlsf_realloc .text.tlsf_realloc)
+    *tlsf/tlsf.*(.literal.tlsf_size .text.tlsf_size)
+    *components/log/*/log_lock.*(.literal .literal.* .text .text.*)
+    *components/log/*/log_timestamp.*(.literal.esp_log_early_timestamp .text.esp_log_early_timestamp)
+    *components/log/*/log_timestamp.*(.literal.esp_log_timestamp .text.esp_log_timestamp)
+    *components/log/*/log_write.*(.literal.esp_log_write .text.esp_log_write)
+
+    *libnet80211.a:(.wifi0iram .wifi0iram.*)
+    *libnet80211.a:(.wifirxiram .wifirxiram.*)
+    *libnet80211.a:(.wifislprxiram .wifislprxiram.*)
+
+    *components/newlib/abort.*(.literal .literal.* .text .text.*)
+    *components/newlib/assert.*(.literal .literal.* .text .text.*)
+    *components/newlib/heap.*(.literal .literal.* .text .text.*)
+    *components/newlib/stdatomic.*(.literal .literal.* .text .text.*)
+
+    *libpp.a:(.wifi0iram .wifi0iram.*)
+    *libpp.a:(.wifiorslpiram .wifiorslpiram.*)
+    *libpp.a:(.wifirxiram .wifirxiram.*)
+    *libpp.a:(.wifislprxiram .wifislprxiram.*)
+    *librtc.a:(.literal .literal.* .text .text.*)
+
+    *components/soc/lldesc.*(.literal .literal.* .text .text.*)
+    *components/spi_flash/flash_brownout_hook.*(.literal .literal.* .text .text.*)
+    *components/spi_flash/memspi_host_driver.*(.literal .literal.* .text .text.*)
+    *components/spi_flash/spi_flash_chip_boya.*(.literal .literal.* .text .text.*)
+    *components/spi_flash/spi_flash_chip_gd.*(.literal .literal.* .text .text.*)
+    *components/spi_flash/spi_flash_chip_generic.*(.literal .literal.* .text .text.*)
+    *components/spi_flash/spi_flash_chip_issi.*(.literal .literal.* .text .text.*)
+    *components/spi_flash/spi_flash_chip_mxic*.*(.literal .literal.* .text .text.*)
+    *components/spi_flash/spi_flash_chip_th.*(.literal .literal.* .text .text.*)
+    *components/spi_flash/spi_flash_chip_winbond.*(.literal .literal.* .text .text.*)
+    *components/spi_flash/spi_flash_wrap.*(.literal .literal.* .text .text.*)
+
+    *libxt_hal.a:(.literal .literal.* .text .text.*)
+
+    *components/xtensa/*(.literal .literal.* .text .text.*)
+
+    /* Padding for possible CPU prefetch + alignment for PMS split lines */
+    . += _esp_memprot_prefetch_pad_size;
+    . = ALIGN(_esp_memprot_align_size);
+
+    /* iram_end_test section exists for use by memprot unit tests only */
+    *(.iram_end_test)
+
+    _iram_text_end = ABSOLUTE(.);
+  } > iram0_0_seg
+
+  .dram0_reserved_for_iram (NOLOAD):
+  {
+    . = ORIGIN(dram0_0_seg) + _iram_end - _iram_start;
+  } > dram0_0_seg
+
+  .dram0.data :
+  {
+    _data_start = ABSOLUTE(.);
+    *(.gnu.linkonce.d.*)
+    *(.data1)
+    *(.sdata)
+    *(.sdata.*)
+    KEEP (*(SORT(.xfa.*)))
+    *(.gnu.linkonce.s.*)
+    *(.gnu.linkonce.s2.*)
+    *(.jcr)
+
+    *(EXCLUDE_FILE(*components/bt/* *libbtdm_app.a) .data EXCLUDE_FILE(*components/bt/* *libbtdm_app.a) .data.*)
+    *(.data .data.*)
+    *(.dram1 .dram1.*)
+
+    _coredump_dram_start = ABSOLUTE(.);
+    *(.dram2.coredump .dram2.coredump.*)
+    _coredump_dram_end = ABSOLUTE(.);
+
+    *components/app_trace/app_trace.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/app_trace/app_trace_util.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/app_trace/port/port_uart.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+
+    _bt_data_start = ABSOLUTE(.);
+    *libbt.a:(.data .data.*)
+    . = ALIGN(4);
+    _bt_data_end = ABSOLUTE(.);
+    . = ALIGN(4);
+    _bt_controller_data_start = ABSOLUTE(.);
+    *libbtdm_app.a:(.data .data.*)
+    . = ALIGN(4);
+    _bt_controller_data_end = ABSOLUTE(.);
+
+
+    *components/esp_hw_support/esp_memory_utils.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/esp_hw_support/mspi_timing_tuning.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/esp_hw_support/*/rtc_clk.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/esp_hw_support/*/systimer.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/esp_mm/esp_cache.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/esp_psram/*/esp_psram_impl_*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/esp_psram/mmu_psram_flash*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/esp_rom/esp_rom_cache_esp32s2_esp32s3.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/esp_rom/patches/esp_rom_print.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/esp_rom/patches/esp_rom_spiflash.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/esp_rom/patches/esp_rom_sys.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/esp_rom/patches/esp_rom_systimer.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/esp_system/esp_err.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/esp_system/port/image_process.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/esp_system/ubsan.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+
+    *libclang_rt.builtins.a:_divsf3.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *libgcc.a:_divsf3.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *libgcov.a:(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+
+    *components/hal/cache_hal.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/hal/i2c_hal_iram.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/hal/ledc_hal_iram.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/hal/mmu_hal.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/hal/spi_flash_encrypt_hal_iram.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/hal/spi_flash_hal_gpspi.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/hal/spi_flash_hal_iram.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/hal/spi_hal_iram.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/hal/spi_slave_hal_iram.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/hal/systimer_hal.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/hal/wdt_hal_iram.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/log/log_lock.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/newlib/abort.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/newlib/assert.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/newlib/heap.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/newlib/stdatomic.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+
+    _nimble_data_start = ABSOLUTE(.);
+    *libnimble.a:(.data .data.*)
+    . = ALIGN(4);
+    _nimble_data_end = ABSOLUTE(.);
+    *libphy.a:(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+
+    *components/soc/lldesc.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/spi_flash/flash_brownout_hook.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/spi_flash/memspi_host_driver.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/spi_flash/spi_flash_chip_boya.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/spi_flash/spi_flash_chip_gd.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/spi_flash/spi_flash_chip_generic.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/spi_flash/spi_flash_chip_issi.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/spi_flash/spi_flash_chip_mxic*.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/spi_flash/spi_flash_chip_th.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/spi_flash/spi_flash_chip_winbond.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/spi_flash/spi_flash_wrap.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+
+    _data_end = ABSOLUTE(.);
+  } > dram0_0_seg
+
+  /**
+   * This section holds data that should not be initialized at power up.
+   * The section located in Internal SRAM memory region. The macro _NOINIT
+   * can be used as attribute to place data into this section.
+   * See the "esp_attr.h" file for more information.
+   */
+  .noinit (NOLOAD):
+  {
+    ALIGNED_SYMBOL(4, _noinit_start)
+
+    *(.noinit .noinit.*)
+
+    ALIGNED_SYMBOL(4, _noinit_end)
+  } > dram0_0_seg
+
+#if CONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY
+  /* External Memory BSS. (Variables with EXT_RAM_BSS_ATTR attribute). */
+  .ext_ram.bss (NOLOAD) :
+  {
+    ALIGNED_SYMBOL(4, _ext_ram_bss_start)
+
+    mapping[extern_ram]
+
+    ALIGNED_SYMBOL(4, _ext_ram_bss_end)
+  } > extern_ram_seg
+#endif //CONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY
+
+#if CONFIG_SPIRAM_ALLOW_NOINIT_SEG_EXTERNAL_MEMORY
+  /**
+   * This section holds data that won't be initialised when startup.
+   * This section locates in External RAM region.
+   */
+  .ext_ram_noinit (NOLOAD) :
+  {
+    _ext_ram_noinit_start = ABSOLUTE(.);
+
+    *(.ext_ram_noinit*)
+
+    ALIGNED_SYMBOL(4, _ext_ram_noinit_end)
+  } > extern_ram_seg
+#endif //CONFIG_SPIRAM_ALLOW_NOINIT_SEG_EXTERNAL_MEMORY
+
+  /* Shared RAM */
+  .dram0.bss (NOLOAD) :
+  {
+    ALIGNED_SYMBOL(8, _bss_start)
+
+    /**
+     * ldgen places all bss-related data to mapping[dram0_bss]
+     * (See components/esp_system/app.lf).
+     */
+    *(.bss .bss.*)
+    *(.dynbss .dynsbss .gnu.linkonce.b .gnu.linkonce.b.* .gnu.linkonce.sb .gnu.linkonce.sb.* .gnu.linkonce.sb2 .gnu.linkonce.sb2.* .sbss .sbss.* .sbss2 .sbss2.* .scommon .share.mem)
+    *(.ext_ram.bss .ext_ram.bss.*)
+    *(COMMON)
+
+    . = ALIGN(4);
+    _bt_bss_start = ABSOLUTE(.);
+    *libbt.a:(.bss .bss.*)
+    . = ALIGN(4);
+    _bt_bss_end = ABSOLUTE(.);
+    . = ALIGN(4);
+    _bt_common_start = ABSOLUTE(.);
+    *libbt.a:(COMMON)
+    . = ALIGN(4);
+    _bt_common_end = ABSOLUTE(.);
+    . = ALIGN(4);
+    _bt_controller_bss_start = ABSOLUTE(.);
+    *libbtdm_app.a:(.bss .bss.*)
+    . = ALIGN(4);
+    _bt_controller_bss_end = ABSOLUTE(.);
+    . = ALIGN(4);
+    _bt_controller_common_start = ABSOLUTE(.);
+    *libbtdm_app.a:(COMMON)
+    . = ALIGN(4);
+    _bt_controller_common_end = ABSOLUTE(.);
+    _nimble_bss_start = ABSOLUTE(.);
+    *libnimble.a:(.bss .bss.* COMMON)
+    . = ALIGN(4);
+    _nimble_bss_end = ABSOLUTE(.);
+
+    ALIGNED_SYMBOL(8, _bss_end)
+  } > dram0_0_seg
+
+  .flash.appdesc : ALIGN(0x10)
+  {
+    /**
+     * Mark flash.rodata start.
+     * This can be used for mmu driver to maintain virtual address
+     */
+    _rodata_reserved_start = ABSOLUTE(.);
+    _rodata_start = ABSOLUTE(.);
+
+    /* !DO NOT PUT ANYTHING BEFORE THIS! */
+
+    /* Should be the first.  App version info. */
+    *(.rodata_desc .rodata_desc.*)
+    /* Should be the second. Custom app version info. */
+    *(.rodata_custom_desc .rodata_custom_desc.*)
+
+    /**
+     * Create an empty gap within this section. Thanks to this, the end of this
+     * section will match .flah.rodata's begin address. Thus, both sections
+     * will be merged when creating the final bin image.
+     */
+    . = ALIGN(ALIGNOF(.flash.rodata));
+  } > default_rodata_seg
+  ASSERT_SECTIONS_GAP(.flash.appdesc, .flash.rodata)
+
+  .flash.rodata : ALIGN(0x10)
+  {
+    _flash_rodata_start = ABSOLUTE(.);
+
+    *(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *(.rodata_wlog_error .rodata_wlog_error.*)
+    *(.rodata_wlog_info .rodata_wlog_info.*)
+    *(.rodata_wlog_warning .rodata_wlog_warning.*)
+
+    KEEP (*(SORT(.roxfa.*)))
+
+    *(.irom1.text) /* catch stray ICACHE_RODATA_ATTR */
+    *(.gnu.linkonce.r.*)
+    *(.rodata1)
+
+    /* C++ exception handlers table.  */
+    ALIGNED_SYMBOL(4, __XT_EXCEPTION_TABLE_)
+    *(.xt_except_table)
+    *(.gcc_except_table .gcc_except_table.*)
+    *(.gnu.linkonce.e.*)
+
+    ALIGNED_SYMBOL(4, __XT_EXCEPTION_DESCS_)
+    *(.xt_except_desc)
+    *(.gnu.linkonce.h.*)
+    __XT_EXCEPTION_DESCS_END__ = ABSOLUTE(.);
+    *(.xt_except_desc_end)
+
+#if CONFIG_COMPILER_CXX_EXCEPTIONS
+    ALIGNED_SYMBOL(4, __eh_frame)
+    KEEP(*(.eh_frame))
+    /**
+     * As we are not linking with crtend.o, which includes the CIE terminator
+     * (see __FRAME_END__ in libgcc sources), it is manually provided here.
+     */
+    LONG(0);
+#endif // CONFIG_COMPILER_CXX_EXCEPTIONS
+
+    /**
+     * C++ constructor tables.
+     *
+     * Excluding crtbegin.o/crtend.o since IDF doesn't use the toolchain crt.
+     */
+    ALIGNED_SYMBOL(4, __init_array_start)
+    KEEP (*(EXCLUDE_FILE (*crtend.* *crtbegin.*) .ctors SORT(.ctors.*)))
+    __init_array_end = ABSOLUTE(.);
+
+    /* Addresses of memory regions reserved via SOC_RESERVE_MEMORY_REGION() */
+    ALIGNED_SYMBOL(4, soc_reserved_memory_region_start)
+    KEEP (*(.reserved_memory_address))
+    soc_reserved_memory_region_end = ABSOLUTE(.);
+
+    /* System init functions registered via ESP_SYSTEM_INIT_FN */
+    ALIGNED_SYMBOL(4, _esp_system_init_fn_array_start)
+    KEEP (*(SORT_BY_INIT_PRIORITY(.esp_system_init_fn.*)))
+    _esp_system_init_fn_array_end = ABSOLUTE(.);
+
+    _rodata_end = ABSOLUTE(.);
+
+    /* Literals are also RO data. */
+    _lit4_start = ABSOLUTE(.);
+    *(*.lit4)
+    *(.lit4.*)
+    *(.gnu.linkonce.lit4.*)
+    _lit4_end = ABSOLUTE(.);
+
+    /* TLS data. */
+    ALIGNED_SYMBOL(4, _thread_local_start)
+    *(.tdata)
+    *(.tdata.*)
+    *(.tbss)
+    *(.tbss.*)
+    _thread_local_end = ABSOLUTE(.);
+  } > default_rodata_seg
+
+  _flash_rodata_align = ALIGNOF(.flash.rodata);
+
+  /**
+   * This section contains all the rodata that is not used
+   * at runtime, helping to avoid an increase in binary size.
+   */
+  .flash.rodata_noload (NOLOAD) :
+  {
+    /**
+     * This symbol marks the end of flash.rodata. It can be utilized by the MMU
+     * driver to maintain the virtual address.
+     * NOLOAD rodata may not be included in this section.
+     */
+    _rodata_reserved_end = ABSOLUTE(.);
+
+    . = ALIGN(CONFIG_MMU_PAGE_SIZE);
+    _fp_mmu_start = .;
+    _fp_mmu_end = . + CONFIG_ESP_FLASHPAGE_CAPACITY;
+
+    _fp_mem_start = . ;
+    KEEP(*(SORT(.flash_writable.*)))
+    _fp_mem_end = . ;
+    . = ALIGN(4096);
+    _end_fw = . ;
+
+    *(.rodata_wlog_debug .rodata_wlog_debug.*)
+    *(.rodata_wlog_verbose .rodata_wlog_verbose.*)
+  } > default_rodata_seg
+
+  .flash.text :
+  {
+    _stext = .;
+    /**
+     * Mark the start of flash.text.
+     * This can be used by the MMU driver to maintain the virtual address.
+     */
+    _instruction_reserved_start = ABSOLUTE(.);
+    _text_start = ABSOLUTE(.);
+
+    *(.literal .literal.* .text .text.*)
+    *(.wifi0iram.*)
+    *(.wifiextrairam .wifiextrairam.*)
+    *(.wifiorslpiram .wifiorslpiram.*)
+    *(.wifirxiram .wifirxiram.*)
+    *(.wifislpiram .wifislpiram.*)
+    *(.wifislprxiram .wifislprxiram.*)
+
+    *(.stub)
+    *(.gnu.warning)
+    *(.gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
+    *(.irom0.text) /* catch stray ICACHE_RODATA_ATTR */
+
+    /**
+     * CPU will try to prefetch up to 16 bytes of of instructions.
+     * This means that any configuration (e.g. MMU, PMS) must allow
+     * safe access to up to 16 bytes after the last real instruction,
+     * add dummy bytes to ensure this.
+     */
+    . += _esp_flash_mmap_prefetch_pad_size;
+
+    _text_end = ABSOLUTE(.);
+    /**
+     * Mark the flash.text end.
+     * This can be used for MMU driver to maintain virtual address.
+     */
+    _instruction_reserved_end = ABSOLUTE(.);
+    _etext = .;
+
+    /**
+     * Similar to _iram_start, this symbol goes here so it is
+     * resolved by addr2line in preference to the first symbol in
+     * the flash.text segment.
+     */
+    _flash_cache_start = ABSOLUTE(0);
+  } > default_code_seg
+
+  /* Marks the end of IRAM code segment */
+  .iram0.text_end (NOLOAD) :
+  {
+    ALIGNED_SYMBOL(4, _iram_end)
+  } > iram0_0_seg
+
+  /* Marks the end of data, bss and possibly rodata  */
+  .dram0.heap_start (NOLOAD) :
+  {
+    /* Lowest possible start address for the heap */
+    ALIGNED_SYMBOL(8, _heap_low_start)
+    _sheap = ABSOLUTE(.);
+  } > dram0_0_seg
+
+
+  . = ORIGIN(dram0_0_seg) + LENGTH(dram0_0_seg);
+  _eheap = ABSOLUTE(.);
+
+  . = _heap_end;
+
+#include "elf_misc.ld.in"
+}
+
+ASSERT(((_iram_text_end - ORIGIN(iram0_0_seg)) <= LENGTH(iram0_0_seg)),
+          "IRAM0 segment data does not fit.")
+
+ASSERT(((_heap_low_start - _data_start) <= LENGTH(dram0_0_seg)),
+          "DRAM segment data does not fit.")

@@ -209,7 +209,7 @@ int sht2x_read_ident(const sht2x_t *dev, uint8_t * buffer, size_t buflen)
     DEBUG("[SHT2x] ident (1): %02x %02x %02x %02x\n", data1[4], data1[5], data1[6], data1[7]);
     for (size_t ix = 0; ix < sizeof(data1); ix += 2) {
         if (sht2x_checkcrc(&data1[ix], 1, data1[ix + 1]) != 0) {
-            DEBUG("[SHT2x] checksum error first (ix=%d)\n", ix);
+            DEBUG("[SHT2x] checksum error first (ix=%zu)\n", ix);
             return SHT2X_ERR_CRC;
         }
     }
@@ -225,7 +225,7 @@ int sht2x_read_ident(const sht2x_t *dev, uint8_t * buffer, size_t buflen)
     DEBUG("[SHT2x] ident (2): %02x %02x %02x\n", data2[3], data2[4], data2[5]);
     for (size_t ix = 0; ix < sizeof(data2); ix += 3) {
         if (sht2x_checkcrc(&data2[ix], 2, data2[ix + 2]) != 0) {
-            DEBUG("[SHT2x] checksum error, second (ix=%d)\n", ix);
+            DEBUG("[SHT2x] checksum error, second (ix=%zu)\n", ix);
             return SHT2X_ERR_CRC;
         }
     }
@@ -300,7 +300,7 @@ int sht2x_write_userreg(const sht2x_t *dev, uint8_t userreg)
  * @brief       Read a sensor value from the given SHT2X device
  *
  * @param[in]  dev          Device descriptor of SHT2X device to read from
- * @param[in]  cmd          The SHT2x command (hold mode only)
+ * @param[in]  command      The SHT2x command (hold mode only)
  * @param[out] val          The raw sensor value (only valid if no error)
  *
  * @return                  SHT2X_OK value is returned in @p val
@@ -346,7 +346,7 @@ static int read_sensor(const sht2x_t* dev, cmd_t command, uint16_t *val)
  * @brief       Read a sensor value from the given SHT2X device, polling mode
  *
  * @param[in]  dev          Device descriptor of SHT2X device to read from
- * @param[in]  cmd          The SHT2x command (hold mode only)
+ * @param[in]  command      The SHT2x command (hold mode only)
  * @param[out] val          The raw sensor value (only valid if no error)
  *
  * @return                  SHT2X_OK value is returned in @p val

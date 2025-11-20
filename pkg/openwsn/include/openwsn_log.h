@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_openwsn
  * @{
@@ -19,8 +21,7 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef OPENWSN_LOG_H
-#define OPENWSN_LOG_H
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -93,5 +94,4 @@ enum {
 }
 #endif
 
-#endif /* OPENWSN_LOG_H */
 /** @} */

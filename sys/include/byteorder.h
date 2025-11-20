@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
-
-#ifndef BYTEORDER_H
-#define BYTEORDER_H
 
 #include <string.h>
 #include <stdint.h>
@@ -618,5 +617,4 @@ static inline void byteorder_htolebufll(uint8_t *buf, uint64_t val)
 }
 #endif
 
-#endif /* BYTEORDER_H */
 /** @} */

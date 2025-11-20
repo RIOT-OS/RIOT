@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup pthread
  * @{
@@ -13,9 +15,6 @@
  * @brief   Synchronization barriers.
  * @note    Do not include this header file directly, but pthread.h.
  */
-
-#ifndef PTHREAD_BARRIER_H
-#define PTHREAD_BARRIER_H
 
 #include "mutex.h"
 
@@ -135,8 +134,6 @@ int pthread_barrierattr_setpshared(pthread_barrierattr_t *attr, int pshared);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* PTHREAD_BARRIER_H */
 
 /**
  * @}

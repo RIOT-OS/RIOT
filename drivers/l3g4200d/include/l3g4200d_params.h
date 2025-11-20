@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_l3g4200d
  *
@@ -15,9 +17,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef L3G4200D_PARAMS_H
-#define L3G4200D_PARAMS_H
 
 #include "board.h"
 #include "l3g4200d.h"
@@ -83,5 +82,4 @@ static const saul_reg_info_t l3g4200d_saul_info[] =
 }
 #endif
 
-#endif /* L3G4200D_PARAMS_H */
 /** @} */

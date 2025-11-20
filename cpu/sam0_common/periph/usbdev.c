@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2019 Koen Zandberg
- *               2022 SSV Software Systems GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Koen Zandberg
+ * SPDX-FileCopyrightText: 2022 SSV Software Systems GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -335,12 +332,12 @@ static void _usbdev_init(usbdev_t *dev)
     _poweron(usbdev);
 
     /* Reset peripheral */
-    usbdev->config->device->CTRLA.reg |= USB_CTRLA_SWRST;
+    usbdev->config->device->CTRLA.reg = USB_CTRLA_SWRST;
     while (_syncbusy_swrst(usbdev)) {}
 
     /* Enable USB device */
     usbdev->config->device->DESCADD.reg = (uint32_t)&usbdev->banks;
-    usbdev->config->device->CTRLA.reg |= USB_CTRLA_ENABLE;
+    usbdev->config->device->CTRLA.reg = USB_CTRLA_ENABLE;
     while (_syncbusy_enable(usbdev)) {}
 
     /* Calibration values */

@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2018 Inria
- *               2023 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Inria
+ * SPDX-FileCopyrightText: 2023 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_stm32l496g-disco
@@ -17,9 +16,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include <stdint.h>
 
@@ -148,12 +144,14 @@ extern "C" {
  * - LD3 green, active LOW (connected to PA5)
  * @{
  */
-#define LED0_PIN_NUM        13      /**< green LED (LD2) pin */
-#define LED0_PORT_NUM       PORT_B  /**< green LED (LD2) port */
+#define LED0_PIN_NUM        13          /**< green LED (LD2) pin */
+#define LED0_PORT           GPIO_PORT_B /**< GPIO port of green LED (LD2) */
+#define LED0_PORT_NUM       PORT_B      /**< green LED (LD2) port */
 
-#define LED1_PIN_NUM        5       /**< green LED (LD3) pin */
-#define LED1_PORT_NUM       PORT_A  /**< green LED (LD3) port */
-#define LED1_IS_INVERTED    1       /**< green LED (LD3) is LOW active */
+#define LED1_PIN_NUM        5           /**< green LED (LD3) pin */
+#define LED1_PORT           GPIO_PORT_A /**< GPIO port of green LED (LD3) */
+#define LED1_PORT_NUM       PORT_A      /**< green LED (LD3) port */
+#define LED1_IS_INVERTED    1           /**< green LED (LD3) is LOW active */
 /** @} */
 
 /**
@@ -184,5 +182,4 @@ extern "C" {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

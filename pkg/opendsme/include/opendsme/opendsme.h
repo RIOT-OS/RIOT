@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    pkg_opendsme openDSME - IEEE 802.15.4 DSME
  * @ingroup     pkg
@@ -85,7 +87,7 @@
  * superframes per multisuperframe.
  *
  * Joining devices scan for beacons and perform the association procedure with
- * the the (PAN) coordinator. On success, the device is ready to communicate with
+ * the (PAN) coordinator. On success, the device is ready to communicate with
  * other devices in the DSME network.
  * To extend the network, coordinator devices can associate to any other
  * coordinator (including the PAN coordinator) and start emitting beacons in a
@@ -184,8 +186,6 @@
  * ## MAC configuration
  *
  */
-#ifndef OPENDSME_OPENDSME_H
-#define OPENDSME_OPENDSME_H
 
 #include <stdbool.h>
 #include "byteorder.h"
@@ -278,7 +278,5 @@ int gnrc_netif_opendsme_create(gnrc_netif_t *netif, char *stack, int stacksize,
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* OPENDSME_OPENDSME_H */
 
 /** @} */

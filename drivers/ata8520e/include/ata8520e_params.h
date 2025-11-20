@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ata8520e
  * @brief       Default initialization parameters for the ATA8520E device
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef ATA8520E_PARAMS_H
-#define ATA8520E_PARAMS_H
 
 #include "board.h"
 #include "ata8520e.h"
@@ -71,5 +70,4 @@ static const ata8520e_params_t ata8520e_params[] =
 }
 #endif
 
-#endif /* ATA8520E_PARAMS_H */
 /** @} */

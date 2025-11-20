@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_sx127x
  * @{
@@ -16,9 +18,6 @@
  * @author      José Ignacio Alamos <jose.alamos@inria.cl>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef SX127X_NETDEV_H
-#define SX127X_NETDEV_H
 
 #include "net/netdev.h"
 
@@ -35,5 +34,4 @@ extern const netdev_driver_t sx127x_driver;
 }
 #endif
 
-#endif /* SX127X_NETDEV_H */
 /** @} */

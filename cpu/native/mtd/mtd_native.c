@@ -1,18 +1,13 @@
 /*
- * Copyright (C) 2016  OTA keys S.A.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 OTA keys S.A.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
- * @{
- * @brief       mtd flash emulation for native
- *
  * @file
- *
- * @author      Vincent Dupont <vincent@otakeys.com>
+ * @ingroup drivers_mtd_native
+ * @brief   MTD flash emulation for native
+ * @author  Vincent Dupont <vincent@otakeys.com>
  */
 
 #include <errno.h>
@@ -156,5 +151,3 @@ const mtd_desc_t native_flash_driver = {
     .erase = _erase,
     .init = _init,
 };
-
-/** @} */

@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2017 Eistec AB
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2017 Eistec AB
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_common_kw41z
@@ -15,9 +14,6 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef PERIPH_CONF_COMMON_H
-#define PERIPH_CONF_COMMON_H
 
 #include "periph_cpu.h"
 
@@ -177,5 +173,4 @@ static const uint32_t spi_clk_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_COMMON_H */
 /** @} */

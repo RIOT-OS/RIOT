@@ -1,0 +1,43 @@
+From 4b83c7a4d753d57ab44964be762068ab8a6560fd Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Tue, 25 Mar 2025 14:12:40 +0100
+Subject: [PATCH 29/29] hal/uart_types: avoid type conflicts with RIOT uart
+ types
+
+---
+ components/hal/include/hal/uart_types.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/components/hal/include/hal/uart_types.h b/components/hal/include/hal/uart_types.h
+index b97944abea..7f14ea6f9d 100644
+--- a/components/hal/include/hal/uart_types.h
++++ b/components/hal/include/hal/uart_types.h
+@@ -61,6 +61,7 @@ typedef enum {
+     UART_DATA_BITS_MAX = 0x4,
+ } uart_word_length_t;
+ 
++#ifndef HAVE_UART_STOP_BITS_T
+ /**
+  * @brief UART stop bits number
+  */
+@@ -70,7 +71,9 @@ typedef enum {
+     UART_STOP_BITS_2   = 0x3,  /*!< stop bit: 2bits*/
+     UART_STOP_BITS_MAX = 0x4,
+ } uart_stop_bits_t;
++#endif
+ 
++#ifndef HAVE_UART_PARITY_T
+ /**
+  * @brief UART parity constants
+  */
+@@ -79,6 +82,7 @@ typedef enum {
+     UART_PARITY_EVEN     = 0x2,  /*!< Enable UART even parity*/
+     UART_PARITY_ODD      = 0x3   /*!< Enable UART odd parity*/
+ } uart_parity_t;
++#endif
+ 
+ /**
+  * @brief UART hardware flow control modes
+-- 
+2.34.1
+

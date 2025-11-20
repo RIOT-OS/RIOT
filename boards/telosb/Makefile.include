@@ -4,4 +4,6 @@ GOODFET_FLAGS ?= --telosb
 
 PROGRAMMERS_SUPPORTED += goodfet
 
+BAUD := 9600
+
 include $(RIOTBOARD)/common/msp430/Makefile.include

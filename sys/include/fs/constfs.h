@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup  sys_fs_constfs ConstFS static file system
  * @ingroup   sys_fs
@@ -20,9 +22,6 @@
  * @brief   ConstFS public API
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef FS_CONSTFS_H
-#define FS_CONSTFS_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -60,7 +59,5 @@ extern const vfs_file_system_t constfs_file_system;
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* FS_CONSTFS_H */
 
 /** @} */

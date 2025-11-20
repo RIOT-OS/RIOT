@@ -274,7 +274,7 @@ static int lis3dh_write_reg(const lis3dh_t *dev, const uint8_t reg,
 /**
  * @brief Write (both set and clear) bits of an 8-bit register on the LIS3DH.
  *
- * @param[in]  addr         Register address on the LIS3DH.
+ * @param[in]  reg          Register address on the LIS3DH.
  * @param[in]  mask         Bitmask for the bits to modify.
  * @param[in]  values       The values to write to the masked bits.
  *

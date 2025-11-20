@@ -1,12 +1,10 @@
 /*
- * Copyright (C) 2014-2015 Freie Universität Berlin
- *               2020 Koen Zandberg <koen@bergzand.net>
- *               2023 Gunar Schorcht <gunar@schorcht.net>
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2014-2015 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2020 Koen Zandberg <koen@bergzand.net>
+ * SPDX-FileCopyrightText: 2023 Gunar Schorcht <gunar@schorcht.net>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
 /**
  * @ingroup         cpu_gd32v
  * @{
@@ -160,7 +158,7 @@ void gpio_init_analog(gpio_t pin)
     *pin_reg &= ~(0xfl << (4 * (pin_num - ((pin_num >= 8) * 8))));
 }
 
-int gpio_read(gpio_t pin)
+bool gpio_read(gpio_t pin)
 {
     GPIO_Type *port = _port(pin);
     unsigned pin_num = _pin_num(pin);
@@ -195,7 +193,7 @@ void gpio_toggle(gpio_t pin)
     }
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     if (value) {
         gpio_set(pin);

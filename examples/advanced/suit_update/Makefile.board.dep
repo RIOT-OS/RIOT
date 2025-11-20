@@ -1,0 +1,14 @@
+ifneq (,$(filter native native32 native64,$(BOARD)))
+  USEMODULE += suit_storage_ram
+  USEMODULE += netdev_default
+  # Use VFS storage for native
+  USEMODULE += suit_storage_vfs
+  ## Use VFS
+  USEMODULE += vfs
+  ## Use default storage
+  USEMODULE += vfs_default
+  ## Auto-format on mount
+  USEMODULE += vfs_auto_format
+else
+  USEMODULE += suit_storage_flashwrite
+endif

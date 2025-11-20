@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_w5500
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Stefan Schmidt <stemschmidt@gmail.com>
  */
-
-#ifndef W5500_PARAMS_H
-#define W5500_PARAMS_H
 
 #include "board.h"
 
@@ -69,5 +68,4 @@ static const w5500_params_t w5500_params[] = {
 }
 #endif
 
-#endif /* W5500_PARAMS_H */
 /** @} */

@@ -193,15 +193,7 @@ uint32_t ztimer_set(ztimer_clock_t *clock, ztimer_t *timer, uint32_t val)
 
     timer->base.offset = val;
     _add_entry_to_list(clock, &timer->base);
-    if (clock->list.next == &timer->base) {
-#ifdef MODULE_ZTIMER_EXTEND
-        if (clock->max_value < UINT32_MAX) {
-            val = _min_u32(val, clock->max_value >> 1);
-        }
-        DEBUG("ztimer_set(): %p setting %" PRIu32 "\n", (void *)clock, val);
-#endif
-        clock->ops->set(clock, val);
-    }
+    _ztimer_update(clock);
 
     irq_restore(state);
 
@@ -424,13 +416,7 @@ static void _ztimer_update(ztimer_clock_t *clock)
             clock->ops->set(clock, clock->list.next->offset);
         }
         else {
-            if (IS_USED(MODULE_ZTIMER_NOW64)) {
-                /* ensure there's at least one ISR per half period */
-                clock->ops->set(clock, clock->max_value >> 1);
-            }
-            else {
-                clock->ops->cancel(clock);
-            }
+            clock->ops->cancel(clock);
         }
     }
 }
@@ -445,8 +431,8 @@ void ztimer_handler(ztimer_clock_t *clock)
         _ztimer_print(clock);
     }
 
-#if MODULE_ZTIMER_EXTEND || MODULE_ZTIMER_NOW64
-    if (IS_USED(MODULE_ZTIMER_NOW64) || clock->max_value < UINT32_MAX) {
+#if MODULE_ZTIMER_EXTEND
+    if (clock->max_value < UINT32_MAX) {
         /* calling now triggers checkpointing */
         uint32_t now = ztimer_now(clock);
 

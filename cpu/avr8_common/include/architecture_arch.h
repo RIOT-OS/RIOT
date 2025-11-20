@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
- *               2021 Gerson Fernando Budke
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-FileCopyrightText: 2021 Gerson Fernando Budke
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_avr8_common
@@ -18,9 +17,6 @@
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  */
-
-#ifndef ARCHITECTURE_ARCH_H
-#define ARCHITECTURE_ARCH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,4 +36,3 @@ typedef uint32_t   uinttxtptr_t;
 #endif
 
 /** @} */
-#endif /* ARCHITECTURE_ARCH_H */

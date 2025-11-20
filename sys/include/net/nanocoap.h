@@ -9,6 +9,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_nanocoap nanoCoAP small CoAP library
  * @ingroup     net
@@ -74,9 +76,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NET_NANOCOAP_H
-#define NET_NANOCOAP_H
-
 #include <assert.h>
 #include <errno.h>
 #include <stdint.h>
@@ -85,24 +84,14 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifdef RIOT_VERSION
 #include "bitarithm.h"
 #include "bitfield.h"
 #include "byteorder.h"
 #include "iolist.h"
 #include "macros/utils.h"
-#include "net/coap.h"
 #include "modules.h"
-#else
-#include "coap.h"
-#include <arpa/inet.h>
-#endif
-
-#if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
+#include "net/coap.h"
 #include "net/sock/udp.h"
-#else
-typedef void sock_udp_ep_t;
-#endif
 
 #if defined(MODULE_NANOCOAP_RESOURCES)
 #include "xfa.h"
@@ -352,6 +341,11 @@ struct _coap_request_ctx {
 #endif
 };
 
+/* forward declarations */
+static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr);
+static inline size_t coap_hdr_get_token_len(const coap_hdr_t *hdr);
+static inline const void * coap_hdr_get_token(const coap_hdr_t *hdr);
+
 /**
  * @brief   Get resource path associated with a CoAP request
  *
@@ -428,7 +422,7 @@ typedef struct {
  * @param name  internal name of the resource entry, must be unique
  */
 #define NANOCOAP_RESOURCE(name) \
-    XFA_CONST(coap_resources_xfa, 0) coap_resource_t CONCAT(coap_resource_, name) =
+    XFA_CONST(coap_resource_t, coap_resources_xfa, 0) CONCAT(coap_resource_, name) =
 #else
 /**
  * @brief   Global CoAP resource list
@@ -548,27 +542,8 @@ static inline unsigned coap_get_id(const coap_pkt_t *pkt)
  */
 static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
 {
-    uint8_t tkl = pkt->hdr->ver_t_tkl & 0xf;
-
-    if (!IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        return tkl;
-    }
-
-    void *ext = pkt->hdr + 1;
-    switch (tkl) {
-    case 13:
-        return tkl + *(uint8_t *)ext;
-    case 14:
-        return tkl + 255 + byteorder_bebuftohs(ext);
-    case 15:
-        assert(0);
-        /* fall-through */
-    default:
-        return tkl;
-    }
+    return coap_hdr_get_token_len(pkt->hdr);
 }
-
-static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr);
 
 /**
  * @brief   Get pointer to a message's token
@@ -580,18 +555,6 @@ static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr);
 static inline void *coap_get_token(const coap_pkt_t *pkt)
 {
     return coap_hdr_data_ptr(pkt->hdr);
-}
-
-/**
- * @brief   Get the total header length (4-byte header + token length)
- *
- * @param[in]   pkt   CoAP packet
- *
- * @returns     total header length
- */
-static inline unsigned coap_get_total_hdr_len(const coap_pkt_t *pkt)
-{
-    return sizeof(coap_hdr_t) + coap_get_token_len(pkt);
 }
 
 /**
@@ -677,6 +640,35 @@ static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr)
 }
 
 /**
+ * @brief   Get the total header length (4-byte header + token length)
+ *
+ * @param[in]   pkt   CoAP packet
+ *
+ * @returns     total header length
+ */
+static inline unsigned coap_get_total_hdr_len(const coap_pkt_t *pkt)
+{
+    return sizeof(coap_hdr_t) + coap_hdr_tkl_ext_len(pkt->hdr) +
+           coap_get_token_len(pkt);
+}
+
+/**
+ * @brief   Get the header length a response to the given packet will have
+ *
+ * @param[in]   pkt     CoAP packet to reply to
+ * @return      Length of the response header including token excluding
+ *              CoAP options and any payload marker
+ *
+ * @note    The main use case is the use of @ref coap_block2_build_reply, which
+ *          is building the CoAP header of the response after options and
+ *          payload have been added.
+ */
+static inline unsigned coap_get_response_hdr_len(const coap_pkt_t *pkt)
+{
+    return coap_get_total_hdr_len(pkt);
+}
+
+/**
  * @brief   Write the given raw message code to given CoAP header
  *
  * @param[out]  hdr     CoAP header to write to
@@ -685,6 +677,17 @@ static inline uint8_t *coap_hdr_data_ptr(const coap_hdr_t *hdr)
 static inline void coap_hdr_set_code(coap_hdr_t *hdr, uint8_t code)
 {
     hdr->code = code;
+}
+
+/**
+ * @brief   Write the given raw message code to given CoAP pkt
+ *
+ * @param[out]  pkt     CoAP packet to write to
+ * @param[in]   code    raw message code
+ */
+static inline void coap_pkt_set_code(coap_pkt_t *pkt, uint8_t code)
+{
+    coap_hdr_set_code(pkt->hdr, code);
 }
 
 /**
@@ -702,6 +705,87 @@ static inline void coap_hdr_set_type(coap_hdr_t *hdr, unsigned type)
 
     hdr->ver_t_tkl &= ~0x30;
     hdr->ver_t_tkl |= type << 4;
+}
+
+/**
+ * @brief       Get the token length of a CoAP over UDP (DTLS) packet
+ * @param[in]   hdr     CoAP over UDP header
+ * @return      The size of the token in bytes
+ *
+ * @warning     This API is super goofy. It assumes that the packet is valid
+ *              and will read more than `sizeof(*hdr)` into the data `hdr`
+ *              points to while crossing fingers hard.
+ *
+ * @deprecated  This function was introduced to keep legacy code alive.
+ *              Introducing new callers should be avoided. In the RX path an
+ *              @ref coap_pkt_t will be available, so that you can call
+ *              @ref coap_get_token instead. In the TX path the token was
+ *              added by us, so we really should know.
+ */
+static inline size_t coap_hdr_get_token_len(const coap_hdr_t *hdr)
+{
+    const uint8_t *buf = (const void *)hdr;
+    /* Regarding use unnamed magic numbers 13 and 269:
+     * - If token length is < 13 it fits into TKL field (4 bit)
+     * - If token length is < 269 it fits into 8-bit extended TKL field
+     * - Otherwise token length goes into 16-bit extended TKL field.
+     *
+     * (Not using named constants here, as RFC 8974 also has no names for those
+     * magic numbers.)
+     *
+     * See: https://www.rfc-editor.org/rfc/rfc8974#name-extended-token-length-tkl-f
+     */
+    switch (coap_hdr_tkl_ext_len(hdr)) {
+    case 0:
+        return hdr->ver_t_tkl & 0xf;
+    case 1:
+        return buf[sizeof(coap_hdr_t)] + 13;
+    case 2:
+        return byteorder_bebuftohs(buf + sizeof(coap_hdr_t)) + 269;
+    }
+
+    return 0;
+}
+
+/**
+ * @brief       Get the Token of a CoAP over UDP (DTLS) packet
+ * @param[in]   hdr     CoAP over UDP header
+ * @return      The CoAP Token inside the packet that @p hdr belongs to
+ *
+ * @warning     This API is super goofy. It assumes that the packet is valid
+ *              and will read more than `sizeof(*hdr)` into the data `hdr`
+ *              points to while crossing fingers hard.
+ *
+ * @deprecated  This function was introduced to keep legacy code alive.
+ *              Introducing new callers should be avoided. In the RX path an
+ *              @ref coap_pkt_t will be available, so that you can call
+ *              @ref coap_get_token instead. In the TX path the token was
+ *              added by us, so we really should know.
+ */
+static inline const void * coap_hdr_get_token(const coap_hdr_t *hdr)
+{
+    uint8_t *token = (void *)hdr;
+    token += sizeof(*hdr) + coap_hdr_tkl_ext_len(hdr);
+    return token;
+}
+
+/**
+ * @brief       Get the header length of a CoAP packet.
+ *
+ * @warning     This API is super goofy. It assumes that the packet is valid
+ *              and will read more than `sizeof(*hdr)` into the data `hdr`
+ *              points to while crossing fingers hard.
+ *
+ * @deprecated  This function was introduced to keep legacy code alive.
+ *              Introducing new callers should be avoided. In the RX path an
+ *              @ref coap_pkt_t will be available, so that you can call
+ *              @ref coap_get_total_hdr_len instead. In the TX path the header
+ *              was created by us (e.g. using @ref coap_build_hdr which returns
+ *              the header size), so we really should know already.
+ */
+static inline size_t coap_hdr_len(const coap_hdr_t *hdr)
+{
+    return sizeof(*hdr) + coap_hdr_tkl_ext_len(hdr) + coap_hdr_get_token_len(hdr);
 }
 /**@}*/
 
@@ -902,6 +986,31 @@ static inline ssize_t coap_get_uri_query_string(coap_pkt_t *pkt, char *target,
  */
 bool coap_find_uri_query(coap_pkt_t *pkt, const char *key,
                          const char **value, size_t *len);
+
+/**
+ * @brief   Iterate over a packet's URI Query options
+ *
+ * This expects that the Uri-Query options follow the widespread format `key=value`
+ * or just `key`
+ *
+ * Key and Value will be copied into the supplied buffers as a NULL-terminated
+ * string.
+ *
+ * @param[in]   pkt           packet to read from
+ * @param[out]  ctx           opaque, must be set to `NULL` on first call
+ * @param[out]  key           Output buffer for the key
+ * @param[in]   key_len_max   Size of the key output buffer
+ * @param[out]  value         Output buffer for the value
+ * @param[in]   value_len_max Size of the value output buffer
+ *
+ * @return      2           if key and value were found
+ * @return      1           if key was found
+ * @return      0           if no key was found
+ * @return -E2BIG           if key or value does not fit the supplied space
+ */
+int coap_iterate_uri_query(coap_pkt_t *pkt, void **ctx,
+                           char *key, size_t key_len_max,
+                           char *value, size_t value_len_max);
 
 /**
  * @brief   Iterate over a packet's options
@@ -1696,6 +1805,22 @@ static inline size_t coap_opt_put_block2_control(uint8_t *buf, uint16_t lastonum
 }
 
 /**
+ * @brief   Insert an CoAP Observe Option into the buffer
+ *
+ * @param[out]  buf         Buffer to write to
+ * @param[in]   lastonum    last option number (must be < 6)
+ * @param[in]   obs         observe number to write
+ *
+ * @returns     amount of bytes written to @p buf
+ */
+static inline size_t coap_opt_put_observe(uint8_t *buf, uint16_t lastonum,
+                                          uint32_t obs)
+{
+    obs &= COAP_OBS_MAX_VALUE_MASK; /* trim obs down to 24 bit */
+    return coap_opt_put_uint(buf, lastonum, COAP_OPT_OBSERVE, obs);
+}
+
+/**
  * @brief   Encode the given string as multi-part option into buffer
  *
  * @param[out]  buf         buffer to write to
@@ -1927,6 +2052,9 @@ static inline size_t coap_put_option_ct(uint8_t *buf, uint16_t lastonum,
  * @param[in]   payload_len length of payload
  * @param[in]   slicer      slicer to use
  *
+ * @warning Use @ref coap_get_response_hdr_len to determine the size of the
+ *          header this will write.
+ *
  * @returns     size of reply packet on success
  * @returns     <0 on error
  */
@@ -1946,6 +2074,11 @@ ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,
  * @param[in]    code       CoAP code (e.g., COAP_CODE_204, ...)
  * @param[in]    id         CoAP request id
  *
+ * @pre     @p token is either not overlapping with the memory buffer
+ *          @p hdr points to, or is already at the right offset (e.g.
+ *          when building the response inside the buffer the contained
+ *          the request).
+ *
  * @returns      length of resulting header
  */
 ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
@@ -1958,29 +2091,60 @@ ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
  * will create the reply packet header based on parameters from the request
  * (e.g., id, token).
  *
- * Passing a non-zero @p payload_len will ensure the payload fits into the
- * buffer along with the header. For this validation, payload_len must include
- * any options, the payload marker, as well as the payload proper.
+ * Passing a non-zero @p max_data_len will ensure the remaining data fits into
+ * the buffer along with the header. For this validation, @p max_data_len must
+ * include any CoAP Options, the payload marker, as well as the payload proper.
  *
- * @param[in]   pkt         packet to reply to
- * @param[in]   code        reply code (e.g., COAP_CODE_204)
- * @param[out]  rbuf        buffer to write reply to
- * @param[in]   rlen        size of @p rbuf
- * @param[in]   payload_len length of payload
+ * @param[in]   pkt             packet to reply to
+ * @param[in]   code            reply code (e.g., COAP_CODE_204)
+ * @param[out]  rbuf            buffer to write reply to
+ * @param[in]   rlen            size of @p rbuf
+ * @param[in]   max_data_len    Length of additional CoAP options, the payload marker and payload
  *
- * @returns     size of reply packet on success
+ * @warning     CoAP request handlers *must* check the return value for being
+ *              negative. If it is, they must stop further processing of the
+ *              request and pass on the return value unmodified.
  *
- *              Note that this size can be severely shortened if due to a No-Response option there
- *              is only an empty ACK to be sent back. The caller may just continue populating the
- *              payload (the space was checked to suffice), but may also skip that needless step
- *              if the returned length is less than the requested payload length.
+ * @return      @p max_data_len + size of the header written in bytes
  *
- * @returns     0 if no response should be sent due to a No-Response option in the request
- * @returns     <0 on error
- * @returns     -ENOSPC if @p rbuf too small
+ * @retval      -ECANCELED          No-Response Option present and matching
+ * @retval      -ENOSPC             @p rbuf too small
+ * @retval      <0                  other error
+ *
+ * Usage:
+ *
+ * ```C
+ * static ssize_t _foo_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+ *                             coap_request_ctx_t *context)
+ * {
+ *     static const char *payload = "Hello World";
+ *     const payload_len = strlen(payload);
+ *     // Worst case estimation of the data to add:
+ *     size_t max_data_len = COAP_OPT_FOO_MAX_LEN + COAP_OPT_BAR_MAX_LEN
+ *                         + COAP_PAYLOAD_MARKER_SIZE + payload_len;
+ *     ssize_t hdr_len = coap_build_reply(pkt, COAP_CODE_CONTENT, buf, len, max_data_len);
+ *
+ *     if (hdr_len < 0) {
+ *         return hdr_len; // pass through error
+ *     }
+ *
+ *     // This step is needed due to an API design flaw
+ *     hdr_len -= max_data_len;
+ *
+ *     uint8_t *pos = buf + hdr_len;
+ *     uint16_t lastonum = 0;
+ *     pos += coap_opt_put_uint(buf, lastonum, COAP_OPT_FOO, 42);
+ *     lastonum = COAP_OPT_FOO;
+ *     pos += coap_opt_put_uint(buf, lastonum, COAP_OPT_BAR, 1337);
+ *     *pos++ = COAP_PAYLOAD_MARKER;
+ *     memcpy(pos, payload, payload_len);
+ *     pos += payload_len;
+ *     return (uintptr_t)pos - (uintptr_t)buf;
+ * }
+ * ```
  */
 ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
-                         uint8_t *rbuf, unsigned rlen, unsigned payload_len);
+                         uint8_t *rbuf, unsigned rlen, unsigned max_data_len);
 
 /**
  * @brief   Build empty reply to CoAP request
@@ -2169,8 +2333,7 @@ ssize_t coap_payload_put_char(coap_pkt_t *pkt, char c);
  * @param[in]   code        reply code (e.g., COAP_CODE_204)
  * @param[out]  buf         buffer to write reply to
  * @param[in]   len         size of @p buf
- * @param[in]   ct          content type of payload
- *                          if ct < 0 this will be ignored
+ * @param[in]   ct          content type of payload or @ref COAP_FORMAT_NONE
  * @param[out]  payload     Will be set to the start of the payload inside
  *                          @p buf.
  *                          May be set to NULL if no payload response is
@@ -2178,13 +2341,13 @@ ssize_t coap_payload_put_char(coap_pkt_t *pkt, char c);
  * @param[out]  payload_len_max max length of payload left in @p buf
  *
  * @returns     size of reply header on success
- * @returns     0 if no reply should be sent
- * @returns     <0 on error
- * @returns     -ENOSPC if @p buf too small
+ * @retval      -ECANCELED  reply should be sent due to no-reply option
+ *                          (pass this error through, server will handle this)
+ * @retval      -ENOSPC     @p buf too small
+ * @retval      <0          other error
  */
 ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
-                                void *buf, size_t len,
-                                int ct,
+                                void *buf, size_t len, uint16_t ct,
                                 void **payload, size_t *payload_len_max);
 
 /**
@@ -2200,18 +2363,20 @@ ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
  * @param[in]   code        reply code (e.g., COAP_CODE_204)
  * @param[out]  buf         buffer to write reply to
  * @param[in]   len         size of @p buf
- * @param[in]   ct          content type of payload
+ * @param[in]   ct          content type of payload or @ref COAP_FORMAT_NONE
  * @param[in]   payload     ptr to payload
  * @param[in]   payload_len length of payload
  *
  * @returns     size of reply packet on success
- * @returns     <0 on error
- * @returns     -ENOSPC if @p buf too small
+ * @retval      -ECANCELED  reply should be sent due to no-reply option
+ *                          (pass this error through, server will handle this)
+ * @retval      -ENOSPC     @p buf too small
+ * @retval      <0          other error
  */
 ssize_t coap_reply_simple(coap_pkt_t *pkt,
                           unsigned code,
                           uint8_t *buf, size_t len,
-                          unsigned ct,
+                          uint16_t ct,
                           const void *payload, size_t payload_len);
 
 /**
@@ -2245,7 +2410,7 @@ extern ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, \
  * @return <0 if the resource path sorts before the URI
  * @return >0 if the resource path sorts after the URI
  */
-int coap_match_path(const coap_resource_t *resource, uint8_t *uri);
+int coap_match_path(const coap_resource_t *resource, const uint8_t *uri);
 
 #if defined(MODULE_GCOAP) || defined(DOXYGEN)
 /**
@@ -2302,5 +2467,4 @@ static inline uint32_t coap_get_observe(coap_pkt_t *pkt)
 #ifdef __cplusplus
 }
 #endif
-#endif /* NET_NANOCOAP_H */
 /** @} */

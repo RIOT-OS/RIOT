@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_bmx280
  *
@@ -20,11 +22,9 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef BMX280_PARAMS_H
-#define BMX280_PARAMS_H
-
 #include "board.h"
 #include "bmx280.h"
+#include "kernel_defines.h"
 #include "saul_reg.h"
 
 #ifdef __cplusplus
@@ -118,5 +118,4 @@ static const saul_reg_info_t bmx280_saul_reg_info[BMX280_NUMOF] =
 }
 #endif
 
-#endif /* BMX280_PARAMS_H */
 /** @} */

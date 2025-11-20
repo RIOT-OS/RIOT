@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup pthread POSIX threads
  * POSIX conforming multi-threading features.
@@ -16,9 +18,6 @@
  * @details Please see the transcluded `pthread_*.h` files for further information.
  * @see     [The Open Group Base Specifications Issue 7: pthread.h - threads](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
  */
-
-#ifndef PTHREAD_H
-#define PTHREAD_H
 
 #include <time.h>
 
@@ -57,8 +56,6 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* PTHREAD_H */
 
 /**
  * @}

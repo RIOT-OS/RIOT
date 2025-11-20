@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup   drivers_ad7746 AD7746 Capacitance-to-digital converter driver
  * @ingroup    drivers_sensors
@@ -40,9 +42,6 @@
  *
  * @author     Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef AD7746_H
-#define AD7746_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -331,5 +330,4 @@ int ad7746_set_cap_sr(const ad7746_t *dev, ad7746_cap_sample_rate_t sr);
 }
 #endif
 
-#endif /* AD7746_H */
 /** @} */

@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2023 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2023 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_nrf52840dk
@@ -18,9 +17,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef ARDUINO_IOMAP_H
-#define ARDUINO_IOMAP_H
 
 #include "periph/gpio.h"
 #include "periph/adc.h"
@@ -58,6 +54,13 @@ extern "C" {
  *          it
  */
 #define ARDUINO_I2C_UNO         I2C_DEV(0)
+/** @} */
+
+/**
+ * @name    on-board LED (LED1/D25)
+ * @{
+ */
+#define ARDUINO_LED     (24)
 /** @} */
 
 /**
@@ -176,5 +179,4 @@ extern "C" {
 }
 #endif
 
-#endif /* ARDUINO_IOMAP_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_hmc5883l HMC5883L 3-axis digital compass
  * @ingroup     drivers_sensors
@@ -15,7 +17,7 @@
  * The driver implements basic polling mode. The application can use
  * different approaches to get new data, either
  *
- * - using the #hmc5883l_read function at a lower rate than the the DOR, or
+ * - using the #hmc5883l_read function at a lower rate than the DOR, or
  * - using the data-ready interrupt (**DRDY**), see #hmc5883l_init_int.
  *
  * The data-ready interrupt (**DRDY**) is only be available when module
@@ -28,9 +30,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @file
  */
-
-#ifndef HMC5883L_H
-#define HMC5883L_H
 
 #ifdef __cplusplus
 extern "C"
@@ -292,5 +291,4 @@ int hmc5883l_power_up(hmc5883l_t *dev);
 }
 #endif
 
-#endif /* HMC5883L_H */
 /** @} */

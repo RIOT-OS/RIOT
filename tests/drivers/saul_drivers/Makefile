@@ -16,6 +16,9 @@ DRIVERS ?= $(subst _saul.c,,$(notdir $(DRIVERS_WITH_SAUL_PATHS)))
 USEMODULE += $(DRIVERS)
 
 # Somes drivers with submodules needs special care to select a precise driver variant
+ifneq (,$(filter abp2,$(DRIVERS)))
+  USEMODULE += abp2_spi
+endif
 ifneq (,$(filter adcxx1c,$(DRIVERS)))
   USEMODULE += adc081c
 endif
@@ -33,6 +36,9 @@ ifneq (,$(filter lsm6dsxx,$(DRIVERS)))
 endif
 ifneq (,$(filter lpsxxx,$(DRIVERS)))
   USEMODULE += lps22hh
+endif
+ifneq (,$(filter mcp23x17,$(DRIVERS)))
+  USEMODULE += mcp23x17_i2c
 endif
 ifneq (,$(filter mhz19,$(DRIVERS)))
   USEMODULE += mhz19_uart

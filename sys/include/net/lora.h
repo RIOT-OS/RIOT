@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_lora LoRa modulation
  * @ingroup     net
@@ -17,9 +19,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef NET_LORA_H
-#define NET_LORA_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -282,5 +281,4 @@ enum {
 }
 #endif
 
-#endif /* NET_LORA_H */
 /** @} */

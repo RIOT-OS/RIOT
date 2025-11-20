@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2023 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2023 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -239,9 +236,9 @@ static_assert(SDMMC_CONFIG_NUMOF < 3, "MCU supports only 2 SDIO/SD/MMC interface
 static_assert(SDMMC_CONFIG_NUMOF < 2, "MCU supports only 1 SDIO/SD/MMC interface");
 #endif
 
-XFA_CONST(sdmmc_devs, 0) sdmmc_dev_t * const _sdmmc_1 = (sdmmc_dev_t * const)&_sdmmc_devs[0];
+XFA_CONST(sdmmc_dev_t * const, sdmmc_devs, 0) _sdmmc_1 = (sdmmc_dev_t * const)&_sdmmc_devs[0];
 #if SDMMC_CONFIG_NUMOF > 1
-XFA_CONST(sdmmc_devs, 0) sdmmc_dev_t * const _sdmmc_2 = (sdmmc_dev_t * const)&_sdmmc_devs[1];
+XFA_CONST(sdmmc_dev_t * const, sdmmc_devs, 0) _sdmmc_2 = (sdmmc_dev_t * const)&_sdmmc_devs[1];
 #endif
 
 static inline bool _use_dma(const sdmmc_conf_t *conf)

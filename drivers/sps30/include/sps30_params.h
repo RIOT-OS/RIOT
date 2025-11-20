@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_sps30
  * @brief       Default configuration for Sensirion SPS30 sensors devices
@@ -13,9 +15,6 @@
  * @file
  * @{
  */
-
-#ifndef SPS30_PARAMS_H
-#define SPS30_PARAMS_H
 
 #include "board.h"
 #include "sps30.h"
@@ -70,5 +69,4 @@ static const saul_reg_info_t sps30_saul_info[] =
 }
 #endif
 
-#endif /* SPS30_PARAMS_H */
 /** @} */

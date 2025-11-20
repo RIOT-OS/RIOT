@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup     sys_bhp Bottom Half Processor
  * @ingroup      sys
@@ -25,9 +27,6 @@
  *
  * @author       José I. Alamos <jose.alamos@haw-hamburg.de>
  */
-
-#ifndef BHP_H
-#define BHP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -86,5 +85,4 @@ static inline void bhp_set_cb(bhp_t *bhp, bhp_cb_t cb, void *ctx)
 }
 #endif
 
-#endif /* BHP_H */
 /** @} */

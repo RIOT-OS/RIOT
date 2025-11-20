@@ -1,9 +1,6 @@
 /*
- * Copyright 2017 Ken Rabold
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Ken Rabold
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -90,7 +87,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_read(gpio_t pin)
+bool gpio_read(gpio_t pin)
 {
     return (GPIO_REG(GPIO_INPUT_VAL) & (1 << pin)) ? 1 : 0;
 }
@@ -111,7 +108,7 @@ void gpio_toggle(gpio_t pin)
                        __ATOMIC_RELAXED);
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     if (value) {
         _set_pin_reg(GPIO_OUTPUT_VAL, pin);

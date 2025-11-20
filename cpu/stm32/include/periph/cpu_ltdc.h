@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_stm32
@@ -15,9 +14,6 @@
  *
  * @author          Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef PERIPH_CPU_LTDC_H
-#define PERIPH_CPU_LTDC_H
 
 #include <stdint.h>
 
@@ -92,5 +88,4 @@ void ltdc_fill(uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2, const uint16_
 }
 #endif
 
-#endif /* PERIPH_CPU_LTDC_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_soft_spi Soft SPI
  * @ingroup     drivers_soft_periph
@@ -24,9 +26,6 @@
  *
  * @author      Markus Blechschmidt <Markus.Blechschmidt@haw-hamburg.de>
  */
-
-#ifndef SOFT_SPI_H
-#define SOFT_SPI_H
 
 #include "periph/gpio.h"
 #include "periph/spi.h"
@@ -264,5 +263,4 @@ void soft_spi_transfer_regs(soft_spi_t bus, soft_spi_cs_t cs, uint8_t reg,
 }
 #endif
 
-#endif /* SOFT_SPI_H */
 /** @} */

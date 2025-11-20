@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_soft_uart
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef SOFT_UART_PARAMS_H
-#define SOFT_UART_PARAMS_H
 
 #include "board.h"
 #include "soft_uart.h"
@@ -70,5 +69,4 @@ static const soft_uart_conf_t soft_uart_config[] = {
 }
 #endif
 
-#endif /* SOFT_UART_PARAMS_H */
 /** @} */

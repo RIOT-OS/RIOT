@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_netif Network interface API
  * @ingroup     net_gnrc
@@ -26,8 +28,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF_H
-#define NET_GNRC_NETIF_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -55,9 +55,6 @@
 #include "net/gnrc/netif/flags.h"
 #if IS_USED(MODULE_GNRC_NETIF_IPV6)
 #include "net/gnrc/netif/ipv6.h"
-#endif
-#if IS_USED(MODULE_GNRC_NETIF_MAC)
-#include "net/gnrc/netif/mac.h"
 #endif
 #if IS_USED(MODULE_GNRC_NETIF_PKTQ)
 #include "net/gnrc/netif/pktq/type.h"
@@ -146,9 +143,6 @@ typedef struct {
 #if IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN)
     gnrc_netif_ipv6_t ipv6;                 /**< IPv6 component */
 #endif
-#if IS_USED(MODULE_GNRC_NETIF_MAC) || defined(DOXYGEN)
-    gnrc_netif_mac_t mac;                   /**< @ref net_gnrc_mac component */
-#endif  /* IS_USED(MODULE_GNRC_NETIF_MAC) || defined(DOXYGEN) */
 #if IS_USED(MODULE_GNRC_NETIF_BUS) || DOXYGEN
     msg_bus_t bus[GNRC_NETIF_BUS_NUMOF];    /**< Event Message Bus */
 #endif
@@ -245,7 +239,7 @@ static inline bool gnrc_netif_netdev_legacy_api(gnrc_netif_t *netif)
 {
     if (!IS_USED(MODULE_NETDEV_NEW_API) && !IS_USED(MODULE_NETDEV_LEGACY_API)) {
         /* this should only happen for external netdevs or when no netdev is
-         * used (e.g. examples/gcoap can be used without any netdev, as still
+         * used (e.g. examples/networking/coap/gcoap can be used without any netdev, as still
          * CoAP requests to ::1 can be send */
         return true;
     }
@@ -762,6 +756,7 @@ static inline msg_bus_t* gnrc_netif_get_bus(gnrc_netif_t *netif,
  *                      May be NULL, then this checks for a global address
  *                      on *any* interface.
  * @param timeout_ms    Time to wait for an address to become available, in ms.
+ *                      Use `UINT32_MAX` to wait indefinitely.
  *
  * @return              true if a global address is configured
  */
@@ -773,5 +768,4 @@ bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
 }
 #endif
 
-#endif /* NET_GNRC_NETIF_H */
 /** @} */

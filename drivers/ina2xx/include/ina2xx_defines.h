@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ina2xx
  * @{
@@ -18,9 +20,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef INA2XX_DEFINES_H
-#define INA2XX_DEFINES_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -60,5 +59,4 @@ typedef enum ina2xx_reg {
 }
 #endif
 
-#endif /* INA2XX_DEFINES_H */
 /** @} */

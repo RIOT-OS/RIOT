@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2015 Jan Wagner <mail@jwagner.eu>
- *               2015-2016 Freie Universität Berlin
- *               2019 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Jan Wagner <mail@jwagner.eu>
+ * SPDX-FileCopyrightText: 2015-2016 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2019 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -126,7 +123,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_read(gpio_t pin)
+bool gpio_read(gpio_t pin)
 {
     if (port(pin)->DIR & (1 << pin_num(pin))) {
         return (port(pin)->OUT & (1 << pin_num(pin))) ? 1 : 0;
@@ -151,7 +148,7 @@ void gpio_toggle(gpio_t pin)
     port(pin)->OUT ^= (1 << pin_num(pin));
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     if (value) {
         port(pin)->OUTSET = (1 << pin_num(pin));

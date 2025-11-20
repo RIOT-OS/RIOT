@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2020 Nalys
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Nalys
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -19,42 +16,36 @@
  * @}
  */
 
-#include <assert.h>
-#include <errno.h>
 #include <isrpipe.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "candev_mcp2515.h"
+#include "periph/can.h"
 #include "shell.h"
 #include "test_utils/expect.h"
-#include "can/device.h"
 
-#if IS_USED(MODULE_PERIPH_CAN)
+/* The params header is only in the include path when the module is used */
+#if MODULE_MCP2515
+#  include "mcp2515_params.h"
+#endif
 
-#include "periph/can.h"
-#include "can_params.h"
-#include "board.h"
-#include "periph_conf.h"
-#include "periph/gpio.h"
-
-static can_t periph_dev;
-
-#elif defined(MODULE_MCP2515)
-#include "candev_mcp2515.h"
-#include "mcp2515_params.h"
-
-static candev_mcp2515_t mcp2515_dev;
-
-#else
-/* add includes for other candev drivers here */
+#if MODULE_PERIPH_CAN
+#  include "can_params.h"
+#  include "periph_conf.h"
 #endif
 
 #define ENABLE_DEBUG 0
-#include <debug.h>
+#include "debug.h"
 
 /* Default is not using loopback test mode */
 #ifndef CONFIG_USE_LOOPBACK_MODE
-#define CONFIG_USE_LOOPBACK_MODE        0
+#  define CONFIG_USE_LOOPBACK_MODE  0
+#endif
+
+#ifndef CONFIG_CAN_DEV
+#  define CONFIG_CAN_DEV 0
 #endif
 
 #define RX_RINGBUFFER_SIZE 128      /* Needs to be a power of 2! */
@@ -63,13 +54,54 @@ static uint8_t rx_ringbuf[RX_RINGBUFFER_SIZE];
 
 static candev_t *candev = NULL;
 
+/* Only one of them is actually used, depending on the driver selected.
+ * We rely on the compiler to garbage collect the unused */
+static can_t periph_dev;
+static candev_mcp2515_t mcp2515_dev;
+
+/* The params header is only in the include path when the module is used,
+ * so we fall back to a NULL ptr if not */
+#if MODULE_MCP2515
+static const candev_mcp2515_conf_t *mcp2515_conf = &candev_mcp2515_conf[CONFIG_CAN_DEV];
+#else
+static const candev_mcp2515_conf_t *mcp2515_conf = NULL;
+#endif
+
+#if MODULE_PERIPH_CAN
+static const can_conf_t *periph_can_conf = &(candev_conf[CONFIG_CAN_DEV]);
+#else
+static const can_conf_t *periph_can_conf = NULL;
+#endif
+
+/**
+ * @brief Convert a @ref can_t into an @ref candev_t
+ * @param[in]   dev     Peripheral CAN to get the candev_t of
+ * @return              The corresponding @ref candev_t
+ *
+ * @details     Either @ref can_t is an alias to @ref candev_t, or `HAVE_CAN_T`
+ *              is defined `can_t` has a member `candev_t candev`.
+ */
+static candev_t *_can_t2candev_t(can_t *dev);
+
+#ifdef HAVE_CAN_T
+static candev_t *_can_t2candev_t(can_t *dev)
+{
+    return &dev->candev;
+}
+#else
+static candev_t *_can_t2candev_t(can_t *dev)
+{
+    return dev;
+}
+#endif
+
 static int _send(int argc, char **argv)
 {
     int ret = 0;
 
-    struct can_frame frame = {
+    can_frame_t frame = {
         .can_id = 1,
-        .can_dlc = 3,
+        .len = 3,
         .data[0] = 0xAB,
         .data[1] = 0xCD,
         .data[2] = 0xEF,
@@ -83,7 +115,7 @@ static int _send(int argc, char **argv)
         for (int i = 1; i < argc; i++) {
             frame.data[i - 1] = atoi(argv[i]);
         }
-        frame.can_dlc = argc - 1;
+        frame.len = argc - 1;
     }
 
     ret = candev->driver->send(candev, &frame);
@@ -110,17 +142,17 @@ static int _receive(int argc, char **argv)
     }
 
     for (int i = 0; i < n; i++) {
-        struct can_frame frame;
+        can_frame_t frame;
 
         puts("Reading from Rxbuf...");
         isrpipe_read(&rxbuf, (uint8_t *)&(frame.can_id), sizeof(frame.can_id));
         frame.can_id &= 0x1FFFFFFF; /* clear invalid bits */
-        isrpipe_read(&rxbuf, (uint8_t *)&(frame.can_dlc), 1);
-        printf("id: %" PRIx32 " dlc: %" PRIx8, frame.can_id, frame.can_dlc);
-        if (frame.can_dlc > 0) {
+        isrpipe_read(&rxbuf, (uint8_t *)&(frame.len), 1);
+        printf("id: %" PRIx32 " dlc: %" PRIx8, frame.can_id, frame.len);
+        if (frame.len > 0) {
             printf(" data: ");
-            isrpipe_read(&rxbuf, frame.data, frame.can_dlc); /* data */
-            for (int i = 0; i < frame.can_dlc; i++) {
+            isrpipe_read(&rxbuf, frame.data, frame.len); /* data */
+            for (int i = 0; i < frame.len; i++) {
                 printf("0x%X ", frame.data[i]);
             }
         }
@@ -218,7 +250,7 @@ static const shell_command_t shell_commands[] = {
 static void _can_event_callback(candev_t *dev, candev_event_t event, void *arg)
 {
     (void)arg;
-    struct can_frame *frame;
+    can_frame_t *frame;
 
     switch (event) {
     case CANDEV_EVENT_ISR:
@@ -237,19 +269,19 @@ static void _can_event_callback(candev_t *dev, candev_event_t event, void *arg)
     case CANDEV_EVENT_RX_INDICATION:
         DEBUG("_can_event: CANDEV_EVENT_RX_INDICATION\n");
 
-        frame = (struct can_frame *)arg;
+        frame = (can_frame_t *)arg;
 
         DEBUG("            id: %" PRIx32 " dlc: %u data: ", frame->can_id & 0x1FFFFFFF,
-              frame->can_dlc);
-        for (uint8_t i = 0; i < frame->can_dlc; i++) {
+              frame->len);
+        for (uint8_t i = 0; i < frame->len; i++) {
             DEBUG("0x%X ", frame->data[i]);
         }
         DEBUG_PUTS("");
 
         /* Store in buffer until user requests the data */
         isrpipe_write(&rxbuf, (uint8_t *)&(frame->can_id), sizeof(frame->can_id));
-        isrpipe_write_one(&rxbuf, frame->can_dlc);
-        isrpipe_write(&rxbuf, frame->data, frame->can_dlc);
+        isrpipe_write_one(&rxbuf, frame->len);
+        isrpipe_write(&rxbuf, frame->data, frame->len);
 
         break;
     case CANDEV_EVENT_RX_ERROR:
@@ -275,26 +307,29 @@ static void _can_event_callback(candev_t *dev, candev_event_t event, void *arg)
 
 int main(void)
 {
-
     puts("candev test application\n");
 
     isrpipe_init(&rxbuf, (uint8_t *)rx_ringbuf, sizeof(rx_ringbuf));
-#if IS_USED(MODULE_PERIPH_CAN)
-    puts("Initializing CAN periph device");
-    can_init(&periph_dev, &(candev_conf[0]));
-    candev = &(periph_dev.candev);
-#if defined(BOARD_SAME54_XPRO)
-    gpio_init(AT6561_STBY_PIN, GPIO_OUT);
-    gpio_clear(AT6561_STBY_PIN);
-#endif
-#elif defined(MODULE_MCP2515)
-    puts("Initializing MCP2515");
-    candev_mcp2515_init(&mcp2515_dev, &candev_mcp2515_conf[0]);
-    candev = (candev_t *)&mcp2515_dev;
-
-#else
-    /* add initialization for other candev drivers here */
-#endif
+    if (IS_USED(MODULE_PERIPH_CAN)) {
+        puts("Initializing CAN periph device");
+        can_init(&periph_dev, periph_can_conf);
+        candev = _can_t2candev_t(&periph_dev);
+    }
+    else if (IS_USED(MODULE_MCP2515)) {
+        puts("Initializing MCP2515");
+        candev_mcp2515_init(&mcp2515_dev, mcp2515_conf);
+        candev = &mcp2515_dev.candev;
+    }
+    else {
+        /* No CAN driver is used or used CAN driver is not integrated in this
+         * test yet. We use an undefined function name to let this fail at
+         * compile time. The conditions above are all compile time constants
+         * and the compiler will eliminate the dead branches. So if any of them
+         * matched, this function call will not be part of the compiled object
+         * file and linking will work. */
+        extern void the_can_test_apps_depends_on_a_supported_can_driver_but_none_is_used(void);
+        the_can_test_apps_depends_on_a_supported_can_driver_but_none_is_used();
+    }
 
     expect(candev);
 

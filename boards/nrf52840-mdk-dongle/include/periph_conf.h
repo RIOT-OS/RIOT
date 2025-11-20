@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2020 Benjamin Valentin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Benjamin Valentin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_nrf52840-mdk-dongle
@@ -16,9 +15,6 @@
  * @author      Benjamin Valentin <benpicco@googlemail.com>
  *
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "cfg_clock_32_1.h"
@@ -73,5 +69,4 @@ static const pwm_conf_t pwm_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

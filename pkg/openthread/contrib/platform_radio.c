@@ -172,6 +172,27 @@ void recv_pkt(otInstance *aInstance, netdev_t *dev)
 }
 
 /* Called upon TX event */
+#ifdef MODULE_NETDEV_NEW_API
+void send_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event)
+{
+    (void)event;
+
+    assert(dev->driver->confirm_send);
+
+    int res = dev->driver->confirm_send(dev, NULL);
+    DEBUG("openthread: confirm_send returned %d\n", res);
+
+    if (res > 0) {
+        otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_NONE);
+    } else if (res == -EBUSY) {
+        otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_CHANNEL_ACCESS_FAILURE);
+    } else if (res == -EHOSTUNREACH) {
+        otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_NO_ACK);
+    } else {
+        otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_ABORT);
+    }
+}
+#else
 void send_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event)
 {
     (void)dev;
@@ -198,6 +219,7 @@ void send_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event)
             break;
     }
 }
+#endif
 
 /* OpenThread will call this for setting PAN ID */
 void otPlatRadioSetPanId(otInstance *aInstance, uint16_t panid)

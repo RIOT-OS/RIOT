@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -21,9 +23,6 @@
  *              or "implementation-defined".
  *              These macros will be implemented successively in the future.
  */
-
-#ifndef PSA_CRYPTO_PSA_CRYPTO_SIZES_H
-#define PSA_CRYPTO_PSA_CRYPTO_SIZES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -1045,5 +1044,4 @@ extern "C" {
 }
 #endif
 
-#endif /* PSA_CRYPTO_PSA_CRYPTO_SIZES_H */
 /** @} */

@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
- *               2017 OTA keys S.A.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2017 OTA keys S.A.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_stm32
@@ -17,9 +16,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
-
-#ifndef PERIPH_CPU_ETH_H
-#define PERIPH_CPU_ETH_H
 
 #include <stdint.h>
 
@@ -96,7 +92,7 @@ typedef struct eth_dma_desc {
  */
 #define RX_DESC_STAT_FL         (0x3FFF0000) /* bits 16-29 */
 #define RX_DESC_STAT_DE         (BIT14) /**< If set, a frame too large to fit buffers given by descriptors was received */
-#define RX_DESC_STAT_ES         (BIT14) /**< If set, an error occurred during RX */
+#define RX_DESC_STAT_ES         (BIT15) /**< If set, an error occurred during RX */
 #define RX_DESC_STAT_OWN        (BIT31) /**< If set, descriptor is owned by DMA, otherwise by CPU */
 /** @} */
 /**
@@ -140,7 +136,11 @@ typedef struct eth_dma_desc {
  * | `0b10` | Calculate and insert IPv4 checksum, insert pre-calculated payload checksum    |
  * | `0b11  | Calculated and insert both IPv4 and payload checksum                          |
  */
-#define TX_DESC_STAT_CIC        (BIT22 | BIT23)
+#define TX_DESC_STAT_CIC                    (BIT22 | BIT23)
+#define TX_DESC_STAT_CIC_NO_HW_CHECKSUM     (0)             /**< Do not compute checksums in hardware */
+#define TX_DESC_STAT_CIC_HW_CHECKSUM_IPV4   (BIT22)         /**< Compute the IPv4 header checksum in hardware */
+#define TX_DESC_STAT_CIC_HW_CHECKSUM_BOTH   (BIT22 | BIT32) /**< Compute the IPv4 header and payload checksum in hardware */
+
 #define TX_DESC_STAT_TTSE       (BIT25) /**< If set, an PTP timestamp is added to the descriptor after TX completed */
 #define TX_DESC_STAT_FS         (BIT28) /**< If set, buffer contains first segment of frame to transmit */
 #define TX_DESC_STAT_LS         (BIT29) /**< If set, buffer contains last segment of frame to transmit */
@@ -156,10 +156,8 @@ typedef struct eth_dma_desc {
 void stm32_eth_common_init(void);
 #endif /* MODULE_PERIPH_ETH_COMMON */
 
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CPU_ETH_H */
 /** @} */

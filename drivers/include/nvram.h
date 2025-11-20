@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_nvram Non-volatile RAM
  * @ingroup     drivers_storage
@@ -23,9 +25,6 @@
  * @brief       Generic non-volatile RAM driver interface
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef NVRAM_H
-#define NVRAM_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -91,5 +90,4 @@ extern const vfs_file_ops_t nvram_vfs_ops;
 }
 #endif
 
-#endif /* NVRAM_H */
 /** @} */

@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2017 OTA keys S.A.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 OTA keys S.A.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @brief       Compute clock constants for STM32F[2|4|7] CPUs
@@ -13,9 +12,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @{
  */
-
-#ifndef CLK_CONF_H
-#define CLK_CONF_H
 
 #include <stdbool.h>
 
@@ -655,5 +651,4 @@ static const clk_cfg_t stm32_mp_clk_cfg[] = {
 }
 #endif
 
-#endif /* CLK_CONF_H */
 /** @} */

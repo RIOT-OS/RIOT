@@ -23,6 +23,7 @@ export NATIVEINCLUDES        # The native include paths, set by the various nati
 
 export GCC_C_INCLUDES        # system include dirs implicitly used by GCC's c compiler, only defined with TOOLCHAIN=llvm
 export GCC_CXX_INCLUDES      # system include dirs implicitly used by GCC's c++ compiler, only defined with TOOLCHAIN=llvm
+export GCC_VERSION           # version of GCC if GCC is used, empty otherwise
 
 export USEMODULE             # Sys Module dependencies of the application. Set in the application's Makefile.
 export BIN_USEMODULE         # Modules specific to bindist (see bindist.ink.mk). Set in the application's Makefile.
@@ -70,6 +71,7 @@ export CXX                   # The CXX compiler to use.
 export CCAS                  # The C compiler to use for assembler files, typically the same as CC.
 export CFLAGS                # The compiler flags. Must only ever be used with `+=`.
 export CFLAGS_CPU            # CPU architecture specific compiler flags
+export CFLAGS_STATIC_ANALYSIS# Additional CFLAGS to use when static analysis should be enabled
 export CXXUWFLAGS            # (Patterns of) flags in CFLAGS that should not be passed to CXX.
 export CXXEXFLAGS            # Additional flags that should be passed to CXX.
 export CCASUWFLAGS           # (Patterns of) flags in CFLAGS that should not be passed to CCAS.
@@ -116,7 +118,7 @@ export HEXFILE               # The 'intel hex' stripped result of the compilatio
 # DEBUGSERVER_FLAGS          # The parameters to supply to DEBUGSERVER.
 # DEBUGCLIENT                # The command to call on "make debug-client", usually a script starting the GDB client.
 # DEBUGCLIENT_FLAGS          # The parameters to supply to DEBUGCLIENT.
-# DEVELHELP                  # Set to 1 to spend ROM, RAM and CPU time for help during development (e.g. enable asserts())
+export DEVELHELP             # Set to 1 to spend ROM, RAM and CPU time for help during development (e.g. enable asserts())
 # RESET                      # The command to call on "make reset", this command resets/reboots the target.
 # RESET_FLAGS                # The parameters to supply to RESET.
 # PROGRAMMER                 # The programmer to use when flashing, resetting or debugging
@@ -126,10 +128,14 @@ export HEXFILE               # The 'intel hex' stripped result of the compilatio
 # USE_PROGRAMMER_WRAPPER_SCRIPT     # Use the programmer wrapper Python script. Default is 0 (wrapper not used).
 
 
-export DLCACHE               # directory used to cache http downloads
-export DOWNLOAD_TO_FILE      # Use `$(DOWNLOAD_TO_FILE) $(DESTINATION) $(URL)` to download `$(URL)` to `$(DESTINATION)`.
-export DOWNLOAD_TO_STDOUT    # Use `$(DOWNLOAD_TO_STDOUT) $(URL)` to download `$(URL)` output `$(URL)` to stdout, e.g. to be piped into `tar xz`.
-export UNZIP_HERE            # Use `cd $(SOME_FOLDER) && $(UNZIP_HERE) $(SOME_FILE)` to extract the contents of the zip file `$(SOME_FILE)` into `$(SOME_FOLDER)`.
+export DLCACHE               # Use `$(DLCACHE) $(DESTINATION) $(URL) [$(SHA512)]` to
+                             # download `$(URL)` to `$(DESTINATION)` but keep a copy in cache
+                             # with an `$(SHA512)` checksum. If no checksum is given, the
+                             # URL will just be downloaded, not cached.
+export DOWNLOAD_TO_FILE      # Use `$(DOWNLOAD_TO_FILE) $(DESTINATION) $(URL) [$(SHA512)]` to
+                             # download `$(URL)` to `$(DESTINATION)`. Alias for $(DLCACHE).
+export UNZIP_HERE            # Use `cd $(SOME_FOLDER) && $(UNZIP_HERE) $(SOME_FILE)` to extract
+                             # the contents of the zip file `$(SOME_FILE)` into `$(SOME_FOLDER)`.
 
 export LAZYSPONGE            # Command saving stdin to a file only on content update.
 export LAZYSPONGE_FLAGS      # Parameters supplied to LAZYSPONGE.
@@ -144,3 +150,8 @@ export RUST_TARGET           # Rust's own version of the target triple / quadrup
                              #
                              # It is set by the architecture (and thus eventually the CPU), and exported to
                              # be available when building Rust modules.
+export RUSTFLAGS             # Like CFLAGS but for Rust.
+                             #
+                             # We influence those to set useful defaults that
+                             # would otherwise need to be reiterated in Cargo
+                             # files.

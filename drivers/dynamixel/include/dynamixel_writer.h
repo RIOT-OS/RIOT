@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_dynamixel
  *
@@ -16,9 +18,6 @@
  *
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
-
-#ifndef DYNAMIXEL_WRITER_H
-#define DYNAMIXEL_WRITER_H
 
 #include "dynamixel_protocol.h"
 #include <stdint.h>
@@ -98,5 +97,4 @@ void dynamixel_writer_read_make(dynamixel_writer_t *writer, uint8_t id, uint16_t
 }
 #endif
 
-#endif /* DYNAMIXEL_WRITER_H */
 /** @} */

@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_msp430_f2xx_g2xx
@@ -15,9 +14,6 @@
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef F2XX_G2XX_PERIPH_CPU_H
-#define F2XX_G2XX_PERIPH_CPU_H
 
 #include <stdbool.h>
 
@@ -184,6 +180,16 @@ typedef struct {
 } spi_conf_t;
 
 /**
+ * @brief   Register map of GPIO PORT 7
+ */
+extern msp430_port_p7_p8_t PORT_7;
+
+/**
+ * @brief   Register map of GPIO PORT 8
+ */
+extern msp430_port_p7_p8_t PORT_8;
+
+/**
  * @brief   Acquire and initialize USCI for use a SPI/UART peripheral
  *
  * @param   params      Parameter identifying the USCI to use
@@ -258,5 +264,4 @@ extern const msp430_usci_spi_params_t usci_b1_as_spi;
 }
 #endif
 
-#endif /* F2XX_G2XX_PERIPH_CPU_H */
 /** @} */

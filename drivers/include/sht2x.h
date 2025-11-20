@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_sht2x SHT2x Humidity and Temperature sensor
  * @ingroup     drivers_sensors
@@ -22,9 +24,6 @@
  * @author      George Psimenos <gp7g14@soton.ac.uk>
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
-
-#ifndef SHT2X_H
-#define SHT2X_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -193,5 +192,4 @@ int sht2x_write_userreg(const sht2x_t *dev, uint8_t userreg);
 }
 #endif
 
-#endif /* SHT2X_H */
 /** @} */

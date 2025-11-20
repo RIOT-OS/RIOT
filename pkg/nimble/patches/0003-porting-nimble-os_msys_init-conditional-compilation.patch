@@ -1,0 +1,38 @@
+From dc727e2b086de03b7c456b3d6e24eb0d5049a6cb Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 17 Apr 2025 14:22:01 +0200
+Subject: [PATCH 3/4] porting/nimble/os_msys_init: conditional compilation
+
+BLE library for ESP32x implements its own version of `os_msys_init`, which is used by the BLE controller implementation for ESP32x and is implicitly called when the BLE controller is enabled.
+---
+ porting/nimble/src/os_msys_init.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/porting/nimble/src/os_msys_init.c b/porting/nimble/src/os_msys_init.c
+index d22ae351..6917d833 100644
+--- a/porting/nimble/src/os_msys_init.c
++++ b/porting/nimble/src/os_msys_init.c
+@@ -17,6 +17,11 @@
+  * under the License.
+  */
+ 
++/* If `os_msys_init` is realized by the low-level BLE Controller driver,
++ * which is the case for the ESP32-H2, for example, this file must not
++ * be compiled. */
++#if !NIMBLE_OS_MSYS_INIT_IN_CONTROLLER
++
+ #include <assert.h>
+ #include "os/os.h"
+ #include "mem/mem.h"
+@@ -153,4 +158,6 @@ os_msys_init(void)
+     rc = os_sanity_check_register(&os_msys_sc);
+     SYSINIT_PANIC_ASSERT(rc == 0);
+ #endif
+-}
+\ No newline at end of file
++}
++
++#endif /* !NIMBLE_OS_MSYS_INIT_IN_CONTROLLER */
+-- 
+2.34.1
+

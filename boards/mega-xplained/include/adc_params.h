@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2016 Eistec AB
- *               2018 Matthew Blue <matthew.blue.neuro@gmail.com>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Eistec AB
+ * SPDX-FileCopyrightText: 2018 Matthew Blue <matthew.blue.neuro@gmail.com>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup   boards_mega-xplained
@@ -17,9 +16,6 @@
  * @author    Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author    Matthew Blue <matthew.blue.neuro@gmail.com>
  */
-
-#ifndef ADC_PARAMS_H
-#define ADC_PARAMS_H
 
 #include "board.h"
 #include "saul/periph.h"
@@ -54,5 +50,4 @@ static const  saul_adc_params_t saul_adc_params[] =
 }
 #endif
 
-#endif /* ADC_PARAMS_H */
 /** @} */

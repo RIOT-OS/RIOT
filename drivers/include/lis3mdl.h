@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_lis3mdl LIS3MDL 3-axis magnetometer
  * @ingroup     drivers_sensors
@@ -20,9 +22,6 @@
  *
  * @author      René Herthel <rene-herthel@outlook.de>
  */
-
-#ifndef LIS3MDL_H
-#define LIS3MDL_H
 
 #include <stdint.h>
 #include "periph/i2c.h"
@@ -158,5 +157,4 @@ void lis3mdl_disable(const lis3mdl_t *dev);
 }
 #endif
 
-#endif /* LIS3MDL_H */
 /** @} */

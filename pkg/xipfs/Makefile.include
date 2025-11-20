@@ -1,0 +1,8 @@
+INCLUDES += -I$(PKGDIRBASE)/xipfs
+
+ifneq (,$(filter xipfs_fs,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/xipfs/fs
+endif
+
+# include archive
+ARCHIVES += $(BINDIR)/xipfs.a

@@ -8,6 +8,8 @@
  *
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_mma7660
  * @{
@@ -18,9 +20,6 @@
  * @author      Michael Andersen <m.andersen@cs.berkeley.edu>
  *
  */
-
-#ifndef MMA7660_PARAMS_H
-#define MMA7660_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -82,5 +81,4 @@ static const saul_reg_info_t mma7660_saul_info[] =
 }
 #endif
 
-#endif /* MMA7660_PARAMS_H */
 /** @} */

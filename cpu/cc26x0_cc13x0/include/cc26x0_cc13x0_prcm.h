@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2016 Leon George
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Leon George
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_cc26x0_cc13x0_definitions
@@ -13,9 +12,6 @@
  * @file
  * @brief           CC26x0/CC13x0 PRCM register definitions
  */
-
-#ifndef CC26X0_CC13X0_PRCM_H
-#define CC26X0_CC13X0_PRCM_H
 
 #include <cc26xx_cc13xx.h>
 
@@ -359,5 +355,4 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC26X0_CC13X0_PRCM_H */
 /** @} */

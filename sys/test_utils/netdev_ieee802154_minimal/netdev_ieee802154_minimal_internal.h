@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     test_utils_netdev_ieee802154_minimal
  *
@@ -15,9 +17,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef NETDEV_IEEE802154_MINIMAL_INTERNAL_H
-#define NETDEV_IEEE802154_MINIMAL_INTERNAL_H
 
 #include "net/netdev.h"
 #include "event.h"
@@ -41,7 +40,5 @@ extern device_reg_entry_t _devices[NETDEV_IEEE802154_MINIMAL_NUMOF];
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* NETDEV_IEEE802154_MINIMAL_INTERNAL_H */
 
 /** @} */

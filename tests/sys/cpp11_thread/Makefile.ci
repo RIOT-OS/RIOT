@@ -1,6 +1,5 @@
 BOARD_INSUFFICIENT_MEMORY := \
     nucleo-c031c6 \
-    nucleo-f031k6 \
     nucleo-f042k6 \
     nucleo-l011k4 \
     nucleo-l031k6 \

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_ir_nec IR NEC Remote receiver
  * @ingroup     drivers_misc
@@ -17,9 +19,6 @@
  *
  * @author      Dario Petrillo <dario.pk1@gmail.com>
  */
-
-#ifndef IR_NEC_H
-#define IR_NEC_H
 
 #include <stdint.h>
 
@@ -62,8 +61,8 @@ typedef struct {
 /**
  * @brief   Initialize the given device
  *
- * @param[inout] dev        Device descriptor of the driver
- * @param[in]    params     Initialization parameters
+ * @param[in,out] dev       Device descriptor of the driver
+ * @param[in]     params    Initialization parameters
  *
  * @return                  0 on success
  */
@@ -72,8 +71,8 @@ int ir_nec_init(ir_nec_t *dev, const ir_nec_params_t *params);
 /**
  * @brief   Read a command packet. Blocks until one is received
  *
- * @param[inout] dev        Device descriptor of the driver
- * @param[out]   command    Structure to write the result into
+ * @param[in,out] dev       Device descriptor of the driver
+ * @param[out]    command   Structure to write the result into
  *
  * @retval       0          Success
  * @retval       -1         Isrpipe returned too few bytes. Should never happen
@@ -84,5 +83,4 @@ int ir_nec_read(ir_nec_t *dev, ir_nec_cmd_t *command);
 }
 #endif
 
-#endif /* IR_NEC_H */
 /** @} */

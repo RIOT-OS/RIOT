@@ -1,13 +1,9 @@
 /*
- * Copyright (C) 2015 HAW Hamburg
- *               2016 INRIA
- *               2023 Hugues Larrive
- *               2023 Gerson Fernando Budke
-
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 HAW Hamburg
+ * SPDX-FileCopyrightText: 2016 INRIA
+ * SPDX-FileCopyrightText: 2023 Hugues Larrive
+ * SPDX-FileCopyrightText: 2023 Gerson Fernando Budke
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -154,7 +150,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_read(gpio_t pin)
+bool gpio_read(gpio_t pin)
 {
     return (_SFR_MEM8(atmega_pin_addr(pin)) & (1 << atmega_pin_num(pin)));
 }
@@ -179,7 +175,7 @@ void gpio_toggle(gpio_t pin)
     }
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     if (value) {
         gpio_set(pin);

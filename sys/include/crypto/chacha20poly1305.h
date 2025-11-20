@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_crypto_chacha20poly1305 chacha20poly1305 AEAD cipher
  * @ingroup     sys_crypto
@@ -24,9 +26,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef CRYPTO_CHACHA20POLY1305_H
-#define CRYPTO_CHACHA20POLY1305_H
 
 #include "crypto/poly1305.h"
 
@@ -176,5 +175,4 @@ void chacha20_finish(   chacha20_ctx_t *ctx,
 #ifdef __cplusplus
 }
 #endif
-#endif /* CRYPTO_CHACHA20POLY1305_H */
 /** @} */

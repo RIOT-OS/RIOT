@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_senml_phydat SenML Phydat
  * @ingroup     sys_senml
@@ -21,9 +23,6 @@
  *
  * @author      Silke Hofstra <silke@slxh.eu>
  */
-
-#ifndef SENML_PHYDAT_H
-#define SENML_PHYDAT_H
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -94,5 +93,4 @@ void phydat_to_senml_decimal(senml_value_t *senml, const phydat_t *phydat, const
 }
 #endif
 
-#endif /* SENML_PHYDAT_H */
 /** @} */

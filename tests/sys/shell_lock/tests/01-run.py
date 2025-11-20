@@ -22,15 +22,6 @@ PASSWORDS_INCORRECT = [
     "_password"
 ]
 
-EXPECTED_HELP = (
-    'Command              Description',
-    '---------------------------------------',
-    'lock                 Lock the shell',
-    'pm                   interact with layered PM subsystem',
-    'reboot               Reboot the node',
-    'version              Prints current RIOT_VERSION',
-)
-
 AUTO_LOCK_TIMEOUT_MS = 7000
 SHELL_PROMPT = '> '
 PASSWORD_PROMPT = 'Password: '
@@ -40,7 +31,7 @@ BOARD = os.environ['BOARD']
 def testfunc(child):
 
     # avoid sending an extra empty line on native.
-    if BOARD in ['native', 'native64']:
+    if BOARD in ['native', 'native32', 'native64']:
         child.crlf = '\n'
 
     # unlock
@@ -49,16 +40,15 @@ def testfunc(child):
     child.expect_exact(SHELL_PROMPT)
 
     # check we have access
-    child.sendline('help')
-    for line in EXPECTED_HELP:
-        child.expect_exact(line)
+    child.sendline('ping')
+    child.expect_exact("PONG!")
 
     # lock
     child.sendline('lock')
     child.expect(SHELL_PROMPT)
 
     # trigger password prompt
-    child.sendline('help')
+    child.sendline('ping')
     child.expect('The shell is locked. Enter a valid password to unlock.')
 
     # test different incorrect passwords
@@ -82,16 +72,15 @@ def testfunc(child):
     child.expect_exact(SHELL_PROMPT)
 
     # check we have access
-    child.sendline('help')
-    for line in EXPECTED_HELP:
-        child.expect_exact(line)
+    child.sendline('ping')
+    child.expect_exact("PONG!")
 
     # wait until auto_lock locks the shell after
     # CONFIG_SHELL_LOCK_AUTO_LOCK_TIMEOUT_MS (+ 1 second buffer time)
     time.sleep((AUTO_LOCK_TIMEOUT_MS / 1000.0) + 1)
 
     # trigger password prompt
-    child.sendline('help')
+    child.sendline('ping')
     child.expect('The shell is locked. Enter a valid password to unlock.')
 
 

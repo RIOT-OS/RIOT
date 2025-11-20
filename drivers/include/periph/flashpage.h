@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_periph_flashpage Flash page driver
  * @ingroup     drivers_periph
@@ -44,9 +46,6 @@
  * @author      Federico Pellegrin <fede@evolware.org>
  *
  */
-
-#ifndef PERIPH_FLASHPAGE_H
-#define PERIPH_FLASHPAGE_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -423,5 +422,4 @@ int flashpage_rwwee_write_and_verify(unsigned page, const void *data);
 }
 #endif
 
-#endif /* PERIPH_FLASHPAGE_H */
 /** @} */

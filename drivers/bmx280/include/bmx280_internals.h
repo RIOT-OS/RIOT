@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_bmx280
  * @brief       Internal addresses, registers, constants for the BMX280 family sensors.
@@ -17,9 +19,6 @@
  * @author      Kees Bakker <kees@sodaq.com>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef BMX280_INTERNALS_H
-#define BMX280_INTERNALS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -126,5 +125,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BMX280_INTERNALS_H */
 /** @} */

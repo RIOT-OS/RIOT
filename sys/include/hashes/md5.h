@@ -17,6 +17,8 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_hashes_md5 MD5
  * @ingroup     sys_hashes_unkeyed
@@ -50,9 +52,6 @@
  * @author      Christopher R. Hertel <crh@ubiqx.mn.org>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef HASHES_MD5_H
-#define HASHES_MD5_H
 
 #include <stdint.h>
 #include <string.h>
@@ -124,5 +123,4 @@ void md5(void *digest, const void *data, size_t len);
 }
 #endif
 
-#endif /* HASHES_MD5_H */
 /** @} */

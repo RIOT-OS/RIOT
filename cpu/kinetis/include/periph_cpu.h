@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2015-2016 Freie Universität Berlin
- * Copyright (C) 2017-2018 Eistec AB
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015-2016 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2017-2018 Eistec AB
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_kinetis
@@ -17,9 +16,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -881,5 +877,4 @@ void gpio_init_port(gpio_t pin, uint32_t pcr);
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_at25xxx
  * @{
@@ -16,9 +18,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  * @}
  */
-
-#ifndef AT25XXX_CONSTANTS_H
-#define AT25XXX_CONSTANTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,5 +39,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* AT25XXX_CONSTANTS_H */

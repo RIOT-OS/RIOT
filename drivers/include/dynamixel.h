@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_dynamixel Dynamixel driver
  * @ingroup     drivers_actuators
@@ -20,9 +22,6 @@
  *
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
-
-#ifndef DYNAMIXEL_H
-#define DYNAMIXEL_H
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -167,5 +166,4 @@ int dynamixel_read(const dynamixel_t *device, dynamixel_addr_t reg, uint8_t *dat
 }
 #endif
 
-#endif /* DYNAMIXEL_H */
 /** @} */

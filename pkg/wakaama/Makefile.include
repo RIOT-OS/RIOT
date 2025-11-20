@@ -1,8 +1,11 @@
 DIRS += $(RIOTBASE)/pkg/wakaama/contrib
 
-INCLUDES += -I$(RIOTBASE)/pkg/wakaama/include
-INCLUDES += -I$(PKGDIRBASE)/wakaama/core
-INCLUDES += -I$(PKGDIRBASE)/wakaama/core/er-coap-13
+# Using -isystem instead of -I to prevent warnings for the following headers
+INCLUDES += -isystem$(RIOTBASE)/pkg/wakaama/include
+INCLUDES += -isystem$(PKGDIRBASE)/wakaama/include
+INCLUDES += -isystem$(PKGDIRBASE)/wakaama/core
+INCLUDES += -isystem$(PKGDIRBASE)/wakaama/data
+INCLUDES += -isystem$(PKGDIRBASE)/wakaama/coap/er-coap-13
 
 # NOTE: Use wakaama in client mode
 CFLAGS += -DLWM2M_CLIENT_MODE
@@ -15,6 +18,13 @@ endif
 
 ifneq (,$(or $(CONFIG_LWM2M_WITH_LOGS),$(filter -DCONFIG_LWM2M_WITH_LOGS=1,$(CFLAGS))))
   CFLAGS += -DLWM2M_WITH_LOGS=1
+endif
+
+# NOTE: "Default CoAP block size; Used if not set on a per-target basis"
+ifeq (,$(CONFIG_LWM2M_COAP_DEFAULT_BLOCK_SIZE))
+  CFLAGS += -DLWM2M_COAP_DEFAULT_BLOCK_SIZE=1024
+else
+  CFLAGS += -DLWM2M_COAP_DEFAULT_BLOCK_SIZE='1<<$(CONFIG_LWM2M_COAP_DEFAULT_BLOCK_SIZE)'
 endif
 
 PSEUDOMODULES += wakaama

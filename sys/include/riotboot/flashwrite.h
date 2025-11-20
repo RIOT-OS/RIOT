@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_riotboot_flashwrite riotboot flash writer
  * @ingroup     sys
@@ -55,9 +57,6 @@
  *
  * @}
  */
-
-#ifndef RIOTBOOT_FLASHWRITE_H
-#define RIOTBOOT_FLASHWRITE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -276,5 +275,3 @@ int riotboot_flashwrite_verify_sha256(const uint8_t *sha256_digest,
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* RIOTBOOT_FLASHWRITE_H */

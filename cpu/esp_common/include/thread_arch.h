@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2019 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_esp_common
@@ -18,9 +17,6 @@
  *
  * @}
  */
-
-#ifndef THREAD_ARCH_H
-#define THREAD_ARCH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,5 +32,3 @@ extern void thread_isr_stack_init(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* THREAD_ARCH_H */

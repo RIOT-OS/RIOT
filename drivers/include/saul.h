@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_saul [S]ensor [A]ctuator [U]ber [L]ayer
  * @ingroup     drivers
@@ -44,9 +46,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef SAUL_H
-#define SAUL_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -356,5 +355,4 @@ ssize_t saul_class_write(char *dest, size_t max_size, uint8_t class_id);
 }
 #endif
 
-#endif /* SAUL_H */
 /** @} */

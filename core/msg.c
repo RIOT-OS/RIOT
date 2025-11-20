@@ -21,8 +21,10 @@
  */
 
 #include <stddef.h>
+#include <string.h>
 #include <inttypes.h>
 #include <assert.h>
+#include "macros/utils.h"
 #include "sched.h"
 #include "msg.h"
 #include "msg_bus.h"
@@ -456,12 +458,23 @@ static unsigned _msg_avail(thread_t *thread)
 
 unsigned msg_avail_thread(kernel_pid_t pid)
 {
-    return _msg_avail(thread_get(pid));
+    unsigned irq_state = irq_disable();
+    thread_t *t = thread_get(pid);
+    if (!t) {
+        irq_restore(irq_state);
+        return 0;
+    }
+    unsigned result = _msg_avail(t);
+    irq_restore(irq_state);
+    return result;
 }
 
 unsigned msg_avail(void)
 {
-    return _msg_avail(thread_get_active());
+    unsigned irq_state = irq_disable();
+    unsigned result = _msg_avail(thread_get_active());
+    irq_restore(irq_state);
+    return result;
 }
 
 unsigned msg_queue_capacity(kernel_pid_t pid)
@@ -471,7 +484,9 @@ unsigned msg_queue_capacity(kernel_pid_t pid)
 
     thread_t *thread = thread_get(pid);
 
-    assert(thread != NULL);
+    if (!thread) {
+        return 0;
+    }
 
     int queue_cap = 0;
 
@@ -495,26 +510,50 @@ void msg_queue_print(void)
     unsigned state = irq_disable();
     thread_t *thread = thread_get_active();
 
-    unsigned msg_counter = msg_avail();
+    unsigned msg_count = msg_avail();
 
-    if (msg_counter < 1) {
+    if (msg_count < 1) {
         /* no msg queue */
         irq_restore(state);
         printf("No messages or no message queue\n");
         return;
     }
+
     cib_t *msg_queue = &thread->msg_queue;
-    msg_t *msg_array = thread->msg_array;
-    int first_msg = cib_peek(msg_queue);
+
+    /* copy message queue information to stack
+       before re-enabling IRQs (needed for highlevel_stdio) */
+    unsigned size = msg_queue->mask + 1;
+    unsigned msg_count_print = MIN(msg_count, CONFIG_MSG_QUEUE_PRINT_MAX);
+    int msg_idx_first = cib_peek(msg_queue);
+    int msg_idx_last = (msg_idx_first + msg_count) & msg_queue->mask;
+    unsigned msg_count_to_end = size - msg_idx_first;
+
+    static msg_t msg_array[CONFIG_MSG_QUEUE_PRINT_MAX];
+    if (msg_idx_last > msg_idx_first || msg_count_to_end > msg_count_print) {
+        memcpy(msg_array, &thread->msg_array[msg_idx_first],
+               sizeof(msg_t) * (msg_count_print));
+    }
+    else {
+        unsigned msg_count_from_start = MIN((unsigned)(msg_idx_last + 1),
+                                            msg_count_print - msg_count_to_end);
+        memcpy(&msg_array[0], &thread->msg_array[msg_idx_first],
+               sizeof(msg_t) * msg_count_to_end);
+        memcpy(&msg_array[msg_count_to_end], &thread->msg_array[0],
+               sizeof(msg_t) * msg_count_from_start);
+    }
+    irq_restore(state);
 
     printf("Message queue of thread %" PRIkernel_pid "\n", thread->pid);
-    printf("    size: %u (avail: %u)\n", msg_queue->mask + 1, msg_counter);
+    printf("    size: %u (avail: %u)\n", size, msg_count);
 
-    for (unsigned i = 0; i < msg_counter; i++) {
-        msg_t *m = &msg_array[(first_msg + i) & msg_queue->mask];
-        printf("    * %u: sender: %" PRIkernel_pid ", type: 0x%04" PRIu16
+    for (unsigned i = 0; i < msg_count_print; i++) {
+        msg_t *m = &msg_array[i];
+        printf("    * %u: sender: %" PRIkernel_pid ", type: 0x%04" PRIx16
                ", content: %" PRIu32 " (%p)\n", i, m->sender_pid, m->type,
                m->content.value, m->content.ptr);
     }
-    irq_restore(state);
+    if (msg_count > msg_count_print) {
+        puts("    ... (print more by changing CONFIG_MSG_QUEUE_PRINT_MAX)");
+    }
 }

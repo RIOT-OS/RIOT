@@ -49,7 +49,7 @@ _RATIOS = [
 ]
 
 DEFAULT_APPS = [
-    "examples/hello-world",
+    "examples/basic/hello-world",
     "tests/drivers/mtd_mapper",
     "tests/drivers/saul",
     "tests/pkg/tinyusb_cdc_msc",
@@ -91,7 +91,7 @@ DEFAULT_BOARDS = [
     'mega-xplained',
     'microbit',
     'mulle',
-    'native',
+    'native32',
     'native64',
     'nrf52840dk',
     'nrf9160dk',
@@ -120,7 +120,6 @@ DEFAULT_BOARDS = [
     'slwstk6220a',
     'stm32f723e-disco',
     'stm32mp157c-dk2',
-    'waspmote-pro',
     'waveshare-nrf52840-eval-kit',
     'weact-f401ce',
     'z1'
@@ -195,15 +194,16 @@ def _modules_packages(app, board, jobs, env, cwd, args):
         _print_module_or_pkg_mismatch(app, board, lines, args)
 
 
-def _build(app, board, jobs, env, cwd, args):
+def _build(app, board, toolchain, jobs, env, cwd, args):
     cmd = (f'/bin/bash -c "source .murdock; JOBS={jobs} '
-           f'compile {app} {board}:gnu"')
+           f'compile {app} {board}:{toolchain}"')
     try:
         out = __exec_cmd(cmd, shell=True, env=env, cwd=cwd,
                          stderr=subprocess.STDOUT)
         if args.very_very_verbose:
             print(out)
         print(f"{app: <30} {board: <30} PASS")
+        return True
     except subprocess.CalledProcessError as err:
         err.output = err.output.decode("utf-8", errors="replace")
         lines = err.output.split("\n")
@@ -216,6 +216,7 @@ def _build(app, board, jobs, env, cwd, args):
             print(f"{app: <30} {board: <30} FAIL: Kconfig hash mismatch")
         else:
             print(f"{app: <30} {board: <30} FAIL")
+        return False
 
 
 def main():
@@ -236,6 +237,8 @@ def main():
     parser.add_argument("-a", "--apps", nargs="+",
                         help=("A list of apps to test on the supported boards."
                               " If empty we will choose what is tested."))
+    parser.add_argument("-t", "--toolchain", choices=["gnu", "llvm"], default="gnu",
+                        help=("Toolchain to use"))
     parser.add_argument("-d", "--dry-run", action="store_true",
                         help=("Show each of the boards and apps to be compiled"
                               " without spending super long to compile them"))
@@ -262,6 +265,7 @@ def main():
     if 'all' in apps:
         apps = _all_apps(riot_dir)
 
+    ret = 0
     for app in apps:
         test_dir = str(pathlib.PurePath(riot_dir, app))
         if not pathlib.Path(test_dir).exists():
@@ -282,9 +286,12 @@ def main():
                 _modules_packages(app, board, args.jobs, full_env, riot_dir,
                                   args)
             else:
-                _build(app, board, args.jobs, full_env, riot_dir, args)
+                if not _build(app, board, args.toolchain, args.jobs, full_env,
+                              riot_dir, args):
+                    ret = -1
     elapse_time = datetime.datetime.now() - start_time
     _end(elapse_time.total_seconds(), args.jobs)
+    exit(ret)
 
 
 if __name__ == '__main__':

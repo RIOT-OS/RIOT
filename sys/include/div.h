@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup  sys_div   Integer division functions
  * @ingroup   sys_math
@@ -20,9 +22,6 @@
  * @author    Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @{
  */
-
-#ifndef DIV_H
-#define DIV_H
 
 #include <assert.h>
 #include <stdint.h>
@@ -181,4 +180,3 @@ static inline uint32_t div_u32_mod_44488(uint32_t val)
 }
 #endif
 /** @} */
-#endif /* DIV_H */

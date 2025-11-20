@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_util
  * @{
@@ -16,6 +18,9 @@
  *
  * This header offers a bunch of "LOG_*" functions that, with the default
  * implementation, just use printf, but honour a verbosity level.
+ *
+ * If you want a logging unit name to be prefixed to the logs, define LOG_UNIT
+ * in the source file before including this header.
  *
  * If desired, it is possible to implement a log module which then will be used
  * instead the default printf-based implementation.  In order to do so, the log
@@ -29,9 +34,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef LOG_H
-#define LOG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -72,17 +74,28 @@ enum {
 #endif
 
 /**
+ * @brief Log with/without unit.
+ *
+ * @note Internal use only, use @ref LOG() instead.
+ */
+#ifdef LOG_UNIT
+#  define LOG_WRITE(level, fmt, ...) log_write((level), "%s: "fmt, LOG_UNIT, ##__VA_ARGS__)
+#else
+#  define LOG_WRITE(level, ...) log_write((level), __VA_ARGS__)
+#endif
+
+/**
  * @brief Log message if level <= LOG_LEVEL
  */
 #ifdef __clang__    /* following pragmas required for clang 3.8.0 */
 #define LOG(level, ...) do { \
         _Pragma("clang diagnostic push") \
         _Pragma("clang diagnostic ignored \"-Wtautological-compare\"") \
-        if ((level) <= LOG_LEVEL) log_write((level), __VA_ARGS__); } while (0U) \
+        if ((level) <= LOG_LEVEL) LOG_WRITE((level), __VA_ARGS__); } while (0U) \
         _Pragma("clang diagnostic pop")
 #else
 #define LOG(level, ...) do { \
-        if ((level) <= LOG_LEVEL) log_write((level), __VA_ARGS__); } while (0U)
+        if ((level) <= LOG_LEVEL) LOG_WRITE((level), __VA_ARGS__); } while (0U)
 #endif /* __clang__ */
 
 /**
@@ -92,7 +105,21 @@ enum {
 #define LOG_ERROR(...) LOG(LOG_ERROR, __VA_ARGS__)      /**< log an error */
 #define LOG_WARNING(...) LOG(LOG_WARNING, __VA_ARGS__)  /**< log a warning */
 #define LOG_INFO(...) LOG(LOG_INFO, __VA_ARGS__)        /**< for the curious */
-#define LOG_DEBUG(...) LOG(LOG_DEBUG, __VA_ARGS__)      /**< teach some ignorance */
+/**
+ * @brief   Print a log message, if `LOG_LEVEL` is defined to be at least
+ *          `LOG_DEBUG`
+ *
+ * @note    This looks similar to the @ref DEBUG function. However, it is
+ *          enabled *globally*. Prefer @ref DEBUG (which can be enabled on a
+ *          per-file granularity) for debug output relevant for debugging
+ *          a module in RIOT. Prefer this for debug output relevant for
+ *          application developers using your module (e.g. to hint potentially
+ *          incorrect / inefficient use of your library).
+ * @details If a variable is only accessed by `LOG_DEBUG()`, the compiler will
+ *          not warn about unused variables even when the log level is lower
+ *          than `LOG_DEBUG`.
+ */
+#define LOG_DEBUG(...) LOG(LOG_DEBUG, __VA_ARGS__)
 /** @} */
 
 #ifdef MODULE_LOG
@@ -110,5 +137,4 @@ enum {
 }
 #endif
 
-#endif /* LOG_H */
 /** @} */

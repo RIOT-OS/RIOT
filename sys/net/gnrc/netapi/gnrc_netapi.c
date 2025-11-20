@@ -92,6 +92,7 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
     if (numof != 0) {
         gnrc_netreg_entry_t *sendto = gnrc_netreg_lookup(type, demux_ctx);
 
+        /* the packet is replicated over all interfaces that is's being sent on */
         gnrc_pktbuf_hold(pkt, numof - 1);
 
         while (sendto) {

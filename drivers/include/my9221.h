@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_my9221 MY9221 LED controller
  * @ingroup     drivers_actuators
@@ -17,9 +19,6 @@
  *
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef MY9221_H
-#define MY9221_H
 
 #include <stdint.h>
 
@@ -125,5 +124,4 @@ void my9221_toggle_led(my9221_t *dev, const uint8_t led);
 }
 #endif
 
-#endif /* MY9221_H */
 /** @} */

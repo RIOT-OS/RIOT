@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 Engineering-Spirit
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2016 Engineering-Spirit
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -96,6 +93,13 @@ int adc_init(adc_t line)
     assume((periph_apb_clk(APB2) / clk_div) <= ADC_CLK_MAX);
     ADC->CCR = ((clk_div / 2) - 1) << 16;
 
+    if (IS_USED(MODULE_PERIPH_VBAT)) {
+        /* Set the sampling rate for the VBat channel to 112 cycles. It reads
+        * correct with 84 cycles already, so this adds some margin. */
+        ADC1->SMPR1 = (ADC1->SMPR1 & ~ADC_SMPR1_SMP18) | \
+                      (ADC_SMPR1_SMP18_2 | ADC_SMPR1_SMP18_0);
+    }
+
     /* enable the ADC module */
     dev(line)->CR2 = ADC_CR2_ADON;
 
@@ -109,7 +113,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     int sample;
 
     /* check if resolution is applicable */
-    if (res < 0xff) {
+    if ((res & ADC_CR1_RES) != res) {
         return -1;
     }
 

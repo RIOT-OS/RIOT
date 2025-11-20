@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_stm32
@@ -15,9 +14,6 @@
  *
  * @author          Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef PERIPH_CPU_GPIO_LL_H
-#define PERIPH_CPU_GPIO_LL_H
 
 #include <stdalign.h>
 #include <stdint.h>
@@ -30,6 +26,11 @@ extern "C" {
 /* Hide this from Doxygen to avoid merging implementation details into
  * public view on type */
 #ifndef DOXYGEN
+
+#if !defined(CPU_FAM_STM32F1)
+/* For the STM32F1 GPIO peripheral, the gpio_ll_switch_dir is not supported */
+#  define HAVE_GPIO_LL_PREPARE_SWITCH_DIR
+#endif
 
 #define HAVE_GPIO_PULL_STRENGTH_T
 typedef enum {
@@ -190,5 +191,4 @@ union gpio_conf_stm32 {
 }
 #endif
 
-#endif /* PERIPH_CPU_GPIO_LL_H */
 /** @} */

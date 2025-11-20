@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_vfs_util    VFS helper functions
  * @ingroup     sys_vfs
@@ -16,9 +18,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef VFS_UTIL_H
-#define VFS_UTIL_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -144,5 +143,4 @@ int vfs_unlink_recursive(const char *root, char *path_buf, size_t max_size);
 }
 #endif
 
-#endif /* VFS_UTIL_H */
 /** @} */

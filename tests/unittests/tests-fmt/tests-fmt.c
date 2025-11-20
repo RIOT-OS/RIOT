@@ -17,6 +17,7 @@
 
 #include "embUnit/embUnit.h"
 
+#include "compiler_hints.h"
 #include "fmt.h"
 #include "tests-fmt.h"
 
@@ -244,6 +245,7 @@ static void test_fmt_hex_bytes(void)
 
 static void test_fmt_u16_hex(void)
 {
+    NONSTRING
     char out[8] = "zzzzzzzz";
 
     /* Check return count with null buffer input */
@@ -260,6 +262,7 @@ static void test_fmt_u16_hex(void)
 
 static void test_fmt_u32_hex(void)
 {
+    NONSTRING
     char out[12] = "zzzzzzzzzzzz";
 
     /* Check return count with null buffer input */
@@ -276,6 +279,7 @@ static void test_fmt_u32_hex(void)
 
 static void test_fmt_u64_hex(void)
 {
+    NONSTRING
     char out[20] = "zzzzzzzzzzzzzzzzzzzz";
 
     /* Check return count with null buffer input */
@@ -292,6 +296,7 @@ static void test_fmt_u64_hex(void)
 
 static void test_fmt_u16_dec(void)
 {
+    NONSTRING
     char out[8] = "zzzzzzzz";
     uint8_t chars = 0;
 
@@ -310,6 +315,7 @@ static void test_fmt_u16_dec(void)
 
 static void test_fmt_u32_dec(void)
 {
+    NONSTRING
     char out[16] = "zzzzzzzzzzzzzzzz";
     uint8_t chars = 0;
 
@@ -329,6 +335,7 @@ static void test_fmt_u32_dec(void)
 
 static void test_fmt_u64_dec(void)
 {
+    NONSTRING
     char out[24] = "zzzzzzzzzzzzzzzzzzzzzzzz";
     uint8_t chars = 0;
 
@@ -345,6 +352,7 @@ static void test_fmt_u64_dec(void)
 
 static void test_fmt_u64_dec_zero(void)
 {
+    NONSTRING
     char out[24] = "zzzzzzzzzzzzzzzzzzzzzzzz";
     uint8_t chars = 0;
 
@@ -355,6 +363,7 @@ static void test_fmt_u64_dec_zero(void)
 
 static void test_fmt_u64_dec_u64max(void)
 {
+    NONSTRING
     char out[24] = "zzzzzzzzzzzzzzzzzzzzzzzz";
     uint8_t chars = 0;
 
@@ -869,6 +878,34 @@ static void test_scn_u32_hex(void)
     TEST_ASSERT_EQUAL_INT(0xab, scn_u32_hex("aB", 9));
 }
 
+static void test_scn_buf_hex(void)
+{
+    uint8_t buf[8];
+    const char *input_invalid = "hallo";
+    const char *input_valid = "deadbeef";
+    const uint8_t expected[] = { 0xde, 0xad, 0xbe, 0xef };
+    const size_t len_valid = strlen(input_valid);
+    const size_t len_invalid = strlen(input_invalid);
+    const size_t len_expected = sizeof(expected);
+
+    /* invalid due to odd length */
+    TEST_ASSERT_EQUAL_INT(-EINVAL, scn_buf_hex(buf, sizeof(buf),
+                                               input_valid, len_valid - 1));
+    /* invalid due to non-hex chars */
+    TEST_ASSERT_EQUAL_INT(-EINVAL, scn_buf_hex(buf, sizeof(buf),
+                                               input_invalid, len_invalid));
+    /* overflow */
+    TEST_ASSERT_EQUAL_INT(-EOVERFLOW, scn_buf_hex(buf, 2,
+                                                  input_valid, len_valid));
+
+    memset(buf, 0x55, sizeof(buf));
+    TEST_ASSERT_EQUAL_INT(len_expected, scn_buf_hex(buf, sizeof(buf),
+                                                    input_valid, len_valid));
+    TEST_ASSERT(0 == memcmp(expected, buf, len_expected));
+    /* did not overwrite */
+    TEST_ASSERT_EQUAL_INT(0x55, buf[len_expected]);
+}
+
 static void test_fmt_lpad(void)
 {
     const char base[] = "abcd";
@@ -903,6 +940,98 @@ static void test_fmt_lpad(void)
     TEST_ASSERT_EQUAL_STRING((char*)string, "xxxx3333");
 }
 
+static void test_fmt_time_iso8601(void)
+{
+    char out[20] = { 0 };
+    const char *expected = "2025-04-08T17:40:02";
+
+    struct tm time = {
+        .tm_year = 2025 - 1900,
+        .tm_mon = 4 - 1,
+        .tm_mday = 8,
+        .tm_hour = 17,
+        .tm_min = 40,
+        .tm_sec = 2
+    };
+
+    TEST_ASSERT_EQUAL_INT(19, fmt_time_tm_iso8601(out, &time, 'T'));
+    TEST_ASSERT_EQUAL_STRING(expected, out);
+    expected = "2025-04-08 17:40:02";
+    TEST_ASSERT_EQUAL_INT(19, fmt_time_tm_iso8601(out, &time, ' '));
+    TEST_ASSERT_EQUAL_STRING(expected, out);
+
+    time.tm_year = -1901;
+    TEST_ASSERT_EQUAL_INT(-EINVAL, fmt_time_tm_iso8601(out, &time, 'T'));
+    time.tm_year = 9999 - 1899;
+    TEST_ASSERT_EQUAL_INT(-EINVAL, fmt_time_tm_iso8601(out, &time, 'T'));
+}
+
+static void test_scn_time_iso8601(void)
+{
+    struct tm time;
+
+    memset(&time, 0, sizeof(time));
+    TEST_ASSERT_EQUAL_INT(19, scn_time_tm_iso8601(&time, "2025-04-08T17:40:02", 'T'));
+    TEST_ASSERT_EQUAL_INT(2025 - 1900, time.tm_year);
+    TEST_ASSERT_EQUAL_INT(4 - 1, time.tm_mon);
+    TEST_ASSERT_EQUAL_INT(8, time.tm_mday);
+    TEST_ASSERT_EQUAL_INT(17, time.tm_hour);
+    TEST_ASSERT_EQUAL_INT(40, time.tm_min);
+    TEST_ASSERT_EQUAL_INT(2, time.tm_sec);
+
+    memset(&time, 0, sizeof(time));
+    TEST_ASSERT_EQUAL_INT(19, scn_time_tm_iso8601(&time, "2025-04-08 17:40:02", ' '));
+    TEST_ASSERT_EQUAL_INT(2025 - 1900, time.tm_year);
+    TEST_ASSERT_EQUAL_INT(4 - 1, time.tm_mon);
+    TEST_ASSERT_EQUAL_INT(8, time.tm_mday);
+    TEST_ASSERT_EQUAL_INT(17, time.tm_hour);
+    TEST_ASSERT_EQUAL_INT(40, time.tm_min);
+    TEST_ASSERT_EQUAL_INT(2, time.tm_sec);
+
+    memset(&time, 0, sizeof(time));
+    TEST_ASSERT_EQUAL_INT(10, scn_time_tm_iso8601(&time, "2025-04-08", 'T'));
+    TEST_ASSERT_EQUAL_INT(2025 - 1900, time.tm_year);
+    TEST_ASSERT_EQUAL_INT(4 - 1, time.tm_mon);
+    TEST_ASSERT_EQUAL_INT(8, time.tm_mday);
+
+    memset(&time, 0, sizeof(time));
+    TEST_ASSERT_EQUAL_INT(19, scn_time_tm_iso8601(&time, "2025-13-08T17:40:02", 'T'));
+    TEST_ASSERT_EQUAL_INT(2025 - 1900, time.tm_year);
+    TEST_ASSERT_EQUAL_INT(13 - 1, time.tm_mon);
+    TEST_ASSERT_EQUAL_INT(8, time.tm_mday);
+    TEST_ASSERT_EQUAL_INT(17, time.tm_hour);
+    TEST_ASSERT_EQUAL_INT(40, time.tm_min);
+    TEST_ASSERT_EQUAL_INT(2, time.tm_sec);
+
+    memset(&time, 0, sizeof(time));
+    TEST_ASSERT_EQUAL_INT(19, scn_time_tm_iso8601(&time, "2025-04-08T17:60:02", 'T'));
+    TEST_ASSERT_EQUAL_INT(2025 - 1900, time.tm_year);
+    TEST_ASSERT_EQUAL_INT(4 - 1, time.tm_mon);
+    TEST_ASSERT_EQUAL_INT(8, time.tm_mday);
+    TEST_ASSERT_EQUAL_INT(17, time.tm_hour);
+    TEST_ASSERT_EQUAL_INT(60, time.tm_min);
+    TEST_ASSERT_EQUAL_INT(2, time.tm_sec);
+
+    memset(&time, 0, sizeof(time));
+    TEST_ASSERT_EQUAL_INT(19, scn_time_tm_iso8601(&time, "1899-04-08T17:40:02", 'T'));
+    TEST_ASSERT_EQUAL_INT(1899 - 1900, time.tm_year);
+    TEST_ASSERT_EQUAL_INT(4 - 1, time.tm_mon);
+    TEST_ASSERT_EQUAL_INT(8, time.tm_mday);
+    TEST_ASSERT_EQUAL_INT(17, time.tm_hour);
+    TEST_ASSERT_EQUAL_INT(40, time.tm_min);
+    TEST_ASSERT_EQUAL_INT(2, time.tm_sec);
+
+    memset(&time, 0, sizeof(time));
+    TEST_ASSERT_EQUAL_INT(-EBADF, scn_time_tm_iso8601(&time, "2025-04-08T", ' '));
+    TEST_ASSERT_EQUAL_INT(-EBADF, scn_time_tm_iso8601(&time, "2025-04-08 17:40:02", 'T'));
+    TEST_ASSERT_EQUAL_INT(-EINVAL, scn_time_tm_iso8601(&time, "2025-XX-08T17:40:02", 'T'));
+    TEST_ASSERT_EQUAL_INT(-EINVAL, scn_time_tm_iso8601(&time, "2025-4-08T17:40:02", 'T'));
+    TEST_ASSERT_EQUAL_INT(-EINVAL, scn_time_tm_iso8601(&time, "2025-04-8T17:40:02", 'T'));
+    TEST_ASSERT_EQUAL_INT(-EINVAL, scn_time_tm_iso8601(&time, "2025-04-08T17:40:2", 'T'));
+    TEST_ASSERT_EQUAL_INT(-EINVAL, scn_time_tm_iso8601(&time, "-2025-04-08T17:40:02", 'T'));
+    TEST_ASSERT_EQUAL_INT(-EINVAL, scn_time_tm_iso8601(&time, "10000-04-08T17:40:02", 'T'));
+}
+
 Test *tests_fmt_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -935,7 +1064,10 @@ Test *tests_fmt_tests(void)
         new_TestFixture(test_fmt_to_lower),
         new_TestFixture(test_scn_u32_dec),
         new_TestFixture(test_scn_u32_hex),
+        new_TestFixture(test_scn_buf_hex),
         new_TestFixture(test_fmt_lpad),
+        new_TestFixture(test_fmt_time_iso8601),
+        new_TestFixture(test_scn_time_iso8601),
     };
 
     EMB_UNIT_TESTCALLER(fmt_tests, NULL, NULL, fixtures);

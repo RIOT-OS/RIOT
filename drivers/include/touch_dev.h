@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_touch_dev Touch device generic API
  * @ingroup     drivers_misc
@@ -16,9 +18,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef TOUCH_DEV_H
-#define TOUCH_DEV_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -209,5 +208,4 @@ void touch_dev_set_touch_event_callback(const touch_dev_t *dev, touch_event_cb_t
 }
 #endif
 
-#endif /* TOUCH_DEV_H */
 /** @} */

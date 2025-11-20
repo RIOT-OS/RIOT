@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_lm75
  *
@@ -22,9 +24,6 @@
  * @ingroup     drivers_sensors
  * @brief       Driver for the lm75 temperature sensors.
  */
-
-#ifndef LM75_H
-#define LM75_H
 
 #include <stdbool.h>
 #include "periph/i2c.h"
@@ -136,7 +135,7 @@ int lm75_get_temperature(lm75_t *dev, int *temperature);
  * @param[in] temp_os       desired OS temperature in mºC
  * @param[in] temp_hyst     desired HYST temperature in mºC
  * @param[in] cb            callback that is called from interrupt context
- * @param[in] *arg          optional arguments for the gpio_init_int function
+ * @param[in] arg           optional arguments for the gpio_init_int function
  *
  * @return LM75_SUCCESS, on success
  * @return LM75_ERROR_I2C, on I2C related error
@@ -242,5 +241,4 @@ int lm75_low_power_mode(lm75_t *dev, uint16_t interval);
 }
 #endif
 
-#endif /* LM75_H */
 /** @} */

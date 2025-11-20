@@ -1,13 +1,9 @@
 /*
- * Copyright (C) 2013, Freie Universitaet Berlin (FUB). All rights reserved.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2013 Freie Universität Berlin (FUB)
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#ifndef CPU_H
-#define CPU_H
+#pragma once
 
 /**
  * @defgroup    cpu_lpc23xx     NXP LPC23XX
@@ -79,4 +75,3 @@ bool cpu_backup_ram_is_initialized(void);
 #endif
 
 /** @} */
-#endif /* CPU_H */

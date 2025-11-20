@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2022 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2022 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_esp32
@@ -16,9 +15,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
-
 #include <stdbool.h>
 #include <stdint.h>
 #include "sdkconfig.h"
@@ -27,6 +23,8 @@
 #include "soc/ledc_struct.h"
 #include "soc/periph_defs.h"
 #include "soc/soc_caps.h"
+
+#include "modules.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,7 +63,14 @@ extern "C" {
 /**
  * @brief   Length of the CPU_ID in octets
  */
-#define CPUID_LEN               (6U)
+#if defined(CPU_FAM_ESP32H2) && defined(CONFIG_IEEE802154_ENABLED)
+/* ESP32H2 has IEEE802.15.4 radio which has an EUI64 address. Function
+ * esp_efuse_mac_get_default will return this 8 byte address if
+ * CONFIG_IEEE802154_ENABLED */
+#  define CPUID_LEN             (8U)
+#else
+#  define CPUID_LEN             (6U)
+#endif
 
 /**
  * @name   GPIO configuration
@@ -149,21 +154,18 @@ typedef enum {
 /* BEGIN: GPIO LL overwrites */
 
 #if SOC_GPIO_PIN_COUNT > 32
-
-#define GPIO_PORT_NUMOF         2
-#define GPIO_PORT_0             GPIO_PORT(0)
-#define GPIO_PORT_1             GPIO_PORT(1)
-#define GPIO_PORT_0_PIN_NUMOF   (32)
-#define GPIO_PORT_1_PIN_NUMOF   (SOC_GPIO_PIN_COUNT - 32)
-#define GPIO_PORT_PIN_NUMOF(p)  ((p == GPIO_PORT_0) ? GPIO_PORT_0_PIN_NUMOF \
-                                                    : GPIO_PORT_1_PIN_NUMOF)
+#  define GPIO_PORT_NUMOF           2
+#  define GPIO_PORT_0               0
+#  define GPIO_PORT_1               1
+#  define GPIO_PORT_0_PIN_NUMOF     (32)
+#  define GPIO_PORT_1_PIN_NUMOF     (SOC_GPIO_PIN_COUNT - 32)
+#  define GPIO_PORT_PIN_NUMOF(p)    ((p == GPIO_PORT_0) ? GPIO_PORT_0_PIN_NUMOF \
+                                                        : GPIO_PORT_1_PIN_NUMOF)
 #else
-
-#define GPIO_PORT_NUMOF         1
-#define GPIO_PORT_0             GPIO_PORT(0)
-#define GPIO_PORT_0_PIN_NUMOF   (SOC_GPIO_PIN_COUNT)
-#define GPIO_PORT_PIN_NUMOF(p)  ((p == GPIO_PORT_0) ? GPIO_PORT_0_PIN_NUMOF : 0)
-
+#  define GPIO_PORT_NUMOF            1
+#  define GPIO_PORT_0               0
+#  define GPIO_PORT_0_PIN_NUMOF     (SOC_GPIO_PIN_COUNT)
+#  define GPIO_PORT_PIN_NUMOF(p)    ((p == GPIO_PORT_0) ? GPIO_PORT_0_PIN_NUMOF : 0)
 #endif
 
 #define HAVE_GPIO_PORT_T
@@ -185,13 +187,20 @@ typedef enum {
     GPIO_PULL_STRONGEST = 0
 } gpio_pull_strength_t;
 
+/*
+ * This include is placed here by intention to avoid type name conflicts.
+ * Having the macros HAVE_GPIO_* defined before including this file allows to
+ * use these macros in `hal/gpio_types.h` to decide whether to use the
+ * ESP-IDF types when compiling ESP-IDF modules or to use the RIOT types
+ * when compiling RIOT source code.
+ */
+#include "hal/gpio_types.h"
+
 #define HAVE_GPIO_PULL_T
-typedef enum {
-    GPIO_FLOATING = 0,
-    GPIO_PULL_UP = 1,
-    GPIO_PULL_DOWN = 2,
-    GPIO_PULL_KEEP = 3   /*< not supported */
-} gpio_pull_t;
+typedef gpio_pull_mode_t gpio_pull_t;
+#define GPIO_PULL_UP    GPIO_PULLUP_ONLY
+#define GPIO_PULL_DOWN  GPIO_PULLDOWN_ONLY
+#define GPIO_PULL_KEEP  GPIO_PULLUP_PULLDOWN
 
 /**
  * @brief   Current an output pin can drive in active and sleep modes
@@ -330,18 +339,6 @@ union gpio_conf_esp32 {
  * @note The reference voltage Vref can vary from device to device in the range
  *       of 1.0V and 1.2V.
  *
- * The Vref of a device can be read at a predefined GPIO with the function
- * #adc_line_vref_to_gpio. The results of the ADC input can then be adjusted
- * accordingly.
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
- * extern int adc_line_vref_to_gpio(adc_t line, gpio_t gpio);
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * For the GPIO that can be used with this function, see:
- *
- * - \ref esp32_adc_channels_esp32 "ESP32"
- * - \ref esp32_adc_channels_esp32c3 "ESP32-C3"
- * - \ref esp32_adc_channels_esp32s3 "ESP32-S3"
- *
  * @{
  */
 
@@ -392,7 +389,7 @@ union gpio_conf_esp32 {
  * @brief  Number of DAC channels that could be used at maximum.
  */
 #if defined(SOC_DAC_SUPPORTED) || DOXYGEN
-#define DAC_NUMOF_MAX   (SOC_DAC_PERIPH_NUM)
+#  define DAC_NUMOF_MAX (SOC_DAC_PERIPH_NUM)
 #endif
 
 /** @} */
@@ -848,13 +845,13 @@ typedef spi_host_device_t spi_ctrl_t;
  * source code compatibility reasons these alias names are defined here.
  */
 #if defined(CPU_FAM_ESP32)
-#define HSPI    SPI2_HOST   /**< Alias name for SPI2_HOST as used in former ESP-IDF versions */
-#define VSPI    SPI3_HOST   /**< Alias name for SPI3_HOST as used in former ESP-IDF versions */
+#  define HSPI  SPI2_HOST   /**< Alias name for SPI2_HOST as used in former ESP-IDF versions */
+#  define VSPI  SPI3_HOST   /**< Alias name for SPI3_HOST as used in former ESP-IDF versions */
 #elif defined(CPU_FAM_ESP32S2)
-#define FSPI    SPI2_HOST   /**< Alias name for SPI2_HOST as used in former ESP-IDF versions */
-#define HSPI    SPI3_HOST   /**< Alias name for SPI3_HOST as used in former ESP-IDF versions */
+#  define FSPI  SPI2_HOST   /**< Alias name for SPI2_HOST as used in former ESP-IDF versions */
+#  define HSPI  SPI3_HOST   /**< Alias name for SPI3_HOST as used in former ESP-IDF versions */
 #else
-#define FSPI    SPI2_HOST   /**< Alias name for SPI2_HOST as used in former ESP-IDF versions */
+#  define FSPI  SPI2_HOST   /**< Alias name for SPI2_HOST as used in former ESP-IDF versions */
 #endif
 
 /**
@@ -910,14 +907,14 @@ typedef struct {
  * Since one timer is used for the system time, there is one timer less than
  * the total number of timers.
  */
-#define TIMER_NUMOF         (SOC_TIMER_GROUP_TOTAL_TIMERS - 1)
-#define TIMER_CHANNEL_NUMOF (1)
+#  define TIMER_NUMOF           (SOC_TIMER_GROUP_TOTAL_TIMERS - 1)
+#  define TIMER_CHANNEL_NUMOF   (1)
 #endif
 
 /** Timer group used for system time */
-#define TIMER_SYSTEM_GROUP      TIMER_GROUP_0
-/** Index of the timer in the timer timer group used for system time */
-#define TIMER_SYSTEM_INDEX      TIMER_0
+#define TIMER_SYSTEM_GROUP      0   /* formerly TIMER_GROUP_0 */
+/** Index of the timer in the timer group used for system time */
+#define TIMER_SYSTEM_INDEX      0   /* formerly TIMER_0 */
 /** System time interrupt source */
 #define TIMER_SYSTEM_INT_SRC    ETS_TG0_T0_LEVEL_INTR_SOURCE
 
@@ -978,6 +975,40 @@ typedef struct {
     gpio_t rxd;             /**< GPIO used as RxD pin */
 } uart_conf_t;
 
+#ifndef DOXYGEN
+/**
+ * @brief   Override UART stop bits
+ */
+typedef enum {
+    UART_STOP_BITS_1   = 0x1,  /*!< stop bit: 1bit*/
+    UART_STOP_BITS_1_5 = 0x2,  /*!< stop bit: 1.5bits*/
+    UART_STOP_BITS_2   = 0x3,  /*!< stop bit: 2bits*/
+} uart_stop_bits_t;
+
+#define HAVE_UART_STOP_BITS_T
+
+/**
+ * @brief   Marker for unsupported UART parity modes
+ */
+#define UART_MODE_UNSUPPORTED 0xf0
+
+/**
+ * @brief   Override UART parity values
+ */
+typedef enum {
+    UART_PARITY_NONE  = 0x0,
+    UART_PARITY_EVEN  = 0x2,
+    UART_PARITY_ODD   = 0x3,
+    UART_PARITY_MARK  = UART_MODE_UNSUPPORTED | 0,
+    UART_PARITY_SPACE = UART_MODE_UNSUPPORTED | 1,
+} uart_parity_t;
+
+#define UART_PARITY_DISABLE     UART_PARITY_NONE
+
+#define HAVE_UART_PARITY_T
+
+#endif /* !DOXYGEN */
+
 /**
  * @brief   Maximum number of UART interfaces
  */
@@ -1007,20 +1038,22 @@ typedef struct {
  * @brief   Include ESP32x family specific peripheral configuration
  */
 #if defined(CPU_FAM_ESP32)
-#include "periph_cpu_esp32.h"
+#  include "periph_cpu_esp32.h"
 #elif defined(CPU_FAM_ESP32C3)
-#include "periph_cpu_esp32c3.h"
+#  include "periph_cpu_esp32c3.h"
+#elif defined(CPU_FAM_ESP32C6)
+#  include "periph_cpu_esp32c6.h"
+#elif defined(CPU_FAM_ESP32H2)
+#  include "periph_cpu_esp32h2.h"
 #elif defined(CPU_FAM_ESP32S2)
-#include "periph_cpu_esp32s2.h"
+#  include "periph_cpu_esp32s2.h"
 #elif defined(CPU_FAM_ESP32S3)
-#include "periph_cpu_esp32s3.h"
+#  include "periph_cpu_esp32s3.h"
 #else
-#error "ESP32x family implementation missing"
+#  error "ESP32x family implementation missing"
 #endif
 
 #ifdef MODULE_PERIPH_CAN
-#include "can_esp.h"
+#  include "can_esp.h"
 #endif
-
-#endif /* PERIPH_CPU_H */
 /** @} */

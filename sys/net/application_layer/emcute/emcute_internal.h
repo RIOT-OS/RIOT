@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     net_emcute
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef EMCUTE_INTERNAL_H
-#define EMCUTE_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,5 +69,4 @@ enum {
 }
 #endif
 
-#endif /* EMCUTE_INTERNAL_H */
 /** @} */

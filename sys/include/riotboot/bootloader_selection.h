@@ -5,6 +5,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /** @ingroup bootloaders
  *
  * @{
@@ -19,8 +22,6 @@
  * to the riotboot_dfu application that isn't written in C++ and not included
  * from anywhere else either, but still here for consistency (and because
  * otherwise the checks complain) */
-#ifndef RIOTBOOT_BOOTLOADER_SELECTION_H
-#define RIOTBOOT_BOOTLOADER_SELECTION_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,7 +82,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* RIOTBOOT_BOOTLOADER_SELECTION_H */
 
 /** @} */

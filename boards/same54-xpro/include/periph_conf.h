@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2019 ML!PA Consulting GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 ML!PA Consulting GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_same54-xpro
@@ -16,9 +15,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -107,6 +103,13 @@ static const tc32_conf_t timer_config[] = {
 /** @} */
 
 /**
+ * @brief ATA6561 STANDBY pin definition
+ * @{
+ */
+#define AT6561_STBY_PIN            GPIO_PIN(PC, 13)
+/** @} */
+
+/**
  * @name CAN configuration
  * @{
  */
@@ -117,6 +120,9 @@ static const can_conf_t candev_conf[] = {
         .rx_pin = GPIO_PIN(PB, 13),
         .tx_pin = GPIO_PIN(PB, 12),
         .gclk_src = SAM0_GCLK_PERIPH,
+        .enable_pin = AT6561_STBY_PIN,
+        .enable_pin_mode = GPIO_OUT,
+        .enable_pin_active_low = true,
     }
 };
 
@@ -346,7 +352,8 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
  */
 
 /* ADC Default values */
-#define ADC_PRESCALER                       ADC_CTRLA_PRESCALER_DIV128
+#define ADC_GCLK_SRC                        SAM0_GCLK_PERIPH    /**< clock used for ADC */
+#define ADC_PRESCALER                       ADC_CTRLA_PRESCALER_DIV8
 
 #define ADC_NEG_INPUT                       ADC_INPUTCTRL_MUXNEG(0x18u)
 #define ADC_REF_DEFAULT                     ADC_REFCTRL_REFSEL_INTVCC1
@@ -367,10 +374,10 @@ static const adc_conf_chan_t adc_channels[] = {
  */
                             /* Must not exceed 12 MHz */
 #define DAC_CLOCK           SAM0_GCLK_TIMER
-                            /* Use external reference voltage on PA03 */
-                            /* (You have to manually connect PA03 with Vcc) */
+#ifndef DAC_VREF
                             /* Internal reference only gives 1V */
-#define DAC_VREF            DAC_CTRLB_REFSEL_VREFPU
+#define DAC_VREF            DAC_CTRLB_REFSEL_INTREF
+#endif
 /** @} */
 
 /**
@@ -435,5 +442,4 @@ static const freqm_config_t freqm_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

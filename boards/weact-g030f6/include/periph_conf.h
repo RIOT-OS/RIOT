@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2024 ML!PA Consulting GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2024 ML!PA Consulting GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_weact-g030f6
@@ -15,9 +14,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include <stdint.h>
 
@@ -75,5 +71,4 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

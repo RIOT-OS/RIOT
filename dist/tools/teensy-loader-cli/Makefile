@@ -11,6 +11,8 @@ else
   PKG_VERSION=76921edbdd81ae99b869b104404c16c06b0a266f
 endif
 
+RIOTBASE ?= $(CURDIR)/../../..
+
 PKG_SOURCE_DIR = $(CURDIR)/bin
 PKG_BUILD_OUT_OF_SOURCE = 0
 include $(RIOTBASE)/pkg/pkg.mk

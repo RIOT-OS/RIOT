@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_sx1280
  * @{
@@ -17,9 +19,6 @@
  * @author      Aymeric Brochier <aymeric.brochier@univ-grenoble-alpes.fr>
  *
  */
-
-#ifndef SX1280_CONSTANTS_H
-#define SX1280_CONSTANTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -71,5 +70,4 @@ extern "C" {
 }
 #endif
 
-#endif /* SX1280_CONSTANTS_H */
 /** @} */

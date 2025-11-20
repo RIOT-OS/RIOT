@@ -1,25 +1,21 @@
 /*
- * Copyright (C) 2019 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+#pragma once
+
+/**
+ * @defgroup drivers_eeprom_native Native extra API for EEPROM
+ * @ingroup  cpu_native
+ * @brief    Implementation of EEPROM buffer persistence in file.
+ * @{
  */
 
 /**
- * @defgroup    drivers_eeprom_native Native extra API for EEPROM
- * @ingroup     cpu_native
- * @brief       Implementation of EEPROM buffer persistence in file.
- *
- * @{
- *
  * @file
- *
- * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef EEPROM_NATIVE_H
-#define EEPROM_NATIVE_H
 
 #include "cpu.h"
 
@@ -27,8 +23,11 @@
 extern "C" {
 #endif
 
-#ifndef EEPROM_FILEPATH_MAX_LEN
-#define EEPROM_FILEPATH_MAX_LEN     (128U) /**< Maximum path len to store the EEPROM filepath */
+#if !defined(EEPROM_FILEPATH_MAX_LEN) || defined(DOXYGEN)
+/**
+ * @brief Maximum path len to store the EEPROM filepath
+ */
+#  define EEPROM_FILEPATH_MAX_LEN     (128U)
 #endif
 
 /**
@@ -44,5 +43,4 @@ void eeprom_native_read(void);
 }
 #endif
 
-#endif /* EEPROM_NATIVE_H */
 /** @} */

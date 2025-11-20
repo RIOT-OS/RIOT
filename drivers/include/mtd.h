@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_mtd Memory Technology Device
  * @ingroup     drivers_storage
@@ -69,9 +71,6 @@
  * @author      Aurelien Gonce <aurelien.gonce@altran.com>
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
-
-#ifndef MTD_H
-#define MTD_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -164,7 +163,7 @@ mtd_dev_t * const mtd_dev_xfa[];
  * @param   idx     Priority of the MTD device pointer within the XFA
  */
 #define MTD_XFA_ADD(dev, idx) \
-    XFA_CONST(mtd_dev_xfa, idx) mtd_dev_t *mtd ## idx = (mtd_dev_t *)&(dev)
+    XFA_CONST(mtd_dev_t, mtd_dev_xfa, idx) *mtd ## idx = (mtd_dev_t *)&(dev)
 
 /**
  * @brief   Number of MTDs defined in the MTD device array in XFA
@@ -544,5 +543,4 @@ static inline mtd_dev_t *mtd_dev_get(unsigned idx)
 }
 #endif
 
-#endif /* MTD_H */
 /** @} */

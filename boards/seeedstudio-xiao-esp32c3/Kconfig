@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2025 David Picard
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "seeedstudio-xiao-esp32c3" if BOARD_SEEEDSTUDIO_XIAO_ESP32C3
+
+config BOARD_SEEEDSTUDIO_XIAO_ESP32C3
+    bool
+    default y
+    select BOARD_COMMON_ESP32C3
+    select CPU_MODEL_ESP32C3_FH4
+
+source "$(RIOTBOARD)/common/esp32c3/Kconfig"

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_ipv4_addr   IPv4 addresses
  * @ingroup     net_ipv4
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_IPV4_ADDR_H
-#define NET_IPV4_ADDR_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -46,6 +46,11 @@ extern "C" {
  * @return initialized IPv4 address
  */
 #define IPV4_ADDR_INIT(a, b, c, d) { .u8 = {a, b, c, d} }
+
+/**
+ * @brief   Static initializer for the loopback IPv4 address (127.0.0.1)
+ */
+#define IPV4_ADDR_LOOPBACK          IPV4_ADDR_INIT(127, 0, 0, 1)
 
 /**
  * @brief Data type to represent an IPv4 address.
@@ -141,5 +146,4 @@ void ipv4_addr_print(const ipv4_addr_t *addr);
 }
 #endif
 
-#endif /* NET_IPV4_ADDR_H */
 /** @} */

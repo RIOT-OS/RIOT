@@ -31,6 +31,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     sipeed-longan-nano \
     sipeed-longan-nano-tft \
     stm32f7508-dk \
-    waspmote-pro \
     zigduino \
     #

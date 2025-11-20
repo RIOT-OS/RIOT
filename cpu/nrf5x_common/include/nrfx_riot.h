@@ -1,12 +1,11 @@
 /*
- * Copyright (C) 2018 Freie Universität Berlin
- * Copyright (C) 2020 Inria
- * Copyright (C) 2020 Koen Zandberg <koen@bergzand.net>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2020 Inria
+ * SPDX-FileCopyrightText: 2020 Koen Zandberg <koen@bergzand.net>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_nrf5x_common
@@ -18,9 +17,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef NRFX_RIOT_H
-#define NRFX_RIOT_H
 
 #include "kernel_defines.h"
 #include "cpu_conf.h"
@@ -63,5 +59,4 @@ static inline void nrfx_dcdc_init(void)
 }
 #endif
 
-#endif /* NRFX_RIOT_H */
 /** @} */

@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2019 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup    cpu_esp8266_conf ESP8266 compile configurations
@@ -18,9 +17,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #include "cpu_conf_common.h"
 #include "xtensa_conf.h"
@@ -117,5 +113,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

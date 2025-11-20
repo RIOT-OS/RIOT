@@ -8,6 +8,8 @@
  *
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_mma8x5x
  * @{
@@ -19,9 +21,6 @@
  * @author      Hauke Petersen
  *
  */
-
-#ifndef MMA8X5X_REGS_H
-#define MMA8X5X_REGS_H
 
 #ifdef __cplusplus
 extern "C"
@@ -258,5 +257,4 @@ extern "C"
 }
 #endif
 
-#endif /* MMA8X5X_REGS_H */
 /** @} */

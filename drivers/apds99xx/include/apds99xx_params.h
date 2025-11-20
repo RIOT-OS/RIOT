@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_apds99xx
  * @brief       Default configuration for Broadcom APDS99XX proximity and ambient light sensor
@@ -13,9 +15,6 @@
  * @file
  * @{
  */
-
-#ifndef APDS99XX_PARAMS_H
-#define APDS99XX_PARAMS_H
 
 #include "board.h"
 #include "apds99xx.h"
@@ -108,5 +107,4 @@ static const saul_reg_info_t apds99xx_saul_info[] =
 }
 #endif
 
-#endif /* APDS99XX_PARAMS_H */
 /** @} */

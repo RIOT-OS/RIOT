@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_w5500 W5500 ethernet driver
  * @ingroup     drivers_netdev
@@ -30,9 +32,6 @@
  *
  * @author      Stefan Schmidt <stemschmidt@gmail.com>
  */
-
-#ifndef W5500_H
-#define W5500_H
 
 #include <stdint.h>
 
@@ -86,5 +85,4 @@ void w5500_setup(w5500_t *dev, const w5500_params_t *params, uint8_t index);
 }
 #endif
 
-#endif /* W5500_H */
 /** @} */

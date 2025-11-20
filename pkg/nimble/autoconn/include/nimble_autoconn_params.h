@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_nimble_autoconn
  *
@@ -15,9 +17,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NIMBLE_AUTOCONN_PARAMS_H
-#define NIMBLE_AUTOCONN_PARAMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -103,5 +102,4 @@ static const nimble_autoconn_params_t nimble_autoconn_params =
 }
 #endif
 
-#endif /* NIMBLE_AUTOCONN_PARAMS_H */
 /** @} */

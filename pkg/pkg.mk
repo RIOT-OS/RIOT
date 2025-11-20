@@ -63,7 +63,8 @@ ifeq ($(QUIET),1)
 endif
 
 GITFLAGS ?= -c user.email=buildsystem@riot -c user.name="RIOT buildsystem"
-GITAMFLAGS ?= $(GIT_QUIET) --no-gpg-sign --ignore-whitespace --whitespace=nowarn
+GITAMFLAGS ?= $(GIT_QUIET)
+GITAMFLAGS += --no-gpg-sign --ignore-whitespace --whitespace=nowarn
 
 .PHONY: all prepare clean distclean FORCE
 
@@ -194,4 +195,19 @@ distclean:: clean
 
 # Reset goal for package
 .DEFAULT_GOAL =
+endif
+
+# Disabling some diagnostics: These issues needs to be fixed upstream
+CFLAGS += -Wno-maybe-uninitialized
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += -Wno-documentation
+endif
+
+include $(RIOTBASE)/makefiles/utils/strings.mk
+# Disabling -Wunterminated-string-initialization on toolchains that support this
+# warning
+ifeq (1,$(call version_is_greater_or_equal,$(GCC_VERSION),15))
+  CFLAGS += -Wno-unterminated-string-initialization
+  # this flag should not be passed to g++, only gcc:
+  CXXUWFLAGS += -Wno-unterminated-string-initialization
 endif

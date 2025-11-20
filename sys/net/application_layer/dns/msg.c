@@ -26,6 +26,9 @@
 
 #include "net/dns/msg.h"
 
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
 static ssize_t _enc_domain_name(uint8_t *out, const char *domain_name)
 {
     /*
@@ -76,10 +79,13 @@ static ssize_t _skip_hostname(const uint8_t *buf, size_t len,
 
     if (bufpos >= buflim) {
         /* out-of-bound */
+        DEBUG("dns_msg: bufpos is out of bounds\n");
         return -EBADMSG;
     }
+
     /* handle DNS Message Compression */
-    if (*bufpos >= 192) {
+    if (*bufpos & 0xc0) {
+        DEBUG("dns_msg: hostname is compressed\n");
         if ((bufpos + 2) >= buflim) {
             return -EBADMSG;
         }
@@ -90,6 +96,7 @@ static ssize_t _skip_hostname(const uint8_t *buf, size_t len,
         res += bufpos[res] + 1;
         if ((&bufpos[res]) >= buflim) {
             /* out-of-bound */
+            DEBUG("dns_msg: hostname out-of-bounds\n");
             return -EBADMSG;
         }
     }
@@ -156,6 +163,7 @@ int dns_msg_parse_reply(const uint8_t *buf, size_t len, int family,
         bufpos += tmp;
         if ((bufpos + RR_TYPE_LENGTH + RR_CLASS_LENGTH +
              RR_TTL_LENGTH + sizeof(uint16_t)) >= buflim) {
+            DEBUG("dns_msg: record beyond buf limit");
             return -EBADMSG;
         }
         uint16_t _type = ntohs(_get_short(bufpos));
@@ -167,35 +175,38 @@ int dns_msg_parse_reply(const uint8_t *buf, size_t len, int family,
         }
         bufpos += RR_TTL_LENGTH;
 
-        unsigned addrlen = ntohs(_get_short(bufpos));
+        unsigned rdlen = ntohs(_get_short(bufpos));
+        bufpos += RR_RDLENGTH_LENGTH;
+        if ((bufpos + rdlen) > buflim) {
+            return -EBADMSG;
+        }
+
+        DEBUG("dns_msg: type: %u, class: %u, len: %u\n", _type, class, rdlen);
+
         /* skip unwanted answers */
         if ((class != DNS_CLASS_IN) ||
                 ((_type == DNS_TYPE_A) && (family == AF_INET6)) ||
                 ((_type == DNS_TYPE_AAAA) && (family == AF_INET)) ||
                 ! ((_type == DNS_TYPE_A) || ((_type == DNS_TYPE_AAAA))
                     )) {
-            if (addrlen > len) {
+            if (rdlen > len) {
                 /* buffer wraps around memory space */
                 return -EBADMSG;
             }
-            bufpos += addrlen;
+            bufpos += rdlen;
             /* other out-of-bound is checked in `_skip_hostname()` at start of
              * loop */
             continue;
         }
-        if (((addrlen != INADDRSZ) && (family == AF_INET)) ||
-            ((addrlen != IN6ADDRSZ) && (family == AF_INET6)) ||
-            ((addrlen != IN6ADDRSZ) && (addrlen != INADDRSZ) &&
+        if (((rdlen != INADDRSZ)  && (family == AF_INET))  ||
+            ((rdlen != IN6ADDRSZ) && (family == AF_INET6)) ||
+            ((rdlen != IN6ADDRSZ) && (rdlen != INADDRSZ) &&
              (family == AF_UNSPEC))) {
             return -EBADMSG;
         }
-        bufpos += RR_RDLENGTH_LENGTH;
-        if ((bufpos + addrlen) > buflim) {
-            return -EBADMSG;
-        }
 
-        memcpy(addr_out, bufpos, addrlen);
-        return addrlen;
+        memcpy(addr_out, bufpos, rdlen);
+        return rdlen;
     }
 
     return -EBADMSG;

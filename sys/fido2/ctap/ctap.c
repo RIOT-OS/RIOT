@@ -248,26 +248,26 @@ static uint8_t _pin_token[CTAP_PIN_TOKEN_SZ];
  */
 static int _rem_pin_att_boot = CTAP_PIN_MAX_ATTS_BOOT;
 
-int fido2_ctap_init(void)
+ctap_status_code_t fido2_ctap_init(void)
 {
     int ret;
 
     ret = fido2_ctap_mem_init();
 
     if (ret != CTAP2_OK) {
-        return -EPROTO;
+        return ret;
     }
 
     ret = fido2_ctap_mem_read_state_from_flash(&_state);
     if (ret != CTAP2_OK) {
-        return -EPROTO;
+        return ret;
     }
 
     /* first startup of the device */
     if (_state.initialized_marker != CTAP_INITIALIZED_MARKER) {
         ret = _reset();
         if (ret != CTAP2_OK) {
-            return -EPROTO;
+            return ret;
         }
     }
 
@@ -275,29 +275,29 @@ int fido2_ctap_init(void)
         ret = fido2_ctap_utils_init_gpio_pin(CTAP_UP_BUTTON, CTAP_UP_BUTTON_MODE,
                                              CTAP_UP_BUTTON_FLANK);
         if (ret != CTAP2_OK) {
-            return -EPROTO;
+            return ret;
         }
     }
 
     ret = fido2_ctap_crypto_init();
 
     if (ret != CTAP2_OK) {
-        return -EPROTO;
+        return ret;
     }
 
     /* initialize pin_token */
     ret = fido2_ctap_crypto_prng(_pin_token, sizeof(_pin_token));
 
     if (ret != CTAP2_OK) {
-        return -EPROTO;
+        return ret;
     }
 
     DEBUG("fido2_ctap: initialization successful \n");
 
-    return 0;
+    return CTAP2_OK;
 }
 
-size_t fido2_ctap_handle_request(ctap_req_t *req, ctap_resp_t *resp)
+ctap_status_code_t fido2_ctap_handle_request(ctap_req_t *req, ctap_resp_t *resp)
 {
     assert(req);
     assert(resp);
@@ -305,35 +305,38 @@ size_t fido2_ctap_handle_request(ctap_req_t *req, ctap_resp_t *resp)
     switch (req->method) {
     case CTAP_GET_INFO:
         DEBUG("fido2_ctap: get_info req \n");
-        return fido2_ctap_get_info(resp);
+        fido2_ctap_get_info(resp);
         break;
     case CTAP_MAKE_CREDENTIAL:
         DEBUG("fido2_ctap: make_credential req \n");
-        return fido2_ctap_make_credential(req, resp);
+        fido2_ctap_make_credential(req, resp);
         break;
     case CTAP_GET_ASSERTION:
         DEBUG("fido2_ctap: get_assertion req \n");
-        return fido2_ctap_get_assertion(req, resp);
+        fido2_ctap_get_assertion(req, resp);
         break;
     case CTAP_GET_NEXT_ASSERTION:
         DEBUG("fido2_ctap: get_next_assertion req \n");
-        return fido2_ctap_get_next_assertion(resp);
+        fido2_ctap_get_next_assertion(resp);
         break;
     case CTAP_CLIENT_PIN:
         DEBUG("fido2_ctap: client_pin req \n");
-        return fido2_ctap_client_pin(req, resp);
+        fido2_ctap_client_pin(req, resp);
         break;
     case CTAP_RESET:
         DEBUG("fido2_ctap: reset req \n");
-        return fido2_ctap_reset(resp);
+        fido2_ctap_reset(resp);
         break;
     default:
         DEBUG("fido2_ctap: unknown req: %u \n", req->method);
         resp->status = CTAP1_ERR_INVALID_COMMAND;
+        resp->len = 0x0;
         break;
     }
 
-    return 0;
+    DEBUG("Resp status %d \n", resp->status);
+
+    return resp->status;
 }
 
 ctap_state_t *fido2_ctap_get_state(void)
@@ -341,18 +344,19 @@ ctap_state_t *fido2_ctap_get_state(void)
     return &_state;
 }
 
-size_t fido2_ctap_get_info(ctap_resp_t *resp)
+ctap_status_code_t fido2_ctap_get_info(ctap_resp_t *resp)
 {
     assert(resp);
 
     fido2_ctap_cbor_init_encoder(resp->data, sizeof(resp->data));
 
     resp->status = _get_info();
+    resp->len = fido2_ctap_cbor_get_buffer_size(resp->data);
 
-    return fido2_ctap_cbor_get_buffer_size(resp->data);
+    return resp->status;
 }
 
-size_t fido2_ctap_make_credential(ctap_req_t *req, ctap_resp_t *resp)
+ctap_status_code_t fido2_ctap_make_credential(ctap_req_t *req, ctap_resp_t *resp)
 {
     assert(req);
     assert(resp);
@@ -360,11 +364,12 @@ size_t fido2_ctap_make_credential(ctap_req_t *req, ctap_resp_t *resp)
     fido2_ctap_cbor_init_encoder(resp->data, sizeof(resp->data));
 
     resp->status = _make_credential(req);
+    resp->len = fido2_ctap_cbor_get_buffer_size(resp->data);
 
-    return fido2_ctap_cbor_get_buffer_size(resp->data);
+    return resp->status;
 }
 
-size_t fido2_ctap_get_assertion(ctap_req_t *req, ctap_resp_t *resp)
+ctap_status_code_t fido2_ctap_get_assertion(ctap_req_t *req, ctap_resp_t *resp)
 {
     assert(req);
     assert(resp);
@@ -372,22 +377,24 @@ size_t fido2_ctap_get_assertion(ctap_req_t *req, ctap_resp_t *resp)
     fido2_ctap_cbor_init_encoder(resp->data, sizeof(resp->data));
 
     resp->status = _get_assertion(req);
+    resp->len = fido2_ctap_cbor_get_buffer_size(resp->data);
 
-    return fido2_ctap_cbor_get_buffer_size(resp->data);
+    return resp->status;
 }
 
-size_t fido2_ctap_get_next_assertion(ctap_resp_t *resp)
+ctap_status_code_t fido2_ctap_get_next_assertion(ctap_resp_t *resp)
 {
     assert(resp);
 
     fido2_ctap_cbor_init_encoder(resp->data, sizeof(resp->data));
 
     resp->status = _get_next_assertion();
+    resp->len = fido2_ctap_cbor_get_buffer_size(resp->data);
 
-    return fido2_ctap_cbor_get_buffer_size(resp->data);
+    return resp->status;
 }
 
-size_t fido2_ctap_client_pin(ctap_req_t *req, ctap_resp_t *resp)
+ctap_status_code_t fido2_ctap_client_pin(ctap_req_t *req, ctap_resp_t *resp)
 {
     assert(req);
     assert(resp);
@@ -395,15 +402,19 @@ size_t fido2_ctap_client_pin(ctap_req_t *req, ctap_resp_t *resp)
     fido2_ctap_cbor_init_encoder(resp->data, sizeof(resp->data));
 
     resp->status = _client_pin(req);
+    resp->len = fido2_ctap_cbor_get_buffer_size(resp->data);
 
-    return fido2_ctap_cbor_get_buffer_size(resp->data);
+    return resp->status;
 }
 
-size_t fido2_ctap_reset(ctap_resp_t *resp)
+ctap_status_code_t fido2_ctap_reset(ctap_resp_t *resp)
 {
-    resp->status = _reset();
+    assert(resp);
 
-    return 0;
+    resp->status = _reset();
+    resp->len = 0x0;
+
+    return resp->status;
 }
 
 static uint32_t get_id(void)
@@ -413,7 +424,11 @@ static uint32_t get_id(void)
 
 static int _reset(void)
 {
-    fido2_ctap_mem_erase_flash();
+    int ret = fido2_ctap_mem_erase_flash();
+
+    if (ret != CTAP2_OK) {
+        return ret;
+    }
 
     _state.initialized_marker = CTAP_INITIALIZED_MARKER;
     _state.rem_pin_att = CTAP_PIN_MAX_ATTS;
@@ -540,12 +555,12 @@ static int _make_credential(ctap_req_t *req_raw)
     }
 
     /* last moment where transaction can be cancelled */
-    if (IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)) {
-        if (fido2_ctap_transport_hid_should_cancel()) {
-            ret = CTAP2_ERR_KEEPALIVE_CANCEL;
-            goto done;
-        }
+#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
+    if (fido2_ctap_transport_hid_should_cancel()) {
+        ret = CTAP2_ERR_KEEPALIVE_CANCEL;
+        goto done;
     }
+#endif
 
     /* user presence test to create a new credential */
     if (IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)) {
@@ -690,6 +705,11 @@ static int _get_assertion(ctap_req_t *req_raw)
         goto done;
     }
 
+    /* CTAP specification (version 20190130) section 5.2, step 9 */
+    if (req.allow_list_len > 0 && _assert_state.count > 1) {
+        _assert_state.count = 1;
+    }
+
     memcpy(_assert_state.client_data_hash, req.client_data_hash,
            SHA256_DIGEST_LENGTH);
 
@@ -697,10 +717,12 @@ static int _get_assertion(ctap_req_t *req_raw)
     rk = &_assert_state.rks[_assert_state.cred_counter++];
 
     /* last moment where transaction can be cancelled */
+#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
     if (fido2_ctap_transport_hid_should_cancel()) {
         ret = CTAP2_ERR_KEEPALIVE_CANCEL;
         goto done;
     }
+#endif
 
     ret = _make_auth_data_assert(req.rp_id, req.rp_id_len, &auth_data, uv,
                                  up,
@@ -732,8 +754,13 @@ static int _get_assertion(ctap_req_t *req_raw)
         }
     }
 
-    /* save current time for get_next_assertion timeout */
-    _assert_state.timer = ztimer_now(ZTIMER_MSEC);
+    /**
+       if more than 1 eligible credential found and no allow list, save current time for
+       get_next_assertion timeout
+     */
+    if (_assert_state.count > 1 && req.allow_list_len == 0) {
+        _assert_state.timer = ztimer_now(ZTIMER_MSEC);
+    }
 
     ret = CTAP2_OK;
 
@@ -855,7 +882,7 @@ static int _client_pin(ctap_req_t *req_raw)
     }
 
     /* common error handling */
-    if (req.sub_command != CTAP_CP_REQ_SUB_COMMAND_GET_RETRIES) {
+    if (req.sub_command != CTAP_PIN_GET_RETRIES) {
         if (_is_locked()) {
             return CTAP2_ERR_PIN_BLOCKED;
         }
@@ -870,19 +897,19 @@ static int _client_pin(ctap_req_t *req_raw)
     }
 
     switch (req.sub_command) {
-    case CTAP_CP_REQ_SUB_COMMAND_GET_RETRIES:
+    case CTAP_PIN_GET_RETRIES:
         ret = _get_retries();
         break;
-    case CTAP_CP_REQ_SUB_COMMAND_GET_KEY_AGREEMENT:
+    case CTAP_PIN_GET_KEY_AGREEMENT:
         ret = _get_key_agreement();
         break;
-    case CTAP_CP_REQ_SUB_COMMAND_SET_PIN:
+    case CTAP_PIN_SET_PIN:
         ret = _set_pin(&req);
         break;
-    case CTAP_CP_REQ_SUB_COMMAND_CHANGE_PIN:
+    case CTAP_PIN_CHANGE_PIN:
         ret = _change_pin(&req);
         break;
-    case CTAP_CP_REQ_SUB_COMMAND_GET_PIN_TOKEN:
+    case CTAP_PIN_GET_PIN_TOKEN:
         ret = _get_pin_token(&req);
         break;
     default:
@@ -903,7 +930,6 @@ static int _get_key_agreement(void)
 {
     int ret;
     ctap_public_key_cose_t key = { 0 };
-
 
     /* generate key agreement key */
     ret =
@@ -989,12 +1015,12 @@ static int _set_pin(ctap_client_pin_req_t *req)
     }
 
     /* last moment where transaction can be cancelled */
-    if (IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)) {
-        if (fido2_ctap_transport_hid_should_cancel()) {
-            ret = CTAP2_ERR_KEEPALIVE_CANCEL;
-            goto done;
-        }
+#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
+    if (fido2_ctap_transport_hid_should_cancel()) {
+        ret = CTAP2_ERR_KEEPALIVE_CANCEL;
+        goto done;
     }
+#endif
 
     sz = fmt_strnlen((char *)new_pin_dec, CTAP_PIN_MAX_SIZE + 1);
     if (sz < CTAP_PIN_MIN_SIZE || sz > CTAP_PIN_MAX_SIZE) {
@@ -1100,13 +1126,12 @@ static int _change_pin(ctap_client_pin_req_t *req)
     }
 
     /* last moment where transaction can be cancelled */
-    if (IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)) {
-        if (fido2_ctap_transport_hid_should_cancel()) {
-            ret = CTAP2_ERR_KEEPALIVE_CANCEL;
-            goto done;
-        }
+#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
+    if (fido2_ctap_transport_hid_should_cancel()) {
+        ret = CTAP2_ERR_KEEPALIVE_CANCEL;
+        goto done;
     }
-
+#endif
     /* verify decrypted pinHash against LEFT(SHA-256(curPin), 16) */
     if (memcmp(pin_hash_dec, _state.pin_hash, CTAP_PIN_TOKEN_SZ) != 0) {
         DEBUG("fido2_ctap: _get_pin_token - invalid pin \n");
@@ -1198,13 +1223,12 @@ static int _get_pin_token(ctap_client_pin_req_t *req)
     }
 
     /* last moment where transaction can be cancelled */
-    if (IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)) {
-        if (fido2_ctap_transport_hid_should_cancel()) {
-            ret = CTAP2_ERR_KEEPALIVE_CANCEL;
-            goto done;
-        }
+#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
+    if (fido2_ctap_transport_hid_should_cancel()) {
+        ret = CTAP2_ERR_KEEPALIVE_CANCEL;
+        goto done;
     }
-
+#endif
     /* sha256 of shared secret ((abG).x) to obtain shared key */
     ret = fido2_ctap_crypto_sha256(shared_secret, sizeof(shared_secret), shared_key);
 

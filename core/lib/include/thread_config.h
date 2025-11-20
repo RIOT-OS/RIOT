@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_thread
  *
@@ -18,9 +20,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef THREAD_CONFIG_H
-#define THREAD_CONFIG_H
 
 #include "cpu_conf.h"
 #include "sched.h"      /* for SCHED_PRIO_LEVELS */
@@ -140,5 +139,4 @@ extern "C" {
 }
 #endif
 
-#endif /* THREAD_CONFIG_H */
 /** @} */

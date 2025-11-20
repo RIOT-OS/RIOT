@@ -2,3 +2,10 @@ INCLUDES += -I$(PKGDIRBASE)/cifra/src
 INCLUDES += -I$(PKGDIRBASE)/cifra/src/ext
 
 CFLAGS += -DFULL_FAT_ASSERT
+
+ifneq (,$(filter psa_cifra_%, $(USEMODULE)))
+  DIRS += $(RIOTPKG)/cifra/psa_cifra
+  INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
+endif
+
+PSEUDOMODULES += psa_cifra_aes_ccm

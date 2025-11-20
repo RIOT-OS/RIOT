@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_random Random
  * @ingroup     sys
@@ -31,9 +33,6 @@
  * @file
  * @brief       Common interface to the software PRNG
  */
-
-#ifndef RANDOM_H
-#define RANDOM_H
 
 #include <inttypes.h>
 #include <stddef.h>
@@ -138,5 +137,4 @@ double random_res53(void);
 }
 #endif
 
-#endif /* RANDOM_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_hsc
  *
@@ -15,9 +17,6 @@
  *
  * @author      Quang Pham <phhr_quang@live.com>
  */
-
-#ifndef HSC_PARAMS_H
-#define HSC_PARAMS_H
 
 #include "board.h"
 #include "hsc.h"
@@ -72,5 +71,4 @@ static const saul_reg_info_t hsc_saul_info[] =
 }
 #endif
 
-#endif /* HSC_PARAMS_H */
 /** @} */

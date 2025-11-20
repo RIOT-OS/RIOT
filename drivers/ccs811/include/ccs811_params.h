@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ccs811
  * @brief       Default configuration for AMS CCS811 digital gas sensors
@@ -13,9 +15,6 @@
  * @file
  * @{
  */
-
-#ifndef CCS811_PARAMS_H
-#define CCS811_PARAMS_H
 
 #include "board.h"
 #include "ccs811.h"
@@ -95,5 +94,4 @@ static const saul_reg_info_t ccs811_saul_info[] =
 }
 #endif
 
-#endif /* CCS811_PARAMS_H */
 /** @} */

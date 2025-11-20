@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_itg320x
  * @brief       Register definitions for InvenSense ITG320X 3-axis gyroscope
@@ -13,9 +15,6 @@
  * @file
  * @{
  */
-
-#ifndef ITG320X_REGS_H
-#define ITG320X_REGS_H
 
 #ifdef __cplusplus
 extern "C"
@@ -71,5 +70,4 @@ extern "C"
 }
 #endif
 
-#endif /* ITG320X_REGS_H */
 /** @} */

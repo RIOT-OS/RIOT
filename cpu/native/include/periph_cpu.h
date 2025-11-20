@@ -1,23 +1,20 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+#pragma once
+
+/**
+ * @addtogroup cpu_native
+ * @{
  */
 
 /**
- * @ingroup         cpu_native
- * @{
- *
  * @file
- * @brief           CPU specific definitions for internal peripheral handling
- *
- * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @brief  CPU specific definitions for internal peripheral handling
+ * @author Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include "periph_conf.h"
 
@@ -28,15 +25,15 @@ extern "C" {
 /**
  * @brief   Length of the CPU_ID in octets
  */
-#ifndef CPUID_LEN
-#define CPUID_LEN           (4U)
+#if !defined(CPUID_LEN) || defined(DOXYGEN)
+#  define CPUID_LEN           (4U)
 #endif
 
 /**
- * @name    Power mode configuration
+ * @brief Power mode configuration
  */
-#ifndef PM_NUM_MODES
-#define PM_NUM_MODES        (1U)
+#if !defined(PM_NUM_MODES) || defined(DOXYGEN)
+#  define PM_NUM_MODES        (1U)
 #endif
 
 /**
@@ -46,30 +43,47 @@ extern "C" {
 
 /* GPIO configuration only if the module is available (=Linux) */
 #if defined(MODULE_PERIPH_GPIO_LINUX) || defined(DOXYGEN)
-#include <linux/gpio.h>
+#  include <linux/gpio.h>
 
+/* MARK: - GPIO Configuration */
 /**
  * @name GPIO Configuration
  * @{
  */
-
 /**
  * @brief   The offset between Port and Pin
  */
-#define GPIO_PORT_SHIFT     (24)
+#  define GPIO_PORT_SHIFT     (24)
 
 /**
  * @brief   Define a custom GPIO_PIN macro for native
  */
-#define GPIO_PIN(port, pin) (gpio_t)((port << GPIO_PORT_SHIFT) | pin)
+#  define GPIO_PIN(port, pin) (gpio_t)((port << GPIO_PORT_SHIFT) | pin)
 
-#define HAVE_GPIO_MODE_T
-#ifndef GPIOHANDLE_REQUEST_PULL_DOWN
-#define GPIOHANDLE_REQUEST_PULL_DOWN    (0xFF)
-#endif
-#ifndef GPIOHANDLE_REQUEST_PULL_UP
-#define GPIOHANDLE_REQUEST_PULL_UP      (0xFF)
-#endif
+/**
+ * @brief Macro indicating whether GPIO modes are available on the native CPU
+ */
+#  define HAVE_GPIO_MODE_T
+/**
+ * @brief Pull-down
+ */
+#  if !defined(GPIOHANDLE_REQUEST_PULL_DOWN) || defined(DOXYGEN)
+#    if defined(GPIOHANDLE_REQUEST_BIAS_PULL_DOWN)
+#      define GPIOHANDLE_REQUEST_PULL_DOWN    GPIOHANDLE_REQUEST_BIAS_PULL_DOWN
+#    else
+#      define GPIOHANDLE_REQUEST_PULL_DOWN    (0xFF)
+#    endif
+#  endif
+/**
+ * @brief Pull-up
+ */
+#  if !defined(GPIOHANDLE_REQUEST_PULL_UP) || defined(DOXYGEN)
+#    if defined(GPIOHANDLE_REQUEST_BIAS_PULL_UP)
+#      define GPIOHANDLE_REQUEST_PULL_UP      GPIOHANDLE_REQUEST_BIAS_PULL_UP
+#    else
+#      define GPIOHANDLE_REQUEST_PULL_UP      (0xFF)
+#    endif
+#  endif
 
 /**
  * @brief   Available pin modes
@@ -88,21 +102,27 @@ typedef enum {
     GPIO_OD_PU = GPIOHANDLE_REQUEST_OPEN_DRAIN | GPIOHANDLE_REQUEST_PULL_UP
 } gpio_mode_t;
 
-#define HAVE_GPIO_FLANK_T
+/**
+ * @brief A macro indicating whether the native CPU supports GPIO edge behavior
+ */
+#  define HAVE_GPIO_FLANK_T
+
+/**
+ * @brief An enum for the type of flank that emit interrupts
+ */
 typedef enum {
     GPIO_FALLING = GPIOEVENT_EVENT_FALLING_EDGE,    /**< emit interrupt on falling flank */
     GPIO_RISING = GPIOEVENT_EVENT_RISING_EDGE,      /**< emit interrupt on rising flank */
     GPIO_BOTH = GPIO_FALLING | GPIO_RISING          /**< emit interrupt on both flanks */
 } gpio_flank_t;
-
 /** @} */
+
 #elif defined(MODULE_PERIPH_GPIO_MOCK)
 
 /**
  * @brief   Mocked GPIO
  *
  * Mocked GPIO representation for simulation.
- * @{
  */
 typedef struct {
     int value;              /**< current value */
@@ -111,24 +131,23 @@ typedef struct {
     void (*cb)(void *arg);  /**< ISR */
     void *arg;              /**< ISR arg */
 } gpio_mock_t;
-/** @} */
 
-#define GPIO_UNDEF          0
+#  define GPIO_UNDEF          0
 
-#ifndef GPIO_PORT_MAX
-#define GPIO_PORT_MAX       (16)
-#endif
+#  if !defined(GPIO_PORT_MAX) || defined(DOXYGEN)
+#    define GPIO_PORT_MAX       (16)
+#  endif
 
-#ifndef GPIO_PIN_MAX
-#define GPIO_PIN_MAX        (32)
-#endif
+#  if !defined(GPIO_PIN_MAX) || defined(DOXYGEN)
+#    define GPIO_PIN_MAX        (32)
+#  endif
 
 /**
  * @brief Mocked GPIO array
  */
 extern gpio_mock_t gpio_mock[GPIO_PORT_MAX][GPIO_PIN_MAX];
 
-#define HAVE_GPIO_T
+#  define HAVE_GPIO_T
 /**
  * @brief   Pointer on a mocked GPIO
  */
@@ -138,7 +157,7 @@ typedef gpio_mock_t* gpio_t;
  * @brief   Define a custom GPIO_PIN macro for native mocked GPIO framework.
  *          Get the mocked GPIO object from mocked GPIO array.
  */
-#define GPIO_PIN(port, pin) \
+#  define GPIO_PIN(port, pin) \
     (((port >= 0) && (pin >= 0) && (port < GPIO_PORT_MAX) && (pin < GPIO_PIN_MAX)) \
      ? &gpio_mock[port][pin] \
      : GPIO_UNDEF)
@@ -150,13 +169,35 @@ typedef gpio_mock_t* gpio_t;
  */
 #define PERIPH_TIMER_PROVIDES_SET
 
+/* MARK: - Power management configuration*/
 /**
- * @name    Power management configuration
+ * @name Power management configuration
  * @{
  */
 #define PROVIDES_PM_OFF
 #define PROVIDES_PM_SET_LOWEST
 /** @} */
+
+/**
+ * @name I2C Configuration
+ *
+ * The common I2C implementation is requested to provide the default implementations of the
+ * `i2c_{read,write}_{reg,regs}` functions.
+ */
+
+#define PERIPH_I2C_NEED_READ_REG
+#define PERIPH_I2C_NEED_READ_REGS
+#define PERIPH_I2C_NEED_WRITE_REG
+#define PERIPH_I2C_NEED_WRITE_REGS
+
+#if defined(MODULE_PERIPH_I2C_MOCK) || defined(DOXYGEN)
+/**
+ * @brief   I2C configuration structure type
+ */
+typedef struct {
+    void *dummy;    /**< dummy attribute */
+} i2c_conf_t;
+#endif
 
 /* Configuration for the wrapper around the Linux SPI API (periph_spidev_linux)
  *
@@ -164,35 +205,34 @@ typedef gpio_mock_t* gpio_t;
  * spi.h.
  */
 #if defined(MODULE_PERIPH_SPIDEV_LINUX) || defined(DOXYGEN)
-
+/* MARK: - SPI Configuration */
 /**
  * @name SPI Configuration
+ * @{
  */
-
 /**
  * @brief   Use the common `transfer_byte` SPI function
  */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
+#  define PERIPH_SPI_NEEDS_TRANSFER_BYTE
 /**
  * @brief   Use the common `transfer_reg` SPI function
  */
-#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#  define PERIPH_SPI_NEEDS_TRANSFER_REG
 /**
  * @brief   Use the common `transfer_regs` SPI function
  */
-#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+#  define PERIPH_SPI_NEEDS_TRANSFER_REGS
 
-#ifndef DOXYGEN
+#  ifndef DOXYGEN
 /**
  * @brief   Use a custom clock speed type
  */
-#define HAVE_SPI_CLK_T
+#    define HAVE_SPI_CLK_T
 /**
  * @brief   SPI clock speed values
  *
  * The Linux userspace driver takes values in Hertz, which values are available
  * can only be determined at runtime.
- * @{
  */
 typedef enum {
     SPI_CLK_100KHZ = (100000U),
@@ -201,26 +241,23 @@ typedef enum {
     SPI_CLK_5MHZ   = (5000000U),
     SPI_CLK_10MHZ  = (10000000U)
 } spi_clk_t;
+#  endif /* ndef DOXYGEN */
 /** @} */
-#endif /* ndef DOXYGEN */
 #endif /* MODULE_PERIPH_SPI | DOXYGEN */
 
 /**
- * @name    EEPROM configuration
- * @{
+ * @brief EEPROM configuration
  */
-#ifndef EEPROM_SIZE
-#define EEPROM_SIZE             (1024U)  /* 1kB */
+#if !defined(EEPROM_SIZE) || defined(DOXYGEN)
+#  define EEPROM_SIZE             (1024U)  /* 1kB */
 #endif
-/** @} */
 
 #ifdef MODULE_PERIPH_CAN
-#include "candev_linux.h"
+#  include "candev_linux.h"
 #endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

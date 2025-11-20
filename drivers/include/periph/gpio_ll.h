@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_periph_gpio_ll GPIO Low-Level API
  * @ingroup     drivers_periph
@@ -14,6 +16,15 @@
  *
  * @warning     This API is not stable yet and intended for internal use only
  *              as of now.
+ *
+ * # General
+ *
+ * Ports and pin numbers are not always internally defined as the same numbers
+ * that you would expect them to be. Therefore it is highly recommended to call
+ * the low level functions like gpio_ll_init() or gpio_ll_query_conf() with the
+ * gpio_get_port() and gpio_get_pin_num() functions instead of directly setting
+ * port or pin numbers. Using the helper functions will assure reliable
+ * operation on all platforms and GPIO banks.
  *
  * # Design Goals
  *
@@ -66,9 +77,6 @@
  *              of now.
  */
 
-#ifndef PERIPH_GPIO_LL_H
-#define PERIPH_GPIO_LL_H
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -93,38 +101,62 @@ typedef uintptr_t gpio_port_t;
 #define GPIO_PORT_UNDEF         UINTPTR_MAX
 #endif
 
-#ifdef DOXYGEN
+#if defined(DOXYGEN)
 /**
- * @brief   Get the @ref gpio_port_t value of the port identified by @p num
+ * @brief   Indicates whether GPIO ports are enumerated alphabetically (`1`)
+ *          or numerically (`0`).
  *
- * @note    If @p num is a compile time constant, this is guaranteed to be
- *          suitable for a constant initializer.
- *
- * Typically this will be something like `(GPIO_BASE_ADDR + num * sizeof(struct
- * vendor_gpio_reg))`
+ * @note    You can use both @ref GPIO_PORT_A and @ref GPIO_PORT_0 to refer
+ *          to the first GPIO port in RIOT, regardless of the naming scheme
+ *          used by the MCU the app is compiled for. This macro is useful
+ *          e.g. for pretty-printing.
  */
-#define GPIO_PORT(num)  implementation_specific
+#  define GPIO_PORT_NUMBERING_ALPHABETIC    implementation_specific
 #endif
 
 #ifdef DOXYGEN
 /**
- * @brief   Get the number of the GPIO port belonging to the given @ref
- *          gpio_port_t value
+ * @brief   Get the @ref gpio_port_t value of the port labeled 0.
  *
- * @note    If @p port is a compile time constant, this is guaranteed to be
- *          suitable for a constant initializer.
- *
- * @pre     @p port is the return value of @ref GPIO_PORT
- *
- * For every supported port number *n* the following `assert()` must not blow
- * up:
- *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
- * assert(n == GPIO_PORT_NUM(GPIO_PORT(n)));
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * @note    For MCUs that use letters instead of numbers, this will be an alias
+ *          for @ref GPIO_PORT_A
+ * @note    Some MCUs will not start with Port 0 / Port A, but rather with
+ *          Port 1 (e.g. MSP430) or Port B (e.g. ATmega328P). It will be
+ *          undefined when unavailable
+ * @note    There will also be `GPIO_PORT_1`, `GPIO_PORT_2`, etc. when there
+ *          are corresponding GPIO ports in hardware.
  */
-#define GPIO_PORT_NUM(port) implementation_specific
-#endif
+#define GPIO_PORT_0     implementation_specific
+
+/**
+ * @brief       Get the @ref gpio_port_t value of the port number @p num
+ * @param[in]   num     The number of the port to get
+ * @pre         @p num is a valid GPIO port number. An implementation may
+ *              follow the "garbage in, garbage out" philosophy.
+ *
+ * @note        If the MCU uses an alphabetic naming scheme, number 0 refers
+ *              to port A.
+ * @warning     This may involve accessing a lookup table, prefer e.g. using
+ *              `GPIO_PORT_0` over `gpio_port(0)` if the port number is known
+ *              at compile time.
+ */
+gpio_port_t gpio_port(uword_t num);
+
+/**
+ * @brief       Get the number of the GPIO port @p port refers to
+ * @param[in]   port    The port to get the number of
+ *
+ * @pre         @p port is a valid GPIO port. An implementation may follow the
+ *              "garbage in, garbage out" philosophy.
+ * @warning     This may involve iterating over a lookup table, prefer using
+ *              e.g. `0` instead of `gpio_port_num(GPIO_PORT_0)` if the port
+ *              number is known at compile time.
+ *
+ * In other words `n == gpio_port_num(gpio_port(n))` for every `n` that is
+ * a valid port number.
+ */
+uword_t gpio_port_num(gpio_port_t port);
+#endif /* DOXYGEN */
 
 #if !defined(HAVE_GPIO_STATE_T) || defined(DOXYGEN)
 /**
@@ -368,7 +400,7 @@ union gpio_conf_minimal {
          * consulted.
          */
         bool initial_value              : 1;
-        uint8_t                         : 2; /*< padding */
+        uint8_t                         : 2; /**< padding */
     };
 };
 
@@ -490,7 +522,7 @@ static const gpio_conf_t gpio_ll_od_pu = {
 #endif
 
 /**
- * @brief   Check if the given number is a valid argument for @ref GPIO_PORT
+ * @brief   Check if the given number is a valid argument for @ref gpio_port
  *
  * @param[in]       num     port number to check
  * @retval          true    the MCU used has a GPIO port with that number
@@ -706,29 +738,39 @@ static inline uword_t gpio_ll_prepare_write(gpio_port_t port, uword_t mask,
 }
 #endif
 
+#if defined(DOXYGEN) || !defined(HAVE_GPIO_LL_PREPARE_SWITCH_DIR)
 /**
- * @brief       Turn GPIO pins specified by the bitmask @p outputs to outputs
+ * @brief       Prepare bitmask for use with @ref gpio_ll_switch_dir_output
+ *              and @ref gpio_ll_switch_dir_input
+ * @param[in]   mask    bitmask specifying the pins to switch the direction of
+ *
+ * @return      Value to use in @ref gpio_ll_switch_dir_output or
+ *              @ref gpio_ll_switch_dir_input
+ */
+static inline uword_t gpio_ll_prepare_switch_dir(uword_t mask)
+{
+    return mask;
+}
+#endif
+
+/**
+ * @brief       Turn GPIO pins specified by @p pins (obtained from
+ *              @ref gpio_ll_prepare_switch_dir) to outputs
  *
  * @param[in]   port        GPIO port to modify
- * @param[in]   outputs     Bitmask specifying the GPIO pins to set in output
- *                          mode
+ * @param[in]   pins        Output of @ref gpio_ll_prepare_switch_dir
  * @pre         The feature `gpio_ll_switch_dir` is available
  * @pre         Each affected GPIO pin is either configured as input or as
  *              push-pull output.
- *
- * @note        This is a makeshift solution to implement bit-banging of
- *              bidirectional protocols on less sophisticated GPIO peripherals
- *              that do not support open drain mode.
- * @warning     Use open drain mode instead, if supported.
  */
-static inline void gpio_ll_switch_dir_output(gpio_port_t port, uword_t outputs);
+static inline void gpio_ll_switch_dir_output(gpio_port_t port, uword_t pins);
 
 /**
- * @brief       Turn GPIO pins specified by the bitmask @p inputs to inputs
+ * @brief       Turn GPIO pins specified by @p pins (obtained from
+ *              @ref gpio_ll_prepare_switch_dir) to inputs
  *
  * @param[in]   port        GPIO port to modify
- * @param[in]   inputs      Bitmask specifying the GPIO pins to set in input
- *                          mode
+ * @param[in]   pins        Output of @ref gpio_ll_prepare_switch_dir
  * @pre         The feature `gpio_ll_switch_dir` is available
  * @pre         Each affected GPIO pin is either configured as input or as
  *              push-pull output.
@@ -740,12 +782,8 @@ static inline void gpio_ll_switch_dir_output(gpio_port_t port, uword_t outputs);
  *              resistor is enabled). Hence, the bits in the output
  *              register of the pins switched to input should be restored
  *              just after this call.
- * @note        This is a makeshift solution to implement bit-banging of
- *              bidirectional protocols on less sophisticated GPIO peripherals
- *              that do not support open drain mode.
- * @warning     Use open drain mode instead, if supported.
  */
-static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t inputs);
+static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t pins);
 
 /**
  * @brief   Perform a masked write operation on the I/O register of the port
@@ -792,11 +830,31 @@ static inline void gpio_ll_write(gpio_port_t port, uword_t state);
 
 /**
  * @brief   Extract the `gpio_port_t` from a `gpio_t`
+ *
+ * CPU specific implementation to return the GPIO port for a given
+ * GPIO pin.
+ *
+ * @param[in] pin GPIO pin structure, usually defined with the GPIO_PIN macro
+ *
+ * @return  GPIO port
+ *
  */
 static inline gpio_port_t gpio_get_port(gpio_t pin);
 
 /**
  * @brief   Extract the pin number from a `gpio_t`
+ *
+ * CPU specific implementation to return the internal pin number for a
+ * given GPIO pin.
+ *
+ * @note    The actual, internal pin numbers are not always directly related to
+ *          their name. For example on some microcontrollers as the nRF52,
+ *          the distinction between P0 and P1 pins is made by a bit that is set
+ *          in the pin numbers.
+ *
+ * @param[in] pin GPIO pin structure, usually defined with the GPIO_PIN macro
+ *
+ * @return  Internal pin number
  */
 static inline uint8_t gpio_get_pin_num(gpio_t pin);
 
@@ -868,5 +926,110 @@ static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t inputs)
  * to be provided */
 #include "gpio_ll_arch.h" /* IWYU pragma: export */
 
-#endif /* PERIPH_GPIO_LL_H */
+#if !defined(DOXYGEN) && !defined(GPIO_PORT_NUMBERING_ALPHABETIC)
+#  define GPIO_PORT_NUMBERING_ALPHABETIC    0
+#endif
+
+/**
+ * @name    GPIO port aliases for alphabetic enumeration
+ * @{
+ */
+#if defined(GPIO_PORT_0) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_0`
+ */
+#  define GPIO_PORT_A   GPIO_PORT_0
+#endif
+#if defined(GPIO_PORT_1) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_1`
+ */
+#  define GPIO_PORT_B   GPIO_PORT_1
+#endif
+#if defined(GPIO_PORT_2) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_2`
+ */
+#  define GPIO_PORT_C   GPIO_PORT_2
+#endif
+#if defined(GPIO_PORT_3) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_3`
+ */
+#  define GPIO_PORT_D   GPIO_PORT_3
+#endif
+#if defined(GPIO_PORT_4) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_4`
+ */
+#  define GPIO_PORT_E   GPIO_PORT_4
+#endif
+#if defined(GPIO_PORT_5) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_5`
+ */
+#  define GPIO_PORT_F   GPIO_PORT_5
+#endif
+#if defined(GPIO_PORT_6) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_6`
+ */
+#  define GPIO_PORT_G   GPIO_PORT_6
+#endif
+#if defined(GPIO_PORT_7) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_7`
+ */
+#  define GPIO_PORT_H   GPIO_PORT_7
+#endif
+#if defined(GPIO_PORT_8) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_8`
+ */
+#  define GPIO_PORT_I   GPIO_PORT_8
+#endif
+#if defined(GPIO_PORT_9) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_9`
+ */
+#  define GPIO_PORT_J   GPIO_PORT_9
+#endif
+#if defined(GPIO_PORT_10) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_10`
+ */
+#  define GPIO_PORT_K   GPIO_PORT_10
+#endif
+#if defined(GPIO_PORT_11) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_11`
+ */
+#  define GPIO_PORT_L   GPIO_PORT_11
+#endif
+#if defined(GPIO_PORT_12) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_12`
+ */
+#  define GPIO_PORT_M   GPIO_PORT_12
+#endif
+#if defined(GPIO_PORT_13) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_13`
+ */
+#  define GPIO_PORT_N   GPIO_PORT_13
+#endif
+#if defined(GPIO_PORT_14) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_14`
+ */
+#  define GPIO_PORT_O   GPIO_PORT_14
+#endif
+#if defined(GPIO_PORT_15) || defined(DOXYGEN)
+/**
+ * @brief   Alias of `ref GPIO_PORT_15`
+ */
+#  define GPIO_PORT_P   GPIO_PORT_15
+#endif
+/** @} */
+
 /** @} */

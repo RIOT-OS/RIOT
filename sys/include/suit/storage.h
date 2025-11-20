@@ -6,6 +6,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /**
  * @defgroup    sys_suit_storage SUIT secure firmware OTA upgrade storage
  *                               infrastructure
@@ -94,9 +97,6 @@
  *
  * @warning This API is by design not thread safe
  */
-
-#ifndef SUIT_STORAGE_H
-#define SUIT_STORAGE_H
 
 #include "suit.h"
 
@@ -543,8 +543,8 @@ static inline bool suit_storage_has_location(suit_storage_t *storage,
  * @returns     True if the location matches the offset,
  * @returns     False otherwise
  */
-static inline int suit_storage_match_offset(const suit_storage_t *storage,
-                                            size_t offset)
+static inline bool suit_storage_match_offset(const suit_storage_t *storage,
+                                             size_t offset)
 {
     return storage->driver->match_offset(storage, offset);
 }
@@ -611,5 +611,4 @@ static inline int suit_storage_set_seq_no(suit_storage_t *storage,
 }
 #endif
 
-#endif /* SUIT_STORAGE_H */
 /** @} */

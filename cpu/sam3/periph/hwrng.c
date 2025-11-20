@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2014-2016 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014-2016 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -39,9 +36,9 @@ void hwrng_read(void *buf, unsigned int num)
     uint8_t *b = (uint8_t *)buf;
 
     /* enable clock signal for TRNG module */
-    PMC->PMC_PCER1 |= PMC_PCER1_PID41;
+    PMC->PMC_PCER1 = PMC_PCER1_PID41;
     /* enable the generation of random numbers */
-    TRNG->TRNG_CR |= (KEY | TRNG_CR_ENABLE);
+    TRNG->TRNG_CR = (KEY | TRNG_CR_ENABLE);
 
     while (count < num) {
         /* wait until new value is generated -> takes up to 84 cycles */
@@ -56,7 +53,7 @@ void hwrng_read(void *buf, unsigned int num)
     }
 
     /* disable the generation of random numbers */
-    TRNG->TRNG_CR &= ~(KEY | TRNG_CR_ENABLE);
+    TRNG->TRNG_CR = KEY;
     /* disable clock signal for TRNG module */
-    PMC->PMC_PCER1 &= ~(PMC_PCER1_PID41);
+    PMC->PMC_PCDR1 = PMC_PCER1_PID41;
 }

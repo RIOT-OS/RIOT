@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2025 Gunar Schorcht
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "esp32h2-devkit" if BOARD_ESP32H2_DEVKIT
+
+config BOARD_ESP32H2_DEVKIT
+    bool
+    default y
+    select BOARD_COMMON_ESP32H2
+    select CPU_MODEL_ESP32H2_MINI_1X_H4S
+
+source "$(RIOTBOARD)/common/esp32h2/Kconfig"

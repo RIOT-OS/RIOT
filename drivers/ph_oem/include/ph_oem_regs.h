@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ph_oem
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Igor Knippenberg <igor.knippenberg@gmail.com>
  */
-
-#ifndef PH_OEM_REGS_H
-#define PH_OEM_REGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,5 +55,4 @@ typedef enum ph_oem_reg {
 }
 #endif
 
-#endif /* PH_OEM_REGS_H */
 /** @} */

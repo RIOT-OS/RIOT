@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_rpx0xx
@@ -16,9 +15,6 @@
  * @author          Fabian Hüßler <fabian.huessler@ovgu.de>
  * @author          Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include "cpu.h"
 #include "vendor/RP2040.h"
@@ -816,5 +812,4 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

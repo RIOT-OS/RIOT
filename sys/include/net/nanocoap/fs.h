@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     net_nanosock
  * @brief       nanoCoAP virtual file system
@@ -16,8 +18,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-#ifndef NET_NANOCOAP_FS_H
-#define NET_NANOCOAP_FS_H
 
 #include "mutex.h"
 #include "net/nanocoap_sock.h"
@@ -63,5 +63,4 @@ extern const vfs_file_system_t nanocoap_fs_file_system;
 #ifdef __cplusplus
 }
 #endif
-#endif /* NET_NANOCOAP_FS_H */
 /** @} */

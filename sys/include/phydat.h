@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_phydat Phydat
  * @ingroup     sys
@@ -31,9 +33,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PHYDAT_H
-#define PHYDAT_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -220,7 +219,7 @@ char phydat_prefix_from_scale(int8_t scale);
  * Inserts the @p values in the given @p dat so that all @p dim values in
  * @p values fit inside the limits of the data type,
  * [@ref PHYDAT_MIN, @ref PHYDAT_MAX], and updates the stored scale factor.
- * The @ref phydat_t::scale member in @p dat is used as the the original scale
+ * The @ref phydat_t::scale member in @p dat is used as the original scale
  * of the @p values.
  * The value is rounded to the nearest integer if possible, otherwise away from
  * zero. E.g. `0.5` and `0.6` are rounded to `1`, `0.4` and `-0.4` are rounded
@@ -324,5 +323,4 @@ int64_t phydat_unix(int16_t year, int16_t month, int16_t day,
 }
 #endif
 
-#endif /* PHYDAT_H */
 /** @} */

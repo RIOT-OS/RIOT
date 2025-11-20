@@ -5,13 +5,13 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /**
  * @ingroup     sys_malloc_monitor
  * @{
  */
-
-#ifndef MALLOC_MONITOR_H
-#define MALLOC_MONITOR_H
 
 #include <assert.h>
 #include <stdint.h>
@@ -51,8 +51,6 @@ void malloc_monitor_reset_high_watermark(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* MALLOC_MONITOR_H */
 
 /**
  * @}

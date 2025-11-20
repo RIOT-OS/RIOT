@@ -88,7 +88,7 @@ jobs:
       TEST_PERIPH_TIMER_PERIODIC_PRECISION: 0.30
     steps:
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.8
       - name: Install Python dependencies
@@ -98,7 +98,7 @@ jobs:
       - name: Configure credentials
         run: echo '${{ secrets.IOTLABRC }}' > ~/.iotlabrc
       - name: Setup SSH agent
-        uses: webfactory/ssh-agent@v0.4.1
+        uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.IOTLAB_PRIVATE_KEY }}
       - name: Fetch host key from IoT-LAB ${{ matrix.boards.iotlab.site }} site
@@ -131,7 +131,7 @@ jobs:
       - name: Archive results
         if: always()
         # Store generated results-<riot board name> artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.boards.riot }}
           path: results-${{ matrix.boards.riot }}

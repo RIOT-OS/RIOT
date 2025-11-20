@@ -1450,6 +1450,60 @@ static void test_nib_offl_alloc__success_overwrite_unspecified(void)
 }
 
 /*
+ * Creates an off-link entry (to a next hop) and an on-link entry on the same interface.
+ * Then proceeds to delete the off-link entries to this next hop
+ * by only comparing the next hop, not checking the _PFX_ON_LINK flag.
+ *
+ * Expected results: Only off-link entries are deleted.
+ * On-link entries on the same interface are unaffected by the deletion.
+ */
+static void test_nib_offl_alloc__next_hop_indicates_whether_onl(void)
+{
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+    /*are in practice different prefixes actually*/
+    static const ipv6_addr_t *onl_pfx = &pfx;
+    static const ipv6_addr_t *offl_pfx = &pfx;
+
+    /* Add off-link entry */
+    _nib_offl_entry_t *dst1;
+    TEST_ASSERT_NOT_NULL((dst1 = _nib_ft_add(&next_hop, IFACE, offl_pfx, GLOBAL_PREFIX_LEN)));
+
+    /* Add on-link entry */
+    const unsigned pfx_len = GLOBAL_PREFIX_LEN; /* arbitrary */
+
+    /* (calls _nib_offl_alloc) */
+    _nib_offl_entry_t *dst;
+    TEST_ASSERT_NOT_NULL((dst = _nib_pl_add(IFACE, onl_pfx, pfx_len, UINT32_MAX, UINT32_MAX)));
+    TEST_ASSERT(ipv6_addr_is_unspecified(&dst->next_hop->ipv6));
+    /* would normally be set by PIO flags in Router Advertisement */
+    dst->flags |= _PFX_ON_LINK;
+
+    /* Delete all off-link entries to next_hop */
+    _nib_offl_entry_t *route = NULL;
+    while ((route = _nib_offl_iter(route))) {
+        if ((_nib_onl_get_if(route->next_hop) == IFACE) &&
+            (route->next_hop != NULL) &&
+            ipv6_addr_equal(&route->next_hop->ipv6, &next_hop) /*off-link, to this next hop*/
+            /*should not need to be checked for when next hop is already checked:*/
+            /*&& !(route->flags & _PFX_ON_LINK)*/
+            ) {
+            _nib_ft_remove(route);
+            }
+    }
+
+    /* Expected result: On-link entries remain unaffected */
+    gnrc_ipv6_nib_pl_t prefix;
+    void *state = NULL;
+    TEST_ASSERT_MESSAGE(gnrc_ipv6_nib_pl_iter(IFACE, &state, &prefix),
+                        "No prefix list entry found");
+    TEST_ASSERT_MESSAGE(ipv6_addr_match_prefix(onl_pfx, &prefix.pfx) >= pfx_len,
+                        "Unexpected prefix configured");
+}
+
+/*
  * Creates an off-link entry.
  * Expected result: new entry should contain the given prefix, address and
  *                  interface
@@ -2069,6 +2123,7 @@ Test *tests_gnrc_ipv6_nib_internal_tests(void)
         new_TestFixture(test_nib_offl_alloc__no_space_left_diff_next_hop_iface_pfx_pfx_len),
         new_TestFixture(test_nib_offl_alloc__success_duplicate),
         new_TestFixture(test_nib_offl_alloc__success_overwrite_unspecified),
+        new_TestFixture(test_nib_offl_alloc__next_hop_indicates_whether_onl),
         new_TestFixture(test_nib_offl_alloc__success),
         new_TestFixture(test_nib_offl_clear__uncleared),
         new_TestFixture(test_nib_offl_clear__same_next_hop),

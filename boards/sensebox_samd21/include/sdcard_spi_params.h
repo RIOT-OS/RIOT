@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2018 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_sensebox_samd21
@@ -17,9 +16,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef SDCARD_SPI_PARAMS_H
-#define SDCARD_SPI_PARAMS_H
 
 #include "board.h"
 
@@ -51,5 +47,4 @@ static const  sdcard_spi_params_t sdcard_spi_params[] = {
 }
 #endif
 
-#endif /* SDCARD_SPI_PARAMS_H */
 /** @} */

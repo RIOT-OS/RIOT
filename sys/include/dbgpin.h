@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_dbgpin Direct pin control for debugging/profiling
  * @ingroup     sys
@@ -19,9 +21,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef DBGPIN_H
-#define DBGPIN_H
 
 #include "container.h"
 #include "periph/gpio.h"
@@ -124,5 +123,4 @@ static inline void dbgpin_init(void)
 }
 #endif
 
-#endif /* DBGPIN_H */
 /** @} **/

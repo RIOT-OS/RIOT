@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_ipv6_nib_conf  GNRC IPv6 NIB compile configurations
  * @ingroup     net_gnrc_ipv6_nib
@@ -18,8 +20,6 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_IPV6_NIB_CONF_H
-#define NET_GNRC_IPV6_NIB_CONF_H
 
 #include "modules.h"
 
@@ -32,51 +32,50 @@ extern "C" {
 
 /* some pseudo-module based configuration, doc: see below */
 #ifdef MODULE_GNRC_IPV6_NIB_6LBR
-#ifndef CONFIG_GNRC_IPV6_NIB_6LBR
-#define CONFIG_GNRC_IPV6_NIB_6LBR                     1
-#endif
-#ifndef CONFIG_GNRC_IPV6_NIB_NUMOF
-#define CONFIG_GNRC_IPV6_NIB_NUMOF                   (16)
-#endif
+#  ifndef CONFIG_GNRC_IPV6_NIB_6LBR
+#    define CONFIG_GNRC_IPV6_NIB_6LBR                 1
+#  endif
+#  ifndef CONFIG_GNRC_IPV6_NIB_NUMOF
+#    define CONFIG_GNRC_IPV6_NIB_NUMOF               (16)
+#  endif
 #endif
 
 #ifdef MODULE_GNRC_IPV6_NIB_6LR
-#ifndef CONFIG_GNRC_IPV6_NIB_6LR
-#define CONFIG_GNRC_IPV6_NIB_6LR                      1
-#endif
+#  ifndef CONFIG_GNRC_IPV6_NIB_6LR
+#    define CONFIG_GNRC_IPV6_NIB_6LR                  1
+#  endif
 #endif
 
 #ifdef MODULE_GNRC_IPV6_NIB_6LN
-#ifndef CONFIG_GNRC_IPV6_NIB_6LN
-#define CONFIG_GNRC_IPV6_NIB_6LN                      1
-#endif
-
-/* We are only a 6lo node with no 'classic' IPv6 interface */
-#ifndef MODULE_GNRC_IPV6_CLASSIC
-#ifndef CONFIG_GNRC_IPV6_NIB_QUEUE_PKT
-#define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT                0
-#endif
-#ifndef CONFIG_GNRC_IPV6_NIB_SLAAC
-#define CONFIG_GNRC_IPV6_NIB_SLAAC                    0
-#endif
-#if !CONFIG_GNRC_IPV6_NIB_6LR
-# ifndef CONFIG_GNRC_IPV6_NIB_ARSM
-# define CONFIG_GNRC_IPV6_NIB_ARSM                    0
-# endif
-# ifndef CONFIG_GNRC_IPV6_NIB_NUMOF
-/* only needs to store default router */
-# define CONFIG_GNRC_IPV6_NIB_NUMOF                  (1)
-# endif
-#endif
-#endif
+#  ifndef CONFIG_GNRC_IPV6_NIB_6LN
+#    define CONFIG_GNRC_IPV6_NIB_6LN                  1
+#  endif
+#  ifndef MODULE_GNRC_IPV6_CLASSIC
+     /* We are only a 6lo node with no 'classic' IPv6 interface */
+#    ifndef CONFIG_GNRC_IPV6_NIB_QUEUE_PKT
+#      define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT          0
+#    endif
+#    ifndef CONFIG_GNRC_IPV6_NIB_SLAAC
+#      define CONFIG_GNRC_IPV6_NIB_SLAAC              0
+#    endif
+#    if !CONFIG_GNRC_IPV6_NIB_6LR
+#      ifndef CONFIG_GNRC_IPV6_NIB_ARSM
+#        define CONFIG_GNRC_IPV6_NIB_ARSM             0
+#      endif
+#      ifndef CONFIG_GNRC_IPV6_NIB_NUMOF
+         /* only needs to store default router */
+#        define CONFIG_GNRC_IPV6_NIB_NUMOF           (1)
+#      endif
+#    endif
+#  endif
 #endif
 
 #ifdef MODULE_GNRC_IPV6_NIB_ROUTER
-#define CONFIG_GNRC_IPV6_NIB_ROUTER                   1
+#  define CONFIG_GNRC_IPV6_NIB_ROUTER                 1
 #endif
 
 #ifdef MODULE_GNRC_IPV6_NIB_DNS
-#define CONFIG_GNRC_IPV6_NIB_DNS                      1
+#  define CONFIG_GNRC_IPV6_NIB_DNS                    1
 #endif
 
 /**
@@ -88,47 +87,54 @@ extern "C" {
  * @brief   enable features for 6Lo border router
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_6LBR
-#define CONFIG_GNRC_IPV6_NIB_6LBR                     0
+#  define CONFIG_GNRC_IPV6_NIB_6LBR                   0
 #endif
 
 /**
  * @brief    enable features for 6Lo router
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_6LR
-#if CONFIG_GNRC_IPV6_NIB_6LBR
-#define CONFIG_GNRC_IPV6_NIB_6LR                      1
-#else
-#define CONFIG_GNRC_IPV6_NIB_6LR                      0
-#endif
+#  if CONFIG_GNRC_IPV6_NIB_6LBR
+#    define CONFIG_GNRC_IPV6_NIB_6LR                  1
+#  else
+#    define CONFIG_GNRC_IPV6_NIB_6LR                  0
+#  endif
 #endif
 
 /**
  * @brief    enable features for 6Lo node
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_6LN
-#if CONFIG_GNRC_IPV6_NIB_6LR
-#define CONFIG_GNRC_IPV6_NIB_6LN                      1
-#else
-#define CONFIG_GNRC_IPV6_NIB_6LN                      0
-#endif
+#  if CONFIG_GNRC_IPV6_NIB_6LR
+#    define CONFIG_GNRC_IPV6_NIB_6LN                  1
+#  else
+#    define CONFIG_GNRC_IPV6_NIB_6LN                  0
+#  endif
 #endif
 
 /**
  * @brief   enable features for IPv6 routers
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_ROUTER
-#if CONFIG_GNRC_IPV6_NIB_6LR
-#define CONFIG_GNRC_IPV6_NIB_ROUTER                   1
-#else
-#define CONFIG_GNRC_IPV6_NIB_ROUTER                   0
-#endif
+#  if CONFIG_GNRC_IPV6_NIB_6LR
+#    define CONFIG_GNRC_IPV6_NIB_ROUTER               1
+#  else
+#    define CONFIG_GNRC_IPV6_NIB_ROUTER               0
+#  endif
 #endif
 
 /**
  * @brief    activate router advertising at interface start-up
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_ADV_ROUTER
-#define CONFIG_GNRC_IPV6_NIB_ADV_ROUTER               0
+#  define CONFIG_GNRC_IPV6_NIB_ADV_ROUTER             0
+#endif
+
+/**
+ * @brief   enable periodic router solicitations
+ */
+#ifndef CONFIG_GNRC_IPV6_NIB_SOL_ROUTER
+#  define CONFIG_GNRC_IPV6_NIB_SOL_ROUTER             1
 #endif
 
 /**
@@ -144,7 +150,7 @@ extern "C" {
  *          Requires the `gnrc_ipv6_nib_rio` module.
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_RA
-#define CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_RA            0
+#  define CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_RA          0
 #endif
 
 /**
@@ -155,25 +161,25 @@ extern "C" {
  *          Requires the `gnrc_ipv6_nib_rio` module.
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_LAST_RA
-#if IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS)
-#define CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_LAST_RA       1
-#else
-#define CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_LAST_RA       0
-#endif
+#  if IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS)
+#    define CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_LAST_RA   1
+#  else
+#    define CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_LAST_RA   0
+#  endif
 #endif
 
 /**
  * @brief   (de-)activate NDP address resolution state-machine
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_ARSM
-#define CONFIG_GNRC_IPV6_NIB_ARSM                     1
+#  define CONFIG_GNRC_IPV6_NIB_ARSM                   1
 #endif
 
 /**
  * @brief    queue packets for address resolution
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_QUEUE_PKT
-#define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT                1
+#  define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT              1
 #endif
 
 /**
@@ -183,25 +189,25 @@ extern "C" {
  * @see [RFC 4862](https://tools.ietf.org/html/rfc4862)
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_SLAAC
-#define CONFIG_GNRC_IPV6_NIB_SLAAC                    1
+#  define CONFIG_GNRC_IPV6_NIB_SLAAC                  1
 #endif
 
 /**
  * @brief    handle Redirect Messages
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_REDIRECT
-#define CONFIG_GNRC_IPV6_NIB_REDIRECT                 0
+#  define CONFIG_GNRC_IPV6_NIB_REDIRECT               0
 #endif
 
 /**
  * @brief   (de-)activate destination cache
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_DC
-#if CONFIG_GNRC_IPV6_NIB_REDIRECT
-#define CONFIG_GNRC_IPV6_NIB_DC                       1
-#else
-#define CONFIG_GNRC_IPV6_NIB_DC                       0
-#endif
+#  if CONFIG_GNRC_IPV6_NIB_REDIRECT
+#    define CONFIG_GNRC_IPV6_NIB_DC                   1
+#  else
+#    define CONFIG_GNRC_IPV6_NIB_DC                   0
+#  endif
 #endif
 
 /**
@@ -210,7 +216,7 @@ extern "C" {
  * @see [RFC 8106](https://tools.ietf.org/html/rfc8106)
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_DNS
-#define CONFIG_GNRC_IPV6_NIB_DNS                      0
+#  define CONFIG_GNRC_IPV6_NIB_DNS                    0
 #endif
 
 /**
@@ -219,11 +225,11 @@ extern "C" {
  * @see [RFC 6775, section 8.1](https://tools.ietf.org/html/rfc6775#section-8.1)
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C
-#if CONFIG_GNRC_IPV6_NIB_6LR
-#define CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C             1
-#else
-#define CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C             0
-#endif
+#  if CONFIG_GNRC_IPV6_NIB_6LR
+#    define CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C         1
+#  else
+#    define CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C         0
+#  endif
 #endif
 
 /**
@@ -232,7 +238,7 @@ extern "C" {
  * @see [RFC 6775, section 8.2](https://tools.ietf.org/html/rfc6775#section-8.2)
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD
-#define CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD             0
+#  define CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD           0
 #endif
 /** @} */
 
@@ -242,7 +248,7 @@ extern "C" {
  * @see [RFC 4861, section 6.3.4](https://tools.ietf.org/html/rfc4861#section-6.3.4)
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_REACH_TIME_RESET
-#define CONFIG_GNRC_IPV6_NIB_REACH_TIME_RESET        (7200000U)
+#  define CONFIG_GNRC_IPV6_NIB_REACH_TIME_RESET      (7200000U)
 #endif
 
 /**
@@ -251,14 +257,14 @@ extern "C" {
  * @warning Only do this if you know what you're doing
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_NO_RTR_SOL
-#define CONFIG_GNRC_IPV6_NIB_NO_RTR_SOL               0
+#  define CONFIG_GNRC_IPV6_NIB_NO_RTR_SOL             0
 #endif
 
 /**
  * @brief   Maximum link-layer address length (aligned)
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN
-#define CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN          (8U)
+#  define CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN        (8U)
 #endif
 
 /**
@@ -268,7 +274,7 @@ extern "C" {
  *              default routers
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF
-#define CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF    (1)
+#  define CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF  (1)
 #endif
 
 /**
@@ -278,7 +284,19 @@ extern "C" {
  *              neighbors and duplicate address detection table entries
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_NUMOF
-#define CONFIG_GNRC_IPV6_NIB_NUMOF                   (4)
+#  define CONFIG_GNRC_IPV6_NIB_NUMOF                 (4)
+#endif
+
+/**
+ * @brief Per-neighbor packet queue capacity
+ *
+ * If @ref CONFIG_GNRC_IPV6_NIB_QUEUE_PKT enabled, this is the maximum number
+ * of packets, per neighbor, awaiting packet resolution.
+ *
+ * @attention This MUST be leq UINT8_MAX
+ */
+#ifndef CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP
+#  define CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP        (16)
 #endif
 
 /**
@@ -288,16 +306,16 @@ extern "C" {
  *              and prefix list entries in NIB
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF
-#define CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF              (8)
+#  define CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF            (8)
 #endif
 
 #if CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C || defined(DOXYGEN)
 /**
  * @brief   Number of authoritative border router entries in NIB
  */
-#ifndef CONFIG_GNRC_IPV6_NIB_ABR_NUMOF
-#define CONFIG_GNRC_IPV6_NIB_ABR_NUMOF               (1)
-#endif
+#  ifndef CONFIG_GNRC_IPV6_NIB_ABR_NUMOF
+#    define CONFIG_GNRC_IPV6_NIB_ABR_NUMOF           (1)
+#  endif
 #endif
 
 #endif /* !CONFIG_KCONFIG_MODULE_GNRC_IPV6_NIB || DOXYGEN */
@@ -306,5 +324,4 @@ extern "C" {
 }
 #endif
 
-#endif /* NET_GNRC_IPV6_NIB_CONF_H */
 /** @} */

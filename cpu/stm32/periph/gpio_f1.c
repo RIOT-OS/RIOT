@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2014-2015 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2014-2015 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -145,7 +142,7 @@ void gpio_init_analog(gpio_t pin)
     *(uint32_t *)(&_port(pin)->CRL + (pin_num >= 8)) &= ~(0xfl << (4 * (pin_num - ((pin_num >= 8) * 8))));
 }
 
-int gpio_read(gpio_t pin)
+bool gpio_read(gpio_t pin)
 {
     GPIO_TypeDef *port = _port(pin);
     int pin_num = _pin_num(pin);
@@ -180,7 +177,7 @@ void gpio_toggle(gpio_t pin)
     }
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write(gpio_t pin, bool value)
 {
     if (value) {
         _port(pin)->BSRR = (1 << _pin_num(pin));

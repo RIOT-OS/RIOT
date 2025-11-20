@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com>
- * Copyright (C) 2017 Marc Poulhiès <dkm@kataplop.net>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Rakendra Thapa <rakendrathapa@gmail.com>
+ * SPDX-FileCopyrightText: 2017 Marc Poulhiès <dkm@kataplop.net>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_lm4f120
@@ -17,9 +16,6 @@
  * @author          Rakendra Thapa <rakendrathapa@gmail.com>
  * @author          Marc Poulhiès <dkm@kataplop.net>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include "cpu.h"
 
@@ -187,5 +183,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

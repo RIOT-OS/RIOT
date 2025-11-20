@@ -60,15 +60,15 @@ static int _send(int argc, char **argv)
     }
 
     conn_can_raw_t conn;
-    struct can_frame frame;
+    can_frame_t frame;
     int ifnum = atoi(argv[1]);
     if (ifnum >= CAN_DLL_NUMOF) {
         puts("Invalid ifnum");
         return 1;
     }
     frame.can_id = strtoul(argv[2], NULL, 16);
-    frame.can_dlc = argc - 3;
-    for (int i = 0; i < frame.can_dlc; i++) {
+    frame.len = argc - 3;
+    for (int i = 0; i < frame.len; i++) {
         frame.data[i] = strtoul(argv[3 + i], NULL, 16);
     }
     conn_can_raw_create(&conn, NULL, 0, ifnum, 0);
@@ -87,7 +87,7 @@ static int _dump(int argc, char **argv)
     int ret = -1;
     struct can_filter filters[SC_CAN_MAX_FILTERS];
     conn_can_raw_t conn;
-    struct can_frame frame;
+    can_frame_t frame;
     int ifnum = atoi(argv[1]);
     int cnt = atoi(argv[2]);
     uint32_t ms = strtoul(argv[3], NULL, 0);
@@ -130,11 +130,11 @@ static int _dump(int argc, char **argv)
     conn_can_raw_create(&conn, filters, nb_filters, ifnum, 0);
     while ((cnt != 1) &&
            ((ret = conn_can_raw_recv(&conn, &frame, ms * US_PER_MS))
-           == sizeof(struct can_frame))) {
+           == sizeof(can_frame_t))) {
         printf("%-8s(%d) %8" PRIX32 "  [%x] ",
                raw_can_get_name_by_ifnum(ifnum), ifnum,
-               frame.can_id, frame.can_dlc);
-        for (int i = 0; i < frame.can_dlc; i++) {
+               frame.can_id, frame.len);
+        for (int i = 0; i < frame.len; i++) {
             printf(" %02X", frame.data[i]);
         }
         printf("\n");

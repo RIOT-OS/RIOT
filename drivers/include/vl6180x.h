@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_vl6180x VL6180X Ranging and Ambient Light Sensing (ALS) module
  * @ingroup     drivers_sensors
@@ -390,9 +392,6 @@
  * @file
  */
 
-#ifndef VL6180X_H
-#define VL6180X_H
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -401,6 +400,7 @@ extern "C"
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "modules.h"
 #include "periph/gpio.h"
 #include "periph/i2c.h"
 
@@ -1072,5 +1072,4 @@ int vl6180x_reg_read(const vl6180x_t *dev,
 }
 #endif
 
-#endif /* VL6180X_H */
 /** @} */

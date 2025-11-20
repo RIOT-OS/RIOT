@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_isl29125 ISL29125 RGB light sensor
  * @ingroup     drivers_sensors
@@ -44,9 +46,6 @@
  * @author      Martin Heusmann <martin.heusmann@haw-hamburg.de>
  * @author      Cenk Gündoğan <mail-github@cgundogan.de>
  */
-
-#ifndef ISL29125_H
-#define ISL29125_H
 
 #include <stdint.h>
 
@@ -214,5 +213,4 @@ int isl29125_read_irq_status(const isl29125_t *dev);
 }
 #endif
 
-#endif /* ISL29125_H */
 /** @} */

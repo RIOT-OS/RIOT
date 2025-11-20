@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_internal
  * @{
@@ -17,9 +19,6 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
-
-#ifndef CONTAINER_H
-#define CONTAINER_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -87,5 +86,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CONTAINER_H */
 /** @} */

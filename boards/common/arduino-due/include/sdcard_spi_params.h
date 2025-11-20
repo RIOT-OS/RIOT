@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2017 Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
- *               2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_common_arduino_due
@@ -17,9 +16,6 @@
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef SDCARD_SPI_PARAMS_H
-#define SDCARD_SPI_PARAMS_H
 
 #include "arduino_pinmap.h"
 
@@ -74,5 +70,4 @@ static const  sdcard_spi_params_t sdcard_spi_params[] = {
 }
 #endif
 
-#endif /* SDCARD_SPI_PARAMS_H */
 /** @} */

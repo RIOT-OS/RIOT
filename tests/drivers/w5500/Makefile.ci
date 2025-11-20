@@ -9,11 +9,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega8 \
     bluepill-stm32f030c8 \
     i-nucleo-lrwan1 \
-    msb-430 \
-    msb-430h \
-    nucleo-f030r8 \
     nucleo-f031k6 \
-    nucleo-f042k6 \
     nucleo-f303k8 \
     nucleo-f334r8 \
     nucleo-l011k4 \
@@ -25,5 +21,4 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32f030f4-demo \
     stm32f0discovery \
     stm32l0538-disco \
-    waspmote-pro \
     #

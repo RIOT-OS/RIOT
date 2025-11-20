@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    test_utils_benchmark_udp    UDP benchmark
  * @ingroup     sys
@@ -16,9 +18,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef TEST_UTILS_BENCHMARK_UDP_H
-#define TEST_UTILS_BENCHMARK_UDP_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -109,5 +108,4 @@ bool benchmark_udp_stop(void);
 }
 #endif
 
-#endif /* TEST_UTILS_BENCHMARK_UDP_H */
 /** @} */

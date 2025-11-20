@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2016-2018 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016-2018 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_common_nrf52
@@ -16,9 +15,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  */
-
-#ifndef CFG_SPI_DEFAULT_H
-#define CFG_SPI_DEFAULT_H
 
 #include "periph_cpu.h"
 
@@ -49,5 +45,4 @@ static const spi_conf_t spi_config[] = {
 }
 #endif
 
-#endif /* CFG_SPI_DEFAULT_H */
 /** @} */

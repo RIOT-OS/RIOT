@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2020 Benjamin Valentin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Benjamin Valentin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_nrf52840-mdk-dongle
@@ -15,9 +14,6 @@
  *
  * @author      Benjamin Valentin <benpicco@googlemail.com>
  */
-
-#ifndef PWM_PARAMS_H
-#define PWM_PARAMS_H
 
 #include "board.h"
 #include "saul/periph.h"
@@ -50,5 +46,4 @@ static const saul_pwm_rgb_params_t saul_pwm_rgb_params[] =
 }
 #endif
 
-#endif /* PWM_PARAMS_H */
 /** @} */

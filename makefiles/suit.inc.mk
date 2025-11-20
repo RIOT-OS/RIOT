@@ -35,6 +35,7 @@ SUIT_NOTIFY_MANIFEST ?= $(SUIT_MANIFEST_BASENAME).$(SUIT_NOTIFY_VERSION).bin
 # Long manifest names require more buffer space when parsing
 export CFLAGS += -DCONFIG_SOCK_URLPATH_MAXLEN=128
 export CFLAGS += -DSUIT_VENDOR_DOMAIN="\"$(SUIT_VENDOR)\""
+export CFLAGS += -DSUIT_CLASS_ID="\"$(SUIT_CLASS)\""
 
 SUIT_MANIFEST_PAYLOADS ?= $(SLOT0_RIOT_BIN) $(SLOT1_RIOT_BIN)
 SUIT_MANIFEST_SLOTFILES ?= $(SLOT0_RIOT_BIN):$(SLOT0_OFFSET) \
@@ -54,7 +55,19 @@ $(SUIT_MANIFEST): $(SUIT_MANIFEST_PAYLOADS) $(BINDIR_SUIT)
 	$(Q)rm -f $@.tmp
 
 $(SUIT_MANIFEST_SIGNED): $(SUIT_MANIFEST) $(SUIT_SEC)
-	$(Q)$(SUIT_TOOL) sign $(SUIT_TOOL_ARGS) -k $(SUIT_SEC) -m $(SUIT_MANIFEST) -o $@
+	$(Q)(											\
+	if grep -q ENCRYPTED $(SUIT_SEC_SIGN); then						\
+		if [ -z "$(SUIT_SEC_PASSWORD)" ]; then						\
+			printf "Enter encryption for key file $(SUIT_SEC_SIGN): ";		\
+			read PASSWORD;								\
+		else										\
+			PASSWORD="$(SUIT_SEC_PASSWORD)";					\
+		fi;										\
+		$(SUIT_TOOL) sign -p "$$PASSWORD" -k $(SUIT_SEC_SIGN) -m $(SUIT_MANIFEST) -o $@;\
+	else											\
+		$(SUIT_TOOL) sign -k $(SUIT_SEC_SIGN) -m $(SUIT_MANIFEST) -o $@;		\
+	fi											\
+	)
 
 $(SUIT_MANIFEST_LATEST): $(SUIT_MANIFEST)
 	$(Q)ln -f -s $< $@

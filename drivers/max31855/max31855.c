@@ -29,7 +29,6 @@
 #include "max31855_constants.h"
 #include "max31855_params.h"
 
-
 void _raw_data_to_thermocouple_temperature(uint32_t raw_data, int32_t *temperature)
 {
     assert(temperature);

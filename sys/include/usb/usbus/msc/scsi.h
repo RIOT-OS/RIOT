@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     usbus_msc
  *
@@ -16,9 +18,6 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifndef USB_USBUS_MSC_SCSI_H
-#define USB_USBUS_MSC_SCSI_H
 
 #include "byteorder.h"
 
@@ -291,5 +290,4 @@ void scsi_gen_csw(usbus_handler_t *handler, cbw_info_t *cmd);
 }
 #endif
 
-#endif /* USB_USBUS_MSC_SCSI_H */
 /** @} */

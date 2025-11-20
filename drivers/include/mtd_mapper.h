@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_mtd_mapper  MTD address mapper
  * @ingroup     drivers_storage
@@ -59,9 +61,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef MTD_MAPPER_H
-#define MTD_MAPPER_H
-
 #include <stdint.h>
 #include <stdbool.h>
 #include "mtd.h"
@@ -109,5 +108,4 @@ extern const mtd_desc_t mtd_mapper_driver;
 }
 #endif
 
-#endif /* MTD_MAPPER_H */
 /** @} */

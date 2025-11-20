@@ -68,7 +68,7 @@ int main(void)
         pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
 
         /* Fill in the lucky number */
-        message.lucky_number = 13;
+        message.number = SimpleMessage_Enum_lucky;
 
         /* Now we are ready to encode the message! */
         status = pb_encode(&stream, SimpleMessage_fields, &message);
@@ -106,7 +106,7 @@ int main(void)
         }
 
         /* Print the data contained in the message. */
-        printf("Your lucky number was %d!\n", (int)message.lucky_number);
+        printf("Your lucky number was %d!\n", (int)message.number);
     }
 
     return 0;

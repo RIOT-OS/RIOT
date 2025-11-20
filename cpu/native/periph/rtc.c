@@ -1,23 +1,18 @@
 /*
- * Copyright (C) 2013, 2014 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2013-2014 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
- * @ingroup     cpu_native
- * @ingroup     drivers_periph_rtc
- * @{
- *
  * @file
- * @brief Native CPU periph/rtc.h implementation
+ * @ingroup cpu_native
+ * @ingroup drivers_periph_rtc
+ * @brief   Native CPU periph/rtc.h implementation
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @{
  *
  * The implementation uses POSIX system calls to emulate a real-time
  * clock based on the system clock.
- *
- * @author Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  *
  * @}
  */
@@ -42,7 +37,7 @@
  * @brief   Time source of the native RTC
  */
 #ifndef NATIVE_RTC_SOURCE
-#define NATIVE_RTC_SOURCE CLOCK_REALTIME
+#  define NATIVE_RTC_SOURCE CLOCK_REALTIME
 #endif
 
 static int _native_rtc_initialized = 0;

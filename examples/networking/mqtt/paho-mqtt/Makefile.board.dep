@@ -1,0 +1,12 @@
+# Put board specific dependencies here
+
+ifneq (,$(filter arch_esp,$(FEATURES_USED)))
+  ifneq (esp32h2,$(CPU_FAM))
+    # ESP32-H2 doesn't have WiFi module
+    USEMODULE += esp_wifi
+  endif
+endif
+
+ifneq (,$(filter native native32 native64,$(BOARD)))
+  USEMODULE += netdev_default
+endif

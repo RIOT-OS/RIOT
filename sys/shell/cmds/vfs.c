@@ -419,7 +419,7 @@ static int _write_handler(int argc, char **argv)
         return 5;
     }
 
-    int fd = vfs_open(path, flag, 0);
+    int fd = vfs_open(path, flag, 0644);
     if (fd < 0) {
         printf("Error opening file \"%s\": %s\n", path, tiny_strerror(fd));
         return 3;

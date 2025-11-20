@@ -9,6 +9,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_sock_udp    UDP sock API
  * @ingroup     net_sock
@@ -16,7 +18,7 @@
  *
  * How To Use
  * ----------
- * First you need to @ref including-modules "include" a module that implements
+ * First you need to [include][include-link] a module that implements
  * this API in your application's Makefile. For example the implementation for
  * @ref net_gnrc "GNRC" is called `gnrc_sock_udp`.
  *
@@ -59,7 +61,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * Above you see a simple UDP echo server. Don't forget to also
- * @ref including-modules "include" the IPv6 module of your networking
+ * [include][include-link] the IPv6 module of your networking
  * implementation (e.g. `gnrc_ipv6_default` for @ref net_gnrc GNRC) and at least
  * one network device.
  *
@@ -191,7 +193,7 @@
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * Again: Don't forget to also @ref including-modules "include" the IPv6 module
+ * Again: Don't forget to also [include][include-link] the IPv6 module
  * of your networking implementation (e.g. `gnrc_ipv6_default` for
  * @ref net_gnrc "GNRC") and at least one network device.
  *
@@ -253,6 +255,8 @@
  * Finally, we wait a second before sending out the next "Hello!" with
  * `xtimer_sleep(1)`.
  *
+ * [include-link]: https://guide.riot-os.org/advanced_tutorials/creating_application/#including-modules
+ *
  * @{
  *
  * @file
@@ -265,8 +269,6 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef NET_SOCK_UDP_H
-#define NET_SOCK_UDP_H
 
 #include <assert.h>
 #include <errno.h>
@@ -633,7 +635,7 @@ static inline ssize_t sock_udp_recv_buf(sock_udp_t *sock,
 }
 
 /**
- * @brief   Sends a UDP message to remote end point with non-continous payload
+ * @brief   Sends a UDP message to remote end point with non-continuous payload
  *
  * @pre `((sock != NULL || remote != NULL))`
  *
@@ -759,7 +761,7 @@ static inline ssize_t sock_udp_send(sock_udp_t *sock,
 }
 
 /**
- * @brief   Sends a UDP message to remote end point with non-continous payload
+ * @brief   Sends a UDP message to remote end point with non-continuous payload
  *
  * @pre `((sock != NULL || remote != NULL))`
  *
@@ -848,5 +850,4 @@ static inline bool sock_udp_ep_is_v6(const sock_udp_ep_t *ep)
 }
 #endif
 
-#endif /* NET_SOCK_UDP_H */
 /** @} */

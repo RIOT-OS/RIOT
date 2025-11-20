@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ina3221
  * @{
@@ -17,9 +19,6 @@
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
-
-#ifndef INA3221_DEFINES_H
-#define INA3221_DEFINES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,5 +55,4 @@ extern "C" {
 }
 #endif
 
-#endif /* INA3221_DEFINES_H */
 /** @} */

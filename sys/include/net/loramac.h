@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_loramac LoRaMAC
  * @ingroup     net
@@ -18,9 +20,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef NET_LORAMAC_H
-#define NET_LORAMAC_H
 
 #include <assert.h>
 #include <stdint.h>
@@ -1120,7 +1119,6 @@ static inline uint32_t lora_time_on_air(size_t pkt_len, loramac_dr_idx_t dr, uin
 }
 #endif
 
-#endif /* NET_LORAMAC_H */
 /**
  * @}
  */

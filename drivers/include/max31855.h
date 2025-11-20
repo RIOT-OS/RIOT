@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_max31855 MAX31855 Thermocouple-to-Digital Converter driver
  * @ingroup     drivers_sensors
@@ -31,9 +33,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef MAX31855_H
-#define MAX31855_H
 
 /* Add header includes here */
 
@@ -82,8 +81,8 @@ typedef struct {
 /**
  * @brief   Initialize the given device
  *
- * @param[inout] dev        Device descriptor of the driver
- * @param[in]    params     Initialization parameters
+ * @param[in,out] dev       Device descriptor of the driver
+ * @param[in]     params    Initialization parameters
  *
  * @retval    0 on success
  * @retval    -ENXIO invalid SPI device
@@ -131,5 +130,4 @@ void max31855_read_raw(max31855_t *dev, uint32_t *data);
 }
 #endif
 
-#endif /* MAX31855_H */
 /** @} */

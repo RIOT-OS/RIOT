@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    ble_bluetil_ad BLE Advertising Data (AD) Processing
  * @ingroup     ble_bluetil
@@ -23,9 +25,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NET_BLUETIL_AD_H
-#define NET_BLUETIL_AD_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -205,5 +204,4 @@ static inline int bluetil_ad_init_with_flags(bluetil_ad_t *ad,
 }
 #endif
 
-#endif /* NET_BLUETIL_AD_H */
 /** @} */

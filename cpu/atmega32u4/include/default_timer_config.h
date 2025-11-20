@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2017 Thomas Perrot <thomas.perrot@tupi.fr>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Thomas Perrot <thomas.perrot@tupi.fr>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_atmega32u4
@@ -16,9 +15,6 @@
  * @author          Thomas Perrot <thomas.perrot@tupi.fr>
  *
  */
-
-#ifndef DEFAULT_TIMER_CONFIG_H
-#define DEFAULT_TIMER_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,5 +43,4 @@ extern "C" {
 }
 #endif
 
-#endif /* DEFAULT_TIMER_CONFIG_H */
 /** @} */

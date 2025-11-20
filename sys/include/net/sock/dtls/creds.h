@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_sock_dtls_creds    DTLS sock credentials API
  * @ingroup     net_sock_dtls
@@ -17,9 +19,6 @@
  *
  * @author  Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef NET_SOCK_DTLS_CREDS_H
-#define NET_SOCK_DTLS_CREDS_H
 
 #include "net/sock/udp.h"
 
@@ -148,5 +147,4 @@ void sock_dtls_set_rpk_cb(sock_dtls_t *sock, sock_dtls_rpk_cb_t cb);
 }
 #endif
 
-#endif /* NET_SOCK_DTLS_CREDS_H */
 /** @} */

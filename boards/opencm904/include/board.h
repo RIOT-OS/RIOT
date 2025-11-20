@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2017 INRIA
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2017 INRIA
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_opencm904
@@ -16,9 +15,6 @@
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,6 +33,7 @@ extern "C" {
  * @{
  */
 #define LED0_PIN_NUM        9
+#define LED0_PORT           GPIO_PORT_B /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_B
 /** @} */
 
@@ -77,5 +74,4 @@ extern "C" {
 
 #include "stm32_leds.h"
 
-#endif /* BOARD_H */
 /** @} */

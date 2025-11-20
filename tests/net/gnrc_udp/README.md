@@ -8,4 +8,4 @@ The server is also modified as it outputs the number of currently received
 packets when a new packet is received instead of the content of the new packet.
 This counter can be reset using `udp reset`
 
-[1]: https://github.com/RIOT-OS/RIOT/tree/master/examples/gnrc_networking
+[1]: https://github.com/RIOT-OS/RIOT/tree/master/examples/networking/gnrc/networking

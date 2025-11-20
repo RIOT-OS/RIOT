@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup net_gnrc_ipv6_nib
  * @internal
@@ -18,8 +20,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef PRIV_NIB_ARSM_H
-#define PRIV_NIB_ARSM_H
 
 #include <kernel_defines.h>
 #include <stdint.h>
@@ -174,13 +174,21 @@ void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
 void _recalc_reach_time(gnrc_netif_ipv6_t *netif);
 
 /**
- * @brief   Sets a neighbor cache entry reachable and starts the required
+ * @brief   Sets a neighbor cache entry REACHABLE and starts the required
  *          event timers
  *
  * @param[in] netif Interface to the NCE
- * @param[in] nce   The neighbor cache entry to set reachable
+ * @param[in] nce   The neighbor cache entry to set REACHABLE
  */
 void _set_reachable(gnrc_netif_t *netif, _nib_onl_entry_t *nce);
+
+/**
+ * @brief   Sets a neighbor cache entry UNREACHABLE and flushes its packet queue
+ *
+ * @param[in] netif Interface to the NCE
+ * @param[in] nce   The neighbor cache entry to set UNREACHABLE
+ */
+void _set_unreachable(gnrc_netif_t *netif, _nib_onl_entry_t *nce);
 
 /**
  * @brief   Initializes interface for address registration state machine
@@ -257,6 +265,5 @@ bool _is_reachable(_nib_onl_entry_t *entry);
 }
 #endif
 
-#endif /* PRIV_NIB_ARSM_H */
 /** @internal
  * @} */

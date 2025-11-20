@@ -1,15 +1,15 @@
 /*
- * Copyright (C) 2019 Benjamin Valentin
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for
- * more details.
+ * SPDX-FileCopyrightText: 2019 Benjamin Valentin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+#pragma once
+
 /**
- * @defgroup    drivers_gpio_linux Linux User Mode GPIO Driver
- * @ingroup     cpu_native
- * @brief       Implementation of GPIO access from Linux User Space
+ * @defgroup drivers_gpio_linux Linux User Mode GPIO Driver
+ * @ingroup  cpu_native
+ * @brief    Implementation of GPIO access from Linux User Space
+ * @{
  *
  * This module allows to connect a RIOT application that runs on a Linux host to
  * the physical GPIO pins of that host. To do so, the application has to be
@@ -34,17 +34,13 @@
  * port would be PIN(0,1) and so on.
  *
  * Please refer to your board's documentation for the mapping of the pins.
- *
- * @{
- *
- * @file
- * @brief       Implementation of GPIO access from Linux User Space
- *
- * @author      Benjamin Valentin <benpicco@googlemail.com>
  */
 
-#ifndef GPIODEV_LINUX_H
-#define GPIODEV_LINUX_H
+/**
+ * @file
+ * @brief  Implementation of GPIO access from Linux User Space
+ * @author Benjamin Valentin <benpicco@googlemail.com>
+ */
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,5 +66,4 @@ void gpio_linux_teardown(void);
 }
 #endif
 
-#endif /* GPIODEV_LINUX_H */
 /** @} */

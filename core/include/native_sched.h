@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    core_sched_native Scheduler for native
  * @ingroup     core_sched
@@ -19,9 +21,6 @@
  *
  * @author      Raphael Hiesgen <raphael.hiesgen@haw-hamburg.de>
  */
-
-#ifndef NATIVE_SCHED_H
-#define NATIVE_SCHED_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,5 +63,4 @@ extern int sched_yield(void);
 }
 #endif
 
-#endif /* NATIVE_SCHED_H */
 /** @} */

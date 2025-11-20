@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_bmx055
  *
@@ -15,9 +17,6 @@
  *
  * @author      Semjon Kerner <semjon.kerner@fu-berlin.de>
  */
-
-#ifndef BMX055_PARAMS_H
-#define BMX055_PARAMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -98,5 +97,4 @@ static const saul_reg_info_t bmx055_saul_info[][3] = {
 }
 #endif
 
-#endif /* BMX055_PARAMS_H */
 /** @} */

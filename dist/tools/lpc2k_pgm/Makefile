@@ -42,6 +42,8 @@ boot_23xx.c boot_23xx.h: src/boot_23xx.armasm mkbootc
 clean:
 	rm -f bin/lpc2k_pgm cksum_test obj/*.o obj/*.d core core.* obj/*.armobj bin/pseudoterm
 
+distclean: clean
+
 install:
 	install -m 0755 bin/lpc2k_pgm $(prefix)/bin
 

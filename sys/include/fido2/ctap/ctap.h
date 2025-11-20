@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    fido2_ctap_ctap FIDO2 CTAP
  * @ingroup     fido2_ctap
@@ -21,9 +23,6 @@
  *
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
-
-#ifndef FIDO2_CTAP_CTAP_H
-#define FIDO2_CTAP_CTAP_H
 
 #include <stdint.h>
 
@@ -49,19 +48,6 @@ extern "C" {
  * CTAP specification (version 20190130) section 5.5.8.2.
  */
 #define CTAP_PIN_AUTH_SZ 16
-
-/**
- * @name CTAP methods
- *
- * @{
- */
-#define CTAP_MAKE_CREDENTIAL                0x01    /**< authenticatorMakeCredential method */
-#define CTAP_GET_ASSERTION                  0x02    /**< authenticatorGetAssertion method */
-#define CTAP_GET_INFO                       0x04    /**< authenticatorGetInfo method */
-#define CTAP_CLIENT_PIN                     0x06    /**< authenticatorClientPIN method */
-#define CTAP_RESET                          0x07    /**< authenticatorReset method */
-#define CTAP_GET_NEXT_ASSERTION             0x08    /**< authenticatorGetNextAssertion method */
-/** @} */
 
 /**
  * @name CTAP authenticator data option flags
@@ -111,15 +97,17 @@ extern "C" {
 /** @} */
 
 /**
- * @name CTAP Client PIN request subCommand CBOR key values
+ * @brief CTAP Client PIN request subCommand CBOR key values
  *
  * @{
  */
-#define CTAP_CP_REQ_SUB_COMMAND_GET_RETRIES         0x01    /**< getRetries subCommand */
-#define CTAP_CP_REQ_SUB_COMMAND_GET_KEY_AGREEMENT   0x02    /**< getKeyAgreement subCommand */
-#define CTAP_CP_REQ_SUB_COMMAND_SET_PIN             0x03    /**< setPIN subCommand */
-#define CTAP_CP_REQ_SUB_COMMAND_CHANGE_PIN          0x04    /**< changePIN subCommand */
-#define CTAP_CP_REQ_SUB_COMMAND_GET_PIN_TOKEN       0x05    /**< getPinToken subCommand */
+typedef enum {
+    CTAP_PIN_GET_RETRIES     =    0x01,    /**< getRetries subCommand */
+    CTAP_PIN_GET_KEY_AGREEMENT =  0x02,    /**< getKeyAgreement subCommand */
+    CTAP_PIN_SET_PIN           =  0x03,    /**< setPIN subCommand */
+    CTAP_PIN_CHANGE_PIN        =  0x04,    /**< changePIN subCommand */
+    CTAP_PIN_GET_PIN_TOKEN     =  0x05    /**< getPinToken subCommand */
+} ctap_pin_subcommand_t;
 /** @} */
 
 /**
@@ -572,7 +560,7 @@ typedef struct {
     uint8_t pin_auth[CTAP_PIN_AUTH_SZ];                         /**< first 16 bytes of HMAC-SHA-256 of encrypted contents  */
     uint8_t new_pin_enc[CTAP_PIN_ENC_MAX_SIZE];                 /**< Encrypted new PIN using sharedSecret. */
     uint8_t pin_hash_enc[SHA256_DIGEST_LENGTH / 2];             /**< Encrypted first 16 bytes of SHA-256 of PIN using           sharedSecret. */
-    uint8_t sub_command;                                        /**< authenticator Client PIN sub command */
+    ctap_pin_subcommand_t sub_command;                          /**< ClientPIN sub command */
     uint8_t pin_protocol;                                       /**< PIN protocol version chosen by the client */
     bool pin_hash_enc_present;                                  /**< indicate pin_hash_enc is present */
     bool pin_auth_present;                                      /**< indicate if pin_auth present */
@@ -642,7 +630,7 @@ typedef struct {
  * @param[in] sig               signature buffer
  * @param[in] sig_len           length of @p sig
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
 int fido2_ctap_get_sig(const uint8_t *auth_data, size_t auth_data_len,
                        const uint8_t *client_data_hash,
@@ -668,7 +656,7 @@ bool fido2_ctap_cred_params_supported(uint8_t cred_type, int32_t alg_type);
  * @param[in] nonce_len         length of @p nonce
  * @param[in] id                credential id struct storing encrypted resident key
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
 int fido2_ctap_encrypt_rk(ctap_resident_key_t *rk, uint8_t *nonce,
                           size_t nonce_len, ctap_cred_id_t *id);
@@ -691,5 +679,4 @@ ctap_state_t *fido2_ctap_get_state(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_CTAP_H */
 /** @} */

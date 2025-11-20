@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_si114x
  * @brief       Internal addresses, registers, constants for the Si114x sensors family.
@@ -16,9 +18,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef SI114X_INTERNALS_H
-#define SI114X_INTERNALS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -203,5 +202,4 @@ extern "C" {
 }
 #endif
 
-#endif /* SI114X_INTERNALS_H */
 /** @} */

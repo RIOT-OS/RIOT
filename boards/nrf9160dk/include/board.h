@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021 Mesotic SAS
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Mesotic SAS
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_nrf9160dk
@@ -15,9 +14,6 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 
@@ -99,5 +95,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

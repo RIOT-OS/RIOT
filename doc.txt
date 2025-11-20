@@ -60,6 +60,34 @@
 #endif
 
 /**
+ * @def RIOT_FILE_RELATIVE
+ * @brief   Provides the current filename relative to the RIOT base directory (RIOTBASE)
+ * @warning This only works within `*.c` and `*.cpp` files. For `*.h`/`*.hpp` files the
+ *          source compiles, however, the including `*.c`/`*.cpp` file will be
+ *          substituted.
+ * @see     @ref RIOT_FILE_NOPATH
+ * @deprecated  This macro will be removed after the 2025.10 release.
+ *              Use the compiler builtin `__FILE__` instead (GCC 8+, clang 10+)
+ */
+#if DOXYGEN
+#   define RIOT_FILE_RELATIVE
+#endif
+
+/**
+ * @def RIOT_FILE_NOPATH
+ * @brief   Provides the current filename without the parent directory path
+ * @warning This only works within `*.c` and `*.cpp` files. For `*.h`/`*.hpp` files the
+ *          source compiles, however, the including `*.c`/`*.cpp` file will be
+ *          substituted.
+ * @see     @ref RIOT_FILE_RELATIVE
+ * @deprecated  This macro will be removed after the 2025.10 release.
+ *              Use the compiler builtin `__FILE_NAME__` instead (GCC 12+, clang 9+)
+ */
+#if DOXYGEN
+#   define RIOT_FILE_NOPATH
+#endif
+
+/**
  * @def CONFIG_THREAD_NAMES
  * @brief   This global macro enable storage of thread names to help developers.
  *

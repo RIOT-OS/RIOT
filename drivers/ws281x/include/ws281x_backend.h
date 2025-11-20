@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ws281x
  *
@@ -15,9 +17,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef WS281X_BACKEND_H
-#define WS281X_BACKEND_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,5 +63,4 @@ extern "C" {
 }
 #endif
 
-#endif /* WS281X_BACKEND_H */
 /** @} */

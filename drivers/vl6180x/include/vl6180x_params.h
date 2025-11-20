@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_vl6180x
  * @brief       Default configuration for ST VL6180X Ranging and Ambient Light Sensing (ALS) module
@@ -13,9 +15,6 @@
  * @file
  * @{
  */
-
-#ifndef VL6180X_PARAMS_H
-#define VL6180X_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -244,5 +243,4 @@ static const saul_reg_info_t vl6180x_saul_info[] =
 }
 #endif
 
-#endif /* VL6180X_PARAMS_H */
 /** @} */

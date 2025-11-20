@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_st77xx
  * @{
@@ -19,9 +21,6 @@
  *
  * @}
  */
-
-#ifndef ST7796_INTERNAL_H
-#define ST7796_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,5 +46,3 @@ int st7796_init(lcd_t *dev, const lcd_params_t *params);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* ST7796_INTERNAL_H */

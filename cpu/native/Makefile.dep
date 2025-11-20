@@ -4,6 +4,9 @@ ifeq ($(OS),Linux)
       USEMODULE += periph_gpio_linux
     endif
   endif
+  ifneq (,$(filter periph_i2c,$(USEMODULE)))
+    USEMODULE += periph_i2c_mock
+  endif
   ifneq (,$(filter periph_spi,$(USEMODULE)))
     USEMODULE += periph_spidev_linux
   endif
@@ -11,9 +14,12 @@ else
   ifneq (,$(filter periph_gpio,$(USEMODULE)))
     USEMODULE += periph_gpio_mock
   endif
+  ifneq (,$(filter periph_i2c,$(USEMODULE)))
+    USEMODULE += periph_i2c_mock
+  endif
 endif
 
-ifeq (,$(filter stdio_%,$(USEMODULE)))
+ifneq (,$(filter stdio_default,$(USEMODULE)))
   USEMODULE += stdio_native
 endif
 
@@ -37,11 +43,12 @@ ifneq (,$(filter socket_zep,$(USEMODULE)))
   USEMODULE += ieee802154
   ifneq (,$(filter netdev,$(USEMODULE)))
     USEMODULE += netdev_ieee802154_submac
+    USEMODULE += netdev_ieee802154_submac_soft_ack
   endif
 endif
 
 ifneq (,$(filter netdev_tap,$(USEMODULE)))
-  USEMODULE += netdev_legacy_api
+  USEMODULE += netdev_new_api
 endif
 
 ifneq (,$(filter libc_gettimeofday,$(USEMODULE)))
@@ -52,3 +59,5 @@ USEMODULE += periph
 
 # UART is needed by startup.c
 USEMODULE += periph_uart
+
+USEMODULE += fdcan

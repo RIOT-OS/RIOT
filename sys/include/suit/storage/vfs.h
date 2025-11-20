@@ -5,6 +5,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /**
  * @defgroup    sys_suit_storage_vfs  riotboot vfs storage backend
  * @ingroup     sys_suit_storage
@@ -18,7 +21,7 @@
  * #include "xfa.h"
  *
  * XFA_USE(char*, suit_storage_files_reg);
- * XFA(suit_storage_files_reg, 0) char* _firmware_0 = VFS_DEFAULT_DATA "/FW0.TXT";
+ * XFA(char*, suit_storage_files_reg, 0) _firmware_0 = VFS_DEFAULT_DATA "/FW0.TXT";
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * Once registered its content may be securely updated via SUIT by specifying the
@@ -29,9 +32,6 @@
  * @brief       riotboot vfs storage backend functions for SUIT manifests
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef SUIT_STORAGE_VFS_H
-#define SUIT_STORAGE_VFS_H
 
 #include "suit.h"
 #include "../../sys/include/vfs.h"
@@ -68,5 +68,4 @@ typedef struct {
 }
 #endif
 
-#endif /* SUIT_STORAGE_VFS_H */
 /** @} */

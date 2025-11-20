@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_bmx055 BMX055 9-axis sensor
  * @ingroup     drivers_sensors
@@ -22,9 +24,6 @@
  *
  * @author      Semjon Kerner <semjon.kerner@fu-berlin.de>
  */
-
-#ifndef BMX055_H
-#define BMX055_H
 
 #include <stdint.h>
 
@@ -199,5 +198,4 @@ int bmx055_gyro_read(const bmx055_t *dev, int16_t *data);
 }
 #endif
 
-#endif /* BMX055_H */
 /** @} */

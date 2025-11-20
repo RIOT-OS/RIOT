@@ -48,6 +48,9 @@ void auto_init_periph_can(void) {
         candev_dev[i].rx_inactivity_timeout = candev_params[i].rx_inactivity_timeout;
         candev_dev[i].tx_wakeup_timeout = candev_params[i].tx_wakeup_timeout;
 #endif
+#ifdef MODULE_FDCAN
+        candev_dev[i].loop_delay = candev_params[i].loop_delay;
+#endif
 
         can_device_init(_can_stacks[i], CANDEV_STACKSIZE, CANDEV_BASE_PRIORITY + i,
                         candev_params[i].name, &candev_dev[i]);

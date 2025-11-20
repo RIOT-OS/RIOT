@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    fido2_ctap CTAP
  * @ingroup     fido2
@@ -21,9 +23,6 @@
  *
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
-
-#ifndef FIDO2_CTAP_H
-#define FIDO2_CTAP_H
 
 #include <stdint.h>
 
@@ -98,7 +97,22 @@ typedef enum {
     CTAP2_ERR_EXTENSION_LAST            = 0xEF,
     CTAP2_ERR_VENDOR_FIRST              = 0xF0,
     CTAP2_ERR_VENDOR_LAST               = 0xFF
-} ctap_status_codes_t;
+} ctap_status_code_t;
+/** @} */
+
+/**
+ * @brief CTAP methods
+ *
+ * @{
+ */
+typedef enum {
+    CTAP_MAKE_CREDENTIAL    =   0x01,
+    CTAP_GET_ASSERTION      =   0x02,
+    CTAP_GET_INFO           =   0x04,
+    CTAP_CLIENT_PIN         =   0x06,
+    CTAP_RESET              =   0x07,
+    CTAP_GET_NEXT_ASSERTION =   0x08
+} ctap_method_t;
 /** @} */
 
 /**
@@ -118,17 +132,17 @@ typedef struct {
  * CTAP specification (version 20190130) section 6.2
  */
 typedef struct {
-    uint8_t status;                     /**< response status */
+    ctap_status_code_t status;          /**< response status */
     uint8_t data[CTAP_MAX_MSG_SIZE];    /**< response data */
+    size_t len;                         /**< length of response data */
 } ctap_resp_t;
 
 /**
  * @brief Initialize ctap
  *
- * @return 0 for success
- * @return negative error code otherwise
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_init(void);
+ctap_status_code_t fido2_ctap_init(void);
 
 /**
  * @brief Handle CBOR encoded ctap request.
@@ -139,9 +153,9 @@ int fido2_ctap_init(void);
  * @param[in] req               request struct
  * @param[in] resp              response struct
  *
- * @return Length of @p resp->data
+ * @return @ref ctap_status_code_t
  */
-size_t fido2_ctap_handle_request(ctap_req_t *req, ctap_resp_t *resp);
+ctap_status_code_t fido2_ctap_handle_request(ctap_req_t *req, ctap_resp_t *resp);
 
 /**
  * @brief MakeCredential method
@@ -151,9 +165,9 @@ size_t fido2_ctap_handle_request(ctap_req_t *req, ctap_resp_t *resp);
  * @param[in] req               CTAP request
  * @param[in, out] resp         CTAP response
  *
- * @return Length of @p resp->data
+ * @return @ref ctap_status_code_t
  */
-size_t fido2_ctap_make_credential(ctap_req_t *req, ctap_resp_t *resp);
+ctap_status_code_t fido2_ctap_make_credential(ctap_req_t *req, ctap_resp_t *resp);
 
 /**
  * @brief GetAssertion method
@@ -163,9 +177,9 @@ size_t fido2_ctap_make_credential(ctap_req_t *req, ctap_resp_t *resp);
  * @param[in] req               CTAP request
  * @param[in, out] resp         CTAP response
  *
- * @return Length of @p resp->data
+ * @return @ref ctap_status_code_t
  */
-size_t fido2_ctap_get_assertion(ctap_req_t *req, ctap_resp_t *resp);
+ctap_status_code_t fido2_ctap_get_assertion(ctap_req_t *req, ctap_resp_t *resp);
 
 /**
  * @brief GetNextAssertion method
@@ -174,9 +188,9 @@ size_t fido2_ctap_get_assertion(ctap_req_t *req, ctap_resp_t *resp);
  *
  * @param[in, out] resp         CTAP response
  *
- * @return Length of @p resp->data
+ * @return @ref ctap_status_code_t
  */
-size_t fido2_ctap_get_next_assertion(ctap_resp_t *resp);
+ctap_status_code_t fido2_ctap_get_next_assertion(ctap_resp_t *resp);
 
 /**
  * @brief GetInfo method
@@ -185,9 +199,9 @@ size_t fido2_ctap_get_next_assertion(ctap_resp_t *resp);
  *
  * @param[in, out] resp CTAP response
  *
- * @return Length of @p resp->data
+ * @return @ref ctap_status_code_t
  */
-size_t fido2_ctap_get_info(ctap_resp_t *resp);
+ctap_status_code_t fido2_ctap_get_info(ctap_resp_t *resp);
 
 /**
  * @brief ClientPIN method
@@ -197,9 +211,9 @@ size_t fido2_ctap_get_info(ctap_resp_t *resp);
  * @param[in] req               CTAP request
  * @param[in, out] resp         CTAP response
  *
- * @return Length of @p resp->data
+ * @return @ref ctap_status_code_t
  */
-size_t fido2_ctap_client_pin(ctap_req_t *req, ctap_resp_t *resp);
+ctap_status_code_t fido2_ctap_client_pin(ctap_req_t *req, ctap_resp_t *resp);
 
 /**
  * @brief Reset method
@@ -208,12 +222,11 @@ size_t fido2_ctap_client_pin(ctap_req_t *req, ctap_resp_t *resp);
  *
  * @param[in, out] resp         CTAP response
  *
- * @return Length of @p resp->data
+ * @return @ref ctap_status_code_t
  */
-size_t fido2_ctap_reset(ctap_resp_t *resp);
+ctap_status_code_t fido2_ctap_reset(ctap_resp_t *resp);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_H */
 /** @} */

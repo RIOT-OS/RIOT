@@ -39,7 +39,13 @@ FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_spi
 
+FEATURES_PROVIDED += arduino_analog
+FEATURES_PROVIDED += arduino_dac
+FEATURES_PROVIDED += arduino_i2c
 FEATURES_PROVIDED += arduino_pins
+FEATURES_PROVIDED += arduino_pwm
+FEATURES_PROVIDED += arduino_spi
+FEATURES_PROVIDED += arduino_uart
 
 ifneq (,$(filter esp32s2-devkitc-%,$(BOARD_VERSION)))
   FEATURES_PROVIDED += periph_usbdev

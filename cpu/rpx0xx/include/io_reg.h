@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_rpx0xx
@@ -23,9 +22,6 @@
  * @author          Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  * @author          Fabian Hüßler <fabian.huessler@ovgu.de>
  */
-
-#ifndef IO_REG_H
-#define IO_REG_H
 
 #include <stdint.h>
 
@@ -134,5 +130,4 @@ static inline void io_reg_write_dont_corrupt(volatile uint32_t *reg, uint32_t va
 }
 #endif
 
-#endif /* IO_REG_H */
 /** @} */

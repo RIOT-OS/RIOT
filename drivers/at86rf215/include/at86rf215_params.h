@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_at86rf215
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef AT86RF215_PARAMS_H
-#define AT86RF215_PARAMS_H
 
 #include "at86rf215.h"
 #include "board.h"
@@ -68,5 +67,4 @@ static const at86rf215_params_t at86rf215_params[] =
 }
 #endif
 
-#endif /* AT86RF215_PARAMS_H */
 /** @} */

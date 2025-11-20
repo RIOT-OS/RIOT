@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    fido2_ctap_transport_hid FIDO2 CTAPHID
  * @ingroup     fido2_ctap_transport
@@ -18,9 +20,6 @@
  *
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
-
-#ifndef FIDO2_CTAP_TRANSPORT_HID_CTAP_HID_H
-#define FIDO2_CTAP_TRANSPORT_HID_CTAP_HID_H
 
 #include <stdint.h>
 
@@ -208,7 +207,7 @@ typedef struct __attribute__((packed)){
 typedef struct {
     bool taken;                             /**< is cid taken? */
     uint32_t cid;                           /**< channel identifier */
-    uint64_t last_used;                     /**< timestamp of last usage */
+    uint32_t last_used;                     /**< timestamp of last usage */
 } ctap_hid_cid_t;
 
 /**
@@ -251,5 +250,4 @@ bool fido2_ctap_transport_hid_should_cancel(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_TRANSPORT_HID_CTAP_HID_H */
 /** @} */

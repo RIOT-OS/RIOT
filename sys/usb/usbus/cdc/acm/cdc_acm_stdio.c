@@ -37,13 +37,13 @@ static uint8_t _cdc_tx_buf_mem[CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE];
 static ssize_t _write(const void* buffer, size_t len)
 {
     const char *start = buffer;
-    do {
+    while (len) {
         size_t n = usbus_cdc_acm_submit(&cdcacm, buffer, len);
         usbus_cdc_acm_flush(&cdcacm);
         /* Use tsrb and flush */
         buffer = (char *)buffer + n;
         len -= n;
-    } while (len);
+    }
     return (char *)buffer - start;
 }
 
@@ -51,9 +51,7 @@ static void _cdc_acm_rx_pipe(usbus_cdcacm_device_t *cdcacm,
                              uint8_t *data, size_t len)
 {
     (void)cdcacm;
-    for (size_t i = 0; i < len; i++) {
-        isrpipe_write_one(&stdin_isrpipe, data[i]);
-    }
+    isrpipe_write(&stdin_isrpipe, data, len);
 }
 
 void usb_cdc_acm_stdio_init(usbus_t *usbus)

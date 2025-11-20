@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2020 Locha Inc
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Locha Inc
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_cc26x2_cc13x2
@@ -13,9 +12,6 @@
  * @file
  * @brief           CC26x2/CC13x2 Device setup functions
  */
-
-#ifndef CC26X2_CC13X2_SETUP_H
-#define CC26X2_CC13X2_SETUP_H
 
 #include <cc26xx_cc13xx.h>
 
@@ -117,5 +113,4 @@ void setup_trim_device(void);
 } /* end extern "C" */
 #endif
 
-#endif /* CC26X2_CC13X2_SETUP_H */
 /** @} */

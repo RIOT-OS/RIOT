@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2020 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -22,7 +19,7 @@
 #include <stdio.h>
 #include <strings.h>
 
-#include "common.h"
+#include "test_common.h"
 #include "errno.h"
 #include "event/thread.h"
 #include "luid.h"
@@ -157,7 +154,7 @@ static event_t _rx_done_event = {
 static void _hal_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t status)
 {
     (void) dev;
-    switch(status) {
+    switch (status) {
         case IEEE802154_RADIO_CONFIRM_TX_DONE:
         case IEEE802154_RADIO_CONFIRM_CCA:
             mutex_unlock(&lock);
@@ -182,7 +179,8 @@ static void _tx_finish_handler(event_t *event)
     expect(ieee802154_radio_confirm_transmit(&_radio, &tx_info) >= 0);
 
     ieee802154_radio_set_rx(&_radio);
-    if (!ieee802154_radio_has_irq_ack_timeout(&_radio) && !ieee802154_radio_has_frame_retrans(&_radio)) {
+    if (!ieee802154_radio_has_irq_ack_timeout(&_radio) &&
+        !ieee802154_radio_has_frame_retrans(&_radio)) {
         /* This is just to show how the MAC layer would handle ACKs... */
         xtimer_set(&timer_ack, ACK_TIMEOUT_TIME);
     }
@@ -227,7 +225,7 @@ static void _send(iolist_t *pkt)
     ieee802154_radio_write(&_radio, pkt);
 
     /* Block until the radio confirms the state change */
-    while(ieee802154_radio_confirm_set_idle(&_radio) == -EAGAIN);
+    while (ieee802154_radio_confirm_set_idle(&_radio) == -EAGAIN) {}
 
     /* Set the frame filter to receive ACKs */
     ieee802154_radio_set_frame_filter_mode(&_radio, IEEE802154_FILTER_ACK_ONLY);
@@ -252,7 +250,7 @@ static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
 {
     struct _reg_container *reg = opaque;
     printf("Trying to register ");
-    switch(type) {
+    switch (type) {
         case IEEE802154_DEV_TYPE_CC2538_RF:
             printf("cc2538_rf");
             break;
@@ -267,6 +265,9 @@ static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
             break;
         case IEEE802154_DEV_TYPE_MRF24J40:
             printf("mrf24j40");
+            break;
+        case IEEE802154_DEV_TYPE_ESP_IEEE802154:
+            printf("esp_ieee802154");
             break;
     }
 
@@ -300,7 +301,7 @@ static int _init(void)
      * The transceiver state will be "TRX_OFF" */
     res = ieee802154_radio_request_on(&_radio);
     expect(res >= 0);
-    while(ieee802154_radio_confirm_on(&_radio) == -EAGAIN) {}
+    while (ieee802154_radio_confirm_on(&_radio) == -EAGAIN) {}
 
     ieee802154_radio_set_frame_filter_mode(&_radio, IEEE802154_FILTER_ACCEPT);
 
@@ -318,7 +319,9 @@ static int _init(void)
     expect(res >= 0);
 
     /* Set PHY configuration */
-    ieee802154_phy_conf_t conf = {.channel=CONFIG_IEEE802154_DEFAULT_CHANNEL, .page=CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE, .pow=CONFIG_IEEE802154_DEFAULT_TXPOWER};
+    ieee802154_phy_conf_t conf = { .channel=CONFIG_IEEE802154_DEFAULT_CHANNEL,
+                                   .page=CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE,
+                                   .pow=CONFIG_IEEE802154_DEFAULT_TXPOWER};
 
     res = ieee802154_radio_config_phy(&_radio, &conf);
     expect(res >= 0);
@@ -334,7 +337,8 @@ static int _init(void)
     return 0;
 }
 
-uint8_t payload[] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ornare lacinia mi elementum interdum ligula.";
+uint8_t payload[] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+                    "Etiam ornare lacinia mi elementum interdum ligula.";
 
 static int send(uint8_t *dst, size_t dst_len,
                 size_t len, bool ack_req)
@@ -415,21 +419,21 @@ int _test_states(int argc, char **argv)
 
     /* Force transition to IDLE */
     res = ieee802154_radio_set_idle(&_radio, true);
-    assert(res == 0);
+    expect(res == 0);
 
     printf("Testing TX<->RX transition time: ");
     a = xtimer_now();
     res = ieee802154_radio_set_rx(&_radio);
-    assert(res == 0);
+    expect(res == 0);
     usecs = xtimer_usec_from_ticks(xtimer_diff(xtimer_now(), a));
     printf("%" PRIu32 " us (%s)\n", usecs, usecs > MAX_TX_RX_TURNAROUND
                                            ? "FAIL"
                                            : "PASS");
 
-    printf("Testing RX<->TX transition time");
+    printf("Testing RX<->TX transition time: ");
     a = xtimer_now();
     res = ieee802154_radio_set_idle(&_radio, true);
-    assert(res == 0);
+    expect(res == 0);
     usecs = xtimer_usec_from_ticks(xtimer_diff(xtimer_now(), a));
     printf("%" PRIu32 " us (%s)\n", usecs, usecs > MAX_TX_RX_TURNAROUND
                                            ? "FAIL"

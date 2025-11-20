@@ -10,5 +10,6 @@ ifneq (,$(filter disp_dev,$(USEMODULE)))
   USEMODULE += ili9341
 endif
 
-include $(RIOTBOARD)/common/nrf52/bootloader_nrfutil.dep.mk
+USEMODULE += boards_common_adafruit-nrf52-bootloader
+
 include $(RIOTBOARD)/common/nrf52/Makefile.dep

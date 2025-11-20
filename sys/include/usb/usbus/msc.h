@@ -8,6 +8,8 @@
  *
  */
 
+#pragma once
+
 /**
  * @ingroup     usbus_msc
  *
@@ -18,9 +20,6 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifndef USB_USBUS_MSC_H
-#define USB_USBUS_MSC_H
 
 #include <stdint.h>
 #include "usb/usbus.h"
@@ -131,5 +130,4 @@ int usbus_msc_remove_lun(usbus_t *usbus, mtd_dev_t *dev);
 }
 #endif
 
-#endif /* USB_USBUS_MSC_H */
 /** @} */

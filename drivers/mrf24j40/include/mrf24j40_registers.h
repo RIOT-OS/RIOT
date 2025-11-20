@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup drivers_mrf24j40
  * @{
@@ -17,9 +19,6 @@
  * @author      Neo Nenaco <neo@nenaco.de>
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef MRF24J40_REGISTERS_H
-#define MRF24J40_REGISTERS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -513,5 +512,4 @@ extern "C" {
 }
 #endif
 
-#endif /* MRF24J40_REGISTERS_H */
 /** @} */

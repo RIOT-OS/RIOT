@@ -1,24 +1,22 @@
 /*
- * Copyright (C) 2015 Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for
- * more details.
+ * SPDX-FileCopyrightText: 2015 Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+#pragma once
+
+/**
+ * @addtogroup cpu_native
+ * @{
  */
 
 /**
- * @ingroup     cpu_native
- * @{
- *
  * @file
- * @brief       Multiple asynchronous read on file descriptors
- *
- * @author      Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
+ * @brief  Multiple asynchronous read on file descriptors
+ * @author Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
  */
-#ifndef ASYNC_READ_H
-#define ASYNC_READ_H
 
-#include <stdlib.h>
+#include <sys/types.h>
 #include <poll.h>
 
 #ifdef __cplusplus
@@ -29,7 +27,7 @@ extern "C" {
  * @brief   Maximum number of file descriptors
  */
 #ifndef ASYNC_READ_NUMOF
-#define ASYNC_READ_NUMOF 2
+#  define ASYNC_READ_NUMOF 8
 #endif
 
 /**
@@ -101,5 +99,4 @@ void native_async_read_add_int_handler(int fd, void *arg, native_async_read_call
 }
 #endif
 
-#endif /* ASYNC_READ_H */
 /** @} */

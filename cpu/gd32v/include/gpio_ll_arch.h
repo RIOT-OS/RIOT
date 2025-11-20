@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2023 Gunar Schorcht <gunar@schorcht.net>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2023 Gunar Schorcht <gunar@schorcht.net>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_gd32v
@@ -17,11 +16,7 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifndef GPIO_LL_ARCH_H
-#define GPIO_LL_ARCH_H
-
 #include "architecture.h"
-#include "periph/gpio_ll.h"
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
@@ -35,15 +30,69 @@ extern "C" {
  */
 #define GPIO_PORT_NUMOF 5
 
-/**
- * @brief   Get a GPIO port by number
- */
-#define GPIO_PORT(num)      (GPIOA_BASE + ((num) << 10))
+#define GPIO_PORT_NUMBERING_ALPHABETIC  1
 
-/**
- * @brief   Get a GPIO port number by gpio_t value
- */
-#define GPIO_PORT_NUM(port) (((port) - GPIOA_BASE) >> 10)
+#ifdef GPIOA_BASE
+#  define GPIO_PORT_0       GPIOA_BASE
+#endif
+
+#ifdef GPIOB_BASE
+#  define GPIO_PORT_1       GPIOB_BASE
+#endif
+
+#ifdef GPIOC_BASE
+#  define GPIO_PORT_2       GPIOC_BASE
+#endif
+
+#ifdef GPIOD_BASE
+#  define GPIO_PORT_3       GPIOD_BASE
+#endif
+
+#ifdef GPIOE_BASE
+#  define GPIO_PORT_4       GPIOE_BASE
+#endif
+
+#ifdef GPIOF_BASE
+#  define GPIO_PORT_5       GPIOF_BASE
+#endif
+
+#ifdef GPIOG_BASE
+#  define GPIO_PORT_6       GPIOG_BASE
+#endif
+
+#ifdef GPIOH_BASE
+#  define GPIO_PORT_7       GPIOH_BASE
+#endif
+
+#ifdef GPIOI_BASE
+#  define GPIO_PORT_8       GPIOI_BASE
+#endif
+
+#ifdef GPIOJ_BASE
+#  define GPIO_PORT_9       GPIOJ_BASE
+#endif
+
+#ifdef GPIOK_BASE
+#  define GPIO_PORT_10      GPIOK_BASE
+#endif
+
+static inline gpio_port_t gpio_port(uword_t num)
+{
+#if defined(CPU_FAM_STM32MP1)
+    return GPIOA_BASE + (num << 12);
+#else
+    return GPIOA_BASE + (num << 10);
+#endif
+}
+
+static inline uword_t gpio_port_num(gpio_port_t port)
+{
+#if defined(CPU_FAM_STM32MP1)
+    return (port - GPIOA_BASE) >> 12;
+#else
+    return (port - GPIOA_BASE) >> 10;
+#endif
+}
 
 static inline uword_t gpio_ll_read(gpio_port_t port)
 {
@@ -112,5 +161,4 @@ static inline bool is_gpio_port_num_valid(uint_fast8_t num)
 }
 #endif
 
-#endif /* GPIO_LL_ARCH_H */
 /** @} */

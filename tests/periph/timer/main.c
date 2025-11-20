@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -202,7 +199,7 @@ static int test_timer(unsigned num, uint32_t timer_freq)
         return 0;
     }
 
-    printf("    OK (no spurious IRQs)\n");
+    printf("    [OK] (no spurious IRQs)\n");
 
     return 1;
 }
@@ -249,8 +246,47 @@ static void print_supported_frequencies(tim_t dev)
                "    %u: %" PRIu32 "\n",
                (unsigned)(end - 1), timer_query_freqs(dev, end - 1));
     }
+}
 
-    expect(timer_query_freqs(dev, end) == 0);
+static void test_querying(tim_t dev)
+{
+    uword_t last = query_freq_numof(dev) - 1;
+
+    puts("Testing timer_get_closest_freq()...");
+    for (uword_t i = 0; i <= MIN(last, 255); i++) {
+        uint32_t closest;
+        uint32_t freq = timer_query_freqs(dev, i);
+
+        /* Searching for a supported freq should yield the supported freq: */
+        expect(freq == timer_get_closest_freq(dev, freq));
+
+        /* Assuming that no other frequency close to `freq` are supported,
+         * we would assume that asking for `freq - 1` and for `freq + 1` would
+         * also return `freq`. There are some corner cases, though. Let's look
+         * at asking for `freq - 1` here first:
+         *
+         * - `freq - 1` is actually also supported. In that case
+         *   `timer_get_closest_freq(dev, freq - 1)` should actually return
+         *   `freq - 1`
+         * - `freq - 2` is also supported (but not `freq - 1`). In this case
+         *   returning either `freq - 2` or `freq` would be valid for
+         *   `timer_get_closest_freq(dev, freq - 1)`.
+         *
+         * Therefore, we just except `freq - 2`, `freq - 1`, and `freq` as
+         * results for `timer_get_closest_freq(dev, freq - 1)`. */
+        closest = timer_get_closest_freq(dev, freq - 1);
+        expect((freq >= closest) && closest >= freq - 2);
+
+        /* Now same with `freq + 1` as target. Due to the same corner cases,
+         * we accept `freq`, `freq + 1`, and `freq + 2` here. */
+        closest = timer_get_closest_freq(dev, freq + 1);
+        expect((freq <= closest) && closest <= freq + 2);
+    }
+
+    puts("[OK]\n"
+         "Testing timer_query_freqs() for out of bound index...");
+    expect(timer_query_freqs(dev, last + 1) == 0);
+    puts("[OK]");
 }
 
 int main(void)
@@ -265,6 +301,12 @@ int main(void)
         printf("\nTIMER %u\n"
                  "=======\n\n", i);
         print_supported_frequencies(TIMER_DEV(i));
+
+        /* test querying of frequencies, but only if supported by the driver */
+        if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+            test_querying(TIMER_DEV(i));
+        }
+
         uword_t end = query_freq_numof(TIMER_DEV(i));
 
         /* Test only up to three frequencies and only the fastest once.

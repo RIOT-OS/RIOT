@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup drivers_periph_usbdev
  * @{
@@ -17,9 +19,6 @@
  * @author  Koen Zandberg <koen@bergzand.net>
  * @author  Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef USBDEV_SYNOPSYS_DWC2_H
-#define USBDEV_SYNOPSYS_DWC2_H
 
 #include <stdint.h>
 
@@ -120,5 +119,4 @@ typedef struct {
 }
 #endif
 
-#endif /* USBDEV_SYNOPSYS_DWC2_H */
 /** @} */

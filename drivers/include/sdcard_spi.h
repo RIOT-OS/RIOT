@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_sdcard_spi SPI SD Card driver
  * @ingroup     drivers_storage
@@ -18,9 +20,6 @@
  *
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
-
-#ifndef SDCARD_SPI_H
-#define SDCARD_SPI_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -280,5 +279,4 @@ uint64_t sdcard_spi_get_capacity(sdcard_spi_t *card);
 }
 #endif
 
-#endif /* SDCARD_SPI_H */
 /** @} */

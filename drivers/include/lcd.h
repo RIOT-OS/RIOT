@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_lcd LCD display driver
  * @ingroup     drivers_display
@@ -43,9 +45,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  *
  */
-
-#ifndef LCD_H
-#define LCD_H
 
 #include "board.h"
 #include "mutex.h"
@@ -493,5 +492,4 @@ extern const lcd_ll_par_driver_t lcd_ll_par_driver;
 #ifdef __cplusplus
 }
 #endif
-#endif /* LCD_H */
 /** @} */

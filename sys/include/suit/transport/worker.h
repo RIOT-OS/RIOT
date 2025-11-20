@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_suit
  * @defgroup    sys_suit_transport_worker SUIT firmware worker thread
@@ -22,10 +24,10 @@
  *
  */
 
-#ifndef SUIT_TRANSPORT_WORKER_H
-#define SUIT_TRANSPORT_WORKER_H
-
-#include "net/nanocoap.h"
+#include <stdbool.h>
+#if MODULE_NANOCOAP
+#  include "net/nanocoap.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,8 +38,11 @@ extern "C" {
  *
  * @param[in] url       url pointer containing the full coap url to the manifest
  * @param[in] len       length of the url
+ *
+ * @retval true if the worker was triggered
+ * @retval false if the worker is already busy
  */
-void suit_worker_trigger(const char *url, size_t len);
+bool suit_worker_trigger(const char *url, size_t len);
 
 /**
  * @brief   Trigger a SUIT update via a worker thread
@@ -63,9 +68,9 @@ void suit_worker_trigger_prepared(const uint8_t *manifest, size_t size);
  * area into which the manifest is to be written. The lock must be released by
  * calling @ref suit_worker_trigger_prepared later.
  *
- * @param[out]   buffer    On success, buffer into which the image may be
+ * @param[out]    buffer   On success, buffer into which the image may be
  *                         written.
- * @param[inout] size      Requested buffer size. On some errors, this will be
+ * @param[in,out] size     Requested buffer size. On some errors, this will be
  *                         decreased to a size that would be acceptable.
  *
  * @return 0 on success
@@ -133,5 +138,4 @@ int suit_handle_manifest_buf(const uint8_t *buffer, size_t size);
 }
 #endif
 
-#endif /* SUIT_TRANSPORT_WORKER_H */
 /** @} */

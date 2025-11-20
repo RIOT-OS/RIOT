@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup     net_ieee802154_submac IEEE802.15.4 SubMAC layer
  * @ingroup      net_ieee802154
@@ -104,8 +106,6 @@
  *
  * @author       José I. Alamos <jose.alamos@haw-hamburg.de>
  */
-#ifndef NET_IEEE802154_SUBMAC_H
-#define NET_IEEE802154_SUBMAC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -195,6 +195,8 @@ struct ieee802154_submac {
     const ieee802154_submac_cb_t *cb;   /**< pointer to the SubMAC callbacks */
     ieee802154_csma_be_t be;            /**< CSMA-CA backoff exponent params */
     bool wait_for_ack;                  /**< SubMAC is waiting for an ACK frame */
+    uint16_t ack_timeout_us;            /**< ACK timeout in µs */
+    uint16_t csma_backoff_us;           /**< CSMA sender backoff period in µs */
     uint16_t panid;                     /**< IEEE 802.15.4 PAN ID */
     uint16_t channel_num;               /**< IEEE 802.15.4 channel number */
     uint8_t channel_page;               /**< IEEE 802.15.4 channel page */
@@ -310,9 +312,7 @@ static inline ieee802154_phy_mode_t ieee802154_get_phy_mode(
  * @brief Set IEEE 802.15.4 PHY configuration (channel, TX power)
  *
  * @param[in] submac pointer to the SubMAC descriptor
- * @param[in] channel_num channel number
- * @param[in] channel_page channel page
- * @param[in] tx_pow transmission power (in dBm)
+ * @param[in] conf   pointer to the PHY configuration
  *
  * @return 0 on success
  * @return -ENOTSUP if the PHY settings are not supported
@@ -321,8 +321,7 @@ static inline ieee802154_phy_mode_t ieee802154_get_phy_mode(
  *         @ref ieee802154_submac_cb_t::tx_done
  * @return negative errno on error
  */
-int ieee802154_set_phy_conf(ieee802154_submac_t *submac, uint16_t channel_num,
-                            uint8_t channel_page, int8_t tx_pow);
+int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_conf_t *conf);
 
 /**
  * @brief Set IEEE 802.15.4 channel number
@@ -342,8 +341,14 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, uint16_t channel_num,
 static inline int ieee802154_set_channel_number(ieee802154_submac_t *submac,
                                                 uint16_t channel_num)
 {
-    return ieee802154_set_phy_conf(submac, channel_num, submac->channel_page,
-                                   submac->tx_pow);
+    const ieee802154_phy_conf_t conf = {
+        .phy_mode = IEEE802154_PHY_NO_OP,
+        .channel = channel_num,
+        .page = submac->channel_page,
+        .pow = submac->tx_pow,
+    };
+
+    return ieee802154_set_phy_conf(submac, &conf);
 }
 
 /**
@@ -364,8 +369,14 @@ static inline int ieee802154_set_channel_number(ieee802154_submac_t *submac,
 static inline int ieee802154_set_channel_page(ieee802154_submac_t *submac,
                                               uint16_t channel_page)
 {
-    return ieee802154_set_phy_conf(submac, submac->channel_num, channel_page,
-                                   submac->tx_pow);
+    const ieee802154_phy_conf_t conf = {
+        .phy_mode = IEEE802154_PHY_NO_OP,
+        .channel = submac->channel_num,
+        .page = channel_page,
+        .pow = submac->tx_pow,
+    };
+
+    return ieee802154_set_phy_conf(submac, &conf);
 }
 
 /**
@@ -386,8 +397,14 @@ static inline int ieee802154_set_channel_page(ieee802154_submac_t *submac,
 static inline int ieee802154_set_tx_power(ieee802154_submac_t *submac,
                                           int8_t tx_pow)
 {
-    return ieee802154_set_phy_conf(submac, submac->channel_num,
-                                   submac->channel_page, tx_pow);
+    const ieee802154_phy_conf_t conf = {
+        .phy_mode = IEEE802154_PHY_NO_OP,
+        .channel = submac->channel_num,
+        .page = submac->channel_page,
+        .pow = tx_pow,
+    };
+
+    return ieee802154_set_phy_conf(submac, &conf);
 }
 
 /**
@@ -501,10 +518,8 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
  * @note This function should be implemented by the user of the SubMAC.
  *
  * @param[in] submac pointer to the SubMAC descriptor
- * @param[in] us microseconds until the ACK timeout timer is fired
  */
-extern void ieee802154_submac_ack_timer_set(ieee802154_submac_t *submac,
-                                            uint16_t us);
+extern void ieee802154_submac_ack_timer_set(ieee802154_submac_t *submac);
 
 /**
  * @brief Cancel the ACK timeout timer
@@ -597,5 +612,4 @@ static inline void ieee802154_submac_tx_done_cb(ieee802154_submac_t *submac)
 }
 #endif
 
-#endif /* NET_IEEE802154_SUBMAC_H */
 /** @} */

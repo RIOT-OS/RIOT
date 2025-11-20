@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2019 Ken Rabold
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Ken Rabold
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup    boards_hifive1b SiFive HiFive1b RISC-V board
@@ -17,9 +16,6 @@
  *
  * @author      Ken Rabold
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "arduino_pinmap.h"
@@ -65,5 +61,4 @@ void board_init_clock(void);
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */

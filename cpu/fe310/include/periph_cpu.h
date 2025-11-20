@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2017 Ken Rabold
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2017 Ken Rabold
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_fe310
@@ -15,9 +14,6 @@
  *
  * @author          Ken Rabold
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include <inttypes.h>
 
@@ -181,5 +177,4 @@ void fe310_clock_init(void);
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_cst816s
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef CST816S_TOUCH_DEV_H
-#define CST816S_TOUCH_DEV_H
 
 #include "touch_dev.h"
 
@@ -34,5 +33,4 @@ extern const touch_dev_driver_t cst816s_touch_dev_driver;
 }
 #endif
 
-#endif /* CST816S_TOUCH_DEV_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-#ifndef TESTS_ZTIMER_H
-#define TESTS_ZTIMER_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,4 @@ void tests_ztimer(void);
 }
 #endif
 
-#endif /* TESTS_ZTIMER_H */
 /** @} */

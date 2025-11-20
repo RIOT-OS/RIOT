@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2018 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_common_nrf52
@@ -16,9 +15,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  */
-
-#ifndef CFG_RTT_DEFAULT_H
-#define CFG_RTT_DEFAULT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,6 +32,11 @@ extern "C" {
 #define RTT_MAX_FREQUENCY   (32768U)             /* in Hz */
 #define RTT_MIN_FREQUENCY   (8U)                 /* in Hz */
 #define RTT_CLOCK_FREQUENCY (32768U)             /* in Hz, LFCLK*/
+/**
+ * Default offset of 2 ticks is not enough, see figures 8 and 9 in
+ * https://docs.nordicsemi.com/bundle/ps_nrf52840/page/rtc.html.
+ */
+#define RTT_MIN_OFFSET      (3U)
 
 #ifndef RTT_FREQUENCY
 #define RTT_FREQUENCY       (1024U)              /* in Hz */
@@ -46,5 +47,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CFG_RTT_DEFAULT_H */
 /** @} */

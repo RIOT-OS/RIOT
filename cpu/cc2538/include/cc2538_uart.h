@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2014 Loci Controls Inc.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014 Loci Controls Inc.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup        cpu_cc2538_uart CC2538 UART
@@ -16,9 +15,6 @@
  *
  * @author          Ian Martin <ian@locicontrols.com>
  */
-
-#ifndef CC2538_UART_H
-#define CC2538_UART_H
 
 #include "cc2538.h"
 
@@ -187,5 +183,4 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC2538_UART_H */
 /** @} */

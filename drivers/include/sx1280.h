@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_sx1280 LoRa radio driver
  * @ingroup     drivers_netdev
@@ -20,9 +22,6 @@
  * @author      Aymeric Brochier <aymeric.brochier@univ-grenoble-alpes.fr>
  *
  */
-
-#ifndef SX1280_H
-#define SX1280_H
 
 #include <assert.h>
 
@@ -92,7 +91,7 @@ void sx1280_setup(sx1280_t *dev, const sx1280_params_t *params, uint8_t index);
 /**
  * @brief   Initialize the given device
  *
- * @param[inout] dev                    Device descriptor of the driver
+ * @param[in,out] dev                   Device descriptor of the driver
  *
  * @return 0 on success
  */
@@ -263,5 +262,4 @@ void sx1280_set_lora_iq_invert(sx1280_t *dev, bool iq_invert);
 }
 #endif
 
-#endif /* SX1280_H */
 /** @} */

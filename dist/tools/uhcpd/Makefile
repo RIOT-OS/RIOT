@@ -15,3 +15,5 @@ bin/uhcpd: $(SRCS) $(HDRS)
 
 clean:
 	rm -f bin/uhcpd
+
+distclean: clean

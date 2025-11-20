@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2013, Freie Universitaet Berlin (FUB). All rights reserved.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2013 Freie Universität Berlin (FUB)
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_msp430
@@ -14,9 +13,6 @@
  * @brief       Common CPU definitions for MSP430
  *
  */
-
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -96,5 +92,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

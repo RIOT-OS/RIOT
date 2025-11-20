@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
- * Copyright (C) 2018 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2014 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2018 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_openmote-b
@@ -17,9 +16,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -122,6 +118,12 @@
 #define AT86RF215_PARAM_CS         GPIO_PIN(0, 3) /* A3 */
 #define AT86RF215_PARAM_INT        GPIO_PIN(3, 0) /* D0 */
 #define AT86RF215_PARAM_RESET      GPIO_PIN(3, 1) /* D1 */
+
+/**
+ * @brief board requires unusually long reset */
+#ifndef CONFIG_AT86RF215_RESET_PULSE_WIDTH_US
+#define CONFIG_AT86RF215_RESET_PULSE_WIDTH_US   (50000u)
+#endif
 /** @} */
 
 /**
@@ -152,5 +154,4 @@
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_H */
 /** @} */

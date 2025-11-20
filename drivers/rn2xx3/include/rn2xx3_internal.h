@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_rn2xx3
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef RN2XX3_INTERNAL_H
-#define RN2XX3_INTERNAL_H
 
 #include <stdint.h>
 
@@ -113,5 +112,4 @@ int rn2xx3_process_reply(rn2xx3_t *dev);
 }
 #endif
 
-#endif /* RN2XX3_INTERNAL_H */
 /** @} */

@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_lpc23xx
@@ -15,9 +14,6 @@
  *
  * @author          Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -252,5 +248,4 @@ typedef struct {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

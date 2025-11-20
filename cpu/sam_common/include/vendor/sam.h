@@ -23,13 +23,6 @@
 extern "C" {
 #endif
 
-#if defined(CPU_FAM_SAM3) && !defined(PERIPH_COUNT_IRQn)
-/**
- * @brief Number of periphical IRQs for SAM3 CPUs
- */
-#define PERIPH_COUNT_IRQn       (45U)
-#endif
-
 #if   defined(CPU_MODEL_SAM3A4C)
   #include "vendor/sam3x/include/sam3a4c.h"
 #elif defined(CPU_MODEL_SAM3A8C)
@@ -80,6 +73,13 @@ extern "C" {
 
 #else
   #error "Unsupported Atmel SAM variant."
+#endif
+
+#if defined(CPU_FAM_SAM3) && !defined(PERIPH_COUNT_IRQn)
+/**
+ * @brief Number of periphical IRQs for SAM3 CPUs
+ */
+#define PERIPH_COUNT_IRQn       (45U)
 #endif
 
 #ifdef __cplusplus

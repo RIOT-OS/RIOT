@@ -11,4 +11,4 @@ license = "LGPL-2.1-only"
 publish = false
 
 [dependencies]
-riot-wrappers = "^0.8"
+riot-wrappers = "^0.9.0"

@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2019 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_esp32_heltec-lora32-v2
@@ -26,9 +25,6 @@
  * @file
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include <stdint.h>
 
@@ -101,7 +97,7 @@
  */
 /** PWM channels for device PWM_DEV(0) */
 #ifndef PWM0_GPIOS
-#define PWM0_GPIOS  { GPIO25, GPIO0, GPIO2, GPIO17 }
+#define PWM0_GPIOS  { GPIO25, GPIO17, GPIO2 }
 #endif
 
 /** PWM_DEV(1) is not used */
@@ -172,5 +168,4 @@
 /* include common board definitions as last step */
 #include "periph_conf_common.h"
 
-#endif /* PERIPH_CONF_H */
 /** @} */

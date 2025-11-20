@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ad7746
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef AD7746_PARAMS_H
-#define AD7746_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -96,5 +95,4 @@ static const saul_reg_info_t ad7746_saul_info[] =
 }
 #endif
 
-#endif /* AD7746_PARAMS_H */
 /** @} */

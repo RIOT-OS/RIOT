@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ata8520e
  * @brief       Internal addresses, registers, constants for the ATA8520E device
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef ATA8520E_INTERNALS_H
-#define ATA8520E_INTERNALS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -84,5 +83,4 @@ extern "C" {
 }
 #endif
 
-#endif /* ATA8520E_INTERNALS_H */
 /** @} */

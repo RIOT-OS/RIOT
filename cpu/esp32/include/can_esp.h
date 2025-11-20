@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2019 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup    cpu_esp32_esp_can ESP32 CAN controller
@@ -41,9 +40,6 @@
  * @{
  * @file
  */
-
-#ifndef CAN_ESP_H
-#define CAN_ESP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -104,5 +100,4 @@ typedef struct {
 }
 #endif
 
-#endif /* CAN_ESP_H */
 /** @} */

@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2020 iosabi
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2020 iosabi
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_qn908x
@@ -19,9 +18,6 @@
  *
  * @author      iosabi <iosabi@protonmail.com>
  */
-
-#ifndef GPIO_MUX_H
-#define GPIO_MUX_H
 
 #include <stdint.h>
 #include "periph_cpu.h"
@@ -77,5 +73,4 @@ void gpio_init_mux(gpio_t pin, uint32_t func);
 }
 #endif
 
-#endif /* GPIO_MUX_H */
 /** @} */

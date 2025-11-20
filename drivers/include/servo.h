@@ -8,6 +8,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_servo Servo Motor Driver
  * @ingroup     drivers_actuators
@@ -38,9 +40,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef SERVO_H
-#define SERVO_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -232,5 +231,4 @@ void servo_set(servo_t *dev, uint8_t pos);
 }
 #endif
 
-#endif /* SERVO_H */
 /** @} */

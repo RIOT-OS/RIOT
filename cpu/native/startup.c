@@ -1,31 +1,22 @@
-/**
- * Native CPU entry code
- *
- * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- *               2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- *
- * @ingroup cpu_native
- * @{
- * @file
- * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- * @author  Martine Lenders <m.lenders@fu-berlin.de>
- * @}
+/*
+ * SPDX-FileCopyrightText: 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
+/**
+ * @file    Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @brief   Native CPU entry code
+ * @ingroup cpu_native
+ * @author  Martine Lenders <m.lenders@fu-berlin.de>
+ */
+
 #include <dlfcn.h>
-#else
-#include <dlfcn.h>
-#endif
 #include <assert.h>
 #include <err.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <features.h>
 #include <getopt.h>
 #include <stdbool.h>
@@ -47,6 +38,7 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+#define DEBUG_STARTUP(...) DEBUG("[native] startup: " __VA_ARGS__)
 
 typedef enum {
     _STDIOTYPE_STDIO = 0,   /**< leave intact */
@@ -62,7 +54,6 @@ pid_t _native_pid;
 pid_t _native_id;
 unsigned _native_rng_seed = 0;
 int _native_rng_mode = 0;
-const char *_native_unix_socket_path = NULL;
 
 #ifdef MODULE_NETDEV_TAP
 #include "netdev_tap_params.h"
@@ -120,9 +111,11 @@ static const char short_opts[] = ":hi:s:deEoc:"
     "";
 
 #if __GLIBC__
-static const bool _is_glibc = true;
+/* glibc and Apple's libSystem pass argc, argv, and envp to init_fini handlers */
+# define _HAVE_INIT_FINIT_PROGRAM_ARGUMENTS 1
 #else
-static const bool _is_glibc = false;
+/* otherwise, not guaranteed */
+# define _HAVE_INIT_FINIT_PROGRAM_ARGUMENTS 0
 #endif
 
 static const struct option long_opts[] = {
@@ -161,7 +154,7 @@ static const struct option long_opts[] = {
 /**
  * @brief   initialize _native_null_in_pipe to allow for reading from stdin
  *
- * @param[in] stdiotype _STDIOTYPE_STDIO to to just initialize pipe, any other
+ * @param[in] stdintype _STDIOTYPE_STDIO to to just initialize pipe, any other
  *                      value to also redirect stdin to that pipe
  */
 void _native_input(_stdiotype_t stdintype)
@@ -255,7 +248,7 @@ void daemonize(void)
 /**
  * Remove any -d options from an argument vector.
  *
- * @param[in][out]  argv    an argument vector
+ * @param[in,out]   argv    an argument vector
  */
 static void filter_daemonize_argv(char **argv)
 {
@@ -469,13 +462,11 @@ static void _reset_handler(void)
 __attribute__((constructor)) static void startup(int argc, char **argv, char **envp)
 {
     _native_init_syscalls();
-    /* initialize stdio as early as possible */
-    early_init();
 
     /* Passing argc, argv, and envp to init_fini handlers is a glibc
      * extension. If we are not running glibc, we parse /proc/self/cmdline
      * to populate argc and argv by hand */
-    if (!_is_glibc) {
+    if (!_HAVE_INIT_FINIT_PROGRAM_ARGUMENTS) {
         const size_t bufsize = 4096;
         const size_t argc_max = 32;
         size_t cmdlen = 0;
@@ -513,6 +504,11 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
         }
         expect((size_t)argc < argc_max);
         argv = realloc(argv, sizeof(char *) * (argc + 1));
+    } else {
+        /* must be */
+        assert(argc > 0);
+        assert(argv);
+        assert(argv[0]);
     }
 
     _native_argv = argv;
@@ -689,24 +685,24 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
      */
     init_func_t *init_array_ptr = &__init_array_start;
     DEBUG("__init_array_start: %p\n", (void *)init_array_ptr);
-    while (init_array_ptr != &__init_array_end) {
+    while (init_array_ptr < &__init_array_end) {
         /* Skip everything which has already been run */
         if ((*init_array_ptr) == startup) {
             /* Found ourselves, move on to calling the rest of the constructors */
-            DEBUG("%18p - myself\n", (void *)init_array_ptr);
+            DEBUG_STARTUP("%18p - myself\n", (void *)init_array_ptr);
             ++init_array_ptr;
             break;
         }
-        DEBUG("%18p - skip\n", (void *)init_array_ptr);
+        DEBUG_STARTUP("%18p - skip\n", (void *)init_array_ptr);
         ++init_array_ptr;
     }
-    while (init_array_ptr != &__init_array_end) {
+    while (init_array_ptr < &__init_array_end) {
         /* call all remaining constructors */
-        DEBUG("%18p - call\n", (void *)init_array_ptr);
+        DEBUG_STARTUP("%18p - call\n", (void *)init_array_ptr);
         (*init_array_ptr)(argc, argv, envp);
         ++init_array_ptr;
     }
-    DEBUG("done, __init_array_end: %p\n", (void *)init_array_ptr);
+    DEBUG_STARTUP("done, __init_array_end: %p\n", (void *)init_array_ptr);
 
     native_cpu_init();
     native_interrupt_init();
@@ -727,7 +723,10 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
     periph_init();
     board_init();
 
-    register_interrupt(SIGUSR1, _reset_handler);
+    native_register_interrupt(SIGUSR1, _reset_handler);
+
+    /* initialize stdio after signal setup */
+    early_init();
 
     puts("RIOT native hardware initialization complete.\n");
     irq_enable();

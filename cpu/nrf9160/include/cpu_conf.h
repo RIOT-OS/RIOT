@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021 Mesotic SAS
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Mesotic SAS
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup        cpu_nrf9160 Nordic nRF9160 MCU
@@ -18,9 +17,6 @@
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  *
  */
-
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
 
 #include "vendor/nrf9160.h"
 #include "vendor/nrf9160_bitfields.h"
@@ -61,5 +57,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CPU_CONF_H */
 /** @} */

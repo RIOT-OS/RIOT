@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     net_gnrc_rpl
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Eric Engel <eric.engel@fu-berlin.de>
  */
-
-#ifndef OF0_H
-#define OF0_H
 
 #include "net/gnrc/rpl/structs.h"
 
@@ -37,7 +36,6 @@ gnrc_rpl_of_t *gnrc_rpl_get_of0(void);
 }
 #endif
 
-#endif /* OF0_H */
 /**
  * @}
  */

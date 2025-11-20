@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_periph_eeprom EEPROM driver
  * @ingroup     drivers_periph
@@ -18,9 +20,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  */
-
-#ifndef PERIPH_EEPROM_H
-#define PERIPH_EEPROM_H
 
 #include <stdint.h>
 
@@ -120,5 +119,4 @@ size_t eeprom_erase(void);
 }
 #endif
 
-#endif /* PERIPH_EEPROM_H */
 /** @} */

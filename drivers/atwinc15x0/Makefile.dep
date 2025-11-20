@@ -1,6 +1,6 @@
 USEMODULE += netdev_eth
 USEMODULE += ztimer_msec
-USEMODULE += netdev_legacy_api
+USEMODULE += netdev_new_api
 
 ifeq (,$(filter atwinc15x0_dynamic_%,$(USEMODULE)))
   # use static connect by default when no dynamic module is loaded
@@ -17,10 +17,3 @@ USEPKG += driver_atwinc15x0
 FEATURES_REQUIRED += periph_gpio
 FEATURES_REQUIRED += periph_gpio_irq
 FEATURES_REQUIRED += periph_spi
-
-# esp8266 and esp32 vendor code and atwinc15x0 both define conflicting
-# spi_flash_{read, write} functions.
-# esp8266 and esp32 already have build-in WiFi, so it's unlikely to ever
-# use this driver - just blacklist the architecture.
-FEATURES_BLACKLIST += arch_esp8266
-FEATURES_BLACKLIST += arch_esp32

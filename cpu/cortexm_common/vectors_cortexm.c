@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -197,12 +194,15 @@ void reset_handler_default(void)
     dbgpin_init();
 #endif
 
+#if !DISABLE_CPU_INIT
     /* initialize the CPU */
     extern void cpu_init(void);
     cpu_init();
-
-    /* initialize the board (which also initiates CPU initialization) */
+#endif
+#if !DISABLE_BOARD_INIT
+    /* initialize the board */
     board_init();
+#endif
 
 #if MODULE_NEWLIB || MODULE_PICOLIBC
     /* initialize std-c library (this must be done after board_init) */

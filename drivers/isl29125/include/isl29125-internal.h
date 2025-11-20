@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_isl29125
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
-
-#ifndef ISL29125_INTERNAL_H
-#define ISL29125_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -89,5 +88,4 @@ extern "C" {
 }
 #endif
 
-#endif /* ISL29125_INTERNAL_H */
 /** @} */

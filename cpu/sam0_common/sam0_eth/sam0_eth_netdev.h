@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2020 Dylan Laduranty
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Dylan Laduranty
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup     cpu_sam0_common_eth sam0 Ethernet peripheral
@@ -16,9 +15,6 @@
  *
  * @author      Dylan Laduranty <dylanladuranty@gmail.com>
  */
-
-#ifndef SAM0_ETH_NETDEV_H
-#define SAM0_ETH_NETDEV_H
 
 #include <stdbool.h>
 
@@ -53,5 +49,4 @@ void sam0_eth_setup(netdev_t* dev);
 }
 #endif
 
-#endif /* SAM0_ETH_NETDEV_H */
 /** @} */

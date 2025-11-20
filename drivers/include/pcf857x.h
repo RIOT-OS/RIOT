@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_pcf857x PCF857X I2C I/O expanders
  * @ingroup     drivers_misc
@@ -236,9 +238,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @file
  */
-
-#ifndef PCF857X_H
-#define PCF857X_H
 
 #ifdef __cplusplus
 extern "C"
@@ -601,5 +600,4 @@ void pcf857x_gpio_irq_disable(pcf857x_t *dev, uint8_t pin);
 }
 #endif
 
-#endif /* PCF857X_H */
 /** @} */

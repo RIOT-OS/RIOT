@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_checksum_fletcher16 Fletcher16
  * @ingroup     sys_checksum
@@ -16,9 +18,6 @@
  * @file
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef CHECKSUM_FLETCHER16_H
-#define CHECKSUM_FLETCHER16_H
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -80,7 +79,5 @@ uint16_t fletcher16_finish(fletcher16_ctx_t *ctx);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* CHECKSUM_FLETCHER16_H */
 
 /** @} */

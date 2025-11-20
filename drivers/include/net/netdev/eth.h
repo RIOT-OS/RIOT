@@ -6,6 +6,8 @@
  * more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_netdev_eth Ethernet drivers
  * @ingroup     drivers_netdev_api
@@ -16,9 +18,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef NET_NETDEV_ETH_H
-#define NET_NETDEV_ETH_H
 
 #include <stdint.h>
 
@@ -82,5 +81,4 @@ int netdev_eth_set(netdev_t *dev, netopt_t opt, const void *value, size_t value_
 }
 #endif
 
-#endif /* NET_NETDEV_ETH_H */
 /** @} */

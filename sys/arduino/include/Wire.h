@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_arduino
  * @brief       Wrapper to keep source code compatibility for Wire.h
@@ -13,9 +15,6 @@
  * @file
  * @{
  */
-
-#ifndef WIRE_H
-#define WIRE_H
 
 #ifndef MODULE_PERIPH_I2C
 #error "No I2C support on your board"
@@ -33,5 +32,4 @@ extern "C" {
 }
 #endif
 
-#endif /* WIRE_H */
 /** @} */

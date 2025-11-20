@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -20,7 +17,7 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "hd44780.h"
 #include "hd44780_params.h"
 
@@ -38,11 +35,11 @@ int main(void)
     hd44780_home(&dev);
     /* write first line */
     hd44780_print(&dev, "Hello World ...");
-    xtimer_sleep(1);
+    ztimer_sleep(ZTIMER_SEC, 1);
     /* set cursor to second line and write */
     hd44780_set_cursor(&dev, 0, 1);
     hd44780_print(&dev, "   RIOT is here!");
-    xtimer_sleep(3);
+    ztimer_sleep(ZTIMER_SEC, 3);
     /* clear screen, reset cursor */
     hd44780_clear(&dev);
     hd44780_home(&dev);

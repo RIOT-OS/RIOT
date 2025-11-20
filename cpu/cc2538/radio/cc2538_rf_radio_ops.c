@@ -1,10 +1,6 @@
 /*
- * Copyright (C) 2020 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- *
+ * SPDX-FileCopyrightText: 2020 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -412,8 +408,10 @@ void cc2538_irq_handler(void)
 
     if (flags_f0 & RXPKTDONE) {
         handled_f0 |= RXPKTDONE;
-        /* CRC check */
-        uint8_t pkt_len = rfcore_peek_rx_fifo(0);
+        /* CRC_OK bit is located in the last byte of the packet.
+         * The radio masks the length byte before filling the FIFO with the
+         * corresponding number of bytes. */
+        uint8_t pkt_len = (rfcore_peek_rx_fifo(0) & CC2538_LENGTH_BYTE_MASK);
         if (rfcore_peek_rx_fifo(pkt_len) & CC2538_CRC_BIT_MASK) {
             /* Disable RX while the frame has not been processed */
             _disable_rx();
@@ -617,6 +615,7 @@ void cc2538_rf_hal_setup(ieee802154_dev_t *hal)
 
 static const ieee802154_radio_ops_t cc2538_rf_ops = {
     .caps = IEEE802154_CAP_24_GHZ
+          | IEEE802154_CAP_AUTO_ACK
           | IEEE802154_CAP_AUTO_CSMA
           | IEEE802154_CAP_IRQ_CRC_ERROR
           | IEEE802154_CAP_IRQ_TX_DONE

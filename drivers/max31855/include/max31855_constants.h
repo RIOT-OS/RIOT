@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_max31855
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef MAX31855_CONSTANTS_H
-#define MAX31855_CONSTANTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -169,5 +168,4 @@ extern "C" {
 }
 #endif
 
-#endif /* MAX31855_CONSTANTS_H */
 /** @} */

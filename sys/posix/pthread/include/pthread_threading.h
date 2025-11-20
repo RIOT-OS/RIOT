@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup pthread
  * @{
@@ -13,9 +15,6 @@
  * @brief   Thread creation features.
  * @note    Do not include this header file directly, but pthread.h.
  */
-
-#ifndef PTHREAD_THREADING_H
-#define PTHREAD_THREADING_H
 
 #include "kernel_defines.h"
 
@@ -53,7 +52,6 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
  *               Native threads must call sched_thread_exit().
  *               A pthread must not call sched_thread_exit().
  * @param[out]   retval   Return value, supplied to a joining thread.
- * @return       This function does not return.
  */
 void pthread_exit(void *retval) NORETURN;
 
@@ -106,8 +104,6 @@ static inline int pthread_equal(pthread_t thread1, pthread_t thread2)
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* PTHREAD_THREADING_H */
 
 /**
  * @}

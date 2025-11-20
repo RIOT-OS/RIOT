@@ -74,7 +74,7 @@ ifneq (,$(filter psa_asymmetric_ecc_ed25519,$(USEMODULE)))
     ifneq (,$(filter periph_ecc_ed25519,$(FEATURES_USED)))
       USEMODULE += psa_asymmetric_ecc_ed25519_backend_periph
     else
-      USEMODULE += psa_asymmetric_ecc_ed25519_backend_c25519
+      USEMODULE += psa_asymmetric_ecc_ed25519_backend_monocypher
     endif
   endif
 endif
@@ -83,6 +83,12 @@ ifneq (,$(filter psa_asymmetric_ecc_ed25519_backend_c25519,$(USEMODULE)))
   USEPKG += c25519
   USEMODULE += psa_c25519
   USEMODULE += psa_c25519_edsign
+endif
+
+ifneq (,$(filter psa_asymmetric_ecc_ed25519_backend_monocypher,$(USEMODULE)))
+  USEPKG += monocypher
+  USEMODULE += psa_monocypher
+  USEMODULE += psa_monocypher_ed25519
 endif
 
 ifneq (,$(filter psa_asymmetric_ecc_ed25519_backend_periph,$(USEMODULE)))
@@ -142,6 +148,75 @@ ifneq (,$(filter psa_cipher_aes_192_cbc_backend_riot,$(USEMODULE)))
   USEMODULE += psa_riot_cipher
   USEMODULE += psa_riot_cipher_aes_192_cbc
 endif
+
+# AEAD
+ifneq (,$(filter psa_aead,$(USEMODULE)))
+  USEMODULE += psa_key_management
+endif
+
+## AES-128-CCM
+ifneq (,$(filter psa_aead_aes_128_ccm,$(USEMODULE)))
+  ifeq (,$(filter psa_aead_aes_128_ccm_custom_backend,$(USEMODULE)))
+    FEATURES_OPTIONAL += periph_aead_aes_128_ccm
+    include $(RIOTMAKE)/features_check.inc.mk
+    # HACK: Due to kconfig migration, may cause problems
+    ifneq (,$(filter periph_aead_aes_128_ccm,$(FEATURES_USED)))
+      USEMODULE += psa_aead_aes_128_ccm_backend_periph
+    else
+      USEMODULE += psa_aead_aes_128_ccm_backend_cifra
+    endif
+  endif
+endif
+ifneq (,$(filter psa_aead_aes_128_ccm_backend_periph,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_aead_aes_128_ccm
+endif
+ifneq (,$(filter psa_aead_aes_128_ccm_backend_tinycrypt,$(USEMODULE)))
+  USEPKG += tinycrypt
+  USEMODULE += psa_tinycrypt
+  USEMODULE += psa_tinycrypt_aes_ccm
+endif
+
+## AES-192-CCM
+ifneq (,$(filter psa_aead_aes_192_ccm,$(USEMODULE)))
+  ifeq (,$(filter psa_aead_aes_192_ccm_custom_backend,$(USEMODULE)))
+    FEATURES_OPTIONAL += periph_aead_aes_192_ccm
+    include $(RIOTMAKE)/features_check.inc.mk
+    # HACK: Due to kconfig migration, may cause problems
+    ifneq (,$(filter periph_aead_aes_192_ccm,$(FEATURES_USED)))
+      USEMODULE += psa_aead_aes_192_ccm_backend_periph
+    else
+      USEMODULE += psa_aead_aes_192_ccm_backend_cifra
+    endif
+  endif
+endif
+ifneq (,$(filter psa_aead_aes_192_ccm_backend_periph,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_aead_aes_192_ccm
+endif
+
+## AES-256-CCM
+ifneq (,$(filter psa_aead_aes_256_ccm,$(USEMODULE)))
+  ifeq (,$(filter psa_aead_aes_256_ccm_custom_backend,$(USEMODULE)))
+    FEATURES_OPTIONAL += periph_aead_aes_256_ccm
+    include $(RIOTMAKE)/features_check.inc.mk
+    # HACK: Due to kconfig migration, may cause problems
+    ifneq (,$(filter periph_aead_aes_256_ccm,$(FEATURES_USED)))
+      USEMODULE += psa_aead_aes_256_ccm_backend_periph
+    else
+      USEMODULE += psa_aead_aes_256_ccm_backend_cifra
+    endif
+  endif
+endif
+ifneq (,$(filter psa_aead_aes_256_ccm_backend_periph,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_aead_aes_256_ccm
+endif
+
+## Cifra supports all of them
+ifneq (,$(filter psa_aead_aes_%_ccm_backend_cifra,$(USEMODULE)))
+  USEPKG += cifra
+  USEMODULE += psa_cifra
+  USEMODULE += psa_cifra_aes_ccm
+endif
+
 
 ## ChaCha20
 ifneq (,$(filter psa_cipher_chacha20,$(USEMODULE)))
@@ -432,6 +507,9 @@ endif
 
 ## HMAC SHA-256
 ifneq (,$(filter psa_mac_hmac_sha_256,$(USEMODULE)))
+  # Keys longer than PSA_HASH_BLOCK_LENGTH(PSA_ALG_SHA_256) need to be hashed first
+  USEMODULE += psa_hash
+  USEMODULE += psa_hash_sha_256
   ifeq (,$(filter psa_mac_hmac_sha_256_custom_backend,$(USEMODULE)))
     FEATURES_OPTIONAL += periph_hmac_sha_256
     include $(RIOTMAKE)/features_check.inc.mk

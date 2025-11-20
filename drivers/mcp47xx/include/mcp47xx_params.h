@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_mcp47xx
  * @brief       Default configuration for Microchip MCP47xx DAC with I2C interface
@@ -13,9 +15,6 @@
  * @file
  * @{
  */
-
-#ifndef MCP47XX_PARAMS_H
-#define MCP47XX_PARAMS_H
 
 #include "board.h"
 #include "mcp47xx.h"
@@ -105,5 +104,4 @@ static const  mcp47xx_saul_dac_params_t mcp47xx_saul_dac_params[] =
 }
 #endif
 
-#endif /* MCP47XX_PARAMS_H */
 /** @} */

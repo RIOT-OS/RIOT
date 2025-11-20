@@ -22,6 +22,7 @@
 #include <assert.h>
 #include <stdatomic.h>
 
+#include "bit.h"
 #include "log.h"
 #include "random.h"
 #include "thread_flags.h"

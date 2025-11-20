@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2018 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_stm32l476g-disco
@@ -15,9 +14,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 /* Add specific clock configuration (HSE, LSE) for this board here */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -129,9 +125,52 @@ static const adc_conf_t adc_config[] = {
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
+/**
+ * @name    PWM configuration
+ * @{
+ *
+ * To find appriopate device and channel find in the MCU datasheet table
+ * concerning "Alternate function AF0 to AF7" a text similar to TIM[X]_CH[Y],
+ * where:
+ * TIM[X] - is device,
+ * [Y] - describes used channel (indexed from 0), for example TIM2_CH1 is
+ * channel 0 in configuration structure (cc_chan - field),
+ * Port column in the table describes connected port.
+ *
+ * For stm32l476g-disco this information is in the MCU datasheet,
+ * Table 17, page 88.
+ *
+ * Remark!
+ * PMW device 0 overlaps with ADC.
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIM2,
+        .rcc_mask = RCC_APB1ENR1_TIM2EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_A, 5), .cc_chan = 0},
+                      { .pin = GPIO_PIN(PORT_A, 1), .cc_chan = 1},
+                      { .pin = GPIO_PIN(PORT_A, 2), .cc_chan = 2},
+                      { .pin = GPIO_PIN(PORT_A, 3), .cc_chan = 3} },
+        .af       = GPIO_AF1,
+        .bus      = APB1
+    },
+    {
+        .dev      = TIM1,
+        .rcc_mask = RCC_APB2ENR_TIM1EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_E, 11), .cc_chan = 1},
+                      { .pin = GPIO_PIN(PORT_E, 13), .cc_chan = 2},
+                      { .pin = GPIO_PIN(PORT_E, 14), .cc_chan = 3},
+                      { .pin = GPIO_UNDEF,           .cc_chan = 0} },
+        .af       = GPIO_AF1,
+        .bus      = APB2
+    }
+};
+
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

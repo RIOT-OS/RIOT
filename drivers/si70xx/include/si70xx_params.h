@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_si70xx
  *
@@ -17,9 +19,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef SI70XX_PARAMS_H
-#define SI70XX_PARAMS_H
 
 #include "board.h"
 #include "si70xx.h"
@@ -70,5 +69,4 @@ static const saul_reg_info_t si70xx_saul_info[] =
 }
 #endif
 
-#endif /* SI70XX_PARAMS_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_dfplayer
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef DFPLAYER_CONSTANTS_H
-#define DFPLAYER_CONSTANTS_H
 
 #include <stdint.h>
 #include <periph/gpio.h>
@@ -200,5 +199,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif /* DFPLAYER_CONSTANTS_H */
 /** @} */

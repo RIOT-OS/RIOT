@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2016-2018 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016-2018 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup    boards_common_nrf52xxxdk NRF52 DK common
@@ -17,9 +16,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  */
-
-#ifndef PERIPH_CONF_COMMON_H
-#define PERIPH_CONF_COMMON_H
 
 #include "periph_cpu.h"
 #include "cfg_clock_32_1.h"
@@ -73,5 +69,4 @@ static const pwm_conf_t pwm_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_COMMON_H */
 /** @} */

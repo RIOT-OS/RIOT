@@ -5,6 +5,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /**
  * @defgroup    sys_suit_transport_vfs SUIT secure firmware OTA VFS transport
  * @ingroup     sys_suit
@@ -21,9 +24,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  *
  */
-
-#ifndef SUIT_TRANSPORT_VFS_H
-#define SUIT_TRANSPORT_VFS_H
 
 #include "net/nanocoap.h"
 #include "suit.h"
@@ -48,5 +48,4 @@ int suit_transport_vfs_fetch(const suit_manifest_t *manifest, coap_blockwise_cb_
 }
 #endif
 
-#endif /* SUIT_TRANSPORT_VFS_H */
 /** @} */

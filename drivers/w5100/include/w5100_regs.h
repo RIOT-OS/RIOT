@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_w5100
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef W5100_REGS_H
-#define W5100_REGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -139,5 +138,4 @@ extern "C" {
 }
 #endif
 
-#endif /* W5100_REGS_H */
 /** @} */

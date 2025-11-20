@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_auto_init
  *
@@ -15,9 +17,6 @@
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
-
-#ifndef AUTO_INIT_PRIORITIES_H
-#define AUTO_INIT_PRIORITIES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -400,5 +399,4 @@ extern "C" {
 }
 #endif
 
-#endif /* AUTO_INIT_PRIORITIES_H */
 /** @} */

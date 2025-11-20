@@ -1,23 +1,20 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+#pragma once
+
+/**
+ * @addtogroup drivers_netdev
+ * @{
  */
 
 /**
- * @ingroup     drivers_netdev
- * @brief
- * @{
- *
  * @file
- * @brief       Default configuration for the netdev_tap driver
- *
- * @author  Martine Lenders <m.lenders@fu-berlin.de>
+ * @brief  Default configuration for the netdev_tap driver
+ * @author Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NETDEV_TAP_PARAMS_H
-#define NETDEV_TAP_PARAMS_H
 
 #include "netdev_tap.h"
 
@@ -31,8 +28,8 @@ extern "C" {
  * @note    This was decided to only be configurable on compile-time to be
  *          more similar to actual boards
  */
-#ifndef NETDEV_TAP_MAX
-#define NETDEV_TAP_MAX              (1)
+#if !defined(NETDEV_TAP_MAX) || defined(DOXYGEN)
+#  define NETDEV_TAP_MAX              (1)
 #endif
 
 /**
@@ -46,5 +43,4 @@ extern netdev_tap_params_t netdev_tap_params[NETDEV_TAP_MAX];
 }
 #endif
 
-#endif /* NETDEV_TAP_PARAMS_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup drivers_mfrc522
  * @brief   Register definitions for the MFRC522 controller
@@ -18,9 +20,6 @@
  * @file
  * @{
  */
-
-#ifndef MFRC522_REGS_H
-#define MFRC522_REGS_H
 
 #include "bitarithm.h"
 
@@ -200,8 +199,6 @@ typedef enum {
  */
 #define MFRC522_BITMASK_COMMAND_POWER_DOWN  0x0F
 
-
-
 /**
  * @brief 0 = Signal on pin IRQ is equal to the IRq bit; in combination with the
  *            DivIEnReg register’s IRqPushPull bit, the default value of logic 1
@@ -254,8 +251,6 @@ typedef enum {
  */
 #define MFRC522_BIT_COML_EN_TIMER_I_EN      BIT0
 
-
-
 /**
  * @brief 0 = Pin IRQ is an open-drain output pin
  *        1 = Pin IRQ is a standard CMOS output pin
@@ -272,8 +267,6 @@ typedef enum {
  *        register’s CRCIRq bit, to be propagated to pin IRQ
  */
 #define MFRC522_BIT_DIVL_EN_CRC_I_EN        BIT2
-
-
 
 /**
  * @brief 0 = Indicates that the marked bits in the ComIrqReg register are cleared
@@ -329,8 +322,6 @@ typedef enum {
  */
 #define MFRC522_BIT_COM_IRQ_TIMER_IRQ       BIT0
 
-
-
 /**
  * @brief 0 = Indicates that the marked bits in the DivIrqReg register are cleared
  *        1 = Indicates that the marked bits in the DivIrqReg register are set
@@ -347,8 +338,6 @@ typedef enum {
  * @brief 1 = The CalcCRC command is active and all data is processed
  */
 #define MFRC522_BIT_DIV_IRQ_CRC_IRQ         BIT2
-
-
 
 /**
  * @brief 1 = Data is written into the FIFO buffer by the host during the
@@ -401,8 +390,6 @@ typedef enum {
  */
 #define MFRC522_BIT_ERROR_PROTOCOL_ERR  BIT0
 
-
-
 /**
  * @brief 1 = The CRC result is zero; for data transmission and reception, the
  *            CRCOk bit is undefined: use the ErrorReg register’s CRCErr bit;
@@ -452,8 +439,6 @@ typedef enum {
  */
 #define MFRC522_BIT_STATUS_1_LO_ALERT   BIT0
 
-
-
 /**
  * @brief 1 = Clears the temperature error if the temperature is below the alarm
  *            limit of 125 °C
@@ -496,8 +481,6 @@ typedef enum {
  */
 #define MFRC522_BITMASK_STATUS_2_MODEM_STATE_2  0x07
 
-
-
 /**
  * @brief Data input and output port for the internal 64-byte FIFO buffer;
  *        FIFO buffer acts as parallel in/parallel out converter for all serial
@@ -506,8 +489,6 @@ typedef enum {
  *        MFRC522_REG_FIFO_DATA[7:0]
  */
 #define MFRC522_BITMASK_FIFO_DATA   0xFF
-
-
 
 /**
  * @brief 1 = Immediately clears the internal FIFO buffer’s read and write
@@ -525,8 +506,6 @@ typedef enum {
  */
 #define MFRC522_BITMASK_FIFO_LEVEL_FIFO_LEVEL  0x7F
 
-
-
 /**
  * @brief Defines a warning level to indicate a FIFO buffer overflow or underflow:
  *        Status1Reg register’s HiAlert bit is set to logic 1 if the remaining
@@ -540,8 +519,6 @@ typedef enum {
  *        MFRC522_REG_WATER_LEVEL[5:0]
  */
 #define MFRC522_BITMASK_WATER_LEVEL_WATER_LEVEL     0x3F
-
-
 
 /**
  * @brief 1 = Timer stops immediately;
@@ -562,8 +539,6 @@ typedef enum {
  *        MFRC522_REG_CONTROL[2:0]
  */
 #define MFRC522_BITMASK_CONTROL_RX_LAST_BITS    0x07
-
-
 
 /**
  * @brief Starts the transmission of data; only valid in combination with the
@@ -598,8 +573,6 @@ typedef enum {
  */
 #define MFRC522_BIT_BIT_FRAMING_TX_LAST_BITS    0x07
 
-
-
 /**
  * @brief 0 = All received bits will be cleared after a collision; only used
  *            during bitwise anticollision at 106 kBd, otherwise it is set to logic 1
@@ -625,8 +598,6 @@ typedef enum {
  *        MFRC522_REG_COLL[4:0]
  */
 #define MFRC522_BITMASK_COLL_COLL_POS           0x1F
-
-
 
 /**
  * @brief 1 = CRC coprocessor calculates the CRC with MSB first; in the
@@ -665,8 +636,6 @@ typedef enum {
  */
 #define MFRC522_BITMASK_MODE_CRC_PRESET     0x03
 
-
-
 /**
  * @brief 1 = Enables CRC generation during data transmission; Remark: can only
  *            be set to logic 0 at 106 kBd
@@ -690,8 +659,6 @@ typedef enum {
  * @brief 1 = Modulation of transmitted data is inverted
  */
 #define MFRC522_BIT_TX_MODE_INV_MOD         BIT3
-
-
 
 /**
  * @brief 1 = Enables the CRC calculation during reception; Remark: can only be
@@ -735,8 +702,6 @@ typedef enum {
  */
 #define MFRC522_BIT_RX_MODE_RX_MULTIPLE     BIT2
 
-
-
 /**
  * @brief 1 = Output signal on pin TX2 inverted when driver TX2 is enabled
  */
@@ -776,15 +741,11 @@ typedef enum {
  */
 #define MFRC522_BIT_TX_CONTROL_TX1_RF_EN        BIT0
 
-
-
 /**
  * @brief 1 = Forces a 100 % ASK modulation independent of the ModGsPReg
  *            register setting
  */
 #define MFRC522_BIT_TX_ASK_FORCE_100_ASK    BIT6
-
-
 
 /**
  * @brief Selects the input of drivers TX1 and TX2
@@ -820,8 +781,6 @@ typedef enum {
  */
 #define MFRC522_BITMASK_TX_SEL_MF_OUT_SEL   0x0F
 
-
-
 /**
  * @brief Selects the input of the contactless UART
  *
@@ -846,8 +805,6 @@ typedef enum {
  */
 #define MFRC522_BITMASK_RX_SEL_RX_WAIT      0x3F
 
-
-
 /**
  * @brief Defines the minimum signal strength at the decoder input that will be
  *        accepted; if the signal strength is below this level it is not
@@ -866,8 +823,6 @@ typedef enum {
  *        MFRC522_REG_RX_THRESHHOLD[2:0]
  */
 #define MFRC522_BITMASK_RX_THRESHHOLD_COLL_LEVEL    0x07
-
-
 
 /**
  * @brief Defines the use of I and Q channel during reception; Remark: the FixIQ
@@ -917,8 +872,6 @@ typedef enum {
  */
 #define MFRC522_BITMASK_DEMOD_TAU_SYNC      0x03
 
-
-
 /**
  * @brief Defines the additional response time; 7 bits are added to the value of
  *        the register bit by default
@@ -927,16 +880,12 @@ typedef enum {
  */
 #define MFRC522_BITMASK_MF_TX_TX_WAIT   0x03
 
-
-
 /**
  * @brief 1 = Generation of the parity bit for transmission and the parity check
  *            for receiving is switched off; the received parity bit is handled
  *            like a data bit
  */
 #define MFRC522_BIT_MF_RX_PARITY_DISABLE    BIT4
-
-
 
 /**
  * @brief Factor BR_T0 adjusts the transfer speed: for description, see Section
@@ -953,8 +902,6 @@ typedef enum {
  *        MFRC522_REG_SERIAL_SPEED[4:0]
  */
 #define MFRC522_BITMASK_SERIAL_SPEED_BR_T1  0x1F
-
-
 
 /**
  * @brief Shows the value of the CRCResultReg register’s most significant byte;
@@ -973,8 +920,6 @@ typedef enum {
  */
 #define MFRC522_BITMASK_CRC_RESULT_LSB_CRC_RESULT_LSB   0xFF
 
-
-
 /**
  * @brief Defines the width of the Miller modulation as multiples of the carrier
  *        frequency (ModWidth + 1 / f_clk); the maximum value is half the bit
@@ -983,8 +928,6 @@ typedef enum {
  *        MFRC522_REG_MOD_WIDTH[7:0]
  */
 #define MFRC522_BITMASK_MOD_WIDTH   0xFF
-
-
 
 /**
  * @brief Defines the receiver’s signal voltage gain factor:
@@ -1003,7 +946,6 @@ typedef enum {
  * @see mfrc522_pcd_rx_gain
  */
 #define MFRC522_BITMASK_RF_CFG_RX_GAIN  0x70
-
 
 /**
  * @brief Defines the conductance of the output n-driver during periods without
@@ -1028,8 +970,6 @@ typedef enum {
  */
 #define MFRC522_BITMASK_GS_N_MOD_GS_N   0x0F
 
-
-
 /**
  * @brief Defines the conductance of the p-driver output which can be used to
  *        regulate the output power and subsequently current consumption and
@@ -1039,8 +979,6 @@ typedef enum {
  *        MFRC522_REG_CW_GS_P[5:0]
  */
 #define MFRC522_BITMASK_CW_GS_P_CW_GS_P     0x3F
-
-
 
 /**
  * @brief Defines the conductance of the p-driver output during modulation which
@@ -1052,8 +990,6 @@ typedef enum {
  *        MFRC522_REG_MOD_GS_P[5:0]
  */
 #define MFRC522_BITMASK_MOD_GS_P_MOD_GS_P   0x3F
-
-
 
 /**
  * @brief 0 = Indicates that the timer is not influenced by the protocol
@@ -1124,8 +1060,6 @@ typedef enum {
  */
 #define MFRC522_BITMASK_T_PRESCALER_T_PRESCALER_LO  0xFF
 
-
-
 /**
  * @brief Defines the higher 8 bits of the 16-bit timer reload value; on a start
  *        event, the timer loads the timer reload value; changing this register
@@ -1143,8 +1077,6 @@ typedef enum {
  *        MFRC522_REG_T_RELOAD_LSB[7:0]
  */
 #define MFRC522_BITMASK_T_RELOAD_LSB_T_RELOAD_VAL_LO    0xFF
-
-
 
 /**
  * @brief Timer value higher 8 bits
@@ -1164,5 +1096,4 @@ typedef enum {
 }
 #endif
 
-#endif /* MFRC522_REGS_H */
 /** @} */

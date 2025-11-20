@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_congure_config  CongURE compile time configuration
  * @ingroup     sys_congure
@@ -17,8 +19,6 @@
  *
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef CONGURE_CONFIG_H
-#define CONGURE_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,5 +48,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CONGURE_CONFIG_H */
 /** @} */

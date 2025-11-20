@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_seq
  * @{
@@ -18,9 +20,6 @@
  *
  * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
  */
-
-#ifndef SEQ_H
-#define SEQ_H
 
 #include <stdint.h>
 #include <errno.h>
@@ -391,4 +390,3 @@ static inline int seq64_compare(seq64_t s1, seq64_t s2)
 #endif
 
 /** @} */
-#endif /* SEQ_H */

@@ -1,0 +1,2 @@
+USEMODULE += isrpipe
+USEMODULE += isrpipe_read_timeout

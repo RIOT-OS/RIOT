@@ -7,6 +7,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_encx24j600
  * @{
@@ -16,9 +18,6 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-
-#ifndef ENCX24J600_DEFINES_H
-#define ENCX24J600_DEFINES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -203,5 +202,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif /* ENCX24J600_DEFINES_H */
 /** @} */

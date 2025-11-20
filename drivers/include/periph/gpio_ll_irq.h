@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_periph_gpio_ll_irq  IRQ Support in Peripheral GPIO Low-Level API
  * @ingroup     drivers_periph_gpio_ll
@@ -42,9 +44,6 @@
  *              as of now.
  */
 
-#ifndef PERIPH_GPIO_LL_IRQ_H
-#define PERIPH_GPIO_LL_IRQ_H
-
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -58,6 +57,16 @@ extern "C" {
 #if !defined(HAVE_GPIO_IRQ_TRIG_T) || defined(DOXYGEN)
 /**
  * @brief   Definition of possible IRQ triggers
+ *
+ * The following features indicate support:
+ *
+ * | Trigger                        | Feature provided if trigger is supported  |
+ * |:------------------------------ |:----------------------------------------- |
+ * | `GPIO_TRIGGER_EDGE_FALLING`    | Always available                          |
+ * | `GPIO_TRIGGER_EDGE_RISING`     | Always available                          |
+ * | `GPIO_TRIGGER_EDGE_BOTH`       | `periph_gpio_ll_irq_edge_triggered_both`  |
+ * | `GPIO_TRIGGER_LEVEL_HIGH`      | `periph_gpio_ll_irq_level_triggered_high` |
+ * | `GPIO_TRIGGER_LEVEL_LOW`       | `periph_gpio_ll_irq_level_triggered_low`  |
  */
 typedef enum {
     GPIO_TRIGGER_EDGE_FALLING,  /**< edge triggered IRQ on falling flanks only
@@ -167,5 +176,4 @@ void gpio_ll_irq_off(gpio_port_t port, uint8_t pin);
 }
 #endif
 
-#endif /* PERIPH_GPIO_LL_IRQ_H */
 /** @} */

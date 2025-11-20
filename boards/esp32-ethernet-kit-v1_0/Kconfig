@@ -1,9 +1,6 @@
-# Copyright (c) 2020 HAW Hamburg
-# Copyright (c) 2020 Google LLC
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2020 HAW Hamburg
+# SPDX-FileCopyrightText: 2020 Google LLC
+# SPDX-License-Identifier: LGPL-2.1-only
 
 config BOARD
     default "esp32-ethernet-kit-v1_0" if BOARD_ESP32_ETHERNET_KIT_V1_0

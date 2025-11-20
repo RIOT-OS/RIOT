@@ -9,7 +9,7 @@ especially true since this list is used by the CI to check which boards to build
 Right now, only a single test case is added: It will run the logic behind
 `make info-boards-supported` without any modules used other than the default modules and subtracts
 the result from the list of all available boards. The resulting difference is the set of boards
-which will never be build by the CI - not even for `examples/hello-world`. If this result is empty,
+which will never be build by the CI - not even for `examples/basic/hello-world`. If this result is empty,
 the test succeeds. Otherwise the list of never build boards will be printed and the test fails.
 
 It is intended that some more advanced unit tests will be added later on.

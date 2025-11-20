@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2018 Eistec AB
- * Copyright (C) 2018 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Eistec AB
+ * SPDX-FileCopyrightText: 2018 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup   boards_phynode-kw41z
@@ -17,9 +16,6 @@
  * @author    Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author    José Alamos <jose.alamos@haw-hamburg.de>
  */
-
-#ifndef GPIO_PARAMS_H
-#define GPIO_PARAMS_H
 
 #include "board.h"
 #include "saul/periph.h"
@@ -79,5 +75,4 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 }
 #endif
 
-#endif /* GPIO_PARAMS_H */
 /** @} */

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_gnrc_lorawan GNRC LoRaWAN
  * @ingroup     net_gnrc
@@ -20,8 +22,6 @@
  * @author  José Ignacio Alamos <jose.alamos@haw-hamburg.de>
  * @author  Francisco Molina <femolina@uc.cl>
  */
-#ifndef NET_GNRC_LORAWAN_H
-#define NET_GNRC_LORAWAN_H
 
 #include "gnrc_lorawan_internal.h"
 #include "assert.h"
@@ -340,5 +340,4 @@ static inline void gnrc_lorawan_set_uncnf_redundancy(gnrc_lorawan_t *mac,
 }
 #endif
 
-#endif /* NET_GNRC_LORAWAN_H */
 /** @} */

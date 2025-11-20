@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_at86rf2xx
  * @{
@@ -16,9 +18,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef AT86RF2XX_PARAMS_H
-#define AT86RF2XX_PARAMS_H
 
 #include "at86rf2xx.h"
 #include "board.h"
@@ -105,5 +104,4 @@ static const at86rf2xx_params_t at86rf2xx_params[] =
 }
 #endif
 
-#endif /* AT86RF2XX_PARAMS_H */
 /** @} */

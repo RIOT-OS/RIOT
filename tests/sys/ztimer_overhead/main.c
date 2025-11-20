@@ -67,9 +67,9 @@ int main(void)
     ZTIMER_USEC->adjust_sleep = 0;
     printf("ZTIMER_USEC auto_adjust params cleared\n");
 
-    printf("zitmer_overhead_set...\n");
+    printf("ztimer_overhead_set...\n");
     ZTIMER_USEC->adjust_set = _ztimer_usec_overhead(SAMPLES, BASE, ztimer_overhead_set);
-    printf("zitmer_overhead_sleep...\n");
+    printf("ztimer_overhead_sleep...\n");
     ZTIMER_USEC->adjust_sleep = _ztimer_usec_overhead(SAMPLES, BASE, ztimer_overhead_sleep);
     printf("ZTIMER_USEC adjust params for %s:\n", RIOT_BOARD);
     printf("    CONFIG_ZTIMER_USEC_ADJUST_SET    %" PRIi16 "\n", ZTIMER_USEC->adjust_set);

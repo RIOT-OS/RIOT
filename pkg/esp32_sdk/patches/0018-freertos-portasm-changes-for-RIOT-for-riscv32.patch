@@ -1,0 +1,77 @@
+From 0065ed08bb49264552b1f966196736872e27eba2 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sat, 1 Mar 2025 18:28:29 +0100
+Subject: [PATCH 18/28] freertos/portasm: changes for RIOT for riscv32
+
+---
+ .../FreeRTOS-Kernel/portable/riscv/portasm.S  | 33 ++++++++++++++++---
+ 1 file changed, 28 insertions(+), 5 deletions(-)
+
+diff --git a/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S b/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S
+index 5f32c613a0..f6ba4eb72b 100644
+--- a/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S
++++ b/components/freertos/FreeRTOS-Kernel/portable/riscv/portasm.S
+@@ -4,17 +4,30 @@
+  * SPDX-License-Identifier: Apache-2.0
+  */
+ #include "sdkconfig.h"
+-#include "portmacro.h"
+-#include "freertos/FreeRTOSConfig.h"
+ #include "soc/soc_caps.h"
+-#include "riscv/rvruntime-frames.h"
+-#include "riscv/csr_hwlp.h"
+-#include "riscv/csr_pie.h"
+ 
+     .extern pxCurrentTCBs
+ 
+ #if CONFIG_ESP_SYSTEM_HW_STACK_GUARD
+ #include "esp_private/hw_stack_guard.h"
++#endif
++
++#ifdef RIOT_VERSION
++#include "cpu_conf.h"
++
++#define port_uxInterruptNesting irq_interrupt_nesting
++#define port_xSchedulerRunning  sched_num_threads
++#define pxCurrentTCB            sched_active_thread
++#define pxCurrentTCBs           sched_active_thread
++#define vTaskSwitchContext      sched_run
++#define xPortSwitchFlag         sched_context_switch_request
++
++#define configISR_STACK_SIZE    ESP_ISR_STACKSIZE
++
++.extern sched_active_thread
++.extern sched_num_threads
++.extern sched_context_switch_request
++.extern irq_interrupt_nesting
+ #endif
+ 
+     .global port_uxInterruptNesting
+@@ -30,6 +43,14 @@
+     .global esp_hw_stack_guard_set_bounds
+ #endif /* CONFIG_ESP_SYSTEM_HW_STACK_GUARD */
+ 
++    .data
++    .align      16
++    .global     port_IntStack
++port_IntStack:
++    .space      configISR_STACK_SIZE
++    .global     port_IntStackTop
++port_IntStackTop:
++
+     .section .text
+ 
+ 
+@@ -707,7 +728,9 @@ no_switch_restored:
+ #else
+     /* Recover the stack of next task */
+     lw      a0, pxCurrentTCBs
++    beq     a0, zero, rtos_enter_isr_stack
+     lw      sp, 0(a0)
++rtos_enter_isr_stack:
+ #endif /* ( configNUM_CORES > 1 ) */
+ 
+ 
+-- 
+2.34.1
+

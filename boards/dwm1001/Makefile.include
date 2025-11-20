@@ -1,2 +1,7 @@
+# Set UICR.PSELRESET[0] and UICR.PSELRESET[1] registers at 0x10001200
+# to pin P0.21 (0x15), which is connected to the onboard Reset button
+JLINK_POST_FLASH += "Write4 0x10001200 00000015 00000015"
+OPENOCD_PRE_VERIFY_CMDS = -c 'flash fillw 0x10001200 0x00000015 2'
+
 # include common configuration for nrf52 based boards
 include $(RIOTBOARD)/common/nrf52/Makefile.include

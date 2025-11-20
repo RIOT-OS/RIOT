@@ -1,0 +1,96 @@
+/*
+ * Copyright (C) 2024 Otto-von-Guericke-Universität Magdeburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @defgroup    config_riotbuild    riotbuild.h: Preprocessor Constants to Query the Build System Configuration
+ * @ingroup     config
+ *
+ * The RIOT build system generates a header file `riotbuild.h` that is included
+ * in every C compilation unit by passing the `-include` flag to the C compiler.
+ * Hence, it provides a set of macros that are unconditionally available and
+ * can be used by C code to query the build system configuration.
+ * @{
+ */
+
+#ifdef DOXYGEN
+/**
+ * @brief   The used RIOT version as human readable string literal, e.g., for
+ *          printing to stdio or writing to a log.
+ */
+#define RIOT_VERSION "<YEAR_OF_RELEASE>.<MONTH_OF_RELEASE>-<POSTFIX>"
+
+/**
+ * @brief   The used RIOT version as machine readable number, e.g., for testing
+ *          whether new APIs are available.
+ *
+ * @see     RIOT_VERSION_NUM
+ */
+#define RIOT_VERSION_CODE   RIOT_VERSION_NUM(<YEAR>,<MONTH>,<PATCH>,<EXTRA>)
+
+/**
+ * @brief   Name of the RIOT application as string literal
+ *
+ * The string is defined in the applications `Makefile` using the `APPLICATION`
+ * variable.
+ */
+#define RIOT_APPLICATION    "<RIOT_APP_NAME>"
+
+/**
+ * @brief   Name of the board the app is compiled for as string literal
+ */
+#define RIOT_BOARD          "<BOARD_NAME>"
+
+/**
+ * @brief   Name of the MCU the app is compiled for as string literal
+ *
+ * This is the name of the MCU family in terms of RIOT's peripheral drivers,
+ * or in other words, the folder name in the `cpu` folder in RIOT's repo root
+ * used.
+ */
+#define RIOT_CPU            "<CPU_FOLDER_NAME>"
+
+/**
+ * @brief   Size of the RAM in Bytes
+ *
+ * @warning Not every CPU family provides this, it will be undefined if
+ *          not provided
+ */
+#define CPU_RAM_SIZE        /* RAM Size in Bytes */
+#endif /* DOXYGEN */
+
+/**
+ * @brief   Mark a preprocessor macro as deprecated by including this
+ *          macro in the definition
+ *
+ * Usage:
+ * ``` C
+ * /// @deprecated, use @ref BAR instead of FOO
+ * #define FOO          MACRO_DEPRECATED BAR
+ * ```
+ */
+#if defined(DOXYGEN)
+#  define MACRO_DEPRECATED    /* implementation */
+#elif defined(__GNUC__) || defined(__clang__)
+#  define MACRO_DEPRECATED _Pragma("GCC warning \"Code is using a deprecated macro\"")
+#else
+#  define MACRO_DEPRECATED
+#endif
+
+/**
+ * @brief   Name of the MCU the app is compiled for as string literal
+ *
+ * @deprecated  Use @ref RIOT_CPU instead. This will be removed soonest in
+ *              release 2025.04
+ *
+ * This has been renamed to `RIOT_CPU` for consistency. Even though MCU would
+ * technically be the better name, CPU is used every else in the source code
+ * and folder structure.
+ */
+#define RIOT_MCU        MACRO_DEPRECATED RIOT_CPU
+
+/** @} */

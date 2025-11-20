@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     net_nanosock
  * @brief       NanoCoAP Link Format helper functions
@@ -18,8 +20,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-#ifndef NET_NANOCOAP_LINK_FORMAT_H
-#define NET_NANOCOAP_LINK_FORMAT_H
 
 #include "net/nanocoap_sock.h"
 
@@ -45,12 +45,15 @@ typedef int (*coap_link_format_handler_t)(char *entry, void *ctx);
  * @param[in]   path    path of the resource
  * @param[in]   cb      Callback to execute for each resource entry
  * @param[in]   arg     Optional callback argument
+ * @param[out]  dirent_buf      Response buffer
+ * @param[in]   dirent_buf_len  Length of the response buffer
  *
  * @returns     0 on success
  * @returns     <0 on error
  */
 int nanocoap_link_format_get(nanocoap_sock_t *sock, const char *path,
-                             coap_link_format_handler_t cb, void *arg);
+                             coap_link_format_handler_t cb, void *arg,
+                             char *dirent_buf, size_t dirent_buf_len);
 
 /**
  * @brief   Downloads the resource behind @p url via blockwise GET
@@ -58,15 +61,17 @@ int nanocoap_link_format_get(nanocoap_sock_t *sock, const char *path,
  * @param[in]   url     URL to the resource
  * @param[in]   cb      Callback to execute for each resource entry
  * @param[in]   arg     Optional callback argument
+ * @param[out]  dirent_buf      Response buffer
+ * @param[in]   dirent_buf_len  Length of the response buffer
  *
  * @returns     0 on success
  * @returns     <0 on error
  */
 int nanocoap_link_format_get_url(const char *url,
-                                 coap_link_format_handler_t cb, void *arg);
+                                 coap_link_format_handler_t cb, void *arg,
+                                 char *dirent_buf, size_t dirent_buf_len);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* NET_NANOCOAP_LINK_FORMAT_H */
 /** @} */

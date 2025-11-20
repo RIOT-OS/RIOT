@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    fido2_ctap_utils FIDO2 CTAP utils
  * @ingroup     fido2_ctap
@@ -19,9 +21,6 @@
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
 
-#ifndef FIDO2_CTAP_CTAP_UTILS_H
-#define FIDO2_CTAP_CTAP_UTILS_H
-
 #include <stdint.h>
 #include "fido2/ctap/ctap.h"
 #include "periph/gpio.h"
@@ -33,23 +32,23 @@ extern "C" {
 /**
  * @brief LED animation to indicate that user action is required
  */
-void fido2_ctap_utils_led_animation(void);
+void fido2_ctap_utils_wait_for_user_presence(void);
 
 /**
  * @brief Initialize button to be used for user presence test
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_utils_init_gpio_pin(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank);
+ctap_status_code_t fido2_ctap_utils_init_gpio_pin(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank);
 
 /**
  * @brief Test user presence
  *
  * Successful if user clicks button in less than @ref CTAP_UP_TIMEOUT
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_utils_user_presence_test(void);
+ctap_status_code_t fido2_ctap_utils_user_presence_test(void);
 
 /**
  * @brief Compare fido2 credentials based on id to find more recent one
@@ -90,5 +89,4 @@ static inline bool fido2_ctap_utils_ks_equal(const ctap_resident_key_t *k1,
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_CTAP_UTILS_H */
 /** @} */

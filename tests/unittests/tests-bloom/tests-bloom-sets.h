@@ -6,8 +6,7 @@
  * directory for more details.
  */
 
-#ifndef TESTS_BLOOM_SETS_H
-#define TESTS_BLOOM_SETS_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -1031,5 +1030,3 @@ const char* const B[10] = {"interbedded",
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* TESTS_BLOOM_SETS_H */

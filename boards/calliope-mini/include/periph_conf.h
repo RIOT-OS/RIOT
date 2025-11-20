@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2016-2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016-2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_calliope-mini
@@ -16,9 +15,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Semjon Kerner <semjon.kerner@fu-berlin.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "cfg_clock_16_0.h"
@@ -80,5 +76,4 @@ static const i2c_conf_t i2c_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

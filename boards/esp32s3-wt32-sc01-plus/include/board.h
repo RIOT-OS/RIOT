@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2023 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2023 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_esp32s3_wt32_sc01_plus
@@ -20,9 +19,6 @@
  * @file
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include <stdint.h>
 
@@ -151,5 +147,4 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
-#endif /* BOARD_H */
 /** @} */

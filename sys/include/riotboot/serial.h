@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_riotboot_serial Serial Bootloader Protocol
  * @ingroup     sys
@@ -18,9 +20,6 @@
  *
  * @}
  */
-
-#ifndef RIOTBOOT_SERIAL_H
-#define RIOTBOOT_SERIAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -116,5 +115,3 @@ int riotboot_serial_loader(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* RIOTBOOT_SERIAL_H */

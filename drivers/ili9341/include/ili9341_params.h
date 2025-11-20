@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ili9341
  *
@@ -15,9 +17,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef ILI9341_PARAMS_H
-#define ILI9341_PARAMS_H
 
 #include "board.h"
 #include "lcd.h"
@@ -187,5 +186,4 @@ static const uint8_t ili9341_screen_ids[] =
 }
 #endif
 
-#endif /* ILI9341_PARAMS_H */
 /** @} */

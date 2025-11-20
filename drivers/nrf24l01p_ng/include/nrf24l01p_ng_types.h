@@ -5,6 +5,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /**
  * @ingroup drivers_nrf24l01p
  * @{
@@ -15,8 +18,6 @@
  *
  * @author  Fabian Hüßler <fabian.huessler@ovgu.de>
  */
-#ifndef NRF24L01P_NG_TYPES_H
-#define NRF24L01P_NG_TYPES_H
 
 #include <stdint.h>
 
@@ -362,5 +363,4 @@ nrf24l01p_ng_rfdr_t nrf24l01p_ng_valtoe_rfdr(uint16_t data_rate)
 }
 #endif
 
-#endif /* NRF24L01P_NG_TYPES_H */
 /** @} */

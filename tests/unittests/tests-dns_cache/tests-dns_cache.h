@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-#ifndef TESTS_DNS_CACHE_H
-#define TESTS_DNS_CACHE_H
 
 #include "embUnit.h"
 
@@ -40,5 +40,4 @@ Test *tests_dns_cache_tests(void);
 }
 #endif
 
-#endif /* TESTS_DNS_CACHE_H */
 /** @} */

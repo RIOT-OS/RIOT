@@ -87,7 +87,6 @@ static void _cep_set_timeout(client_ep_t *cep, ztimer_t *timer, uint32_t timeout
     ztimer_set(ZTIMER_MSEC, timer, timeout_ms);
 }
 
-
 void gcoap_forward_proxy_init(void)
 {
     gcoap_register_listener(&forward_proxy_listener);
@@ -236,7 +235,7 @@ static ssize_t _dispatch_msg(const void *buf, size_t len, sock_udp_ep_t *remote,
     ssize_t res = gcoap_req_send(buf, len, remote, local, NULL, NULL,
                                  GCOAP_SOCKET_TYPE_UDP);
     if (res <= 0) {
-        DEBUG("gcoap_forward_proxy: unable to dispatch message: %d\n", -res);
+        DEBUG("gcoap_forward_proxy: unable to dispatch message: %d\n", (int)-res);
     }
     return res;
 }
@@ -276,6 +275,9 @@ static void _forward_resp_handler(const gcoap_request_memo_t *memo,
     /* No harm done in removing a timer that's not active */
     ztimer_remove(ZTIMER_MSEC, &cep->empty_ack_timer);
     buf_len = coap_get_total_len(pdu);
+    assert(memo->state == GCOAP_MEMO_RESP ||
+           memo->state == GCOAP_MEMO_RESP_TRUNC ||
+           memo->state == GCOAP_MEMO_TIMEOUT);
     if (memo->state == GCOAP_MEMO_RESP) {
         uint8_t req_etag_len = _cep_get_req_etag_len(cep);
 
@@ -304,6 +306,7 @@ static void _forward_resp_handler(const gcoap_request_memo_t *memo,
             }
 #endif
         }
+        _set_response_type(pdu, _cep_get_response_type(cep));
         /* we do not need to check if valid came from upstream as this is already automatically
          * converted by the client-side to the cached response */
         /* else forward the response packet as-is to the client */
@@ -315,8 +318,13 @@ static void _forward_resp_handler(const gcoap_request_memo_t *memo,
         assert(buf_len >= (sizeof(*pdu->hdr) + 4U));
         gcoap_resp_init(pdu, (uint8_t *)pdu->hdr, buf_len, COAP_CODE_INTERNAL_SERVER_ERROR);
         coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
+        _set_response_type(pdu, _cep_get_response_type(cep));
     }
-    _set_response_type(pdu, _cep_get_response_type(cep));
+    else if (memo->state == GCOAP_MEMO_TIMEOUT) {
+        /* send RST */
+        gcoap_resp_init(pdu, (uint8_t *)pdu->hdr, buf_len, COAP_CODE_EMPTY);
+        coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
+    }
     /* don't use buf_len here, in case the above `gcoap_resp_init`s changed `pdu` */
     _dispatch_msg(pdu->hdr, coap_get_total_len(pdu), &cep->ep, &cep->proxy_ep);
     _free_client_ep(cep);
@@ -353,7 +361,7 @@ static int _gcoap_forward_proxy_copy_options(coap_pkt_t *pkt,
     bool uri_path_added = false;
     bool etag_added = false;
 
-    for (int i = 0; i < client_pkt->options_len; i++) {
+    for (uint16_t i = 0; i < client_pkt->options_len; i++) {
         ssize_t optlen = coap_opt_get_next(client_pkt, &opt, &value, !i);
         /* wrt to ETag option slack: we always have at least the Proxy-URI option in the client_pkt,
          * so we should hit at least once (and it's opt_num is also >= COAP_OPT_ETAG) */

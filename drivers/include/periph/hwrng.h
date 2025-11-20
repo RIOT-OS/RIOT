@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_periph_hwrng HWRNG Abstraction
  * @ingroup     drivers_periph
@@ -37,9 +39,6 @@
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_HWRNG_H
-#define PERIPH_HWRNG_H
 
 #include <stdint.h>
 
@@ -73,5 +72,4 @@ void hwrng_read(void *buf, unsigned int num);
 }
 #endif
 
-#endif /* PERIPH_HWRNG_H */
 /** @} */

@@ -60,7 +60,7 @@ void auto_init_dht(void)
     for (unsigned int i = 0; i < DHT_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing dht #%u\n", i);
 
-        if (dht_init(&dht_devs[i], &dht_params[i]) != DHT_OK) {
+        if (dht_init(&dht_devs[i], &dht_params[i]) != 0) {
             LOG_ERROR("[auto_init_saul] error initializing dht #%u\n", i);
             continue;
         }

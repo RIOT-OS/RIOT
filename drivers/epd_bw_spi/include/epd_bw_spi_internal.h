@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_epd_bw_spi
  * @{
@@ -17,9 +19,6 @@
  *
  * @}
  */
-
-#ifndef EPD_BW_SPI_INTERNAL_H
-#define EPD_BW_SPI_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -100,4 +99,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif /* EPD_BW_SPI_INTERNAL_H */

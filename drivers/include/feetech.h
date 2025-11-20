@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_feetech Feetech driver
  * @ingroup     drivers_actuators
@@ -20,9 +22,6 @@
  *
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
-
-#ifndef FEETECH_H
-#define FEETECH_H
 
 #include <stdlib.h>
 
@@ -166,5 +165,4 @@ int feetech_read(const feetech_t *device, feetech_addr_t addr, uint8_t *data, si
 }
 #endif
 
-#endif /* FEETECH_H */
 /** @} */

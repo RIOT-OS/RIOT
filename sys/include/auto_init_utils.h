@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_auto_init_utils Utilities to influence the order of auto-initialized modules
  * @ingroup     sys
@@ -24,8 +26,6 @@
  * @experimental
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
-#ifndef AUTO_INIT_UTILS_H
-#define AUTO_INIT_UTILS_H
 
 #include <stdint.h>
 #include "xfa.h"
@@ -75,15 +75,15 @@ typedef struct {
  * @param   priority    Priority level @ref auto_init_prio_t
  */
 #define AUTO_INIT(function, priority)                                                   \
-    XFA_CONST(auto_init_xfa, priority)                                                  \
-    auto_init_module_t auto_init_xfa_ ## function                                       \
+    XFA_CONST(auto_init_module_t, auto_init_xfa, priority)                              \
+    auto_init_xfa_ ## function                                                          \
         = { .init = (auto_init_fn_t)function,                                           \
             .prio = priority,                                                           \
             .name = XTSTR(function) }
 #else
 #define AUTO_INIT(function, priority)                                                   \
-    XFA_CONST(auto_init_xfa, priority)                                                  \
-    auto_init_module_t auto_init_xfa_ ## function                                       \
+    XFA_CONST(auto_init_module_t, auto_init_xfa, priority)                              \
+    auto_init_xfa_ ## function                                                          \
         = { .init = (auto_init_fn_t)function }
 #endif
 
@@ -97,5 +97,4 @@ typedef struct {
 }
 #endif
 
-#endif /* AUTO_INIT_UTILS_H */
 /** @} */

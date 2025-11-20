@@ -16,7 +16,7 @@ export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
 
 # basic cflags:
-CFLAGS += -Wall -Wextra -pedantic $(CFLAGS_DBG) $(CFLAGS_OPT)
+CFLAGS += -Wall -Wextra $(CFLAGS_DBG) $(CFLAGS_OPT)
 CFLAGS += -U_FORTIFY_SOURCE
 CFLAGS_DBG ?= -g3
 
@@ -57,6 +57,12 @@ ifeq ($(OS),Darwin)
   CFLAGS += -Wno-deprecated-declarations
 endif
 
+ifneq ($(filter $(OS),Darwin FreeBSD),)
+  CFLAGS += -D_XOPEN_SOURCE
+else
+  CFLAGS += -D_GNU_SOURCE
+endif
+
 # unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
 CXXUWFLAGS +=
 CXXEXFLAGS +=
@@ -72,7 +78,7 @@ LINKFLAGS += -T$(RIOTBASE)/cpu/native/ldscripts/xfa.ld
 
 # fix this warning:
 # ```
-# /usr/bin/ld: examples/hello-world/bin/native/cpu/tramp.o: warning: relocation against `_native_saved_eip' in read-only section `.text'
+# /usr/bin/ld: examples/basic/hello-world/bin/native/cpu/tramp.o: warning: relocation against `_native_saved_eip' in read-only section `.text'
 # /usr/bin/ld: warning: creating DT_TEXTREL in a PIE
 # ```
 LINKFLAGS += -no-pie

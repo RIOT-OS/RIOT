@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @file
  * @brief       Example configuration for Microchip CryptoAuth devices
@@ -25,9 +27,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
-
-#ifndef ATECC608A_CONFIG_H
-#define ATECC608A_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -112,5 +111,3 @@ const uint8_t atecc608a_config[] = {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* ATECC608A_CONFIG_H */

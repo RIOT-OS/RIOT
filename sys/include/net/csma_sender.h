@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_csma_sender  CSMA/CA helper
  * @ingroup     net
@@ -21,9 +23,6 @@
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-
-#ifndef NET_CSMA_SENDER_H
-#define NET_CSMA_SENDER_H
 
 #include <stdint.h>
 
@@ -141,7 +140,5 @@ int csma_sender_cca_send(netdev_t *dev, iolist_t *iolist);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* NET_CSMA_SENDER_H */
 
 /** @} */

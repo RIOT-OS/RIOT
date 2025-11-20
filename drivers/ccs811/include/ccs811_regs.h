@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ccs811
  * @brief       Register definitions for the AMS CCS811 digital gas sensor
@@ -13,9 +15,6 @@
  * @file
  * @{
  */
-
-#ifndef CCS811_REGS_H
-#define CCS811_REGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,5 +76,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CCS811_REGS_H */
 /** @} */

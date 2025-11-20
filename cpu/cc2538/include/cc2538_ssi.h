@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2014 Loci Controls Inc.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014 Loci Controls Inc.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @addtogroup      cpu_cc2538
@@ -16,9 +15,6 @@
  * @author          Ian Martin <ian@locicontrols.com>
  * @author          Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef CC2538_SSI_H
-#define CC2538_SSI_H
 
 #include "cc2538.h"
 
@@ -61,5 +57,4 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC2538_SSI_H */
 /** @} */

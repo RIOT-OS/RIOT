@@ -8,6 +8,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_st77xx ST77xx display driver
  * @ingroup     drivers_display
@@ -49,9 +51,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef ST77XX_H
-#define ST77XX_H
 
 #include "lcd.h"
 
@@ -404,5 +403,4 @@ extern const lcd_driver_t lcd_st77xx_driver;
 #ifdef __cplusplus
 }
 #endif
-#endif /* ST77XX_H */
 /** @} */

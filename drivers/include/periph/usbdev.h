@@ -5,6 +5,9 @@
  * Public License v2.1. See the file LICENSE in the top level directory for
  * more details.
  */
+
+#pragma once
+
 /**
  * @defgroup    drivers_periph_usbdev usbdev - USB Device Driver API
  * @ingroup     drivers_periph
@@ -71,9 +74,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef PERIPH_USBDEV_H
-#define PERIPH_USBDEV_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -420,9 +420,9 @@ typedef struct usbdev_driver {
      * @note The @p buf passed here must have been declared as
      * @ref usbdev_ep_buf_t before so that DMA restrictions are applied to it
      *
-     * @param[in] ep        USB endpoint descriptor
-     * @param[inout] buf    Buffer with the data to transfer
-     * @param[in] len       (Max) Length of the data to transfer
+     * @param[in]       ep      USB endpoint descriptor
+     * @param[in,out]   buf     Buffer with the data to transfer
+     * @param[in]       len     (Max) Length of the data to transfer
      */
     int (*xmit)(usbdev_ep_t *ep, uint8_t *buf, size_t len);
 } usbdev_driver_t;
@@ -672,9 +672,9 @@ static inline void usbdev_ep_esr(usbdev_ep_t *ep)
  * @pre `(ep != NULL)`
  * @pre `(ep->dev != NULL)`
  *
- * @param[in]    ep     USB endpoint descriptor
- * @param[inout] buf    Buffer to submit for transmission
- * @param[in]    len    length of the buffer in bytes to be transmitted or received
+ * @param[in]     ep    USB endpoint descriptor
+ * @param[in,out] buf   Buffer to submit for transmission
+ * @param[in]     len   length of the buffer in bytes to be transmitted or received
  */
 static inline int usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 {
@@ -687,5 +687,4 @@ static inline int usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t *buf, size_t len)
 }
 #endif
 
-#endif /* PERIPH_USBDEV_H */
 /** @} */

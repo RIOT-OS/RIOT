@@ -4,12 +4,6 @@ CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
 # this CPU implementation doesn't use CMSIS initialization
 CFLAGS += -DDONT_USE_CMSIS_INIT
 
-ROM_START_ADDR ?= 0x80000
-RAM_START_ADDR ?= 0x20070000
-
-ROM_LEN ?= 0x80000
-RAM_LEN ?= 0x18000
-
 LINKER_SCRIPT ?= cortexm.ld
 
 INCLUDES += -I$(RIOTCPU)/sam_common/include

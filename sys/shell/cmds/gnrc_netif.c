@@ -211,7 +211,7 @@ static void _set_usage(char *cmd_name)
          "       * \"hop_limit\" - set hop limit\n"
          "       * \"hl\" - alias for \"hop_limit\"\n"
          "       * \"key\" - set the encryption key in hexadecimal format\n"
-         "       * \"mtu\" - IPv6 maximum transition unit\n"
+         "       * \"mtu\" - IPv6 maximum transmission unit\n"
          "       * \"nid\" - sets the network identifier (or the PAN ID)\n"
          "       * \"page\" - set the channel page (IEEE 802.15.4)\n"
          "       * \"pan\" - alias for \"nid\"\n"
@@ -621,6 +621,8 @@ static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
             break;
         }
     }
+#else
+    (void)flags;
 #endif
     _newline(0U, _LINE_THRESHOLD);
 }

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_bh1750fvi BH1750FVI Light Sensor
  * @ingroup     drivers_sensors
@@ -17,9 +19,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef BH1750FVI_H
-#define BH1750FVI_H
 
 #include "periph/i2c.h"
 
@@ -99,5 +98,4 @@ uint16_t bh1750fvi_sample(const bh1750fvi_t *dev);
 }
 #endif
 
-#endif /* BH1750FVI_H */
 /** @} */

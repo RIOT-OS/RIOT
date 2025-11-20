@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ina2xx
  *
@@ -15,9 +17,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef INA2XX_PARAMS_H
-#define INA2XX_PARAMS_H
 
 #include "board.h"
 #include "ina2xx.h"
@@ -124,5 +123,4 @@ static const saul_reg_info_t ina2xx_saul_info[] =
 }
 #endif
 
-#endif /* INA2XX_PARAMS_H */
 /** @} */

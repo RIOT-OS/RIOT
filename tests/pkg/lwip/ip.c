@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -20,7 +17,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "common.h"
+#include "cli.h"
 #include "kernel_defines.h"
 #include "od.h"
 #include "net/af.h"
@@ -29,6 +26,7 @@
 #include "shell.h"
 #include "thread.h"
 #include "test_utils/expect.h"
+#include "utilities.h"
 #include "ztimer.h"
 
 #ifdef MODULE_SOCK_IP

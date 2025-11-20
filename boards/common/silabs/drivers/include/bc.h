@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2018 Bas Stottelaar <basstottelaar@gmail.com>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Bas Stottelaar <basstottelaar@gmail.com>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup    boards_common_silabs_drivers_bc Board communication controller
@@ -16,9 +15,6 @@
  *
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
-
-#ifndef BC_H
-#define BC_H
 
 #include "board.h"
 
@@ -39,5 +35,4 @@ void bc_init(void);
 }
 #endif
 
-#endif /* BC_H */
 /** @} */

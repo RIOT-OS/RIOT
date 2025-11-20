@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_max31855
  *
@@ -15,9 +17,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef MAX31855_PARAMS_H
-#define MAX31855_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -82,5 +81,4 @@ static const saul_reg_info_t max31855_saul_info[] =
 }
 #endif
 
-#endif /* MAX31855_PARAMS_H */
 /** @} */

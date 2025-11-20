@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -30,7 +27,20 @@
 #define COMPENSATE_OVERHEAD 1
 #endif
 
-static gpio_port_t port_out = GPIO_PORT(PORT_OUT);
+#ifndef PORT_OUT
+#  if defined(GPIO_PORT_0)
+#    define PORT_OUT        GPIO_PORT_0
+#    define PORT_OUT_NUM    0
+#  elif defined(GPIO_PORT_1)
+#    define PORT_OUT        GPIO_PORT_1
+#    define PORT_OUT_NUM    1
+#  elif defined(GPIO_PORT_2)
+#    define PORT_OUT        GPIO_PORT_2
+#    define PORT_OUT_NUM    2
+#  endif
+#endif
+
+static gpio_port_t port_out = PORT_OUT;
 
 static void print_summary_compensated(uint_fast16_t loops, uint32_t duration,
                                       uint32_t duration_uncompensated)
@@ -124,8 +134,8 @@ int main(void)
         puts("\n"
              "periph/gpio: Using 2x gpio_set() and 2x gpio_clear()\n"
              "---------------------------------------------------");
-        gpio_t p0 = GPIO_PIN(PORT_OUT, PIN_OUT_0);
-        gpio_t p1 = GPIO_PIN(PORT_OUT, PIN_OUT_1);
+        gpio_t p0 = GPIO_PIN(PORT_OUT_NUM, PIN_OUT_0);
+        gpio_t p1 = GPIO_PIN(PORT_OUT_NUM, PIN_OUT_1);
         gpio_init(p0, GPIO_OUT);
         gpio_init(p1, GPIO_OUT);
 
@@ -177,8 +187,8 @@ int main(void)
         puts("\n"
              "periph/gpio: Using 4x gpio_toggle()\n"
              "-----------------------------------");
-        gpio_t p0 = GPIO_PIN(PORT_OUT, PIN_OUT_0);
-        gpio_t p1 = GPIO_PIN(PORT_OUT, PIN_OUT_1);
+        gpio_t p0 = GPIO_PIN(PORT_OUT_NUM, PIN_OUT_0);
+        gpio_t p1 = GPIO_PIN(PORT_OUT_NUM, PIN_OUT_1);
         gpio_init(p0, GPIO_OUT);
         gpio_init(p1, GPIO_OUT);
 
@@ -230,8 +240,8 @@ int main(void)
         puts("\n"
              "periph/gpio: Using 4x gpio_write()\n"
              "----------------------------------");
-        gpio_t p0 = GPIO_PIN(PORT_OUT, PIN_OUT_0);
-        gpio_t p1 = GPIO_PIN(PORT_OUT, PIN_OUT_1);
+        gpio_t p0 = GPIO_PIN(PORT_OUT_NUM, PIN_OUT_0);
+        gpio_t p1 = GPIO_PIN(PORT_OUT_NUM, PIN_OUT_1);
         gpio_init(p0, GPIO_OUT);
         gpio_init(p1, GPIO_OUT);
 

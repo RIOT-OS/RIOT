@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_crypto
  * @{
@@ -26,9 +28,6 @@
  * @author      Fabrice Bellard
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  */
-
-#ifndef CRYPTO_AES_H
-#define CRYPTO_AES_H
 
 #include <stdint.h>
 #include "crypto/ciphers.h"
@@ -89,7 +88,7 @@ int aes_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize);
  * @brief   encrypts one plainBlock-block and saves the result in cipherblock.
  *          encrypts one blocksize long block of plaintext pointed to by
  *          plainBlock to one blocksize long block of ciphertext which will be
- *          written to the the memory-area pointed to by cipherBlock
+ *          written to the memory-area pointed to by cipherBlock
  *
  * @param       context       the cipher_context_t-struct to use for this
  *                            encryption
@@ -130,4 +129,3 @@ int aes_decrypt(const cipher_context_t *context, const uint8_t *cipher_block,
 #endif
 
 /** @} */
-#endif /* CRYPTO_AES_H */

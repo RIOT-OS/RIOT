@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_adxl345
  * @{
@@ -15,9 +17,6 @@
  *
  * @author     Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifndef ADXL345_PARAMS_H
-#define ADXL345_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -87,5 +86,4 @@ static const saul_reg_info_t adxl345_saul_info[] =
 }
 #endif
 
-#endif /* ADXL345_PARAMS_H */
 /** @} */

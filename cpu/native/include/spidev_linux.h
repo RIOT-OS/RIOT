@@ -1,15 +1,15 @@
 /*
- * Copyright (C) 2019 Frank Hessel <frank@fhessel.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Frank Hessel <frank@fhessel.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+#pragma once
+
 /**
- * @defgroup    drivers_spidev_linux Linux User Mode SPI Driver
- * @ingroup     cpu_native
- * @brief       Implementation of SPI access from Linux User Space
+ * @defgroup drivers_spidev_linux Linux User Mode SPI Driver
+ * @ingroup  cpu_native
+ * @brief    Implementation of SPI access from Linux User Space
+ * @{
  *
  * This module allows to connect a RIOT application that runs on a Linux host to
  * the physical SPI bus(ses) of that host. To do so, the application has to be
@@ -50,17 +50,13 @@
  * select the file descriptor with the lowest HWCS id for that bus, but the
  * actual CS line will not be pulled low (if the hardware supports this). This
  * would (in principle) allow to control CS manually.
- *
- * @{
- *
- * @file
- * @brief       Implementation of SPI access from Linux User Space
- *
- * @author      Frank Hessel <frank@fhessel.de>
  */
 
-#ifndef SPIDEV_LINUX_H
-#define SPIDEV_LINUX_H
+/**
+ * @file
+ * @brief  Implementation of SPI access from Linux User Space
+ * @author Frank Hessel <frank@fhessel.de>
+ */
 
 #if defined(__linux__) || defined(DOXYGEN) /* Linux-only */
 
@@ -130,5 +126,4 @@ void spidev_linux_teardown(void);
 #endif
 #endif /* defined(__linux__) || defined(DOXYGEN) */
 
-#endif /* SPIDEV_LINUX_H */
 /** @} */

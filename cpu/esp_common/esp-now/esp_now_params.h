@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_esp_common_esp_now
@@ -15,9 +14,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef ESP_NOW_PARAMS_H
-#define ESP_NOW_PARAMS_H
 
 #if defined(MODULE_ESP_NOW) || defined(DOXYGEN)
 
@@ -125,5 +121,4 @@ static const esp_now_params_t esp_now_params = ESP_NOW_PARAMS;
 
 #endif /* MODULE_ESP_NOW || DOXYGEN */
 
-#endif /* ESP_NOW_PARAMS_H */
 /**@}*/

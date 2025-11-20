@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_sam0_common
@@ -17,9 +16,6 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifndef PERIPH_CPU_COMMON_H
-#define PERIPH_CPU_COMMON_H
 
 #include "cpu.h"
 #include "exti_config.h"
@@ -41,8 +37,8 @@ extern "C" {
 #define PERIPH_SPI_NEEDS_INIT_CS
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTE
 #ifndef MODULE_PERIPH_DMA
-#define PERIPH_SPI_NEEDS_TRANSFER_REG
-#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+#  define PERIPH_SPI_NEEDS_TRANSFER_REG
+#  define PERIPH_SPI_NEEDS_TRANSFER_REGS
 #endif
 /** @} */
 
@@ -79,17 +75,17 @@ typedef uint32_t gpio_t;
  * @{
  */
 #ifdef MODULE_PERIPH_GPIO_FAST_READ
-#ifdef PORT_IOBUS_SEC
-#define GPIO_PIN(x, y)      (((gpio_t)(&PORT_IOBUS_SEC->Group[x])) | y)
-#else /* Use IOBUS access when available */
-#define GPIO_PIN(x, y)      (((gpio_t)(&PORT_IOBUS->Group[x])) | y)
-#endif /* PORT_IOBUS_SEC */
+#  ifdef PORT_IOBUS_SEC
+#    define GPIO_PIN(x, y)  (((gpio_t)(&PORT_IOBUS_SEC->Group[x])) | y)
+#  else /* Use IOBUS access when available */
+#    define GPIO_PIN(x, y)  (((gpio_t)(&PORT_IOBUS->Group[x])) | y)
+#  endif /* PORT_IOBUS_SEC */
 #else
-#ifdef PORT_SEC
-#define GPIO_PIN(x, y)      (((gpio_t)(&PORT_SEC->Group[x])) | y)
-#else
-#define GPIO_PIN(x, y)      (((gpio_t)(&PORT->Group[x])) | y)
-#endif /* PORT_IOBUS_SEC */
+#  ifdef PORT_SEC
+#    define GPIO_PIN(x, y)  (((gpio_t)(&PORT_SEC->Group[x])) | y)
+#  else
+#    define GPIO_PIN(x, y)  (((gpio_t)(&PORT->Group[x])) | y)
+#  endif /* PORT_IOBUS_SEC */
 #endif
 
 /**
@@ -116,7 +112,7 @@ enum {
 /**
  * @brief   Override GPIO modes
  */
-#define HAVE_GPIO_MODE_T
+#  define HAVE_GPIO_MODE_T
 typedef enum {
     GPIO_IN    = GPIO_MODE(0, 1, 0),    /**< IN */
     GPIO_IN_PD = GPIO_MODE(0, 1, 1),    /**< IN with pull-down */
@@ -126,7 +122,7 @@ typedef enum {
     GPIO_OD_PU = 0xff                   /**< not supported by HW */
 } gpio_mode_t;
 
-#define HAVE_GPIO_SLEW_T
+#  define HAVE_GPIO_SLEW_T
 typedef enum {
     GPIO_SLEW_SLOWEST = 0,
     GPIO_SLEW_SLOW = 0,
@@ -134,7 +130,7 @@ typedef enum {
     GPIO_SLEW_FASTEST = 0,
 } gpio_slew_t;
 
-#define HAVE_GPIO_PULL_STRENGTH_T
+#  define HAVE_GPIO_PULL_STRENGTH_T
 typedef enum {
     GPIO_PULL_WEAKEST = 0,
     GPIO_PULL_WEAK = 0,
@@ -142,7 +138,7 @@ typedef enum {
     GPIO_PULL_STRONGEST = 0
 } gpio_pull_strength_t;
 
-#define HAVE_GPIO_DRIVE_STRENGTH_T
+#  define HAVE_GPIO_DRIVE_STRENGTH_T
 typedef enum {
     GPIO_DRIVE_WEAKEST = 0,
     GPIO_DRIVE_WEAK = 0,
@@ -150,7 +146,7 @@ typedef enum {
     GPIO_DRIVE_STRONGEST = 1
 } gpio_drive_strength_t;
 
-#define HAVE_GPIO_PULL_T
+#  define HAVE_GPIO_PULL_T
 typedef enum {
     GPIO_FLOATING,
     GPIO_PULL_UP,
@@ -158,7 +154,7 @@ typedef enum {
     GPIO_PULL_KEEP,
 } gpio_pull_t;
 
-#define HAVE_GPIO_STATE_T
+#  define HAVE_GPIO_STATE_T
 typedef enum {
     GPIO_OUTPUT_PUSH_PULL,
     GPIO_OUTPUT_OPEN_DRAIN,
@@ -168,7 +164,7 @@ typedef enum {
     GPIO_DISCONNECT,
 } gpio_state_t;
 
-#define HAVE_GPIO_IRQ_TRIG_T
+#  define HAVE_GPIO_IRQ_TRIG_T
 typedef enum {
     GPIO_TRIGGER_EDGE_RISING    = EIC_CONFIG_SENSE0_RISE_Val,
     GPIO_TRIGGER_EDGE_FALLING   = EIC_CONFIG_SENSE0_FALL_Val,
@@ -177,14 +173,14 @@ typedef enum {
     GPIO_TRIGGER_LEVEL_LOW      = EIC_CONFIG_SENSE0_LOW_Val,
 } gpio_irq_trig_t;
 
-#define HAVE_GPIO_CONF_T
+#  define HAVE_GPIO_CONF_T
 typedef union gpio_conf_sam0 gpio_conf_t;
 
 /**
  * @brief   Override active flank configuration values
  * @{
  */
-#define HAVE_GPIO_FLANK_T
+#  define HAVE_GPIO_FLANK_T
 typedef enum {
     GPIO_FALLING = 2,       /**< emit interrupt on falling flank */
     GPIO_RISING = 1,        /**< emit interrupt on rising flank */
@@ -232,7 +228,7 @@ union gpio_conf_sam0 {
          * consulted.
          */
         bool initial_value                      : 1;
-        uint8_t                                 : 1; /*< padding */
+        uint8_t                                 : 1; /**< padding */
     };
 };
 
@@ -297,7 +293,7 @@ typedef enum {
  * RIOT UART peripheral API.
  * @{
  */
-#define HAVE_UART_DATA_BITS_T
+#  define HAVE_UART_DATA_BITS_T
 typedef enum {
     UART_DATA_BITS_5 = 0x5,   /**< 5 data bits */
     UART_DATA_BITS_6 = 0x6,   /**< 6 data bits */
@@ -310,8 +306,8 @@ typedef enum {
  * @brief   UART pin getters
  * @{
  */
-#define uart_pin_rx(dev) uart_config[dev].rx_pin
-#define uart_pin_tx(dev) uart_config[dev].tx_pin
+#  define uart_pin_rx(dev) uart_config[dev].rx_pin
+#  define uart_pin_tx(dev) uart_config[dev].tx_pin
 /** @} */
 
 #endif /* ndef DOXYGEN */
@@ -320,7 +316,7 @@ typedef enum {
  * @brief   Size of the UART TX buffer for non-blocking mode.
  */
 #ifndef UART_TXBUF_SIZE
-#define UART_TXBUF_SIZE    (64)
+#  define UART_TXBUF_SIZE  (64)
 #endif
 
 /**
@@ -382,14 +378,14 @@ typedef struct {
  * @brief   Static initializer for TC timer configuration
  */
 #ifdef MCLK
-#define TC_CONFIG(tim)                    { \
+#  define TC_CONFIG(tim)                  { \
         .dev       = {.tc = tim},           \
         .mclk      = MCLK_ ## tim,          \
         .mclk_mask = MCLK_ ## tim ## _MASK, \
         .gclk_id   = tim ## _GCLK_ID,       \
         .type      = TIMER_TYPE_TC,       }
 #else
-#define TC_CONFIG(tim)                    { \
+#  define TC_CONFIG(tim)                  { \
         .dev       = {.tc = tim},           \
         .pm_mask   = PM_APBCMASK_ ## tim,   \
         .gclk_id   = tim ## _GCLK_ID,       \
@@ -400,14 +396,14 @@ typedef struct {
  * @brief   Static initializer for TCC timer configuration
  */
 #ifdef MCLK
-#define TCC_CONFIG(tim)                   { \
+#  define TCC_CONFIG(tim)                 { \
         .dev       = {.tcc = tim},          \
         .mclk      = MCLK_ ## tim,          \
         .mclk_mask = MCLK_ ## tim ## _MASK, \
         .gclk_id   = tim ## _GCLK_ID,       \
         .type      = TIMER_TYPE_TCC,      }
 #else
-#define TCC_CONFIG(tim)                   { \
+#  define TCC_CONFIG(tim)                 { \
         .dev       = {.tcc = tim},          \
         .pm_mask   = PM_APBCMASK_ ## tim,   \
         .gclk_id   = tim ## _GCLK_ID,       \
@@ -458,7 +454,7 @@ typedef enum {
  * @brief   Override SPI modes
  * @{
  */
-#define HAVE_SPI_MODE_T
+#  define HAVE_SPI_MODE_T
 typedef enum {
     SPI_MODE_0 = 0x0,       /**< CPOL=0, CPHA=0 */
     SPI_MODE_1 = 0x1,       /**< CPOL=0, CPHA=1 */
@@ -471,7 +467,7 @@ typedef enum {
  * @brief   Override SPI clock speed values
  * @{
  */
-#define HAVE_SPI_CLK_T
+#  define HAVE_SPI_CLK_T
 typedef enum {
     SPI_CLK_100KHZ =   100000U, /**< drive the SPI bus with 100KHz */
     SPI_CLK_400KHZ =   400000U, /**< drive the SPI bus with 400KHz */
@@ -485,9 +481,9 @@ typedef enum {
  * @brief   SPI pin getters
  * @{
  */
-#define spi_pin_mosi(dev) spi_config[dev].mosi_pin
-#define spi_pin_miso(dev) spi_config[dev].miso_pin
-#define spi_pin_clk(dev)  spi_config[dev].clk_pin
+#  define spi_pin_mosi(dev) spi_config[dev].mosi_pin
+#  define spi_pin_miso(dev) spi_config[dev].miso_pin
+#  define spi_pin_clk(dev)  spi_config[dev].clk_pin
 /** @} */
 
 #endif /* ndef DOXYGEN */
@@ -526,7 +522,7 @@ typedef enum {
  * @name    Override I2C clock speed values
  * @{
  */
-#define HAVE_I2C_SPEED_T
+#  define HAVE_I2C_SPEED_T
 typedef enum {
     I2C_SPEED_LOW       = 10000U,      /**< low speed mode:    ~10kbit/s */
     I2C_SPEED_NORMAL    = 100000U,     /**< normal mode:       ~100kbit/s */
@@ -540,8 +536,8 @@ typedef enum {
  * @name    I2C pin getter functions
  * @{
  */
-#define i2c_pin_sda(dev) i2c_config[dev].sda_pin
-#define i2c_pin_scl(dev) i2c_config[dev].scl_pin
+#  define i2c_pin_sda(dev) i2c_config[dev].sda_pin
+#  define i2c_pin_scl(dev) i2c_config[dev].scl_pin
 /** @} */
 
 #endif /* ndef DOXYGEN */
@@ -599,38 +595,52 @@ typedef struct {
  */
 void gpio_init_mux(gpio_t pin, gpio_mux_t mux);
 
+#ifdef PM_SLEEPCFG_SLEEPMODE_OFF
+
+/**
+ * @brief   CPU provides own pm_off() function
+ */
+#  define PROVIDES_PM_OFF
+
+/**
+ * @brief   CPU provides own pm_off() function
+ */
+#  define PROVIDES_PM_LAYERED_OFF
+
+#endif /* PM_SLEEPCFG_SLEEPMODE_OFF */
+
 /**
  * @brief   Called before the power management enters a power mode
  *
- * @param[in] deep
+ * @param[in] deep      1 for deep sleep, 0 otherwise
  */
 void gpio_pm_cb_enter(int deep);
 
 /**
  * @brief   Called after the power management left a power mode
  *
- * @param[in] deep
+ * @param[in] deep      1 for deep sleep, 0 otherwise
  */
 void gpio_pm_cb_leave(int deep);
 
 /**
  * @brief   Called before the power management enters a power mode
  *
- * @param[in] deep
+ * @param[in] deep      1 for deep sleep, 0 otherwise
  */
 void cpu_pm_cb_enter(int deep);
 
 /**
  * @brief   Called after the power management left a power mode
  *
- * @param[in] deep
+ * @param[in] deep      1 for deep sleep, 0 otherwise
  */
 void cpu_pm_cb_leave(int deep);
 
 /**
  * @brief   Wrapper for cortexm_sleep calling power management callbacks
  *
- * @param[in] deep
+ * @param[in] deep      1 for deep sleep, 0 otherwise
  */
 static inline void sam0_cortexm_sleep(int deep)
 {
@@ -660,9 +670,9 @@ void gpio_disable_mux(gpio_t pin);
  * @brief   Available voltage regulators on the supply controller.
  */
 typedef enum {
-    SAM0_VREG_LDO,  /*< LDO, always available but not very power efficient */
-    SAM0_VREG_BUCK  /*< Buck converter, efficient but may clash with internal
-                        fast clock generators (see errata sheets) */
+    SAM0_VREG_LDO,  /**< LDO, always available but not very power efficient */
+    SAM0_VREG_BUCK  /**< Buck converter, efficient but may clash with internal
+                         fast clock generators (see errata sheets) */
 } sam0_supc_t;
 
 /**
@@ -676,7 +686,8 @@ typedef enum {
  *                 Please refer to the errata sheet, further restrictions may
  *                 apply depending on the MCU.
  *
- * @param[in]   src
+ * @param[in]   src     Voltage regulator to use, see @ref sam0_supc_t for
+ *                      options
  */
 static inline void sam0_set_voltage_regulator(sam0_supc_t src)
 {
@@ -788,11 +799,11 @@ static inline void sercom_clk_en(void *sercom)
     if (id < 5) {
         MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << id);
     }
-#if defined(CPU_COMMON_SAML21)
+#  if defined(CPU_COMMON_SAML21)
     else {
         MCLK->APBDMASK.reg |= (MCLK_APBDMASK_SERCOM5);
     }
-#endif /* CPU_COMMON_SAML21 */
+#  endif /* CPU_COMMON_SAML21 */
 #endif
 }
 
@@ -818,11 +829,11 @@ static inline void sercom_clk_dis(void *sercom)
     if (id < 5) {
         MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << id);
     }
-#if defined (CPU_COMMON_SAML21)
+#  if defined (CPU_COMMON_SAML21)
     else {
         MCLK->APBDMASK.reg &= ~(MCLK_APBDMASK_SERCOM5);
     }
-#endif /* CPU_COMMON_SAML21 */
+#  endif /* CPU_COMMON_SAML21 */
 #endif
 }
 
@@ -830,9 +841,11 @@ static inline void sercom_clk_dis(void *sercom)
 static inline uint8_t _sercom_gclk_id_core(uint8_t sercom_id) {
     if (sercom_id < 2) {
         return sercom_id + 7;
-    } else if (sercom_id < 4) {
+    }
+    else if (sercom_id < 4) {
         return sercom_id + 21;
-    } else {
+    }
+    else {
         return sercom_id + 30;
     }
 }
@@ -858,11 +871,11 @@ static inline void sercom_set_gen(void *sercom, uint8_t gclk)
     if (id < 5) {
         GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + id].reg = (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(gclk));
     }
-#if defined(CPU_COMMON_SAML21)
+#  if defined(CPU_COMMON_SAML21)
     else {
         GCLK->PCHCTRL[SERCOM5_GCLK_ID_CORE].reg = (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(gclk));
     }
-#endif /* CPU_COMMON_SAML21 */
+#  endif /* CPU_COMMON_SAML21 */
 #endif
 }
 
@@ -893,7 +906,7 @@ typedef struct {
  *        Unused on all platforms that have DIFFMODE in CTRLB
  */
 #ifndef ADC_INPUTCTRL_DIFFMODE
-#define ADC_INPUTCTRL_DIFFMODE  (1 << 7)
+#  define ADC_INPUTCTRL_DIFFMODE    (1 << 7)
 #endif
 
 /**
@@ -910,22 +923,22 @@ typedef struct {
 /**
  * @brief Pin that can be used for external voltage reference C
  */
-#define ADC_REFSEL_AREFC_PIN    GPIO_PIN(PA, 6)
+#  define ADC_REFSEL_AREFC_PIN  GPIO_PIN(PA, 6)
 #endif
 
 #ifndef DOXYGEN
-#define HAVE_ADC_RES_T
+#  define HAVE_ADC_RES_T
 typedef enum {
     ADC_RES_6BIT  = 0xff,                       /**< not supported */
-#if defined(ADC_CTRLB_RESSEL)
+#  if defined(ADC_CTRLB_RESSEL)
     ADC_RES_8BIT  = ADC_CTRLB_RESSEL_8BIT_Val,  /**< ADC resolution: 8 bit */
     ADC_RES_10BIT = ADC_CTRLB_RESSEL_10BIT_Val, /**< ADC resolution: 10 bit */
     ADC_RES_12BIT = ADC_CTRLB_RESSEL_12BIT_Val, /**< ADC resolution: 12 bit */
-#elif defined(ADC_CTRLC_RESSEL)
+#  elif defined(ADC_CTRLC_RESSEL)
     ADC_RES_8BIT  = ADC_CTRLC_RESSEL_8BIT_Val,  /**< ADC resolution: 8 bit */
     ADC_RES_10BIT = ADC_CTRLC_RESSEL_10BIT_Val, /**< ADC resolution: 10 bit */
     ADC_RES_12BIT = ADC_CTRLC_RESSEL_12BIT_Val, /**< ADC resolution: 12 bit */
-#endif
+#  endif
     ADC_RES_16BIT_2SAMPL    = ( 0x1 << 2) | 0x1, /**< sum of 2 12 bit samples    */
     ADC_RES_16BIT_4SAMPL    = ( 0x2 << 2) | 0x1, /**< sum of 4 12 bit samples    */
     ADC_RES_16BIT_8SAMPL    = ( 0x3 << 2) | 0x1, /**< sum of 8 12 bit samples    */
@@ -939,7 +952,7 @@ typedef enum {
     ADC_RES_14BIT = 0xfe,                        /**< not supported */
 } adc_res_t;
 
-#define ADC_RES_16BIT   ADC_RES_16BIT_16SAMPL   /**< default to 16x oversampling */
+#  define ADC_RES_16BIT ADC_RES_16BIT_16SAMPL   /**< default to 16x oversampling */
 #endif /* DOXYGEN */
 
 /**
@@ -947,19 +960,19 @@ typedef enum {
  * @{
  */
 #ifndef ETH_RX_BUFFER_COUNT
-#define ETH_RX_BUFFER_COUNT (4)
+#  define ETH_RX_BUFFER_COUNT (4)
 #endif
 
 #ifndef ETH_TX_BUFFER_COUNT
-#define ETH_TX_BUFFER_COUNT (2)
+#  define ETH_TX_BUFFER_COUNT (2)
 #endif
 
 #ifndef ETH_RX_BUFFER_SIZE
-#define ETH_RX_BUFFER_SIZE (1536)
+#  define ETH_RX_BUFFER_SIZE (1536)
 #endif
 
 #ifndef ETH_TX_BUFFER_SIZE
-#define ETH_TX_BUFFER_SIZE (1536)
+#  define ETH_TX_BUFFER_SIZE (1536)
 #endif
 /** @} */
 
@@ -1103,23 +1116,23 @@ typedef struct {
  * @brief Indicates that the peripheral doesn't utilize the DMA controller.
  *        Matches with the register configuration for software based triggers.
  */
-#define DMA_TRIGGER_DISABLED           0
+#  define DMA_TRIGGER_DISABLED         0
 
 /**
  * @brief Move the DMA descriptors to the LP SRAM. Required on the SAML21
  */
-#if defined(CPU_COMMON_SAML21) || defined(DOXYGEN)
-#define DMA_DESCRIPTOR_IN_LPSRAM
-#endif
+#  if defined(CPU_COMMON_SAML21) || defined(DOXYGEN)
+#    define DMA_DESCRIPTOR_IN_LPSRAM
+#  endif
 
 /**
  * @brief Extra attributes required for instantiating DMA descriptors.
  */
-#ifdef DMA_DESCRIPTOR_IN_LPSRAM
-#define DMA_DESCRIPTOR_ATTRS    __attribute__((section(".backup.bss")))
-#else
-#define DMA_DESCRIPTOR_ATTRS
-#endif
+#  ifdef DMA_DESCRIPTOR_IN_LPSRAM
+#    define DMA_DESCRIPTOR_ATTRS    __attribute__((section(".backup.bss")))
+#  else
+#    define DMA_DESCRIPTOR_ATTRS
+#  endif
 
 /**
  * @brief DMA channel type
@@ -1340,9 +1353,25 @@ void rtc_tamper_init(void);
  * @param   pin     The GPIO pin to be used for tamper detection
  * @param   flank   The Flank to trigger the even
  *
- * @return  0 on success, -1 if pin is not RTC pin
+ * @return  0 on success, -1 if pin is not an RTC pin
  */
 int rtc_tamper_register(gpio_t pin, gpio_flank_t flank);
+
+/**
+ * @brief   (Re-)Enable Tamper Detection pin
+ *
+ * @param   pin     The GPIO pin to be used for tamper detection
+ *
+ * @return  0 on success, -1 if pin is not an RTC pin
+ */
+int rtc_tamper_pin_enable(gpio_t pin);
+
+/**
+ * @brief   Disable Tamper Detection pin
+ *
+ * @param   pin     The GPIO pin to no longer be used for tamper detection
+ */
+void rtc_tamper_pin_disable(gpio_t pin);
 
 /**
  * @brief   Enable Tamper Detection IRQs
@@ -1391,9 +1420,9 @@ typedef struct sam0_aux_cfg_mapping nvm_user_page_t;
  * @brief   Size of the free to use auxiliary area in the user page
  */
 #ifdef FLASH_USER_PAGE_SIZE
-#define FLASH_USER_PAGE_AUX_SIZE (FLASH_USER_PAGE_SIZE - sizeof(nvm_user_page_t))
+#  define FLASH_USER_PAGE_AUX_SIZE (FLASH_USER_PAGE_SIZE - sizeof(nvm_user_page_t))
 #else
-#define FLASH_USER_PAGE_AUX_SIZE (AUX_PAGE_SIZE * AUX_NB_OF_PAGES - sizeof(nvm_user_page_t))
+#  define FLASH_USER_PAGE_AUX_SIZE (AUX_PAGE_SIZE * AUX_NB_OF_PAGES - sizeof(nvm_user_page_t))
 #endif
 
 /**
@@ -1447,5 +1476,4 @@ void sam0_flashpage_aux_write(uint32_t offset, const void *data, size_t len);
 }
 #endif
 
-#endif /* PERIPH_CPU_COMMON_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_fmt_table Table extension of the string formatting API (fmt_table)
  * @ingroup     sys_fmt
@@ -23,9 +25,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef FMT_TABLE_H
-#define FMT_TABLE_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -53,4 +52,3 @@ void print_col_s32_dec(int32_t number, size_t width);
 #endif
 
 /** @} */
-#endif /* FMT_TABLE_H */

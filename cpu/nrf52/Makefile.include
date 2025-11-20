@@ -42,5 +42,8 @@ JLINK_DEVICE = $(subst xx,_xx,$(CPU_MODEL))
 
 VECTORS_O ?= $(BINDIR)/nrf52_vectors/vectors_$(CPU_MODEL).o
 
+SVD_VENDOR := Nordic
+SVD_MODEL := $(patsubst %xxaa,%,$(CPU_MODEL))
+
 include $(RIOTCPU)/nrf5x_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk

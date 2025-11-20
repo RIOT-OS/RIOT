@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_pn532 PN532 NFC Reader
  * @ingroup     drivers_netdev
@@ -17,9 +19,6 @@
  *
  * @author      Víctor Ariño <victor.arino@triagnosys.com>
  */
-
-#ifndef PN532_H
-#define PN532_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -391,5 +390,4 @@ void pn532_release_passive(pn532_t *dev, unsigned target_id);
 }
 #endif
 
-#endif /* PN532_H */
 /** @} */

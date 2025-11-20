@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup sys_xtimer
  *
@@ -14,9 +16,6 @@
  * @brief   xtimer tick <-> seconds conversions for different values of XTIMER_HZ
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef XTIMER_TICK_CONVERSION_H
-#define XTIMER_TICK_CONVERSION_H
 
 #ifndef XTIMER_H
 #error "Do not include this file directly! Use xtimer.h instead"
@@ -135,5 +134,4 @@ static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
 }
 #endif
 
-#endif /* XTIMER_TICK_CONVERSION_H */
 /** @} */

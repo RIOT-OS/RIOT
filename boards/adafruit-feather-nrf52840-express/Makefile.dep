@@ -1,0 +1,20 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+  USEMODULE += saul_bat_voltage
+  USEMODULE += ws281x
+endif
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_spi_nor
+endif
+
+# default to using littlefs2 on the external flash
+ifneq (,$(filter vfs_default,$(USEMODULE)))
+  USEPKG += littlefs2
+  USEMODULE += mtd
+endif
+
+USEMODULE += boards_common_adafruit-nrf52-bootloader
+
+# include common nrf52 dependencies
+include $(RIOTBOARD)/common/nrf52/Makefile.dep

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_ds1307  DS1307 RTC
  * @ingroup     drivers_sensors
@@ -17,8 +19,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef DS1307_H
-#define DS1307_H
 
 #include <stdbool.h>
 #include <time.h>
@@ -157,5 +157,4 @@ int ds1307_get_sqw_mode(const ds1307_t *dev);
 }
 #endif
 
-#endif /* DS1307_H */
 /** @} */

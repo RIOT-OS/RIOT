@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ltc4150
  *
@@ -15,9 +17,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef LTC4150_PARAMS_H
-#define LTC4150_PARAMS_H
 
 #include "board.h"
 #include "ltc4150.h"
@@ -92,5 +91,4 @@ static const saul_reg_info_t ltc4150_saul_info[] =
 }
 #endif
 
-#endif /* LTC4150_PARAMS_H */
 /** @} */

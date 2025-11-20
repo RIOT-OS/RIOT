@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2019 Koen Zandberg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Koen Zandberg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup    cpu_nrf52_nrfusb NRF usb peripheral implementation
@@ -18,9 +17,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef NRFUSB_H
-#define NRFUSB_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -66,5 +62,4 @@ typedef struct {
 #ifdef __cplusplus
 }
 #endif
-#endif /* NRFUSB_H */
 /** @} */

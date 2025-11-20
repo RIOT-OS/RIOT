@@ -1,12 +1,11 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
- *               2017 OTA keys S.A.
- *               2023 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2017 OTA keys S.A.
+ * SPDX-FileCopyrightText: 2023 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_sam0_common
@@ -19,11 +18,7 @@
  * @author          Marian Buschsieweke <marian.buschsieweke@posteo.net>
  */
 
-#ifndef GPIO_LL_ARCH_H
-#define GPIO_LL_ARCH_H
-
 #include "architecture.h"
-#include "periph/gpio_ll.h"
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
@@ -48,6 +43,36 @@ extern "C" {
 #  define GPIO_IOBUS_BASE GPIO_APB_BASE /* no IOBUS present, fall back to APB */
 #endif
 
+#define GPIO_PORT_NUMBERING_ALPHABETIC  1
+
+#if PORT_GROUPS >= 1
+#  define GPIO_PORT_0   ((uintptr_t)&GPIO_IOBUS_BASE->Group[0])
+#endif
+#if PORT_GROUPS >= 2
+#  define GPIO_PORT_1   ((uintptr_t)&GPIO_IOBUS_BASE->Group[1])
+#endif
+#if PORT_GROUPS >= 3
+#  define GPIO_PORT_2   ((uintptr_t)&GPIO_IOBUS_BASE->Group[2])
+#endif
+#if PORT_GROUPS >= 4
+#  define GPIO_PORT_3   ((uintptr_t)&GPIO_IOBUS_BASE->Group[3])
+#endif
+#if PORT_GROUPS >= 5
+#  define GPIO_PORT_4   ((uintptr_t)&GPIO_IOBUS_BASE->Group[4])
+#endif
+#if PORT_GROUPS >= 5
+#  define GPIO_PORT_4   ((uintptr_t)&GPIO_IOBUS_BASE->Group[4])
+#endif
+#if PORT_GROUPS >= 6
+#  define GPIO_PORT_5   ((uintptr_t)&GPIO_IOBUS_BASE->Group[5])
+#endif
+#if PORT_GROUPS >= 7
+#  define GPIO_PORT_6   ((uintptr_t)&GPIO_IOBUS_BASE->Group[6])
+#endif
+#if PORT_GROUPS >= 8
+#  define GPIO_PORT_7   ((uintptr_t)&GPIO_IOBUS_BASE->Group[7])
+#endif
+
 /**
  * @brief   Get a GPIO port by number
  */
@@ -58,6 +83,16 @@ extern "C" {
  */
 #define GPIO_PORT_NUM(port) \
     (((port) - (uintptr_t)&GPIO_IOBUS_BASE->Group[0]) / sizeof(GPIO_IOBUS_BASE->Group[0]))
+
+static inline gpio_port_t gpio_port(uword_t num)
+{
+    return (uintptr_t)&GPIO_IOBUS_BASE->Group[num];
+}
+
+static inline uword_t gpio_port_num(gpio_port_t port)
+{
+    return (port - (uintptr_t)&GPIO_IOBUS_BASE->Group[0]) / sizeof(GPIO_IOBUS_BASE->Group[0]);
+}
 
 static inline PortGroup *sam0_gpio_iobus2ap(PortGroup *iobus)
 {
@@ -120,7 +155,15 @@ static inline void gpio_ll_switch_dir_input(gpio_port_t port, uword_t inputs)
 
 static inline gpio_port_t gpio_get_port(gpio_t pin)
 {
-    return (gpio_port_t)(pin & ~(0x1f));
+    /* GPIO LL and legacy GPIO API may disagree on what is the GPIO base
+     * address if one is using the IOBUS and the other is using the APB for
+     * access. In this case, we need to do impedance matching by adding the
+     * offset. */
+    const uintptr_t gpio_ll_base = GPIO_PORT_0;
+    const uintptr_t gpio_legacy_base = GPIO_PIN(0, 0) & ~(0x1f);
+    uintptr_t addr = (pin & ~(0x1f));
+
+    return addr + (gpio_ll_base - gpio_legacy_base);
 }
 
 static inline uint8_t gpio_get_pin_num(gpio_t pin)
@@ -155,5 +198,4 @@ static inline bool is_gpio_port_num_valid(uint_fast8_t num)
 }
 #endif
 
-#endif /* GPIO_LL_ARCH_H */
 /** @} */

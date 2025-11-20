@@ -1,12 +1,11 @@
 /*
- * Copyright (C)    2016 Nicholas Jackson
- *                  2017 HAW Hamburg
- *                  2020 Locha Inc
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Nicholas Jackson
+ * SPDX-FileCopyrightText: 2017 HAW Hamburg
+ * SPDX-FileCopyrightText: 2020 Locha Inc
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         boards_cc1312_launchpad
@@ -19,9 +18,6 @@
  * @author          Sebastian Meiling <s@mlng.net>
  * @author          Jean Pierre Dudey <jeandudey@hotmail.com>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -118,5 +114,4 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

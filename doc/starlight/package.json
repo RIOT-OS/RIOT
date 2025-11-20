@@ -1,0 +1,20 @@
+{
+  "name": "guide",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.12",
+    "@astrojs/starlight": "^0.36.0",
+    "astro": "^5.14.0",
+    "rehype-github-emoji": "^1.0.0",
+    "sharp": "^0.34.0",
+    "starlight-image-zoom": "^0.13.1"
+  }
+}

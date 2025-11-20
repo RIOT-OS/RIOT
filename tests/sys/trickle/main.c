@@ -25,7 +25,6 @@
 #include "msg.h"
 #include "ztimer.h"
 
-
 #define TRICKLE_MSG     (0xfeef)
 #define TR_IMIN         (8)
 #define TR_IDOUBLINGS   (20)

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_apds99xx
  * @brief       Register definitions for Broadcom APDS99XX proximity and ambient light sensor
@@ -13,9 +15,6 @@
  * @file
  * @{
  */
-
-#ifndef APDS99XX_REGS_H
-#define APDS99XX_REGS_H
 
 #ifdef __cplusplus
 extern "C"
@@ -134,5 +133,4 @@ extern "C"
 }
 #endif
 
-#endif /* APDS99XX_REGS_H */
 /** @} */

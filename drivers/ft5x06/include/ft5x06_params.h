@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ft5x06
  *
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef FT5X06_PARAMS_H
-#define FT5X06_PARAMS_H
 
 #include <stdint.h>
 
@@ -94,5 +93,4 @@ static const uint8_t ft5x06_screen_ids[] =
 }
 #endif
 
-#endif /* FT5X06_PARAMS_H */
 /** @} */

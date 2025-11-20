@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_sgp30 SGP30 Gas Sensor
  * @ingroup     drivers_sensors
@@ -42,9 +44,6 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
-
-#ifndef SGP30_H
-#define SGP30_H
 
 #include "periph/i2c.h"
 #include "ztimer.h"
@@ -96,8 +95,8 @@ typedef struct {
 /**
  * @brief   Initialize the given device
  *
- * @param[inout] dev        Device descriptor of the driver
- * @param[in]    params     Initialization parameters
+ * @param[in,out] dev       Device descriptor of the driver
+ * @param[in]     params    Initialization parameters
  *
  * @return                  0 on success
  */
@@ -108,7 +107,7 @@ int sgp30_init(sgp30_t *dev, const sgp30_params_t *params);
  *
  * @note    Must be called after every power-cycle or soft reset.
  *
- * @param[inout] dev        Device descriptor of the driver
+ * @param[in,out] dev       Device descriptor of the driver
  *
  * @retval  0         Success
  * @retval -PROTO     Sensor did not acknowledge command
@@ -251,5 +250,4 @@ int sgp30_read_raw_measurements(sgp30_t *dev, sgp30_raw_data_t *data);
 }
 #endif
 
-#endif /* SGP30_H */
 /** @} */

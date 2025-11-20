@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_hmc5883l
  * @brief       Register definitions for the Honeywell HMC5883L 3-axis digital compass
@@ -13,9 +15,6 @@
  * @file
  * @{
  */
-
-#ifndef HMC5883L_REGS_H
-#define HMC5883L_REGS_H
 
 #ifdef __cplusplus
 extern "C"
@@ -72,5 +71,4 @@ extern "C"
 }
 #endif
 
-#endif /* HMC5883L_REGS_H */
 /** @} */

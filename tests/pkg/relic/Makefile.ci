@@ -1,23 +1,52 @@
 BOARD_INSUFFICIENT_MEMORY := \
+    airfy-beacon \
+    atmega1284p \
     atmega8 \
+    b-l072z-lrwan1 \
+    blackpill-stm32f103c8 \
+    blackpill-stm32f103cb \
     bluepill-stm32f030c8 \
+    bluepill-stm32f103c8 \
+    bluepill-stm32f103cb \
+    calliope-mini \
+    cc1350-launchpad \
+    cc2650-launchpad \
+    cc2650stk \
     i-nucleo-lrwan1 \
+    im880b \
+    lsn50 \
+    maple-mini \
+    microbit \
+    nrf51dongle \
     nucleo-c031c6 \
     nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
+    nucleo-f070rb \
+    nucleo-f072rb \
+    nucleo-f103rb \
     nucleo-f303k8 \
     nucleo-f334r8 \
     nucleo-l011k4 \
     nucleo-l031k6 \
     nucleo-l053r8 \
+    nucleo-l073rz \
     olimex-msp430-h1611 \
     olimex-msp430-h2618 \
+    olimexino-stm32 \
+    opencm904 \
     samd10-xmini \
+    saml10-xpro \
+    saml11-xpro \
     slstk3400a \
+    spark-core \
     stk3200 \
+    stm32c0116-dk \
+    stm32c0316-dk \
     stm32f030f4-demo \
     stm32g0316-disco \
     stm32l0538-disco \
     weact-g030f6 \
+    yunjia-nrf51822 \
+    zigduino \
     #

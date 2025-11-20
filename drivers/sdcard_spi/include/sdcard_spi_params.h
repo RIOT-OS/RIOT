@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_sdcard_spi
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
-
-#ifndef SDCARD_SPI_PARAMS_H
-#define SDCARD_SPI_PARAMS_H
 
 #include "board.h"
 
@@ -74,5 +73,4 @@ static const  sdcard_spi_params_t sdcard_spi_params[] = {
 }
 #endif
 
-#endif /* SDCARD_SPI_PARAMS_H */
 /** @} */

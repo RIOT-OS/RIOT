@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_shell Shell
  * @ingroup     sys
@@ -19,14 +21,30 @@
  * there is no expectation of security of the system when an attacker gains
  * access to the shell.
  *
+ * ## Usage
+ *
+ * Enable the `shell` module e.g. by adding the following snippet to your
+ * applications `Makefile`.
+ *
+ * ```
+ * USEMODULE += shell
+ * ```
+ *
+ * And run the shell using @ref shell_run_forever e.g. from the `main` thread
+ * after everything is set up. This call will never return.
+ *
+ * ## Builtin Commands
+ *
+ * The commands `help` and `help_json` are builtins that print the list of
+ * available commands: The former prints a human readable table and is always
+ * available, the latter requires module `shell_builtin_cmd_help_json` to be
+ * used and will give the same info machine readable.
+ *
  * @{
  *
  * @file
  * @brief       Shell interface definition
  */
-
-#ifndef SHELL_H
-#define SHELL_H
 
 #include <stdint.h>
 #include "periph/pm.h"
@@ -91,7 +109,7 @@ extern "C" {
  *   passing stdin (`isrpipe_t stdin_isrpipe`) does not support backpressure
  *   and overflows silently. As a consequence, commands through such terminals
  *   appear to be truncated at @ref STDIO_RX_BUFSIZE bytes (defaulting to 64)
- *   unless the command is sent in parts (on many terminals, by presing Ctrl-D
+ *   unless the command is sent in parts (on many terminals, by pressing Ctrl-D
  *   half way through the command).
  *
  *   For example, this affects systems with direct USB stdio (@ref
@@ -252,6 +270,31 @@ int shell_handle_input_line(const shell_command_t *commands, char *line);
 int shell_parse_file(const shell_command_t *commands,
                      const char *filename, unsigned *line_nr);
 
+/**
+ * @brief   Read a single line from standard input into a buffer.
+ *
+ * In addition to copying characters, this routine echoes the line back to
+ * stdout and also supports primitive line editing.
+ *
+ * If the input line is too long, the input will still be consumed until the end
+ * to prevent the next line from containing garbage.
+ *
+ * We allow Unix (`\n`), DOS (`\r\n`), and Mac linebreaks (`\r`).
+ * QEMU transmits only a single `\r` == 13 on hitting enter ("-serial stdio").
+ * DOS newlines are handled like hitting enter twice.
+ *
+ * @param   buf     Buffer where the input will be placed.
+ * @param   size    Size of the buffer. The maximum line length will be one less
+ *                  than size, to accommodate for the null terminator.
+ *                  The minimum buffer size is 1.
+ *
+ * @return  length of the read line, excluding the terminator, if reading was
+ *          successful.
+ * @return  EOF, if the end of the input stream was reached.
+ * @return  -ENOBUFS if the buffer size was exceeded.
+ */
+int shell_readline(char *buf, size_t size);
+
 #ifndef __cplusplus
 /**
  * @brief   Define shell command
@@ -283,20 +326,18 @@ int shell_parse_file(const shell_command_t *commands,
  * ```
  */
 #define SHELL_COMMAND(cmd, help, func) \
-    XFA_USE_CONST(shell_command_xfa_t*, shell_commands_xfa); \
+    XFA_USE_CONST(shell_command_xfa_t, shell_commands_xfa_v2); \
     static FLASH_ATTR const char _xfa_ ## cmd ## _cmd_name[] = #cmd; \
     static FLASH_ATTR const char _xfa_ ## cmd ## _cmd_desc[] = help; \
-    static const shell_command_xfa_t _xfa_ ## cmd ## _cmd = { \
+    XFA_CONST(shell_command_xfa_t, shell_commands_xfa_v2, 0) _xfa_ ## cmd ## _cmd = { \
         .name = _xfa_ ## cmd ## _cmd_name, \
         .desc = _xfa_ ## cmd ## _cmd_desc, \
         .handler = &func \
-    }; \
-    XFA_ADD_PTR(shell_commands_xfa, cmd, cmd, &_xfa_ ## cmd ## _cmd)
+    };
 #endif /* __cplusplus */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* SHELL_H */
 /** @} */

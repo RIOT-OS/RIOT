@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2022 SSV Software Systems GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2022 SSV Software Systems GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_xg23-pk6068a
@@ -15,9 +14,6 @@
  *
  * @author      Juergen Fitschen <me@jue.yt>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include <stdint.h>
 
@@ -175,5 +171,4 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

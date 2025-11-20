@@ -5,6 +5,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /**
  * @ingroup     drivers_cst816s
  *
@@ -14,8 +17,6 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-#ifndef CST816S_INTERNAL_H
-#define CST816S_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,5 +34,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CST816S_INTERNAL_H */
 /** @} */

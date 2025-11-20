@@ -30,7 +30,7 @@ static void epd_bw_spi_cmd_start(epd_bw_spi_params_t *p, uint8_t cmd, bool cont)
 {
     DEBUG("[epd_bw_spi] cmd_start: command 0x%02x\n", cmd);
     if (gpio_is_valid(p->busy_pin)) {
-        while ((bool)gpio_read(p->busy_pin) == p->busy_value) {}
+        while (gpio_read(p->busy_pin) == p->busy_value) {}
     }
     gpio_clear(p->dc_pin);
     spi_transfer_byte(p->spi, p->cs_pin, cont, (uint8_t)cmd);
@@ -52,7 +52,7 @@ static void epd_bw_spi_wait(epd_bw_spi_params_t *p, uint32_t msec)
 {
     if (gpio_is_valid(p->busy_pin)) {
         DEBUG("[epd_bw_spi] wait: for busy bin\n");
-        while ((bool)gpio_read(p->busy_pin) == p->busy_value) {}
+        while (gpio_read(p->busy_pin) == p->busy_value) {}
     }
     else {
         DEBUG("[epd_bw_spi] wait: for %" PRIu32 " milliseconds\n", msec);

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    core_sync_rmutex Recursive Mutex
  * @ingroup     core_sync
@@ -19,9 +21,6 @@
  * @author      Martin Elshuber <martin.elshuber@theobroma-systems.com>
  *
  */
-
-#ifndef RMUTEX_H
-#define RMUTEX_H
 
 #include <stdint.h>
 
@@ -109,5 +108,4 @@ void rmutex_unlock(rmutex_t *rmutex);
 }
 #endif
 
-#endif /* RMUTEX_H */
 /** @} */

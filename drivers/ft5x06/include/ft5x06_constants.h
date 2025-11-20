@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_ft5x06
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef FT5X06_CONSTANTS_H
-#define FT5X06_CONSTANTS_H
 
 #include "kernel_defines.h"
 
@@ -138,5 +137,4 @@ extern "C" {
 }
 #endif
 
-#endif /* FT5X06_CONSTANTS_H */
 /** @} */

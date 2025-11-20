@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    fido2_ctap_mem FIDO2 CTAP flash
  * @ingroup     fido2_ctap
@@ -18,9 +20,6 @@
  *
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
-
-#ifndef FIDO2_CTAP_CTAP_MEM_H
-#define FIDO2_CTAP_CTAP_MEM_H
 
 #include <stdint.h>
 
@@ -100,9 +99,9 @@ extern "C" {
 /**
  * @brief Initialize memory helper
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_mem_init(void);
+ctap_status_code_t fido2_ctap_mem_init(void);
 
 /**
  * @brief Read from flash memory
@@ -112,34 +111,34 @@ int fido2_ctap_mem_init(void);
  * @param[in]  offset     offset from the start of the page (in bytes)
  * @param[in] len       number of bytes to write
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_mem_read(void *buf, uint32_t page, uint32_t offset, uint32_t len);
+ctap_status_code_t fido2_ctap_mem_read(void *buf, uint32_t page, uint32_t offset, uint32_t len);
 
 /**
  * @brief Erase all flashpages containing CTAP data
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_mem_erase_flash(void);
+ctap_status_code_t fido2_ctap_mem_erase_flash(void);
 
 /**
  * @brief Read authenticator state from flash
  *
  * @param[in]  state       pointer to authenticator state
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_mem_read_state_from_flash(ctap_state_t *state);
+ctap_status_code_t fido2_ctap_mem_read_state_from_flash(ctap_state_t *state);
 
 /**
  * @brief Write authenticator state to flash
  *
  * @param[in]  state       pointer to authenticator state
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_mem_write_state_to_flash(ctap_state_t *state);
+ctap_status_code_t fido2_ctap_mem_write_state_to_flash(ctap_state_t *state);
 
 /**
  * @brief Find resident credential for @p rp_id_hash in flash
@@ -153,22 +152,21 @@ int fido2_ctap_mem_write_state_to_flash(ctap_state_t *state);
  * @param[in]   rp_id_hash pointer to hash of rp domain string
  * @param[in] addr pointer to address where to read from
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_mem_read_rk_from_flash(ctap_resident_key_t *key, uint8_t *rp_id_hash,
-                                      uint32_t *addr);
+ctap_status_code_t fido2_ctap_mem_read_rk_from_flash(ctap_resident_key_t *key, uint8_t *rp_id_hash,
+                                                     uint32_t *addr);
 
 /**
  * @brief Write resident credential to flash
  *
  * @param[in]  rk      pointer to resident credential
  *
- * @return @ref ctap_status_codes_t
+ * @return @ref ctap_status_code_t
  */
-int fido2_ctap_mem_write_rk_to_flash(ctap_resident_key_t *rk);
+ctap_status_code_t fido2_ctap_mem_write_rk_to_flash(ctap_resident_key_t *rk);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* FIDO2_CTAP_CTAP_MEM_H */
 /** @} */

@@ -1,6 +1,6 @@
 # setup JLink for flashing
 JLINK_DEVICE = EFR32MG1BxxxF256
-JLINK_PRE_FLASH = r
+JLINK_PRE_FLASH += r
 
 # setup OpenOCD for flashing
 PROGRAMMERS_SUPPORTED += openocd

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_matstat
  *
@@ -28,9 +30,6 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef MATSTAT_H
-#define MATSTAT_H
 
 #include <stdint.h>
 
@@ -104,7 +103,7 @@ uint64_t matstat_variance(const matstat_state_t *state);
  * Add the sums and count of @p src and @p dest, take the maximum of the max
  * values and minimum of the min values. The result is written to @p dest.
  *
- * @param[inout]    dest    destination state struct
+ * @param[in,out]   dest    destination state struct
  * @param[out]      src     source state struct
  */
 void matstat_merge(matstat_state_t *dest, const matstat_state_t *src);
@@ -112,7 +111,5 @@ void matstat_merge(matstat_state_t *dest, const matstat_state_t *src);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* MATSTAT_H */
 
 /** @} */

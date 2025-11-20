@@ -1,3 +1,0 @@
-FEATURES_PROVIDED += periph_flashpage
-
-include $(RIOTBOARD)/native/Makefile.features

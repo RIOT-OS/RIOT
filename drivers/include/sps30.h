@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_sps30 SPS30 Particulate Matter Sensor
  * @ingroup     drivers_sensors
@@ -57,9 +59,6 @@
  *
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
-
-#ifndef SPS30_H
-#define SPS30_H
 
 #include <stdbool.h>
 #include "periph/gpio.h"
@@ -308,5 +307,4 @@ int sps30_wakeup(const sps30_t *dev);
 #ifdef __cplusplus
 }
 #endif
-#endif /* SPS30_H */
 /** @} */

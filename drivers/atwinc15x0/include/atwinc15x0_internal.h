@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_atwinc15x0
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef ATWINC15X0_INTERNAL_H
-#define ATWINC15X0_INTERNAL_H
 
 #include <stdbool.h>
 #include <string.h>
@@ -305,5 +304,4 @@ void atwinc15x0_irq(void);
 }
 #endif
 
-#endif /* ATWINC15X0_INTERNAL_H */
 /** @} */

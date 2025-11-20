@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_mynewt_core
  * @{
@@ -16,9 +18,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
-
-#ifndef MCU_MCU_H
-#define MCU_MCU_H
 
 #include "cpu.h"
 
@@ -57,5 +56,3 @@ void nrf5x_hw_set_isr(int irqn, void (*addr)(void));
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* MCU_MCU_H */

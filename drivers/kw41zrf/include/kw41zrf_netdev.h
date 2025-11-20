@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_kw41zrf
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-#ifndef KW41ZRF_NETDEV_H
-#define KW41ZRF_NETDEV_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,5 +31,4 @@ extern const netdev_driver_t kw41zrf_driver;
 }
 #endif
 
-#endif /* KW41ZRF_NETDEV_H */
 /** @} */

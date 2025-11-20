@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    net_tcp TCP
  * @ingroup     net
@@ -18,9 +20,6 @@
  *
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
-
-#ifndef NET_TCP_H
-#define NET_TCP_H
 
 #include "byteorder.h"
 
@@ -87,5 +86,4 @@ void tcp_hdr_print(tcp_hdr_t *hdr);
 }
 #endif
 
-#endif /* NET_TCP_H */
 /** @} */

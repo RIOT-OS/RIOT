@@ -16,6 +16,7 @@ ifeq (,$(filter nrf5340_app,$(CPU_MODEL)))
   FEATURES_PROVIDED += periph_gpio_ll_input_pull_down
   FEATURES_PROVIDED += periph_gpio_ll_input_pull_up
   FEATURES_PROVIDED += periph_gpio_ll_irq
+  FEATURES_PROVIDED += periph_gpio_ll_irq_edge_triggered_both
   FEATURES_PROVIDED += periph_gpio_ll_irq_unmask
   FEATURES_PROVIDED += periph_gpio_ll_open_drain
   FEATURES_PROVIDED += periph_gpio_ll_open_drain_pull_up
@@ -35,5 +36,8 @@ ifeq (,$(filter nrf9160 nrf5340_app,$(CPU_MODEL)))
   FEATURES_PROVIDED += radio_nrfmin
   FEATURES_PROVIDED += netif
 endif
+
+FEATURES_CONFLICT += radio_nrf802154:radio_nrfble radio_nrf802154:radio_nrfmin radio_nrfble:radio_nrfmin
+FEATURES_CONFLICT_MSG += "Multiplexing the nRF radio between different radio modes is not supported."
 
 include $(RIOTCPU)/cortexm_common/Makefile.features

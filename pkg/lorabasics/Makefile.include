@@ -1,4 +1,5 @@
-INCLUDES += -I$(PKGDIRBASE)/lorabasicsmodem \
+# Using -isystem instead of -I to prevent warnings for the following headers
+INCLUDES += -isystem$(PKGDIRBASE)/lorabasicsmodem \
             #
 
 ifneq (,$(filter lorabasics_driver_sx1280_hal,$(USEMODULE)))

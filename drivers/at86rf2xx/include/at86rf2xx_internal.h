@@ -8,6 +8,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_at86rf2xx
  * @{
@@ -20,9 +22,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Sebastian Meiling <s@mlng.net>
  */
-
-#ifndef AT86RF2XX_INTERNAL_H
-#define AT86RF2XX_INTERNAL_H
 
 #include <stdint.h>
 
@@ -150,7 +149,7 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev, uint8_t offset,
                           const uint8_t *data, size_t len);
 #endif
 /**
- * @brief   Start a read transcation internal frame buffer of the given device
+ * @brief   Start a read transaction internal frame buffer of the given device
  *
  * Reading the frame buffer returns some extra bytes that are not accessible
  * through reading the RAM directly. This locks the used SPI.
@@ -182,7 +181,7 @@ static inline void at86rf2xx_fb_read(const at86rf2xx_t *dev, uint8_t *data, size
 void at86rf2xx_fb_read(const at86rf2xx_t *dev, uint8_t *data, size_t len);
 #endif
 /**
- * @brief   Stop a read transcation internal frame buffer of the given device
+ * @brief   Stop a read transaction internal frame buffer of the given device
  *
  * Release the SPI device and unlock frame buffer protection.
  *
@@ -339,5 +338,4 @@ static inline uint32_t at86rf2xx_get_sc(const at86rf2xx_t *dev)
 }
 #endif
 
-#endif /* AT86RF2XX_INTERNAL_H */
 /** @} */

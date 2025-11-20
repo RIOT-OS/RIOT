@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2015-2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015-2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_efm32
@@ -16,9 +15,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
-
-#ifndef PERIPH_CPU_H
-#define PERIPH_CPU_H
 
 #include "kernel_defines.h"
 #include "mutex.h"
@@ -63,7 +59,6 @@ typedef struct {
     CMU_Clock_TypeDef clk;   /**< Clock domain */
     CMU_ClkDiv_TypeDef div;  /**< Divisor */
 } clk_div_t;
-
 
 /**
  * @brief   Length of CPU ID in octets.
@@ -456,9 +451,9 @@ typedef struct {
  */
 #define HAVE_PWM_MODE_T
 typedef enum {
-    PWM_LEFT = timerModeUp,           /*< use left aligned PWM */
-    PWM_RIGHT = timerModeDown,        /*< use right aligned PWM */
-    PWM_CENTER = timerModeUp          /*< not supported, use left aligned */
+    PWM_LEFT = timerModeUp,           /**< use left aligned PWM */
+    PWM_RIGHT = timerModeDown,        /**< use right aligned PWM */
+    PWM_CENTER = timerModeUp          /**< not supported, use left aligned */
 } pwm_mode_t;
 /** @} */
 #endif /* ndef DOXYGEN */
@@ -745,5 +740,4 @@ typedef enum {
 }
 #endif
 
-#endif /* PERIPH_CPU_H */
 /** @} */

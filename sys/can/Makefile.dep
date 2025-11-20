@@ -16,4 +16,10 @@ ifneq (,$(filter can_mbox,$(USEMODULE)))
   USEMODULE += core_mbox
 endif
 
+# on native32/native64/native, the can headers include libsocketcan.h for
+# some definitions, so we actually need to use that package
+ifneq (,$(filter native%,$(BOARD)))
+  USEPKG += libsocketcan
+endif
+
 USEMODULE += memarray

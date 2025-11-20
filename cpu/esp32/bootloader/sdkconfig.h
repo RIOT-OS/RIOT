@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2021 iosabi
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 iosabi
+ * SPDX-FileCopyrightText: 2024 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     pkg_esp32_sdk
@@ -22,25 +22,27 @@
  * bootloader.
  *
  * @author      iosabi <iosabi@protonmail.com>
+ * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef SDKCONFIG_H
-#define SDKCONFIG_H
 
 #ifndef DOXYGEN
 
 #include "esp_idf_ver.h"
 
 #if defined(CPU_FAM_ESP32)
-#include "sdkconfig_default_esp32.h"
+#  include "sdkconfig_default_esp32.h"
 #elif defined(CPU_FAM_ESP32C3)
-#include "sdkconfig_default_esp32c3.h"
+#  include "sdkconfig_default_esp32c3.h"
+#elif defined(CPU_FAM_ESP32C6)
+#  include "sdkconfig_default_esp32c6.h"
+#elif defined(CPU_FAM_ESP32H2)
+#  include "sdkconfig_default_esp32h2.h"
 #elif defined(CPU_FAM_ESP32S2)
-#include "sdkconfig_default_esp32s2.h"
+#  include "sdkconfig_default_esp32s2.h"
 #elif defined(CPU_FAM_ESP32S3)
-#include "sdkconfig_default_esp32s3.h"
+#  include "sdkconfig_default_esp32s3.h"
 #else
-#error "ESP32x family implementation missing"
+#  error "ESP32x family implementation missing"
 #endif
 
 #include "sdkconfig_default_common.h"
@@ -49,8 +51,10 @@
 extern "C" {
 #endif
 
+#define CONFIG_BOOTLOADER_PROJECT_VER   1
+
 #if MODULE_ESP_LOG_COLORED
-#define CONFIG_LOG_COLORS   1
+#  define CONFIG_BOOTLOADER_LOG_COLORS  1
 #endif
 
 #ifndef CONFIG_BOOTLOADER_LOG_LEVEL
@@ -64,11 +68,11 @@ extern "C" {
  *  4 = DEBUG
  *  5 = VERBOSE
  */
-#if MODULE_ESP_LOG_STARTUP
-#define CONFIG_BOOTLOADER_LOG_LEVEL     3   /* INFO */
-#else
-#define CONFIG_BOOTLOADER_LOG_LEVEL     0   /* NONE */
-#endif
+#  if MODULE_ESP_LOG_STARTUP
+#    define CONFIG_BOOTLOADER_LOG_LEVEL 3   /* INFO */
+#  else
+#    define CONFIG_BOOTLOADER_LOG_LEVEL 0   /* NONE */
+#  endif
 #endif
 
 /**
@@ -78,7 +82,7 @@ extern "C" {
     !defined(CONFIG_FLASHMODE_DIO) && \
     !defined(CONFIG_FLASHMODE_QOUT) && \
     !defined(CONFIG_FLASHMODE_QIO)
-#error "Flash mode not configured"
+#  error "Flash mode not configured"
 #endif
 
 /*
@@ -92,18 +96,22 @@ extern "C" {
  * bootloader.
  */
 #if defined(CONFIG_CONSOLE_UART_TX) && defined(CONFIG_CONSOLE_UART_RX)
-#define CONFIG_ESP_CONSOLE_UART_CUSTOM      1
-#define CONFIG_ESP_CONSOLE_UART_TX_GPIO     CONFIG_CONSOLE_UART_TX
-#define CONFIG_ESP_CONSOLE_UART_RX_GPIO     CONFIG_CONSOLE_UART_RX
+#  define CONFIG_ESP_CONSOLE_UART_CUSTOM    1
+#  define CONFIG_ESP_CONSOLE_UART_TX_GPIO   CONFIG_CONSOLE_UART_TX
+#  define CONFIG_ESP_CONSOLE_UART_RX_GPIO   CONFIG_CONSOLE_UART_RX
 #else
-#define CONFIG_ESP_CONSOLE_UART_DEFAULT     1
+#  define CONFIG_ESP_CONSOLE_UART_DEFAULT   1
 #endif
 
 #if defined(CONFIG_CONSOLE_UART_NUM)
-#define CONFIG_ESP_CONSOLE_UART_NUM         CONFIG_CONSOLE_UART_NUM
+#  define CONFIG_ESP_CONSOLE_UART_NUM       CONFIG_CONSOLE_UART_NUM
 #else
-#define CONFIG_ESP_CONSOLE_UART_NUM         0
+#  define CONFIG_ESP_CONSOLE_UART_NUM       0
 #endif
+
+#define CONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM CONFIG_ESP_CONSOLE_UART_NUM
+
+#define CONFIG_LOG_TAG_LEVEL_IMPL_CACHE_AND_LINKED_LIST 1
 
 #ifdef __cplusplus
 }
@@ -111,5 +119,3 @@ extern "C" {
 
 #endif /* DOXYGEN */
 /** @} */
-
-#endif /* SDKCONFIG_H */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_periph_vbat backup battery monitoring
  * @ingroup     drivers_periph
@@ -29,9 +31,6 @@
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
-
-#ifndef PERIPH_VBAT_H
-#define PERIPH_VBAT_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -68,5 +67,4 @@ bool vbat_is_empty(void);
 }
 #endif
 
-#endif /* PERIPH_VBAT_H */
 /** @} */

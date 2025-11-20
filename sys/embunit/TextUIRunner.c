@@ -39,26 +39,28 @@
  */
 static TestResult result_;
 static OutputterRef outputterRef_ = 0;
-static int wasfailure_ = 0;
+static int testcasewasfailure_ = 0;
+static int testsuitewasfailure_ = 0;
 
 static void TextUIRunner_startTest(TestListnerRef self,TestRef test)
 {
     (void)self;
     (void)test;
-    wasfailure_ = 0;
+    testcasewasfailure_ = 0;
 }
 
 static void TextUIRunner_endTest(TestListnerRef self,TestRef test)
 {
     (void)self;
-    if (!wasfailure_)
+    if (!testcasewasfailure_)
         Outputter_printSuccessful(outputterRef_,test,result_.runCount);
 }
 
 static void TextUIRunner_addFailure(TestListnerRef self,TestRef test,char *msg,int line,char *file)
 {
     (void)self;
-    wasfailure_ = 1;
+    testcasewasfailure_ = 1;
+    testsuitewasfailure_ = 1;
     Outputter_printFailure(outputterRef_,test,msg,line,file,result_.runCount);
 }
 
@@ -89,6 +91,7 @@ void TextUIRunner_startWithOutputter(OutputterRef outputter)
 
 void TextUIRunner_start(void)
 {
+    testsuitewasfailure_ = 0;
     if (!outputterRef_)
         outputterRef_ = TextOutputter_outputter();
     TextUIRunner_startWithOutputter(outputterRef_);
@@ -104,5 +107,5 @@ void TextUIRunner_runTest(TestRef test)
 int TextUIRunner_end(void)
 {
     Outputter_printStatistics(outputterRef_,&result_);
-    return wasfailure_;
+    return testsuitewasfailure_;
 }

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_event
  * @brief       Provides functionality to trigger multiple events at once
@@ -18,9 +20,6 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  *
  */
-
-#ifndef EVENT_SOURCE_H
-#define EVENT_SOURCE_H
 
 #include "event.h"
 #include "list.h"
@@ -114,5 +113,4 @@ static inline void event_source_trigger(event_source_t *source)
 #ifdef __cplusplus
 }
 #endif
-#endif /* EVENT_SOURCE_H */
 /** @} */

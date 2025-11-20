@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_driver_cryptocell_310
  * @{
@@ -17,9 +19,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
-
-#ifndef PSA_CRYPTOCELL_310_ECC_COMMON_H
-#define PSA_CRYPTOCELL_310_ECC_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -76,6 +75,22 @@ psa_status_t cryptocell_310_common_ecc_generate_key_pair(uint8_t *priv_key_buffe
                                                  CRYS_ECPKI_DomainID_t domain);
 
 /**
+ * @brief   Common ECC public key derivation function (not supported)
+ *
+ * @param   priv_key_buffer         Input buffer to read ECC private key
+ * @param   pub_key_buffer          Output buffer to write ECC public key
+ * @param   priv_key_buffer_length  Length of private key
+ * @param   pub_key_buffer_length   Output pointer to write public key length
+ * @param   domain                  ECC domain of type @c CRYS_ECPKI_DomainID_t
+ * @return  psa_status_t
+ */
+psa_status_t cryptocell_310_common_ecc_derive_pub_key(const uint8_t *priv_key_buffer,
+                                                 uint8_t *pub_key_buffer,
+                                                 uint32_t priv_key_buffer_length,
+                                                 uint32_t *pub_key_buffer_length,
+                                                 CRYS_ECPKI_DomainID_t domain);
+
+/**
  * @brief   Common ECC signature function
  *
  * @param   priv_key            Pointer to ECC private key
@@ -124,5 +139,4 @@ psa_status_t cryptocell_310_common_ecc_verify(const uint8_t *pub_key,
 }
 #endif
 
-#endif /* PSA_CRYPTOCELL_310_ECC_COMMON_H */
 /** @} */

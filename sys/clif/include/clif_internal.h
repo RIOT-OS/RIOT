@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup    sys_clif
  *
@@ -16,8 +18,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-#ifndef CLIF_INTERNAL_H
-#define CLIF_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -151,5 +151,4 @@ extern "C" {
 }
 #endif
 
-#endif /* CLIF_INTERNAL_H */
 /** @} */

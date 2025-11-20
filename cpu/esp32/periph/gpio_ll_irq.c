@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -27,6 +24,7 @@
 #include "log.h"
 #include "periph/gpio_ll_irq.h"
 
+#include "driver/gpio.h"
 #include "esp/common_macros.h"
 #include "esp_intr_alloc.h"
 #include "hal/gpio_hal.h"
@@ -36,8 +34,6 @@
 #if __xtensa__
 #include "xtensa/xtensa_api.h"
 #endif
-
-#include "esp_idf_api/gpio.h"
 
 #include "irq_arch.h"
 
@@ -61,14 +57,14 @@ int gpio_ll_irq(gpio_port_t port, uint8_t pin, gpio_irq_trig_t trig,
 
     unsigned state = irq_disable();
 
-    gpio_t gpio = GPIO_PIN(GPIO_PORT_NUM(port), pin);
+    gpio_t gpio = GPIO_PIN(gpio_port_num(port), pin);
 
     DEBUG("%s gpio=%u port=%u pin=%u trig=%d cb=%p arg=%p\n",
-          __func__, gpio, GPIO_PORT_NUM(port), pin, trig, cb, arg);
+          __func__, gpio, (unsigned)gpio_port_num(port), pin, trig, cb, arg);
 
     /* install GPIO ISR of ESP-IDF if not yet done */
     if (!gpio_isr_service_installed &&
-        esp_idf_gpio_install_isr_service(ESP_INTR_FLAG_LEVEL1) != ESP_OK) {
+        gpio_install_isr_service(ESP_INTR_FLAG_LEVEL1) != ESP_OK) {
         return -1;
     }
     gpio_isr_service_installed = true;
@@ -94,12 +90,12 @@ int gpio_ll_irq(gpio_port_t port, uint8_t pin, gpio_irq_trig_t trig,
     default:
         type = GPIO_INTR_DISABLE;
     }
-    if (esp_idf_gpio_set_intr_type(gpio, type) != ESP_OK) {
+    if (gpio_set_intr_type(gpio, type) != ESP_OK) {
         return -1;
     }
 
     /* add interrupt handler for the pin */
-    if (esp_idf_gpio_isr_handler_add(gpio, cb, arg) != ESP_OK) {
+    if (gpio_isr_handler_add(gpio, cb, arg) != ESP_OK) {
         return -1;
     }
 
@@ -113,45 +109,45 @@ int gpio_ll_irq(gpio_port_t port, uint8_t pin, gpio_irq_trig_t trig,
 
 void gpio_ll_irq_mask(gpio_port_t port, uint8_t pin)
 {
-    gpio_t gpio = GPIO_PIN(GPIO_PORT_NUM(port), pin);
+    gpio_t gpio = GPIO_PIN(gpio_port_num(port), pin);
 
     DEBUG("%s gpio=%u port=%u pin=%u\n",
-          __func__, gpio, GPIO_PORT_NUM(port), pin);
+          __func__, gpio, (unsigned)gpio_port_num(port), pin);
 
-    if (esp_idf_gpio_intr_disable(gpio) == ESP_OK) {
+    if (gpio_intr_disable(gpio) == ESP_OK) {
         gpio_int_enabled_table[gpio] = false;
     }
 }
 
 void gpio_ll_irq_unmask(gpio_port_t port, uint8_t pin)
 {
-    gpio_t gpio = GPIO_PIN(GPIO_PORT_NUM(port), pin);
+    gpio_t gpio = GPIO_PIN(gpio_port_num(port), pin);
 
     DEBUG("%s gpio=%u port=%u pin=%u\n",
           __func__, gpio, port, pin);
 
-    if (esp_idf_gpio_intr_enable(gpio) == ESP_OK) {
+    if (gpio_intr_enable(gpio) == ESP_OK) {
         gpio_int_enabled_table[gpio] = true;
     }
 }
 
 void gpio_ll_irq_unmask_and_clear(gpio_port_t port, uint8_t pin)
 {
-    gpio_t gpio = GPIO_PIN(GPIO_PORT_NUM(port), pin);
+    gpio_t gpio = GPIO_PIN(gpio_port_num(port), pin);
 
     DEBUG("%s gpio=%u port=%u pin=%u\n",
-          __func__, gpio, GPIO_PORT_NUM(port), pin);
+          __func__, gpio, (unsigned)gpio_port_num(port), pin);
 
     volatile uint32_t *status_w1tc = (uint32_t *)GPIO_STATUS_W1TC_REG;
 #if GPIO_PORT_NUMOF > 1
-    if (GPIO_PORT_NUM(port) != 0) {
+    if (gpio_port_num(port) != 0) {
         status_w1tc = (uint32_t *)GPIO_STATUS1_W1TC_REG;
     }
 #endif
 
     *status_w1tc = BIT(pin);
 
-    if (esp_idf_gpio_intr_enable(gpio) == ESP_OK) {
+    if (gpio_intr_enable(gpio) == ESP_OK) {
         gpio_int_enabled_table[gpio] = true;
     }
 }

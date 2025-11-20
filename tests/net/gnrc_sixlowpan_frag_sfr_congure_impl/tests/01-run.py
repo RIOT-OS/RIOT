@@ -130,7 +130,7 @@ def test_fragmentation(factory, zep_dispatch):
         # 2 intermediate hops, 64 - 2
         assert_result(result, 34, 1, 64 - 2)
 
-        result = parser.parse(D.ping6(root_addr, count=100, interval=30, packet_size=500))
+        result = parser.parse(D.ping6(root_addr, count=100, interval=200, packet_size=500))
         # assert packetloss is under 90%
         # assert at least one response
         # 2 intermediate hops, 64 - 2
@@ -157,7 +157,7 @@ def run_zep_dispatch():
 
 if __name__ == "__main__":
     board = os.environ.get('BOARD', 'native')
-    if board not in ['native', 'native64']:
+    if board not in ['native', 'native32', 'native64']:
         print('\x1b[1;31mThis test requires a native board.\x1b[0m\n',
               file=sys.stderr)
         sys.exit(1)

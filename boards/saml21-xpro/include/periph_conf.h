@@ -1,12 +1,11 @@
 /*
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- *               2015 FreshTemp, LLC.
- *               2014-2016 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2015 FreshTemp, LLC.
+ * SPDX-FileCopyrightText: 2014-2016 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_saml21-xpro
@@ -19,9 +18,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -49,7 +45,7 @@ static const tc32_conf_t timer_config[] = {
         .dev            = TC0,
         .irq            = TC0_IRQn,
         .mclk           = &MCLK->APBCMASK.reg,
-        .mclk_mask      = MCLK_APBCMASK_TC0 | MCLK_APBCMASK_TC1,
+        .mclk_mask      = MCLK_APBCMASK_TC0_Msk | MCLK_APBCMASK_TC1_Msk,
         .gclk_id        = TC0_GCLK_ID,
         .gclk_src       = SAM0_GCLK_TIMER,
         .flags          = TC_CTRLA_MODE_COUNT32,
@@ -277,5 +273,4 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

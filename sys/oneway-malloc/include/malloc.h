@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    oneway_malloc Oneway malloc
  * @ingroup     sys_memory_management
@@ -28,9 +30,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
-
-#ifndef MALLOC_H
-#define MALLOC_H
 
 #include <stdlib.h>
 
@@ -78,8 +77,6 @@ void free(void *ptr);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* MALLOC_H */
 
 /**
  * @}

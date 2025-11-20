@@ -75,6 +75,27 @@ samd21: `Atmel.SAMD21_DFP.1.3.395.atpack`
 Each atpack has an include subdirectory with the files we copy into
 RIOT. The files are copied unmodified.
 
+## SAMD51 files
+
+samd51: `Atmel.SAMD51_DFP.1.1.96.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The files are copied unmodified.
+
+## SAME51 files
+
+same51: `Atmel.SAME51_DFP.1.1.139.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The files are copied unmodified.
+
+## SAME54 files
+
+same54: `Atmel.SAME54_DFP.1.0.87.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The files are copied unmodified.
+
 ## SAML10/SAML11 files
 
 Since 2019 the necessary variant files are available in atpacks at

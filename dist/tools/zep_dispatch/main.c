@@ -200,7 +200,7 @@ static void _print_help(const char *progname)
     fprintf(stderr, "\tport\t\tlocal port to bind to\n");
 
     fprintf(stderr, "\noptional arguments:\n");
-    fprintf(stderr, "\t-t <file>\tLoad toplogy from file\n");
+    fprintf(stderr, "\t-t <file>\tLoad topology from file\n");
     fprintf(stderr, "\t-p <file>\tStore PID in file\n");
     fprintf(stderr, "\t-s <seed>\tRandom seed used to simulate packet loss\n");
     fprintf(stderr, "\t-g <file>\tFile to dump topology as Graphviz visualisation on SIGUSR1\n");

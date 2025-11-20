@@ -22,8 +22,6 @@
 #include "msg.h"
 
 #include "net/nanocoap_sock.h"
-#include "net/gnrc/netif.h"
-#include "net/ipv6/addr.h"
 #include "shell.h"
 
 #define MAIN_QUEUE_SIZE (4)
@@ -31,7 +29,6 @@ static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 #if IS_USED(MODULE_NANOCOAP_DTLS)
 #include "net/credman.h"
-#include "net/dsm.h"
 #include "tinydtls_keys.h"
 
 static const uint8_t psk_id_0[] = PSK_DEFAULT_IDENTITY;
@@ -48,25 +45,8 @@ static const credman_credential_t credential = {
 };
 #endif
 
-extern int nanotest_client_cmd(int argc, char **argv);
-extern int nanotest_client_url_cmd(int argc, char **argv);
-extern int nanotest_server_cmd(int argc, char **argv);
-extern int nanotest_client_put_cmd(int argc, char **argv);
-extern int nanotest_client_put_non_cmd(int argc, char **argv);
-static int _list_all_inet6(int argc, char **argv);
-
-static const shell_command_t shell_commands[] = {
-    { "client", "CoAP client", nanotest_client_cmd },
-    { "url", "CoAP client URL request", nanotest_client_url_cmd },
-    { "put", "experimental put", nanotest_client_put_cmd },
-    { "put_non", "non-confirmable put", nanotest_client_put_non_cmd },
-    { "server", "CoAP server", nanotest_server_cmd },
-    { "inet6", "IPv6 addresses", _list_all_inet6 },
-    { NULL, NULL, NULL }
-};
-
 /* _list_all_inet6() and _print_addr() derived from sc_gnrc_netif.c */
-
+#ifdef MODULE_GNRC_IPV6
 static void _print_addr(ipv6_addr_t *addr, uint8_t flags)
 {
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
@@ -103,7 +83,7 @@ static void _print_addr(ipv6_addr_t *addr, uint8_t flags)
     printf("\n");
 }
 
-static int _list_all_inet6(int argc, char **argv)
+static int _cmd_inet6(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
@@ -135,6 +115,9 @@ static int _list_all_inet6(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(inet6, "IPv6 addresses", _cmd_inet6);
+#endif
+
 int main(void)
 {
     /* for the thread running the shell */
@@ -152,7 +135,7 @@ int main(void)
     /* start shell */
     puts("All up, running the shell now");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     /* should never be reached */
     return 0;

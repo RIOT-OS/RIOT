@@ -1,0 +1,39 @@
+From 5f9f202974a10576afec2ed941b4b2c192ccbc00 Mon Sep 17 00:00:00 2001
+From: Moritz <moritz.holzer@haw-hamburg.de>
+Date: Mon, 21 Oct 2024 13:26:54 +0200
+Subject: [PATCH 3/3] fixed const parameter
+
+---
+ core/observe.c     | 2 +-
+ include/liblwm2m.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/core/observe.c b/core/observe.c
+index af70fd6..3cd9c41 100644
+--- a/core/observe.c
++++ b/core/observe.c
+@@ -469,7 +469,7 @@ lwm2m_observed_t * observe_findByUri(lwm2m_context_t * contextP,
+ }
+ 
+ void lwm2m_resource_value_changed(lwm2m_context_t * contextP,
+-                                  lwm2m_uri_t * uriP)
++                                  const lwm2m_uri_t * uriP)
+ {
+     lwm2m_observed_t * targetP;
+ 
+diff --git a/include/liblwm2m.h b/include/liblwm2m.h
+index 58a1a53..3d12e03 100644
+--- a/include/liblwm2m.h
++++ b/include/liblwm2m.h
+@@ -877,7 +877,7 @@ int lwm2m_remove_object(lwm2m_context_t * contextP, uint16_t id);
+ int lwm2m_update_registration(lwm2m_context_t * contextP, uint16_t shortServerID, bool withObjects);
+ // send deregistration to all servers connected to client
+ void lwm2m_deregister(lwm2m_context_t * context);
+-void lwm2m_resource_value_changed(lwm2m_context_t * contextP, lwm2m_uri_t * uriP);
++void lwm2m_resource_value_changed(lwm2m_context_t * contextP, const lwm2m_uri_t * uriP);
+ 
+ #ifndef LWM2M_VERSION_1_0
+ // send resources specified by URIs to the server specified by the server short
+-- 
+2.34.1
+

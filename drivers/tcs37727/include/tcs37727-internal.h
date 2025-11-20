@@ -7,6 +7,8 @@
  *
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_tcs37727
  * @{
@@ -17,9 +19,6 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  *
  */
-
-#ifndef TCS37727_INTERNAL_H
-#define TCS37727_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C"
@@ -145,5 +144,4 @@ extern "C"
 }
 #endif
 
-#endif /* TCS37727_INTERNAL_H */
 /** @} */

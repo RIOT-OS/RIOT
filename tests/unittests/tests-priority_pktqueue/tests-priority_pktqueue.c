@@ -22,8 +22,8 @@
 #include "unittests-constants.h"
 #include "tests-priority_pktqueue.h"
 
-#define PKT_INIT_ELEM(len, data, next) \
-    { (next), (void *)(data), (len), 1, GNRC_NETTYPE_UNDEF }
+#define PKT_INIT_ELEM(len, ptr, nxt) \
+    { .next = (nxt), .data = (void *)(ptr), .size = (len), .users = 1, .type = GNRC_NETTYPE_UNDEF }
 #define PKT_INIT_ELEM_STATIC_DATA(data, next) PKT_INIT_ELEM(sizeof(data), (void *)(data), (next))
 #define PKTQUEUE_INIT_ELEM(pkt) { NULL, pkt }
 

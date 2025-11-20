@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2014-2016 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2014-2016 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -49,7 +46,6 @@ static unsigned channel_numof(tim_t tim)
      * had exactly 4 channels */
     return TIMER_CHANNEL_NUMOF;
 }
-
 
 #ifdef MODULE_PERIPH_TIMER_PERIODIC
 
@@ -195,10 +191,12 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
     }
 #endif
 
-    /* clear spurious IRQs */
-    dev(tim)->SR &= ~(TIM_SR_CC1IF << channel);
-
     TIM_CHAN(tim, channel) = value;
+
+    /* clear spurious IRQs
+     * note: This might also clear the IRQ just set, but that is handled below
+     * anyway. */
+    dev(tim)->SR &= ~(TIM_SR_CC1IF << channel);
 
     /* enable IRQ */
     dev(tim)->DIER |= (TIM_DIER_CC1IE << channel);
@@ -236,7 +234,7 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
         dev(tim)->CNT = 0;
 
         /* wait for the interrupt & clear it */
-        while(dev(tim)->SR == 0) {}
+        while (dev(tim)->SR == 0) {}
         dev(tim)->SR = 0;
     }
 
@@ -264,7 +262,13 @@ int timer_clear(tim_t tim, int channel)
     }
 
     unsigned irqstate = irq_disable();
+
+    /* disable IRQ */
     dev(tim)->DIER &= ~(TIM_DIER_CC1IE << channel);
+
+    /* clear spurious IRQs */
+    dev(tim)->SR &= ~(TIM_SR_CC1IF << channel);
+
     irq_restore(irqstate);
 
 #ifdef MODULE_PERIPH_TIMER_PERIODIC

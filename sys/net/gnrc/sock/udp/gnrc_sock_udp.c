@@ -28,6 +28,10 @@
 #include "net/udp.h"
 #include "random.h"
 
+#ifdef SOCK_HAS_ASYNC_CTX
+#include "net/sock/async/event.h"
+#endif
+
 #include "gnrc_sock_internal.h"
 
 #define ENABLE_DEBUG 0
@@ -97,7 +101,7 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
         (local->netif != remote->netif)) {
         return -EINVAL;
     }
-    memset(&sock->local, 0, sizeof(sock_udp_ep_t));
+    memset(sock, 0, sizeof(*sock));
     if (local != NULL) {
         uint16_t port = local->port;
 
@@ -126,7 +130,6 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
         memcpy(&sock->local, local, sizeof(sock_udp_ep_t));
         sock->local.port = port;
     }
-    memset(&sock->remote, 0, sizeof(sock_udp_ep_t));
     if (remote != NULL) {
         if (gnrc_af_not_supported(remote->family)) {
             return -EAFNOSUPPORT;
@@ -155,6 +158,9 @@ void sock_udp_close(sock_udp_t *sock)
 {
     assert(sock != NULL);
     gnrc_netreg_unregister(GNRC_NETTYPE_UDP, &sock->reg.entry);
+#ifdef SOCK_HAS_ASYNC_CTX
+    sock_event_close(sock_udp_get_async_ctx(sock));
+#endif
 #ifdef MODULE_GNRC_SOCK_CHECK_REUSE
     if (_udp_socks != NULL) {
         gnrc_sock_reg_t *head = (gnrc_sock_reg_t *)_udp_socks;
@@ -239,16 +245,6 @@ static bool _accept_remote(const sock_udp_t *sock, const udp_hdr_t *hdr,
     return true;
 }
 
-static uint32_t _now_us(void)
-{
-#ifdef MODULE_ZTIMER_USEC
-    return ztimer_now(ZTIMER_USEC);
-#endif
-#ifdef MODULE_ZTIMER_MSEC
-    return ztimer_now(ZTIMER_MSEC) * US_PER_MS;
-#endif
-}
-
 ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
                               uint32_t timeout, sock_udp_ep_t *remote,
                               sock_udp_aux_rx_t *aux)
@@ -286,26 +282,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
         _aux.rssi = &aux->rssi;
     }
 #endif
-    unsigned now = _now_us();
-    while (1) {
-        res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp, &_aux);
-
-        if (res != -ETIMEDOUT) {
-            break;
-        }
-
-        /* HACK: gnrc_sock_recv() sometimes returns -ETIMEDOUT too early */
-        uint32_t time_elapsed = _now_us() - now;
-        if (time_elapsed < (timeout - timeout/10))  {
-            DEBUG("gnrc_sock_udp: timeout happened  %"PRIu32" µs early\n",
-                  timeout - time_elapsed);
-            timeout -= time_elapsed;
-            now = _now_us();
-            continue;
-        }
-        break;
-    }
-
+    res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp, &_aux);
     if (res < 0) {
         return res;
     }

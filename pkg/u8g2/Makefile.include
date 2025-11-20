@@ -1,5 +1,6 @@
 INCLUDES += -I$(PKGDIRBASE)/u8g2/csrc
 INCLUDES += -I$(RIOTBASE)/pkg/u8g2/contrib
+INCLUDES += -I$(RIOTBASE)/pkg/u8g2/contrib/disp_dev/include
 
 DIRS += $(RIOTBASE)/pkg/u8g2/contrib
 

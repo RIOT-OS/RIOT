@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2023 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2023 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup    cpu_stm32_lcd_fmc STM32 FMC/FSMC LCD low-level parallel interface driver
@@ -12,9 +11,6 @@
  *
  * @{
  */
-
-#ifndef LCD_FMC_H
-#define LCD_FMC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,5 +52,4 @@ typedef struct {
 }
 #endif
 
-#endif /* LCD_FMC_H */
 /** @} */

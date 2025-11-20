@@ -132,7 +132,7 @@ static const uint32_t T[4][16] = {
  * Oh... and the algorithm requires that there be at least one padding byte. The
  * first padding byte has a value of 0x80, and any others are 0x00.
  *
- * @param[in|out] abcd      Pointer to an array of four unsigned longwords
+ * @param[in,out] abcd      Pointer to an array of four unsigned longwords
  * @param[in]     block     Array of bytes, must be 64 bytes in size
  */
 static void permute(uint32_t abcd[4], const uint8_t block[64] )

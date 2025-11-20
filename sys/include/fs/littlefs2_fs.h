@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_littlefs2 littlefs v2 integration
  * @ingroup     pkg_littlefs2
@@ -20,9 +22,6 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Koen Zandberg <koen@bergzand.net>
  */
-
-#ifndef FS_LITTLEFS2_FS_H
-#define FS_LITTLEFS2_FS_H
 
 #include <stdalign.h>
 
@@ -124,5 +123,4 @@ extern const vfs_file_system_t littlefs2_file_system;
 }
 #endif
 
-#endif /* FS_LITTLEFS2_FS_H */
 /** @} */

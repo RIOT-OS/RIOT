@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_mtd_at25xxx MTD wrapper for AT25xxx family of SPI-EEPROMs
  * @ingroup     drivers_storage
@@ -18,9 +20,6 @@
  *
  * @author      Johannes Koster <johannes.koster@ml-pa.com>
  */
-
-#ifndef AT25XXX_MTD_H
-#define AT25XXX_MTD_H
 
 #include <stdint.h>
 
@@ -52,5 +51,4 @@ extern const mtd_desc_t mtd_at25xxx_driver;
 }
 #endif
 
-#endif /* AT25XXX_MTD_H */
 /** @} */

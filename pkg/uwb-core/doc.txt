@@ -35,7 +35,7 @@ this in RIOT when using this pkg an event thread is started which will
 run as this default event thread.
 
 To work this library needs to be built on top of an UWB device
-implementing the `uwb` api (see [uwb](https://github.com/Decawave/uwb-core/tree/master/hw/drivers/uwb).
+implementing the `uwb` api (see [uwb](https://github.com/Decawave/uwb-core/tree/master/hw/drivers/uwb)).
 This port uses [uwb-dw1000](https://github.com/Decawave/uwb-dw1000) as
 device driver for dw1000 modules.
 
@@ -90,7 +90,7 @@ is considered awake.
 The following can be wrapped into a timer callback to setup a blinking tag.
 
 For more examples check the [uwb-apps](https://github.com/Decawave/uwb-apps)
-repository as well as [examples/twr_aloha](https://github.com/RIOT-OS/RIOT/tree/master/examples/twr-aloha)
+repository as well as [examples/advanced/twr_aloha](https://github.com/RIOT-OS/RIOT/tree/master/examples/advanced/twr-aloha)
 
 ## Watchout!
 

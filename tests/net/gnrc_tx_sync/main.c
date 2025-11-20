@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -116,7 +113,7 @@ static int netdev_get_max_pdu_size(netdev_t *dev, void *value, size_t max_len)
     (void)dev;
     const uint16_t pdu_size_ethernet = 1500;
     const uint16_t pdu_size_6lo = 96;
-    assert(max_len == sizeof(uint16_t));
+    expect(max_len == sizeof(uint16_t));
     if (IS_USED(MODULE_NETDEV_IEEE802154)) {
         memcpy(value, &pdu_size_6lo, sizeof(pdu_size_6lo));
     }

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_jc42
  *
@@ -17,9 +19,6 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef JC42_PARAMS_H
-#define JC42_PARAMS_H
 
 #include "board.h"
 #include "jc42.h"
@@ -73,5 +72,4 @@ static const saul_reg_info_t jc42_saul_info[] =
 }
 #endif
 
-#endif /* JC42_PARAMS_H */
 /** @} */

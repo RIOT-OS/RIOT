@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_msp430
@@ -19,9 +18,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef MSP430_REGS_COMMON_H
-#define MSP430_REGS_COMMON_H
 
 #include <stdint.h>
 
@@ -93,17 +89,6 @@ typedef struct {
 } msp430_port_t;
 
 /**
- * @brief   GPIO Port 1/2 (with interrupt functionality)
- */
-typedef struct {
-    msp430_port_t base; /**< common GPIO port registers */
-    REG8    IFG;        /**< interrupt flag */
-    REG8    IES;        /**< interrupt edge select */
-    REG8    IE;         /**< interrupt enable */
-    REG8    SEL;        /**< alternative function select */
-} msp430_port_p1_p2_t;
-
-/**
  * @brief   GPIO Port 3..6 (without interrupt functionality)
  */
 typedef struct {
@@ -124,70 +109,8 @@ typedef struct {
     REG16   CCR[7];     /**< capture compare channel values */
 } msp430_timer_t;
 
-/**
- * @name    MSP430 Common Peripheral Register Maps
- *
- * @details The addresses will be provided by the linker script using the
- *          vendor files.
- * @{
- */
-/**
- * @brief   Register map of GPIO PORT 1
- */
-extern msp430_port_p1_p2_t PORT_1;
-/**
- * @brief   Register map of GPIO PORT 2
- */
-extern msp430_port_p1_p2_t PORT_2;
-/**
- * @brief   Register map of GPIO PORT 3
- */
-extern msp430_port_p3_p6_t PORT_3;
-/**
- * @brief   Register map of GPIO PORT 4
- */
-extern msp430_port_p3_p6_t PORT_4;
-/**
- * @brief   Register map of GPIO PORT 5
- */
-extern msp430_port_p3_p6_t PORT_5;
-/**
- * @brief   Register map of GPIO PORT 6
- */
-extern msp430_port_p3_p6_t PORT_6;
-
-/**
- * @brief   Register map of the timer A control registers
- */
-extern msp430_timer_t TIMER_A;
-
-/**
- * @brief   IRQ flags for TIMER_A
- *
- * Called TAIV in the data sheet / vendor files. This shallow alias
- * makes the name more readable and does impedance matching for the type
- * (`volatile uint16_t` vs `volatile short`).
- */
-extern REG16 TIMER_A_IRQFLAGS;
-
-/**
- * @brief   IRQ flags for TIMER_B
- *
- * Called TBIV in the data sheet / vendor files. This shallow alias
- * makes the name more readable and does impedance matching for the type
- * (`volatile uint16_t` vs `volatile short`).
- */
-extern REG16 TIMER_B_IRQFLAGS;
-
-/**
- * @brief   Register map of the timer B control registers
- */
-extern msp430_timer_t TIMER_B;
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* MSP430_REGS_COMMON_H */
 /** @} */

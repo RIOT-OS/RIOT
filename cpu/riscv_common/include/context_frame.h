@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2017, 2019 JP Bonn, Ken Rabold
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017, 2019 JP Bonn, Ken Rabold
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     cpu_riscv_common
@@ -15,9 +14,6 @@
  *
  * @author      JP Bonn
  */
-
-#ifndef CONTEXT_FRAME_H
-#define CONTEXT_FRAME_H
 
 #if !defined(__ASSEMBLER__)
 #include <stdint.h>
@@ -126,5 +122,4 @@ struct context_switch_frame {
 }
 #endif
 
-#endif /* CONTEXT_FRAME_H */
 /** @} */

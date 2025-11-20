@@ -1,10 +1,9 @@
 /*
- * Copyright (C)  2020 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_waveshare_nrf52840_eval_kit
@@ -18,9 +17,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef ARDUINO_IOMAP_H
-#define ARDUINO_IOMAP_H
 
 #include "periph/gpio.h"
 #include "periph/adc.h"
@@ -125,5 +121,4 @@ extern "C" {
 }
 #endif
 
-#endif /* ARDUINO_IOMAP_H */
 /** @} */

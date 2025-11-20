@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @addtogroup  unittests
  * @{
@@ -15,8 +17,6 @@
  *
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef TESTS_TSRB_H
-#define TESTS_TSRB_H
 
 #include "embUnit.h"
 
@@ -33,5 +33,4 @@ void tests_tsrb(void);
 }
 #endif
 
-#endif /* TESTS_TSRB_H */
 /** @} */

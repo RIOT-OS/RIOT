@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     core_util
  * @{
@@ -17,10 +19,18 @@
  *              and combined with an memory array forms a circular buffer.
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * @warning     This API is NOT thread-safe.
+ *
+ * @note        It may appear that the functions would be thread safe if the
+ *              management data structure is only ever accessed by a single
+ *              consumer and a singler producer on platforms where loads and
+ *              stores to `unsigned int` is atomic. But even this is not the
+ *              case, as this would require careful use of memory barriers to
+ *              ensure correct order of memory accesses. So: Just make sure
+ *              to use either a mutex or to disable interrupts to ensure
+ *              exclusive access as indicated in the API doc.
  */
-
-#ifndef CIB_H
-#define CIB_H
 
 #include "assert.h"
 
@@ -84,6 +94,9 @@ static inline unsigned int cib_size(const cib_t *cib)
  * @param[in] cib       the cib_t to check.
  *                      Must not be NULL.
  * @return How often cib_get() can be called before @p cib is empty.
+ *
+ * @warning This function is not thread safe. (The caller needs to ensure
+ *          exclusive access to the `cib_t`.)
  */
 static inline unsigned int cib_avail(const cib_t *cib)
 {
@@ -96,6 +109,9 @@ static inline unsigned int cib_avail(const cib_t *cib)
  * @param[in] cib       the cib_t to check.
  *                      Must not be NULL.
  * @return      1 if cib_put() would return "-1", 0 otherwise
+ *
+ * @warning This function is not thread safe. (The caller needs to ensure
+ *          exclusive access to the `cib_t`.)
  */
 static inline unsigned int cib_full(const cib_t *cib)
 {
@@ -109,6 +125,9 @@ static inline unsigned int cib_full(const cib_t *cib)
  *                      Must not be NULL.
  * @return index of next item
  * @retval -1 if the buffer is empty
+ *
+ * @warning This function is not thread safe. (The caller needs to ensure
+ *          exclusive access to the `cib_t`.)
  */
 static inline int cib_get(cib_t *__restrict cib)
 {
@@ -134,8 +153,12 @@ static inline int cib_get(cib_t *__restrict cib)
  *
  * @return index of item
  * @retval -1 if no item at @p offset exists in the buffer
+ *
+ * @warning This function is not thread safe. (The caller needs to ensure
+ *          exclusive access to the `cib_t` and must not release that exclusive
+ *          access between the call to @ref cib_avail and this function.)
  */
-static inline int cib_peek_at_unsafe(cib_t *__restrict cib, unsigned offset)
+static inline int cib_peek_at_unsafe(const cib_t *__restrict cib, unsigned offset)
 {
     return (cib->read_count + offset) & cib->mask;
 }
@@ -152,8 +175,11 @@ static inline int cib_peek_at_unsafe(cib_t *__restrict cib, unsigned offset)
  *
  * @return index of item
  * @retval -1 if no item at @p offset exists in the buffer
+ *
+ * @warning This function is not thread safe. (The caller needs to ensure
+ *          exclusive access to the `cib_t`.)
  */
-static inline int cib_peek_at(cib_t *__restrict cib, unsigned offset)
+static inline int cib_peek_at(const cib_t *__restrict cib, unsigned offset)
 {
     if (offset < cib_avail(cib)) {
         return cib_peek_at_unsafe(cib, offset);
@@ -171,8 +197,12 @@ static inline int cib_peek_at(cib_t *__restrict cib, unsigned offset)
  *                      Must not be NULL.
  * @return index of next item
  * @retval -1 if the buffer is empty
+ *
+ * @warning This function is not thread safe. (The caller needs to ensure
+ *          exclusive access to the `cib_t` and must not release that exclusive
+ *          access between the call to @ref cib_avail and this function.)
  */
-static inline int cib_peek_unsafe(cib_t *__restrict cib)
+static inline int cib_peek_unsafe(const cib_t *__restrict cib)
 {
     return cib_peek_at_unsafe(cib, 0);
 }
@@ -184,8 +214,11 @@ static inline int cib_peek_unsafe(cib_t *__restrict cib)
  *                      Must not be NULL.
  * @return index of next item
  * @retval -1 if the buffer is empty
+ *
+ * @warning This function is not thread safe. (The caller needs to ensure
+ *          exclusive access to the `cib_t`.)
  */
-static inline int cib_peek(cib_t *__restrict cib)
+static inline int cib_peek(const cib_t *__restrict cib)
 {
     return cib_peek_at(cib, 0);
 }
@@ -198,6 +231,9 @@ static inline int cib_peek(cib_t *__restrict cib)
  * @param[in,out] cib   corresponding *cib* to buffer.
  *                      Must not be NULL.
  * @return index of next item
+ *
+ * @warning This function is not thread safe. (The caller needs to ensure
+ *          exclusive access to the `cib_t`.)
  */
 static inline int cib_get_unsafe(cib_t *cib)
 {
@@ -211,6 +247,9 @@ static inline int cib_get_unsafe(cib_t *cib)
  *                      Must not be NULL.
  * @return index of item to put to
  * @retval -1 if the buffer is full
+ *
+ * @warning This function is not thread safe. (The caller needs to ensure
+ *          exclusive access to the `cib_t`.)
  */
 static inline int cib_put(cib_t *__restrict cib)
 {
@@ -232,6 +271,9 @@ static inline int cib_put(cib_t *__restrict cib)
  * @param[in,out] cib   corresponding *cib* to buffer.
  *                      Must not be NULL.
  * @return index of item to put to
+ *
+ * @warning This function is not thread safe. (The caller needs to ensure
+ *          exclusive access to the `cib_t`.)
  */
 static inline int cib_put_unsafe(cib_t *cib)
 {
@@ -242,5 +284,4 @@ static inline int cib_put_unsafe(cib_t *cib)
 }
 #endif
 
-#endif /* CIB_H */
 /** @} */

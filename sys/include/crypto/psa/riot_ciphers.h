@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -15,9 +17,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
-
-#ifndef CRYPTO_PSA_RIOT_CIPHERS_H
-#define CRYPTO_PSA_RIOT_CIPHERS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,5 +60,4 @@ typedef struct {
 }
 #endif
 
-#endif /* CRYPTO_PSA_RIOT_CIPHERS_H */
 /** @} */

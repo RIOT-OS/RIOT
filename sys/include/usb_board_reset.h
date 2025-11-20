@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    sys_usb_board_reset Board reset via USB CDC ACM
  * @ingroup     sys
@@ -16,9 +18,6 @@
  * @file
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-
-#ifndef USB_BOARD_RESET_H
-#define USB_BOARD_RESET_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,5 +37,4 @@ void usb_board_reset_in_bootloader(void);
 }
 #endif
 
-#endif /* USB_BOARD_RESET_H */
 /** @} */

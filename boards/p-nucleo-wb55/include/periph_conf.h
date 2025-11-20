@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2019 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     boards_p-nucleo-wb55
@@ -15,9 +14,6 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
-
-#ifndef PERIPH_CONF_H
-#define PERIPH_CONF_H
 
 /* Add specific clock configuration (HSE, LSE) for this board here */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -145,12 +141,12 @@ static const stm32_usbdev_fs_config_t stm32_usbdev_fs_config[] = {
     {
         .base_addr  = (uintptr_t)USB,
         .rcc_mask   = RCC_APB1ENR1_USBEN | RCC_APB1ENR1_CRSEN,
-        .irqn       = USB_LP_IRQn,
-        .apb        = APB1,
         .dm         = GPIO_PIN(PORT_A, 11),
         .dp         = GPIO_PIN(PORT_A, 12),
         .af         = GPIO_AF10,
         .disconn    = GPIO_UNDEF,
+        .irqn       = USB_LP_IRQn,
+        .apb        = APB1,
     },
 };
 
@@ -210,5 +206,4 @@ static const adc_conf_t adc_config[] = {
 }
 #endif
 
-#endif /* PERIPH_CONF_H */
 /** @} */

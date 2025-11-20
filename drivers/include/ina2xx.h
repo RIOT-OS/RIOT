@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_ina2xx INA2XX current/power monitor
  * @ingroup     drivers_sensors
@@ -43,9 +45,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef INA2XX_H
-#define INA2XX_H
 
 #include <stdint.h>
 
@@ -256,5 +255,4 @@ int ina2xx_read_power(const ina2xx_t *dev, uint32_t *power);
 }
 #endif
 
-#endif /* INA2XX_H */
 /** @} */

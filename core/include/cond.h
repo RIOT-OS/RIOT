@@ -4,6 +4,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    core_sync_cond Condition Variable
  * @ingroup     core_sync
@@ -134,9 +136,6 @@
  * @author      Sam Kumar <samkumar@berkeley.edu>
  */
 
-#ifndef COND_H
-#define COND_H
-
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -211,5 +210,4 @@ void cond_broadcast(cond_t *cond);
 }
 #endif
 
-#endif /* COND_H */
 /** @} */

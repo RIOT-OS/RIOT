@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     net_gnrc_tcp
  *
@@ -16,9 +18,6 @@
  *
 * @author       Simon Brummer <simon.brummer@posteo.de>
  */
-
-#ifndef GNRC_TCP_EVENTLOOP_H
-#define GNRC_TCP_EVENTLOOP_H
 
 #include <stdint.h>
 
@@ -62,5 +61,4 @@ void _gnrc_tcp_eventloop_unsched(evtimer_msg_event_t *event);
 }
 #endif
 
-#endif /* GNRC_TCP_EVENTLOOP_H */
 /** @} */

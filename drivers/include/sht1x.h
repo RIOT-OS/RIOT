@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    drivers_sht1x SHT10/SHT11/SHT15 Humidity and Temperature Sensor
  * @ingroup     drivers_sensors
@@ -19,9 +21,6 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
-
-#ifndef SHT1X_H
-#define SHT1X_H
 
 #include <stdint.h>
 #include <periph/gpio.h>
@@ -183,5 +182,4 @@ int sht1x_reset(sht1x_dev_t *dev);
 }
 #endif
 
-#endif /* SHT1X_H */
 /** @} */

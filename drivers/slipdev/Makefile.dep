@@ -1,9 +1,16 @@
 USEMODULE += chunked_ringbuffer
 USEMODULE += eui_provider
-USEMODULE += netdev_legacy_api
+USEMODULE += netdev_new_api
 USEMODULE += netdev_register
 FEATURES_REQUIRED += periph_uart
 
 ifneq (,$(filter slipdev_stdio,$(USEMODULE)))
   USEMODULE += isrpipe
+endif
+ifneq (,$(filter slipdev_config,$(USEMODULE)))
+  USEMODULE += checksum
+  USEMODULE += sock_udp
+  USEMODULE += gnrc_ipv6
+  USEMODULE += nanocoap_sock
+  USEMODULE += nanocoap_resources
 endif

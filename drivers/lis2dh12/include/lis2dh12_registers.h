@@ -3,6 +3,8 @@
  *
  */
 
+#pragma once
+
 /**
  * @ingroup     drivers_lis2dh12
  * @{
@@ -12,9 +14,6 @@
  *
  * @author      Jan Mohr <jan.mohr@ml-pa.com>
  */
-
-#ifndef LIS2DH12_REGISTERS_H
-#define LIS2DH12_REGISTERS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -305,7 +304,7 @@ typedef union {
 typedef union {
     struct {
         uint8_t FTH:5;  /**< Set the watermark level for FIFO */
-        uint8_t TR:1;   /**< Trigging selection, FIFO event triggers INT1 or INT2 */
+        uint8_t TR:1;   /**< Triggering selection, FIFO event triggers INT1 or INT2 */
         uint8_t FM:2;   /**< FIFO mode selection */
     } bit;              /**< Structure used for bit access */
     uint8_t reg;        /**< Type used for register access */
@@ -469,5 +468,4 @@ typedef union {
 }
 #endif
 
-#endif /* LIS2DH12_REGISTERS_H */
 /** @} */

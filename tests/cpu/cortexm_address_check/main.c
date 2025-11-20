@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2018 Unwired Devices LLC
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Unwired Devices LLC
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -47,10 +44,7 @@ static int cmd_check(int argc, char **argv)
     return 0;
 }
 
-static const shell_command_t shell_commands[] = {
-    { "check", "Check address", cmd_check},
-    { NULL, NULL, NULL }
-};
+SHELL_COMMAND(check, "Check address", cmd_check);
 
 int main(void)
 {
@@ -61,6 +55,6 @@ int main(void)
 
     /* run the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }

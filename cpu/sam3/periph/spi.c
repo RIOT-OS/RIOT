@@ -1,11 +1,8 @@
 /*
-* Copyright (C) 2014 Hamburg University of Applied Sciences
-*               2016-2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
-*/
+ * SPDX-FileCopyrightText: 2014 Hamburg University of Applied Sciences
+ * SPDX-FileCopyrightText: 2016-2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
 
 /**
  * @ingroup     cpu_sam3
@@ -71,7 +68,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     /* lock bus */
     mutex_lock(&locks[bus]);
     /* enable SPI device clock */
-    PMC->PMC_PCER0 |= (1 << spi_config[bus].id);
+    PMC->PMC_PCER0 = (1 << spi_config[bus].id);
     /* set mode and speed */
     dev(bus)->SPI_CSR[0] = (SPI_CSR_SCBR(CLOCK_CORECLOCK / clk) | mode);
     dev(bus)->SPI_MR = (SPI_MR_MSTR | SPI_MR_MODFDIS);
@@ -82,7 +79,7 @@ void spi_release(spi_t bus)
 {
     /* disable device and turn off clock signal */
     dev(bus)->SPI_CR = 0;
-    PMC->PMC_PCER0 &= ~(1 << spi_config[bus].id);
+    PMC->PMC_PCDR0 = (1 << spi_config[bus].id);
     /* release device lock */
     mutex_unlock(&locks[bus]);
 }

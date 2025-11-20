@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2022 Benjamin Valentin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2022 Benjamin Valentin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup    drivers_mtd_sam0_sdhc MTD wrapper for SAM0 SDHC devices
@@ -19,11 +18,6 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef MTD_SAM0_SDHC_H
-#define MTD_SAM0_SDHC_H
-
-#include <stdint.h>
 
 #include "mtd.h"
 #include "sdhc.h"
@@ -52,5 +46,4 @@ extern const mtd_desc_t mtd_sam0_sdhc_driver;
 }
 #endif
 
-#endif /* MTD_SAM0_SDHC_H */
 /** @} */

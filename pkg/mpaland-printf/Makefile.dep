@@ -1,0 +1,14 @@
+# mpaland's printf does not implement non-standard format specifiers. For
+# AVR MCUs we do need the ability to print from PROGMEM, though. Hence, this
+# is not compatible with AVR MCUs.
+FEATURES_BLACKLIST += arch_avr8
+
+# On ESP it is not easily possible to replace newlib's stdio, as there is only
+# API compatibility and not ABI compatibility between mpaland-printf and newlib's
+# printf and the ESP SDK contains binary blobs.
+FEATURES_BLACKLIST += arch_esp
+
+# On 64 bit systems, we depend on long long support to be able to support `%p`
+ifneq (,$(filter arch_64bit,$(FEATURES_USED)))
+  USEMODULE += printf_long_long
+endif

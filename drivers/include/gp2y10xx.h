@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup   drivers_gp2y10xx GP2Y10xx Optical Dust Sensor device driver
  * @ingroup    drivers_sensors
@@ -33,9 +35,6 @@
  *
  * @author     Jean Pierre Dudey <jeandudey@hotmail.com>
  */
-
-#ifndef GP2Y10XX_H
-#define GP2Y10XX_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -124,5 +123,4 @@ int gp2y10xx_read_density(const gp2y10xx_t *dev, uint16_t *density);
 }
 #endif
 
-#endif /* GP2Y10XX_H */
 /** @} */

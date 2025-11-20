@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2020 ML!PA Consulting GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 ML!PA Consulting GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup         cpu_cc2538
@@ -15,9 +14,6 @@
  *
  * @author          Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
-
-#ifndef CC2538_EUI_PRIMARY_H
-#define CC2538_EUI_PRIMARY_H
 
 #include "net/eui64.h"
 
@@ -71,5 +67,4 @@ static inline int cc2538_get_eui64_primary(uint8_t index, eui64_t *addr)
 } /* end extern "C" */
 #endif
 
-#endif /* CC2538_EUI_PRIMARY_H */
 /** @} */
