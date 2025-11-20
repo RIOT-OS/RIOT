@@ -144,6 +144,10 @@ int main(void)
         kvdb_type_string_sample(&kvdb);
         /* run blob KV samples */
         kvdb_type_blob_sample(&kvdb);
+
+        /* deinit the kvdb to make sure all open files are properly closed */
+        fdb_err_t dres = fdb_kvdb_deinit(&kvdb);
+        printf("kvdb deinit %s\n", resstr(dres == FDB_NO_ERR));
     }
 #endif /* FDB_USING_KVDB */
 
@@ -187,6 +191,10 @@ int main(void)
 
         /* run TSDB sample */
         tsdb_sample(&tsdb);
+
+        /* deinit the tsdb to make sure all open files are properly closed */
+        fdb_err_t dres = fdb_tsdb_deinit(&tsdb);
+        printf("tsdb deinit %s\n", resstr(dres == FDB_NO_ERR));
     }
 #endif /* FDB_USING_TSDB */
 
