@@ -26,65 +26,6 @@ extern "C" {
 #include "kernel_defines.h"
 #include "psa/crypto_includes.h"
 
-
-#if IS_USED(MODULE_PSA_HASH)
-/**
- * @brief   Structure containing the hash contexts needed by the application.
- */
-typedef union {
-#if IS_USED(MODULE_PSA_HASH_MD5) || defined(DOXYGEN)
-    psa_hashes_md5_ctx_t md5;   /**< MD5 context */
-#endif
-#if IS_USED(MODULE_PSA_HASH_SHA_1) || defined(DOXYGEN)
-    psa_hashes_sha1_ctx_t sha1; /**< SHA-1 context */
-#endif
-#if IS_USED(MODULE_PSA_HASH_SHA_224) || defined(DOXYGEN)
-    psa_hashes_sha224_ctx_t sha224; /**< SHA-224 context */
-#endif
-#if IS_USED(MODULE_PSA_HASH_SHA_256) || defined(DOXYGEN)
-    psa_hashes_sha256_ctx_t sha256; /**< SHA-256 context */
-#endif
-#if IS_USED(MODULE_PSA_HASH_SHA_384) || defined(DOXYGEN)
-    psa_hashes_sha384_ctx_t sha384; /**< SHA-384 context */
-#endif
-#if IS_USED(MODULE_PSA_HASH_SHA_512) || defined(DOXYGEN)
-    psa_hashes_sha512_ctx_t sha512; /**< SHA-512 context */
-#endif
-#if IS_USED(MODULE_PSA_HASH_SHA3_256) || IS_USED(MODULE_PSA_HASH_SHA3_384) \
-|| IS_USED(MODULE_PSA_HASH_SHA3_512) || defined(DOXYGEN)
-    psa_hashes_sha3_ctx_t sha3; /**< SHA-3 context */
-#endif
-#if IS_USED(MODULE_PSA_HASH_SHA_512_224) || defined(DOXYGEN)
-    psa_hashes_sha512_224_ctx_t sha512_224; /**< SHA-512/224 context */
-#endif
-#if IS_USED(MODULE_PSA_HASH_SHA_512_256) || defined(DOXYGEN)
-    psa_hashes_sha512_256_ctx_t sha512_256; /**< SHA-512/256 context */
-#endif
-} psa_hash_context_t;
-#endif
-
-#if IS_USED(MODULE_PSA_CIPHER)
-/**
- * @brief   Structure containing the cipher contexts needed by the application.
- */
-typedef union {
-#if IS_USED(MODULE_PSA_CIPHER_AES_128_ECB) ||\
-    IS_USED(MODULE_PSA_CIPHER_AES_128_CBC) ||\
-    defined(DOXYGEN)
-    psa_cipher_aes_128_ctx_t aes_128;   /**< AES 128 context*/
-#endif
-#if IS_USED(MODULE_PSA_CIPHER_AES_192_CBC) || defined(DOXYGEN)
-    psa_cipher_aes_192_ctx_t aes_192;   /**< AES 192 context*/
-#endif
-#if IS_USED(MODULE_PSA_CIPHER_AES_256_CBC) || defined(DOXYGEN)
-    psa_cipher_aes_256_ctx_t aes_256;   /**< AES 256 context*/
-#endif
-#if IS_USED(MODULE_PSA_CIPHER_CHACHA20) || defined(DOXYGEN)
-    psa_cipher_chacha20_ctx_t chacha20;   /**< CHACHA20 context*/
-#endif
-} psa_cipher_context_t;
-#endif
-
 #if IS_USED(MODULE_PSA_SECURE_ELEMENT)
 /**
  * @brief   Structure containing the secure element specific cipher contexts needed by the

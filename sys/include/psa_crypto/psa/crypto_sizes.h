@@ -67,7 +67,7 @@ extern "C" {
        IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1))
 #define CONFIG_PSA_MAX_KEY_SIZE 24
 #elif (IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)) || \
-      (IS_USED(MODULE_PSA_CIPHER_AES_128_ECB))
+    (IS_USED(MODULE_PSA_CIPHER_AES_128_ECB))
 #define CONFIG_PSA_MAX_KEY_SIZE 16
 #else
 #define CONFIG_PSA_MAX_KEY_SIZE 0
@@ -349,25 +349,7 @@ extern "C" {
  *
  *          See also @ref PSA_HASH_LENGTH().
  */
-#define PSA_HASH_MAX_SIZE   (64)
-
-/**
- * @brief   The input block size of a hash algorithm, in bytes.
- *
- * @details Hash algorithms process their input data in blocks. Hash operations will retain any
- *          partial blocks until they have enough input to fill the block or until the operation
- *          is finished.
- *
- *          This affects the output from @ref psa_hash_suspend().
- *
- * @param   alg A hash algorithm: a value of type @ref psa_algorithm_t such that
- *              @ref PSA_ALG_IS_HASH(@p alg) is true.
- *
- * @return  The block size in bytes for the specified hash algorithm. If the hash algorithm is not
- *          recognized, return 0. An implementation can return either 0 or the correct size for a
- *          hash algorithm that it recognizes, but does not support.
- */
-#define PSA_HASH_BLOCK_LENGTH(alg) /* implementation-defined value */
+#define PSA_HASH_MAX_SIZE (64)
 
 /**
  * @brief   The size of the output of @ref psa_hash_compute() and @ref psa_hash_finish(), in bytes.
@@ -400,7 +382,7 @@ extern "C" {
         PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_SHA3_256 ? 32 :       \
         PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_SHA3_384 ? 48 :       \
         PSA_ALG_HMAC_GET_HASH(alg) == PSA_ALG_SHA3_512 ? 64 :       \
-        0)
+                                                            0)
 
 /**
  * @brief   The size of the output of @ref psa_mac_compute() and @ref psa_mac_sign_finish(),
@@ -427,7 +409,7 @@ extern "C" {
 #define PSA_MAC_LENGTH(key_type, key_bits, alg)  \
     ((PSA_ALG_IS_HMAC(alg)) ? PSA_HASH_LENGTH(PSA_ALG_HMAC_GET_HASH(alg)) :         \
      PSA_ALG_IS_BLOCK_CIPHER_MAC(alg) ? PSA_BLOCK_CIPHER_BLOCK_LENGTH(key_type) : \
-     ((void)(key_type), (void)(key_bits), 0))
+                                        ((void)(key_type), (void)(key_bits), 0))
 
 /**
  * @brief   A sufficient buffer size for storing the MAC output by @ref psa_mac_verify() and
@@ -806,8 +788,8 @@ extern "C" {
 #define PSA_KEY_EXPORT_ECC_KEY_MAX_SIZE(key_type, key_bits)                  \
     (size_t)\
     (PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_TWISTED_EDWARDS ? 32 : \
-    (PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_SECP_R1 ? PSA_BITS_TO_BYTES(key_bits) : \
-     0))
+                                                                                       (PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_SECP_R1 ? PSA_BITS_TO_BYTES(key_bits) : \
+                                                                                                                                                          0))
 
 /**
  * @brief   Sufficient output buffer size for @ref psa_export_key().
@@ -847,8 +829,8 @@ extern "C" {
  */
 #define PSA_EXPORT_KEY_OUTPUT_SIZE(key_type, key_bits) \
     (PSA_KEY_TYPE_IS_PUBLIC_KEY(key_type) ? PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(key_type, key_bits) : \
-    (PSA_KEY_TYPE_IS_ECC(key_type) ? PSA_KEY_EXPORT_ECC_KEY_MAX_SIZE(key_type, key_bits) : \
-     0))
+                                            (PSA_KEY_TYPE_IS_ECC(key_type) ? PSA_KEY_EXPORT_ECC_KEY_MAX_SIZE(key_type, key_bits) : \
+                                                                             0))
 
 /**
  * @brief   Check whether the key size is a valid ECC size for key type.
@@ -865,7 +847,7 @@ extern "C" {
          bits == 224 || \
          bits == 256 || \
          bits == 384) : \
-    0))
+              0))
 
 /**
  * @brief   The maximum size of an asymmetric private key.
@@ -884,13 +866,13 @@ extern "C" {
 #if (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || \
      IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256))
 #define PSA_EXPORT_KEY_PAIR_MAX_SIZE \
-    (PSA_EXPORT_KEY_OUTPUT_SIZE(PSA_ECC_FAMILY_SECT_R1, 256))
+      (PSA_EXPORT_KEY_OUTPUT_SIZE(PSA_ECC_FAMILY_SECT_R1, 256))
 #elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519))
 #define PSA_EXPORT_KEY_PAIR_MAX_SIZE \
-    (PSA_EXPORT_KEY_OUTPUT_SIZE(PSA_ECC_FAMILY_TWISTED_EDWARDS, 255))
+      (PSA_EXPORT_KEY_OUTPUT_SIZE(PSA_ECC_FAMILY_TWISTED_EDWARDS, 255))
 #elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1))
 #define PSA_EXPORT_KEY_PAIR_MAX_SIZE \
-    (PSA_EXPORT_KEY_OUTPUT_SIZE(PSA_ECC_FAMILY_SECT_R1, 192))
+      (PSA_EXPORT_KEY_OUTPUT_SIZE(PSA_ECC_FAMILY_SECT_R1, 192))
 #else
 #define PSA_EXPORT_KEY_PAIR_MAX_SIZE 0
 #endif
@@ -909,7 +891,7 @@ extern "C" {
  */
 #define PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(key_type, key_bits)                  \
     (PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_TWISTED_EDWARDS ? 32 : \
-     ((size_t)(2 * PSA_BITS_TO_BYTES(key_bits) + 1)))
+                                                                               ((size_t)(2 * PSA_BITS_TO_BYTES(key_bits) + 1)))
 
 /**
  * @brief   Sufficient output buffer size for @ref psa_export_public_key().
@@ -953,7 +935,7 @@ extern "C" {
  */
 #define PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(key_type, key_bits)                           \
     (PSA_KEY_TYPE_IS_ECC(key_type) ? PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(key_type, key_bits) : \
-     0)
+                                     0)
 
 /**
  * @brief   Sufficient buffer size for exporting any asymmetric public key.
@@ -968,13 +950,13 @@ extern "C" {
 #if (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || \
      IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256))
 #define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
-    (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_SECT_R1, 256))
+      (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_SECT_R1, 256))
 #elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1))
 #define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
-    (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_SECT_R1, 192))
+      (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_SECT_R1, 192))
 #elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519))
 #define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
-    (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_TWISTED_EDWARDS, 255))
+      (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_TWISTED_EDWARDS, 255))
 #else
 #define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE 0
 #endif
@@ -990,7 +972,7 @@ extern "C" {
  * @brief   The maximum size of an asymmetric private key pair.
  */
 #define PSA_MAX_ASYMMETRIC_KEYPAIR_SIZE     (PSA_BITS_TO_BYTES(PSA_MAX_PRIV_KEY_SIZE) + \
-                                             PSA_EXPORT_PUBLIC_KEY_MAX_SIZE)
+                                         PSA_EXPORT_PUBLIC_KEY_MAX_SIZE)
 
 /**
  * @brief   The maximum size of the used key data.
@@ -1038,7 +1020,7 @@ extern "C" {
  */
 #define PSA_SIGN_OUTPUT_SIZE(key_type, key_bits, alg)        \
     (PSA_KEY_TYPE_IS_ECC(key_type) ? PSA_ECDSA_SIGNATURE_SIZE(key_bits) : \
-     ((void)alg, 0))
+                                     ((void)alg, 0))
 
 #ifdef __cplusplus
 }
