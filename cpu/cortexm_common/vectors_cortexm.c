@@ -46,6 +46,8 @@
 #define CPU_BACKUP_RAM_NOT_RETAINED 0
 #endif
 
+#define PERSIST_MAGIC_WORD 0x44444444UL
+
 /**
  * @brief   Memory markers, defined in the linker script
  * @{
@@ -61,6 +63,8 @@ extern uint32_t _sstack;
 extern uint32_t _estack;
 extern uint8_t _sram;
 extern uint8_t _eram;
+extern uint32_t __noinit_start[];
+extern uint32_t __noinit_end[];
 
 /* Support for LPRAM. */
 #ifdef CPU_HAS_BACKUP_RAM
@@ -69,6 +73,12 @@ extern uint32_t _sbackup_data[];
 extern uint32_t _ebackup_data[];
 extern uint32_t _sbackup_bss[];
 extern uint32_t _ebackup_bss[];
+extern uint32_t _sbackup_noinit[];
+extern uint32_t _ebackup_noinit[];
+
+BACKUP_RAM_DATA uint32_t _persist_magic = PERSIST_MAGIC_WORD;
+#else
+uint32_t _persist_magic = PERSIST_MAGIC_WORD;
 #endif /* CPU_HAS_BACKUP_RAM */
 /** @} */
 
@@ -122,6 +132,16 @@ void reset_handler_default(void)
     }
 #endif
 
+    /* This has to happen before loading any .data section as it would overwrite
+     * _persist_magic. */
+    bool const persist_ram_invalid = _persist_magic != PERSIST_MAGIC_WORD;
+
+    if (persist_ram_invalid) {
+        for (dst = __noinit_start; dst < __noinit_end; dst++) {
+            *dst = 0;
+        }
+    }
+
     /* load data section from flash to ram */
     /* cppcheck-suppress comparePointers
      * (addresses exported as symbols via linker script and look unrelated
@@ -143,7 +163,8 @@ void reset_handler_default(void)
     backup_ram_init();
 #endif
     if (!cpu_woke_from_backup() ||
-        CPU_BACKUP_RAM_NOT_RETAINED) {
+        CPU_BACKUP_RAM_NOT_RETAINED ||
+        persist_ram_invalid) {
 
         /* load low-power data section. */
         for (dst = _sbackup_data, src = _sbackup_data_load;
@@ -157,6 +178,10 @@ void reset_handler_default(void)
          * (addresses exported as symbols via linker script and look unrelated
          * to cppcheck) */
         for (dst = _sbackup_bss; dst < _ebackup_bss; dst++) {
+            *dst = 0;
+        }
+
+        for (dst = _sbackup_noinit; dst < _ebackup_noinit; dst++) {
             *dst = 0;
         }
     }
@@ -212,6 +237,11 @@ void reset_handler_default(void)
 
     /* startup the kernel */
     kernel_init();
+}
+
+void cpu_invalidate_persistent_ram(void)
+{
+    _persist_magic = 0;
 }
 
 __attribute__((weak))
