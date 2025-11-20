@@ -182,19 +182,26 @@ thread_flags_t thread_flags_wait_all(thread_flags_t mask);
 thread_flags_t thread_flags_wait_one(thread_flags_t mask);
 
 /**
- * @brief Possibly Wake up thread waiting for flags
- *
- * Wakes up a thread if it is thread flag blocked and its condition is met.
- * Has to be called with interrupts disabled.
- * Does not trigger yield.
+ * @brief   Set the flags of the given thread and update its state, but do not
+ *          yield
  *
  * @internal
  *
- * @param[in]   thread  thread to possibly wake up
- * @return      1       if @p thread has been woken up
- *              0       otherwise
+ * @warning This is not a stable API intended for external use.
+ *
+ * @param[in,out]   thread  Thread to modify
+ * @param[in]       mask    Bitmask containing the flags to set
+ *
+ * @retval  true    The thread in @p thread has changed its state to pending,
+ *                  the caller needs to yield
+ * @retval  false   The thread in @p has not changed its state. It may already
+ *                  be pending or is not waiting on the flags in @p mask
+ *
+ * @pre     The caller has IRQ disabled.
+ * @pre     @p thread is not `NULL`
+ * @pre     The caller is prepared to yield if this function returns `true`
  */
-int thread_flags_wake(thread_t *thread);
+bool thread_flags_set_internal(thread_t *thread, thread_flags_t mask);
 
 #ifdef __cplusplus
 }

@@ -58,8 +58,7 @@ static int queue_msg(thread_t *target, const msg_t *m)
 
     *dest = *m;
 #if MODULE_CORE_THREAD_FLAGS
-    target->flags |= THREAD_FLAG_MSG_WAITING;
-    thread_flags_wake(target);
+    thread_flags_set_internal(target, THREAD_FLAG_MSG_WAITING);
 #endif
     return 1;
 }
@@ -157,8 +156,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block,
         thread_add_to_list(&(target->msg_waiters), me);
 
 #if MODULE_CORE_THREAD_FLAGS
-        target->flags |= THREAD_FLAG_MSG_WAITING;
-        thread_flags_wake(target);
+        thread_flags_set_internal(target, THREAD_FLAG_MSG_WAITING);
 #endif
 
         irq_restore(state);
