@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <errno.h>
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -72,10 +73,17 @@ static fdb_time_t get_time(void)
     return time(NULL);
 }
 
+/* converts a test condition to a human readable string */
+const char *resstr(bool condition)
+{
+    return condition ? "[OK]" : "[FAILED]";
+}
+
 int main(void)
 {
     fdb_err_t result;
     uint32_t sec_size = 4096, db_size = sec_size * 4;
+
 
     if (IS_USED(MODULE_FLASHDB_MTD)) {
 #if defined(FDB_MTD)
@@ -96,7 +104,11 @@ int main(void)
         bool file_mode = true;
         fdb_kvdb_control(&kvdb, FDB_KVDB_CTRL_SET_FILE_MODE, &file_mode);
         /* create database directory */
-        vfs_mkdir(FDB_DIR "/fdb_kvdb1", 0777);
+        int res = vfs_mkdir(KVDB_DIR, 0777);
+        printf("mkdir '%s' %s\n", KVDB_DIR, resstr(res == 0 || res == -EEXIST));
+        if (!(res == 0 || res == -EEXIST)) {
+            return -1;
+        }
 #endif
         default_kv.kvs = default_kv_table;
         default_kv.num = sizeof(default_kv_table) / sizeof(default_kv_table[0]);
@@ -116,7 +128,8 @@ int main(void)
          * &default_kv: The default KV nodes. It will auto add to KVDB when first initialize successfully.
          *  &kv_locker: The locker object.
          */
-        result = fdb_kvdb_init(&kvdb, "env", FDB_DIR "/fdb_kvdb1", &default_kv, &kv_locker);
+        result = fdb_kvdb_init(&kvdb, "env", KVDB_DIR, &default_kv, &kv_locker);
+        printf("fdb_kvdb_init %s\n", resstr(result == FDB_NO_ERR));
 
         if (result != FDB_NO_ERR) {
             return -1;
@@ -145,7 +158,11 @@ int main(void)
         bool file_mode = true;
         fdb_tsdb_control(&tsdb, FDB_TSDB_CTRL_SET_FILE_MODE, &file_mode);
         /* create database directory */
-        vfs_mkdir(FDB_DIR "/fdb_tsdb1", 0777);
+        int res = vfs_mkdir(TSDB_DIR, 0777);
+        printf("mkdir '%s' %s\n", TSDB_DIR, resstr(res == 0 || res == -EEXIST));
+        if (!(res == 0 || res == -EEXIST)) {
+            return -1;
+        }
 #endif
         /* Time series database initialization
          *
@@ -157,7 +174,7 @@ int main(void)
          *         128: maximum length of each log
          *   ts_locker: The locker object.
          */
-        result = fdb_tsdb_init(&tsdb, "log", FDB_DIR "/fdb_tsdb1", get_time, 128, &ts_locker);
+        result = fdb_tsdb_init(&tsdb, "log", TSDB_DIR, get_time, 128, &ts_locker);
         /* read last saved time for simulated timestamp */
         fdb_tsdb_control(&tsdb, FDB_TSDB_CTRL_GET_LAST_TIME, &counts);
 
