@@ -151,6 +151,7 @@
 #include "net/gnrc/rpl/dodag.h"
 #include "net/gnrc/rpl/of_manager.h"
 #include "net/fib.h"
+#include "time_units.h"
 #include "trickle.h"
 
 #ifdef MODULE_NETSTATS_RPL
@@ -625,6 +626,13 @@ extern netstats_rpl_t gnrc_rpl_netstats;
  */
 #ifndef CONFIG_GNRC_RPL_PARENT_TIMEOUT_DIS_RETRIES
 #define CONFIG_GNRC_RPL_PARENT_TIMEOUT_DIS_RETRIES (3)
+#endif
+
+/**
+ * @brief Timeout for floating DODAGs in milliseconds.
+ */
+#ifndef CONFIG_GNRC_RPL_DODAG_FLOAT_TIMEOUT
+#  define CONFIG_GNRC_RPL_DODAG_FLOAT_TIMEOUT (15 * MS_PER_SEC * SEC_PER_MIN)
 #endif
 
 /**
