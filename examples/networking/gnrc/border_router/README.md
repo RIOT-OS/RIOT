@@ -118,7 +118,7 @@ interface and configure the BR.
 Notice that this will also configure `2001:db8::/64` as a prefix.
 This prefix should be announced to other motes through the wireless interface.
 
-As said previously, `ethos` and `slipdev` allow to send IP packets and shell commands.
+As said previously, `ethos` and `slipmux` allow to send IP packets and shell commands.
 This is done through the same serial interface.
 By typing `help` you will get the list of available shell commands.
 

@@ -1765,7 +1765,7 @@ static int _netif_add(char *cmd_name, netif_t *iface, int argc, char **argv)
     (void)iface;
     (void)argc;
     (void)argv;
-    printf("error: unable to add IPv6 address.\n");
+    printf("error: IPv6 module not enabled.\n");
 
     return 1;
 #endif

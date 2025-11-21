@@ -1,5 +1,5 @@
 # exclude submodule sources from *.c wildcard source selection
-SRC := $(filter-out stdio.c,$(wildcard *.c))
+SRC := $(filter-out stdio.c coap.c net.c,$(wildcard *.c))
 
 # enable submodules
 SUBMODULES := 1
