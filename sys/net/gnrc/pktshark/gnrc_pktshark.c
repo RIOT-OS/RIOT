@@ -28,7 +28,6 @@
 #include "fmt.h"
 #include "thread.h"
 #include "msg.h"
-#include "net/gnrc/pktdump.h"
 #include "net/gnrc.h"
 #include "net/icmpv6.h"
 #include "net/ipv6/addr.h"
@@ -46,6 +45,44 @@
 #include "debug.h"
 
 /**
+ * @brief   Default message queue size for the pktshark thread (as exponent of
+ *          2^n).
+ *
+ *          As the queue size ALWAYS needs to be power of two, this option
+ *          represents the exponent of 2^n, which will be used as the size of
+ *          the queue.
+ */
+#ifndef CONFIG_GNRC_PKTSHARK_MSG_QUEUE_SIZE_EXP
+#define CONFIG_GNRC_PKTSHARK_MSG_QUEUE_SIZE_EXP  3
+#endif
+/** @} */
+
+/**
+ * @brief   Message queue size for the pktshark thread
+ */
+#ifndef GNRC_PKTSHARK_MSG_QUEUE_SIZE
+#define GNRC_PKTSHARK_MSG_QUEUE_SIZE  (1 << CONFIG_GNRC_PKTSHARK_MSG_QUEUE_SIZE_EXP)
+#endif
+
+/**
+ * @brief   Priority of the pktshark thread
+ */
+#ifndef GNRC_PKTSHARK_PRIO
+#define GNRC_PKTSHARK_PRIO               (THREAD_PRIORITY_MAIN - 1)
+#endif
+
+/**
+ * @brief   Stack size used for the pktshark thread
+ *
+ * @note    The message queue was previously allocated on the stack.
+ *          The default number of messages is 2³.
+ *          Given sizeof(msg_t) == 8, the stack size is reduced by 64 bytes.
+ */
+#ifndef GNRC_PKTSHARK_STACKSIZE
+#define GNRC_PKTSHARK_STACKSIZE          ((THREAD_STACKSIZE_MAIN) - 64)
+#endif
+
+/**
  * @brief   PID of the pktshark thread
  */
 static kernel_pid_t gnrc_pktshark_pid = KERNEL_PID_UNDEF;
@@ -53,8 +90,8 @@ static kernel_pid_t gnrc_pktshark_pid = KERNEL_PID_UNDEF;
 /**
  * @brief   Stack for the pktshark thread
  */
-static char _stack[GNRC_PKTDUMP_STACKSIZE];
-static msg_t _msg_queue[GNRC_PKTDUMP_MSG_QUEUE_SIZE];
+static char _stack[GNRC_PKTSHARK_STACKSIZE];
+static msg_t _msg_queue[GNRC_PKTSHARK_MSG_QUEUE_SIZE];
 
 /* Iterator for NDP options in a packet */
 #define FOREACH_OPT(ndp_pkt, opt, icmpv6_len) \
@@ -639,7 +676,7 @@ static void *_eventloop(void *arg)
     msg_t msg, reply;
 
     /* setup the message queue */
-    msg_init_queue(_msg_queue, GNRC_PKTDUMP_MSG_QUEUE_SIZE);
+    msg_init_queue(_msg_queue, GNRC_PKTSHARK_MSG_QUEUE_SIZE);
 
     reply.content.value = (uint32_t)(-ENOTSUP);
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
@@ -689,13 +726,13 @@ static void _set_capture(bool enable)
 
 static void gnrc_pktshark_init(void)
 {
-    gnrc_pktshark_pid = thread_create(_stack, sizeof(_stack), GNRC_PKTDUMP_PRIO, 0,
+    gnrc_pktshark_pid = thread_create(_stack, sizeof(_stack), GNRC_PKTSHARK_PRIO, 0,
                                       _eventloop, NULL, "pktshark");
     if (IS_USED(MODULE_AUTO_INIT_GNRC_PKTSHARK)) {
         _set_capture(true);
     }
 }
-AUTO_INIT(gnrc_pktshark_init, AUTO_INIT_PRIO_MOD_GNRC_PKTDUMP);
+AUTO_INIT(gnrc_pktshark_init, AUTO_INIT_PRIO_MOD_GNRC_PKTSHARK);
 
 #ifdef MODULE_SHELL
 static int cmd_pktshark(int argc, char **argv)
