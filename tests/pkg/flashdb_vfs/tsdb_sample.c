@@ -44,14 +44,14 @@ void tsdb_sample(fdb_tsdb_t tsdb)
         status.temp = 36;
         status.humi = 85;
         fdb_err_t res = fdb_tsl_append(tsdb, fdb_blob_make(&blob, &status, sizeof(status)));
-        printf("append the new status.temp (%d) and status.humi (%d) %s\n", status.temp, status.humi,
-               resstr(res == FDB_NO_ERR));
+        printf("append the new status.temp (%d) and status.humi (%d) %s\n", status.temp,
+               status.humi, resstr(res == FDB_NO_ERR));
 
         status.temp = 38;
         status.humi = 90;
         res = fdb_tsl_append(tsdb, fdb_blob_make(&blob, &status, sizeof(status)));
-        printf("append the new status.temp (%d) and status.humi (%d) %s\n", status.temp, status.humi,
-               resstr(res == FDB_NO_ERR));
+        printf("append the new status.temp (%d) and status.humi (%d) %s\n", status.temp,
+               status.humi, resstr(res == FDB_NO_ERR));
     }
 
     { /* QUERY the TSDB */
@@ -61,8 +61,10 @@ void tsdb_sample(fdb_tsdb_t tsdb)
 
     { /* QUERY the TSDB by time */
         /* prepare query time (from 1970-01-01 00:00:00 to 2020-05-05 00:00:00) */
-        struct tm tm_from = { .tm_year = 1970 - 1900, .tm_mon = 0, .tm_mday = 1, .tm_hour = 0, .tm_min = 0, .tm_sec = 0 };
-        struct tm tm_to = { .tm_year = 2020 - 1900, .tm_mon = 4, .tm_mday = 5, .tm_hour = 0, .tm_min = 0, .tm_sec = 0 };
+        struct tm tm_from = { .tm_year = 1970 - 1900, .tm_mon = 0, .tm_mday = 1,
+                              .tm_hour = 0, .tm_min = 0, .tm_sec = 0 };
+        struct tm tm_to = { .tm_year = 2020 - 1900, .tm_mon = 4, .tm_mday = 5,
+                            .tm_hour = 0, .tm_min = 0, .tm_sec = 0 };
         time_t from_time = mktime(&tm_from), to_time = mktime(&tm_to);
         unsigned count;
         /* query all TSL in TSDB by time */
@@ -77,7 +79,8 @@ void tsdb_sample(fdb_tsdb_t tsdb)
          * set_status_cb: the change operation will in this callback
          *
          * NOTE: The actions to modify the state must be in order.
-         *       like: FDB_TSL_WRITE -> FDB_TSL_USER_STATUS1 -> FDB_TSL_DELETED -> FDB_TSL_USER_STATUS2
+         *       like: FDB_TSL_WRITE -> FDB_TSL_USER_STATUS1 -> FDB_TSL_DELETED
+         *             -> FDB_TSL_USER_STATUS2
          *       The intermediate states can also be ignored.
          *       such as: FDB_TSL_WRITE -> FDB_TSL_DELETED
          */
@@ -93,9 +96,11 @@ static bool query_cb(fdb_tsl_t tsl, void *arg)
     struct env_status status = {0};
     fdb_tsdb_t db = arg;
 
-    size_t len = fdb_blob_read((fdb_db_t) db, fdb_tsl_to_blob(tsl, fdb_blob_make(&blob, &status, sizeof(status))));
-    printf("[query_cb] queried a TSL: time: %"PRId32", temp: %d, humi: %d %s\n", tsl->time, status.temp, status.humi,
-            resstr(len == sizeof(status)));
+    size_t len = fdb_blob_read((fdb_db_t)db,
+                               fdb_tsl_to_blob(tsl,
+                                               fdb_blob_make(&blob, &status, sizeof(status))));
+    printf("[query_cb] queried a TSL: time: %"PRId32", temp: %d, humi: %d %s\n", tsl->time,
+           status.temp, status.humi, resstr(len == sizeof(status)));
 
     return false;
 }
@@ -106,9 +111,11 @@ static bool query_by_time_cb(fdb_tsl_t tsl, void *arg)
     struct env_status status = {0};
     fdb_tsdb_t db = arg;
 
-    size_t len = fdb_blob_read((fdb_db_t) db, fdb_tsl_to_blob(tsl, fdb_blob_make(&blob, &status, sizeof(status))));
-    printf("[query_by_time_cb] queried a TSL: time: %"PRId32", temp: %d, humi: %d %s\n", tsl->time, status.temp, status.humi,
-            resstr(len == sizeof(status)));
+    size_t len = fdb_blob_read((fdb_db_t)db,
+                               fdb_tsl_to_blob(tsl,
+                                               fdb_blob_make(&blob, &status, sizeof(status))));
+    printf("[query_by_time_cb] queried a TSL: time: %"PRId32", temp: %d, humi: %d %s\n",
+           tsl->time, status.temp, status.humi, resstr(len == sizeof(status)));
 
     return false;
 }
@@ -118,8 +125,8 @@ static bool set_status_cb(fdb_tsl_t tsl, void *arg)
     fdb_tsdb_t db = arg;
 
     fdb_err_t res = fdb_tsl_set_status(db, tsl, FDB_TSL_USER_STATUS1);
-    printf("set the TSL (time %"PRId32") status from %d to %d %s\n", tsl->time, tsl->status, FDB_TSL_USER_STATUS1,
-           resstr(res == FDB_NO_ERR));
+    printf("set the TSL (time %"PRId32") status from %d to %d %s\n", tsl->time, tsl->status,
+           FDB_TSL_USER_STATUS1, resstr(res == FDB_NO_ERR));
     return false;
 }
 
