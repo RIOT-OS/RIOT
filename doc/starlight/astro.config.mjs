@@ -137,6 +137,7 @@ export default defineConfig({
                 "advanced_tutorials/creating_modules",
                 "advanced_tutorials/device_drivers",
                 "advanced_tutorials/porting_boards",
+                "advanced_tutorials/event_queue",
               ],
             },
           ],
