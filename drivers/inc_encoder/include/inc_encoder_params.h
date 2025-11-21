@@ -24,6 +24,10 @@ extern "C" {
 #endif
 
 /**
+ * @name    default configuration parameters for a generic incremental rotary encoder
+ * @{
+ */
+/**
  * @brief Default gear reduction ratio
  */
 #ifndef CONFIG_INC_ENCODER_GEAR_RED_RATIO
@@ -38,19 +42,15 @@ extern "C" {
 #endif
 
 /**
- * @brief Default number of pulses per revolution
+ * @brief Default period for hardware RPM calculation in milliseconds
  */
-#if IS_USED(MODULE_INC_ENCODER_HARDWARE)
+#if IS_USED(MODULE_INC_ENCODER_HARDWARE) || DOXYGEN
 #  ifndef CONFIG_INC_ENCODER_HARDWARE_PERIOD_MS
 #    define CONFIG_INC_ENCODER_HARDWARE_PERIOD_MS 200
 #  endif
 #endif
 
-/**
- * @name    default configuration parameters for a generic incremental rotary encoder
- * @{
- */
-#if IS_USED(MODULE_INC_ENCODER_SOFTWARE)
+#if IS_USED(MODULE_INC_ENCODER_SOFTWARE) || DOXYGEN
 /**
  * @brief Default pin of the first phase used to trigger the interrupt for software decoding
  */
@@ -67,7 +67,7 @@ extern "C" {
 #  endif
 #endif /* IS_USED(MODULE_INC_ENCODER_SOFTWARE) */
 
-#if IS_USED(MODULE_INC_ENCODER_HARDWARE)
+#if IS_USED(MODULE_INC_ENCODER_HARDWARE) || DOXYGEN
 /**
  * @brief Default QDEC device used for hardware decoding
  */
@@ -79,12 +79,12 @@ extern "C" {
 /**
  * @brief Default parameters
  */
-#if IS_USED(MODULE_INC_ENCODER_SOFTWARE)
+#if IS_USED(MODULE_INC_ENCODER_SOFTWARE) || DOXYGEN
 #  ifndef INC_ENCODER_PARAMS
 #    define INC_ENCODER_PARAMS { .interrupt = INC_ENCODER_INTERRUPT, \
                                  .direction = INC_ENCODER_DIRECTION }
 #  endif
-#elif IS_USED(MODULE_INC_ENCODER_HARDWARE)
+#elif IS_USED(MODULE_INC_ENCODER_HARDWARE) || DOXYGEN
 
 #  ifndef INC_ENCODER_PARAMS
 #    define INC_ENCODER_PARAMS { .qdec_dev = INC_ENCODER_QDEC_DEV }

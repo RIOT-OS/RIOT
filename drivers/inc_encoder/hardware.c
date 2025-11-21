@@ -88,7 +88,7 @@ int inc_encoder_read_reset_milli_revs(inc_encoder_t *dev, int32_t *rev_counter)
 
     /* We reset the counter but we need to keep the number
      * of pulses since last read for the RPM calculation */
-    dev->leftover_count = delta_count;
+    dev->leftover_count += delta_count;
     dev->extended_count = 0;
     dev->prev_count = 0;
     irq_restore(irq_state);

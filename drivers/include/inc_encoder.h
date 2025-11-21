@@ -99,9 +99,9 @@ extern "C" {
  * @brief Device initialization parameters
  */
 typedef struct {
-#if IS_USED(MODULE_INC_ENCODER_HARDWARE)
+#if IS_USED(MODULE_INC_ENCODER_HARDWARE) || DOXYGEN
     qdec_t qdec_dev;  /**< QDEC device used for hardware decoding */
-#elif IS_USED(MODULE_INC_ENCODER_SOFTWARE)
+#elif IS_USED(MODULE_INC_ENCODER_SOFTWARE) || DOXYGEN
     gpio_t interrupt; /**< Interrupt pin (first phase) */
     gpio_t direction; /**< Pin used to determine the direction (shifted phase) */
 #endif
@@ -112,13 +112,13 @@ typedef struct {
  */
 typedef struct {
     inc_encoder_params_t params;          /**< configuration parameters */
-#if IS_USED(MODULE_INC_ENCODER_SOFTWARE)
+#if IS_USED(MODULE_INC_ENCODER_SOFTWARE) || DOXYGEN
     uint32_t             delta_t;         /**< time delta since the last pulse */
     int32_t              pulse_counter;   /**< number of pulses since last read */
     uint32_t             last_read_time;  /**< time of the last read */
     bool                 cw;              /**< clock wise rotation */
     bool                 stale;           /**< indicates that there is no new data to be read */
-#elif IS_USED(MODULE_INC_ENCODER_HARDWARE)
+#elif IS_USED(MODULE_INC_ENCODER_HARDWARE) || DOXYGEN
     int32_t              extended_count;  /**< accumulated count of pulse overflows */
     int32_t              prev_count;      /**< number of pulses at last RPM calculation */
     int32_t              leftover_count;  /**< leftover from last reset */
