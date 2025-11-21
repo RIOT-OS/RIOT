@@ -87,7 +87,6 @@ int main(void)
     fdb_err_t result;
     uint32_t sec_size = 4096, db_size = sec_size * 4;
 
-
     if (IS_USED(MODULE_FLASHDB_MTD)) {
 #if defined(FDB_MTD)
     fdb_mtd_init(FDB_MTD);
@@ -114,7 +113,7 @@ int main(void)
         }
 #endif
         default_kv.kvs = default_kv_table;
-        default_kv.num = sizeof(default_kv_table) / sizeof(default_kv_table[0]);
+        default_kv.num = ARRAY_SIZE(default_kv_table);
         /* set the lock and unlock function if you want */
         mutex_init(&kv_locker);
         fdb_kvdb_control(&kvdb, FDB_KVDB_CTRL_SET_LOCK, (void *)(uintptr_t)lock);
