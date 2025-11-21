@@ -83,7 +83,6 @@ Cargo.*                                     @chrysn
 /drivers/pca9685/                           @gschorcht
 /drivers/sht3x/                             @gschorcht
 /drivers/si70xx/                            @basilfx
-/drivers/slipdev/                           @miri64
 /drivers/sx127x/                            @aabadie @jia200x
 /drivers/ws281x/                            @maribu
 /drivers/xbee/                              @miri64

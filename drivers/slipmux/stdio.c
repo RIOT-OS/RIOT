@@ -17,9 +17,8 @@
 #include "isrpipe.h"
 #include "periph/uart.h"
 
-#include "slipdev.h"
-#include "slipdev_internal.h"
-#include "slipdev_params.h"
+#include "slipmux_internal.h"
+#include "slipmux_params.h"
 
 #include "stdio_base.h"
 #include "stdio_uart.h"
@@ -33,22 +32,22 @@ static void _init(void)
 {
     /* intentionally overwritten in netdev init so we have stdio before
      * the network device is initialized */
-    uart_init(slipdev_params[0].uart, slipdev_params[0].baudrate,
+    uart_init(slipmux_params[0].uart, slipmux_params[0].baudrate,
               _isrpipe_write, &stdin_isrpipe);
 
-    slipdev_write_byte(slipdev_params[0].uart, SLIPDEV_END);
+    slipmux_write_byte(slipmux_params[0].uart, SLIPMUX_END);
 }
 
 static ssize_t _write(const void *buffer, size_t len)
 {
-    mutex_lock(&slipdev_mutex);
-    slipdev_write_byte(slipdev_params[0].uart, SLIPDEV_STDIO_START);
-    slipdev_write_bytes(slipdev_params[0].uart, buffer, len);
-    slipdev_write_byte(slipdev_params[0].uart, SLIPDEV_END);
-    mutex_unlock(&slipdev_mutex);
+    slipmux_lock();
+    slipmux_write_byte(slipmux_params[0].uart, SLIPMUX_STDIO_START);
+    slipmux_write_bytes(slipmux_params[0].uart, buffer, len);
+    slipmux_write_byte(slipmux_params[0].uart, SLIPMUX_END);
+    slipmux_unlock();
     return len;
 }
 
-STDIO_PROVIDER(STDIO_SLIP, _init, NULL, _write)
+STDIO_PROVIDER(STDIO_SLIPMUX, _init, NULL, _write)
 
 /** @} */
