@@ -31,7 +31,8 @@ void kvdb_type_blob_sample(fdb_kvdb_t kvdb)
     /* It will create new KV node when "temp" KV not in database.
      * fdb_blob_make: It's a blob make function, and it will return the blob when make finish.
      */
-    fdb_err_t res = fdb_kv_set_blob(kvdb, "temp", fdb_blob_make(&blob, &temp_data1, sizeof(temp_data1)));
+    fdb_err_t res = fdb_kv_set_blob(kvdb, "temp",
+                                    fdb_blob_make(&blob, &temp_data1, sizeof(temp_data1)));
     printf("create the 'temp' blob KV, value is: %d %s\n", temp_data1,
             resstr(res == FDB_NO_ERR));
 
@@ -39,7 +40,8 @@ void kvdb_type_blob_sample(fdb_kvdb_t kvdb)
     int temp_data2 = 0;
 
     /* get the "temp" KV value */
-    size_t len = fdb_kv_get_blob(kvdb, "temp", fdb_blob_make(&blob, &temp_data2, sizeof(temp_data2)));
+    size_t len = fdb_kv_get_blob(kvdb, "temp",
+                                 fdb_blob_make(&blob, &temp_data2, sizeof(temp_data2)));
     printf("get the 'temp' value is: %d %s\n", temp_data2,
             resstr(len == sizeof(temp_data2) && temp_data1 == temp_data2));
 
