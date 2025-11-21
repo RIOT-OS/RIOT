@@ -91,6 +91,7 @@ enum {
     UNIT_G_FORCE,   /**< gravitational force equivalent */
     UNIT_G = UNIT_G_FORCE, /**< @deprecated, use UNIT_G_FORCE instead */
     UNIT_DPS,       /**< degree per second */
+    UNIT_RPM,       /**< revolutions per minute */
     /* weight */
     UNIT_GRAM,      /**< grams - not using the SI unit (kg) here to make scale
                      *   handling simpler */
