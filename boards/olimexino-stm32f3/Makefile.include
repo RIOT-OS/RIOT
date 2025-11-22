@@ -1,0 +1,29 @@
+# we use shared STM32 configuration snippets
+INCLUDES += -I$(RIOTBASE)/boards/common/stm32/include
+
+# default to flashing over USB
+PROGRAMMER ?= dfu-util
+DFU_USB_ID ?= 0483:df11
+DFU_USE_DFUSE ?= 1
+ROM_OFFSET ?= 0x0
+
+# CDC ACM is available faster on STM32
+TERM_DELAY ?= 1
+
+# The common stlink variants do not have the 1.27 mm 10 pin SWD connector. But
+# e.g. the formerly cheap J-Link EDU Mini does have this, so this likely makes
+# a better default.
+OPENOCD_DEBUG_ADAPTER ?= jlink
+
+# The reset pin on the 10 pin 1.27 mm SWD connector requires the solder bridge
+# SJ5 to be manually closed to be useable. This is a good thing to do, but for
+# a better out of the box experience, we disable the use of the RST pin by
+# default.
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 0
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyACM0
+
+# Setup of programmer and serial is shared between STM32 based boards
+include $(RIOTMAKE)/boards/stm32.inc.mk
+include $(RIOTMAKE)/tools/usb_board_reset.mk
