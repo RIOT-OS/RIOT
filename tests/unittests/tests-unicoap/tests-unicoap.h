@@ -38,6 +38,12 @@
 #  define _TEST_ASSERT_EQUAL_POINTER(a, b) \
     TEST_ASSERT_EQUAL_INT((uintptr_t)a, (uintptr_t)b)
 
+#  define _TEST_ASSERT_TRUE(a) \
+    TEST_ASSERT_EQUAL_INT(a, true)
+
+#  define _TEST_ASSERT_FALSE(a) \
+    TEST_ASSERT_EQUAL_INT(a, false)
+
 #  define _BYTES(...) ((uint8_t[]){ __VA_ARGS__ })
 
 #  define _UINT4_MAX  (12)
