@@ -4,10 +4,6 @@ ifneq (,$(filter adc%1c,$(USEMODULE)))
   USEMODULE += adcxx1c
 endif
 
-ifneq (,$(filter ads101%,$(USEMODULE)))
-  USEMODULE += ads101x
-endif
-
 ifneq (,$(filter apds99%,$(USEMODULE)))
   USEMODULE += apds99xx
 endif
@@ -334,4 +330,8 @@ ifneq (,$(filter gnrc_netif_timestamp,$(USEMODULE)))
   ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
     USEMODULE += netdev_ieee802154_rx_timestamp
   endif
+endif
+
+ifneq (,$(filter ads101% ads111%,$(USEMODULE)))
+  USEMODULE += ads1x1x
 endif
