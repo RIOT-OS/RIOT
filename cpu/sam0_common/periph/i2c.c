@@ -20,19 +20,14 @@
  */
 
 #include <assert.h>
-#include <stdint.h>
 #include <errno.h>
+#include <stdint.h>
 
 #include "busy_wait.h"
-#include "cpu.h"
-#include "board.h"
 #include "mutex.h"
 #include "periph_conf.h"
 #include "periph/gpio.h"
 #include "periph/i2c.h"
-
-#include "sched.h"
-#include "thread.h"
 
 #define ENABLE_DEBUG        0
 #include "debug.h"
@@ -112,7 +107,8 @@ static bool _check_and_unblock_bus(i2c_t dev_id, bool initialized)
 {
     const i2c_conf_t *dev_conf = &i2c_config[dev_id];
 
-    /* reconfigure pins to gpio for testing */
+    /* power off SERCOM and reconfigure pins to GPIO for testing */
+    _i2c_poweroff(dev_id);
     gpio_disable_mux(dev_conf->sda_pin);
     gpio_disable_mux(dev_conf->scl_pin);
     gpio_init(dev_conf->sda_pin, GPIO_IN);
@@ -157,9 +153,17 @@ static bool _check_and_unblock_bus(i2c_t dev_id, bool initialized)
         gpio_init_mux(dev_conf->scl_pin, dev_conf->mux);
         gpio_init_mux(dev_conf->sda_pin, dev_conf->mux);
 
-        /* reset bus state */
-        dev_conf->dev->STATUS.reg = BUSSTATE_IDLE;
-        _syncbusy(dev_conf->dev);
+        /* re-power SERCOM */
+        _i2c_poweron(dev_id);
+        /* Start timeout if bus state is unknown. */
+        uint32_t timeout_counter = 0;
+        while ((bus(dev_id)->STATUS.reg &
+              SERCOM_I2CM_STATUS_BUSSTATE_Msk) == BUSSTATE_UNKNOWN) {
+            if (timeout_counter++ >= SAMD21_I2C_TIMEOUT) {
+                /* Timeout, force bus state to idle. */
+                bus(dev_id)->STATUS.reg = BUSSTATE_IDLE;
+            }
+        }
     }
 
     return success;
@@ -168,7 +172,7 @@ static bool _check_and_unblock_bus(i2c_t dev_id, bool initialized)
 void i2c_init(i2c_t dev)
 {
     uint32_t timeout_counter = 0;
-    int32_t tmp_baud;
+    uint32_t tmp_baud;
 
     assert(dev < I2C_NUMOF);
 
