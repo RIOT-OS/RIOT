@@ -19,6 +19,7 @@
 #define USB_H_USER_IS_RIOT_INTERNAL
 
 #include <assert.h>
+#include <errno.h>
 #include <string.h>
 
 #include "tsrb.h"
@@ -148,12 +149,12 @@ static size_t _gen_full_acm_descriptor(usbus_t *usbus, void *arg)
 }
 
 /* Submit (ACM interface in) */
-size_t usbus_cdc_acm_submit(usbus_cdcacm_device_t *cdcacm, const uint8_t *buf, size_t len)
+ssize_t usbus_cdc_acm_submit(usbus_cdcacm_device_t *cdcacm, const uint8_t *buf, size_t len)
 {
-    size_t n;
+    ssize_t n;
     unsigned old;
     if (cdcacm->state == USBUS_CDC_ACM_LINE_STATE_DISCONNECTED) {
-        return len;
+        return -ECONNRESET;
     }
 
     old = irq_disable();
