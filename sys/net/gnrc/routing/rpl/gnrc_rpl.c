@@ -15,6 +15,7 @@
  * @author  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
+#include "net/ipv6/addr.h"
 #include <assert.h>
 #include <string.h>
 #include "kernel_defines.h"
@@ -58,7 +59,8 @@ static xtimer_t _lt_timer;
 static msg_t _lt_msg = { .type = GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE };
 #endif
 static msg_t _msg_q[GNRC_RPL_MSG_QUEUE_SIZE];
-static gnrc_netreg_entry_t _me_reg;
+static gnrc_netreg_entry_t _me_icmpv6_reg;
+static gnrc_netreg_entry_t _me_routing_reg;
 static mutex_t _inst_id_mutex = MUTEX_INIT;
 static uint8_t _instance_id;
 
@@ -100,10 +102,15 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
          * queue, and registration with netreg can commence. */
         mutex_lock(&eventloop_startup);
 
-        _me_reg.demux_ctx = ICMPV6_RPL_CTRL;
-        _me_reg.target.pid = gnrc_rpl_pid;
-        /* register interest in all ICMPv6 packets */
-        gnrc_netreg_register(GNRC_NETTYPE_ICMPV6, &_me_reg);
+        /* Register interest in all ICMPv6 packets. */
+        _me_icmpv6_reg.demux_ctx = ICMPV6_RPL_CTRL;
+        _me_icmpv6_reg.target.pid = gnrc_rpl_pid;
+        gnrc_netreg_register(GNRC_NETTYPE_ICMPV6, &_me_icmpv6_reg);
+
+        /* Register interest in L3 routing info. */
+        _me_routing_reg.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
+        _me_routing_reg.target.pid = gnrc_rpl_pid;
+        gnrc_netreg_register(GNRC_NETTYPE_L3_ROUTING, &_me_routing_reg);
 
         gnrc_rpl_of_manager_init();
         evtimer_init_msg(&gnrc_rpl_evtimer);
@@ -273,6 +280,64 @@ static void _parent_timeout(gnrc_rpl_parent_t *parent)
     evtimer_add_msg(&gnrc_rpl_evtimer, &parent->timeout_event, gnrc_rpl_pid);
 }
 
+/**
+ * @brief   Handles the event that a new neighbor was discovered and is reachable.
+ *
+ * @param[in] addr  The address of the neighbor.
+ */
+static inline void _handle_discovered_neighbor(ipv6_addr_t *addr)
+{
+    /* Send DODAG soliciation message to node. */
+    gnrc_rpl_send_DIS(NULL, addr, NULL, 0);
+}
+
+/**
+ * @brief   Handles the event that a neighbor became unreachable.
+ *
+ * @param[in] addr  The address of the neighbor.
+ */
+static inline void _handle_unreachable_neighbor(ipv6_addr_t *addr)
+{
+    gnrc_rpl_parent_t *parent;
+    int idx = 0;
+
+    /* Iterate through all parents and timeout the ones with matching address.
+       There can be multiple parents with the same address because the same node
+       can be a parent in multiple different DODAGs. */
+    while ((idx = gnrc_rpl_parent_iter_by_addr(addr, &parent, idx)) >= 0) {
+        _parent_timeout(parent);
+    }
+}
+
+/**
+ * @brief   Handles a netapi event notification.
+ *
+ * @param[in] notify    The type of notification.
+ */
+static inline void _netapi_notify_event(gnrc_netapi_notify_t *notify)
+{
+    ipv6_addr_t neigh_addr;
+    netapi_notify_t type = notify->event;
+
+    int res = gnrc_netapi_notify_copy_event_data(notify, sizeof(ipv6_addr_t), &neigh_addr);
+
+    if (res != sizeof(ipv6_addr_t)) {
+        DEBUG("RPL: Received invalid data for netapi notify event.\n");
+        return;
+    }
+
+    switch (type) {
+    case NETAPI_NOTIFY_L3_DISCOVERED:
+        _handle_discovered_neighbor(&neigh_addr);
+        break;
+    case NETAPI_NOTIFY_L3_UNREACHABLE:
+        _handle_unreachable_neighbor(&neigh_addr);
+        break;
+    default:
+        break;
+    }
+}
+
 static void *_event_loop(void *args)
 {
     msg_t msg, reply;
@@ -341,6 +406,10 @@ static void *_event_loop(void *args)
                 DEBUG("RPL: reply to unsupported get/set\n");
                 reply.content.value = -ENOTSUP;
                 msg_reply(&msg, &reply);
+                break;
+            case GNRC_NETAPI_MSG_TYPE_NOTIFY:
+                DEBUG("RPL: GNRC_NETAPI_MSG_TYPE_NOTIFY received\n");
+                _netapi_notify_event(msg.content.ptr);
                 break;
             default:
                 break;
