@@ -40,20 +40,37 @@ extern "C" {
  */
 #ifdef DEVELHELP
 #include "cpu_conf.h"
-#define DEBUG_PRINT(...) \
+#ifdef __GNU_C__
+#define DEBUG_PRINT(X, ...) \
     do { \
-        if ((thread_get_active() == NULL) || \
-            (thread_get_active()->stack_size >= \
-             THREAD_EXTRA_STACKSIZE_PRINTF)) { \
-            printf(__VA_ARGS__); \
-        } \
-        else { \
-            puts("Cannot debug, stack too small. Consider using DEBUG_PUTS()."); \
-        } \
+        if (sizeof((const char[]){"empty"#__VA_ARGS__}) == sizeof((const char[]){"empty"}))\
+            printf(X, ##__VA_ARGS__);\
+        else {\
+            if ((thread_get_active() == NULL) || \
+                (thread_get_active()->stack_size >= \
+                THREAD_EXTRA_STACKSIZE_PRINTF)) { \
+                    printf(X, ##__VA_ARGS__); \
+                } \
+            else { \
+                puts("Cannot debug, stack too small. Consider using DEBUG_PUTS()."); \
+            } }\
     } while (0)
-#else
+#else /*__GNU_C__*/
+#define DEBUG_PRINT( ...) \
+    do { \
+            if ((thread_get_active() == NULL) || \
+                (thread_get_active()->stack_size >= \
+                THREAD_EXTRA_STACKSIZE_PRINTF)) { \
+                    printf(__VA_ARGS__); \
+                } \
+            else { \
+                puts("Cannot debug, stack too small. Consider using DEBUG_PUTS()."); \
+            }\
+    } while (0)
+#endif /*__GNU_C__*/
+#else /* DEVELHELP */
 #define DEBUG_PRINT(...) printf(__VA_ARGS__)
-#endif
+#endif /* DEVELHELP */
 
 /**
  * @def DEBUG_BREAKPOINT
