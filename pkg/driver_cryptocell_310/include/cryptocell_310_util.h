@@ -23,6 +23,10 @@
 extern "C" {
 #endif
 
+#ifdef CPU_NRF52
+#define CHECK_POINTER_DMA_ACCESS(p) ((unsigned int)p >= 0x20000000 ? (unsigned int)p < 0x40000000 : 0)
+#endif
+
 /**
  * @brief   Enable CryptoCell module and IRQs.
  *

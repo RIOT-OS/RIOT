@@ -223,6 +223,42 @@ typedef enum {
  * @return  @ref psa_cipher_op_t
  * @return  @ref PSA_INVALID_OPERATION  @c alg, @c bits and @c type are not compatible
  */
+#define GET_CTR_OPERATION(type, bits) \
+    (PSA_INVALID_OPERATION)
+
+/**
+ * @brief Combine key type and size with a PSA_ALG_ECB_NO_PADDING algorithm
+ *
+ * @param type Key type of type @ref psa_key_type_t
+ * @param bits Size of the used key of type @ref psa_key_bits_t
+ *
+ * @return  @ref psa_cipher_op_t
+ * @return  @ref PSA_INVALID_OPERATION  @c alg, @c bits and @c type are not compatible
+ */
+#define GET_ECB_NO_PADDING_OPERATION(type, bits) \
+    (PSA_INVALID_OPERATION)
+
+/**
+ * @brief Combine key type and size with a PSA_ALG_OFB algorithm
+ *
+ * @param type Key type of type @ref psa_key_type_t
+ * @param bits Size of the used key of type @ref psa_key_bits_t
+ *
+ * @return  @ref psa_cipher_op_t
+ * @return  @ref PSA_INVALID_OPERATION  @c alg, @c bits and @c type are not compatible
+ */
+#define GET_OFB_OPERATION(type, bits) \
+    (PSA_INVALID_OPERATION)
+
+/**
+ * @brief Combine key type and size with a PSA_ALG_STREAM_CIPHER algorithm
+ *
+ * @param type Key type of type @ref psa_key_type_t
+ * @param bits Size of the used key of type @ref psa_key_bits_t
+ *
+ * @return  @ref psa_cipher_op_t
+ * @return  @ref PSA_INVALID_OPERATION  @c alg, @c bits and @c type are not compatible
+ */
 #define GET_STREAM_CIPHER_OPERATION(type, bits) \
     (((type == PSA_KEY_TYPE_CHACHA20) && (bits == 256)) ? PSA_STREAM_CIPHER_CHACHA20 : \
      PSA_INVALID_OPERATION)
