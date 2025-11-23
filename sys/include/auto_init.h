@@ -1,11 +1,9 @@
 /*
- * Copyright (C) 2010,2015 Freie Universität Berlin
- * Copyright (C) 2010 Kaspar Schleiser <kaspar@schleiser.de>
- * Copyright (C) 2013-2018 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2010 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2010 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2013-2018 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
