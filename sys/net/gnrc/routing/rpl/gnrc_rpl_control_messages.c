@@ -546,7 +546,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
             }
             else {
                 DEBUG("RPL: Unsupported OCP 0x%02x\n", byteorder_ntohs(dc->ocp));
-                inst->of = gnrc_rpl_get_of_for_ocp(GNRC_RPL_DEFAULT_OCP);
+                inst->of = gnrc_rpl_get_of_for_ocp(CONFIG_GNRC_RPL_DEFAULT_OCP);
             }
             dodag->dio_interval_doubl = dc->dio_int_doubl;
             dodag->dio_min = dc->dio_int_min;
@@ -636,26 +636,6 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
                                  dodag->iface,
                                  dodag->default_lifetime * dodag->lifetime_unit);
             break;
-
-        case (GNRC_RPL_OPT_TARGET):
-            DEBUG("RPL: RPL TARGET DAO option parsed\n");
-            *included_opts |= ((uint32_t) 1) << GNRC_RPL_OPT_TARGET;
-
-            gnrc_rpl_opt_target_t *target = (gnrc_rpl_opt_target_t *) opt;
-            if (first_target == NULL) {
-                first_target = target;
-            }
-
-            DEBUG("RPL: adding FT entry %s/%d\n",
-                    ipv6_addr_to_str(addr_str, &(target->target), (unsigned)sizeof(addr_str)),
-                    target->prefix_length);
-
-            gnrc_ipv6_nib_ft_del(&(target->target), target->prefix_length);
-            gnrc_ipv6_nib_ft_add(&(target->target), target->prefix_length, src,
-                                    dodag->iface,
-                                    dodag->default_lifetime * dodag->lifetime_unit);
-            break;
-
         case (GNRC_RPL_OPT_TRANSIT):
             DEBUG("RPL: RPL TRANSIT INFO DAO option parsed\n");
             *included_opts |= ((uint32_t) 1) << GNRC_RPL_OPT_TRANSIT;
@@ -896,7 +876,7 @@ void _recv_DIO_for_new_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio_t *dio, ker
     assert(netif != NULL);
 
     inst->mop = (dio->g_mop_prf >> GNRC_RPL_MOP_SHIFT) & GNRC_RPL_SHIFTED_MOP_MASK;
-    inst->of = gnrc_rpl_get_of_for_ocp(GNRC_RPL_DEFAULT_OCP);
+    inst->of = gnrc_rpl_get_of_for_ocp(CONFIG_GNRC_RPL_DEFAULT_OCP);
 
     gnrc_rpl_dodag_init(inst, &dio->dodag_id, netif->pid);
 
