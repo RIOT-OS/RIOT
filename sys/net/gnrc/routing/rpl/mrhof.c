@@ -266,13 +266,14 @@ static int which_parent(gnrc_rpl_parent_t *p1, gnrc_rpl_parent_t *p2)
     return -1;
 }
 
-/* Prefer d2 if d2 is grounded and d1 is not */
-static gnrc_rpl_dodag_t *which_dodag(gnrc_rpl_dodag_t *d1, gnrc_rpl_dodag_t *d2)
+/* prefer dio if dio is grounded dodag */
+int which_dodag(gnrc_rpl_dodag_t *d1, gnrc_rpl_dio_t *dio)
 {
-    if (!(d1->grounded) && d2->grounded) {
-        return d2;
+    int dio_grounded = dio->g_mop_prf >> GNRC_RPL_GROUNDED_SHIFT;
+    if (d1->grounded > dio_grounded) {
+        return -1;
     }
-    return d1;
+    return 1;
 }
 
 static gnrc_rpl_of_t gnrc_rpl_mrhof = {
