@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2013-2014 INRIA.
+ * SPDX-FileCopyrightText: 2013-2014 INRIA
  * SPDX-FileCopyrightText: 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
  * SPDX-FileCopyrightText: 2015-2018 Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  * SPDX-License-Identifier: LGPL-2.1-only
