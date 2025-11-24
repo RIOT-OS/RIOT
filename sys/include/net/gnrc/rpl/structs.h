@@ -1,7 +1,7 @@
 /*
  * SPDX-FileCopyrightText: 2017 HAW Hamburg
  * SPDX-FileCopyrightText: 2015–2018 Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
- * SPDX-FileCopyrightText: 2013 INRIA.
+ * SPDX-FileCopyrightText: 2013 INRIA
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
