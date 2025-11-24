@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2013 INRIA.
+ * SPDX-FileCopyrightText: 2013 INRIA
  * SPDX-FileCopyrightText: 2015 Cenk Gündoğan <cnkgndgn@gmail.com>
  * SPDX-License-Identifier: LGPL-2.1-only
  */
