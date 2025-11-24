@@ -230,6 +230,12 @@ int putchar(int c)
     return _native_write(STDOUT_FILENO, &tmp, sizeof(tmp));
 }
 
+int fputc(int c, FILE *fp)
+{
+    char tmp = c;
+    return _native_write(fileno(fp), &tmp, sizeof(tmp));
+}
+
 int puts(const char *s)
 {
     int r;
