@@ -1,6 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2013 INRIA
- * SPDX-FileCopyrightText: 2014 INRIA
+ * SPDX-FileCopyrightText: 2013-2014 INRIA
  * SPDX-FileCopyrightText: 2017 HAW Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
