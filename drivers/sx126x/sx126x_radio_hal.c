@@ -404,7 +404,9 @@ static int _config_phy(ieee802154_dev_t *hal, ieee802154_phy_conf_t *conf)
         sx126x_symbol_time_on_air_us(dev) * (IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS +
                                              IEEE802154_AUNITBACKOFF_PERIOD_IN_SYMBOLS) +
         sx126x_time_on_air_us(dev, IEEE802154_ACK_FRAME_LEN);
+    conf->res.sifs_period_us = 12 * sx126x_symbol_time_on_air_us(dev);
     assert(conf->res.ack_timeout_us);
+    assert(conf->res.sifs_period_us);
     return 0;
 }
 
@@ -536,7 +538,8 @@ static const ieee802154_radio_ops_t _sx126x_ops = {
           | IEEE802154_CAP_IRQ_CRC_ERROR
           | IEEE802154_CAP_IRQ_RX_START
           | IEEE802154_CAP_IRQ_TX_DONE
-          | IEEE802154_CAP_IRQ_CCA_DONE,
+          | IEEE802154_CAP_IRQ_CCA_DONE
+          | IEEE802154_CAP_PHY_LORA,
     .write = _write,
     .read = _read,
     .request_on = _request_on,
