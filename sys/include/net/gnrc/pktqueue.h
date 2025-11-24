@@ -1,6 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
- * SPDX-FileCopyrightText: 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * SPDX-FileCopyrightText: 2014-2015 Martine Lenders <mlenders@inf.fu-berlin.de>
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
