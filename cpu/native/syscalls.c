@@ -233,9 +233,18 @@ int putchar(int c)
 int puts(const char *s)
 {
     int r;
-    r = _native_write(STDOUT_FILENO, (char*)s, strlen(s));
+    r = _native_write(STDOUT_FILENO, s, strlen(s));
     putchar('\n');
     return r;
+}
+int fputs(const char *s, FILE *fp)
+{
+    return _native_write(fileno(fp), s, strlen(s));
+}
+
+size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *fp)
+{
+    return _native_write(fileno(fp), ptr, size * nmemb);
 }
 #endif
 
