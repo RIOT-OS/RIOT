@@ -25,6 +25,7 @@
 extern "C" {
 #endif
 
+#include "modules.h"
 #include "psa/sizes.h"
 #include "type.h"
 

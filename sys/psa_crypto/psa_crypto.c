@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -710,11 +707,26 @@ psa_status_t psa_cipher_finish(psa_cipher_operation_t *operation,
                                size_t output_size,
                                size_t *output_length)
 {
-    (void)operation;
-    (void)output;
-    (void)output_size;
-    (void)output_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation || !output || !output_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (operation->iv_required && !operation->iv_set) {
+        psa_cipher_abort(operation);
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    status = psa_location_dispatch_cipher_finish(operation, output, output_size, output_length);
+    if (status != PSA_SUCCESS) {
+        psa_cipher_abort(operation);
+    }
+    return status;
 }
 
 psa_status_t psa_cipher_generate_iv(psa_cipher_operation_t *operation,
@@ -745,7 +757,7 @@ psa_status_t psa_cipher_generate_iv(psa_cipher_operation_t *operation,
 
     status = psa_generate_random(iv, iv_size);
     if (status != PSA_SUCCESS) {
-        return status;
+        return status; 
     }
 
     operation->iv_set = 1;
@@ -758,10 +770,28 @@ psa_status_t psa_cipher_set_iv(psa_cipher_operation_t *operation,
                                const uint8_t *iv,
                                size_t iv_length)
 {
-    (void)operation;
-    (void)iv;
-    (void)iv_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation || !iv) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (!operation->iv_required || operation->iv_set) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    status = psa_location_dispatch_cipher_set_iv(operation, iv, iv_length);
+    if (status != PSA_SUCCESS){
+        return status;
+    }
+
+    operation->iv_set = 1;
+
+    return status;
 }
 
 psa_status_t psa_cipher_update(psa_cipher_operation_t *operation,
@@ -771,13 +801,25 @@ psa_status_t psa_cipher_update(psa_cipher_operation_t *operation,
                                size_t output_size,
                                size_t *output_length)
 {
-    (void)operation;
-    (void)input;
-    (void)input_length;
-    (void)output;
-    (void)output_size;
-    (void)output_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation || !input || !output || !output_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (operation->iv_required && !operation->iv_set) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    status = psa_location_dispatch_cipher_update(operation, input, input_length,
+                                                  output, output_size, output_length);
+
+
+    return status;
 }
 
 #endif /* MODULE_PSA_CIPHER */
