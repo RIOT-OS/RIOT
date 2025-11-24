@@ -167,7 +167,7 @@ void ieee802154_submac_ack_timer_set(ieee802154_submac_t *submac)
                                                              netdev_ieee802154_submac_t,
                                                              submac);
     ieee802154_submac_ack_timer_cancel(submac);
-    DEBUG("IEEE802154 submac: Setting ACK timeout %"PRIu16" us\n", submac->ack_timeout_us);
+    DEBUG("IEEE802154 submac: Setting ACK timeout %"PRIu32" us\n", submac->ack_timeout_us);
     ztimer_set(ZTIMER_USEC, &netdev_submac->ack_timer, submac->ack_timeout_us);
 }
 
