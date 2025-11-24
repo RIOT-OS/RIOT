@@ -173,9 +173,13 @@ void usbus_cdc_acm_set_coding_cb(usbus_cdcacm_device_t *cdcacm,
 /* flush event */
 void usbus_cdc_acm_flush(usbus_cdcacm_device_t *cdcacm)
 {
-    if (cdcacm->usbus) {
-        usbus_event_post(cdcacm->usbus, &cdcacm->flush);
+    if (!cdcacm->usbus) {
+        return;
     }
+    if (cdcacm->state == USBUS_CDC_ACM_LINE_STATE_DISCONNECTED) {
+        return;
+    }
+    usbus_event_post(cdcacm->usbus, &cdcacm->flush);
 }
 
 void usbus_cdc_acm_init(usbus_t *usbus, usbus_cdcacm_device_t *cdcacm,
