@@ -265,5 +265,8 @@ int suit_worker_try_prepare(uint8_t **buffer, size_t *size)
     }
 
     *buffer = _manifest_buf;
+    if (!*size) {
+        *size = SUIT_MANIFEST_BUFSIZE;
+    }
     return 0;
 }
