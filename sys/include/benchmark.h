@@ -1,6 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2017-2018 Freie Universität Berlin
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
