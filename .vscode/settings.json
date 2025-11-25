@@ -8,8 +8,7 @@
     "files.associations": {
         "Makefile.*": "makefile",
         "*.mk": "makefile",
-        "*.sketch": "cpp",
-        "crypto_contexts.h": "c"
+        "*.sketch": "cpp"
     },
     "[shellscript][c][cpp]": {
         "editor.tabSize": 4,

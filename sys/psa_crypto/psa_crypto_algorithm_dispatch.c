@@ -46,7 +46,6 @@
 #include "psa_crypto_operation_encoder.h"
 #include "psa_crypto_algorithm_dispatch.h"
 #endif
-#include <psa/hash/sizes.h>
 
 #if IS_USED(MODULE_PSA_HASH)
 psa_status_t psa_algorithm_dispatch_hash_setup(psa_hash_operation_t *operation,
@@ -616,7 +615,7 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
         return ret;
     }
     else if (attributes->type == PSA_KEY_TYPE_HMAC && PSA_ALG_IS_HMAC(attributes->policy.alg) &&
-             data_length > PSA_HASH_MAX_BLOCK_SIZE) {
+            data_length > PSA_HASH_BLOCK_LENGTH(attributes->policy.alg)){
         psa_status_t ret = PSA_ERROR_NOT_SUPPORTED;
 #if IS_USED(MODULE_PSA_HASH)
         /* must compute hash beforehand if key is too long */
@@ -643,18 +642,18 @@ psa_status_t psa_algorithm_dispatch_cipher_encrypt_setup(   psa_cipher_operation
                                                             const psa_key_slot_t *slot,
                                                             psa_algorithm_t alg)
 {
-    operation->alg = PSA_ENCODE_CIPHER_OPERATION(alg, attributes->type, attributes->bits);
+    operation->cipher_instance = PSA_ENCODE_CIPHER_OPERATION(alg, attributes->type, attributes->bits);
 
     uint8_t *key_data = NULL;
     size_t *key_bytes = NULL;
 
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
 
-    if (operation->alg == PSA_INVALID_OPERATION) {
+    if (operation->cipher_instance == PSA_INVALID_OPERATION) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    switch (operation->alg) {
+    switch (operation->cipher_instance) {
     #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
         case PSA_STREAM_CIPHER_CHACHA20:
             return psa_cipher_chacha20_encrypt_setup(&operation->backend_ctx.cipher_ctx.chacha20, key_data, *key_bytes);
@@ -673,18 +672,18 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt_setup(   psa_cipher_operation
                                                             const psa_key_slot_t *slot,
                                                             psa_algorithm_t alg)
 {
-    operation->alg = PSA_ENCODE_CIPHER_OPERATION(alg, attributes->type, attributes->bits);
+    operation->cipher_instance = PSA_ENCODE_CIPHER_OPERATION(alg, attributes->type, attributes->bits);
 
     uint8_t *key_data = NULL;
     size_t *key_bytes = NULL;
 
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
 
-    if (operation->alg == PSA_INVALID_OPERATION) {
+    if (operation->cipher_instance == PSA_INVALID_OPERATION) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    switch (operation->alg) {
+    switch (operation->cipher_instance) {
     #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
         case PSA_STREAM_CIPHER_CHACHA20:
             return psa_cipher_chacha20_decrypt_setup(&operation->backend_ctx.cipher_ctx.chacha20, key_data, *key_bytes);
@@ -703,7 +702,7 @@ psa_status_t psa_algorithm_dispatch_cipher_finish(  psa_cipher_operation_t *oper
                                                     size_t output_size,
                                                     size_t *output_length)
 {
-    switch (operation->alg) {
+    switch (operation->cipher_instance) {
     #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
         case PSA_STREAM_CIPHER_CHACHA20:
             return psa_cipher_chacha20_finish(  &operation->backend_ctx.cipher_ctx.chacha20,
@@ -725,7 +724,7 @@ psa_status_t psa_algorithm_dispatch_cipher_update(  psa_cipher_operation_t *oper
                                                     size_t output_size,
                                                     size_t *output_length)
 {
-    switch (operation->alg) {
+    switch (operation->cipher_instance) {
     #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
         case PSA_STREAM_CIPHER_CHACHA20:
             return psa_cipher_chacha20_update(  &operation->backend_ctx.cipher_ctx.chacha20,
@@ -747,7 +746,7 @@ psa_status_t psa_algorithm_dispatch_cipher_set_iv(  psa_cipher_operation_t *oper
                                                     const uint8_t *iv,
                                                     size_t iv_length)
 {
-    switch (operation->alg) {
+    switch (operation->cipher_instance) {
     #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
         case PSA_STREAM_CIPHER_CHACHA20:
             return psa_cipher_chacha20_set_iv(  &operation->backend_ctx.cipher_ctx.chacha20,
