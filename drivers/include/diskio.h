@@ -1,10 +1,7 @@
 /*
- * Copyright 2010 ChaN
- * Copyright 2016 INRIA
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2010 ChaN
+ * SPDX-FileCopyrightText: 2016 INRIA
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
