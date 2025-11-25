@@ -42,17 +42,35 @@ extern "C" {
 #endif
 
 /**
- * @def ADS1X1X_PARAM_ADDR
+ * @def CONFIG_ADS1X1X_I2C_ADDR
  * @brief Default I2C address
  */
-#ifndef ADS1X1X_PARAM_ADDR
-#  define ADS1X1X_PARAM_ADDR       (0x48)
+#ifndef CONFIG_ADS1X1X_I2C_ADDR
+#  define CONFIG_ADS1X1X_I2C_ADDR       (0x48)
 #endif
 
 /**
  * @def ADS1X1X_PARAM_MUX
  * @brief Default multiplexer configuration
  */
+#if IS_ACTIVE(CONFIG_ADS1X1X_MUX_AIN0_DIFFM_AIN1)
+#  define ADS1X1X_PARAM_MUX       (ADS1X1X_AIN0_DIFFM_AIN1)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_MUX_AIN0_DIFFM_AIN3)
+#  define ADS1X1X_PARAM_MUX       (ADS1X1X_AIN0_DIFFM_AIN3)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_MUX_AIN1_DIFFM_AIN3)
+#  define ADS1X1X_PARAM_MUX       (ADS1X1X_AIN1_DIFFM_AIN3)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_MUX_AIN2_DIFFM_AIN3)
+#  define ADS1X1X_PARAM_MUX       (ADS1X1X_AIN2_DIFFM_AIN3)
+#elif IS_ACTIVE(CONFIG_ADS1X1X1_MUX_AIN0_SINGM)
+#  define ADS1X1X_PARAM_MUX       (ADS1X1X_AIN0_SINGM)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_MUX_AIN1_SINGM)
+#  define ADS1X1X_PARAM_MUX       (ADS1X1X_AIN1_SINGM)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_MUX_AIN2_SINGM)
+#  define ADS1X1X_PARAM_MUX       (ADS1X1X_AIN2_SINGM)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_MUX_AIN3_SINGM)
+#  define ADS1X1X_PARAM_MUX       (ADS1X1X_AIN3_SINGM)
+#endif
+
 #ifndef ADS1X1X_PARAM_MUX
 #  define ADS1X1X_PARAM_MUX       (ADS1X1X_AIN0_DIFFM_AIN1)
 #endif
@@ -66,25 +84,39 @@ extern "C" {
 #endif
 
 /**
- * @def ADS1X1X_PARAM_LOW_LIMIT
+ * @def CONFIG_ADS1X1X_LOW_LIMIT
  * @brief Default low limit for alert
  */
-#ifndef ADS1X1X_PARAM_LOW_LIMIT
-#  define ADS1X1X_PARAM_LOW_LIMIT  (10000U)
+#ifndef CONFIG_ADS1X1X_LOW_LIMIT
+#  define CONFIG_ADS1X1X_LOW_LIMIT  (10000U)
 #endif
 
 /**
- * @def ADS1X1X_PARAM_HIGH_LIMIT
+ * @def CONFIG_ADS1X1X_HIGH_LIMIT
  * @brief Default high limit for alert
  */
-#ifndef ADS1X1X_PARAM_HIGH_LIMIT
-#  define ADS1X1X_PARAM_HIGH_LIMIT (20000U)
+#ifndef CONFIG_ADS1X1X_HIGH_LIMIT
+#  define CONFIG_ADS1X1X_HIGH_LIMIT (20000U)
 #endif
 
 /**
  * @def ADS1X1X_PARAM_PGA
  * @brief Default programmable gain amplifier configuration
  */
+#if IS_ACTIVE(CONFIG_ADS1X1X_PGA_FSR_6V144)
+#  define ADS1X1X_PARAM_PGA       (ADS1X1X_PGA_FSR_6V144)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_PGA_FSR_4V096)
+#  define ADS1X1X_PARAM_PGA       (ADS1X1X_PGA_FSR_4V096)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_PGA_FSR_2V048)
+#  define ADS1X1X_PARAM_PGA       (ADS1X1X_PGA_FSR_2V048)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_PGA_FSR_1V024)
+#  define ADS1X1X_PARAM_PGA       (ADS1X1X_PGA_FSR_1V024)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_PGA_FSR_0V512)
+#  define ADS1X1X_PARAM_PGA       (ADS1X1X_PGA_FSR_0V512)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_PGA_FSR_0V256)
+#  define ADS1X1X_PARAM_PGA       (ADS1X1X_PGA_FSR_0V256)
+#endif
+
 #ifndef ADS1X1X_PARAM_PGA
 #  define ADS1X1X_PARAM_PGA       (ADS1X1X_PGA_FSR_2V048)
 #endif
@@ -101,6 +133,12 @@ extern "C" {
  * @def ADS1X1X_PARAM_MODE
  * @brief Default operating mode
  */
+#if IS_ACTIVE(CONFIG_ADS1X1X_MODE_SINGLE)
+#  define ADS1X1X_PARAM_MODE  (ADS1X1X_MODE_SINGLE)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_MODE_CONTINUOUS)
+#  define ADS1X1X_PARAM_MODE  (ADS1X1X_MODE_CONTINUOUS)
+#endif
+
 #ifndef ADS1X1X_PARAM_MODE
 #  define ADS1X1X_PARAM_MODE  (ADS1X1X_MODE_SINGLE)
 #endif
@@ -109,6 +147,12 @@ extern "C" {
  * @def ADS1X1X_PARAM_COMP_MODE
  * @brief Default comparator mode (No effect on ADS1113/1013)
  */
+#if IS_ACTIVE(CONFIG_ADS1X1X_COMP_MODE_TRADITIONAL)
+#  define ADS1X1X_PARAM_COMP_MODE  (ADS1X1X_COMP_MODE_TRADITIONAL)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_COMP_MODE_WINDOW)
+#  define ADS1X1X_PARAM_COMP_MODE  (ADS1X1X_COMP_MODE_WINDOW)
+#endif
+
 #ifndef ADS1X1X_PARAM_COMP_MODE
 #  define ADS1X1X_PARAM_COMP_MODE  (ADS1X1X_COMP_MODE_TRADITIONAL)
 #endif
@@ -117,6 +161,12 @@ extern "C" {
  * @def ADS1X1X_PARAM_COMP_POLARITY
  * @brief Default comparator polarity (No effect on ADS1113/1013)
  */
+#if IS_ACTIVE(CONFIG_ADS1X1X_COMP_POLARITY_LOW)
+#  define ADS1X1X_PARAM_COMP_POLARITY (ADS1X1X_COMP_POLARITY_LOW)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_COMP_POLARITY_HIGH)
+#  define ADS1X1X_PARAM_COMP_POLARITY (ADS1X1X_COMP_POLARITY_HIGH)
+#endif
+
 #ifndef ADS1X1X_PARAM_COMP_POLARITY
 #  define ADS1X1X_PARAM_COMP_POLARITY (ADS1X1X_COMP_POLARITY_LOW)
 #endif
@@ -125,6 +175,12 @@ extern "C" {
  * @def ADS1X1X_PARAM_COMP_LATCH
  * @brief Default comparator latch (No effect on ADS1113/1013)
  */
+#if IS_ACTIVE(CONFIG_ADS1X1X_COMP_LATCH_DISABLE)
+#  define ADS1X1X_PARAM_COMP_LATCH (ADS1X1X_COMP_LATCH_DISABLE)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_COMP_LATCH_ENABLE)
+#  define ADS1X1X_PARAM_COMP_LATCH (ADS1X1X_COMP_LATCH_ENABLE)
+#endif
+
 #ifndef ADS1X1X_PARAM_COMP_LATCH
 #  define ADS1X1X_PARAM_COMP_LATCH (ADS1X1X_COMP_LATCH_DISABLE)
 #endif
@@ -133,6 +189,16 @@ extern "C" {
  * @def ADS1X1X_PARAM_COMP_QUEUE
  * @brief Default comparator queue (No effect on ADS1113/1013)
  */
+#if IS_ACTIVE(CONFIG_ADS1X1X_COMP_QUEUE_1)
+#  define ADS1X1X_PARAM_COMP_QUEUE (ADS1X1X_COMP_QUEUE_1)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_COMP_QUEUE_2)
+#  define ADS1X1X_PARAM_COMP_QUEUE (ADS1X1X_COMP_QUEUE_2)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_COMP_QUEUE_4)
+#  define ADS1X1X_PARAM_COMP_QUEUE (ADS1X1X_COMP_QUEUE_4)
+#elif IS_ACTIVE(CONFIG_ADS1X1X_COMP_QUEUE_DISABLE)
+#  define ADS1X1X_PARAM_COMP_QUEUE (ADS1X1X_COMP_QUEUE_DISABLE)
+#endif
+
 #ifndef ADS1X1X_PARAM_COMP_QUEUE
 #  define ADS1X1X_PARAM_COMP_QUEUE (ADS1X1X_COMP_QUEUE_DISABLE)
 #endif
@@ -169,7 +235,7 @@ extern "C" {
  */
 #ifndef ADS1X1X_PARAMS
 #  define ADS1X1X_PARAMS          { .i2c = ADS1X1X_PARAM_I2C,        \
-                                  .addr = ADS1X1X_PARAM_ADDR,       \
+                                  .addr = CONFIG_ADS1X1X_I2C_ADDR,       \
                                   .mux = ADS1X1X_PARAM_MUX,        \
                                   .pga = ADS1X1X_PARAM_PGA,        \
                                   .mode = ADS1X1X_PARAM_MODE,       \
@@ -183,14 +249,14 @@ extern "C" {
  */
 #ifndef ADS1X1X_ALERT_PARAMS
 #  define ADS1X1X_ALERT_PARAMS    { .i2c = ADS1X1X_PARAM_I2C,        \
-                                  .addr = ADS1X1X_PARAM_ADDR,       \
+                                  .addr = CONFIG_ADS1X1X_I2C_ADDR,       \
                                   .comp_mode = ADS1X1X_PARAM_COMP_MODE,  \
                                   .comp_polarity = ADS1X1X_PARAM_COMP_POLARITY, \
                                   .comp_latch = ADS1X1X_PARAM_COMP_LATCH,  \
                                   .comp_queue = ADS1X1X_PARAM_COMP_QUEUE,  \
                                   .alert_pin = ADS1X1X_PARAM_ALERT_PIN,  \
-                                  .low_limit = ADS1X1X_PARAM_LOW_LIMIT,  \
-                                  .high_limit = ADS1X1X_PARAM_HIGH_LIMIT }
+                                  .low_limit = CONFIG_ADS1X1X_LOW_LIMIT,  \
+                                  .high_limit = CONFIG_ADS1X1X_HIGH_LIMIT }
 #endif
 
 /**
