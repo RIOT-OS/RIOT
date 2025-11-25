@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_periph_rtc RTC
  * @ingroup     drivers_periph
@@ -35,6 +33,9 @@
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
+
+#ifndef PERIPH_RTC_H
+#define PERIPH_RTC_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -152,4 +153,5 @@ void rtc_poweroff(void);
 }
 #endif
 
+#endif /* PERIPH_RTC_H */
 /** @} */

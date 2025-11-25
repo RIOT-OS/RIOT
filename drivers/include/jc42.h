@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_jc42 JC42 compliant temperature sensor driver
  * @ingroup     drivers_sensors
@@ -31,6 +29,9 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
+
+#ifndef JC42_H
+#define JC42_H
 
 #include "periph/i2c.h"
 #include "saul.h"
@@ -119,4 +120,5 @@ int jc42_get_temperature(const jc42_t* dev, int16_t* temperature);
 }
 #endif
 
+#endif /* JC42_H */
 /** @} */

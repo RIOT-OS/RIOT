@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2020 HAW Hamburg
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 HAW Hamburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -19,15 +22,11 @@
 #include "assert.h"
 #include "kernel_defines.h"
 #include "net/ieee802154/radio.h"
-#include "test_common.h"
+#include "common.h"
 #include "bhp/event.h"
 
 #ifdef MODULE_CC2538_RF
 #include "cc2538_rf.h"
-#endif
-
-#ifdef MODULE_ESP_IEEE802154
-#include "esp_ieee802154_hal.h"
 #endif
 
 #ifdef MODULE_NRF802154
@@ -80,13 +79,6 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
     if ((radio = cb(IEEE802154_DEV_TYPE_CC2538_RF, opaque)) ){
         cc2538_rf_hal_setup(radio);
         cc2538_init();
-    }
-#endif
-
-#ifdef MODULE_ESP_IEEE802154
-    if ((radio = cb(IEEE802154_DEV_TYPE_ESP_IEEE802154, opaque)) ){
-        esp_ieee802154_setup(radio);
-        esp_ieee802154_init();
     }
 #endif
 

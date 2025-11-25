@@ -24,12 +24,28 @@
 
 #include "congure_impl.h"
 
+static int _json_statham(int argc, char **argv);
+static int _set_cwnd(int argc, char **argv);
+static int _get_fr_calls(int argc, char **argv);
+static int _set_same_wnd_adv_res(int argc, char **argv);
+
 static congure_abe_snd_t _congure_state;
+static const shell_command_t shell_commands[] = {
+    { "state", "Prints current CongURE state object as JSON", _json_statham },
+    { "set_cwnd", "Set cwnd member for CongURE state object", _set_cwnd },
+    { "get_ff_calls",
+      "Get the number of calls to fast_retransmit callback of CongURE state "
+      "object", _get_fr_calls },
+    { "set_same_wnd_adv",
+      "Set the result for the same_window_advertised callback of CongURE state "
+      "object", _set_same_wnd_adv_res },
+    { NULL, NULL, NULL }
+};
 
 int main(void)
 {
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }
 
@@ -93,8 +109,6 @@ static int _json_statham(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(state, "Prints current CongURE state object as JSON", _json_statham );
-
 static int _set_cwnd(int argc, char **argv)
 {
     uint32_t tmp;
@@ -111,8 +125,6 @@ static int _set_cwnd(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(set_cwnd, "Set cwnd member for CongURE state object", _set_cwnd );
-
 static int _get_fr_calls(int argc, char **argv)
 {
     (void)argc;
@@ -123,9 +135,6 @@ static int _get_fr_calls(int argc, char **argv)
     print_str("}\n");
     return 0;
 }
-
-SHELL_COMMAND(get_ff_calls, "Get the number of calls to fast_retransmit"
-    "callback of CongURE state object", _get_fr_calls);
 
 static int _set_same_wnd_adv_res(int argc, char **argv)
 {
@@ -138,8 +147,5 @@ static int _set_same_wnd_adv_res(int argc, char **argv)
     );
     return 0;
 }
-
-SHELL_COMMAND(set_same_wnd_adv, "Set the result for the same_window_advertised"
-    "callback of CongURE state object", _set_same_wnd_adv_res);
 
 /** @} */

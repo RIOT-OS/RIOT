@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2020 Oppila Microsystems - http://www.oppila.in
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 Oppila Microsystems - http://www.oppila.in
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_omote
@@ -12,6 +13,9 @@
  * @file
  * @brief       Board specific definitions for the omote board
  */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -89,4 +93,5 @@
 } /* end extern "C" */
 #endif
 
+#endif /* BOARD_H */
 /** @} */

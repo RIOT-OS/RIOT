@@ -28,7 +28,7 @@
  * config zone, to lock the config zone (this will lock the config zone permanently
  * and cannot be undone) and to check whether config and data zone are locked.
  * The shell handler is enabled, if cryptoauthlib is included as a package in the
- * Makefile of an application that also includes the shell (e.g. examples/basic/default).
+ * Makefile of an application that also includes the shell (e.g. examples/default).
  *
  * ### No poll mode
  *
@@ -84,7 +84,7 @@
  *
  * If you want to use more than one device, the best way is to create a file called
  * `custom_atca_params.h` in your application folder (you can see an example of this in
- * `examples/advanced/psa_crypto`).
+ * `examples/psa_crypto`).
  *
  * In your custom file you can now add a second device to `ATCA_PARAMS`:
  * @code
@@ -232,7 +232,7 @@
  *                              { ATCA_SLOTS_DEVX }
  * @endcode
  *
- * A usage example for this can be found in `examples/advanced/psa_crypto`.
+ * A usage example for this can be found in `examples/psa_crypto`.
  *
  * ## Troubleshooting
  *

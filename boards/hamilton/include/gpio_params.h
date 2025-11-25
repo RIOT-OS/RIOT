@@ -1,11 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
- * SPDX-FileCopyrightText: 2016 UC Berkeley
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 Freie Universität Berlin
+ *               2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2016 UC Berkeley
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup   boards_hamilton
@@ -19,6 +20,9 @@
  * @author    Sebastian Meiling <s@mlng.net>
  * @author    Michael Andersen <m.andersen@berkeley.edu>
  */
+
+#ifndef GPIO_PARAMS_H
+#define GPIO_PARAMS_H
 
 #include "board.h"
 #include "saul/periph.h"
@@ -50,4 +54,5 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 }
 #endif
 
+#endif /* GPIO_PARAMS_H */
 /** @} */

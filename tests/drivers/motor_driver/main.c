@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2018 Gilles DOFFE <g.doffe@gmail.com>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 Gilles DOFFE <g.doffe@gmail.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -18,36 +21,20 @@
 #include <string.h>
 
 /* RIOT includes */
-#include "init_dev.h"
 #include "log.h"
 #include "motor_driver.h"
-#include "motor_driver_params.h"
 #include "test_utils/expect.h"
-#include "time_units.h"
-#include "ztimer.h"
+#include "xtimer.h"
 
-void motor_driver_callback_example(
-    const motor_driver_t *motor_driver, uint8_t motor_id,
-    int32_t pwm_duty_cycle)
-{
-    LOG_DEBUG("MOTOR-DRIVER=%p" \
-        "    MOTOR_ID = %"PRIu8     \
-        "    PWM_VALUE = %"PRIi32"\n", \
-        (void*)motor_driver, motor_id,
-        pwm_duty_cycle);
-}
+/* set interval to 20 milli-second */
+#define INTERVAL (3000 * US_PER_MS)
 
-/* Set interval to 3 seconds */
-#define INTERVAL (3 * MS_PER_SEC)
-
-#define MOTOR_0_ID  ((uint8_t)0)
-#define MOTOR_1_ID  ((uint8_t)1)
-
-static motor_driver_t motor_driver;
+#define MOTOR_0_ID  0
+#define MOTOR_1_ID  1
 
 void motors_control(int32_t duty_cycle)
 {
-    char str[4];
+    char str[6];
 
     if (duty_cycle >= 0) {
         strncpy(str, "CW", 3);
@@ -56,26 +43,26 @@ void motors_control(int32_t duty_cycle)
         strncpy(str, "CCW", 4);
     }
 
-    puts("\nActuate Motors");
+    printf("Duty cycle = %" PRId32 "   Direction = %s\n", duty_cycle, str);
 
-    if (motor_set(&motor_driver, MOTOR_0_ID, duty_cycle)) {
-        printf("Cannot set PWM duty cycle for motor %" PRIu8 "\n", \
-               MOTOR_0_ID);
+    if (motor_set(MOTOR_DRIVER_DEV(0), MOTOR_0_ID, duty_cycle)) {
+        printf("Cannot set PWM duty cycle for motor %" PRIu32 "\n", \
+               (uint32_t)MOTOR_0_ID);
     }
-    if (motor_set(&motor_driver, MOTOR_1_ID, duty_cycle)) {
-        printf("Cannot set PWM duty cycle for motor %" PRIu8 "\n", \
-               MOTOR_1_ID);
+    if (motor_set(MOTOR_DRIVER_DEV(0), MOTOR_1_ID, duty_cycle)) {
+        printf("Cannot set PWM duty cycle for motor %" PRIu32 "\n", \
+               (uint32_t)MOTOR_1_ID);
     }
 }
 
 void motors_brake(void)
 {
-    puts("\nBrake motors");
+    puts("Brake motors !!!");
 
-    if (motor_brake(&motor_driver, MOTOR_0_ID)) {
+    if (motor_brake(MOTOR_DRIVER_DEV(0), MOTOR_0_ID)) {
         printf("Cannot brake motor %" PRIu32 "\n", (uint32_t)MOTOR_0_ID);
     }
-    if (motor_brake(&motor_driver, MOTOR_1_ID)) {
+    if (motor_brake(MOTOR_DRIVER_DEV(0), MOTOR_1_ID)) {
         printf("Cannot brake motor %" PRIu32 "\n", (uint32_t)MOTOR_1_ID);
     }
 }
@@ -84,40 +71,42 @@ void motion_control(void)
 {
     int8_t dir = 1;
     int ret = 0;
-    int32_t pwm_res = motor_driver_params->pwm_resolution;
+    xtimer_ticks32_t last_wakeup /*, start*/;
+    int32_t pwm_res = motor_driver_config[MOTOR_DRIVER_DEV(0)].pwm_resolution;
 
-    ret = motor_driver_init(&motor_driver, &motor_driver_params[0]);
+    ret = motor_driver_init(MOTOR_DRIVER_DEV(0));
     if (ret) {
         LOG_ERROR("motor_driver_init failed with error code %d\n", ret);
     }
     expect(ret == 0);
 
-    while (1) {
+    for (;;) {
         /* BRAKE - duty cycle 100% */
+        last_wakeup = xtimer_now();
         motors_brake();
-        ztimer_sleep(ZTIMER_MSEC, INTERVAL);
+        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
 
         /* CW - duty cycle 50% */
+        last_wakeup = xtimer_now();
         motors_control(dir * pwm_res / 2);
-        ztimer_sleep(ZTIMER_MSEC, INTERVAL);
+        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
 
         /* Disable motor during INTERVAL µs (motor driver must have enable
-         * feature) */
-        puts("\nDisable motors");
-        motor_disable(&motor_driver, MOTOR_0_ID);
-        motor_disable(&motor_driver, MOTOR_1_ID);
-        ztimer_sleep(ZTIMER_MSEC, INTERVAL);
-        puts("\nEnable motors");
-        motor_enable(&motor_driver, MOTOR_0_ID);
-        motor_enable(&motor_driver, MOTOR_1_ID);
-        ztimer_sleep(ZTIMER_MSEC, INTERVAL);
+           feature */
+        last_wakeup = xtimer_now();
+        motor_disable(MOTOR_DRIVER_DEV(0), MOTOR_0_ID);
+        motor_disable(MOTOR_DRIVER_DEV(0), MOTOR_1_ID);
+        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
+        motor_enable(MOTOR_DRIVER_DEV(0), MOTOR_0_ID);
+        motor_enable(MOTOR_DRIVER_DEV(0), MOTOR_1_ID);
 
         /* CW - duty cycle 100% */
+        last_wakeup = xtimer_now();
         motors_control(dir * pwm_res);
-        ztimer_sleep(ZTIMER_MSEC, INTERVAL);
+        xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
 
         /* Reverse direction */
-        dir *= -1;
+        dir = dir * -1;
     }
 }
 

@@ -18,6 +18,7 @@
 #include <string.h>
 
 #include "ztimer.h"
+#include "ztimer64.h"
 #include "usb/usbus.h"
 #include "usb/usbus/hid.h"
 #include "usb/usbus/hid_io.h"
@@ -477,8 +478,9 @@ static uint32_t _handle_init_packet(uint32_t cid, uint16_t bcnt,
 
 static void _handle_cbor_packet(uint8_t cmd, uint32_t cid, uint8_t *buf, uint16_t bcnt)
 {
-    ctap_resp_t resp = {0x0};
+    ctap_resp_t resp;
     uint8_t err;
+    size_t size;
 
     if (bcnt == 0) {
         err = CTAP_HID_ERR_INVALID_LEN;
@@ -487,24 +489,26 @@ static void _handle_cbor_packet(uint8_t cmd, uint32_t cid, uint8_t *buf, uint16_
         return;
     }
 
-    ctap_req_t req = {
-        .method = *buf,
-        .buf = buf + 1,
-        .len = bcnt - 1
-    };
+    memset(&resp, 0, sizeof(ctap_resp_t));
 
-    ctap_status_code_t status = fido2_ctap_handle_request(&req, &resp);
+    ctap_req_t req;
+
+    req.method = *buf;
+    req.buf = buf + 1;
+    req.len = bcnt - 1;
+
+    size = fido2_ctap_handle_request(&req, &resp);
 
     /* transaction done, clear should_cancel flag */
     _state.should_cancel = false;
 
-    if (status == CTAP2_OK && resp.len > 0) {
+    if (resp.status == CTAP2_OK && size > 0) {
         /* status + data */
-        _ctap_hid_write(cmd, cid, &resp, resp.len + sizeof(resp.status));
+        _ctap_hid_write(cmd, cid, &resp, size + sizeof(resp.status));
     }
     else {
         /* status only */
-        _ctap_hid_write(cmd, cid, &resp.status, sizeof(status));
+        _ctap_hid_write(cmd, cid, &resp.status, sizeof(resp.status));
     }
 }
 
@@ -525,7 +529,7 @@ bool fido2_ctap_transport_hid_should_cancel(void)
 
 void fido2_ctap_transport_hid_check_timeouts(void)
 {
-    uint32_t now = ztimer_now(ZTIMER_MSEC);
+    uint64_t now = ztimer64_now(ZTIMER64_MSEC);
 
     for (uint8_t i = 0; i < CTAP_HID_CIDS_MAX; i++) {
         /* transaction timed out because cont packets didn't arrive in time */
@@ -544,14 +548,14 @@ void fido2_ctap_transport_hid_check_timeouts(void)
 
 static int8_t _add_cid(uint32_t cid)
 {
-    uint32_t oldest = ztimer_now(ZTIMER_MSEC);
+    uint64_t oldest = ztimer64_now(ZTIMER64_MSEC);
     int8_t index_oldest = -1;
 
     for (int i = 0; i < CTAP_HID_CIDS_MAX; i++) {
         if (!g_cids[i].taken) {
             g_cids[i].taken = true;
             g_cids[i].cid = cid;
-            g_cids[i].last_used = ztimer_now(ZTIMER_MSEC);
+            g_cids[i].last_used = ztimer64_now(ZTIMER64_MSEC);
 
             return CTAP_HID_OK;
         }
@@ -566,7 +570,7 @@ static int8_t _add_cid(uint32_t cid)
     if (index_oldest > -1) {
         g_cids[index_oldest].taken = true;
         g_cids[index_oldest].cid = cid;
-        g_cids[index_oldest].last_used = ztimer_now(ZTIMER_MSEC);
+        g_cids[index_oldest].last_used = ztimer64_now(ZTIMER64_MSEC);
         return CTAP_HID_OK;
     }
 
@@ -577,7 +581,7 @@ static int8_t _refresh_cid(uint32_t cid)
 {
     for (int i = 0; i < CTAP_HID_CIDS_MAX; i++) {
         if (g_cids[i].cid == cid) {
-            g_cids[i].last_used = ztimer_now(ZTIMER_MSEC);
+            g_cids[i].last_used = ztimer64_now(ZTIMER64_MSEC);
             return CTAP_HID_OK;
         }
     }

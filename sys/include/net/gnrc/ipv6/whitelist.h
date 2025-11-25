@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gnrc_ipv6_whitelist IPv6 address whitelist
  * @ingroup     net_gnrc_ipv6
@@ -19,6 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef NET_GNRC_IPV6_WHITELIST_H
+#define NET_GNRC_IPV6_WHITELIST_H
 
 #include <stdbool.h>
 
@@ -80,4 +80,5 @@ void gnrc_ipv6_whitelist_print(void);
 }
 #endif
 
+#endif /* NET_GNRC_IPV6_WHITELIST_H */
 /** @} */

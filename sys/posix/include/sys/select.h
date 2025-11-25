@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup posix_select   POSIX select
  * @ingroup  posix
@@ -27,6 +25,9 @@
  * @see     [The Open Group Base Specification Issue 7, 2018 edition,
  *          <sys/select.h>](https://pubs.opengroup.org/onlinepubs/9699919799.2018edition/basedefs/sys_select.h)
  */
+
+#ifndef SYS_SELECT_H
+#define SYS_SELECT_H
 
 #ifdef CPU_NATIVE
 /* On native, system headers may depend on system's <sys/select.h>. Hence,
@@ -178,4 +179,5 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *errorfds,
 }
 #endif
 
+#endif /* SYS_SELECT_H */
 /** @} */

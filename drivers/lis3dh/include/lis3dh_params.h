@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_lis3dh
  *
@@ -17,6 +15,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef LIS3DH_PARAMS_H
+#define LIS3DH_PARAMS_H
 
 #include "board.h"
 #include "lis3dh.h"
@@ -86,4 +87,5 @@ static const saul_reg_info_t lis3dh_saul_info[] =
 }
 #endif
 
+#endif /* LIS3DH_PARAMS_H */
 /** @} */

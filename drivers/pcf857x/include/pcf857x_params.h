@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_pcf857x
  * @brief       Default configuration for Texas Instruments PCF857X I2C I/O expanders
@@ -15,6 +13,9 @@
  * @file
  * @{
  */
+
+#ifndef PCF857X_PARAMS_H
+#define PCF857X_PARAMS_H
 
 #include "board.h"
 #include "pcf857x.h"
@@ -118,4 +119,5 @@ static const  pcf857x_saul_gpio_params_t pcf857x_saul_gpio_params[] =
 }
 #endif
 
+#endif /* PCF857X_PARAMS_H */
 /** @} */

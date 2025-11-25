@@ -60,13 +60,13 @@
  *
  * The maximum number of pointers that can be monitored at once can be set with Kconfig
  * in System > Heap Memory Usage Monitor > Monitor Size or by setting the corresponding
- * CFlag in your application's Makefile as `CFLAGS += -DCONFIG_MODULE_SYS_MALLOC_MONITOR_SIZE=42`.
+ * CFlag in your application's Makefile as `CFLAGS += CONFIG_MODULE_SYS_MALLOC_MONITOR_SIZE=42`.
  * It defaults to 100.
  *
  * For more fine-grained debugging of invalid calls to @ref free(), duplicated calls to @ref free(),
  * or memory leaks, the module can be configured to print information on every call to @ref malloc(),
  * @ref calloc(), @ref realloc(), or @ref free() by setting System > Heap Memory Usage Monitor > Verbose
- * or adding `CFLAGS += -DCONFIG_MODULE_SYS_MALLOC_MONITOR_VERBOSE=1` to your Makefile.
+ * or adding `CFLAGS += CONFIG_MODULE_SYS_MALLOC_MONITOR_VERBOSE=1` to your Makefile.
  * `malloc_monitor` defaults to be non-verbose.
  *
  */

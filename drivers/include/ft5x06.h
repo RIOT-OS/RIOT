@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_ft5x06 FocalTech FT5x06 touch panel driver
  * @ingroup     drivers_sensors
@@ -22,6 +20,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef FT5X06_H
+#define FT5X06_H
 
 #include <stdint.h>
 
@@ -134,10 +135,10 @@ typedef struct {
 /**
  * @brief   Initialize the given device
  *
- * @param[in,out] dev       Device descriptor of the driver
- * @param[in]     params    Initialization parameters
- * @param[in]     cb        Callback function called on touch interrupts
- * @param[in]     arg       Context argument used in callback function
+ * @param[inout] dev        Device descriptor of the driver
+ * @param[in] params        Initialization parameters
+ * @param[in] cb            Callback function called on touch interrupts
+ * @param[in] arg           Context argument used in callback function
  *
  * @return                  0 on success
  * @return                  -ENODEV when no valid device
@@ -184,4 +185,5 @@ int ft5x06_read_touch_gesture(const ft5x06_t *dev, ft5x06_touch_gesture_t *gestu
 }
 #endif
 
+#endif /* FT5X06_H */
 /** @} */

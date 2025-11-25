@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2020 Beuth Hochschule für Technik Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 Beuth Hochschule für Technik Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -20,17 +23,8 @@
 #include "cpu.h"
 #include "periph/dac.h"
 #include "periph/gpio.h"
-#include "macros/units.h"
 
 #define DAC_VAL(in) (in >> (16 - DAC_RES_BITS))
-
-#ifndef CONFIG_SAM0_DAC_REFRESH
-#define CONFIG_SAM0_DAC_REFRESH 2
-#endif
-
-#ifndef CONFIG_SAM0_DAC_RUN_ON_STANDBY
-#define CONFIG_SAM0_DAC_RUN_ON_STANDBY 0
-#endif
 
 static void _dac_init_clock(dac_t line)
 {
@@ -72,15 +66,15 @@ static inline void _sync(void)
 #ifdef DAC_DACCTRL_CCTRL_Msk
 static uint32_t _get_CCTRL(uint32_t freq)
 {
-    if (freq <= KHZ(1200)) {
+    if (freq < 1200000) {
         return DAC_DACCTRL_CCTRL_CC100K;
     }
 
-    if (freq <= MHZ(6)) {
+    if (freq < 6000000) {
         return DAC_DACCTRL_CCTRL_CC1M;
     }
 
-    if (freq <= MHZ(12)) {
+    if (freq < 12000000) {
         return DAC_DACCTRL_CCTRL_CC12M;
     }
 
@@ -121,23 +115,7 @@ int8_t dac_init(dac_t line)
 
 #ifdef DAC_DACCTRL_ENABLE
     DAC->DACCTRL[line].reg = DAC_DACCTRL_ENABLE
-                           | _get_CCTRL(sam0_gclk_freq(DAC_CLOCK))
-#endif
-#if CONFIG_SAM0_DAC_RUN_ON_STANDBY && defined(DAC_DACCTRL_RUNSTDBY)
-                           | DAC_DACCTRL_RUNSTDBY
-#endif
-                           ;
-
-#ifdef DAC_DACCTRL_REFRESH
-    /** The DAC can only maintain its output on the desired value for approximately 100 μs.
-     *  For static voltages the conversion must be refreshed periodically (see e.g.
-     *  '47.6.9.3 Conversion Refresh' in the SAM D5xE5x family data sheet).
-     *
-     *  Note: T_REFRESH = REFRESH * T_OSCULP32K
-     */
-    static_assert(CONFIG_SAM0_DAC_REFRESH != 1, "DACCTRLx.REFRESH = 1 is reserved");
-
-    DAC->DACCTRL[line].bit.REFRESH = CONFIG_SAM0_DAC_REFRESH;
+                           | _get_CCTRL(sam0_gclk_freq(DAC_CLOCK));
 #endif
 
     /* Set Reference Voltage & enable Output if needed */
@@ -147,11 +125,7 @@ int8_t dac_init(dac_t line)
 #endif
                    ;
 
-    DAC->CTRLA.reg = DAC_CTRLA_ENABLE
-#if CONFIG_SAM0_DAC_RUN_ON_STANDBY && defined(DAC_CTRLA_RUNSTDBY)
-                   | DAC_CTRLA_RUNSTDBY
-#endif
-                   ;
+    DAC->CTRLA.reg |= DAC_CTRLA_ENABLE;
     _sync();
 
 #ifdef DAC_STATUS_READY
@@ -166,14 +140,14 @@ int8_t dac_init(dac_t line)
 void dac_set(dac_t line, uint16_t value)
 {
 #ifdef DAC_SYNCBUSY_DATA1
-    const uint32_t mask = (1 << (DAC_INTFLAG_EMPTY_Pos + line));
-    while (!(DAC->INTFLAG.reg & mask)) {}
-
     /* DAC has multiple outputs */
+    const uint32_t mask = (1 << (DAC_SYNCBUSY_DATA_Pos + line));
+    while (DAC->SYNCBUSY.reg & mask) {}
+
     DAC->DATA[line].reg = DAC_VAL(value);
 #else
     /* DAC has only one output */
-    (void)line;
+    (void) line;
 
     _sync();
     DAC->DATA.reg = DAC_VAL(value);

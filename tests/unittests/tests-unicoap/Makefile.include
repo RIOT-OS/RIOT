@@ -1,2 +1,0 @@
-USEMODULE += unicoap
-USEMODULE += unicoap_driver_rfc7252_pdu

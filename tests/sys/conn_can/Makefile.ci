@@ -1,3 +1,26 @@
 BOARD_INSUFFICIENT_MEMORY := \
-    olimexino-stm32 \
+    airfy-beacon \
+    calliope-mini \
+    i-nucleo-lrwan1 \
+    im880b \
+    microbit \
+    nrf51dongle \
+    nrf6310 \
+    nucleo-f030r8 \
+    nucleo-f031k6 \
+    nucleo-f042k6 \
+    nucleo-f070rb \
+    nucleo-f072rb \
+    nucleo-f302r8 \
+    nucleo-f303k8 \
+    nucleo-f303re \
+    nucleo-f334r8 \
+    nucleo-l031k6 \
+    nucleo-l053r8 \
+    saml10-xpro \
+    saml11-xpro \
+    stm32f030f4-demo \
+    stm32f0discovery \
+    stm32l0538-disco \
+    yunjia-nrf51822 \
     #

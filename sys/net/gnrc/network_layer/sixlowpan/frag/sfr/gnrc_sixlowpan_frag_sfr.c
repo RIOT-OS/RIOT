@@ -102,11 +102,10 @@ static const gnrc_sixlowpan_frag_sfr_bitmap_t _null_bitmap = { .u32 = 0U };
 static gnrc_sixlowpan_frag_sfr_stats_t _stats;
 
 /**
- * @brief   Get the @ref gnrc_sixlowpan_frag_sfr_bitmap_t from an
- *          @ref gnrc_sixlowpan_frag_rb_t
+ * @brief   Converts a @ref sys_bitmap based bitmap to a
+ *          gnrc_sixlowpan_frag_sfr_bitmap_t
  *
- * @param[in]   frag_rb       Fragment containing the bitmap tracking received
- *                            fragments
+ * @param[in] bitmap A @ref sys_bitmap
  *
  * @return  A gnrc_sixlowpan_frag_sfr_bitmap_t.
  */

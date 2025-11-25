@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_adcxx1c
  * @{
@@ -18,6 +16,9 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @}
  */
+
+#ifndef ADCXX1C_PARAMS_H
+#define ADCXX1C_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -115,3 +116,5 @@ static const saul_reg_info_t adcxx1c_saul_info[] =
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* ADCXX1C_PARAMS_H */

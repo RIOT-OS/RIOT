@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    posix_semaphore POSIX semaphores
  * @ingroup     posix
@@ -23,6 +21,9 @@
  * @author  René Kijewski <kijewski@inf.fu-berlin.de>
  * @author  Víctor Ariño <victor.arino@zii.aero>
  */
+
+#ifndef SEMAPHORE_H
+#define SEMAPHORE_H
 
 #include <errno.h>
 #include <time.h>
@@ -293,4 +294,5 @@ static inline int sem_getvalue(sem_t *sem, int *sval)
 }
 #endif
 
+#endif /* SEMAPHORE_H */
 /** @} */

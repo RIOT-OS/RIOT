@@ -29,17 +29,6 @@
 
 #define CSMA_SENDER_BACKOFF_PERIOD_UNIT_US  (320U)
 #define ACK_TIMEOUT_US                      (864U)
-/* 2.4 GHz, 250 kb/s, O-QPSK 62.5 ksymbols/s, 1 / 62 500 s = 16 µs */
-/* 12 symbols -> 12 * 16us = 192us */
-#define SIFS_PERIOD_US                      (192U)
-
-/* internal type for IEEE 802.15.4 frame control field */
-enum ieee802154_fcf {
-    _FCF_BEACON     = IEEE802154_FCF_TYPE_BEACON,
-    _FCF_DATA       = IEEE802154_FCF_TYPE_DATA,
-    _FCF_ACK        = IEEE802154_FCF_TYPE_ACK,
-    _FCF_MACCMD     = IEEE802154_FCF_TYPE_MACCMD
-};
 
 static char *str_states[IEEE802154_FSM_STATE_NUMOF] = {
     "INVALID",
@@ -141,34 +130,6 @@ static int _handle_fsm_ev_request_tx(ieee802154_submac_t *submac)
     }
 }
 
-static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
-                                                 ieee802154_fsm_ev_t ev,
-                                                 enum ieee802154_fcf ftype);
-
-static ieee802154_fsm_state_t _fsm_state_tx(ieee802154_submac_t *submac,
-                                            ieee802154_fsm_ev_t ev);
-
-static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac)
-{
-    ieee802154_dev_t *dev = &submac->dev;
-
-    /* Set state to TX_ON */
-    int res;
-    if ((res = ieee802154_radio_set_idle(dev, false)) < 0) {
-        return res;
-    }
-    if ((res = ieee802154_radio_write(dev, submac->psdu)) < 0) {
-        return res;
-    }
-    /* skip async Tx request */
-    _fsm_state_prepare(submac, IEEE802154_FSM_EV_BH, IEEE802154_FCF_TYPE_ACK);
-    /* wait for Tx done */
-    while (_fsm_state_tx(submac, IEEE802154_FSM_EV_TX_DONE) == IEEE802154_FSM_STATE_INVALID) {
-        DEBUG("IEEE802154 submac: wait until ACK sent\n");
-    }
-    return 0;
-}
-
 static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802154_fsm_ev_t ev)
 {
     ieee802154_dev_t *dev = &submac->dev;
@@ -231,16 +192,7 @@ static ieee802154_fsm_state_t _fsm_state_idle(ieee802154_submac_t *submac, ieee8
 
     switch (ev) {
     case IEEE802154_FSM_EV_REQUEST_TX:
-        /* An ACK is sent synchronous to prevent that the upper layer (IPv6)
-           can initiate the next transmission which would fail because the transceiver
-           is still busy. */
-        if (submac->psdu->iol_len == IEEE802154_ACK_FRAME_LEN - IEEE802154_FCS_LEN &&
-            (((uint8_t *)submac->psdu->iol_base)[0] & IEEE802154_FCF_TYPE_ACK) &&
-            submac->psdu->iol_next == NULL) {
-            _handle_fsm_ev_tx_ack(submac);
-            return IEEE802154_FSM_STATE_IDLE;
-        }
-        else if (_handle_fsm_ev_request_tx(submac) < 0) {
+        if (_handle_fsm_ev_request_tx(submac) < 0) {
             return IEEE802154_FSM_STATE_IDLE;
         }
         return IEEE802154_FSM_STATE_PREPARE;
@@ -266,18 +218,16 @@ static ieee802154_fsm_state_t _fsm_state_idle(ieee802154_submac_t *submac, ieee8
 }
 
 static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
-                                                 ieee802154_fsm_ev_t ev,
-                                                 enum ieee802154_fcf ftype)
+                                                 ieee802154_fsm_ev_t ev)
 {
     ieee802154_dev_t *dev = &submac->dev;
 
     switch (ev) {
     case IEEE802154_FSM_EV_BH:
-        if (ftype == IEEE802154_FCF_TYPE_DATA
-            && !_does_handle_csma(dev)) {
+        if (!_does_handle_csma(dev)) {
             /* delay for an adequate random backoff period */
             uint32_t bp = (random_uint32() & submac->backoff_mask) *
-                          submac->csma_backoff_us;
+                          CSMA_SENDER_BACKOFF_PERIOD_UNIT_US;
 
             ztimer_sleep(ZTIMER_USEC, bp);
             /* Prepare for next iteration */
@@ -285,10 +235,6 @@ static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
             if (curr_be < submac->be.max) {
                 submac->backoff_mask = (submac->backoff_mask << 1) | 1;
             }
-        }
-        else if (ftype == IEEE802154_FCF_TYPE_ACK) {
-            /* no backoff for ACK frames but wait for SIFSPeriod */
-            ztimer_sleep(ZTIMER_USEC, SIFS_PERIOD_US);
         }
 
         while (ieee802154_radio_request_transmit(dev) == -EBUSY) {}
@@ -336,7 +282,7 @@ static ieee802154_fsm_state_t _fsm_state_tx_process_tx_done(ieee802154_submac_t 
             assert (res >= 0);
 
             /* Handle ACK reception */
-            ieee802154_submac_ack_timer_set(submac);
+            ieee802154_submac_ack_timer_set(submac, ACK_TIMEOUT_US);
             return IEEE802154_FSM_STATE_WAIT_FOR_ACK;
         }
         break;
@@ -375,10 +321,9 @@ static ieee802154_fsm_state_t _fsm_state_tx(ieee802154_submac_t *submac, ieee802
 
     switch (ev) {
     case IEEE802154_FSM_EV_TX_DONE:
-        if ((res = ieee802154_radio_confirm_transmit(&submac->dev, &info)) >= 0) {
-            return _fsm_state_tx_process_tx_done(submac, &info);
-        }
-        break;
+        res = ieee802154_radio_confirm_transmit(&submac->dev, &info);
+        assert(res >= 0);
+        return _fsm_state_tx_process_tx_done(submac, &info);
     case IEEE802154_FSM_EV_RX_DONE:
     case IEEE802154_FSM_EV_CRC_ERROR:
         /* This might happen in case there's a race condition between ACK_TIMEOUT
@@ -432,33 +377,27 @@ ieee802154_fsm_state_t ieee802154_submac_process_ev(ieee802154_submac_t *submac,
 
     switch (submac->fsm_state) {
     case IEEE802154_FSM_STATE_RX:
-        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_RX + %s\n", str_ev[ev]);
         new_state = _fsm_state_rx(submac, ev);
         break;
     case IEEE802154_FSM_STATE_IDLE:
-        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_IDLE + %s\n", str_ev[ev]);
         new_state = _fsm_state_idle(submac, ev);
         break;
     case IEEE802154_FSM_STATE_PREPARE:
-        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_PREPARE + %s\n", str_ev[ev]);
-        new_state = _fsm_state_prepare(submac, ev, IEEE802154_FCF_TYPE_DATA);
+        new_state = _fsm_state_prepare(submac, ev);
         break;
     case IEEE802154_FSM_STATE_TX:
-        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_TX + %s\n", str_ev[ev]);
         new_state = _fsm_state_tx(submac, ev);
         break;
     case IEEE802154_FSM_STATE_WAIT_FOR_ACK:
-        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_WAIT_FOR_ACK + %s\n", str_ev[ev]);
         new_state = _fsm_state_wait_for_ack(submac, ev);
         break;
     default:
-        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): INVALID STATE\n");
         new_state = IEEE802154_FSM_STATE_INVALID;
     }
 
     if (new_state == IEEE802154_FSM_STATE_INVALID) {
         _print_debug(submac->fsm_state, new_state, ev);
-        new_state = submac->fsm_state;
+        assert(false);
     }
     submac->fsm_state = new_state;
     return submac->fsm_state;
@@ -469,7 +408,6 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
     ieee802154_fsm_state_t current_state = submac->fsm_state;
 
     if (current_state != IEEE802154_FSM_STATE_RX && current_state != IEEE802154_FSM_STATE_IDLE) {
-        DEBUG("IEEE802154 submac: ieee802154_send(): Sending aborted, current state is %s\n", str_states[current_state]);
         return -EBUSY;
     }
 
@@ -479,8 +417,6 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
 
     uint8_t *buf = iolist->iol_base;
     bool cnf = buf[0] & IEEE802154_FCF_ACK_REQ;
-    bool is_ack = iolist->iol_len == IEEE802154_ACK_FRAME_LEN - IEEE802154_FCS_LEN &&
-                  (buf[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_ACK;
 
     submac->wait_for_ack = cnf;
     submac->psdu = iolist;
@@ -488,220 +424,11 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
     submac->csma_retries_nb = 0;
     submac->backoff_mask = (1 << submac->be.min) - 1;
 
-    if (!is_ack && ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_REQUEST_TX)
+    if (ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_REQUEST_TX)
         != IEEE802154_FSM_STATE_PREPARE) {
-        DEBUG("IEEE802154 submac: ieee802154_send(): Tx frame failed %s\n", str_states[current_state]);
-        return -EBUSY;
-    }
-    if (is_ack && ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_REQUEST_TX)
-             != IEEE802154_FSM_STATE_IDLE) {
-        DEBUG("IEEE802154 submac: ieee802154_send(): Tx ACK failed %s\n", str_states[current_state]);
         return -EBUSY;
     }
     return 0;
-}
-
-/*
- * MR-OQPSK timing calculations
- *
- * The standard unfortunately does not list the formula, instead it has to be pieced together
- * from scattered information and tables in the IEEE 802.15.4 document - may contain errors.
- */
-
-static uint8_t _mr_oqpsk_spreading(uint8_t chips, uint8_t mode)
-{
-    if (mode == 4) {
-        return 1;
-    }
-
-    uint8_t spread = 1 << (3 - mode);
-
-    if (chips == IEEE802154_MR_OQPSK_CHIPS_1000) {
-        return 2 * spread;
-    }
-
-    if (chips == IEEE802154_MR_OQPSK_CHIPS_2000) {
-        return 4 * spread;
-    }
-
-    return spread;
-}
-
-static inline uint16_t _mr_oqpsk_symbol_duration_us(uint8_t chips)
-{
-    /* 802.15.4g, Table 183 / Table 165 */
-    switch (chips) {
-    case IEEE802154_MR_OQPSK_CHIPS_100:
-        return 320;
-    case IEEE802154_MR_OQPSK_CHIPS_200:
-        return 160;
-    case IEEE802154_MR_OQPSK_CHIPS_1000:
-    case IEEE802154_MR_OQPSK_CHIPS_2000:
-    default:
-        return 64;
-    }
-}
-
-static inline uint8_t _mr_oqpsk_cca_duration_syms(uint8_t chips)
-{
-    /* 802.15.4g, Table 188 */
-    return (chips < IEEE802154_MR_OQPSK_CHIPS_1000) ? 4 : 8;
-}
-
-static inline uint8_t _mr_oqpsk_shr_duration_syms(uint8_t chips)
-{
-    /* 802.15.4g, Table 184 / Table 165 */
-    return (chips < IEEE802154_MR_OQPSK_CHIPS_1000) ? 48 : 72;
-}
-
-static inline uint8_t _mr_oqpsk_ack_psdu_duration_syms(uint8_t chips, uint8_t mode)
-{
-    /* pg. 119, section 18.3.2.14 */
-    static const uint8_t sym_len[] = { 32, 32, 64, 128 };
-    const uint8_t Ns = sym_len[chips];
-    const uint8_t Rspread = _mr_oqpsk_spreading(chips, mode);
-    /* Nd == 63, since ACK length is 5 or 7 octets only */
-    const uint16_t Npsdu = Rspread * 2 * 63;
-
-    /* phyPSDUDuration = ceiling(Npsdu / Ns) + ceiling(Npsdu / Mp) */
-    /* with Mp = Np * 16, see Table 182 */
-    return (Npsdu + Ns/2) / Ns + (Npsdu + 8 * Ns) / (16 * Ns);
-}
-
-MAYBE_UNUSED
-static inline uint16_t _mr_oqpsk_ack_timeout_us(const ieee802154_mr_oqpsk_conf_t *conf)
-{
-    /* see 802.15.4g-2012, p. 30 */
-    uint16_t symbols = _mr_oqpsk_cca_duration_syms(conf->chips)
-                     + _mr_oqpsk_shr_duration_syms(conf->chips)
-                     + 15   /* PHR duration */
-                     + _mr_oqpsk_ack_psdu_duration_syms(conf->chips, conf->rate_mode);
-
-    return _mr_oqpsk_symbol_duration_us(conf->chips) * symbols
-         + IEEE802154G_ATURNAROUNDTIME_US;
-}
-
-MAYBE_UNUSED
-static inline uint16_t _mr_oqpsk_csma_backoff_period_us(const ieee802154_mr_oqpsk_conf_t *conf)
-{
-    return _mr_oqpsk_cca_duration_syms(conf->chips) * _mr_oqpsk_symbol_duration_us(conf->chips)
-         + IEEE802154G_ATURNAROUNDTIME_US;
-}
-
-/*
- * MR-OFDM timing calculations
- *
- * The standard unfortunately does not list the formula, instead it has to be pieced together
- * from scattered information and tables in the IEEE 802.15.4 document - may contain errors.
- */
-
-static unsigned _mr_ofdm_frame_duration(uint8_t option, uint8_t scheme, uint8_t bytes)
-{
-    /* Table 150 - phySymbolsPerOctet values for MR-OFDM PHY, IEEE 802.15.4g-2012 */
-    static const uint8_t quot[] = { 3, 3, 6, 12, 18, 24, 36 };
-
-    --option;
-    /* phyMaxFrameDuration = phySHRDuration + phyPHRDuration
-     *                     + ceiling [(aMaxPHYPacketSize + 1) x phySymbolsPerOctet] */
-    const unsigned phySHRDuration = 6;
-    const unsigned phyPHRDuration = option ? 6 : 3;
-    const unsigned phyPDUDuration = ((bytes + 1) * (1 << option) + quot[scheme] - 1)
-                                  / quot[scheme];
-
-    return (phySHRDuration + phyPHRDuration + phyPDUDuration) * IEEE802154_MR_OFDM_SYMBOL_TIME_US;
-}
-
-static inline uint16_t _mr_ofdm_csma_backoff_period_us(const ieee802154_mr_ofdm_conf_t *conf)
-{
-    (void)conf;
-
-    return IEEE802154_CCA_DURATION_IN_SYMBOLS * IEEE802154_MR_OFDM_SYMBOL_TIME_US
-         + IEEE802154G_ATURNAROUNDTIME_US;
-}
-
-MAYBE_UNUSED
-static inline uint16_t _mr_ofdm_ack_timeout_us(const ieee802154_mr_ofdm_conf_t *conf)
-{
-    return _mr_ofdm_csma_backoff_period_us(conf)
-         + IEEE802154G_ATURNAROUNDTIME_US
-         + _mr_ofdm_frame_duration(conf->option, conf->scheme, IEEE802154_ACK_FRAME_LEN);
-}
-
-/*
- * MR-FSK timing calculations
- *
- * The standard unfortunately does not list the formula, instead it has to be pieced together
- * from scattered information and tables in the IEEE 802.15.4 document - may contain errors.
- */
-
-MAYBE_UNUSED
-static inline uint16_t _mr_fsk_csma_backoff_period_us(const ieee802154_mr_fsk_conf_t *conf)
-{
-    (void)conf;
-
-    return IEEE802154_CCA_DURATION_IN_SYMBOLS * IEEE802154_MR_FSK_SYMBOL_TIME_US
-         + IEEE802154G_ATURNAROUNDTIME_US;
-}
-
-MAYBE_UNUSED
-static inline uint16_t _mr_fsk_ack_timeout_us(const ieee802154_mr_fsk_conf_t *conf)
-{
-    uint8_t ack_len = IEEE802154_ACK_FRAME_LEN;
-    uint8_t fsk_pl = ieee802154_mr_fsk_plen(conf->srate);
-
-    /* PHR uses same data rate as PSDU */
-    ack_len += 2;
-
-    /* 4-FSK doubles data rate */
-    if (conf->mod_ord == 4) {
-        ack_len /= 2;
-    }
-
-    /* forward error correction halves data rate */
-    if (conf->fec) {
-        ack_len *= 2;
-    }
-
-    return _mr_fsk_csma_backoff_period_us(conf)
-         + IEEE802154G_ATURNAROUNDTIME_US
-         /* long Preamble + SFD; SFD=2 */
-         + ((fsk_pl * 8 + 2) + ack_len) * 8 * IEEE802154_MR_FSK_SYMBOL_TIME_US;
-}
-
-static int ieee802154_submac_config_phy(ieee802154_submac_t *submac,
-                                        const ieee802154_phy_conf_t *conf)
-{
-    switch (conf->phy_mode) {
-    case IEEE802154_PHY_OQPSK:
-        submac->ack_timeout_us = ACK_TIMEOUT_US;
-        submac->csma_backoff_us = CSMA_SENDER_BACKOFF_PERIOD_UNIT_US;
-        break;
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
-    case IEEE802154_PHY_MR_OQPSK:
-        submac->ack_timeout_us = _mr_oqpsk_ack_timeout_us((void *)conf);
-        submac->csma_backoff_us = _mr_oqpsk_csma_backoff_period_us((void *)conf);
-        break;
-#endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
-    case IEEE802154_PHY_MR_OFDM:
-        submac->ack_timeout_us = _mr_ofdm_ack_timeout_us((void *)conf);
-        submac->csma_backoff_us = _mr_ofdm_csma_backoff_period_us((void *)conf);
-        break;
-#endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
-    case IEEE802154_PHY_MR_FSK:
-        submac->ack_timeout_us = _mr_fsk_ack_timeout_us((void *)conf);
-        submac->csma_backoff_us = _mr_fsk_csma_backoff_period_us((void *)conf);
-        break;
-#endif
-    case IEEE802154_PHY_NO_OP:
-    case IEEE802154_PHY_DISABLED:
-        break;
-    default:
-        return -EINVAL;
-    }
-
-    return ieee802154_radio_config_phy(&submac->dev, conf);
 }
 
 int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *short_addr,
@@ -772,46 +499,13 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     ieee802154_radio_config_addr_filter(dev, IEEE802154_AF_PANID, &submac->panid);
 
     /* Configure PHY settings (mode, channel, TX power) */
-    union {
-        ieee802154_phy_conf_t super;
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
-        ieee802154_mr_oqpsk_conf_t mr_oqpsk;
-#endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
-        ieee802154_mr_ofdm_conf_t mr_ofdm;
-#endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
-        ieee802154_mr_fsk_conf_t mr_fsk;
-#endif
-    } conf;
+    ieee802154_phy_conf_t conf =
+    { .phy_mode = submac->phy_mode,
+      .channel = submac->channel_num,
+      .page = submac->channel_page,
+      .pow = submac->tx_pow };
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
-    if (submac->phy_mode == IEEE802154_PHY_MR_OQPSK) {
-        conf.mr_oqpsk.chips = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_CHIPS;
-        conf.mr_oqpsk.rate_mode = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_RATE;
-    }
-#endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
-    if (submac->phy_mode == IEEE802154_PHY_MR_OFDM) {
-        conf.mr_ofdm.option = CONFIG_IEEE802154_MR_OFDM_DEFAULT_OPTION;
-        conf.mr_ofdm.scheme = CONFIG_IEEE802154_MR_OFDM_DEFAULT_SCHEME;
-    }
-#endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
-    if (submac->phy_mode == IEEE802154_PHY_MR_FSK) {
-        conf.mr_fsk.srate = CONFIG_IEEE802154_MR_FSK_DEFAULT_SRATE;
-        conf.mr_fsk.mod_ord = CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_ORD;
-        conf.mr_fsk.mod_idx = CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_IDX;
-        conf.mr_fsk.fec = CONFIG_IEEE802154_MR_FSK_DEFAULT_FEC;
-    }
-#endif
-
-    conf.super.phy_mode = submac->phy_mode;
-    conf.super.channel = submac->channel_num;
-    conf.super.page = submac->channel_page;
-    conf.super.pow = submac->tx_pow;
-
-    ieee802154_submac_config_phy(submac, &conf.super);
+    ieee802154_radio_config_phy(dev, &conf);
     ieee802154_radio_set_cca_threshold(dev,
                                        CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
     assert(res >= 0);
@@ -821,9 +515,15 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     return res;
 }
 
-int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_conf_t *conf)
+int ieee802154_set_phy_conf(ieee802154_submac_t *submac, uint16_t channel_num,
+                            uint8_t channel_page, int8_t tx_pow)
 {
     ieee802154_dev_t *dev = &submac->dev;
+    const ieee802154_phy_conf_t conf =
+    { .phy_mode = submac->phy_mode,
+      .channel = channel_num,
+      .page = channel_page,
+      .pow = tx_pow };
     int res;
     ieee802154_fsm_state_t current_state = submac->fsm_state;
 
@@ -839,23 +539,19 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_co
         }
     }
 
-    res = ieee802154_submac_config_phy(submac, conf);
+    res = ieee802154_radio_config_phy(dev, &conf);
 
     if (res >= 0) {
-        submac->channel_num = conf->channel;
-        submac->channel_page = conf->page;
-        submac->tx_pow = conf->pow;
-        if (conf->phy_mode != IEEE802154_PHY_NO_OP) {
-            submac->phy_mode = conf->phy_mode;
-        }
+        submac->channel_num = channel_num;
+        submac->channel_page = channel_page;
+        submac->tx_pow = tx_pow;
     }
     while (ieee802154_radio_confirm_set_idle(dev) == -EAGAIN) {}
 
     /* Go back to RX if needed */
     if (current_state == IEEE802154_FSM_STATE_RX) {
-        int rx = ieee802154_radio_set_rx(dev);
-        assert(rx >= 0);
-        (void)rx;
+        res = ieee802154_radio_set_rx(dev);
+        assert (res >= 0);
     }
 
     return res;
@@ -879,8 +575,6 @@ int ieee802154_set_rx(ieee802154_submac_t *submac)
         }
         break;
     default:
-        DEBUG("IEEE802154 submac: ieee802154_set_rx(): Setting RX failed, currently in %s\n",
-              str_states[current_state]);
         break;
     }
 

@@ -48,9 +48,7 @@ static FLASH_ATTR const char _edquot[] = "-EDQUOT";
 static FLASH_ATTR const char _eexist[] = "-EEXIST";
 static FLASH_ATTR const char _efault[] = "-EFAULT";
 static FLASH_ATTR const char _efbig[] = "-EFBIG";
-#ifdef EHOSTDOWN /* not part of POSIX and not universally available */
 static FLASH_ATTR const char _ehostdown[] = "-EHOSTDOWN";
-#endif
 static FLASH_ATTR const char _ehostunreach[] = "-EHOSTUNREACH";
 static FLASH_ATTR const char _eidrm[] = "-EIDRM";
 static FLASH_ATTR const char _eilseq[] = "-EILSEQ";
@@ -95,9 +93,7 @@ static FLASH_ATTR const char _enxio[] = "-ENXIO";
 static FLASH_ATTR const char _eoverflow[] = "-EOVERFLOW";
 static FLASH_ATTR const char _eownerdead[] = "-EOWNERDEAD";
 static FLASH_ATTR const char _eperm[] = "-EPERM";
-#ifdef EPFNOSUPPORT /* not part of POSIX and not universally available */
 static FLASH_ATTR const char _epfnosupport[] = "-EPFNOSUPPORT";
-#endif
 static FLASH_ATTR const char _epipe[] = "-EPIPE";
 static FLASH_ATTR const char _eprotonosupport[] = "-EPROTONOSUPPORT";
 static FLASH_ATTR const char _eprototype[] = "-EPROTOTYPE";
@@ -109,9 +105,7 @@ static FLASH_ATTR const char _esrch[] = "-ESRCH";
 static FLASH_ATTR const char _estale[] = "-ESTALE";
 static FLASH_ATTR const char _etimedout[] = "-ETIMEDOUT";
 static FLASH_ATTR const char _etime[] = "-ETIME";
-#ifdef ETOOMANYREFS /* not part of POSIX and not universally available */
 static FLASH_ATTR const char _etoomanyrefs[] = "-ETOOMANYREFS";
-#endif
 static FLASH_ATTR const char _etxtbsy[] = "-ETXTBSY";
 static FLASH_ATTR const char _exdev[] = "-EXDEV";
 /* EAGAIN and EWOULDBLOCK have the exact same meaning and consequently may
@@ -149,9 +143,7 @@ static FLASH_ATTR const char * FLASH_ATTR const lookup[] = {
     [EEXIST]            = _eexist,
     [EFAULT]            = _efault,
     [EFBIG]             = _efbig,
-#ifdef EHOSTDOWN /* not part of POSIX and not universally available */
     [EHOSTDOWN]         = _ehostdown,
-#endif
     [EHOSTUNREACH]      = _ehostunreach,
     [EIDRM]             = _eidrm,
     [EILSEQ]            = _eilseq,
@@ -196,9 +188,7 @@ static FLASH_ATTR const char * FLASH_ATTR const lookup[] = {
     [EOVERFLOW]         = _eoverflow,
     [EOWNERDEAD ]       = _eownerdead,
     [EPERM]             = _eperm,
-#ifdef EPFNOSUPPORT /* not part of POSIX and not universally available */
     [EPFNOSUPPORT]      = _epfnosupport,
-#endif
     [EPIPE]             = _epipe,
     [EPROTONOSUPPORT]   = _eprotonosupport,
     [EPROTOTYPE]        = _eprototype,
@@ -210,9 +200,7 @@ static FLASH_ATTR const char * FLASH_ATTR const lookup[] = {
     [ESTALE]            = _estale,
     [ETIMEDOUT]         = _etimedout,
     [ETIME]             = _etime,
-#ifdef ETOOMANYREFS /* not part of POSIX and not universally available */
     [ETOOMANYREFS]      = _etoomanyrefs,
-#endif
     [ETXTBSY]           = _etxtbsy,
     [EXDEV]             = _exdev,
 #if EAGAIN != EWOULDBLOCK

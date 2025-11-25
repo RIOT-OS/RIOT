@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_pir
  *
@@ -17,6 +15,9 @@
  *
  * @author      Hyung-Sin Kim <hs.kim@cs.berkeley.edu>
  */
+
+#ifndef PIR_PARAMS_H
+#define PIR_PARAMS_H
 
 #include "board.h"
 #include "pir.h"
@@ -79,4 +80,5 @@ static const saul_reg_info_t pir_saul_info[] =
 }
 #endif
 
+#endif /* PIR_PARAMS_H */
 /** @} */

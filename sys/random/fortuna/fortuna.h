@@ -171,7 +171,7 @@ typedef uint32_t fortuna_seed_t[FORTUNA_SEED_SIZE];
  *
  * It is possible to use this method to clear an existing state.
  *
- * @param[in,out] state     PRNG state
+ * @param[inout] state      PRNG state
  *
  * @return                  zero on successful initialization
  * @return                  non-zero on error
@@ -182,9 +182,9 @@ int fortuna_init(fortuna_state_t *state);
  * @brief   Read random bytes from the PRNG. The number of bytes may not exceed
  *          FORTUNA_RESEED_LIMIT bytes.
  *
- * @param[in,out] state     PRNG state
- * @param[out]    out       pointer to buffer
- * @param[in]     bytes     number of bytes to write in buffer
+ * @param[inout] state      PRNG state
+ * @param[out] out          pointer to buffer
+ * @param[in] bytes         number of bytes to write in buffer
  *
  * @return                  zero on success
  * @return                  -1 on reading more that FORTUNA_RESEED_LIMIT bytes
@@ -197,11 +197,11 @@ int fortuna_random_data(fortuna_state_t *state, uint8_t *out, size_t bytes);
  * @brief   Add a entropy of a random event to one PRNG pool. The pool must
  *          exist and the source length must be 1-32 bytes.
  *
- * @param[in,out] state     PRNG state
- * @param[in]     data      pointer to entropy source
- * @param[in]     length    length of entropy source
- * @param[in]     source    source identifier (each source has its own ID)
- * @param[in]     pool      pool number to add entropy to
+ * @param[inout] state      PRNG state
+ * @param[in] data          pointer to entropy source
+ * @param[in] length        length of entropy source
+ * @param[in] source        source identifier (each source has its own ID)
+ * @param[in] pool          pool number to add entropy to
  *
  * @return                  zero on success
  * @return                  -1 on zero bytes or more than 32 bytes
@@ -217,8 +217,8 @@ int fortuna_add_random_event(fortuna_state_t *state, const uint8_t *data,
  * This method must be invoked before shutting down the PRNG (e.g. on system
  * shutdown).
  *
- * @param[in,out] state     PRNG state
- * @param[out]    data      pointer to output buffer for the seed
+ * @param[inout] state      PRNG state
+ * @param[out] data         pointer to output buffer for the seed
  *
  * @return                  zero on success
  */
@@ -231,8 +231,8 @@ int fortuna_write_seed(fortuna_state_t *state, fortuna_seed_t *out);
  * This method should be invoked once on PRNG startup, in case a seed is
  * available.
  *
- * @param[in,out] state     PRNG state
- * @param[in,out] data      pointer to input and output buffer for the seed
+ * @param[inout] state      PRNG state
+ * @param[inout] data       pointer to input and output buffer for the seed
  *
  * @return                  zero on success
  */

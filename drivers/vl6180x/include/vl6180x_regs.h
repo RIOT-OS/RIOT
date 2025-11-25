@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_vl6180x
  * @brief       Register definitions for ST VL6180X Ranging and Ambient Light Sensing (ALS) module
@@ -15,6 +13,9 @@
  * @file
  * @{
  */
+
+#ifndef VL6180X_REGS_H
+#define VL6180X_REGS_H
 
 #ifdef __cplusplus
 extern "C"
@@ -147,4 +148,5 @@ extern "C"
 }
 #endif
 
+#endif /* VL6180X_REGS_H */
 /** @} */

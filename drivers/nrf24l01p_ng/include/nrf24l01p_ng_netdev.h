@@ -5,9 +5,6 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-
-#pragma once
-
 /**
  * @ingroup drivers_nrf24l01p_ng
  * @{
@@ -17,6 +14,8 @@
  *
  * @author  Fabian Hüßler <fabian.huessler@ovgu.de>
  */
+#ifndef NRF24L01P_NG_NETDEV_H
+#define NRF24L01P_NG_NETDEV_H
 
 #include "net/netdev.h"
 
@@ -33,4 +32,5 @@ extern const netdev_driver_t nrf24l01p_ng_driver;
 }
 #endif
 
+#endif /* NRF24L01P_NG_NETDEV_H */
 /** @} */

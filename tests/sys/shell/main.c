@@ -130,7 +130,7 @@ static int print_periodic(int argc, char **argv)
 
     _periodic_ctx.period_ms = 500;
 
-    thread_create(_stack, sizeof(_stack), THREAD_PRIORITY_MAIN, 0,
+    thread_create(_stack, sizeof(_stack), THREAD_PRIORITY_MAIN, THREAD_CREATE_STACKTEST,
                   _func, NULL, "periodic");
 
     return 0;

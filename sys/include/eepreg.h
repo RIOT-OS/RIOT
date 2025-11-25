@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_eepreg EEPROM registration
  * @ingroup     sys
@@ -55,6 +53,9 @@
  *
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  */
+
+#ifndef EEPREG_H
+#define EEPREG_H
 
 #include <stdint.h>
 
@@ -266,3 +267,5 @@ int eepreg_free(uint32_t *len);
 #endif
 
 /** @} */
+
+#endif /* EEPREG_H */

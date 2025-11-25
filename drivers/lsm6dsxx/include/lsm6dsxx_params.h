@@ -8,8 +8,6 @@
  *
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_lsm6dsxx
  * @{
@@ -21,6 +19,9 @@
  * @author      Miquel Borrell <miquel.borrell@haw-hamburg.de>
  *
  */
+
+#ifndef LSM6DSXX_PARAMS_H
+#define LSM6DSXX_PARAMS_H
 
 #include "board.h"
 #include "lsm6dsxx.h"
@@ -94,4 +95,5 @@ static const saul_reg_info_t lsm6dsxx_saul_info[] =
 }
 #endif
 
+#endif /* LSM6DSXX_PARAMS_H */
 /** @} */

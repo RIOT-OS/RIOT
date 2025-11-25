@@ -6,6 +6,7 @@ BOARD_WITHOUT_LORAMAC_RX := \
     arduino-mega2560 \
     i-nucleo-lrwan1 \
     stm32f0discovery \
+    waspmote-pro \
 
 LORA_DRIVER ?= sx1276
 LORA_REGION ?= EU868

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_sht1x
  *
@@ -17,6 +15,9 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
+
+#ifndef SHT1X_PARAMS_H
+#define SHT1X_PARAMS_H
 
 #include "board.h"
 #include "sht1x.h"
@@ -102,4 +103,5 @@ static const saul_reg_info_t sht1x_saul_info[] =
 }
 #endif
 
+#endif /* SHT1X_PARAMS_H */
 /** @} */

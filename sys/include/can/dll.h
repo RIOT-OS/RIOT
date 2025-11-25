@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @ingroup    sys_can_dll
  * @{
@@ -18,6 +16,9 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
+
+#ifndef CAN_DLL_H
+#define CAN_DLL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,7 +60,7 @@ int can_dll_register_candev(candev_dev_t *candev);
  * @return 0 on success
  * @return -ENOMEM if the message can not be sent
  */
-int can_dll_dispatch_rx_frame(can_frame_t *frame, kernel_pid_t pid);
+int can_dll_dispatch_rx_frame(struct can_frame *frame, kernel_pid_t pid);
 
 /**
  * @brief Dispatch a tx confirmation
@@ -102,5 +103,7 @@ int can_dll_dispatch_bus_off(kernel_pid_t pid);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* CAN_DLL_H */
 
 /** @} */

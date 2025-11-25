@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2016 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @defgroup    boards_common_microbit Common microbit LED handling
@@ -15,6 +16,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef MICROBIT_H
+#define MICROBIT_H
 
 #include <stdint.h>
 
@@ -83,4 +87,5 @@ void microbit_matrix_shift_str(const char *str, uint32_t delay);
 }
 #endif
 
+#endif /* MICROBIT_H */
 /** @} */

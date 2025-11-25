@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2023 Benjamin Valentin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2023 Benjamin Valentin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
 
 /**
@@ -19,7 +22,7 @@
  * @}
  */
 
-#include "esp_private/periph_ctrl.h"
+#include "driver/periph_ctrl.h"
 #include "rom/usb/chip_usb_dw_wrapper.h"
 #include "rom/usb/usb_persist.h"
 #include "soc/rtc_cntl_reg.h"

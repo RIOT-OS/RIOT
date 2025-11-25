@@ -1,31 +1,30 @@
 PKG_SOURCE_DIR ?= $(PKGDIRBASE)/cryptoauthlib
 PKG_TESTINCLDIR = $(PKG_SOURCE_DIR)/test
 
-# Using -isystem instead of -I to prevent warnings for the following headers
-INCLUDES += -isystem$(PKG_SOURCE_DIR)
-INCLUDES += -isystem$(PKG_SOURCE_DIR)/lib
-INCLUDES += -isystem$(PKG_SOURCE_DIR)/app
-INCLUDES += -isystem$(PKG_SOURCE_DIR)/lib/calib
-INCLUDES += -isystem$(RIOTPKG)/cryptoauthlib/include
+INCLUDES += -I$(PKG_SOURCE_DIR)
+INCLUDES += -I$(PKG_SOURCE_DIR)/lib
+INCLUDES += -I$(PKG_SOURCE_DIR)/app
+INCLUDES += -I$(PKG_SOURCE_DIR)/lib/calib
+INCLUDES += -I$(RIOTPKG)/cryptoauthlib/include
 
 ifneq (,$(filter psa_crypto, $(USEMODULE)))
   DIRS += $(RIOTPKG)/cryptoauthlib/psa_atca_driver
-  INCLUDES += -isystem$(RIOTBASE)/sys/psa_crypto/include
+  INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
 endif
 
 DIRS += $(RIOTPKG)/cryptoauthlib/contrib
 ARCHIVES += $(BINDIR)/cryptoauthlib.a
 
 ifneq (,$(filter cryptoauthlib_test,$(USEMODULE)))
-  INCLUDES += -isystem$(PKG_TESTINCLDIR)
-  INCLUDES += -isystem$(PKG_TESTINCLDIR)/jwt
-  INCLUDES += -isystem$(PKG_TESTINCLDIR)/tng
-  INCLUDES += -isystem$(PKG_TESTINCLDIR)/atcacert
-  INCLUDES += -isystem$(PKG_TESTINCLDIR)/api_atcab
-  INCLUDES += -isystem$(PKG_TESTINCLDIR)/api_calib
-  INCLUDES += -isystem$(PKG_TESTINCLDIR)/api_crypto
-  INCLUDES += -isystem$(PKG_TESTINCLDIR)/vectors
-  INCLUDES += -isystem$(PKG_SOURCE_DIR)/third_party/unity
+  INCLUDES += -I$(PKG_TESTINCLDIR)
+  INCLUDES += -I$(PKG_TESTINCLDIR)/jwt
+  INCLUDES += -I$(PKG_TESTINCLDIR)/tng
+  INCLUDES += -I$(PKG_TESTINCLDIR)/atcacert
+  INCLUDES += -I$(PKG_TESTINCLDIR)/api_atcab
+  INCLUDES += -I$(PKG_TESTINCLDIR)/api_calib
+  INCLUDES += -I$(PKG_TESTINCLDIR)/api_crypto
+  INCLUDES += -I$(PKG_TESTINCLDIR)/vectors
+  INCLUDES += -I$(PKG_SOURCE_DIR)/third_party/unity
 endif
 
 PSEUDOMODULES += psa_secure_element_ateccx08a

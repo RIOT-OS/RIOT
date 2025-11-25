@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2023-2024 Mesotic SAS
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2023-2024 Mesotic SAS
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -109,7 +112,6 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
 uint8_t pwm_channels(pwm_t pwm)
 {
-    (void)pwm;  /* avoid compilation problems with NDEBUG */
     assert(pwm < PWM_NUMOF);
     return PWM_CHANNEL_NUMOF;
 }

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_fxos8700
  * @{
@@ -18,6 +16,9 @@
  * @author      Michael Andersen <m.andersen@cs.berkeley.edu>
  * @author      Hyung-Sin Kim <hs.kim@cs.berkeley.edu>
  */
+
+#ifndef FXOS8700_REGS_H
+#define FXOS8700_REGS_H
 
 #ifdef __cplusplus
 extern "C"
@@ -205,4 +206,5 @@ extern "C"
 }
 #endif
 
+#endif /* FXOS8700_REGS_H */
 /** @} */

@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_mpl3115a2 MPL3115A2 Pressure Sensor
  * @ingroup     drivers_sensors
@@ -29,6 +27,9 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Sebastian Meiling <s@mlng.net>
  */
+
+#ifndef MPL3115A2_H
+#define MPL3115A2_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -183,4 +184,5 @@ int mpl3115a2_read_temp(const mpl3115a2_t *dev, int16_t *temp);
 }
 #endif
 
+#endif /* MPL3115A2_H */
 /** @} */

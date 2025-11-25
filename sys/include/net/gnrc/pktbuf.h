@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gnrc_pktbuf   Packet buffer
  * @ingroup     net_gnrc
@@ -29,6 +27,8 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+#ifndef NET_GNRC_PKTBUF_H
+#define NET_GNRC_PKTBUF_H
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -64,23 +64,6 @@ extern "C" {
 #define CONFIG_GNRC_PKTBUF_SIZE    (6144)
 #endif
 /** @} */
-
-/**
- * @brief   Enable use-after-free/out of bounds write detection in gnrc_pktbuf
- */
-#ifndef CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE
-#define CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE (0)
-#endif
-
-/**
- * @brief   Canary value for free pktbuf memory when
- *          @see CONFIG_GNRC_PKTBUF_CHECK_USE_AFTER_FREE is enabled.
- *
- *          Unallocated pktbuf memory is filled with this value and overwritten
- *          with `~GNRC_PKTBUF_CANARY` when handed out.
- *          This way we can try to detect when unallocated memory was used.
- */
-#define GNRC_PKTBUF_CANARY          (0x55)
 
 /**
  * @brief   Initializes packet buffer module.
@@ -330,4 +313,5 @@ bool gnrc_pktbuf_is_sane(void);
 }
 #endif
 
+#endif /* NET_GNRC_PKTBUF_H */
 /** @} */

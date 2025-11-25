@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_dcf77
  *
@@ -17,6 +15,9 @@
  *
  * @author      Michel Gerlach <michel.gerlach@haw-hamburg.de>
  */
+
+#ifndef DCF77_PARAMS_H
+#define DCF77_PARAMS_H
 
 #include "board.h"
 #include "dcf77.h"
@@ -53,4 +54,5 @@ static const dcf77_params_t dcf77_params[] =
 }
 #endif
 
+#endif /* DCF77_PARAMS_H */
 /** @} */

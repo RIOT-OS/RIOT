@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_eui64   IEEE EUI-64 identifier
  * @ingroup     net
@@ -23,6 +21,8 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
+#ifndef NET_EUI64_H
+#define NET_EUI64_H
 
 #include <stdint.h>
 #include "byteorder.h"
@@ -88,4 +88,5 @@ static inline void eui64_clear_group(eui64_t *addr)
 }
 #endif
 
+#endif /* NET_EUI64_H */
 /** @} */

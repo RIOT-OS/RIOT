@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @defgroup     drivers_netdev_ieee802154_submac IEEE802.15.4 SubMAC netdev layer
  * @ingroup      drivers_netdev_api
@@ -21,6 +19,8 @@
  *
  * @author       José I. Alamos <jose.alamos@haw-hamburg.de>
  */
+#ifndef NET_NETDEV_IEEE802154_SUBMAC_H
+#define NET_NETDEV_IEEE802154_SUBMAC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,8 +49,7 @@ typedef struct {
     netdev_ieee802154_t dev;            /**< IEEE 802.15.4 netdev descriptor */
     ieee802154_submac_t submac;         /**< IEEE 802.15.4 SubMAC descriptor */
     ztimer_t ack_timer;                 /**< ztimer descriptor for the ACK timeout timer */
-    uint32_t isr_flags;                 /**< netdev submac @ref NETDEV_EVENT_ISR flags */
-    int bytes_tx;                       /**< size of the sent frame or tx error */
+    int isr_flags;                      /**< netdev submac @ref NETDEV_EVENT_ISR flags */
     int8_t retrans;                     /**< number of frame retransmissions of the last TX */
     bool dispatch;                      /**< whether an event should be dispatched or not */
     netdev_event_t ev;                  /**< event to be dispatched */
@@ -70,4 +69,5 @@ int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac);
 }
 #endif
 
+#endif /* NET_NETDEV_IEEE802154_SUBMAC_H */
 /** @} */

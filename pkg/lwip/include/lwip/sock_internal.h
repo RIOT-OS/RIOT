@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    pkg_lwip_sock   lwIP-specific implementation of sock API
  * @ingroup     pkg_lwip
@@ -21,6 +19,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef LWIP_SOCK_INTERNAL_H
+#define LWIP_SOCK_INTERNAL_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -77,5 +77,6 @@ static inline ssize_t lwip_sock_send(struct netconn *conn,
 }
 #endif
 
+#endif /* LWIP_SOCK_INTERNAL_H */
 /** @internal
  * @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     boards_particle-xenon
  * @{
@@ -18,6 +16,9 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "periph_conf_common.h"
@@ -63,4 +64,5 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

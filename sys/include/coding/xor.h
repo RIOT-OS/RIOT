@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_coding_xor  XOR code
  * @ingroup     sys_coding
@@ -25,6 +23,9 @@
  *
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+
+#ifndef CODING_XOR_H
+#define CODING_XOR_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -88,4 +89,5 @@ bool coding_xor_recover(void *data, size_t len, uint8_t *parity,
 }
 #endif
 
+#endif /* CODING_XOR_H */
 /** @} */

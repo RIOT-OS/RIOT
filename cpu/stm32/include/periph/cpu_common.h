@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2017 OTA keys S.A.
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2016 Freie Universität Berlin
+ *               2017 OTA keys S.A.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_stm32
@@ -16,6 +17,9 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Vincent Dupont <vincent@otakeys.com>
  */
+
+#ifndef PERIPH_CPU_COMMON_H
+#define PERIPH_CPU_COMMON_H
 
 #include <stdint.h>
 
@@ -264,4 +268,5 @@ void periph_lpclk_dis(bus_t bus, uint32_t mask);
 }
 #endif
 
+#endif /* PERIPH_CPU_COMMON_H */
 /** @} */

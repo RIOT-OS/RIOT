@@ -1,8 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2014-2016 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2020 Inria
- * SPDX-FileCopyrightText: 2020 Koen Zandberg <koen@bergzand.net>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2014-2016 Freie Universität Berlin
+ * Copyright (C) 2020 Inria
+ * Copyright (C) 2020 Koen Zandberg <koen@bergzand.net>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -149,11 +152,11 @@ int spi_init_with_gpio_mode(spi_t bus, const spi_gpio_mode_t* mode)
     assert(bus < SPI_NUMOF);
 
     if (gpio_is_valid(spi_config[bus].mosi)) {
-        gpio_init(spi_config[bus].mosi, mode->mosi);
+        gpio_init(spi_config[bus].miso, mode->mosi);
     }
 
     if (gpio_is_valid(spi_config[bus].miso)) {
-        gpio_init(spi_config[bus].miso, mode->miso);
+        gpio_init(spi_config[bus].mosi, mode->miso);
     }
 
     if (gpio_is_valid(spi_config[bus].sclk)) {

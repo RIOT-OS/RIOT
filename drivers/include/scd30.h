@@ -8,8 +8,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_scd30 SCD30 CO2, temperature and humidity sensor
  * @ingroup     drivers_sensors
@@ -22,6 +20,9 @@
  * @author      Jan Schlichter   <schlichter@ibr.cs.tu-bs.de>
  * @}
  */
+
+#ifndef SCD30_H
+#define SCD30_H
 
 #include "periph/i2c.h"
 #include "saul.h"
@@ -178,3 +179,5 @@ int8_t scd30_reset(scd30_t *dev);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* SCD30_H */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,8 @@
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
+#ifndef TESTS_GNRC_IPV6_H
+#define TESTS_GNRC_IPV6_H
 
 #include "embUnit.h"
 
@@ -33,4 +33,5 @@ void tests_gnrc_ipv6(void);
 }
 #endif
 
+#endif /* TESTS_GNRC_IPV6_H */
 /** @} */

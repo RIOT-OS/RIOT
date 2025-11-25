@@ -50,7 +50,7 @@ void can_pkt_init(void)
     mutex_unlock(&_mutex);
 }
 
-static can_pkt_t *_pkt_alloc(int ifnum, const can_frame_t *frame)
+static can_pkt_t *_pkt_alloc(int ifnum, const struct can_frame *frame)
 {
     can_pkt_t *pkt;
 
@@ -87,7 +87,7 @@ static void _init_tx_pkt(can_pkt_t *pkt)
     mutex_unlock(&_mutex);
 }
 
-can_pkt_t *can_pkt_alloc_tx(int ifnum, const can_frame_t *frame, kernel_pid_t tx_pid)
+can_pkt_t *can_pkt_alloc_tx(int ifnum, const struct can_frame *frame, kernel_pid_t tx_pid)
 {
     can_pkt_t *pkt = _pkt_alloc(ifnum, frame);
 
@@ -104,7 +104,7 @@ can_pkt_t *can_pkt_alloc_tx(int ifnum, const can_frame_t *frame, kernel_pid_t tx
     return pkt;
 }
 
-can_pkt_t *can_pkt_alloc_rx(int ifnum, const can_frame_t *frame)
+can_pkt_t *can_pkt_alloc_rx(int ifnum, const struct can_frame *frame)
 {
     can_pkt_t *pkt = _pkt_alloc(ifnum, frame);
 
@@ -118,7 +118,7 @@ can_pkt_t *can_pkt_alloc_rx(int ifnum, const can_frame_t *frame)
 }
 
 #ifdef MODULE_CAN_MBOX
-can_pkt_t *can_pkt_alloc_mbox_tx(int ifnum, const can_frame_t *frame, mbox_t *tx_mbox)
+can_pkt_t *can_pkt_alloc_mbox_tx(int ifnum, const struct can_frame *frame, mbox_t *tx_mbox)
 {
     can_pkt_t *pkt = _pkt_alloc(ifnum, frame);
 

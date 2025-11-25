@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_tcs37727 TCS37727 RGB Light Sensor
  * @ingroup     drivers_sensors
@@ -25,6 +23,9 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef TCS37727_H
+#define TCS37727_H
 
 #include <stdint.h>
 
@@ -147,4 +148,5 @@ void tcs37727_read(const tcs37727_t *dev, tcs37727_data_t *data);
 }
 #endif
 
+#endif /* TCS37727_H */
 /** @} */

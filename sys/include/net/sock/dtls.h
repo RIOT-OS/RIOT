@@ -10,8 +10,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_sock_dtls    DTLS sock API
  * @ingroup     net_sock net_dtls
@@ -55,9 +53,7 @@
  *
  * ## Makefile Includes
  *
- * First, we need to
- * [include](https://guide.riot-os.org/advanced_tutorials/creating_application/#including-modules)
- * a module that implements
+ * First, we need to [include](@ref including-modules) a module that implements
  * this API in our applications Makefile. For example the module that
  * implements this API for [tinydtls](@ref pkg_tinydtls) is called
  * `tinydtls_sock_dtls'.
@@ -284,9 +280,8 @@
  * application waits indefinitely for new packets. If we want to timeout this
  * wait period we could alternatively set the `timeout` parameter of the
  * function to a value != @ref SOCK_NO_TIMEOUT. If an error occurs we just
- * ignore it and continue looping. A newly established DTLS session would be
- * signaled by a return value - @ref SOCK_DTLS_HANDSHAKE, but it is also ignored
- * here. We can reply to an incoming message using its `session`.
+ * ignore it and continue looping. We can reply to an incoming message using
+ * its `session`.
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  * while (1) {
@@ -531,6 +526,9 @@
  * @author  Ken Bannister <kb2ma@runbox.com>
  * @author  Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
+
+#ifndef NET_SOCK_DTLS_H
+#define NET_SOCK_DTLS_H
 
 #include <assert.h>
 #include <errno.h>
@@ -923,7 +921,7 @@ static inline ssize_t sock_dtls_recv_buf(sock_dtls_t *sock,
 }
 
 /**
- * @brief Encrypts and sends a message to a remote peer with non-continuous payload
+ * @brief Encrypts and sends a message to a remote peer with non-continous payload
  *
  * @param[in]   sock    DTLS sock to use
  * @param[in]   remote  DTLS session to use. A new session will be created
@@ -1057,7 +1055,7 @@ static inline ssize_t sock_dtls_send(sock_dtls_t *sock,
 }
 
 /**
- * @brief Encrypts and sends a message to a remote peer with non-continuous payload
+ * @brief Encrypts and sends a message to a remote peer with non-continous payload
  *
  * @param[in] sock      DTLS sock to use
  * @param[in] remote    DTLS session to use. A new session will be created
@@ -1126,4 +1124,5 @@ void sock_dtls_close(sock_dtls_t *sock);
 }
 #endif
 
+#endif /* NET_SOCK_DTLS_H */
 /** @} */

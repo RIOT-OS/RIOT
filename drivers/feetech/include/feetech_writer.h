@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_feetech
  *
@@ -18,6 +16,9 @@
  *
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
+
+#ifndef FEETECH_WRITER_H
+#define FEETECH_WRITER_H
 
 #include "feetech_protocol.h"
 
@@ -180,4 +181,5 @@ void feetech_writer_sync_write_add_16bits(feetech_writer_t *writer, uint8_t id, 
 }
 #endif
 
+#endif /* FEETECH_WRITER_H */
 /** @} */

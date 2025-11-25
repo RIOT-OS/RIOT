@@ -28,10 +28,6 @@
 
 #include "gnrc_sock_internal.h"
 
-#ifdef SOCK_HAS_ASYNC_CTX
-#include "net/sock/async/event.h"
-#endif
-
 int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
                    const sock_ip_ep_t *remote, uint8_t proto, uint16_t flags)
 {
@@ -69,9 +65,6 @@ void sock_ip_close(sock_ip_t *sock)
 {
     assert(sock != NULL);
     gnrc_netreg_unregister(GNRC_NETTYPE_IPV6, &sock->reg.entry);
-#ifdef SOCK_HAS_ASYNC_CTX
-    sock_event_close(sock_ip_get_async_ctx(sock));
-#endif
 }
 
 int sock_ip_get_local(sock_ip_t *sock, sock_ip_ep_t *local)

@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2017 Gilles DOFFE <gdoffe@gmail.com>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 Gilles DOFFE <gdoffe@gmail.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -36,8 +39,8 @@ static qdec_isr_ctx_t isr_ctx[QDEC_NUMOF];
 /**
  * @brief Read the current value of the given qdec device. Internal use.
  *
- * @param[in] qdec          the qdec to read the current value from
- * @param[in] reset         perform a reset of qdec counter if not 0
+ * @param[in] dev           the qdec to read the current value from
+ * @param[in] dev           perform a reset of qdec counter if not 0
  *
  * @return                  the qdecs current value
  */

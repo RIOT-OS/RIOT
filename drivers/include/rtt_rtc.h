@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_rtt_rtc     RTC emulation on top of a RTT
  * @ingroup     drivers_periph_rtc
@@ -19,6 +17,9 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+
+#ifndef RTT_RTC_H
+#define RTT_RTC_H
 
 #include <stdint.h>
 
@@ -56,4 +57,5 @@ void rtt_rtc_gettimeofday(uint32_t *s, uint32_t *us);
 }
 #endif
 
+#endif /* RTT_RTC_H */
 /** @} */

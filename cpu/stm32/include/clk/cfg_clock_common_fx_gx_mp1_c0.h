@@ -1,11 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2017 OTA keys S.A.
- * SPDX-FileCopyrightText: 2018-2020 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 Freie Universität Berlin
+ *               2017 OTA keys S.A.
+ *               2018-2020 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_stm32
@@ -18,6 +19,9 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef CLK_CFG_CLOCK_COMMON_FX_GX_MP1_C0_H
+#define CLK_CFG_CLOCK_COMMON_FX_GX_MP1_C0_H
 
 #include "kernel_defines.h"
 
@@ -85,4 +89,5 @@ extern "C" {
 }
 #endif
 
+#endif /* CLK_CFG_CLOCK_COMMON_FX_GX_MP1_C0_H */
 /** @} */

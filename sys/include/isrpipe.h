@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup isr_pipe ISR Pipe
  * @ingroup sys
@@ -20,6 +18,9 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  */
+
+#ifndef ISRPIPE_H
+#define ISRPIPE_H
 
 #include <stdint.h>
 
@@ -40,21 +41,15 @@ typedef struct {
 
 /**
  * @brief   Static initializer for irspipe
- *
- * @note The size of the buffer (`sizeof(@p buf)`) must be a power of two.
- *
- * @param[in] buf           buffer to use as ringbuffer
  */
-#define ISRPIPE_INIT(buf) { .mutex = MUTEX_INIT_LOCKED, \
-                            .tsrb = TSRB_INIT(buf) }
+#define ISRPIPE_INIT(tsrb_buf) { .mutex = MUTEX_INIT, \
+                                 .tsrb = TSRB_INIT(tsrb_buf) }
 
 /**
  * @brief   Initialisation function for isrpipe
  *
- * @note The size of the buffer (@p bufsize) must be a power of two.
- *
  * @param[in]   isrpipe     isrpipe object to initialize
- * @param[in]   buf         buffer to use as ringbuffer
+ * @param[in]   buf         buffer to use as ringbuffer (must be power of two sized!)
  * @param[in]   bufsize     size of @p buf
  */
 void isrpipe_init(isrpipe_t *isrpipe, uint8_t *buf, size_t bufsize);
@@ -97,3 +92,4 @@ int isrpipe_read(isrpipe_t *isrpipe, uint8_t *buf, size_t count);
 }
 #endif
 /** @} */
+#endif /* ISRPIPE_H */

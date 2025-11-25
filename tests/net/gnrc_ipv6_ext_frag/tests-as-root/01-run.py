@@ -379,7 +379,7 @@ def testfunc(child):
         run_sock_test(test_ipv6_ext_frag_fwd_success, s)
         run_sock_test(test_ipv6_ext_frag_fwd_too_big, s)
 
-    if not os.environ.get("BOARD", "") in ['native', 'native32', 'native64']:
+    if not os.environ.get("BOARD", "") in ["native", "native64"]:
         # ethos currently can't handle the larger, rapidly sent packets by the
         # IPv6 fragmentation of the Linux Kernel
         print("SUCCESS")

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_ws281x WS2812/SK6812 RGB LED (NeoPixel)
  * @ingroup     drivers_actuators
@@ -84,6 +82,9 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
+
+#ifndef WS281X_H
+#define WS281X_H
 
 #include <stdint.h>
 
@@ -251,4 +252,5 @@ static inline void ws281x_write(ws281x_t *dev)
 }
 #endif
 
+#endif /* WS281X_H */
 /** @} */

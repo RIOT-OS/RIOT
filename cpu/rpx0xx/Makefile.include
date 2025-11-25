@@ -14,8 +14,8 @@ INCLUDES += -I$(RIOTCPU)/rpx0xx/include
 VECTORS_O       ?= $(BINDIR)/cpu/vectors.o
 VECTORS_FILE    := $(RIOTCPU)/rpx0xx/vectors.c
 
-PROGRAMMERS_SUPPORTED   := picotool openocd jlink
-PROGRAMMER ?= picotool
+PROGRAMMERS_SUPPORTED   := elf2uf2 openocd jlink
+PROGRAMMER ?= elf2uf2
 OPENOCD_DEBUG_ADAPTER   ?= dap
 
 include $(RIOTMAKE)/arch/cortexm.inc.mk

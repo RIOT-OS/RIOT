@@ -1,11 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2019 Inria
- * SPDX-FileCopyrightText: 2019 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2019 Kaspar Schleiser <kaspar@schleiser.de>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 Inria
+ *               2019 Freie Universität Berln
+ *               2019 Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_pyboard
@@ -16,6 +17,9 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 /* This board provides an LSE */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -157,4 +161,5 @@ static const i2c_conf_t i2c_config[] = {
 }
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

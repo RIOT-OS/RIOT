@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2019 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_esp8266_sdk
@@ -15,6 +16,9 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}
  */
+
+#ifndef SYSTEM_H
+#define SYSTEM_H
 
 #ifndef DOXYGEN
 
@@ -51,3 +55,4 @@ extern void system_restart(void);
 #endif
 
 #endif /* DOXYGEN */
+#endif /* SYSTEM_H */

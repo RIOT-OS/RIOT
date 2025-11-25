@@ -1,12 +1,15 @@
 /*
- * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
+ * @{
+ *
  * @file
- * @ingroup cpu_native
- * @brief   Backtrace implementation for native CPU
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
@@ -52,3 +55,5 @@ int backtrace_len(void)
 
     return backtrace(array, BACKTRACE_SIZE + 1) - 1;
 }
+
+/** @} */

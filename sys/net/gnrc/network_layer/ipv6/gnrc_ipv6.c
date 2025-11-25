@@ -576,7 +576,7 @@ static void _send_multicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
     if (!gnrc_netif_highlander()) {
         /* interface not given: send over all interfaces */
         if (netif == NULL) {
-            /* the packet is replicated over all interfaces that is's being sent on */
+            /* send packet to link layer */
             gnrc_pktbuf_hold(pkt, ifnum - 1);
 
             while ((netif = gnrc_netif_iter(netif))) {

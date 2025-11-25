@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     lwm2m_objects
  * @defgroup    lwm2m_objects_current Current
@@ -88,6 +86,9 @@
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
 
+#ifndef OBJECTS_CURRENT_H
+#define OBJECTS_CURRENT_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -154,4 +155,5 @@ void lwm2m_object_current_update_value(const lwm2m_client_data_t *client_data,
 }
 #endif
 
+#endif /* OBJECTS_CURRENT_H */
 /** @} */

@@ -13,7 +13,6 @@ JERRY_GC_LIMIT ?= 0  # Use default value, e.g. 1/32 of total heap size
 JERRY_GC_MARK_LIMIT ?= 8  # maximum recursion depth during GC mark phase
 
 EXT_CFLAGS := -D__TARGET_RIOT
-EXT_CFLAGS += -Wno-pedantic
 CFLAGS += -Wno-cast-align
 
 # disable warnings when compiling with LLVM for board native
@@ -26,7 +25,6 @@ else ifeq (esp32,$(CPU))
   # The ESP-IDF uses #include_next that causes errors when compiling with warnings
   # that are enabled by jerryscript build system so disable them for these CPUs:
   EXT_CFLAGS += -Wno-pedantic
-  EXT_CFLAGS += -Wno-maybe-uninitialized
 else ifeq (esp8266,$(CPU))
   # The esp8266 C newlib version 3.0.0 has errors when compiling with warnings
   # that are enabled by jerryscript build system so disable them for this cpu:
@@ -46,15 +44,12 @@ $(BINDIR)/jerryscript.a: $(PKG_BUILD_DIR)/Makefile
 	@cp $(PKG_BUILD_DIR)/lib/libjerry-ext.a $(BINDIR)/jerryscript-ext.a
 	@cp $(PKG_BUILD_DIR)/lib/libjerry-port-default.a $(BINDIR)/jerryscript-port-default.a
 
-# TODO: Drop `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` once upstream is compatible
-#       with newer cmake (e.g. compilation still succeeds with cmake 4.x)
 $(PKG_BUILD_DIR)/Makefile:
 	cmake -B$(PKG_BUILD_DIR) -H$(PKG_SOURCE_DIR) \
 	 -DCMAKE_SYSTEM_NAME=RIOT \
 	 -DCMAKE_SYSTEM_PROCESSOR="$(MCPU)" \
 	 -DCMAKE_C_COMPILER=$(CC) \
 	 -DCMAKE_C_COMPILER_WORKS=TRUE \
-	 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
 	 -DENABLE_LTO=OFF \
 	 -DENABLE_AMALGAM=OFF \
 	 -DHAVE_TIME_H=0 \

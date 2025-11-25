@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2008-2009 Heiko Will <hwill@inf.fu-berlin.de>
- * SPDX-FileCopyrightText: 2009 Kaspar Schleiser <kaspar@schleiser.de>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2008, 2009  Heiko Will <hwill@inf.fu-berlin.de>
+ * Copyright (C) 2009 Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_arm7_common
@@ -16,6 +17,8 @@
  * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @author Heiko Will <heiko.will@fu-berlin.de>
  */
+#ifndef THREAD_ARCH_H
+#define THREAD_ARCH_H
 
 #include "irq.h"
 
@@ -43,4 +46,5 @@ static inline __attribute__((always_inline)) void thread_yield_higher(void)
 }
 #endif
 
+#endif /* THREAD_ARCH_H */
 /** @} */

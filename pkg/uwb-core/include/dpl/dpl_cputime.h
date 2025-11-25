@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_uwb_core
  * @{
@@ -18,6 +16,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+
+#ifndef DPL_DPL_CPUTIME_H
+#define DPL_DPL_CPUTIME_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -144,3 +145,5 @@ static inline void dpl_cputime_timer_stop(struct hal_timer *timer)
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* DPL_DPL_CPUTIME_H */

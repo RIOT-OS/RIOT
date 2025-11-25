@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_ztimer_stopwatch ztimer stop watch
  * @ingroup     sys_ztimer
@@ -16,6 +14,8 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  * @{
  */
+#ifndef ZTIMER_STOPWATCH_H
+#define ZTIMER_STOPWATCH_H
 
 #include "ztimer.h"
 
@@ -98,4 +98,5 @@ static inline void ztimer_stopwatch_stop(ztimer_stopwatch_t *timer)
 }
 #endif
 
+#endif /* ZTIMER_STOPWATCH_H */
 /** @} */

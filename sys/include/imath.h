@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_imath   imath: Integer Math functions
  * @ingroup     sys
@@ -19,6 +17,9 @@
  * @author      Karl Fessel <karl.fessel@ovgu.de>
  * @{
  */
+
+#ifndef IMATH_H
+#define IMATH_H
 
 #include <stdint.h>
 
@@ -139,4 +140,5 @@ static inline uint32_t powi(unsigned x, unsigned y)
 }
 #endif
 
+#endif /* IMATH_H */
 /** @} */

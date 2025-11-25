@@ -7,8 +7,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_srf02 SRF02 ultrasonic range sensor
  * @ingroup     drivers_sensors
@@ -23,6 +21,9 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  */
+
+#ifndef SRF02_H
+#define SRF02_H
 
 #include <stdint.h>
 #include "periph/i2c.h"
@@ -135,4 +136,5 @@ int srf02_set_addr(srf02_t *dev, uint8_t new_addr);
 }
 #endif
 
+#endif /* SRF02_H */
 /** @} */

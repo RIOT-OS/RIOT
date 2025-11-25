@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,8 @@
  *
  * @author      Ken Bannister <kb2ma@runbox.com>
  */
+#ifndef TESTS_GCOAP_H
+#define TESTS_GCOAP_H
 
 #include "embUnit.h"
 
@@ -36,4 +36,5 @@ void tests_gcoap(void);
 }
 #endif
 
+#endif /* TESTS_GCOAP_H */
 /** @} */

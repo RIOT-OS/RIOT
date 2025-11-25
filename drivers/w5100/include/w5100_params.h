@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_w5100
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef W5100_PARAMS_H
+#define W5100_PARAMS_H
 
 #include "board.h"
 
@@ -70,4 +71,5 @@ static const  w5100_params_t w5100_params[] = {
 }
 #endif
 
+#endif /* W5100_PARAMS_H */
 /** @} */

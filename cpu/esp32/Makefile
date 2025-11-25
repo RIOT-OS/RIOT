@@ -1,12 +1,13 @@
 # Define the module that is built:
 MODULE = cpu
 
-SRC = irq_arch.c startup.c stdatomic.c syscalls.c
+SRC = irq_arch.c startup.c syscalls.c
 
 # Add a list of subdirectories, that should also be built:
 DIRS += $(RIOTCPU)/esp_common
 DIRS += periph
 DIRS += esp-idf
+DIRS += esp-idf-api
 
 ifneq (, $(filter esp_bootloader, $(USEMODULE)))
     DIRS += bootloader
@@ -26,10 +27,6 @@ endif
 
 ifneq (, $(filter esp_freertos, $(USEMODULE)))
     DIRS += freertos
-endif
-
-ifneq (, $(filter esp_ieee802154, $(USEMODULE)))
-    DIRS += esp-ieee802154
 endif
 
 ifneq (, $(filter esp_lcd, $(USEMODULE)))

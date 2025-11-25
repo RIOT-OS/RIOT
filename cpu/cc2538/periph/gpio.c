@@ -1,7 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2014 Loci Controls Inc.
- * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2014 Loci Controls Inc.
+ *               2016 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -28,7 +31,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define MODE_NOTSUP         (0xf0)
+#define MODE_NOTSUP         (0xff)
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
 static gpio_isr_ctx_t isr_ctx[4][8];
@@ -97,7 +100,7 @@ static inline uint8_t _pp_num(gpio_t pin)
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     /* check if mode is valid */
-    if (mode >= MODE_NOTSUP) {
+    if (mode == MODE_NOTSUP) {
         return -1;
     }
 
@@ -119,7 +122,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-bool gpio_read(gpio_t pin)
+int gpio_read(gpio_t pin)
 {
     return (int)(gpio(pin)->DATA & _pin_mask(pin));
 }
@@ -139,7 +142,7 @@ void gpio_toggle(gpio_t pin)
     gpio(pin)->DATA ^= _pin_mask(pin);
 }
 
-void gpio_write(gpio_t pin, bool value)
+void gpio_write(gpio_t pin, int value)
 {
     if (value) {
         gpio(pin)->DATA |= _pin_mask(pin);

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup net_gnrc_lorawan
  * @{
@@ -17,6 +15,8 @@
  *
  * @author  José Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
+#ifndef NET_GNRC_LORAWAN_REGION_H
+#define NET_GNRC_LORAWAN_REGION_H
 
 #include "modules.h"
 #include "net/gnrc/lorawan.h"
@@ -75,4 +75,5 @@ bool gnrc_lorawan_validate_dr(uint8_t dr);
 }
 #endif
 
+#endif /* NET_GNRC_LORAWAN_REGION_H */
 /** @} */

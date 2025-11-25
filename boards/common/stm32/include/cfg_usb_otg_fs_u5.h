@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2019 Koen Zandberg
- * SPDX-FileCopyrightText: 2023 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 Koen Zandberg
+ *               2023 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_common_stm32
@@ -16,6 +17,9 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
+
+#ifndef CFG_USB_OTG_FS_U5_H
+#define CFG_USB_OTG_FS_U5_H
 
 #include "periph_cpu.h"
 #include "usbdev_synopsys_dwc2.h"
@@ -55,4 +59,5 @@ static const dwc2_usb_otg_fshs_config_t dwc2_usb_otg_fshs_config[] = {
 }
 #endif
 
+#endif /* CFG_USB_OTG_FS_U5_H */
 /** @} */

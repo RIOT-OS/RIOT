@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup net_gnrc_sixlowpan_frag_rb 6LoWPAN reassembly buffer
  * @ingroup  net_gnrc_sixlowpan_frag
@@ -19,6 +17,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef NET_GNRC_SIXLOWPAN_FRAG_RB_H
+#define NET_GNRC_SIXLOWPAN_FRAG_RB_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -256,7 +256,7 @@ void gnrc_sixlowpan_frag_rb_gc(void);
  *
  * @return  >0, when the datagram in @p rbuf was complete and dispatched.
  * @return  0, when the datagram in @p rbuf is not complete.
- * @return  -1, if the reassembled datagram was not dispatched. @p rbuf is
+ * @return  -1, if the the reassembled datagram was not dispatched. @p rbuf is
  *          destroyed either way.
  */
 int gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf,
@@ -316,4 +316,5 @@ static inline bool gnrc_sixlowpan_frag_rb_ints_empty(void)
 }
 #endif
 
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_RB_H */
 /** @} */

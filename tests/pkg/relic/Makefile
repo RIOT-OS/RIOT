@@ -9,9 +9,6 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     atmega256rfr2-xpro \
                     atmega328p \
                     atmega328p-xplained-mini \
-                    atxmega-a1-xplained \
-                    atxmega-a1u-xpro \
-                    atxmega-a3bu-xplained \
                     derfmega128 \
                     derfmega256 \
                     f4vi1 \
@@ -26,10 +23,11 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     stm32f0discovery \
                     stm32f3discovery \
                     telosb \
+                    waspmote-pro \
                     z1 \
                     #
 
-CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(14*THREAD_STACKSIZE_DEFAULT\)
+CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(6*THREAD_STACKSIZE_DEFAULT\)
 
 USEPKG += relic
 USEMODULE += embunit
@@ -44,6 +42,6 @@ endif
 #  				platform.
 
 # The rest of the parameters are configuration parameters for RELIC described in its documentation.
-export RELIC_CONFIG_FLAGS=-DARCH=NONE -DOPSYS=NONE -DQUIET=off -DWSIZE=32 -DFP_PRIME=255 -DWITH="BN;MD;DV;FP;EP;CP;BC;EC" -DBN_PRECI=512 -DSEED=RIOTRND
+export RELIC_CONFIG_FLAGS=-DARCH=NONE -DOPSYS=NONE -DQUIET=off -DWSIZE=32 -DFP_PRIME=255 -DWITH="BN;MD;DV;FP;EP;CP;BC;EC" -DSEED=RIOTRND
 
 include $(RIOTBASE)/Makefile.include

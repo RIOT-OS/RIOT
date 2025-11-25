@@ -1,5 +1,4 @@
-# Using -isystem instead of -I to prevent warnings for the following headers
-INCLUDES += -isystem$(PKGDIRBASE)/cn-cbor/include
+INCLUDES += -I$(PKGDIRBASE)/cn-cbor/include
 
 #enable context pointer
 CFLAGS += -DUSE_CBOR_CONTEXT

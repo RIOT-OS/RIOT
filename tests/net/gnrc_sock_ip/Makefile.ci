@@ -6,8 +6,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega328p \
     atmega328p-xplained-mini \
     atmega8 \
-    msb-430 \
-    msb-430h \
     nucleo-c031c6 \
     nucleo-f031k6 \
     nucleo-f042k6 \
@@ -16,8 +14,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     olimex-msp430-h1611 \
     samd10-xmini \
     stk3200 \
-    stm32c0116-dk \
-    stm32c0316-dk \
     stm32f030f4-demo \
     stm32g0316-disco \
     telosb \

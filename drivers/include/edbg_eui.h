@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_edbg_eui Driver for getting MAC address out of Atmel EDBG
  * @ingroup     drivers_misc
@@ -18,6 +16,9 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+
+#ifndef EDBG_EUI_H
+#define EDBG_EUI_H
 
 #include <stdint.h>
 #include "net/eui64.h"
@@ -42,4 +43,5 @@ int edbg_get_eui64(eui64_t *addr);
 }
 #endif
 
+#endif /* EDBG_EUI_H */
 /** @} */

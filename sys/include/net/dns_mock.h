@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_dns_mock DNS defines
  * @ingroup     net
@@ -19,6 +17,8 @@
  *
  * @author  Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
+#ifndef NET_DNS_MOCK_H
+#define NET_DNS_MOCK_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,4 +52,5 @@ static const ipv6_addr_t sock_dns_mock_example_com_addr_ipv6 = { {
 }
 #endif
 
+#endif /* NET_DNS_MOCK_H */
 /** @} */

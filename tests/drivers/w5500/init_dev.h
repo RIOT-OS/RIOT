@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2023 Stefan Schmidt
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2023 Stefan Schmidt
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     tests
@@ -14,6 +15,8 @@
  *
  * @author      Stefan Schmidt <stemschmidt@gmail.com>
  */
+#ifndef INIT_DEV_H
+#define INIT_DEV_H
 
 #include <stdint.h>
 
@@ -38,4 +41,5 @@ extern "C" {
 }
 #endif
 
+#endif /* INIT_DEV_H */
 /** @} */

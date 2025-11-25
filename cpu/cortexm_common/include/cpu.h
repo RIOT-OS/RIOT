@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2014-2015 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2014-2015 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @defgroup    cpu_cortexm_common ARM Cortex-M common
@@ -26,10 +27,15 @@
  * @todo        remove include irq.h once core was adjusted
  */
 
+#ifndef CPU_H
+#define CPU_H
+
+#include <stdio.h>
+
 #include "irq.h"
 #include "sched.h"
 #include "thread.h"
-#include "cpu_conf.h" /* IWYU pragma: export */
+#include "cpu_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -246,4 +252,5 @@ bool cpu_check_address(volatile const char *address);
 }
 #endif
 
+#endif /* CPU_H */
 /** @} */

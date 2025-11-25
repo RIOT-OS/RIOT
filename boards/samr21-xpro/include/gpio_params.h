@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 Freie Universität Berlin
+ *               2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup   boards_samr21-xpro
@@ -17,6 +18,9 @@
  * @author    Kaspar Schleiser <kaspar@schleiser.de>
  * @author    Sebastian Meiling <s@mlng.net>
  */
+
+#ifndef GPIO_PARAMS_H
+#define GPIO_PARAMS_H
 
 #include "board.h"
 #include "saul/periph.h"
@@ -48,4 +52,5 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 }
 #endif
 
+#endif /* GPIO_PARAMS_H */
 /** @} */

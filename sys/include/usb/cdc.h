@@ -6,8 +6,6 @@
  * more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    usb_cdc   CDC - USB communications device class
  * @ingroup     usb
@@ -21,6 +19,9 @@
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  * @author      Koen Zandberg <koen@bergzand.net>
  */
+
+#ifndef USB_CDC_H
+#define USB_CDC_H
 
 #include <stdint.h>
 
@@ -300,4 +301,5 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
+#endif /* USB_CDC_H */
 /** @} */

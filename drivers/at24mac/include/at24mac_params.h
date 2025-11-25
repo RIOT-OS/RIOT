@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_at24mac
  *
@@ -17,6 +15,9 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+
+#ifndef AT24MAC_PARAMS_H
+#define AT24MAC_PARAMS_H
 
 #include "board.h"
 #include "at24mac.h"
@@ -58,4 +59,5 @@ static const at24mac_params_t at24mac_params[] =
 }
 #endif
 
+#endif /* AT24MAC_PARAMS_H */
 /** @} */

@@ -490,6 +490,7 @@ static void _result_components_matches_input(void)
     }
 }
 
+
 static void test_uri_parser__unterminated_string(void)
 {
     char *failure_msg =
@@ -548,6 +549,7 @@ static void test_uri_parser__unterminated_string(void)
         TEST_FAIL(failure_msg);
     }
 }
+
 
 Test *tests_uri_parser_tests(void)
 {

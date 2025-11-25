@@ -22,7 +22,7 @@ def testfunc(child):
     number_of_tests = int(child.match.group(1))
     initial_allocations = 0
     for _ in range(number_of_tests):
-        child.expect(r"Allocated {} Bytes at (0x)?[a-z0-9]+, total [a-z0-9]+\r\n"
+        child.expect(r"Allocated {} Bytes at 0x[a-z0-9]+, total [a-z0-9]+\r\n"
                      .format(chunk_size))
         child.expect(r'Allocations count: (\d+)\r\n',
                      timeout=ALLOCATION_TIMEOUT)
@@ -31,7 +31,7 @@ def testfunc(child):
         if initial_allocations == 0:
             initial_allocations = allocations
         assert initial_allocations == allocations
-        child.expect(r"Free {} Bytes at (0x)?[a-z0-9]+, total [a-z0-9]+\r\n"
+        child.expect(r"Free {} Bytes at 0x[a-z0-9]+, total [a-z0-9]+\r\n"
                      .format(chunk_size))
         child.expect(r'Free count: (\d+)\r\n', timeout=FREE_TIMEOUT)
         freed = int(child.match.group(1))

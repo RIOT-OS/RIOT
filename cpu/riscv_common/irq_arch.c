@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2017, 2019 Ken Rabold, JP Bonn
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017, 2019 Ken Rabold, JP Bonn
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -143,8 +146,8 @@ static void handle_trap(uword_t mcause)
 #ifdef DEVELHELP
             printf("Unhandled trap:\n");
             printf("  mcause: 0x%" PRIx32 "\n", trap);
-            printf("  mepc:   0x%lx\n", read_csr(mepc));
-            printf("  mtval:  0x%lx\n", read_csr(mtval));
+            printf("  mepc:   0x%" PRIx32 "\n", read_csr(mepc));
+            printf("  mtval:  0x%" PRIx32 "\n", read_csr(mtval));
 #endif
             /* Unknown trap */
             core_panic(PANIC_GENERAL_ERROR, "Unhandled trap");

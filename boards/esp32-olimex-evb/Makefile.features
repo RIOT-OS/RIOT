@@ -22,10 +22,4 @@ FEATURES_CONFLICT_MSG += "SD/MMC and SPI cannot be used at the same time on this
 FEATURES_PROVIDED += periph_can     # CAN peripheral interface
 FEATURES_PROVIDED += periph_eth     # Ethernet MAC (EMAC)
 
-ifneq (,$(filter olimex_esp32_gateway,$(USEMODULE)))
-  FEATURES_PROVIDED += arduino_analog
-endif
-FEATURES_PROVIDED += arduino_i2c
 FEATURES_PROVIDED += arduino_pins
-FEATURES_PROVIDED += arduino_spi
-FEATURES_PROVIDED += arduino_uart

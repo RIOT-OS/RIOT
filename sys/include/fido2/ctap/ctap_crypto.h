@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    fido2_ctap_crypto FIDO2 CTAP crypto
  * @ingroup     fido2_ctap
@@ -22,10 +20,12 @@
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
 
+#ifndef FIDO2_CTAP_CTAP_CRYPTO_H
+#define FIDO2_CTAP_CTAP_CRYPTO_H
+
 #include <stdint.h>
 
 #include "hashes/sha256.h"
-#include "fido2/ctap.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,9 +64,9 @@ typedef struct {
  *
  * Initializes crypto libs and creates key_agreement key pair
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_init(void);
+int fido2_ctap_crypto_init(void);
 
 /**
  * @brief Wrapper function for @ref random_bytes
@@ -74,18 +74,18 @@ ctap_status_code_t fido2_ctap_crypto_init(void);
  * @param[in] buf   buffer to hold random bytes
  * @param[in] len   length of @p buf
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_prng(uint8_t *buf, size_t len);
+int fido2_ctap_crypto_prng(uint8_t *buf, size_t len);
 
 /**
  * @brief Wrapper function for @ref sha256_init
  *
  * @param ctx  sha256_context_t handle to init
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_sha256_init(sha256_context_t *ctx);
+int fido2_ctap_crypto_sha256_init(sha256_context_t *ctx);
 
 /**
  * @brief Wrapper function for @ref sha256_update
@@ -94,9 +94,9 @@ ctap_status_code_t fido2_ctap_crypto_sha256_init(sha256_context_t *ctx);
  * @param[in] data Input data
  * @param[in] len  Length of @p data
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_sha256_update(sha256_context_t *ctx, const void *data, size_t len);
+int fido2_ctap_crypto_sha256_update(sha256_context_t *ctx, const void *data, size_t len);
 
 /**
  * @brief Wrapper for @ref sha256_final
@@ -104,9 +104,9 @@ ctap_status_code_t fido2_ctap_crypto_sha256_update(sha256_context_t *ctx, const 
  * @param ctx    sha256_context_t handle to use
  * @param digest resulting digest, this is the hash of all the bytes
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_sha256_final(sha256_context_t *ctx, void *digest);
+int fido2_ctap_crypto_sha256_final(sha256_context_t *ctx, void *digest);
 
 /**
  * @brief Wrapper function for @ref sha256
@@ -118,9 +118,9 @@ ctap_status_code_t fido2_ctap_crypto_sha256_final(sha256_context_t *ctx, void *d
  *
  * @note discards the pointer returned by @ref sha256
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_sha256(const void *data, size_t len,
+int fido2_ctap_crypto_sha256(const void *data, size_t len,
                              void *digest);
 
 /**
@@ -130,9 +130,9 @@ ctap_status_code_t fido2_ctap_crypto_sha256(const void *data, size_t len,
  * @param[in] key key used in the hmac-sha256 computation
  * @param[in] key_length length of @p key
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_hmac_sha256_init(hmac_context_t *ctx, const void *key,
+int fido2_ctap_crypto_hmac_sha256_init(hmac_context_t *ctx, const void *key,
                                        size_t key_length);
 
 /**
@@ -142,9 +142,9 @@ ctap_status_code_t fido2_ctap_crypto_hmac_sha256_init(hmac_context_t *ctx, const
  * @param[in] data pointer to the buffer to generate hash from
  * @param[in] len length of @p data
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_hmac_sha256_update(hmac_context_t *ctx, const void *data, size_t len);
+int fido2_ctap_crypto_hmac_sha256_update(hmac_context_t *ctx, const void *data, size_t len);
 
 /**
  * @brief Wrapper function for @ref hmac_sha256_final
@@ -153,9 +153,9 @@ ctap_status_code_t fido2_ctap_crypto_hmac_sha256_update(hmac_context_t *ctx, con
  * @param[out] digest the computed hmac-sha256,
  *             length MUST be SHA256_DIGEST_LENGTH
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_hmac_sha256_final(hmac_context_t *ctx, void *digest);
+int fido2_ctap_crypto_hmac_sha256_final(hmac_context_t *ctx, void *digest);
 
 /**
  * @brief Wrapper function for @ref hmac_sha256
@@ -169,9 +169,9 @@ ctap_status_code_t fido2_ctap_crypto_hmac_sha256_final(hmac_context_t *ctx, void
  *
  * @note discards the pointer returned by @ref hmac_sha256
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_hmac_sha256(const void *key,
+int fido2_ctap_crypto_hmac_sha256(const void *key,
                                   size_t key_length, const void *data, size_t len,
                                   void *digest);
 
@@ -182,9 +182,9 @@ ctap_status_code_t fido2_ctap_crypto_hmac_sha256(const void *key,
  * @param[in] priv_key  private key buffer
  * @param[in] len       length of @p priv_key
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_gen_keypair(ctap_crypto_pub_key_t *pub_key, uint8_t *priv_key, size_t len);
+int fido2_ctap_crypto_gen_keypair(ctap_crypto_pub_key_t *pub_key, uint8_t *priv_key, size_t len);
 
 /**
  * @brief Elliptic-curve Diffie-Hellmann
@@ -195,9 +195,9 @@ ctap_status_code_t fido2_ctap_crypto_gen_keypair(ctap_crypto_pub_key_t *pub_key,
  * @param[in] priv_key  private key
  * @param[in] key_len   length of @p priv_key
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_ecdh(uint8_t *out, size_t len,
+int fido2_ctap_crypto_ecdh(uint8_t *out, size_t len,
                            ctap_crypto_pub_key_t *pub_key, uint8_t *priv_key, size_t key_len);
 
 /**
@@ -210,9 +210,9 @@ ctap_status_code_t fido2_ctap_crypto_ecdh(uint8_t *out, size_t len,
  * @param[in] key               private key to use for signature
  * @param[in] key_len           length of @p key
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_get_sig(uint8_t *hash, size_t hash_len, uint8_t *sig,
+int fido2_ctap_crypto_get_sig(uint8_t *hash, size_t hash_len, uint8_t *sig,
                               size_t *sig_len, const uint8_t *key, size_t key_len);
 
 /**
@@ -225,9 +225,9 @@ ctap_status_code_t fido2_ctap_crypto_get_sig(uint8_t *hash, size_t hash_len, uin
  * @param[in] key              symmetric key to use for encryption
  * @param[in] key_len          length of @p key
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_aes_enc(uint8_t * out, size_t *out_len, uint8_t * in,
+int fido2_ctap_crypto_aes_enc(uint8_t * out, size_t *out_len, uint8_t * in,
                               size_t in_len, const uint8_t * key, size_t key_len);
 
 /**
@@ -240,9 +240,9 @@ ctap_status_code_t fido2_ctap_crypto_aes_enc(uint8_t * out, size_t *out_len, uin
  * @param[in] key              symmetric key to use for decryption
  * @param[in] key_len          length of @p key
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_aes_dec(uint8_t * out, size_t *out_len, uint8_t * in,
+int fido2_ctap_crypto_aes_dec(uint8_t * out, size_t *out_len, uint8_t * in,
                               size_t in_len, const uint8_t * key, size_t key_len);
 
 /**
@@ -261,9 +261,9 @@ ctap_status_code_t fido2_ctap_crypto_aes_dec(uint8_t * out, size_t *out_len, uin
  * @param[in] key              symmetric key to use for encryption
  * @param[in] key_len          length of @p key
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_aes_ccm_enc(uint8_t *out, size_t out_len,
+int fido2_ctap_crypto_aes_ccm_enc(uint8_t *out, size_t out_len,
                                   const uint8_t *in, size_t in_len,
                                   uint8_t *auth_data, size_t auth_data_len,
                                   uint8_t mac_len, uint8_t length_encoding,
@@ -286,9 +286,9 @@ ctap_status_code_t fido2_ctap_crypto_aes_ccm_enc(uint8_t *out, size_t out_len,
  * @param[in] key              symmetric key to use for encryption
  * @param[in] key_len          length of @p key
  *
- * @return @ref ctap_status_code_t
+ * @return @ref ctap_status_codes_t
  */
-ctap_status_code_t fido2_ctap_crypto_aes_ccm_dec(uint8_t *out, size_t out_len,
+int fido2_ctap_crypto_aes_ccm_dec(uint8_t *out, size_t out_len,
                                   const uint8_t *in, size_t in_len,
                                   uint8_t *auth_data, size_t auth_data_len,
                                   uint8_t mac_len, uint8_t length_encoding,
@@ -297,4 +297,5 @@ ctap_status_code_t fido2_ctap_crypto_aes_ccm_dec(uint8_t *out, size_t out_len,
 #ifdef __cplusplus
 }
 #endif
+#endif /* FIDO2_CTAP_CTAP_CRYPTO_H */
 /** @} */

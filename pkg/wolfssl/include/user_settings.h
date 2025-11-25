@@ -1,6 +1,7 @@
-#pragma once
-
 /* user_settings.h : custom configuration for wolfcrypt/wolfSSL */
+
+#ifndef USER_SETTINGS_H
+#define USER_SETTINGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,10 +60,10 @@ extern "C" {
 #define HAVE_TLS_EXTENSIONS
 #endif
 
-/* Align on 32-bit (exc. native32,
+/* Align on 32-bit (exc. native,
  * don't modify default alignment.)
  */
-#ifndef BOARD_NATIVE32
+#ifndef BOARD_NATIVE
 #define WOLFSSL_GENERAL_ALIGNMENT 4
 #endif
 
@@ -336,6 +337,7 @@ int strncasecmp(const char *s1, const char * s2, size_t sz);
  */
 #define _SAML21_AES_COMPONENT_
 #define _SAMD51_AES_COMPONENT_
-#define _SAME51_AES_COMPONENT_
 #define _SAME54_AES_COMPONENT_
 #define _SAMR34_AES_COMPONENT_
+
+#endif /* USER_SETTINGS_H */

@@ -1,4 +1,0 @@
-# include sam common periph drivers
-USEMODULE += sam_common_periph
-
-include $(RIOTCPU)/cortexm_common/Makefile.dep

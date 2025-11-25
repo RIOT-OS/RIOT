@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_sock_util_conf SOCK utility functions compile configurations
  * @ingroup     net_sock_conf
@@ -19,6 +17,9 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef NET_SOCK_CONFIG_H
+#define NET_SOCK_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,4 +66,5 @@ extern "C" {
 }
 #endif
 
+#endif /* NET_SOCK_CONFIG_H */
 /** @} */

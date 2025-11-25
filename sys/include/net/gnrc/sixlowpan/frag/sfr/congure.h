@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup net_gnrc_sixlowpan_frag_sfr_congure Congestion control for 6LoWPAN SFR
  * @ingroup net_gnrc_sixlowpan_frag_sfr
@@ -28,6 +26,8 @@
  *
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef NET_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE_H
+#define NET_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE_H
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -427,4 +427,5 @@ static inline void gnrc_sixlowpan_frag_sfr_congure_snd_report_ecn(
 }
 #endif
 
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE_H */
 /** @} */

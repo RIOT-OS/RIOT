@@ -1,0 +1,6 @@
+CPU = native
+
+FEATURES_PROVIDED += arch_32bit
+NATIVE_ARCH_BIT = 32
+
+include $(RIOTBOARD)/native/common_features.inc.mk

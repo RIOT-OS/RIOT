@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2015-2016 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015-2016 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_saml21
@@ -15,6 +16,9 @@
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include "periph_cpu_common.h"
 
@@ -170,4 +174,5 @@ struct sam0_aux_cfg_mapping {
 }
 #endif
 
+#endif /* PERIPH_CPU_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_driver_cryptocell_310
  * @{
@@ -18,6 +16,8 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
+#ifndef PSA_ERROR_H
+#define PSA_ERROR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,4 +58,5 @@ const char *cryptocell310_status_to_humanly_readable(uint32_t status);
 }
 #endif
 
+#endif /* PSA_ERROR_H */
 /** @} */

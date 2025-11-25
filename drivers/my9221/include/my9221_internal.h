@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_my9221
  *
@@ -17,6 +15,9 @@
  *
  * @author      Sebastian Meiling <s@mlng.net>
  */
+
+#ifndef MY9221_INTERNAL_H
+#define MY9221_INTERNAL_H
 
 #include "xtimer.h"
 
@@ -43,4 +44,5 @@ extern "C" {
 }
 #endif
 
+#endif /* MY9221_INTERNAL_H */
 /** @} */

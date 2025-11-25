@@ -8,8 +8,6 @@
  *
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_lsm6dsxx
  * @{
@@ -22,6 +20,9 @@
  * @author      Miquel Borrell <miquel.borrell@haw-hamburg.de>
  *
  */
+
+#ifndef LSM6DSXX_INTERNAL_H
+#define LSM6DSXX_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -187,4 +188,5 @@ extern "C" {
 }
 #endif
 
+#endif /* LSM6DSXX_INTERNAL_H */
 /** @} */

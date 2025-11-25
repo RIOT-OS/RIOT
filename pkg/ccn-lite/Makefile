@@ -1,6 +1,6 @@
 PKG_NAME=ccn-lite
 PKG_URL=https://github.com/cn-uofbasel/ccn-lite/
-PKG_VERSION=74568442b48b1154719fce8210d9974d75537502
+PKG_VERSION=0aa974b0efdaabc61df95f35af5f74f5ed148aa8
 PKG_LICENSE=ISC
 
 include $(RIOTBASE)/pkg/pkg.mk
@@ -27,12 +27,9 @@ $(BINDIR)/ccn-lite.a: $(PKG_BUILD_DIR)/lib/libccnl-riot.a
 $(PKG_BUILD_DIR)/lib/libccnl-riot.a: $(PKG_BUILD_DIR)/Makefile
 	$(MAKE) -C $(PKG_BUILD_DIR)
 
-# TODO: Drop `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` once upstream is compatible
-#       with newer cmake (e.g. compilation still succeeds with cmake 4.x)
 $(PKG_BUILD_DIR)/Makefile: $(PKG_PREPARED) $(TOOLCHAIN_FILE) | ..cmake_version_supported
 	cmake -B$(PKG_BUILD_DIR) -H$(PKG_SOURCE_DIR)/src \
 	      -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
-	      -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
 	      -DCCNL_RIOT=1 -DRIOT_CFLAGS="$(RIOT_CFLAGS)" -DBUILD_TESTING=OFF
 
 $(TOOLCHAIN_FILE): FORCE

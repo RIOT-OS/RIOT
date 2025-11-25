@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_driver_cryptocell_310
  * @{
@@ -19,6 +17,9 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
+
+#ifndef PSA_CRYPTOCELL_310_AES_COMMON_H
+#define PSA_CRYPTOCELL_310_AES_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,4 +69,5 @@ psa_status_t cryptocell_310_common_aes_encrypt_decrypt(SaSiAesUserContext_t *ctx
 }
 #endif
 
+#endif /* PSA_CRYPTOCELL_310_AES_COMMON_H */
 /** @} */

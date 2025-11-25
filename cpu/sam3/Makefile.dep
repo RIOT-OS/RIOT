@@ -1,1 +1,1 @@
-include $(RIOTCPU)/sam_common/Makefile.dep
+include $(RIOTCPU)/cortexm_common/Makefile.dep

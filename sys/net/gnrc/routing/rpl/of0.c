@@ -25,18 +25,18 @@
 
 static uint16_t calc_rank(gnrc_rpl_dodag_t *, uint16_t);
 static int parent_cmp(gnrc_rpl_parent_t *, gnrc_rpl_parent_t *);
-static int which_dodag(gnrc_rpl_dodag_t *, gnrc_rpl_dio_t *);
+static gnrc_rpl_dodag_t *which_dodag(gnrc_rpl_dodag_t *, gnrc_rpl_dodag_t *);
 static void reset(gnrc_rpl_dodag_t *);
 
 static gnrc_rpl_of_t gnrc_rpl_of0 = {
-    .ocp = 0x0,
-    .calc_rank = calc_rank,
-    .parent_cmp = parent_cmp,
-    .which_dodag = which_dodag,
-    .reset = reset,
+    .ocp          = 0x0,
+    .calc_rank    = calc_rank,
+    .parent_cmp   = parent_cmp,
+    .which_dodag  = which_dodag,
+    .reset        = reset,
     .parent_state_callback = NULL,
-    .init = NULL,
-    .process_dio = NULL
+    .init         = NULL,
+    .process_dio  = NULL
 };
 
 gnrc_rpl_of_t *gnrc_rpl_get_of0(void)
@@ -87,59 +87,9 @@ int parent_cmp(gnrc_rpl_parent_t *parent1, gnrc_rpl_parent_t *parent2)
     return 0;
 }
 
-int which_dodag(gnrc_rpl_dodag_t *d1, gnrc_rpl_dio_t *dio)
+/* Not used yet */
+gnrc_rpl_dodag_t *which_dodag(gnrc_rpl_dodag_t *d1, gnrc_rpl_dodag_t *d2)
 {
-    /* RFC 6552, Section 4.2 */
-
-    /* parent set must not be empty */
-    if ((d1->node_status != GNRC_RPL_ROOT_NODE) && !d1->parents) {
-        return 1;
-    }
-
-    /* prefer grounded dodag */
-    int dio_grounded = dio->g_mop_prf >> GNRC_RPL_GROUNDED_SHIFT;
-    if (d1->grounded > dio_grounded) {
-        return -1;
-    }
-    else if (dio_grounded > d1->grounded) {
-        return 1;
-    }
-
-    int dio_prf = dio->g_mop_prf & GNRC_RPL_PRF_MASK;
-
-    /* prefer dodag with more preferable root */
-    if (d1->prf > dio_prf) {
-        return -1;
-    }
-    else if (dio_prf > d1->prf) {
-        return 1;
-    }
-
-    /* prefer DODAG with more recent version */
-    if (ipv6_addr_equal(&d1->dodag_id, &dio->dodag_id)) {
-        if (GNRC_RPL_COUNTER_GREATER_THAN(d1->version, dio->version_number)) {
-            return -1;
-        }
-        else if (GNRC_RPL_COUNTER_GREATER_THAN(dio->version_number, d1->version)) {
-            return 1;
-        }
-    }
-
-    /* prefer dodag with lesser resulting rank */
-    /* TODO: calc rank properly */
-    int d1_rank = d1->parents->rank;
-    int d2_rank = byteorder_ntohs(dio->rank);
-    if (d1_rank < d2_rank) {
-        return -1;
-    }
-    else if (d2_rank < d1_rank) {
-        return 1;
-    }
-
-    /* prefer DODAG for which there is an alternate parent */
-    if (d1->parents->next) {
-        return -1;
-    }
-
-    return 0;
+    (void) d2;
+    return d1;
 }

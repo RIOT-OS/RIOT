@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_adt7310 ADT7310 SPI temperature sensor
  * @ingroup     drivers_sensors
@@ -48,6 +46,9 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
+
+#ifndef ADT7310_H
+#define ADT7310_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -176,4 +177,5 @@ float adt7310_read_float(const adt7310_t *dev);
 }
 #endif
 
+#endif /* ADT7310_H */
 /** @} */

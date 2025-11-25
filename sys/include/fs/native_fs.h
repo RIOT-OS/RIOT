@@ -6,20 +6,21 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
- * @defgroup sys_fs_native Native FS Integration
- * @ingroup cpu_native
- * @brief Access to the host filesystem from RIOT native
+ * @defgroup    sys_fs_native native fs integration
+ * @ingroup     cpu_native
+ * @brief       Access to the host fs from RIOT native
  *
  * @{
  *
  * @file
- * @brief       Native integration with virtual filesystem (VFS)
+ * @brief       native integration with vfs
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+
+#ifndef FS_NATIVE_FS_H
+#define FS_NATIVE_FS_H
 
 #include <stdalign.h>
 
@@ -45,4 +46,5 @@ extern const vfs_file_system_t native_file_system;
 }
 #endif
 
+#endif /* FS_NATIVE_FS_H */
 /** @} */

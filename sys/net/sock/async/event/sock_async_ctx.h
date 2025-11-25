@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  net_sock_async_event
  * @{
@@ -17,6 +15,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef SOCK_ASYNC_CTX_H
+#define SOCK_ASYNC_CTX_H
 
 #include "event.h"
 
@@ -70,4 +70,5 @@ typedef struct {
 }
 #endif
 
+#endif /* SOCK_ASYNC_CTX_H */
 /** @} */

@@ -14,8 +14,6 @@
  * @{
  */
 
-#include <inttypes.h>
-#include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -39,7 +37,7 @@
 
 #define DEBUG_DEV(m, d, ...) \
         DEBUG("[l3gxxxx] %s dev=%" PRIxPTR ": " m "\n", \
-              __func__, (uintptr_t)d, ## __VA_ARGS__)
+              __func__, (unsigned int)d, ## __VA_ARGS__)
 
 #else /* ENABLE_DEBUG */
 
@@ -1034,7 +1032,7 @@ static int _read(const l3gxxxx_t *dev, uint8_t reg, uint8_t *data, uint8_t len)
 
         if (ENABLE_DEBUG) {
             printf("[l3gxxxx] %s dev=%" PRIxPTR ": read following bytes: ",
-                   __func__,  (uintptr_t)dev);
+                   __func__,  (unsigned int)dev);
             for (uint8_t i = 0; i < len; i++) {
                 printf("%02x ", data[i]);
             }
@@ -1061,7 +1059,7 @@ static int _read(const l3gxxxx_t *dev, uint8_t reg, uint8_t *data, uint8_t len)
 
         if (ENABLE_DEBUG) {
             printf("[l3gxxxx] %s dev=%" PRIxPTR ": read following bytes: ",
-                   __func__,  (uintptr_t)dev);
+                   __func__,  (unsigned int)dev);
             for (uint8_t i = 0; i < len; i++) {
                 printf("%02x ", data[i]);
             }
@@ -1092,7 +1090,7 @@ static int _write(const l3gxxxx_t *dev,
 
         if (ENABLE_DEBUG) {
             printf("[l3gxxxx] %s dev=%" PRIxPTR ": write following bytes: ",
-                   __func__,  (uintptr_t)dev);
+                   __func__,  (unsigned int)dev);
             for (uint8_t i = 0; i < len; i++) {
                 printf("%02x ", data[i]);
             }
@@ -1114,7 +1112,7 @@ static int _write(const l3gxxxx_t *dev,
 
         if (ENABLE_DEBUG) {
             printf("[l3gxxxx] %s dev=%" PRIxPTR ": write following bytes: ",
-                   __func__,  (uintptr_t)dev);
+                   __func__,  (unsigned int)dev);
             for (uint8_t i = 0; i < len; i++) {
                 printf("%02x ", data[i]);
             }

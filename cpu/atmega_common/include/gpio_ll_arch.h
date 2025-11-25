@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_atmega_common
@@ -18,6 +19,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef GPIO_LL_ARCH_H
+#define GPIO_LL_ARCH_H
 
 #include <assert.h>
 
@@ -53,85 +57,19 @@ extern "C" {
  * whenever the port number is known at compile time.
  */
 
-#define GPIO_PORT_NUMBERING_ALPHABETIC  1
-
-#ifdef PINA
-/* We sadly cannot use PINA, as PINA is technically (in terms of C spec lingo)
- * not constant and would trigger:
- *      initializer element is not constant
- * Hence, the defines are a bit more involved to yield proper constants
- * suitable for initializers.
- */
-#  define GPIO_PORT_0   (ATMEGA_GPIO_BASE_A)
+#ifdef PORTH
+#define GPIO_PORT(num) \
+    ((num >= PORT_H) ? \
+     (ATMEGA_GPIO_BASE_H + ((num) - PORT_H) * ATMEGA_GPIO_SIZE) : \
+     (ATMEGA_GPIO_BASE_A + (num) * ATMEGA_GPIO_SIZE))
+#define GPIO_PORT_NUM(port) \
+    (((port) >= ATMEGA_GPIO_BASE_H) ? \
+     (((port) - ATMEGA_GPIO_BASE_H) / ATMEGA_GPIO_SIZE + PORT_H) : \
+     (((port) - ATMEGA_GPIO_BASE_A) / ATMEGA_GPIO_SIZE))
+#else
+#define GPIO_PORT(num) (ATMEGA_GPIO_BASE_A + (num) * ATMEGA_GPIO_SIZE)
+#define GPIO_PORT_NUM(port) (((port) - ATMEGA_GPIO_BASE_A) / ATMEGA_GPIO_SIZE)
 #endif
-
-#ifdef PINB
-#  define GPIO_PORT_1   (ATMEGA_GPIO_BASE_A + 1 * ATMEGA_GPIO_SIZE)
-#endif
-
-#ifdef PINC
-#  define GPIO_PORT_2   (ATMEGA_GPIO_BASE_A + 2 * ATMEGA_GPIO_SIZE)
-#endif
-
-#ifdef PIND
-#  define GPIO_PORT_3   (ATMEGA_GPIO_BASE_A + 3 * ATMEGA_GPIO_SIZE)
-#endif
-
-#ifdef PINE
-#  define GPIO_PORT_4   (ATMEGA_GPIO_BASE_A + 4 * ATMEGA_GPIO_SIZE)
-#endif
-
-#ifdef PINF
-#  define GPIO_PORT_5   (ATMEGA_GPIO_BASE_A + 5 * ATMEGA_GPIO_SIZE)
-#endif
-
-#ifdef PING
-#  define GPIO_PORT_6   (ATMEGA_GPIO_BASE_A + 6 * ATMEGA_GPIO_SIZE)
-#endif
-
-/* There is a larger gap between PING and PINH to allow other peripherals to
- * also be mapped into the fast I/O memory area. */
-#ifdef PINH
-#  define GPIO_PORT_7   (ATMEGA_GPIO_BASE_H)
-#endif
-
-#ifdef PINI
-#  define GPIO_PORT_8   (ATMEGA_GPIO_BASE_H + 1 * ATMEGA_GPIO_SIZE)
-#endif
-
-#ifdef PINJ
-#  define GPIO_PORT_9   (ATMEGA_GPIO_BASE_H + 2 * ATMEGA_GPIO_SIZE)
-#endif
-
-#ifdef PINK
-#  define GPIO_PORT_10  (ATMEGA_GPIO_BASE_H + 3 * ATMEGA_GPIO_SIZE)
-#endif
-
-#ifdef PINL
-#  define GPIO_PORT_11  (ATMEGA_GPIO_BASE_H + 4 * ATMEGA_GPIO_SIZE)
-#endif
-
-static inline gpio_port_t gpio_port(uword_t num)
-{
-#ifdef PINH
-    if (num >= PORT_H) {
-        return ATMEGA_GPIO_BASE_H + ((num - PORT_H) * ATMEGA_GPIO_SIZE);
-    }
-#endif
-
-    return ATMEGA_GPIO_BASE_A + (num * ATMEGA_GPIO_SIZE);
-}
-
-static inline uword_t gpio_port_num(gpio_port_t port)
-{
-#ifdef PINH
-    if ((port) >= ATMEGA_GPIO_BASE_H) {
-        return (port - ATMEGA_GPIO_BASE_H) / ATMEGA_GPIO_SIZE + PORT_H;
-    }
-#endif
-
-     return (port - ATMEGA_GPIO_BASE_A) / ATMEGA_GPIO_SIZE;
-}
 
 static inline uword_t gpio_ll_read(gpio_port_t port)
 {
@@ -220,7 +158,7 @@ static inline void gpio_ll_write(gpio_port_t port, uword_t value)
 
 static inline gpio_port_t gpio_get_port(gpio_t pin)
 {
-    return gpio_port(pin >> 4);
+    return GPIO_PORT(pin >> 4);
 }
 
 static inline uint8_t gpio_get_pin_num(gpio_t pin)
@@ -368,4 +306,5 @@ static inline bool is_gpio_port_num_valid(uint_fast8_t num)
 }
 #endif
 
+#endif /* GPIO_LL_ARCH_H */
 /** @} */

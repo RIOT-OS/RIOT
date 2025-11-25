@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_periph_adc ADC
  * @ingroup     drivers_periph
@@ -53,6 +51,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef PERIPH_ADC_H
+#define PERIPH_ADC_H
 
 #include <limits.h>
 #include <stdint.h>
@@ -141,6 +142,8 @@ void adc_continuous_begin(adc_res_t res);
  *
  * @note requires the `periph_adc_continuous` feature
  *
+ * @brief   Sample a value from the given ADC line
+ *
  * @return                  the sampled value on success
  */
 int32_t adc_continuous_sample(adc_t line);
@@ -156,4 +159,5 @@ void adc_continuous_stop(void);
 }
 #endif
 
+#endif /* PERIPH_ADC_H */
 /** @} */

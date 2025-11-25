@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     net_gnrc_pktbuf
  * @brief       Internal stuff for gnrc_pktbuf
@@ -22,6 +20,8 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+#ifndef PKTBUF_INTERNAL_H
+#define PKTBUF_INTERNAL_H
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -88,4 +88,5 @@ bool gnrc_pktbuf_is_sane(void);
 }
 #endif
 
+#endif /* PKTBUF_INTERNAL_H */
 /** @} */

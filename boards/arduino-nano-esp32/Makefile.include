@@ -1,6 +1,0 @@
-# the board uses a ESP32-S3 with embedded 8MB QSPI PSRAM and a 16MB QSPI Flash
-FLASH_SIZE ?= 16
-
-PORT_LINUX ?= /dev/ttyACM0
-
-OPENOCD_CONFIG ?= board/esp32s3-builtin.cfg

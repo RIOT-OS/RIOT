@@ -19,7 +19,6 @@
 #include <string.h>
 #include <errno.h>
 
-#include "bit.h"
 #include "log.h"
 #include "msg.h"
 #include "net/gnrc.h"

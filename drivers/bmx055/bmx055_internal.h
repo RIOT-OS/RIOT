@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_bmx055
  *
@@ -17,6 +15,9 @@
  *
  * @author      Semjon Kerner <semjon.kerner@fu-berlin.de>
  */
+
+#ifndef BMX055_INTERNAL_H
+#define BMX055_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,4 +82,5 @@ extern "C" {
 }
 #endif
 
+#endif /* BMX055_INTERNAL_H */
 /** @} */

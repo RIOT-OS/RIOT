@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @experimental
  * @defgroup    net_l2filter Link layer address filter
@@ -30,6 +28,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef NET_L2FILTER_H
+#define NET_L2FILTER_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -83,10 +84,8 @@ typedef struct {
  * @pre     @p addr != NULL
  * @pre     @p addr_maxlen <= @ref CONFIG_L2FILTER_ADDR_MAXLEN
  *
- * @retval  0 on success
- * @retval  -ENOMEM if no empty slot left in list
- * @retval  -EINVAL if `addr_len > CONFIG_L2FILTER_ADDR_MAXLEN` **AND** `NDEBUG` is enabled.
- *          Otherwise this condition will trip an `assert()`.
+ * @return  0 on success
+ * @return  -ENOMEM if no empty slot left in list
  */
 int l2filter_add(l2filter_t *list, const void *addr, size_t addr_len);
 
@@ -133,4 +132,5 @@ bool l2filter_pass(const l2filter_t *list, const void *addr, size_t addr_len);
 }
 #endif
 
+#endif /* NET_L2FILTER_H */
 /** @} */

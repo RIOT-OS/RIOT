@@ -8,8 +8,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_nanosock nanoCoAP Sock
  * @ingroup     net
@@ -112,13 +110,10 @@
  * Start with coap_block2_init() to read the client request and initialize a
  * coap_slicer_t struct with the size and location for this slice of the
  * overall payload. Then write the block2 option in the response with
- * coap_opt_put_block2(). Use @ref coap_get_response_hdr_len to get the length
- * of the response header: This will be the offset in the buffer where you
- * should start adding options. The Block2 option includes an indicator
- * ("more") that a slice completes the overall payload transfer. You may not
- * know the value for _more_ at this point, but you must initialize the space
- * in the packet for the option before writing the payload. The option is
- * rewritten later.
+ * coap_opt_put_block2(). The option includes an indicator ("more") that a
+ * slice completes the overall payload transfer. You may not know the value for
+ * _more_ at this point, but you must initialize the space in the packet for
+ * the option before writing the payload. The option is rewritten later.
  *
  * Next, use the coap_blockwise_put_xxx() functions to write the payload
  * content. These functions use the coap_block_slicer_t to enable or disable
@@ -136,6 +131,9 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+
+#ifndef NET_NANOCOAP_SOCK_H
+#define NET_NANOCOAP_SOCK_H
 
 #include <stdint.h>
 #include <unistd.h>
@@ -190,13 +188,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Event priority for nanoCoAP sock events (e.g. used by `nanocoap_sock_observe`)
- */
-#ifndef CONFIG_NANOCOAP_SOCK_EVENT_PRIO
-#  define CONFIG_NANOCOAP_SOCK_EVENT_PRIO       EVENT_PRIO_MEDIUM
-#endif
-
-/**
  * @brief   NanoCoAP socket types
  */
 typedef enum {
@@ -217,8 +208,6 @@ typedef struct {
     nanocoap_socket_type_t type;            /**< Socket type (UDP, DTLS) */
 #endif
     uint16_t msg_id;                        /**< next CoAP message ID */
-    uint8_t hdr_buf[CONFIG_NANOCOAP_BLOCK_HEADER_MAX]; /**< buffer for CoAP header with options,
-                                                            token and payload marker */
 } nanocoap_sock_t;
 
 /**
@@ -233,20 +222,13 @@ typedef struct {
 } coap_block_request_t;
 
 /**
- * @brief   Observe Client helper struct
- */
-typedef struct {
-    coap_request_cb_t cb;           /**< user callback function             */
-    void *arg;                      /**< callback function argument         */
-    nanocoap_sock_t sock;           /**< socket used for the request        */
-} coap_observe_client_t;
-
-/**
  * @brief   Context from CoAP request for separate response
  */
 typedef struct {
     sock_udp_ep_t remote;           /**< remote to send response to         */
+#if defined(MODULE_SOCK_AUX_LOCAL) || DOXYGEN
     sock_udp_ep_t local;            /**< local from which to send response  */
+#endif
     uint8_t token[COAP_TOKEN_LENGTH_MAX];   /**< request token              */
     uint8_t tkl;                    /**< request token length               */
     uint8_t no_response;            /**< no-response bitmap                 */
@@ -261,47 +243,20 @@ typedef struct {
  * The CoAP handler should then respond with an empty ACK by calling
  * @ref coap_build_empty_ack
  *
- * @warning This function is only available when using the module
- *          `nanocoap_server_separate`
- *
  * @param[out]  ctx     Context information for separate response
  * @param[in]   pkt     CoAP packet to which the response will be generated
  * @param[in]   req     Context of the CoAP request
- *
- * @retval  0           Success
- * @retval  -EOVERFLOW  Storing context would have overflown buffers in @p ctx
- *                      (e.g. RFC 8974 (module `nanocoap_token_ext`) is in
- *                      use and token too long)
- * @retval  <0          Other error
  */
-int nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
-                                     coap_pkt_t *pkt, const coap_request_ctx_t *req);
+void nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
+                                      coap_pkt_t *pkt, const coap_request_ctx_t *req);
 
 /**
- * @brief   Check if a given separate response context was prepared for the
- *          remote endpoint of a given request
- *
- * @param[in]   ctx     Separate response context to check
- * @param[in]   req     Request from the remote to check for
- *
- * @retval  true        The remote endpoint given by @p req is in @p ctx
- * @retval  false       @p ctx was prepared for a different remote endpoint
- */
-bool nanocoap_server_is_remote_in_response_ctx(const nanocoap_server_response_ctx_t *ctx,
-                                               const coap_request_ctx_t *req);
-
-/**
- * @brief   Build and send a separate response to a CoAP request
+ * @brief   Send a separate response to a CoAP request
  *
  *  This sends a response to a CoAP request outside the CoAP handler
  *
  * @pre     @ref nanocoap_server_prepare_separate has been called on @p ctx
  *          inside the CoAP handler
- * @pre     Synchronization between calls of this function and calls of
- *          @ref nanocoap_server_prepare_separate is ensured
- *
- * @warning This function is only available when using the module
- *          `nanocoap_server_separate`
  *
  * @param[in]   ctx     Context information for the CoAP response
  * @param[in]   code    CoAP response code
@@ -309,159 +264,12 @@ bool nanocoap_server_is_remote_in_response_ctx(const nanocoap_server_response_ct
  * @param[in]   payload Response payload
  * @param[in]   len     Payload length
  *
- * @retval      0               Success
- * @retval      -ECANCELED      Request contained no-response option that did match the given @p code
- * @retval      <0              Negative errno code indicating the error
+ * @returns     0 on success
+ *              negative error (see @ref sock_udp_sendv_aux)
  */
 int nanocoap_server_send_separate(const nanocoap_server_response_ctx_t *ctx,
                                   unsigned code, unsigned type,
                                   const void *payload, size_t len);
-
-/**
- * @brief   Build a separate response header to a CoAP request
- *
- * This builds the response packet header. You may add CoAP Options, a payload
- * marker and a payload as needed after the header.
- *
- * @pre     @ref nanocoap_server_prepare_separate has been called on @p ctx
- *          inside the CoAP handler
- * @pre     Synchronization between calls of this function and calls of
- *          @ref nanocoap_server_prepare_separate is ensured
- *
- * @warning This function is only available when using the module
- *          `nanocoap_server_separate`
- *
- * @param[in]   ctx     Context information for the CoAP response
- * @param[out]  buf     Buffer to write the header to
- * @param[in]   buf_len Length of @p buf in bytes
- * @param[in]   code    CoAP response code
- * @param[in]   type    Response type, may be `COAP_TYPE_NON`
- * @param[in]   msg_id  Message ID to send
- *
- * @return      Length of the header build in bytes
- * @retval      -ECANCELED      Request contained no-response option that did match the given @p code
- * @retval      <0              Negative errno code indicating the error
- */
-ssize_t nanocoap_server_build_separate(const nanocoap_server_response_ctx_t *ctx,
-                                       void *buf, size_t buf_len,
-                                       unsigned code, unsigned type,
-                                       uint16_t msg_id);
-
-/**
- * @brief   Send an already build separate response
- *
- * @pre     @ref nanocoap_server_prepare_separate has been called on @p ctx
- *          inside the CoAP handler
- * @pre     Synchronization between calls of this function and calls of
- *          @ref nanocoap_server_prepare_separate is ensured
- * @pre     @ref nanocoap_server_build_separate has been used to build the
- *          header in @p msg
- *
- * @warning This function is only available when using the module
- *          `nanocoap_server_separate`
- *
- * @param[in]   ctx     Context information for the CoAP response
- * @param[in]   reply   I/O list containing the reply to send
- *
- * @retval      0   Success
- * @retval      <0  negative errno code indicating the error
- */
-int nanocoap_server_sendv_separate(const nanocoap_server_response_ctx_t *ctx,
-                                   const iolist_t *reply);
-
-/**
- * @brief           Register an observer
- * @param[in]       req_ctx         Request context belonging to @p req_pkt
- * @param[in,out]   req_pkt         Request that contained the observe registration request
- *
- * @warning This depends on module `nanocoap_server_observe`
- *
- * @note    If the same endpoint already was registered on the same resource,
- *          it will just update the token and keep the existing entry. This
- *          way duplicate detection is not needed and we eagerly can reclaim
- *          resources when a client lost state.
- *
- * @warning Preventing the same endpoint to registers more than once (using
- *          different tokens) to the same resource deviates from RFC 7641.
- *
- * The deviation here is intentional. A server can receive a second registration
- * from the same endpoint for the same resource for one of the following
- * reasons:
- *
- * 1. Reaffirming the registration by using the same token again.
- * 2. Losing state on the client side.
- * 3. A malicious client trying to exhaust resources.
- * 4. The same resource has different representations depending on the
- *    request. (E.g. `/.well-known/core` can yield a wildly different response
- *    depending on filters provided via URI-Query Options.)
- *
- * For case 1 updating the registration is matching what the spec mandates.
- * For two the old registration will not be of value for the client, and
- * overwriting it makes more efficient use of network bandwidth and RAM.
- * For 3 the deviation forces the adversary to send observe requests from
- * different ports to exhaust resources, which is a very minor improvement.
- * For 4 the deviation is a problem. However, the observe API does not allow to
- * send out different notification messages for the same resource anyway, so
- * case 4 cannot occur here.
- *
- * @retval  0           Success
- * @retval  -ENOMEM     Not enough resources to register another observer
- * @retval  <0          Negative errno code indicating error
- */
-int nanocoap_register_observer(const coap_request_ctx_t *req_ctx, coap_pkt_t *req_pkt);
-
-/**
- * @brief   Unregister an observer
- * @param   req_ctx         Request context belonging to @p req_pkt
- * @param   req_pkt         Received request for unregistration
- *
- * @warning This depends on module `nanocoap_server_observe`
- *
- * @note    It is safe to call this multiple times, e.g. duplicate detection
- *          is not needed for this.
- */
-void nanocoap_unregister_observer(const coap_request_ctx_t *req_ctx,
-                                  const coap_pkt_t *req_pkt);
-
-/**
- * @brief   Unregister a stale observation due to a reset message received
- * @param[in]   ep      Endpoint to wipe from the observer list
- * @param[in]   msg_id  Message ID of the notification send.
- */
-void nanocoap_unregister_observer_due_to_reset(const sock_udp_ep_t *ep,
-                                               uint16_t msg_id);
-
-/**
- * @brief   Notify all currently registered observers of the given resource
- *
- * @param[in]   res     Resource to send updates for
- * @param[in]   iol     I/O list containing the CoAP Options, payload marker,
- *                      and payload of the update to send up
- *
- * @pre     @p iol contains everything but the CoAP header needed to send out.
- *          This will at least be a CoAP observe option, a payload marker,
- *          and a payload
- *
- * @post    For each registered observer a CoAP packet header is generated and
- *          the concatenation of that header and the provided list is sent
- */
-void nanocoap_notify_observers(const coap_resource_t *res, const iolist_t *iol);
-
-/**
- * @brief   Build and send notification to observers registered to a specific
- *          resource.
- *
- * @note    Use @ref nanocoap_notify_observers for more control (such
- *          as adding custom options) over the notification(s) to send.
- *
- * @param[in]   res         Resource to send updates for
- * @param[in]   obs         24-bit number to add as observe option
- * @param[in]   payload     Payload to send out
- * @param[in]   payload_len Length of @p payload in bytes
- */
-void nanocoap_notify_observers_simple(const coap_resource_t *res, uint32_t obs,
-                                      const void *payload, size_t payload_len);
-
 /**
  * @brief   Get next consecutive message ID for use when building a new
  *          CoAP request.
@@ -476,17 +284,18 @@ static inline uint16_t nanocoap_sock_next_msg_id(nanocoap_sock_t *sock)
 }
 
 /**
- * @brief   Start a nanoCoAP server instance
+ * @brief   Start a nanocoap server instance
  *
- * This function only returns if there's an error binding to @p local.
+ * This function only returns if there's an error binding to @p local, or if
+ * receiving of UDP packets fails.
  *
  * @param[in]   local   local UDP endpoint to bind to
- * @param[in]   buf     response buffer to use
+ * @param[in]   buf     input buffer to use
  * @param[in]   bufsize size of @p buf
  *
- * @returns     return code of @see sock_udp_create on error
+ * @returns     -1 on error
  */
-int nanocoap_server(sock_udp_ep_t *local, void *buf, size_t bufsize);
+int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize);
 
 /**
  * @brief   Create and start the nanoCoAP server thread
@@ -567,72 +376,18 @@ static inline void nanocoap_sock_close(nanocoap_sock_t *sock)
 }
 
 /**
- * @brief   Observe a CoAP resource behind a URL (via GET)
- *
- * @note This requires the `nanocoap_sock_observe` module.
- *
- * @param[in]   url     URL to subscribe to
- * @param[out]  ctx     nanoCoAP observe context
- * @param[in]   cb      callback function called for every resource update
- * @param[in]   arg     callback function argument
- *
- * @returns     Number of bytes send on success
- * @retval      -EPROTONOSUPPORT    registration failed
- * @retval      <0                  other error
-
- */
-ssize_t nanocoap_sock_observe_url(const char *url, coap_observe_client_t *ctx,
-                                  coap_request_cb_t cb, void *arg);
-/**
- * @brief   Stop observing a CoAP resource
- *
- * @note This requires the `nanocoap_sock_observe` module.
- *
- * @param[in]   url     URL to unsubscribe subscribe from
- * @param[out]  ctx     nanoCoAP observe context that was previously used with
- *                      @see nanocoap_sock_observe_url
- *
- * @pre         @p nanocoap_sock_observe_url has been called on the same arguments
- *              before and the Observation has not yet been cancelled yet.
- *
- * @returns     >=0 on success
- * @returns     <0 on error
- */
-ssize_t nanocoap_sock_unobserve_url(const char *url, coap_observe_client_t *ctx);
-
-/**
  * @brief   Simple synchronous CoAP (confirmable) GET
  *
  * @param[in]   sock    socket to use for the request
  * @param[in]   path    remote path and query
- * @param[out]  response buffer to write response to
- * @param[in]   len_max length of @p buffer
+ * @param[out]  buf     buffer to write response to
+ * @param[in]   len     length of @p buffer
  *
- * @return          length of response payload or error code
- * @retval  >=0     Success, return value is the length of the response payload
- * @retval  <0      Failure, return value is the error code. See
-                    @ref nanocoap_sock_request_cb on error for the list of
-                    error codes
+ * @returns     length of response payload on success
+ * @returns     <0 on error
  */
-ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path,
-                          void *response, size_t len_max);
-
-/**
- * @brief   Simple non-confirmable GET
- *
- * @param[in]   sock    socket to use for the request
- * @param[in]   path    remote path and query
- * @param[out]  response buffer for the response, may be NULL
- * @param[in]   len_max length of @p response
- *
- * @return          length of response payload or error code
- * @retval  >=0     Success, return value is the length of the response payload
- * @retval  <0      Failure, return value is the error code. See
-                    @ref nanocoap_sock_request_cb on error for the list of
-                    error codes
- */
-ssize_t nanocoap_sock_get_non(nanocoap_sock_t *sock, const char *path,
-                              void *response, size_t len_max);
+ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path, void *buf,
+                          size_t len);
 
 /**
  * @brief   Simple synchronous CoAP (confirmable) PUT
@@ -644,11 +399,8 @@ ssize_t nanocoap_sock_get_non(nanocoap_sock_t *sock, const char *path,
  * @param[out]  response buffer for the response, may be NULL
  * @param[in]   len_max length of @p response
  *
- * @return          length of response payload or error code
- * @retval  >=0     Success, return value is the length of the response payload
- * @retval  <0      Failure, return value is the error code. See
-                    @ref nanocoap_sock_request_cb on error for the list of
-                    error codes
+ * @returns     length of response payload on success
+ * @returns     <0 on error
  */
 ssize_t nanocoap_sock_put(nanocoap_sock_t *sock, const char *path,
                           const void *request, size_t len,
@@ -664,11 +416,10 @@ ssize_t nanocoap_sock_put(nanocoap_sock_t *sock, const char *path,
  * @param[out]  response buffer for the response, may be NULL
  * @param[in]   len_max length of @p response
  *
- * @return          length of response payload or error code
- * @retval  >=0     Success, return value is the length of the response payload
- * @retval  <0      Failure, return value is the error code. See
-                    @ref nanocoap_sock_request_cb on error for the list of
-                    error codes
+ * @returns     length of response payload on success
+ * @returns     0 if the request was sent and no response buffer was provided,
+ *              independently of success (because no response is requested in that case)
+ * @returns     <0 on error
  */
 ssize_t nanocoap_sock_put_non(nanocoap_sock_t *sock, const char *path,
                               const void *request, size_t len,
@@ -700,12 +451,8 @@ ssize_t nanocoap_sock_put_url(const char *url,
  * @param[out]  response buffer for the response, may be NULL
  * @param[in]   len_max length of @p response
  *
- * @return          length of response payload or error code
- * @retval  >0      Success, return value is the length of the response payload
- * @retval  0       Success, response contained no payload
- * @retval  <0      Failure, return value is the error code. See
-                    @ref nanocoap_sock_request_cb on error for the list of
-                    error codes
+ * @returns     length of response payload on success
+ * @returns     <0 on error
  */
 ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path,
                            const void *request, size_t len,
@@ -721,12 +468,10 @@ ssize_t nanocoap_sock_post(nanocoap_sock_t *sock, const char *path,
  * @param[out]  response buffer for the response, may be NULL
  * @param[in]   len_max length of @p response
  *
- * @return          length of response payload or error code
- * @retval  >0      Success, return value is the length of the response payload
- * @retval  0       Success, response contained no payload
- * @retval  <0      Failure, return value is the error code. See
-                    @ref nanocoap_sock_request_cb on error for the list of
-                    error codes
+ * @returns     length of response payload on success
+ * @returns     0 if the request was sent and no response buffer was provided,
+ *              independently of success (because no response is requested in that case)
+ * @returns     <0 on error
  */
 ssize_t nanocoap_sock_post_non(nanocoap_sock_t *sock, const char *path,
                                const void *request, size_t len,
@@ -759,11 +504,8 @@ ssize_t nanocoap_sock_post_url(const char *url,
  * @param[out]  response buffer for the response, may be NULL
  * @param[in]   len_max length of @p response
  *
- * @return          length of response payload or error code
- * @retval  >=0     Success, return value is the length of the response payload
- * @retval  <0      Failure, return value is the error code. See
-                    @ref nanocoap_sock_request_cb on error for the list of
-                    error codes
+ * @returns     length of response payload on success
+ * @returns     <0 on error
  */
 ssize_t nanocoap_sock_fetch(nanocoap_sock_t *sock, const char *path,
                             const void *request, size_t len,
@@ -780,11 +522,10 @@ ssize_t nanocoap_sock_fetch(nanocoap_sock_t *sock, const char *path,
  * @param[out]  response buffer for the response, may be NULL
  * @param[in]   len_max length of @p response
  *
- * @return          length of response payload or error code
- * @retval  >=0     Success, return value is the length of the response payload
- * @retval  <0      Failure, return value is the error code. See
-                    @ref nanocoap_sock_request_cb on error for the list of
-                    error codes
+ * @returns     length of response payload on success
+ * @returns     0 if the request was sent and no response buffer was provided,
+ *              independently of success (because no response is requested in that case)
+ * @returns     <0 on error
  */
 ssize_t nanocoap_sock_fetch_non(nanocoap_sock_t *sock, const char *path,
                                 const void *request, size_t len,
@@ -813,10 +554,8 @@ ssize_t nanocoap_sock_fetch_url(const char *url,
  * @param[in]   sock    socket to use for the request
  * @param[in]   path    remote path (with query) to delete
  *
- * @retval  0       Success, return value is the length of the response payload
- * @retval  <0      Failure, return value is the error code. See
-                    @ref nanocoap_sock_request_cb on error for the list of
-                    error codes
+ * @returns     0 on success
+ * @returns     <0 on error
  */
 ssize_t nanocoap_sock_delete(nanocoap_sock_t *sock, const char *path);
 
@@ -963,15 +702,7 @@ ssize_t nanocoap_sock_request(nanocoap_sock_t *sock, coap_pkt_t *pkt, size_t len
  * @param[in]       arg     Optional callback argumnent
  *
  * @returns     length of response on success
- * @returns     0 for a request for which no response is expected, indicated by @p cb == NULL,
- *              or for a 2.xx response
- * @returns     -ETIMEDOUT, if no matching ACK or no response was received
- * @returns     -EBADMSG, if a matching RST was received
- * @returns     -ENXIO, if @p cb == NULL and the response indicates a 4.xx client error
- * @returns     -ENETRESET, if @p cb == NULL and the response indicates a 5.xx server error
- * @returns     any error on @see sock_udp_sendv or @see sock_dtls_sendv
- * @returns     any error on @see sock_udp_recv_buf or @see sock_dtls_recv_buf
- * @returns     any return value of @p cb for a matching response
+ * @returns     <0 on error
  */
 ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
                                  coap_request_cb_t cb, void *arg);
@@ -986,11 +717,8 @@ ssize_t nanocoap_sock_request_cb(nanocoap_sock_t *sock, coap_pkt_t *pkt,
  * @param[in]       len     Total length of the buffer associated with the
  *                          request
  *
- * @return          length of response payload or error code
- * @retval  >=0     Success, return value is the length of the response payload
- * @retval  <0      Failure, return value is the error code. See
-                    @ref nanocoap_sock_request_cb on error for the list of
-                    error codes
+ * @returns     length of response on success
+ * @returns     <0 on error
  */
 ssize_t nanocoap_request(coap_pkt_t *pkt, const sock_udp_ep_t *local,
                          const sock_udp_ep_t *remote, size_t len);
@@ -1047,4 +775,5 @@ int nanocoap_sock_block_request(coap_block_request_t *ctx,
 #ifdef __cplusplus
 }
 #endif
+#endif /* NET_NANOCOAP_SOCK_H */
 /** @} */

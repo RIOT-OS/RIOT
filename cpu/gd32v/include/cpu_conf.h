@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2020 Koen Zandberg <koen@bergzand.net>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 Koen Zandberg <koen@bergzand.net>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_gd32v
@@ -17,6 +18,9 @@
 
 #include "vendor/gd32vf103_core.h"
 #include "cpu_conf_common.h"
+
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,4 +78,5 @@ typedef enum {
 }
 #endif
 
+#endif /* CPU_CONF_H */
 /** @} */

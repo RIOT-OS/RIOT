@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     sys_psa_crypto
  * @defgroup    psa_crypto_se_mgmt  PSA Crypto SE Management
@@ -19,6 +17,9 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
+
+#ifndef PSA_CRYPTO_SE_MANAGEMENT_H
+#define PSA_CRYPTO_SE_MANAGEMENT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -202,4 +203,5 @@ psa_status_t psa_destroy_se_persistent_data(psa_key_location_t location);
 }
 #endif
 
+#endif /* PSA_CRYPTO_SE_MANAGEMENT_H */
 /**@}*/

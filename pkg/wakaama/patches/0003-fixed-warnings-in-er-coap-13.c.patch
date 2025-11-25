@@ -1,0 +1,35 @@
+From cb33c63fad39a27b7164965f7ba3649852ab5104 Mon Sep 17 00:00:00 2001
+From: Christian Manal <moenoel@informatik.uni-bremen.de>
+Date: Thu, 23 Nov 2017 11:08:53 +0100
+Subject: [PATCH 03/12] fixed warnings in er-coap-13.c
+
+---
+ core/er-coap-13/er-coap-13.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/core/er-coap-13/er-coap-13.c b/core/er-coap-13/er-coap-13.c
+index 67d1bb3..647bb88 100644
+--- a/core/er-coap-13/er-coap-13.c
++++ b/core/er-coap-13/er-coap-13.c
+@@ -381,7 +381,7 @@ coap_get_variable(const uint8_t *buffer, size_t length, const char *name, const
+ 
+ /*-----------------------------------------------------------------------------------*/
+ uint16_t
+-coap_get_mid()
++coap_get_mid(void)
+ {
+   return ++current_mid;
+ }
+@@ -860,6 +860,9 @@ coap_get_query_variable(void *packet, const char *name, const char **output)
+     return coap_get_variable(coap_pkt->uri_query, coap_pkt->uri_query_len, name, output);
+   }
+ */
++  (void)packet;
++  (void)name;
++  (void)output;
+   return 0;
+ }
+ 
+-- 
+2.1.4
+

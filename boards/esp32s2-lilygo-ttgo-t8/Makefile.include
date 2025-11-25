@@ -4,6 +4,8 @@ ifneq (,$(filter esp32s2-lilygo-ttgo-t8-usb,$(USEMODULE)))
   PORT_LINUX ?= /dev/ttyACM0
 endif
 
+include $(RIOTBOARD)/common/esp32s2/Makefile.include
+
 # Only consider TTYs matching the following filter when auto-selecting the TTY
 # with `MOST_RECENT_PORT=1`.
 TTY_BOARD_FILTER := --driver 'ch341' --vendor '1a86' --model 'USB Serial'

@@ -51,7 +51,7 @@ static msg_t _msg_queue[GNRC_UDP_MSG_QUEUE_SIZE];
  * @note    If the checksum turns out to be 0x0000, the function returns 0xffff
  *          as specified in RFC768
  *
- * @param[in] hdr           pointer to the packet in the packet header
+ * @param[in] pkt           pointer to the packet in the packet buffer
  * @param[in] pseudo_hdr    pointer to the network layer header
  * @param[in] payload       pointer to the payload
  *

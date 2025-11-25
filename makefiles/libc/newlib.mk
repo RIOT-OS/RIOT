@@ -100,7 +100,3 @@ ifeq (1,$(USE_NEWLIB_NANO))
      INCLUDES := -isystem $(NEWLIB_NANO_INCLUDE_DIR) $(INCLUDES)
   endif
 endif
-
-# In case externally compiled code gets linked in, it may use newlib's assert
-# implementation. We wrap that to RIOT's assert implementation for consistency.
-LINKFLAGS += -Wl,-wrap=__assert_func

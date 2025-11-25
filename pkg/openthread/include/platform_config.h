@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @{
  * @ingroup     net
@@ -17,6 +15,9 @@
  * @author      Baptiste Clenet <bapclenet@gmail.com>
  * @}
  */
+
+#ifndef PLATFORM_CONFIG_H
+#define PLATFORM_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,3 +46,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PLATFORM_CONFIG_H */

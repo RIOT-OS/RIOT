@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2020 Koen Zandberg <koen@bergzand.net>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020, Koen Zandberg <koen@bergzand.net>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @defgroup    cpu_riscv_common RISC-V common
@@ -20,6 +21,9 @@
 #include <stdint.h>
 
 #include "irq_arch.h"
+
+#ifndef CPU_COMMON_H
+#define CPU_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,4 +85,5 @@ void cpu_reg_disable_bits(volatile uint32_t *reg, uint32_t mask)
 }
 #endif
 
+#endif /* CPU_COMMON_H */
 /** @} */

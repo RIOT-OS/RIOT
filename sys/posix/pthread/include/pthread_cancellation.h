@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup pthread
  * @{
@@ -16,6 +14,9 @@
  * @note    None of these functions are implemented, yet.
  * @note    Do not include this header file directly, but pthread.h.
  */
+
+#ifndef PTHREAD_CANCELLATION_H
+#define PTHREAD_CANCELLATION_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,6 +68,8 @@ void pthread_testcancel(void);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PTHREAD_CANCELLATION_H */
 
 /**
  * @}

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup net_gnrc_netif
  * @{
@@ -17,6 +15,8 @@
  *
  * @author  Jose Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
+#ifndef NET_GNRC_NETIF_LORAWAN_H
+#define NET_GNRC_NETIF_LORAWAN_H
 
 #include "net/gnrc/lorawan.h"
 
@@ -166,4 +166,5 @@ static inline int gnrc_netif_lorawan_set_nwksenckey(gnrc_netif_lorawan_t *lw_net
 }
 #endif
 
+#endif /* NET_GNRC_NETIF_LORAWAN_H */
 /** @} */

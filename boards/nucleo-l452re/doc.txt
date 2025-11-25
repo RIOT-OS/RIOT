@@ -1,0 +1,51 @@
+/**
+@defgroup    boards_nucleo-l452re STM32 Nucleo-L452RE
+@ingroup     boards_common_nucleo64
+@brief       Support for the STM32 Nucleo-L452RE
+
+## Overview
+
+The Nucleo-L452RE is a board from ST's Nucleo family supporting ARM Cortex-M4
+STM32L452RE microcontroller with 160KiB of RAM and 512KiB of Flash.
+
+## Pinout
+
+@image html pinouts/nucleo-l452re.svg "Pinout for the nucleo-l452re (from STM board manual)" width=50%
+
+### MCU
+
+| MCU        |   STM32L452RE       |
+|:---------- |:------------------- |
+| Family     | ARM Cortex-M4       |
+| Vendor     | ST Microelectronics |
+| RAM        | 160KiB              |
+| Flash      | 512KiB              |
+| Frequency  | up to 80MHz         |
+| FPU        | yes                 |
+| Timers     | 12 (2x watchdog, 1 SysTick, 8x 16-bit, 1x 32-bit) |
+| ADCs       | 1x 12-bit           |
+| UARTs      | 5 (one UART, three USARTs and one Low-Power UART) |
+| SPIs       | 3                   |
+| I2Cs       | 4                   |
+| RTC        | 1                   |
+| CAN        | 1                   |
+| Vcc        | 1.71 V - 3.6V       |
+| Datasheet  | [Datasheet](https://www.st.com/resource/en/datasheet/stm32l452cc.pdf) |
+| Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/rm0394-stm32l41xxx42xxx43xxx44xxx45xxx46xxx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf) |
+| Programming Manual | [Programming Manual](http://www.st.com/content/ccc/resource/technical/document/programming_manual/6c/3a/cb/e7/e4/ea/44/9b/DM00046982.pdf/files/DM00046982.pdf/jcr:content/translations/en.DM00046982.pdf) |
+| Board Manual   | [Board Manual](https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf) |
+
+## Flashing the Board Using ST-LINK Removable Media
+
+On-board ST-LINK programmer provides via composite USB device removable media.
+Copying the HEX file causes reprogramming of the board. This task
+could be performed manually; however, the cpy2remed (copy to removable
+media) PROGRAMMER script does this automatically. To program board in
+this manner, use the command:
+```
+make BOARD=nucleo-l452re PROGRAMMER=cpy2remed flash
+```
+@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
+can be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
+
+ */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     sys_event
  * @brief       Provides functionality to trigger periodic event callbacks
@@ -24,7 +22,9 @@
  *
  */
 
-#include <assert.h>
+#ifndef EVENT_PERIODIC_CALLBACK_H
+#define EVENT_PERIODIC_CALLBACK_H
+
 #include "event/callback.h"
 #include "event/periodic.h"
 
@@ -94,7 +94,6 @@ static inline void event_periodic_callback_init(event_periodic_callback_t *event
 static inline void event_periodic_callback_start(event_periodic_callback_t *event,
                                                  uint32_t interval)
 {
-    assert(event->event.callback);
     event_periodic_start(&event->periodic, interval);
 }
 
@@ -179,4 +178,5 @@ static inline void event_periodic_callback_stop(event_periodic_callback_t *event
 #ifdef __cplusplus
 }
 #endif
+#endif /* EVENT_PERIODIC_CALLBACK_H */
 /** @} */

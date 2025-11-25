@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_feetech
  *
@@ -18,6 +16,9 @@
  *
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
+
+#ifndef FEETECH_PROTOCOL_H
+#define FEETECH_PROTOCOL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -94,4 +95,5 @@ typedef enum {
 }
 #endif
 
+#endif /* FEETECH_PROTOCOL_H */
 /** @} */

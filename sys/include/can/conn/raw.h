@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_can_conn Connection
  * @ingroup     sys_can
@@ -23,6 +21,9 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  *
  */
+
+#ifndef CAN_CONN_RAW_H
+#define CAN_CONN_RAW_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,11 +66,11 @@ typedef struct conn_can_raw {
 /**
  * @brief  Create can connection socket
  *
- * @param[in,out]   conn    CAN connection
- * @param[in]       filter  list of filters to set
- * @param[in]       count   number of filters in @p filter
- * @param[in]       ifnum   can device Interface
- * @param[in]       flags   conn flags to set (CONN_CAN_RECVONLY)
+ * @param[inout] conn       CAN connection
+ * @param[in] filter        list of filters to set
+ * @param[in] count         number of filters in @p filter
+ * @param[in] ifnum         can device Interface
+ * @param[in] flags         conn flags to set (CONN_CAN_RECVONLY)
  *
  * @post   @p filter must remain allocated until @p conn is closed
  *
@@ -99,7 +100,7 @@ int conn_can_raw_close(conn_can_raw_t *conn);
  * @return the number of bytes received
  * @return any other negative number in case of an error
  */
-int conn_can_raw_recv(conn_can_raw_t *conn, can_frame_t *frame, uint32_t timeout);
+int conn_can_raw_recv(conn_can_raw_t *conn, struct can_frame *frame, uint32_t timeout);
 
 /**
  * @brief  Generic can send
@@ -112,7 +113,7 @@ int conn_can_raw_recv(conn_can_raw_t *conn, can_frame_t *frame, uint32_t timeout
  * @return the number of bytes sent
  * @return any other negative number in case of an error
  */
-int conn_can_raw_send(conn_can_raw_t *conn, const can_frame_t *frame, int flags);
+int conn_can_raw_send(conn_can_raw_t *conn, const struct can_frame *frame, int flags);
 
 /**
  * @brief  Set raw CAN filters
@@ -137,4 +138,5 @@ int conn_can_raw_set_filter(conn_can_raw_t *conn, struct can_filter *filter, siz
 }
 #endif
 
+#endif /* CAN_CONN_RAW_H */
 /** @} */

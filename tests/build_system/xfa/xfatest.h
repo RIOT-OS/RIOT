@@ -1,9 +1,13 @@
 /*
- * SPDX-FileCopyrightText: 2016 Kaspar Schleiser <kaspar@schleiser.de>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
-#pragma once
+#ifndef XFATEST_H
+#define XFATEST_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,7 +18,6 @@ extern "C" {
 typedef struct {
     unsigned val;
     const char *text;
-    char letter;
 } xfatest_t;
 
 #endif /* DOXYGEN */
@@ -22,3 +25,5 @@ typedef struct {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* XFATEST_H */

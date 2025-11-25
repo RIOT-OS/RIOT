@@ -1,14 +1,21 @@
 /*
- * SPDX-FileCopyrightText: 2019 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
+ * @ingroup     cpu_native
+ * @ingroup     drivers_periph_eeprom
+ * @{
+ *
  * @file
- * @ingroup cpu_native
- * @ingroup drivers_periph_eeprom
- * @brief   Low-level EEPROM driver implementation for native
- * @author  Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @brief       Low-level EEPROM driver implementation for native
+ *
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @}
  */
 
 #include <stdio.h>

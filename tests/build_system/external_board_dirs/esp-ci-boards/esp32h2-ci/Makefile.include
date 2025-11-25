@@ -1,5 +1,0 @@
-# We must duplicate the include done by $(RIOTBASE)/Makefile.include
-# to also include the main board header
-INCLUDES += $(addprefix -I,$(wildcard $(RIOTBOARD)/esp32h2-devkit/include))
-
-include $(RIOTBOARD)/esp32h2-devkit/Makefile.include

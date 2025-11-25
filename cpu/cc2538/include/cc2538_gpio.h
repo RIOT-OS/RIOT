@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2014 Loci Controls Inc.
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2014 Loci Controls Inc.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @defgroup        cpu_cc2538_gpio CC2538 General-Purpose I/O
@@ -19,6 +20,9 @@
  *
  * @{
  */
+
+#ifndef CC2538_GPIO_H
+#define CC2538_GPIO_H
 
 #include <stdint.h>
 
@@ -339,6 +343,8 @@ typedef struct {
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
+
+#endif /* CC2538_GPIO_H */
 
 /** @} */
 /** @} */

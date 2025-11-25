@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    core_thread_flags Thread Flags
  * @ingroup     core
@@ -56,6 +54,9 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+#ifndef THREAD_FLAGS_H
+#define THREAD_FLAGS_H
+
 #include "sched.h"  /* for thread_t typedef */
 
 #ifdef __cplusplus
@@ -200,4 +201,5 @@ int thread_flags_wake(thread_t *thread);
 }
 #endif
 
+#endif /* THREAD_FLAGS_H */
 /** @} */

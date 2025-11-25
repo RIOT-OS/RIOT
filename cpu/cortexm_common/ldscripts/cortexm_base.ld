@@ -53,7 +53,6 @@ SECTIONS
         _sfixed = .;
         _isr_vectors = DEFINED(_isr_vectors) ? _isr_vectors : . ;
         KEEP(*(SORT(.vectors*)))
-        KEEP(*(SORT(.picobin_block*))) /* Keep picobin block used by RP2350 */
         *(.text .text.* .gnu.linkonce.t.*)
         *(.glue_7t) *(.glue_7)
         *(.rodata .rodata* .gnu.linkonce.r.*)
@@ -228,12 +227,6 @@ SECTIONS
         _ebackup_bss = .;
         /* Round size so that we can use 4 byte copy in init */
         . = ALIGN(4);
-    } > bkup_ram
-
-    .backup.noinit (NOLOAD) : ALIGN(4) {
-        _sbackup_noinit = .;
-        *(.backup.noinit)
-        _ebackup_noinit = .;
     } > bkup_ram
 
     .heap3 (NOLOAD) : ALIGN(4) {

@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2020 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu
@@ -14,6 +15,9 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
+
+#ifndef OPENWSN_DEFS_H
+#define OPENWSN_DEFS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,4 +39,5 @@ extern "C" {
 }
 #endif
 
+#endif /* OPENWSN_DEFS_H */
 /** @} */

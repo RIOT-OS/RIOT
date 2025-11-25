@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_cc110x
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
+
+#ifndef CC110X_COMMUNICATION_H
+#define CC110X_COMMUNICATION_H
 
 #include "periph/gpio.h"
 #include "periph/spi.h"
@@ -207,4 +208,5 @@ int cc110x_power_on_and_acquire(cc110x_t *dev);
 }
 #endif
 
+#endif /* CC110X_COMMUNICATION_H */
 /** @} */

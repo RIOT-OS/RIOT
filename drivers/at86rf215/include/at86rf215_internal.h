@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_at86rf215
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+
+#ifndef AT86RF215_INTERNAL_H
+#define AT86RF215_INTERNAL_H
 
 #include <stdint.h>
 #include "at86rf215.h"
@@ -685,4 +686,5 @@ static inline bool is_subGHz(const at86rf215_t *dev)
 }
 #endif
 
+#endif /* AT86RF215_INTERNAL_H */
 /** @} */

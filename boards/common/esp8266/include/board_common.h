@@ -1,9 +1,13 @@
 /*
- * SPDX-FileCopyrightText: 2018 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
-#pragma once
+#ifndef BOARD_COMMON_H
+#define BOARD_COMMON_H
 
 /**
  * @ingroup     boards_common_esp8266
@@ -129,3 +133,4 @@ void board_print_config (void);
 /** @} */
 
 #endif /* ESP_PLATFORM */
+#endif /* BOARD_COMMON_H */

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FONTS_H
+#define FONTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,3 +11,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* FONTS_H */

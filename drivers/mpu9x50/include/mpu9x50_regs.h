@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_mpu9x50
  * @{
@@ -19,6 +17,9 @@
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
  * @author      Jannes Volkens <jannes.volkens@haw-hamburg.de>
  */
+
+#ifndef MPU9X50_REGS_H
+#define MPU9X50_REGS_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -99,4 +100,5 @@
 }
 #endif
 
+#endif /* MPU9X50_REGS_H */
 /** @} */

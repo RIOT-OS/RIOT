@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_someip SOME/IP
  * @ingroup     net
@@ -20,6 +18,8 @@
  *
  * @author  Jannes Volkens <jannes.volkens@haw-hamburg.de>
  */
+#ifndef NET_SOMEIP_H
+#define NET_SOMEIP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,4 +69,5 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
+#endif /* NET_SOMEIP_H */
 /** @} */

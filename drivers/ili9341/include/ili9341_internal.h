@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_ili9341
  * @{
@@ -20,6 +18,9 @@
  * @}
  */
 
+#ifndef ILI9341_INTERNAL_H
+#define ILI9341_INTERNAL_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,3 +30,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* ILI9341_INTERNAL_H */

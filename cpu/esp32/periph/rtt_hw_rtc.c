@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2020 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -16,26 +19,25 @@
  * @}
  */
 
-#include "stdint.h"
-
 /* RIOT headers have to be included before ESP-IDF headers! */
+#include "cpu.h"
 #include "esp/common_macros.h"
+#include "esp_common.h"
 #include "irq_arch.h"
 #include "log.h"
 #include "periph/rtt.h"
 #include "rtt_arch.h"
+#include "syscalls.h"
+#include "timex.h"
 
 /* ESP-IDF headers */
-#include "esp_cpu.h"
+#include "esp_attr.h"
+#include "esp_sleep.h"
+#include "hal/interrupt_controller_types.h"
+#include "hal/interrupt_controller_ll.h"
 #include "rom/ets_sys.h"
-#include "soc/rtc.h"
-#include "soc/soc_caps.h"
-
-#if SOC_LP_TIMER_SUPPORTED
-#  include "hal/lp_timer_ll.h"
-#else
-#  include "soc/rtc_cntl_struct.h"
-#endif
+#include "soc/periph_defs.h"
+#include "soc/rtc_cntl_struct.h"
 
 #if __xtensa__
 #include "soc/dport_reg.h"
@@ -45,11 +47,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if SOC_LP_TIMER_SUPPORTED
-#  define RTC_TIMER_INTR_SOURCE ETS_LP_RTC_TIMER_INTR_SOURCE
-#else
-#  define RTC_TIMER_INTR_SOURCE ETS_RTC_CORE_INTR_SOURCE
-#endif
+#define RTC_CLK_CAL_FRACT       19  /* fractional bits of calibration value */
 
 typedef struct {
     uint32_t alarm_set;     /**< alarm set at interface */
@@ -72,7 +70,7 @@ uint64_t _rtc_counter_to_us(uint64_t raw)
 {
     const uint32_t cal = esp_clk_slowclk_cal_get();
     return ((((raw >> 32) * cal) << (32 - RTC_CLK_CAL_FRACT)) + /* high part */
-            (((raw & UINT32_MAX) * cal) >> RTC_CLK_CAL_FRACT)); /* low part */
+            (((raw & 0xffffffff) * cal) >> RTC_CLK_CAL_FRACT)); /* low part */
 }
 
 static void _rtc_init(void)
@@ -82,119 +80,19 @@ static void _rtc_init(void)
 static void _rtc_poweron(void)
 {
     /* route all interrupt sources to the same RTT level type interrupt */
-    intr_matrix_set(PRO_CPU_NUM, RTC_TIMER_INTR_SOURCE, CPU_INUM_RTT);
+    intr_matrix_set(PRO_CPU_NUM, ETS_RTC_CORE_INTR_SOURCE, CPU_INUM_RTT);
 
     /* set interrupt handler and enable the CPU interrupt */
-    esp_cpu_intr_set_handler(CPU_INUM_RTT, _rtc_isr, NULL);
-    esp_cpu_intr_enable(BIT(CPU_INUM_RTT));
+    intr_cntrl_ll_set_int_handler(CPU_INUM_RTT, _rtc_isr, NULL);
+    intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_RTT));
 }
 
 static void _rtc_poweroff(void)
 {
     /* reset interrupt handler and disable the CPU interrupt */
-    esp_cpu_intr_disable(BIT(CPU_INUM_RTT));
-    esp_cpu_intr_set_handler(CPU_INUM_RTT, NULL, NULL);
+    intr_cntrl_ll_disable_interrupts(BIT(CPU_INUM_RTT));
+    intr_cntrl_ll_set_int_handler(CPU_INUM_RTT, NULL, NULL);
 }
-
-static void _rtc_save_counter(void)
-{
-}
-
-static void _rtc_restore_counter(bool in_init)
-{
-    (void)in_init;
-}
-
-#if SOC_LP_TIMER_SUPPORTED
-
-uint64_t _rtc_get_counter(void)
-{
-    /* trigger timer register update */
-    LP_TIMER.update.update = 1;
-    /* read the time from 48-bit counter and return */
-    return ((uint64_t)LP_TIMER.counter[0].hi.counter_hi << 32) +
-           LP_TIMER.counter[0].lo.counter_lo;
-}
-
-static void _rtc_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
-{
-    /* compute the time difference for 32.768 kHz as 32-bit value */
-    uint64_t rtc_counter = _rtc_get_counter();
-    uint32_t rtt_diff = alarm - rtc_counter;
-
-    /* use computed time difference directly to set the RTC counter alarm */
-    uint64_t rtc_alarm = (rtc_counter + rtt_diff) & RTT_HW_COUNTER_MAX;
-
-    DEBUG("%s alarm=%" PRIu32 " rtt_diff=%" PRIu32
-          " rtc_alarm=%" PRIu32 " @rtc=%" PRIu32 "\n",
-          __func__, alarm, rtt_diff, (uint32_t)rtc_alarm, (uint32_t)rtc_counter);
-
-    /* save the alarm configuration for interrupt handling */
-    _rtc_alarm.alarm_set = alarm;
-    _rtc_alarm.alarm_cb = cb;
-    _rtc_alarm.alarm_arg = arg;
-
-    /* set the timer value */
-    LP_TIMER.target[0].lo.target_lo = rtc_alarm & UINT32_MAX;
-    LP_TIMER.target[0].hi.target_hi = rtc_alarm >> 32;
-
-    DEBUG("%s %08x%08x \n", __func__,
-          (unsigned)LP_TIMER.target[0].hi.target_hi,
-          (unsigned)LP_TIMER.target[0].lo.target_lo);
-
-    /* clear and enable RTC timer interrupt */
-    LP_TIMER.int_clr.alarm = 1;
-    LP_TIMER.int_en.alarm = 1;
-
-    /* enable RTC timer alarm */
-    LP_TIMER.target[0].hi.enable = 1;
-}
-
-static void _rtc_clear_alarm(void)
-{
-    /* disable alarms first */
-    LP_TIMER.target[0].hi.enable = 0;
-
-    /* clear the bit in interrupt enable and status register */
-    LP_TIMER.int_clr.alarm = 0;
-    LP_TIMER.int_en.alarm = 0;
-
-    /* reset the alarm configuration for interrupt handling */
-    _rtc_alarm.alarm_set = 0;
-    _rtc_alarm.alarm_cb = NULL;
-    _rtc_alarm.alarm_arg = NULL;
-}
-
-static void IRAM _rtc_isr(void *arg)
-{
-    /* disable alarms first */
-    LP_TIMER.target[0].hi.enable = 0;
-
-    /* clear the bit in interrupt enable and status register */
-    LP_TIMER.int_en.alarm = 0;
-    LP_TIMER.int_clr.alarm = 1;
-
-    /* save the lower 32 bit of the current counter value */
-    uint32_t counter = _rtc_get_counter();
-
-    DEBUG("%s %" PRIu32 "\n", __func__, counter);
-
-    if (_rtc_alarm.alarm_cb) {
-        DEBUG("%s alarm %" PRIu32 "\n", __func__, counter);
-
-        rtt_cb_t alarm_cb = _rtc_alarm.alarm_cb;
-        void *alarm_arg = _rtc_alarm.alarm_arg;
-
-        /* clear the alarm first */
-        _rtc_alarm.alarm_cb = NULL;
-        _rtc_alarm.alarm_arg = NULL;
-
-        /* call the alarm handler afterwards if callback was defined */
-        alarm_cb(alarm_arg);
-    }
-}
-
-#else
 
 uint64_t _rtc_get_counter(void)
 {
@@ -225,8 +123,8 @@ static void _rtc_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     uint64_t rtc_alarm = (rtc_counter + rtt_diff) & RTT_HW_COUNTER_MAX;
 
     DEBUG("%s alarm=%" PRIu32 " rtt_diff=%" PRIu32
-          " rtc_alarm=%" PRIu32 " @rtc=%" PRIu32 "\n",
-          __func__, alarm, rtt_diff, (uint32_t)rtc_alarm, (uint32_t)rtc_counter);
+          " rtc_alarm=%" PRIu64 " @rtc=%" PRIu64 "\n",
+          __func__, alarm, rtt_diff, rtc_alarm, rtc_counter);
 
     /* save the alarm configuration for interrupt handling */
     _rtc_alarm.alarm_set = alarm;
@@ -234,18 +132,18 @@ static void _rtc_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     _rtc_alarm.alarm_arg = arg;
 
     /* set the timer value */
-    RTCCNTL.slp_timer0 = rtc_alarm & UINT32_MAX;
+    RTCCNTL.slp_timer0 = rtc_alarm & 0xffffffff;
     RTCCNTL.slp_timer1.slp_val_hi = rtc_alarm >> 32;
 
     DEBUG("%s %08x%08x \n", __func__,
           (unsigned)RTCCNTL.slp_timer1.slp_val_hi, (unsigned)RTCCNTL.slp_timer0);
 
+    /* enable RTC timer alarm */
+    RTCCNTL.slp_timer1.main_timer_alarm_en = 1;
+
     /* clear and enable RTC timer interrupt */
     RTCCNTL.int_clr.rtc_main_timer = 1;
     RTCCNTL.int_ena.rtc_main_timer = 1;
-
-    /* enable RTC timer alarm */
-    RTCCNTL.slp_timer1.main_timer_alarm_en = 1;
 }
 
 static void _rtc_clear_alarm(void)
@@ -263,14 +161,23 @@ static void _rtc_clear_alarm(void)
     _rtc_alarm.alarm_arg = NULL;
 }
 
+static void _rtc_save_counter(void)
+{
+}
+
+static void _rtc_restore_counter(bool in_init)
+{
+    (void)in_init;
+}
+
 static void IRAM _rtc_isr(void *arg)
 {
     /* disable alarms first */
     RTCCNTL.slp_timer1.main_timer_alarm_en = 0;
 
     /* clear the bit in interrupt enable and status register */
+    RTCCNTL.int_clr.rtc_main_timer = 0;
     RTCCNTL.int_ena.rtc_main_timer = 0;
-    RTCCNTL.int_clr.rtc_main_timer = 1;
 
     /* save the lower 32 bit of the current counter value */
     uint32_t counter = _rtc_get_counter();
@@ -291,8 +198,6 @@ static void IRAM _rtc_isr(void *arg)
         alarm_cb(alarm_arg);
     }
 }
-
-#endif
 
 const rtt_hw_driver_t _rtt_hw_rtc_driver = {
         .init = _rtc_init,

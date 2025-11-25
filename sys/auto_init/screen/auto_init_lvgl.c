@@ -50,10 +50,6 @@ void auto_init_lvgl(void)
     /* Only a single screen is supported by lvgl */
 #if !IS_USED(MODULE_LV_DRIVERS_SDL)
     disp_dev_reg_t *disp_dev = disp_dev_reg_find_screen(CONFIG_LVGL_SCREEN_DEFAULT);
-    if (disp_dev == NULL) {
-        puts("[auto_init_screen] error: no display device found\n");
-        return;
-    }
     s_screen.display = disp_dev->dev;
 #endif
 

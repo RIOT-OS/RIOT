@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    pkg_nimble_autoadv Automated advertising
  * @ingroup     pkg_nimble
@@ -26,6 +24,9 @@
  *
  * @author      Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
+
+#ifndef NIMBLE_AUTOADV_H
+#define NIMBLE_AUTOADV_H
 
 #include "host/ble_gap.h"
 
@@ -190,3 +191,4 @@ int nimble_autoadv_get_adv_instance(void);
 }
 #endif
 /** @} */
+#endif /* NIMBLE_AUTOADV_H */

@@ -24,12 +24,36 @@
 
 #include "congure_impl.h"
 
+static int _json_statham(int argc, char **argv);
+static int _set_cwnd(int argc, char **argv);
+static int _set_ssthresh(int argc, char **argv);
+static int _set_limited(int argc, char **argv);
+static int _set_max_ack_delay(int argc, char **argv);
+static int _set_recovery_start(int argc, char **argv);
+static int _get_event_cb(int argc, char **argv);
+
 static congure_quic_snd_t _congure_state;
+static const shell_command_t shell_commands[] = {
+    { "state", "Prints current CongURE state object as JSON", _json_statham },
+    { "set_cwnd", "Set cwnd member for CongURE state object", _set_cwnd },
+    { "set_ssthresh", "Set ssthresh member for CongURE state object",
+      _set_ssthresh },
+    { "set_limited", "Set limited member for CongURE state object",
+      _set_limited },
+    { "set_max_ack_delay", "Set max_ack_delay member for CongURE state object",
+      _set_max_ack_delay },
+    { "set_recovery_start", "Set recovery_start member for CongURE state object",
+      _set_recovery_start },
+    { "get_event_cb",
+      "Get state of cong_event_cb mock of CongURE state object",
+      _get_event_cb },
+    { NULL, NULL, NULL }
+};
 
 int main(void)
 {
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }
 
@@ -100,8 +124,6 @@ static int _json_statham(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(state, "Prints current CongURE state object as JSON", _json_statham);
-
 static int _set_cwnd(int argc, char **argv)
 {
     uint32_t tmp;
@@ -117,8 +139,6 @@ static int _set_cwnd(int argc, char **argv)
     _congure_state.super.cwnd = (congure_wnd_size_t)tmp;
     return 0;
 }
-
-SHELL_COMMAND(set_cwnd, "Set cwnd member for CongURE state object", _set_cwnd);
 
 static int _set_ssthresh(int argc, char **argv)
 {
@@ -136,8 +156,6 @@ static int _set_ssthresh(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(set_ssthresh, "Set ssthresh member for CongURE state object", _set_ssthresh);
-
 static int _set_limited(int argc, char **argv)
 {
     uint32_t tmp;
@@ -153,8 +171,6 @@ static int _set_limited(int argc, char **argv)
     _congure_state.limited = (uint16_t)tmp;
     return 0;
 }
-
-SHELL_COMMAND(set_limited, "Set limited member for CongURE state object", _set_limited);
 
 static int _set_max_ack_delay(int argc, char **argv)
 {
@@ -172,9 +188,6 @@ static int _set_max_ack_delay(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(set_max_ack_delay,
-    "Set max_ack_delay member for CongURE state object", _set_max_ack_delay);
-
 static int _set_recovery_start(int argc, char **argv)
 {
     if (argc < 2) {
@@ -184,9 +197,6 @@ static int _set_recovery_start(int argc, char **argv)
     _congure_state.recovery_start = scn_u32_dec(argv[1], strlen(argv[1]));
     return 0;
 }
-
-SHELL_COMMAND(set_recovery_start,
-    "Set recovery_start member for CongURE state object", _set_recovery_start);
 
 static int _get_event_cb(int argc, char **argv)
 {
@@ -204,8 +214,5 @@ static int _get_event_cb(int argc, char **argv)
     print_str("}\n");
     return 0;
 }
-
-SHELL_COMMAND(get_event_cb,
-    "Get state of cong_event_cb mock of CongURE state object", _get_event_cb);
 
 /** @} */

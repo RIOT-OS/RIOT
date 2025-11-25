@@ -1,9 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
- * SPDX-FileCopyrightText: 2017 Thomas Perrot <thomas.perrot@tupi.fr>
- * SPDX-FileCopyrightText: 2023 Hugues Larrive
- * SPDX-FileCopyrightText: 2023 Gerson Fernando Budke
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
+ *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
+ *               2023 Hugues Larrive
+ *               2023 Gerson Fernando Budke
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**

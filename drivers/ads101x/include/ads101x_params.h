@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_ads101x
  * @{
@@ -19,6 +17,9 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  */
+
+#ifndef ADS101X_PARAMS_H
+#define ADS101X_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -99,4 +100,5 @@ static const saul_reg_info_t ads101x_saul_info[] =
 }
 #endif
 
+#endif /* ADS101X_PARAMS_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -17,6 +15,9 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
+
+#ifndef PSA_CRYPTO_PSA_CRYPTO_INCLUDES_H
+#define PSA_CRYPTO_PSA_CRYPTO_INCLUDES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,4 +61,5 @@ extern "C" {
 }
 #endif
 
+#endif /* PSA_CRYPTO_PSA_CRYPTO_INCLUDES_H */
 /** @} */

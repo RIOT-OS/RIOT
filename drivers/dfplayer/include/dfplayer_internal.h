@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_dfplayer
  * @{
@@ -16,6 +14,9 @@
  * @brief       Internal functions of DFPlayer Mini Device driver
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
+
+#ifndef DFPLAYER_INTERNAL_H
+#define DFPLAYER_INTERNAL_H
 
 #include <stdint.h>
 
@@ -209,4 +210,5 @@ static inline int dfplayer_query(dfplayer_t *dev, uint16_t *resp, uint8_t cmd)
 }
 #endif
 
+#endif /* DFPLAYER_INTERNAL_H */
 /** @} */

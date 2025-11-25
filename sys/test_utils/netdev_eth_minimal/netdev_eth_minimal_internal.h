@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     test_utils_netdev_eth_minimal
  *
@@ -17,6 +15,9 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
+
+#ifndef NETDEV_ETH_MINIMAL_INTERNAL_H
+#define NETDEV_ETH_MINIMAL_INTERNAL_H
 
 #include "net/netdev.h"
 #include "event.h"
@@ -45,4 +46,5 @@ extern device_reg_entry_t _devices[NETDEV_ETH_MINIMAL_NUMOF];
 }
 #endif
 
+#endif /* NETDEV_ETH_MINIMAL_INTERNAL_H */
 /** @} */

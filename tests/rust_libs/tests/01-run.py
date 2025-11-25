@@ -7,24 +7,33 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-import json
 import sys
 from testrunner import run
 
 
-EXPECTED_CMDS = {
-        'bufsize': 'Get the shell\'s buffer size',
-        'start_test': 'starts a test',
-        'end_test': 'ends a test',
-        'echo': 'prints the input command',
-        'empty': 'print nothing on command',
-        'periodic': 'periodically print command',
-        'hello_world': 'Print a greeting',
-        'xfa_test1': 'xfa test command 1',
-        'xfa_test2': 'xfa test command 2',
-}
+EXPECTED_HELP = (
+    'Command              Description',
+    '---------------------------------------',
+    'bufsize              Get the shell\'s buffer size',
+    'start_test           starts a test',
+    'end_test             ends a test',
+    'echo                 prints the input command',
+    'empty                print nothing on command',
+    'hello_world          Print a greeting',
+    'xfa_test1            xfa test command 1',
+    'xfa_test2            xfa test command 2',
+)
 
 PROMPT = '> '
+
+CMDS = (
+    ('start_test', '[TEST_START]'),
+
+    # test default commands
+    ('help', EXPECTED_HELP),
+
+    ('end_test', '[TEST_END]'),
+)
 
 CMDS_REGEX = {'ps.rs'}
 
@@ -40,26 +49,10 @@ def check_cmd(child, cmd, expected):
             child.expect_exact(line)
 
 
-def check_cmd_list(child):
-    child.expect(PROMPT)
-    child.sendline('help_json')
-    child.expect(r"(\{[^\n\r]*\})\r\n")
-    cmdlist = json.loads(child.match.group(1))["cmds"]
-    cmds = set(EXPECTED_CMDS)
-    for item in cmdlist:
-        assert item['cmd'] in EXPECTED_CMDS, f"command {item['cmd']} not expected"
-        assert item['cmd'] in cmds, f"command {item['cmd']} listed twice"
-        assert item['desc'] == EXPECTED_CMDS[item['cmd']], f"description of {item['cmd']} not expected"
-        cmds.remove(item['cmd'])
-
-    assert len(cmds) == 0, f"commands {cmds} missing"
-
-
 def testfunc(child):
     # loop other defined commands and expected output
-    check_cmd(child, 'start_test', '[TEST_START]')
-    check_cmd_list(child)
-    check_cmd(child, 'end_test', '[TEST_END]')
+    for cmd, expected in CMDS:
+        check_cmd(child, cmd, expected)
 
 
 if __name__ == "__main__":

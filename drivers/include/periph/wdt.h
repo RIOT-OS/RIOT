@@ -8,8 +8,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_periph_wdt WDT
  * @ingroup     drivers_periph
@@ -205,6 +203,9 @@
  *              Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
+#ifndef PERIPH_WDT_H
+#define PERIPH_WDT_H
+
 #include <stdint.h>
 #include "periph_cpu.h"
 
@@ -366,4 +367,5 @@ void wdt_setup_reboot_with_callback(uint32_t min_time, uint32_t max_time,
 }
 #endif
 
+#endif /* PERIPH_WDT_H */
 /** @} */

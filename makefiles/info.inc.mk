@@ -1,4 +1,4 @@
-.PHONY: info-objsize info-buildsize info-build info-boards-supported \
+.PHONY: info-objsize info-buildsizes info-build info-boards-supported \
         info-features-missing info-modules info-cpu \
         info-features-provided info-features-required \
         info-features-used info-kconfig-variables \
@@ -35,7 +35,7 @@ info-build:
 	@echo 'APPDIR:      $(APPDIR)'
 	@echo ''
 	@echo 'supported boards:'
-	@echo $$(env -i PATH='$(PATH)' LANG='$(LANG)' HOME='$(HOME)' SHELL='$(SHELL)' $(MAKE) info-boards-supported)
+	@echo $$($(MAKE) info-boards-supported)
 	@echo ''
 	@echo 'BOARD:   $(BOARD)'
 	@echo 'CPU:     $(CPU)'
@@ -110,9 +110,8 @@ info-build:
 	@echo 'DEBUGGER:       $(DEBUGGER)'
 	@echo 'DEBUGGER_FLAGS: $(DEBUGGER_FLAGS)'
 	@echo
-	@echo 'DLCACHE:            $(DLCACHE)'
-	@echo 'DLCACHE_DIR:        $(DLCACHE_DIR)'
 	@echo 'DOWNLOAD_TO_FILE:   $(DOWNLOAD_TO_FILE)'
+	@echo 'DOWNLOAD_TO_STDOUT: $(DOWNLOAD_TO_STDOUT)'
 	@echo 'UNZIP_HERE:         $(UNZIP_HERE)'
 	@echo ''
 	@echo 'DEBUGSERVER:       $(DEBUGSERVER)'
@@ -135,25 +134,9 @@ define _to_json_string_list
 [$(filter-out "","$(subst $(space),"$(comma)$(space)",$(1))")]
 endef
 
-json_escape_swap := EsCaPe
-json_escape_quote := QuOtE
-# Corrects quotation and escape sequences in a string to be JSON compliant.
-# This does not support the use of single quotation. All single quotation marks
-# are removed.
+# Strips out any existing quotes so that the generated JSON is valid, not necessary sensible
 define to_json_string_list
-$(call _to_json_string_list,$(strip $(subst $(json_escape_swap),\,\
-  $(subst $(json_escape_quote),",\
-  $(subst \,$(json_escape_swap)$(json_escape_swap),\
-  $(subst \/,$(json_escape_swap)/,\
-  $(subst \b,$(json_escape_swap)b,\
-  $(subst \f,$(json_escape_swap)f,\
-  $(subst \n,$(json_escape_swap)n,\
-  $(subst \r,$(json_escape_swap)r,\
-  $(subst \t,$(json_escape_swap)t,\
-  $(subst \u,$(json_escape_swap)u,\
-  $(subst ',,\
-  $(subst ",$(json_escape_swap)$(json_escape_quote),\
-  $(1)))))))))))))))
+$(call _to_json_string_list,$(strip $(subst ",,$(subst \",,$(1)))))
 endef
 
 # Crude json encoded build info.
@@ -161,7 +144,8 @@ endef
 # converting the space separated lists in Make to a JSON array is flawed, it
 # doesn't consider quoted parts as a single list item.  This mainly shows up in
 # cflags such as:  -DNIMBLE_HOST_PRIO="(NIMBLE_CONTROLLER_PRIO + 1)", this is
-# splitted into 3 array elements.
+# splitted into 3 array elements. To ensure that the generated JSON is valid,
+# double quotes are currently stripped before generating the array.
 info-build-json:
 	@echo '{ '
 	@echo '"APPLICATION": "$(APPLICATION)",'
@@ -172,19 +156,15 @@ info-build-json:
 	@echo '"BOARDDIR": "$(BOARDDIR)",'
 	@echo '"RIOTCPU": "$(RIOTCPU)",'
 	@echo '"RIOTPKG": "$(RIOTPKG)",'
-	@echo '"EXTERNAL_BOARD_DIRS": $(call to_json_string_list,$(EXTERNAL_BOARD_DIRS)),'
+	@echo '"EXTERNAL_BOARD_DIRS": $(call json_string_or_null,$(EXTERNAL_BOARD_DIRS)),'
 	@echo '"BINDIR": "$(BINDIR)",'
 	@echo '"ELFFILE": "$(ELFFILE)",'
 	@echo '"HEXFILE": "$(HEXFILE)",'
 	@echo '"BINFILE": "$(BINFILE)",'
 	@echo '"FLASHFILE": "$(FLASHFILE)",'
-	@echo '"EXTERNAL_MODULE_DIRS": $(call to_json_string_list,$(EXTERNAL_MODULE_DIRS)),'
-	@echo '"EXTERNAL_MODULE_PATHS": $(call to_json_string_list,$(EXTERNAL_MODULE_PATHS)),'
-	@echo '"EXTERNAL_PKG_DIRS": $(call to_json_string_list,$(EXTERNAL_PKG_DIRS)),'
 	@echo '"DEFAULT_MODULE": $(call to_json_string_list,$(sort $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE)))),'
 	@echo '"DISABLE_MODULE": $(call to_json_string_list,$(sort $(DISABLE_MODULE))),'
 	@echo '"USEMODULE": $(call to_json_string_list,$(sort $(filter-out $(DEFAULT_MODULE), $(USEMODULE)))),'
-	@echo '"USEPKG": $(call to_json_string_list,$(sort $(USEPKG))),'
 	@echo '"FEATURES_USED": $(call to_json_string_list,$(FEATURES_USED)),'
 	@echo '"FEATURES_REQUIRED": $(call to_json_string_list,$(sort $(FEATURES_REQUIRED))),'
 	@echo '"FEATURES_REQUIRED_ANY": $(call to_json_string_list,$(sort $(FEATURES_REQUIRED_ANY))),'
@@ -270,10 +250,7 @@ info-rust:
 	cargo version
 	c2rust --version
 	@echo "To use this setup of Rust in an IDE, add these command line arguments to the \`cargo check\` or \`rust-analyzer\`:"
-	@echo "    --profile $(CARGO_PROFILE) $(CARGO_OPTIONS)"
+	@echo "    --target $(RUST_TARGET) --profile $(CARGO_PROFILE)"
 	@echo "and export these environment variables:"
-	@echo "    CARGO_BUILD_TARGET=\"$(RUST_TARGET)\""
 	@echo "    RIOT_COMPILE_COMMANDS_JSON=\"$(CARGO_COMPILE_COMMANDS)\""
 	@echo "    RIOTBUILD_CONFIG_HEADER_C=\"$(RIOTBUILD_CONFIG_HEADER_C)\""
-	@echo "You can also call cargo related commands with \`make cargo-command CARGO_COMMAND=\"cargo check\"\`."
-	@echo "Beware that the way command line arguments are passed in is not consistent across cargo commands, so adding \`--profile $(CARGO_PROFILE)\` or other flags from above as part of CARGO_COMMAND may be necessary."

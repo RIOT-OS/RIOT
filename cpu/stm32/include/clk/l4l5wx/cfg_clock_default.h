@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2019 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 Freie Universität Berlin
+ *               2019 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_stm32
@@ -16,6 +17,9 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef CLK_L4L5WX_CFG_CLOCK_DEFAULT_H
+#define CLK_L4L5WX_CFG_CLOCK_DEFAULT_H
 
 #include "cfg_clock_common_lx_u5_wx.h"
 #include "kernel_defines.h"
@@ -181,4 +185,5 @@ extern "C" {
 }
 #endif
 
+#endif /* CLK_L4L5WX_CFG_CLOCK_DEFAULT_H */
 /** @} */

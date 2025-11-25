@@ -5,7 +5,7 @@ PKG_LICENSE=BSD-2-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-all: $(filter u8g2_%,$(filter-out u8g2_csrc% u8g2_disp_dev, $(USEMODULE)))
+all: $(filter u8g2_%,$(filter-out u8g2_csrc%, $(USEMODULE)))
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/csrc -f $(CURDIR)/Makefile.$(PKG_NAME)_csrc
 
 u8g2_%:

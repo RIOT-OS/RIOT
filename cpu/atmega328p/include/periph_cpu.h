@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2015 HAW Hamburg
- * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 HAW Hamburg
+ *               2016 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_atmega328p
@@ -16,6 +17,9 @@
  * @author          René Herthel <rene-herthel@outlook.de>
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include "periph_cpu_common.h"
 
@@ -99,4 +103,5 @@ static inline bool atmega_has_pin_exti(uint8_t port_num, uint8_t pin_num)
 #include "periph_conf.h"
 #include "default_timer_config.h"
 
+#endif /* PERIPH_CPU_H */
 /** @} */

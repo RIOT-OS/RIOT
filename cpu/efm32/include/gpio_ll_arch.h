@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2022 Christian Amsüss
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2022 Christian Amsüss
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_efm32
@@ -33,6 +34,9 @@
  * @author      Christian Amsüss <chrysn@fsfe.org>
  */
 
+#ifndef GPIO_LL_ARCH_H
+#define GPIO_LL_ARCH_H
+
 #include "cpu.h"
 #include "periph_cpu.h"
 
@@ -44,63 +48,12 @@ extern "C" {
 
 #ifndef DOXYGEN /* hide implementation specific details from Doxygen */
 
-#define GPIO_PORT_NUMBERING_ALPHABETIC  1
-
-/* Note: The pin count may be defined as zero to indicate the port not existing.
- * Hence, don't to `#if defined(foo)` but only `#if foo`
- */
-#if _GPIO_PORT_A_PIN_COUNT
-#  define GPIO_PORT_0   0
-#endif
-
-#if _GPIO_PORT_B_PIN_COUNT
-#  define GPIO_PORT_1   1
-#endif
-
-#if _GPIO_PORT_C_PIN_COUNT
-#  define GPIO_PORT_2   2
-#endif
-
-#if _GPIO_PORT_D_PIN_COUNT
-#  define GPIO_PORT_3   3
-#endif
-
-#if _GPIO_PORT_E_PIN_COUNT
-#  define GPIO_PORT_4   4
-#endif
-
-#if _GPIO_PORT_F_PIN_COUNT
-#  define GPIO_PORT_6   6
-#endif
-
-#if _GPIO_PORT_G_PIN_COUNT
-#  define GPIO_PORT_7   7
-#endif
-
-#if _GPIO_PORT_H_PIN_COUNT
-#  define GPIO_PORT_8   8
-#endif
-
-#if _GPIO_PORT_I_PIN_COUNT
-#  define GPIO_PORT_9   9
-#endif
-
-#if _GPIO_PORT_J_PIN_COUNT
-#  define GPIO_PORT_10  10
-#endif
-
-#if _GPIO_PORT_K_PIN_COUNT
-#  define GPIO_PORT_11  11
-#endif
-
 /* We could do
  *
- * static inline gpio_port_t gpio_port(uword_t num)
- * {
- *     return GPIO->P[num];
- * }
+#define GPIO_PORT(num) (GPIO->P[num])
+#define GPIO_PORT_NUM(port) ((port - &GPIO->P))
  *
- * which works for some operations, but at latest when _ll_set needs to fan out
+ * which forks for some operations, but at latest when _ll_set needs to fan out
  * for some EFM32 families to
  *
 #if defined(_GPIO_P_DOUTSET_MASK)
@@ -125,15 +78,9 @@ extern "C" {
  * an implementation for other EFM32 families. For the time being, the
  * suboptimal-but-works-for-all version is the best we have.
  */
-static inline gpio_port_t gpio_port(uword_t num)
-{
-    return num;
-}
 
-static inline uword_t gpio_port_num(gpio_port_t port)
-{
-    return port;
-}
+#define GPIO_PORT(num) (num)
+#define GPIO_PORT_NUM(port) (port)
 
 static inline uword_t gpio_ll_read(gpio_port_t port)
 {
@@ -199,4 +146,5 @@ static inline void * gpio_port_unpack_addr(gpio_port_t port)
 }
 #endif
 
+#endif /* GPIO_LL_ARCH_H */
 /** @} */

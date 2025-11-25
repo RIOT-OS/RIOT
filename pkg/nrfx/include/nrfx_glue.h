@@ -31,8 +31,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_nrfx
  * @{
@@ -44,6 +42,9 @@
  *
  * @author      Nordic Semiconductor ASA
  */
+
+#ifndef NRFX_GLUE_H
+#define NRFX_GLUE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -280,4 +281,5 @@ extern "C" {
 }
 #endif
 
+#endif /* NRFX_GLUE_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_wakaama
  * @defgroup    lwm2m_platform Platform adaption for Wakaama package
@@ -18,6 +16,8 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
+#ifndef LWM2M_PLATFORM_H
+#define LWM2M_PLATFORM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,4 +50,5 @@ void lwm2m_tlsf_status(void);
 }
 #endif
 
+#endif /* LWM2M_PLATFORM_H */
 /** @} */

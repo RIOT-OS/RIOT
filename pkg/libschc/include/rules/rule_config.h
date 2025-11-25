@@ -16,13 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
 /**
  * @internal
  * @author  boortmans <bart.moons@gmail.com>
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef RULES_RULE_CONFIG_H
+#define RULES_RULE_CONFIG_H
 
 #include "rules.h"
 
@@ -33,3 +33,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* RULES_RULE_CONFIG_H */

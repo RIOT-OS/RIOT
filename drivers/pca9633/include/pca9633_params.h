@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_actuators
  * @brief       Default configuration for the PCA9633 I2C PWM controller
@@ -17,6 +15,8 @@
  * @author      Hendrik van Essen <hendrik.ve@fu-berlin.de>
  * @file
  */
+#ifndef PCA9633_PARAMS_H
+#define PCA9633_PARAMS_H
 
 #include <stdbool.h>
 
@@ -94,4 +94,5 @@ static const pca9633_params_t pca9633_params[] =
 }
 #endif
 
+#endif /* PCA9633_PARAMS_H */
 /** @} */

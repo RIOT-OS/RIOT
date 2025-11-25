@@ -1,5 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2021 Armink <armink.ztl@gmail.com>
+ * Copyright (c) 2021, Armink, <armink.ztl@gmail.com>
+ *
  * SPDX-License-Identifier: Apache-2.0
  */
 

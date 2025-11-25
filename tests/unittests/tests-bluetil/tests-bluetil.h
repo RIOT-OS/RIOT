@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -18,6 +16,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin>
  */
 
+#ifndef TESTS_BLUETIL_H
+#define TESTS_BLUETIL_H
 #include "embUnit/embUnit.h"
 
 #ifdef __cplusplus
@@ -33,4 +33,5 @@ void tests_bluetil(void);
 }
 #endif
 
+#endif /* TESTS_BLUETIL_H */
 /** @} */

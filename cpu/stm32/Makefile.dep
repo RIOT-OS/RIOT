@@ -78,9 +78,10 @@ ifneq (,$(filter periph_rtc_mem,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtc
 endif
 
-ifneq (,$(filter periph_can,$(FEATURES_USED)))
-  ifneq (,$(filter g4,$(CPU_FAM)))
-	USEMODULE += fdcan
+ifneq (,$(filter periph_adc,$(FEATURES_USED)))
+  ifneq (,$(filter f3 l4 wb wl, $(CPU_FAM)))
+    USEMODULE += ztimer
+    USEMODULE += ztimer_msec
   endif
 endif
 

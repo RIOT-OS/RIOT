@@ -1,14 +1,20 @@
 /*
- * SPDX-FileCopyrightText: 2016 Kaspar Schleiser <kaspar@schleiser.de>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for
+ * more details.
  */
 
 /**
+ * @ingroup     cpu_native
+ * @ingroup     drivers_periph_pm
+ * @{
+ *
  * @file
- * @ingroup cpu_native
- * @ingroup drivers_periph_pm
- * @brief   Native Power Management implementation
- * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @brief       native Power Management implementation
+ *
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #include <err.h>
@@ -34,12 +40,12 @@ unsigned _native_retval = EXIT_SUCCESS;
 
 static void _native_sleep(void)
 {
-    _native_pending_syscalls_up(); /* no switching here */
+    _native_in_syscall++; /* no switching here */
     real_pause();
-    _native_pending_syscalls_down();
+    _native_in_syscall--;
 
-    if (_native_pending_signals > 0) {
-        _native_pending_syscalls_up();
+    if (_native_sigpend > 0) {
+        _native_in_syscall++;
         _native_syscall_leave();
     }
 }

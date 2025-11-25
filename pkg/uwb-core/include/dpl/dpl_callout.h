@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_uwb_core
  * @{
@@ -21,6 +19,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+
+#ifndef DPL_DPL_CALLOUT_H
+#define DPL_DPL_CALLOUT_H
 
 #include "os/os_callout.h"
 
@@ -81,3 +82,5 @@ static inline void dpl_callout_stop(struct dpl_callout *c)
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* DPL_DPL_CALLOUT_H */

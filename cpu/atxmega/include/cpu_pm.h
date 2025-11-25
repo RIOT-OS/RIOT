@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2021 Gerson Fernando Budke
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2021 Gerson Fernando Budke
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_atxmega
@@ -21,6 +22,9 @@
 
 #include "periph_cpu.h"
 
+#ifndef CPU_PM_H
+#define CPU_PM_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -33,4 +37,5 @@ void pm_periph_power_off(void);
 }
 #endif
 
+#endif /* CPU_PM_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_tsrb Thread safe ringbuffer
  * @ingroup     sys
@@ -22,6 +20,9 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
+#ifndef TSRB_H
+#define TSRB_H
+
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -33,7 +34,7 @@ extern "C" {
 #endif
 
 /**
- * @brief       thread-safe ringbuffer struct
+ * @brief     thread-safe ringbuffer struct
  */
 typedef struct tsrb {
     uint8_t *buf;               /**< Buffer to operate on. */
@@ -43,22 +44,15 @@ typedef struct tsrb {
 } tsrb_t;
 
 /**
- * @brief       Static initializer
- *
- * @note The size of the buffer (`sizeof(@p BUF)`) must be a power of two.
- *
- * @param[in]   BUF       Buffer to use by tsrb.
+ * @brief Static initializer
  */
 #define TSRB_INIT(BUF) { (BUF), sizeof (BUF), 0, 0 }
 
 /**
- * @brief       Initialize a tsrb.
- *
- * @note The size of the buffer (@p bufsize) must be a power of two.
- *
- * @param[out]  rb        Datum to initialize.
- * @param[in]   buffer    Buffer to use by tsrb.
- * @param[in]   bufsize   Size of @p buffer.
+ * @brief        Initialize a tsrb.
+ * @param[out]   rb        Datum to initialize.
+ * @param[in]    buffer    Buffer to use by tsrb.
+ * @param[in]    bufsize   `sizeof (buffer)`, must be power of 2.
  */
 static inline void tsrb_init(tsrb_t *rb, uint8_t *buffer, unsigned bufsize)
 {
@@ -74,8 +68,8 @@ static inline void tsrb_init(tsrb_t *rb, uint8_t *buffer, unsigned bufsize)
 }
 
 /**
- * @brief       Clear a tsrb.
- * @param[out]  rb Ringbuffer to operate on
+ * @brief        Clear a tsrb.
+ * @param[out]   rb Ringbuffer to operate on
  */
 static inline void tsrb_clear(tsrb_t *rb)
 {
@@ -106,7 +100,7 @@ static inline int tsrb_empty(const tsrb_t *rb)
 static inline unsigned int tsrb_avail(const tsrb_t *rb)
 {
     unsigned irq_state = irq_disable();
-    unsigned int retval = (rb->writes - rb->reads);
+    int retval = (rb->writes - rb->reads);
     irq_restore(irq_state);
     return retval;
 }
@@ -133,7 +127,7 @@ static inline int tsrb_full(const tsrb_t *rb)
 static inline unsigned int tsrb_free(const tsrb_t *rb)
 {
     unsigned irq_state = irq_disable();
-    unsigned int retval = (rb->size - rb->writes + rb->reads);
+    int retval = (rb->size - rb->writes + rb->reads);
     irq_restore(irq_state);
     return retval;
 }
@@ -202,4 +196,5 @@ int tsrb_add(tsrb_t *rb, const uint8_t *src, size_t n);
 }
 #endif
 
+#endif /* TSRB_H */
 /** @} */

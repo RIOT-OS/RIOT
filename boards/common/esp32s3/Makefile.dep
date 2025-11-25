@@ -1,1 +1,3 @@
-USEMODULE += boards_common_esp32x
+USEMODULE += boards_common_esp32s3
+
+include $(RIOTBOARD)/common/esp32x/Makefile.dep

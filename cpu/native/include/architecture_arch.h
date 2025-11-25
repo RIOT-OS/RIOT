@@ -1,20 +1,24 @@
 /*
- * SPDX-FileCopyrightText: 2020 Otto-von-Guericke-Universität Magdeburg
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
-#pragma once
-
 /**
- * @addtogroup cpu_native
+ * @ingroup     cpu_native
  * @{
+ *
+ * @file
+ * @brief       Architecture details
+ *
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ *
  */
 
-/**
- * @file
- * @brief Architecture details
- * @author Marian Buschsieweke <marian.buschsieweke@ovgu.de>
- */
+#ifndef ARCHITECTURE_ARCH_H
+#define ARCHITECTURE_ARCH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,12 +33,12 @@ void native_breakpoint(void);
 
 /* Doc is provided centrally in architecture.h, hide this from Doxygen */
 #ifndef DOXYGEN
-#  if (__SIZEOF_POINTER__ == 8)
-#    define ARCHITECTURE_WORD_BITS      (64U)
-#  else
-#    define ARCHITECTURE_WORD_BITS      (32U)
-#  endif
-#  define ARCHITECTURE_BREAKPOINT(v)  native_breakpoint()
+#if (__SIZEOF_POINTER__ == 8)
+#define ARCHITECTURE_WORD_BITS      (64U)
+#else
+#define ARCHITECTURE_WORD_BITS      (32U)
+#endif
+#define ARCHITECTURE_BREAKPOINT(v)  native_breakpoint()
 #endif /* DOXYGEN */
 
 #ifdef __cplusplus
@@ -42,3 +46,4 @@ void native_breakpoint(void);
 #endif
 
 /** @} */
+#endif /* ARCHITECTURE_ARCH_H */

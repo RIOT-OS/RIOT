@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_tinyusb
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
+
+#ifndef TINYUSB_DESCRIPTORS_H
+#define TINYUSB_DESCRIPTORS_H
 
 #include "tusb_config.h"        /* defined by the application */
 #include "tinyusb.h"
@@ -204,4 +205,5 @@ enum {
 #endif
 
 #endif /* !DOXYGEN */
+#endif /* TINYUSB_DESCRIPTORS_H */
 /** @} */

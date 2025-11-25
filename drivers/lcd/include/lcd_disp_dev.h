@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_lcd
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef LCD_DISP_DEV_H
+#define LCD_DISP_DEV_H
 
 #include "disp_dev.h"
 
@@ -33,4 +34,5 @@ extern const disp_dev_driver_t lcd_disp_dev_driver;
 }
 #endif
 
+#endif /* LCD_DISP_DEV_H */
 /** @} */

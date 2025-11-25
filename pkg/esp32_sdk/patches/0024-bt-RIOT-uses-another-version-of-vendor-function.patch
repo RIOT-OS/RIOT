@@ -1,0 +1,26 @@
+From 612d6db5386a9a599fe66cfae9ad526c5dfb7372 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 11 Aug 2022 01:44:44 +0200
+Subject: [PATCH 24/26] bt: RIOT uses another version of vendor function
+
+The xt_ints_on function version used  by RIOT returns an integer value, the old mask. Using this function instead of void version, doesn't lead to any problem.
+---
+ components/bt/controller/esp32/bt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/components/bt/controller/esp32/bt.c b/components/bt/controller/esp32/bt.c
+index 8ed126f867..f967c5b238 100644
+--- a/components/bt/controller/esp32/bt.c
++++ b/components/bt/controller/esp32/bt.c
+@@ -125,7 +125,7 @@ typedef struct {
+ struct osi_funcs_t {
+     uint32_t _version;
+     xt_handler (*_set_isr)(int n, xt_handler f, void *arg);
+-    void (*_ints_on)(unsigned int mask);
++    unsigned int (*_ints_on)(unsigned int mask);
+     void (*_interrupt_disable)(void);
+     void (*_interrupt_restore)(void);
+     void (*_task_yield)(void);
+-- 
+2.17.1
+

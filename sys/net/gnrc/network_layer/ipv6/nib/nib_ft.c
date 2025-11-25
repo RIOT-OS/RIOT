@@ -132,26 +132,14 @@ bool gnrc_ipv6_nib_ft_iter(const ipv6_addr_t *next_hop, unsigned iface,
 
         while ((offl = _nib_offl_iter(offl))) {
             assert(offl->mode != 0);
-            if (offl->next_hop == NULL) {
-                /* 'holey' NIB / dangling reference.
-                 * there is no next hop (not even an interface) */
-                continue;
+            if ((offl->next_hop != NULL) &&
+                ((iface == 0) || (iface == _nib_onl_get_if(offl->next_hop))) &&
+                ((next_hop == NULL) || ipv6_addr_equal(&offl->next_hop->ipv6,
+                                                       next_hop))) {
+                _nib_ft_get(offl, fte);
+                *state = offl;
+                return true;
             }
-            if (offl->mode == _PL && !(offl->flags & _PFX_ON_LINK)) {
-                /* prefix list entry is off-link */
-                continue;
-            }
-            if (iface && iface != _nib_onl_get_if(offl->next_hop)) {
-                /* interface does not match */
-                continue;
-            }
-            if (next_hop && !ipv6_addr_equal(&offl->next_hop->ipv6, next_hop)) {
-                /* next hop does not match */
-                continue;
-            }
-            _nib_ft_get(offl, fte);
-            *state = offl;
-            return true;
         }
         *state = NULL;
     }

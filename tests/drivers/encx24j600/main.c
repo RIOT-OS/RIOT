@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2022 HAW Hamburg
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2022 HAW Hamburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -18,9 +21,9 @@
 #include <stdio.h>
 
 #include "shell.h"
-#include "test_utils/expect.h"
 #include "test_utils/netdev_eth_minimal.h"
 #include "init_dev.h"
+#include "assert.h"
 #include "encx24j600.h"
 #include "encx24j600_params.h"
 
@@ -38,7 +41,7 @@ int netdev_eth_minimal_init_devs(netdev_event_cb_t cb) {
 
         /* initialize the device driver */
         int res = device->driver->init(device);
-        expect(!res);
+        assert(!res);
     }
 
     return 0;

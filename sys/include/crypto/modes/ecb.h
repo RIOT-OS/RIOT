@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     sys_crypto
  * @{
@@ -18,6 +16,9 @@
  * @author      Freie Universitaet Berlin, Computer Systems & Telematics
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  */
+
+#ifndef CRYPTO_MODES_ECB_H
+#define CRYPTO_MODES_ECB_H
 
 #include "crypto/ciphers.h"
 
@@ -64,4 +65,5 @@ int cipher_decrypt_ecb(const cipher_t *cipher, const uint8_t *input,
 }
 #endif
 
+#endif /* CRYPTO_MODES_ECB_H */
 /** @} */

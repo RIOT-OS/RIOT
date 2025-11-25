@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_pca9685
  * @brief       Default configuration for the PCA9685 I2C PWM controller
@@ -15,6 +13,9 @@
  * @file
  * @{
  */
+
+#ifndef PCA9685_PARAMS_H
+#define PCA9685_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -138,4 +139,5 @@ static const  pca9685_saul_pwm_params_t pca9685_saul_pwm_params[] =
 }
 #endif
 
+#endif /* PCA9685_PARAMS_H */
 /** @} */

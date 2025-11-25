@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_at24mac AT24MAC unique ID chip
  * @ingroup     drivers_misc
@@ -18,6 +16,9 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+
+#ifndef AT24MAC_H
+#define AT24MAC_H
 
 #include <stdint.h>
 #include "net/eui48.h"
@@ -100,4 +101,5 @@ at24mac_type_t at24mac_get_type(at24mac_t dev);
 }
 #endif
 
+#endif /* AT24MAC_H */
 /** @} */

@@ -1,9 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2014-2015 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2015 Hamburg University of Applied Sciences
- * SPDX-FileCopyrightText: 2017-2020 Inria
- * SPDX-FileCopyrightText: 2017 OTA keys S.A.
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2014-2015 Freie Universität Berlin
+ *               2015 Hamburg University of Applied Sciences
+ *               2017-2020 Inria
+ *               2017 OTA keys S.A.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
 
 /**
@@ -200,7 +203,7 @@ void gpio_irq_disable(gpio_t pin)
     EXTI_REG_IMR &= ~(1 << _pin_num(pin));
 }
 
-bool gpio_read(gpio_t pin)
+int gpio_read(gpio_t pin)
 {
     return (_port(pin)->IDR & (1 << _pin_num(pin)));
 }
@@ -224,7 +227,7 @@ void gpio_toggle(gpio_t pin)
     }
 }
 
-void gpio_write(gpio_t pin, bool value)
+void gpio_write(gpio_t pin, int value)
 {
     if (value) {
         gpio_set(pin);

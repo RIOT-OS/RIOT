@@ -1,12 +1,13 @@
 /*
- * SPDX-FileCopyrightText: 2018 Gilles DOFFE <g.doffe@gmail.com>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 Gilles DOFFE <g.doffe@gmail.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
-#pragma once
-
 /**
- * @defgroup    drivers_motor_driver DC Motor Driver
+ * @defgroup    drivers_motor DC Motor Driver
  * @ingroup     drivers_actuators
  * @brief       High-level driver for DC motors
  *
@@ -68,9 +69,11 @@
  * - CCW (Counter ClockWise)
  * and a brake capability
  *
- * Most H-bridges brake in both BRAKE HIGH and BRAKE LOW states,
- * but some only support BRAKE HIGH due to hardware
- * When breaking the PWM duty cycle is set to 0.
+ * BRAKE LOW is functionally the same than BRAKE HIGH but some H-bridge only
+ * brake on BRAKE HIGH due to hardware.
+ * In case of single direction GPIO, there is no BRAKE, PWM duty cycle is set
+ * to 0.
+
  * @{
  * @file
  * @brief       High-level driver for DC motors
@@ -78,7 +81,8 @@
  * @author      Gilles DOFFE <g.doffe@gmail.com>
  */
 
-#include <stdbool.h>
+#ifndef MOTOR_DRIVER_H
+#define MOTOR_DRIVER_H
 
 #include "periph/pwm.h"
 #include "periph/gpio.h"
@@ -88,7 +92,7 @@ extern "C" {
 #endif
 
 /**
- * @defgroup drivers_motor_driver_config     motor_driver driver build configuration
+ * @defgroup drivers_motor_driver_config     Motor_Driver driver compile configuration
  * @ingroup config_drivers_actuators
  * @{
  */
@@ -96,21 +100,34 @@ extern "C" {
  * @brief Maximum number of motors by motor driver
  */
 #ifndef CONFIG_MOTOR_DRIVER_MAX
-#  define CONFIG_MOTOR_DRIVER_MAX  (2)
+#define CONFIG_MOTOR_DRIVER_MAX    (2)
 #endif
 /** @} */
+
+/**
+ * @brief Macro to return motor driver id
+ */
+#define MOTOR_DRIVER_DEV(x) (x)
 
 /**
  * @brief Describe DC motor driver modes
  */
 typedef enum {
-    MOTOR_DRIVER_2_DIRS         = 0,            /**< 2 GPIOs for direction, \
-                                                     handling brake */
-    MOTOR_DRIVER_1_DIR          = 1,            /**< single GPIO for direction, \
-                                                     no brake */
-    MOTOR_DRIVER_1_DIR_BRAKE    = 2             /**< single GPIO for direction, \
-                                                     single GPIO for brake */
+    MOTOR_DRIVER_2_DIRS         = 0,            /**< 2 GPIOS for direction, \
+                                                      handling BRAKE */
+    MOTOR_DRIVER_1_DIR          = 1,            /**< Single GPIO for direction, \
+                                                      no BRAKE */
+    MOTOR_DRIVER_1_DIR_BRAKE    = 2             /**< Single GPIO for direction, \
+                                                      Single GPIO for BRAKE */
 } motor_driver_mode_t;
+
+/**
+ * @brief Describe DC motor driver brake modes
+ */
+typedef enum {
+    MOTOR_BRAKE_LOW     = 0,        /**< Low stage brake */
+    MOTOR_BRAKE_HIGH    = 1,        /**< High stage brake */
+} motor_driver_mode_brake_t;
 
 /**
  * @brief Describe DC motor direction states
@@ -126,84 +143,61 @@ typedef enum {
 typedef struct {
     int pwm_channel;            /**< PWM channel the motor is connected to */
     gpio_t gpio_enable;         /**< GPIO to enable/disable motor */
-    gpio_t gpio_dir0;           /**< GPIO to control direction */
-    union {
-        gpio_t gpio_dir1;       /**< GPIO to control direction */
-        gpio_t gpio_brake;      /**< GPIO to control brake */
-    };
-    bool gpio_dir_reverse;      /**< flag to reverse direction */
+    gpio_t gpio_dir0;           /**< GPIO to control rotation direction */
+    gpio_t gpio_dir1_or_brake;  /**< GPIO to control rotation direction */
+    uint8_t gpio_dir_reverse;   /**< flag to reverse direction */
+    uint8_t gpio_enable_invert; /**< flag to set enable GPIO inverted mode */
+    uint8_t gpio_brake_invert;  /**< flag to make brake active low */
 } motor_t;
 
 /**
- * @brief   Motor driver
+ * @brief   Default motor driver type definition
  */
-typedef struct _motor_driver_t motor_driver_t;
+typedef unsigned int motor_driver_t;
 
 /**
  * @brief   Motor callback. It is called at end of motor_set()
  */
-typedef void (*motor_set_post_cb_t)(const motor_driver_t *motor_driver,
+typedef void (*motor_driver_cb_t)(const motor_driver_t motor_driver,
                                   uint8_t motor_id,
                                   int32_t pwm_duty_cycle);
-
-/**
- * @brief   Motor set callback. Called to set motor speed.
- */
-typedef void (*motor_set_cb_t)(const motor_t *motor,
-                               motor_direction_t direction);
-
-/**
- * @brief   Motor brake callback. Called to brake a motor.
- */
-typedef void (*motor_brake_cb_t)(const motor_t *motor,
-                                 bool brake);
 
 /**
  * @brief Describe DC motor driver with PWM device and motors array
  */
 typedef struct {
-    motor_driver_mode_t mode;                   /**< driver mode */
-    pwm_t pwm_dev;                              /**< PWM device driving motors */
-    pwm_mode_t pwm_mode;                        /**< PWM mode */
-    uint32_t pwm_frequency;                     /**< PWM device frequency */
-    uint32_t pwm_resolution;                    /**< PWM device resolution */
-    bool brake_inverted;                        /**< if false, brake high (1), low (0) otherwise */
-    bool enable_inverted;                       /**< if false, enable high (1), low (0) otherwise */
-    uint8_t nb_motors;                          /**< number of motors */
-    motor_t motors[CONFIG_MOTOR_DRIVER_MAX];    /**< motors array */
-    motor_set_post_cb_t motor_set_post_cb;      /**< callback post to motor_set */
-} motor_driver_params_t;
-
-/**
- * @brief   Motor driver
- */
-struct _motor_driver_t {
-    const motor_driver_params_t *params;        /**< parameters */
-};
+    pwm_t pwm_dev;                          /**< PWM device driving motors */
+    motor_driver_mode_t mode;               /**< driver mode */
+    motor_driver_mode_brake_t mode_brake;   /**< driver brake mode */
+    pwm_mode_t pwm_mode;                    /**< PWM mode */
+    uint32_t pwm_frequency;                 /**< PWM device frequency */
+    uint32_t pwm_resolution;                /**< PWM device resolution */
+    uint8_t nb_motors;                      /**< number of moros */
+    motor_t motors[CONFIG_MOTOR_DRIVER_MAX];       /**< motors array */
+    motor_driver_cb_t cb;                   /**< callback on motor_set */
+} motor_driver_config_t;
 
 /**
  * @brief Initialize DC motor driver board
  *
- * @param[out]  motor_driver    motor driver to initialize
- * @param[in]   params          motor driver parameters
+ * @param[out] motor_driver     motor driver to initialize
  *
- * @retval                      0 on success
- * @retval                      -EINVAL on bad parameter value
- * @retval                      -EIO on failed GPIO init
+ * @return                      0 on success
+ * @return                      -1 on error with errno set
  */
-int motor_driver_init(motor_driver_t *motor_driver, const motor_driver_params_t *params);
+int motor_driver_init(const motor_driver_t motor_driver);
 
 /**
  * @brief Set motor speed and direction
  *
  * @param[in] motor_driver      motor driver to which motor is attached
  * @param[in] motor_id          motor ID on driver
- * @param[in] pwm_duty_cycle    signed PWM duty_cycle to set motor speed and direction
+ * @param[in] pwm_duty_cycle    Signed PWM duty_cycle to set motor speed and direction
  *
- * @retval                      0 on success
- * @retval                      -EINVAL on bad motor ID
+ * @return                      0 on success
+ * @return                      -1 on error with errno set
  */
-int motor_set(const motor_driver_t *motor_driver, uint8_t motor_id, \
+int motor_set(const motor_driver_t motor_driver, uint8_t motor_id, \
               int32_t pwm_duty_cycle);
 
 /**
@@ -212,29 +206,34 @@ int motor_set(const motor_driver_t *motor_driver, uint8_t motor_id, \
  * @param[in] motor_driver      motor driver to which motor is attached
  * @param[in] motor_id          motor ID on driver
  *
- * @retval                      0 on success
- * @retval                      -EINVAL on bad motor ID
+ * @return                      0 on success
+ * @return                      -1 on error with errno set
  */
-int motor_brake(const motor_driver_t *motor_driver, uint8_t motor_id);
+int motor_brake(const motor_driver_t motor_driver, uint8_t motor_id);
 
 /**
  * @brief Enable a motor of a given motor driver
  *
  * @param[in] motor_driver      motor driver to which motor is attached
  * @param[in] motor_id          motor ID on driver
+ *
+ * @return
  */
-void motor_enable(const motor_driver_t *motor_driver, uint8_t motor_id);
+void motor_enable(const motor_driver_t motor_driver, uint8_t motor_id);
 
 /**
  * @brief Disable a motor of a given motor driver
  *
  * @param[in] motor_driver      motor driver to which motor is attached
  * @param[in] motor_id          motor ID on driver
+ *
+ * @return
  */
-void motor_disable(const motor_driver_t *motor_driver, uint8_t motor_id);
+void motor_disable(const motor_driver_t motor_driver, uint8_t motor_id);
 
 #ifdef __cplusplus
 }
 #endif
 
+#endif /* MOTOR_DRIVER_H */
 /** @} */

@@ -1,8 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2015 Ludwig Knüpfer
- * SPDX-FileCopyrightText: 2015 Christian Mehlis
- * SPDX-FileCopyrightText: 2016-2017 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 Ludwig Knüpfer, Christian Mehlis
+ *               2016-2017 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -37,7 +39,7 @@ int main(void)
 
     /* initialize first configured sensor */
     printf("Initializing DHT sensor...\t");
-    if (dht_init(&dev, &dht_params[0]) == 0) {
+    if (dht_init(&dev, &dht_params[0]) == DHT_OK) {
         puts("[OK]\n");
     }
     else {
@@ -49,16 +51,8 @@ int main(void)
     while (1) {
         ztimer_sleep(ZTIMER_USEC, DELAY);
 
-        if (dht_read(&dev, &temp, &hum) != 0) {
-            puts("Error reading both values");
-            continue;
-        }
-        if (dht_read(&dev, &temp, NULL) != 0) {
-            puts("Error reading just temperature");
-            continue;
-        }
-        if (dht_read(&dev, NULL, &hum) != 0) {
-            puts("Error reading just humidity");
+        if (dht_read(&dev, &temp, &hum) != DHT_OK) {
+            puts("Error reading values");
             continue;
         }
 

@@ -8,8 +8,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 #if !DOXYGEN    /* hide from documentation */
 
 /**
@@ -31,6 +29,9 @@
  * backward compatibility.
  */
 
+#ifndef ST7735_H
+#define ST7735_H
+
 #include "lcd.h"
 #include "st77xx.h"
 
@@ -51,5 +52,6 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+#endif /* ST7735_H */
 /** @} */
 #endif /* !DOXYGEN */

@@ -1,0 +1,22 @@
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup cpu CPU
+ * @brief CPU specific implementations
+ *
+ * This module contains all CPU specific source files. In case of multiple CPUs
+ * sharing the same architecture, the implementation is split into several CPU
+ * specific parts and an architecture part (e.g. arm7_common and lpc23xx).
+ */
+
+ /**
+ * @defgroup    config_cpu CPU Configurations
+ * @ingroup     config
+ * @brief       Compile time configurations for different kinds of CPU.
+ */

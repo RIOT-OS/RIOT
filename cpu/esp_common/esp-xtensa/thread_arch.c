@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2019 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -283,9 +286,6 @@ void IRAM_ATTR thread_yield_higher(void)
         ets_soft_int_type = ETS_SOFT_INT_YIELD;
         WSR(BIT(ETS_SOFT_INUM), interrupt);
         critical_exit();
-#elif defined(__XTENSA__)
-        /* generate the software interrupt to switch the context */
-        WSR(BIT(CPU_INUM_SOFTWARE), interrupt);
 #elif defined(DPORT_CPU_INTR_FROM_CPU_0_REG)
         /* generate the software interrupt to switch the context */
         DPORT_WRITE_PERI_REG(DPORT_CPU_INTR_FROM_CPU_0_REG, DPORT_CPU_INTR_FROM_CPU_0);

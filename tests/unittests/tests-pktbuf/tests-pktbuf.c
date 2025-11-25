@@ -325,10 +325,7 @@ static void test_pktbuf_mark__pkt_NOT_NULL__size_greater_than_pkt_size(void)
 
 static void test_pktbuf_mark__pkt_NOT_NULL__pkt_data_NULL(void)
 {
-    gnrc_pktsnip_t pkt = { .size  = sizeof(TEST_STRING16),
-                           .type  = GNRC_NETTYPE_TEST,
-                           .users = 1,
-                         };
+    gnrc_pktsnip_t pkt = { NULL, NULL, sizeof(TEST_STRING16), 1, GNRC_NETTYPE_TEST };
 
     TEST_ASSERT_NULL(gnrc_pktbuf_mark(&pkt, sizeof(TEST_STRING16) - 1,
                                       GNRC_NETTYPE_TEST));

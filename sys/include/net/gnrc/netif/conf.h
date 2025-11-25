@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gnrc_netif_conf GNRC network interface configurations
  * @ingroup     net_gnrc_netif
@@ -19,6 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef NET_GNRC_NETIF_CONF_H
+#define NET_GNRC_NETIF_CONF_H
 
 #include "modules.h"
 
@@ -209,3 +209,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* NET_GNRC_NETIF_CONF_H */

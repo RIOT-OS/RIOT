@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2019 ML!PA Consulting GmbH
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 ML!PA Consulting GmbH
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_samd5x
@@ -15,6 +16,9 @@
  *
  * @author          Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include <limits.h>
 
@@ -32,8 +36,8 @@ extern "C" {
 #define SAM0_DFLL_FREQ_HZ       MHZ(48)
 
 /**
- * @brief   XOSC is used to generate a fixed frequency of 48 MHz
- */
+￼ * @brief   XOSC is used to generate a fixed frequency of 48 MHz
+￼ */
 #define SAM0_XOSC_FREQ_HZ       (XOSC0_FREQUENCY ? XOSC0_FREQUENCY : XOSC1_FREQUENCY)
 
 /**
@@ -69,16 +73,16 @@ enum {
  */
 #define SAM0_GCLK_MAIN 0                /**< 120 MHz main clock       */
 #ifndef SAM0_GCLK_32KHZ
-#  define SAM0_GCLK_32KHZ 1             /**< 32 kHz clock             */
+#define SAM0_GCLK_32KHZ 1               /**< 32 kHz clock             */
 #endif
 #ifndef SAM0_GCLK_TIMER
-#  define SAM0_GCLK_TIMER 2             /**< 4-8 MHz clock for xTimer */
+#define SAM0_GCLK_TIMER 2               /**< 4-8 MHz clock for xTimer */
 #endif
 #ifndef SAM0_GCLK_PERIPH
-#  define SAM0_GCLK_PERIPH 3            /**< 12-48 MHz (DFLL) clock   */
+#define SAM0_GCLK_PERIPH 3              /**< 12-48 MHz (DFLL) clock   */
 #endif
 #ifndef SAM0_GCLK_100MHZ
-#  define SAM0_GCLK_100MHZ 4            /**< 100MHz FDPLL clock       */
+#define SAM0_GCLK_100MHZ 4              /**< 100MHz FDPLL clock       */
 #endif
 /** @} */
 
@@ -296,4 +300,5 @@ struct sam0_aux_cfg_mapping {
 }
 #endif
 
+#endif /* PERIPH_CPU_H */
 /** @} */

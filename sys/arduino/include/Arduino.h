@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     sys_arduino
  * @brief       Wrapper to keep source code compatibility for Arduino.h
@@ -15,6 +13,9 @@
  * @file
  * @{
  */
+
+#ifndef ARDUINO_H
+#define ARDUINO_H
 
 #ifdef __cplusplus
 #include "arduino.hpp"
@@ -28,4 +29,5 @@ extern "C" {
 }
 #endif
 
+#endif /* ARDUINO_H */
 /** @} */

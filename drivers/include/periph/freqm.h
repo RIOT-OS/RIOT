@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_periph_freqm FREQM
  * @ingroup     drivers_periph
@@ -26,6 +24,9 @@
  *
  * @author      Urs Gompper <urs.gompper@ml-pa.com>
  */
+
+#ifndef PERIPH_FREQM_H
+#define PERIPH_FREQM_H
 
 #include <errno.h>
 #include <mutex.h>
@@ -96,3 +97,4 @@ int freqm_frequency_get(freqm_t idx, uint32_t *result, uint32_t period_us);
 #endif
 
 /** @} */
+#endif /* PERIPH_FREQM_H */

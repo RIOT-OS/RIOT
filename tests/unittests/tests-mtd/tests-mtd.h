@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,8 @@
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
+#ifndef TESTS_MTD_H
+#define TESTS_MTD_H
 
 #include "embUnit.h"
 
@@ -33,4 +33,5 @@ void tests_mtd(void);
 }
 #endif
 
+#endif /* TESTS_MTD_H */
 /** @} */

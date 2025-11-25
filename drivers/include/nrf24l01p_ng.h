@@ -5,9 +5,6 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-
-#pragma once
-
 /**
  * @defgroup    drivers_nrf24l01p_ng NRF24L01+ (NG) 2.4 GHz trasceiver driver
  * @ingroup     drivers_netdev
@@ -21,6 +18,8 @@
  *
  * @author  Fabian Hüßler <fabian.huessler@ovgu.de>
  */
+#ifndef NRF24L01P_NG_H
+#define NRF24L01P_NG_H
 
 #include <stdint.h>
 
@@ -476,4 +475,5 @@ void nrf24l01p_ng_print_dev_info(const nrf24l01p_ng_t *dev);
 }
 #endif
 
+#endif /* NRF24L01P_NG_H */
 /** @} */

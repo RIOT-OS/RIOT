@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_mhz19
  *
@@ -19,6 +17,9 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  * @author      Christian Manal <manal@uni-bremen.de>
  */
+
+#ifndef MHZ19_PARAMS_H
+#define MHZ19_PARAMS_H
 
 #include "board.h"
 #include "mhz19.h"
@@ -81,4 +82,5 @@ static const saul_reg_info_t mhz19_saul_info[] =
 }
 #endif
 
+#endif /* MHZ19_PARAMS_H */
 /** @} */

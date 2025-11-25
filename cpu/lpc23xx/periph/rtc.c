@@ -1,10 +1,13 @@
 /*
- * SPDX-FileCopyrightText: 2008-2010 Freie Universität Berlin (FUB)
- * SPDX-FileCopyrightText: 2014 INRIA
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright 2008-2010, Freie Universitaet Berlin (FUB). All rights reserved.
+ * Copyright 2014 INRIA
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
-/**
+ /**
   * @ingroup     cpu_lpc23xx
   * @ingroup     drivers_periph_rtc
   * @{

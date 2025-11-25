@@ -1,4 +1,4 @@
-BOARD ?= adafruit-feather-nrf52840-sense
+BOARD ?= feather-nrf52840-sense
 include ../Makefile.drivers_common
 
 DISABLE_MODULE += test_utils_interactive_sync

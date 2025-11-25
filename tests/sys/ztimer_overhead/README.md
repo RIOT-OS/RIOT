@@ -22,7 +22,3 @@ ZTIMER_USEC adjust params for dwm1001:
     CONFIG_ZTIMER_USEC_ADJUST_SET    6
     CONFIG_ZTIMER_USEC_ADJUST_SLEEP  21
 ```
-
-This test application also makes use of the `ztimer_auto_adjust` pseudomodule
-and thereby allows for comparison of the offset values calculated during
-auto-initialization and later during this test.

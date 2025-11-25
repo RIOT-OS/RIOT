@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_itg320x ITG320X 3-axis gyroscope
  * @ingroup     drivers_sensors
@@ -38,6 +36,9 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
+
+#ifndef ITG320X_H
+#define ITG320X_H
 
 #ifdef __cplusplus
 extern "C"
@@ -311,4 +312,5 @@ int itg320x_power_up(itg320x_t *dev);
 }
 #endif
 
+#endif /* ITG320X_H */
 /** @} */

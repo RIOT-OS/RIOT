@@ -2,7 +2,7 @@ include ../Makefile.sys_common
 
 BOARD ?= native
 
-BOARD_WHITELIST += native32 native64
+BOARD_WHITELIST += native native64
 
 USEMODULE += frac
 

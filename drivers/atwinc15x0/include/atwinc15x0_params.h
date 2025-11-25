@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_atwinc15x0
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
+
+#ifndef ATWINC15X0_PARAMS_H
+#define ATWINC15X0_PARAMS_H
 
 #include "board.h"
 
@@ -96,4 +97,5 @@ static const atwinc15x0_params_t atwinc15x0_params[] =
 }
 #endif
 
+#endif /* ATWINC15X0_PARAMS_H */
 /** @} */

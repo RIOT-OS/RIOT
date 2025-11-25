@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_lvgl
  * @brief       LVGL configuration macros
@@ -15,6 +13,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef LV_CONF_H
+#define LV_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,17 +30,13 @@ extern "C" {
  *====================*/
 
 /* Color depth:
- * - 1:  1 bit per pixel
+ * - 1:  1 byte per pixel
  * - 8:  RGB233
  * - 16: RGB565
  * - 32: ARGB8888
  */
 #ifndef LV_COLOR_DEPTH
-#  if IS_USED(MODULE_U8G2_DISP_DEV)
-#    define LV_COLOR_DEPTH     1
-#  else
-#    define LV_COLOR_DEPTH     16
-#  endif
+#define LV_COLOR_DEPTH     16
 #endif
 
 /* Swap the 2 bytes of RGB565 color.
@@ -68,20 +65,13 @@ extern "C" {
 #define LV_MEM_CUSTOM      0
 #if LV_MEM_CUSTOM == 0
 /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
-#ifndef LV_MEM_SIZE
-#  if (__SIZEOF_POINTER__ > 4)
-/*64-bit platforms require additional space because a lot of pointers are stored on the lvgl heap.*/
-#    if IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW)
-#    define LV_MEM_SIZE    (9U * 1024U)          /*[bytes]*/
-#    else
-#    define LV_MEM_SIZE    (8U * 1024U)          /*[bytes]*/
-#    endif
-#  else
-#    if IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW)
-#    define LV_MEM_SIZE    (6U * 1024U)          /*[bytes]*/
-#    else
-#    define LV_MEM_SIZE    (5U * 1024U)          /*[bytes]*/
-#    endif
+#if IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW)
+#  ifndef LV_MEM_SIZE
+#  define LV_MEM_SIZE    (6U * 1024U)          /*[bytes]*/
+#  endif
+#else
+#  ifndef LV_MEM_SIZE
+#  define LV_MEM_SIZE    (5U * 1024U)          /*[bytes]*/
 #  endif
 #endif
 
@@ -555,4 +545,5 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 }
 #endif
 
+#endif /* LV_CONF_H */
 /** @} */

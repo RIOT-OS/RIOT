@@ -1,8 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2018 Koen Zandberg <koen@bergzand.net>
- * SPDX-FileCopyrightText: 2018 Beduino Master Projekt - University of Bremen
- * SPDX-FileCopyrightText: 2020 Bas Stottelaar <basstottelaar@gmail.com>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 Koen Zandberg <koen@bergzand.net>
+ * Copyright (C) 2018 Beduino Master Projekt - University of Bremen
+ * Copyright (C) 2020 Bas Stottelaar <basstottelaar@gmail.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**

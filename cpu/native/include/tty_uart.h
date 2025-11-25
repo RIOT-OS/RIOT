@@ -1,20 +1,23 @@
 /*
- * SPDX-FileCopyrightText: 2015 Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for
+ * more details.
  */
 
-#pragma once
-
 /**
- * @addtogroup cpu_native
+ * @ingroup     cpu_native
  * @{
+ *
+ * @file
+ * @brief       UART implementation based on /dev/tty devices on host
+ *
+ * @author      Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
  */
 
-/**
- * @file
- * @brief  UART implementation based on /dev/tty devices on host
- * @author Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
- */
+#ifndef TTY_UART_H
+#define TTY_UART_H
 
 #include "periph/uart.h"
 
@@ -34,4 +37,5 @@ void tty_uart_setup(uart_t uart, const char *name);
 }
 #endif
 
+#endif /* TTY_UART_H */
 /** @} */

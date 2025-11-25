@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_lcd
  * @{
@@ -21,6 +19,9 @@
  *
  * @}
  */
+
+#ifndef LCD_INTERNAL_H
+#define LCD_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,3 +80,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* LCD_INTERNAL_H */

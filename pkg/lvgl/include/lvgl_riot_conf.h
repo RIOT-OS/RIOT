@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_lvgl
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef LVGL_RIOT_CONF_H
+#define LVGL_RIOT_CONF_H
 
 #include "kernel_defines.h"
 #include "board.h"
@@ -61,4 +62,5 @@ typedef int16_t lv_coord_t;
 }
 #endif
 
+#endif /* LVGL_RIOT_CONF_H */
 /** @} */

@@ -27,7 +27,7 @@ Then provide de device and test:
 On another device setup a BR and start `start_network.sh` on that device serial
 port.
 
-    $ BOARD=<board> make -C examples/networking/gnrc/border_router flash
+    $ BOARD=<board> make -C examples/gnrc_border_router flash
 
     $ sudo dist/tools/ethos/start_network.sh /dev/ttyACMx riot0 2001:db8::/64
 

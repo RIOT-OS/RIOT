@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_mynewt_core
  * @{
@@ -18,6 +16,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+
+#ifndef LOG_LOG_H
+#define LOG_LOG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,3 +44,5 @@ struct log {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* LOG_LOG_H */

@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_srf08 SRF08 ultrasonic range sensor
  * @ingroup     drivers_sensors
@@ -26,6 +24,9 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  */
+
+#ifndef SRF08_H
+#define SRF08_H
 
 #include <stdint.h>
 #include "periph/i2c.h"
@@ -164,3 +165,4 @@ int srf08_get_distances(const srf08_t *dev,
 #endif
 
 /** @} */
+#endif /* SRF08_H */

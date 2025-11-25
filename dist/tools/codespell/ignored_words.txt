@@ -174,21 +174,3 @@ fram
 
 # MIS (mask interrupt register)
 mis
-
-# assertIn (python test framework method)
-assertIn
-
-# bootup (common spelling of boot-up)
-bootup
-
-# shiftIn (Arduino function name)
-shiftIn
-
-# <b>e</b>lements (used in Congure documentation)
-lements
-
-# Ethernet MAC, used in ESPs
-emac
-
-# For some reason it looked at some binary dump and found this to be a word...
-joo

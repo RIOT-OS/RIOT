@@ -161,6 +161,7 @@ void test_phydat_to_senml_decimal(void)
     }
 }
 
+
 Test *tests_senml(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {

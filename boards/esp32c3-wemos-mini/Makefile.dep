@@ -1,4 +1,4 @@
-ifneq (,$(filter stdio_default,$(USEMODULE)))
+ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
   USEMODULE += stdio_usb_serial_jtag
 endif
 
@@ -11,4 +11,4 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
 
-USEMODULE += boards_common_esp32c3
+include $(RIOTBOARD)/common/esp32c3/Makefile.dep

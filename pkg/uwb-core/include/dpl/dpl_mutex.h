@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_uwb_core
  * @{
@@ -18,6 +16,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+
+#ifndef DPL_DPL_MUTEX_H
+#define DPL_DPL_MUTEX_H
 
 #include "os/os_mutex.h"
 
@@ -75,3 +76,5 @@ static inline dpl_error_t dpl_mutex_release(struct dpl_mutex *mu)
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* DPL_DPL_MUTEX_H */

@@ -1,8 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
- * SPDX-FileCopyrightText: 2015 FreshTemp, LLC.
- * SPDX-FileCopyrightText: 2014-2015 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2015 FreshTemp, LLC.
+ *               2014-2015 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**

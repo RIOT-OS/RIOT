@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2017 Josua Arndt, Steffen Robertz, RWTH Aachen
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) Josua Arndt, Steffen Robertz 2017 RWTH Aachen
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_atmega128rfa1
@@ -15,6 +16,9 @@
  * @author          Josua Arndt <jarndt@ias.rwth-aachen.de>
  * @author          Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
+
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include "periph_cpu_common.h"
 #include "atmega_regs_common.h"
@@ -103,4 +107,5 @@ static inline bool atmega_has_pin_exti(uint8_t port_num, uint8_t pin_num)
 #include "periph_conf.h"
 #include "default_timer_config.h"
 
+#endif /* PERIPH_CPU_H */
 /** @} */

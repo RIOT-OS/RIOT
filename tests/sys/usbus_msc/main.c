@@ -23,7 +23,6 @@
 #include <string.h>
 
 #include "board.h"
-#include "test_utils/expect.h"
 
 #if defined(MODULE_MTD_EMULATED)
 
@@ -85,8 +84,6 @@ static int _cmd_add_lun(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(add_lun, "Add a MTD device as new LUN",  _cmd_add_lun);
-
 static int _cmd_remove_lun(int argc, char **argv)
 {
     int dev, ret;
@@ -115,8 +112,6 @@ static int _cmd_remove_lun(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(remove_lun, "Remove existing LUN", _cmd_remove_lun);
-
 static int _cmd_usb_attach(int argc, char **argv)
 {
     (void)argc;
@@ -127,8 +122,6 @@ static int _cmd_usb_attach(int argc, char **argv)
                sizeof(usbopt_enable_t));
     return 0;
 }
-
-SHELL_COMMAND(usb_attach, "Attach USB to host", _cmd_usb_attach);
 
 static int _cmd_usb_detach(int argc, char **argv)
 {
@@ -141,8 +134,6 @@ static int _cmd_usb_detach(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(usb_detach, "Detach USB from host", _cmd_usb_detach);
-
 static int _cmd_usb_reset(int argc, char **argv)
 {
     _cmd_usb_detach(argc, argv);
@@ -151,7 +142,14 @@ static int _cmd_usb_reset(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(usb_reset, "Combine Detach and Attach with a 100ms delay", _cmd_usb_reset);
+static const shell_command_t shell_commands[] = {
+    { "add_lun",  "Add a MTD device as new LUN",  _cmd_add_lun },
+    { "remove_lun", "Remove existing LUN", _cmd_remove_lun },
+    { "usb_attach", "Attach USB to host", _cmd_usb_attach },
+    { "usb_detach", "Detach USB from host", _cmd_usb_detach },
+    { "usb_reset", "Combine Detach and Attach with a 100ms delay", _cmd_usb_reset },
+    { NULL, NULL, NULL }
+};
 
 int main(void)
 {
@@ -162,7 +160,7 @@ int main(void)
 
     /* Get driver context */
     usbdev_t *usbdev = usbdev_get_ctx(0);
-    expect(usbdev);
+    assert(usbdev);
 
     usbus_t *usbus_auto_init_get(void);
     usbus = usbus_auto_init_get();
@@ -170,7 +168,8 @@ int main(void)
     /* start shell */
     puts("All up, running the shell now");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     /* should be never reached */
     return 0;

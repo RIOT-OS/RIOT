@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup drivers_ds1307
  * @{
@@ -17,6 +15,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef DS1307_PARAMS_H
+#define DS1307_PARAMS_H
 
 #include "board.h"
 #include "ds1307.h"
@@ -50,4 +50,5 @@ static const ds1307_params_t ds1307_params[] =
 }
 #endif
 
+#endif /* DS1307_PARAMS_H */
 /** @} */

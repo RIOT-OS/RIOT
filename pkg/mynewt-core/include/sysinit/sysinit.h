@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_mynewt_core
  * @{
@@ -18,6 +16,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+
+#ifndef SYSINIT_SYSINIT_H
+#define SYSINIT_SYSINIT_H
 
 #include "assert.h"
 
@@ -38,3 +39,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* SYSINIT_SYSINIT_H */

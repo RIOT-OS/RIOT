@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_matrix_keypad Matrix Keypad
  * @ingroup     drivers_sensors
@@ -50,6 +48,9 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
+
+#ifndef MATRIX_KEYPAD_H
+#define MATRIX_KEYPAD_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -197,10 +198,10 @@ typedef struct {
 /**
  * @brief   Initialize the given device
  *
- * @param[in,out] dev       Device descriptor of the driver
- * @param[in]     params    Initialization parameters
- * @param[in]     callback  Callback to call on state changes
- * @param[in]     arg       Context argument for the callback
+ * @param[inout] dev        Device descriptor of the driver
+ * @param[in]    params     Initialization parameters
+ * @param[in]    callback   Callback to call on state changes
+ * @param[in]    arg        Context argument for the callback
  *
  * @return                  0 on success
  */
@@ -215,7 +216,7 @@ int matrix_keypad_init(matrix_keypad_t *dev,
  * This updates the state of the device descriptor, calling
  * @ref matrix_keypad_cb_t when a key press or release has been detected
  *
- * @param[in,out] dev       Device descriptor of the driver
+ * @param[inout] dev        Device descriptor of the driver
  *
  * @return                  Number of keys that changed state
  */
@@ -224,4 +225,5 @@ size_t matrix_keypad_scan(matrix_keypad_t *dev);
 }
 #endif
 
+#endif /* MATRIX_KEYPAD_H */
 /** @} */

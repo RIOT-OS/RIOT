@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup pthread
  * @{
@@ -15,6 +13,9 @@
  * @brief   Singletons features / single-shot execution.
  * @note    Do not include this header file directly, but pthread.h.
  */
+
+#ifndef PTHREAD_ONCE_H
+#define PTHREAD_ONCE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,6 +53,8 @@ int pthread_once(pthread_once_t *once_control, void (*init_routine)(void));
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PTHREAD_ONCE_H */
 
 /**
  * @}

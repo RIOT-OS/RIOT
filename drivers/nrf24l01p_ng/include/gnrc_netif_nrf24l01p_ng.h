@@ -5,9 +5,6 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-
-#pragma once
-
 /**
  * @ingroup drivers_nrf24l01p_ng
  * @ingroup drivers_netdev
@@ -19,6 +16,8 @@
  *
  * @author  Fabian Hüßler <fabian.huessler@ovgu.de>
  */
+#ifndef GNRC_NETIF_NRF24L01P_NG_H
+#define GNRC_NETIF_NRF24L01P_NG_H
 
 #include "net/gnrc/netif.h"
 
@@ -60,4 +59,5 @@ int gnrc_netif_nrf24l01p_ng_create(gnrc_netif_t *netif, char *stack,
 }
 #endif
 
+#endif /* GNRC_NETIF_NRF24L01P_NG_H */
 /** @} */

@@ -113,7 +113,7 @@ If you would like to clean intermediate files for all boards go to main RIOT
 directory and use this command.
 
 @warning This command cleans all local files, for example, pkg downloads and
-locally generated docs.
+locally generared docs.
 
 
     make distclean
@@ -127,8 +127,7 @@ As some board can't be reset without a manual trigger tests should be implemente
 with some kind of `synchronization`. This can be done in two ways:
 
 - use `test_utils_interactive_sync` when uart input/output does not need to be
-  disabled for the test. This is enabled by default, except for `native` and
-  `native64`.
+  disabled for the test. This is enabled by default.
 - set up the test in a loop so the test script will be able so sync with some kind
   of start condition in the test.
 

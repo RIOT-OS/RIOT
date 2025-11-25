@@ -1,8 +1,2 @@
 INCLUDES += -I$(PKGDIRBASE)/monocypher/src
 INCLUDES += -I$(PKGDIRBASE)/monocypher/src/optional
-
-ifneq (,$(filter psa_monocypher_%, $(USEMODULE)))
-  PSEUDOMODULES += psa_monocypher_ed25519
-  DIRS += $(RIOTPKG)/monocypher/psa_monocypher
-  INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
-endif

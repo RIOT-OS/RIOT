@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_l3g4200d
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef L3G4200D_REGS_H
+#define L3G4200D_REGS_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -89,4 +90,5 @@
 }
 #endif
 
+#endif /* L3G4200D_REGS_H */
 /** @} */

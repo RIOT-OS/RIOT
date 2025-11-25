@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_at86rf215
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+
+#ifndef AT86RF215_REGISTERS_H
+#define AT86RF215_REGISTERS_H
 
 #include <stdint.h>
 #include "vendor/at86rf215.h"
@@ -611,4 +612,5 @@ static const struct at86rf215_BBC_regs BBC1_regs = {
 }
 #endif
 
+#endif /* AT86RF215_REGISTERS_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_hd44780
  *
@@ -17,6 +15,9 @@
  *
  * @author      Sebastian Meiling <s@mlng.net>
  */
+
+#ifndef HD44780_INTERNAL_H
+#define HD44780_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -96,4 +97,5 @@ extern "C" {
 }
 #endif
 
+#endif /* HD44780_INTERNAL_H */
 /** @} */

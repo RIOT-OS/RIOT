@@ -8,8 +8,10 @@ include $(RIOTBASE)/pkg/pkg.mk
 
 CFLAGS += -Wno-format
 
-# replace pkg supplied logging macros with RIOT's
-CFLAGS += -include $(PKG_DIR)/lfs_log.h
+# Disable debug printing
+ifneq ($(DEVELHELP),1)
+  CFLAGS += -DLFS_NO_DEBUG -DLFS_NO_WARN -DLFS_NO_ERROR
+endif
 
 all:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(RIOTBASE)/Makefile.base

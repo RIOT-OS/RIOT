@@ -1,2 +1,0 @@
-# add the common header files to the include path
-INCLUDES += -I$(RIOTBOARD)/common/seeedstudio-xiao-nrf52840/include

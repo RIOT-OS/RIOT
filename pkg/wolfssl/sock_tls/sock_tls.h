@@ -7,16 +7,14 @@
  * directory for more details.
  */
 
-#pragma once
-
 /* @defgroup    module sock_tls
  * @ingroup     pkg_wolfssl
  * @brief       Sock submodule for TLS/DTLS sessions
  *
  * How To Use
  * ----------
- * First you need to [include][include-link]
- * a module that implements this API in your application's Makefile.
+ * First you need to @ref including-modules "include" a module that implements
+ * this API in your application's Makefile.
  *
  * The `sock_tls` module requires the `wolfssl` package.
  *
@@ -109,8 +107,8 @@
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * Above you see a simple DTLS echo server. It is important to at least
- * [include][include-link] the IPv6 module of your networking
+ * Above you see a simple DTLS echo server. It is important to at least include
+ * @ref including-modules "include" the IPv6 module of your networking
  * implementation (e.g. `gnrc_ipv6_default` for @ref net_gnrc GNRC) and at least
  * one network device.
  * A separate file should define the buffers used as certificate and private key,
@@ -220,7 +218,6 @@
  *     return 0;
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * [include-link]: https://guide.riot-os.org/advanced_tutorials/creating_application/#including-modules
  */
 
 #include <string.h>
@@ -230,6 +227,8 @@
 #include <net/sock.h>
 #include <wolfssl/ssl.h>
 
+#ifndef SOCK_TLS_H
+#define SOCK_TLS_H
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -338,3 +337,5 @@ void sock_dtls_close(sock_tls_t *sk);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* SOCK_TLS_H */

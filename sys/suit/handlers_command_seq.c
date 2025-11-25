@@ -160,12 +160,8 @@ static int _cond_comp_offset(suit_manifest_t *manifest,
     LOG_INFO("Comparing manifest offset %"PRIx32" with other slot offset\n",
              offset);
 
-    bool match = suit_storage_match_offset(comp->storage_backend, offset);
-    if (match) {
-        return SUIT_OK;
-    }
-    LOG_WARNING("offset does not match\n");
-    return SUIT_ERR_COND;
+    return suit_storage_match_offset(comp->storage_backend, offset) ?
+        SUIT_OK : SUIT_ERR_COND;
 }
 
 static int _dtv_set_comp_idx(suit_manifest_t *manifest,
@@ -475,7 +471,7 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
         suit_component_set_flag(comp, SUIT_COMPONENT_STATE_FETCH_FAILED);
         /* TODO: The leftover data from a failed fetch should be purged. It
          * could contain potential malicious data from an attacker */
-        LOG_INFO("image download (%s) failed with code %i\n", manifest->urlbuf, res);
+        LOG_INFO("image download failed with code %i\n", res);
         return res;
     }
 

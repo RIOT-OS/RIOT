@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @defgroup
@@ -16,6 +17,8 @@
  *
  * @author  Gaëtan Harter <gaetan.harter@fu-berlin.de>
  */
+#ifndef EXTERNAL_MODULE_H
+#define EXTERNAL_MODULE_H
 
 #include <stdbool.h>
 
@@ -44,3 +47,4 @@ void auto_init_external_module(void);
 #endif
 
 /** @} */
+#endif /* EXTERNAL_MODULE_H */

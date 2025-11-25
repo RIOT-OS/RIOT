@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     tests
  * @{
@@ -20,6 +18,9 @@
  *
  * @}
  */
+
+#ifndef CREDENTIALS_H
+#define CREDENTIALS_H
 
 #include "net/credman.h"
 
@@ -51,3 +52,5 @@ static const unsigned char ecdsa_pub_key_y[] = {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* CREDENTIALS_H */

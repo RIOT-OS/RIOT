@@ -1,8 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2014 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2014 PHYTEC Messtechnik GmbH
- * SPDX-FileCopyrightText: 2014 Eistec AB
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014 PHYTEC Messtechnik GmbH
+ * Copyright (C) 2014 Eistec AB
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
 
 /**
@@ -244,7 +247,7 @@ void gpio_init_port(gpio_t pin, uint32_t pcr)
 #endif /* KINETIS_HAVE_PCR */
 }
 
-bool gpio_read(gpio_t pin)
+int gpio_read(gpio_t pin)
 {
     if (gpio(pin)->PDDR & (1 << pin_num(pin))) {
         return (gpio(pin)->PDOR & (1 << pin_num(pin))) ? 1 : 0;
@@ -269,7 +272,7 @@ void gpio_toggle(gpio_t pin)
     gpio(pin)->PTOR = (1 << pin_num(pin));
 }
 
-void gpio_write(gpio_t pin, bool value)
+void gpio_write(gpio_t pin, int value)
 {
     if (value) {
         gpio(pin)->PSOR = (1 << pin_num(pin));

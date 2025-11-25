@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2017 OTA keys S.A.
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2016 Freie Universität Berlin
+ *               2017 OTA keys S.A.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_stm32
@@ -17,6 +18,9 @@
  * @author          Vincent Dupont <vincent@otakeys.com>
  * @author          Joshua DeWeese <jdeweese@primecontrols.com>
  */
+
+#ifndef PERIPH_CPU_DMA_H
+#define PERIPH_CPU_DMA_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -176,7 +180,7 @@ uint16_t dma_suspend(dma_t dma);
  * @brief   Resume a suspended DMA transfer on a stream
  *
  * @param[in] dma         logical DMA stream
- * @param[in] remaining   the remaining number of transfers to perform
+ * @param[in] reamaining  the remaining number of transfers to perform
  */
 void dma_resume(dma_t dma, uint16_t remaining);
 
@@ -256,7 +260,7 @@ void dma_setup_ext(dma_t dma, dma_burst_t pburst, dma_burst_t mburst,
  * @param[in]   dma         Logical DMA stream
  * @param[in]   mem         Memory address
  * @param[in]   len         Number of transfers to perform
- * @param[in]   incr_mem    Increment the memory address (by the transfer width) after read/write
+ * @param[in]   inc_mem     Increment the memory address (by the transfer width) after read/write
  */
 void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem);
 
@@ -266,4 +270,5 @@ void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem);
 }
 #endif
 
+#endif /* PERIPH_CPU_DMA_H */
 /** @} */

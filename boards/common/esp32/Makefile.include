@@ -1,1 +1,3 @@
 INCLUDES += -I$(RIOTBOARD)/common/esp32/include
+
+include $(RIOTBOARD)/common/esp32x/Makefile.include

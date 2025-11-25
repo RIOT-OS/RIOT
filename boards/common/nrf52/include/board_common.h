@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_common_nrf52
@@ -16,6 +17,9 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
+#ifndef BOARD_COMMON_H
+#define BOARD_COMMON_H
+
 #include "cpu.h"
 
 #ifdef __cplusplus
@@ -26,4 +30,5 @@ extern "C" {
 }
 #endif
 
+#endif /* BOARD_COMMON_H */
 /** @} */

@@ -16,13 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
 /**
  * @internal
  * @author  boortmans <bart.moons@gmail.com>
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef RULES_RULES_H
+#define RULES_RULES_H
 
 #include "kernel_defines.h"
 
@@ -340,3 +340,5 @@ static const struct schc_device* devices[] = { &node1, &node2 };
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* RULES_RULES_H */

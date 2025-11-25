@@ -6,8 +6,6 @@
  * more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    usbus_hid USBUS HID
  * @ingroup     usb
@@ -25,6 +23,9 @@
  *
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
+
+#ifndef USB_USBUS_HID_H
+#define USB_USBUS_HID_H
 
 #include <stdint.h>
 
@@ -105,4 +106,5 @@ void usbus_hid_init(usbus_t *usbus, usbus_hid_device_t *hid,
 }
 #endif
 
+#endif /* USB_USBUS_HID_H */
 /** @} */

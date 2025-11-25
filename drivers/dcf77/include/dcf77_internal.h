@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup drivers_dcf77
  * @brief
@@ -18,6 +16,8 @@
  *
  * @author  Michel Gerlach <michel.gerlach@haw-hamburg.de>
  */
+#ifndef DCF77_INTERNAL_H
+#define DCF77_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,4 +70,5 @@ enum {
 }
 #endif
 
+#endif /* DCF77_INTERNAL_H */
 /** @} */

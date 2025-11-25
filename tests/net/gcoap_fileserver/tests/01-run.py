@@ -136,7 +136,7 @@ def run_test(func, factory):
 
 if __name__ == "__main__":
     board = os.environ.get('BOARD', 'native')
-    if board not in ['native', 'native32', 'native64']:
+    if board not in ['native', 'native64']:
         print('\x1b[1;31mThis test requires a native board.\x1b[0m\n',
               file=sys.stderr)
         sys.exit(1)

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    core_thread Threading
  * @ingroup     core
@@ -118,11 +116,11 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#include <stdbool.h>
+#ifndef THREAD_H
+#define THREAD_H
 
-#include "cib.h"
 #include "clist.h"
-#include "compiler_hints.h"
+#include "cib.h"
 #include "msg.h"
 #include "sched.h"
 #include "thread_config.h"
@@ -260,21 +258,18 @@ struct _thread {
  *       is considered to be a bad programming practice and we strongly
  *       discourage you from doing so.
  *
- * @pre The @p name parameter must stay valid even after the thread has
- *      terminated (e.g. using a literal).
- *
  * @param[out] stack    start address of the preallocated stack memory
  * @param[in] stacksize the size of the thread's stack in bytes
  * @param[in] priority  priority of the new thread, lower mean higher priority
  * @param[in] flags     optional flags for the creation of the new thread
  * @param[in] task_func pointer to the code that is executed in the new thread
  * @param[in] arg       the argument to the function
- * @param[in] name      a human readable descriptor for the thread.
+ * @param[in] name      a human readable descriptor for the thread
  *
  * @return              PID of newly created task on success
- * @retval  -EINVAL     @p priority is greater than or equal to
- *                      @ref SCHED_PRIO_LEVELS or @p stacksize is too small
- * @retval  -EOVERFLOW  there are too many threads running already
+ * @return              -EINVAL, if @p priority is greater than or equal to
+ *                      @ref SCHED_PRIO_LEVELS
+ * @return              -EOVERFLOW, if there are too many threads running already
  */
 kernel_pid_t thread_create(char *stack,
                            int stacksize,
@@ -287,9 +282,8 @@ kernel_pid_t thread_create(char *stack,
 /**
  * @brief       Retrieve a thread control block by PID.
  * @pre         @p pid is valid
- * @param[in]   pid         Thread to retrieve.
- * @return      The thread identified by @p pid
- * @retval      `NULL`      no thread at the given valid PID is active.
+ * @param[in]   pid   Thread to retrieve.
+ * @return      `NULL` if the PID is invalid or there is no such thread.
  */
 static inline thread_t *thread_get_unchecked(kernel_pid_t pid)
 {
@@ -514,15 +508,11 @@ void thread_print_stack(void);
  *
  * @param[in] thread    The thread to check for
  *
- * @pre     @p thread is not `NULL` and the thread corresponding to the thread
- *          control block @p thread points to (still) exists
- *
- * @retval  false    @p thread has no initialized message queue
- * @retval  true     @p thread has its message queue initialized
+ * @return  `== 0`, if @p thread has no initialized message queue
+ * @return  `!= 0`, if @p thread has its message queue initialized
  */
-static inline bool thread_has_msg_queue(const thread_t *thread)
+static inline int thread_has_msg_queue(const volatile struct _thread *thread)
 {
-    assume(thread != NULL);
 #if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
     return (thread->msg_array != NULL);
 #else
@@ -650,8 +640,8 @@ static inline const char *thread_get_name(const thread_t *thread)
 /**
  * @brief       Measures the stack usage of a stack
  *
- * @pre         Does not work if the thread was created with the flag
- *              `THREAD_CREATE_NO_STACKTEST`.
+ * @pre         Only works if the thread was created with the flag
+ *              `THREAD_CREATE_STACKTEST`.
  *
  * @param[in] thread    The thread to measure the stack of
  *
@@ -670,3 +660,4 @@ static inline uintptr_t thread_measure_stack_free(const thread_t *thread)
 #endif
 
 /** @} */
+#endif /* THREAD_H */

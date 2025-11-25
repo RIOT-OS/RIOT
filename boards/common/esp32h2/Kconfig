@@ -1,8 +1,0 @@
-# SPDX-FileCopyrightText: 2025 Gunar Schorcht
-# SPDX-License-Identifier: LGPL-2.1-only
-
-config BOARD_COMMON_ESP32H2
-    bool
-    select BOARD_COMMON_ESP32X
-
-source "$(RIOTBOARD)/common/esp32x/Kconfig"

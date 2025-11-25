@@ -9,7 +9,6 @@ of this document using the following links:
 * [Contributing code][contributing-code]
 * [Writing Documentation][writing-documentation]
 * [Working with Git][working with git]
-* [Mediate Conflicts][mediate-conflicts]
 
 If you have questions, please write a post over at our [forum] or chat on
 `#riot-os:matrix.org` on [Matrix].
@@ -25,9 +24,9 @@ As a reminder, all contributors are expected to follow our
 If you are just beginning to work with RIOT you might first want to read our
 [documentation]. Especially the following sections might be of interest to you
 
-- [Getting Started](https://guide.riot-os.org/getting-started/installing/)
-- [Creating modules](https://guide.riot-os.org/advanced_tutorials/creating_modules/)
-- [Creating an application](https://guide.riot-os.org/advanced_tutorials/creating_application/)
+- [Getting Started](https://doc.riot-os.org/getting-started.html)
+- [Creating modules](https://doc.riot-os.org/creating-modules.html)
+- [Creating an application](https://doc.riot-os.org/creating-an-application.html)
 
 [documentation]: https://doc.riot-os.org
 
@@ -150,10 +149,6 @@ It is possible to check if your code follows these conventions:
   simple as it is.
   ```
 
-* The commit message is automatically checked by the static tests for keywords
-  that prevent a merge, for example "fixup" or "DONOTMERGE". The full list
-  of these keywords is stored in `dist/tools/pr_check/no_merge_keywords`.
-
 ### Pull Requests
 [pull requests]: #pull-requests
 
@@ -239,7 +234,7 @@ In this section, we give the bare minimum for a better experience with our
 development workflow on GitHub.
 
 [try-github-io]: https://try.github.io/
-[git-scm-getting-started]: https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository
+[git-scm-getting-started]: https://git-scm.com/book/en/v2/Getting-Started-Git-Basics
 
 ### Setup your local RIOT repository
 
@@ -309,9 +304,6 @@ $ git commit --fixup <prefix2 commit hash>
 
 ### Squash commits after review
 
-*** Note: If the static tests warn you about a no-merge keyword, please look
-at [our commit conventions][commit-conventions].
-
 Squashing a commit is done using the rebase subcommand of git in interactive
 mode:
 
@@ -331,7 +323,7 @@ phase, squashing commits can be performed in a single command:
 $ git rebase -i --autosquash
 ```
 
-***Watch out: Don't squash your commit until a maintainer asks you to do it.***
+**Watch out: Don't squash your commit until a maintainer asks you to do it.**
 
 Otherwise the history of review changes is lost and for large PRs, it
 makes it difficult for the reviewer to follow them. It might also happen that
@@ -364,45 +356,3 @@ PR:
 ```console
 $ git push --force-with-lease
 ```
-
-## Mediating Conflicts
-[mediate-conflicts]: #mediate-conflicts
-
-A diverse community such as the RIOT community has inherently a diverse set of
-views and opinions. Occasionally those may clash, even with all parties adhering
-to our [code of conduct][code-of-conduct]. In case you seek out help to resolve
-it you may send an email to [mediator email list][email-mediator]. The email
-will be forwarded to a panel of mediators consisting of trusted RIOT
-community members including both maintainers and non-maintainers.
-
-We see the mediation as a tool to solve conflicts, not as a way to sanction
-people. Hence, do not be afraid to contact our mediators and equally do not
-feel denounced or punished if someone invokes mediation.
-
-This is a (non-exhaustive) list of reasons you can ask for mediation:
-
-- You are a contributor and feel being treated unfairly by another contributor
-  or maintainer
-    - Your PR is rejected/blocked for unjust or non-technical reasons.
-    - A PR is rejected/blocked for valid technical reasons, but without due
-      consideration of your arguments
-    - A maintainer is asking for disproportionate changes to your PR in order
-      to get it upstream, e.g. fixing issues unrelated to your PR
-- You disagree with other contributors/maintainers on how RIOT should evolve
-    - E.g. there are competing pull requests that cover highly related use
-      cases and there is a disagreement which should be preferred
-    - A pull requests results (or resulted) deliberately in a regression for a
-      particular use case, e.g. by doing a different trade-off that benefits
-      another use case
-    - A feature relevant for your use case has been deprecated/removed
-      (e.g. to reduce maintenance burden, reduce (perceived) duplication of
-      features, etc.) but your use case relies on the feature or implementation
-      details of the feature
-
-Note: Violations of our [code of conduct][code-of-conduct] should be reported
-      to [email-coc]. See our [code of conduct][code-of-conduct] for more
-      details.
-
-[code-of-conduct]: CODE_OF_CONDUCT.md
-[email-mediator]: mailto:mediation@riot-os.org
-[email-coc]: mailto:conduct@riot-os.org

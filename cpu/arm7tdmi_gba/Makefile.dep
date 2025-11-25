@@ -1,6 +1,6 @@
 USEMODULE += arm7_common
 
-ifneq (,$(filter stdio_default,$(USEMODULE)))
+ifeq (,$(filter stdio_%,$(USEMODULE)))
   USEMODULE += stdio_fb
 endif
 

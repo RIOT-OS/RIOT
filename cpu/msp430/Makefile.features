@@ -3,8 +3,6 @@ CPU_CORE = msp430
 
 ifneq (,$(filter msp430f2% msp430g2%,$(CPU_MODEL)))
   CPU_FAM := msp430_f2xx_g2xx
-  FEATURES_PROVIDED += periph_gpio_ll_input_pull_down
-  FEATURES_PROVIDED += periph_gpio_ll_input_pull_up
   FEATURES_PROVIDED += periph_spi_reconfigure
 endif
 
@@ -14,7 +12,6 @@ endif
 
 FEATURES_PROVIDED += arch_16bit
 FEATURES_PROVIDED += arch_msp430
-FEATURES_PROVIDED += bug_newlib_broken_stdio
 FEATURES_PROVIDED += cpu_$(CPU_FAM)
 FEATURES_PROVIDED += dbgpin
 FEATURES_PROVIDED += newlib
@@ -23,7 +20,3 @@ FEATURES_PROVIDED += periph_flashpage_in_address_space
 FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += periph_timer_query_freqs
-
-FEATURES_PROVIDED += periph_gpio_ll
-FEATURES_PROVIDED += periph_gpio_ll_irq
-FEATURES_PROVIDED += periph_gpio_ll_switch_dir

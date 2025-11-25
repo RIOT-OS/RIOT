@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gnrc_rpl_srh RPL source routing header extension
  * @ingroup     net_gnrc_rpl
@@ -22,6 +20,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef NET_GNRC_RPL_SRH_H
+#define NET_GNRC_RPL_SRH_H
 
 #include "net/ipv6/hdr.h"
 #include "net/ipv6/addr.h"
@@ -73,4 +73,5 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh, void **err_ptr);
 }
 #endif
 
+#endif /* NET_GNRC_RPL_SRH_H */
 /** @} */

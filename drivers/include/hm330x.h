@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_hm330x HM330X Laser Particulate Matter Sensor
  * @ingroup     drivers_sensors
@@ -32,7 +30,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
 
-#include "modules.h"
+#ifndef HM330X_H
+#define HM330X_H
+
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 
@@ -92,8 +92,8 @@ typedef struct {
 /**
  * @brief   Initialize the given device
  *
- * @param[in,out] dev       Device descriptor of the driver
- * @param[in]     params    Initialization parameters
+ * @param[inout] dev        Device descriptor of the driver
+ * @param[in]    params     Initialization parameters
  *
  * @retval  0         Success
  * @retval -EIO       Failed to initialize GPIO pins
@@ -138,4 +138,5 @@ void hm330x_wakeup(hm330x_t *dev);
 }
 #endif
 
+#endif /* HM330X_H */
 /** @} */

@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2020 Benjamin Valentin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 Benjamin Valentin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_nrf52840-mdk-dongle
@@ -14,6 +15,9 @@
  *
  * @author      Benjamin Valentin <benpicco@googlemail.com>
  */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "board_common.h"
@@ -86,4 +90,5 @@ extern "C" {
 }
 #endif
 
+#endif /* BOARD_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_tsl4531x TSL4531x Illuminance sensor
  * @ingroup     drivers_sensors
@@ -39,6 +37,9 @@
  * @author      Juan I Carrano <j.carrano@fu-berlin.de>
  * @author      Daniel Petry <daniel.petry@fu-berlin.de>
  */
+
+#ifndef TSL4531X_H
+#define TSL4531X_H
 
 #include <stdint.h>
 
@@ -190,4 +191,5 @@ int tsl4531x_simple_read(tsl4531x_t *dev);
 }
 #endif
 
+#endif /* TSL4531X_H */
 /** @} */

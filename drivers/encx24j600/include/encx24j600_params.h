@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_encx24j600
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
+
+#ifndef ENCX24J600_PARAMS_H
+#define ENCX24J600_PARAMS_H
 
 #include "encx24j600.h"
 #include "board.h"
@@ -57,4 +58,5 @@ static const  encx24j600_params_t encx24j600_params[] = {
 }
 #endif
 
+#endif /* ENCX24J600_PARAMS_H */
 /** @} */

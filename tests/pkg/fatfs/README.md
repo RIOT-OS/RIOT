@@ -23,8 +23,5 @@ or your FS will probably get damaged.
 
 # Real Hardware
 
-On real hardware, an SD card is used by default either via an SD/MMC controller
-in SD mode or via an SPI interface in SPI mode using the driver module
-`sdcard_spi`. Whether the SD card is used with an SD/MMC controller in
-SD mode is determined by the board by enabling the `mtd_sdmmc_default` module.
-Generally any device that supports the mtd-interface can be used with FatFS.
+Currently the test defaults to sdcard_spi on real hardware. But generally any
+device that supports the mtd-interface can be used with FatFs.

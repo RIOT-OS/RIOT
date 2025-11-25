@@ -8,8 +8,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 #if !DOXYGEN    /* hide from documentation */
 /**
  * @ingroup     drivers_st7735
@@ -27,6 +25,9 @@
  * backward compatibility.
  */
 
+#ifndef ST7735_PARAMS_H
+#define ST7735_PARAMS_H
+
 #include "board.h"
 #include "lcd.h"
 #include "st7735.h"
@@ -39,5 +40,6 @@ extern "C" {
 }
 #endif
 
+#endif /* ST7735_PARAMS_H */
 /** @} */
 #endif /* DOXYGEN */

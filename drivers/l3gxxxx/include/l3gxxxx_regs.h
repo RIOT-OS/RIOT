@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_l3gxxxx
  * @brief       Register definitions for ST L3Gxxxx 3-axis gyroscope sensor family
@@ -15,6 +13,9 @@
  * @file
  * @{
  */
+
+#ifndef L3GXXXX_REGS_H
+#define L3GXXXX_REGS_H
 
 #ifdef __cplusplus
 extern "C"
@@ -191,4 +192,5 @@ extern "C"
 }
 #endif
 
+#endif /* L3GXXXX_REGS_H */
 /** @} */

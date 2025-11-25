@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_openwsn
  * @{
@@ -22,6 +20,9 @@
  *
  * @}
  */
+
+#ifndef BOARD_INFO_H
+#define BOARD_INFO_H
 
 #include <stdint.h>
 #include <string.h>
@@ -143,3 +144,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* BOARD_INFO_H */

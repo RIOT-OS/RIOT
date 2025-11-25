@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_stmpe811
  *
@@ -17,6 +15,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef STMPE811_CONSTANTS_H
+#define STMPE811_CONSTANTS_H
 
 #include "stmpe811.h"
 
@@ -113,6 +114,7 @@ extern "C" {
 #define STMPE811_SPI_CFG_SPI_CLK_MOD1               (1 << 1)    /**< SCAD/A0 pin during power-up reset */
 #define STMPE811_SPI_CFG_AUTO_INCR                  (1 << 2)    /**< SPI transactions internal autoincrement */
 /** @} */
+
 
 /**
  * @name    INT_CTRL register bitfields
@@ -245,4 +247,5 @@ extern "C" {
 }
 #endif
 
+#endif /* STMPE811_CONSTANTS_H */
 /** @} */

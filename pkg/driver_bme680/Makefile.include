@@ -1,5 +1,4 @@
-# Using -isystem instead of -I to prevent warnings for the following headers
-INCLUDES += -isystem$(PKGDIRBASE)/driver_bme680
-INCLUDES += -isystem$(RIOTPKG)/driver_bme680/include
+INCLUDES += -I$(PKGDIRBASE)/driver_bme680
+INCLUDES += -I$(RIOTPKG)/driver_bme680/include
 
 DIRS += $(RIOTPKG)/driver_bme680/contrib

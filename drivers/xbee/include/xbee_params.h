@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_xbee
  * @{
@@ -19,6 +17,9 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef XBEE_PARAMS_H
+#define XBEE_PARAMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,4 +62,5 @@ static const xbee_params_t xbee_params[] =
 }
 #endif
 
+#endif /* XBEE_PARAMS_H */
 /** @} */

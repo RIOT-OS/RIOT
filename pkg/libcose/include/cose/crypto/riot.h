@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_libcose
  *
@@ -18,6 +16,9 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
+
+#ifndef COSE_CRYPTO_RIOT_H
+#define COSE_CRYPTO_RIOT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,5 +50,7 @@ void libcose_crypt_init(void);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* COSE_CRYPTO_RIOT_H */
 
 /** @} */

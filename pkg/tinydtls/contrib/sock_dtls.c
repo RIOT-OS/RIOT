@@ -97,12 +97,6 @@ static int _read(struct dtls_context_t *ctx, session_t *session, uint8_t *buf, s
 {
     sock_dtls_t *sock = dtls_get_app_data(ctx);
 
-    if (sock->buffer.data != NULL) {
-        DEBUG("sock_dtls: dropping decrypted message\n");
-        /* anyhow ignored by tinydtls */
-        return -ENOBUFS;
-    }
-
     DEBUG("sock_dtls: decrypted message arrived\n");
     sock->buffer.data = buf;
     sock->buffer.datalen = len;
@@ -149,8 +143,6 @@ static int _event(struct dtls_context_t *ctx, session_t *session,
         }
     }
     if (!level && (code != DTLS_EVENT_CONNECT)) {
-        /* TODO: dTLS alerts and events other than DTLS_EVENT_CONNECTED
-         * are currently silently ignored on the receiving side */
         mbox_put(&sock->mbox, &msg);
     }
 
@@ -175,7 +167,6 @@ static int _event(struct dtls_context_t *ctx, session_t *session,
             break;
         case DTLS_EVENT_CONNECTED:
             /* we received a session handshake initialization */
-            memset(&sock->async_cb_session, 0, sizeof(sock->async_cb_session));
             sock->async_cb(sock, SOCK_ASYNC_CONN_RECV,
                            sock->async_cb_arg);
             break;
@@ -733,7 +724,7 @@ ssize_t sock_dtls_sendv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
 #if SOCK_HAS_ASYNC
 /**
  * @brief   Checks for and iterates for more data chunks within the network
- *          stacks internal packet buffer
+ *          stacks anternal packet buffer
  *
  * When no more chunks exists, `data_ctx` assures cleaning up the internal
  * buffer state and `sock_udp_recv_buf()` returns 0.
@@ -781,6 +772,18 @@ static ssize_t _copy_buffer(sock_dtls_t *sock, sock_dtls_session_t *remote,
         _copy_session(sock, remote);
         _check_more_chunks(sock->udp_sock, (void **)&buf, &sock->buf_ctx,
                            &ep);
+        if (sock->async_cb &&
+            /* is there a message in the sock's mbox? */
+            mbox_avail(&sock->mbox)) {
+            if (sock->buffer.data) {
+                sock->async_cb(sock, SOCK_ASYNC_MSG_RECV,
+                               sock->async_cb_arg);
+            }
+            else {
+                sock->async_cb(sock, SOCK_ASYNC_CONN_RECV,
+                               sock->async_cb_arg);
+            }
+        }
         return buflen;
     }
 #else
@@ -797,8 +800,25 @@ static ssize_t _complete_handshake(sock_dtls_t *sock,
                                    sock_dtls_session_t *remote,
                                    const session_t *session)
 {
-    (void)sock;
     memcpy(&remote->dtls_session, session, sizeof(remote->dtls_session));
+#ifdef SOCK_HAS_ASYNC
+    if (sock->async_cb) {
+        sock_async_flags_t flags = SOCK_ASYNC_CONN_RDY;
+
+        if (mbox_avail(&sock->mbox)) {
+            if (sock->buffer.data) {
+                flags |= SOCK_ASYNC_MSG_RECV;
+            }
+            else {
+                flags |= SOCK_ASYNC_CONN_RECV;
+            }
+        }
+        memcpy(&sock->async_cb_session, session, sizeof(session_t));
+        sock->async_cb(sock, flags, sock->async_cb_arg);
+    }
+#else
+    (void)sock;
+#endif
     return -SOCK_DTLS_HANDSHAKE;
 }
 
@@ -818,16 +838,12 @@ ssize_t sock_dtls_recv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
         uint32_t start_recv = ztimer_now(ZTIMER_USEC);
         msg_t msg;
 
-        /* Check whether there is a session establishment to be acked. */
-        while (mbox_try_get(&sock->mbox, &msg)) {
-            if (msg.type == DTLS_EVENT_CONNECTED) {
-                return _complete_handshake(sock, remote, msg.content.ptr);
-            }
-            /* silently ignore other potential mbox messages */
-        }
-        /* Check whether there is decrypted data available */
         if (sock->buffer.data != NULL) {
             return _copy_buffer(sock, remote, data, max_len);
+        }
+        else if (mbox_try_get(&sock->mbox, &msg) &&
+                 msg.type == DTLS_EVENT_CONNECTED) {
+            return _complete_handshake(sock, remote, msg.content.ptr);
         }
         /* Crude way to somewhat test that `sock_dtls_aux_rx_t` and
          * `sock_udp_aux_rx_t` remain compatible: */
@@ -867,7 +883,7 @@ ssize_t sock_dtls_recv_buf_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
     sock_udp_ep_t ep;
 
     /* 2nd call to the function (with ctx set) will free the data */
-    if (*buf_ctx != NULL) {
+    if (*buf_ctx) {
         int res = sock_udp_recv_buf_aux(sock->udp_sock, data, buf_ctx,
                                         timeout, &ep, (sock_udp_aux_rx_t *)aux);
         assert(res == 0);
@@ -880,26 +896,16 @@ ssize_t sock_dtls_recv_buf_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
         uint32_t start_recv = ztimer_now(ZTIMER_USEC);
         msg_t msg;
 
-        /* Check whether there is a session establishment to be acked. */
-        while (mbox_try_get(&sock->mbox, &msg)) {
-            if (msg.type == DTLS_EVENT_CONNECTED) {
-                return _complete_handshake(sock, remote, msg.content.ptr);
-            }
-            /* silently ignore other potential mbox messages */
-        }
-        /* Check whether there is decrypted data available */
         if (sock->buffer.data != NULL) {
             *data = sock->buffer.data;
             sock->buffer.data = NULL;
             _copy_session(sock, remote);
-#ifdef SOCK_HAS_ASYNC
-            /* only overwrite buf_ctx if used below during call to dtls_handle_message */
-            if (*buf_ctx == NULL) {
-                *buf_ctx = sock->buf_ctx;
-                sock->buf_ctx = NULL;
-            }
-#endif /* SOCK_HAS_ASYNC */
+
             return sock->buffer.datalen;
+        }
+        else if (mbox_try_get(&sock->mbox, &msg) &&
+                 msg.type == DTLS_EVENT_CONNECTED) {
+            return _complete_handshake(sock, remote, msg.content.ptr);
         }
         /* Crude way to somewhat test that `sock_dtls_aux_rx_t` and
          * `sock_udp_aux_rx_t` remain compatible: */
@@ -933,9 +939,6 @@ ssize_t sock_dtls_recv_buf_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
 void sock_dtls_close(sock_dtls_t *sock)
 {
     dtls_free_context(sock->dtls_ctx);
-#ifdef SOCK_HAS_ASYNC_CTX
-    sock_event_close(sock_dtls_get_async_ctx(sock));
-#endif
 }
 
 void sock_dtls_init(void)
@@ -1045,9 +1048,7 @@ void _udp_cb(sock_udp_t *udp_sock, sock_async_flags_t flags, void *ctx)
         sock->buf_ctx = data_ctx;
         res = dtls_handle_message(sock->dtls_ctx, &remote,
                                   data, res);
-        if (res < 0 || sock->buffer.data == NULL) {
-            /* buffer.data will point to decrypted application data, if available.
-             * if not or on failure, drop potential remaining udp chunks */
+        if (sock->buffer.data == NULL) {
             _check_more_chunks(udp_sock, &data, &data_ctx, &remote_ep);
             sock->buf_ctx = NULL;
         }
@@ -1062,13 +1063,13 @@ void sock_dtls_set_cb(sock_dtls_t *sock, sock_dtls_cb_t cb, void *cb_arg)
 {
     sock->async_cb = cb;
     sock->async_cb_arg = cb_arg;
-#if MODULE_SOCK_ASYNC_EVENT
-    sock_async_ctx_t *ctx = sock_dtls_get_async_ctx(sock);
-    if (ctx->queue) {
-        sock_udp_event_init(sock->udp_sock, ctx->queue, _udp_cb, sock);
-        return;
+    if (IS_USED(MODULE_SOCK_ASYNC_EVENT)) {
+        sock_async_ctx_t *ctx = sock_dtls_get_async_ctx(sock);
+        if (ctx->queue) {
+            sock_udp_event_init(sock->udp_sock, ctx->queue, _udp_cb, sock);
+            return;
+        }
     }
-#endif
     sock_udp_set_cb(sock->udp_sock, _udp_cb, sock);
 }
 

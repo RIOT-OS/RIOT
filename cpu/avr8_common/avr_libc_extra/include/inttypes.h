@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @addtogroup  cpu_atmega_common
@@ -14,6 +15,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef INTTYPES_H
+#define INTTYPES_H
 
 #include_next <inttypes.h>
 
@@ -30,4 +33,5 @@ extern "C" {
 }
 #endif
 
+#endif /* INTTYPES_H */
 /** @} */

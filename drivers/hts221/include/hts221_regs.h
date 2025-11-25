@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_hts221
  *
@@ -17,6 +15,9 @@
  *
  * @author      Sebastian Meiling <s@mlng.net>
  */
+
+#ifndef HTS221_REGS_H
+#define HTS221_REGS_H
 
 #include "board.h"
 #include "hts221.h"
@@ -148,4 +149,5 @@ enum {
 }
 #endif
 
+#endif /* HTS221_REGS_H */
 /** @} */

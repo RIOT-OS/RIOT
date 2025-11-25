@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_lwext4 lwEXT4 integration
  * @ingroup     pkg_lwext4
@@ -20,6 +18,9 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+
+#ifndef FS_LWEXT4_FS_H
+#define FS_LWEXT4_FS_H
 
 #include <stdalign.h>
 
@@ -53,4 +54,5 @@ extern const vfs_file_system_t lwext4_file_system;
 }
 #endif
 
+#endif /* FS_LWEXT4_FS_H */
 /** @} */

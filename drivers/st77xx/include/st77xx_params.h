@@ -8,8 +8,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_st77xx
  *
@@ -21,6 +19,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
+
+#ifndef ST77XX_PARAMS_H
+#define ST77XX_PARAMS_H
 
 #include "board.h"
 #include "lcd.h"
@@ -202,6 +203,7 @@ extern "C" {
                                       ST77XX_PARAM_IF_SPI \
                                       ST77XX_PARAM_IF_PAR \
                                       ST77XX_PARAM_IF_PAR_16BIT \
+                                      .cntrl = ST77XX_PARAM_CNTRL, \
                                       .cs_pin = ST77XX_PARAM_CS, \
                                       .dcx_pin = ST77XX_PARAM_DCX, \
                                       .rst_pin = ST77XX_PARAM_RST, \
@@ -212,7 +214,6 @@ extern "C" {
                                       .rotation = ST77XX_PARAM_ROTATION, \
                                       .offset_x = ST77XX_PARAM_OFFSET_X, \
                                       .offset_y = ST77XX_PARAM_OFFSET_Y, \
-                                      .cntrl = ST77XX_PARAM_CNTRL, \
                                     }
 #endif /* ST77XX_PARAMS */
 /** @} */
@@ -253,4 +254,5 @@ static const uint8_t st77xx_screen_ids[] =
 }
 #endif
 
+#endif /* ST77XX_PARAMS_H */
 /** @} */

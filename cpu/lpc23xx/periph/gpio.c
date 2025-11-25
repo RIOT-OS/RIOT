@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -96,7 +99,7 @@ int gpio_init_mux(unsigned pin, unsigned mux)
     return 0;
 }
 
-bool gpio_read(gpio_t pin)
+int gpio_read(gpio_t pin)
 {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
@@ -130,13 +133,13 @@ void gpio_toggle(gpio_t dev)
     }
 }
 
-void gpio_write(gpio_t pin, bool value)
+void gpio_write(gpio_t dev, int value)
 {
     if (value) {
-        gpio_set(pin);
+        gpio_set(dev);
     }
     else {
-        gpio_clear(pin);
+        gpio_clear(dev);
     }
 }
 

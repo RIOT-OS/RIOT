@@ -1,11 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
- * SPDX-FileCopyrightText: 2016 Laurent Navet <laurent.navet@gmail.com>
- * SPDX-FileCopyrightText: 2017 Thomas Perrot <thomas.perrot@tupi.fr>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
+ *               2016 Laurent Navet <laurent.navet@gmail.com>
+ *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @defgroup    boards_common_arduino-atmega Arduino Atmega Common
@@ -20,6 +21,9 @@
  * @author      Laurent Navet <laurent.navet@gmail.com>
  * @author      Thomas Perrot <thomas.perrot@tupi.fr>
  */
+
+#ifndef BOARD_COMMON_H
+#define BOARD_COMMON_H
 
 #include "cpu.h"
 #include "arduino_pinmap.h"
@@ -123,4 +127,5 @@ extern "C" {
 }
 #endif
 
+#endif /* BOARD_COMMON_H */
 /** @} */

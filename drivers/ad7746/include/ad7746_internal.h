@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_ad7746
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
+
+#ifndef AD7746_INTERNAL_H
+#define AD7746_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -130,4 +131,5 @@ extern "C" {
 }
 #endif
 
+#endif /* AD7746_INTERNAL_H */
 /** @} */

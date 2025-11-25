@@ -21,10 +21,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "net/coap.h"
-#include "net/nanocoap.h"
+#include "net/nanocoap_sock.h"
 #include "net/sock/udp.h"
-#include "shell.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -71,9 +69,6 @@ static int _nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize,
             }
             if ((res = coap_handle_req(&pkt, buf, bufsize, &ctx)) > 0) {
                 res = sock_udp_send(&sock, buf, res, &remote);
-                if (res < 0) {
-                    DEBUG("nanocoap: failed to send: %" PRIdSIZE "\n", res);
-                }
             }
         }
     }
@@ -88,7 +83,7 @@ static void _start_server(uint16_t port, int ignore_count)
     _nanocoap_server(&local, buf, sizeof(buf), ignore_count);
 }
 
-static int _cmd_server(int argc, char **argv)
+int nanotest_server_cmd(int argc, char **argv)
 {
     if (argc < 2) {
         goto error;
@@ -137,5 +132,3 @@ static int _cmd_server(int argc, char **argv)
     printf("  port  defaults to %u\n", COAP_PORT);
     return 1;
 }
-
-SHELL_COMMAND(server, "CoAP server", _cmd_server);

@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_hdc1000
  * @{
@@ -19,6 +17,9 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef HDC1000_REGS_H
+#define HDC1000_REGS_H
 
 #ifdef __cplusplus
 extern "C"
@@ -68,4 +69,5 @@ extern "C"
 }
 #endif
 
+#endif /* HDC1000_REGS_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    pkg_lwip_netdev    lwIP netdev adapter
  * @ingroup     pkg_lwip
@@ -19,6 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef LWIP_NETIF_NETDEV_H
+#define LWIP_NETIF_NETDEV_H
 
 #include "net/ethernet.h"
 #include "net/netdev.h"
@@ -59,4 +59,5 @@ err_t lwip_netdev_init(struct netif *netif);
 }
 #endif
 
+#endif /* LWIP_NETIF_NETDEV_H */
 /** @} */

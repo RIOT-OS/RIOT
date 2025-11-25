@@ -1,4 +1,5 @@
 BOARD_INSUFFICIENT_MEMORY := \
     atmega8 \
+    nucleo-f031k6 \
     stm32f030f4-demo \
     #

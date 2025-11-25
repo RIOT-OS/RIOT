@@ -6,9 +6,6 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-
-#pragma once
-
 /**
  * @ingroup     sys_suit
  * @brief       SUIT conditions
@@ -20,6 +17,9 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  */
+
+#ifndef SUIT_CONDITIONS_H
+#define SUIT_CONDITIONS_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -105,4 +105,5 @@ uuid_t *suit_get_device_id(void);
 }
 #endif
 
+#endif /* SUIT_CONDITIONS_H */
 /** @} */

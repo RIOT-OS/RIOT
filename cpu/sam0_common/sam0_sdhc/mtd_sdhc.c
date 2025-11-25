@@ -1,6 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2022 Benjamin Valentin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2022 Benjamin Valentin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ *
  */
 
 /**
@@ -42,11 +46,9 @@ static int _init(mtd_dev_t *dev)
 
 #if IS_USED(MODULE_MTD_WRITE_PAGE)
     /* TODO: move to MTD layer */
-    if (!dev->work_area) {
-        dev->work_area = malloc(SD_MMC_BLOCK_SIZE);
-        if (dev->work_area == NULL) {
-            return -ENOMEM;
-        }
+    dev->work_area = malloc(SD_MMC_BLOCK_SIZE);
+    if (dev->work_area == NULL) {
+        return -ENOMEM;
     }
     dev->write_size = 1;
 #endif

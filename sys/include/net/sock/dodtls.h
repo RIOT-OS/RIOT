@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_sock_dodtls     DNS over DTLS sock API
  * @ingroup     net_sock
@@ -30,6 +28,9 @@
  *
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
+
+#ifndef NET_SOCK_DODTLS_H
+#define NET_SOCK_DODTLS_H
 
 #include "net/sock/dtls.h"
 #include "net/sock/udp.h"
@@ -142,4 +143,5 @@ int sock_dodtls_set_server(const sock_udp_ep_t *server,
 }
 #endif
 
+#endif /* NET_SOCK_DODTLS_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_aip31068
  * @brief       Register definitions for the AIP31068 I2C LCD controller
@@ -15,6 +13,9 @@
  * @file
  * @{
  */
+
+#ifndef AIP31068_REGS_H
+#define AIP31068_REGS_H
 
 #include "bitarithm.h"
 
@@ -156,4 +157,5 @@ extern "C"
 }
 #endif
 
+#endif /* AIP31068_REGS_H */
 /** @} */

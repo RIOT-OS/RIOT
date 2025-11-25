@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup        net_sock_async_event    Asynchronous sock with event API
  * @ingroup         net_sock
@@ -19,20 +17,13 @@
  * How To Use
  * ----------
  *
- * You need to [include][include-link] at least one module that
+ * You need to [include](@ref including-modules) at least one module that
  * implements a [`sock` API](@ref net_sock) (e.g. `gnrc_sock_udp` and
  * `gnrc_sock_async` for the [GNRC](@ref net_gnrc) implementation using UDP) and
  * the module `sock_async_event` in your application's Makefile.
  *
  * For the following example [`sock_udp`](@ref net_sock_udp) is used. It is
  * however easily adaptable for other `sock` types:
- *
- * @warning An async socket may only be closed from the same thread that
- *          processes the queue. This is because there is no way to prevent the
- *          networking subsystem from posting socket events other than calling
- *          sock_*_close(), which would then race against these events. If
- *          unsure, use sock_*_event_close(), which will close the socket on
- *          the correct thread.
  *
  * ### An asynchronous UDP Echo server using the event API
  *
@@ -82,7 +73,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * Above you see a simple UDP echo server using @ref sys_event. Don't forget to
- * also [include][include-link] the IPv6 module of your networking
+ * also @ref including-modules "include" the IPv6 module of your networking
  * implementation (e.g. `gnrc_ipv6_default` for @ref net_gnrc GNRC) and at least
  * one network device.
  *
@@ -159,8 +150,6 @@
  *     event_loop(&queue);
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * [include-link]: https://guide.riot-os.org/advanced_tutorials/creating_application/#including-modules
- *
  * @{
  *
  * @file
@@ -169,6 +158,8 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
+#ifndef NET_SOCK_ASYNC_EVENT_H
+#define NET_SOCK_ASYNC_EVENT_H
 
 #include "event.h"
 /* guard required since `sock_dtls_types.h` might not be provided */
@@ -200,15 +191,6 @@ extern "C" {
  */
 void sock_dtls_event_init(sock_dtls_t *sock, event_queue_t *ev_queue,
                           sock_dtls_cb_t handler, void *handler_arg);
-
-/**
- * @brief Close a possibly async DTLS socket
- *
- * Helper function that closes a possibly async socket on the event thread.
- *
- * @param sock socket
- */
-void sock_dtls_event_close(sock_dtls_t *sock);
 #endif  /* defined(MODULE_SOCK_DTLS) || defined(DOXYGEN) */
 
 #if defined(MODULE_SOCK_IP) || defined(DOXYGEN)
@@ -226,15 +208,6 @@ void sock_dtls_event_close(sock_dtls_t *sock);
  */
 void sock_ip_event_init(sock_ip_t *sock, event_queue_t *ev_queue,
                         sock_ip_cb_t handler, void *handler_arg);
-
-/**
- * @brief Close a possibly async IP socket
- *
- * Helper function that closes a possibly async socket on the event thread.
- *
- * @param sock socket
- */
-void sock_ip_event_close(sock_ip_t *sock);
 #endif  /* defined(MODULE_SOCK_IP) || defined(DOXYGEN) */
 
 #if defined(MODULE_SOCK_TCP) || defined(DOXYGEN)
@@ -252,15 +225,6 @@ void sock_ip_event_close(sock_ip_t *sock);
  */
 void sock_tcp_event_init(sock_tcp_t *sock, event_queue_t *ev_queue,
                          sock_tcp_cb_t handler, void *handler_arg);
-
-/**
- * @brief Close a possibly async TCP socket
- *
- * Helper function that closes a possibly async socket on the event thread.
- *
- * @param sock socket
- */
-void sock_tcp_event_close(sock_tcp_t *sock);
 
 /**
  * @brief   Makes a TCP listening queue able to handle asynchronous events using
@@ -293,30 +257,11 @@ void sock_tcp_queue_event_init(sock_tcp_queue_t *queue, event_queue_t *ev_queue,
  */
 void sock_udp_event_init(sock_udp_t *sock, event_queue_t *ev_queue,
                          sock_udp_cb_t handler, void *handler_arg);
-
-/**
- * @brief Close a possibly async UDP socket
- *
- * Helper function that closes a possibly async socket on the event thread.
- *
- * @param sock socket
- */
-void sock_udp_event_close(sock_udp_t *sock);
-
 #endif  /* defined(MODULE_SOCK_UDP) || defined(DOXYGEN) */
-
-/**
- * @brief clear any pending socket async events
- *
- * @warning Do not call this in the application, it is automatically called by
- * sock_*_close().
- *
- * @param[in] async_ctx socket async context
- */
-void sock_event_close(sock_async_ctx_t *async_ctx);
 
 #ifdef __cplusplus
 }
 #endif
 
+#endif /* NET_SOCK_ASYNC_EVENT_H */
 /** @} */

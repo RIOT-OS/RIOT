@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_aip31068
  * @brief       Internal definitions for the AIP31068 I2C LCD controller
@@ -15,6 +13,9 @@
  * @file
  * @{
  */
+
+#ifndef AIP31068_INTERNAL_H
+#define AIP31068_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C"
@@ -36,4 +37,5 @@ extern "C"
 }
 #endif
 
+#endif /* AIP31068_INTERNAL_H */
 /** @} */

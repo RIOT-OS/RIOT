@@ -8,8 +8,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_riotboot_slot   Helpers to manipulate partitions (slots) on internal flash
  * @ingroup     sys
@@ -23,6 +21,9 @@
  *
  * @}
  */
+
+#ifndef RIOTBOOT_SLOT_H
+#define RIOTBOOT_SLOT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,20 +71,6 @@ void riotboot_slot_jump(unsigned slot);
  * @returns header of image slot nr @p slot
  */
 const riotboot_hdr_t *riotboot_slot_get_hdr(unsigned slot);
-
-/**
- * @brief  Get header from currently running image slot
- *
- * @returns header of current image
- */
-static inline const riotboot_hdr_t *riotboot_slot_get_current_hdr(void)
-{
-    int slot = riotboot_slot_current();
-    if (slot < 0) {
-        return NULL;
-    }
-    return riotboot_slot_get_hdr(slot);
-}
 
 /**
  * @brief  Validate slot
@@ -155,3 +142,5 @@ extern const riotboot_hdr_t *const riotboot_slots[];
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* RIOTBOOT_SLOT_H */

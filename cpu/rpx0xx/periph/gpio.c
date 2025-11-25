@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2021 Otto-von-Guericke Universität Magdeburg
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2021 Otto-von-Guericke Universität Magdeburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -103,7 +106,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-bool gpio_read(gpio_t pin)
+int gpio_read(gpio_t pin)
 {
     if (SIO->GPIO_OE & (1LU << pin)) {
         /* pin is output: */
@@ -128,7 +131,7 @@ void gpio_toggle(gpio_t pin)
     SIO->GPIO_OUT_XOR = 1LU << pin;
 }
 
-void gpio_write(gpio_t pin, bool value)
+void gpio_write(gpio_t pin, int value)
 {
     if (value) {
         gpio_set(pin);

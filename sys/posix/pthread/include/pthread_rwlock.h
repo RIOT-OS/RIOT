@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup pthread
  * @{
@@ -15,6 +13,9 @@
  * @brief   Implementation of a fair, POSIX conforming reader/writer lock.
  * @note    Do not include this header file directly, but pthread.h.
  */
+
+#ifndef PTHREAD_RWLOCK_H
+#define PTHREAD_RWLOCK_H
 
 #include "priority_queue.h"
 #include "thread.h"
@@ -174,6 +175,8 @@ bool __pthread_rwlock_blocked_writingly(const pthread_rwlock_t *rwlock);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PTHREAD_RWLOCK_H */
 
 /**
  * @}

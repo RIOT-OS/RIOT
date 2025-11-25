@@ -7,8 +7,6 @@
  *
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_dose
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Juergen Fitschen <me@jue.yt>
  */
+
+#ifndef DOSE_PARAMS_H
+#define DOSE_PARAMS_H
 
 #include "board.h"
 
@@ -71,4 +72,5 @@ static const dose_params_t dose_params[] =
 }
 #endif
 
+#endif /* DOSE_PARAMS_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_sixlowpan_nd    6LoWPAN Neighbor Discovery
  * @ingroup     net_sixlowpan
@@ -21,6 +19,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef NET_SIXLOWPAN_ND_H
+#define NET_SIXLOWPAN_ND_H
 
 #include <stdint.h>
 
@@ -278,4 +278,5 @@ static inline uint16_t gnrc_sixlowpan_nd_opt_get_ltime(const sixlowpan_nd_opt_ab
 }
 #endif
 
+#endif /* NET_SIXLOWPAN_ND_H */
 /** @} */

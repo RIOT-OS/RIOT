@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_mynewt_core
  * @{
@@ -18,6 +16,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+
+#ifndef OS_OS_TIME_H
+#define OS_OS_TIME_H
 
 #include "os/os_error.h"
 #include "ztimer.h"
@@ -111,3 +112,5 @@ static inline void os_time_delay(os_time_t ticks)
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* OS_OS_TIME_H */

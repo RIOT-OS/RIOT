@@ -1,0 +1,6 @@
+# configure the terminal program
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
+BAUD        ?= 9600
+WASPMOTE_PRO_BOOTLOADER ?= stk500v1
+
+include $(RIOTBOARD)/common/atmega/Makefile.include

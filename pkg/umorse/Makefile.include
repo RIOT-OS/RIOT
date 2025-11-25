@@ -1,2 +1,1 @@
-# Using -isystem instead of -I to prevent warnings for the following headers
-INCLUDES += -isystem$(PKGDIRBASE)/umorse
+INCLUDES += -I$(PKGDIRBASE)/umorse

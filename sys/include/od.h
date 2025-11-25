@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup sys_od Object dump
  * @ingroup  sys
@@ -20,6 +18,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef OD_H
+#define OD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -71,4 +71,5 @@ static inline void od_hex_dump(const void *data, size_t data_len, uint8_t width)
 }
 #endif
 
+#endif /* OD_H */
 /** @} */

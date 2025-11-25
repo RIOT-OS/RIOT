@@ -1,5 +1,0 @@
-ifneq (,$(filter saul_default,$(USEMODULE)))
-  USEMODULE += saul_gpio
-endif
-
-USEMODULE += boards_common_esp32h2

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_ina3221
  * @{
@@ -18,6 +16,9 @@
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
+
+#ifndef INA3221_INTERNAL_H
+#define INA3221_INTERNAL_H
 
 #include <assert.h>
 #include "ina3221_defines.h"
@@ -128,4 +129,5 @@ static inline int16_t sum_shunt_voltage_uv_to_reg_val(int32_t sum_suv)
 }
 #endif
 
+#endif /* INA3221_INTERNAL_H */
 /** @} */

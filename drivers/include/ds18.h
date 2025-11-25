@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_ds18 DS18 temperature sensor driver
  * @ingroup     drivers_sensors
@@ -36,6 +34,9 @@
  *
  * @author      Frits Kuipers <frits.kuipers@gmail.com>
  */
+
+#ifndef DS18_H
+#define DS18_H
 
 #include <stdint.h>
 
@@ -123,3 +124,4 @@ int ds18_get_temperature(const ds18_t *dev, int16_t *temperature);
 #endif
 
 /** @} */
+#endif /* DS18_H */

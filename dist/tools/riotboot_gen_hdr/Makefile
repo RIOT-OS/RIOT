@@ -18,7 +18,7 @@ GENHDR_SRC := $(COMMON_SRC) $(RIOT_HDR_SRC) \
 
 GENHDR_HDR := $(COMMON_HDR) $(RIOT_HDR_HDR)
 
-CFLAGS += -g -I. -O3 -Wall -Wextra
+CFLAGS += -g -I. -O3 -Wall -Wextra -pedantic -std=c99
 
 ifeq ($(QUIET),1)
   Q=@
@@ -37,5 +37,3 @@ bin/genhdr: $(GENHDR_HDR) $(GENHDR_SRC) Makefile | bin/
 
 clean:
 	$(Q)rm -rf bin/
-
-distclean: clean

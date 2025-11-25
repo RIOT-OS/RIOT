@@ -5,9 +5,6 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-
-#pragma once
-
 /**
  * @ingroup  pkg_tlsf_malloc
  * @{
@@ -18,6 +15,9 @@
  * @author  Juan I Carrano
  *
  */
+
+#ifndef TLSF_MALLOC_INTERNAL_H
+#define TLSF_MALLOC_INTERNAL_H
 
 #include "tlsf.h"
 
@@ -31,4 +31,5 @@ extern tlsf_t tlsf_malloc_gheap;
 }
 #endif
 
+#endif /* TLSF_MALLOC_INTERNAL_H */
 /** @} */

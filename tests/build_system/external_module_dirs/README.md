@@ -7,5 +7,5 @@ It demonstrates:
 
  * Adding a module with source code
  * Setting a header include directory
- * Adding (transitive) dependencies, which are evaluated before other modules dependencies
+ * Adding dependencies, which are evaluated before other modules dependencies
  * Registering a module for auto-initialization

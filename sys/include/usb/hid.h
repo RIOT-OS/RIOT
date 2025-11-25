@@ -6,8 +6,6 @@
  * more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    usb_hid   HID - USB communications device class
  * @ingroup     usb
@@ -20,6 +18,9 @@
  *
  * @author      Nils Ollrogge <nils.ollrogge@fu-berlin.de>
  */
+
+#ifndef USB_HID_H
+#define USB_HID_H
 
 #include <stdint.h>
 
@@ -121,6 +122,7 @@ typedef struct __attribute__((packed)){
  * @brief USB HID descriptor format helpers
  * @{
  */
+
 
 /**
  * @brief HID Main item type
@@ -293,6 +295,7 @@ typedef struct __attribute__((packed)){
     USB_HID_ITEM(USB_HID_ITEM_TAG_OUTPUT, USB_HID_ITEM_TYPE_MAIN, 1), \
     output
 
+
 /**
  * @brief Defines a HID Feature item
  *
@@ -364,6 +367,7 @@ typedef struct __attribute__((packed)){
 #define USB_HID_LOGICAL_MIN16(minimum) \
     USB_HID_ITEM(USB_HID_ITEM_TAG_LOGICAL_MIN, USB_HID_ITEM_TYPE_GLOBAL, 2), \
     minimum & 0xff, (minimum >> 8)
+
 
 /**
  * @brief Defines a HID Logical Minimum item
@@ -509,4 +513,5 @@ typedef struct __attribute__((packed)){
 }
 #endif
 
+#endif /* USB_HID_H */
 /** @} */

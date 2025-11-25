@@ -24,11 +24,9 @@
 #include <unistd.h>
 #include <string.h>
 
-#include "compiler_hints.h"
 #include "fmt.h"
 #include "fmt_table.h"
 
-NONSTRING
 static const char fmt_table_spaces[16] = "                ";
 
 /**

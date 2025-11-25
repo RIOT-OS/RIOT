@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup pthread
  * @{
@@ -18,6 +16,9 @@
  *          They will burn away the battery needlessly, and may not work because RIOT is tickless.
  *          Use irq_disable() and irq_restore() for shortterm locks instead.
  */
+
+#ifndef PTHREAD_SPIN_H
+#define PTHREAD_SPIN_H
 
 #ifdef __cplusplus
 #include <atomic>
@@ -94,6 +95,8 @@ int pthread_spin_unlock(pthread_spinlock_t *lock);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PTHREAD_SPIN_H */
 
 /**
  * @}

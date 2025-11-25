@@ -6,14 +6,14 @@
  * more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_ipv6_addr    IPv6 addresses
  * @ingroup     net_ipv6
  * @brief       IPv6 address architecture
  *
- * @see [RFC 4291](http://tools.ietf.org/html/rfc4291)
+ * @see <a href="http://tools.ietf.org/html/rfc4291">
+ *          RFC 4291
+ *      </a>
  *
  * @{
  *
@@ -22,6 +22,9 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+
+#ifndef NET_IPV6_ADDR_H
+#define NET_IPV6_ADDR_H
 
 #include <stdbool.h>
 #include <string.h>
@@ -53,10 +56,12 @@ extern "C" {
 /**
  * @brief The first 10 bits of a site-local IPv6 unicast address
  *
- * @see [RFC 4291, section 2.5.7](http://tools.ietf.org/html/rfc4291#section-2.5.7)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.7">
+ *          RFC 4291, section 2.5.7
+ *      </a>
  *
- * @note Site-local addresses are now deprecated as defined in
- *       [SLDEP](http://tools.ietf.org/html/rfc3879). They are only
+ * @note Site-local addresses are now deprecated as defined in <a
+ *       href="http://tools.ietf.org/html/rfc3879">SLDEP</a>. They are only
  *       defined here for the distinction of global unicast addresses.
  */
 #define IPV6_ADDR_SITE_LOCAL_PREFIX (0xfec0)
@@ -74,7 +79,9 @@ typedef union {
 /**
  * @brief   Static initializer for the unspecified IPv6 address (::)
  *
- * @see [RFC 4291, section 2.5.2](http://tools.ietf.org/html/rfc4291#section-2.5.2)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.2">
+ *          RFC 4291, section 2.5.2
+ *      </a>
  */
 #define IPV6_ADDR_UNSPECIFIED               {{ 0x00, 0x00, 0x00, 0x00, \
                                                0x00, 0x00, 0x00, 0x00, \
@@ -84,7 +91,9 @@ typedef union {
 /**
  * @brief   Static initializer for the loopback IPv6 address (::1)
  *
- * @see [RFC 4291, section 2.5.3](http://tools.ietf.org/html/rfc4291#section-2.5.3)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.3">
+ *          RFC 4291, section 2.5.3
+ *      </a>
  */
 #define IPV6_ADDR_LOOPBACK                  {{ 0x00, 0x00, 0x00, 0x00, \
                                                0x00, 0x00, 0x00, 0x00, \
@@ -93,7 +102,9 @@ typedef union {
 /**
  * @brief   Static initializer for the link-local prefix (fe80::/64)
  *
- * @see [RFC 4291, section 2.5.6](http://tools.ietf.org/html/rfc4291#section-2.5.6)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.6">
+ *          RFC 4291, section 2.5.6
+ *      </a>
  */
 #define IPV6_ADDR_LINK_LOCAL_PREFIX         {{ 0xfe, 0x80, 0x00, 0x00, \
                                                0x00, 0x00, 0x00, 0x00, \
@@ -104,7 +115,9 @@ typedef union {
  * @brief   Static initializer for the interface-local all nodes multicast IPv6
  *          address (ff01::1)
  *
- * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
+ *          RFC 4291, section 2.7
+ *      </a>
  */
 #define IPV6_ADDR_ALL_NODES_IF_LOCAL        {{ 0xff, 0x01, 0x00, 0x00, \
                                                0x00, 0x00, 0x00, 0x00, \
@@ -115,7 +128,9 @@ typedef union {
  * @brief   Static initializer for the link-local all nodes multicast IPv6
  *          address (ff02::1)
  *
- * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
+ *          RFC 4291, section 2.7
+ *      </a>
  */
 #define IPV6_ADDR_ALL_NODES_LINK_LOCAL      {{ 0xff, 0x02, 0x00, 0x00, \
                                                0x00, 0x00, 0x00, 0x00, \
@@ -126,7 +141,9 @@ typedef union {
  * @brief   Static initializer for the interface-local all routers multicast IPv6
  *          address (ff01::2)
  *
- * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
+ *          RFC 4291, section 2.7
+ *      </a>
  */
 #define IPV6_ADDR_ALL_ROUTERS_IF_LOCAL      {{ 0xff, 0x01, 0x00, 0x00, \
                                                0x00, 0x00, 0x00, 0x00, \
@@ -137,7 +154,9 @@ typedef union {
  * @brief   Static initializer for the link-local all routers multicast IPv6
  *          address (ff02::2)
  *
- * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
+ *          RFC 4291, section 2.7
+ *      </a>
  */
 #define IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL    {{ 0xff, 0x02, 0x00, 0x00, \
                                                0x00, 0x00, 0x00, 0x00, \
@@ -148,7 +167,9 @@ typedef union {
  * @brief   Static initializer for the site-local all routers multicast IPv6
  *          address (ff05::2)
  *
- * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
+ *          RFC 4291, section 2.7
+ *      </a>
  */
 #define IPV6_ADDR_ALL_ROUTERS_SITE_LOCAL    {{ 0xff, 0x05, 0x00, 0x00, \
                                                0x00, 0x00, 0x00, 0x00, \
@@ -159,7 +180,9 @@ typedef union {
  * @brief   Static initializer for the solicited node multicast prefix
  *          (ff02:0:0:0:0:1:ff00::/104)
  *
- * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
+ *          RFC 4291, section 2.7
+ *      </a>
  */
 #define IPV6_ADDR_SOLICITED_NODE_PREFIX     {{ 0xff, 0x02, 0x00, 0x00, \
                                                0x00, 0x00, 0x00, 0x00, \
@@ -171,7 +194,9 @@ typedef union {
  * @brief   Values for the flag field in multicast addresses.
  * @{
  *
- * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
+ *          RFC 4291, section 2.7
+ *      </a>
  */
 /**
  * @brief   The address is transient, i.e. not well-known, permanently
@@ -182,14 +207,18 @@ typedef union {
 /**
  * @brief   The address is based on a network prefix
  *
- * @see [RFC 3306, section 4](http://tools.ietf.org/html/rfc3306#section-4)
+ * @see <a href="http://tools.ietf.org/html/rfc3306#section-4">
+ *          RFC 3306, section 4
+ *      </a>
  */
 #define IPV6_ADDR_MCAST_FLAG_PREFIX_BASED   (0x02)
 
 /**
  * @brief   The address embeds the address on the rendezvous point
  *
- * @see [RFC 3956, section 3](http://tools.ietf.org/html/rfc3956#section-3)
+ * @see <a href="http://tools.ietf.org/html/rfc3956#section-3">
+ *          RFC 3956, section 3
+ *      </a>
  */
 #define IPV6_ADDR_MCAST_FLAG_EMBED_ON_RP    (0x04)
 /** @} */
@@ -199,7 +228,9 @@ typedef union {
  * @brief   Values for the scope field in multicast addresses.
  * @{
  *
- * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
+ *          RFC 4291, section 2.7
+ *      </a>
  */
 #define IPV6_ADDR_MCAST_SCP_IF_LOCAL        (0x1)   /**< interface-local scope */
 #define IPV6_ADDR_MCAST_SCP_LINK_LOCAL      (0x2)   /**< link-local scope */
@@ -207,8 +238,12 @@ typedef union {
 /**
  * @brief realm-local scope
  *
- * @see [RFC 7346, section 3](http://tools.ietf.org/html/rfc7346#section-3) and
- *      [RFC 7346, section 5](http://tools.ietf.org/html/rfc7346#section-5)
+ * @see <a href="http://tools.ietf.org/html/rfc7346#section-3">
+ *          RFC 7346, section 3
+ *      </a> and
+ *      <a href="http://tools.ietf.org/html/rfc7346#section-5">
+ *          RFC 7346, section 5
+ *      </a> and
  */
 #define IPV6_ADDR_MCAST_SCP_REALM_LOCAL (0x3)
 #define IPV6_ADDR_MCAST_SCP_ADMIN_LOCAL (0x4)      /**< admin-local scope */
@@ -272,7 +307,9 @@ extern const ipv6_addr_t ipv6_addr_solicited_node_prefix;
 /**
  * @brief   Checks if @p addr is unspecified (all zero).
  *
- * @see [RFC 4291, section 2.5.2](http://tools.ietf.org/html/rfc4291#section-2.5.2)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.2">
+ *          RFC 4291, section 2.5.2
+ *      </a>
  *
  * @param[in] addr  An IPv6 address.
  *
@@ -287,7 +324,9 @@ static inline bool ipv6_addr_is_unspecified(const ipv6_addr_t *addr)
 /**
  * @brief   Checks if @p addr is a loopback address.
  *
- * @see [RFC 4291, section 2.5.3](http://tools.ietf.org/html/rfc4291#section-2.5.3)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.3">
+ *          RFC 4291, section 2.5.3
+ *      </a>
  *
  * @param[in] addr  An IPv6 address.
  *
@@ -302,7 +341,9 @@ static inline bool ipv6_addr_is_loopback(const ipv6_addr_t *addr)
 /**
  * @brief   Checks if @p addr is a IPv4-compatible IPv6 address.
  *
- * @see [RFC 4291, section 2.5.5.1](http://tools.ietf.org/html/rfc4291#section-2.5.5.1)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.5.1">
+ *          RFC 4291, section 2.5.5.1
+ *      </a>
  *
  * @param[in] addr  An IPv6 address.
  *
@@ -318,7 +359,9 @@ static inline bool ipv6_addr_is_ipv4_compat(const ipv6_addr_t *addr)
 /**
  * @brief   Checks if @p addr is a IPv4-mapped IPv6 address.
  *
- * @see [RFC 4291, section 2.5.5.2](http://tools.ietf.org/html/rfc4291#section-2.5.5.2)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.5.2">
+ *          RFC 4291, section 2.5.5.2
+ *      </a>
  *
  * @param[in] addr  An IPv6 address.
  *
@@ -335,7 +378,9 @@ static inline bool ipv6_addr_is_ipv4_mapped(const ipv6_addr_t *addr)
 /**
  * @brief   Check if @p addr is a multicast address.
  *
- * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
+ *          RFC 4291, section 2.7
+ *      </a>
  *
  * @param[in] addr  An IPv6 address.
  *
@@ -350,8 +395,12 @@ static inline bool ipv6_addr_is_multicast(const ipv6_addr_t *addr)
 /**
  * @brief   Check if @p addr is a link-local address.
  *
- * @see [RFC 4291, section 2.5.6](http://tools.ietf.org/html/rfc4291#section-2.5.6)
- * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.6">
+ *          RFC 4291, section 2.5.6
+ *      </a>
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
+ *          RFC 4291, section 2.7
+ *      </a>
  *
  * @param[in] addr  An IPv6 address.
  *
@@ -368,10 +417,12 @@ static inline bool ipv6_addr_is_link_local(const ipv6_addr_t *addr)
 /**
  * @brief   Checks if @p addr is a site-local address.
  *
- * @see [RFC 4291, section 2.5.7](http://tools.ietf.org/html/rfc4291#section-2.5.7)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.7">
+ *          RFC 4291, section 2.5.7
+ *      </a>
  *
- * @note Site-local addresses are now deprecated as defined in
- *       [SLDEP](http://tools.ietf.org/html/rfc3879). They are only
+ * @note Site-local addresses are now deprecated as defined in <a
+ *       href="http://tools.ietf.org/html/rfc3879">SLDEP</a>. They are only
  *       defined here for the distinction of global unicast addresses.
  *
  * @param[in] addr  An IPv6 address.
@@ -390,7 +441,9 @@ static inline bool ipv6_addr_is_site_local(const ipv6_addr_t *addr)
 /**
  * @brief   Check if @p addr is unique local unicast address.
  *
- * @see [RFC 4193](http://tools.ietf.org/html/rfc4193)
+ * @see <a href="http://tools.ietf.org/html/rfc4193">
+ *          RFC 4193
+ *      </a>
  *
  * @param[in] addr  An IPv6 address.
  *
@@ -405,7 +458,9 @@ static inline bool ipv6_addr_is_unique_local_unicast(const ipv6_addr_t *addr)
 /**
  * @brief   Check if @p addr is global unicast address.
  *
- * @see [RFC 4291, section 2.5.4](http://tools.ietf.org/html/rfc4291#section-2.5.4)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.4">
+ *          RFC 4291, section 2.5.4
+ *      </a>
  *
  * @param[in] addr  An IPv6 address.
  *
@@ -428,7 +483,9 @@ static inline bool ipv6_addr_is_global(const ipv6_addr_t *addr)
 /**
  * @brief   Check if @p addr is solicited-node multicast address.
  *
- * @see [RFC 4291, section 2.7.1](http://tools.ietf.org/html/rfc4291#section-2.7.1)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7.1">
+ *          RFC 4291, section 2.7.1
+ *      </a>
  *
  * @param[in] addr  An IPv6 address.
  *
@@ -501,7 +558,9 @@ void ipv6_addr_init_iid(ipv6_addr_t *out, const uint8_t *iid, uint8_t bits);
 /**
  * @brief   Sets @p addr dynamically to the unspecified IPv6 address (::).
  *
- * @see [RFC 4291, section 2.5.2](http://tools.ietf.org/html/rfc4291#section-2.5.2)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.2">
+ *          RFC 4291, section 2.5.2
+ *      </a>
  *
  * @param[in,out] addr  The address to set.
  */
@@ -513,7 +572,9 @@ static inline void ipv6_addr_set_unspecified(ipv6_addr_t *addr)
 /**
  * @brief   Sets @p addr dynamically to the loopback IPv6 address (::1).
  *
- * @see [RFC 4291, section 2.5.3](http://tools.ietf.org/html/rfc4291#section-2.5.3)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.3">
+ *          RFC 4291, section 2.5.3
+ *      </a>
  *
  * @param[in,out] addr  The address to set.
  */
@@ -526,7 +587,9 @@ static inline void ipv6_addr_set_loopback(ipv6_addr_t *addr)
 /**
  * @brief   Sets the first 64 bit of @p addr to link local prefix (fe08::/64).
  *
- * @see [RFC 4291, section 2.5.6](http://tools.ietf.org/html/rfc4291#section-2.5.6)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.6">
+ *          RFC 4291, section 2.5.6
+ *      </a>
  *
  * @param[in,out] addr  The address to set.
  */
@@ -539,7 +602,9 @@ static inline void ipv6_addr_set_link_local_prefix(ipv6_addr_t *addr)
  * @brief   Sets the 64-bit interface ID (as integer) of a unicast or anycast
  *          IPv6 address.
  *
- * @see [RFC 4291, section 2.5.4](http://tools.ietf.org/html/rfc4291#section-2.5.4)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.4">
+ *          RFC 4291, section 2.5.4
+ *      </a>
  *
  * @param[in,out] addr  The address to set.
  * @param[in] iid       The interface ID as integer to set.
@@ -553,7 +618,9 @@ static inline void ipv6_addr_set_iid(ipv6_addr_t *addr, uint64_t iid)
  * @brief   Sets the 64-bit interface ID (as array) of a unicast or anycast
  *          IPv6 address.
  *
- * @see [RFC 4291, section 2.5.4](http://tools.ietf.org/html/rfc4291#section-2.5.4)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.4">
+ *          RFC 4291, section 2.5.4
+ *      </a>
  *
  * @param[in,out] addr  The address to set.
  * @param[in] iid       The interface ID as array of at least length 8 to set.
@@ -566,7 +633,9 @@ static inline void ipv6_addr_set_aiid(ipv6_addr_t *addr, uint8_t *iid)
 /**
  * @brief   Sets the bits for an address required to be a multicast address.
  *
- * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7">
+ *          RFC 4291, section 2.7
+ *      </a>
  *
  * @param[in,out] addr  The address to set.
  * @param[in] flags     The multicast address' flags.
@@ -583,7 +652,9 @@ static inline void ipv6_addr_set_multicast(ipv6_addr_t *addr, unsigned int flags
  * @brief   Sets @p addr dynamically to an all nodes multicast IPv6 address (ff0S::1,
  *          where S is the scope).
  *
- * @see [RFC 4291, section 2.7.1](http://tools.ietf.org/html/rfc4291#section-2.7.1)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7.1">
+ *          RFC 4291, section 2.7.1
+ *      </a>
  *
  * @param[in,out] addr  The address to set.
  * @param[in] scope     The multicast address' scope.
@@ -598,7 +669,9 @@ static inline void ipv6_addr_set_all_nodes_multicast(ipv6_addr_t *addr, unsigned
  * @brief   Sets @p addr dynamically to an all routers multicast IPv6 address (ff0S::2,
  *          where S is the scope).
  *
- * @see [RFC 4291, section 2.7.1](http://tools.ietf.org/html/rfc4291#section-2.7.1)
+ * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.7.1">
+ *          RFC 4291, section 2.7.1
+ *      </a>
  *
  * @param[in,out] addr  The address to set.
  * @param[in] scope     The multicast address' scope.
@@ -613,7 +686,9 @@ static inline void ipv6_addr_set_all_routers_multicast(ipv6_addr_t *addr, unsign
  * @brief   Set @p out to the solicited-node multicast address
  *          computed from @p in.
  *
- * @see [RFC 4291](http://tools.ietf.org/html/rfc4291)
+ * @see <a href="http://tools.ietf.org/html/rfc4291">
+ *          RFC 4291
+ *      </a>
  *
  * @param[out]  out   Is set to solicited-node address of this node.
  * @param[in]   in    The IPv6 address the solicited-node address.
@@ -630,7 +705,9 @@ static inline void ipv6_addr_set_solicited_nodes(ipv6_addr_t *out, const ipv6_ad
 /**
  * @brief   Converts an IPv6 address to its string representation
  *
- * @see [RFC 5952](https://tools.ietf.org/html/rfc5952)
+ * @see <a href="https://tools.ietf.org/html/rfc5952">
+ *          RFC 5952
+ *      </a>
  *
  * @param[out] result       The resulting string representation of at least
  *                          @ref IPV6_ADDR_MAX_STR_LEN
@@ -647,7 +724,9 @@ char *ipv6_addr_to_str(char *result, const ipv6_addr_t *addr, uint8_t result_len
  * @brief   Converts an IPv6 address string representation to a byte-represented
  *          IPv6 address
  *
- * @see [RFC 5952](https://tools.ietf.org/html/rfc5952)
+ * @see <a href="https://tools.ietf.org/html/rfc5952">
+ *          RFC 5952
+ *      </a>
  *
  * @param[out] result    The resulting byte representation
  * @param[in] addr       An IPv6 address string representation
@@ -662,7 +741,9 @@ ipv6_addr_t *ipv6_addr_from_str(ipv6_addr_t *result, const char *addr);
  * @brief   Converts an IPv6 prefix string representation to a byte-represented
  *          IPv6 address
  *
- * @see [RFC 5952](https://tools.ietf.org/html/rfc5952)
+ * @see <a href="https://tools.ietf.org/html/rfc5952">
+ *          RFC 5952
+ *      </a>
  *
  * @param[out] result    The resulting byte representation
  * @param[in]  prefix    An IPv6 prefix string representation
@@ -676,7 +757,9 @@ int ipv6_prefix_from_str(ipv6_addr_t *result, const char *prefix);
  * @brief   Converts an IPv6 address from a buffer of characters to a
  *          byte-represented IPv6 address
  *
- * @see [RFC 5952](https://tools.ietf.org/html/rfc5952)
+ * @see <a href="https://tools.ietf.org/html/rfc5952">
+ *          RFC 5952
+ *      </a>
  *
  * @note    @p addr_len should be between 0 and IPV6_ADDR_MAX_STR_LEN
  *
@@ -767,6 +850,7 @@ void ipv6_addrs_print(const ipv6_addr_t *addrs, size_t num,
 }
 #endif
 
+#endif /* NET_IPV6_ADDR_H */
 /**
  * @}
  */

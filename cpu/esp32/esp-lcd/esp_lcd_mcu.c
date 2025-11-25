@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2023 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2023 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -24,7 +27,6 @@
 #include "periph/gpio.h"
 #include "ztimer.h"
 
-#include "esp_lcd_common.h"
 #include "esp_lcd_panel_io.h"
 #include "soc/gpio_reg.h"
 
@@ -54,10 +56,6 @@
 
 static_assert(CONFIG_LCD_PANEL_IO_FORMAT_BUF_SIZE >= 32,
               "CONFIG_LCD_PANEL_IO_FORMAT_BUF_SIZE mus be at least 32");
-
-static_assert(CONFIG_LCD_PANEL_IO_FORMAT_BUF_SIZE <= LCD_I80_IO_FORMAT_BUF_SIZE,
-              "CONFIG_LCD_PANEL_IO_FORMAT_BUF_SIZE must be less or equal to "
-              "LCD_I80_IO_FORMAT_BUF_SIZE");
 
 /* ESP32x SoCs support only one LCD peripheral so we can use single instances
  * of the following variables */
@@ -93,7 +91,7 @@ static void _lcd_ll_mcu_init(lcd_t *dev)
    esp_lcd_i80_bus_config_t i80_bus_config = {
         .dc_gpio_num = dev->params->dcx_pin,
         .wr_gpio_num = dev->params->wrx_pin,
-        .clk_src = LCD_CLK_SRC_DEFAULT,
+        .clk_src = LCD_CLK_SRC_PLL160M,
 #if IS_USED(MODULE_LCD_PARALLEL_16BIT)
         .data_gpio_nums = {
             dev->params->d0_pin,

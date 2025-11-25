@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    pkg_openthread_cli   OpenThread
  * @ingroup     pkg_openthread
@@ -51,6 +49,9 @@
  * @author      Jose Ignacio Alamos <jialamos@uc.cl>
  * @author      Baptiste Clenet <bapclenet@gmail.com>
  */
+
+#ifndef OT_H
+#define OT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -163,13 +164,9 @@ int openthread_netdev_init(char *stack, int stacksize, char priority, const char
  */
 void ot_random_init(void);
 
-/**
- * @brief   Init shell for OpenThread CLI
- */
-void ot_shell_init(otInstance *aInstance);
-
 #ifdef __cplusplus
 }
 #endif
 
+#endif /* OT_H */
 /** @} */

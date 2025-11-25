@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_hd44780
  *
@@ -17,6 +15,8 @@
  *
  * @author      Sebastian Meiling <s@mlng.net>
  */
+#ifndef HD44780_PARAMS_H
+#define HD44780_PARAMS_H
 
 #include "board.h"
 #ifdef MODULE_PCF857X
@@ -106,4 +106,5 @@ static const hd44780_params_t hd44780_params[] =
 }
 #endif
 
+#endif /* HD44780_PARAMS_H */
 /** @} */

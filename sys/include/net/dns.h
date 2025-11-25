@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_dns DNS defines
  * @ingroup     net
@@ -19,21 +17,13 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef NET_DNS_H
+#define NET_DNS_H
 
 #include "modules.h"
-#include "net/af.h"
-#if IS_USED(MODULE_HOSTS)
-#  include "net/hosts.h"
-#endif
-#if IS_USED(MODULE_SOCK_DNS) || IS_USED(MODULE_SOCK_DNS_MOCK)
-#  include "net/sock/dns.h"
-#endif
-#if IS_USED(MODULE_SOCK_DODTLS)
-#  include "net/sock/dodtls.h"
-#endif
-#if IS_USED(MODULE_GCOAP_DNS)
-#  include "net/gcoap/dns.h"
-#endif
+#include "net/sock/dns.h"
+#include "net/sock/dodtls.h"
+#include "net/gcoap/dns.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -82,9 +72,6 @@ extern "C" {
  */
 static inline int dns_query(const char *domain_name, void *addr_out, int family)
 {
-    (void)domain_name;
-    (void)addr_out;
-
     int res = -ENOTSUP;
 
     if (family == AF_UNSPEC) {
@@ -96,26 +83,15 @@ static inline int dns_query(const char *domain_name, void *addr_out, int family)
         }
     }
 
-#if IS_USED(MODULE_HOSTS)
-    if (res <= 0) {
-        res = hosts_query(domain_name, addr_out, family);
-    }
-#endif
-#if IS_USED(MODULE_GCOAP_DNS)
-    if (res <= 0) {
+    if (res <= 0 && IS_USED(MODULE_GCOAP_DNS)) {
         res = gcoap_dns_query(domain_name, addr_out, family);
     }
-#endif
-#if IS_USED(MODULE_SOCK_DODTLS)
-    if (res <= 0) {
+    if (res <= 0 && IS_USED(MODULE_SOCK_DODTLS)) {
         res = sock_dodtls_query(domain_name, addr_out, family);
     }
-#endif
-#if IS_USED(MODULE_SOCK_DNS) || IS_USED(MODULE_SOCK_DNS_MOCK)
-    if (res <= 0) {
+    if (res <= 0 && (IS_USED(MODULE_SOCK_DNS) || IS_USED(MODULE_SOCK_DNS_MOCK))) {
         res = sock_dns_query(domain_name, addr_out, family);
     }
-#endif
 
     return res;
 }
@@ -124,4 +100,5 @@ static inline int dns_query(const char *domain_name, void *addr_out, int family)
 }
 #endif
 
+#endif /* NET_DNS_H */
 /** @} */

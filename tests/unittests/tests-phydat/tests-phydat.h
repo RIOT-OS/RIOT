@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -19,6 +17,9 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef TESTS_PHYDAT_H
+#define TESTS_PHYDAT_H
 
 #include "embUnit.h"
 
@@ -35,4 +36,5 @@ void tests_phydat(void);
 }
 #endif
 
+#endif /* TESTS_PHYDAT_H */
 /** @} */

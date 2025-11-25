@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sched_round_robin Round Robin Scheduler
  * @ingroup     sys
@@ -31,6 +29,8 @@
  * @author      Karl Fessel <karl.fessel@ovgu.de>
  *
  */
+#ifndef SCHED_ROUND_ROBIN_H
+#define SCHED_ROUND_ROBIN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -83,4 +83,5 @@ void sched_round_robin_init(void);
 }
 #endif
 
+#endif /* SCHED_ROUND_ROBIN_H */
 /** @} */

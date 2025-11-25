@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_cc110x
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
+
+#ifndef CC110X_RX_TX_H
+#define CC110X_RX_TX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,4 +42,5 @@ void cc110x_enter_rx_mode(cc110x_t *dev);
 }
 #endif
 
+#endif /* CC110X_RX_TX_H */
 /** @} */

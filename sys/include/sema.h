@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_sema Semaphores
  * @ingroup     sys
@@ -23,6 +21,9 @@
  * @author  René Kijewski <kijewski@inf.fu-berlin.de>
  * @author  Víctor Ariño <victor.arino@zii.aero>
  */
+
+#ifndef SEMA_H
+#define SEMA_H
 
 #include <stdint.h>
 
@@ -252,4 +253,5 @@ int sema_post(sema_t *sema);
 }
 #endif
 
+#endif /* SEMA_H */
 /** @} */

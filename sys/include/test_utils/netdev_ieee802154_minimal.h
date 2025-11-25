@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    test_utils_netdev_ieee802154_minimal Minimal netdev IEEE 802.15.4 device processing
  * @ingroup     sys
@@ -27,6 +25,9 @@
  *
  * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  */
+
+#ifndef TEST_UTILS_NETDEV_IEEE802154_MINIMAL_H
+#define TEST_UTILS_NETDEV_IEEE802154_MINIMAL_H
 
 #include "net/netdev.h"
 
@@ -111,4 +112,5 @@ int netdev_ieee802154_minimal_set(struct netdev *dev, netopt_t opt, void *data, 
 }
 #endif
 
+#endif /* TEST_UTILS_NETDEV_IEEE802154_MINIMAL_H */
 /** @} */

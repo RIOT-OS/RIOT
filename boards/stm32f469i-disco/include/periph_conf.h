@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2021 luisan00
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2021 luisan00
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @ingroup   boards_stm32f469i-disco
@@ -12,6 +13,9 @@
  * @brief     Peripheral MCU configuration for the STM32F469I-DISCO
  * @author    Luis A. Ruiz <luisan00@hotmail.com>
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 /* This board provides a LSE, marked as X3 on the board */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -386,4 +390,5 @@ static const fmc_bank_conf_t fmc_bank_config[] = {
 }
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

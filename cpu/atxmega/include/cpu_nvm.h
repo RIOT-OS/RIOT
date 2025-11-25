@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2021 Gerson Fernando Budke <nandojve@gmail.com>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2021 Gerson Fernando Budke <nandojve@gmail.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_atxmega
@@ -13,6 +14,9 @@
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  */
+
+#ifndef CPU_NVM_H
+#define CPU_NVM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,4 +61,5 @@ uint8_t nvm_read_production_signature_row(uint8_t address);
 }
 #endif
 
+#endif /* CPU_NVM_H */
 /** @} */

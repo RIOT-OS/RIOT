@@ -152,10 +152,14 @@ groups:
         help: ESP WiFi SoftAP support is present.
       - name: esp_wifi_enterprise
         help: The ESP WiFi interface supports WPA2 enterprise mode.
+      - name: esp_ble_esp32
+        help: The ESP32x SoC uses the SDK Bluetooth LE library for the ESP32
+              variant.
+      - name: esp_ble_esp32c3
+        help: The ESP32x SoC uses the SDK Bluetooth LE library for the ESP32-C3 or
+              ESP32-S3 variant.
       - name: esp_hw_counter
         help: The used ESP32x SoC supports HW counters that can be used as timers.
-      - name: esp_ieee802154
-        help: The ESP32x IEEE 802.15.4 driver
       - name: esp_rmt
         help: The ESP32x SoC has an RMT (Remote Control Transceiver) peripheral.
       - name: esp_rtc_timer_32k
@@ -169,7 +173,7 @@ groups:
               case additional GPIOs are used for the SPI interface and cannot be
               used for other purposes.
       - name: esp_ble
-        help: An ESP32x Bluetooth LE transceiver is present.
+        help: An ESP32 Bluetooth LE transceiver is present.
     - title: nordic nRF Specific Features
       features:
       - name: radio_nrf802154
@@ -242,10 +246,6 @@ groups:
           features:
           - name: cpu_sam3
             help: The MCU has an Atmel/Microchip SAM 3 CPU
-        - title: SAM4S Grouping
-          features:
-          - name: cpu_sam4s
-            help: The MCU has an Atmel/Microchip SAM 4S CPU
 
       - title: GigaDevice Semiconductor Inc Grouping
         features:
@@ -283,8 +283,6 @@ groups:
         features:
         - name: cpu_rpx0xx
           help: The MCU is part of the Raspberry PI RPx0xx family.
-        - name: cpu_rp2350
-          help: The MCU is a Raspberry Pi RP2350
 
       - title: Silicon Laboratories EFM32 Grouping
         features:
@@ -407,14 +405,6 @@ groups:
             Indicates that the board is mechanically and electrically compatible
             with shields developed for the Arduino Nano. (Note: Except the
             ISP header, that requires `arduino_shield_isp` in addition.)
-    - name: feather_shield
-      help: >
-            Indicates that the board is mechanically and electrically compatible
-            with shields developed for the Adafruit Feather board family.
-    - name: xiao_shield
-      help: >
-            Indicates that the board is mechanically and electrically compatible
-            with shields developed for the Seeed Studio XIAO board family.
 
 - title: RAM Related Features
   help: These features indicate presence of special RAM regions or features
@@ -544,9 +534,6 @@ groups:
         help: Level triggered IRQs are supported for level high.
       - name: periph_gpio_ll_irq_level_triggered_low
         help: Level triggered IRQs are supported for level low.
-      - name: periph_gpio_ll_irq_edge_triggered_both
-        help: Edge triggered IRQs are supported with both falling and rising
-              edges as trigger
       - name: periph_gpio_ll_irq_unmask
         help: The GPIO LL driver supports unmasking interrupts without
               clearing pending IRQs that came in while masked.
@@ -577,9 +564,9 @@ groups:
         help: The GPIO LL driver allows switching the direction between input
               and (push-pull) output in an efficient manner. The main use case
               is bit-banging bidirectional protocols when open-drain / open-source
-              mode is not supported. Another use case is controlling GPIOs
-              at high speed with three output states (high, low, high impedance),
-              as e.g. needed for Charlieplexing
+              mode is not supported. GPIO LL drivers for peripherals that do
+              support open drain mode typically do not bother implementing this,
+              even if the hardware would allow it.
 
   - title: Serial Interfaces
     help: Features related to serial interfaces
@@ -806,8 +793,6 @@ groups:
   - title: Platform Specific
     help: Things specific to a single MCU family / MCU vendor
     features:
-    - name: board_bat_voltage
-      help: Measures battery voltage based on ADC sampling.
     - name: periph_ics
       help: An NXP Kinetis Internal Clock Source Controller (ICS peripheral) is
             present.
@@ -868,8 +853,6 @@ groups:
       help: AES 128 CBC hardware acceleration present
     - name: periph_cipher_chacha20
       help: ChaCha20 hardware acceleration present
-    - name: periph_aead_aes_128_ccm
-      help: AES 128 CCM hardware acceleration present
     - name: periph_ecc_p192r1
       help: ECC P192R1 hardware acceleration peripheral present.
     - name: periph_ecc_p256r1
@@ -922,17 +905,3 @@ groups:
             open and solder bridges SB4, SB5 and SB6 are closed instead, SPI2 is
             connected to the STMmod+/Pmod connector. Request this feature to use
             SPI2 with this board configuration.
-
-- title: Bugs in hardware, toolchain, or binary blobs
-  help: This allows modelling bugs found in boards, so that workarounds can
-        be enabled for affected builds by inspecting "FEATURES_USED". Any
-        feature prefixed with "bug_" provided in a build will always be used,
-        regardless of build configuration.
-  features:
-  - name: bug_newlib_broken_stdio
-    help: newlib's stdio is not inherently thread-safe, but depends on the
-          reentrancy hooks to be provided for correct operation. When
-          reentrancy is not enabled, using newlib's stdio is racy, causing
-          random crashes at runtime. Use of this feature will cause an
-          alternative stdio implementation to be used if (and only if) newlib
-          is used as standard c lib.

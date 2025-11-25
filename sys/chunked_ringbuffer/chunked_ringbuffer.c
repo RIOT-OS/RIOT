@@ -87,13 +87,13 @@ static unsigned _get_cur_len(chunk_ringbuf_t *rb)
     }
 }
 
-unsigned crb_end_chunk(chunk_ringbuf_t *rb, bool keep)
+bool crb_end_chunk(chunk_ringbuf_t *rb, bool keep)
 {
     int idx;
 
     /* no chunk was started */
     if (rb->cur_start == NULL) {
-        return 0;
+        return false;
     }
 
     if (keep) {
@@ -109,7 +109,7 @@ unsigned crb_end_chunk(chunk_ringbuf_t *rb, bool keep)
         }
         rb->cur = rb->cur_start;
         rb->cur_start = NULL;
-        return 0;
+        return false;
     }
 
     /* store complete chunk */
@@ -117,7 +117,7 @@ unsigned crb_end_chunk(chunk_ringbuf_t *rb, bool keep)
     rb->chunk_len[idx] = _get_cur_len(rb);
     rb->cur_start = NULL;
 
-    return rb->chunk_len[idx];
+    return true;
 }
 
 bool crb_get_chunk_size(chunk_ringbuf_t *rb, size_t *len)

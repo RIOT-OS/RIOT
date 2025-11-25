@@ -1,5 +1,5 @@
 # setup JLink for flashing
-JLINK_PRE_FLASH += r
+JLINK_PRE_FLASH = r
 
 # limit the stack size so most tests and examples compile
 CFLAGS += -DTHREAD_STACKSIZE_DEFAULT=512

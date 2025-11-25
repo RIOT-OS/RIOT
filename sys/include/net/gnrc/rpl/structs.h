@@ -8,8 +8,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup net_gnrc_rpl
  * @{
@@ -22,6 +20,9 @@
  * @author      Eric Engel <eric.engel@fu-berlin.de>
  * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
+
+#ifndef NET_GNRC_RPL_STRUCTS_H
+#define NET_GNRC_RPL_STRUCTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -286,7 +287,7 @@ typedef struct {
      * @return      Negative, if the first parent is preferred.
      */
     int (*parent_cmp)(gnrc_rpl_parent_t *parent1, gnrc_rpl_parent_t *parent2);
-    int (*which_dodag)(gnrc_rpl_dodag_t *, gnrc_rpl_dio_t *); /**< compare for dodags */
+    gnrc_rpl_dodag_t *(*which_dodag)(gnrc_rpl_dodag_t *, gnrc_rpl_dodag_t *); /**< compare for dodags */
 
     /**
      * @brief Reset the state of the objective function.
@@ -374,6 +375,7 @@ typedef struct  {
 }
 #endif
 
+#endif /* NET_GNRC_RPL_STRUCTS_H */
 /**
  * @}
  */

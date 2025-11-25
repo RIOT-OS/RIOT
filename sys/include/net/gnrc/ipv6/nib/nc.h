@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gnrc_ipv6_nib_nc   Neighbor Cache
  * @ingroup     net_gnrc_ipv6_nib
@@ -19,6 +17,8 @@
  *
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef NET_GNRC_IPV6_NIB_NC_H
+#define NET_GNRC_IPV6_NIB_NC_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -313,4 +313,5 @@ void gnrc_ipv6_nib_nc_print(gnrc_ipv6_nib_nc_t *nce);
 }
 #endif
 
+#endif /* NET_GNRC_IPV6_NIB_NC_H */
 /** @} */

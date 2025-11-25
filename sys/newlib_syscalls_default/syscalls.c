@@ -34,7 +34,6 @@
 #include <sys/unistd.h>
 #include <unistd.h>
 
-#include "assert.h"
 #include "log.h"
 #include "modules.h"
 #include "periph/pm.h"
@@ -145,7 +144,23 @@ static const struct heap heaps[NUM_HEAPS] = {
  */
 void _init(void)
 {
-    /* nothing to do here */
+    /* Definition copied from newlib/libc/stdio/local.h */
+    extern void __sinit (struct _reent *);
+
+    /* When running multiple threads: Initialize reentrant structure before the
+     * scheduler starts. This normally happens upon the first stdio function
+     * called. However, if no boot message happens this can result in two
+     * concurrent "first calls" to stdio in data corruption, if no locking is
+     * used. Except for ESP (which is using its own syscalls.c anyway), this
+     * currently is the case in RIOT. */
+    if (MAXTHREADS > 1) {
+        /* Also, make an exception for riotboot, which does not use stdio
+         * at all. This would pull in stdio and increase .text size
+         * significantly there */
+        if (!IS_USED(MODULE_RIOTBOOT)) {
+            __sinit(_REENT);
+        }
+    }
 }
 
 /**
@@ -449,7 +464,7 @@ int _fstat_r(struct _reent *r, int fd, struct stat *buf)
  *
  * @param[in]  r        pointer to reent structure
  * @param[in]  name     path to file
- * @param[out] st       pointer to stat struct to fill
+ * @param[out] buf      pointer to stat struct to fill
  *
  * @return 0 on success
  * @return -1 on error, @c r->_errno set to a constant from errno.h to indicate the error
@@ -646,21 +661,4 @@ clock_t _times_r(struct _reent *ptr, struct tms *ptms)
     ptr->_errno = ENOSYS;
 
     return (-1);
-}
-
-/**
- * @brief Wrapper for newlib's assert implementation
- */
-NORETURN
-void __wrap___assert_func (const char *file, int line, const char *func, const char *expr)
-{
-    (void)file;
-    (void)line;
-    (void)func;
-    (void)expr;
-#ifdef DEBUG_ASSERT_VERBOSE
-    _assert_failure(file, line);
-#else
-    _assert_panic();
-#endif
 }

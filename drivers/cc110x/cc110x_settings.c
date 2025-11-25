@@ -61,8 +61,8 @@ const uint8_t cc110x_conf[CC110X_CONF_SIZE] = {
      * SYNC1, SYNC0; defaults: 0xD3, 0x91
      * Use 0xD3,0x91 as sync word
      */
-    0xD3,   /**< SYNC1 */
-    0x91,   /**< SYNC0 */
+    0xD3,   /*< SYNC1 */
+    0x91,   /*< SYNC0 */
     /*
      * PKTLEN; default: 0xFF
      * Packet length in bytes in fixed length mode, else maximum length
@@ -126,9 +126,9 @@ const uint8_t cc110x_conf[CC110X_CONF_SIZE] = {
      * Default is 800.000 MHz, which is not in a license free frequency band.
      * Using LoRa channel 10 instead.
      */
-    0x21,   /**< FREQ2 */
-    0x46,   /**< FREQ1 */
-    0xE4,   /**< FREQ0 */
+    0x21,   /*< FREQ2 */
+    0x46,   /*< FREQ1 */
+    0xE4,   /*< FREQ0 */
     /*
      * MDMCFG4, MDMCFG3; defaults: 0x8C, 0x22
      * 541.67 kHz channel filter bandwidth,
@@ -144,8 +144,8 @@ const uint8_t cc110x_conf[CC110X_CONF_SIZE] = {
      *  - 540 kHz channel filter bandwidth
      *  - 127 kHz deviation
      */
-    0x2D,   /**< MDMCFG4 */
-    0x3B,   /**< MDMCFG3 */
+    0x2D,   /*< MDMCFG4 */
+    0x3B,   /*< MDMCFG3 */
     /*
      * MDMCFG2; default: 0x02
      * DC blocking filter on,
@@ -176,8 +176,8 @@ const uint8_t cc110x_conf[CC110X_CONF_SIZE] = {
      * a resolution of 50kHz - this seems to allow to configure all desired
      * channel layouts.
      */
-    0x20,   /**< MDMCFG1 */
-    0xF8,   /**< MDMCFG0 */
+    0x20,   /*< MDMCFG1 */
+    0xF8,   /*< MDMCFG0 */
     /*
      * DEVIATN; default: 0x47
      * Deviation of frequency to encode data: +- 126.953kHz in 2-FSK/4-FSK/GFSK
@@ -272,9 +272,9 @@ const uint8_t cc110x_conf[CC110X_CONF_SIZE] = {
      * RC oscillator calibration: Enabled
      * WOR_RES: 0 (Relevant for Event0 resolution and maximum timeout)
      */
-    0x87,   /**< WOREVT1 */
-    0x6B,   /**< WOREVT0 */
-    0xF8,   /**< WORCTRL */
+    0x87,   /*< WOREVT1 */
+    0x6B,   /*< WOREVT0 */
+    0xF8,   /*< WORCTRL */
     /*
      * FREND1; default: 0x56
      * LNA_CURRENT: 0b01
@@ -315,16 +315,16 @@ const uint8_t cc110x_conf[CC110X_CONF_SIZE] = {
      * Using "magic" values obtained with SmartRF Studio software for 868 MHz
      * band.
      */
-    0xEA,   /**< FSCAL3: charge pump current calibration, frequency independent */
-    0x2A,   /**< FSCAL2: VCO current calibration, frequency independent */
-    0x00,   /**< FSCAL1: VCO capacitance calibration, frequency dependent */
-    0x1F,   /**< FSCAL0: "Magic number", use SmartRF Studio to obtain */
+    0xEA,   /*< FSCAL3: charge pump current calibration, frequency independent */
+    0x2A,   /*< FSCAL2: VCO current calibration, frequency independent */
+    0x00,   /*< FSCAL1: VCO capacitance calibration, frequency dependent */
+    0x1F,   /*< FSCAL0: "Magic number", use SmartRF Studio to obtain */
     /*
      * RCCTRL1, RCCTRL0; defaults: 0x41, 0x00
      * RC oscillator configuration, no explanation given in data sheet.
      */
-    0x41,   /**< RCCTRL1 */
-    0x00,   /**< RCCTRL0 */
+    0x41,   /*< RCCTRL1 */
+    0x00,   /*< RCCTRL0 */
 };
 
 const uint8_t cc110x_magic_registers[3] = { 0x88, 0x31, 0x09 };

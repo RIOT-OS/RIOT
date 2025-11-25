@@ -2,8 +2,9 @@ include ../Makefile.drivers_common
 
 USEMODULE += shell
 USEMODULE += shell_cmds_default
-USEMODULE += shell_cmd_mtd
 
+USEMODULE += od
+USEMODULE += mtd
 USEMODULE += mtd_write_page
 
 # enable true erase if MTD is an SD card

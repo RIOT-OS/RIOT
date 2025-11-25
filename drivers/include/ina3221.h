@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_ina3221 INA3221 current/power monitor
  * @ingroup     drivers_sensors
@@ -68,6 +66,9 @@
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
+
+#ifndef INA3221_H
+#define INA3221_H
 
 #include <assert.h>
 #include <errno.h>
@@ -353,8 +354,8 @@ typedef struct {
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
  * @return      -ENODEV, if device could not be reset
- * @return      See @ref i2c_read_regs
- * @return      See @ref i2c_write_regs
+ * @return      @see i2c_read_regs
+ * @return      @see i2c_write_regs
  */
 int ina3221_reset(ina3221_t *dev);
 
@@ -370,8 +371,8 @@ int ina3221_reset(ina3221_t *dev);
  * @return      -ENXIO, if manufacturer ID or DIE ID does not match
  * @return      -ENODEV, if reset failed
  * @return      -EINVAL, if configuration could not be applied
- * @return      See @ref i2c_read_regs
- * @return      See @ref i2c_write_regs
+ * @return      @see i2c_read_regs
+ * @return      @see i2c_write_regs
  */
 int ina3221_init(ina3221_t *dev, const ina3221_params_t *params);
 
@@ -671,7 +672,7 @@ static inline void ina3221_config_set_mode(uint16_t *cfg,
  *
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_write_regs
+ * @return      @see i2c_write_regs
  */
 int ina3221_set_config(ina3221_t *dev, uint16_t cfg);
 
@@ -683,7 +684,7 @@ int ina3221_set_config(ina3221_t *dev, uint16_t cfg);
  *
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_read_regs
+ * @return      @see i2c_read_regs
  */
 int ina3221_get_config(const ina3221_t *dev, uint16_t *cfg);
 
@@ -695,8 +696,8 @@ int ina3221_get_config(const ina3221_t *dev, uint16_t *cfg);
  *
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_read_regs
- * @return      See @ref i2c_write_regs
+ * @return      @see i2c_read_regs
+ * @return      @see i2c_write_regs
  */
 int ina3221_set_enable_channel(ina3221_t *dev, ina3221_ch_t ch);
 
@@ -720,8 +721,8 @@ static inline void ina3221_get_enable_channel(const ina3221_t *dev,
  *
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_read_regs
- * @return      See @ref i2c_write_regs
+ * @return      @see i2c_read_regs
+ * @return      @see i2c_write_regs
  */
 int ina3221_set_num_samples(ina3221_t *dev, ina3221_num_samples_t ns);
 
@@ -745,8 +746,8 @@ static inline void ina3221_get_num_samples(const ina3221_t *dev,
  *
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_read_regs
- * @return      See @ref i2c_write_regs
+ * @return      @see i2c_read_regs
+ * @return      @see i2c_write_regs
  */
 int ina3221_set_conv_time_bus_adc(ina3221_t *dev,
                                   ina3221_conv_time_bus_adc_t ctb);
@@ -771,8 +772,8 @@ static inline void ina3221_get_conv_time_bus_adc(const ina3221_t *dev,
  *
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_read_regs
- * @return      See @ref i2c_write_regs
+ * @return      @see i2c_read_regs
+ * @return      @see i2c_write_regs
  */
 int ina3221_set_conv_time_shunt_adc(ina3221_t *dev,
                                     ina3221_conv_time_shunt_adc_t cts);
@@ -797,8 +798,8 @@ static inline void ina3221_get_conv_time_shunt_adc(const ina3221_t *dev,
  *
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_read_regs
- * @return      See @ref i2c_write_regs
+ * @return      @see i2c_read_regs
+ * @return      @see i2c_write_regs
  */
 int ina3221_set_mode(ina3221_t *dev, ina3221_mode_t mode);
 
@@ -824,8 +825,8 @@ static inline void ina3221_get_mode(const ina3221_t *dev, ina3221_mode_t *mode)
  *
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_read_regs
- * @return      See @ref i2c_write_regs
+ * @return      @see i2c_read_regs
+ * @return      @see i2c_write_regs
  */
 int ina3221_set_enable_sum_channel(const ina3221_t *dev, ina3221_ch_t ch);
 
@@ -837,7 +838,7 @@ int ina3221_set_enable_sum_channel(const ina3221_t *dev, ina3221_ch_t ch);
  *
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_read_regs
+ * @return      @see i2c_read_regs
  */
 int ina3221_get_enable_sum_channel(const ina3221_t *dev, ina3221_ch_t *ch);
 
@@ -850,8 +851,8 @@ int ina3221_get_enable_sum_channel(const ina3221_t *dev, ina3221_ch_t *ch);
  *
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_read_regs
- * @return      See @ref i2c_write_regs
+ * @return      @see i2c_read_regs
+ * @return      @see i2c_write_regs
  */
 int ina3221_set_latch(const ina3221_t *dev, bool warn, bool crit);
 
@@ -864,7 +865,7 @@ int ina3221_set_latch(const ina3221_t *dev, bool warn, bool crit);
  *
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_read_regs
+ * @return      @see i2c_read_regs
  */
 int ina3221_get_latch(const ina3221_t *dev, bool *warn, bool *crit);
 
@@ -925,7 +926,7 @@ ina3221_ch_t ina3221_get_warn_alert_limit(const ina3221_t *dev, ina3221_ch_t ch,
  * @return      0, on success
  * @return      -ERANGE, if @p in_uv was not in [INA3221_MIN_SHUNT_SUM_UV; INA3221_MAX_SHUNT_SUM_UV]
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_write_regs
+ * @return      @see i2c_write_regs
  */
 int ina3221_set_shunt_voltage_sum_alert_limit(const ina3221_t *dev,
                                               int32_t in_uv);
@@ -938,7 +939,7 @@ int ina3221_set_shunt_voltage_sum_alert_limit(const ina3221_t *dev,
  *
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_read_regs
+ * @return      @see i2c_read_regs
  */
 int ina3221_get_shunt_voltage_sum_alert_limit(const ina3221_t *dev,
                                               int32_t *out_uv);
@@ -952,7 +953,7 @@ int ina3221_get_shunt_voltage_sum_alert_limit(const ina3221_t *dev,
  * @return      0, on success
  * @return      -ERANGE, if @p in_mv was not in [INA3221_MIN_BUS_MV; INA3221_MAX_BUS_MV]
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_write_regs
+ * @return      @see i2c_write_regs
  */
 int ina3221_set_power_valid_upper_limit(const ina3221_t *dev, int32_t in_mv);
 
@@ -964,7 +965,7 @@ int ina3221_set_power_valid_upper_limit(const ina3221_t *dev, int32_t in_mv);
  *
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_read_regs
+ * @return      @see i2c_read_regs
  */
 int ina3221_get_power_valid_upper_limit(const ina3221_t *dev, int32_t *out_mv);
 
@@ -977,7 +978,7 @@ int ina3221_get_power_valid_upper_limit(const ina3221_t *dev, int32_t *out_mv);
  * @return      0, on success
  * @return      -ERANGE, if @p in_mv was not in [INA3221_MIN_BUS_MV; INA3221_MAX_BUS_MV]
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_write_regs
+ * @return      @see i2c_write_regs
  */
 int ina3221_set_power_valid_lower_limit(const ina3221_t *dev, int32_t in_mv);
 
@@ -989,7 +990,7 @@ int ina3221_set_power_valid_lower_limit(const ina3221_t *dev, int32_t in_mv);
  *
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_read_regs
+ * @return      @see i2c_read_regs
  */
 int ina3221_get_power_valid_lower_limit(const ina3221_t *dev, int32_t *out_mv);
 
@@ -1001,7 +1002,7 @@ int ina3221_get_power_valid_lower_limit(const ina3221_t *dev, int32_t *out_mv);
  *
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_read_regs
+ * @return      @see i2c_read_regs
  */
 int ina3221_read_flags(const ina3221_t *dev, uint16_t *flags);
 
@@ -1014,7 +1015,7 @@ int ina3221_read_flags(const ina3221_t *dev, uint16_t *flags);
  *
  * @return      0, on success
  * @return      -EIO, if I2C bus acquirement failed
- * @return      See @ref i2c_read_regs
+ * @return      @see i2c_read_regs
  */
 int ina3221_read_shunt_sum_uv(const ina3221_t *dev, int32_t *out_uv,
                               uint16_t *flags);
@@ -1102,4 +1103,5 @@ void ina3221_calculate_power_uw(ina3221_ch_t ch,
 }
 #endif
 
+#endif /* INA3221_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup net_gnrc_rpl
  * @{
@@ -17,6 +15,9 @@
  *
  * @author  Fabian Brandt <fabianbr@zedat.fu-berlin.de>
  */
+
+#ifndef NET_GNRC_RPL_OF_MANAGER_H
+#define NET_GNRC_RPL_OF_MANAGER_H
 
 #include "structs.h"
 
@@ -40,4 +41,5 @@ gnrc_rpl_of_t *gnrc_rpl_get_of_for_ocp(uint16_t ocp);
 }
 #endif
 
+#endif /* NET_GNRC_RPL_OF_MANAGER_H */
 /** @} */

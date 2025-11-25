@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     sys_crypto
  * @{
@@ -18,6 +16,9 @@
  * @author      Freie Universitaet Berlin, Computer Systems & Telematics
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  */
+
+#ifndef CRYPTO_MODES_CBC_H
+#define CRYPTO_MODES_CBC_H
 
 #include <stddef.h>
 #include "crypto/ciphers.h"
@@ -67,4 +68,5 @@ int cipher_decrypt_cbc(const cipher_t *cipher, uint8_t iv[16], const uint8_t *in
 }
 #endif
 
+#endif /* CRYPTO_MODES_CBC_H */
 /** @} */

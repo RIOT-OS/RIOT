@@ -17,7 +17,7 @@ CUSTOM_GNRC_TCP_NO_TIMEOUT ?= 1
 # Suppress test execution to avoid CI errors
 TEST_ON_CI_BLACKLIST += all
 
-ifneq (,$(filter native native32 native64,$(BOARD)))
+ifneq (,$(filter native native64,$(BOARD)))
   PORT ?= $(TAP)
 else
   ETHOS_BAUDRATE ?= 115200

@@ -1,0 +1,90 @@
+/**
+@defgroup    boards_nucleo-f030r8 STM32 Nucleo-F030R8
+@ingroup     boards_common_nucleo64
+@brief       Support for the STM32 Nucleo-F030R8
+
+## Overview
+
+The Nucleo-F030R8 is a board from ST's Nucleo family supporting a ARM Cortex-M0
+STM32F030R8 microcontroller with 8KiB of RAM and 64KiB of Flash.
+
+## Hardware
+
+![Nucleo64 F030R8](http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
+
+## Pinout
+
+@image html pinouts/nucleo-f030r8.svg "Pinout for the nucleo-f030r8" width=50%
+
+### MCU
+| MCU        | STM32F030R8                                                          |
+|:---------- |:-------------------------------------------------------------------- |
+| Family     | ARM Cortex-M0                                                        |
+| Vendor     | ST Microelectronics                                                  |
+| RAM        | 8KiB                                                                 |
+| Flash      | 64KiB                                                                |
+| Frequency  | up to 48MHz                                                          |
+| FPU        | no                                                                   |
+| Timers     | 10 (2x watchdog, 1 SysTick, 7x 16-bit)                               |
+| ADCs       | 1x 12-bit                                                            |
+| UARTs      | 2                                                                    |
+| SPIs       | 2                                                                    |
+| I2Cs       | 2                                                                    |
+| RTC        | 1                                                                    |
+| Vcc        | 2.4V - 3.6V                                                          |
+| Datasheet  | [Datasheet](http://www.st.com/resource/en/datasheet/stm32f030r8.pdf) |
+| Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/dm00091010.pdf) |
+| Programming Manual | [Programming Manual](http://www.st.com/resource/en/programming_manual/dm00051352.pdf) |
+| Board Manual   | [Board Manual](http://www.st.com/resource/en/user_manual/dm00105823.pdf)|
+
+
+
+## Implementation Status
+| Device | ID        | Supported | Comments  |
+|:------------- |:------------- |:------------- |:------------- |
+| MCU        | STM32F030R8   | partly    | Energy saving modes not fully utilized |
+| Low-level driver | GPIO    | yes       | |
+|        | PWM       | yes (4 pins available)  |  |
+|        | UART      | 2 UARTs       | USART2 via STLink/USB or D0(RX)/D1(TX) and USART1 on PA10(RX)/PA09(TX) |
+|        | ADC       | 6 pins        | |
+|        | I2C       | no        | |
+|        | SPI       | no        | |
+|        | USB       | no        | |
+|        | Timer     | 3 16 bit timers       | |
+
+
+## Flashing the device
+
+### Flashing the Board Using OpenOCD
+
+The ST Nucleo-F030R8 board includes an on-board ST-LINK V2 programmer. The
+easiest way to program the board is to use OpenOCD. Once you have installed
+OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
+installation instructions), you can flash the board simply by typing
+
+```
+make BOARD=nucleo-f030r8 flash
+```
+and debug via GDB by simply typing
+```
+make BOARD=nucleo-f030r8 debug
+```
+
+### Flashing the Board Using ST-LINK Removable Media
+
+On-board ST-LINK programmer provides via composite USB device removable media.
+Copying the HEX file causes reprogramming of the board. This task
+could be performed manually; however, the cpy2remed (copy to removable
+media) PROGRAMMER script does this automatically. To program board in
+this manner, use the command:
+```
+make BOARD=nucleo-f030r8 PROGRAMMER=cpy2remed flash
+```
+@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
+could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
+
+## Supported Toolchains
+For using the ST Nucleo-F030R8 board we strongly recommend the usage of the
+[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
+toolchain.
+ */

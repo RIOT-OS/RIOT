@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2018 Alkgrove
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 Alkgrove
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @defgroup    cpu_sam0_common_sdhc sam0 SD Host Controller
@@ -21,6 +22,9 @@
  * @author      alkgrove <bob@alkgrove.com>
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+
+#ifndef SDHC_H
+#define SDHC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -163,4 +167,5 @@ int sdhc_erase_blocks(sdhc_state_t *state, uint32_t block, uint16_t num);
 }
 #endif
 
+#endif /* SDHC_H */
 /** @} */

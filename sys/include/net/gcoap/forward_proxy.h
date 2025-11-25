@@ -6,8 +6,6 @@
  * more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gcoap_forward_proxy    GCoAP Forward Proxy
  * @ingroup     net_gcoap
@@ -24,6 +22,9 @@
  *
  * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
+
+#ifndef NET_GCOAP_FORWARD_PROXY_H
+#define NET_GCOAP_FORWARD_PROXY_H
 
 #include <stdbool.h>
 #include <errno.h>
@@ -85,6 +86,7 @@ void gcoap_forward_proxy_find_req_memo(gcoap_request_memo_t **memo_ptr,
 }
 #endif
 
+#endif /* NET_GCOAP_FORWARD_PROXY_H */
 /**
  * @}
  */

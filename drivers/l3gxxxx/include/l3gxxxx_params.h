@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_l3gxxxx
  * @brief       Default configuration for ST L3Gxxxx 3-axis gyroscope sensor family
@@ -15,6 +13,9 @@
  * @file
  * @{
  */
+
+#ifndef L3GXXXX_PARAMS_H
+#define L3GXXXX_PARAMS_H
 
 #include "board.h"
 #include "l3gxxxx.h"
@@ -380,4 +381,5 @@ static const saul_reg_info_t l3gxxxx_saul_info[] =
 }
 #endif
 
+#endif /* L3GXXXX_PARAMS_H */
 /** @} */

@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2019 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -57,13 +60,13 @@
 
 /* gpio access macros */
 #if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
-#  define GPIO_SET(lo, hi, b) if (b < 32) { GPIO.lo =  BIT(b); } else { GPIO.hi.val =  BIT(b-32); }
-#  define GPIO_GET(lo, hi, b) ((b < 32) ? GPIO.lo & BIT(b) : GPIO.hi.val & BIT(b-32))
-#elif defined(CPU_FAM_ESP32C3) || defined(CPU_FAM_ESP32C6) || defined(CPU_FAM_ESP32H2)
-#  define GPIO_SET(lo, hi, b) GPIO.lo.val = BIT(b)
-#  define GPIO_GET(lo, hi, b) GPIO.lo.val & BIT(b)
+#define GPIO_SET(lo, hi, b) if (b < 32) { GPIO.lo =  BIT(b); } else { GPIO.hi.val =  BIT(b-32); }
+#define GPIO_GET(lo, hi, b) ((b < 32) ? GPIO.lo & BIT(b) : GPIO.hi.val & BIT(b-32))
+#elif defined(CPU_FAM_ESP32C3)
+#define GPIO_SET(lo, hi, b) GPIO.lo.val = BIT(b)
+#define GPIO_GET(lo, hi, b) GPIO.lo.val & BIT(b)
 #else
-#  error "Platform implementation is missing"
+#error "Platform implementation is missing"
 #endif
 
 #else /* CPU_ESP8266 */
@@ -80,7 +83,7 @@
  */
 #ifndef I2C_CLOCK_STRETCH
 /* max clock stretching counter (ca. 10 ms) */
-#  define I2C_CLOCK_STRETCH 40000
+#define I2C_CLOCK_STRETCH 40000
 #endif /* I2C_CLOCK_STRETCH */
 
 /* following functions have to be declared as extern since it is not possible */
@@ -113,21 +116,17 @@ static _i2c_bus_t _i2c_bus[I2C_NUMOF] = {};
 #pragma GCC optimize ("O2")
 
 #if defined(CPU_FAM_ESP32)
-#  define I2C_CLK_CAL   62      /* clock calibration offset */
+#define I2C_CLK_CAL     62      /* clock calibration offset */
 #elif defined(CPU_FAM_ESP32C3)
-#  define I2C_CLK_CAL   32      /* clock calibration offset */
-#elif defined(CPU_FAM_ESP32C6)
-#  define I2C_CLK_CAL   32      /* clock calibration offset */
-#elif defined(CPU_FAM_ESP32H2)
-#  define I2C_CLK_CAL   24      /* clock calibration offset */
+#define I2C_CLK_CAL     32      /* clock calibration offset */
 #elif defined(CPU_FAM_ESP32S2)
-#  define I2C_CLK_CAL   82      /* clock calibration offset */
+#define I2C_CLK_CAL     82      /* clock calibration offset */
 #elif defined(CPU_FAM_ESP32S3)
-#  define I2C_CLK_CAL   82      /* clock calibration offset */
+#define I2C_CLK_CAL     82      /* clock calibration offset */
 #elif defined(CPU_ESP8266)
-#  define I2C_CLK_CAL   47      /* clock calibration offset */
+#define I2C_CLK_CAL     47      /* clock calibration offset */
 #else
-#  error "Platform implementation is missing"
+#error "Platform implementation is missing"
 #endif
 
 static const uint32_t _i2c_clocks[] = {
@@ -425,9 +424,9 @@ static inline void _i2c_delay(_i2c_bus_t* bus)
             __asm__ __volatile__("rsr %0,ccount":"=a" (ccount));
         }
 #else
-        uint32_t start = esp_cpu_get_cycle_count();
+        uint32_t start = cpu_hal_get_cycle_count();
         uint32_t wait_until = start + cycles;
-        while (esp_cpu_get_cycle_count() < wait_until) { }
+        while (cpu_hal_get_cycle_count() < wait_until) { }
 #endif
     }
 }

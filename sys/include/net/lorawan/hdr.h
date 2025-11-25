@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_lorawan_hdr    LoRaWAN header
  * @ingroup     net_lorawan
@@ -20,6 +18,9 @@
  *
  * @author  Jose Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
+
+#ifndef NET_LORAWAN_HDR_H
+#define NET_LORAWAN_HDR_H
 
 #include <stdio.h>
 #include <stdint.h>
@@ -296,4 +297,5 @@ static inline bool lorawan_ja_hdr_get_optneg(lorawan_join_accept_t *ja_hdr)
 }
 #endif
 
+#endif /* NET_LORAWAN_HDR_H */
 /** @} */

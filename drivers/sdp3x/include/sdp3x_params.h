@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_sensors
  * @{
@@ -19,6 +17,9 @@
  * @author      Nishchay Agrawal <f2016088@pilani.bits-pilani.ac.in>
  * @}
  */
+
+#ifndef SDP3X_PARAMS_H
+#define SDP3X_PARAMS_H
 
 #include "board.h"
 #include "sdp3x.h"
@@ -100,3 +101,5 @@ static const saul_reg_info_t sdp3x_saul_info[SDP3X_NUMOF] =
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* SDP3X_PARAMS_H */

@@ -654,27 +654,15 @@ static int _preparse_advertise(uint8_t *adv, size_t len, uint8_t **buf)
         }
         switch (byteorder_ntohs(opt->type)) {
             case DHCPV6_OPT_CID:
-                if (_opt_len(opt) < sizeof(dhcpv6_opt_duid_t)) {
-                    return -1;
-                }
                 cid = (dhcpv6_opt_duid_t *)opt;
                 break;
             case DHCPV6_OPT_SID:
-                if (_opt_len(opt) < sizeof(dhcpv6_opt_duid_t)) {
-                    return -1;
-                }
                 sid = (dhcpv6_opt_duid_t *)opt;
                 break;
             case DHCPV6_OPT_STATUS:
-                if (_opt_len(opt) < sizeof(dhcpv6_opt_status_t)) {
-                    return -1;
-                }
                 status = (dhcpv6_opt_status_t *)opt;
                 break;
             case DHCPV6_OPT_PREF:
-                if (_opt_len(opt) < sizeof(dhcpv6_opt_pref_t)) {
-                    return -1;
-                }
                 pref = (dhcpv6_opt_pref_t *)opt;
                 break;
             default:
@@ -698,10 +686,6 @@ static int _preparse_advertise(uint8_t *adv, size_t len, uint8_t **buf)
             *buf = best_adv;
         }
         server.duid_len = byteorder_ntohs(sid->len);
-        if (server.duid_len > DHCPV6_DUID_MAX_LEN) {
-            DEBUG("DHCPv6 client: DUID length is too long.\n");
-            return -1;
-        }
         memcpy(server.duid.u8, sid->duid, server.duid_len);
         server.pref = pref_val;
     }
@@ -802,10 +786,6 @@ static void _parse_advertise(uint8_t *adv, size_t len)
          len > 0; len -= _opt_len(opt), opt = _opt_next(opt)) {
         switch (byteorder_ntohs(opt->type)) {
             case DHCPV6_OPT_IA_PD:
-                if (_opt_len(opt) < sizeof(dhcpv6_opt_ia_pd_t)) {
-                    DEBUG("DHCPv6 client: IA_PD option underflow minimum size\n");
-                    return;
-                }
                 for (unsigned i = 0;
                      IS_USED(MODULE_DHCPV6_CLIENT_IA_PD) &&
                      (i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX);
@@ -847,10 +827,6 @@ static void _parse_advertise(uint8_t *adv, size_t len)
                 }
                 break;
             case DHCPV6_OPT_IA_NA:
-                if (_opt_len(opt) < sizeof(dhcpv6_opt_ia_na_t)) {
-                    DEBUG("DHCPv6 client: IA_NA option underflows minimum size\n");
-                    return;
-                }
                 for (unsigned i = 0;
                     IS_USED(MODULE_DHCPV6_CLIENT_IA_NA) &&
                     i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX;
@@ -893,10 +869,6 @@ static void _parse_advertise(uint8_t *adv, size_t len)
                 }
                 break;
             case DHCPV6_OPT_SMR:
-                if (_opt_len(opt) < sizeof(dhcpv6_opt_smr_t)) {
-                    DEBUG("DHCPv6 client: SMR option underflows minimum size\n");
-                    return;
-                }
                 smr = (dhcpv6_opt_smr_t *)opt;
                 break;
             default:

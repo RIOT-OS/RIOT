@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_ltc4150 LTC4150 coulomb counter
  * @ingroup     drivers_sensors
@@ -60,6 +58,9 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
+
+#ifndef LTC4150_H
+#define LTC4150_H
 
 #include <stdint.h>
 
@@ -238,7 +239,7 @@ extern const ltc4150_recorder_t ltc4150_last_minute;
  * @brief             Initialize the LTC4150 driver
  *
  * @param  dev        Device to initialize
- * @param  params     Information on how the LTC4150 is connected
+ * @param  params     Information on how the LTC4150 is conntected
  *
  * @retval  0         Success
  * @retval -EINVAL    Called with invalid argument(s)
@@ -342,4 +343,5 @@ void ltc4150_pulses2c(const ltc4150_dev_t *dev,
 }
 #endif
 
+#endif /* LTC4150_H */
 /** @} */

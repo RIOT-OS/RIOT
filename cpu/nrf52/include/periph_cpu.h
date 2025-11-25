@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2015-2018 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2020 Philipp-Alexander Blum <philipp-blum@jakiku.de>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015-2018 Freie Universität Berlin
+ *               2020 Philipp-Alexander Blum <philipp-blum@jakiku.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_nrf52
@@ -16,6 +17,9 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Philipp-Alexander Blum <philipp-blum@jakiku.de>
  */
+
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include "periph_cpu_common.h"
 
@@ -147,4 +151,5 @@ void nrf5x_spi_release(NRF_SPIM_Type *bus);
 }
 #endif
 
+#endif /* PERIPH_CPU_H */
 /** @} */

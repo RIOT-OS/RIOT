@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    ble_defs Generic BLE defines
  * @ingroup     ble
@@ -19,6 +17,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef NET_BLE_H
+#define NET_BLE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -495,4 +496,5 @@ extern "C" {
 }
 #endif
 
+#endif /* NET_BLE_H */
 /** @} */

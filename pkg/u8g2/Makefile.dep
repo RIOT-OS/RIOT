@@ -5,7 +5,3 @@ FEATURES_REQUIRED += periph_gpio
 
 USEMODULE += u8g2_csrc_riot
 USEMODULE += u8g2_csrc
-
-ifneq (,$(filter disp_dev,$(USEMODULE)))
-  USEMODULE += u8g2_disp_dev
-endif

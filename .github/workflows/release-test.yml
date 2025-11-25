@@ -68,19 +68,29 @@ jobs:
         echo '${{ secrets.IOTLABRC }}' > ~/.iotlabrc
     - name: Setup SSH agent
       if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
-      uses: webfactory/ssh-agent@v0.9.0
+      uses: webfactory/ssh-agent@v0.4.1
       with:
         ssh-private-key: ${{ secrets.IOTLAB_PRIVATE_KEY }}
-    - name: Fetch host keys from IoT-LAB sites
+    - name: Fetch host key from IoT-LAB saclay site
       if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
-      # lille and saclay are not being used in the most recent release specs but kept in for
-      # backwords compatibility
       run: |
         IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
-        for site in grenoble saclay lille strasbourg; do
-          ssh -oStrictHostKeyChecking=accept-new \
-            "${IOTLAB_USER}@${site}.iot-lab.info" exit
-        done
+        ssh -oStrictHostKeyChecking=accept-new \
+          ${IOTLAB_USER}@saclay.iot-lab.info exit
+    - name: Fetch host key from IoT-LAB lille site
+      # Not being used in the most recent release specs but kept in for
+      # backwords compatibility
+      if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
+      run: |
+        IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
+        ssh -oStrictHostKeyChecking=accept-new \
+          ${IOTLAB_USER}@lille.iot-lab.info exit
+    - name: Fetch host key from IoT-LAB strasbourg site
+      if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
+      run: |
+        IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
+        ssh -oStrictHostKeyChecking=accept-new \
+          ${IOTLAB_USER}@strasbourg.iot-lab.info exit
     - name: Checkout Release-Specs
       uses: actions/checkout@main
       with:
@@ -96,7 +106,7 @@ jobs:
         fetch-depth: 1
         ref: ${{ github.event.inputs.riot_version }}
     - name: Set up Python 3.8
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v2
       with:
         python-version: 3.8
     - name: Install Python dependencies
@@ -171,8 +181,8 @@ jobs:
         mkdir test-reports/
         junit2html ${REPORT_XML} ${REPORT_NAME}.html
         cp ${REPORT_XML} ${REPORT_NAME}.xml
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v2
       if: always()
       with:
-        name: Test-Reports-${{ matrix.pytest_mark }}
+        name: Test Reports
         path: test-reports/*

@@ -134,8 +134,11 @@ endif
 
 ifneq (,$(filter sntp,$(USEMODULE)))
   USEMODULE += sock_udp
-  USEMODULE += ztimer64
-  USEMODULE += ztimer64_usec
+  USEMODULE += xtimer
+  ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+    # requires 64bit ftimestamps
+    USEMODULE += ztimer64_xtimer_compat
+  endif
 endif
 
 ifneq (,$(filter sock_%,$(USEMODULE)))
@@ -145,6 +148,14 @@ endif
 ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += random
+endif
+
+ifneq (,$(filter netdev_ieee802154_submac,$(USEMODULE)))
+  USEMODULE += netdev_ieee802154
+  USEMODULE += netdev_legacy_api
+  USEMODULE += ieee802154
+  USEMODULE += ieee802154_submac
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter uhcpc,$(USEMODULE)))
@@ -224,13 +235,6 @@ ifneq (,$(filter newlib,$(USEMODULE)))
         # requires 64bit timestamps
         USEMODULE += ztimer64_xtimer_compat
       endif
-    endif
-  endif
-  ifneq (,$(filter bug_newlib_broken_stdio,$(FEATURES_USED)))
-    # work around broken newlib stdio by using alternative stdio implementation,
-    # unless stdio_null is used, which is inherently thread-safe :)
-    ifeq (,$(filter stdio_null,$(USEMODULE)))
-      USEPKG += mpaland-printf
     endif
   endif
 endif
@@ -351,6 +355,9 @@ ifneq (,$(filter evtimer_mbox,$(USEMODULE)))
   USEMODULE += core_mbox
 endif
 
+ifneq (,$(filter can_%,$(USEMODULE)))
+endif
+
 ifneq (,$(filter conn_can,$(USEMODULE)))
   USEMODULE += can
 endif
@@ -375,10 +382,6 @@ endif
 ifneq (,$(filter event_periodic_callback,$(USEMODULE)))
   USEMODULE += event_callback
   USEMODULE += event_periodic
-endif
-
-ifneq (,$(filter event_loop_debug,$(USEMODULE)))
-  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter emcute,$(USEMODULE)))
@@ -526,10 +529,6 @@ ifneq (,$(filter nanocoap_server_auto_init,$(USEMODULE)))
   USEMODULE += nanocoap_server
 endif
 
-ifneq (,$(filter nanocoap_server_observe,$(USEMODULE)))
-  USEMODULE += nanocoap_server_separate
-endif
-
 ifneq (,$(filter nanocoap_server_separate,$(USEMODULE)))
   USEMODULE += nanocoap_server
   USEMODULE += sock_aux_local
@@ -561,12 +560,6 @@ ifneq (,$(filter nanocoap_link_format,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
-ifneq (,$(filter nanocoap_sock_observe,$(USEMODULE)))
-  USEMODULE += event_thread
-  USEMODULE += sock_async_event
-  USEMODULE += nanocoap_sock
-endif
-
 ifneq (,$(filter nanocoap_vfs,$(USEMODULE)))
   USEMODULE += nanocoap_sock
   USEMODULE += vfs
@@ -574,11 +567,6 @@ endif
 
 ifneq (,$(filter nanocoap_%,$(USEMODULE)))
   USEMODULE += nanocoap
-endif
-
-# include unicoap dependencies
-ifneq (,$(filter unicoap%,$(USEMODULE)))
-  include $(RIOTBASE)/sys/net/application_layer/unicoap/Makefile.dep
 endif
 
 ifneq (,$(filter skald_%,$(USEMODULE)))

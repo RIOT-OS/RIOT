@@ -26,7 +26,7 @@ $(PKG_SOURCE_DIR)/: $(PKG_ZIPFILE)
 
 $(PKG_ZIPFILE):
 	$(QQ)mkdir -p $(PKGDIRBASE)
-	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_ZIP_URL) $(PKG_SHA512)
+	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_ZIP_URL)
 
 clean::
 	# Reset package to checkout state.

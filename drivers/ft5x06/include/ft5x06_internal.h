@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @{
  * @file
@@ -15,6 +13,9 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
+
+#ifndef FT5X06_INTERNAL_H
+#define FT5X06_INTERNAL_H
 
 #include <inttypes.h>
 #include "ft5x06.h"
@@ -36,4 +37,5 @@ uint8_t ft5x06_get_touches_count_max(const ft5x06_t *dev);
 }
 #endif
 
+#endif /* FT5X06_INTERNAL_H */
 /** @} */

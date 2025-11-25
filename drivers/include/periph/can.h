@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_periph_can CAN
  * @ingroup     drivers_periph
@@ -27,6 +25,9 @@
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
+
+#ifndef PERIPH_CAN_H
+#define PERIPH_CAN_H
 
 #include "periph_cpu.h"
 #include "can/candev.h"
@@ -61,4 +62,5 @@ void can_init(can_t *dev, const can_conf_t *conf);
 }
 #endif
 
+#endif /* PERIPH_CAN_H */
 /** @} */

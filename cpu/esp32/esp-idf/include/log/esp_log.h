@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2022 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2022 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_esp32
@@ -16,13 +17,15 @@
  * @}
  */
 
+#ifndef LOG_ESP_LOG_H
+#define LOG_ESP_LOG_H
+
 #ifndef DOXYGEN     /* Hide implementation details from doxygen */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "log.h"
 #include_next "esp_log.h"
 
 #if defined(RIOT_VERSION)
@@ -53,7 +56,7 @@ extern "C" {
             } while (0)
 
 #define ESP_LOG_LEVEL_LOCAL(level, tag, format, ...) \
-            do { \
+            do {               \
                 if ( LOG_LOCAL_LEVEL >= level ) { \
                     ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
                 } \
@@ -67,31 +70,26 @@ extern "C" {
 
 #if MODULE_ESP_LOG_TAGGED
 
-#define ESP_DRAM_LOG_LEVEL(level, letter, tag, format, ...) \
+#define ESP_DRAM_LOGE(tag, format, ...) \
             do { \
-                if ((esp_log_level_t)LOG_LOCAL_LEVEL >= level ) { \
-                    esp_rom_printf(DRAM_STR(LOG_FORMAT(letter, format)), \
+                if ((esp_log_level_t)LOG_LOCAL_LEVEL >= ESP_LOG_ERROR ) { \
+                    esp_rom_printf(DRAM_STR(LOG_FORMAT(E, format)), \
                                    system_get_time_ms(), ##__VA_ARGS__); \
                 }\
             } while (0U)
 
 #else
 
-#define ESP_DRAM_LOG_LEVEL(level, letter, tag, format, ...) \
+#define ESP_DRAM_LOGE(tag, format, ...) \
             do { \
-                if ((esp_log_level_t)LOG_LOCAL_LEVEL >= level ) { \
-                    esp_rom_printf(DRAM_STR(LOG_FORMAT(letter, format)), \
+                if ((esp_log_level_t)LOG_LOCAL_LEVEL >= ESP_LOG_ERROR ) { \
+                    esp_rom_printf(DRAM_STR(LOG_FORMAT(E, format)), \
                                    ##__VA_ARGS__); \
                 }\
             } while (0U)
 
 #endif
 
-#define ESP_DRAM_LOGE(tag, format, ...) ESP_DRAM_LOG_LEVEL(LOG_ERROR  , E, tag, format "\n", ##__VA_ARGS__)
-#define ESP_DRAM_LOGW(tag, format, ...) ESP_DRAM_LOG_LEVEL(LOG_WARNING, W, tag, format "\n", ##__VA_ARGS__)
-#define ESP_DRAM_LOGI(tag, format, ...) ESP_DRAM_LOG_LEVEL(LOG_INFO   , I, tag, format "\n", ##__VA_ARGS__)
-#define ESP_DRAM_LOGD(tag, format, ...) ESP_DRAM_LOG_LEVEL(LOG_DEBUG  , D, tag, format "\n", ##__VA_ARGS__)
-#define ESP_DRAM_LOGV(tag, format, ...) ESP_DRAM_LOG_LEVEL(LOG_ALL    , V, tag, format "\n", ##__VA_ARGS__)
 
 #endif /* defined(RIOT_VERSION) */
 
@@ -100,3 +98,4 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
+#endif /* LOG_ESP_LOG_H */

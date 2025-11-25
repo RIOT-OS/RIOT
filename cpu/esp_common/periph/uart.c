@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2022 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2022 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -44,7 +47,7 @@
 #if defined(CPU_ESP8266)
 
 #include "esp/iomux_regs.h"
-#include "uart_ll.h"
+#include "esp8266/uart_struct.h"
 
 #ifdef MODULE_ESP_QEMU
 #include "esp/uart_regs.h"
@@ -56,13 +59,11 @@
 
 #else /* defined(CPU_ESP8266) */
 
-#include "esp_cpu.h"
-#include "esp_private/periph_ctrl.h"
+#include "driver/periph_ctrl.h"
 #include "esp_rom_gpio.h"
 #include "esp_rom_uart.h"
-#include "hal/clk_tree_ll.h"
-#include "hal/uart_ll.h"
-#include "soc/clk_tree_defs.h"
+#include "hal/interrupt_controller_types.h"
+#include "hal/interrupt_controller_ll.h"
 #include "soc/gpio_reg.h"
 #include "soc/gpio_sig_map.h"
 #include "soc/gpio_struct.h"
@@ -70,24 +71,11 @@
 #include "soc/rtc.h"
 #include "soc/soc_caps.h"
 #include "soc/uart_pins.h"
+#include "soc/uart_reg.h"
+#include "soc/uart_struct.h"
 
 #undef  UART_CLK_FREQ
-
-#if CPU_FAM_ESP32 || CPU_FAM_ESP32S2 || CPU_FAM_ESP32S3 || CPU_FAM_ESP32C3
-/* UART_CLK_FREQ corresponds to APB_CLK_FREQ for ESP32, ESP32-S2, ESP32-S3,
- * ESP32-C2 and ESP32-C3, which is a fixed frequency of 80 MHz. However,
- * this only applies to CPU clock frequencies of 80 MHz and above.
- * For lower CPU clock frequencies, the APB clock corresponds to the CPU clock
- * frequency. Therefore, we need to determine the actual UART clock frequency
- * from the actual APB clock frequency. */
-#  define UART_CLK_FREQ rtc_clk_apb_freq_get() /* APB_CLK is used */
-#elif CPU_FAM_ESP32C6
-#  define UART_CLK_FREQ (CLK_LL_PLL_80M_FREQ_MHZ * MHZ)  /* PLL_F80M_CLK is used */
-#elif CPU_FAM_ESP32H2
-#  define UART_CLK_FREQ (CLK_LL_PLL_48M_FREQ_MHZ * MHZ)  /* PLL_F48M_CLK is used */
-#else
-#  error "Platform implementation is missing"
-#endif
+#define UART_CLK_FREQ   rtc_clk_apb_freq_get() /* APB_CLK is used */
 
 #endif /* defined(CPU_ESP8266) */
 
@@ -201,7 +189,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         gpio_set_pin_usage(uart_config[uart].txd, _UART);
         gpio_set_pin_usage(uart_config[uart].rxd, _UART);
 
-        esp_rom_output_tx_wait_idle(uart);
+        esp_rom_uart_tx_wait_idle(uart);
         esp_rom_gpio_connect_out_signal(uart_config[uart].txd,
                                         _uarts[uart].signal_txd, false, false);
         esp_rom_gpio_connect_in_signal(uart_config[uart].rxd,
@@ -262,7 +250,7 @@ void uart_system_init(void)
 {
     for (unsigned uart = 0; uart < UART_NUMOF; uart++) {
         /* reset all UART interrupt status registers */
-        uart_ll_clr_intsts_mask(_uarts[uart].regs, UART_LL_INTR_MASK);
+        _uarts[uart].regs->int_clr.val = ~0;
     }
 #ifndef CPU_ESP8266
     /* reset the pin usage of the default UART0 pins to GPIO to allow
@@ -288,7 +276,7 @@ void uart_print_config(void)
 
 static void IRAM _uart_intr_handler(void *arg)
 {
-   /* to satisfy the compiler */
+    /* to satisfy the compiler */
     (void)arg;
 
     irq_isr_enter();
@@ -297,10 +285,14 @@ static void IRAM _uart_intr_handler(void *arg)
        interrupt, so we have to use the status to distinguish interruptees */
     for (unsigned uart = 0; uart < UART_NUMOF; uart++) {
         if (_uarts[uart].used) {
-            uint32_t int_st = uart_ll_get_intsts_mask(_uarts[uart].regs);
-            DEBUG("%s uart=%d int_st=%08"PRIx32"\n", __func__, uart, int_st);
+            DEBUG("%s uart=%d int_st=%08x\n", __func__,
+                  uart, (unsigned)_uarts[uart].regs->int_st.val);
 
-            if (_uarts[uart].used && (int_st & UART_RXFIFO_FULL_INT_ST)) {
+#ifdef CPU_FAM_ESP32S3
+            if (_uarts[uart].used && _uarts[uart].regs->int_st.rxfifo_full_int_st) {
+#else
+            if (_uarts[uart].used && _uarts[uart].regs->int_st.rxfifo_full) {
+#endif
                 /* read one byte of data */
                 uint8_t data = _uart_rx_one_char(uart);
                 /* if registered, call the RX callback function */
@@ -308,21 +300,28 @@ static void IRAM _uart_intr_handler(void *arg)
                     _uarts[uart].isr_ctx.rx_cb(_uarts[uart].isr_ctx.arg, data);
                 }
                 /* clear interrupt flag */
-                uart_ll_clr_intsts_mask(_uarts[uart].regs, UART_RXFIFO_FULL_INT_ST);
+#ifdef CPU_FAM_ESP32S3
+                _uarts[uart].regs->int_clr.rxfifo_full_int_clr = 1;
+#else
+                _uarts[uart].regs->int_clr.rxfifo_full = 1;
+#endif
             }
 
             /* TODO handle other types of interrupts, for the moment just clear them */
-            uart_ll_clr_intsts_mask(_uarts[uart].regs, UART_LL_INTR_MASK);
+            _uarts[uart].regs->int_clr.val = ~0x0;
         }
     }
 
     irq_isr_exit();
 }
 
+/* RX/TX FIFO capacity is 128 byte */
+#define UART_FIFO_MAX 128
+
 /* receive one data byte with wait */
 static uint8_t IRAM _uart_rx_one_char(uart_t uart)
 {
-#if defined(CPU_ESP8266) && defined(MODULE_ESP_QEMU)
+#if defined(MODULE_ESP_QEMU) && defined(CPU_ESP8266)
     /* wait until at least von byte is in RX FIFO */
     while (!FIELD2VAL(UART_STATUS_RXFIFO_COUNT, UART(uart).STATUS)) {}
 
@@ -330,37 +329,54 @@ static uint8_t IRAM _uart_rx_one_char(uart_t uart)
     return UART(uart).FIFO & 0xff; /* only bit 0 ... 7 */
 #else
     /* wait until at least von byte is in RX FIFO */
-    while (uart_ll_get_rxfifo_len(_uarts[uart].regs) == 0) {}
+    while (!_uarts[uart].regs->status.rxfifo_cnt) {}
 
-    uint8_t data;
-    uart_ll_read_rxfifo(_uarts[uart].regs, &data, 1);
-
-    return data;
+#if defined(CPU_FAM_ESP32) || defined(CPU_ESP8266)
+    /* read the lowest byte from RX FIFO register */
+    return _uarts[uart].regs->fifo.rw_byte;
+#elif defined(CPU_FAM_ESP32S3)
+    /* read the lowest byte from RX FIFO register */
+    return _uarts[uart].regs->fifo.rxfifo_rd_byte;
+#elif defined(CPU_FAM_ESP32S2)
+    return READ_PERI_REG(UART_FIFO_AHB_REG(uart));
+#else
+    /* read the lowest byte from RX FIFO register */
+    return _uarts[uart].regs->ahb_fifo.rw_byte;
 #endif
+#endif
+
 }
 
 /* send one data byte with wait */
 static void _uart_tx_one_char(uart_t uart, uint8_t data)
 {
     /* wait until at least one byte is available in the TX FIFO */
-    while (!uart_ll_get_txfifo_len(_uarts[uart].regs)) {}
+    while (_uarts[uart].regs->status.txfifo_cnt >= UART_FIFO_MAX) {}
 
     /* send the byte by placing it in the TX FIFO using MPU */
-#if defined(CPU_ESP8266) && defined(MODULE_ESP_QEMU)
+#ifdef CPU_ESP8266
+#ifdef MODULE_ESP_QEMU
     UART(uart).FIFO = data;
-#else
-    uart_ll_write_txfifo(_uarts[uart].regs, &data, 1);
-#endif
+#else /* MODULE_ESP_QEMU */
+    _uarts[uart].regs->fifo.rw_byte = data;
+#endif /* MODULE_ESP_QEMU */
+#else /* CPU_ESP8266 */
+    WRITE_PERI_REG(UART_FIFO_AHB_REG(uart), data);
+#endif /* CPU_ESP8266 */
 }
 
 static void _uart_intr_enable(uart_t uart)
 {
-    uart_ll_ena_intr_mask(_uarts[uart].regs, UART_RXFIFO_FULL_INT_RAW);
-    uart_ll_clr_intsts_mask(_uarts[uart].regs, UART_RXFIFO_FULL_INT_RAW);
-
+#ifdef CPU_FAM_ESP32S3
+    _uarts[uart].regs->int_ena.rxfifo_full_int_ena = 1;
+    _uarts[uart].regs->int_clr.rxfifo_full_int_clr = 1;
+#else
+    _uarts[uart].regs->int_ena.rxfifo_full = 1;
+    _uarts[uart].regs->int_clr.rxfifo_full = 1;
+#endif
     _uarts[uart].used = true;
 
-    DEBUG("%s %08"PRIx32"\n", __func__, uart_ll_get_intr_ena_status(_uarts[uart].regs));
+    DEBUG("%s %08x\n", __func__, (unsigned)_uarts[uart].regs->int_ena.val);
 }
 
 static void _uart_config(uart_t uart)
@@ -379,13 +395,15 @@ static void _uart_config(uart_t uart)
     }
 
     /* reset the FIFOs */
-    uart_ll_rxfifo_rst(_uarts[uart].regs);
-    uart_ll_txfifo_rst(_uarts[uart].regs);
+    _uarts[uart].regs->conf0.rxfifo_rst = 1;
+    _uarts[uart].regs->conf0.rxfifo_rst = 0;
+    _uarts[uart].regs->conf0.txfifo_rst = 1;
+    _uarts[uart].regs->conf0.txfifo_rst = 0;
 
     if (_uarts[uart].isr_ctx.rx_cb) {
         /* since reading can only be done byte by byte, we set
            UART_RXFIFO_FULL_THRHD interrupt level to 1 byte */
-        uart_ll_set_rxfifo_full_thr(_uarts[uart].regs, 1);
+        _uarts[uart].regs->conf1.rxfifo_full_thrhd = 1;
 
         /* enable the RX FIFO FULL interrupt */
         _uart_intr_enable(uart);
@@ -398,11 +416,11 @@ static void _uart_config(uart_t uart)
         /* route all UART interrupt sources to same the CPU interrupt */
         intr_matrix_set(PRO_CPU_NUM, _uarts[uart].int_src, CPU_INUM_UART);
         /* we have to enable therefore the CPU interrupt here */
-        esp_cpu_intr_set_handler(CPU_INUM_UART, _uart_intr_handler, NULL);
-        esp_cpu_intr_enable(BIT(CPU_INUM_UART));
+        intr_cntrl_ll_set_int_handler(CPU_INUM_UART, _uart_intr_handler, NULL);
+        intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_UART));
 #ifdef SOC_CPU_HAS_FLEXIBLE_INTC
         /* set interrupt level */
-        esp_cpu_intr_set_priority(CPU_INUM_UART, 1);
+        intr_cntrl_ll_set_int_level(CPU_INUM_UART, 1);
 #endif
 #endif /* CPU_ESP8266 */
     }
@@ -415,14 +433,39 @@ static int _uart_set_baudrate(uart_t uart, uint32_t baudrate)
     assert(uart < UART_NUMOF);
 
     /* wait until TX FIFO is empty */
-    while (uart_ll_get_txfifo_len(_uarts[uart].regs) < UART_LL_FIFO_DEF_LEN) { }
+    while (_uarts[uart].regs->status.txfifo_cnt != 0) { }
 
     critical_enter();
 
     _uarts[uart].baudrate = baudrate;
 
-    uart_ll_set_sclk(_uarts[uart].regs, (soc_module_clk_t)UART_SCLK_DEFAULT);
-    uart_ll_set_baudrate(_uarts[uart].regs, _uarts[uart].baudrate, UART_CLK_FREQ);
+#ifdef CPU_ESP8266
+
+    /* compute and set clock divider */
+    uint32_t clk_div = UART_CLK_FREQ / _uarts[uart].baudrate;
+    _uarts[uart].regs->clk_div.val = clk_div & 0xFFFFF;
+
+#else
+
+/* TODO look for an HAL/LL API function */
+#ifdef CPU_FAM_ESP32
+    /* use APB_CLK */
+    _uarts[uart].regs->conf0.tick_ref_always_on = 1;
+#endif
+#if defined(CPU_FAM_ESP32C3) || defined(CPU_FAM_ESP32S3)
+    _uarts[uart].regs->clk_conf.sclk_sel = 1; /* APB clock used instead of XTAL */
+#endif
+    /* compute and set the integral and the decimal part */
+    uint32_t clk_div = (UART_CLK_FREQ << 4) / _uarts[uart].baudrate;
+#ifdef CPU_FAM_ESP32S3
+    _uarts[uart].regs->clkdiv.clkdiv  = clk_div >> 4;
+    _uarts[uart].regs->clkdiv.clkdiv_frag = clk_div & 0xf;
+#else
+    _uarts[uart].regs->clk_div.div_int  = clk_div >> 4;
+    _uarts[uart].regs->clk_div.div_frag = clk_div & 0xf;
+#endif /* CPU_FAM_ESP32S3 */
+
+#endif
 
     critical_exit();
 
@@ -441,43 +484,58 @@ static int _uart_set_mode(uart_t uart, uart_data_bits_t data_bits,
 
     /* set number of data bits */
     switch (data_bits) {
-        case UART_DATA_BITS_5: break;
-        case UART_DATA_BITS_6: break;
-        case UART_DATA_BITS_7: break;
-        case UART_DATA_BITS_8: break;
+        case UART_DATA_BITS_5: _uarts[uart].regs->conf0.bit_num = 0; break;
+        case UART_DATA_BITS_6: _uarts[uart].regs->conf0.bit_num = 1; break;
+        case UART_DATA_BITS_7: _uarts[uart].regs->conf0.bit_num = 2; break;
+        case UART_DATA_BITS_8: _uarts[uart].regs->conf0.bit_num = 3; break;
         default: LOG_TAG_ERROR("uart", "invalid number of data bits\n");
                  critical_exit();
                  return UART_NOMODE;
     }
-    uart_ll_set_data_bit_num(_uarts[uart].regs, (uart_word_length_t)data_bits);
-
     /* store changed number of data bits in configuration */
     _uarts[uart].data = data_bits;
 
     /* set number of stop bits */
+#ifdef CPU_ESP8266
     switch (stop_bits) {
-        case UART_STOP_BITS_1: break;
-        case UART_STOP_BITS_2: break;
+        case UART_STOP_BITS_1: _uarts[uart].regs->conf0.stop_bit_num = 1; break;
+        case UART_STOP_BITS_2: _uarts[uart].regs->conf0.stop_bit_num = 3; break;
         default: LOG_TAG_ERROR("uart", "invalid number of stop bits\n");
                  critical_exit();
                  return UART_NOMODE;
     }
-    uart_ll_set_stop_bits(_uarts[uart].regs, stop_bits);
+#else
+    /* workaround for hardware bug when stop bits are set to 2-bit mode. */
+    switch (stop_bits) {
+        case UART_STOP_BITS_1: _uarts[uart].regs->conf0.stop_bit_num = 1;
+                               _uarts[uart].regs->rs485_conf.dl1_en = 0;
+                               break;
+        case UART_STOP_BITS_2: _uarts[uart].regs->conf0.stop_bit_num = 1;
+                               _uarts[uart].regs->rs485_conf.dl1_en = 1;
+                               break;
+        default: LOG_TAG_ERROR("uart", "invalid number of stop bits\n");
+                 critical_exit();
+                 return UART_NOMODE;
+    }
+#endif
 
     /* store changed number of stop bits in configuration */
     _uarts[uart].stop = stop_bits;
 
     /* set parity mode */
     switch (parity) {
-        case UART_PARITY_NONE: break;
-        case UART_PARITY_EVEN: break;
-        case UART_PARITY_ODD: break;
+        case UART_PARITY_NONE: _uarts[uart].regs->conf0.parity_en = 0;
+                               break;
+        case UART_PARITY_EVEN: _uarts[uart].regs->conf0.parity = 0;
+                               _uarts[uart].regs->conf0.parity_en = 1;
+                               break;
+        case UART_PARITY_ODD: _uarts[uart].regs->conf0.parity = 1;
+                              _uarts[uart].regs->conf0.parity_en = 1;
+                              break;
         default: LOG_TAG_ERROR("uart", "invalid or unsupported parity mode\n");
                  critical_exit();
                  return UART_NOMODE;
     }
-    uart_ll_set_parity(_uarts[uart].regs, parity);
-
     /* store changed parity in configuration */
     _uarts[uart].parity = parity;
 

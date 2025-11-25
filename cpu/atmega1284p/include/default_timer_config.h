@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2020 Otto-von-Guericke-Universität Magdeburg
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_atmega1284p
@@ -14,6 +15,9 @@
  *
  * @author          Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
+
+#ifndef DEFAULT_TIMER_CONFIG_H
+#define DEFAULT_TIMER_CONFIG_H
 
 #include "periph_cpu_common.h"
 #include "periph_conf.h" /* <- Allow overwriting timer config from board */
@@ -43,4 +47,5 @@ extern "C" {
 }
 #endif
 
+#endif /* DEFAULT_TIMER_CONFIG_H */
 /** @} */

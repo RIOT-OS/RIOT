@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_sm_pwm_01c
  * @{
@@ -17,6 +15,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  *
  */
+
+#ifndef SM_PWM_01C_PARAMS_H
+#define SM_PWM_01C_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -75,4 +76,5 @@ static const saul_reg_info_t sm_pwm_01c_saul_info[] =
 }
 #endif
 
+#endif /* SM_PWM_01C_PARAMS_H */
 /** @} */

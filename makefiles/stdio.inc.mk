@@ -18,6 +18,7 @@ STDIO_MODULES = \
 STDIO_LEGACY_MODULES = \
   ethos_stdio \
   stdio_ethos \
+  stdio_native  # requires #19002 \
   #
 
 # select stdio_uart if no other stdio module is slected
@@ -33,7 +34,7 @@ ifneq (,$(filter stdin,$(USEMODULE)))
   USEMODULE += isrpipe
 endif
 
-ifneq (1, $(words $(sort $(filter $(STDIO_MODULES),$(USEMODULE)))))
+ifneq (1, $(words $(filter $(STDIO_MODULES),$(USEMODULE))))
   USEMODULE += stdio_dispatch
 endif
 

@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2018 Koen Zandberg <koen@bergzand.net>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 Koen Zandberg <koen@bergzand.net>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -50,24 +53,22 @@ int main(void)
     }
 
     puts("lcd TFT display filling map");
-    lcd_fill(&dev, 0, dev.params->lines - 1, 0, dev.params->rgb_channels - 1,
-             0x0000);
+    lcd_fill(&dev, 0, dev.params->lines, 0, dev.params->rgb_channels, 0x0000);
     puts("lcd TFT display map filled");
 
     /* Fill square with blue */
     puts("Drawing blue rectangle");
-    lcd_fill(&dev, 0, dev.params->lines / 3, 0, dev.params->rgb_channels - 1,
-             0x001F);
+    lcd_fill(&dev, 0, dev.params->lines / 3, 0, dev.params->rgb_channels, 0x001F);
     ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
 
     puts("Drawing green rectangle");
     lcd_fill(&dev, dev.params->lines / 3, 2 * (dev.params->lines / 3), 0,
-             dev.params->rgb_channels - 1, 0x07E0);
+             dev.params->rgb_channels, 0x07E0);
     ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
 
     puts("Drawing red rectangle");
     lcd_fill(&dev, 2 * (dev.params->lines / 3), dev.params->lines, 0,
-             dev.params->rgb_channels - 1, 0xf800);
+             dev.params->rgb_channels, 0xf800);
     ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
 
     lcd_invert_on(&dev);
@@ -77,8 +78,7 @@ int main(void)
     puts("lcd TFT display normal");
 
     puts("lcd TFT display clear screen");
-    lcd_fill(&dev, 0, dev.params->lines - 1, 0, dev.params->rgb_channels - 1,
-             0x0000);
+    lcd_fill(&dev, 0, dev.params->lines, 0, dev.params->rgb_channels, 0x0000);
 #ifndef CONFIG_NO_RIOT_IMAGE
     /* Approximate middle of the display */
     uint8_t x1 = (dev.params->lines / 2) - (RIOT_LOGO_WIDTH / 2);

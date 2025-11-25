@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2013 Christian Mehlis <mehlis@inf.fu-berlin.de>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2013 Christian Mehlis <mehlis@inf.fu-berlin.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -83,11 +86,14 @@ void *thread3(void *arg)
 int main(void)
 {
     p_main = thread_getpid();
-    p1 = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN + 1, 0,
+    p1 = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN - 1,
+                       THREAD_CREATE_WOUT_YIELD,
                        thread1, NULL, "nr1");
-    p2 = thread_create(t2_stack, sizeof(t2_stack), THREAD_PRIORITY_MAIN + 1, 0,
+    p2 = thread_create(t2_stack, sizeof(t2_stack), THREAD_PRIORITY_MAIN - 1,
+                       THREAD_CREATE_WOUT_YIELD,
                        thread2, NULL, "nr2");
-    p3 = thread_create(t3_stack, sizeof(t3_stack), THREAD_PRIORITY_MAIN + 1, 0,
+    p3 = thread_create(t3_stack, sizeof(t3_stack), THREAD_PRIORITY_MAIN - 1,
+                       THREAD_CREATE_WOUT_YIELD,
                        thread3, NULL, "nr3");
     puts("THREADS CREATED\n");
 

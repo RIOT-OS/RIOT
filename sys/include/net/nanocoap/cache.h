@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_nanocoap_cache nanoCoAP-Cache implementation
  * @ingroup     net_nanocoap
@@ -20,6 +18,9 @@
  *
  * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
+
+#ifndef NET_NANOCOAP_CACHE_H
+#define NET_NANOCOAP_CACHE_H
 
 #include <assert.h>
 #include <stdbool.h>
@@ -268,4 +269,5 @@ static inline bool nanocoap_cache_entry_is_stale(const nanocoap_cache_entry_t *c
 #ifdef __cplusplus
 }
 #endif
+#endif /* NET_NANOCOAP_CACHE_H */
 /** @} */

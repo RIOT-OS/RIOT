@@ -21,8 +21,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
-
 /**
  * @defgroup    sys_ut utlist
  * @ingroup     sys
@@ -35,6 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *              For in-depth documentation see
  *              http://troydhanson.github.io/uthash/utlist.html
  */
+
+#ifndef UTLIST_H
+#define UTLIST_H
 
 /** @brief Version number */
 #define UTLIST_VERSION 1.9.9
@@ -867,4 +868,5 @@ do {                                                                            
 }
 #endif
 
+#endif /* UTLIST_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup net_gnrc_ipv6_nib
  * @{
@@ -18,6 +16,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef PRIV_NIB_6LN_H
+#define PRIV_NIB_6LN_H
 
 #include <kernel_defines.h>
 #include <stdint.h>
@@ -154,4 +154,5 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
 }
 #endif
 
+#endif /* PRIV_NIB_6LN_H */
 /** @} */

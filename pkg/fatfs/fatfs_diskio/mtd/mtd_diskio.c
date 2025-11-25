@@ -147,8 +147,8 @@ DRESULT disk_write(BYTE pdrv, const BYTE *buff, DWORD sector, UINT count)
  * @brief                  perform miscellaneous low-level control functions
  *
  * @param[in]      pdrv    Physical drive nmuber (0..FF_VOLUMES-1)
- * @param[in,out]  cmd     Control code
- * @param[in]      buff    Buffer to send/receive control data
+ * @param[in out]  cmd     Control code
+ * @param[in]      sector  Buffer to send/receive control data
  *
  * @return                 RES_OK if no error occurred
  * @return                 RES_PARERR if cmd is unknown or

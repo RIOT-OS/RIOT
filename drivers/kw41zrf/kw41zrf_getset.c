@@ -20,7 +20,6 @@
 #include <errno.h>
 #include <string.h>
 #include "log.h"
-#include "bit.h"
 #include "cpu.h"
 #include "byteorder.h"
 #include "kw41zrf.h"

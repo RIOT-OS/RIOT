@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2015 PHYTEC Messtechnik GmbH
- * SPDX-FileCopyrightText: 2015 Eistec AB
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 PHYTEC Messtechnik GmbH
+ * Copyright (C) 2015 Eistec AB
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @defgroup    cpu_kinetis_wdog Kinetis WDOG
@@ -35,6 +36,9 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
+#ifndef WDOG_H
+#define WDOG_H
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -49,4 +53,5 @@ void wdog_disable(void);
 }
 #endif
 
+#endif /* WDOG_H */
 /** @} */

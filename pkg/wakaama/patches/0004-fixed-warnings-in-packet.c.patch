@@ -1,0 +1,35 @@
+From b3195957e4fa9217f71f3d5f4505aa463516abed Mon Sep 17 00:00:00 2001
+From: Christian Manal <moenoel@informatik.uni-bremen.de>
+Date: Thu, 23 Nov 2017 11:11:17 +0100
+Subject: [PATCH 04/12] fixed warnings in packet.c
+
+---
+ core/packet.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/core/packet.c b/core/packet.c
+index dc998d3..5e9d9c1 100644
+--- a/core/packet.c
++++ b/core/packet.c
+@@ -97,6 +97,9 @@ static void handle_reset(lwm2m_context_t * contextP,
+                          void * fromSessionH,
+                          coap_packet_t * message)
+ {
++    (void)contextP;
++    (void)fromSessionH;
++    (void)message;
+ #ifdef LWM2M_CLIENT_MODE
+     LOG("Entering");
+     observe_cancel(contextP, message->mid, fromSessionH);
+@@ -108,6 +111,8 @@ static uint8_t handle_request(lwm2m_context_t * contextP,
+                               coap_packet_t * message,
+                               coap_packet_t * response)
+ {
++    (void)contextP;
++    (void)fromSessionH;
+     lwm2m_uri_t * uriP;
+     uint8_t result = COAP_IGNORE;
+ 
+-- 
+2.1.4
+

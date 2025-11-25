@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_netdev_ble netdev BLE mode
  * @ingroup     drivers_netdev_api
@@ -75,6 +73,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef NET_NETDEV_BLE_H
+#define NET_NETDEV_BLE_H
 
 #include "net/netdev.h"
 
@@ -195,4 +196,5 @@ static inline void netdev_ble_stop(netdev_t *dev)
 }
 #endif
 
+#endif /* NET_NETDEV_BLE_H */
 /** @} */

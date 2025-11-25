@@ -93,14 +93,10 @@
  *          the standard C++ lib (feature `libstdcpp`) is not required.
  *
  * As a minimum requirement, the features `arduino_pins` is a hard dependency.
- * See [Digital Pins](https://guide.riot-os.org/misc/io_mapping_and_shields/#digital-pins
- * what a board needs to provide this.
+ * See @ref iomaps-mapping-gpio what a board needs to provide this.
  *
- * Additional mappings for analog pins
- * (see [Analog Pins](https://guide.riot-os.org/misc/io_mapping_and_shields/#analog-pins))
- * and PWM pins
- * (see [PWM Pins](https://guide.riot-os.org/misc/io_mapping_and_shields/#pwm-pins))
- * is required to be able to use
+ * Additional mappings for analog pins (see @ref iomaps-mapping-adc) and PWM
+ * pins (see @ref iomaps-mapping-pwm) is required to be able to use
  * `analogRead()` and `analogWrite()`.
  *
  * See also @ref iomaps on how a board can provide more I/O mappings and even

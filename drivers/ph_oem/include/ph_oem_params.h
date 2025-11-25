@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_ph_oem
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Igor Knippenberg <igor.knippenberg@gmail.com>
  */
+
+#ifndef PH_OEM_PARAMS_H
+#define PH_OEM_PARAMS_H
 
 #include "board.h" /* THIS INCLUDE IS MANDATORY */
 #include "saul_reg.h"
@@ -78,4 +79,5 @@ static const saul_reg_info_t ph_oem_saul_info[] =
 }
 #endif
 
+#endif /* PH_OEM_PARAMS_H */
 /** @} */

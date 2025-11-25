@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    pkg_mbedtls_entropy Access API to Mbed TLS entropy module
  * @ingroup     pkg_mbedtls
@@ -20,6 +18,9 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  *
  */
+
+#ifndef ENTROPY_MBEDTLS_RIOT_H
+#define ENTROPY_MBEDTLS_RIOT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -76,3 +77,5 @@ int entropy_mbedtls_riot_get(unsigned char *output, size_t len);
 }
 #endif
 /** @} */
+
+#endif /* ENTROPY_MBEDTLS_RIOT_H */

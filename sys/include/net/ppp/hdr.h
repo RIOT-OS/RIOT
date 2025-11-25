@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_ppphdr Point-to-Point Protocol Header
  * @ingroup     net_ppp
@@ -19,6 +17,9 @@
  *
  * @author  José Ignacio Alamos
  */
+
+#ifndef NET_PPP_HDR_H
+#define NET_PPP_HDR_H
 
 #include <inttypes.h>
 
@@ -61,4 +62,5 @@ typedef struct __attribute__((packed)){
 }
 #endif
 
+#endif /* NET_PPP_HDR_H */
 /** @} */

@@ -1,9 +1,8 @@
-# Using -isystem instead of -I to prevent warnings for the following headers
-INCLUDES += -isystem$(RIOTPKG)/mynewt-core/include \
-            -isystem$(PKGDIRBASE)/mynewt-core/kernel/os/include \
-            -isystem$(PKGDIRBASE)/mynewt-core/hw/hal/include \
-            -isystem$(PKGDIRBASE)/mynewt-core/util/mem/include \
-            -isystem$(PKGDIRBASE)/mynewt-core/sys/stats/stub/include \
+INCLUDES += -I$(RIOTPKG)/mynewt-core/include \
+            -I$(PKGDIRBASE)/mynewt-core/kernel/os/include \
+            -I$(PKGDIRBASE)/mynewt-core/hw/hal/include \
+            -I$(PKGDIRBASE)/mynewt-core/util/mem/include \
+            -I$(PKGDIRBASE)/mynewt-core/sys/stats/stub/include \
             #
 
 DIRS += $(RIOTPKG)/mynewt-core/contrib \

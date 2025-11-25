@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2019 Mesotic SAS
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 Mesotic SAS
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @defgroup    boards_common_saml1x Microchip SAML1X
@@ -18,6 +19,9 @@
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
 
+#ifndef BOARD_H
+#define BOARD_H
+
 #include "cpu.h"
 #include "periph/gpio.h"
 
@@ -26,11 +30,12 @@ extern "C" {
 #endif
 
 /**
- * @brief ATCA device type on SAML1x XPro boards
+ * @brief ATCA device type on SAML11 XPro boards
  * @{
  */
-#define ATCA_DEVTYPE        ATECC508A
-#define ATCA_PARAM_I2C      I2C_DEV(0)      /**< I2C bus device is connected to */
+#ifdef BOARD_SAML11_XPRO
+#define ATCA_DEVTYPE    (ATECC508A)
+#endif
 /** @} */
 
 /**
@@ -77,4 +82,5 @@ extern "C" {
 }
 #endif
 
+#endif /* BOARD_H */
 /** @} */

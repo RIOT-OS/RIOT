@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_enc28j60
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef ENC28J60_REGS_H
+#define ENC28J60_REGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -430,4 +431,5 @@ extern "C" {
 }
 #endif
 
+#endif /* ENC28J60_REGS_H */
 /** @} */

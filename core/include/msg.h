@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    core_msg  Messaging / IPC
  * @ingroup     core
@@ -174,6 +172,9 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
+
+#ifndef MSG_H
+#define MSG_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -374,30 +375,24 @@ int msg_reply_int(msg_t *m, msg_t *reply);
  *
  * @param[in] pid    a PID
  *
- * @return  Number of messages available in queue of the thread identified by
- *          PID @p pid
- * @retval  0       The message queue of the thread identified by PID @p pid is
- *                  *not* initialized or PID @p pid does not refer to a running
- *                  thread
+ * @return Number of messages available in queue of @p pid on success
+ * @return 0, if no caller's message queue is initialized
  */
 unsigned msg_avail_thread(kernel_pid_t pid);
 
 /**
  * @brief Check how many messages are available (waiting) in the message queue
  *
- * @pre     The caller is running in thread context
- *
- * @return  Number of messages available in our queue
- * @retval  0       Caller's message queue is *not* initialized
+ * @return Number of messages available in our queue on success
+ * @return 0, if no caller's message queue is initialized
  */
 unsigned msg_avail(void);
 
 /**
- * @brief   Get maximum capacity of a thread's queue length
+ * @brief Get maximum capacity of a thread's queue length
  *
- * @return  Number of total messages that fit in the queue of @p pid on success
- * @retval  0       Either the thread identified by PID @p pid does not exist or
- *                  has no message queue initialized (yet)
+ * @return Number of total messages that fit in the queue of @p pid on success
+ * @return 0, if no caller's message queue is initialized
  */
 unsigned msg_queue_capacity(kernel_pid_t pid);
 
@@ -417,16 +412,7 @@ unsigned msg_queue_capacity(kernel_pid_t pid);
 void msg_init_queue(msg_t *array, int num);
 
 /**
- * @brief Number of messages to be maximally printed through @ref msg_queue_print
- */
-#ifndef CONFIG_MSG_QUEUE_PRINT_MAX
-#  define CONFIG_MSG_QUEUE_PRINT_MAX 16U
-#endif
-
-/**
  * @brief   Prints the message queue of the current thread.
- *
- * @note    Prints at most CONFIG_MSG_QUEUE_PRINT_MAX messages.
  */
 void msg_queue_print(void);
 
@@ -434,4 +420,5 @@ void msg_queue_print(void);
 }
 #endif
 
+#endif /* MSG_H */
 /** @} */

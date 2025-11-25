@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2020 Koen Zandberg <koen@bergzand.net>
- * SPDX-FileCopyrightText: 2023 Gunar Schorcht <gunar@schorcht.net>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 Koen Zandberg <koen@bergzand.net>
+ *               2023 Gunar Schorcht <gunar@schorcht.net>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_gd32v
@@ -16,6 +17,9 @@
  * @author          Koen Zandberg <koen@bergzand.net>
  * @author          Gunar Schorcht <gunar@schorcht.net>
  */
+
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include <inttypes.h>
 
@@ -566,4 +570,5 @@ void gd32v_disable_irc8(void);
 }
 #endif
 
+#endif /* PERIPH_CPU_H */
 /** @} */

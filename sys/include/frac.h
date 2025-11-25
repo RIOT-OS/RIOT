@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup  sys_frac   Fractional integer operations
  * @ingroup   sys
@@ -39,6 +37,9 @@
  * @author    Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @{
  */
+
+#ifndef FRAC_H
+#define FRAC_H
 
 #include <stdint.h>
 
@@ -97,3 +98,4 @@ static inline uint32_t frac_scale(const frac_t *frac, uint32_t x)
 }
 #endif
 /** @} */
+#endif /* FRAC_H */

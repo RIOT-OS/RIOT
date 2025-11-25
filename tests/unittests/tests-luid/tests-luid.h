@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,8 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+#ifndef TESTS_LUID_H
+#define TESTS_LUID_H
 
 #include "embUnit.h"
 
@@ -40,4 +40,5 @@ Test *tests_luid_tests(void);
 }
 #endif
 
+#endif /* TESTS_LUID_H */
 /** @} */

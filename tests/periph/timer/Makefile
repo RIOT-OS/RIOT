@@ -44,6 +44,7 @@ BOARDS_TIMER_SYSCLK := \
   openmote-cc2538 \
   remote-reva \
   remote-revb \
+  waspmote-pro \
   #
 
 ifneq (,$(filter $(BOARDS_TIMER_500kHz),$(BOARD)))

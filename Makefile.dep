@@ -2,11 +2,6 @@
 -include $(APPDIR)/Makefile.board.dep
 -include $(APPDIR)/Makefile.$(TOOLCHAIN).dep
 
-# select default stdio provider if no other is selected
-ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
-  USEMODULE += stdio_default
-endif
-
 # include board dependencies
 -include $(BOARDDIR)/Makefile.dep
 
@@ -17,10 +12,9 @@ endif
 # processed before RIOT ones to be evaluated before the 'default' rules.
 -include $(EXTERNAL_MODULE_PATHS:%=%Makefile.dep)
 
-# pull dependencies from sys, drivers and (common) boards
+# pull dependencies from sys and drivers
 include $(RIOTBASE)/sys/Makefile.dep
 include $(RIOTBASE)/drivers/Makefile.dep
-include $(RIOTBASE)/boards/Makefile.dep
 
 # pull Makefile.dep of each driver modules if they exist
 -include $(sort $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.dep))
@@ -52,6 +46,13 @@ ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
   USEMODULE += libfixmath
 endif
 
+ifneq (,$(filter random,$(USEMODULE)))
+  # select default prng if no prng is selected
+  ifeq (,$(filter prng_%,$(USEMODULE)))
+    USEMODULE += prng_musl_lcg
+  endif
+endif
+
 ifneq (,$(filter spiffs,$(USEMODULE)))
   USEPKG += spiffs
   USEMODULE += vfs
@@ -81,12 +82,6 @@ endif
 ifneq (,$(filter lwext%_vfs,$(USEMODULE)))
   USEPKG += lwext4
   USEMODULE += vfs
-endif
-
-ifneq (,$(filter xipfs,$(USEMODULE)))
-  USEPKG += xipfs
-  USEMODULE += vfs
-  USEMODULE += xipfs_fs
 endif
 
 ifneq (,$(filter nimble_%,$(USEMODULE)))

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_hm330x
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
+
+#ifndef HM330X_CONSTANTS_H
+#define HM330X_CONSTANTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,4 +42,5 @@ extern "C" {
 }
 #endif
 
+#endif /* HM330X_CONSTANTS_H */
 /** @} */

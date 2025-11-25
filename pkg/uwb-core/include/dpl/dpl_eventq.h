@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_uwb_core
  * @{
@@ -18,6 +16,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+
+#ifndef DPL_DPL_EVENTQ_H
+#define DPL_DPL_EVENTQ_H
 
 #include <dpl/dpl_types.h>
 
@@ -32,7 +33,7 @@ extern "C" {
  * @brief dpl event wrapper
  */
 struct dpl_event {
-    struct os_event ev;     /**< the event */
+    struct os_event ev;     /**< the envent */
 };
 
 /**
@@ -218,3 +219,5 @@ static inline struct dpl_eventq * dpl_eventq_dflt_get(void)
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* DPL_DPL_EVENTQ_H */

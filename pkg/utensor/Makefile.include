@@ -10,6 +10,4 @@ CXXEXFLAGS += -Wno-sign-compare
 ifeq (llvm,$(TOOLCHAIN))
   CXXEXFLAGS += -Wno-unused-variable
   CXXEXFLAGS += -Wno-shift-count-negative
-else if (esp32,$(CPU))
-  CXXEXFLAGS += -Wno-shift-count-negative
 endif

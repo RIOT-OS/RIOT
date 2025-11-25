@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_uwb_core
  * @{
@@ -19,6 +17,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+
+#ifndef SYSCFG_UWB_DW1000_H
+#define SYSCFG_UWB_DW1000_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -115,3 +116,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* SYSCFG_UWB_DW1000_H */

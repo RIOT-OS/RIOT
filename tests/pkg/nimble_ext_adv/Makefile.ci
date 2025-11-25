@@ -3,5 +3,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     calliope-mini \
     microbit \
     nrf51dongle \
+    nrf6310 \
     yunjia-nrf51822 \
     #

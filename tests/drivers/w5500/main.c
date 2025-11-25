@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2023 Stefan Schmidt
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2023 Stefan Schmidt
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -18,9 +21,9 @@
 #include <stdio.h>
 
 #include "shell.h"
-#include "test_utils/expect.h"
 #include "test_utils/netdev_eth_minimal.h"
 #include "init_dev.h"
+#include "assert.h"
 #include "w5500.h"
 #include "w5500_params.h"
 
@@ -38,7 +41,7 @@ int netdev_eth_minimal_init_devs(netdev_event_cb_t cb) {
 
         /* initialize the device driver */
         int res = device->driver->init(device);
-        expect(!res);
+        assert(!res);
     }
 
     return 0;

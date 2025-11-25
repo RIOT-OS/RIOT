@@ -3,7 +3,7 @@
 # Note: as the CPU variable is not set at this point, we manually 'whitelist'
 #       all supported nrf51-boards here
 BOARDS_NRF51 := airfy-beacon calliope-mini microbit nrf51dk nrf51dongle \
-                yunjia-nrf51822
+                nrf6310 yunjia-nrf51822
 ifneq (,$(filter $(BOARDS_NRF51),$(BOARD)))
   APP_MTU ?= 250
   MSYS_CNT ?= 6

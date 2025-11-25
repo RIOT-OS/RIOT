@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_ina3221
  * @{
@@ -19,6 +17,9 @@
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
+
+#ifndef INA3221_PARAMS_H
+#define INA3221_PARAMS_H
 
 #include "board.h"
 #include "ina3221.h"
@@ -139,4 +140,5 @@ static const saul_reg_info_t ina3221_saul_info[] = {
 }
 #endif
 
+#endif /* INA3221_PARAMS_H */
 /** @} */

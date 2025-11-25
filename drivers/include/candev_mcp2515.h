@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_mcp2515 MCP2515
  * @ingroup     drivers_can
@@ -23,6 +21,9 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Wouter Symons <wosym@airsantelmo.com>
  */
+
+#ifndef CANDEV_MCP2515_H
+#define CANDEV_MCP2515_H
 
 #include <stdbool.h>
 
@@ -131,4 +132,5 @@ void candev_mcp2515_init(candev_mcp2515_t *dev,
 }
 #endif
 
+#endif /* CANDEV_MCP2515_H */
 /** @} */

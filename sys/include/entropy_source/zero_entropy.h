@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup   sys_entropy_source_zero Zero Entropy Source
  * @ingroup    sys_entropy_source
@@ -20,6 +18,9 @@
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
+
+#ifndef ENTROPY_SOURCE_ZERO_ENTROPY_H
+#define ENTROPY_SOURCE_ZERO_ENTROPY_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -87,4 +88,5 @@ int entropy_source_zero_get(uint8_t *buf, size_t len);
 }
 #endif
 
+#endif /* ENTROPY_SOURCE_ZERO_ENTROPY_H */
 /** @} */

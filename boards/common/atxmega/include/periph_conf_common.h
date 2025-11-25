@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2021 Gerson Fernando Budke <nandojve@gmail.com>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2021 Gerson Fernando Budke <nandojve@gmail.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_common_atxmega
@@ -14,6 +15,9 @@
  *
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
  */
+
+#ifndef PERIPH_CONF_COMMON_H
+#define PERIPH_CONF_COMMON_H
 
 #include "periph_cpu.h"
 #include "macros/units.h"
@@ -92,4 +96,5 @@ extern "C" {
 }
 #endif
 
+#endif /* PERIPH_CONF_COMMON_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_periph_pwm PWM
  * @ingroup     drivers_periph
@@ -60,6 +58,9 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
+#ifndef PERIPH_PWM_H
+#define PERIPH_PWM_H
+
 #include <stdint.h>
 #include <limits.h>
 
@@ -96,9 +97,9 @@ typedef uint_fast8_t pwm_t;
  */
 #ifndef HAVE_PWM_MODE_T
 typedef enum {
-    PWM_LEFT,           /**< use left aligned PWM */
-    PWM_RIGHT,          /**< use right aligned PWM */
-    PWM_CENTER          /**< use center aligned PWM */
+    PWM_LEFT,           /*< use left aligned PWM */
+    PWM_RIGHT,          /*< use right aligned PWM */
+    PWM_CENTER          /*< use center aligned PWM */
 } pwm_mode_t;
 #endif
 
@@ -185,4 +186,5 @@ void pwm_poweroff(pwm_t dev);
 }
 #endif
 
+#endif /* PERIPH_PWM_H */
 /** @} */

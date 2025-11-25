@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup drivers_mfrc522 MFRC522 RFID controller
  * @ingroup  drivers_actuators
@@ -36,6 +34,9 @@
  * @author   Hendrik van Essen <hendrik.ve@fu-berlin.de>
  * @file
  */
+
+#ifndef MFRC522_H
+#define MFRC522_H
 
 #ifdef __cplusplus
 extern "C"
@@ -232,9 +233,9 @@ void mfrc522_pcd_soft_power_up(mfrc522_t *dev);
  * @param[in]     send_len    Number of bytes to transfer to the FIFO
  * @param[out]    back_data   Buffer if data should be read back after executing
  *                            the command, otherwise NULL
- * @param[in,out] back_len    Max number of bytes to write to *back_data.
+ * @param[inout]  back_len    Max number of bytes to write to *back_data.
  *                            Returns number of bytes returned.
- * @param[in,out] valid_bits  Number of valid bits in the last byte. 0 for 8
+ * @param[inout]  valid_bits  Number of valid bits in the last byte. 0 for 8
  *                            valid bits
  * @param[in]     rx_align    Defines the bit position in back_data[0] for the
  *                            first bit received
@@ -266,9 +267,9 @@ int mfrc522_pcd_transceive_data(mfrc522_t *dev,
  * @param[in]     send_len    Number of bytes to transfer to the FIFO
  * @param[out]    back_data   Buffer if data should be read back after executing
  *                            the command, otherwise NULL
- * @param[in,out] back_len    Max number of bytes to write to *back_data.
+ * @param[inout]  back_len    Max number of bytes to write to *back_data.
  *                            Returns number of bytes returned.
- * @param[in,out] valid_bits  Number of valid bits in the last byte. 0 for 8
+ * @param[inout]  valid_bits  Number of valid bits in the last byte. 0 for 8
  *                            valid bits.
  * @param[in]     rx_align    Defines the bit position in back_data[0] for the
  *                            first bit received
@@ -296,7 +297,7 @@ int mfrc522_pcd_communicate_with_picc(mfrc522_t *dev, mfrc522_pcd_command_t comm
  *
  * @param[in]      dev          Device descriptor of the MFRC522
  * @param[out]     buffer_atqa  Buffer to store the ATQA in
- * @param[in,out]  buffer_size  Buffer size, at least two bytes. Also number of
+ * @param[inout]   buffer_size  Buffer size, at least two bytes. Also number of
  *                              bytes returned on success.
  *
  * @retval  0             on success
@@ -317,7 +318,7 @@ int mfrc522_picc_request_a(mfrc522_t *dev, uint8_t *buffer_atqa, uint8_t *buffer
  *
  * @param[in]      dev          Device descriptor of the MFRC522
  * @param[out]     buffer_atqa  Buffer to store the ATQA in
- * @param[in,out]  buffer_size  Buffer size, at least two bytes. Also number of
+ * @param[inout]   buffer_size  Buffer size, at least two bytes. Also number of
  *                              bytes returned on success.
  *
  * @retval  0             on success
@@ -339,7 +340,7 @@ int mfrc522_picc_wakeup_a(mfrc522_t *dev, uint8_t *buffer_atqa, uint8_t *buffer_
  * @param[in]     command      Command to send - MFRC522_PICC_CMD_ISO_14443_REQA
  *                             or MFRC522_PICC_CMD_ISO_14443_WUPA
  * @param[out]    buffer_atqa  Buffer to store the ATQA in
- * @param[in,out] buffer_size  Buffer size, at least two bytes. Also number of
+ * @param[inout]  buffer_size  Buffer size, at least two bytes. Also number of
  *                             bytes returned on success.
  *
  * @retval  0             on success
@@ -375,7 +376,7 @@ int mfrc522_picc_reqa_or_wupa(mfrc522_t *dev, mfrc522_picc_command_t command,
  * triple            10                   3       Not currently in use?
  *
  * @param[in]     dev         Device descriptor of the MFRC522
- * @param[in,out] uid         Normally output, but can also be used to supply a
+ * @param[inout]  uid         Normally output, but can also be used to supply a
  *                            known UID
  * @param[in]     valid_bits  Number of known UID bits supplied in *uid.
  *                            Normally 0. If set you must also supply uid->size.
@@ -461,7 +462,7 @@ void mfrc522_pcd_stop_crypto1(mfrc522_t *dev);
  * @param[in]      block_addr   MIFARE Classic: The block (0-0xff) number.
  *                              MIFARE Ultralight: The first page to return data from.
  * @param[out]     buffer       Buffer to store the data in
- * @param[in,out]  buffer_size  Buffer size, at least 18 bytes. Also number of
+ * @param[inout]   buffer_size  Buffer size, at least 18 bytes. Also number of
  *                              bytes returned on success.
  *
  * @retval  0             on success
@@ -873,4 +874,5 @@ bool mfrc522_pcd_perform_self_test(mfrc522_t *dev);
 }
 #endif
 
+#endif /* MFRC522_H */
 /** @} */

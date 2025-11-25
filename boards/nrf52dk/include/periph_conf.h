@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2016-2018 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2018 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2016-2018 Freie Universität Berlin
+ *               2018 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_nrf52dk
@@ -17,6 +18,9 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_conf_common.h"
 
@@ -65,4 +69,5 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

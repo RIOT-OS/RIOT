@@ -44,8 +44,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     msba2 \
     nrf51dk \
     nrf51dongle \
+    nrf6310 \
     nucleo-c031c6 \
-    nucleo-c071rb \
     nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
@@ -80,7 +80,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     pba-d-01-kw2x \
     remote-pa \
     remote-reva \
-    remote-revb \
     samd10-xmini \
     samd20-xpro \
     samd21-xpro \
@@ -99,8 +98,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     spark-core \
     stk3200 \
     stk3600 \
-    stm32c0116-dk \
-    stm32c0316-dk \
     stm32f030f4-demo \
     stm32f0discovery \
     stm32f3discovery \

@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2022 SSV Software Systems GmbH
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2022 SSV Software Systems GmbH
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_xg23-pk6068a
@@ -14,6 +15,9 @@
  *
  * @author      Juergen Fitschen <me@jue.yt>
  */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -128,4 +132,5 @@ void board_init(void);
 }
 #endif
 
+#endif /* BOARD_H */
 /** @} */

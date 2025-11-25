@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_tja1042 TJA1042
  * @ingroup     drivers_can
@@ -22,6 +20,8 @@
  * @author      Aurelien Gonce <aurelien.gonce@altran.com>
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
+#ifndef TJA1042_H
+#define TJA1042_H
 
 #include <stdio.h>
 
@@ -78,4 +78,5 @@ extern const trx_driver_t tja1042_driver;
 }
 #endif
 
+#endif /* TJA1042_H */
 /** @} */

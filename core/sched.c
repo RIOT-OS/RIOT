@@ -252,7 +252,7 @@ static inline __attribute__((always_inline)) void _runqueue_pop(thread_t *thread
 {
     DEBUG("sched_set_status: removing thread %" PRIkernel_pid " from runqueue %" PRIu8 ".\n",
           thread->pid, thread->priority);
-    clist_remove(&sched_runqueues[thread->priority], &thread->rq_entry);
+    clist_lpop(&sched_runqueues[thread->priority]);
 
     if (!sched_runqueues[thread->priority].next) {
         _clear_runqueue_bit(thread->priority);

@@ -29,65 +29,21 @@ else
 endif
 
 CPU_FAM = $(call lowercase,$(STM32_TYPE)$(STM32_FAMILY))
-SVD_VENDOR := STMicro
 
 ifeq (f0,$(CPU_FAM))
   CPU_CORE = cortex-m0
-  ifneq (,$(filter $(STM32_MODEL),031 042 072 091))
-    SVD_MODEL := STM32F$(STM32_MODEL)x
-  endif
-  ifeq (030,$(STM32_MODEL))
-    SVD_MODEL := STM32F$(STM32_MODEL)
-  endif
-else ifeq (f1,$(CPU_FAM))
+else ifneq (,$(filter $(CPU_FAM),f1 f2 l1))
   CPU_CORE = cortex-m3
-  SVD_MODEL := STM32F$(STM32_MODEL)xx
-else ifeq (f2,$(CPU_FAM))
-  CPU_CORE = cortex-m3
-  SVD_MODEL := STM32F2$(STM32_MODEL2)x
-else ifeq (l1,$(CPU_FAM))
-  CPU_CORE = cortex-m3
-  # TODO: Memory map description is split over multiple SVD files, but this
-  # is not yet supported by the build system. We load the common STM32L1xx
-  # SVD file only for now
-	SVD_MODEL := STM32L1xx
-else ifeq (f3,$(CPU_FAM))
+else ifneq (,$(filter $(CPU_FAM),f3 f4 l4 mp1))
   CPU_CORE = cortex-m4f
-  ifneq (,$(filter $(STM32_MODEL3),4 8))
-    SVD_MODEL := STM32F3x$(STM32_MODEL3)
-  else
-    SVD_MODEL := STM32F$(STM32_MODEL)
-  endif
-else ifeq (f4,$(CPU_FAM))
-  CPU_CORE = cortex-m4f
-  SVD_MODEL := STM32F$(STM32_MODEL)
-else ifeq (l4,$(CPU_FAM))
-  CPU_CORE = cortex-m4f
-  SVD_MODEL := STM32L4x$(STM32_MODEL3)
-else ifeq (mp1,$(CPU_FAM))
-  CPU_CORE = cortex-m4f
-else ifeq (g4,$(CPU_FAM))
-  CPU_CORE = cortex-m4
-  SVD_MODEL := STM32G$(STM32_MODEL)xx
-else ifneq (,$(filter $(CPU_FAM),wb wl))
+else ifneq (,$(filter $(CPU_FAM),g4 wb wl))
   CPU_CORE = cortex-m4
 else ifeq (f7,$(CPU_FAM))
   CPU_CORE = cortex-m7
-	SVD_MODEL := STM32F7x$(STM32_MODEL3)
-else ifeq (g0,$(CPU_FAM))
+else ifneq (,$(filter $(CPU_FAM),g0 l0 c0))
   CPU_CORE = cortex-m0plus
-  SVD_MODEL := STM32G$(STM32_MODEL)
-else ifeq (l0,$(CPU_FAM))
-  CPU_CORE = cortex-m0plus
-  SVD_MODEL := STM32L0x$(STM32_MODEL3)
-else ifeq (c0,$(CPU_FAM))
-  CPU_CORE = cortex-m0plus
-else ifeq (l5,$(CPU_FAM))
+else ifneq (,$(filter $(CPU_FAM),l5 u5))
   CPU_CORE = cortex-m33
-  SVD_MODEL := STM32L$(STM32_MODEL)
-else ifeq (u5,$(CPU_FAM))
-  CPU_CORE = cortex-m33
-  SVD_MODEL := STM32U$(STM32_MODEL)
 else
   $(error Not supported CPU family: '$(CPU_FAM)')
 endif

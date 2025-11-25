@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2021 Otto-von-Guericke-Universität Magdeburg
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2021 Otto-von-Guericke-Universität Magdeburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_rpx0xx
@@ -14,6 +15,9 @@
  *
  * @author          Fabian Hüßler <fabian.huessler@ovgu.de>
 */
+
+#ifndef PIO_PIO_H
+#define PIO_PIO_H
 
 #include "periph_conf.h"
 #include "periph/gpio.h"
@@ -1328,4 +1332,5 @@ static inline bool pio_sm_rx_fifo_full(pio_t pio, pio_sm_t sm)
 }
 #endif
 
+#endif /* PIO_PIO_H */
 /** @} */

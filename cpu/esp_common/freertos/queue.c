@@ -1,6 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2019 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ *
+ * FreeRTOS to RIOT-OS adaption module for source code compatibility
  */
 
 #ifndef DOXYGEN
@@ -30,57 +35,24 @@
 #include "freertos/semphr.h"
 #include "freertos/task.h"
 
-QueueHandle_t xQueueCreateStatic( const UBaseType_t uxQueueLength,
-                                  const UBaseType_t uxItemSize,
-                                  uint8_t *pucQueueStorageBuffer,
-                                  StaticQueue_t *pxQueueBuffer )
-
-{
-    DEBUG("%s pid=%d len=%u size=%u storage=%p buffer=%p\n", __func__,
-          thread_getpid(),
-          uxQueueLength, uxItemSize, pucQueueStorageBuffer, pxQueueBuffer);
-
-    _queue_t *queue = (_queue_t *)pxQueueBuffer;
-    uint32_t queue_size = uxQueueLength * uxItemSize;
-
-    assert(queue != NULL);
-    memset(queue, 0, sizeof(_queue_t));
-
-    if (uxItemSize) {
-        assert(pucQueueStorageBuffer != NULL);
-        memset(pucQueueStorageBuffer, 0, uxQueueLength * uxItemSize);
-    }
-
-    queue->type = queueQUEUE_TYPE_BASE;
-    queue->stat = true;
-    queue->receiving.next = NULL;
-    queue->sending.next = NULL;
-    queue->queue = (queue_size) ? pucQueueStorageBuffer : NULL;
-    queue->item_num = uxQueueLength;
-    queue->item_size = uxItemSize;
-    queue->item_front = 0;
-    queue->item_tail = 0;
-    queue->item_level = 0;
-
-    return queue;
-}
-
-BaseType_t xQueueGetStaticBuffers( QueueHandle_t xQueue,
-                                   uint8_t **ppucQueueStorage,
-                                   StaticQueue_t **ppxStaticQueue )
-{
-    _queue_t *queue = (_queue_t *)xQueue;
-
-    assert(queue != NULL);
-    assert(ppxStaticQueue != NULL);
-
-    if (ppucQueueStorage) {
-        *ppucQueueStorage = queue->queue;
-    }
-    *ppxStaticQueue = queue;
-
-    return pdTRUE;
-}
+/*
+ * In FreeRTOS different types of semaphores, mutexes and queues are all
+ * mapped to a single generic queue type. With all these different types,
+ * single functions for send, receive, give and take are then used. To be
+ * able to dsitinguish between these different types in RIOT, we need typed
+ * objects.
+ */
+typedef struct {
+    uint8_t     type;        /* type of the queue, MUST be the first element */
+    list_node_t sending;     /* threads that are waiting to send */
+    list_node_t receiving;   /* threads that are waiting to receive */
+    uint8_t*    queue;       /* the queue of waiting items */
+    uint32_t    item_size;   /* size of each item in the queue */
+    uint32_t    item_num;    /* num of items that can be stored in queue */
+    uint32_t    item_front;  /* first item in queue */
+    uint32_t    item_tail;   /* last item in queue */
+    uint32_t    item_level;  /* num of items stored in queue */
+} _queue_t;
 
 QueueHandle_t xQueueGenericCreate( const UBaseType_t uxQueueLength,
                                    const UBaseType_t uxItemSize,
@@ -90,19 +62,24 @@ QueueHandle_t xQueueGenericCreate( const UBaseType_t uxQueueLength,
           thread_getpid(), uxQueueLength, uxItemSize, ucQueueType);
 
     uint32_t queue_size = uxQueueLength * uxItemSize;
-    _queue_t *queue = malloc(sizeof(_queue_t) + queue_size);
+    _queue_t* queue = malloc(sizeof(_queue_t) + queue_size);
 
     assert(queue != NULL);
 
-    QueueHandle_t handle;
-    handle = xQueueCreateStatic(uxQueueLength, uxItemSize,
-                                (uint8_t*)queue + sizeof(_queue_t), queue);
+    memset(queue, 0, sizeof(_queue_t) + queue_size);
     queue->type = ucQueueType;
-    queue->stat = false;
+    queue->receiving.next = NULL;
+    queue->sending.next = NULL;
+    queue->queue = (queue_size) ? (uint8_t*)queue + sizeof(_queue_t) : NULL;
+    queue->item_num = uxQueueLength;
+    queue->item_size = uxItemSize;
+    queue->item_front = 0;
+    queue->item_tail = 0;
+    queue->item_level = 0;
 
     DEBUG("queue=%p\n", queue);
 
-    return handle;
+    return queue;
 }
 
 #define queueSEMAPHORE_QUEUE_ITEM_LENGTH ( ( UBaseType_t ) 0 )
@@ -129,49 +106,12 @@ QueueHandle_t xQueueCreateCountingSemaphore (const UBaseType_t uxMaxCount,
     return queue;
 }
 
-QueueHandle_t xQueueCreateCountingSemaphoreStatic(const UBaseType_t uxMaxCount,
-                                                  const UBaseType_t uxInitialCount,
-                                                  StaticQueue_t *pxStaticQueue)
-{
-    assert(pxStaticQueue);
-    assert(uxMaxCount != 0);
-    assert(uxInitialCount <= uxMaxCount);
-
-    _queue_t *queue = (_queue_t *)pxStaticQueue;
-
-    DEBUG("%s pid=%d queue=%p max=%d initial=%d\n", __func__,
-          thread_getpid(), queue, uxMaxCount, uxInitialCount);
-
-    if (xQueueCreateStatic(uxMaxCount, queueSEMAPHORE_QUEUE_ITEM_LENGTH,
-                           NULL, pxStaticQueue) == NULL) {
-        return NULL;
-    }
-
-    queue->type = queueQUEUE_TYPE_COUNTING_SEMAPHORE;
-    queue->item_level = uxInitialCount;
-    queue->item_tail = (queue->item_front + queue->item_level) % queue->item_num;
-
-    return queue;
-}
-
-QueueHandle_t xQueueCreateWithCaps(const UBaseType_t uxQueueLength,
-                                   const UBaseType_t uxItemSize,
-                                   const UBaseType_t uxMemoryCaps)
-{
-    (void)uxMemoryCaps;
-    return xQueueGenericCreate(uxQueueLength, uxItemSize, queueQUEUE_TYPE_BASE);
-}
-
 void vQueueDelete( QueueHandle_t xQueue )
 {
     DEBUG("%s pid=%d queue=%p\n", __func__, thread_getpid(), xQueue);
 
     assert(xQueue != NULL);
-
-    _queue_t* queue = (_queue_t*)xQueue;
-    if (!(queue->stat)) {
-        free(queue);
-    }
+    free(xQueue);
 }
 
 BaseType_t IRAM_ATTR xQueueReset( QueueHandle_t xQueue )
@@ -559,10 +499,8 @@ BaseType_t IRAM_ATTR xQueueReceiveFromISR (QueueHandle_t xQueue,
                                0, pxHigherPriorityTaskWoken);
 }
 
-UBaseType_t uxQueueMessagesWaiting(QueueHandle_t xQueue)
+UBaseType_t uxQueueMessagesWaiting( QueueHandle_t xQueue )
 {
-    DEBUG("%s queue=%p isr=%d\n", __func__, xQueue, irq_is_in());
-
     assert(xQueue != NULL);
 
     _queue_t* queue = (_queue_t*)xQueue;
@@ -578,23 +516,6 @@ BaseType_t xQueueGiveFromISR (QueueHandle_t xQueue,
 
     return _queue_generic_send(xQueue, NULL, queueSEND_TO_BACK,
                                0, pxHigherPriorityTaskWoken);
-}
-
-UBaseType_t uxQueueMessagesWaitingFromISR(const QueueHandle_t xQueue)
-{
-    return uxQueueMessagesWaiting(xQueue);
-}
-
-BaseType_t xQueueIsQueueEmpty(const QueueHandle_t xQueue)
-{
-    DEBUG("%s queue=%p isr=%d\n", __func__, xQueue, irq_is_in());
-    return uxQueueMessagesWaitingFromISR(xQueue) == 0;
-}
-
-BaseType_t xQueueIsQueueEmptyFromISR(const QueueHandle_t xQueue)
-{
-    DEBUG("%s queue=%p\n", __func__, xQueue);
-    return xQueueIsQueueEmpty(xQueue);
 }
 
 #endif /* DOXYGEN */

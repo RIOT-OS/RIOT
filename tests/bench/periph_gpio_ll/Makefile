@@ -9,7 +9,7 @@ BOARD ?= nucleo-f767zi
 #
 # Beware: If other pins on the output port are configured as output GPIOs, they
 #         might be written to during this test.
-#PORT_OUT := 0
+PORT_OUT ?= 0
 PIN_OUT_0 ?= 0
 PIN_OUT_1 ?= 1
 
@@ -36,10 +36,7 @@ endif
 
 COMPENSATE_OVERHEAD ?= 1
 
-ifneq (,$(PORT_OUT))
-  CFLAGS += -DPORT_OUT=GPIO_PORT_$(PORT_OUT)
-  CFLAGS += -DPORT_OUT_NUM=$(PORT_OUT)
-endif
+CFLAGS += -DPORT_OUT=$(PORT_OUT)
 CFLAGS += -DPIN_OUT_0=$(PIN_OUT_0)
 CFLAGS += -DPIN_OUT_1=$(PIN_OUT_1)
 CFLAGS += -DCOMPENSATE_OVERHEAD=$(COMPENSATE_OVERHEAD)

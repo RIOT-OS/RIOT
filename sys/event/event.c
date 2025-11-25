@@ -27,7 +27,6 @@
 
 #include "event.h"
 #include "clist.h"
-#include "mutex.h"
 #include "thread.h"
 
 #if IS_USED(MODULE_XTIMER)
@@ -37,7 +36,6 @@
 void event_post(event_queue_t *queue, event_t *event)
 {
     assert(queue && event);
-    assert(event->handler);
 
     unsigned state = irq_disable();
     if (!event->list_node.next) {
@@ -90,7 +88,7 @@ event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
     assert(queues && n_queues);
     event_t *result = NULL;
 
-    while (1) {
+    do {
         unsigned state = irq_disable();
         for (size_t i = 0; i < n_queues; i++) {
             assert(queues[i].waiter);
@@ -100,16 +98,14 @@ event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
                 break;
             }
         }
-
-        if (result != NULL) {
-            result->list_node.next = NULL;
-            irq_restore(state);
-            return result;
-        }
-
         irq_restore(state);
-        thread_flags_wait_any(THREAD_FLAG_EVENT);
-    }
+        if (result == NULL) {
+            thread_flags_wait_any(THREAD_FLAG_EVENT);
+        }
+    } while (result == NULL);
+
+    result->list_node.next = NULL;
+    return result;
 }
 
 #if IS_USED(MODULE_XTIMER) || IS_USED(MODULE_ZTIMER)
@@ -178,27 +174,3 @@ event_t *event_wait_timeout_ztimer(event_queue_t *queue,
     return result;
 }
 #endif
-
-typedef struct {
-    event_t ev;
-    mutex_t synced;
-} sync_ev_t;
-
-static void sync_ev_handler(event_t *ev)
-{
-    sync_ev_t *sync_ev = (sync_ev_t *)ev;
-    mutex_unlock(&sync_ev->synced);
-}
-
-void event_sync(event_queue_t *queue)
-{
-    /* if we're on the queue, this would block forever */
-    assert(!queue->waiter || queue->waiter->pid != thread_getpid());
-
-    sync_ev_t sync_ev = {
-        .ev.handler = sync_ev_handler,
-        .synced = MUTEX_INIT_LOCKED,
-    };
-    event_post(queue, &sync_ev.ev);
-    mutex_lock(&sync_ev.synced);
-}

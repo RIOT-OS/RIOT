@@ -1,10 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2015 HAW Hamburg
- * SPDX-FileCopyrightText: 2016 INRIA
- * SPDX-License-Identifier: LGPL-2.1-only
- */
+ * Copyright (C) 2015 HAW Hamburg
+ *               2016 INRIA
 
-#pragma once
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
 
 /**
  * @ingroup     cpu_atmega_common
@@ -20,6 +22,8 @@
  * @author      Laurent Navet <laurent.navet@gmail.com>
  */
 
+#ifndef ATMEGA_GPIO_H
+#define ATMEGA_GPIO_H
 #include <stddef.h>
 #include <stdio.h>
 
@@ -79,4 +83,5 @@ static inline uint16_t atmega_port_addr(gpio_t pin)
 }
 #endif
 
+#endif /* ATMEGA_GPIO_H */
 /** @} */

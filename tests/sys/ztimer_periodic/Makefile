@@ -5,7 +5,7 @@ include ../Makefile.sys_common
 # application. If the host is busy enough it won't schedule the process,
 # delaying the application, thus delaying the time measurement. This happens
 # often on ci with resulting offsets of +10ms
-TEST_ON_CI_BLACKLIST += native32 native64
+TEST_ON_CI_BLACKLIST += native native64
 
 USEMODULE += fmt
 USEMODULE += ztimer_usec ztimer_msec

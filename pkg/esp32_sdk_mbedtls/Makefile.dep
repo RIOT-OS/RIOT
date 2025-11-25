@@ -1,2 +1,0 @@
-# This package can only be used with the ESP32 CPU
-FEATURES_REQUIRED += arch_esp32

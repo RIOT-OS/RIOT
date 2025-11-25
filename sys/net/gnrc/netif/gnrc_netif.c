@@ -51,7 +51,7 @@
 #include "debug.h"
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif);
-static void _check_netdev_capabilities(netdev_t *dev, bool legacy);
+static void _check_netdev_capabilities(netdev_t *dev);
 static void *_gnrc_netif_thread(void *args);
 static void _event_cb(netdev_t *dev, netdev_event_t event);
 
@@ -1078,13 +1078,11 @@ static int _create_candidate_set(const gnrc_netif_t *netif,
              *  (so don't consider tentative addresses for source address
              *  selection) */
             gnrc_netif_ipv6_addr_dad_trans(netif, i)) {
-            DEBUG(" -> skip tentative address\n");
             continue;
         }
         /* Check if we only want link local addresses */
         if (ll_only && !ipv6_addr_is_link_local(tmp)) {
-           DEBUG(" -> skip non link-local address\n");
-           continue;
+            continue;
         }
         /* "For all multicast and link-local destination addresses, the set of
          *  candidate source addresses MUST only include addresses assigned to
@@ -1383,14 +1381,6 @@ static void _netif_bus_msg_global(gnrc_netif_t *netif, msg_t* m, bool *has_globa
     }
 }
 
-static void _unset_arg(void *arg)
-{
-    ztimer_t *timer = arg;
-    if (timer) {
-        timer->arg = NULL;
-    }
-}
-
 bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
                                              uint32_t timeout_ms)
 {
@@ -1406,7 +1396,6 @@ bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
 
     if (netif != NULL) {
         if (_has_global_addr(netif)) {
-            DEBUG("gnrc_netif: %u already has a global address\n", netif->pid);
             return true;
         }
 
@@ -1417,7 +1406,6 @@ bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
              (netif = gnrc_netif_iter(netif));
              count++) {
             if (_has_global_addr(netif)) {
-                DEBUG("gnrc_netif: %u already has a global address\n", netif->pid);
                 has_global = true;
             }
 
@@ -1427,22 +1415,15 @@ bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
 
     /* wait for global address */
     msg_t m;
-    ztimer_t _timeout = { .callback = _unset_arg, .arg = &_timeout };
-    if (timeout_ms != UINT32_MAX) {
-        ztimer_set(ZTIMER_MSEC, &_timeout, timeout_ms);
-    }
-
+    ztimer_now_t t_stop = ztimer_now(ZTIMER_MSEC) + timeout_ms;
     while (!has_global) {
         /* stop if timeout reached */
-        if (!_timeout.arg) {
+        if (ztimer_now(ZTIMER_MSEC) > t_stop) {
             DEBUG_PUTS("gnrc_netif: timeout reached");
             break;
         }
-
         /* waiting for any message */
-        if (timeout_ms == UINT32_MAX) {
-            msg_receive(&m);
-        } else if (ztimer_msg_receive_timeout(ZTIMER_MSEC, &m, timeout_ms) < 0) {
+        if (ztimer_msg_receive_timeout(ZTIMER_MSEC, &m, timeout_ms) < 0) {
             DEBUG_PUTS("gnrc_netif: timeout waiting for prefix");
             break;
         }
@@ -1457,8 +1438,6 @@ bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
             }
         }
     }
-
-    ztimer_remove(ZTIMER_MSEC, &_timeout);
 
     /* called with a given interface */
     if (netif != NULL) {
@@ -1512,15 +1491,11 @@ static void _init_from_device(gnrc_netif_t *netif)
     _update_l2addr_from_dev(netif);
 }
 
-static void _check_netdev_capabilities(netdev_t *dev, bool legacy)
+static void _check_netdev_capabilities(netdev_t *dev)
 {
     /* Check whether RX- and TX-complete interrupts are supported by the driver */
     if (IS_ACTIVE(DEVELHELP)) {
         if (IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ)) {
-            if (!legacy) {
-                /* new API implies TX end event */
-                return;
-            }
             netopt_enable_t enable = NETOPT_ENABLE;
             int res = dev->driver->get(dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
             if ((res != sizeof(enable)) || (enable != NETOPT_ENABLE)) {
@@ -1665,7 +1640,7 @@ int gnrc_netif_default_init(gnrc_netif_t *netif)
         return res;
     }
     netif_register(&netif->netif);
-    _check_netdev_capabilities(dev, gnrc_netif_netdev_legacy_api(netif));
+    _check_netdev_capabilities(dev);
     _init_from_device(netif);
 #ifdef DEVELHELP
     _test_options(netif);
@@ -1737,6 +1712,8 @@ static event_t *_gnrc_netif_fetch_event(gnrc_netif_t *netif)
  *
  * @param[in]   netif   gnrc_netif instance to operate on
  * @param[out]  msg     pointer to message buffer to write the first received message
+ *
+ * @return >0 if msg contains a new message
  */
 static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
 {
@@ -1745,10 +1722,12 @@ static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
 
         /* First drain the queues before blocking the thread */
         /* Events will be handled before messages */
+        DEBUG("gnrc_netif: handling events\n");
         event_t *evp;
         /* We can not use event_loop() or event_wait() because then we would not
          * wake up when a message arrives */
         while ((evp = _gnrc_netif_fetch_event(netif))) {
+            DEBUG("gnrc_netif: event %p\n", (void *)evp);
             if (evp->handler) {
                 evp->handler(evp);
             }
@@ -1758,6 +1737,7 @@ static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
         if (msg_waiting > 0) {
             return;
         }
+        DEBUG("gnrc_netif: waiting for events\n");
         /* Block the thread until something interesting happens */
         thread_flags_wait_any(THREAD_FLAG_MSG_WAITING | THREAD_FLAG_EVENT);
     }
@@ -1776,17 +1756,6 @@ static void _send_queued_pkt(gnrc_netif_t *netif)
 #endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
 }
 
-static netstats_nb_result_t _res_to_nb_result(int res)
-{
-    if (res >= 0) {
-        return NETSTATS_NB_SUCCESS;
-    }
-    if (res == -EHOSTUNREACH) {
-        return NETSTATS_NB_NOACK;
-    }
-    return NETSTATS_NB_BUSY;
-}
-
 static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
                      gnrc_pktsnip_t *tx_sync, int res, bool push_back)
 {
@@ -1798,23 +1767,12 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
         gnrc_pktbuf_release_error(tx_sync, err);
     }
 
-    if (IS_USED(MODULE_NETSTATS_NEIGHBOR) && gnrc_netif_netdev_new_api(netif)) {
-        int8_t retries = -1;
-        netstats_nb_result_t result = _res_to_nb_result(res);
-        if (result != NETSTATS_NB_BUSY) {
-            netdev_t *dev = netif->dev;
-            retries = dev->driver->get(dev, NETOPT_TX_RETRIES_NEEDED, &retries, sizeof(retries));
-        }
-
-        netstats_nb_update_tx(&netif->netif, result, retries + 1);
-    }
-
     /* no frame was transmitted */
     if (res < 0) {
         DEBUG("gnrc_netif: error sending packet %p (code: %i)\n",
               (void *)pkt, res);
 
-        if (IS_USED(MODULE_NETSTATS_NEIGHBOR) && gnrc_netif_netdev_legacy_api(netif)) {
+        if (IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
             netstats_nb_update_tx(&netif->netif, NETSTATS_NB_BUSY, 0);
         }
     }
@@ -1845,17 +1803,16 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
             return; /* early return to not release */
         }
         else {
-            LOG_ERROR("gnrc_netif: can't queue packet for sending, drop it\n");
+            LOG_ERROR("gnrc_netif: can't queue packet for sending\n");
             /* If we got here, it means the device was busy and the pkt queue
              * was full. The packet should be dropped here anyway */
             gnrc_pktbuf_release_error(pkt, ENOMEM);
         }
         return;
     }
-    else if (gnrc_netif_netdev_legacy_api(netif)) {
+    else {
         /* remove previously held packet */
         gnrc_pktbuf_release(pkt);
-        return;
     }
 #endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
 
@@ -1918,10 +1875,13 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
             return;
         }
         else {
-            LOG_WARNING("gnrc_netif: can't queue packet for sending, try sending\n");
+            LOG_WARNING("gnrc_netif: can't queue packet for sending\n");
             /* try to send anyway */
         }
     }
+    /* hold in case device was busy to not having to rewrite *all* the link
+     * layer implementations in case `gnrc_netif_pktq` is included */
+    gnrc_pktbuf_hold(pkt, 1);
 #endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
 
     /* Record send in neighbor statistics if destination is unicast */
@@ -1942,21 +1902,13 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
     /* Split off the TX sync snip */
     gnrc_pktsnip_t *tx_sync = IS_USED(MODULE_GNRC_TX_SYNC)
                             ? gnrc_tx_sync_split(pkt) : NULL;
-#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
-    /* hold in case device was busy to not having to rewrite *all* the link
-     * layer implementations in case `gnrc_netif_pktq` is included */
-    if (gnrc_netif_netdev_legacy_api(netif)) {
-        gnrc_pktbuf_hold(pkt, 1);
-    }
-#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
     int res = netif->ops->send(netif, pkt);
 
     /* For legacy netdevs (no confirm_send) TX is blocking, thus it is always
-     * completed. For new netdevs (with confirm_send), TX is usually async (res == 0).
-     * It is only done if TX failed right away (res < 0) or if the driver signaled
-     * that the transmission already completed (res > 0).
+     * completed. For new netdevs (with confirm_send), TX is async. It is only
+     * done if TX failed right away (res < 0).
      */
-    if (gnrc_netif_netdev_legacy_api(netif) || (res != 0)) {
+    if (gnrc_netif_netdev_legacy_api(netif) || (res < 0)) {
         _tx_done(netif, pkt, tx_sync, res, push_back);
     }
 #if IS_USED(MODULE_NETDEV_NEW_API)
@@ -1964,11 +1916,11 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
         /* new API *and* send() was a success --> block netif and memorize
          * frame to free memory later */
         netif->tx_pkt = pkt;
+    }
 
-        gnrc_pkt_append(pkt, tx_sync);
-        if (IS_USED(MODULE_GNRC_NETIF_PKTQ) && push_back) {
-            netif->flags |= GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE;
-        }
+    gnrc_pkt_append(pkt, tx_sync);
+    if (IS_USED(MODULE_GNRC_NETIF_PKTQ) && push_back) {
+        netif->flags |= GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE;
     }
 #endif
 }

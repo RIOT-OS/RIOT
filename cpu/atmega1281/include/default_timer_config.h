@@ -1,11 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2015 HAW Hamburg
- * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2016 INRIA
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 HAW Hamburg
+ *               2016 Freie Universität Berlin
+ *               2016 INRIA
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_atmega1281
@@ -18,6 +19,9 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Francisco Acosta <francisco.acosta@inria.fr>
  */
+
+#ifndef DEFAULT_TIMER_CONFIG_H
+#define DEFAULT_TIMER_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,4 +50,5 @@ extern "C" {
 }
 #endif
 
+#endif /* DEFAULT_TIMER_CONFIG_H */
 /** @} */

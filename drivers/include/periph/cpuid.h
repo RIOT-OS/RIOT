@@ -6,18 +6,12 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_periph_cpuid CPUID
  * @ingroup     drivers_periph
  * @brief       Low-level CPU ID peripheral driver
  *
  * Provides access the CPU's serial number
- *
- * @note This is *distinct* from what is called CPUID in ARM CPUs (which only
- * covers variation down to silicon revisions, not down to individual instances
- * of a CPU).
  *
  * # (Low-) Power Implications
  *
@@ -32,6 +26,9 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+
+#ifndef PERIPH_CPUID_H
+#define PERIPH_CPUID_H
 
 #include "periph_cpu.h"
 
@@ -61,4 +58,5 @@ void cpuid_get(void *id);
 }
 #endif
 
+#endif /* PERIPH_CPUID_H */
 /** @} */

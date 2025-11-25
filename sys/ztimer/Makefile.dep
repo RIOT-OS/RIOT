@@ -39,7 +39,6 @@ endif
 
 ifneq (,$(filter ztimer_periph_timer,$(USEMODULE)))
   FEATURES_REQUIRED += periph_timer
-  FEATURES_OPTIONAL += periph_timer_query_freqs
 endif
 
 ifneq (,$(filter ztimer_periph_rtc,$(USEMODULE)))

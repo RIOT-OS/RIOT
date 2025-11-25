@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_driver_bme680
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
+
+#ifndef BME680_HAL_H
+#define BME680_HAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,4 +45,5 @@ int8_t bme680_spi_write_hal(uint8_t dev_id, uint8_t reg_addr,
 }
 #endif
 
+#endif /* BME680_HAL_H */
 /** @} */

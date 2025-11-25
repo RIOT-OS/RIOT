@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup drivers_ds1307
  * @brief
@@ -18,6 +16,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef DS1307_INTERNAL_H
+#define DS1307_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,4 +68,5 @@ extern "C" {
 }
 #endif
 
+#endif /* DS1307_INTERNAL_H */
 /** @} */

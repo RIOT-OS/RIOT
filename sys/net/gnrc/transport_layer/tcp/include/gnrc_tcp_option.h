@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     net_gnrc_tcp
  *
@@ -18,6 +16,9 @@
  *
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
+
+#ifndef GNRC_TCP_OPTION_H
+#define GNRC_TCP_OPTION_H
 
 #include <stdint.h>
 #include "assert.h"
@@ -70,4 +71,5 @@ int _gnrc_tcp_option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr);
 }
 #endif
 
+#endif /* GNRC_TCP_OPTION_H */
 /** @} */

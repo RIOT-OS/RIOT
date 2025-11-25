@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2018 Inria
- * SPDX-FileCopyrightText: 2019 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 Inria
+ *               2019 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_common_nrf51
@@ -16,6 +17,9 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef CFG_RTT_DEFAULT_H
+#define CFG_RTT_DEFAULT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,4 +47,5 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
+#endif /* CFG_RTT_DEFAULT_H */
 /** @} */

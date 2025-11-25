@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2020 Koen Zandberg <koen@bergzand.net>
- * SPDX-FileCopyrightText: 2023 Gunar Schorcht <gunar@schorcht.net>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 Koen Zandberg <koen@bergzand.net>
+ *               2023 Gunar Schorcht <gunar@schorcht.net>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_common_gd32v
@@ -16,6 +17,9 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
+
+#ifndef CFG_SPI_DEFAULT_H
+#define CFG_SPI_DEFAULT_H
 
 #include "periph_cpu.h"
 
@@ -102,4 +106,5 @@ static const spi_conf_t spi_config[] = {
 }
 #endif
 
+#endif /* CFG_SPI_DEFAULT_H */
 /** @} */

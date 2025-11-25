@@ -7,8 +7,7 @@
     "files.insertFinalNewline": true,
     "files.associations": {
         "Makefile.*": "makefile",
-        "*.mk": "makefile",
-        "*.sketch": "cpp"
+        "*.mk": "makefile"
     },
     "[shellscript][c][cpp]": {
         "editor.tabSize": 4,
@@ -18,8 +17,4 @@
         "editor.tabSize": 2,
         "editor.insertSpaces": true,
     },
-    "[javascript][typescript]": {
-        "editor.tabSize": 2,
-        "editor.insertSpaces": true
-    }
 }

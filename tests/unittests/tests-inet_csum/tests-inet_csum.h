@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,8 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef TESTS_INET_CSUM_H
+#define TESTS_INET_CSUM_H
 
 #include "embUnit.h"
 
@@ -33,4 +33,5 @@ void tests_inet_csum(void);
 }
 #endif
 
+#endif /* TESTS_INET_CSUM_H */
 /** @} */

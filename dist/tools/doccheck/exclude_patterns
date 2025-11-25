@@ -17,4 +17,3 @@ boards/waveshare-nrf52840-eval-kit/include/board\.h:[0-9]+: warning: Member SDCA
 boards/waveshare-nrf52840-eval-kit/include/periph_conf\.h:[0-9]+: warning: Member UART_[A-Z0-9_]+ \(macro definition\) of file periph_conf\.h is not documented\.
 boards/waveshare-nrf52840-eval-kit/include/periph_conf\.h:[0-9]+: warning: Member [A-Z0-9_]+NUMOF \(macro definition\) of file periph_conf\.h is not documented\.
 boards/waveshare-nrf52840-eval-kit/include/periph_conf\.h:[0-9]+: warning: Member [a-z0-9_]+config\[\] \(variable\) of file periph_conf\.h is not documented\.
-warning: Member XIAO_NRF52840_[A-Z0-9_]+ \(macro definition\) of file board\.h is not documented\.

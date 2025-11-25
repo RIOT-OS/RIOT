@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2022 HAW Hamburg
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2022 HAW Hamburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -23,7 +26,7 @@
 #include "shell.h"
 #include "test_utils/netdev_ieee802154_minimal.h"
 #include "net/netdev/ieee802154_submac.h"
-#include "test_common.h"
+#include "common.h"
 
 static netdev_ieee802154_submac_t mrf24j40_netdev[MRF24J40_NUM];
 

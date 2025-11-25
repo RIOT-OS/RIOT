@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_sx1280
  * @{
@@ -19,6 +17,9 @@
  * @author      Aymeric Brochier <aymeric.brochier@univ-grenoble-alpes.fr>
  *
  */
+
+#ifndef SX1280_PARAMS_H
+#define SX1280_PARAMS_H
 
 #include "board.h"
 #include "sx1280.h"
@@ -81,6 +82,7 @@ extern "C" {
 #define SX1280_PARAM_DIO1                   GPIO_PIN(2, 7) /**< DIO1 */
 #endif
 
+
 /**
  * @brief Default sx1280 parameters
  */
@@ -107,4 +109,5 @@ static const sx1280_params_t sx1280_params[] =
 }
 #endif
 
+#endif /* SX1280_PARAMS_H */
 /** @} */

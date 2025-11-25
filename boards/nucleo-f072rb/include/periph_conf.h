@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015  Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_nucleo-f072rb
@@ -15,6 +16,9 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      José Ignacio Alamos <jialamos@uc.cl>
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 /* HSE available on this board */
 #ifndef CONFIG_BOARD_HAS_HSE
@@ -195,4 +199,5 @@ static const adc_conf_t adc_config[] = {
 }
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

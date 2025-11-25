@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2017 OTA keys S.A.
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 OTA keys S.A.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_stm32f769i-disco
@@ -15,6 +16,9 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Sebastian Meiling <s@mlng.net>
  */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -28,19 +32,15 @@ extern "C" {
  * @{
  */
 #define LED0_PIN_NUM        13
-#define LED0_PORT           GPIO_PORT_J /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_J
 
 #define LED1_PIN_NUM        5
-#define LED1_PORT           GPIO_PORT_J /**< GPIO port of LED 1 */
 #define LED1_PORT_NUM       PORT_J
 
 #define LED2_PIN_NUM        12
-#define LED2_PORT           GPIO_PORT_A /**< GPIO port of LED 2 */
 #define LED2_PORT_NUM       PORT_A
 
 #define LED3_PIN_NUM        4
-#define LED3_PORT           GPIO_PORT_D /**< GPIO port of LED 3 */
 #define LED3_PORT_NUM       PORT_D
 /** @} */
 
@@ -58,4 +58,5 @@ extern "C" {
 
 #include "stm32_leds.h"
 
+#endif /* BOARD_H */
 /** @} */

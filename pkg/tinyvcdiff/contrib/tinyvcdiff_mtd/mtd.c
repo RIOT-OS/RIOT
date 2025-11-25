@@ -99,7 +99,6 @@ static int _write (void *dev, uint8_t *src, size_t offset, size_t len)
     vcdiff_mtd_t *mtd = dev;
 
     assert(offset == mtd->offset);
-    (void)offset;   /* avoid compilation problems with NDEBUG */
 
     DEBUG("_write: 0x%" PRIxSIZE " + %" PRIuSIZE "B\n", mtd->offset, len);
 

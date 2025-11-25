@@ -12,10 +12,11 @@ crate-type = [ "staticlib" ]
 lto = true
 opt-level = "s"
 debug = true
+panic = "abort"
 codegen-units = 1
 
 [dependencies]
-riot-wrappers = { version = "0.9.0", features = [ "set_panic_handler" ] }
+riot-wrappers = { version = "0.8", features = [ "set_panic_handler" ] }
 
 rust_riotmodules = { path = "../rust_riotmodules" }
 

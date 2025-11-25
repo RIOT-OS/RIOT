@@ -9,8 +9,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_sock_ip     Raw IPv4/IPv6 sock API
  * @ingroup     net_sock
@@ -18,7 +16,7 @@
  *
  * How To Use
  * ----------
- * First you need to [include][include-link] a module that implements
+ * First you need to @ref including-modules "include" a module that implements
  * this API in your application's Makefile. For example the implementation for
  * @ref net_gnrc "GNRC" is called `gnrc_sock_ip`.
  *
@@ -60,8 +58,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * Above you see a simple IPv6 server. Don't forget to also
- * [include][include-link]
- * the IPv6 module of your networking
+ * @ref including-modules "include" the IPv6 module of your networking
  * implementation (e.g. `gnrc_ipv6_default` for @ref net_gnrc "GNRC") and at
  * least one network device.
  *
@@ -196,7 +193,7 @@
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * Again: Don't forget to also [include][include-link] the IPv6 module
+ * Again: Don't forget to also @ref including-modules "include" the IPv6 module
  * of your networking implementation (e.g. `gnrc_ipv6_default` for
  * @ref net_gnrc "GNRC") and at least one network device.
  *
@@ -256,8 +253,6 @@
  * Finally, we wait a second before sending out the next "Hello!" with
  * `xtimer_sleep(1)`.
  *
- * [include-link]: https://guide.riot-os.org/advanced_tutorials/creating_application/#including-modules
- *
  * @{
  *
  * @file
@@ -270,6 +265,8 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
+#ifndef NET_SOCK_IP_H
+#define NET_SOCK_IP_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -710,4 +707,5 @@ static inline ssize_t sock_ip_send(sock_ip_t *sock,
 }
 #endif
 
+#endif /* NET_SOCK_IP_H */
 /** @} */

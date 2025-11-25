@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gnrc_netreg  Network protocol registry
  * @ingroup     net_gnrc
@@ -20,6 +18,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef NET_GNRC_NETREG_H
+#define NET_GNRC_NETREG_H
 
 #include <inttypes.h>
 
@@ -435,4 +435,5 @@ int gnrc_netreg_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr);
 }
 #endif
 
+#endif /* NET_GNRC_NETREG_H */
 /** @} */

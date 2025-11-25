@@ -38,10 +38,8 @@ import argparse
 import re
 import codecs
 import platform
-import psutil
 
 from subprocess import Popen, PIPE
-from signal import SIGINT
 
 try:
     serial.Serial
@@ -390,14 +388,6 @@ class SerCmd(cmd.Cmd):
 
         if self.tcp_serial:
             self.ser.close()
-        # When a subprocess has been spawned, we want to send a SIGINT to all
-        # child processes
-        if self.process:
-            parent = psutil.Process(self.ser.pid)
-            children = parent.children(recursive=True)
-            for child in children:
-                os.kill(child.pid, SIGINT)
-            self.ser.send_signal(SIGINT)
         return True
 
     def do_PYTERM_save(self, line):

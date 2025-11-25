@@ -21,9 +21,7 @@
  */
 
 #include "assert.h"
-#include "compiler_hints.h"
 #include "irq.h"
-#include "modules.h"
 #include "ztimer/periph_timer.h"
 
 #ifndef ZTIMER_PERIPH_TIMER_OFFSET
@@ -106,16 +104,12 @@ static const ztimer_ops_t _ztimer_periph_timer_ops = {
 #endif
 };
 
-uint32_t ztimer_periph_timer_init(ztimer_periph_timer_t *clock, tim_t dev,
-                                  uint32_t freq, uint32_t max_val)
+void ztimer_periph_timer_init(ztimer_periph_timer_t *clock, tim_t dev,
+                              uint32_t freq, uint32_t max_val)
 {
     clock->dev = dev;
     clock->super.ops = &_ztimer_periph_timer_ops;
     clock->super.max_value = max_val;
-
-    if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
-        freq = timer_get_closest_freq(dev, freq);
-    }
     int ret = timer_init(dev, freq, _ztimer_periph_timer_callback, clock);
 
     (void)ret;
@@ -133,6 +127,4 @@ uint32_t ztimer_periph_timer_init(ztimer_periph_timer_t *clock, tim_t dev,
      * the first ztimer_acquire() call starts the peripheral */
     timer_stop(dev);
 #endif
-
-    return freq;
 }

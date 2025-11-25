@@ -116,10 +116,6 @@ int gnrc_lorawan_parse_dl(gnrc_lorawan_t *mac, uint8_t *buf, size_t len,
         pkt->fopts.iol_base = buf;
         pkt->fopts.iol_len = fopts_length;
         buf += fopts_length;
-        if (buf >= p_mic) {
-            DEBUG("gnrc_lorawan: packet with fopts but no payload. Drop\n");
-            return -1;
-        }
     }
 
     if (buf < p_mic) {
@@ -168,11 +164,6 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
                                         size_t size)
 {
     struct parsed_packet _pkt;
-
-    if (size < sizeof(lorawan_hdr_t) + MIC_SIZE) {
-        DEBUG("gnrc_lorawan: invalid psdu size\n");
-        return;
-    }
 
     /* NOTE: MIC is in pkt */
     if (!gnrc_lorawan_mic_is_valid(psdu, size, mac->ctx.snwksintkey,

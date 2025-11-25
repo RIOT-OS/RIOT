@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2023 Gunar Schorcht <gunar@schorcht.net>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2023 Gunar Schorcht <gunar@schorcht.net>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_common_gd32v
@@ -14,6 +15,9 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
+
+#ifndef CFG_USBDEV_DEFAULT_H
+#define CFG_USBDEV_DEFAULT_H
 
 #include "vendor/usbdev_gd32v.h"
 #include "usbdev_synopsys_dwc2.h"
@@ -55,4 +59,5 @@ static const dwc2_usb_otg_fshs_config_t dwc2_usb_otg_fshs_config[] = {
 }
 #endif
 
+#endif /* CFG_USBDEV_DEFAULT_H */
 /** @} */

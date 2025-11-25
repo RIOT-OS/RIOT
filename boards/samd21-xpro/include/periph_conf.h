@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2017 Travis Griggs <travisgriggs@gmail.com>
- * SPDX-FileCopyrightText: 2017 Dan Evans <photonthunder@gmail.com>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 Travis Griggs <travisgriggs@gmail.com>
+ * Copyright (C) 2017 Dan Evans <photonthunder@gmail.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_samd21-xpro
@@ -17,6 +18,9 @@
  * @author      Travis Griggs <travisgriggs@gmail.com>
  * @author      Dan Evans <photonthunder@gmail.com>
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include <stdint.h>
 
@@ -390,4 +394,5 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
 }
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

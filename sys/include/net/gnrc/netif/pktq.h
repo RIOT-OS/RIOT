@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gnrc_netif_pktq Send queue for @ref net_gnrc_netif
  * @ingroup     net_gnrc_netif
@@ -19,6 +17,8 @@
  *
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef NET_GNRC_NETIF_PKTQ_H
+#define NET_GNRC_NETIF_PKTQ_H
 
 #include <assert.h>
 #include <stdbool.h>
@@ -141,4 +141,5 @@ static inline bool gnrc_netif_pktq_empty(gnrc_netif_t *netif)
 }
 #endif
 
+#endif /* NET_GNRC_NETIF_PKTQ_H */
 /** @} */

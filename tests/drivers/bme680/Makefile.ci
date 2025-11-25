@@ -1,4 +1,5 @@
 BOARD_INSUFFICIENT_MEMORY := \
     atmega8 \
     chronos \
+    nucleo-f031k6 \
     #

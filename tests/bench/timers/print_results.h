@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2018 Eistec AB
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 Eistec AB
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     tests
@@ -14,6 +15,9 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
+
+#ifndef PRINT_RESULTS_H
+#define PRINT_RESULTS_H
 
 #include "matstat.h"
 
@@ -55,3 +59,5 @@ void print_results(const result_presentation_t *pres, const matstat_state_t *ref
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PRINT_RESULTS_H */

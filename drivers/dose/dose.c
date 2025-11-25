@@ -530,13 +530,6 @@ static inline void _send_done(dose_t *ctx, bool collision)
 #endif
 }
 
-static int _confirm_send(netdev_t *dev, void *info)
-{
-    (void)dev;
-    (void)info;
-    return -EOPNOTSUPP;
-}
-
 static int _send(netdev_t *dev, const iolist_t *iolist)
 {
     dose_t *ctx = container_of(dev, dose_t, netdev);
@@ -600,6 +593,9 @@ send:
 
     _send_done(ctx, false);
 
+    /* We probably sent the whole packet?! */
+    dev->event_callback(dev, NETDEV_EVENT_TX_COMPLETE);
+
     /* Get out of the SEND state */
     state(ctx, DOSE_SIGNAL_END);
 
@@ -609,6 +605,7 @@ collision:
     _send_done(ctx, true);
     DEBUG("dose _send(): collision!\n");
     if (--retries < 0) {
+        dev->event_callback(dev, NETDEV_EVENT_TX_MEDIUM_BUSY);
         return -EBUSY;
     }
 
@@ -679,10 +676,7 @@ static void _poweroff(dose_t *ctx, dose_state_t sleep_state)
         return;
     }
 
-    /* allow powering off without a state transition */
-    if (ctx->state != DOSE_STATE_IDLE) {
-        wait_for_state(ctx, DOSE_STATE_IDLE);
-    }
+    wait_for_state(ctx, DOSE_STATE_IDLE);
 
     if (gpio_is_valid(ctx->standby_pin)) {
         gpio_set(ctx->standby_pin);
@@ -771,8 +765,7 @@ static const netdev_driver_t netdev_driver_dose = {
     .init = _init,
     .isr = _isr,
     .get = _get,
-    .set = _set,
-    .confirm_send = _confirm_send,
+    .set = _set
 };
 
 void dose_setup(dose_t *ctx, const dose_params_t *params, uint8_t index)

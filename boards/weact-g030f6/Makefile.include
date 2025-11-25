@@ -1,13 +1,18 @@
 # we use shared STM32 configuration snippets
 INCLUDES += -I$(RIOTBASE)/boards/common/stm32/include
 
-# setup programmer
-PROGRAMMERS_SUPPORTED += openocd
-PROGRAMMER ?= openocd
-OPENOCD_DEBUG_ADAPTER ?= stlink
-include $(RIOTMAKE)/tools/openocd.inc.mk
-
-# setup serial terminal
+# define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
+
+# setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
+
+PROGRAMMER ?= openocd
+OPENOCD_DEBUG_ADAPTER ?= stlink
+
+# openocd programmer is supported
+PROGRAMMERS_SUPPORTED += openocd
+
+# this board uses openocd
+include $(RIOTMAKE)/tools/openocd.inc.mk

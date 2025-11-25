@@ -8,7 +8,7 @@ SIGN_BINFILE = $(BINDIR)/signed-$(APPLICATION).bin
 MCUBOOT_KEYFILE ?= $(BINDIR)/key.pem
 MCUBOOT_BIN ?= $(BINDIR)/mcuboot.bin
 MCUBOOT_BIN_URL ?= http://download.riot-os.org/mynewt.mcuboot.bin
-MCUBOOT_BIN_SHA512 ?=
+MCUBOOT_BIN_MD5 ?= 0c71a0589bd3709fc2d90f07a0035ce7
 
 export IMAGE_HDR_SIZE ?= 512
 
@@ -37,7 +37,7 @@ mcuboot: mcuboot-create-key link
 	@$(COLOR_ECHO)
 
 $(MCUBOOT_BIN):
-	$(Q)$(DLCACHE) $@ $(MCUBOOT_BIN_URL) $(MCUBOOT_BIN_SHA512)
+	$(Q)$(DLCACHE) $(MCUBOOT_BIN_URL) $(MCUBOOT_BIN_MD5) $@
 
 .PHONY: mcuboot-flash-bootloader mcuboot-flash
 

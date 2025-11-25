@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     core_macros
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
+
+#ifndef MACROS_XTSTR_H
+#define MACROS_XTSTR_H
 
 #include <stddef.h>
 
@@ -40,4 +41,5 @@ extern "C" {
 }
 #endif
 
+#endif /* MACROS_XTSTR_H */
 /** @} */

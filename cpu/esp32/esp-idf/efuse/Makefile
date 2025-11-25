@@ -11,9 +11,9 @@ ESP32_SDK_SRC = \
   #
 
 ifneq (,$(filter esp32,$(CPU_FAM)))
-  ESP32_SDK_SRC += components/efuse/src/efuse_controller/keys/without_key_purposes/three_key_blocks/esp_efuse_api_key.c
+  ESP32_SDK_SRC += components/efuse/src/esp_efuse_api_key_esp32.c
 else
-  ESP32_SDK_SRC += components/efuse/src/efuse_controller/keys/with_key_purposes/esp_efuse_api_key.c
+  ESP32_SDK_SRC += components/efuse/src/esp_efuse_api_key_esp32xx.c
 endif
 
 # additional include pathes required by this module

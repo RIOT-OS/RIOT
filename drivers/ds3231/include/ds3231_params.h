@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_ds3231
  * @{
@@ -17,6 +15,8 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+#ifndef DS3231_PARAMS_H
+#define DS3231_PARAMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,4 +60,5 @@ static const ds3231_params_t ds3231_params[] =
 }
 #endif
 
+#endif /* DS3231_PARAMS_H */
 /** @} */

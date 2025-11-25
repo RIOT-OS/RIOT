@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     core_util
  * @{
@@ -21,6 +19,9 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Víctor Ariño <victor.arino@zii.aero>
  */
+
+#ifndef LIST_H
+#define LIST_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -98,4 +99,5 @@ static inline list_node_t *list_remove(list_node_t *list, list_node_t *node)
 }
 #endif
 
+#endif /* LIST_H */
 /** @} */

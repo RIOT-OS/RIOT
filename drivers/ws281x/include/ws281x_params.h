@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_ws281x
  *
@@ -17,6 +15,9 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
+
+#ifndef WS281X_PARAMS_H
+#define WS281X_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -125,4 +126,5 @@ static const saul_reg_info_t ws281x_saul_info[] =
 }
 #endif
 
+#endif /* WS281X_PARAMS_H */
 /** @} */

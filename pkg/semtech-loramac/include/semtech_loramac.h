@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup         pkg_semtech-loramac
  * @brief           Public API and definitions of the Semtech LoRaMAC
@@ -17,6 +15,9 @@
  *
  * @author          Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef SEMTECH_LORAMAC_H
+#define SEMTECH_LORAMAC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -566,4 +567,5 @@ void semtech_loramac_erase_config(void);
 }
 #endif
 
+#endif /* SEMTECH_LORAMAC_H */
 /** @} */

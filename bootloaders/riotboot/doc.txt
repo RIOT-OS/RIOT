@@ -78,7 +78,7 @@ be booted.
 The image can also be flashed using `riotboot/flash` which also flashes
 the bootloader. Below a concrete example:
 
-`BOARD=samr21-xpro FEATURES_REQUIRED+=riotboot APP_VER=$(date +%s) make -C examples/basic/hello-world riotboot/flash-combined-slot0`
+`BOARD=samr21-xpro FEATURES_REQUIRED+=riotboot APP_VER=$(date +%s) make -C examples/hello-world riotboot/flash-combined-slot0`
 
 The above compiles a hello world binary and a bootloader, then flashes the
 combined binary comprising of: bootloader + slot 0 header + slot 0 image.

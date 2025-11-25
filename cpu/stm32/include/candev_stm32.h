@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2016 OTA keys S.A.
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2016 OTA keys S.A.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_stm32
@@ -26,6 +27,9 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @}
  */
+
+#ifndef CANDEV_STM32_H
+#define CANDEV_STM32_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -195,3 +199,5 @@ void candev_stm32_set_pins(can_t *dev, gpio_t tx_pin, gpio_t rx_pin);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* CANDEV_STM32_H */

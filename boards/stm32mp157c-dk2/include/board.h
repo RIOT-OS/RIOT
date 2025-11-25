@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2020 Savoir-faire Linux
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 Savoir-faire Linux
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_stm32mp157c-dk2
@@ -14,6 +15,9 @@
  *
  * @author      Gilles DOFFE <gilles.doffe@savoirfairelinux.com>
  */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -26,4 +30,5 @@ extern "C" {
 }
 #endif
 
+#endif /* BOARD_H */
 /** @} */

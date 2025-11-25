@@ -5,9 +5,6 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-
-#pragma once
-
 /**
  * @defgroup    sys_hashes_pbkdf2 PBKDF2
  * @ingroup     sys_hashes
@@ -21,6 +18,9 @@
  *
  * @}
  */
+
+#ifndef HASHES_PBKDF2_H
+#define HASHES_PBKDF2_H
 
 #include "hashes/sha256.h"
 
@@ -55,3 +55,5 @@ void pbkdf2_sha256(const void *password, size_t password_len,
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* HASHES_PBKDF2_H */

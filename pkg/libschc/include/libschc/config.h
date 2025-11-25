@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    pkg_libschc_config libSCHC compile-time configuration
  * @ingroup     pkg_libschc
@@ -20,6 +18,8 @@
  *
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef LIBSCHC_CONFIG_H
+#define LIBSCHC_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,4 +68,5 @@ extern "C" {
 }
 #endif
 
+#endif /* LIBSCHC_CONFIG_H */
 /** @} */

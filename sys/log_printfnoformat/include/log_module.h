@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_log_printfnoformat log_printfnoformat: puts log module
  * @ingroup     sys
@@ -22,6 +20,9 @@
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+
+#ifndef LOG_MODULE_H
+#define LOG_MODULE_H
 
 #include <stdio.h>
 
@@ -47,3 +48,4 @@ static inline void log_write(unsigned level, const char *format, ...) {
 }
 #endif
 /**@}*/
+#endif /* LOG_MODULE_H */

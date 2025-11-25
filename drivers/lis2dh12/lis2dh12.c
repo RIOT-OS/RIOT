@@ -437,7 +437,7 @@ static uint32_t _merge_int_flags(const lis2dh12_t *dev, uint8_t events)
                               ((uint32_t)LIS2DH12_INT_SRC_IA <<  8) | \
                               ((uint32_t)LIS2DH12_INT_SRC_IA << 16))
 
-int32_t lis2dh12_wait_event(const lis2dh12_t *dev, uint8_t line, bool stale_events)
+int lis2dh12_wait_event(const lis2dh12_t *dev, uint8_t line, bool stale_events)
 {
     uint32_t int_src;
     uint8_t events = 0;

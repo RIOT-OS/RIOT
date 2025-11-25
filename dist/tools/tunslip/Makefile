@@ -12,6 +12,4 @@ uninstall:
 clean:
 	rm -f $(BIN)
 
-distclean: clean
-
 CFLAGS += -Wall -Wextra -pedantic -std=c99

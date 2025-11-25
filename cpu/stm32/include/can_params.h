@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2016 OTA keys S.A.
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2016 OTA keys S.A.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @ingroup     candev_stm32
@@ -16,6 +17,9 @@
  * @}
  */
 
+#ifndef CAN_PARAMS_H
+#define CAN_PARAMS_H
+
 #include "can/device.h"
 #include "periph/can.h"
 
@@ -26,15 +30,7 @@ extern "C" {
 /** Default STM32 CAN devices config */
 static const can_conf_t candev_conf[] = {
     {
-#if defined(CPU_FAM_STM32G4)
-        .can = FDCAN1,
-        .rcc_mask = RCC_APB1ENR1_FDCANEN,
-        .rx_pin = GPIO_PIN(PORT_A, 11),
-        .tx_pin = GPIO_PIN(PORT_A, 12),
-        .af = GPIO_AF9,
-        .it0_irqn = FDCAN1_IT0_IRQn,
-        .it1_irqn = FDCAN1_IT1_IRQn,
-#elif defined(CPU_FAM_STM32F0)
+#if defined(CPU_FAM_STM32F0)
         .can = CAN,
         .rcc_mask = RCC_APB1ENR_CANEN,
         .rx_pin = GPIO_PIN(PORT_A, 11),
@@ -58,16 +54,9 @@ static const can_conf_t candev_conf[] = {
         .rx_pin = GPIO_PIN(PORT_A, 11),
         .tx_pin = GPIO_PIN(PORT_A, 12),
 #elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F4)
-
-#if defined(CPU_MODEL_STM32L432KC)
-        .rx_pin = GPIO_PIN(PORT_A, 11),
-        .tx_pin = GPIO_PIN(PORT_A, 12),
-        .af = GPIO_AF9,
-#else
         .rx_pin = GPIO_PIN(PORT_B, 8),
         .tx_pin = GPIO_PIN(PORT_B, 9),
         .af = GPIO_AF9,
-#endif
 #else
         .rx_pin = GPIO_PIN(PORT_D, 0),
         .tx_pin = GPIO_PIN(PORT_D, 1),
@@ -158,3 +147,5 @@ static const candev_params_t candev_params[] = {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* CAN_PARAMS_H */

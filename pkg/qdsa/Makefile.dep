@@ -1,0 +1,20 @@
+ifneq (,$(filter cortex-m23 cortex-m0%,$(CPU_CORE)))
+  USEMODULE += qdsa_asm
+endif
+
+ifneq (,$(filter arch_avr8,$(FEATURES_USED)))
+  USEMODULE += qdsa_asm
+endif
+
+ifeq (,$(filter qdsa_impl_%,$(USEMODULE)))
+  ifneq (,$(filter cortex-m23 cortex-m0%,$(CPU_CORE)))
+    USEMODULE += qdsa_impl_arm
+  else ifneq (,$(filter arch_avr8,$(FEATURES_USED)))
+    USEMODULE += qdsa_impl_avr
+  else
+    USEMODULE += qdsa_impl_cref
+  endif
+endif
+
+# qDsa is not 16 bit compatible
+FEATURES_BLACKLIST += arch_16bit

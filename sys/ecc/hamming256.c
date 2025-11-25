@@ -197,17 +197,15 @@ static void compute256(const uint8_t *data, uint8_t *code, uint8_t padding)
 }
 
 /**
- * @brief   Verifies and corrects a 256-bytes block of data using the given
- *          22-bits hamming code.
+ *  @brief Verifies and corrects a 256-bytes block of data using the given 22-bits
+ *  hamming code.
  *
- * @param   pucData         Data buffer to check.
- * @param   pucOriginalCode Hamming code to use for verifying the data.
- * @param   padding         Amount of zeroes to be appended to the data such
- *                          that it sizes equals 256 bytes
+ *  @param data  Data buffer to check.
+ *  @param originalCode  Hamming code to use for verifying the data.
+ *  @param padding Amount of zeroes to be appended to the data such that it sizes
+ *                 equals 256 bytes
  *
- * @retval  0               Success
- * @retval  !=0             Failure (return value is a HAMMING_ERROR code
- *                          indicating the cause)
+ *  @return 0 if there is no error, otherwise returns a HAMMING_ERROR code.
  */
 uint8_t verify256( uint8_t *pucData, const uint8_t *pucOriginalCode, uint8_t padding )
 {

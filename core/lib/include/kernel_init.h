@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     core_internal
  * @{
@@ -19,6 +17,9 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+
+#ifndef KERNEL_INIT_H
+#define KERNEL_INIT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,4 +69,5 @@ static inline void early_init(void) {}
 }
 #endif
 
+#endif /* KERNEL_INIT_H */
 /** @} */

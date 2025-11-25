@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_shtcx
  *
@@ -19,6 +17,9 @@
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
+
+#ifndef SHTCX_PARAMS_H
+#define SHTCX_PARAMS_H
 
 #include "board.h"
 #include "shtcx.h"
@@ -70,4 +71,5 @@ static const saul_reg_info_t shtcx_saul_info[] =
 }
 #endif
 
+#endif /* SHTCX_PARAMS_H */
 /** @} */

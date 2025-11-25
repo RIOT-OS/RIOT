@@ -1,11 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2019 Inria
- * SPDX-FileCopyrightText: 2019 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2019 Kaspar Schleiser <kaspar@schleiser.de>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 Inria
+ *               2019 Freie Universität Berlin
+ *               2019 Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_pyboard
@@ -16,6 +17,9 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <stdint.h>
 
@@ -30,7 +34,6 @@ extern "C" {
  * @{
  */
 #define LED0_PIN_NUM        4
-#define LED0_PORT           GPIO_PORT_B /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_B
 /** @} */
 
@@ -48,4 +51,5 @@ extern "C" {
 
 #include "stm32_leds.h"
 
+#endif /* BOARD_H */
 /** @} */

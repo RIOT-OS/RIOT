@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_mtd_emulated MTD wrapper for emulated MTD devices
  * @ingroup     drivers_mtd
@@ -18,6 +16,8 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
+#ifndef MTD_EMULATED_H
+#define MTD_EMULATED_H
 
 #include <stdbool.h>
 
@@ -63,7 +63,7 @@ extern "C" {
         .init_done = false,                             \
     };                                                  \
                                                         \
-    XFA_CONST(mtd_dev_t, mtd_dev_xfa, 99) CONCAT(*mtd_emulated, n) = (mtd_dev_t *)&mtd_emulated_dev ## n
+    XFA_CONST(mtd_dev_xfa, 99) mtd_dev_t CONCAT(*mtd_emulated, n) = (mtd_dev_t *)&mtd_emulated_dev ## n
 
 #if MODULE_VFS_AUTO_MOUNT || DOXYGEN
 /**
@@ -104,4 +104,5 @@ extern const mtd_desc_t _mtd_emulated_driver;
 }
 #endif
 
+#endif /* MTD_EMULATED_H */
 /** @} */

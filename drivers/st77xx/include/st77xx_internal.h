@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_st77xx
  * @{
@@ -22,6 +20,9 @@
  * @}
  */
 
+#ifndef ST77XX_INTERNAL_H
+#define ST77XX_INTERNAL_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,3 +32,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* ST77XX_INTERNAL_H */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_ucglib
  * @{
@@ -20,6 +18,9 @@
  *
  * @}
  */
+
+#ifndef UCG_RIOTOS_H
+#define UCG_RIOTOS_H
 
 #include "ucg.h"
 
@@ -60,3 +61,5 @@ ucg_int_t ucg_dev_dummy_riotos(ucg_t *ucg, ucg_int_t msg, void *data);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* UCG_RIOTOS_H */

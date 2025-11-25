@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_tmp00x TMP006/TMP007 Infrared Thermopile Sensor
  * @ingroup     drivers_sensors
@@ -78,6 +76,9 @@
  * @author      Sebastian Meiling <s@mlng.net>
  * @author      Jannes Volkens <jannes.volkens@haw-hamburg.de>
  */
+
+#ifndef TMP00X_H
+#define TMP00X_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -166,6 +167,7 @@ extern "C"
 #define TMP00X_CONFIG_CR_AS16      (0x04)   /**< Conversion Time 4s, AVG Samples: 16 */
 #define TMP00X_CONFIG_CR_DEF       TMP00X_CONFIG_CR_AS4 /**< Default for Testing */
 /** @} */
+
 
 /**
  * @name    Constants for TMP00X calibration
@@ -296,4 +298,5 @@ int tmp00x_read_temperature(const tmp00x_t *dev, int16_t *ta, int16_t *to);
 }
 #endif
 
+#endif /* TMP00X_H */
 /** @} */

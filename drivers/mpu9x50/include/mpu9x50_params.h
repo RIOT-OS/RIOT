@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_mpu9x50
  * @{
@@ -19,6 +17,9 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Jannes Volkens <jannes.volkens@haw-hamburg.de>
  */
+
+#ifndef MPU9X50_PARAMS_H
+#define MPU9X50_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -76,4 +77,5 @@ static const saul_reg_info_t mpu9x50_saul_info[] =
 }
 #endif
 
+#endif /* MPU9X50_PARAMS_H */
 /** @} */

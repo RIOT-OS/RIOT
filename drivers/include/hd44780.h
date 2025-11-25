@@ -6,15 +6,12 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_hd44780 HD44780 LCD driver
  * @ingroup     drivers_display
  * @brief       Driver for the Hitachi HD44780 LCD driver
  *
- * @note        The driver currently supports both direct addressing
- *              and I2C if the [PCF857X module](@ref drivers_pcf857x) is used
+ * @note        The driver currently supports direct addressing, no I2C
  *
  * @{
  *
@@ -23,6 +20,8 @@
  *
  * @author      Sebastian Meiling <s@mlng.net>
  */
+#ifndef HD44780_H
+#define HD44780_H
 
 #include <stdint.h>
 
@@ -210,4 +209,5 @@ void hd44780_print(const hd44780_t *dev, const char *data);
 }
 #endif
 
+#endif /* HD44780_H */
 /** @} */

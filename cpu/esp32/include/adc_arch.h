@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2022 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2022 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_esp32
@@ -23,6 +24,9 @@
  * @}
  */
 
+#ifndef ADC_ARCH_H
+#define ADC_ARCH_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,7 +35,7 @@ extern "C" {
 #include "periph/gpio.h"
 
 #include "driver/adc.h"
-#include "driver/adc_types_legacy.h"
+#include "hal/adc_types.h"
 
 /**
  * @brief  Attenuations that can be set for ADC lines
@@ -44,26 +48,16 @@ typedef enum {
     ADC_ATTENUATION_0_DB = ADC_ATTEN_DB_0,    /**< full-range is about 1.1 V (Vref) */
     ADC_ATTENUATION_3_DB = ADC_ATTEN_DB_2_5,  /**< full-range is about 1.5 V */
     ADC_ATTENUATION_6_DB = ADC_ATTEN_DB_6,    /**< full-range is about 2.2 V */
-    ADC_ATTENUATION_12_DB = ADC_ATTEN_DB_12,  /**< full-range is about 3.3 V */
+    ADC_ATTENUATION_11_DB = ADC_ATTEN_DB_11,  /**< full-range is about 3.3 V */
 } adc_attenuation_t;
 
 /**
- * @brief   Attenuation of 11 dB is depcricated and has to be mapped
- *
- * The define ensures the compatibility with older versions.
- *
- * @deprecated `ADC_ATTENUATION_11_DB` is deprecated, use
- *             `ADC_ATTENUATION_12_DB` instead.
- */
-#define ADC_ATTENUATION_11_DB   ADC_ATTENUATION_12_DB
-
-/**
- * @brief   Set the attenuation for the ADC line. Default attenuation is 12 dB.
+ * @brief   Set the attenuation for the ADC line. Default attenuation is 11 dB.
  *
  * For each ADC line, an attenuation of the input signal can be defined
  * separately. This results in different full ranges of the measurable voltage
- * at the input. The attenuation can be set to 0 dB, 3 dB, 6 dB and 12 dB,
- * with 12 dB being the standard attenuation. Since an ADC input is measured
+ * at the input. The attenuation can be set to 0 dB, 3 dB, 6 dB and 11 dB,
+ * with 11 dB being the standard attenuation. Since an ADC input is measured
  * against a reference voltage Vref of 1.1 V, approximately the following
  * measurement ranges are given when using a corresponding attenuation:
  *
@@ -71,71 +65,41 @@ typedef enum {
  *
  * Attenuation     | Voltage Range     | Symbol
  * ----------------|-------------------|----------------------
- *  0 dB           | 0 ... 1.1V (Vref) | `ADC_ATTEN_DB_0`
- *  2.5 dB         | 0 ... 1.5V        | `ADC_ATTEN_DB_2_5`
- *  6 dB           | 0 ... 2.2V        | `ADC_ATTEN_DB_6`
- * 12 dB (default) | 0 ... 3.3V        | `ADC_ATTEN_DB_12`
+ *  0 dB           | 0 ... 1.1V (Vref) | ADC_ATTEN_DB_0
+ *  2.5 dB         | 0 ... 1.5V        | ADC_ATTEN_DB_2_5
+ *  6 dB           | 0 ... 2.2V        | ADC_ATTEN_DB_6
+ * 11 dB (default) | 0 ... 3.3V        | ADC_ATTEN_DB_11
  *
  * </center>
  *
- * @pre   #adc_init must have been executed for the line before.
- * @note  The function has to be executed before @ref adc_sample if required.
- *        The configured attenuation is then used for all subsequent samples.
+ * @note: The reference voltage Vref can vary from ADC unit to ADC unit in
+ * the range of 1.0V and 1.2V. The Vref of a unit can be routed with
+ * function *adc_vref_to_gpio* to a GPIO pin.
  *
- * @param [in] line   ADC line for which the attenuation is set
- * @param [in] atten  Attenuation, see type definition of @ref adc_attenuation_t
- * @retval  0    on success
- * @retval  -1   on error
+ * @param   line    ADC line for which the attenuation is set
+ * @param   atten   Attenuation, see type definition of *adc_attenuation_t
+ * @return  0       on success
+ * @return  -1      on error
  */
 int adc_set_attenuation(adc_t line, adc_atten_t atten);
 
 /**
- * @brief   Get the voltage for a given sample value
+ * @brief   Output reference voltage of a ADC line to GPIO n
  *
- * The function converts the given sample value as read from the channel
- * according to the attenuation set with @ref adc_set_attenuation and the
- * resolution used to read the sample with @ref adc_sample. It uses a predefined
- * calibration scheme and the calibration parameters that have been burned
- * into the eFuses of the ESP32x SoC. If the calibration parameters have not
- * been burned into the eFuses and the initialization of the calibration
- * fails, a linear conversion according to the predefined voltage
- * ranges is used as a fallback.
- *
- * @note In the case that the initialization of the calibration fails,
- *       the function returns `-EINVAL` and the value in parameter `voltage`
- *       is expected to be inaccurate.
- * @note For ESP32, the valid voltages start at around 140 mV.
- *
- * @param [in]  line    ADC line
- * @param [in]  sample  sample sample as read by adc_read
- * @param [out] voltage voltage in mV
- * @retval 0 on success
- * @retval -EINVAL if the initialization of the calibration failed
- */
-int adc_raw_to_voltage(adc_t line, int sample, int *voltage);
-
-#if !DOXYGEN
-/**
- * @brief   Output reference voltage of a ADC line to a GPIO pin
- *
- * The Vref of the ADC unit for the given ADC line is routed to a GPIO pin.
+ * The Vref of the ADC unit of the given ADC line is routed to a GPIO pin n.
  * This allows to measure the Vref used by the ADC unit to adjusted the
  * results of the conversions accordingly.
  *
- * @warning The function is not supported any longer, use
- *          @ref adc_raw_to_voltage to get the voltage for a sample value.
- *
  * @note
  * - The given GPIO must be a valid ADC channel of ADC2 unit.
- * - For ESP32, only the internal reference voltage of ADC2 is given.
+ * - For ESP32 and ESP32C3, the given ADC line has to be a channel of ADC2 unit.
  *
- * @param [in] line    ADC line for which Vref of its ADC unit is routed to the GPIO
- * @param [in] gpio    GPIO to which Vref is routed (ADC2 channel GPIOs only)
+ * @param   line    ADC line for which Vref of its ADC unit is routed to the GPIO
+ * @param   gpio    GPIO to which Vref is routed (ADC2 channel GPIOs only)
  *
- * @retval  0       on success
- * @retval  -1      on error
+ * @return  0       on success
+ * @return  -1      on error
  */
-__attribute__((__deprecated__))
 int adc_line_vref_to_gpio(adc_t line, gpio_t gpio);
 
 #if defined(CPU_FAM_ESP32)
@@ -144,20 +108,17 @@ int adc_line_vref_to_gpio(adc_t line, gpio_t gpio);
  *
  * This function is deprecated and will be removed in future versions.
  *
- * @warning The function is not supported any longer, use
- *          @ref adc_raw_to_voltage to get the voltage for a sample value.
- *
- * @retval  0 on success
- * @retval  -1 on invalid ADC line
+ * @return  0 on success
+ * @return  -1 on invalid ADC line
  */
-__attribute__((__deprecated__))
 static inline int adc_vref_to_gpio25(void)
 {
     return adc_vref_to_gpio(ADC_UNIT_2, GPIO25);
 }
 #endif
-#endif /* !DOXYGEN */
 
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* ADC_ARCH_H */

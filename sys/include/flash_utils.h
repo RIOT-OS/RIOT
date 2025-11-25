@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_flash_utils Utility functions, macros, and types for
  *                              read-only memory
@@ -45,6 +43,9 @@
  * @brief       Utility functions, macros, and types for read-only memory
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
+
+#ifndef FLASH_UTILS_H
+#define FLASH_UTILS_H
 
 #include <stdio.h>
 #include <string.h>
@@ -250,4 +251,5 @@ static inline void flash_print_str(FLASH_ATTR const char *flash)
 }
 #endif
 
+#endif /* FLASH_UTILS_H */
 /** @} */

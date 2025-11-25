@@ -27,41 +27,41 @@
 const cc110x_patable_t cc110x_patable_433mhz = {
     .data =  {
         /* Settings for 433 MHz */
-        0x12,   /**< -30 dBm */
-        0x0E,   /**< -20 dBm */
-        0x1D,   /**< -15 dBm */
-        0x34,   /**< -10 dBm */
-        0x60,   /**<   0 dBm */
-        0x84,   /**<   5 dBm */
-        0xC8,   /**<   7 dBm */
-        0xC0,   /**<  10 dBm */
+        0x12,   /*< -30 dBm */
+        0x0E,   /*< -20 dBm */
+        0x1D,   /*< -15 dBm */
+        0x34,   /*< -10 dBm */
+        0x60,   /*<   0 dBm */
+        0x84,   /*<   5 dBm */
+        0xC8,   /*<   7 dBm */
+        0xC0,   /*<  10 dBm */
     }
 };
 
 const cc110x_patable_t cc110x_patable_868mhz = {
     .data =  {
         /* Settings for 868 MHz */
-        0x03,   /**< -30 dBm */
-        0x0F,   /**< -20 dBm */
-        0x1E,   /**< -15 dBm */
-        0x27,   /**< -10 dBm */
-        0x50,   /**<   0 dBm */
-        0x81,   /**<   5 dBm */
-        0xCB,   /**<   7 dBm */
-        0xC2,   /**<  10 dBm */
+        0x03,   /*< -30 dBm */
+        0x0F,   /*< -20 dBm */
+        0x1E,   /*< -15 dBm */
+        0x27,   /*< -10 dBm */
+        0x50,   /*<   0 dBm */
+        0x81,   /*<   5 dBm */
+        0xCB,   /*<   7 dBm */
+        0xC2,   /*<  10 dBm */
     }
 };
 
 const cc110x_patable_t cc110x_patable_915mhz = {
     .data =  {
         /* Settings for 915 MHz */
-        0x03,   /**< -30 dBm */
-        0x0E,   /**< -20 dBm */
-        0x1E,   /**< -15 dBm */
-        0x27,   /**< -10 dBm */
-        0x8E,   /**<   0 dBm */
-        0xCD,   /**<   5 dBm */
-        0xC7,   /**<   7 dBm */
-        0xC0,   /**<  10 dBm */
+        0x03,   /*< -30 dBm */
+        0x0E,   /*< -20 dBm */
+        0x1E,   /*< -15 dBm */
+        0x27,   /*< -10 dBm */
+        0x8E,   /*<   0 dBm */
+        0xCD,   /*<   5 dBm */
+        0xC7,   /*<   7 dBm */
+        0xC0,   /*<  10 dBm */
     }
 };

@@ -1,6 +1,5 @@
-# using -isystem to avoid warnings about these headers
-INCLUDES += -isystem$(PKGDIRBASE)/libcose/include \
-            -isystem$(RIOTBASE)/pkg/libcose/include \
+INCLUDES += -I$(PKGDIRBASE)/libcose/include \
+            -I$(RIOTBASE)/pkg/libcose/include \
             #
 
 CFLAGS += -DUSE_CBOR_CONTEXT

@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2019 Lokotius Filzer
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019  Lokotius Filzer
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_bastwan
@@ -14,6 +15,9 @@
  *
  * @author      Lokotius Filzer <h-filzer@pixelsalat.de>
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 #include "macros/units.h"
@@ -42,7 +46,7 @@ static const tc32_conf_t timer_config[] = {
         .dev = TC0,
         .irq = TC0_IRQn,
         .mclk = &MCLK->APBCMASK.reg,
-        .mclk_mask = MCLK_APBCMASK_TC0_Msk | MCLK_APBCMASK_TC1_Msk,
+        .mclk_mask = MCLK_APBCMASK_TC0 | MCLK_APBCMASK_TC1,
         .gclk_id = TC0_GCLK_ID,
         .gclk_src = SAM0_GCLK_TIMER,
         .flags = TC_CTRLA_MODE_COUNT32,
@@ -201,4 +205,5 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
 }
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

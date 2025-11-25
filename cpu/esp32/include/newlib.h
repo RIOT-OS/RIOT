@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2022 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2022 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_esp32
@@ -18,6 +19,9 @@
  * correctly if the `newlib_nano` module is used. In difference to other
  * toolchains, ESP32x toolchains don't use different `newlib.h` versions.
  */
+
+#ifndef NEWLIB_H
+#define NEWLIB_H
 
 #include "kernel_defines.h"
 
@@ -39,4 +43,5 @@ extern "C" {
 #endif
 
 #endif /* DOXYGEN */
+#endif /* NEWLIB_H */
 /** @} */

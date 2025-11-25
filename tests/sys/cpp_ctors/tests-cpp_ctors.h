@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,8 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
+#ifndef TESTS_CPP_CTORS_H
+#define TESTS_CPP_CTORS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,4 +45,5 @@ namespace RIOTTestCPP {
 }
 #endif
 
+#endif /* TESTS_CPP_CTORS_H */
 /** @} */

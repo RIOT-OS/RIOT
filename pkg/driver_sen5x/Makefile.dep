@@ -1,2 +1,0 @@
-USEMODULE += periph_i2c
-USEMODULE += ztimer

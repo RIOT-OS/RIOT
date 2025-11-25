@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_opt3001
  *
@@ -17,6 +15,9 @@
  *
  * @author      Jannes Volkens <jannes.volkens@haw-hamburg.de>
  */
+
+#ifndef OPT3001_PARAMS_H
+#define OPT3001_PARAMS_H
 
 #include "board.h"
 #include "opt3001.h"
@@ -68,4 +69,5 @@ extern "C" {
 }
 #endif
 
+#endif /* OPT3001_PARAMS_H */
 /** @} */

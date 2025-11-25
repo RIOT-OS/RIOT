@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_cryptoauthlib
  * @{
@@ -17,6 +15,9 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
+
+#ifndef CRYPTOAUTHLIB_TEST_H
+#define CRYPTOAUTHLIB_TEST_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,4 +38,5 @@ int atca_run_cmd(char *command, size_t len);
 }
 #endif
 
+#endif /* CRYPTOAUTHLIB_TEST_H */
 /** @} */

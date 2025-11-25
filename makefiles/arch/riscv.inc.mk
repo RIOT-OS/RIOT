@@ -67,14 +67,14 @@ endif
 # autodetected gcc target triples are incompatible with clang
 TARGET_ARCH_LLVM := riscv32-none-elf
 ifneq ($(TOOLCHAIN),llvm)
-  CFLAGS_NO_ASM += -mcmodel=medlow -msmall-data-limit=8
+  CFLAGS_CPU += -mcmodel=medlow -msmall-data-limit=8
   # We cannot invoke the compiler on the host system if build in docker.
   # Instead, hard-code the required flags for the docker toolchain here
   ifeq (1,$(BUILD_IN_DOCKER))
-    CFLAGS_NO_ASM += -malign-data=natural
+    CFLAGS_CPU += -malign-data=natural
   else
     ifneq (,$(shell $(TARGET_ARCH)-gcc --help=target | grep '\-malign-data='))
-      CFLAGS_NO_ASM += -malign-data=natural
+      CFLAGS_CPU += -malign-data=natural
     endif
   endif
 endif
@@ -86,8 +86,8 @@ LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/riscv_common/ldscripts
 LINKER_SCRIPT ?= $(CPU_MODEL).ld
 LINKFLAGS += -T$(LINKER_SCRIPT)
 
-CFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) $(CFLAGS_LINK) $(CFLAGS_NO_ASM)
-ASFLAGS += $(CFLAGS_CPU)
+CFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) $(CFLAGS_LINK)
+ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
 # export linker flags
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT) -nostartfiles -Wl,--gc-sections -static -lgcc
 

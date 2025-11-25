@@ -12,24 +12,15 @@ import socket
 from testrunner import run
 
 
-def get_random_free_port() -> int:
-    # we let the OS determine a free port and then return it
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(("127.0.0.1", 0))
-        # quickly reuse the port after the return
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        return s.getsockname()[1]
-
-
 IEEE802154_FRAME_LEN_MAX = 127
 ZEP_DATA_HEADER_SIZE = 32
 FCS_LEN = 2
 RCVBUF_LEN = IEEE802154_FRAME_LEN_MAX + ZEP_DATA_HEADER_SIZE + FCS_LEN
 zep_params = {
         "local_addr": "127.0.0.1",
-        "local_port": get_random_free_port(),
+        "local_port": 12345,
         "remote_addr": "127.0.0.1",
-        "remote_port": get_random_free_port(),
+        "remote_port": 17754,
     }
 s = None
 

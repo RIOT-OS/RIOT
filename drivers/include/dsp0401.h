@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_dsp0401 DSP0401
  * @ingroup     drivers_display
@@ -19,6 +17,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef DSP0401_H
+#define DSP0401_H
 
 #include <inttypes.h>
 #include <stdint.h>
@@ -102,4 +103,5 @@ void dsp0401_scroll_text(const dsp0401_t *dev, char *text, uint16_t delay);
 }
 #endif
 
+#endif /* DSP0401_H */
 /** @} */

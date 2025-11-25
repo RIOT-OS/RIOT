@@ -6,7 +6,8 @@
  * directory for more details.
  */
 
-#pragma once
+#ifndef RIOTBOOT_FLASHWRITE_H
+#define RIOTBOOT_FLASHWRITE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,3 +47,5 @@ static inline riotboot_flashwrite_verify_sha256(digest,
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* RIOTBOOT_FLASHWRITE_H */

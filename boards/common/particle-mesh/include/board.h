@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2018 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_common_particle-mesh
@@ -14,6 +15,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "board_common.h"
@@ -91,18 +95,6 @@ extern "C" {
 #define LED2_MASK           (1 << 15)
 #define LED_MASK            (LED0_MASK | LED1_MASK | LED2_MASK)
 
-/* The typical SAUL setup for this board uses PWM to make the LEDs (really a
- * single RGB LED) into a PWM controlled RGB LED entry. As a consequence of the
- * PWM configuration, toggling the GPIO has no effect any more, and thus we do
- * not define the macros so that no LEDs get picked up for LEDn_IS_PROVIDED.
- * (The LEDn_ON etc macros will still be present and no-op as usual, but those
- * explicitly checking for IS_PROVIDED will get an accurate picture).
- *
- * Both conditions are typically true when saul_default is on, but strictly, it
- * is those two that in combination make LEDs effectively unavailable to users.
- * */
-#if !(IS_USED(MODULE_AUTO_INIT_SAUL) && IS_USED(MODULE_SAUL_PWM))
-
 #define LED0_ON             (LED_PORT->OUTCLR = LED0_MASK)
 #define LED0_OFF            (LED_PORT->OUTSET = LED0_MASK)
 #define LED0_TOGGLE         (LED_PORT->OUT   ^= LED0_MASK)
@@ -114,9 +106,6 @@ extern "C" {
 #define LED2_ON             (LED_PORT->OUTCLR = LED2_MASK)
 #define LED2_OFF            (LED_PORT->OUTSET = LED2_MASK)
 #define LED2_TOGGLE         (LED_PORT->OUT   ^= LED2_MASK)
-
-#endif /* !(IS_USED(MODULE_AUTO_INIT_SAUL) && IS_USED(MODULE_SAUL_PWM)) */
-
 /** @} */
 
 /**
@@ -186,4 +175,5 @@ void board_nrfantenna_select(enum board_nrfantenna_selection choice);
 }
 #endif
 
+#endif /* BOARD_H */
 /** @} */

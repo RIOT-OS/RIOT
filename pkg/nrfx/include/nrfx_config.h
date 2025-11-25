@@ -31,8 +31,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_nrfx
  * @{
@@ -42,6 +40,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef NRFX_CONFIG_H
+#define NRFX_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,4 +55,5 @@ extern "C" {
 }
 #endif
 
+#endif /* NRFX_CONFIG_H */
 /** @} **/

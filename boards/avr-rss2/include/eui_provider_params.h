@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2020 ML!PA Consulting GmbH
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 ML!PA Consulting GmbH
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_avr-rss2
@@ -14,6 +15,9 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+#ifndef EUI_PROVIDER_PARAMS_H
+#define EUI_PROVIDER_PARAMS_H
+
 #include "at24mac.h"
 
 #ifdef __cplusplus
@@ -42,4 +46,5 @@ static inline int _at24mac_get_eui64(uint8_t index, eui64_t *addr)
 }
 #endif
 
+#endif /* EUI_PROVIDER_PARAMS_H */
 /** @} */

@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2023 Gunar Schorcht <gunar@schorcht.net>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2023 Gunar Schorcht <gunar@schorcht.net>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_sipeed_longan_nano
@@ -14,6 +15,9 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "macros/units.h"
 
@@ -144,4 +148,5 @@ static const pwm_conf_t pwm_config[] = {
 }
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gnrc_udp UDP
  * @ingroup     net_gnrc
@@ -20,6 +18,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef NET_GNRC_UDP_H
+#define NET_GNRC_UDP_H
 
 #include <stdint.h>
 
@@ -114,4 +115,5 @@ int gnrc_udp_init(void);
 }
 #endif
 
+#endif /* NET_GNRC_UDP_H */
 /** @} */

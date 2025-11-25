@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @ingroup    sys_can_dll
  * @{
@@ -22,6 +20,9 @@
  * @author      Toon Stegen <toon.stegen@altran.com>
  * @author      Aurelien Gonce <aurelien.gonce@altran.com>
  */
+
+#ifndef CAN_RAW_H
+#define CAN_RAW_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,7 +60,7 @@ extern "C" {
  * @return a positive handle identifying the sent frame on success
  * @return < 0 on error
  */
-int raw_can_send(int ifnum, const can_frame_t *frame, kernel_pid_t pid);
+int raw_can_send(int ifnum, const struct can_frame *frame, kernel_pid_t pid);
 
 /**
  * @brief Abort a CAN frame
@@ -155,7 +156,7 @@ int raw_can_set_can_opt(int ifnum, can_opt_t *opt);
  * @return a positive handle identifying the sent frame on success
  * @return < 0 on error
  */
-int raw_can_send_mbox(int ifnum, const can_frame_t *frame, mbox_t *mbox);
+int raw_can_send_mbox(int ifnum, const struct can_frame *frame, mbox_t *mbox);
 
 /**
  * @brief Subscribe to a CAN filter
@@ -274,4 +275,5 @@ int raw_can_set_trx(int ifnum, can_trx_t *trx);
 }
 #endif
 
+#endif /* CAN_RAW_H */
 /** @} */

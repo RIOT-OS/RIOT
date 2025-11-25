@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2019 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -22,25 +25,19 @@
 #include "gpio_arch.h"
 #include "irq_arch.h"
 
-#include "esp_clk_tree.h"
-#include "esp_cpu.h"
-#include "esp_private/periph_ctrl.h"
+#include "driver/periph_ctrl.h"
 #include "esp_rom_gpio.h"
+#include "hal/interrupt_controller_types.h"
+#include "hal/interrupt_controller_ll.h"
 #include "hal/twai_hal.h"
 #include "log.h"
 #include "rom/ets_sys.h"
-#include "soc/clk_tree_defs.h"
 #include "soc/gpio_sig_map.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define CAN     TWAI
-
-#ifdef CPU_FAM_ESP32H2
-#  define PERIPH_TWAI_MODULE    PERIPH_TWAI0_MODULE
-#  define ETS_TWAI_INTR_SOURCE  ETS_TWAI0_INTR_SOURCE
-#endif
 
 /** Common ESP CAN definitions */
 #define ESP_CAN_INTR_MASK   (0xffU)      /* interrupts handled by ESP CAN */
@@ -243,7 +240,7 @@ static int _esp_can_send(candev_t *candev, const struct can_frame *frame)
     /* prepare the frame as expected by ESP32 */
     twai_hal_frame_t esp_frame = { };
 
-    esp_frame.dlc = frame->len;
+    esp_frame.dlc = frame->can_dlc;
     esp_frame.rtr = (frame->can_id & CAN_RTR_FLAG);
     esp_frame.frame_format = (frame->can_id & CAN_EFF_FLAG);
 
@@ -595,17 +592,11 @@ static void _esp_can_power_up(can_t *dev)
     periph_module_reset(PERIPH_TWAI_MODULE);
     periph_module_enable(PERIPH_TWAI_MODULE);
 
-    twai_hal_config_t config = { .controller_id = 0 };
-
-    esp_clk_tree_src_get_freq_hz((soc_module_clk_t)TWAI_CLK_SRC_DEFAULT,
-                                 ESP_CLK_TREE_SRC_FREQ_PRECISION_CACHED,
-                                 &config.clock_source_hz);
-
     /* initialize the HAL context, on return the CAN controller is in listen
      * only mode but not yet started, the error counters are reset and
      * pending interrupts cleared */
 
-    if (!twai_hal_init(&hw, &config)) {
+    if (!twai_hal_init(&hw)) {
         assert(false);
     }
 
@@ -617,8 +608,8 @@ static void _esp_can_power_up(can_t *dev)
 
     /* route CAN interrupt source to CPU interrupt and enable it */
     intr_matrix_set(PRO_CPU_NUM, ETS_TWAI_INTR_SOURCE, CPU_INUM_CAN);
-    esp_cpu_intr_set_handler(CPU_INUM_CAN, _esp_can_intr_handler, (void*)(uintptr_t)dev);
-    esp_cpu_intr_enable(BIT(CPU_INUM_CAN));
+    intr_cntrl_ll_set_int_handler(CPU_INUM_CAN, _esp_can_intr_handler, (void*)(uintptr_t)dev);
+    intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_CAN));
 
     /* initialize used GPIOs */
     _esp_can_init_pins();
@@ -834,7 +825,7 @@ static void IRAM_ATTR _esp_can_intr_handler(void *arg)
                 }
                 frame.can_id |= esp_frame.rtr ? CAN_RTR_FLAG : 0;
                 frame.can_id |= esp_frame.frame_format ? CAN_EFF_FLAG : 0;
-                frame.len = esp_frame.dlc;
+                frame.can_dlc = esp_frame.dlc;
 
                 /* apply acceptance filters only if they are set */
                 unsigned f_id = 0;

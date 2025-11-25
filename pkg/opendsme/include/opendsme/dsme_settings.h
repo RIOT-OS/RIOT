@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_opendsme
  *
@@ -17,6 +15,8 @@
  *
  * @author      José I. Álamos <jose.alamos@haw-hamburg.de>
  */
+#ifndef OPENDSME_DSME_SETTINGS_H
+#define OPENDSME_DSME_SETTINGS_H
 
 #include <stdint.h>
 
@@ -162,4 +162,5 @@ constexpr uint8_t ADDITIONAL_ACK_WAIT_DURATION = 63;
 }
 #endif
 
+#endif /* OPENDSME_DSME_SETTINGS_H */
 /** @} */

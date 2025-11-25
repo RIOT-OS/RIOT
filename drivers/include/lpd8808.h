@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_lpd8808 LPD8808 based LED Strip
  * @ingroup     drivers_actuators
@@ -28,6 +26,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef LPD8808_H
+#define LPD8808_H
 
 #include "color.h"
 #include "periph/gpio.h"
@@ -78,4 +79,5 @@ void lpd8808_load_rgb(const lpd8808_t *dev, color_rgb_t vals[]);
 }
 #endif
 
+#endif /* LPD8808_H */
 /** @} */

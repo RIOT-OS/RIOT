@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_l3gxxxx L3Gxxxx 3-axis gyroscope sensor family
  * @ingroup     drivers_sensors
@@ -958,6 +956,9 @@
  * @file
  * @brief       Device Driver for ST L3Gxxxx 3-axis gyroscope sensor family
  */
+
+#ifndef L3GXXXX_H
+#define L3GXXXX_H
 
 #ifdef __cplusplus
 extern "C"
@@ -1994,4 +1995,5 @@ int l3gxxxx_reg_read(const l3gxxxx_t *dev,
 }
 #endif
 
+#endif /* L3GXXXX_H */
 /** @} */

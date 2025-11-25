@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2017 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_nucleo-f722ze
@@ -14,6 +15,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 /* This board provides an LSE */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -95,24 +99,9 @@ static const uart_conf_t uart_config[] = {
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
-static const adc_conf_t adc_config[] = {
-    {GPIO_PIN(PORT_A, 3),  .dev = 2, .chan = 3},  /* ADC123_IN3 */
-    {GPIO_PIN(PORT_C, 0),  .dev = 2, .chan = 10}, /* ADC123_IN10 */
-    {GPIO_PIN(PORT_C, 3),  .dev = 2, .chan = 13}, /* ADC123_IN13 */
-    {GPIO_PIN(PORT_F, 3),  .dev = 2, .chan = 9},  /* ADC3_IN9    */
-    {GPIO_PIN(PORT_F, 5),  .dev = 2, .chan = 15}, /* ADC3_IN15   */
-    {GPIO_PIN(PORT_F, 10), .dev = 2, .chan = 8},  /* ADC3_IN8    */
-    {GPIO_UNDEF,           .dev = 0, .chan = 18}, /* VBAT */
-};
-
-#define VBAT_ADC            ADC_LINE(6) /**< VBAT ADC line */
-
-#define ADC_CLK_MAX         MHZ(36)     /**< Use a faster than default ADC clock */
-
-#define ADC_NUMOF           ARRAY_SIZE(adc_config)
-
 #ifdef __cplusplus
 }
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

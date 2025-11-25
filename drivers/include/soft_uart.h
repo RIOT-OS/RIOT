@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_soft_uart Software UART
  * @ingroup     drivers_soft_periph
@@ -27,6 +25,9 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+
+#ifndef SOFT_UART_H
+#define SOFT_UART_H
 
 #include "periph/gpio.h"
 #include "periph/uart.h"
@@ -136,4 +137,5 @@ void soft_uart_poweroff(soft_uart_t uart);
 }
 #endif
 
+#endif /* SOFT_UART_H */
 /** @} */

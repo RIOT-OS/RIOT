@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_openwsn
  * @{
@@ -21,6 +19,9 @@
  *
  * @}
  */
+
+#ifndef OPENWSN_DEBUGPINS_H
+#define OPENWSN_DEBUGPINS_H
 
 #include "periph/gpio.h"
 
@@ -51,3 +52,5 @@ void openwsn_debugpins_init(const debugpins_config_t *user_config);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* OPENWSN_DEBUGPINS_H */

@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#pragma once
-
+#ifndef UNITTESTS_CONSTANTS_H
+#define UNITTESTS_CONSTANTS_H
 #include <limits.h>
 #include <stdint.h>
 
@@ -68,4 +68,5 @@ extern "C" {
 }
 #endif
 
+#endif /* UNITTESTS_CONSTANTS_H */
 /** @} */

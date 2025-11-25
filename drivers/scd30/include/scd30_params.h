@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_sensors
  * @{
@@ -19,6 +17,9 @@
  * @author      Puhang Ding      <czarsir@gmail.com>
  * @}
  */
+
+#ifndef SCD30_PARAMS_H
+#define SCD30_PARAMS_H
 
 #include "periph/i2c.h"
 #include "scd30.h"
@@ -81,3 +82,5 @@ static const saul_reg_info_t scd30_saul_info[] =
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* SCD30_PARAMS_H */

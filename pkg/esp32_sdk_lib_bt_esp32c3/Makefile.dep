@@ -1,3 +1,4 @@
 # This package can only be used with the ESP32 CPU
 FEATURES_REQUIRED += arch_esp32
 FEATURES_REQUIRED += esp_ble
+FEATURES_REQUIRED += esp_ble_esp32c3

@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2020 LAAS-CNRS
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 LAAS-CNRS
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -16,25 +19,15 @@
  * @}
  */
 
-#include "busy_wait.h"
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/adc.h"
 #include "periph_conf.h"
+#include "ztimer.h"
 #include "periph/vbat.h"
 
-#define ADC_SMP_MIN_VAL     (0x2) /*< Sampling time for slow channels
-                                      (0x2 = 4.5 ADC clock cycles) */
-#define ADC_SMP_VBAT_VAL    (0x5) /*< Sampling time when the VBat channel
-                                      is read (0x5 = 61.5 ADC clock cycles) */
-
-/* The sampling time width is 3 bit */
-#define ADC_SMP_BIT_WIDTH    (3)
-
-/* The sampling time can be specified for each channel over SMPR1 and SMPR2.
-   This specifies the first channel that goes to SMPR2 instead of SMPR1. */
-#define ADC_SMPR2_FIRST_CHAN (10)
-
+#define SMP_MIN         (0x2) /*< Sampling time for slow channels
+                                  (0x2 = 4.5 ADC clock cycles) */
 #ifdef ADC1_COMMON
 #define ADC_INSTANCE    ADC1_COMMON
 #else
@@ -150,7 +143,13 @@ int adc_init(adc_t line)
     if (!(dev(line)->CR & ADC_CR_ADEN)) {
         /* Enable ADC internal voltage regulator and wait for startup period */
         dev(line)->CR |= ADC_CR_ADVREGEN;
-        busy_wait_us(ADC_T_ADCVREG_STUP_US * 2);
+#if IS_USED(MODULE_ZTIMER_USEC)
+        ztimer_sleep(ZTIMER_USEC, ADC_T_ADCVREG_STUP_US);
+#else
+        /* to avoid using ZTIMER_USEC unless already included round up the
+           internal voltage regulator start up to 1ms */
+        ztimer_sleep(ZTIMER_MSEC, 1);
+#endif
 
         if (dev(line)->DIFSEL & (1 << adc_config[line].chan)) {
             /* Configure calibration for differential inputs */
@@ -176,21 +175,12 @@ int adc_init(adc_t line)
         dev(line)->SQR1 |= (0 & ADC_SQR1_L);
     }
 
-    /* determine the right sampling time */
-    uint32_t smp_time = ADC_SMP_MIN_VAL;
-    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
-        smp_time = ADC_SMP_VBAT_VAL;
-    }
-
     /* Configure sampling time for the given channel */
     if (adc_config[line].chan < 10) {
-        dev(line)->SMPR1 = (smp_time << (adc_config[line].chan
-                                        * ADC_SMP_BIT_WIDTH));
+        dev(line)->SMPR1 =  (SMP_MIN << (adc_config[line].chan * 3));
     }
     else {
-        dev(line)->SMPR2 = (smp_time << ((adc_config[line].chan
-                                        - ADC_SMPR2_FIRST_CHAN)
-                                        * ADC_SMP_BIT_WIDTH));
+        dev(line)->SMPR2 =  (SMP_MIN << ((adc_config[line].chan - 10) * 3));
     }
 
     /* Power off and unlock device again */
@@ -204,7 +194,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     int sample;
 
     /* Check if resolution is applicable */
-    if ((res & ADC_CFGR_RES) != res) {
+    if (res & 0x3) {
         return -1;
     }
 

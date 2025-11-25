@@ -39,12 +39,13 @@ $(CARGO_COMPILE_COMMANDS): $(BUILDDEPS)
 	        -e 's/"riscv64-elf"/"riscv32"/g' \
 	  | $(LAZYSPONGE) $@
 
-cargo-preflight: FORCE
+
+$(CARGO_LIB): $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS) FORCE
 	@command -v cargo >/dev/null || ($(COLOR_ECHO) \
-		'$(COLOR_RED)Error: `cargo` command missing to build Rust modules.$(COLOR_RESET) Please install as described on <https://guide.riot-os.org/rust_tutorials/rust_in_riot/>.' ;\
+		'$(COLOR_RED)Error: `cargo` command missing to build Rust modules.$(COLOR_RESET) Please install as described on <https://doc.riot-os.org/using-rust.html>.' ;\
 		exit 1)
 	@command -v $${C2RUST:-c2rust} >/dev/null || ($(COLOR_ECHO) \
-		'$(COLOR_RED)Error: `'$${C2RUST:-c2rust}'` command missing to build Rust modules.$(COLOR_RESET) Please install as described on <https://guide.riot-os.org/rust_tutorials/rust_in_riot/>.' ;\
+		'$(COLOR_RED)Error: `'$${C2RUST:-c2rust}'` command missing to build Rust modules.$(COLOR_RESET) Please install as described on <https://doc.riot-os.org/using-rust.html>.' ;\
 		exit 1)
 	@command -v rustup >/dev/null || ($(COLOR_ECHO) \
 		'$(COLOR_RED)Error: `rustup` command missing.$(COLOR_RESET) While it is not essential for building Rust modules, it is the only known way to install the target core libraries (or nightly for -Zbuild-std) needed to do so. If you do think that building should be possible, please edit this file, and file an issue about building Rust modules with the installation method you are using -- later checks in this file, based on rustup, will need to be adjusted for that.' ;\
@@ -57,25 +58,14 @@ cargo-preflight: FORCE
 		($(COLOR_ECHO) \
 		'$(COLOR_RED)Error: No Rust libraries are installed for the board'"'"'s CPU.$(COLOR_RESET) Run\n    $(COLOR_GREEN)$$$(COLOR_RESET) rustup target add $(RUST_TARGET)\nor set `CARGO_OPTIONS=-Zbuild-std=core`.'; \
 		exit 1)
-
-$(CARGO_LIB): cargo-preflight $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS) FORCE
-	@# mind the "+" to pass down make's jobserver.
+	@# finally call out to cargo. mind the "+" to pass down make's jobserver.
 	$(Q)+ CC= CFLAGS= CPPFLAGS= CXXFLAGS= \
 		RIOT_COMPILE_COMMANDS_JSON="$(CARGO_COMPILE_COMMANDS)" \
-		CARGO_BUILD_TARGET="$(RUST_TARGET)" \
 		cargo \
 			build \
+			--target $(RUST_TARGET) \
 			--profile $(CARGO_PROFILE) \
 			$(CARGO_OPTIONS)
-
-cargo-command: cargo-preflight $(RIOTBUILD_CONFIG_HEADER_C) $(CARGO_COMPILE_COMMANDS) FORCE
-	@[ x"$(CARGO_COMMAND)" != x"" ] || ($(COLOR_ECHO) "$(COLOR_RED)Error: Running cargo-command requires a CARGO_COMMAND to be set.$(COLOR_RESET) Set CARGO_COMMAND=\"cargo clippy --release --fix\" or any other cargo command to run with the right RIOT environment."; exit 1)
-	@# mind the "+" to pass down make's jobserver.
-	$(Q)+ CC= CFLAGS= CPPFLAGS= CXXFLAGS= \
-		RIOT_COMPILE_COMMANDS_JSON="$(CARGO_COMPILE_COMMANDS)" \
-		CARGO_BUILD_TARGET="$(RUST_TARGET)" \
-		PROFILE="$(CARGO_PROFILE)" \
-		$(CARGO_COMMAND)
 
 $(APPLICATION_RUST_MODULE).module: $(CARGO_LIB) FORCE
 	$(Q)# Ensure no old object files persist. These would lead to duplicate
@@ -90,6 +80,12 @@ $(APPLICATION_RUST_MODULE).module: $(CARGO_LIB) FORCE
 	$(Q)cd $(BINDIR)/$(APPLICATION_RUST_MODULE)/ && $(AR) x $<
 	$(Q)# ... and move them back if any exist, careful to err if anything is duplicate
 	$(Q)rmdir $(BINDIR)/$(APPLICATION_RUST_MODULE)/bin/ || (mv -n $(BINDIR)/$(APPLICATION_RUST_MODULE)/bin/* $(BINDIR)/$(APPLICATION_RUST_MODULE)/ && rmdir $(BINDIR)/$(APPLICATION_RUST_MODULE)/bin/)
+
+# create cargo folders
+# This prevents cargo inside docker from creating them with root permissions
+# (should they not exist), and also from re-building everything every time
+# because the .cargo inside is as ephemeral as the build container.
+$(shell mkdir -p ~/.cargo/git ~/.cargo/registry)
 
 FORCE:
 .phony: FORCE

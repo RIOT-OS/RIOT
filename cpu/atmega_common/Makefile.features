@@ -10,7 +10,6 @@ FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_gpio_ll
 FEATURES_PROVIDED += periph_gpio_ll_input_pull_up
 FEATURES_PROVIDED += periph_gpio_ll_irq
-FEATURES_PROVIDED += periph_gpio_ll_irq_edge_triggered_both
 FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_low
 FEATURES_PROVIDED += periph_gpio_ll_irq_unmask
 FEATURES_PROVIDED += periph_gpio_ll_switch_dir

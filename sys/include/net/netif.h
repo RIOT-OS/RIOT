@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_netif   Network interfaces
  * @ingroup     net
@@ -32,6 +30,8 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @author  José Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
+#ifndef NET_NETIF_H
+#define NET_NETIF_H
 
 #include <stdint.h>
 #include <string.h>
@@ -265,4 +265,5 @@ void netifs_print_ipv6(const char *separator);
 }
 #endif
 
+#endif /* NET_NETIF_H */
 /** @} */

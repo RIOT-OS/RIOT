@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2018 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -40,6 +43,7 @@
 #include "periph/rtc.h"
 
 /* ESP-IDF headers */
+#include "driver/periph_ctrl.h"
 #include "esp_attr.h"
 #include "esp_clk_internal.h"
 #include "esp_heap_caps_init.h"
@@ -49,16 +53,17 @@
 #include "esp_rom_uart.h"
 #include "esp_sleep.h"
 #include "esp_timer.h"
+#include "hal/interrupt_controller_types.h"
+#include "hal/interrupt_controller_ll.h"
 #include "rom/cache.h"
 #include "rom/ets_sys.h"
 #include "rom/rtc.h"
 #include "rom/uart.h"
+#include "soc/apb_ctrl_reg.h"
+#include "soc/cpu.h"
 #include "soc/rtc.h"
-#if !CPU_FAM_ESP32H2 && !CPU_FAM_ESP32C6
-#  include "soc/rtc_cntl_reg.h"
-#  include "soc/rtc_cntl_struct.h"
-#  include "soc/syscon_reg.h"
-#endif
+#include "soc/rtc_cntl_reg.h"
+#include "soc/rtc_cntl_struct.h"
 #include "soc/timer_group_struct.h"
 
 #if __xtensa__
@@ -68,13 +73,8 @@
 #include "xtensa/xtensa_api.h"
 #endif
 
-#if IS_USED(MODULE_ESP_IDF_SPI_FLASH)
-#include "esp_private/spi_flash_os.h"
-#include "esp_flash_internal.h"
-#endif
-
 #if IS_USED(MODULE_ESP_SPI_RAM)
-#include "esp_private/esp_psram_extram.h"
+#include "spiram.h"
 #endif
 
 #if IS_USED(MODULE_PUF_SRAM)
@@ -134,7 +134,6 @@ esp_err_t esp_timer_impl_early_init(void)
  * This function is the entry point in the user application. It is called
  * after a CPU initialization to startup the system.
  */
-
 static NORETURN void IRAM system_startup_cpu0(void)
 {
 #if __xtensa__
@@ -151,7 +150,6 @@ static NORETURN void IRAM system_startup_cpu0(void)
 #if IS_USED(MODULE_ESP_IDF_HEAP)
     /* init heap */
     heap_caps_init();
-    heap_caps_enable_nonos_stack_heaps();
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         ets_printf("Heap free: %u byte\n", get_free_heap_size());
     }
@@ -165,7 +163,7 @@ static NORETURN void IRAM system_startup_cpu0(void)
     uart_system_init();
 
     /* initialize stdio */
-    esp_rom_output_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
+    esp_rom_uart_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
     early_init();
 
     RESET_REASON reset_reason = rtc_get_reset_reason(PRO_CPU_NUM);
@@ -252,11 +250,9 @@ static NORETURN void IRAM system_init (void)
     srand(hwrand());
 
     /* add SPI RAM to heap if enabled */
-#if CONFIG_SPIRAM && CONFIG_SPIRAM_BOOT_INIT
-    esp_psram_extram_add_to_heap_allocator();
-#if CONFIG_SPIRAM_USE_MALLOC
-    heap_caps_malloc_extmem_enable(CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL);
-#endif
+#if CONFIG_SPIRAM_SUPPORT && CONFIG_SPIRAM_BOOT_INIT
+    esp_spiram_init_cache();
+    esp_spiram_add_to_heapalloc();
 #endif
 
     /* print some infos */
@@ -266,7 +262,7 @@ static NORETURN void IRAM system_init (void)
                 rtc_clk_fast_freq_get() == RTC_FAST_FREQ_8M ? 8 * MHZ
                                                             : esp_clk_xtal_freq()/4,
                 rtc_clk_slow_freq_get_hz());
-    LOG_STARTUP("RTC Slow Clock calibration value: %d\n", esp_clk_slowclk_cal_get());
+    LOG_STARTUP("XTAL calibration value: %d\n", esp_clk_slowclk_cal_get());
     LOG_STARTUP("Heap free: %u bytes\n", get_free_heap_size());
 
     /* initialize architecture specific interrupt handling */
@@ -308,14 +304,11 @@ static NORETURN void IRAM system_init (void)
     extern void board_init(void);
     board_init();
 
-#ifndef __XTENSA__
-    /* route a software interrupt source to CPU as trigger for thread yields,
-     * we use an internal software interrupt on Xtensa-based ESP32x SoCs */
+    /* route a software interrupt source to CPU as trigger for thread yields */
     intr_matrix_set(PRO_CPU_NUM, ETS_FROM_CPU_INTR0_SOURCE, CPU_INUM_SOFTWARE);
-#endif
     /* set thread yield handler and enable the software interrupt */
-    esp_cpu_intr_set_handler(CPU_INUM_SOFTWARE, thread_yield_isr, NULL);
-    esp_cpu_intr_enable(BIT(CPU_INUM_SOFTWARE));
+    intr_cntrl_ll_set_int_handler(CPU_INUM_SOFTWARE, thread_yield_isr, NULL);
+    intr_cntrl_ll_enable_interrupts(BIT(CPU_INUM_SOFTWARE));
 
     /* initialize ESP system event loop */
     extern void esp_event_handler_init(void);
@@ -324,29 +317,13 @@ static NORETURN void IRAM system_init (void)
     /* initialize ESP-IDF timer task */
     esp_timer_init();
 
-#if IS_USED(MODULE_ESP_IDF_SPI_FLASH)
-#if CONFIG_SPI_FLASH_ROM_IMPL
-    spi_flash_rom_impl_init();
-#endif
-
-    extern void spi_flash_init_lock(void);
-
-    spi_flash_init_lock();
-    spi_flash_guard_set(&g_flash_guard_default_ops);
-
-    esp_err_t flash_ret = esp_flash_init_default_chip();
-    (void)flash_ret;
-    assert(flash_ret == ESP_OK);
-#endif /* MODULE_ESP_IDF_SPI_FLASH */
-
     /* starting RIOT */
 #if IS_USED(MODULE_ESP_LOG_STARTUP)
     LOG_STARTUP("Starting RIOT kernel on PRO cpu\n");
-    esp_rom_output_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
+    esp_rom_uart_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
 #else
     ets_printf("\n");
 #endif
-
     kernel_init();
     UNREACHABLE();
 }

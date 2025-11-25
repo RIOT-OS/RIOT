@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    pkg_opendsme_dsmemessage DSME Message interface implementation.
  * @ingroup     pkg_opendsme
@@ -20,6 +18,9 @@
  *
  * @author  José I. Álamos <jose.alamos@haw-hamburg.de>
  */
+
+#ifndef OPENDSME_DSMEMESSAGE_H
+#define OPENDSME_DSMEMESSAGE_H
 
 #include <stdint.h>
 #include <string.h>
@@ -335,4 +336,5 @@ friend class DSMEMessageBuffer;
 }
 #endif
 
+#endif /* OPENDSME_DSMEMESSAGE_H */
 /** @} */

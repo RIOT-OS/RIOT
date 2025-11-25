@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2021 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2021 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_esp32
@@ -15,6 +16,9 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}
  */
+
+#ifndef GPIO_ARCH_H
+#define GPIO_ARCH_H
 
 #include <stdbool.h>
 
@@ -40,3 +44,5 @@ void gpio_pm_sleep_exit(uint32_t cause);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* GPIO_ARCH_H */

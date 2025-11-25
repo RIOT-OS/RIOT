@@ -1,7 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2016 TriaGnoSys GmbH
- * SPDX-FileCopyrightText: 2020 Otto-von-Guericke-Universität Magdeburg
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2016 TriaGnoSys GmbH
+ *               2020 Otto-von-Guericke-Universität Magdeburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
 
 /**
@@ -105,14 +108,14 @@ static ztimer_t _link_status_timer;
 #  endif
 #endif
 
-#ifndef STM32_ETH_TRACING_TX_PORT
-#  if defined(LED1_PORT) || defined(DOXYGEN)
+#ifndef STM32_ETH_TRACING_TX_PORT_NUM
+#  if defined(LED1_PORT_NUM) || defined(DOXYGEN)
 /**
  * @brief   port to trace TX events
  */
-#    define STM32_ETH_TRACING_TX_PORT   LED1_PORT
+#    define STM32_ETH_TRACING_TX_PORT_NUM LED1_PORT_NUM
 #  else
-#    define STM32_ETH_TRACING_TX_PORT   GPIO_PORT_0
+#    define STM32_ETH_TRACING_TX_PORT_NUM 0
 #  endif
 #endif
 
@@ -127,14 +130,14 @@ static ztimer_t _link_status_timer;
 #  endif
 #endif
 
-#ifndef STM32_ETH_TRACING_RX_PORT
-#  if defined(LED2_PORT) || defined(DOXYGEN)
+#ifndef STM32_ETH_TRACING_RX_PORT_NUM
+#  if defined(LED2_PORT_NUM) || defined(DOXYGEN)
 /**
  * @brief   port to trace RX events
  */
-#    define STM32_ETH_TRACING_RX_PORT   LED2_PORT
+#    define STM32_ETH_TRACING_RX_PORT_NUM LED2_PORT_NUM
 #  else
-#    define STM32_ETH_TRACING_RX_PORT   GPIO_PORT_0
+#    define STM32_ETH_TRACING_RX_PORT_NUM 0
 #  endif
 #endif
 /** @} */
@@ -477,10 +480,10 @@ static int stm32_eth_init(netdev_t *netdev)
 {
     (void)netdev;
     if (IS_USED(MODULE_STM32_ETH_TRACING)) {
-        gpio_ll_init(STM32_ETH_TRACING_TX_PORT,
+        gpio_ll_init(GPIO_PORT(STM32_ETH_TRACING_TX_PORT_NUM),
                      STM32_ETH_TRACING_TX_PIN_NUM,
                      gpio_ll_out);
-        gpio_ll_init(STM32_ETH_TRACING_RX_PORT,
+        gpio_ll_init(GPIO_PORT(STM32_ETH_TRACING_RX_PORT_NUM),
                      STM32_ETH_TRACING_RX_PIN_NUM,
                      gpio_ll_out);
     }
@@ -575,7 +578,7 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
     }
 
     if (IS_USED(MODULE_STM32_ETH_TRACING)) {
-        gpio_ll_set(STM32_ETH_TRACING_TX_PORT,
+        gpio_ll_set(GPIO_PORT(STM32_ETH_TRACING_TX_PORT_NUM),
                     (1U << STM32_ETH_TRACING_TX_PIN_NUM));
     }
     /* start TX */
@@ -592,7 +595,7 @@ static int stm32_eth_confirm_send(netdev_t *netdev, void *info)
     (void)info;
     (void)netdev;
     if (IS_USED(MODULE_STM32_ETH_TRACING)) {
-        gpio_ll_clear(STM32_ETH_TRACING_TX_PORT,
+        gpio_ll_clear(GPIO_PORT(STM32_ETH_TRACING_TX_PORT_NUM),
                       (1U << STM32_ETH_TRACING_TX_PIN_NUM));
     }
     DEBUG("[stm32_eth] TX completed\n");
@@ -765,7 +768,7 @@ static int stm32_eth_recv(netdev_t *netdev, void *_buf, size_t max_len,
     }
 
     if (IS_USED(MODULE_STM32_ETH_TRACING)) {
-        gpio_ll_clear(STM32_ETH_TRACING_RX_PORT,
+        gpio_ll_clear(GPIO_PORT(STM32_ETH_TRACING_RX_PORT_NUM),
                       (1U << STM32_ETH_TRACING_RX_PIN_NUM));
     }
 
@@ -803,7 +806,7 @@ static void stm32_eth_isr(netdev_t *netdev)
     }
 
     if (IS_USED(MODULE_STM32_ETH_TRACING)) {
-        gpio_ll_set(STM32_ETH_TRACING_RX_PORT,
+        gpio_ll_set(GPIO_PORT(STM32_ETH_TRACING_RX_PORT_NUM),
                     (1U << STM32_ETH_TRACING_RX_PIN_NUM));
     }
     netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);

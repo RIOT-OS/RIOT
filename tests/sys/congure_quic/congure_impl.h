@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @{
  *
@@ -15,6 +13,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef CONGURE_IMPL_H
+#define CONGURE_IMPL_H
 
 #include "congure/quic.h"
 
@@ -32,4 +32,5 @@ void *congure_quic_test_get_event_cb_arg(void);
 }
 #endif
 
+#endif /* CONGURE_IMPL_H */
 /** @} */

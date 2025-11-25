@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LIBB2_CONFIG_H
+#define LIBB2_CONFIG_H
 
 #include "cpu.h"
 
@@ -17,3 +18,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+#endif /* LIBB2_CONFIG_H */

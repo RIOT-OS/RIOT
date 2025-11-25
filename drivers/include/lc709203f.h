@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_lc709203f LC709203F
  * @ingroup     drivers_sensors
@@ -20,6 +18,9 @@
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
+
+#ifndef LC709203F_H
+#define LC709203F_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -140,8 +141,8 @@ typedef struct {
 /**
  * @brief initializes the sensor and i2c
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
- * @param[in] params    pointer to lc709203f_param_t struct containing the interrupt pin and callback
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *params   pointer to lc709203f_param_t struct containing the interrupt pin and callback
  *
  * @return              LC709203F_OK on a working initialization
  * @return              LC709203F_NOI2C on undefined i2c device given in periph_conf
@@ -151,7 +152,7 @@ int lc709203f_init(lc709203f_t *dev, const lc709203f_params_t *params);
 /**
  * @brief  reads battery voltage from Sensor
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  *
  * @return              voltage in mV
  */
@@ -160,7 +161,7 @@ int16_t lc709203f_get_voltage(const lc709203f_t *dev);
 /**
  * @brief  reads battery state of charge from Sensor
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  *
  * @return              rsoc in %
  */
@@ -169,7 +170,7 @@ int16_t lc709203f_get_rsoc(const lc709203f_t *dev);
 /**
  * @brief  reads battery indicator to empty from Sensor
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  *
  * @return              ite in 0.1%
  */
@@ -178,7 +179,7 @@ int16_t lc709203f_get_ite(const lc709203f_t *dev);
 /**
  * @brief  reads Sensor id
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  *
  * @return              id value
  */
@@ -187,7 +188,7 @@ int16_t lc709203f_get_id(const lc709203f_t *dev);
 /**
  * @brief  reads cell temperature from sensor
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  *
  * @return              temp in 0.1°C steps
  */
@@ -196,7 +197,7 @@ int16_t lc709203f_get_cell_temp(const lc709203f_t *dev);
 /**
  * @brief  reads status bit register (Temperature obtaining mode)
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  *
  * @return              THERMISTOR_MODE Thermistor mode
  * @return              I2C_MODE I2C Mode
@@ -206,7 +207,7 @@ lc709203f_temp_obtaining_mode_t lc709203f_get_status_bit(const lc709203f_t *dev)
 /**
  * @brief  reads IC Power Mode register
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  *
  * @return              OPERATIONAL_MODE Operational Mode
  * @return              SLEEP_MODE Sleep mode
@@ -216,7 +217,7 @@ lc709203f_power_mode_t lc709203f_get_power_mode(const lc709203f_t *dev);
 /**
  * @brief  reads Alarm Low Cell Voltage Register
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  *
  * @return              0 Disable
  * @return              Threshold value in 1mV steps
@@ -226,7 +227,7 @@ int16_t lc709203f_get_alarm_low_voltage(const lc709203f_t *dev);
 /**
  * @brief  reads Alarm Low RSOC Register
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  *
  * @return              0 Disable
  * @return              Threshold value in %
@@ -236,7 +237,7 @@ int16_t lc709203f_get_alarm_low_rsoc(const lc709203f_t *dev);
 /**
  * @brief  reads Change of the Parameter register, Battery Profile selection
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  *
  * @return              Battery profile number (1 or 0)
  */
@@ -246,7 +247,7 @@ int16_t lc709203f_get_change_of_parameter(const lc709203f_t *dev);
  * @brief  reads APT (Adjustment Pack Thermistor)
  * value to adjust temperature measurement delay timing.
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  *
  * @return              value to adjust temperature measurement delay timing.
  */
@@ -256,7 +257,7 @@ int16_t lc709203f_get_apt(const lc709203f_t *dev);
  * @brief  reads APA (Adjustment Pack Application) in 1mOhm steps
  * value to adjust temperature measurement delay timing.
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  *
  * @return              parasitic impedance
  */
@@ -265,7 +266,7 @@ int16_t lc709203f_get_apa(const lc709203f_t *dev);
 /**
  * @brief  reads Current Direction Register
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  *
  * @return              AUTO_MODE Auto mode
  * @return              CHARGE_MODE charge mode
@@ -276,7 +277,7 @@ lc709203f_current_direction_t lc709203f_get_current_direction(const lc709203f_t 
 /**
  * @brief  reads Thermistor-B register (Thermistor B constant to be measured)
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  *
  * @return              B Value in 1K steps
  */
@@ -285,14 +286,14 @@ int16_t lc709203f_get_thermistor_b(const lc709203f_t *dev);
 /**
  * @brief  Executes RSOC initialization with sampled maximum voltage
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  */
 void lc709203f_set_rsoc_before(const lc709203f_t *dev);
 
 /**
  * @brief  Sets B constant of the Thermistor
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  * @param[in] value     Bconstant of thermistor
  */
 void lc709203f_set_thermistor_b(const lc709203f_t *dev, const unsigned int value);
@@ -300,14 +301,14 @@ void lc709203f_set_thermistor_b(const lc709203f_t *dev, const unsigned int value
 /**
  * @brief  Executes RSOC initialization
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  */
 void lc709203f_set_rsoc_initial(const lc709203f_t *dev);
 
 /**
  * @brief  Sets cell temperature in I2C-mode
  *
- * @param[in] dev 		pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev		pointer to lc709203f_t struct containing the i2c device and the address
  * @param[in] value		temp in 0.1K 0xAAC=0°C
  *
  * @return              LC709203F_CELL_TEMP_INVALID Invalid cell temp
@@ -318,7 +319,7 @@ int8_t lc709203f_set_cell_temp(const lc709203f_t *dev, const unsigned int value)
 /**
  * @brief  Sets current direction
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  * @param[in] direction current direction, AUTO_MODE, CHARGE_MODE, DISCHARGE_MODE
  */
 void lc709203f_set_current_direction(const lc709203f_t *dev, const lc709203f_current_direction_t direction);
@@ -326,7 +327,7 @@ void lc709203f_set_current_direction(const lc709203f_t *dev, const lc709203f_cur
 /**
  * @brief  Sets parasitic impedance (adjustment pack application)
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  * @param[in] value     impedance in 1mOhm steps
  */
 void lc709203f_set_apa(const lc709203f_t *dev, const uint8_t value);
@@ -334,7 +335,7 @@ void lc709203f_set_apa(const lc709203f_t *dev, const uint8_t value);
 /**
  * @brief  Sets value to adjust temperature measurement delay timing (adjusmtent pack thermistor)
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  * @param[in] value     adjustment value
  */
 void lc709203f_set_apt(const lc709203f_t *dev, const unsigned int value);
@@ -342,7 +343,7 @@ void lc709203f_set_apt(const lc709203f_t *dev, const unsigned int value);
 /**
  * @brief  Sets battery profile
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  * @param[in] value     profile (enum) BAT_PROFILE_1 BAT_PROFILE_2
  */
 void lc709203f_set_change_of_parameter(const lc709203f_t *dev, const lc709203f_battery_profile_t value);
@@ -350,7 +351,7 @@ void lc709203f_set_change_of_parameter(const lc709203f_t *dev, const lc709203f_b
 /**
  * @brief  Sets threshold for low rsoc alert
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  * @param[in] value     alert threshold (0-100%)
  */
 void lc709203f_set_alarm_low_rsoc(const lc709203f_t *dev, const uint8_t value);
@@ -358,7 +359,7 @@ void lc709203f_set_alarm_low_rsoc(const lc709203f_t *dev, const uint8_t value);
 /**
  * @brief  Sets threshold for low cell voltage alert
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  * @param[in] value     alert threshold in 1mV steps
  */
 void lc709203f_set_alarm_low_cell_voltage(const lc709203f_t *dev, const unsigned int value);
@@ -366,7 +367,7 @@ void lc709203f_set_alarm_low_cell_voltage(const lc709203f_t *dev, const unsigned
 /**
  * @brief  Sets power mode
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  * @param[in] value     Power mode (enum) OPERATIONAL_MODE, SLEEP_MODE
  */
 void lc709203f_set_power_mode(const lc709203f_t *dev, const lc709203f_power_mode_t value);
@@ -374,7 +375,7 @@ void lc709203f_set_power_mode(const lc709203f_t *dev, const lc709203f_power_mode
 /**
  * @brief  Sets temperature obtaining method
  *
- * @param[in] dev       pointer to lc709203f_t struct containing the i2c device and the address
+ * @param[in] *dev      pointer to lc709203f_t struct containing the i2c device and the address
  * @param[in] value     method to be used (enum) I2C_MODE, THERMISTOR_MODE
  */
 void lc709203f_set_status_bit(const lc709203f_t *dev, const lc709203f_temp_obtaining_mode_t value);
@@ -383,4 +384,5 @@ void lc709203f_set_status_bit(const lc709203f_t *dev, const lc709203f_temp_obtai
 }
 #endif
 
+#endif /* LC709203F_H */
 /** @} */

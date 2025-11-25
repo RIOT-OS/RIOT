@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2022 Otto-von-Guericke-Universität Magdeburg
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2022 Otto-von-Guericke-Universität Magdeburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @addtogroup cpu_atmega_common
@@ -20,6 +21,9 @@
  */
 
 #include <string.h>
+
+#ifndef STRINGS_H
+#define STRINGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,4 +78,5 @@ static inline void bcopy(const void *src, void *dest, size_t n)
 }
 #endif
 
+#endif /* STRINGS_H */
 /** @} */

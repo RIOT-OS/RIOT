@@ -19,10 +19,10 @@ BOARD_INSUFFICIENT_MEMORY := \
     samd10-xmini \
     slstk3400a \
     stk3200 \
-    stm32c0116-dk \
     stm32f030f4-demo \
     stm32f0discovery \
     stm32g0316-disco \
     stm32l0538-disco \
+    waspmote-pro \
     weact-g030f6 \
     #

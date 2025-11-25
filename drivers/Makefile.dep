@@ -120,10 +120,6 @@ ifneq (,$(filter mrf24j40m%,$(USEMODULE)))
   USEMODULE += mrf24j40
 endif
 
-ifneq (,$(filter mcp23%17 mcp23x17_%,$(USEMODULE)))
-  USEMODULE += mcp23x17
-endif
-
 ifneq (,$(filter mtd_%,$(USEMODULE)))
   USEMODULE += mtd
 endif
@@ -192,26 +188,8 @@ ifneq (,$(filter sdp3x_%,$(USEMODULE)))
   USEMODULE += sdp3x
 endif
 
-ifneq (,$(filter sen5%,$(USEMODULE)))
-  USEMODULE += sen5x
-endif
-
 ifneq (,$(filter servo_%,$(USEMODULE)))
   USEMODULE += servo
-endif
-
-ifneq (,$(filter shield_llcc68,$(USEMODULE)))
-  FEATURES_REQUIRED += arduino_pins
-  FEATURES_REQUIRED += arduino_shield_uno
-  FEATURES_REQUIRED += arduino_spi
-  USEMODULE += llcc68
-endif
-
-ifneq (,$(filter shield_sx1262,$(USEMODULE)))
-  FEATURES_REQUIRED += arduino_pins
-  FEATURES_REQUIRED += arduino_shield_uno
-  FEATURES_REQUIRED += arduino_spi
-  USEMODULE += sx1262
 endif
 
 ifneq (,$(filter shield_w5100,$(USEMODULE)))
@@ -277,11 +255,6 @@ endif
 
 ifneq (,$(filter ws281x_%,$(USEMODULE)))
   USEMODULE += ws281x
-endif
-
-ifneq (,$(filter saul_bat_voltage,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_adc
-  FEATURES_REQUIRED += board_bat_voltage
 endif
 
 ifneq (,$(filter saul_adc,$(USEMODULE)))

@@ -9,5 +9,3 @@ fixdep: fixdep_patched.c
 clean:
 	$(RM) fixdep_patched.c
 	$(RM) fixdep
-
-distclean: clean

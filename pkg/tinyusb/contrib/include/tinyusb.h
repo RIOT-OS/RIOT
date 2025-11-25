@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_tinyusb
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
+
+#ifndef TINYUSB_H
+#define TINYUSB_H
 
 #include "periph_conf.h"
 #include "tinyusb_hw_defaults.h"
@@ -62,4 +63,5 @@ int tinyusb_setup(void);
 }
 #endif
 
+#endif /* TINYUSB_H */
 /** @} */

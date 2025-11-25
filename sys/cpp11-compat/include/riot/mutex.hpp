@@ -302,8 +302,8 @@ void unique_lock<Mutex>::unlock() {
 
 /**
  * @brief Swaps two mutexes.
- * @param[in,out] lhs   Reference to one mutex.
- * @param[in,out] rhs   Reference to the other mutex.
+ * @param[inout] lhs    Reference to one mutex.
+ * @param[inout] rhs    Reference to the other mutex.
  */
 template <class Mutex>
 inline void swap(unique_lock<Mutex>& lhs, unique_lock<Mutex>& rhs) noexcept {

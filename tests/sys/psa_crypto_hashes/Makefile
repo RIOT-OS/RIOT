@@ -18,5 +18,3 @@ USEMODULE += psa_hash_sha_512_224
 USEMODULE += psa_hash_sha_512_256
 
 include $(RIOTBASE)/Makefile.include
-
-CFLAGS += -DTHREAD_STACKSIZE_MAIN=2048

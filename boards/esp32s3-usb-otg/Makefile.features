@@ -6,7 +6,6 @@ include $(RIOTBOARD)/common/esp32s3/Makefile.features
 # additional features provided by the board
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_pwm
-FEATURES_PROVIDED += periph_sdmmc
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_usbdev

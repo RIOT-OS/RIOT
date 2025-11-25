@@ -1,21 +1,28 @@
-/*
- * SPDX-FileCopyrightText: 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- * SPDX-License-Identifier: LGPL-2.1-only
- */
-
 /**
- * @file
- * @ingroup cpu_native
- * @brief   Native CPU syscall managing
- * @{
+ * Native CPU syscall managing
  *
  * Wrap system calls and system call invoking library calls to make
  * sure no context switches happen during a system call.
  *
- * @}
+ * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ *
+ * @ingroup cpu_native
+ * @{
+ * @file
+ * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
 #include <dlfcn.h>
+#else
+#include <dlfcn.h>
+#endif
+
 #include <err.h>
 #include <errno.h>
 #include <poll.h>
@@ -25,7 +32,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #ifdef MODULE_LIBC_GETTIMEOFDAY
-# include <sys/time.h>
+#include <sys/time.h>
 #endif
 #include <ifaddrs.h>
 #include <sys/stat.h>
@@ -33,55 +40,114 @@
 #include "cpu.h"
 #include "irq.h"
 #ifdef MODULE_LIBC_GETTIMEOFDAY
-# include "time_units.h"
-# include "ztimer64.h"
+#include "time_units.h"
+#include "ztimer64.h"
 #endif
-
 #include "stdio_base.h"
 
 #include "kernel_defines.h"
-/* This header defines the system call function pointers */
-#define NATIVE_SYSCALLS_DEFINITION 1
 #include "native_internal.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define _DEBUG_PREFIX "[native] syscalls: "
-#define DEBUG_SYSCALLS(...) DEBUG(_DEBUG_PREFIX __VA_ARGS__)
-
-#define _SYSCALL_ENTER_MESSAGE _DEBUG_PREFIX "> _native_pending_syscalls\n"
-#define _SYSCALL_LEAVE_MESSAGE _DEBUG_PREFIX "< _native_pending_syscalls\n"
+ssize_t (*real_read)(int fd, void *buf, size_t count);
+ssize_t (*real_write)(int fd, const void *buf, size_t count);
+size_t (*real_fread)(void *ptr, size_t size, size_t nmemb, FILE *stream);
+ssize_t (*real_recv)(int sockfd, void *buf, size_t len, int flags);
+void (*real_clearerr)(FILE *stream);
+__attribute__((noreturn)) void (*real_exit)(int status);
+void (*real_free)(void *ptr);
+void* (*real_malloc)(size_t size);
+void* (*real_calloc)(size_t nmemb, size_t size);
+void* (*real_realloc)(void *ptr, size_t size);
+void (*real_freeaddrinfo)(struct addrinfo *res);
+void (*real_freeifaddrs)(struct ifaddrs *ifa);
+void (*real_srandom)(unsigned int seed);
+int (*real_accept)(int socket, ...);
+int (*real_bind)(int socket, ...);
+int (*real_connect)(int socket, ...);
+int (*real_printf)(const char *format, ...);
+int (*real_getaddrinfo)(const char *node, ...);
+int (*real_getifaddrs)(struct ifaddrs **ifap);
+int (*real_gettimeofday)(struct timeval *t, ...);
+int (*real_getpid)(void);
+int (*real_chdir)(const char *path);
+int (*real_close)(int);
+int (*real_fcntl)(int, int, ...);
+int (*real_creat)(const char *path, ...);
+int (*real_dup2)(int, int);
+int (*real_execve)(const char *, char *const[], char *const[]);
+int (*real_fork)(void);
+int (*real_feof)(FILE *stream);
+int (*real_ferror)(FILE *stream);
+int (*real_listen)(int socket, int backlog);
+int (*real_ioctl)(int fildes, unsigned long request, ...);
+int (*real_open)(const char *path, int oflag, ...);
+int (*real_pause)(void);
+int (*real_pipe)(int[2]);
+int (*real_select)(int nfds, ...);
+int (*real_poll)(struct pollfd *fds, ...);
+int (*real_setsid)(void);
+int (*real_setsockopt)(int socket, ...);
+int (*real_socket)(int domain, int type, int protocol);
+int (*real_unlink)(const char *);
+long int (*real_random)(void);
+const char* (*real_gai_strerror)(int errcode);
+FILE* (*real_fopen)(const char *path, const char *mode);
+int (*real_fclose)(FILE *stream);
+int (*real_fseek)(FILE *stream, long offset, int whence);
+long (*real_ftell)(FILE *stream);
+int (*real_fputc)(int c, FILE *stream);
+int (*real_fgetc)(FILE *stream);
+mode_t (*real_umask)(mode_t cmask);
+ssize_t (*real_writev)(int fildes, const struct iovec *iov, int iovcnt);
+ssize_t (*real_send)(int sockfd, const void *buf, size_t len, int flags);
+off_t (*real_lseek)(int fd, off_t offset, int whence);
+off_t (*real_fstat)(int fd, struct stat *statbuf);
+int (*real_fsync)(int fd);
+int (*real_mkdir)(const char *pathname, mode_t mode);
+int (*real_rmdir)(const char *pathname);
+DIR *(*real_opendir)(const char *name);
+struct dirent *(*real_readdir)(DIR *dirp);
+int (*real_closedir)(DIR *dirp);
+int (*real_rename)(const char *, const char *);
+int (*real_statvfs)(const char *restrict path, struct statvfs *restrict buf);
 
 void _native_syscall_enter(void)
 {
-    _native_pending_syscalls_up();
+    _native_in_syscall++;
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
-        real_write(STDERR_FILENO, _SYSCALL_ENTER_MESSAGE, sizeof(_SYSCALL_ENTER_MESSAGE) - 1);
+        real_write(STDERR_FILENO, "> _native_in_syscall\n", 21);
     }
 }
 
 void _native_syscall_leave(void)
 {
     if (IS_ACTIVE(ENABLE_DEBUG)) {
-        real_write(STDERR_FILENO, _SYSCALL_LEAVE_MESSAGE, sizeof(_SYSCALL_LEAVE_MESSAGE) - 1);
+        real_write(STDERR_FILENO, "< _native_in_syscall\n", 21);
     }
 
-    _native_pending_syscalls_down();
+    _native_in_syscall--;
     if (
-            (_native_pending_signals > 0)
+            (_native_sigpend > 0)
             && (_native_in_isr == 0)
-            && (_native_pending_syscalls == 0)
-            && (_native_interrupts_enabled)
+            && (_native_in_syscall == 0)
+            && (native_interrupts_enabled == 1)
             && (thread_get_active() != NULL)
        )
     {
         _native_in_isr = 1;
-        _native_interrupts_enabled = false;
-
-        _native_isr_context_make(_native_call_sig_handlers_and_switch);
-        if (swapcontext(_native_user_context(), _native_isr_context) == -1) {
+        /* Use intermediate cast to uintptr_t to silence -Wcast-align.
+         * stacks are manually word aligned in thread_static_init() */
+        _native_cur_ctx = (ucontext_t *)(uintptr_t)thread_get_active()->sp;
+        native_isr_context.uc_stack.ss_sp = __isr_stack;
+        native_isr_context.uc_stack.ss_size = __isr_stack_size;
+        native_isr_context.uc_stack.ss_flags = 0;
+        native_interrupts_enabled = 0;
+        makecontext(&native_isr_context, native_irq_handler, 0);
+        if (swapcontext(_native_cur_ctx, &native_isr_context) == -1) {
             err(EXIT_FAILURE, "_native_syscall_leave: swapcontext");
         }
     }
@@ -163,7 +229,7 @@ ssize_t _native_read(int fd, void *buf, size_t count)
 {
     ssize_t r;
 
-    if (fd == STDIN_FILENO && IS_USED(MODULE_STDIN)) {
+    if (fd == STDIN_FILENO) {
         return stdio_read(buf, count);
     }
 
@@ -223,11 +289,16 @@ ssize_t _native_writev(int fd, const struct iovec *iov, int iovcnt)
 #if defined(__FreeBSD__)
 #undef putchar
 #endif
-#ifndef MODULE_STDIO_NULL
 int putchar(int c)
 {
     char tmp = c;
     return _native_write(STDOUT_FILENO, &tmp, sizeof(tmp));
+}
+
+int putc(int c, FILE *fp)
+{
+    char tmp = c;
+    return _native_write(fileno(fp), &tmp, sizeof(tmp));
 }
 
 int puts(const char *s)
@@ -236,13 +307,6 @@ int puts(const char *s)
     r = _native_write(STDOUT_FILENO, (char*)s, strlen(s));
     putchar('\n');
     return r;
-}
-#endif
-
-int putc(int c, FILE *fp)
-{
-    char tmp = c;
-    return _native_write(fileno(fp), &tmp, sizeof(tmp));
 }
 
 int fgetc(FILE *fp)
@@ -307,7 +371,6 @@ char *make_message(const char *format, va_list argp)
     }
 }
 
-#ifndef MODULE_STDIO_NULL
 int printf(const char *format, ...)
 {
     int r;
@@ -324,7 +387,6 @@ int vprintf(const char *format, va_list argp)
 {
     return vfprintf(stdout, format, argp);
 }
-#endif
 
 int fprintf(FILE *fp, const char *format, ...)
 {
@@ -447,6 +509,9 @@ int _gettimeofday(struct timeval *tp, void *restrict tzp)
 }
 #endif
 
+/**
+ * set up native internal syscall symbols
+ */
 void _native_init_syscalls(void)
 {
     *(void **)(&real_read) = dlsym(RTLD_NEXT, "read");

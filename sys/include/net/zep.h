@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_zep  ZigBee Encapsulation Protocol
  * @ingroup     net
@@ -20,6 +18,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef NET_ZEP_H
+#define NET_ZEP_H
 
 #include <stdint.h>
 
@@ -100,4 +100,5 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
+#endif /* NET_ZEP_H */
 /** @} */

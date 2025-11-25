@@ -1,13 +1,8 @@
 # Define the CPU family so we can differentiate between them in the code
 CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
 
-CPU_MODEL_UPPERCASE := $(call uppercase_and_underscore,$(CPU_MODEL))
 # Generate ASF compatible model definition
-CFLAGS += -D__$(CPU_MODEL_UPPERCASE)__
-
-# Identify SVD file to load with `USE_PYCORTEXMDEBUG=1`:
-SVD_VENDOR := Atmel
-SVD_MODEL := AT$(CPU_MODEL_UPPERCASE)
+CFLAGS += -D__$(call uppercase_and_underscore,$(CPU_MODEL))__
 
 # Compute CPU_LINE
 LINE   := $(shell echo $(CPU_MODEL) | sed -E -e 's/^sam([a-z][0-9][0-9])(.)([0-9][0-9])(.)*/\1 \2 \3 \4/')

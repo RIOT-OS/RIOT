@@ -38,11 +38,7 @@ void event_timeout_ztimer_init(event_timeout_t *event_timeout, ztimer_clock_t *c
 
 void event_timeout_set(event_timeout_t *event_timeout, uint32_t timeout)
 {
-    if (timeout == 0) {
-        event_post(event_timeout->queue, event_timeout->event);
-    } else {
-        ztimer_set(event_timeout->clock, &event_timeout->timer, timeout);
-    }
+    ztimer_set(event_timeout->clock, &event_timeout->timer, timeout);
 }
 
 void event_timeout_clear(event_timeout_t *event_timeout)

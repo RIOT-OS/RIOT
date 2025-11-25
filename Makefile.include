@@ -55,15 +55,11 @@ RIOTPROJECT                     ?= $(shell git rev-parse --show-toplevel 2>/dev/
 BUILD_DIR                       ?= $(RIOTBASE)/build
 APPDIR                          ?= $(CURDIR)
 BINDIRBASE                      ?= $(APPDIR)/bin
+BINDIR                          ?= $(BINDIRBASE)/$(BOARD)
 PKGDIRBASE                      ?= $(BUILD_DIR)/pkg
 DLCACHE                         ?= $(RIOTTOOLS)/dlcache/dlcache.sh
 DLCACHE_DIR                     ?= $(RIOTBASE)/.dlcache
 RIOT_VERSION_DUMMY_CODE         ?= RIOT_VERSION_NUM\(2042,5,23,0\)
-
-# Resolve potential BOARD alias to canonical name before defining BINDIR
-include $(RIOTMAKE)/board_alias.inc.mk
-
-BINDIR                          ?= $(BINDIRBASE)/$(BOARD)
 
 # include CI info such as BOARD_INSUFFICIENT_MEMORY, if existing
 -include Makefile.ci
@@ -198,6 +194,9 @@ include $(RIOTMAKE)/docker.inc.mk
 include $(RIOTMAKE)/utils/ansi.mk
 include $(RIOTMAKE)/color.inc.mk
 
+# include concurrency helpers
+include $(RIOTMAKE)/info-nproc.inc.mk
+
 # List of boards variables
 include $(RIOTMAKE)/boards.inc.mk
 
@@ -205,7 +204,7 @@ include $(RIOTMAKE)/boards.inc.mk
 include $(RIOTMAKE)/dependencies_debug.inc.mk
 
 # Use TOOLCHAIN environment variable to select the toolchain to use.
-ifneq (,$(filter native native32 native64,$(BOARD)))
+ifneq (,$(filter native native64,$(BOARD)))
   ifeq ($(OS),Darwin)
     $(shell $(COLOR_ECHO) "$(COLOR_RED)"Buildin on macOS is not supported."\
                           "We recommend vagrant for building:$(COLOR_RESET)"\
@@ -228,16 +227,19 @@ endif
 
 include $(RIOTMAKE)/cargo-settings.inc.mk
 
-GLOBAL_GOALS += info-boards-features-blacklisted \
+GLOBAL_GOALS += buildtest \
+                buildtest-indocker \
+                info-boards-features-blacklisted \
                 info-boards-features-conflicting \
                 info-boards-features-missing \
                 info-boards-supported \
-                info-buildsizes-diff \
+                info-buildsizes info-buildsizes-diff \
                 generate-Makefile.ci \
                 #
 
 ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))
   include $(RIOTMAKE)/info-global.inc.mk
+  include $(RIOTMAKE)/buildtests.inc.mk
 else
 
 all: link
@@ -333,7 +335,28 @@ APPLICATION := $(strip $(APPLICATION))
 
 # provide common external programs for `Makefile.include`s
 
-DOWNLOAD_TO_FILE ?= $(DLCACHE)
+ifeq (,$(and $(DOWNLOAD_TO_STDOUT),$(DOWNLOAD_TO_FILE)))
+  ifeq (,$(WGET))
+    ifeq (0,$(shell which wget > /dev/null 2>&1 ; echo $$?))
+      WGET = $(call memoized,WGET,$(shell which wget))
+    endif
+  endif
+  ifeq (,$(CURL))
+    ifeq (0,$(shell which curl > /dev/null 2>&1 ; echo $$?))
+      CURL = $(call memoized,CURL,$(shell which curl))
+    endif
+  endif
+  ifeq (,$(WGET)$(CURL))
+    $(warning Neither wget nor curl is installed!)
+  endif
+
+  ifeq (,$(DOWNLOAD_TO_STDOUT))
+    DOWNLOAD_TO_STDOUT ?= $(if $(CURL),$(CURL) -s,$(WGET) -q -O-)
+  endif
+  ifeq (,$(DOWNLOAD_TO_FILE))
+    DOWNLOAD_TO_FILE ?= $(if $(WGET),$(WGET) -nv -c -O,$(CURL) -s -o)
+  endif
+endif
 
 ifeq (,$(UNZIP_HERE))
   ifeq (0,$(shell which unzip > /dev/null 2>&1 ; echo $$?))
@@ -376,7 +399,6 @@ ifneq (,$(IOTLAB_NODE))
 endif
 
 # Add standard include directories
-INCLUDES += -I$(APPDIR)
 INCLUDES += -I$(RIOTBASE)/core/lib/include
 INCLUDES += -I$(RIOTBASE)/core/include
 INCLUDES += -I$(RIOTBASE)/drivers/include
@@ -402,8 +424,6 @@ include $(RIOTMAKE)/kconfig.mk
 FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
 # always select CPU core features
 FEATURES_REQUIRED += $(filter cpu_core_%,$(FEATURES_PROVIDED))
-# always "select" bug affecting the current build
-FEATURES_REQUIRED += $(filter bug_%,$(FEATURES_PROVIDED))
 
 # check if required features are provided and update $(FEATURES_USED)
 include $(RIOTMAKE)/features_check.inc.mk
@@ -428,12 +448,6 @@ include $(BOARDDIR)/Makefile.include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
-# include global Makefile.include for `boards` modules
-include $(RIOTBASE)/boards/Makefile.include
-
-# Include common programmer logic if available
--include $(RIOTMAKE)/tools/$(PROGRAMMER).inc.mk
-
 # Include common serial logic to define TERMPROG, TERMFLAGS variables based on
 # the content of RIOT_TERMINAL
 include $(RIOTMAKE)/tools/serial.inc.mk
@@ -446,6 +460,9 @@ ifeq (1,$(EMULATE))
   TERMDEPS += $(EMULATORDEPS)
   DEBUGDEPS += $(EMULATORDEPS)
 endif
+
+# Include common programmer logic if available
+-include $(RIOTMAKE)/tools/$(PROGRAMMER).inc.mk
 
 # Check if programmer is supported by the board, only if PROGRAMMERS_SUPPORTED
 # is set and if programmer is not iotlab
@@ -468,7 +485,7 @@ include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
 
 # Other than on native, RWX segments in ROM are not actually RWX, as regular
 # store instructions won't write to flash.
-ifeq (,$(filter native native32 native64,$(BOARD)))
+ifeq (,$(filter native native64,$(BOARD)))
   LINKER_SUPPORTS_NOWARNRWX ?= $(shell LC_ALL=C $(LINK) $(RIOTTOOLS)/testprogs/minimal_linkable.c -o /dev/null -lc -Wall -Wextra -pedantic -Wl,--no-warn-rwx-segments 2> /dev/null && echo 1 || echo 0)
   ifeq (1,$(LINKER_SUPPORTS_NOWARNRWX))
     LINKFLAGS += -Wl,--no-warn-rwx-segments
@@ -495,27 +512,13 @@ export CCACHE_CPP2=yes
 # set some settings useful for continuous integration builds
 ifeq ($(RIOT_CI_BUILD),1)
     RIOT_VERSION ?= buildtest
+    # set a dummy version number
+    RIOT_VERSION_CODE ?= $(RIOT_VERSION_DUMMY_CODE)
     ifneq ($(filter $(BOARD_INSUFFICIENT_MEMORY), $(BOARD)),)
         RIOTNOLINK:=1
     endif
     # be more quiet when building for CI
     QUIETER=1
-
-    # Enable static analysis only for some boards to not spent to much CPU time.
-    # This list is intentionally a subset of the `QUICKBUILD_BOARDS` from
-    # `.murdock`
-    BOARDS_CI_STATIC_ANALYSIS := \
-      esp32-wroom-32 \
-      native64 \
-      nrf52840dk \
-      samr21-xpro \
-      stm32f429i-disc1 \
-      #
-    ifneq (,$(filter $(BOARD),$(BOARDS_CI_STATIC_ANALYSIS)))
-      export STATIC_ANALYSIS := 1
-    else
-      export STATIC_ANALYSIS := 0
-    endif
 endif
 
 ifeq ($(QUIETER),1)
@@ -539,8 +542,7 @@ include $(RIOTMAKE)/cflags.inc.mk
 -include $(RIOTBASE)/EXTRAVERSION
 
 include $(RIOTMAKE)/git_version.inc.mk
-RIOT_VERSION_GIT := $(or $(GIT_VERSION),'UNKNOWN (builddir: $(RIOTBASE))')
-RIOT_VERSION ?= $(RIOT_VERSION_GIT)
+RIOT_VERSION ?= $(or $(GIT_VERSION),'UNKNOWN (builddir: $(RIOTBASE))')
 RIOT_EXTRAVERSION ?= 0
 
 # Deprecate using RIOT_VERSION_OVERRIDE but currently keep the behavior
@@ -550,7 +552,7 @@ ifneq (,$(RIOT_VERSION_OVERRIDE))
 endif
 
 # Generate machine readable RIOT VERSION macro
-RIOT_VERSION_CODE ?= $(shell echo $(RIOT_VERSION_GIT) | \
+RIOT_VERSION_CODE ?= $(shell echo $(RIOT_VERSION) | \
                       sed -E 's/([0-9]+)\.([0-9]+)\.?([0-9]+)?.*/RIOT_VERSION_NUM\\\(\1,\2,0\3,$(RIOT_EXTRAVERSION)\\\)/' | \
                       grep RIOT_VERSION_NUM || echo "$(RIOT_VERSION_DUMMY_CODE)")
 
@@ -566,8 +568,10 @@ BASELIBS += $(APPDEPS)
 # add extra include paths for packages in $(USEMODULE)
 USEMODULE_INCLUDES =
 
-# include global Makefile.include for `sys` modules
 include $(RIOTBASE)/sys/Makefile.include
+
+# add default board_init()
+DIRS += $(RIOTBASE)/boards/common/init
 
 # include Makefile.includes of each driver modules if they exist
 -include $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.include)
@@ -598,7 +602,7 @@ include $(RIOTMAKE)/bindist.inc.mk
 include $(RIOTMAKE)/modules.inc.mk
 
 
-.PHONY: all link clean flash flash-only termdeps term doc doc-man doc-latex debug debug-server reset objdump help info-modules
+.PHONY: all link clean flash flash-only termdeps term doc debug debug-server reset objdump help info-modules
 .PHONY: print-size elffile lstfile binfile hexfile flashfile cosy
 .PHONY: ..in-docker-container
 
@@ -716,7 +720,6 @@ COMPILE_COMMANDS_FLAGS ?= --clangd
 compile-commands: $(COMPILE_COMMANDS_PATH)
 %/compile_commands.json: $(BUILDDEPS)
 	$(Q)DIRS="$(DIRS)" APPLICATION_BLOBS="$(BLOBS)" \
-    APPLICATION_SRC="$(SRC)" APPLICATION_SRCXX="$(SRCXX)" APPLICATION_ASMSRC="$(ASMSRC)" APPLICATION_ASSMSRC="$(ASSMSRC)" \
 	  "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk compile-commands
 	$(Q)$(RIOTTOOLS)/compile_commands/compile_commands.py $(COMPILE_COMMANDS_FLAGS) $(BINDIR) \
 	  > $@
@@ -741,7 +744,6 @@ $(ELFFILE): $(BASELIBS) $(ARCHIVES) $(LD_SCRIPTS)
 
 $(APPLICATION_MODULE).module: pkg-build $(BUILDDEPS)
 	$(Q)DIRS="$(DIRS)" APPLICATION_BLOBS="$(BLOBS)" \
-    APPLICATION_SRC="$(SRC)" APPLICATION_SRCXX="$(SRCXX)" APPLICATION_ASMSRC="$(ASMSRC)" APPLICATION_ASSMSRC="$(ASSMSRC)" \
 	  "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
 $(APPLICATION_MODULE).module: FORCE
 
@@ -861,10 +863,6 @@ TERMFLASHDEPS ?= $(filter flash flash-only,$(MAKECMDGOALS))
 TERMDEPS += $(TERMFLASHDEPS)
 termdeps: $(TERMDEPS)
 
-# (At least) the native targets don't have `flash` as a dependency,
-# therefore the terminal will be called before the compilation is done.
-# Setting `term` to NOTPARALLEL makes sure it is not executed during compilation.
-.NOTPARALLEL: term
 term: $(TERMDEPS)
 	$(call check_cmd,$(TERMPROG),Terminal program)
 	${TERMENV} $(TERMPROG) $(TERMFLAGS) $(TERMTEE)
@@ -879,8 +877,8 @@ cleanterm: $(TERMDEPS)
 list-ttys:
 	$(Q)$(RIOTTOOLS)/usb-serial/ttys.py
 
-doc doc-man doc-latex:
-	$(MAKE) -C $(RIOTBASE) $@
+doc:
+	$(MAKE) -BC $(RIOTBASE) doc
 
 debug: $(DEBUGDEPS)
 	$(call check_cmd,$(DEBUGGER),Debug program)
@@ -934,8 +932,9 @@ include $(RIOTMAKE)/tools/targets.inc.mk
 include $(RIOTMAKE)/usb-codes.inc.mk
 
 # Warn if the selected board and drivers don't provide all needed features:
-ifeq (, $(filter help generate-Makefile.ci, $(MAKECMDGOALS)))
+ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   EXPECT_ERRORS :=
+  EXPECT_CONFLICT :=
 
   # Test if there where dependencies against a module in DISABLE_MODULE.
   ifneq (, $(filter $(DISABLE_MODULE), $(USEMODULE)))
@@ -961,12 +960,12 @@ ifeq (, $(filter help generate-Makefile.ci, $(MAKECMDGOALS)))
 
   # Test if any used feature conflict with another one.
   ifneq (,$(FEATURES_CONFLICTING))
-    $(shell $(COLOR_ECHO) "$(COLOR_RED)The following features conflict:$(COLOR_RESET)"\
+    $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)The following features may conflict:$(COLOR_RESET)"\
                           "$(FEATURES_CONFLICTING)" 1>&2)
     ifneq (, $(FEATURES_CONFLICT_MSG))
         $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)Rationale: $(COLOR_RESET)$(FEATURES_CONFLICT_MSG)" 1>&2)
     endif
-    EXPECT_ERRORS := 1
+    EXPECT_CONFLICT := 1
   endif
 
   # If there is a whitelist, then test if the board is whitelisted.
@@ -999,6 +998,10 @@ ifeq (, $(filter help generate-Makefile.ci, $(MAKECMDGOALS)))
     endif
   endif
 
+  ifneq (, $(EXPECT_CONFLICT))
+    $(shell $(COLOR_ECHO) "\n$(COLOR_YELLOW)EXPECT undesired behaviour!$(COLOR_RESET)" 1>&2)
+  endif
+
   # Fail by default when errors are expected
   CONTINUE_ON_EXPECTED_ERRORS ?= 0
   ifneq (, $(EXPECT_ERRORS))
@@ -1012,8 +1015,7 @@ endif
 
 help:
   # filter all targets starting with lowercase and containing lowercase letters, hyphens, or underscores; explicitly include generate-Makefile.ci
-  # inspired by: https://stackoverflow.com/a/26339924
-	@LC_ALL=C $(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | sed -ne 's/\(^[a-z][a-z_-]*\|generate-Makefile.ci\):.*/\1/p' | sort -u
+	@$(MAKE) -qp | sed -ne 's/\(^[a-z][a-z_-]*\|generate-Makefile.ci\):.*/\1/p' | sort -u
 
 ifeq (iotlab-m3,$(BOARD))
   ifneq (,$(filter iotlab-%,$(MAKECMDGOALS)))

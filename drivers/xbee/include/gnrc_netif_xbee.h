@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup net_gnrc_netif
  * @{
@@ -17,6 +15,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef GNRC_NETIF_XBEE_H
+#define GNRC_NETIF_XBEE_H
 
 #include "net/gnrc/netif.h"
 
@@ -46,4 +46,5 @@ int gnrc_netif_xbee_create(gnrc_netif_t *netif, char *stack, int stacksize,
 }
 #endif
 
+#endif /* GNRC_NETIF_XBEE_H */
 /** @} */

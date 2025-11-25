@@ -1,9 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2014 Hamburg University of Applied Sciences
- * SPDX-FileCopyrightText: 2014 PHYTEC Messtechnik GmbH
- * SPDX-FileCopyrightText: 2015 Eistec AB
- * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2014 Hamburg University of Applied Sciences
+ *               2014 PHYTEC Messtechnik GmbH
+ *               2015 Eistec AB
+ *               2016 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**

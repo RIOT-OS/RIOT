@@ -30,7 +30,7 @@
 
 #define ASCII_MIN           0x20    /**< start of ASCII table */
 #define ASCII_MAX           0x7e    /**< end of ASCII table */
-#define CHAR_PIXEL_WIDTH          (6U)    /**< pixel width of a single character */
+#define CHAR_WIDTH          (6U)    /**< pixel width of a single character */
 
 #define SPI_CLK             (SPI_CLK_1MHZ)
 #define SPI_MODE            (SPI_MODE_0)
@@ -328,10 +328,10 @@ void pcd8544_write_c(const pcd8544_t *dev, uint8_t x, uint8_t y, char c)
     }
     /* set position */
     lock(dev);
-    _set_x(dev, x * CHAR_PIXEL_WIDTH);
+    _set_x(dev, x * CHAR_WIDTH);
     _set_y(dev, y);
     /* write char */
-    for (unsigned i = 0; i < CHAR_PIXEL_WIDTH - 1; i++) {
+    for (unsigned i = 0; i < CHAR_WIDTH - 1; i++) {
         _write(dev, MODE_DTA, _ascii[c - ASCII_MIN][i]);
     }
     _write(dev, MODE_DTA, 0x00);

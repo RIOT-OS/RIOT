@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_at86rf2xx
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef AT86RF2XX_NETDEV_H
+#define AT86RF2XX_NETDEV_H
 
 #include "net/netdev.h"
 
@@ -33,4 +34,5 @@ extern const netdev_driver_t at86rf2xx_driver;
 }
 #endif
 
+#endif /* AT86RF2XX_NETDEV_H */
 /** @} */

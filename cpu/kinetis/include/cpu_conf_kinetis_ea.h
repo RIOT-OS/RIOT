@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2017 Eistec AB
- * SPDX-FileCopyrightText: 2018 HERE Deutschland GmbH
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 Eistec AB
+ * Copyright (C) 2018 HERE Deutschland GmbH
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_kinetis
@@ -18,6 +19,9 @@
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author          Anton Gerasimov <anton.gerasimov@here.com>
  */
+
+#ifndef CPU_CONF_KINETIS_EA_H
+#define CPU_CONF_KINETIS_EA_H
 
 #if defined(KINETIS_CORE_Z)
 #if (KINETIS_ROMSIZE == 128)
@@ -37,4 +41,5 @@ extern "C"
 }
 #endif
 
+#endif /* CPU_CONF_KINETIS_EA_H */
 /** @} */

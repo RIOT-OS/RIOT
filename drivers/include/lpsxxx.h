@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_lpsxxx LPS331AP/LPS25HB/LPS22HB Pressure Sensors Driver
  * @ingroup     drivers_sensors
@@ -27,6 +25,9 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef LPSXXX_H
+#define LPSXXX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -173,4 +174,5 @@ int lpsxxx_disable(const lpsxxx_t *dev);
 }
 #endif
 
+#endif /* LPSXXX_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef TESTS_UT_PROCESS_H
+#define TESTS_UT_PROCESS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,4 +31,5 @@ void test_uri_parser(void);
 }
 #endif
 
+#endif /* TESTS_UT_PROCESS_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @{
  *
@@ -15,6 +13,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef CONGURE_IMPL_H
+#define CONGURE_IMPL_H
 
 #include "congure/mock.h"
 
@@ -30,4 +30,5 @@ int congure_test_snd_setup(congure_test_snd_t *c, unsigned id);
 }
 #endif
 
+#endif /* CONGURE_IMPL_H */
 /** @} */

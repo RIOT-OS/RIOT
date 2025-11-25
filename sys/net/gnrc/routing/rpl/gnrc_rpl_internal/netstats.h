@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     net_gnrc_rpl
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
+
+#ifndef NETSTATS_H
+#define NETSTATS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -216,4 +217,5 @@ static inline void gnrc_rpl_netstats_tx_DAO_ACK(netstats_rpl_t *netstats, size_t
 }
 #endif
 
+#endif /* NETSTATS_H */
 /** @} */

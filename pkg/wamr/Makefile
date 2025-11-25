@@ -21,7 +21,7 @@ CFLAGS += -Wno-old-style-definition
 CFLAGS += -Wno-cast-function-type
 
 #Prepapre includes for cmake
-RIOT_INCLUDES = $(filter-out -%,$(subst -isystem,,$(subst -I,,$(INCLUDES))))
+RIOT_INCLUDES = $(filter-out -%,$(subst -I,,$(INCLUDES)))
 
 #translate (CPU_ARCH) to Build Target
 #WAMR_BUILD_TARGET is "X86_32", "X86_64", "AARCH64[sub]", "ARM[sub]",

@@ -1,10 +1,15 @@
 /*
- * SPDX-FileCopyrightText: 2016 Kaspar Schleiser <kaspar@schleiser.de>
- * SPDX-FileCopyrightText: 2014 Freie Universität Berlin (FUB) & INRIA
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2014, Freie Universitaet Berlin (FUB) & INRIA.
+ * All rights reserved.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 #include "cpu.h"
+#include "kernel_init.h"
 #include "irq.h"
 #include "sched.h"
 #include "thread.h"

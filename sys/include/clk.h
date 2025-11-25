@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_clk System core clock
  * @ingroup     sys
@@ -16,6 +14,9 @@
  * @file
  * @brief       System core clock utility functions
  */
+
+#ifndef CLK_H
+#define CLK_H
 
 #include <assert.h>
 #include <stdint.h>
@@ -44,4 +45,5 @@ static inline uint32_t coreclk(void) {
 }
 #endif
 
+#endif /* CLK_H */
 /** @} */

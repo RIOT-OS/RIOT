@@ -1,9 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2014-2015 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
- * SPDX-FileCopyrightText: 2015 FreshTemp, LLC.
- * SPDX-FileCopyrightText: 2022 SSV Software Systems GmbH
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2014-2015 Freie Universität Berlin
+ *               2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2015 FreshTemp, LLC.
+ *               2022 SSV Software Systems GmbH
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -141,11 +144,8 @@ void gpio_init_mux(gpio_t pin, gpio_mux_t mux)
     int pin_pos = _pin_pos(pin);
 
     port->PINCFG[pin_pos].reg |= PORT_PINCFG_PMUXEN;
-
-    uint8_t pmux = port->PMUX[pin_pos >> 1].reg;
-    pmux &= ~(0xf << (4 * (pin_pos & 0x1)));
-    pmux |= (mux << (4 * (pin_pos & 0x1)));
-    port->PMUX[pin_pos >> 1].reg = pmux;
+    port->PMUX[pin_pos >> 1].reg &= ~(0xf << (4 * (pin_pos & 0x1)));
+    port->PMUX[pin_pos >> 1].reg |=  (mux << (4 * (pin_pos & 0x1)));
 }
 
 void gpio_disable_mux(gpio_t pin)
@@ -195,7 +195,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-bool gpio_read(gpio_t pin)
+int gpio_read(gpio_t pin)
 {
     PortGroup *port;
     int mask = _pin_mask(pin);
@@ -230,7 +230,7 @@ void gpio_toggle(gpio_t pin)
     _port_iobus(pin)->OUTTGL.reg = _pin_mask(pin);
 }
 
-void gpio_write(gpio_t pin, bool value)
+void gpio_write(gpio_t pin, int value)
 {
     if (value) {
         _port_iobus(pin)->OUTSET.reg = _pin_mask(pin);
@@ -481,10 +481,6 @@ void gpio_irq_enable(gpio_t pin)
 
     /* enable wake from deep sleep */
     _set_extwake(pin, true);
-
-    if (IS_ACTIVE(MODULE_PERIPH_GPIO_TAMPER_WAKE)) {
-        rtc_tamper_pin_enable(pin);
-    }
 }
 
 void gpio_irq_disable(gpio_t pin)
@@ -506,10 +502,6 @@ void gpio_irq_disable(gpio_t pin)
 
     /* disable wake from deep sleep */
     _set_extwake(pin, false);
-
-    if (IS_ACTIVE(MODULE_PERIPH_GPIO_TAMPER_WAKE)) {
-        rtc_tamper_pin_disable(pin);
-    }
 }
 
 #if defined(CPU_COMMON_SAML1X)

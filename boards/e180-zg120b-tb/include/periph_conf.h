@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2015-2020 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015-2020 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_e180-zg120b-tb
@@ -16,6 +17,9 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "cpu.h"
 #include "periph_cpu.h"
@@ -147,4 +151,5 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

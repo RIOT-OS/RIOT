@@ -15,33 +15,32 @@ PSEUDOMODULES += openwsn_serial \
 
 DIRS += $(RIOTBASE)/pkg/openwsn/contrib
 
-# Using -isystem instead of -I to prevent warnings for the following headers
-INCLUDES += -isystem$(PKGDIRBASE)/openwsn \
-            -isystem$(PKGDIRBASE)/openwsn/kernel \
-            -isystem$(PKGDIRBASE)/openwsn/inc \
-            -isystem$(PKGDIRBASE)/openwsn/drivers/common \
-            -isystem$(PKGDIRBASE)/openwsn/drivers/common/crypto \
-            -isystem$(PKGDIRBASE)/openwsn/bsp/boards/ \
-            -isystem$(PKGDIRBASE)/openwsn/openstack/ \
-            -isystem$(PKGDIRBASE)/openwsn/openstack/02a-MAClow \
-            -isystem$(PKGDIRBASE)/openwsn/openstack/02b-MAChigh \
-            -isystem$(PKGDIRBASE)/openwsn/openstack/03a-IPHC \
-            -isystem$(PKGDIRBASE)/openwsn/openstack/03b-IPv6 \
-            -isystem$(PKGDIRBASE)/openwsn/openstack/04-TRAN \
-            -isystem$(PKGDIRBASE)/openwsn/openstack/cross-layers \
-            -isystem$(PKGDIRBASE)/openwsn/openapps \
-            -isystem$(PKGDIRBASE)/openwsn/openapps/cjoin \
-            -isystem$(PKGDIRBASE)/openwsn/openweb \
-            -isystem$(PKGDIRBASE)/openwsn/openweb/opencoap \
-            -isystem$(RIOTBASE)/pkg/openwsn/include \
+INCLUDES += -I$(PKGDIRBASE)/openwsn \
+            -I$(PKGDIRBASE)/openwsn/kernel \
+            -I$(PKGDIRBASE)/openwsn/inc \
+            -I$(PKGDIRBASE)/openwsn/drivers/common \
+            -I$(PKGDIRBASE)/openwsn/drivers/common/crypto \
+            -I$(PKGDIRBASE)/openwsn/bsp/boards/ \
+            -I$(PKGDIRBASE)/openwsn/openstack/ \
+            -I$(PKGDIRBASE)/openwsn/openstack/02a-MAClow \
+            -I$(PKGDIRBASE)/openwsn/openstack/02b-MAChigh \
+            -I$(PKGDIRBASE)/openwsn/openstack/03a-IPHC \
+            -I$(PKGDIRBASE)/openwsn/openstack/03b-IPv6 \
+            -I$(PKGDIRBASE)/openwsn/openstack/04-TRAN \
+            -I$(PKGDIRBASE)/openwsn/openstack/cross-layers \
+            -I$(PKGDIRBASE)/openwsn/openapps \
+            -I$(PKGDIRBASE)/openwsn/openapps/cjoin \
+            -I$(PKGDIRBASE)/openwsn/openweb \
+            -I$(PKGDIRBASE)/openwsn/openweb/opencoap \
+            -I$(RIOTBASE)/pkg/openwsn/include \
 
 ifneq (,$(filter openwsn_riotos,$(USEMODULE)))
-  INCLUDES += -isystem$(RIOTBASE)/pkg/openwsn/scheduler
+  INCLUDES += -I$(RIOTBASE)/pkg/openwsn/scheduler
   DIRS += $(RIOTBASE)/pkg/openwsn/scheduler
 endif
 
 ifneq (,$(filter openwsn_sock_udp,$(USEMODULE)))
-  INCLUDES += -isystem$(RIOTBASE)/pkg/openwsn/sock
+  INCLUDES += -I$(RIOTBASE)/pkg/openwsn/sock
   DIRS += $(RIOTBASE)/pkg/openwsn/sock
 endif
 

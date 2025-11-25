@@ -149,10 +149,10 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
     at86rf215_t *dev = container_of(netdev_ieee802154, at86rf215_t, netdev);
+    size_t len = 0;
 
-    ssize_t len = at86rf215_tx_prepare(dev);
-    if (len) {
-        return len;
+    if (at86rf215_tx_prepare(dev)) {
+        return -EBUSY;
     }
 
     /* load packet data into FIFO */
@@ -176,8 +176,9 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         at86rf215_tx_exec(dev);
     }
 
-    /* netdev_new just returns 0 on success */
-    return 0;
+    /* return the number of bytes that were actually loaded into the frame
+     * buffer/send out */
+    return (int)len;
 }
 
 static int _confirm_send(netdev_t *netdev, void *info)
@@ -322,6 +323,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         case NETOPT_RX_START_IRQ:
         case NETOPT_TX_START_IRQ:
+        case NETOPT_TX_END_IRQ:
             *((netopt_enable_t *)val) = NETOPT_ENABLE;
             return sizeof(netopt_enable_t);
 
@@ -855,7 +857,7 @@ static void _enable_tx2rx(at86rf215_t *dev)
     at86rf215_reg_write(dev, dev->BBC->RG_AMCS, amcs);
 }
 
-static void _tx_end(at86rf215_t *dev)
+static void _tx_end(at86rf215_t *dev, netdev_event_t event)
 {
     netdev_t *netdev = &dev->netdev.netdev;
 
@@ -867,20 +869,17 @@ static void _tx_end(at86rf215_t *dev)
 
     at86rf215_tx_done(dev);
 
+    if (event == NETDEV_EVENT_TX_NOACK) {
+        /* signal error to confirm_send */
+        dev->tx_frame_len = (int16_t)-EIO;
+    }
+
     if (netdev->event_callback) {
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     }
 
     dev->timeout = 0;
     dev->state = AT86RF215_STATE_IDLE;
-}
-
-static void __tx_end_timeout(at86rf215_t *dev)
-{
-    /* signal error to confirm_send */
-    dev->tx_frame_len = (int16_t)-EHOSTUNREACH;
-
-    _tx_end(dev);
 }
 
 static void _ack_timeout_cb(void* arg) {
@@ -974,7 +973,7 @@ static void _handle_ack_timeout(at86rf215_t *dev)
         at86rf215_rf_cmd(dev, CMD_RF_TXPREP);
     } else {
         /* no retransmissions left */
-        __tx_end_timeout(dev);
+        _tx_end(dev, NETDEV_EVENT_TX_NOACK);
     }
 }
 
@@ -1233,7 +1232,7 @@ static void _isr(netdev_t *netdev)
             dev->state = AT86RF215_STATE_TX_WAIT_ACK;
             _start_ack_timer(dev);
         } else {
-            _tx_end(dev);
+            _tx_end(dev, NETDEV_EVENT_TX_COMPLETE);
         }
         break;
 
@@ -1254,7 +1253,7 @@ static void _isr(netdev_t *netdev)
         if (_ack_frame_received(dev)) {
             timeout = 0;
             xtimer_remove(&dev->timer);
-            _tx_end(dev);
+            _tx_end(dev, NETDEV_EVENT_TX_COMPLETE);
             at86rf215_rf_cmd(dev, CMD_RF_RX);
             break;
         }

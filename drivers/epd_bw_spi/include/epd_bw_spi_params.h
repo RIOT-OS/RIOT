@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_epd_bw_spi
  *
@@ -17,6 +15,9 @@
  *
  * @author      Silke Hofstra <silke@slxh.eu>
  */
+
+#ifndef EPD_BW_SPI_PARAMS_H
+#define EPD_BW_SPI_PARAMS_H
 
 #include "board.h"
 #include "epd_bw_spi.h"
@@ -200,4 +201,5 @@ static const epd_bw_spi_params_t epd_bw_spi_params[] =
 #ifdef __cplusplus
 }
 #endif
+#endif /* EPD_BW_SPI_PARAMS_H */
 /**@}*/

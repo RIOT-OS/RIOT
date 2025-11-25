@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,8 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
+#ifndef TESTS_CORE_XFA_H
+#define TESTS_CORE_XFA_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,5 +30,7 @@ typedef struct {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* TESTS_CORE_XFA_H */
 
 /** @} */

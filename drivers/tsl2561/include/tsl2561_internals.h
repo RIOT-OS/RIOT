@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_tsl2561
  * @brief       Internal addresses, registers, constants for the TSL2561 sensor.
@@ -18,6 +16,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef TSL2561_INTERNALS_H
+#define TSL2561_INTERNALS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -103,4 +104,5 @@ extern "C" {
 }
 #endif
 
+#endif /* TSL2561_INTERNALS_H */
 /** @} */

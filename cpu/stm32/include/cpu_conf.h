@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2016 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2016 Freie Universität Berlin
+ *               2016 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_stm32
@@ -16,6 +17,9 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Alexandre Abadie <alexandre.abadie@inria.fr>
 */
+
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
 #include <stdint.h>
 #include "cpu_conf_common.h"
@@ -255,4 +259,5 @@ typedef uint16_t stm32_flashpage_block_t;
 }
 #endif
 
+#endif /* CPU_CONF_H */
 /** @} */

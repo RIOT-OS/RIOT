@@ -12,9 +12,4 @@ FEATURES_PROVIDED += periph_spi
 # unique features provided by the board
 FEATURES_PROVIDED += esp_jtag
 
-FEATURES_PROVIDED += arduino_analog
-FEATURES_PROVIDED += arduino_i2c
 FEATURES_PROVIDED += arduino_pins
-FEATURES_PROVIDED += arduino_pwm
-FEATURES_PROVIDED += arduino_spi
-FEATURES_PROVIDED += arduino_uart

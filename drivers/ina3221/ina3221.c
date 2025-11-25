@@ -54,7 +54,7 @@
  *
  * @return      0, on success
  * @return      -EIO, if i2c bus acquirement failed
- * @return      Same as @ref i2c_read_regs
+ * @return      @see i2c_read_regs
  */
 static int _read_reg(const ina3221_t *dev, uint8_t reg, uint16_t *out)
 {
@@ -80,7 +80,7 @@ static int _read_reg(const ina3221_t *dev, uint8_t reg, uint16_t *out)
  *
  * @return      0, on success
  * @return      -EIO, if i2c bus acquirement failed
- * @return      Same as @ref i2c_write_regs
+ * @return      @see i2c_write_regs
  */
 static int _write_reg(const ina3221_t *dev, uint8_t reg, uint16_t in)
 {

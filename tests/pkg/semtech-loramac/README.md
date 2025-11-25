@@ -261,7 +261,7 @@ for ABP. The test assumes that both devices have the same Application EUI.
 
 3. stop the iotlab experiment:
 
-    $ make -C examples/networking/misc/lorawan/ iotlab-stop
+    $ make -C examples/lorawan/ iotlab-stop
 
 _note_: if you have multiple running experiments you will need to set `IOTLAB_EXP_ID`
         to the appropriate experiment, when using the `iotlab-exp` you will see a:

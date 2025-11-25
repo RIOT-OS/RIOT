@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2020 Otto-von-Guericke-Universität Magdeburg
- * SPDX-FileCopyrightText: 2021 Gerson Fernando Budke
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
+ *               2021 Gerson Fernando Budke
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_avr8_common
@@ -17,6 +18,8 @@
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
  */
 
+#ifndef ATOMIC_UTILS_ARCH_H
+#define ATOMIC_UTILS_ARCH_H
 #ifndef DOXYGEN
 
 #include "periph_cpu.h"
@@ -47,4 +50,5 @@ static inline void atomic_store_u8(volatile uint8_t *dest, uint8_t val)
 #endif
 
 #endif /* DOXYGEN */
+#endif /* ATOMIC_UTILS_ARCH_H */
 /** @} */

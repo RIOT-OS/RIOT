@@ -35,6 +35,10 @@ static mutex_t _lock;
 
 void __attribute__((used)) *__wrap_malloc(size_t size)
 {
+    uinttxtptr_t pc;
+    if (IS_USED(MODULE_MALLOC_TRACING)) {
+        pc = cpu_get_caller_pc();
+    }
     assert(!irq_is_in());
     mutex_lock(&_lock);
     void *ptr = __real_malloc(size);
@@ -42,11 +46,19 @@ void __attribute__((used)) *__wrap_malloc(size_t size)
         malloc_monitor_add(ptr, size, cpu_get_caller_pc(), "m");
     }
     mutex_unlock(&_lock);
+    if (IS_USED(MODULE_MALLOC_TRACING)) {
+        printf("malloc(%" PRIuSIZE ") @ 0x%" PRIxTXTPTR " returned %p\n",
+               size, pc, ptr);
+    }
     return ptr;
 }
 
 void __attribute__((used)) __wrap_free(void *ptr)
 {
+    if (IS_USED(MODULE_MALLOC_TRACING)) {
+        uinttxtptr_t pc = cpu_get_caller_pc();
+        printf("free(%p) @ 0x%" PRIxTXTPTR ")\n", ptr, pc);
+    }
     assert(!irq_is_in());
     mutex_lock(&_lock);
     __real_free(ptr);
@@ -58,11 +70,19 @@ void __attribute__((used)) __wrap_free(void *ptr)
 
 void * __attribute__((used)) __wrap_calloc(size_t nmemb, size_t size)
 {
+    uinttxtptr_t pc;
+    if (IS_USED(MODULE_MALLOC_TRACING)) {
+        pc = cpu_get_caller_pc();
+    }
     /* some c libs don't perform proper overflow check (e.g. newlib < 4.0.0). Hence, we
      * just implement calloc on top of malloc ourselves. In addition to ensuring proper
      * overflow checks, this likely saves a bit of ROM */
     size_t total_size;
     if (__builtin_mul_overflow(nmemb, size, &total_size)) {
+        if (IS_USED(MODULE_MALLOC_TRACING)) {
+            printf("calloc(%" PRIuSIZE ", %" PRIuSIZE ") @ 0x%" PRIxTXTPTR " overflowed\n",
+                   nmemb, size, pc);
+        }
         return NULL;
     }
 
@@ -76,11 +96,21 @@ void * __attribute__((used)) __wrap_calloc(size_t nmemb, size_t size)
         memset(res, 0, total_size);
     }
 
+    if (IS_USED(MODULE_MALLOC_TRACING)) {
+        printf("calloc(%" PRIuSIZE ", %" PRIuSIZE ") @ 0x%" PRIxTXTPTR " returned %p\n",
+               nmemb, size, pc, res);
+    }
+
     return res;
 }
 
 void * __attribute__((used))__wrap_realloc(void *ptr, size_t size)
 {
+    uinttxtptr_t pc;
+    if (IS_USED(MODULE_MALLOC_TRACING)) {
+        pc = cpu_get_caller_pc();
+    }
+
     assert(!irq_is_in());
     mutex_lock(&_lock);
     void *new = __real_realloc(ptr, size);
@@ -89,6 +119,10 @@ void * __attribute__((used))__wrap_realloc(void *ptr, size_t size)
     }
     mutex_unlock(&_lock);
 
+    if (IS_USED(MODULE_MALLOC_TRACING)) {
+        printf("realloc(%p, %" PRIuSIZE ") @0x%" PRIxTXTPTR " returned %p\n",
+               ptr, size, pc, new);
+    }
     return new;
 }
 

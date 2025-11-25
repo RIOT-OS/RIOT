@@ -1,34 +1,11 @@
 include ../Makefile.net_common
 
-# use GNRC by default
-LWIP_IPV4 ?= 0
-LWIP_IPV6 ?= 0
-
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += netdev_default
-
-ifeq (,$(filter 1, $(LWIP_IPV4) $(LWIP_IPV6)))
-  USEMODULE += auto_init_gnrc_netif
-  # Specify the mandatory networking modules
-  USEMODULE += gnrc_ipv6_default
-else
-  ifeq (1,$(LWIP_IPV4))
-    USEMODULE += ipv4_addr
-
-    USEMODULE += lwip_arp
-    USEMODULE += lwip_ipv4
-    USEMODULE += lwip_dhcp_auto
-    CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
-  endif
-
-  ifeq (1,$(LWIP_IPV6))
-    USEMODULE += ipv6_addr
-
-    USEMODULE += lwip_ipv6
-    USEMODULE += lwip_ipv6_autoconfig
-  endif
-endif
+USEMODULE += auto_init_gnrc_netif
+# Specify the mandatory networking modules
+USEMODULE += gnrc_ipv6_default
 
 # Optionally include DNS support. This includes resolution of names at an
 # upstream DNS server and the handling of RDNSS options in Router Advertisements
@@ -38,7 +15,6 @@ endif
 
 USEMODULE += nanocoap_sock
 USEMODULE += nanocoap_resources
-USEMODULE += fmt # scn_buf_hex() for shell cmd client_token
 
 # boards where basic nanocoap functionality fits, but no VFS
 LOW_MEMORY_BOARDS := \
@@ -48,8 +24,6 @@ LOW_MEMORY_BOARDS := \
   bluepill-stm32f103c8 \
   derfmega128 \
   im880b \
-  nucleo-f070rb \
-  nucleo-f072rb \
   nucleo-f302r8 \
   saml10-xpro \
   saml11-xpro \
@@ -65,7 +39,6 @@ ifeq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   USEMODULE += nanocoap_dtls
   USEMODULE += prng_sha256prng
 
-  USEMODULE += nanocoap_sock_observe
   USEMODULE += nanocoap_vfs
   USEMODULE += vfs_default
   # USEMODULE += vfs_auto_format
@@ -75,7 +48,7 @@ ifeq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(3*THREAD_STACKSIZE_DEFAULT\)
 
   # always enable auto-format for native
-  ifneq (,$(filter native native32 native64,$(BOARD)))
+  ifneq (,$(filter native native64,$(BOARD)))
     USEMODULE += vfs_auto_format
   endif
 endif

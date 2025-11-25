@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_hdc1000
  *
@@ -17,6 +15,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef HDC1000_PARAMS_H
+#define HDC1000_PARAMS_H
 
 #include "board.h"
 #include "hdc1000.h"
@@ -96,4 +97,5 @@ static const saul_reg_info_t hdc1000_saul_info[] =
 }
 #endif
 
+#endif /* HDC1000_PARAMS_H */
 /** @} */

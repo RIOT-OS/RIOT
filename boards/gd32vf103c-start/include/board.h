@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2024 Marian Buschsieweke
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2024 Marian Buschsieweke
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_gd32vf103c_start
@@ -14,6 +15,9 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "board_common.h"
 #include "periph/gpio.h"
@@ -46,4 +50,5 @@ extern "C" {
 }
 #endif
 
+#endif /* BOARD_H */
 /** @} */

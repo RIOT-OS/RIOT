@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2023 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2023 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_gd32v
@@ -12,6 +13,9 @@
  * @file
  * @brief       CPU specific definitions
  */
+
+#ifndef CPU_H
+#define CPU_H
 
 #include "cpu_conf.h"
 #include "cpu_common.h"
@@ -41,4 +45,5 @@ static inline void cpu_jump_to_image(uint32_t addr)
 }
 #endif
 
+#endif /* CPU_H */
 /** @} */

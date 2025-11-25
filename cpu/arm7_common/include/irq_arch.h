@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2005-2008 by Thomas Hillebrandt and Heiko Will
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2005, 2006, 2007, 2008 by Thomas Hillebrandt and Heiko Will
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_arm7_common
@@ -14,6 +15,9 @@
  *
  * @author          Heiko Will <hwill@inf.fu-berlin.de>
  */
+
+#ifndef IRQ_ARCH_H
+#define IRQ_ARCH_H
 
 #include "VIC.h"
 #include <stdbool.h>
@@ -75,4 +79,5 @@ static inline __attribute__((always_inline)) bool irq_is_enabled(void)
 }
 #endif
 
+#endif /* IRQ_ARCH_H */
 /** @} */

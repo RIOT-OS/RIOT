@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    pkg_nimble_addr Address Helper
  * @ingroup     pkg_nimble
@@ -19,6 +17,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef NIMBLE_ADDR_H
+#define NIMBLE_ADDR_H
 
 #include "nimble/ble.h"
 
@@ -53,4 +54,5 @@ void nimble_addr_sprint(char *buf, const ble_addr_t *addr);
 }
 #endif
 
+#endif /* NIMBLE_ADDR_H */
 /** @} */

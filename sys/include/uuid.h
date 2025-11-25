@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_uuid RFC 4122 compliant UUID's
  * @ingroup     sys
@@ -24,6 +22,9 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
+
+#ifndef UUID_H
+#define UUID_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -160,4 +161,5 @@ int uuid_from_string(uuid_t *uuid, const char *str);
 #ifdef __cplusplus
 }
 #endif
+#endif /* UUID_H */
 /** @} */

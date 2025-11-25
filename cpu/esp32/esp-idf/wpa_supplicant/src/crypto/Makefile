@@ -32,7 +32,6 @@ ESP32_SDK_SRC = \
   components/wpa_supplicant/src/crypto/sha1-pbkdf2.c \
   components/wpa_supplicant/src/crypto/sha1-prf.c \
   components/wpa_supplicant/src/crypto/sha1-tlsprf.c \
-  components/wpa_supplicant/src/crypto/sha1-tprf.c \
   components/wpa_supplicant/src/crypto/sha256.c \
   components/wpa_supplicant/src/crypto/sha256-internal.c \
   components/wpa_supplicant/src/crypto/sha256-kdf.c \
@@ -42,7 +41,6 @@ ESP32_SDK_SRC = \
   components/wpa_supplicant/src/crypto/sha384-prf.c \
   components/wpa_supplicant/src/crypto/sha384-tlsprf.c \
   components/wpa_supplicant/src/crypto/sha512-internal.c \
-  components/wpa_supplicant/src/crypto/tls_internal.c \
   #
 
 include $(ESP_IDF_WPA_SUPPLICANT_PATH)/esp_idf_wpa_supplicant.mk

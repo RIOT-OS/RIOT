@@ -1,18 +1,17 @@
-# Using -isystem instead of -I to prevent warnings for the following headers
-INCLUDES += -isystem$(PKGDIRBASE)/uwb-core/hw/drivers/uwb/include/ \
-            -isystem$(PKGDIRBASE)/uwb-core/lib/euclid/include \
-            -isystem$(PKGDIRBASE)/uwb-core/lib/dsp/include \
-            -isystem$(PKGDIRBASE)/uwb-core/lib/json/include \
-            -isystem$(PKGDIRBASE)/uwb-core/lib/rng_math/include \
-            -isystem$(PKGDIRBASE)/uwb-core/lib/twr_ss/include \
-            -isystem$(PKGDIRBASE)/uwb-core/lib/twr_ss_ext/include \
-            -isystem$(PKGDIRBASE)/uwb-core/lib/twr_ss_ack/include \
-            -isystem$(PKGDIRBASE)/uwb-core/lib/twr_ds/include \
-            -isystem$(PKGDIRBASE)/uwb-core/lib/twr_ds_ext/include \
-            -isystem$(PKGDIRBASE)/uwb-core/lib/uwb_rng/include \
-            -isystem$(PKGDIRBASE)/uwb-core/porting/dpl/riot/include/ \
-            -isystem$(PKGDIRBASE)/uwb-core/sys/uwbcfg/include \
-            -isystem$(RIOTPKG)/uwb-core/include \
+INCLUDES += -I$(PKGDIRBASE)/uwb-core/hw/drivers/uwb/include/ \
+            -I$(PKGDIRBASE)/uwb-core/lib/euclid/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/dsp/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/json/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/rng_math/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/twr_ss/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/twr_ss_ext/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/twr_ss_ack/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/twr_ds/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/twr_ds_ext/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/uwb_rng/include \
+            -I$(PKGDIRBASE)/uwb-core/porting/dpl/riot/include/ \
+            -I$(PKGDIRBASE)/uwb-core/sys/uwbcfg/include \
+            -I$(RIOTPKG)/uwb-core/include \
             #
 
 PSEUDOMODULES += uwb-core_dpl

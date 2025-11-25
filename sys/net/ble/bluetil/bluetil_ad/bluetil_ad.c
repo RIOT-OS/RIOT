@@ -44,12 +44,8 @@ int bluetil_ad_find(const bluetil_ad_t *ad, uint8_t type,
 
     unsigned pos = 0;
 
-    while ((pos + POS_DATA) < ad->pos) {
+    while ((pos + POS_TYPE) < ad->pos) {
         uint8_t len = ad->buf[pos];
-
-        if (pos + len >= ad->pos) {
-            return BLUETIL_AD_NOMEM;
-        }
 
         if (ad->buf[pos + POS_TYPE] == type) {
             data->data = ad->buf + pos + POS_DATA;

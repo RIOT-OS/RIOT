@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_ds3234
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
+
+#ifndef DS3234_REGS_H
+#define DS3234_REGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,4 +71,5 @@ enum {
 }
 #endif
 
+#endif /* DS3234_REGS_H */
 /** @} */

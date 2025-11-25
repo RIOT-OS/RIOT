@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_uwb_core
  * @{
@@ -18,6 +16,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+
+#ifndef DPL_DPL_OS_H
+#define DPL_DPL_OS_H
 
 #include "os/os.h"
 
@@ -72,3 +73,5 @@ static inline bool dpl_hw_is_in_critical(void)
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* DPL_DPL_OS_H */

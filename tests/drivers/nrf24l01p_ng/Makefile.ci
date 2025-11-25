@@ -11,7 +11,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atxmega-a3bu-xplained \
     bluepill-stm32f030c8 \
     i-nucleo-lrwan1 \
-    msb-430h \
+    msb-430 \
     nucleo-c031c6 \
     nucleo-f030r8 \
     nucleo-f031k6 \
@@ -27,4 +27,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32f0discovery \
     stm32l0538-disco \
     telosb \
+    waspmote-pro \
     #

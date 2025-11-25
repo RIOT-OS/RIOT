@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_at25xxx
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+
+#ifndef AT25XXX_PARAMS_H
+#define AT25XXX_PARAMS_H
 
 #include "board.h"
 #include "at25xxx.h"
@@ -77,4 +78,5 @@ static const at25xxx_params_t at25xxx_params[] =
 }
 #endif
 
+#endif /* AT25XXX_PARAMS_H */
 /** @} */

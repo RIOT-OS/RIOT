@@ -1,12 +1,13 @@
 /*
- * SPDX-FileCopyrightText: 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
- * SPDX-FileCopyrightText: 2016 Laurent Navet <laurent.navet@gmail.com>
- * SPDX-FileCopyrightText: 2019 Otto-von-Guericke-Universität Magdeburg
- * SPDX-FileCopyrightText: 2021-2023 Gerson Fernando Budke
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
+ *               2016 Laurent Navet <laurent.navet@gmail.com>
+ *               2019 Otto-von-Guericke-Universität Magdeburg
+ *               2021-2123 Gerson Fernando Budke
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_atmega328p_xplained_mini
@@ -20,6 +21,9 @@
  * @author      Laurent Navet <laurent.navet@gmail.com>
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
  */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -76,4 +80,5 @@ extern "C" {
 }
 #endif
 
+#endif /* BOARD_H */
 /** @} */

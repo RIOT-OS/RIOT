@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_uwb_core
  * @{
@@ -19,6 +17,9 @@
  * @}
  */
 
+#ifndef DPL_QUEUE_H
+#define DPL_QUEUE_H
+
 #include "os/os_queue.h"
 
 #ifdef __cplusplus
@@ -28,3 +29,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* DPL_QUEUE_H */

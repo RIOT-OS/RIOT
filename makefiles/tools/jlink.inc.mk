@@ -1,5 +1,3 @@
-include $(RIOTMAKE)/tools/dbg_common.inc.mk
-
 FLASHER ?= $(RIOTTOOLS)/jlink/jlink.sh
 DEBUGGER ?= $(RIOTTOOLS)/jlink/jlink.sh
 DEBUGSERVER ?= $(RIOTTOOLS)/jlink/jlink.sh
@@ -20,8 +18,7 @@ JLINK_PRE_FLASH ?=
 JLINK_POST_FLASH ?=
 
 JLINK_FLASH_TARGETS = flash flash%
-JLINK_DEBUG_TARGETS = debug debug-server
-JLINK_TARGETS = $(JLINK_DEBUG_TARGETS) $(JLINK_FLASH_TARGETS) reset term-rtt
+JLINK_TARGETS = debug% $(JLINK_FLASH_TARGETS) reset term-rtt
 
 # Export JLINK_SERIAL to required targets
 $(call target-export-variables,$(JLINK_TARGETS),JLINK_SERIAL)
@@ -52,9 +49,4 @@ endif
 # Export JLINK_POST_FLASH to flash targets only if not empty
 ifneq (,$(JLINK_POST_FLASH))
   $(call target-export-variables,JLINK_FLASH_TARGETS,JLINK_POST_FLASH)
-endif
-
-ifneq (,$(DBG_EXTRA_FLAGS))
-  # Export OPENOCD_DBG_EXTRA_CMD only to the flash/flash-only target
-  $(call target-export-variables,$(JLINK_DEBUG_TARGETS),DBG_EXTRA_FLAGS)
 endif

@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2022 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2022 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -31,6 +34,8 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#define RTC_CLK_CAL_FRACT       19  /* fractional bits of calibration value */
+
 /* contains the values as given at the interface */
 typedef struct {
     uint32_t alarm;         /**< alarm value as set at the interface */
@@ -54,7 +59,6 @@ extern uint32_t rtc_clk_slow_freq_get_hz(void);
 void rtt_restore_counter(bool sys_time);
 static void _rtt_update_hw_alarm(void);
 static void _rtt_isr(void *arg);
-static inline uint32_t _rtt_get_counter(void);
 
 /* forward declarations of driver functions */
 uint64_t _rtc_get_counter(void);
@@ -78,10 +82,10 @@ void rtt_init(void)
         }
     }
 
-    DEBUG("%s rtt_offset=%" PRIu32 " @rtc=%" PRIu32
-          " rtc_active=%d @sys_time=%" PRIu32 "\n", __func__,
-          _rtt_offset, (uint32_t)_rtc_get_counter(),
-          (_rtt_hw == &_rtt_hw_sys_driver) ? 1 : 0, (uint32_t)system_get_time_64());
+    DEBUG("%s rtt_offset=%" PRIu32 " @rtc=%" PRIu64
+          " rtc_active=%d @sys_time=%" PRIi64 "\n", __func__,
+          _rtt_offset, _rtc_get_counter(),
+          (_rtt_hw == &_rtt_hw_sys_driver) ? 1 : 0, system_get_time_64());
 
     /* init the hardware counter if necessary */
     _rtt_hw->init();
@@ -128,8 +132,8 @@ void rtt_clear_overflow_cb(void)
 uint32_t rtt_get_counter(void)
 {
     /* we use only the lower 32 bit of the 48-bit RTC counter */
-    uint32_t counter = _rtt_get_counter();
-    DEBUG("%s counter=%" PRIu32 " @sys_time=%" PRIu32 "\n",
+    uint32_t counter = _rtt_hw->get_counter() + _rtt_offset;
+    DEBUG("%s counter=%" PRIu32 " @sys_time=%" PRIu32" \n",
           __func__, counter, system_get_time());
     return counter;
 }
@@ -139,22 +143,20 @@ void rtt_set_counter(uint32_t counter)
     uint32_t _rtt_current = _rtt_hw->get_counter();
     _rtt_offset = counter - _rtt_current;
 
-    DEBUG("%s set=%" PRIu32 " rtt_offset=%" PRIu32 " @rtt=%" PRIu32
-          " @sys_time=%" PRIu32 "\n",
-          __func__, counter, _rtt_offset, _rtt_current, system_get_time());
+    DEBUG("%s set=%" PRIu32 " rtt_offset=%" PRIu32 " @rtt=%" PRIu32 "\n",
+          __func__, counter, _rtt_offset, _rtt_current);
 
     _rtt_update_hw_alarm();
 }
 
 void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
 {
-    uint32_t counter = _rtt_get_counter();
+    uint32_t counter = rtt_get_counter();
     rtt_counter.alarm = alarm;
     rtt_counter.alarm_cb = cb;
     rtt_counter.alarm_arg = arg;
 
-    DEBUG("%s alarm=%" PRIu32 " @rtt=%" PRIu32 " @sys_time=%" PRIu32 "\n",
-          __func__, alarm, counter, system_get_time());
+    DEBUG("%s alarm=%" PRIu32 " @rtt=%" PRIu32 "\n", __func__, alarm, counter);
 
     _rtt_update_hw_alarm();
 }
@@ -166,8 +168,7 @@ void rtt_clear_alarm(void)
     rtt_counter.alarm_cb = NULL;
     rtt_counter.alarm_arg = NULL;
 
-    DEBUG("%s @rtt=%" PRIu32 " @sys_time=%" PRIu32 "\n",
-          __func__, (uint32_t)_rtt_hw->get_counter(), system_get_time());
+    DEBUG("%s @rtt=%" PRIu32 "\n", __func__, (uint32_t)_rtt_hw->get_counter());
 
     _rtt_update_hw_alarm();
 }
@@ -195,11 +196,11 @@ uint64_t rtt_pm_sleep_enter(unsigned mode)
         return 0;
     }
 
-    uint32_t counter = _rtt_get_counter();
+    uint32_t counter = rtt_get_counter();
     uint64_t t_diff = RTT_TICKS_TO_US(rtt_counter.alarm_active - counter);
 
-    DEBUG("%s rtt_alarm=%" PRIu32 " @rtt=%" PRIu32 " t_diff=%" PRIu32 "\n", __func__,
-          rtt_counter.alarm_active, counter, (uint32_t)t_diff);
+    DEBUG("%s rtt_alarm=%" PRIu32 " @rtt=%" PRIu32 " t_diff=%llu\n", __func__,
+          rtt_counter.alarm_active, counter, t_diff);
 
     if (t_diff) {
         rtt_counter.wakeup = true;
@@ -221,14 +222,9 @@ void rtt_pm_sleep_exit(uint32_t cause)
     }
 }
 
-static inline uint32_t _rtt_get_counter(void)
-{
-    return _rtt_hw->get_counter() + _rtt_offset;
-}
-
 static void _rtt_update_hw_alarm(void)
 {
-    if (rtt_counter.alarm_cb && ((rtt_counter.alarm > _rtt_get_counter()) ||
+    if (rtt_counter.alarm_cb && ((rtt_counter.alarm > rtt_get_counter()) ||
                                  (rtt_counter.overflow_cb == NULL))) {
         /* alarm is the next event if either the alarm is greater than the
            current counter value or the overflow callback is not set. */
@@ -257,7 +253,7 @@ static void IRAM_ATTR _rtt_isr(void *arg)
     if (rtt_counter.wakeup) {
         rtt_counter.wakeup = false;
         DEBUG("%s wakeup alarm alarm=%" PRIu32 " rtt_alarm=%" PRIu32 " @rtt=%" PRIu32 "\n",
-              __func__, alarm, rtt_counter.alarm_active, _rtt_get_counter());
+              __func__, alarm, rtt_counter.alarm_active, rtt_get_counter());
     }
 
     if ((alarm == rtt_counter.alarm) && rtt_counter.alarm_cb) {
@@ -282,7 +278,7 @@ static void IRAM_ATTR _rtt_isr(void *arg)
         }
     }
 
-    DEBUG("%s next rtt=%" PRIu32 "\n", __func__, rtt_counter.alarm_active);
+   DEBUG("%s next rtt=%" PRIu32 "\n", __func__, rtt_counter.alarm_active);
 }
 
 uint32_t _rtt_hw_to_rtt_counter(uint32_t hw_counter)

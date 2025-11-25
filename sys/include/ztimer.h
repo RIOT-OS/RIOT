@@ -5,9 +5,6 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-
-#pragma once
-
 /**
  * @defgroup    sys_ztimer ztimer high level timer abstraction layer
  * @ingroup     sys
@@ -262,13 +259,15 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
+#ifndef ZTIMER_H
+#define ZTIMER_H
+
 #include <stdint.h>
 
-#include "mbox.h"
+#include "sched.h"
 #include "msg.h"
 #include "mutex.h"
 #include "rmutex.h"
-#include "sched.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -303,12 +302,26 @@ struct ztimer_base {
 };
 
 /**
+ * @defgroup   sys_ztimer_now64 ztimer_now64
+ * @brief 64-bit timestamp support
+ *
+ * @deprecated use @ref ztimer_now() returning uint32_t or alternatively use
+ *             module `ztimer64` with @ref ztimer64_now() returning uint64_t.
+ *             Will be removed after 2022.10 release.
+ */
+/**
  * @typedef ztimer_now_t
  * @brief type for ztimer_now() result
  *
- * This is always uint32_t.
+ * @deprecated use @ref ztimer_now() returning uint32_t or alternatively use
+ *             module `ztimer64` with @ref ztimer64_now() returning uint64_t.
+ *             Will be removed after 2022.10 release.
  */
+#if MODULE_ZTIMER_NOW64
+typedef uint64_t ztimer_now_t;
+#else
 typedef uint32_t ztimer_now_t;
+#endif
 
 /**
  * @brief   ztimer structure
@@ -380,7 +393,7 @@ struct ztimer_clock {
                                          stopped state                      */
     uint16_t users;                 /**< user count of this clock */
 #endif
-#if MODULE_ZTIMER_EXTEND || DOXYGEN
+#if MODULE_ZTIMER_EXTEND || MODULE_ZTIMER_NOW64 || DOXYGEN
     /* values used for checkpointed intervals and 32bit extension */
     uint32_t max_value;             /**< maximum relative timer value       */
     uint32_t lower_last;            /**< timer value at last now() call     */
@@ -404,7 +417,7 @@ void ztimer_handler(ztimer_clock_t *clock);
 /**
  * @brief   Acquire a clock
  *
- * This will indicate the underlying clock is required to be running.
+ * This will indicate the the underlying clock is required to be running.
  * If time differences are measured using @ref ztimer_now this will make
  * sure ztimer won't turn of the clock source.
  *
@@ -425,7 +438,7 @@ static inline bool ztimer_acquire(ztimer_clock_t *clock)
 /**
  * @brief   Release a clock
  *
- * This will indicate the underlying clock isn't required to be running
+ * This will indicate the the underlying clock isn't required to be running
  * anymore and may be turned off.
  *
  * @param[in]   clock       ztimer clock to operate on
@@ -532,22 +545,6 @@ int ztimer_msg_receive_timeout(ztimer_clock_t *clock, msg_t *msg,
 #define MSG_ZTIMER 0xc83e   /**< msg type used by ztimer_msg_receive_timeout */
 
 /**
- * @brief Get message from mailbox, blocking with a timeout
- *
- * If the mailbox is empty, this function will block until a message becomes
- * available or the timeout triggers
- *
- * @param[in]   clock           ztimer clock to operate on
- * @param[in]   mbox            ptr to mailbox to operate on
- * @param[in]   msg             ptr to storage for retrieved message
- * @param[in]   timeout         relative timeout, in @p clock time units
- *
- * @retval  0           Got a message
- * @retval -ETIMEDOUT   Timeout triggered before a message was obtained
- */
-int ztimer_mbox_get_timeout(ztimer_clock_t *clock, mbox_t *mbox, msg_t *msg, uint32_t timeout);
-
-/**
  * @brief ztimer_now() for extending timers
  *
  * @internal
@@ -573,7 +570,7 @@ void _ztimer_assert_clock_active(ztimer_clock_t *clock);
  *
  * There are several caveats to consider when using values returned by
  * `ztimer_now()` (or comparing those values to results of @ref ztimer_set,
- * which are compatible):
+ * which are compatible unless MODULE_ZTMIER_NOW64 is in use):
  *
  * * A single value has no meaning of its own. Meaningful results are only ever
  *   produced when subtracting values from each other (in the wrapping fashion
@@ -607,7 +604,7 @@ void _ztimer_assert_clock_active(ztimer_clock_t *clock);
  *
  *   If the clock was active, then the difference between the second value and
  *   the first is then the elapsed time in the clock's unit, **modulo 2³²
- *   ticks**.
+ *   ticks** (or 2⁶⁴ when using the ZTIMER_NOW64 module).
  *
  * * A difference between two values (calculated in the usual wrapping way) is
  *   guaranteed to be exactly the elapsed time (not just modulo 2³²) if there
@@ -686,7 +683,9 @@ static inline ztimer_now_t ztimer_now(ztimer_clock_t *clock)
     _ztimer_assert_clock_active(clock);
 #endif
 
-#if MODULE_ZTIMER_EXTEND
+#if MODULE_ZTIMER_NOW64
+    if (1) {
+#elif MODULE_ZTIMER_EXTEND
     if (clock->max_value < UINT32_MAX) {
 #else
     if (0) {
@@ -895,4 +894,5 @@ extern ztimer_clock_t *const ZTIMER_MSEC_BASE;
 }
 #endif
 
+#endif /* ZTIMER_H */
 /** @} */

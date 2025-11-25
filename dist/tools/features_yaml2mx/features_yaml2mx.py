@@ -103,7 +103,7 @@ def write_mdfile(outfile, yaml_path, parsed):
     :type parsed:       dict
     """
     outfile.write(f"""\
-# List of Features (Features as Build System Enties)            {{#feature-list}}
+# List of Features (Features as Build System Enties)
 <!--
 WARNING: This has been auto-generated from {yaml_path}.
          Do not edit this by hand, but update {yaml_path} instead.

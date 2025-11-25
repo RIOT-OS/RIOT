@@ -1,6 +1,6 @@
 include ../Makefile.pkg_common
 
-TEST_ON_CI_WHITELIST += native32 native64
+TEST_ON_CI_WHITELIST += native native64
 
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(5*THREAD_STACKSIZE_DEFAULT\)
 

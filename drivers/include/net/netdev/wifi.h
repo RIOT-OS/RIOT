@@ -6,8 +6,6 @@
  * more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_netdev_wifi Wi-Fi drivers
  * @ingroup     drivers_netdev_api
@@ -18,6 +16,9 @@
  *
  * @author      Fabian Hüßler <fabian.huessler@ml-pa.com>
  */
+
+#ifndef NET_NETDEV_WIFI_H
+#define NET_NETDEV_WIFI_H
 
 #include "net/ethernet/hdr.h"
 #include "net/netopt.h"
@@ -204,4 +205,5 @@ typedef void (*wifi_on_disconnect_result_t) (void *netif, const wifi_disconnect_
 }
 #endif
 
+#endif /* NET_NETDEV_WIFI_H */
 /** @} */

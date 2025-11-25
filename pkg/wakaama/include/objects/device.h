@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     lwm2m_objects
  * @defgroup    lwm2m_objects_device Device LwM2M object
@@ -45,6 +43,9 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
+
+#ifndef OBJECTS_DEVICE_H
+#define OBJECTS_DEVICE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -269,4 +270,5 @@ bool lwm2m_device_reboot_requested(void);
 }
 #endif
 
+#endif /* OBJECTS_DEVICE_H */
 /** @} */

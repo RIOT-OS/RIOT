@@ -1,4 +1,0 @@
-# This must be a different name than 'board' as it is implemented by 'native'
-USEMODULE += board_external_native
-
-include $(RIOTBOARD)/native32/Makefile.dep

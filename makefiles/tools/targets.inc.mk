@@ -66,17 +66,12 @@ $(RIOTTOOLS)/uf2/uf2conv.py: $(RIOTTOOLS)/uf2/Makefile
 	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/uf2
 	@echo "[INFO] uf2conv.py successfully fetched!"
 
-$(RIOTTOOLS)/picotool/picotool: $(RIOTTOOLS)/picotool/Makefile
-	@echo "[INFO] picotool not found - fetching it from GitHub now"
-	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/picotool
-	@echo "[INFO] picotool successfully fetched!"
+$(RIOTTOOLS)/elf2uf2/elf2uf2: $(RIOTTOOLS)/elf2uf2/Makefile
+	@echo "[INFO] elf2uf2 not found - fetching it from GitHub now"
+	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/elf2uf2
+	@echo "[INFO] elf2uf2 successfully fetched!"
 
 $(RIOTTOOLS)/pioasm/pioasm: $(RIOTTOOLS)/pioasm/Makefile
 	@echo "[INFO] pioasm not found - fetching it from GitHub now"
 	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/pioasm
 	@echo "[INFO] pioasm successfully fetched!"
-
-$(RIOTTOOLS)/PyCortexMDebug/checkout: $(RIOTTOOLS)/PyCortexMDebug/Makefile
-	@echo "[INFO] PyCortexMDebug not found - fetching it from GitHub now"
-	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/PyCortexMDebug
-	@echo "[INFO] PyCortexMDebug successfully fetched!"

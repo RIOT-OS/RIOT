@@ -6,18 +6,19 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     net_gnrc_tcp
  *
  * @{
  *
  * @file
- * @brief       TCP finite state machine declarations.
+ * @brief       TCP finite state maschine declarations.
  *
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
+
+#ifndef GNRC_TCP_FSM_H
+#define GNRC_TCP_FSM_H
 
 #include <stdint.h>
 #include "mbox.h"
@@ -63,7 +64,7 @@ typedef enum {
 } _gnrc_tcp_fsm_event_t;
 
 /**
- * @brief TCP finite state machine
+ * @brief TCP finite state maschine
  *
  * @param[in,out] tcb     TCB holding the connection information.
  * @param[in]     event   Current event that triggers FSM transition.
@@ -100,4 +101,5 @@ _gnrc_tcp_fsm_state_t _gnrc_tcp_fsm_get_state(gnrc_tcp_tcb_t *tcb);
 }
 #endif
 
+#endif /* GNRC_TCP_FSM_H */
 /** @} */

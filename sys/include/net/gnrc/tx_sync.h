@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gnrc_tx_sync    Helpers for synchronizing with transmission.
  * @ingroup     net_gnrc
@@ -20,6 +18,8 @@
  *
  * @author  Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
+#ifndef NET_GNRC_TX_SYNC_H
+#define NET_GNRC_TX_SYNC_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -135,4 +135,5 @@ static inline void gnrc_tx_sync(gnrc_tx_sync_t *sync)
 }
 #endif
 
+#endif /* NET_GNRC_TX_SYNC_H */
 /** @} */

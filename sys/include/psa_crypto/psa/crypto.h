@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -20,6 +18,9 @@
  * @see         https://armmbed.github.io/mbed-crypto/html/index.html
  *
  */
+
+#ifndef PSA_CRYPTO_PSA_CRYPTO_H
+#define PSA_CRYPTO_PSA_CRYPTO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -894,6 +895,7 @@ psa_status_t psa_asymmetric_decrypt(psa_key_id_t key,
                                     size_t *output_length);
 #endif /* MODULE_PSA_ASYMMETRIC */
 
+
 #if IS_USED(MODULE_PSA_CIPHER) || defined(DOXYGEN)
 /**
  * @brief   Abort a cipher operation.
@@ -1742,6 +1744,12 @@ psa_status_t psa_export_public_key(psa_key_id_t key,
  *
  * @details This function generates a random symmetric key. As of yet it does not implement
  *          asymmetric key generation.
+ *
+ * @param attributes
+ * @param key_buffer
+ * @param key_buffer_size
+ * @param key_buffer_length
+ * @return psa_status_t
  */
 psa_status_t psa_builtin_generate_key(const psa_key_attributes_t *attributes, uint8_t *key_buffer,
                                       size_t key_buffer_size, size_t *key_buffer_length);
@@ -4070,4 +4078,5 @@ psa_status_t psa_verify_message(psa_key_id_t key,
 }
 #endif
 
+#endif /* PSA_CRYPTO_PSA_CRYPTO_H */
 /** @} */

@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_dynamixel
  *
@@ -18,6 +16,9 @@
  *
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
+
+#ifndef DYNAMIXEL_CRC_H
+#define DYNAMIXEL_CRC_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -32,4 +33,5 @@ uint16_t dynamixel_crc_update(uint16_t crc_accum, const uint8_t *buffer, size_t 
 }
 #endif
 
+#endif /* DYNAMIXEL_CRC_H */
 /** @} */

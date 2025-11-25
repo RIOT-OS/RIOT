@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers
  * @{
@@ -19,6 +17,9 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  */
+
+#ifndef ARDUINO_PINMAP_H
+#define ARDUINO_PINMAP_H
 
 #include "arduino_iomap.h"
 
@@ -33,4 +34,5 @@ extern "C" {
 }
 #endif
 
+#endif /* ARDUINO_PINMAP_H */
 /** @} */

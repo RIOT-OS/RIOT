@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_adxl345
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
+
+#ifndef ADXL345_REGS_H
+#define ADXL345_REGS_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -187,4 +188,5 @@
 }
 #endif
 
+#endif /* ADXL345_REGS_H */
 /** @} */

@@ -36,7 +36,6 @@ static bool reboot;
 /**
  * @brief 'Execute' callback for the Device object.
  *
- * @param[in] context           LWM2M Context
  * @param[in] instance_id       Instance ID. Should be 0 as a single instance exists.
  * @param[in] resource_id       ID of the resource to execute.
  * @param[in] buffer            Information needed for the execution.
@@ -48,13 +47,12 @@ static bool reboot;
  * @return COAP_400_BAD_REQUEST         when wrong information has been sent
  * @return COAP_405_METHOD_NOT_ALLOWED  when trying to execute a resource that is not supported
  */
-static uint8_t _execute_cb(lwm2m_context_t * context, uint16_t instance_id, uint16_t resource_id,
-                           uint8_t * buffer, int length, lwm2m_object_t * object);
+static uint8_t _execute_cb(uint16_t instance_id, uint16_t resource_id, uint8_t *buffer, int length,
+                           lwm2m_object_t *object);
 
 /**
  * @brief 'Read' callback for the Device object.
  *
- * @param[in] context           LWM2M Context
  * @param[in] instance_id       Instance ID. Should be 0 as a single instance exists.
  * @param[in, out] num_data     Number of resources requested. 0 means all.
  * @param[in, out] data_array   Initialized data array to output the values,
@@ -65,13 +63,12 @@ static uint8_t _execute_cb(lwm2m_context_t * context, uint16_t instance_id, uint
  * @return COAP_404_NOT_FOUND               when resource can't be found
  * @return COAP_500_INTERNAL_SERVER_ERROR   otherwise
  */
-static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data,
-                        lwm2m_data_t ** data_array, lwm2m_object_t * object);
+static uint8_t _read_cb(uint16_t instance_id, int *num_data, lwm2m_data_t **data_array,
+                        lwm2m_object_t *object);
 
 /**
  * @brief 'Discover' callback for the Device object.
  *
- * @param[in] context           LWM2M Context
  * @param[in] instance_id       Instance ID. Should be 0 as a single instance exists.
  * @param[in, out] num_data     Number of resources requested. 0 means all.
  * @param[in, out] data_array   Initialized data array to determine if the resource exists,
@@ -82,8 +79,8 @@ static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * n
  * @return COAP_404_NOT_FOUND               when a resource is not supported
  * @return COAP_500_INTERNAL_SERVER_ERROR   otherwise
  */
-static uint8_t _discover_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data,
-                            lwm2m_data_t ** data_array, lwm2m_object_t * object);
+static uint8_t _discover_cb(uint16_t instance_id, int *num_data, lwm2m_data_t **data_array,
+                            lwm2m_object_t *object);
 
 typedef struct {
     lwm2m_list_t list;              /**< Linked list handle */
@@ -98,7 +95,7 @@ static lwm2m_object_t _device_object = {
     .next           = NULL,
     .objID          = LWM2M_DEVICE_OBJECT_ID,
     .instanceList   = (lwm2m_list_t *)&_instance,
-    .readFunc       =  _read_cb,
+    .readFunc       = _read_cb,
     .executeFunc    = _execute_cb,
     .discoverFunc   = _discover_cb,
     .writeFunc      = NULL,
@@ -107,13 +104,12 @@ static lwm2m_object_t _device_object = {
     .userData       = NULL
 };
 
-static uint8_t _discover_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data,
-                            lwm2m_data_t ** data_array, lwm2m_object_t * object)
+static uint8_t _discover_cb(uint16_t instance_id, int *num_data, lwm2m_data_t **data_array,
+                            lwm2m_object_t *object)
 {
     uint8_t result;
     int i;
 
-    (void)context;
     (void)object;
 
     if (instance_id != 0) {
@@ -170,10 +166,9 @@ static uint8_t _discover_cb(lwm2m_context_t * context, uint16_t instance_id, int
     return result;
 }
 
-static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * num_data,
-                        lwm2m_data_t ** data_array, lwm2m_object_t * object)
+static uint8_t _read_cb(uint16_t instance_id, int *num_data, lwm2m_data_t **data_array,
+                        lwm2m_object_t *object)
 {
-    (void)context;
     (void)object;
     int i;
     DEBUG("[lwm2m:device:read]\n");
@@ -269,10 +264,9 @@ static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * n
     return COAP_205_CONTENT;
 }
 
-static uint8_t _execute_cb(lwm2m_context_t * context, uint16_t instance_id, uint16_t resource_id,
-                           uint8_t * buffer, int length, lwm2m_object_t * object)
+static uint8_t _execute_cb(uint16_t instance_id, uint16_t resource_id, uint8_t *buffer, int length,
+                           lwm2m_object_t *object)
 {
-    (void)context;
     (void)buffer;
     (void)object;
 

@@ -11,7 +11,7 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.sendline("mtd info")
+    child.sendline("info")
     child.expect(r'mtd devices: (\d+)')
     mtd_numof = int(child.match.group(1))
     for dev in range(mtd_numof):

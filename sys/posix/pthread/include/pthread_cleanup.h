@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup pthread
  * @{
@@ -15,6 +13,9 @@
  * @brief   Cleanup primitives for pthread threads.
  * @note    Do not include this header file directly, but pthread.h.
  */
+
+#ifndef PTHREAD_CLEANUP_H
+#define PTHREAD_CLEANUP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -93,6 +94,8 @@ void __pthread_cleanup_pop(__pthread_cleanup_datum_t *datum, int execute);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PTHREAD_CLEANUP_H */
 
 /**
  * @}

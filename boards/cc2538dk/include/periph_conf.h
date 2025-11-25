@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2014 Loci Controls Inc.
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2014 Loci Controls Inc.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_cc2538dk
@@ -14,6 +15,9 @@
  *
  * @author      Ian Martin <ian@locicontrols.com>
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "cpu.h"
 #include "periph_cpu.h"
@@ -100,4 +104,5 @@ static const adc_conf_t adc_config[] = {
 } /* end extern "C" */
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

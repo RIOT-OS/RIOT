@@ -68,18 +68,10 @@
 # The setsid command is needed so that Ctrl+C in GDB doesn't kill OpenOCD
 : ${SETSID:=setsid}
 
-# GDB command, usually a separate command for each platform (e.g. arm-none-eabi-gdb)
-: ${GDB:=gdb}
-# Debugger client command, can be used to wrap GDB in a front-end
-: ${DBG:=${GDB}}
-# Start with tui by default
-: ${TUI:=-tui}
-# Extra debugger flags, added by the user
-: ${DBG_EXTRA_FLAGS:=}
 # default GDB port
-: ${GDB_PORT:=3333}
+_GDB_PORT=3333
 # default telnet port
-: ${TELNET_PORT:=4444}
+_TELNET_PORT=4444
 # default J-Link command names, interface and speed
 _JLINK=JLinkExe
 _JLINK_SERVER=JLinkGDBServer
@@ -123,6 +115,15 @@ test_binfile() {
     fi
 }
 
+test_ports() {
+    if [ -z "${GDB_PORT}" ]; then
+        GDB_PORT=${_GDB_PORT}
+    fi
+    if [ -z "${TELNET_PORT}" ]; then
+        TELNET_PORT=${_TELNET_PORT}
+    fi
+}
+
 test_elffile() {
     if [ ! -f "${ELFFILE}" ]; then
         echo "Error: Unable to locate ELFFILE"
@@ -131,10 +132,22 @@ test_elffile() {
     fi
 }
 
+test_tui() {
+    if [ -n "${TUI}" ]; then
+        TUI=-tui
+    fi
+}
+
 test_serial() {
     if [ -n "${JLINK_SERIAL}" ]; then
         JLINK_SERIAL_SERVER="-select usb='${JLINK_SERIAL}'"
         JLINK_SERIAL="-selectemubysn '${JLINK_SERIAL}'"
+    fi
+}
+
+test_dbg() {
+    if [ -z "${DBG}" ]; then
+        DBG="${GDB}"
     fi
 }
 
@@ -173,10 +186,7 @@ flash_common() {
     test_serial
     test_version
     if [ -n "${JLINK_POST_FLASH}" ]; then
-        eval "set -- ${JLINK_POST_FLASH}"
-        for cmd in "$@"; do
-            printf "%s\n" "$cmd"
-        done >> "${BINDIR}/burn.seg"
+        printf "%s\n" "${JLINK_POST_FLASH}" >> "${BINDIR}/burn.seg"
     fi
     cat "${JLINK_RESET_FILE}" >> "${BINDIR}/burn.seg"
     # flash device
@@ -200,10 +210,7 @@ do_flash_bin() {
     truncate -s 0 "${BINDIR}/burn.seg"
     # create temporary burn file
     if [ -n "${JLINK_PRE_FLASH}" ]; then
-        eval "set -- ${JLINK_PRE_FLASH}"
-        for cmd in "$@"; do
-            printf "%s\n" "$cmd"
-        done >> "${BINDIR}/burn.seg"
+        printf "%s\n" "${JLINK_PRE_FLASH}" >> "${BINDIR}/burn.seg"
     fi
     # address to flash is hex formatted, as required by JLink
     ADDR_TO_FLASH="$(printf "0x%08x\n" "$((FLASH_ADDR + IMAGE_OFFSET))")"
@@ -218,10 +225,7 @@ do_flash_elf() {
     truncate -s 0 "${BINDIR}/burn.seg"
     # create temporary burn file
     if [ -n "${JLINK_PRE_FLASH}" ]; then
-        eval "set -- ${JLINK_PRE_FLASH}"
-        for cmd in "$@"; do
-            printf "%s\n" "$cmd"
-        done >> "${BINDIR}/burn.seg"
+        printf "%s\n" "${JLINK_PRE_FLASH}" >> "${BINDIR}/burn.seg"
     fi
     echo "loadfile ${ELFFILE}" >> "${BINDIR}/burn.seg"
     flash_common
@@ -233,6 +237,9 @@ do_debug() {
     test_serial
     test_version
     test_elffile
+    test_ports
+    test_tui
+    test_dbg
     # start the J-Link GDB server
     ${SETSID} sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
                            -nogui \
@@ -245,7 +252,7 @@ do_debug() {
     # save PID for terminating the server afterwards
     DBG_PID=$!
     # connect to the GDB server
-    sh -c "${DBG} -q ${TUI} -ex \"tar ext :${GDB_PORT}\" ${DBG_EXTRA_FLAGS} \"${ELFFILE}\""
+    ${DBG} -q ${TUI} -ex "tar ext :${GDB_PORT}" ${ELFFILE}
     # clean up
     kill ${DBG_PID}
 }
@@ -254,6 +261,7 @@ do_debugserver() {
     test_config
     test_serial
     test_version
+    test_ports
     # start the J-Link GDB server
     sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
                            -nogui \

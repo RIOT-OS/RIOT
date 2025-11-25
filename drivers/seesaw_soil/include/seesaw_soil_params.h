@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_seesaw_soil
  *
@@ -17,6 +15,9 @@
  *
  * @author      Viktor Gal <viktor.gal@maeth.com>
  */
+
+#ifndef SEESAW_SOIL_PARAMS_H
+#define SEESAW_SOIL_PARAMS_H
 
 #include "board.h"
 #include "seesaw_soil.h"
@@ -66,4 +67,5 @@ static const saul_reg_info_t seesaw_soil_saul_info[] =
 }
 #endif
 
+#endif /* SEESAW_SOIL_PARAMS_H */
 /** @} */

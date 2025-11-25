@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_tps6274x
  *
@@ -17,6 +15,9 @@
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
+
+#ifndef TPS6274X_PARAMS_H
+#define TPS6274X_PARAMS_H
 
 #include "board.h"
 #include "tps6274x.h"
@@ -52,4 +53,5 @@ static const tps6274x_params_t tps6274x_params[] =
 }
 #endif
 
+#endif /* TPS6274X_PARAMS_H */
 /** @} */

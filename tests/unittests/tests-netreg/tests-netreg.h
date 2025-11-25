@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,8 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef TESTS_NETREG_H
+#define TESTS_NETREG_H
 
 #include "embUnit.h"
 
@@ -33,4 +33,5 @@ void tests_netreg(void);
 }
 #endif
 
+#endif /* TESTS_NETREG_H */
 /** @} */

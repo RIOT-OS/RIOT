@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_driver_cryptocell_310
  * @{
@@ -18,6 +16,9 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
+
+#ifndef PSA_PERIPH_HASHES_CTX_H
+#define PSA_PERIPH_HASHES_CTX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,4 +60,5 @@ typedef CRYS_HASHUserContext_t psa_hashes_sha512_ctx_t;
 }
 #endif
 
+#endif /* PSA_PERIPH_HASHES_CTX_H */
 /** @} */

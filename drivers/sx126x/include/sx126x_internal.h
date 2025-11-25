@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_sx126x_internal SX1261/2/8 and LLCC68 internal functions
  * @ingroup     drivers_sx126x
@@ -19,6 +17,8 @@
  *
  * @author      José I. Alamos <jose.alamos@haw-hamburg.de>
  */
+#ifndef SX126X_INTERNAL_H
+#define SX126X_INTERNAL_H
 
 #include <assert.h>
 #include "sx126x.h"
@@ -122,25 +122,9 @@ static inline bool sx126x_is_stm32wl(sx126x_t *dev)
     }
 }
 
-/**
- * @brief   Get the current chip state
- *
- * @param[in]   dev                     Device descriptor of the driver
- *
- * @return  Chip state
- */
-sx126x_chip_modes_t sx126x_get_state(const sx126x_t *dev);
-
-/**
- * @brief   Set the internal chip state
- *
- * @param[in]   dev                     Device descriptor of the driver
- * @param[in]   state                   State to set
- */
-void sx126x_set_state(sx126x_t *dev, sx126x_chip_modes_t state);
-
 #ifdef __cplusplus
 }
 #endif
 
+#endif /* SX126X_INTERNAL_H */
 /** @} */

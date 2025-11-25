@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     core_util
  * @{
@@ -19,6 +17,9 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+
+#ifndef BITARITHM_H
+#define BITARITHM_H
 
 #include <stdint.h>
 
@@ -277,4 +278,5 @@ static inline unsigned bitarithm_test_and_clear(unsigned state, uint8_t *index)
 }
 #endif
 
+#endif /* BITARITHM_H */
 /** @} */

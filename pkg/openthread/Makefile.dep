@@ -1,14 +1,10 @@
-USEMODULE += event
-USEMODULE += l2util
-USEMODULE += netdev
 USEMODULE += openthread_contrib
+
+USEMODULE += netdev
 USEMODULE += openthread_contrib_netdev
-
-ifneq (,$(filter openthread-cli-%,$(USEMODULE)))
-  USEMODULE += shell_cmds_default
-endif
-
+USEMODULE += l2util
 USEMODULE += ztimer
 USEMODULE += ztimer_msec
+USEMODULE += event
 
 FEATURES_REQUIRED += cpp

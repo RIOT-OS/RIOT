@@ -69,12 +69,4 @@ ifneq (,$(filter periph_wdt,$(USEMODULE)))
     since values can deviate up to 50% from reference)
 endif
 
-ifneq (,$(filter periph_can,$(FEATURES_USED)))
-  ifneq (,$(filter g4,$(CPU_FAM)))
-	SRC += fdcan.c
-  else
-	SRC += classiccan.c
-  endif
-endif
-
 include $(RIOTMAKE)/periph.mk

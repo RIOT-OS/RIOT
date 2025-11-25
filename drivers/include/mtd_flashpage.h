@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_mtd_flashpage MTD wrapper for Flashpage devices
  * @ingroup     drivers_storage
@@ -24,6 +22,9 @@
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
+
+#ifndef MTD_FLASHPAGE_H
+#define MTD_FLASHPAGE_H
 
 #include "mtd.h"
 #include "periph/flashpage.h"
@@ -116,4 +117,5 @@ extern mtd_dev_t *mtd_aux;
 }
 #endif
 
+#endif /* MTD_FLASHPAGE_H */
 /** @} */

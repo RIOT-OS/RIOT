@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     core_util
  * @{
@@ -20,6 +18,9 @@
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
+
+#ifndef PANIC_H
+#define PANIC_H
 
 #include "kernel_defines.h"
 
@@ -84,6 +85,8 @@ typedef enum {
  *
  * @param[in] crash_code    a unique code for identifying the crash reason
  * @param[in] message       a human readable reason for the crash
+ *
+ * @return                  this function never returns
  * */
 NORETURN void core_panic(core_panic_t crash_code, const char *message);
 
@@ -99,4 +102,5 @@ void panic_arch(void);
 }
 #endif
 
+#endif /* PANIC_H */
 /** @} */

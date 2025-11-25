@@ -1,9 +1,1 @@
-# Using -isystem instead of -I to avoid warnings about these headers
-INCLUDES += -isystem$(PKGDIRBASE)/tinycrypt/lib/include
-
-ifneq (,$(filter psa_tinycrypt_%, $(USEMODULE)))
-  DIRS += $(RIOTPKG)/tinycrypt/psa_tinycrypt
-  INCLUDES += -I$(RIOTBASE)/sys/psa_crypto/include
-endif
-
-PSEUDOMODULES += psa_tinycrypt_aes_ccm
+INCLUDES += -I$(PKGDIRBASE)/tinycrypt/lib/include

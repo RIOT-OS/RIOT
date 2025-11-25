@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2017 JP Bonn
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 JP Bonn
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_riscv_common
@@ -14,6 +15,9 @@
  *
  * @author          JP Bonn
  */
+
+#ifndef CPUCYCLE_H
+#define CPUCYCLE_H
 
 #include <stdint.h>
 
@@ -32,4 +36,5 @@ uint64_t get_cycle_count(void);
 }
 #endif
 
+#endif /* CPUCYCLE_H */
 /** @} */

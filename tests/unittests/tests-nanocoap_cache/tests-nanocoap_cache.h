@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,8 @@
  *
  * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
+#ifndef TESTS_NANOCOAP_CACHE_H
+#define TESTS_NANOCOAP_CACHE_H
 
 #include "embUnit.h"
 
@@ -33,4 +33,5 @@ void tests_nanocoap_cache(void);
 }
 #endif
 
+#endif /* TESTS_NANOCOAP_CACHE_H */
 /** @} */

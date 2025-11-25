@@ -25,13 +25,6 @@ static void test_crb_add_and_consume(void)
 
     crb_init(&cb, buffer, sizeof(buffer));
 
-    /* add a chunk but don't finish it */
-    crb_start_chunk(&cb);
-    crb_add_byte(&cb, 1);
-    crb_add_byte(&cb, 2);
-    crb_add_byte(&cb, 3);
-
-    /* unfinished chunk should be silently discarded */
     TEST_ASSERT(crb_add_chunk(&cb, "one", 4));
     TEST_ASSERT(crb_add_chunk(&cb, "two", 4));
     TEST_ASSERT(crb_add_chunk(&cb, "three", 6));

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup sys_auto_init_lwip_netif
  *
@@ -18,6 +16,9 @@
  *
  * @author  Erik Ekman <eekman@google.com>
  */
+
+#ifndef LWIP_INIT_DEVS_H
+#define LWIP_INIT_DEVS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -72,4 +73,5 @@ typedef void (*lwip_netif_setup_func_t)(void);
 }
 #endif
 
+#endif /* LWIP_INIT_DEVS_H */
 /** @} */

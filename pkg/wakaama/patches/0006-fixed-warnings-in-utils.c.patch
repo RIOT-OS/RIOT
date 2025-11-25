@@ -1,0 +1,33 @@
+From 91e610adbf53342088242e7bc6a207fc4b48a715 Mon Sep 17 00:00:00 2001
+From: Christian Manal <moenoel@informatik.uni-bremen.de>
+Date: Thu, 23 Nov 2017 11:35:06 +0100
+Subject: [PATCH 06/12] fixed warnings in utils.c
+
+---
+ core/utils.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/core/utils.c b/core/utils.c
+index 715dec9..a06d1f6 100644
+--- a/core/utils.c
++++ b/core/utils.c
+@@ -52,7 +52,6 @@
+ #include <stdio.h>
+ #include <float.h>
+ 
+-
+ int utils_textToInt(uint8_t * buffer,
+                     int length,
+                     int64_t * dataP)
+@@ -376,6 +375,8 @@ lwm2m_server_t * utils_findServer(lwm2m_context_t * contextP,
+ lwm2m_server_t * utils_findBootstrapServer(lwm2m_context_t * contextP,
+                                            void * fromSessionH)
+ {
++    (void)contextP;
++    (void)fromSessionH;
+ #ifdef LWM2M_CLIENT_MODE
+ 
+     lwm2m_server_t * targetP;
+-- 
+2.1.4
+

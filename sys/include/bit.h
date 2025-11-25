@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     sys
  * @{
@@ -18,7 +16,9 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
-#include <stdbool.h>
+#ifndef BIT_H
+#define BIT_H
+
 #include <stdint.h>
 #include "cpu.h"
 
@@ -305,4 +305,5 @@ static inline bool bit_check8(volatile uint8_t *ptr, uint8_t bit)
 }
 #endif
 
+#endif /* BIT_H */
 /** @} */

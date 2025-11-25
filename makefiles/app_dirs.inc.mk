@@ -3,25 +3,32 @@
 # fallback so empty RIOTBASE won't lead to "/examples/"
 RIOTBASE ?= .
 
-APPS_BASE_DIRS = bootloaders examples fuzzing tests
-TOOLS_BASE_DIRS = dist/tools
+# 1. use wildcard to find Makefiles
+# 2. use patsubst to drop trailing "/"
+# 3. use patsubst to drop possible leading "./"
+# 4. sort
 
-# 1. recursively find Makefiles
-# 2. take parent folders
-# 3. exclude build artifacts (below bin/)
-# 4. exclude false positives from app_dirs.blacklist
-# 5. sort
-APPLICATION_DIRS := $(shell find $(APPS_BASE_DIRS) -name Makefile -type f | \
-    xargs dirname | \
-    grep -vF "/bin/" | \
-    grep -vFf $(RIOTBASE)/makefiles/app_dirs.blacklist | \
-    sort | uniq)
+# Prepare the list of application directories
+APPLICATION_DIRS :=                   \
+    fuzzing                           \
+    bootloaders                       \
+    examples                          \
+    tests                             \
+    tests/bench                       \
+    tests/build_system                \
+    tests/core                        \
+    tests/cpu                         \
+    tests/drivers                     \
+    tests/net                         \
+    tests/periph                      \
+    tests/pkg                         \
+    tests/sys                         \
+    #
 
-# used for `make claen` and `make distclean`
-TOOLS_DIRS := $(shell find $(TOOLS_BASE_DIRS) -mindepth 2 -maxdepth 2 -name Makefile -type f | \
-    xargs dirname | \
-    grep -vFf $(RIOTBASE)/makefiles/app_dirs.blacklist | \
-    sort | uniq)
+APPLICATION_DIRS := $(addprefix $(RIOTBASE)/,$(APPLICATION_DIRS))
+APPLICATION_DIRS_RELATIVE := $(dir $(wildcard $(addsuffix /*/Makefile,$(APPLICATION_DIRS))))
+APPLICATION_DIRS_ABSOLUTE := $(abspath $(APPLICATION_DIRS_RELATIVE))
+APPLICATION_DIRS := $(sort $(patsubst ./%,%,$(patsubst %/,%,$(APPLICATION_DIRS_RELATIVE))))
 
 info-applications:
 	@for dir in $(APPLICATION_DIRS); do echo $$dir; done

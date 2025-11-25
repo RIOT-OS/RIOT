@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gnrc_neterr Error reporting
  * @ingroup     net_gnrc
@@ -19,6 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef NET_GNRC_NETERR_H
+#define NET_GNRC_NETERR_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -88,4 +88,5 @@ static inline int gnrc_neterr_reg(gnrc_pktsnip_t *pkt)
 }
 #endif
 
+#endif /* NET_GNRC_NETERR_H */
 /** @} */

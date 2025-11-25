@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_mcp2515
  * @brief       Driver for the Microchip MCP2515 can controller.
@@ -20,6 +18,8 @@
  *
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
+#ifndef MCP2515_H
+#define MCP2515_H
 
 #include "mcp2515_defines.h"
 #include "candev_mcp2515.h"
@@ -295,4 +295,5 @@ int mcp2515_set_mask(candev_mcp2515_t *dev, int mailbox, uint32_t mask);
 }
 #endif
 
+#endif /* MCP2515_H */
 /** @} */

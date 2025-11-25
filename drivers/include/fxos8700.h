@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_fxos8700 FXOS8700 3-axis accelerometer/magnetometer
  * @ingroup     drivers_sensors
@@ -26,6 +24,9 @@
  * @author      Michael Andersen <m.andersen@cs.berkeley.edu>
  * @author      Hyung-Sin Kim <hs.kim@cs.berkeley.edu>
  */
+
+#ifndef FXOS8700_H
+#define FXOS8700_H
 
 #include <stdint.h>
 #include "periph/i2c.h"
@@ -166,4 +167,5 @@ int fxos8700_read_cached(const void* dev, fxos8700_measurement_t* acc, fxos8700_
 }
 #endif
 
+#endif /* FXOS8700_H */
 /** @} */

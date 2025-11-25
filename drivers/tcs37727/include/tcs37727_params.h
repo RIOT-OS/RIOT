@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_tcs37727
  *
@@ -17,6 +15,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef TCS37727_PARAMS_H
+#define TCS37727_PARAMS_H
 
 #include "board.h"
 #include "tcs37727.h"
@@ -70,4 +71,5 @@ static const saul_reg_info_t tcs37727_saul_info[] =
 }
 #endif
 
+#endif /* TCS37727_PARAMS_H */
 /** @} */

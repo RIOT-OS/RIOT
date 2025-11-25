@@ -52,6 +52,7 @@ static uint8_t _ili9341_calc_vml(int16_t vcoml)
     return (vcoml + 2500) / 25;
 }
 
+
 static int _init(lcd_t *dev, const lcd_params_t *params)
 {
     assert(params->lines >= 16 && params->lines <= 320 && !(params->lines & 0x7));

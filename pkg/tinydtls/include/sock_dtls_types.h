@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @{
  *
@@ -17,6 +15,9 @@
  * @author  Aiman Ismail <muhammadaimanbin.ismail@haw-hamburg.de>
  * @author  Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
+
+#ifndef SOCK_DTLS_TYPES_H
+#define SOCK_DTLS_TYPES_H
 
 #include "dtls.h"
 #include "net/sock/udp.h"
@@ -93,4 +94,5 @@ struct sock_dtls_session {
 }
 #endif
 
+#endif /* SOCK_DTLS_TYPES_H */
 /** @} */

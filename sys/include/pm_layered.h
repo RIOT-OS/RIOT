@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_pm_layered Layered PM Infrastructure
  * @ingroup     sys
@@ -33,6 +31,9 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+
+#ifndef PM_LAYERED_H
+#define PM_LAYERED_H
 
 #include <stdint.h>
 #include "periph_cpu.h"
@@ -104,4 +105,5 @@ pm_blocker_t pm_get_blocker(void);
 }
 #endif
 
+#endif /* PM_LAYERED_H */
 /** @} */

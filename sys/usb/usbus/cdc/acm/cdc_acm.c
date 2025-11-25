@@ -22,7 +22,7 @@
 #include <string.h>
 
 #include "tsrb.h"
-#include "turb.h"
+#include "usb/descriptor.h"
 #include "usb/cdc.h"
 #include "usb/descriptor.h"
 #include "usb/usbus.h"
@@ -152,14 +152,25 @@ size_t usbus_cdc_acm_submit(usbus_cdcacm_device_t *cdcacm, const uint8_t *buf, s
 {
     size_t n;
     unsigned old;
-    if (cdcacm->state == USBUS_CDC_ACM_LINE_STATE_DISCONNECTED) {
-        return len;
+    if (cdcacm->state != USBUS_CDC_ACM_LINE_STATE_DISCONNECTED) {
+        old = irq_disable();
+        n = tsrb_add(&cdcacm->tsrb, buf, len);
+        irq_restore(old);
+        return n;
     }
-
+    /* stuff as much data as possible into tsrb, discarding the oldest */
     old = irq_disable();
-    n = turb_add(&cdcacm->tsrb, buf, len);
+    n = tsrb_free(&cdcacm->tsrb);
+    if (len > n) {
+        n += tsrb_drop(&cdcacm->tsrb, len - n);
+        buf += len - n;
+    } else {
+        n = len;
+    }
+    tsrb_add(&cdcacm->tsrb, buf, n);
+    /* behave as if everything has been written correctly */
     irq_restore(old);
-    return n;
+    return len;
 }
 
 void usbus_cdc_acm_set_coding_cb(usbus_cdcacm_device_t *cdcacm,
@@ -330,8 +341,8 @@ static void _handle_in(usbus_cdcacm_device_t *cdcacm,
     }
     /* copy at most CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE chars from input into ep->buf */
     unsigned old = irq_disable();
-    while (!turb_empty(&cdcacm->tsrb)) {
-        int c = turb_get_one(&cdcacm->tsrb);
+    while (!tsrb_empty(&cdcacm->tsrb)) {
+        int c = tsrb_get_one(&cdcacm->tsrb);
         cdcacm->in_buf[cdcacm->occupied++] = (uint8_t)c;
         if (cdcacm->occupied >= CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE) {
             break;
@@ -346,12 +357,8 @@ static void _transfer_handler(usbus_t *usbus, usbus_handler_t *handler,
 {
     (void)usbus;
     (void)event; /* Only receives TR_COMPLETE events */
-    if (ep->type != USB_EP_TYPE_BULK) {
-        return;
-    }
-
     usbus_cdcacm_device_t *cdcacm = (usbus_cdcacm_device_t*)handler;
-    if (ep->dir == USB_EP_DIR_OUT) {
+    if ((ep->dir == USB_EP_DIR_OUT) && (ep->type == USB_EP_TYPE_BULK)) {
         size_t len;
         /* Retrieve incoming data */
         usbdev_ep_get(ep, USBOPT_EP_AVAILABLE, &len, sizeof(size_t));
@@ -360,7 +367,7 @@ static void _transfer_handler(usbus_t *usbus, usbus_handler_t *handler,
         }
         usbdev_ep_xmit(ep, cdcacm->out_buf, CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE);
     }
-    else if (ep->dir == USB_EP_DIR_IN) {
+    if ((ep->dir == USB_EP_DIR_IN) && (ep->type == USB_EP_TYPE_BULK)) {
         cdcacm->occupied = 0;
         if (!tsrb_empty(&cdcacm->tsrb)) {
             return _handle_in(cdcacm, ep);

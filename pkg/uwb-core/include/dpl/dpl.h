@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_uwb_core
  * @{
@@ -18,6 +16,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+
+#ifndef DPL_DPL_H
+#define DPL_DPL_H
 
 #include "syscfg/syscfg.h"
 #include "dpl/dpl_types.h"
@@ -34,3 +35,5 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#endif /* DPL_DPL_H */

@@ -57,7 +57,7 @@ static void *_forward_proxy_thread_start(void *arg)
 void gcoap_forward_proxy_thread_init(void)
 {
     forward_proxy_pid = thread_create(_forward_proxy_thread, sizeof(_forward_proxy_thread),
-                                       THREAD_PRIORITY_MAIN - 1, 0,
+                                       THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
                                        _forward_proxy_thread_start, NULL, "gcoap proxy");
     if (forward_proxy_pid <= KERNEL_PID_UNDEF) {
         DEBUG_PUTS("gcoap_forward_proxy_thread_init(): thread_create failed\n");

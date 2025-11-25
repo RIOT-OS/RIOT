@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_riotboot_magic     Magic values for riotboot
  * @ingroup     sys
@@ -20,6 +18,9 @@
  *
  * @}
  */
+
+#ifndef RIOTBOOT_MAGIC_H
+#define RIOTBOOT_MAGIC_H
 
 #include "riotboot/hdr.h"
 
@@ -42,3 +43,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* RIOTBOOT_MAGIC_H */

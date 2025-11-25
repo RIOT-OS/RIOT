@@ -6,8 +6,6 @@
  * more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_ethernet_hdr Ethernet header
  * @ingroup     net_ethernet
@@ -19,6 +17,9 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+
+#ifndef NET_ETHERNET_HDR_H
+#define NET_ETHERNET_HDR_H
 
 #include <inttypes.h>
 
@@ -49,6 +50,7 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
+#endif /* NET_ETHERNET_HDR_H */
 /**
  * @}
  */

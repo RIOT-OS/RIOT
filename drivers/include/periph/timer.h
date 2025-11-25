@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_periph_timer Timer
  * @ingroup     drivers_periph
@@ -31,6 +29,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef PERIPH_TIMER_H
+#define PERIPH_TIMER_H
 
 #include <limits.h>
 #include <stdint.h>
@@ -266,7 +267,7 @@ uword_t timer_query_channel_numof(tim_t dev);
 /**
  * @brief   Iterate over supported frequencies
  *
- * @param   dev     The timer to get the next supported frequency of
+ * @param   dev     Timer to get the next supported frequency of
  * @param   index   Index of the frequency to get
  * @return          The @p index highest frequency supported by the timer
  * @retval  0       @p index is too high
@@ -280,7 +281,7 @@ uword_t timer_query_channel_numof(tim_t dev);
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
  * uint32_t freq:
- * for (uword_t i = 0; (freq = timer_query_freqs(dev, i)); i++) {
+ * for (uword_t i; (freq = timer_query_freqs(dev, i)); i++) {
  *     work_with_frequency(freq);
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -288,30 +289,12 @@ uword_t timer_query_channel_numof(tim_t dev);
  * Or alternatively:
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
- * for (uword_t i = 0; i < timer_query_freqs_numof(dev); i++) {
+ * for (uword_t i; i < timer_query_freqs_numof(dev); i++) {
  *     work_with_frequency(timer_query_freqs(dev, i));
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 uint32_t timer_query_freqs(tim_t dev, uword_t index);
-
-/**
- * @brief   Search the frequency supported by the timer that is closest to
- *          a given target frequency, efficiently
- *
- * @param   dev     The timer to get the closest supported frequency for
- * @param   target  Ideal frequency to match
- * @return          The frequency supported by the timer @p dev that is
- *                  closest to @p target
- *
- * @details This will use binary search internally to have an O(log(n))
- *          runtime. This can be relevant on hardware with 16 bit or 32 bit
- *          prescaler registers.
- *
- * @note    Add `FEATURES_REQUIRED += periph_timer_query_freqs` to your
- *          `Makefile`.
- */
-uint32_t timer_get_closest_freq(tim_t dev, uint32_t target);
 
 #if defined(DOXYGEN)
 /**
@@ -350,4 +333,5 @@ bool timer_poll_channel(tim_t dev, int channel);
 }
 #endif
 
+#endif /* PERIPH_TIMER_H */
 /** @} */

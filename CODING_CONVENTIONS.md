@@ -3,7 +3,7 @@
 ## General
 
 * Code shall be [C11](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf)
-  compliant, with a list of exceptions detailed below.
+  compliant.
 * Avoid dynamic memory allocation (malloc/free, new, etc.)! It will break
   real-time guarantees, increase code complexity, and make it more likely to use
   more memory than available.
@@ -43,39 +43,6 @@
 * You can use [uncrustify](http://uncrustify.sourceforge.net/) with the provided
   option files: https://github.com/RIOT-OS/RIOT/blob/master/uncrustify-riot.cfg
 
-## Standard Compliance
-
-Using extensions to the C standard in general decreases portability and
-maintainability: The former because porting RIOT to platforms for which limited
-compiler options are available becomes more difficult when compiler-specific
-extensions are used. The latter because extensions are often not as clearly
-defined as standard C, not as well known within the C development community,
-and have fewer resources to look up.
-
-There are a number of cases in which using extensions cannot be avoided, or
-would not be maintainable. For these cases, an exception can be made. A list
-of recognised exceptions where we can (or even must) rely on extensions include:
-
-- Use of `__attribute__((packed))` is allowed for serialization and
-  de-serialization and only there. Ideally, it should not be used in public
-  APIs and types.
-- Code specific to MCU families may use extensions commonly used in this domain,
-  such as inline assembly (e.g. as needed for context swapping), special
-  function attributes (e.g. as needed for IRQ vector entries on some MCUs),
-  etc. Code should still prefer standard compliance when there is no significant
-  downside to it compared to using the extension.
-- `#include_next` may be used when system headers need to be extended.
-- Function attributes for which a wrapper exists in `compiler_hints.h` may be
-  used using that wrapper. These wrappers either unlock additional optimization
-  (such as `NORETURN` or `PURE`) or influence warnings (such as `MAYBE_UNUSED`)
-  produced by the compiler and can simply be replaced by an empty token for
-  compilers that do not support them.
-- `__attribute__((used))`, `__attribute__((section("...")))`,
-  `__attribute__((weak))`, and `__attribute__((alias("...")))`
-  can be used where applicable. Unlike the wrappers in `compiler_hints.h`, we
-  actually require toolchain support for them (an empty-token implementation
-  will not generate correct binaries).
-
 ## Types
 
 * Be careful with platform dependent type sizes like `int` or `long`. Use data
@@ -85,7 +52,7 @@ of recognised exceptions where we can (or even must) rely on extensions include:
 * Type definitions (using `typedef`) always end on "_t".
 * If a typedef is used for a struct, it has to be specified at the struct
   definition (i.e., not as a separate line). E.g.:
-```c
+```
     typedef struct {
         uint8_t a;
         uint8_t b;
@@ -93,7 +60,7 @@ of recognised exceptions where we can (or even must) rely on extensions include:
 ```
 * Use of a separate line typedef for structs is allowed for forward
   declarations, e.g.,
-```c
+```
     typedef struct mystruct mystruct_t;
     [...]
     struct mystruct {
@@ -149,7 +116,7 @@ of recognised exceptions where we can (or even must) rely on extensions include:
 
 *  Names of all public functions and variables must start with the name of the
    corresponding library, e.g.:
-```c
+```
     thread_getpid(void);
     hwtimer_init_comp(uint32_t fcpu);
     int transceiver_pid;
@@ -157,7 +124,7 @@ of recognised exceptions where we can (or even must) rely on extensions include:
 * Private functions and variables do NOT have this library prefix.
 * Do NOT use CamelCase. Function, variable and file names as well as enums,
   structs or typedefs are written in lowercase with underscores.
-```c
+```
     /* instead of: */
     void CamelCaseNamedFunction(int camelCaseNamedVar);
 
@@ -178,7 +145,7 @@ of recognised exceptions where we can (or even must) rely on extensions include:
   `do`-statement, it goes into the same line.
 * Use curly braces even for one-line blocks. This improves debugging and later
   additions.
-```c
+```
     /* instead of: */
     if (debug) println("DEBUG");
     else println("DEBUG ELSE");
@@ -194,103 +161,6 @@ of recognised exceptions where we can (or even must) rely on extensions include:
 * Commas are always followed by a space.
 * For complex statements it is always good to use more parentheses - or split up
   the statement and simplify it.
-* Switch cases are an exception, the `case` statement is supposed to be on
-  the same indentation level as the `switch`:
-```c
-    switch(foo) {
-    case BAR:
-        printf("Hello");
-        break;
-    case PUB:
-        printf("World");
-        break;
-    default:
-        break;
-    }
-```
-
-## Indentation of Preprocessor Directives
-
-Add two spaces of indent *after* the `#` per level of indent. Increment the
-indent when entering conditional compilation using `#if`/`#ifdef`/`#ifndef`
-(except for the include guard, which does not add to the indent). Treat indent
-for C language statements and C preprocessor directives independently.
-
-```c
-/* BAD: */
-#if XOSC1
-#define XOSC XOSC1
-#define XOSC_NUM 1
-#elif XOSC2
-#define XOSC XSOC2
-#define XOSC_NUM 2
-#endif /* XOSC1/XOSC2 */
-```
-
-```c
-/* GOOD: */
-#if XOSC1
-#  define XOSC XOSC1
-#  define XOSC_NUM 1
-#elif XOSC2
-#  define XOSC XSOC2
-#  define XOSC_NUM 2
-#endif
-```
-
-```c
-/* BAD: */
-void init_foo(uint32_t param)
-{
-    (void)param;
-    #if HAS_FOO
-    switch (param) {
-    case CASE1:
-        do_foo_init_for_case1;
-        break;
-    #if HAS_CASE_2
-    case CASE2:
-        do_foo_init_for_case2;
-        break;
-        #endif
-    #endif
-}
-```
-
-```c
-/* GOOD: */
-void init_foo(uint32_t param)
-{
-    (void)param;
-#if HAS_FOO
-    switch (param) {
-    case CASE1:
-        do_foo_init_for_case1;
-        break;
-#  if HAS_CASE_2
-    case CASE2:
-        do_foo_init_for_case2;
-        break;
-#  endif
-#endif
-}
-```
-
-### Reasoning
-
-Adding the indent does improve readability a lot, more than adding comments.
-Hence, we prefer the indent to allow reviewers to quickly grasp the structure
-of the code.
-
-Adding spaces before the `#` is not in compliance with the C standard (even
-though in practice compilers will be just fine with whitespace in front), but
-adding spaces afterwards is standard compliant. In either case, having the `#`
-at the beginning of the line makes it visually stand out from C statements,
-which eases reading the code.
-
-Using an indent width of 2 makes preprocessor directives visually more
-distinctive from C code, which helps to quickly understand the structure
-of code.
 
 ## Includes
 
@@ -301,33 +171,13 @@ of code.
   statement around includes of optional headers:
 ```c
 #ifdef MODULE_ABC
-#  include "abc.h"
+#include "abc.h"
 #endif
 ```
 
-### Include What You Use (IWYU)
-
-`#include` directives that are not actually needed should be removed to reduce
-clutter and improve compilation speed. Similar: Try to add the corresponding
-`#include`s for all the functions, macros, types, etc. used and do not rely on
-`bar.h` to implicitly include `foo.h`, unless this is documented behavior.
-
-Tools such as [clang's Include Cleaner][clangd-include-cleaner] can help with
-that. These tools may show false positives in cases where headers are *expected*
-to be included indirectly: E.g. if `foo.h` is the public header that contains
-common helpers and implementations, but a per platform `foo_arch.h` is included
-from within `foo.h` for platform specific implementations. If in this scenario
-only functions provided by `foo_arch.h` are included, the `#include` of `foo.h`
-is considered as unused. To avoid this, one should add
-[`/* IWYU pragma: export */`](https://github.com/include-what-you-use/include-what-you-use/blob/master/docs/IWYUPragmas.md) after `#include "foo_arch.h"` in `foo.h`.
-
-[clangd-include-cleaner]: https://clangd.llvm.org/design/include-cleaner
-
 ## Header Guards
 
-All header files are required to either contain the widely supported `#pragma once`
-preprocessor directive as the first line after the [copyright note](#documentation),
-or header guards of the form
+All files are required to have header guards of the form
 
 ```c
 #ifndef PATH_TO_FILE_FILENAME_H
@@ -336,9 +186,6 @@ or header guards of the form
 ...
 #endif /* PATH_TO_FILE_FILENAME_H */
 ```
-
-Header guards are deprecated in RIOT header files and will gradually be converted
-to `#pragma once`.
 
 Rules for generating the guard name:
 
@@ -363,7 +210,7 @@ Note: these rules will be enforced by the CI.
 * C Header files should be always wrapped for C++ compatibility to prevent
   issues with name mangling, i.e. mark all the containing functions and
   definitions as `extern "C"`
-```c
+``` C
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -382,48 +229,29 @@ extern "C" {
 
 * Absolute values must be specified as macros or enums, not as literals, i.e.
   instead of
-```c
+```
 int timeout = 7 * 1000000;
 ```
 write
-```c
+```
 int timeout = TIMEOUT_INTERVAL * USEC_PER_SEC;
 ```
 ## Comments
 * All comments should be written as C-style comments.
-* Long multi-Line comments should have a leading asterisk for the second and
-  following lines. The first and last lines should be left empty and not contain
-  any comment text.
-  See also: [Linux Kernel Coding Style](https://www.kernel.org/doc/html/v4.10/process/coding-style.html#commenting).
-* For short multi-line comments of two or three lines, a shorter style is
-  also permissible, where the first and last line do not need to be left empty.
 
 E.g:
-```c
+```
 /* This is a C-style comment */
-
-/* This is a short
- * multi-line comment (max 2-3 lines). */
-
-/*
- * This is a long multi-
- * line comment for more
- * than three lines of
- * comment text.
- */
 ```
 Wrong:
-```c
+```
 // C++ comment here
-
-/* This is a multi-line comment
-   without leading asterisk. */
 ```
 
 ## Documentation
 
 * All documentation must be in English.
-* All files have to contain the copyright and the author note in the SPDX format.
+* All files contain the copyright note and the author.
 * Doxygen documentation is mandatory for all header files.
 * Every header file includes a general description about the provided
   functionality.
@@ -431,10 +259,13 @@ Wrong:
 
 An exemplary doxygen documentation in a header file can look like this.
 
-```c
+```
 /*
- * SPDX-FileCopyrightText: 2014 Peter Schmerzl <peter@schmerzl-os.org>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2014 Peter Schmerzl <peter@schmerzl-os.org>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
 
 /**
@@ -459,56 +290,7 @@ An exemplary doxygen documentation in a header file can look like this.
  * @return 1 if setting the state was successful, 0 otherwise.
  */
  int set_foobar(int state, int *old_state);
-
-/**
- * @brief   Document multiple return values.
- *
- * You can use the `@return` command to specify the general kind of return
- * value and the `@retval` commands to specify distinct values that will be
- * returned by your function.
- *
- * @return  Length of FOO on success or an error code on failure.
- * @retval  -EIO on Input Output Errors
- * @retval  -ENOMEM on small microcontrollers with little RAM
- */
-int get_foolength(void);
 ```
-
-### SPDX
-
-SPDX (System Package Data Exchange) is an open standard for adding
-information about licenses, security information or other metadata to source files.
-It allows for easy, automatic generation of SBOMs (Software Bill of Materials).
-
-RIOT used to use the standard copyright format in a long form, however this
-adds a lot of boilerplate code without much benefit. Furthermore the copyright
-notices tend to vary depending on the author, making it difficult to parse
-automatically and reliably.
-
-Old Style - License Information:
-```c
-/*
- * Copyright (C) 2013, 2014 INRIA
- *               2015 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
-
-```
-
-New Style - SPDX Format:
-```c
-/*
- * SPDX-FileCopyrightText: 2013-2014 INRIA
- * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
- */
-```
-
-More information concerning the transition to SPDX format can be found
-[here](https://github.com/RIOT-OS/RIOT/issues/21515).
 
 ## Common compilation warnings
 
@@ -561,7 +343,7 @@ not a string literal`.
   possibility to suppress this warning/error. You MUST do so by adding a
   comment, including a rationale why it is a false positive and why the code
   can't be fixed otherwise, in the following format:
-```c
+```
     /* cppcheck-suppress <category of error/warning>
      * (reason: cppcheck is being really silly. this is certainly not a
      * null-pointer dereference */
@@ -569,18 +351,17 @@ not a string literal`.
 
 ## Python coding convention
 
-* Code shall be compliant with Python 3.10 at minimum, because this is the
-  default Python 3 version in Ubuntu 22.04 (used as the reference system for
-  CI).
+* Code shall be compliant with Python 3.5 minimum because this is the default
+  Python 3 version in Ubuntu 16.04 (used as the reference system for CI)
 * Code shall report no error when running the
   [Flake8](http://flake8.pycqa.org/en/latest/) tool, e.g:
     * for style checks described in
-      [PEP 8](https://www.python.org/dev/peps/pep-0008/),
+      [PEP8](https://www.python.org/dev/peps/pep-0008/),
     * for lint checks provided by
       [Pyflakes](https://pypi.python.org/pypi/pyflakes),
     * for complexity checks provided by the
       [McCabe project](https://pypi.python.org/pypi/mccabe)
-* A line length of maximum of 120 is allowed instead of 79 as per PEP 8. This
+* A line length of maximum of 120 is allowed instead of the pep8 79: this
   increases tests readability as they can expects long line of output.
 * Only runnable scripts shall start with `#!/usr/bin/env python3`
 * Runnable scripts shall use the following scheme:

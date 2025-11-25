@@ -1,5 +1,0 @@
-USEMODULE += dns_msg
-
-USEMODULE += gnrc_ipv6
-USEMODULE += sock_udp
-USEMODULE += posix_inet

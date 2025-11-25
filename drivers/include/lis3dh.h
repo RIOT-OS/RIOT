@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_lis3dh LIS3DH accelerometer
  * @ingroup     drivers_sensors
@@ -23,6 +21,9 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
+
+#ifndef LIS3DH_H
+#define LIS3DH_H
 
 #include <stdint.h>
 
@@ -904,4 +905,5 @@ int lis3dh_get_fifo_level(const lis3dh_t *dev);
 }
 #endif
 
+#endif /* LIS3DH_H */
 /** @} */

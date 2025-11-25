@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_congure_quic    CongURE implementation of QUIC's CC
  * @ingroup     sys_congure
@@ -19,6 +17,8 @@
  *
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef CONGURE_QUIC_H
+#define CONGURE_QUIC_H
 
 #include "ztimer.h"
 
@@ -229,4 +229,5 @@ void congure_quic_snd_setup(congure_quic_snd_t *c,
 }
 #endif
 
+#endif /* CONGURE_QUIC_H */
 /** @} */

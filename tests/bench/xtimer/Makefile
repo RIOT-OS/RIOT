@@ -42,6 +42,7 @@ LOW_MEMORY_BOARDS += \
   msb-430 \
   msb-430h \
   nrf51dongle \
+  nrf6310 \
   nucleo-f030r8 \
   nucleo-f042k6 \
   nucleo-f070rb \
@@ -67,6 +68,7 @@ LOW_MEMORY_BOARDS += \
   stm32f0discovery \
   stm32l0538-disco \
   telosb \
+  waspmote-pro \
   wemos-zero \
   yarm \
   yunjia-nrf51822 \

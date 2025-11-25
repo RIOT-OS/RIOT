@@ -8,8 +8,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_ztimer_overhead  ztimer overhead utility
  * @ingroup     sys_ztimer
@@ -22,6 +20,9 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+
+#ifndef ZTIMER_OVERHEAD_H
+#define ZTIMER_OVERHEAD_H
 
 #include "ztimer.h"
 
@@ -53,4 +54,5 @@ int32_t ztimer_overhead_set(ztimer_clock_t *clock, uint32_t base);
  */
 int32_t ztimer_overhead_sleep(ztimer_clock_t *clock, uint32_t base);
 
+#endif /* ZTIMER_OVERHEAD_H */
 /** @} */

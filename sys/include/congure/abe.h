@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_congure_abe CongURE implementation of TCP ABE
  * @ingroup     sys_congure
@@ -22,6 +20,8 @@
  *
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef CONGURE_ABE_H
+#define CONGURE_ABE_H
 
 #include <stdint.h>
 
@@ -91,4 +91,5 @@ static inline void congure_abe_set_mss(congure_abe_snd_t *c, unsigned mss)
 }
 #endif
 
+#endif /* CONGURE_ABE_H */
 /** @} */

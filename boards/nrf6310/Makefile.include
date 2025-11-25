@@ -1,0 +1,12 @@
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
+
+# use jlink to program this board
+PROGRAMMER ?= jlink
+
+# set required debug adapter for openocd if it's used
+OPENOCD_DEBUG_ADAPTER = jlink
+
+# include nrf51 boards common configuration
+include $(RIOTBOARD)/common/nrf51/Makefile.include

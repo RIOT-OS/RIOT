@@ -39,7 +39,7 @@ static int _set_power(const hts221_t *dev, const bool active);
  * @note This function does not acquire or release the I2C bus, must be done
  *       in calling function!
  *
- * @param[in,out] dev   device descriptor of sensor
+ * @param[in|out] dev   device descriptor of sensor
  *
  * @returns             HTS221_OK on success, or error otherwise
  */
@@ -88,7 +88,7 @@ int _humidity_calibration(hts221_t *dev)
  * @note This function does not acquire or release the I2C bus, must be done
  *       in calling function!
  *
- * @param[in,out] dev   device descriptor of sensor
+ * @param[in|out] dev   device descriptor of sensor
  *
  * @returns             HTS221_OK on success, or error otherwise
  */

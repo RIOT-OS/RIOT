@@ -1,6 +1,7 @@
-/*
-* SPDX-FileCopyrightText: 2020 Armink <armink.ztl@gmail.com>
-* SPDX-License-Identifier: Apache-2.0
+#/*
+ * Copyright (c) 2020, Armink, <armink.ztl@gmail.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 /**

@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_openwsn
  * @{
@@ -25,6 +23,9 @@
  *
  * @}
  */
+
+#ifndef OPENWSN_BOARD_H
+#define OPENWSN_BOARD_H
 
 #include "board_info.h"
 
@@ -66,3 +67,5 @@ void board_sleep(void);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* OPENWSN_BOARD_H */

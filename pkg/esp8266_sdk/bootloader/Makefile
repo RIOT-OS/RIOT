@@ -8,7 +8,6 @@ MODULE := esp_bootloader
 NO_AUTO_SRC = 1
 
 include $(RIOTBASE)/Makefile.base
-include $(RIOTMAKE)/tools/esptool.inc.mk
 
 # List of bootloader sources.
 include $(CURDIR)/bootloader.inc.mk
@@ -97,7 +96,7 @@ $(ESP_SDK_BOOTLOADER_ELF): $(ESP_SDK_BOOTLOADER_OBJS) \
 	$(Q)$(CC) -o $@ $(LINKFLAGS) -Wl,-Map=$(@:%.elf=%.map)
 
 FLASH_CHIP = esp8266
-
+ESPTOOL ?= $(RIOTTOOLS)/esptools/esptool.py
 # TODO: These should be exported/configurable from the app side. That would
 # require to export these values.
 FLASH_MODE ?= dout
@@ -108,8 +107,7 @@ FLASH_SIZE ?= 4
 # like the regular objdump binary file but it contains a 16 byte header which
 # specifies the flash size, mode and speed that the ROM bootloader uses to load
 # this second-stage bootloader image.
-$(ESP_SDK_BOOTLOADER_BIN): esptool $(ESP_SDK_BOOTLOADER_ELF)
-	$(Q)echo "Generating bootloader image $(ESP_SDK_BOOTLOADER_BIN)"
-	$(Q)$(ESPTOOL) --chip $(FLASH_CHIP) elf2image --flash-mode $(FLASH_MODE) \
-	  --flash-size $(FLASH_SIZE)MB --flash-freq $(FLASH_FREQ) -o $@ $(ESP_SDK_BOOTLOADER_ELF)
+$(ESP_SDK_BOOTLOADER_BIN): $(ESP_SDK_BOOTLOADER_ELF)
+	$(Q)$(ESPTOOL) --chip $(FLASH_CHIP) elf2image --flash_mode $(FLASH_MODE) \
+	  --flash_size $(FLASH_SIZE)MB --flash_freq $(FLASH_FREQ) --version 1 -o $@ $<
 	$(Q)mv $(@)0x00000.bin $@

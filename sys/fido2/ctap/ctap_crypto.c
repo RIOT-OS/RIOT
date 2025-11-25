@@ -28,6 +28,7 @@
 #include "tiny-asn1.h"
 
 #include "fido2/ctap/ctap_crypto.h"
+#include "fido2/ctap.h"
 #include "fido2/ctap/ctap_utils.h"
 
 #define ENABLE_DEBUG    (0)
@@ -36,7 +37,7 @@
 /**
  * @brief Parse signature into ASN.1 DER format
  */
-static ctap_status_code_t _sig_to_der_format(uint8_t *r, uint8_t *s, uint8_t *sig,
+static int _sig_to_der_format(uint8_t *r, uint8_t *s, uint8_t *sig,
                               size_t *sig_len);
 
 /**
@@ -44,72 +45,72 @@ static ctap_status_code_t _sig_to_der_format(uint8_t *r, uint8_t *s, uint8_t *si
  *
  * wrapper for @ref fido2_ctap_crypto_prng
  */
-static int _RNG(uint8_t *dest, unsigned size)
-{
-    fido2_ctap_crypto_prng(dest, (size_t)size);
-    return 1;
-}
+static int _RNG(uint8_t *dest, unsigned size);
 
-ctap_status_code_t fido2_ctap_crypto_init(void)
+int fido2_ctap_crypto_init(void)
 {
     uECC_set_rng(&_RNG);
 
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_prng(uint8_t *buf, size_t len)
+static int _RNG(uint8_t *dest, unsigned size)
+{
+    fido2_ctap_crypto_prng(dest, (size_t)size);
+    return 1;
+}
+
+int fido2_ctap_crypto_prng(uint8_t *buf, size_t len)
 {
     random_bytes(buf, len);
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_sha256_init(sha256_context_t *ctx)
+int fido2_ctap_crypto_sha256_init(sha256_context_t *ctx)
 {
     sha256_init(ctx);
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_sha256_update(sha256_context_t *ctx,
-                                                   const void *data, size_t len)
+int fido2_ctap_crypto_sha256_update(sha256_context_t *ctx, const void *data, size_t len)
 {
     sha256_update(ctx, data, len);
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_sha256_final(sha256_context_t *ctx, void *digest)
+int fido2_ctap_crypto_sha256_final(sha256_context_t *ctx, void *digest)
 {
     sha256_final(ctx, digest);
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_sha256(const void *data, size_t len,
+int fido2_ctap_crypto_sha256(const void *data, size_t len,
                              void *digest)
 {
     sha256(data, len, digest);
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_hmac_sha256_init(hmac_context_t *ctx, const void *key,
+int fido2_ctap_crypto_hmac_sha256_init(hmac_context_t *ctx, const void *key,
                                        size_t key_length)
 {
     hmac_sha256_init(ctx, key, key_length);
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_hmac_sha256_update(hmac_context_t *ctx,
-                                                        const void *data, size_t len)
+int fido2_ctap_crypto_hmac_sha256_update(hmac_context_t *ctx, const void *data, size_t len)
 {
     hmac_sha256_update(ctx, data, len);
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_hmac_sha256_final(hmac_context_t *ctx, void *digest)
+int fido2_ctap_crypto_hmac_sha256_final(hmac_context_t *ctx, void *digest)
 {
     hmac_sha256_final(ctx, digest);
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_hmac_sha256(const void *key,
+int fido2_ctap_crypto_hmac_sha256(const void *key,
                                   size_t key_length, const void *data, size_t len,
                                   void *digest)
 {
@@ -117,7 +118,7 @@ ctap_status_code_t fido2_ctap_crypto_hmac_sha256(const void *key,
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_ecdh(uint8_t *out, size_t len,
+int fido2_ctap_crypto_ecdh(uint8_t *out, size_t len,
                            ctap_crypto_pub_key_t *pub_key, uint8_t *priv_key, size_t key_len)
 {
     assert(len == CTAP_CRYPTO_KEY_SIZE);
@@ -135,7 +136,7 @@ ctap_status_code_t fido2_ctap_crypto_ecdh(uint8_t *out, size_t len,
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_aes_enc(uint8_t *out, size_t *out_len, uint8_t *in,
+int fido2_ctap_crypto_aes_enc(uint8_t *out, size_t *out_len, uint8_t *in,
                               size_t in_len, const uint8_t *key,
                               size_t key_len)
 {
@@ -159,7 +160,7 @@ ctap_status_code_t fido2_ctap_crypto_aes_enc(uint8_t *out, size_t *out_len, uint
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_aes_dec(uint8_t *out, size_t *out_len, uint8_t *in,
+int fido2_ctap_crypto_aes_dec(uint8_t *out, size_t *out_len, uint8_t *in,
                               size_t in_len, const uint8_t *key,
                               size_t key_len)
 {
@@ -183,7 +184,7 @@ ctap_status_code_t fido2_ctap_crypto_aes_dec(uint8_t *out, size_t *out_len, uint
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_aes_ccm_enc(uint8_t *out, size_t out_len,
+int fido2_ctap_crypto_aes_ccm_enc(uint8_t *out, size_t out_len,
                                   const uint8_t *in, size_t in_len,
                                   uint8_t *auth_data, size_t auth_data_len,
                                   uint8_t mac_len, uint8_t length_encoding,
@@ -212,7 +213,7 @@ ctap_status_code_t fido2_ctap_crypto_aes_ccm_enc(uint8_t *out, size_t out_len,
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_aes_ccm_dec(uint8_t *out, size_t out_len,
+int fido2_ctap_crypto_aes_ccm_dec(uint8_t *out, size_t out_len,
                                   const uint8_t *in, size_t in_len,
                                   uint8_t *auth_data, size_t auth_data_len,
                                   uint8_t mac_len, uint8_t length_encoding,
@@ -241,7 +242,7 @@ ctap_status_code_t fido2_ctap_crypto_aes_ccm_dec(uint8_t *out, size_t out_len,
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_gen_keypair(ctap_crypto_pub_key_t *pub_key,
+int fido2_ctap_crypto_gen_keypair(ctap_crypto_pub_key_t *pub_key,
                                   uint8_t *priv_key, size_t len)
 {
     assert(len == CTAP_CRYPTO_KEY_SIZE);
@@ -257,7 +258,7 @@ ctap_status_code_t fido2_ctap_crypto_gen_keypair(ctap_crypto_pub_key_t *pub_key,
     return CTAP2_OK;
 }
 
-ctap_status_code_t fido2_ctap_crypto_get_sig(uint8_t *hash, size_t hash_len, uint8_t *sig,
+int fido2_ctap_crypto_get_sig(uint8_t *hash, size_t hash_len, uint8_t *sig,
                               size_t *sig_len, const uint8_t *key,
                               size_t key_len)
 {
@@ -292,7 +293,7 @@ ctap_status_code_t fido2_ctap_crypto_get_sig(uint8_t *hash, size_t hash_len, uin
     return CTAP2_OK;
 }
 
-static ctap_status_code_t _sig_to_der_format(uint8_t *r, uint8_t *s, uint8_t *sig,
+static int _sig_to_der_format(uint8_t *r, uint8_t *s, uint8_t *sig,
                               size_t *sig_len)
 {
     asn1_tree t;

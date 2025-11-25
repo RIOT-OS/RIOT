@@ -24,6 +24,13 @@
 #include "net/gnrc/netif/ieee802154.h"
 #include "include/init_devs.h"
 
+#ifdef MODULE_GNRC_LWMAC
+#include "net/gnrc/lwmac/lwmac.h"
+#endif
+#ifdef MODULE_GNRC_GOMACH
+#include "net/gnrc/gomach/gomach.h"
+#endif
+
 #include "kw41zrf.h"
 
 /**
@@ -52,9 +59,19 @@ void auto_init_kw41zrf(void)
         LOG_DEBUG("[auto_init_netif] initializing kw41zrf #%u\n", i);
         kw41zrf_setup(&kw41zrf_devs[i], i);
 
+#if defined(MODULE_GNRC_GOMACH)
+        gnrc_netif_gomach_create(&_netif[i], _kw41zrf_stacks[i], KW41ZRF_NETIF_STACKSIZE,
+                                 KW41ZRF_NETIF_PRIO, "kw41zrf-gomach",
+                                 &kw41zrf_devs[i].netdev.netdev);
+#elif defined(MODULE_GNRC_LWMAC)
+        gnrc_netif_lwmac_create(&_netif[i], _kw41zrf_stacks[i], KW41ZRF_NETIF_STACKSIZE,
+                                KW41ZRF_NETIF_PRIO, "kw41zrf-lwmac",
+                                &kw41zrf_devs[i].netdev.netdev);
+#else
         gnrc_netif_ieee802154_create(&_netif[i], _kw41zrf_stacks[i], KW41ZRF_NETIF_STACKSIZE,
                                      KW41ZRF_NETIF_PRIO, "kw41zrf",
                                      &kw41zrf_devs[i].netdev.netdev);
+#endif
     }
 }
 /** @} */

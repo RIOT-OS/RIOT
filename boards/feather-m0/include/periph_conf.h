@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2017 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C)  2017 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_feather-m0
@@ -14,6 +15,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include <stdint.h>
 
@@ -182,8 +186,8 @@ static const pwm_conf_t pwm_config[] = {
 #define ADC_PRESCALER                       ADC_CTRLB_PRESCALER_DIV512
 
 #define ADC_NEG_INPUT                       ADC_INPUTCTRL_MUXNEG_GND
-#define ADC_GAIN_FACTOR_DEFAULT             ADC_INPUTCTRL_GAIN_DIV2
-#define ADC_REF_DEFAULT                     ADC_REFCTRL_REFSEL_INTVCC1
+#define ADC_GAIN_FACTOR_DEFAULT             ADC_INPUTCTRL_GAIN_1X
+#define ADC_REF_DEFAULT                     ADC_REFCTRL_REFSEL_INT1V
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */
@@ -192,7 +196,7 @@ static const adc_conf_chan_t adc_channels[] = {
     { .inputctrl = ADC_INPUTCTRL_MUXPOS_PB09 },     /* A2 */
     { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA04 },     /* A3 */
     { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA05 },     /* A4 */
-    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PB02 },     /* A5 */
+    { .inputctrl = ADC_INPUTCTRL_MUXPOS_PB02 },    /* A5 */
     { .inputctrl = ADC_INPUTCTRL_MUXPOS_PA07 },     /* A7 */
 };
 
@@ -271,4 +275,5 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
 }
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

@@ -8,8 +8,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_sx127x
  * @{
@@ -22,6 +20,9 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  */
+
+#ifndef SX127X_REGISTERS_H
+#define SX127X_REGISTERS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -1428,4 +1429,5 @@ extern "C" {
 }
 #endif
 
+#endif /* SX127X_REGISTERS_H */
 /** @} */

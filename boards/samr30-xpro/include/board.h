@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2017 Baptiste Clenet <bapclenet@gmail.com>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 Baptiste Clenet <bapclenet@gmail.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @defgroup    boards_samr30-xpro Atmel SAM R30 Xplained Pro
@@ -16,6 +17,9 @@
  *
  * @author      Baptiste Clenet <bapclenet@gmail.com>
  */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -97,4 +101,5 @@ void board_antenna_config(uint8_t antenna);
 }
 #endif
 
+#endif /* BOARD_H */
 /** @} */

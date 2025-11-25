@@ -40,7 +40,7 @@
 #define MCP2515_TX_CTRL(mailbox) ((MCP2515_TXB0CTRL) + ((mailbox) << 4))
 #define MCP2515_RX_CTRL(mailbox) ((MCP2515_RXB0CTRL) + ((mailbox) << 4))
 
-/* length of the fixed part of a can message: 4 bytes can_id + 1 byte len */
+/* length of the fixed part of a can message: 4 bytes can_id + 1 byte can_dlc */
 #define CAN_FIXED_LEN 5
 
 /* oscillator startup time
@@ -75,7 +75,7 @@ static int _mcp2515_enable_irq(candev_mcp2515_t *dev, uint8_t irq);
  * the “ID” or “data” address of any of the three transmit buffers.
  *
  * @param[in]  id           filter identifier in the MCP2515 mailbox
- * @param[out] bytebuf      buffer instruction
+ * @param|out] bytebuf      buffer instruction
  */
 static void _fill_standard_id(uint32_t id, uint8_t *bytebuf);
 
@@ -85,7 +85,7 @@ static void _fill_standard_id(uint32_t id, uint8_t *bytebuf);
  * for more details see _fill_standard_id.
  *
  * @param[in]  id           filter identifier in the MCP2515 mailbox
- * @param[out] bytebuf      buffer instruction
+ * @param|out] bytebuf      buffer instruction
  */
 static void _fill_extended_id(uint32_t id, uint8_t *bytebuf);
 
@@ -165,13 +165,13 @@ int mcp2515_send(candev_mcp2515_t *dev, const struct can_frame *frame,
 
     struct can_frame framebuf;
 
-    if (frame->len > CAN_MAX_DLEN) {
+    if (frame->can_dlc > CAN_MAX_DLEN) {
         return -1;
     }
 
     framebuf.can_id = frame->can_id;
-    framebuf.len = frame->len;
-    for (int i = 0; i < framebuf.len; i++) {
+    framebuf.can_dlc = frame->can_dlc;
+    for (int i = 0; i < framebuf.can_dlc; i++) {
         framebuf.data[i] = frame->data[i];
     }
 
@@ -192,14 +192,14 @@ int mcp2515_send(candev_mcp2515_t *dev, const struct can_frame *frame,
         _fill_standard_id(framebuf.can_id, outbuf);
     }
 
-    outbuf[4] = framebuf.len;
-    memcpy(&outbuf[CAN_FIXED_LEN], framebuf.data, framebuf.len);
+    outbuf[4] = framebuf.can_dlc;
+    memcpy(&outbuf[CAN_FIXED_LEN], framebuf.data, framebuf.can_dlc);
 
     /* set mailbox priority */
     mcp2515_spi_write(dev, MCP2515_TX_CTRL(mailbox), &prio, 1);
 
     mcp2515_spi_write_txbuf(dev, mailbox, outbuf,
-                            CAN_FIXED_LEN + framebuf.len);
+                            CAN_FIXED_LEN + framebuf.can_dlc);
     _mcp2515_enable_irq(dev, MCP2515_CANINTE_TX0IE << mailbox);
     mcp2515_spi_rts(dev, mailbox);
 
@@ -228,8 +228,8 @@ int mcp2515_receive(candev_mcp2515_t *dev, struct can_frame *frame, int mailbox)
                         (((uint32_t)inbuf[1] & 0xE0) >> 5);
     }
 
-    frame->len = inbuf[4];
-    memcpy(frame->data, inbuf + 5, frame->len);
+    frame->can_dlc = inbuf[4];
+    memcpy(frame->data, inbuf + 5, frame->can_dlc);
     return mailbox;
 }
 

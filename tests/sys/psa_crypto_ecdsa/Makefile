@@ -9,8 +9,6 @@ USEMODULE += psa_hash
 USEMODULE += psa_hash_sha_256
 USEMODULE += psa_asymmetric
 USEMODULE += psa_asymmetric_ecc_p256r1
-USEMODULE += psa_asymmetric_ecc_p256r1_custom_backend
-USEMODULE += psa_asymmetric_ecc_p256r1_backend_microecc
 
 CFLAGS += -DCONFIG_PSA_ASYMMETRIC_KEYPAIR_COUNT=1
 CFLAGS += -DCONFIG_PSA_SINGLE_KEY_COUNT=1

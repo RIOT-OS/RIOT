@@ -1,0 +1,24 @@
+From 15b1302039495a979c749fbdc464960901c68684 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Tue, 8 Mar 2022 11:36:06 +0100
+Subject: [PATCH 17/17] esp_phy: add missing header includes
+
+---
+ components/esp_phy/src/phy_init.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/components/esp_phy/src/phy_init.c b/components/esp_phy/src/phy_init.c
+index 7fd5b2c1247..f915b0e1b8f 100644
+--- a/components/esp_phy/src/phy_init.c
++++ b/components/esp_phy/src/phy_init.c
+@@ -11,6 +11,7 @@
+ #include <sys/lock.h>
+ 
+ #include "soc/rtc.h"
++#include "soc/soc_caps.h"
+ #include "esp_err.h"
+ #include "esp_phy_init.h"
+ #include "esp_system.h"
+-- 
+2.17.1
+

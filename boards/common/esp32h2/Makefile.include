@@ -1,1 +1,0 @@
-INCLUDES += -I$(RIOTBOARD)/common/esp32h2/include

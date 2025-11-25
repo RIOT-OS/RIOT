@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_ztimer_convert_muldiv64 plain 64bit carithmetic
  * @ingroup     sys_ztimer_convert
@@ -48,6 +46,9 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
+#ifndef ZTIMER_CONVERT_MULDIV64_H
+#define ZTIMER_CONVERT_MULDIV64_H
+
 #include "ztimer.h"
 #include "ztimer/convert.h"
 
@@ -80,4 +81,5 @@ void ztimer_convert_muldiv64_init(
 }
 #endif
 
+#endif /* ZTIMER_CONVERT_MULDIV64_H */
 /** @} */

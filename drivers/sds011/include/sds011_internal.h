@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
  /**
   * @ingroup     drivers_sds011
   * @{
@@ -17,6 +15,8 @@
   *
   * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
   */
+#ifndef SDS011_INTERNAL_H
+#define SDS011_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -95,4 +95,5 @@ extern "C" {
 }
 #endif
 
+#endif /* SDS011_INTERNAL_H */
 /** @} */

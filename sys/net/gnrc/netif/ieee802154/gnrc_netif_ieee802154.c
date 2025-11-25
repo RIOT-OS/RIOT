@@ -387,7 +387,16 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         netif->stats.tx_unicast_count++;
     }
 #endif
+#ifdef MODULE_GNRC_MAC
+    if (netif->mac.mac_info & GNRC_NETIF_MAC_INFO_CSMA_ENABLED) {
+        res = csma_sender_csma_ca_send(dev, &iolist_header, &netif->mac.csma_conf);
+    }
+    else {
+        res = dev->driver->send(dev, &iolist_header);
+    }
+#else
     res = dev->driver->send(dev, &iolist_header);
+#endif
 
     if (gnrc_netif_netdev_legacy_api(netif)) {
         /* only for legacy drivers we need to release pkt here */

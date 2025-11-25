@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_wakaama
  * @defgroup    lwm2m_objects_common Common LwM2M Object functionalities
@@ -18,6 +16,9 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
+
+#ifndef OBJECTS_COMMON_H
+#define OBJECTS_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -506,8 +507,44 @@ int lwm2m_set_objlink(lwm2m_client_data_t *client_data, const lwm2m_uri_t *uri,
 int lwm2m_set_objlink_by_path(lwm2m_client_data_t *client_data, const char *path, size_t path_len,
                               uint16_t object_id_in, uint16_t instance_id_in);
 
+#ifdef DOXYGEN
+/**
+ * @name    URI representation
+ * @brief   Note that these are defined in `liblwm2m.h`.
+ * @{
+ */
+
+/**
+ * @brief Flag to indicate in @ref lwm2m_uri_t::flag that the object ID is present.
+ */
+#define LWM2M_URI_FLAG_OBJECT_ID    (uint8_t)0x04
+
+/**
+ * @brief Flag to indicate in @ref lwm2m_uri_t::flag that the instance ID is present.
+ */
+#define LWM2M_URI_FLAG_INSTANCE_ID  (uint8_t)0x02
+
+/**
+ * @brief Flag to indicate in @ref lwm2m_uri_t::flag that the resource ID is present.
+ */
+#define LWM2M_URI_FLAG_RESOURCE_ID  (uint8_t)0x01
+
+/**
+ * @brief Representation of an URI in a LwM2M client (defined in `liblwm2m.h`).
+ */
+typedef struct {
+    uint8_t     flag;       /**< indicates which segments are present */
+    uint16_t    objectId;   /**< object ID */
+    uint16_t    instanceId; /**< instance ID */
+    uint16_t    resourceId; /**< resource ID */
+} lwm2m_uri_t;
+
+/** @} */
+#endif /* DOXYGEN */
+
 #ifdef __cplusplus
 }
 #endif
 
+#endif /* OBJECTS_COMMON_H */
 /** @} */

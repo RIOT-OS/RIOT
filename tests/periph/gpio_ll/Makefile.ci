@@ -1,4 +1,3 @@
 BOARD_INSUFFICIENT_MEMORY := \
     atmega8 \
-    samd10-xmini \
     #

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_ds18
  *
@@ -17,6 +15,9 @@
  *
  * @author      Frits Kuipers <frits.kuipers@gmail.com>
  */
+
+#ifndef DS18_PARAMS_H
+#define DS18_PARAMS_H
 
 #include "board.h"
 #include "ds18.h"
@@ -65,4 +66,5 @@ static const saul_reg_info_t ds18_saul_reg_info[] =
 }
 #endif
 
+#endif /* DS18_PARAMS_H */
 /** @} */

@@ -1,5 +1,0 @@
-ifneq (,$(filter saul_default,$(USEMODULE)))
-  USEMODULE += lsm6dsxx
-endif
-
-USEMODULE += boards_common_seeedstudio-xiao-nrf52840

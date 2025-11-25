@@ -1,4 +1,0 @@
-BOARD_INSUFFICIENT_MEMORY := \
-    atmega8 \
-    nucleo-l011k4 \
-    #

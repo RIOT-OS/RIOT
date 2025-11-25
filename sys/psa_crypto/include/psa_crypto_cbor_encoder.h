@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     sys_psa_crypto
  * @defgroup    sys_psa_crypto_cbor_encoder     Module for encoding PSA keys in CBOR
@@ -19,6 +17,9 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
+
+#ifndef PSA_CRYPTO_CBOR_ENCODER_H
+#define PSA_CRYPTO_CBOR_ENCODER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -144,4 +145,5 @@ psa_status_t psa_decode_key_attributes(psa_key_attributes_t *attr, uint8_t *cbor
 }
 #endif
 
+#endif /* PSA_CRYPTO_CBOR_ENCODER_H */
 /** @} */

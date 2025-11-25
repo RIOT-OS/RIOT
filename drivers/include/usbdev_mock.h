@@ -5,9 +5,6 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-
-#pragma once
-
 /**
  * @defgroup    drivers_usbdev_mock USBdev mockup device
  * @ingroup     drivers_misc
@@ -16,6 +13,9 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
+
+#ifndef USBDEV_MOCK_H
+#define USBDEV_MOCK_H
 
 #include <stdint.h>
 
@@ -114,4 +114,5 @@ void usbdev_mock_setup(usbdev_mock_esr_cb_t esr_cb,
 }
 #endif
 
+#endif /* USBDEV_MOCK_H */
 /** @} */

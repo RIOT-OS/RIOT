@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_l2util Stack-independent helpers for IPv6 over X
  * @ingroup     net
@@ -24,6 +22,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef NET_L2UTIL_H
+#define NET_L2UTIL_H
 
 #include <stdint.h>
 
@@ -214,4 +214,5 @@ static inline bool l2util_addr_equal(const uint8_t *addr_a, uint8_t addr_a_len,
 }
 #endif
 
+#endif /* NET_L2UTIL_H */
 /** @} */

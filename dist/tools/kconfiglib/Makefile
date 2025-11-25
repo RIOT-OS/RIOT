@@ -3,8 +3,6 @@ PKG_URL=https://github.com/RIOT-OS/Kconfiglib
 PKG_VERSION=110688d78edba9fa7eb09cbe001c62fbbee86abf
 PKG_LICENSE=ISC
 
-RIOTBASE ?= $(CURDIR)/../../..
-
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:

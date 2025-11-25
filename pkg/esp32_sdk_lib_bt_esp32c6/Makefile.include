@@ -1,3 +1,0 @@
-export ESP32_SDK_LIB_BT_DIR ?= $(PKGDIRBASE)/esp32_sdk_lib_bt_esp32c6/$(CPU_FAM)
-
-PSEUDOMODULES += esp32_sdk_lib_bt_esp32c6

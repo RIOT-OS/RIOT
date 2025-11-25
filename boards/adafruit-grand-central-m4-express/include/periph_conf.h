@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2021 ML!PA Consulting GmbH
- * SPDX-FileCopyrightText: 2023 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2021 ML!PA Consulting GmbH
+ *               2023 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_adafruit-grand-central-m4-express
@@ -16,6 +17,9 @@
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -53,8 +57,7 @@ extern "C" {
  */
 
 /* ADC Default values */
-#define ADC_GCLK_SRC                        SAM0_GCLK_PERIPH    /**< clock used for ADC */
-#define ADC_PRESCALER                       ADC_CTRLA_PRESCALER_DIV8
+#define ADC_PRESCALER                       ADC_CTRLA_PRESCALER_DIV128
 
 #define ADC_NEG_INPUT                       ADC_INPUTCTRL_MUXNEG(0x18u)
 #define ADC_REF_DEFAULT                     ADC_REFCTRL_REFSEL_INTVCC1
@@ -201,7 +204,7 @@ static const tc32_conf_t timer_config[] = {
  * @{
  */
 static const spi_conf_t spi_config[] = {
-    {   /* SPI on XIO connector *AND* SPI on ISP */
+    {   /* SPI on XIO connector */
         .dev      = &(SERCOM7->SPI),
         .miso_pin = GPIO_PIN(PD, 11),   /* D50 MISO */
         .mosi_pin = GPIO_PIN(PD, 8),    /* D51 MOSI */
@@ -335,4 +338,5 @@ static const uart_conf_t uart_config[] = {
 }
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

@@ -1,9 +1,12 @@
-/*
- * SPDX-FileCopyrightText: 2005-2008 by Thomas Hillebrandt and Heiko Will
- * SPDX-License-Identifier: LGPL-2.1-only
+/* Copyright (C) 2005, 2006, 2007, 2008 by Thomas Hillebrandt and Heiko Will
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ *
  */
 
-#pragma once
+#ifndef VIC_H
+#define VIC_H
 
 #include <stdbool.h>
 
@@ -83,3 +86,4 @@ bool cpu_install_irq(int IntNumber, void *HandlerAddr, int Priority);
 #endif
 
 /** @} */
+#endif /* VIC_H */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     sys_crypto
  * @{
@@ -18,6 +16,9 @@
  * @author      Freie Universitaet Berlin, Computer Systems & Telematics
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  */
+
+#ifndef CRYPTO_MODES_CTR_H
+#define CRYPTO_MODES_CTR_H
 
 #include "crypto/ciphers.h"
 
@@ -74,4 +75,5 @@ int cipher_decrypt_ctr(const cipher_t *cipher, uint8_t nonce_counter[16],
 }
 #endif
 
+#endif /* CRYPTO_MODES_CTR_H */
 /** @} */

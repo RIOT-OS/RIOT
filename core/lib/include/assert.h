@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     core_util
  *
@@ -20,6 +18,9 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
+
+#ifndef ASSERT_H
+#define ASSERT_H
 
 #include <stdint.h>
 
@@ -44,7 +45,7 @@ extern "C" {
  * CFLAGS += -DDEBUG_ASSERT_VERBOSE
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
-#  define DEBUG_ASSERT_VERBOSE
+#define DEBUG_ASSERT_VERBOSE
 
 /**
  * @brief   Activate breakpoints for @ref assert() when defined
@@ -58,39 +59,32 @@ extern "C" {
  * execution is stopped directly in the debugger. Otherwise the execution stops
  * in an endless while loop.
  */
-#  define DEBUG_ASSERT_BREAKPOINT
+#define DEBUG_ASSERT_BREAKPOINT
 #else
 /* we should not include custom headers in standard headers */
-#  define _likely(x)      __builtin_expect((uintptr_t)(x), 1)
+#define _likely(x)      __builtin_expect((uintptr_t)(x), 1)
 #endif
 
+/**
+ * @def __NORETURN
+ * @brief hidden (__) NORETURN definition
+ * @internal
+ *
+ * Duplicating the definitions of kernel_defines.h as these are unsuitable for
+ * system header files like the assert.h.
+ * kernel_defines.h would define symbols that are not reserved.
+ */
 #ifndef __NORETURN
-#  if defined(__GNUC__) || defined(DOXYGEN)
-/**
- * @brief   Same as @ref NORETURN
- * @internal
- *
- * We are not using @ref NORETURN from `compiler_hints.h` here to avoid RIOT
- * dependencies for standard C headers
- */
-#    define __NORETURN __attribute__((noreturn))
-#  else
-#    define __NORETURN
-#  endif
-#endif
+#ifdef __GNUC__
+#define __NORETURN __attribute__((noreturn))
+#else /*__GNUC__*/
+#define __NORETURN
+#endif /*__GNUC__*/
+#endif /*__NORETURN*/
 
-/**
- * @brief   Internal function to trigger a panic with a failed assertion as
- *          identifying cause
- * @internal
- * @warning This is an internal function. API changes may happen without regard
- *          for out-of tree uses.
- *
- * The implementation will identify the cause of the panic as a blown assertion,
- * e.g. via a log output.
- */
-__NORETURN void _assert_panic(void);
-
+#ifdef NDEBUG
+#define assert(ignore)((void)0)
+#elif defined(DEBUG_ASSERT_VERBOSE)
 /**
  * @brief   Function to handle failed assertion
  *
@@ -102,10 +96,6 @@ __NORETURN void _assert_panic(void);
  * @param[in] line  The code line of @p file the assertion failed in
  */
 __NORETURN void _assert_failure(const char *file, unsigned line);
-
-#ifdef NDEBUG
-#  define assert(ignore)((void)0)
-#elif defined(DEBUG_ASSERT_VERBOSE)
 /**
  * @brief    abort the program if assertion is false
  *
@@ -143,26 +133,27 @@ __NORETURN void _assert_failure(const char *file, unsigned line);
  *
  * @see http://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html
  */
-#  define assert(cond) (_likely(cond) ? (void)0 :  _assert_failure(__FILE__, __LINE__))
+#define assert(cond) (_likely(cond) ? (void)0 :  _assert_failure(__FILE__, __LINE__))
 #else /* DEBUG_ASSERT_VERBOSE */
-#  define assert(cond) (_likely(cond) ? (void)0 : _assert_panic())
+__NORETURN void _assert_panic(void);
+#define assert(cond) (_likely(cond) ? (void)0 : _assert_panic())
 #endif /* DEBUG_ASSERT_VERBOSE */
 
 #if !defined __cplusplus
-#  if __STDC_VERSION__ >= 201112L
+#if __STDC_VERSION__ >= 201112L
 /**
  * @brief c11 static_assert() macro
  */
-#    define static_assert(...) _Static_assert(__VA_ARGS__)
-#  else
+#define static_assert(...) _Static_assert(__VA_ARGS__)
+#else
 /**
  * @brief static_assert for c-version < c11
  *
  * Generates a division by zero compile error when cond is false
  */
-#    define static_assert(cond, ...) \
-        { enum { static_assert_failed_on_div_by_0 = 1 / (!!(cond)) }; }
-#  endif
+#define static_assert(cond, ...) \
+    { enum { static_assert_failed_on_div_by_0 = 1 / (!!(cond)) }; }
+#endif
 #endif
 
 /**
@@ -171,11 +162,12 @@ __NORETURN void _assert_failure(const char *file, unsigned line);
  * If the assertion failed in an interrupt, the system will still panic.
  */
 #ifndef DEBUG_ASSERT_NO_PANIC
-#  define DEBUG_ASSERT_NO_PANIC (1)
+#define DEBUG_ASSERT_NO_PANIC (1)
 #endif
 
 #ifdef __cplusplus
 }
 #endif
 
+#endif /* ASSERT_H */
 /** @} */

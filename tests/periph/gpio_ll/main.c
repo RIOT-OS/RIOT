@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2021 Otto-von-Guericke-Universität Magdeburg
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2021 Otto-von-Guericke-Universität Magdeburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -33,33 +36,9 @@
 #define LOW_ROM 0
 #endif
 
-/* On e.g. ATmega328P the smallest available GPIO Port is GPIO_PORT_1 (GPIOB),
- * on others (e.g. nRF51) the highest available GPIO PORT is GPIO_PORT_0.
- * So we need the following dance to find a valid GPIO port to allow compile
- * testing. Extend the dance as needed, when new MCUs are added */
-#if !defined(PORT_OUT)
-#  if defined(GPIO_PORT_0)
-#    define PORT_OUT GPIO_PORT_0
-#    define PORT_OUT_NUM 0
-#  elif defined(GPIO_PORT_1)
-#    define PORT_OUT GPIO_PORT_1
-#    define PORT_OUT_NUM 1
-#  endif
-#endif
-
-#if !defined(PORT_IN)
-#  if defined(GPIO_PORT_0)
-#    define PORT_IN GPIO_PORT_0
-#    define PORT_IN_NUM 0
-#  elif defined(GPIO_PORT_1)
-#    define PORT_IN GPIO_PORT_1
-#    define PORT_IN_NUM 1
-#  endif
-#endif
-
 static const char *noyes[] = { "no", "yes" };
-static gpio_port_t port_out = PORT_OUT;
-static gpio_port_t port_in = PORT_IN;
+static gpio_port_t port_out = GPIO_PORT(PORT_OUT);
+static gpio_port_t port_in = GPIO_PORT(PORT_IN);
 
 static const uint64_t mutex_timeout = US_PER_MS;
 
@@ -96,15 +75,9 @@ static void expect_impl(int val, unsigned line)
 static void print_cabling(unsigned port1, unsigned pin1,
                           unsigned port2, unsigned pin2)
 {
-    if (GPIO_PORT_NUMBERING_ALPHABETIC) {
-        /* alphabetic naming scheme */
-        printf("  P%c%u -- P%c%u\n", 'A' + (char)port1, pin1,
-                                     'A' + (char)port2, pin2);
-    }
-    else {
-        /* numeric naming scheme */
-        printf("  P%u.%u -- P%u.%u\n", port1, pin1, port2, pin2);
-    }
+    printf("  P%u.%u (P%c%u) -- P%u.%u (P%c%u)\n",
+           port1, pin1, 'A' + (char)port1, pin1,
+           port2, pin2, 'A' + (char)port2, pin2);
 }
 
 static void print_details(void)
@@ -113,8 +86,8 @@ static void print_details(void)
                   "========================\n"
                   "Cabling:\n"
                   "(INPUT -- OUTPUT)");
-    print_cabling(PORT_IN_NUM, PIN_IN_0, PORT_OUT_NUM, PIN_OUT_0);
-    print_cabling(PORT_IN_NUM, PIN_IN_1, PORT_OUT_NUM, PIN_OUT_1);
+    print_cabling(PORT_IN, PIN_IN_0, PORT_OUT, PIN_OUT_0);
+    print_cabling(PORT_IN, PIN_IN_1, PORT_OUT, PIN_OUT_1);
     printf("Number of pull resistor values supported: %u\n", GPIO_PULL_NUMOF);
     printf("Number of drive strengths supported: %u\n", GPIO_DRIVE_NUMOF);
     printf("Number of slew rates supported: %u\n", GPIO_SLEW_NUMOF);
@@ -513,8 +486,8 @@ static void test_gpio_ll_init(void)
                   "\n"
                   "Testing is_gpio_port_num_valid() is true for PORT_OUT and "
                   "PORT_IN:");
-    expect(is_gpio_port_num_valid(PORT_IN_NUM));
-    expect(is_gpio_port_num_valid(PORT_OUT_NUM));
+    expect(is_gpio_port_num_valid(PORT_IN));
+    expect(is_gpio_port_num_valid(PORT_OUT));
 
     /* first, iterate through input configurations and test them one by one */
     test_gpio_ll_init_input_configs();
@@ -715,31 +688,26 @@ static void test_irq_edge(void)
     puts_optional("... OK");
 
     puts_optional("Testing both edges on PIN_IN_0");
-    if (IS_USED(MODULE_PERIPH_GPIO_LL_IRQ_EDGE_TRIGGERED_BOTH)) {
-        expect(0 == gpio_ll_irq(port_in, PIN_IN_0, GPIO_TRIGGER_EDGE_BOTH,
-                                irq_edge_cb, &irq_mut));
-        /* test for spurious IRQ */
-        expect(-ECANCELED == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
-                                                       mutex_timeout));
-        gpio_ll_set(port_out, 1UL << PIN_OUT_0);
-        /* test for IRQ on rising edge */
-        expect(0 == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
-                                              mutex_timeout));
-        /* test for spurious IRQ */
-        expect(-ECANCELED == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
-                                                       mutex_timeout));
-        gpio_ll_clear(port_out, 1UL << PIN_OUT_0);
-        /* test for IRQ on falling edge */
-        expect(0 == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
-                                              mutex_timeout));
-        /* test for spurious IRQ */
-        expect(-ECANCELED == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
-                                                       mutex_timeout));
-        puts_optional("... OK");
-    }
-    else {
-        puts_optional("... SKIPPED (not supported)");
-    }
+    expect(0 == gpio_ll_irq(port_in, PIN_IN_0, GPIO_TRIGGER_EDGE_BOTH,
+                            irq_edge_cb, &irq_mut));
+    /* test for spurious IRQ */
+    expect(-ECANCELED == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
+                                                   mutex_timeout));
+    gpio_ll_set(port_out, 1UL << PIN_OUT_0);
+    /* test for IRQ on rising edge */
+    expect(0 == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
+                                          mutex_timeout));
+    /* test for spurious IRQ */
+    expect(-ECANCELED == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
+                                                   mutex_timeout));
+    gpio_ll_clear(port_out, 1UL << PIN_OUT_0);
+    /* test for IRQ on falling edge */
+    expect(0 == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
+                                          mutex_timeout));
+    /* test for spurious IRQ */
+    expect(-ECANCELED == ztimer_mutex_lock_timeout(ZTIMER_USEC, &irq_mut,
+                                                   mutex_timeout));
+    puts_optional("... OK");
 
     puts_optional("Testing masking of IRQs (still both edges on PIN_IN_0)");
     gpio_ll_irq_mask(port_in, PIN_IN_0);
@@ -902,7 +870,6 @@ static void test_switch_dir(void)
          "===========================\n");
 
     uword_t mask_out = 1U << PIN_OUT_0;
-    uword_t pins_out = gpio_ll_prepare_switch_dir(mask_out);
     uword_t mask_in = 1U << PIN_IN_0;
 
     /* floating input must be supported by every MCU */
@@ -912,17 +879,12 @@ static void test_switch_dir(void)
     expect(conf.state == GPIO_INPUT);
     gpio_conf_t conf_orig = conf;
 
-    /* conf_orig.initial_value contains the current value in query_conf.
-     * Since this is a floating input connected to a floating input, it is
-     * random here. ==> Clear it. */
-    conf_orig.initial_value = false;
-
     /* capture output state before switching from input mode to output mode, so
      * that it can be restored when switching back to input mode */
     uword_t out_state = gpio_ll_read_output(port_out);
 
     /* now, switch to output mode and verify the switch */
-    gpio_ll_switch_dir_output(port_out, pins_out);
+    gpio_ll_switch_dir_output(port_out, mask_out);
     conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
     test_passed = (conf.state == GPIO_OUTPUT_PUSH_PULL);
     printf_optional("Input pin can be switched to output (push-pull) mode: %s\n",
@@ -930,23 +892,19 @@ static void test_switch_dir(void)
     expect(test_passed);
 
     gpio_ll_clear(port_out, mask_out);
-    ztimer_sleep(ZTIMER_USEC, US_PER_MS);
     test_passed = (0 == (gpio_ll_read(port_in) & mask_in));
     gpio_ll_set(port_out, mask_out);
-    ztimer_sleep(ZTIMER_USEC, US_PER_MS);
     test_passed = test_passed && (gpio_ll_read(port_in) & mask_in);
     printf_optional("Pin behaves as output after switched to output mode: %s\n",
                     noyes[test_passed]);
     expect(test_passed);
 
     /* switch back to input mode */
-    gpio_ll_switch_dir_input(port_out, pins_out);
+    gpio_ll_switch_dir_input(port_out, mask_out);
     /* restore out state from before the switch */
     gpio_ll_write(port_out, out_state);
     /* verify we are back at the old config */
     conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
-    /* again, initial_value is random due to floating input ==> clear it */
-    conf.initial_value = false;
     test_passed = (conf.bits == conf_orig.bits);
     printf_optional("Returning back to input had no side effects on config: %s\n",
                     noyes[test_passed]);
@@ -964,10 +922,8 @@ static void test_switch_dir(void)
     expect(0 == gpio_ll_init(port_in, PIN_IN_0, gpio_ll_out));
 
     gpio_ll_clear(port_in, mask_in);
-    ztimer_sleep(ZTIMER_USEC, US_PER_MS);
     test_passed = (0 == (gpio_ll_read(port_out) & mask_out));
     gpio_ll_set(port_in, mask_in);
-    ztimer_sleep(ZTIMER_USEC, US_PER_MS);
     test_passed = test_passed && (gpio_ll_read(port_out) & mask_out);
     printf_optional("Pin behaves as input after switched back to input mode: %s\n",
                     noyes[test_passed]);

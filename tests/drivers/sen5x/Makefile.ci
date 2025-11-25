@@ -1,6 +1,0 @@
-BOARD_INSUFFICIENT_MEMORY := \
-    atmega8 \
-    nucleo-l011k4 \
-    samd10-xmini \
-    stk3200 \
-    #

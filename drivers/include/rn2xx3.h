@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_rn2xx3 RN2483/RN2903 LoRa module driver
  * @ingroup     drivers_netdev
@@ -19,6 +17,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef RN2XX3_H
+#define RN2XX3_H
 
 #include <stdint.h>
 
@@ -700,4 +701,5 @@ void rn2xx3_sys_set_sleep_duration(rn2xx3_t *dev, uint32_t sleep);
 }
 #endif
 
+#endif /* RN2XX3_H */
 /** @} */

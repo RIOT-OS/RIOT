@@ -1,2 +1,0 @@
-# Set a different prng than the default
-USEMODULE += prng_xorshift

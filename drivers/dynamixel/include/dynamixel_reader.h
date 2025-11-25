@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_dynamixel
  *
@@ -18,6 +16,9 @@
  *
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
+
+#ifndef DYNAMIXEL_READER_H
+#define DYNAMIXEL_READER_H
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -144,4 +145,5 @@ static inline size_t dynamixel_reader_status_get_payload_size(const dynamixel_re
 }
 #endif
 
+#endif /* DYNAMIXEL_READER_H */
 /** @} */

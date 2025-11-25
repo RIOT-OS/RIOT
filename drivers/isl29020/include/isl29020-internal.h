@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_isl29020
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef ISL29020_INTERNAL_H
+#define ISL29020_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,4 +69,5 @@ extern "C" {
 }
 #endif
 
+#endif /* ISL29020_INTERNAL_H */
 /** @} */

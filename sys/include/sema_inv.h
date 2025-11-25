@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_sema_inv    inverse Semaphores
  * @ingroup     sys
@@ -40,6 +38,9 @@
  *
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+
+#ifndef SEMA_INV_H
+#define SEMA_INV_H
 
 #include "atomic_utils.h"
 #include "mutex.h"
@@ -146,4 +147,5 @@ static inline int sema_inv_wait_timeout(sema_inv_t *s, uint32_t us)
 }
 #endif
 
+#endif /* SEMA_INV_H */
 /** @} */

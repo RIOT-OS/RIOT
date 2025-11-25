@@ -1,10 +1,14 @@
 /*
- * SPDX-FileCopyrightText: 2016 Eistec AB
- * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2016 Eistec AB
+ * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
-#pragma once
+#ifndef UNISTD_H
+#define UNISTD_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -76,8 +80,8 @@ int          pipe(int [2]);
 ssize_t      pread(int, void *, size_t, off_t);
 ssize_t      pwrite(int, const void *, size_t, off_t);
 ssize_t      read(int, void *, size_t);
-ssize_t      readlink(const char *__restrict, char *__restrict, size_t);
-ssize_t      readlinkat(int, const char *__restrict, char *__restrict, size_t);
+ssize_t      readlink(const char *restrict, char *restrict, size_t);
+ssize_t      readlinkat(int, const char *restrict, char *restrict, size_t);
 int          rmdir(const char *);
 int          setegid(gid_t);
 int          seteuid(uid_t);
@@ -102,3 +106,5 @@ ssize_t      write(int, const void *, size_t);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* UNISTD_H */

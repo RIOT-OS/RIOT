@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2019 ML!PA Consulting GmbH
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 ML!PA Consulting GmbH
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -14,7 +17,6 @@
  * @}
  */
 
-#include "busy_wait.h"
 #include <assert.h>
 
 #include "cpu.h"
@@ -22,76 +24,75 @@
 #include "macros/units.h"
 #include "periph_conf.h"
 #include "periph/init.h"
+#include "stdio_base.h"
 
 /*
  * An external inductor needs to be present on the board,
  * so the feature can only be enabled by the board configuration.
  */
 #ifndef USE_VREG_BUCK
-#  define USE_VREG_BUCK (0)
+#define USE_VREG_BUCK   (0)
 #endif
 
 #if CLOCK_CORECLOCK == 0
-#  error Please select CLOCK_CORECLOCK
+#error Please select CLOCK_CORECLOCK
 #endif
 
 #if EXTERNAL_OSC32_SOURCE && ULTRA_LOW_POWER_INTERNAL_OSC_SOURCE
-#  error Select EITHER external 32kHz oscillator OR internal 32kHz Oscillator
+#error Select EITHER external 32kHz oscillator OR internal 32kHz Oscillator
 #endif
 
 #ifndef XOSC0_FREQUENCY
-#  define XOSC0_FREQUENCY (0)
+#define XOSC0_FREQUENCY (0)
 #endif
 
 #ifndef XOSC1_FREQUENCY
-#  define XOSC1_FREQUENCY (0)
+#define XOSC1_FREQUENCY (0)
 #endif
 
-#define GCLK_SOURCE_ACTIVE_XOSC \
-    (XOSC0_FREQUENCY ? GCLK_SOURCE_XOSC0 : GCLK_SOURCE_XOSC1)
+#define GCLK_SOURCE_ACTIVE_XOSC (XOSC0_FREQUENCY ? GCLK_SOURCE_XOSC0 : GCLK_SOURCE_XOSC1)
 
 #if USE_XOSC_ONLY /* don't use fast internal oscillators */
 
-#  if (XOSC0_FREQUENCY == 0) && (XOSC1_FREQUENCY == 0)
-#    error Configuration error: no external oscillator frequency defined
-#  endif
+#if (XOSC0_FREQUENCY == 0) && (XOSC1_FREQUENCY == 0)
+#error Configuration error: no external oscillator frequency defined
+#endif
 
-#  if (CLOCK_CORECLOCK > SAM0_XOSC_FREQ_HZ)
-#    error When using an external oscillator for the main clock,\
-the CPU frequency can't exceed it's frequency.
-#  endif
+#if (CLOCK_CORECLOCK > SAM0_XOSC_FREQ_HZ)
+#error When using an external oscillator for the main clock, the CPU frequency can't exceed it's frequency.
+#endif
 
-#  define USE_DPLL 0
-#  define USE_DFLL 0
-#  define USE_XOSC 1
+#define USE_DPLL 0
+#define USE_DFLL 0
+#define USE_XOSC 1
 
-#  ifndef GCLK_TIMER_HZ
-#    define GCLK_TIMER_HZ MHZ(4)
-#  endif
+#ifndef GCLK_TIMER_HZ
+#define GCLK_TIMER_HZ   MHZ(4)
+#endif
 
 #else /* !USE_XOSC_ONLY */
 
 /* Main clock > 48 MHz -> use DPLL, otherwise use DFLL */
-#  define USE_DPLL (CLOCK_CORECLOCK > SAM0_DFLL_FREQ_HZ)
-#  define USE_DFLL 1
-#  define USE_XOSC 0
+#define USE_DPLL (CLOCK_CORECLOCK > SAM0_DFLL_FREQ_HZ)
+#define USE_DFLL 1
+#define USE_XOSC 0
 
-#  ifndef GCLK_TIMER_HZ
-#    define GCLK_TIMER_HZ MHZ(8)
-#  endif
+#ifndef GCLK_TIMER_HZ
+#define GCLK_TIMER_HZ   MHZ(8)
+#endif
 
 #endif /* USE_XOSC_ONLY */
 
 #if (CLOCK_CORECLOCK <= SAM0_DFLL_FREQ_HZ) && (SAM0_DFLL_FREQ_HZ % CLOCK_CORECLOCK)
-#  error For frequencies <= 48 MHz, CLOCK_CORECLOCK must be a divider of 48 MHz
+#error For frequencies <= 48 MHz, CLOCK_CORECLOCK must be a divider of 48 MHz
 #endif
 
 /* If the CPU clock is lower than the minimal DPLL Freq
    set fDPLL = 2 * CLOCK_CORECLOCK */
 #if USE_DPLL && (CLOCK_CORECLOCK < SAM0_DPLL_FREQ_MIN_HZ)
-#  define DPLL_DIV 2
+#define DPLL_DIV 2
 #else
-#  define DPLL_DIV 1
+#define DPLL_DIV 1
 #endif
 
 static void xosc32k_init(void)
@@ -101,16 +102,12 @@ static void xosc32k_init(void)
         return;
     }
 
-    /* Startup should be a valid value 0 - 6 (~63 ms to ~8000 ms) see manual 7 is reserved
-     * table 29-2 : time_for_startup_val[] = {63ms, 125ms, 500ms, 1sec, 2sec, 4sec, 8sec}
-     * this delay will happen only when the system is powered on or the XOSC32
-     * is re-enabled after being disabled for e.g.: standby*/
     OSC32KCTRL->XOSC32K.reg = OSC32KCTRL_XOSC32K_ENABLE
                             | OSC32KCTRL_XOSC32K_EN1K
                             | OSC32KCTRL_XOSC32K_EN32K
                             | OSC32KCTRL_XOSC32K_RUNSTDBY
                             | OSC32KCTRL_XOSC32K_XTALEN
-                            | OSC32KCTRL_XOSC32K_STARTUP(3); /* 3 ^= ~1sec see above or manual*/
+                            | OSC32KCTRL_XOSC32K_STARTUP(7);
 
     while (!(OSC32KCTRL->STATUS.reg & OSC32KCTRL_STATUS_XOSC32KRDY)) {}
 }
@@ -120,8 +117,8 @@ static void xosc_init(uint8_t idx)
     uint32_t freq;
 
     if (!USE_XOSC ||
-            (idx == 0 && XOSC0_FREQUENCY == 0) ||
-            (idx == 1 && XOSC1_FREQUENCY == 0)) {
+        (idx == 0 && XOSC0_FREQUENCY == 0) ||
+        (idx == 1 && XOSC1_FREQUENCY == 0)) {
         OSCCTRL->XOSCCTRL[idx].reg = 0;
         return;
     }
@@ -130,8 +127,7 @@ static void xosc_init(uint8_t idx)
 
     if (idx == 0) {
         freq = XOSC0_FREQUENCY;
-    }
-    else if (idx == 1) {
+    } else if (idx == 1) {
         freq = XOSC1_FREQUENCY;
     }
 
@@ -147,20 +143,17 @@ static void xosc_init(uint8_t idx)
         reg |= OSCCTRL_XOSCCTRL_STARTUP(9)
             |  OSCCTRL_XOSCCTRL_IMULT(3)
             |  OSCCTRL_XOSCCTRL_IPTAT(2);
-    }
-    else if (freq <= MHZ(16)) {
+    } else if (freq <= MHZ(16)) {
         /* 62000 cycles @ 16MHz = 3875 µs */
         reg |= OSCCTRL_XOSCCTRL_STARTUP(7)
             |  OSCCTRL_XOSCCTRL_IMULT(4)
             |  OSCCTRL_XOSCCTRL_IPTAT(3);
-    }
-    else if (freq <= MHZ(24)) {
+    } else if (freq <= MHZ(24)) {
         /* 68500 cycles @ 24MHz = 2854 µs */
         reg |= OSCCTRL_XOSCCTRL_STARTUP(7)
             |  OSCCTRL_XOSCCTRL_IMULT(5)
             |  OSCCTRL_XOSCCTRL_IPTAT(3);
-    }
-    else {
+    } else {
         /* 38500 cycles @ 48MHz = 802 µs */
         reg |= OSCCTRL_XOSCCTRL_STARTUP(5)
             |  OSCCTRL_XOSCCTRL_IMULT(6)
@@ -175,9 +168,9 @@ static void dfll_init(void)
 {
     uint32_t reg = OSCCTRL_DFLLCTRLB_QLDIS
 #ifdef OSCCTRL_DFLLCTRLB_WAITLOCK
-                 | OSCCTRL_DFLLCTRLB_WAITLOCK
+          | OSCCTRL_DFLLCTRLB_WAITLOCK
 #endif
-                 ;
+    ;
 
     /* workaround for Errata 2.8.3 DFLLVAL.FINE Value When DFLL48M Re-enabled */
     OSCCTRL->DFLLMUL.reg   = 0;   /* Write new DFLLMULL configuration */
@@ -200,69 +193,37 @@ static void fdpll_init_nolock(uint8_t idx, uint32_t f_cpu, uint8_t flags)
         return;
     }
 
+    /* Source the DPLL from 32kHz GCLK1 ( equivalent to ((f_cpu << 5) / 32768) ) */
+    const uint32_t LDR = (f_cpu >> 10);
+
     /* disable the DPLL before changing the configuration */
-    OSCCTRL->Dpll[idx].DPLLCTRLA.reg = 0;
+    OSCCTRL->Dpll[idx].DPLLCTRLA.reg &= ~OSCCTRL_DPLLCTRLA_ENABLE;
     while (OSCCTRL->Dpll[idx].DPLLSYNCBUSY.reg) {}
 
-    uint32_t ctrlb = 0;
+    /* set DPLL clock source */
+    GCLK->PCHCTRL[OSCCTRL_GCLK_ID_FDPLL0 + idx].reg = GCLK_PCHCTRL_GEN(1) | GCLK_PCHCTRL_CHEN;
+    while (!(GCLK->PCHCTRL[OSCCTRL_GCLK_ID_FDPLL0 + idx].reg & GCLK_PCHCTRL_CHEN)) {}
 
-    /* HW revision before F  (A and D) might false unlock -> LBYPASS and WUF */
-    unsigned rev = (DSU->DID.reg & DSU_DID_REVISION_Msk) >> DSU_DID_REVISION_Pos;
-    if ('A' + rev < 'F') {
-        ctrlb |= OSCCTRL_DPLLCTRLB_WUF | OSCCTRL_DPLLCTRLB_LBYPASS;
-    }
+    OSCCTRL->Dpll[idx].DPLLRATIO.reg = OSCCTRL_DPLLRATIO_LDRFRAC(LDR & 0x1F)
+                                     | OSCCTRL_DPLLRATIO_LDR((LDR >> 5) - 1);
 
-    /* Without LBYPASS, startup takes very long, see errata section 2.13.
-     * according to the documentation several milliseconds
-     * (critical for some application not so much for other)*/
-    if (EXTERNAL_OSC32_SOURCE) {
-        /* Source the DPLL from 32kHz XOSC32 ( equivalent to ((f_cpu << 5) / 32768) ) */
-        const uint32_t LDR = (f_cpu >> 10);
-        OSCCTRL->Dpll[idx].DPLLRATIO.reg = OSCCTRL_DPLLRATIO_LDRFRAC(LDR & 0x1F)
-                                         | OSCCTRL_DPLLRATIO_LDR((LDR >> 5) - 1);
+    /* Without LBYPASS, startup takes very long, see errata section 2.13. */
+    OSCCTRL->Dpll[idx].DPLLCTRLB.reg = OSCCTRL_DPLLCTRLB_REFCLK_GCLK
+                                     | OSCCTRL_DPLLCTRLB_WUF
+                                     | OSCCTRL_DPLLCTRLB_LBYPASS;
 
-        ctrlb |= OSCCTRL_DPLLCTRLB_REFCLK_XOSC32;
-        OSCCTRL->Dpll[idx].DPLLCTRLB.reg = ctrlb;
-    }
-    else {
-        /* TODO find a better fallback source (eg 48MCLK routed though gclk divided down to 1MHz)
-         * until then the frequency might not be defined if source is low power internal 32kHz*/
-        /* set DPLL clock source */
-        GCLK->PCHCTRL[OSCCTRL_GCLK_ID_FDPLL0 + idx].reg = GCLK_PCHCTRL_GEN(1) | GCLK_PCHCTRL_CHEN;
-        while (!(GCLK->PCHCTRL[OSCCTRL_GCLK_ID_FDPLL0 + idx].reg & GCLK_PCHCTRL_CHEN)) {}
-        /* Source the DPLL from 32kHz GCLK1 ( equivalent to ((f_cpu << 5) / 32768) )
-         * avoid the routing through gclk when XOSC32 is the source */
-        const uint32_t LDR = (f_cpu >> 10);
-        OSCCTRL->Dpll[idx].DPLLRATIO.reg  = OSCCTRL_DPLLRATIO_LDRFRAC(LDR & 0x1F)
-                                            | OSCCTRL_DPLLRATIO_LDR((LDR >> 5) - 1);
-        ctrlb |= OSCCTRL_DPLLCTRLB_REFCLK_GCLK;
-    }
-    OSCCTRL->Dpll[idx].DPLLCTRLB.reg = ctrlb;
     OSCCTRL->Dpll[idx].DPLLCTRLA.reg = OSCCTRL_DPLLCTRLA_ENABLE | flags;
 
     while (OSCCTRL->Dpll[idx].DPLLSYNCBUSY.reg) {}
 }
 
-static void fdpll_lock(uint8_t idx)
-{
+static void fdpll_lock(uint8_t idx) {
     const uint32_t flags = (OSCCTRL_DPLLSTATUS_CLKRDY | OSCCTRL_DPLLSTATUS_LOCK);
     while (!((OSCCTRL->Dpll[idx].DPLLSTATUS.reg & flags) == flags)) {}
-
-    /* TODO make this configurable currently prefer correctness over time */
-    /* HW revision before F  (A and D) might false unlock -> LBYPASS and WUF
-     * doing that we need to ensure the PLL had enough time to lock(at least 10 ms) */
-    unsigned rev = (DSU->DID.reg & DSU_DID_REVISION_Msk) >> DSU_DID_REVISION_Pos;
-    if ('A' + rev < 'F') {
-        busy_wait_us(10 * US_PER_MS);
-    }
 }
 
-static void gclk_connect(uint8_t id, uint8_t src, uint32_t flags)
-{
-    GCLK->GENCTRL[id].reg = GCLK_GENCTRL_SRC(src)
-                          | GCLK_GENCTRL_GENEN
-                          | flags
-                          | GCLK_GENCTRL_IDC;
+static void gclk_connect(uint8_t id, uint8_t src, uint32_t flags) {
+    GCLK->GENCTRL[id].reg = GCLK_GENCTRL_SRC(src) | GCLK_GENCTRL_GENEN | flags | GCLK_GENCTRL_IDC;
     while (GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_GENCTRL(id)) {}
 }
 
@@ -277,13 +238,11 @@ void sam0_gclk_enable(uint8_t id)
             gclk_connect(SAM0_GCLK_TIMER,
                          GCLK_SOURCE_DPLL0,
                          GCLK_GENCTRL_DIV(DPLL_DIV * CLOCK_CORECLOCK / GCLK_TIMER_HZ));
-        }
-        else if (USE_DFLL) {
+        } else if (USE_DFLL) {
             gclk_connect(SAM0_GCLK_TIMER,
                          GCLK_SOURCE_DFLL,
                          GCLK_GENCTRL_DIV(SAM0_DFLL_FREQ_HZ / GCLK_TIMER_HZ));
-        }
-        else if (USE_XOSC) {
+        } else if (USE_XOSC) {
             gclk_connect(SAM0_GCLK_TIMER,
                          GCLK_SOURCE_ACTIVE_XOSC,
                          GCLK_GENCTRL_DIV(SAM0_XOSC_FREQ_HZ / GCLK_TIMER_HZ));
@@ -292,8 +251,7 @@ void sam0_gclk_enable(uint8_t id)
     case SAM0_GCLK_PERIPH:
         if (USE_DFLL) {
             gclk_connect(SAM0_GCLK_PERIPH, GCLK_SOURCE_DFLL, 0);
-        }
-        else if (USE_XOSC) {
+        } else if (USE_XOSC) {
             gclk_connect(SAM0_GCLK_PERIPH, GCLK_SOURCE_ACTIVE_XOSC, 0);
         }
         break;
@@ -317,11 +275,9 @@ uint32_t sam0_gclk_freq(uint8_t id)
     case SAM0_GCLK_PERIPH:
         if (USE_DFLL) {
             return SAM0_DFLL_FREQ_HZ;
-        }
-        else if (USE_XOSC) {
+        } else if (USE_XOSC) {
             return SAM0_XOSC_FREQ_HZ;
-        }
-        else {
+        } else {
             assert(0);
             return 0;
         }
@@ -334,7 +290,7 @@ uint32_t sam0_gclk_freq(uint8_t id)
 
 void cpu_pm_cb_enter(int deep)
 {
-    (void)deep;
+    (void) deep;
     /* will be called before entering sleep */
 }
 
@@ -399,8 +355,7 @@ void cpu_init(void)
     xosc32k_init();
     if (EXTERNAL_OSC32_SOURCE) {
         gclk_connect(SAM0_GCLK_32KHZ, GCLK_SOURCE_XOSC32K, 0);
-    }
-    else if (ULTRA_LOW_POWER_INTERNAL_OSC_SOURCE) {
+    } else if (ULTRA_LOW_POWER_INTERNAL_OSC_SOURCE) {
         gclk_connect(SAM0_GCLK_32KHZ, GCLK_SOURCE_OSCULP32K, 0);
     }
 
@@ -413,12 +368,10 @@ void cpu_init(void)
         gclk_connect(SAM0_GCLK_MAIN, GCLK_SOURCE_DPLL0,
                      GCLK_GENCTRL_DIV(DPLL_DIV));
         fdpll_lock(0);
-    }
-    else if (USE_DFLL) {
+    } else if (USE_DFLL) {
         gclk_connect(SAM0_GCLK_MAIN, GCLK_SOURCE_DFLL,
                      GCLK_GENCTRL_DIV(SAM0_DFLL_FREQ_HZ / CLOCK_CORECLOCK));
-    }
-    else if (USE_XOSC) {
+    } else if (USE_XOSC) {
         gclk_connect(SAM0_GCLK_MAIN, GCLK_SOURCE_ACTIVE_XOSC,
                      GCLK_GENCTRL_DIV(SAM0_XOSC_FREQ_HZ / CLOCK_CORECLOCK));
     }

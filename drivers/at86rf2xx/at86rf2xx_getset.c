@@ -214,6 +214,7 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page, int16
     at86rf2xx_set_state(dev, prev_state);
 }
 
+
 int8_t at86rf2xx_get_rxsensitivity(const at86rf2xx_t *dev)
 {
     uint8_t rxsens = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN)

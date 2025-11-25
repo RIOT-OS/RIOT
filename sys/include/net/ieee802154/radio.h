@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @defgroup     drivers_ieee802154_hal IEEE802.15.4 Radio Hardware Abstraction Layer
  * @ingroup      drivers
@@ -20,6 +18,9 @@
  *
  * @author       José I. Alamos <jose.alamos@haw-hamburg.de>
  */
+
+#ifndef NET_IEEE802154_RADIO_H
+#define NET_IEEE802154_RADIO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,13 +74,6 @@ typedef enum {
      */
     IEEE802154_CAP_AUTO_CSMA            = BIT1,
     /**
-     * @brief the device supports automatic ACK frame transmission
-     *
-     * The device automatically sends an ACK frame when it receives a frame
-     * with the ACK Req bit set.
-     */
-    IEEE802154_CAP_AUTO_ACK             = BIT2,
-    /**
      * @brief the device support ACK timeout interrupt
      *
      * The device will automatically attempt to receive and handle the ACK
@@ -90,71 +84,71 @@ typedef enum {
      *
      * The ACK frame is not indicated to the upper layer.
      */
-    IEEE802154_CAP_IRQ_ACK_TIMEOUT      = BIT3,
+    IEEE802154_CAP_IRQ_ACK_TIMEOUT      = BIT2,
     /**
      * @brief the device supports the IEEE802.15.4 2.4 GHz band
      *
      * It's assumed that @ref IEEE802154_CAP_IRQ_TX_DONE is present.
      */
-    IEEE802154_CAP_24_GHZ               = BIT4,
+    IEEE802154_CAP_24_GHZ               = BIT3,
     /**
      * @brief the device support the IEEE802.15.4 Sub GHz band
      */
-    IEEE802154_CAP_SUB_GHZ              = BIT5,
+    IEEE802154_CAP_SUB_GHZ              = BIT4,
     /**
      * @brief the device reports reception off frames with invalid CRC.
      */
-    IEEE802154_CAP_IRQ_CRC_ERROR        = BIT6,
+    IEEE802154_CAP_IRQ_CRC_ERROR        = BIT5,
     /**
      * @brief the device reports when the transmission is done
      */
-    IEEE802154_CAP_IRQ_TX_DONE          = BIT7,
+    IEEE802154_CAP_IRQ_TX_DONE          = BIT6,
     /**
      * @brief the device reports the start of a frame (SFD) when received.
      */
-    IEEE802154_CAP_IRQ_RX_START         = BIT8,
+    IEEE802154_CAP_IRQ_RX_START         = BIT7,
     /**
      * @brief the device reports the start of a frame (SFD) was sent.
      */
-    IEEE802154_CAP_IRQ_TX_START         = BIT9,
+    IEEE802154_CAP_IRQ_TX_START         = BIT8,
     /**
      * @brief the device reports the end of the CCA procedure
      */
-    IEEE802154_CAP_IRQ_CCA_DONE         = BIT10,
+    IEEE802154_CAP_IRQ_CCA_DONE         = BIT9,
     /**
      * @brief the device provides the number of retransmissions
      *
      * It's assumed that @ref IEEE802154_CAP_FRAME_RETRANS is present.
      */
-    IEEE802154_CAP_FRAME_RETRANS_INFO   = BIT11,
+    IEEE802154_CAP_FRAME_RETRANS_INFO   = BIT10,
     /**
      * @brief the device retains all register values when off.
      */
-    IEEE802154_CAP_REG_RETENTION        = BIT12,
+    IEEE802154_CAP_REG_RETENTION        = BIT11,
     /**
      * @brief Binary Phase Shift Keying PHY mode
      */
-    IEEE802154_CAP_PHY_BPSK             = BIT13,
+    IEEE802154_CAP_PHY_BPSK             = BIT12,
     /**
      * @brief Amplitude-Shift Keying PHY mode
      */
-    IEEE802154_CAP_PHY_ASK              = BIT14,
+    IEEE802154_CAP_PHY_ASK              = BIT13,
     /**
      * @brief Offset Quadrature Phase-Shift Keying
      */
-    IEEE802154_CAP_PHY_OQPSK            = BIT15,
+    IEEE802154_CAP_PHY_OQPSK            = BIT14,
     /**
      * @brief Multi-Rate Offset Quadrature Phase-Shift Keying PHY mode
      */
-    IEEE802154_CAP_PHY_MR_OQPSK         = BIT16,
+    IEEE802154_CAP_PHY_MR_OQPSK         = BIT15,
     /**
      * @brief Multi-Rate Orthogonal Frequency-Division Multiplexing PHY mode
      */
-    IEEE802154_CAP_PHY_MR_OFDM          = BIT17,
+    IEEE802154_CAP_PHY_MR_OFDM          = BIT16,
     /**
      * @brief Multi-Rate Frequency Shift Keying PHY mode
      */
-    IEEE802154_CAP_PHY_MR_FSK           = BIT18,
+    IEEE802154_CAP_PHY_MR_FSK           = BIT17,
     /**
      * @brief the device supports source address match table.
      *
@@ -163,7 +157,7 @@ typedef enum {
      * Request command from a child node, the Frame Pending bit of the ACK is
      * set if the source address matches one from the table.
      */
-    IEEE802154_CAP_SRC_ADDR_MATCH       = BIT19,
+    IEEE802154_CAP_SRC_ADDR_MATCH       = BIT18,
 } ieee802154_rf_caps_t;
 
 /**
@@ -466,35 +460,6 @@ typedef struct {
 } ieee802154_phy_conf_t;
 
 /**
- * @brief extension for IEEE 802.15.4g MR-OQPSK PHY
- */
-typedef struct {
-    ieee802154_phy_conf_t super;        /**< common settings */
-    ieee802154_mr_oqpsk_chips_t chips;  /**< chip rate       */
-    uint8_t rate_mode;                  /**< rate mode       */
-} ieee802154_mr_oqpsk_conf_t;
-
-/**
- * @brief extension for IEEE 802.15.4g MR-ODFM PHY
- */
-typedef struct {
-    ieee802154_phy_conf_t super;        /**< common settings */
-    uint8_t option;                     /**< OFDM Option */
-    uint8_t scheme;                     /**< Modulation & Coding Scheme */
-} ieee802154_mr_ofdm_conf_t;
-
-/**
- * @brief extension for IEEE 802.15.4g MR-FSK PHY
- */
-typedef struct {
-    ieee802154_phy_conf_t super;        /**< common settings */
-    ieee802154_mr_fsk_srate_t srate;    /**< symbol rate */
-    uint8_t mod_ord;                    /**< modulation order, 2 or 4 */
-    uint8_t mod_idx;                    /**< modulation index */
-    ieee802154_mr_fsk_fec_t fec;        /**< forward error correction */
-} ieee802154_mr_fsk_conf_t;
-
-/**
  * @brief IEEE 802.15.4 radio operations
  */
 typedef enum {
@@ -539,8 +504,8 @@ struct ieee802154_radio_ops {
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] psdu PSDU frame to be sent
      *
-     * @retval 0 on success
-     * @retval negative errno on error
+     * @return 0 on success
+     * @return negative errno on error
      */
     int (*write)(ieee802154_dev_t *dev, const iolist_t *psdu);
 
@@ -579,8 +544,8 @@ struct ieee802154_radio_ops {
      * @param[in] info information of the received frame (LQI, RSSI). Can be
      *            NULL if this information is not needed.
      *
-     * @retval number of bytes written in @p buffer (0 if @p buf == NULL)
-     * @retval -ENOBUFS if the frame doesn't fit in @p buf
+     * @return number of bytes written in @p buffer (0 if @p buf == NULL)
+     * @return -ENOBUFS if the frame doesn't fit in @p
      */
     int (*read)(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_info_t *info);
     /**
@@ -592,8 +557,8 @@ struct ieee802154_radio_ops {
      *
      * @post the device is off
      *
-     * @retval 0 on success
-     * @retval negative errno on error
+     * @return 0 on success
+     * @return negative errno on error
      */
     int (*off)(ieee802154_dev_t *dev);
 
@@ -607,8 +572,8 @@ struct ieee802154_radio_ops {
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      *
-     * @retval 0 on success
-     * @retval negative errno on error
+     * @return 0 on success
+     * @return negative errno on error
      */
     int (*request_on)(ieee802154_dev_t *dev);
 
@@ -634,9 +599,9 @@ struct ieee802154_radio_ops {
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      *
-     * @retval 0 if the device is on
-     * @retval -EAGAIN if the device is still busy turning on
-     * @retval negative errno on error
+     * @return 0 if the device is on
+     * @return -EAGAIN if the device is still busy turning on
+     * @return negative errno on error
      */
     int (*confirm_on)(ieee802154_dev_t *dev);
 
@@ -681,8 +646,8 @@ struct ieee802154_radio_ops {
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] threshold the threshold in dBm.
      *
-     * @retval 0 on success
-     * @retval negative errno on error
+     * @return 0 on success
+     * @return negative errno on error
      */
     int (*set_cca_threshold)(ieee802154_dev_t *dev, int8_t threshold);
 
@@ -696,9 +661,9 @@ struct ieee802154_radio_ops {
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] mode the CCA mode
      *
-     * @retval 0 on success
-     * @retval -ENOTSUP if the mode is not supported
-     * @retval negative errno on error
+     * @return 0 on success
+     * @return -ENOTSUP if the mode is not supported
+     * @return negative errno on error
      */
     int (*set_cca_mode)(ieee802154_dev_t *dev, ieee802154_cca_mode_t mode);
 
@@ -717,9 +682,9 @@ struct ieee802154_radio_ops {
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] conf the PHY configuration
      *
-     * @retval 0        on success
-     * @retval -EINVAL  if the configuration is not valid for the device.
-     * @retval <0       error, return value is negative errno indicating the cause.
+     * @return 0        on success
+     * @return -EINVAL  if the configuration is not valid for the device.
+     * @return <0       error, return value is negative errno indicating the cause.
      */
     int (*config_phy)(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf);
 
@@ -734,8 +699,8 @@ struct ieee802154_radio_ops {
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] retrans the number of retransmissions attempts.
      *
-     * @retval 0 on success
-     * @retval negative errno on error
+     * @return 0 on success
+     * @return negative errno on error
      */
     int (*set_frame_retrans)(ieee802154_dev_t *dev, uint8_t retrans);
 
@@ -753,38 +718,25 @@ struct ieee802154_radio_ops {
      *                    ieee802154_radio_request_transmit function is
      *                    equivalent to CCA send.
      *
-     * @retval 0 on success
-     * @retval -EINVAL if the settings are not supported.
-     * @retval negative errno on error
+     * @return 0 on success
+     * @return -EINVAL if the settings are not supported.
+     * @return negative errno on error
      */
     int (*set_csma_params)(ieee802154_dev_t *dev, const ieee802154_csma_be_t *bd,
                            int8_t retries);
 
     /**
-     * @brief Set the frame filter mode.
+     * @brief Set the frame filter moder.
      *
      * @pre the device is on
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] mode address filter mode
      *
-     * @retval 0 on success
-     * @retval negative errno on error
+     * @return 0 on success
+     * @return negative errno on error
      */
     int (*set_frame_filter_mode)(ieee802154_dev_t *dev, ieee802154_filter_mode_t mode);
-
-    /**
-     * @brief Get the frame filter mode.
-     *
-     * @pre the device is on
-     *
-     * @param[in] dev IEEE802.15.4 device descriptor
-     * @param[out] mode address filter mode
-     *
-     * @retval 0 on success
-     * @retval negative errno on error
-     */
-    int (*get_frame_filter_mode)(ieee802154_dev_t *dev, ieee802154_filter_mode_t *mode);
 
     /**
      * @brief Configure the address filter.
@@ -798,8 +750,8 @@ struct ieee802154_radio_ops {
      * @param[in] cmd command for the address filter
      * @param[in] value value for @p cmd.
      *
-     * @retval 0 on success
-     * @retval negative errno on error
+     * @return 0 on success
+     * @return negative errno on error
      */
     int (*config_addr_filter)(ieee802154_dev_t *dev, ieee802154_af_cmd_t cmd, const void *value);
 
@@ -818,26 +770,12 @@ struct ieee802154_radio_ops {
      * @param[in] cmd command for the source address match configuration
      * @param[in] value value associated to @p cmd.
      *
-     * @retval 0 on success
-     * @retval negative errno on error
+     * @return 0 on success
+     * @return negative errno on error
      */
     int (*config_src_addr_match)(ieee802154_dev_t *dev, ieee802154_src_match_t cmd,
                                  const void *value);
 };
-
-/**
- * @brief Check if the device has a specific capability
- *
- * @param[in] dev IEEE802.15.4 device descriptor
- * @param[in] cap capabilities to check for
- *
- * @retval true if the device has the capability
- * @retval false if the device doesn't have the capability
- */
-static inline bool ieee802154_radio_has_capability(ieee802154_dev_t *dev, uint32_t cap)
-{
-    return (dev->driver->caps & cap) == cap;
-}
 
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::write
@@ -1046,25 +984,6 @@ static inline int ieee802154_radio_set_frame_filter_mode(ieee802154_dev_t *dev,
                                                     ieee802154_filter_mode_t mode)
 {
     return dev->driver->set_frame_filter_mode(dev, mode);
-}
-
-/**
- * @brief Shortcut to @ref ieee802154_radio_ops::get_frame_filter_mode
- *
- * @pre the device is on
- *
- * @param[in] dev IEEE802.15.4 device descriptor
- * @param[out] mode frame filter mode
- *
- * @return result of @ref ieee802154_radio_ops::get_frame_filter_mode
- */
-static inline int ieee802154_radio_get_frame_filter_mode(ieee802154_dev_t *dev,
-                                                         ieee802154_filter_mode_t *mode)
-{
-    if (dev->driver->get_frame_filter_mode) {
-        return dev->driver->get_frame_filter_mode(dev, mode);
-    }
-    return -ENOTSUP;
 }
 
 /**
@@ -1699,4 +1618,5 @@ static inline ieee802154_phy_mode_t ieee802154_cap_to_phy_mode(uint32_t cap)
 }
 #endif
 
+#endif /* NET_IEEE802154_RADIO_H */
 /** @} */

@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2018 Eistec AB
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 Eistec AB
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @defgroup    sys_spin_random Spin_random - random CPU delays
@@ -16,6 +17,9 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
+
+#ifndef SPIN_RANDOM_H
+#define SPIN_RANDOM_H
 
 #include <stdint.h>
 #include "periph/timer.h"
@@ -62,4 +66,5 @@ uint32_t spin_random_calibrate(tim_t timer_dev, uint32_t spin_max_target);
 }
 #endif
 
+#endif /* SPIN_RANDOM_H */
 /** @} */

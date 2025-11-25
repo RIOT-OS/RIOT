@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_sdp3x SDP3x temperature and differential pressure sensor
  * @ingroup     drivers_sensors
@@ -20,6 +18,9 @@
  * @author      Nishchay Agrawal <f2016088@pilani.bits-pilani.ac.in>
  * @}
  */
+
+#ifndef SDP3X_H
+#define SDP3X_H
 
 #include "saul.h"
 #include "xtimer.h"
@@ -193,3 +194,5 @@ int8_t sdp3x_exit_sleep(const sdp3x_t *dev);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* SDP3X_H */

@@ -1,7 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2023 Otto-von-Guericke-Universität Magdeburg
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 Freie Universität Berlin
+ *               2023 Otto-von-Guericke-Universität Magdeburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -71,6 +74,7 @@ int uart_init(uart_t uart, uint32_t symbolrate, uart_rx_cb_t rx_cb, void *arg)
     /* prepare and save UART config */
     confs[uart].ctl = CHAR;
     confs[uart].prescaler = msp430_usart_prescale(symbolrate, USART_MIN_BR_UART);
+
 
     if (rx_cb) {
         init(uart);

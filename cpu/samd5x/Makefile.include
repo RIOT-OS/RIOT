@@ -1,9 +1,6 @@
 ifneq (,$(filter samd51%,$(CPU_MODEL)))
   CFLAGS += -DCPU_SAMD51
 endif
-ifneq (,$(filter same51%,$(CPU_MODEL)))
-  CFLAGS += -DCPU_SAME51
-endif
 ifneq (,$(filter same54%,$(CPU_MODEL)))
   CFLAGS += -DCPU_SAME54
 endif
@@ -20,6 +17,3 @@ BACKUP_RAM_LEN  = 0x2000
 
 include $(RIOTCPU)/sam0_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk
-
-# The Black Magic Probe has tested to work fine on SAMD5x
-PROGRAMMERS_SUPPORTED += bmp

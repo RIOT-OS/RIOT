@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_xtimer xtimer high level timer abstraction layer (deprecated)
  * @ingroup     sys
@@ -41,11 +39,7 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-
-/**
- * @brief This macro is used to check whether internal headers have been
- * included via the public header
- */
+#ifndef XTIMER_H
 #define XTIMER_H
 
 #include <stdbool.h>
@@ -689,3 +683,4 @@ static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout);
 #endif /* MODULE_ZTIMER_XTIMER_COMPAT */
 
 /** @} */
+#endif /* XTIMER_H */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_lis2dh12
  *
@@ -17,6 +15,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef LIS2DH12_PARAMS_H
+#define LIS2DH12_PARAMS_H
 
 #include "board.h"
 #include "lis2dh12.h"
@@ -115,4 +116,5 @@ static const saul_reg_info_t lis2dh12_saul_info[] =
 }
 #endif
 
+#endif /* LIS2DH12_PARAMS_H */
 /** @} */

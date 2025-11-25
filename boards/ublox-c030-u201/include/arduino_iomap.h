@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2018 OTA keys S.A.
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 OTA keys S.A.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_ublox-c030-u201
@@ -17,6 +18,9 @@
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
+
+#ifndef ARDUINO_IOMAP_H
+#define ARDUINO_IOMAP_H
 
 #include "periph/gpio.h"
 #include "periph/adc.h"
@@ -89,4 +93,5 @@ extern "C" {
 }
 #endif
 
+#endif /* ARDUINO_IOMAP_H */
 /** @} */

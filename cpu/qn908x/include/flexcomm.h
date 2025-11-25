@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2020 iosabi
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 iosabi
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_qn908x
@@ -20,6 +21,9 @@
  *
  * @author      iosabi <iosabi@protonmail.com>
  */
+
+#ifndef FLEXCOMM_H
+#define FLEXCOMM_H
 
 #include <stdint.h>
 #include "periph_cpu.h"
@@ -59,4 +63,5 @@ int flexcomm_instance_from_addr(const FLEXCOMM_Type *dev);
 }
 #endif
 
+#endif /* FLEXCOMM_H */
 /** @} */

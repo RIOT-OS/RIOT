@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     net_eui_provider
  *
@@ -16,6 +14,8 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+#ifndef EUI48_PROVIDER_PARAMS_H
+#define EUI48_PROVIDER_PARAMS_H
 
 #if __has_include("eui_provider_params.h")
 #include "eui_provider_params.h"
@@ -83,3 +83,5 @@ static const eui48_conf_t eui48_conf[] = {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* EUI48_PROVIDER_PARAMS_H */

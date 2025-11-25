@@ -6,8 +6,6 @@
  * more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_ppp Point-to-Point Protocol (PPP) Data Link Layer
  * @ingroup     net
@@ -25,6 +23,9 @@
  *              </a>
  */
 
+#ifndef NET_PPPTYPE_H
+#define NET_PPPTYPE_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,6 +42,7 @@ extern "C" {
 }
 #endif
 
+#endif /* NET_PPPTYPE_H */
 /**
  * @}
  */

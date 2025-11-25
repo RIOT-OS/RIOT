@@ -17,14 +17,14 @@ def testfunc(child):
     if ret == 1:
         return
     child.sendline('malloc 100')
-    child.expect('allocated (0x)?')
+    child.expect('allocated 0x')
     addr = child.readline()
     addr = addr[:-2]
     child.expect_exact('> ')
     child.sendline('heap')
     child.expect(r'heap: \d+ \(used \d+, free \d+\) \[bytes\]')
     child.sendline('free 0x' + addr)
-    child.expect('freeing (0x)?' + addr)
+    child.expect('freeing 0x' + addr)
     child.expect_exact('>')
     child.sendline('heap')
     child.expect(r'heap: \d+ \(used \d+, free \d+\) \[bytes\]')

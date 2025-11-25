@@ -1,5 +1,4 @@
-# Using -isystem instead of -I to prevent warnings for the following headers
-INCLUDES += -isystem$(PKGDIRBASE)/opendsme
-INCLUDES += -isystem$(RIOTBASE)/pkg/opendsme/include
+INCLUDES += -I$(PKGDIRBASE)/opendsme
+INCLUDES += -I$(RIOTBASE)/pkg/opendsme/include
 
 DIRS += $(RIOTBASE)/pkg/opendsme/contrib

@@ -980,21 +980,7 @@ int vfs_normalize_path(char *buf, const char *path, size_t buflen)
     return npathcomp;
 }
 
-/**
- * @brief Iterate through all mounted file systems
- *
- * @attention Not thread safe! Do not mix calls to this function with other
- * calls which modify the mount table, such as vfs_mount() and vfs_umount().
- * Use the public thread-safe API function `vfs_iterate_mount_dirs` instead.
- *
- * Set @p cur to @c NULL to start from the beginning
- *
- * @param[in]  cur  current iterator value
- *
- * @return     Pointer to next mounted file system in list after @p cur
- * @return     NULL if @p cur is the last element in the list
- */
-static const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur)
+const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur)
 {
     clist_node_t *node;
     if (cur == NULL) {

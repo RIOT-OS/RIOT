@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2017 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 Freie Universität Berlin
+ *               2017 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_nucleo-l053r8
@@ -16,6 +17,9 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 /* Add specific clock configuration (HSE, LSE) for this board here */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -115,4 +119,5 @@ static const spi_conf_t spi_config[] = {
 }
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

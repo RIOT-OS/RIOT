@@ -1,6 +1,0 @@
-CPU_CORE = cortex-m4
-CPU_FAM  = sam4s
-
-FEATURES_PROVIDED += cortexm_mpu
-
-include $(RIOTCPU)/cortexm_common/Makefile.features

@@ -1,0 +1,32 @@
+From b02c4c62bd162472a49f2cd133683a043eeb939a Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 17 Jul 2022 16:06:34 +0200
+Subject: [PATCH 26/26] hal: conditional definition of gpio_pull_mode_t
+
+Define type `gpio_pull_mode_t` only if it is not yet defined by RIOT `periph/gpio`. When this header is used during the compilation of RIOT source, this type definition isn't required and leads to name conflicts with RIOT's `gpio_pull_t` and `GPIO_FLOATING` definition. The definition of `gpio_pull_mode_t` in this header is only required when ESP-IDF source code is compiled. In that case RIOT's `gpio_pull_t` isn't defined.
+---
+ components/hal/include/hal/gpio_types.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/components/hal/include/hal/gpio_types.h b/components/hal/include/hal/gpio_types.h
+index 8a15b8e396c..0b60f7284a8 100644
+--- a/components/hal/include/hal/gpio_types.h
++++ b/components/hal/include/hal/gpio_types.h
+@@ -401,12 +401,14 @@ typedef struct {
+     gpio_int_type_t intr_type;      /*!< GPIO interrupt type                                  */
+ } gpio_config_t;
+ 
++#ifndef HAVE_GPIO_PULL_T
+ typedef enum {
+     GPIO_PULLUP_ONLY,               /*!< Pad pull up            */
+     GPIO_PULLDOWN_ONLY,             /*!< Pad pull down          */
+     GPIO_PULLUP_PULLDOWN,           /*!< Pad pull up + pull down*/
+     GPIO_FLOATING,                  /*!< Pad floating           */
+ } gpio_pull_mode_t;
++#endif
+ 
+ typedef enum {
+     GPIO_DRIVE_CAP_0       = 0,    /*!< Pad drive capability: weak          */
+-- 
+2.17.1
+

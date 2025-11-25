@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gnrc_rpl_p2p Reactive Discovery of P2P Routes in LLNs
  * @ingroup     net_gnrc_rpl
@@ -22,6 +20,8 @@
  *
  * @author  Cenk Gündoğan <mail@cgundogan.de>
  */
+#ifndef NET_GNRC_RPL_P2P_H
+#define NET_GNRC_RPL_P2P_H
 
 #include "net/ipv6/addr.h"
 #include "net/gnrc.h"
@@ -176,4 +176,5 @@ void gnrc_rpl_p2p_update(void);
 }
 #endif
 
+#endif /* NET_GNRC_RPL_P2P_H */
 /** @} */

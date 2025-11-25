@@ -31,11 +31,10 @@ def testfunc(child):
     child.expect(r"00000020  55  44  33  FF  FE  22  11  00  54  B8  59  AF  3A  B4  5C  85")
     child.expect(r"00000030  1E  CE  E2  EB  05  4E  A3  85")
     child.sendline("pktbuf")
-    child.expect(r"packet buffer: first byte: ((0x)?[0-9a-fA-F]+), "
-                 r"last byte: (0x)?[0-9a-fA-F]+ \(size: (\d+)\)")
+    child.expect(r"packet buffer: first byte: (0x[0-9a-fA-F]+), "
+                 r"last byte: 0x[0-9a-fA-F]+ \(size: (\d+)\)")
     start_addr = child.match.group(1)
-    size = child.match.group(4)
-    print(start_addr, size)
+    size = child.match.group(2)
     child.expect(r"  position of last byte used: \d+")
     child.expect(r"~ unused: {} \(next: (\(nil\)|0(x0+)?), size: +{}\) ~"
                  .format(start_addr, size))

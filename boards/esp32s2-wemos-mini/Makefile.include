@@ -2,3 +2,5 @@ PORT_LINUX ?= /dev/ttyACM0
 
 CFLAGS += -DCONFIG_CONSOLE_UART_TX=39
 CFLAGS += -DCONFIG_CONSOLE_UART_RX=37
+
+include $(RIOTBOARD)/common/esp32s2/Makefile.include

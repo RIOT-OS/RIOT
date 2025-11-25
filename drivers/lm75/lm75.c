@@ -244,7 +244,7 @@ int lm75_get_os_pin(lm75_t *dev, bool *os_pin_state) {
         return LM75_ERROR;
     }
 
-    *os_pin_state = gpio_read(dev->lm75_params.gpio_alarm) == dev->lm75_params.polarity;
+    *os_pin_state = !!gpio_read(dev->lm75_params.gpio_alarm) == dev->lm75_params.polarity;
     return LM75_SUCCESS;
 }
 

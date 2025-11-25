@@ -1,15 +1,5 @@
-# Hack: On LLVM, use `-isystem` instead of -I to ignore warnings about the
-#       package's headers. On g++ (at least the AVR variant), `-system` is C
-#       only. But luckily, g++ does not emit the warnings we need to ignore
-#       anyway.
-
-ifeq (llvm,$(TOOLCHAIN))
-  INCLUDES += -isystem$(PKGDIRBASE)/etl/include
-  INCLUDES += -isystem$(RIOTPKG)/etl/config
-else
-  INCLUDES += -I$(PKGDIRBASE)/etl/include
-  INCLUDES += -I$(RIOTPKG)/etl/config
-endif
+INCLUDES += -I$(PKGDIRBASE)/etl/include
+INCLUDES += -I$(RIOTPKG)/etl/config
 
 # There's nothing to build in this package, it's used as a header only library.
 # So it's declared as a pseudo-module

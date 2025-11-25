@@ -1,11 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2014 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2017 HAW Hamburg
- * SPDX-FileCopyrightText: 2020 Oppila Microsystems -  http://www.oppila.in
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2017 HAW Hamburg
+ *               2020 Oppila Microsystems -  http://www.oppila.in
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_omote
@@ -15,6 +16,9 @@
  * @brief       Peripheral MCU configuration for the omote board
  *
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "cc2538_gpio.h"
 #include "periph_cpu.h"
@@ -111,4 +115,5 @@ static const uart_conf_t uart_config[] = {
 } /* end extern "C" */
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

@@ -8,8 +8,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_micropython
  *
@@ -20,6 +18,9 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+
+#ifndef MICROPYTHON_H
+#define MICROPYTHON_H
 
 #include <stdint.h>
 
@@ -54,4 +55,5 @@ void mp_riot_init(char* heap, size_t heap_size);
  */
 void mp_do_str(const char *src, int len);
 
+#endif /* MICROPYTHON_H */
 /** @} */

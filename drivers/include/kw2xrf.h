@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_kw2xrf KW2x radio-driver
  * @ingroup     drivers_netdev
@@ -21,6 +19,9 @@
  * @author      Jonas Remmert <j.remmert@phytec.de>
  * @author      Sebastian Meiling <s@mlng.net>
  */
+
+#ifndef KW2XRF_H
+#define KW2XRF_H
 
 #include <stdint.h>
 
@@ -172,4 +173,5 @@ void kw2xrf_radio_hal_irq_handler(void *dev);
 }
 #endif
 
+#endif /* KW2XRF_H */
 /** @} */

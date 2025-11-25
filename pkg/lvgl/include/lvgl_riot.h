@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_lvgl
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef LVGL_RIOT_H
+#define LVGL_RIOT_H
 
 #include "screen_dev.h"
 
@@ -55,4 +56,5 @@ void lvgl_wakeup(void);
 }
 #endif
 
+#endif /* LVGL_RIOT_H */
 /** @} */

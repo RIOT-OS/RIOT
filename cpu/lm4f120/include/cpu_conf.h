@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2015 Rakendra Thapa <rakendrathapa@gmail.com
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @defgroup        cpu_lm4f120 LM4F
@@ -16,6 +17,9 @@
  *
  * @author          Rakendra Thapa <rakendrathapa@gmail.com>
  */
+
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
 #include "cpu_conf_common.h"
 
@@ -67,4 +71,5 @@ extern void cpu_clock_init(int);
 }
 #endif
 
+#endif /* CPU_CONF_H */
 /** @} */

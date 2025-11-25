@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_riotboot_usb_dfu   Initialization of USB Device Firmware
  *                                     Upgrade for riotboot
@@ -21,6 +19,9 @@
  *
  * @}
  */
+
+#ifndef RIOTBOOT_USB_DFU_H
+#define RIOTBOOT_USB_DFU_H
 
 #include "riotboot/hdr.h"
 
@@ -52,3 +53,5 @@ void riotboot_usb_dfu_init(unsigned forced);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* RIOTBOOT_USB_DFU_H */

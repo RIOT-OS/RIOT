@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2020 ML!PA Consulting GmbH
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 ML!PA Consulting GmbH
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -20,7 +23,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <inttypes.h>
 #include "fmt.h"
 #include "thread.h"
 #include "shell.h"
@@ -77,10 +79,10 @@ void* lis2dh12_test_process(void* arg) {
     while (1) {
 
         /* wait for interrupt */
-        int32_t int1_src = lis2dh12_wait_event(&dev, LIS2DH12_INT1, false);
+        int int1_src = lis2dh12_wait_event(&dev, LIS2DH12_INT1, false);
 
         if (int1_src <= 0) {
-            printf("error: %" PRId32 "\n", int1_src);
+            printf("error: %d\n", int1_src);
             continue;
         }
 

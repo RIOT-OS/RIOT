@@ -30,8 +30,6 @@
  * $FreeBSD: src/lib/libmd/sha256.h,v 1.1.2.1 2005/06/24 13:32:25 cperciva Exp $
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_hashes_sha224 SHA-224
  * @ingroup     sys_hashes_unkeyed
@@ -47,6 +45,9 @@
  * @author      Hermann Lelong
  * @author      Peter Kietzmann
  */
+
+#ifndef HASHES_SHA224_H
+#define HASHES_SHA224_H
 
 #include <inttypes.h>
 #include <stddef.h>
@@ -119,3 +120,4 @@ void sha224(const void *data, size_t len, void *digest);
 #endif
 
 /** @} */
+#endif /* HASHES_SHA224_H */

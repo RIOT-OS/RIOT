@@ -8,15 +8,15 @@ the CI are (intentionally) not added.
 
 ## Installation
 
-1. Copy the `zsh-riot.zsh` script where you can find it,
-   e.g. `cp zsh-riot.zsh ~/.zsh-riot.zsh`
+1. Copy the `zsh-riot.sh` script where you can find it,
+   e.g. `cp zsh-riot.sh ~/.zsh-riot.sh`
 2. Hook up the custom RIOT specific make completion in `.zshrc` and use that
    instead of the default `make` completion if and only if the working
    directory is inside a RIOT repository. This can be done by adding the
    following snippet:
 
 ``` sh
-source ~/.zsh-riot.zsh
+source ~/.zsh-riot.sh
 compdef '
 if git rev-parse --is-inside-work-tree &> /dev/null && [[ -e "$(git rev-parse --show-toplevel)/.murdock" ]]; then
   _riot

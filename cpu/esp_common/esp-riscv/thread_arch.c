@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2022 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2022 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -171,7 +174,7 @@ void IRAM_ATTR thread_yield_isr(void* arg)
     /* clear the interrupt first */
     WRITE_PERI_REG(SYSTEM_CPU_INTR_FROM_CPU_0_REG, 0);
     /* set the context switch flag (indicates that context has to be switched
-     * on exit from interrupt in rtos_int_exit) */
+       is switch on exit from interrupt in rtos_int_exit */
     sched_context_switch_request = 1;
 }
 
@@ -193,9 +196,8 @@ void IRAM_ATTR thread_yield_higher(void)
     }
     else {
         /* otherwise trigger a software interrupt for context switch */
-        WRITE_PERI_REG(SYSTEM_CPU_INTR_FROM_CPU_0_REG, SYSTEM_CPU_INTR_FROM_CPU_0);
+        WRITE_PERI_REG(SYSTEM_CPU_INTR_FROM_CPU_0_REG, 1);
         /* small delay of 3-4 instructions required here before we return */
-        __asm__ volatile ( "nop" );
         __asm__ volatile ( "nop" );
         __asm__ volatile ( "nop" );
         __asm__ volatile ( "nop" );

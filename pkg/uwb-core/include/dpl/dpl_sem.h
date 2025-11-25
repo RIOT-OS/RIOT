@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_uwb_core
  * @{
@@ -18,6 +16,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+
+#ifndef DPL_DPL_SEM_H
+#define DPL_DPL_SEM_H
 
 #include <stdint.h>
 
@@ -95,3 +96,5 @@ static inline int16_t dpl_sem_get_count(struct dpl_sem *sem)
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* DPL_DPL_SEM_H */

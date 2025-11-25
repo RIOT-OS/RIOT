@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup  sys_vfs Virtual File System (VFS) layer
  * @ingroup   sys
@@ -52,6 +50,9 @@
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
+#ifndef VFS_H
+#define VFS_H
+
 #include <stdint.h>
 #include <sys/stat.h> /* for struct stat */
 #include <sys/types.h> /* for off_t etc. */
@@ -78,10 +79,10 @@ extern "C" {
 #endif
 
 /**
- * @brief   MAX7 Function to get the largest of 7 values
+ * @brief   MAX6 Function to get the largest of 6 values
  */
-#ifndef MAX7
-#define MAX7(a, b, c, d, e, f, g) MAX(MAX(MAX(MAX(MAX((a), (b)), MAX((c), (d))), (e)), (f)), (g))
+#ifndef MAX6
+#define MAX6(a, b, c, d, e, f) MAX(MAX(MAX(MAX((a), (b)), MAX((c), (d))), (e)), (f))
 #endif
 
 /**
@@ -217,19 +218,6 @@ extern "C" {
 #endif
 /** @} */
 
-/**
- * @brief   VFS parameters for xipfs
- * @{
- */
-#if defined(MODULE_XIPFS) || DOXYGEN
-#  define XIPFS_VFS_DIR_BUFFER_SIZE        (68) /**< sizeof(xipfs_dir_desc_t) */
-#  define XIPFS_VFS_FILE_BUFFER_SIZE       (12) /**< sizeof(xipfs_file_desc_t) */
-#else
-#  define XIPFS_VFS_DIR_BUFFER_SIZE        (1)
-#  define XIPFS_VFS_FILE_BUFFER_SIZE       (1)
-#endif
-/** @} */
-
 #ifndef VFS_MAX_OPEN_FILES
 /**
  * @brief Maximum number of simultaneous open files
@@ -265,13 +253,12 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_DIR_BUFFER_SIZE MAX7(FATFS_VFS_DIR_BUFFER_SIZE,       \
-                                 LITTLEFS_VFS_DIR_BUFFER_SIZE,    \
-                                 LITTLEFS2_VFS_DIR_BUFFER_SIZE,   \
-                                 SPIFFS_VFS_DIR_BUFFER_SIZE,      \
-                                 LWEXT4_VFS_DIR_BUFFER_SIZE,      \
-                                 NANOCOAP_FS_VFS_DIR_BUFFER_SIZE, \
-                                 XIPFS_VFS_DIR_BUFFER_SIZE        \
+#define VFS_DIR_BUFFER_SIZE MAX6(FATFS_VFS_DIR_BUFFER_SIZE,      \
+                                 LITTLEFS_VFS_DIR_BUFFER_SIZE,   \
+                                 LITTLEFS2_VFS_DIR_BUFFER_SIZE,  \
+                                 SPIFFS_VFS_DIR_BUFFER_SIZE,     \
+                                 LWEXT4_VFS_DIR_BUFFER_SIZE,     \
+                                 NANOCOAP_FS_VFS_DIR_BUFFER_SIZE \
                                 )
 #endif
 
@@ -295,13 +282,12 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_FILE_BUFFER_SIZE MAX7(FATFS_VFS_FILE_BUFFER_SIZE,       \
-                                  LITTLEFS_VFS_FILE_BUFFER_SIZE,    \
-                                  LITTLEFS2_VFS_FILE_BUFFER_SIZE,   \
-                                  SPIFFS_VFS_FILE_BUFFER_SIZE,      \
-                                  LWEXT4_VFS_FILE_BUFFER_SIZE,      \
-                                  NANOCOAP_FS_VFS_FILE_BUFFER_SIZE, \
-                                  XIPFS_VFS_FILE_BUFFER_SIZE        \
+#define VFS_FILE_BUFFER_SIZE MAX6(FATFS_VFS_FILE_BUFFER_SIZE,      \
+                                  LITTLEFS_VFS_FILE_BUFFER_SIZE,   \
+                                  LITTLEFS2_VFS_FILE_BUFFER_SIZE,  \
+                                  SPIFFS_VFS_FILE_BUFFER_SIZE,     \
+                                  LWEXT4_VFS_FILE_BUFFER_SIZE,     \
+                                  NANOCOAP_FS_VFS_FILE_BUFFER_SIZE \
                                  )
 #endif
 
@@ -344,8 +330,8 @@ extern "C" {
 #define VFS_AUTO_MOUNT(type, mtd, path, idx)        \
     static type ## _desc_t fs_desc_ ## idx = mtd;   \
                                                     \
-    XFA(vfs_mount_t, vfs_mountpoints_xfa, 0)        \
-    _mount_mtd_ ## idx = {                          \
+    XFA(vfs_mountpoints_xfa, 0)                     \
+    vfs_mount_t _mount_mtd_ ## idx = {              \
         .fs = &type ## _file_system,                \
         .mount_point = path,                        \
         .private_data = &fs_desc_ ## idx,           \
@@ -1161,9 +1147,27 @@ int vfs_bind(int fd, int flags, const vfs_file_ops_t *f_op, void *private_data);
 int vfs_normalize_path(char *buf, const char *path, size_t buflen);
 
 /**
+ * @brief Iterate through all mounted file systems
+ *
+ * @attention Not thread safe! Do not mix calls to this function with other
+ * calls which modify the mount table, such as vfs_mount() and vfs_umount()
+ *
+ * Set @p cur to @c NULL to start from the beginning
+ *
+ * @deprecated This will become an internal-only function after the 2022.04
+ *   release, use @ref vfs_iterate_mount_dirs instead.
+ *
+ * @param[in]  cur  current iterator value
+ *
+ * @return     Pointer to next mounted file system in list after @p cur
+ * @return     NULL if @p cur is the last element in the list
+ */
+const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur);
+
+/**
  * @brief Iterate through all mounted file systems by their root directories
  *
- * This function is thread safe, and allows thread safe
+ * Unlike @ref vfs_iterate_mounts, this is thread safe, and allows thread safe
  * access to the mount point's stats through @ref vfs_dstatvfs. If mounts or
  * unmounts happen while iterating, this is guaranteed to report all file
  * systems that stayed mounted, and may report any that are transiently
@@ -1184,7 +1188,7 @@ int vfs_normalize_path(char *buf, const char *path, size_t buflen);
  *
  * @see @c sc_vfs.c (@c df command) for a usage example
  *
- * @param[in,out] dir     The root directory of the discovered mount point
+ * @param[inout]  dir     The root directory of the discovered mount point
  *
  * @return     @c true if another file system is mounted; @p dir then contains an open directory.
  * @return     @c false if the file system list is exhausted; @p dir is uninitialized then.
@@ -1223,5 +1227,7 @@ int vfs_sysop_stat_from_fstat(vfs_mount_t *mountp,
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* VFS_H */
 
 /** @} */

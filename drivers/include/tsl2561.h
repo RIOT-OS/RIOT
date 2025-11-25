@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_tsl2561 TSL2561 illuminance sensor
  * @ingroup     drivers_sensors
@@ -22,6 +20,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef TSL2561_H
+#define TSL2561_H
 
 #include "saul.h"
 #include "periph/i2c.h"
@@ -108,4 +109,5 @@ uint16_t tsl2561_read_illuminance(const tsl2561_t *dev);
 }
 #endif
 
+#endif /* TSL2561_H */
 /** @} */

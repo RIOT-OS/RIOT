@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_tmp00x
  *
@@ -18,6 +16,9 @@
  * @author      Sebastian Meiling <s@mlng.net>
  * @author      Jannes Volkens <jannes.volkens@haw-hamburg.de>
  */
+
+#ifndef TMP00X_REGS_H
+#define TMP00X_REGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -103,4 +104,5 @@ extern "C" {
 }
 #endif
 
+#endif /* TMP00X_REGS_H */
 /** @} */

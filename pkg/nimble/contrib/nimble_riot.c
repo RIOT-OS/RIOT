@@ -70,14 +70,11 @@ static char _stack_host[NIMBLE_HOST_STACKSIZE];
 
 uint8_t nimble_riot_own_addr_type;
 
-bool nimble_port_initialized = false;
-
 static void *_host_thread(void *arg)
 {
     (void)arg;
 
     nimble_port_init();
-    nimble_port_initialized = true;
 
 #ifdef MODULE_NIMBLE_CONTROLLER
     /* XXX: NimBLE needs the nRF5x's LF clock to run */

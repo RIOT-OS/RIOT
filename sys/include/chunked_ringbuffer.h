@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_chunk_buffer    chunked Ringbuffer
  * @ingroup     sys
@@ -21,6 +19,9 @@
  *
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+
+#ifndef CHUNKED_RINGBUFFER_H
+#define CHUNKED_RINGBUFFER_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -72,24 +73,7 @@ typedef void (*crb_foreach_callback_t)(void *ctx, uint8_t *bytes, size_t len);
 void crb_init(chunk_ringbuf_t *rb, void *buffer, size_t len);
 
 /**
- * @brief Close the current chunk
- *
- * @note  This function is expected to be called in ISR context / with
- *        interrupts disabled.
- *
- * @param[in] rb        The Ringbuffer to work on
- * @param[in] valid     True if the chunk is valid and should be stored
- *                      False if the current chunk should be discarded
- *
- * @return size of chunk if the chunk could be stored in the valid chunk array
- * @return 0 if there is no more space in the valid chunk array
- */
-unsigned crb_end_chunk(chunk_ringbuf_t *rb, bool valid);
-
-/**
  * @brief Start a new chunk on the ringbuffer
- *
- * If an unfinished chunk already exists, it will be discarded.
  *
  * @note  This function is expected to be called in ISR context / with
  *        interrupts disabled.
@@ -101,11 +85,6 @@ unsigned crb_end_chunk(chunk_ringbuf_t *rb, bool valid);
  */
 static inline bool crb_start_chunk(chunk_ringbuf_t *rb)
 {
-    /* discard stale chunk */
-    if (rb->cur_start) {
-        crb_end_chunk(rb, false);
-    }
-
     /* pointing to the start of the first chunk */
     if (rb->cur == rb->protect) {
         return false;
@@ -170,6 +149,21 @@ static inline bool crb_add_byte(chunk_ringbuf_t *rb, uint8_t b)
  * @return false        If the ringbuffer is full
  */
 bool crb_add_bytes(chunk_ringbuf_t *rb, const void *data, size_t len);
+
+/**
+ * @brief Close the current chunk
+ *
+ * @note  This function is expected to be called in ISR context / with
+ *        interrupts disabled.
+ *
+ * @param[in] rb        The Ringbuffer to work on
+ * @param[in] valid     True if the chunk is valid and should be stored
+ *                      False if the current chunk should be discarded
+ *
+ * @return true         If the chunk could be stored in the valid chunk array
+ * @return false        If there is no more space in the valid chunk array
+ */
+bool crb_end_chunk(chunk_ringbuf_t *rb, bool valid);
 
 /**
  * @brief Add a complete chunk to the Ringbuffer
@@ -246,4 +240,5 @@ bool crb_chunk_foreach(chunk_ringbuf_t *rb, crb_foreach_callback_t func, void *c
 }
 #endif
 
+#endif /* CHUNKED_RINGBUFFER_H */
 /** @} */

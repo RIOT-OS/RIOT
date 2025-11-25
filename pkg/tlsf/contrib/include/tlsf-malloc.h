@@ -5,9 +5,6 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-
-#pragma once
-
 /**
  * @defgroup pkg_tlsf_malloc TLSF-based malloc.
  * @ingroup  pkg
@@ -35,6 +32,9 @@
  * @author  Juan I Carrano
  *
  */
+
+#ifndef TLSF_MALLOC_H
+#define TLSF_MALLOC_H
 
 #include <stddef.h>
 
@@ -92,6 +92,8 @@ tlsf_t _tlsf_get_global_control(void);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* TLSF_MALLOC_H */
 
 /**
  * @}

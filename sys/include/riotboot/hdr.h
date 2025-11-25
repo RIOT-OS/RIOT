@@ -8,8 +8,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_riotboot_hdr RIOT header helpers and tools
  * @ingroup     sys
@@ -30,6 +28,9 @@
  *
  * @}
  */
+
+#ifndef RIOTBOOT_HDR_H
+#define RIOTBOOT_HDR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -85,3 +86,5 @@ uint32_t riotboot_hdr_checksum(const riotboot_hdr_t *riotboot_hdr);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* RIOTBOOT_HDR_H */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gnrc_ipv6_nib   Neighbor Information Base for IPv6
  * @ingroup     net_gnrc_ipv6
@@ -24,6 +22,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef NET_GNRC_IPV6_NIB_H
+#define NET_GNRC_IPV6_NIB_H
 
 #include "net/gnrc/ipv6/nib/abr.h"
 #include "net/gnrc/ipv6/nib/ft.h"
@@ -433,4 +433,5 @@ void gnrc_ipv6_nib_change_rtr_adv_iface(gnrc_netif_t *netif, bool enable);
 }
 #endif
 
+#endif /* NET_GNRC_IPV6_NIB_H */
 /** @} */

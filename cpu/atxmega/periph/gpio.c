@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2021-2023 Gerson Fernando Budke <nandojve@gmail.com>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2021-2023 Gerson Fernando Budke <nandojve@gmail.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -249,7 +252,7 @@ void gpio_irq_disable(gpio_t pin)
     }
 }
 
-bool gpio_read(gpio_t pin)
+int gpio_read(gpio_t pin)
 {
     PORT_t *port = _port_addr(pin);
     uint8_t pin_mask = _pin_mask(pin);
@@ -303,7 +306,7 @@ void gpio_toggle(gpio_t pin)
     }
 }
 
-void gpio_write(gpio_t pin, bool value)
+void gpio_write(gpio_t pin, int value)
 {
     DEBUG("gpio_write pin = 0x%04x, value = 0x%02x \n", pin, value);
 

@@ -10,9 +10,7 @@ endif
 
 ifneq (,$(filter fido2_ctap,$(USEMODULE)))
   FEATURES_REQUIRED += periph_flashpage
-ifeq (,$(filter native,$(CPU)))
   FEATURES_REQUIRED += periph_flashpage_in_address_space
-endif
   FEATURES_REQUIRED += periph_gpio_irq
 
   USEPKG += tiny-asn1
@@ -28,5 +26,4 @@ endif
   USEMODULE += crypto_aes_256
   USEMODULE += hashes
   USEMODULE += fido2
-  USEMODULE += fmt
 endif

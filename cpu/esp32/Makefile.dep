@@ -4,6 +4,7 @@ include $(RIOTCPU)/esp_common/Makefile.dep
 
 USEPKG += esp32_sdk
 
+USEMODULE += esp_idf_api
 USEMODULE += esp_idf_common
 USEMODULE += esp_idf_efuse
 USEMODULE += esp_bootloader
@@ -20,26 +21,13 @@ ifneq (,$(filter esp_ble,$(USEMODULE)))
   # add additional modules and packages used for any BLE interface
   FEATURES_REQUIRED += esp_ble
   USEMODULE += esp_idf_ble
-  USEMODULE += esp_idf_nvs_flash
-  USEMODULE += esp_idf_phy
   USEPKG += esp32_sdk_lib_phy
-  ifeq (esp32s3,$(CPU_FAM))
+  ifeq (esp32,$(CPU_FAM))
+    FEATURES_REQUIRED += esp_ble_esp32
+    USEPKG += esp32_sdk_lib_bt_esp32
+  else ifneq (,$(filter esp32c3 esp32s3,$(CPU_FAM)))
+    FEATURES_REQUIRED += esp_ble_esp32c3
     USEPKG += esp32_sdk_lib_bt_esp32c3
-  else
-    USEPKG += esp32_sdk_lib_bt_$(CPU_FAM)
-  endif
-endif
-
-ifneq (,$(filter esp_ieee802154,$(USEMODULE)))
-  FEATURES_REQUIRED += esp_ieee802154
-  USEMODULE += esp_idf_ieee802154
-  USEMODULE += esp_idf_phy
-  USEPKG += esp32_sdk_lib_phy
-  ifeq (esp32c6,$(CPU_FAM))
-    USEMODULE += esp_idf_nvs_flash
-  endif
-  ifneq (,$(filter netdev,$(USEMODULE)))
-    USEMODULE += netdev_ieee802154_submac
   endif
 endif
 
@@ -48,19 +36,20 @@ ifneq (,$(filter esp_eth,$(USEMODULE)))
   USEMODULE += esp_idf_eth
   USEMODULE += esp_idf_event
   USEMODULE += esp_idf_gpio
+  USEMODULE += esp_idf_spi_flash
   USEMODULE += netdev_eth
   USEMODULE += netopt
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
   # add additional modules and packages used for any WiFi interface
-  USEPKG += esp32_sdk_lib_coexist
   USEPKG += esp32_sdk_lib_phy
   USEPKG += esp32_sdk_lib_wifi
   USEMODULE += esp_idf_event
   USEMODULE += esp_idf_heap
   USEMODULE += esp_idf_nvs_flash
-  USEMODULE += esp_idf_phy
+  USEMODULE += esp_idf_spi_flash
   USEMODULE += esp_idf_wifi
   USEMODULE += esp_idf_wpa_supplicant
   USEMODULE += esp_idf_wpa_supplicant_esp_supplicant
@@ -81,12 +70,9 @@ ifneq (,$(filter esp_hw_counter,$(USEMODULE)))
 endif
 
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
-  # NVS flash uses MBed TLS for encryption
-  USEPKG += mbedtls
-  USEMODULE += mbedtls_contrib
   # add additional modules required by esp_idf_nvs_flash
-  USEMODULE += esp_idf_spi_flash
   USEMODULE += pthread
+  USEMODULE += mtd
 endif
 
 ifneq (,$(filter esp_idf_wifi,$(USEMODULE)))
@@ -129,6 +115,7 @@ ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
   FEATURES_OPTIONAL += esp_spi_oct
   USEMODULE += esp_idf_gpio
   USEMODULE += esp_idf_heap
+  USEMODULE += esp_idf_spi_flash
   USEMODULE += esp_idf_spi_ram
 endif
 
@@ -137,12 +124,13 @@ ifneq (,$(filter esp_spi_oct,$(FEATURES_USED)))
 endif
 
 ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
-  # ESP-IDF heap component uses its own and modified TLSF implementation
-  USEPKG += esp32_sdk_tlsf
-endif
-
-ifneq (,$(filter esp_jtag,$(USEMODULE)))
-  FEATURES_REQUIRED += esp_jtag
+  # The ESP-IDF heap component uses the TLSF implementation that is part of
+  # the component. To avoid conflicts with modules and packages that use the
+  # RIOT package `tlsf`, this package is also used for the ESP-IDF heap instead
+  # of its own implementation. There does not seem to be any differences in
+  # the implementations of TLSF with the exception of heap poisoning, which
+  # is not configured.
+  USEPKG += tlsf
 endif
 
 ifneq (,$(filter lcd_parallel_ll_mcu,$(USEMODULE)))
@@ -158,15 +146,9 @@ endif
 ifneq (,$(filter nimble,$(USEPKG)))
   USEMODULE += esp_ble
   USEMODULE += esp_ble_nimble
-  USEMODULE += esp_idf_nvs_flash
   USEMODULE += nimble_host
   USEMODULE += nimble_transport_hci_h4
   USEMODULE += ztimer_msec
-  ifneq (,$(filter esp32c6 esp32h2,$(CPU_FAM)))
-    # TODO for the moment, we use tinycrypt for encryption
-    # USEPKG += esp32_sdk_mbedtls
-    USEPKG += esp32_sdk_lib_coexist
-  endif
 endif
 
 ifneq (,$(filter periph_adc,$(USEMODULE)))
@@ -208,6 +190,10 @@ endif
 
 ifneq (,$(filter tinyusb_portable_espressif,$(USEMODULE)))
   USEMODULE += esp_idf_usb
+endif
+
+ifneq (,$(filter esp_jtag,$(USEMODULE)))
+  FEATURES_REQUIRED += esp_jtag
 endif
 
 # enable bootloader reset over USB, requires CDC ACM to be used

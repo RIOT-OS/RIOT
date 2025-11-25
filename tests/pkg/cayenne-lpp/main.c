@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2018 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -21,7 +24,7 @@
 #include "cayenne_lpp.h"
 
 #define TEST_BUFFER1 { 0x03, 0x67, 0x01, 0x10, 0x05, 0x67, 0x00, 0xff }
-#if defined(BOARD_NATIVE32)
+#if defined(BOARD_NATIVE)
 #define TEST_BUFFER2 { 0x01, 0x67, 0xFF, 0xD8, \
                        0x06, 0x71, 0x04, 0xD1, 0xFB, 0x2F, 0x00, 0x00 }
 #else

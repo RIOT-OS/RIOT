@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_congure_reno    CongURE implementation of TCP Reno
  * @ingroup     sys_congure
@@ -22,6 +20,8 @@
  *
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef CONGURE_RENO_H
+#define CONGURE_RENO_H
 
 #include <stdint.h>
 
@@ -308,4 +308,5 @@ void congure_reno_snd_report_ecn_ce(congure_snd_t *c, ztimer_now_t time);
 }
 #endif
 
+#endif /* CONGURE_RENO_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     core_macros
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+
+#ifndef MACROS_UNITS_H
+#define MACROS_UNITS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,4 +57,5 @@ extern "C" {
 }
 #endif
 
+#endif /* MACROS_UNITS_H */
 /** @} */

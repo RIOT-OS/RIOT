@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2019 Yegor Yefremov
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 Yegor Yefremov
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_esp32_ttgo-t-beam
@@ -26,6 +27,9 @@
  * @author      Yegor Yefremov <yegorslists@googlemail.com>
  */
 
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
+
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -47,10 +51,10 @@
 #ifndef ADC_GPIOS
 #if MODULE_ESP32_TTGO_T_BEAM_V1_0
 #define ADC_GPIOS   { GPIO0, GPIO2, GPIO4, GPIO13, GPIO25, \
-                      GPIO32, GPIO33, GPIO35, GPIO36, GPIO39 }
+                      GPIO32, GPIO33, GPIO35 }
 #else
 #define ADC_GPIOS   { GPIO0, GPIO2, GPIO4, GPIO13, GPIO25, \
-                      GPIO32, GPIO33, GPIO35, GPIO36, GPIO34 }
+                      GPIO32, GPIO33, GPIO34, GPIO35 }
 #endif
 #endif
 
@@ -171,4 +175,5 @@
 /* include common board definitions as last step */
 #include "periph_conf_common.h"
 
+#endif /* PERIPH_CONF_H */
 /** @} */

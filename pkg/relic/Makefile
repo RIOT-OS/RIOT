@@ -1,7 +1,6 @@
 PKG_NAME=relic
 PKG_URL=https://github.com/relic-toolkit/relic.git
-# version 0.7.0
-PKG_VERSION=e8b13783dbbe120cff5a68ff460f3bb9bec69666
+PKG_VERSION=e3f82e36250b228f3b4646781f6e06a8be497d18
 PKG_LICENSE=LGPL-2.1
 
 PKG_CUSTOM_PREPARED = $(BINDIR)/pkg-build/$(PKG_NAME)/include
@@ -14,8 +13,7 @@ CMAKE_MINIMAL_VERSION = 3.6.0
 
 CFLAGS += -Wno-unused-function -Wno-old-style-definition -Wno-unused-parameter \
           -Wno-pedantic -Wno-array-parameter -Wno-unused-but-set-variable \
-          -Wno-stringop-overflow -Wno-sign-compare -Wno-type-limits \
-          -Wno-shift-count-overflow -Wno-format
+          -Wno-stringop-overflow
 
 ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += $(GCC_C_INCLUDES)

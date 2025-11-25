@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup
  * @defgroup       <name> <description>
@@ -19,6 +17,9 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
+
+#ifndef TESTS_PSA_PERSISTENT_STORAGE_H
+#define TESTS_PSA_PERSISTENT_STORAGE_H
 
 #include <stdint.h>
 #include "embUnit.h"
@@ -56,4 +57,5 @@ Test* tests_psa_fail_overwrite_existing_key(void);
 }
 #endif
 
+#endif /* TESTS_PSA_PERSISTENT_STORAGE_H */
 /** @} */

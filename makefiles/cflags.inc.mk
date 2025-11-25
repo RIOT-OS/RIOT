@@ -40,7 +40,6 @@ CFLAGS += -Wstrict-overflow
 # Worse yet they hide errors by accepting wildcard argument types.
 OPTIONAL_CFLAGS += -Wstrict-prototypes
 OPTIONAL_CFLAGS += -Wold-style-definition
-OPTIONAL_CFLAGS += -Wdocumentation -Wno-documentation-deprecated-sync
 
 # Unwanted flags for c++
 CXXUWFLAGS += -std=%

@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2020 ML!PA Consulting GmbH
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (c) 2020 ML!PA Consulting GmbH
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -21,9 +24,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "board.h"
+#include "od.h"
 #include "mtd.h"
 #include "shell.h"
+#include "board.h"
+#include "macros/units.h"
 #include "test_utils/expect.h"
 
 static mtd_dev_t *_get_dev(int argc, char **argv)
@@ -41,6 +46,285 @@ static mtd_dev_t *_get_dev(int argc, char **argv)
     }
 
     return mtd_dev_get(idx);
+}
+
+static uint64_t _get_size(mtd_dev_t *dev)
+{
+    return (uint64_t)dev->sector_count
+         * dev->pages_per_sector
+         * dev->page_size;
+}
+
+static int cmd_read(int argc, char **argv)
+{
+    mtd_dev_t *dev = _get_dev(argc, argv);
+    uint32_t addr, len;
+
+    if (argc < 4 || dev == NULL) {
+        printf("usage: %s <dev> <addr> <len>\n", argv[0]);
+        return -1;
+    }
+
+    addr = atoi(argv[2]);
+    len  = atoi(argv[3]);
+
+    void *buffer = malloc(len);
+    if (buffer == NULL) {
+        puts("out of memory");
+        return -1;
+    }
+
+    /* don't print random data if read fails */
+    memset(buffer, 0x3F, len);
+
+    int res = mtd_read(dev, buffer, addr, len);
+
+    if (res) {
+        printf("error: %i\n", res);
+    } else {
+        od_hex_dump_ext(buffer, len, 0, addr);
+    }
+
+    free(buffer);
+
+    return res;
+}
+
+static int cmd_read_page(int argc, char **argv)
+{
+    mtd_dev_t *dev = _get_dev(argc, argv);
+    uint32_t page, offset, len;
+
+    if (argc < 5 || dev == NULL) {
+        printf("usage: %s <dev> <page> <offset> <len>\n", argv[0]);
+        return -1;
+    }
+
+    page   = atoi(argv[2]);
+    offset = atoi(argv[3]);
+    len    = atoi(argv[4]);
+
+    void *buffer = malloc(len);
+    if (buffer == NULL) {
+        puts("out of memory");
+        return -1;
+    }
+
+    int res = mtd_read_page(dev, buffer, page, offset, len);
+
+    if (res) {
+        printf("error: %i\n", res);
+    } else {
+        od_hex_dump_ext(buffer, len, 0, page * dev->page_size + offset);
+    }
+
+    free(buffer);
+
+    return res;
+}
+
+static int cmd_write(int argc, char **argv)
+{
+    mtd_dev_t *dev = _get_dev(argc, argv);
+    uint32_t addr, len;
+
+    if (argc < 4 || dev == NULL) {
+        printf("usage: %s <dev> <addr> <data>\n", argv[0]);
+        return -1;
+    }
+
+    addr = atoi(argv[2]);
+    len  = strlen(argv[3]);
+
+    int res = mtd_write(dev, argv[3], addr, len);
+
+    if (res) {
+        printf("error: %i\n", res);
+    }
+
+    return res;
+}
+
+static int cmd_write_page_raw(int argc, char **argv)
+{
+    mtd_dev_t *dev = _get_dev(argc, argv);
+    uint32_t page, offset, len;
+
+    if (argc < 5 || dev == NULL) {
+        printf("usage: %s <dev> <page> <offset> <data>\n", argv[0]);
+        return -1;
+    }
+
+    page   = atoi(argv[2]);
+    offset = atoi(argv[3]);
+    len    = strlen(argv[4]);
+
+    int res = mtd_write_page_raw(dev, argv[4], page, offset, len);
+
+    if (res) {
+        printf("error: %i\n", res);
+    }
+
+    return res;
+}
+
+static int cmd_write_page(int argc, char **argv)
+{
+    mtd_dev_t *dev = _get_dev(argc, argv);
+    uint32_t page, offset, len;
+
+    if (argc < 5 || dev == NULL) {
+        printf("usage: %s <dev> <page> <offset> <data>\n", argv[0]);
+        return -1;
+    }
+
+    page   = atoi(argv[2]);
+    offset = atoi(argv[3]);
+    len    = strlen(argv[4]);
+
+    int res = mtd_write_page(dev, argv[4], page, offset, len);
+
+    if (res) {
+        printf("error: %i\n", res);
+    }
+
+    return res;
+}
+
+static int cmd_erase(int argc, char **argv)
+{
+    mtd_dev_t *dev = _get_dev(argc, argv);
+    uint32_t addr;
+    uint32_t len;
+
+    if (argc < 4 || dev == NULL) {
+        printf("usage: %s <dev> <addr> <len>\n", argv[0]);
+        return -1;
+    }
+
+    addr = atoi(argv[2]);
+    len  = atoi(argv[3]);
+
+    int res = mtd_erase(dev, addr, len);
+
+    if (res) {
+        printf("error: %i\n", res);
+    }
+
+    return res;
+}
+
+static int cmd_erase_sector(int argc, char **argv)
+{
+    mtd_dev_t *dev = _get_dev(argc, argv);
+    uint32_t sector, count = 1;
+
+    if (argc < 3 || dev == NULL) {
+        printf("usage: %s <dev> <sector> [count]\n", argv[0]);
+        return -1;
+    }
+
+    sector = atoi(argv[2]);
+
+    if (argc > 3) {
+        count = atoi(argv[3]);
+    }
+
+    int res = mtd_erase_sector(dev, sector, count);
+
+    if (res) {
+        printf("error: %i\n", res);
+    }
+
+    return res;
+}
+
+static void _print_size(uint64_t size)
+{
+    unsigned long len;
+    const char *unit;
+
+    if (size == 0) {
+        len = 0;
+        unit = "byte";
+    } else if ((size & (GiB(1) - 1)) == 0) {
+        len = size / GiB(1);
+        unit = "GiB";
+    }
+    else if ((size & (MiB(1) - 1)) == 0) {
+        len = size / MiB(1);
+        unit = "MiB";
+    }
+    else if ((size & (KiB(1) - 1)) == 0) {
+        len = size / KiB(1);
+        unit = "kiB";
+    } else {
+        len = size;
+        unit = "byte";
+    }
+
+    printf("%lu %s", len, unit);
+}
+
+static void _print_info(mtd_dev_t *dev)
+{
+    printf("sectors: %"PRIu32"\n", dev->sector_count);
+    printf("pages per sector: %"PRIu32"\n", dev->pages_per_sector);
+    printf("page size: %"PRIu32"\n", dev->page_size);
+    printf("total: ");
+    _print_size(_get_size(dev));
+    puts("");
+}
+
+static int cmd_info(int argc, char **argv)
+{
+    if (argc < 2) {
+        printf("mtd devices: %d\n", (unsigned)MTD_NUMOF);
+
+        for (unsigned i = 0; i < MTD_NUMOF; ++i) {
+            printf(" -=[ MTD_%d ]=-\n", i);
+            _print_info(mtd_dev_get(i));
+        }
+        return 0;
+    }
+
+    mtd_dev_t *dev = _get_dev(argc, argv);
+
+    if (dev == NULL) {
+        return -1;
+    }
+
+    _print_info(dev);
+
+    return 0;
+}
+
+static inline int _print_power_usage(const char *progname)
+{
+    printf("usage: %s <dev> <on|off>\n", progname);
+    return -1;
+}
+
+static int cmd_power(int argc, char **argv)
+{
+    mtd_dev_t *dev = _get_dev(argc, argv);
+    enum mtd_power_state state;
+
+    if (argc < 3 || dev == NULL) {
+        return _print_power_usage(argv[0]);
+    }
+
+    if (strcmp(argv[2], "off") == 0) {
+        state = MTD_POWER_DOWN;
+    } else if (strcmp(argv[2], "on") == 0) {
+        state = MTD_POWER_UP;
+    } else {
+        return _print_power_usage(argv[0]);
+    }
+
+    mtd_power(dev, state);
+
+    return 0;
 }
 
 static bool mem_is_all_set(const uint8_t *buf, uint8_t c, size_t n)
@@ -140,7 +424,23 @@ static int cmd_test(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(test, "Erase & write test data to the last two sectors", cmd_test);
+static const shell_command_t shell_commands[] = {
+    { "info", "Print properties of the MTD device", cmd_info },
+    { "power", "Turn the MTD device on/off", cmd_power },
+    { "read", "Read a region of memory on the MTD device", cmd_read },
+    { "read_page", "Read a region of memory on the MTD device (pagewise addressing)", cmd_read_page },
+    { "write", "Write a region of memory on the MTD device", cmd_write },
+    { "write_page_raw",
+      "Write a region of memory on the MTD device (pagewise addressing)",
+      cmd_write_page_raw },
+    { "write_page",
+      "Write a region of memory on the MTD device (pagewise addressing, read-modify-write)",
+      cmd_write_page },
+    { "erase", "Erase a region of memory on the MTD device", cmd_erase },
+    { "erase_sector", "Erase a sector of memory on the MTD device", cmd_erase_sector },
+    { "test", "Erase & write test data to the last two sectors", cmd_test },
+    { NULL, NULL, NULL }
+};
 
 int main(void)
 {
@@ -160,12 +460,15 @@ int main(void)
             continue;
         }
 
+        printf("OK (");
+        _print_size(_get_size(dev));
+        puts(")");
         mtd_power(dev, MTD_POWER_UP);
     }
 
     /* run the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

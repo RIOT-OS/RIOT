@@ -1,0 +1,8 @@
+CPU_MODEL = nrf51x22xxaa
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_uart
+
+# include common nrf51 based boards features
+include $(RIOTBOARD)/common/nrf51/Makefile.features

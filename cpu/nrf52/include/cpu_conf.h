@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2020 Philipp-Alexander Blum <philipp-blum@jakiku.de>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2016 Freie Universität Berlin
+ *               2020 Philipp-Alexander Blum <philipp-blum@jakiku.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @defgroup        cpu_nrf52 Nordic nRF52 MCU
@@ -19,6 +20,9 @@
  * @author      Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  */
+
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
 #include "cpu_conf_common.h"
 
@@ -139,4 +143,5 @@ static inline void nrf52_sleep(void)
 }
 #endif
 
+#endif /* CPU_CONF_H */
 /** @} */

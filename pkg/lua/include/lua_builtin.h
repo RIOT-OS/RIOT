@@ -5,9 +5,6 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-
-#pragma once
-
 /**
  * @ingroup  pkg_lua
  * @{
@@ -24,6 +21,9 @@
  * These symbols are defined as weak, so there if they are not defined elsewhere
  * they will default to zero (or NULL), that is, empty tables.
  */
+
+#ifndef LUA_BUILTIN_H
+#define LUA_BUILTIN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -78,5 +78,7 @@ extern WEAK const size_t lua_riot_builtin_c_table_len;
 #ifdef __cplusplus
 extern "C" }
 #endif
+
+#endif /* LUA_BUILTIN_H */
 
 /** @} */

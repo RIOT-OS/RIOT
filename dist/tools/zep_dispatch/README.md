@@ -117,7 +117,7 @@ This can be changed with the `TOPOLOGY` environment variable.
 
 Next, start the border router example with RPL enabled:
 
-    USEMODULE=gnrc_rpl make -C examples/networking/gnrc/border_router all term
+    USEMODULE=gnrc_rpl make -C examples/gnrc_border_router all term
 
 Verify that the border router got a prefix on it's downstream interface with `ifconfig`.
 
@@ -149,8 +149,8 @@ Iface  6  HWaddr: 7A:37:FC:7D:1A:AF
 
 Now start as many `gnrc_networking` nodes as you have mesh nodes defined in your topology file:
 
-    USE_ZEP=1 make -C examples/networking/gnrc/networking all term
-    USE_ZEP=1 make -C examples/networking/gnrc/networking all term
+    USE_ZEP=1 make -C examples/gnrc_networking all term
+    USE_ZEP=1 make -C examples/gnrc_networking all term
     …
 
 The node should be able to join the DODAG as you can verify with the `rpl` command:

@@ -67,10 +67,8 @@ static void _event_cb(netdev_t *dev, netdev_event_t event) {
             recv_pkt(sInstance, dev);
             break;
         case NETDEV_EVENT_TX_COMPLETE:
-#ifndef MODULE_NETDEV_NEW_API
         case NETDEV_EVENT_TX_NOACK:
         case NETDEV_EVENT_TX_MEDIUM_BUSY:
-#endif
             DEBUG("openthread_netdev: Transmission of a packet\n");
             send_pkt(sInstance, dev, event);
             break;
@@ -96,7 +94,7 @@ static void *_openthread_event_loop(void *arg)
     sInstance = otInstanceInitSingle();
 
 #if defined(MODULE_OPENTHREAD_CLI_FTD) || defined(MODULE_OPENTHREAD_CLI_MTD)
-    ot_shell_init(sInstance);
+    otCliUartInit(sInstance);
     /* Init default parameters */
     otPanId panid = OPENTHREAD_PANID;
     uint8_t channel = OPENTHREAD_CHANNEL;

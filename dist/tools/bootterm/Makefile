@@ -1,7 +1,6 @@
 PKG_NAME=bootterm
 PKG_URL=https://github.com/wtarreau/bootterm
-# version 0.5
-PKG_VERSION=02d6a1a0539f696010770a46d1fd52df53400e69
+PKG_VERSION=2d50ab50c3259dbc82d75775c37bbf436d06fb89
 PKG_LICENSE=MIT
 
 # manually set some RIOT env vars, so this Makefile can be called stand-alone

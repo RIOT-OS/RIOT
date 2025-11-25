@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_periph_rtt RTT
  * @ingroup     drivers_periph
@@ -36,6 +34,9 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef PERIPH_RTT_H
+#define PERIPH_RTT_H
 
 #include <stdint.h>
 
@@ -239,4 +240,5 @@ void rtt_poweroff(void);
 }
 #endif
 
+#endif /* PERIPH_RTT_H */
 /** @} */

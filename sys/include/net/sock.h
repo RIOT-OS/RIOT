@@ -9,8 +9,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_sock    Sock API
  * @ingroup     net
@@ -100,6 +98,9 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
+
+#ifndef NET_SOCK_H
+#define NET_SOCK_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -351,4 +352,5 @@ typedef uint8_t sock_aux_flags_t;
 }
 #endif
 
+#endif /* NET_SOCK_H */
 /** @} */

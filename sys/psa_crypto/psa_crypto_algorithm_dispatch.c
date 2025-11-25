@@ -38,10 +38,6 @@
 #include "psa_ciphers.h"
 #endif
 
-#if IS_USED(MODULE_PSA_AEAD)
-#include "psa_aead.h"
-#endif
-
 #if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
 #include "psa_crypto_operation_encoder.h"
 #include "psa_crypto_algorithm_dispatch.h"
@@ -241,13 +237,11 @@ psa_status_t psa_algorithm_dispatch_hash_finish(psa_hash_operation_t *operation,
     #endif
     #if (IS_USED(MODULE_PSA_HASH_SHA_512_224))
     case PSA_ALG_SHA_512_224:
-        return psa_hashes_sha512_224_finish(&operation->ctx.sha512_224, hash,
-                                            hash_size, hash_length);
+        return psa_hashes_sha512_224_finish(&operation->ctx.sha512_224, hash, hash_size, hash_length);
     #endif
     #if (IS_USED(MODULE_PSA_HASH_SHA_512_256))
     case PSA_ALG_SHA_512_256:
-        return psa_hashes_sha512_256_finish(&operation->ctx.sha512_256, hash,
-                                            hash_size, hash_length);
+        return psa_hashes_sha512_256_finish(&operation->ctx.sha512_256, hash, hash_size, hash_length);
     #endif
     #if (IS_USED(MODULE_PSA_HASH_SHA3_256))
     case PSA_ALG_SHA3_256:
@@ -289,8 +283,7 @@ psa_status_t psa_algorithm_dispatch_sign_hash(  const psa_key_attributes_t *attr
 
     if (PSA_KEY_TYPE_IS_ECC_KEY_PAIR(attributes->type)) {
         asym_key =
-            PSA_ENCODE_ECC_KEY_TYPE(attributes->bits,
-                                    PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
+            PSA_ENCODE_ECC_KEY_TYPE(attributes->bits, PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
 
         if (asym_key == PSA_INVALID_OPERATION) {
             return PSA_ERROR_INVALID_ARGUMENT;
@@ -341,8 +334,7 @@ psa_status_t psa_algorithm_dispatch_sign_message(const psa_key_attributes_t *att
 
     if (PSA_KEY_TYPE_IS_ECC_KEY_PAIR(attributes->type)) {
         asym_key =
-            PSA_ENCODE_ECC_KEY_TYPE(attributes->bits,
-                                    PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
+            PSA_ENCODE_ECC_KEY_TYPE(attributes->bits, PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
 
         if (asym_key == PSA_INVALID_OPERATION) {
             return PSA_ERROR_INVALID_ARGUMENT;
@@ -354,27 +346,19 @@ psa_status_t psa_algorithm_dispatch_sign_message(const psa_key_attributes_t *att
     switch (asym_key) {
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1)
     case PSA_ECC_P192_R1:
-        return psa_ecc_p192r1_sign_message(attributes, alg, key_data, *key_bytes, input,
-                                           input_length,
-                                           signature, signature_size, signature_length);
+        return psa_ecc_p192r1_sign_message(attributes, alg, key_data, *key_bytes, input, input_length,
+                                        signature, signature_size, signature_length);
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1)
     case PSA_ECC_P256_R1:
-        return psa_ecc_p256r1_sign_message(attributes, alg, key_data, *key_bytes, input,
-                                           input_length,
-                                           signature, signature_size, signature_length);
+        return psa_ecc_p256r1_sign_message(attributes, alg, key_data, *key_bytes, input, input_length,
+                                        signature, signature_size, signature_length);
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
     case PSA_ECC_ED25519:
         psa_get_public_key_data_from_key_slot(slot, &pub_key_data, &pub_key_bytes);
-        assert(*key_bytes == 32);
-        assert(*pub_key_bytes == 32);
-        if (signature_size < 64) {
-            return PSA_ERROR_BUFFER_TOO_SMALL;
-        }
-        *signature_length = 64;
-        return psa_ecc_ed25519_sign_message(key_data, pub_key_data,
-                                            input, input_length, signature);
+        return psa_ecc_ed25519_sign_message(key_data, *key_bytes, pub_key_data, *pub_key_bytes, input, input_length,
+                                    signature, signature_size, signature_length);
 #endif
     default:
         (void)alg;
@@ -404,8 +388,7 @@ psa_status_t psa_algorithm_dispatch_verify_hash(  const psa_key_attributes_t *at
 
     if (PSA_KEY_TYPE_IS_ECC(attributes->type)) {
         asym_key =
-            PSA_ENCODE_ECC_KEY_TYPE(attributes->bits,
-                                    PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
+            PSA_ENCODE_ECC_KEY_TYPE(attributes->bits, PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
 
         if (asym_key == PSA_INVALID_OPERATION) {
             return PSA_ERROR_INVALID_ARGUMENT;
@@ -450,8 +433,7 @@ psa_status_t psa_algorithm_dispatch_verify_message(const psa_key_attributes_t *a
 
     if (PSA_KEY_TYPE_IS_ECC(attributes->type)) {
         asym_key =
-            PSA_ENCODE_ECC_KEY_TYPE(attributes->bits,
-                                    PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
+            PSA_ENCODE_ECC_KEY_TYPE(attributes->bits, PSA_KEY_TYPE_ECC_GET_FAMILY(attributes->type));
 
         if (asym_key == PSA_INVALID_OPERATION) {
             return PSA_ERROR_INVALID_ARGUMENT;
@@ -473,11 +455,8 @@ psa_status_t psa_algorithm_dispatch_verify_message(const psa_key_attributes_t *a
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
     case PSA_ECC_ED25519:
-        assert(*pubkey_data_len == 32);
-        if (signature_length < 64) {
-            return PSA_ERROR_INVALID_SIGNATURE;
-        }
-        return psa_ecc_ed25519_verify_message(pubkey_data, input, input_length, signature);
+        return psa_ecc_ed25519_verify_message(pubkey_data, *pubkey_data_len, input,
+                                        input_length, signature, signature_length);
 #endif
     default:
         (void)alg;
@@ -534,9 +513,7 @@ psa_status_t psa_algorithm_dispatch_generate_key(   const psa_key_attributes_t *
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
         case PSA_ECC_ED25519:
-            *key_bytes = 32;
-            *pubkey_data_len = 32;
-            return psa_generate_ecc_ed25519_key_pair(key_data, pubkey_data);
+            return psa_generate_ecc_ed25519_key_pair(key_data, pubkey_data, key_bytes, pubkey_data_len);
 #endif
         default:
             (void)status;
@@ -590,16 +567,14 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1)
         case PSA_ECC_P256_R1:
-            ret = psa_derive_ecc_p256r1_public_key(data, pubkey_data, data_length, pubkey_data_len);
+            // todo: support for Weierstrass curves
+            (void)slot;
+            ret = PSA_ERROR_NOT_SUPPORTED;
             break;
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
         case PSA_ECC_ED25519:
-            if (data_length < 32) {
-                return PSA_ERROR_INVALID_ARGUMENT;
-            }
-            ret = psa_derive_ecc_ed25519_public_key(data, pubkey_data);
-            *pubkey_data_len = 32;
+            ret = psa_derive_ecc_ed25519_public_key(data, pubkey_data, data_length, pubkey_data_len);
             break;
 #endif
         default:
@@ -614,23 +589,7 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
         }
         return ret;
     }
-    else if (attributes->type == PSA_KEY_TYPE_HMAC && PSA_ALG_IS_HMAC(attributes->policy.alg) &&
-            data_length > PSA_HASH_BLOCK_LENGTH(attributes->policy.alg)){
-        psa_status_t ret = PSA_ERROR_NOT_SUPPORTED;
-#if IS_USED(MODULE_PSA_HASH)
-        /* must compute hash beforehand if key is too long */
-        ret = psa_hash_compute(PSA_ALG_HMAC_GET_HASH(attributes->policy.alg), data, data_length, key_data,
-                                PSA_HASH_MAX_BLOCK_SIZE, key_bytes);
-        if (ret != PSA_SUCCESS) {
-            return ret;
-        }
-        *bits = PSA_BYTES_TO_BITS(*key_bytes);
-        slot->attr.bits = *bits;
-#endif /* MODULE_PSA_HASH */
-        return ret;
-    }
-    return psa_builtin_import_key(attributes, data, data_length, key_data, key_data_size,
-                                  key_bytes, bits);
+    return psa_builtin_import_key(attributes, data, data_length, key_data, key_data_size, key_bytes, bits);
 }
 
 #endif /* MODULE_PSA_KEY_MANAGEMENT */
@@ -869,152 +828,6 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
 }
 #endif /* MODULE_PSA_CIPHER */
 
-#if IS_USED(MODULE_PSA_AEAD)
-psa_status_t psa_algorithm_dispatch_aead_encrypt(   const psa_key_attributes_t *attributes,
-                                                    psa_algorithm_t alg,
-                                                    const psa_key_slot_t *slot,
-                                                    const uint8_t *nonce,
-                                                    size_t nonce_length,
-                                                    const uint8_t *additional_data,
-                                                    size_t additional_data_length,
-                                                    const uint8_t *plaintext,
-                                                    size_t plaintext_length,
-                                                    uint8_t *ciphertext,
-                                                    size_t ciphertext_size,
-                                                    size_t *ciphertext_length)
-{
-    psa_aead_op_t op = PSA_ENCODE_AEAD_OPERATION(alg, attributes->type, attributes->bits);
-
-    uint8_t *key_data = NULL;
-    size_t *key_bytes = NULL;
-
-    psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
-
-    if (attributes->type != PSA_KEY_TYPE_AES) {
-        return PSA_ERROR_NOT_SUPPORTED;
-    }
-
-    if (op == PSA_INVALID_OPERATION) {
-        return PSA_ERROR_INVALID_ARGUMENT;
-    }
-
-    uint8_t tag_len = PSA_AEAD_TAG_LENGTH(attributes->type, attributes->bits, alg);
-
-    switch (op) {
-    #if IS_USED(MODULE_PSA_AEAD_AES_128_CCM)
-        case PSA_CCM_AES_128:
-            return psa_aead_aes_128_ccm_encrypt(attributes, key_data, *key_bytes, tag_len,
-                                            nonce, nonce_length, additional_data,
-                                            additional_data_length, plaintext,
-                                            plaintext_length, ciphertext,
-                                            ciphertext_size, ciphertext_length);
-    #endif
-    #if IS_USED(MODULE_PSA_AEAD_AES_192_CCM)
-        case PSA_CCM_AES_192:
-            return psa_aead_aes_192_ccm_encrypt(attributes, key_data, *key_bytes, tag_len,
-                                            nonce, nonce_length, additional_data,
-                                            additional_data_length, plaintext,
-                                            plaintext_length, ciphertext,
-                                            ciphertext_size, ciphertext_length);
-    #endif
-    #if IS_USED(MODULE_PSA_AEAD_AES_256_CCM)
-        case PSA_CCM_AES_256:
-            return psa_aead_aes_256_ccm_encrypt(attributes, key_data, *key_bytes, tag_len,
-                                            nonce, nonce_length, additional_data,
-                                            additional_data_length, plaintext,
-                                            plaintext_length, ciphertext,
-                                            ciphertext_size, ciphertext_length);
-    #endif
-        default:
-            (void)attributes;
-            (void)alg;
-            (void)slot;
-            (void)nonce;
-            (void)nonce_length;
-            (void)additional_data;
-            (void)additional_data_length;
-            (void)plaintext;
-            (void)plaintext_length;
-            (void)ciphertext;
-            (void)ciphertext_size;
-            (void)ciphertext_length;
-            return PSA_ERROR_NOT_SUPPORTED;
-    }
-}
-
-psa_status_t psa_algorithm_dispatch_aead_decrypt(   const psa_key_attributes_t *attributes,
-                                                    psa_algorithm_t alg,
-                                                    const psa_key_slot_t *slot,
-                                                    const uint8_t *nonce,
-                                                    size_t nonce_length,
-                                                    const uint8_t *additional_data,
-                                                    size_t additional_data_length,
-                                                    const uint8_t *ciphertext,
-                                                    size_t ciphertext_length,
-                                                    uint8_t *plaintext,
-                                                    size_t plaintext_size,
-                                                    size_t *plaintext_length)
-{
-    psa_aead_op_t op = PSA_ENCODE_AEAD_OPERATION(alg, attributes->type, attributes->bits);
-
-    uint8_t *key_data = NULL;
-    size_t *key_bytes = NULL;
-
-    psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
-
-    if (attributes->type != PSA_KEY_TYPE_AES) {
-        return PSA_ERROR_NOT_SUPPORTED;
-    }
-
-    if (op == PSA_INVALID_OPERATION) {
-        return PSA_ERROR_INVALID_ARGUMENT;
-    }
-
-    uint8_t tag_len = PSA_AEAD_TAG_LENGTH(attributes->type, attributes->bits, alg);
-
-    switch (op) {
-    #if IS_USED(MODULE_PSA_AEAD_AES_128_CCM)
-        case PSA_CCM_AES_128:
-            return psa_aead_aes_128_ccm_decrypt(attributes, key_data, *key_bytes, tag_len,
-                                            nonce, nonce_length, additional_data,
-                                            additional_data_length, ciphertext,
-                                            ciphertext_length, plaintext,
-                                            plaintext_size, plaintext_length);
-    #endif
-    #if IS_USED(MODULE_PSA_AEAD_AES_192_CCM)
-        case PSA_CCM_AES_192:
-            return psa_aead_aes_192_ccm_decrypt(attributes, key_data, *key_bytes, tag_len,
-                                            nonce, nonce_length, additional_data,
-                                            additional_data_length, ciphertext,
-                                            ciphertext_length, plaintext,
-                                            plaintext_size, plaintext_length);
-    #endif
-    #if IS_USED(MODULE_PSA_AEAD_AES_256_CCM)
-        case PSA_CCM_AES_256:
-            return psa_aead_aes_256_ccm_decrypt(attributes, key_data, *key_bytes, tag_len,
-                                            nonce, nonce_length, additional_data,
-                                            additional_data_length, ciphertext,
-                                            ciphertext_length, plaintext,
-                                            plaintext_size, plaintext_length);
-    #endif
-        default:
-            (void)attributes;
-            (void)alg;
-            (void)slot;
-            (void)nonce;
-            (void)nonce_length;
-            (void)additional_data;
-            (void)additional_data_length;
-            (void)ciphertext;
-            (void)ciphertext_length;
-            (void)plaintext;
-            (void)plaintext_size;
-            (void)plaintext_length;
-            return PSA_ERROR_NOT_SUPPORTED;
-    }
-}
-#endif /* MODULE_PSA_AEAD */
-
 #if IS_USED(MODULE_PSA_MAC)
 psa_status_t psa_algorithm_dispatch_mac_compute(const psa_key_attributes_t *attributes,
                                                 psa_algorithm_t alg,
@@ -1025,541 +838,33 @@ psa_status_t psa_algorithm_dispatch_mac_compute(const psa_key_attributes_t *attr
                                                 size_t mac_size,
                                                 size_t *mac_length)
 {
-    uint8_t *key_data = NULL;
-    size_t *key_bytes = NULL;
-
-    psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
-
-    if (!key_data || !key_bytes) {
-        return PSA_ERROR_INVALID_ARGUMENT;
-    }
-
-    switch (alg) {
-#if IS_USED(MODULE_PSA_MAC_HMAC_MD5)
-    case PSA_ALG_HMAC(PSA_ALG_MD5):
-        return psa_mac_compute_hmac_md5(attributes, key_data, *key_bytes, input, input_length,
-                                        mac, mac_size, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_1)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_1):
-        return psa_mac_compute_hmac_sha1(attributes, key_data, *key_bytes, input, input_length,
-                                         mac, mac_size, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_224)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_224):
-        return psa_mac_compute_hmac_sha224(attributes, key_data, *key_bytes, input, input_length,
-                                           mac, mac_size, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_256)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_256):
-        return psa_mac_compute_hmac_sha256(attributes, key_data, *key_bytes, input, input_length,
-                                           mac, mac_size, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_384)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_384):
-        return psa_mac_compute_hmac_sha384(attributes, key_data, *key_bytes, input, input_length,
-                                           mac, mac_size, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_512)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_512):
-        return psa_mac_compute_hmac_sha512(attributes, key_data, *key_bytes, input, input_length,
-                                           mac, mac_size, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_256)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_256):
-        return psa_mac_compute_hmac_sha3_256(attributes, key_data, *key_bytes, input, input_length,
-                                             mac, mac_size, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_384)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_384):
-        return psa_mac_compute_hmac_sha3_384(attributes, key_data, *key_bytes, input, input_length,
-                                             mac, mac_size, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_512)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_512):
-        return psa_mac_compute_hmac_sha3_512(attributes, key_data, *key_bytes, input, input_length,
-                                             mac, mac_size, mac_length);
-#endif
-    default:
-        (void)attributes;
-        (void)slot;
-        (void)input;
-        (void)input_length;
-        (void)mac;
-        (void)mac_size;
-        (void)mac_length;
-        return PSA_ERROR_NOT_SUPPORTED;
-    }
-}
-
-psa_status_t psa_algorithm_dispatch_mac_verify(const psa_key_attributes_t *attributes,
-                                               psa_algorithm_t alg,
-                                               const psa_key_slot_t *slot,
-                                               const uint8_t *input,
-                                               size_t input_length,
-                                               const uint8_t *mac,
-                                               size_t mac_length)
-{
-    uint8_t *key_data = NULL;
-    size_t *key_bytes = NULL;
-
-    psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
-
-    if (!key_data || !key_bytes) {
-        return PSA_ERROR_INVALID_ARGUMENT;
-    }
-
-    switch (alg) {
-#if IS_USED(MODULE_PSA_MAC_HMAC_MD5)
-    case PSA_ALG_HMAC(PSA_ALG_MD5):
-        return psa_mac_verify_hmac_md5(attributes, key_data, *key_bytes, input, input_length,
-                                       mac, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_1)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_1):
-        return psa_mac_verify_hmac_sha1(attributes, key_data, *key_bytes, input, input_length,
-                                        mac, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_224)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_224):
-        return psa_mac_verify_hmac_sha224(attributes, key_data, *key_bytes, input, input_length,
-                                          mac, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_256)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_256):
-        return psa_mac_verify_hmac_sha256(attributes, key_data, *key_bytes, input, input_length,
-                                          mac, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_384)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_384):
-        return psa_mac_verify_hmac_sha384(attributes, key_data, *key_bytes, input, input_length,
-                                          mac, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_512)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_512):
-        return psa_mac_verify_hmac_sha512(attributes, key_data, *key_bytes, input, input_length,
-                                          mac, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_256)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_256):
-        return psa_mac_verify_hmac_sha3_256(attributes, key_data, *key_bytes, input, input_length,
-                                            mac, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_384)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_384):
-        return psa_mac_verify_hmac_sha3_384(attributes, key_data, *key_bytes, input, input_length,
-                                            mac, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_512)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_512):
-        return psa_mac_verify_hmac_sha3_512(attributes, key_data, *key_bytes, input, input_length,
-                                            mac, mac_length);
-#endif
-    default:
-        (void)attributes;
-        (void)slot;
-        (void)input;
-        (void)input_length;
-        (void)mac;
-        (void)mac_length;
-        return PSA_ERROR_NOT_SUPPORTED;
-    }
-}
-
-psa_status_t psa_algorithm_dispatch_mac_sign_setup(psa_mac_operation_t *operation,
-                                                   const psa_key_attributes_t *attributes,
-                                                   const psa_key_slot_t *slot,
-                                                   psa_algorithm_t alg)
-{
     psa_status_t status = PSA_ERROR_NOT_SUPPORTED;
     uint8_t *key_data = NULL;
     size_t *key_bytes = NULL;
 
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
 
-    if (!key_data || !key_bytes) {
-        return PSA_ERROR_INVALID_ARGUMENT;
-    }
-
     switch (alg) {
-#if IS_USED(MODULE_PSA_MAC_HMAC_MD5)
-    case PSA_ALG_HMAC(PSA_ALG_MD5):
-        status = psa_mac_sign_setup_hmac_md5(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_1)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_1):
-        status = psa_mac_sign_setup_hmac_sha1(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_224)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_224):
-        status = psa_mac_sign_setup_hmac_sha224(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_256)
+    #if IS_USED(MODULE_PSA_MAC_HMAC_SHA_256)
     case PSA_ALG_HMAC(PSA_ALG_SHA_256):
-        status = psa_mac_sign_setup_hmac_sha256(operation, attributes, key_data, *key_bytes);
+        status = psa_mac_compute_hmac_sha256(attributes, key_data, *key_bytes, input, input_length,
+                                             mac, mac_size, mac_length);
         if (status != PSA_SUCCESS) {
             return status;
         }
         break;
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_384)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_384):
-        status = psa_mac_sign_setup_hmac_sha384(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_512)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_512):
-        status = psa_mac_sign_setup_hmac_sha512(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_256)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_256):
-        status = psa_mac_sign_setup_hmac_sha3_256(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_384)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_384):
-        status = psa_mac_sign_setup_hmac_sha3_384(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_512)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_512):
-        status = psa_mac_sign_setup_hmac_sha3_512(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
+    #endif
     default:
-        (void)attributes;
-        (void)operation;
-        (void)alg;
-        return status;
+        (void)status;
+        return PSA_ERROR_NOT_SUPPORTED;
     }
 
-    operation->alg = alg;
-
+    (void)attributes;
+    (void)input;
+    (void)input_length;
+    (void)mac;
+    (void)mac_size;
+    (void)mac_length;
     return PSA_SUCCESS;
-}
-
-psa_status_t psa_algorithm_dispatch_mac_verify_setup(psa_mac_operation_t *operation,
-                                                     const psa_key_attributes_t *attributes,
-                                                     const psa_key_slot_t *slot,
-                                                     psa_algorithm_t alg)
-{
-    psa_status_t status = PSA_ERROR_NOT_SUPPORTED;
-    uint8_t *key_data = NULL;
-    size_t *key_bytes = NULL;
-
-    psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
-
-    if (!key_data || !key_bytes) {
-        return PSA_ERROR_INVALID_ARGUMENT;
-    }
-
-    switch (alg) {
-#if IS_USED(MODULE_PSA_MAC_HMAC_MD5)
-    case PSA_ALG_HMAC(PSA_ALG_MD5):
-        status = psa_mac_verify_setup_hmac_md5(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_1)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_1):
-        status = psa_mac_verify_setup_hmac_sha1(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_224)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_224):
-        status = psa_mac_verify_setup_hmac_sha224(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_256)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_256):
-        status = psa_mac_verify_setup_hmac_sha256(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_384)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_384):
-        status = psa_mac_verify_setup_hmac_sha384(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_512)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_512):
-        status = psa_mac_verify_setup_hmac_sha512(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_256)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_256):
-        status = psa_mac_verify_setup_hmac_sha3_256(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_384)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_384):
-        status = psa_mac_verify_setup_hmac_sha3_384(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_512)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_512):
-        status = psa_mac_verify_setup_hmac_sha3_512(operation, attributes, key_data, *key_bytes);
-        if (status != PSA_SUCCESS) {
-            return status;
-        }
-        break;
-#endif
-    default:
-        (void)attributes;
-        (void)operation;
-        (void)alg;
-        return status;
-    }
-
-    operation->alg = alg;
-
-    return PSA_SUCCESS;
-}
-
-psa_status_t psa_algorithm_dispatch_mac_update(psa_mac_operation_t *operation,
-                                               const uint8_t *input,
-                                               size_t input_length)
-{
-    switch (operation->alg) {
-#if IS_USED(MODULE_PSA_MAC_HMAC_MD5)
-    case PSA_ALG_HMAC(PSA_ALG_MD5):
-        return psa_mac_update_hmac_md5(operation, input, input_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_1)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_1):
-        return psa_mac_update_hmac_sha1(operation, input, input_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_224)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_224):
-        return psa_mac_update_hmac_sha224(operation, input, input_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_256)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_256):
-        return psa_mac_update_hmac_sha256(operation, input, input_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_384)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_384):
-        return psa_mac_update_hmac_sha384(operation, input, input_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_512)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_512):
-        return psa_mac_update_hmac_sha512(operation, input, input_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_256)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_256):
-        return psa_mac_update_hmac_sha3_256(operation, input, input_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_384)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_384):
-        return psa_mac_update_hmac_sha3_384(operation, input, input_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_512)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_512):
-        return psa_mac_update_hmac_sha3_512(operation, input, input_length);
-#endif
-    default:
-        (void)operation;
-        (void)input;
-        (void)input_length;
-        return PSA_ERROR_NOT_SUPPORTED;
-    }
-}
-
-psa_status_t psa_algorithm_dispatch_mac_sign_finish(psa_mac_operation_t *operation,
-                                                    uint8_t *mac,
-                                                    size_t mac_size,
-                                                    size_t *mac_length)
-{
-    switch (operation->alg) {
-#if IS_USED(MODULE_PSA_MAC_HMAC_MD5)
-    case PSA_ALG_HMAC(PSA_ALG_MD5):
-        return psa_mac_sign_finish_hmac_md5(operation, mac, mac_size, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_1)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_1):
-        return psa_mac_sign_finish_hmac_sha1(operation, mac, mac_size, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_224)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_224):
-        return psa_mac_sign_finish_hmac_sha224(operation, mac, mac_size, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_256)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_256):
-        return psa_mac_sign_finish_hmac_sha256(operation, mac, mac_size, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_384)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_384):
-        return psa_mac_sign_finish_hmac_sha384(operation, mac, mac_size, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_512)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_512):
-        return psa_mac_sign_finish_hmac_sha512(operation, mac, mac_size, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_256)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_256):
-        return psa_mac_sign_finish_hmac_sha3_256(operation, mac, mac_size, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_384)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_384):
-        return psa_mac_sign_finish_hmac_sha3_384(operation, mac, mac_size, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_512)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_512):
-        return psa_mac_sign_finish_hmac_sha3_512(operation, mac, mac_size, mac_length);
-#endif
-    default:
-        (void)operation;
-        (void)mac;
-        (void)mac_size;
-        (void)mac_length;
-        return PSA_ERROR_NOT_SUPPORTED;
-    }
-}
-
-psa_status_t psa_algorithm_dispatch_mac_verify_finish(psa_mac_operation_t *operation,
-                                                      const uint8_t *mac,
-                                                      size_t mac_length)
-{
-    switch (operation->alg) {
-#if IS_USED(MODULE_PSA_MAC_HMAC_MD5)
-    case PSA_ALG_HMAC(PSA_ALG_MD5):
-        return psa_mac_verify_finish_hmac_md5(operation, mac, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_1)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_1):
-        return psa_mac_verify_finish_hmac_sha1(operation, mac, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_224)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_224):
-        return psa_mac_verify_finish_hmac_sha224(operation, mac, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_256)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_256):
-        return psa_mac_verify_finish_hmac_sha256(operation, mac, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_384)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_384):
-        return psa_mac_verify_finish_hmac_sha384(operation, mac, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_512)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_512):
-        return psa_mac_verify_finish_hmac_sha512(operation, mac, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_256)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_256):
-        return psa_mac_verify_finish_hmac_sha3_256(operation, mac, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_384)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_384):
-        return psa_mac_verify_finish_hmac_sha3_384(operation, mac, mac_length);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_512)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_512):
-        return psa_mac_verify_finish_hmac_sha3_512(operation, mac, mac_length);
-#endif
-    default:
-        (void)operation;
-        (void)mac;
-        (void)mac_length;
-        return PSA_ERROR_NOT_SUPPORTED;
-    }
-}
-
-psa_status_t psa_algorithm_dispatch_mac_abort(psa_mac_operation_t *operation)
-{
-    switch (operation->alg) {
-#if IS_USED(MODULE_PSA_MAC_HMAC_MD5)
-    case PSA_ALG_HMAC(PSA_ALG_MD5):
-        return psa_mac_abort_hmac_md5(operation);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_1)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_1):
-        return psa_mac_abort_hmac_sha1(operation);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_224)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_224):
-        return psa_mac_abort_hmac_sha224(operation);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_256)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_256):
-        return psa_mac_abort_hmac_sha256(operation);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_384)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_384):
-        return psa_mac_abort_hmac_sha384(operation);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_512)
-    case PSA_ALG_HMAC(PSA_ALG_SHA_512):
-        return psa_mac_abort_hmac_sha512(operation);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_256)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_256):
-        return psa_mac_abort_hmac_sha3_256(operation);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_384)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_384):
-        return psa_mac_abort_hmac_sha3_384(operation);
-#endif
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_512)
-    case PSA_ALG_HMAC(PSA_ALG_SHA3_512):
-        return psa_mac_abort_hmac_sha3_512(operation);
-#endif
-    case PSA_ALG_NONE:
-        /* Calling psa_mac_abort() on a fresh psa_mac_operation_t is valid */
-        return PSA_SUCCESS;
-    default:
-        (void)operation;
-        return PSA_ERROR_NOT_SUPPORTED;
-    }
 }
 #endif /* MODULE_PSA_MAC */

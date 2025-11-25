@@ -422,7 +422,7 @@ static void *_usbus_thread(void *args)
                   "USB serial byte length must be at most 63 due to protocol "
                   "limitations");
     uint8_t luid_buf[CONFIG_USB_SERIAL_BYTE_LENGTH];
-    luid_base(luid_buf, sizeof(luid_buf));
+    luid_get(luid_buf, sizeof(luid_buf));
     fmt_bytes_hex(usbus->serial_str, luid_buf, sizeof(luid_buf));
     usbus_add_string_descriptor(usbus, &usbus->serial, usbus->serial_str);
 #endif

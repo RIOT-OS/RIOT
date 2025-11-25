@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2017 Eistec AB
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 Eistec AB
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @defgroup    cpu_kinetis_bme Kinetis Bit Manipulation Engine (BME)
@@ -18,6 +19,9 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
+#ifndef BME_H
+#define BME_H
+
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -28,7 +32,7 @@ extern "C"
 /**
  * @brief Tell bit.h that we provide CPU specific bit manipulation functions
  */
-#define BITBAND_FUNCTIONS_PROVIDED 0
+#define BITBAND_FUNCTIONS_PROVIDED 1
 
 #define BME_AND_MASK        (1 << 26) /**< AND decoration bitmask */
 #define BME_OR_MASK         (1 << 27) /**< OR decoration bitmask */
@@ -52,7 +56,7 @@ extern "C"
  *
  * @param[in]  ptr   Pointer to target register
  * @param[in]  bit   Location of the LSB of the bitfield within the register
- * @param[in]  width Width of the bitfield, in bits
+ * @param[in]  width Width of the the bitfield, in bits
  *
  * @return   bitfield address as an uintptr_t
  */
@@ -72,7 +76,7 @@ static inline volatile void *bme_bf_addr(volatile void *ptr, uintptr_t bit, uint
  *
  * @param[in]  ptr   Pointer to target register
  * @param[in]  bit   Location of the LSB of the bitfield within the register
- * @param[in]  width Width of the bitfield, in bits
+ * @param[in]  width Width of the the bitfield, in bits
  *
  * @return bitfield extracted as a (modifiable) lvalue
  */
@@ -92,7 +96,7 @@ static inline volatile uint32_t *bme_bitfield32(volatile uint32_t *ptr, uint8_t 
  *
  * @param[in]  ptr   Pointer to target register
  * @param[in]  bit   Location of the LSB of the bitfield within the register
- * @param[in]  width Width of the bitfield, in bits
+ * @param[in]  width Width of the the bitfield, in bits
  *
  * @return bitfield extracted as a (modifiable) lvalue
  */
@@ -112,7 +116,7 @@ static inline volatile uint16_t *bme_bitfield16(volatile uint16_t *ptr, uint8_t 
  *
  * @param[in]  ptr   Pointer to target register
  * @param[in]  bit   Location of the LSB of the bitfield within the register
- * @param[in]  width Width of the bitfield, in bits
+ * @param[in]  width Width of the the bitfield, in bits
  *
  * @return bitfield extracted as a (modifiable) lvalue
  */
@@ -121,7 +125,6 @@ static inline volatile uint8_t *bme_bitfield8(volatile uint8_t *ptr, uint8_t bit
     return (volatile uint8_t *)(bme_bf_addr(ptr, bit, width));
 }
 
-#if BITBAND_FUNCTIONS_PROVIDED
 /* For compatibility with the M3/M4 bitbanding macros: */
 
 /**
@@ -244,10 +247,10 @@ static inline void bit_clear8(volatile uint8_t *ptr, uint8_t bit)
     *((volatile uint8_t *)(((uintptr_t)ptr) | BME_AND_MASK)) = (uint8_t)(~(1ul << bit));
 }
 
-#endif /* BITBAND_FUNCTIONS_PROVIDED */
-
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* BME_H */
 
 /** @} */

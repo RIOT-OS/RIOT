@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2014 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2015 Zolertia SL
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2015 Zolertia SL
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @defgroup    boards_common_remote Zolertia Re-Mote common
@@ -18,6 +19,9 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *              Antonio Lignan <alinan@zolertia.com>
  */
+
+#ifndef BOARD_COMMON_H
+#define BOARD_COMMON_H
 
 #include "cpu.h"
 #include "periph/gpio.h"
@@ -83,4 +87,5 @@
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
+#endif /* BOARD_COMMON_H */
 /** @} */

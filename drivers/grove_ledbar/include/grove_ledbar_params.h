@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_grove_ledbar
  *
@@ -17,6 +15,8 @@
  *
  * @author      Sebastian Meiling <s@mlng.net>
  */
+#ifndef GROVE_LEDBAR_PARAMS_H
+#define GROVE_LEDBAR_PARAMS_H
 
 #include "board.h"
 #include "periph/gpio.h"
@@ -86,4 +86,5 @@ static const saul_reg_info_t grove_ledbar_saul_info[] =
 }
 #endif
 
+#endif /* GROVE_LEDBAR_PARAMS_H */
 /** @} */

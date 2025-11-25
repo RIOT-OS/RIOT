@@ -1,8 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2020 Puhang Ding
- * SPDX-FileCopyrightText: 2020 Jan Schlichter
- * SPDX-FileCopyrightText: 2020 Nishchay Agrawal
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 Puhang Ding
+ *               2020 Jan Schlichter
+ *               2020 Nishchay Agrawal
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**

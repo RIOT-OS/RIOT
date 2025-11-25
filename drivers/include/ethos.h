@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_ethos_stdio   STDIO via ethos
  * @ingroup     sys_stdio
@@ -34,6 +32,9 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+
+#ifndef ETHOS_H
+#define ETHOS_H
 
 #include <stdbool.h>
 
@@ -162,4 +163,5 @@ void ethos_send_frame(ethos_t *dev, const uint8_t *data, size_t len, unsigned fr
 #ifdef __cplusplus
 }
 #endif
+#endif /* ETHOS_H */
 /** @} */

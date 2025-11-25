@@ -5,9 +5,6 @@
  * Public License v2.1. See the file LICENSE in the top level directory for
  * more details.
  */
-
-#pragma once
-
 /**
  * @defgroup    usb_descriptor   USB descriptors
  * @ingroup     usb
@@ -19,6 +16,8 @@
  *
  * @author  Koen Zandberg <koen@bergzand.net>
  */
+#ifndef USB_DESCRIPTOR_H
+#define USB_DESCRIPTOR_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -230,4 +229,5 @@ static inline bool usb_setup_is_read(usb_setup_t *pkt)
 }
 #endif
 
+#endif /* USB_DESCRIPTOR_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_mpu9x50
  *
@@ -17,6 +15,8 @@
  *
  * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  */
+#ifndef MPU9X50_INTERNAL_H
+#define MPU9X50_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,4 +79,5 @@ extern "C" {
 }
 #endif
 
+#endif /* MPU9X50_INTERNAL_H */
 /** @} */

@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2022 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2022 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_esp32
@@ -15,12 +16,15 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
+#ifndef PERIPH_CPU_ESP32S3_H
+#define PERIPH_CPU_ESP32S3_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /** Mapping configured ESP32-S3 default clock to CLOCK_CORECLOCK define */
-#define CLOCK_CORECLOCK     (1000000UL * CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ)
+#define CLOCK_CORECLOCK     (1000000UL * CONFIG_ESP32S3_DEFAULT_CPU_FREQ_MHZ)
 
 /**
  * @brief   CPU cycles per busy wait loop
@@ -92,6 +96,8 @@ extern "C" {
  * - ADC2 is also used by the WiFi module. The GPIOs connected to ADC2 are
  *   therefore not available as ADC channels if the modules `esp_wifi` or
  *   `esp_now` are used.
+ * - Vref can be read with function #adc_line_vref_to_gpio at an ADC2 channel,
+ *   that is at GPIO11 ... GPIO20.
  * - GPIO3 is a strapping pin und shouldn't be used as ADC channel
  */
 
@@ -269,4 +275,5 @@ extern "C" {
 }
 #endif
 
+#endif /* PERIPH_CPU_ESP32S3_H */
 /** @} */

@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2017 Eistec AB
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 Eistec AB
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_kinetis
@@ -16,6 +17,9 @@
  *
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
+
+#ifndef CPU_CONF_KINETIS_W_H
+#define CPU_CONF_KINETIS_W_H
 
 #if defined(KINETIS_CORE_D)
 /* Kinetis KW2xD */
@@ -99,4 +103,5 @@ extern "C"
 }
 #endif
 
+#endif /* CPU_CONF_KINETIS_W_H */
 /** @} */

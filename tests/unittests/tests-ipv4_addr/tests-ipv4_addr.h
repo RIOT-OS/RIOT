@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,8 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef TESTS_IPV4_ADDR_H
+#define TESTS_IPV4_ADDR_H
 
 #include "embUnit.h"
 
@@ -33,4 +33,5 @@ void tests_ipv4_addr(void);
 }
 #endif
 
+#endif /* TESTS_IPV4_ADDR_H */
 /** @} */

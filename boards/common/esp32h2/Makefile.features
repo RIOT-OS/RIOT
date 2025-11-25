@@ -1,3 +1,0 @@
-CPU_FAM = esp32h2
-
-include $(RIOTBOARD)/common/esp32x/Makefile.features

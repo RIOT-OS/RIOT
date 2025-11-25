@@ -292,7 +292,7 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 
 late_err:
     vfs_close(fd);
-    coap_pkt_set_code(pdu, COAP_CODE_INTERNAL_SERVER_ERROR);
+    coap_hdr_set_code(pdu->hdr, COAP_CODE_INTERNAL_SERVER_ERROR);
     return coap_get_total_hdr_len(pdu);
 }
 

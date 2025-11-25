@@ -2,7 +2,7 @@ include ../Makefile.cpu_common
 
 USEMODULE += backtrace
 
-BOARD_WHITELIST := native32 native64
+BOARD_WHITELIST := native native64
 
 # Tests if native returns a backtrace of size three.
 # The following function should be included in the backtrace:

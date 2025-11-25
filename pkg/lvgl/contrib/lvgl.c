@@ -39,11 +39,7 @@
 #endif
 
 #ifndef LVGL_COLOR_BUF_SIZE
-#  if IS_USED(MODULE_U8G2_DISP_DEV)
-#    define LVGL_COLOR_BUF_SIZE                 (LV_HOR_RES_MAX * 10 * 8)
-#  else
-#    define LVGL_COLOR_BUF_SIZE                 (LV_HOR_RES_MAX * 10)
-#  endif
+#define LVGL_COLOR_BUF_SIZE                 (LV_HOR_RES_MAX * 10)
 #endif
 
 #ifndef CONFIG_LVGL_INACTIVITY_PERIOD_MS
@@ -138,23 +134,6 @@ static void _touch_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 }
 #endif
 
-/* Pixel placement for monochrome displays where color depth is 1 bit, and each bit represents
-   a pixel */
-static void _monochrome_1bit_set_px_cb(lv_disp_drv_t *disp_drv, uint8_t *buf, lv_coord_t buf_w,
-                                       lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa)
-{
-    (void)disp_drv;
-    (void)opa;
-
-    uint16_t byte = (y * buf_w / 8) + (x / 8);
-    if (lv_color_brightness(color) > 128) {
-        (buf[byte]) |= (1 << (x % 8));
-    }
-    else {
-        (buf[byte]) &= ~(1 << (x % 8));
-    }
-}
-
 void lvgl_init(screen_dev_t *screen_dev)
 {
     lv_init();
@@ -184,11 +163,6 @@ void lvgl_init(screen_dev_t *screen_dev)
     disp_drv.hor_res = disp_dev_width(screen_dev->display);
     disp_drv.ver_res = disp_dev_height(screen_dev->display);
 #endif
-
-    if (disp_dev_color_depth(screen_dev->display) == 1) {
-        disp_drv.full_refresh = 1;
-        disp_drv.set_px_cb = _monochrome_1bit_set_px_cb;
-    }
 
     lv_disp_drv_register(&disp_drv);
 
@@ -234,6 +208,5 @@ void lvgl_run(void)
 void lvgl_wakeup(void)
 {
     thread_t *tcb = thread_get(_task_thread_pid);
-
     thread_flags_set(tcb, LVGL_THREAD_FLAG);
 }

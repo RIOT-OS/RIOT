@@ -16,7 +16,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     microbit \
     nrf51dongle \
     nucleo-c031c6 \
-    nucleo-c071rb \
     nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
@@ -45,8 +44,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     slstk3400a \
     spark-core \
     stk3200 \
-    stm32c0116-dk \
-    stm32c0316-dk \
     stm32f030f4-demo \
     stm32f0discovery \
     stm32f7508-dk \

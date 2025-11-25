@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     cpu_arm7tdmi_gba
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Bennet Blischke
  */
+
+#ifndef PERIPH_GBA_H
+#define PERIPH_GBA_H
 
 #include <stdint.h>
 
@@ -101,4 +102,5 @@ extern "C"
 }
 #endif
 
+#endif /* PERIPH_GBA_H */
 /** @} */

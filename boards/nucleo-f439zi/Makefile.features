@@ -2,7 +2,6 @@ CPU = stm32
 CPU_MODEL = stm32f439zi
 
 # Put defined MCU peripherals here (in alphabetical order)
-FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_dma
 FEATURES_PROVIDED += periph_eth
 FEATURES_PROVIDED += periph_i2c

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup pthread
  * @{
@@ -15,6 +13,9 @@
  * @brief   Mutual exclusion.
  * @note    Do not include this header file directly, but pthread.h.
  */
+
+#ifndef PTHREAD_MUTEX_H
+#define PTHREAD_MUTEX_H
 
 #include <time.h>
 
@@ -110,6 +111,8 @@ int pthread_mutex_setprioceiling(pthread_mutex_t *mutex, int prioceiling, int *o
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PTHREAD_MUTEX_H */
 
 /**
  * @}

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_mynewt_core
  * @{
@@ -18,6 +16,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+
+#ifndef OS_OS_EVENTQ_H
+#define OS_OS_EVENTQ_H
 
 #include <os/os_types.h>
 
@@ -231,3 +232,5 @@ static inline bool os_eventq_is_empty(struct os_eventq *evq)
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* OS_OS_EVENTQ_H */

@@ -30,8 +30,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static char _dirent_buf[CONFIG_NANOCOAP_QS_MAX];
-
 static int nanocoap_fs_mount(vfs_mount_t *mountp)
 {
     nanocoap_fs_t *fs = mountp->private_data;
@@ -290,8 +288,7 @@ static int nanocoap_fs_readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
         .offset = dir->offset++,
     };
 
-    res = nanocoap_link_format_get(&fs->sock, dir->urlbuf, _dir_cb, &ctx,
-                                   _dirent_buf, sizeof(_dirent_buf));
+    res = nanocoap_link_format_get(&fs->sock, dir->urlbuf, _dir_cb, &ctx);
     if (res == -EINTR) {
         /* we use this to abort listing early */
         res = 1;

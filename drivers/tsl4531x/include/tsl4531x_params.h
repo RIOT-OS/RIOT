@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_tsl4531x
  *
@@ -21,6 +19,9 @@
  *
  * Derived from the default configuration for the tsl2561 driver.
  */
+
+#ifndef TSL4531X_PARAMS_H
+#define TSL4531X_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -82,4 +83,5 @@ saul_reg_info_t tsl4531x_saul_info[] =
 }
 #endif
 
+#endif /* TSL4531X_PARAMS_H */
 /** @} */

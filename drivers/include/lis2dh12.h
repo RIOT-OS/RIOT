@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_lis2dh12 LIS2DH12 Accelerometer
  * @ingroup     drivers_sensors
@@ -34,6 +32,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef LIS2DH12_H
+#define LIS2DH12_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -311,7 +312,7 @@ void lis2dh12_cfg_disable_event(const lis2dh12_t *dev, uint8_t event, uint8_t pi
  * @return  negative error
  * @return  positive LIS2DH12_INT_SRC bit mask on success
  */
-int32_t lis2dh12_wait_event(const lis2dh12_t *dev, uint8_t pin, bool stale_events);
+int lis2dh12_wait_event(const lis2dh12_t *dev, uint8_t pin, bool stale_events);
 #endif /* MODULE_LIS2DH12_INT */
 
 /**
@@ -502,4 +503,5 @@ int lis2dh12_poweroff(const lis2dh12_t *dev);
 }
 #endif
 
+#endif /* LIS2DH12_H */
 /** @} */

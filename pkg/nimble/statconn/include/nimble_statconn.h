@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    pkg_nimble_statconn Statconn
  * @ingroup     pkg_nimble
@@ -48,6 +46,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef NIMBLE_STATCONN_H
+#define NIMBLE_STATCONN_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -192,4 +193,5 @@ int nimble_statconn_rm(const uint8_t *addr);
 }
 #endif
 
+#endif /* NIMBLE_STATCONN_H */
 /** @} */

@@ -16,7 +16,6 @@ ifneq (,$(filter usbus_cdc_ecm,$(USEMODULE)))
   USEMODULE += iolist
   USEMODULE += fmt
   USEMODULE += usbus_urb
-  USEMODULE += netdev_new_api
   USEMODULE += netdev_eth
   USEMODULE += luid
 endif

@@ -25,6 +25,11 @@ BLOBS += $(MANIFEST_DIR)/file2.bin
 
 CFLAGS += -DCONFIG_SUIT_COMPONENT_MAX=2
 
+# Use a version of 'native' that includes flash page support
+ifneq (,$(filter native native64,$(BOARD)))
+  EXTERNAL_BOARD_DIRS = $(CURDIR)/native_flashpage
+endif
+
 FEATURES_REQUIRED += periph_flashpage
 
 TEST_DATA = $(MANIFEST_DIR)/created

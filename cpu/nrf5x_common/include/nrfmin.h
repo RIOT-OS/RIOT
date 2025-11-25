@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2015-2017 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015-2017 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @defgroup    drivers_nrf5x_nrfmin NRF minimal radio driver
@@ -67,6 +68,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef NRFMIN_H
+#define NRFMIN_H
 
 #include "net/netdev.h"
 
@@ -217,4 +221,5 @@ void nrfmin_set_txpower(int16_t power);
 }
 #endif
 
+#endif /* NRFMIN_H */
 /** @} */

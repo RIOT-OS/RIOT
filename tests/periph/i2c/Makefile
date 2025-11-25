@@ -11,6 +11,6 @@ USEMODULE += xtimer
 # avoid running Kconfig by default
 SHOULD_RUN_KCONFIG ?=
 
-EXTERNAL_BOARD_DIRS += $(RIOTBASE)/tests/build_system/external_board_dirs/esp-ci-boards
+EXTERNAL_BOARD_DIRS += $(CURDIR)/../external_board_dirs/esp-ci-boards
 
 include $(RIOTBASE)/Makefile.include

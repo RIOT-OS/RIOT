@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_pulse_counter
  *
@@ -17,6 +15,9 @@
  *
  * @author      Hyung-Sin Kim <hs.kim@cs.berkeley.edu>
  */
+
+#ifndef PULSE_COUNTER_PARAMS_H
+#define PULSE_COUNTER_PARAMS_H
 
 #include "board.h"
 #include "pulse_counter.h"
@@ -81,4 +82,5 @@ static const saul_reg_info_t pulse_counter_saul_info[] =
 }
 #endif
 
+#endif /* PULSE_COUNTER_PARAMS_H */
 /** @} */

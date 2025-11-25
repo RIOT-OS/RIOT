@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_congure_mock    CongURE mock implementation
  * @ingroup     sys_congure
@@ -18,6 +16,8 @@
  *
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef CONGURE_MOCK_H
+#define CONGURE_MOCK_H
 
 #include <stdint.h>
 
@@ -168,4 +168,5 @@ void congure_mock_snd_setup(congure_mock_snd_t *c,
 }
 #endif
 
+#endif /* CONGURE_MOCK_H */
 /** @} */

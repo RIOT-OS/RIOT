@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2015-2016 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015-2016 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_samd21
@@ -15,6 +16,9 @@
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include <limits.h>
 
@@ -36,7 +40,7 @@ extern "C" {
  *          Idle modes are enabled by default, deep sleep mode blocked
  */
 #ifndef PM_BLOCKER_INITIAL
-#  define PM_BLOCKER_INITIAL    { 1, 0, 0, 0 }
+#define PM_BLOCKER_INITIAL      { 1, 0, 0, 0 }
 #endif
 
 /**
@@ -196,4 +200,5 @@ struct sam0_aux_cfg_mapping {
 }
 #endif
 
+#endif /* PERIPH_CPU_H */
 /** @} */

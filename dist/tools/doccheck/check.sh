@@ -20,8 +20,6 @@ if [[ -z ${DOCUMENTATION_FORMAT+x} ]]; then
 export DOCUMENTATION_FORMAT=check
 fi
 
-# not running shellcheck with -x in the CI --> disable SC1091
-# shellcheck disable=SC1091
 . "${RIOTBASE}"/dist/tools/ci/github_annotate.sh
 
 github_annotate_setup
@@ -35,19 +33,8 @@ else
     CWARN=
     CRESET=
 fi
-
-# Execute `doc-ci` instead of `doc` to download and use the Doxygen version
-# specified in `doc/doxygen/Makefile`, but only if the machine is
-# `Linux x86_64` to avoid having to compile Doxygen.
-if [[ "$(uname -s -m)" == "Linux x86_64" ]]; then
-    DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc-ci 2>&1)
-else
-    DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc 2>&1)
-fi
-
-DOXY_OUTPUT=$(echo "${DOXY_OUTPUT}" | grep -Fvf "${EXCLUDE_SIMPLE_FILE}" | \
-              grep -Evf "${EXCLUDE_PATTERN_FILE}" | \
-              grep -Evf "${GENERIC_EXCLUDE_PATTERN_FILE}")
+DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc 2>&1| grep -Fvf "${EXCLUDE_SIMPLE_FILE}" )
+DOXY_OUTPUT=$(echo "${DOXY_OUTPUT}" | grep -Evf "${EXCLUDE_PATTERN_FILE}" | grep -Evf "${GENERIC_EXCLUDE_PATTERN_FILE}")
 DOXY_ERRCODE=$?
 RESULT=0
 
@@ -86,8 +73,8 @@ exclude_filter() {
 
 # Check groups are correctly defined (e.g. no undefined groups and no group
 # defined multiple times)
-ALL_RAW_DEFGROUP=$(git grep -n '@defgroup' -- '*.h' '*.hpp' '*.txt' '*/doc.md' '*.doc.md' 'makefiles/pseudomodules.inc.mk' 'sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c'| exclude_filter)
-ALL_RAW_INGROUP=$(git grep -n '@ingroup' -- '*.h' '*.hpp' '*.txt' '*/doc.md' '*.doc.md' 'makefiles/pseudomodules.inc.mk' 'sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c'| exclude_filter)
+ALL_RAW_DEFGROUP=$(git grep -n @defgroup -- '*.h' '*.hpp' '*.txt' 'makefiles/pseudomodules.inc.mk' 'sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c'| exclude_filter)
+ALL_RAW_INGROUP=$(git grep -n '@ingroup' -- '*.h' '*.hpp' '*.txt' 'makefiles/pseudomodules.inc.mk' 'sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c'| exclude_filter)
 DEFINED_GROUPS=$(echo "${ALL_RAW_DEFGROUP}" | \
                     grep -oE '@defgroup[ ]+[^ ]+' | \
                     grep -oE '[^ ]+$' | \

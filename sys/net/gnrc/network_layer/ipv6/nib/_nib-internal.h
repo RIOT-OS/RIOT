@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  net_gnrc_ipv6_nib
  * @internal
@@ -18,6 +16,8 @@
  *
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef PRIV_NIB_INTERNAL_H
+#define PRIV_NIB_INTERNAL_H
 
 #include <assert.h>
 #include <stdbool.h>
@@ -179,9 +179,6 @@ typedef struct _nib_onl_entry {
      * @note    Only available if @ref CONFIG_GNRC_IPV6_NIB_ARSM != 0.
      */
     uint8_t l2addr_len;
-#endif
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT) || defined(DOXYGEN)
-    uint8_t pktqueue_len; /**< Number of queued packets (in pktqueue) */
 #endif
 } _nib_onl_entry_t;
 
@@ -683,7 +680,7 @@ static inline _nib_offl_entry_t *_nib_dc_add(const ipv6_addr_t *next_hop,
 /**
  * @brief   Removes a destination cache entry
  *
- * @param[in,out] nib_offl  Destination entry to remove.
+ * @param[in,out] nib_dr    An entry.
  *
  * Corresponding on-link entry is removed, too.
  *
@@ -735,7 +732,7 @@ void _nib_pl_remove(_nib_offl_entry_t *nib_offl);
  * @brief   Removes a prefix from the prefix list as well as the addresses
  *          associated with the prefix.
  *
- * @param[in,out] pfx       The prefix to remove.
+ * @param[in,out] nib_offl    An entry.
  *
  * Corresponding on-link entry is removed, too.
  */
@@ -845,7 +842,6 @@ _nib_offl_entry_t *_nib_abr_iter_pfx(const _nib_abr_entry_t *abr,
 _nib_abr_entry_t *_nib_abr_iter(const _nib_abr_entry_t *last);
 #else
 #define _nib_abr_iter(abr) NULL
-#define _nib_abr_add_pfx(abr, pfx) (void)abr
 #endif
 
 /**
@@ -873,47 +869,13 @@ void _nib_ft_get(const _nib_offl_entry_t *dst, gnrc_ipv6_nib_ft_t *fte);
  * @return  0, on success.
  * @return  -ENETUNREACH, when no route was found.
  */
-int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
-                   gnrc_ipv6_nib_ft_t *fte);
-
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_QUEUE_PKT) || DOXYGEN
-/**
- * @brief Flush the packet queue of a on-link neighbor.
- *
- * @param node neighbor entry to be flushed
- */
-void _nbr_flush_pktqueue(_nib_onl_entry_t *node);
-
-/**
- * @brief Remove oldest packet from a on-link neighbor's packet queue.
- *
- * @param node neighbor entry
- *
- * @retval pointer to the packet entry or NULL if the queue is empty
- */
-gnrc_pktqueue_t *_nbr_pop_pkt(_nib_onl_entry_t *node);
-
-/**
- * @brief Push packet to a on-link neighbor's packet queue.
- *
- * If there are already @ref CONFIG_GNRC_IPV6_NIB_NBR_QUEUE_CAP packets queued,
- * the oldest will be dropped silently.
- *
- * @pre Neighbor is INCOMPLETE.
- *
- * @param node neighbor entry
- * @param pkt packet to be pushed
- */
-void _nbr_push_pkt(_nib_onl_entry_t *node, gnrc_pktqueue_t *pkt);
-#else
-#define _nbr_flush_pktqueue(node) ((void)node)
-#define _nbr_pop_pkt(node) ((void)node, NULL)
-#define _nbr_push_pkt(node, pkt) ((void)node, (void)pkt)
-#endif
+int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *ctx,
+                   gnrc_ipv6_nib_ft_t *entry);
 
 #ifdef __cplusplus
 }
 #endif
 
+#endif /* PRIV_NIB_INTERNAL_H */
 /** @internal
  * @} */

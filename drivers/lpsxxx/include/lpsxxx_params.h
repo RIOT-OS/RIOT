@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_lpsxxx
  *
@@ -19,6 +17,9 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef LPSXXX_PARAMS_H
+#define LPSXXX_PARAMS_H
 
 #include "board.h"
 #include "lpsxxx.h"
@@ -84,4 +85,5 @@ static const saul_reg_info_t lpsxxx_saul_info[] =
 }
 #endif
 
+#endif /* LPSXXX_PARAMS_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_pca9685 PCA9685 I2C PWM controller
  * @ingroup     drivers_actuators
@@ -82,6 +80,9 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @file
  */
+
+#ifndef PCA9685_H
+#define PCA9685_H
 
 #ifdef __cplusplus
 extern "C"
@@ -317,4 +318,5 @@ static inline uint8_t pca9685_pwm_channels(pca9685_t *dev)
 }
 #endif
 
+#endif /* PCA9685_H */
 /** @} */

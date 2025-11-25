@@ -12,7 +12,6 @@ FEATURES_PROVIDED += periph_gpio_ll_disconnect
 FEATURES_PROVIDED += periph_gpio_ll_input_pull_down
 FEATURES_PROVIDED += periph_gpio_ll_input_pull_up
 FEATURES_PROVIDED += periph_gpio_ll_irq
-FEATURES_PROVIDED += periph_gpio_ll_irq_edge_triggered_both
 FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_high
 FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_low
 FEATURES_PROVIDED += periph_gpio_ll_open_drain
@@ -25,7 +24,6 @@ FEATURES_PROVIDED += periph_uart_nonblocking
 
 ifneq (f1,$(CPU_FAM))
   FEATURES_PROVIDED += periph_gpio_ll_open_drain_pull_up
-  FEATURES_PROVIDED += periph_gpio_ll_switch_dir
 endif
 
 ifneq (,$(filter $(CPU_FAM),c0 f0 f1 f3 g0 g4 l0 l1 l4 l5 u5 wb wl))
@@ -35,8 +33,7 @@ ifneq (,$(filter $(CPU_FAM),c0 f0 f1 f3 g0 g4 l0 l1 l4 l5 u5 wb wl))
 endif
 
 ifneq (,$(filter $(CPU_FAM),f0 f2 f3 f4 f7 l0 l1 l4 l5 u5 wb wl))
-  CPU_MODELS_WITHOUT_RTC_BKPR += stm32f030% stm32f070% \
-                                 stm32f302%
+  CPU_MODELS_WITHOUT_RTC_BKPR += stm32f030% stm32f070%
   ifeq (,$(filter $(CPU_MODELS_WITHOUT_RTC_BKPR),$(CPU_MODEL)))
     FEATURES_PROVIDED += periph_rtc_mem
   endif
@@ -61,7 +58,7 @@ STM32_WITH_VBAT = stm32f031% stm32f038% stm32f042% stm32f048% \
                   stm32f7% \
                   stm32g0% \
                   stm32g4% stm32gbk1cb \
-                  stm32l412% stm32l433% stm32l45% stm32l47% stm32l49% stm32l4r% \
+                  stm32l4% \
                   stm32l5% \
                   stm32u5% \
                   stm32wb% \

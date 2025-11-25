@@ -1,0 +1,25 @@
+From f7c65c6c3ad1c00fc9d10b0bd25e6119d1020f88 Mon Sep 17 00:00:00 2001
+From: Christian Manal <moenoel@informatik.uni-bremen.de>
+Date: Thu, 23 Nov 2017 11:58:52 +0100
+Subject: [PATCH 07/12] fixed warnings in transaction.c
+
+---
+ core/transaction.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/core/transaction.c b/core/transaction.c
+index fd7d5d4..2dd86b1 100644
+--- a/core/transaction.c
++++ b/core/transaction.c
+@@ -377,7 +377,7 @@ int transaction_send(lwm2m_context_t * contextP,
+ 
+     if (!transacP->ack_received)
+     {
+-        long unsigned timeout;
++        long unsigned timeout = 0;
+ 
+         if (0 == transacP->retrans_counter)
+         {
+-- 
+2.1.4
+

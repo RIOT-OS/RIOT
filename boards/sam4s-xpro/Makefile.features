@@ -1,7 +1,0 @@
-CPU = sam4s
-CPU_MODEL = sam4sd32c
-
-# Put defined MCU peripherals here (in alphabetical order)
-FEATURES_PROVIDED += periph_gpio periph_gpio_irq
-FEATURES_PROVIDED += periph_timer
-FEATURES_PROVIDED += periph_uart

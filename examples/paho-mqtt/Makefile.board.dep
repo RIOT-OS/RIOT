@@ -1,0 +1,9 @@
+# Put board specific dependencies here
+
+ifneq (,$(filter arch_esp,$(FEATURES_USED)))
+  USEMODULE += esp_wifi
+endif
+
+ifneq (,$(filter native native64,$(BOARD)))
+  USEMODULE += netdev_default
+endif

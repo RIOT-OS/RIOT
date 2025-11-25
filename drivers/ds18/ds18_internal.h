@@ -1,12 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2017 Frits Kuipers
- * SPDX-FileCopyrightText: 2018 HAW Hamburg
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 Frits Kuipers
+ *               2018 HAW Hamburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
-
-#include "time_units.h"
 
 /**
  * @ingroup     drivers_ds18
@@ -18,6 +17,9 @@
  * @author      Frits Kuipers <frits.kuipers@gmail.com>
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
+
+#ifndef DS18_INTERNAL_H
+#define DS18_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,3 +60,5 @@ extern "C" {
 }
 #endif
 /** @} */
+
+#endif /* DS18_INTERNAL_H */

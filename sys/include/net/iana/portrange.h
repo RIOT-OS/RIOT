@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_iana_portrange  IANA Port Ranges
  * @ingroup     net
@@ -19,6 +17,8 @@
  *
  * @author  smlng <s@mlng.net>,
  */
+#ifndef NET_IANA_PORTRANGE_H
+#define NET_IANA_PORTRANGE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,4 +43,5 @@ extern "C" {
 }
 #endif
 
+#endif /* NET_IANA_PORTRANGE_H */
 /** @} */

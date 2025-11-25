@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_kw2xrf
  * @{
@@ -16,6 +14,9 @@
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
  */
+
+#ifndef KW2XRF_SPI_H
+#define KW2XRF_SPI_H
 
 #include <stdio.h>
 #include "board.h"
@@ -135,4 +136,5 @@ void kw2xrf_read_fifo(kw2xrf_t *dev, uint8_t *data, uint8_t data_length);
 }
 #endif
 
+#endif /* KW2XRF_SPI_H */
 /** @} */

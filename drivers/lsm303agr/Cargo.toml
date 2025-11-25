@@ -12,4 +12,4 @@ publish = false
 
 [dependencies]
 lsm303agr = "1.0"
-riot-wrappers = "^0.9.0"
+riot-wrappers = "^0.8"

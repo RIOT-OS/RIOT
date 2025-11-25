@@ -86,7 +86,6 @@ riotboot/flash-bootloader: riotboot/bootloader/flash
 riotboot/bootloader/%: $$(if $$(filter riotboot/bootloader/clean,$$@),,$$(BUILDDEPS) pkg-prepare)
 	$(Q)/usr/bin/env -i \
 		QUIET=$(QUIET) PATH="$(PATH)" USER="$(USER)"\
-		BUILD_DIR="$(BUILD_DIR)"\
 		INCLUDES="$(INCLUDES)"\
 		EXTERNAL_BOARD_DIRS="$(EXTERNAL_BOARD_DIRS)" BOARD=$(BOARD) \
 		OPENOCD_DEBUG_ADAPTER=$(OPENOCD_DEBUG_ADAPTER) \

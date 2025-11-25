@@ -1,12 +1,13 @@
 /*
- * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
- * SPDX-FileCopyrightText: 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
- * SPDX-FileCopyrightText: 2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
- * SPDX-FileCopyrightText: 2021-2023 Gerson Fernando Budke <nandojve@gmail.com>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2014 Freie Universität Berlin, Hinnerk van Bruinehsen
+ *               2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
+ *               2021-2023 Gerson Fernando Budke <nandojve@gmail.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_avr8_common
@@ -27,6 +28,9 @@
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  */
+
+#ifndef CPU_H
+#define CPU_H
 
 #include <stdio.h>
 #include <stdint.h>
@@ -177,4 +181,5 @@ void avr8_reset_cause(void);
 }
 #endif
 
+#endif /* CPU_H */
 /** @} */

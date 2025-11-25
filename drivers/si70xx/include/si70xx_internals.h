@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_si70xx
  *
@@ -17,6 +15,9 @@
  *
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
+
+#ifndef SI70XX_INTERNALS_H
+#define SI70XX_INTERNALS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -83,4 +84,5 @@ extern "C" {
 }
 #endif
 
+#endif /* SI70XX_INTERNALS_H */
 /** @} */

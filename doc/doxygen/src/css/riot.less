@@ -186,6 +186,7 @@ div.fragment {
   line-height: @line-height-base;
   margin: 0 0 10px;
   padding: 10px;
+  overflow: visible;
   page-break-inside: avoid;
   word-break: break-all;
   word-wrap: break-word;
@@ -459,15 +460,4 @@ dl.todo > dt {
 }
 table.retval > tbody > tr > td.paramname {
   padding-right: 2em;
-}
-blockquote {
-  background-color: #eadde1;
-}
-/* HACK: *doc.md files are processed correctly, but additionally add an empty page,
- * see https://github.com/doxygen/doxygen/issues/9437
- * and https://github.com/RIOT-OS/RIOT/issues/21220#issuecomment-2701284183
- * can be removed as soon as the doxygen issue is fixed */
-li:has(> .item a[class^="md_"][class$="doc.html"]),
-tr:has(> .entry a[href^="md_"][href$="doc.html"]) {
-    display: none;
 }

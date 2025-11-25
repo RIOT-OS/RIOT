@@ -1,6 +1,0 @@
-CPU = native
-
-FEATURES_PROVIDED += arch_32bit
-NATIVE_ARCH_BIT = 32
-
-include $(RIOTBOARD)/common/native/Makefile.features

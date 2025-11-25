@@ -33,8 +33,6 @@ static int malloc_cmd(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(malloc, "malloc <size>", malloc_cmd);
-
 static int free_cmd(int argc, char **argv)
 {
     if (argc < 2) {
@@ -50,7 +48,11 @@ static int free_cmd(int argc, char **argv)
     return 0;
 }
 
-SHELL_COMMAND(free, "free <addr in hex> returned from malloc, e.g., 0x1234", free_cmd);
+static const shell_command_t shell_commands[] = {
+    { "malloc", "malloc <size>", malloc_cmd },
+    { "free", "free <addr in hex> returned from malloc, e.g., 0x1234", free_cmd },
+    { NULL, NULL, NULL }
+};
 
 int main(void)
 {
@@ -61,7 +63,7 @@ int main(void)
     char line_buf[SHELL_DEFAULT_BUFSIZE];
 
     /* define own shell commands */
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

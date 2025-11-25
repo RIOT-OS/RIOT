@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_eui48 IEEE EUI-48 identifier
  * @ingroup     net
@@ -19,6 +17,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef NET_EUI48_H
+#define NET_EUI48_H
 
 #include <stdint.h>
 
@@ -159,4 +160,5 @@ static inline void eui48_from_ipv6_iid(eui48_t *addr, const eui64_t *iid)
 }
 #endif
 
+#endif /* NET_EUI48_H */
 /** @} */

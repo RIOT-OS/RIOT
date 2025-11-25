@@ -4,7 +4,7 @@ ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
   PSEUDOMODULES += xtimer
 endif
 
-MODULES_ZTIMER_ON_RTT_CONFLICT = rtt_rtc
+MODULES_ZTIMER_ON_RTT_CONFLICT = rtt_rtc gnrc_lwmac gnrc_gomach
 
 # By defaul use highest possible RTT_FREQUENCY for platforms that allow it. This
 # might not be the most optimized for conversion guarantees that ztimer_periph_rtt

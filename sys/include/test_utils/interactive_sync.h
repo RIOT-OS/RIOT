@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    test_utils_interactive_sync Test interactive synchronization
  * @ingroup     sys
@@ -19,6 +17,9 @@
  *
  * @author      Gaëtan Harter <gaetan.harter@fu-berlin.de>
  */
+
+#ifndef TEST_UTILS_INTERACTIVE_SYNC_H
+#define TEST_UTILS_INTERACTIVE_SYNC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,4 +40,5 @@ static inline void test_utils_interactive_sync(void) {}
 #ifdef __cplusplus
 }
 #endif
+#endif /* TEST_UTILS_INTERACTIVE_SYNC_H */
 /** @} */

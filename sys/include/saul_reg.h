@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_saul_reg SAUL registry
  * @ingroup     sys
@@ -22,6 +20,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef SAUL_REG_H
+#define SAUL_REG_H
 
 #include <stdint.h>
 
@@ -139,4 +140,5 @@ int saul_reg_write(saul_reg_t *dev, const phydat_t *data);
 }
 #endif
 
+#endif /* SAUL_REG_H */
 /** @} */

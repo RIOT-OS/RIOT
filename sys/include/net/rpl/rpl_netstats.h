@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_netstats_rpl Packet statistics for RPL
  * @ingroup     net_netstats
@@ -21,6 +19,9 @@
  */
 
 #include <stdint.h>
+
+#ifndef NET_RPL_RPL_NETSTATS_H
+#define NET_RPL_RPL_NETSTATS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,4 +56,5 @@ typedef struct {
 }
 #endif
 
+#endif /* NET_RPL_RPL_NETSTATS_H */
 /** @} */

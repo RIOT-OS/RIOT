@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_mpl3115a2
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Sebastian Meiling <s@mlng.net>
  */
+
+#ifndef MPL3115A2_PARAMS_H
+#define MPL3115A2_PARAMS_H
 
 #include "board.h"
 #include "saul_reg.h"
@@ -73,4 +74,5 @@ static const saul_reg_info_t mpl3115a2_saul_info[] =
 }
 #endif
 
+#endif /* MPL3115A2_PARAMS_H */
 /** @} */

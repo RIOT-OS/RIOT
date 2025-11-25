@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_emcute MQTT-SN Client (emCute)
  * @ingroup     net
@@ -85,6 +83,9 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
+#ifndef NET_EMCUTE_H
+#define NET_EMCUTE_H
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -105,7 +106,7 @@ extern "C" {
  */
 /**
  * @brief   Default UDP port to listen on (also used as SRC port). Usage can be
- *          found in examples/networking/mqtt/emcute_mqttsn. Application code is expected to use
+ *          found in examples/emcute_mqttsn. Application code is expected to use
  *          this macro to assign the default port.
  */
 #ifndef CONFIG_EMCUTE_DEFAULT_PORT
@@ -388,4 +389,5 @@ const char *emcute_type_str(uint8_t type);
 }
 #endif
 
+#endif /* NET_EMCUTE_H */
 /** @} */

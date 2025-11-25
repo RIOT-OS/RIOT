@@ -5,9 +5,6 @@
  * Public License v2.1. See the file LICENSE in the top level directory for
  * more details.
  */
-
-#pragma once
-
 /**
  * @defgroup    usb_hid_usage   USB HID usage tables
  * @ingroup     usb_hid
@@ -22,6 +19,9 @@
  *
  * @see Based on HID Usage Tables 1.21, https://www.usb.org/sites/default/files/hut1_21.pdf
  */
+
+#ifndef USB_HID_HID_USAGE_H
+#define USB_HID_HID_USAGE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -2729,4 +2729,5 @@ extern "C" {
 }
 #endif
 
+#endif /* USB_HID_HID_USAGE_H */
 /** @} */

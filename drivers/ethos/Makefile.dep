@@ -1,7 +1,7 @@
 FEATURES_REQUIRED += periph_uart
 USEMODULE += iolist
 USEMODULE += netdev_eth
-USEMODULE += netdev_new_api
+USEMODULE += netdev_legacy_api
 USEMODULE += random
 USEMODULE += tsrb
 

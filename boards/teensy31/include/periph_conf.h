@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2017 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_teensy31
@@ -14,6 +15,9 @@
  *
  * @author      Loïc Dauphin <loic.dauphin@inria.fr>
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #include "periph_cpu.h"
 
@@ -167,4 +171,5 @@ static const pwm_conf_t pwm_config[] = {
 }
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_hsc
  * @brief       Internal addresses, constants for the HSC sensor.
@@ -18,6 +16,9 @@
  *
  * @author      Quang Pham <phhr_quang@live.com>
  */
+
+#ifndef HSC_INTERNALS_H
+#define HSC_INTERNALS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,4 +60,5 @@ enum {
 }
 #endif
 
+#endif /* HSC_INTERNALS_H */
 /** @} */

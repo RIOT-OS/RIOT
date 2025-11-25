@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     unittests
  * @{
@@ -17,6 +15,8 @@
  *
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef TESTS_GNRC_SIXLOWPAN_FRAG_VRB_H
+#define TESTS_GNRC_SIXLOWPAN_FRAG_VRB_H
 
 #include "embUnit.h"
 
@@ -33,4 +33,5 @@ void tests_gnrc_sixlowpan_frag_vrb(void);
 }
 #endif
 
+#endif /* TESTS_GNRC_SIXLOWPAN_FRAG_VRB_H */
 /** @} */

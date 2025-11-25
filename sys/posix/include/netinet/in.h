@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  posix_sockets
  * @{
@@ -22,6 +20,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef NETINET_IN_H
+#define NETINET_IN_H
 
 #include <inttypes.h>
 #include <sys/socket.h>
@@ -271,3 +271,4 @@ extern const struct in6_addr in6addr_loopback;
 /**
  * @}
  */
+#endif /* NETINET_IN_H */

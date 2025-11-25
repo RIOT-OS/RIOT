@@ -48,26 +48,6 @@ psa_status_t psa_generate_ecc_p256r1_key_pair(  const psa_key_attributes_t *attr
     return PSA_SUCCESS;
 }
 
-psa_status_t psa_derive_ecc_p256r1_public_key(const uint8_t *priv_key_buffer, uint8_t *pub_key_buffer,
-                                        size_t priv_key_buffer_length,
-                                        size_t *pub_key_buffer_length)
-{
-    int ret = 0;
-
-    const struct uECC_Curve_t *curve = uECC_secp256r1();
-
-    *pub_key_buffer_length = uECC_curve_public_key_size(curve) + 1;
-
-    pub_key_buffer[0] = 0x04;
-    ret = uECC_compute_public_key(priv_key_buffer, pub_key_buffer+1, curve);
-    if (!ret) {
-        return PSA_ERROR_GENERIC_ERROR;
-    }
-
-    (void)priv_key_buffer_length;
-    return PSA_SUCCESS;
-}
-
 psa_status_t psa_ecc_p256r1_sign_hash(  const psa_key_attributes_t *attributes,
                                         psa_algorithm_t alg, const uint8_t *key_buffer,
                                         size_t key_buffer_size, const uint8_t *hash,

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_luid Locally Unique ID Generator
  * @ingroup     sys
@@ -51,6 +49,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef LUID_H
+#define LUID_H
 
 #include <stddef.h>
 
@@ -179,7 +180,7 @@ void luid_netdev_get_eui64(const netdev_t *netdev, eui64_t *addr);
  * @param[in]  len      length of the LUID in bytes
  * @param[in]  gen      custom LUID generator value
  */
-void luid_custom(void *buf, size_t len, uint16_t gen);
+void luid_custom(void *buf, size_t len, int gen);
 
 /**
  * @brief   Get a LUID base value
@@ -198,4 +199,5 @@ void luid_base(void *buf, size_t len);
 }
 #endif
 
+#endif /* LUID_H */
 /** @} */

@@ -1,4 +1,5 @@
 BOARD_INSUFFICIENT_MEMORY := \
+    nucleo-f031k6 \
     nucleo-l011k4 \
     stm32f030f4-demo \
     #

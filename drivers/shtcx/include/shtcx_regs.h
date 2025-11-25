@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_shtcx
  *
@@ -18,6 +16,9 @@
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
+
+#ifndef SHTCX_REGS_H
+#define SHTCX_REGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,4 +45,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+#endif /* SHTCX_REGS_H */
 /** @} */

@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2020 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_stm32
@@ -15,6 +16,9 @@
  * @author          Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  */
+
+#ifndef PERIPH_G4_PERIPH_CPU_H
+#define PERIPH_G4_PERIPH_CPU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,4 +46,5 @@ extern "C" {
 }
 #endif
 
+#endif /* PERIPH_G4_PERIPH_CPU_H */
 /** @} */

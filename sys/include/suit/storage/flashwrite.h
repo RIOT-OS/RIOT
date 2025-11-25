@@ -6,9 +6,6 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-
-#pragma once
-
 /**
  * @defgroup    sys_suit_storage_flashwrite  riotboot flashwrite storage backend
  * @ingroup     sys_suit_storage
@@ -19,6 +16,9 @@
  * @brief       riotboot Flashwrite storage backend functions for SUIT manifests
  * @author      Koen Zandberg <koen@bergzand.net>
  */
+
+#ifndef SUIT_STORAGE_FLASHWRITE_H
+#define SUIT_STORAGE_FLASHWRITE_H
 
 #include "suit.h"
 #include "riotboot/flashwrite.h"
@@ -39,4 +39,5 @@ typedef struct {
 }
 #endif
 
+#endif /* SUIT_STORAGE_FLASHWRITE_H */
 /** @} */

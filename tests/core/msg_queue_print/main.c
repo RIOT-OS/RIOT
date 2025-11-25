@@ -1,7 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2021 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2024 TU Dresden
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2021 Freie Universität Berlin,
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -13,7 +15,6 @@
  *
  *
  * @author      Julian Holzwarth <julian.holzwarth@fu-berlin.de>
- * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  *
  */
 
@@ -28,41 +29,19 @@ msg_t msg_queue[QUEUE_SIZE];
 
 int main(void)
 {
-    msg_t msg;
+    msg_t messages[QUEUE_SIZE];
 
     msg_queue_print();
     msg_init_queue(msg_queue, QUEUE_SIZE);
     msg_queue_print();
 
-    /* fill message queue */
     for (uintptr_t i = 0; i < QUEUE_SIZE; i++) {
-        msg = (msg_t) {
-            .type = i,
-            .content.ptr = (void *)i,
-        };
-        msg_send_to_self(&msg);
+        messages[i].type = i;
+        messages[i].content.ptr = (void *) i;
+        msg_send_to_self(&messages[i]);
     }
 
     msg_queue_print();
-
-    /* drain half of message queue */
-    for (uintptr_t i = 0; i < QUEUE_SIZE/2; i++) {
-        msg_receive(&msg);
-    }
-
-    msg_queue_print();
-
-    /* fill up message queue again */
-    for (uintptr_t i = QUEUE_SIZE; i < QUEUE_SIZE + QUEUE_SIZE/2; i++) {
-        msg = (msg_t) {
-            .type = i,
-            .content.ptr = (void *)i,
-        };
-        msg_send_to_self(&msg);
-    }
-
-    msg_queue_print();
-
     puts("DONE");
     return 0;
 }

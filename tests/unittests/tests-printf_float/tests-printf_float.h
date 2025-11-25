@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef TESTS_PRINTF_FLOAT_H
+#define TESTS_PRINTF_FLOAT_H
 
 #include "embUnit.h"
 
@@ -33,4 +34,5 @@ void tests_printf_float(void);
 }
 #endif
 
+#endif /* TESTS_PRINTF_FLOAT_H */
 /** @} */

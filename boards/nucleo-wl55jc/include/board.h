@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2021 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2021 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_nucleo-wl55jc
@@ -15,6 +16,9 @@
  * @author      Akshai M <akshai.m@fu-berlin.de>
  * @author      Hauke Petersen <devel@haukepetersen.de>
  */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "board_nucleo.h"
 
@@ -45,15 +49,12 @@ extern void nucleo_wl55jc_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_
  * @{
  */
 #define LED0_PIN_NUM        15
-#define LED0_PORT           GPIO_PORT_B /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_B
 
 #define LED1_PIN_NUM        9
-#define LED1_PORT           GPIO_PORT_B /**< GPIO port of LED 1 */
 #define LED1_PORT_NUM       PORT_B
 
 #define LED2_PIN_NUM        11
-#define LED2_PORT           GPIO_PORT_B /**< GPIO port of LED 2 */
 #define LED2_PORT_NUM       PORT_B
 /** @} */
 
@@ -86,4 +87,5 @@ extern void nucleo_wl55jc_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_
 
 #include "stm32_leds.h"
 
+#endif /* BOARD_H */
 /** @} */

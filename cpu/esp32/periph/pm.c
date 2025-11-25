@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2022 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2022 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -27,15 +30,13 @@
 #include "periph/uart.h"
 
 /* ESP-IDF headers */
-#include "driver/gpio.h"
-#include "driver/uart.h"
 #include "esp_sleep.h"
 #include "rom/rtc.h"
 #include "rom/uart.h"
 #include "soc/rtc.h"
-#if !CPU_FAM_ESP32H2 && !CPU_FAM_ESP32C6
-#  include "soc/rtc_cntl_reg.h"
-#endif
+#include "soc/rtc_cntl_reg.h"
+
+#include "esp_idf_api/uart.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -84,10 +85,8 @@ static inline void pm_set_lowest_normal(void)
 void IRAM_ATTR pm_off(void)
 {
     /* disable remaining power domains */
-#if ESP_PD_DOMAIN_RTC_SLOW_MEM && ESP_PD_DOMAIN_RTC_FAST_MEM
     esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_OFF);
     esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM, ESP_PD_OPTION_OFF);
-#endif
 
     /* enter hibernate mode without any enabled wake-up sources */
     esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
@@ -138,7 +137,6 @@ void pm_set(unsigned mode)
     /* flush stdout */
     fflush(stdout);
 
-#if SOC_PM_SUPPORT_RTC_SLOW_MEM_PD
     /* Labels for RTC slow memory that are defined in the linker script */
     extern int _rtc_bss_rtc_start;
     extern int _rtc_bss_rtc_end;
@@ -153,7 +151,6 @@ void pm_set(unsigned mode)
     if (&_rtc_bss_rtc_end > &_rtc_bss_rtc_start) {
         esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_ON);
     }
-#endif
 
     /* first disable all wake-up sources */
     esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
@@ -164,34 +161,17 @@ void pm_set(unsigned mode)
     /* Prepare GPIOs as wakeup source */
     gpio_pm_sleep_enter(mode);
 
+    extern esp_err_t esp_sleep_enable_uart_wakeup(int uart);
 #if (ESP_PM_WUP_UART0 > 2)
-    _Static_assert(UART_NUMOF > 0, "UART_DEV(0) is not defined");
-#if CPU_FAM_ESP32
-    /* For ESP32, UART RxD has to be configured for direct IO using IOMUX */
-    const uart_periph_sig_t *sig = &uart_periph_signal[UART_DEV(0)].pins[SOC_UART_RX_PIN_IDX];
-    gpio_iomux_out(UART0_RXD, sig->iomux_func, false);
-    gpio_iomux_in(UART0_RXD, sig->signal);
-#endif
-    uart_set_wakeup_threshold(UART_DEV(0), ESP_PM_WUP_UART0);
+    esp_idf_uart_set_wakeup_threshold(UART_DEV(0), ESP_PM_WUP_UART0);
     esp_sleep_enable_uart_wakeup(0);
 #endif
 #if (ESP_PM_WUP_UART1 > 2)
-    _Static_assert(UART_NUMOF > 1, "UART_DEV(1) is not defined");
-#if CPU_FAM_ESP32
-    /* For ESP32, UART RxD has to be configured for direct IO using IOMUX */
-    const uart_periph_sig_t *sig = &uart_periph_signal[UART_DEV(0)].pins[SOC_UART_RX_PIN_IDX];
-    gpio_iomux_out(UART1_RXD, sig->iomux_func, false);
-    gpio_iomux_in(UART1_RXD, sig->signal);
-#endif
-    uart_set_wakeup_threshold(UART_DEV(1), ESP_PM_WUP_UART1);
+    esp_idf_uart_set_wakeup_threshold(UART_DEV(1), ESP_PM_WUP_UART1);
     esp_sleep_enable_uart_wakeup(1);
-#endif
-#if MODULE_STDIO_UART
-    uart_wait_tx_idle_polling(CONFIG_ESP_CONSOLE_UART_NUM);
 #endif
 
     if (mode == ESP_PM_DEEP_SLEEP) {
-        system_wdt_stop();
         esp_deep_sleep_start();
         /* waking up from deep-sleep leads to a DEEPSLEEP_RESET */
         UNREACHABLE();

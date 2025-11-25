@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_tsl4531x
  * @brief       Internal addresses, registers, constants for the TSL4531x sensor.
@@ -23,6 +21,9 @@
  *
  * Derived from the internals.h file for the tsl2561 driver.
  */
+
+#ifndef TSL4531X_INTERNALS_H
+#define TSL4531X_INTERNALS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -100,4 +101,5 @@ extern "C" {
 }
 #endif
 
+#endif /* TSL4531X_INTERNALS_H */
 /** @} */

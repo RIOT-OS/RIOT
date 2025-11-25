@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
 /**
  * @addtogroup  pkg_libschc_config
  *
@@ -33,6 +31,8 @@
  * @author  boortmans <bart.moons@gmail.com>
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef SCHC_CONFIG_H
+#define SCHC_CONFIG_H
 
 #include <stdio.h>
 #include <unistd.h>
@@ -121,6 +121,7 @@ extern "C" {
 }
 #endif
 
+#endif /* SCHC_CONFIG_H */
 /**
  * @internal
  * @}

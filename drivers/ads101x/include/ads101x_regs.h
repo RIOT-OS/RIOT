@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_ads101x
  * @{
@@ -19,6 +17,9 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  */
+
+#ifndef ADS101X_REGS_H
+#define ADS101X_REGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -103,4 +104,5 @@ extern "C" {
 }
 #endif
 
+#endif /* ADS101X_REGS_H */
 /** @} */

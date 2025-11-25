@@ -439,11 +439,10 @@ static void _sdp3x_irq_callback(void *arg)
 #endif
 
 /**
- * @brief   Function to check if the product number set is the one we get from
- *          the sensor
- * @param  readData     data read from the sensor
- * @retval true         values from sensor are correct
- * @retval false        values from sensor are incorrect
+ *      Function to check if the product number set
+ *      is the one we get from the sensor
+ *      @param  data  data read from the sensor
+ *      @return true  if values from sensor were correct
  */
 static bool _check_product_number(uint8_t *readData)
 {

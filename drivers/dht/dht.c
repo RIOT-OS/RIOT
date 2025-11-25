@@ -74,7 +74,7 @@ static void _wait_for_level(gpio_t pin, bool expected, uint32_t start)
     /* Calls to ztimer_now() can be relatively slow on low end platforms.
      * Mixing in a busy down-counting loop solves issues e.g. on AVR boards. */
     uint8_t pre_timeout = 0;
-    while ((gpio_read(pin) != expected) && (++pre_timeout
+    while (((bool)gpio_read(pin) != expected) && (++pre_timeout
         || ztimer_now(ZTIMER_USEC) < start + SPIN_TIMEOUT)) {}
 }
 
@@ -272,12 +272,8 @@ int dht_read(dht_t *dev, int16_t *temp, int16_t *hum)
         return ret;
     }
 
-    if (hum != NULL) {
-        *hum = dev->last_val.humidity;
-    }
-    if (temp != NULL) {
-        *temp = dev->last_val.temperature;
-    }
+    *hum = dev->last_val.humidity;
+    *temp = dev->last_val.temperature;
 
     return 0;
 }

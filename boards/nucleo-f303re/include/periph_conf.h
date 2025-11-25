@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2015 Hamburg University of Applied Sciences
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015  Freie Universität Berlin
+ * Copyright (C) 2015 Hamburg University of Applied Sciences
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_nucleo-f303re
@@ -16,6 +17,9 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Katja Kirstein <katja.kirstein@haw-hamburg.de>
  */
+
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 /* This board provides an LSE */
 #ifndef CONFIG_BOARD_HAS_LSE
@@ -213,4 +217,5 @@ static const i2c_conf_t i2c_config[] = {
 }
 #endif
 
+#endif /* PERIPH_CONF_H */
 /** @} */

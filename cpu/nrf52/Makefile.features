@@ -21,7 +21,6 @@ ifneq (,$(filter nrf52840xxaa,$(CPU_MODEL)))
   FEATURES_PROVIDED += periph_hmac_sha_256
   FEATURES_PROVIDED += periph_cipher_aes_128_cbc
   FEATURES_PROVIDED += periph_cipher_chacha20
-  FEATURES_PROVIDED += periph_aead_aes_128_ccm
   FEATURES_PROVIDED += periph_ecc_p192r1
   FEATURES_PROVIDED += periph_ecc_p256r1
   FEATURES_PROVIDED += periph_ecc_ed25519

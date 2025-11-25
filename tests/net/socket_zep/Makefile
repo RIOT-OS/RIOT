@@ -1,6 +1,6 @@
 include ../Makefile.net_common
 
-BOARD_WHITELIST = native32 native64   # socket_zep is only available on native
+BOARD_WHITELIST = native native64   # socket_zep is only available on native
 
 USEMODULE += od
 USEMODULE += socket_zep

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup net_gnrc_netif
  * @{
@@ -18,6 +16,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef NET_GNRC_NETIF_RAW_H
+#define NET_GNRC_NETIF_RAW_H
 
 #include "net/gnrc/netif.h"
 
@@ -47,4 +47,5 @@ int gnrc_netif_raw_create(gnrc_netif_t *netif, char *stack, int stacksize,
 }
 #endif
 
+#endif /* NET_GNRC_NETIF_RAW_H */
 /** @} */

@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gnrc_sixlowpan_frag   6LoWPAN Fragmentation
  * @ingroup     net_gnrc_sixlowpan
@@ -24,6 +22,8 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author  Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
+#ifndef NET_GNRC_SIXLOWPAN_FRAG_H
+#define NET_GNRC_SIXLOWPAN_FRAG_H
 
 #include <inttypes.h>
 
@@ -71,4 +71,5 @@ void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
 }
 #endif
 
+#endif /* NET_GNRC_SIXLOWPAN_FRAG_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     sys_crypto
  * @{
@@ -21,6 +19,9 @@
  *
  * @author      Mathias Tausig <mathias@tausig.at>
  */
+
+#ifndef CRYPTO_MODES_OCB_H
+#define CRYPTO_MODES_OCB_H
 
 #include "crypto/ciphers.h"
 #include <stdint.h>
@@ -111,4 +112,5 @@ int32_t cipher_decrypt_ocb(const cipher_t *cipher,
 }
 #endif
 
+#endif /* CRYPTO_MODES_OCB_H */
 /** @} */

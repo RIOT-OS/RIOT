@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_jc42
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
+
+#ifndef JC42_INTERNAL_H
+#define JC42_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,4 +48,5 @@ extern "C" {
 }
 #endif
 
+#endif /* JC42_INTERNAL_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_srf08
  *
@@ -17,6 +15,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef SRF08_PARAMS_H
+#define SRF08_PARAMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,4 +59,5 @@ static const srf08_params_t srf08_params[] = {
 }
 #endif
 
+#endif /* SRF08_PARAMS_H */
 /** @} */

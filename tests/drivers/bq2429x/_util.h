@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2020 Locha Inc
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 Locha Inc
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     tests
@@ -12,6 +13,9 @@
  * @author      Jean Pierre Dudey <jeandudey@hotmail.com>
  * @file
  */
+
+#ifndef PRIV_UTIL_H
+#define PRIV_UTIL_H
 
 #include <assert.h>
 #include "bq2429x.h"
@@ -204,3 +208,5 @@ static inline const char *_util_chrg_fault_to_str(bq2429x_chrg_fault_t fault)
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PRIV_UTIL_H */

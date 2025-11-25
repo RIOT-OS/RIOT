@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_color Color
  * @ingroup     sys
@@ -21,6 +19,9 @@
  * @author      Cenk Gündoğan <mail@cgundogan.de>
  * @author      Simon Brummer <brummer.simon@googlemail.com>
  */
+
+#ifndef COLOR_H
+#define COLOR_H
 
 #include <stdint.h>
 
@@ -182,4 +183,5 @@ void color_rgb_complementary(const color_rgb_t *rgb, color_rgb_t *comp_rgb);
 }
 #endif
 
+#endif /* COLOR_H */
 /** @} */

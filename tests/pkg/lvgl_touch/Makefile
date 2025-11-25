@@ -17,10 +17,13 @@ USEMODULE += lvgl_extra_theme_default
 
 USEMODULE += random
 
+# blacklist native64 until https://github.com/RIOT-OS/riotdocker/pull/241 is resolved
+BOARD_BLACKLIST += native64
+
 include $(RIOTBASE)/Makefile.include
 
 # SDL requires more stack
-ifneq (,$(filter native native32 native64,$(BOARD)))
+ifneq (,$(filter native native64,$(BOARD)))
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=64*1024
 else ifneq (,$(filter esp%,$(CPU_FAM)))
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=4*1024

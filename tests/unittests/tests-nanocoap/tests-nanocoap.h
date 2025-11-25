@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,8 @@
  *
  * @author      Ken Bannister <kb2ma@runbox.com>
  */
+#ifndef TESTS_NANOCOAP_H
+#define TESTS_NANOCOAP_H
 
 #include "embUnit.h"
 
@@ -33,4 +33,5 @@ void tests_nanocoap(void);
 }
 #endif
 
+#endif /* TESTS_NANOCOAP_H */
 /** @} */

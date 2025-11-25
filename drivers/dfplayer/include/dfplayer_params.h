@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_dfplayer
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
+
+#ifndef DFPLAYER_PARAMS_H
+#define DFPLAYER_PARAMS_H
 
 #include "board.h"
 #include "dfplayer_types.h"
@@ -71,4 +72,5 @@ static const dfplayer_params_t dfplayer_params[] =
 }
 #endif
 
+#endif /* DFPLAYER_PARAMS_H */
 /** @} */

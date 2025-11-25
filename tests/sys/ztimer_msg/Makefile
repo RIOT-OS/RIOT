@@ -10,6 +10,6 @@ USEMODULE += ztimer_usec
 
 # The test is sensitive to background CPU load. On the CI workers a lot of
 # compilation tasks are run in parallel, making this test randomly fail.
-TEST_ON_CI_BLACKLIST += native32 native64
+TEST_ON_CI_BLACKLIST += native native64
 
 include $(RIOTBASE)/Makefile.include

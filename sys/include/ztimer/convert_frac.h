@@ -7,8 +7,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @defgroup  sys_ztimer_convert_frac ztimer_convert_frac frequency conversion layer
  * @ingroup   sys_ztimer_convert
@@ -27,6 +25,8 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
+#ifndef ZTIMER_CONVERT_FRAC_H
+#define ZTIMER_CONVERT_FRAC_H
 
 #include <stdint.h>
 #include "ztimer.h"
@@ -88,4 +88,5 @@ void ztimer_convert_frac_change_rate(ztimer_convert_frac_t *self,
 }
 #endif
 
+#endif /* ZTIMER_CONVERT_FRAC_H */
 /** @} */

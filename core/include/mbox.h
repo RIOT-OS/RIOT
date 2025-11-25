@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    core_mbox Mailboxes
  * @ingroup     core
@@ -20,6 +18,9 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+
+#ifndef MBOX_H
+#define MBOX_H
 
 #include "list.h"
 #include "cib.h"
@@ -200,3 +201,4 @@ static inline void mbox_unset(mbox_t *mbox)
 #endif
 
 /** @} */
+#endif /* MBOX_H */

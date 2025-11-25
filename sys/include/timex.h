@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_timex Timex
  * @brief       Timestamp representation, computation, and conversion
@@ -18,6 +16,9 @@
  * @file
  * @brief       Utility library for comparing and computing timestamps
  */
+
+#ifndef TIMEX_H
+#define TIMEX_H
 
 #include <stdint.h>
 #include <inttypes.h>
@@ -159,3 +160,4 @@ const char *timex_to_str(timex_t t, char *timestamp);
 #endif
 
 /** @} */
+#endif /* TIMEX_H */

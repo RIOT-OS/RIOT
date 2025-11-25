@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gnrc_sock   GNRC-specific implementation of the sock API
  * @ingroup     net_gnrc
@@ -21,6 +19,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef SOCK_TYPES_H
+#define SOCK_TYPES_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -144,4 +144,5 @@ struct sock_udp {
 }
 #endif
 
+#endif /* SOCK_TYPES_H */
 /** @} */

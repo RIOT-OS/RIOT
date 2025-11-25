@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2015-2020 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015-2020 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_common_slwstk6000b
@@ -16,6 +17,9 @@
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  * @author      Kai Beckmann <kai.beckmann@hs-rm.de>
  */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -121,4 +125,5 @@ extern "C" {
 }
 #endif
 
+#endif /* BOARD_H */
 /** @} */

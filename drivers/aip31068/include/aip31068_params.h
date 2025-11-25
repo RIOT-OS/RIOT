@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_aip31068
  * @brief       Default configuration for the AIP31068 I2C LCD controller
@@ -17,6 +15,8 @@
  * @author      Hendrik van Essen <hendrik.ve@fu-berlin.de>
  * @file
  */
+#ifndef AIP31068_PARAMS_H
+#define AIP31068_PARAMS_H
 
 #include <stdbool.h>
 
@@ -68,4 +68,5 @@ static const aip31068_params_t aip31068_params[] =
 }
 #endif
 
+#endif /* AIP31068_PARAMS_H */
 /** @} */

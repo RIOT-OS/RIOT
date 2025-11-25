@@ -8,8 +8,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup   sys_xtimer
 
@@ -22,6 +20,8 @@
  * @author  Josua Arndt <jarndt@ias.rwth-aachen.de>
  *
  */
+#ifndef XTIMER_IMPLEMENTATION_H
+#define XTIMER_IMPLEMENTATION_H
 
 #ifndef XTIMER_H
 #error "Do not include this file directly! Use xtimer.h instead"
@@ -335,4 +335,5 @@ static inline bool xtimer_is_set(const xtimer_t *timer)
 }
 #endif
 
+#endif /* XTIMER_IMPLEMENTATION_H */
 /** @} */

@@ -12,6 +12,6 @@ USEMODULE += chunked_ringbuffer
 USEMODULE += eui_provider
 USEMODULE += iolist
 USEMODULE += netdev_eth
-USEMODULE += netdev_new_api
+USEMODULE += netdev_legacy_api
 USEMODULE += random
 USEMODULE += ztimer_usec

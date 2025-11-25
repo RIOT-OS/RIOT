@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_mynewt_core
  * @{
@@ -18,6 +16,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+
+#ifndef OS_MYNEWT_H
+#define OS_MYNEWT_H
 
 #include <stdlib.h>
 #include "syscfg/syscfg.h"
@@ -31,3 +32,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* OS_MYNEWT_H */

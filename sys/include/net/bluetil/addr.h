@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    ble_bluetil_addr BLE Address Helper
  * @ingroup     ble_bluetil
@@ -19,6 +17,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef NET_BLUETIL_ADDR_H
+#define NET_BLUETIL_ADDR_H
 
 #include <stdint.h>
 
@@ -111,4 +112,5 @@ void bluetil_addr_ipv6_l2ll_print(const uint8_t *addr);
 }
 #endif
 
+#endif /* NET_BLUETIL_ADDR_H */
 /** @} */

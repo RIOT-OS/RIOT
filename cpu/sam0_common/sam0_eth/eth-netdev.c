@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2020 Mesotic SAS
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2020 Mesotic SAS
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
 
 /**
@@ -25,7 +28,6 @@
 #include "net/eui_provider.h"
 
 #include "periph/gpio.h"
-#include "xtimer.h"
 #include "ztimer.h"
 
 #include "sam0_eth_netdev.h"
@@ -151,10 +153,6 @@ static inline void _setup_phy_irq(gpio_cb_t cb, void *arg)
 
 static int _sam0_eth_init(netdev_t *netdev)
 {
-    /* HACK: without the delay we see random hard faults or no sent/received
-       frames after boot. */
-    xtimer_msleep(10);
-
     sam0_eth_init();
     eui48_t hwaddr;
     netdev_eui48_get(netdev, &hwaddr);
@@ -199,8 +197,15 @@ static int _sam0_eth_recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 static int _sam0_eth_send(netdev_t *netdev, const iolist_t *iolist)
 {
+    int ret;
+
     netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
-    return sam0_eth_send(iolist);
+    ret = sam0_eth_send(iolist);
+    if (ret == -EOVERFLOW) {
+        /* TODO: use a specific netdev callback here ? */
+        return -EOVERFLOW;
+    }
+    return ret;
 }
 
 static int _sam0_eth_confirm_send(netdev_t *netdev, void *info)
@@ -216,13 +221,13 @@ static int _sam0_eth_confirm_send(netdev_t *netdev, void *info)
         return -EAGAIN;
     }
 
-    /* Retry Limit Exceeded, Collision Occurred */
-    if (tsr & (GMAC_TSR_RLE | GMAC_TSR_COL)) {
+    /* Retry Limit Exceeded */
+    if (tsr & GMAC_TSR_RLE) {
         return -EBUSY;
     }
 
-    /* Transmit Frame Corruption */
-    if (tsr & GMAC_TSR_TFC) {
+    /* Transmit Frame Corruption, Collision Occurred */
+    if (tsr & (GMAC_TSR_TFC | GMAC_TSR_COL)) {
         return -EIO;
     }
 

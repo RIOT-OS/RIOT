@@ -5,7 +5,7 @@ RIOTBASE ?= $(CURDIR)/../..
 export TAP ?= tap0
 
 # use Ethernet as link-layer protocol
-ifneq (,$(filter native native32 native64,$(BOARD)))
+ifneq (,$(filter native native64,$(BOARD)))
   PORT ?= $(TAP)
 else
   ETHOS_BAUDRATE ?= 115200

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  net_gnrc_netif
  * @internal
@@ -20,6 +18,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef NET_GNRC_NETIF_INTERNAL_H
+#define NET_GNRC_NETIF_INTERNAL_H
 
 #include "modules.h"
 
@@ -695,10 +695,10 @@ static inline int gnrc_netif_ndp_addr_len_from_l2ao(gnrc_netif_t *netif,
  * @pre There is enough allocated space in @p l2_group for an address for a
  *      device of type @p dev_type (e.g. 6 bytes for an ethernet address).
  *
- * @param[in]   netif       The network interface @p l2_addr should be generated
+ * @param[in] dev_type      The network interface @p l2_addr should be generated
  *                          for.
- * @param[in]   ipv6_group  An IPv6 multicast address.
- * @param[out]  l2_group    A link layer multicast address
+ * @param[in] ipv6_group    An IPv6 multicast address.
+ * @param[out] l2_group     A link layer multicast address
  *
  * @return  Length of @p l2_group in bytes
  * @return  `-ENOTSUP` if link layer does not support multicast.
@@ -747,5 +747,6 @@ int gnrc_netif_ipv6_add_prefix(gnrc_netif_t *netif,
 }
 #endif
 
+#endif /* NET_GNRC_NETIF_INTERNAL_H */
 /** @internal
  *@} */

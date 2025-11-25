@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup net_gnrc_rpl
  * @{
@@ -21,6 +19,9 @@
  * @author      Eric Engel <eric.engel@fu-berlin.de>
  * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
  */
+
+#ifndef NET_GNRC_RPL_DODAG_H
+#define NET_GNRC_RPL_DODAG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,18 +78,14 @@ bool gnrc_rpl_instance_add(uint8_t instance_id, gnrc_rpl_instance_t **inst);
 bool gnrc_rpl_instance_remove_by_id(uint8_t instance_id);
 
 /**
- * @brief   Remove a RPL DODAG with the pointer @p dodag from its instance.
- *
- * @param[in] dodag     Pointer to the RPL DODAG to remove.
- */
-void gnrc_rpl_dodag_remove(gnrc_rpl_dodag_t *dodag);
-
-/**
  * @brief   Remove a RPL instance with the pointer @p inst.
  *
- * @param[in] inst     Pointer to the RPL instance to remove.
+ * @param[in] inst     Pointer to the the RPL instance to remove.
+ *
+ * @return  true, on success.
+ * @return  false, otherwise.
  */
-void gnrc_rpl_instance_remove(gnrc_rpl_instance_t *inst);
+bool gnrc_rpl_instance_remove(gnrc_rpl_instance_t *inst);
 
 /**
  * @brief   Get the RPL instance with the id @p instance_id.
@@ -183,6 +180,7 @@ void gnrc_rpl_router_operation(gnrc_rpl_dodag_t *dodag);
 }
 #endif
 
+#endif /* NET_GNRC_RPL_DODAG_H */
 /**
  * @}
  */

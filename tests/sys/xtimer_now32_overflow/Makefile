@@ -7,9 +7,8 @@ DISABLE_MODULE += auto_init_xtimer
 
 # Boards that can't run only on xtimer or that always select ztimer
 BOARD_BLACKLIST += \
-                   adafruit-feather-nrf52840-express \
-                   bitcraze-crazyflie21-main \
                    esp32s2-wemos-mini \
+                   feather-nrf52840 \
                    hamilton \
                    mulle \
                    pinetime \
@@ -20,6 +19,7 @@ BOARD_BLACKLIST += \
                    stm32f429i-disco \
                    stm32f4discovery \
                    thingy52 \
+                   waspmote-pro  \
                    weact-f401cc \
                    weact-f401ce \
                    weact-f411ce \

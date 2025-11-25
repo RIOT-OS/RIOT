@@ -583,7 +583,7 @@ void gnrc_sixlowpan_frag_rb_gc(void)
     unsigned int i;
 
     for (i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
-        /* since pkt occupies pktbuf, aggressively collect garbage */
+        /* since pkt occupies pktbuf, aggressivly collect garbage */
         if (!gnrc_sixlowpan_frag_rb_entry_empty(&rbuf[i]) &&
               ((now_usec - rbuf[i].super.arrival) >
                CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {

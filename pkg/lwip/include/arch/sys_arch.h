@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    pkg_lwip_sys    Porting layer
  * @ingroup     pkg_lwip
@@ -20,6 +18,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef ARCH_SYS_ARCH_H
+#define ARCH_SYS_ARCH_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -140,4 +140,5 @@ void sys_unlock_tcpip_core(void);
 }
 #endif
 
+#endif /* ARCH_SYS_ARCH_H */
 /** @} */

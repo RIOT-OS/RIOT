@@ -6,8 +6,6 @@
  * more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_ethertype Ether types
  * @ingroup     net
@@ -23,6 +21,9 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+
+#ifndef NET_ETHERTYPE_H
+#define NET_ETHERTYPE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,6 +60,7 @@ extern "C" {
 }
 #endif
 
+#endif /* NET_ETHERTYPE_H */
 /**
  * @}
  */

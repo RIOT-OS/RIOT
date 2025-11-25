@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2019 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -22,15 +25,25 @@
 
 #include "bootloader_random.h"
 #include "esp_random.h"
+#include "soc/wdev_reg.h"
+
+#define RNG_DATA_REG (*(volatile uint32_t *)RNG_DATA_REG_ADDR)
 
 void hwrng_init(void)
 {
-    /* If the ADC SAR is used, the Bootloader RNG must not be enabled before
-     * the random numbers are actually required. The reason is that the
-     * Bootloader RNG uses the noise of the ADC SAR reference voltage as
-     * a non-RF entropy source. The calibration of the ADC SAR does not
-     * work correctly in this case. Therefore, the Bootloader RNG is only
-     * enabled if random numbers are really required. */
+    if (!IS_USED(MODULE_WIFI_ANY)) {
+        /*
+         * The hardware RNG generates random numbers uses the noise in the
+         * RF system of the WiFi or the BT interface as entropy source.
+         * If both are disabled, the random number generator just returns
+         * pseudo-random numbers.
+         * However, the bootloader use an internal non-RF entropy source,
+         * the internal reference voltage noise. This can be re-enabled
+         * after startup as entropy source for applications that don't
+         * use the WiFi or the BT interface.
+         */
+        bootloader_random_enable();
+    }
 }
 
 /**
@@ -43,22 +56,10 @@ void hwrng_init(void)
  */
 void hwrng_read(void *buf, unsigned int num)
 {
-    if (!IS_USED(MODULE_ESP_WIFI_ANY) && !IS_USED(MODULE_ESP_BLE)) {
-        /* enable the Bootloader RNG if WiFi and BT are not used */
-        bootloader_random_enable();
-    }
-
     esp_fill_random(buf, num);
-
-    if (!IS_USED(MODULE_ESP_WIFI_ANY) && !IS_USED(MODULE_ESP_BLE)) {
-        /* disable the Bootloader RNG to ensure that ADC SAR calibration works */
-        bootloader_random_disable();
-    }
 }
 
 uint32_t hwrand(void)
 {
-    uint32_t rand;
-    hwrng_read(&rand, 4);
-    return rand;
+    return esp_random();
 }

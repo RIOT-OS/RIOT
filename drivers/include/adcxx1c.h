@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup   drivers_adcxx1c ADCXX1C ADC device driver
  * @ingroup    drivers_sensors
@@ -24,6 +22,9 @@
  *
  * @author     Vincent Dupont <vincent@otakeys.com>
  */
+
+#ifndef ADCXX1C_H
+#define ADCXX1C_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -180,4 +181,5 @@ int adcxx1c_get_and_clear_alert(const adcxx1c_t *dev);
 }
 #endif
 
+#endif /* ADCXX1C_H */
 /** @} */

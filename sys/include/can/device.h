@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @ingroup    sys_can_dll
  * @{
@@ -18,6 +16,9 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Toon Stegen <toon.stegen@altran.com>
  */
+
+#ifndef CAN_DEVICE_H
+#define CAN_DEVICE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,9 +57,6 @@ typedef struct candev_params {
 #if defined(MODULE_CAN_TRX) || defined(DOXYGEN)
     can_trx_t *trx;                  /**< transceiver to set */
 #endif
-#if defined(MODULE_FDCAN)
-    uint16_t loop_delay;             /**< CAN FD transceiver loop delay */
-#endif
 #if defined(MODULE_CAN_PM) || defined(DOXYGEN)
     uint32_t rx_inactivity_timeout;  /**< power management rx timeout value */
     uint32_t tx_wakeup_timeout;      /**< power management tx wake up value */
@@ -75,9 +73,6 @@ typedef struct candev_dev {
     const char *name; /**< device name */
 #if defined(MODULE_CAN_TRX) || defined(DOXYGEN)
     can_trx_t *trx;   /**< transceiver attached to the device */
-#endif
-#if defined(MODULE_FDCAN)
-    uint16_t loop_delay;    /**< CAN FD transceiver loop delay */
 #endif
 #if defined(MODULE_CAN_PM) || defined(DOXYGEN)
     uint32_t rx_inactivity_timeout; /**< Min timeout loaded when a frame is received */
@@ -120,5 +115,7 @@ int can_device_calc_bittiming(uint32_t clock, const struct can_bittiming_const *
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* CAN_DEVICE_H */
 
 /** @} */

@@ -22,12 +22,18 @@
 
 #include "congure_impl.h"
 
+static int _json_statham(int argc, char **argv);
+
 static congure_test_snd_t _congure_state;
+static const shell_command_t shell_commands[] = {
+    { "state", "Prints current CongURE state object as JSON", _json_statham },
+    { NULL, NULL, NULL }
+};
 
 int main(void)
 {
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }
 
@@ -325,7 +331,5 @@ static int _json_statham(int argc, char **argv)
     print_str("}\n");
     return 0;
 }
-
-SHELL_COMMAND(state, "Prints current CongURE state object as JSON", _json_statham);
 
 /** @} */

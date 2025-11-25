@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2023 Otto-von-Guericke-Universität Magdeburg
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2023 Otto-von-Guericke-Universität Magdeburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_common_stm32
@@ -15,6 +16,9 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
+
+#ifndef CFG_TIMER_TIM2_TIM15_TIM16_H
+#define CFG_TIMER_TIM2_TIM15_TIM16_H
 
 #include "periph_cpu.h"
 
@@ -69,4 +73,5 @@ static const timer_conf_t timer_config[] = {
 }
 #endif
 
+#endif /* CFG_TIMER_TIM2_TIM15_TIM16_H */
 /** @} */

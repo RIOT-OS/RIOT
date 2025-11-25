@@ -265,7 +265,7 @@ static int _init(netdev_t *netdev)
 /**
  * @brief   NRF24L01+ @ref netdev_driver_t::recv routine
  *
- * @pre @ref nrf24l01p_ng_acquire must have been called before.
+ * @pre @see nrf24l01p_ng_acquire must have been called before.
  * @pre Interrupts should be disabled
  *
  * The SPI bus is not acquired in this function because it is called from
@@ -273,10 +273,10 @@ static int _init(netdev_t *netdev)
  * device acquired the SPI bus within the ISR, the ISR would block
  * until that device releases the bus.
  *
- * @param[in]   netdev      Abstract network device handle
- * @param[out]  buf         Rx buffer
- * @param[in]   len         Size of Rx buffer
- * @param[out]  info        LQI and RSSI information (unused)
+ * @param[in] netdev        Abstract network device handle
+ * @param[out] buf          Rx buffer
+ * @param[in] len           Size of Rx buffer
+ * @param[out]              LQI and RSSI information (unused)
  *
  * @return                  Size of received frame in @p buf
  * @return                  Upper estimation of the frame width,

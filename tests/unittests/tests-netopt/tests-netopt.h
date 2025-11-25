@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,8 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+#ifndef TESTS_NETOPT_H
+#define TESTS_NETOPT_H
 
 #include "embUnit.h"
 
@@ -33,4 +33,5 @@ void tests_netopt(void);
 }
 #endif
 
+#endif /* TESTS_NETOPT_H */
 /** @} */

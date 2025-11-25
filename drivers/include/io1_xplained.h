@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_io1_xplained Atmel IO1 Xplained Extension board
  * @ingroup     drivers_sensors
@@ -38,6 +36,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef IO1_XPLAINED_H
+#define IO1_XPLAINED_H
 
 #include "saul.h"
 #include "at30tse75x.h"
@@ -107,4 +108,5 @@ int io1_xplained_read_light_level(uint16_t *light);
 }
 #endif
 
+#endif /* IO1_XPLAINED_H */
 /** @} */

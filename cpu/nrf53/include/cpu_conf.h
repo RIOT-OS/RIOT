@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2023 Mesotic SAS
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2023 Mesotic SAS
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @defgroup        cpu_nrf53 Nordic nRF53 MCU
@@ -17,6 +18,9 @@
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  *
  */
+
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
 #ifdef CPU_MODEL_NRF5340_APP
 #include "vendor/nrf5340_application.h"
@@ -67,4 +71,5 @@ extern "C" {
 }
 #endif
 
+#endif /* CPU_CONF_H */
 /** @} */

@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_ztimer_periph_timer  ztimer periph/timer backend
  * @ingroup     sys_ztimer
@@ -25,6 +23,9 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+
+#ifndef ZTIMER_PERIPH_TIMER_H
+#define ZTIMER_PERIPH_TIMER_H
 
 #include "ztimer.h"
 #include "periph/timer.h"
@@ -51,14 +52,13 @@ typedef struct {
  * @param[in]   dev     periph timer to use
  * @param[in]   freq    frequency to configure
  * @param[in]   max_val maximum value this timer supports
- *
- * @return  The actual frequency the timer has been configured to
  */
-uint32_t ztimer_periph_timer_init(ztimer_periph_timer_t *clock, tim_t dev,
-                                  uint32_t freq, uint32_t max_val);
+void ztimer_periph_timer_init(ztimer_periph_timer_t *clock, tim_t dev,
+                              uint32_t freq, uint32_t max_val);
 
 #ifdef __cplusplus
 }
 #endif
 
+#endif /* ZTIMER_PERIPH_TIMER_H */
 /** @} */

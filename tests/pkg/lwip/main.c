@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -19,7 +22,7 @@
 #include <errno.h>
 #include <stdio.h>
 
-#include "cli.h"
+#include "common.h"
 #include "lwip.h"
 #include "lwip/netif.h"
 #if LWIP_IPV4

@@ -4,9 +4,6 @@ This is a test application for the HD44780 LCD driver. This display comes with
 many Arduino starter kits under the name of LCM1602C, and typically has 16x2
 columns and rows.
 
-This examples covers the parallel mode of the HD44780 driver. For the I2C mode,
-please refer to `tests/drivers/hd44780_i2c`.
-
 # Details
 
 This test application will initialize the HD44780 driver with the configuration

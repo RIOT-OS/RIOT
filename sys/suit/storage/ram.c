@@ -231,4 +231,4 @@ suit_storage_ram_t suit_storage_ram = {
     },
 };
 
-XFA(suit_storage_t *, suit_storage_reg, 0) suit_storage_ram_ptr = &suit_storage_ram.storage;
+XFA(suit_storage_reg, 0) suit_storage_t* suit_storage_ram_ptr = &suit_storage_ram.storage;

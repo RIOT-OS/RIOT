@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_mcp2515
  * @{
@@ -18,6 +16,9 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Wouter Symons <wosym@airsantelmo.com>
  */
+
+#ifndef MCP2515_PARAMS_H
+#define MCP2515_PARAMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -93,4 +94,5 @@ static const candev_params_t candev_mcp2515_params[] = {
 }
 #endif
 
+#endif /* MCP2515_PARAMS_H */
 /** @} */

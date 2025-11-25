@@ -34,6 +34,7 @@ BOARD_WHITELIST := \
   stm32f4discovery \
   udoo \
   yunjia-nrf51822 \
+  nrf6310 \
   #
 
 include $(RIOTBASE)/Makefile.include

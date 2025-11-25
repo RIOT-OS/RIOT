@@ -1,4 +1,0 @@
-USEPKG += driver_sen5x
-
-FEATURES_REQUIRED += periph_i2c
-USEMODULE += ztimer

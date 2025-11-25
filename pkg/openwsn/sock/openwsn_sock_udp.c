@@ -349,9 +349,6 @@ void sock_udp_close(sock_udp_t *sock)
         LL_DELETE(_udp_socket_list, sock);
         mutex_unlock(&_sock_list_lock);
         sock->next = NULL;
-#ifdef SOCK_HAS_ASYNC_CTX
-        sock_event_close(sock_udp_get_async_ctx(udp));
-#endif
     }
 }
 

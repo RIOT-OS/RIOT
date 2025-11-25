@@ -1,9 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2019 HAW Hamburg
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 HAW Hamburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
+#ifndef APP_H
+#define APP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,3 +22,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* APP_H */

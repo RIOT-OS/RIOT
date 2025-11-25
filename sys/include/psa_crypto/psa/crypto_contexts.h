@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     sys_psa_crypto
  * @{
@@ -19,11 +17,15 @@
  *
  */
 
+#ifndef PSA_CRYPTO_PSA_CRYPTO_CONTEXTS_H
+#define PSA_CRYPTO_PSA_CRYPTO_CONTEXTS_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "kernel_defines.h"
+
 #include "psa/crypto_includes.h"
 
 
@@ -106,4 +108,5 @@ typedef struct {
 }
 #endif
 
+#endif /* PSA_CRYPTO_PSA_CRYPTO_CONTEXTS_H */
 /** @} */

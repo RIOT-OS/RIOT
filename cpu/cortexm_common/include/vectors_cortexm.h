@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_cortexm_common
@@ -14,6 +15,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef VECTORS_CORTEXM_H
+#define VECTORS_CORTEXM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -137,4 +141,5 @@ void dummy_handler_default(void);
 }
 #endif
 
+#endif /* VECTORS_CORTEXM_H */
 /** @} */

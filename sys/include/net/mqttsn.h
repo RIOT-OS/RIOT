@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_mqttsn MQTT-SN Defines
  * @ingroup     net
@@ -21,6 +19,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef NET_MQTTSN_H
+#define NET_MQTTSN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -109,4 +110,5 @@ enum {
 }
 #endif
 
+#endif /* NET_MQTTSN_H */
 /** @} */

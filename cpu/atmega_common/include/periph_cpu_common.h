@@ -1,12 +1,13 @@
 /*
- * SPDX-FileCopyrightText: 2015 HAW Hamburg
- * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2016 INRIA
- * SPDX-FileCopyrightText: 2023 Hugues Larrive
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 HAW Hamburg
+ *               2016 Freie Universität Berlin
+ *               2016 INRIA
+ *               2023 Hugues Larrive
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup         cpu_atmega_common
@@ -20,6 +21,9 @@
  * @author          Francisco Acosta <francisco.acosta@inria.fr>
  * @author          Hugues Larrive <hugues.larrive@pm.me>
  */
+
+#ifndef PERIPH_CPU_COMMON_H
+#define PERIPH_CPU_COMMON_H
 
 #include "cpu.h"
 
@@ -69,16 +73,16 @@ typedef uint8_t gpio_t;
 #ifdef GPIO_PORT_DESCENDENT
 #ifdef      _AVR_ATTINY1634_H_INCLUDED
 /*          the only one that requires particular treatment! */
-#define     ATMEGA_GPIO_BASE_A  0x2F
+#define     ATMEGA_GPIO_BASE_A  (0x2F)
 #else
 /*          all other port descendent, including :
              - _AVR_IO8534_ (only have port A but with 0x1B address) ;
              - _AVR_IOAT94K_H_ (only have ports D and E) ;
              - _AVR_IOTN28_H_ (only have ports A and D). */
-#define     ATMEGA_GPIO_BASE_A  0x39
+#define     ATMEGA_GPIO_BASE_A  (0x39)
 #endif /*   _AVR_ATTINY1634_H_INCLUDED */
 #else /* !GPIO_PORT_DESCENDENT */
-#define     ATMEGA_GPIO_BASE_A  0x20
+#define     ATMEGA_GPIO_BASE_A  (0x20)
 #endif /* GPIO_PORT_DESCENDENT */
 /**
  * @brief   Base of the GPIO port G register as memory address
@@ -380,4 +384,5 @@ typedef struct {
 }
 #endif
 
+#endif /* PERIPH_CPU_COMMON_H */
 /** @} */

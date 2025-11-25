@@ -6,8 +6,6 @@
  * more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_ethernet Ethernet
  * @ingroup     net
@@ -19,6 +17,9 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+
+#ifndef NET_ETHERNET_H
+#define NET_ETHERNET_H
 
 #include <stdint.h>
 
@@ -49,6 +50,7 @@ extern "C" {
 }
 #endif
 
+#endif /* NET_ETHERNET_H */
 /**
  * @}
  */

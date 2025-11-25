@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    pkg_nimble_autoconn Autoconn
  * @ingroup     pkg_nimble
@@ -107,6 +105,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef NIMBLE_AUTOCONN_H
+#define NIMBLE_AUTOCONN_H
 
 #include <stdint.h>
 
@@ -216,4 +217,5 @@ void nimble_autoconn_disable(void);
 }
 #endif
 
+#endif /* NIMBLE_AUTOCONN_H */
 /** @} */

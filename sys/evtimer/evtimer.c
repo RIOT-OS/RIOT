@@ -171,7 +171,7 @@ static void _evtimer_handler(void *arg)
 
     evtimer_t *evtimer = (evtimer_t *)arg;
 
-    /* this function gets called directly by ztimer if the set ztimer expired.
+    /* this function gets called directly by xtimer if the set xtimer expired.
      * Thus the offset of the first event is down to zero. */
     evtimer_event_t *event = evtimer->events;
     event->offset = 0;

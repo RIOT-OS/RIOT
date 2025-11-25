@@ -1,0 +1,27 @@
+From ff70fdaa8c4c11e060772c47195c271188b7bf01 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Fri, 27 May 2022 15:29:14 +0200
+Subject: [PATCH 22/23] driver/gpio: fix undefined reference to
+ rtc_gpio_force_hold_all
+
+Fix the undefined reference to `rtc_gpio_force_hold_en_all` in `components/driver/gpio.c`
+---
+ components/driver/gpio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/components/driver/gpio.c b/components/driver/gpio.c
+index db27ab45ab..0c696f0d9f 100644
+--- a/components/driver/gpio.c
++++ b/components/driver/gpio.c
+@@ -682,7 +682,7 @@ void gpio_deep_sleep_hold_dis(void)
+ esp_err_t gpio_force_hold_all()
+ {
+ #if SOC_RTCIO_HOLD_SUPPORTED
+-    rtc_gpio_force_hold_all();
++    rtc_gpio_force_hold_en_all();
+ #endif
+     portENTER_CRITICAL(&gpio_context.gpio_spinlock);
+     gpio_hal_force_hold_all(gpio_context.gpio_hal);
+-- 
+2.17.1
+

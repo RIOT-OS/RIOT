@@ -21,10 +21,6 @@ ifneq (,$(filter psa_cryptocell_310_aes_cbc,$(USEMODULE)))
   USEMODULE += psa_cryptocell_310_aes_common
 endif
 
-ifneq (,$(filter psa_cryptocell_310_aes_ccm,$(USEMODULE)))
-  USEMODULE += psa_cryptocell_310_aes_common
-endif
-
 ifneq (,$(filter psa_cryptocell_310_ecc_p192,$(USEMODULE)))
   USEMODULE += psa_cryptocell_310_ecc_common
 endif

@@ -20,21 +20,6 @@
 
 #include "test_utils/interactive_sync.h"
 
-/* this command is used by the test automation to check whether commands are
- * executed or not (due to the shell being locked). */
-static int _cmd_ping(int argc, char **argv)
-{
-    if (argc != 1) {
-        printf("Usage: %s\n", argv[0]);
-        return 1;
-    }
-
-    puts("PONG!");
-    return 0;
-}
-
-SHELL_COMMAND(ping, "Echo \"PONG!\"", _cmd_ping);
-
 int main(void)
 {
     test_utils_interactive_sync();

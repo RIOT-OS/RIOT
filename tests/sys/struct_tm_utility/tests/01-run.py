@@ -12,6 +12,20 @@ import datetime
 from testrunner import run
 
 
+def _check_help(child):
+    child.sendline('help')
+    child.expect_exact('Command              Description')
+    child.expect_exact('---------------------------------------')
+    child.expect_exact('days_in              '
+                       'Tells you the number of days in a month.')
+    child.expect_exact('leap_year            '
+                       'Tells you if a supplied year is a leap year.')
+    child.expect_exact('doomsday             '
+                       'Tells you the wday Doomsday of the supplied year.')
+    child.expect_exact('day                  '
+                       'Tells you the day of the supplied date.')
+
+
 def _check_days_in(child):
     # verify usage
     child.sendline('days_in')
@@ -98,6 +112,7 @@ def _wait_prompt(child):
 
 def testfunc(child):
     _wait_prompt(child)
+    _check_help(child)
     _check_days_in(child)
     _check_leap_year(child)
     _check_doomsday(child)

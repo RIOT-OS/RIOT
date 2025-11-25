@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2018 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -19,7 +22,7 @@
  *
  * The application can use different approaches to get new data:
  *
- * - using the #hmc5883l_read function at a lower rate than the DOR
+ * - using the #hmc5883l_read function at a lower rate than the the DOR
  * - using the data-ready interrupt (**DRDY**), see #hmc5883l_init_int.
  *
  * To use the data-ready interrupt (**DRDY), the application has to enable

@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @ingroup     sys_ztimer
  * @{
@@ -18,6 +16,9 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+
+#ifndef ZTIMER_CONFIG_H
+#define ZTIMER_CONFIG_H
 
 #include "board.h"
 #include "periph_conf.h"
@@ -175,8 +176,7 @@ extern "C" {
 
 /**
  * @brief   An offset for ZTIMER_USEC allowing to compentsate for the offset
- *          of @ref ztimer_sleep(). It can be measured with @ref
- *          ztimer_overhead_sleep()
+ *          of @ref ztimer_sleep().
  *
  * @note    As internally @ref ztimer_sleep() uses @ref ztimer_set()
  *          @ref CONFIG_ZTIMER_USEC_ADJUST_SET should be tuned before.
@@ -202,4 +202,5 @@ extern "C" {
 }
 #endif
 
+#endif /* ZTIMER_CONFIG_H */
 /** @} */

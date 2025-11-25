@@ -13,7 +13,7 @@ config EMCUTE_DEFAULT_PORT
     help
         Default UDP port to listen on (also used as SRC port). This will write
         to macro 'CONFIG_EMCUTE_DEFAULT_PORT'. Usage can be found in
-        examples/networking/mqtt/emcute_mqttsn.
+        examples/emcute_mqttsn.
 
 config EMCUTE_BUFSIZE
     int "Buffer size used for TX and RX buffers"

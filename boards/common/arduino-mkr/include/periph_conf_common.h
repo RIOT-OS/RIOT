@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2016-2017 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C)  2016 Freie Universität Berlin
+ *                2016-2017 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_common_arduino-mkr
@@ -20,6 +21,9 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Bumsik kim <kbumsik@gmail.com>
  */
+
+#ifndef PERIPH_CONF_COMMON_H
+#define PERIPH_CONF_COMMON_H
 
 #include "periph_cpu.h"
 
@@ -212,4 +216,5 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
 }
 #endif
 
+#endif /* PERIPH_CONF_COMMON_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_cord_ep CoRE RD Endpoint
  * @ingroup     net_cord
@@ -16,7 +14,7 @@
  * This module implements a CoRE Resource Directory endpoint library, that
  * allows RIOT nodes to register themselves with resource directories.
  * It implements the standard endpoint functionality as defined in
- * RFC 9176.
+ * draft-ietf-core-resource-directory-27.
  * @see https://datatracker.ietf.org/doc/html/rfc9176
  *
  * # Design Decisions
@@ -32,6 +30,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef NET_CORD_EP_H
+#define NET_CORD_EP_H
 
 #include "net/sock/udp.h"
 
@@ -114,4 +115,5 @@ void cord_ep_dump_status(void);
 }
 #endif
 
+#endif /* NET_CORD_EP_H */
 /** @} */

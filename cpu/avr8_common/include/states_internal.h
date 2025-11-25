@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2023 Gerson Fernando Budke
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2023 Gerson Fernando Budke
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_avr8_common
@@ -15,6 +16,9 @@
  * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  */
+
+#ifndef STATES_INTERNAL_H
+#define STATES_INTERNAL_H
 
 #include <avr/io.h>
 
@@ -105,4 +109,5 @@ extern uint8_t avr8_state_irq_count_sram;               /**< IRQ state variable.
 }
 #endif
 
+#endif /* STATES_INTERNAL_H */
 /** @} */

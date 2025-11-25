@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2017 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_b-l072z-lrwan1
@@ -14,6 +15,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <stdint.h>
 
@@ -51,19 +55,15 @@ extern "C" {
  * @{
  */
 #define LED0_PIN_NUM        5
-#define LED0_PORT           GPIO_PORT_A /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_A
 
 #define LED1_PIN_NUM        5
-#define LED1_PORT           GPIO_PORT_B /**< GPIO port of LED 1 */
 #define LED1_PORT_NUM       PORT_B
 
 #define LED2_PIN_NUM        6
-#define LED2_PORT           GPIO_PORT_B /**< GPIO port of LED 2 */
 #define LED2_PORT_NUM       PORT_B
 
 #define LED3_PIN_NUM        7
-#define LED3_PORT           GPIO_PORT_B /**< GPIO port of LED 3 */
 #define LED3_PORT_NUM       PORT_B
 /** @} */
 
@@ -81,4 +81,5 @@ extern "C" {
 
 #include "stm32_leds.h"
 
+#endif /* BOARD_H */
 /** @} */

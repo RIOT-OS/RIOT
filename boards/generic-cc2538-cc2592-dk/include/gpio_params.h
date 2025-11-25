@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2024 Marian Buschsieweke
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2024 Marian Buschsieweke
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_generic_cc2538_cc2592_dk
@@ -14,6 +15,9 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  */
+#ifndef GPIO_PARAMS_H
+#define GPIO_PARAMS_H
+
 #include "board.h"
 #include "saul/periph.h"
 
@@ -83,4 +87,5 @@ static const saul_gpio_params_t saul_gpio_params[] =
 }
 #endif
 
+#endif /* GPIO_PARAMS_H */
 /** @} */

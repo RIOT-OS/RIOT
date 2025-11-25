@@ -18,7 +18,6 @@
  * @}
  */
 
-#include "kernel_defines.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "bmx055.h"

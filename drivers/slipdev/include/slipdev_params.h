@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup drivers_slipdev
  * @{
@@ -17,6 +15,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef SLIPDEV_PARAMS_H
+#define SLIPDEV_PARAMS_H
 
 #include "board.h"
 #include "slipdev.h"
@@ -71,4 +71,5 @@ static const slipdev_params_t slipdev_params[] = {
 }
 #endif
 
+#endif /* SLIPDEV_PARAMS_H */
 /** @} */

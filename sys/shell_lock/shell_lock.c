@@ -52,6 +52,9 @@ static bool _shell_is_locked = true;
 static ztimer_t _shell_auto_lock_ztimer;
 #endif
 
+/* defined in shell.c */
+extern int readline(char *buf, size_t size);
+
 static int _lock_handler(int argc, char **argv)
 {
     (void) argc;
@@ -105,7 +108,7 @@ static bool _login(char *line_buf, size_t buf_size)
 
     while (1) {
         memset(line_buf, 0, buf_size);
-        while (shell_readline(line_buf, buf_size) > 0) {
+        while (readline(line_buf, buf_size) > 0) {
             return _safe_strcmp(line_buf, CONFIG_SHELL_LOCK_PASSWORD);
         }
     }

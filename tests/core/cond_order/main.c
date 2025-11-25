@@ -1,7 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2018 University of California, Berkeley
- * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 University of California, Berkeley
+ * Copyright (C) 2016 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -59,10 +62,6 @@ int main(void)
 
     mutex_init(&testlock);
     cond_init(&testcond);
-
-    /* Test if condition signal and broadcast works when no thread is waiting */
-    cond_signal(&testcond);
-    cond_broadcast(&testcond);
 
     /* create threads */
     for (unsigned i = 0; i < THREAD_NUMOF; i++) {

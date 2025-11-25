@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FONT_TERMINAL_H
+#define FONT_TERMINAL_H
 
 #ifdef __cplusplus
 extern "C"
@@ -281,3 +282,5 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* FONT_TERMINAL_H */

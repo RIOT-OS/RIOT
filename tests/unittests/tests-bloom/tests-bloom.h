@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,8 @@
  *
  * @author      Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
  */
+#ifndef TESTS_BLOOM_H
+#define TESTS_BLOOM_H
 
 #include "embUnit.h"
 
@@ -40,4 +40,5 @@ Test *tests_bloom_tests(void);
 }
 #endif
 
+#endif /* TESTS_BLOOM_H */
 /** @} */

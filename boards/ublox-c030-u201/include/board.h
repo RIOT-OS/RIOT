@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2018 OTA keys S.A.
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 OTA keys S.A.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @defgroup    boards_ublox-c030-u201 Ublox C030-U201
@@ -16,6 +17,9 @@
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <stdint.h>
 
@@ -30,15 +34,12 @@ extern "C" {
  * @{
  */
 #define LED0_PIN_NUM        3
-#define LED0_PORT           GPIO_PORT_E /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_E
 
 #define LED1_PIN_NUM        4
-#define LED1_PORT           GPIO_PORT_E /**< GPIO port of LED 1 */
 #define LED1_PORT_NUM       PORT_E
 
 #define LED2_PIN_NUM        1
-#define LED2_PORT           GPIO_PORT_E /**< GPIO port of LED 2 */
 #define LED2_PORT_NUM       PORT_E
 /** @} */
 
@@ -88,4 +89,5 @@ extern "C" {
 
 #include "stm32_leds.h"
 
+#endif /* BOARD_H */
 /** @} */

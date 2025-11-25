@@ -1,4 +1,3 @@
-# Using -isystem instead of -I to prevent warnings for the following headers
-INCLUDES += -isystem$(PKGDIRBASE)/relic/include
-INCLUDES += -isystem$(BINDIR)/pkg-build/relic/include
+INCLUDES += -I$(PKGDIRBASE)/relic/include
+INCLUDES += -I$(BINDIR)/pkg-build/relic/include
 ARCHIVES += $(BINDIR)/relic.a

@@ -97,7 +97,7 @@ ifeq (G,$(STM32_TYPE))
 endif
 ifeq (C,$(STM32_TYPE))
   ifeq (0,$(STM32_FAMILY))  # STM32C0
-    ifneq (,$(filter $(STM32_MODEL), 011 031 051 071 091 092))
+    ifneq (,$(filter $(STM32_MODEL), 011 031 071 091))
       CPU_LINE = STM32C$(STM32_MODEL)xx
     endif
   endif

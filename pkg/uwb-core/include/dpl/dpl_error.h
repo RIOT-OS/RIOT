@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_uwb_core
  * @{
@@ -18,6 +16,9 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+
+#ifndef DPL_DPL_ERROR_H
+#define DPL_DPL_ERROR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,3 +53,5 @@ typedef os_error_t dpl_error_t;
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* DPL_DPL_ERROR_H */

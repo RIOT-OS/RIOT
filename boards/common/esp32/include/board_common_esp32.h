@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2018 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2018 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_common_esp32
@@ -18,6 +19,11 @@
  * @file
  * @{
  */
+
+#ifndef BOARD_COMMON_ESP32_H
+#define BOARD_COMMON_ESP32_H
+
+#include "board_common.h"
 
 /**
  * @brief   External clock crystal frequency (MHz)
@@ -34,23 +40,6 @@
 #define ESP32_XTAL_FREQ             (40)
 #endif
 
-#if !DOXYGEN
-
-/**
- * @name    ztimer Configuration valid for all ESP32 boards
- * @{
- */
-#if CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ <= 80
-#  define CONFIG_ZTIMER_USEC_ADJUST_SET   (880/CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ)
-#  define CONFIG_ZTIMER_USEC_ADJUST_SLEEP ((CONFIG_ZTIMER_USEC_ADJUST_SET >> 2) * 5)
-#else
-#  define CONFIG_ZTIMER_USEC_ADJUST_SET   (960/CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ)
-#  define CONFIG_ZTIMER_USEC_ADJUST_SLEEP (CONFIG_ZTIMER_USEC_ADJUST_SET + 1)
-#endif
-/** @} */
-
-#endif /* !DOXYGEN */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -59,4 +48,5 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
+#endif /* BOARD_COMMON_ESP32_H */
 /** @} */

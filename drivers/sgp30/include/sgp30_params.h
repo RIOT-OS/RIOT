@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_sgp30
  *
@@ -17,6 +15,9 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
+
+#ifndef SGP30_PARAMS_H
+#define SGP30_PARAMS_H
 
 #include "board.h"
 #include "sgp30.h"
@@ -72,4 +73,5 @@ static const saul_reg_info_t sgp30_saul_info[] =
 }
 #endif
 
+#endif /* SGP30_PARAMS_H */
 /** @} */

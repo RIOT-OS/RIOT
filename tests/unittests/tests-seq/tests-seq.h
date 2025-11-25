@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,8 @@
  *
  * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
  */
+#ifndef TESTS_SEQ_H
+#define TESTS_SEQ_H
 
 #include "embUnit.h"
 
@@ -33,4 +33,5 @@ void tests_seq(void);
 }
 #endif
 
+#endif /* TESTS_SEQ_H */
 /** @} */

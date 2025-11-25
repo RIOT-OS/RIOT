@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    pkg_nimble_scanlist Scan Result Helper
  * @ingroup     pkg_nimble
@@ -23,6 +21,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef NIMBLE_SCANLIST_H
+#define NIMBLE_SCANLIST_H
 
 #include "clist.h"
 #include "net/ble.h"
@@ -119,4 +120,5 @@ void nimble_scanlist_print_entry(nimble_scanlist_entry_t *e);
 }
 #endif
 
+#endif /* NIMBLE_SCANLIST_H */
 /** @} */

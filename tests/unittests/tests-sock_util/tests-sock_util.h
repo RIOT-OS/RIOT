@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -17,6 +15,8 @@
  * @brief       Unittests for the sock_util module
  *
  */
+#ifndef TESTS_SOCK_UTIL_H
+#define TESTS_SOCK_UTIL_H
 
 #include "embUnit/embUnit.h"
 
@@ -33,4 +33,5 @@ void tests_sockutil(void);
 }
 #endif
 
+#endif /* TESTS_SOCK_UTIL_H */
 /** @} */

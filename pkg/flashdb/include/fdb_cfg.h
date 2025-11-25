@@ -4,12 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#pragma once
-
 /**
  * @file
  * @brief configuration file
  */
+
+#ifndef FDB_CFG_H
+#define FDB_CFG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,3 +26,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+#endif /* FDB_CFG_H */

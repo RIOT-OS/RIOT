@@ -1,14 +1,21 @@
 /*
- * SPDX-FileCopyrightText: 2019 Frank Hessel <frank@fhessel.de>
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 Frank Hessel <frank@fhessel.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
+ * @ingroup     cpu_native
+ * @ingroup     drivers_spidev_linux
+ * @{
+ *
  * @file
- * @ingroup cpu_native
- * @ingroup drivers_spidev_linux
- * @brief   Implementation of SPI access from Linux User Space
- * @author  Frank Hessel <frank@fhessel.de>
+ * @brief       Implementation of SPI access from Linux User Space
+ *
+ * @author      Frank Hessel <frank@fhessel.de>
+ * @}
  */
 
 #ifdef MODULE_PERIPH_SPIDEV_LINUX

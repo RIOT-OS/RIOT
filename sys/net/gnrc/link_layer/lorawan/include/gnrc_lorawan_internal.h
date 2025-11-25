@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup net_gnrc_lorawan
  * @{
@@ -17,6 +15,8 @@
  *
  * @author  Jose Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
+#ifndef GNRC_LORAWAN_INTERNAL_H
+#define GNRC_LORAWAN_INTERNAL_H
 
 #include <stdio.h>
 #include <string.h>
@@ -563,7 +563,7 @@ void gnrc_lorawan_open_rx_window(gnrc_lorawan_t *mac);
  * @brief save internal MAC state in non-volatile storage and shutdown
  *        the MAC layer gracefully.
  *
- * @param[in] mac pointer to the MAC descriptor
+ * @param mac
  */
 void gnrc_lorawan_perform_save(gnrc_lorawan_t *mac);
 
@@ -815,4 +815,5 @@ static inline void gnrc_lorawan_mlme_join_set_appkey(mlme_lorawan_join_t *mlme_j
 }
 #endif
 
+#endif /* GNRC_LORAWAN_INTERNAL_H */
 /** @} */

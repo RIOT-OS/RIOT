@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    pkg_mbedtls_entropy_sources Entropy source API to Mbed TLS
  * @ingroup     pkg_mbedtls
@@ -19,6 +17,9 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  *
  */
+
+#ifndef ENTROPY_SOURCES_MBEDTLS_RIOT_H
+#define ENTROPY_SOURCES_MBEDTLS_RIOT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -88,3 +89,5 @@ int riot_adc_poll(void *data, unsigned char *output, size_t len,
 }
 #endif
 /** @} */
+
+#endif /* ENTROPY_SOURCES_MBEDTLS_RIOT_H */

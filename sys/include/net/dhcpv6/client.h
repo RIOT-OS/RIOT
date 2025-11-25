@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup net_dhcpv6_client  DHCPv6 client
  * @ingroup  net_dhcpv6
@@ -19,6 +17,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef NET_DHCPV6_CLIENT_H
+#define NET_DHCPV6_CLIENT_H
 
 #include "byteorder.h"
 #include "event.h"
@@ -317,4 +317,5 @@ uint8_t dhcpv6_client_get_conf_mode(void);
 }
 #endif
 
+#endif /* NET_DHCPV6_CLIENT_H */
 /** @} */

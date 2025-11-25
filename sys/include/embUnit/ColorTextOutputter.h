@@ -6,13 +6,13 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @{
  *
  * @file    ColorTextOutputter.h
  */
+#ifndef EMBUNIT_COLORTEXTOUTPUTTER_H
+#define EMBUNIT_COLORTEXTOUTPUTTER_H
 
 #include "Outputter.h"
 
@@ -26,4 +26,5 @@ OutputterRef ColorTextOutputter_outputter(void);
 }
 #endif
 
+#endif /* EMBUNIT_COLORTEXTOUTPUTTER_H */
 /** @} */

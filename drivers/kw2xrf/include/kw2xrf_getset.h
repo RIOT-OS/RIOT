@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_kw2xrf
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
  */
+
+#ifndef KW2XRF_GETSET_H
+#define KW2XRF_GETSET_H
 
 #include "kw2xrf_reg.h"
 #include "kw2xrf.h"
@@ -200,4 +201,5 @@ void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state);
 }
 #endif
 
+#endif /* KW2XRF_GETSET_H */
 /** @} */

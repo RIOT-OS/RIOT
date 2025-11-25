@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_telnet_stdio    STDIO over telnet
  * @ingroup     sys_stdio
@@ -43,6 +41,8 @@
  *
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
+#ifndef NET_TELNET_H
+#define NET_TELNET_H
 
 #include "net/sock/tcp.h"
 
@@ -72,7 +72,7 @@ int telnet_server_start(void);
  *
  * @return  0 on success, error otherwise
  */
-ssize_t telnet_server_write(const void* buffer, size_t len);
+int telnet_server_write(const void* buffer, size_t len);
 
 /**
  * @brief   Read data from the telnet client, will block until data is available.
@@ -119,4 +119,5 @@ void telnet_cb_disconneced(void);
 }
 #endif
 
+#endif /* NET_TELNET_H */
 /** @} */

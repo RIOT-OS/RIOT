@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gnrc_netapi   GNRC communication interface
  * @ingroup     net_gnrc
@@ -57,6 +55,9 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * @}
  */
+
+#ifndef NET_GNRC_NETAPI_H
+#define NET_GNRC_NETAPI_H
 
 #include "thread.h"
 #include "net/netopt.h"
@@ -264,6 +265,7 @@ static inline int gnrc_netapi_set(kernel_pid_t pid, netopt_t opt,
 }
 #endif
 
+#endif /* NET_GNRC_NETAPI_H */
 /**
  * @}^
  */

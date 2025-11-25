@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_cst816s
  *
@@ -18,6 +16,9 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
+
+#ifndef CST816S_PARAMS_H
+#define CST816S_PARAMS_H
 
 #include "board.h"
 #include "cst816s.h"
@@ -93,4 +94,5 @@ static const uint8_t cst816s_screen_ids[] =
 }
 #endif
 
+#endif /* CST816S_PARAMS_H */
 /** @} */

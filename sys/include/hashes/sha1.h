@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_hashes_sha1 SHA-1
  * @ingroup     sys_hashes_unkeyed
@@ -24,6 +22,9 @@
 
 /* This code is public-domain - it is based on libcrypt
  * placed in the public domain by Wei Dai and other contributors. */
+
+#ifndef HASHES_SHA1_H
+#define HASHES_SHA1_H
 
 #include <stdint.h>
 
@@ -116,4 +117,5 @@ void sha1_final_hmac(sha1_context *ctx, void *digest);
 }
 #endif
 
+#endif /* HASHES_SHA1_H */
 /** @} */

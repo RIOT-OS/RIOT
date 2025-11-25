@@ -8,8 +8,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
   * @ingroup    drivers_cc2420
   * @{
@@ -24,6 +22,8 @@
   * @author     Francisco Acosta <francisco.acosta@inria.fr>
   *
   */
+#ifndef CC2420_INTERNAL_H
+#define CC2420_INTERNAL_H
 
 #include <stdint.h>
 
@@ -120,4 +120,5 @@ void cc2420_en_xosc(cc2420_t *dev);
 }
 #endif
 
+#endif /* CC2420_INTERNAL_H */
 /** @} */

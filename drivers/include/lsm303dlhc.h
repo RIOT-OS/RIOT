@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_lsm303dlhc LSM303DLHC 3D accelerometer/magnetometer
  * @ingroup     drivers_sensors
@@ -22,6 +20,9 @@
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
+
+#ifndef LSM303DLHC_H
+#define LSM303DLHC_H
 
 #include <stdint.h>
 #include "periph/i2c.h"
@@ -214,4 +215,5 @@ int lsm303dlhc_disable(const lsm303dlhc_t *dev);
 }
 #endif
 
+#endif /* LSM303DLHC_H */
  /** @} */

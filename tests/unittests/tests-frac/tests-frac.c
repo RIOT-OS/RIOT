@@ -6,12 +6,13 @@
  * directory for more details.
  */
 
-#include <inttypes.h>
 #include <string.h>
 #include "embUnit.h"
 #include "tests-frac.h"
 
+#include "kernel_defines.h"
 #include "frac.h"
+#include "div.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -119,21 +120,11 @@ static void test_frac_scale32(void)
                 uint32_t actual = frac_scale(&frac, u32_test_values[i]);
                 if ((uint32_t)expected != actual) {
                     int32_t diff = actual - expected;
-#ifdef PRIu64
                     DEBUG("%" PRIu32 " * (%" PRIu32 " / %" PRIu32 ")"
                         " tmp %" PRIu64 " expect %" PRIu32 ", actual %" PRIu32
                         ", diff = %" PRId32 " shift=%u\n",
                         u32_test_values[i], num, den, tmp, (uint32_t)expected,
                         actual, diff, frac.shift);
-#else
-                    DEBUG("%" PRIu32 " * (%" PRIu32 " / %" PRIu32 ")"
-                        " tmp %" PRIu32"%s expect %" PRIu32 ", actual %" PRIu32
-                        ", diff = %" PRId32 " shift=%u\n",
-                        u32_test_values[i], num, den,
-                        (uint32_t)tmp, ((uint32_t)tmp != tmp) ? "!trunc" : "",
-                        (uint32_t)expected,
-                        actual, diff, frac.shift);
-#endif
 
                     /* The frac algorithm sacrifices accuracy for speed,
                      * some large numbers will be incorrectly rounded,

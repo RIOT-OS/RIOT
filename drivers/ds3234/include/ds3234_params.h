@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_ds3234
  *
@@ -17,6 +15,9 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
+
+#ifndef DS3234_PARAMS_H
+#define DS3234_PARAMS_H
 
 #include "board.h"
 #include "ds3234.h"
@@ -60,4 +61,5 @@ static const ds3234_params_t ds3234_params[] =
 }
 #endif
 
+#endif /* DS3234_PARAMS_H */
 /** @} */

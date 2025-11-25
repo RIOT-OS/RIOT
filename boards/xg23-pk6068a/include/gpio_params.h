@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2022 SSV Software Systems GmbH
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2022 SSV Software Systems GmbH
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_xg23-pk6068a
@@ -14,6 +15,9 @@
  *
  * @author      Juergen Fitschen <me@jue.yt>
  */
+
+#ifndef GPIO_PARAMS_H
+#define GPIO_PARAMS_H
 
 #include "board.h"
 #include "saul/periph.h"
@@ -55,4 +59,5 @@ static const  saul_gpio_params_t saul_gpio_params[] =
 }
 #endif
 
+#endif /* GPIO_PARAMS_H */
 /** @} */

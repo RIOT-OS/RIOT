@@ -1,3 +1,0 @@
-FEATURES_PROVIDED += esp_rtc_timer_32k
-
-include $(RIOTBOARD)/esp32h2-devkit/Makefile.features

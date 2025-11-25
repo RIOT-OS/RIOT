@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     net_gnrc_rpl
  * @{
@@ -17,6 +15,9 @@
  *
  * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
+
+#ifndef GLOBALS_H
+#define GLOBALS_H
 
 #include "evtimer.h"
 
@@ -79,4 +80,5 @@ extern evtimer_msg_t gnrc_rpl_evtimer;
 }
 #endif
 
+#endif /* GLOBALS_H */
 /** @} */

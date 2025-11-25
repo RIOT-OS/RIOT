@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2022 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2022 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -33,6 +36,39 @@
 ESP_EVENT_DEFINE_BASE(IP_EVENT);
 #endif
 
+/* Global variables required by ESP-IDF */
+uint8_t *g_wpa_anonymous_identity;
+int g_wpa_anonymous_identity_len;
+
+uint8_t *g_wpa_username;
+int g_wpa_username_len;
+
+uint8_t *g_wpa_password;
+int g_wpa_password_len;
+
+uint8_t *g_wpa_new_password;
+int g_wpa_new_password_len;
+
+const uint8_t *g_wpa_client_cert;
+int g_wpa_client_cert_len;
+
+const uint8_t *g_wpa_private_key;
+int g_wpa_private_key_len;
+
+const uint8_t *g_wpa_private_key_passwd;
+int g_wpa_private_key_passwd_len;
+
+const uint8_t *g_wpa_ca_cert;
+int g_wpa_ca_cert_len;
+
+char *g_wpa_ttls_phase2_type;
+bool g_wpa_suiteb_certification;
+
+char *g_wpa_phase1_options;
+
+uint8_t *g_wpa_pac_file;
+int g_wpa_pac_file_len;
+
 /*
  * provided by: /path/to/esp-idf/components/log/log_freertos.c
  */
@@ -52,7 +88,7 @@ static esp_log_level_entry_t _log_levels[] = {
 };
 
 /*
- * provided by: /path/to/esp-idf/components/log/log.c
+ * provided by: /path/to/esp-idf/component/log/log.c
  */
 void IRAM_ATTR esp_log_write(esp_log_level_t level,
                              const char* tag, const char* format, ...)
@@ -64,7 +100,7 @@ void IRAM_ATTR esp_log_write(esp_log_level_t level,
 }
 
 /*
- * provided by: /path/to/esp-idf/components/log/log.c
+ * provided by: /path/to/esp-idf/component/log/log.c
  */
 void IRAM_ATTR esp_log_writev(esp_log_level_t level,
                               const char *tag,
@@ -98,7 +134,7 @@ void IRAM_ATTR esp_log_writev(esp_log_level_t level,
 }
 
 /*
- * provided by: /path/to/esp-idf/components/log/log.c
+ * provided by: /path/to/esp-idf/component/log/log.c
  */
 void esp_log_level_set(const char* tag, esp_log_level_t level)
 {
@@ -115,13 +151,4 @@ void esp_log_level_set(const char* tag, esp_log_level_t level)
     }
 
     _log_levels[i].level = level;
-}
-
-/*
- * provided by: /path/to/esp-idf/components/newlib/time.c
- */
-void esp_newlib_time_init(void)
-{
-    extern void esp_time_impl_init(void);
-    esp_time_impl_init();
 }

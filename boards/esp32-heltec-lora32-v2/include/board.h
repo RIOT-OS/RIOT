@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2019 Gunar Schorcht
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2019 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
-
-#pragma once
 
 /**
  * @ingroup     boards_esp32_heltec-lora32-v2
@@ -25,6 +26,9 @@
  * @file
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <stdint.h>
 
@@ -101,4 +105,5 @@ extern "C" {
 } /* end extern "C" */
 #endif
 
+#endif /* BOARD_H */
 /** @} */

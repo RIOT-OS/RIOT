@@ -1,4 +1,3 @@
-# Using -isystem instead of -I to prevent warnings for the following headers
-INCLUDES += -isystem$(PKGDIRBASE)/lua
-INCLUDES += -isystem$(RIOTPKG)/lua/include
+INCLUDES += -I$(PKGDIRBASE)/lua
+INCLUDES += -I$(RIOTPKG)/lua/include
 DIRS += $(RIOTPKG)/lua/contrib

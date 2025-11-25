@@ -1,12 +1,15 @@
 /*
- * SPDX-FileCopyrightText: 2017 Inria
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2017 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
-#pragma once
-
 /**
- * @ingroup     boards_common_nucleo32
+ * @defgroup    boards_common_nucleo32 STM32 Nucleo-32
+ * @ingroup     boards
+ * @brief       Support for STM32 Nucleo-32 boards
  * @{
  *
  * @file
@@ -15,6 +18,9 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "board_nucleo.h"
 #include "arduino_pinmap.h"
@@ -28,7 +34,6 @@ extern "C" {
  * @{
  */
 #define LED0_PIN_NUM        3
-#define LED0_PORT           GPIO_PORT_B /**< GPIO port of LED 0 */
 #define LED0_PORT_NUM       PORT_B
 /** @} */
 
@@ -38,4 +43,5 @@ extern "C" {
 
 #include "stm32_leds.h"
 
+#endif /* BOARD_H */
 /** @} */

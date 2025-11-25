@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_bme680
  *
@@ -19,6 +17,9 @@
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
+
+#ifndef BME680_PARAMS_H
+#define BME680_PARAMS_H
 
 #include "board.h"
 #include "bme680.h"
@@ -140,4 +141,5 @@ static const saul_reg_info_t bme680_saul_info[] =
 }
 #endif
 
+#endif /* BME680_PARAMS_H */
 /** @} */

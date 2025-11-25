@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_log_color log_color: Colored log module
  * @ingroup     sys
@@ -19,6 +17,9 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
+
+#ifndef LOG_MODULE_H
+#define LOG_MODULE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,4 +37,5 @@ void log_write(unsigned level, const char *format, ...);
 #ifdef __cplusplus
 }
 #endif
+#endif /* LOG_MODULE_H */
 /**@}*/

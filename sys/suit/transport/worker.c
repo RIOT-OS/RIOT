@@ -207,13 +207,11 @@ static bool _worker_reap(void)
     return true;
 }
 
-bool suit_worker_trigger(const char *url, size_t len)
+void suit_worker_trigger(const char *url, size_t len)
 {
-    if (!mutex_trylock(&_worker_lock)) {
-        return false;
-    }
+    mutex_lock(&_worker_lock);
     if (!_worker_reap()) {
-        return false;
+        return;
     }
 
     assert(len != 0); /* A zero-length URI is invalid, but _url[0] == '\0' is
@@ -224,7 +222,6 @@ bool suit_worker_trigger(const char *url, size_t len)
     _worker_pid = thread_create(_stack, SUIT_WORKER_STACKSIZE, SUIT_COAP_WORKER_PRIO,
                   0,
                   _suit_worker_thread, NULL, "suit worker");
-    return true;
 }
 
 void suit_worker_trigger_prepared(const uint8_t *buffer, size_t size)

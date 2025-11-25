@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_sock_dns    DNS sock API
  * @ingroup     net_sock
@@ -22,6 +20,9 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @author  Hendrik van Essen <hendrik.ve@fu-berlin.de>
  */
+
+#ifndef NET_SOCK_DNS_H
+#define NET_SOCK_DNS_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -54,11 +55,11 @@ extern "C" {
  * @brief Address of the DNS server
  */
 #ifndef CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR
-    /* Default to Quad9 Public DNS */
+    /* Default to Google Public DNS */
     #if CONFIG_AUTO_INIT_SOCK_DNS_IP_VERSION == 6
-        #define CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR "2620:fe::fe"
+        #define CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR "2001:4860:4860::8888"
     #elif CONFIG_AUTO_INIT_SOCK_DNS_IP_VERSION == 4
-        #define CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR "9.9.9.9"
+        #define CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR "8.8.8.8"
     #endif
 #endif
 
@@ -113,4 +114,5 @@ extern sock_udp_ep_t sock_dns_server;
 }
 #endif
 
+#endif /* NET_SOCK_DNS_H */
 /** @} */

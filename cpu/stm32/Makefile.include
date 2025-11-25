@@ -69,7 +69,7 @@ endif
 ifneq (,$(filter periph_fmc_sdram periph_fmc_nor_sram,$(USEMODULE)))
   ifneq (,$(FMC_RAM_LEN))
     LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_fmc_ram_addr=$(FMC_RAM_ADDR)
-    LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_fmc_ram_length=$(FMC_RAM_LEN)
+    LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_fmc_ram_len=$(FMC_RAM_LEN)
     CFLAGS += -DCPU_HAS_FMC_RAM=1
     CFLAGS += -DNUM_HEAPS=4
   endif

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_at24cxxx
  * @{
@@ -22,6 +20,9 @@
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  */
+
+#ifndef AT24CXXX_DEFINES_H
+#define AT24CXXX_DEFINES_H
 
 #include "kernel_defines.h"
 
@@ -469,4 +470,5 @@ extern "C" {
 }
 #endif
 
+#endif /* AT24CXXX_DEFINES_H */
 /** @} */

@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_led Control on-board LEDs
  * @ingroup     drivers_actuators
@@ -30,6 +28,9 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
+#ifndef LED_H
+#define LED_H
 
 #include "board.h"
 
@@ -207,4 +208,5 @@ static inline void led_toggle(unsigned id)
 }
 #endif
 
+#endif /* LED_H */
 /** @} */

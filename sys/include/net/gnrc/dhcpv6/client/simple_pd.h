@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_dhcpv6_client_simple_pd     gnrc_dhcpv6_client_simple_pd: DHCPv6 client for
  *                                              simple prefix delegation
@@ -21,6 +19,8 @@
  *
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef NET_GNRC_DHCPV6_CLIENT_SIMPLE_PD_H
+#define NET_GNRC_DHCPV6_CLIENT_SIMPLE_PD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -91,4 +91,5 @@ void gnrc_dhcpv6_client_simple_pd_init(void);
 }
 #endif
 
+#endif /* NET_GNRC_DHCPV6_CLIENT_SIMPLE_PD_H */
 /** @} */

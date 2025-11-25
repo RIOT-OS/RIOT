@@ -1,5 +1,4 @@
-# Using -isystem instead of -I to prevent warnings for the following headers
-INCLUDES += -isystem$(RIOTBASE)/pkg/semtech-loramac/include
+INCLUDES += -I$(RIOTBASE)/pkg/semtech-loramac/include
 
 DIRS += $(RIOTBASE)/pkg/semtech-loramac/contrib
 

@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_endian  endian conversions as provided by most libcs
  * @ingroup     sys
@@ -21,6 +19,9 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
  */
+
+#ifndef ENDIAN_H
+#define ENDIAN_H
 
 #include <stdint.h>
 
@@ -93,79 +94,31 @@ uint64_t le64toh(uint64_t little_endian_64bits);/**< little endian to host, 64 b
 #endif
 
 #if BYTE_ORDER == LITTLE_ENDIAN
-#  ifndef htobe16
 #  define htobe16(_x) __builtin_bswap16(_x)
-#  endif
-#  ifndef htole16
 #  define htole16(_x) ((uint16_t)(_x))
-#  endif
-#  ifndef be16toh
 #  define be16toh(_x) __builtin_bswap16(_x)
-#  endif
-#  ifndef le16toh
 #  define le16toh(_x) ((uint16_t)(_x))
-#  endif
-#  ifndef htobe32
 #  define htobe32(_x) __builtin_bswap32(_x)
-#  endif
-#  ifndef htole32
 #  define htole32(_x) ((uint32_t)(_x))
-#  endif
-#  ifndef be32toh
 #  define be32toh(_x) __builtin_bswap32(_x)
-#  endif
-#  ifndef le32toh
 #  define le32toh(_x) ((uint32_t)(_x))
-#  endif
-#  ifndef htobe64
 #  define htobe64(_x) __builtin_bswap64(_x)
-#  endif
-#  ifndef htole64
 #  define htole64(_x) ((uint64_t)(_x))
-#  endif
-#  ifndef be64toh
 #  define be64toh(_x) __builtin_bswap64(_x)
-#  endif
-#  ifndef le64toh
 #  define le64toh(_x) ((uint64_t)(_x))
-#  endif
 #elif BYTE_ORDER == BIG_ENDIAN
-#  ifndef htole16
 #  define htole16(_x) __builtin_bswap16(_x)
-#  endif
-#  ifndef htobe16
 #  define htobe16(_x) ((uint16_t)(_x))
-#  endif
-#  ifndef le16toh
 #  define le16toh(_x) __builtin_bswap16(_x)
-#  endif
-#  ifndef be16toh
 #  define be16toh(_x) ((uint16_t)(_x))
-#  endif
-#  ifndef htole32
 #  define htole32(_x) __builtin_bswap32(_x)
-#  endif
-#  ifndef htobe32
 #  define htobe32(_x) ((uint32_t)(_x))
-#  endif
-#  ifndef le32toh
 #  define le32toh(_x) __builtin_bswap32(_x)
-#  endif
-#  ifndef be32toh
 #  define be32toh(_x) ((uint32_t)(_x))
-#  endif
-#  ifndef htole64
 #  define htole64(_x) __builtin_bswap64(_x)
-#  endif
-#  ifndef htobe64
 #  define htobe64(_x) ((uint64_t)(_x))
-#  endif
-#  ifndef le64toh
 #  define le64toh(_x) __builtin_bswap64(_x)
-#  endif
-#  ifndef be64toh
 #  define be64toh(_x) ((uint64_t)(_x))
-#  endif
 #else
 #  error "Byte order not supported"
 #endif
@@ -176,4 +129,5 @@ uint64_t le64toh(uint64_t little_endian_64bits);/**< little endian to host, 64 b
 }
 #endif
 
+#endif /* ENDIAN_H */
 /** @} */

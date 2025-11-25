@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2015 Marc Poulhiès
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2015 Marc Poulhiès
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
 
 /**
@@ -116,7 +119,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-bool gpio_read(gpio_t pin)
+int gpio_read(gpio_t pin)
 {
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
@@ -154,7 +157,7 @@ void gpio_toggle(gpio_t pin)
     }
 }
 
-void gpio_write(gpio_t pin, bool value)
+void gpio_write(gpio_t pin, int value)
 {
     if (value) {
         gpio_set(pin);

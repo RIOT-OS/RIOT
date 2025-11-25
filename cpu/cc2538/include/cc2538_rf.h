@@ -1,10 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2016 MUTEX NZ Ltd.
- * SPDX-FileCopyrightText: 2015 Loci Controls Inc.
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2016 MUTEX NZ Ltd.
+ * Copyright (C) 2015 Loci Controls Inc.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ *
  */
-
-#pragma once
 
 /**
  * @ingroup     cpu_cc2538
@@ -16,6 +18,9 @@
  * @author      Aaron Sowry <aaron@mutex.nz>
  * @author      Ian Martin <ian@locicontrols.com>
  */
+
+#ifndef CC2538_RF_H
+#define CC2538_RF_H
 
 #include <stdbool.h>
 
@@ -36,7 +41,6 @@ extern "C" {
 #define CC2538_AUTOCRC_LEN          (2)
 #define CC2538_RF_FIFO_SIZE         (128)
 #define CC2538_PACKET_LENGTH_SIZE   (1)
-#define CC2538_LENGTH_BYTE_MASK     (0x7F) /**< Mask for the length byte in the packet */
 
 #define CC2538_RF_MAX_DATA_LEN (CC2538_RF_FIFO_SIZE - CC2538_PACKET_LENGTH_SIZE)
 
@@ -463,4 +467,5 @@ void cc2538_set_tx_power(int dBm);
 }
 #endif
 
+#endif /* CC2538_RF_H */
 /** @} */

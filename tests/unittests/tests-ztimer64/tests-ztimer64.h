@@ -4,8 +4,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @addtogroup  unittests
  * @{
@@ -14,6 +12,8 @@
  * @brief       Unittests for ztimer64
  *
  */
+#ifndef TESTS_ZTIMER64_H
+#define TESTS_ZTIMER64_H
 
 #include "embUnit.h"
 
@@ -30,4 +30,5 @@ void tests_ztimer(void);
 }
 #endif
 
+#endif /* TESTS_ZTIMER64_H */
 /** @} */

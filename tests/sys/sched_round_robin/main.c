@@ -22,6 +22,7 @@
 
 static kernel_pid_t main_pid;
 
+
 void * thread_wakeup_main(void *d)
 {
     (void) d;

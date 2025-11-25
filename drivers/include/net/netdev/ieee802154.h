@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_netdev_ieee802154 802.15.4 radio drivers
  * @ingroup     drivers_netdev_api
@@ -19,6 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef NET_NETDEV_IEEE802154_H
+#define NET_NETDEV_IEEE802154_H
 
 #include "net/eui_provider.h"
 #include "net/ieee802154.h"
@@ -286,4 +286,5 @@ static inline void netdev_ieee802154_setup(netdev_ieee802154_t *dev)
 }
 #endif
 
+#endif /* NET_NETDEV_IEEE802154_H */
 /** @} */

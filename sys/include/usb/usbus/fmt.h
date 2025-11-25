@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    usb_usbus_fmt USBUS descriptor formatter functions
  * @ingroup     usb_usbus
@@ -19,6 +17,9 @@
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
+
+#ifndef USB_USBUS_FMT_H
+#define USB_USBUS_FMT_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -49,4 +50,5 @@ size_t usbus_fmt_descriptor_dev(usbus_t *usbus);
 #ifdef __cplusplus
 }
 #endif
+#endif /* USB_USBUS_FMT_H */
 /** @} */

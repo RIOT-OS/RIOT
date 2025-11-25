@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
 * @defgroup    drivers_ncv7356 NCV7356 Single Wire CAN Transceiver
 * @ingroup     drivers_can
@@ -31,6 +29,8 @@
  * @author      Aurelien Gonce <aurelien.gonce@altran.com>
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
+#ifndef NCV7356_H
+#define NCV7356_H
 
 #include <stdio.h>
 
@@ -92,4 +92,5 @@ extern const trx_driver_t ncv7356_driver;
 }
 #endif
 
+#endif /* NCV7356_H */
 /** @} */

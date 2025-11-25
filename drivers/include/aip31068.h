@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_aip31068 AIP31068 I2C LCD controller
  * @ingroup     drivers_display
@@ -18,6 +16,9 @@
  * @author      Hendrik van Essen <hendrik.ve@fu-berlin.de>
  * @file
  */
+
+#ifndef AIP31068_H
+#define AIP31068_H
 
 #ifdef __cplusplus
 extern "C"
@@ -421,4 +422,5 @@ int aip31068_print_char(aip31068_t *dev, char c);
 }
 #endif
 
+#endif /* AIP31068_H */
 /** @} */

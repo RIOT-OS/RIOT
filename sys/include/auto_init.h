@@ -8,19 +8,17 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    sys_auto_init Auto-initialization
  * @ingroup     sys
  * @brief       Auto initialize modules
  *
- * This feature is automatically enabled and can be disabled in any application
- * by disabling the `auto_init` module in the application's `Makefile`:
+ * This feature can be enabled in any application by adding the `auto_init`
+ * module to the application's `Makefile`:
  *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- * DISABLE_MODULE += auto_init
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * ~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ * USEMODULE += auto_init
+ * ~~~~~~~~~~~~~~~~~~~~~~~
  *
  * `auto_init` initializes any included module that provides
  * auto-initialization capabilities.
@@ -46,7 +44,7 @@
  *  - by passing them via the `CFLAGS` variable on the build command line:
  *
  * ```
- * CFLAGS=-DBMP180_PARAM_OVERSAMPLING=1 USEMODULE=bmp180 make BOARD=arduino-zero -C examples/basic/default
+ * CFLAGS=-DBMP180_PARAM_OVERSAMPLING=1 USEMODULE=bmp180 make BOARD=arduino-zero -C examples/default
  * ```
  *
  * - by setting the `CFLAGS` variable in the application `Makefile`:
@@ -107,6 +105,9 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
+#ifndef AUTO_INIT_H
+#define AUTO_INIT_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -125,3 +126,4 @@ void auto_init(void);
 #endif
 
 /** @} */
+#endif /* AUTO_INIT_H */

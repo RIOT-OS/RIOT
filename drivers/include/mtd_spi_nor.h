@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_mtd_spi_nor Serial NOR flash
  * @ingroup     drivers_storage
@@ -22,6 +20,9 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
+
+#ifndef MTD_SPI_NOR_H
+#define MTD_SPI_NOR_H
 
 #include <stdint.h>
 
@@ -183,4 +184,5 @@ extern const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default_4bytes;
 }
 #endif
 
+#endif /* MTD_SPI_NOR_H */
 /** @} */

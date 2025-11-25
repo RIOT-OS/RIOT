@@ -6,8 +6,6 @@
  * details.
  */
 
-#pragma once
-
 /**
  * @defgroup    drivers_encx24j600 ENCX24J600
  * @ingroup     drivers_netdev
@@ -19,6 +17,9 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+
+#ifndef ENCX24J600_H
+#define ENCX24J600_H
 
 #include "mutex.h"
 #include "periph/spi.h"
@@ -66,4 +67,5 @@ void encx24j600_setup(encx24j600_t *dev, const encx24j600_params_t *params, uint
 #ifdef __cplusplus
 }
 #endif
+#endif /* ENCX24J600_H */
 /** @} */

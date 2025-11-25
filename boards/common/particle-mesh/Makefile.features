@@ -1,7 +1,6 @@
 CPU_MODEL = nrf52840xxaa
 
 # Put defined MCU peripherals here (in alphabetical order)
-FEATURES_PROVIDED += board_bat_voltage
 FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_spi

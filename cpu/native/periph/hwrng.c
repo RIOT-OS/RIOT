@@ -1,15 +1,21 @@
 /*
- * SPDX-FileCopyrightText: 2014 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2014 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ *               2016 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
+ * @ingroup     cpu_native
+ * @ingroup     drivers_periph_hwrng
+ * @{
+ *
  * @file
- * @ingroup cpu_native
- * @ingroup drivers_periph_hwrng
- * @brief   HWRNG interface implementation
- * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @brief       HWRNG interface implementation
+ *
+ * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
 
 #include <string.h>
@@ -29,7 +35,9 @@
 static int initialized = 0;
 static int dev_random = -1;
 
-/* MARK: - Internal API declaration */
+/**********************************************************************
+ * internal API declaration
+ **********************************************************************/
 
 /**
  * seed host random module with @ref _native_rng_seed
@@ -39,7 +47,9 @@ void _native_rng_init_hq(void);
 unsigned _native_rng_read_det(uint8_t *buf, unsigned num);
 unsigned _native_rng_read_hq(uint8_t *buf, unsigned num);
 
-/* MARK: - Public API implementation */
+/**********************************************************************
+ * public API implementation
+ **********************************************************************/
 
 void hwrng_init(void)
 {
@@ -84,7 +94,9 @@ void hwrng_read(void *buf, unsigned int num)
     }
 }
 
-/* MARK: - Internal API implementation */
+/**********************************************************************
+ * internal API implementation
+ **********************************************************************/
 
 void _native_rng_init_det(void)
 {
@@ -140,3 +152,7 @@ unsigned _native_rng_read_hq(uint8_t *buf, unsigned num)
 
     return offset;
 }
+
+/**
+ * @}
+ */

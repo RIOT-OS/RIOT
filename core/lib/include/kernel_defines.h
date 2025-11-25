@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     core_internal
  * @{
@@ -19,6 +17,9 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
+
+#ifndef KERNEL_DEFINES_H
+#define KERNEL_DEFINES_H
 
 #include "modules.h"
 #include "riot_version.h"
@@ -33,4 +34,5 @@ extern "C" {
 }
 #endif
 
+#endif /* KERNEL_DEFINES_H */
 /** @} */

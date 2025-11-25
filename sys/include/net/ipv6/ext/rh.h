@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_ipv6_ext_rh IPv6 routing header extension
  * @ingroup     net_ipv6_ext
@@ -21,6 +19,8 @@
  * @author  Cenk Gündoğan <cnkgndgn@gmail.com>
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#ifndef NET_IPV6_EXT_RH_H
+#define NET_IPV6_EXT_RH_H
 
 #include <stdint.h>
 
@@ -74,4 +74,5 @@ typedef struct __attribute__((packed)) {
 }
 #endif
 
+#endif /* NET_IPV6_EXT_RH_H */
 /** @} */

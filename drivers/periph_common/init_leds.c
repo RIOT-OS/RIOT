@@ -17,7 +17,7 @@
  * @}
  */
 
-#include "led.h"
+#include "board.h"
 #include "periph/gpio.h"
 #include "kernel_defines.h"
 
@@ -35,32 +35,28 @@ void led_init(void)
         return;
     }
 
-    /* The condition is dual: We don't init if the LED is absent (eg. when a
-     * LEDn_PIN is defined, but there is a higher level driver such as SAUL PWM that makes the
-     * direct use impossible), but we also don't init if there is no pin (eg.
-     * on native where there is a different mechanism for LEDs). */
-#if defined(LED0_IS_PRESENT) && defined(LED0_PIN)
+#ifdef LED0_PIN
     LED_INIT(0);
 #endif
-#if defined(LED1_IS_PRESENT) && defined(LED1_PIN)
+#ifdef LED1_PIN
     LED_INIT(1);
 #endif
-#if defined(LED2_IS_PRESENT) && defined(LED2_PIN)
+#ifdef LED2_PIN
     LED_INIT(2);
 #endif
-#if defined(LED3_IS_PRESENT) && defined(LED3_PIN)
+#ifdef LED3_PIN
     LED_INIT(3);
 #endif
-#if defined(LED4_IS_PRESENT) && defined(LED4_PIN)
+#ifdef LED4_PIN
     LED_INIT(4);
 #endif
-#if defined(LED5_IS_PRESENT) && defined(LED5_PIN)
+#ifdef LED5_PIN
     LED_INIT(5);
 #endif
-#if defined(LED6_IS_PRESENT) && defined(LED6_PIN)
+#ifdef LED6_PIN
     LED_INIT(6);
 #endif
-#if defined(LED7_IS_PRESENT) && defined(LED7_PIN)
+#ifdef LED7_PIN
     LED_INIT(7);
 #endif
 }

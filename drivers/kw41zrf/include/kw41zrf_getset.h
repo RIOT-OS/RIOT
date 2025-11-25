@@ -7,8 +7,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_kw41zrf
  * @{
@@ -18,6 +16,9 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
+
+#ifndef KW41ZRF_GETSET_H
+#define KW41ZRF_GETSET_H
 
 #include "kw41zrf.h"
 
@@ -203,4 +204,5 @@ void kw41zrf_set_option(kw41zrf_t *dev, uint8_t option, uint8_t state);
 }
 #endif
 
+#endif /* KW41ZRF_GETSET_H */
 /** @} */

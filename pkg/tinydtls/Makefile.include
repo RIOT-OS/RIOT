@@ -1,14 +1,13 @@
 PKG_BUILDDIR ?= $(PKGDIRBASE)/tinydtls
 
-# Using -isystem instead of -I to prevent warnings for the following headers
-INCLUDES += -isystem$(PKG_BUILDDIR)
+INCLUDES += -I$(PKG_BUILDDIR)
 
 ifeq ($(TOOLCHAIN), llvm)
   CFLAGS += -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-function
 endif
 
-INCLUDES += -isystem$(RIOTBASE)/pkg/tinydtls/include
-INCLUDES += -isystem$(PKG_BUILDDIR)
+INCLUDES += -I$(RIOTBASE)/pkg/tinydtls/include
+INCLUDES += -I$(PKG_BUILDDIR)
 # Mandatory for tinyDTLS
 CFLAGS += -DDTLSv12 -DWITH_SHA256
 

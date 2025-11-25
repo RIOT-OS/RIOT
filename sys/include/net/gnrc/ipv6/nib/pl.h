@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_gnrc_ipv6_nib_pl    Prefix list
  * @ingroup     net_gnrc_ipv6_nib
@@ -19,6 +17,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef NET_GNRC_IPV6_NIB_PL_H
+#define NET_GNRC_IPV6_NIB_PL_H
 
 #include <stdint.h>
 #include "modules.h"
@@ -178,4 +178,5 @@ void gnrc_ipv6_nib_pl_print(gnrc_ipv6_nib_pl_t *ple);
 }
 #endif
 
+#endif /* NET_GNRC_IPV6_NIB_PL_H */
 /** @} */

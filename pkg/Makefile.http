@@ -3,7 +3,6 @@ PKG_URL     = http://example.com/downloads # source url of the package e.g. a gi
 PKG_VERSION = v1.2.3                       # version of the package to use e.g. a git commit/ref
 PKG_EXT     = zip                          # extension of this package
 PKG_LICENSE = MIT                          # license of the package
-PKG_SHA512  = 5bcc4310f09ea247f5b65d63afae872fb92bb5c39029f336d94503fe04feccfcd22aa42b377b0927ab7f0a19111fd5a0a6842ecab147761c8f218f7f115e0da5 # SHA512 checksum of the package
 
 ifneq ($(RIOTBASE),)
 include $(RIOTBASE)/Makefile.base
@@ -31,9 +30,7 @@ $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/: $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PK
 
 $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT):
 	# Get PKG_VERSION of package from PKG_URL
-	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT) $(PKG_SHA512)
-	# Note: Since Release 2025.10, DOWNLOAD_TO_FILE uses dlcache and
-	# requires an SHA512 checksum for caching!
+	$(Q)$(DOWNLOAD_TO_FILE) $@ $(PKG_URL)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
 
 clean::
 	# Reset package to checkout state.

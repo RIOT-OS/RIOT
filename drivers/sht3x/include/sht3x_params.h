@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup     drivers_sht3x
  * @brief       Default configuration for Sensirion SHT30/SHT31/SHT35 devices
@@ -15,6 +13,9 @@
  * @file
  * @{
  */
+
+#ifndef SHT3X_PARAMS_H
+#define SHT3X_PARAMS_H
 
 #include "board.h"
 #include "sht3x.h"
@@ -74,4 +75,5 @@ static const saul_reg_info_t sht3x_saul_info[] =
 }
 #endif
 
+#endif /* SHT3X_PARAMS_H */
 /** @} */

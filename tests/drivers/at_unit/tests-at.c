@@ -1,6 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2024 ML!PA GmbH
- * SPDX-License-Identifier: LGPL-2.1-only
+ * Copyright (C) 2024 ML!PA GmbH
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 #include "embUnit.h"
@@ -47,7 +50,7 @@ at_urc_t urc_short = {
 };
 #endif
 
-#ifdef CPU_NATIVE
+#ifdef BOARD_NATIVE
 #define AT_UNIT_UART_DEV 0
 #else
 /* Most non-native boards have stdout mapped to device 0 */

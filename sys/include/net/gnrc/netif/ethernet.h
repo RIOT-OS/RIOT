@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @ingroup net_gnrc_netif
  * @{
@@ -17,6 +15,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+#ifndef NET_GNRC_NETIF_ETHERNET_H
+#define NET_GNRC_NETIF_ETHERNET_H
 
 #include "net/gnrc/netif.h"
 
@@ -46,4 +46,5 @@ int gnrc_netif_ethernet_create(gnrc_netif_t *netif, char *stack, int stacksize,
 }
 #endif
 
+#endif /* NET_GNRC_NETIF_ETHERNET_H */
 /** @} */

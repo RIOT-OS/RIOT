@@ -30,9 +30,6 @@
 #include "thread.h"
 #include "ztimer.h"
 
-#define ENABLE_DEBUG    0
-#include "debug.h"
-
 static void _callback_unlock_mutex(void *arg)
 {
     mutex_t *mutex = (mutex_t *)arg;
@@ -130,49 +127,6 @@ int ztimer_msg_receive_timeout(ztimer_clock_t *clock, msg_t *msg,
 }
 
 #endif /* MODULE_CORE_MSG */
-
-#ifdef MODULE_CORE_MBOX
-struct ztimer_mbox_thread_status {
-    ztimer_t timer;
-    mbox_t *mbox;
-    thread_t *thread;
-    int status;
-};
-
-static void _ztimer_mbox_get_timeout(void *arg)
-{
-    struct ztimer_mbox_thread_status *data = arg;
-    if (!list_remove(&data->mbox->readers, &data->thread->rq_entry)) {
-        /* timeout triggered just after the message was received but before the
-         * timer was canceled. --> ignore the timeout */
-        DEBUG_PUTS("ztimer_mbox_get_timeout: timeout triggered, but message already received");
-        return;
-    }
-
-    sched_set_status(data->thread, STATUS_PENDING);
-    data->status = -ETIMEDOUT;
-    thread_yield_higher();
-    DEBUG_PUTS("ztimer_mbox_get_timeout: timeout triggered");
-}
-
-int ztimer_mbox_get_timeout(ztimer_clock_t *clock, mbox_t *mbox, msg_t *msg, uint32_t timeout)
-{
-    struct ztimer_mbox_thread_status data = {
-        .timer = {
-            .arg = &data,
-            .callback = _ztimer_mbox_get_timeout,
-        },
-        .mbox = mbox,
-        .thread = thread_get_active(),
-        .status = 0,
-    };
-
-    ztimer_set(clock, &data.timer, timeout);
-    mbox_get(mbox, msg);
-    ztimer_remove(clock, &data.timer);
-    return data.status;
-}
-#endif
 
 #ifdef MODULE_CORE_THREAD_FLAGS
 static void _set_timeout_flag_callback(void *arg)

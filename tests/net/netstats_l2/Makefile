@@ -11,7 +11,7 @@ USEMODULE += netstats_l2
 
 # Cannot run the test on `murdock` in `native`
 #   open(/dev/net/tun): No such file or directory
-TEST_ON_CI_BLACKLIST += native32 native64
+TEST_ON_CI_BLACKLIST += native native64
 
 # sometimes fails on esp32, see #14237.
 TEST_ON_CI_BLACKLIST += esp32-wroom-32

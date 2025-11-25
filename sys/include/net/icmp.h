@@ -6,8 +6,6 @@
  * directory for more details.
  */
 
-#pragma once
-
 /**
  * @defgroup    net_icmp  ICMPV4
  * @ingroup     net_ipv4
@@ -22,6 +20,8 @@
  *
  * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
+#ifndef NET_ICMP_H
+#define NET_ICMP_H
 
 #include "byteorder.h"
 
@@ -48,4 +48,5 @@ typedef struct __attribute__((packed)){
 }
 #endif
 
+#endif /* NET_ICMP_H */
 /** @} */

@@ -50,7 +50,7 @@ static void setup(void)
 }
 
 /**
- * @brief   Test ztimer64_now()
+ * @brief
  */
 static void test_ztimer64_now(void)
 {

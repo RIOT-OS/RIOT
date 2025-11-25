@@ -5,11 +5,10 @@ PKG_LICENSE=BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-# Use -isystem instead of -I to disable warnings for these headers
-INCLUDES += -isystem$(PKGDIRBASE)/semtech-loramac/src/mac \
-            -isystem$(PKGDIRBASE)/semtech-loramac/src/boards/mcu \
-            -isystem$(PKGDIRBASE)/semtech-loramac/src/system/crypto \
-            -isystem$(PKGDIRBASE)/semtech-loramac/src
+INCLUDES += -I$(PKGDIRBASE)/semtech-loramac/src/mac \
+            -I$(PKGDIRBASE)/semtech-loramac/src/boards/mcu \
+            -I$(PKGDIRBASE)/semtech-loramac/src/system/crypto \
+            -I$(PKGDIRBASE)/semtech-loramac/src
 
 LORAMAC_MODULES = loramac_arch loramac_crypto loramac_mac loramac_region
 
