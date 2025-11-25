@@ -172,6 +172,7 @@ static void _dispatch_next_header(gnrc_pktsnip_t *pkt, unsigned nh,
     }
 }
 
+#ifdef MODULE_NIMBLE_NETIF
 /**
  * @brief   Find entry in NIB neighbor cache.
  *
@@ -270,6 +271,7 @@ static inline void _netapi_notify_event(gnrc_netapi_notify_t *notify)
         break;
     }
 }
+#endif /* MODULE_NIMBLE_NETIF */
 
 static void *_event_loop(void *args)
 {
@@ -278,9 +280,11 @@ static void *_event_loop(void *args)
     /* Register entry for messages in IPv6 context. */
     gnrc_netreg_entry_t me_ipv6_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
                                                                  thread_getpid());
+#ifdef MODULE_NIMBLE_NETIF
     /* Register entry for messages in L2 discovery context. */
     gnrc_netreg_entry_t me_discovery_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
                                                                       thread_getpid());
+#endif /* MODULE_NIMBLE_NETIF */
 
     (void)args;
     msg_init_queue(_msg_q, GNRC_IPV6_MSG_QUEUE_SIZE);
@@ -293,8 +297,10 @@ static void *_event_loop(void *args)
     /* Register interest in all IPv6 packets. */
     gnrc_netreg_register(GNRC_NETTYPE_IPV6, &me_ipv6_reg);
 
+#ifdef MODULE_NIMBLE_NETIF
     /* Register interest in L2 neighbor discovery info. */
     gnrc_netreg_register(GNRC_NETTYPE_L2_DISCOVERY, &me_discovery_reg);
+#endif /* MODULE_NIMBLE_NETIF */
 
     /* preinitialize ACK */
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
@@ -321,10 +327,12 @@ static void *_event_loop(void *args)
                 reply.content.value = -ENOTSUP;
                 msg_reply(&msg, &reply);
                 break;
+#ifdef MODULE_NIMBLE_NETIF
             case GNRC_NETAPI_MSG_TYPE_NOTIFY:
                 DEBUG("ipv6: GNRC_NETAPI_MSG_TYPE_NOTIFY received\n");
                 _netapi_notify_event(msg.content.ptr);
                 break;
+#endif /* MODULE_NIMBLE_NETIF */
 
 #ifdef MODULE_GNRC_IPV6_EXT_FRAG
             case GNRC_IPV6_EXT_FRAG_RBUF_GC:

@@ -94,6 +94,7 @@ ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6
   USEMODULE += gnrc_icmpv6
   USEMODULE += gnrc_ipv6_nib
   USEMODULE += trickle
@@ -442,11 +443,15 @@ endif
 
 ifneq (,$(filter gnrc,$(USEMODULE)))
   USEMODULE += gnrc_netapi
-  USEMODULE += gnrc_netapi_notify
   USEMODULE += gnrc_netreg
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_netif_hdr
   USEMODULE += gnrc_pktbuf
+	ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
+	  ifneq (,$(filter nimble_netif,$(USEMODULE)))
+      USEMODULE += gnrc_netapi_notify
+	  endif
+	endif
   ifneq (,$(filter sock_async, $(USEMODULE)))
     USEMODULE += gnrc_sock_async
   endif
