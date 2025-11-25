@@ -41,6 +41,10 @@ extern "C" {
 #include "psa_periph_aes_ctx.h"
 #endif
 
+#if IS_USED(MODULE_PERIPH_CIPHER_CHACHA20)
+#include "psa_periph_chacha20_ctx.h"
+#endif
+
 #if IS_USED(MODULE_PERIPH_HASH_SHA_1) || IS_USED(MODULE_PERIPH_HASH_SHA_224) || \
     IS_USED(MODULE_PERIPH_HASH_SHA_256) || IS_USED(MODULE_PERIPH_HASH_SHA_384) || \
     IS_USED(MODULE_PERIPH_HASH_SHA_512) || IS_USED(MODULE_PERIPH_HASH_SHA_512_224) || \

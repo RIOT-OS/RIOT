@@ -44,7 +44,9 @@
 
 #if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
 #include "psa_crypto_operation_encoder.h"
+#include "psa_crypto_algorithm_dispatch.h"
 #endif
+#include <psa/hash/sizes.h>
 
 #if IS_USED(MODULE_PSA_HASH)
 psa_status_t psa_algorithm_dispatch_hash_setup(psa_hash_operation_t *operation,
@@ -614,7 +616,7 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
         return ret;
     }
     else if (attributes->type == PSA_KEY_TYPE_HMAC && PSA_ALG_IS_HMAC(attributes->policy.alg) &&
-            data_length > PSA_HASH_BLOCK_LENGTH(attributes->policy.alg)){
+             data_length > PSA_HASH_MAX_BLOCK_SIZE) {
         psa_status_t ret = PSA_ERROR_NOT_SUPPORTED;
 #if IS_USED(MODULE_PSA_HASH)
         /* must compute hash beforehand if key is too long */
@@ -631,17 +633,142 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
     return psa_builtin_import_key(attributes, data, data_length, key_data, key_data_size,
                                   key_bytes, bits);
 }
+
 #endif /* MODULE_PSA_KEY_MANAGEMENT */
 
 #if IS_USED(MODULE_PSA_CIPHER)
-psa_status_t psa_algorithm_dispatch_cipher_encrypt( const psa_key_attributes_t *attributes,
-                                                    psa_algorithm_t alg,
-                                                    const psa_key_slot_t *slot,
+
+psa_status_t psa_algorithm_dispatch_cipher_encrypt_setup(   psa_cipher_operation_t *operation,
+                                                            const psa_key_attributes_t *attributes,
+                                                            const psa_key_slot_t *slot,
+                                                            psa_algorithm_t alg)
+{
+    operation->alg = PSA_ENCODE_CIPHER_OPERATION(alg, attributes->type, attributes->bits);
+
+    uint8_t *key_data = NULL;
+    size_t *key_bytes = NULL;
+
+    psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
+
+    if (operation->alg == PSA_INVALID_OPERATION) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    switch (operation->alg) {
+    #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
+        case PSA_STREAM_CIPHER_CHACHA20:
+            return psa_cipher_chacha20_encrypt_setup(&operation->backend_ctx.cipher_ctx.chacha20, key_data, *key_bytes);
+    #endif
+    default:
+        (void)operation;
+        (void)attributes;
+        (void)slot;
+        (void)alg;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+}
+
+psa_status_t psa_algorithm_dispatch_cipher_decrypt_setup(   psa_cipher_operation_t *operation,
+                                                            const psa_key_attributes_t *attributes,
+                                                            const psa_key_slot_t *slot,
+                                                            psa_algorithm_t alg)
+{
+    operation->alg = PSA_ENCODE_CIPHER_OPERATION(alg, attributes->type, attributes->bits);
+
+    uint8_t *key_data = NULL;
+    size_t *key_bytes = NULL;
+
+    psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
+
+    if (operation->alg == PSA_INVALID_OPERATION) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    switch (operation->alg) {
+    #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
+        case PSA_STREAM_CIPHER_CHACHA20:
+            return psa_cipher_chacha20_decrypt_setup(&operation->backend_ctx.cipher_ctx.chacha20, key_data, *key_bytes);
+    #endif
+    default:
+        (void)operation;
+        (void)attributes;
+        (void)slot;
+        (void)alg;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+}
+
+psa_status_t psa_algorithm_dispatch_cipher_finish(  psa_cipher_operation_t *operation,
+                                                    uint8_t *output,
+                                                    size_t output_size,
+                                                    size_t *output_length)
+{
+    switch (operation->alg) {
+    #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
+        case PSA_STREAM_CIPHER_CHACHA20:
+            return psa_cipher_chacha20_finish(  &operation->backend_ctx.cipher_ctx.chacha20,
+                                                output, output_size, output_length);
+    #endif
+    default:
+        (void)operation;
+        (void)output;
+        (void)output_size;
+        (void)output_length;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+}
+
+psa_status_t psa_algorithm_dispatch_cipher_update(  psa_cipher_operation_t *operation,
                                                     const uint8_t *input,
                                                     size_t input_length,
                                                     uint8_t *output,
                                                     size_t output_size,
                                                     size_t *output_length)
+{
+    switch (operation->alg) {
+    #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
+        case PSA_STREAM_CIPHER_CHACHA20:
+            return psa_cipher_chacha20_update(  &operation->backend_ctx.cipher_ctx.chacha20,
+                                                input, input_length,
+                                                output, output_size, output_length);
+    #endif
+    default:
+        (void)operation;
+        (void)input;
+        (void)input_length;
+        (void)output;
+        (void)output_size;
+        (void)output_length;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+}
+
+psa_status_t psa_algorithm_dispatch_cipher_set_iv(  psa_cipher_operation_t *operation,
+                                                    const uint8_t *iv,
+                                                    size_t iv_length)
+{
+    switch (operation->alg) {
+    #if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
+        case PSA_STREAM_CIPHER_CHACHA20:
+            return psa_cipher_chacha20_set_iv(  &operation->backend_ctx.cipher_ctx.chacha20,
+                                                iv, iv_length);
+    #endif
+    default:
+        (void)operation;
+        (void)iv;
+        (void)iv_length;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+}
+
+psa_status_t psa_algorithm_dispatch_cipher_encrypt(const psa_key_attributes_t *attributes,
+                                          psa_algorithm_t alg,
+                                          const psa_key_slot_t *slot,
+                                          const uint8_t *input,
+                                          size_t input_length,
+                                          uint8_t *output,
+                                          size_t output_size,
+                                          size_t *output_length)
 {
     psa_cipher_op_t op = PSA_ENCODE_CIPHER_OPERATION(alg, attributes->type, attributes->bits);
 

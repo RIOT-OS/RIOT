@@ -43,7 +43,9 @@ static const uint32_t constant[] = {0x61707865,
 /* Padding to add to the poly1305 authentication tag */
 static const uint8_t padding[15] = {0};
 
-/* Single round */
+/**
+ * @brief   Calculates a single round of the ChaCha20 block algorithm on a 32b word.
+ */
 static void _r(uint32_t *a, uint32_t *b, uint32_t *d, unsigned c)
 {
     *a += *b;
@@ -51,64 +53,58 @@ static void _r(uint32_t *a, uint32_t *b, uint32_t *d, unsigned c)
     *d = (tmp << c) | (tmp >> (32 - c));
 }
 
-static void _add_initial(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
+/**
+ * @brief   Initialization function, that initializes the ChaCha20 state with
+ *          the given key, nonce and counter
+ */
+static void _create_initial(chacha20_ctx_t *ctx, const uint8_t *key,
                          const uint8_t *nonce, uint32_t blk)
 {
     for (unsigned i = 0; i < 4; i++) {
-        ctx->state[i] += constant[i];
+        ctx->split.constant[i] = constant[i];
     }
     for (unsigned i = 0; i < 8; i++) {
-        ctx->state[i+4] += unaligned_get_u32(key + 4*i);
+        ctx->split.key[i] = unaligned_get_u32(key + 4*i);
     }
-    ctx->state[12] += unaligned_get_u32((uint8_t*)&blk);
-    ctx->state[13] += unaligned_get_u32(nonce);
-    ctx->state[14] += unaligned_get_u32(nonce+4);
-    ctx->state[15] += unaligned_get_u32(nonce+8);
+    ctx->split.counter[0] = unaligned_get_u32((uint8_t*)&blk);
+    ctx->split.nonce[0] = unaligned_get_u32(nonce);
+    ctx->split.nonce[1] = unaligned_get_u32(nonce+4);
+    ctx->split.nonce[2] = unaligned_get_u32(nonce+8);
 }
 
-static void _keystream(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
-                       const uint8_t *nonce, uint32_t blk)
+/**
+ * @brief   Does 32bit uint addition of the initial state to the key_stream buffer.
+ */
+static void _add_initial(chacha20_ctx_t *ctx, uint32_t *key_stream)
+{
+    for (unsigned i = 0; i < 16; i++) {
+        key_stream[i] += ctx->words[i];
+    }
+}
+
+/**
+ * @brief   Calculates the ChaCha20 Block function with the given state/context
+ *          and returns it in the key_stream buffer (64B).
+ */
+static void _keystream(chacha20_ctx_t *ctx, uint32_t *key_stream)
 {
     /* Initialize block state */
-    memset(ctx->state, 0, sizeof(ctx->state));
-    _add_initial(ctx, key, nonce, blk);
+    memset(key_stream, 0, 16 * 4);
+    _add_initial(ctx, key_stream);
 
     /* perform rounds */
     for (unsigned i = 0; i < 80; ++i) {
-        uint32_t *a = &ctx->state[((i                    ) & 3)          ];
-        uint32_t *b = &ctx->state[((i + ((i & 4) ? 1 : 0)) & 3) + (4 * 1)];
-        uint32_t *c = &ctx->state[((i + ((i & 4) ? 2 : 0)) & 3) + (4 * 2)];
-        uint32_t *d = &ctx->state[((i + ((i & 4) ? 3 : 0)) & 3) + (4 * 3)];
+        uint32_t *a = &key_stream[((i                    ) & 3)          ];
+        uint32_t *b = &key_stream[((i + ((i & 4) ? 1 : 0)) & 3) + (4 * 1)];
+        uint32_t *c = &key_stream[((i + ((i & 4) ? 2 : 0)) & 3) + (4 * 2)];
+        uint32_t *d = &key_stream[((i + ((i & 4) ? 3 : 0)) & 3) + (4 * 3)];
         _r(a, b, d, 16);
         _r(c, d, b, 12);
         _r(a, b, d, 8);
         _r(c, d, b, 7);
     }
     /* add initial state */
-    _add_initial(ctx, key, nonce, blk);
-}
-
-static void _xcrypt(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
-                    const uint8_t *nonce, const uint8_t *in, uint8_t *out,
-                    size_t len, size_t counter)
-{
-    /* Number of full 64 byte blocks */
-    const size_t num_blocks = len >> 6;
-    size_t pos = 0;
-    /* xcrypt full blocks */
-    for (size_t i = 0; i < num_blocks; i++, pos += 64) {
-        _keystream(ctx, key, nonce, i + counter);
-        for (size_t j = 0; j < 64; j++) {
-            out[pos+j] = in[pos+j] ^ ((uint8_t*)ctx->state)[j];
-        }
-    }
-    /* xcrypt remaining bytes */
-    if (len - pos) {
-        _keystream(ctx, key, nonce, num_blocks + counter);
-        for (size_t j = 0; j < len - pos; j++) {
-            out[pos+j] = in[pos+j] ^ ((uint8_t*)ctx->state)[j];
-        }
-    }
+    _add_initial(ctx, key_stream);
 }
 
 static void _poly1305_padded(poly1305_ctx_t *pctx, const uint8_t *data, size_t len)
@@ -125,8 +121,10 @@ static void _poly1305_gentag(uint8_t *mac, const uint8_t *key, const uint8_t *no
 {
     chacha20poly1305_ctx_t ctx;
     /* generate one time key */
-    _keystream(&ctx, key, nonce, 0);
-    poly1305_init(&ctx.poly, (uint8_t*)ctx.state);
+    _create_initial(&ctx.chacha20, key, nonce, 0);
+    uint32_t key_stream[16];
+    _keystream(&ctx.chacha20, key_stream);
+    poly1305_init(&ctx.poly, (uint8_t*)key_stream);
     /* Add aad */
     _poly1305_padded(&ctx.poly, aad, aadlen);
     /* Add ciphertext */
@@ -142,9 +140,8 @@ void chacha20poly1305_encrypt(uint8_t *cipher, const uint8_t *msg,
                               size_t msglen, const uint8_t *aad, size_t aadlen,
                               const uint8_t *key, const uint8_t *nonce)
 {
-    chacha20poly1305_ctx_t ctx;
-    _xcrypt(&ctx, key, nonce, msg, cipher, msglen, 1);
-    crypto_secure_wipe(&ctx, sizeof(ctx));
+
+    chacha20_encrypt_decrypt(key, nonce, 1, msg, msglen, cipher);
     /* Generate tag */
     _poly1305_gentag(&cipher[msglen], key, nonce,
                     cipher, msglen, aad, aadlen);
@@ -163,16 +160,62 @@ int chacha20poly1305_decrypt(const uint8_t *cipher, size_t cipherlen,
     if (crypto_equals(cipher+*msglen, mac, CHACHA20POLY1305_TAG_BYTES) == 0) {
         return 0;
     }
-    chacha20poly1305_ctx_t ctx;
-    /* Number of full blocks */
-    _xcrypt(&ctx, key, nonce, cipher, msg, *msglen, 1);
+    chacha20_encrypt_decrypt(key, nonce, 1, cipher, cipherlen, msg);
     return 1;
 }
 
-void chacha20_encrypt_decrypt(const uint8_t *input, uint8_t *output,
-                              const uint8_t *key, const uint8_t *nonce,
-                              size_t inputlen)
+void chacha20_encrypt_decrypt(  const uint8_t *key,
+                                const uint8_t *nonce,
+                                uint32_t counter,
+                                const uint8_t *input,
+                                size_t input_length,
+                                uint8_t *output)
 {
-    chacha20poly1305_ctx_t ctx;
-    _xcrypt(&ctx, key, nonce, input, output, inputlen, 0);
+    chacha20_ctx_t ctx;
+    chacha20_setup(&ctx, key, nonce, counter);
+    const size_t num_blocks = input_length >> 6;
+    size_t pos = 0;
+    /* xcrypt full blocks */
+    for (size_t i = 0; i < num_blocks; i++, pos += 64) {
+        chacha20_update(&ctx, &input[pos], &output[pos]);
+    }
+    /* xcrypt remaining bytes */
+    if (input_length - pos) {
+        chacha20_finish(&ctx, &input[pos], input_length - pos, &output[pos]);
+    }
+}
+
+void chacha20_setup(chacha20_ctx_t *ctx,
+                    const uint8_t *key,
+                    const uint8_t *nonce,
+                    const uint32_t counter)
+{
+    _create_initial(ctx, key, nonce, counter);
+}
+
+void chacha20_update(   chacha20_ctx_t *ctx,
+                        const uint8_t *input,
+                        uint8_t *output)
+{
+
+    uint32_t key_stream[16];
+    /* xcrypt full block */
+    _keystream(ctx, key_stream);
+    for (size_t j = 0; j < 64; j++) {
+        output[j] = input[j] ^ ((uint8_t*)key_stream)[j];
+    }
+    ctx->split.counter[0]++;
+}
+
+void chacha20_finish(   chacha20_ctx_t *ctx,
+                        const uint8_t *input,
+                        size_t input_length,
+                        uint8_t *output)
+{
+    uint32_t key_stream[16];
+    _keystream(ctx, key_stream);
+    for (size_t j = 0; j < input_length; j++) {
+        output[j] = input[j] ^ ((uint8_t*)key_stream)[j];
+    }
+    crypto_secure_wipe(ctx, sizeof(*ctx));
 }
