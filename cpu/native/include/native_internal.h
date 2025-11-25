@@ -87,6 +87,12 @@ void native_cpu_init(void);
 extern volatile bool _native_interrupts_enabled;
 
 /**
+ * @brief Signal set during "IRQs enabled"
+ * @internal
+ */
+extern sigset_t _native_sig_set;
+
+/**
  * @brief Pipe yielding signals
  * @private
  *
