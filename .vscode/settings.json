@@ -9,11 +9,7 @@
         "Makefile.*": "makefile",
         "*.mk": "makefile",
         "*.sketch": "cpp",
-        "crypto_contexts.h": "c",
-        "types.h": "c",
-        "crypto_sizes.h": "c",
-        "sizes.h": "c",
-        "crypto.h": "c"
+        "crypto_contexts.h": "c"
     },
     "[shellscript][c][cpp]": {
         "editor.tabSize": 4,
