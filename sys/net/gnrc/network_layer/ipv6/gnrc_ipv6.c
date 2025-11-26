@@ -239,8 +239,10 @@ static inline void _on_l2_disconnected(kernel_pid_t if_pid, uint8_t *l2addr, uin
                            NETAPI_NOTIFY_L3_UNREACHABLE, &ipv6, sizeof(ipv6_addr_t));
     }
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
     /* Remove from neighbor cache. */
     gnrc_ipv6_nib_nc_del_l2(if_pid, l2addr, l2addr_len);
+#endif /* CONFIG_GNRC_IPV6_NIB_ARSM */
 }
 
 /**

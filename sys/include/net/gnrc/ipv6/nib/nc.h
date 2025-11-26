@@ -263,6 +263,7 @@ static inline int gnrc_ipv6_nib_nc_set_6ln(unsigned iface, const uint8_t *l2addr
 }
 #endif /* CONFIG_GNRC_IPV6_NIB_6LN */
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)  || defined(DOXYGEN)
 /**
  * @brief   Deletes neighbor with address @p ipv6 from NIB
  *
@@ -274,6 +275,7 @@ static inline int gnrc_ipv6_nib_nc_set_6ln(unsigned iface, const uint8_t *l2addr
  * If the @p ipv6 can't be found for a neighbor in the NIB nothing happens.
  */
 void gnrc_ipv6_nib_nc_del(const ipv6_addr_t *ipv6, unsigned iface);
+#endif /* CONFIG_GNRC_IPV6_NIB_ARSM */
 
 /**
  * @brief   Deletes neighbor with link-layer address @p l2addr from NIB.

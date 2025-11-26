@@ -103,6 +103,7 @@ void gnrc_ipv6_nib_nc_del(const ipv6_addr_t *ipv6, unsigned iface)
     _nib_release();
 }
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
 bool gnrc_ipv6_nib_nc_del_l2(unsigned iface, const uint8_t *l2addr, size_t l2addr_len)
 {
     _nib_onl_entry_t *node = NULL;
@@ -123,6 +124,7 @@ bool gnrc_ipv6_nib_nc_del_l2(unsigned iface, const uint8_t *l2addr, size_t l2add
 
     return res;
 }
+#endif /* CONFIG_GNRC_IPV6_NIB_ARSM */
 
 void gnrc_ipv6_nib_nc_mark_reachable(const ipv6_addr_t *ipv6)
 {
