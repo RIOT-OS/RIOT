@@ -22,6 +22,7 @@
 
 #include "sx126x_netdev.h"
 
+#include "log.h"
 #include "macros/units.h"
 #include "net/lora.h"
 #include "periph/spi.h"
@@ -321,6 +322,35 @@ static void _dio1_isr(void *arg)
 }
 #endif
 
+/**
+ * @brief   Detect whether an SX126x device is actually connected
+ * @param   dev     Initialized device descriptor to use
+ * @pre     @p dev is initialized and the /CS pin has been configured
+ *
+ * This sadly is a bit more involved than one would hope, as no vendor and
+ * model codes are in the register map that can be searched for. Instead,
+ * we write the packet type (or rather modulation type) to be 100% the device
+ * must be configured to use LoRa modulation, then read this back and expect
+ * it to be LoRa. In we also check the device status to be valid, which adds
+ * one more known bit to compare against.
+ */
+static bool _sx126x_detect(sx126x_t *dev)
+{
+    sx126x_pkt_type_t pkt_type = UINT8_MAX;
+    sx126x_chip_status_t radio_status = { 0 };
+    sx126x_set_pkt_type(dev, SX126X_PKT_TYPE_LORA);
+    sx126x_get_status(dev, &radio_status);
+    sx126x_get_pkt_type(dev, &pkt_type);
+
+    if ((pkt_type == SX126X_PKT_TYPE_LORA) && (radio_status.chip_mode)) {
+        return true;
+    }
+    DEBUG("[sx126x] pkt_type = %x, radio_status.chip_mode = %u\n",
+               (unsigned)pkt_type, (unsigned)radio_status.chip_mode);
+    LOG_ERROR("[sx126x] No device detected\n");
+    return false;
+}
+
 int sx126x_init(sx126x_t *dev)
 {
     /* Setup SPI for SX126X */
@@ -355,22 +385,7 @@ int sx126x_init(sx126x_t *dev)
     /* Reset the device */
     sx126x_reset(dev);
 
-    /* Read status and packet type to verify device presence. Just reading the
-     * status can lead incorrectly detecting the chip to be present, e.g. when
-     * CIPO (a.k.a. MISO) is pulled high. The packet type after reset should be
-     * valid. The chance of it not being valid is quite good on floating SPI.
-     * If CIPO is pulled down, `radio_status.chip_mode` will be zero, if CIPO
-     * is pulled high, `pkt_type` will be `UINT8_MAX`. So in those two cases,
-     * an unconnected chip will be detected reliably.
-     */
-    sx126x_pkt_type_t pkt_type = UINT8_MAX;
-    sx126x_chip_status_t radio_status = { 0 };
-    sx126x_get_pkt_type(dev, &pkt_type);
-    sx126x_get_status(dev, &radio_status);
-    if ((pkt_type > SX126X_PKT_TYPE_LR_FHSS) || !radio_status.chip_mode) {
-        DEBUG("[sx126x] error: no device found\n");
-        printf("pkt_type = %x, radio_status.chip_mode = %u\n",
-               (unsigned)pkt_type, (unsigned)radio_status.chip_mode);
+    if (!_sx126x_detect(dev)) {
         return -ENODEV;
     }
 
