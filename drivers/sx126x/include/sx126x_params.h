@@ -43,23 +43,38 @@ extern "C" {
  * Default values are adapted for mbed shield used with to nucleo64 boards
  * @{
  */
-#ifndef SX126X_PARAM_SPI
+#if !defined(SX126X_PARAM_SPI) || defined(DOXYGEN)
+/**
+ * @brief   SPI bus
+ */
 #  define SX126X_PARAM_SPI                  SPI_DEV(0)
 #endif
 
-#ifndef SX126X_PARAM_SPI_NSS
+#if !defined(SX126X_PARAM_SPI_NSS) || defined(DOXYGEN)
+/**
+ * @brief   SPI chip select pin
+ */
 #  define SX126X_PARAM_SPI_NSS              GPIO_PIN(0, 8)  /* D7 */
 #endif
 
-#ifndef SX126X_PARAM_RESET
+#if !defined(SX126X_PARAM_RESET) || defined(DOXYGEN)
+/**
+ * @brief   Reset pin
+ */
 #  define SX126X_PARAM_RESET                GPIO_PIN(0, 0)  /* A0 */
 #endif
 
-#ifndef SX126X_PARAM_BUSY
+#if !defined(SX126X_PARAM_BUSY) || defined(DOXYGEN)
+/**
+ * @brief   Busy pin
+ */
 #  define SX126X_PARAM_BUSY                 GPIO_PIN(1, 3)  /* D3 */
 #endif
 
-#ifndef SX126X_PARAM_DIO1
+#if !defined(SX126X_PARAM_DIO1) || defined(DOXYGEN)
+/**
+ * @brief   DIO1 interrupt pin
+ */
 #  define SX126X_PARAM_DIO1                 GPIO_PIN(1, 4)  /* D5 */
 #endif
 
@@ -71,11 +86,18 @@ extern "C" {
 #  define SX126X_PARAM_REGULATOR            SX126X_REG_MODE_DCDC
 #endif
 
-#ifndef SX126X_PARAM_SET_RF_MODE_CB
+#if !defined(SX126X_PARAM_SET_RF_MODE_CB) || defined(DOXYGEN)
+/**
+ * @brief   Callback function to call when switching between RX and TX states
+ */
 #  define SX126X_PARAM_SET_RF_MODE_CB       NULL
 #endif
 
-#ifndef SX126X_PARAM_TX_PA_MODE
+#if !defined(SX126X_PARAM_TX_PA_MODE) || defined(DOXYGEN)
+/**
+ * @brief   Transmit power amplifier mode which can be
+ *          SX126X_RF_MODE_TX_HPA or SX126X_RF_MODE_TX_LPA
+ */
 #  define SX126X_PARAM_TX_PA_MODE           SX126X_RF_MODE_TX_LPA
 #endif
 

@@ -49,7 +49,7 @@ void auto_init_socket_zep(void)
         LOG_DEBUG("[auto_init_netif: initializing socket ZEP device #%u\n", i);
         /* setup netdev device */
         netdev_register(&_socket_zep_netdev[i].dev.netdev, NETDEV_SOCKET_ZEP, i);
-        netdev_ieee802154_submac_init(&_socket_zep_netdev[i]);
+        netdev_ieee802154_submac_init(&_socket_zep_netdev[i], NULL);
         socket_zep_hal_setup(&_socket_zeps[i], &_socket_zep_netdev[i].submac.dev);
 
         socket_zep_setup(&_socket_zeps[i], &socket_zep_params[i]);

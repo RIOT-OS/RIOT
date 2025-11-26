@@ -531,7 +531,8 @@ static const char *_netopt_ieee802154_phy_str[] = {
     [IEEE802154_PHY_OQPSK] = "O-QPSK",
     [IEEE802154_PHY_MR_OQPSK] = "MR-O-QPSK",
     [IEEE802154_PHY_MR_OFDM] = "MR-OFDM",
-    [IEEE802154_PHY_MR_FSK] = "MR-FSK"
+    [IEEE802154_PHY_MR_FSK] = "MR-FSK",
+    [IEEE802154_PHY_LORA] = "LORA",
 };
 #endif
 
