@@ -24,8 +24,10 @@
 
 #include_next "sx126x.h"
 
+#if IS_USED(MODULE_SX126X_IEEE802154)
+#include "net/ieee802154/radio.h"
+#endif
 #include "net/netdev.h"
-
 #include "periph/gpio.h"
 #include "periph/spi.h"
 
@@ -48,6 +50,92 @@ extern "C" {
  */
 #  define CONFIG_SX126X_DEFAULT_SYNC_WORD       0x12
 #endif
+
+#if !defined(CONFIG_SX126X_CHANNEL_DEFAULT) || defined(DOXYGEN)
+/**
+ * @brief   Default LoRa channel frequency in Hz
+ */
+#  define CONFIG_SX126X_CHANNEL_DEFAULT                     (868300000UL)
+#endif
+
+#if !defined(CONFIG_SX126X_TX_POWER_DEFAULT) || defined(DOXYGEN)
+/**
+ * @brief   Default TX power in dBm
+ */
+#    define CONFIG_SX126X_TX_POWER_DEFAULT                  (14U)
+#endif
+
+#if !defined(CONFIG_SX126X_RAMP_TIME_DEFAULT) || defined(DOXYGEN)
+/**
+ * @brief   Default TX ramp-up time
+ */
+#  define CONFIG_SX126X_RAMP_TIME_DEFAULT                   (SX126X_RAMP_10_US)
+#endif
+
+#if !defined(CONFIG_SX126X_LORA_BW_DEFAULT) || defined(DOXYGEN)
+/**
+ * @brief   Default LoRa bandwidth
+ */
+#  define CONFIG_SX126X_LORA_BW_DEFAULT                     (CONFIG_LORA_BW_DEFAULT)
+#endif
+
+#if !defined(CONFIG_SX126X_LORA_SF_DEFAULT) || defined(DOXYGEN)
+/**
+ * @brief   Default LoRa spreading factor
+ */
+#  define CONFIG_SX126X_LORA_SF_DEFAULT                     (CONFIG_LORA_SF_DEFAULT)
+#endif
+
+#if !defined(CONFIG_SX126X_LORA_CR_DEFAULT) || defined(DOXYGEN)
+/**
+ * @brief   Default LoRa coding rate
+ */
+#  define CONFIG_SX126X_LORA_CR_DEFAULT                     (CONFIG_LORA_CR_DEFAULT)
+#endif
+
+#if !defined(CONFIG_SX126X_LORA_PAYLOAD_CRC_OFF_DEFAULT) || defined(DOXYGEN)
+/**
+ * @brief   Default LoRa payload CRC setting
+ */
+#  define CONFIG_SX126X_LORA_PAYLOAD_CRC_OFF_DEFAULT        CONFIG_LORA_PAYLOAD_CRC_OFF_DEFAULT
+#endif
+
+#if !defined(CONFIG_SX126X_LORA_FIXED_HEADER_LEN_MODE_DEFAULT) || defined(DOXYGEN)
+/**
+ * @brief   Default LoRa fixed header length mode
+ */
+#  define CONFIG_SX126X_LORA_FIXED_HEADER_LEN_MODE_DEFAULT  CONFIG_LORA_FIXED_HEADER_LEN_MODE_DEFAULT
+#endif
+
+#if !defined(CONFIG_SX126X_LORA_FIXED_PAYLOAD_LENGTH_DEFAULT) || defined(DOXYGEN)
+/**
+ * @brief   Default LoRa fixed payload length
+ */
+#  define CONFIG_SX126X_LORA_FIXED_PAYLOAD_LENGTH_DEFAULT   (0)
+#endif
+
+#if !defined(CONFIG_SX126X_LORA_PREAMBLE_LENGTH_DEFAULT) || defined(DOXYGEN)
+/**
+ * @brief   Default LoRa preamble length
+ */
+#  define CONFIG_SX126X_LORA_PREAMBLE_LENGTH_DEFAULT        (CONFIG_LORA_PREAMBLE_LENGTH_DEFAULT)
+#endif
+
+#if !defined(CONFIG_SX126X_LORA_IQ_INVERTED_DEFAULT) || defined(DOXYGEN)
+/**
+ * @brief   Default LoRa IQ inverted setting
+ */
+#  define CONFIG_SX126X_LORA_IQ_INVERTED_DEFAULT            CONFIG_LORA_IQ_INVERTED_DEFAULT
+#endif
+
+/**
+ * @brief Minimum TX power in dBm
+ */
+#define SX126X_POWER_MIN                (-17)
+/**
+ * @brief Maximum TX power in dBm
+ */
+#define SX126X_POWER_MAX                (22)
 
 /**
  * * @note Forward declaration of the SX126x device descriptor
@@ -157,16 +245,31 @@ typedef struct {
  */
 struct sx126x {
     netdev_t netdev;                        /**< Netdev parent struct */
-    sx126x_params_t *params;                /**< Initialization parameters */
+    const sx126x_params_t *params;          /**< Initialization parameters */
     sx126x_pkt_params_lora_t pkt_params;    /**< Lora packet parameters */
     sx126x_mod_params_lora_t mod_params;    /**< Lora modulation parameters */
     uint32_t channel;                       /**< Current channel frequency (in Hz) */
-    uint16_t rx_timeout;                    /**< Rx Timeout in terms of symbols */
+    int32_t rx_timeout;                     /**< Rx Timeout in terms of symbols:
+                                                 <0: continuous Rx,
+                                                  0: single Rx,
+                                                 >0: actual timeout */
     bool radio_sleep;                       /**< Radio sleep status */
+#if IS_USED(MODULE_SX126X_IEEE802154)
+    bool cad_detected   : 1;                /**< Channel Activity Detected Flag */
+    bool cad_done       : 1;                /**< Channel Activity Detection Done Flag */
+    bool ack_filter     : 1;                /**< whether the ACK filter is activated or not */
+    bool promisc        : 1;                /**< whether the device is in promiscuous mode or not */
+    bool pending        : 1;                /**< whether there pending bit should be set in the ACK frame or not */
+    uint8_t short_addr[IEEE802154_SHORT_ADDRESS_LEN];   /**< Short (2 bytes) device address */
+    uint8_t long_addr[IEEE802154_LONG_ADDRESS_LEN];     /**< Long (8 bytes) device address */
+    uint16_t pan_id;                                    /**< PAN ID */
+#endif
+    void (*event_cb)(void *arg);            /**< IRQ event callback */
+    void *event_arg;                        /**< IRQ event argument */
 };
 
 /**
- * @brief   Setup the radio device
+ * @brief   Setup the radio device for LoRA mode
  *
  * @param[in] dev                       Device descriptor
  * @param[in] params                    Parameters for device initialization
@@ -174,6 +277,20 @@ struct sx126x {
  *                                      If initialized manually, pass a unique identifier instead.
  */
 void sx126x_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index);
+
+/**
+ * @brief   Setup the radio device for HAL layer
+ *
+ * @param[in] dev                       Device descriptor
+ * @param[in] params                    Parameters for device initialization
+ * @param[in] index                     Index of @p params in a global parameter struct array.
+ *                                      If initialized manually, pass a unique identifier instead.
+ * @param[in] hal                       HAL layer
+ * @param[in] event_cb                  Event callback function
+ * @param[in] arg                       Event callback argument
+ */
+void sx126x_hal_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index,
+                      void *hal, void (*event_cb)(void *arg), void *arg);
 
 /**
  * @brief   Initialize the given device
@@ -364,6 +481,25 @@ bool sx126x_get_lora_iq_invert(const sx126x_t *dev);
  * @param[in] iq_invert                The LoRa IQ inverted mode
  */
 void sx126x_set_lora_iq_invert(sx126x_t *dev, bool iq_invert);
+
+/**
+ * @brief   Calculate the time on air in µs for 1 symbol
+ *
+ * @param[in] dev                      Device descriptor of the driver
+ *
+ * @return the time on air in µs for 1 symbol
+ */
+uint32_t sx126x_symbol_time_on_air_us(const sx126x_t *dev);
+
+/**
+ * @brief   Calculate the time on air in µs for a given payload length
+ *
+ * @param[in] dev                      Device descriptor of the driver
+ * @param[in] payload_len              The payload length of a frame to be sent
+ *
+ * @return the time on air in µs of a frame with the given payload length
+ */
+uint32_t sx126x_time_on_air_us(const sx126x_t *dev, uint16_t payload_len);
 
 #ifdef __cplusplus
 }
