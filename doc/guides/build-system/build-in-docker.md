@@ -17,17 +17,27 @@ If your user does not have permissions to access the Docker daemon:
 $ BUILD_IN_DOCKER=1 DOCKER="sudo docker" make
 ```
 
-to always use Docker for building, set `BUILD_IN_DOCKER=1` (and if necessary
+To always use Docker for building, set `BUILD_IN_DOCKER=1` (and if necessary
 `DOCKER="sudo docker"`) in the environment:
 
 ```console
 $ export BUILD_IN_DOCKER=1
 ```
 
-## Targets ran in Docker: DOCKER_MAKECMDGOALS_POSSIBLE
+The used Docker image defaults to a pinned version of [riot/riotbuild] for a
+given commit in the RIOT repository. It can be overwritten via the environment
+variable `DOCKER_IMAGE`, for example:
 
-Currently only build related targets are ran in the docker container, the exact
+```shell
+$ BUILD_IN_DOCKER=1 DOCKER_IMAGE="local/tinybuild-native64:latest" make
+```
+
+## Targets run in Docker: DOCKER_MAKECMDGOALS_POSSIBLE
+
+Currently, only build-related targets are run in the Docker container, the exact
 list is under `DOCKER_MAKECMDGOALS_POSSIBLE` variable.
+
+For `native` boards, `make test` is also executed within the Docker container.
 
 ## Environment Variables: DOCKER_ENV_VARS
 
@@ -130,3 +140,4 @@ evaluated inside the Docker image again), conditional on a less complex environm
 variable that gets added to `DOCKER_ENV_VARS` in the Makefile.
 
 [option-summary]: https://www.gnu.org/software/make/manual/html_node/Options-Summary.html
+[riot/riotbuild]: https://hub.docker.com/r/riot/riotbuild/tags
