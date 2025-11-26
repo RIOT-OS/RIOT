@@ -12,8 +12,8 @@ CURRENT_TIME = $(call date_nanoseconds)
 
 $(call target-export-variables,test-exported-variables,$(EXPORTED_VARIABLES))
 test-exported-variables:
-	$(Q)bash -c 'test "$(MY_VARIABLE)" = "$${MY_VARIABLE}" || { echo ERROR: "$(MY_VARIABLE)" != "$${MY_VARIABLE}"; exit 1; }'
-	$(Q)bash -c 'test $(PARSE_TIME) -lt $${CURRENT_TIME} || { echo ERROR: $(PARSE_TIME) \>= $${CURRENT_TIME} >&2; exit 1; }'
+	$(Q)test "$(MY_VARIABLE)" = "$${MY_VARIABLE}" || { echo ERROR: "$(MY_VARIABLE)" != "$${MY_VARIABLE}"; exit 1; }
+	$(Q)test $(PARSE_TIME) -lt $${CURRENT_TIME} || { echo ERROR: $(PARSE_TIME) \>= $${CURRENT_TIME} >&2; exit 1; }
 
 
 MEMOIZED_CURRENT_TIME = $(call memoized,MEMOIZED_CURRENT_TIME,$(call date_nanoseconds))
