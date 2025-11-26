@@ -24,6 +24,7 @@
 #include "net/eui48.h"
 #include "net/gnrc/netif.h"
 #include "net/ieee802154.h"
+#include "net/sixlowpan/nd.h"
 #include "net/l2util.h"
 
 #if IS_USED(MODULE_GNRC_NETIF_IPV6)
@@ -218,6 +219,24 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
             break;
     }
 }
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+int gnrc_netif_ipv6_dad_transmits(const gnrc_netif_t *netif)
+{
+    switch (netif->device_type) {
+        #if defined(MODULE_NETDEV_IEEE802154)
+        case NETDEV_TYPE_IEEE802154:
+            return SIXLOWPAN_ND_REG_TRANSMIT_NUMOF;
+        #endif
+        #if defined(MODULE_NETDEV_ETH)
+        case NETDEV_TYPE_ETHERNET:
+            return NDP_DAD_TRANSMIT_NUMOF;
+        #endif
+        default:
+            return -ENOTSUP;
+    }
+}
+#endif
 
 int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
                                   const uint8_t *addr, size_t addr_len,
