@@ -302,8 +302,8 @@ static inline void _handle_unreachable_neighbor(ipv6_addr_t *addr)
     int idx = 0;
 
     /* Iterate through all parents and timeout the ones with matching address.
-       There can be multiple parents with the same address because the same node
-       can be a parent in multiple different DODAGs. */
+     * There can be multiple parents with the same address because the same node
+     * can be a parent in multiple different DODAGs. */
     while ((idx = gnrc_rpl_parent_iter_by_addr(addr, &parent, idx)) >= 0) {
         _parent_timeout(parent);
     }
