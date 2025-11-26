@@ -18,7 +18,6 @@
 #include "net/gnrc/netapi/notify.h"
 #include "net/ipv6/addr.h"
 
-
 int _copy_l2_connection_data(gnrc_netapi_notify_t *notify, netapi_notify_l2_connection_t *data)
 {
     assert(notify->_data_len == sizeof(netapi_notify_l2_connection_t));
