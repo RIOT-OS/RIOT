@@ -59,8 +59,12 @@ static xtimer_t _lt_timer;
 static msg_t _lt_msg = { .type = GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE };
 #endif
 static msg_t _msg_q[GNRC_RPL_MSG_QUEUE_SIZE];
+
 static gnrc_netreg_entry_t _me_icmpv6_reg;
+#if IS_USED(MODULE_GNRC_NETAPI_NOTIFY)
 static gnrc_netreg_entry_t _me_routing_reg;
+#endif /* MODULE_GNRC_NETAPI_NOTIFY*/
+
 static mutex_t _inst_id_mutex = MUTEX_INIT;
 static uint8_t _instance_id;
 
@@ -107,10 +111,12 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
         _me_icmpv6_reg.target.pid = gnrc_rpl_pid;
         gnrc_netreg_register(GNRC_NETTYPE_ICMPV6, &_me_icmpv6_reg);
 
+#if IS_USED(MODULE_GNRC_NETAPI_NOTIFY)
         /* Register interest in L3 routing info. */
         _me_routing_reg.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
         _me_routing_reg.target.pid = gnrc_rpl_pid;
         gnrc_netreg_register(GNRC_NETTYPE_L3_ROUTING, &_me_routing_reg);
+#endif /* MODULE_GNRC_NETAPI_NOTIFY*/
 
         gnrc_rpl_of_manager_init();
         evtimer_init_msg(&gnrc_rpl_evtimer);
@@ -407,10 +413,12 @@ static void *_event_loop(void *args)
                 reply.content.value = -ENOTSUP;
                 msg_reply(&msg, &reply);
                 break;
+#if IS_USED(MODULE_GNRC_NETAPI_NOTIFY)
             case GNRC_NETAPI_MSG_TYPE_NOTIFY:
                 DEBUG("RPL: GNRC_NETAPI_MSG_TYPE_NOTIFY received\n");
                 _netapi_notify_event(msg.content.ptr);
                 break;
+#endif /* MODULE_GNRC_NETAPI_NOTIFY */
             default:
                 break;
         }

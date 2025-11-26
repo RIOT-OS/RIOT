@@ -332,7 +332,6 @@ end:
     ble_l2cap_recv_ready(event->receive.chan, rxb);
 }
 
-#ifdef MODULE_GNRC_IPV6
 /**
  * @brief   Sends a netapi notification for a connection event.
  *
@@ -351,7 +350,6 @@ static inline void _dispatch_connection_event(netapi_notify_t notify, uint8_t *a
     gnrc_netapi_notify(GNRC_NETTYPE_L2_DISCOVERY, GNRC_NETREG_DEMUX_CTX_ALL,
                        notify, &event, sizeof(netapi_notify_l2_connection_t));
 }
-#endif /* MODULE_GNRC_IPV6 */
 
 static int _on_l2cap_client_evt(struct ble_l2cap_event *event, void *arg)
 {
@@ -371,9 +369,9 @@ static int _on_l2cap_client_evt(struct ble_l2cap_event *event, void *arg)
             conn->state |= NIMBLE_NETIF_L2CAP_CLIENT;
             conn->state &= ~NIMBLE_NETIF_CONNECTING;
             _notify(handle, NIMBLE_NETIF_CONNECTED_MASTER, conn->addr);
-#ifdef MODULE_GNRC_IPV6
+#if IS_USED(MODULE_GNRC_NETAPI_NOTIFY)
             _dispatch_connection_event(NETAPI_NOTIFY_L2_NEIGH_CONNECTED, conn->addr);
-#endif /* MODULE_GNRC_IPV6 */
+#endif /* MODULE_GNRC_NETAPI_NOTIFY */
             break;
         case BLE_L2CAP_EVENT_COC_DISCONNECTED:
             assert(conn->state & NIMBLE_NETIF_L2CAP_CLIENT);
@@ -429,9 +427,9 @@ static int _on_l2cap_server_evt(struct ble_l2cap_event *event, void *arg)
             }
 
             _notify(handle, NIMBLE_NETIF_CONNECTED_SLAVE, conn->addr);
-#ifdef MODULE_GNRC_IPV6
+#if IS_USED(MODULE_GNRC_NETAPI_NOTIFY)
             _dispatch_connection_event(NETAPI_NOTIFY_L2_NEIGH_CONNECTED, conn->addr);
-#endif /* MODULE_GNRC_IPV6 */
+#endif /* MODULE_GNRC_NETAPI_NOTIFY */
             break;
         case BLE_L2CAP_EVENT_COC_DISCONNECTED:
             conn = nimble_netif_conn_from_gaphandle(event->disconnect.conn_handle);
@@ -526,9 +524,9 @@ static int _on_gap_master_evt(struct ble_gap_event *event, void *arg)
             nimble_netif_conn_free(handle, addr);
             thread_flags_set(_netif_thread, FLAG_TX_NOTCONN);
             _notify(handle, type, addr);
-#ifdef MODULE_GNRC_IPV6
+#if IS_USED(MODULE_GNRC_NETAPI_NOTIFY)
             _dispatch_connection_event(NETAPI_NOTIFY_L2_NEIGH_DISCONNECTED, addr);
-#endif /* MODULE_GNRC_IPV6 */
+#endif /* MODULE_GNRC_NETAPI_NOTIFY */
             break;
         }
         case BLE_GAP_EVENT_CONN_UPDATE:
@@ -573,9 +571,9 @@ static int _on_gap_slave_evt(struct ble_gap_event *event, void *arg)
             nimble_netif_conn_free(handle, addr);
             thread_flags_set(_netif_thread, FLAG_TX_NOTCONN);
             _notify(handle, type, addr);
-#ifdef MODULE_GNRC_IPV6
+#if IS_USED(MODULE_GNRC_NETAPI_NOTIFY)
             _dispatch_connection_event(NETAPI_NOTIFY_L2_NEIGH_DISCONNECTED, addr);
-#endif /* MODULE_GNRC_IPV6 */
+#endif /* MODULE_GNRC_NETAPI_NOTIFY */
             break;
         }
         case BLE_GAP_EVENT_CONN_UPDATE:
