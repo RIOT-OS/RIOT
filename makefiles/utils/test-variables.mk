@@ -3,7 +3,7 @@ include variables.mk
 # Timestamp in nanoseconds (to be an integer)
 # OSx 'date' does not support 'date +%s%N' so rely on python instead
 # It could be OSx specific but we do not have 'OS' defined here to differentiate
-date_nanoseconds = $(shell python -c 'import time; print(int(time.time() * 1000000000))')
+date_nanoseconds = $(shell python3 -c 'import time; print(int(time.time() * 1000000000))')
 
 EXPORTED_VARIABLES = MY_VARIABLE CURRENT_TIME
 MY_VARIABLE = my_variable
