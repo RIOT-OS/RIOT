@@ -145,6 +145,8 @@ typedef struct {
 typedef enum {
     /* Device is in no mode (currently did not receiving any data frame) */
     SLIPMUX_STATE_NONE = 0,
+    /* Device discards incoming data until next frame begins */
+    SLIPMUX_STATE_UNKNOWN,
     /* Device handles data as network device */
     SLIPMUX_STATE_NET,
     /* Device handles data as network device, next byte is escaped */

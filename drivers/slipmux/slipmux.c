@@ -92,7 +92,7 @@ void slipmux_rx_cb(void *arg, uint8_t byte)
             if (!crb_add_byte(&dev->coap_rb, byte)) {
                 DEBUG("slipmux: coap rx buffer full, drop frame\n");
                 crb_end_chunk(&dev->coap_rb, false);
-                dev->state = SLIPMUX_STATE_NONE;
+                dev->state = SLIPMUX_STATE_UNKNOWN;
                 return;
             }
 #endif
@@ -113,7 +113,7 @@ void slipmux_rx_cb(void *arg, uint8_t byte)
         if (!crb_add_byte(&dev->coap_rb, byte)) {
             DEBUG("slipmux: coap rx buffer full, drop frame\n");
             crb_end_chunk(&dev->coap_rb, false);
-            dev->state = SLIPMUX_STATE_NONE;
+            dev->state = SLIPMUX_STATE_UNKNOWN;
             return;
         }
 #endif
@@ -137,7 +137,7 @@ void slipmux_rx_cb(void *arg, uint8_t byte)
         if (!crb_add_byte(&dev->net_rb, byte)) {
             DEBUG("slipmux: net rx buffer full, drop frame\n");
             crb_end_chunk(&dev->net_rb, false);
-            dev->state = SLIPMUX_STATE_NONE;
+            dev->state = SLIPMUX_STATE_UNKNOWN;
         }
 #endif
         return;
@@ -156,13 +156,17 @@ void slipmux_rx_cb(void *arg, uint8_t byte)
         if (!crb_add_byte(&dev->net_rb, byte)) {
             DEBUG("slipmux: net rx buffer full, drop frame\n");
             crb_end_chunk(&dev->net_rb, false);
-            dev->state = SLIPMUX_STATE_NONE;
+            dev->state = SLIPMUX_STATE_UNKNOWN;
             return;
         }
 #endif
         dev->state = SLIPMUX_STATE_NET;
         return;
-
+    case SLIPMUX_STATE_UNKNOWN:
+        if (byte == SLIPMUX_END) {
+            dev->state = SLIPMUX_STATE_NONE;
+        }
+        return;
     case SLIPMUX_STATE_NONE:
         /* is diagnostic frame? */
         if (byte == SLIPMUX_START_STDIO) {
@@ -174,6 +178,7 @@ void slipmux_rx_cb(void *arg, uint8_t byte)
 #if IS_USED(MODULE_SLIPMUX_COAP)
             /* try to create new configuration / CoAP frame */
             if (!crb_start_chunk(&dev->coap_rb)) {
+                dev->state = SLIPMUX_STATE_UNKNOWN;
                 return;
             }
 #endif
@@ -186,12 +191,13 @@ void slipmux_rx_cb(void *arg, uint8_t byte)
             /* try to create new ip frame */
             if (!crb_start_chunk(&dev->net_rb)) {
                 DEBUG("slipmux: can't start new net frame, drop frame\n");
+                dev->state = SLIPMUX_STATE_UNKNOWN;
                 return;
             }
             if (!crb_add_byte(&dev->net_rb, byte)) {
                 DEBUG("slipmux: net rx buffer full, drop frame\n");
                 crb_end_chunk(&dev->net_rb, false);
-                dev->state = SLIPMUX_STATE_NONE;
+                dev->state = SLIPMUX_STATE_UNKNOWN;
                 return;
             }
 #endif
@@ -204,8 +210,8 @@ void slipmux_rx_cb(void *arg, uint8_t byte)
             return;
         }
 
+        dev->state = SLIPMUX_STATE_UNKNOWN;
         DEBUG("slipmux: Unknown start byte %b ignored\n", byte);
-        // todo: Own parser category for unknown packet
     }
 }
 
