@@ -27,11 +27,6 @@
 #include "slipmux_internal.h"
 #include "slipmux_params.h"
 
-#if (IS_USED(MODULE_SLIPMUX_STDIO) || IS_USED(MODULE_SLIPMUX_COAP))
-/* For synchronization with stdio/config threads */
-mutex_t slipmux_mutex = MUTEX_INIT;
-#endif
-
 slipmux_t slipmux_devs[SLIPMUX_DEV_NUM];
 
 void slipmux_rx_cb(void *arg, uint8_t byte)
