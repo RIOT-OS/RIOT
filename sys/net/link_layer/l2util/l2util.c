@@ -123,11 +123,11 @@ int l2util_eui64_from_addr(int dev_type, const uint8_t *addr, size_t addr_len,
                 return -EINVAL;
             }
 #endif /* defined (MODULE_NRF24L01P_NG) */
-#if defined(MODULE_SLIPMUX_L2ADDR)
+#if defined(MODULE_SLIPMUX_NET_L2ADDR)
         case NETDEV_TYPE_SLIP:
             memcpy(eui64, addr, addr_len);
             return sizeof(eui64_t);
-#endif /* defined(MODULE_SLIPMUX_L2ADDR) */
+#endif /* defined(MODULE_SLIPMUX_NET_L2ADDR) */
         default:
             (void)addr;
             (void)addr_len;
@@ -235,11 +235,11 @@ int l2util_ipv6_iid_to_addr(int dev_type, const eui64_t *iid, uint8_t *addr)
             memcpy(&addr[addr_len - 3], &iid->uint8[5], 3);
             return addr_len;
 #endif /* defined(MODULE_NRF24L01P_NG) */
-#if defined(MODULE_SLIPMUX_L2ADDR)
+#if defined(MODULE_SLIPMUX_NET_L2ADDR)
         case NETDEV_TYPE_SLIP:
             memcpy(addr, iid, sizeof(eui64_t));
             return sizeof(eui64_t);
-#endif /* defined(MODULE_SLIP) */
+#endif /* defined(MODULE_SLIPMUX_NET_L2ADDR) */
         default:
             (void)iid;
             (void)addr;
@@ -298,10 +298,10 @@ int l2util_ndp_addr_len_from_l2ao(int dev_type,
             (void)opt;
             return 5; /* maximum length */
 #endif /* defined(MODULE_NRF24L01P_NG) */
-#if defined(MODULE_SLIPMUX_L2ADDR)
+#if defined(MODULE_SLIPMUX_NET_L2ADDR)
         case NETDEV_TYPE_SLIP:
             return sizeof(eui64_t);
-#endif /* defined(MODULE_SLIPMUX_L2ADDR) */
+#endif /* defined(MODULE_SLIPMUX_NET_L2ADDR) */
         default:
             (void)opt;
 #ifdef DEVELHELP

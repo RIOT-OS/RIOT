@@ -223,7 +223,7 @@ err_t lwip_netdev_init(struct netif *netif)
 #if LWIP_IPV6
         netif->output_ip6 = slip_output6;
 
-        if (IS_USED(MODULE_SLIPMUX_L2ADDR)) {
+        if (IS_USED(MODULE_SLIPMUX_NET_L2ADDR)) {
             netif->hwaddr_len = (u8_t)netdev->driver->get(netdev, NETOPT_ADDRESS_LONG,
                                                           netif->hwaddr,
                                                           sizeof(netif->hwaddr));
