@@ -1,0 +1,15 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#               2021 HAW Hamburg
+#               2025 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menu "SLIPMUX driver"
+    depends on USEMODULE_SLIPMUX
+
+# todo
+
+endmenu # SLIPMUX driver
