@@ -38,7 +38,7 @@ static void _init(void)
 static ssize_t _write(const void *buffer, size_t len)
 {
     slipmux_lock(&slipmux_devs[0]);
-    slipmux_write_byte(slipmux_params[0].uart, SLIPMUX_STDIO_START);
+    slipmux_write_byte(slipmux_params[0].uart, SLIPMUX_START_STDIO);
     slipmux_write_bytes(slipmux_params[0].uart, buffer, len);
     slipmux_write_byte(slipmux_params[0].uart, SLIPMUX_END);
     slipmux_unlock(&slipmux_devs[0]);

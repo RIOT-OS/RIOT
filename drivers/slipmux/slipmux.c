@@ -158,12 +158,12 @@ void slipmux_rx_cb(void *arg, uint8_t byte)
 
     case SLIPMUX_STATE_NONE:
         /* is diagnostic frame? */
-        if (byte == SLIPMUX_STDIO_START) {
+        if (byte == SLIPMUX_START_STDIO) {
             dev->state = SLIPMUX_STATE_STDIN;
             return;
         }
 
-        if (byte == SLIPMUX_COAP_START) {
+        if (byte == SLIPMUX_START_COAP) {
 #if IS_USED(MODULE_SLIPMUX_COAP)
             /* try to create new configuration / CoAP frame */
             if (!crb_start_chunk(&dev->coap_rb)) {
@@ -174,7 +174,7 @@ void slipmux_rx_cb(void *arg, uint8_t byte)
             return;
         }
 
-        if (SLIPMUX_NET_START(byte)) {
+        if (SLIPMUX_START_NET(byte)) {
 #if IS_USED(MODULE_SLIPMUX_NET)
             /* try to create new ip frame */
             if (!crb_start_chunk(&dev->net_rb)) {

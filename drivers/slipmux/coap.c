@@ -41,7 +41,7 @@ void slipmux_coap_send(uint8_t *buf, size_t len, slipmux_t *dev)
     uint16_t fcs_sum = crc16_ccitt_fcs_finish(SPECIAL_INIT_FCS, buf, len);
 
     slipmux_lock(dev);
-    slipmux_write_byte(dev->config.uart, SLIPMUX_COAP_START);
+    slipmux_write_byte(dev->config.uart, SLIPMUX_START_COAP);
     slipmux_write_bytes(dev->config.uart, buf, len);
     slipmux_write_bytes(dev->config.uart, (uint8_t *) &fcs_sum, 2);
     slipmux_write_byte(dev->config.uart, SLIPMUX_END);
