@@ -44,7 +44,7 @@ static void _poweron(slipmux_t *dev)
         return;
     }
 
-    dev->state = 0;
+    dev->state = SLIPMUX_STATE_NONE;
     uart_init(dev->config.uart, dev->config.baudrate, slipmux_rx_cb, dev);
 }
 
@@ -125,7 +125,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 static void _isr(netdev_t *netdev)
 {
-    slipmux_t *dev =  container_of(netdev, slipmux_t, netdev);
+    slipmux_t *dev = container_of(netdev, slipmux_t, netdev);
 
     size_t len;
     while (crb_get_chunk_size(&dev->net_rb, &len)) {
@@ -136,10 +136,6 @@ static void _isr(netdev_t *netdev)
 #if !(IS_USED(MODULE_SLIPMUX_STDIO) ||  IS_USED(MODULE_SLIPMUX_COAP))
 static int _set_state(slipmux_t *dev, netopt_state_t state)
 {
-    if (IS_USED(MODULE_SLIPMUX_STDIO)) {
-        return -ENOTSUP;
-    }
-
     switch (state) {
     case NETOPT_STATE_STANDBY:
         _poweroff(dev, SLIPMUX_STATE_STANDBY);
@@ -209,10 +205,10 @@ static const netdev_driver_t slip_driver = {
     .isr = _isr,
     .get = _get,
     .confirm_send = _confirm_send,
-#if (IS_USED(MODULE_SLIPMUX_STDIO) || IS_USED(MODULE_SLIPMUX_COAP))
-    .set = netdev_set_notsup,
-#else
+#if !(IS_USED(MODULE_SLIPMUX_STDIO) || IS_USED(MODULE_SLIPMUX_COAP))
     .set = _set,
+#else
+    .set = netdev_set_notsup,
 #endif
 };
 
