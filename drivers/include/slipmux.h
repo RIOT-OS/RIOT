@@ -22,12 +22,12 @@
  *
  * This is the base module, see @ref drivers_slipmux_net, @ref drivers_slipmux_coap and
  * @ref drivers_slipmux_stdio for more information.
- * 
+ *
  * For example, to use STDIO and also provide a network interface over SLIPMUX select:
- * 
+ *
  *     USEMODULE += slipmux_stdio
  *     USEMODULE += slipmux_net
- * 
+ *
  * @{
  *
  * @file
@@ -106,7 +106,7 @@ extern "C" {
  * To enable this implementation, select
  *
  *     USEMODULE += slipmux_net
- * 
+ *
  * To add link-layer addresses to the SLIPMUX network interfaces, select
  *
  *     USEMODULE += slipmux_net_l2addr
