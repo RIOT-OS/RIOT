@@ -34,11 +34,11 @@ extern "C" {
 /**
  * @brief   Default UART to use
  */
-#define SLIPMUX_PARAM_UART          UART_DEV(0)
+#  define SLIPMUX_PARAM_UART          UART_DEV(0)
 /**
  * @brief   Default baudrate to use
  */
-#define SLIPMUX_PARAM_BAUDRATE      (115200U)
+#  define SLIPMUX_PARAM_BAUDRATE      (115200U)
 #endif /* DOXYGEN */
 
 #ifndef SLIPMUX_PARAM_UART
@@ -52,19 +52,25 @@ extern "C" {
 #  define SLIPMUX_PARAM_UART        STDIO_UART_DEV
 # endif /* MODULE_SLIPMUX_STDIO */
 #endif  /* SLIPMUX_PARAM_UART */
+
+/* if the user hasn't defined their own specific baudrate... */
 #ifndef SLIPMUX_PARAM_BAUDRATE
+/* ... and we are not using the STDIO module... */
 # ifndef MODULE_SLIPMUX_STDIO
+/*      ... we default to this baudrate */
 #  define SLIPMUX_PARAM_BAUDRATE    (115200U)
+/* ... but if we are using the STDIO module... */
 # else  /* MODULE_SLIPMUX_STDIO */
+/*      ... we use the default STDIO baudrate */
 #  define SLIPMUX_PARAM_BAUDRATE    (STDIO_UART_BAUDRATE)
 # endif /* MODULE_SLIPMUX_STDIO */
 #endif  /* SLIPMUX_PARAM_BAUDRATE */
 
-#ifndef SLIPMUX_PARAMS
+#if !defined(SLIPMUX_PARAMS) || DOXYGEN
 /**
  * @brief   Default UART parameters for SLIPMUX
  */
-#define SLIPMUX_PARAMS          { .uart = SLIPMUX_PARAM_UART,   \
+#  define SLIPMUX_PARAMS          { .uart = SLIPMUX_PARAM_UART,   \
                                   .baudrate = SLIPMUX_PARAM_BAUDRATE }
 #endif
 /** @} */

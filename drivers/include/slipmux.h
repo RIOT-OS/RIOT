@@ -82,7 +82,7 @@ extern "C" {
  * Reduce this value if your expected traffic does not include full IPv6 MTU
  * sized packets.
  */
-#ifndef CONFIG_SLIPMUX_COAP_BUFSIZE
+#if !defined(CONFIG_SLIPMUX_COAP_BUFSIZE) || defined(DOXYGEN)
 #  define CONFIG_SLIPMUX_COAP_BUFSIZE (512U)
 #endif
 /** @} */
@@ -115,12 +115,12 @@ extern "C" {
  * Reduce this value if your expected traffic does not include full IPv6 MTU
  * sized packets.
  */
-#ifdef CONFIG_SLIPMUX_NET_BUFSIZE_EXP
-#  define CONFIG_SLIPMUX_NET_BUFSIZE (1<<CONFIG_SLIPMUX_NET_BUFSIZE_EXP)
-#endif
-
-#ifndef CONFIG_SLIPMUX_NET_BUFSIZE
-#  define CONFIG_SLIPMUX_NET_BUFSIZE (2048U)
+#if !defined(CONFIG_SLIPMUX_NET_BUFSIZE) || defined(DOXYGEN)
+#  ifdef CONFIG_SLIPMUX_NET_BUFSIZE_EXP
+#    define CONFIG_SLIPMUX_NET_BUFSIZE (1<<CONFIG_SLIPMUX_NET_BUFSIZE_EXP)
+#  else
+#    define CONFIG_SLIPMUX_NET_BUFSIZE (2048U)
+#  endif
 #endif
 /** @} */
 
@@ -134,12 +134,10 @@ typedef struct {
 
 /**
  * @brief   Device descriptor for slipmux
- *
- * @extends netdev_t
  */
 typedef struct {
     slipmux_params_t config;                /**< configuration parameters */
-#if IS_USED(MODULE_SLIPMUX_NET)
+#if IS_USED(MODULE_SLIPMUX_NET) || defined(DOXYGEN)
     netdev_t netdev;                        /**< netdev */
     chunk_ringbuf_t net_rb;                 /**< Ringbuffer to store received networking frames.*/
                                             /* Written to from interrupts (with irq_disable */
@@ -149,11 +147,11 @@ typedef struct {
 
     uint8_t net_rx[CONFIG_SLIPMUX_NET_BUFSIZE]; /**< memory used by RX buffer */
 #endif
-#if IS_USED(MODULE_SLIPMUX_COAP)
+#if IS_USED(MODULE_SLIPMUX_COAP) || defined(DOXYGEN)
     chunk_ringbuf_t coap_rb;                /**< Ringbuffer stores received configuration frames */
     uint8_t coap_rx[CONFIG_SLIPMUX_COAP_BUFSIZE];/**< memory used by RX buffer */
     kernel_pid_t coap_server_pid;           /**< The PID of the CoAP server */
-    event_t event;
+    event_t event;                          /**< Event that is sent to the CoAP server */
 #endif
     /**
      * @brief   Device state (decoder-, powerstate)

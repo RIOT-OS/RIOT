@@ -71,15 +71,15 @@ extern slipmux_t slipmux_devs[SLIPMUX_DEV_NUM];
 /**
  * @brief   Starts a diagnostic frame
  */
-#define SLIPMUX_STDIO_START (0x0aU)
+#define SLIPMUX_START_STDIO (0x0aU)
 /**
  * @brief   Starts a configuration frame
  */
-#define SLIPMUX_COAP_START (0xa9U)
+#define SLIPMUX_START_COAP (0xa9U)
 /**
- * @brief   Starts a IP packet frame
+ * @brief   Starts an IP packet frame
  */
-#define SLIPMUX_NET_START(byte) (\
+#define SLIPMUX_START_NET(byte) (\
             /* is it an IPv4 packet? */ \
             (byte >= 0x45 && byte <= 0x4f) || \
             /* or is it an IPv6 packet? */ \
@@ -93,17 +93,17 @@ extern slipmux_t slipmux_devs[SLIPMUX_DEV_NUM];
 enum {
     /* Device is in no mode (currently did not receiving any data frame) */
     SLIPMUX_STATE_NONE = 0,
-    /* Device writes handles data as network device */
+    /* Device handles data as network device */
     SLIPMUX_STATE_NET,
-    /* Device writes handles data as network device, next byte is escaped */
+    /* Device handles data as network device, next byte is escaped */
     SLIPMUX_STATE_NET_ESC,
-    /* Device writes received data to stdin */
+    /* Device handles received data to stdin */
     SLIPMUX_STATE_STDIN,
-    /* Device writes received data to stdin, next byte is escaped */
+    /* Device handles received data to stdin, next byte is escaped */
     SLIPMUX_STATE_STDIN_ESC,
-    /* Device writes received data as CoAP message */
+    /* Device handles received data as CoAP message */
     SLIPMUX_STATE_COAP,
-    /* Device writes received data as CoAP message, next byte is escaped */
+    /* Device handles received data as CoAP message, next byte is escaped */
     SLIPMUX_STATE_COAP_ESC,
     /* Device is in standby, will wake up when sending data */
     SLIPMUX_STATE_STANDBY,
@@ -117,7 +117,7 @@ enum {
 void slipmux_rx_cb(void *arg, uint8_t byte);
 
 /**
- * @brief   Writes one byte to UART
+ * @brief   Writes one byte to UART without escaping
  *
  * @param[in] uart  The UART device to write to.
  * @param[in] byte  The byte to write to @p uart.
@@ -160,7 +160,7 @@ static inline void slipmux_unlock(slipmux_t *dev)
 #endif
 }
 
-#if IS_USED(MODULE_SLIPMUX_COAP)
+#if IS_USED(MODULE_SLIPMUX_COAP) || defined(DOXYGEN)
 /**
  * @brief   Initialise the CoAP handling
  *
@@ -176,8 +176,9 @@ void slipmux_coap_init(slipmux_t *dev, unsigned index);
  * @param[in] dev  The Slipmux device to notify.
  */
 void slipmux_coap_notify(slipmux_t *dev);
-#endif
-#if IS_USED(MODULE_SLIPMUX_NET)
+#endif /* MODULE_SLIPMUX_COAP */
+
+#if IS_USED(MODULE_SLIPMUX_NET) || defined(DOXYGEN)
 /**
  * @brief   Initialise the network handling
  *
@@ -193,7 +194,7 @@ void slipmux_net_init(slipmux_t *dev, unsigned index);
  * @param[in] dev  The Slipmux device to notify.
  */
 void slipmux_net_notify(slipmux_t *dev);
-#endif
+#endif /* MODULE_SLIPMUX_NET */
 
 #ifdef __cplusplus
 }
