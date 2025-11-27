@@ -1,0 +1,47 @@
+name: Deploy PR previews
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
+      - labeled
+    paths:
+      - "doc/guides/**"
+      - "doc/starlight/**"
+      - "CODE_OF_CONDUCT.md"
+      - "GOVERNANCE.md"
+      - "CONTRIBUTING.md"
+      - "CODING_CONVENTIONS*.md"
+      - "release-notes.txt"
+
+# Prevent race conditions when multiple PRs are updated simultaneously
+concurrency: preview-${{ github.ref }}
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    if: "${{ contains(github.event.pull_request.labels.*.name, 'CI: preview docs') }}"
+    defaults:
+      run:
+        working-directory: doc/starlight
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+
+      - name: Change Base URL
+        run: echo "PREVIEW_PATH=pr-preview/pr-${{ github.event.number }}" >> "$GITHUB_ENV"
+
+      - name: Build documentation
+        if: github.event.action != 'closed' # Skip build on PR close
+        run: make build
+
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./dist/

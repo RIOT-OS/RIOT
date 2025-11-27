@@ -4,9 +4,12 @@ import starlight from "@astrojs/starlight";
 import rehypeGithubEmoji from "rehype-github-emoji";
 import starlightImageZoom from "starlight-image-zoom";
 
+const base_url = process.env.PREVIEW_PATH ? process.env.PREVIEW_PATH : "/";
+
 // https://astro.build/config
 export default defineConfig({
   site: "https://guide.riot-os.org",
+  base: base_url,
   markdown: {
     rehypePlugins: [rehypeGithubEmoji],
   },
