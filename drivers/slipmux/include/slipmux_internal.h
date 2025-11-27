@@ -88,30 +88,6 @@ extern slipmux_t slipmux_devs[SLIPMUX_DEV_NUM];
 /** @} */
 
 /**
- * @brief   Decoder internal state
- */
-enum {
-    /* Device is in no mode (currently did not receiving any data frame) */
-    SLIPMUX_STATE_NONE = 0,
-    /* Device handles data as network device */
-    SLIPMUX_STATE_NET,
-    /* Device handles data as network device, next byte is escaped */
-    SLIPMUX_STATE_NET_ESC,
-    /* Device handles received data to stdin */
-    SLIPMUX_STATE_STDIN,
-    /* Device handles received data to stdin, next byte is escaped */
-    SLIPMUX_STATE_STDIN_ESC,
-    /* Device handles received data as CoAP message */
-    SLIPMUX_STATE_COAP,
-    /* Device handles received data as CoAP message, next byte is escaped */
-    SLIPMUX_STATE_COAP_ESC,
-    /* Device is in standby, will wake up when sending data */
-    SLIPMUX_STATE_STANDBY,
-    /* Device is in sleep mode */
-    SLIPMUX_STATE_SLEEP,
-};
-
-/**
  * @brief   Callback for the UART on receiving data
  */
 void slipmux_rx_cb(void *arg, uint8_t byte);

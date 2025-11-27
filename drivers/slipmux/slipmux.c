@@ -34,6 +34,13 @@ void slipmux_rx_cb(void *arg, uint8_t byte)
     slipmux_t *dev = arg;
 
     switch (dev->state) {
+    case SLIPMUX_STATE_STANDBY:
+        /* fall through */
+    case SLIPMUX_STATE_SLEEP:
+        /* do nothing if we are supposed to sleep */
+        /* and we should usually not be able to hit this case anyways */
+        assert(0);
+        break;
     case SLIPMUX_STATE_STDIN:
         switch (byte) {
         case SLIPMUX_ESC:

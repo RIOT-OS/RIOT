@@ -140,6 +140,30 @@ typedef struct {
 } slipmux_params_t;
 
 /**
+ * @brief   Decoder internal state
+ */
+typedef enum {
+    /* Device is in no mode (currently did not receiving any data frame) */
+    SLIPMUX_STATE_NONE = 0,
+    /* Device handles data as network device */
+    SLIPMUX_STATE_NET,
+    /* Device handles data as network device, next byte is escaped */
+    SLIPMUX_STATE_NET_ESC,
+    /* Device handles received data to stdin */
+    SLIPMUX_STATE_STDIN,
+    /* Device handles received data to stdin, next byte is escaped */
+    SLIPMUX_STATE_STDIN_ESC,
+    /* Device handles received data as CoAP message */
+    SLIPMUX_STATE_COAP,
+    /* Device handles received data as CoAP message, next byte is escaped */
+    SLIPMUX_STATE_COAP_ESC,
+    /* Device is in standby, will wake up when sending data */
+    SLIPMUX_STATE_STANDBY,
+    /* Device is in sleep mode */
+    SLIPMUX_STATE_SLEEP,
+} slipmux_state_t;
+
+/**
  * @brief   Device descriptor for slipmux
  */
 typedef struct {
@@ -163,7 +187,7 @@ typedef struct {
     /**
      * @brief   Device state (decoder-, powerstate)
      */
-    uint8_t state;
+    slipmux_state_t state;
 #if IS_USED(MODULE_SLIPMUX_STDIO) || IS_USED(MODULE_SLIPMUX_COAP)
     /**
      * @brief   Mutex to synchronize write operations to the UART between stdio,
