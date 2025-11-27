@@ -32,7 +32,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: dist
+          folder: doc/starlight/dist
           clean: true
           force: false
           clean-exclude: |
