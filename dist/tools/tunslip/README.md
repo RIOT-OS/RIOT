@@ -1,10 +1,10 @@
 # Creating a SLIP network interface
 
-The module `slipdev` (Serial line IP) enables the RIOT network stack to
-send and receive IP packets over a serial interface. This collection of
-tools originally from Contiki [1] enables Linux to interpret this data.
-Though there is a tool for such operations on Linux (`slattach`) it is
-only able to handle IPv4 packages and is unnecessarily complicated.
+The module `slipmux_net` (Serial line IP Multiplexing) enables the RIOT network
+stack to send and receive IP packets over a serial interface. This collection
+of tools originally from Contiki [1] enables Linux to interpret this data.
+Though there is a tool for such operations on Linux (`slattach`) it is only
+able to handle IPv4 packages and is unnecessarily complicated.
 
 ## Installation
 
