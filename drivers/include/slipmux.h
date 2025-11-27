@@ -22,7 +22,12 @@
  *
  * This is the base module, see @ref drivers_slipmux_net, @ref drivers_slipmux_coap and
  * @ref drivers_slipmux_stdio for more information.
- *
+ * 
+ * For example, to use STDIO and also provide a network interface over SLIPMUX select:
+ * 
+ *     USEMODULE += slipmux_stdio
+ *     USEMODULE += slipmux_net
+ * 
  * @{
  *
  * @file
@@ -56,7 +61,7 @@ extern "C" {
  */
 
 /**
- * @defgroup    drivers_slipmux_coap CoAP via SLIP
+ * @defgroup    drivers_slipmux_coap CoAP via SLIPMUX
  * @ingroup     drivers_slipmux
  * @brief       Exchange CoAP requests and responses via SLIPMUX
  * @see         [draft-bormann-t2trg-slipmux-03](https://datatracker.ietf.org/doc/html/draft-bormann-t2trg-slipmux-03)
@@ -79,8 +84,6 @@ extern "C" {
 /**
  * @brief   UART buffer size used for TX and RX buffers
  *
- * Reduce this value if your expected traffic does not include full IPv6 MTU
- * sized packets.
  */
 #if !defined(CONFIG_SLIPMUX_COAP_BUFSIZE) || defined(DOXYGEN)
 #  define CONFIG_SLIPMUX_COAP_BUFSIZE (512U)
@@ -89,7 +92,7 @@ extern "C" {
 
 
 /**
- * @defgroup    drivers_slipmux_net SLIP network device
+ * @defgroup    drivers_slipmux_net IP via SLIPMUX / SLIP network device
  * @ingroup     drivers_netdev
  * @brief       SLIP network device over @ref drivers_periph_uart
  * @see         [RFC 1055](https://datatracker.ietf.org/doc/html/rfc1055)
@@ -97,8 +100,8 @@ extern "C" {
  * This extension is part of the [Slipmux draft](https://datatracker.ietf.org/doc/html/draft-bormann-t2trg-slipmux-03).
  * @warning This module is under development for optimizations and module names might change!
  *
- * This will offer the traditional Serial Line Internet Protocol as a network interface
- * using GNRC.
+ * This will offer the traditional Serial Line Internet Protocol as a network interface.
+ * Uses GNRC by default, can also be used with LWIP.
  *
  * To enable this implementation, select
  *
