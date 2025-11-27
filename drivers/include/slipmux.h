@@ -106,6 +106,10 @@ extern "C" {
  * To enable this implementation, select
  *
  *     USEMODULE += slipmux_net
+ * 
+ * To add link-layer addresses to the SLIPMUX network interfaces, select
+ *
+ *     USEMODULE += slipmux_net_l2addr
  *
  * @see         drivers_slipmux
  *
