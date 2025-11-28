@@ -18,7 +18,7 @@ $(BINDIR_RIOTBOOT): $(CLEAN)
 export SLOT0_OFFSET SLOT0_LEN SLOT1_OFFSET SLOT1_LEN
 
 # Mandatory APP_VER, set to epoch by default
-EPOCH = $(call memoized,EPOCH,$(shell date +%s))
+EPOCH := $(call memoized,EPOCH,$(shell date +%s))
 APP_VER ?= $(EPOCH)
 
 # Final target for slot 0 with riot_hdr
