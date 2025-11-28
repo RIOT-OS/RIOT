@@ -108,7 +108,7 @@ static void test_gcoap__client_get_resp(void)
 {
     uint8_t buf[CONFIG_GCOAP_PDU_BUF_SIZE];
     coap_pkt_t pdu;
-    int res;
+    ssize_t res;
     size_t hdr_fixed_len = 4;
     char exp_payload[]   = "Oct 22 10:46:48";
     size_t exp_tokenlen  = 2;
@@ -121,9 +121,9 @@ static void test_gcoap__client_get_resp(void)
     };
     memcpy(buf, pdu_data, sizeof(pdu_data));
 
-    res = coap_parse(&pdu, &buf[0], sizeof(pdu_data));
+    res = coap_parse_udp(&pdu, &buf[0], sizeof(pdu_data));
 
-    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(sizeof(pdu_data), res);
     TEST_ASSERT_EQUAL_INT(COAP_CLASS_SUCCESS, coap_get_code_class(&pdu));
     TEST_ASSERT_EQUAL_INT(exp_tokenlen, coap_get_token_len(&pdu));
     TEST_ASSERT_EQUAL_INT(hdr_fixed_len + exp_tokenlen, coap_get_total_hdr_len(&pdu));
@@ -152,7 +152,7 @@ static void test_gcoap__client_put_req(void)
     len = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
     memcpy(pdu.payload, payload, 1);
 
-    coap_parse(&pdu, buf, len + 1);
+    coap_parse_udp(&pdu, buf, len + 1);
 
     TEST_ASSERT_EQUAL_INT(COAP_METHOD_PUT, coap_get_code_decimal(&pdu));
     TEST_ASSERT_EQUAL_INT(1, pdu.payload_len);
@@ -198,9 +198,9 @@ static void test_gcoap__client_get_path_defer(void)
 
     len = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
     TEST_ASSERT_EQUAL_INT(len,
-                          sizeof(coap_hdr_t) + CONFIG_GCOAP_TOKENLEN + ETAG_SLACK + optlen);
+                          sizeof(coap_udp_hdr_t) + CONFIG_GCOAP_TOKENLEN + ETAG_SLACK + optlen);
 
-    coap_parse(&pdu, buf, len);
+    coap_parse_udp(&pdu, buf, len);
 
     char uri[CONFIG_NANOCOAP_URI_MAX] = {0};
     coap_get_uri_path(&pdu, (uint8_t *)&uri[0]);
@@ -234,7 +234,7 @@ static void test_gcoap__client_ping(void)
  * Request from libcoap example for gcoap_cli /cli/stats resource
  * Include 2-byte token and Uri-Host option.
  */
-static int _read_cli_stats_req(coap_pkt_t *pdu, uint8_t *buf)
+static ssize_t _read_cli_stats_req(coap_pkt_t *pdu, uint8_t *buf)
 {
     uint8_t pdu_data[] = {
         0x52, 0x01, 0x20, 0xb6, 0x35, 0x61, 0x3d, 0x10,
@@ -246,7 +246,7 @@ static int _read_cli_stats_req(coap_pkt_t *pdu, uint8_t *buf)
     };
     memcpy(buf, pdu_data, sizeof(pdu_data));
 
-    return coap_parse(pdu, buf, sizeof(pdu_data));
+    return coap_parse_udp(pdu, buf, sizeof(pdu_data));
 }
 
 /* Server GET request success case. Validate request example. */
@@ -255,9 +255,9 @@ static void test_gcoap__server_get_req(void)
     uint8_t buf[CONFIG_GCOAP_PDU_BUF_SIZE];
     coap_pkt_t pdu;
 
-    int res = _read_cli_stats_req(&pdu, &buf[0]);
+    ssize_t res = _read_cli_stats_req(&pdu, &buf[0]);
 
-    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT(res > 0);
     TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code_decimal(&pdu));
     TEST_ASSERT_EQUAL_INT(2, coap_get_token_len(&pdu));
     TEST_ASSERT_EQUAL_INT(4 + 2, coap_get_total_hdr_len(&pdu));
@@ -310,7 +310,7 @@ static void test_gcoap__server_get_resp(void)
  * Confirmable request from libcoap example for gcoap_cli /cli/stats resource.
  * Include 2-byte token.
  */
-static int _read_cli_stats_req_con(coap_pkt_t *pdu, uint8_t *buf)
+static ssize_t _read_cli_stats_req_con(coap_pkt_t *pdu, uint8_t *buf)
 {
     uint8_t pdu_data[] = {
         0x42, 0x01, 0x8e, 0x03, 0x35, 0x61, 0xb3, 0x63,
@@ -318,7 +318,7 @@ static int _read_cli_stats_req_con(coap_pkt_t *pdu, uint8_t *buf)
     };
     memcpy(buf, pdu_data, sizeof(pdu_data));
 
-    return coap_parse(pdu, buf, sizeof(pdu_data));
+    return coap_parse_udp(pdu, buf, sizeof(pdu_data));
 }
 
 /* Server CON GET request success case. Validate request is confirmable. */
@@ -327,9 +327,9 @@ static void test_gcoap__server_con_req(void)
     uint8_t buf[CONFIG_GCOAP_PDU_BUF_SIZE];
     coap_pkt_t pdu;
 
-    int res = _read_cli_stats_req_con(&pdu, &buf[0]);
+    ssize_t res = _read_cli_stats_req_con(&pdu, &buf[0]);
 
-    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT(res > 0);
     TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code_decimal(&pdu));
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_CON, coap_get_type(&pdu));
 }
