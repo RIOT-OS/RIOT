@@ -1,0 +1,2 @@
+USEMODULE += rtc_utils
+USEMODULE += fmt
