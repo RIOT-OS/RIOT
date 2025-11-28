@@ -1,0 +1,28 @@
+# name of your application
+APPLICATION = event_queue_example
+
+# Change this to your board if you want to build for a different board
+BOARD ?= native
+
+# This has to be the absolute path to the RIOT base directory:
+# If you are following the tutorial, your RIOT base directory will
+# most likely be something like RIOTBASE ?= $(CURDIR)/RIOT
+# instead of this
+RIOTBASE ?= $(CURDIR)/../../..
+
+# Add the e
+USEMODULE += event_callback
+USEMODULE += event_periodic
+USEMODULE += event_thread
+
+USEMODULE += ztimer_sec
+
+# Comment this out to disable code in RIOT that does safety checking
+# which is not needed in a production environment but helps in the
+# development process:
+DEVELHELP ?= 1
+
+# Change this to 0 show compiler invocation lines by default:
+QUIET ?= 1
+
+include $(RIOTBASE)/Makefile.include

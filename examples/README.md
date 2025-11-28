@@ -155,3 +155,4 @@ Here is a quick overview of the examples available in the RIOT:
 | [saul](./guides/saul/README.md) | Teaches you how to interact with sensors and actuators through the SAUL interface. [SAUL](https://guide.riot-os.org/c_tutorials/saul/) tutorial |
 | [threads](./guides/threads/README.md) | Teaches you how to create and manage multiple execution threads in your RIOT application. [Threads](https://guide.riot-os.org/c_tutorials/threads/) tutorial |
 | [timers](./guides/timers/README.md) | Teaches you how to use timers for periodic tasks and time measurement in RIOT. [Timers](https://guide.riot-os.org/c_tutorials/timers/) tutorial |
+| [event_queue](./guides/event_queue/README.md) | Teaches you how to use the event queue. [Event Queue](https://guide.riot-os.org/advanced_tutorials/event_queue/) guide |
