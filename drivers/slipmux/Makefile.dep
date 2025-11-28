@@ -1,13 +1,23 @@
+ifneq (,$(filter slipmux_net_l2addr,$(USEMODULE)))
+  USEMODULE += slipmux_net
+endif
+
+ifeq (,$(filter slipmux_%,$(USEMODULE)))
+  USEMODULE += slipmux_stdio
+  USEMODULE += slipmux_coap
+  USEMODULE += slipmux_net
+endif
+
 USEMODULE += chunked_ringbuffer
 USEMODULE += eui_provider
 USEMODULE += netdev_new_api
 USEMODULE += netdev_register
 FEATURES_REQUIRED += periph_uart
 
-ifneq (,$(filter slipdev_stdio,$(USEMODULE)))
+ifneq (,$(filter slipmux_stdio,$(USEMODULE)))
   USEMODULE += isrpipe
 endif
-ifneq (,$(filter slipdev_config,$(USEMODULE)))
+ifneq (,$(filter slipmux_coap,$(USEMODULE)))
   USEMODULE += checksum
   USEMODULE += sock_udp
   USEMODULE += gnrc_ipv6

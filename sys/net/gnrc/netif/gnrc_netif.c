@@ -1621,11 +1621,11 @@ static void _test_options(gnrc_netif_t *netif)
             assert(netif->l2addr_len >= 3U && netif->l2addr_len <= 5U);
             break;
         case NETDEV_TYPE_SLIP:
-#if IS_USED(MODULE_SLIPDEV_L2ADDR)
+#if IS_USED(MODULE_SLIPMUX_NET_L2ADDR)
             assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
             assert(8U == netif->l2addr_len);
             break;
-#endif /* IS_USED(MODULE_SLIPDEV_L2ADDR) */
+#endif /* IS_USED(MODULE_SLIPMUX_NET_L2ADDR) */
         case NETDEV_TYPE_LORA: /* LoRa doesn't provide L2 ADDR */
             assert(!(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR));
             assert(0U == netif->l2addr_len);
