@@ -330,6 +330,10 @@ struct gnrc_rpl_dodag {
     uint8_t dio_opts;               /**< options in the next DIO
                                          (see @ref GNRC_RPL_REQ_DIO_OPTS "DIO Options") */
     evtimer_msg_event_t dao_event;  /**< DAO TX events (see @ref GNRC_RPL_MSG_TYPE_DODAG_DAO_TX) */
+    /**
+     * floating dodag timeout events (see @ref GNRC_RPL_MSG_TYPE_DODAG_FLOAT_TIMEOUT)
+     */
+    evtimer_msg_event_t float_timeout_event;
     trickle_t trickle;              /**< trickle representation */
 };
 
