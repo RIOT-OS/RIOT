@@ -784,6 +784,40 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
     return len;
 }
 
+ssize_t coap_build_separate_reply(coap_pkt_t *pkt, unsigned type, unsigned code,
+                                  uint8_t *rbuf, unsigned rlen, unsigned payload_len)
+{
+    assert(type == COAP_TYPE_CON || type == COAP_TYPE_NON);
+
+    unsigned tkl = coap_get_token_len(pkt);
+    unsigned len = sizeof(coap_hdr_t) + tkl;
+
+    if ((len + payload_len) > rlen) {
+        return -ENOSPC;
+    }
+
+    uint32_t no_response;
+    if (coap_opt_get_uint(pkt, COAP_OPT_NO_RESPONSE, &no_response) == 0) {
+
+        const uint8_t no_response_index = (code >> 5) - 1;
+        /* If the handler code misbehaved here, we'd face UB otherwise */
+        assert(no_response_index < 7);
+
+        const uint8_t mask = 1 << no_response_index;
+
+        /* option contains bitmap of disinterest */
+        if (no_response & mask) {
+            return 0;
+        }
+    }
+
+    coap_build_hdr((coap_hdr_t *)rbuf, type, coap_get_token(pkt), tkl, code,
+                   ntohs(pkt->hdr->id));
+    len += payload_len;
+
+    return len;
+}
+
 ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, const void *token,
                        size_t token_len, unsigned code, uint16_t id)
 {
