@@ -21,5 +21,6 @@
     "[javascript][typescript]": {
         "editor.tabSize": 2,
         "editor.insertSpaces": true
-    }
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/gcc"
 }

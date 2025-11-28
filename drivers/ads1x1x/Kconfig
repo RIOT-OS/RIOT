@@ -5,16 +5,16 @@
 # directory for more details.
 #
 
-menu "ADS101X driver"
-    depends on USEMODULE_ADS101X
+menu "ADS1X1X driver"
+    depends on USEMODULE_ADS1X1X
 
-config ADS101X_I2C_ADDRESS
+config ADS1X1X_I2C_ADDRESS
     hex "Default I2C address"
     range 0x48 0x51
     default 0x48
     help
-        ADS101X allows for upto 4 devices on Single Bus. The value depends on
+        ADS1X1X allows for upto 4 devices on Single Bus. The value depends on
         the state of ADDR Pin. Default value (0x48) corresponds to ADDR pin tied
         to GND. For more information refer I2C Address Selection in Datasheet.
 
-endmenu # ADS101X driver
+endmenu # ADS1X1X driver
