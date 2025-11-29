@@ -1,0 +1,81 @@
+From 5bfd79858ae719ad7f2b00e05d2e947f0ba45797 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
+Date: Sat, 29 Nov 2025 23:44:11 +0100
+Subject: [PATCH] curve-specific.inc: work around compiler bug
+
+Adding memory barriers to work around a compiler bug on AVR GCC 15.2.0
+---
+ curve-specific.inc | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/curve-specific.inc b/curve-specific.inc
+index 0453b21..b42df6e 100644
+--- a/curve-specific.inc
++++ b/curve-specific.inc
+@@ -793,6 +793,7 @@ static void vli_mmod_fast_secp256r1(uint8_t *result, uint8_t *product) {
+     tmp[28] = product[60]; tmp[29] = product[61]; tmp[30] = product[62]; tmp[31] = product[63];
+     carry = uECC_vli_add(tmp, tmp, tmp, num_words_secp256r1);
+     carry += uECC_vli_add(result, result, tmp, num_words_secp256r1);
++    __asm__ volatile ("" : : : "memory");
+     
+     /* s2 */
+     tmp[12] = product[48]; tmp[13] = product[49]; tmp[14] = product[50]; tmp[15] = product[51];
+@@ -802,6 +803,7 @@ static void vli_mmod_fast_secp256r1(uint8_t *result, uint8_t *product) {
+     tmp[28] = tmp[29] = tmp[30] = tmp[31] = 0;
+     carry += uECC_vli_add(tmp, tmp, tmp, num_words_secp256r1);
+     carry += uECC_vli_add(result, result, tmp, num_words_secp256r1);
++    __asm__ volatile ("" : : : "memory");
+     
+     /* s3 */
+     tmp[0] = product[32]; tmp[1] = product[33]; tmp[2] = product[34]; tmp[3] = product[35];
+@@ -813,6 +815,7 @@ static void vli_mmod_fast_secp256r1(uint8_t *result, uint8_t *product) {
+     tmp[24] = product[56]; tmp[25] = product[57]; tmp[26] = product[58]; tmp[27] = product[59];
+     tmp[28] = product[60]; tmp[29] = product[61]; tmp[30] = product[62]; tmp[31] = product[63];
+     carry += uECC_vli_add(result, result, tmp, num_words_secp256r1);
++    __asm__ volatile ("" : : : "memory");
+     
+     /* s4 */
+     tmp[0] = product[36]; tmp[1] = product[37]; tmp[2] = product[38]; tmp[3] = product[39];
+@@ -824,6 +827,7 @@ static void vli_mmod_fast_secp256r1(uint8_t *result, uint8_t *product) {
+     tmp[24] = product[52]; tmp[25] = product[53]; tmp[26] = product[54]; tmp[27] = product[55];
+     tmp[28] = product[32]; tmp[29] = product[33]; tmp[30] = product[34]; tmp[31] = product[35];
+     carry += uECC_vli_add(result, result, tmp, num_words_secp256r1);
++    __asm__ volatile ("" : : : "memory");
+     
+     /* d1 */
+     tmp[0] = product[44]; tmp[1] = product[45]; tmp[2] = product[46]; tmp[3] = product[47];
+@@ -835,6 +839,7 @@ static void vli_mmod_fast_secp256r1(uint8_t *result, uint8_t *product) {
+     tmp[24] = product[32]; tmp[25] = product[33]; tmp[26] = product[34]; tmp[27] = product[35];
+     tmp[28] = product[40]; tmp[29] = product[41]; tmp[30] = product[42]; tmp[31] = product[43];
+     carry -= uECC_vli_sub(result, result, tmp, num_words_secp256r1);
++    __asm__ volatile ("" : : : "memory");
+     
+     /* d2 */
+     tmp[0] = product[48]; tmp[1] = product[49]; tmp[2] = product[50]; tmp[3] = product[51];
+@@ -846,6 +851,7 @@ static void vli_mmod_fast_secp256r1(uint8_t *result, uint8_t *product) {
+     tmp[24] = product[36]; tmp[25] = product[37]; tmp[26] = product[38]; tmp[27] = product[39];
+     tmp[28] = product[44]; tmp[29] = product[45]; tmp[30] = product[46]; tmp[31] = product[47];
+     carry -= uECC_vli_sub(result, result, tmp, num_words_secp256r1);
++    __asm__ volatile ("" : : : "memory");
+     
+     /* d3 */
+     tmp[0] = product[52]; tmp[1] = product[53]; tmp[2] = product[54]; tmp[3] = product[55];
+@@ -857,6 +863,7 @@ static void vli_mmod_fast_secp256r1(uint8_t *result, uint8_t *product) {
+     tmp[24] = tmp[25] = tmp[26] = tmp[27] = 0;
+     tmp[28] = product[48]; tmp[29] = product[49]; tmp[30] = product[50]; tmp[31] = product[51];
+     carry -= uECC_vli_sub(result, result, tmp, num_words_secp256r1);
++    __asm__ volatile ("" : : : "memory");
+     
+     /* d4 */
+     tmp[0] = product[56]; tmp[1] = product[57]; tmp[2] = product[58]; tmp[3] = product[59];
+@@ -868,6 +875,7 @@ static void vli_mmod_fast_secp256r1(uint8_t *result, uint8_t *product) {
+     tmp[24] = tmp[25] = tmp[26] = tmp[27] = 0;
+     tmp[28] = product[52]; tmp[29] = product[53]; tmp[30] = product[54]; tmp[31] = product[55];
+     carry -= uECC_vli_sub(result, result, tmp, num_words_secp256r1);
++    __asm__ volatile ("" : : : "memory");
+     
+     if (carry < 0) {
+         do {
+-- 
+2.52.0
+
