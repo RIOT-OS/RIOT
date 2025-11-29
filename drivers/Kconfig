@@ -29,7 +29,7 @@ rsource "periph_common/Kconfig"
 endmenu # Peripherals drivers
 
 menu "Sensor Device Drivers"
-rsource "ads101x/Kconfig"
+rsource "ads1x1x/Kconfig"
 rsource "bmx055/Kconfig"
 rsource "fxos8700/Kconfig"
 rsource "gp2y10xx/Kconfig"

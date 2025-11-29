@@ -1,0 +1,151 @@
+# Copyright (c) 2025 Baptiste Le Duc
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menu "ADS1X1X driver"
+    depends on USEMODULE_ADS1X1X
+
+# I2C address configuration
+config ADS1X1X_I2C_ADDR
+    hex "Default I2C address"
+    range 0x48 0x51
+    default 0x48
+    help
+        ADS1X1X allows for upto 4 devices on Single Bus. The value depends on
+        the state of ADDR Pin. Default value (0x48) corresponds to ADDR pin tied
+        to GND. For more information refer I2C Address Selection in Datasheet.
+
+
+# Multiplexer configuration
+choice
+    bool "Multiplexer configuration"
+    default ADS1X1X_AIN0_DIFFM_AIN1
+    help
+        Select the multiplexer configuration. This has no effect on ADS1013-4 and ADS1113-4.
+config ADS1X1X_AIN0_DIFFM_AIN1
+    bool "Differential AIN0 - AIN1"
+config ADS1X1X_AIN0_DIFFM_AIN3
+    bool "Differential AIN0 - AIN3"
+config ADS1X1X_AIN1_DIFFM_AIN3
+    bool "Differential AIN1 - AIN3"
+config ADS1X1X_AIN2_DIFFM_AIN3
+    bool "Differential AIN2 - AIN3"
+config ADS1X1X_AIN0_SINGM
+    bool "Single-ended AIN0"
+config ADS1X1X_AIN1_SINGM
+    bool "Single-ended AIN1"
+config ADS1X1X_AIN2_SINGM
+    bool "Single-ended AIN2"
+config ADS1X1X_AIN3_SINGM
+    bool "Single-ended AIN3"
+endchoice
+
+# Alert comparator thresholds
+config ADS1X1X_LOW_LIMIT
+    int "Low alert threshold"
+    range -32768 32767
+    default 10000
+    help
+        Low threshold value for the comparator (16-bit signed).
+        Must be lower than the high threshold.
+
+config ADS1X1X_HIGH_LIMIT
+    int "High alert threshold"
+    range -32768 32767
+    default 20000
+    help
+        High threshold value for the comparator (16-bit signed).
+        Must be greater than the low threshold.
+
+# Programmable gain amplifier configuration
+choice
+    bool "Programmable Gain Amplifier configuration"
+    default ADS1X1X_PGA_FSR_2V048
+    help
+        Select the Programmable Gain Amplifier configuration. This has no effect on ADS1013 and ADS1113 (both use 2.048V FSR).
+
+config ADS1X1X_PGA_FSR_6V144
+    bool "Full-scale range ±6.144V"
+config ADS1X1X_PGA_FSR_4V096
+    bool "Full-scale range ±4.096V"
+config ADS1X1X_PGA_FSR_2V048
+    bool "Full-scale range ±2.048V"
+config ADS1X1X_PGA_FSR_1V024
+    bool "Full-scale range ±1.024V"
+config ADS1X1X_PGA_FSR_0V512
+    bool "Full-scale range ±0.512V"
+config ADS1X1X_PGA_FSR_0V256
+    bool "Full-scale range ±0.256V"
+endchoice
+
+# Operating mode
+choice
+    bool "Operating mode"
+    default ADS1X1X_MODE_SINGLE
+    help
+        Select the default operating mode of the device (single-shot or continuous).
+
+config ADS1X1X_MODE_SINGLE
+    bool "Single-shot mode"
+config ADS1X1X_MODE_CONTINUOUS
+    bool "Continuous conversion mode"
+endchoice
+
+# Comparator mode
+choice
+    bool "Comparator mode"
+    default ADS1X1X_COMP_MODE_TRADITIONAL
+    help
+        Select the comparator mode for the ALERT pin.
+config ADS1X1X_COMP_MODE_TRADITIONAL
+    bool "Traditional comparator"
+config ADS1X1X_COMP_MODE_WINDOW
+    bool "Window comparator"
+endchoice
+
+# Comparator polarity
+choice
+    bool "Comparator polarity"
+    default ADS1X1X_COMP_POLARITY_LOW
+    help
+        Define the polarity of the ALERT pin.
+config ADS1X1X_COMP_POLARITY_LOW
+    bool "Active low"
+config ADS1X1X_COMP_POLARITY_HIGH
+    bool "Active high"
+endchoice
+
+# Comparator latch
+choice
+    bool "Comparator latch"
+    default ADS1X1X_COMP_LATCH_DISABLED
+    help
+        Define whether the ALERT pin latches once asserted or clears once the
+        conversion data is read.
+config ADS1X1X_COMP_LATCH_DISABLED
+    bool "Non-latching"
+config ADS1X1X_COMP_LATCH_ENABLED
+    bool "Latching"
+endchoice
+
+# Comparator queue
+choice
+    bool "Comparator queue"
+    default ADS1X1X_COMP_QUEUE_DISABLE
+    help
+        Define the number of consecutive conversions exceeding the
+        comparator threshold(s) required to enable the ALERT pin.
+config ADS1X1X_COMP_QUEUE_1
+    bool "Assert ALERT after 1 conversion"
+config ADS1X1X_COMP_QUEUE_2
+    bool "Assert ALERT after 2 conversions"
+config ADS1X1X_COMP_QUEUE_4
+    bool "Assert ALERT after 4 conversions"
+config ADS1X1X_COMP_QUEUE_DISABLE
+    bool "Disable ALERT pin"
+endchoice
+
+endmenu # ADS1X1X driver
