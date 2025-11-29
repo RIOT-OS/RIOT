@@ -1115,6 +1115,7 @@ EXCLUDE_SYMLINKS       = NO
 # exclude all test directories for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = */board/*/tools/* \
+                         */board/*/periph_conf.h \
                          */cpu/atmega_common/include/sys/*.h \
                          */cpu/msp430/include/stdatomic.h \
                          */cpu/msp430/include/sys/*.h \
