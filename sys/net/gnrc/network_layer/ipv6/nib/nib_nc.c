@@ -24,6 +24,9 @@
 #include "net/gnrc/ipv6/nib/nc.h"
 
 #include "_nib-internal.h"
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
+#  include "_nib-6ln.h"
+#endif /* CONFIG_GNRC_IPV6_NIB_6LN */
 
 int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
                          const uint8_t *l2addr, size_t l2addr_len)
@@ -59,6 +62,32 @@ int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
     return 0;
 }
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
+int gnrc_ipv6_nib_nc_set_6ln(unsigned iface, const uint8_t *l2addr, size_t l2addr_len)
+{
+    int res;
+    ipv6_addr_t ipv6addr;
+
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
+
+    if (netif == NULL) {
+        return -ENOENT;
+    }
+    /* Build link-local IPv6 address based on L2-address. */
+    res = _build_ll_ipv6_from_addr(netif, l2addr, l2addr_len, &ipv6addr);
+    if (res < 0) {
+        return res;
+    }
+    /* Add as unmanaged entry to neighbor cache. */
+    res = gnrc_ipv6_nib_nc_set(&ipv6addr, netif->pid, l2addr, l2addr_len);
+    if (res < 0) {
+        return res;
+    }
+
+    return 0;
+}
+#endif
+
 void gnrc_ipv6_nib_nc_del(const ipv6_addr_t *ipv6, unsigned iface)
 {
     _nib_onl_entry_t *node = NULL;
@@ -73,6 +102,29 @@ void gnrc_ipv6_nib_nc_del(const ipv6_addr_t *ipv6, unsigned iface)
     }
     _nib_release();
 }
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
+bool gnrc_ipv6_nib_nc_del_l2(unsigned iface, const uint8_t *l2addr, size_t l2addr_len)
+{
+    _nib_onl_entry_t *node = NULL;
+    bool res = false;
+
+    _nib_acquire();
+
+    /* Find and remove entry with matching l2 address.*/
+    while ((node = _nib_onl_iter(node)) != NULL) {
+        if ((_nib_onl_get_if(node) == iface) &&
+            l2util_addr_equal(l2addr, l2addr_len, node->l2addr, node->l2addr_len)) {
+            _nib_nc_remove(node);
+            res = true;
+            break;
+        }
+    }
+    _nib_release();
+
+    return res;
+}
+#endif /* CONFIG_GNRC_IPV6_NIB_ARSM */
 
 void gnrc_ipv6_nib_nc_mark_reachable(const ipv6_addr_t *ipv6)
 {
