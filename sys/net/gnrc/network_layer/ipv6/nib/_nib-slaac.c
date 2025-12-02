@@ -15,6 +15,12 @@
 
 #include <kernel_defines.h>
 #include <stdbool.h>
+#include "_nib-slaac.h"
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+#include <hashes/sha256.h>
+#include "ztimer.h"
+#include "random.h"
+#endif
 
 #include "log.h"
 #include "luid.h"
@@ -30,8 +36,24 @@
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
-void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
-                          uint8_t pfx_len)
+inline void auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                                uint8_t pfx_len)
+{
+#if !IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+    _auto_configure_addr(netif, pfx, pfx_len);
+#else
+    _auto_configure_addr_with_dad_ctr(netif, pfx, pfx_len, 0);
+#endif
+}
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+void _auto_configure_addr_with_dad_ctr(gnrc_netif_t *netif,
+                                       const ipv6_addr_t *pfx, uint8_t pfx_len,
+                                       uint8_t dad_ctr)
+#else
+void _auto_configure_addr(gnrc_netif_t *netif,
+                          const ipv6_addr_t *pfx, uint8_t pfx_len)
+#endif
 {
     ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
     int idx;
@@ -46,20 +68,32 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
         return;
     }
 #endif
-    if (!(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR)) {
-        DEBUG("nib: interface %i has no link-layer addresses\n", netif->pid);
-        return;
-    }
     DEBUG("nib: add address based on %s/%u automatically to interface %u\n",
           ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)),
           pfx_len, netif->pid);
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     bool new_address = false;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
-    if (gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&addr.u64[1]) < 0) {
-        DEBUG("nib: Can't get IID on interface %u\n", netif->pid);
-        return;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+    bool is_rfc7217 = !(gnrc_netif_is_6ln(netif) && ipv6_addr_is_link_local(pfx));
+    if (is_rfc7217) {
+        if (ipv6_get_rfc7217_iid((eui64_t *) &addr.u64[1], netif, pfx, &dad_ctr) < 0) {
+            return;
+        }
+        flags |= (dad_ctr << GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS);
+    } else
+#endif
+    {
+        if (!(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR)) {
+            DEBUG("nib: interface %i has no link-layer addresses\n", netif->pid);
+            return;
+        }
+        if (gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&addr.u64[1]) < 0) {
+            DEBUG("nib: Can't get IID on interface %u\n", netif->pid);
+            return;
+        }
     }
+
     ipv6_addr_init_prefix(&addr, pfx, pfx_len);
     if ((idx = gnrc_netif_ipv6_addr_idx(netif, &addr)) < 0) {
         if ((idx = gnrc_netif_ipv6_addr_add_internal(netif, &addr, pfx_len,
@@ -96,7 +130,120 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 }
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+bool _iid_is_iana_reserved(const eui64_t *iid)
+{
+    return (iid->uint64.u64 == htonll(0))
+           || (iid->uint32[0].u32 == htonl(0x02005eff) && iid->uint8[4] == 0xfe)
+           || (iid->uint32[0].u32 == htonl(0xfdffffff) && iid->uint16[2].u16 == htons(0xffff) && iid->uint8[6] == 0xff && (iid->uint8[7] & 0x80));
+}
+
+inline bool _stable_privacy_should_retry_idgen(uint8_t *dad_ctr, const char *reason) {
+    if (*dad_ctr < STABLE_PRIVACY_IDGEN_RETRIES) { /*within retry limit*/
+        LOG_DEBUG("nib: %s", reason);
+        *dad_ctr += 1;
+        LOG_DEBUG(", retrying IDGEN. (%u/%u)\n", *dad_ctr, STABLE_PRIVACY_IDGEN_RETRIES);
+        return true;
+    }
+    /*retried often enough*/
+    LOG_WARNING("nib: %s", reason);
+    LOG_WARNING(", not retrying: IDGEN_RETRIES limit reached\n");
+    return false;
+}
+
+int ipv6_get_rfc7217_iid(eui64_t *iid, gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                         uint8_t *dad_ctr)
+{
+#if GNRC_NETIF_L2ADDR_MAXLEN > 0
+    if (!(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR))
+#endif /* GNRC_NETIF_L2ADDR_MAXLEN > 0 */
+    {
+        LOG_ERROR("nib: interface %i has no link-layer addresses\n", netif->pid);
+        return -ENOTSUP;
+    }
+
+#ifndef STABLE_PRIVACY_SECRET_KEY
+#error "Stable privacy requires a secret_key, this should have been configured by sys/net/gnrc/Makefile.dep"
+#endif
+    const uint8_t secret_key[16] = { STABLE_PRIVACY_SECRET_KEY };
+    /*SHOULD be of at least 128 bits - https://datatracker.ietf.org/doc/html/rfc7217*/
+
+    uint8_t digest[SHA256_DIGEST_LENGTH];
+
+    {
+        sha256_context_t c;
+        sha256_init(&c);
+        sha256_update(&c, pfx, sizeof(*pfx));
+        sha256_update(&c, &netif->l2addr, netif->l2addr_len);
+        sha256_update(&c, dad_ctr, sizeof(*dad_ctr));
+        sha256_update(&c, secret_key, sizeof(secret_key));
+        sha256_final(&c, digest);
+    }
+
+    iid->uint64.u64 = 0;
+    /* uninitialized if called via gnrc_netapi_get (NETOPT_IPV6_IID_RFC7217)
+     * needs to be all zeros as precondition for the following copy operation*/
+
+    assert(sizeof(digest) >= sizeof(*iid)); /*as bits: 256 >= 64, "digest is large enough"*/
+
+    /* copy digest into IID
+     * RFC 7217 says "starting from the least significant bit",
+     * i.e. in reverse order */
+    for (uint8_t i = 0; i < sizeof(*iid); i++) { /*for each of the 8 bytes*/
+        for (int j = 0; j < 8; j++) { /*for each of the 8 bits _within byte_*/
+            if ((digest[(sizeof(digest)-1)-i])&(1<<j)) { /*is 1, reverse order*/
+                iid->uint8[i] |= 1 << ((8-1)-j); /*set 1, precondition: iid->uint8[i] = 0*/
+            }
+        }
+    }
+
+    /* "The resulting Interface Identifier SHOULD be compared against
+     * the reserved IPv6 Interface Identifiers"
+     * "and against those Interface Identifiers already employed [...]"
+     * - https://datatracker.ietf.org/doc/html/rfc7217#section-5 */
+    ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
+    ipv6_addr_init_prefix(&addr, pfx, SLAAC_PREFIX_LENGTH);
+    ipv6_addr_set_aiid(&addr, iid->uint8);
+    if (_iid_is_iana_reserved(iid) || ((gnrc_netif_ipv6_addr_idx(netif, &addr)) >= 0)) {
+        if (!_stable_privacy_should_retry_idgen(dad_ctr,
+                                                "IANA reserved IID generated"
+                                                " or generated address already exists")) {
+            return -1;
+        }
+        iid->uint64.u64 = 0; /* @pre for method call */
+        return ipv6_get_rfc7217_iid(iid, netif, pfx, dad_ctr);
+    }
+
+    return 0;
+}
+
+inline int ipv6_get_rfc7217_iid_idempotent(eui64_t *iid, gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                                    uint8_t *dad_ctr) {
+    int idx;
+    if ((idx = gnrc_netif_ipv6_addr_pfx_idx(netif, pfx, SLAAC_PREFIX_LENGTH)) >= 0) {
+        /* if the prefix is already known,
+         * do not cause generation of a potentially different
+         * stable privacy address (keyword DAD_Counter).
+         * refer to https://datatracker.ietf.org/doc/html/rfc4862#section-5.5.3 d)
+         * */
+        DEBUG("nib: Not calling IDGEN, prefix already known.\n");
+
+        //write out params
+        //- dad_ctr
+        *dad_ctr = gnrc_netif_ipv6_addr_gen_retries(netif, idx);
+        //- iid
+        ipv6_addr_t *addr = &netif->ipv6.addrs[idx];
+        memcpy(iid, &addr->u64[1], sizeof(*iid));
+
+        return 1;
+    }
+
+    return ipv6_get_rfc7217_iid(iid, netif, pfx,dad_ctr);
+}
+#endif
+
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
+#if !IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
 static bool _try_l2addr_reconfiguration(gnrc_netif_t *netif)
 {
     uint8_t hwaddr[GNRC_NETIF_L2ADDR_MAXLEN];
@@ -152,14 +299,41 @@ static bool _try_addr_reconfiguration(gnrc_netif_t *netif)
     }
     return hwaddr_reconf;
 }
+#endif
 
 void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
 {
     DEBUG("nib: other node has TENTATIVE address %s assigned "
           "=> removing that address\n",
           ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+    int idx = gnrc_netif_ipv6_addr_idx(netif, addr);
+    assert(idx >= 0);
+    uint8_t dad_counter = gnrc_netif_ipv6_addr_gen_retries(netif, idx);
+#endif
     gnrc_netif_ipv6_addr_remove_internal(netif, addr);
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+    if (_stable_privacy_should_retry_idgen(&dad_counter, "Duplicate address detected")) {
+
+        /* > Hosts SHOULD introduce a random delay between 0 and IDGEN_DELAY seconds
+         * - https://datatracker.ietf.org/doc/html/rfc7217#section-6 */
+        uint32_t random_delay_ms = random_uint32_range(0, STABLE_PRIVACY_IDGEN_DELAY_MS);
+        ztimer_sleep(ZTIMER_MSEC, random_delay_ms);
+
+        _auto_configure_addr_with_dad_ctr(netif, addr, SLAAC_PREFIX_LENGTH, dad_counter);
+    } else {
+        /*"hosts MUST NOT automatically fall back to employing other algorithms
+         for generating Interface Identifiers"
+        - https://datatracker.ietf.org/doc/html/rfc7217#section-6*/
+
+        /*> If the address is a link-local address
+        > [...]
+        > not formed from an interface identifier based on the hardware address
+        > IP operation on the interface MAY be continued
+        - https://datatracker.ietf.org/doc/html/rfc4862#section-5.4.5*/
+    }
+#else
     if (!ipv6_addr_is_link_local(addr) ||
         !_try_addr_reconfiguration(netif)) {
         /* Cannot use target address as personal address and can
@@ -175,6 +349,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
                   "but DHCPv6 is not provided", netif->pid);
         }
     }
+#endif
 }
 
 static int _get_netif_state(gnrc_netif_t **netif, const ipv6_addr_t *addr)
