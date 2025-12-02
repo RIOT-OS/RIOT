@@ -1,4 +1,7 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
+
+# local is not POSIX standard, but all practical shells (even busybox) have it
+# shellcheck disable=SC3043
 
 DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
 
@@ -9,6 +12,7 @@ _echo() {
 }
 
 if [ "$(uname)" = Darwin ]; then
+    SHA512="shasum -a 512"
     _locked() {
         local lockfile="$1"
         shift
@@ -22,19 +26,18 @@ if [ "$(uname)" = Darwin ]; then
         rm "$lockfile"
     }
 else
+    SHA512="sha512sum"
     _locked() {
         local lockfile="$1"
         shift
 
         (
-        flock -w 600 9 || exit 1
+        timeout 600 flock 9 || exit 1
         "$@"
         ) 9>"$lockfile"
     }
 fi
 
-# shasum is supported on Linux and Darwin
-SHA512="shasum -a 512"
 
 calcsha512() {
     local file="$1"
