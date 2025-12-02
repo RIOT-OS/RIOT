@@ -123,10 +123,6 @@ void saul_init_devs(void)
         extern void auto_init_grove_ledbar(void);
         auto_init_grove_ledbar();
     }
-    if (IS_USED(MODULE_INC_ENCODER)) {
-        extern void auto_init_inc_encoder(void);
-        auto_init_inc_encoder();
-    }
     if (IS_USED(MODULE_HMC5883L)) {
         extern void auto_init_hmc5883l(void);
         auto_init_hmc5883l();
@@ -154,6 +150,10 @@ void saul_init_devs(void)
     if (IS_USED(MODUE_INA3221)) {
         extern void auto_init_ina3221(void);
         auto_init_ina3221();
+    }
+    if (IS_USED(MODULE_INC_ENCODER)) {
+        extern void auto_init_inc_encoder(void);
+        auto_init_inc_encoder();
     }
     if (IS_USED(MODULE_IO1_XPLAINED)) {
         extern void auto_init_io1_xplained(void);
