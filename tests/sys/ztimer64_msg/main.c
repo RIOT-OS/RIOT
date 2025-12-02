@@ -20,6 +20,7 @@
  */
 
 #include <stdio.h>
+#include <time.h>
 
 #include "ztimer64.h"
 #include "thread.h"
@@ -90,6 +91,39 @@ void *timer_thread(void *arg)
     }
 }
 
+static void _timestamp_to_gmt_civil(struct tm *_tm, uint32_t epoch)
+{
+    uint32_t s = epoch % 86400;
+
+    epoch /= 86400;
+    uint32_t h = s / 3600;
+    uint32_t m = s / 60 % 60;
+
+    s = s % 60;
+    uint32_t x = (epoch * 4 + 102032) / 146097 + 15;
+    uint32_t b = epoch + 2442113 + x - (x / 4);
+    uint32_t c = (b * 20 - 2442) / 7305;
+    uint32_t d = b - 365 * c - c / 4;
+    uint32_t e = d * 1000 / 30601;
+    uint32_t f = d - e * 30 - e * 601 / 1000;
+
+    if (e < 14) {
+        struct tm tmp =
+        { .tm_year = c - 4716 - 1900, .tm_mon = e - 1, .tm_mday = f,
+          .tm_hour = h, .tm_min = m, .tm_sec = s };
+        *_tm = tmp;
+    }
+    else {
+        struct tm tmp =
+        { .tm_year = c - 4715 - 1900, .tm_mon = e - 13, .tm_mday = f,
+          .tm_hour = h, .tm_min = m, .tm_sec = s };
+        *_tm = tmp;
+    }
+
+    /* struct tm counts months starting from 0 */
+    _tm->tm_mon -= 1;
+}
+
 void *timer_thread_local(void *arg)
 {
     (void)arg;
@@ -100,12 +134,15 @@ void *timer_thread_local(void *arg)
         msg_t m;
         msg_receive(&m);
 
+        struct tm tmp;
         uint64_t now = ztimer64_now(ZTIMER64);
-        uint32_t sec = now / TICKS_PER_SEC;
-        uint32_t min = sec / 60;
-        uint32_t hr = sec / 3600;
-        printf("sec=%" PRIu32 " min=%" PRIu32 " hour=%" PRIu32 "\n", sec, min,
-               hr);
+        _timestamp_to_gmt_civil(&tmp, now / 1000000);
+        uint32_t sec = tmp.tm_sec;
+        uint32_t min = tmp.tm_min;
+        uint32_t hr = tmp.tm_hour;
+        printf("%02i.%02i.%04i %02" PRIu32 ":%02" PRIu32 ":%02" PRIu32 "\n", 
+                tmp.tm_mday, tmp.tm_mon, tmp.tm_year +  1900,
+                hr, min, sec);
     }
 }
 
