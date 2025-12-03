@@ -1,5 +1,6 @@
 STDIO_MODULES = \
   slipmux_stdio \
+  slipmux \
   stdio_cdc_acm \
   stdio_ethos \
   stdio_native \
@@ -101,7 +102,7 @@ endif
 
 # enable stdout buffering for modules that benefit from sending out buffers in larger chunks
 ifneq (,$(filter picolibc,$(USEMODULE)))
-  ifneq (,$(filter stdio_cdc_acm stdio_ethos slipmux_stdio stdio_semihosting stdio_tinyusb_cdc_acm,$(USEMODULE)))
+  ifneq (,$(filter stdio_cdc_acm stdio_ethos slipmux slipmux_stdio stdio_semihosting stdio_tinyusb_cdc_acm,$(USEMODULE)))
     USEMODULE += picolibc_stdout_buffered
   endif
 endif

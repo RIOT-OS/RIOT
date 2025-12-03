@@ -15,5 +15,5 @@ rsource "dose/Kconfig"
 rsource "mrf24j40/Kconfig"
 rsource "pn532/Kconfig"
 rsource "rn2xx3/Kconfig"
-rsource "slipmux/Kconfig"
+rsource "slipmux_dev/Kconfig"
 endmenu # Network Device Drivers

@@ -1,3 +1,4 @@
+PSEUDOMODULES += slipmux
 PSEUDOMODULES += slipmux_stdio
 PSEUDOMODULES += slipmux_coap
 PSEUDOMODULES += slipmux_net

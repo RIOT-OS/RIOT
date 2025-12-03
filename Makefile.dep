@@ -3,7 +3,7 @@
 -include $(APPDIR)/Makefile.$(TOOLCHAIN).dep
 
 # select default stdio provider if no other is selected
-ifeq (,$(filter stdio_% slipmux_stdio,$(USEMODULE)))
+ifeq (,$(filter stdio_% slipmux_stdio slipmux,$(USEMODULE)))
   USEMODULE += stdio_default
 endif
 
