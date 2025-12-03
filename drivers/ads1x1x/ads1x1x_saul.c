@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     drivers_ads101x
+ * @ingroup     drivers_ads1x1x
  * @{
  *
  * @file
@@ -24,8 +24,8 @@
 #include <stdio.h>
 
 #include "saul.h"
-#include "ads101x.h"
-#include "ads101x_regs.h"
+#include "ads1x1x.h"
+#include "ads1x1x_internal.h"
 
 /* LSB conversion to power of 10
  * (5/8) * 2^16 = 40960 */
@@ -33,20 +33,20 @@
 
 static int read_adc(const void *dev, phydat_t *res)
 {
-    const ads101x_t *mydev = dev;
+    const ads1x1x_t *mydev = dev;
 
     /* Change the mux channel */
-    ads101x_set_mux_gain(mydev, mydev->params.mux_gain);
+    ads1x1x_set_mux_gain(mydev, mydev->params.mux_gain);
 
     /* Read raw value */
-    if (ads101x_read_raw(mydev, res->val) < 0) {
+    if (ads1x1x_read_raw(mydev, res->val) < 0) {
         return ECANCELED;
     }
 
     /* Special case for 2.048V */
     /* (this is the fixed FSR of ADS1013 and ADS1113) */
-    if ((mydev->params.mux_gain & ADS101X_PGA_MASK)
-        == ADS101X_PGA_FSR_2V048) {
+    if ((mydev->params.mux_gain & ADS1X1X_PGA_MASK)
+        == ADS1X1X_PGA_FSR_2V048) {
 
         /* LSB == 62.5uV to LSB == 100uV */
         *(res->val) = (int16_t)((CONV_TO_B10 * (int32_t)*(res->val)) >> 16);
@@ -64,7 +64,7 @@ static int read_adc(const void *dev, phydat_t *res)
     return 1;
 }
 
-const saul_driver_t ads101x_saul_driver = {
+const saul_driver_t ads1x1x_saul_driver = {
     .read = read_adc,
     .write = saul_write_notsup,
     .type = SAUL_SENSE_ANALOG,

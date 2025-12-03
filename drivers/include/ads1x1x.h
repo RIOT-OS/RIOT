@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup   drivers_ads101x ADS101x/111x ADC device driver
+ * @defgroup   drivers_ads1x1x ADS101x/111x ADC device driver
  * @ingroup    drivers_sensors
  * @ingroup    drivers_saul
  * @brief      I2C Analog-to-Digital Converter device driver
@@ -38,7 +38,7 @@ extern "C" {
 #include "periph/gpio.h"
 
 /**
- * @defgroup drivers_ads101x_config    ADS101 driver compile configuration
+ * @defgroup drivers_ads1x1x_config    ADS101 driver compile configuration
  * @ingroup config_drivers_sensors
  * @{
  */
@@ -48,8 +48,8 @@ extern "C" {
  *
  * Address pin tied to: GND (0x48), Vcc (0x49), SDA (0x50), SCL (0x51)
  */
-#ifndef CONFIG_ADS101X_I2C_ADDRESS
-#define CONFIG_ADS101X_I2C_ADDRESS    (0x48)
+#ifndef CONFIG_ADS1X1X_I2C_ADDRESS
+#define CONFIG_ADS1X1X_I2C_ADDRESS    (0x48)
 #endif
 /** @} */
 
@@ -57,52 +57,52 @@ extern "C" {
  * @brief   Named return values
  */
 enum {
-    ADS101X_OK          =  0,       /**< everything was fine */
-    ADS101X_NOI2C       = -1,       /**< I2C communication failed */
-    ADS101X_NODEV       = -2,       /**< no ADS101X device found on the bus */
-    ADS101X_NODATA      = -3        /**< no data available */
+    ADS1X1X_OK          =  0,       /**< everything was fine */
+    ADS1X1X_NOI2C       = -1,       /**< I2C communication failed */
+    ADS1X1X_NODEV       = -2,       /**< no ADS1X1X device found on the bus */
+    ADS1X1X_NODATA      = -3        /**< no data available */
 };
 
 /**
  * @brief   ADS101x/111x params
  */
-typedef struct ads101x_params {
+typedef struct ads1x1x_params {
     i2c_t i2c;              /**< i2c device */
     uint8_t addr;           /**< i2c address */
     uint8_t mux_gain;       /**< Mux and gain boolean settings */
-} ads101x_params_t;
+} ads1x1x_params_t;
 
 /**
  * @brief   ADS101x/111x alert params
  */
-typedef struct ads101x_alert_params {
+typedef struct ads1x1x_alert_params {
     i2c_t i2c;              /**< i2c device */
     uint8_t addr;           /**< i2c address */
     gpio_t alert_pin;       /**< alert pin (GPIO_UNDEF if not connected) */
     int16_t low_limit;      /**< alert low value */
     int16_t high_limit;     /**< alert high value */
-} ads101x_alert_params_t;
+} ads1x1x_alert_params_t;
 
 /**
  * @brief   ADS101x/111x device descriptor
  */
-typedef struct ads101x {
-    ads101x_params_t params;    /**< device driver configuration */
-} ads101x_t;
+typedef struct ads1x1x {
+    ads1x1x_params_t params;    /**< device driver configuration */
+} ads1x1x_t;
 
 /**
  * @brief   ADS101x/111x alert callback
  */
-typedef void (*ads101x_alert_cb_t)(void *);
+typedef void (*ads1x1x_alert_cb_t)(void *);
 
 /**
  * @brief   ADS101x/111x alert device descriptor
  */
-typedef struct ads101x_alert {
-    ads101x_alert_params_t params;    /**< device driver configuration */
-    ads101x_alert_cb_t cb;            /**< alert callback */
+typedef struct ads1x1x_alert {
+    ads1x1x_alert_params_t params;    /**< device driver configuration */
+    ads1x1x_alert_cb_t cb;            /**< alert callback */
     void *arg;                        /**< alert callback param */
-} ads101x_alert_t;
+} ads1x1x_alert_t;
 
 /**
  * @brief   Initialize an ADS101x/111x ADC device (ADC only)
@@ -112,7 +112,7 @@ typedef struct ads101x_alert {
  *
  * @return zero on successful initialization, non zero on error
  */
-int ads101x_init(ads101x_t *dev, const ads101x_params_t *params);
+int ads1x1x_init(ads1x1x_t *dev, const ads1x1x_params_t *params);
 
 /**
  * @brief   Initialize an ADS101x/111x alert device
@@ -122,8 +122,8 @@ int ads101x_init(ads101x_t *dev, const ads101x_params_t *params);
  *
  * @return zero on successful initialization, non zero on error
  */
-int ads101x_alert_init(ads101x_alert_t *dev,
-                       const ads101x_alert_params_t *params);
+int ads1x1x_alert_init(ads1x1x_alert_t *dev,
+                       const ads1x1x_alert_params_t *params);
 
 /**
  * @brief   Set mux and gain
@@ -136,7 +136,7 @@ int ads101x_alert_init(ads101x_alert_t *dev,
  *
  * @return zero on successful read, non zero on error
  */
-int ads101x_set_mux_gain(const ads101x_t *dev, uint8_t mux_gain);
+int ads1x1x_set_mux_gain(const ads1x1x_t *dev, uint8_t mux_gain);
 
 /**
  * @brief   Read a raw ADC value
@@ -146,7 +146,7 @@ int ads101x_set_mux_gain(const ads101x_t *dev, uint8_t mux_gain);
  *
  * @return zero on successful read, non zero on error
  */
-int ads101x_read_raw(const ads101x_t *dev, int16_t *raw);
+int ads1x1x_read_raw(const ads1x1x_t *dev, int16_t *raw);
 
 /**
  * @brief   Enable alert interrupt
@@ -159,8 +159,8 @@ int ads101x_read_raw(const ads101x_t *dev, int16_t *raw);
  *
  * @return zero on success, non zero on error
  */
-int ads101x_enable_alert(ads101x_alert_t *dev,
-                         ads101x_alert_cb_t cb, void *arg);
+int ads1x1x_enable_alert(ads1x1x_alert_t *dev,
+                         ads1x1x_alert_cb_t cb, void *arg);
 
 /**
  * @brief   Set the alert parameters
@@ -173,7 +173,7 @@ int ads101x_enable_alert(ads101x_alert_t *dev,
  *
  * @return zero on success, non zero on error
  */
-int ads101x_set_alert_parameters(const ads101x_alert_t *dev,
+int ads1x1x_set_alert_parameters(const ads1x1x_alert_t *dev,
                                  int16_t low_limit, int16_t high_limit);
 
 #ifdef __cplusplus
