@@ -28,10 +28,6 @@
 #include "walltime.h"
 #include "ztimer.h"
 
-#if !defined(MODULE_PERIPH_RTC) && !defined(MODULE_RTT_RTC)
-#define ZTIMER_FALLBACK
-#endif
-
 #ifndef AUTO_INIT_PRIO_MOD_WALLTIME
 #define AUTO_INIT_PRIO_MOD_WALLTIME    AUTO_INIT_PRIO_WDT_EVENT
 #endif
@@ -39,9 +35,6 @@
 static uint32_t _boottime;
 #ifdef BACKUP_RAM
 static uint32_t _boottime_bkup BACKUP_RAM;
-#endif
-#ifdef ZTIMER_FALLBACK
-uint32_t ztimer_offset;
 #endif
 
 static void *subscriber;
@@ -76,17 +69,9 @@ bool walltime_change_unsubscribe(walltime_change_sub_t *sub)
 
 uint32_t walltime_get_riot(uint16_t *ms)
 {
-#ifdef ZTIMER_FALLBACK
-    uint32_t now = ztimer_now(ZTIMER_MSEC);
-    if (ms) {
-        *ms = now % 1000;
-    }
-    return now / 1000 + ztimer_offset;
-#else
     struct tm now;
     walltime_get(&now, ms);
     return rtc_mktime(&now);
-#endif
 }
 
 time_t walltime_get_unix(uint16_t *ms)
@@ -114,11 +99,7 @@ int walltime_set(struct tm *time)
     _boottime_bkup += diff;
 #endif
 
-#ifdef ZTIMER_FALLBACK
-    ztimer_offset = rtc_mktime(time) - ztimer_now(ZTIMER_MSEC) / 1000;
-#else
-    rtc_set_time(time);
-#endif
+    int res = walltime_impl_set(time);
 
     walltime_change_sub_t *tail = subscriber;
     while (tail) {
@@ -126,24 +107,18 @@ int walltime_set(struct tm *time)
         tail = tail->next;
     }
 
-    return 0;
+    return res;
 }
 
 int walltime_get(struct tm *time, uint16_t *ms)
 {
-    uint32_t msec = 0;
-#ifdef ZTIMER_FALLBACK
-    rtc_localtime(walltime_get_riot(ms), time);
-#elif defined(MODULE_PERIPH_RTC_MS)
-    rtc_get_time_ms(time, &msec);
-#else
-    rtc_get_time(time);
-#endif
+    uint16_t msec = 0;
+    int res = walltime_impl_get(time, &msec);
     if (ms) {
         *ms = msec;
     }
 
-    return 0;
+    return res;
 }
 
 uint32_t walltime_uptime(bool full)
