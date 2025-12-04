@@ -524,6 +524,11 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_frag_reass(gnrc_pktsnip_t *pkt)
             DEBUG("ipv6_ext_frag: fragment length not divisible by 8");
             goto error_exit;
         }
+        else if (rbuf->pkt != NULL && rbuf->pkt->size < pkt->size) {
+            DEBUG("ipv6_ext_frag: reassembly buffer too small to fit first "
+                  "fragment\n");
+            goto error_exit;
+        }
         _set_nh(fh_snip->next, nh);
         gnrc_pktbuf_remove_snip(pkt, fh_snip);
         /* TODO: RFC 8200 says "- 8"; determine if `sizeof(ipv6_ext_frag_t)` is
