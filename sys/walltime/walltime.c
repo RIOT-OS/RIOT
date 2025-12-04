@@ -17,6 +17,8 @@
  *
  * @}
  */
+#include <errno.h>
+
 #include "auto_init.h"
 #include "auto_init_utils.h"
 #include "auto_init_priorities.h"
@@ -94,9 +96,19 @@ time_t walltime_get_unix(uint16_t *ms)
     return mktime(&now);
 }
 
-void walltime_set(struct tm *time)
+int walltime_set(struct tm *time)
 {
-    int32_t diff = rtc_mktime(time) - walltime_get_riot(NULL);
+    uint32_t now = rtc_mktime(time);
+    uint32_t old = walltime_get_riot(NULL);
+    int32_t diff = now - old;
+
+    if (now > old && diff <= 0) {
+        return -ERANGE;
+    }
+    if (now < old && diff >= 0) {
+        return -ERANGE;
+    }
+
     _boottime += diff;
 #ifdef BACKUP_RAM
     _boottime_bkup += diff;
@@ -113,9 +125,11 @@ void walltime_set(struct tm *time)
         tail->cb(tail->ctx, diff, 0);
         tail = tail->next;
     }
+
+    return 0;
 }
 
-void walltime_get(struct tm *time, uint16_t *ms)
+int walltime_get(struct tm *time, uint16_t *ms)
 {
     uint32_t msec = 0;
 #ifdef ZTIMER_FALLBACK
@@ -128,6 +142,8 @@ void walltime_get(struct tm *time, uint16_t *ms)
     if (ms) {
         *ms = msec;
     }
+
+    return 0;
 }
 
 uint32_t walltime_uptime(bool full)

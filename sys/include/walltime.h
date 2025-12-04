@@ -81,8 +81,11 @@ bool walltime_change_unsubscribe(walltime_change_sub_t *sub);
  * @brief   Set the system date / time
  *
  * @param[in] time  The current data / time to set
+ *
+ * @returns 0 on success
+ * @returns -ERANGE if the difference to the current time is too large
  */
-void walltime_set(struct tm *time);
+int walltime_set(struct tm *time);
 
 /**
  * @brief   Get the system date / time
@@ -90,8 +93,11 @@ void walltime_set(struct tm *time);
  * @param[out] time current time output
  * @param[out] ms   current milliseconds output, may be NULL
  *                  always returns 0 if the backend supports no millisecond resolution
+ *
+ * @returns 0 on success
+ * @returns -ERANGE if the difference to the current time is too large
  */
-void walltime_get(struct tm *time, uint16_t *ms);
+int walltime_get(struct tm *time, uint16_t *ms);
 
 /**
  * @brief   Get the current system time in seconds since @ref RIOT_EPOCH
