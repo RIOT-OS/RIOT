@@ -131,6 +131,25 @@ time_t walltime_get_unix(uint16_t *ms);
  */
 uint32_t walltime_uptime(bool full);
 
+/**
+ * @brief   Backend implementation to set the system time
+ *
+ * @param[in] time  The current data / time to set
+ *
+ * @returns 0 on success
+ */
+int walltime_impl_set(struct tm *time);
+
+/**
+ * @brief   Backend implementation to get the system time
+ *
+ * @param[out] time current time output
+ * @param[out] ms   current milliseconds output (will never be NULL)
+ *
+ * @returns 0 on success
+ */
+int walltime_impl_get(struct tm *time, uint16_t *ms);
+
 #ifdef __cplusplus
 }
 #endif
