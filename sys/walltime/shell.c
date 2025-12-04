@@ -53,9 +53,12 @@ static int _cmd_set_time(char **argv)
         return -2;
     }
 
-    walltime_set(&now);
+    int res = walltime_set(&now);
+    if (res) {
+        printf("setting time failed: %d\n", res);
+    }
 
-    return 0;
+    return res;
 }
 
 static int cmd_walltime(int argc, char **argv)
@@ -64,7 +67,12 @@ static int cmd_walltime(int argc, char **argv)
         struct tm now;
         char out[20];
 
-        walltime_get(&now, NULL);
+        int res = walltime_get(&now, NULL);
+        if (res) {
+            printf("getting time failed: %d\n", res);
+            return res;
+        }
+
         fmt_time_tm_iso8601(out, &now, ' ');
         print(out, 20);
         print("\n", 1);
