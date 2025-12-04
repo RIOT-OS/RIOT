@@ -664,7 +664,6 @@ int scn_time_tm_iso8601_time(struct tm *tm, const char *str)
     return 8;
 }
 
-
 int scn_time_tm_iso8601(struct tm *tm, const char *str, char separator)
 {
     assert(tm);
