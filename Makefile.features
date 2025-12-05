@@ -19,10 +19,26 @@ ifeq (,$(CPU))
   $(error $(BOARD): CPU must be defined by board / board_common Makefile.features)
 endif
 
-include $(RIOTCPU)/$(CPU)/Makefile.features
+CPUSDIRS := $(EXTERNAL_CPU_DIRS) $(RIOTCPU)
+
+# Take the first folder in $(CPUSDIRS) that contains a folder named $(CPU)
+CPUDIR := $(word 1,$(foreach dir,$(CPUSDIRS),$(wildcard $(dir)/$(CPU)/.)))
+# Sanitize folder
+CPUDIR := $(abspath $(CPUDIR))
+
+# Also provide CPUSDIR for compatibility and for accessing common folders
+# (e.g. include $(CPUSDIR)/common/external_common/Makefile.dep)
+CPUSDIR := $(dir $(CPUDIR))
+
+ifeq (,$(CPUDIR))
+  $(info Folders searched for the cpu: $(CPUSDIRS))
+  $(error The specified cpu $(CPU) does not exist.)
+endif
+
+include $(CPUDIR)/Makefile.features
 
 # Provide CPU as a feature to allow listing all boards with a CPU
-FEATURES_PROVIDED += cpu_$(CPU)
+#FEATURES_PROVIDED += cpu_external#$(CPU)
 
 # Features that are conflicting for all architectures
 FEATURES_CONFLICT += picolibc:newlib

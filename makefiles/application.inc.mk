@@ -1,6 +1,6 @@
 MODULE = $(APPLICATION_MODULE)
 
-DIRS += $(RIOTCPU)/$(CPU) $(BOARDDIR)
+DIRS += $(CPUDIR) $(BOARDDIR)
 DIRS += $(RIOTBASE)/boards
 DIRS += $(RIOTBASE)/core $(RIOTBASE)/core/lib $(RIOTBASE)/drivers $(RIOTBASE)/sys
 
