@@ -180,7 +180,7 @@ def _check_iface(child):
     mock_id = None
     hwaddr = None
     for _ in range(2):
-        child.expect(r"Iface\s+(\d+)\s+.*")
+        child.expect(r"Iface\s+(\d+)\s+.*\n")
         match = re.search(r"HWaddr:\s+([0-9A-F:]{17})\s+",
                           child.match.group(0))
         if match is not None:
