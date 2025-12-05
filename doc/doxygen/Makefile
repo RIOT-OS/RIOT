@@ -78,17 +78,17 @@ doc-ci: $(RIOTTOOLS)/doxygen/Makefile
 
 # by marking html as phony we force make to re-run Doxygen even if the directory exists.
 .PHONY: html
-html: src/changelog.md src/coc.md src/governance.md
+html: src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ) | $(DOXYGEN) -
 	@echo ""
 	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/doxygen/html/index.html"
 
 .PHONY: check
-check: src/changelog.md src/coc.md src/governance.md
+check: src/changelog.md
 	( cat riot.doxyfile) | $(DOXYGEN) -
 
 .PHONY: man
-man: src/changelog.md src/coc.md src/governance.md
+man: src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_MAN = yes" ) | $(DOXYGEN) -
 	@echo ""
 	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/doxygen/man/man3"
@@ -103,18 +103,12 @@ src/css/variables.less: src/config.json
 src/changelog.md: src/changelog.md.tmp ../../release-notes.txt
 	@./generate-changelog.py $+ $@
 
-src/coc.md: ../../CODE_OF_CONDUCT.md
-	awk 'NR == 1 {print $$0,"{#coc}"} NR > 1 {print $$0}' $< > $@
-
-src/governance.md: ../../GOVERNANCE.md
-	@sed 's/<!-- TOC start -->/\[TOC\]\n\0/' $< | sed '/<!-- TOC start -->/,/<!-- TOC end -->/d' > $@
-
 .PHONY:
-latex: src/changelog.md src/coc.md src/governance.md
+latex: src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_LATEX= yes" ) | $(DOXYGEN) -
 	@echo ""
 	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/doxygen/latex/index.tex"
 
 clean:
-	-@rm -rf latex man html doxygen_objdb_*.tmp doxygen_entrydb_*.tmp src/changelog.md src/coc.md src/governance.md
+	-@rm -rf latex man html doxygen_objdb_*.tmp doxygen_entrydb_*.tmp src/changelog.md
 	@$(MAKE) -C $(RIOTTOOLS)/doxygen clean

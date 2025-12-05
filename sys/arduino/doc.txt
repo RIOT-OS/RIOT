@@ -103,7 +103,8 @@
  * is required to be able to use
  * `analogRead()` and `analogWrite()`.
  *
- * See also @ref iomaps on how a board can provide more I/O mappings and even
+ * See also [IO-Mapping and Shields](https://guide.riot-os.org/board_specific/io_mapping_and_shields/)
+ * on how a board can provide more I/O mappings and even
  * declare electrical and mechanical compatibility with common Arduino form
  * factors.
  *
