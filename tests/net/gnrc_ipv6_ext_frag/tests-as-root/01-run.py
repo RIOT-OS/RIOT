@@ -19,6 +19,7 @@ from scapy.all import Ether, ICMPv6PacketTooBig, IPv6, IPv6ExtHdrFragment, \
 from testrunner import run, check_unittests
 
 
+BOARD = os.environ.get("BOARD", "")
 RECV_BUFSIZE = 2 * 1500
 TEST_SAMPLE = b"This is a test. Failure might sometimes be an option, but " \
               b"not today. "
@@ -242,8 +243,13 @@ def test_ipv6_ext_frag_send_last_fragment_only_one_byte(child, s,
 def test_ipv6_ext_frag_send_full_pktbuf(child, s, iface, ll_dst):
     length = pktbuf_size(child)
     # remove some slack for meta-data and header and 1 addition fragment header
+    slack = 96
+    if BOARD in ["native64"]:
+        # size_t and pointers are 4 bytes larger in 64-bit architectures, so add some
+        # more slack per snip, since they are larger
+        slack += 96
     length -= (len(IPv6() / IPv6ExtHdrFragment() / UDP()) +
-               (len(IPv6() / IPv6ExtHdrFragment())) + 96)
+               (len(IPv6() / IPv6ExtHdrFragment())) + slack)
     port = s.getsockname()[1]
     ethos_id, _, _ = _check_iface(child)
     # trigger neighbor discovery so it doesn't fill the packet buffer
@@ -379,7 +385,7 @@ def testfunc(child):
         run_sock_test(test_ipv6_ext_frag_fwd_success, s)
         run_sock_test(test_ipv6_ext_frag_fwd_too_big, s)
 
-    if not os.environ.get("BOARD", "") in ['native', 'native32', 'native64']:
+    if BOARD not in ['native', 'native32', 'native64']:
         # ethos currently can't handle the larger, rapidly sent packets by the
         # IPv6 fragmentation of the Linux Kernel
         print("SUCCESS")
