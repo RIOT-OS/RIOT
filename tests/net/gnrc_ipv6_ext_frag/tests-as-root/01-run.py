@@ -156,6 +156,22 @@ def test_reass_offset_too_large(child, iface, hw_dst, ll_dst, ll_src):
     pktbuf_empty(child)
 
 
+def test_reass_empty_fragment(child, iface, hw_dst, ll_dst, ll_src):
+    # Originally proposed by Nils Bernsdorf (Uni Saarland), adapted by Martine Lenders
+    # send the first packet (without payload) to initialize the reassembly buffer
+    # with a null pointer
+    sendp(Ether(dst=hw_dst) / IPv6(dst=ll_dst, src=ll_src) /
+          IPv6ExtHdrFragment(id=0xabcd, nh=0, m=1, offset=0),
+          iface=iface, verbose=0)
+    # send the second packet to potentially trigger a memcpy
+    sendp(Ether(dst=hw_dst) / IPv6(dst=ll_dst, src=ll_src) /
+          IPv6ExtHdrFragment(id=0xabcd, nh=0, m=1, offset=0) /
+          (b"A" * (24 - 8)),
+          iface=iface, verbose=0)
+    time.sleep(11)  # let reassembly buffer garbage collect
+    pktbuf_empty(child)
+
+
 def test_reass_first_fragment_repeat(child, iface, hw_dst, ll_dst, ll_src):
     # Originally proposed by Nils Bernsdorf (Uni Saarland), adapted by Martine Lenders
     # send the first packet to initialize the reassembly buffer
@@ -439,6 +455,7 @@ def testfunc(child):
     run(test_reass_successful_udp)
     run(test_reass_too_short_header)
     run(test_reass_offset_too_large)
+    run(test_reass_empty_fragment)
     run(test_reass_first_fragment_repeat)
     print("SUCCESS")
 
