@@ -18,7 +18,7 @@ $(BINDIR_RIOTBOOT): $(CLEAN)
 export SLOT0_OFFSET SLOT0_LEN SLOT1_OFFSET SLOT1_LEN
 
 # Mandatory APP_VER, set to epoch by default
-EPOCH = $(call memoized,EPOCH,$(shell date +%s))
+EPOCH := $(call memoized,EPOCH,$(shell date +%s))
 APP_VER ?= $(EPOCH)
 
 # Final target for slot 0 with riot_hdr
@@ -96,7 +96,7 @@ endif
 # allocated space. This is used afterwards to create a combined
 # binary with both bootloader and RIOT firmware with header
 BOOTLOADER_BIN = $(RIOTBOOT_DIR)/bin/$(BOARD)
-$(BOOTLOADER_BIN)/riotboot.extended.bin: $(BOOTLOADER_BIN)/riotboot.bin
+$(BINDIR_RIOTBOOT)/riotboot.extended.bin: $(BOOTLOADER_BIN)/riotboot.bin
 	$(Q)cp $^ $@.tmp
 	$(Q)truncate -s $$(($(RIOTBOOT_LEN))) $@.tmp
 	$(Q)mv $@.tmp $@
@@ -112,7 +112,7 @@ endif
 # Create combined binary booloader + RIOT firmware with header
 RIOTBOOT_COMBINED_BIN = $(BINDIR_RIOTBOOT)/slot0-combined.bin
 riotboot/combined-slot0: $(RIOTBOOT_COMBINED_BIN)
-$(RIOTBOOT_COMBINED_BIN): $(BOOTLOADER_BIN)/riotboot.extended.bin $(SLOT0_RIOT_BIN)
+$(RIOTBOOT_COMBINED_BIN): $(BINDIR_RIOTBOOT)/riotboot.extended.bin $(SLOT0_RIOT_BIN)
 	$(Q)cat $^ > $@
 
 RIOTBOOT_EXTENDED_BIN = $(BINDIR_RIOTBOOT)/slot0-extended.bin
