@@ -1006,35 +1006,8 @@ INPUT                  = ../../doc.txt \
                          ../../sys \
                          src/ \
                          src/mainpage.md \
-                         src/vision.md \
-                         src/governance-deprecated.md \
-                         src/roadmap.md \
-                         src/coc-info.md \
-                         src/coc-deprecated.md \
-                         src/coc-reporting-guide.md \
-                         src/coc-faq.md \
-                         src/creating-modules.md \
-                         src/creating-an-application.md \
-                         src/porting-boards.md \
-                         src/driver-guide.md \
-                         src/getting-started.md \
-                         src/flashing.md \
-                         src/terminal-programs.md \
-                         src/build-in-docker.md \
                          ../../tests/README.md \
-                         src/dev-best-practices.md \
-                         src/build-system-basics.md \
                          src/feature_list.md \
-                         src/kconfig/kconfig.md \
-                         src/using-cpp.md \
-                         src/using-rust.md \
-                         src/advanced-build-system-tricks.md \
-                         src/debugging-aids.md \
-                         src/emulators.md \
-                         src/release-cycle.md \
-                         src/io-mapping-and-shields.md \
-                         src/changelog-deprecated.md \
-                         src/LOSTANDFOUND.md \
                          ../../makefiles/pseudomodules.inc.mk \
                          ../../makefiles/blob.inc.mk \
                          ../../sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c \
