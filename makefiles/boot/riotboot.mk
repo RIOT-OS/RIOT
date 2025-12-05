@@ -26,14 +26,8 @@ SLOT0_RIOT_BIN = $(BINDIR_RIOTBOOT)/slot0.$(APP_VER).bin
 SLOT1_RIOT_BIN = $(BINDIR_RIOTBOOT)/slot1.$(APP_VER).bin
 SLOT_RIOT_BINS = $(SLOT0_RIOT_BIN) $(SLOT1_RIOT_BIN)
 
-# if RIOTBOOT_SKIP_COMPILE is set to 1, "make riotboot/slot[01](-flash)"
-# will not depend on the base elf files, thus skipping the compilation step.
-# This results in the equivalent to "make flash-only" for
-# "make riotboot/flash-slot[01]".
-ifneq (1, $(RIOTBOOT_SKIP_COMPILE))
 $(BINDIR_RIOTBOOT)/%.elf: $(BASELIBS) $(ARCHIVES) $(BINDIR_RIOTBOOT)
 	$(Q)$(_LINK) -o $@
-endif
 
 # Slot 0 and 1 firmware offset, after header
 SLOT0_IMAGE_OFFSET := $$(($(SLOT0_OFFSET) + $(RIOTBOOT_HDR_LEN)))
@@ -78,6 +72,7 @@ $(BINDIR_RIOTBOOT)/slot1.hdr: OFFSET=$(SLOT1_IMAGE_OFFSET)
 # Generic target to create a binary files for both slots
 riotboot: $(SLOT_RIOT_BINS)
 
+ifneq (1, $(RIOTBOOT_SKIP_COMPILE))
 # riotboot bootloader compile target
 riotboot/flash-bootloader: riotboot/bootloader/flash
 # IOTLAB_NODE is passed so that FLASHFILE is also set in the recursive make call
@@ -95,6 +90,7 @@ riotboot/bootloader/%: $$(if $$(filter riotboot/bootloader/clean,$$@),,$$(BUILDD
 		PROGRAMMER=$(PROGRAMMER) PROGRAMMER_QUIET=$(PROGRAMMER_QUIET) \
 		SLOT_AUX_LEN=$(SLOT_AUX_LEN) \
 			$(MAKE) --no-print-directory -C $(RIOTBOOT_DIR) $*
+endif
 
 # Generate a binary file from the bootloader which fills all the
 # allocated space. This is used afterwards to create a combined
@@ -105,10 +101,12 @@ $(BOOTLOADER_BIN)/riotboot.extended.bin: $(BOOTLOADER_BIN)/riotboot.bin
 	$(Q)truncate -s $$(($(RIOTBOOT_LEN))) $@.tmp
 	$(Q)mv $@.tmp $@
 
-# Only call sub make if not already in riotboot
+# Only call sub make if not already in riotboot and not explicitly disabled
 ifneq ($(BOOTLOADER_BIN)/riotboot.bin,$(BINFILE))
-  clean: riotboot/bootloader/clean
-  $(BOOTLOADER_BIN)/riotboot.bin: riotboot/bootloader/binfile
+  ifneq (1, $(RIOTBOOT_SKIP_COMPILE))
+    clean: riotboot/bootloader/clean
+    $(BOOTLOADER_BIN)/riotboot.bin: riotboot/bootloader/binfile
+  endif
 endif
 
 # Create combined binary booloader + RIOT firmware with header
