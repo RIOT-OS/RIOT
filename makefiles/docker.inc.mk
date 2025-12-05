@@ -344,8 +344,10 @@ DOCKER_OVERRIDE_CMDLINE += $(call docker_cmdline_mapping,EXTERNAL_BOARD_DIRS,$(D
 # would lead to both being mapped to '$(DOCKER_BUILD_ROOT)/external/name'
 _mounted_dirs = $(foreach d,$(EXTERNAL_MODULE_DIRS),$(if $(call dir_is_outside_riotbase,$(d)),$(d)))
 ifneq ($(words $(sort $(notdir $(_mounted_dirs)))),$(words $(sort $(_mounted_dirs))))
-  $(warning Mounted EXTERNAL_MODULE_DIRS: $(_mounted_dirs))
-  $(error Mapping EXTERNAL_MODULE_DIRS in docker is not supported for directories with the same name)
+  ifeq (1, $(BUILD_IN_DOCKER))
+    $(warning Mounted EXTERNAL_MODULE_DIRS: $(_mounted_dirs))
+    $(error Mapping EXTERNAL_MODULE_DIRS in docker is not supported for directories with the same name)
+  endif
 endif
 
 # Handle worktree by mounting the git common dir in the same location
