@@ -54,9 +54,9 @@ It is also possible to connect non-routing leaf nodes with a single interface:
 
 On physical hardware the setup will be the same.
 Routing nodes need at least two interfaces between which they can route.
-For a simple setup, you can use `ethos` or `slipdev` to turn any UART into
+For a simple setup, you can use `ethos` or `slipmux_net` to turn any UART into
 a network interface. (If you need to use DHCPv6 IA_PD for obtaining a prefix,
-use `slipdev_l2addr` instead of plain `slipdev`)
+use `slipmux_net_l2addr` instead of plain `slipmux_net`)
 
 ### Obtaining the prefix
 

@@ -28,8 +28,8 @@ ifeq (,$(SLIP_BAUDRATE))
   SLIP_BAUDRATE=115200
 endif
 
-CFLAGS += -DSLIPDEV_PARAM_UART=$(SLIP_UART)
-CFLAGS += -DSLIPDEV_PARAM_BAUDRATE=$(SLIP_BAUDRATE)
+CFLAGS += -DSLIPMUX_PARAM_UART=$(SLIP_UART)
+CFLAGS += -DSLIPMUX_PARAM_BAUDRATE=$(SLIP_BAUDRATE)
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
@@ -42,7 +42,7 @@ USEMODULE += gnrc_rpl
 
 # Border router requirements
 # Include SLIP package for IP over Serial communication
-USEMODULE += slipdev
+USEMODULE += slipmux_net
 # Specify the mandatory networking modules for 6LoWPAN border router
 USEMODULE += gnrc_sixlowpan_border_router_default
 # Additional networking modules that can be dropped if not needed

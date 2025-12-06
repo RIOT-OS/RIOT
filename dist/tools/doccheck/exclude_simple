@@ -6399,13 +6399,6 @@ warning: Member SIXLOWPAN_ND_OPT_6CTX_LEN_MAX (macro definition) of group net_si
 warning: Member SIXLOWPAN_ND_OPT_6CTX_LEN_MIN (macro definition) of group net_sixlowpan_nd is not documented.
 warning: Member SIXLOWPAN_ND_OPT_ABR_LEN (macro definition) of group net_sixlowpan_nd is not documented.
 warning: Member SIXLOWPAN_ND_OPT_AR_LEN (macro definition) of group net_sixlowpan_nd is not documented.
-warning: Member SLIPDEV_END_ESC (macro definition) of file slipdev_internal.h is not documented.
-warning: Member SLIPDEV_END (macro definition) of file slipdev_internal.h is not documented.
-warning: Member SLIPDEV_ESC_ESC (macro definition) of file slipdev_internal.h is not documented.
-warning: Member SLIPDEV_ESC (macro definition) of file slipdev_internal.h is not documented.
-warning: Member SLIPDEV_PARAM_BAUDRATE (macro definition) of file slipdev_params.h is not documented.
-warning: Member SLIPDEV_PARAMS (macro definition) of file slipdev_params.h is not documented.
-warning: Member SLIPDEV_PARAM_UART (macro definition) of file slipdev_params.h is not documented.
 warning: Member SLOTDURATION (macro definition) of file board_info.h is not documented.
 warning: Member SM_PWM_01C_PARAMS_DEFAULT (macro definition) of file sm_pwm_01c_params.h is not documented.
 warning: Member SM_PWM_01C_SAUL_INFO (macro definition) of file sm_pwm_01c_params.h is not documented.

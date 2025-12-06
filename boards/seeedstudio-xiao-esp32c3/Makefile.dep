@@ -13,7 +13,7 @@ ifeq (,$(filter info-% generate-%,$(MAKECMDGOALS)))
   endif
 endif
 
-ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+ifeq (,$(filter stdio_% slipmux_stdio,$(USEMODULE)))
   USEMODULE += stdio_usb_serial_jtag
 endif
 

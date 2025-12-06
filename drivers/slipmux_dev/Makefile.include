@@ -1,0 +1,8 @@
+PSEUDOMODULES += slipmux
+PSEUDOMODULES += slipmux_stdio
+PSEUDOMODULES += slipmux_coap
+PSEUDOMODULES += slipmux_net
+PSEUDOMODULES += slipmux_net_l2addr
+
+USEMODULE_INCLUDES_slipmux := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_slipmux)
