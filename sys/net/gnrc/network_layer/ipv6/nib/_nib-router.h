@@ -50,7 +50,7 @@ static inline void _init_iface_router(gnrc_netif_t *netif)
         netif->flags |= GNRC_NETIF_FLAGS_IPV6_RTR_ADV;
     }
 
-    if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)) {
+    if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ABR)) {
         netif->flags |= GNRC_NETIF_FLAGS_6LO_ABR;
     }
 }
