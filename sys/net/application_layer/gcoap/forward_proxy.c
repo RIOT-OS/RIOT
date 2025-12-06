@@ -71,6 +71,9 @@ const coap_resource_t forward_proxy_resources[] = {
 gcoap_listener_t forward_proxy_listener = {
     &forward_proxy_resources[0],
     ARRAY_SIZE(forward_proxy_resources),
+#if IS_USED(MODULE_GCOAP_DTLS)
+    GCOAP_SOCKET_TYPE_DTLS |
+#endif
     GCOAP_SOCKET_TYPE_UDP,
     NULL,
     NULL,
@@ -95,7 +98,7 @@ void gcoap_forward_proxy_init(void)
     }
 }
 
-static client_ep_t *_allocate_client_ep(const sock_udp_ep_t *ep)
+static client_ep_t *_allocate_client_ep(const sock_udp_ep_t *ep, gcoap_socket_type_t tl)
 {
     client_ep_t *cep;
     for (cep = _client_eps;
@@ -105,6 +108,7 @@ static client_ep_t *_allocate_client_ep(const sock_udp_ep_t *ep)
             _cep_set_in_use(cep);
             _cep_set_req_etag(cep, NULL, 0);
             memcpy(&cep->ep, ep, sizeof(*ep));
+            cep->client_tl = tl;
             DEBUG("Client_ep is allocated %p\n", (void *)cep);
             return cep;
         }
@@ -143,7 +147,9 @@ static ssize_t _forward_proxy_handler(coap_pkt_t *pdu, uint8_t *buf,
     const sock_udp_ep_t *remote = coap_request_ctx_get_remote_udp(ctx);
     const sock_udp_ep_t *local = coap_request_ctx_get_local_udp(ctx);
 
-    pdu_len = gcoap_forward_proxy_request_process(pdu, remote, local);
+    pdu_len = gcoap_forward_proxy_request_process(
+        pdu, remote, local, (gcoap_socket_type_t)ctx->tl_type
+    );
 
     /* Out of memory, reply with 5.00 */
     if (pdu_len == -ENOMEM) {
@@ -161,24 +167,25 @@ static ssize_t _forward_proxy_handler(coap_pkt_t *pdu, uint8_t *buf,
     return pdu_len;
 }
 
-static bool _parse_endpoint(sock_udp_ep_t *remote,
-                            uri_parser_result_t *urip)
+static gcoap_socket_type_t _parse_endpoint(sock_udp_ep_t *remote,
+                                           uri_parser_result_t *urip)
 {
     char scratch[8];
     ipv6_addr_t addr;
+    gcoap_socket_type_t res = GCOAP_SOCKET_TYPE_UDP;
+
     remote->family = AF_INET6;
 
     /* support IPv6 only for now */
     if (!urip->ipv6addr) {
-        return false;
+        return GCOAP_SOCKET_TYPE_UNDEF;
     }
-
     /* check for interface */
     if (urip->zoneid) {
         /* only works with integer based zoneids */
 
         if (urip->zoneid_len > (ARRAY_SIZE(scratch) - 1)) {
-            return false;
+            return GCOAP_SOCKET_TYPE_UNDEF;
         }
 
         memcpy(scratch, urip->zoneid, urip->zoneid_len);
@@ -188,7 +195,7 @@ static bool _parse_endpoint(sock_udp_ep_t *remote,
         int pid = atoi(scratch);
 
         if (gnrc_netif_get_by_pid(pid) == NULL) {
-            return false;
+            return GCOAP_SOCKET_TYPE_UNDEF;
         }
         remote->netif = pid;
     }
@@ -205,35 +212,42 @@ static bool _parse_endpoint(sock_udp_ep_t *remote,
 
     /* parse destination address */
     if (ipv6_addr_from_buf(&addr, urip->ipv6addr, urip->ipv6addr_len) == NULL) {
-        return false;
+        return GCOAP_SOCKET_TYPE_UNDEF;
     }
     if ((remote->netif == SOCK_ADDR_ANY_NETIF) &&
         ipv6_addr_is_link_local(&addr)) {
-        return false;
+        return GCOAP_SOCKET_TYPE_UNDEF;
     }
     memcpy(&remote->addr.ipv6[0], &addr.u8[0], sizeof(addr.u8));
 
+    bool is_coaps = (IS_USED(MODULE_GCOAP_DTLS) && !strncmp(urip->scheme, "coaps", 5));
+    if (is_coaps) {
+        res = GCOAP_SOCKET_TYPE_DTLS;
+    }
     if (urip->port != 0) {
         remote->port = urip->port;
     }
-    else if (!strncmp(urip->scheme, "coaps", 5)) {
+    else if (is_coaps) {
         remote->port = COAPS_PORT;
     }
     else {
         remote->port = COAP_PORT;
     }
 
-    return true;
+    return res;
 }
 
-static ssize_t _dispatch_msg(const void *buf, size_t len, sock_udp_ep_t *remote,
-                             const sock_udp_ep_t *local)
+static ssize_t _dispatch_msg(const void *buf,
+                             size_t len,
+                             sock_udp_ep_t *remote,
+                             sock_udp_ep_t *local,
+                             gcoap_socket_type_t socket_type)
 {
     /* Yes it's not a request -- but turns out there is nothing in
      * gcoap_req_send that is actually request specific, especially if we
      * don't assign a callback. */
     ssize_t res = gcoap_req_send(buf, len, remote, local, NULL, NULL,
-                                 GCOAP_SOCKET_TYPE_UDP);
+                                 socket_type);
     if (res <= 0) {
         DEBUG("gcoap_forward_proxy: unable to dispatch message: %d\n", (int)-res);
     }
@@ -253,7 +267,7 @@ static void _send_empty_ack(event_t *event)
     /* Flipping byte order as unlike in the other places where mid is
      * used, coap_build_hdr would actually flip it back */
     coap_build_hdr(&buf, COAP_TYPE_ACK, NULL, 0, 0, ntohs(cep->mid));
-    _dispatch_msg(&buf, sizeof(buf), &cep->ep, &cep->proxy_ep);
+    _dispatch_msg(&buf, sizeof(buf), &cep->ep, &cep->proxy_ep, cep->client_tl);
 }
 
 static void _set_response_type(coap_pkt_t *pdu, uint8_t resp_type)
@@ -326,7 +340,7 @@ static void _forward_resp_handler(const gcoap_request_memo_t *memo,
         coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
     }
     /* don't use buf_len here, in case the above `gcoap_resp_init`s changed `pdu` */
-    _dispatch_msg(pdu->hdr, coap_get_total_len(pdu), &cep->ep, &cep->proxy_ep);
+    _dispatch_msg(pdu->hdr, coap_get_total_len(pdu), &cep->ep, &cep->proxy_ep, cep->client_tl);
     _free_client_ep(cep);
 }
 
@@ -419,7 +433,7 @@ int gcoap_forward_proxy_req_send(client_ep_t *cep)
     int len;
     if ((len = gcoap_req_send((uint8_t *)cep->pdu.hdr, coap_get_total_len(&cep->pdu),
                              &cep->server_ep, NULL, _forward_resp_handler, cep,
-                             GCOAP_SOCKET_TYPE_UNDEF)) <= 0) {
+                             cep->server_tl)) <= 0) {
         DEBUG("gcoap_forward_proxy_req_send(): gcoap_req_send failed %d\n", len);
         _free_client_ep(cep);
     }
@@ -430,10 +444,12 @@ static int _gcoap_forward_proxy_via_coap(coap_pkt_t *client_pkt,
                                          client_ep_t *client_ep,
                                          uri_parser_result_t *urip)
 {
+    gcoap_socket_type_t server_tl;
+
     ssize_t len;
     gcoap_request_memo_t *memo = NULL;
 
-    if (!_parse_endpoint(&client_ep->server_ep, urip)) {
+    if ((server_tl = _parse_endpoint(&client_ep->server_ep, urip)) == GCOAP_SOCKET_TYPE_UNDEF) {
         _free_client_ep(client_ep);
         return -EINVAL;
     }
@@ -473,6 +489,7 @@ static int _gcoap_forward_proxy_via_coap(coap_pkt_t *client_pkt,
         _free_client_ep(client_ep);
         return -EINVAL;
     }
+    client_ep->server_tl = server_tl;
     if (IS_USED(MODULE_GCOAP_FORWARD_PROXY_THREAD)) {
         /* WORKAROUND: DTLS communication is blocking the gcoap thread,
          * therefore the communication should be handled in the proxy thread */
@@ -490,12 +507,14 @@ static int _gcoap_forward_proxy_via_coap(coap_pkt_t *client_pkt,
 }
 
 int gcoap_forward_proxy_request_process(coap_pkt_t *pkt,
-                                        const sock_udp_ep_t *client, const sock_udp_ep_t *local) {
+                                        const sock_udp_ep_t *client,
+                                        const sock_udp_ep_t *local,
+                                        gcoap_socket_type_t client_tl) {
     char *uri;
     uri_parser_result_t urip;
     ssize_t optlen = 0;
 
-    client_ep_t *cep = _allocate_client_ep(client);
+    client_ep_t *cep = _allocate_client_ep(client, client_tl);
     cep->proxy_ep = local ? *local : (sock_udp_ep_t){ 0 };
     if (!cep) {
         return -ENOMEM;
@@ -525,7 +544,8 @@ int gcoap_forward_proxy_request_process(coap_pkt_t *pkt,
 
     /* target is using CoAP */
     if (!strncmp("coap", urip.scheme, urip.scheme_len) ||
-        !strncmp("coaps", urip.scheme, urip.scheme_len)) {
+        (IS_USED(MODULE_GCOAP_DTLS) &&
+         !strncmp("coaps", urip.scheme, urip.scheme_len))) {
         /* client context ownership is passed to gcoap_forward_proxy_req_send() */
         int res = _gcoap_forward_proxy_via_coap(pkt, cep, &urip);
         if (res < 0) {
