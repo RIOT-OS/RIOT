@@ -26,14 +26,8 @@ SLOT0_RIOT_BIN = $(BINDIR_RIOTBOOT)/slot0.$(APP_VER).bin
 SLOT1_RIOT_BIN = $(BINDIR_RIOTBOOT)/slot1.$(APP_VER).bin
 SLOT_RIOT_BINS = $(SLOT0_RIOT_BIN) $(SLOT1_RIOT_BIN)
 
-# if RIOTBOOT_SKIP_COMPILE is set to 1, "make riotboot/slot[01](-flash)"
-# will not depend on the base elf files, thus skipping the compilation step.
-# This results in the equivalent to "make flash-only" for
-# "make riotboot/flash-slot[01]".
-ifneq (1, $(RIOTBOOT_SKIP_COMPILE))
 $(BINDIR_RIOTBOOT)/%.elf: $(BASELIBS) $(ARCHIVES) $(BINDIR_RIOTBOOT)
 	$(Q)$(_LINK) -o $@
-endif
 
 # Slot 0 and 1 firmware offset, after header
 SLOT0_IMAGE_OFFSET := $$(($(SLOT0_OFFSET) + $(RIOTBOOT_HDR_LEN)))
