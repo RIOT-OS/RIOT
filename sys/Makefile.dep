@@ -717,4 +717,8 @@ ifneq (,$(filter wifi_scan_list,$(USEMODULE)))
   USEMODULE += l2scan_list
 endif
 
+ifneq (,$(filter registry%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/registry/Makefile.dep
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
