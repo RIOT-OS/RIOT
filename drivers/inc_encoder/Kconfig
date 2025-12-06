@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: 2025 TU Dresden
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config MODULE_INC_ENCODER
+    bool "Incremental Rotary Encoder"
+    depends on TEST_KCONFIG
+
+
+menu "Incremental Rotary Encoder Driver"
+    depends on USEMODULE_INC_ENCODER
+
+    config INC_ENCODER_MAX_RPM
+        int "Maximum RPM"
+        default 210
+        help
+            Defines the maximum RPM the encoder is expected to handle.
+
+    config INC_ENCODER_GEAR_RED_RATIO
+        int "Gear Reduction Ratio (in tenths)"
+        default 204
+        help
+            Defines the gear reduction ratio. For example a gear reduction ratio
+            of 1:20.4 would result in a value of 204.
+
+    config INC_ENCODER_PPR
+        int "Pulses per Revolution"
+        default 13
+        help
+            Number of Rising Edges per Revolution.
+
+    config INC_ENCODER_HARDWARE_PERIOD_MS
+        int "RPM Calculation Period (in ms)"
+        depends on USEMODULE_INC_ENCODER_HARDWARE
+        default 200
+        help
+            Time period in milliseconds for RPM calculation.
+
+endmenu # Incremental Encoder Driver
