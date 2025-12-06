@@ -1251,7 +1251,7 @@ int nanocoap_server_prepare_separate(nanocoap_server_response_ctx_t *ctx,
         ctx->no_response = 0xff;
         return -EOVERFLOW;
     }
-    ctx->tkl = tkl;
+    ctx->req = *(pkt->hdr);
     memcpy(ctx->token, coap_get_token(pkt), tkl);
     memcpy(&ctx->remote, req->remote, sizeof(ctx->remote));
     assert(req->local);
@@ -1279,17 +1279,16 @@ ssize_t nanocoap_server_build_separate(const nanocoap_server_response_ctx_t *ctx
     if ((sizeof(coap_hdr_t) + COAP_TOKEN_LENGTH_MAX + 1) > buf_len) {
         return -EOVERFLOW;
     }
-
-    const uint8_t no_response_index = (code >> 5) - 1;
-    /* If the handler code misbehaved here, we'd face UB otherwise */
-    assert(no_response_index < 7);
-
-    const uint8_t mask = 1 << no_response_index;
-    if (ctx->no_response & mask) {
-        return -ECANCELED;
+    *((coap_hdr_t *)buf) = ctx->req;
+    ((coap_hdr_t *)buf)->id = htons(msg_id);
+    memcpy(buf + sizeof(ctx->req), ctx->token, coap_hdr_get_token_len(&ctx->req));
+    if (ctx->no_response) {
+        coap_opt_put_uint(buf, 0, COAP_OPT_NO_RESPONSE, ctx->no_response);
     }
-
-    return coap_build_hdr(buf, type, ctx->token, ctx->tkl, code, msg_id);
+    coap_pkt_t req = {
+        .hdr = buf,
+    };
+    return coap_build_separate_reply(&req, type, code, buf, buf_len, 0);
 }
 
 int nanocoap_server_sendv_separate(const nanocoap_server_response_ctx_t *ctx,
@@ -1369,7 +1368,7 @@ int nanocoap_register_observer(const coap_request_ctx_t *req_ctx, coap_pkt_t *re
              * subscription in either case */
             DEBUG("nanocoap: observe slot %" PRIuSIZE " reused\n", i);
             uint8_t tkl = coap_get_token_len(req_pkt);
-            _observer_pool[i].response.tkl = tkl;
+            _observer_pool[i].response.req = *(req_pkt->hdr);
             memcpy(_observer_pool[i].response.token, coap_get_token(req_pkt), tkl);
             mutex_unlock(&_observer_pool_lock);
             return 0;
@@ -1402,9 +1401,9 @@ void nanocoap_unregister_observer(const coap_request_ctx_t *req_ctx,
     mutex_lock(&_observer_pool_lock);
     for (size_t i = 0; i < CONFIG_NANOCOAP_MAX_OBSERVERS; i++) {
         if ((_observer_pool[i].resource == req_ctx->resource)
-                && (_observer_pool[i].response.tkl == coap_get_token_len(req_pkt))
+                && (coap_hdr_get_token_len(&_observer_pool[i].response.req) == coap_get_token_len(req_pkt))
                 && !memcmp(_observer_pool[i].response.token, coap_get_token(req_pkt),
-                           _observer_pool[i].response.tkl)
+                           coap_hdr_get_token_len(&_observer_pool[i].response.req))
                 && sock_udp_ep_equal(&_observer_pool[i].response.remote, coap_request_ctx_get_remote_udp(req_ctx))) {
             DEBUG("nanocoap: observer at index %" PRIuSIZE " unregistered\n", i);
             _observer_pool[i].resource = NULL;

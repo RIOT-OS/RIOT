@@ -247,8 +247,8 @@ typedef struct {
 typedef struct {
     sock_udp_ep_t remote;           /**< remote to send response to         */
     sock_udp_ep_t local;            /**< local from which to send response  */
+    coap_hdr_t req;                 /**< CoAP request header                */
     uint8_t token[COAP_TOKEN_LENGTH_MAX];   /**< request token              */
-    uint8_t tkl;                    /**< request token length               */
     uint8_t no_response;            /**< no-response bitmap                 */
 } nanocoap_server_response_ctx_t;
 
