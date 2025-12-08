@@ -29,6 +29,97 @@
 
 slipmux_t slipmux_devs[SLIPMUX_DEV_NUM];
 
+static inline void _slipmux_stdio_add_to_frame(slipmux_t * dev, uint8_t byte) {
+#if IS_USED(MODULE_SLIPMUX_STDIO)
+    if (dev->config.uart == STDIO_UART_DEV) {
+        isrpipe_write_one(&stdin_isrpipe, byte);
+    }
+#else
+    (void) dev;
+    (void) byte;
+#endif
+}
+
+static inline bool _slipmux_coap_start_frame(slipmux_t * dev) {
+#if IS_USED(MODULE_SLIPMUX_COAP)
+    /* try to create new configuration / CoAP frame */
+    if (!crb_start_chunk(&dev->coap_rb)) {
+        return 0;
+    }
+#else
+    (void) dev;
+#endif
+    return 1;
+}
+
+static inline void _slipmux_coap_end_frame(slipmux_t * dev) {
+#if IS_USED(MODULE_SLIPMUX_COAP)
+    crb_end_chunk(&dev->coap_rb, true);
+    slipmux_coap_notify(dev);
+#else
+    (void) dev;
+#endif
+}
+
+static inline bool _slipmux_coap_add_to_frame(slipmux_t * dev, uint8_t byte) {
+#if IS_USED(MODULE_SLIPMUX_COAP)
+    /* discard frame if byte can't be added */
+    if (!crb_add_byte(&dev->coap_rb, byte)) {
+        DEBUG("slipmux: coap rx buffer full, drop frame\n");
+        crb_end_chunk(&dev->coap_rb, false);
+        return 0;
+    }
+#else
+    (void) dev;
+    (void) byte;
+#endif
+    return 1;
+}
+
+static inline bool _slipmux_net_start_frame(slipmux_t * dev, uint8_t byte) {
+#if IS_USED(MODULE_SLIPMUX_NET)
+    /* try to create new ip frame */
+    if (!crb_start_chunk(&dev->net_rb)) {
+        DEBUG("slipmux: can't start new net frame, drop frame\n");
+        return 0;
+    }
+    if (!crb_add_byte(&dev->net_rb, byte)) {
+        DEBUG("slipmux: net rx buffer full, drop frame\n");
+        crb_end_chunk(&dev->net_rb, false);
+        return 0;
+    }
+#else
+    (void) dev;
+    (void) byte;
+#endif
+    return 1;
+}
+
+static inline void _slipmux_net_end_frame(slipmux_t * dev) {
+#if IS_USED(MODULE_SLIPMUX_NET)
+    crb_end_chunk(&dev->net_rb, true);
+    slipmux_net_notify(dev);
+#else
+    (void) dev;
+#endif
+}
+
+static inline bool _slipmux_net_add_to_frame(slipmux_t * dev, uint8_t byte) {
+#if IS_USED(MODULE_SLIPMUX_NET)
+    /* discard frame if byte can't be added */
+    if (!crb_add_byte(&dev->net_rb, byte)) {
+        DEBUG("slipmux: net rx buffer full, drop frame\n");
+        crb_end_chunk(&dev->net_rb, false);
+        return 0;
+    }
+#else
+    (void) dev;
+    (void) byte;
+#endif
+    return 1;
+}
+
+
 void slipmux_rx_cb(void *arg, uint8_t byte)
 {
     slipmux_t *dev = arg;
@@ -50,11 +141,7 @@ void slipmux_rx_cb(void *arg, uint8_t byte)
             dev->state = SLIPMUX_STATE_NONE;
             break;
         default:
-#if IS_USED(MODULE_SLIPMUX_STDIO)
-            if (dev->config.uart == STDIO_UART_DEV) {
-                isrpipe_write_one(&stdin_isrpipe, byte);
-            }
-#endif
+            _slipmux_stdio_add_to_frame(dev, byte);
             break;
         }
         return;
@@ -68,11 +155,7 @@ void slipmux_rx_cb(void *arg, uint8_t byte)
             break;
         }
         dev->state = SLIPMUX_STATE_STDIN;
-#if IS_USED(MODULE_SLIPMUX_STDIO)
-        if (dev->config.uart == STDIO_UART_DEV) {
-            isrpipe_write_one(&stdin_isrpipe, byte);
-        }
-#endif
+        _slipmux_stdio_add_to_frame(dev, byte);
         return;
     case SLIPMUX_STATE_COAP:
         switch (byte) {
@@ -81,21 +164,12 @@ void slipmux_rx_cb(void *arg, uint8_t byte)
             break;
         case SLIPMUX_END:
             dev->state = SLIPMUX_STATE_NONE;
-#if IS_USED(MODULE_SLIPMUX_COAP)
-            crb_end_chunk(&dev->coap_rb, true);
-            slipmux_coap_notify(dev);
-#endif
+            _slipmux_coap_end_frame(dev);
             break;
         default:
-#if IS_USED(MODULE_SLIPMUX_COAP)
-            /* discard frame if byte can't be added */
-            if (!crb_add_byte(&dev->coap_rb, byte)) {
-                DEBUG("slipmux: coap rx buffer full, drop frame\n");
-                crb_end_chunk(&dev->coap_rb, false);
+            if (!_slipmux_coap_add_to_frame(dev, byte)) {
                 dev->state = SLIPMUX_STATE_UNKNOWN;
-                return;
             }
-#endif
             break;
         }
         return;
@@ -108,38 +182,27 @@ void slipmux_rx_cb(void *arg, uint8_t byte)
             byte = SLIPMUX_ESC;
             break;
         }
-#if IS_USED(MODULE_SLIPMUX_COAP)
-        /* discard frame if byte can't be added */
-        if (!crb_add_byte(&dev->coap_rb, byte)) {
-            DEBUG("slipmux: coap rx buffer full, drop frame\n");
-            crb_end_chunk(&dev->coap_rb, false);
+        if (!_slipmux_coap_add_to_frame(dev, byte)) {
             dev->state = SLIPMUX_STATE_UNKNOWN;
-            return;
+        } else {
+            dev->state = SLIPMUX_STATE_COAP;
         }
-#endif
-        dev->state = SLIPMUX_STATE_COAP;
         return;
     case SLIPMUX_STATE_NET:
         switch (byte) {
         case SLIPMUX_ESC:
             dev->state = SLIPMUX_STATE_NET_ESC;
-            return;
+            break;
         case SLIPMUX_END:
-#if IS_USED(MODULE_SLIPMUX_NET)
-            crb_end_chunk(&dev->net_rb, true);
-            slipmux_net_notify(dev);
-#endif
+            _slipmux_net_end_frame(dev);
             dev->state = SLIPMUX_STATE_NONE;
-            return;
+            break;
+        default:
+            if (!_slipmux_net_add_to_frame(dev, byte)) {
+                dev->state = SLIPMUX_STATE_UNKNOWN;
+            }
+            break;
         }
-#if IS_USED(MODULE_SLIPMUX_NET)
-        /* discard frame if byte can't be added */
-        if (!crb_add_byte(&dev->net_rb, byte)) {
-            DEBUG("slipmux: net rx buffer full, drop frame\n");
-            crb_end_chunk(&dev->net_rb, false);
-            dev->state = SLIPMUX_STATE_UNKNOWN;
-        }
-#endif
         return;
     /* escaped byte received */
     case SLIPMUX_STATE_NET_ESC:
@@ -151,16 +214,11 @@ void slipmux_rx_cb(void *arg, uint8_t byte)
             byte = SLIPMUX_ESC;
             break;
         }
-#if IS_USED(MODULE_SLIPMUX_NET)
-        /* discard frame if byte can't be added */
-        if (!crb_add_byte(&dev->net_rb, byte)) {
-            DEBUG("slipmux: net rx buffer full, drop frame\n");
-            crb_end_chunk(&dev->net_rb, false);
+        if (!_slipmux_net_add_to_frame(dev, byte)) {
             dev->state = SLIPMUX_STATE_UNKNOWN;
-            return;
+        } else {
+            dev->state = SLIPMUX_STATE_NET;
         }
-#endif
-        dev->state = SLIPMUX_STATE_NET;
         return;
     case SLIPMUX_STATE_UNKNOWN:
         if (byte == SLIPMUX_END) {
@@ -175,33 +233,20 @@ void slipmux_rx_cb(void *arg, uint8_t byte)
         }
 
         if (byte == SLIPMUX_START_COAP) {
-#if IS_USED(MODULE_SLIPMUX_COAP)
-            /* try to create new configuration / CoAP frame */
-            if (!crb_start_chunk(&dev->coap_rb)) {
+            if (!_slipmux_coap_start_frame(dev)) {
                 dev->state = SLIPMUX_STATE_UNKNOWN;
-                return;
+            } else {
+                dev->state = SLIPMUX_STATE_COAP;
             }
-#endif
-            dev->state = SLIPMUX_STATE_COAP;
             return;
         }
 
         if (SLIPMUX_START_NET(byte)) {
-#if IS_USED(MODULE_SLIPMUX_NET)
-            /* try to create new ip frame */
-            if (!crb_start_chunk(&dev->net_rb)) {
-                DEBUG("slipmux: can't start new net frame, drop frame\n");
+            if (!_slipmux_net_start_frame(dev, byte)) {
                 dev->state = SLIPMUX_STATE_UNKNOWN;
-                return;
+            } else {
+                dev->state = SLIPMUX_STATE_NET;
             }
-            if (!crb_add_byte(&dev->net_rb, byte)) {
-                DEBUG("slipmux: net rx buffer full, drop frame\n");
-                crb_end_chunk(&dev->net_rb, false);
-                dev->state = SLIPMUX_STATE_UNKNOWN;
-                return;
-            }
-#endif
-            dev->state = SLIPMUX_STATE_NET;
             return;
         }
 
