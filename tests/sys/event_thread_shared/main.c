@@ -17,10 +17,16 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdio.h>
 
 #include "thread.h"
 #include "event/thread.h"
+
+static_assert(EVENT_THREAD_LOWEST_STACKSIZE == 567,
+              "Selecting highest of the minimum stack size requirements "
+              "declared via `EVENT_THREAD_HIGHEST_STACKSIZE_MIN += <num>` "
+              "must work correctly");
 
 static void _handler_high(event_t *event) {
     (void)event;
