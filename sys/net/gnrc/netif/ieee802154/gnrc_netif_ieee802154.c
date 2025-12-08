@@ -247,19 +247,6 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 
     return pkt;
 }
-static int _send_raw(gnrc_netif_t *netif, iolist_t *iolist)
-{
-    netdev_t *dev = netif->dev;
-    int res;
-
-    res = dev->driver->send(dev, iolist);
-
-    if (gnrc_netif_netdev_legacy_api(netif)) {
-        /* only for legacy drivers we need to release pkt here */
-        gnrc_pktbuf_release((gnrc_pktsnip_t *)iolist);
-    }
-    return res;
-}
 
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
@@ -277,11 +264,6 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 #endif
     uint8_t flags = (uint8_t)(state->flags & NETDEV_IEEE802154_SEND_MASK);
     le_uint16_t dev_pan = byteorder_htols(state->pan);
-
-    /* send raw 802.15.4 packets out without adding a header */
-    if (netif->flags & GNRC_NETIF_FLAGS_RAWMODE) {
-        return _send_raw(netif, (iolist_t *)pkt);
-    }
 
     flags |= IEEE802154_FCF_TYPE_DATA;
     if (pkt == NULL) {
@@ -405,7 +387,12 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         netif->stats.tx_unicast_count++;
     }
 #endif
-    res = _send_raw(netif, &iolist_header);
+    res = dev->driver->send(dev, &iolist_header);
+
+    if (gnrc_netif_netdev_legacy_api(netif)) {
+        /* only for legacy drivers we need to release pkt here */
+        gnrc_pktbuf_release(pkt);
+    }
     return res;
 }
 /** @} */

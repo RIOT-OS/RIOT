@@ -141,9 +141,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value,
         return ieee802154_radio_set_frame_filter_mode(&submac->dev,
                                                       *((bool *)value) ? IEEE802154_FILTER_PROMISC
                                                                        : IEEE802154_FILTER_ACCEPT);
-    case NETOPT_ACK_PENDING:
-        return ieee802154_radio_config_src_address_match(&submac->dev,
-                                                         IEEE802154_SRC_MATCH_EN, value);
     default:
         break;
     }

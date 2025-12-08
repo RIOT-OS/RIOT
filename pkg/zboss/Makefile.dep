@@ -11,8 +11,10 @@ USEMODULE += zboss-unix
 USEMODULE += memarray
 USEMODULE += ztimer
 USEMODULE += netdev_default
-USEMODULE += auto_init_gnrc_netif
-USEMODULE += gnrc_tx_sync
+USEMODULE += auto_init
+USEMODULE += ieee802154
+USEMODULE += ieee802154_submac
+USEMODULE += luid
 
 FEATURES_REQUIRED += periph_flashpage
 FEATURES_REQUIRED += periph_flashpage_pagewise
