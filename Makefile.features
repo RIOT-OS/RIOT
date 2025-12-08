@@ -38,7 +38,7 @@ endif
 include $(CPUDIR)/Makefile.features
 
 # Provide CPU as a feature to allow listing all boards with a CPU
-#FEATURES_PROVIDED += cpu_external#$(CPU)
+FEATURES_PROVIDED += cpu_$(CPU)
 
 # Features that are conflicting for all architectures
 FEATURES_CONFLICT += picolibc:newlib

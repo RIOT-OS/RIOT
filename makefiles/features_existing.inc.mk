@@ -112,7 +112,6 @@ FEATURES_EXISTING := \
     cpu_stm32u5 \
     cpu_stm32wb \
     cpu_stm32wl \
-    cpu_external \
     dbgpin \
     efm32_coretemp \
     emulator_renode \
