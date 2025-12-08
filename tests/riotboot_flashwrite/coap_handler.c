@@ -5,7 +5,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 
 #include "net/nanocoap.h"
 #include "riotboot/flashwrite.h"
@@ -69,10 +68,10 @@ ssize_t _flashwrite_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_requ
         return reply_len;
     }
 
-    uint8_t *pkt_pos = (uint8_t*)pkt->hdr + reply_len;
+    uint8_t *pkt_pos = pkt->buf + reply_len;
     pkt_pos += coap_put_block1_ok(pkt_pos, &block1, 0);
 
-    return pkt_pos - (uint8_t*)pkt->hdr;
+    return pkt_pos - pkt->buf;
 }
 
 NANOCOAP_RESOURCE(flashwrite) {

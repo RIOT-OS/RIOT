@@ -23,9 +23,7 @@
 #include "assert.h"
 #include "net/gcoap.h"
 #include "net/cord/epsim.h"
-#include "net/cord/config.h"
 #include "net/cord/common.h"
-#include "net/ipv6/addr.h"
 
 #define BUFSIZE             (128U)
 
@@ -59,7 +57,7 @@ int cord_epsim_register(const sock_udp_ep_t *rd_ep)
         return CORD_EPSIM_ERROR;
     }
     /* make packet confirmable */
-    coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
+    coap_pkt_set_type(&pkt, COAP_TYPE_CON);
     /* add Uri-Query options */
     if (cord_common_add_qstring(&pkt) < 0) {
         return CORD_EPSIM_ERROR;
