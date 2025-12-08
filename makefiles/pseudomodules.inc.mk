@@ -209,6 +209,10 @@ PSEUDOMODULES += gnrc_nettype_udp
 ## @}
 ## @}
 
+PSEUDOMODULES += gnrc_pktshark_4in6
+PSEUDOMODULES += gnrc_pktshark_coap
+PSEUDOMODULES += gnrc_pktshark_default
+PSEUDOMODULES += gnrc_pktshark_icmpv6
 
 PSEUDOMODULES += gnrc_sixloenc
 PSEUDOMODULES += gnrc_sixlowpan_border_router_default
@@ -432,6 +436,7 @@ PSEUDOMODULES += shell_cmd_gnrc_netif
 PSEUDOMODULES += shell_cmd_gnrc_netif_lora
 PSEUDOMODULES += shell_cmd_gnrc_netif_lorawan
 PSEUDOMODULES += shell_cmd_gnrc_pktbuf
+PSEUDOMODULES += shell_cmd_gnrc_pktshark
 PSEUDOMODULES += shell_cmd_gnrc_rpl
 PSEUDOMODULES += shell_cmd_gnrc_sixlowpan_ctx
 PSEUDOMODULES += shell_cmd_gnrc_sixlowpan_frag_stats

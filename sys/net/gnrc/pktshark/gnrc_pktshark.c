@@ -262,6 +262,10 @@ static void _dump_icmpv6(const icmpv6_hdr_t *hdr, size_t payload_len)
 {
     print_str("\n\tICMPv6 ");
 
+    if (!IS_USED(MODULE_GNRC_PKTSHARK_ICMPV6)) {
+        goto _default;
+    }
+
     switch (hdr->type) {
     case ICMPV6_DST_UNR:
         print_str("Destination unreachable");
@@ -296,6 +300,7 @@ static void _dump_icmpv6(const icmpv6_hdr_t *hdr, size_t payload_len)
         print_str("Multicast Listener Report v2");
         break;
     default:
+    _default:
         print_str("msg type ");
         print_u32_dec(hdr->type);
         print_str(" (");
@@ -354,6 +359,10 @@ static void _print_coap_format(unsigned format)
 
 static bool _dump_coap(const void *buf, size_t len)
 {
+    if (!IS_USED(MODULE_GNRC_PKTSHARK_COAP)) {
+        return false;
+    }
+
     coap_pkt_t pkt;
     if (coap_parse(&pkt, (void *)buf, len) < 0) {
         return false;
@@ -595,11 +604,6 @@ static void _dump_ipv6(const ipv6_hdr_t *hdr, size_t payload_len, bool rx)
         }
 
         switch (next_header) {
-        case PROTNUM_IPV4:
-            /* 4in6 */
-            print_str("\n\t");
-            _dump_ipv4(payload, payload_len - sizeof(ipv4_hdr_t), rx);
-            break;
         case PROTNUM_ICMPV6:
             _dump_icmpv6(payload, payload_len);
             break;
@@ -609,6 +613,14 @@ static void _dump_ipv6(const ipv6_hdr_t *hdr, size_t payload_len, bool rx)
         case PROTNUM_TCP:
             _dump_tcp(payload, payload_len - sizeof(tcp_hdr_t));
             break;
+        case PROTNUM_IPV4:
+            if (IS_USED(MODULE_GNRC_PKTSHARK_4IN6)) {
+                /* 4in6 */
+                print_str("\n\t");
+                _dump_ipv4(payload, payload_len - sizeof(ipv4_hdr_t), rx);
+                break;
+            }
+            /* fall-through */
         default:
             print_str("\tunknown next header type ");
             print_u32_dec(next_header);
@@ -734,7 +746,7 @@ static void gnrc_pktshark_init(void)
 }
 AUTO_INIT(gnrc_pktshark_init, AUTO_INIT_PRIO_MOD_GNRC_PKTSHARK);
 
-#ifdef MODULE_SHELL
+#ifdef MODULE_SHELL_CMD_GNRC_PKTSHARK
 static int cmd_pktshark(int argc, char **argv)
 {
     if (argc < 2) {
