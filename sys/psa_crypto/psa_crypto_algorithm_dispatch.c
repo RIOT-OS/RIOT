@@ -764,7 +764,7 @@ psa_status_t psa_algorithm_dispatch_aead_encrypt(   const psa_key_attributes_t *
 
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
 
-    if (attributes->type != PSA_KEY_TYPE_AES) {
+    if (attributes->type != PSA_KEY_TYPE_AES && attributes->type != PSA_KEY_TYPE_CHACHA20) {
         return PSA_ERROR_NOT_SUPPORTED;
     }
 
@@ -794,6 +794,14 @@ psa_status_t psa_algorithm_dispatch_aead_encrypt(   const psa_key_attributes_t *
     #if IS_USED(MODULE_PSA_AEAD_AES_256_CCM)
         case PSA_CCM_AES_256:
             return psa_aead_aes_256_ccm_encrypt(attributes, key_data, *key_bytes, tag_len,
+                                            nonce, nonce_length, additional_data,
+                                            additional_data_length, plaintext,
+                                            plaintext_length, ciphertext,
+                                            ciphertext_size, ciphertext_length);
+    #endif
+    #if IS_USED(MODULE_PSA_RIOT_AEAD_CHACHA20_POLY1305)
+        case PSA_CHACHA20_POLY1305:
+            return psa_aead_chacha20_poly1305_encrypt(attributes, key_data, *key_bytes, tag_len,
                                             nonce, nonce_length, additional_data,
                                             additional_data_length, plaintext,
                                             plaintext_length, ciphertext,
@@ -836,7 +844,7 @@ psa_status_t psa_algorithm_dispatch_aead_decrypt(   const psa_key_attributes_t *
 
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
 
-    if (attributes->type != PSA_KEY_TYPE_AES) {
+    if (attributes->type != PSA_KEY_TYPE_AES && attributes->type != PSA_KEY_TYPE_CHACHA20) {
         return PSA_ERROR_NOT_SUPPORTED;
     }
 
@@ -866,6 +874,14 @@ psa_status_t psa_algorithm_dispatch_aead_decrypt(   const psa_key_attributes_t *
     #if IS_USED(MODULE_PSA_AEAD_AES_256_CCM)
         case PSA_CCM_AES_256:
             return psa_aead_aes_256_ccm_decrypt(attributes, key_data, *key_bytes, tag_len,
+                                            nonce, nonce_length, additional_data,
+                                            additional_data_length, ciphertext,
+                                            ciphertext_length, plaintext,
+                                            plaintext_size, plaintext_length);
+    #endif
+    #if IS_USED(MODULE_PSA_RIOT_AEAD_CHACHA20_POLY1305)
+        case PSA_CHACHA20_POLY1305:
+            return psa_aead_chacha20_poly1305_decrypt(attributes, key_data, *key_bytes, tag_len,
                                             nonce, nonce_length, additional_data,
                                             additional_data_length, ciphertext,
                                             ciphertext_length, plaintext,

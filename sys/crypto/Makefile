@@ -8,4 +8,8 @@ ifneq (,$(filter psa_riot_cipher_%,$(USEMODULE)))
   DIRS += psa_riot_cipher
 endif
 
+ifneq (,$(filter psa_riot_aead_%,$(USEMODULE)))
+  DIRS += psa_riot_aead
+endif
+
 include $(RIOTBASE)/Makefile.base
