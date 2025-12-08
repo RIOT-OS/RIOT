@@ -209,10 +209,17 @@ PSEUDOMODULES += gnrc_nettype_udp
 ## @}
 ## @}
 
+## @addtogroup	net_gnrc_pktshark
+## @{
+## @brief	Enable parsing of IPv6 encapsulated IPv4 packets
 PSEUDOMODULES += gnrc_pktshark_4in6
+## @brief	Enable parsing of CoAP messages
 PSEUDOMODULES += gnrc_pktshark_coap
+## @brief	Enable parsing of default protocols
 PSEUDOMODULES += gnrc_pktshark_default
+## @brief	Enable parsing of ICMPv6 messages
 PSEUDOMODULES += gnrc_pktshark_icmpv6
+## @}
 
 PSEUDOMODULES += gnrc_sixloenc
 PSEUDOMODULES += gnrc_sixlowpan_border_router_default
