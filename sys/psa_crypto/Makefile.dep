@@ -211,6 +211,31 @@ ifneq (,$(filter psa_aead_aes_%_ccm_backend_cifra,$(USEMODULE)))
   USEMODULE += psa_cifra_aes_ccm
 endif
 
+## Chacha20-Poly1305
+ifneq (,$(filter psa_aead_chacha20_poly1305,$(USEMODULE)))
+  ifeq (,$(filter psa_aead_chacha20_poly1305_custom_backend,$(USEMODULE)))
+    FEATURES_OPTIONAL += periph_aead_chacha20_poly1305
+    include $(RIOTMAKE)/features_check.inc.mk
+    # HACK: Due to kconfig migration, may cause problems
+    ifneq (,$(filter periph_aead_chacha20_poly1305,$(FEATURES_USED)))
+      USEMODULE += psa_aead_chacha20_poly1305_backend_periph
+    else
+      USEMODULE += psa_aead_chacha20_poly1305_backend_riot
+    endif
+  endif
+endif
+
+ifneq (,$(filter psa_aead_chacha20_poly1305_backend_periph,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_aead_chacha20_poly1305
+endif
+
+ifneq (,$(filter psa_aead_chacha20_poly1305_backend_riot,$(USEMODULE)))
+  USEMODULE += crypto
+  USEMODULE += psa_riot_aead
+  USEMODULE += psa_riot_aead_chacha20_poly1305
+endif
+
+
 
 ## ChaCha20
 ifneq (,$(filter psa_cipher_chacha20,$(USEMODULE)))
