@@ -10,7 +10,7 @@
 
 /**
  * @defgroup    drivers_touch_dev Touch device generic API
- * @ingroup     drivers_misc
+ * @ingroup     drivers_display
  * @brief       Define the generic API of a touch device
  * @experimental This API is experimental and in an early state - expect
  *               changes!
