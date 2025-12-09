@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=../../../../../dist/tools/registry_gen/schema.json
+id: 1
+name: rgb
+description: Representation of an rgb color.
+items:
+  - id: 0
+    name: opaque
+    description: Opaque data type property.
+    type: opaque
+    size: 50
+
+  - id: 1
+    name: string
+    description: String data type property.
+    type: string
+    size: 50
+
+  - id: 2
+    name: boolean
+    description: Boolean data type property.
+    type: bool
+
+  - id: 3
+    name: u8
+    description: 8 bit unsigned integer data type property.
+    type: uint8
+
+  - id: 4
+    name: u16
+    description: 16 bit unsigned integer data type property.
+    type: uint16
+
+  - id: 5
+    name: u32
+    description: 32 bit unsigned integer data type property.
+    type: uint32
+
+  - id: 6
+    name: u64
+    description: 64 bit unsigned integer data type property.
+    type: uint64
+
+  - id: 7
+    name: i8
+    description: 8 bit integer data type property.
+    type: int8
+
+  - id: 8
+    name: i16
+    description: 16 bit integer data type property.
+    type: int16
+
+  - id: 9
+    name: i32
+    description: 32 bit integer data type property.
+    type: int32
+
+  - id: 10
+    name: i64
+    description: 64 bit integer data type property.
+    type: int64
+
+  - id: 11
+    name: f32
+    description: 64 bit integer data type property.
+    type: float32
+
+  - id: 12
+    name: f64
+    description: 64 bit integer data type property.
+    type: float64
