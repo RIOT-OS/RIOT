@@ -134,6 +134,18 @@ bool gnrc_rpl_parent_add_by_addr(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *addr,
                                  gnrc_rpl_parent_t **parent);
 
 /**
+ * @brief   Iterate over all parents in all DODAGs with @p IPv6 address.
+ *
+ * @param[in]   addr        IPV6 address of the parent.
+ * @param[out]  parent      Pointer to the parent if one was found. Otherwise NULL.
+ * @param[in]   idx         Index to start searching from.
+ *
+ * @retval  Index > 0 to continue next search from, if parent was found.
+ * @retval  -ENONENT if not found
+ */
+int gnrc_rpl_parent_iter_by_addr(const ipv6_addr_t *addr, gnrc_rpl_parent_t **parent, int idx);
+
+/**
  * @brief   Remove the @p parent from its DODAG.
  *
  * @param[in] parent     Pointer to the parent.
