@@ -14,11 +14,11 @@ This package provides support for the official library for Microchip CryptoAuth 
 
 ## Usage
 
-Add
-@code
+Add the following to your makefile:
+
+```makefile
 USEPKG += cryptoauthlib
-@endcode
-to your Makefile.
+```
 
 ### Shell
 
@@ -66,7 +66,7 @@ ATECCX08A device parameters are configured in
 There you can specify your device's address, the I2C bus to use and more by
 defining `ATCA_PARAMS`. Per default one device is defined in RIOT (example shown below).
 
-@code
+```c
 #define ATCA_PARAM_I2C       (I2C_DEV(0))
 #define ATCA_PARAM_ADDR      (ATCA_I2C_ADDR)
 #define ATCA_RX_RETRIES      (20)
@@ -79,14 +79,15 @@ defining `ATCA_PARAMS`. Per default one device is defined in RIOT (example shown
                                          .atcai2c.baud = -1, \
                                          .wake_delay = 1500, \
                                          .rx_retries = ATCA_RX_RETRIES }
-@endcode
+```
 
 If you want to use more than one device, the best way is to create a file called
 `custom_atca_params.h` in your application folder (you can see an example of this in
 `examples/advanced/psa_crypto`).
 
 In your custom file you can now add a second device to `ATCA_PARAMS`:
-@code
+
+```c
 #define ATCA_PARAM_I2C_DEV0       (I2C_DEV(0))
 #define ATCA_PARAM_ADDR_DEV0      (ATCA_I2C_ADDR_DEV0)
 #define ATCA_RX_RETRIES_DEV0      (20)
@@ -111,13 +112,14 @@ In your custom file you can now add a second device to `ATCA_PARAMS`:
                                          .atcai2c.baud = -1, \
                                          .wake_delay = 1500, \
                                          .rx_retries = ATCA_RX_RETRIES }
-@endcode
+```
 
 Now you just need to add the following to your Makefile:
-@code
+
+```Makefile
 CFLAGS += -DCUSTOM_ATCA_PARAMS
 INCLUDES += -I$(APPDIR)
-@endcode
+```
 
 This way your custom params file is included in the build process and both your
 devices will be initialized by the `auto_init` module.
@@ -127,10 +129,10 @@ allows you to pass a device handle. Pointers to all initialized devices are stor
 in the `atca_devs_ptr` array, which is included in `atca_params.h`.
 Include `atca_params.h` in your source file and pass the device handle as shown below.
 
-@code {.c}
+```c
 ATCADevice dev = atca_devs_ptr[0];
 calib_sha_start(dev);
-@endcode
+```
 
 ## Using Cryptoauthlib as a backend for PSA Crypto {#psa-cryptoauthlib}
 
@@ -145,7 +147,8 @@ location value. The primary device can get the value
 @ref PSA_KEY_LOCATION_SE_MIN and @ref PSA_KEY_LOCATION_SE_MAX.
 
 Your structure should now look like this:
-@code
+
+```c
 #define PSA_ATCA_LOCATION  (PSA_KEY_LOCATION_PRIMARY_SECURE_ELEMENT)
 #define ATCA_PARAM_I2C     (I2C_DEV(0))
 #define ATCA_PARAM_ADDR    (ATCA_I2C_ADDR)
@@ -162,7 +165,7 @@ Your structure should now look like this:
                                                 .wake_delay = 1500, \
                                                 .rx_retries = ATCA_RX_RETRIES } \
                                         }
-@endcode
+```
 
 When using multiple SEs, just add more device parameters as shown in section
 [Using Multiple ATECCX08A Devices](#multi-ateccx08a).
@@ -188,19 +191,20 @@ For this you need to initialize a list of key slot configuration structures, wit
 for each slot.
 
 For these devices the structure looks like this:
-@code {.c}
+
+```c
 typedef struct {
     psa_key_type_t key_type_allowed; // Declare the key type allowed in this slot
     uint8_t key_persistent;          // Ignore for now, PSA does not yet support persistent keys
     uint8_t slot_occupied;           // Set to 0, PSA will set this to one after writing a key
 } psa_atca_slot_config_t;
-@endcode
+```
 
 To make your configurations known to PSA, simply add the following to your `custom_atca_params.h`
 file (these values are only an example, of course you need to modify them according to
 your needs).
 
-@code {.c}
+```c
 #define ATCA_SLOTS_DEV0  {   { PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1), 0, 0 }, \
                              { PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1), 0, 0 }, \
                              { PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1), 0, 0 }, \
@@ -219,17 +223,17 @@ your needs).
                              { 0, 0, 0 }}
 
 #define ATCA_CONFIG_LIST     { ATCA_SLOTS_DEV0 }
-@endcode
+```
 
 To use multiple devices, define `ATCA_SLOTS_DEV0` - `ATCA_SLOTS_DEVX` and add them to
 `ATCA_CONFIG_LIST` like so:
 
-@code {.c}
+```c
 #define ATCA_CONFIG_LIST     { ATCA_SLOTS_DEV0 }, \
                              { ATCA_SLOTS_DEV1 }, \
                                      ...          \
                              { ATCA_SLOTS_DEVX }
-@endcode
+```
 
 A usage example for this can be found in `examples/advanced/psa_crypto`.
 
