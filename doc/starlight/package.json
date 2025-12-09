@@ -10,11 +10,11 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/rss": "^4.0.12",
-    "@astrojs/starlight": "^0.36.0",
-    "astro": "^5.14.0",
+    "@astrojs/rss": "^4.0.14",
+    "@astrojs/starlight": "^0.37.0",
+    "astro": "5.14.0",
     "rehype-github-emoji": "^1.0.0",
-    "sharp": "^0.34.0",
-    "starlight-image-zoom": "^0.13.1"
+    "sharp": "^0.34.5",
+    "starlight-image-zoom": "^0.13.2"
   }
 }

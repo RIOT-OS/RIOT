@@ -1,11 +1,14 @@
 import { defineCollection, z } from "astro:content";
 import { type Loader } from "astro/loaders";
-import { docsLoader } from "@astrojs/starlight/loaders";
 import { docsSchema } from "@astrojs/starlight/schema";
 import { promises as fs } from "node:fs";
+import { glob } from "astro/loaders";
 
 export const collections = {
-  docs: defineCollection({ loader: docsLoader(), schema: docsSchema() }),
+  docs: defineCollection({
+    loader: glob({ pattern: "**/*.(md|mdx)", base: "../guides" }),
+    schema: docsSchema(),
+  }),
   changelog: defineCollection({
     loader: changelogLoader(),
     schema: z.object({
