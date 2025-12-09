@@ -447,6 +447,11 @@ ifneq (,$(filter gnrc,$(USEMODULE)))
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_netif_hdr
   USEMODULE += gnrc_pktbuf
+	ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
+	  ifneq (,$(filter nimble_netif,$(USEMODULE)))
+      USEMODULE += gnrc_netapi_notify
+	  endif
+	endif
   ifneq (,$(filter sock_async, $(USEMODULE)))
     USEMODULE += gnrc_sock_async
   endif
