@@ -207,10 +207,18 @@ static inline void _on_l2_connected(kernel_pid_t if_pid, uint8_t *l2addr, uint8_
 {
     (void)if_pid;
 
+    ipv6_addr_t ipv6;
+
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     /* Add neighbor to neighbor cache if interface represents a 6LN. */
     gnrc_ipv6_nib_nc_set_6ln(if_pid, l2addr, l2addr_len);
 #endif /* CONFIG_GNRC_IPV6_NIB_6LN */
+
+    /* Inform routing layer of new reachable neighbor. */
+    if (_find_entry_in_nc(l2addr, l2addr_len, &ipv6)) {
+        gnrc_netapi_notify(GNRC_NETTYPE_L3_ROUTING, GNRC_NETREG_DEMUX_CTX_ALL,
+                           NETAPI_NOTIFY_L3_DISCOVERED, &ipv6, sizeof(ipv6_addr_t));
+    }
 }
 
 /**
@@ -223,6 +231,15 @@ static inline void _on_l2_connected(kernel_pid_t if_pid, uint8_t *l2addr, uint8_
 static inline void _on_l2_disconnected(kernel_pid_t if_pid, uint8_t *l2addr, uint8_t l2addr_len)
 {
     (void)if_pid;
+
+    ipv6_addr_t ipv6;
+
+    /* Inform routing layer of unreachable neighbor. This must be done *before* removing
+       the neighbor from the neighbor cache. */
+    if (_find_entry_in_nc(l2addr, l2addr_len, &ipv6)) {
+        gnrc_netapi_notify(GNRC_NETTYPE_L3_ROUTING, GNRC_NETREG_DEMUX_CTX_ALL,
+                           NETAPI_NOTIFY_L3_UNREACHABLE, &ipv6, sizeof(ipv6_addr_t));
+    }
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
     /* Remove from neighbor cache. */

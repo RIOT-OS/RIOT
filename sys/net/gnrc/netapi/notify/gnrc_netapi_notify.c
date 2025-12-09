@@ -36,6 +36,14 @@ int _copy_l2_connection_data(gnrc_netapi_notify_t *notify, netapi_notify_l2_conn
     return sizeof(netapi_notify_l2_connection_t);
 }
 
+int _copy_l3_address(gnrc_netapi_notify_t *notify, ipv6_addr_t *addr)
+{
+    assert(notify->_data_len == sizeof(ipv6_addr_t));
+
+    memcpy(addr, notify->_data, sizeof(ipv6_addr_t));
+    return sizeof(ipv6_addr_t);
+}
+
 int gnrc_netapi_notify_copy_event_data(gnrc_netapi_notify_t *notify, uint8_t data_len, void *data)
 {
     int res;
@@ -48,6 +56,14 @@ int gnrc_netapi_notify_copy_event_data(gnrc_netapi_notify_t *notify, uint8_t dat
             break;
         }
         res = _copy_l2_connection_data(notify, data);
+        break;
+    case NETAPI_NOTIFY_L3_DISCOVERED:
+    case NETAPI_NOTIFY_L3_UNREACHABLE:
+        if (data_len != sizeof(ipv6_addr_t)) {
+            res = -EINVAL;
+            break;
+        }
+        res = _copy_l3_address(notify, data);
         break;
     default:
         res = -EINVAL;

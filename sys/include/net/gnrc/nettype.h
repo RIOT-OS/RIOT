@@ -139,6 +139,15 @@ typedef enum {
      *          and their l2 address.
      */
     GNRC_NETTYPE_L2_DISCOVERY,
+    /**
+     * @brief   Reports routing-relevant information, e.g., discovered or
+     *          unreachable nodes, from the IPv6-layer to routing protocol like
+     *          RPL.
+     *
+     * @note    Compared to @ref GNRC_NETTYPE_L2_DISCOVERY, events published to
+     *          this type include the IPv6 address of the node.
+     */
+    GNRC_NETTYPE_L3_ROUTING,
     /** @} */
 
     /**

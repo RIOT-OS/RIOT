@@ -48,6 +48,8 @@ extern "C" {
 typedef enum {
     NETAPI_NOTIFY_L2_NEIGH_CONNECTED,       /**< Connection established on layer 2. */
     NETAPI_NOTIFY_L2_NEIGH_DISCONNECTED,    /**< Connection closed on layer 2. */
+    NETAPI_NOTIFY_L3_DISCOVERED,            /**< Discovered node on the network layer. */
+    NETAPI_NOTIFY_L3_UNREACHABLE,           /**< Node became unreachable on the network layer. */
 } netapi_notify_t;
 
 /**
