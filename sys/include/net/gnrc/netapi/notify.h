@@ -46,7 +46,8 @@ extern "C" {
  *          be added for parsing the data and calling @ref gnrc_netapi_notify_ack.
  */
 typedef enum {
-    PLACEHOLDER
+    NETAPI_NOTIFY_L2_NEIGH_CONNECTED,       /**< Connection established on layer 2. */
+    NETAPI_NOTIFY_L2_NEIGH_DISCONNECTED,    /**< Connection closed on layer 2. */
 } netapi_notify_t;
 
 /**
@@ -58,6 +59,16 @@ typedef struct {
     uint16_t _data_len;             /**< size of the event data */
     sema_inv_t ack;                 /**< inverse semaphore for collecting ack's */
 } gnrc_netapi_notify_t;
+
+/**
+ * @brief   L2 connection event data associated with @ref NETAPI_NOTIFY_L2_NEIGH_CONNECTED or
+ *          @ref NETAPI_NOTIFY_L2_NEIGH_DISCONNECTED events.
+ */
+typedef struct {
+    uint8_t l2addr[GNRC_NETIF_L2ADDR_MAXLEN];   /**< L2 address of the node */
+    uint8_t l2addr_len;                         /**< length of L2 address in byte */
+    kernel_pid_t if_pid;                        /**< PID of network interface */
+} netapi_notify_l2_connection_t;
 
 /**
  * @brief   Acknowledge that a notify event was received and its data read.

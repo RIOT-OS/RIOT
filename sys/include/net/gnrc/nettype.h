@@ -132,6 +132,13 @@ typedef enum {
      * }
      */
 
+    /**
+     * @brief   Reports the reachability of link-layer neighbors.
+     *          Connection-oriented links such as BLE can use this to inform
+     *          the IPv6-layer, e.g., about new connected or disconnected nodes
+     *          and their l2 address.
+     */
+    GNRC_NETTYPE_L2_DISCOVERY,
     /** @} */
 
     /**
