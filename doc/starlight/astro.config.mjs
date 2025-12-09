@@ -13,6 +13,9 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "RIOT Documentation",
+      markdown: {
+        processedDirs: ["../guides"],
+      },
       head: [
         {
           tag: "link",
@@ -185,7 +188,6 @@ export default defineConfig({
         replacesTitle: true,
       },
       plugins: [starlightImageZoom()],
-      routeMiddleware: "./src/routeData.ts",
       editLink: {
         baseUrl: "https://github.com/RIOT-OS/RIOT/tree/master/doc/guides",
       },
