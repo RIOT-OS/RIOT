@@ -201,6 +201,19 @@ void gnrc_rpl_dodag_remove_all_parents(gnrc_rpl_dodag_t *dodag)
     dodag->my_rank = GNRC_RPL_INFINITE_RANK;
 }
 
+int gnrc_rpl_parent_iter_by_addr(const ipv6_addr_t *addr, gnrc_rpl_parent_t **parent, int idx)
+{
+    *parent = NULL;
+    for (uint8_t i = idx; i < GNRC_RPL_PARENTS_NUMOF; ++i) {
+        if ((gnrc_rpl_parents[i].state != 0) && ipv6_addr_equal(&gnrc_rpl_parents[i].addr, addr)) {
+            *parent = &gnrc_rpl_parents[i];
+            /* Index to continue search from. */
+            return i + 1;
+        }
+    }
+    return -ENOENT;
+}
+
 bool gnrc_rpl_parent_add_by_addr(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *addr,
                                  gnrc_rpl_parent_t **parent)
 {
