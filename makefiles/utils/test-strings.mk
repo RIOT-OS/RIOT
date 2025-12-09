@@ -35,3 +35,11 @@ test-version_is_greater_or_equal:
 	$(Q)test 1 = "$(call version_is_greater_or_equal,$(TEST_VERSION_4),$(TEST_VERSION_3))" || { echo ERROR: "$(TEST_VERSION_3)" \< "$(TEST_VERSION_4)"; exit 1; }
 	$(Q)test "" = "$(call version_is_greater_or_equal,$(TEST_VERSION_3),$(TEST_VERSION_4))" || { echo ERROR: Test should fail, "$(TEST_VERSION_4)" is not \< "$(TEST_VERSION_3)"; exit 1; }
 	$(Q)test "" = "$(call version_is_greater_or_equal,$(TEST_VERSION_1),$(TEST_VERSION_4))" || { echo ERROR: Test should fail, "$(TEST_VERSION_1)" is not \< "$(TEST_VERSION_4)"; exit 1; }
+
+test-max_number:
+	$(Q)test "8" = "$(call max_number, 7 4 8 0 1 3)"
+	$(Q)test "42" = "$(call max_number, 42 4 8 0 1 3)"
+	$(Q)test "1337" = "$(call max_number, 42 4 8 0 1 1337)"
+	$(Q)test "0" = "$(call max_number, 0 0 0 0 0)"
+	$(Q)test "13" = "$(call max_number, 13)"
+	$(Q)test "0" = "$(call max_number,)"
