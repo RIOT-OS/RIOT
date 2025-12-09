@@ -10,7 +10,7 @@
 
 /**
  * @defgroup     drivers_ieee802154_hal IEEE802.15.4 Radio Hardware Abstraction Layer
- * @ingroup      drivers
+ * @ingroup      drivers_netdev
  * @experimental This API is experimental and in an early state - expect
  *               changes!
 

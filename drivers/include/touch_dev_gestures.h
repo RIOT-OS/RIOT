@@ -10,7 +10,7 @@
 
 /**
  * @defgroup    drivers_touch_dev_gestures Touch device gesture recognition
- * @ingroup     drivers_misc
+ * @ingroup     drivers_display
  *
  * @brief       Gesture recognition for touch devices
  * @{

@@ -10,7 +10,7 @@
 
 /**
  * @defgroup    drivers_mtd_sdcard MTD wrapper for SPI SD Cards
- * @ingroup     drivers_storage
+ * @ingroup     drivers_mtd
  * @brief       Driver for SPI SD Cards using the MTD interface
  *
  * @{
