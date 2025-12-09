@@ -7,3 +7,4 @@ Cargo.lock binary
 *.md conflict-marker-size=100
 *.txt conflict-marker-size=100
 *.svg binary
+package-lock.json binary
