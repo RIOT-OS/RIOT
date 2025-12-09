@@ -10,7 +10,7 @@
 
 /**
  * @defgroup    drivers_mtd_at24cxxx MTD wrapper for AT24cxxx family of I2C-EEPROMs
- * @ingroup     drivers_storage
+ * @ingroup     drivers_mtd
  * @brief       MTD wrapper for AT24XXX I2C based EEPROMs
  *
  * @{
