@@ -4,6 +4,8 @@ description: Learn how to use CoAP with RIOT
 code_folder: examples/guides/coap
 ---
 
+import FileTree from '@components/FileTree.astro';
+
 CoAP (Constrained Application Protocol) is a protocol to implement REST APIs
 for constrained devices and networks.
 It is designed for IoT applications and is similar to HTTP but much lighter.
@@ -24,11 +26,13 @@ that will feature a more streamlined API and additional functionality.
 
 Create a new directory for your project:
 
-```text
-coap-hello-server
-├── Makefile
-└── main.c
-```
+<FileTree>
+
+- coap-hello-server
+    - Makefile
+    - main.c
+
+</FileTree>
 
 ### Step 2: Create the Makefile
 
@@ -152,11 +156,13 @@ BOARD=arduino-feather-nrf52840-sense make all flash term
 
 Create a new directory for your project:
 
-```text
-coap-hello-client
-├── Makefile
-└── main.c
-```
+<FileTree>
+
+- coap-hello-client
+    - Makefile
+    - main.c
+
+</FileTree>
 
 ### Step 2: Create the Makefile
 

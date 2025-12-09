@@ -3,6 +3,8 @@ title: Creating Modules
 description: Guide on how to create modules in RIOT-OS
 ---
 
+import FileTree from '@components/FileTree.astro';
+
 Modules in RIOT are well-defined units of code that provide a set of features
 to your application. This includes also drivers and to a certain extent ports
 for CPUs and boards (with some exceptions, see the
@@ -47,12 +49,11 @@ in the linker which can be hard to track down.
 
 This problem happened in the past for:
 
- * Packages root directory (libfixmath/u8g2)
- * boards/cpu/periph and their common boards/cpu/periph
+* Packages root directory (libfixmath/u8g2)
+* boards/cpu/periph and their common boards/cpu/periph
 
 Note: even if all boards and cpus implement the `board` and `cpu` modules, only
       one is used in an application so there is no conflict.
-
 
 ## Module Dependencies
 
@@ -77,6 +78,7 @@ the user needs to add the directory (or directories) containing external modules
 to `EXTERNAL_MODULE_DIRS`.
 
 External modules can optionally define the following files:
+
 * `Makefile.include` file to set global build configuration like `CFLAGS` or add
   API headers include paths to the `USEMODULE_INCLUDES` variable.
 * `Makefile.dep` file to set module dependencies
@@ -114,12 +116,14 @@ These modules appear in RIOT under two forms:
 
 1. Conditionally included source files:
 
-```
-foo
-├── foo_bar.c
-├── foo.c
-└── Makefile
-```
+<FileTree>
+
+- foo
+    - foo_bar.c
+    - foo.c
+    - Makefile
+
+</FileTree>
 
 In `foo/Makefile` you add the source file to the `SRC` variable, conditioned on
 the Pseudomodule inclusion
@@ -134,13 +138,16 @@ See `sys/net/ble/skald` for an example in code.
 
 2. Using the `SUBMODULES` mechanism:
 
-```
-foo
-├── spam.c
-├── ham.c
-├── eggs.c
-└── Makefile
-```
+
+<FileTree>
+
+- foo
+    - spam.c
+    - ham.c
+    - eggs.c
+    - Makefile
+
+</FileTree>
 
 ```makefile
 # make all code end up in "foo_bar.a", this can be any name
@@ -181,16 +188,19 @@ implementation.
 The module source files are created in the `sys` directory.
 
 From the RIOT base directory, run:
+
 ```sh
 make generate-module
 ```
+
 Then answer a few questions about the driver:
-- Module name: enter a name for your module. It will be used as both the name
+
+* Module name: enter a name for your module. It will be used as both the name
   of the module directory under sys, where the source files are created, and
   the build system module (used with `USEMODULE`).
-- Module doxygen name: Enter the name of module, as displayed in the
+* Module doxygen name: Enter the name of module, as displayed in the
   Doxygen documentation.
-- Brief doxygen description: Describe in one line what is this module about.
+* Brief doxygen description: Describe in one line what is this module about.
 
 Other global information (author name, email, organization) should be retrieved
 automatically from your git configuration.

@@ -3,6 +3,8 @@ title: Creating an Application
 description: How to create your own application for RIOT
 ---
 
+import FileTree from '@components/FileTree.astro';
+
 To create your own application you need to create a directory containing one or
 multiple C file(s) with your source code and a Makefile. A template Makefile is
 available in the `dist` folder of the
@@ -241,21 +243,23 @@ tree applications, modules and boards are supported.
 For a full application with custom board and modules, the following directory
 tree can be used:
 
-```
-├── apps
-│   └── my_app
-│       └── Makefile
-├── boards
-│   └── my_board
-├── modules
-│   └── my_module
-│       ├── include
-│       │   └── my_module.h
-│       ├── Makefile
-│       ├── Makefile.include
-│       └── my_module.c
-└── RIOT
-```
+<FileTree>
+
+- apps
+    - my_app
+        - Makefile
+- boards
+  - my_board/
+- modules
+    - my_module
+        - include
+            -my_module.h
+        - Makefile
+        - Makefile.include
+        - my_module.c
+- RIOT/
+
+</FileTree>
 
 In this example tree, the `apps` directory contains a collection of applications
 for the project. The modules directory could contain extra modules for the
