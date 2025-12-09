@@ -122,6 +122,20 @@ typedef enum {
 
     /**
      * @{
+     * @name    Cross-layer network events.
+     *
+     * @brief   Subscription types for protocol-independent events.
+     *          They are used by lower-layers in the network stack to published
+     *          information about the network state.
+     *
+     * @details See @ref net_gnrc_netapi_notify.
+     * }
+     */
+
+    /** @} */
+
+    /**
+     * @{
      * @name Testing
      */
 #ifdef TEST_SUITES
