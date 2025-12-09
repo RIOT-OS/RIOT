@@ -222,9 +222,6 @@ static void _on_netif_evt(int handle, nimble_netif_event_t event,
         case NIMBLE_NETIF_CONNECTED_MASTER:
             /* parent selected */
             assert(_current_parent == handle);
-            /* send a DIS once connected to a (new) parent) */
-            gnrc_rpl_send_DIS(NULL, (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes,
-                              NULL, 0);
             break;
         case NIMBLE_NETIF_CONNECTED_SLAVE:
             /* child added */
