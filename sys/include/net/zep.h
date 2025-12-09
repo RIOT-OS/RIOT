@@ -24,6 +24,7 @@
 #include <stdint.h>
 
 #include "byteorder.h"
+#include "compiler_hints.h"
 #include "net/ntp_packet.h"
 
 #ifdef __cplusplus
@@ -51,6 +52,7 @@ extern "C" {
  * @brief   ZEP header definition
  */
 typedef struct __attribute__((packed)) {
+    NONSTRING
     char preamble[2];       /**< Preamble code (must be "EX") */
     uint8_t version;        /**< Protocol Version (must be 1 or 2) */
 } zep_hdr_t;
