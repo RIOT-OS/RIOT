@@ -52,6 +52,12 @@
  */
 
 /**
+ * @defgroup    drivers_crypto Crypto Device Drivers
+ * @ingroup     drivers
+ * @brief       Drivers for crypto devices
+ */
+
+/**
  * @defgroup    drivers_display Display Device Drivers
  * @ingroup     drivers
  * @brief       Drivers for display devices
