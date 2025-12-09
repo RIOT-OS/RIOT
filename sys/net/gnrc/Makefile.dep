@@ -94,6 +94,7 @@ ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6
   USEMODULE += gnrc_icmpv6
   USEMODULE += gnrc_ipv6_nib
   USEMODULE += trickle
