@@ -10,7 +10,6 @@
 #endif
 
 extern "C" {
-  // declare with external linkage
   extern const unsigned char g_model[] ALN;
   extern const unsigned int  g_model_len;
 const unsigned char g_model[] ALN = {

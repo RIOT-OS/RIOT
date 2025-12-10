@@ -1,16 +1,11 @@
 APPLICATION = tflm_fmnist_demo
 BOARD ?= nrf52840dk
 RIOTBASE ?= $(CURDIR)/../../..
-
 FEATURES_REQUIRED += cpp
 USEPKG += tflite-micro
-USEMODULE += xtimer
-
-# ✅ List ALL C++ sources here
+USEMODULE += ztimer
 CXXSRC += main.cpp
 CXXSRC += model_data.cpp
-
-# Keep TFLM warnings non-fatal on MCUs
-WERROR ?= 0
-
+CFLAGS  += -Wno-error=unused-parameter
+CXXFLAGS += -Wno-error=unused-parameter
 include $(RIOTBASE)/Makefile.include
