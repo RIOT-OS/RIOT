@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -94,6 +91,12 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
         /* add netif header, if interface was given */
         if (iface > 0) {
             gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+
+            if (netif == NULL) {
+                puts("Error: unable to allocate NETIF header");
+                gnrc_pktbuf_release(ip);
+                return;
+            }
 
             ((gnrc_netif_hdr_t *)netif->data)->if_pid = (kernel_pid_t)iface;
             ip = gnrc_pkt_prepend(ip, netif);

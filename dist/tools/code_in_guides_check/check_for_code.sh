@@ -38,10 +38,13 @@ parse_code_block() {
 
     # Check if this code exists in any file in the source directory
     found=0
-    for src_file in "$SOURCE_DIR"/*; do
-        # Skip if not a regular file
-        [ -f "$src_file" ] || continue
-
+    # Exclude `/bin/` folders
+    INPUT_FILES=$(
+        find "$SOURCE_DIR" \
+        -type d -name "bin" -prune\
+        -or -type f -print\
+    )
+    for src_file in $INPUT_FILES;  do
         # Read the file content
         src_content=$(cat "$src_file")
 

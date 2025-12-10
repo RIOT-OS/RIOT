@@ -85,7 +85,7 @@ of recognised exceptions where we can (or even must) rely on extensions include:
 * Type definitions (using `typedef`) always end on "_t".
 * If a typedef is used for a struct, it has to be specified at the struct
   definition (i.e., not as a separate line). E.g.:
-```
+```c
     typedef struct {
         uint8_t a;
         uint8_t b;
@@ -93,7 +93,7 @@ of recognised exceptions where we can (or even must) rely on extensions include:
 ```
 * Use of a separate line typedef for structs is allowed for forward
   declarations, e.g.,
-```
+```c
     typedef struct mystruct mystruct_t;
     [...]
     struct mystruct {
@@ -149,7 +149,7 @@ of recognised exceptions where we can (or even must) rely on extensions include:
 
 *  Names of all public functions and variables must start with the name of the
    corresponding library, e.g.:
-```
+```c
     thread_getpid(void);
     hwtimer_init_comp(uint32_t fcpu);
     int transceiver_pid;
@@ -157,7 +157,7 @@ of recognised exceptions where we can (or even must) rely on extensions include:
 * Private functions and variables do NOT have this library prefix.
 * Do NOT use CamelCase. Function, variable and file names as well as enums,
   structs or typedefs are written in lowercase with underscores.
-```
+```c
     /* instead of: */
     void CamelCaseNamedFunction(int camelCaseNamedVar);
 
@@ -178,7 +178,7 @@ of recognised exceptions where we can (or even must) rely on extensions include:
   `do`-statement, it goes into the same line.
 * Use curly braces even for one-line blocks. This improves debugging and later
   additions.
-```
+```c
     /* instead of: */
     if (debug) println("DEBUG");
     else println("DEBUG ELSE");
@@ -194,6 +194,20 @@ of recognised exceptions where we can (or even must) rely on extensions include:
 * Commas are always followed by a space.
 * For complex statements it is always good to use more parentheses - or split up
   the statement and simplify it.
+* Switch cases are an exception, the `case` statement is supposed to be on
+  the same indentation level as the `switch`:
+```c
+    switch(foo) {
+    case BAR:
+        printf("Hello");
+        break;
+    case PUB:
+        printf("World");
+        break;
+    default:
+        break;
+    }
+```
 
 ## Indentation of Preprocessor Directives
 
@@ -202,7 +216,7 @@ indent when entering conditional compilation using `#if`/`#ifdef`/`#ifndef`
 (except for the include guard, which does not add to the indent). Treat indent
 for C language statements and C preprocessor directives independently.
 
-```
+```c
 /* BAD: */
 #if XOSC1
 #define XOSC XOSC1
@@ -213,7 +227,7 @@ for C language statements and C preprocessor directives independently.
 #endif /* XOSC1/XOSC2 */
 ```
 
-```
+```c
 /* GOOD: */
 #if XOSC1
 #  define XOSC XOSC1
@@ -224,7 +238,7 @@ for C language statements and C preprocessor directives independently.
 #endif
 ```
 
-```
+```c
 /* BAD: */
 void init_foo(uint32_t param)
 {
@@ -243,7 +257,7 @@ void init_foo(uint32_t param)
 }
 ```
 
-```
+```c
 /* GOOD: */
 void init_foo(uint32_t param)
 {
@@ -349,7 +363,7 @@ Note: these rules will be enforced by the CI.
 * C Header files should be always wrapped for C++ compatibility to prevent
   issues with name mangling, i.e. mark all the containing functions and
   definitions as `extern "C"`
-``` C
+```c
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -368,23 +382,42 @@ extern "C" {
 
 * Absolute values must be specified as macros or enums, not as literals, i.e.
   instead of
-```
+```c
 int timeout = 7 * 1000000;
 ```
 write
-```
+```c
 int timeout = TIMEOUT_INTERVAL * USEC_PER_SEC;
 ```
 ## Comments
 * All comments should be written as C-style comments.
+* Long multi-Line comments should have a leading asterisk for the second and
+  following lines. The first and last lines should be left empty and not contain
+  any comment text.
+  See also: [Linux Kernel Coding Style](https://www.kernel.org/doc/html/v4.10/process/coding-style.html#commenting).
+* For short multi-line comments of two or three lines, a shorter style is
+  also permissible, where the first and last line do not need to be left empty.
 
 E.g:
-```
+```c
 /* This is a C-style comment */
+
+/* This is a short
+ * multi-line comment (max 2-3 lines). */
+
+/*
+ * This is a long multi-
+ * line comment for more
+ * than three lines of
+ * comment text.
+ */
 ```
 Wrong:
-```
+```c
 // C++ comment here
+
+/* This is a multi-line comment
+   without leading asterisk. */
 ```
 
 ## Documentation
@@ -398,7 +431,7 @@ Wrong:
 
 An exemplary doxygen documentation in a header file can look like this.
 
-```
+```c
 /*
  * SPDX-FileCopyrightText: 2014 Peter Schmerzl <peter@schmerzl-os.org>
  * SPDX-License-Identifier: LGPL-2.1-only
@@ -426,6 +459,19 @@ An exemplary doxygen documentation in a header file can look like this.
  * @return 1 if setting the state was successful, 0 otherwise.
  */
  int set_foobar(int state, int *old_state);
+
+/**
+ * @brief   Document multiple return values.
+ *
+ * You can use the `@return` command to specify the general kind of return
+ * value and the `@retval` commands to specify distinct values that will be
+ * returned by your function.
+ *
+ * @return  Length of FOO on success or an error code on failure.
+ * @retval  -EIO on Input Output Errors
+ * @retval  -ENOMEM on small microcontrollers with little RAM
+ */
+int get_foolength(void);
 ```
 
 ### SPDX
@@ -440,7 +486,7 @@ notices tend to vary depending on the author, making it difficult to parse
 automatically and reliably.
 
 Old Style - License Information:
-```
+```c
 /*
  * Copyright (C) 2013, 2014 INRIA
  *               2015 Freie Universität Berlin
@@ -453,7 +499,7 @@ Old Style - License Information:
 ```
 
 New Style - SPDX Format:
-```
+```c
 /*
  * SPDX-FileCopyrightText: 2013-2014 INRIA
  * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
@@ -515,7 +561,7 @@ not a string literal`.
   possibility to suppress this warning/error. You MUST do so by adding a
   comment, including a rationale why it is a false positive and why the code
   can't be fixed otherwise, in the following format:
-```
+```c
     /* cppcheck-suppress <category of error/warning>
      * (reason: cppcheck is being really silly. this is certainly not a
      * null-pointer dereference */

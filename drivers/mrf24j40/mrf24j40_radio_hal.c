@@ -254,7 +254,7 @@ static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
     mrf24j40_t *dev = hal->priv;
     int8_t pow = conf->pow;
     uint8_t channel = conf->channel;
-    if (pow < MRF24J40_MIN_TXPOWER && pow > MRF24J40_MAX_TXPOWER) {
+    if (pow < MRF24J40_MIN_TXPOWER || pow > MRF24J40_MAX_TXPOWER) {
         return -EINVAL;
     }
     mrf24j40_set_txpower(dev, pow);
@@ -343,6 +343,7 @@ int _set_frame_retrans(ieee802154_dev_t *hal, uint8_t retrans)
 
 static const ieee802154_radio_ops_t mrf24j40_ops = {
     .caps =  IEEE802154_CAP_24_GHZ
+          | IEEE802154_CAP_AUTO_ACK
           | IEEE802154_CAP_IRQ_TX_DONE
           | IEEE802154_CAP_FRAME_RETRANS
           | IEEE802154_CAP_FRAME_RETRANS_INFO

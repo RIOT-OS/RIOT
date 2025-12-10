@@ -62,7 +62,7 @@ define welcome_message
 	@echo "Usually, you should run 'make' in your application's directory instead."
 	@echo ""
 	@echo "Please see our Quick Start Guide at:"
-	@echo "    https://doc.riot-os.org/getting-started.html"
+	@echo "    https://guide.riot-os.org/getting-started/installing/"
 	@echo "You can ask questions or discuss with other users on our forum:"
 	@echo "    https://forum.riot-os.org"
 	@echo ""

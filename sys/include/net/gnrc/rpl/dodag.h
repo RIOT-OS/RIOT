@@ -77,14 +77,18 @@ bool gnrc_rpl_instance_add(uint8_t instance_id, gnrc_rpl_instance_t **inst);
 bool gnrc_rpl_instance_remove_by_id(uint8_t instance_id);
 
 /**
+ * @brief   Remove a RPL DODAG with the pointer @p dodag from its instance.
+ *
+ * @param[in] dodag     Pointer to the RPL DODAG to remove.
+ */
+void gnrc_rpl_dodag_remove(gnrc_rpl_dodag_t *dodag);
+
+/**
  * @brief   Remove a RPL instance with the pointer @p inst.
  *
  * @param[in] inst     Pointer to the RPL instance to remove.
- *
- * @return  true, on success.
- * @return  false, otherwise.
  */
-bool gnrc_rpl_instance_remove(gnrc_rpl_instance_t *inst);
+void gnrc_rpl_instance_remove(gnrc_rpl_instance_t *inst);
 
 /**
  * @brief   Get the RPL instance with the id @p instance_id.
@@ -128,6 +132,18 @@ void gnrc_rpl_dodag_remove_all_parents(gnrc_rpl_dodag_t *dodag);
  */
 bool gnrc_rpl_parent_add_by_addr(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *addr,
                                  gnrc_rpl_parent_t **parent);
+
+/**
+ * @brief   Iterate over all parents in all DODAGs with @p IPv6 address.
+ *
+ * @param[in]   addr        IPV6 address of the parent.
+ * @param[out]  parent      Pointer to the parent if one was found. Otherwise NULL.
+ * @param[in]   idx         Index to start searching from.
+ *
+ * @retval  Index > 0 to continue next search from, if parent was found.
+ * @retval  -ENONENT if not found
+ */
+int gnrc_rpl_parent_iter_by_addr(const ipv6_addr_t *addr, gnrc_rpl_parent_t **parent, int idx);
 
 /**
  * @brief   Remove the @p parent from its DODAG.

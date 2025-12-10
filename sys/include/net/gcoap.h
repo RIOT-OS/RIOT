@@ -400,14 +400,15 @@
 
 #include "event/callback.h"
 #include "event/timeout.h"
-#include "net/ipv6/addr.h"
 #include "net/sock/udp.h"
-#if IS_USED(MODULE_GCOAP_DTLS)
-#include "net/sock/dtls.h"
-#endif
 #include "net/nanocoap.h"
-#include "net/nanocoap/cache.h"
-#include "timex.h"
+
+#if IS_USED(MODULE_GCOAP_DTLS)
+#  include "net/sock/dtls.h"
+#endif
+#if IS_USED(MODULE_NANOCOAP_CACHE)
+#  include "net/nanocoap/cache.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -479,7 +480,7 @@ extern "C" {
 /**
  * @brief   Maximum length in bytes for a header, including the token
  */
-#define GCOAP_HEADER_MAXLEN     (sizeof(coap_hdr_t) + GCOAP_TOKENLEN_MAX)
+#define GCOAP_HEADER_MAXLEN     (sizeof(coap_udp_hdr_t) + GCOAP_TOKENLEN_MAX)
 
 /**
  * @ingroup net_gcoap_conf
@@ -1188,20 +1189,35 @@ sock_dtls_t *gcoap_get_sock_dtls(void);
 #endif
 
 /**
+ * @brief   Get the buffer from a @ref gcoap_request_memo_t
+ *
+ * @param[in] memo  A request memo. Must not be NULL.
+ *
+ * @return  The buffer storing the message
+ */
+static inline uint8_t *gcoap_request_memo_get_buf(gcoap_request_memo_t *memo)
+{
+    if (memo->send_limit == GCOAP_SEND_LIMIT_NON) {
+        return &memo->msg.hdr_buf[0];
+    }
+    else {
+        return memo->msg.data.pdu_buf;
+    }
+}
+
+/**
  * @brief   Get the header of a request from a @ref gcoap_request_memo_t
  *
  * @param[in] memo  A request memo. Must not be NULL.
  *
  * @return  The request header for the given request memo.
+ *
+ * @deprecated  Use @ref gcoap_request_memo_get_buf instead
  */
-static inline coap_hdr_t *gcoap_request_memo_get_hdr(const gcoap_request_memo_t *memo)
+static inline coap_udp_hdr_t *gcoap_request_memo_get_hdr(const gcoap_request_memo_t *memo)
 {
-    if (memo->send_limit == GCOAP_SEND_LIMIT_NON) {
-        return (coap_hdr_t *)&memo->msg.hdr_buf[0];
-    }
-    else {
-        return (coap_hdr_t *)memo->msg.data.pdu_buf;
-    }
+    gcoap_request_memo_t *evil_cast_is_evil = (gcoap_request_memo_t *)memo;
+    return (coap_udp_hdr_t *)gcoap_request_memo_get_buf(evil_cast_is_evil);
 }
 
 #ifdef __cplusplus

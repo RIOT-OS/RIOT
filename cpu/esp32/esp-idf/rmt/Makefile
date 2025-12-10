@@ -11,7 +11,11 @@ ESP32_SDK_SRC = \
   #
 
 ifeq (esp32s3,$(CPU_FAM))
-  ESP32_SDK_SRC += components/bootloader_support/src/flash_encrypt.c
+  ifeq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
+    # this file is already compiled in `esp_idf_nvs_flash`
+    # don't compile it again if `esp_idf_nvs_flash` is used
+    ESP32_SDK_SRC += components/bootloader_support/src/flash_encrypt.c
+  endif
   ESP32_SDK_SRC += components/esp_hw_support/dma/gdma.c
   ESP32_SDK_SRC += components/hal/gdma_hal_ahb_v1.c
   ESP32_SDK_SRC += components/hal/gdma_hal_top.c

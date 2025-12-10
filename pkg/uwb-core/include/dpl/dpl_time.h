@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_uwb_core
  * @{
@@ -16,9 +18,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
-
-#ifndef DPL_DPL_TIME_H
-#define DPL_DPL_TIME_H
 
 #include "os/os_time.h"
 
@@ -99,5 +98,3 @@ static inline void dpl_time_delay(dpl_time_t ticks)
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* DPL_DPL_TIME_H */

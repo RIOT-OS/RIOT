@@ -1,9 +1,6 @@
 <!--
-Copyright (C) 2025 Gunar Schorcht
-
-This file is subject to the terms and conditions of the GNU Lesser
-General Public License v2.1. See the file LICENSE in the top level
-directory for more details.
+SPDX-FileCopyrightText: 2025 Gunar Schorcht
+SPDX-License-Identifier: LGPL-2.1-only
 -->
 
 @defgroup        cpu_esp8266 ESP8266 / ESP8285
@@ -721,7 +718,7 @@ line, e.g.:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi \
 CFLAGS='-DWIFI_SSID=\"MySSID\" -DWIFI_PASS=\"MyPassphrase\"' \
-make -C examples/networking/gnrc/gnrc_networking BOARD=...
+make -C examples/networking/gnrc/networking BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note
@@ -772,7 +769,7 @@ line, for example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi_ap \
 CFLAGS='-DWIFI_SSID=\"MySSID\" -DWIFI_PASS=\"MyPassphrase\" -DESP_WIFI_MAX_CONN=1' \
-make -C examples/networking/gnrc/gnrc_networking BOARD=...
+make -C examples/networking/gnrc/networking BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note

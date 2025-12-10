@@ -1,13 +1,9 @@
 /*
- * Copyright (C) 2014 Philipp Rosenkranz
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014 Philipp Rosenkranz
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#ifndef TESTS_BLOOM_SETS_H
-#define TESTS_BLOOM_SETS_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -1031,5 +1027,3 @@ const char* const B[10] = {"interbedded",
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* TESTS_BLOOM_SETS_H */

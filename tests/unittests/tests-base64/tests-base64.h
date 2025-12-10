@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2015 Martin Landsmann
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Martin Landsmann
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @addtogroup  unittests
@@ -15,8 +14,7 @@
  *
  * @author      Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
  */
-#ifndef TESTS_BASE64_H
-#define TESTS_BASE64_H
+
 #include "embUnit/embUnit.h"
 
 #ifdef __cplusplus
@@ -39,5 +37,4 @@ Test *tests_base64_tests(void);
 }
 #endif
 
-#endif /* TESTS_BASE64_H */
 /** @} */

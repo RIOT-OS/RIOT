@@ -19,19 +19,18 @@ Let's create a simple thread that prints a message to the console.
 Go into your `main.c` file and add the following code:
 
 ```c
-void *my_first_thread(void *arg) {
-  /* The argument we receive will not be used */
-  (void)arg;
+void *my_first_thread(void *arg)
+{
+    /* The argument we receive will not be used */
+    (void)arg;
 
-  /* We print a simple message from the thread */
-  puts("Hello, from the thread!");
+    /* We print a simple message from the thread */
+    puts("Hello, from the thread!");
 
-  /* We return NULL to indicate that the thread has finished */
-  return NULL;
+    /* We return NULL to indicate that the thread has finished */
+    return NULL;
 }
 ```
-
-![The thread function in Visual Studio Code](img/threads/01_thread_function.png)
 
 This function takes a single argument,
 a pointer to any data, and prints "Hello, from the thread!" to the console.
@@ -56,26 +55,25 @@ The stack size can vary depending on the complexity of your thread.
 For example, depending of the amount of local variables you use,
 the stack size might need to be larger.
 
-Lets define the stack as a global variable:
+Let's define the stack as a global variable:
 
 ```c
 char my_thread_stack[THREAD_STACKSIZE_MAIN];
 ```
 
-![The thread stack in Visual Studio Code](img/threads/02_stack.png)
-
 Lastly, we need to actually start the thread.
 Go into your `main` function and include the following code:
 
 ```c
-int main(void) {
-  /* Create a thread with the stack we defined above */
-  thread_create(my_thread_stack, sizeof(my_thread_stack),
-                THREAD_PRIORITY_MAIN - 1, 0, my_first_thread, NULL,
-                "My first thread");
+int main(void)
+{
+    /* Create a thread with the stack we defined above */
+    thread_create(my_thread_stack, sizeof(my_thread_stack),
+                  THREAD_PRIORITY_MAIN - 1, 0, my_first_thread, NULL,
+                  "My first thread");
 
-  /* The main thread can continue doing its work (e.g., printing a message) */
-  puts("Hello, from the main thread!");
+    /* The main thread can continue doing its work (e.g., printing a message) */
+    puts("Hello, from the main thread!");
 }
 ```
 
@@ -87,6 +85,43 @@ int main(void) {
 - `my_first_thread`: The thread function
 - `NULL`: The argument for the thread function
 - `"My first thread"`: The name of the thread
+
+The final code should now look like this:
+
+```c title="main.c" {5-9, 25-31}
+#include <stdio.h>
+
+#include "thread.h"
+
+/*
+ * Define a stack for the thread.
+ * The size of the stack is defined by THREAD_STACKSIZE_MAIN.
+ */
+char my_thread_stack[THREAD_STACKSIZE_MAIN];
+
+void *my_first_thread(void *arg)
+{
+    /* The argument we receive will not be used */
+    (void)arg;
+
+    /* We print a simple message from the thread */
+    puts("Hello, from the thread!");
+
+    /* We return NULL to indicate that the thread has finished */
+    return NULL;
+}
+
+int main(void)
+{
+    /* Create a thread with the stack we defined above */
+    thread_create(my_thread_stack, sizeof(my_thread_stack),
+                  THREAD_PRIORITY_MAIN - 1, 0, my_first_thread, NULL,
+                  "My first thread");
+
+    /* The main thread can continue doing its work (e.g., printing a message) */
+    puts("Hello, from the main thread!");
+}
+```
 
 ## Step 3: Building and Running the Program
 

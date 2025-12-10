@@ -476,18 +476,17 @@ static inline uint16_t nanocoap_sock_next_msg_id(nanocoap_sock_t *sock)
 }
 
 /**
- * @brief   Start a nanocoap server instance
+ * @brief   Start a nanoCoAP server instance
  *
- * This function only returns if there's an error binding to @p local, or if
- * receiving of UDP packets fails.
+ * This function only returns if there's an error binding to @p local.
  *
  * @param[in]   local   local UDP endpoint to bind to
- * @param[in]   buf     input buffer to use
+ * @param[in]   buf     response buffer to use
  * @param[in]   bufsize size of @p buf
  *
- * @returns     -1 on error
+ * @returns     return code of @see sock_udp_create on error
  */
-int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize);
+int nanocoap_server(sock_udp_ep_t *local, void *buf, size_t bufsize);
 
 /**
  * @brief   Create and start the nanoCoAP server thread

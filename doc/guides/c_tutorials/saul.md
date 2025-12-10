@@ -22,9 +22,45 @@ add the following line to the `Makefile`:
 ```makefile
 USEMODULE += saul
 USEMODULE += saul_default
+
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
 ```
 
-![Makefile in VSCode](img/saul/01_makefile.png)
+```makefile title="Makefile" {21-27}
+# name of your application
+APPLICATION = saul_example
+
+# Change this to your board if you want to build for a different board
+BOARD ?= arduino-feather-nrf52840-sense
+
+# This has to be the absolute path to the RIOT base directory:
+# If you are following the tutorial, your RIOT base directory will
+# most likely be something like RIOTBASE ?= $(CURDIR)/RIOT
+# instead of this
+RIOTBASE ?= $(CURDIR)/../../..
+
+# Comment this out to disable code in RIOT that does safety checking
+# which is not needed in a production environment but helps in the
+# development process:
+DEVELHELP ?= 1
+
+# This board requires a start sleep to actually catch the printed output
+USEMODULE += shell
+
+# Add the SAUL module to the application
+USEMODULE += saul
+USEMODULE += saul_default
+
+# Enable the milliseconds timer.
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
+
+# Change this to 0 show compiler invocation lines by default:
+QUIET ?= 1
+
+include $(RIOTBASE)/Makefile.include
+```
 
 ## Including the Headers
 
@@ -40,13 +76,27 @@ Add the following lines to the top of the file:
 ```
 
 We need:
+
 - `stdio.h` for the `printf` function,
 - `board.h` for the board specific configuration,
 - `ztimer.h` for the ztimer module so we can sleep for a while,
 - and `saul_reg.h` for the SAUL registry and related functions.
 
+The code should now look like this:
 
-![main.c in VSCode](img/saul/02_main_c.png)
+<!--skip ci-->
+```c title="main.c"
+#include <stdio.h>
+
+#include "board.h"
+#include "saul_reg.h"
+#include "ztimer.h"
+
+int main(void)
+{
+
+}
+```
 
 ## Registering a Sensor
 
@@ -57,8 +107,8 @@ In this example we will register a temperature sensor, as such we need to simply
 search for `SAUL_SENSE_TEMP` devices.
 
 ```c
-  /* Define our temperature sensor */
-  saul_reg_t *temperature_sensor = saul_reg_find_type(SAUL_SENSE_TEMP);
+    /* Define our temperature sensor */
+    saul_reg_t *temperature_sensor = saul_reg_find_type(SAUL_SENSE_TEMP);
 ```
 
 This doesn't actually guarantee that the sensor is available, which is why we also need to
@@ -66,20 +116,53 @@ check if the sensor truly exists. To do this we create a simple if statement tha
 whether the result of the function was `NULL` or not.
 
 ```c
-  /* Exit if we can't find a temperature sensor */
-  if (!temperature_sensor) {
-    puts("No temperature sensor found");
-    return 1;
-  } else {
-    /*
-     * Otherwise print the name of the temperature sensor
-     * and continue the program
-     */
-    printf("Temperature sensor found: %s\n", temperature_sensor->name);
-  }
+    /* Exit if we can't find a temperature sensor */
+    if (!temperature_sensor) {
+        puts("No temperature sensor found");
+        return 1;
+    }
+    else {
+        /*
+         * Otherwise print the name of the temperature sensor
+         * and continue the program
+         */
+        printf("Temperature sensor found: %s\n", temperature_sensor->name);
+    }
 ```
 
-![Code to register sensor in VSCode](img/saul/03_register.png)
+The code should now look like this:
+
+<!--skip ci-->
+```c title="main.c" {9-27}
+#include <stdio.h>
+
+#include "board.h"
+#include "saul_reg.h"
+#include "ztimer.h"
+
+int main(void)
+{
+    /* We sleep for 5 seconds to allow the system to initialize */
+    ztimer_sleep(ZTIMER_MSEC, 5000);
+    puts("Welcome to SAUL magic!");
+
+    /* Define our temperature sensor */
+    saul_reg_t *temperature_sensor = saul_reg_find_type(SAUL_SENSE_TEMP);
+
+    /* Exit if we can't find a temperature sensor */
+    if (!temperature_sensor) {
+        puts("No temperature sensor found");
+        return 1;
+    }
+    else {
+        /*
+         * Otherwise print the name of the temperature sensor
+         * and continue the program
+         */
+        printf("Temperature sensor found: %s\n", temperature_sensor->name);
+    }
+}
+```
 
 Congratulations, by this point your program should be able to find
 a temperature sensor on your board.
@@ -91,17 +174,17 @@ to read the sensor we simply call the `saul_reg_read` function
 which then stores the result in a `phydat_t` struct we provide.
 
 ```c
-  /* We start an infinite loop to continuously read the temperature */
-  while (1) {
-    /* Define a variable to store the temperature */
-    phydat_t temperature;
+    /* We start an infinite loop to continuously read the temperature */
+    while (1) {
+        /* Define a variable to store the temperature */
+        phydat_t temperature;
 
-    /*
-     * Read the temperature sensor
-     * and store the result in the temperature variable
-     * saul_reg_read returns the dimension of the data read (1 in this case)
-     */
-    int dimension = saul_reg_read(temperature_sensor, &temperature);
+        /*
+         * Read the temperature sensor
+         * and store the result in the temperature variable
+         * saul_reg_read returns the dimension of the data read (1 in this case)
+         */
+        int dimension = saul_reg_read(temperature_sensor, &temperature);
 ```
 
 Once again, since C doesn't have exceptions,
@@ -109,11 +192,11 @@ we need to check if the sensor was read correctly.
 In this case we simply need to check if the dimension is greater than 0.
 
 ```c
-    /* If the read was successful (1+ Dimensions), print the temperature */
-    if (dimension <= 0) {
-      puts("Error reading temperature sensor");
-      return 1;
-    }
+        /* If the read was successful (1+ Dimensions), print the temperature */
+        if (dimension <= 0) {
+            puts("Error reading temperature sensor");
+            return 1;
+        }
 ```
 
 Now all that is left is to print the temperature to the console and go to sleep.
@@ -122,14 +205,70 @@ RIOT provides a simple function to solve this problem,
 `phydat_dump` which prints the data in a `phydat_t` struct to the console.
 
 ```c
-    /* Dump the temperature to the console */
-    phydat_dump(&temperature, dimension);
+        /* Dump the temperature to the console */
+        phydat_dump(&temperature, dimension);
 
-    /* Sleep for 1 seconds */
-    ztimer_sleep(ZTIMER_MSEC, 1000);
+        /* Sleep for 1 seconds */
+        ztimer_sleep(ZTIMER_MSEC, 1000);
 ```
 
-![Code to read sensor in VSCode](img/saul/04_read.png)
+The final code should now look like this:
+
+```c title="main.c" {29-52}
+#include <stdio.h>
+
+#include "board.h"
+#include "saul_reg.h"
+#include "ztimer.h"
+
+int main(void)
+{
+    /* We sleep for 5 seconds to allow the system to initialize */
+    ztimer_sleep(ZTIMER_MSEC, 5000);
+    puts("Welcome to SAUL magic!");
+
+    /* Define our temperature sensor */
+    saul_reg_t *temperature_sensor = saul_reg_find_type(SAUL_SENSE_TEMP);
+
+    /* Exit if we can't find a temperature sensor */
+    if (!temperature_sensor) {
+        puts("No temperature sensor found");
+        return 1;
+    }
+    else {
+        /*
+         * Otherwise print the name of the temperature sensor
+         * and continue the program
+         */
+        printf("Temperature sensor found: %s\n", temperature_sensor->name);
+    }
+
+    /* We start an infinite loop to continuously read the temperature */
+    while (1) {
+        /* Define a variable to store the temperature */
+        phydat_t temperature;
+
+        /*
+         * Read the temperature sensor
+         * and store the result in the temperature variable
+         * saul_reg_read returns the dimension of the data read (1 in this case)
+         */
+        int dimension = saul_reg_read(temperature_sensor, &temperature);
+
+        /* If the read was successful (1+ Dimensions), print the temperature */
+        if (dimension <= 0) {
+            puts("Error reading temperature sensor");
+            return 1;
+        }
+
+        /* Dump the temperature to the console */
+        phydat_dump(&temperature, dimension);
+
+        /* Sleep for 1 seconds */
+        ztimer_sleep(ZTIMER_MSEC, 1000);
+    }
+}
+```
 
 ## Building and Running the Program
 

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2023 ML!PA Consulting GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2023 ML!PA Consulting GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -1142,6 +1139,7 @@ void ISR_CAN0(void)
     if (_can_0->candev.event_callback) {
         _can_0->candev.event_callback(&(_can_0->candev), CANDEV_EVENT_ISR, NULL);
     }
+    cortexm_isr_end();
 }
 #endif
 
@@ -1155,6 +1153,6 @@ void ISR_CAN1(void)
     if (_can_1->candev.event_callback) {
         _can_1->candev.event_callback(&(_can_1->candev), CANDEV_EVENT_ISR, NULL);
     }
-
+   cortexm_isr_end();
 }
 #endif

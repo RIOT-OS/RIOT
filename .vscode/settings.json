@@ -18,4 +18,8 @@
         "editor.tabSize": 2,
         "editor.insertSpaces": true,
     },
+    "[javascript][typescript]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true
+    }
 }

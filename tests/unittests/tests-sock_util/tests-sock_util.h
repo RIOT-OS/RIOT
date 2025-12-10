@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2018 Freie Universität Berlin
- * Copyright (C) 2018 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2018 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @addtogroup  unittests
@@ -15,8 +14,6 @@
  * @brief       Unittests for the sock_util module
  *
  */
-#ifndef TESTS_SOCK_UTIL_H
-#define TESTS_SOCK_UTIL_H
 
 #include "embUnit/embUnit.h"
 
@@ -33,5 +30,4 @@ void tests_sockutil(void);
 }
 #endif
 
-#endif /* TESTS_SOCK_UTIL_H */
 /** @} */

@@ -122,6 +122,36 @@ typedef enum {
 
     /**
      * @{
+     * @name    Cross-layer network events.
+     *
+     * @brief   Subscription types for protocol-independent events.
+     *          They are used by lower-layers in the network stack to published
+     *          information about the network state.
+     *
+     * @details See @ref net_gnrc_netapi_notify.
+     * }
+     */
+
+    /**
+     * @brief   Reports the reachability of link-layer neighbors.
+     *          Connection-oriented links such as BLE can use this to inform
+     *          the IPv6-layer, e.g., about new connected or disconnected nodes
+     *          and their l2 address.
+     */
+    GNRC_NETTYPE_L2_DISCOVERY,
+    /**
+     * @brief   Reports routing-relevant information, e.g., discovered or
+     *          unreachable nodes, from the IPv6-layer to routing protocol like
+     *          RPL.
+     *
+     * @note    Compared to @ref GNRC_NETTYPE_L2_DISCOVERY, events published to
+     *          this type include the IPv6 address of the node.
+     */
+    GNRC_NETTYPE_L3_ROUTING,
+    /** @} */
+
+    /**
+     * @{
      * @name Testing
      */
 #ifdef TEST_SUITES

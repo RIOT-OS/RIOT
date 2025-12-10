@@ -1,16 +1,13 @@
 /*
- * Copyright (C) 2022 Benjamin Valentin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2022 Benjamin Valentin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
 
 /**
  * @defgroup    drivers_mtd_sam0_sdhc MTD wrapper for SAM0 SDHC devices
- * @ingroup     drivers_storage
+ * @ingroup     drivers_mtd
  * @ingroup     cpu_sam0_common_sdhc
  * @brief       Driver for SD Cards connected to the SAM0 SDHC peripheral using the MTD interface
  *

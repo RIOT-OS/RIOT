@@ -60,7 +60,13 @@ $(SUIT_SEC): | $(CLEAN)
 	)
 	$(Q)if [ ! -s $@ ]; then rm $@; fi
 
-%.pem.pub: %.pem
+# Allow to disable auto-generating public key from private key, e.g. if only the
+# public key is available at build time and manifest is created elsewhere.
+SUIT_GEN_PUBKEY ?= 1
+ifeq (1, $(SUIT_GEN_PUBKEY))
+  _PUB_FROM_SEC := %.pem
+endif
+%.pem.pub: $(_PUB_FROM_SEC)
 	$(Q)openssl ec -inform pem -in $< -outform pem -pubout -out $@
 
 # Convert public keys to C headers - only last 32 bytes are key material

@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- *               2015 FreshTemp, LLC.
- *               2022 SSV Software Systems GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2015 FreshTemp, LLC.
+ * SPDX-FileCopyrightText: 2022 SSV Software Systems GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -30,6 +27,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "atomic_utils.h"
 #include "pm_layered.h"
 #include "periph/rtc.h"
 #include "periph/rtt.h"
@@ -504,6 +502,30 @@ int rtc_tamper_register(gpio_t pin, gpio_flank_t flank)
     }
 
     return 0;
+}
+
+int rtc_tamper_pin_enable(gpio_t pin)
+{
+    int in = _rtc_pin(pin);
+
+    if (in < 0) {
+        return -1;
+    }
+
+    atomic_set_bit_u32(atomic_bit_u32(&tampctr, 2 * in));
+
+    return 0;
+}
+
+void rtc_tamper_pin_disable(gpio_t pin)
+{
+    int in = _rtc_pin(pin);
+
+    if (in < 0) {
+        return;
+    }
+
+    atomic_clear_bit_u32(atomic_bit_u32(&tampctr, 2 * in));
 }
 
 void rtc_tamper_enable(void)

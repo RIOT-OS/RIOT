@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_wakaama
  * @defgroup    lwm2m_client LwM2M Client using Wakaama
@@ -16,9 +18,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef LWM2M_CLIENT_H
-#define LWM2M_CLIENT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -163,5 +162,4 @@ void lwm2m_client_remove_credential(credman_tag_t tag);
 }
 #endif
 
-#endif /* LWM2M_CLIENT_H */
 /** @} */

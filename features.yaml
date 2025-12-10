@@ -922,3 +922,17 @@ groups:
             open and solder bridges SB4, SB5 and SB6 are closed instead, SPI2 is
             connected to the STMmod+/Pmod connector. Request this feature to use
             SPI2 with this board configuration.
+
+- title: Bugs in hardware, toolchain, or binary blobs
+  help: This allows modelling bugs found in boards, so that workarounds can
+        be enabled for affected builds by inspecting "FEATURES_USED". Any
+        feature prefixed with "bug_" provided in a build will always be used,
+        regardless of build configuration.
+  features:
+  - name: bug_newlib_broken_stdio
+    help: newlib's stdio is not inherently thread-safe, but depends on the
+          reentrancy hooks to be provided for correct operation. When
+          reentrancy is not enabled, using newlib's stdio is racy, causing
+          random crashes at runtime. Use of this feature will cause an
+          alternative stdio implementation to be used if (and only if) newlib
+          is used as standard c lib.

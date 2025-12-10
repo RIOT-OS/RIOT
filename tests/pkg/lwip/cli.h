@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2016 Martine Lenders <mlenders@inf.fu-berlin.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup     tests
@@ -15,8 +14,6 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef CLI_H
-#define CLI_H
 
 #include <stdint.h>
 #include <sys/types.h>
@@ -89,5 +86,4 @@ int udp_cmd(int argc, char **argv);
 }
 #endif
 
-#endif /* CLI_H */
 /** @} */

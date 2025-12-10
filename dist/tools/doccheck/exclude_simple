@@ -18,8 +18,6 @@ warning: found documented return type for mcp47xx_dac_get that does not return a
 warning: found documented return type for mcp47xx_dac_poweroff that does not return anything
 warning: found documented return type for mcp47xx_dac_poweron that does not return anything
 warning: found documented return type for mcp47xx_dac_set that does not return anything
-warning: found documented return type for motor_disable that does not return anything
-warning: found documented return type for motor_enable that does not return anything
 warning: found documented return type for pthread_exit that does not return anything
 warning: found documented return type for senml_set_duration_ms that does not return anything
 warning: found documented return type for senml_set_duration_us that does not return anything
@@ -106,46 +104,46 @@ warning: Member ADI_SET (macro definition) of file cc26xx_cc13xx.h is not docume
 warning: Member ADPS9960_PARAM_ADDR (macro definition) of file board.h is not documented.
 warning: Member ADPS9960_PARAM_I2C (macro definition) of file board.h is not documented.
 warning: Member ADPS9960_PARAM_PIN_INT (macro definition) of file board.h is not documented.
-warning: Member ADS101X_AIN0_DIFFM_AIN1 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_AIN0_DIFFM_AIN3 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_AIN0_SINGM (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_AIN1_DIFFM_AIN3 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_AIN1_SINGM (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_AIN2_DIFFM_AIN3 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_AIN2_SINGM (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_AIN3_SINGM (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_ALERT_PARAMS (macro definition) of file ads101x_params.h is not documented.
-warning: Member ADS101X_CONF_ADDR (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_CONF_COMP_DIS (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_CONF_COMP_MODE_WIND (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_CONF_OS_CONV (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_CONV_RES_ADDR (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_DATAR_128 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_DATAR_1600 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_DATAR_2400 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_DATAR_250 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_DATAR_3300 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_DATAR_490 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_DATAR_920 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_DATAR_MASK (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_HIGH_LIMIT_ADDR (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_LOW_LIMIT_ADDR (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_MUX_MASK (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_PARAM_ADDR (macro definition) of file ads101x_params.h is not documented.
-warning: Member ADS101X_PARAM_ALERT_PIN (macro definition) of file ads101x_params.h is not documented.
-warning: Member ADS101X_PARAM_HIGH_LIMIT (macro definition) of file ads101x_params.h is not documented.
-warning: Member ADS101X_PARAM_I2C (macro definition) of file ads101x_params.h is not documented.
-warning: Member ADS101X_PARAM_LOW_LIMIT (macro definition) of file ads101x_params.h is not documented.
-warning: Member ADS101X_PARAM_MUX_GAIN (macro definition) of file ads101x_params.h is not documented.
-warning: Member ADS101X_PARAMS (macro definition) of file ads101x_params.h is not documented.
-warning: Member ADS101X_PGA_FSR_0V256 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_PGA_FSR_0V512 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_PGA_FSR_1V024 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_PGA_FSR_2V048 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_PGA_FSR_4V096 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_PGA_FSR_6V144 (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_PGA_MASK (macro definition) of file ads101x_regs.h is not documented.
-warning: Member ADS101X_SAUL_INFO (macro definition) of file ads101x_params.h is not documented.
+warning: Member ADS1X1X_AIN0_DIFFM_AIN1 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_AIN0_DIFFM_AIN3 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_AIN0_SINGM (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_AIN1_DIFFM_AIN3 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_AIN1_SINGM (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_AIN2_DIFFM_AIN3 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_AIN2_SINGM (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_AIN3_SINGM (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_ALERT_PARAMS (macro definition) of file ads1x1x_params.h is not documented.
+warning: Member ADS1X1X_CONF_ADDR (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_CONF_COMP_DIS (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_CONF_COMP_MODE_WIND (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_CONF_OS_CONV (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_CONV_RES_ADDR (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_DATAR_128 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_DATAR_1600 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_DATAR_2400 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_DATAR_250 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_DATAR_3300 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_DATAR_490 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_DATAR_920 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_DATAR_MASK (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_HIGH_LIMIT_ADDR (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_LOW_LIMIT_ADDR (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_MUX_MASK (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_PARAM_ADDR (macro definition) of file ads1x1x_params.h is not documented.
+warning: Member ADS1X1X_PARAM_ALERT_PIN (macro definition) of file ads1x1x_params.h is not documented.
+warning: Member ADS1X1X_PARAM_HIGH_LIMIT (macro definition) of file ads1x1x_params.h is not documented.
+warning: Member ADS1X1X_PARAM_I2C (macro definition) of file ads1x1x_params.h is not documented.
+warning: Member ADS1X1X_PARAM_LOW_LIMIT (macro definition) of file ads1x1x_params.h is not documented.
+warning: Member ADS1X1X_PARAM_MUX_GAIN (macro definition) of file ads1x1x_params.h is not documented.
+warning: Member ADS1X1X_PARAMS (macro definition) of file ads1x1x_params.h is not documented.
+warning: Member ADS1X1X_PGA_FSR_0V256 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_PGA_FSR_0V512 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_PGA_FSR_1V024 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_PGA_FSR_2V048 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_PGA_FSR_4V096 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_PGA_FSR_6V144 (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_PGA_MASK (macro definition) of file ads1x1x_internal.h is not documented.
+warning: Member ADS1X1X_SAUL_INFO (macro definition) of file ads1x1x_params.h is not documented.
 warning: Member ADT7310_CONF_CT_POL_MASK (macro definition) of group drivers_adt7310 is not documented.
 warning: Member ADT7310_CONF_CT_POL_SHIFT (macro definition) of group drivers_adt7310 is not documented.
 warning: Member ADT7310_CONF_CT_POL(x) (macro definition) of group drivers_adt7310 is not documented.
@@ -4699,8 +4697,6 @@ warning: Member MODULE_PIN_P6 (macro definition) of file board_module.h is not d
 warning: Member MODULE_PIN_P7 (macro definition) of file board_module.h is not documented.
 warning: Member MODULE_PIN_P8 (macro definition) of file board_module.h is not documented.
 warning: Member MODULE_PIN_P9 (macro definition) of file board_module.h is not documented.
-warning: Member motor_driver_config[] (variable) of group boards_common_nucleo64 is not documented.
-warning: Member MOTOR_DRIVER_NUMOF (macro definition) of group boards_common_nucleo64 is not documented.
 warning: Member MPL3115A2_CTRL_REG1_ALT (macro definition) of file mpl3115a2_reg.h is not documented.
 warning: Member MPL3115A2_CTRL_REG1_OS_MASK (macro definition) of file mpl3115a2_reg.h is not documented.
 warning: Member MPL3115A2_CTRL_REG1_OS_SHIFT (macro definition) of file mpl3115a2_reg.h is not documented.
@@ -4871,17 +4867,17 @@ warning: Member MRF24J40_PACON2_TXONTS1 (macro definition) of file mrf24j40_regi
 warning: Member MRF24J40_PACON2_TXONTS2 (macro definition) of file mrf24j40_registers.h is not documented.
 warning: Member MRF24J40_PACON2_TXONTS3 (macro definition) of file mrf24j40_registers.h is not documented.
 warning: Member MRF24J40_PARAM_CS (macro definition) of file mrf24j40_params.h is not documented.
-warning: Member MRF24J40_PARAM_CS (macro definition) of group boards_common_nucleo64 is not documented.
+warning: Member MRF24J40_PARAM_CS (macro definition) of file board.h is not documented.
 warning: Member MRF24J40_PARAM_INT (macro definition) of file mrf24j40_params.h is not documented.
-warning: Member MRF24J40_PARAM_INT (macro definition) of group boards_common_nucleo64 is not documented.
+warning: Member MRF24J40_PARAM_INT (macro definition) of file board.h is not documented.
 warning: Member MRF24J40_PARAM_RESET (macro definition) of file mrf24j40_params.h is not documented.
-warning: Member MRF24J40_PARAM_RESET (macro definition) of group boards_common_nucleo64 is not documented.
+warning: Member MRF24J40_PARAM_RESET (macro definition) of file board.h is not documented.
 warning: Member MRF24J40_PARAMS (macro definition) of file mrf24j40_params.h is not documented.
-warning: Member MRF24J40_PARAMS (macro definition) of group boards_common_nucleo64 is not documented.
+warning: Member MRF24J40_PARAMS (macro definition) of file board.h is not documented.
 warning: Member MRF24J40_PARAM_SPI_CLK (macro definition) of file mrf24j40_params.h is not documented.
-warning: Member MRF24J40_PARAM_SPI_CLK (macro definition) of group boards_common_nucleo64 is not documented.
+warning: Member MRF24J40_PARAM_SPI_CLK (macro definition) of file board.h is not documented.
 warning: Member MRF24J40_PARAM_SPI (macro definition) of file mrf24j40_params.h is not documented.
-warning: Member MRF24J40_PARAM_SPI (macro definition) of group boards_common_nucleo64 is not documented.
+warning: Member MRF24J40_PARAM_SPI (macro definition) of file board.h is not documented.
 warning: Member MRF24J40_REG_ACKTMOUT (macro definition) of file mrf24j40_registers.h is not documented.
 warning: Member MRF24J40_REG_ASSOEADR0 (macro definition) of file mrf24j40_registers.h is not documented.
 warning: Member MRF24J40_REG_ASSOEADR1 (macro definition) of file mrf24j40_registers.h is not documented.
@@ -8409,3 +8405,136 @@ warning: Member LSM6DSL_REG_Y_OFS_USR (macro definition) of file lsm6dsxx_intern
 warning: Member LSM6DSL_REG_Z_OFS_USR (macro definition) of file lsm6dsxx_internal.h is not documented.
 warning: Member LSM6DS33_REG_ORIENT_CFG_G (macro definition) of file lsm6dsxx_internal.h is not documented.
 warning: Member AT6561_STBY_PIN (macro definition) of file board.h is not documented.
+cpu/sam0_common/include/sdhc.h:167: warning: Reached end of file while still searching closing '`' of a verbatim block starting at line 14
+cpu/sam0_common/include/sdhc.h:167: warning: Reached end of file while still inside a (nested) comment. Nesting level 1 (possible line reference(s): 8)
+cpu/sam0_common/include/sdhc.h:23: warning: Found end of C comment inside a '`' block without matching start of the comment! Maybe the end marker for the block is missing?
+cpu/stm32/include/periph/cpu_eth.h:164: warning: Reached end of file while still searching closing '`' of a verbatim block starting at line 137
+cpu/stm32/include/periph/cpu_eth.h:164: warning: Reached end of file while still inside a (nested) comment. Nesting level 1 (possible line reference(s): 129)
+cpu/stm32/include/periph/cpu_eth.h:138: warning: Found end of C comment inside a '`' block without matching start of the comment! Maybe the end marker for the block is missing?
+drivers/include/mcp23x17.h:689: warning: Reached end of file while still searching closing '``' of a verbatim block starting at line 78
+drivers/include/mcp23x17.h:689: warning: Reached end of file while still inside a (nested) comment. Nesting level 1 (possible line reference(s): 11)
+drivers/include/mcp23x17.h:343: warning: Found end of C comment inside a '``' block without matching start of the comment! Maybe the end marker for the block is missing?
+drivers/include/periph/gpio_ll.h:1036: warning: Reached end of file while still searching closing '`' of a verbatim block starting at line 1029
+drivers/include/periph/gpio_ll.h:1036: warning: Reached end of file while still inside a (nested) comment. Nesting level 1 (possible line reference(s): 412)
+drivers/include/periph/gpio_ll.h:422: warning: Found end of C comment inside a '`' block without matching start of the comment! Maybe the end marker for the block is missing?
+drivers/include/periph/pwm.h:189: warning: Reached end of file while still searching closing '`' of a verbatim block starting at line 39
+drivers/include/periph/pwm.h:189: warning: Reached end of file while still inside a (nested) comment. Nesting level 1 (possible line reference(s): 11)
+drivers/include/periph/pwm.h:61: warning: Found end of C comment inside a '`' block without matching start of the comment! Maybe the end marker for the block is missing?
+drivers/include/periph/qdec.h:202: warning: Reached end of file while still searching closing '`' of a verbatim block starting at line 65
+drivers/include/periph/qdec.h:202: warning: Reached end of file while still inside a (nested) comment. Nesting level 1 (possible line reference(s): 11)
+drivers/include/periph/qdec.h:77: warning: Found end of C comment inside a '`' block without matching start of the comment! Maybe the end marker for the block is missing?
+drivers/include/vl6180x.h:1076: warning: Reached end of file while still searching closing '`' of a verbatim block starting at line 1011
+drivers/include/vl6180x.h:1076: warning: Reached end of file while still inside a (nested) comment. Nesting level 1 (possible line reference(s): 11)
+drivers/include/vl6180x.h:393: warning: Found end of C comment inside a '`' block without matching start of the comment! Maybe the end marker for the block is missing?
+pkg/nimble/autoconn/include/nimble_autoconn.h:220: warning: Reached end of file while still searching closing '`' of a verbatim block starting at line 81
+pkg/nimble/autoconn/include/nimble_autoconn.h:220: warning: Reached end of file while still inside a (nested) comment. Nesting level 1 (possible line reference(s): 11)
+pkg/nimble/autoconn/include/nimble_autoconn.h:109: warning: Found end of C comment inside a '`' block without matching start of the comment! Maybe the end marker for the block is missing?
+pkg/wamr/CMakeLists.txt:61: warning: More #if's than #endif's found (might be in an included file).
+sys/include/net/gnrc/ipv6/nib/pl.h:182: warning: Reached end of file while still searching closing '`' of a verbatim block starting at line 171
+sys/include/net/gnrc/ipv6/nib/pl.h:182: warning: Reached end of file while still inside a (nested) comment. Nesting level 1 (possible line reference(s): 49)
+sys/include/net/gnrc/ipv6/nib/pl.h:76: warning: Found end of C comment inside a '`' block without matching start of the comment! Maybe the end marker for the block is missing?
+sys/include/net/gnrc/ndp.h:103: warning: Found end of C comment inside a '`' block without matching start of the comment! Maybe the end marker for the block is missing?
+sys/include/net/gnrc/ndp.h:132: warning: Found end of C comment inside a '`' block without matching start of the comment! Maybe the end marker for the block is missing?
+sys/include/net/gnrc/netif.h:479: warning: Found end of C comment inside a '`' block without matching start of the comment! Maybe the end marker for the block is missing?
+sys/include/net/gnrc/netif.h:564: warning: Found end of C comment inside a '`' block without matching start of the comment! Maybe the end marker for the block is missing?
+sys/include/net/sock/dtls.h:1130: warning: Reached end of file while still searching closing '`' of a verbatim block starting at line 1115
+sys/include/net/sock/dtls.h:1130: warning: Reached end of file while still inside a (nested) comment. Nesting level 1 (possible line reference(s): 15)
+sys/include/net/sock/dtls.h:533: warning: Found end of C comment inside a '`' block without matching start of the comment! Maybe the end marker for the block is missing?
+sys/posix/include/semaphore.h:43: warning: Found end of C comment inside a '`' block without matching start of the comment! Maybe the end marker for the block is missing?
+sys/posix/include/semaphore.h:243: warning: Found end of C comment inside a '`' block without matching start of the comment! Maybe the end marker for the block is missing?
+sys/posix/include/sys/socket.h:512: warning: Reached end of file while still searching closing '``' of a verbatim block starting at line 472
+sys/posix/include/sys/socket.h:512: warning: Reached end of file while still inside a (nested) comment. Nesting level 1 (possible line reference(s): 462)
+sys/posix/include/sys/socket.h:482: warning: Found end of C comment inside a '``' block without matching start of the comment! Maybe the end marker for the block is missing?
+sys/psa_crypto/doc.md:1092: warning: Reached end of file while still searching closing '``' of a verbatim block starting at line 848
+cpu/sam0_common/include/sdhc.h:37: warning: Compound sdhc_state_t is not documented.
+sys/include/net/gnrc/netif/pktq.h:16: warning: Potential recursion while resolving \ref command!
+sys/include/net/gnrc/netif/pktq/type.h:15: warning: Potential recursion while resolving \ref command!
+sys/posix/include/sys/socket.h:55: warning: unable to resolve reference to 'socket()' for \ref command
+sys/include/net/gnrc/netif/pktq.h:0: warning: Potential recursion while resolving \ref command!
+boards/common/arduino-mkr/include/periph_conf_common.h:71: warning: Member CLOCK_DIV (macro definition) of file periph_conf_common.h is not documented.
+boards/common/native/include/board.h:136: warning: Member SPIFFS_MTD_DEV (macro definition) of file board.h is not documented.
+boards/arduino-nano-33-iot/include/periph_conf.h:65: warning: Member CLOCK_DIV (macro definition) of file periph_conf.h is not documented.
+boards/common/arduino-zero/include/periph_conf.h:73: warning: Member CLOCK_DIV (macro definition) of file periph_conf.h is not documented.
+boards/feather-m0/include/periph_conf.h:67: warning: Member CLOCK_DIV (macro definition) of file periph_conf.h is not documented.
+boards/hamilton/include/periph_conf.h:80: warning: Member CLOCK_DIV (macro definition) of file periph_conf.h is not documented.
+boards/samd10-xmini/include/periph_conf.h:84: warning: Member CLOCK_DIV (macro definition) of file periph_conf.h is not documented.
+boards/samd20-xpro/include/periph_conf.h:86: warning: Member CLOCK_DIV (macro definition) of file periph_conf.h is not documented.
+boards/samd21-xpro/include/periph_conf.h:86: warning: Member CLOCK_DIV (macro definition) of file periph_conf.h is not documented.
+boards/samr21-xpro/include/periph_conf.h:86: warning: Member CLOCK_DIV (macro definition) of file periph_conf.h is not documented.
+boards/seeeduino_xiao/include/periph_conf.h:69: warning: Member CLOCK_DIV (macro definition) of file periph_conf.h is not documented.
+boards/sensebox_samd21/include/periph_conf.h:68: warning: Member CLOCK_DIV (macro definition) of file periph_conf.h is not documented.
+boards/serpente/include/periph_conf.h:67: warning: Member CLOCK_DIV (macro definition) of file periph_conf.h is not documented.
+boards/common/sodaq/include/cfg_clock_default.h:68: warning: Member CLOCK_DIV (macro definition) of file cfg_clock_default.h is not documented.
+cpu/stm32/include/periph/cpu_eth.h:139: warning: Member TX_DESC_STAT_CIC (macro definition) of file cpu_eth.h is not documented.
+cpu/stm32/include/periph/cpu_eth.h:140: warning: Member TX_DESC_STAT_CIC_NO_HW_CHECKSUM (macro definition) of file cpu_eth.h is not documented.
+cpu/stm32/include/periph/cpu_eth.h:148: warning: explicit link request to 'define' could not be resolved
+cpu/stm32/include/periph/cpu_eth.h:149: warning: explicit link request to 'define' could not be resolved
+drivers/include/periph/pwm.h:77: warning: Member PWM_DEV(x) (macro definition) of group drivers_periph_pwm is not documented.
+drivers/include/periph/qdec.h:93: warning: Member QDEC_DEV(x) (macro definition) of group drivers_periph_qdec is not documented.
+drivers/include/vl6180x.h:409: warning: explicit link request to 'define' could not be resolved
+drivers/include/vl6180x.h:409: warning: Member VL6180X_I2C_ADDR (macro definition) of file vl6180x.h is not documented.
+sys/posix/include/semaphore.h:44: warning: Member SEM_FAILED (macro definition) of file semaphore.h is not documented.
+sys/include/net/sock/dodtls.h:135: warning: unable to resolve reference to 'sock_dtls_create()' for \ref command
+sys/include/net/sock/dtls.h:36: warning: unable to resolve reference to 'sock_dtls_create()' for \ref command
+sys/include/net/sock/dtls.h:46: warning: unable to resolve reference to 'sock_dtls_create()' for \ref command
+sys/include/net/sock/dtls.h:267: warning: unable to resolve reference to 'sock_dtls_create()' for \ref command
+sys/include/net/sock/dtls.h:434: warning: unable to resolve reference to 'sock_dtls_close()' for \ref command
+sys/include/net/sock/dtls.h:1110: warning: unable to resolve reference to 'sock_dtls_create()' for \ref command
+sys/include/net/sock/dtls.h:897: warning: Found unexpanded alias '@experimental'. Check if number of arguments passed is correct.
+sys/include/net/sock/dtls.h:853: warning: Found unexpanded alias '@experimental'. Check if number of arguments passed is correct.
+boards/esp32c6-devkit/doc.md:44: warning: unable to resolve reference to 'esp32c6_devkit_optional_hardware' for \ref command
+boards/esp32h2-devkit/doc.md:40: warning: unable to resolve reference to 'esp32h2_devkit_optional_hardware' for \ref command
+cpu/esp8266/doc.md:600: warning: explicit link request to 'PWM_DEV(0)' could not be resolved
+cpu/esp8266/doc.md:926: warning: Illegal command '@icode' found as part of a \ref
+cpu/esp8266/doc.md:928: warning: Illegal command '@endicode' found as part of a \ref
+cpu/esp8266/doc.md:937: warning: Illegal command '@ref' found as part of a \ref
+sys/include/net/gnrc.h:109: warning: unable to resolve reference to 'net_gnrc_netapi::GNRC_NETAPI_MSG_TYPE_RCV' for \ref command
+sys/include/net/gnrc/ndp.h:96: warning: argument 'cur_hl' of command @param is not found in the argument list of gnrc_ndp_opt_build(uint8_t type, size_t size, gnrc_pktsnip_t *next)
+sys/include/net/gnrc/ndp.h:96: warning: argument 'flags' of command @param is not found in the argument list of gnrc_ndp_opt_build(uint8_t type, size_t size, gnrc_pktsnip_t *next)
+sys/include/net/gnrc/ndp.h:96: warning: argument 'ltime' of command @param is not found in the argument list of gnrc_ndp_opt_build(uint8_t type, size_t size, gnrc_pktsnip_t *next)
+sys/include/net/gnrc/ndp.h:96: warning: argument 'reach_time' of command @param is not found in the argument list of gnrc_ndp_opt_build(uint8_t type, size_t size, gnrc_pktsnip_t *next)
+sys/include/net/gnrc/ndp.h:96: warning: argument 'retrans_timer' of command @param is not found in the argument list of gnrc_ndp_opt_build(uint8_t type, size_t size, gnrc_pktsnip_t *next)
+sys/include/net/gnrc/ndp.h:96: warning: argument 'options' of command @param is not found in the argument list of gnrc_ndp_opt_build(uint8_t type, size_t size, gnrc_pktsnip_t *next)
+drivers/include/mcp23x17.h:190: warning: explicit link request to 'mcp23x17_interrupt_context_problem' could not be resolved
+boards/msbiot/doc.md:68: warning: unable to resolve reference to 'LED0_PIN' for \ref command
+boards/msbiot/doc.md:68: warning: unable to resolve reference to 'LED1_PIN' for \ref command
+boards/msbiot/doc.md:69: warning: unable to resolve reference to 'LED0_ON' for \ref command
+boards/msbiot/doc.md:69: warning: unable to resolve reference to 'LED1_ON' for \ref command
+boards/msbiot/doc.md:72: warning: unable to resolve reference to 'LED0_ON' for \ref command
+boards/msbiot/doc.md:72: warning: unable to resolve reference to 'LED0_OFF' for \ref command
+boards/msbiot/doc.md:72: warning: unable to resolve reference to 'LED0_TOGGLE' for \ref command
+boards/msbiot/doc.md:73: warning: unable to resolve reference to 'LED1_ON' for \ref command
+boards/msbiot/doc.md:73: warning: unable to resolve reference to 'LED1_OFF' for \ref command
+boards/msbiot/doc.md:73: warning: unable to resolve reference to 'LED1_TOGGLE' for \ref command
+sys/include/net/gnrc/netif.h:463: warning: argument 'addrs' of command @param is not found in the argument list of gnrc_netif_ipv6_addr_add(const gnrc_netif_t *netif, const ipv6_addr_t *addr, unsigned pfx_len, uint8_t flags)
+sys/include/net/gnrc/netif.h:463: warning: argument 'max_len' of command @param is not found in the argument list of gnrc_netif_ipv6_addr_add(const gnrc_netif_t *netif, const ipv6_addr_t *addr, unsigned pfx_len, uint8_t flags)
+sys/include/net/gnrc/netif.h:463: warning: argument netif from the argument list of gnrc_netif_ipv6_addr_add has multiple @param documentation sections
+sys/include/net/gnrc/netif.h:549: warning: argument 'groups' of command @param is not found in the argument list of gnrc_netif_ipv6_group_join(const gnrc_netif_t *netif, const ipv6_addr_t *group)
+sys/include/net/gnrc/netif.h:549: warning: argument 'max_len' of command @param is not found in the argument list of gnrc_netif_ipv6_group_join(const gnrc_netif_t *netif, const ipv6_addr_t *group)
+sys/include/net/gnrc/netif.h:549: warning: argument netif from the argument list of gnrc_netif_ipv6_group_join has multiple @param documentation sections
+sys/posix/include/semaphore.h:44: warning: explicit link request to 'define' could not be resolved
+sys/posix/include/semaphore.h:174: warning: unable to resolve reference to 'SEM_FAILED' for \ref command
+sys/posix/include/semaphore.h:227: warning: argument 'abstime' of command @param is not found in the argument list of sem_trywait(sem_t *sem)
+sys/posix/include/semaphore.h:227: warning: argument sem from the argument list of sem_trywait has multiple @param documentation sections
+sys/posix/include/sys/socket.h:464: warning: argument 'domain' of command @param is not found in the argument list of getsockopt(int socket, int level, int option_name, void *option_value, socklen_t *option_len)
+sys/posix/include/sys/socket.h:464: warning: argument 'protocol' of command @param is not found in the argument list of getsockopt(int socket, int level, int option_name, void *option_value, socklen_t *option_len)
+sys/posix/include/sys/socket.h:464: warning: The following parameters of getsockopt(int socket, int level, int option_name, void *option_value, socklen_t *option_len) are not documented:
+sys/include/net/gnrc/ipv6/nib/pl.h:52: warning: argument 'valid_ltime' of command @param is not found in the argument list of gnrc_ipv6_nib_pl_del(unsigned iface, const ipv6_addr_t *pfx, unsigned pfx_len)
+sys/include/net/gnrc/ipv6/nib/pl.h:52: warning: argument 'pref_ltime' of command @param is not found in the argument list of gnrc_ipv6_nib_pl_del(unsigned iface, const ipv6_addr_t *pfx, unsigned pfx_len)
+sys/include/net/gnrc/ipv6/nib/pl.h:52: warning: argument iface from the argument list of gnrc_ipv6_nib_pl_del has multiple @param documentation sections
+sys/include/net/gnrc/ipv6/nib/pl.h:52: warning: argument pfx from the argument list of gnrc_ipv6_nib_pl_del has multiple @param documentation sections
+sys/include/net/gnrc/ipv6/nib/pl.h:52: warning: argument pfx_len from the argument list of gnrc_ipv6_nib_pl_del has multiple @param documentation sections
+sys/include/net/gnrc/ipv6/nib/pl.h:52: warning: found documented return type for gnrc_ipv6_nib_pl_del that does not return anything
+sys/include/net/gnrc/netif/pktq/type.h:12: warning: Potential recursion while resolving \ref command!
+drivers/include/vl6180x.h:338: warning: explicit link request to 'VL6180X_I2C_ADDR' could not be resolved
+boards/esp32s2-wemos-mini/doc.md:38: warning: unable to resolve reference to 'esp32s2-wemos-mini_toc' for \ref command
+drivers/include/ph_oem.h:177: warning: unable to resolve reference to 'GPIO_IN_PU' for \ref command
+drivers/include/ph_oem.h:178: warning: unable to resolve reference to 'GPIO_IN_PD' for \ref command
+drivers/include/ph_oem.h:179: warning: unable to resolve reference to 'GPIO_IN_PD' for \ref command
+sys/include/net/gnrc/netif.h:210: warning: Potential recursion while resolving \ref command!
+sys/include/net/ieee802154_security.h:69: warning: unable to resolve reference to 'ieee802154_sec_context_t::ieee802154_sec_dev_t' for \ref command
+sys/include/net/ieee802154_security.h:83: warning: unable to resolve reference to 'ieee802154_sec_context_t::ieee802154_sec_dev_t' for \ref command
+sys/include/net/ieee802154_security.h:59: warning: unable to resolve reference to 'ieee802154_sec_context_t::ieee802154_sec_dev_t' for \ref command
+sys/include/net/gnrc/netif/>:1: warning: Potential recursion while resolving \ref command!
+sys/include/net/gnrc/netif/pktq/>:1: warning: Potential recursion while resolving \ref command!
+makefiles/pseudomodules.inc.mk:232: warning: maximum nesting level exceeded for group net_gnrc_sixlowpan_frag_sfr_congure_sfr: check for possible recursive group relation!

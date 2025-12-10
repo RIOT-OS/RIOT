@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -257,37 +254,6 @@ static void _send_zep_hello(socket_zep_t *dev)
     }
 }
 
-static void _send_ack(void *arg)
-{
-    ieee802154_dev_t *dev = arg;
-    socket_zep_t *zepdev = dev->priv;
-    const uint8_t *rxbuf = &zepdev->rcv_buf[sizeof(zep_v2_data_hdr_t)];
-    uint8_t ack[3];
-    zep_v2_data_hdr_t hdr;
-
-    /* sending ACK should only happen if we received a frame */
-    assert(zepdev->state == ZEPDEV_STATE_RX_RECV);
-    /* ACK request bit should be set if we get here */
-    assert((rxbuf[0] & IEEE802154_FCF_ACK_REQ) != 0);
-
-    DEBUG("socket_zep::send_ack: seq_no: %u\n", rxbuf[2]);
-
-    _zep_hdr_fill(zepdev, &hdr.hdr, sizeof(ack) + IEEE802154_FCF_LEN);
-
-    ack[0] = IEEE802154_FCF_TYPE_ACK; /* FCF */
-    ack[1] = 0; /* FCF */
-    ack[2] = rxbuf[2];  /* SeqNum */
-
-    /* calculate checksum */
-    uint16_t chksum = crc16_ccitt_false_update(0, ack, 3);
-
-    real_send(zepdev->sock_fd, &hdr, sizeof(hdr), MSG_MORE);
-    real_send(zepdev->sock_fd, ack, sizeof(ack), MSG_MORE);
-    real_send(zepdev->sock_fd, &chksum, sizeof(chksum), 0);
-
-    dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
-}
-
 static void _send_frame(void *arg)
 {
     ieee802154_dev_t *dev = arg;
@@ -359,13 +325,7 @@ static void _socket_isr(int fd, void *arg)
     zepdev->rcv_len = res;
     dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_START);
 
-    /* send ACK after 192 µs */
-    if ((((uint8_t *)(zep + 1))[0] & IEEE802154_FCF_ACK_REQ) != 0) {
-        zepdev->ack_timer.callback = _send_ack;
-        ztimer_set(ZTIMER_USEC, &zepdev->ack_timer, ACK_DELAY_US);
-    } else {
-        dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
-    }
+    dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
 
     return;
 out:
@@ -505,6 +465,13 @@ static int _set_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_
     return 0;
 }
 
+static int _get_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_t *mode)
+{
+    socket_zep_t *zepdev = dev->priv;
+    *mode = zepdev->filter_mode;
+    return 0;
+}
+
 static int _write(ieee802154_dev_t *dev, const iolist_t *iolist)
 {
     socket_zep_t *zepdev = dev->priv;
@@ -544,14 +511,22 @@ static int _request_transmit(ieee802154_dev_t *dev)
     zepdev->state = ZEPDEV_STATE_TX;
 
     /* 8 bit are mapped to 2 symbols */
-    unsigned time_tx = 2 * zepdev->snd_len * IEEE802154_SYMBOL_TIME_US;
+    unsigned time_tx = 2 * (zepdev->snd_len - sizeof(zep_v2_data_hdr_t)) * IEEE802154_SYMBOL_TIME_US;
     DEBUG("socket_zep::request_transmit(%u bytes, %u µs)\n", zepdev->snd_len, time_tx);
 
     dev->cb(dev, IEEE802154_RADIO_INDICATION_TX_START);
 
-    /* delay transmission to simulate airtime */
-    zepdev->ack_timer.callback = _send_frame;
-    ztimer_set(ZTIMER_USEC, &zepdev->ack_timer, time_tx);
+    /* native overhead prevents short timers from triggering in time,
+       send directly if delay is less than 200 µs */
+    if (time_tx <= 200) {
+        _send_frame(zepdev->ack_timer.arg);
+    }
+    else {
+        time_tx -= 200;
+        /* delay transmission to simulate airtime */
+        zepdev->ack_timer.callback = _send_frame;
+        ztimer_set(ZTIMER_USEC, &zepdev->ack_timer, time_tx);
+    }
 
     return 0;
 }
@@ -560,7 +535,14 @@ static int _confirm_transmit(ieee802154_dev_t *dev, ieee802154_tx_info_t *info)
 {
     (void) dev;
 
+    socket_zep_t *zepdev = dev->priv;
+
+    if (zepdev->state == ZEPDEV_STATE_TX) {
+        DEBUG("socket_zep::confirm_transmit: still in TX state\n");
+        return -EAGAIN; /* TX is still in progress */
+    }
     if (info) {
+        DEBUG("socket_zep::confirm_transmit: success\n");
         info->status = TX_STATUS_SUCCESS;
     }
 
@@ -628,6 +610,7 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
     switch (op) {
     case IEEE802154_HAL_OP_TRANSMIT:
         if (zepdev->state != ZEPDEV_STATE_IDLE) {
+            DEBUG("socket_zep::request_op: request TX in state %u (busy)\n", zepdev->state);
             return -EBUSY;
         }
         res = _request_transmit(dev);
@@ -659,6 +642,7 @@ static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
             ztimer_remove(ZTIMER_USEC, &zepdev->ack_timer);
             zepdev->state = ZEPDEV_STATE_IDLE;
         } else {
+            DEBUG("socket_zep::request_op: request IDLE in state TX\n");
             return -EBUSY;
         }
 
@@ -723,6 +707,7 @@ static const ieee802154_radio_ops_t socket_zep_rf_ops = {
     .config_src_addr_match = _config_src_addr_match,
     .set_csma_params = _set_csma_params,
     .set_frame_filter_mode = _set_frame_filter_mode,
+    .get_frame_filter_mode = _get_frame_filter_mode,
 };
 
 void socket_zep_hal_setup(socket_zep_t *dev, ieee802154_dev_t *hal)

@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2016 Ken Bannister. All rights reserved.
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Ken Bannister
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @addtogroup  unittests
@@ -15,8 +14,6 @@
  *
  * @author      Ken Bannister <kb2ma@runbox.com>
  */
-#ifndef TESTS_GCOAP_H
-#define TESTS_GCOAP_H
 
 #include "embUnit.h"
 
@@ -36,5 +33,4 @@ void tests_gcoap(void);
 }
 #endif
 
-#endif /* TESTS_GCOAP_H */
 /** @} */

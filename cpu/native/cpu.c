@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
- *               2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -80,6 +77,17 @@ void _isr_switch_to_user(void) {
 
     /* Now we want to go to _native_isr_leave before resuming execution at _native_user_fptr. */
     _context_set_fptr(context, (uintptr_t)_native_isr_leave);
+
+    /* libucontext does not restore signal mask on setcontext() [1], so we
+     * need to enable signals again to not get locked up
+     *
+     * [1]: https://man.archlinux.org/man/libucontext.3.en#CAVEATS
+     */
+    if (IS_ACTIVE(USE_LIBUCONTEXT)) {
+        if (sigprocmask(SIG_SETMASK, &_native_sig_set, NULL) == -1) {
+            err(EXIT_FAILURE, "irq_enable: sigprocmask");
+        }
+    }
 
     if (setcontext(context) == -1) {
         err(EXIT_FAILURE, "_isr_schedule_and_switch: setcontext");

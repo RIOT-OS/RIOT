@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2024 Marian Buschsieweke
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2024 Marian Buschsieweke
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -26,6 +23,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+
+#include "modules.h"
 
 static bool failed = false;
 
@@ -277,7 +276,12 @@ int main(void)
     test_int8();
     test_int16();
     test_int32();
-    test_int64();
+    if (IS_USED(MODULE_PRINTF_LONG_LONG)) {
+        test_int64();
+    }
+    else {
+        puts("WARNING: Module printf_long_long not used, skipping test for 64 bit");
+    }
     test_size();
     test_flags_widths();
 

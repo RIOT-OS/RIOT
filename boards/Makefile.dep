@@ -2,6 +2,27 @@
 ifneq (,$(filter boards_common_adafruit-nrf52-bootloader,$(USEMODULE)))
   include $(RIOTBOARD)/common/adafruit-nrf52-bootloader/Makefile.dep
 endif
+ifneq (,$(filter boards_common_esp32,$(USEMODULE)))
+  include $(RIOTBOARD)/common/esp32/Makefile.dep
+endif
+ifneq (,$(filter boards_common_esp32c3,$(USEMODULE)))
+  include $(RIOTBOARD)/common/esp32c3/Makefile.dep
+endif
+ifneq (,$(filter boards_common_esp32c6,$(USEMODULE)))
+  include $(RIOTBOARD)/common/esp32c6/Makefile.dep
+endif
+ifneq (,$(filter boards_common_esp32h2,$(USEMODULE)))
+  include $(RIOTBOARD)/common/esp32h2/Makefile.dep
+endif
+ifneq (,$(filter boards_common_esp32s2,$(USEMODULE)))
+  include $(RIOTBOARD)/common/esp32s2/Makefile.dep
+endif
+ifneq (,$(filter boards_common_esp32s3,$(USEMODULE)))
+  include $(RIOTBOARD)/common/esp32s3/Makefile.dep
+endif
+ifneq (,$(filter boards_common_esp32x,$(USEMODULE)))
+  include $(RIOTBOARD)/common/esp32x/Makefile.dep
+endif
 ifneq (,$(filter boards_common_seeedstudio-xiao-nrf52840,$(USEMODULE)))
   include $(RIOTBOARD)/common/seeedstudio-xiao-nrf52840/Makefile.dep
 endif

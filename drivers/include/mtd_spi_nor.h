@@ -11,7 +11,7 @@
 
 /**
  * @defgroup    drivers_mtd_spi_nor Serial NOR flash
- * @ingroup     drivers_storage
+ * @ingroup     drivers_mtd
  * @brief       Driver for serial NOR flash memory technology devices attached via SPI
  *
  * @{

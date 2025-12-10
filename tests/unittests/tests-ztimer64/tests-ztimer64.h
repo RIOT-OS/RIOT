@@ -1,8 +1,8 @@
 /*
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @addtogroup  unittests
@@ -12,8 +12,6 @@
  * @brief       Unittests for ztimer64
  *
  */
-#ifndef TESTS_ZTIMER64_H
-#define TESTS_ZTIMER64_H
 
 #include "embUnit.h"
 
@@ -30,5 +28,4 @@ void tests_ztimer(void);
 }
 #endif
 
-#endif /* TESTS_ZTIMER64_H */
 /** @} */

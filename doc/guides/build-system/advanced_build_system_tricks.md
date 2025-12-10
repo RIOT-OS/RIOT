@@ -7,7 +7,7 @@ This page describes some build systems tricks that can help developers but are n
 
 They are low level commands that should not be taken as part of a stable API but better have a documentation than only having a description in the build system code.
 
-## Customize the build system
+## Customize the Build System
 
 - `RIOT_MAKEFILES_GLOBAL_PRE`: files parsed before the body of `$RIOTBASE/Makefile.include`
 - `RIOT_MAKEFILES_GLOBAL_POST`: files parsed after the body of `$RIOTBASE/Makefile.include`
@@ -23,7 +23,7 @@ You can configure your own files that will be parsed by the build system main `M
 - Define your custom targets
 - Override default targets
 
-## Speed-up builds with ccache
+## Speed-up Builds with ccache
 
 [`ccache`](https://ccache.samba.org/) is a compiler cache. It speeds up recompilation by caching previous compilations and detecting when the same compilation is being done again.
 
@@ -101,7 +101,7 @@ sys     0m0.327s
 [kaspar@booze default (master)]$
 ```
 
-## Analyze dependency resolution
+## Analyze Dependency Resolution
 
 When refactoring dependency handling or modifying variables used for dependency resolution, one may want to evaluate the impact on the existing applications. This describe some debug targets to dump variables used during dependency resolution.
 
@@ -123,7 +123,7 @@ For more configuration and usage details, see in the file defining the targets `
 
 To do a repository wide analysis, you can use the script `dist/tools/buildsystem_sanity_check/save_all_dependencies_resolution_variables.sh` that will generate the output for all boards and applications. It currently take around 2 hours on an 8 cores machine with ssd.
 
-## Generate Makefile.ci content
+## Generate Makefile.ci Content
 
 Most applications and tests include a `Makefile.ci` to indicate which boards cannot compile the application or test. The content for these files can be generated via the script in:
 

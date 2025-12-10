@@ -6,7 +6,7 @@ description: "Create a new project with a simple hello world program"
 import GitSetup from '@components/gitsetup.mdx';
 import Contact from '@components/contact.astro';
 
-## Step 1: Create a new project
+## Step 1: Create a new Project
 
 <GitSetup />
 
@@ -150,6 +150,24 @@ Run the following command in your terminal:
 ```bash
 make info-rust
 ```
+
+:::tip
+If the above command fails due to missing dependencies,
+you can also run it in Docker by running:
+
+```bash
+BUILD_IN_DOCKER=1 make info-rust
+```
+
+You will have to include `BUILD_IN_DOCKER=1` for all subsequent make commands as well.
+
+This ensures that we have all the necessary dependencies to build our program.
+For more information on building in Docker,
+see [Build in Docker](/build-system/build-in-docker/).
+
+Do note that building in Docker will take quite a bit longer on the first run,
+as it needs to download a massive Docker image.
+:::
 
 The output will look something like this:
 

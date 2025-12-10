@@ -39,8 +39,8 @@ Even applications requiring network interface access should be able to work:
 
 ```sh
 sudo dist/tools/tapsetup/tapsetup
-make -C examples/networking/gnrc/gnrc_networking all -j16
-make -C examples/networking/gnrc/gnrc_networking term
+make -C examples/networking/gnrc/networking all -j16
+make -C examples/networking/gnrc/networking term
 ```
 
 ```

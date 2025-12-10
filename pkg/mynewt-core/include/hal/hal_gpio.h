@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_uwb_dw1000
  * @{
@@ -16,9 +18,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
-
-#ifndef HAL_HAL_GPIO_H
-#define HAL_HAL_GPIO_H
 
 #include "periph/gpio.h"
 
@@ -193,5 +192,3 @@ static inline void hal_gpio_irq_disable(gpio_t pin)
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* HAL_HAL_GPIO_H */

@@ -35,15 +35,16 @@ Go into your `main.c` file and include the following code:
 ```
 
 ```c title="The main function"
-int main(void) {
-  /* Buffer to store command line input */
-  char buffer[SHELL_DEFAULT_BUFSIZE];
+int main(void)
+{
+    /* Buffer to store command line input */
+    char buffer[SHELL_DEFAULT_BUFSIZE];
 
-  /* Start the shell */
-  shell_run(NULL, buffer, SHELL_DEFAULT_BUFSIZE);
+    /* Start the shell */
+    shell_run(NULL, buffer, SHELL_DEFAULT_BUFSIZE);
 
-  /* Return 0 to indicate that the program has finished successfully */
-  return 0;
+    /* Return 0 to indicate that the program has finished successfully */
+    return 0;
 }
 ```
 
@@ -83,17 +84,18 @@ Go into your `main.c` file and include the following code:
 
 ```c title="The function that implements the echo command"
 /* Our command we want to register to the shell */
-int echo_command(int argc, char **argv) {
-  /* We take the arguments passed to the command */
-  for (int i = 1; i < argc; i++) {
-    /* We print each argument followed by a space */
-    printf("%s ", argv[i]);
-  }
-  /* Finally, we print a newline character to end the line */
-  printf("\n");
+int echo_command(int argc, char **argv)
+{
+    /* We take the arguments passed to the command */
+    for (int i = 1; i < argc; i++) {
+        /* We print each argument followed by a space */
+        printf("%s ", argv[i]);
+    }
+    /* Finally, we print a newline character to end the line */
+    printf("\n");
 
-  /* Return 0 to indicate success */
-  return 0;
+    /* Return 0 to indicate success */
+    return 0;
 }
 ```
 
@@ -107,7 +109,6 @@ Go back to your `main.c` file and include the following code _outside_ of the `m
 ```c title="Register the command with the shell"
 /* This little macro registers the command so we can use it in the shell */
 SHELL_COMMAND(echo, "Echo a message", echo_command);
-
 ```
 
 This macro takes three arguments: the name of the command,

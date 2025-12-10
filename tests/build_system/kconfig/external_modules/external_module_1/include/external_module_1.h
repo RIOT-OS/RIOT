@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup
@@ -20,9 +19,6 @@
  * @}
  */
 
-#ifndef EXTERNAL_MODULE_1_H
-#define EXTERNAL_MODULE_1_H
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,4 +32,3 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* EXTERNAL_MODULE_1_H */

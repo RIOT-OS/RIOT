@@ -63,9 +63,9 @@ void saul_init_devs(void)
         extern void auto_init_adcxx1c(void);
         auto_init_adcxx1c();
     }
-    if (IS_USED(MODULE_ADS101X)) {
-        extern void auto_init_ads101x(void);
-        auto_init_ads101x();
+    if (IS_USED(MODULE_ADS1X1X)) {
+        extern void auto_init_ads1x1x(void);
+        auto_init_ads1x1x();
     }
     if (IS_USED(MODULE_ADXL345)) {
         extern void auto_init_adxl345(void);
@@ -254,6 +254,10 @@ void saul_init_devs(void)
     if (IS_USED(MODULE_OPT3001)) {
         extern void auto_init_opt3001(void);
         auto_init_opt3001();
+    }
+    if (IS_USED(MODULE_PAA5100JE)) {
+        extern void auto_init_paa5100je(void);
+        auto_init_paa5100je();
     }
     if (IS_USED(MODULE_PCA9685)) {
         extern void auto_init_pca9685(void);

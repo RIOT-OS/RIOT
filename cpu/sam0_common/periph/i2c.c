@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2014 CLENET Baptiste
- * Copyright (C) 2018 Mesotic SAS
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014 CLENET Baptiste
+ * SPDX-FileCopyrightText: 2018 Mesotic SAS
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -23,19 +20,14 @@
  */
 
 #include <assert.h>
-#include <stdint.h>
 #include <errno.h>
+#include <stdint.h>
 
 #include "busy_wait.h"
-#include "cpu.h"
-#include "board.h"
 #include "mutex.h"
 #include "periph_conf.h"
 #include "periph/gpio.h"
 #include "periph/i2c.h"
-
-#include "sched.h"
-#include "thread.h"
 
 #define ENABLE_DEBUG        0
 #include "debug.h"
@@ -115,7 +107,10 @@ static bool _check_and_unblock_bus(i2c_t dev_id, bool initialized)
 {
     const i2c_conf_t *dev_conf = &i2c_config[dev_id];
 
-    /* reconfigure pins to gpio for testing */
+    /* do a full reset of the SERCOM */
+    if (initialized) {
+        bus(dev_id)->CTRLA.reg = SERCOM_I2CM_CTRLA_SWRST;
+    }
     gpio_disable_mux(dev_conf->sda_pin);
     gpio_disable_mux(dev_conf->scl_pin);
     gpio_init(dev_conf->sda_pin, GPIO_IN);
@@ -156,13 +151,7 @@ static bool _check_and_unblock_bus(i2c_t dev_id, bool initialized)
     }
 
     if (initialized) {
-        /* reconfigure pins for i2c */
-        gpio_init_mux(dev_conf->scl_pin, dev_conf->mux);
-        gpio_init_mux(dev_conf->sda_pin, dev_conf->mux);
-
-        /* reset bus state */
-        dev_conf->dev->STATUS.reg = BUSSTATE_IDLE;
-        _syncbusy(dev_conf->dev);
+        i2c_init(dev_id);
     }
 
     return success;
@@ -171,7 +160,7 @@ static bool _check_and_unblock_bus(i2c_t dev_id, bool initialized)
 void i2c_init(i2c_t dev)
 {
     uint32_t timeout_counter = 0;
-    int32_t tmp_baud;
+    uint32_t tmp_baud;
 
     assert(dev < I2C_NUMOF);
 

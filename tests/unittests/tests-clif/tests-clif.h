@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2019 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @addtogroup  unittests
@@ -15,8 +14,7 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-#ifndef TESTS_CLIF_H
-#define TESTS_CLIF_H
+
 #include "embUnit/embUnit.h"
 
 #ifdef __cplusplus
@@ -39,5 +37,4 @@ Test *tests_clif_tests(void);
 }
 #endif
 
-#endif /* TESTS_CLIF_H */
 /** @} */

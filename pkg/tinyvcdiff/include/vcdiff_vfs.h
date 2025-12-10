@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @{
  *
@@ -14,9 +16,6 @@
  *
  * @author  Juergen Fitschen <me@jue.yt>
  */
-
-#ifndef VCDIFF_VFS_H
-#define VCDIFF_VFS_H
 
 #include "vcdiff.h"
 #include "vfs.h"
@@ -52,5 +51,4 @@ typedef struct {
 }
 #endif
 
-#endif /* VCDIFF_VFS_H */
 /** @} */

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2025 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2025 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #include "esp_ieee802154.h"
@@ -438,6 +435,7 @@ int esp_ieee802154_init(void)
 static const ieee802154_radio_ops_t esp_ieee802154_driver = {
     .caps = IEEE802154_CAP_24_GHZ
           | IEEE802154_CAP_PHY_OQPSK
+          | IEEE802154_CAP_AUTO_ACK
           | IEEE802154_CAP_AUTO_CSMA
           | IEEE802154_CAP_SRC_ADDR_MATCH
 #if _USE_CCA_DONE

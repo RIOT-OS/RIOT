@@ -8,26 +8,28 @@
 
 #include "ztimer.h"
 
-void timer_callback(void *arg) {
-  /* Cast the received pointer "arg" to a C String type */
-  char *message = (char *)arg;
+void timer_callback(void *arg)
+{
+    /* Cast the received pointer "arg" to a C String type */
+    char *message = (char *)arg;
 
-  /* Print the message */
-  puts(message);
+    /* Print the message */
+    puts(message);
 }
 
-int main(void) {
-  /* Create a timer */
-  ztimer_t timer = {.callback = timer_callback,
-                    .arg = "3 seconds have passed!"};
+int main(void)
+{
+    /* Create a timer */
+    ztimer_t timer = { .callback = timer_callback,
+                       .arg = "3 seconds have passed!" };
 
-  /* Set the timer to fire in 3 seconds */
-  ztimer_set(ZTIMER_SEC, &timer, 3);
+    /* Set the timer to fire in 3 seconds */
+    ztimer_set(ZTIMER_SEC, &timer, 3);
 
-  /* Sleep for 5 seconds */
-  ztimer_sleep(ZTIMER_SEC, 5);
+    /* Sleep for 5 seconds */
+    ztimer_sleep(ZTIMER_SEC, 5);
 
-  puts("5 seconds have passed!");
+    puts("5 seconds have passed!");
 
-  return 0;
+    return 0;
 }

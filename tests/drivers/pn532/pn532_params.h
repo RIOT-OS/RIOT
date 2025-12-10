@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2016 TriaGnoSys GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 TriaGnoSys GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @ingroup   tests
@@ -15,9 +14,6 @@
  *
  * @author    Víctor Ariño <victor.arino@triagnosys.com>
  */
-
-#ifndef PN532_PARAMS_H
-#define PN532_PARAMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,5 +41,4 @@ static const pn532_params_t pn532_conf[] = {
 }
 #endif
 
-#endif /* PN532_PARAMS_H */
 /** @} */

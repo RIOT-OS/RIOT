@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2020 Mesotic SAS
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2020 Mesotic SAS
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -358,6 +355,9 @@ bool sam0_eth_has_queued_pkt(void)
 
 int sam0_eth_init(void)
 {
+    /* HACK: interrupting the init sequence leads to strange hangs */
+    unsigned state = irq_disable();
+
     /* Enable clocks */
     _enable_clock();
     /* Initialize GPIOs */
@@ -415,6 +415,8 @@ int sam0_eth_init(void)
     NVIC_EnableIRQ(GMAC_IRQn);
     /* Enable both receiver and transmitter */
     GMAC->NCR.reg |= GMAC_NCR_TXEN | GMAC_NCR_RXEN;
+
+    irq_restore(state);
 
     return 0;
 }

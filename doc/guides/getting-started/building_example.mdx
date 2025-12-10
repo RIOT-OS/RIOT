@@ -58,16 +58,18 @@ the following line, logging out and logging in again:
 sudo usermod -aG $(stat --format="%G" /dev/ttyACM0) $USER
 ```
 
-Note that the `PORT` macro has a slightly different semantic in `native`. Here
+:::note
+The `PORT` macro has a slightly different semantic in `native`. Here
 it is used to provide the name of the TAP interface you want to use for the
 virtualized networking capabilities of RIOT.
+:::
 
 We use `pyterm` as the default terminal application. It is shipped with RIOT in
 the `dist/tools/pyterm/` directory. If you choose to use another terminal
 program you can set `TERMPROG` (and if need be the `TERMFLAGS`) macros:
 
 ```bash
-make -C examples/networking/gnrc/gnrc_networking/ term \
+make -C examples/networking/gnrc/networking/ term \
     BOARD=samr21-xpro \
     TERMPROG=gtkterm \
     TERMFLAGS="-s 115200 -p /dev/ttyACM0 -e"
@@ -80,22 +82,3 @@ main(): This is RIOT!
 ```
 
 when you flash the board. In this case, type `reboot` in the command line or reboot manually.
-
-:::tip[Using the native port with networking]
-If you compile RIOT for the native cpu and include the `netdev_tap` module,
-you can specify a network interface like this: `PORT=tap0 make term`
-
-*Setting up a tap network*
-
-There is a shell script in `RIOT/dist/tools/tapsetup` called `tapsetup` which
-you can use to create a network of tap interfaces.
-
-*USAGE*
-
-To create a bridge and two (or `count` at your option) tap interfaces:
-```shell
-    sudo ./dist/tools/tapsetup/tapsetup [-c [<count>]]
-```
-
-A detailed example can be found in `examples/networking/gnrc/gnrc_networking`.
-:::

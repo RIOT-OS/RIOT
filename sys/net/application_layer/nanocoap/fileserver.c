@@ -21,11 +21,13 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include "kernel_defines.h"
 #include "checksum/fletcher32.h"
 #include "net/nanocoap/fileserver.h"
 #include "vfs.h"
-#include "vfs_util.h"
+
+#if MODULE_VFS_UTIL
+#  include "vfs_util.h"
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -518,16 +520,15 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     vfs_closedir(&dir);
     coap_block2_finish(&slicer);
 
-    return (uintptr_t)buf - (uintptr_t)pdu->hdr;
+    return (uintptr_t)buf - (uintptr_t)pdu->buf;
 }
 
 #if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)
 static ssize_t _put_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                               struct requestdata *request)
 {
-    int err;
     vfs_DIR dir;
-    if ((err = vfs_opendir(&dir, request->namebuf)) == 0) {
+    if (vfs_opendir(&dir, request->namebuf) == 0) {
         vfs_closedir(&dir);
         if (request->options.exists.if_match && request->options.if_match_len) {
             return _error_handler(pdu, buf, len, COAP_CODE_PRECONDITION_FAILED);
@@ -538,6 +539,7 @@ static ssize_t _put_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         if (request->options.exists.if_match) {
             return _error_handler(pdu, buf, len, COAP_CODE_PRECONDITION_FAILED);
         }
+        int err;
         if ((err = vfs_mkdir(request->namebuf, 0777)) < 0) {
             return _error_handler(pdu, buf, len, err);
         }

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    pkg_nimble_contrib RIOT Integration
  * @ingroup     pkg_nimble
@@ -18,9 +20,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NIMBLE_RIOT_H
-#define NIMBLE_RIOT_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -120,5 +119,4 @@ int nimble_riot_get_phy_hci(uint8_t mode);
 }
 #endif
 
-#endif /* NIMBLE_RIOT_H */
 /** @} */

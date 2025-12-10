@@ -1,9 +1,6 @@
 /*
- * Copyright (c) 2020 Cenk Gündoğan
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Cenk Gündoğan
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -11,7 +8,6 @@
  *
  * @file
  */
-#include <errno.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
@@ -22,7 +18,6 @@
 #include "ztimer.h"
 #include "hashes/sha256.h"
 
-#include "unittests-constants.h"
 #include "tests-nanocoap_cache.h"
 #define _BUF_SIZE (128U)
 
@@ -41,15 +36,15 @@ static void test_nanocoap_cache__cachekey(void)
     size_t len;
 
     /* 1. packet */
-    len = coap_build_hdr((coap_hdr_t *)&buf1[0], COAP_TYPE_NON,
-                         &token[0], 2, COAP_METHOD_GET, msgid);
+    len = coap_build_udp_hdr(buf1, sizeof(buf1), COAP_TYPE_NON,
+                             &token[0], 2, COAP_METHOD_GET, msgid);
     coap_pkt_init(&pkt1, &buf1[0], sizeof(buf1), len);
     coap_opt_add_string(&pkt1, COAP_OPT_URI_PATH, &path[0], '/');
     coap_opt_finish(&pkt1, COAP_OPT_FINISH_NONE);
 
     /* 2. packet */
-    len = coap_build_hdr((coap_hdr_t *)&buf2[0], COAP_TYPE_NON,
-                         &token[0], 2, COAP_METHOD_GET, msgid);
+    len = coap_build_udp_hdr(buf2, sizeof(buf2), COAP_TYPE_NON,
+                             &token[0], 2, COAP_METHOD_GET, msgid);
     coap_pkt_init(&pkt2, &buf2[0], sizeof(buf2), len);
     coap_opt_add_string(&pkt2, COAP_OPT_URI_PATH, &path[0], '/');
     coap_opt_finish(&pkt2, COAP_OPT_FINISH_NONE);
@@ -61,8 +56,8 @@ static void test_nanocoap_cache__cachekey(void)
     TEST_ASSERT_EQUAL_INT(0, nanocoap_cache_key_compare(digest1, digest2));
 
     /* 3. packet */
-    len = coap_build_hdr((coap_hdr_t *)&buf2[0], COAP_TYPE_NON,
-                         &token[0], 2, COAP_METHOD_GET, msgid);
+    len = coap_build_udp_hdr(buf2, sizeof(buf2), COAP_TYPE_NON,
+                             &token[0], 2, COAP_METHOD_GET, msgid);
     coap_pkt_init(&pkt2, &buf2[0], sizeof(buf2), len);
     coap_opt_add_string(&pkt2, COAP_OPT_URI_PATH, &path2[0], '/');
     coap_opt_finish(&pkt2, COAP_OPT_FINISH_NONE);
@@ -95,8 +90,8 @@ static void test_nanocoap_cache__cachekey_blockwise(void)
     };
 
     /* 1. packet */
-    len = coap_build_hdr((coap_hdr_t *)&buf1[0], COAP_TYPE_NON,
-                         &token[0], 2, COAP_METHOD_GET, msgid);
+    len = coap_build_udp_hdr(buf1, sizeof(buf1), COAP_TYPE_NON,
+                             &token[0], 2, COAP_METHOD_GET, msgid);
     coap_pkt_init(&pkt1, &buf1[0], sizeof(buf1), len);
     coap_opt_add_string(&pkt1, COAP_OPT_URI_PATH, &path[0], '/');
     coap_opt_add_block1_control(&pkt1, &blockopt);
@@ -106,8 +101,8 @@ static void test_nanocoap_cache__cachekey_blockwise(void)
     blockopt.blknum = 2;
 
     /* 2. packet */
-    len = coap_build_hdr((coap_hdr_t *)&buf2[0], COAP_TYPE_NON,
-                         &token[0], 2, COAP_METHOD_GET, msgid);
+    len = coap_build_udp_hdr(buf2, sizeof(buf2), COAP_TYPE_NON,
+                             &token[0], 2, COAP_METHOD_GET, msgid);
     coap_pkt_init(&pkt2, &buf2[0], sizeof(buf2), len);
     coap_opt_add_string(&pkt2, COAP_OPT_URI_PATH, &path[0], '/');
     coap_opt_add_block1_control(&pkt1, &blockopt);
@@ -159,15 +154,15 @@ static void test_nanocoap_cache__add(void)
         snprintf(path, sizeof(path), "/path_%u", i);
 
         /* request */
-        len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
-                             &token[0], 2, COAP_METHOD_GET, msgid);
+        len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
+                                 &token[0], 2, COAP_METHOD_GET, msgid);
         coap_pkt_init(&req, &buf[0], sizeof(buf), len);
         coap_opt_add_string(&req, COAP_OPT_URI_PATH, &path[0], '/');
         coap_opt_finish(&req, COAP_OPT_FINISH_NONE);
 
         /* response */
-        len = coap_build_hdr((coap_hdr_t *)&rbuf[0], COAP_TYPE_NON,
-                             &token[0], 2, COAP_CODE_205, msgid);
+        len = coap_build_udp_hdr(rbuf, sizeof(rbuf), COAP_TYPE_NON,
+                                 &token[0], 2, COAP_CODE_205, msgid);
         coap_pkt_init(&resp, &rbuf[0], sizeof(rbuf), len);
         coap_opt_finish(&resp, COAP_OPT_FINISH_NONE);
 
@@ -218,15 +213,15 @@ static void test_nanocoap_cache__del(void)
     TEST_ASSERT_EQUAL_INT(0, nanocoap_cache_used_count());
 
     /* request */
-    len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
-                         &token[0], 2, COAP_METHOD_GET, msgid);
+    len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
+                             &token[0], 2, COAP_METHOD_GET, msgid);
     coap_pkt_init(&req, &buf[0], sizeof(buf), len);
     coap_opt_add_string(&req, COAP_OPT_URI_PATH, &path[0], '/');
     coap_opt_finish(&req, COAP_OPT_FINISH_NONE);
 
     /* response */
-    len = coap_build_hdr((coap_hdr_t *)&rbuf[0], COAP_TYPE_NON,
-                         &token[0], 2, COAP_CODE_205, msgid);
+    len = coap_build_udp_hdr(rbuf, sizeof(rbuf), COAP_TYPE_NON,
+                             &token[0], 2, COAP_CODE_205, msgid);
     coap_pkt_init(&resp, &rbuf[0], sizeof(rbuf), len);
     coap_opt_finish(&resp, COAP_OPT_FINISH_NONE);
 
@@ -264,15 +259,15 @@ static void test_nanocoap_cache__max_age(void)
     nanocoap_cache_init();
 
     /* request */
-    len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
-                         &token[0], 2, COAP_METHOD_GET, msgid);
+    len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
+                             &token[0], 2, COAP_METHOD_GET, msgid);
     coap_pkt_init(&req, &buf[0], sizeof(buf), len);
     coap_opt_add_string(&req, COAP_OPT_URI_PATH, &path[0], '/');
     coap_opt_finish(&req, COAP_OPT_FINISH_NONE);
 
     /* response with max-age 30 sec */
-    len = coap_build_hdr((coap_hdr_t *)&rbuf[0], COAP_TYPE_NON,
-                         &token[0], 2, COAP_CODE_205, msgid);
+    len = coap_build_udp_hdr(rbuf, sizeof(rbuf), COAP_TYPE_NON,
+                             &token[0], 2, COAP_CODE_205, msgid);
     coap_pkt_init(&resp, &rbuf[0], sizeof(rbuf), len);
     coap_opt_add_uint(&resp, COAP_OPT_MAX_AGE, 30);
     coap_opt_finish(&resp, COAP_OPT_FINISH_NONE);
@@ -290,8 +285,8 @@ static void test_nanocoap_cache__max_age(void)
     nanocoap_cache_del(c);
 
     /* response with max-age 60 sec (default, if option is missing) */
-    len = coap_build_hdr((coap_hdr_t *)&rbuf[0], COAP_TYPE_NON,
-                         &token[0], 2, COAP_CODE_205, msgid);
+    len = coap_build_udp_hdr(rbuf, sizeof(rbuf), COAP_TYPE_NON,
+                             &token[0], 2, COAP_CODE_205, msgid);
     coap_pkt_init(&resp, &rbuf[0], sizeof(rbuf), len);
     coap_opt_finish(&resp, COAP_OPT_FINISH_NONE);
 

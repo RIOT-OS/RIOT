@@ -22,9 +22,10 @@ The fact that many `FEATURES` translate directly into a `MODULE` is only by
 convenience.
 
 e.g.
-
-    # all periph features correspond to a periph submodule
-    USEMODULE += $(filter periph_%,$(FEATURES_USED))
+```makefile
+# all periph features correspond to a periph submodule
+USEMODULE += $(filter periph_%,$(FEATURES_USED))
+```
 
 ### Providing a FEATURE
 
@@ -70,7 +71,7 @@ For a `FEATURE` to be provided by a `board` it must meet 2 criteria, and for
 
 ### Where to define FEATURES\_%
 
-- `FEATURES_PROVIDED`, `FEATURES_CONFLICT` and `FEATURES_CONFLICT_MSG ` are
+- `FEATURES_PROVIDED`, `FEATURES_CONFLICT` and `FEATURES_CONFLICT_MSG` are
   defined in `Makefile.features`
 
 - `FEATURES_REQUIRED`, `FEATURES_OPTIONAL`, `FEATURES_REQUIRED_ANY`,
@@ -134,9 +135,9 @@ summarizes some of the pros and cons as well as specifies good and bad patterns
 in our build system. You might want to refer to `gnu make` documentation
 regarding these subjects.
 
-## Avoid unnecessary export
+## Avoid Unnecessary Export
 
-```
+```makefile
 export OUTPUT = $(shell some-command)
 ```
 
@@ -154,11 +155,11 @@ This is why global variables need clear documentation.
 
 [gnumake doc](https://www.gnu.org/software/make/manual/html_node/Variables_002fRecursion.html)
 
-## Use memoized for variables referencing a function or command
+## Use Memoized for Variables Referencing a Function or Command
 
-### recursively expanded variable:
+### Recursively Expanded Variable
 
-```
+```makefile
 OUTPUT = $(shell some-command $(ANOTHER_VARIABLE))
 ```
 
@@ -175,9 +176,9 @@ OUTPUT = $(shell some-command $(ANOTHER_VARIABLE))
 - If the variable expansion doesn't involve evaluating a function the overhead
   is none.
 
-### simply expanded variable:
+### Simply Expanded Variable
 
-```
+```makefile
 OUTPUT := $(shell some-command $(ANOTHER_VARIABLE))
 ```
 
@@ -193,9 +194,9 @@ OUTPUT := $(shell some-command $(ANOTHER_VARIABLE))
 
 - The values of variables declared with `:=` depend on the order of definition.
 
-### memoized:
+### Memoized
 
-```
+```makefile
 OUTPUT = $(call memoized,OUTPUT,$(shell some-command))
 ```
 
@@ -208,7 +209,7 @@ OUTPUT = $(call memoized,OUTPUT,$(shell some-command))
 
 [gnumake doc](https://www.gnu.org/software/make/manual/html_node/Flavors.html)
 
-## Additional documentation
+## Additional Documentation
 
 - Deferred vs. simple expansion: http://make.mad-scientist.net/deferred-simple-variable-expansion/
 - Tracking issue: [#10850](https://github.com/RIOT-OS/RIOT/issues/10850)

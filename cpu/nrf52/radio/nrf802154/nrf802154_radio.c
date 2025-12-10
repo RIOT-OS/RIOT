@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2020 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -22,7 +19,6 @@
 #include <errno.h>
 
 #include "cpu.h"
-#include "luid.h"
 #include "nrf_clock.h"
 
 #include "net/ieee802154.h"
@@ -64,17 +60,14 @@
                              RADIO_SHORTS_CCABUSY_DISABLE_Msk | \
                              RADIO_SHORTS_TXREADY_START_Msk)
 
-#define MAC_TIMER_CHAN_ACK  (0U)    /**< MAC timer channel for transmitting an ACK frame */
 #define MAC_TIMER_CHAN_IFS  (1U)    /**< MAC timer channel for handling IFS logic */
 
 static uint8_t rxbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
-static uint8_t ack[IEEE802154_ACK_FRAME_LEN];
 
 typedef enum {
     STATE_IDLE,
     STATE_TX,
-    STATE_ACK,
     STATE_RX,
     STATE_CCA_CLEAR,
     STATE_CCA_BUSY,
@@ -207,7 +200,7 @@ static void _disable_blocking(void)
 
 static int _request_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
 {
-    (void) dev;
+    (void)dev;
 
     int res = -EBUSY;
     int state = STATE_IDLE;
@@ -264,7 +257,7 @@ end:
 
 static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
 {
-    (void) dev;
+    (void)dev;
     bool eagain;
     ieee802154_tx_info_t *info = ctx;
     int state = _state;
@@ -315,19 +308,10 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
     return 0;
 }
 
-/**
- * @brief   Convert from the internal representation to dBm, when the
- *          radio operates as a IEEE802.15.4 transceiver.
- */
-static inline int8_t _hwval_to_ieee802154_dbm(uint8_t hwval)
-{
-    return (ED_RSSISCALE * hwval) + ED_RSSIOFFS;
-}
-
 static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
                           ieee802154_rx_info_t *info)
 {
-    (void) dev;
+    (void)dev;
     size_t pktlen = (size_t)rxbuf[0] - IEEE802154_FCS_LEN;
     int res = -ENOBUFS;
 
@@ -335,26 +319,25 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
         DEBUG("[nrf802154] recv: buffer is to small\n");
         return res;
     }
-    else {
-        DEBUG("[nrf802154] recv: reading packet of length %i\n", pktlen);
-        if (info != NULL) {
-            ieee802154_rx_info_t *radio_info = info;
-            /* Hardware link quality indicator */
-            uint8_t hwlqi = rxbuf[pktlen + 1];
-            /* Convert to 802.15.4 LQI (page 319 of product spec v1.1) */
-            radio_info->lqi = (uint8_t)(hwlqi > UINT8_MAX/ED_RSSISCALE
-                                       ? UINT8_MAX
-                                       : hwlqi * ED_RSSISCALE);
-            /* Converting the hardware-provided LQI value back to the
-               original RSSI value is not properly documented in the PS.
-               The linear mapping used here has been found empirically
-               through comparison with the RSSI value provided by NRF_RADIO->RSSISAMPLE
-               after enabling the ADDRESS_RSSISTART short. */
-            int8_t rssi_dbm = hwlqi + ED_RSSIOFFS - 1;
-            radio_info->rssi = ieee802154_dbm_to_rssi(rssi_dbm);
-        }
-        memcpy(buf, &rxbuf[1], pktlen);
+
+    DEBUG("[nrf802154] recv: reading packet of length %i\n", pktlen);
+    if (info != NULL) {
+        ieee802154_rx_info_t *radio_info = info;
+        /* Hardware link quality indicator */
+        uint8_t hwlqi = rxbuf[pktlen + 1];
+        /* Convert to 802.15.4 LQI (page 319 of product spec v1.1) */
+        radio_info->lqi = (uint8_t)(hwlqi > UINT8_MAX/ED_RSSISCALE
+                                   ? UINT8_MAX
+                                   : hwlqi * ED_RSSISCALE);
+        /* Converting the hardware-provided LQI value back to the
+           original RSSI value is not properly documented in the PS.
+           The linear mapping used here has been found empirically
+           through comparison with the RSSI value provided by NRF_RADIO->RSSISAMPLE
+           after enabling the ADDRESS_RSSISTART short. */
+        int16_t rssi_dbm = hwlqi + ED_RSSIOFFS - 1;
+        radio_info->rssi = ieee802154_dbm_to_rssi(rssi_dbm);
     }
+    memcpy(buf, &rxbuf[1], pktlen);
 
     return pktlen;
 }
@@ -370,7 +353,7 @@ static inline uint8_t _dbm_to_ieee802154_hwval(int8_t dbm)
 
 static int set_cca_threshold(ieee802154_dev_t *dev, int8_t threshold)
 {
-    (void) dev;
+    (void)dev;
 
     if (threshold < ED_RSSIOFFS) {
         return -EINVAL;
@@ -433,27 +416,12 @@ static void _set_ifs_timer(bool lifs)
 static void _timer_cb(void *arg, int chan)
 {
     (void)arg;
-    ieee802154_dev_t *dev = nrf802154_hal_dev;
-
-    if (chan == MAC_TIMER_CHAN_ACK) {
-        /* Copy sqn */
-        ack[1] = IEEE802154_FCF_TYPE_ACK;
-        if (cfg.pending) {
-            ack[1] |= IEEE802154_FCF_FRAME_PEND;
-        }
-
-        ack[3] = rxbuf[3];
-
-        NRF_RADIO->PACKETPTR = (uint32_t) &ack;
-        NRF_RADIO->TASKS_TXEN = 1;
-        dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
-    }
-    else if (chan == MAC_TIMER_CHAN_IFS) {
+    if (chan == MAC_TIMER_CHAN_IFS) {
         cfg.ifs = false;
     }
-
     timer_stop(NRF802154_TIMER);
 }
+
 /**
  * @brief   Set radio into DISABLED state
  */
@@ -463,10 +431,6 @@ int nrf802154_init(void)
     /* reset buffer */
     rxbuf[0] = 0;
     txbuf[0] = 0;
-
-    ack[0] = IEEE802154_ACK_FRAME_LEN; /* PSDU length */
-    ack[1] = IEEE802154_FCF_TYPE_ACK; /* FCF */
-    ack[2] = 0; /* FCF */
 
     int result = timer_init(NRF802154_TIMER, TIMER_FREQ, _timer_cb, NULL);
     assert(result >= 0);
@@ -527,38 +491,25 @@ void isr_radio(void)
             break;
         case STATE_RX:
             if (NRF_RADIO->CRCSTATUS) {
-                bool l2filter_passed = _l2filter(rxbuf+1);
-                bool is_auto_ack_en = !IS_ACTIVE(CONFIG_IEEE802154_AUTO_ACK_DISABLE);
                 bool is_ack = rxbuf[1] & IEEE802154_FCF_TYPE_ACK;
-                bool ack_req = rxbuf[1] & IEEE802154_FCF_ACK_REQ;
 
-                /* If radio is in promiscuos mode, indicate packet and
+                /* If radio is in promiscuous mode, indicate packet and
                  * don't event think of sending an ACK frame :) */
                 if (cfg.promisc) {
                     DEBUG("[nrf802154] Promiscuous mode is enabled.\n");
                     _state = STATE_IDLE;
                     dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
                 }
-                /* If the L2 filter passes, device if the frame is indicated
-                 * directly or if the driver should send an ACK frame before
-                 * the indication */
-                else if (l2filter_passed) {
-                    if (ack_req && is_auto_ack_en) {
-                        timer_set(NRF802154_TIMER, MAC_TIMER_CHAN_ACK, IEEE802154_SIFS_SYMS);
-                        timer_start(NRF802154_TIMER);
-                        _disable();
-                        _state = STATE_ACK;
-                    }
-                    else {
-                        DEBUG("[nrf802154] RX frame doesn't require ACK frame.\n");
-                        _state = STATE_IDLE;
-                        dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
-                    }
-                }
                 /* In case the packet is an ACK and the ACK filter is disabled,
                  * indicate the frame reception */
                 else if (is_ack && !cfg.ack_filter) {
                     DEBUG("[nrf802154] Received ACK.\n");
+                    _state = STATE_IDLE;
+                    dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
+                }
+                /* If the L2 filter passes the frame is indicated directly */
+                else if (_l2filter(rxbuf+1)) {
+                    DEBUG("[nrf802154] RX data frame.\n");
                     _state = STATE_IDLE;
                     dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
                 }
@@ -574,16 +525,6 @@ void isr_radio(void)
                 dev->cb(dev, IEEE802154_RADIO_INDICATION_CRC_ERROR);
             }
             break;
-        case STATE_ACK:
-            _state = STATE_IDLE;
-
-            /* We disable the radio to avoid unwanted emissions (see ERRATA
-             * ID 204, "Switching between TX and RX causes unwanted emissions")
-             */
-            _disable();
-            DEBUG("[nrf52840] TX ACK done.");
-            _set_ifs_timer(false);
-            break;
         default:
             assert(false);
         }
@@ -594,13 +535,13 @@ void isr_radio(void)
 
 static int _confirm_on(ieee802154_dev_t *dev)
 {
-    (void) dev;
+    (void)dev;
     return 0;
 }
 
 static int _request_on(ieee802154_dev_t *dev)
 {
-    (void) dev;
+    (void)dev;
     _state = STATE_IDLE;
     DEBUG("[nrf802154]: Request to turn on\n");
     _power_on();
@@ -641,7 +582,7 @@ static int _request_on(ieee802154_dev_t *dev)
 
 static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
 {
-    (void) dev;
+    (void)dev;
     int8_t pow = conf->pow;
 
     if (pow < TX_POWER_MIN || pow > TX_POWER_MAX) {
@@ -666,7 +607,7 @@ static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
 
 static int _off(ieee802154_dev_t *dev)
 {
-    (void) dev;
+    (void)dev;
     DEBUG("[nrf802154] Turning off the radio\n");
     _power_off();
     return 0;
@@ -674,14 +615,14 @@ static int _off(ieee802154_dev_t *dev)
 
 int _len(ieee802154_dev_t *dev)
 {
-    (void) dev;
+    (void)dev;
     DEBUG("[nrf802154] Length of frame is %i\n", (size_t)rxbuf[0] - IEEE802154_FCS_LEN);
     return (size_t)rxbuf[0] - IEEE802154_FCS_LEN;
 }
 
 int _set_cca_mode(ieee802154_dev_t *dev, ieee802154_cca_mode_t mode)
 {
-    (void) dev;
+    (void)dev;
 
     NRF_RADIO->CCACTRL &= RADIO_CCACTRL_CCAMODE_Msk;
     uint8_t tmp = 0;
@@ -712,9 +653,9 @@ int _set_cca_mode(ieee802154_dev_t *dev, ieee802154_cca_mode_t mode)
 
 static int _config_addr_filter(ieee802154_dev_t *dev, ieee802154_af_cmd_t cmd, const void *value)
 {
-    (void) dev;
+    (void)dev;
     const uint16_t *pan_id = value;
-    switch(cmd) {
+    switch (cmd) {
         case IEEE802154_AF_SHORT_ADDR:
             memcpy(nrf802154_short_addr, value, IEEE802154_SHORT_ADDRESS_LEN);
             break;
@@ -731,10 +672,11 @@ static int _config_addr_filter(ieee802154_dev_t *dev, ieee802154_af_cmd_t cmd, c
     return 0;
 }
 
-static int _config_src_addr_match(ieee802154_dev_t *dev, ieee802154_src_match_t cmd, const void *value)
+static int _config_src_addr_match(ieee802154_dev_t *dev, ieee802154_src_match_t cmd,
+                                  const void *value)
 {
-    (void) dev;
-    switch(cmd) {
+    (void)dev;
+    switch (cmd) {
         case IEEE802154_SRC_MATCH_EN:
             cfg.pending = *((const bool*) value);
             break;
@@ -746,7 +688,7 @@ static int _config_src_addr_match(ieee802154_dev_t *dev, ieee802154_src_match_t 
 
 static int _set_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_t mode)
 {
-    (void) dev;
+    (void)dev;
 
     bool ackf = true;
     bool _promisc = false;
@@ -770,11 +712,26 @@ static int _set_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_
     return 0;
 }
 
+static int _get_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_t *mode)
+{
+    (void) dev;
+    if (cfg.promisc) {
+        *mode = IEEE802154_FILTER_PROMISC;
+    }
+    else if (!cfg.ack_filter) {
+        *mode = IEEE802154_FILTER_ACK_ONLY;
+    }
+    else {
+        *mode = IEEE802154_FILTER_ACCEPT;
+    }
+    return 0;
+}
+
 static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *bd,
                             int8_t retries)
 {
-    (void) dev;
-    (void) bd;
+    (void)dev;
+    (void)bd;
 
     if (retries > 0) {
         return -ENOTSUP;
@@ -787,7 +744,7 @@ static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *b
 
 void nrf802154_setup(nrf802154_t *dev)
 {
-    (void) dev;
+    (void)dev;
     nrf802154_init();
 }
 
@@ -823,4 +780,5 @@ static const ieee802154_radio_ops_t nrf802154_ops = {
     .config_addr_filter = _config_addr_filter,
     .config_src_addr_match = _config_src_addr_match,
     .set_frame_filter_mode = _set_frame_filter_mode,
+    .get_frame_filter_mode = _get_frame_filter_mode,
 };

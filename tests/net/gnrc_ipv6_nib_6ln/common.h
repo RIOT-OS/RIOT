@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup    tests_gnrc_ipv6_nib Common header for GNRC's NIB tests
@@ -16,8 +15,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef COMMON_H
-#define COMMON_H
 
 #include <stdio.h>
 
@@ -47,5 +44,4 @@ void _common_set_up(void);
 }
 #endif
 
-#endif /* COMMON_H */
 /** @} */

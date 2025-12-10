@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2016-2017 Eistec AB
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016-2017 Eistec AB
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @addtogroup  unittests
@@ -15,8 +14,6 @@
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
-#ifndef TESTS_CPP_CTORS_H
-#define TESTS_CPP_CTORS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,5 +42,4 @@ namespace RIOTTestCPP {
 }
 #endif
 
-#endif /* TESTS_CPP_CTORS_H */
 /** @} */

@@ -17,17 +17,27 @@ If your user does not have permissions to access the Docker daemon:
 $ BUILD_IN_DOCKER=1 DOCKER="sudo docker" make
 ```
 
-to always use Docker for building, set `BUILD_IN_DOCKER=1` (and if necessary
+To always use Docker for building, set `BUILD_IN_DOCKER=1` (and if necessary
 `DOCKER="sudo docker"`) in the environment:
 
 ```console
 $ export BUILD_IN_DOCKER=1
 ```
 
-## Targets ran in Docker: DOCKER_MAKECMDGOALS_POSSIBLE
+The used Docker image defaults to a pinned version of [riot/riotbuild] for a
+given commit in the RIOT repository. It can be overwritten via the environment
+variable `DOCKER_IMAGE`, for example:
 
-Currently only build related targets are ran in the docker container, the exact
+```shell
+$ BUILD_IN_DOCKER=1 DOCKER_IMAGE="local/tinybuild-native64:latest" make
+```
+
+## Targets run in Docker: DOCKER_MAKECMDGOALS_POSSIBLE
+
+Currently, only build-related targets are run in the Docker container, the exact
 list is under `DOCKER_MAKECMDGOALS_POSSIBLE` variable.
+
+For `native` boards, `make test` is also executed within the Docker container.
 
 ## Environment Variables: DOCKER_ENV_VARS
 
@@ -63,7 +73,7 @@ but will need to be prefixed with `-e` (see [option-summary]).
 
 e.g.:
 
-```
+```shell
 DOCKER_ENVIRONMENT_CMDLINE='-e BEER_TYPE="imperial stout"' BUILD_IN_DOCKER=1 make -C examples/basic/hello-world/
 docker run --rm -t -u "$(id -u)" \
     ...
@@ -105,7 +115,7 @@ A subset of these variables, namely variables relating to dependency resolution
 are therefore unconditionally passed to docker. The complete list can be found
 under `DOCKER_ENV_VARS_ALWAYS`.
 
-#### CFLAGS
+### CFLAGS
 
 CFLAGS are not automatically passed to docker because they might contain spaces,
 '"' or other characters that will require escaping. The solution is to pass it with
@@ -113,12 +123,16 @@ CFLAGS are not automatically passed to docker because they might contain spaces,
 
 e.g: if wanting to override STRING_WITH_SPACES
 
+#### Normal Build
+
+```shell
+CFLAGS='-DSTRING_WITH_SPACES="\"with space\""' make
 ```
-# normal build
-CFLAGS=-DSTRING_WITH_SPACES='\"with space\" make
-# in docker
-DOCKER_ENVIRONMENT_CMDLINE='-e CFLAGS=-DSTRING_WITH_SPACES=\'\\\"with\ space\\\"\'' \
-  BUILD_IN_DOCKER=1 make
+
+#### In Docker
+
+```shell
+DOCKER_ENVIRONMENT_CMDLINE="-e CFLAGS='-DSTRING_WITH_SPACES=\\\"with\ space\\\"'" BUILD_IN_DOCKER=1 make
 ```
 
 Alternatively, it is often easier to define the CFLAGS in the Makefile which gets
@@ -126,3 +140,4 @@ evaluated inside the Docker image again), conditional on a less complex environm
 variable that gets added to `DOCKER_ENV_VARS` in the Makefile.
 
 [option-summary]: https://www.gnu.org/software/make/manual/html_node/Options-Summary.html
+[riot/riotbuild]: https://hub.docker.com/r/riot/riotbuild/tags

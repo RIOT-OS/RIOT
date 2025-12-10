@@ -1,10 +1,9 @@
 /*
- * Copyright 2016 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @addtogroup  unittests
@@ -15,8 +14,6 @@
  *
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */
-#ifndef TESTS_CHECKSUM_H
-#define TESTS_CHECKSUM_H
 
 #include "embUnit.h"
 
@@ -110,5 +107,4 @@ Test *tests_checksum_ucrc16_tests(void);
 }
 #endif
 
-#endif /* TESTS_CHECKSUM_H */
 /** @} */

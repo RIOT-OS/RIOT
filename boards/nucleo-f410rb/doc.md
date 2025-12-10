@@ -7,6 +7,9 @@
 The Nucleo-F410RB is a board from ST's Nucleo family supporting a ARM Cortex-M4
 STM32F410RB microcontroller with 32KiB of RAM and 128KiB of Flash.
 
+You can find general information about the Nucleo64 boards on the
+@ref boards_common_nucleo64 page.
+
 ## Hardware
 
 ![Nucleo64 F410RB](http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
@@ -50,41 +53,8 @@ STM32F410RB microcontroller with 32KiB of RAM and 128KiB of Flash.
 |        | USB       | no        | |
 |        | Timer     | 2 32 bit timers       | |
 
-## Flashing the device
+## Flashing the Board
 
-### Flashing the Board Using OpenOCD
-
-The ST Nucleo-F410RB board includes an on-board ST-LINK V2 programmer. The
-easiest way to program the board is to use OpenOCD. You need OpenOCD in
-version
-0.10 minimum. Once you have installed OpenOCD (look
-[here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for installation
-instructions), you can flash the board simply by typing
-
-```
-make BOARD=nucleo-f410rb flash
-```
-and debug via GDB by simply typing
-```
-make BOARD=nucleo-f410rb debug
-```
-
-### Flashing the Board Using ST-LINK Removable Media
-
-On-board ST-LINK programmer provides via composite USB device removable media.
-Copying the HEX file causes reprogramming of the board. This task
-could be performed manually; however, the cpy2remed (copy to removable
-media) PROGRAMMER script does this automatically. To program board in
-this manner, use the command:
-```
-make BOARD=nucleo-f410rb PROGRAMMER=cpy2remed flash
-```
-@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
-could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
-
-
-## Supported Toolchains
-
-For using the ST Nucleo-F410RB board we strongly recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
-toolchain.
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the Nucleo-F401RB is `nucleo-f401rb`.

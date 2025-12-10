@@ -1,11 +1,6 @@
 /*
- * Copyright (C) 2019 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- *
- * FreeRTOS to RIOT-OS adaption module for source code compatibility
+ * SPDX-FileCopyrightText: 2019 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #ifndef DOXYGEN
@@ -157,7 +152,10 @@ BaseType_t xSemaphoreGiveRecursive(SemaphoreHandle_t xSemaphore)
     _rsem_t* rsem = (_rsem_t*)xSemaphore;
 
     assert(rsem != NULL);
-    assert(rsem->type == queueQUEUE_TYPE_RECURSIVE_MUTEX);
+
+    if (rsem->type == queueQUEUE_TYPE_MUTEX) {
+        return xSemaphoreGive(xSemaphore);
+    }
 
     rmutex_unlock(&rsem->rmutex);
     if (rsem->rmutex.mutex.queue.next == NULL) {
@@ -179,7 +177,10 @@ BaseType_t xSemaphoreTakeRecursive(SemaphoreHandle_t xSemaphore,
     _rsem_t* rsem = (_rsem_t*)xSemaphore;
 
     assert(rsem != NULL);
-    assert(rsem->type == queueQUEUE_TYPE_RECURSIVE_MUTEX);
+
+    if (rsem->type == queueQUEUE_TYPE_MUTEX) {
+        return xSemaphoreTake(xSemaphore, xTicksToWait);
+    }
 
     BaseType_t ret = pdTRUE;
 

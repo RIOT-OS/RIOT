@@ -33,6 +33,22 @@
 extern "C" {
 #endif
 
+#if defined(DOXYGEN)
+/**
+ * @brief   Configure the LoRa sync word
+ *
+ * The sync word for sx126x is 16 bits long.
+ * Private networks should use 0x1424.
+ * Public networks should use 0x3444.
+ * Using the driver API you only configure 2 nibbles Y and Z to form a sync word 0xY4Z4.
+ * The default chip value is 0x12 (0x1424).
+ *
+ * See https://blog.classycode.com/lora-sync-word-compatibility-between-sx127x-and-sx126x-460324d1787a
+ * for more information and a comparison with sx127x.
+ */
+#  define CONFIG_SX126X_DEFAULT_SYNC_WORD       0x12
+#endif
+
 /**
  * * @note Forward declaration of the SX126x device descriptor
  */
@@ -79,6 +95,33 @@ typedef enum {
 } sx126x_type_t;
 
 /**
+ * @brief   Dio2 pin mode
+ */
+typedef enum {
+    SX126X_DIO2_UNUSED,     /**< Not used */
+    SX126X_DIO2_IRQ,        /**< IRQ pin (ToDo) */
+    SX126X_DIO2_RF_SWITCH,  /**< RF switch control pin */
+} sx126x_dio2_mode_t;
+
+/**
+ * @brief   Dio3 pin mode
+ */
+typedef enum {
+    SX126X_DIO3_UNUSED,     /**< Not used */
+    SX126X_DIO3_IRQ,        /**< IRQ pin (ToDo) */
+    SX126X_DIO3_TCXO,       /**< TCXO control pin */
+} sx126x_dio3_mode_t;
+
+/**
+ * @brief   Mask of all available interrupts
+ */
+#define SX126X_IRQ_MASK_ALL     (SX126X_IRQ_TX_DONE | SX126X_IRQ_RX_DONE | \
+                                 SX126X_IRQ_PREAMBLE_DETECTED | SX126X_IRQ_SYNC_WORD_VALID | \
+                                 SX126X_IRQ_HEADER_VALID | SX126X_IRQ_HEADER_ERROR | \
+                                 SX126X_IRQ_CRC_ERROR | SX126X_IRQ_CAD_DONE | \
+                                 SX126X_IRQ_CAD_DETECTED | SX126X_IRQ_TIMEOUT)
+
+/**
  * @brief   Device initialization parameters
  */
 typedef struct {
@@ -87,6 +130,17 @@ typedef struct {
     gpio_t reset_pin;                   /**< Reset pin */
     gpio_t busy_pin;                    /**< Busy pin */
     gpio_t dio1_pin;                    /**< Dio1 pin */
+#if IS_USED(MODULE_SX126X_DIO2)
+    sx126x_dio2_mode_t dio2_mode;       /**< Dio2 mode */
+#endif
+#if IS_USED(MODULE_SX126X_DIO3)
+    sx126x_dio3_mode_t dio3_mode;       /**< Dio3 mode */
+    struct {
+        unsigned tcxo_volt    :8;   /**< TCXO voltage (see sx126x_tcxo_ctrl_voltages_t)*/
+        unsigned tcxo_timeout :24;  /**< TCXO timeout to wait for 32MHz coming from TXC0,
+                                         Delay duration = Delay(23:0) * 15.625 μs */
+    } dio3_arg;
+#endif
     sx126x_reg_mod_t regulator;         /**< Power regulator mode */
     sx126x_type_t type;                 /**< Variant of sx126x */
 #if IS_USED(MODULE_SX126X_RF_SWITCH)
@@ -214,6 +268,17 @@ uint8_t sx126x_get_coding_rate(const sx126x_t *dev);
  * @param[in] cr                       The LoRa coding rate
  */
 void sx126x_set_coding_rate(sx126x_t *dev, uint8_t cr);
+
+/**
+ * @brief   Sets the TX power and ramp time
+ *
+ * The actual transmission power may be different depending on device capabilities and board design.
+ *
+ * @param[in] dev                       Device descriptor of the driver
+ * @param[in] power_dbm                 The TX power in dBm
+ * @param[in] ramp_time                 The ramp time
+ */
+void sx126x_set_tx_power(sx126x_t *dev, int8_t power_dbm, sx126x_ramp_time_t ramp_time);
 
 /**
  * @brief   Gets the payload length

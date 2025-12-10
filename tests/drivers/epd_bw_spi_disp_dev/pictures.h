@@ -1,10 +1,8 @@
 /*
- * Copyright (C) 2013 RIOT OS
- *
- * All Rights Reserved.
- * See: https://www.riot-os.org/branding.html
- *
+ * SPDX-FileCopyrightText: 2013 RIOT OS, All Rights Reserved.
  */
+
+#pragma once
 
 /**
  * @ingroup     tests_drivers_epd_bw_spi
@@ -23,9 +21,6 @@
  *
  * @}
  */
-
-#ifndef PICTURES_H
-#define PICTURES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -269,4 +264,3 @@ const uint8_t riot_logo_32[17][4] = {
 #ifdef __cplusplus
 }
 #endif
-#endif /* PICTURES_H */

@@ -1,5 +1,5 @@
-#ifndef MODEL_H
-#define MODEL_H
+#pragma once
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -7791,4 +7791,3 @@ int32_t model_predict(const float *features, int32_t features_length) {
 #ifdef __cplusplus
 }
 #endif
-#endif /* MODEL_H */

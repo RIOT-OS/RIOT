@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2021 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @{
@@ -13,8 +12,6 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef CONGURE_IMPL_H
-#define CONGURE_IMPL_H
 
 #include "congure/abe.h"
 
@@ -32,5 +29,4 @@ void congure_abe_test_set_same_wnd_adv_res(bool value);
 }
 #endif
 
-#endif /* CONGURE_IMPL_H */
 /** @} */

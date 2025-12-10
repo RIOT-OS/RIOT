@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2014 Philipp Rosenkranz
- * Copyright (C) 2014 Nico von Geyso
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014 Philipp Rosenkranz
+ * SPDX-FileCopyrightText: 2014 Nico von Geyso
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @addtogroup  unittests
@@ -16,8 +15,6 @@
  *
  * @author      Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
  */
-#ifndef TESTS_CRYPTO_H
-#define TESTS_CRYPTO_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -68,5 +65,4 @@ Test* tests_crypto_modes_ctr_tests(void);
 }
 #endif
 
-#endif /* TESTS_CRYPTO_H */
 /** @} */

@@ -11,7 +11,8 @@ and based on the externally maintained [lsm303agr] crate.
 This means that:
 
 - it is only available on platforms supported by Rust,
-- it needs Rust installed on the build machine as described in @ref using-rust, and
+- it needs Rust installed on the build machine as described in
+    [Rust in RIOT](https://guide.riot-os.org/rust_tutorials/rust_in_riot/), and
 - it downloads additional Rust code from crates.io (in versions pinned by RIOT) when first used.
 
 [lsm303agr]: https://crates.io/crates/lsm303agr

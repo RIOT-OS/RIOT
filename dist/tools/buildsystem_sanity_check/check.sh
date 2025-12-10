@@ -13,6 +13,8 @@
 #
 #
 
+export ENABLE_DOCKER_PINNING_TEST=${ENABLE_DOCKER_PINNING_TEST:-1}
+
 : "${RIOTBASE:="$(cd "$(dirname "$0")/../../../" || exit; pwd)"}"
 
 : "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
@@ -382,6 +384,10 @@ check_tests_application_path() {
 }
 
 check_pinned_docker_version_is_up_to_date() {
+    if [ "$ENABLE_DOCKER_PINNING_TEST" != "1" ]; then
+        # Skipping docker version test as requested
+        return
+    fi
     local pinned_repo_digest
     local upstream_repo_digest
     pinned_repo_digest="$(awk '/^DOCKER_TESTED_IMAGE_REPO_DIGEST := (.*)$/ { print substr($0, index($0, $3)); exit }' "$RIOTMAKE/docker.inc.mk")"

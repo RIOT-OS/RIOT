@@ -68,10 +68,10 @@ void suit_worker_trigger_prepared(const uint8_t *manifest, size_t size);
  * area into which the manifest is to be written. The lock must be released by
  * calling @ref suit_worker_trigger_prepared later.
  *
- * @param[out]    buffer   On success, buffer into which the image may be
+ * @param[out]    buffer   On success, buffer into which the manifest may be
  *                         written.
- * @param[in,out] size     Requested buffer size. On some errors, this will be
- *                         decreased to a size that would be acceptable.
+ * @param[in,out] size     Requested buffer size. When size is `0` or on some
+ *                         errors, this will be set to a size that would be acceptable.
  *
  * @return 0 on success
  * @return -EAGAIN if the worker is currently busy.

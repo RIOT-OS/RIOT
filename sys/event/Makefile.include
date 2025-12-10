@@ -1,0 +1,35 @@
+include $(RIOTMAKE)/utils/strings.mk
+
+# This applies to all thread stacks
+ifneq (, $(EVENT_THREAD_STACKSIZE_MIN))
+  EVENT_THREAD_STACKSIZE_MIN := $(call max_number,$(EVENT_THREAD_STACKSIZE_MIN))
+endif
+
+ifeq (,$(filter event_thread_highest, $(USEMODULE)))
+  # No highest priority event thread, so the highest prio queue is handled by
+  # the same thread handling the medium priority queue. So we "trickle down"
+  # the requirements here
+  EVENT_THREAD_MEDIUM_STACKSIZE_MIN += $(EVENT_THREAD_HIGHEST_STACKSIZE_MIN)
+else
+  ifneq (, $(EVENT_THREAD_HIGHEST_STACKSIZE_MIN))
+    EVENT_THREAD_HIGHEST_STACKSIZE_MIN := $(call max_number,$(EVENT_THREAD_HIGHEST_STACKSIZE_MIN) $(EVENT_THREAD_STACKSIZE_MIN))
+    CFLAGS += -DEVENT_THREAD_HIGHEST_STACKSIZE=$(EVENT_THREAD_HIGHEST_STACKSIZE_MIN)
+  endif
+endif
+
+ifeq (,$(filter event_thread_medium, $(USEMODULE)))
+  # No medium priority event thread, so the medium prio queue is handled by
+  # the same thread handling the lowest priority queue. So we "trickle down"
+  # the requirements here
+  EVENT_THREAD_LOWEST_STACKSIZE_MIN += $(EVENT_THREAD_MEDIUM_STACKSIZE_MIN)
+else
+  ifneq (, $(EVENT_THREAD_MEDIUM_STACKSIZE_MIN))
+    EVENT_THREAD_MEDIUM_STACKSIZE_MIN := $(call max_number,$(EVENT_THREAD_MEDIUM_STACKSIZE_MIN) $(EVENT_THREAD_STACKSIZE_MIN))
+    CFLAGS += -DEVENT_THREAD_MEDIUM_STACKSIZE=$(EVENT_THREAD_MEDIUM_STACKSIZE_MIN)
+  endif
+endif
+
+ifneq (, $(EVENT_THREAD_LOWEST_STACKSIZE_MIN))
+  EVENT_THREAD_LOWEST_STACKSIZE_MIN := $(call max_number,$(EVENT_THREAD_LOWEST_STACKSIZE_MIN) $(EVENT_THREAD_STACKSIZE_MIN))
+  CFLAGS += -DEVENT_THREAD_LOWEST_STACKSIZE=$(EVENT_THREAD_LOWEST_STACKSIZE_MIN)
+endif

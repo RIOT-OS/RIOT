@@ -11,7 +11,10 @@ LINKFLAGS += -Wl,-wrap=vdprintf
 LINKFLAGS += -Wl,-wrap=vsprintf
 LINKFLAGS += -Wl,-wrap=vsnprintf
 LINKFLAGS += -Wl,-wrap=putchar
+LINKFLAGS += -Wl,-wrap=putc
+LINKFLAGS += -Wl,-wrap=fputc
 LINKFLAGS += -Wl,-wrap=puts
+LINKFLAGS += -Wl,-wrap=fputs
 
 # By wrapping the newlib only `_printf_common` symbol to the undefined
 # `__wrap__printf_common` symbol, linking will fail if any reference to
@@ -19,6 +22,10 @@ LINKFLAGS += -Wl,-wrap=puts
 # stdio, we will catch any instance of both mpaland-printf and newlib's stdio
 # being both linked in.
 LINKFLAGS += -Wl,-wrap=_printf_common
+LINKFLAGS += -Wl,-wrap=_fprintf_r
+LINKFLAGS += -Wl,-wrap=_printf_r
+LINKFLAGS += -Wl,-wrap=iprintf
+LINKFLAGS += -Wl,-wrap=fiprintf
 
 # Workaround for bug in the newlib headers shipped with e.g. Ubuntu 24.04 LTS
 # not defining PRId64 / PRIu64 / PRIx64 / PRIo64 in <inttypes.h> due to an issue

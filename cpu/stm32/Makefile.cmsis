@@ -3,8 +3,8 @@ PKG_NAME=stm32cmsis
 # The package URL depends on the family of the target STM32
 PKG_URL=https://github.com/STMicroelectronics/cmsis_device_$(CPU_FAM)
 
-# v1.1.0
-PKG_VERSION_c0=7e32bf9d8117ee4c8f6a1d138b814fc24bf4c906
+# v1.3.0
+PKG_VERSION_c0=517611273f835ffe95318947647bc1408f69120d
 # v2.3.7
 PKG_VERSION_f0=3973d99a89ac5fdf1f2593abc29a73d2981ce94a
 # v4.3.4

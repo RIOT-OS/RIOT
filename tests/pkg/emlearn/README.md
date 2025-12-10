@@ -35,6 +35,5 @@ The application comes with 3 Python scripts:
   $ ./train_model.py
   ```
   will just train the model.
-- `generate_model.py` is used to generate the `sonar.h` header file from the
-  `model` binary file. The script is called automatically by the build system
-  when the `model` binary file is updated.
+- `generate_model.py` is used to generate the `model.h` header file from the
+  `model` binary file.

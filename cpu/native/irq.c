@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2013 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -43,7 +40,7 @@ ucontext_t *_native_current_context = NULL;
 
 volatile uintptr_t _native_user_fptr;
 
-static sigset_t _native_sig_set;
+sigset_t _native_sig_set;
 static sigset_t _native_sig_set_dint;
 volatile int _native_pending_signals;
 int _signal_pipe_fd[2];

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2018 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -24,7 +21,7 @@
 #include "board.h"
 #include "ds18.h"
 #include "ds18_params.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #define SAMPLING_PERIOD     2
 
@@ -63,7 +60,7 @@ int main(void)
             puts("[Error] Could not read temperature");
         }
 
-        xtimer_sleep(SAMPLING_PERIOD);
+        ztimer_sleep(ZTIMER_SEC, SAMPLING_PERIOD);
     }
 
     return 0;

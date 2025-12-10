@@ -110,8 +110,9 @@ info-build:
 	@echo 'DEBUGGER:       $(DEBUGGER)'
 	@echo 'DEBUGGER_FLAGS: $(DEBUGGER_FLAGS)'
 	@echo
+	@echo 'DLCACHE:            $(DLCACHE)'
+	@echo 'DLCACHE_DIR:        $(DLCACHE_DIR)'
 	@echo 'DOWNLOAD_TO_FILE:   $(DOWNLOAD_TO_FILE)'
-	@echo 'DOWNLOAD_TO_STDOUT: $(DOWNLOAD_TO_STDOUT)'
 	@echo 'UNZIP_HERE:         $(UNZIP_HERE)'
 	@echo ''
 	@echo 'DEBUGSERVER:       $(DEBUGSERVER)'
@@ -134,9 +135,25 @@ define _to_json_string_list
 [$(filter-out "","$(subst $(space),"$(comma)$(space)",$(1))")]
 endef
 
-# Strips out any existing quotes so that the generated JSON is valid, not necessary sensible
+json_escape_swap := EsCaPe
+json_escape_quote := QuOtE
+# Corrects quotation and escape sequences in a string to be JSON compliant.
+# This does not support the use of single quotation. All single quotation marks
+# are removed.
 define to_json_string_list
-$(call _to_json_string_list,$(strip $(subst ",,$(subst \",,$(1)))))
+$(call _to_json_string_list,$(strip $(subst $(json_escape_swap),\,\
+  $(subst $(json_escape_quote),",\
+  $(subst \,$(json_escape_swap)$(json_escape_swap),\
+  $(subst \/,$(json_escape_swap)/,\
+  $(subst \b,$(json_escape_swap)b,\
+  $(subst \f,$(json_escape_swap)f,\
+  $(subst \n,$(json_escape_swap)n,\
+  $(subst \r,$(json_escape_swap)r,\
+  $(subst \t,$(json_escape_swap)t,\
+  $(subst \u,$(json_escape_swap)u,\
+  $(subst ',,\
+  $(subst ",$(json_escape_swap)$(json_escape_quote),\
+  $(1)))))))))))))))
 endef
 
 # Crude json encoded build info.
@@ -144,8 +161,7 @@ endef
 # converting the space separated lists in Make to a JSON array is flawed, it
 # doesn't consider quoted parts as a single list item.  This mainly shows up in
 # cflags such as:  -DNIMBLE_HOST_PRIO="(NIMBLE_CONTROLLER_PRIO + 1)", this is
-# splitted into 3 array elements. To ensure that the generated JSON is valid,
-# double quotes are currently stripped before generating the array.
+# splitted into 3 array elements.
 info-build-json:
 	@echo '{ '
 	@echo '"APPLICATION": "$(APPLICATION)",'
@@ -156,15 +172,19 @@ info-build-json:
 	@echo '"BOARDDIR": "$(BOARDDIR)",'
 	@echo '"RIOTCPU": "$(RIOTCPU)",'
 	@echo '"RIOTPKG": "$(RIOTPKG)",'
-	@echo '"EXTERNAL_BOARD_DIRS": $(call json_string_or_null,$(EXTERNAL_BOARD_DIRS)),'
+	@echo '"EXTERNAL_BOARD_DIRS": $(call to_json_string_list,$(EXTERNAL_BOARD_DIRS)),'
 	@echo '"BINDIR": "$(BINDIR)",'
 	@echo '"ELFFILE": "$(ELFFILE)",'
 	@echo '"HEXFILE": "$(HEXFILE)",'
 	@echo '"BINFILE": "$(BINFILE)",'
 	@echo '"FLASHFILE": "$(FLASHFILE)",'
+	@echo '"EXTERNAL_MODULE_DIRS": $(call to_json_string_list,$(EXTERNAL_MODULE_DIRS)),'
+	@echo '"EXTERNAL_MODULE_PATHS": $(call to_json_string_list,$(EXTERNAL_MODULE_PATHS)),'
+	@echo '"EXTERNAL_PKG_DIRS": $(call to_json_string_list,$(EXTERNAL_PKG_DIRS)),'
 	@echo '"DEFAULT_MODULE": $(call to_json_string_list,$(sort $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE)))),'
 	@echo '"DISABLE_MODULE": $(call to_json_string_list,$(sort $(DISABLE_MODULE))),'
 	@echo '"USEMODULE": $(call to_json_string_list,$(sort $(filter-out $(DEFAULT_MODULE), $(USEMODULE)))),'
+	@echo '"USEPKG": $(call to_json_string_list,$(sort $(USEPKG))),'
 	@echo '"FEATURES_USED": $(call to_json_string_list,$(FEATURES_USED)),'
 	@echo '"FEATURES_REQUIRED": $(call to_json_string_list,$(sort $(FEATURES_REQUIRED))),'
 	@echo '"FEATURES_REQUIRED_ANY": $(call to_json_string_list,$(sort $(FEATURES_REQUIRED_ANY))),'

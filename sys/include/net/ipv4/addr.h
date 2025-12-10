@@ -48,6 +48,11 @@ extern "C" {
 #define IPV4_ADDR_INIT(a, b, c, d) { .u8 = {a, b, c, d} }
 
 /**
+ * @brief   Static initializer for the loopback IPv4 address (127.0.0.1)
+ */
+#define IPV4_ADDR_LOOPBACK          IPV4_ADDR_INIT(127, 0, 0, 1)
+
+/**
  * @brief Data type to represent an IPv4 address.
  */
 typedef union {

@@ -1078,11 +1078,13 @@ static int _create_candidate_set(const gnrc_netif_t *netif,
              *  (so don't consider tentative addresses for source address
              *  selection) */
             gnrc_netif_ipv6_addr_dad_trans(netif, i)) {
+            DEBUG(" -> skip tentative address\n");
             continue;
         }
         /* Check if we only want link local addresses */
         if (ll_only && !ipv6_addr_is_link_local(tmp)) {
-            continue;
+           DEBUG(" -> skip non link-local address\n");
+           continue;
         }
         /* "For all multicast and link-local destination addresses, the set of
          *  candidate source addresses MUST only include addresses assigned to
@@ -1743,12 +1745,10 @@ static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
 
         /* First drain the queues before blocking the thread */
         /* Events will be handled before messages */
-        DEBUG("gnrc_netif: handling events\n");
         event_t *evp;
         /* We can not use event_loop() or event_wait() because then we would not
          * wake up when a message arrives */
         while ((evp = _gnrc_netif_fetch_event(netif))) {
-            DEBUG("gnrc_netif: event %p\n", (void *)evp);
             if (evp->handler) {
                 evp->handler(evp);
             }
@@ -1758,7 +1758,6 @@ static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
         if (msg_waiting > 0) {
             return;
         }
-        DEBUG("gnrc_netif: waiting for events\n");
         /* Block the thread until something interesting happens */
         thread_flags_wait_any(THREAD_FLAG_MSG_WAITING | THREAD_FLAG_EVENT);
     }
@@ -1923,11 +1922,6 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
             /* try to send anyway */
         }
     }
-    /* hold in case device was busy to not having to rewrite *all* the link
-     * layer implementations in case `gnrc_netif_pktq` is included */
-    if (gnrc_netif_netdev_legacy_api(netif)) {
-        gnrc_pktbuf_hold(pkt, 1);
-    }
 #endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
 
     /* Record send in neighbor statistics if destination is unicast */
@@ -1948,11 +1942,19 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
     /* Split off the TX sync snip */
     gnrc_pktsnip_t *tx_sync = IS_USED(MODULE_GNRC_TX_SYNC)
                             ? gnrc_tx_sync_split(pkt) : NULL;
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+    /* hold in case device was busy to not having to rewrite *all* the link
+     * layer implementations in case `gnrc_netif_pktq` is included */
+    if (gnrc_netif_netdev_legacy_api(netif)) {
+        gnrc_pktbuf_hold(pkt, 1);
+    }
+#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
     int res = netif->ops->send(netif, pkt);
 
     /* For legacy netdevs (no confirm_send) TX is blocking, thus it is always
-     * completed. For new netdevs (with confirm_send), TX is async. It is only
-     * done if TX failed right away (res < 0).
+     * completed. For new netdevs (with confirm_send), TX is usually async (res == 0).
+     * It is only done if TX failed right away (res < 0) or if the driver signaled
+     * that the transmission already completed (res > 0).
      */
     if (gnrc_netif_netdev_legacy_api(netif) || (res != 0)) {
         _tx_done(netif, pkt, tx_sync, res, push_back);
@@ -1962,11 +1964,11 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
         /* new API *and* send() was a success --> block netif and memorize
          * frame to free memory later */
         netif->tx_pkt = pkt;
-    }
 
-    gnrc_pkt_append(pkt, tx_sync);
-    if (IS_USED(MODULE_GNRC_NETIF_PKTQ) && push_back) {
-        netif->flags |= GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE;
+        gnrc_pkt_append(pkt, tx_sync);
+        if (IS_USED(MODULE_GNRC_NETIF_PKTQ) && push_back) {
+            netif->flags |= GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE;
+        }
     }
 #endif
 }

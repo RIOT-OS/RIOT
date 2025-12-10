@@ -182,7 +182,7 @@ announcement can be skipped and the fix merged once at least two ACKs are
 there.
 
 [list of maintainers]: https://riot-os.org/maintainers.html
-[Best Practices]: https://doc.riot-os.org/dev-best-practices.html
-[Comparing build sizes]: https://doc.riot-os.org/advanced-build-system-tricks.html#comparing-build-sizes
-[Coding Conventions]: CODING_CONVENTIONS.md
-[Code of Conduct]: https://github.com/RIOT-OS/RIOT/blob/master/CODE_OF_CONDUCT.md
+[Best Practices]: https://guide.riot-os.org/misc/dev_best_practices/
+[Comparing build sizes]: https://guide.riot-os.org/build-system/advanced_build_system_tricks/#comparing-build-sizes
+[Coding Conventions]: https://guide.riot-os.org/c_tutorials/coding_conventions/
+[Code of Conduct]: https://guide.riot-os.org/general/code_of_conduct/

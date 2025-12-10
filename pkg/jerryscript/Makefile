@@ -46,12 +46,15 @@ $(BINDIR)/jerryscript.a: $(PKG_BUILD_DIR)/Makefile
 	@cp $(PKG_BUILD_DIR)/lib/libjerry-ext.a $(BINDIR)/jerryscript-ext.a
 	@cp $(PKG_BUILD_DIR)/lib/libjerry-port-default.a $(BINDIR)/jerryscript-port-default.a
 
+# TODO: Drop `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` once upstream is compatible
+#       with newer cmake (e.g. compilation still succeeds with cmake 4.x)
 $(PKG_BUILD_DIR)/Makefile:
 	cmake -B$(PKG_BUILD_DIR) -H$(PKG_SOURCE_DIR) \
 	 -DCMAKE_SYSTEM_NAME=RIOT \
 	 -DCMAKE_SYSTEM_PROCESSOR="$(MCPU)" \
 	 -DCMAKE_C_COMPILER=$(CC) \
 	 -DCMAKE_C_COMPILER_WORKS=TRUE \
+	 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
 	 -DENABLE_LTO=OFF \
 	 -DENABLE_AMALGAM=OFF \
 	 -DHAVE_TIME_H=0 \

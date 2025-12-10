@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
- *               2013 Freie Universität Berlin
- *               2017 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2013 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2017 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -62,20 +59,21 @@
  *
  * Or use the clist_foreach() helper function, e.g.,:
  *
- *    static int _print_node(clist_node_t *node)
- *    {
- *        printf("0x%08x ", (unsigned)node);
- *        return 0;
- *    }
+ *     static int _print_node(clist_node_t *node, void *arg)
+ *     {
+ *         (void) arg; // unused optional argument
+ *         printf("0x%08x ", (unsigned)node);
+ *         return 0;
+ *     }
  *
- *    [...]
- *    clist_foreach(&list, _print_node);
+ *     [...]
+ *     clist_foreach(&list, _print_node, NULL);
  *
  * To use clist as a queue, use clist_rpush() for adding elements and clist_lpop()
  * for removal. Using clist_lpush() and clist_rpop() is inefficient due to
  * clist_rpop()'s O(n) runtime.
  *
- * To use clist as stack, use clist_lpush()/clist_lpop().
+ * To use clist as stack, use clist_lpush() / clist_lpop().
  *
  * Implementation details:
  *

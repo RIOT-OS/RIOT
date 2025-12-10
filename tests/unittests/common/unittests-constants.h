@@ -1,13 +1,10 @@
 /*
- * Copyright (C) 2015 Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#ifndef UNITTESTS_CONSTANTS_H
-#define UNITTESTS_CONSTANTS_H
+#pragma once
+
 #include <limits.h>
 #include <stdint.h>
 
@@ -68,5 +65,4 @@ extern "C" {
 }
 #endif
 
-#endif /* UNITTESTS_CONSTANTS_H */
 /** @} */

@@ -1,9 +1,6 @@
 <!--
-Copyright (C) 2025 Gunar Schorcht
-
-This file is subject to the terms and conditions of the GNU Lesser
-General Public License v2.1. See the file LICENSE in the top level
-directory for more details.
+SPDX-FileCopyrightText: 2025 Gunar Schorcht
+SPDX-License-Identifier: LGPL-2.1-only
 -->
 
 @defgroup     stdio_usb_serial_jtag  STDIO over ESP32 Debug Serial/JTAG
@@ -497,7 +494,7 @@ The easiest way to use the ESP32 toolchain is to use the RIOT Docker build
 image. It is specially prepared for building RIOT applications for various
 platforms and already has all the required tools and packages installed.
 Details on how to setup Docker can be found in section
-[Getting Started](https://doc.riot-os.org/getting-started.html#docker).
+[Build in Docker](https://guide.riot-os.org/build-system/build-in-docker/).
 
 The building process using Docker comprises two steps:
 
@@ -525,7 +522,7 @@ $ BUILD_IN_DOCKER=1 make flash BOARD=...
 ### Prerequisites
 
 In addition to the common tools defined in section
-[Getting Started - Common Tools](https://doc.riot-os.org/getting-started.html#compiling-riot),
+[Getting Started - Setup Development Environment](https://guide.riot-os.org/getting-started/installing/),
 the following tools or packages are required to install and use the ESP32
 toolchain (Debian/Ubuntu package names):
 
@@ -1691,7 +1688,7 @@ line, for example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi \
 CFLAGS='-DWIFI_SSID=\"MySSID\" -DWIFI_PASS=\"MyPassphrase\"' \
-make -C examples/networking/gnrc/gnrc_networking BOARD=...
+make -C examples/networking/gnrc/networking BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note
@@ -1748,7 +1745,7 @@ line, for example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi_enterprise \
 CFLAGS='-DWIFI_SSID=\"MySSID\" -DWIFI_EAP_ID=\"anonymous\" -DWIFI_EAP_USER=\"MyUserName\" -DWIFI_EAP_PASS=\"MyPassphrase\"' \
-make -C examples/networking/gnrc/gnrc_networking BOARD=...
+make -C examples/networking/gnrc/networking BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note
@@ -1800,7 +1797,7 @@ line, for example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 USEMODULE=esp_wifi_ap \
 CFLAGS='-DWIFI_SSID=\"MySSID\" -DWIFI_PASS=\"MyPassphrase\" -DESP_WIFI_MAX_CONN=1' \
-make -C examples/networking/gnrc/gnrc_networking BOARD=...
+make -C examples/networking/gnrc/networking BOARD=...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 @note

@@ -475,7 +475,7 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
         suit_component_set_flag(comp, SUIT_COMPONENT_STATE_FETCH_FAILED);
         /* TODO: The leftover data from a failed fetch should be purged. It
          * could contain potential malicious data from an attacker */
-        LOG_INFO("image download failed with code %i\n", res);
+        LOG_INFO("image download (%s) failed with code %i\n", manifest->urlbuf, res);
         return res;
     }
 

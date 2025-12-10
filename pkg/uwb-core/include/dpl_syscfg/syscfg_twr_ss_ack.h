@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_uwb_core
  * @{
@@ -17,9 +19,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
-
-#ifndef DPL_SYSCFG_SYSCFG_TWR_SS_ACK_H
-#define DPL_SYSCFG_SYSCFG_TWR_SS_ACK_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,5 +48,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* DPL_SYSCFG_SYSCFG_TWR_SS_ACK_H */

@@ -19,6 +19,7 @@ from scapy.all import Ether, ICMPv6PacketTooBig, IPv6, IPv6ExtHdrFragment, \
 from testrunner import run, check_unittests
 
 
+BOARD = os.environ.get("BOARD", "")
 RECV_BUFSIZE = 2 * 1500
 TEST_SAMPLE = b"This is a test. Failure might sometimes be an option, but " \
               b"not today. "
@@ -156,6 +157,39 @@ def test_reass_offset_too_large(child, iface, hw_dst, ll_dst, ll_src):
     pktbuf_empty(child)
 
 
+def test_reass_empty_fragment(child, iface, hw_dst, ll_dst, ll_src):
+    # Originally proposed by Nils Bernsdorf (Uni Saarland), adapted by Martine Lenders
+    # send the first packet (without payload) to initialize the reassembly buffer
+    # with a null pointer
+    sendp(Ether(dst=hw_dst) / IPv6(dst=ll_dst, src=ll_src) /
+          IPv6ExtHdrFragment(id=0xabcd, nh=0, m=1, offset=0),
+          iface=iface, verbose=0)
+    # send the second packet to potentially trigger a memcpy
+    sendp(Ether(dst=hw_dst) / IPv6(dst=ll_dst, src=ll_src) /
+          IPv6ExtHdrFragment(id=0xabcd, nh=0, m=1, offset=0) /
+          (b"A" * (24 - 8)),
+          iface=iface, verbose=0)
+    time.sleep(11)  # let reassembly buffer garbage collect
+    pktbuf_empty(child)
+
+
+def test_reass_first_fragment_repeat(child, iface, hw_dst, ll_dst, ll_src):
+    # Originally proposed by Nils Bernsdorf (Uni Saarland), adapted by Martine Lenders
+    # send the first packet to initialize the reassembly buffer
+    sendp(Ether(dst=hw_dst) / IPv6(dst=ll_dst, src=ll_src) /
+          IPv6ExtHdrFragment(id=0xabcd, nh=0, m=1, offset=0) /
+          (b"A"*(24-8)),
+          iface=iface, verbose=0)
+    # send the a second larger packet (also with offset 0) to trigger the buffer
+    # overflow
+    sendp(Ether(dst=hw_dst) / IPv6(dst=ll_dst, src=ll_src) /
+          IPv6ExtHdrFragment(id=0xabcd, nh=0, m=1, offset=0) /
+          (b"A"*(128-8)),
+          iface=iface, verbose=0)
+    # the fragments should be discarded
+    pktbuf_empty(child)
+
+
 def test_ipv6_ext_frag_shell_test_0(child, s, iface, ll_dst):
     child.sendline("test {} 0".format(ll_dst))
     data, _ = s.recvfrom(RECV_BUFSIZE)
@@ -180,7 +214,7 @@ def _check_iface(child):
     mock_id = None
     hwaddr = None
     for _ in range(2):
-        child.expect(r"Iface\s+(\d+)\s+.*")
+        child.expect(r"Iface\s+(\d+)\s+.*\n")
         match = re.search(r"HWaddr:\s+([0-9A-F:]{17})\s+",
                           child.match.group(0))
         if match is not None:
@@ -242,8 +276,13 @@ def test_ipv6_ext_frag_send_last_fragment_only_one_byte(child, s,
 def test_ipv6_ext_frag_send_full_pktbuf(child, s, iface, ll_dst):
     length = pktbuf_size(child)
     # remove some slack for meta-data and header and 1 addition fragment header
+    slack = 96
+    if BOARD in ["native64"]:
+        # size_t and pointers are 4 bytes larger in 64-bit architectures, so add some
+        # more slack per snip, since they are larger
+        slack += 96
     length -= (len(IPv6() / IPv6ExtHdrFragment() / UDP()) +
-               (len(IPv6() / IPv6ExtHdrFragment())) + 96)
+               (len(IPv6() / IPv6ExtHdrFragment())) + slack)
     port = s.getsockname()[1]
     ethos_id, _, _ = _check_iface(child)
     # trigger neighbor discovery so it doesn't fill the packet buffer
@@ -379,7 +418,7 @@ def testfunc(child):
         run_sock_test(test_ipv6_ext_frag_fwd_success, s)
         run_sock_test(test_ipv6_ext_frag_fwd_too_big, s)
 
-    if not os.environ.get("BOARD", "") in ['native', 'native32', 'native64']:
+    if BOARD not in ['native', 'native32', 'native64']:
         # ethos currently can't handle the larger, rapidly sent packets by the
         # IPv6 fragmentation of the Linux Kernel
         print("SUCCESS")
@@ -422,6 +461,8 @@ def testfunc(child):
     run(test_reass_successful_udp)
     run(test_reass_too_short_header)
     run(test_reass_offset_too_large)
+    run(test_reass_empty_fragment)
+    run(test_reass_first_fragment_repeat)
     print("SUCCESS")
 
 
