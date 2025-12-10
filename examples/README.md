@@ -127,6 +127,13 @@ Here is a quick overview of the examples available in the RIOT:
 | [benckmark_udp](./networking/misc/benchmark_udp/README.md) | This example uses the `benchmark_udp` module to create a stress-test for the RIOT network stack. |
 | [sock_tcp_echo](./networking/misc/sock_tcp_echo/README.md) | This is a simple TCP echo server / client that uses the SOCK API. |
 
+### Zigbee
+
+| Example | Description |
+|---------|-------------|
+| [zigbee-lightbulb](./networking/zigbee-lightbulb/README.md) | This application allows a microcontroller to perform as a lightbulb using ZBOSS in RIOT. |
+| [zigbee-remote](./networking/zigbee-remote/README.md) | This application allows a microcontroller to perform as a remote control using ZBOSS in RIOT. |
+
 ## Advanced Examples
 
 | Example | Description |
