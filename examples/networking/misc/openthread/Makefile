@@ -27,6 +27,11 @@ BOARDS_SUPPORTED := \
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../../..
 
+# (optional) Absolute path to expand the OpenThread config
+# All options under https://openthread.io/reference - config variables
+OT_PROJECT_CONFIG_PATH ?= $(CURDIR)/project_conf.h
+export OT_PROJECT_CONFIG_PATH
+
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
@@ -48,12 +53,24 @@ USEMODULE += openthread-cli-$(OPENTHREAD_TYPE)
 
 USEMODULE += netdev_default
 
-#Define PANID, CHANNEL and UART_BAUDRATE used by default
+#Define PANID, CHANNEL and NETWORK_KEY used by default
 OPENTHREAD_PANID ?= 0xbeef
 OPENTHREAD_CHANNEL ?= 26
+OPENTHREAD_NETWORK_KEY ?= "\"00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff\""
 
 CFLAGS += -DOPENTHREAD_PANID=$(OPENTHREAD_PANID)
 CFLAGS += -DOPENTHREAD_CHANNEL=$(OPENTHREAD_CHANNEL)
+CFLAGS += -DOPENTHREAD_NETWORK_KEY=$(OPENTHREAD_NETWORK_KEY)
+
+# Setting network name, mesh prefix and the extended PAN ID is optional
+# OPENTHREAD_NETWORK_NAME ?= "\"ot-net\""
+# OPENTHREAD_MESH_PREFIX ?= "\"fd:05:77:bd:d2:c1:da:be\""
+# OPENTHREAD_EXT_PANID ?= "\"de:ad:00:be:ef:00:ca:fe\""
+
+# CFLAGS += -DOPENTHREAD_NETWORK_NAME=$(OPENTHREAD_NETWORK_NAME)
+# CFLAGS += -DOPENTHREAD_MESH_PREFIX=$(OPENTHREAD_MESH_PREFIX)
+# CFLAGS += -DOPENTHREAD_EXT_PANID=$(OPENTHREAD_EXT_PANID)
+
 
 ifneq (,$(filter samr21-xpro,$(BOARD)))
   DRIVER := at86rf233

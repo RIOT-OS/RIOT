@@ -17,10 +17,12 @@
  * @}
  */
 
+#define OT_NETWORK_KEY_SIZE 16
+
+#include <ctype.h>
 #include <errno.h>
 #include <string.h>
 #include "msg.h"
-#include "openthread/cli.h"
 #include "openthread/instance.h"
 #include "openthread/ip6.h"
 #include "openthread/platform/alarm-milli.h"
@@ -35,6 +37,29 @@
 static otInstance *sInstance;   /**< global OpenThread instance */
 static netdev_t *_dev;          /**< netdev descriptor for OpenThread */
 static event_queue_t ev_queue;  /**< the event queue for OpenThread */
+
+static int bytes_from_str(uint8_t *buf, int buf_len, const char *src)
+{
+    size_t i;
+    size_t src_len = strlen(src);
+    char *endptr;
+
+    for (i = 0U; i < src_len; i++) {
+        if (!isxdigit((unsigned char)src[i]) &&
+            src[i] != ':') {
+            return -EINVAL;
+        }
+    }
+
+    (void)memset(buf, 0, buf_len);
+
+    for (i = 0U; i < (size_t)buf_len; i++) {
+        buf[i] = (uint8_t)strtol(src, &endptr, 16);
+        src = ++endptr;
+    }
+
+    return 0;
+}
 
 static void _ev_isr_handler(event_t *event)
 {
@@ -79,8 +104,45 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
     }
 }
 
+static void _openthread_manual_config(otInstance *sInstance)
+{
+    /* Init default parameters */
+    otPanId panid = OPENTHREAD_PANID;
+    uint8_t channel = OPENTHREAD_CHANNEL;
+    char *networkkey = OPENTHREAD_NETWORK_KEY;
+    otNetworkKey otNetKey;
+
+    otLinkSetChannel(sInstance, channel);
+    otLinkSetPanId(sInstance, panid);
+
+    bytes_from_str(otNetKey.m8, OT_NETWORK_KEY_SIZE, networkkey);
+    otThreadSetNetworkKey(sInstance, &otNetKey);
+
+    /* Init optional parameters */
+#ifdef OPENTHREAD_NETWORK_NAME
+    char *networkname = OPENTHREAD_NETWORK_NAME;
+    otThreadSetNetworkName(sInstance, networkname);
+#endif
+
+#ifdef OPENTHREAD_MESH_PREFIX
+    otMeshLocalPrefix otMeshLocalPrefix;
+    char *meshprefix = OPENTHREAD_MESH_PREFIX;
+    bytes_from_str(otMeshLocalPrefix.m8, OT_MESH_LOCAL_PREFIX_SIZE, meshprefix);
+    otThreadSetMeshLocalPrefix(sInstance, &otMeshLocalPrefix);
+#endif
+
+#ifdef OPENTHREAD_EXT_PANID
+    otExtendedPanId otExtPanId;
+    char *extpanid = OPENTHREAD_EXT_PANID;
+    bytes_from_str(otExtPanId.m8, OT_EXT_PAN_ID_SIZE, extpanid);
+    otThreadSetExtendedPanId(sInstance, &otExtPanId);
+#endif
+}
+
 static void *_openthread_event_loop(void *arg)
 {
+    otError error;
+
     _dev = arg;
     netdev_t *netdev = arg;
 
@@ -97,16 +159,20 @@ static void *_openthread_event_loop(void *arg)
 
 #if defined(MODULE_OPENTHREAD_CLI_FTD) || defined(MODULE_OPENTHREAD_CLI_MTD)
     ot_shell_init(sInstance);
-    /* Init default parameters */
-    otPanId panid = OPENTHREAD_PANID;
-    uint8_t channel = OPENTHREAD_CHANNEL;
-    otLinkSetPanId(sInstance, panid);
-    otLinkSetChannel(sInstance, channel);
+#endif
+
     /* Bring up the IPv6 interface  */
-    otIp6SetEnabled(sInstance, true);
+    error = otIp6SetEnabled(sInstance, true);
+
+    /* Manually configure OpenThread requires -DOT_OPERATIONAL_DATASET_AUTO_INIT=1 */
+    _openthread_manual_config(sInstance);
+
     /* Start Thread protocol operation */
     otThreadSetEnabled(sInstance, true);
-#endif
+
+    if (error != OT_ERROR_NONE) {
+        printf("pkg/openthread: Error in initialization\n");
+    }
 
 #if OPENTHREAD_ENABLE_DIAG
     diagInit(sInstance);

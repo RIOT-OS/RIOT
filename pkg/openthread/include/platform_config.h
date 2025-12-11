@@ -23,24 +23,18 @@ extern "C" {
 #endif
 
 /**
- * @def OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS
+ * @def OPENTHREAD_CONFIG_TCP_ENABLE
  *
- * The number of message buffers in buffer pool
+ * If set to 1 enables TCP in OpenThread. Currently not supported
  */
-#if OPENTHREAD_MTD
-#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS       (20U)
-#else
-#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS       (10U)
-#endif
+#define OPENTHREAD_CONFIG_TCP_ENABLE 0
 
 /**
- * @def OPENTHREAD_CONFIG_LOG_LEVEL
+ * @def OPENTHREAD_CONFIG_THREAD_VERSION
  *
- * Set OpenThread log level
- *
- * @see https://openthread.io/releases/thread-reference-20170716/group/plat-logging
+ * Set the version of the thread protocol specification.
  */
-#define OPENTHREAD_CONFIG_LOG_LEVEL OT_LOG_LEVEL_NONE
+#define OPENTHREAD_CONFIG_THREAD_VERSION OT_THREAD_VERSION_1_4
 
 #ifdef __cplusplus
 }
