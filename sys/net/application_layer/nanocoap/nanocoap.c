@@ -461,8 +461,6 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, uint8_
 {
     uint8_t *optpos = coap_find_option(pkt, option);
     if (!optpos) {
-        *blknum = 0;
-        *szx = 0;
         return -1;
     }
 
