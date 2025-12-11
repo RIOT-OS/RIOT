@@ -69,18 +69,15 @@ static inline void slipdev_unlock(void)
 }
 
 static inline void _slipdev_stdio_add_to_frame(slipdev_t * dev, uint8_t byte) {
-#if IS_USED(MODULE_SLIPDEV_STDIO)
-    if (dev->config.uart == slipdev_params[0].uart) {
-        isrpipe_write_one(&stdin_isrpipe, byte);
+    if (IS_USED(MODULE_SLIPDEV_STDIO)) {
+        if (dev->config.uart == slipdev_params[0].uart) {
+            isrpipe_write_one(&stdin_isrpipe, byte);
+        }
     }
-#else
-    (void) dev;
-    (void) byte;
-#endif
 }
 
 static inline bool _slipdev_config_start_frame(slipdev_t * dev) {
-#if IS_USED(MODULE_SLIPDEV_CONFIG)
+#ifdef MODULE_SLIPDEV_CONFIG
     /* try to create new configuration / CoAP frame */
     return crb_start_chunk(&dev->rb_config);
 #else
@@ -90,7 +87,7 @@ static inline bool _slipdev_config_start_frame(slipdev_t * dev) {
 }
 
 static inline void _slipdev_config_end_frame(slipdev_t * dev) {
-#if IS_USED(MODULE_SLIPDEV_CONFIG)
+#ifdef MODULE_SLIPDEV_CONFIG
     crb_end_chunk(&dev->rb_config, true);
     thread_flags_set(thread_get(dev->coap_server_pid), 1);
 #else
@@ -99,7 +96,7 @@ static inline void _slipdev_config_end_frame(slipdev_t * dev) {
 }
 
 static inline bool _slipdev_config_add_to_frame(slipdev_t * dev, uint8_t byte) {
-#if IS_USED(MODULE_SLIPDEV_CONFIG)
+#ifdef MODULE_SLIPDEV_CONFIG
     /* discard frame if byte can't be added */
     if (!crb_add_byte(&dev->rb_config, byte)) {
         DEBUG("slipmux: coap rx buffer full, drop frame\n");
