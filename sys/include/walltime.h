@@ -132,6 +132,11 @@ time_t walltime_get_unix(uint16_t *ms);
 uint32_t walltime_uptime(bool full);
 
 /**
+ * @brief   Backend implementation init, only implement when necessary.
+ */
+void walltime_impl_init(void);
+
+/**
  * @brief   Backend implementation to set the system time
  *
  * @param[in] time  The current data / time to set

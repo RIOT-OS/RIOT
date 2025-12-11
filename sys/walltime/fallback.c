@@ -42,3 +42,9 @@ int walltime_impl_set(struct tm *time)
     ztimer_offset = rtc_mktime(time) - ztimer_now(ZTIMER_MSEC) / 1000;
     return 0;
 }
+
+__attribute__((weak))
+void walltime_impl_init(void)
+{
+    /* no-op */
+}

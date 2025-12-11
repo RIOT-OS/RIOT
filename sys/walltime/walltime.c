@@ -136,6 +136,8 @@ uint32_t walltime_uptime(bool full)
 
 static void auto_init_uptime(void)
 {
+    walltime_impl_init();
+
     _boottime = walltime_get_riot(NULL);
 #ifdef BACKUP_RAM
     if (!cpu_woke_from_backup()) {
