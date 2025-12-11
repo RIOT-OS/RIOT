@@ -1426,6 +1426,8 @@ void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
         if (CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX - 4 < szx) {
             szx = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX - 4;
         }
+    } else {
+        szx = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX - 4;
     }
 
     coap_block_slicer_init(slicer, blknum, coap_szx2size(szx));
