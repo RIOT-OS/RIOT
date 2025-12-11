@@ -23,6 +23,7 @@
 #include "log.h"
 #include "slipdev.h"
 #include "slipdev_internal.h"
+#include "slipdev_params.h"
 #include "net/eui_provider.h"
 
 /* XXX: BE CAREFUL ABOUT USING OUTPUT WITH MODULE_SLIPDEV_STDIO IN SENDING
@@ -69,7 +70,7 @@ static inline void slipdev_unlock(void)
 
 static inline void _slipdev_stdio_add_to_frame(slipdev_t * dev, uint8_t byte) {
 #if IS_USED(MODULE_SLIPDEV_STDIO)
-    if (dev->config.uart == STDIO_UART_DEV) {
+    if (dev->config.uart == slipdev_params[0].uart) {
         isrpipe_write_one(&stdin_isrpipe, byte);
     }
 #else
