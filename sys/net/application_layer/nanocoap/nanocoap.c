@@ -461,8 +461,6 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, uint8_
 {
     uint8_t *optpos = coap_find_option(pkt, option);
     if (!optpos) {
-        *blknum = 0;
-        *szx = 0;
         return -1;
     }
 
@@ -1041,15 +1039,11 @@ static unsigned _slicer2blkopt(coap_block_slicer_t *slicer, bool more)
 
 int coap_get_block(coap_pkt_t *pkt, coap_block1_t *block, uint16_t option)
 {
+    block->blknum = 0;
     block->more = coap_get_blockopt(pkt, option, &block->blknum, &block->szx);
-    if (block->more >= 0) {
-        block->offset = block->blknum << (block->szx + 4);
-    }
-    else {
-        block->offset = 0;
-    }
+    block->offset = block->blknum << (block->szx + 4);
 
-    return (block->more >= 0);
+    return block->more >= 0;
 }
 
 size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t lastonum)
@@ -1417,7 +1411,7 @@ void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
 void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
 {
     uint32_t blknum = 0;
-    uint8_t szx = 0;
+    uint8_t szx = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX - 4;
 
     /* Retrieve the block2 option from the client request */
     if (coap_get_blockopt(pkt, COAP_OPT_BLOCK2, &blknum, &szx) >= 0) {
