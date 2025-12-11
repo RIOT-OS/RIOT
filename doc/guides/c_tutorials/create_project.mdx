@@ -5,6 +5,7 @@ code_folder: examples/guides/creating_project/
 ---
 import Contact from '@components/contact.astro';
 import GitSetup from '@components/gitsetup.mdx';
+import FileTree from '@components/FileTree.astro';
 
 Now that we have played around with the examples and have a basic understanding of how to use RIOT,
 let's create a new project from scratch.
@@ -96,6 +97,15 @@ include $(RIOTBASE)/Makefile.include
 
 ![The Makefile in Visual Studio Code](img/create_project/04_makefile.png)
 
+By now, your project directory should look like this:
+
+<FileTree>
+- hello_world
+    - RIOT/
+    - **Makefile**
+    - **main.c**
+</FileTree>
+
 Congratulations! You have now created a new project with a simple hello world program.
 In the next step, we will build and run our program just like we did in the "Getting Started" guide.
 
@@ -173,6 +183,16 @@ bin/
 *.a
 *.out
 ```
+
+The `.gitignore` should sit in the root of your project directory, like this:
+
+<FileTree>
+- hello_world
+    - RIOT/
+    - Makefile
+    - main.c
+    - **.gitignore**
+</FileTree>
 :::
 
 ## Conclusion

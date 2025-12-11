@@ -1,4 +1,3 @@
-// @ts-check
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import rehypeGithubEmoji from "rehype-github-emoji";
