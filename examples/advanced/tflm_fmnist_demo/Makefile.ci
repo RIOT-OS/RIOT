@@ -1,2 +1,3 @@
-# Boards that cannot link this example due to tiny Flash/RAM
-BOARD_INSUFFICIENT_MEMORY := stk3200
+BOARD_INSUFFICIENT_MEMORY := \
+    msba2 \
+    stk3200
