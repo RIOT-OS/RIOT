@@ -296,9 +296,10 @@ of code.
 
 * The include of system headers (in <>-brackets) always precedes RIOT specific
   includes (in quotes).
-* Optional headers must only be included if their corresponding module is
-  selected/being build. In other words: always put an `#ifdef MODULE_...`
-  statement around includes of optional headers:
+* Headers should only be guarded if they are not always available, i.e.,
+  if they explicitly depend on a module. If that is the case, the import
+  should be guarded with `#ifdef MODULE_...` statements:
+
 ```c
 #ifdef MODULE_ABC
 #  include "abc.h"
