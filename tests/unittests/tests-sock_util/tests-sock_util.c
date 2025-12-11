@@ -47,9 +47,11 @@
 #define TEST_URL_LONG_HOSTPORT      "https://veryveryvery.long.hostname.that." \
                                     "doesnt.fit.inside.sixtyfour.characters." \
                                     "of.buffer.space/localpart"
-#define TEST_URL_LONG_URLPATH       "http://shorthostname/very/very/long/ " \
-                                    "path/that/doesnt/fit/inside/sixtyfour/" \
-                                    "chars/of/buffer/space"
+#define TEST_URL_LONG_URLPATH       "http://shorthostname/super/duper/"\
+                                    "mega/ultra/collssaly/massively/long/ " \
+                                    "path/that/doesnt/fit/inside/" \
+                                    "one-hundred-and-twentyfour/bytes/" \
+                                    "/of/preallocated/buffer/space"
 
 static char addr[CONFIG_SOCK_URLPATH_MAXLEN];
 static char urlpath[CONFIG_SOCK_URLPATH_MAXLEN];
