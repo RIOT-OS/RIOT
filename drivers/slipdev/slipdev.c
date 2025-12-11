@@ -81,13 +81,11 @@ static inline void _slipdev_stdio_add_to_frame(slipdev_t * dev, uint8_t byte) {
 static inline bool _slipdev_config_start_frame(slipdev_t * dev) {
 #if IS_USED(MODULE_SLIPDEV_CONFIG)
     /* try to create new configuration / CoAP frame */
-    if (!crb_start_chunk(&dev->rb_config)) {
-        return 0;
-    }
+    return crb_start_chunk(&dev->rb_config);
 #else
     (void) dev;
-#endif
     return 1;
+#endif
 }
 
 static inline void _slipdev_config_end_frame(slipdev_t * dev) {
