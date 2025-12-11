@@ -3,6 +3,8 @@ title: Porting Boards
 description: Guide on how to port new boards to RIOT-OS
 ---
 
+import FileTree from '@components/FileTree.astro';
+
 At some point you might need to port a new `BOARD` to `RIOT`, either because
 that specific development board is not yet supported or because you have a
 custom `BOARD` for your project.
@@ -31,21 +33,23 @@ Makefiles. Usually a `BOARD` directory has the following structure,
 although not all of the subdirectories or Makefiles have to be present for
 a board implementation to work.
 
-```
-board-foo
-├── dist
-│   └── scripts
-├── board.c
-├── doc.md
-├── include
-│   ├── periph_conf.h
-│   ├── board.h
-│   └── gpio_params.h
-├── Makefile
-├── Makefile.dep
-├── Makefile.features
-└── Makefile.include
-```
+<FileTree>
+
+- board-foo
+    - dist
+        - scripts/
+    - board.c
+    - doc.md
+    - include
+        - periph_conf.h
+        - board.h
+        - gpio_params.h
+    - Makefile
+    - Makefile.dep
+    - Makefile.features
+    - Makefile.include
+
+</FileTree>
 
 ### Source Files
 
@@ -430,22 +434,24 @@ The directory structure of a common folder is very similar to the board
 folder structure and not all files and folders have to be present except for
 the main `Makefile`.
 
-```
-RIOT
-└── boards
-    └── common
-        └── adafruit-nrf52-bootloader
-            ├── board.c
-            ├── doc.md
-            ├── include
-            │   ├── periph_conf.h
-            │   ├── board.h
-            │   └── gpio_params.h
-            ├── Makefile
-            ├── Makefile.dep
-            ├── Makefile.features
-            └── Makefile.include
-```
+<FileTree>
+
+- RIOT
+    - boards
+        - common
+            - adafruit-nrf52-bootloader
+                - board.c
+                - doc.md
+                - include
+                    - periph_conf.h
+                    - board.h
+                    - gpio_params.h
+                - Makefile
+                - Makefile.dep
+                - Makefile.features
+                - Makefile.include
+
+</FileTree>
 
 The main `Makefile` defines the module name for the common board module and
 should follow the general naming scheme of `boards_common_awesome-common-stuff`.
@@ -502,25 +508,26 @@ external boards, e.g.: `EXTERNAL_BOARD_DIRS=/home/external-boards/` (this would
 commonly be done in your application `Makefile` or your environment). You can
 specify multiple directories separated by spaces.
 
-```
-/home
-├── RIOT
-│   └── ...
-└── external-boards
-    └── board-foo
-        ├── dist
-        │   └── scripts
-        ├── board.c
-        ├── doc.md
-        ├── include
-        │   ├── periph_conf.h
-        │   ├── board.h
-        │   └── gpio_params.h
-        ├── Makefile
-        ├── Makefile.dep
-        ├── Makefile.features
-        └── Makefile.include
-```
+<FileTree>
+
+- home
+    - RIOT/
+    - external-boards
+        - board-foo
+            - dist
+                - scripts/
+            - board.c
+            - doc.md
+            - include
+                - periph_conf.h
+                - board.h
+                - gpio_params.h
+            - Makefile
+            - Makefile.dep
+            - Makefile.features
+            - Makefile.include
+
+</FileTree>
 
 If the external `BOARD` is very similar to a `BOARD` already present in
 `RIOTBOARD`, the external `BOARD` (`board-foo`) can inherit from that
