@@ -155,37 +155,14 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, const ipv6_addr_t *
         instance_id = gnrc_rpl_gen_instance_id(local_inst_id);
     }
 
-    gnrc_rpl_dodag_t *dodag = NULL;
     gnrc_rpl_instance_t *inst = gnrc_rpl_root_instance_init(instance_id, dodag_id,
                                                             GNRC_RPL_DEFAULT_MOP);
 
     if (!inst) {
         return NULL;
     }
-
-    dodag = &inst->dodag;
-
-    dodag->dtsn = 1;
-    dodag->prf = 0;
-    dodag->dio_interval_doubl = CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS;
-    dodag->dio_min = CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN;
-    dodag->dio_redun = CONFIG_GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT;
-    dodag->default_lifetime = CONFIG_GNRC_RPL_DEFAULT_LIFETIME;
-    dodag->lifetime_unit = CONFIG_GNRC_RPL_LIFETIME_UNIT;
-    dodag->version = GNRC_RPL_COUNTER_INIT;
-    dodag->grounded = GNRC_RPL_GROUNDED;
-    dodag->node_status = GNRC_RPL_ROOT_NODE;
-    dodag->my_rank = GNRC_RPL_ROOT_RANK;
-    dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_DODAG_CONF;
-
-    if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_PIO)) {
-        dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO;
-    }
-
-    trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_MSG,
-                  (1 << dodag->dio_min), dodag->dio_interval_doubl,
-                  dodag->dio_redun);
-    gnrc_rpl_rpble_update(dodag);
+    gnrc_rpl_dodag_root_init(&inst->dodag);
+    gnrc_rpl_rpble_update(&inst->dodag);
 
     return inst;
 }
@@ -349,6 +326,19 @@ static inline void _netapi_notify_event(gnrc_netapi_notify_t *notify)
     }
 }
 
+/**
+ * @brief   Handles the timeout for floating DODAG by poisoning all routes.
+ *
+ * @param[in] dodag  Pointer to the dodag.
+ */
+static void _dodag_float_timeout(gnrc_rpl_dodag_t *dodag)
+{
+    if (dodag->grounded != GNRC_RPL_GROUNDED) {
+        gnrc_rpl_poison_routes(dodag);
+    }
+    evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&dodag->float_timeout_event);
+}
+
 static void *_event_loop(void *args)
 {
     msg_t msg, reply;
@@ -398,6 +388,11 @@ static void *_event_loop(void *args)
                 if (instance->dodag.parents == NULL) {
                     gnrc_rpl_instance_remove(instance);
                 }
+                break;
+            case GNRC_RPL_MSG_TYPE_DODAG_FLOAT_TIMEOUT:
+                DEBUG("RPL: GNRC_RPL_MSG_TYPE_DODAG_FLOAT_TIMEOUT received\n");
+                instance = msg.content.ptr;
+                _dodag_float_timeout(&instance->dodag);
                 break;
             case GNRC_RPL_MSG_TYPE_TRICKLE_MSG:
                 DEBUG("RPL: GNRC_RPL_MSG_TYPE_TRICKLE_MSG received\n");
