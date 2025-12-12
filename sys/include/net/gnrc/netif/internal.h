@@ -305,6 +305,25 @@ static inline void gnrc_netif_ipv6_bus_post(gnrc_netif_t *netif, int type,
 #endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN) */
 
 /**
+ * @brief   Posts a message to the event bus of the interface
+ *
+ * @param[in] netif     Pointer to the interface
+ * @param[in] type      [Type of the event](@ref gnrc_netif_event_t)
+ * @param[in] ctx       The context of the event
+ */
+static inline void gnrc_netif_event_bus_post(gnrc_netif_t *netif, int type,
+                                             const void *ctx)
+{
+#ifdef MODULE_GNRC_NETIF_BUS
+    msg_bus_post(&netif->bus[GNRC_NETIF_BUS_IFACE], type, ctx);
+#else
+    (void) netif;
+    (void) type;
+    (void) ctx;
+#endif
+}
+
+/**
  * @brief   Checks if the interface represents a router according to RFC 4861
  *
  * @attention   Requires prior locking
