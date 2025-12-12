@@ -9,12 +9,6 @@ config MODULE_INC_ENCODER
 menu "Incremental Rotary Encoder Driver"
     depends on USEMODULE_INC_ENCODER
 
-    config INC_ENCODER_MAX_RPM
-        int "Maximum RPM"
-        default 210
-        help
-            Defines the maximum RPM the encoder is expected to handle.
-
     config INC_ENCODER_GEAR_RED_RATIO
         int "Gear Reduction Ratio (in tenths)"
         default 204

@@ -74,6 +74,7 @@
  * @note After 327 revolutions without reading and resetting
  *       the revolution counter, the `phydat` value will overflow.
  *       Use the regular driver interface instead of SAUL if necessary.
+ *       This interface also offers a higher RPM resolution (milli-PRM).
  *
  * @{
  *
@@ -122,7 +123,7 @@ typedef struct {
     int32_t              extended_count;  /**< accumulated count of pulse overflows */
     int32_t              prev_count;      /**< number of pulses at last RPM calculation */
     int32_t              leftover_count;  /**< leftover from last reset */
-    int32_t              last_rpm;        /**< last calculated RPM value */
+    int32_t              last_mrpm;       /**< last calculated RPM value */
     ztimer_periodic_t    rpm_timer;       /**< timer used to periodically calculate RPM */
 #endif
 } inc_encoder_t;
@@ -143,12 +144,12 @@ int inc_encoder_init(inc_encoder_t *dev, const inc_encoder_params_t *params);
  * @brief          Read the current RPM of the motor.
  *
  * @param[in]      dev            Device descriptor of incremental rotary encoder
- * @param[out]     rpm            Revolutions per minute.
+ * @param[out]     mrpm           Milli-revolutions per minute.
  *                                Negative RPM responds to counter clock wise rotation.
  *
  * @return         0              on success
  */
-int inc_encoder_read_rpm(inc_encoder_t *dev, int32_t *rpm);
+int inc_encoder_read_mrpm(inc_encoder_t *dev, int32_t *mrpm);
 
 /**
  * @brief          Read and reset number of revolutions since the last readout in

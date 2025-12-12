@@ -19,21 +19,16 @@
 #include "inc_encoder_params.h"
 #include "inc_encoder_constants.h"
 
-#include <errno.h>
 #include "log.h"
 #include "time_units.h"
 
+#define MRPM_PER_RPM 1000LL
+
 /* If delta_t exceeds this threshold, the calculated RPM will be less than one
  * and will be truncated to zero.
- * When delta_t is larger than this threshold, we directly return zero
- * and prevent potential overflows in the RPM calculation.
- *
- * An overflow would occur when delta_t > INT32_MAX / (PPR * GEAR_RED_RATIO),
- * but our threshold is always lower than that because:
- *
- *     INT32_MAX > SEC_PER_MIN * US_PER_SEC * GEAR_RED_RATIO_SCALE
+ * When delta_t is larger than this threshold, we directly return zero.
  */
-#define DELTA_T_THRESHOLD ((SEC_PER_MIN * US_PER_SEC * GEAR_RED_RATIO_SCALE) \
+#define DELTA_T_THRESHOLD ((SEC_PER_MIN * US_PER_SEC * GEAR_RED_RATIO_SCALE * MRPM_PER_RPM) \
                            / (CONFIG_INC_ENCODER_PPR * CONFIG_INC_ENCODER_GEAR_RED_RATIO))
 
 /* Prototypes */
@@ -64,12 +59,12 @@ int inc_encoder_init(inc_encoder_t *dev, const inc_encoder_params_t *params)
     return 0;
 }
 
-int inc_encoder_read_rpm(inc_encoder_t *dev, int32_t *rpm)
+int inc_encoder_read_mrpm(inc_encoder_t *dev, int32_t *mrpm)
 {
     uint32_t delta_t;
     bool cw;
     if (!_read_delta_t_direction(dev, &delta_t, &cw) || (delta_t >= DELTA_T_THRESHOLD)) {
-        *rpm = 0;
+        *mrpm = 0;
         return 0;
     }
 
@@ -77,10 +72,10 @@ int inc_encoder_read_rpm(inc_encoder_t *dev, int32_t *rpm)
      * Invert and divide by the number of microseconds per minute
      * to obtain the RPM. Apply scaling factors like gear reduction
      * or pulses per revolution. */
-    *rpm = SEC_PER_MIN * US_PER_SEC * GEAR_RED_RATIO_SCALE
+    *mrpm = (MRPM_PER_RPM * SEC_PER_MIN * US_PER_SEC * GEAR_RED_RATIO_SCALE)
            / (delta_t * CONFIG_INC_ENCODER_PPR * CONFIG_INC_ENCODER_GEAR_RED_RATIO);
     if (!cw) {
-        *rpm *= -1;
+        *mrpm *= -1;
     }
 
     return 0;

@@ -15,23 +15,20 @@
  * @}
  */
 
-#include <string.h>
-#include <stdio.h>
-
 #include "saul.h"
 #include "inc_encoder.h"
 
 static int read_rpm(const void *dev, phydat_t *res)
 {
     inc_encoder_t *d = (inc_encoder_t *) dev;
-    int32_t rpm;
-    if (inc_encoder_read_rpm(d, &rpm)) {
+    int32_t mrpm;
+    if (inc_encoder_read_rpm(d, &mrpm)) {
         /* Read failure */
         return -ECANCELED;
     }
-    res->val[0] = (uint16_t) rpm;
+    res->val[0] = (uint16_t) mrpm / 100;
     res->unit = UNIT_RPM;
-    res->scale = 0;
+    res->scale = -1;
     return 1;
 }
 

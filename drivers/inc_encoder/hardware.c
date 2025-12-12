@@ -19,26 +19,11 @@
 #include "inc_encoder_params.h"
 #include "inc_encoder_constants.h"
 
-#include <errno.h>
 #include "log.h"
 #include "ztimer.h"
 #include "time_units.h"
 
-/* The maximum delta_count that does not cause an overflow in the RPM calculation */
-#define DELTA_COUNT_MAX (INT32_MAX / (SEC_PER_MIN * MS_PER_SEC * GEAR_RED_RATIO_SCALE))
-
-/* Maximum RPM before we accumulate more than DELTA_COUNT_MAX pulses per calculation period,
- * which would cause an overflow. */
-#define MAX_RPM ((DELTA_COUNT_MAX * SEC_PER_MIN * MS_PER_SEC * GEAR_RED_RATIO_SCALE) \
-                 / (CONFIG_INC_ENCODER_PPR \
-                    * CONFIG_INC_ENCODER_GEAR_RED_RATIO \
-                    * CONFIG_INC_ENCODER_HARDWARE_PERIOD_MS \
-                    * 4))
-
-#if (MAX_RPM < CONFIG_INC_ENCODER_MAX_RPM)
-#  error With the current configuration the RPM calculation can overflow. \
-         Please reduce the period, pulses per revolution, gear reduction ratio, or the max RPM.
-#endif
+#define MRPM_PER_RPM 1000LL
 
 /* Prototypes */
 static bool _rpm_calc_timer_cb(void *arg);
@@ -57,7 +42,7 @@ int inc_encoder_init(inc_encoder_t *dev, const inc_encoder_params_t *params)
     dev->extended_count = 0;
     dev->prev_count     = 0;
     dev->leftover_count = 0;
-    dev->last_rpm       = 0;
+    dev->last_mrpm      = 0;
 
     /* Task to periodically calculate RPM */
     ztimer_periodic_init(ZTIMER_MSEC, &dev->rpm_timer, _rpm_calc_timer_cb, (void *) dev,
@@ -68,10 +53,10 @@ int inc_encoder_init(inc_encoder_t *dev, const inc_encoder_params_t *params)
     return 0;
 }
 
-int inc_encoder_read_rpm(inc_encoder_t *dev, int32_t *rpm)
+int inc_encoder_read_mrpm(inc_encoder_t *dev, int32_t *mrpm)
 {
     int irq_state = irq_disable();
-    *rpm = dev->last_rpm;
+    *mrpm = dev->last_mrpm;
     irq_restore(irq_state);
     return 0;
 }
@@ -107,7 +92,7 @@ static bool _rpm_calc_timer_cb(void *arg)
 {
     inc_encoder_t *dev = (inc_encoder_t *) arg;
     int32_t delta_count;
-    int32_t rpm;
+    int32_t mrpm;
     int32_t total_count;
 
     total_count = dev->extended_count + qdec_read(dev->params.qdec_dev);
@@ -119,11 +104,11 @@ static bool _rpm_calc_timer_cb(void *arg)
     }
     dev->prev_count = total_count;
 
-    rpm = (int32_t)(SEC_PER_MIN * MS_PER_SEC * GEAR_RED_RATIO_SCALE * delta_count) /
-          (int32_t)(CONFIG_INC_ENCODER_PPR * CONFIG_INC_ENCODER_GEAR_RED_RATIO
+    mrpm = (MRPM_PER_RPM * SEC_PER_MIN * MS_PER_SEC * GEAR_RED_RATIO_SCALE * delta_count) /
+          (CONFIG_INC_ENCODER_PPR * CONFIG_INC_ENCODER_GEAR_RED_RATIO
                     * CONFIG_INC_ENCODER_HARDWARE_PERIOD_MS * 4); /* 4X mode counts all edges */
 
-    dev->last_rpm = rpm;
+    dev->last_mrpm = mrpm;
     return true;
 }
 
