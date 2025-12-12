@@ -94,15 +94,17 @@ extern "C" {
 /** @} */
 
 /**
- * @name    Device state definitions
- * @anchor  drivers_slipdev_states
- * @{
+ * @brief   States for the slipdev and its parser
  */
-enum {
+typedef enum {
     /**
      * @brief   Device is in no mode (currently did not receiving any data frame)
      */
     SLIPDEV_STATE_NONE = 0,
+    /**
+     * @brief   Device discards incoming data until next frame begins
+     */
+    SLIPDEV_STATE_UNKNOWN,
     /**
      * @brief   Device writes handles data as network device
      */
@@ -135,8 +137,7 @@ enum {
      * @brief   Device is in sleep mode
      */
     SLIPDEV_STATE_SLEEP,
-};
-/** @} */
+} slipdev_state_t;
 
 /**
  * @brief   Configuration parameters for a slipdev
@@ -169,9 +170,9 @@ typedef struct {
 #endif
     /**
      * @brief   Device state
-     * @see     [Device state definitions](@ref drivers_slipdev_states)
+     * @see     [Device state definitions](@ref slipdev_state_t)
      */
-    uint8_t state;
+    slipdev_state_t state;
 } slipdev_t;
 
 /**
