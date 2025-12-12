@@ -35,6 +35,8 @@
 #include "time_units.h"
 #include "thread.h"
 
+#include "include/mtd_spi_nor_defines.h"
+
 #if IS_USED(MODULE_ZTIMER)
 #include "ztimer.h"
 #elif IS_USED(MODULE_XTIMER)
@@ -64,7 +66,7 @@
 #define MTD_4K              (4096ul)
 #define MTD_4K_ADDR_MASK    (0xFFF)
 
-#define MBIT_AS_BYTES       ((1024 * 1024) / 8)
+#define MBIT_AS_BYTES       ((1024UL * 1024UL) / 8)
 
 /**
  * @brief   JEDEC memory manufacturer ID codes.
@@ -75,8 +77,8 @@
 #define JEDEC_BANK(n)   ((n) << 8)
 
 typedef enum {
-    SPI_NOR_JEDEC_ATMEL = 0x1F | JEDEC_BANK(1),
-    SPI_NOR_JEDEC_MICROCHIP = 0xBF | JEDEC_BANK(1),
+    SPI_NOR_JEDEC_ATMEL = 0x1FU | JEDEC_BANK(1),
+    SPI_NOR_JEDEC_MICROCHIP = 0xBFU | JEDEC_BANK(1),
 } jedec_manuf_t;
 /** @} */
 
@@ -205,7 +207,8 @@ static void mtd_spi_cmd_read(const mtd_spi_nor_t *dev, uint8_t opcode, void *des
  * @param[out] src    write buffer
  * @param[in]  count  number of bytes to write after the opcode has been sent
  */
-static void __attribute__((unused)) mtd_spi_cmd_write(const mtd_spi_nor_t *dev, uint8_t opcode, const void *src, uint32_t count)
+static void __attribute__((unused)) mtd_spi_cmd_write(const mtd_spi_nor_t *dev, uint8_t opcode,
+                                                      const void *src, uint32_t count)
 {
     TRACE("mtd_spi_cmd_write: %p, %02x, %p, %" PRIu32 "\n",
           (void *)dev, (unsigned int)opcode, src, count);
@@ -231,7 +234,7 @@ static void mtd_spi_cmd(const mtd_spi_nor_t *dev, uint8_t opcode)
 
 static bool mtd_spi_manuf_match(const mtd_jedec_id_t *id, jedec_manuf_t manuf)
 {
-    return manuf == ((id->bank << 8) | id->manuf);
+    return manuf == (uint32_t)((id->bank << 8) | id->manuf);
 }
 
 /**
@@ -313,7 +316,7 @@ static uint32_t mtd_spi_nor_get_size(const mtd_jedec_id_t *id)
         /* ID 2 is used to encode the product version, usually 1 or 2 */
         (id->device[1] & ~0x3) == 0) {
         /* capacity encoded as power of 32k sectors */
-        return (32 * 1024) << (0x1F & id->device[0]);
+        return (32 * (uint32_t)1024) << (0x1F & id->device[0]);
     }
     if (mtd_spi_manuf_match(id, SPI_NOR_JEDEC_MICROCHIP)) {
         switch (id->device[1]) {
@@ -353,6 +356,36 @@ static void delay_us(unsigned us)
 #endif
 }
 
+static inline void wait_for_write_enable_cleared(const mtd_spi_nor_t *dev)
+{
+    do {
+        uint8_t status;
+        mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
+
+        TRACE("mtd_spi_nor: wait device status = 0x%02x, waiting !WEL-Flag\n",
+              (unsigned int)status);
+        if ((status & SPI_NOR_STATUS_WEL) == 0) {
+            break;
+        }
+        thread_yield();
+    } while (1);
+}
+
+static inline void wait_for_write_enable_set(const mtd_spi_nor_t *dev)
+{
+    do {
+        uint8_t status;
+        mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
+
+        TRACE("mtd_spi_nor: wait device status = 0x%02x, waiting WEL-Flag\n",
+              (unsigned int)status);
+        if (status & SPI_NOR_STATUS_WEL) {
+            break;
+        }
+        thread_yield();
+    } while (1);
+}
+
 static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us)
 {
     unsigned i = 0, j = 0;
@@ -369,8 +402,9 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
         uint8_t status;
         mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
 
-        TRACE("mtd_spi_nor: wait device status = 0x%02x\n", (unsigned int)status);
-        if ((status & 1) == 0) { /* TODO magic number */
+        TRACE("mtd_spi_nor: wait device status = 0x%02x, waiting !WIP-Flag\n",
+              (unsigned int)status);
+        if ((status & SPI_NOR_STATUS_WIP) == 0) {
             break;
         }
         i++;
@@ -400,6 +434,49 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
     DEBUG(", total wait %"PRIu32"us", diff);
 #endif
     DEBUG("\n");
+}
+
+static inline int check_data_integrity(const mtd_spi_nor_t *dev, int ret)
+{
+    /* skip the test if the device definitiuon does not include the integrity test */
+    if (!(dev->params->flag & SPI_NOR_F_CHECK_INTEGRETY)) {
+        return ret;
+    }
+
+    int new_ret = ret;
+    uint8_t buffer;
+
+    /* read the first byte of the JEDEC ID to distinguish between manufacturers */
+    mtd_spi_cmd_read(dev, dev->params->opcode->rdid, &buffer, sizeof(buffer));
+
+    if (buffer == SPI_NOR_F_MANUF_MACRONIX) {
+        /* Macronix specific: Read security register */
+        mtd_spi_cmd_read(dev, dev->params->opcode->mx_rdscur, &buffer, sizeof(buffer));
+        if (buffer & MX_SECURITY_PFAIL || buffer & MX_SECURITY_EFAIL) {
+            DEBUG("mtd_spi_nor: ERR: program/erase failed! scur = %02x\n", buffer);
+
+            new_ret = -EIO;
+        }
+    } else if (buffer == SPI_NOR_F_MANUF_ISSI) {
+        /* ISSI specific: Read extended read register for data integrity flags */
+        mtd_spi_cmd_read(dev, dev->params->opcode->issi_rderp, &buffer, sizeof(buffer));
+        if (buffer & IS_ERP_P_ERR || buffer & IS_ERP_E_ERR) {
+            DEBUG("mtd_spi_nor: ERR: program/erase failed! erp = %02x\n", buffer);
+
+            new_ret = -EIO;
+
+            /* clear the extended read parameters register manually */
+            mtd_spi_cmd(dev, dev->params->opcode->issi_clerp);
+
+            /* ISSI flashs do not reset the WEL-Flag when an operation was not *completed* */
+            mtd_spi_cmd(dev, dev->params->opcode->issi_wrdi);
+        }
+    } else {
+        DEBUG("mtd_spi_nor: ERR: unknown manufacturer ID = %02x, skip data integrity test\n",
+              buffer);
+    }
+
+    return new_ret;
 }
 
 static void _init_pins(mtd_spi_nor_t *dev)
@@ -487,7 +564,8 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
 
     DEBUG("mtd_spi_nor_init: -> spi: %lx, cs: %lx, opcodes: %p\n",
-          (unsigned long)_get_spi(dev), (unsigned long)dev->params->cs, (void *)dev->params->opcode);
+          (unsigned long)_get_spi(dev), (unsigned long)dev->params->cs,
+          (void *)dev->params->opcode);
 
     /* CS, WP, Hold */
     _init_pins(dev);
@@ -506,7 +584,8 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
         return -EIO;
     }
     DEBUG("mtd_spi_nor_init: Found chip with ID: (%d, 0x%02x, 0x%02x, 0x%02x)\n",
-          dev->jedec_id.bank, dev->jedec_id.manuf, dev->jedec_id.device[0], dev->jedec_id.device[1]);
+          dev->jedec_id.bank, dev->jedec_id.manuf,
+          dev->jedec_id.device[0], dev->jedec_id.device[1]);
 
     /* derive density from JEDEC ID  */
     if (mtd->sector_count == 0) {
@@ -614,6 +693,7 @@ static int mtd_spi_nor_write_page(mtd_dev_t *mtd, const void *src, uint32_t page
 
     uint32_t remaining = mtd->page_size - offset;
     size = MIN(remaining, size);
+    int ret = size;
 
     uint32_t addr = page * mtd->page_size + offset;
 
@@ -622,19 +702,29 @@ static int mtd_spi_nor_write_page(mtd_dev_t *mtd, const void *src, uint32_t page
     /* write enable */
     mtd_spi_cmd(dev, dev->params->opcode->wren);
 
+    /* Wait for WEL-Flag to be set */
+    wait_for_write_enable_set(dev);
+
     /* Page program */
     mtd_spi_cmd_addr_write(dev, dev->params->opcode->page_program, addr, src, size);
 
     /* waiting for the command to complete before returning */
     wait_for_write_complete(dev, 0);
 
+    /* (optionally) check if the operation was successful */
+    ret = check_data_integrity(dev, ret);
+
+    /* Wait for WEL-Flag to be cleared */
+    wait_for_write_enable_cleared(dev);
+
     mtd_spi_release(dev);
 
-    return size;
+    return ret;
 }
 
 static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
 {
+    int ret = 0;
     DEBUG("mtd_spi_nor_erase: %p, 0x%" PRIx32 ", 0x%" PRIx32 "\n",
           (void *)mtd, addr, size);
     mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
@@ -663,6 +753,9 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
 
         /* write enable */
         mtd_spi_cmd(dev, dev->params->opcode->wren);
+
+        /* Wait for WEL-Flag to be set */
+        wait_for_write_enable_set(dev);
 
         if (size == total_size) {
             mtd_spi_cmd(dev, dev->params->opcode->chip_erase);
@@ -703,10 +796,17 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
 
         /* waiting for the command to complete before continuing */
         wait_for_write_complete(dev, us);
+
+        /* (optionally) check if the operation was successful */
+        ret = check_data_integrity(dev, ret);
+
+        /* Wait for WEL-Flag to be cleared */
+        wait_for_write_enable_cleared(dev);
+
     }
     mtd_spi_release(dev);
 
-    return 0;
+    return ret;
 }
 
 const mtd_desc_t mtd_spi_nor_driver = {
