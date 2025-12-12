@@ -1,0 +1,67 @@
+# This variable ensures the warning is printed only once
+_SLIPMUX_OVERSELECTED_MODULES ?= 0
+ifeq (0, $(_SLIPMUX_OVERSELECTED_MODULES))
+  ifneq (,$(filter slipmux,$(USEMODULE)))
+    _SUBMODS = $(filter slipmux_stdio slipmux_coap slipmux_net,$(USEMODULE))
+    # any submodules at all?
+    ifneq (,$(_SUBMODS))
+      # but less then three? Because if we use all three submodules the behaviour is identical
+      # to using the base module. Same result, no confusion or unexpected behaviour for the user.
+      # So we don't warn. This works because the `word` filter returns either the third word
+      # from submods (-> we have three modules defined) or nothing at all -> one or two moduels in use
+      ifeq (,$(word 3,$(_SUBMODS)))
+        # an undefined variable can be used to trick make into allowing leading whitespace
+        # we don't even have to define the variable itself, see, it is commented out!
+        # _give_space =
+        $(info $(COLOR_YELLOW)Warning in slipmux_dev:)
+        $(info $(_give_space) You selected the submodule(s) `$(_SUBMODS)` manually in USEMODULE together with the module `slipmux`.)
+        $(info $(_give_space) The module `slipmux` enables all submodules by default.)
+        $(info $(_give_space) If you want to use only the submodule that you selected and want to disable the others:)
+        $(info $(_give_space)    Remove the `slipmux` module from your USEMODULE.)
+        $(info $(_give_space) If you want to enable all submodules and get rid of this warning:)
+        $(info $(_give_space)    Remove the `$(_SUBMODS)` submodule(s) from your USEMODULE. Keep `slipmux` only.)
+        $(info $(_give_space) If you want to enable all submodules and keep this warning:)
+        $(info $(_give_space)    Do nothing.$(COLOR_RESET))
+        _SLIPMUX_OVERSELECTED_MODULES = 1
+      endif
+    endif
+  endif
+endif
+
+# If the pseudomodule `slipmux` is used, enable all frame types
+ifneq (,$(filter slipmux,$(USEMODULE)))
+  USEMODULE += slipmux_stdio
+  USEMODULE += slipmux_coap
+  USEMODULE += slipmux_net
+endif
+
+# If the _net suboption is used, ensure _net is enabled
+ifneq (,$(filter slipmux_net_l2addr,$(USEMODULE)))
+  USEMODULE += slipmux_net
+endif
+
+# Both the modules need the ringbuffer
+ifneq (,$(filter slipmux_coap slipmux_net,$(USEMODULE)))
+  USEMODULE += chunked_ringbuffer
+endif
+
+ifneq (,$(filter slipmux_net,$(USEMODULE)))
+  USEMODULE += eui_provider
+  USEMODULE += netdev_new_api
+  USEMODULE += netdev_register
+endif
+
+ifneq (,$(filter slipmux_stdio,$(USEMODULE)))
+  USEMODULE += isrpipe
+endif
+
+ifneq (,$(filter slipmux_coap,$(USEMODULE)))
+  USEMODULE += checksum
+  USEMODULE += sock_udp
+  USEMODULE += gnrc_ipv6
+  USEMODULE += nanocoap_sock
+  USEMODULE += nanocoap_resources
+endif
+
+# We always require a uart
+FEATURES_REQUIRED += periph_uart

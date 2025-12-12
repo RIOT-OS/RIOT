@@ -33,7 +33,8 @@ We include two approaches to configuration below, automated via RPL, and manual 
 
 First, define a TUN interface on an Ubuntu host with tunslip, in the `dist/tools/tunslip` directory. In the example below, the tun interface is host 1.
 
-    cd ../../dist/tools/tunslip/
+    cd ../../../../dist/tools/tunslip/
+    make
     sudo ./tunslip6 -s ttyUSB0 -t tun0 bbbb::1/64
     sudo ip -6 route add aaaa::/64 dev tun0
 

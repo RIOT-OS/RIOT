@@ -2,9 +2,11 @@ include ../Makefile.net_common
 
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc
+USEMODULE += gnrc_ipv6
+USEMODULE += gnrc_icmpv6_echo
 USEMODULE += gnrc_pktdump
 USEMODULE += gnrc_txtsnd
-USEMODULE += slipdev
+USEMODULE += slipmux_net
 USEMODULE += shell
 USEMODULE += shell_cmds_default
 
@@ -13,8 +15,8 @@ SLIP_UART     ?= "UART_NUMOF-1"
 SLIP_BAUDRATE ?= 115200
 
 # export slip parameters
-CFLAGS += -DSLIPDEV_PARAM_UART="UART_DEV($(SLIP_UART))"
-CFLAGS += -DSLIPDEV_PARAM_BAUDRATE=$(SLIP_BAUDRATE)
+CFLAGS += -DSLIPMUX_PARAM_UART="UART_DEV($(SLIP_UART))"
+CFLAGS += -DSLIPMUX_PARAM_BAUDRATE=$(SLIP_BAUDRATE)
 
 # add current directory to the include path. Putting it in CFLAGS will make
 # it go to the beginning, before the standard includes.

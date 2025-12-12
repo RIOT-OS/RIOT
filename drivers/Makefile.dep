@@ -242,8 +242,8 @@ ifneq (,$(filter si70%,$(USEMODULE)))
   USEMODULE += si70xx
 endif
 
-ifneq (,$(filter slipdev_%,$(USEMODULE)))
-  USEMODULE += slipdev
+ifneq (,$(filter slipmux%,$(USEMODULE)))
+  USEMODULE += slipmux_dev
 endif
 
 ifneq (,$(filter stmpe811_%,$(USEMODULE)))
