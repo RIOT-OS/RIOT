@@ -125,6 +125,7 @@ run ./dist/tools/coccinelle/check.sh
 run ./dist/tools/flake8/check.sh
 run ./dist/tools/headerguards/check.sh
 run ./dist/tools/buildsystem_sanity_check/check.sh
+run ./dist/tools/buildinfo/check.sh
 run ./dist/tools/feature_resolution/check.sh
 run ./dist/tools/boards_supported/check.sh
 run ./dist/tools/codespell/check.sh
