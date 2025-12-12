@@ -35,11 +35,6 @@
       [completely different](https://www.kernel.org/doc/html/latest/process/coding-style.html#typedefs)
       (see below) (BTW: Do we have any reason to do so?)
     * Comments should be C-style comments (see below)
-* In order to follow Linux's recommendation on
-  [conditional compilation](https://www.kernel.org/doc/html/latest/process/coding-style.html#conditional-compilation)
-  make use of `IS_ACTIVE` and `IS_USED` macros from `kernel_defines.h` with C
-  conditionals. If a symbol is not going to be defined under a certain
-  condition, the usage of preprocessor `#if defined()` is fine.
 * You can use [uncrustify](http://uncrustify.sourceforge.net/) with the provided
   option files: https://github.com/RIOT-OS/RIOT/blob/master/uncrustify-riot.cfg
 
@@ -209,6 +204,113 @@ of recognised exceptions where we can (or even must) rely on extensions include:
     }
 ```
 
+### Conditional Compilation
+
+In order to follow Linux's recommendation on
+[conditional compilation](https://www.kernel.org/doc/html/latest/process/coding-style.html#conditional-compilation)
+make use of `IS_ACTIVE` and `IS_USED` macros from `kernel_defines.h` with C
+conditionals.
+If a symbol is not going to be defined under a certain condition,
+the usage of preprocessor `#if defined()` is fine.
+
+Optional branches in C code should use macros instead of preprocessor
+conditionals:
+
+```c
+/* BAD */
+#if MODULE_GNRC_IPV6_EXT_FRAG_STATS
+    _stats.fragments++;
+    _stats.datagrams++;
+#endif /* MODULE_GNRC_IPV6_EXT_FRAG_STATS */
+```
+
+```c
+/* GOOD */
+if (IS_USED(MODULE_GNRC_IPV6_EXT_FRAG_STATS)) {
+    _stats.fragments++;
+    _stats.datagrams++;
+}
+```
+
+That way tooling such as language servers and static code analysers will still
+see the code and perform their checks on it.
+
+If preprocessor conditionals are needed, use `#ifdef MODULE_FOO` or
+`#if MODULE_FOO` instead of `#if IS_USED(MODULE_FOO)`
+
+The general rule is to reduce preprocessor statements as much as possible.
+Instead of guarding individual code sections, add a stub or use early returns:
+
+```c
+/* BAD */
+#ifdef MODULE_FOO
+#  include "foo.h"
+#endif /* MODULE_FOO */
+
+#ifdef MODULE_FOO
+static void _do_foo(void) {
+    // do foo
+    ...
+}
+#endif /* MODULE_FOO */
+
+void bar(my_type t) {
+    switch(t)
+#ifdef MODULE_FOO
+    case MY_TYPE_FOO:
+        _do_foo();
+#endif /* MODULE_FOO */
+    ...
+}
+```
+
+```c
+/* GOOD: Stubs */
+#include "foo.h"
+
+#ifdef MODULE_FOO
+static void _do_foo(void) {
+    // do foo
+    ...
+}
+#else
+/* No-op stub */
+void _do_foo(void) {
+    return;
+}
+#endif /* MODULE_FOO */
+
+void bar(my_type t) {
+    switch(t)
+    case MY_TYPE_FOO:
+        _do_foo();
+    ...
+}
+```
+
+```c
+/* GOOD: Early Returns */
+#include "foo.h"
+
+static void _do_foo(void) {
+    if (!IS_USED(MODULE_FOO)) {
+        return;
+    }
+    // do foo
+    ...
+}
+
+void bar(my_type t) {
+    switch(t)
+    case MY_TYPE_FOO:
+        _do_foo();
+        break;
+    ...
+}
+```
+
+The compiler will eliminate dead branches.
+
 ## Indentation of Preprocessor Directives
 
 Add two spaces of indent *after* the `#` per level of indent. Increment the
@@ -296,9 +398,10 @@ of code.
 
 * The include of system headers (in <>-brackets) always precedes RIOT specific
   includes (in quotes).
-* Optional headers must only be included if their corresponding module is
-  selected/being build. In other words: always put an `#ifdef MODULE_...`
-  statement around includes of optional headers:
+* Headers should only be guarded if they are not always available, i.e.,
+  if they explicitly depend on a module. If that is the case, the import
+  should be guarded with `#ifdef MODULE_...` statements:
+
 ```c
 #ifdef MODULE_ABC
 #  include "abc.h"
