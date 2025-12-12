@@ -8,6 +8,7 @@ LOG=cat
 LOGFILE=
 OUTFILE=github_annotate_outfile.log
 ECHO_ESC=echo
+GITHUB_RUN_ID="${GITHUB_RUN_ID:-}"
 
 if [ -n "${BASH_VERSION}" ]; then
     # workaround when included in bash to escape newlines and carriage returns
