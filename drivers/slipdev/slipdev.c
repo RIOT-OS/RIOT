@@ -286,7 +286,7 @@ void _slip_rx_cb(void *arg, uint8_t byte)
         }
 
         dev->state = SLIPDEV_STATE_UNKNOWN;
-        DEBUG("slipmux: Unknown start byte %b ignored\n", byte);
+        DEBUG("slipmux: Unknown start byte %02x ignored\n", byte);
     }
 }
 
