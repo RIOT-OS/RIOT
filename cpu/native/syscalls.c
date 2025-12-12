@@ -447,8 +447,7 @@ void errx(int eval, const char *fmt, ...)
 
 int getpid(void)
 {
-    warnx("getpid(): not implemented");
-    return -1;
+    return thread_getpid();
 }
 
 #if (IS_USED(MODULE_LIBC_GETTIMEOFDAY))
