@@ -17,6 +17,8 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
+#include "buildinfo/boardinfo.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,29 +37,29 @@ extern "C" {
  * */
 #ifndef INTERNAL_PERIPHERAL_VID
 /** Reserved for RIOT standard peripherals as per http://pid.codes/1209/7D00/ */
-#define INTERNAL_PERIPHERAL_VID (0x1209)
+#  define INTERNAL_PERIPHERAL_VID (0x1209)
 #endif
 #ifndef INTERNAL_PERIPHERAL_PID
 /** Reserved for RIOT standard peripherals as per http://pid.codes/1209/7D00/ */
-#define INTERNAL_PERIPHERAL_PID (0x7D00)
+#  define INTERNAL_PERIPHERAL_PID (0x7D00)
 #endif
 
 #if !(defined(CONFIG_USB_VID) && defined(CONFIG_USB_PID))
-#ifdef USB_H_USER_IS_RIOT_INTERNAL
-#define CONFIG_USB_VID INTERNAL_PERIPHERAL_VID
-#define CONFIG_USB_PID INTERNAL_PERIPHERAL_PID
+#  ifdef USB_H_USER_IS_RIOT_INTERNAL
+#    define CONFIG_USB_VID INTERNAL_PERIPHERAL_VID
+#    define CONFIG_USB_PID INTERNAL_PERIPHERAL_PID
+#  else
+#    error "Please configure your vendor and product IDs. For development, you " \
+           "may set USB_VID=${USB_VID_TESTING} USB_PID=${USB_PID_TESTING}."
+#  endif
 #else
-#error Please configure your vendor and product IDs. For development, you may \
-    set USB_VID=${USB_VID_TESTING} USB_PID=${USB_PID_TESTING}.
-#endif
-#else
-#if CONFIG_USB_VID == INTERNAL_PERIPHERAL_VID && \
-    CONFIG_USB_PID == INTERNAL_PERIPHERAL_PID
-#error Please configure your vendor and product IDs differently than the \
-    INTERNAL_PERIPHERAL_* settings. For development, you may set \
-    USB_VID=${USB_VID_TESTING} \
-    USB_PID=${USB_PID_TESTING}.
-#endif
+#  if CONFIG_USB_VID == INTERNAL_PERIPHERAL_VID && \
+      CONFIG_USB_PID == INTERNAL_PERIPHERAL_PID
+#    error "Please configure your vendor and product IDs differently than the " \
+           "INTERNAL_PERIPHERAL_* settings. For development, you may set " \
+           "USB_VID=${USB_VID_TESTING} " \
+           "USB_PID=${USB_PID_TESTING}."
+#  endif
 #endif /* !(defined(CONFIG_USB_VID) && defined(CONFIG_USB_PID)) */
 
 /**
@@ -67,7 +69,7 @@ extern "C" {
  * device with USB.
  */
 #ifdef DOXYGEN
-#define CONFIG_USB_VID
+#  define CONFIG_USB_VID
 #endif
 
 /**
@@ -77,28 +79,28 @@ extern "C" {
  * device with USB.
  */
 #ifdef DOXYGEN
-#define CONFIG_USB_PID
+#  define CONFIG_USB_PID
 #endif
 
 /**
  * @brief USB peripheral manufacturer string
  */
 #ifndef CONFIG_USB_MANUF_STR
-#define CONFIG_USB_MANUF_STR   "RIOT-os.org"
+#  define CONFIG_USB_MANUF_STR "RIOT-os.org"
 #endif
 
 /**
  * @brief USB peripheral product string
  */
 #ifndef CONFIG_USB_PRODUCT_STR
-#define CONFIG_USB_PRODUCT_STR  RIOT_BOARD
+#  define CONFIG_USB_PRODUCT_STR RIOT_BOARD_LITERAL
 #endif
 
 /**
  * @brief USB peripheral configuration string
  */
 #ifndef CONFIG_USB_CONFIGURATION_STR
-#define CONFIG_USB_CONFIGURATION_STR    "USB config"
+#  define CONFIG_USB_CONFIGURATION_STR "USB config"
 #endif
 
 /**
@@ -111,7 +113,7 @@ extern "C" {
  * devices with identical VID:PID combination.
  */
 #ifdef DOXYGEN
-#define CONFIG_USB_SERIAL_STR           "RIOT-12345"
+#  define CONFIG_USB_SERIAL_STR "RIOT-12345"
 #endif
 
 /**
@@ -124,7 +126,7 @@ extern "C" {
  * in length due to conversion from bytes to hex chars.
  */
 #if !defined(CONFIG_USB_SERIAL_STR) && !defined(CONFIG_USB_SERIAL_BYTE_LENGTH)
-#define CONFIG_USB_SERIAL_BYTE_LENGTH 8
+#  define CONFIG_USB_SERIAL_BYTE_LENGTH 8
 #endif
 
 /**
@@ -134,48 +136,48 @@ extern "C" {
  * @note Not to be be confused with the USB version number
  */
 #ifndef CONFIG_USB_PRODUCT_BCDVERSION
-#define CONFIG_USB_PRODUCT_BCDVERSION   0x0100
+#  define CONFIG_USB_PRODUCT_BCDVERSION 0x0100
 #endif
 
 /**
  * @brief USB specification version
  */
 #ifndef CONFIG_USB_SPEC_BCDVERSION
-#if defined(CONFIG_USB_SPEC_BCDVERSION_1_1)
-#define CONFIG_USB_SPEC_BCDVERSION      0x0110
-#elif defined(CONFIG_USB_SPEC_BCDVERSION_2_0)
-#define CONFIG_USB_SPEC_BCDVERSION      0x0200
-#else
-#define CONFIG_USB_SPEC_BCDVERSION      0x0200
-#endif
+#  if defined(CONFIG_USB_SPEC_BCDVERSION_1_1)
+#    define CONFIG_USB_SPEC_BCDVERSION 0x0110
+#  elif defined(CONFIG_USB_SPEC_BCDVERSION_2_0)
+#    define CONFIG_USB_SPEC_BCDVERSION 0x0200
+#  else
+#    define CONFIG_USB_SPEC_BCDVERSION 0x0200
+#  endif
 #endif
 
 /**
  * @brief USB peripheral setting to indicate self powered devices.
  */
 #ifndef CONFIG_USB_SELF_POWERED
-#define CONFIG_USB_SELF_POWERED   (0)
+#  define CONFIG_USB_SELF_POWERED (0)
 #endif
 
 /**
  * @brief USB peripheral setting to indicate remote wakeup capability.
  */
 #ifndef CONFIG_USB_REM_WAKEUP
-#define CONFIG_USB_REM_WAKEUP   (0)
+#  define CONFIG_USB_REM_WAKEUP (0)
 #endif
 
 /**
  * @brief USB device max power draw in mA, between 0 and 500mA
  */
 #ifndef CONFIG_USB_MAX_POWER
-#define CONFIG_USB_MAX_POWER   (100)
+#  define CONFIG_USB_MAX_POWER (100)
 #endif
 
 /**
  * @brief Default LANG ID reported to the host
  */
 #ifndef CONFIG_USB_DEFAULT_LANGID
-#define CONFIG_USB_DEFAULT_LANGID   0x0409 /* EN-US */
+#  define CONFIG_USB_DEFAULT_LANGID 0x0409 /* EN-US */
 #endif
 /** @} */
 
@@ -204,7 +206,7 @@ extern "C" {
  * @{
  */
 #ifdef DOXYGEN
-#define USB_H_USER_IS_RIOT_INTERNAL
+#  define USB_H_USER_IS_RIOT_INTERNAL
 #endif
 /** @} */
 

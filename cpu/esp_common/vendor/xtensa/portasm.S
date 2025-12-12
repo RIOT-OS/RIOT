@@ -23,7 +23,7 @@
 //-----------------------------------------------------------------------------
 */
 
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
 #include "xtensa_conf.h"
 
 #define pxCurrentTCB            sched_active_thread
@@ -61,7 +61,7 @@ port_IntStackTop:
 _chip_interrupt_tmp:
     .word       0
 
-#ifndef RIOT_VERSION
+#ifndef RIOT_OS
 port_switch_flag:
     .word       0
 #endif
@@ -431,7 +431,7 @@ _frxt_dispatch:
     /* Restore CPENABLE from task's co-processor save area. */
     movi    a3, pxCurrentTCB
     l32i    a3, a3, 0                   /* a3 = pxCurrentTCB                */
-    #ifdef RIOT_VERSION
+    #ifdef RIOT_OS
     addi    a2, a3, -XT_CP_SIZE         /* a2 = pxCurrentTCB->cp_state      */
     #else
     l32i    a2, a3, CP_TOPOFSTACK_OFFS  /* StackType_t *pxStack;            */
@@ -528,7 +528,7 @@ vPortYield:
 
     #if XCHAL_CP_NUM > 0
     /* Clear CPENABLE, also in task's co-processor state save area. */
-    #ifdef RIOT_VERSION
+    #ifdef RIOT_OS
     addi    a2,  a2, -XT_CP_SIZE        /* a2 = pxCurrentTCB->cp_state      */
     #else
     l32i    a2,  a2, CP_TOPOFSTACK_OFFS /* a2 = pxCurrentTCB->cp_state      */
@@ -575,7 +575,7 @@ vPortYieldFromInt:
     /* Save CPENABLE in task's co-processor save area, and clear CPENABLE.  */
     movi    a3, pxCurrentTCB
     l32i    a3, a3, 0                   /* a3 = pxCurrentTCB                */
-    #ifdef RIOT_VERSION
+    #ifdef RIOT_OS
     addi    a2, a3, -XT_CP_SIZE         /* a2 = pxCurrentTCB->cp_state      */
     #else
     l32i    a2, a3, CP_TOPOFSTACK_OFFS  /* a2 = pxCurrentTCB->cp_state      */
@@ -625,7 +625,7 @@ _frxt_task_coproc_state:
     movi    a15, pxCurrentTCB
     l32i    a15, a15, 0                 /* && pxCurrentTCB != 0) {                 */
     beqz    a15, 2f
-    #ifdef RIOT_VERSION
+    #ifdef RIOT_OS
     addi    a15, a15, -XT_CP_SIZE       /* a15 = pxCurrentTCB->cp_state            */
     #else
     l32i    a15, a15, CP_TOPOFSTACK_OFFS

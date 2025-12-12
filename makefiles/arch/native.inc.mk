@@ -7,6 +7,7 @@ NATIVEINCLUDES += -I$(RIOTBASE)/core/lib/include/
 NATIVEINCLUDES += -I$(RIOTBASE)/core/include/
 NATIVEINCLUDES += -I$(RIOTBASE)/sys/include/
 NATIVEINCLUDES += -I$(RIOTBASE)/drivers/include/
+NATIVEINCLUDES += -I$(BINDIR)/riotbuild/
 
 ifeq ($(OS),Darwin)
   DEBUGGER ?= lldb

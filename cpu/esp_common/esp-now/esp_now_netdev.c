@@ -14,6 +14,7 @@
  * @author      Timo Rothenpieler <timo.rothenpieler@uni-bremen.de>
  */
 
+#include "buildinfo/cpuinfo.h"
 #include "log.h"
 #include "tools.h"
 

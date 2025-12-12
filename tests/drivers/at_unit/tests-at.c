@@ -6,6 +6,7 @@
 #include "embUnit.h"
 #include <stdio.h>
 
+#include "buildinfo/cpuinfo.h"
 #include "at.h"
 #include "isrpipe/read_timeout.h"
 

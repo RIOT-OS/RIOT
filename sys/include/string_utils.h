@@ -35,6 +35,10 @@
 #include "flash_utils.h"
 #include "modules.h"
 
+#if defined(RIOT_OS)
+#  include "buildinfo/cpuinfo.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

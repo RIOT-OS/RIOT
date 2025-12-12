@@ -16,28 +16,23 @@
  * @}
  */
 
-#include <errno.h>
 #include <stdbool.h>
-#include <stdint.h>
 
 #include "auto_init.h"
 #include "irq.h"
 #include "kernel_init.h"
 #include "log.h"
 #include "periph/pm.h"
-#include "thread.h"
 #include "stdio_base.h"
+#include "thread.h"
 
 #if IS_USED(MODULE_VFS)
 #include "vfs.h"
 #endif
 
-#define ENABLE_DEBUG 0
-#include "debug.h"
-
 #ifndef CONFIG_BOOT_MSG_STRING
-#define CONFIG_BOOT_MSG_STRING "main(): This is RIOT! (Version: " \
-    RIOT_VERSION ")"
+#define CONFIG_BOOT_MSG_STRING "main(): This is RIOT! (Version: %s)\n", \
+    RIOT_VERSION
 #endif
 
 extern int main(void);
@@ -58,7 +53,7 @@ static void *main_trampoline(void *arg)
     }
 
     if (!IS_ACTIVE(CONFIG_SKIP_BOOT_MSG) && !IS_USED(MODULE_STDIO_NULL)) {
-        LOG_INFO(CONFIG_BOOT_MSG_STRING "\n");
+        LOG_INFO(CONFIG_BOOT_MSG_STRING);
     }
 
     int res = main();

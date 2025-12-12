@@ -16,6 +16,8 @@
  */
 
 #include <stdio.h>
+
+#include "buildinfo/boardinfo.h"
 #include "external_native.h"
 
 int main(void)

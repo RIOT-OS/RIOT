@@ -31,6 +31,7 @@
  * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
+#include "buildinfo/cpuinfo.h"
 #include "periph_cpu.h"
 
 #ifdef __cplusplus

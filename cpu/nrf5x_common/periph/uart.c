@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "buildinfo/cpuinfo.h"
 #include "compiler_hints.h"
 #include "cpu.h"
 #include "periph/gpio.h"
