@@ -339,3 +339,7 @@ ifneq (,$(filter gnrc_netif_timestamp,$(USEMODULE)))
     USEMODULE += netdev_ieee802154_rx_timestamp
   endif
 endif
+
+ifneq (,$(filter ads101% ads111%,$(USEMODULE)))
+  USEMODULE += ads1x1x
+endif
