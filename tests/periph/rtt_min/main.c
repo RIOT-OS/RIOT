@@ -19,10 +19,10 @@
 #include <stdio.h>
 #include <stdatomic.h>
 
+#include "buildinfo/board.h"
 #include "cpu.h"
 #include "periph_conf.h"
 #include "periph/rtt.h"
-
 #include "xtimer.h"
 
 #define US_PER_TICK     (US_PER_SEC / RTT_FREQUENCY)

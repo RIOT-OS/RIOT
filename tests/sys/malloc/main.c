@@ -21,6 +21,7 @@
 #include <string.h>
 #include <inttypes.h>
 
+#include "buildinfo/cpu.h"
 #include "architecture.h"
 #include "test_utils/expect.h"
 

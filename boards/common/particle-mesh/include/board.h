@@ -15,6 +15,7 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
+#include "buildinfo/board.h"
 #include "cpu.h"
 #include "board_common.h"
 

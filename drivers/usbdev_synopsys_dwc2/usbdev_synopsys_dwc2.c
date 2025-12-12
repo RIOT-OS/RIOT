@@ -34,6 +34,7 @@
 
 #include "architecture.h"
 #include "bitarithm.h"
+#include "buildinfo/cpu.h"
 #include "cpu.h"
 #include "cpu_conf.h"
 #include "log.h"

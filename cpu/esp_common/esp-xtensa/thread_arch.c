@@ -48,6 +48,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "buildinfo/cpu.h"
 #include "board.h"
 #include "cpu.h"
 #include "irq.h"

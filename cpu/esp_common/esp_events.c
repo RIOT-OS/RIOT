@@ -21,6 +21,7 @@
 
 #include <string.h>
 
+#include "buildinfo/cpu.h"
 #include "esp_common.h"
 #include "log.h"
 

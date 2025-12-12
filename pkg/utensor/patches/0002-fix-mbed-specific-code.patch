@@ -4,22 +4,23 @@ Date: Sat, 23 Nov 2019 13:11:00 +0100
 Subject: [PATCH] Fix mbed specific code
 
 ---
- src/uTensor/util/uTensor_util.cpp | 4 ++--
+ src/uTensor/util/uTensor_util.cpp | 5 +++--
  src/uTensor/util/uTensor_util.hpp | 2 --
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/src/uTensor/util/uTensor_util.cpp b/src/uTensor/util/uTensor_util.cpp
-index 4d1dd48..32c50df 100644
+index 4d1dd48..94db6bf 100644
 --- a/src/uTensor/util/uTensor_util.cpp
 +++ b/src/uTensor/util/uTensor_util.cpp
-@@ -1,5 +1,5 @@
+@@ -1,5 +1,6 @@
  #include "src/uTensor/util/uTensor_util.hpp"
 -#if !(defined(TARGET_MBED) || defined(ARDUINO))
++#include "buildinfo/cpu.h"
 +#ifdef CPU_NATIVE
  #include <sys/stat.h>
  #include <dirent.h>
  #endif
-@@ -45,7 +45,7 @@ uint32_t ntoh32(uint32_t val) {
+@@ -45,7 +46,7 @@ uint32_t ntoh32(uint32_t val) {
    return ret;
  }
  
@@ -42,5 +43,5 @@ index 25ebcf3..5390ed8 100644
  //#   error "Unknown compiler"
      // little endian to big endian
 -- 
-2.20.1
+2.52.0
 

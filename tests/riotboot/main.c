@@ -21,6 +21,8 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
+#include "buildinfo/board.h"
+#include "buildinfo/cpu.h"
 #include "riotboot/slot.h"
 #include "shell.h"
 

@@ -20,6 +20,8 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
+#include "buildinfo/board.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

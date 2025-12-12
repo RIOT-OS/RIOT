@@ -22,6 +22,8 @@
 
 #include <stdint.h>
 
+#include "buildinfo/cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

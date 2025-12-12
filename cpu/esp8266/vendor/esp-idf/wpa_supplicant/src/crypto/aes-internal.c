@@ -20,7 +20,7 @@
  *
  * See README and COPYING for more details.
  */
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
 #pragma weak rijndaelKeySetupEnc
 #endif
 

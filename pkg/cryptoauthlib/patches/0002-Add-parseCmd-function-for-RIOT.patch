@@ -15,7 +15,7 @@ index 837361d2..a98f3169 100644
  
      return exit_code;
  }
-+#elif defined(RIOT_APPLICATION)
++#elif defined(RIOT_OS)
 +#include <stdio.h>
 +#include <stdlib.h>
 +#include "cmd-processor.h"

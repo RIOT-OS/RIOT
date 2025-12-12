@@ -20,8 +20,10 @@
 #include "sdkconfig.h"
 
 #include "nvs_flash.h"
-#ifndef RIOT_VERSION
+#ifndef RIOT_OS
 #include "tcpip_adapter.h"
+#else
+#include "buildinfo/cpu.h"
 #endif
 
 #include "esp_log.h"
@@ -99,7 +101,7 @@ static void user_init_entry(void *param)
     }
 #endif
 
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
     /* initialize RIOT for ESP8266 */
     wifi_os_init();
     /* start RIOT kernel */
@@ -132,7 +134,7 @@ void call_user_start(size_t start_addr)
             *dest++ = *src++;
     }
 
-    /* 
+    /*
      * When finish copying IRAM program, the exception vect must be initialized.
      * And then user can load/store data which is not aligned by 4-byte.
      */
@@ -156,7 +158,7 @@ void call_user_start(size_t start_addr)
 
     heap_caps_init();
 
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
     /* in case of RIOT, user_init_entry is called directly and not from a task */
     user_init_entry(NULL);
 #else

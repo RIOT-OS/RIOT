@@ -19,6 +19,7 @@
 #include <string.h>
 
 #include "architecture.h"
+#include "buildinfo/board.h"
 #include "benchmark.h"
 #include "mutex.h"
 #include "test_utils/expect.h"

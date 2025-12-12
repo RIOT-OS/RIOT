@@ -20,7 +20,7 @@
 
 #include "esp_err.h"
 #include "esp_wifi_types.h"
-#ifndef RIOT_VERSION
+#ifndef RIOT_OS
 #include "lwip/ip_addr.h"
 #include "tcpip_adapter.h"
 #endif
@@ -97,7 +97,7 @@ typedef struct {
     wifi_auth_mode_t new_mode;         /**< the new auth mode of AP */
 } system_event_sta_authmode_change_t;
 
-#ifndef RIOT_VERSION
+#ifndef RIOT_OS
 typedef struct {
     tcpip_adapter_ip_info_t ip_info;
     bool ip_changed;
@@ -108,7 +108,7 @@ typedef struct {
     uint8_t pin_code[8];         /**< PIN code of station in enrollee mode */
 } system_event_sta_wps_er_pin_t;
 
-#ifndef RIOT_VERSION
+#ifndef RIOT_OS
 typedef struct {
     tcpip_adapter_if_t if_index;
     tcpip_adapter_ip6_info_t ip6_info;
@@ -135,7 +135,7 @@ typedef union {
     system_event_sta_disconnected_t            disconnected;       /**< ESP8266 station disconnected to AP */
     system_event_sta_scan_done_t               scan_done;          /**< ESP8266 station scan (APs) done */
     system_event_sta_authmode_change_t         auth_change;        /**< the auth mode of AP ESP8266 station connected to changed */
-#ifndef RIOT_VERSION
+#ifndef RIOT_OS
     system_event_sta_got_ip_t                  got_ip;             /**< ESP8266 station got IP, first time got IP or when IP is changed */
 #endif
     system_event_sta_wps_er_pin_t              sta_er_pin;         /**< ESP8266 station WPS enrollee mode PIN code received */
@@ -143,7 +143,7 @@ typedef union {
     system_event_ap_staconnected_t             sta_connected;      /**< a station connected to ESP8266 soft-AP */
     system_event_ap_stadisconnected_t          sta_disconnected;   /**< a station disconnected to ESP8266 soft-AP */
     system_event_ap_probe_req_rx_t             ap_probereqrecved;  /**< ESP8266 soft-AP receive probe request packet */
-#ifndef RIOT_VERSION
+#ifndef RIOT_OS
     system_event_got_ip6_t                     got_ip6;            /**< ESP8266 station　or ap or ethernet ipv6 addr state change to preferred */
 #endif
 } system_event_info_t;

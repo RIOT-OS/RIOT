@@ -671,7 +671,7 @@ int scn_time_tm_iso8601(struct tm *tm, const char *str, char separator)
  * And when not building for RIOT, there's no `stdio_write()`.
  * In those cases, just defer to `printf()`.
  */
-#if IS_USED(MODULE_STDIO_NATIVE) || !defined(RIOT_VERSION)
+#if IS_USED(MODULE_STDIO_NATIVE) || !defined(RIOT_OS)
 void print(const char *s, size_t n)
 {
     printf("%.*s", (int)n, s);

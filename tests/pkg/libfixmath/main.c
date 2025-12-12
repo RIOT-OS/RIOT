@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 
+#include "buildinfo/cpu.h"
 #include "kernel_defines.h"
 #include "fix16.h"
 

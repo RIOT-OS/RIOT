@@ -23,6 +23,7 @@
 extern "C" {
 #endif
 
+#include "buildinfo/cpu.h"
 #ifdef CPU_NATIVE
 #include <stdio.h>
 

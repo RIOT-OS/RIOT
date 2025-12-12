@@ -23,7 +23,7 @@
 #include "esp8266/uart_register.h"
 #include "esp8266/rom_functions.h"
 
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
 
 /* the putchar definition from stdio.h can't be used here */
 #undef putchar
@@ -31,17 +31,17 @@
 /* inidicator is true when stdio is initialized */
 int stdio_is_initialized = 0;
 
-#endif /* RIOT_VERSION */
+#endif /* RIOT_OS */
 
 #ifndef CONFIG_CONSOLE_UART_NONE
 static void uart_putc(int c)
 {
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
     if (stdio_is_initialized) {
         putchar(c);
         return;
     }
-#endif /* RIOT_VERSION */
+#endif /* RIOT_OS */
 
     while (1) {
         uint32_t fifo_cnt = READ_PERI_REG(UART_STATUS(CONFIG_CONSOLE_UART_NUM)) & (UART_TXFIFO_CNT << UART_TXFIFO_CNT_S);
@@ -298,7 +298,7 @@ int ets_vprintf(const char *fmt, va_list ap)
  * Re-write ets_printf in SDK side, since ets_printf in ROM will use a global
  * variable which address is in heap region of SDK side. If use ets_printf in ROM,
  * this variable maybe re-write when heap alloc and modification.
- * 
+ *
  * Using new "ets_vprintf" costs stack without alignment and accuracy:
  *                      just "fmt": 136 Bytes
  *                            "%s": 172 Bytes

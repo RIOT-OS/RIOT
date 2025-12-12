@@ -18,6 +18,7 @@
 #include <string.h>
 #include "ztimer.h"
 
+#include "buildinfo/board.h"
 #include "board.h"
 #include "microbit.h"
 #include "mineplex.h"

@@ -17,6 +17,7 @@
 
 #include <string.h>
 
+#include "buildinfo/cpu.h"
 #include "bitarithm.h"
 
 #include "mtd.h"

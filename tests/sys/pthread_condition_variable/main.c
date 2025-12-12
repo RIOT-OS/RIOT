@@ -16,6 +16,8 @@
  */
 
 #include <stdio.h>
+
+#include "buildinfo/cpu.h"
 #include "pthread.h"
 #include "thread.h"
 

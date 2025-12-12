@@ -14,9 +14,10 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-#include "board.h"
 
+#include "board.h"
 #include "board_internal.h"
+#include "buildinfo/board.h"
 
 #ifdef MODULE_MTD
 #include "mtd_native.h"

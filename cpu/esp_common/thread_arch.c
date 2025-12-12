@@ -19,6 +19,7 @@
 #include <string.h>
 
 #include "board.h"
+#include "buildinfo/cpu.h"
 #include "cpu.h"
 #include "irq.h"
 #include "log.h"

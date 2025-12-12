@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 
+#include "buildinfo/cpu.h"
 #include "atomic_utils.h"
 #include "test_utils/expect.h"
 #include "thread.h"
