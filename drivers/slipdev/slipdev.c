@@ -68,15 +68,17 @@ static inline void slipdev_unlock(void)
     }
 }
 
-static inline void _slipdev_stdio_add_to_frame(slipdev_t * dev, uint8_t byte) {
-    if (IS_USED(MODULE_SLIPDEV_STDIO)) {
-        if (dev->config.uart == slipdev_params[0].uart) {
-            isrpipe_write_one(&stdin_isrpipe, byte);
-        }
+static inline void _slipdev_stdio_add_to_frame(slipdev_t * dev, uint8_t byte)
+{
+    if (!IS_USED(MODULE_SLIPDEV_STDIO) ||
+        dev->config.uart != slipdev_params[0].uart) {
+        return;
     }
+    isrpipe_write_one(&stdin_isrpipe, byte);
 }
 
-static inline bool _slipdev_config_start_frame(slipdev_t * dev) {
+static inline bool _slipdev_config_start_frame(slipdev_t * dev)
+{
 #ifdef MODULE_SLIPDEV_CONFIG
     /* try to create new configuration / CoAP frame */
     return crb_start_chunk(&dev->rb_config);
@@ -86,7 +88,8 @@ static inline bool _slipdev_config_start_frame(slipdev_t * dev) {
 #endif
 }
 
-static inline void _slipdev_config_end_frame(slipdev_t * dev) {
+static inline void _slipdev_config_end_frame(slipdev_t * dev)
+{
 #ifdef MODULE_SLIPDEV_CONFIG
     crb_end_chunk(&dev->rb_config, true);
     thread_flags_set(thread_get(dev->coap_server_pid), 1);
@@ -95,7 +98,8 @@ static inline void _slipdev_config_end_frame(slipdev_t * dev) {
 #endif
 }
 
-static inline bool _slipdev_config_add_to_frame(slipdev_t * dev, uint8_t byte) {
+static inline bool _slipdev_config_add_to_frame(slipdev_t * dev, uint8_t byte)
+{
 #ifdef MODULE_SLIPDEV_CONFIG
     /* discard frame if byte can't be added */
     if (!crb_add_byte(&dev->rb_config, byte)) {
@@ -110,7 +114,8 @@ static inline bool _slipdev_config_add_to_frame(slipdev_t * dev, uint8_t byte) {
     return 1;
 }
 
-static inline bool _slipdev_net_start_frame(slipdev_t * dev, uint8_t byte) {
+static inline bool _slipdev_net_start_frame(slipdev_t * dev, uint8_t byte)
+{
     /* try to create new ip frame */
     if (!crb_start_chunk(&dev->rb)) {
         DEBUG("slipmux: can't start new net frame, drop frame\n");
@@ -124,12 +129,14 @@ static inline bool _slipdev_net_start_frame(slipdev_t * dev, uint8_t byte) {
     return 1;
 }
 
-static inline void _slipdev_net_end_frame(slipdev_t * dev) {
+static inline void _slipdev_net_end_frame(slipdev_t * dev)
+{
     crb_end_chunk(&dev->rb, true);
     netdev_trigger_event_isr(&dev->netdev);
 }
 
-static inline bool _slipdev_net_add_to_frame(slipdev_t * dev, uint8_t byte) {
+static inline bool _slipdev_net_add_to_frame(slipdev_t * dev, uint8_t byte)
+{
     /* discard frame if byte can't be added */
     if (!crb_add_byte(&dev->rb, byte)) {
         DEBUG("slipmux: net rx buffer full, drop frame\n");
@@ -138,7 +145,6 @@ static inline bool _slipdev_net_add_to_frame(slipdev_t * dev, uint8_t byte) {
     }
     return 1;
 }
-
 
 void _slip_rx_cb(void *arg, uint8_t byte)
 {
@@ -202,10 +208,10 @@ void _slip_rx_cb(void *arg, uint8_t byte)
             byte = SLIPDEV_ESC;
             break;
         }
-        if (!_slipdev_config_add_to_frame(dev, byte)) {
-            dev->state = SLIPDEV_STATE_UNKNOWN;
-        } else {
+        if (_slipdev_config_add_to_frame(dev, byte)) {
             dev->state = SLIPDEV_STATE_CONFIG;
+        } else {
+            dev->state = SLIPDEV_STATE_UNKNOWN;
         }
         return;
     case SLIPDEV_STATE_NET:
@@ -234,10 +240,10 @@ void _slip_rx_cb(void *arg, uint8_t byte)
             byte = SLIPDEV_ESC;
             break;
         }
-        if (!_slipdev_net_add_to_frame(dev, byte)) {
-            dev->state = SLIPDEV_STATE_UNKNOWN;
-        } else {
+        if (_slipdev_net_add_to_frame(dev, byte)) {
             dev->state = SLIPDEV_STATE_NET;
+        } else {
+            dev->state = SLIPDEV_STATE_UNKNOWN;
         }
         return;
     case SLIPDEV_STATE_UNKNOWN:
@@ -253,19 +259,19 @@ void _slip_rx_cb(void *arg, uint8_t byte)
         }
 
         if (byte == SLIPDEV_START_COAP) {
-            if (!_slipdev_config_start_frame(dev)) {
-                dev->state = SLIPDEV_STATE_UNKNOWN;
-            } else {
+            if (_slipdev_config_start_frame(dev)) {
                 dev->state = SLIPDEV_STATE_CONFIG;
+            } else {
+                dev->state = SLIPDEV_STATE_UNKNOWN;
             }
             return;
         }
 
         if (SLIPDEV_START_NET(byte)) {
-            if (!_slipdev_net_start_frame(dev, byte)) {
-                dev->state = SLIPDEV_STATE_UNKNOWN;
-            } else {
+            if (_slipdev_net_start_frame(dev, byte)) {
                 dev->state = SLIPDEV_STATE_NET;
+            } else {
+                dev->state = SLIPDEV_STATE_UNKNOWN;
             }
             return;
         }
