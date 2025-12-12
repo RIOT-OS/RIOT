@@ -30,6 +30,7 @@
 #include <errno.h>
 #include <stdbool.h>
 
+#include "buildinfo/cpuinfo.h"
 #include "cpu.h"
 #include "log.h"
 #include "macros/units.h"

@@ -18,6 +18,7 @@
  * @}
  */
 
+#include "buildinfo/cpuinfo.h"
 #include "cpu_conf.h"
 #include "shell.h"
 

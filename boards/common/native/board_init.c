@@ -14,8 +14,8 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-#include "board.h"
 
+#include "board.h"
 #include "board_internal.h"
 
 #ifdef MODULE_MTD
@@ -83,5 +83,5 @@ void board_init(void)
         puts("TZ not set, setting UTC");
     }
     setenv("TZ", "UTC", 0);
-    puts("RIOT " RIOT_BOARD " board initialized.");
+    printf("RIOT %s board initialized.", RIOT_BOARD);
 }

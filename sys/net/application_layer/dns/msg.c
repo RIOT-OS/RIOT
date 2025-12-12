@@ -20,7 +20,7 @@
 
 #include "net/dns.h"
 
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
 #include "byteorder.h"
 #endif
 

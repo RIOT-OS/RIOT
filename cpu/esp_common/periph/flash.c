@@ -20,6 +20,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "buildinfo/cpuinfo.h"
 #include "architecture.h"
 #include "board.h"
 #include "esp_common.h"

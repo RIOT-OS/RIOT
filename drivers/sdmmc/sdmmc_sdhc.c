@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include "assert.h"
+#include "buildinfo/cpuinfo.h"
 #include "macros/math.h"
 #include "periph_cpu.h"
 #include "periph/gpio.h"

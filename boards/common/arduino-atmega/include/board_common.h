@@ -21,6 +21,7 @@
  * @author      Thomas Perrot <thomas.perrot@tupi.fr>
  */
 
+#include "buildinfo/cpuinfo.h"
 #include "cpu.h"
 #include "arduino_pinmap.h"
 
