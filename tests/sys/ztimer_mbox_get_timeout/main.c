@@ -18,6 +18,7 @@
 #include <errno.h>
 #include <stdio.h>
 
+#include "buildinfo/cpu.h"
 #include "mbox.h"
 #include "test_utils/expect.h"
 #include "time_units.h"

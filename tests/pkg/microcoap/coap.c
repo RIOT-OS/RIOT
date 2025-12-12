@@ -6,6 +6,8 @@
 #include <coap.h>
 #include <string.h>
 
+#include "buildinfo/board.h"
+
 #define MAX_RESPONSE_LEN 500
 static uint8_t response[MAX_RESPONSE_LEN] = { 0 };
 

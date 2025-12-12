@@ -21,6 +21,7 @@
 #include <sys/unistd.h>
 #include <sys/reent.h>
 
+#include "buildinfo/cpu.h"
 #include "irq_arch.h"
 #include "mutex.h"
 #include "rmutex.h"

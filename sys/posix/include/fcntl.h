@@ -18,6 +18,8 @@
  * @{
  */
 
+#include "buildinfo/cpu.h"
+
 #ifndef DOXYGEN
 #if defined(CPU_NATIVE) || MODULE_NEWLIB || MODULE_PICOLIBC
 /* If building on native or newlib we need to use the system header instead */

@@ -23,11 +23,11 @@
  * @}
  */
 
+#include "buildinfo/cpu.h"
 #include "cpu.h"
-#include "pm_layered.h"
-
-#include "periph/uart.h"
 #include "periph/gpio.h"
+#include "periph/uart.h"
+#include "pm_layered.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"

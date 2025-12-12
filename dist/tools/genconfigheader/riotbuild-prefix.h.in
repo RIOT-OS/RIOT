@@ -19,42 +19,6 @@
 
 #ifdef DOXYGEN
 /**
- * @brief   The used RIOT version as human readable string literal, e.g., for
- *          printing to stdio or writing to a log.
- */
-#define RIOT_VERSION "<YEAR_OF_RELEASE>.<MONTH_OF_RELEASE>-<POSTFIX>"
-
-/**
- * @brief   The used RIOT version as machine readable number, e.g., for testing
- *          whether new APIs are available.
- *
- * @see     RIOT_VERSION_NUM
- */
-#define RIOT_VERSION_CODE   RIOT_VERSION_NUM(<YEAR>,<MONTH>,<PATCH>,<EXTRA>)
-
-/**
- * @brief   Name of the RIOT application as string literal
- *
- * The string is defined in the applications `Makefile` using the `APPLICATION`
- * variable.
- */
-#define RIOT_APPLICATION    "<RIOT_APP_NAME>"
-
-/**
- * @brief   Name of the board the app is compiled for as string literal
- */
-#define RIOT_BOARD          "<BOARD_NAME>"
-
-/**
- * @brief   Name of the MCU the app is compiled for as string literal
- *
- * This is the name of the MCU family in terms of RIOT's peripheral drivers,
- * or in other words, the folder name in the `cpu` folder in RIOT's repo root
- * used.
- */
-#define RIOT_CPU            "<CPU_FOLDER_NAME>"
-
-/**
  * @brief   Size of the RAM in Bytes
  *
  * @warning Not every CPU family provides this, it will be undefined if
@@ -92,5 +56,15 @@
  * and folder structure.
  */
 #define RIOT_MCU        MACRO_DEPRECATED RIOT_CPU
+
+/**
+ * @brief   Preprocessor macro that can be used to check whether it is compiled
+ *          as part of a RIOT build
+ *
+ * @note    This is useful for external code that can also be compiled as RIOT
+ *          package, in case the upstream wants to feature guard RIOT specific
+ *          features in the external code.
+ */
+#define RIOT_OS 1
 
 /** @} */

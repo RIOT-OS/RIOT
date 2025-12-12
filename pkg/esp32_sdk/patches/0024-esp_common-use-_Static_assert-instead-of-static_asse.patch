@@ -15,7 +15,7 @@ index fa54fdbedb..e6a77ae046 100644
  
  /* Since IDF v5.0, C17 standard is used, which supports both _Static_assert and static_assert syntax */
  /* Please do not use `_Static_assert` for C++ compatibility */
-+#ifndef RIOT_VERSION
++#ifndef RIOT_OS
  #define ESP_STATIC_ASSERT static_assert
 +#else
 +#define ESP_STATIC_ASSERT _Static_assert

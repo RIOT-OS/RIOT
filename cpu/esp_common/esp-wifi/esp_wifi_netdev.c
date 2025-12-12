@@ -19,6 +19,7 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "buildinfo/cpu.h"
 #include "net/ethernet.h"
 #include "net/netdev/eth.h"
 #include "od.h"

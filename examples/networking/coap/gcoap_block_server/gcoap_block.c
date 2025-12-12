@@ -18,6 +18,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "buildinfo/board.h"
+#include "buildinfo/cpu.h"
+#include "buildinfo/riotver.h"
 #include "fmt.h"
 #include "hashes/sha256.h"
 #include "net/gcoap.h"

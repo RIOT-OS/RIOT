@@ -19,7 +19,7 @@
 extern "C" {
 #endif
 
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
 #include "syscalls.h"
 #define os_memset   system_secure_memset
 #endif
@@ -204,7 +204,7 @@ char * os_readfile(const char *name, size_t *len);
 
 #ifndef os_bzero
 #define os_bzero(s, n) bzero(s, n)
-#endif 
+#endif
 
 
 #ifndef os_strdup

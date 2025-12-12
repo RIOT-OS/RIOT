@@ -17,6 +17,7 @@
 #include <errno.h>
 #include <stdint.h>
 
+#include "buildinfo/cpu.h"
 #include "cpu.h"
 #include "embUnit.h"
 #include "embUnit/embUnit.h"

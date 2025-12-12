@@ -381,6 +381,7 @@ INCLUDES += -I$(RIOTBASE)/core/lib/include
 INCLUDES += -I$(RIOTBASE)/core/include
 INCLUDES += -I$(RIOTBASE)/drivers/include
 INCLUDES += -I$(RIOTBASE)/sys/include
+INCLUDES += -I$(BINDIR)/riotbuild
 
 # process provided features
 include $(RIOTBASE)/Makefile.features
@@ -523,13 +524,6 @@ ifeq ($(QUIETER),1)
 else
   QQ=
 endif
-
-# if you want to publish the board into the sources as an uppercase #define
-BOARDDEF = $(call uppercase_and_underscore,$(BOARD))
-CPUDEF = $(call uppercase_and_underscore,$(CPU))
-CFLAGS += -DRIOT_APPLICATION=\"$(APPLICATION)\"
-CFLAGS += -DBOARD_$(BOARDDEF)=\"$(BOARD)\" -DRIOT_BOARD=BOARD_$(BOARDDEF)
-CFLAGS += -DCPU_$(CPUDEF)=\"$(CPU)\" -DRIOT_CPU=CPU_$(CPUDEF)
 
 # Feature test default CFLAGS and LINKFLAGS for the set compiled.
 include $(RIOTMAKE)/cflags.inc.mk
@@ -684,6 +678,9 @@ BUILDDEPS += $(RIOTBUILD_CONFIG_HEADER_C)
 BUILDDEPS += pkg-prepare
 BUILDDEPS += $(APPDEPS)
 BUILDDEPS += $(MODULE_LIST_DIR)
+
+# dynamically generated headers for `#include "buildinfo/*.h"`
+include $(RIOTMAKE)/buildinfo.inc.mk
 
 # Build dependencies depend on clean (if a make goal), as clean may wipe them.
 # Without them depending on clean parallel builds occasionally fail due to
@@ -1051,11 +1048,7 @@ $(RIOTBUILD_CONFIG_HEADER_C).in: FORCE | $(CLEAN)
 		| '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
 
 CFLAGS_WITH_MACROS += $(CFLAGS)
-CFLAGS_WITH_MACROS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
-CFLAGS_WITH_MACROS += -DRIOT_VERSION_CODE=$(RIOT_VERSION_CODE)
-ifneq (,$(RIOT_VERSION_EXTRA))
-  CFLAGS_WITH_MACROS += -DCONFIG_RIOT_VERSION_EXTRA=\""$(RIOT_VERSION_EXTRA)"\"
-endif
+
 # MODULE_NAME defines. Declared in 'makefiles/modules.inc.mk'
 CFLAGS_WITH_MACROS += $(EXTDEFINES)
 

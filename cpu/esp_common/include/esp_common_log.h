@@ -26,6 +26,7 @@ extern "C" {
 #include <stdint.h>
 #include <inttypes.h>
 
+#include "buildinfo/cpu.h"
 #include "log.h"
 
 extern uint32_t system_get_time_ms (void);

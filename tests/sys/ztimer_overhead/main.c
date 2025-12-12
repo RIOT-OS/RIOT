@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
+#include "buildinfo/board.h"
 #include "board.h"
 #include "ztimer.h"
 #include "ztimer/overhead.h"

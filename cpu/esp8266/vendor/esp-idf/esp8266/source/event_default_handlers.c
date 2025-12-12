@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
 #define ENABLE_DEBUG 0
 #include "debug.h"
 #include "esp_common.h"
@@ -35,7 +35,7 @@
 #include "freertos/queue.h"
 #include "freertos/semphr.h"
 
-#ifndef RIOT_VERSION
+#ifndef RIOT_OS
 #include "tcpip_adapter.h"
 #endif
 #include "esp_log.h"
@@ -70,7 +70,7 @@ static system_event_handler_t default_event_handlers[SYSTEM_EVENT_MAX] = { 0 };
 
 static esp_err_t system_event_sta_got_ip_default(system_event_t *event)
 {
-#ifndef RIOT_VERSION /* TODO implement */
+#ifndef RIOT_OS /* TODO implement */
     ESP_LOGI(TAG, "sta ip: " IPSTR ", mask: " IPSTR ", gw: " IPSTR,
            IP2STR(&event->event_info.got_ip.ip_info.ip),
            IP2STR(&event->event_info.got_ip.ip_info.netmask),
@@ -84,7 +84,7 @@ static esp_err_t system_event_sta_got_ip_default(system_event_t *event)
 
 static esp_err_t system_event_sta_lost_ip_default(system_event_t *event)
 {
-#ifndef RIOT_VERSION
+#ifndef RIOT_OS
     ESP_LOGI(TAG, "station ip lost");
 #else
     ESP_LOGD(TAG, "%s", __func__);
@@ -94,7 +94,7 @@ static esp_err_t system_event_sta_lost_ip_default(system_event_t *event)
 
 esp_err_t system_event_ap_start_handle_default(system_event_t *event)
 {
-#ifndef RIOT_VERSION /* TODO implement */
+#ifndef RIOT_OS /* TODO implement */
     tcpip_adapter_ip_info_t ap_ip;
     uint8_t ap_mac[6];
 
@@ -111,7 +111,7 @@ esp_err_t system_event_ap_start_handle_default(system_event_t *event)
 
 esp_err_t system_event_ap_stop_handle_default(system_event_t *event)
 {
-#ifndef RIOT_VERSION /* TODO implement */
+#ifndef RIOT_OS /* TODO implement */
     tcpip_adapter_stop(TCPIP_ADAPTER_IF_AP);
 #else
     ESP_LOGD(TAG, "%s", __func__);
@@ -122,7 +122,7 @@ esp_err_t system_event_ap_stop_handle_default(system_event_t *event)
 
 esp_err_t system_event_sta_start_handle_default(system_event_t *event)
 {
-#ifndef RIOT_VERSION /* TODO implement */
+#ifndef RIOT_OS /* TODO implement */
     tcpip_adapter_ip_info_t sta_ip;
     uint8_t sta_mac[6];
 
@@ -138,7 +138,7 @@ esp_err_t system_event_sta_start_handle_default(system_event_t *event)
 
 esp_err_t system_event_sta_stop_handle_default(system_event_t *event)
 {
-#ifndef RIOT_VERSION /* TODO implement */
+#ifndef RIOT_OS /* TODO implement */
     tcpip_adapter_stop(TCPIP_ADAPTER_IF_STA);
 #else
     ESP_LOGD(TAG, "%s", __func__);
@@ -149,7 +149,7 @@ esp_err_t system_event_sta_stop_handle_default(system_event_t *event)
 
 esp_err_t system_event_sta_connected_handle_default(system_event_t *event)
 {
-#ifndef RIOT_VERSION /* TODO implement */
+#ifndef RIOT_OS /* TODO implement */
     tcpip_adapter_dhcp_status_t status;
 
     tcpip_adapter_up(TCPIP_ADAPTER_IF_STA);
@@ -192,7 +192,7 @@ esp_err_t system_event_sta_connected_handle_default(system_event_t *event)
 
 esp_err_t system_event_sta_disconnected_handle_default(system_event_t *event)
 {
-#ifndef RIOT_VERSION /* TODO implement */
+#ifndef RIOT_OS /* TODO implement */
     tcpip_adapter_down(TCPIP_ADAPTER_IF_STA);
 #else
     ESP_LOGD(TAG, "%s", __func__);
@@ -248,7 +248,7 @@ static esp_err_t esp_system_event_debug(system_event_t *event)
         break;
     }
     case SYSTEM_EVENT_STA_GOT_IP: {
-    #ifndef RIOT_VERSION /* TODO implement */
+    #ifndef RIOT_OS /* TODO implement */
         system_event_sta_got_ip_t *got_ip = &event->event_info.got_ip;
         (void)got_ip; /* to avoid compile error: unused variable */
         ESP_LOGD(TAG, "SYSTEM_EVENT_STA_GOT_IP, ip:" IPSTR ", mask:" IPSTR ", gw:" IPSTR,
@@ -316,7 +316,7 @@ static esp_err_t esp_system_event_debug(system_event_t *event)
     }
 #if ESP_EVENT_IPV6
     case SYSTEM_EVENT_GOT_IP6: {
-    #ifndef RIOT_VERSION /* TODO implement */
+    #ifndef RIOT_OS /* TODO implement */
         ip6_addr_t *addr = &event->event_info.got_ip6.ip6_info.ip;
         ESP_LOGD(TAG, "SYSTEM_EVENT_AP_STA_GOT_IP6 address %04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x",
                  IP6_ADDR_BLOCK1(addr),
@@ -334,7 +334,7 @@ static esp_err_t esp_system_event_debug(system_event_t *event)
     }
 #endif
 
-    
+
     default: {
         ESP_LOGW(TAG, "unexpected system event %d!", event->event_id);
         break;

@@ -22,6 +22,7 @@
 #include <string.h>
 #include <time.h>
 
+#include "buildinfo/board.h"
 #include "event/periodic_callback.h"
 #include "event/thread.h"
 #include "fmt.h"

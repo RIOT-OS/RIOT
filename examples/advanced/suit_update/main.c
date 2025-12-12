@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 
+#include "buildinfo/cpu.h"
 #include "fmt.h"
 #include "thread.h"
 #include "irq.h"

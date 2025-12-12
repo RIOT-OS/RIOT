@@ -20,6 +20,8 @@
 
 #include <stdio.h>
 
+#include "buildinfo/app.h"
+#include "buildinfo/riotver.h"
 #include "periph/pm.h"
 #include "shell.h"
 

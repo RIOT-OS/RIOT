@@ -18,6 +18,7 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
+#include "buildinfo/board.h"
 #include "periph/adc.h"
 #include "periph/gpio.h"
 #include "periph/i2c.h"

@@ -1,0 +1,25 @@
+From 8f34ab66d9c0518bb9f20971e9f1904b5ad03bdf Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ml-pa.com>
+Date: Sat, 13 Dec 2025 11:13:23 +0100
+Subject: [PATCH] ports/riot: add includes needed for RIOT_BOARD & RIOT_CPU
+
+---
+ ports/riot/mpconfigport.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/ports/riot/mpconfigport.h b/ports/riot/mpconfigport.h
+index b36dd7234..2b16c2d99 100644
+--- a/ports/riot/mpconfigport.h
++++ b/ports/riot/mpconfigport.h
+@@ -26,6 +26,8 @@
+ #include <stdlib.h>
+ #include <stdint.h>
+ 
++#include "buildinfo/board.h"
++#include "buildinfo/cpu.h"
+ #include "irq.h"
+ 
+ // Usually passed from Makefile
+-- 
+2.52.0
+

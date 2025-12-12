@@ -1011,7 +1011,8 @@ INPUT                  = ../../doc.txt \
                          ../../makefiles/pseudomodules.inc.mk \
                          ../../makefiles/blob.inc.mk \
                          ../../sys/net/gnrc/routing/ipv6_auto_subnets/gnrc_ipv6_auto_subnets.c \
-                         ../../dist/tools/genconfigheader/riotbuild-prefix.h.in
+                         ../../dist/tools/genconfigheader/riotbuild-prefix.h.in \
+						 src/buildinfo
 
 # This tag can be used to specify the character encoding of the source files
 # that Doxygen parses. Internally Doxygen uses the UTF-8 encoding. Doxygen uses

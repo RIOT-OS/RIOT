@@ -47,8 +47,9 @@
  */
 
 #include <stdint.h>
-#include "periph/pm.h"
 
+#include "buildinfo/cpu.h"
+#include "periph/pm.h"
 #include "modules.h"
 #include "xfa.h"
 

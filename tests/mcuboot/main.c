@@ -16,6 +16,9 @@
  */
 
 #include <stdio.h>
+
+#include "buildinfo/board.h"
+#include "buildinfo/cpu.h"
 #include "cpu.h"
 
 int main(void)

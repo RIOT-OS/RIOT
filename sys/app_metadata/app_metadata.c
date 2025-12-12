@@ -15,6 +15,11 @@ Copyright (C) 2019, HAW Hamburg.
 
 #include <stdio.h>
 
+#include "buildinfo/app.h"
+#include "buildinfo/board.h"
+#include "buildinfo/cpu.h"
+#include "buildinfo/riotver.h"
+
 void app_metadata_print_json(void)
 {
     puts("{\"cmd\": \"app_metadata_print_json()\"}");

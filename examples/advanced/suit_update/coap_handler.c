@@ -5,11 +5,12 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#include "log.h"
-#include "suit.h"
-#include "net/nanocoap.h"
-#include "suit/transport/coap.h"
+#include "buildinfo/board.h"
 #include "kernel_defines.h"
+#include "log.h"
+#include "net/nanocoap.h"
+#include "suit.h"
+#include "suit/transport/coap.h"
 
 #ifdef MODULE_RIOTBOOT_SLOT
 #include "riotboot/slot.h"

@@ -20,6 +20,7 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include "buildinfo/cpu.h"
 #include "kernel_init.h"
 #include "periph/init.h"
 #include "periph/uart.h"

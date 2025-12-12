@@ -17,6 +17,7 @@
  * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  */
 
+#include "buildinfo/board.h"
 #include "cpu.h"
 #include "board_common.h"
 #include "periph/gpio.h"

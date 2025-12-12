@@ -20,6 +20,7 @@
 
 #include "embUnit/embUnit.h"
 
+#include "buildinfo/cpu.h"
 #include "vfs.h"
 #include "fs/constfs.h"
 

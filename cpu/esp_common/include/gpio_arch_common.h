@@ -16,6 +16,7 @@
  * @}
  */
 
+#include "buildinfo/cpu.h"
 #include "periph/gpio.h"
 
 #ifndef DOXYGEN

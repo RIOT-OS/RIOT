@@ -106,7 +106,7 @@ uint32_t esp_log_early_timestamp(void);
  */
 void esp_log_write(esp_log_level_t level, const char* tag, const char* format, ...) __attribute__ ((format (printf, 3, 4)));
 
-#ifndef RIOT_VERSION
+#ifndef RIOT_OS
 
 /** @cond */
 
@@ -314,7 +314,7 @@ void esp_log_write(esp_log_level_t level, const char* tag, const char* format, .
         if ( LOG_LOCAL_LEVEL >= level ) ESP_LOG_LEVEL(level, tag, format, ##__VA_ARGS__); \
     } while(0)
 
-#else /* RIOT_VERSION */
+#else /* RIOT_OS */
 
 #include "esp_common.h"
 
@@ -348,7 +348,7 @@ void esp_log_write(esp_log_level_t level, const char* tag, const char* format, .
                 } \
             } while(0)
 
-#endif /* RIOT_VERSION */
+#endif /* RIOT_OS */
 
 #ifdef __cplusplus
 }

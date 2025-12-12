@@ -18,6 +18,9 @@
 
 #include <stdio.h>
 
+#include "buildinfo/board.h"
+#include "buildinfo/cpu.h"
+
 int main(void)
 {
     puts("Hello World!");
