@@ -85,7 +85,7 @@ extern "C" {
  * sized packets.
  */
 #ifdef CONFIG_SLIPDEV_BUFSIZE_EXP
-#define CONFIG_SLIPDEV_BUFSIZE (1<<CONFIG_SLIPDEV_BUFSIZE_EXP)
+#define CONFIG_SLIPDEV_BUFSIZE (1 << CONFIG_SLIPDEV_BUFSIZE_EXP)
 #endif
 
 #ifndef CONFIG_SLIPDEV_BUFSIZE
@@ -99,7 +99,7 @@ extern "C" {
 typedef enum {
     /**
      * @brief  Device is in no mode (currently not receiving any frame), this is the idle state.
-     * 
+     *
      * Waits for any byte, if the byte is a valid frame start byte (diagnostic, configuration,
      * IP packet), it starts a new frame of the respective type and switches to the corresponding
      * state. If the byte is a frame end byte, it is a no-op (we received an empty frame).
@@ -109,7 +109,7 @@ typedef enum {
     SLIPDEV_STATE_NONE = 0,
     /**
      * @brief   Device discards incoming data.
-     * 
+     *
      * It switches back to the NONE (idle) state once the unknown frame is ended via a frame
      * end byte.
      */
@@ -173,9 +173,9 @@ typedef struct {
     uint8_t rxmem[CONFIG_SLIPDEV_BUFSIZE];  /**< memory used by RX buffer */
 
 #if IS_USED(MODULE_SLIPDEV_CONFIG)
-    chunk_ringbuf_t rb_config;              /**< Ringbuffer stores received configuration frames */
-    uint8_t rxmem_config[CONFIG_SLIPDEV_BUFSIZE]; /**< memory used by RX buffer */
-    kernel_pid_t coap_server_pid;           /**< The PID of the CoAP server */
+    chunk_ringbuf_t rb_config;                      /**< Ringbuffer stores received configuration frames */
+    uint8_t rxmem_config[CONFIG_SLIPDEV_BUFSIZE];   /**< memory used by RX buffer */
+    kernel_pid_t coap_server_pid;                   /**< The PID of the CoAP server */
 #endif
     /**
      * @brief   Device state

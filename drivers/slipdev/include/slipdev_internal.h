@@ -57,12 +57,12 @@ extern "C" {
 /**
  * @brief   Starts an IP packet frame
  */
-#define SLIPDEV_START_NET(byte) (\
+#define SLIPDEV_START_NET(byte) ( \
             /* is it an IPv4 packet? */ \
             (byte >= 0x45 && byte <= 0x4f) || \
             /* or is it an IPv6 packet? */ \
             (byte >= 0x60 && byte <= 0x6f) \
-        )
+            )
 /** @} */
 
 /**
