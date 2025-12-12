@@ -94,9 +94,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name    Device state definitions
- * @anchor  drivers_slipdev_states
- * @{
+ * @brief   States for the slipdev and its parser
  */
 typedef enum {
     /**
@@ -140,7 +138,6 @@ typedef enum {
      */
     SLIPDEV_STATE_SLEEP,
 } slipdev_state_t;
-/** @} */
 
 /**
  * @brief   Configuration parameters for a slipdev
@@ -173,7 +170,7 @@ typedef struct {
 #endif
     /**
      * @brief   Device state
-     * @see     [Device state definitions](@ref drivers_slipdev_states)
+     * @see     [Device state definitions](@ref slipdev_state_t)
      */
     slipdev_state_t state;
 } slipdev_t;
