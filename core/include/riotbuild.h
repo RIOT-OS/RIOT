@@ -1,19 +1,20 @@
 /*
- * Copyright (C) 2024 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2024 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+#pragma once
+
 /**
- * @defgroup    config_riotbuild    riotbuild.h: Preprocessor Constants to Query the Build System Configuration
+ * @defgroup    config_riotbuild    riotbuild.h: Macros injected into every compilation unit
  * @ingroup     config
  *
- * The RIOT build system generates a header file `riotbuild.h` that is included
- * in every C compilation unit by passing the `-include` flag to the C compiler.
- * Hence, it provides a set of macros that are unconditionally available and
- * can be used by C code to query the build system configuration.
+ * The RIOT build system injects this header into every compilation unit with
+ * `CFLAGS += -include riotbuild.h`. Some of the macros documented here are
+ * dynamic and actually provided as `CFLAGS += -D<MACRO_NAME>=<MACRO_VALUE>`
+ * and guarded behind and `#ifdef DOXYGEN`; but from the user point of view
+ * this should be an implementation detail.
+ *
  * @{
  */
 
