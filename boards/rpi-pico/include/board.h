@@ -16,6 +16,7 @@
  * @author          Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
+#include "buildinfo/board.h"
 #include "cpu.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"

@@ -1,0 +1,469 @@
+From f044de457927bc263cc9484511ba7031db6e9811 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ml-pa.com>
+Date: Fri, 12 Dec 2025 22:51:16 +0100
+Subject: [PATCH] tree-wide: use RIOT_OS macro to detect RIOT OS
+
+---
+ crypto.c     |  8 ++++----
+ dtls.c       | 12 ++++++------
+ dtls_debug.c |  4 ++--
+ dtls_debug.h |  4 ++--
+ dtls_mutex.h |  6 +++---
+ dtls_prng.c  |  2 +-
+ dtls_time.c  |  4 ++--
+ dtls_time.h  |  6 +++---
+ global.h     |  6 +++---
+ hmac.h       |  6 +++---
+ netq.c       |  4 ++--
+ netq.h       |  4 ++--
+ peer.c       |  4 ++--
+ session.c    |  8 ++++----
+ session.h    |  4 ++--
+ tinydtls.h   |  8 ++++----
+ 16 files changed, 45 insertions(+), 45 deletions(-)
+
+diff --git a/crypto.c b/crypto.c
+index 1937681..3badcca 100644
+--- a/crypto.c
++++ b/crypto.c
+@@ -41,7 +41,7 @@
+ LOG_MODULE_DECLARE(TINYDTLS, CONFIG_TINYDTLS_LOG_LEVEL);
+ #endif /* WITH_ZEPHYR */
+ 
+-#if defined(RIOT_VERSION)
++#if defined(RIOT_OS)
+ # include <memarray.h>
+ 
+ dtls_handshake_parameters_t handshake_storage_data[DTLS_HANDSHAKE_MAX];
+@@ -54,7 +54,7 @@ memarray_t security_storage;
+ memarray_t handshake_storage;
+ memarray_t security_storage;
+ 
+-#endif /* RIOT_VERSION */
++#endif /* RIOT_OS */
+ 
+ #define HMAC_UPDATE_SEED(Context,Seed,Length)		\
+   if (Seed) dtls_hmac_update(Context, (Seed), (Length))
+@@ -73,7 +73,7 @@ static void dtls_cipher_context_release(void)
+   dtls_mutex_unlock(&cipher_context_mutex);
+ }
+ 
+-#if !(defined (WITH_CONTIKI)) && !(defined (RIOT_VERSION))
++#if !(defined (WITH_CONTIKI)) && !(defined (RIOT_OS))
+ void crypto_init(void)
+ {
+ }
+@@ -120,7 +120,7 @@ static void dtls_security_dealloc(dtls_security_parameters_t *security) {
+   memb_free(&security_storage, security);
+ }
+ 
+-#elif defined (RIOT_VERSION)
++#elif defined (RIOT_OS)
+ 
+ void crypto_init(void) {
+   memarray_init(&handshake_storage, handshake_storage_data, sizeof(dtls_handshake_parameters_t), DTLS_HANDSHAKE_MAX);
+diff --git a/dtls.c b/dtls.c
+index 33b352f..cebb93f 100644
+--- a/dtls.c
++++ b/dtls.c
+@@ -73,12 +73,12 @@ LOG_MODULE_DECLARE(TINYDTLS, CONFIG_TINYDTLS_LOG_LEVEL);
+  */
+ #define DTLS_DESTROY_CLOSE 0x02
+ 
+-#ifdef RIOT_VERSION
++#ifdef RIOT_OS
+ # include <memarray.h>
+ 
+ dtls_context_t dtlscontext_storage_data[DTLS_CONTEXT_MAX];
+ memarray_t dtlscontext_storage;
+-#endif /* RIOT_VERSION */
++#endif /* RIOT_OS */
+ 
+ #define dtls_set_version(H,V) dtls_int_to_uint16((H)->version, (V))
+ #define dtls_set_content_type(H,V) ((H)->content_type = (V) & 0xff)
+@@ -299,7 +299,7 @@ free_context(dtls_context_t *context) {
+ 
+ #endif /* WITH_CONTIKI || WITH_LWIP */
+ 
+-#ifdef RIOT_VERSION
++#ifdef RIOT_OS
+ static inline dtls_context_t *
+ malloc_context(void) {
+      return (dtls_context_t *) memarray_alloc(&dtlscontext_storage);
+@@ -308,7 +308,7 @@ malloc_context(void) {
+ static inline void free_context(dtls_context_t *context) {
+   memarray_free(&dtlscontext_storage, context);
+ }
+-#endif /* RIOT_VERSION */
++#endif /* RIOT_OS */
+ 
+ #if defined(WITH_POSIX) || defined(IS_WINDOWS)
+ 
+@@ -331,10 +331,10 @@ dtls_init(void) {
+   netq_init();
+   peer_init();
+ 
+-#ifdef RIOT_VERSION
++#ifdef RIOT_OS
+ memarray_init(&dtlscontext_storage, dtlscontext_storage_data,
+               sizeof(dtls_context_t), DTLS_CONTEXT_MAX);
+-#endif /* RIOT_VERSION */
++#endif /* RIOT_OS */
+ }
+ 
+ /* Calls cb_alert() with given arguments if defined, otherwise an
+diff --git a/dtls_debug.c b/dtls_debug.c
+index 28fd0d7..7a499c5 100644
+--- a/dtls_debug.c
++++ b/dtls_debug.c
+@@ -224,13 +224,13 @@ dsrv_print_addr(const session_t *addr, char *buf, size_t len) {
+ 
+ #endif /* WITH_CONTIKI */
+ 
+-#if defined(RIOT_VERSION) || defined(IS_WINDOWS) || defined(WITH_LWIP)
++#if defined(RIOT_OS) || defined(IS_WINDOWS) || defined(WITH_LWIP)
+   /* FIXME: Switch to RIOT own DEBUG lines */
+   /* TODO: Check if inet_ntop can be used on Windows */
+   (void) addr;
+   (void) buf;
+   (void) len;
+-#endif /* RIOT_VERSION || IS_WINDOWS */
++#endif /* RIOT_OS || IS_WINDOWS */
+ 
+ #ifdef WITH_POSIX
+   /* TODO: output addresses manually */
+diff --git a/dtls_debug.h b/dtls_debug.h
+index cd65373..14afc1a 100644
+--- a/dtls_debug.h
++++ b/dtls_debug.h
+@@ -28,7 +28,7 @@
+ #include <zephyr/logging/log.h>
+ #endif /* WITH_ZEPHYR */
+ 
+-#ifdef RIOT_VERSION
++#ifdef RIOT_OS
+ #include "log.h"
+ #include "od.h"
+ #endif
+@@ -131,7 +131,7 @@ void dtls_dsrv_log_addr(log_t level, const char *name, const session_t *addr);
+ #define dtls_debug(...) LOG_DBG(__VA_ARGS__)
+ #define dtls_debug_hexdump(name, buf, length) { LOG_DBG("%s (%zu bytes):", name, length); LOG_HEXDUMP_DBG(buf, length, name); }
+ #define dtls_debug_dump(name, buf, length) { LOG_DBG("%s (%zu bytes):", name, length); LOG_HEXDUMP_DBG(buf, length, name); }
+-#elif defined(RIOT_VERSION)
++#elif defined(RIOT_OS)
+ #define dtls_emerg(...) LOG_ERROR(__VA_ARGS__)
+ #define dtls_alert(...) LOG_ERROR(__VA_ARGS__)
+ #define dtls_crit(...) LOG_ERROR(__VA_ARGS__)
+diff --git a/dtls_mutex.h b/dtls_mutex.h
+index fe46ca1..2c33fb3 100644
+--- a/dtls_mutex.h
++++ b/dtls_mutex.h
+@@ -22,7 +22,7 @@
+ #ifndef _DTLS_MUTEX_H_
+ #define _DTLS_MUTEX_H_
+ 
+-#if defined(RIOT_VERSION)
++#if defined(RIOT_OS)
+ 
+ #include <mutex.h>
+ 
+@@ -55,7 +55,7 @@ typedef int dtls_mutex_t;
+ #define dtls_mutex_unlock(a) *(a) = 0
+ 
+ 
+-#else /* ! RIOT_VERSION && ! WITH_CONTIKI && ! WITH_ZEPHYR && ! IS_WINDOWS */
++#else /* ! RIOT_OS && ! WITH_CONTIKI && ! WITH_ZEPHYR && ! IS_WINDOWS */
+ 
+ #include <pthread.h>
+ 
+@@ -65,6 +65,6 @@ typedef pthread_mutex_t dtls_mutex_t;
+ #define dtls_mutex_trylock(a) pthread_mutex_trylock(a)
+ #define dtls_mutex_unlock(a) pthread_mutex_unlock(a)
+ 
+-#endif /* ! RIOT_VERSION && ! WITH_CONTIKI && ! IS_WINDOWS */
++#endif /* ! RIOT_OS && ! WITH_CONTIKI && ! IS_WINDOWS */
+ 
+ #endif /* _DTLS_MUTEX_H_ */
+diff --git a/dtls_prng.c b/dtls_prng.c
+index 1ccbf55..25692b4 100644
+--- a/dtls_prng.c
++++ b/dtls_prng.c
+@@ -24,7 +24,7 @@
+ #elif defined (ESPIDF_VERSION)
+ #include "platform-specific/dtls_prng_espidf.c"
+ 
+-#elif defined (RIOT_VERSION)
++#elif defined (RIOT_OS)
+ #include "platform-specific/dtls_prng_riot.c"
+ 
+ #elif defined (WITH_ZEPHYR)
+diff --git a/dtls_time.c b/dtls_time.c
+index 9a9cecf..efb7192 100644
+--- a/dtls_time.c
++++ b/dtls_time.c
+@@ -41,7 +41,7 @@ dtls_ticks(dtls_tick_t *t) {
+   *t = clock_time();
+ }
+ 
+-#elif defined(RIOT_VERSION)
++#elif defined(RIOT_OS)
+ 
+ dtls_tick_t dtls_clock_offset;
+ 
+@@ -114,4 +114,4 @@ void dtls_ticks(dtls_tick_t *t) {
+ #endif
+ }
+ 
+-#endif /* ! CONTIKI && ! RIOT_VERSION && ! WITH_ZEPHYR && ! WITH_LWIP && ! WITH_POSIX */
++#endif /* ! CONTIKI && ! RIOT_OS && ! WITH_ZEPHYR && ! WITH_LWIP && ! WITH_POSIX */
+diff --git a/dtls_time.h b/dtls_time.h
+index ee2eaed..a03e510 100644
+--- a/dtls_time.h
++++ b/dtls_time.h
+@@ -40,7 +40,7 @@
+ #ifdef WITH_CONTIKI
+ #include "clock.h"
+ 
+-#elif defined(RIOT_VERSION)
++#elif defined(RIOT_OS)
+ 
+ #include "ztimer.h"
+ #include "timex.h"
+@@ -72,7 +72,7 @@ typedef int64_t clock_time_t;
+ 
+ typedef uint32_t clock_time_t;
+ 
+-#else /* ! WITH_CONTIKI && ! RIOT_VERSION && ! WITH_ZEPHYR && ! WITH_LWIP */
++#else /* ! WITH_CONTIKI && ! RIOT_OS && ! WITH_ZEPHYR && ! WITH_LWIP */
+ 
+ #ifdef HAVE_TIME_H
+ #include <time.h>
+@@ -84,7 +84,7 @@ typedef uint32_t clock_time_t;
+ 
+ typedef uint32_t clock_time_t;
+ 
+-#endif /* ! WITH_CONTIKI && ! RIOT_VERSION && ! WITH_ZEPHYR && ! WITH_LWIP */
++#endif /* ! WITH_CONTIKI && ! RIOT_OS && ! WITH_ZEPHYR && ! WITH_LWIP */
+ 
+ typedef clock_time_t dtls_tick_t;
+ 
+diff --git a/global.h b/global.h
+index d915aed..3a4e167 100644
+--- a/global.h
++++ b/global.h
+@@ -46,7 +46,7 @@ typedef unsigned char uint48[6];
+ /** Maximum size of DTLS message.
+     When Peers are sending bigger messages this causes problems. Californium
+     with ECDSA needs at least 220 */
+-#if (defined(WITH_CONTIKI) || defined(RIOT_VERSION))
++#if (defined(WITH_CONTIKI) || defined(RIOT_OS))
+ #ifdef DTLS_ECC
+ #define DTLS_MAX_BUF 200
+ #else /* DTLS_ECC */
+@@ -54,14 +54,14 @@ typedef unsigned char uint48[6];
+ #endif /* DTLS_ECC */
+ #else /* WITH_CONTIKI */
+ #define DTLS_MAX_BUF 1400
+-#endif /* WITH_CONTIKI || RIOT_VERSION */
++#endif /* WITH_CONTIKI || RIOT_OS */
+ #endif
+ 
+ /*
+  * DTLS send buf is alloctaed on the stack by default
+  */
+ #if !defined(DTLS_CONSTRAINED_STACK) && \
+-    (defined(WITH_CONTIKI) || defined(RIOT_VERSION)) && \
++    (defined(WITH_CONTIKI) || defined(RIOT_OS)) && \
+     (DTLS_MAX_BUF > 200)
+ #define DTLS_CONSTRAINED_STACK 1
+ #endif
+diff --git a/hmac.h b/hmac.h
+index 67ceaa7..8ca8070 100644
+--- a/hmac.h
++++ b/hmac.h
+@@ -24,7 +24,7 @@
+ #include "global.h"
+ 
+ #ifdef WITH_SHA256
+-#ifdef RIOT_VERSION
++#ifdef RIOT_OS
+ #include "hashes/sha256.h"
+ 
+ typedef sha256_context_t dtls_hash_ctx;
+@@ -48,7 +48,7 @@ typedef crypto_hash_sha256_state dtls_sha256_ctx;
+ #define dtls_sha256_update(Ctx,Input,Len) crypto_hash_sha256_update((Ctx), (Input), (Len))
+ #define dtls_sha256_final(Buf,Ctx)        crypto_hash_sha256_final((Ctx), (Buf))
+ 
+-#else /* ! RIOT_VERSION && ! ESP_PLATFORM */
++#else /* ! RIOT_OS && ! ESP_PLATFORM */
+ 
+ /** Aaron D. Gifford's implementation of SHA256
+  *  see http://www.aarongifford.com/ */
+@@ -57,7 +57,7 @@ typedef crypto_hash_sha256_state dtls_sha256_ctx;
+ typedef dtls_sha256_ctx dtls_hash_ctx;
+ #define DTLS_HASH_CTX_SIZE sizeof(dtls_sha256_ctx)
+ 
+-#endif /* ! RIOT_VERSION && ! ESP_PLATFORM */
++#endif /* ! RIOT_OS && ! ESP_PLATFORM */
+ 
+ 
+ typedef dtls_hash_ctx *dtls_hash_t;
+diff --git a/netq.c b/netq.c
+index a6d17a1..582a4bc 100644
+--- a/netq.c
++++ b/netq.c
+@@ -32,7 +32,7 @@
+ LOG_MODULE_DECLARE(TINYDTLS, CONFIG_TINYDTLS_LOG_LEVEL);
+ #endif /* WITH_ZEPHYR */
+ 
+-#if !(defined (WITH_CONTIKI)) && !(defined (RIOT_VERSION))
++#if !(defined (WITH_CONTIKI)) && !(defined (RIOT_OS))
+ #include <stdlib.h>
+ 
+ static inline netq_t *
+@@ -65,7 +65,7 @@ netq_init() {
+   memb_init(&netq_storage);
+ }
+ 
+-#elif defined (RIOT_VERSION)
++#elif defined (RIOT_OS)
+ # include <memarray.h>
+ 
+ netq_t netq_storage_data[NETQ_MAXCNT];
+diff --git a/netq.h b/netq.h
+index 61876cc..aa804c4 100644
+--- a/netq.h
++++ b/netq.h
+@@ -66,14 +66,14 @@ typedef struct netq_t {
+   unsigned char retransmit_cnt;	/**< retransmission counter, will be removed when zero */
+ 
+   size_t length;		/**< actual length of data */
+-#if !(defined (WITH_CONTIKI)) && !(defined (RIOT_VERSION))
++#if !(defined (WITH_CONTIKI)) && !(defined (RIOT_OS))
+   unsigned char data[];		/**< the datagram to send */
+ #else
+   netq_packet_t data;		/**< the datagram to send */
+ #endif
+ } netq_t;
+ 
+-#if !(defined (WITH_CONTIKI)) && !(defined (RIOT_VERSION))
++#if !(defined (WITH_CONTIKI)) && !(defined (RIOT_OS))
+ static inline void netq_init(void)
+ { }
+ #else
+diff --git a/peer.c b/peer.c
+index e66dd86..8144970 100644
+--- a/peer.c
++++ b/peer.c
+@@ -21,7 +21,7 @@
+ #include "peer.h"
+ #include "dtls_debug.h"
+ 
+-#if !(defined (WITH_CONTIKI)) && !(defined (RIOT_VERSION))
++#if !(defined (WITH_CONTIKI)) && !(defined (RIOT_OS))
+ void peer_init(void)
+ {
+ }
+@@ -61,7 +61,7 @@ dtls_free_peer(dtls_peer_t *peer) {
+   memb_free(&peer_storage, peer);
+ }
+ 
+-#elif defined (RIOT_VERSION)
++#elif defined (RIOT_OS)
+ # include <memarray.h>
+ 
+ dtls_peer_t peer_storage_data[DTLS_PEER_MAX];
+diff --git a/session.c b/session.c
+index 346eae5..330e764 100644
+--- a/session.c
++++ b/session.c
+@@ -111,7 +111,7 @@ dtls_session_init(session_t *sess) {
+  * for sessions and peers and store a pointer to a session in the peer
+  * struct.
+  */
+-#if !(defined (WITH_CONTIKI)) && !(defined (RIOT_VERSION)) && !(defined (WITH_LWIP_NO_SOCKET))
++#if !(defined (WITH_CONTIKI)) && !(defined (RIOT_OS)) && !(defined (WITH_LWIP_NO_SOCKET))
+ session_t*
+ dtls_new_session(struct sockaddr *addr, socklen_t addrlen) {
+   session_t *sess;
+@@ -140,12 +140,12 @@ dtls_session_addr(session_t *sess, socklen_t *addrlen) {
+   *addrlen = sess->size;
+   return &sess->addr.sa;
+ }
+-#endif /* ! WITH_CONTIKI && ! RIOT_VERSION && ! WITH_LWIP_NO_SOCKET */
++#endif /* ! WITH_CONTIKI && ! RIOT_OS && ! WITH_LWIP_NO_SOCKET */
+ 
+ int
+ dtls_session_equals(const session_t *a, const session_t *b) {
+   assert(a); assert(b);
+-#ifdef RIOT_VERSION
++#ifdef RIOT_OS
+   switch (a->addr.family) {
+ #ifdef SOCK_HAS_IPV4
+   case AF_INET:
+@@ -161,5 +161,5 @@ dtls_session_equals(const session_t *a, const session_t *b) {
+   }
+ #else
+   return _dtls_address_equals_impl(a, b);
+-#endif /* RIOT_VERSION */
++#endif /* RIOT_OS */
+ }
+diff --git a/session.h b/session.h
+index 21903d8..4ae2581 100644
+--- a/session.h
++++ b/session.h
+@@ -109,7 +109,7 @@ typedef struct {
+  */
+ void dtls_session_init(session_t *sess);
+ 
+-#if !(defined (WITH_CONTIKI)) && !(defined (RIOT_VERSION)) && !(defined (WITH_LWIP_NO_SOCKET))
++#if !(defined (WITH_CONTIKI)) && !(defined (RIOT_OS)) && !(defined (WITH_LWIP_NO_SOCKET))
+ /**
+  * Creates a new ::session_t for the given address.
+  *
+@@ -136,7 +136,7 @@ void dtls_free_session(session_t *sess);
+  * @return The address or @c NULL if @p sess was @c NULL.
+  */
+ struct sockaddr* dtls_session_addr(session_t *sess, socklen_t *addrlen);
+-#endif /* ! WITH_CONTIKI && ! RIOT_VERSION && ! WITH_LWIP_NO_SOCKET */
++#endif /* ! WITH_CONTIKI && ! RIOT_OS && ! WITH_LWIP_NO_SOCKET */
+ 
+ /**
+  * Compares the given session objects. This function returns @c 0
+diff --git a/tinydtls.h b/tinydtls.h
+index 33b7d3c..5f0fa8f 100644
+--- a/tinydtls.h
++++ b/tinydtls.h
+@@ -24,9 +24,9 @@
+ #ifndef _DTLS_TINYDTLS_H_
+ #define _DTLS_TINYDTLS_H_
+ 
+-#ifdef RIOT_VERSION
++#ifdef RIOT_OS
+ #include "platform-specific/riot_boards.h"
+-#endif /* RIOT_VERSION */
++#endif /* RIOT_OS */
+ 
+ #ifdef CONTIKI
+ #include "platform-specific/platform.h"
+@@ -43,7 +43,7 @@
+ 
+ #ifndef WITH_LWIP
+ #ifndef CONTIKI
+-#ifndef RIOT_VERSION
++#ifndef RIOT_OS
+ #ifndef IS_WINDOWS
+ #ifndef WITH_POSIX
+ /* TODO: To remove in a future */
+@@ -51,7 +51,7 @@
+ #endif /* WITH_POSIX */
+ #endif /* IS_WINDOWS */
+ #include "dtls_config.h"
+-#endif /* RIOT_VERSION */
++#endif /* RIOT_OS */
+ #endif /* CONTIKI */
+ #endif /* WITH_LWIP */
+ 
+-- 
+2.52.0
+

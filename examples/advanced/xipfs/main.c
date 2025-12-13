@@ -22,6 +22,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 
+#include "buildinfo/board.h"
 #include "fs/xipfs_fs.h"
 #include "periph/flashpage.h"
 #include "shell.h"

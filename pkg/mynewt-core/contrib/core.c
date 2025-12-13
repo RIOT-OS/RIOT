@@ -19,6 +19,7 @@
 
 #include <assert.h>
 
+#include "buildinfo/cpu.h"
 #include "os/os_cputime.h"
 #include "hal/hal_timer.h"
 

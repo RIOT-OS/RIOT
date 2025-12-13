@@ -28,6 +28,7 @@
  *          <sys/select.h>](https://pubs.opengroup.org/onlinepubs/9699919799.2018edition/basedefs/sys_select.h)
  */
 
+#include "buildinfo/cpu.h"
 #ifdef CPU_NATIVE
 /* On native, system headers may depend on system's <sys/select.h>. Hence,
  * include the real sys/select.h here. */

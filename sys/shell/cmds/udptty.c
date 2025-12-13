@@ -17,11 +17,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "shell.h"
-#include "stdio_base.h"
+
+#include "buildinfo/cpu.h"
 #include "net/sock/async.h"
 #include "net/sock/udp.h"
 #include "net/utils.h"
+#include "shell.h"
+#include "stdio_base.h"
 #include "ztimer.h"
 
 #ifndef CONFIG_STDIO_UDP_PORT

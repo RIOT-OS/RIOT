@@ -20,6 +20,7 @@
 #include <stdio.h>
 
 #include "atomic_utils.h"
+#include "buildinfo/cpu.h"
 #include "macros/utils.h"
 #include "xtimer.h"
 

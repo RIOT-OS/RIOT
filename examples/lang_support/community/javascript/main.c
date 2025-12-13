@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "buildinfo/board.h"
+#include "buildinfo/cpu.h"
 #include "jerryscript.h"
 #include "jerryscript-ext/handler.h"
 

@@ -17,6 +17,9 @@
 
 #include <stdint.h>
 #include <wolfssl/wolfcrypt/ed25519.h>
+
+#include "buildinfo/board.h"
+#include "buildinfo/cpu.h"
 #include "log.h"
 
 const uint8_t ed_public_key[ED25519_KEY_SIZE] = {

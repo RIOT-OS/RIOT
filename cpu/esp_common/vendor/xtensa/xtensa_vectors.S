@@ -90,6 +90,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 *******************************************************************************/
 
+#include "buildinfo/cpu.h"
 #include "xtensa_context.h"
 #include "xtensa_rtos.h"
 
@@ -218,7 +219,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     movi    a3, XT_TIMER_INTEN              /* a3 = timer interrupt bit */
     wsr     a4, INTCLEAR                    /* clear sw or edge-triggered interrupt */
 
-    #ifndef RIOT_VERSION                    /* we use it as hardware timer in RIOT OS */
+    #ifndef RIOT_OS                         /* we use it as hardware timer in RIOT OS */
     beq     a3, a4, 7f                      /* if timer interrupt then skip table */
     #endif
 
@@ -311,7 +312,7 @@ _xt_panic:
     movi    a2, SYS_gdb_abort
     simcall
     #else
-    #ifdef RIOT_VERSION
+    #ifdef RIOT_OS
     addi    a2, a0, -3
     call0   _panic_handler
     #endif
@@ -2010,7 +2011,7 @@ _xt_nmi:
     /* USER_EDIT:
     ADD HIGH PRIORITY NON-MASKABLE INTERRUPT (NMI) HANDLER CODE HERE.
     */
-    #if defined(RIOT_VERSION) && defined(CPU_ESP8266)
+    #if defined(RIOT_OS) && defined(CPU_ESP8266)
 
     rsr     a0, EXCSAVE + XCHAL_NMILEVEL /* restore a0 as saved in _NMIExceptionHandler */
 
@@ -2116,7 +2117,7 @@ _xt_nmi:
 
     /*************************** NMI Handler END ****************************/
 
-    #endif  /* defined(RIOT_VERSION) && defined(CPU_ESP8266) */
+    #endif  /* defined(RIOT_OS) && defined(CPU_ESP8266) */
 
     .align  4
 .L_xt_nmi_exit:

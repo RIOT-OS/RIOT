@@ -33,6 +33,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "buildinfo/board.h"
+#include "buildinfo/cpu.h"
+#include "buildinfo/riotver.h"
+
 #include "nimble_riot.h"
 #include "nimble_autoadv.h"
 

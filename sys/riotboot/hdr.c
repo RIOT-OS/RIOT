@@ -25,7 +25,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
 #include "log.h"
 #else
 #define LOG_INFO(...) printf(__VA_ARGS__)

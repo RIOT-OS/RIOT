@@ -23,6 +23,8 @@
  * @author      Thomas Perrot <thomas.perrot@tupi.fr>
  */
 
+#include "buildinfo/board.h"
+#include "buildinfo/cpu.h"
 #include "periph/adc.h"
 #include "periph/gpio.h"
 #include "periph/i2c.h"

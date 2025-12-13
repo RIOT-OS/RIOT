@@ -30,6 +30,7 @@
 #define CONFIG_BOARD_HAS_HSE    1
 #endif
 
+#include "buildinfo/board.h"
 #include "periph_cpu.h"
 #include "clk_conf.h"
 

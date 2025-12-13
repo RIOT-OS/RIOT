@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "buildinfo/cpu.h"
 #include "architecture.h"
 #include "arduino_iomap.h"
 #include "macros/units.h"

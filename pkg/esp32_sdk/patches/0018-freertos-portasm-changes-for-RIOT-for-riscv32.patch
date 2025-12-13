@@ -28,7 +28,7 @@ index 5f32c613a0..f6ba4eb72b 100644
  #include "esp_private/hw_stack_guard.h"
 +#endif
 +
-+#ifdef RIOT_VERSION
++#ifdef RIOT_OS
 +#include "cpu_conf.h"
 +
 +#define port_uxInterruptNesting irq_interrupt_nesting

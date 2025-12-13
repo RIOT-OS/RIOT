@@ -21,12 +21,14 @@
 #include <stdint.h>
 
 #include "auto_init.h"
+#include "buildinfo/cpu.h"
+#include "buildinfo/riotver.h"
 #include "irq.h"
 #include "kernel_init.h"
 #include "log.h"
 #include "periph/pm.h"
-#include "thread.h"
 #include "stdio_base.h"
+#include "thread.h"
 
 #if IS_USED(MODULE_VFS)
 #include "vfs.h"

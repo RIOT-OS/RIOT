@@ -1,0 +1,155 @@
+From 8ff05a1eec8d9b992b38eca851a16df1fe7f6ebc Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ml-pa.com>
+Date: Sat, 13 Dec 2025 11:44:15 +0100
+Subject: [PATCH] nimble,porting: use RIOT_OS macro to detect RIOT
+
+---
+ nimble/controller/include/controller/ble_ll.h | 2 +-
+ nimble/drivers/nrf51/src/ble_hw.c             | 2 +-
+ nimble/drivers/nrf51/src/ble_phy.c            | 2 +-
+ nimble/drivers/nrf52/src/ble_hw.c             | 2 +-
+ nimble/drivers/nrf52/src/ble_phy.c            | 6 +++---
+ nimble/drivers/nrf5340/src/ble_hw.c           | 2 +-
+ nimble/drivers/nrf5340/src/ble_phy.c          | 2 +-
+ porting/nimble/src/hal_timer.c                | 2 +-
+ porting/nimble/src/nimble_port.c              | 2 +-
+ 9 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/nimble/controller/include/controller/ble_ll.h b/nimble/controller/include/controller/ble_ll.h
+index f336c08..d6004ab 100644
+--- a/nimble/controller/include/controller/ble_ll.h
++++ b/nimble/controller/include/controller/ble_ll.h
+@@ -29,7 +29,7 @@
+ #include "controller/ble_ll_ctrl.h"
+ #include "hal/hal_system.h"
+ #endif
+-#ifdef RIOT_VERSION
++#ifdef RIOT_OS
+ #include "hal/hal_timer.h"
+ #endif
+ 
+diff --git a/nimble/drivers/nrf51/src/ble_hw.c b/nimble/drivers/nrf51/src/ble_hw.c
+index fb6e844..cacf875 100644
+--- a/nimble/drivers/nrf51/src/ble_hw.c
++++ b/nimble/drivers/nrf51/src/ble_hw.c
+@@ -325,7 +325,7 @@ ble_hw_rng_init(ble_rng_isr_cb_t cb, int bias)
+ 
+     /* If we were passed a function pointer we need to enable the interrupt */
+     if (cb != NULL) {
+-#ifndef RIOT_VERSION
++#ifndef RIOT_OS
+         NVIC_SetPriority(RNG_IRQn, (1 << __NVIC_PRIO_BITS) - 1);
+ #endif
+ #if MYNEWT
+diff --git a/nimble/drivers/nrf51/src/ble_phy.c b/nimble/drivers/nrf51/src/ble_phy.c
+index a74252b..6c72689 100644
+--- a/nimble/drivers/nrf51/src/ble_phy.c
++++ b/nimble/drivers/nrf51/src/ble_phy.c
+@@ -921,7 +921,7 @@ ble_phy_init(void)
+     NRF_PPI->CH[5].TEP = (uint32_t)&(NRF_RADIO->TASKS_DISABLE);
+ 
+     /* Set isr in vector table and enable interrupt */
+-#ifndef RIOT_VERSION
++#ifndef RIOT_OS
+     NVIC_SetPriority(RADIO_IRQn, 0);
+ #endif
+ #if MYNEWT
+diff --git a/nimble/drivers/nrf52/src/ble_hw.c b/nimble/drivers/nrf52/src/ble_hw.c
+index 0accbbf..ee618a6 100644
+--- a/nimble/drivers/nrf52/src/ble_hw.c
++++ b/nimble/drivers/nrf52/src/ble_hw.c
+@@ -352,7 +352,7 @@ ble_hw_rng_init(ble_rng_isr_cb_t cb, int bias)
+ 
+     /* If we were passed a function pointer we need to enable the interrupt */
+     if (cb != NULL) {
+-#ifndef RIOT_VERSION
++#ifndef RIOT_OS
+         NVIC_SetPriority(RNG_IRQn, (1 << __NVIC_PRIO_BITS) - 1);
+ #endif
+ #if MYNEWT
+diff --git a/nimble/drivers/nrf52/src/ble_phy.c b/nimble/drivers/nrf52/src/ble_phy.c
+index 9b44123..2d4f57d 100644
+--- a/nimble/drivers/nrf52/src/ble_phy.c
++++ b/nimble/drivers/nrf52/src/ble_phy.c
+@@ -1608,7 +1608,7 @@ ble_phy_init(void)
+ #endif
+ 
+     /* Set isr in vector table and enable interrupt */
+-#ifndef RIOT_VERSION
++#ifndef RIOT_OS
+     NVIC_SetPriority(RADIO_IRQn, 0);
+ #endif
+ #if MYNEWT
+@@ -2239,7 +2239,7 @@ void ble_phy_disable_dtm(void)
+ void
+ ble_phy_rfclk_enable(void)
+ {
+-#if MYNEWT || defined(RIOT_VERSION)
++#if MYNEWT || defined(RIOT_OS)
+     nrf52_clock_hfxo_request();
+ #else
+     nrf_clock_task_trigger(NRF_CLOCK, NRF_CLOCK_TASK_HFCLKSTART);
+@@ -2249,7 +2249,7 @@ ble_phy_rfclk_enable(void)
+ void
+ ble_phy_rfclk_disable(void)
+ {
+-#if MYNEWT || defined(RIOT_VERSION)
++#if MYNEWT || defined(RIOT_OS)
+     nrf52_clock_hfxo_release();
+ #else
+     nrf_clock_task_trigger(NRF_CLOCK, NRF_CLOCK_TASK_HFCLKSTOP);
+diff --git a/nimble/drivers/nrf5340/src/ble_hw.c b/nimble/drivers/nrf5340/src/ble_hw.c
+index e578fd0..a2ebc39 100644
+--- a/nimble/drivers/nrf5340/src/ble_hw.c
++++ b/nimble/drivers/nrf5340/src/ble_hw.c
+@@ -312,7 +312,7 @@ ble_hw_rng_init(ble_rng_isr_cb_t cb, int bias)
+ 
+     /* If we were passed a function pointer we need to enable the interrupt */
+     if (cb != NULL) {
+-#ifndef RIOT_VERSION
++#ifndef RIOT_OS
+         NVIC_SetPriority(RNG_IRQn, (1 << __NVIC_PRIO_BITS) - 1);
+ #endif
+ #if MYNEWT
+diff --git a/nimble/drivers/nrf5340/src/ble_phy.c b/nimble/drivers/nrf5340/src/ble_phy.c
+index 060e32e..9ded1ea 100644
+--- a/nimble/drivers/nrf5340/src/ble_phy.c
++++ b/nimble/drivers/nrf5340/src/ble_phy.c
+@@ -1465,7 +1465,7 @@ ble_phy_init(void)
+ #endif
+ 
+     /* Set isr in vector table and enable interrupt */
+-#ifndef RIOT_VERSION
++#ifndef RIOT_OS
+     NVIC_SetPriority(RADIO_IRQn, 0);
+ #endif
+ #if MYNEWT
+diff --git a/porting/nimble/src/hal_timer.c b/porting/nimble/src/hal_timer.c
+index aa78bf9..2325dd1 100644
+--- a/porting/nimble/src/hal_timer.c
++++ b/porting/nimble/src/hal_timer.c
+@@ -538,7 +538,7 @@ hal_timer_init(int timer_num, void *cfg)
+ 
+     /* Disable IRQ, set priority and set vector in table */
+     NVIC_DisableIRQ(irq_num);
+-#ifndef RIOT_VERSION
++#ifndef RIOT_OS
+     NVIC_SetPriority(irq_num, (1 << __NVIC_PRIO_BITS) - 1);
+ #endif
+ #if MYNEWT
+diff --git a/porting/nimble/src/nimble_port.c b/porting/nimble/src/nimble_port.c
+index 5e18020..a047ee4 100644
+--- a/porting/nimble/src/nimble_port.c
++++ b/porting/nimble/src/nimble_port.c
+@@ -48,7 +48,7 @@ nimble_port_init(void)
+     ble_transport_hs_init();
+ 
+ #if NIMBLE_CFG_CONTROLLER
+-#ifndef RIOT_VERSION
++#ifndef RIOT_OS
+     hal_timer_init(5, NULL);
+     os_cputime_init(32768);
+ #endif
+-- 
+2.52.0
+

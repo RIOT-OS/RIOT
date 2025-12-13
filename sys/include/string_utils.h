@@ -32,6 +32,7 @@
 #include <strings.h>
 #include <sys/types.h>
 
+#include "buildinfo/cpu.h"
 #include "flash_utils.h"
 #include "modules.h"
 

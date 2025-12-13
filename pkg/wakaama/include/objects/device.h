@@ -54,6 +54,8 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 
+#include "buildinfo/board.h"
+#include "buildinfo/riotver.h"
 #include "liblwm2m.h"
 #include "lwm2m_client.h"
 #include "lwm2m_client_config.h"

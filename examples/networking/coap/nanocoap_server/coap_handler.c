@@ -7,6 +7,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "buildinfo/board.h"
+#include "buildinfo/cpu.h"
+#include "buildinfo/riotver.h"
 #include "event/callback.h"
 #include "event/periodic.h"
 #include "event/thread.h"
