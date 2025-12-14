@@ -98,7 +98,7 @@ esp_err_t esp_event_loop_init(system_event_cb_t cb, void *ctx)
     s_event_queue = wifi_queue_create(32, sizeof(system_event_t));
     if(s_event_queue == NULL)
         return ESP_ERR_NO_MEM;
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
     if(wifi_task_create(esp_event_loop_task, "esp_events", EVENT_LOOP_STACKSIZE, NULL, wifi_task_get_max_priority() - 5) == NULL) {
 #else
     if(wifi_task_create(esp_event_loop_task, "esp_event_loop_task", EVENT_LOOP_STACKSIZE, NULL, wifi_task_get_max_priority() - 5) == NULL) {

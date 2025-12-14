@@ -15,7 +15,7 @@ index dff4a1bd83..ce7cb27efb 100644
      return IDF_VER;
  }
  
-+#ifndef RIOT_VERSION
++#ifndef RIOT_OS
  void __attribute__((noreturn)) esp_system_abort(const char *details)
  {
      panic_abort(details);

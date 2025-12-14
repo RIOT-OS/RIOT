@@ -16,6 +16,8 @@
  */
 
 #include <stdio.h>
+
+#include "buildinfo/cpu.h"
 #include "thread.h"
 #include "mutex.h"
 

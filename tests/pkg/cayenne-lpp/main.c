@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "buildinfo/board.h"
 #include "cayenne_lpp.h"
 
 #define TEST_BUFFER1 { 0x03, 0x67, 0x01, 0x10, 0x05, 0x67, 0x00, 0xff }

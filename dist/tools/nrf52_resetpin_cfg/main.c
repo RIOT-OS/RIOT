@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "buildinfo/cpu.h"
 #include "cpu.h"
 #include "periph/pm.h"
 

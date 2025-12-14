@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
+#include "buildinfo/cpu.h"
 #include "ztimer.h"
 #include "ztimer/periodic.h"
 #include "fmt.h"

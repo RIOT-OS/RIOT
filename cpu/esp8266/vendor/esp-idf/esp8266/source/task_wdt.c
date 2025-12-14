@@ -32,10 +32,10 @@ static void esp_task_wdt_isr(void *param)
     /*
      * In RIOT-OS, the interrupt from WDT (stage 1) is only used to wakeup
      * the system and to execute `sched_run` on the exit from the interrupt
-     * to schedule the next task which also resets the WDT.     
+     * to schedule the next task which also resets the WDT.
      * The system is hard-reset (stage 2), if the system is locked completely.
      */
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
     esp_task_wdt_reset();
 #else
     extern void panicHandler(void *frame, int wdt);

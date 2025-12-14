@@ -18,13 +18,13 @@ Copyright (C) 2019, HAW Hamburg.
 void app_metadata_print_json(void)
 {
     puts("{\"cmd\": \"app_metadata_print_json()\"}");
-    printf("{\"data\": {\"APP_NAME\": \"%s\"}}\n", RIOT_APPLICATION);
-    printf("{\"data\": {\"BOARD\": \"%s\"}}\n", RIOT_BOARD);
-    printf("{\"data\": {\"CPU\": \"%s\"}}\n", RIOT_CPU);
+    printf("{\"data\": {\"APP_NAME\": \"%s\"}}\n", buildinfo_app_name);
+    printf("{\"data\": {\"BOARD\": \"%s\"}}\n", buildinfo_board_name);
+    printf("{\"data\": {\"CPU\": \"%s\"}}\n", buildinfo_cpu_name);
 #ifdef APP_SHELL_FMT
     printf("{\"data\": {\"APP_SHELL_FMT\": \"%s\"}}\n", APP_SHELL_FMT);
 #endif
-    printf("{\"data\": {\"OS_VERSION\": \"%s\"}}\n", RIOT_VERSION);
+    printf("{\"data\": {\"OS_VERSION\": \"%s\"}}\n", buildinfo_riot_version);
 
     printf("{\"result\": \"SUCCESS\"}\n");
 }

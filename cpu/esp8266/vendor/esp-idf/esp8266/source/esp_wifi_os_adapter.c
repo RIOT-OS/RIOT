@@ -25,12 +25,12 @@
 #include "freertos/semphr.h"
 #include "freertos/timers.h"
 
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
 #include "esp_log.h"
 #include "freertos/portmacro.h"
 #include "xtensa/xtensa_api.h"
 
-#endif
+#endif /* RIOT_OS*/
 
 #include "nvs.h"
 
@@ -38,13 +38,13 @@
 #include "esp_newlib.h"
 #endif
 
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
 
 extern void vPortYield(void);
 extern void vPortYieldFromInt(void);
 void  thread_yield_higher(void);
 
-#endif /* RIOT_VERSION */
+#endif /* RIOT_OS*/
 
 static void *task_create_wrapper(void *task_func, const char *name, uint32_t stack_depth, void *param, uint32_t prio)
 {
@@ -62,7 +62,7 @@ static void task_delete_wrapper(void *task_handle)
 
 static void task_yield_wrapper(void)
 {
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
     thread_yield_higher();
 #else
     portYIELD();
@@ -71,7 +71,7 @@ static void task_yield_wrapper(void)
 
 static void task_yield_from_isr_wrapper(void)
 {
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
     thread_yield_higher();
 #else
     portYIELD();
@@ -100,7 +100,7 @@ static uint32_t task_ms_to_tick_wrapper(uint32_t ms)
 
 static void task_suspend_all_wrapper(void)
 {
-#ifndef RIOT_VERSION
+#ifndef RIOT_OS
     /* there is no equivalent in RIOT */
     vTaskSuspendAll();
 #endif
@@ -108,7 +108,7 @@ static void task_suspend_all_wrapper(void)
 
 static void task_resume_all_wrapper(void)
 {
-#ifndef RIOT_VERSION
+#ifndef RIOT_OS
     /* there is no equivalent in RIOT */
     xTaskResumeAll();
 #endif
@@ -116,7 +116,7 @@ static void task_resume_all_wrapper(void)
 
 static void os_init_wrapper(void)
 {
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
     extern void esp_riot_init(void);
     esp_riot_init();
 #else
@@ -128,7 +128,7 @@ static void os_init_wrapper(void)
 
 static void os_start_wrapper(void)
 {
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
     extern void esp_riot_start(void);
     esp_riot_start();
 #else

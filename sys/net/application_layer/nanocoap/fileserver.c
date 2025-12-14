@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "buildinfo/cpu.h"
 #include "checksum/fletcher32.h"
 #include "net/nanocoap/fileserver.h"
 #include "vfs.h"

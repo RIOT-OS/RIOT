@@ -24,6 +24,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "buildinfo/board.h"
 #include "uuid.h"
 
 #ifdef __cplusplus
@@ -43,7 +44,7 @@ extern "C" {
 /**
  * @brief The SUIT class ID source
  *
- * By default the RIOT_VERSION define is used for this
+ * By default the RIOT_BOARD define is used for this
  */
 #ifndef SUIT_CLASS_ID
 #define SUIT_CLASS_ID  RIOT_BOARD

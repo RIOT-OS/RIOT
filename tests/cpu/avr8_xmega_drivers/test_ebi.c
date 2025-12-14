@@ -17,6 +17,7 @@
 
 #if defined(MODULE_ATXMEGA_EBI)
 
+#include "buildinfo/board.h"
 #include "board.h"
 #include "cpu_ebi.h"
 #include "errno.h"

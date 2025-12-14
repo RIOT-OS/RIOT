@@ -22,6 +22,7 @@
 extern "C" {
 #endif
 
+#include "buildinfo/cpu.h"
 #include "log.h"
 #include "esp_common_log.h"
 #include "macros/utils.h"

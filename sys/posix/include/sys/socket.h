@@ -29,6 +29,8 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include "buildinfo/cpu.h"
+
 #ifdef CPU_NATIVE
 /* Ignore Linux definitions in native */
 #define _BITS_SOCKADDR_H    1

@@ -18,6 +18,7 @@
  *
  */
 
+#include "buildinfo/board.h"
 #include "periph_cpu.h"
 #include "cfg_clock_32_1.h"
 #include "cfg_rtt_default.h"

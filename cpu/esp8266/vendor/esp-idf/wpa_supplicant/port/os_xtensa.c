@@ -29,7 +29,7 @@
 #include <sys/time.h>
 #include "esp_system.h"
 
-#ifndef RIOT_VERSION
+#ifndef RIOT_OS
 
 int os_get_time(struct os_time *t)
 {

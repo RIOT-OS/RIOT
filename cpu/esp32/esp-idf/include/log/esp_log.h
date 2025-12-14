@@ -25,7 +25,7 @@ extern "C" {
 #include "log.h"
 #include_next "esp_log.h"
 
-#if defined(RIOT_VERSION)
+#if defined(RIOT_OS)
 
 #include "esp_common.h"
 
@@ -93,7 +93,7 @@ extern "C" {
 #define ESP_DRAM_LOGD(tag, format, ...) ESP_DRAM_LOG_LEVEL(LOG_DEBUG  , D, tag, format "\n", ##__VA_ARGS__)
 #define ESP_DRAM_LOGV(tag, format, ...) ESP_DRAM_LOG_LEVEL(LOG_ALL    , V, tag, format "\n", ##__VA_ARGS__)
 
-#endif /* defined(RIOT_VERSION) */
+#endif /* defined(RIOT_OS) */
 
 #ifdef __cplusplus
 }

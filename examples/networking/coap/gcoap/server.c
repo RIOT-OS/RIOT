@@ -214,9 +214,10 @@ static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, co
     size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
 
     /* write the RIOT board name in the response buffer */
-    if (pdu->payload_len >= strlen(RIOT_BOARD)) {
-        memcpy(pdu->payload, RIOT_BOARD, strlen(RIOT_BOARD));
-        return resp_len + strlen(RIOT_BOARD);
+    size_t board_name_len = strlen(buildinfo_board_name);
+    if (pdu->payload_len >= board_name_len) {
+        memcpy(pdu->payload, buildinfo_board_name, board_name_len);
+        return resp_len + strlen(buildinfo_board_name);
     }
     else {
         puts("gcoap_cli: msg buffer too small");

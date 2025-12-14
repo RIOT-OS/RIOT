@@ -18,6 +18,7 @@
 
 #include <assert.h>
 
+#include "buildinfo/cpu.h"
 #include "esp_common.h"
 #include "cpu.h"
 #include "irq_arch.h"

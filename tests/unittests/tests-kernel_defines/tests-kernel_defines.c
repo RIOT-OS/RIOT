@@ -9,6 +9,8 @@
  * @file
  */
 #include "assert.h"
+#include "buildinfo/cpu.h"
+#include "buildinfo/riotver.h"
 #include "embUnit.h"
 #include "kernel_defines.h"
 

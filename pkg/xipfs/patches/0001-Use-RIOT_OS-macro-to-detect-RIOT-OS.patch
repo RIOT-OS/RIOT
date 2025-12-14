@@ -1,0 +1,39 @@
+From 8334dea72d503cbfef43a48f8a1452cc189206be Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
+Date: Sat, 13 Dec 2025 16:29:20 +0100
+Subject: [PATCH] Use RIOT_OS macro to detect RIOT OS
+
+---
+ include/xipfs.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/xipfs.h b/include/xipfs.h
+index 29839bc..4dfd71e 100644
+--- a/include/xipfs.h
++++ b/include/xipfs.h
+@@ -38,11 +38,11 @@
+ #include <fcntl.h>
+ #include <stdarg.h>
+ 
+-#ifndef RIOT_VERSION
++#ifndef RIOT_OS
+ 
+ #include "xipfs_config.h"
+ 
+-#else /* !RIOT_VERSION */
++#else /* !RIOT_OS */
+ 
+ #include "cpu.h"
+ #include "periph/flashpage.h"
+@@ -127,7 +127,7 @@
+  */
+ #define XIPFS_NVM_PAGE_SIZE (FLASHPAGE_SIZE)
+ 
+-#endif /* !RIOT_VERSION */
++#endif /* !RIOT_OS */
+ 
+ 
+ #ifndef XIPFS_PATH_MAX
+-- 
+2.52.0
+

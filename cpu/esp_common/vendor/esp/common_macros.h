@@ -27,6 +27,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 #include <sys/cdefs.h>
 
+#include "buildinfo/cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

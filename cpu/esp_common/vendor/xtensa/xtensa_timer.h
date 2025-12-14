@@ -47,10 +47,10 @@ and the Xtensa core configuration need not have a timer.
 #include    <xtensa/corebits.h>
 #include    <xtensa/config/system.h>
 
-#ifndef RIOT_VERSION
+#ifndef RIOT_OS
 #include    "xtensa_rtos.h"     /* in case this wasn't included directly */
 #include    <FreeRTOSConfig.h>
-#endif /* ifndef RIOT_VERSION */
+#endif /* ifndef RIOT_OS */
 
 #ifdef __cplusplus
 extern "C" {
@@ -112,7 +112,7 @@ Otherwise select the first low or medium priority interrupt timer available.
 
 #endif /* XCHAL_NUM_TIMERS */
 
-#ifndef RIOT_VERSION
+#ifndef RIOT_OS
 /*
 Set processor clock frequency, used to determine clock divisor for timer tick.
 User should BE SURE TO ADJUST THIS for the Xtensa platform being used.
@@ -156,7 +156,7 @@ Derivation of clock divisor for timer tick and interrupt (one per tick).
 #ifdef XT_CLOCK_FREQ
 #define XT_TICK_DIVISOR     (XT_CLOCK_FREQ / XT_TICK_PER_SEC)
 #endif
-#endif /* ifndef RIOT_VERSION */
+#endif /* ifndef RIOT_OS */
 
 #ifndef __ASSEMBLER__
 extern unsigned _xt_tick_divisor;

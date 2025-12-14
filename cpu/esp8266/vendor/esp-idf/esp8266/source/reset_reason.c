@@ -73,7 +73,7 @@ static inline uint32_t get_reset_reason(uint32_t rtc_reset_reason, uint32_t rese
                 return reset_reason_hint;
             return ESP_RST_POWERON;
         case EXT_RESET:
-#ifdef RIOT_VERSION
+#ifdef RIOT_OS
             if (reset_reason_hint == ESP_RST_DEEPSLEEP ||
                 reset_reason_hint == ESP_RST_SW ||
                 reset_reason_hint == ESP_RST_POWERON) {
