@@ -365,3 +365,10 @@ void sched_change_priority(thread_t *thread, uint8_t priority)
         thread_yield_higher();
     }
 }
+
+/* for compat with POSIX's sched.h - intended to be used by external code only */
+int sched_yield(void)
+{
+    thread_yield();
+    return 0;
+}
