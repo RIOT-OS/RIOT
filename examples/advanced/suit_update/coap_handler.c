@@ -5,7 +5,6 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#include "buildinfo/board.h"
 #include "kernel_defines.h"
 #include "log.h"
 #include "net/nanocoap.h"
@@ -21,7 +20,8 @@ static ssize_t _riot_board_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
 {
     (void)context;
     return coap_reply_simple(pkt, COAP_CODE_205, buf, len,
-            COAP_FORMAT_TEXT, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
+                             COAP_FORMAT_TEXT, (uint8_t*)buildinfo_board_name,
+                             strlen(buildinfo_board_name));
 }
 
 static ssize_t _version_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,

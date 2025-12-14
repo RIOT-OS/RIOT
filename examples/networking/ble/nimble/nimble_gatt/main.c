@@ -33,10 +33,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "buildinfo/board.h"
-#include "buildinfo/cpu.h"
-#include "buildinfo/riotver.h"
-
 #include "nimble_riot.h"
 #include "nimble_autoadv.h"
 
@@ -141,7 +137,7 @@ static int gatt_svr_chr_access_device_info_manufacturer(
     (void) arg;
 
     snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
-             "This is RIOT! (Version: %s)\n", RIOT_VERSION);
+             "This is RIOT! (Version: %s)\n", buildinfo_riot_version);
     puts(str_answer);
 
     int rc = os_mbuf_append(ctxt->om, str_answer, strlen(str_answer));
@@ -162,8 +158,8 @@ static int gatt_svr_chr_access_device_info_model(
     (void) arg;
 
     snprintf(str_answer, STR_ANSWER_BUFFER_SIZE,
-             "You are running RIOT on a(n) %s board, "
-             "which features a(n) %s CPU.", RIOT_BOARD, RIOT_CPU);
+             "You are running RIOT on a(n) %s board, which features a(n) %s CPU.",
+             buildinfo_board_name, buildinfo_cpu_name);
     puts(str_answer);
 
     int rc = os_mbuf_append(ctxt->om, str_answer, strlen(str_answer));

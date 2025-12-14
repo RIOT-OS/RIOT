@@ -21,8 +21,6 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-#include "buildinfo/board.h"
-#include "buildinfo/cpu.h"
 #include "riotboot/slot.h"
 #include "shell.h"
 
@@ -78,8 +76,8 @@ int main(void)
 
     puts("Hello riotboot!");
 
-    printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
-    printf("This board features a(n) %s CPU.\n", RIOT_CPU);
+    printf("You are running RIOT on a(n) %s board.\n", buildinfo_board_name);
+    printf("This board features a(n) %s CPU.\n", buildinfo_cpu_name);
 
     /* print some information about the running image */
     current_slot = riotboot_slot_current();

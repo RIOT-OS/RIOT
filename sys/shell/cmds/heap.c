@@ -18,7 +18,6 @@
  * @}
  */
 
-#include "buildinfo/cpu.h"
 #include "cpu_conf.h"
 #include "shell.h"
 
@@ -37,7 +36,7 @@ static int _heap_handler(int argc, char **argv)
     heap_stats();
     return 0;
 #else
-    printf("heap statistics are not supported for %s cpu\n", RIOT_CPU);
+    printf("heap statistics are not supported for %s cpu\n", buildinfo_cpu_name);
     return 1;
 #endif
 }

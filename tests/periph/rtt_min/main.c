@@ -19,7 +19,6 @@
 #include <stdio.h>
 #include <stdatomic.h>
 
-#include "buildinfo/board.h"
 #include "cpu.h"
 #include "periph_conf.h"
 #include "periph/rtt.h"
@@ -71,7 +70,7 @@ int main(void)
     printf("\n");
 
     printf("RTT_MIN_OFFSET for %s over %" PRIu32 " samples: %" PRIu32 "\n",
-           RIOT_BOARD, samples, value);
+           buildinfo_board_name, samples, value);
 
     return 0;
 }

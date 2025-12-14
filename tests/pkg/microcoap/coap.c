@@ -6,8 +6,6 @@
 #include <coap.h>
 #include <string.h>
 
-#include "buildinfo/board.h"
-
 #define MAX_RESPONSE_LEN 500
 static uint8_t response[MAX_RESPONSE_LEN] = { 0 };
 
@@ -91,8 +89,8 @@ static int handle_get_riot_board(coap_rw_buffer_t *scratch,
         const coap_packet_t *inpkt, coap_packet_t *outpkt,
         uint8_t id_hi, uint8_t id_lo)
 {
-    const char *riot_name = RIOT_BOARD;
-    int len = strlen(RIOT_BOARD);
+    const char *riot_name = buildinfo_board_name;
+    int len = strlen(buildinfo_board_name);
 
     memcpy(response, riot_name, len);
 

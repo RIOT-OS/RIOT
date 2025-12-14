@@ -20,7 +20,6 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-#include "buildinfo/board.h"
 #include "board.h"
 #include "ztimer.h"
 #include "ztimer/overhead.h"
@@ -69,7 +68,7 @@ int main(void)
     ZTIMER_USEC->adjust_set = _ztimer_usec_overhead(SAMPLES, BASE, ztimer_overhead_set);
     printf("ztimer_overhead_sleep...\n");
     ZTIMER_USEC->adjust_sleep = _ztimer_usec_overhead(SAMPLES, BASE, ztimer_overhead_sleep);
-    printf("ZTIMER_USEC adjust params for %s:\n", RIOT_BOARD);
+    printf("ZTIMER_USEC adjust params for %s:\n", buildinfo_bard_name);
     printf("    CONFIG_ZTIMER_USEC_ADJUST_SET    %" PRIi16 "\n", ZTIMER_USEC->adjust_set);
     printf("    CONFIG_ZTIMER_USEC_ADJUST_SLEEP  %" PRIi16 "\n", ZTIMER_USEC->adjust_sleep);
 

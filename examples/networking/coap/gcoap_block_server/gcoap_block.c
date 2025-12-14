@@ -19,9 +19,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "buildinfo/board.h"
-#include "buildinfo/cpu.h"
-#include "buildinfo/riotver.h"
 #include "fmt.h"
 #include "hashes/sha256.h"
 #include "net/gcoap.h"
@@ -62,12 +59,18 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, c
 
     /* Add actual content */
     plen += coap_blockwise_put_bytes(&slicer, buf+plen, block2_intro, sizeof(block2_intro)-1);
-    plen += coap_blockwise_put_bytes(&slicer, buf+plen, (uint8_t*)RIOT_VERSION, strlen(RIOT_VERSION));
+    plen += coap_blockwise_put_bytes(&slicer, buf+plen,
+                                     (uint8_t*)buildinfo_riot_version,
+                                     strlen(buildinfo_riot_version));
     plen += coap_blockwise_put_char(&slicer, buf+plen, ')');
     plen += coap_blockwise_put_bytes(&slicer, buf+plen, block2_board, sizeof(block2_board)-1);
-    plen += coap_blockwise_put_bytes(&slicer, buf+plen, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
+    plen += coap_blockwise_put_bytes(&slicer, buf+plen,
+                                     (uint8_t*)buildinfo_board_name,
+                                     strlen(buildinfo_board_name));
     plen += coap_blockwise_put_bytes(&slicer, buf+plen, block2_mcu, sizeof(block2_mcu)-1);
-    plen += coap_blockwise_put_bytes(&slicer, buf+plen, (uint8_t*)RIOT_CPU, strlen(RIOT_CPU));
+    plen += coap_blockwise_put_bytes(&slicer, buf+plen,
+                                     (uint8_t*)buildinfo_cpu_name,
+                                     strlen(buildinfo_cpu_name));
     /* To demonstrate individual chars */
     plen += coap_blockwise_put_char(&slicer, buf+plen, ' ');
     plen += coap_blockwise_put_char(&slicer, buf+plen, 'M');

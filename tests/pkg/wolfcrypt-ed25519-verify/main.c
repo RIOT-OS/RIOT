@@ -18,8 +18,6 @@
 #include <stdint.h>
 #include <wolfssl/wolfcrypt/ed25519.h>
 
-#include "buildinfo/board.h"
-#include "buildinfo/cpu.h"
 #include "log.h"
 
 const uint8_t ed_public_key[ED25519_KEY_SIZE] = {
@@ -47,8 +45,8 @@ int main(void)
     int stat;
     int ret;
     ed25519_key key;
-    LOG_INFO("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
-    LOG_INFO("This board features a(n) %s CPU.\n", RIOT_CPU);
+    LOG_INFO("You are running RIOT on a(n) %s board.\n", buildinfo_board_name);
+    LOG_INFO("This board features a(n) %s CPU.\n", buildinfo_cpu_name);
     wc_ed25519_init(&key);
     LOG_INFO("Starting ed25519 test.\n");
 

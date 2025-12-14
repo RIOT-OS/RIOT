@@ -17,14 +17,13 @@
 
 #include <stdio.h>
 
-#include "buildinfo/board.h"
 #include "external_native.h"
 
 int main(void)
 {
     puts("Hello World!");
 
-    printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
+    printf("You are running RIOT on a(n) %s board.\n", buildinfo_board_name);
     printf("THIS_BOARD_IS %s\n", THIS_BOARD_IS);
     printf("This board is '%s'\n", external_native_board_description);
 

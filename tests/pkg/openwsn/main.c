@@ -18,8 +18,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "buildinfo/board.h"
-#include "buildinfo/cpu.h"
 #include "shell.h"
 
 extern int udp_cmd(int argc, char **argv);
@@ -34,8 +32,8 @@ int main(void)
 {
     puts("OpenWSN UDP test");
 
-    printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
-    printf("This board features a(n) %s CPU.\n", RIOT_CPU);
+    printf("You are running RIOT on a(n) %s board.\n", buildinfo_board_name);
+    printf("This board features a(n) %s CPU.\n", buildinfo_cpu_name);
 
     udp_cli_init();
 

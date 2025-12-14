@@ -18,15 +18,12 @@
 
 #include <stdio.h>
 
-#include "buildinfo/board.h"
-#include "buildinfo/cpu.h"
-
 int main(void)
 {
     puts("Hello World!");
 
-    printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
-    printf("This board features a(n) %s CPU.\n", RIOT_CPU);
+    printf("You are running RIOT on a(n) %s board.\n", buildinfo_board_name);
+    printf("This board features a(n) %s CPU.\n", buildinfo_cpu_name);
 
     return 0;
 }

@@ -68,4 +68,37 @@
  */
 #define RIOT_OS 1
 
+#ifndef __ASSEMBLER__
+/**
+ * @brief   Name of the application running
+ *
+ * @note    Same as RIOT_APPLICATION from `buildinfo/app.h`, but using this
+ *          is better for ccache efficiency.
+ */
+extern const char *buildinfo_app_name;
+
+/**
+ * @brief   Name of the board the application is running on
+ *
+ * @note    Same as RIOT_BOARD from `buildinfo/board.h`, but using this
+ *          is better for ccache efficiency.
+ */
+extern const char *buildinfo_board_name;
+
+/**
+ * @brief   Name of the CPU the application is running on
+ *
+ * @note    Same as RIOT_CPU from `buildinfo/cpu.h`, but using this
+ *          is better for ccache efficiency.
+ */
+extern const char *buildinfo_cpu_name;
+/**
+ * @brief   RIOT version linked into the running firmware
+ *
+ * @note    Same as RIOT_VERSION from `buildinfo/riotver.h`, but using this
+ *          is better for ccache efficiency.
+ */
+extern const char *buildinfo_riot_version;
+#endif /* __ASSEMBLER__ */
+
 /** @} */

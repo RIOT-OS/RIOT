@@ -7,9 +7,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "buildinfo/board.h"
-#include "buildinfo/cpu.h"
-#include "buildinfo/riotver.h"
 #include "event/callback.h"
 #include "event/periodic.h"
 #include "event/thread.h"
@@ -45,7 +42,8 @@ static ssize_t _riot_board_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, co
 {
     (void)context;
     return coap_reply_simple(pkt, COAP_CODE_205, buf, len,
-            COAP_FORMAT_TEXT, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
+                             COAP_FORMAT_TEXT, (uint8_t *)buildinfo_board_name,
+                             strlen(buildinfo_board_name));
 }
 
 static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
@@ -63,12 +61,18 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, c
 
     /* Add actual content */
     bufpos += coap_blockwise_put_bytes(&slicer, bufpos, block2_intro, sizeof(block2_intro)-1);
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_VERSION, strlen(RIOT_VERSION));
+    bufpos += coap_blockwise_put_bytes(&slicer, bufpos,
+                                       (uint8_t *)buildinfo_riot_version,
+                                       strlen(buildinfo_riot_version));
     bufpos += coap_blockwise_put_char(&slicer, bufpos, ')');
     bufpos += coap_blockwise_put_bytes(&slicer, bufpos, block2_board, sizeof(block2_board)-1);
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
+    bufpos += coap_blockwise_put_bytes(&slicer, bufpos,
+                                       (uint8_t *)buildinfo_board_name,
+                                       strlen(buildinfo_board_name));
     bufpos += coap_blockwise_put_bytes(&slicer, bufpos, block2_mcu, sizeof(block2_mcu)-1);
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_CPU, strlen(RIOT_CPU));
+    bufpos += coap_blockwise_put_bytes(&slicer, bufpos,
+                                       (uint8_t *)buildinfo_cpu_name,
+                                       strlen(buildinfo_cpu_name));
     /* To demonstrate individual chars */
     bufpos += coap_blockwise_put_char(&slicer, bufpos, ' ');
     bufpos += coap_blockwise_put_char(&slicer, bufpos, 'M');

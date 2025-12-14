@@ -20,8 +20,6 @@
 
 #include <stdio.h>
 
-#include "buildinfo/app.h"
-#include "buildinfo/riotver.h"
 #include "periph/pm.h"
 #include "shell.h"
 
@@ -65,13 +63,13 @@ static int _version_handler(int argc, char **argv)
     (void) argc;
     (void) argv;
 
-    puts(RIOT_VERSION);
+    puts(buildinfo_app_name);
 
 #ifdef MODULE_RIOTBOOT_SLOT
     int slot = riotboot_slot_current();
     if (slot >= 0) {
         const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(slot);
-        printf("%s v%"PRIu32", slot %u\n", RIOT_APPLICATION, hdr->version, slot);
+        printf("%s v%"PRIu32", slot %u\n", riot_app_name, hdr->version, slot);
     }
 #endif
 #ifdef CONFIG_RIOT_VERSION_EXTRA
