@@ -81,7 +81,6 @@
 #include <inttypes.h>
 
 #include "kernel_defines.h"
-#include "native_sched.h"
 #include "clist.h"
 
 #ifdef __cplusplus
