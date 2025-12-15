@@ -67,6 +67,15 @@ extern "C" {
 #define SX127X_PARAM_PASELECT           (SX127X_PA_BOOST)
 /** @} */
 
+/**
+ * @brief   This board uses the UF2 bootloader
+ *
+ * @details Boards after around 2018 use the more modern UF2 bootloader.
+ *          Comment out for the old BOSSA bootloader or upgrade to
+ *          the UF2 bootloader.
+ */
+#define BOOTLOADER_UF2    1
+
 #ifdef __cplusplus
 }
 #endif

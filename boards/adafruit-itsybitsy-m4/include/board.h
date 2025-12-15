@@ -60,6 +60,8 @@ extern "C" {
 #define XTIMER_HZ                   (1000000ul)
 /** @} */
 
+#define BOOTLOADER_UF2    1     /**< This board uses the UF2 bootloader */
+
 #ifdef __cplusplus
 }
 #endif
