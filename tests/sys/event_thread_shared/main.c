@@ -23,7 +23,7 @@
 #include "thread.h"
 #include "event/thread.h"
 
-static_assert(EVENT_THREAD_LOWEST_STACKSIZE == 567,
+static_assert(EVENT_THREAD_MEDIUM_STACKSIZE == 567,
               "Selecting highest of the minimum stack size requirements "
               "declared via `EVENT_THREAD_HIGHEST_STACKSIZE_MIN += <num>` "
               "must work correctly");
