@@ -1,1 +1,6 @@
-EVENT_THREAD_HIGHEST_STACKSIZE_MIN += 567
+ifneq (,$(filter native%,$(BOARD)))
+  # native needs larger stacks
+  EVENT_THREAD_HIGHEST_STACKSIZE_MIN += 4096
+else
+  EVENT_THREAD_HIGHEST_STACKSIZE_MIN += 567
+endif
