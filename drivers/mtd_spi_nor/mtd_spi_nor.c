@@ -34,12 +34,7 @@
 #include "mtd_spi_nor.h"
 #include "time_units.h"
 #include "thread.h"
-
-#if IS_USED(MODULE_ZTIMER)
-#include "ztimer.h"
-#elif IS_USED(MODULE_XTIMER)
 #include "xtimer.h"
-#endif
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
@@ -342,28 +337,12 @@ static uint32_t mtd_spi_nor_get_size(const mtd_jedec_id_t *id)
     return 1 << id->device[1];
 }
 
-static void delay_us(unsigned us)
-{
-#if defined(MODULE_ZTIMER_USEC)
-    ztimer_sleep(ZTIMER_USEC, us);
-#elif defined(MODULE_ZTIMER_MSEC)
-    ztimer_sleep(ZTIMER_MSEC, DIV_ROUND_UP(us, US_PER_MS));
-#else
-    busy_wait_us(us);
-#endif
-}
-
 static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us)
 {
     unsigned i = 0, j = 0;
     uint32_t div = 1; /* first wait one full interval */
 #if IS_ACTIVE(ENABLE_DEBUG)
-    uint32_t diff = 0;
-#endif
-#if IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_ZTIMER_USEC)
-    diff = ztimer_now(ZTIMER_USEC);
-#elif IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_XTIMER)
-    diff = xtimer_now_usec();
+    uint32_t diff = xtimer_now_usec();
 #endif
     do {
         uint8_t status;
@@ -380,7 +359,7 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
 
             wait_us = wait_us > wait_min ? wait_us : wait_min;
 
-            delay_us(wait_us);
+            xtimer_usleep(wait_us);
             /* reduce the waiting time quickly if the estimate was too short,
              * but still avoid busy (yield) waiting */
             div++;
@@ -392,14 +371,9 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
     } while (1);
     DEBUG("wait loop %u times, yield %u times", i, j);
 #if IS_ACTIVE(ENABLE_DEBUG)
-#if IS_USED(MODULE_ZTIMER_USEC)
-    diff = ztimer_now(ZTIMER_USEC) - diff;
-#elif IS_USED(MODULE_XTIMER)
     diff = xtimer_now_usec() - diff;
+    DEBUG(", total wait %"PRIu32"us\n", diff);
 #endif
-    DEBUG(", total wait %"PRIu32"us", diff);
-#endif
-    DEBUG("\n");
 }
 
 static void _init_pins(mtd_spi_nor_t *dev)
@@ -437,15 +411,10 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
         case MTD_POWER_UP:
             mtd_spi_cmd(dev, dev->params->opcode->wake);
 
-            /* fall back to polling if no timer is used */
             unsigned retries = MTD_POWER_UP_WAIT_FOR_ID;
-            if (!IS_USED(MODULE_ZTIMER) && !IS_USED(MODULE_XTIMER)) {
-                retries *= dev->params->wait_chip_wake_up * 1000;
-            }
-
             int res = 0;
             do {
-                delay_us(dev->params->wait_chip_wake_up);
+                xtimer_usleep(dev->params->wait_chip_wake_up);
                 res = mtd_spi_read_jedec_id(dev, &dev->jedec_id);
             } while (res < 0 && --retries);
             if (res < 0) {
