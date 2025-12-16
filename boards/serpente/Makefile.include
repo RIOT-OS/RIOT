@@ -1,5 +1,3 @@
-CFLAGS += -DBOOTLOADER_UF2
-
 # Include all definitions for flashing with bossa other USB
 include $(RIOTBOARD)/common/samdx1-arduino-bootloader/Makefile.include
 # Include handling of serial and non-bossa programmers (if selected by user)

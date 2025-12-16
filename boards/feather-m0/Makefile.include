@@ -1,8 +1,3 @@
-# Boards after around 2018 use the more modern UF2 bootloader.
-# Comment out for the old BOSSA bootloader or upgrade to
-# the UF2 bootloader.
-CFLAGS += -DBOOTLOADER_UF2
-
 # setup the flash tool used
 ifeq ($(PROGRAMMER),jlink)
   # in case J-Link is attached to SWD pins, use a plain CPU memory model
