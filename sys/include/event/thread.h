@@ -60,15 +60,15 @@
  * requirements declared by any module will be picked and added to the
  * `CFLAGS`.
  *
- * @note    `EVENT_THREAD_MEDIUM_STACKSIZE_MIN` and
+ * @note    `EVENT_THREAD_LOWEST_STACKSIZE_MIN` and
  *          `EVENT_THREAD_HIGHEST_STACKSIZE_MIN` always apply to the thread
- *          managing the medium priority queue.
+ *          managing the lowest and highest priority queue, respectively.
  * @details  E.g. without the module `event_thread_medium` the lowest priority
- *          and medium priority queues are both handled by the lowest priority
- *          even thread. In that case, `EVENT_THREAD_MEDIUM_STACKSIZE_MIN` would
- *          ensure a minimum thread statck size on the lowest priority even
- *          thread. With `event_thread_medium` in use, it would instead apply
- *          to the stack of the dedicated medium event queue thread.
+ *          and medium priority queues are both handled by the medium priority
+ *          event thread. In that case, `EVENT_THREAD_LOWEST_STACKSIZE_MIN`
+ *          would ensure a minimum thread statck size on the medium priority
+ *          event thread. With `event_thread_medium` in use, it would instead
+ *          apply to the stack of the dedicated lowest event queue thread.
  *
  * @{
  *
