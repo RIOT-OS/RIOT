@@ -1,3 +1,0 @@
-BOARD_INSUFFICIENT_MEMORY := \
-    atmega8 \
-    #
