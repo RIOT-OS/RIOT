@@ -143,6 +143,20 @@ static inline uint32_t xtimer_now_usec(void)
     return xtimer_now();
 }
 
+static inline uint32_t xtimer_now_msec(void)
+{
+    if (IS_USED(MODULE_ZTIMER_MSEC)) {
+        return ztimer_now(ZTIMER_MSEC);
+    }
+    if (IS_USED(MODULE_ZTIMER_USEC)) {
+        return ztimer64_now(ZTIMER64_USEC) / US_PER_MS;
+    }
+    else {
+        _XTIMER_BACKEND_NOT_IMPLEMENTED;
+        return 0;
+    }
+}
+
 static inline uint64_t xtimer_now_usec64(void)
 {
     if (IS_USED(MODULE_ZTIMER_USEC)) {
