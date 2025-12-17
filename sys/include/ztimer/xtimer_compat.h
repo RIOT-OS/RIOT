@@ -140,6 +140,20 @@ static inline uint32_t xtimer_now_usec(void)
     return xtimer_now();
 }
 
+static inline uint32_t xtimer_now_msec(void)
+{
+    if (IS_USED(MODULE_ZTIMER_MSEC)) {
+        return ztimer_now(ZTIMER_MSEC);
+    }
+    if (IS_USED(MODULE_ZTIMER_USEC)) {
+        return ztimer_now(ZTIMER_USEC) / US_PER_MS;
+    }
+    else {
+        _XTIMER_BACKEND_NOT_IMPLEMENTED;
+        return 0;
+    }
+}
+
 static inline void _ztimer_sleep_scale(ztimer_clock_t *clock, uint32_t time,
                                        uint32_t scale)
 {

@@ -27,7 +27,6 @@
 /* make sure to overwrite potentially conflicting XTIMER_WIDTH definition from
  * board.h by eagerly including it */
 #include "board.h"
-#include "busy_wait.h"
 #include "div.h"
 #include "timex.h"
 #ifdef MODULE_CORE_MSG
@@ -143,6 +142,20 @@ static inline uint32_t xtimer_now_usec(void)
     return xtimer_now();
 }
 
+static inline uint32_t xtimer_now_msec(void)
+{
+    if (IS_USED(MODULE_ZTIMER_MSEC)) {
+        return ztimer_now(ZTIMER_MSEC);
+    }
+    if (IS_USED(MODULE_ZTIMER_USEC)) {
+        return ztimer64_now(ZTIMER64_USEC) / US_PER_MS;
+    }
+    else {
+        _XTIMER_BACKEND_NOT_IMPLEMENTED;
+        return 0;
+    }
+}
+
 static inline uint64_t xtimer_now_usec64(void)
 {
     if (IS_USED(MODULE_ZTIMER_USEC)) {
@@ -200,7 +213,7 @@ static inline void xtimer_msleep(uint32_t milliseconds)
         ztimer64_sleep(ZTIMER64_USEC, ((uint64_t)milliseconds) * 1000LLU);
     }
     else {
-        busy_wait_us(US_PER_MS * milliseconds);
+        assume(0);
     }
 }
 
@@ -213,7 +226,7 @@ static inline void xtimer_usleep(uint32_t microseconds)
         ztimer_sleep(ZTIMER_MSEC, _div_round_up_u32(microseconds, US_PER_MS));
     }
     else {
-        busy_wait_us(microseconds);
+        assume(0);
     }
 }
 
@@ -380,7 +393,7 @@ static inline void xtimer_spin(xtimer_ticks32_t ticks)
         ztimer_spin(ZTIMER_MSEC, xtimer_msec_from_ticks(ticks));
     }
     else {
-        busy_wait_us(xtimer_usec_from_ticks(ticks));
+        assume(0);
     }
 }
 
