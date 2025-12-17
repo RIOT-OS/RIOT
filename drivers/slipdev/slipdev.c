@@ -23,6 +23,7 @@
 #include "log.h"
 #include "slipdev.h"
 #include "slipdev_internal.h"
+#include "slipdev_params.h"
 #include "net/eui_provider.h"
 
 /* XXX: BE CAREFUL ABOUT USING OUTPUT WITH MODULE_SLIPDEV_STDIO IN SENDING
@@ -67,11 +68,96 @@ static inline void slipdev_unlock(void)
     }
 }
 
-static void _slip_rx_cb(void *arg, uint8_t byte)
+static inline void _slipdev_stdio_add_to_frame(slipdev_t *dev, uint8_t byte)
+{
+    if (!IS_USED(MODULE_SLIPDEV_STDIO) ||
+        dev->config.uart != slipdev_params[0].uart) {
+        return;
+    }
+    isrpipe_write_one(&stdin_isrpipe, byte);
+}
+
+static inline bool _slipdev_config_start_frame(slipdev_t *dev)
+{
+#ifdef MODULE_SLIPDEV_CONFIG
+    /* try to create new configuration / CoAP frame */
+    return crb_start_chunk(&dev->rb_config);
+#else
+    (void)dev;
+    return 1;
+#endif
+}
+
+static inline void _slipdev_config_end_frame(slipdev_t *dev)
+{
+#ifdef MODULE_SLIPDEV_CONFIG
+    crb_end_chunk(&dev->rb_config, true);
+    thread_flags_set(thread_get(dev->coap_server_pid), 1);
+#else
+    (void)dev;
+#endif
+}
+
+static inline bool _slipdev_config_add_to_frame(slipdev_t *dev, uint8_t byte)
+{
+#ifdef MODULE_SLIPDEV_CONFIG
+    /* discard frame if byte can't be added */
+    if (!crb_add_byte(&dev->rb_config, byte)) {
+        DEBUG("slipmux: coap rx buffer full, drop frame\n");
+        crb_end_chunk(&dev->rb_config, false);
+        return 0;
+    }
+#else
+    (void)dev;
+    (void)byte;
+#endif
+    return 1;
+}
+
+static inline bool _slipdev_net_start_frame(slipdev_t *dev, uint8_t byte)
+{
+    /* try to create new ip frame */
+    if (!crb_start_chunk(&dev->rb)) {
+        DEBUG("slipmux: can't start new net frame, drop frame\n");
+        return 0;
+    }
+    if (!crb_add_byte(&dev->rb, byte)) {
+        DEBUG("slipmux: net rx buffer full, drop frame\n");
+        crb_end_chunk(&dev->rb, false);
+        return 0;
+    }
+    return 1;
+}
+
+static inline void _slipdev_net_end_frame(slipdev_t *dev)
+{
+    crb_end_chunk(&dev->rb, true);
+    netdev_trigger_event_isr(&dev->netdev);
+}
+
+static inline bool _slipdev_net_add_to_frame(slipdev_t *dev, uint8_t byte)
+{
+    /* discard frame if byte can't be added */
+    if (!crb_add_byte(&dev->rb, byte)) {
+        DEBUG("slipmux: net rx buffer full, drop frame\n");
+        crb_end_chunk(&dev->rb, false);
+        return 0;
+    }
+    return 1;
+}
+
+void _slip_rx_cb(void *arg, uint8_t byte)
 {
     slipdev_t *dev = arg;
 
     switch (dev->state) {
+    case SLIPDEV_STATE_STANDBY:
+    /* fall through */
+    case SLIPDEV_STATE_SLEEP:
+        /* do nothing if we are supposed to sleep */
+        /* and we should usually not be able to hit this case anyways */
+        assert(0);
+        break;
     case SLIPDEV_STATE_STDIN:
         switch (byte) {
         case SLIPDEV_ESC:
@@ -81,11 +167,7 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
             dev->state = SLIPDEV_STATE_NONE;
             break;
         default:
-#if IS_USED(MODULE_SLIPDEV_STDIO)
-            if (dev->config.uart == STDIO_UART_DEV) {
-                isrpipe_write_one(&stdin_isrpipe, byte);
-            }
-#endif
+            _slipdev_stdio_add_to_frame(dev, byte);
             break;
         }
         return;
@@ -99,11 +181,7 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
             break;
         }
         dev->state = SLIPDEV_STATE_STDIN;
-#if IS_USED(MODULE_SLIPDEV_STDIO)
-        if (dev->config.uart == STDIO_UART_DEV) {
-            isrpipe_write_one(&stdin_isrpipe, byte);
-        }
-#endif
+        _slipdev_stdio_add_to_frame(dev, byte);
         return;
     case SLIPDEV_STATE_CONFIG:
         switch (byte) {
@@ -112,21 +190,12 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
             break;
         case SLIPDEV_END:
             dev->state = SLIPDEV_STATE_NONE;
-#if IS_USED(MODULE_SLIPDEV_CONFIG)
-            crb_end_chunk(&dev->rb_config, true);
-            thread_flags_set(thread_get(dev->coap_server_pid), 1);
-#endif
+            _slipdev_config_end_frame(dev);
             break;
         default:
-#if IS_USED(MODULE_SLIPDEV_CONFIG)
-            /* discard frame if byte can't be added */
-            if (!crb_add_byte(&dev->rb_config, byte)) {
-                DEBUG("slipdev: rx buffer full, drop frame\n");
-                crb_end_chunk(&dev->rb_config, false);
-                dev->state = SLIPDEV_STATE_NONE;
-                return;
+            if (!_slipdev_config_add_to_frame(dev, byte)) {
+                dev->state = SLIPDEV_STATE_UNKNOWN;
             }
-#endif
             break;
         }
         return;
@@ -139,58 +208,29 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
             byte = SLIPDEV_ESC;
             break;
         }
-#if IS_USED(MODULE_SLIPDEV_CONFIG)
-        /* discard frame if byte can't be added */
-        if (!crb_add_byte(&dev->rb_config, byte)) {
-            DEBUG("slipdev: rx buffer full, drop frame\n");
-            crb_end_chunk(&dev->rb_config, false);
-            dev->state = SLIPDEV_STATE_NONE;
-            return;
-        }
-#endif
-        dev->state = SLIPDEV_STATE_CONFIG;
-        return;
-    case SLIPDEV_STATE_NONE:
-        /* is diagnostic frame? */
-        if (byte == SLIPDEV_STDIO_START) {
-            dev->state = SLIPDEV_STATE_STDIN;
-            return;
-        }
-
-        if (byte == SLIPDEV_CONFIG_START) {
-#if IS_USED(MODULE_SLIPDEV_CONFIG)
-            /* try to create new frame */
-            if (!crb_start_chunk(&dev->rb_config)) {
-                return;
-            }
-#endif
+        if (_slipdev_config_add_to_frame(dev, byte)) {
             dev->state = SLIPDEV_STATE_CONFIG;
-            return;
         }
-
-        /* ignore empty frame */
-        if (byte == SLIPDEV_END) {
-            return;
+        else {
+            dev->state = SLIPDEV_STATE_UNKNOWN;
         }
-
-        /* try to create new ip frame */
-        if (!crb_start_chunk(&dev->rb)) {
-            return;
-        }
-        dev->state = SLIPDEV_STATE_NET;
-        /* fall-through */
+        return;
     case SLIPDEV_STATE_NET:
         switch (byte) {
         case SLIPDEV_ESC:
             dev->state = SLIPDEV_STATE_NET_ESC;
-            return;
+            break;
         case SLIPDEV_END:
-            crb_end_chunk(&dev->rb, true);
-            netdev_trigger_event_isr(&dev->netdev);
+            _slipdev_net_end_frame(dev);
             dev->state = SLIPDEV_STATE_NONE;
-            return;
+            break;
+        default:
+            if (!_slipdev_net_add_to_frame(dev, byte)) {
+                dev->state = SLIPDEV_STATE_UNKNOWN;
+            }
+            break;
         }
-        break;
+        return;
     /* escaped byte received */
     case SLIPDEV_STATE_NET_ESC:
         switch (byte) {
@@ -201,25 +241,59 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
             byte = SLIPDEV_ESC;
             break;
         }
-        dev->state = SLIPDEV_STATE_NET;
-        break;
-    }
-
-    assert(dev->state == SLIPDEV_STATE_NET);
-
-    /* discard frame if byte can't be added */
-    if (!crb_add_byte(&dev->rb, byte)) {
-        DEBUG("slipdev: rx buffer full, drop frame\n");
-        crb_end_chunk(&dev->rb, false);
-        dev->state = SLIPDEV_STATE_NONE;
+        if (_slipdev_net_add_to_frame(dev, byte)) {
+            dev->state = SLIPDEV_STATE_NET;
+        }
+        else {
+            dev->state = SLIPDEV_STATE_UNKNOWN;
+        }
         return;
+    case SLIPDEV_STATE_UNKNOWN:
+        if (byte == SLIPDEV_END) {
+            dev->state = SLIPDEV_STATE_NONE;
+        }
+        return;
+    case SLIPDEV_STATE_NONE:
+        /* is diagnostic frame? */
+        if (byte == SLIPDEV_START_STDIO) {
+            dev->state = SLIPDEV_STATE_STDIN;
+            return;
+        }
+
+        if (byte == SLIPDEV_START_COAP) {
+            if (_slipdev_config_start_frame(dev)) {
+                dev->state = SLIPDEV_STATE_CONFIG;
+            }
+            else {
+                dev->state = SLIPDEV_STATE_UNKNOWN;
+            }
+            return;
+        }
+
+        if (SLIPDEV_START_NET(byte)) {
+            if (_slipdev_net_start_frame(dev, byte)) {
+                dev->state = SLIPDEV_STATE_NET;
+            }
+            else {
+                dev->state = SLIPDEV_STATE_UNKNOWN;
+            }
+            return;
+        }
+
+        /* ignore empty frame */
+        if (byte == SLIPDEV_END) {
+            return;
+        }
+
+        dev->state = SLIPDEV_STATE_UNKNOWN;
+        DEBUG("slipmux: Unknown start byte %02x ignored\n", byte);
     }
 }
 
 static void _poweron(slipdev_t *dev)
 {
     if ((dev->state != SLIPDEV_STATE_STANDBY) &&
-            (dev->state != SLIPDEV_STATE_SLEEP)) {
+        (dev->state != SLIPDEV_STATE_SLEEP)) {
         return;
     }
 
@@ -258,18 +332,18 @@ void slipdev_write_bytes(uart_t uart, const uint8_t *data, size_t len)
 {
     for (unsigned j = 0; j < len; j++, data++) {
         switch (*data) {
-            case SLIPDEV_END:
-                /* escaping END byte*/
-                slipdev_write_byte(uart, SLIPDEV_ESC);
-                slipdev_write_byte(uart, SLIPDEV_END_ESC);
-                break;
-            case SLIPDEV_ESC:
-                /* escaping ESC byte*/
-                slipdev_write_byte(uart, SLIPDEV_ESC);
-                slipdev_write_byte(uart, SLIPDEV_ESC_ESC);
-                break;
-            default:
-                slipdev_write_byte(uart, *data);
+        case SLIPDEV_END:
+            /* escaping END byte*/
+            slipdev_write_byte(uart, SLIPDEV_ESC);
+            slipdev_write_byte(uart, SLIPDEV_END_ESC);
+            break;
+        case SLIPDEV_ESC:
+            /* escaping ESC byte*/
+            slipdev_write_byte(uart, SLIPDEV_ESC);
+            slipdev_write_byte(uart, SLIPDEV_ESC_ESC);
+            break;
+        default:
+            slipdev_write_byte(uart, *data);
         }
     }
 }
@@ -298,6 +372,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     slipdev_t *dev = (slipdev_t *)netdev;
     int bytes = _check_state(dev);
+
     if (bytes) {
         return bytes;
     }
@@ -325,7 +400,8 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         if (len > 0) {
             /* remove data */
             crb_consume_chunk(&dev->rb, NULL, len);
-        } else {
+        }
+        else {
             /* the user was warned not to use a buffer size > `INT_MAX` ;-) */
             crb_get_chunk_size(&dev->rb, &res);
         }
@@ -395,20 +471,20 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
     (void)value;
     (void)max_len;
     switch (opt) {
-        case NETOPT_IS_WIRED:
-            return 1;
-        case NETOPT_DEVICE_TYPE:
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)value) = NETDEV_TYPE_SLIP;
-            return sizeof(uint16_t);
+    case NETOPT_IS_WIRED:
+        return 1;
+    case NETOPT_DEVICE_TYPE:
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)value) = NETDEV_TYPE_SLIP;
+        return sizeof(uint16_t);
 #if IS_USED(MODULE_SLIPDEV_L2ADDR)
-        case NETOPT_ADDRESS_LONG:
-            assert(max_len == sizeof(eui64_t));
-            netdev_eui64_get(netdev, value);
-            return sizeof(eui64_t);
+    case NETOPT_ADDRESS_LONG:
+        assert(max_len == sizeof(eui64_t));
+        netdev_eui64_get(netdev, value);
+        return sizeof(eui64_t);
 #endif
-        default:
-            return -ENOTSUP;
+    default:
+        return -ENOTSUP;
     }
 }
 
@@ -438,10 +514,15 @@ static void *_coap_server_thread(void *arg)
 {
     static uint8_t buf[512];
     slipdev_t *dev = arg;
+
     while (1) {
         thread_flags_wait_any(1);
         size_t len;
         while (crb_get_chunk_size(&dev->rb_config, &len)) {
+            if (len > sizeof(buf)) {
+                crb_consume_chunk(&dev->rb_config, NULL, len);
+                continue;
+            }
             crb_consume_chunk(&dev->rb_config, buf, len);
 
             /* Is the crc correct via residue(=0xF0B8) test */
@@ -468,9 +549,9 @@ static void *_coap_server_thread(void *arg)
             uint16_t fcs_sum = crc16_ccitt_fcs_finish(SPECIAL_INIT_FCS, buf, res);
 
             slipdev_lock();
-            slipdev_write_byte(dev->config.uart, SLIPDEV_CONFIG_START);
+            slipdev_write_byte(dev->config.uart, SLIPDEV_START_COAP);
             slipdev_write_bytes(dev->config.uart, buf, res);
-            slipdev_write_bytes(dev->config.uart, (uint8_t *) &fcs_sum, 2);
+            slipdev_write_bytes(dev->config.uart, (uint8_t *)&fcs_sum, 2);
             slipdev_write_byte(dev->config.uart, SLIPDEV_END);
             slipdev_unlock();
         }
@@ -486,8 +567,8 @@ void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index
     crb_init(&dev->rb_config, dev->rxmem_config, sizeof(dev->rxmem_config));
 
     dev->coap_server_pid = thread_create(coap_stack, sizeof(coap_stack), THREAD_PRIORITY_MAIN - 1,
-                                     THREAD_CREATE_STACKTEST, _coap_server_thread,
-                                     (void *)dev, "Slipmux CoAP server");
+                                         THREAD_CREATE_STACKTEST, _coap_server_thread,
+                                         (void *)dev, "Slipmux CoAP server");
 #endif
     /* set device descriptor fields */
     dev->config = *params;
