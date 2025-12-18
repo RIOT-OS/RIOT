@@ -543,6 +543,7 @@ PSEUDOMODULES += vfs_auto_mount
 ## backends.
 PSEUDOMODULES += vfs_default
 
+PSEUDOMODULES += walltime_impl_rtc
 PSEUDOMODULES += wakaama_objects_%
 PSEUDOMODULES += wifi_scan_list
 PSEUDOMODULES += wifi_enterprise

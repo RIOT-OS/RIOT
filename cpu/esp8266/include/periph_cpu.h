@@ -15,6 +15,7 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <limits.h>
 
@@ -324,6 +325,11 @@ typedef struct {
  */
 #define UART_NUMOF_MAX  (2)
 /** @} */
+
+/**
+ * @brief   Returns true if the CPU woke up from deep sleep
+ */
+bool cpu_woke_from_backup(void);
 
 #ifdef __cplusplus
 }
