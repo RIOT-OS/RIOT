@@ -155,3 +155,8 @@ void __wrap_pm_attach(void)
     __real_pm_attach();
 #endif
 }
+
+bool cpu_woke_from_backup(void)
+{
+    return esp_reset_reason() == ESP_RST_DEEPSLEEP;
+}
