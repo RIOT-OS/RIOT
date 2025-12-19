@@ -101,6 +101,13 @@ void gnrc_rpl_instance_remove(gnrc_rpl_instance_t *inst);
 gnrc_rpl_instance_t *gnrc_rpl_instance_get(uint8_t instance_id);
 
 /**
+ * @brief   Setup self as root for the @p dodag.
+ *
+ * @param[in] dodag     Pointer to the dodag.
+ */
+void gnrc_rpl_dodag_root_init(gnrc_rpl_dodag_t *dodag);
+
+/**
  * @brief   Initialize a new RPL DODAG with the id @p dodag_id for the instance @p instance.
  *
  * @param[in]   instance        Pointer to the instance to add the DODAG to
@@ -170,6 +177,15 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent);
  * @param[in] dodag     Pointer to the DODAG
  */
 void gnrc_rpl_cleanup_start(gnrc_rpl_dodag_t *dodag);
+
+/**
+ * @brief Poison all routes of @p dodag by setting an infinite rank, and schedule
+ * a cleanup for the @p dodag.
+ *
+ * @param[in] dodag     Pointer to the DODAG
+ *
+ */
+void gnrc_rpl_poison_routes(gnrc_rpl_dodag_t *dodag);
 
 /**
  * @brief   Start a local repair.
