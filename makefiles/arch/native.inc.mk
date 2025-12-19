@@ -126,7 +126,7 @@ all-asan: export AFL_USE_ASAN=1
 
 INCLUDES += $(NATIVEINCLUDES)
 
-CFLAGS += -DDEBUG_ASSERT_VERBOSE
+CFLAGS += -DCONFIG_ASSERT_VERBOSE=1
 
 # workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52624
 ifneq ($(shell gcc --version | head -1 | grep -E ' (4.6|4.7)'),)
