@@ -73,7 +73,7 @@
  *   retries or PREPARE otherwise.
  *
  * The events that trigger state machine changes are defined in
- * @ref ieee802154_fsm_state_t
+ * @ref ieee802154_fsm_state_cb_t
  *
  * The following events are valid for each state:
  *
@@ -83,7 +83,6 @@
  * RX_DONE       | X  | X*    | X*      | X* | X
  * CRC_ERROR     | X  | X*    | X*      | X* | X
  * ACK_TIMEOUT   | -  | -     | -       | -  | X
- * BH            | -  | -     | X       | -  | -
  * REQ_TX        | X  | X     | -       | -  | -
  * REQ_SET_RX_ON | -  | X     | -       | -  | -
  * REQ_SET_IDLE  | X  | -     | -       | -  | -
@@ -100,17 +99,16 @@
  * - @ref ieee802154_submac_cb_t::tx_done.
  * - @ref ieee802154_submac_ack_timer_set
  * - @ref ieee802154_submac_ack_timer_cancel
- * - @ref ieee802154_submac_bh_request
  *
  * @{
  *
  * @author       José I. Alamos <jose.alamos@haw-hamburg.de>
  */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include "assert.h"
@@ -158,32 +156,44 @@ typedef struct {
 } ieee802154_submac_cb_t;
 
 /**
- * @brief Internal SubMAC FSM state machine states
- */
-typedef enum {
-   IEEE802154_FSM_STATE_INVALID,        /**< Invalid state */
-   IEEE802154_FSM_STATE_RX,             /**< SubMAC is ready to receive frames */
-   IEEE802154_FSM_STATE_IDLE,           /**< The transceiver is off */
-   IEEE802154_FSM_STATE_PREPARE,        /**< The SubMAC is preparing the next transmission */
-   IEEE802154_FSM_STATE_TX,             /**< The SubMAC is currently transmitting a frame */
-   IEEE802154_FSM_STATE_WAIT_FOR_ACK,   /**< The SubMAC is waiting for an ACK frame */
-   IEEE802154_FSM_STATE_NUMOF,          /**< Number of SubMAC FSM states */
-} ieee802154_fsm_state_t;
-
-/**
  * @brief Internal SubMAC FSM state machine events
  */
 typedef enum {
+    IEEE802154_FSM_EV_ENTRY,                /**< FSM calls entry function of a state */
+    IEEE802154_FSM_EV_EXIT,                 /**< FSM calls exit function of a state */
     IEEE802154_FSM_EV_TX_DONE,              /**< Radio reports frame was sent */
     IEEE802154_FSM_EV_RX_DONE,              /**< Radio reports frame was received */
     IEEE802154_FSM_EV_CRC_ERROR,            /**< Radio reports frame was received but CRC failed */
     IEEE802154_FSM_EV_ACK_TIMEOUT,          /**< ACK timer fired */
-    IEEE802154_FSM_EV_BH,                   /**< The Bottom Half should process an event */
     IEEE802154_FSM_EV_REQUEST_TX,           /**< The upper layer requested to transmit a frame */
     IEEE802154_FSM_EV_REQUEST_SET_RX_ON,    /**< The upper layer requested to go to RX */
     IEEE802154_FSM_EV_REQUEST_SET_IDLE,     /**< The upper layer requested to go to IDLE */
     IEEE802154_FSM_EV_NUMOF,                /**< Number of SubMAC FSM events */
 } ieee802154_fsm_ev_t;
+
+/**
+ * @brief Internal SubMAC FSM process Event return status
+ */
+typedef enum {
+    IEEE802154_SUBMAC_FSM_RETURN_HANDLED,       /**< Event was handled */
+    IEEE802154_SUBMAC_FSM_RETURN_TRANSITION,    /**< Event has caused a transition */
+    IEEE802154_SUBMAC_FSM_RETURN_IGNORED,       /**< Event was ignored, no action was performed*/
+} ieee802154_submac_fsm_return_t;
+
+/**
+ * @brief Internal SubMAC FSM state
+ */
+typedef ieee802154_submac_fsm_return_t (*ieee802154_fsm_state_cb_t)(ieee802154_submac_t *submac,
+                                                                      ieee802154_fsm_ev_t ev,
+                                                                      void* ctx);
+
+/**
+ * @brief Internal SubMAC FSM
+ */
+typedef struct {
+    ieee802154_fsm_state_cb_t fsm_state_cb;     /**< current state of the SubMAC FSM */
+    uint8_t busy_status;                        /**< flag if the SubMAC is in use or not */
+} ieee802154_fsm_t;
 
 /**
  * @brief IEEE 802.15.4 SubMAC descriptor
@@ -205,7 +215,8 @@ struct ieee802154_submac {
     uint8_t backoff_mask;               /**< internal value used for random backoff calculation */
     uint8_t csma_retries;               /**< maximum number of CSMA-CA retries */
     int8_t tx_pow;                      /**< Transmission power (in dBm) */
-    ieee802154_fsm_state_t fsm_state;    /**< State of the SubMAC */
+    ieee802154_fsm_t fsm;               /**< FSM of the SubMAC */
+    int32_t fsm_context_res;            /**< Result of the proceeded fsm action */
     ieee802154_phy_mode_t phy_mode;     /**< IEEE 802.15.4 PHY mode */
     const iolist_t *psdu;               /**< stores the current PSDU */
 };
@@ -479,10 +490,7 @@ int ieee802154_set_rx(ieee802154_submac_t *submac);
  * @retval true if the SubMAC is in RX state
  * @retval false otherwise
  */
-static inline bool ieee802154_submac_state_is_rx(ieee802154_submac_t *submac)
-{
-    return submac->fsm_state == IEEE802154_FSM_STATE_RX;
-}
+bool ieee802154_submac_state_is_rx(ieee802154_submac_t *submac);
 
 /**
  * @brief Check whether the SubMAC is in IDLE state
@@ -492,10 +500,7 @@ static inline bool ieee802154_submac_state_is_rx(ieee802154_submac_t *submac)
  * @retval true if the SubMAC is in IDLE state
  * @retval false otherwise
  */
-static inline bool ieee802154_submac_state_is_idle(ieee802154_submac_t *submac)
-{
-    return submac->fsm_state == IEEE802154_FSM_STATE_IDLE;
-}
+bool ieee802154_submac_state_is_idle(ieee802154_submac_t *submac);
 
 /**
  * @brief Init the IEEE 802.15.4 SubMAC
@@ -531,15 +536,6 @@ extern void ieee802154_submac_ack_timer_set(ieee802154_submac_t *submac);
 extern void ieee802154_submac_ack_timer_cancel(ieee802154_submac_t *submac);
 
 /**
- * @brief @ref ieee802154_submac_bh_process should be called as soon as possible.
- *
- * @note This function should be implemented by the user of the SubMAC.
- *
- * @param[in] submac pointer to the SubMAC descriptor
- */
-extern void ieee802154_submac_bh_request(ieee802154_submac_t *submac);
-
-/**
  * @brief Process an FSM event
  *
  * @internal
@@ -549,8 +545,8 @@ extern void ieee802154_submac_bh_request(ieee802154_submac_t *submac);
  *
  * @return  Next FSM event
  */
-ieee802154_fsm_state_t ieee802154_submac_process_ev(ieee802154_submac_t *submac,
-                                                    ieee802154_fsm_ev_t ev);
+int ieee802154_submac_process_ev(ieee802154_submac_t *submac,
+                                 ieee802154_fsm_ev_t ev, void *ctx);
 
 /**
  * @brief Indicate the SubMAC that the ACK timeout fired.
@@ -565,17 +561,7 @@ ieee802154_fsm_state_t ieee802154_submac_process_ev(ieee802154_submac_t *submac,
  */
 static inline void ieee802154_submac_ack_timeout_fired(ieee802154_submac_t *submac)
 {
-    ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_ACK_TIMEOUT);
-}
-
-/**
- * @brief Indicate the SubMAC that the BH should process an internal event
- *
- * @param[in] submac pointer to the SubMAC descriptor
- */
-static inline void ieee802154_submac_bh_process(ieee802154_submac_t *submac)
-{
-    ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_BH);
+    ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_ACK_TIMEOUT, 0);
 }
 
 /**
@@ -585,7 +571,7 @@ static inline void ieee802154_submac_bh_process(ieee802154_submac_t *submac)
  */
 static inline void ieee802154_submac_rx_done_cb(ieee802154_submac_t *submac)
 {
-    ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_RX_DONE);
+    ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_RX_DONE, 0);
 }
 
 /**
@@ -595,7 +581,7 @@ static inline void ieee802154_submac_rx_done_cb(ieee802154_submac_t *submac)
  */
 static inline void ieee802154_submac_crc_error_cb(ieee802154_submac_t *submac)
 {
-    ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_CRC_ERROR);
+    ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_CRC_ERROR, 0);
 }
 
 /**
@@ -605,7 +591,7 @@ static inline void ieee802154_submac_crc_error_cb(ieee802154_submac_t *submac)
  */
 static inline void ieee802154_submac_tx_done_cb(ieee802154_submac_t *submac)
 {
-    ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_TX_DONE);
+    ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_TX_DONE, 0);
 }
 
 #ifdef __cplusplus
