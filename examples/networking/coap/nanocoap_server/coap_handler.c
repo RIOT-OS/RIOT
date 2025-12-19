@@ -183,8 +183,8 @@ NANOCOAP_RESOURCE(sha256) {
     .path = "/sha256", .methods = COAP_POST, .handler = _sha256_handler
 };
 
-/* separate response requires an event thread to execute it */
-#ifdef MODULE_EVENT_THREAD
+/* separate response is an optional feature */
+#ifdef MODULE_NANOCOAP_SERVER_SEPARATE
 static nanocoap_server_response_ctx_t _separate_ctx;
 
 static void _send_response(void *ctx)
@@ -223,13 +223,13 @@ static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap
                               &event_timed.super);
     event_timeout_set(&event_timeout, 1 * MS_PER_SEC);
 
-    return coap_build_empty_ack(pkt, (void *)buf);
+    return coap_reply_empty_ack(pkt, buf, len);
 }
 
 NANOCOAP_RESOURCE(separate) {
     .path = "/separate", .methods = COAP_GET, .handler = _separate_handler,
 };
-#endif /* MODULE_EVENT_THREAD */
+#endif /* MODULE_NANOCOAP_SERVER_SEPARATE */
 
 #ifdef MODULE_NANOCOAP_SERVER_OBSERVE
 static ssize_t _time_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
