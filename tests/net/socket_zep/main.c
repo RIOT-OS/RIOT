@@ -53,7 +53,7 @@ static void test_init(void)
            p->local_addr, p->local_port, p->remote_addr, p->remote_port);
     netdev_register(&_socket_zep_netdev.dev.netdev, NETDEV_SOCKET_ZEP, 0);
     netdev->event_callback = _event_cb;
-    netdev_ieee802154_submac_init(&_socket_zep_netdev);
+    netdev_ieee802154_submac_init(&_socket_zep_netdev, NULL);
     socket_zep_hal_setup(&_dev, &_socket_zep_netdev.submac.dev);
     socket_zep_setup(&_dev, p);
     expect(netdev->driver->init(netdev) >= 0);
