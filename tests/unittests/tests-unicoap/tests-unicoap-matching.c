@@ -26,7 +26,7 @@
 
 static void _test_root_with_string(bool match_subtree) {
     unicoap_resource_t r = {
-        .path = "/",
+        .path = UNICOAP_PATH_ROOT,
         .flags = match_subtree ? UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE : 0
     };
 
@@ -44,7 +44,7 @@ static void test_root_with_string_subtree(void) {
 
 static void _test_root_with_options(bool match_subtree) {
     unicoap_resource_t r = {
-        .path = "/",
+        .path = UNICOAP_PATH_ROOT,
         .flags = match_subtree ? UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE : 0
     };
 
@@ -56,7 +56,7 @@ static void _test_root_with_options(bool match_subtree) {
     TEST_ASSERT_EQUAL_INT(unicoap_resource_match_path_options(&r, &options), match_subtree);
 }
 
-static void test_root_with_options(void) {
+static void test_root_with_options(void) {printf("test_root_with_options\n");
     _test_root_with_options(false);
 }
 
@@ -66,12 +66,12 @@ static void test_root_with_options_subtree(void) {
 
 static void _test_simple_with_string(bool match_subtree) {
     unicoap_resource_t r = {
-        .path = "/a",
+        .path = UNICOAP_PATH("a"),
         .flags = match_subtree ? UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE : 0
     };
 
     _TEST_ASSERT_FALSE(_MATCH_STRING(&r, "/"));
-    _TEST_ASSERT_FALSE(_MATCH_STRING(&r, "a"));
+    _TEST_ASSERT_TRUE(_MATCH_STRING(&r, "a"));
     _TEST_ASSERT_TRUE(_MATCH_STRING(&r, "/a"));
     _TEST_ASSERT_TRUE(_MATCH_STRING(&r, "/a/"));
     _TEST_ASSERT_FALSE(_MATCH_STRING(&r, "/aa"));
@@ -88,7 +88,7 @@ static void test_simple_with_string_subtree(void) {
 
 static void _test_simple_with_options(bool match_subtree) {
     unicoap_resource_t r = {
-        .path = "/a",
+        .path = UNICOAP_PATH("a"),
         .flags = match_subtree ? UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE : 0
     };
     UNICOAP_OPTIONS_ALLOC(options, 10);
@@ -115,9 +115,21 @@ static void test_simple_with_options_subtree(void) {
 
 static void _test_long_with_string(bool match_subtree) {
     unicoap_resource_t r = {
-        .path = "/a123/b567",
+        .path = UNICOAP_PATH("a123", "b567"),
         .flags = match_subtree ? UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE : 0
     };
+
+    /*
+    char test_buffer[20] = {};
+
+    ssize_t res = unicoap_path_serialize(&r.path, test_buffer, sizeof(test_buffer));
+    TEST_ASSERT_EQUAL_INT(res, static_strlen("/a123/a567"));
+    printf("'%.*s'\n", (int)res, test_buffer);
+
+    printf("'");
+    unicoap_path_print(&r.path);
+    printf("'\n");
+    */
 
     _TEST_ASSERT_FALSE(_MATCH_STRING(&r, "/"));
     _TEST_ASSERT_FALSE(_MATCH_STRING(&r, "a"));
@@ -141,7 +153,7 @@ static void test_long_with_string_subtree(void) {
 
 static void _test_long_with_options(bool match_subtree) {
     unicoap_resource_t r = {
-        .path = "/a123/b567",
+        .path = UNICOAP_PATH("a123", "b567"),
         .flags = match_subtree ? UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE : 0
     };
 
