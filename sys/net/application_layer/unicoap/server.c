@@ -46,9 +46,10 @@ int unicoap_resource_match_request_default(const unicoap_listener_t* listener,
             DEBUG(">, proto %s not in allowed set\n", unicoap_string_from_proto(endpoint->proto));
             continue;
         }
+        assert(request->options->entries->data);
 
         if (!unicoap_resource_match_path_options(*resource,
-                                                 (unicoap_options_t*)&request->options)) {
+                                                 (const unicoap_options_t*)request->options)) {
             /* URI mismatch */
             continue;
         }
@@ -86,7 +87,7 @@ ssize_t unicoap_resource_encode_link(const unicoap_resource_t* resource, char* b
     }
     buffer[pos++] = '<';
     ssize_t res = 0;
-    if ((res = unicoap_path_serialize(&resource->path, buffer, capacity - exp_size)) < 0) {
+    if ((res = unicoap_path_serialize(&resource->path, buffer + pos, capacity - exp_size)) < 0) {
         return res;
     }
     pos += res;

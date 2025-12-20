@@ -41,21 +41,20 @@ size_t unicoap_path_component_count(const unicoap_path_t* path) {
 
 void unicoap_path_print(const unicoap_path_t* path) {
     assert(path);
-    if (!path->_components) {
-        printf("/\n");
+    if (!path->_components || !*path->_components) {
+        printf("/");
         return;
     }
     for (const char** p = path->_components; *p; p += 1) {
         printf("/%s", *p);
     }
-    printf("\n");
 }
 
 ssize_t unicoap_path_serialize(const unicoap_path_t* path, char* buffer, size_t capacity) {
     if (capacity == 0) {
         return -ENOBUFS;
     }
-    if (!path->_components) {
+    if (!path->_components || !*path->_components) {
         *buffer = '/';
         return 1;
     }
@@ -186,6 +185,7 @@ bool unicoap_path_matches_options(const unicoap_path_t* path,
 {
     assert(path);
     assert(options);
+    assert(options->entries->data);
     unicoap_options_iterator_t iterator;
     /* Disqualifying the const here is fine as the iterator is only used locally and options
      * are not manipulated. As we only have one iterator concept for both mutable and read-only
