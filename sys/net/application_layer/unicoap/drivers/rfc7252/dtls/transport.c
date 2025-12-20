@@ -48,7 +48,7 @@ static void _dtls_session_triage(unicoap_scheduled_event_t* event)
 {
     (void)event;
     sock_dtls_session_t session;
-    if (dsm_get_num_available_slots() < CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS) {
+    if (dsm_get_num_available_slots() < CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS) {
         if (dsm_get_least_recently_used_session(&_dtls_socket, &session) != -1) {
             DTLS_DEBUG("session triage: freeing least recently used session\n");
             dsm_remove(&_dtls_socket, &session);
@@ -92,13 +92,13 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
         }
 
         /* If not enough session slots left: set timeout to free session. */
-        if (dsm_get_num_available_slots() < CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS) {
+        if (dsm_get_num_available_slots() < CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS) {
             DTLS_DEBUG("session triage: fewer than %u session slots available in session mgmt,"
                        " limiting session lifespan to %" PRIu32 " ms\n",
-                       (unsigned int)CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS,
-                       (uint32_t)CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_MS);
+                       (unsigned int)CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS,
+                       (uint32_t)CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS);
             unicoap_event_schedule(&_dtls_session_triage_event, _dtls_session_triage,
-                                   CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_MS);
+                                   CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS);
         }
     }
 

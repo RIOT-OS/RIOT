@@ -155,7 +155,7 @@ menu "CoAP Unified Suite (unicoap)"
             help
                  Timeout for the DTLS handshake process. Set to 0 for infinite time.
 
-        config UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS
+        config UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS
             int "DTLS minimum number of available sessions at any time"
             range 0 9999999
             default 1
