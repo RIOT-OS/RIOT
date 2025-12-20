@@ -26,7 +26,7 @@
 #include "debug.h"
 #include "private.h"
 
-#define UDP_DEBUG(...) _UNICOAP_PREFIX_DEBUG(".transport.udp", __VA_ARGS__)
+#define _UDP_DEBUG(...) _UNICOAP_PREFIX_DEBUG(".transport.udp", __VA_ARGS__)
 
 UNICOAP_DECL_RECEIVER_STORAGE_EXTERN;
 
@@ -58,7 +58,7 @@ static void _udp_on_event(sock_udp_t* sock, sock_async_flags_t type, void* arg)
                                              unicoap_endpoint_get_udp(&remote), &aux_rx);
 
             if (received < 0) {
-                UDP_DEBUG("recv failure: %" PRIdSIZE "\n", received);
+                _UDP_DEBUG("recv failure: %" PRIdSIZE "\n", received);
                 return;
             }
             if (received == 0) {
@@ -73,7 +73,7 @@ static void _udp_on_event(sock_udp_t* sock, sock_async_flags_t type, void* arg)
                 ssize_t chunk_size = sock_udp_recv_buf_aux(
                     sock, &stackbuf, &buffer_ctx, 0, unicoap_endpoint_get_udp(&remote), &aux_rx);
                 if (chunk_size < 0) {
-                    UDP_DEBUG("recv failure: %" PRIdSIZE "\n", chunk_size);
+                    _UDP_DEBUG("recv failure: %" PRIdSIZE "\n", chunk_size);
                     return;
                 }
                 if (chunk_size == 0) {
@@ -119,7 +119,7 @@ int unicoap_transport_sendv_udp(iolist_t* iolist, const sock_udp_ep_t* remote,
     assert(remote);
     assert(iolist);
 
-    UDP_DEBUG("sendv: %" PRIuSIZE " bytes\n", iolist_size(iolist));
+    _UDP_DEBUG("sendv: %" PRIuSIZE " bytes\n", iolist_size(iolist));
 
     int res = 0;
     if (unlikely(local)) {
@@ -131,7 +131,7 @@ int unicoap_transport_sendv_udp(iolist_t* iolist, const sock_udp_ep_t* remote,
     }
 
     if (res < 0) {
-        UDP_DEBUG("udp_sendv_aux failed: %i\n", res);
+        _UDP_DEBUG("udp_sendv_aux failed: %i\n", res);
     }
 
     return res;
@@ -139,14 +139,14 @@ int unicoap_transport_sendv_udp(iolist_t* iolist, const sock_udp_ep_t* remote,
 
 static int _add_socket(event_queue_t* queue, sock_udp_t* socket, sock_udp_ep_t* local)
 {
-    UDP_DEBUG("zero_copy_guarantees=%u creating UDP sock, port=%" PRIu16 " if=%" PRIu16
+    _UDP_DEBUG("zero_copy_guarantees=%u creating UDP sock, port=%" PRIu16 " if=%" PRIu16
               " family=%s\n",
               CONFIG_UNICOAP_SOCK_ZERO_COPY_GUARANTEES, local->port, local->netif,
               local->family == AF_INET6 ? "inet6" : (local->family == AF_INET ? "inet" : "?"));
 
     int res = sock_udp_create(socket, local, NULL, 0);
     if (res < 0) {
-        UDP_DEBUG("cannot create sock: %d (%s)\n", res, strerror(-res));
+        _UDP_DEBUG("cannot create sock: %d (%s)\n", res, strerror(-res));
         return res;
     }
 
