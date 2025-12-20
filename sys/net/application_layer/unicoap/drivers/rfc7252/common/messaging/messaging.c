@@ -724,7 +724,9 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
     }
     else if (unicoap_message_code_is_response(packet->message->code) &&
              /* Message properties in the packet are still those of the request (ID, token, type) */
-             _get_type(packet) == UNICOAP_TYPE_CON) {
+             _get_type(packet) == UNICOAP_TYPE_CON &&
+             /* Do not piggyback when instructed to respond reliably, send CON and require ACK */
+             !(flags & UNICOAP_MESSAGING_FLAG_RELIABLE)) {
         /* piggybacked response, immediate response style */
         _set_type(packet, UNICOAP_TYPE_ACK);
     }
