@@ -14,7 +14,7 @@ a resource reachable under /hello-world using the designated initializer.
 
 ```c
 UNICOAP_RESOURCE(hello_world_resource) {
-  .path = "/hello-world",
+  .path = UNICOAP_PATH("hello-world"),
   .handler = my_hello_world_handler,
   .methods = UNICOAP_METHODS(UNICOAP_METHOD_GET)
 };

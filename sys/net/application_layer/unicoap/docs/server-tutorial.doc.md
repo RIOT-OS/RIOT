@@ -67,7 +67,7 @@ Since we want to define a root instance, we set it to `/`.
 
 ```c
 UNICOAP_RESOURCE(hello) {
-    .path = "/",
+    .path = UNICOAP_PATH_ROOT,
 };
 ```
 
@@ -78,7 +78,7 @@ methods, `unicoap` will reject that request with a `Method Not Allowed` CoAP res
 
 ```c
 UNICOAP_RESOURCE(hello) {
-    .path = "/",
+    .path = UNICOAP_PATH_ROOT,
     .methods = UNICOAP_METHODS(UNICOAP_METHOD_GET, UNICOAP_METHOD_FETCH),
 };
 ```
@@ -103,7 +103,7 @@ To do this, we pass the @ref UNICOAP_RESOURCE_FLAG_RELIABLE flag.
 
 ```c
 UNICOAP_RESOURCE(hello) {
-    .path = "/",
+    .path = UNICOAP_PATH_ROOT,
     .methods = UNICOAP_METHODS(UNICOAP_METHOD_GET, UNICOAP_METHOD_FETCH),
     .flags = UNICOAP_RESOURCE_FLAG_RELIABLE,
 };
@@ -114,7 +114,7 @@ Finally, we specify a function that is going to handle requests to `/`. We're go
 
 ```c
 UNICOAP_RESOURCE(hello) {
-    .path = "/",
+    .path = UNICOAP_PATH_ROOT,
     .methods = UNICOAP_METHODS(UNICOAP_METHOD_GET, UNICOAP_METHOD_FETCH),
     .flags = UNICOAP_RESOURCE_FLAG_RELIABLE,
     .handler = handle_hello_request
@@ -169,7 +169,7 @@ The first step is to define a new resource.
 
 ```c
 UNICOAP_RESOURCE(greeting) {
-    .path = "/greeting",
+    .path = UNICOAP_PATH("greeting"),
     .flags = UNICOAP_RESOURCE_FLAG_RELIABLE,
     .methods = UNICOAP_METHODS(UNICOAP_METHOD_GET),
     .handler = handle_greeting_request,

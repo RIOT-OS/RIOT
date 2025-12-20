@@ -16,7 +16,7 @@ You can either declare a resource using static cross-file arrays (1) or manually
 
    ```c
    UNICOAP_RESOURCE(my_resource) {
-     .path = "/led/state",
+     .path = UNICOAP_PATH("led", "state"),
      .handler = my_request_handler,
      .methods = UNICOAP_METHODS(UNICOAP_METHOD_GET, UNICOAP_METHOD_PUT)
    }
@@ -29,7 +29,7 @@ You can either declare a resource using static cross-file arrays (1) or manually
    // First, declare your resources in an array
    static unicoap_resource_t my_resources[] = {
       {
-        .path = "/led/state",
+        .path = UNICOAP_PATH("led", "state"),
         .handler = my_request_handler,
         .methods = UNICOAP_METHODS(UNICOAP_METHOD_GET, UNICOAP_METHOD_PUT)
       }
