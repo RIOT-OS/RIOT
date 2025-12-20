@@ -58,14 +58,14 @@ static void _dtls_session_triage(unicoap_scheduled_event_t* event)
 }
 
 static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg)
-{_DTLS_DEBUG("received event from network backend %x\n", type);
+{
     (void)arg;
     sock_dtls_session_t session = { 0 };
 
     if (type & SOCK_ASYNC_CONN_RECV) {
         _DTLS_DEBUG("establishing session\n");
-        ssize_t res = sock_dtls_recv(sock, &session, unicoap_receiver_buffer,
-                                     sizeof(unicoap_receiver_buffer),
+        uint8_t buf[1];
+        ssize_t res = sock_dtls_recv(sock, &session, buf, sizeof(buf),
                                      CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS * US_PER_MS);
 
         if (res != -SOCK_DTLS_HANDSHAKE) {
@@ -102,27 +102,6 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
         }
     }
 
-    if (type & SOCK_ASYNC_CONN_FIN) {
-        _DTLS_DEBUG("closing session\n");
-        if (sock_dtls_get_event_session(sock, &session)) {
-            /* Session is already destroyed, only remove it from session mgmt. */
-            dsm_remove(sock, &session);
-        }
-        else {
-            _DTLS_DEBUG("session was closed, but the corresponding session "
-                       "could not be retrieved from the socket\n");
-            return;
-        }
-
-        _DTLS_DEBUG("session ended, removing associated endpoint state\n");
-
-        unicoap_endpoint_t endpoint = { .proto = UNICOAP_PROTO_DTLS };
-        sock_dtls_session_get_udp_ep(&session, unicoap_endpoint_get_dtls(&endpoint));
-        unicoap_exchange_release_endpoint_state(&endpoint);
-        /* It is safe to ignore the result of exchange_release_endpoint state as this logic follows
-         * a best-effort philosophy. */
-    }
-
     if (type & SOCK_ASYNC_CONN_RDY) {
         _DTLS_DEBUG("connection ready\n");
     }
@@ -139,11 +118,6 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
         ssize_t received = sock_dtls_recv_buf_aux(sock, &session, &pdu, &buffer_ctx, 0, &aux_rx);
         if (received < 0) {
             _DTLS_DEBUG("recv failure: %" PRIdSIZE "\n", received);
-            return;
-        }
-        /* FIXME: sock_dtls_recv_buf_aux fails on second read due to sock->buf_ctx not being NULL */
-        // sock->buf_ctx = NULL;
-        if (received == 0) {
             return;
         }
 
@@ -165,6 +139,29 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
 
         /* Truncated DTLS messages would already have gotten lost at verification */
         unicoap_messaging_process_rfc7252((uint8_t*)pdu, received, false, &packet);
+
+        received = sock_dtls_recv_buf_aux(sock, &session, &pdu, &buffer_ctx, 0, &aux_rx);
+        /* If the networking backends holds its zero-copy guarantee, then trying to read
+         * another chunk must not yield any more data. */
+        assert(received == 0);
+    }
+
+    if (type & SOCK_ASYNC_CONN_FIN) {
+        if (sock_dtls_get_event_session(sock, &session)) {
+            /* Session is already destroyed, only remove it from dsm */
+            dsm_remove(sock, &session);
+        }
+        else {
+            _DTLS_DEBUG("session was closed, but the corresponding session "
+                       "could not be retrieved from the socket\n");
+            return;
+        }
+
+        _DTLS_DEBUG("session ended, removing associated endpoint state\n");
+
+        unicoap_endpoint_t endpoint = { .proto = UNICOAP_PROTO_DTLS };
+        sock_dtls_session_get_udp_ep(&session, unicoap_endpoint_get_dtls(&endpoint));
+        unicoap_exchange_release_endpoint_state(&endpoint);
     }
 
     return;
@@ -236,18 +233,20 @@ int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
             return res;
         }
     }
-    /* prepare session */
-    sock_dtls_session_set_udp_ep(session, remote);
-    dsm_state_t session_state = dsm_store(&_dtls_socket, session, SESSION_STATE_HANDSHAKE, true);
-    if (session_state == NO_SPACE) {
-        return -1;
-    }
+
+    // todo: not needed, already done in _dtls_authenticate, or session is already established?!
+    // /* prepare session */
+    // sock_dtls_session_set_udp_ep(session, remote);
+    // dsm_state_t session_state = dsm_store(&_dtls_socket, session, SESSION_STATE_HANDSHAKE, true);
+    // if (session_state == NO_SPACE) {
+    //     return -1;
+    // }
 
     _DTLS_DEBUG("started sending\n");
 
     if (unlikely(local)) {
         sock_dtls_aux_tx_t aux_tx = { .flags = SOCK_AUX_SET_LOCAL, .local = *local };
-        res = sock_dtls_sendv_aux(&_dtls_socket, session, iolist, SOCK_NO_TIMEOUT, &aux_tx);
+        res = sock_dtls_sendv_aux(&_dtls_socket, session, iolist, 500000, &aux_tx);
     }
     else {
         res = sock_dtls_sendv_aux(&_dtls_socket, session, iolist,
