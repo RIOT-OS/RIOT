@@ -87,7 +87,7 @@ ssize_t unicoap_resource_encode_link(const unicoap_resource_t* resource, char* b
     }
     buffer[pos++] = '<';
     ssize_t res = 0;
-    if ((res = unicoap_path_serialize(&resource->path, buffer + posg, capacity - exp_size)) < 0) {
+    if ((res = unicoap_path_serialize(&resource->path, buffer + pos, capacity - exp_size)) < 0) {
         return res;
     }
     pos += res;
