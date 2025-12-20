@@ -201,9 +201,9 @@ int unicoap_server_send_response_body(unicoap_packet_t* packet,
     return 0;
 
 error:
-    SERVER_DEBUG("failed to send response, trying to send 5.05 unreliably\n");
+    _SERVER_DEBUG("failed to send response, trying to send 5.00 unreliably\n");
 
-    /* try to send 5.05,  */
+    /* try to send 5.00,  */
     unicoap_response_init_empty(packet->message, UNICOAP_STATUS_INTERNAL_SERVER_ERROR);
     unicoap_messaging_send(packet, _messaging_flags_resource(resource->flags) &
                                          ~UNICOAP_MESSAGING_FLAG_RELIABLE);
