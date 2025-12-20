@@ -39,6 +39,19 @@ size_t unicoap_path_component_count(const unicoap_path_t* path) {
     return count;
 }
 
+void unicoap_path_print(const unicoap_path_t* path) {
+    size_t count = 0;
+    assert(path);
+    if (!path->_components) {
+        printf("/\n");
+        return
+    }
+    for (const char** p = path->_components; *p; p += 1) {
+        printf("/%s", *p);
+    }
+    printf("\n");
+}
+
 bool unicoap_path_is_equal(const unicoap_path_t* lhs, const unicoap_path_t* rhs) {
     assert(lhs);
     assert(rhs);

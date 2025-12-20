@@ -65,7 +65,7 @@ static_assert(sizeof(unicoap_path_t) == sizeof(char*),
 #define UNICOAP_PATH_ROOT ((unicoap_path_t) { ._components = NULL })
 
 /** @brief The path for resource discovery (`/.well-known/core`) */
-#define UNICOAP_PATH_RESORCE_DISCOVERY UNICOAP_PATH(".well-known", "core")
+#define UNICOAP_PATH_RESOURCE_DISCOVERY UNICOAP_PATH(".well-known", "core")
 
 /**
  * @brief Determines whether the given path is the root path
@@ -101,6 +101,58 @@ size_t unicoap_path_component_count(const unicoap_path_t* path);
  * respective path objects do not need to be equal.
  */
 bool unicoap_path_is_equal(const unicoap_path_t* lhs, const unicoap_path_t* rhs);
+
+/**
+ * @brief Compares `Uri-Path` options against path object
+ * @param[in] path Path object to match against
+ * @param[in] options Options object with `Uri-Path` options
+ * @param match_subtree A boolean determining whether the aggregate path of `Uri-Path` options is
+ * permitted to be longer than the given @p path. If `false`, both @p path and @p options must have
+ * exactly the same number of path components (or `Uri-Path` options, respectively).
+ *
+ * @returns A boolean value indicating whether the two paths match.
+ */
+bool unicoap_path_matches_options(const unicoap_path_t* path,
+                                  const unicoap_options_t* options, bool match_subtree);
+
+/**
+ * @brief Compares UTF-8 string path against path object
+ * @param[in] path Path object to match against
+ * @param[in] string String path, not necessarily null-terminated, with path components separated by
+ * possibly multiple slash separators (`/`)
+ * @param match_subtree A boolean determining whether @p string is
+ * permitted to have more path components than the given @p path.
+ * If `false`, both @p path and @p string must have exactly the same number of path components.
+ *
+ * This function ignores trailing slashes in @p string
+ */
+bool unicoap_path_matches_string(const unicoap_path_t* path,
+                                 const char* string, size_t _string_length, bool match_subtree);
+
+/**
+ * @brief Writes path into buffer, with path components separated by `/`
+ * @param[in] path Path object to serialize
+ * @param[out] buffer UTF-8 buffer to write path string into
+ * @param capacity Number of free UTF-8 code units (bytes) available in @p buffer
+ *
+ * @note This function does not null-terminate.
+ *
+ * The resulting path string will always begin with a leading slash. A root path will result in a
+ * path string consisting of just the component separator `/`.
+ *
+ * @returns Number of UTF-8 code units (bytes) used to represent the serialized path or negative
+ * error number
+ * @retval `-ENOBUFS` if buffer lacks capacity to store path
+ */
+ssize_t unicoap_path_serialize(const unicoap_path_t* path, char* buffer, size_t capacity);
+
+/**
+ * @brief Prints given path object as serialized path
+ * @param[in] path Path object to serialize and print
+ *
+ * @note The path can be of arbitrary length.
+ */
+void unicoap_path_print(const unicoap_path_t* path);
 
 /**
  * @brief Auxiliary exchange information
@@ -331,7 +383,7 @@ struct unicoap_resource {
      *
      * @warning This path must not have any trailing slash separators, apart from the root path `/`
      */
-    const char* path;
+    const unicoap_path_t path;
 
     /**
      * @brief Request handler callback
@@ -493,8 +545,6 @@ typedef struct unicoap_listener unicoap_listener_t;
 /**
  * @brief   Handler function for the request matcher strategy
  *
- * @param[in]  path         Requested path
- * @param      path_length  Number of UTF-8 characters in @p path (excluding null-terminator)
  * @param[in]  listener     Listener
  * @param[out] resource     Matching resource
  * @param[in]  request      Request message
@@ -503,8 +553,7 @@ typedef struct unicoap_listener unicoap_listener_t;
  * @retval Zero if resource is found and matcher determined request matches resource definition
  * @retval Non-zero CoAP status code appropriate for the mismatch
  */
-typedef int (*unicoap_request_matcher_t)(const char* path, size_t path_length,
-                                         const unicoap_listener_t* listener,
+typedef int (*unicoap_request_matcher_t)(const unicoap_listener_t* listener,
                                          const unicoap_resource_t** resource,
                                          const unicoap_message_t* request,
                                          const unicoap_endpoint_t* endpoint);
@@ -602,7 +651,11 @@ int unicoap_listener_deregister(unicoap_listener_t* listener);
  *
  * @returns A boolean value indicating whether the specified path matches the resource definition.
  */
-bool unicoap_resource_match_path_string(const unicoap_resource_t* resource, const char* path, size_t length);
+static inline bool unicoap_resource_match_path_string(const unicoap_resource_t* resource,
+                                                      const char* path, size_t length) {
+    return unicoap_path_matches_string(&resource->path, path, length,
+                                     (resource->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE) != 0);
+}
 
 /**
  * @brief Determines whether the complete Uri-Path matches the resources path.
@@ -619,8 +672,11 @@ bool unicoap_resource_match_path_string(const unicoap_resource_t* resource, cons
  *
  * @returns A boolean value indicating whether the given resource matches the path in @p options.
  */
-bool unicoap_resource_match_path_options(const unicoap_resource_t* resource,
-                                         const unicoap_options_t* options);
+static inline bool unicoap_resource_match_path_options(const unicoap_resource_t* resource,
+                                                       const unicoap_options_t* options) {
+    return unicoap_path_matches_options(&resource->path, options,
+                                      (resource->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE) != 0);
+}
 /** @} */
 
 /**
