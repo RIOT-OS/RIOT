@@ -40,16 +40,39 @@ size_t unicoap_path_component_count(const unicoap_path_t* path) {
 }
 
 void unicoap_path_print(const unicoap_path_t* path) {
-    size_t count = 0;
     assert(path);
     if (!path->_components) {
         printf("/\n");
-        return
+        return;
     }
     for (const char** p = path->_components; *p; p += 1) {
         printf("/%s", *p);
     }
     printf("\n");
+}
+
+ssize_t unicoap_path_serialize(const unicoap_path_t* path, char* buffer, size_t capacity) {
+    if (capacity == 0) {
+        return -ENOBUFS;
+    }
+    if (!path->_components) {
+        *buffer = '/';
+        return 1;
+    }
+    size_t og_capacity = capacity;
+    for (const char** component = path->_components; *component; component += 1) {
+        size_t length = strlen(*component);
+        if (capacity < (length + 1)) {
+            return -ENOBUFS;
+        }
+        capacity -= length + 1;
+        *buffer = '/';
+        buffer += 1;
+        memcpy(buffer, *component, length);
+        buffer += length;
+    }
+
+    return og_capacity - capacity;
 }
 
 bool unicoap_path_is_equal(const unicoap_path_t* lhs, const unicoap_path_t* rhs) {
@@ -79,6 +102,125 @@ bool unicoap_path_is_equal(const unicoap_path_t* lhs, const unicoap_path_t* rhs)
 
     /* If we reached the end of both paths simultaneously (NULL), they are equal. */
     return !*l && !*r;
+}
+
+/** @brief Returns new length of path excluding trailing slashes */
+static inline size_t _trim_trailing_slashes(const char* path, size_t length) {
+    if (length > 0) {
+        size_t i = length - 1;
+        while (i > 0) {
+            if (path[i] == '/') {
+                i -= 1;
+            } else {
+                break;
+            }
+        }
+        return i + 1;
+    } else {
+        return length;
+    }
+}
+
+bool unicoap_path_matches_string(const unicoap_path_t* path,
+                                 const char* string, size_t string_length, bool match_subtree) {
+
+    assert(path);
+    assert(string);
+
+    char* cursor = (char*)string;
+
+    if (path->_components) {
+        for (const char** component = path->_components; *component; component += 1) {
+            size_t path_component_length = strlen(*component);
+
+            /* Ignore duplicate slashes */
+            while (*cursor == '/') {
+                cursor += 1;
+                string_length -= 1;
+            }
+
+            if (string_length == 0) {
+                return false;
+            }
+
+            /* Find end of string component */
+            size_t string_component_length = string_length;
+            for (size_t i = 0; i < string_length; i += 1) {
+                if (cursor[i] == '/') {
+                    string_component_length = i;
+                    break;
+                }
+            }
+
+            if (path_component_length != string_component_length) {
+                return false;
+            }
+
+            if (strncmp(*component, cursor, path_component_length) != 0) {
+                return false;
+            }
+
+            cursor += string_component_length;
+            string_length -= string_component_length;
+        }
+    }
+
+    if (match_subtree) {
+        /* There may be more path components in the string options.
+         * But this is fine as subpaths are allowed. */
+        return true;
+    } else {
+        /* Make sure we read all path components in the string, i.e., the actual path is not longer
+         * than the given path's. */
+        for (size_t i = 0; i < string_length; i += 1) {
+            if (cursor[i] != '/') {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+bool unicoap_path_matches_options(const unicoap_path_t* path,
+                                  const unicoap_options_t* options, bool match_subtree)
+{
+    assert(path);
+    assert(options);
+    unicoap_options_iterator_t iterator;
+    /* Disqualifying the const here is fine as the iterator is only used locally and options
+     * are not manipulated. As we only have one iterator concept for both mutable and read-only
+     * borrowing access patterns, this is the only way to go. */
+    unicoap_options_iterator_init(&iterator, (unicoap_options_t*)options);
+
+    const char* uri_component = NULL;
+
+    if (path->_components) {
+        for (const char** component = path->_components; *component; component += 1) {
+            size_t path_component_length = strlen(*component);
+
+            int res = -1;
+            if ((res = unicoap_options_get_next_uri_path_component(&iterator, &uri_component)) < 0) {
+                return false;
+            }
+
+            if (path_component_length != (size_t)res) {
+                return false;
+            }
+
+            if (strncmp(*component, uri_component, path_component_length) != 0) {
+                return false;
+            }
+        }
+    }
+
+    if (match_subtree) {
+        /* There may be more Uri-Path options. But this is fine as subpaths are allowed. */
+        return true;
+    } else {
+        /* Make sure we read all options, i.e., the actual path is not longer than the given
+         * paths's. */
+        return unicoap_options_get_next_uri_path_component(&iterator, &uri_component) == -1;
+    }
 }
 
 static inline void iolist_init(iolist_t* iolist, uint8_t* buffer, size_t size, iolist_t* next)
@@ -521,6 +663,27 @@ void unicoap_options_dump_all(const unicoap_options_t* options)
             printf("%02X", value[i]);
         }
         printf(">\n");
+    }
+}
+
+void unicoap_options_print_uri_path(const unicoap_options_t* options)
+{
+    assert(options);
+    unicoap_options_iterator_t iterator;
+    /* Disqualifying the const here is fine as the iterator is only used locally and options
+     * are not manipulated. As we only have one iterator concept for both mutable and read-only
+     * borrowing access patterns, this is the only way to go. */
+    unicoap_options_iterator_init(&iterator, (unicoap_options_t*)options);
+
+    const char* uri_component = NULL;
+    int res = -2;
+    while ((res = unicoap_options_get_next_uri_path_component(&iterator, &uri_component)) >= 0) {
+        printf("/%.*s", (int)res, uri_component);
+    }
+
+    if (res == -2) {
+        /* Root path, so no Uri-Path options. */
+        printf("/");
     }
 }
 

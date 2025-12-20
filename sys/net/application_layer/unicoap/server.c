@@ -25,162 +25,30 @@
 #include "debug.h"
 #include "private.h"
 
-
-/** @brief Returns new length of path excluding trailing slashes */
-static inline size_t _trim_trailing_slashes(const char* path, size_t length) {
-    if (length > 0) {
-        size_t i = length - 1;
-        while (i > 0) {
-            if (path[i] == '/') {
-                i -= 1;
-            } else {
-                break;
-            }
-        }
-        return i + 1;
-    } else {
-        return length;
-    }
-}
-
-bool unicoap_resource_match_path_string(const unicoap_resource_t* resource,
-                                        const char* lhs_path, size_t _lhs_length)
-{
-    assert(resource);
-    assert(lhs_path);
-
-    /* We are comparing the left-hand side (path from request) to the right-hand side (resource). */
-
-    size_t rhs_length = strlen(resource->path);
-    assert(rhs_length > 0);
-    size_t lhs_length = _trim_trailing_slashes(lhs_path, _lhs_length);
-
-    if (resource->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE) {
-        /* The actual path (LHS) length may be longer. If it is shorter, bail out. */
-        if (lhs_length < rhs_length) {
-            return false;
-        }
-
-        /* The actual path (LHS) is now either as long or longer. If it is longer, then we
-         * expect a slash to indicate a subtree. Either the RHS path already ends with a slash
-         * or the LHS has a slash that succeeds the last RHS character.
-         *
-         * Examples:
-         *
-         * LHS: /a   -> RHS ends in slash, every path that is longer than RHS is a subpath
-         * RHS: /
-         *
-         * LHS: /a/a -> RHS ends in slash, every path that is longer than RHS is a subpath
-         * RHS: /a/
-         *
-         * LHS: /a/a -> RHS does not end in slash, so we need to require one to indicate subpath
-         * RHS: /a
-         */
-        if (lhs_length > rhs_length && !(lhs_path[rhs_length] == '/' || resource->path[rhs_length - 1] == '/'))  {
-            return false;
-        }
-
-        return strncmp(lhs_path, resource->path, rhs_length) == 0; /* RHS is null-terminated */
-    } else {
-        /* The actual path (LHS) length must match. If it is unequal, bail out. */
-        if (lhs_length != rhs_length) {
-            return false;
-        }
-
-        return strncmp(lhs_path, resource->path, lhs_length) == 0; /* RHS is null-terminated */
-    }
-}
-
-bool unicoap_resource_match_path_options(const unicoap_resource_t* resource,
-                                         const unicoap_options_t* options)
-{
-    assert(resource);
-    assert(options);
-    unicoap_options_iterator_t iterator;
-    /* Disqualifying the const here is fine as the iterator is only used locally and options
-     * are not manipulated. As we only have one iterator concept for both mutable and read-only
-     * borrowing access patterns, this is the only way to go. */
-    unicoap_options_iterator_init(&iterator, (unicoap_options_t*)options);
-
-    char* cursor = (char*)resource->path;
-    const char* end = resource->path + strlen(resource->path);
-
-    /* Skip multiple successive slashes.
-     * https://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap03.html#tag_03_266
-     */
-    while (*cursor == '/') {
-        cursor += 1;
-    }
-    char* start = cursor;
-    const char* component = NULL;
-
-    /* You might think, why not check cursor < end. To remove the need for end - 1 and bounds
-     * checks, we use cursor <= end and treat that case as if the NULL-terminator were a slash.
-     * The slash/NULL-terminator signals to the loop that it is supposed to compare the
-     * sequence of characters it has read since the last slash to the current Uri-Path option. */
-    while (cursor <= end) {
-        /* Found the end of a path component.
-         * That may either be a slash or the end of the string. */
-        if ((*cursor == '/') || ((cursor != start) && (cursor == end))) {
-
-            int res = -1;
-            if ((res = unicoap_options_get_next_uri_path_component(&iterator, &component)) < 0) {
-                break;
-            }
-            /* Cursor points to the element with the index one greater than the last character. */
-            size_t size = (uintptr_t)cursor - (uintptr_t)start;
-
-            /* Compare Uri-Path component with string path component. */
-            if (((size_t)res != size) || (strncmp(start, component, size) != 0)) {
-                return false;
-            }
-
-            /* Skip multiple successive slashes. */
-            while (*cursor == '/') {
-                cursor += 1;
-            }
-            start = cursor;
-        }
-        else {
-            /* Skip over path component characters. */
-            cursor += 1;
-        }
-    }
-
-    if (cursor != end + 1) {
-        /* If the resource's path is longer than the actual path, the paths definitely don't match.
-         * The end + 1 comparison is justified as we treat the NULL-terminator like a trailing
-         * slash. See above. */
-        return false;
-    }
-
-    if (resource->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE) {
-        /* There may be more Uri-Path options. But this is fine as subpaths are allowed. */
-        return true;
-    }
-    else {
-        /* Make sure we read all options, i.e., the actual path is not longer than the resource's.
-         */
-        return unicoap_options_get_next_uri_path_component(&iterator, &component) == -1;
-    }
-}
-
-int unicoap_resource_match_request_default(const char* path, size_t path_length,
-                                           const unicoap_listener_t* listener,
+int unicoap_resource_match_request_default(const unicoap_listener_t* listener,
                                            const unicoap_resource_t** resource,
                                            const unicoap_message_t* request,
                                            const unicoap_endpoint_t* endpoint)
 {
+    assert(listener);
+    assert(resource);
+    assert(request);
+    assert(endpoint);
+
     int res = UNICOAP_STATUS_PATH_NOT_FOUND;
     for (unsigned int i = 0; i < listener->resource_count; i += 1) {
         *resource = &listener->resources[i];
         if (!unicoap_match_proto((*resource)->protocols, endpoint->proto)) {
-            SERVER_DEBUG("ignoring resource %s, proto %s not in set\n", (*resource)->path,
-                         unicoap_string_from_proto(endpoint->proto));
+            SERVER_DEBUG("ignoring resource <");
+            if (IS_ACTIVE(ENABLE_DEBUG)) {
+                unicoap_path_print(&(*resource)->path);
+            }
+            DEBUG(">, proto %s not in allowed set\n", unicoap_string_from_proto(endpoint->proto));
             continue;
         }
 
-        if (!unicoap_resource_match_path_string(*resource, path, path_length)) {
+        if (!unicoap_resource_match_path_options(*resource,
+                                                 (unicoap_options_t*)&request->options)) {
             /* URI mismatch */
             continue;
         }
@@ -205,12 +73,11 @@ ssize_t unicoap_resource_encode_link(const unicoap_resource_t* resource, char* b
                                      size_t capacity, unicoap_link_encoder_ctx_t* context)
 {
     assert(buffer);
-    size_t path_len = strlen(resource->path);
-    /* count target separators and any link separator */
-    size_t exp_size = path_len + 2 + (context->uninitialized ? 0 : 1);
+    /* count target separators and any link separator, path is at least one character (`/`) */
+    size_t exp_size = 2 + (context->uninitialized ? 0 : 1);
 
-    unsigned pos = 0;
-    if (exp_size > capacity) {
+    unsigned int pos = 0;
+    if (capacity < exp_size) {
         return -ENOBUFS;
     }
 
@@ -218,10 +85,14 @@ ssize_t unicoap_resource_encode_link(const unicoap_resource_t* resource, char* b
         buffer[pos++] = ',';
     }
     buffer[pos++] = '<';
-    memcpy(&buffer[pos], resource->path, path_len);
-    buffer[pos + path_len] = '>';
+    ssize_t res = 0;
+    if ((res = unicoap_path_serialize(&resource->path, buffer, capacity - exp_size)) < 0) {
+        return res;
+    }
+    pos += res;
+    buffer[pos] = '>';
 
-    return exp_size;
+    return exp_size + res;
 }
 
 /**

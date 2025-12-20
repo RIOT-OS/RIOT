@@ -32,7 +32,7 @@ UNICOAP_DECL_RECEIVER_STORAGE;
 /* Internal variables */
 const unicoap_resource_t _unicoap_default_resources[] = {
 #if CONFIG_UNICOAP_WELL_KNOWN_CORE
-    /* (unicoap_resource_t) */ { .path = "/.well-known/core",
+    /* (unicoap_resource_t) */ { .path = UNICOAP_PATH_RESOURCE_DISCOVERY,
                                  .handler = unicoap_resource_handle_well_known_core,
                                  .methods = UNICOAP_METHODS(UNICOAP_METHOD_GET) }
 #endif
@@ -234,9 +234,15 @@ void unicoap_listener_register(unicoap_listener_t* listener)
     for (unsigned int i = 0; i < listener->resource_count; i += 1) {
         if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
             if (!listener->resources[i].methods) {
-                unicoap_assist(API_WARNING("resource '%s' is inaccessible")
+                char path[CONFIG_UNIOCOAP_PATH_LENGTH_MAX];
+                ssize_t length =
+                    unicoap_path_serialize(&listener->resources[i].path, path, sizeof(path));
+                if (length < 0) {
+                    continue;
+                }
+                unicoap_assist(API_WARNING("resource '%.*s' is inaccessible")
                                FIXIT("Set .methods"),
-                               listener->resources[i].path);
+                               (int)length, path);
             }
 
             /* TODO: Advanced features: emit warnings */
@@ -455,20 +461,6 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
     assert(packet);
     int ret = UNICOAP_STATUS_PATH_NOT_FOUND;
 
-    char path[CONFIG_UNIOCOAP_PATH_LENGTH_MAX];
-    ssize_t path_length = 0;
-
-    /* Copying Uri-Paths once followed by calls to strcmp is cheaper than
-     * repeatedly parsing options and not allocating a buffer */
-    if ((path_length =
-         unicoap_options_copy_uri_path(packet->message->options, path, sizeof(path))) <= 0) {
-        /* The Uri-Path options are longer than
-         * CONFIG_UNIOCOAP_PATH_SIZE_MAX, and thus do not match anything
-         * that could be found by this handler. */
-        SERVER_DEBUG("could not copy Uri-Path\n");
-        return UNICOAP_STATUS_PATH_NOT_FOUND;
-    }
-
     for (unicoap_listener_t* listener = _state.listeners; listener; listener = listener->next) {
         const unicoap_resource_t* resource;
         int res;
@@ -479,8 +471,7 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
             continue;
         }
 
-        res = listener->request_matcher(path, (size_t)path_length, listener,
-                                        &resource, packet->message, packet->remote);
+        res = listener->request_matcher(listener, &resource, packet->message, packet->remote);
         switch (res) {
         case UNICOAP_STATUS_PATH_NOT_FOUND:
             /* check next resource on mismatch */
@@ -494,8 +485,12 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
         case 0:
             *resource_ptr = resource;
             *listener_ptr = listener;
-            SERVER_DEBUG("%s%s: found\n", (*resource_ptr)->path,
-                         (*resource_ptr)->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE ? "/**" : "");
+            SERVER_DEBUG("<");
+            if (IS_ACTIVE(ENABLE_DEBUG)) {
+                unicoap_path_print(&resource->path);
+            }
+            DEBUG("%s>: found\n",
+                 (*resource_ptr)->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE ? "/**" : "");
             return 0;
         default:
             SERVER_DEBUG("error: resource matcher failed\n");
@@ -508,12 +503,16 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         switch (ret) {
         case UNICOAP_STATUS_METHOD_NOT_ALLOWED:
-            SERVER_DEBUG("%s%s: method %s not allowed\n", (*resource_ptr)->path,
+            SERVER_DEBUG("<");
+            unicoap_path_print(&(*resource_ptr)->path);
+            DEBUG("%s>: method %s not allowed\n",
                          (*resource_ptr)->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE ? "/**" : "",
                          unicoap_string_from_method(unicoap_request_get_method(packet->message)));
             break;
         case UNICOAP_STATUS_PATH_NOT_FOUND:
-            SERVER_DEBUG("%.*s: resource not found\n", (int)path_length, path);
+            SERVER_DEBUG("<");
+            unicoap_options_print_uri_path(packet->message->options);
+            DEBUG(">: resource not found\n");
             break;
         default:
             break;
@@ -549,7 +548,9 @@ void unicoap_print_listeners(void)
         for (size_t k = 0; k < listener->resource_count; k += 1) {
             const unicoap_resource_t* resource = &listener->resources[k];
 
-            printf("\t\t\t\t- resource #%" PRIuSIZE " %s\n", k, resource->path);
+            printf("\t\t\t\t- resource #%" PRIuSIZE " ", k);
+            unicoap_path_print(&resource->path);
+            printf("\n");
 
             printf("\t\t\t\t\t- flags=");
             unicoap_print_resource_flags(resource->flags);

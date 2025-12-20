@@ -643,6 +643,15 @@ ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* itera
  * @param[in] options Options
  */
 void unicoap_options_dump_all(const unicoap_options_t* options);
+
+/**
+ * @brief Iterates over all `Uri-Path` options and prints the resulting path using `printf`.
+ * @param[in] options Options
+ *
+ * The resulting path will always start with a leading `/`. The root path (no `Uri-Path` options)
+ * will result in just the path component separator `/` being printed.
+ */
+void unicoap_options_print_uri_path(const unicoap_options_t* options);
 /** @} */
 
 /* MARK: - Strings */

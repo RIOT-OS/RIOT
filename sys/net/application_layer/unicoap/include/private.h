@@ -203,8 +203,6 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
  *
  * The resource variable passed by reference will be set to the respective resource, if found.
  *
- * @param[in] path Path
- * @param[in] path_length Number of UTF-8 characters in @p path (excluding null-terminator)
  * @param[in] listener Listener
  * @param[out] resource_ptr Pointer to a resource variable
  * @param[in] request Request message
@@ -213,8 +211,7 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
  * @retval `0` if found
  * @retval An @ref unicoap_status_t if not found, method mismatch, or server error
  */
-int unicoap_resource_match_request_default(const char* path, size_t path_length,
-                                           const unicoap_listener_t* listener,
+int unicoap_resource_match_request_default(const unicoap_listener_t* listener,
                                            const unicoap_resource_t** resource_ptr,
                                            const unicoap_message_t* request,
                                            const unicoap_endpoint_t* endpoint);
