@@ -74,7 +74,7 @@ static int handle_hello_request(unicoap_message_t* message, const unicoap_aux_t*
 UNICOAP_RESOURCE(hello) {
     /* Each resource must be assigned a path. This will be the part that follows the host/domain
      * and port in the CoAP URI. */
-    .path = "/",
+    .path = UNICOAP_PATH_ROOT,
 
     /* Since we are using CoAP over UDP (or CoAP over DTLS, which relies on UDP for that matter),
      * we can instruct `unicoap` to send confirmable responses. This is optional. For other
@@ -183,7 +183,7 @@ static int handle_greeting_request(unicoap_message_t* message, const unicoap_aux
 }
 
 UNICOAP_RESOURCE(greeting) {
-    .path = "/greeting",
+    .path = UNICOAP_PATH("greeting"),
 
     .flags = UNICOAP_RESOURCE_FLAG_RELIABLE,
 
