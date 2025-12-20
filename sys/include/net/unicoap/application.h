@@ -37,6 +37,71 @@ extern "C" {
  * @name Utilities
  * @{
  */
+/** @brief A path object */
+typedef struct {
+    /**
+     * @brief Pointer to contiguously stored character pointers to null-terminated strings
+     * @private
+     */
+    const char** _components;
+} unicoap_path_t;
+
+/* Ensure components array is not stored in-place as this will make the resource struct variable
+ * in length, screwing XFA resource definitions where resources are assumed to be equal in size. */
+static_assert(sizeof(unicoap_path_t) == sizeof(char*),
+              "unicoap_path_t has an unexpected size. Please file a bug report.");
+
+/**
+ * @brief Construct a path
+ *
+ * @params Path components as string literals
+ *
+ * `PATH("foo", "bar")` corresponds to `/foo/bar`. To create the root path `/`, use
+ * @ref UNICOAP_PATH_ROOT instead.
+ */
+#define UNICOAP_PATH(...) ((unicoap_path_t) { ._components = (const char*[]){ __VA_ARGS__, NULL } })
+
+/** @brief The root path `/` */
+#define UNICOAP_PATH_ROOT ((unicoap_path_t) { ._components = NULL })
+
+/** @brief The path for resource discovery (`/.well-known/core`) */
+#define UNICOAP_PATH_RESORCE_DISCOVERY UNICOAP_PATH(".well-known", "core")
+
+/**
+ * @brief Determines whether the given path is the root path
+ * @param[in] path Path to check for root equality
+ * @returns A boolean value indicating whether the given @p path corresponds to `/`.
+ */
+static inline bool unicoap_path_is_root(const unicoap_path_t* path) {
+    assert(path);
+    return path->_components == NULL || *path->_components == NULL;
+}
+
+/**
+ * @brief Counts path components in path
+ * @param[in] path Path whose components to count
+ * @returns Returns the number of path components in @p path
+ *
+ * A path component is the sequence of characters between slashes in a URI path, excluding the
+ * `/` separator, and excluding any null-terminators.
+ *
+ * @note Note that for root paths, this function will return zero.
+ */
+size_t unicoap_path_component_count(const unicoap_path_t* path);
+
+/**
+ * @brief Compares two path objects
+ * @param[in] lhs Left-hand side path
+ * @param[in] rhs Right-hand side path
+ * @returns A boolean value determining whether the two paths object correspond to the same path
+ *
+ * @remark Note that lhs and rhs do not necessarily have the same in-memory representation to
+ * be considered equal. First, a root path may be represented differently. Second, the actual
+ * path components are compared using `strcmp`, meaning that the path component pointers in the
+ * respective path objects do not need to be equal.
+ */
+bool unicoap_path_is_equal(const unicoap_path_t* lhs, const unicoap_path_t* rhs);
+
 /**
  * @brief Auxiliary exchange information
  */

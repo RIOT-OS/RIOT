@@ -26,6 +26,48 @@
 #include "debug.h"
 #include "private.h"
 
+size_t unicoap_path_component_count(const unicoap_path_t* path) {
+    size_t count = 0;
+    assert(path);
+    if (!path->_components) {
+        /* Root */
+        return 0;
+    }
+    for (const char** p = path->_components; *p; p += 1) {
+        count += 1;
+    }
+    return count;
+}
+
+bool unicoap_path_is_equal(const unicoap_path_t* lhs, const unicoap_path_t* rhs) {
+    assert(lhs);
+    assert(rhs);
+
+    /* If one is a root path, the other must be, too. */
+    if ((!lhs->_components && (!rhs->_components || !*rhs->_components)) ||
+        (!rhs->_components && (!lhs->_components || !*lhs->_components))) {
+        return true;
+    }
+    /* If just one of them is a root path, they cannot be equal. */
+    if (!lhs->_components || !rhs->_components) {
+        return false;
+    }
+
+    const char** l = lhs->_components;
+    const char** r = rhs->_components;
+
+    while (*l && *r) {
+        if (strcmp(*l, *r) != 0) {
+            break;
+        }
+        l += 1;
+        r += 1;
+    }
+
+    /* If we reached the end of both paths simultaneously (NULL), they are equal. */
+    return !*l && !*r;
+}
+
 static inline void iolist_init(iolist_t* iolist, uint8_t* buffer, size_t size, iolist_t* next)
 {
     iolist->iol_base = buffer;
