@@ -177,7 +177,7 @@ kernel_pid_t unicoap_init(void)
 
     _xfa_listener.resource_count = XFA_LEN(unicoap_resource_t, unicoap_resources_xfa);
     unicoap_listener_register(&_xfa_listener);
-    SERVER_DEBUG("registered %" PRIuSIZE " XFA resources\n", _xfa_listener.resource_count);
+    _SERVER_DEBUG("registered %" PRIuSIZE " XFA resources\n", _xfa_listener.resource_count);
 #endif
 
     event_queue_init_detached(&_queue);
@@ -302,7 +302,7 @@ int unicoap_messaging_send(unicoap_packet_t* packet, unicoap_messaging_flags_t f
     assert(packet->remote);
     assert(packet->message);
 
-    MESSAGING_DEBUG("sending ");
+    _MESSAGING_DEBUG("sending ");
     _debug_packet(packet);
 
     switch (unicoap_packet_proto(packet)) {
@@ -313,7 +313,7 @@ int unicoap_messaging_send(unicoap_packet_t* packet, unicoap_messaging_flags_t f
 #endif
     /* MARK: unicoap_driver_extension_point */
     default:
-        MESSAGING_DEBUG("missing driver for proto %s\n",
+        _MESSAGING_DEBUG("missing driver for proto %s\n",
                         unicoap_string_from_proto(unicoap_packet_proto(packet)));
         unicoap_assist_emit_diagnostic_missing_driver(packet->remote->proto);
         return -ENOTSUP;
@@ -329,13 +329,13 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
     unicoap_message_t* message = packet->message;
     int res = 0;
 
-    MESSAGING_DEBUG("received ");
+    _MESSAGING_DEBUG("received ");
     _debug_packet(packet);
 
     switch (unicoap_code_class(packet->message->code)) {
     case UNICOAP_CODE_CLASS_REQUEST: {
         if (truncated) {
-            SERVER_DEBUG("truncated, not processing, sending Size1\n");
+            _SERVER_DEBUG("truncated, not processing, sending Size1\n");
             UNICOAP_OPTIONS_ALLOC(response_options, 5);
             unicoap_options_set_size1(&response_options, CONFIG_UNICOAP_BLOCK_SIZE);
             unicoap_response_init_with_options(message, UNICOAP_STATUS_REQUEST_ENTITY_TOO_LARGE,
@@ -368,7 +368,7 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
         return UNICOAP_PREPROCESSING_ERROR_UNSUPPORTED;
 
     default:
-        MESSAGING_DEBUG("illegal code class %" PRIu8 "\n", unicoap_code_class(message->code));
+        _MESSAGING_DEBUG("illegal code class %" PRIu8 "\n", unicoap_code_class(message->code));
         return UNICOAP_PREPROCESSING_ERROR_INVALID_CODE_CLASS;
     }
 }
@@ -466,7 +466,7 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
         int res;
 
         if (!unicoap_match_proto(listener->protocols, unicoap_packet_proto(packet))) {
-            SERVER_DEBUG("ignoring listener, proto %s not in set\n",
+            _SERVER_DEBUG("ignoring listener, proto %s not in set\n",
                          unicoap_string_from_proto(unicoap_packet_proto(packet)));
             continue;
         }
@@ -485,7 +485,7 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
         case 0:
             *resource_ptr = resource;
             *listener_ptr = listener;
-            SERVER_DEBUG("<");
+            _SERVER_DEBUG("<");
             if (IS_ACTIVE(ENABLE_DEBUG)) {
                 unicoap_path_print(&resource->path);
             }
@@ -493,7 +493,7 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
                  (*resource_ptr)->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE ? "/**" : "");
             return 0;
         default:
-            SERVER_DEBUG("error: resource matcher failed\n");
+            _SERVER_DEBUG("error: resource matcher failed\n");
             /* res is probably UNICOAP_RESOURCE_ERROR or some other
                  * unhandled error */
             return res;
@@ -503,14 +503,14 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         switch (ret) {
         case UNICOAP_STATUS_METHOD_NOT_ALLOWED:
-            SERVER_DEBUG("<");
+            _SERVER_DEBUG("<");
             unicoap_path_print(&(*resource_ptr)->path);
             DEBUG("%s>: method %s not allowed\n",
                          (*resource_ptr)->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE ? "/**" : "",
                          unicoap_string_from_method(unicoap_request_get_method(packet->message)));
             break;
         case UNICOAP_STATUS_PATH_NOT_FOUND:
-            SERVER_DEBUG("<");
+            _SERVER_DEBUG("<");
             unicoap_options_print_uri_path(packet->message->options);
             DEBUG(">: resource not found\n");
             break;

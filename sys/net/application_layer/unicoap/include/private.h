@@ -64,11 +64,11 @@ extern "C" {
  */
 #  define _UNICOAP_PREFIX_DEBUG(category, ...) DEBUG(UNICOAP_DEBUG_PREFIX category ": " __VA_ARGS__)
 #  define UNICOAP_DEBUG(...)                   _UNICOAP_PREFIX_DEBUG("", __VA_ARGS__)
-#  define OPTIONS_DEBUG(...)                   _UNICOAP_PREFIX_DEBUG(".options", __VA_ARGS__)
-#  define MESSAGING_DEBUG(...)                 _UNICOAP_PREFIX_DEBUG(".messaging", __VA_ARGS__)
-#  define STATE_DEBUG(...)                     _UNICOAP_PREFIX_DEBUG(".state", __VA_ARGS__)
-#  define TRANSPORT_DEBUG(...)                 _UNICOAP_PREFIX_DEBUG(".transport", __VA_ARGS__)
-#  define SERVER_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".server", __VA_ARGS__)
+#  define _OPTIONS_DEBUG(...)                   _UNICOAP_PREFIX_DEBUG(".options", __VA_ARGS__)
+#  define _MESSAGING_DEBUG(...)                 _UNICOAP_PREFIX_DEBUG(".messaging", __VA_ARGS__)
+#  define _STATE_DEBUG(...)                     _UNICOAP_PREFIX_DEBUG(".state", __VA_ARGS__)
+#  define _TRANSPORT_DEBUG(...)                 _UNICOAP_PREFIX_DEBUG(".transport", __VA_ARGS__)
+#  define _SERVER_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".server", __VA_ARGS__)
 #  define API_WARNING(message)                 "WARNING: " message "\n"
 #  define API_ERROR(message)                   "ERROR: " message "\n"
 #  define API_MISUSE(message)                  "API MISUSE: " message "\n"
@@ -274,8 +274,8 @@ static inline bool unicoap_transport_truncate_received(size_t* chunk_size, size_
      * extern decl would affect transport.c, too */
     if (received + *chunk_size > CONFIG_UNICOAP_PDU_SIZE_MAX) {
         /* Limit chunk size to remaining available storage capacity */
-        TRANSPORT_DEBUG("truncated\n");
-        TRANSPORT_DEBUG("warning: recv storage too small, need at least %" PRIdSIZE "\n",
+        _TRANSPORT_DEBUG("truncated\n");
+        _TRANSPORT_DEBUG("warning: recv storage too small, need at least %" PRIdSIZE "\n",
                         received + *chunk_size);
         *chunk_size = CONFIG_UNICOAP_PDU_SIZE_MAX - received;
         return true;

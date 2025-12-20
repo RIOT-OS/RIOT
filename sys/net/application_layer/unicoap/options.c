@@ -140,7 +140,7 @@ ssize_t _uint_read_in_range(uint8_t nibble, const uint8_t** cursor, const uint8_
     else if (nibble == 13) {
         *cursor += sizeof(uint8_t);
         if (*cursor > end) {
-            OPTIONS_DEBUG("extended uint: reading out of bounds\n");
+            _OPTIONS_DEBUG("extended uint: reading out of bounds\n");
             return -EBADOPT;
         }
         return DECODE_UINT12(extended);
@@ -148,13 +148,13 @@ ssize_t _uint_read_in_range(uint8_t nibble, const uint8_t** cursor, const uint8_
     else if (nibble == 14) {
         *cursor += sizeof(uint16_t);
         if (*cursor > end) {
-            OPTIONS_DEBUG("extended uint: reading out of bounds\n");
+            _OPTIONS_DEBUG("extended uint: reading out of bounds\n");
             return -EBADOPT;
         }
         return DECODE_UINT20(extended);
     }
     else {
-        OPTIONS_DEBUG("invalid uint nibble\n");
+        _OPTIONS_DEBUG("invalid uint nibble\n");
         return -EBADOPT;
     }
 }
@@ -175,7 +175,7 @@ static ssize_t _uint_read(uint8_t nibble, const uint8_t** cursor)
         return value;
     }
     else {
-        OPTIONS_DEBUG("invalid uint nibble\n");
+        _OPTIONS_DEBUG("invalid uint nibble\n");
         return -EBADOPT;
     }
 }
@@ -196,7 +196,7 @@ static int _uint_write(uint32_t value, uint8_t** cursor)
         return 14;
     }
     else {
-        OPTIONS_DEBUG("invalid uint value\n");
+        _OPTIONS_DEBUG("invalid uint value\n");
         return -EINVAL;
     }
 }
@@ -247,13 +247,13 @@ static inline ssize_t _read_option_in_range(const uint8_t** cursor, const uint8_
 
     ssize_t d = _uint_read_in_range(DECODE_DELTA_NIBBLE(head), cursor, end);
     if (d < 0) {
-        OPTIONS_DEBUG("bad op delta\n");
+        _OPTIONS_DEBUG("bad op delta\n");
         return d;
     }
 
     ssize_t value_size = _uint_read_in_range(DECODE_LENGTH_NIBBLE(head), cursor, end);
     if (value_size < 0) {
-        OPTIONS_DEBUG("bad op len\n");
+        _OPTIONS_DEBUG("bad op len\n");
         return value_size;
     }
 
@@ -266,7 +266,7 @@ static inline ssize_t _read_option_in_range(const uint8_t** cursor, const uint8_
     }
     *cursor += value_size;
     if (*cursor > end) {
-        OPTIONS_DEBUG("bad op val len\n");
+        _OPTIONS_DEBUG("bad op val len\n");
         return -EBADOPT;
     }
 
@@ -290,14 +290,14 @@ static inline ssize_t _read_option(const uint8_t** cursor, const uint8_t** value
 
     ssize_t delta_size = _uint_extended_size(DECODE_DELTA_NIBBLE(head));
     if (delta_size < 0) {
-        OPTIONS_DEBUG("bad op delta\n");
+        _OPTIONS_DEBUG("bad op delta\n");
         return -EBADOPT;
     }
     *cursor += delta_size;
 
     ssize_t value_size = _uint_read(DECODE_LENGTH_NIBBLE(head), cursor);
     if (value_size < 0) {
-        OPTIONS_DEBUG("bad op value size\n");
+        _OPTIONS_DEBUG("bad op value size\n");
         return value_size;
     }
 
@@ -413,7 +413,7 @@ static int _shift_options(unicoap_options_t* options, size_t i, ssize_t data_dif
 {
     size_t new_size = options->storage_size + data_diff;
     if (new_size > options->storage_capacity) {
-        OPTIONS_DEBUG("buf too small, " _UNICOAP_NEED_HAVE "\n", new_size,
+        _OPTIONS_DEBUG("buf too small, " _UNICOAP_NEED_HAVE "\n", new_size,
                       options->storage_capacity);
         return -ENOBUFS;
     }
@@ -487,14 +487,14 @@ ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* en
             message->payload_size = (size_t)(end - cursor);
             message->payload = message->payload_size > 0 ? cursor : NULL;
             message->options->storage_capacity = (uintptr_t)cursor - (uintptr_t)start; /* (<-) */
-            OPTIONS_DEBUG("payload size = %" PRIuSIZE " opts capacity = %" PRIuSIZE "\n",
+            _OPTIONS_DEBUG("payload size = %" PRIuSIZE " opts capacity = %" PRIuSIZE "\n",
                           message->payload_size, message->options->storage_capacity);
             return 0;
         }
         else if (option_size >= 0) {
             option_number += delta;
             if (message->options->option_count >= CONFIG_UNICOAP_OPTIONS_MAX) {
-                OPTIONS_DEBUG("unicoap: max nr of options exceeded\n");
+                _OPTIONS_DEBUG("unicoap: max nr of options exceeded\n");
                 return -ENOBUFS;
             }
 
@@ -504,7 +504,7 @@ ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* en
             message->options->storage_size += e->size;
 
             /*
-            OPTIONS_DEBUG("option nr=%u label=%s\n", (unsigned int)option_number,
+            _OPTIONS_DEBUG("option nr=%u label=%s\n", (unsigned int)option_number,
              unicoap_string_from_option_number(option_number));
              */
             e += 1;
@@ -595,7 +595,7 @@ int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t numb
 
     size_t count = options->option_count;
     if (count >= CONFIG_UNICOAP_OPTIONS_MAX) {
-        OPTIONS_DEBUG("limit of %" PRIuSIZE " exceeded\n", (size_t)CONFIG_UNICOAP_OPTIONS_MAX);
+        _OPTIONS_DEBUG("limit of %" PRIuSIZE " exceeded\n", (size_t)CONFIG_UNICOAP_OPTIONS_MAX);
         return -ENOBUFS;
     }
 
@@ -612,7 +612,7 @@ int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t numb
         size_t storage_size = options->storage_size + option_size;
         /* Option to be inserted is trailing option, can just add after last option */
         if (storage_size > options->storage_capacity) {
-            OPTIONS_DEBUG("buf too small to insert opt " _UNICOAP_NEED_HAVE "\n",
+            _OPTIONS_DEBUG("buf too small to insert opt " _UNICOAP_NEED_HAVE "\n",
                           storage_size, options->storage_capacity);
             return -ENOBUFS;
         }
@@ -632,7 +632,7 @@ int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t numb
         ssize_t diff = _option_size_diff(new_delta, DECODE_DELTA_NIBBLE(*cursor));
         ssize_t total_diff = option_size + diff;
         if (_shift_options(options, i, total_diff) < 0) {
-            OPTIONS_DEBUG("storage too small for new option\n");
+            _OPTIONS_DEBUG("storage too small for new option\n");
             return -ENOBUFS;
         }
 
@@ -727,7 +727,7 @@ int unicoap_options_set(unicoap_options_t* options, unicoap_option_number_t numb
 
         size_t option_size = _option_size(delta, value_size);
         if (_shift_options(options, i + 1, (int)option_size - (int)e->size) < 0) {
-            OPTIONS_DEBUG("storage too small for new option value\n");
+            _OPTIONS_DEBUG("storage too small for new option value\n");
             return -ENOBUFS;
         }
 
@@ -740,7 +740,7 @@ int unicoap_options_set(unicoap_options_t* options, unicoap_option_number_t numb
 
 int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number_t number)
 {
-    OPTIONS_DEBUG("attempting to remove %s (nr=%u)\n", unicoap_string_from_option_number(number),
+    _OPTIONS_DEBUG("attempting to remove %s (nr=%u)\n", unicoap_string_from_option_number(number),
                   number);
     int i = _find_option_index(options, number);
     if (unlikely(i < 0)) {
@@ -782,7 +782,7 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
 
         size_t new_size = options->storage_size + total_diff;
         if (new_size > options->storage_capacity) {
-            OPTIONS_DEBUG("storage too small to remove option (delta of next option changes)\n");
+            _OPTIONS_DEBUG("storage too small to remove option (delta of next option changes)\n");
             return -ENOBUFS;
         }
 
@@ -990,7 +990,7 @@ ssize_t unicoap_options_swap_storage(unicoap_options_t* options, uint8_t* destin
     assert(options->entries->data);
 
     if (options->storage_size > capacity) {
-        OPTIONS_DEBUG("no buffer space to copy options\n");
+        _OPTIONS_DEBUG("no buffer space to copy options\n");
         return -ENOBUFS;
     }
 

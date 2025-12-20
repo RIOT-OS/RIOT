@@ -39,7 +39,7 @@ int unicoap_resource_match_request_default(const unicoap_listener_t* listener,
     for (unsigned int i = 0; i < listener->resource_count; i += 1) {
         *resource = &listener->resources[i];
         if (!unicoap_match_proto((*resource)->protocols, endpoint->proto)) {
-            SERVER_DEBUG("ignoring resource <");
+            _SERVER_DEBUG("ignoring resource <");
             if (IS_ACTIVE(ENABLE_DEBUG)) {
                 unicoap_path_print(&(*resource)->path);
             }
@@ -134,17 +134,17 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
         .properties = &packet->properties,
     };
 
-    SERVER_DEBUG("invoking handler\n");
+    _SERVER_DEBUG("invoking handler\n");
     res = resource->handler(packet->message, &aux, &context, resource->handler_arg);
 
     if (res > 0) {
-        SERVER_DEBUG("sending response " UNICOAP_CODE_CLASS_DETAIL_FORMAT
+        _SERVER_DEBUG("sending response " UNICOAP_CODE_CLASS_DETAIL_FORMAT
                      " from return value\n",
                      unicoap_code_class((uint8_t)res), unicoap_code_detail((uint8_t)res));
 
         if (IS_ACTIVE(CONFIG_UNICOAP_PREVENT_OPTIONAL_RESPONSES)) {
             if (unicoap_response_is_optional(packet->message->options, (unicoap_status_t)res)) {
-                SERVER_DEBUG("response " UNICOAP_CODE_CLASS_DETAIL_FORMAT
+                _SERVER_DEBUG("response " UNICOAP_CODE_CLASS_DETAIL_FORMAT
                              " is optional, not responding\n",
                              unicoap_code_class((uint8_t)res),
                              unicoap_code_detail((uint8_t)res));
@@ -195,7 +195,7 @@ int unicoap_server_send_response_body(unicoap_packet_t* packet,
 {
     int res = 0;
     if ((res = unicoap_messaging_send(packet, _messaging_flags_resource(resource->flags))) < 0) {
-        SERVER_DEBUG("error: could not send response\n");
+        _SERVER_DEBUG("error: could not send response\n");
         goto error;
     }
     return 0;
@@ -226,7 +226,7 @@ int unicoap_send_response(unicoap_message_t* response, unicoap_request_context_t
     }
 
     assert(context->_packet);
-    SERVER_DEBUG("sending immediate response\n");
+    _SERVER_DEBUG("sending immediate response\n");
 
     /* reuse the packet, stack-allocated, we're still inside resource handler */
     ((unicoap_packet_t*)context->_packet)->message = response;
