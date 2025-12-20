@@ -37,7 +37,7 @@ extern "C" {
  * @name Utilities
  * @{
  */
-/** @brief A path object */
+/** @brief An immutable path object */
 typedef struct {
     /**
      * @brief Pointer to contiguously stored character pointers to null-terminated strings
