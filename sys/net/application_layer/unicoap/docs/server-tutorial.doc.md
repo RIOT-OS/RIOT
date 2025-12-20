@@ -276,7 +276,9 @@ list.iol_next = &name_chunk;
 
 Through `.iol_next = &suffix`, we chain the suffix behind the middle part and using
 `list.iol_next = &name_chunk` appends this chain of two chunks to the first chunk. Our vector is
-done and we can finally send the response after having set the status and message payload.
+done and we can finally send the response after having set the status and message payload. unicoap
+supports multiple slightly different ways to use the API to respond to reduce boilerplate.
+Find an extended explanation in @ref net_unicoap_server. 
 
 ```c
 unicoap_message_payload_set_chunks(message, &list);
