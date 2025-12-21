@@ -113,8 +113,9 @@ ifeq (,$(filter STM32MP157Cxx STM32F030x4,$(CPU_LINE)))
   # package so they are hardcoded in RIOTs codebase.
   # For other lines, the IRQs are automatically generated once from the whole
   # list of CMSIS headers available in a given family
-  STM32IRQS_INCLUDE_FILE = $(RIOTCPU)/stm32/include/irqs/$(CPU_FAM)/irqs.h
+  STM32IRQS_INCLUDE_FILE = $(RIOTCPU)/stm32/include/irqs/$(CPU_FAM)/stm32_irqs.h
   BUILDDEPS += $(STM32IRQS_INCLUDE_FILE)
+  INCLUDES += -I$(RIOTCPU)/stm32/include/irqs/$(CPU_FAM)
 endif
 
 # The IRQ header for a given family requires the family headers to be fetched
