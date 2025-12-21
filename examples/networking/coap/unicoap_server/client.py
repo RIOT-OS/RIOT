@@ -10,8 +10,15 @@ from aiocoap.transports.tinydtls import DTLSClientConnection
 
 logging.basicConfig(level=logging.DEBUG)
 
+import sys
+from pathlib import Path
+LOG_PREFIX = Path(__file__).name
+
+tell = lambda message: print(f"{LOG_PREFIX}: {message}")
+complain = lambda message: print(f"{LOG_PREFIX}: error: {message}", file=sys.stderr)
+
 print(
-    "usage: client.py" +
+    "usage: {}".format(Path(__file__).name) +
     " -m <GET|PUT|POST|DELETE|PATCH|iPATCH|FETCH>" +
     " -u <URI>" +
     " [--type <NON|CON>] [--observe] [-p <PAYLOAD>]")
@@ -83,7 +90,7 @@ async def main():
     observeValue = None
 
     if args.observe and args.observe_cancel:
-        raise ValueError("cannot register for and cancel notifications")
+        raise ValueError("{LOG_PREFIX}: error: cannot register for and cancel notifications")
 
     if args.observe:
         observeValue = 0
@@ -91,8 +98,8 @@ async def main():
     elif args.observe_cancel:
         observeValue = 1
 
-    print(f"using {message_type(args.type)} {method(args.method)} request")
-    print(f"timeout set to {args.timeout}s")
+    tell(f"using {message_type(args.type)} {method(args.method)} request")
+    tell(f"timeout set to {args.timeout}s")
 
     port = 5600
     protocol = await Context.create_server_context(bind=("::", port), site=resource.Site())
@@ -118,23 +125,22 @@ async def main():
 
         async with asyncio.timeout(args.timeout):
             r = await pr.response
-            print("response: %s\n%r" % (r.code, r.payload))
+            tell("response: %s\n%r" % (r.code, r.payload))
 
         if args.observe:
-            print("waiting for resource notifications")
+            tell("waiting for resource notifications")
 
             async for r in pr.observation:
-                print("notification: %s\n%r" % (r, r.payload))
+                tell("notification: %s\n%r" % (r, r.payload))
                 break
 
         await protocol.shutdown()
 
     except TimeoutError:
-        print(f"error: timeout exceeded after waiting {args.timeout}s")
+        complain(f"timeout exceeded after waiting {args.timeout}s")
 
     except Exception as e:
-        print("error:")
-        print(e)
+        complain(e)
 
 if __name__ == "__main__":
     asyncio.run(main())
