@@ -37,7 +37,17 @@ extern "C" {
  * @name Utilities
  * @{
  */
-/** @brief An immutable path object */
+/**
+ * @brief An immutable path object
+ *
+ * This type specifies an immutable Uniform Resource Identifier (URI) path by leveraging an internal
+ * storage representation for the path. Currently, this types stores a list of path component
+ * strings that form the path. In future versions, this type may also gain support for, e.g.,
+ * variable path components, such as in Node.js applications (/motors/:location/speed).
+ *
+ * @warning Never make assumptions about this type's layout. Always use dedicated accessors and
+ * methods.
+ */
 typedef struct {
     /**
      * @brief Pointer to contiguously stored character pointers to null-terminated strings
