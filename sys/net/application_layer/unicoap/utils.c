@@ -728,7 +728,7 @@ void unicoap_print_resource_flags(unicoap_resource_flags_t flags)
 
 void unicoap_assist_emit_diagnostic_missing_driver(unicoap_proto_t proto)
 {
-    if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
+    if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST) || IS_ACTIVE(ENABLE_DEBUG)) {
         switch (proto) {
         case UNICOAP_PROTO_UDP:
             unicoap_assist(API_ERROR("CoAP over UDP driver missing")

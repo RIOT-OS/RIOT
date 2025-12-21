@@ -104,7 +104,7 @@ extern "C" {
 #  endif
 #  define unicoap_assist(...)                     \
       do {                                        \
-          if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) { \
+          if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST) || IS_ACTIVE(CONFIG_UNICOAP_DEBUG_LOGGING)) { \
               printf(__VA_ARGS__);                \
           }                                       \
       } while (0)
