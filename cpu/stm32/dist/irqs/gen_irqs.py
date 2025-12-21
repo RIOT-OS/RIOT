@@ -18,7 +18,7 @@ RIOTBASE = os.getenv(
     "RIOTBASE", os.path.abspath(os.path.join(CURRENT_DIR, "../../../..")))
 STM32_INCLUDE_DIR = os.path.join(RIOTBASE, "cpu/stm32/include")
 STM32_IRQS_DIR = os.path.join(
-    RIOTBASE, STM32_INCLUDE_DIR, "irqs/{}/irqs.h")
+    RIOTBASE, STM32_INCLUDE_DIR, "irqs/{}/stm32_irqs.h")
 
 IRQS_FORMAT = """
 /*
@@ -30,6 +30,8 @@ IRQS_FORMAT = """
 
 #ifndef IRQS_{cpu_fam}_H
 #define IRQS_{cpu_fam}_H
+
+#include "{cpu_fam_include}"
 
 #ifdef __cplusplus
 extern "C" {{
@@ -122,6 +124,7 @@ def generate_irqs(context):
     irqs_content = IRQS_FORMAT.format(
         cpu_fam=context["cpu_fam"].upper(),
         irq_lines="\n".join(irq_lines),
+        cpu_fam_include="stm32{}xx.h".format(context["cpu_fam"])
         )
     dest_file = os.path.join(STM32_IRQS_DIR.format(context["cpu_fam"]))
 
