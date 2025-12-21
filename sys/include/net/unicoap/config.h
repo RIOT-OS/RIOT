@@ -50,6 +50,8 @@
  * @brief Enables debug logging in all `unicoap` source files, except where locally overwritten
  *
  * **Default**: disabled
+ *
+ * Debug logging includes assistance diagnostics, such as for API misuse.
  */
 #if !defined(CONFIG_UNICOAP_DEBUG_LOGGING) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_DEBUG_LOGGING 0
@@ -58,18 +60,20 @@
 /**
  * @brief Catches and prints API misuse
  *
- * When enabled, helpful warnings and error explanations are printed to stdout. Disable this
- * setting and enable link-time optimization to strip logic from application binary.
- * Trades safety for performance due to added conditional statements.
+ * This is a lighter version of debug logging, where no trace information and artifacts are logged,
+ * but only warnings for missing modules, API misuse, and tips for fixing these.
  *
- * **Default:** enabled.
+ * **Default:** enabled if @ref CONFIG_UNICOAP_DEBUG_LOGGING is enabled.
  *
  * @warning unicoap will not honour safety fences, hence you may run into faulty memory behavior
  * if your API usage deviates from the documented one.
  */
-
 #if !defined(CONFIG_UNICOAP_ASSIST) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_ASSIST 1
+#  define CONFIG_UNICOAP_ASSIST CONFIG_UNICOAP_DEBUG_LOGGING
+#endif
+
+#if CONFIG_UNICOAP_DEBUG_LOGGING && !CONFIG_UNICOAP_ASSIST
+#  warning Disabling CONFIG_UNICOAP_ASSIST when CONFIG_UNICOAP_DEBUG_LOGGING is enabled has no effect because debug logging implies emitting asstistance diagnostics.
 #endif
 /** @} */
 

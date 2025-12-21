@@ -46,15 +46,16 @@ menu "CoAP Unified Suite (unicoap)"
 
         config UNICOAP_DEBUG_LOGGING
             bool "Enable debug logging"
+            imply UNICOAP_ASSIST
             default n
             help
-                When enabled, debug logs are printed. Helps trace messages through layers.
+                When enabled, debug logs are printed. Helps trace messages through layers. Debug logging includes assistance diagnostics, such as for API misuse.
 
         config UNICOAP_ASSIST
-            bool "Enable assistant (API misuse, warnings, fixits)"
-            default n
+            bool "Enable assistance diagnostics (API misuse, warnings, fixits)"
+            default y if UNICOAP_DEBUG_LOGGING
             help
-                When enabled, helpful warnings and error explanations are printed to stdout. Disable this setting and enable link-time optimization to strip logic from application binary. Enables safety measures in the parser and client and server API. Trades safety for performance due to added conditional statements.
+                 This is a lighter version of debug logging, where no trace information and artifacts are logged, but only warnings for missing modules, API misuse, and tips for fixing these. unicoap will not honour safety fences, hence you may run into faulty memory behavior if your API usage deviates from the documented one.
 
         config UNICOAP_PREVENT_OPTIONAL_RESPONSES
             bool "Prevent sending optional responses"
