@@ -204,7 +204,7 @@ static void test_long_with_options_subtree(void) {
     _test_long_with_options(true);
 }
 
-static inline bool path_is_equal(unicoap_path_t lhs, unicoap_path_t rhs) {
+static inline bool path_is_equal(unicoap_pathspec_t lhs, unicoap_pathspec_t rhs) {
     return unicoap_path_is_equal(&lhs, &rhs);
 }
 
@@ -213,48 +213,48 @@ static void test_path_object(void) {
     const char* str_bar = "bar";
     const char* str_zoo = "zoo";
 
-    const unicoap_path_t my_path1 = UNICOAP_PATH(str_foo);
+    const unicoap_pathspec_t my_path1 = UNICOAP_PATH(str_foo);
     const char* my_path1_layout[] = { str_foo, NULL };
     TEST_ASSERT_EQUAL_INT(memcmp(my_path1._components, my_path1_layout, sizeof(my_path1_layout)), 0);
 
 
-    const unicoap_path_t my_path2 = UNICOAP_PATH(str_foo, str_bar, str_zoo);
+    const unicoap_pathspec_t my_path2 = UNICOAP_PATH(str_foo, str_bar, str_zoo);
     const char* my_path2_layout[] = { str_foo, str_bar, str_zoo, NULL };
     TEST_ASSERT_EQUAL_INT(memcmp(my_path2._components, my_path2_layout, sizeof(my_path2_layout)), 0);
 
-    const unicoap_path_t my_root = UNICOAP_PATH_ROOT;
+    const unicoap_pathspec_t my_root = UNICOAP_PATH_ROOT;
     TEST_ASSERT_EQUAL_INT(my_root._components, NULL);
 
-    const unicoap_path_t my_root2 = UNICOAP_PATH(NULL);
+    const unicoap_pathspec_t my_root2 = UNICOAP_PATH(NULL);
     const char* my_root2_layout[] = { NULL };
     TEST_ASSERT_EQUAL_INT(memcmp(my_root2._components, my_root2_layout, sizeof(my_root2_layout)), 0);
 }
 
 static void test_path_object_is_root(void) {
-    const unicoap_path_t my_path1 = UNICOAP_PATH("a");
+    const unicoap_pathspec_t my_path1 = UNICOAP_PATH("a");
     _TEST_ASSERT_FALSE(unicoap_path_is_root(&my_path1));
 
-    const unicoap_path_t my_root = UNICOAP_PATH_ROOT;
+    const unicoap_pathspec_t my_root = UNICOAP_PATH_ROOT;
     _TEST_ASSERT_TRUE(unicoap_path_is_root(&my_root));
 
-    const unicoap_path_t my_root2 = UNICOAP_PATH(NULL);
+    const unicoap_pathspec_t my_root2 = UNICOAP_PATH(NULL);
     _TEST_ASSERT_TRUE(unicoap_path_is_root(&my_root2));
 
-    const unicoap_path_t my_path2 = UNICOAP_PATH("foo", "bar", "zoo");
+    const unicoap_pathspec_t my_path2 = UNICOAP_PATH("foo", "bar", "zoo");
     _TEST_ASSERT_FALSE(unicoap_path_is_root(&my_path2));
 }
 
 static void test_path_object_component_count(void) {
-    const unicoap_path_t my_path1 = UNICOAP_PATH("a");
+    const unicoap_pathspec_t my_path1 = UNICOAP_PATH("a");
     TEST_ASSERT_EQUAL_INT(unicoap_path_component_count(&my_path1), 1);
 
-    const unicoap_path_t my_root = UNICOAP_PATH_ROOT;
+    const unicoap_pathspec_t my_root = UNICOAP_PATH_ROOT;
     TEST_ASSERT_EQUAL_INT(unicoap_path_component_count(&my_root), 0);
 
-    const unicoap_path_t my_root2 = UNICOAP_PATH(NULL);
+    const unicoap_pathspec_t my_root2 = UNICOAP_PATH(NULL);
     TEST_ASSERT_EQUAL_INT(unicoap_path_component_count(&my_root2), 0);
 
-    const unicoap_path_t my_path2 = UNICOAP_PATH("foo", "bar", "zoo");
+    const unicoap_pathspec_t my_path2 = UNICOAP_PATH("foo", "bar", "zoo");
     TEST_ASSERT_EQUAL_INT(unicoap_path_component_count(&my_path2), 3);
 }
 

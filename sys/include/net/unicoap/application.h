@@ -44,12 +44,12 @@ typedef struct {
      * @private
      */
     const char** _components;
-} unicoap_path_t;
+} unicoap_pathspec_t;
 
 /* Ensure components array is not stored in-place as this will make the resource struct variable
  * in length, screwing XFA resource definitions where resources are assumed to be equal in size. */
-static_assert(sizeof(unicoap_path_t) == sizeof(char*),
-              "unicoap_path_t has an unexpected size. Please file a bug report.");
+static_assert(sizeof(unicoap_pathspec_t) == sizeof(char*),
+              "unicoap_pathspec_t is of unexpected size. Please file a bug report.");
 
 /**
  * @brief Construct a path
@@ -59,10 +59,12 @@ static_assert(sizeof(unicoap_path_t) == sizeof(char*),
  * `PATH("foo", "bar")` corresponds to `/foo/bar`. To create the root path `/`, use
  * @ref UNICOAP_PATH_ROOT instead.
  */
-#define UNICOAP_PATH(...) ((unicoap_path_t) { ._components = (const char*[]){ __VA_ARGS__, NULL } })
+#define UNICOAP_PATH(...) \
+    ((unicoap_pathspec_t) { ._components = (const char*[]){ __VA_ARGS__, NULL } })
 
 /** @brief The root path `/` */
-#define UNICOAP_PATH_ROOT ((unicoap_path_t) { ._components = NULL })
+#define UNICOAP_PATH_ROOT \
+    ((unicoap_pathspec_t) { ._components = NULL })
 
 /** @brief The path for resource discovery (`/.well-known/core`) */
 #define UNICOAP_PATH_RESOURCE_DISCOVERY UNICOAP_PATH(".well-known", "core")
@@ -72,7 +74,7 @@ static_assert(sizeof(unicoap_path_t) == sizeof(char*),
  * @param[in] path Path to check for root equality
  * @returns A boolean value indicating whether the given @p path corresponds to `/`.
  */
-static inline bool unicoap_path_is_root(const unicoap_path_t* path) {
+static inline bool unicoap_path_is_root(const unicoap_pathspec_t* path) {
     assert(path);
     return path->_components == NULL || *path->_components == NULL;
 }
@@ -87,7 +89,7 @@ static inline bool unicoap_path_is_root(const unicoap_path_t* path) {
  *
  * @note Note that for root paths, this function will return zero.
  */
-size_t unicoap_path_component_count(const unicoap_path_t* path);
+size_t unicoap_path_component_count(const unicoap_pathspec_t* path);
 
 /**
  * @brief Compares two path objects
@@ -100,7 +102,7 @@ size_t unicoap_path_component_count(const unicoap_path_t* path);
  * path components are compared using `strcmp`, meaning that the path component pointers in the
  * respective path objects do not need to be equal.
  */
-bool unicoap_path_is_equal(const unicoap_path_t* lhs, const unicoap_path_t* rhs);
+bool unicoap_path_is_equal(const unicoap_pathspec_t* lhs, const unicoap_pathspec_t* rhs);
 
 /**
  * @brief Compares `Uri-Path` options against path object
@@ -112,7 +114,7 @@ bool unicoap_path_is_equal(const unicoap_path_t* lhs, const unicoap_path_t* rhs)
  *
  * @returns A boolean value indicating whether the two paths match.
  */
-bool unicoap_path_matches_options(const unicoap_path_t* path,
+bool unicoap_path_matches_options(const unicoap_pathspec_t* path,
                                   const unicoap_options_t* options, bool match_subtree);
 
 /**
@@ -126,7 +128,7 @@ bool unicoap_path_matches_options(const unicoap_path_t* path,
  *
  * This function ignores trailing slashes in @p string
  */
-bool unicoap_path_matches_string(const unicoap_path_t* path,
+bool unicoap_path_matches_string(const unicoap_pathspec_t* path,
                                  const char* string, size_t _string_length, bool match_subtree);
 
 /**
@@ -144,7 +146,7 @@ bool unicoap_path_matches_string(const unicoap_path_t* path,
  * error number
  * @retval `-ENOBUFS` if buffer lacks capacity to store path
  */
-ssize_t unicoap_path_serialize(const unicoap_path_t* path, char* buffer, size_t capacity);
+ssize_t unicoap_path_serialize(const unicoap_pathspec_t* path, char* buffer, size_t capacity);
 
 /**
  * @brief Prints given path object as serialized path
@@ -152,7 +154,7 @@ ssize_t unicoap_path_serialize(const unicoap_path_t* path, char* buffer, size_t 
  *
  * @note The path can be of arbitrary length.
  */
-void unicoap_path_print(const unicoap_path_t* path);
+void unicoap_path_print(const unicoap_pathspec_t* path);
 
 /**
  * @brief Auxiliary exchange information
@@ -383,7 +385,7 @@ struct unicoap_resource {
      *
      * @warning This path must not have any trailing slash separators, apart from the root path `/`
      */
-    const unicoap_path_t path;
+    const unicoap_pathspec_t path;
 
     /**
      * @brief Request handler callback

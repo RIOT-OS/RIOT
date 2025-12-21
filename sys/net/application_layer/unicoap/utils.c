@@ -26,7 +26,7 @@
 #include "debug.h"
 #include "private.h"
 
-size_t unicoap_path_component_count(const unicoap_path_t* path) {
+size_t unicoap_path_component_count(const unicoap_pathspec_t* path) {
     size_t count = 0;
     assert(path);
     if (!path->_components) {
@@ -39,7 +39,7 @@ size_t unicoap_path_component_count(const unicoap_path_t* path) {
     return count;
 }
 
-void unicoap_path_print(const unicoap_path_t* path) {
+void unicoap_path_print(const unicoap_pathspec_t* path) {
     assert(path);
     if (!path->_components || !*path->_components) {
         printf("/");
@@ -50,7 +50,7 @@ void unicoap_path_print(const unicoap_path_t* path) {
     }
 }
 
-ssize_t unicoap_path_serialize(const unicoap_path_t* path, char* buffer, size_t capacity) {
+ssize_t unicoap_path_serialize(const unicoap_pathspec_t* path, char* buffer, size_t capacity) {
     if (capacity == 0) {
         return -ENOBUFS;
     }
@@ -74,7 +74,7 @@ ssize_t unicoap_path_serialize(const unicoap_path_t* path, char* buffer, size_t 
     return og_capacity - capacity;
 }
 
-bool unicoap_path_is_equal(const unicoap_path_t* lhs, const unicoap_path_t* rhs) {
+bool unicoap_path_is_equal(const unicoap_pathspec_t* lhs, const unicoap_pathspec_t* rhs) {
     assert(lhs);
     assert(rhs);
 
@@ -120,7 +120,7 @@ static inline size_t _trim_trailing_slashes(const char* path, size_t length) {
     }
 }
 
-bool unicoap_path_matches_string(const unicoap_path_t* path,
+bool unicoap_path_matches_string(const unicoap_pathspec_t* path,
                                  const char* string, size_t string_length, bool match_subtree) {
 
     assert(path);
@@ -180,7 +180,7 @@ bool unicoap_path_matches_string(const unicoap_path_t* path,
     }
 }
 
-bool unicoap_path_matches_options(const unicoap_path_t* path,
+bool unicoap_path_matches_options(const unicoap_pathspec_t* path,
                                   const unicoap_options_t* options, bool match_subtree)
 {
     assert(path);
