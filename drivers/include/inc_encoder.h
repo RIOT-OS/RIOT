@@ -71,10 +71,12 @@
  *  - One for reading the current RPM
  *  - One for reading the total number of revolutions since the last read.
  *
- * @note After 327 revolutions without reading and resetting
- *       the revolution counter, the `phydat` value will overflow.
- *       Use the regular driver interface instead of SAUL if necessary.
- *       This interface also offers a higher RPM resolution (milli-PRM).
+ *@note When reading from a SAUL registry device, values are stored in a
+ *      `phydat` structure, which uses 16-bit integers. As a result, both
+ *      the revolution counter and RPM measurement may overflow
+ *      (e.g., after 32 revolutions, or at high RPM depending on gear ratio, etc).
+ *      Use the native driver interface if larger ranges are required.
+ *      It also provides higher RPM resolution (milli-RPM).
  *
  * @{
  *
