@@ -402,6 +402,18 @@ check_pinned_docker_version_is_up_to_date() {
     fi
 }
 
+check_if_cflags_are_touched_at_right_place() {
+    for file in $(git -C "${RIOTBASE}" grep -lE 'CFLAGS[\t ]*\+='); do
+        case $file in
+        */Makefile.dep)
+            # CFLAGS may not be touched in `Makefile.dep`
+            git -C "${RIOTBASE}" grep -nE 'CFLAGS[\t ]*\+=' "$file" \
+                | error_with_message  "A Makefile.dep is for dependency modelling only. Modify CFLAGS in a Makefile.include, in an app's Makefile, or (if only relevant to a single module/package) in the module's/package's Makefile"
+            ;;
+        esac
+    done
+}
+
 error_on_input() {
     ! grep ''
 }
@@ -425,6 +437,7 @@ all_checks() {
     check_stderr_null
     check_tests_application_path
     check_pinned_docker_version_is_up_to_date
+    check_if_cflags_are_touched_at_right_place
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
