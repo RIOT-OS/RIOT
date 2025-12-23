@@ -33,8 +33,4 @@ CXXEXFLAGS += -Wno-unused-parameter -Wno-pedantic -Wno-missing-field-initializer
 FEATURES_REQUIRED += cpp # basic C++ support
 FEATURES_REQUIRED += libstdcpp # libstdc++ support (for #include <cstdio>)
 
-
-# Disable Auto-ACK (not supported by openDSME)
-CFLAGS += -DCONFIG_IEEE802154_AUTO_ACK_DISABLE=1
-
 USEMODULE += random

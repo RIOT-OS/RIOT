@@ -44,7 +44,6 @@ endif
 
 ifneq (,$(filter lwip_sock_%,$(USEMODULE)))
   USEMODULE += lwip_sock
-  CFLAGS += -DLWIP_SO_RCVTIMEO
 endif
 
 ifneq (,$(filter lwip_sock_ip,$(USEMODULE)))
