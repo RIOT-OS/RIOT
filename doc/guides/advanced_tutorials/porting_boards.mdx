@@ -62,13 +62,13 @@ configurations. e.g:
   buttons. It might as well override default drivers parameters (e.g.: assigning
   specific pin connections to a LCD screen, radio, etc.).
 - `gpio_params.h`: if the board supports
-  [SAUL](https://doc.riot-os.org/group__drivers__saul.html) then its
-  [saul_gpio_params_t](https://doc.riot-os.org/structsaul__gpio__params__t.html)
+  [SAUL](https://api.riot-os.org/group__drivers__saul.html) then its
+  [saul_gpio_params_t](https://api.riot-os.org/structsaul__gpio__params__t.html)
   is defined here. (Analogously, an `adc_params.h` can
-  contain a [saul_adc_params_t](https://doc.riot-os.org/structsaul__adc__params__t.html)
+  contain a [saul_adc_params_t](https://api.riot-os.org/structsaul__adc__params__t.html)
   and `pwm_params.h` a
-  [saul_pwm_rgb_params_t](https://doc.riot-os.org/structsaul__pwm__rgb__params__t.html)
-  and a [saul_pwm_dimmer_params_t](https://doc.riot-os.org/structsaul__pwm__dimmer__params__t.html)).
+  [saul_pwm_rgb_params_t](https://api.riot-os.org/structsaul__pwm__rgb__params__t.html)
+  and a [saul_pwm_dimmer_params_t](https://api.riot-os.org/structsaul__pwm__dimmer__params__t.html)).
 - other: other specific headers needed by one `BOARD`
 
 :::note
@@ -128,12 +128,12 @@ present in the platform should be enabled. Each board (or CPU) has knowledge as
 to which drivers should be enabled in each case.
 
 The previous code snippet shows how a board which has a
-[Semtech SX1272 and SX1276 radio driver](https://doc.riot-os.org/group__drivers__sx127x.html)
+[Semtech SX1272 and SX1276 radio driver](https://api.riot-os.org/group__drivers__sx127x.html)
 device, pulls in its driver when the default network interfaces are required.
 
 When the pseudomodule `saul_default` is enabled, the board should pull in all
 the drivers of the devices it has which provide a
-[[S]ensor [A]ctuator [U]ber [L]ayer](https://doc.riot-os.org/group__drivers__saul.html)
+[[S]ensor [A]ctuator [U]ber [L]ayer](https://api.riot-os.org/group__drivers__saul.html)
 interface. This is usually done as following:
 
 ```makefile
@@ -273,8 +273,8 @@ For example: If you observe "erratic" blinking patterns in
 ### Overhead Calibration
 
 When using the high level timer `ztimer` there is an overhead in calling the
-[ztimer_sleep](https://doc.riot-os.org/group__sys__ztimer.html#gade98636e198f2d571c8acd861d29d360)
-and [ztimer_set](https://doc.riot-os.org/group__sys__ztimer.html#ga8934a79a89e35d58673418a1e4a2e69c)
+[ztimer_sleep](https://api.riot-os.org/group__sys__ztimer.html#gade98636e198f2d571c8acd861d29d360)
+and [ztimer_set](https://api.riot-os.org/group__sys__ztimer.html#ga8934a79a89e35d58673418a1e4a2e69c)
 functions. This offset can be compensated for.
 It can be measured by running `tests/sys/ztimer_overhead` on your board, i.e:
 
@@ -311,7 +311,7 @@ The last two lines can be added as defines to the new board `board.h`:
 ```
 
 Alternatively, the pseudomodule
-[ztimer_auto_adjust](https://doc.riot-os.org/group__pseudomodule__ztimer__auto__adjust.html)
+[ztimer_auto_adjust](https://api.riot-os.org/group__pseudomodule__ztimer__auto__adjust.html)
 can be used in an application to enable automatic timer offset compensation at board startup.
 This however incurs overhead both in the text segment and at bootup time.
 
@@ -572,10 +572,10 @@ in place of the actual board name in the environment or Make variable `BOARD`.
 
 A list of all existing board aliases can be found in
 [`makefiles/board_alias.inc.mk`](https://github.com/RIOT-OS/RIOT/blob/master/makefiles/board_alias.inc.mk).
-[`BOARD=native`](https://doc.riot-os.org/group__boards__common__native.html)
+[`BOARD=native`](https://api.riot-os.org/group__boards__common__native.html)
 is a special alias in that it
-resolves to either [`native32`](https://doc.riot-os.org/group__boards__native32.html)
-or [`native64`](https://doc.riot-os.org/group__boards__native64.html)
+resolves to either [`native32`](https://api.riot-os.org/group__boards__native32.html)
+or [`native64`](https://api.riot-os.org/group__boards__native64.html)
 depending on the host architecture.
 
 ## Tools
@@ -595,7 +595,7 @@ Some scripts and tools available to ease `BOARD` porting and testing:
 ## Further Reference
 
 - [In her blog](https://blog.martine-lenders.eu/riot-board-en.html), Martine Lenders documented her approach of
-  porting the [Adafruit Feather nRF52840 Express](https://doc.riot-os.org/group__boards__adafruit-feather-nrf52840-express.html)
+  porting the [Adafruit Feather nRF52840 Express](https://api.riot-os.org/group__boards__adafruit-feather-nrf52840-express.html)
   in February 2020.
 - [Over at HackMD](https://hackmd.io/njFHwQ33SNS3sQKAkLkNtQ), Akshai M documented his approach of
-  porting the [Silicon Labs SLSTK3400A starter kit](https://doc.riot-os.org/group__boards__slstk3400a.html) in July 2020.
+  porting the [Silicon Labs SLSTK3400A starter kit](https://api.riot-os.org/group__boards__slstk3400a.html) in July 2020.

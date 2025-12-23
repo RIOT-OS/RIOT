@@ -81,9 +81,9 @@ target board's flash memory or RAM.
 
 By default a RIOT application comprises only of the applications' code itself,
 the kernel, and platform specific code. In order to use additional modules,
-such as a particular [device driver](https://doc.riot-os.org/group__drivers.html)
-or [a system library](https://doc.riot-os.org/group__sys.html)
-(including [networking capabilities](https://doc.riot-os.org/group__net.html)),
+such as a particular [device driver](https://api.riot-os.org/group__drivers.html)
+or [a system library](https://api.riot-os.org/group__sys.html)
+(including [networking capabilities](https://api.riot-os.org/group__net.html)),
 you have to append the modules' names to the USEMODULE variable.
 For example, to build an application using the
 SHT11 temperature sensor and UDP/IPv6 functionalities of the GNRC network stack,
@@ -119,7 +119,7 @@ CFLAGS += -DTHREAD_STACKSIZE_MAIN=2048
 ```
 
 For a list of all compile time configurations check the
-[API Documentation](https://doc.riot-os.org/group__config.html).
+[API Documentation](https://api.riot-os.org/group__config.html).
 
 #### Kconfig
 

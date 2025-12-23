@@ -146,7 +146,7 @@ and then check the `Downlink` section.
 
 After sending data, the LoRaWAN Network Server will reply with the downlink
 data. For simplicity, this application is configured to dump downlink data to
-[GNRC pktdump](https://doc.riot-os.org/pktdump_8h.html).
+[GNRC pktdump](https://api.riot-os.org/pktdump_8h.html).
 
 E.g:
 ```

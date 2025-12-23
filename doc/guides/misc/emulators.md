@@ -71,7 +71,7 @@ application with the same board to run in parallel.
 
 [Qemu](https://www.qemu.org/) is a machine emulator and virtualizer. It can
 be used to emulate regular computer architectures but also some microcontroller
-based boards such as the [BBC micro:bit](https://doc.riot-os.org/group__boards__microbit.html).
+based boards such as the [BBC micro:bit](https://api.riot-os.org/group__boards__microbit.html).
 
 ### Installation
 
@@ -82,7 +82,7 @@ Depending on your local system, the installation procedure is described on the
 ### Supported Boards
 
 So far, in RIOT, only the
-[BBC micro:bit](https://doc.riot-os.org/group__boards__microbit.html)
+[BBC micro:bit](https://api.riot-os.org/group__boards__microbit.html)
 board is supported with qemu.
 
 ### Configuration

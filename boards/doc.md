@@ -79,7 +79,7 @@ Guide to board pinouts {#pinout_guide}
 The following are the steps to take to locate specific pinouts on boards.
 This is useful when connecting external hardware to RIOT supported boards.
 
-1. Check the [board documentation](http://doc.riot-os.org/group__boards.html)
+1. Check the [board documentation](http://api.riot-os.org/group__boards.html)
 to see if the pinout is available
 2. If the pinout is not available or up to date check the following:
     - `boards/<BOARD>/include/periph_conf.h` for board specific

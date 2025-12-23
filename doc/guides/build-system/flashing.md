@@ -104,7 +104,7 @@ support multiple platforms are given in section above.
 #### nRF52
 
 - `adafruit-nrfutil`, `uf2conv` (requires Adafruit bootloader),
-see [Adafruit nRF52 Bootloader Common](https://doc.riot-os.org/group__boards__common__adafruit-nrf52-bootloader.html)
+see [Adafruit nRF52 Bootloader Common](https://api.riot-os.org/group__boards__common__adafruit-nrf52-bootloader.html)
 - `nrfutil` (required nRF bootloader)
 - `nrfjprog` (requires a separate J-Link debugger)
 

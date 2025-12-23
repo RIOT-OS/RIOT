@@ -41,7 +41,7 @@ your device from entering a low-power/sleep state,
 thus drastically increasing energy usage.
 As such it is most often not worth it unless you specifically need the precision.
 For more details you can visit the
-[ztimer API documentation](https://doc.riot-os.org/group__sys__ztimer.html).
+[ztimer API documentation](https://api.riot-os.org/group__sys__ztimer.html).
 
 This allows us to do a simple `ztimer_sleep(ZTIMER_SEC, 5);` which we will
 also use soon. Using `ztimer_sleep(ZTIMER_SEC, 5);` we simply wait for around

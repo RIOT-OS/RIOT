@@ -451,7 +451,7 @@ reserved for the cases described below:
 | `CPU_FAM_` | Models a family of CPUs |
 | `CPU_MODEL_` | Models a particular model of CPU |
 | `USEMODULE_` | Models a [RIOT module](https://guide.riot-os.org/advanced_tutorials/creating_modules/). Generated from `USEMODULE` variable |
-| `USEPKG_` | Models an [external package](https://doc.riot-os.org/group__pkg.html). Generated from `USEPKG` variable |
+| `USEPKG_` | Models an [external package](https://api.riot-os.org/group__pkg.html). Generated from `USEPKG` variable |
 
 ---
 ## Appendices

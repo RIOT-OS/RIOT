@@ -11,7 +11,7 @@ RIOT calls this the SAUL (Sensors/Actuators Abstraction Layer) system.
 The availability of sensors and actuators can vary greatly between different boards,
 so the SAUL system provides a way to interact with them in a uniform way,
 regardless of the underlying hardware.
-So consulting the [documentation](https://doc.riot-os.org/group__drivers__saul.html)
+So consulting the [documentation](https://api.riot-os.org/group__drivers__saul.html)
 is always a good idea.
 
 ## The Makefile

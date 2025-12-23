@@ -67,4 +67,4 @@ Iface  6  HWaddr: F1:28:23:23:F1:28
 ```
 
 [Vagrantfile]: ./Vagrantfile
-[native]: https://doc.riot-os.org/group__boards__native.html
+[native]: https://api.riot-os.org/group__boards__native.html

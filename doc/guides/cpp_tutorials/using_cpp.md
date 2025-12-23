@@ -47,5 +47,5 @@ using their `Makefile.dep`.
 
 ## See Also
 
-Reference [C++ modules](https://doc.riot-os.org/group__cpp.html)
+Reference [C++ modules](https://api.riot-os.org/group__cpp.html)
 for a list of C++ modules.
