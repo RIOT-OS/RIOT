@@ -36,8 +36,8 @@ $(CARGO_COMPILE_COMMANDS): $(BUILDDEPS)
 	        -e 's/"riscv32-elf"/"riscv32"/g' \
 	        -e 's/"riscv64-none-elf"/"riscv32"/g' \
 	        -e 's/"riscv64-unknown-elf"/"riscv32"/g' \
-	        -e 's/"riscv64-elf"/"riscv32"/g' \
-	  | $(LAZYSPONGE) $@
+	        -e 's/"riscv64-elf"/"riscv32"/g' > '$@.tmp'
+	$(Q)cmp '$@' '$@.tmp' > /dev/null 2>&1 || mv '$@.tmp' '$@'
 
 cargo-preflight: FORCE
 	@command -v cargo >/dev/null || ($(COLOR_ECHO) \

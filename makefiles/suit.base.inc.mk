@@ -84,6 +84,7 @@ $(SUIT_PUB_HDR): $(SUIT_PUBS) FORCE | $(CLEAN)
 			echo " },";				\
 		done;						\
 		echo "};"					\
-	) | '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
+	) > '$@.tmp'
+	$(Q)cmp '$@' '$@.tmp' > /dev/null 2>&1 || mv '$@.tmp' '$@'
 
 suit/genkey: $(SUIT_SEC)
