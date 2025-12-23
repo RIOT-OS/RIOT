@@ -58,7 +58,7 @@ cargo-preflight: FORCE
 		'$(COLOR_RED)Error: No Rust libraries are installed for the board'"'"'s CPU.$(COLOR_RESET) Run\n    $(COLOR_GREEN)$$$(COLOR_RESET) rustup target add $(RUST_TARGET)\nor set `CARGO_OPTIONS=-Zbuild-std=core`.'; \
 		exit 1)
 
-$(CARGO_LIB): cargo-preflight $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS) FORCE
+$(CARGO_LIB): cargo-preflight $(MODULE_DEFINE_FILE) $(CFLAGS_HASH_FILE) $(BUILDDEPS) $(CARGO_COMPILE_COMMANDS) FORCE
 	@# mind the "+" to pass down make's jobserver.
 	$(Q)+ CC= CFLAGS= CPPFLAGS= CXXFLAGS= \
 		RIOT_COMPILE_COMMANDS_JSON="$(CARGO_COMPILE_COMMANDS)" \
@@ -68,7 +68,7 @@ $(CARGO_LIB): cargo-preflight $(RIOTBUILD_CONFIG_HEADER_C) $(BUILDDEPS) $(CARGO_
 			--profile $(CARGO_PROFILE) \
 			$(CARGO_OPTIONS)
 
-cargo-command: cargo-preflight $(RIOTBUILD_CONFIG_HEADER_C) $(CARGO_COMPILE_COMMANDS) FORCE
+cargo-command: cargo-preflight $(MODULE_DEFINE_FILE) $(CFLAGS_HASH_FILE) $(CARGO_COMPILE_COMMANDS) FORCE
 	@[ x"$(CARGO_COMMAND)" != x"" ] || ($(COLOR_ECHO) "$(COLOR_RED)Error: Running cargo-command requires a CARGO_COMMAND to be set.$(COLOR_RESET) Set CARGO_COMMAND=\"cargo clippy --release --fix\" or any other cargo command to run with the right RIOT environment."; exit 1)
 	@# mind the "+" to pass down make's jobserver.
 	$(Q)+ CC= CFLAGS= CPPFLAGS= CXXFLAGS= \

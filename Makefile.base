@@ -150,8 +150,9 @@ CCASFLAGS = $(filter-out $(CCASUWFLAGS), $(CFLAGS)) $(CCASEXFLAGS)
 
 $(OBJC_LTO): CFLAGS+=$(LTOFLAGS)
 
-# Define dependencies for object files
-OBJ_DEPS += $(RIOTBUILD_CONFIG_HEADER_C)
+# Depend on the modules and the CFLAGS used: If those have changed, we need to
+# rebuild
+OBJ_DEPS += $(MODULE_DEFINE_FILE) $(CFLAGS_HASH_FILE)
 
 $(OBJC): $(BINDIR)/$(MODULE)/%.o: %.c $(OBJ_DEPS) | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
 	$(Q)$(CCACHE) $(CC) \

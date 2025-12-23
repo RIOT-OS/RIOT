@@ -264,8 +264,6 @@ include $(RIOTMAKE)/info.inc.mk
 # Static code analysis tools provided by LLVM
 include $(RIOTMAKE)/scan-build.inc.mk
 
-export RIOTBUILD_CONFIG_HEADER_C = $(BINDIR)/riotbuild/riotbuild.h
-
 ifeq ($(OS),Darwin)
   OPEN   := open
 else
@@ -347,10 +345,9 @@ ifeq (,$(UNZIP_HERE))
   endif
 endif
 
-# Tool saving stdin to a file only on content update.
-# It keeps the file timestamp if it would end up the same.
-LAZYSPONGE ?= $(RIOTTOOLS)/lazysponge/lazysponge.py
-LAZYSPONGE_FLAGS ?= $(if $(filter 1,$(QUIET)),,--verbose)
+# Command to compute the SHA256 sum. Use `shasum -a 256` if available
+# (most Linux and OS X systems) and fall back to sha256sum if not.
+SHA256SUM ?= $(shell command -v shasum > /dev/null && echo 'shasum -a 256' || echo sha256sum)
 
 ifeq (, $(APPLICATION))
     $(error An application name must be specified as APPLICATION.)
@@ -680,7 +677,10 @@ LINKFLAGPREFIX ?= -Wl,
 DIRS += $(EXTERNAL_MODULE_PATHS)
 
 # Define dependencies required for building (headers, downloading source files,)
-BUILDDEPS += $(RIOTBUILD_CONFIG_HEADER_C)
+export MODULE_DEFINE_FILE := $(BINDIR)/module_defines.txt
+export CFLAGS_HASH_FILE := $(BINDIR)/cflags_hash.txt
+BUILDDEPS += $(MODULE_DEFINE_FILE)
+BUILDDEPS += $(CFLAGS_HASH_FILE)
 BUILDDEPS += pkg-prepare
 BUILDDEPS += $(APPDEPS)
 BUILDDEPS += $(MODULE_LIST_DIR)
@@ -1028,38 +1028,17 @@ endif
 # Include desvirt Makefile
 include $(RIOTTOOLS)/desvirt/Makefile.desvirt
 
-# Build a header file with all common macro definitions and undefinitions
-# Everytime the header is updated, it will trigger a new compilation.
-#
-# The file is created first through a `.in` file that will be modified if
-# any CFLAGS changed. It depends on FORCE to re-run of the script every time
-# even if the file exists but the file will only be updated on modifications.
-#
-# The header is then created by keeping only the macros. Keeping the
-# comments added absolute path in the file that screwed caching.
-#
-# The rebuild behavior could even only be done with an empty file, but currently
-# some macros definitions are passed through this file.
-$(RIOTBUILD_CONFIG_HEADER_C): $(RIOTBUILD_CONFIG_HEADER_C).in
-	$(Q)sed -n -e '1i\
-/* Generated file do not edit */' -e '/^#.*/ p' $< > $@
-
-.SECONDARY: $(RIOTBUILD_CONFIG_HEADER_C).in
-$(RIOTBUILD_CONFIG_HEADER_C).in: FORCE | $(CLEAN)
-	@mkdir -p '$(dir $@)'
-	$(Q)'$(RIOTTOOLS)/genconfigheader/genconfigheader.sh' $(CFLAGS_WITH_MACROS) \
-		| '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
-
-CFLAGS_WITH_MACROS += $(CFLAGS)
-CFLAGS_WITH_MACROS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
-CFLAGS_WITH_MACROS += -DRIOT_VERSION_CODE=$(RIOT_VERSION_CODE)
+CFLAGS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
+CFLAGS += -DRIOT_VERSION_CODE=$(RIOT_VERSION_CODE)
 ifneq (,$(RIOT_VERSION_EXTRA))
-  CFLAGS_WITH_MACROS += -DCONFIG_RIOT_VERSION_EXTRA=\""$(RIOT_VERSION_EXTRA)"\"
+  CFLAGS += -DCONFIG_RIOT_VERSION_EXTRA=\""$(RIOT_VERSION_EXTRA)"\"
 endif
-# MODULE_NAME defines. Declared in 'makefiles/modules.inc.mk'
-CFLAGS_WITH_MACROS += $(EXTDEFINES)
 
-CFLAGS += -include '$(RIOTBUILD_CONFIG_HEADER_C)'
+# include core/include/riotbuild.h that provides alias for backward
+# compatibility
+CFLAGS += -include 'riotbuild.h'
+
+CFLAGS += '@$(MODULE_DEFINE_FILE)'
 
 # include mcuboot support
 include $(RIOTMAKE)/mcuboot.mk
@@ -1083,6 +1062,26 @@ endif
 endif
 
 include $(RIOTMAKE)/cargo-targets.inc.mk
+
+$(BINDIR):
+	$(Q)mkdir -p '$@'
+
+# Dump module define arguments to a file, rather than adding them to the
+# cmdline, to reduce the length of the command to execute. Update the file
+# only if changed, so that full rebuilds are only performed if used modules
+# actually change.
+.PHONY: $(MODULE_DEFINE_FILE)
+$(MODULE_DEFINE_FILE): $(BINDIR)
+	$(Q)echo '$(sort $(EXTDEFINES))' > '$@.tmp'
+	$(Q)cmp '$@' '$@.tmp' > /dev/null 2>&1 || mv '$@.tmp' '$@'
+
+# Dump a hash of the CFLAGS to a file, but only write the file if the hash
+# has changed. The sole purpose is to force a rebuild if `$(CFLAGS)` have
+# changed since the last build, the actual hash value is not used.
+.PHONY: $(CFLAGS_HASH_FILE)
+$(CFLAGS_HASH_FILE): $(BINDIR)
+	$(Q)echo '$(CFLAGS)' | $(SHA256SUM) - > '$@.tmp'
+	$(Q)cmp '$@' '$@.tmp' > /dev/null 2>&1 || mv '$@.tmp' '$@'
 
 # include RIOT_MAKEFILES_GLOBAL_POST configuration files
 # allows setting user specific system wide configuration parsed after the body
