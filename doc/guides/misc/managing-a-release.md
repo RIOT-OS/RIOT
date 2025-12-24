@@ -51,7 +51,7 @@ A good time to start preparing for the release is two months before the intended
 
 Get in contact with the maintainers, discuss ongoing development and generate a **short** and realistic list of wanted features which should be published to the maintainers mailing list, on agreement. It is worth it to ask around for planned holidays to estimate an appropriate timetable. You should announce a date for the feature freeze and the estimated release date on all mailing lists.
 
-Have a look at the [list of deprecated features](http://doc.riot-os.org/deprecated.html). If any of them are pending removal for the release (or previous releases) you should remove them or assign somebody to remove them.
+Have a look at the [list of deprecated features](http://api.riot-os.org/deprecated.html). If any of them are pending removal for the release (or previous releases) you should remove them or assign somebody to remove them.
 
 During the month of release you should keep track of the development progress, coordinate between pull requests and help to get candidates merged. Shortly before feature freeze you should postpone pull requests that will (obviously) not make it until feature freeze. This SHOULD NOT be commented.
 

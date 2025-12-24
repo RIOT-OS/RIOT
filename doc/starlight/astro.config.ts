@@ -64,12 +64,12 @@ export default defineConfig({
           items: [
             {
               label: "API Documentation",
-              link: "https://doc.riot-os.org",
+              link: "https://api.riot-os.org",
               badge: { text: "Doxygen", variant: "tip" },
             },
             {
               label: "Rust Documentation",
-              link: "https://doc.riot-os.org/rustdoc/latest/riot_doc_helpers/",
+              link: "https://api.riot-os.org/rustdoc/latest/riot_doc_helpers/",
               badge: { text: "Rustdoc", variant: "tip" },
             },
           ],

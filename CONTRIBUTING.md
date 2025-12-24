@@ -23,13 +23,15 @@ As a reminder, all contributors are expected to follow our
 ## Getting Started
 [getting-started]: #getting-started
 If you are just beginning to work with RIOT you might first want to read our
-[documentation]. Especially the following sections might be of interest to you
+[guide] and [API documentation]. Especially the following sections might be of
+interest to you
 
 - [Getting Started](https://guide.riot-os.org/getting-started/installing/)
 - [Creating modules](https://guide.riot-os.org/advanced_tutorials/creating_modules/)
 - [Creating an application](https://guide.riot-os.org/advanced_tutorials/creating_application/)
 
-[documentation]: https://doc.riot-os.org
+[guide]: https://guide.riot-os.org
+[API documentation]: https://api.riot-os.org
 
 ## Bug reports and feature requests
 [issues]: #bug-reports-and-feature-requests

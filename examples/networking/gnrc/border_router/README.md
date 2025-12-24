@@ -18,13 +18,13 @@ to run 6LoWPAN on and an IPv6 uplink.
 
 This example comes with support for three uplink types pre-configured:
 
- - [`ethos`](https://doc.riot-os.org/group__drivers__ethos.html) (default)
+ - [`ethos`](https://api.riot-os.org/group__drivers__ethos.html) (default)
  - [`slip`](https://tools.ietf.org/html/rfc1055)
  - `wifi`
 
-For `native` the host-facing [`netdev_tap`](https://doc.riot-os.org/netdev__tap_8h.html) device
+For `native` the host-facing [`netdev_tap`](https://api.riot-os.org/netdev__tap_8h.html) device
 is configured, providing connectivity via a TAP interface to the RIOT instance.
-On the node-facing side [`socket_zep`](https://doc.riot-os.org/group__drivers__socket__zep.html)
+On the node-facing side [`socket_zep`](https://api.riot-os.org/group__drivers__socket__zep.html)
 is used to simulate a IEEE 802.15.4 network.
 
 To select an uplink, set the UPLINK environment variable. For instance, use `UPLINK=slip`

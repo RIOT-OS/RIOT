@@ -16900,7 +16900,7 @@ Full and Minimal Thread Devices support in OpenThread and compliance of
 LoRaWAN 1.0.2 (ABP counters stored in EEPROM). Several boards were introduced.
 
 During the last release the board documentation was migrated from the wiki to
-the [RIOT API documentation](https://doc.riot-os.org) to improve the
+the [RIOT API documentation](https://api.riot-os.org) to improve the
 maintenance of these entries and provide a better user experience when
 browsing the documentation. There were also some efforts in grouping some
 modules to make them easier to access in the documentation.

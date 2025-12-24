@@ -20,7 +20,7 @@ WiFi module. The ATWINC15x0 WiFi module is widely used as WiFi interface on
 various boards and extension boards. Examples are:
 
 - [Adafruit Feather M0 WiFi](https://learn.adafruit.com/adafruit-feather-m0-wifi-atwinc1500/)
-  (also supported by [RIOT](https://doc.riot-os.org/group__boards__feather-m0.html))
+  (also supported by [RIOT](https://api.riot-os.org/group__boards__feather-m0.html))
 - [ATWIN1500-XPRO](https://www.microchip.com/DevelopmentTools/ProductDetails/ATWINC1500-XPRO)
   for the extension of Atmel Xplained PRO boards (also supported by RIOT)
 - [Adafruit ATWINC1500 WiFi breakout](https://learn.adafruit.com/adafruit-atwinc1500-wifi-module-breakout)

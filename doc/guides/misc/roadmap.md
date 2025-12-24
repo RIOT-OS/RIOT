@@ -70,7 +70,7 @@ The text and items below are tentative, up for discussion, to be updated by regu
 (contact/steering: [gschorcht](https://github.com/gschorcht), [maribu](https://github.com/maribu))
 
 - add a port-based, feature-rich, thread-safe GPIO API
-    - [GPIO LL](https://doc.riot-os.org/group__drivers__periph__gpio__ll.html) seems to fit the bill so for
+    - [GPIO LL](https://api.riot-os.org/group__drivers__periph__gpio__ll.html) seems to fit the bill so for
     - many MCUs still need an implementation
 - add a high level API that unifies external and internal GPIOs on top
 

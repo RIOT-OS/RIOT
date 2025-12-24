@@ -204,10 +204,10 @@ above.
 ### Compile-time Configuration Documentation
 
 The macros that configure the driver during compilation is added to the listing
-for [Compile time configurations](https://doc.riot-os.org/group__config.html). Refer to the following example
+for [Compile time configurations](https://api.riot-os.org/group__config.html). Refer to the following example
 that exposes
 [TMP00x sensor](https://github.com/RIOT-OS/RIOT/blob/2025.07-branch/drivers/include/tmp00x.h#L96-L157)
-to [sensors group](https://doc.riot-os.org/group__config__drivers__sensors.htmls).
+to [sensors group](https://api.riot-os.org/group__config__drivers__sensors.htmls).
 
 ```c
 /**

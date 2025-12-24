@@ -59,7 +59,7 @@ LGPL code.
 [license-badge]: https://img.shields.io/github/license/RIOT-OS/RIOT
 [license-link]: https://github.com/RIOT-OS/RIOT/blob/master/LICENSE
 [api-badge]: https://img.shields.io/badge/docs-API-informational.svg
-[api-link]: https://doc.riot-os.org/
+[api-link]: https://api.riot-os.org/
 [guide-badge]: https://img.shields.io/badge/docs-Getting_Started_Guide-informational.svg
 [guide-link]: https://guide.riot-os.org/getting-started/installing/
 [mastodon-badge]: https://img.shields.io/badge/social-Mastodon-informational.svg
@@ -81,7 +81,7 @@ LGPL code.
 [getting-started]: https://guide.riot-os.org/getting-started/installing/
 [tutorials]: https://github.com/RIOT-OS/Tutorials
 [riot-course]: https://github.com/RIOT-OS/riot-course
-[api-docs]: https://doc.riot-os.org/
+[api-docs]: https://api.riot-os.org/
 
 ## Features
 
