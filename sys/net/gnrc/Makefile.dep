@@ -460,6 +460,7 @@ ifneq (,$(filter gnrc,$(USEMODULE)))
   endif
   ifneq (,$(filter sock_udp, $(USEMODULE)))
     USEMODULE += gnrc_sock_udp
+    USEMODULE += gnrc_ipv6
   endif
   ifneq (,$(filter sock_tcp, $(USEMODULE)))
     USEMODULE += gnrc_sock_tcp
