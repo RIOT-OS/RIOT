@@ -1,1 +1,4 @@
 include $(RIOTBOARD)/common/arduino-mkr/Makefile.features
+
+# Put other features for this board (in alphabetical order)
+FEATURES_PROVIDED += netif
