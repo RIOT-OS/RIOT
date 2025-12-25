@@ -24,13 +24,27 @@
 extern "C" {
 #endif
 
+/* Provide backward compatibility with old DEBUG_ASSERT* macros. */
+#ifndef DOXYGEN
+#  ifdef DEBUG_ASSERT_VERBOSE
+#    define CONFIG_ASSERT_VERBOSE 1
+#  endif
+#  ifdef DEBUG_ASSERT_BREAKPOINT
+#    define CONFIG_ASSERT_BREAKPOINT 1
+#  endif
+#  ifdef DEBUG_ASSERT_NO_PANIC
+#    define CONFIG_ASSERT_NO_PANIC 1
+#  endif
+#endif
+
 #ifdef DOXYGEN
 /**
  * @brief   Activate verbose output for @ref assert() when defined.
  *
- * Without this macro defined, @ref assert() will just print the address of the
- * code line the assertion failed in. With this macro defined, @ref assert()
- * will also print the file and the code line of the failed assertion.
+ * Without this macro defined as `1`, @ref assert() will just print the address
+ * of the code line the assertion failed in. With this macro defined,
+ * @ref assert() will also print the file and the code line of the failed
+ * assertion.
  *
  * Enabling verbose output will on the other hand lead to an increased size of
  * the binary, since it needs to contain the names of all files with assertions.
@@ -38,24 +52,25 @@ extern "C" {
  * To define just add it to your `CFLAGS` in your application's Makefile:
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- * CFLAGS += -DDEBUG_ASSERT_VERBOSE
+ * CFLAGS += -DCONFIG_ASSERT_VERBOSE=1
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
-#  define DEBUG_ASSERT_VERBOSE
+#  define CONFIG_ASSERT_VERBOSE 0
 
 /**
  * @brief   Activate breakpoints for @ref assert() when defined
  *
- * Without this macro defined the @ref assert() macro will just print some
- * information about the failed assertion, see @ref assert() and
- * @ref DEBUG_ASSERT_VERBOSE.
- * If @ref DEBUG_ASSERT_BREAKPOINT is defined, the execution will stop on a
- * failed assertion instead of producing the output. If the architecture
+ * With this macro defined as `0` or undefined, the @ref assert() macro will
+ * just print some information about the failed assertion, see @ref assert() and
+ * @ref CONFIG_ASSERT_VERBOSE.
+ *
+ * If @ref CONFIG_ASSERT_BREAKPOINT is defined as `1`, the execution will stop
+ * on a failed assertion instead of producing the output. If the architecture
  * defines the macro @ref DEBUG_BREAKPOINT, a breakpoint is inserted and the
  * execution is stopped directly in the debugger. Otherwise the execution stops
  * in an endless while loop.
  */
-#  define DEBUG_ASSERT_BREAKPOINT
+#  define CONFIG_ASSERT_BREAKPOINT 1
 #else
 /* we should not include custom headers in standard headers */
 #  define _likely(x)      __builtin_expect((uintptr_t)(x), 1)
@@ -102,7 +117,7 @@ __NORETURN void _assert_failure(const char *file, unsigned line);
 
 #ifdef NDEBUG
 #  define assert(ignore)((void)0)
-#elif defined(DEBUG_ASSERT_VERBOSE)
+#elif CONFIG_ASSERT_VERBOSE
 /**
  * @brief    abort the program if assertion is false
  *
@@ -124,15 +139,16 @@ __NORETURN void _assert_failure(const char *file, unsigned line);
  * or `gdb` (with the command `info line *(0x89abcdef)`) to identify the line
  * the assertion failed in.
  *
- * With @ref DEBUG_ASSERT_VERBOSE defined this will instead directly print the
- * file and the line the assertion failed in:
+ * With @ref CONFIG_ASSERT_VERBOSE defined as `1` this will instead directly
+ * print the file and the line the assertion failed in:
  *
  *     example/file.c:42 => FAILED ASSERTION.
  *
- * If the `backtrace` module is enabled (and implemented for the architecture in use)
- * a backtrace will be printed in addition to the location of the failed assertion.
+ * a backtrace will be printed in addition to the location of the failed
+ * assertion. If the `backtrace` module is enabled (and implemented for the
+ * architecture in use)
  *
- * If @ref DEBUG_ASSERT_BREAKPOINT is defined, the execution will stop on a
+ * If @ref CONFIG_ASSERT_BREAKPOINT is defined, the execution will stop on a
  * failed assertion instead of producing the above output. If the architecture
  * defines the macro @ref DEBUG_BREAKPOINT, a breakpoint is inserted and the
  * execution is stopped directly in the debugger. Otherwise the execution stops
@@ -141,9 +157,9 @@ __NORETURN void _assert_failure(const char *file, unsigned line);
  * @see http://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html
  */
 #  define assert(cond) (_likely(cond) ? (void)0 :  _assert_failure(__FILE__, __LINE__))
-#else /* DEBUG_ASSERT_VERBOSE */
+#else /* CONFIG_ASSERT_VERBOSE */
 #  define assert(cond) (_likely(cond) ? (void)0 : _assert_panic())
-#endif /* DEBUG_ASSERT_VERBOSE */
+#endif /* CONFIG_ASSERT_VERBOSE */
 
 #if !defined __cplusplus
 #  if __STDC_VERSION__ >= 201112L
@@ -167,8 +183,8 @@ __NORETURN void _assert_failure(const char *file, unsigned line);
  *
  * If the assertion failed in an interrupt, the system will still panic.
  */
-#ifndef DEBUG_ASSERT_NO_PANIC
-#  define DEBUG_ASSERT_NO_PANIC (1)
+#ifndef CONFIG_ASSERT_NO_PANIC
+#  define CONFIG_ASSERT_NO_PANIC 1
 #endif
 
 #ifdef __cplusplus
