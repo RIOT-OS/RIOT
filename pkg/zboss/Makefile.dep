@@ -1,0 +1,20 @@
+USEMODULE += zboss
+USEMODULE += zboss-aps
+USEMODULE += zboss-common
+USEMODULE += zboss-mac
+USEMODULE += zboss-nwk
+USEMODULE += zboss-secur
+USEMODULE += zboss-zcl
+USEMODULE += zboss-zdo
+USEMODULE += zboss-unix
+
+USEMODULE += memarray
+USEMODULE += ztimer
+USEMODULE += netdev_default
+USEMODULE += auto_init
+USEMODULE += ieee802154
+USEMODULE += ieee802154_submac
+USEMODULE += luid
+
+FEATURES_REQUIRED += periph_flashpage
+FEATURES_REQUIRED += periph_flashpage_pagewise
