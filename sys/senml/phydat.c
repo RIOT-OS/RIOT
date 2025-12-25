@@ -33,6 +33,7 @@ static uint8_t phydat_unit_to_senml_unit(uint8_t unit)
     case UNIT_PH:      return SENML_UNIT_PH;
     case UNIT_PA:      return SENML_UNIT_PASCAL;
     case UNIT_CD:      return SENML_UNIT_CANDELA;
+    case UNIT_RPM:     return SENML_UNIT_RPM;
 
     /* Compatible Secondary units */
     case UNIT_DBM:     return SENML_UNIT_DECIBEL_MILLIWATT;
