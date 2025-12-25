@@ -1,6 +1,7 @@
 /*
  * SPDX-FileCopyrightText: 2017 OTA keys S.A.
  * SPDX-FileCopyrightText: 2018 Acutam Automation, LLC
+ * SPDX-FileCopyrightText: 2025 Baptiste Le Duc <baptiste.leduc38@gmail.com>
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
@@ -13,10 +14,13 @@
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
+ * @author      Baptiste Le Duc <baptiste.leduc38@gmail.com>
  * @}
  */
 
 #include <stdio.h>
+
+#define ADS1X1X_PARAM_HIGH_LIMIT 10000
 
 #include "ztimer.h"
 #include "ads1x1x.h"
@@ -39,7 +43,7 @@ int main(void)
     int16_t data;
 
     puts("ADS1X1X analog to digital driver test application\n");
-    printf("Initializing ADS101x analog to digital at I2C_DEV(%i)... ",
+    printf("Initializing ADS1X1X analog to digital at I2C_DEV(%i)... ",
            ads1x1x_params->i2c);
 
     if (ads1x1x_init(&dev, ads1x1x_params) == ADS1X1X_OK) {
@@ -62,7 +66,7 @@ int main(void)
     }
 
     printf("Enabling alert interrupt: ");
-    if (ads1x1x_enable_alert(&alert_dev, alert_cb, NULL) == ADS1X1X_OK) {
+    if (ads1x1x_enable_alert(&alert_dev, alert_cb, NULL, 4) == ADS1X1X_OK) {
         puts("[OK]");
     }
     else {
@@ -72,7 +76,10 @@ int main(void)
 
     while (1) {
         printf("Raw analog read. CH0: ");
-        ads1x1x_set_mux_gain(&dev, ADS1X1X_AIN0_SINGM | ADS1X1X_PGA_FSR_2V048);
+        if (ads1x1x_set_mux(&dev, ADS1X1X_AIN0_SINGM) < 0) {
+            puts("[Fail]");
+            return -1;
+        };
         if (ads1x1x_read_raw(&dev, &data) == ADS1X1X_OK) {
             printf("%d", data);
         }
@@ -82,7 +89,10 @@ int main(void)
         }
 
         printf(" CH1: ");
-        ads1x1x_set_mux_gain(&dev, ADS1X1X_AIN1_SINGM | ADS1X1X_PGA_FSR_2V048);
+        if (ads1x1x_set_mux(&dev, ADS1X1X_AIN1_SINGM) < 0) {
+            puts("[Fail]");
+            return -1;
+        }
         if (ads1x1x_read_raw(&dev, &data) == ADS1X1X_OK) {
             printf("%d", data);
         }
@@ -92,7 +102,10 @@ int main(void)
         }
 
         printf(" CH2: ");
-        ads1x1x_set_mux_gain(&dev, ADS1X1X_AIN2_SINGM | ADS1X1X_PGA_FSR_2V048);
+        if (ads1x1x_set_mux(&dev, ADS1X1X_AIN2_SINGM) < 0) {
+            puts("[Fail]");
+            return -1;
+        }
         if (ads1x1x_read_raw(&dev, &data) == ADS1X1X_OK) {
             printf("%d", data);
         }
@@ -102,7 +115,10 @@ int main(void)
         }
 
         printf(" CH3: ");
-        ads1x1x_set_mux_gain(&dev, ADS1X1X_AIN3_SINGM | ADS1X1X_PGA_FSR_2V048);
+        if (ads1x1x_set_mux(&dev, ADS1X1X_AIN3_SINGM) < 0) {
+            puts("[Fail]");
+            return -1;
+        }
         if (ads1x1x_read_raw(&dev, &data) == ADS1X1X_OK) {
             printf("%d", data);
         }
