@@ -24,8 +24,11 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
+#include <kernel_defines.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <net/ipv6/addr.h>
+#include "eui64.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -909,6 +912,38 @@ typedef enum {
                                  *   not listening to packets. */
     /* add other states if needed */
 } netopt_state_t;
+
+/**
+ * @brief   Option parameter to be used with @ref NETOPT_IPV6_IID
+ */
+enum {
+    NETOPT_IPV6_IID_HWADDR = 0,
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY) || defined(DOXYGEN)
+    NETOPT_IPV6_IID_RFC7217,
+#endif
+};
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY) || defined(DOXYGEN)
+/**
+ * @brief       Data for @ref NETOPT_IPV6_IID when using RFC7217,
+ *              passed on to ipv6_get_rfc7217_iid,
+ *              from which the descriptions are also copied
+ */
+typedef struct {
+    /**
+     * @param[out] where to store the generated interface identifier
+     */
+    eui64_t *iid;
+    /**
+     * @param[in] pfx The prefix for which the IID is to be generated.
+     */
+    const ipv6_addr_t *pfx;
+    /**
+     * @param[in,out] dad_ctr ("DAD_Counter" in rfc7217)
+     */
+    uint8_t *dad_ctr;
+} netopt_ipv6_rfc7217_iid_data;
+#endif
 
 /**
  * @brief   Option parameter to be used with @ref NETOPT_RF_TESTMODE

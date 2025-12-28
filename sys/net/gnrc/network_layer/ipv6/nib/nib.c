@@ -190,7 +190,7 @@ void gnrc_ipv6_nib_iface_up(gnrc_netif_t *netif)
         DEBUG("nib: Can't join link-local all-nodes on interface %u\n", netif->pid);
     }
     _add_static_lladdr(netif);
-    _auto_configure_addr(netif, &ipv6_addr_link_local_prefix, 64U);
+    auto_configure_addr(netif, &ipv6_addr_link_local_prefix, 64U);
     if (_should_search_rtr(netif)) {
         uint32_t next_rs_time = random_uint32_range(0, NDP_MAX_RS_MS_DELAY);
 
@@ -1717,8 +1717,18 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
     DEBUG("     - Preferred lifetime: %" PRIu32 "\n",
           byteorder_ntohl(pio->pref_ltime));
 
-    if (pio->flags & NDP_OPT_PI_FLAGS_A) {
-        _auto_configure_addr(netif, &pio->prefix, pio->prefix_len);
+    if (pio->flags & NDP_OPT_PI_FLAGS_A
+        && pio->prefix_len == SLAAC_PREFIX_LENGTH
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+        && (gnrc_netif_ipv6_addr_pfx_idx(netif, &pio->prefix, pio->prefix_len) < 0)
+        /* if the prefix is already known,
+         * do not cause generation of a potentially different
+         * stable privacy address (keyword DAD_Counter).
+         * refer to https://datatracker.ietf.org/doc/html/rfc4862#section-5.5.3 d)
+         * */
+#endif
+        ) {
+        auto_configure_addr(netif, &pio->prefix, pio->prefix_len);
     }
     if ((pio->flags & (NDP_OPT_PI_FLAGS_A | NDP_OPT_PI_FLAGS_L))
         || _multihop_p6c(netif, abr)) {

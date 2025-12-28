@@ -49,6 +49,7 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+#include "../network_layer/ipv6/nib/_nib-slaac.h"
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif);
 static void _check_netdev_capabilities(netdev_t *dev, bool legacy);
@@ -269,8 +270,23 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             }
             break;
         case NETOPT_IPV6_IID:
-            assert(opt->data_len >= sizeof(eui64_t));
-            res = gnrc_netif_ipv6_get_iid(netif, opt->data);
+            switch ((int16_t)opt->context) {
+                case NETOPT_IPV6_IID_HWADDR:
+                    assert(opt->data_len >= sizeof(eui64_t));
+                    res = gnrc_netif_ipv6_get_iid(netif, opt->data);
+                    break;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+                case NETOPT_IPV6_IID_RFC7217:
+                    assert(opt->data_len == sizeof(netopt_ipv6_rfc7217_iid_data));
+                    netopt_ipv6_rfc7217_iid_data *data =
+                            (netopt_ipv6_rfc7217_iid_data *) opt->data;
+                    res = ipv6_get_rfc7217_iid_idempotent(
+                            data->iid, netif, data->pfx, data->dad_ctr);
+                    break;
+#endif
+                default:
+                    break;
+            }
             break;
         case NETOPT_MAX_PDU_SIZE:
             if (opt->context == GNRC_NETTYPE_IPV6) {
@@ -502,6 +518,9 @@ void gnrc_netif_release(gnrc_netif_t *netif)
 
 #if IS_USED(MODULE_GNRC_NETIF_IPV6)
 static int _addr_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr);
+static int _addr_pfx_idx(const gnrc_netif_t *netif,
+                                const ipv6_addr_t *pfx,
+                                uint8_t pfx_len);
 static int _group_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr);
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
@@ -730,6 +749,23 @@ int gnrc_netif_ipv6_addr_idx(gnrc_netif_t *netif,
     return idx;
 }
 
+int gnrc_netif_ipv6_addr_pfx_idx(gnrc_netif_t *netif,
+                                 const ipv6_addr_t *pfx, uint8_t pfx_len)
+{
+    int idx;
+
+    assert((netif != NULL) && (pfx != NULL));
+    DEBUG("gnrc_netif: get index of first address matching %s/%u"
+          " from interface %" PRIkernel_pid "\n",
+          ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)),
+          pfx_len,
+          netif->pid);
+    gnrc_netif_acquire(netif);
+    idx = _addr_pfx_idx(netif, pfx, pfx_len);
+    gnrc_netif_release(netif);
+    return idx;
+}
+
 int gnrc_netif_ipv6_addr_match(gnrc_netif_t *netif,
                                const ipv6_addr_t *addr)
 {
@@ -947,9 +983,33 @@ static int _idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr, bool mcast)
     return -1;
 }
 
+static int _pfx_idx(const gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint8_t pfx_len, bool mcast)
+{
+    /*same as function @ref _idx above, but with generalized condition*/
+    if (!ipv6_addr_is_unspecified(pfx)) {
+        const ipv6_addr_t *iplist = (mcast) ? netif->ipv6.groups :
+                                    netif->ipv6.addrs;
+        unsigned ipmax = (mcast) ? GNRC_NETIF_IPV6_GROUPS_NUMOF :
+                         CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF;
+        for (unsigned i = 0; i < ipmax; i++) {
+            if (ipv6_addr_match_prefix(&iplist[i], pfx) >= pfx_len) {
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+
 static inline int _addr_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr)
 {
     return _idx(netif, addr, false);
+}
+
+static inline int _addr_pfx_idx(const gnrc_netif_t *netif,
+                                const ipv6_addr_t *pfx,
+                                uint8_t pfx_len)
+{
+    return _pfx_idx(netif, pfx, pfx_len, false);
 }
 
 static inline int _group_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr)
@@ -1286,8 +1346,22 @@ int gnrc_netif_ipv6_add_prefix(gnrc_netif_t *netif,
     assert(netif != NULL);
     DEBUG("gnrc_netif: (re-)configure prefix %s/%d\n",
           ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)), pfx_len);
-    if (gnrc_netapi_get(netif->pid, NETOPT_IPV6_IID, 0, &iid,
-                        sizeof(eui64_t)) >= 0) {
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+    uint8_t dad_ctr = 0;
+    netopt_ipv6_rfc7217_iid_data data;
+    data.iid = &iid;
+    data.pfx = pfx;
+    data.dad_ctr = &dad_ctr;
+    /* no need to store dad_ctr with address (via flags)
+     * as it can't fail DAD, since already valid */
+#endif
+    if (gnrc_netapi_get(netif->pid, NETOPT_IPV6_IID,
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+                        NETOPT_IPV6_IID_RFC7217, &data, sizeof(data)
+#else
+                        NETOPT_IPV6_IID_HWADDR, &iid, sizeof(eui64_t)
+#endif
+                        ) >= 0) {
         ipv6_addr_set_aiid(&addr, iid.uint8);
     }
     else {
