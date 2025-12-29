@@ -25,6 +25,7 @@
 
 #include "ztimer.h"
 #include "lwip/netif.h"
+#include "lwip_utils.h"
 #include <arpa/inet.h>
 
 #ifndef CONFIG_CLIENT_TIMEOUT_SEC
@@ -132,8 +133,8 @@ void *server_thread(void *arg)
     return NULL;
 }
 
-#define _TEST_ADDR4_LOCAL  (0x0b64a8c0U)   /* 192.168.100.11 */
-#define _TEST_ADDR4_MASK   (0x00ffffffU)   /* 255.255.255.0 */
+#define _TEST_ADDR4_LOCAL  LWIP_IP4_ADDR_INIT(192, 168, 100, 11)
+#define _TEST_ADDR4_MASK   LWIP_IP4_ADDR_INIT(255, 255, 255, 0)
 
 int main(void)
 {
@@ -143,9 +144,8 @@ int main(void)
     struct netif *iface = netif_find("ET0");
 
 #ifndef MODULE_LWIP_DHCP_AUTO
-    ip4_addr_t ip, subnet;
-    ip.addr = _TEST_ADDR4_LOCAL;
-    subnet.addr = _TEST_ADDR4_MASK;
+    ip4_addr_t ip = _TEST_ADDR4_LOCAL;
+    ip4_addr_t subnet = _TEST_ADDR4_MASK;
     netif_set_addr(iface, &ip, &subnet, NULL);
 #else
     printf("Waiting for DHCP address autoconfiguration ...\n");
