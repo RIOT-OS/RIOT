@@ -56,7 +56,8 @@ typedef enum {
 typedef enum {
     PSA_CCM_AES_128,
     PSA_CCM_AES_192,
-    PSA_CCM_AES_256
+    PSA_CCM_AES_256,
+    PSA_CHACHA20_POLY1305
 } psa_aead_op_t;
 
 /**
@@ -271,8 +272,9 @@ typedef enum {
  * @return  @ref PSA_INVALID_OPERATION  @c alg, @c bits and @c type are not compatible
  */
 #define PSA_ENCODE_AEAD_OPERATION(alg, type, bits) \
-    ((PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_CCM) ? \
-        GET_AES_CCM_OPERATION(type, bits) : PSA_INVALID_OPERATION)
+    ((PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_CCM) ? GET_AES_CCM_OPERATION(type, bits) : \
+     (PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_CHACHA20_POLY1305) ? PSA_CHACHA20_POLY1305 : \
+     PSA_INVALID_OPERATION)
 
 #ifdef __cplusplus
 }
