@@ -63,10 +63,12 @@ psa_status_t psa_cipher_chacha20_set_iv(psa_cipher_chacha20_ctx_t *ctx,
     /* See PSA Specification */
     switch (iv_length) {
         case 8:
-            /* IoT-TODO: Chacha20 implementation only handles 12byte nonce */
             /* 8 bytes: the cipher operation uses the original [CHACHA20] definition
             of ChaCha20: the provided IV is used as the 64-bit nonce, and the 64-bit
-            counter value is set to zero. */
+            counter value is set to zero.
+            This is currently not supported, as the current implementation only handles
+            12-byte nonces. To change this, you would need to modify chacha20_ctx_t
+            and functions that are using this type. */
             status = PSA_ERROR_NOT_SUPPORTED;
             break;
         case 12:

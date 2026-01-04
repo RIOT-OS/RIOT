@@ -112,7 +112,6 @@ psa_status_t psa_cipher_chacha20_set_iv(psa_cipher_chacha20_ctx_t *ctx,
     return status;
 }
 
-/* IoT-ToDo: multipart might be wrong */
 psa_status_t psa_cipher_chacha20_update(psa_cipher_chacha20_ctx_t *ctx,
                                         const uint8_t *input,
                                         size_t input_length,
@@ -156,7 +155,8 @@ psa_status_t psa_cipher_chacha20_update(psa_cipher_chacha20_ctx_t *ctx,
         CRYS_CHACHA_BLOCK_SIZE_IN_BYTES) * CRYS_CHACHA_BLOCK_SIZE_IN_BYTES;
     /* xcrypt full blocks */
 
-    /* IoT-TODO: if blocks_length == 0: CRYS_CHACHA_Block returns PSA_INVALID_ARGUMENT (CRYS_CHACHA_DATA_IN_SIZE_ILLEGAL) */
+    /* Check if there is at least 1 full block to xcrypt.
+        if blocks_length == 0: CRYS_CHACHA_Block returns PSA_INVALID_ARGUMENT (CRYS_CHACHA_DATA_IN_SIZE_ILLEGAL) */
     if(blocks_length > 0) {
         periph_status = CRYS_CHACHA_Block(  &ctx->ctx.post_setup,
                                         (uint8_t *)&input[input_index],
