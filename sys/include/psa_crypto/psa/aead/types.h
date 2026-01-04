@@ -25,13 +25,24 @@
 extern "C" {
 #endif
 
+#include "psa/algorithm.h"
+#include "psa/cipher/types.h"
 /**
  * @brief   Structure storing an AEAD operation context
  *
  * @note    Not implemented, yet
  */
 struct psa_aead_operation_s {
-    int dummy;  /**< Not implemented, yet */
+    uint8_t nonce_set : 1;        /**< True if Nonce was already set */
+    uint8_t nonce_required : 1;   /**< True if IV was already set */
+    uint8_t default_nonce_length; /**< Default IV length for algorithm */
+    psa_algorithm_t alg;          /**< Operation algorithm*/
+    /** Union containing AEAD cipher contexts for the executing backend */
+    union aead_cipher_context {
+        psa_cipher_context_t cipher_ctx; /**< Cipher context */
+    } backend_ctx;
+
+    int dummy; /**< Not implemented, yet */
 };
 
 /* These are all temporarily defined as some numeric type to prevent errors at compile time.*/
@@ -71,7 +82,10 @@ typedef struct psa_aead_operation_s psa_aead_operation_t;
  * @brief   This macro returns a suitable initializer for an AEAD operation object of type
  *          @ref psa_aead_operation_t.
  */
-#define PSA_AEAD_OPERATION_INIT { 0 }
+#define PSA_AEAD_OPERATION_INIT \
+    {                           \
+        0                       \
+    }
 
 /**
  * @brief   Return an initial value for an AEAD operation object.
