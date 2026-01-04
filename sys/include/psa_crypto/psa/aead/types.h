@@ -36,6 +36,9 @@ struct psa_aead_operation_s {
     uint8_t nonce_set : 1;        /**< True if Nonce was already set */
     uint8_t nonce_required : 1;   /**< True if IV was already set */
     uint8_t default_nonce_length; /**< Default IV length for algorithm */
+    uint8_t lengths_set : 1;      /**< True if lengths were already set */
+    size_t ad_length;             /**< Length of additional data */
+    size_t message_length;        /**< Length of message data */
     psa_algorithm_t alg;          /**< Operation algorithm*/
     /** Union containing AEAD cipher contexts for the executing backend */
     union aead_cipher_context {

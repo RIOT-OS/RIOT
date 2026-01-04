@@ -405,10 +405,23 @@ psa_status_t psa_aead_set_lengths(psa_aead_operation_t *operation,
                                   size_t ad_length,
                                   size_t plaintext_length)
 {
-    (void)operation;
-    (void)ad_length;
-    (void)plaintext_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    if (!lib_initialized || operation->nonce_set) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    // return PSA_ERROR_INVALID_ARGUMENT if ad_length or plaintext_length are too large for the chosen algorithm.
+
+    // return PSA_ERROR_NOT_SUPPORTED if ad_length or plaintext_length are too large for the implementation.
+
+    operation->message_length = plaintext_length;
+    operation->ad_length = ad_length;
+    operation->lengths_set = 1;
+
+    return PSA_SUCCESS;
 }
 
 /* IoT-TODO */

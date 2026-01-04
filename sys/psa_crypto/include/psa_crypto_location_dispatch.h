@@ -227,6 +227,12 @@ psa_status_t psa_location_dispatch_cipher_decrypt(  const psa_key_attributes_t *
 #endif /* MODULE_PSA_CIPHER */
 
 #if IS_USED(MODULE_PSA_AEAD)
+// IoT-ToDo: add documentation
+psa_status_t psa_location_dispatch_aead_encrypt_setup( psa_aead_operation_t *operation,
+                                                        const psa_key_attributes_t *attributes,
+                                                        const psa_key_slot_t *slot,
+                                                        psa_algorithm_t alg);
+
 /**
  * @brief   Dispatch a aead encrypt function to a specific backend.
  *          See @ref psa_aead_encrypt()
