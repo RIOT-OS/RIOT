@@ -381,6 +381,12 @@ psa_status_t psa_aead_generate_nonce(psa_aead_operation_t *operation,
         return PSA_ERROR_BAD_STATE;
     }
 
+    /* CCM algorithm requires psa_aead_set_lengths() to be called
+        before psa_aead_generate_nonce() or psa_aead_set_nonce(). */
+    if (operation->alg == PSA_ALG_CCM && !operation->lengths_set) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
     if (nonce_size > PSA_AEAD_NONCE_MAX_SIZE) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
@@ -439,6 +445,12 @@ psa_status_t psa_aead_set_nonce(psa_aead_operation_t *operation,
     }
 
     if (operation->nonce_set) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    /* CCM algorithm requires psa_aead_set_lengths() to be called
+        before psa_aead_generate_nonce() or psa_aead_set_nonce(). */
+    if (operation->alg == PSA_ALG_CCM && !operation->lengths_set) {
         return PSA_ERROR_BAD_STATE;
     }
 
