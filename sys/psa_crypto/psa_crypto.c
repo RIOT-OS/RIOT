@@ -387,14 +387,13 @@ psa_status_t psa_aead_generate_nonce(psa_aead_operation_t *operation,
 
     *nonce_length = 0;
 
-    /* set the nonce in the operation 
-    status = ...
-    */
-
+    // IoT-ToDo: generate random nonce
+    status = psa_generate_random(nonce, nonce_size);
     if (status != PSA_SUCCESS) {
         return status;
     }
 
+    *nonce_length = nonce_size;
     operation->nonce_set = 1;
 
     return status;
