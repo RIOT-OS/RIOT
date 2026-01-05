@@ -512,6 +512,13 @@ groups:
             Enabling this feature reduces read latency for an increase in power
             consumption. It affects both the classic GPIO API driver and the
             GPIO LL driver.
+    - name: periph_gpio_read_output
+      help: This feature is currently implemented on Microchip SAM0 based MCUs only.
+            Enabling this feature makes `gpio_read()` read back the actual pin level
+            of an output GPIO (instead of just returning the configured level).
+            This can be used to detect hardware problems (e.g. if a pin is set HIGH but
+            reads low).
+            The feature comes at the cost of slightly higher power consumption.
 
     groups:
     - title: Pin Level Peripheral GPIO API
