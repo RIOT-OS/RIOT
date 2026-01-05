@@ -68,7 +68,12 @@ VFS_AUTO_MOUNT(lwext4, VFS_MTD(mtd0_dev), VFS_DEFAULT_NVM(0), 0);
 
 /* host fs pass-through */
 #elif defined(MODULE_FS_NATIVE)
-VFS_AUTO_MOUNT(native, { .hostpath = FS_NATIVE_DIR }, VFS_DEFAULT_NVM(0), 0);
+
+#ifndef FS_NATIVE_MOUNT
+#define FS_NATIVE_MOUNT  VFS_DEFAULT_NVM(0)
+#endif
+
+VFS_AUTO_MOUNT(native, { .hostpath = FS_NATIVE_DIR }, FS_NATIVE_MOUNT, 0);
 
 #endif
 #endif /* MODULE_VFS_DEFAULT */
