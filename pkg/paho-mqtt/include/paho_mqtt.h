@@ -111,6 +111,7 @@ typedef struct Network {
      * @brief write internal function
      */
     int (*mqttwrite) (struct Network*, unsigned char*, int, int);
+    void* app_context;
 } Network;
 
 /**
