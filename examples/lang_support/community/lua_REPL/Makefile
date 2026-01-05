@@ -13,7 +13,7 @@ DEVELHELP ?= 1
 
 # Uncomment the following lines to enable debugging features.
 #CFLAGS_OPT = -Og
-#CFLAGS += -DDEBUG_ASSERT_VERBOSE -DLUA_DEBUG
+#CFLAGS += -DCONFIG_ASSERT_VERBOSE -DLUA_DEBUG
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
