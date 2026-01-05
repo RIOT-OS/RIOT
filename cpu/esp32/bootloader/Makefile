@@ -212,7 +212,6 @@ endif
 
 # Bootloader sdkconfig.h defined in CURDIR directory.
 INCLUDES = \
-  -I$(dir $(RIOTBUILD_CONFIG_HEADER_C)) \
   -I$(CURDIR) \
   -I$(ESP32_SDK_DIR)/components \
   -I$(ESP32_SDK_DIR)/components/bootloader/subproject/components/micro-ecc \
@@ -255,7 +254,7 @@ INCLUDES = \
 
 # include CFLAGS from cpu/esp_common/Makefile.include including the defines of
 # CONFIG_ESPTOOLPY_FLASHFREQ_* and CONFIG_FLASHMODE_*
-CFLAGS = -include '$(RIOTBUILD_CONFIG_HEADER_C)' \
+CFLAGS = $(ESPFLASH_CFLAGS)
 
 # TODO: required to be able to compile with GCC 12.1, remove them after upgrade to ESP-IDF 5.1
 CFLAGS += -Wno-error=format=
