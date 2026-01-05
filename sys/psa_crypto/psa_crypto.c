@@ -305,6 +305,8 @@ psa_status_t psa_aead_encrypt_setup(psa_aead_operation_t *operation,
     psa_key_slot_t *slot;
     psa_key_usage_t usage = PSA_KEY_USAGE_ENCRYPT;
 
+    /* IoT: set key in op*/
+
     if (!lib_initialized) {
         return PSA_ERROR_BAD_STATE;
     }
@@ -387,6 +389,7 @@ psa_status_t psa_aead_generate_nonce(psa_aead_operation_t *operation,
         return PSA_ERROR_BAD_STATE;
     }
 
+    /* IoT-Todo: change to proper if statement -> see function documentation */
     if (nonce_size > PSA_AEAD_NONCE_MAX_SIZE) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
@@ -458,7 +461,7 @@ psa_status_t psa_aead_set_nonce(psa_aead_operation_t *operation,
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
-    /* set the nonce in the operation 
+    /* IoT-Todo set the nonce in the operation 
     status = 
     */
     if (status != PSA_SUCCESS) {
