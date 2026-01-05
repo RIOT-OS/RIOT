@@ -35,6 +35,13 @@ typedef struct {
     riotboot_flashwrite_t writer; /**< Riotboot flashwriter */
 } suit_storage_flashwrite_t;
 
+/**
+ * @brief   Use the sequence number from the SUIT manifest in the riotboot header
+ */
+#ifndef CONFIG_SUIT_STORAGE_FLASHWRITE_SEQ_FROM_MANIFEST
+#define CONFIG_SUIT_STORAGE_FLASHWRITE_SEQ_FROM_MANIFEST    0
+#endif
+
 #ifdef __cplusplus
 }
 #endif
