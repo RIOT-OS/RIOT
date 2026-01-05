@@ -303,30 +303,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
         netdev_rx_info->lqi = rx_info.lqi;
     }
-#if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC_SOFT_ACK)
-    const uint8_t *mhr = buf;
-    if ((mhr[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_DATA &&
-        (mhr[0] & IEEE802154_FCF_ACK_REQ)) {
-        ieee802154_filter_mode_t mode;
-        if (!ieee802154_radio_has_capability(&submac->dev, IEEE802154_CAP_AUTO_ACK) &&
-            (ieee802154_radio_get_frame_filter_mode(&submac->dev, &mode) < 0
-                || mode == IEEE802154_FILTER_ACCEPT)) {
-            /* send ACK if not handled by the driver and not in promiscuous mode */
-            uint8_t ack[IEEE802154_ACK_FRAME_LEN - IEEE802154_FCS_LEN]
-                = { IEEE802154_FCF_TYPE_ACK, 0x00, ieee802154_get_seq(mhr) };
-            iolist_t io = {
-                .iol_base = ack,
-                .iol_len = sizeof(ack),
-                .iol_next = NULL
-            };
-            DEBUG("IEEE802154 submac: Sending ACK\n");
-            int snd = _send(netdev, &io);
-            if (snd < 0) {
-                DEBUG("IEEE802154 submac: failed to send ACK (%d)\n", snd);
-            }
-        }
-    }
-#endif
+
     return res;
 }
 
