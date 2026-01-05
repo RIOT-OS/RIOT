@@ -550,7 +550,7 @@ $ dist/tools/esptools/install.sh
 Usage: install.sh <tool>
        install.sh gdb <platform>
        install.sh qemu <platform>
-<tool> = all | esptool | gdb | openocd | qemu |
+<tool> = all | gdb | openocd | qemu |
          esp8266 | esp32 | esp32c3 | esp32h2 | esp32s2 | esp32s3
 <platform> = xtensa | riscv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
