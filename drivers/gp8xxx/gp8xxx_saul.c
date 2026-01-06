@@ -49,7 +49,7 @@ static int set_voltage(const void *dev, const phydat_t *data)
     /* write voltage*/
     int res = gp8xxx_set_voltage(saul_dev->dev, saul_dev->channel, value);
 
-    if (res != GP8XXX_OK) {
+    if (res != 0) {
         return -ECANCELED;
     }
 
@@ -70,7 +70,7 @@ static int set_current(const void *dev, const phydat_t *data)
     /* write current */
     int res = gp8xxx_set_current(saul_dev->dev, saul_dev->channel, value);
 
-    if (res != GP8XXX_OK) {
+    if (res != 0) {
         return -ECANCELED;
     }
 

@@ -10,7 +10,7 @@
  * @{
  *
  * @file
- * @brief       Actuator information of Guestgood GP8xxx I2C DACs
+ * @brief       Definitions of the Guestgood GP8xxx I2C DACs
  *
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   GP8xxx actuator information
+ * @name    GP8xxx DAC information
  * @{
  */
 #define GP8XXX_INFO_TYPE_VDAC           (0)         /**< VDAC type */
@@ -40,63 +40,63 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   GP8503 info
+ * @name    GP8503 info
  * @{
  */
-#define GP8503_INFO_TYPE                GP8XXX_INFO_TYPE_VDAC
-#define GP8503_INFO_CHANNELS            GP8XXX_INFO_CHANNELS_DUAL
-#define GP8503_INFO_RANGE               GP8XXX_INFO_RANGE_2V5_VCC
-#define GP8503_INFO_RESOLUTION          GP8XXX_INFO_RESOLUTION_12_BIT
+#define GP8503_INFO_TYPE                GP8XXX_INFO_TYPE_VDAC           /**< DAC type */
+#define GP8503_INFO_CHANNELS            GP8XXX_INFO_CHANNELS_DUAL       /**< Number of channels */
+#define GP8503_INFO_RANGE               GP8XXX_INFO_RANGE_2V5_VCC       /**< Output range */
+#define GP8503_INFO_RESOLUTION          GP8XXX_INFO_RESOLUTION_12_BIT   /**< Output resolution */
 /** @} */
 
 /**
- * @brief   GP8512 info
+ * @name    GP8512 info
  * @{
  */
-#define GP8512_INFO_TYPE                GP8XXX_INFO_TYPE_VDAC
-#define GP8512_INFO_CHANNELS            GP8XXX_INFO_CHANNELS_SINGLE
-#define GP8512_INFO_RANGE               GP8XXX_INFO_RANGE_2V5_VCC
-#define GP8512_INFO_RESOLUTION          GP8XXX_INFO_RESOLUTION_15_BIT
+#define GP8512_INFO_TYPE                GP8XXX_INFO_TYPE_VDAC           /**< DAC type */
+#define GP8512_INFO_CHANNELS            GP8XXX_INFO_CHANNELS_SINGLE     /**< Number of channels */
+#define GP8512_INFO_RANGE               GP8XXX_INFO_RANGE_2V5_VCC       /**< Output range */
+#define GP8512_INFO_RESOLUTION          GP8XXX_INFO_RESOLUTION_15_BIT   /**< Output resolution */
 /** @} */
 
 /**
- * @brief   GP8211S info
+ * @name    GP8211S info
  * @{
  */
-#define GP8211S_INFO_TYPE               GP8XXX_INFO_TYPE_VDAC
-#define GP8211S_INFO_CHANNELS           GP8XXX_INFO_CHANNELS_SINGLE
-#define GP8211S_INFO_RANGE              GP8XXX_INFO_RANGE_5V_10V
-#define GP8211S_INFO_RESOLUTION         GP8XXX_INFO_RESOLUTION_15_BIT
+#define GP8211S_INFO_TYPE               GP8XXX_INFO_TYPE_VDAC           /**< DAC type */
+#define GP8211S_INFO_CHANNELS           GP8XXX_INFO_CHANNELS_SINGLE     /**< Number of channels */
+#define GP8211S_INFO_RANGE              GP8XXX_INFO_RANGE_5V_10V        /**< Output range */
+#define GP8211S_INFO_RESOLUTION         GP8XXX_INFO_RESOLUTION_15_BIT   /**< Output resolution */
 /** @} */
 
 /**
- * @brief   GP8403 info
+ * @name    GP8403 info
  * @{
  */
-#define GP8403_INFO_TYPE                GP8XXX_INFO_TYPE_VDAC
-#define GP8403_INFO_CHANNELS            GP8XXX_INFO_CHANNELS_DUAL
-#define GP8403_INFO_RANGE               GP8XXX_INFO_RANGE_5V_10V
-#define GP8403_INFO_RESOLUTION          GP8XXX_INFO_RESOLUTION_12_BIT
+#define GP8403_INFO_TYPE                GP8XXX_INFO_TYPE_VDAC           /**< DAC type */
+#define GP8403_INFO_CHANNELS            GP8XXX_INFO_CHANNELS_DUAL       /**< Number of channels */
+#define GP8403_INFO_RANGE               GP8XXX_INFO_RANGE_5V_10V        /**< Output range */
+#define GP8403_INFO_RESOLUTION          GP8XXX_INFO_RESOLUTION_12_BIT   /**< Output resolution */
 /** @} */
 
 /**
- * @brief   GP8413 info
+ * @name    GP8413 info
  * @{
  */
-#define GP8413_INFO_TYPE                GP8XXX_INFO_TYPE_VDAC
-#define GP8413_INFO_CHANNELS            GP8XXX_INFO_CHANNELS_DUAL
-#define GP8413_INFO_RANGE               GP8XXX_INFO_RANGE_5V_10V
-#define GP8413_INFO_RESOLUTION          GP8XXX_INFO_RESOLUTION_15_BIT
+#define GP8413_INFO_TYPE                GP8XXX_INFO_TYPE_VDAC           /**< DAC type */
+#define GP8413_INFO_CHANNELS            GP8XXX_INFO_CHANNELS_DUAL       /**< Number of channels */
+#define GP8413_INFO_RANGE               GP8XXX_INFO_RANGE_5V_10V        /**< Output range */
+#define GP8413_INFO_RESOLUTION          GP8XXX_INFO_RESOLUTION_15_BIT   /**< Output resolution */
 /** @} */
 
 /**
- * @brief   GP8302 info
+ * @name    GP8302 info
  * @{
  */
-#define GP8302_INFO_TYPE                GP8XXX_INFO_TYPE_IDAC
-#define GP8302_INFO_CHANNELS            GP8XXX_INFO_CHANNELS_SINGLE
-#define GP8302_INFO_RANGE               GP8XXX_INFO_RANGE_4MA_20MA
-#define GP8302_INFO_RESOLUTION          GP8XXX_INFO_RESOLUTION_12_BIT
+#define GP8302_INFO_TYPE                GP8XXX_INFO_TYPE_IDAC           /**< DAC type */
+#define GP8302_INFO_CHANNELS            GP8XXX_INFO_CHANNELS_SINGLE     /**< Number of channels */
+#define GP8302_INFO_RANGE               GP8XXX_INFO_RANGE_4MA_20MA      /**< Output range */
+#define GP8302_INFO_RESOLUTION          GP8XXX_INFO_RESOLUTION_12_BIT   /**< Output resolution */
 /** @} */
 
 /**

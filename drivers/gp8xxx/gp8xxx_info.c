@@ -8,7 +8,7 @@
  * @{
  *
  * @file
- * @brief       Actuator information of Guestgood GP8xxx I2C DACs
+ * @brief       Definitions of the Guestgood GP8xxx I2C DACs
  *
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  *

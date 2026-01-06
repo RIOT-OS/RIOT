@@ -16,6 +16,7 @@
  */
 
 #include <assert.h>
+#include <errno.h>
 #include <string.h>
 
 #include "gp8xxx.h"
@@ -29,7 +30,7 @@
 #define GP8XXX_ADDR     (dev->params.address)
 
 #if GP8XXX_HAS_VDAC
-#define GP8XXX_RANGE    (dev->params.range)
+#  define GP8XXX_RANGE    (dev->params.range)
 #endif
 
 int gp8xxx_init(gp8xxx_t *dev, const gp8xxx_params_t *params)
@@ -44,7 +45,7 @@ int gp8xxx_init(gp8xxx_t *dev, const gp8xxx_params_t *params)
     if (i2c_write_byte(GP8XXX_I2C, GP8XXX_ADDR, 0, 0) != 0) {
         DEBUG("[gp8xxx] gp8xxx_init: init failed\n");
         i2c_release(GP8XXX_I2C);
-        return GP8XXX_ERR_NODEV;
+        return -ENODEV;
     }
 
     i2c_release(GP8XXX_I2C);
@@ -63,7 +64,7 @@ int gp8xxx_init(gp8xxx_t *dev, const gp8xxx_params_t *params)
     }
 #endif
 
-    return GP8XXX_OK;
+    return 0;
 }
 
 int gp8xxx_set_dac(gp8xxx_t *dev, gp8xxx_channel_t channel, uint16_t value)
@@ -97,12 +98,12 @@ int gp8xxx_set_dac(gp8xxx_t *dev, gp8xxx_channel_t channel, uint16_t value)
     if (i2c_write_bytes(GP8XXX_I2C, GP8XXX_ADDR, &out, size, 0) != 0) {
         DEBUG("[gp8xxx] gp8xxx_set_dac: set raw value failed\n");
         i2c_release(GP8XXX_I2C);
-        return GP8XXX_ERR_I2C;
+        return -EIO;
     }
 
     i2c_release(GP8XXX_I2C);
 
-    return GP8XXX_OK;
+    return 0;
 }
 
 #if GP8XXX_HAS_VDAC
@@ -122,15 +123,15 @@ int gp8xxx_set_voltage_range(gp8xxx_t *dev, gp8xxx_output_range_t range)
             value = 0x11;
             break;
         default:
-            return GP8XXX_ERR_RANGE;
+            return -ERANGE;
         }
 
         i2c_acquire(GP8XXX_I2C);
 
-        if (i2c_write_reg(GP8XXX_I2C, GP8XXX_ADDR, GP8XXX_REG_OUTPUT, value, 0) != 0) {
-            DEBUG("[ERROR] Cannot set voltage range.\n");
+        if (i2c_write_reg(GP8XXX_I2C, GP8XXX_ADDR, GP8XXX_REG_OUTPUT_RANGE, value, 0) != 0) {
+            DEBUG("[gp8xxx] gp8xxx_set_voltage_range: cannot set voltage range\n");
             i2c_release(GP8XXX_I2C);
-            return GP8XXX_ERR_I2C;
+            return -EIO;
         }
 
         i2c_release(GP8XXX_I2C);
@@ -139,7 +140,7 @@ int gp8xxx_set_voltage_range(gp8xxx_t *dev, gp8xxx_output_range_t range)
     /* store range for calculation purposes */
     dev->range = range;
 
-    return GP8XXX_OK;
+    return 0;
 }
 
 int gp8xxx_set_voltage(gp8xxx_t *dev, gp8xxx_channel_t channel, uint16_t voltage)
@@ -148,7 +149,7 @@ int gp8xxx_set_voltage(gp8xxx_t *dev, gp8xxx_channel_t channel, uint16_t voltage
 
     if (voltage > dev->range) {
         DEBUG("[gp8xxx] gp8xxx_set_voltage: voltage out of range\n");
-        return GP8XXX_ERR_RANGE;
+        return -ERANGE;
     }
 
     uint32_t value = ((uint32_t)voltage * (dev->params.info->resolution - 1) + (dev->range / 2)) /
@@ -163,7 +164,9 @@ void gp8xxx_set_current_calibration(gp8xxx_t *dev, uint16_t calibration_4ma,
                                     uint16_t calibration_20ma)
 {
     assert(dev->params.info->type == GP8XXX_INFO_TYPE_IDAC);
-    assert((calibration_4ma == 0 && calibration_20ma == 0) || calibration_4ma < calibration_20ma);
+    assert((calibration_4ma == 0 && calibration_20ma == 0) ||
+           (calibration_4ma < calibration_20ma && calibration_4ma < dev->params.info->resolution &&
+            calibration_20ma <= dev->params.info->resolution));
 
     dev->calibration_4ma = calibration_4ma;
     dev->calibration_20ma = calibration_20ma;
@@ -176,7 +179,7 @@ int gp8xxx_set_current(gp8xxx_t *dev, gp8xxx_channel_t channel, uint16_t current
     /* ensure current is within configured range */
     if (current > dev->range) {
         DEBUG("[gp8xxx] gp8xxx_set_current: current out of range\n");
-        return GP8XXX_ERR_RANGE;
+        return -ERANGE;
     }
 
     /* compute ADC value based on either calibration data or configured range */

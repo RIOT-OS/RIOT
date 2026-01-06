@@ -64,7 +64,7 @@ void auto_init_gp8xxx(void)
     for (unsigned i = 0; i < GP8XXX_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing GP8XXX #%u\n", i);
 
-        if (gp8xxx_init(&gp8xxx_devs[i], &gp8xxx_params[i]) != GP8XXX_OK) {
+        if (gp8xxx_init(&gp8xxx_devs[i], &gp8xxx_params[i]) != 0) {
             LOG_ERROR("[auto_init_saul] error initializing GP8XXX #%i\n", i);
             continue;
         }

@@ -23,8 +23,8 @@ extern "C" {
  * @name GP8xxx registers
  * @{
  */
-#define GP8XXX_REG_OUTPUT           (0x01)
-#define GP8XXX_REG_CHANNEL          (0x02)
+#define GP8XXX_REG_OUTPUT_RANGE     (0x01)  /**< Register for output range */
+#define GP8XXX_REG_CHANNEL          (0x02)  /**< Register for channel selection */
 /** @} */
 
 #ifdef __cplusplus

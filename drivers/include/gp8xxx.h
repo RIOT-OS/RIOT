@@ -13,9 +13,9 @@
  *
  * The Guestgood GP8xxx I2C DACs are a series of digital-to-analog voltage
  * (VDAC) and current (IDAC) converters. The driver supports a range of
- * actuators, each with different number of channels and output ranges.
+ * converters, each with different number of channels and output ranges.
  *
- * The supported actuators are:
+ * The supported DACs are:
  *
  * * GP8503: 2-channel 12-bit VDAC with 0-2.5/VCC V output range
  * * GP8512: 1-channel 15-bit VDAC with 0-2.5/VCC V output range
@@ -24,8 +24,8 @@
  * * GP8413: 2-channel 15-bit VDAC with 0-5/10 V output range
  * * GP8302: 1-channel 12-bit IDAC with 0-25 mA output range
  *
- * Storing output settings is not supported by this driver, because the driver
- * will always initialize to a known state.
+ * Storing the output settings into internal memory is not supported by this
+ * driver, because the driver will always initialize to a known state.
  *
  * This driver provides @ref drivers_saul capabilities.
  *
@@ -48,26 +48,16 @@ extern "C" {
  * @brief Compile time macros to enable/disable features
  *
  * VDAC or IDAC support is only enabled if a module is selected that supports
- * it. A Minor code size increase is expected when both a VDAC and IDAC module
+ * it. A minor code size increase is expected when both a VDAC and IDAC module
  * are selected.
  */
 #if MODULE_GP8503 || MODULE_GP8512 || MODULE_GP8403 || MODULE_GP8413 || \
     MODULE_GP8211S
-#define GP8XXX_HAS_VDAC 1
+#  define GP8XXX_HAS_VDAC 1
 #endif
 #if MODULE_GP8302
-#define GP8XXX_HAS_IDAC 1
+#  define GP8XXX_HAS_IDAC 1
 #endif
-
-/**
- * @brief   Driver return codes
- */
-enum {
-    GP8XXX_OK,                  /**< All OK */
-    GP8XXX_ERR_NODEV,           /**< No valid device found on I2C bus */
-    GP8XXX_ERR_I2C,             /**< An error occurred when reading/writing on I2C bus */
-    GP8XXX_ERR_RANGE,           /**< Value out of range */
-};
 
 /**
  * @brief   Channel values
@@ -93,8 +83,8 @@ typedef enum {
  * @brief   Device initialization parameters
  */
 typedef struct {
-    i2c_t i2c_dev;                  /**< I2C bus the actuator is connected to */
-    uint8_t address;                /**< actuator address */
+    i2c_t i2c_dev;                  /**< I2C bus the converter is connected to */
+    uint8_t address;                /**< converter address */
 #if GP8XXX_HAS_VDAC || DOXYGEN
     gp8xxx_output_range_t range;    /**< default output range */
 #endif /* GP8XXX_HAS_VDAC || DOXYGEN */
@@ -141,8 +131,8 @@ typedef struct {
  * @param[in,out] dev       Device descriptor of the driver
  * @param[in]     params    Initialization parameters
  *
- * @return                  GP8XXX_OK on success
- * @return                  GP8XXX_ERR_NODEV if no device is found
+ * @retval                  0 on success
+ * @retval                  -ENODEV if no device is found
  */
 int gp8xxx_init(gp8xxx_t *dev, const gp8xxx_params_t *params);
 
@@ -153,9 +143,9 @@ int gp8xxx_init(gp8xxx_t *dev, const gp8xxx_params_t *params);
  * @param[in] channel       Channel to set
  * @param[in] value         Value to set (between 0 and maximum resolution)
  *
- * @return                  GP8XXX_OK on success
- * @return                  GP8XXX_ERR_RANGE if value is out of range
- * @return                  GP8XXX_ERR_I2C on I2C error
+ * @retval                  0 on success
+ * @retval                  -ERANGE if value is out of range
+ * @retval                  -EIO on I2C error
  */
 int gp8xxx_set_dac(gp8xxx_t *dev, gp8xxx_channel_t channel, uint16_t value);
 
@@ -166,8 +156,8 @@ int gp8xxx_set_dac(gp8xxx_t *dev, gp8xxx_channel_t channel, uint16_t value);
  * @param[in] dev           Device descriptor of the driver
  * @param[in] value         Output range to set
  *
- * @return                  GP8XXX_OK on success
- * @return                  GP8XXX_ERR_I2C on I2C error
+ * @retval                  0 on success
+ * @retval                  -EIO on I2C error
  */
 int gp8xxx_set_voltage_range(gp8xxx_t *dev, gp8xxx_output_range_t value);
 
@@ -178,9 +168,9 @@ int gp8xxx_set_voltage_range(gp8xxx_t *dev, gp8xxx_output_range_t value);
  * @param[in] channel       Channel to set
  * @param[in] voltage       Voltage to set (in mV)
  *
- * @return                  GP8XXX_OK on success
- * @return                  GP8XXX_ERR_RANGE if value is out of range
- * @return                  GP8XXX_ERR_I2C on I2C error
+ * @retval                  0 on success
+ * @retval                  -ERANGE if value is out of range
+ * @retval                  -EIO on I2C error
  */
 int gp8xxx_set_voltage(gp8xxx_t *dev, gp8xxx_channel_t channel, uint16_t voltage);
 #endif /* GP8XXX_HAS_VDAC || DOXYGEN */
@@ -192,6 +182,9 @@ int gp8xxx_set_voltage(gp8xxx_t *dev, gp8xxx_channel_t channel, uint16_t voltage
  * When both calibration values are set, the driver can more precisely set the
  * current between 4 mA and 20 mA. If both values are set to 0, the driver will
  * default to a linear interpolation between 4 mA and 20 mA.
+ *
+ * The value of @p calibration_4ma must be smaller than @p calibration_20ma
+ * and both values must be between 0 and the maximum resolution of the DAC.
  *
  * @param[in] dev                   Device descriptor of the driver
  * @param[in] calibration_4ma       ADC value for 4 mA
@@ -207,9 +200,9 @@ void gp8xxx_set_current_calibration(gp8xxx_t *dev, uint16_t calibration_4ma,
  * @param[in] channel       Channel to set
  * @param[in] current       Current to set (in uA)
  *
- * @return                  GP8XXX_OK on success
- * @return                  GP8XXX_ERR_RANGE if value is out of range
- * @return                  GP8XXX_ERR_I2C on I2C error
+ * @retval                  0 on success
+ * @retval                  -ERANGE if value is out of range
+ * @retval                  -EIO on I2C error
  */
 int gp8xxx_set_current(gp8xxx_t *dev, gp8xxx_channel_t channel, uint16_t current);
 #endif /* GP8XXX_HAS_IDAC || DOXYGEN */
