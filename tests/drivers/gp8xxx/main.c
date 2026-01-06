@@ -56,7 +56,7 @@ static int _info(int argc, char **argv)
         }
 
         if (info->type == GP8XXX_INFO_TYPE_VDAC) {
-            printf("Current range: 0 - %d mV\n", dev->range);
+            printf("Voltage range: 0 - %d mV\n", dev->range);
         }
         else if (info->type == GP8XXX_INFO_TYPE_IDAC) {
             printf("Current range: 0 - %d uA\n", dev->range);
@@ -137,7 +137,7 @@ static int _set_current(int argc, char **argv)
 
     int res = gp8xxx_set_current(&gp8xxx_devs[dev], channel, current);
 
-    if (res != GP8XXX_OK) {
+    if (res != 0) {
         printf("Failed to set current (%d).\n", res);
         return 1;
     }
@@ -174,7 +174,7 @@ static int _set_dac(int argc, char **argv)
 
     int res = gp8xxx_set_dac(&gp8xxx_devs[dev], channel, value);
 
-    if (res != GP8XXX_OK) {
+    if (res != 0) {
         printf("Failed to set DAC (%d).\n", res);
         return 1;
     }
@@ -211,7 +211,7 @@ static int _set_voltage(int argc, char **argv)
 
     int res = gp8xxx_set_voltage(&gp8xxx_devs[dev], channel, voltage);
 
-    if (res != GP8XXX_OK) {
+    if (res != 0) {
         printf("Failed to set voltage (%d).\n", res);
         return 1;
     }
@@ -246,7 +246,7 @@ static int _set_range(int argc, char **argv)
 
     int res = gp8xxx_set_voltage_range(&gp8xxx_devs[dev], range);
 
-    if (res != GP8XXX_OK) {
+    if (res != 0) {
         printf("Failed to set range (%d).\n", res);
         return 1;
     }
@@ -275,7 +275,7 @@ static int _sweep(int argc, char **argv)
     printf("Sweeping channel(s) from 0 - %d.\n", resolution);
 
     for (uint16_t i = 0; i < resolution; i++) {
-        if (gp8xxx_set_dac(&gp8xxx_devs[dev], GP8XXX_CHANNEL_ALL, i) != GP8XXX_OK) {
+        if (gp8xxx_set_dac(&gp8xxx_devs[dev], GP8XXX_CHANNEL_ALL, i) != 0) {
             printf("Sweep failed at value %d.\n", i);
             return 1;
         }
@@ -289,7 +289,7 @@ static int _sweep(int argc, char **argv)
 }
 
 static const shell_command_t shell_commands[] = {
-    { "info", "Print actuators info.", _info },
+    { "info", "Print DAC info.", _info },
 #if GP8XXX_HAS_IDAC
     { "calibrate", "Calibrate 4 mA and 20 mA values.", _calibrate },
     { "set_current", "Set current (in uA).", _set_current },
@@ -305,11 +305,11 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    /* initialize the actuator */
-    puts("Initializing actuators... ");
+    /* initialize the DACs */
+    puts("Initializing DACs... ");
 
     for (unsigned i = 0; i < ARRAY_SIZE(gp8xxx_params); i++) {
-        if (gp8xxx_init(&gp8xxx_devs[i], &gp8xxx_params[i]) == GP8XXX_OK) {
+        if (gp8xxx_init(&gp8xxx_devs[i], &gp8xxx_params[i]) == 0) {
             printf("GP8xxx #%d [OK]\n", i);
         }
         else {
