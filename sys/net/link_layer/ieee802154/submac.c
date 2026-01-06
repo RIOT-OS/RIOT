@@ -153,7 +153,7 @@ static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
 static ieee802154_fsm_state_t _fsm_state_tx(ieee802154_submac_t *submac,
                                             ieee802154_fsm_ev_t ev);
 
-static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac)
+static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac, uint8_t seq_num)
 {
     ieee802154_dev_t *dev = &submac->dev;
 
@@ -165,6 +165,19 @@ static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac)
     if ((res = ieee802154_radio_write(dev, submac->psdu)) < 0) {
         return res;
     }
+    uint8_t ack[]
+         = { IEEE802154_FCF_TYPE_ACK, 0x00,  seq_num };
+    iolist_t iolist = {
+        .iol_base = ack,
+        .iol_len = sizeof(ack),
+        .iol_next = NULL
+    };
+    submac->wait_for_ack = 0;
+    submac->psdu = &iolist;
+    submac->retrans = 0;
+    submac->csma_retries_nb = 0;
+    submac->backoff_mask = (1 << submac->be.min) - 1;
+    DEBUG("IEEE802154 submac: Sending ACK\n");
     /* skip async Tx request */
     _fsm_state_prepare(submac, IEEE802154_FSM_EV_BH, IEEE802154_FCF_TYPE_ACK);
     /* wait for Tx done */
@@ -192,9 +205,6 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
         /* Make sure it's not an ACK frame */
         while (ieee802154_radio_set_idle(dev, false) < 0) {}
         if (ieee802154_radio_len(dev) > (int)IEEE802154_MIN_FRAME_LEN) {
-            /* An ACK is sent synchronous to prevent that the upper layer (IPv6)
-               can initiate the next transmission which would fail because the transceiver
-               is still busy. */
             if (_does_send_ack(dev)) {
                 return IEEE802154_FSM_STATE_IDLE;
             }
@@ -205,21 +215,10 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
                 (buf[0] & IEEE802154_FCF_ACK_REQ) &&
                 (ieee802154_radio_get_frame_filter_mode(dev, &mode) < 0 ||
                 mode == IEEE802154_FILTER_ACCEPT)) {
-
-                uint8_t ack[IEEE802154_ACK_FRAME_LEN - IEEE802154_FCS_LEN]
-                    = { IEEE802154_FCF_TYPE_ACK, 0x00, ieee802154_get_seq(buf) };
-                iolist_t iolist = {
-                    .iol_base = ack,
-                    .iol_len = sizeof(ack),
-                    .iol_next = NULL
-                };
-                submac->wait_for_ack = 0;
-                submac->psdu = &iolist;
-                submac->retrans = 0;
-                submac->csma_retries_nb = 0;
-                submac->backoff_mask = (1 << submac->be.min) - 1;
-                DEBUG("IEEE802154 submac: Sending ACK\n");
-                _handle_fsm_ev_tx_ack(submac);
+                /* An ACK is sent synchronously to prevent that the upper layer (IPv6)
+                   can initiate the next transmission which would fail because the transceiver
+                   is still busy. */
+                _handle_fsm_ev_tx_ack(submac, ieee802154_get_seq(buf));
             }
             submac->cb->rx_done(submac);
             return IEEE802154_FSM_STATE_IDLE;
