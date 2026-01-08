@@ -186,7 +186,7 @@ static psa_status_t psa_aead_encrypt_decrypt(   psa_key_id_t key,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    if (PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) != PSA_ALG_CCM) {
+    if (PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) != PSA_ALG_CCM && PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) != PSA_ALG_CHACHA20_POLY1305) {
         return PSA_ERROR_NOT_SUPPORTED;
     }
 
