@@ -22,7 +22,7 @@ static int read_rpm(const void *dev, phydat_t *res)
 {
     inc_encoder_t *d = (inc_encoder_t *) dev;
     int32_t mrpm;
-    if (inc_encoder_read_rpm(d, &mrpm)) {
+    if (inc_encoder_read_mrpm(d, &mrpm)) {
         /* Read failure */
         return -ECANCELED;
     }
