@@ -6,7 +6,7 @@ USEMODULE += psa_crypto
 
 USEMODULE += psa_aead
 USEMODULE += psa_aead_aes_128_ccm
-USEMODULE += psa_riot_aead_chacha20_poly1305
+USEMODULE += psa_aead_chacha20_poly1305
 
 CFLAGS += -DCONFIG_PSA_SINGLE_KEY_COUNT=2
 

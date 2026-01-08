@@ -2,6 +2,9 @@
 #include "psa/crypto.h"
 #include "crypto/chacha20poly1305.h"
 
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
 psa_status_t psa_aead_chacha20_poly1305_encrypt(const psa_key_attributes_t *attributes,
                                                 uint8_t *key_buffer, size_t key_buffer_length,
                                                 uint8_t tag_length, const uint8_t *nonce,
@@ -15,6 +18,8 @@ psa_status_t psa_aead_chacha20_poly1305_encrypt(const psa_key_attributes_t *attr
     (void)tag_length;
     (void)ciphertext_size;
     (void)ciphertext_length;
+
+    DEBUG("RIOT ChaCha20Poly1305 AEAD Encrypt\n");
 
     /* Only 12 and 8 byte nonces are supported. */
     switch (nonce_length) {
@@ -44,6 +49,8 @@ psa_status_t psa_aead_chacha20_poly1305_decrypt(const psa_key_attributes_t *attr
     (void)key_buffer_length;
     (void)tag_length;
     (void)plaintext_size;
+
+    DEBUG("RIOT ChaCha20Poly1305 AEAD Decrypt\n");
 
     /* Only 12 and 8 byte nonces are supported. */
     switch (nonce_length) {

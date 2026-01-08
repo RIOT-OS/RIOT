@@ -799,7 +799,7 @@ psa_status_t psa_algorithm_dispatch_aead_encrypt(   const psa_key_attributes_t *
                                             plaintext_length, ciphertext,
                                             ciphertext_size, ciphertext_length);
     #endif
-    #if IS_USED(MODULE_PSA_RIOT_AEAD_CHACHA20_POLY1305)
+    #if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
         case PSA_CHACHA20_POLY1305:
             return psa_aead_chacha20_poly1305_encrypt(attributes, key_data, *key_bytes, tag_len,
                                             nonce, nonce_length, additional_data,
@@ -879,7 +879,7 @@ psa_status_t psa_algorithm_dispatch_aead_decrypt(   const psa_key_attributes_t *
                                             ciphertext_length, plaintext,
                                             plaintext_size, plaintext_length);
     #endif
-    #if IS_USED(MODULE_PSA_RIOT_AEAD_CHACHA20_POLY1305)
+    #if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
         case PSA_CHACHA20_POLY1305:
             return psa_aead_chacha20_poly1305_decrypt(attributes, key_data, *key_bytes, tag_len,
                                             nonce, nonce_length, additional_data,
