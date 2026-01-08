@@ -117,9 +117,7 @@ DIFFFILTER="AC" run ./dist/tools/licenses/check.sh
 run ./dist/tools/ci/check_features_existing_inc_mk_is_up_to_date.sh
 run ./dist/tools/doccheck/check.sh
 run ./dist/tools/externc/check.sh
-# broken configuration produces many false positives
-# TODO: fix config and re-enable
-# run ./dist/tools/cppcheck/check.sh
+run ./dist/tools/cppcheck/check.sh
 run ./dist/tools/vera++/check.sh
 run ./dist/tools/coccinelle/check.sh
 run ./dist/tools/flake8/check.sh
