@@ -71,6 +71,7 @@ static FLASH_ATTR const char _sense_voltage[] = "SENSE_VOLTAGE";
 static FLASH_ATTR const char _sense_ph[] = "SENSE_PH";
 static FLASH_ATTR const char _sense_power[] = "SENSE_POWER";
 static FLASH_ATTR const char _sense_size[] = "SENSE_SIZE";
+static FLASH_ATTR const char _sense_speed[] = "SENSE_SPEED";
 
 static FLASH_ATTR const char * FLASH_ATTR const sensors[] = {
     [SAUL_SENSE_ID_ANY]         = _sense_any,
@@ -102,6 +103,7 @@ static FLASH_ATTR const char * FLASH_ATTR const sensors[] = {
     [SAUL_SENSE_ID_PH]          = _sense_ph,
     [SAUL_SENSE_ID_POWER]       = _sense_power,
     [SAUL_SENSE_ID_SIZE]        = _sense_size,
+    [SAUL_SENSE_ID_SPEED]       = _sense_speed,
 };
 
 static FLASH_ATTR const char _class_undef[] = "CLASS_UNDEF";
