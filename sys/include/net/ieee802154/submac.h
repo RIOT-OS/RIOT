@@ -208,6 +208,9 @@ struct ieee802154_submac {
     ieee802154_fsm_state_t fsm_state;    /**< State of the SubMAC */
     ieee802154_phy_mode_t phy_mode;     /**< IEEE 802.15.4 PHY mode */
     const iolist_t *psdu;               /**< stores the current PSDU */
+    uint8_t rx_buf[IEEE802154_FRAME_LEN_MAX]; /**< stores received frame */
+    size_t rx_len;                      /**< stores length of received frame */
+    ieee802154_rx_info_t rx_info;       /**< stores lqi and rssi of received frame */
 };
 
 /**
@@ -410,25 +413,19 @@ static inline int ieee802154_set_tx_power(ieee802154_submac_t *submac,
 /**
  * @brief Get the received frame length
  *
- * @pre this function MUST be called either inside @ref ieee802154_submac_cb_t::rx_done
- *      or in SLEEP state.
- *
  * @param[in] submac pointer to the SubMAC
  *
  * @return length of the PSDU (excluding FCS length)
  */
 static inline int ieee802154_get_frame_length(ieee802154_submac_t *submac)
 {
-    return ieee802154_radio_len(&submac->dev);
+    return submac->rx_len;
 }
 
 /**
  * @brief Read the received frame
  *
  * This functions reads the received PSDU from the device (excluding FCS)
- *
- * @pre this function MUST be called either inside @ref ieee802154_submac_cb_t::rx_done
- *      or in SLEEP state.
  *
  * @param[in] submac pointer to the SubMAC descriptor
  * @param[out] buf buffer to write into. If NULL, the packet is discarded
@@ -441,7 +438,14 @@ static inline int ieee802154_get_frame_length(ieee802154_submac_t *submac)
 static inline int ieee802154_read_frame(ieee802154_submac_t *submac, void *buf,
                                         size_t len, ieee802154_rx_info_t *info)
 {
-    return ieee802154_radio_read(&submac->dev, buf, len, info);
+    if (submac->rx_len > len) {
+        return -ENOBUFS;
+    }
+    if (info != NULL) {
+        memcpy(info, &submac->rx_info, sizeof(ieee802154_rx_info_t));
+    }
+    memcpy(buf, submac->rx_buf, submac->rx_len);
+    return submac->rx_len;
 }
 
 /**
