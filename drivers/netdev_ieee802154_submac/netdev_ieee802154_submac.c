@@ -286,7 +286,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                                                              netdev_ieee802154_submac_t,
                                                              dev);
     ieee802154_submac_t *submac = &netdev_submac->submac;
-    ieee802154_rx_info_t rx_info;
+    ieee802154_rx_info_t rx_info = { 0 };
 
     if (buf == NULL && len == 0) {
         return ieee802154_get_frame_length(submac);

@@ -442,7 +442,8 @@ static inline int ieee802154_read_frame(ieee802154_submac_t *submac, void *buf,
         return -ENOBUFS;
     }
     if (info != NULL) {
-        memcpy(info, &submac->rx_info, sizeof(ieee802154_rx_info_t));
+        info->rssi = submac->rx_info.rssi;
+        info->lqi = submac->rx_info.lqi;
     }
     memcpy(buf, submac->rx_buf, submac->rx_len);
     return submac->rx_len;
