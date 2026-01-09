@@ -208,7 +208,10 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
             if (_does_send_ack(dev)) {
                 return IEEE802154_FSM_STATE_IDLE;
             }
-            submac->rx_len = ieee802154_radio_read(dev, submac->rx_buf, IEEE802154_FRAME_LEN_MAX, &submac->rx_info);
+            submac->rx_len = ieee802154_radio_len(dev);
+            assert(submac->rx_len < IEEE802154_FRAME_LEN_MAX);
+            res = ieee802154_radio_read(dev, submac->rx_buf, submac->rx_len, &submac->rx_info);
+            assert(res == (int)submac->rx_len);
             ieee802154_filter_mode_t mode;
             if ((submac->rx_buf[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_DATA &&
                 (submac->rx_buf[0] & IEEE802154_FCF_ACK_REQ) &&
