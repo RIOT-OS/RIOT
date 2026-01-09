@@ -1,0 +1,26 @@
+From c0d6fb4a7fe32c53e3c47fbaae9b1ee5a1a9f28f Mon Sep 17 00:00:00 2001
+From: krzysztof-cabaj <kcabaj@gmail.com>
+Date: Fri, 9 Jan 2026 10:21:29 +0100
+Subject: [PATCH] ipv4: add macro for ip4_addr initialization
+
+---
+ src/include/lwip/ip4_addr.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/include/lwip/ip4_addr.h b/src/include/lwip/ip4_addr.h
+index 9fd8a0a1..04e59c38 100644
+--- a/src/include/lwip/ip4_addr.h
++++ b/src/include/lwip/ip4_addr.h
+@@ -103,6 +103,9 @@ struct netif;
+ /** Set an IP address given by the four byte-parts */
+ #define IP4_ADDR(ipaddr, a,b,c,d)  (ipaddr)->addr = PP_HTONL(LWIP_MAKEU32(a,b,c,d))
+ 
++/** Initialization of IP address during variable definition */
++#define IP4_ADDR_INIT(a,b,c,d) { .addr = PP_HTONL(LWIP_MAKEU32(a,b,c,d)) }
++
+ /** Copy IP address - faster than ip4_addr_set: no NULL check */
+ #define ip4_addr_copy(dest, src) ((dest).addr = (src).addr)
+ /** Safely copy one IP address to another (src may be NULL) */
+-- 
+2.39.2
+
