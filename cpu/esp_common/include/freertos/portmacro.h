@@ -55,7 +55,16 @@ extern "C" {
 
 #define errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY    ( -1 )
 
-#if SOC_CPU_CORES_NUM
+/*
+ * NOTE: RIOT generally uses only one CPU, and the second CPU, if there is one,
+ * is stalled by default. Defining portNUM_PROCESSORS here as 2 can cause
+ * problems. For example, the SYSTIMER counting units are stopped when the
+ * second CPU is disabled, which in turn leads to a memory leak because
+ * SYSTIMER is used for the esp_timer implementation to delete timers in
+ * thread context. Therefore, we define portNUM_PROCESSORS always as 1 even for
+ * ESP32x SOCs with 2 CPUs.
+ */
+#if 0 /* SOC_CPU_CORES_NUM */
 #  define portNUM_PROCESSORS            SOC_CPU_CORES_NUM
 #else
 #  define portNUM_PROCESSORS            1
