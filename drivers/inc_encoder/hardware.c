@@ -61,7 +61,7 @@ int inc_encoder_read_mrpm(inc_encoder_t *dev, int32_t *mrpm)
     return 0;
 }
 
-int inc_encoder_read_reset_milli_revs(inc_encoder_t *dev, int32_t *rev_counter)
+int inc_encoder_read_reset_mrevs(inc_encoder_t *dev, int32_t *mrevs)
 {
     int32_t total_count;
     int32_t delta_count;
@@ -79,11 +79,11 @@ int inc_encoder_read_reset_milli_revs(inc_encoder_t *dev, int32_t *rev_counter)
     irq_restore(irq_state);
 
     /* The 4X mode counts all falling and rising edges */
-    *rev_counter =  (int32_t) total_count / 4;
+    *mrevs =  (int32_t) total_count / 4;
 
-    *rev_counter *= UNIT_SCALE * GEAR_RED_RATIO_SCALE;
-    *rev_counter /= CONFIG_INC_ENCODER_PPR;
-    *rev_counter /= CONFIG_INC_ENCODER_GEAR_RED_RATIO;
+    *mrevs *= UNIT_SCALE * GEAR_RED_RATIO_SCALE;
+    *mrevs /= CONFIG_INC_ENCODER_PPR;
+    *mrevs /= CONFIG_INC_ENCODER_GEAR_RED_RATIO;
     return 0;
 }
 

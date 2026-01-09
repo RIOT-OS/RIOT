@@ -38,13 +38,13 @@ int main(void)
     puts("Printing sensor state every second.");
     while (1) {
         int32_t mrpm;
-        int32_t revs;
+        int32_t mrevs;
         if (inc_encoder_read_mrpm(&dev, &mrpm)
-            || inc_encoder_read_reset_milli_revs(&dev, &revs)) {
+            || inc_encoder_read_reset_mrevs(&dev, &mrevs)) {
             puts("[Failed]");
             return 1;
         }
-        printf("SENSOR DATA:\n\tMRPM  : %ld\n\tMREVS: %ld\n", (long) mrpm, (long) revs);
+        printf("SENSOR DATA:\n\tMRPM  : %ld\n\tMREVS: %ld\n", (long) mrpm, (long) mrevs);
         ztimer_sleep(ZTIMER_SEC, 1);
     }
 }

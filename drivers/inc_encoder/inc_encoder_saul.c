@@ -26,7 +26,7 @@ static int read_rpm(const void *dev, phydat_t *res)
         /* Read failure */
         return -ECANCELED;
     }
-    res->val[0] = (uint16_t) mrpm / 100;
+    res->val[0] = (int16_t) mrpm / 100;
     res->unit = UNIT_RPM;
     res->scale = -1;
     return 1;
@@ -35,12 +35,12 @@ static int read_rpm(const void *dev, phydat_t *res)
 static int read_reset_rev_counter(const void *dev, phydat_t *res)
 {
     inc_encoder_t *d = (inc_encoder_t *)dev;
-    int32_t rev_counter;
-    if (inc_encoder_read_reset_milli_revs(d, &rev_counter)) {
+    int32_t mrevs;
+    if (inc_encoder_read_reset_mrevs(d, &mrevs)) {
         /* Read failure */
         return -ECANCELED;
     }
-    res->val[0] = (int16_t) rev_counter;
+    res->val[0] = (int16_t) mrevs;
     res->unit = UNIT_CTS;
     res->scale = -3; /* millirevolutions */
     return 1;

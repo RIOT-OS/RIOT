@@ -81,16 +81,16 @@ int inc_encoder_read_mrpm(inc_encoder_t *dev, int32_t *mrpm)
     return 0;
 }
 
-int inc_encoder_read_reset_milli_revs(inc_encoder_t *dev, int32_t *rev_counter)
+int inc_encoder_read_reset_mrevs(inc_encoder_t *dev, int32_t *mrevs)
 {
     int irq_state = irq_disable();
-    *rev_counter = dev->pulse_counter;
+    *mrevs = dev->pulse_counter;
     dev->pulse_counter = 0;
     irq_restore(irq_state);
 
-    *rev_counter *= UNIT_SCALE * GEAR_RED_RATIO_SCALE;
-    *rev_counter /= CONFIG_INC_ENCODER_PPR;
-    *rev_counter /= CONFIG_INC_ENCODER_GEAR_RED_RATIO;
+    *mrevs *= UNIT_SCALE * GEAR_RED_RATIO_SCALE;
+    *mrevs /= CONFIG_INC_ENCODER_PPR;
+    *mrevs /= CONFIG_INC_ENCODER_GEAR_RED_RATIO;
     return 0;
 }
 

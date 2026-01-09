@@ -158,12 +158,12 @@ int inc_encoder_read_mrpm(inc_encoder_t *dev, int32_t *mrpm);
  *                 thousands of a full revolution.
  *
  * @param[in]      dev            Device descriptor of incremental rotary encoder
- * @param[out]     rev_counter    Number of millirevolutions since the last read.
+ * @param[out]     mrevs          Number of millirevolutions since the last read.
  *                                Negative revolutions signal counter clock wise rotations.
  *
  * @return         0              on success
  */
-int inc_encoder_read_reset_milli_revs(inc_encoder_t *dev, int32_t *rev_counter);
+int inc_encoder_read_reset_mrevs(inc_encoder_t *dev, int32_t *mrevs);
 
 #ifdef __cplusplus
 }
