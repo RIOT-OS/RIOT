@@ -21,6 +21,7 @@
  *
  */
 
+#include "psa_crypto_operation_encoder.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,6 +41,7 @@ struct psa_aead_operation_s {
     size_t ad_length;             /**< Length of additional data */
     size_t message_length;        /**< Length of message data */
     psa_algorithm_t alg;          /**< Operation algorithm*/
+    psa_aead_op_t operation;      /**< Encoded operation */
     /** Union containing AEAD cipher contexts for the executing backend */
     union aead_cipher_context {
         psa_cipher_context_t cipher_ctx; /**< Cipher context */

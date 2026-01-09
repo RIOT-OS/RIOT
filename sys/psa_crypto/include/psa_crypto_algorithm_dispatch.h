@@ -28,7 +28,7 @@ extern "C" {
 #include "psa/crypto.h"
 
 #if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
-#include "psa_crypto_slot_management.h"
+#  include "psa_crypto_slot_management.h"
 #endif
 
 #if IS_USED(MODULE_PSA_HASH)
@@ -62,51 +62,51 @@ psa_status_t psa_algorithm_dispatch_hash_finish(psa_hash_operation_t *operation,
  * @brief   Dispatch a hash signature function to a specific backend.
  *          See @ref psa_sign_hash()
  */
-psa_status_t psa_algorithm_dispatch_sign_hash(  const psa_key_attributes_t *attributes,
-                                                psa_algorithm_t alg,
-                                                const psa_key_slot_t *slot,
-                                                const uint8_t *hash,
-                                                size_t hash_length,
-                                                uint8_t *signature,
-                                                size_t signature_size,
-                                                size_t *signature_length);
+psa_status_t psa_algorithm_dispatch_sign_hash(const psa_key_attributes_t *attributes,
+                                              psa_algorithm_t alg,
+                                              const psa_key_slot_t *slot,
+                                              const uint8_t *hash,
+                                              size_t hash_length,
+                                              uint8_t *signature,
+                                              size_t signature_size,
+                                              size_t *signature_length);
 
 /**
  * @brief   Dispatch a message signature function to a specific backend.
  *          See @ref psa_sign_message()
  */
 psa_status_t psa_algorithm_dispatch_sign_message(const psa_key_attributes_t *attributes,
-                                                psa_algorithm_t alg,
-                                                const psa_key_slot_t *slot,
-                                                const uint8_t *input,
-                                                size_t input_length,
-                                                uint8_t *signature,
-                                                size_t signature_size,
-                                                size_t *signature_length);
+                                                 psa_algorithm_t alg,
+                                                 const psa_key_slot_t *slot,
+                                                 const uint8_t *input,
+                                                 size_t input_length,
+                                                 uint8_t *signature,
+                                                 size_t signature_size,
+                                                 size_t *signature_length);
 
 /**
  * @brief   Dispatch a hash verification function to a specific backend.
  *          See @ref psa_verify_hash()
  */
-psa_status_t psa_algorithm_dispatch_verify_hash(  const psa_key_attributes_t *attributes,
-                                                  psa_algorithm_t alg,
-                                                  const psa_key_slot_t *slot,
-                                                  const uint8_t *hash,
-                                                  size_t hash_length,
-                                                  const uint8_t *signature,
-                                                  size_t signature_length);
+psa_status_t psa_algorithm_dispatch_verify_hash(const psa_key_attributes_t *attributes,
+                                                psa_algorithm_t alg,
+                                                const psa_key_slot_t *slot,
+                                                const uint8_t *hash,
+                                                size_t hash_length,
+                                                const uint8_t *signature,
+                                                size_t signature_length);
 
 /**
  * @brief   Dispatch a message verification function to a specific backend.
  *          See @ref psa_verify_message()
  */
-psa_status_t psa_algorithm_dispatch_verify_message( const psa_key_attributes_t *attributes,
-                                                    psa_algorithm_t alg,
-                                                    const psa_key_slot_t *slot,
-                                                    const uint8_t *input,
-                                                    size_t input_length,
-                                                    const uint8_t *signature,
-                                                    size_t signature_length);
+psa_status_t psa_algorithm_dispatch_verify_message(const psa_key_attributes_t *attributes,
+                                                   psa_algorithm_t alg,
+                                                   const psa_key_slot_t *slot,
+                                                   const uint8_t *input,
+                                                   size_t input_length,
+                                                   const uint8_t *signature,
+                                                   size_t signature_length);
 #endif /* MODULE_PSA_ASYMMETRIC */
 
 #if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
@@ -114,8 +114,8 @@ psa_status_t psa_algorithm_dispatch_verify_message( const psa_key_attributes_t *
  * @brief   Dispatch the key generation function to a specific backend.
  *          See @ref psa_generate_key()
  */
-psa_status_t psa_algorithm_dispatch_generate_key(   const psa_key_attributes_t *attributes,
-                                                    psa_key_slot_t *slot);
+psa_status_t psa_algorithm_dispatch_generate_key(const psa_key_attributes_t *attributes,
+                                                 psa_key_slot_t *slot);
 
 /**
  * @brief   Dispatch the key import function to a specific backend.
@@ -131,27 +131,27 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
  * @brief   Dispatch a cipher encrypt function to a specific backend.
  *          See @ref psa_cipher_encrypt()
  */
-psa_status_t psa_algorithm_dispatch_cipher_encrypt( const psa_key_attributes_t *attributes,
-                                                    psa_algorithm_t alg,
-                                                    const psa_key_slot_t *slot,
-                                                    const uint8_t *input,
-                                                    size_t input_length,
-                                                    uint8_t *output,
-                                                    size_t output_size,
-                                                    size_t *output_length);
+psa_status_t psa_algorithm_dispatch_cipher_encrypt(const psa_key_attributes_t *attributes,
+                                                   psa_algorithm_t alg,
+                                                   const psa_key_slot_t *slot,
+                                                   const uint8_t *input,
+                                                   size_t input_length,
+                                                   uint8_t *output,
+                                                   size_t output_size,
+                                                   size_t *output_length);
 
 /**
  * @brief   Dispatch a cipher decrypt function to a specific backend.
  *          See @ref psa_cipher_decrypt()
  */
-psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *attributes,
-                                                    psa_algorithm_t alg,
-                                                    const psa_key_slot_t *slot,
-                                                    const uint8_t *input,
-                                                    size_t input_length,
-                                                    uint8_t *output,
-                                                    size_t output_size,
-                                                    size_t *output_length);
+psa_status_t psa_algorithm_dispatch_cipher_decrypt(const psa_key_attributes_t *attributes,
+                                                   psa_algorithm_t alg,
+                                                   const psa_key_slot_t *slot,
+                                                   const uint8_t *input,
+                                                   size_t input_length,
+                                                   uint8_t *output,
+                                                   size_t output_size,
+                                                   size_t *output_length);
 #endif /* MODULE_PSA_CIPHER */
 
 #if IS_USED(MODULE_PSA_AEAD)
@@ -159,35 +159,76 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
  * @brief   Dispatch a aead encrypt function to a specific backend.
  *          See @ref psa_aead_encrypt()
  */
-psa_status_t psa_algorithm_dispatch_aead_encrypt(   const psa_key_attributes_t *attributes,
-                                                    psa_algorithm_t alg,
-                                                    const psa_key_slot_t *slot,
-                                                    const uint8_t *nonce,
-                                                    size_t nonce_length,
-                                                    const uint8_t *additional_data,
-                                                    size_t additional_data_length,
-                                                    const uint8_t *plaintext,
-                                                    size_t plaintext_length,
-                                                    uint8_t *ciphertext,
-                                                    size_t ciphertext_size,
-                                                    size_t *ciphertext_length);
+psa_status_t psa_algorithm_dispatch_aead_encrypt(const psa_key_attributes_t *attributes,
+                                                 psa_algorithm_t alg,
+                                                 const psa_key_slot_t *slot,
+                                                 const uint8_t *nonce,
+                                                 size_t nonce_length,
+                                                 const uint8_t *additional_data,
+                                                 size_t additional_data_length,
+                                                 const uint8_t *plaintext,
+                                                 size_t plaintext_length,
+                                                 uint8_t *ciphertext,
+                                                 size_t ciphertext_size,
+                                                 size_t *ciphertext_length);
 
 /**
  * @brief   Dispatch a aead decrypt function to a specific backend.
  *          See @ref psa_aead_decrypt()
  */
-psa_status_t psa_algorithm_dispatch_aead_decrypt(   const psa_key_attributes_t *attributes,
-                                                    psa_algorithm_t alg,
-                                                    const psa_key_slot_t *slot,
-                                                    const uint8_t *nonce,
-                                                    size_t nonce_length,
-                                                    const uint8_t *additional_data,
-                                                    size_t additional_data_length,
-                                                    const uint8_t *ciphertext,
-                                                    size_t ciphertext_length,
-                                                    uint8_t *plaintext,
-                                                    size_t plaintext_size,
-                                                    size_t *plaintext_length);
+psa_status_t psa_algorithm_dispatch_aead_decrypt(const psa_key_attributes_t *attributes,
+                                                 psa_algorithm_t alg,
+                                                 const psa_key_slot_t *slot,
+                                                 const uint8_t *nonce,
+                                                 size_t nonce_length,
+                                                 const uint8_t *additional_data,
+                                                 size_t additional_data_length,
+                                                 const uint8_t *ciphertext,
+                                                 size_t ciphertext_length,
+                                                 uint8_t *plaintext,
+                                                 size_t plaintext_size,
+                                                 size_t *plaintext_length);
+
+/* IoT-TODO */
+psa_status_t psa_algorithm_dispatch_aead_encrypt_setup(psa_aead_operation_t *operation,
+                                                       const psa_key_attributes_t *attributes,
+                                                       const psa_key_slot_t *slot,
+                                                       psa_algorithm_t alg);
+
+/* IoT-TODO */
+psa_status_t psa_algorithm_dispatch_aead_decrypt_setup(psa_aead_operation_t *operation,
+                                                       const psa_key_attributes_t *attributes,
+                                                       const psa_key_slot_t *slot,
+                                                       psa_algorithm_t alg);
+
+/* IoT-TODO */
+psa_status_t psa_algorithm_dispatch_aead_set_lengths(psa_aead_operation_t *operation,
+                                                     size_t ad_length,
+                                                     size_t plaintext_length);
+
+/* IoT-TODO: generate nonce proabably */
+
+/* IoT-TODO */
+psa_status_t psa_algorithm_dispatch_aead_set_nonce(psa_aead_operation_t *operation,
+                                                   const uint8_t *nonce,
+                                                   size_t nonce_length);
+
+/* IoT-TODO */
+psa_status_t psa_algorithm_dispatch_aead_update_ad(psa_aead_operation_t *operation,
+                                                   const uint8_t *input,
+                                                   size_t input_length);
+
+/* IoT-TODO */
+psa_status_t psa_algorithm_dispatch_aead_update(psa_aead_operation_t *operation,
+                                                const uint8_t *input,
+                                                size_t input_length,
+                                                uint8_t *output,
+                                                size_t output_size,
+                                                size_t *output_length);
+
+/* IoT-TODO: finish proabably */
+
+/* IoT-TODO: verify proabably */
 #endif /* MODULE_PSA_AEAD */
 
 #if IS_USED(MODULE_PSA_MAC)

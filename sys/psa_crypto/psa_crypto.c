@@ -146,16 +146,6 @@ psa_status_t psa_crypto_init(void)
 }
 
 #if IS_USED(MODULE_PSA_AEAD)
-psa_status_t psa_aead_abort(psa_aead_operation_t *operation)
-{
-    if (!lib_initialized) {
-        return PSA_ERROR_BAD_STATE;
-    }
-
-    *operation = psa_aead_operation_init();
-    return PSA_SUCCESS;
-}
-
 /**
  * @brief   aead encrypt and decrypt function
  *
@@ -266,17 +256,6 @@ psa_status_t psa_aead_decrypt(psa_key_id_t key,
                                     PSA_CRYPTO_DRIVER_DECRYPT);
 }
 
-/* IoT-TODO */
-psa_status_t psa_aead_decrypt_setup(psa_aead_operation_t *operation,
-                                    psa_key_id_t key,
-                                    psa_algorithm_t alg)
-{
-    (void)operation;
-    (void)key;
-    (void)alg;
-    return PSA_ERROR_NOT_SUPPORTED;
-}
-
 psa_status_t psa_aead_encrypt(psa_key_id_t key,
                               psa_algorithm_t alg,
                               const uint8_t *nonce,
@@ -345,22 +324,45 @@ psa_status_t psa_aead_encrypt_setup(psa_aead_operation_t *operation,
 }
 
 /* IoT-TODO */
-psa_status_t psa_aead_finish(psa_aead_operation_t *operation,
-                             uint8_t *ciphertext,
-                             size_t ciphertext_size,
-                             size_t *ciphertext_length,
-                             uint8_t *tag,
-                             size_t tag_size,
-                             size_t *tag_length)
+psa_status_t psa_aead_decrypt_setup(psa_aead_operation_t *operation,
+                                    psa_key_id_t key,
+                                    psa_algorithm_t alg)
 {
     (void)operation;
-    (void)ciphertext;
-    (void)ciphertext_size;
-    (void)ciphertext_length;
-    (void)tag;
-    (void)tag_size;
-    (void)tag_length;
+    (void)key;
+    (void)alg;
     return PSA_ERROR_NOT_SUPPORTED;
+}
+
+/* IoT-TODO */
+psa_status_t psa_aead_set_lengths(psa_aead_operation_t *operation,
+                                  size_t ad_length,
+                                  size_t plaintext_length)
+{
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
+    if (!lib_initialized || operation->nonce_set) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    // return PSA_ERROR_INVALID_ARGUMENT if ad_length or plaintext_length are too large for the chosen algorithm.
+
+    // return PSA_ERROR_NOT_SUPPORTED if ad_length or plaintext_length are too large for the implementation.
+
+    status = psa_location_dispatch_aead_set_lengths(operation, ad_length, plaintext_length);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    operation->message_length = plaintext_length;
+    operation->ad_length = ad_length;
+    operation->lengths_set = 1;
+
+    return status;
 }
 
 /* IoT-TODO */
@@ -390,9 +392,10 @@ psa_status_t psa_aead_generate_nonce(psa_aead_operation_t *operation,
     }
 
     /* IoT-Todo: change to proper if statement -> see function documentation */
-    if (nonce_size > PSA_AEAD_NONCE_MAX_SIZE) {
-        return PSA_ERROR_BUFFER_TOO_SMALL;
-    }
+    // probably need to check this in deeper layers
+    //if (nonce_size > PSA_AEAD_NONCE_MAX_SIZE) {
+    //    return PSA_ERROR_BUFFER_TOO_SMALL;
+    //}
 
     *nonce_length = 0;
 
@@ -406,30 +409,6 @@ psa_status_t psa_aead_generate_nonce(psa_aead_operation_t *operation,
     operation->nonce_set = 1;
 
     return status;
-}
-
-/* IoT-TODO */
-psa_status_t psa_aead_set_lengths(psa_aead_operation_t *operation,
-                                  size_t ad_length,
-                                  size_t plaintext_length)
-{
-    if (!lib_initialized || operation->nonce_set) {
-        return PSA_ERROR_BAD_STATE;
-    }
-
-    if (!operation) {
-        return PSA_ERROR_INVALID_ARGUMENT;
-    }
-
-    // return PSA_ERROR_INVALID_ARGUMENT if ad_length or plaintext_length are too large for the chosen algorithm.
-
-    // return PSA_ERROR_NOT_SUPPORTED if ad_length or plaintext_length are too large for the implementation.
-
-    operation->message_length = plaintext_length;
-    operation->ad_length = ad_length;
-    operation->lengths_set = 1;
-
-    return PSA_SUCCESS;
 }
 
 /* IoT-TODO */
@@ -461,13 +440,37 @@ psa_status_t psa_aead_set_nonce(psa_aead_operation_t *operation,
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
-    /* IoT-Todo set the nonce in the operation 
-    status = 
-    */
+    // call to location dispatch to set nonce in backend
+    status = psa_location_dispatch_aead_set_nonce(operation, nonce, nonce_length);
+
     if (status != PSA_SUCCESS) {
         return status;
     }
     operation->nonce_set = 1;
+
+    return status;
+}
+
+/* IoT-TODO */
+psa_status_t psa_aead_update_ad(psa_aead_operation_t *operation,
+                                const uint8_t *input,
+                                size_t input_length)
+{
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
+    if (!lib_initialized || !operation->nonce_set) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (operation->alg == PSA_ALG_CCM && !operation->lengths_set) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    //check doc
+    status = psa_loocation_dispatch_aead_update_ad(operation, input, input_length);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
 
     return status;
 }
@@ -480,23 +483,45 @@ psa_status_t psa_aead_update(psa_aead_operation_t *operation,
                              size_t output_size,
                              size_t *output_length)
 {
-    (void)operation;
-    (void)input;
-    (void)input_length;
-    (void)output;
-    (void)output_size;
-    (void)output_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
+    if (!lib_initialized || !operation->nonce_set) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (operation->alg == PSA_ALG_CCM && !operation->lengths_set) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    //return PSA_ERROR_BUFFER_TOO_SMALL if output_size is too small to hold the output data for the given input_length.
+
+    // check conditions for PSA_ERROR_INVALID_ARGUMENT
+    // check if input_length is too large for the chosen algorithm
+
+    status = psa_location_dispatch_aead_update(operation, input, input_length, output, output_size, output_length);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
+    return status;
 }
 
 /* IoT-TODO */
-psa_status_t psa_aead_update_ad(psa_aead_operation_t *operation,
-                                const uint8_t *input,
-                                size_t input_length)
+psa_status_t psa_aead_finish(psa_aead_operation_t *operation,
+                             uint8_t *ciphertext,
+                             size_t ciphertext_size,
+                             size_t *ciphertext_length,
+                             uint8_t *tag,
+                             size_t tag_size,
+                             size_t *tag_length)
 {
     (void)operation;
-    (void)input;
-    (void)input_length;
+    (void)ciphertext;
+    (void)ciphertext_size;
+    (void)ciphertext_length;
+    (void)tag;
+    (void)tag_size;
+    (void)tag_length;
     return PSA_ERROR_NOT_SUPPORTED;
 }
 
@@ -515,6 +540,17 @@ psa_status_t psa_aead_verify(psa_aead_operation_t *operation,
     (void)tag;
     (void)tag_length;
     return PSA_ERROR_NOT_SUPPORTED;
+}
+
+/* IoT-TODO */
+psa_status_t psa_aead_abort(psa_aead_operation_t *operation)
+{
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    *operation = psa_aead_operation_init();
+    return PSA_SUCCESS;
 }
 #endif /* MODULE_PSA_AEAD */
 
