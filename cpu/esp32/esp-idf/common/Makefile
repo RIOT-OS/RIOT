@@ -211,7 +211,7 @@ else ifeq (esp32s2,$(CPU_FAM))
   ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/systimer.c
   ESP32_SDK_SRC += components/esp_hw_support/port/$(CPU_FAM)/memprot.c
   ESP32_SDK_SRC += components/esp_system/port/brownout.c
-  ESP32_SDK_SRC += components/esp_timer/src/esp_timer_impl_systimer.c
+  ESP32_SDK_SRC += components/esp_timer/src/esp_timer_impl_lac.c
   ESP32_SDK_SRC += components/hal/$(CPU_FAM)/touch_sensor_hal.c
   ESP32_SDK_SRC += components/hal/brownout_hal.c
   ESP32_SDK_SRC += components/hal/cache_hal.c
