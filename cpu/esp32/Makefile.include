@@ -459,6 +459,12 @@ ifneq (,$(filter esp_jtag,$(USEMODULE)))
   OPENOCD_DBG_EXTRA_CMD += -c 'reset halt'
 endif
 
+ifneq (esptool,$(PROGRAMMER))
+  # we must explicitly include the esptool settings if this is not done via
+  # the PROGRAMMER variable
+  include $(RIOTMAKE)/tools/esptool.inc.mk
+endif
+
 LD_SCRIPTS += $(BINDIR)/memory.ld $(BINDIR)/sections.ld
 LDGENFLAGS += -DLD_FILE_GEN
 LDGENFLAGS += -DRESERVE_RTC_MEM=0x18
