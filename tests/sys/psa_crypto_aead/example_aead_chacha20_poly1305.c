@@ -1,10 +1,29 @@
+/*
+ * SPDX-FileCopyrightText: 2025 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+/**
+ * @ingroup tests
+ * @{
+ *
+ * @brief   Example functions for Chacha20Poly1305 Encryption and Decryption with PSA Crypto
+ *
+ * @author  Oliver Fritz <oliver.fritz-default@protonmail.com>
+ * @author  Sergey Kreis <sergey.kreis@mailbox.tu-dresden.de>
+ *
+ * @}
+ */
 #include <stdio.h>
 #include "psa/crypto.h"
 
 #define CHACHA20_KEY_SIZE (32)
 
-/* IoT-Todo: document origin */
-
+/*
+ *  Chacha20Poly1305 Authenticated Encryption with Associated Data
+ *
+ *  https://datatracker.ietf.org/doc/html/draft-nir-cfrg-chacha20-poly1305-06#appendix-A.5
+ */
 static const uint8_t KEY_CHACHA20[] = {
     0x1c, 0x92, 0x40, 0xa5, 0xeb, 0x55, 0xd3, 0x8a,
     0xf3, 0x33, 0x88, 0x86, 0x04, 0xf6, 0xb5, 0xf0,
@@ -62,6 +81,12 @@ static uint8_t CIPHERTEXT[] = {
     0xA6, 0xAD, 0x5C, 0xB4, 0x02, 0x2B, 0x02, 0x70, 0x9B
 };
 
+/**
+ * @brief   Example function to perform an AEAD CHACHA20POLY1305 encryption and decryption
+ *          with the PSA Crypto API.
+ *
+ * @return  psa_status_t
+ */
 psa_status_t example_aead_chacha20_poly1305(void)
 {
     psa_status_t status = PSA_ERROR_DOES_NOT_EXIST;
@@ -95,7 +120,7 @@ psa_status_t example_aead_chacha20_poly1305(void)
         return status;
     }
 
-    if(memcmp(cipher_out, CIPHERTEXT, sizeof(CIPHERTEXT))) {
+    if (memcmp(cipher_out, CIPHERTEXT, sizeof(CIPHERTEXT))) {
         psa_destroy_key(key_id);
         puts("CHACHA20POLY1305: wrong ciphertext on encryption\n");
         return -1;
