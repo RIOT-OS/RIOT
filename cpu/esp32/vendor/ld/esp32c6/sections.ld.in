@@ -292,6 +292,7 @@ SECTIONS
     *components/hal/spi_hal_iram.*(.literal .literal.* .text .text.*)
     *components/hal/spi_slave_hal_iram.*(.literal .literal.* .text .text.*)
     *components/hal/timer_hal.*(.literal.timer_hal_capture_and_get_counter_value .text.timer_hal_capture_and_get_counter_value)
+    *components/hal/wdt_hal_iram.*(.literal .literal.* .text .text.*)
     *components/heap/multi_heap.*(.literal._multi_heap_lock .text._multi_heap_lock)
     *components/heap/multi_heap.*(.literal._multi_heap_unlock .text._multi_heap_unlock)
     *components/heap/multi_heap.*(.literal.multi_heap_aligned_alloc_offs .text.multi_heap_aligned_alloc_offs)
@@ -467,6 +468,7 @@ SECTIONS
     *components/hal/spi_flash_hal_iram.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
     *components/hal/spi_hal_iram.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
     *components/hal/spi_slave_hal_iram.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/hal/wdt_hal_iram.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
     *components/log/*/log_lock.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
 
     *components/newlib/abort.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
