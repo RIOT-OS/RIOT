@@ -282,9 +282,6 @@ psa_status_t psa_aead_encrypt_setup(psa_aead_operation_t *operation,
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_key_slot_t *slot;
-    psa_key_usage_t usage = PSA_KEY_USAGE_ENCRYPT;
-
-    /* IoT: set key in op*/
 
     if (!lib_initialized) {
         return PSA_ERROR_BAD_STATE;
@@ -298,10 +295,16 @@ psa_status_t psa_aead_encrypt_setup(psa_aead_operation_t *operation,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
+    /* IoT-Todo: key type not compatible with alg => invalid argument? Not done in Oneshot? */
+
+    /* Key not supported for use with alg */
     if (PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) != PSA_ALG_CCM &&
         PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) != PSA_ALG_CHACHA20_POLY1305) {
         return PSA_ERROR_NOT_SUPPORTED;
     }
+
+    /* IoT-Todo: is this supposed to be hard-coded? */
+    psa_key_usage_t usage = PSA_KEY_USAGE_ENCRYPT;
 
     status = psa_get_and_lock_key_slot_with_policy(key, &slot, usage, alg);
     if (status != PSA_SUCCESS) {
@@ -312,9 +315,12 @@ psa_status_t psa_aead_encrypt_setup(psa_aead_operation_t *operation,
         return status;
     }
 
+    /* IoT-Todo: Cipher does this, but would compiler just optimize it anyway?
     psa_key_attributes_t attr = slot->attr;
+    below in decryt_setup aswell
+    */
 
-    status = psa_location_dispatch_aead_encrypt_setup(operation, &attr, slot, alg);
+    status = psa_location_dispatch_aead_encrypt_setup(operation, &slot->attr, slot, alg);
     if (status != PSA_SUCCESS) {
         psa_aead_abort(operation);
     }
@@ -328,10 +334,57 @@ psa_status_t psa_aead_decrypt_setup(psa_aead_operation_t *operation,
                                     psa_key_id_t key,
                                     psa_algorithm_t alg)
 {
-    (void)operation;
-    (void)key;
-    (void)alg;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+    psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
+    psa_key_slot_t *slot;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (!PSA_ALG_IS_AEAD(alg)) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    /* Key not supported for use with alg */
+    if (PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) != PSA_ALG_CCM &&
+        PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) != PSA_ALG_CHACHA20_POLY1305) {
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+
+    /* IoT-Todo: INVALID_HANDLE if key is not valid key identifier? 
+    Not done in Oneshot? Lower Layer?*/
+
+    /* IoT-Todo: INVALID_ARGUMENT key type not compatible with alg => invalid argument? 
+    Not done in Oneshot? Lower Layer? */
+
+    /* IoT-Todo: is this supposed to be hard-coded? */
+    psa_key_usage_t usage = PSA_KEY_USAGE_DECRYPT;
+
+    status = psa_get_and_lock_key_slot_with_policy(key, &slot, usage, alg);
+    if (status != PSA_SUCCESS) {
+        unlock_status = psa_unlock_key_slot(slot);
+        if (unlock_status != PSA_SUCCESS) {
+            status = unlock_status;
+        }
+        return status;
+    }
+
+    /* IoT-Todo: see encrypt_setup(...)
+    psa_key_attributes_t attr = slot->attr;
+    */
+
+    status = psa_location_dispatch_aead_decrypt_setup(operation, &slot->attr, slot, alg);
+    if (status != PSA_SUCCESS) {
+        psa_aead_abort(operation);
+    }
+
+    unlock_status = psa_unlock_key_slot(slot);
+    return ((status == PSA_SUCCESS) ? unlock_status : status);
 }
 
 /* IoT-TODO */
@@ -349,9 +402,19 @@ psa_status_t psa_aead_set_lengths(psa_aead_operation_t *operation,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    // return PSA_ERROR_INVALID_ARGUMENT if ad_length or plaintext_length are too large for the chosen algorithm.
+    /* return PSA_ERROR_INVALID_ARGUMENT if ad_length or plaintext_length are too large for the chosen algorithm.
 
-    // return PSA_ERROR_NOT_SUPPORTED if ad_length or plaintext_length are too large for the implementation.
+    if (ad_length > ___ || plaintext_length > ___) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+    */
+
+    /* return PSA_ERROR_NOT_SUPPORTED if ad_length or plaintext_length are too large for the implementation.
+
+    if (ad_length > ____ || plaintext_length > ____) {
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+    */
 
     status = psa_location_dispatch_aead_set_lengths(operation, ad_length, plaintext_length);
     if (status != PSA_SUCCESS) {
@@ -399,7 +462,6 @@ psa_status_t psa_aead_generate_nonce(psa_aead_operation_t *operation,
 
     *nonce_length = 0;
 
-    // IoT-ToDo: generate random nonce
     status = psa_generate_random(nonce, nonce_size);
     if (status != PSA_SUCCESS) {
         return status;
