@@ -15,6 +15,7 @@ export default defineConfig({
       markdown: {
         processedDirs: ["../guides"],
       },
+      routeMiddleware: "./src/routeData.ts",
       head: [
         {
           tag: "link",
