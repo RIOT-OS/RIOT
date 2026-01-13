@@ -59,3 +59,48 @@ psa_status_t psa_aead_chacha20_poly1305_decrypt(const psa_key_attributes_t *attr
 
     return PSA_SUCCESS;
 }
+
+psa_status_t psa_aead_chacha20_poly1305_encrypt_setup(psa_aead_operation_t *operation,
+                                          const psa_key_attributes_t *attributes,
+                                          const psa_key_slot_t *slot,
+                                          psa_algorithm_t alg)
+ {    (void)operation;
+    (void)attributes;
+    (void)slot;
+    (void)alg;
+    return PSA_ERROR_NOT_SUPPORTED;
+}
+
+psa_status_t psa_aead_chacha20_poly1305_decrypt_setup(psa_aead_operation_t *operation,
+                                          const psa_key_attributes_t *attributes,
+                                          const psa_key_slot_t *slot,
+                                          psa_algorithm_t alg)
+ {
+    (void)operation;
+    (void)attributes;
+    (void)slot;
+    (void)alg;
+    return PSA_ERROR_NOT_SUPPORTED;
+}
+
+psa_status_t psa_aead_chacha20_poly1305_set_lengths(psa_aead_operation_t *operation,
+                                          size_t ad_length,
+                                          size_t plaintext_length)
+ {
+    (void)operation;
+    (void)ad_length;
+    (void)plaintext_length;
+    return PSA_ERROR_NOT_SUPPORTED;
+}
+
+psa_status_t psa_aead_chacha20_poly1305_generate_nonce(psa_aead_operation_t *operation,
+                                          uint8_t *nonce,
+                                          size_t nonce_size,
+                                          size_t *nonce_length)
+ {
+    (void)operation;
+    (void)nonce;
+    (void)nonce_size;
+    (void)nonce_length;
+    return PSA_ERROR_NOT_SUPPORTED;
+}

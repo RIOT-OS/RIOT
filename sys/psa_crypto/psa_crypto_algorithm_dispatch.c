@@ -910,11 +910,20 @@ psa_status_t psa_algorithm_dispatch_aead_encrypt_setup(psa_aead_operation_t *ope
                                                        const psa_key_slot_t *slot,
                                                        psa_algorithm_t alg)
 {
-    (void)operation;
-    (void)attributes;
-    (void)slot;
-    (void)alg;
-    return PSA_ERROR_NOT_SUPPORTED;
+    operation->op = PSA_ENCODE_AEAD_OPERATION(alg, attributes->type, attributes->bits);
+
+    switch (operation->op) {
+#  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
+    case PSA_CHACHA20_POLY1305:
+        return PSA_ERROR_NOT_SUPPORTED;
+#  endif
+    default:
+        (void)operation;
+        (void)attributes;
+        (void)slot;
+        (void)alg;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
 }
 
 /* IoT-TODO */
@@ -923,11 +932,20 @@ psa_status_t psa_algorithm_dispatch_aead_decrypt_setup(psa_aead_operation_t *ope
                                                        const psa_key_slot_t *slot,
                                                        psa_algorithm_t alg)
 {
-    (void)operation;
-    (void)attributes;
-    (void)slot;
-    (void)alg;
-    return PSA_ERROR_NOT_SUPPORTED;
+    operation->op = PSA_ENCODE_AEAD_OPERATION(alg, attributes->type, attributes->bits);
+
+    switch (operation->op) {
+#  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
+    case PSA_CHACHA20_POLY1305:
+        return PSA_ERROR_NOT_SUPPORTED;
+#  endif
+    default:
+        (void)operation;
+        (void)attributes;
+        (void)slot;
+        (void)alg;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
 }
 
 /* IoT-TODO */
@@ -935,10 +953,17 @@ psa_status_t psa_algorithm_dispatch_aead_set_lengths(psa_aead_operation_t *opera
                                                      size_t ad_length,
                                                      size_t plaintext_length)
 {
-    (void)operation;
-    (void)ad_length;
-    (void)plaintext_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    switch (operation->op) {
+#  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
+    case PSA_CHACHA20_POLY1305:
+        return PSA_ERROR_NOT_SUPPORTED;
+#  endif
+    default:
+        (void)operation;
+        (void)ad_length;
+        (void)plaintext_length;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
 }
 
 /* IoT-TODO: generate nonce proabably */
@@ -948,10 +973,17 @@ psa_status_t psa_algorithm_dispatch_aead_set_nonce(psa_aead_operation_t *operati
                                                    const uint8_t *nonce,
                                                    size_t nonce_length)
 {
-    (void)operation;
-    (void)nonce;
-    (void)nonce_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    switch (operation->op) {
+#  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
+    case PSA_CHACHA20_POLY1305:
+        return PSA_ERROR_NOT_SUPPORTED;
+#  endif
+    default:
+        (void)operation;
+        (void)nonce;
+        (void)nonce_length;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
 }
 
 /* IoT-TODO */
@@ -959,10 +991,17 @@ psa_status_t psa_algorithm_dispatch_aead_update_ad(psa_aead_operation_t *operati
                                                    const uint8_t *input,
                                                    size_t input_length)
 {
-    (void)operation;
-    (void)input;
-    (void)input_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    switch (operation->op) {
+#  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
+    case PSA_CHACHA20_POLY1305:
+        return PSA_ERROR_NOT_SUPPORTED;
+#  endif
+    default:
+        (void)operation;
+        (void)input;
+        (void)input_length;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
 }
 
 /* IoT-TODO */
@@ -973,13 +1012,20 @@ psa_status_t psa_algorithm_dispatch_aead_update(psa_aead_operation_t *operation,
                                                 size_t output_size,
                                                 size_t *output_length)
 {
-    (void)operation;
-    (void)input;
-    (void)input_length;
-    (void)output;
-    (void)output_size;
-    (void)output_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    switch (operation->op) {
+#  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
+    case PSA_CHACHA20_POLY1305:
+        return PSA_ERROR_NOT_SUPPORTED;
+#  endif
+    default:
+        (void)operation;
+        (void)input;
+        (void)input_length;
+        (void)output;
+        (void)output_size;
+        (void)output_length;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
 }
 
 /* IoT-TODO: finish proabably */
