@@ -48,16 +48,6 @@ typedef enum {
 } adc_attenuation_t;
 
 /**
- * @brief   Attenuation of 11 dB is depcricated and has to be mapped
- *
- * The define ensures the compatibility with older versions.
- *
- * @deprecated `ADC_ATTENUATION_11_DB` is deprecated, use
- *             `ADC_ATTENUATION_12_DB` instead.
- */
-#define ADC_ATTENUATION_11_DB   ADC_ATTENUATION_12_DB
-
-/**
  * @brief   Set the attenuation for the ADC line. Default attenuation is 12 dB.
  *
  * For each ADC line, an attenuation of the input signal can be defined
