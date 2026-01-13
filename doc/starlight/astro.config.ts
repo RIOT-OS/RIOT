@@ -90,6 +90,7 @@ export default defineConfig({
             "general/structure",
             "general/vision",
             "general/governance",
+            "general/security",
           ],
         },
         {

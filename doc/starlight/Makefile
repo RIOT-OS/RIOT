@@ -27,7 +27,7 @@ clean:
 	-@rm -rf node_modules .astro dist
 
 .PHONY: integrate_outside_files
-integrate_outside_files: code_of_conduct governance lostandfound coding_conventions coding_conventions_cpp
+integrate_outside_files: code_of_conduct governance lostandfound coding_conventions coding_conventions_cpp security
 
 .PHONY: code_of_conduct
 code_of_conduct: ../../CODE_OF_CONDUCT.md
@@ -54,3 +54,9 @@ coding_conventions: ../../CODING_CONVENTIONS.md
 coding_conventions_cpp: ../../CODING_CONVENTIONS_C++.md
 	-@echo "Generating C++ Coding Conventions documentation..."
 	-@sed '1,2d' $< | cat ./templates/CODING_CONVENTIONS_CPP.template.md - > ../guides/generated/CODING_CONVENTIONS_CPP.md
+
+.PHONY: security
+security: ../../SECURITY.md
+	-@mkdir -p ../guides/generated
+	-@echo "Generating Security Guidelines..."
+	-@sed '1,2d' $< | cat ./templates/SECURITY.template.md - > ../guides/generated/SECURITY.md
