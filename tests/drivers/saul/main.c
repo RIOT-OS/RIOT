@@ -16,7 +16,6 @@
 
 #include <stdio.h>
 
-#include "flash_utils.h"
 #include "phydat.h"
 #include "saul_reg.h"
 #include "xtimer.h"
@@ -43,8 +42,9 @@ int main(void)
 
         while (dev) {
             int dim = saul_reg_read(dev, &res);
-            printf("\nDev: %s\tType: %" PRIsflash "\n", dev->name,
-                   saul_class_to_str(dev->driver->type));
+            printf("\nDev: %s\tType: ", dev->name);
+            saul_class_print(dev->driver->type);
+            puts("");
             phydat_dump(&res, dim);
             dev = dev->next;
         }
