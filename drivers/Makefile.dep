@@ -60,6 +60,10 @@ ifneq (,$(filter ft6% ft5% ft3%,$(USEMODULE)))
   USEMODULE += ft5x06
 endif
 
+ifneq (,$(filter gp8%,$(USEMODULE)))
+  USEMODULE += gp8xxx
+endif
+
 ifneq (,$(filter hmc5883l_%,$(USEMODULE)))
   USEMODULE += hmc5883l
 endif
