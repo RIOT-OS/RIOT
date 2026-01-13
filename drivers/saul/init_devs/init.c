@@ -151,6 +151,10 @@ void saul_init_devs(void)
         extern void auto_init_ina3221(void);
         auto_init_ina3221();
     }
+    if (IS_USED(MODULE_INC_ENCODER)) {
+        extern void auto_init_inc_encoder(void);
+        auto_init_inc_encoder();
+    }
     if (IS_USED(MODULE_IO1_XPLAINED)) {
         extern void auto_init_io1_xplained(void);
         auto_init_io1_xplained();
