@@ -16,7 +16,7 @@
  * @author          Tom Hert <git@annsann.eu>
  */
 
-#include "RP2350.h"
+#include <stdint.h>
 #include "macros/units.h"
 
 /** 1-15 MHz range

@@ -16,6 +16,7 @@
  */
 
 #include "periph_cpu.h"
+#include "thread_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,9 +30,18 @@ extern "C" {
 #define core1_psm_bit 24
 
 /**
- * The stack used by core 1, 16 times the thread stack size
+ * @brief Stack size for core 1
+ * @note If not defined, defaults to THREAD_STACKSIZE_MAIN
  */
-static volatile uint32_t core_1_stack[16*THREAD_STACKSIZE_DEFAULT];
+#ifndef THREAD_STACKSIZE_SECOND_CORE
+#  define THREAD_STACKSIZE_SECOND_CORE THREAD_STACKSIZE_MAIN
+#endif
+
+/**
+ * The stack used by core 1
+ * @note Size is defined by THREAD_STACKSIZE_SECOND_CORE
+ */
+static volatile uint8_t core_1_stack[THREAD_STACKSIZE_SECOND_CORE];
 
 /**
  * The function signature used for any function passed onto
