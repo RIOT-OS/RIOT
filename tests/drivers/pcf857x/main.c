@@ -408,7 +408,7 @@ int main(void)
 
     /* initialize configured PCF857X devices */
     for (unsigned i = 0; i < PCF857X_NUM; i++) {
-        if (pcf857x_init(&pcf857x_dev[i], &pcf857x_params[i]) != PCF857X_OK) {
+        if (pcf857x_init(&pcf857x_dev[i], &pcf857x_params[i]) != 0) {
             puts("[Failed]");
             return 1;
         }
