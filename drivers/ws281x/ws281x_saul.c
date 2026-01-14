@@ -27,7 +27,7 @@
 static int set_rgb_led(const void *dev, const phydat_t *res)
 {
     ws281x_t *ws281x = (ws281x_t *)dev;
-    color_rgb_t color = {
+    ws281x_pixel_t color = {
         .r = res->val[0],
         .g = res->val[1],
         .b = res->val[2]

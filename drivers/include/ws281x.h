@@ -97,10 +97,21 @@
 extern "C" {
 #endif
 
+#ifndef WS281X_BYTES_PER_DEVICE
 /**
  * @brief   The number of bytes to allocate in the data buffer per LED
  */
-#define WS281X_BYTES_PER_DEVICE       (3U)
+#  define WS281X_BYTES_PER_DEVICE       (3U)
+#endif
+
+/**
+ * @brief   Pixel type representing a single LED
+ */
+#if WS281X_BYTES_PER_DEVICE == 4
+typedef color_rgbw_t ws281x_pixel_t;
+#else
+typedef color_rgb_t ws281x_pixel_t;
+#endif
 
 /**
  * @brief   Struct to hold initialization parameters for a WS281x RGB LED
@@ -214,7 +225,7 @@ static inline void ws281x_end_transmission(ws281x_t *dev)
  * @warning This change will not become active until @ref ws281x_write is
  *          called
  */
-void ws281x_set_buffer(void *dest, uint16_t index, color_rgb_t color);
+void ws281x_set_buffer(void *dest, uint16_t index, ws281x_pixel_t color);
 
 /**
  * @brief   Sets the color of an LED in the chain in the internal buffer
@@ -226,7 +237,7 @@ void ws281x_set_buffer(void *dest, uint16_t index, color_rgb_t color);
  * @warning This change will not become active until @ref ws281x_write is
  *          called
  */
-static inline void ws281x_set(ws281x_t *dev, uint16_t index, color_rgb_t color)
+static inline void ws281x_set(ws281x_t *dev, uint16_t index, ws281x_pixel_t color)
 {
     ws281x_set_buffer(dev->params.buf, index, color);
 }
