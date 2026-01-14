@@ -20,6 +20,9 @@
 #include "esp_common.h"
 #include "log.h"
 #include "syscalls.h"
+#include "thread.h"
+
+#include "freertos/semphr.h"
 
 #include "esp_attr.h"
 #include "esp_log.h"
@@ -124,4 +127,30 @@ void esp_newlib_time_init(void)
 {
     extern void esp_time_impl_init(void);
     esp_time_impl_init();
+}
+
+/*
+ * replaces function `wifi_thread_semphr_get_wrapper`
+ * in: /path/to/esp-idf/components/esp_wifi/<esp32_variant>/esp_adapter.c
+ *
+ * ESP-IDF uses `pthread` local storage functions such as `pthread_setspecific`
+ * and `pthread_getspecific` to store a thread-associated counting semaphore
+ * used by `libieee80211.a` without creating actual `pthread`s with
+ * `pthread_create` function. This is realized in ESP-IDF by allocating
+ * additional space in the FreeRTOS task control block and implementing
+ * their own `pthread_setspecific` and `pthread_getspecific` to access it.
+ *
+ * This type of implementation isn't possible with the RIOT module `pthread`.
+ * However, it seems that only one such semaphore is used per thread, so we
+ * can simulate it using a simple semaphore array.
+ */
+static SemaphoreHandle_t _wifi_thread_sem[KERNEL_PID_LAST + 1] = { };
+
+void *riot_wifi_thread_semphr_get(void)
+{
+    kernel_pid_t pid = thread_getpid();
+    if (!_wifi_thread_sem[pid]) {
+        _wifi_thread_sem[pid] = xSemaphoreCreateCounting(1, 0);
+    }
+    return (void *)_wifi_thread_sem[pid];
 }
