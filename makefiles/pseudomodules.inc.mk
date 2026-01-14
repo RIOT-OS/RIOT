@@ -91,22 +91,23 @@ PSEUDOMODULES += gcoap_dns
 ## Enable the @ref gcoap_dns_server_proxy_set function
 PSEUDOMODULES += gcoap_dns_proxied
 ## @}
+
 PSEUDOMODULES += fido2_tests
 ## @addtogroup net_dhcpv6_client
 ## @{
+
 ## @defgroup net_gnrc_dhcpv6_client	gnrc_dhcpv6_client: Basic DHCPv6 client implementation in GNRC
-## @{
 PSEUDOMODULES += gnrc_dhcpv6_client
-## @}
+
 ## @defgroup net_gnrc_dhcpv6_client_6lbr gnrc_dhcpv6_client_6lbr: Basic client for GNRC 6LoWPAN BRs
-## @{
 PSEUDOMODULES += gnrc_dhcpv6_client_6lbr
 ## @}
+
 ## @addtogroup net_dhcpv6_client_simple_pd
 ## @{
 PSEUDOMODULES += gnrc_dhcpv6_client_simple_pd
 ## @}
-## @}
+
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_auto_init
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_eui
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_simple
