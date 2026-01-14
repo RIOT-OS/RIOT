@@ -19,7 +19,6 @@ BOOTLOADER_BAUD ?= $(BAUD)
 
 # Bootloader sdkconfig.h defined in CURDIR directory.
 INCLUDES = \
-  -I$(dir $(RIOTBUILD_CONFIG_HEADER_C)) \
   -I$(ESP8266_RTOS_SDK_DIR)/components/bootloader_support/include \
   -I$(ESP8266_RTOS_SDK_DIR)/components/bootloader_support/include_priv \
   -I$(ESP8266_RTOS_SDK_DIR)/components/esp8266/include \

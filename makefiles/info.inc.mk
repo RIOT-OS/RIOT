@@ -274,6 +274,7 @@ info-rust:
 	@echo "and export these environment variables:"
 	@echo "    CARGO_BUILD_TARGET=\"$(RUST_TARGET)\""
 	@echo "    RIOT_COMPILE_COMMANDS_JSON=\"$(CARGO_COMPILE_COMMANDS)\""
-	@echo "    RIOTBUILD_CONFIG_HEADER_C=\"$(RIOTBUILD_CONFIG_HEADER_C)\""
+	@echo "    MODULE_DEFINE_FILE=\"$(MODULE_DEFINE_FILE)\""
+	@echo "    CFLAGS_HASH_FILE=\"$(CFLAGS_HASH_FILE)\""
 	@echo "You can also call cargo related commands with \`make cargo-command CARGO_COMMAND=\"cargo check\"\`."
 	@echo "Beware that the way command line arguments are passed in is not consistent across cargo commands, so adding \`--profile $(CARGO_PROFILE)\` or other flags from above as part of CARGO_COMMAND may be necessary."
