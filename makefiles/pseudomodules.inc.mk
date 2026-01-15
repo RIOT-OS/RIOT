@@ -91,22 +91,23 @@ PSEUDOMODULES += gcoap_dns
 ## Enable the @ref gcoap_dns_server_proxy_set function
 PSEUDOMODULES += gcoap_dns_proxied
 ## @}
+
 PSEUDOMODULES += fido2_tests
 ## @addtogroup net_dhcpv6_client
 ## @{
+
 ## @defgroup net_gnrc_dhcpv6_client	gnrc_dhcpv6_client: Basic DHCPv6 client implementation in GNRC
-## @{
 PSEUDOMODULES += gnrc_dhcpv6_client
-## @}
+
 ## @defgroup net_gnrc_dhcpv6_client_6lbr gnrc_dhcpv6_client_6lbr: Basic client for GNRC 6LoWPAN BRs
-## @{
 PSEUDOMODULES += gnrc_dhcpv6_client_6lbr
 ## @}
+
 ## @addtogroup net_dhcpv6_client_simple_pd
 ## @{
 PSEUDOMODULES += gnrc_dhcpv6_client_simple_pd
 ## @}
-## @}
+
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_auto_init
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_eui
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_simple
@@ -159,16 +160,6 @@ PSEUDOMODULES += gnrc_nettype_ipv6
 ## @{
 ## Enables @ref GNRC_NETTYPE_IPV6_EXT.
 PSEUDOMODULES += gnrc_nettype_ipv6_ext
-## @}
-
-## @defgroup 	net_gnrc_nettype_lorawan    gnrc_nettype_lorawan
-## Enables @ref GNRC_NETTYPE_LORAWAN
-##
-## @deprecated  LoRaWAN payloads do not have a special type anymore and just use
-##              @ref GNRC_NETTYPE_UNDEF. There is no module needed for that.
-##              This module will be removed after 2024.10 release.
-## @{
-PSEUDOMODULES += gnrc_nettype_lorawan
 ## @}
 
 ## @defgroup 	net_gnrc_nettype_ndn        gnrc_nettype_ndn

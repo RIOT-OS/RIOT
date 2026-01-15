@@ -183,8 +183,7 @@ ctap_status_code_t fido2_ctap_mem_write_rk_to_flash(ctap_resident_key_t *rk)
         ret = mtd_read(_mtd_dev, &tmp, addr, sizeof(ctap_resident_key_t));
 
         if (ret < 0) {
-            DEBUG("%s, %d: mtd_read failed", RIOT_FILE_RELATIVE,
-                  __LINE__);
+            DEBUG("%s, %d: mtd_read failed", __FILE__, __LINE__);
             return false;
         }
 
@@ -243,8 +242,7 @@ ctap_status_code_t fido2_ctap_mem_read_rk_from_flash(ctap_resident_key_t *key, u
         int ret = mtd_read(_mtd_dev, key, *addr, sizeof(ctap_resident_key_t));
 
         if (ret < 0) {
-            DEBUG("%s, %d: mtd_read failed", RIOT_FILE_RELATIVE,
-                  __LINE__);
+            DEBUG("%s, %d: mtd_read failed", __FILE__, __LINE__);
             return CTAP1_ERR_OTHER;
         }
 
