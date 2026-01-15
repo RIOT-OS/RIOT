@@ -167,6 +167,7 @@ typedef enum {
    IEEE802154_FSM_STATE_PREPARE,        /**< The SubMAC is preparing the next transmission */
    IEEE802154_FSM_STATE_TX,             /**< The SubMAC is currently transmitting a frame */
    IEEE802154_FSM_STATE_WAIT_FOR_ACK,   /**< The SubMAC is waiting for an ACK frame */
+   IEEE802154_FSM_STATE_TX_ACK,         /**< The SubMAC is transmitting an ACK frame */
    IEEE802154_FSM_STATE_NUMOF,          /**< Number of SubMAC FSM states */
 } ieee802154_fsm_state_t;
 
