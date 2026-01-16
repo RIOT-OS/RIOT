@@ -2,7 +2,6 @@
  * SPDX-FileCopyrightText: 2017 SKF AB
  * SPDX-License-Identifier: LGPL-2.1-only
  */
-
 #pragma once
 
 /**
@@ -89,12 +88,14 @@ extern "C" {
 /**
  * @brief   CCA modes
  */
-#define KW41ZRF_CCATYPE_MODE1               (1U)  /* CCA Mode 1 - Energy */
-#define KW41ZRF_CCATYPE_MODE2               (2U)  /* CCA Mode 2 - Carrier Sense */
-#define KW41ZRF_CCATYPE_MODE3               (3U)  /* CCA Mode 3 - Combined */
+#define KW41ZRF_CCATYPE_MODE1               (1U)  /**< CCA Mode 1 - Energy */
+#define KW41ZRF_CCATYPE_MODE2               (2U)  /**< CCA Mode 2 - Carrier Sense */
+#define KW41ZRF_CCATYPE_MODE3               (3U)  /**< CCA Mode 3 - Combined */
 
-#define MAX_BOOT_RETRIES 9
-
+/**
+ * @brief Maximum number of boot retries for the KW41Z radio
+ */
+#define KW41ZRF_MAX_BOOT_RETRIES    (9)
 
 /**
  * @brief ISR callback function type
@@ -121,9 +122,11 @@ typedef struct {
 } kw41zrf_t;
 
 /**
- * @brief   Setup KW41ZRF HAL in order to be used with the IEEE 802.15.4 Radio HAL
+ * @brief   Setup KW41Z in order to be used with the IEEE 802.15.4 Radio HAL
  *
- * @param[out] dev          hal descriptor
+ * @note    This functions MUST be called before @ref kw41zrf_init.
+ *
+ * @param[in] hal  pointer to the HAL descriptor associated to the device.
  */
 void kw41zrf_hal_setup(ieee802154_dev_t *hal);
 
