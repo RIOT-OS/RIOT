@@ -11,6 +11,7 @@ on:
             - 'GOVERNANCE.md'
             - 'CONTRIBUTING.md'
             - 'CODING_CONVENTIONS*.md'
+            - 'SECURITY.md'
             - 'release-notes.txt'
 
 jobs:
