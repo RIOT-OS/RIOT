@@ -12,7 +12,6 @@
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @}
  */
-#include "net/netdev/ieee802154_submac.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -23,6 +22,7 @@
 #include "msg.h"
 #include "net/gnrc.h"
 #include "net/ieee802154.h"
+#include "net/netdev/ieee802154_submac.h"
 
 #include "kw41zrf.h"
 #include "kw41zrf_netdev.h"

@@ -50,10 +50,6 @@
 #define OPENTHREAD_NETIF_NUMOF        ARRAY_SIZE(at86rf2xx_params)
 #endif
 
-#ifdef MODULE_KW41ZRF
-#define OPENTHREAD_NETIF_NUMOF        (1U)
-#endif
-
 #ifdef MODULE_CC2538_RF
 static netdev_ieee802154_submac_t cc2538_rf_netdev;
 #endif
@@ -63,7 +59,7 @@ static at86rf2xx_t at86rf2xx_dev;
 #endif
 
 #ifdef MODULE_KW41ZRF
-static kw41zrf_t kw41z_dev;
+static netdev_ieee802154_submac_t kw41zrf_netdev;
 #endif
 
 #ifdef MODULE_NRF802154

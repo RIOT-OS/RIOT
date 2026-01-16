@@ -23,41 +23,41 @@
 #include "bhp/event.h"
 
 #ifdef MODULE_CC2538_RF
-#include "cc2538_rf.h"
+#  include "cc2538_rf.h"
 #endif
 
 #ifdef MODULE_ESP_IEEE802154
-#include "esp_ieee802154_hal.h"
+#  include "esp_ieee802154_hal.h"
 #endif
 
 #ifdef MODULE_NRF802154
-#include "nrf802154.h"
+#  include "nrf802154.h"
 #endif
 
 #ifdef MODULE_SOCKET_ZEP
-#include "socket_zep.h"
-#include "socket_zep_params.h"
+#  include "socket_zep.h"
+#  include "socket_zep_params.h"
 #endif
 
 #include "event/thread.h"
 extern void auto_init_event_thread(void);
 
 #ifdef MODULE_KW2XRF
-#include "kw2xrf.h"
-#include "kw2xrf_params.h"
-#define KW2XRF_NUM   ARRAY_SIZE(kw2xrf_params)
+#  include "kw2xrf.h"
+#  include "kw2xrf_params.h"
+#  define KW2XRF_NUM   ARRAY_SIZE(kw2xrf_params)
 static kw2xrf_t kw2xrf_dev[KW2XRF_NUM];
 static bhp_event_t kw2xrf_bhp[KW2XRF_NUM];
 #endif
 
 #ifdef MODULE_KW41ZRF
-#include "kw41zrf.h"
-#endif /* ifdef MODULE_KW41ZRF */
+#  include "kw41zrf.h"
+#endif
 
 #ifdef MODULE_MRF24J40
-#include "mrf24j40.h"
-#include "mrf24j40_params.h"
-#define MRF24J40_NUM    ARRAY_SIZE(mrf24j40_params)
+#  include "mrf24j40.h"
+#  include "mrf24j40_params.h"
+#  define MRF24J40_NUM    ARRAY_SIZE(mrf24j40_params)
 static mrf24j40_t mrf24j40_dev[MRF24J40_NUM];
 static bhp_event_t mrf24j40_bhp[MRF24J40_NUM];
 #endif
@@ -122,7 +122,7 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
         kw41zrf_init();
     }
     return;
-#endif /* ifdef MODULE_KW41ZRF */
+#endif
 
 #ifdef MODULE_SOCKET_ZEP
     static socket_zep_t _socket_zeps[SOCKET_ZEP_MAX];
