@@ -469,7 +469,6 @@ static int _init(void)
 
     struct _reg_container reg = { 0 };
     ieee802154_hal_test_init_devs(_reg_callback, &reg);
-    puts("init device successfull\n");
     int res = ieee802154_submac_init(&submac, &short_addr, &long_addr);
 
     if (res < 0) {
