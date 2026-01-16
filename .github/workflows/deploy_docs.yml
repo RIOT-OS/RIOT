@@ -36,3 +36,14 @@ jobs:
                 publish_branch: gh-pages
                 cname: guide.riot-os.org
                 commit_message: "Deploy documentation"
+
+          - name: Deploy to riot-os.org server
+            uses: burnett01/rsync-deployments@v8
+            with:
+              switches: -avzr --delete
+              path: doc/starlight/dist/
+              remote_path: /
+              remote_host: ${{ secrets.SSH_GUIDES_REMOTE_HOST }}
+              remote_port: ${{ secrets.SSH_GUIDES_REMOTE_PORT }}
+              remote_user: ${{ secrets.SSH_GUIDES_REMOTE_USER }}
+              remote_key: ${{ secrets.SSH_GUIDES_PRIVATE_KEY }}
