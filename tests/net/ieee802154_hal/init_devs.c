@@ -50,6 +50,10 @@ static kw2xrf_t kw2xrf_dev[KW2XRF_NUM];
 static bhp_event_t kw2xrf_bhp[KW2XRF_NUM];
 #endif
 
+#ifdef MODULE_KW41ZRF
+#include "kw41zrf.h"
+#endif /* ifdef MODULE_KW41ZRF */
+
 #ifdef MODULE_MRF24J40
 #include "mrf24j40.h"
 #include "mrf24j40_params.h"
@@ -81,6 +85,7 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
         cc2538_rf_hal_setup(radio);
         cc2538_init();
     }
+    return;
 #endif
 
 #ifdef MODULE_ESP_IEEE802154
@@ -88,6 +93,7 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
         esp_ieee802154_setup(radio);
         esp_ieee802154_init();
     }
+    return;
 #endif
 
 #ifdef MODULE_NRF802154
@@ -95,6 +101,7 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
         nrf802154_hal_setup(radio);
         nrf802154_init();
     }
+    return;
 #endif
 
 #ifdef MODULE_KW2XRF
@@ -106,7 +113,16 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
             break;
         }
     }
+    return;
 #endif
+
+#ifdef MODULE_KW41ZRF
+    if ((radio = cb(IEEE802154_DEV_TYPE_KW41ZRF, opaque))) {
+        kw41zrf_hal_setup(radio);
+        kw41zrf_init();
+    }
+    return;
+#endif /* ifdef MODULE_KW41ZRF */
 
 #ifdef MODULE_SOCKET_ZEP
     static socket_zep_t _socket_zeps[SOCKET_ZEP_MAX];
@@ -114,6 +130,7 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
         socket_zep_hal_setup(&_socket_zeps[0], radio);
         socket_zep_setup(&_socket_zeps[0], &socket_zep_params[0]);
     }
+    return;
 #endif
 
 #ifdef MODULE_MRF24J40
@@ -125,5 +142,8 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
             break;
         }
     }
+    return;
 #endif
+    puts("Radio Module not defined");
+    assert(false);
 }
