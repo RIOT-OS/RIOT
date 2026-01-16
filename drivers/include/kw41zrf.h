@@ -120,9 +120,6 @@ typedef struct {
     uint8_t cca_busy;                       /**< CCA busy flag */
     ieee802154_tx_status_t tx_status;       /**< Status of a transmission */
     uint8_t pm_blocked;                     /**< true if we have blocked a low power mode in the CPU */
-    uint8_t recv_blocked;                   /**< blocks moving to XCVSEQ_RECEIVE to prevent
-                                            *   overwriting the RX buffer before the higher
-                                            *   layers have copied it to system RAM */
     /** @} */
 } kw41zrf_t;
 
@@ -148,6 +145,22 @@ int kw41zrf_init(void);
  * @return <0 on initialization failure
  */
 int kw41zrf_reset_hardware(kw41zrf_t *dev);
+
+
+/**
+ * @brief Print ZLL IRQSTS register state
+ */
+void kw41zrf_print_irq_state(void);
+
+/**
+ * @brief Print ZLL PHY_CTRL register state
+ */
+void kw41zrf_print_phy_ctrl(void);
+
+/**
+ * @brief Print ZLL SEQ_CTRL_STS register state
+ */
+void kw41zrf_print_seq_ctrl_sts(void);
 
 #ifdef __cplusplus
 }
