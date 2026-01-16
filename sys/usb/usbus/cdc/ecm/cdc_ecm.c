@@ -129,6 +129,9 @@ static void _notify_link_speed(usbus_cdcecm_device_t *cdcecm)
     usbdev_ep_xmit(cdcecm->ep_ctrl->ep, cdcecm->control_in,
                     sizeof(usb_desc_cdcecm_speed_t));
     cdcecm->notif = USBUS_CDCECM_NOTIF_SPEED;
+
+    /* signal link UP */
+    cdcecm->netdev.event_callback(&cdcecm->netdev, NETDEV_EVENT_LINK_UP);
 }
 
 static void _notify_link_up(usbus_cdcecm_device_t *cdcecm)
@@ -245,7 +248,7 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     usbus_enable_endpoint(cdcecm->ep_out);
     usbus_enable_endpoint(cdcecm->ep_in);
     usbus_enable_endpoint(cdcecm->ep_ctrl);
-    usbus_handler_set_flag(handler, USBUS_HANDLER_FLAG_RESET);
+    usbus_handler_set_flag(handler, USBUS_HANDLER_FLAG_RESET | USBUS_HANDLER_FLAG_SUSPEND);
 }
 
 static int _control_handler(usbus_t *usbus, usbus_handler_t *handler,
@@ -349,10 +352,29 @@ static void _handle_reset(usbus_t *usbus, usbus_handler_t *handler)
     mutex_unlock(&cdcecm->out_lock);
 }
 
+static void _handle_suspend(usbus_t *usbus, usbus_handler_t *handler)
+{
+    usbus_cdcecm_device_t *cdcecm = (usbus_cdcecm_device_t *)handler;
+
+    DEBUG("CDC ECM: Suspend\n");
+    if (!cdcecm->active_iface) {
+        return;
+    }
+
+    _handle_in_complete(usbus, handler);
+    cdcecm->active_iface = 0;
+
+    /* signal link DOWN */
+    cdcecm->netdev.event_callback(&cdcecm->netdev, NETDEV_EVENT_LINK_DOWN);
+}
+
 static void _event_handler(usbus_t *usbus, usbus_handler_t *handler,
                           usbus_event_usb_t event)
 {
     switch (event) {
+        case USBUS_EVENT_USB_SUSPEND:
+            _handle_suspend(usbus, handler);
+            break;
         case USBUS_EVENT_USB_RESET:
             _handle_reset(usbus, handler);
             break;

@@ -156,9 +156,6 @@ static int _init(netdev_t *netdev)
 
     netdev_eui48_get(netdev, (eui48_t*)&cdcecm->mac_netdev);
 
-    /* signal link UP */
-    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
-
     return 0;
 }
 
