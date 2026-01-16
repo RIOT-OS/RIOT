@@ -16,7 +16,7 @@ which means that we both have the control over the content and layout but at the
 ## How to run the Site locally
 
 To run the site locally, you need to have [Node.js](https://nodejs.org/) installed.
-It is highly recommended to use a version manager such as [NVM](https://github.com/nvm-sh/nvm) to manage your Node.js versions.
+We highly recommend to use a version manager such as [NVM](https://github.com/nvm-sh/nvm) to manage your Node.js versions.
 
 Please make sure to use a fairly recent version of Node.js, some distributions (such as Ubuntu) ship with a very old version of Node.js that is not compatible with Starlight.
 Generally, the latest LTS version should work fine (As of writing v22), as specified in the [Astro documentation](https://docs.astro.build/en/install-and-setup/#prerequisites).
@@ -63,7 +63,7 @@ cd doc/starlight && make build
 
 ### Folder Structure
 
-Generally, there are two folders that are important for the guides:
+Generally, there are two folders that are of significance for the guides:
 
 - `doc/guides/`: This folder contains the actual guides. Each guide is a Markdown file with a specific structure that Starlight uses to generate the navigation and other metadata for the guide.
 - `doc/starlight/`: This folder contains the Starlight configuration files. The most important file is `astro.config.mjs`, which contains the configuration for the site, including the navigation structure and other settings.
@@ -84,7 +84,7 @@ description: This is a description of my new guide
 Hello World!
 ```
 
-Starlight uses the frontmatter of the Markdown file to generate the navigation and other metadata for the guide. On Github this will appear as a small table at the top of the file so your guide will still be readable in the repository.
+Starlight uses the frontmatter of the Markdown file to generate the navigation and other metadata for the guide. On GitHub this will appear as a small table at the top of the file, so your guide will still be readable in the repository.
 
 Now you can add content to the guide using Markdown. Starlight supports all the standard Markdown features, including headings, lists, links, images, and code blocks. You can also use MDX to embed JavaScript, Components, and other features directly into your Markdown files. This allows you to create interactive components and dynamic content within your guides.
 
@@ -116,7 +116,7 @@ It is also important to note that the place in each section is directly related 
 
 Generally, the less information you declare within the config the better, given that ideally your frontmatter information is enough to generate the navigation.
 
-You can either add your guide to an existing section or create a new section. In the event that you want to simply append your guide to an existing section, you can simply add the file name to the list of files in the section. The root of the so called `slug` of your file is the guides folder itself, so a guide under `doc/guides/test/hello_world.md` will have the slug `test/hello_world.md`.
+You can either add your guide to an existing section or create a new section. In the event that you want to simply append your guide to an existing section, you can simply add the file name to the list of files in the section. The root of the so called `slug` of your file is the folder of the guides itself, so a guide under `doc/guides/test/hello_world.md` will have the slug `test/hello_world.md`.
 
 :::note
 There is one exception to this rule, if your file is called index.md, the slug will be the name of the folder it is in. For example `doc/guides/test/index.md` will have the slug `test`.
@@ -124,7 +124,7 @@ There is one exception to this rule, if your file is called index.md, the slug w
 
 ### Creating a new Section
 
-Generally, we want to avoid creating new sections unless absolutely necessary. For example, if you create a totally new tutorial that spans multiple files, it might make sense to create a new section.
+Typically, we want to avoid creating new sections unless absolutely necessary. For example, if you create a totally new tutorial that spans multiple files, it might make sense to create a new section.
 In this case, you can create a new section by adding a new entry to the `sidebar` array in the `astro.config.mjs` file. The entry should look like this:
 
 ```javascript title="doc/starlight/astro.config.mjs"
@@ -139,7 +139,7 @@ sidebar: [
 ```
 
 :::tip
-Sections can also be nested, so you can create a section within a section by adding another array to the `items` array. This is useful for organizing your guides into sub-sections.
+Sections can also be nested, so you can create a section within a section by adding another array to the `items` array. This is useful for organizing your guides into subsections.
 :::
 
 ### Code Block Testing
