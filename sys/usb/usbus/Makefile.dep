@@ -19,6 +19,8 @@ ifneq (,$(filter usbus_cdc_ecm,$(USEMODULE)))
   USEMODULE += netdev_new_api
   USEMODULE += netdev_eth
   USEMODULE += luid
+  USEMODULE += ztimer
+  USEMODULE += ztimer_usec
 endif
 
 ifneq (,$(filter usbus_hid,$(USEMODULE)))

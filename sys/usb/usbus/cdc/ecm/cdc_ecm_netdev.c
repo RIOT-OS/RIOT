@@ -27,10 +27,21 @@
 #include "net/eui_provider.h"
 #include "net/netdev.h"
 #include "net/netdev/eth.h"
+#include "time_units.h"
 #include "usb/usbus/cdc/ecm.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+/**
+ * @brief Timeout [us] for sending a packet down the bus.
+ *
+ * Under certain conditions, packet sending may block for too long. This will
+ * stall the netif thread and any others that sync with it.
+ */
+#ifndef CONFIG_USBUS_CDC_ECM_TX_TIMEOUT_US
+#define CONFIG_USBUS_CDC_ECM_TX_TIMEOUT_US (50 * US_PER_MS)
+#endif
 
 static const netdev_driver_t netdev_driver_cdcecm;
 
@@ -75,7 +86,11 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     size_t usb_remain = cdcecm->ep_in->maxpacketsize;
     DEBUG("CDC_ECM_netdev: cur iol: %d\n", iolist->iol_len);
     while (len) {
-        mutex_lock(&cdcecm->out_lock);
+        if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &cdcecm->out_lock,
+                                  CONFIG_USBUS_CDC_ECM_TX_TIMEOUT_US) != 0) {
+            DEBUG("out_lock timeout!\n");
+            return -EBUSY;
+        }
         if (iolist->iol_len - iol_offset > usb_remain) {
             /* Only part of the iolist can be copied, usb_remain bytes */
             memcpy(buf + usb_offset, (uint8_t *)iolist->iol_base + iol_offset,
@@ -120,7 +135,11 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     }
     /* Zero length USB packet required */
     if ((iolist_size(iolist_start) % cdcecm->ep_in->maxpacketsize) == 0) {
-        mutex_lock(&cdcecm->out_lock);
+        if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &cdcecm->out_lock,
+                                  CONFIG_USBUS_CDC_ECM_TX_TIMEOUT_US) != 0) {
+            DEBUG("out_lock timeout!\n");
+            return -EBUSY;
+        }
         DEBUG("CDC ECM netdev: Zero length USB packet required\n");
         cdcecm->tx_len = 0;
         _signal_tx_xmit(cdcecm);
