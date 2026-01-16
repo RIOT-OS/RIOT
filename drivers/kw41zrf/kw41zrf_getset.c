@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 SKF AB
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2017 SKF AB
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -117,7 +114,7 @@ void kw41zrf_set_pan(kw41zrf_t *dev, uint16_t pan)
     DEBUG("[kw41zrf] set pan to: 0x%x\n", pan);
 }
 
-void kw41zrf_set_pan_coord(uint8_t is_coord)
+void kw41zrf_set_pan_coord(bool is_coord)
 {
     if (is_coord) {
         bit_set32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_PANCORDNTR0_SHIFT);

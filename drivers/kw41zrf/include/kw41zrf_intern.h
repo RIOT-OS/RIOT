@@ -1,12 +1,8 @@
 /*
- * Copyright (C) 2017 SKF AB
- * Copyright (C) 2016 Phytec Messtechnik GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Phytec Messtechnik GmbH
+ * SPDX-FileCopyrightText: 2017 SKF AB
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
-
 #pragma once
 
 /**
@@ -302,6 +298,13 @@ static inline uint32_t kw41zrf_get_timestamp(kw41zrf_t *dev)
     return ZLL->TIMESTAMP;
 }
 
+/**
+ * @brief Checks if an ACK is requested for the transmitting frame
+ *
+ * @param[in] dev       kw41zrf device descriptor
+ *
+ * @return              non-zero if ACK is requested, 0 otherwise
+ */
 static inline uint8_t kw41zrf_ack_requested(kw41zrf_t *dev)
 {
         (void) dev;

@@ -36,7 +36,7 @@
 #include "net/ieee802154/radio.h"
 
 #ifdef MODULE_OD
-#include "od.h"
+#  include "od.h"
 #endif
 
 #define ENABLE_DEBUG (0)
@@ -44,6 +44,7 @@
 
 #define CHECKSUM_MASK               0xFFFF
 
+/* Mask for all kinds of IEEE 802.15.4 frames supported by the radio */
 #define ALL_FRAMES_TYPE_MASK        (ZLL_RX_FRAME_FILTER_BEACON_FT_MASK | \
                                      ZLL_RX_FRAME_FILTER_DATA_FT_MASK    | \
                                      ZLL_RX_FRAME_FILTER_CMD_FT_MASK     | \
@@ -842,7 +843,7 @@ int kw41zrf_reset(void)
         if (!res) {
             break;
         }
-        if (retries == MAX_BOOT_RETRIES) {
+        if (retries == KW41ZRF_MAX_BOOT_RETRIES) {
             kw41zrf_unmask_irqs();
             return res;
         }
