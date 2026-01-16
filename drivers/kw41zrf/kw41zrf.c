@@ -14,6 +14,7 @@
  */
 #include "net/netdev/ieee802154_submac.h"
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #include <errno.h>
 
