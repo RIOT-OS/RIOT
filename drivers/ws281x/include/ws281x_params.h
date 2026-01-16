@@ -21,6 +21,7 @@
 #include <limits.h>
 
 #include "board.h"
+#include "macros/units.h"
 #include "saul_reg.h"
 
 #include "ws281x.h"
@@ -105,6 +106,24 @@ static const ws281x_params_t ws281x_params[] =
  * */
 #ifndef WS281X_TIMER_FREQ
 #define WS281X_TIMER_FREQ 16000000
+#endif
+
+/**
+ * @brief   SPI device to use for WS281x RGB LED data transmission
+ *
+ * This SPI must support DMA.
+ */
+#ifndef WS281X_SPI_DEV
+#define WS281X_SPI_DEV                  SPI_DEV(0)
+#endif
+
+/**
+ * @brief   SPI clock speed: 3.2 MHz → 312.5 ns per SPI bit
+ *
+ * 4 SPI bits add up to 1.25 µs period, which is the time to transmit one WS281x bit.
+ */
+#ifndef WS281X_SPI_CLK
+#define WS281X_SPI_CLK                  KHZ(3200)
 #endif
 
 /**
