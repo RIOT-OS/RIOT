@@ -1,0 +1,3 @@
+USEMODULE += stdio_usb_serial_jtag
+
+USEMODULE += boards_common_esp32c6
