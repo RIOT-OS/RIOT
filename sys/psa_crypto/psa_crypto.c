@@ -274,10 +274,19 @@ psa_status_t psa_aead_encrypt(psa_key_id_t key,
                                     PSA_CRYPTO_DRIVER_ENCRYPT);
 }
 
-/* IoT-TODO */
-psa_status_t psa_aead_encrypt_setup(psa_aead_operation_t *operation,
-                                    psa_key_id_t key,
-                                    psa_algorithm_t alg)
+/**
+ * @brief   aead multipart encrypt and decrypt function to avoid duplicate code
+ *
+ *          See @ref psa_aead_encrypt_setup(...)
+ *          See @ref psa_aead_decrypt_setup(...)
+ *
+ * @param   direction       Whether to encrypt or decrypt, see @ref psa_encrypt_or_decrypt_t
+ * @return  @ref psa_status_t
+ */
+psa_status_t psa_aead_encrypt_decrypt_setup(psa_aead_operation_t *operation,
+                                            psa_key_id_t key,
+                                            psa_algorithm_t alg,
+                                            psa_encrypt_or_decrypt_t direction)
 {
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
@@ -295,16 +304,15 @@ psa_status_t psa_aead_encrypt_setup(psa_aead_operation_t *operation,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    /* IoT-Todo: key type not compatible with alg => invalid argument? Not done in Oneshot? */
-
     /* Key not supported for use with alg */
     if (PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) != PSA_ALG_CCM &&
         PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) != PSA_ALG_CHACHA20_POLY1305) {
         return PSA_ERROR_NOT_SUPPORTED;
     }
 
-    /* IoT-Todo: is this supposed to be hard-coded? */
-    psa_key_usage_t usage = PSA_KEY_USAGE_ENCRYPT;
+    psa_key_usage_t usage = (direction == PSA_CRYPTO_DRIVER_ENCRYPT ?
+                                 PSA_KEY_USAGE_ENCRYPT :
+                                 PSA_KEY_USAGE_DECRYPT);
 
     status = psa_get_and_lock_key_slot_with_policy(key, &slot, usage, alg);
     if (status != PSA_SUCCESS) {
@@ -315,76 +323,29 @@ psa_status_t psa_aead_encrypt_setup(psa_aead_operation_t *operation,
         return status;
     }
 
-    /* IoT-Todo: Cipher does this, but would compiler just optimize it anyway?
-    psa_key_attributes_t attr = slot->attr;
-    below in decryt_setup aswell
-    */
-
-    status = psa_location_dispatch_aead_encrypt_setup(operation, &slot->attr, slot, alg);
-    if (status != PSA_SUCCESS) {
-        psa_aead_abort(operation);
+    if (direction == PSA_CRYPTO_DRIVER_ENCRYPT) {
+        status = psa_location_dispatch_aead_encrypt_setup(operation, &slot->attr, slot, alg);
+    }
+    else {
+        status = psa_location_dispatch_aead_decrypt_setup(operation, &slot->attr, slot, alg);
     }
 
     unlock_status = psa_unlock_key_slot(slot);
     return ((status == PSA_SUCCESS) ? unlock_status : status);
 }
 
-/* IoT-TODO */
+psa_status_t psa_aead_encrypt_setup(psa_aead_operation_t *operation,
+                                    psa_key_id_t key,
+                                    psa_algorithm_t alg)
+{
+    return psa_aead_encrypt_decrypt_setup(operation, key, alg, PSA_CRYPTO_DRIVER_ENCRYPT);
+}
+
 psa_status_t psa_aead_decrypt_setup(psa_aead_operation_t *operation,
                                     psa_key_id_t key,
                                     psa_algorithm_t alg)
 {
-    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
-    psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
-    psa_key_slot_t *slot;
-
-    if (!lib_initialized) {
-        return PSA_ERROR_BAD_STATE;
-    }
-
-    if (!operation) {
-        return PSA_ERROR_INVALID_ARGUMENT;
-    }
-
-    if (!PSA_ALG_IS_AEAD(alg)) {
-        return PSA_ERROR_INVALID_ARGUMENT;
-    }
-
-    /* Key not supported for use with alg */
-    if (PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) != PSA_ALG_CCM &&
-        PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) != PSA_ALG_CHACHA20_POLY1305) {
-        return PSA_ERROR_NOT_SUPPORTED;
-    }
-
-    /* IoT-Todo: INVALID_HANDLE if key is not valid key identifier? 
-    Not done in Oneshot? Lower Layer?*/
-
-    /* IoT-Todo: INVALID_ARGUMENT key type not compatible with alg => invalid argument? 
-    Not done in Oneshot? Lower Layer? */
-
-    /* IoT-Todo: is this supposed to be hard-coded? */
-    psa_key_usage_t usage = PSA_KEY_USAGE_DECRYPT;
-
-    status = psa_get_and_lock_key_slot_with_policy(key, &slot, usage, alg);
-    if (status != PSA_SUCCESS) {
-        unlock_status = psa_unlock_key_slot(slot);
-        if (unlock_status != PSA_SUCCESS) {
-            status = unlock_status;
-        }
-        return status;
-    }
-
-    /* IoT-Todo: see encrypt_setup(...)
-    psa_key_attributes_t attr = slot->attr;
-    */
-
-    status = psa_location_dispatch_aead_decrypt_setup(operation, &slot->attr, slot, alg);
-    if (status != PSA_SUCCESS) {
-        psa_aead_abort(operation);
-    }
-
-    unlock_status = psa_unlock_key_slot(slot);
-    return ((status == PSA_SUCCESS) ? unlock_status : status);
+    return psa_aead_encrypt_decrypt_setup(operation, key, alg, PSA_CRYPTO_DRIVER_DECRYPT);
 }
 
 /* IoT-TODO */
@@ -402,12 +363,11 @@ psa_status_t psa_aead_set_lengths(psa_aead_operation_t *operation,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    /* return PSA_ERROR_INVALID_ARGUMENT if ad_length or plaintext_length are too large for the chosen algorithm.
-
-    if (ad_length > ___ || plaintext_length > ___) {
+    /* return PSA_ERROR_INVALID_ARGUMENT if ad_length or plaintext_length are too large 
+    for the chosen algorithm. */
+    if (ad_length > _____ || plaintext_length > ___) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-    */
 
     /* return PSA_ERROR_NOT_SUPPORTED if ad_length or plaintext_length are too large for the implementation.
 
@@ -418,6 +378,7 @@ psa_status_t psa_aead_set_lengths(psa_aead_operation_t *operation,
 
     status = psa_location_dispatch_aead_set_lengths(operation, ad_length, plaintext_length);
     if (status != PSA_SUCCESS) {
+        psa_aead_abort(operation);
         return status;
     }
 
@@ -449,21 +410,24 @@ psa_status_t psa_aead_generate_nonce(psa_aead_operation_t *operation,
     }
 
     /* CCM algorithm requires psa_aead_set_lengths() to be called
-        before psa_aead_generate_nonce() or psa_aead_set_nonce(). */
+     * before psa_aead_generate_nonce() or psa_aead_set_nonce(). 
+     */
     if (operation->alg == PSA_ALG_CCM && !operation->lengths_set) {
         return PSA_ERROR_BAD_STATE;
     }
 
-    /* IoT-Todo: change to proper if statement -> see function documentation */
-    // probably need to check this in deeper layers
-    //if (nonce_size > PSA_AEAD_NONCE_MAX_SIZE) {
-    //    return PSA_ERROR_BUFFER_TOO_SMALL;
-    //}
+    /* IoT-Todo: change to proper if statement -> see function documentation 
+     * probably need to check this in deeper layers
+     * if (nonce_size > PSA_AEAD_NONCE_MAX_SIZE) {
+     *     return PSA_ERROR_BUFFER_TOO_SMALL;
+     *}
+     */
 
     *nonce_length = 0;
 
     status = psa_generate_random(nonce, nonce_size);
     if (status != PSA_SUCCESS) {
+        psa_aead_abort(operation);
         return status;
     }
 
@@ -493,7 +457,8 @@ psa_status_t psa_aead_set_nonce(psa_aead_operation_t *operation,
     }
 
     /* CCM algorithm requires psa_aead_set_lengths() to be called
-        before psa_aead_generate_nonce() or psa_aead_set_nonce(). */
+     * before psa_aead_generate_nonce() or psa_aead_set_nonce(). 
+     */
     if (operation->alg == PSA_ALG_CCM && !operation->lengths_set) {
         return PSA_ERROR_BAD_STATE;
     }
@@ -502,12 +467,13 @@ psa_status_t psa_aead_set_nonce(psa_aead_operation_t *operation,
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
-    // call to location dispatch to set nonce in backend
+    /* call to location dispatch to set nonce in backend */
     status = psa_location_dispatch_aead_set_nonce(operation, nonce, nonce_length);
-
     if (status != PSA_SUCCESS) {
+        psa_aead_abort(operation);
         return status;
     }
+
     operation->nonce_set = 1;
 
     return status;
@@ -528,9 +494,19 @@ psa_status_t psa_aead_update_ad(psa_aead_operation_t *operation,
         return PSA_ERROR_BAD_STATE;
     }
 
-    //check doc
-    status = psa_loocation_dispatch_aead_update_ad(operation, input, input_length);
+    /* IoT-TODO: return INVALID_ARGUMENT if total input_length to psa_aead_update_ad() is greater 
+    than the additional data length that was previously specified with psa_aead_set_lengths() or 
+    is too large for the chosen AEAD algorithm.*/
+    if (operation->ad_length + input_length > _______) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    /* IoT-TODO: return ERROR_NOT_SUPPORTED if total additional data length exceeds the maximum
+    for the implementation*/
+
+    status = psa_location_dispatch_aead_update_ad(operation, input, input_length);
     if (status != PSA_SUCCESS) {
+        psa_aead_abort(operation);
         return status;
     }
 
@@ -555,14 +531,21 @@ psa_status_t psa_aead_update(psa_aead_operation_t *operation,
         return PSA_ERROR_BAD_STATE;
     }
 
-    //return PSA_ERROR_BUFFER_TOO_SMALL if output_size is too small to hold the output data for the given input_length.
+    /* IoT-TODO: check if this happens in lower layer */
+    /* return PSA_ERROR_BUFFER_TOO_SMALL if output_size is too small to hold the output data for the given input_length. */
+    /* Snippet of oneshot
+    if (output_size < PSA_AEAD_ENCRYPT_OUTPUT_SIZE(slot->attr.type, alg, input_length)) {
+        unlock_status = psa_unlock_key_slot(slot);
+        return PSA_ERROR_BUFFER_TOO_SMALL;
+    }
+    */
 
     // check conditions for PSA_ERROR_INVALID_ARGUMENT
     // check if input_length is too large for the chosen algorithm
 
     status = psa_location_dispatch_aead_update(operation, input, input_length, output, output_size, output_length);
     if (status != PSA_SUCCESS) {
-        return status;
+        psa_aead_abort(operation);
     }
 
     return status;
