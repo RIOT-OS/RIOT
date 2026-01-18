@@ -39,9 +39,10 @@ struct psa_aead_operation_s {
     uint8_t default_nonce_length; /**< Default IV length for algorithm */
     uint8_t lengths_set : 1;      /**< True if lengths were already set */
     size_t ad_length;             /**< Length of additional data */
+    size_t processed_ad_length;   /**< Length of already processed additional data */
     size_t message_length;        /**< Length of message data */
     psa_algorithm_t alg;          /**< Operation algorithm*/
-    psa_aead_op_t op;      /**< Encoded operation */
+    psa_aead_op_t op;             /**< Encoded operation */
     /** Union containing AEAD cipher contexts for the executing backend */
     union aead_cipher_context {
         psa_cipher_context_t cipher_ctx; /**< Cipher context */
