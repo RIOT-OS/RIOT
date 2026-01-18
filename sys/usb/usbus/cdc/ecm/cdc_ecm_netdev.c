@@ -156,9 +156,6 @@ static int _init(netdev_t *netdev)
 
     netdev_eui48_get(netdev, (eui48_t*)&cdcecm->mac_netdev);
 
-    /* signal link UP */
-    netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
-
     return 0;
 }
 
@@ -173,6 +170,11 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             assert(max_len >= ETHERNET_ADDR_LEN);
             memcpy(value, cdcecm->mac_netdev, ETHERNET_ADDR_LEN);
             return ETHERNET_ADDR_LEN;
+        case NETOPT_LINK:
+            assert(max_len >= sizeof(netopt_enable_t));
+            *(netopt_enable_t *)value = cdcecm->active_iface ? NETOPT_ENABLE
+                                                             : NETOPT_DISABLE;
+            return sizeof(netopt_enable_t);
         default:
             return netdev_eth_get(netdev, opt, value, max_len);
     }
