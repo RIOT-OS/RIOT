@@ -93,11 +93,17 @@ psa_status_t example_aead_chacha20_poly1305(void)
     psa_key_id_t key_id = 0;
     psa_key_attributes_t attr = psa_key_attributes_init();
     psa_key_usage_t usage = PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT;
+
     psa_algorithm_t algo = PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(PSA_ALG_CHACHA20_POLY1305);
     size_t encr_output_size = PSA_AEAD_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20,
                                                            algo, sizeof(PLAINTEXT));
 
-    uint8_t cipher_out[encr_output_size];
+    /* IoT-TODO: This needs to be hardcoded for some reason, otherwise this function
+    * doesn't return despite reacing the end of it.
+    * This started happing after changing chacha20poly1305.c and its corresponding
+    * header to the new multipart version.
+    */
+    uint8_t cipher_out[sizeof(PLAINTEXT) + 16];
     uint8_t plain_out[sizeof(PLAINTEXT)];
     size_t output_len = 0;
 
