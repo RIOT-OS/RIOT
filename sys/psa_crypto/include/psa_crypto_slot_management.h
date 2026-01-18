@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 #include "clist.h"
-#include "psa/crypto.h"
+#include "psa/key/sizes.h"
 #include "psa_crypto_se_management.h"
 
 /**
