@@ -146,8 +146,8 @@ int ws281x_init(ws281x_t *dev, const ws281x_params_t *params)
     uint8_t pin = gpio_get_pin_num(dev->params.pin);
 
     err = gpio_ll_init(port, pin, gpio_ll_out);
-    DEBUG("Initializing port %x pin %d (originally %lx): %d\n",
-            port, pin, params->pin, err);
+    DEBUG("Initializing port %x pin %d (originally %x): %d\n",
+            port, pin, (unsigned)params->pin, err);
     if (err != 0) {
         return -EIO;
     }
