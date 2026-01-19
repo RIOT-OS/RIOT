@@ -1,13 +1,9 @@
-/*
- * Copyright (C) 2024 TU Dresden
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+/**
+ * SPDX-FileCopyrightText: 2024 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#ifndef NET_NFC_NDEF_NDEF_H
-#define NET_NFC_NDEF_NDEF_H
+#pragma once
 
 /**
  * @defgroup    ndef NDEF
@@ -17,6 +13,8 @@
  *
  * @file
  * @brief       Typedefs and function definitions for the NFC Data Exchange Format
+ * @see         [NFC Forum NFC Data Exchange Format (NDEF) Technical Specification 1.0]
+ *              (https://archive.org/details/nfcforum-ts-ndef-1.0)
  *
  * @author      Nico Behrens <nifrabe@outlook.de>
  */
@@ -32,12 +30,12 @@ extern "C" {
 /**
  * @brief Maximum payload length for a short NDEF record
  */
-#define NDEF_SHORT_RECORD_PAYLOAD_LENGTH      255
+#define NDEF_RECORD_SHORT_PAYLOAD_LENGTH      255
 
 /**
  * @brief Maximum payload length for a long NDEF record
  */
-#define NDEF_LONG_RECORD_PAYLOAD_LENGTH       65535
+#define NDEF_RECORD_LONG_PAYLOAD_LENGTH       65535
 
 /**
  * @brief The size of the NDEF record header
@@ -70,7 +68,7 @@ extern "C" {
 /**
  * @brief Specifies how many NDEF records can be stored in one NDEF message
  */
-#  define MAX_NDEF_RECORD_COUNT 16
+#  define CONFIG_NDEF_MAX_RECORD_COUNT 16
 #endif
 
 /**
@@ -78,7 +76,7 @@ extern "C" {
  */
 typedef struct {
     /**
-     * @brief Stores the data of the NDEF message
+     * @brief Pointer to the start of the memory containing the NDEF message
      */
     uint8_t *memory;
 
@@ -99,8 +97,8 @@ typedef struct {
  * @brief NDEF record type
  */
 typedef enum {
-    NDEF_SHORT_RECORD = 1,
-    NDEF_LONG_RECORD = 4
+    NDEF_RECORD_SHORT = 1,
+    NDEF_RECORD_LONG = 4
 } ndef_record_type_t;
 
 /**
@@ -191,7 +189,7 @@ typedef struct {
     /**
      * @brief Array of NDEF record descriptors
      */
-    uint8_t *records[MAX_NDEF_RECORD_COUNT];
+    uint8_t *records[CONFIG_NDEF_MAX_RECORD_COUNT];
 
     /**
      * @brief Number of records in the NDEF message
@@ -202,24 +200,10 @@ typedef struct {
 /**
  * @brief Pretty prints the NDEF message descriptors in human-readable format.
  *
- * @param[in] ndef_record_descriptors 	Pointer to the array of record descriptors
+ * @param[in] ndef_record_descriptors   Pointer to the array of record descriptors
  * @param[in] record_count 				Number of records in the array
  */
 void ndef_pretty_print(const ndef_record_desc_t *ndef_record_descriptors, size_t record_count);
-
-/**
- * @brief Writes the data buffer to the given NDEF message.
- *
- * @note This writes the data of the given buffer and
- * shifts the cursor of the NDEF buffer by the length of the data.
- *
- * @param[in,out]   ndef 		    The NDEF message that gets the data written to its memory
- * @param[in]       data 			Data to write
- * @param[in]       data_length 	Length of the data
- * @retval Pointer to the memory cursor before the write
- * @retval NULL if the data is too long
- */
-uint8_t *ndef_put_into_buffer(ndef_t *ndef, const uint8_t *data, uint32_t data_length);
 
 /**
  * @brief Initializes the given NDEF message with the given buffer and buffer size.
@@ -234,32 +218,20 @@ uint8_t *ndef_put_into_buffer(ndef_t *ndef, const uint8_t *data, uint32_t data_l
 void ndef_init(ndef_t *ndef, uint8_t *buffer, uint32_t buffer_size);
 
 /**
- * @brief Adds an NDEF record to the end of the NDEF message
+ * @brief Adds an NDEF record header to the end of the NDEF message
  *
  * @param[in,out] 	ndef     		NDEF message
  * @param[in] 		type 			Type of the record
  * @param[in] 		type_length 	Length of the type
  * @param[in] 		id 				ID of the record
  * @param[in] 		id_length 		Length of the ID
- * @param[in] 		payload 		Payload of the record
  * @param[in] 		payload_length 	Length of the payload
  * @param[in] 		tnf 			Type Name Format of the record
  * @return 			0 if successful
  * @return 			error otherwise
  */
-int ndef_add_record(ndef_t *ndef, const uint8_t *type, uint8_t type_length, const uint8_t *id,
-                    uint8_t id_length, const uint8_t *payload,
-                    uint32_t payload_length, ndef_record_tnf_t tnf);
-
-/**
- * @brief Calculates the expected size of an NDEF record
- *
- * @param[in] type_length       Length of type field
- * @param[in] id_length         Length of ID field
- * @param[in] payload_length    Length of payload field
- * @return size_t Size of the record
- */
-size_t ndef_calculate_record_size(uint8_t type_length, uint8_t id_length, uint32_t payload_length);
+int ndef_record_header_add(ndef_t *ndef, const uint8_t *type, uint8_t type_length, 
+    const uint8_t *id, uint8_t id_length, uint32_t payload_length, ndef_record_tnf_t tnf);
 
 /**
  * @brief Returns the current size of the NDEF message
@@ -267,7 +239,7 @@ size_t ndef_calculate_record_size(uint8_t type_length, uint8_t id_length, uint32
  * @param[in] ndef NDEF message
  * @return size_t Size of the message
  */
-size_t ndef_get_size(const ndef_t *ndef);
+static inline size_t ndef_get_size(const ndef_t *ndef);
 
 /**
  * @brief Removes the last record from the NDEF message
@@ -275,7 +247,7 @@ size_t ndef_get_size(const ndef_t *ndef);
  * @param[in,out] ndef Message to remove the last record from
  * @return 0 if successful, error otherwise
  */
-int ndef_remove_last_record(ndef_t *ndef);
+int ndef_record_remove_last(ndef_t *ndef);
 
 /**
  * @brief Removes all records from the NDEF message
@@ -305,7 +277,7 @@ int ndef_parse(const ndef_t *ndef, ndef_record_desc_t *record_descriptors,
  * @param[out]  record_descriptor   Record descriptor to fill
  *
  */
-void ndef_parse_record(const uint8_t *ndef_record, ndef_record_desc_t *record_descriptor);
+void ndef_record_parse(const uint8_t *ndef_record, ndef_record_desc_t *record_descriptor);
 
 /**
  * @brief NDEF text encoding
@@ -394,16 +366,9 @@ typedef enum {
  * @retval 0                            on success
  * @retval -1                           if writing the payload failed
  */
-int ndef_record_add_uri(ndef_t *ndef, ndef_uri_identifier_code_t identifier_code,
+int ndef_record_uri_add(ndef_t *ndef, ndef_uri_identifier_code_t identifier_code,
                         const char *uri, uint32_t uri_length);
-
-/**
- * @brief Calculates the size of an NDEF URI record
- *
- * @param[in] uri_length Length of the URI
- * @return Size of the URI record
- */
-size_t ndef_record_calculate_uri_size(uint32_t uri_length);
+// size_t ndef_record_calculate_uri_size(uint32_t uri_length);
 
 /**
  * @brief
@@ -416,7 +381,7 @@ size_t ndef_record_calculate_uri_size(uint32_t uri_length);
  * @retval 0                    on success
  * @retval -1                   if writing the payload failed
  */
-int ndef_record_add_mime(ndef_t *ndef, const char *mime_type, uint32_t mime_type_length,
+int ndef_record_mime_add(ndef_t *ndef, const char *mime_type, uint32_t mime_type_length,
                          const uint8_t *mime_payload, uint32_t mime_payload_length);
 
 /**
@@ -433,4 +398,3 @@ size_t ndef_record_calculate_mime_size(uint32_t mime_type_length, uint32_t mime_
 #endif
 
 /** @} */
-#endif /* NET_NFC_NDEF_NDEF_H */
