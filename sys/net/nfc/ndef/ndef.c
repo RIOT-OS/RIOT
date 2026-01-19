@@ -1,9 +1,6 @@
-/*
- * Copyright (C) 2024 TU Dresden
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+/**
+ * SPDX-FileCopyrightText: 2024 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -19,6 +16,7 @@
  */
 
 #include "net/nfc/ndef/ndef.h"
+#include "fmt.h"
 #include "log.h"
 
 #include <stdint.h>
@@ -29,67 +27,64 @@
 #include <inttypes.h>
 #include <byteorder.h>
 
+#define NDEF_RECORD_PAYLOAD_LENGTH_MAXIMUM 65535
+
 #define SHORT_RECORD_PAYLOAD_LENGTH_SIZE 1
 #define LONG_RECORD_PAYLOAD_LENGTH_SIZE  4
 
 /* Structure of the header byte */
-#define RECORD_MB_MASK                   0x80
-#define RECORD_ME_MASK                   0x40
-#define RECORD_CF_MASK                   0x20
-#define RECORD_SR_MASK                   0x10
-#define RECORD_IL_MASK                   0x08
-#define RECORD_TNF_MASK                  0x07
-
-size_t ndef_get_size(const ndef_t *ndef)
-{
-    return ndef->buffer.cursor - ndef->buffer.memory;
-}
+#define RECORD_MB_MASK                   (1 << 7)
+#define RECORD_ME_MASK                   (1 << 6)
+#define RECORD_CF_MASK                   (1 << 5)
+#define RECORD_SR_MASK                   (1 << 4)
+#define RECORD_IL_MASK                   (1 << 3)
+#define RECORD_TNF_MASK                  (0b00000111)
 
 void ndef_pretty_print(const ndef_record_desc_t *ndef_record_descriptors, size_t record_count)
 {
-    printf("----------------\n");
-    printf("\n");
+    print_str("----------------\n\n");
     for (size_t i = 0; i < (size_t)record_count; ++i) {
         const ndef_record_desc_t *record = &ndef_record_descriptors[i];
-        printf("Record %d\n", i);
-        printf("----\n");
-        printf("MB: %d\n", (record->header[0] & RECORD_MB_MASK) != 0);
-        printf("ME: %d\n", (record->header[0] & RECORD_ME_MASK) != 0);
-        printf("CF: %d\n", (record->header[0] & RECORD_CF_MASK) != 0);
-        printf("SR: %d\n", (record->header[0] & RECORD_SR_MASK) != 0);
-        printf("IL: %d\n", (record->header[0] & RECORD_IL_MASK) != 0);
-        printf("TNF: %d\n", record->header[0] & RECORD_TNF_MASK);
-        printf("Type length: %d\n", record->type_length[0]);
-        printf("Type: ");
-        for (int j = 0; j < record->type_length[0]; ++j) {
-            printf("%c", record->type[j]);
-        }
-        printf("\n");
-
-        printf("Payload length size: %u\n", record->record_type);
+        print_str("Record "); print_u32_dec(i); print_str("\n");
+        print_str("----\n");
+        print_str("MB: "); print_u16_dec((record->header[0] & RECORD_MB_MASK) != 0); print_str("\n");
+        print_str("ME: "); print_u16_dec((record->header[0] & RECORD_ME_MASK) != 0); print_str("\n");
+        print_str("CF: "); print_u16_dec((record->header[0] & RECORD_CF_MASK) != 0); print_str("\n");
+        print_str("SR: "); print_u16_dec((record->header[0] & RECORD_SR_MASK) != 0); print_str("\n");
+        print_str("IL: "); print_u16_dec((record->header[0] & RECORD_IL_MASK) != 0); print_str("\n");
+        print_str("TNF: "); print_u16_dec(record->header[0] & RECORD_TNF_MASK); print_str("\n");
+        print_str("Type length: "); print_u16_dec(record->type_length[0]); print_str("\n");
+        print_str("Type: "); print(record->type, record->type_length[0]); print_str("\n");
+        print_str("Payload length size: "); print_u32_dec(record->record_type); print_str("\n");
         uint32_t payload_length;
-        if (record->record_type == NDEF_SHORT_RECORD) {
+        if (record->record_type == NDEF_RECORD_SHORT) {
             payload_length = record->payload_length[0];
-        }
-        else {
+        } else {
             payload_length = ((uint32_t)record->payload_length[0]) << 24 |
                              ((uint32_t)record->payload_length[1]) << 16 |
-                             ((uint32_t)record->payload_length[2]) << 8 |
+                             ((uint32_t)record->payload_length[2]) << 8  |
                              ((uint32_t)record->payload_length[3]);
         }
 
-        printf("Payload length: %" PRIu32 "\n", payload_length);
-        printf("Payload: ");
-        for (size_t j = 0; j < (size_t)payload_length; ++j) {
-            printf("0x%02x ", record->payload[j]);
-        }
-        printf("\n\n");
+        print_str("Payload length: "); print_u32_dec(payload_length); print_str("\n");
+        print_str("Payload: "); print_bytes_hex(record->payload, payload_length); print_str("\n\n");
     }
-    printf("----------------");
-    printf("\n");
+    print_str("----------------\n");
 }
 
-uint8_t *ndef_put_into_buffer(ndef_t *ndef, const uint8_t *data, uint32_t data_length)
+/**
+ * @brief Writes the data buffer to the given NDEF message.
+ *
+ * @note This writes the data of the given buffer and
+ * shifts the cursor of the NDEF buffer by the length of the data.
+ *
+ * @param[in,out]   ndef 		    The NDEF message that gets the data written to its memory
+ * @param[in]       data 			Data to write
+ * @param[in]       data_length 	Length of the data
+ * @retval Pointer to the memory cursor before the write
+ * @retval NULL if the data is too long
+ */
+static uint8_t *ndef_put_into_buffer(ndef_t *ndef, const uint8_t *data, uint32_t data_length)
 {
     uint8_t *before_write = ndef->buffer.cursor;
 
@@ -118,19 +113,18 @@ void ndef_init(ndef_t *ndef, uint8_t *buffer, uint32_t buffer_size)
     ndef->record_count = 0;
 }
 
-int ndef_add_record(ndef_t *ndef, const uint8_t *type, uint8_t type_length, const uint8_t *id,
-                    uint8_t id_length, const uint8_t *payload,
-                    uint32_t payload_length, ndef_record_tnf_t tnf)
+int ndef_record_header_add(ndef_t *ndef, const uint8_t *type, uint8_t type_length, 
+    const uint8_t *id, uint8_t id_length, uint32_t payload_length, ndef_record_tnf_t tnf)
 {
     /* make sure that the message is valid */
     assert(ndef != NULL);
 
     /* a payload must be bigger than zero and smaller than the maximum NDEF payload length */
     assert(payload_length > 0);
-    assert(payload_length <= NDEF_LONG_RECORD_PAYLOAD_LENGTH);
+    assert(payload_length <= NDEF_RECORD_LONG_PAYLOAD_LENGTH);
 
     /* the maximum is specified at compile time */
-    if (ndef->record_count >= MAX_NDEF_RECORD_COUNT) {
+    if (ndef->record_count >= CONFIG_NDEF_MAX_RECORD_COUNT) {
         LOG_ERROR("NDEF record count exceeds maximum\n");
         return -1;
     }
@@ -164,20 +158,10 @@ int ndef_add_record(ndef_t *ndef, const uint8_t *type, uint8_t type_length, cons
     cf = false;
 
     /* if the payload is short, set sr (short record) to true */
-    if (payload_length <= NDEF_SHORT_RECORD_PAYLOAD_LENGTH) {
-        sr = true;
-    }
-    else {
-        sr = false;
-    }
+    sr = (payload_length <= NDEF_RECORD_SHORT_PAYLOAD_LENGTH);
 
     /* if an ID is present, set il to true */
-    if (id) {
-        il = true;
-    }
-    else {
-        il = false;
-    }
+    il = (id != NULL);
 
     /* the header byte consists of the different flags and the Type Name Format (TNF) */
     uint8_t header_byte = 0;
@@ -215,21 +199,13 @@ int ndef_add_record(ndef_t *ndef, const uint8_t *type, uint8_t type_length, cons
         ndef_put_into_buffer(ndef, id, id_length);
     }
 
-    if (payload != NULL) {
-        ndef_put_into_buffer(ndef, payload, payload_length);
-    }
-    else {
-        /* the payload has to be written by the calling function */
-        (void)payload;
-    }
-
     ndef->records[ndef->record_count] = start_pointer;
     ndef->record_count += 1;
 
     return 0;
 }
 
-int ndef_remove_last_record(ndef_t *ndef)
+int ndef_record_remove_last(ndef_t *ndef)
 {
     assert(ndef != NULL);
 
@@ -267,7 +243,16 @@ void ndef_clear(ndef_t *ndef)
     ndef->buffer.cursor = ndef->buffer.memory;
 }
 
-size_t ndef_calculate_record_size(uint8_t type_length, uint8_t id_length, uint32_t payload_length)
+/**
+ * @brief Calculates the expected size of an NDEF record
+ *
+ * @param[in] type_length       Length of type field
+ * @param[in] id_length         Length of ID field
+ * @param[in] payload_length    Length of payload field
+ * @return size_t Size of the record
+ */
+static inline size_t ndef_record_calculate_size(uint8_t type_length, uint8_t id_length, 
+    uint32_t payload_length)
 {
     size_t size = NDEF_RECORD_HEADER_SIZE + NDEF_RECORD_TYPE_LENGTH_SIZE + type_length;
 
@@ -275,11 +260,11 @@ size_t ndef_calculate_record_size(uint8_t type_length, uint8_t id_length, uint32
         size += NDEF_RECORD_ID_LENGTH_SIZE + id_length;
     }
 
-    if (payload_length <= NDEF_SHORT_RECORD_PAYLOAD_LENGTH) {
-        size += SHORT_RECORD_PAYLOAD_LENGTH_SIZE;
+    if (payload_length <= NDEF_RECORD_SHORT_PAYLOAD_LENGTH) {
+        size += NDEF_RECORD_SHORT_PAYLOAD_LENGTH_SIZE;
     }
     else {
-        size += LONG_RECORD_PAYLOAD_LENGTH_SIZE;
+        size += NDEF_RECORD_LONG_PAYLOAD_LENGTH_SIZE;
     }
 
     size += payload_length;
@@ -287,7 +272,7 @@ size_t ndef_calculate_record_size(uint8_t type_length, uint8_t id_length, uint32
     return size;
 }
 
-void ndef_parse_record(const uint8_t *ndef_record, ndef_record_desc_t *record_desc)
+static void ndef_record_parse(const uint8_t *ndef_record, ndef_record_desc_t *record_desc)
 {
     assert(ndef_record != NULL);
     assert(record_desc != NULL);
@@ -314,7 +299,8 @@ void ndef_parse_record(const uint8_t *ndef_record, ndef_record_desc_t *record_de
         return;
     }
 
-    record_desc->record_type = (*(record_desc->header) & RECORD_SR_MASK) ? NDEF_SHORT_RECORD : NDEF_LONG_RECORD;
+    record_desc->record_type = (*(record_desc->header) & RECORD_SR_MASK) 
+        ? NDEF_RECORD_SHORT : NDEF_RECORD_LONG;
 
     record_desc->type_length = (uint8_t *)(record_desc->header + NDEF_RECORD_HEADER_SIZE);
     record_desc->payload_length = (uint8_t *)(record_desc->type_length +
@@ -323,9 +309,9 @@ void ndef_parse_record(const uint8_t *ndef_record, ndef_record_desc_t *record_de
     /* the pointer for any field after the payload_length depends on the type of the record */
     uint8_t *pointer_after_payload_length = (uint8_t *)(record_desc->payload_length +
                                                         ((record_desc->record_type ==
-                                                          NDEF_SHORT_RECORD) ?
-                                                             SHORT_RECORD_PAYLOAD_LENGTH_SIZE :
-                                                             LONG_RECORD_PAYLOAD_LENGTH_SIZE));
+                                                          NDEF_RECORD_SHORT) ?
+                                                             NDEF_RECORD_SHORT_PAYLOAD_LENGTH_SIZE :
+                                                             NDEF_RECORD_LONG_PAYLOAD_LENGTH_SIZE));
 
     if (*(record_desc->header) & RECORD_IL_MASK) {
         record_desc->id_length = pointer_after_payload_length;
@@ -364,4 +350,111 @@ int ndef_parse(const ndef_t *ndef, ndef_record_desc_t *record_descriptors,
         ndef_parse_record(ndef->records[i], record_desc);
     }
     return 0;
+}
+
+// MARK: MIME
+int ndef_record_mime_add(ndef_t *ndef, const char *mime_type, uint32_t mime_type_length,
+                         const uint8_t *mime_payload, uint32_t mime_payload_length)
+{
+    assert(mime_payload_length <= NDEF_LONG_RECORD_PAYLOAD_LENGTH);
+
+    ndef_record_header_add(ndef, (uint8_t *)mime_type, mime_type_length, NULL, 0,
+                    mime_payload_length, NDEF_TNF_MEDIA_TYPE);
+
+    ndef_put_into_buffer(ndef, (uint8_t *)mime_payload, mime_payload_length);
+
+    return 0;
+}
+
+static inline size_t ndef_record_calculate_mime_size(uint32_t mime_type_length, 
+    uint32_t mime_payload_length)
+{
+    return ndef_calculate_record_size(mime_type_length, 0, mime_payload_length);
+}
+
+// MARK: Text
+#define ENCODING_POSITION            7
+#define ENCODING_MASK                (1 << ENCODING_POSITION)
+
+#define STATUS_SIZE                  1
+
+#define LENGTH_OF_LANG_CODE_POSITION 0
+#define LENGTH_OF_LANG_CODE_MASK     0x3F /* 0011 1111 */
+
+#define MAXIMUM_LANG_CODE_LENGTH     LENGTH_OF_LANG_CODE_MASK
+
+const uint8_t ndef_text_record_type[] = { 'T' };
+
+int ndef_record_add_text(ndef_t *message, const char *text, uint32_t text_length,
+                         const char *lang_code,
+                         uint8_t lang_code_length, ndef_text_encoding_t encoding)
+{
+    if (lang_code_length > MAXIMUM_LANG_CODE_LENGTH) {
+        LOG_ERROR("NDEF text record language code is too long");
+        return -1;
+    }
+
+    uint32_t payload_length = STATUS_SIZE + lang_code_length + text_length;
+    assert(payload_length <= NDEF_LONG_RECORD_PAYLOAD_LENGTH);
+
+    uint8_t status_byte = 0;
+
+    /* this is how the status byte is constructed S0LL LLLL */
+    status_byte |= (lang_code_length << LENGTH_OF_LANG_CODE_POSITION);
+    status_byte |= encoding << ENCODING_POSITION;
+
+    int res = ndef_record_header(message, ndef_text_record_type, sizeof(ndef_text_record_type), 
+            NULL, 0, payload_length, NDEF_TNF_WELL_KNOWN);
+    if (res < 0) {
+        return res;
+    }
+
+    /* writes the payload */
+    ndef_put_into_buffer(message, &status_byte, 1);
+    ndef_put_into_buffer(message, lang_code, lang_code_length);
+    ndef_put_into_buffer(message, text, text_length);
+
+    return 0;
+}
+
+static size_t ndef_record_calculate_text_size(uint32_t text_length, uint8_t lang_code_length)
+{
+    size_t payload_size = STATUS_SIZE + lang_code_length + text_length;
+    return ndef_calculate_record_size(sizeof(ndef_text_record_type), 0, payload_size);
+}
+
+// MARK: URI
+#define IDENTIFIER_CODE_LENGTH 1
+
+const uint8_t ndef_uri_record_type[] = { 'U' };
+
+/**
+ * @brief Calculates the size of an NDEF URI record
+ *
+ * @param[in] uri_length Length of the URI
+ * @return Size of the URI record
+ */
+int ndef_record_uri_add(ndef_t *ndef, ndef_uri_identifier_code_t identifier_code, 
+    const char *uri, uint32_t uri_length)
+{
+    uint32_t payload_length = IDENTIFIER_CODE_LENGTH + uri_length;
+    assert(payload_length <= NDEF_RECORD_PAYLOAD_LENGTH_MAXIMUM);
+
+    int res = ndef_record_header_add(ndef, ndef_uri_record_type, sizeof(ndef_uri_record_type),
+                              NULL, 0, payload_length, NDEF_TNF_WELL_KNOWN);
+    if (res < 0) {
+        return res;
+    }
+
+    /* writes the payload */
+    ndef_put_into_buffer(ndef, (uint8_t *)&identifier_code, IDENTIFIER_CODE_LENGTH);
+    ndef_put_into_buffer(ndef, (uint8_t *)uri, uri_length);
+
+    return 0;
+}
+
+static size_t ndef_record_calculate_uri_size(uint32_t uri_length)
+{
+    size_t payload_length = IDENTIFIER_CODE_LENGTH + uri_length;
+    return ndef_calculate_record_size(sizeof(ndef_uri_record_type), 0, payload_length);
 }
