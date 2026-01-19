@@ -4,6 +4,13 @@ USB_CDC_ECM_DIR="$(dirname "$(readlink -f "$0")")"
 
 INTERFACE_CHECK_COUNTER=5  # 5 attempts to find usb interface
 
+# This address is assigned to the CDC-ECM interface of the host
+IPV6_LOCAL=${IPV6_LOCAL:-"fe80::1/64"}
+# This address is assigned to the host
+IPV6_GLOBAL=${IPV6_GLOBAL:-"fd00:dead:beef::1/128"}
+# This address should be assigned to the CDC-ECM interface of the border router
+IPV6_ROUTE_NEXT_HOP=${IPV6_ROUTE_NEXT_HOP:-"fe80::2"}
+
 find_interface() {
     INTERFACE=$(ls -A /sys/bus/usb/drivers/cdc_ether/*/net/ 2>/dev/null)
     INTERFACE_CHECK=$(echo -n "${INTERFACE}" | head -c1 | wc -c)
@@ -36,14 +43,12 @@ setup_interface() {
     sysctl -w net.ipv6.conf."${INTERFACE}".forwarding=1
     sysctl -w net.ipv6.conf."${INTERFACE}".accept_ra=0
     ip link set "${INTERFACE}" up
-    ip a a fe80::1/64 dev "${INTERFACE}"
-    ip a a fd00:dead:beef::1/128 dev lo
+    ip a a "${IPV6_LOCAL}" dev "${INTERFACE}"
+    ip a a "${IPV6_GLOBAL}" dev lo
 }
 
 cleanup_interface() {
-    ip a d fe80::1/64 dev "${INTERFACE}"
-    ip a d fd00:dead:beef::1/128 dev lo
-    ip route del "${PREFIX}" via fe80::2 dev "${INTERFACE}"
+    ip route del "${PREFIX}" via "${IPV6_ROUTE_NEXT_HOP}" dev "${INTERFACE}"
 }
 
 stop_radvd() {
@@ -68,13 +73,13 @@ cleanup() {
 }
 
 start_uhcpd() {
-    ip route add "${PREFIX}" via fe80::2 dev "${INTERFACE}"
+    ip route add "${PREFIX}" via "${IPV6_ROUTE_NEXT_HOP}" dev "${INTERFACE}"
     ${UHCPD} "${INTERFACE}" "${PREFIX}" > /dev/null &
     UHCPD_PID=$!
 }
 
 start_dhcpd() {
-    ip route add "${PREFIX}" via fe80::2 dev "${INTERFACE}"
+    ip route add "${PREFIX}" via "${IPV6_ROUTE_NEXT_HOP}" dev "${INTERFACE}"
     DHCPD_PIDFILE=$(mktemp)
     ${DHCPD} -d -p "${DHCPD_PIDFILE}" "${INTERFACE}" "${PREFIX}" 2> /dev/null
 }
