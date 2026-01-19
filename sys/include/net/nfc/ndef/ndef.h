@@ -178,7 +178,7 @@ typedef enum {
 /**
  * @brief NDEF struct
  *
- * @note It can contain up to @ref MAX_NDEF_RECORD_COUNT records.
+ * @note It can contain up to @ref CONFIG_NDEF_MAX_RECORD_COUNT records.
  */
 typedef struct {
     /**
@@ -230,7 +230,7 @@ void ndef_init(ndef_t *ndef, uint8_t *buffer, uint32_t buffer_size);
  * @return 			0 if successful
  * @return 			error otherwise
  */
-int ndef_record_header_add(ndef_t *ndef, const uint8_t *type, uint8_t type_length, 
+int ndef_record_header_add(ndef_t *ndef, const uint8_t *type, uint8_t type_length,
     const uint8_t *id, uint8_t id_length, uint32_t payload_length, ndef_record_tnf_t tnf);
 
 /**

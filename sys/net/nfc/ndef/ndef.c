@@ -113,7 +113,7 @@ void ndef_init(ndef_t *ndef, uint8_t *buffer, uint32_t buffer_size)
     ndef->record_count = 0;
 }
 
-int ndef_record_header_add(ndef_t *ndef, const uint8_t *type, uint8_t type_length, 
+int ndef_record_header_add(ndef_t *ndef, const uint8_t *type, uint8_t type_length,
     const uint8_t *id, uint8_t id_length, uint32_t payload_length, ndef_record_tnf_t tnf)
 {
     /* make sure that the message is valid */
@@ -251,7 +251,7 @@ void ndef_clear(ndef_t *ndef)
  * @param[in] payload_length    Length of payload field
  * @return size_t Size of the record
  */
-static inline size_t ndef_record_calculate_size(uint8_t type_length, uint8_t id_length, 
+static inline size_t ndef_record_calculate_size(uint8_t type_length, uint8_t id_length,
     uint32_t payload_length)
 {
     size_t size = NDEF_RECORD_HEADER_SIZE + NDEF_RECORD_TYPE_LENGTH_SIZE + type_length;
@@ -299,7 +299,7 @@ static void ndef_record_parse(const uint8_t *ndef_record, ndef_record_desc_t *re
         return;
     }
 
-    record_desc->record_type = (*(record_desc->header) & RECORD_SR_MASK) 
+    record_desc->record_type = (*(record_desc->header) & RECORD_SR_MASK)
         ? NDEF_RECORD_SHORT : NDEF_RECORD_LONG;
 
     record_desc->type_length = (uint8_t *)(record_desc->header + NDEF_RECORD_HEADER_SIZE);
@@ -366,13 +366,13 @@ int ndef_record_mime_add(ndef_t *ndef, const char *mime_type, uint32_t mime_type
     return 0;
 }
 
-static inline size_t ndef_record_calculate_mime_size(uint32_t mime_type_length, 
+static inline size_t ndef_record_calculate_mime_size(uint32_t mime_type_length,
     uint32_t mime_payload_length)
 {
     return ndef_calculate_record_size(mime_type_length, 0, mime_payload_length);
 }
 
-// MARK: Text
+/* MARK: Text */
 #define ENCODING_POSITION            7
 #define ENCODING_MASK                (1 << ENCODING_POSITION)
 
@@ -403,7 +403,7 @@ int ndef_record_add_text(ndef_t *message, const char *text, uint32_t text_length
     status_byte |= (lang_code_length << LENGTH_OF_LANG_CODE_POSITION);
     status_byte |= encoding << ENCODING_POSITION;
 
-    int res = ndef_record_header(message, ndef_text_record_type, sizeof(ndef_text_record_type), 
+    int res = ndef_record_header(message, ndef_text_record_type, sizeof(ndef_text_record_type),
             NULL, 0, payload_length, NDEF_TNF_WELL_KNOWN);
     if (res < 0) {
         return res;
@@ -434,7 +434,7 @@ const uint8_t ndef_uri_record_type[] = { 'U' };
  * @param[in] uri_length Length of the URI
  * @return Size of the URI record
  */
-int ndef_record_uri_add(ndef_t *ndef, ndef_uri_identifier_code_t identifier_code, 
+int ndef_record_uri_add(ndef_t *ndef, ndef_uri_identifier_code_t identifier_code,
     const char *uri, uint32_t uri_length)
 {
     uint32_t payload_length = IDENTIFIER_CODE_LENGTH + uri_length;
