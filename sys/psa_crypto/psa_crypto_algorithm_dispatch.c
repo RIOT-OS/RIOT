@@ -1028,9 +1028,42 @@ psa_status_t psa_algorithm_dispatch_aead_update(psa_aead_operation_t *operation,
     }
 }
 
-/* IoT-TODO: finish proabably */
+/* IoT-TODO*/
+psa_status_t psa_algorithm_dispatch_aead_finish(psa_aead_operation_t *operation,
+                                                const uint8_t *ciphertext,
+                                                size_t ciphertext_size,
+                                                size_t ciphertext_length,
+                                                uint8_t *tag,
+                                                size_t tag_size,
+                                                size_t *tag_length)
+{
+    (void)operation;
+    (void)ciphertext;
+    (void)ciphertext_size;
+    (void)ciphertext_length;
+    (void)tag;
+    (void)tag_size;
+    (void)tag_length;
+    return PSA_ERROR_NOT_SUPPORTED;
+}
 
-/* IoT-TODO: verify proabably */
+/* IoT-TODO */
+psa_status_t psa_algorithm_dispatch_aead_verify(psa_aead_operation_t *operation,
+                                                const uint8_t *plaintext,
+                                                size_t plaintext_size,
+                                                size_t plaintext_length,
+                                                const uint8_t *tag,
+                                                size_t tag_length)
+{
+    (void)operation;
+    (void)plaintext;
+    (void)plaintext_size;
+    (void)plaintext_length;
+    (void)tag;
+    (void)tag_length;
+    return PSA_ERROR_NOT_SUPPORTED;
+}
+
 #endif /* MODULE_PSA_AEAD */
 
 #if IS_USED(MODULE_PSA_MAC)

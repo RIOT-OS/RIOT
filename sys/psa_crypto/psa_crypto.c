@@ -507,8 +507,8 @@ psa_status_t psa_aead_update_ad(psa_aead_operation_t *operation,
 
     size_t new_total = operation->processed_ad_length + input_length;
 
-    /* IoT-TODO: return INVALID_ARGUMENT if total input_length to psa_aead_update_ad() is greater 
-    than the additional data length that was previously specified with psa_aead_set_lengths() or 
+    /* total input_length to psa_aead_update_ad() is greater than the additional data length that 
+    was previously specified with psa_aead_set_lengths() or 
     is too large for the chosen AEAD algorithm. */
     if (new_total > operation->ad_length) {
         return PSA_ERROR_INVALID_ARGUMENT;
@@ -578,14 +578,29 @@ psa_status_t psa_aead_finish(psa_aead_operation_t *operation,
                              size_t tag_size,
                              size_t *tag_length)
 {
-    (void)operation;
-    (void)ciphertext;
-    (void)ciphertext_size;
-    (void)ciphertext_length;
-    (void)tag;
-    (void)tag_size;
-    (void)tag_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation || !ciphertext || !ciphertext_length || !tag || !tag_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (!operation->nonce_set && operation->nonce_required) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    /* IoT-Todo: size of the ciphertext or tag buffer is too small -> prolly on lower layer ? */
+
+    status = psa_location_dispatch_aead_finish(operation, ciphertext, ciphertext_size,
+                                               ciphertext_length, tag, tag_size, tag_length);
+    if (status != PSA_SUCCESS) {
+        psa_aead_abort(operation);
+    }
+
+    return status;
 }
 
 /* IoT-TODO */
@@ -596,16 +611,30 @@ psa_status_t psa_aead_verify(psa_aead_operation_t *operation,
                              const uint8_t *tag,
                              size_t tag_length)
 {
-    (void)operation;
-    (void)plaintext;
-    (void)plaintext_size;
-    (void)plaintext_length;
-    (void)tag;
-    (void)tag_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
+    if (!lib_initialized) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (!operation || !plaintext || !plaintext_length || !tag) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    /* IoT-Todo: active operation with a nonce set */
+    if (!operation->nonce_set && operation->nonce_required) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    status = psa_location_dispatch_aead_verify(operation, plaintext, plaintext_size,
+                                               plaintext_length, tag, tag_length);
+    if (status != PSA_SUCCESS) {
+        psa_aead_abort(operation);
+    }
+
+    return status;
 }
 
-/* IoT-TODO */
 psa_status_t psa_aead_abort(psa_aead_operation_t *operation)
 {
     if (!lib_initialized) {
