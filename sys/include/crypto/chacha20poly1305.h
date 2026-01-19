@@ -171,23 +171,8 @@ void chacha20_finish(chacha20_ctx_t *ctx,
                      uint8_t *output);
 
 /* IoT-TODO */
-void chacha20_poly1305_setup(chacha20poly1305_ctx_t *ctx,
-                             const uint8_t *key);
-
-/* IoT-TODO */
-void chacha20_poly1305_set_nonce(chacha20poly1305_ctx_t *ctx,
-                                 const uint8_t *nonce);
-
-void chacha20_poly1305_update_ad(chacha20poly1305_ctx_t *ctx,
-                                 const uint8_t *ad,
-                                 size_t ad_length);
-
-size_t chacha20_poly1305_update(chacha20poly1305_ctx_t *ctx,
-                                uint8_t setup_done,
-                                size_t block_idx,
-                                const uint8_t *input,
-                                size_t input_length,
-                                uint8_t *output);
+void poly1305_init_from_chacha(chacha20_ctx_t *chacha_ctx,
+                               poly1305_ctx_t *poly_ctx);
 #ifdef __cplusplus
 }
 #endif

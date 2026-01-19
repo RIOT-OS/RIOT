@@ -18,6 +18,7 @@
  * @}
  */
 
+#include "psa/cipher/types.h"
 #include <stdio.h>
 #include "kernel_defines.h"
 #include "psa/crypto.h"
@@ -912,12 +913,17 @@ psa_status_t psa_algorithm_dispatch_aead_encrypt_setup(psa_aead_operation_t *ope
 {
     operation->op = PSA_ENCODE_AEAD_OPERATION(alg, attributes->type, attributes->bits);
 
+    uint8_t *key_data = NULL;
+    size_t *key_bytes = NULL;
+
+    psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
+
     switch (operation->op) {
 #  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
     case PSA_CHACHA20_POLY1305:
         return psa_aead_chacha20_poly1305_encrypt_setup(&operation->backend_ctx.chacha20poly1305,
-                                                        slot->key.data,
-                                                        slot->key.data_len);
+                                                        key_data,
+                                                        *key_bytes);
 #  endif
     default:
         (void)operation;
@@ -936,12 +942,17 @@ psa_status_t psa_algorithm_dispatch_aead_decrypt_setup(psa_aead_operation_t *ope
 {
     operation->op = PSA_ENCODE_AEAD_OPERATION(alg, attributes->type, attributes->bits);
 
+    uint8_t *key_data = NULL;
+    size_t *key_bytes = NULL;
+
+    psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
+
     switch (operation->op) {
 #  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
     case PSA_CHACHA20_POLY1305:
         return psa_aead_chacha20_poly1305_decrypt_setup(&operation->backend_ctx.chacha20poly1305,
-                                                        slot->key.data,
-                                                        slot->key.data_len);
+                                                        key_data,
+                                                        *key_bytes);
 #  endif
     default:
         (void)operation;
@@ -1023,6 +1034,7 @@ psa_status_t psa_algorithm_dispatch_aead_update(psa_aead_operation_t *operation,
     case PSA_CHACHA20_POLY1305:
         return psa_aead_chacha20_poly1305_update(&operation->backend_ctx.chacha20poly1305,
                                                  operation->setup_done,
+                                                 operation->direction,
                                                  input,
                                                  input_length,
                                                  output,
@@ -1044,36 +1056,69 @@ psa_status_t psa_algorithm_dispatch_aead_update(psa_aead_operation_t *operation,
 psa_status_t psa_algorithm_dispatch_aead_finish(psa_aead_operation_t *operation,
                                                 uint8_t *ciphertext,
                                                 size_t ciphertext_size,
-                                                size_t ciphertext_length,
+                                                size_t *ciphertext_length,
                                                 uint8_t *tag,
                                                 size_t tag_size,
                                                 size_t *tag_length)
 {
-    (void)operation;
-    (void)ciphertext;
-    (void)ciphertext_size;
-    (void)ciphertext_length;
-    (void)tag;
-    (void)tag_size;
-    (void)tag_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    switch (operation->op) {
+#  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
+    case PSA_CHACHA20_POLY1305:
+        /* IoT-TODO: Poly1305 requires the total ad and ciphertext length
+         * to finish. This is kinda cheating cuz I’m passing the length
+         * of the plaintext, not the ciphertext!
+         */
+        return psa_aead_chacha20_poly1305_finish(&operation->backend_ctx.chacha20poly1305,
+                                                 operation->processed_ad_length,
+                                                 operation->processed_message_length,
+                                                 ciphertext,
+                                                 ciphertext_size,
+                                                 ciphertext_length,
+                                                 tag,
+                                                 tag_size,
+                                                 tag_length);
+#  endif
+    default:
+        (void)operation;
+        (void)ciphertext;
+        (void)ciphertext_size;
+        (void)ciphertext_length;
+        (void)tag;
+        (void)tag_size;
+        (void)tag_length;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
 }
 
 /* IoT-TODO */
 psa_status_t psa_algorithm_dispatch_aead_verify(psa_aead_operation_t *operation,
-                                                const uint8_t *plaintext,
+                                                uint8_t *plaintext,
                                                 size_t plaintext_size,
-                                                size_t plaintext_length,
+                                                size_t *plaintext_length,
                                                 const uint8_t *tag,
                                                 size_t tag_length)
 {
-    (void)operation;
-    (void)plaintext;
-    (void)plaintext_size;
-    (void)plaintext_length;
-    (void)tag;
-    (void)tag_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    switch (operation->op) {
+#  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
+    case PSA_CHACHA20_POLY1305:
+        return psa_aead_chacha20_poly1305_verify(&operation->backend_ctx.chacha20poly1305,
+                                                 operation->processed_ad_length,
+                                                 operation->processed_message_length,
+                                                 plaintext,
+                                                 plaintext_size,
+                                                 plaintext_length,
+                                                 tag,
+                                                 tag_length);
+#  endif
+    default:
+        (void)operation;
+        (void)plaintext;
+        (void)plaintext_size;
+        (void)plaintext_length;
+        (void)tag;
+        (void)tag_length;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
 }
 #endif /* MODULE_PSA_AEAD */
 

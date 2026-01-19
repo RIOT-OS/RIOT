@@ -22,8 +22,8 @@ extern "C" {
 typedef struct {
     /* This uses a modified Chacha20 context to handle
      * multipart operations */
-    psa_cipher_chacha20_ctx_t ctx; /**< ChaCha20 context */
-    poly1305_ctx_t poly;           /**< Poly1305 context*/
+    psa_cipher_chacha20_ctx_t chacha; /**< ChaCha20 context */
+    poly1305_ctx_t poly;              /**< Poly1305 context*/
 } psa_aead_chacha20_poly1305_ctx_t;
 #endif
 

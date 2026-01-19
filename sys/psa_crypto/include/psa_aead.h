@@ -123,28 +123,48 @@ psa_status_t psa_aead_chacha20_poly1305_decrypt(const psa_key_attributes_t *attr
                                                 size_t plaintext_size, size_t *plaintext_length);
 
 psa_status_t psa_aead_chacha20_poly1305_encrypt_setup(psa_aead_chacha20_poly1305_ctx_t *ctx,
-                                                      const uint8_t *key,
+                                                      uint8_t *key,
                                                       size_t key_length);
 
 psa_status_t psa_aead_chacha20_poly1305_decrypt_setup(psa_aead_chacha20_poly1305_ctx_t *ctx,
-                                                      const uint8_t *key,
+                                                      uint8_t *key,
                                                       size_t key_length);
 
 psa_status_t psa_aead_chacha20_poly1305_set_nonce(psa_aead_chacha20_poly1305_ctx_t *ctx,
                                                   const uint8_t *nonce,
                                                   size_t nonce_length);
 
-psa_status_t psa_aead_chacha20_poly1305_update_ad(psa_aead_chacha20_poly1305_ctx_t *operation,
+psa_status_t psa_aead_chacha20_poly1305_update_ad(psa_aead_chacha20_poly1305_ctx_t *ctx,
                                                   const uint8_t *ad,
                                                   size_t ad_length);
 
-psa_status_t psa_aead_chacha20_poly1305_update(psa_aead_chacha20_poly1305_ctx_t *operation,
+psa_status_t psa_aead_chacha20_poly1305_update(psa_aead_chacha20_poly1305_ctx_t *ctx,
                                                size_t setup_done,
+                                               psa_encrypt_or_decrypt_t direction,
                                                const uint8_t *input,
                                                size_t input_length,
                                                uint8_t *output,
                                                size_t output_size,
                                                size_t *output_length);
+
+psa_status_t psa_aead_chacha20_poly1305_finish(psa_aead_chacha20_poly1305_ctx_t *ctx,
+                                               size_t total_ad_length,
+                                               size_t current_ciphertext_length,
+                                               uint8_t *ciphertext,
+                                               size_t ciphertext_size,
+                                               size_t *ciphertext_length,
+                                               uint8_t *tag,
+                                               size_t tag_size,
+                                               size_t *tag_length);
+
+psa_status_t psa_aead_chacha20_poly1305_verify(psa_aead_chacha20_poly1305_ctx_t *ctx,
+                                               size_t total_ad_length,
+                                               size_t current_ciphertext_length,
+                                               uint8_t *plaintext,
+                                               size_t plaintext_size,
+                                               size_t *plaintext_length,
+                                               const uint8_t *tag,
+                                               size_t tag_length);
 #  endif /* MODULE_PSA_RIOT_AEAD_CHACHA20_POLY1305 */
 
 #  ifdef __cplusplus

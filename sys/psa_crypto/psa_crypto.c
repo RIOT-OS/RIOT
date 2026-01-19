@@ -18,6 +18,7 @@
  * @}
  */
 
+#include "psa/cipher/types.h"
 #include "psa/key/type.h"
 #include <stdio.h>
 #include "psa/crypto.h"
@@ -579,6 +580,10 @@ psa_status_t psa_aead_finish(psa_aead_operation_t *operation,
         return PSA_ERROR_BAD_STATE;
     }
 
+    if (operation->direction != PSA_CRYPTO_DRIVER_ENCRYPT) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
     /* IoT-Todo: size of the ciphertext or tag buffer is too small -> prolly on lower layer ? */
 
     status = psa_location_dispatch_aead_finish(operation, ciphertext, ciphertext_size,
@@ -609,6 +614,10 @@ psa_status_t psa_aead_verify(psa_aead_operation_t *operation,
 
     /* has to be active operation with nonce set */
     if (!operation->nonce_set && operation->nonce_required) {
+        return PSA_ERROR_BAD_STATE;
+    }
+
+    if (operation->direction != PSA_CRYPTO_DRIVER_DECRYPT) {
         return PSA_ERROR_BAD_STATE;
     }
 
