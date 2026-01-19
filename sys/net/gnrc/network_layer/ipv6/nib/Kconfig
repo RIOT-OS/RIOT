@@ -38,6 +38,10 @@ config GNRC_IPV6_NIB_SLAAC
     default n if USEMODULE_GNRC_IPV6_NIB_6LR || USEMODULE_GNRC_IPV6_NIB_6LN
     default y
 
+config GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES
+    bool "Use temporary addresses (rfc8981)"
+    depends on GNRC_IPV6_NIB_SLAAC
+
 config GNRC_IPV6_NIB_QUEUE_PKT
     bool "Use packet queue with address resolution"
     default n if USEMODULE_GNRC_IPV6_NIB_6LN || GNRC_IPV6_NIB_6LN
