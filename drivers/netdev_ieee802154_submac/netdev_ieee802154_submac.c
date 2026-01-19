@@ -246,7 +246,7 @@ static void _isr(netdev_t *netdev)
             DEBUG("IEEE802154 submac: _isr(): NETDEV_SUBMAC_FLAGS_RX_DONE\n");
             ieee802154_submac_rx_done_cb(submac);
             flags &= ~NETDEV_SUBMAC_FLAGS_RX_DONE;
-            /* dispatch to netif */
+            continue;
         }
 
         flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_TX_DONE);
@@ -254,7 +254,7 @@ static void _isr(netdev_t *netdev)
             DEBUG("IEEE802154 submac: _isr(): NETDEV_SUBMAC_FLAGS_TX_DONE\n");
             ieee802154_submac_tx_done_cb(submac);
             flags &= ~NETDEV_SUBMAC_FLAGS_TX_DONE;
-            /* dispatch to netif */
+            continue;
         }
 
         DEBUG("IEEE802154 submac: _isr_flags_get_clear(): pending flags: %"PRIu32"\n", flags);
