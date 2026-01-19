@@ -19,7 +19,11 @@ find_interface() {
 }
 
 echo "Waiting for network interface."
-find_interface
+if [ -z "${INTERFACE}" ]; then
+    find_interface
+else
+    INTERFACE_CHECK=1
+fi
 
 if [ "${INTERFACE_CHECK}" -eq 0 ]; then
     echo "Unable to find network interface"
