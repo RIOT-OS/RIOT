@@ -34,6 +34,7 @@ FEATURES_PROVIDED += periph_spi_reconfigure
 FEATURES_PROVIDED += periph_spi_gpio_mode
 FEATURES_PROVIDED += periph_spi_reconfigure
 FEATURES_PROVIDED += periph_timer_periodic # implements timer_set_periodic()
+FEATURES_PROVIDED += periph_timer_poll
 FEATURES_PROVIDED += periph_timer_query_freqs
 FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += periph_uart_nonblocking

@@ -18,6 +18,8 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
+#include <limits.h>
+
 #include "board.h"
 #include "saul_reg.h"
 
@@ -90,11 +92,10 @@ static const ws281x_params_t ws281x_params[] =
 
 /** @brief Maximum value of the timer used for WS281x (by the timer_gpio_ll implementation)
  *
- * This macro needs to be defined to the `TIMER_x_MAX_VALUE` corresponding to
- * the `TIMER_DEV(x)` in @ref WS281X_TIMER_DEV.
+ * This macro needs to be defined to the maximum value of @ref WS281X_TIMER_DEV.
  * */
 #ifndef WS281X_TIMER_MAX_VALUE
-#define WS281X_TIMER_MAX_VALUE TIMER_2_MAX_VALUE
+#define WS281X_TIMER_MAX_VALUE UINT_MAX
 #endif
 
 /** @brief Frequency for the timer used for WS281x (by the timer_gpio_ll implementation)
