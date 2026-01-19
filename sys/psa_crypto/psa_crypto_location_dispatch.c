@@ -452,7 +452,7 @@ psa_status_t psa_location_dispatch_aead_set_lengths(psa_aead_operation_t *operat
     return psa_algorithm_dispatch_aead_set_lengths(operation, ad_length, plaintext_length);
 }
 
-/* IoT-TODO: generate nonce probably*/
+/* IoT-TODO: generate nonce needed ? */
 
 /* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_set_nonce(psa_aead_operation_t *operation,
@@ -535,7 +535,7 @@ psa_status_t psa_location_dispatch_aead_finish(psa_aead_operation_t *operation,
 }
 /* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_verify(psa_aead_operation_t *operation,
-                                               uint8_t *plaintext,
+                                               const uint8_t *plaintext,
                                                size_t plaintext_size,
                                                size_t *plaintext_length,
                                                const uint8_t *tag,

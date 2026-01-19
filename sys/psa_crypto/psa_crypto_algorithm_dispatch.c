@@ -966,7 +966,7 @@ psa_status_t psa_algorithm_dispatch_aead_set_lengths(psa_aead_operation_t *opera
     }
 }
 
-/* IoT-TODO: generate nonce proabably */
+/* IoT-TODO: generate nonce ? */
 
 /* IoT-TODO */
 psa_status_t psa_algorithm_dispatch_aead_set_nonce(psa_aead_operation_t *operation,
@@ -1030,7 +1030,7 @@ psa_status_t psa_algorithm_dispatch_aead_update(psa_aead_operation_t *operation,
 
 /* IoT-TODO*/
 psa_status_t psa_algorithm_dispatch_aead_finish(psa_aead_operation_t *operation,
-                                                const uint8_t *ciphertext,
+                                                uint8_t *ciphertext,
                                                 size_t ciphertext_size,
                                                 size_t ciphertext_length,
                                                 uint8_t *tag,
@@ -1063,7 +1063,6 @@ psa_status_t psa_algorithm_dispatch_aead_verify(psa_aead_operation_t *operation,
     (void)tag_length;
     return PSA_ERROR_NOT_SUPPORTED;
 }
-
 #endif /* MODULE_PSA_AEAD */
 
 #if IS_USED(MODULE_PSA_MAC)

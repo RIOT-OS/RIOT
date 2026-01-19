@@ -260,36 +260,30 @@ psa_status_t psa_location_dispatch_aead_decrypt(const psa_key_attributes_t *attr
                                                 size_t plaintext_size,
                                                 size_t *plaintext_length);
 
-/* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_encrypt_setup(psa_aead_operation_t *operation,
                                                       const psa_key_attributes_t *attributes,
                                                       const psa_key_slot_t *slot,
                                                       psa_algorithm_t alg);
 
-/* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_decrypt_setup(psa_aead_operation_t *operation,
                                                       const psa_key_attributes_t *attributes,
                                                       const psa_key_slot_t *slot,
                                                       psa_algorithm_t alg);
 
-/* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_set_lengths(psa_aead_operation_t *operation,
                                                     size_t ad_length,
                                                     size_t plaintext_length);
 
-/* IoT-TODO: generate nonce proabably */
+/* IoT-TODO: generate nonce ? */
 
-/* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_set_nonce(psa_aead_operation_t *operation,
                                                   const uint8_t *nonce,
                                                   size_t nonce_length);
 
-/* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_update_ad(psa_aead_operation_t *operation,
                                                   const uint8_t *input,
                                                   size_t input_length);
 
-/* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_update(psa_aead_operation_t *operation,
                                                const uint8_t *input,
                                                size_t input_length,
@@ -297,7 +291,6 @@ psa_status_t psa_location_dispatch_aead_update(psa_aead_operation_t *operation,
                                                size_t output_size,
                                                size_t *output_length);
 
-/* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_finish(psa_aead_operation_t *operation,
                                                uint8_t *ciphertext,
                                                size_t ciphertext_size,
@@ -306,9 +299,8 @@ psa_status_t psa_location_dispatch_aead_finish(psa_aead_operation_t *operation,
                                                size_t tag_size,
                                                size_t *tag_length);
 
-/* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_verify(psa_aead_operation_t *operation,
-                                               uint8_t *plaintext,
+                                               const uint8_t *plaintext,
                                                size_t plaintext_size,
                                                size_t *plaintext_length,
                                                const uint8_t *tag,

@@ -363,20 +363,10 @@ psa_status_t psa_aead_set_lengths(psa_aead_operation_t *operation,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    /* IoT-TODO */
-    /* return PSA_ERROR_INVALID_ARGUMENT if ad_length or plaintext_length are too large 
-    for the chosen algorithm. */
-    /*
-    if (ad_length > _____ || plaintext_length > ___) {
-        return PSA_ERROR_INVALID_ARGUMENT;
-    }
-    */
-    /* return PSA_ERROR_NOT_SUPPORTED if ad_length or plaintext_length are too large for the implementation.
+    /* IoT-TODO: on lower layers? */
+    /* return PSA_ERROR_INVALID_ARGUMENT if ad_length or plaintext_length are too large for the chosen algorithm.* /
 
-    if (ad_length > ____ || plaintext_length > ____) {
-        return PSA_ERROR_NOT_SUPPORTED;
-    }
-    */
+    /* return PSA_ERROR_NOT_SUPPORTED if ad_length or plaintext_length are too large for the implementation. */
 
     status = psa_location_dispatch_aead_set_lengths(operation, ad_length, plaintext_length);
     if (status != PSA_SUCCESS) {
@@ -418,9 +408,11 @@ psa_status_t psa_aead_generate_nonce(psa_aead_operation_t *operation,
         return PSA_ERROR_BAD_STATE;
     }
 
+    /* IoT-TODO: lower layer probably
     if (nonce_size < PSA_AEAD_NONCE_MAX_SIZE) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
+    */
 
     /* IoT-TODO: The size of nonce is not acceptable for 
     the chosen algorithm. how!? lower layer ?!*/
@@ -545,9 +537,11 @@ psa_status_t psa_aead_update(psa_aead_operation_t *operation,
         return PSA_ERROR_BAD_STATE;
     }
 
+    /* IoT-Todo: prolly on lower layer aswell
     if (output_size < PSA_AEAD_UPDATE_OUTPUT_MAX_SIZE(input_length)) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
+    */
 
     /* IoT-Todo: The total length of input to @ref psa_aead_update_ad() so far is less than the
     additional data length that was previously specified with @ref psa_aead_set_lengths() */
@@ -569,7 +563,6 @@ psa_status_t psa_aead_update(psa_aead_operation_t *operation,
     return status;
 }
 
-/* IoT-TODO */
 psa_status_t psa_aead_finish(psa_aead_operation_t *operation,
                              uint8_t *ciphertext,
                              size_t ciphertext_size,
@@ -603,7 +596,6 @@ psa_status_t psa_aead_finish(psa_aead_operation_t *operation,
     return status;
 }
 
-/* IoT-TODO */
 psa_status_t psa_aead_verify(psa_aead_operation_t *operation,
                              uint8_t *plaintext,
                              size_t plaintext_size,
@@ -621,7 +613,7 @@ psa_status_t psa_aead_verify(psa_aead_operation_t *operation,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    /* IoT-Todo: active operation with a nonce set */
+    /* has to be active operation with nonce set */
     if (!operation->nonce_set && operation->nonce_required) {
         return PSA_ERROR_BAD_STATE;
     }

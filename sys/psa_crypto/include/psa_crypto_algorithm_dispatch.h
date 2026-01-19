@@ -237,7 +237,7 @@ psa_status_t psa_algorithm_dispatch_aead_finish(psa_aead_operation_t *operation,
 
 /* IoT-TODO */
 psa_status_t psa_algorithm_dispatch_aead_verify(psa_aead_operation_t *operation,
-                                                uint8_t *plaintext,
+                                                const uint8_t *plaintext,
                                                 size_t plaintext_size,
                                                 size_t *plaintext_length,
                                                 const uint8_t *tag,
