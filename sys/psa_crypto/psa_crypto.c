@@ -561,6 +561,8 @@ psa_status_t psa_aead_update(psa_aead_operation_t *operation,
         psa_aead_abort(operation);
     }
 
+    operation->setup_done = 1;
+
     return status;
 }
 

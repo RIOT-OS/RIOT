@@ -915,7 +915,9 @@ psa_status_t psa_algorithm_dispatch_aead_encrypt_setup(psa_aead_operation_t *ope
     switch (operation->op) {
 #  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
     case PSA_CHACHA20_POLY1305:
-        return PSA_ERROR_NOT_SUPPORTED;
+        return psa_aead_chacha20_poly1305_encrypt_setup(&operation->backend_ctx.chacha20poly1305,
+                                                        slot->key.data,
+                                                        slot->key.data_len);
 #  endif
     default:
         (void)operation;
@@ -937,7 +939,9 @@ psa_status_t psa_algorithm_dispatch_aead_decrypt_setup(psa_aead_operation_t *ope
     switch (operation->op) {
 #  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
     case PSA_CHACHA20_POLY1305:
-        return PSA_ERROR_NOT_SUPPORTED;
+        return psa_aead_chacha20_poly1305_decrypt_setup(&operation->backend_ctx.chacha20poly1305,
+                                                        slot->key.data,
+                                                        slot->key.data_len);
 #  endif
     default:
         (void)operation;
@@ -976,7 +980,8 @@ psa_status_t psa_algorithm_dispatch_aead_set_nonce(psa_aead_operation_t *operati
     switch (operation->op) {
 #  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
     case PSA_CHACHA20_POLY1305:
-        return PSA_ERROR_NOT_SUPPORTED;
+        return psa_aead_chacha20_poly1305_set_nonce(&operation->backend_ctx.chacha20poly1305,
+                                                    nonce, nonce_length);
 #  endif
     default:
         (void)operation;
@@ -994,7 +999,8 @@ psa_status_t psa_algorithm_dispatch_aead_update_ad(psa_aead_operation_t *operati
     switch (operation->op) {
 #  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
     case PSA_CHACHA20_POLY1305:
-        return PSA_ERROR_NOT_SUPPORTED;
+        return psa_aead_chacha20_poly1305_update_ad(&operation->backend_ctx.chacha20poly1305,
+                                                    input, input_length);
 #  endif
     default:
         (void)operation;
@@ -1015,7 +1021,13 @@ psa_status_t psa_algorithm_dispatch_aead_update(psa_aead_operation_t *operation,
     switch (operation->op) {
 #  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
     case PSA_CHACHA20_POLY1305:
-        return PSA_ERROR_NOT_SUPPORTED;
+        return psa_aead_chacha20_poly1305_update(&operation->backend_ctx.chacha20poly1305,
+                                                 operation->setup_done,
+                                                 input,
+                                                 input_length,
+                                                 output,
+                                                 output_size,
+                                                 output_length);
 #  endif
     default:
         (void)operation;

@@ -216,6 +216,73 @@ void chacha20_finish(chacha20_ctx_t *ctx,
     crypto_secure_wipe(ctx, sizeof(*ctx));
 }
 
-void chacha20_poly1305_encrypt_setup(chacha20poly1305_ctx_t *ctx) {
-    chacha20_setup(&ctx->chacha20, NULL, NULL, 0);
+void chacha20_poly1305_setup(chacha20poly1305_ctx_t *ctx,
+                             const uint8_t *key)
+{
+    /* Set key in the Chacha20 ctx, Poly key cannot be set yet as
+     * is derived from the full Chacha20 state, including nonce */
+
+    const uint8_t zero_nonce[12] = { 0 };
+    chacha20_setup(&ctx->chacha20, key, zero_nonce, 0);
+}
+
+void chacha20_poly1305_set_nonce(chacha20poly1305_ctx_t *ctx,
+                                 const uint8_t *nonce)
+{
+    ctx->chacha20.split.nonce[0] = unaligned_get_u32(nonce);
+    ctx->chacha20.split.nonce[1] = unaligned_get_u32(nonce + 4);
+    ctx->chacha20.split.nonce[2] = unaligned_get_u32(nonce + 8);
+
+    /* Derive Poly1305 key */
+    uint32_t key_stream[16];
+    _keystream(&ctx->chacha20, key_stream);
+    poly1305_init(&ctx->poly, (uint8_t *)key_stream);
+    crypto_secure_wipe(key_stream, sizeof(key_stream));
+
+    /* Increment counter to 1 for message encryption */
+    ctx->chacha20.split.counter[0] = 1;
+}
+
+void chacha20_poly1305_update_ad(chacha20poly1305_ctx_t *ctx,
+                                 const uint8_t *ad,
+                                 size_t ad_length)
+{
+    poly1305_update(&ctx->poly, ad, ad_length);
+}
+
+size_t chacha20_poly1305_update(chacha20poly1305_ctx_t *ctx,
+                                uint8_t setup_done,
+                                size_t keystream_idx,
+                                const uint8_t *input,
+                                size_t input_length,
+                                uint8_t *output)
+{
+    if (setup_done == 0) {
+        /* When this function is called, no additional data can be added.
+         * So we pad the given ad to a full 16 byte (Poly) block. */
+        const size_t padlen = (16 - ctx->poly.c_idx) & 0xF;
+        poly1305_update(&ctx->poly, padding, padlen);
+    }
+
+    /* First we calculate the ciphertext */
+    uint32_t key_stream[16];
+    _keystream(&ctx->chacha20, key_stream);
+    for (size_t i = 0; i < input_length; i++) {
+        /* If we reach the end of the current keystream, increment the
+         * counter and calculate a new one. */
+        if (keystream_idx == 64) {
+            ctx->chacha20.split.counter[0]++;
+            _keystream(&ctx->chacha20, key_stream);
+            keystream_idx = 0;
+        }
+        output[i] = input[i] ^ ((uint8_t *)key_stream)[keystream_idx];
+        keystream_idx++;
+    }
+    crypto_secure_wipe(key_stream, sizeof(key_stream));
+
+    /* Then we update Poly with the ciphertext */
+    poly1305_update(&ctx->poly, output, input_length);
+
+    /* IoT-TODO: this seems clunky AF */
+    return keystream_idx;
 }

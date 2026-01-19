@@ -1,3 +1,4 @@
+#include "psa/error.h"
 #include <stdio.h>
 #include "psa/crypto.h"
 #include "crypto/chacha20poly1305.h"
@@ -62,50 +63,73 @@ psa_status_t psa_aead_chacha20_poly1305_decrypt(const psa_key_attributes_t *attr
     return PSA_SUCCESS;
 }
 
-psa_status_t psa_aead_chacha20_poly1305_encrypt_setup(psa_aead_operation_t *operation,
-                                                      const psa_key_attributes_t *attributes,
-                                                      const psa_key_slot_t *slot,
-                                                      psa_algorithm_t alg)
+psa_status_t psa_aead_chacha20_poly1305_encrypt_setup(psa_aead_chacha20_poly1305_ctx_t *ctx,
+                                                      const uint8_t *key,
+                                                      size_t key_length)
 {
-    operation->backend_ctx.chacha20poly1305; /* To avoid unused warning */
+    if (key_length != CHACHA20POLY1305_KEY_BYTES) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
 
-    //(void)operation;
-    (void)attributes;
-    (void)slot;
-    (void)alg;
-    return PSA_ERROR_NOT_SUPPORTED;
+    chacha20_poly1305_setup(&ctx->ctx, key);
+
+    return PSA_SUCCESS;
 }
 
-psa_status_t psa_aead_chacha20_poly1305_decrypt_setup(psa_aead_operation_t *operation,
-                                                      const psa_key_attributes_t *attributes,
-                                                      const psa_key_slot_t *slot,
-                                                      psa_algorithm_t alg)
+psa_status_t psa_aead_chacha20_poly1305_decrypt_setup(psa_aead_chacha20_poly1305_ctx_t *ctx,
+                                                      const uint8_t *key,
+                                                      size_t key_length)
 {
-    (void)operation;
-    (void)attributes;
-    (void)slot;
-    (void)alg;
-    return PSA_ERROR_NOT_SUPPORTED;
+    if (key_length != CHACHA20POLY1305_KEY_BYTES) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    chacha20_poly1305_setup(&ctx->ctx, key);
+
+    return PSA_SUCCESS;
 }
 
-psa_status_t psa_aead_chacha20_poly1305_set_lengths(psa_aead_operation_t *operation,
-                                                    size_t ad_length,
-                                                    size_t plaintext_length)
+psa_status_t psa_aead_chacha20_poly1305_set_nonce(psa_aead_chacha20_poly1305_ctx_t *ctx,
+                                                  const uint8_t *nonce,
+                                                  size_t nonce_length)
 {
-    (void)operation;
-    (void)ad_length;
-    (void)plaintext_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    if (nonce_length != CHACHA20POLY1305_NONCE_BYTES) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    chacha20_poly1305_set_nonce(&ctx->ctx, nonce);
+
+    return PSA_SUCCESS;
 }
 
-psa_status_t psa_aead_chacha20_poly1305_generate_nonce(psa_aead_operation_t *operation,
-                                                       uint8_t *nonce,
-                                                       size_t nonce_size,
-                                                       size_t *nonce_length)
+psa_status_t psa_aead_chacha20_poly1305_update_ad(psa_aead_chacha20_poly1305_ctx_t *ctx,
+                                                  const uint8_t *ad,
+                                                  size_t ad_length)
 {
-    (void)operation;
-    (void)nonce;
-    (void)nonce_size;
-    (void)nonce_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    chacha20_poly1305_update_ad(&ctx->ctx, ad, ad_length);
+
+    return PSA_SUCCESS;
+}
+
+psa_status_t psa_aead_chacha20_poly1305_update(psa_aead_chacha20_poly1305_ctx_t *ctx,
+                                               size_t setup_done,
+                                               const uint8_t *input,
+                                               size_t input_length,
+                                               uint8_t *output,
+                                               size_t output_size,
+                                               size_t *output_length)
+{
+    if (output_size < input_length) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    chacha20_poly1305_update(&ctx->ctx,
+                             setup_done,
+                             ctx->block_idx,
+                             input,
+                             input_length,
+                             output);
+    *output_length = input_length;
+
+    return PSA_SUCCESS;
 }

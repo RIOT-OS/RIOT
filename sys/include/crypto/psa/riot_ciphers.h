@@ -34,7 +34,8 @@ typedef cipher_t psa_cipher_aes_192_ctx_t;
 #if IS_USED(MODULE_PSA_RIOT_CIPHER_AES_256_CBC)
 typedef cipher_t psa_cipher_aes_256_ctx_t;
 #endif
-#if IS_USED(MODULE_PSA_RIOT_CIPHER_CHACHA20)
+#if IS_USED(MODULE_PSA_RIOT_CIPHER_CHACHA20) ||\
+    IS_USED(MODULE_PSA_RIOT_AEAD_CHACHA20_POLY1305)
 #include "crypto/chacha20poly1305.h"
 /**
  * @brief This struct is used to handle the discontinuity between the PSA API

@@ -122,24 +122,29 @@ psa_status_t psa_aead_chacha20_poly1305_decrypt(const psa_key_attributes_t *attr
                                                 size_t ciphertext_length, uint8_t *plaintext,
                                                 size_t plaintext_size, size_t *plaintext_length);
 
-psa_status_t psa_aead_chacha20_poly1305_encrypt_setup(psa_aead_operation_t *operation,
-                                                      const psa_key_attributes_t *attributes,
-                                                      const psa_key_slot_t *slot,
-                                                      psa_algorithm_t alg);
+psa_status_t psa_aead_chacha20_poly1305_encrypt_setup(psa_aead_chacha20_poly1305_ctx_t *ctx,
+                                                      const uint8_t *key,
+                                                      size_t key_length);
 
-psa_status_t psa_aead_chacha20_poly1305_decrypt_setup(psa_aead_operation_t *operation,
-                                                      const psa_key_attributes_t *attributes,
-                                                      const psa_key_slot_t *slot,
-                                                      psa_algorithm_t alg);
+psa_status_t psa_aead_chacha20_poly1305_decrypt_setup(psa_aead_chacha20_poly1305_ctx_t *ctx,
+                                                      const uint8_t *key,
+                                                      size_t key_length);
 
-psa_status_t psa_aead_chacha20_poly1305_set_lengths(psa_aead_operation_t *operation,
-                                                    size_t ad_length,
-                                                    size_t plaintext_length);
+psa_status_t psa_aead_chacha20_poly1305_set_nonce(psa_aead_chacha20_poly1305_ctx_t *ctx,
+                                                  const uint8_t *nonce,
+                                                  size_t nonce_length);
 
-psa_status_t psa_aead_chacha20_poly1305_generate_nonce(psa_aead_operation_t *operation,
-                                                       uint8_t *nonce,
-                                                       size_t nonce_size,
-                                                       size_t *nonce_length);
+psa_status_t psa_aead_chacha20_poly1305_update_ad(psa_aead_chacha20_poly1305_ctx_t *operation,
+                                                  const uint8_t *ad,
+                                                  size_t ad_length);
+
+psa_status_t psa_aead_chacha20_poly1305_update(psa_aead_chacha20_poly1305_ctx_t *operation,
+                                               size_t setup_done,
+                                               const uint8_t *input,
+                                               size_t input_length,
+                                               uint8_t *output,
+                                               size_t output_size,
+                                               size_t *output_length);
 #  endif /* MODULE_PSA_RIOT_AEAD_CHACHA20_POLY1305 */
 
 #  ifdef __cplusplus

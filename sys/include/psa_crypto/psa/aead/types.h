@@ -43,6 +43,7 @@ struct psa_aead_operation_s {
     size_t ad_length;             /**< Length of additional data */
     size_t processed_ad_length;   /**< Length of already processed additional data */
     size_t message_length;        /**< Length of message data */
+    uint8_t setup_done : 1;       /**< True if setup is done, eg. update() was called */
     psa_algorithm_t alg;          /**< Operation algorithm*/
     psa_aead_op_t op;             /**< Encoded operation */
     /** Union containing AEAD cipher contexts for the executing backend */
@@ -51,8 +52,6 @@ struct psa_aead_operation_s {
         psa_aead_chacha20_poly1305_ctx_t chacha20poly1305; /**< ChaCha20 context*/
 #endif
     } backend_ctx;
-
-    int dummy; /**< Not implemented, yet */
 };
 
 /* These are all temporarily defined as some numeric type to prevent errors at compile time.*/
