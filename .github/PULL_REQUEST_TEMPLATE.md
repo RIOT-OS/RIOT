@@ -34,3 +34,13 @@ Please use keywords (e.g., fixes, resolve) with the links to the issues you
 resolved, this way they will be automatically closed when your pull request
 is merged. See https://help.github.com/articles/closing-issues-using-keywords/.
 -->
+
+Declaration of AI-Toolusage:
+[] This PR was written using LLM assistance,
+[] the LLM was tasked to produce whole file(s),
+[] the LLM was tasked to produce function(s),
+[] the LLM was tasked to produce codeblocks or snippets,
+[] the LLM was used to check the code,
+[] the LLM was used to produce documentation,
+[] the LLM was used to spellcheck.
+Tools that where used are: 
