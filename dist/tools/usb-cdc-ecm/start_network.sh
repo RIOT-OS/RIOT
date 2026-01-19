@@ -58,17 +58,27 @@ stop_radvd() {
     fi
 }
 
-cleanup() {
-    echo "Cleaning up..."
-    stop_radvd
-    cleanup_interface
-    if [ -n "${UHCPD_PID}" ]; then
-        kill "${UHCPD_PID}"
-    fi
+stop_dhcpdv6() {
     if [ -n "${DHCPD_PIDFILE}" ]; then
         kill "$(cat "${DHCPD_PIDFILE}")"
         rm "${DHCPD_PIDFILE}"
+        ip route del "${PREFIX}" via "${IPV6_ROUTE_NEXT_HOP}" dev "${INTERFACE}"
     fi
+}
+
+stop_uhcpd() {
+    if [ -n "${UHCPD_PID}" ]; then
+        kill "${UHCPD_PID}"
+        ip route del "${PREFIX}" via "${IPV6_ROUTE_NEXT_HOP}" dev "${INTERFACE}"
+    fi
+}
+
+cleanup() {
+    echo "Cleaning up..."
+    stop_radvd
+    stop_dhcpdv6
+    stop_uhcpd
+    cleanup_interface
     trap "" INT QUIT TERM EXIT
 }
 
