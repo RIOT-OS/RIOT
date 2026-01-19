@@ -46,8 +46,16 @@ cleanup_interface() {
     ip route del "${PREFIX}" via fe80::2 dev "${INTERFACE}"
 }
 
+stop_radvd() {
+    if [ -n "${RADVD_ADDR}" ]; then
+        ${RADVD} -d
+        ip a d "${RADVD_ADDR}" dev "${INTERFACE}"
+    fi
+}
+
 cleanup() {
     echo "Cleaning up..."
+    stop_radvd
     cleanup_interface
     if [ -n "${UHCPD_PID}" ]; then
         kill "${UHCPD_PID}"
@@ -72,8 +80,8 @@ start_dhcpd() {
 }
 
 start_radvd() {
-    ADDR=$(echo "${PREFIX}" | sed -e 's/::\//::1\//')
-    ip a a "${ADDR}" dev "${INTERFACE}"
+    RADVD_ADDR=$(echo "${PREFIX}" | sed -e 's/::\//::1\//')
+    ip a a "${RADVD_ADDR}" dev "${INTERFACE}"
     sysctl net.ipv6.conf."${INTERFACE}".accept_ra=2
     sysctl net.ipv6.conf."${INTERFACE}".accept_ra_rt_info_max_plen=64
     ${RADVD} -c "${INTERFACE}" "${PREFIX}"
