@@ -352,7 +352,7 @@ int ndef_parse(const ndef_t *ndef, ndef_record_desc_t *record_descriptors,
     return 0;
 }
 
-// MARK: MIME
+/* MARK: MIME */
 int ndef_record_mime_add(ndef_t *ndef, const char *mime_type, uint32_t mime_type_length,
                          const uint8_t *mime_payload, uint32_t mime_payload_length)
 {
@@ -423,7 +423,7 @@ static size_t ndef_record_calculate_text_size(uint32_t text_length, uint8_t lang
     return ndef_calculate_record_size(sizeof(ndef_text_record_type), 0, payload_size);
 }
 
-// MARK: URI
+/* MARK: URI */
 #define IDENTIFIER_CODE_LENGTH 1
 
 const uint8_t ndef_uri_record_type[] = { 'U' };
