@@ -189,9 +189,11 @@ static psa_status_t psa_aead_encrypt_decrypt(psa_key_id_t key,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
+    /* IoT-Todo: false statement?
     if (nonce_length > PSA_AEAD_NONCE_MAX_SIZE) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
+    */
 
     if (direction == PSA_CRYPTO_DRIVER_DECRYPT && (!input || input_length == 0)) {
         return PSA_ERROR_INVALID_ARGUMENT;
@@ -365,7 +367,6 @@ psa_status_t psa_aead_set_lengths(psa_aead_operation_t *operation,
 
     /* IoT-TODO: on lower layers? */
     /* return PSA_ERROR_INVALID_ARGUMENT if ad_length or plaintext_length are too large for the chosen algorithm.* /
-
     /* return PSA_ERROR_NOT_SUPPORTED if ad_length or plaintext_length are too large for the implementation. */
 
     status = psa_location_dispatch_aead_set_lengths(operation, ad_length, plaintext_length);
@@ -415,10 +416,10 @@ psa_status_t psa_aead_generate_nonce(psa_aead_operation_t *operation,
     */
 
     /* IoT-TODO: The size of nonce is not acceptable for 
-    the chosen algorithm. how!? lower layer ?!*/
-    /*
-    if (nonce_size < PSA_AEAD_NONCE_LENGTH(PSA_KEY_TYPE_CHACHA20, operation->alg) &&
-        nonce_size < PSA_AEAD_NONCE_LENGTH(PSA_KEY_TYPE_AES, operation->alg)) {
+    the chosen algorithm -> lower layer ?!*/
+
+    /* IoT-Todo: false statement?
+    if (nonce_size > PSA_AEAD_NONCE_MAX_SIZE) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
     */
