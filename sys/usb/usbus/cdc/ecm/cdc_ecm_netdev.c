@@ -76,6 +76,11 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     DEBUG("CDC_ECM_netdev: cur iol: %d\n", iolist->iol_len);
     while (len) {
         mutex_lock(&cdcecm->out_lock);
+        if (cdcecm->active_iface != 1) {
+            /* Link went down while waiting. */
+            mutex_unlock(&cdcecm->out_lock);
+            return -ENOTCONN;
+        }
         if (iolist->iol_len - iol_offset > usb_remain) {
             /* Only part of the iolist can be copied, usb_remain bytes */
             memcpy(buf + usb_offset, (uint8_t *)iolist->iol_base + iol_offset,
@@ -121,6 +126,11 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     /* Zero length USB packet required */
     if ((iolist_size(iolist_start) % cdcecm->ep_in->maxpacketsize) == 0) {
         mutex_lock(&cdcecm->out_lock);
+        if (cdcecm->active_iface != 1) {
+            /* Link went down while waiting. */
+            mutex_unlock(&cdcecm->out_lock);
+            return -ENOTCONN;
+        }
         DEBUG("CDC ECM netdev: Zero length USB packet required\n");
         cdcecm->tx_len = 0;
         _signal_tx_xmit(cdcecm);
