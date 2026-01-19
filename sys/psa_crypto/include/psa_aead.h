@@ -18,16 +18,16 @@
  *
  */
 #ifndef PSA_AEAD_H
-#define PSA_AEAD_H
+#  define PSA_AEAD_H
 
-#ifdef __cplusplus
+#  ifdef __cplusplus
 extern "C" {
-#endif
+#  endif
 
-#include "psa/crypto.h"
-#include "psa/crypto_contexts.h"
+#  include "psa/crypto.h"
+#  include "psa/crypto_contexts.h"
 
-#if IS_USED(MODULE_PSA_AEAD_AES_128_CCM) || defined(DOXYGEN)
+#  if IS_USED(MODULE_PSA_AEAD_AES_128_CCM) || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an AES 128 CCM encryption.
  *          See @ref psa_aead_encrypt()
@@ -51,9 +51,9 @@ psa_status_t psa_aead_aes_128_ccm_decrypt(const psa_key_attributes_t *attributes
                                           size_t additional_data_length, const uint8_t *ciphertext,
                                           size_t ciphertext_length, uint8_t *plaintext,
                                           size_t plaintext_size, size_t *plaintext_length);
-#endif /* MODULE_PSA_AEAD_AES_128_CCM */
+#  endif /* MODULE_PSA_AEAD_AES_128_CCM */
 
-#if IS_USED(MODULE_PSA_AEAD_AES_192_CCM) || defined(DOXYGEN)
+#  if IS_USED(MODULE_PSA_AEAD_AES_192_CCM) || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an AES 192 CCM encryption.
  *          See @ref psa_aead_encrypt()
@@ -77,9 +77,9 @@ psa_status_t psa_aead_aes_192_ccm_decrypt(const psa_key_attributes_t *attributes
                                           size_t additional_data_length, const uint8_t *ciphertext,
                                           size_t ciphertext_length, uint8_t *plaintext,
                                           size_t plaintext_size, size_t *plaintext_length);
-#endif /* MODULE_PSA_AEAD_AES_192_CCM */
+#  endif /* MODULE_PSA_AEAD_AES_192_CCM */
 
-#if IS_USED(MODULE_PSA_AEAD_AES_256_CCM) || defined(DOXYGEN)
+#  if IS_USED(MODULE_PSA_AEAD_AES_256_CCM) || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an AES 256 CCM encryption.
  *          See @ref psa_aead_encrypt()
@@ -103,29 +103,48 @@ psa_status_t psa_aead_aes_256_ccm_decrypt(const psa_key_attributes_t *attributes
                                           size_t additional_data_length, const uint8_t *ciphertext,
                                           size_t ciphertext_length, uint8_t *plaintext,
                                           size_t plaintext_size, size_t *plaintext_length);
-#endif /* MODULE_PSA_AEAD_AES_256_CCM */
+#  endif /* MODULE_PSA_AEAD_AES_256_CCM */
 
-#if IS_USED(MODULE_PSA_RIOT_AEAD_CHACHA20_POLY1305) || defined(DOXYGEN)
+#  if IS_USED(MODULE_PSA_RIOT_AEAD_CHACHA20_POLY1305) || defined(DOXYGEN)
 psa_status_t psa_aead_chacha20_poly1305_encrypt(const psa_key_attributes_t *attributes,
-                                                  uint8_t *key_buffer, size_t key_buffer_length,
-                                                  uint8_t tag_length, const uint8_t *nonce,
-                                                  size_t nonce_length, const uint8_t *additional_data,
-                                                  size_t additional_data_length, const uint8_t *plaintext,
-                                                  size_t plaintext_length, uint8_t *ciphertext,
-                                                  size_t ciphertext_size, size_t *ciphertext_length);
+                                                uint8_t *key_buffer, size_t key_buffer_length,
+                                                uint8_t tag_length, const uint8_t *nonce,
+                                                size_t nonce_length, const uint8_t *additional_data,
+                                                size_t additional_data_length, const uint8_t *plaintext,
+                                                size_t plaintext_length, uint8_t *ciphertext,
+                                                size_t ciphertext_size, size_t *ciphertext_length);
 
 psa_status_t psa_aead_chacha20_poly1305_decrypt(const psa_key_attributes_t *attributes,
-                                                  uint8_t *key_buffer, size_t key_buffer_length,
-                                                  uint8_t tag_length, const uint8_t *nonce,
-                                                  size_t nonce_length, const uint8_t *additional_data,
-                                                  size_t additional_data_length, const uint8_t *ciphertext,
-                                                  size_t ciphertext_length, uint8_t *plaintext,
-                                                  size_t plaintext_size, size_t *plaintext_length);
-#endif /* MODULE_PSA_RIOT_AEAD_CHACHA20_POLY1305 */
+                                                uint8_t *key_buffer, size_t key_buffer_length,
+                                                uint8_t tag_length, const uint8_t *nonce,
+                                                size_t nonce_length, const uint8_t *additional_data,
+                                                size_t additional_data_length, const uint8_t *ciphertext,
+                                                size_t ciphertext_length, uint8_t *plaintext,
+                                                size_t plaintext_size, size_t *plaintext_length);
 
-#ifdef __cplusplus
+psa_status_t psa_aead_chacha20_poly1305_encrypt_setup(psa_aead_operation_t *operation,
+                                                      const psa_key_attributes_t *attributes,
+                                                      const psa_key_slot_t *slot,
+                                                      psa_algorithm_t alg);
+
+psa_status_t psa_aead_chacha20_poly1305_decrypt_setup(psa_aead_operation_t *operation,
+                                                      const psa_key_attributes_t *attributes,
+                                                      const psa_key_slot_t *slot,
+                                                      psa_algorithm_t alg);
+
+psa_status_t psa_aead_chacha20_poly1305_set_lengths(psa_aead_operation_t *operation,
+                                                    size_t ad_length,
+                                                    size_t plaintext_length);
+
+psa_status_t psa_aead_chacha20_poly1305_generate_nonce(psa_aead_operation_t *operation,
+                                                       uint8_t *nonce,
+                                                       size_t nonce_size,
+                                                       size_t *nonce_length);
+#  endif /* MODULE_PSA_RIOT_AEAD_CHACHA20_POLY1305 */
+
+#  ifdef __cplusplus
 }
-#endif
+#  endif
 
 #endif /* PSA_AEAD_H */
 /** @} */

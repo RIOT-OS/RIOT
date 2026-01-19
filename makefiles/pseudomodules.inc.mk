@@ -333,6 +333,7 @@ PSEUDOMODULES += printf_float
 PSEUDOMODULES += printf_long_long
 PSEUDOMODULES += prng
 PSEUDOMODULES += prng_%
+PSEUDOMODULES += psa_riot_aead_chacha20_poly1305
 PSEUDOMODULES += psa_riot_cipher_aes_common
 PSEUDOMODULES += psa_riot_cipher_aes_128_ecb
 PSEUDOMODULES += psa_riot_cipher_aes_128_cbc

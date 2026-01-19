@@ -16,6 +16,7 @@
  * @}
  */
 
+#include "psa_aead.h"
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
@@ -213,4 +214,8 @@ void chacha20_finish(chacha20_ctx_t *ctx,
         output[j] = input[j] ^ ((uint8_t *)key_stream)[j];
     }
     crypto_secure_wipe(ctx, sizeof(*ctx));
+}
+
+void chacha20_poly1305_encrypt_setup(chacha20poly1305_ctx_t *ctx) {
+    chacha20_setup(&ctx->chacha20, NULL, NULL, 0);
 }

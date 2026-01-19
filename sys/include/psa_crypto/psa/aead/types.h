@@ -26,8 +26,10 @@
 extern "C" {
 #endif
 
+#include "crypto/psa/riot_aeads.h"
 #include "psa/algorithm.h"
 #include "psa/cipher/types.h"
+
 /**
  * @brief   Structure storing an AEAD operation context
  *
@@ -44,8 +46,10 @@ struct psa_aead_operation_s {
     psa_algorithm_t alg;          /**< Operation algorithm*/
     psa_aead_op_t op;             /**< Encoded operation */
     /** Union containing AEAD cipher contexts for the executing backend */
-    union aead_cipher_context {
-        psa_cipher_context_t cipher_ctx; /**< Cipher context */
+    union aead_context {
+#if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305) || defined(DOXYGEN)
+        psa_aead_chacha20_poly1305_ctx_t chacha20poly1305; /**< ChaCha20 context*/
+#endif
     } backend_ctx;
 
     int dummy; /**< Not implemented, yet */

@@ -26,7 +26,7 @@ extern psa_status_t example_aead_chacha20_poly1305(void);
 
 int main(void)
 {
-#if IS_USED(MODULE_PSA_RIOT_AEAD_CHACHA20_POLY1305)
+#if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
     puts("Module successfully loaded.\n");
 #endif
 

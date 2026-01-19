@@ -61,6 +61,9 @@ typedef union {
 #if IS_USED(MODULE_PSA_CIPHER_AES_256_CBC) || defined(DOXYGEN)
     psa_cipher_aes_256_ctx_t aes_256;   /**< AES 256 context*/
 #endif
+#if IS_USED(MODULE_PSA_CIPHER_CHACHA20) || defined(DOXYGEN)
+    psa_cipher_chacha20_ctx_t chacha20; /**< ChaCha20 context*/
+#endif
 } psa_cipher_context_t;
 
 /**
