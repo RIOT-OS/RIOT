@@ -11,7 +11,11 @@
  *
  * @file
  * @brief       Peripheral MCU configuration for the nucleo-h753zi board
+<<<<<<< HEAD
  * 
+=======
+ *
+>>>>>>> b34fe3e3f1 (boards: Add TIM2 and TIM5)
  * @author      Joshua DeWeese <jdeweese@primecontrols.com>
  */
 
@@ -25,7 +29,11 @@
 
 #include "periph_cpu.h"
 #include "clk_conf.h"
+<<<<<<< HEAD
 
+=======
+#include "cfg_timer_tim5_and_tim2.h"
+>>>>>>> b34fe3e3f1 (boards: Add TIM2 and TIM5)
 
 #ifdef __cplusplus
 extern "C" {
