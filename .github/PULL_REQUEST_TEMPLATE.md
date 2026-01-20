@@ -43,4 +43,4 @@ Declaration of AI-Toolusage:
 [] the LLM was used to check the code,
 [] the LLM was used to produce documentation,
 [] the LLM was used to spellcheck.
-Tools that where used are: 
+Tools that where used are:
