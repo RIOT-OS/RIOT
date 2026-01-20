@@ -139,7 +139,7 @@ psa_status_t psa_aead_chacha20_poly1305_update(psa_aead_chacha20_poly1305_ctx_t 
         const size_t padlen = (16 - ctx->poly.c_idx) & 0xF;
         poly1305_update(&ctx->poly, padding, padlen);
     }
-
+    /* IoT-TODO: führt zu endlos loop bei 3x ausführung */
     psa_cipher_chacha20_update(&ctx->chacha, input, input_length, output, output_size, output_length);
     /* No matter which direction, Poly always uses the ciphertext as input. */
     if (direction == PSA_CRYPTO_DRIVER_ENCRYPT) {

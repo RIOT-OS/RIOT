@@ -87,21 +87,36 @@ psa_status_t example_aead_chacha20_poly1305_multipart(void)
     status = psa_import_key(&attr, KEY_CHACHA20, sizeof KEY_CHACHA20, &key_id);
     if (status != PSA_SUCCESS) {
         psa_destroy_key(key_id);
-        printf("Import Key Error: %s", psa_status_to_humanly_readable(status));
+        printf("Import Key Error: %s\n", psa_status_to_humanly_readable(status));
         return status;
     }
 
     status = psa_aead_encrypt_setup(&operation, key_id, alg);
     if (status != PSA_SUCCESS) {
         psa_destroy_key(key_id);
-        printf("Encrypt Setup Error: %s", psa_status_to_humanly_readable(status));
+        printf("Encrypt Setup Error: %s\n", psa_status_to_humanly_readable(status));
+        return status;
+    }
+
+    status = psa_aead_set_lengths(&operation, sizeof(ADDITIONAL_DATA), sizeof(PLAINTEXT));
+    if (status != PSA_SUCCESS) {
+        psa_destroy_key(key_id);
+        printf("Set Lengths Error: %s\n", psa_status_to_humanly_readable(status));
         return status;
     }
 
     status = psa_aead_set_nonce(&operation, NONCE, sizeof NONCE);
     if (status != PSA_SUCCESS) {
         psa_destroy_key(key_id);
-        printf("Encrypt Set Nonce Error: %s", psa_status_to_humanly_readable(status));
+        printf("Encrypt Set Nonce Error: %s\n", psa_status_to_humanly_readable(status));
+        return status;
+    }
+
+    /* IoT-TODO: make this multipart*/
+    status = psa_aead_update_ad(&operation, ADDITIONAL_DATA, sizeof(ADDITIONAL_DATA));
+    if (status != PSA_SUCCESS) {
+        psa_destroy_key(key_id);
+        printf("Encrypt Update Ad Error: %s\n", psa_status_to_humanly_readable(status));
         return status;
     }
 
@@ -114,15 +129,18 @@ psa_status_t example_aead_chacha20_poly1305_multipart(void)
             input_length = sizeof(PLAINTEXT) - processed_bytes;
         }
         size_t new_output_length = 0;
+        /* Wird 3x aufgerufen -> 105 bytes, dann endlos loop xdd */
+        puts("asdasd");
         status = psa_aead_update(&operation,
                                  &PLAINTEXT[processed_bytes],
                                  input_length,
                                  &ciphertext_out[calculated_output],
                                  (cipher_output_size - calculated_output),
                                  &new_output_length);
+        puts("asdasdxxxxxxxxx");
         if (status != PSA_SUCCESS) {
             psa_destroy_key(key_id);
-            printf("Encrypt Update Error: %s", psa_status_to_humanly_readable(status));
+            printf("Encrypt Update Error: %s\n", psa_status_to_humanly_readable(status));
             return status;
         }
         calculated_output += new_output_length;
@@ -141,18 +159,18 @@ psa_status_t example_aead_chacha20_poly1305_multipart(void)
                              &calculated_tag_length);
     if (status != PSA_SUCCESS) {
         psa_destroy_key(key_id);
-        printf("Encrypt Finish Error: %s", psa_status_to_humanly_readable(status));
+        printf("Encrypt Finish Error: %s\n", psa_status_to_humanly_readable(status));
         return status;
     }
     calculated_output += finish_output_length;
 
     if (memcmp(ciphertext_out, CIPHERTEXT, sizeof(CIPHERTEXT)) != 0) {
-        puts("Wrong Ciphertext on encryption");
+        puts("Wrong Ciphertext on encryption\n");
         return PSA_ERROR_DATA_INVALID;
     }
 
     if (memcmp(calculated_tag, TAG, sizeof(TAG)) != 0) {
-        puts("Wrong Tag on encryption");
+        puts("Wrong Tag on encryption\n");
         return PSA_ERROR_DATA_INVALID;
     }
 

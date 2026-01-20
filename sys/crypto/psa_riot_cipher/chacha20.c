@@ -123,6 +123,7 @@ psa_status_t psa_cipher_chacha20_update(psa_cipher_chacha20_ctx_t *ctx,
     const size_t num_blocks = (input_length - input_index) >> 6;
     size_t pos = 0;
 
+    /* IoT-TODO: loopt unendlich bei 3x ausführung */
     for (size_t i = 0; i < num_blocks; i++, pos += 64) {
         chacha20_update(&ctx->ctx, &input[input_index + pos], &output[output_index + pos]);
     }

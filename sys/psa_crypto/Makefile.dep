@@ -220,6 +220,8 @@ ifneq (,$(filter psa_aead_chacha20_poly1305_backend_riot,$(USEMODULE)))
   USEMODULE += crypto
   USEMODULE += psa_riot_aead
   USEMODULE += psa_riot_aead_chacha20_poly1305
+  USEMODULE += psa_cipher_chacha20
+  USEMODULE += psa_cipher_chacha20_backend_riot
 endif
 
 
