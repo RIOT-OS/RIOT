@@ -328,9 +328,11 @@ psa_status_t psa_aead_encrypt_decrypt_setup(psa_aead_operation_t *operation,
     }
 
     if (direction == PSA_CRYPTO_DRIVER_ENCRYPT) {
+        operation->direction = PSA_CRYPTO_DRIVER_ENCRYPT;
         status = psa_location_dispatch_aead_encrypt_setup(operation, &slot->attr, slot, alg);
     }
     else {
+        operation->direction = PSA_CRYPTO_DRIVER_DECRYPT;
         status = psa_location_dispatch_aead_decrypt_setup(operation, &slot->attr, slot, alg);
     }
 
