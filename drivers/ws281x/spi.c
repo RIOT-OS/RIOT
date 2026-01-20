@@ -47,9 +47,11 @@
 /* Number of HIGH SPI bits for WS 1 */
 #define _SPI_BITS_ONE           DIV_ROUND_UP(WS281X_T_DATA_ONE_NS, _SPI_NS_PER_BIT)
 /* MSB aligned  bit pattern for WS 0 */
-#define _SPI_NIBBLE_0           (((1U << _SPI_BITS_ZERO) - 1) << (_SPI_BITS_PER_WS - _SPI_BITS_ZERO))
+#define _SPI_NIBBLE_0           (((1U << _SPI_BITS_ZERO) - 1) \
+                                    << (_SPI_BITS_PER_WS - _SPI_BITS_ZERO))
 /* MSB aligned  bit pattern for WS 1 */
-#define _SPI_NIBBLE_1           (((1U << _SPI_BITS_ONE) - 1) << (_SPI_BITS_PER_WS - _SPI_BITS_ONE))
+#define _SPI_NIBBLE_1           (((1U << _SPI_BITS_ONE) - 1) \
+                                    << (_SPI_BITS_PER_WS - _SPI_BITS_ONE))
 /* Number of SPI 0-bytes to trigger a reset */
 #define _SPI_RESET_BYTES        ((WS281X_T_END_US * NS_PER_US) / _SPI_NS_PER_BIT / 8U)
 
@@ -59,15 +61,15 @@ MAYBE_UNUSED
 static const uint8_t _WS281X_SPI_NIBBLE_1 = (uint8_t)_SPI_NIBBLE_1;
 
 #ifndef WS281X_SPI_NIBBLE_0
-#define WS281X_SPI_NIBBLE_0             _WS281X_SPI_NIBBLE_0   /* e.g., 0x08: 1000: short high */
+#  define WS281X_SPI_NIBBLE_0           _WS281X_SPI_NIBBLE_0   /* e.g., 0x08: 1000: short high */
 #endif
 
 #ifndef WS281X_SPI_NIBBLE_1
-#define WS281X_SPI_NIBBLE_1             _WS281X_SPI_NIBBLE_1   /* e.g., 0x0E: 1110: long high  */
+#  define WS281X_SPI_NIBBLE_1           _WS281X_SPI_NIBBLE_1   /* e.g., 0x0E: 1110: long high  */
 #endif
 
 #ifndef WS281X_SPI_BITS_PER_WS_BIT
-#define WS281X_SPI_BITS_PER_WS_BIT      _SPI_BITS_PER_WS       /* e.g., 4: 4 SPI bits per WS bit */
+#  define WS281X_SPI_BITS_PER_WS_BIT    _SPI_BITS_PER_WS       /* e.g., 4: 4 SPI bits per WS bit */
 #endif
 
 typedef struct ws281x_spi_data {
@@ -122,11 +124,9 @@ void ws281x_end_transmission(ws281x_t *dev)
         dev->params.numof = led_numof;
         DEBUG("Detected %u LEDs in chain\n", (unsigned)dev->params.numof);
     }
-#if ENABLE_DEBUG
-#if MODULE_OD
+#if ENABLE_DEBUG && MODULE_OD
     DEBUG("Received SPI data (%u bytes):\n", (unsigned)_spi_size);
     od_hex_dump(_spi_buf, _spi_size, sizeof(ws281x_spi_data_t));
-#endif
 #endif
 }
 

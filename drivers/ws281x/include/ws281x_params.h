@@ -35,24 +35,24 @@ extern "C" {
  * @{
  */
 #ifndef WS281X_PARAM_PIN
-#define WS281X_PARAM_PIN                (GPIO_PIN(0, 0)) /**< GPIO pin connected to the data pin of the first LED */
+#  define WS281X_PARAM_PIN              (GPIO_PIN(0, 0)) /**< GPIO pin connected to the data pin of the first LED */
 #endif
 #ifndef WS281X_PARAM_NUMOF
-#define WS281X_PARAM_NUMOF              (8U)            /**< Number of LEDs chained */
+#  define WS281X_PARAM_NUMOF            (8U)            /**< Number of LEDs chained */
 #endif
 #ifndef WS281X_PARAM_BUF
 /**
  * @brief   Data buffer holding the LED states
  */
 extern uint8_t ws281x_buf[WS281X_PARAM_NUMOF * WS281X_BYTES_PER_DEVICE];
-#define WS281X_PARAM_BUF                (ws281x_buf)  /**< Data buffer holding LED states */
+#  define WS281X_PARAM_BUF              (ws281x_buf)  /**< Data buffer holding LED states */
 #endif
 
 #ifndef WS281X_PARAMS
 /**
  * @brief   WS281x initialization parameters
  */
-#define WS281X_PARAMS                   { \
+#  define WS281X_PARAMS                 { \
                                             .pin = WS281X_PARAM_PIN,  \
                                             .numof = WS281X_PARAM_NUMOF, \
                                             .buf = WS281X_PARAM_BUF, \
@@ -88,7 +88,7 @@ static const ws281x_params_t ws281x_params[] =
  * as the default may change without notice.
  * */
 #if !defined(WS281X_TIMER_DEV) || defined(DOXYGEN)
-#define WS281X_TIMER_DEV TIMER_DEV(2)
+#  define WS281X_TIMER_DEV              TIMER_DEV(2)
 #endif
 
 /** @brief Maximum value of the timer used for WS281x (by the timer_gpio_ll implementation)
@@ -96,7 +96,7 @@ static const ws281x_params_t ws281x_params[] =
  * This macro needs to be defined to the maximum value of @ref WS281X_TIMER_DEV.
  * */
 #ifndef WS281X_TIMER_MAX_VALUE
-#define WS281X_TIMER_MAX_VALUE UINT_MAX
+#  define WS281X_TIMER_MAX_VALUE        UINT_MAX
 #endif
 
 /** @brief Frequency for the timer used for WS281x (by the timer_gpio_ll implementation)
@@ -105,7 +105,7 @@ static const ws281x_params_t ws281x_params[] =
  * depending on the precise low and high times. A value of 16MHz works well.
  * */
 #ifndef WS281X_TIMER_FREQ
-#define WS281X_TIMER_FREQ 16000000
+#  define WS281X_TIMER_FREQ             16000000
 #endif
 
 /**
@@ -114,7 +114,7 @@ static const ws281x_params_t ws281x_params[] =
  * This SPI must support DMA.
  */
 #ifndef WS281X_SPI_DEV
-#define WS281X_SPI_DEV                  SPI_DEV(0)
+#  define WS281X_SPI_DEV                SPI_DEV(0)
 #endif
 
 /**
@@ -123,14 +123,14 @@ static const ws281x_params_t ws281x_params[] =
  * 4 SPI bits add up to 1.25 µs period, which is the time to transmit one WS281x bit.
  */
 #ifndef WS281X_SPI_CLK
-#define WS281X_SPI_CLK                  KHZ(3200)
+#  define WS281X_SPI_CLK                KHZ(3200)
 #endif
 
 /**
  * @brief   SAUL info
  */
 #ifndef WS281X_SAUL_INFO
-#define WS281X_SAUL_INFO  { .name = "WS281X RGB LED" }
+#  define WS281X_SAUL_INFO              { .name = "WS281X RGB LED" }
 #endif
 
 /**

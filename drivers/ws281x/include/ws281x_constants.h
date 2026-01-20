@@ -40,10 +40,10 @@ extern "C" {
  * @{
  */
 #ifndef WS281X_T_DATA_ONE_NS
-#define WS281X_T_DATA_ONE_NS            (650U)
+#  define WS281X_T_DATA_ONE_NS          (650U)
 #endif
 #ifndef WS281X_T_DATA_ZERO_NS
-#define WS281X_T_DATA_ZERO_NS           (325U)
+#  define WS281X_T_DATA_ZERO_NS         (325U)
 #endif
 /**@}*/
 
