@@ -213,18 +213,18 @@ into the source repository.
 RIOT itself applies the LGPL license, see [LICENSE.md], to most of its code exclusively,
 authors of PRs are assumed to do so as well (not necessary exclusive).
 When a PR is published it must also respect all authorship-rights, copyrights and
-licenses of code it uses, if code is copied the original author usually must be named and
+licenses of code it uses. If code is copied the original author usually must be named and
 the original license must be kept, unless the original license states differently.
 Large language models are known to sometimes reproduce large amounts of code,
-that was feed into their database as such it might produce a copy and 
-the pervious sentence must be applied.
+that was feed into their database as such it might produce a copy and
+the previous sentence must be applied.
 When reworking a PR and copying its code to a new one the author of that code still is the original author
-and their rights to the code must be respected such as naming them and keep the license.
+and their rights to the code must be respected such as naming them and keeping the license.
 
 
-If a PR was written using tooling that is able to produce large of code from a knowlegebase 
-(e.g.: large language model assisted tools like copilot, devin or cursor or LLM like GPT, Ollama)
-the PR should be marked as such and described to what extend the tool was used 
+If a PR was written using tooling that is able to produce large of code from a knowlegebase
+(e.g.: large language model assisted tools like copilot, devin or cursor or LLMs like GPT and Ollama)
+the PR should be marked as such and describe to what extend the tool was used
 (producing whole files, functions, code blocks, documentation, code/spell checking).
 
 
