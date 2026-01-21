@@ -7,6 +7,7 @@ PKG_LICENSE=MIT
 include $(RIOTBASE)/pkg/pkg.mk
 
 CFLAGS += -Wno-empty-body
+CFLAGS += -fno-jump-tables
 
 LVGL_DEFAULT_MODULES =  \
     lvgl_core           \
