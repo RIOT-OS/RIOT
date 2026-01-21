@@ -43,4 +43,5 @@ This PR was written using LLM assistance:
 - [ ] the LLM was used to check the code,
 - [ ] the LLM was used to produce documentation,
 - [ ] the LLM was used to spellcheck.
+- ( ) No LLM was used in any way. <!-- You may delete the prior sentence in case. --> 
 Tools that where used are:
