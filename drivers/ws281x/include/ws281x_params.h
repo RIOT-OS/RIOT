@@ -21,7 +21,6 @@
 #include <limits.h>
 
 #include "board.h"
-#include "macros/units.h"
 #include "saul_reg.h"
 
 #include "ws281x.h"
@@ -123,7 +122,7 @@ static const ws281x_params_t ws281x_params[] =
  * 4 SPI bits add up to 1.25 µs period, which is the time to transmit one WS281x bit.
  */
 #ifndef WS281X_SPI_CLK
-#  define WS281X_SPI_CLK                KHZ(3200)
+#  define WS281X_SPI_CLK                3200000
 #endif
 
 /**
