@@ -35,13 +35,15 @@ resolved, this way they will be automatically closed when your pull request
 is merged. See https://help.github.com/articles/closing-issues-using-keywords/.
 -->
 
-Declaration of AI-Toolusage:
-This PR was written using LLM assistance:
-- [ ] the LLM was tasked to produce whole file(s),
-- [ ] the LLM was tasked to produce function(s),
-- [ ] the LLM was tasked to produce codeblocks or snippets,
-- [ ] the LLM was used to check the code,
-- [ ] the LLM was used to produce documentation,
-- [ ] the LLM was used to spellcheck.
-- ( ) No LLM was used in any way. <!-- You may delete the prior sentence in case. --> 
+### Declaration of AI-Toolusage:
+ <!-- You may delete the either sentence in case. --> 
+- This PR was written using LLM assistance:
+  - [ ] the LLM was tasked to produce whole file(s),
+  - [ ] the LLM was tasked to produce function(s),
+  - [ ] the LLM was tasked to produce codeblocks or snippets,
+  - [ ] the LLM was used to check the code,
+  - [ ] the LLM was used to produce documentation,
+  - [ ] the LLM was used to spellcheck.
+- No LLM ("AI") was used in any way.
+
 Tools that where used are:
