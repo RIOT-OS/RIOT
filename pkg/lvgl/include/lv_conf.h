@@ -24,6 +24,9 @@ extern "C" {
 #include "kernel_defines.h"
 #include "lvgl_riot_conf.h"
 
+/* LVGL package requires this definition to confirm that the configuration has been included. */
+#define LV_CONF_H   1
+
 /*====================
    COLOR SETTINGS
  *====================*/
