@@ -97,7 +97,10 @@ static ieee802154_fsm_state_t _tx_end(ieee802154_submac_t *submac, int status,
     res = ieee802154_radio_set_idle(&submac->dev, true);
 
     assert(res >= 0);
-    submac->cb->tx_done(submac, status, info);
+    /* no need to inform upper layer about ACK transmission */
+    if (submac->fsm_state != IEEE802154_FSM_STATE_TX_ACK) {
+        submac->cb->tx_done(submac, status, info);
+    }
     return IEEE802154_FSM_STATE_IDLE;
 }
 
@@ -196,6 +199,7 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
         assert(res == (int)submac->rx_len);
         /* Make sure it's not an ACK frame */
         if (ieee802154_radio_len(dev) > (int)IEEE802154_MIN_FRAME_LEN) {
+            /* sending ACK if radio does not support auto-ACK */
             if (!_does_send_ack(dev)) {
                 ieee802154_filter_mode_t mode;
                 if ((submac->rx_buf[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_DATA &&
@@ -205,6 +209,7 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
                         res = _handle_fsm_ev_tx_ack(submac, ieee802154_get_seq(submac->rx_buf));
                         submac->cb->rx_done(submac);
                         if (res < 0) {
+                            DEBUG("IEEE802154 submac: Sending ACK failed with status: %d\n", res);
                             return IEEE802154_FSM_STATE_IDLE;
                         }
                         return IEEE802154_FSM_STATE_TX_ACK;
@@ -454,13 +459,6 @@ static ieee802154_fsm_state_t _fsm_state_tx_ack(ieee802154_submac_t *submac,
             return _fsm_state_tx_process_tx_done(submac, &info);
         }
         break;
-    case IEEE802154_FSM_EV_CRC_ERROR:
-        /* This might happen in case there's a race condition between ACK_TIMEOUT
-         * and TX_DONE. We simply discard the frame and keep the state as
-         * it is
-         */
-        ieee802154_radio_read(&submac->dev, NULL, 0, NULL);
-        return IEEE802154_FSM_STATE_TX_ACK;
     default:
         break;
     }

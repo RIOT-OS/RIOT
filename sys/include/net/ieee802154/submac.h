@@ -30,22 +30,27 @@
  *  |   RX   |        |PREPARE |<--->|   TX   |
  *  |        |   +--->|        |     |        |
  *  +--------+   |    +--------+     +--------+
- *      ^        |        ^              |
- *      |        |        |              |
- *      |        |        |              |
- *      |        |    +--------+         |
- *      |        |    |        |         v
- *      |        |    |WAIT FOR|<--------+
- *      |        |    |  ACK   |         |
- *      |        |    +--------+         |
- *      |        |         |             |
- *      |        |         |             |
- *      |        |         v             |
- *      |        |     +--------+        |
- *      |        +-----|        |        |
- *      |              |  IDLE  |        |
- *      +------------->|        |<-------+
- *                     +--------+
+ *     |  ^      |        ^              |
+ *     |  |      |        |              |
+ *     |  |      |        |              |
+ *     |  |      |    +--------+         |
+ *     |  |      |    |        |         v
+ *     |  |      |    |WAIT FOR|<--------+
+ *     |  |      |    |  ACK   |         |
+ *     |  |      |    +--------+         |
+ *     |  |      |         |             |
+ *     |  |      |         |             |
+ *     |  |      |         v             |
+ *     |  |      |     +--------+        |
+ *     |  |      +-----|        |        |
+ *     |  |            |  IDLE  |        |
+ *     |  +----------->|        |<-------+
+ *     |               +--------+
+ *     |    +--------+     ^
+ *     |    |        |     |
+ *     +--->| TX ACK |-----+
+ *          |        |
+ *          +--------+
  * ```
  *
  * - IDLE: The transceiver is off and therefore cannot receive frames. Sending
@@ -71,22 +76,25 @@
  *   (either triggered by the radio or a timer), the SubMAC goes to either
  *   IDLE if there are no more retransmissions left or no more CSMA-CA
  *   retries or PREPARE otherwise.
+ * - TX ACK: The received frame requires instantanous acknowledgement. Sending
+ *   further frames in this state is not permitted. After ACK transmission is
+ *   completed, the TX DONE event will be handled as usual.
  *
  * The events that trigger state machine changes are defined in
  * @ref ieee802154_fsm_state_t
  *
  * The following events are valid for each state:
  *
- *  Event/State  | RX | IDLE  | PREPARE | TX | WAIT FOR ACK
- * --------------|----|-------|---------|----|-------------
- * TX_DONE       | -  | -     | -       | X  | -
- * RX_DONE       | X  | X*    | X*      | X* | X
- * CRC_ERROR     | X  | X*    | X*      | X* | X
- * ACK_TIMEOUT   | -  | -     | -       | -  | X
- * BH            | -  | -     | X       | -  | -
- * REQ_TX        | X  | X     | -       | -  | -
- * REQ_SET_RX_ON | -  | X     | -       | -  | -
- * REQ_SET_IDLE  | X  | -     | -       | -  | -
+ *  Event/State  | RX | IDLE  | PREPARE | TX | WAIT FOR ACK | TX ACK |
+ * --------------|----|-------|---------|----|------------------------
+ * TX_DONE       | -  | -     | -       | X  | -            |X
+ * RX_DONE       | X  | X*    | X*      | X* | X            |-
+ * CRC_ERROR     | X  | X*    | X*      | X* | X            |-
+ * ACK_TIMEOUT   | -  | -     | -       | -  | X            |-
+ * BH            | -  | -     | X       | -  | -            |-
+ * REQ_TX        | X  | X     | -       | -  | -            |-
+ * REQ_SET_RX_ON | -  | X     | -       | -  | -            |-
+ * REQ_SET_IDLE  | X  | -     | -       | -  | -            |-
  *
  * *: RX_DONE and CRC_ERROR during these events might be a race condition
  *    between the ACK Timer and the radios RX_DONE event. If this happens, the
