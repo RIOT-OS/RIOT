@@ -79,7 +79,7 @@
  *   retries or PREPARE otherwise.
  * - TX ACK: The received frame requires instantanous acknowledgement. Sending
  *   further frames in this state is not permitted. After ACK transmission is
- *   completed, the TX DONE event will be handled as usual.
+ *   completed, the SubMAC will go IDLE.
  *
  * The events that trigger state machine changes are defined in
  * @ref ieee802154_fsm_state_t
