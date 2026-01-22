@@ -432,7 +432,7 @@ void gpio_pm_cb_enter(int deep)
     else if (IS_ACTIVE(MODULE_PERIPH_GPIO_TAMPER_WAKE)
           && mode > PM_SLEEPCFG_SLEEPMODE_STANDBY
           && _rtc_irq_enabled()) {
-        rtc_tamper_enable();
+        rtc_tamper_enable(NULL, NULL);
     }
 #else
     if (deep) {
