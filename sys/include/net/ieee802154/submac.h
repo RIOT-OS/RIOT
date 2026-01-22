@@ -57,8 +57,9 @@
  *   frames might be triggered using @ref ieee802154_send. The next SubMAC
  *   state would be PREPARE.
  * - RX: The device is ready to receive frames. In case the SubMAC receives a
- *   frame it will call @ref ieee802154_submac_cb_t::rx_done and immediately go
- *   to IDLE. Same as the IDLE state, it's possible
+ *   frame it will transmit an ACK frame if necessary then call
+ *   @ref ieee802154_submac_cb_t::rx_done and immediately go
+ *   to IDLE or TX ACK. Same as the IDLE state, it's possible
  *   to trigger frames using @ref ieee802154_send.
  * - PREPARE: The frame is already in the framebuffer and waiting to be
  *   transmitted.  This state might handle CSMA-CA backoff timer in case the
