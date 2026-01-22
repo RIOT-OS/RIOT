@@ -170,7 +170,6 @@ void chacha20_finish(chacha20_ctx_t *ctx,
                      size_t input_length,
                      uint8_t *output);
 
-/* IoT-TODO */
 void poly1305_init_from_chacha(chacha20_ctx_t *chacha_ctx,
                                poly1305_ctx_t *poly_ctx);
 #ifdef __cplusplus

@@ -212,6 +212,7 @@ ifneq (,$(filter psa_aead_aes_%_ccm_backend_cifra,$(USEMODULE)))
 endif
 
 ## Chacha20-Poly1305
+## USEMODULE += psa_cipher_chacha20 maybe here
 ifneq (,$(filter psa_aead_chacha20_poly1305,$(USEMODULE)))
   USEMODULE += psa_aead_chacha20_poly1305_backend_riot
 endif

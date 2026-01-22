@@ -100,7 +100,7 @@ psa_status_t example_aead_chacha20_poly1305(void)
 
     /* IoT-TODO: This needs to be hardcoded for some reason, otherwise this function
     * doesn't return despite reacing the end of it.
-    * This started happing after changing chacha20poly1305.c and its corresponding
+    * This started happening after changing chacha20poly1305.c and its corresponding
     * header to the new multipart version.
     */
     uint8_t cipher_out[sizeof(PLAINTEXT) + 16];

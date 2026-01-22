@@ -76,7 +76,7 @@ psa_status_t example_aead_chacha20_poly1305_multipart(void)
     const size_t cipher_output_size = sizeof(CIPHERTEXT);
     //const size_t plain_output_size = sizeof(PLAINTEXT);
 
-    uint8_t ciphertext_out[cipher_output_size];
+    uint8_t ciphertext_out[114];
     //uint8_t plain_out[plain_output_size];
 
     psa_set_key_algorithm(&attr, alg);
@@ -98,12 +98,14 @@ psa_status_t example_aead_chacha20_poly1305_multipart(void)
         return status;
     }
 
+    /*
     status = psa_aead_set_lengths(&operation, sizeof(ADDITIONAL_DATA), sizeof(PLAINTEXT));
     if (status != PSA_SUCCESS) {
         psa_destroy_key(key_id);
         printf("Set Lengths Error: %s\n", psa_status_to_humanly_readable(status));
         return status;
     }
+        */
 
     status = psa_aead_set_nonce(&operation, NONCE, sizeof NONCE);
     if (status != PSA_SUCCESS) {
@@ -129,15 +131,12 @@ psa_status_t example_aead_chacha20_poly1305_multipart(void)
             input_length = sizeof(PLAINTEXT) - processed_bytes;
         }
         size_t new_output_length = 0;
-        /* Wird 3x aufgerufen -> 105 bytes, dann endlos loop xdd */
-        puts("asdasd");
         status = psa_aead_update(&operation,
                                  &PLAINTEXT[processed_bytes],
                                  input_length,
                                  &ciphertext_out[calculated_output],
                                  (cipher_output_size - calculated_output),
                                  &new_output_length);
-        puts("asdasdxxxxxxxxx");
         if (status != PSA_SUCCESS) {
             psa_destroy_key(key_id);
             printf("Encrypt Update Error: %s\n", psa_status_to_humanly_readable(status));
@@ -146,6 +145,7 @@ psa_status_t example_aead_chacha20_poly1305_multipart(void)
         calculated_output += new_output_length;
         processed_bytes += input_length;
     }
+
 
     size_t finish_output_length = 0;
     uint8_t calculated_tag[16];
@@ -165,12 +165,16 @@ psa_status_t example_aead_chacha20_poly1305_multipart(void)
     calculated_output += finish_output_length;
 
     if (memcmp(ciphertext_out, CIPHERTEXT, sizeof(CIPHERTEXT)) != 0) {
-        puts("Wrong Ciphertext on encryption\n");
+        psa_destroy_key(key_id);
+        puts("Wrong Ciphertext on encryption");
+        printf("%02X:%02X:%02X:%02X\n", ciphertext_out[0], ciphertext_out[1], ciphertext_out[2], ciphertext_out[3]);
+        printf("%02X:%02X:%02X:%02X\n", CIPHERTEXT[0], CIPHERTEXT[1], CIPHERTEXT[2], CIPHERTEXT[3]);
         return PSA_ERROR_DATA_INVALID;
     }
 
     if (memcmp(calculated_tag, TAG, sizeof(TAG)) != 0) {
-        puts("Wrong Tag on encryption\n");
+        psa_destroy_key(key_id);
+        puts("Wrong Tag on encryption");
         return PSA_ERROR_DATA_INVALID;
     }
 

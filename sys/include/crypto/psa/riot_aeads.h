@@ -1,5 +1,3 @@
-/* IoT-TODO */
-
 #pragma once
 
 /**

@@ -274,8 +274,6 @@ psa_status_t psa_location_dispatch_aead_set_lengths(psa_aead_operation_t *operat
                                                     size_t ad_length,
                                                     size_t plaintext_length);
 
-/* IoT-TODO: generate nonce ? */
-
 psa_status_t psa_location_dispatch_aead_set_nonce(psa_aead_operation_t *operation,
                                                   const uint8_t *nonce,
                                                   size_t nonce_length);

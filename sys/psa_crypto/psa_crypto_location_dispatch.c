@@ -402,7 +402,6 @@ psa_status_t psa_location_dispatch_aead_decrypt(const psa_key_attributes_t *attr
                                                plaintext_size, plaintext_length);
 }
 
-/* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_encrypt_setup(psa_aead_operation_t *operation,
                                                       const psa_key_attributes_t *attributes,
                                                       const psa_key_slot_t *slot,
@@ -420,7 +419,6 @@ psa_status_t psa_location_dispatch_aead_encrypt_setup(psa_aead_operation_t *oper
     return psa_algorithm_dispatch_aead_encrypt_setup(operation, attributes, slot, alg);
 }
 
-/* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_decrypt_setup(psa_aead_operation_t *operation,
                                                       const psa_key_attributes_t *attributes,
                                                       const psa_key_slot_t *slot,
@@ -438,7 +436,6 @@ psa_status_t psa_location_dispatch_aead_decrypt_setup(psa_aead_operation_t *oper
     return psa_algorithm_dispatch_aead_decrypt_setup(operation, attributes, slot, alg);
 }
 
-/* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_set_lengths(psa_aead_operation_t *operation, size_t ad_length, size_t plaintext_length)
 {
 /* TODO: implement MODULE_PSA_SECURE_ELEMENT support */
@@ -452,9 +449,6 @@ psa_status_t psa_location_dispatch_aead_set_lengths(psa_aead_operation_t *operat
     return psa_algorithm_dispatch_aead_set_lengths(operation, ad_length, plaintext_length);
 }
 
-/* IoT-TODO: generate nonce needed ? */
-
-/* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_set_nonce(psa_aead_operation_t *operation,
                                                   const uint8_t *nonce,
                                                   size_t nonce_length)
@@ -470,7 +464,6 @@ psa_status_t psa_location_dispatch_aead_set_nonce(psa_aead_operation_t *operatio
     return psa_algorithm_dispatch_aead_set_nonce(operation, nonce, nonce_length);
 }
 
-/* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_update_ad(psa_aead_operation_t *operation,
                                                   const uint8_t *input,
                                                   size_t input_length)
@@ -486,7 +479,6 @@ psa_status_t psa_location_dispatch_aead_update_ad(psa_aead_operation_t *operatio
     return psa_algorithm_dispatch_aead_update_ad(operation, input, input_length);
 }
 
-/* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_update(psa_aead_operation_t *operation,
                                                const uint8_t *input,
                                                size_t input_length,
@@ -509,7 +501,6 @@ psa_status_t psa_location_dispatch_aead_update(psa_aead_operation_t *operation,
                                               output_size, output_length);
 }
 
-/* IoT-TODO */
 psa_status_t psa_location_dispatch_aead_finish(psa_aead_operation_t *operation,
                                                uint8_t *ciphertext,
                                                size_t ciphertext_size,
@@ -533,7 +524,7 @@ psa_status_t psa_location_dispatch_aead_finish(psa_aead_operation_t *operation,
     return psa_algorithm_dispatch_aead_finish(operation, ciphertext, ciphertext_size,
                                               ciphertext_length, tag, tag_size, tag_length);
 }
-/* IoT-TODO */
+
 psa_status_t psa_location_dispatch_aead_verify(psa_aead_operation_t *operation,
                                                uint8_t *plaintext,
                                                size_t plaintext_size,

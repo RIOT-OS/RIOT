@@ -20,12 +20,12 @@
 #include "psa/crypto.h"
 #include "crypto/chacha20poly1305.h"
 
-#define ENABLE_DEBUG    0
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
-static psa_status_t _setup( psa_cipher_chacha20_ctx_t *ctx,
-                                        uint8_t *key_data,
-                                        size_t key_length)
+static psa_status_t _setup(psa_cipher_chacha20_ctx_t *ctx,
+                           uint8_t *key_data,
+                           size_t key_length)
 {
     DEBUG("RIOT ChaCha20 Cipher setup");
 
@@ -40,16 +40,16 @@ static psa_status_t _setup( psa_cipher_chacha20_ctx_t *ctx,
     return PSA_SUCCESS;
 }
 
-psa_status_t psa_cipher_chacha20_encrypt_setup( psa_cipher_chacha20_ctx_t *ctx,
-                                                uint8_t *key_data,
-                                                size_t key_length)
+psa_status_t psa_cipher_chacha20_encrypt_setup(psa_cipher_chacha20_ctx_t *ctx,
+                                               uint8_t *key_data,
+                                               size_t key_length)
 {
     return _setup(ctx, key_data, key_length);
 }
 
-psa_status_t psa_cipher_chacha20_decrypt_setup( psa_cipher_chacha20_ctx_t *ctx,
-                                                uint8_t *key_data,
-                                                size_t key_length)
+psa_status_t psa_cipher_chacha20_decrypt_setup(psa_cipher_chacha20_ctx_t *ctx,
+                                               uint8_t *key_data,
+                                               size_t key_length)
 {
     return _setup(ctx, key_data, key_length);
 }
@@ -62,30 +62,30 @@ psa_status_t psa_cipher_chacha20_set_iv(psa_cipher_chacha20_ctx_t *ctx,
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     /* See PSA Specification */
     switch (iv_length) {
-        case 8:
-            /* 8 bytes: the cipher operation uses the original [CHACHA20] definition
+    case 8:
+        /* 8 bytes: the cipher operation uses the original [CHACHA20] definition
             of ChaCha20: the provided IV is used as the 64-bit nonce, and the 64-bit
             counter value is set to zero.
             This is currently not supported, as the current implementation only handles
             12-byte nonces. To change this, you would need to modify chacha20_ctx_t
             and functions that are using this type. */
-            status = PSA_ERROR_NOT_SUPPORTED;
-            break;
-        case 12:
-            /* 12 bytes: the provided IV is used as the nonce, and the counter value
+        status = PSA_ERROR_NOT_SUPPORTED;
+        break;
+    case 12:
+        /* 12 bytes: the provided IV is used as the nonce, and the counter value
             is set to zero. */
-            chacha20_setup(&ctx->ctx, ctx->buffer, iv, 0);
-            status = PSA_SUCCESS;
-            break;
-        case 16:
-            /* 16 bytes: the first four bytes of the IV are used as the counter value
+        chacha20_setup(&ctx->ctx, ctx->buffer, iv, 0);
+        status = PSA_SUCCESS;
+        break;
+    case 16:
+        /* 16 bytes: the first four bytes of the IV are used as the counter value
             (encoded as little-endian), and the remaining 12 bytes are used as the nonce. */
-            chacha20_setup(&ctx->ctx, ctx->buffer, &iv[4], unaligned_get_u32(iv));
-            status = PSA_SUCCESS;
-            break;
-        default:
-            /* It is recommended that implementations do not support other sizes of IV. */
-            status = PSA_ERROR_INVALID_ARGUMENT;
+        chacha20_setup(&ctx->ctx, ctx->buffer, &iv[4], unaligned_get_u32(iv));
+        status = PSA_SUCCESS;
+        break;
+    default:
+        /* It is recommended that implementations do not support other sizes of IV. */
+        status = PSA_ERROR_INVALID_ARGUMENT;
     }
     /* Clear key from buffer */
     explicit_bzero(ctx->buffer, sizeof(ctx->buffer));
@@ -100,38 +100,29 @@ psa_status_t psa_cipher_chacha20_update(psa_cipher_chacha20_ctx_t *ctx,
                                         size_t *output_length)
 {
     DEBUG("RIOT ChaCha20 Cipher update");
-    /* We return full blocks, so we check that we have enough output buffer
-        to fit all full blocks in the combined context and input buffer */
-    if (output_size < (((ctx->buffer_length + input_length) / CHACHA20POLY1305_BLOCK_BYTES) * CHACHA20POLY1305_BLOCK_BYTES)) {
+
+    if (output_size < ((ctx->buffer_length + input_length) / 64) * 64) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
-    size_t input_index = 0;
-    size_t output_index = 0;
-    /* check if buffer contains data */
-    if (ctx->buffer_length > 0) {
-        /* if yes, fill buffer up and update this block of data */
-        input_index = sizeof(ctx->buffer) - ctx->buffer_length;
-        memcpy(&ctx->buffer[ctx->buffer_length], input, input_index);
-        chacha20_update(&ctx->ctx, ctx->buffer, output);
-        memset(ctx->buffer, 0, sizeof(ctx->buffer));
+    size_t input_idx = 0;
+    size_t output_idx = 0;
+    while (true) {
+        if (ctx->buffer_length + input_length < 64) {
+            memcpy(&ctx->buffer[ctx->buffer_length], &input[input_idx], input_length);
+            ctx->buffer_length += input_length;
+            input_idx += input_length;
+            break;
+        }
+        memcpy(&ctx->buffer[ctx->buffer_length], &input[input_idx], 64 - ctx->buffer_length);
+        chacha20_update(&ctx->ctx, ctx->buffer, &output[output_idx]);
+        input_length -= 64 - ctx->buffer_length;
         ctx->buffer_length = 0;
-        output_index = 64;
+        input_idx += 64;
+        output_idx += 64;
     }
 
-    /* if not, update blocks of input */
-    const size_t num_blocks = (input_length - input_index) >> 6;
-    size_t pos = 0;
-
-    /* IoT-TODO: loopt unendlich bei 3x ausführung */
-    for (size_t i = 0; i < num_blocks; i++, pos += 64) {
-        chacha20_update(&ctx->ctx, &input[input_index + pos], &output[output_index + pos]);
-    }
-
-    /* put remaining data into buffer */
-    ctx->buffer_length = input_length - (input_index + pos);
-    memcpy(ctx->buffer, &input[input_index + pos], ctx->buffer_length);
-    *output_length = output_index + pos;
+    *output_length = output_idx;
 
     return PSA_SUCCESS;
 }

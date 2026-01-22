@@ -327,12 +327,17 @@ psa_status_t psa_aead_encrypt_decrypt_setup(psa_aead_operation_t *operation,
         return status;
     }
 
+    operation->direction = direction;
+
+    /* Only CCM requires lengths to be set. */
+    if (PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_CCM) {
+        operation->lengths_required = 1;
+    }
+
     if (direction == PSA_CRYPTO_DRIVER_ENCRYPT) {
-        operation->direction = PSA_CRYPTO_DRIVER_ENCRYPT;
         status = psa_location_dispatch_aead_encrypt_setup(operation, &slot->attr, slot, alg);
     }
     else {
-        operation->direction = PSA_CRYPTO_DRIVER_DECRYPT;
         status = psa_location_dispatch_aead_decrypt_setup(operation, &slot->attr, slot, alg);
     }
 
@@ -499,7 +504,8 @@ psa_status_t psa_aead_update_ad(psa_aead_operation_t *operation,
      * was previously specified with psa_aead_set_lengths() or is too large for the chosen AEAD 
      * algorithm. 
      */
-    if (new_total > operation->ad_length) {
+    /* IoT-TODO: maybe add real limit */
+    if (operation->lengths_required && (new_total > operation->ad_length)) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
@@ -535,18 +541,21 @@ psa_status_t psa_aead_update(psa_aead_operation_t *operation,
         return PSA_ERROR_BAD_STATE;
     }
 
-    /* IoT-Todo: total length of input to @ref psa_aead_update_ad() so far is less than the
+    /* IoT-TODO: maybe set real limit */
+    if (operation->lengths_required) {
+        /* IoT-Todo: total length of input to @ref psa_aead_update_ad() so far is less than the
      * additional data length that was previously specified with @ref psa_aead_set_lengths() 
      */
-    if (operation->processed_ad_length < operation->ad_length) {
-        return PSA_ERROR_INVALID_ARGUMENT;
-    }
+        if (operation->processed_ad_length < operation->ad_length) {
+            return PSA_ERROR_INVALID_ARGUMENT;
+        }
 
-    /* IoT-Todo: The total input length overflows the plaintext length that 
+        /* IoT-Todo: The total input length overflows the plaintext length that 
      * was previously specified with @ref psa_aead_set_lengths(). 
      */
-    if (input_length + operation->processed_message_length > operation->message_length) {
-        return PSA_ERROR_INVALID_ARGUMENT;
+        if (input_length + operation->processed_message_length > operation->message_length) {
+            return PSA_ERROR_INVALID_ARGUMENT;
+        }
     }
 
     status = psa_location_dispatch_aead_update(operation, input, input_length, output, output_size, output_length);
@@ -578,7 +587,7 @@ psa_status_t psa_aead_finish(psa_aead_operation_t *operation,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    if (!operation->nonce_set && operation->nonce_required) {
+    if (!operation->nonce_set) {
         return PSA_ERROR_BAD_STATE;
     }
 
@@ -615,7 +624,7 @@ psa_status_t psa_aead_verify(psa_aead_operation_t *operation,
     }
 
     /* has to be active operation with nonce set */
-    if (!operation->nonce_set && operation->nonce_required) {
+    if (!operation->nonce_set) {
         return PSA_ERROR_BAD_STATE;
     }
 
