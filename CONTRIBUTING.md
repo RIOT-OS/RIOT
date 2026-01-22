@@ -222,9 +222,9 @@ When reworking a PR and copying its code to a new one the author of that code st
 and their rights to the code must be respected such as naming them and keeping the license.
 
 
-If a PR was written using tooling that is able to produce large of code from a knowlegebase
-(e.g.: large language model assisted tools like copilot, devin or cursor or LLMs like GPT and Ollama)
-the PR should be marked as such and describe to what extend the tool was used
+If a PR was written using tooling that is able to reproduce code from a knowlegebase
+, e.g.,  large language model assisted tools like Copilot, Devin AI or Cursor or LLMs like GPT and Ollama,
+the PR should be marked as such and describe to what extent the tool was used
 (producing whole files, functions, code blocks, documentation, code/spell checking).
 
 
