@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2018 Koen Zandberg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Koen Zandberg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #include "embUnit/embUnit.h"
@@ -26,7 +23,7 @@ uint8_t ebuf[1024];
 /* Plaintext buffer */
 uint8_t pbuf[1024];
 
-static const uint8_t key_1[32] = {
+static const uint8_t key_1[] = {
     0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
     0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f
 };

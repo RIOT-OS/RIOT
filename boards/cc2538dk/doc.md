@@ -43,7 +43,7 @@ Activating this bootloader is NOT enabled if the flash content is in factory
 default state (e.g. after unboxing). To set the bits in the CCA accordingly you
 have to follow the guidelines found [here](https://web.archive.org/web/20170610111337/http://processors.wiki.ti.com/index.php/CC2538_Bootloader_Backdoor).
 To manage this first time access you have to download the
-["Uniflash"](http://processors.wiki.ti.com/index.php/Category:CCS_UniFlash) tool
+["Uniflash"](https://web.archive.org/web/20201215123705/https://processors.wiki.ti.com/index.php/Category:CCS_UniFlash) tool
 at TI's website.
 
 Some Linux machines may not recognize the CC2538DK's vendor and product ID

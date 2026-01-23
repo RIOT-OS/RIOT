@@ -41,7 +41,7 @@ extern "C" {
  *
  * @return  The block size for a block cipher, or 1 for a stream cipher.
  */
-#define PSA_BLOCK_CIPHER_BLOCK_LENGTH(type)                                     \
+#define PSA_BLOCK_CIPHER_BLOCK_LENGTH(type) \
     (1u << (((type) >> 8) & 7))
 
 /**

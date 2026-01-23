@@ -96,7 +96,7 @@ static void *_openthread_event_loop(void *arg)
     sInstance = otInstanceInitSingle();
 
 #if defined(MODULE_OPENTHREAD_CLI_FTD) || defined(MODULE_OPENTHREAD_CLI_MTD)
-    otCliUartInit(sInstance);
+    ot_shell_init(sInstance);
     /* Init default parameters */
     otPanId panid = OPENTHREAD_PANID;
     uint8_t channel = OPENTHREAD_CHANNEL;

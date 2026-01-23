@@ -74,7 +74,7 @@ ifneq (,$(filter psa_asymmetric_ecc_ed25519,$(USEMODULE)))
     ifneq (,$(filter periph_ecc_ed25519,$(FEATURES_USED)))
       USEMODULE += psa_asymmetric_ecc_ed25519_backend_periph
     else
-      USEMODULE += psa_asymmetric_ecc_ed25519_backend_c25519
+      USEMODULE += psa_asymmetric_ecc_ed25519_backend_monocypher
     endif
   endif
 endif
@@ -83,6 +83,12 @@ ifneq (,$(filter psa_asymmetric_ecc_ed25519_backend_c25519,$(USEMODULE)))
   USEPKG += c25519
   USEMODULE += psa_c25519
   USEMODULE += psa_c25519_edsign
+endif
+
+ifneq (,$(filter psa_asymmetric_ecc_ed25519_backend_monocypher,$(USEMODULE)))
+  USEPKG += monocypher
+  USEMODULE += psa_monocypher
+  USEMODULE += psa_monocypher_ed25519
 endif
 
 ifneq (,$(filter psa_asymmetric_ecc_ed25519_backend_periph,$(USEMODULE)))

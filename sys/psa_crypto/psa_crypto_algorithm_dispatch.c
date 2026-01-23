@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -22,6 +19,7 @@
 #include <stdio.h>
 #include "kernel_defines.h"
 #include "psa/crypto.h"
+#include "psa_crypto_algorithm_dispatch.h"
 
 #if IS_USED(MODULE_PSA_MAC)
 #  include "psa_mac.h"
@@ -635,6 +633,129 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
 #endif /* MODULE_PSA_KEY_MANAGEMENT */
 
 #if IS_USED(MODULE_PSA_CIPHER)
+psa_status_t psa_algorithm_dispatch_cipher_encrypt_setup(psa_cipher_operation_t *operation,
+                                                         const psa_key_attributes_t *attributes,
+                                                         const psa_key_slot_t *slot,
+                                                         psa_algorithm_t alg)
+{
+    operation->cipher_instance = PSA_ENCODE_CIPHER_OPERATION(alg, attributes->type, attributes->bits);
+
+    uint8_t *key_data = NULL;
+    size_t *key_bytes = NULL;
+
+    psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
+
+    if (operation->cipher_instance == PSA_INVALID_OPERATION) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    switch (operation->cipher_instance) {
+#  if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
+    case PSA_STREAM_CIPHER_CHACHA20:
+        return psa_cipher_chacha20_encrypt_setup(&operation->backend_ctx.cipher_ctx.chacha20, key_data, *key_bytes);
+#  endif
+    default:
+        (void)operation;
+        (void)attributes;
+        (void)slot;
+        (void)alg;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+}
+
+psa_status_t psa_algorithm_dispatch_cipher_decrypt_setup(psa_cipher_operation_t *operation,
+                                                         const psa_key_attributes_t *attributes,
+                                                         const psa_key_slot_t *slot,
+                                                         psa_algorithm_t alg)
+{
+    operation->cipher_instance = PSA_ENCODE_CIPHER_OPERATION(alg, attributes->type, attributes->bits);
+
+    uint8_t *key_data = NULL;
+    size_t *key_bytes = NULL;
+
+    psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
+
+    if (operation->cipher_instance == PSA_INVALID_OPERATION) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    switch (operation->cipher_instance) {
+#  if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
+    case PSA_STREAM_CIPHER_CHACHA20:
+        return psa_cipher_chacha20_decrypt_setup(&operation->backend_ctx.cipher_ctx.chacha20, key_data, *key_bytes);
+#  endif
+    default:
+        (void)operation;
+        (void)attributes;
+        (void)slot;
+        (void)alg;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+}
+
+psa_status_t psa_algorithm_dispatch_cipher_finish(psa_cipher_operation_t *operation,
+                                                  uint8_t *output,
+                                                  size_t output_size,
+                                                  size_t *output_length)
+{
+    switch (operation->cipher_instance) {
+#  if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
+    case PSA_STREAM_CIPHER_CHACHA20:
+        return psa_cipher_chacha20_finish(&operation->backend_ctx.cipher_ctx.chacha20,
+                                          output, output_size, output_length);
+#  endif
+    default:
+        (void)operation;
+        (void)output;
+        (void)output_size;
+        (void)output_length;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+}
+
+psa_status_t psa_algorithm_dispatch_cipher_update(psa_cipher_operation_t *operation,
+                                                  const uint8_t *input,
+                                                  size_t input_length,
+                                                  uint8_t *output,
+                                                  size_t output_size,
+                                                  size_t *output_length)
+{
+    switch (operation->cipher_instance) {
+#  if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
+    case PSA_STREAM_CIPHER_CHACHA20:
+        return psa_cipher_chacha20_update(&operation->backend_ctx.cipher_ctx.chacha20,
+                                          input, input_length,
+                                          output, output_size, output_length);
+#  endif
+    default:
+        (void)operation;
+        (void)input;
+        (void)input_length;
+        (void)output;
+        (void)output_size;
+        (void)output_length;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+}
+
+psa_status_t psa_algorithm_dispatch_cipher_set_iv(psa_cipher_operation_t *operation,
+                                                  const uint8_t *iv,
+                                                  size_t iv_length)
+{
+    switch (operation->cipher_instance) {
+#  if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
+    case PSA_STREAM_CIPHER_CHACHA20:
+        return psa_cipher_chacha20_set_iv(&operation->backend_ctx.cipher_ctx.chacha20,
+                                          iv, iv_length);
+#  endif
+    default:
+        (void)operation;
+        (void)iv;
+        (void)iv_length;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+}
+
 psa_status_t psa_algorithm_dispatch_cipher_encrypt(const psa_key_attributes_t *attributes,
                                                    psa_algorithm_t alg,
                                                    const psa_key_slot_t *slot,

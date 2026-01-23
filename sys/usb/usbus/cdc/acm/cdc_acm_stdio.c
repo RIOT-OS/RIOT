@@ -51,9 +51,7 @@ static void _cdc_acm_rx_pipe(usbus_cdcacm_device_t *cdcacm,
                              uint8_t *data, size_t len)
 {
     (void)cdcacm;
-    for (size_t i = 0; i < len; i++) {
-        isrpipe_write_one(&stdin_isrpipe, data[i]);
-    }
+    isrpipe_write(&stdin_isrpipe, data, len);
 }
 
 void usb_cdc_acm_stdio_init(usbus_t *usbus)

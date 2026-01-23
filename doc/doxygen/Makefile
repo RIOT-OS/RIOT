@@ -24,7 +24,11 @@ endif
 # Check that the doxygen version is not too old to avoid
 # certain bugs that were fixed in later revisions. Especially
 # Debian-based distributions tend to have very old versions.
-DOXYGEN_MIN_VERSION = 1.13.2
+# When updating the version, make sure to update the SHA512 checksum
+# of the doxygen-x.xx.x.linux.bin.tar.gz archive accordingly to avoid cache
+# misses.
+DOXYGEN_MIN_VERSION = 1.15.0
+DOXYGEN_TGZ_SHA512 = 0e99fb9a65f9fada2fe90ea0d1f940b8e58d62801f880614b440b9f3a9f82a5c1a8dd1d0719ee6a46f9612ea7447655d5c8494f63463fe7f1222987bdb1485a9
 
 # Set the Doxygen binary if not already set
 DOXYGEN ?= doxygen
@@ -43,26 +47,33 @@ include $(RIOTMAKE)/utils/ansi.mk
 include $(RIOTMAKE)/color.inc.mk
 
 .PHONY: doc doc-man doc-latex
-doc doc-man doc-latex: graphviz-check $(DOCUMENTATION_FORMAT)
+doc doc-man doc-latex: graphviz-check $(DOCUMENTATION_FORMAT) doxygen-version
+
+# Check the Doxygen version and print a warning
+.PHONY: doxygen-version
+.NOTPARALLEL: doxygen-version
+doxygen-version:
 	@if [ "`{ echo "$(DOXYGEN_MIN_VERSION)"; echo "$(DOXYGEN_CUR_VERSION)"; } | \
-		sort -V | head -n1`" != "$(DOXYGEN_MIN_VERSION)" ]; then \
-		$(COLOR_ECHO) "$(COLOR_RED)Warning: Doxygen version $(DOXYGEN_CUR_VERSION) is too old." \
-		"It is recommended to use at least version $(DOXYGEN_MIN_VERSION)" \
-		"to avoid incorrectly formatted output.$(COLOR_RESET)"; \
+	  sort -V | head -n1`" != "$(DOXYGEN_MIN_VERSION)" ]; then \
+	  $(COLOR_ECHO) "$(COLOR_RED)Warning: Doxygen version $(DOXYGEN_CUR_VERSION) is too old." \
+	  "It is recommended to use at least version $(DOXYGEN_MIN_VERSION)" \
+	  "to avoid incorrectly formatted output.\nYou can use 'make doc-ci' to build" \
+	  "the documentation with the required Doxygen version, which will be downloaded" \
+	  "and (if required) compiled locally.$(COLOR_RESET)"; \
 	fi
 
 # GraphViz is a mandatory dependency to generate the Doxygen documentation for RIOT
 .PHONY: graphviz-check
 graphviz-check:
 	@command -v dot >/dev/null 2>&1 || { \
-		$(COLOR_ECHO) "$(COLOR_RED)Error: GraphViz (dot) is not installed." \
-    "GraphViz is mandatory to generate the RIOT documentation.$(COLOR_RESET)"; \
-		exit 1; \
+	  $(COLOR_ECHO) "$(COLOR_RED)Error: GraphViz (dot) is not installed." \
+	  "GraphViz is mandatory to generate the RIOT documentation.$(COLOR_RESET)"; \
+	  exit 1; \
 	}
 
 .PHONY: doc-ci
 doc-ci: $(RIOTTOOLS)/doxygen/Makefile
-	@PKG_VERSION=$(DOXYGEN_VERSION) $(MAKE) -C $(RIOTTOOLS)/doxygen all --no-print-directory
+	@PKG_VERSION=$(DOXYGEN_VERSION) PKG_SHA512=$(DOXYGEN_TGZ_SHA512) $(MAKE) -C $(RIOTTOOLS)/doxygen all --no-print-directory
 	@$(MAKE) -BC $(CURDIR) DOXYGEN=$(RIOTTOOLS)/doxygen/doxygen doc
 
 # by marking html as phony we force make to re-run Doxygen even if the directory exists.

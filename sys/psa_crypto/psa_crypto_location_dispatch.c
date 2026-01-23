@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -23,6 +20,7 @@
 #include "kernel_defines.h"
 #include "psa/crypto.h"
 #include "psa_crypto_algorithm_dispatch.h"
+#include "psa_crypto_location_dispatch.h"
 #include "psa_crypto_se_management.h"
 #include "psa_crypto_se_driver.h"
 
@@ -142,11 +140,7 @@ psa_status_t psa_location_dispatch_cipher_encrypt_setup(psa_cipher_operation_t *
         }
     }
 #  endif /* MODULE_PSA_SECURE_ELEMENT */
-    (void)operation;
-    (void)attributes;
-    (void)slot;
-    (void)alg;
-    return PSA_ERROR_NOT_SUPPORTED;
+    return psa_algorithm_dispatch_cipher_encrypt_setup(operation, attributes, slot, alg);
 }
 
 psa_status_t psa_location_dispatch_cipher_decrypt_setup(psa_cipher_operation_t *operation,
@@ -154,11 +148,81 @@ psa_status_t psa_location_dispatch_cipher_decrypt_setup(psa_cipher_operation_t *
                                                         const psa_key_slot_t *slot,
                                                         psa_algorithm_t alg)
 {
+#  if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+    psa_key_location_t location = PSA_KEY_LIFETIME_GET_LOCATION(attributes->lifetime);
+    if (location != PSA_KEY_LOCATION_LOCAL_STORAGE) {
+        const psa_drv_se_t *drv;
+        psa_drv_se_context_t *drv_context;
+        psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+        psa_key_slot_number_t *slot_number = psa_key_slot_get_slot_number(slot);
+
+        uint8_t *key_data = NULL;
+        size_t *key_bytes = NULL;
+        psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
+
+        if (psa_get_se_driver(attributes->lifetime, &drv, &drv_context)) {
+            if (drv->cipher == NULL || drv->cipher->p_setup == NULL) {
+                return PSA_ERROR_NOT_SUPPORTED;
+            }
+
+            status = drv->cipher->p_setup(drv_context, &operation->backend_ctx.se_ctx, *slot_number,
+                                          attributes->policy.alg, PSA_CRYPTO_DRIVER_DECRYPT);
+
+            return status;
+        }
+    }
+#  endif /* MODULE_PSA_SECURE_ELEMENT */
+    return psa_algorithm_dispatch_cipher_decrypt_setup(operation, attributes, slot, alg);
+}
+
+psa_status_t psa_location_dispatch_cipher_finish(psa_cipher_operation_t *operation,
+                                                 uint8_t *output,
+                                                 size_t output_size,
+                                                 size_t *output_length)
+{
+#  if IS_USED(MODULE_PSA_SECURE_ELEMENT)
     (void)operation;
-    (void)attributes;
-    (void)slot;
-    (void)alg;
+    (void)output;
+    (void)output_size;
+    (void)output_length;
     return PSA_ERROR_NOT_SUPPORTED;
+#  endif /* MODULE_PSA_SECURE_ELEMENT */
+
+    return psa_algorithm_dispatch_cipher_finish(operation, output, output_size, output_length);
+}
+
+psa_status_t psa_location_dispatch_cipher_update(psa_cipher_operation_t *operation,
+                                                 const uint8_t *input,
+                                                 size_t input_length,
+                                                 uint8_t *output,
+                                                 size_t output_size,
+                                                 size_t *output_length)
+{
+#  if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+    (void)operation;
+    (void)input;
+    (void)input_length;
+    (void)output;
+    (void)output_size;
+    (void)output_length;
+    return PSA_ERROR_NOT_SUPPORTED;
+#  endif /* MODULE_PSA_SECURE_ELEMENT */
+
+    return psa_algorithm_dispatch_cipher_update(operation, input, input_length, output, output_size, output_length);
+}
+
+psa_status_t psa_location_dispatch_cipher_set_iv(psa_cipher_operation_t *operation,
+                                                 const uint8_t *iv,
+                                                 size_t iv_length)
+{
+#  if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+    (void)operation;
+    (void)iv;
+    (void)iv_length;
+    return PSA_ERROR_NOT_SUPPORTED;
+#  endif /* MODULE_PSA_SECURE_ELEMENT */
+
+    return psa_algorithm_dispatch_cipher_set_iv(operation, iv, iv_length);
 }
 
 #  if IS_USED(MODULE_PSA_SECURE_ELEMENT)

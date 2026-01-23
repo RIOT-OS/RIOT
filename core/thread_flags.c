@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -51,11 +48,6 @@ static inline int __attribute__((always_inline)) _thread_flags_wake(
     }
 
     return wakeup;
-}
-
-int thread_flags_wake(thread_t *thread)
-{
-    return _thread_flags_wake(thread);
 }
 
 static thread_flags_t _thread_flags_clear_atomic(thread_t *thread,
@@ -140,6 +132,12 @@ thread_flags_t thread_flags_wait_all(thread_flags_t mask)
     }
 
     return _thread_flags_clear_atomic(me, mask);
+}
+
+bool thread_flags_set_internal(thread_t *thread, thread_flags_t mask)
+{
+    thread->flags |= mask;
+    return _thread_flags_wake(thread);
 }
 
 void thread_flags_set(thread_t *thread, thread_flags_t mask)

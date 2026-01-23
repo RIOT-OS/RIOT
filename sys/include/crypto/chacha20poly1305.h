@@ -30,12 +30,12 @@
 extern "C" {
 #endif
 
-#define CHACHA20POLY1305_CONSTANT_BYTES (16U) /**< Constants length in bytes */
-#define CHACHA20POLY1305_KEY_BYTES      (32U) /**< Key length in bytes */
-#define CHACHA20POLY1305_COUNTER_BYTES  (4U)  /**< Counter length in bytes */
-#define CHACHA20POLY1305_NONCE_BYTES    (12U) /**< Nonce length in bytes */
-#define CHACHA20POLY1305_TAG_BYTES      (16U) /**< Tag length in bytes */
-#define CHACHA20POLY1305_BLOCK_BYTES    (64U) /**< Block length in bytes */
+#define CHACHA20POLY1305_CONSTANT_BYTES (16U)   /**< Constants length in bytes */
+#define CHACHA20POLY1305_KEY_BYTES      (32U)   /**< Key length in bytes */
+#define CHACHA20POLY1305_COUNTER_BYTES  (4U)    /**< Counter length in bytes */
+#define CHACHA20POLY1305_NONCE_BYTES    (12U)   /**< Nonce length in bytes */
+#define CHACHA20POLY1305_TAG_BYTES      (16U)   /**< Tag length in bytes */
+#define CHACHA20POLY1305_BLOCK_BYTES    (64U)   /**< Block length in bytes */
 
 /**
  * @brief Context of a ChaCha20 multipart operation
@@ -90,7 +90,6 @@ typedef union {
 void chacha20poly1305_encrypt(uint8_t *cipher, const uint8_t *msg,
                               size_t msglen, const uint8_t *aad, size_t aadlen,
                               const uint8_t *key, const uint8_t *nonce);
-
 /**
  * @brief Verify the tag and decrypt a ciphertext to plaintext.
  *

@@ -28,9 +28,14 @@ extern "C" {
 #include "crypto/psa/riot_ciphers.h"
 #include "kernel_defines.h"
 #include "psa/algorithm.h"
+#include "psa_crypto_operation_encoder.h"
 
 #if IS_USED(MODULE_PERIPH_CIPHER_AES_128_CBC)
 #include "psa_periph_aes_ctx.h"
+#endif
+
+#if IS_USED(MODULE_PERIPH_CIPHER_CHACHA20)
+#include "psa_periph_chacha20_ctx.h"
 #endif
 
 #if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A)
@@ -89,6 +94,8 @@ struct psa_cipher_operation_s {
     uint8_t iv_set : 1;             /**< True if IV was already set */
     uint8_t default_iv_length;      /**< Default IV length for algorithm */
     psa_algorithm_t alg;            /**< Operation algorithm*/
+    /** Combination of the psa_algorithm_t and psa_key_type_t for a specific implementation. */
+    psa_cipher_op_t cipher_instance;
     /** Union containing cipher contexts for the executing backend */
     union cipher_context {
         psa_cipher_context_t cipher_ctx;    /**< Cipher context */

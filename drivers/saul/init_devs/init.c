@@ -255,6 +255,10 @@ void saul_init_devs(void)
         extern void auto_init_opt3001(void);
         auto_init_opt3001();
     }
+    if (IS_USED(MODULE_PAA5100JE)) {
+        extern void auto_init_paa5100je(void);
+        auto_init_paa5100je();
+    }
     if (IS_USED(MODULE_PCA9685)) {
         extern void auto_init_pca9685(void);
         auto_init_pca9685();

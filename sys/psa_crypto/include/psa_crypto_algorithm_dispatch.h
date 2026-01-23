@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -144,14 +141,61 @@ psa_status_t psa_algorithm_dispatch_cipher_encrypt(const psa_key_attributes_t *a
  * @brief   Dispatch a cipher decrypt function to a specific backend.
  *          See @ref psa_cipher_decrypt()
  */
-psa_status_t psa_algorithm_dispatch_cipher_decrypt(const psa_key_attributes_t *attributes,
-                                                   psa_algorithm_t alg,
-                                                   const psa_key_slot_t *slot,
-                                                   const uint8_t *input,
-                                                   size_t input_length,
-                                                   uint8_t *output,
-                                                   size_t output_size,
-                                                   size_t *output_length);
+psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *attributes,
+                                                    psa_algorithm_t alg,
+                                                    const psa_key_slot_t *slot,
+                                                    const uint8_t *input,
+                                                    size_t input_length,
+                                                    uint8_t *output,
+                                                    size_t output_size,
+                                                    size_t *output_length);
+
+/**
+ * @brief   Dispatch call of a cipher encrypt setup function to a location specific backend.
+ *          See psa_cipher_setup()
+ */
+psa_status_t psa_algorithm_dispatch_cipher_encrypt_setup( psa_cipher_operation_t *operation,
+                                                            const psa_key_attributes_t *attributes,
+                                                            const psa_key_slot_t *slot,
+                                                            psa_algorithm_t alg);
+
+/**
+ * @brief   Dispatch call of a cipher decrypt setup function to a location specific backend.
+ *         See psa_cipher_setup()
+ */
+psa_status_t psa_algorithm_dispatch_cipher_decrypt_setup( psa_cipher_operation_t *operation,
+                                                            const psa_key_attributes_t *attributes,
+                                                            const psa_key_slot_t *slot,
+                                                            psa_algorithm_t alg);
+
+/**
+ * @brief   Dispatch call of a cipher finish function to a location specific backend.
+ *         See psa_cipher_finish()
+ */
+psa_status_t psa_algorithm_dispatch_cipher_finish( psa_cipher_operation_t *operation,
+                                                uint8_t *output,
+                                                size_t output_size,
+                                                size_t *output_length);
+
+/**
+ * @brief   Dispatch call of a cipher update function to a location specific backend.
+ *         See psa_cipher_update()
+ */
+psa_status_t psa_algorithm_dispatch_cipher_update( psa_cipher_operation_t *operation,
+                                            const uint8_t *input,
+                                            size_t input_length,
+                                            uint8_t *output,
+                                            size_t output_size,
+                                            size_t *output_length);
+
+/**
+ * @brief   Dispatch call of a function to set a cipher IV to a location specific backend.
+ *        See psa_cipher_set_iv()
+ */
+psa_status_t psa_algorithm_dispatch_cipher_set_iv( psa_cipher_operation_t *operation,
+                                        const uint8_t *iv,
+                                        size_t iv_length);
+
 #endif /* MODULE_PSA_CIPHER */
 
 #if IS_USED(MODULE_PSA_AEAD)

@@ -20,6 +20,8 @@ if [[ -z ${DOCUMENTATION_FORMAT+x} ]]; then
 export DOCUMENTATION_FORMAT=check
 fi
 
+# not running shellcheck with -x in the CI --> disable SC1091
+# shellcheck disable=SC1091
 . "${RIOTBASE}"/dist/tools/ci/github_annotate.sh
 
 github_annotate_setup
@@ -33,8 +35,19 @@ else
     CWARN=
     CRESET=
 fi
-DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc 2>&1| grep -Fvf "${EXCLUDE_SIMPLE_FILE}" )
-DOXY_OUTPUT=$(echo "${DOXY_OUTPUT}" | grep -Evf "${EXCLUDE_PATTERN_FILE}" | grep -Evf "${GENERIC_EXCLUDE_PATTERN_FILE}")
+
+# Execute `doc-ci` instead of `doc` to download and use the Doxygen version
+# specified in `doc/doxygen/Makefile`, but only if the machine is
+# `Linux x86_64` to avoid having to compile Doxygen.
+if [[ "$(uname -s -m)" == "Linux x86_64" ]]; then
+    DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc-ci 2>&1)
+else
+    DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc 2>&1)
+fi
+
+DOXY_OUTPUT=$(echo "${DOXY_OUTPUT}" | grep -Fvf "${EXCLUDE_SIMPLE_FILE}" | \
+              grep -Evf "${EXCLUDE_PATTERN_FILE}" | \
+              grep -Evf "${GENERIC_EXCLUDE_PATTERN_FILE}")
 DOXY_ERRCODE=$?
 RESULT=0
 

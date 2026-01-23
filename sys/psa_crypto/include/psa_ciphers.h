@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -115,6 +112,87 @@ psa_status_t psa_cipher_chacha20_encrypt_setup(psa_cipher_chacha20_ctx_t *ctx,
 psa_status_t psa_cipher_chacha20_decrypt_setup(psa_cipher_chacha20_ctx_t *ctx,
                                                uint8_t *key_data,
                                                size_t key_length);
+
+/**
+ * @brief ChaCha20 set nonce and initial counter function
+ *
+ * @param ctx       Driver specific ChaCha20 context of type @c psa_cipher_chacha20_ctx_t
+ * @param iv        Buffer of IV to be set
+ * @param iv_length Length of the IV Buffer.
+ *                  - 12 bytes: the provided IV is used as the nonce, and the
+ *                  counter value is set to zero.
+ *                  - 16 bytes: the first four bytes of the IV are used as the
+ *                  counter value (encoded as little-endian), and the remaining
+ *                  12 bytes are used as the nonce.
+ *                  - 8 bytes: the cipher operation uses the original [CHACHA20]
+ *                  definition of ChaCha20: the provided IV is used as the
+ *                  64-bit nonce, and the 64-bit counter value is set to zero.
+ *                  - It is recommended that implementations do not support
+ *                  other sizes of IV.
+ */
+psa_status_t psa_cipher_chacha20_set_iv(psa_cipher_chacha20_ctx_t *ctx,
+                                        const uint8_t *iv,
+                                        size_t iv_length);
+
+/**
+ * @brief   ChaCha20 update function, encrypting/decrypting aligned blocks.
+ *
+ * @param   ctx             Driver specific ChaCha20 context of type @c psa_cipher_chacha20_ctx_t
+ * @param   input           Input that is going to be encrypted/decrypted
+ * @param   input_length    Length of @c input buffer
+ * @param   output          Output Buffer for the encrypted/decrypted input
+ * @param   output_size     Length of @c output buffer. Must be large enough to
+ *                          fit the output blocks from buffer and input
+ * @param   output_length   Actual length of the output data. Will be multiple
+ *                          of Block size (64B).
+ * @return  psa_status_t
+ */
+psa_status_t psa_cipher_chacha20_update(psa_cipher_chacha20_ctx_t *ctx,
+                                        const uint8_t *input,
+                                        size_t input_length,
+                                        uint8_t *output,
+                                        size_t output_size,
+                                        size_t *output_length);
+
+/**
+ * @brief   ChaCha20 finish function. Outputs the xcrytion of the remaining buffer.
+ *
+ * @param   ctx             Driver specific ChaCha context of type @c psa_cipher_chacha20_ctx_t
+ * @param   output          Output Buffer for the encrypted/decrypted data
+ * @param   output_size     Length of @c output buffer. Must be large enough to
+ *                          fit the buffer (64B).
+ * @param   output_length   Actual length of the output data. Will be less than
+ *                          Block size (64B).
+ * @return  psa_status_t
+ */
+psa_status_t psa_cipher_chacha20_finish(psa_cipher_chacha20_ctx_t *ctx,
+                                        uint8_t *output,
+                                        size_t output_size,
+                                        size_t *output_length);
+
+/**
+ * @brief   ChaCha20 setup function
+ *
+ * @param   ctx         Driver specific ChaCha20 context of type @c psa_cipher_chacha20_ctx_t
+ * @param   key_data    Key Buffer.
+ * @param   key_length  Length of the key buffer. Must be @c 32 bytes.
+ * @return  psa_status_t
+ */
+psa_status_t psa_cipher_chacha20_encrypt_setup( psa_cipher_chacha20_ctx_t *ctx,
+                                                uint8_t *key_data,
+                                                size_t key_length);
+
+/**
+ * @brief   ChaCha20 setup function
+ *
+ * @param   ctx         Driver specific ChaCha20 context of type @c psa_cipher_chacha20_ctx_t
+ * @param   key_data    Key Buffer.
+ * @param   key_length  Length of the key buffer. Must be @c 32 bytes.
+ * @return  psa_status_t
+ */
+psa_status_t psa_cipher_chacha20_decrypt_setup( psa_cipher_chacha20_ctx_t *ctx,
+                                                uint8_t *key_data,
+                                                size_t key_length);
 
 /**
  * @brief ChaCha20 set nonce and initial counter function

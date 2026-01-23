@@ -1,0 +1,115 @@
+From 568ef712d68eb70574fbce5808fea63963aa908f Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
+Date: Sun, 9 Nov 2025 12:25:11 +0100
+Subject: [PATCH] LoadSVD: Load SVD from ZIP file instead of pkg_resources
+
+This changes the logic with `svd_load <VENDOR> <MODEL>` to not search in
+the pkg_resources of Python module `cmsis_svd.data` but instead search
+in a ZIP file at `$CMSIS_SVD_ZIPFILE` if that environment variable is
+defined, otherwise it looks `$XDG_CACHE_HOME/cmdebug/cmsis-svd-data.zip`
+with `$XDG_CACHE_HOME` falling back to `~/.cache` if not found in the
+environment.
+
+As of 2025-11-09, the `HEAD` of https://github.com/cmsis-svd/cmsis-svd-data
+is 5.8 GiB in size uncompressed, or 254 MiB when zipped. Personally, I
+do not perceive any additional latency by having to unzip the chosen
+SVD file first.
+---
+ cmdebug/svd_gdb.py | 52 +++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 42 insertions(+), 10 deletions(-)
+
+diff --git a/cmdebug/svd_gdb.py b/cmdebug/svd_gdb.py
+index 4fb993b..33c7bec 100644
+--- a/cmdebug/svd_gdb.py
++++ b/cmdebug/svd_gdb.py
+@@ -16,11 +16,15 @@ along with PyCortexMDebug.  If not, see <http://www.gnu.org/licenses/>.
+ """
+ 
+ import gdb
+-import re
+ import math
+-import sys
++import pathlib
++import re
+ import struct
+-import pkg_resources
++import sys
++import tempfile
++import zipfile
++
++from os import environ
+ 
+ sys.path.append('.')
+ from cmdebug.svd import SVDFile
+@@ -31,6 +35,16 @@ BITS_TO_UNPACK_FORMAT = {
+     32: "I",
+ }
+ 
++if "XDG_CACHE_HOME" in environ and environ["XDG_CACHE_HOME"] != "":
++    CACHE_DIR = pathlib.Path.joinpath(environ["XDG_CACHE_HOME"], "cmdebug")
++else:
++    CACHE_DIR = pathlib.Path.joinpath(pathlib.Path.home(), ".cache", "cmdebug")
++
++if "CMSIS_SVD_ZIPFILE" in environ and environ["CMSIS_SVD_ZIPFILE"] != "":
++    CMSIS_SVD_ZIPFILE = pathlib.Path(environ("CMSIS_SVD_ZIPFILE"))
++else:
++    CMSIS_SVD_ZIPFILE = pathlib.Path.joinpath(CACHE_DIR, "cmsis-svd-data.zip")
++
+ 
+ class LoadSVD(gdb.Command):
+     """ A command to load an SVD file and to create the command for inspecting
+@@ -40,11 +54,16 @@ class LoadSVD(gdb.Command):
+     def __init__(self):
+         self.vendors = {}
+         try:
+-            vendor_names = pkg_resources.resource_listdir("cmsis_svd", "data")
+-            for vendor in vendor_names:
+-                fnames = pkg_resources.resource_listdir("cmsis_svd", "data/{}".format(vendor))
+-                self.vendors[vendor] = [fname for fname in fnames if fname.lower().endswith(".svd")]
+-        except:
++            with zipfile.ZipFile(CMSIS_SVD_ZIPFILE, mode='r') as svdzip:
++                for entry in svdzip.namelist():
++                    if entry.lower().endswith(".svd"):
++                        p = pathlib.Path(entry)
++                        vendor = p.parent.name
++                        model = p.name[:-4]
++                        if vendor not in self.vendors:
++                            self.vendors[vendor] = list()
++                        self.vendors[vendor].append(model)
++        except FileNotFoundError:
+             pass
+ 
+         if len(self.vendors) > 0:
+@@ -75,14 +94,27 @@ class LoadSVD(gdb.Command):
+     def invoke(args, from_tty):
+         args = gdb.string_to_argv(args)
+         argc = len(args)
++        f = None
+         if argc == 1:
+             gdb.write("Loading SVD file {}...\n".format(args[0]))
+             f = args[0]
+         elif argc == 2:
+             gdb.write("Loading SVD file {}/{}...\n".format(args[0], args[1]))
+-            f = pkg_resources.resource_filename("cmsis_svd", "data/{}/{}".format(args[0], args[1]))
++            name = args[0].lower() + "/" + args[1].lower() + ".svd"
++            try:
++                with zipfile.ZipFile(CMSIS_SVD_ZIPFILE, mode='r') as svdzip:
++                    for entry in svdzip.namelist():
++                        lower = entry.lower()
++                        if lower == name or lower.endswith("/" + name):
++                            f = svdzip.extract(entry, path=tempfile.TemporaryDirectory().name)
++                            break
++            except FileNotFoundError:
++                raise gdb.GdbError(f"Could not open \"{CMSIS_SVD_ZIPFILE}\"")
++
++            if f is None:
++                raise gdb.GdbError(f"Could not find SVD for \"{args[0]}/{args[1]}\" in \"{CMSIS_SVD_ZIPFILE}\": No case-insensitive match for \"**/{name}\"")
+         else:
+-            raise gdb.GdbError("Usage: svd_load <vendor> <device.svd> or svd_load <path/to/filename.svd>\n")
++            raise gdb.GdbError("Usage: svd_load <vendor> <device> or svd_load <path/to/filename.svd>\n")
+         try:
+             SVD(SVDFile(f))
+         except Exception as e:
+-- 
+2.51.2
+

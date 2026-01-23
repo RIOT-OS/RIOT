@@ -26,7 +26,7 @@ The boards with emulator supported can be listed using the
 $ make info-emulated-boards
 ```
 
-## Features
+### Features
 
 Be aware that not all hardware features provided by a board - and described as
 such in the build system by `FEATURES_PROVIDED` - are implemented in emulators.
@@ -35,7 +35,7 @@ implemented by the renode driver.
 So you may expect some failures when running advanced applications on the
 emulator.
 
-## Usage
+### Usage
 
 All emulators can be used the same way. Just add `EMULATE=1` to the command
 line.
@@ -65,35 +65,35 @@ The default value is built based on a random temporary directory:
 The randomness of this variable allows several emulated sessions of the same
 application with the same board to run in parallel.
 
-# Qemu
+## Qemu
 
-## Overview
+### Overview
 
 [Qemu](https://www.qemu.org/) is a machine emulator and virtualizer. It can
 be used to emulate regular computer architectures but also some microcontroller
 based boards such as the [BBC micro:bit](https://doc.riot-os.org/group__boards__microbit.html).
 
-## Installation
+### Installation
 
 Qemu is usually available via the package manager of common Linux distributions.
 Depending on your local system, the installation procedure is described on the
 [qemu website](https://www.qemu.org/download/).
 
-## Supported Boards
+### Supported Boards
 
 So far, in RIOT, only the
 [BBC micro:bit](https://doc.riot-os.org/group__boards__microbit.html)
 board is supported with qemu.
 
-## Configuration
+### Configuration
 
 The QEMU emulated serial port is exposed on a local Unix socket, redirected to a
 local PTY file (using [socat](http://www.dest-unreach.org/socat/)). This makes
 it possible to open the PTY file in a regular serial port.
 
-# Renode
+## Renode
 
-## Overview
+### Overview
 
 [Renode](http://renode.io) is a virtual development tool for multinode embedded
 networks (both wired and wireless) enabling a scalable workflow for building
@@ -103,14 +103,14 @@ It can easily be used to run applications on a broad range of embedded platforms
 without any changes in the code itself, as if you were running on real
 hardware - but with more possibilities.
 
-## Installation
+### Installation
 
-### From Package
+#### From Package
 
 Packages for macOS, deb-based and rpm-based systems, for Windows and for Arch
 Linux are available on [GitHub](https://github.com/renode/renode/releases/latest).
 
-### From Source
+#### From Source
 
 Follow the installation instructions on Renode's
 [GitHub](https://github.com/renode/renode#installation) page.
@@ -123,16 +123,16 @@ One way to do so, is via symlink:
 sudo ln -s path/to/renode/repository/renode /usr/local/bin/renode
 ```
 
-### Testing
+#### Testing
 
 After installation, verify that Renode is working using `renode --help`. You
 should be presented with a help screen.
 
-## Documentation
+### Documentation
 
 Documentation for Renode can be found on [Read The Docs](https://renode.readthedocs.io).
 
-## Usage
+### Usage
 
 From within RIOT-OS, add `EMULATE=1` to start the emulation. The emulation
 expects a board definition file in `boards/<BOARD>/dist/board.resc`.

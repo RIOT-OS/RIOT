@@ -111,13 +111,17 @@ endif
 
 # Addition of missing modules for boards that do not have physical network
 # module - a dirty hack when lwip_dhcp is used for IPv4 (use of lwip_ipv4 module)
-# on such boards (lack of netdev_new_api module)
+# on such boards (lack of netdev_eth module)
+#
+# This is dirty-hack" to solve compilation problem
+# TODO:
+# Find the root cause of the problem. PR #17174 and PR #17162 could be a good
+# starting point.
 ifneq (,$(filter lwip_dhcp,$(USEMODULE)))
   ifneq (,$(filter lwip_ipv4,$(USEMODULE)))
-    ifeq (,$(filter netdev_new_api,$(USEMODULE)))
+    ifeq (,$(filter netdev_eth,$(USEMODULE)))
       USEMODULE += netdev_eth
-      USEMODULE += netdev_new_api
-   endif
+    endif
   endif
 endif
 

@@ -245,10 +245,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     case NETOPT_DEVICE_TYPE:
         assert(max_len >= sizeof(uint16_t));
-        sx126x_pkt_type_t pkt_type;
-        sx126x_get_pkt_type(dev, &pkt_type);
-        *((uint16_t *)val) =
-            (pkt_type == SX126X_PKT_TYPE_LORA) ? NETDEV_TYPE_LORA : NETDEV_TYPE_UNKNOWN;
+        *((uint16_t *)val) = NETDEV_TYPE_LORA;
         return sizeof(uint16_t);
 
     case NETOPT_CHANNEL_FREQUENCY:
