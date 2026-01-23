@@ -74,7 +74,10 @@ the CPU frequency can't exceed it's frequency.
 /* Main clock > 48 MHz -> use DPLL, otherwise use DFLL */
 #  define USE_DPLL (CLOCK_CORECLOCK > SAM0_DFLL_FREQ_HZ)
 #  define USE_DFLL 1
+/* if USE_XOSC is set 1 it is used as source for (FD)PLL and DFLL unless USE_XOSC_ONLY is set */
+#ifndef USE_XOSC
 #  define USE_XOSC 0
+#endif
 
 #  ifndef GCLK_TIMER_HZ
 #    define GCLK_TIMER_HZ MHZ(8)
@@ -115,9 +118,20 @@ static void xosc32k_init(void)
     while (!(OSC32KCTRL->STATUS.reg & OSC32KCTRL_STATUS_XOSC32KRDY)) {}
 }
 
+/* XOSC0 is run by an external oscillator 0 (default (crystal)) or 1 (external oscillator) */
+#ifndef XOSC0_EXT_OSC
+#  define XOSC0_EXT_OSC (0)
+#endif
+
+/* XOSC1 is run by an external oscillator 0 (default (crystal)) or 1 (external oscillator) */
+#ifndef XOSC1_EXT_OSC
+#  define XOSC1_EXT_OSC (0)
+#endif
+
 static void xosc_init(uint8_t idx)
 {
     uint32_t freq;
+    bool xtal;
 
     if (!USE_XOSC ||
             (idx == 0 && XOSC0_FREQUENCY == 0) ||
@@ -130,9 +144,17 @@ static void xosc_init(uint8_t idx)
 
     if (idx == 0) {
         freq = XOSC0_FREQUENCY;
+        xtal = !XOSC0_EXT_OSC;
     }
     else if (idx == 1) {
         freq = XOSC1_FREQUENCY;
+        xtal = !XOSC1_EXT_OSC;
+    }
+
+    if (xtal) {
+        OSCCTRL->XOSCCTRL[idx].reg = OSCCTRL_XOSCCTRL_ENABLE;
+        while (!(OSCCTRL->STATUS.vec.XOSCRDY & (idx + 1))) {}
+        return;
     }
 
     uint32_t reg = OSCCTRL_XOSCCTRL_XTALEN
@@ -204,6 +226,10 @@ static void fdpll_init_nolock(uint8_t idx, uint32_t f_cpu, uint8_t flags)
     OSCCTRL->Dpll[idx].DPLLCTRLA.reg = 0;
     while (OSCCTRL->Dpll[idx].DPLLSYNCBUSY.reg) {}
 
+     /* holds LDR 13 bit integer and 5 bit fractional part:
+      * - integer part: ldr13_5 >> 5
+      * - fractional part: ldr13_5 & 0x1f */
+    uint32_t ldr13_5;
     uint32_t ctrlb = 0;
 
     /* HW revision before F  (A and D) might false unlock -> LBYPASS and WUF */
@@ -217,12 +243,22 @@ static void fdpll_init_nolock(uint8_t idx, uint32_t f_cpu, uint8_t flags)
      * (critical for some application not so much for other)*/
     if (EXTERNAL_OSC32_SOURCE) {
         /* Source the DPLL from 32kHz XOSC32 ( equivalent to ((f_cpu << 5) / 32768) ) */
-        const uint32_t LDR = (f_cpu >> 10);
-        OSCCTRL->Dpll[idx].DPLLRATIO.reg = OSCCTRL_DPLLRATIO_LDRFRAC(LDR & 0x1F)
-                                         | OSCCTRL_DPLLRATIO_LDR((LDR >> 5) - 1);
-
+        ldr13_5  = (f_cpu >> 10);
         ctrlb |= OSCCTRL_DPLLCTRLB_REFCLK_XOSC32;
-        OSCCTRL->Dpll[idx].DPLLCTRLB.reg = ctrlb;
+    }
+    else if (XOSC0_FREQUENCY) {
+        /* Source the DPLL from XOSC0 divide to 1 MHz then multiply to fcpu */
+        /* fDIV = fXOSC / 2 * ( DIV + 1) */
+        const uint32_t div = (XOSC0_FREQUENCY / MHZ(1) / 2) -1;
+        ldr13_5 = (f_cpu / MHZ(1)) << 5;
+        ctrlb |= OSCCTRL_DPLLCTRLB_DIV(div) | OSCCTRL_DPLLCTRLB_REFCLK_XOSC0;
+    }
+    else if (XOSC1_FREQUENCY) {
+        /* Source the DPLL from XOSC1 divide to 1 MHz then multiply to fcpu */
+        /* fDIV = fXOSC / 2 * ( DIV + 1) */
+        const uint32_t div = (XOSC1_FREQUENCY / MHZ(1) / 2) -1;
+        ldr13_5 = (f_cpu / MHZ(1)) << 5;
+        ctrlb |= OSCCTRL_DPLLCTRLB_DIV(div) | OSCCTRL_DPLLCTRLB_REFCLK_XOSC1;
     }
     else {
         /* TODO find a better fallback source (eg 48MCLK routed though gclk divided down to 1MHz)
@@ -232,11 +268,14 @@ static void fdpll_init_nolock(uint8_t idx, uint32_t f_cpu, uint8_t flags)
         while (!(GCLK->PCHCTRL[OSCCTRL_GCLK_ID_FDPLL0 + idx].reg & GCLK_PCHCTRL_CHEN)) {}
         /* Source the DPLL from 32kHz GCLK1 ( equivalent to ((f_cpu << 5) / 32768) )
          * avoid the routing through gclk when XOSC32 is the source */
-        const uint32_t LDR = (f_cpu >> 10);
-        OSCCTRL->Dpll[idx].DPLLRATIO.reg  = OSCCTRL_DPLLRATIO_LDRFRAC(LDR & 0x1F)
-                                            | OSCCTRL_DPLLRATIO_LDR((LDR >> 5) - 1);
+        ldr13_5 = (f_cpu >> 10);
         ctrlb |= OSCCTRL_DPLLCTRLB_REFCLK_GCLK;
     }
+
+    /* fCLK_DPLL = (fCKR) × (LDR + 1 + LDRFRAC/32) with fCKR = fclock reference / divider (ctrlb) */
+    OSCCTRL->Dpll[idx].DPLLRATIO.reg = OSCCTRL_DPLLRATIO_LDRFRAC(ldr13_5 & 0x1F)
+                                     | OSCCTRL_DPLLRATIO_LDR((ldr13_5 >> 5) - 1);
+
     OSCCTRL->Dpll[idx].DPLLCTRLB.reg = ctrlb;
     OSCCTRL->Dpll[idx].DPLLCTRLA.reg = OSCCTRL_DPLLCTRLA_ENABLE | flags;
 
