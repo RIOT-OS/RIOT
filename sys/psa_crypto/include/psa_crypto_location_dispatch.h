@@ -23,6 +23,7 @@ extern "C" {
 #include <stdlib.h>
 #include "kernel_defines.h"
 #include "psa/crypto.h"
+#include "psa_crypto_slot_management.h"
 
 #if IS_USED(MODULE_PSA_ASYMMETRIC)
 /**

@@ -103,7 +103,7 @@ psa_status_t example_aead_chacha20_poly1305(void)
     * This started happening after changing chacha20poly1305.c and its corresponding
     * header to the new multipart version.
     */
-    uint8_t cipher_out[sizeof(PLAINTEXT) + 16];
+    uint8_t cipher_out[encr_output_size];
     uint8_t plain_out[sizeof(PLAINTEXT)];
     size_t output_len = 0;
 

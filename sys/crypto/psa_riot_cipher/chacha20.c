@@ -117,8 +117,8 @@ psa_status_t psa_cipher_chacha20_update(psa_cipher_chacha20_ctx_t *ctx,
         memcpy(&ctx->buffer[ctx->buffer_length], &input[input_idx], 64 - ctx->buffer_length);
         chacha20_update(&ctx->ctx, ctx->buffer, &output[output_idx]);
         input_length -= 64 - ctx->buffer_length;
+        input_idx += 64 - ctx->buffer_length;
         ctx->buffer_length = 0;
-        input_idx += 64;
         output_idx += 64;
     }
 

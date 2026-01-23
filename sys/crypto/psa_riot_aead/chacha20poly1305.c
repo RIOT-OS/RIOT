@@ -1,7 +1,5 @@
 #include "psa/cipher/types.h"
 #include "psa/error.h"
-#include <stdio.h>
-#include "psa/crypto.h"
 #include "crypto/chacha20poly1305.h"
 #include "psa_ciphers.h"
 
