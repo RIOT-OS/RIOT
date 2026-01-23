@@ -225,15 +225,14 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t size, ieee802154_rx_in
         /* AT86RF2XX_IS_PERIPH means the MCU is ATmegaRFR2 that has symbol counter */
         {
             uint32_t rx_sc;
-            netdev_ieee802154_rx_info_t *rx_info = info;
             rx_sc = at86rf2xx_get_sc(dev);
 
             /* convert counter value to ns */
-            uint64_t res = SC_TO_NS * (uint64_t)rx_sc;
-            netdev_ieee802154_rx_info_set_timestamp(rx_info, res);
+            uint64_t timestamp = SC_TO_NS * (uint64_t)rx_sc;
+            info->timestamp = timestamp;
             DEBUG("[at86rf2xx] CS: %" PRIu32 " timestamp: %" PRIu32 ".%09" PRIu32 " ",
-                  rx_sc, (uint32_t)(rx_info->timestamp / NS_PER_SEC),
-                  (uint32_t)(rx_info->timestamp % NS_PER_SEC));
+                  rx_sc, (uint32_t)(info->timestamp / NS_PER_SEC),
+                  (uint32_t)(info->timestamp % NS_PER_SEC));
         }
 #endif
     }
