@@ -27,17 +27,6 @@ jobs:
             uses: actions/setup-node@v4
           - name: Build documentation
             run: make build
-            # This step will probably need to be changed to use the actual service RIOT is using
-            # This makes it more convenient to deploy while still in development though
-          - name: Deploy documentation
-            uses: peaceiris/actions-gh-pages@v3
-            with:
-                github_token: ${{ secrets.GITHUB_TOKEN }}
-                publish_dir: doc/starlight/dist
-                publish_branch: gh-pages
-                cname: guide.riot-os.org
-                commit_message: "Deploy documentation"
-
           - name: Deploy to riot-os.org server
             uses: burnett01/rsync-deployments@v8
             with:
