@@ -187,6 +187,31 @@ void vTaskDelay(const TickType_t xTicksToDelay)
 {
     DEBUG("%s xTicksToDelay=%"PRIu32"\n", __func__, xTicksToDelay);
 
+#ifdef CPU_ESP8266
+    /*
+     * FIXME if possible
+     * With the ESP8266, this function is only called by
+     * `ieee80211_sta_new_state`, with interrupts of all levels disabled,
+     * for example as a result of executing `esp_wifi_disconnect`.
+     * If `ztimer_sleep` is then called with interrupts disabled, for
+     * some reason this leads to memory corruption when interrupts are
+     * re-enabled afterwards. The only way to avoid this is to re-enable
+     * interrupts before calling `ztimer_sleep`.
+     *
+     * Since debugging ESP8266 code is very limited and sometimes impossible
+     * due to there being only one hardware breakpoint and a lot of closed
+     * binary code involved when calling `esp_wifi_disconnect`, it was not
+     * possible to find the reason for the memory corruption. An exception
+     * occurs after executing `esp_wifi_disconnect` in `ztimer_handler` when
+     * `_callback_unlock_mutex` is called with a mutex parameter that points
+     * to irrelevant read-only memory in IROM.
+     *
+     * Therefore, enabling the interrupts here is currently the only way to
+     * avoid the exception, even though this is only a hack.
+     */
+    irq_enable();
+#endif
+
 #if defined(MODULE_ZTIMER_MSEC)
     uint64_t ms = xTicksToDelay * portTICK_PERIOD_MS;
     ztimer_sleep(ZTIMER_MSEC, ms);
