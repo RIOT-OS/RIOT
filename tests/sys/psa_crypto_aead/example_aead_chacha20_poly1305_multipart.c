@@ -17,6 +17,8 @@
 #include <stdio.h>
 #include "psa/crypto.h"
 
+/* Test Vector from RFC 7539, https://datatracker.ietf.org/doc/html/rfc7539. */
+
 uint8_t PLAINTEXT[] = {
     0x4c, 0x61, 0x64, 0x69, 0x65, 0x73, 0x20, 0x61, 0x6e, 0x64, 0x20, 0x47, 0x65, 0x6e, 0x74, 0x6c,
     0x65, 0x6d, 0x65, 0x6e, 0x20, 0x6f, 0x66, 0x20, 0x74, 0x68, 0x65, 0x20, 0x63, 0x6c, 0x61, 0x73,
@@ -41,8 +43,7 @@ uint8_t KEY_CHACHA20[] = {
 };
 
 uint8_t NONCE[] = {
-    0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
-    0x07, 0x00, 0x00, 0x00
+    0x07, 0x00, 0x00, 0x00, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47
 };
 
 uint8_t CIPHERTEXT[] = {
@@ -65,31 +66,39 @@ uint8_t TAG[] = {
 
 psa_status_t example_aead_chacha20_poly1305_multipart(void)
 {
-    psa_aead_operation_t operation;
-    operation = psa_aead_operation_init();
     psa_status_t status = PSA_ERROR_DOES_NOT_EXIST;
+
+    /* KEY IMPORT ------------------------ */
     psa_key_id_t key_id = 0;
     psa_key_attributes_t attr = psa_key_attributes_init();
     psa_key_usage_t usage = PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT;
     psa_algorithm_t alg = PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(PSA_ALG_CHACHA20_POLY1305);
 
-    const size_t cipher_output_size = sizeof(CIPHERTEXT);
-    //const size_t plain_output_size = sizeof(PLAINTEXT);
-
-    uint8_t ciphertext_out[114];
-    //uint8_t plain_out[plain_output_size];
-
     psa_set_key_algorithm(&attr, alg);
     psa_set_key_usage_flags(&attr, usage);
-    psa_set_key_bits(&attr, 256);
+    psa_set_key_bits(&attr, PSA_BYTES_TO_BITS(sizeof(KEY_CHACHA20)));
     psa_set_key_type(&attr, PSA_KEY_TYPE_CHACHA20);
 
-    status = psa_import_key(&attr, KEY_CHACHA20, sizeof KEY_CHACHA20, &key_id);
+    status = psa_import_key(&attr, KEY_CHACHA20, sizeof(KEY_CHACHA20), &key_id);
     if (status != PSA_SUCCESS) {
         psa_destroy_key(key_id);
         printf("Import Key Error: %s\n", psa_status_to_humanly_readable(status));
         return status;
     }
+    /* KEY IMPORT ------------------------ */
+
+    /* ENCRYPT & TAG-GEN ----------------- */
+    const size_t ciphertext_size = PSA_AEAD_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20,
+                                                                alg,
+                                                                sizeof(PLAINTEXT));
+    const size_t tag_size = PSA_AEAD_TAG_LENGTH(PSA_KEY_TYPE_CHACHA20,
+                                                PSA_BYTES_TO_BITS(sizeof(KEY_CHACHA20)),
+                                                alg);
+    uint8_t ciphertext[ciphertext_size];
+    uint8_t tag[tag_size];
+
+    psa_aead_operation_t operation;
+    operation = psa_aead_operation_init();
 
     status = psa_aead_encrypt_setup(&operation, key_id, alg);
     if (status != PSA_SUCCESS) {
@@ -98,85 +107,173 @@ psa_status_t example_aead_chacha20_poly1305_multipart(void)
         return status;
     }
 
-    /*
-    status = psa_aead_set_lengths(&operation, sizeof(ADDITIONAL_DATA), sizeof(PLAINTEXT));
-    if (status != PSA_SUCCESS) {
-        psa_destroy_key(key_id);
-        printf("Set Lengths Error: %s\n", psa_status_to_humanly_readable(status));
-        return status;
-    }
-        */
-
-    status = psa_aead_set_nonce(&operation, NONCE, sizeof NONCE);
+    status = psa_aead_set_nonce(&operation, NONCE, sizeof(NONCE));
     if (status != PSA_SUCCESS) {
         psa_destroy_key(key_id);
         printf("Encrypt Set Nonce Error: %s\n", psa_status_to_humanly_readable(status));
         return status;
     }
 
-    /* IoT-TODO: make this multipart*/
-    status = psa_aead_update_ad(&operation, ADDITIONAL_DATA, sizeof(ADDITIONAL_DATA));
-    if (status != PSA_SUCCESS) {
-        psa_destroy_key(key_id);
-        printf("Encrypt Update Ad Error: %s\n", psa_status_to_humanly_readable(status));
-        return status;
+    size_t chunk_length = 5;
+    size_t bytes_in = 0;
+    while (bytes_in < sizeof(ADDITIONAL_DATA)) {
+        if ((sizeof(ADDITIONAL_DATA) - bytes_in) < chunk_length) {
+            chunk_length = sizeof(ADDITIONAL_DATA) - bytes_in;
+        }
+
+        status = psa_aead_update_ad(&operation,
+                                    &ADDITIONAL_DATA[bytes_in],
+                                    chunk_length);
+        if (status != PSA_SUCCESS) {
+            psa_destroy_key(key_id);
+            printf("Encrypt Update Ad Error: %s\n", psa_status_to_humanly_readable(status));
+            return status;
+        }
+
+        bytes_in += chunk_length;
     }
 
-    size_t max_encrypt_size = sizeof(PLAINTEXT);
-    uint16_t processed_bytes = 0;
-    uint8_t input_length = 35;
-    uint16_t calculated_output = 0;
-    while (processed_bytes < max_encrypt_size) {
-        if ((sizeof(PLAINTEXT) - processed_bytes) < 35) {
-            input_length = sizeof(PLAINTEXT) - processed_bytes;
+    chunk_length = 35;
+    bytes_in = 0;
+    size_t bytes_out = 0;
+    while (bytes_in < sizeof(PLAINTEXT)) {
+        if ((sizeof(PLAINTEXT) - bytes_in) < chunk_length) {
+            chunk_length = sizeof(PLAINTEXT) - bytes_in;
         }
-        size_t new_output_length = 0;
+
+        size_t chunk_out_length;
         status = psa_aead_update(&operation,
-                                 &PLAINTEXT[processed_bytes],
-                                 input_length,
-                                 &ciphertext_out[calculated_output],
-                                 (cipher_output_size - calculated_output),
-                                 &new_output_length);
+                                 &PLAINTEXT[bytes_in],
+                                 chunk_length,
+                                 &ciphertext[bytes_out],
+                                 ciphertext_size - bytes_out,
+                                 &chunk_out_length);
+
         if (status != PSA_SUCCESS) {
             psa_destroy_key(key_id);
             printf("Encrypt Update Error: %s\n", psa_status_to_humanly_readable(status));
             return status;
         }
-        calculated_output += new_output_length;
-        processed_bytes += input_length;
+
+        bytes_in += chunk_length;
+        bytes_out += chunk_out_length;
     }
 
-
-    size_t finish_output_length = 0;
-    uint8_t calculated_tag[16];
-    size_t calculated_tag_length;
+    size_t finish_out_length;
+    size_t tag_length;
     status = psa_aead_finish(&operation,
-                             &ciphertext_out[calculated_output],
-                             (cipher_output_size - calculated_output),
-                             &finish_output_length,
-                             calculated_tag,
-                             sizeof(calculated_tag),
-                             &calculated_tag_length);
+                             &ciphertext[bytes_out],
+                             ciphertext_size - bytes_out,
+                             &finish_out_length,
+                             tag,
+                             sizeof(tag),
+                             &tag_length);
     if (status != PSA_SUCCESS) {
         psa_destroy_key(key_id);
         printf("Encrypt Finish Error: %s\n", psa_status_to_humanly_readable(status));
         return status;
     }
-    calculated_output += finish_output_length;
+    bytes_out += finish_out_length;
 
-    if (memcmp(ciphertext_out, CIPHERTEXT, sizeof(CIPHERTEXT)) != 0) {
+    if (memcmp(ciphertext, CIPHERTEXT, sizeof(CIPHERTEXT)) != 0) {
         psa_destroy_key(key_id);
         puts("Wrong Ciphertext on encryption");
-        printf("%02X:%02X:%02X:%02X\n", ciphertext_out[0], ciphertext_out[1], ciphertext_out[2], ciphertext_out[3]);
-        printf("%02X:%02X:%02X:%02X\n", CIPHERTEXT[0], CIPHERTEXT[1], CIPHERTEXT[2], CIPHERTEXT[3]);
         return PSA_ERROR_DATA_INVALID;
     }
 
-    if (memcmp(calculated_tag, TAG, sizeof(TAG)) != 0) {
+    if (memcmp(tag, TAG, sizeof(TAG)) != 0) {
         psa_destroy_key(key_id);
         puts("Wrong Tag on encryption");
         return PSA_ERROR_DATA_INVALID;
     }
+    /* ENCRYPT & TAG-GEN ----------------- */
+
+    /* DECRYPT & VERIFY ------------------ */
+    /* IoT-TODO: This macro is broken
+     * const size_t plaintext_size = PSA_AEAD_DECRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20, alg, sizeof(CIPHERTEXT)); */
+    const size_t plaintext_size = sizeof(PLAINTEXT);
+    uint8_t plaintext[plaintext_size];
+
+    operation = psa_aead_operation_init();
+
+    status = psa_aead_decrypt_setup(&operation, key_id, alg);
+    if (status != PSA_SUCCESS) {
+        psa_destroy_key(key_id);
+        printf("Decrypt Setup Error: %s\n", psa_status_to_humanly_readable(status));
+        return status;
+    }
+
+    status = psa_aead_set_nonce(&operation, NONCE, sizeof(NONCE));
+    if (status != PSA_SUCCESS) {
+        psa_destroy_key(key_id);
+        printf("Decrypt Set Nonce Error: %s\n", psa_status_to_humanly_readable(status));
+        return status;
+    }
+
+    chunk_length = 5;
+    bytes_in = 0;
+    while (bytes_in < sizeof(ADDITIONAL_DATA)) {
+        if ((sizeof(ADDITIONAL_DATA) - bytes_in) < chunk_length) {
+            chunk_length = sizeof(ADDITIONAL_DATA) - bytes_in;
+        }
+
+        status = psa_aead_update_ad(&operation,
+                                    &ADDITIONAL_DATA[bytes_in],
+                                    chunk_length);
+        if (status != PSA_SUCCESS) {
+            psa_destroy_key(key_id);
+            printf("Decrypt Update Ad Error: %s\n", psa_status_to_humanly_readable(status));
+            return status;
+        }
+
+        bytes_in += chunk_length;
+    }
+
+    chunk_length = 35;
+    bytes_in = 0;
+    bytes_out = 0;
+    while (bytes_in < sizeof(CIPHERTEXT)) {
+        if ((sizeof(CIPHERTEXT) - bytes_in) < chunk_length) {
+            chunk_length = sizeof(CIPHERTEXT) - bytes_in;
+        }
+
+        size_t chunk_out_length;
+        status = psa_aead_update(&operation,
+                                 &CIPHERTEXT[bytes_in],
+                                 chunk_length,
+                                 &plaintext[bytes_out],
+                                 plaintext_size - bytes_out,
+                                 &chunk_out_length);
+
+        if (status != PSA_SUCCESS) {
+            psa_destroy_key(key_id);
+            printf("Decrypt Update Error: %s\n", psa_status_to_humanly_readable(status));
+            return status;
+        }
+
+        bytes_in += chunk_length;
+        bytes_out += chunk_out_length;
+    }
+
+    status = psa_aead_verify(&operation,
+                             &plaintext[bytes_out],
+                             plaintext_size - bytes_out,
+                             &finish_out_length,
+                             TAG,
+                             sizeof(TAG));
+    if (status != PSA_SUCCESS) {
+        psa_destroy_key(key_id);
+        printf("Decrypt Verify Error: %s\n", psa_status_to_humanly_readable(status));
+        return status;
+    }
+    bytes_out += finish_out_length;
+
+    if (memcmp(plaintext, PLAINTEXT, sizeof(PLAINTEXT)) != 0) {
+        psa_destroy_key(key_id);
+        puts("Wrong Plaintext on decryption");
+        return PSA_ERROR_DATA_INVALID;
+    }
+    /* DECRYPT & VERIFY ------------------ */
 
     return PSA_SUCCESS;
 }

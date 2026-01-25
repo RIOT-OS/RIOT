@@ -222,7 +222,6 @@ void poly1305_init_from_chacha(chacha20_ctx_t *chacha_ctx,
     uint32_t key_stream[16];
     _keystream(chacha_ctx, key_stream);
     poly1305_init(poly_ctx, (uint8_t *)key_stream);
-    crypto_secure_wipe(key_stream, sizeof(key_stream));
 
     /* Increment counter to 1 for message encryption */
     chacha_ctx->split.counter[0] = 1;

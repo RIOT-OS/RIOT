@@ -133,7 +133,12 @@ psa_status_t psa_aead_chacha20_poly1305_update(psa_aead_chacha20_poly1305_ctx_t 
         const size_t padlen = (16 - ctx->poly.c_idx) & 0xF;
         poly1305_update(&ctx->poly, padding, padlen);
     }
-    psa_cipher_chacha20_update(&ctx->chacha, input, input_length, output, output_size, output_length);
+
+    psa_status_t status = psa_cipher_chacha20_update(&ctx->chacha, input, input_length, output, output_size, output_length);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
+
     /* No matter which direction, Poly always uses the ciphertext as input. */
     if (direction == PSA_CRYPTO_DRIVER_ENCRYPT) {
         poly1305_update(&ctx->poly, output, *output_length);
@@ -160,8 +165,10 @@ psa_status_t psa_aead_chacha20_poly1305_finish(psa_aead_chacha20_poly1305_ctx_t 
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
-    psa_cipher_chacha20_finish(&ctx->chacha, ciphertext, ciphertext_size, ciphertext_length);
-    current_ciphertext_length += *ciphertext_length;
+    psa_status_t status = psa_cipher_chacha20_finish(&ctx->chacha, ciphertext, ciphertext_size, ciphertext_length);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
     poly1305_update(&ctx->poly, ciphertext, *ciphertext_length);
 
     /* Now the last bit of ciphertext was calculated. We pad again! */
@@ -187,8 +194,10 @@ psa_status_t psa_aead_chacha20_poly1305_verify(psa_aead_chacha20_poly1305_ctx_t 
                                                const uint8_t *tag,
                                                size_t tag_length)
 {
-    psa_cipher_chacha20_finish(&ctx->chacha, plaintext, plaintext_size, plaintext_length);
-
+    psa_status_t status = psa_cipher_chacha20_finish(&ctx->chacha, plaintext, plaintext_size, plaintext_length);
+    if (status != PSA_SUCCESS) {
+        return status;
+    }
     /* Since this is a decrypt operation, the last bit of ciphertext
      * was already added in psa_aead_update(). Likewise, we do not
      * need to calculate the total ciphertext length here! */
