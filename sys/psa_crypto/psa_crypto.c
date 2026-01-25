@@ -188,11 +188,9 @@ static psa_status_t psa_aead_encrypt_decrypt(psa_key_id_t key,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    /* IoT-Todo: false statement?
     if (nonce_length > PSA_AEAD_NONCE_MAX_SIZE) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-    */
 
     if (direction == PSA_CRYPTO_DRIVER_DECRYPT && (!input || input_length == 0)) {
         return PSA_ERROR_INVALID_ARGUMENT;

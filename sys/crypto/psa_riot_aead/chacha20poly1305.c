@@ -13,16 +13,13 @@ psa_status_t psa_aead_chacha20_poly1305_encrypt(const psa_key_attributes_t *attr
 {
     (void)attributes;
     (void)key_buffer_length;
-    (void)tag_length;
     (void)ciphertext_size;
     (void)ciphertext_length;
 
-    /* Only 12 and 8 byte nonces are supported. */
-    switch (nonce_length) {
-    case 12:
-    case 8:
-        break;
-    default:
+    if (nonce_length != CHACHA20POLY1305_NONCE_BYTES) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+    if (tag_length != CHACHA20POLY1305_TAG_BYTES) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
@@ -43,22 +40,22 @@ psa_status_t psa_aead_chacha20_poly1305_decrypt(const psa_key_attributes_t *attr
 {
     (void)attributes;
     (void)key_buffer_length;
-    (void)tag_length;
     (void)plaintext_size;
 
-    /* Only 12 and 8 byte nonces are supported. */
-    switch (nonce_length) {
-    case 12:
-    case 8:
-        break;
-    default:
+    if (nonce_length != CHACHA20POLY1305_NONCE_BYTES) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+    if (tag_length != CHACHA20POLY1305_TAG_BYTES) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    chacha20poly1305_decrypt(ciphertext, ciphertext_length,
-                             plaintext, plaintext_length,
-                             additional_data, additional_data_length,
-                             key_buffer, nonce);
+    int status = chacha20poly1305_decrypt(ciphertext, ciphertext_length,
+                                          plaintext, plaintext_length,
+                                          additional_data, additional_data_length,
+                                          key_buffer, nonce);
+    if (status == 0) {
+        return PSA_ERROR_INVALID_SIGNATURE;
+    }
 
     return PSA_SUCCESS;
 }

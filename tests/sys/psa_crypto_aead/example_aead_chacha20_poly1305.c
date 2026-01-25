@@ -14,34 +14,35 @@
  *
  * @}
  */
+#include "psa/aead/sizes.h"
+#include "psa/error.h"
+#include "psa/key/type.h"
 #include <stdio.h>
 #include "psa/crypto.h"
-
-#define CHACHA20_KEY_SIZE (32)
 
 /*
  *  Chacha20Poly1305 Authenticated Encryption with Associated Data
  *
  *  https://datatracker.ietf.org/doc/html/draft-nir-cfrg-chacha20-poly1305-06#appendix-A.5
  */
-static const uint8_t KEY_CHACHA20[] = {
+uint8_t KEY_CHACHA20_ONESHOT[] = {
     0x1c, 0x92, 0x40, 0xa5, 0xeb, 0x55, 0xd3, 0x8a,
     0xf3, 0x33, 0x88, 0x86, 0x04, 0xf6, 0xb5, 0xf0,
     0x47, 0x39, 0x17, 0xc1, 0x40, 0x2b, 0x80, 0x09,
     0x9d, 0xca, 0x5c, 0xbc, 0x20, 0x70, 0x75, 0xc0
 };
 
-static const uint8_t NONCE_CHACHA20[] = {
+uint8_t NONCE_CHACHA20_ONESHOT[] = {
     0x00, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04,
     0x05, 0x06, 0x07, 0x08
 };
 
-static const uint8_t ADDITIONAL_DATA[] = {
+uint8_t ADDITIONAL_DATA_ONESHOT[] = {
     0xf3, 0x33, 0x88, 0x86, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x4e, 0x91
 };
 
-static uint8_t PLAINTEXT[] = {
+uint8_t PLAINTEXT_ONESHOT[] = {
     0x49, 0x6E, 0x74, 0x65, 0x72, 0x6E, 0x65, 0x74, 0x2D, 0x44, 0x72, 0x61, 0x66, 0x74, 0x73, 0x20,
     0x61, 0x72, 0x65, 0x20, 0x64, 0x72, 0x61, 0x66, 0x74, 0x20, 0x64, 0x6F, 0x63, 0x75, 0x6D, 0x65,
     0x6E, 0x74, 0x73, 0x20, 0x76, 0x61, 0x6C, 0x69, 0x64, 0x20, 0x66, 0x6F, 0x72, 0x20, 0x61, 0x20,
@@ -61,7 +62,7 @@ static uint8_t PLAINTEXT[] = {
     0x72, 0x65, 0x73, 0x73, 0x2E, 0x2F, 0xE2, 0x80, 0x9D
 };
 
-static uint8_t CIPHERTEXT[] = {
+uint8_t CIPHERTEXT_ONESHOT[] = {
     0x64, 0xA0, 0x86, 0x15, 0x75, 0x86, 0x1A, 0xF4, 0x60, 0xF0, 0x62, 0xC7, 0x9B, 0xE6, 0x43, 0xBD,
     0x5E, 0x80, 0x5C, 0xFD, 0x34, 0x5C, 0xF3, 0x89, 0xF1, 0x08, 0x67, 0x0A, 0xC7, 0x6C, 0x8C, 0xB2,
     0x4C, 0x6C, 0xFC, 0x18, 0x75, 0x5D, 0x43, 0xEE, 0xA0, 0x9E, 0xE9, 0x4E, 0x38, 0x2D, 0x26, 0xB0,
@@ -78,7 +79,9 @@ static uint8_t CIPHERTEXT[] = {
     0xCE, 0xBB, 0x4E, 0x46, 0x6D, 0xAE, 0x5A, 0x10, 0x73, 0xA6, 0x72, 0x76, 0x27, 0x09, 0x7A, 0x10,
     0x49, 0xE6, 0x17, 0xD9, 0x1D, 0x36, 0x10, 0x94, 0xFA, 0x68, 0xF0, 0xFF, 0x77, 0x98, 0x71, 0x30,
     0x30, 0x5B, 0xEA, 0xBA, 0x2E, 0xDA, 0x04, 0xDF, 0x99, 0x7B, 0x71, 0x4D, 0x6C, 0x6F, 0x2C, 0x29,
-    0xA6, 0xAD, 0x5C, 0xB4, 0x02, 0x2B, 0x02, 0x70, 0x9B
+    0xA6, 0xAD, 0x5C, 0xB4, 0x02, 0x2B, 0x02, 0x70, 0x9B,
+    /* The last 16 bytes of the ciphertext are the recieved tag. */
+    0xEE, 0xAD, 0x9D, 0x67, 0x89, 0x0C, 0xBB, 0x22, 0x39, 0x23, 0x36, 0xFE, 0xA1, 0x85, 0x1F, 0x38
 };
 
 /**
@@ -90,55 +93,89 @@ static uint8_t CIPHERTEXT[] = {
 psa_status_t example_aead_chacha20_poly1305(void)
 {
     psa_status_t status = PSA_ERROR_DOES_NOT_EXIST;
+
+    /* KEY IMPORT ------------------------ */
     psa_key_id_t key_id = 0;
     psa_key_attributes_t attr = psa_key_attributes_init();
     psa_key_usage_t usage = PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT;
+    psa_algorithm_t alg = PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(PSA_ALG_CHACHA20_POLY1305);
 
-    psa_algorithm_t algo = PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(PSA_ALG_CHACHA20_POLY1305);
-    size_t encr_output_size = PSA_AEAD_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20,
-                                                           algo, sizeof(PLAINTEXT));
-
-    /* IoT-TODO: This needs to be hardcoded for some reason, otherwise this function
-    * doesn't return despite reacing the end of it.
-    * This started happening after changing chacha20poly1305.c and its corresponding
-    * header to the new multipart version.
-    */
-    uint8_t cipher_out[sizeof(PLAINTEXT) + 16];
-    uint8_t plain_out[sizeof(PLAINTEXT)];
-    size_t output_len = 0;
-
-    psa_set_key_algorithm(&attr, algo);
+    psa_set_key_algorithm(&attr, alg);
     psa_set_key_usage_flags(&attr, usage);
     psa_set_key_bits(&attr, 256);
     psa_set_key_type(&attr, PSA_KEY_TYPE_CHACHA20);
 
-    status = psa_import_key(&attr, KEY_CHACHA20, CHACHA20_KEY_SIZE, &key_id);
+    status = psa_import_key(&attr, KEY_CHACHA20_ONESHOT, sizeof(KEY_CHACHA20_ONESHOT), &key_id);
     if (status != PSA_SUCCESS) {
         psa_destroy_key(key_id);
-        puts("Import key failed");
+        printf("Import Key Error: %s\n", psa_status_to_humanly_readable(status));
+        return status;
+    }
+    /* KEY IMPORT ------------------------ */
+
+    /* ENCRYPT & TAG-GEN ----------------- */
+    const size_t ciphertext_size = PSA_AEAD_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20,
+                                                                alg,
+                                                                sizeof(PLAINTEXT_ONESHOT));
+    uint8_t ciphertext[ciphertext_size];
+
+    size_t output_len = 0;
+    status = psa_aead_encrypt(key_id,
+                              alg,
+                              NONCE_CHACHA20_ONESHOT,
+                              sizeof(NONCE_CHACHA20_ONESHOT),
+                              ADDITIONAL_DATA_ONESHOT,
+                              sizeof(ADDITIONAL_DATA_ONESHOT),
+                              PLAINTEXT_ONESHOT,
+                              sizeof(PLAINTEXT_ONESHOT),
+                              ciphertext,
+                              ciphertext_size,
+                              &output_len);
+    printf("%lu %lu\n", ciphertext_size, output_len);
+
+    if (status != PSA_SUCCESS) {
+        psa_destroy_key(key_id);
+        printf("Encrypt Error: %s\n", psa_status_to_humanly_readable(status));
         return status;
     }
 
-    status = psa_aead_encrypt(key_id, algo, NONCE_CHACHA20, sizeof(NONCE_CHACHA20), ADDITIONAL_DATA, sizeof(ADDITIONAL_DATA),
-                              PLAINTEXT, sizeof(PLAINTEXT), cipher_out, encr_output_size, &output_len);
-    if (status != PSA_SUCCESS) {
-        psa_destroy_key(key_id);
-        return status;
-    }
-
-    if (memcmp(cipher_out, CIPHERTEXT, sizeof(CIPHERTEXT))) {
+    if (memcmp(ciphertext, CIPHERTEXT_ONESHOT, sizeof(CIPHERTEXT_ONESHOT))) {
         psa_destroy_key(key_id);
         puts("CHACHA20POLY1305: wrong ciphertext on encryption\n");
-        return -1;
+        return PSA_ERROR_DATA_INVALID;
+    }
+    /* ENCRYPT & TAG-GEN ----------------- */
+
+    /* DECRYPT & VERIFY ------------------ */
+    /* IoT-TODO: This macro is broken
+     * const size_t plaintext_size = PSA_AEAD_DECRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20, alg, sizeof(CIPHERTEXT_ONESHOT)); */
+    const size_t plaintext_size = sizeof(PLAINTEXT_ONESHOT);
+    uint8_t plaintext[plaintext_size];
+
+    status = psa_aead_decrypt(key_id,
+                              alg,
+                              NONCE_CHACHA20_ONESHOT,
+                              sizeof(NONCE_CHACHA20_ONESHOT),
+                              ADDITIONAL_DATA_ONESHOT,
+                              sizeof(ADDITIONAL_DATA_ONESHOT),
+                              CIPHERTEXT_ONESHOT,
+                              sizeof(CIPHERTEXT_ONESHOT),
+                              plaintext,
+                              plaintext_size,
+                              &output_len);
+
+    if (status != PSA_SUCCESS) {
+        psa_destroy_key(key_id);
+        printf("Decrypt Error: %s\n", psa_status_to_humanly_readable(status));
+        return status;
     }
 
-    status = psa_aead_decrypt(key_id, algo, NONCE_CHACHA20, sizeof(NONCE_CHACHA20), ADDITIONAL_DATA, sizeof(ADDITIONAL_DATA),
-                              cipher_out, sizeof(cipher_out), plain_out, sizeof(plain_out), &output_len);
-    psa_destroy_key(key_id);
-    if (status == PSA_SUCCESS && memcmp(PLAINTEXT, plain_out, sizeof(plain_out))) {
+    if (memcmp(plaintext, PLAINTEXT_ONESHOT, sizeof(PLAINTEXT_ONESHOT))) {
         printf("CHACHA20POLY1305: wrong plaintext on decryption\n");
-        return -1;
+        return PSA_ERROR_DATA_INVALID;
     }
+    /* DECRYPT & VERIFY ------------------ */
 
+    psa_destroy_key(key_id);
     return status;
 }
