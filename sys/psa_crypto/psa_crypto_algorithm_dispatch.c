@@ -1089,7 +1089,6 @@ psa_status_t psa_algorithm_dispatch_aead_set_lengths(psa_aead_operation_t *opera
     switch (operation->op) {
 #  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
     case PSA_CHACHA20_POLY1305:
-        /* IoT-TODO: pretty sure ChachaPoly supports all*/
         return PSA_SUCCESS;
 #  endif
     default:

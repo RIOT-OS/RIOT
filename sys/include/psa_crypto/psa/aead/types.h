@@ -37,7 +37,6 @@ extern "C" {
  */
 struct psa_aead_operation_s {
     uint8_t nonce_set : 1;              /**< True if Nonce was already set */
-    uint8_t lengths_required : 1;       /**< True if lengths are required */
     uint8_t lengths_set : 1;            /**< True if lengths were already set */
     uint8_t setup_done : 1;             /**< True if setup is done, eg. update() was called */
     size_t ad_length;                   /**< Length of additional data */
