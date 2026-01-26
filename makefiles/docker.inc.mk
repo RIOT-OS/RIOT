@@ -7,10 +7,18 @@
 # provide the latest values to verify and fill in.
 DOCKER_TESTED_IMAGE_REPO_DIGEST := 08fa7da2c702ac4db7cf57c23fc46c1971f3bffc4a6eff129793f853ec808736
 
-DOCKER_PULL_IDENTIFIER := docker.io/riot/riotbuild@sha256:$(DOCKER_TESTED_IMAGE_REPO_DIGEST)
-export DOCKER_IMAGE ?= $(DOCKER_PULL_IDENTIFIER)
+# "DOCKER_IMAGE_VARIANT" is a placeholder that is substituted by `$(DOCKER_IMAGE_VARIANT)`
+DOCKER_PULL_IDENTIFIER := docker.io/riot/DOCKER_IMAGE_VARIANT@sha256:$(DOCKER_TESTED_IMAGE_REPO_DIGEST)
 export DOCKER_BUILD_ROOT ?= /data/riotbuild
 DOCKER_RIOTBASE ?= $(DOCKER_BUILD_ROOT)/riotbase
+
+# There are currently three flavors of build images: the legacy riotbuild and
+# the new tinybuild and smallbuilds. The actual selection is done when all the
+# USEMODULEs are fully evaluated, unless a variant was given on the command line.
+# Please note that the DOCKER_IMAGE_VARIANT variable does *not* include the
+# MCU architecture, that is determined automatically.
+DOCKER_IMAGE_VARIANT ?= undefined
+DOCKER_IMAGE_VARIANT := $(strip $(DOCKER_IMAGE_VARIANT))
 
 # These targets need to be run before docker can be run
 DEPS_FOR_RUNNING_DOCKER :=
@@ -388,8 +396,83 @@ $(HOME)/.cargo/registry:
 # container.
 # The `flash`, `term`, `debugserver` etc. targets usually require access to
 # hardware which may not be reachable from inside the container.
+#
+# The image type that will be used for the build is determined automatically
+# based on the input given through `DOCKER_IMAGE_VARIANT`, the `CPU_ARCH` and
+# the `USEMODULE`s selected.
+# Tinybuild is the default choice, smallbuild is selected when C++ or Rust are
+# used and the legacy riotbuild is the fallback for anything not covered by
+# the former two.
+#
+# REMOVE WHEN FIXED: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=119953
+# The upstream g++ currently does not support MSP430, so we fallback to
+# riotbuild if C++ is used.
 ..in-docker-container: $(DEPS_FOR_RUNNING_DOCKER)
-	@$(COLOR_ECHO) '$(COLOR_GREEN)Launching build container using image "$(DOCKER_IMAGE)".$(COLOR_RESET)'
 	@mkdir -p $(HOME)/.cargo/git
 	@mkdir -p $(HOME)/.cargo/registry
-	$(call docker_run_make,$(DOCKER_MAKECMDGOALS),$(DOCKER_IMAGE),,$(DOCKER_MAKE_ARGS))
+	@DOCKER_IMAGE_VARIANT=$$( \
+	  if [ "$(DOCKER_IMAGE_VARIANT)" != "undefined" ]; then \
+      if [ "$(DOCKER_IMAGE_VARIANT)" = "riotbuild" ]; then \
+        echo "riotbuild"; \
+      elif [ "$(DOCKER_IMAGE_VARIANT)" = "tinybuild" ] || \
+           [ "$(DOCKER_IMAGE_VARIANT)" = "smallbuild" ]; then \
+        echo "$(DOCKER_IMAGE_VARIANT)"; \
+      else \
+        $(COLOR_ECHO) '$(COLOR_RED)Unknown Docker Image Variant \
+                       "$(DOCKER_IMAGE_VARIANT)"!$(COLOR_RESET)' 1>&2; \
+        echo "invalid"; \
+      fi; \
+    else \
+	    if echo "$${USEMODULE}" | grep -q "cpp" || \
+         [ -n "$${APPLICATION_RUST_MODULE:-}" ]; then \
+	      echo "smallbuild"; \
+	    else \
+	      echo "tinybuild"; \
+      fi; \
+    fi; \
+	); \
+	if [ "$${DOCKER_IMAGE_VARIANT}" = "invalid" ]; then \
+	  exit 1; \
+	fi; \
+	if [ "$${DOCKER_IMAGE_VARIANT}" != "riotbuild" ]; then \
+	  DOCKER_IMAGE_VARIANT=$$( \
+	    case "$${CPU_ARCH}" in \
+	    "armv4m"|"native32"|"xtensa") \
+	      echo "riotbuild"; \
+	      ;; \
+	    "msp430") \
+	      if echo "$${USEMODULE}" | grep -q "cpp"; then \
+	        echo "riotbuild"; \
+	      else \
+	        echo "$${DOCKER_IMAGE_VARIANT}-msp430"; \
+	      fi; \
+	      ;; \
+	    "armv6m"|"armv7m"|"armv8m") \
+	      echo "$${DOCKER_IMAGE_VARIANT}-arm"; \
+	      ;; \
+	    "avr8") \
+	      echo "$${DOCKER_IMAGE_VARIANT}-avr"; \
+	      ;; \
+	    "native64") \
+	      echo "$${DOCKER_IMAGE_VARIANT}-native64"; \
+	      ;; \
+	    "rv32") \
+	      if echo "$${USEMODULE}" | grep -q "esp_riscv"; then \
+	        echo "riotbuild"; \
+	      else \
+	        echo "$${DOCKER_IMAGE_VARIANT}-risc-v"; \
+	      fi \
+	      ;; \
+	    *) \
+	      echo "riotbuild"; \
+	      ;; \
+	    esac; \
+	  ); \
+	fi; \
+	if [ -z "$${DOCKER_IMAGE:-}" ]; then \
+	  DOCKER_IMAGE=$$(echo "$(DOCKER_PULL_IDENTIFIER)" | sed "s|DOCKER_IMAGE_VARIANT|$${DOCKER_IMAGE_VARIANT}|"); \
+	else \
+	  DOCKER_IMAGE=$(DOCKER_IMAGE); \
+  fi; \
+	$(COLOR_ECHO) '$(COLOR_GREEN)Launching build container using image "'$${DOCKER_IMAGE}'".$(COLOR_RESET)'; \
+	$(call docker_run_make,$(DOCKER_MAKECMDGOALS),'$${DOCKER_IMAGE}',,$(DOCKER_MAKE_ARGS))
