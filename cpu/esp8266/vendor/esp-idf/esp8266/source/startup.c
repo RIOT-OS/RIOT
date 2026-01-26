@@ -121,7 +121,10 @@ void call_user_start(size_t start_addr)
     esp_image_header_t *head = (esp_image_header_t *)(FLASH_MAP_ADDR + (start_addr & (FLASH_MAP_SIZE - 1)));
     esp_image_segment_header_t *segment = (esp_image_segment_header_t *)((uintptr_t)head + sizeof(esp_image_header_t));
 
-    for (i = 0; i < 3; i++) {
+    /* The data in flash cannot be accessed by byte in this stage, so just access by word and get the segment count. */
+    uint8_t segment_count = ((*(volatile uint32_t *)head) & 0xFF00) >> 8;
+
+    for (i = 0; i < segment_count - 1; i++) {
         segment = (esp_image_segment_header_t *)((uintptr_t)segment + sizeof(esp_image_segment_header_t) + segment->data_len);
 
         uint32_t *dest = (uint32_t *)segment->load_addr;
