@@ -22,7 +22,6 @@ extern "C" {
 #    include "psa_periph_chacha20_ctx.h"
 #    include "crypto/poly1305.h"
 #  endif
-/* IoT-TODO: maybe union */
 typedef struct {
     /* This uses a modified Chacha20 context to handle
      * multipart operations */
