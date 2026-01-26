@@ -141,66 +141,66 @@ psa_status_t psa_algorithm_dispatch_cipher_encrypt(const psa_key_attributes_t *a
  * @brief   Dispatch a cipher decrypt function to a specific backend.
  *          See @ref psa_cipher_decrypt()
  */
-psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *attributes,
-                                                    psa_algorithm_t alg,
-                                                    const psa_key_slot_t *slot,
-                                                    const uint8_t *input,
-                                                    size_t input_length,
-                                                    uint8_t *output,
-                                                    size_t output_size,
-                                                    size_t *output_length);
+psa_status_t psa_algorithm_dispatch_cipher_decrypt(const psa_key_attributes_t *attributes,
+                                                   psa_algorithm_t alg,
+                                                   const psa_key_slot_t *slot,
+                                                   const uint8_t *input,
+                                                   size_t input_length,
+                                                   uint8_t *output,
+                                                   size_t output_size,
+                                                   size_t *output_length);
 
 /**
  * @brief   Dispatch call of a cipher encrypt setup function to a location specific backend.
  *          See psa_cipher_setup()
  */
-psa_status_t psa_algorithm_dispatch_cipher_encrypt_setup( psa_cipher_operation_t *operation,
-                                                            const psa_key_attributes_t *attributes,
-                                                            const psa_key_slot_t *slot,
-                                                            psa_algorithm_t alg);
+psa_status_t psa_algorithm_dispatch_cipher_encrypt_setup(psa_cipher_operation_t *operation,
+                                                         const psa_key_attributes_t *attributes,
+                                                         const psa_key_slot_t *slot,
+                                                         psa_algorithm_t alg);
 
 /**
  * @brief   Dispatch call of a cipher decrypt setup function to a location specific backend.
  *         See psa_cipher_setup()
  */
-psa_status_t psa_algorithm_dispatch_cipher_decrypt_setup( psa_cipher_operation_t *operation,
-                                                            const psa_key_attributes_t *attributes,
-                                                            const psa_key_slot_t *slot,
-                                                            psa_algorithm_t alg);
+psa_status_t psa_algorithm_dispatch_cipher_decrypt_setup(psa_cipher_operation_t *operation,
+                                                         const psa_key_attributes_t *attributes,
+                                                         const psa_key_slot_t *slot,
+                                                         psa_algorithm_t alg);
 
 /**
  * @brief   Dispatch call of a cipher finish function to a location specific backend.
  *         See psa_cipher_finish()
  */
-psa_status_t psa_algorithm_dispatch_cipher_finish( psa_cipher_operation_t *operation,
-                                                uint8_t *output,
-                                                size_t output_size,
-                                                size_t *output_length);
+psa_status_t psa_algorithm_dispatch_cipher_finish(psa_cipher_operation_t *operation,
+                                                  uint8_t *output,
+                                                  size_t output_size,
+                                                  size_t *output_length);
 
 /**
  * @brief   Dispatch call of a cipher update function to a location specific backend.
  *         See psa_cipher_update()
  */
-psa_status_t psa_algorithm_dispatch_cipher_update( psa_cipher_operation_t *operation,
-                                            const uint8_t *input,
-                                            size_t input_length,
-                                            uint8_t *output,
-                                            size_t output_size,
-                                            size_t *output_length);
+psa_status_t psa_algorithm_dispatch_cipher_update(psa_cipher_operation_t *operation,
+                                                  const uint8_t *input,
+                                                  size_t input_length,
+                                                  uint8_t *output,
+                                                  size_t output_size,
+                                                  size_t *output_length);
 
 /**
  * @brief   Dispatch call of a function to set a cipher IV to a location specific backend.
  *        See psa_cipher_set_iv()
  */
-psa_status_t psa_algorithm_dispatch_cipher_set_iv( psa_cipher_operation_t *operation,
-                                        const uint8_t *iv,
-                                        size_t iv_length);
+psa_status_t psa_algorithm_dispatch_cipher_set_iv(psa_cipher_operation_t *operation,
+                                                  const uint8_t *iv,
+                                                  size_t iv_length);
 
 #endif /* MODULE_PSA_CIPHER */
 
 #if IS_USED(MODULE_PSA_AEAD)
 /**
- * @brief   Dispatch a aead encrypt function to a specific backend.
+ * @brief   Dispatch a call of an aead encrypt function to a specific backend.
  *          See @ref psa_aead_encrypt()
  */
 psa_status_t psa_algorithm_dispatch_aead_encrypt(const psa_key_attributes_t *attributes,
@@ -217,7 +217,7 @@ psa_status_t psa_algorithm_dispatch_aead_encrypt(const psa_key_attributes_t *att
                                                  size_t *ciphertext_length);
 
 /**
- * @brief   Dispatch a aead decrypt function to a specific backend.
+ * @brief   Dispatch a call of an aead decrypt function to a specific backend.
  *          See @ref psa_aead_decrypt()
  */
 psa_status_t psa_algorithm_dispatch_aead_decrypt(const psa_key_attributes_t *attributes,
@@ -233,28 +233,52 @@ psa_status_t psa_algorithm_dispatch_aead_decrypt(const psa_key_attributes_t *att
                                                  size_t plaintext_size,
                                                  size_t *plaintext_length);
 
+/**
+ * @brief   Dispatch call of an aead encrypt setup function to a specific backend.
+ *          See @ref psa_aead_encrypt_setup()
+ */
 psa_status_t psa_algorithm_dispatch_aead_encrypt_setup(psa_aead_operation_t *operation,
                                                        const psa_key_attributes_t *attributes,
                                                        const psa_key_slot_t *slot,
                                                        psa_algorithm_t alg);
 
+/**
+ * @brief   Dispatch call of an aead decrypt setup function to a specific backend.
+ *          See @ref psa_aead_decrypt_setup()
+ */
 psa_status_t psa_algorithm_dispatch_aead_decrypt_setup(psa_aead_operation_t *operation,
                                                        const psa_key_attributes_t *attributes,
                                                        const psa_key_slot_t *slot,
                                                        psa_algorithm_t alg);
 
+/**
+ * @brief   Dispatch call of an aead set lengths function to a specific backend.
+ *          See @ref psa_aead_set_lengths()
+ */
 psa_status_t psa_algorithm_dispatch_aead_set_lengths(psa_aead_operation_t *operation,
                                                      size_t ad_length,
                                                      size_t plaintext_length);
 
+/**
+ * @brief   Dispatch call of an aead set nonce function to a specific backend.
+ *          See @ref psa_aead_set_nonce()
+ */
 psa_status_t psa_algorithm_dispatch_aead_set_nonce(psa_aead_operation_t *operation,
                                                    const uint8_t *nonce,
                                                    size_t nonce_length);
 
+/**
+ * @brief   Dispatch call of an aead update ad function to a specific backend.
+ *          See @ref psa_aead_update_ad()
+ */
 psa_status_t psa_algorithm_dispatch_aead_update_ad(psa_aead_operation_t *operation,
                                                    const uint8_t *input,
                                                    size_t input_length);
 
+/**
+ * @brief   Dispatch call of an aead update function to a specific backend.
+ *          See @ref psa_aead_update()
+ */
 psa_status_t psa_algorithm_dispatch_aead_update(psa_aead_operation_t *operation,
                                                 const uint8_t *input,
                                                 size_t input_length,
@@ -262,6 +286,10 @@ psa_status_t psa_algorithm_dispatch_aead_update(psa_aead_operation_t *operation,
                                                 size_t output_size,
                                                 size_t *output_length);
 
+/**
+ * @brief   Dispatch call of an aead finish function to a specific backend.
+ *          See @ref psa_aead_finish()
+ */
 psa_status_t psa_algorithm_dispatch_aead_finish(psa_aead_operation_t *operation,
                                                 uint8_t *ciphertext,
                                                 size_t ciphertext_size,
@@ -270,6 +298,10 @@ psa_status_t psa_algorithm_dispatch_aead_finish(psa_aead_operation_t *operation,
                                                 size_t tag_size,
                                                 size_t *tag_length);
 
+/**
+ * @brief   Dispatch call of an aead verify function to a specific backend.
+ *          See @ref psa_aead_verify()
+ */
 psa_status_t psa_algorithm_dispatch_aead_verify(psa_aead_operation_t *operation,
                                                 uint8_t *plaintext,
                                                 size_t plaintext_size,
