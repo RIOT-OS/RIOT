@@ -1177,10 +1177,6 @@ psa_status_t psa_algorithm_dispatch_aead_finish(psa_aead_operation_t *operation,
     switch (operation->op) {
 #  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
     case PSA_CHACHA20_POLY1305:
-        /* IoT-TODO: Poly1305 requires the total ad and ciphertext length
-         * to finish. This is kinda cheating cuz I’m passing the length
-         * of the plaintext, not the ciphertext!
-         */
         return psa_aead_chacha20_poly1305_finish(&operation->backend_ctx.chacha20poly1305,
                                                  operation->processed_ad_length,
                                                  operation->processed_message_length,

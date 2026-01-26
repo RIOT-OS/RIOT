@@ -369,11 +369,6 @@ psa_status_t psa_aead_set_lengths(psa_aead_operation_t *operation,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    /* IoT-TODO: on lower layers probably */
-    /* return PSA_ERROR_INVALID_ARGUMENT if ad_length or plaintext_length are not acceptable for 
-     * the chosen algorithm.
-     */
-
     status = psa_location_dispatch_aead_set_lengths(operation, ad_length, plaintext_length);
     if (status != PSA_SUCCESS) {
         psa_aead_abort(operation);
@@ -464,10 +459,6 @@ psa_status_t psa_aead_set_nonce(psa_aead_operation_t *operation,
         return PSA_ERROR_BAD_STATE;
     }
 
-    /* IoT-Todo: PSA_ERROR_INVALID_ARGUMENT The size of nonce is not acceptable for the
-     * chosen algorithm. how?! lower layer ?!
-     */
-
     /* call to location dispatch to set nonce in backend */
     status = psa_location_dispatch_aead_set_nonce(operation, nonce, nonce_length);
     if (status != PSA_SUCCESS) {
@@ -500,7 +491,6 @@ psa_status_t psa_aead_update_ad(psa_aead_operation_t *operation,
      * was previously specified with psa_aead_set_lengths() or is too large for the chosen AEAD 
      * algorithm. 
      */
-    /* IoT-TODO: maybe add real limit */
     if (operation->lengths_required && (new_total > operation->ad_length)) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
@@ -537,7 +527,6 @@ psa_status_t psa_aead_update(psa_aead_operation_t *operation,
         return PSA_ERROR_BAD_STATE;
     }
 
-    /* IoT-TODO: maybe set real limit */
     if (operation->lengths_required) {
         /* IoT-Todo: total length of input to @ref psa_aead_update_ad() so far is less than the
      * additional data length that was previously specified with @ref psa_aead_set_lengths() 
@@ -590,8 +579,6 @@ psa_status_t psa_aead_finish(psa_aead_operation_t *operation,
     if (operation->direction != PSA_CRYPTO_DRIVER_ENCRYPT) {
         return PSA_ERROR_BAD_STATE;
     }
-
-    /* IoT-Todo: size of the ciphertext or tag buffer is too small -> prolly on lower layer ? */
 
     status = psa_location_dispatch_aead_finish(operation, ciphertext, ciphertext_size,
                                                ciphertext_length, tag, tag_size, tag_length);
