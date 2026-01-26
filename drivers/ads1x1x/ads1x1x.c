@@ -44,7 +44,14 @@
 static inline int _read_reg(const i2c_t i2c, const uint8_t addr, uint8_t reg_addr,
                             uint16_t *reg_value)
 {
-    if (i2c_read_regs(i2c, addr, reg_addr, reg_value, sizeof(*reg_value), 0) < 0) {
+    int res = i2c_read_regs(i2c, addr, reg_addr, reg_value, sizeof(*reg_value), 0);
+    if (res == -ENXIO) {
+        return ADS1X1X_NODEV;
+    }
+    if (res == -EINVAL){
+        return ADS1X1X_INVALID_ARG;
+    }
+    if (res < 0) {
         return ADS1X1X_NOI2C;
     }
     *reg_value = ntohs(*reg_value);
@@ -65,7 +72,14 @@ static inline int _write_reg(const i2c_t i2c, const uint8_t addr, uint8_t reg_ad
                              uint16_t reg_value)
 {
     reg_value = htons(reg_value);
-    if (i2c_write_regs(i2c, addr, reg_addr, &reg_value, sizeof(reg_value), 0) < 0) {
+    int res = i2c_write_regs(i2c, addr, reg_addr, &reg_value, sizeof(reg_value), 0);
+    if (res == -ENXIO) {
+        return ADS1X1X_NODEV;
+    }
+    if (res == -EINVAL){
+        return ADS1X1X_INVALID_ARG;
+    }
+    if (res < 0) {
         return ADS1X1X_NOI2C;
     }
     return ADS1X1X_OK;
@@ -129,7 +143,6 @@ int ads1x1x_reset(i2c_t i2c)
         return ADS1X1X_NODEV;
     }
     return ADS1X1X_OK;
-
 }
 
 /**
@@ -151,17 +164,18 @@ static int _ads1x1x_init_test(i2c_t i2c, uint8_t addr)
     if (res < 0) {
         DEBUG("[ads1x1x] init - error: read test failed (reg=%04x)\n", reg);
         i2c_release(i2c);
-        return ADS1X1X_NOI2C;
+        return res;
     }
 
     /* Save the configuration register value */
     conf = reg;
 
     /* Write test value */
-    if (_write_config_reg(i2c, addr, ADS1X1X_CONF_TEST_VALUE) < 0) {
+    res = _write_config_reg(i2c, addr, ADS1X1X_CONF_TEST_VALUE);
+    if (res < 0) {
         DEBUG("[ads1x1x] init - error: write test failed\n");
         i2c_release(i2c);
-        return ADS1X1X_NODEV;
+        return res;
     }
 
     /* Read back the configuration register */
@@ -169,14 +183,15 @@ static int _ads1x1x_init_test(i2c_t i2c, uint8_t addr)
     if (res < 0 || reg != ADS1X1X_CONF_TEST_VALUE) {
         DEBUG("[ads1x1x] init - error: read test failed (reg=%04x)\n", reg);
         i2c_release(i2c);
-        return ADS1X1X_NOI2C;
+        return res;
     }
 
     /* Restore original configuration */
-    if (_write_config_reg(i2c, addr, conf) < 0) {
+    res = _write_config_reg(i2c, addr, conf);
+    if (res < 0) {
         DEBUG("[ads1x1x] init - error: write restore failed\n");
         i2c_release(i2c);
-        return ADS1X1X_NODEV;
+        return res;
     }
 
     i2c_release(i2c);
@@ -186,6 +201,7 @@ static int _ads1x1x_init_test(i2c_t i2c, uint8_t addr)
 int ads1x1x_init(ads1x1x_t *dev, const ads1x1x_params_t *params)
 {
     assert(dev && params);
+    assert(dev->params.bits_res > ADS1X1X_BITS_RES_UNDEF && params->dr != ADS1X1X_DATAR_UNDEF);
 
     DEBUG("[ads1x1x] init - i2c=%d, addr=0x%02x\n", params->i2c, params->addr);
 
@@ -206,10 +222,11 @@ int ads1x1x_set_parameters(ads1x1x_t *dev, const ads1x1x_params_t *params)
 
     /* Apply actual configuration */
     uint16_t conf = _build_config_reg(params);
-    if (_write_config_reg(params->i2c, params->addr, conf) < 0) {
+    int res = _write_config_reg(params->i2c, params->addr, conf);
+    if (res < 0) {
         DEBUG("[ads1x1x] init - error: setting config failed\n");
         i2c_release(params->i2c);
-        return ADS1X1X_NOI2C;
+        return res;
     }
 
     i2c_release(params->i2c);
@@ -228,7 +245,7 @@ int ads1x1x_set_mux(ads1x1x_t *dev, uint8_t mux)
     int res = _read_config_reg(DEV, ADDR, &reg);
     if (res < 0) {
         i2c_release(DEV);
-        return ADS1X1X_NOI2C;
+        return res;
     }
 
     /* Update MUX bits */
@@ -237,9 +254,10 @@ int ads1x1x_set_mux(ads1x1x_t *dev, uint8_t mux)
     conf |= (mux << 8);                 /* Set new MUX */
 
     /* Write back updated configuration */
-    if (_write_config_reg(DEV, ADDR, conf) < 0) {
+    res = _write_config_reg(DEV, ADDR, conf);
+    if (res < 0) {
         i2c_release(DEV);
-        return ADS1X1X_NOI2C;
+        return res;
     }
 
     i2c_release(DEV);
@@ -260,7 +278,7 @@ int ads1x1x_read_raw(const ads1x1x_t *dev, int16_t *raw)
     int res = _read_config_reg(DEV, ADDR, &reg);
     if (res < 0) {
         i2c_release(DEV);
-        return ADS1X1X_NOI2C;
+        return res;
     }
 
     /* Single-Shot mode */
@@ -268,9 +286,10 @@ int ads1x1x_read_raw(const ads1x1x_t *dev, int16_t *raw)
 
         /* Tell the ADC to acquire a single-shot sample */
         reg |= (ADS1X1X_CONF_OS_CONV_MASK << 8);
-        if (_write_config_reg(DEV, ADDR, reg) < 0) {
+        res = _write_config_reg(DEV, ADDR, reg);
+        if (res < 0) {
             i2c_release(DEV);
-            return ADS1X1X_NOI2C;
+            return res;
         }
 
         /* Wait for the sample to be acquired */
@@ -281,7 +300,7 @@ int ads1x1x_read_raw(const ads1x1x_t *dev, int16_t *raw)
     res = _read_conv_reg(DEV, ADDR, &reg);
     if (res < 0) {
         i2c_release(DEV);
-        return ADS1X1X_NOI2C;
+        return res;
     }
 
     i2c_release(DEV);
@@ -294,7 +313,7 @@ int ads1x1x_convert_to_mv(const ads1x1x_t *dev, int16_t raw)
 {
     assert(dev);
     uint8_t bits_res = dev->params.bits_res;
-    
+
     /* Normalize signed ADC code: range = [-2^(N-1), 2^(N-1)-1] */
     return ((int32_t)raw * _ads1x1x_get_pga_voltage(dev->params.pga))
            / (1 << (bits_res - 1));
@@ -322,21 +341,23 @@ int ads1x1x_set_alert_parameters(ads1x1x_alert_t *dev, const ads1x1x_alert_param
     i2c_acquire(params->i2c);
 
     /* Set up low_limit */
-    if (_write_low_limit_reg(params->i2c, params->addr, params->low_limit) < 0) {
+    int res = _write_low_limit_reg(params->i2c, params->addr, params->low_limit);
+    if (res < 0) {
         i2c_release(params->i2c);
-        return ADS1X1X_NOI2C;
+        return res;
     }
 
     /* Set up high_limit */
-    if (_write_high_limit_reg(params->i2c, params->addr, params->high_limit) < 0) {
-        i2c_release(params->i2c);
-        return ADS1X1X_NOI2C;
-    }
-
-    int res = _read_config_reg(params->i2c, params->addr, &reg);
+    res = _write_high_limit_reg(params->i2c, params->addr, params->high_limit);
     if (res < 0) {
         i2c_release(params->i2c);
-        return ADS1X1X_NOI2C;
+        return res;
+    }
+
+    res = _read_config_reg(params->i2c, params->addr, &reg);
+    if (res < 0) {
+        i2c_release(params->i2c);
+        return res;
     }
 
     /* Clear alert bits */
@@ -351,9 +372,10 @@ int ads1x1x_set_alert_parameters(ads1x1x_alert_t *dev, const ads1x1x_alert_param
     }
 
     /* Write back updated configuration */
-    if (_write_config_reg(params->i2c, params->addr, reg) < 0) {
+    res = _write_config_reg(params->i2c, params->addr, reg);
+    if (res < 0) {
         i2c_release(params->i2c);
-        return ADS1X1X_NOI2C;
+        return res;
     }
 
     i2c_release(params->i2c);
@@ -378,7 +400,7 @@ int ads1x1x_enable_alert(ads1x1x_alert_t *dev,
     int res = _read_config_reg(DEV, ADDR, &reg);
     if (res < 0) {
         i2c_release(DEV);
-        return ADS1X1X_NOI2C;
+        return res;
     }
 
     /* Enable alert comparator */
@@ -391,9 +413,10 @@ int ads1x1x_enable_alert(ads1x1x_alert_t *dev,
     default: return ADS1X1X_INVALID_ARG;
     }
 
-    if (_write_config_reg(DEV, ADDR, reg) < 0) {
+    res = _write_config_reg(DEV, ADDR, reg);
+    if (res < 0) {
         i2c_release(DEV);
-        return ADS1X1X_NOI2C;
+        return res;
     }
 
     i2c_release(DEV);
