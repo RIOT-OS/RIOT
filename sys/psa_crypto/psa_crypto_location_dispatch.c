@@ -513,6 +513,23 @@ psa_status_t psa_location_dispatch_aead_set_lengths(psa_aead_operation_t *operat
     return psa_algorithm_dispatch_aead_set_lengths(operation, ad_length, plaintext_length);
 }
 
+psa_status_t psa_location_dispatch_aead_generate_nonce(psa_aead_operation_t *operation,
+                                                       uint8_t *nonce,
+                                                       size_t nonce_size,
+                                                       size_t *nonce_length)
+{
+    /* TODO: implement MODULE_PSA_SECURE_ELEMENT support */
+#  if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+    (void)operation;
+    (void)nonce;
+    (void)nonce_size;
+    (void)nonce_length;
+    return PSA_ERROR_NOT_SUPPORTED;
+#  endif /* MODULE_PSA_SECURE_ELEMENT */
+
+    return psa_algorithm_dispatch_aead_generate_nonce(operation, nonce, nonce_size, nonce_length);
+}
+
 psa_status_t psa_location_dispatch_aead_set_nonce(psa_aead_operation_t *operation,
                                                   const uint8_t *nonce,
                                                   size_t nonce_length)

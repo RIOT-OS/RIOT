@@ -260,6 +260,15 @@ psa_status_t psa_algorithm_dispatch_aead_set_lengths(psa_aead_operation_t *opera
                                                      size_t plaintext_length);
 
 /**
+ * @brief   Dispatch call of an aead generate nonce function to a specific backend.
+ *          See @ref psa_aead_generate_nonce()
+ */
+psa_status_t psa_algorithm_dispatch_aead_generate_nonce(psa_aead_operation_t *operation,
+                                                        uint8_t *nonce,
+                                                        size_t nonce_size,
+                                                        size_t *nonce_length);
+
+/**
  * @brief   Dispatch call of an aead set nonce function to a specific backend.
  *          See @ref psa_aead_set_nonce()
  */

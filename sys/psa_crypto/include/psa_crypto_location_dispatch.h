@@ -192,21 +192,21 @@ psa_status_t psa_location_dispatch_cipher_decrypt_setup(psa_cipher_operation_t *
  * @brief   Dispatch call of a cipher finish function to a location specific backend.
  *          See psa_cipher_finish()
  */
-psa_status_t psa_location_dispatch_cipher_finish(   psa_cipher_operation_t *operation,
-                                                    uint8_t *output,
-                                                    size_t output_size,
-                                                    size_t *output_length);
+psa_status_t psa_location_dispatch_cipher_finish(psa_cipher_operation_t *operation,
+                                                 uint8_t *output,
+                                                 size_t output_size,
+                                                 size_t *output_length);
 
 /**
  * @brief   Dispatch call of a cipher update function to a location specific backend.
  *         See psa_cipher_update()
  */
-psa_status_t psa_location_dispatch_cipher_update(   psa_cipher_operation_t *operation,
-                                                    const uint8_t *input,
-                                                    size_t input_length,
-                                                    uint8_t *output,
-                                                    size_t output_size,
-                                                    size_t *output_length);
+psa_status_t psa_location_dispatch_cipher_update(psa_cipher_operation_t *operation,
+                                                 const uint8_t *input,
+                                                 size_t input_length,
+                                                 uint8_t *output,
+                                                 size_t output_size,
+                                                 size_t *output_length);
 
 /**
  * @brief   Dispatch call of a function to set a cipher IV to a location specific backend.
@@ -302,6 +302,15 @@ psa_status_t psa_location_dispatch_aead_decrypt_setup(psa_aead_operation_t *oper
 psa_status_t psa_location_dispatch_aead_set_lengths(psa_aead_operation_t *operation,
                                                     size_t ad_length,
                                                     size_t plaintext_length);
+
+/**
+ * @brief   Dispatch call of an aead generate nonce function to a location specific backend.
+ *          See @ref psa_aead_generate_nonce()
+ */
+psa_status_t psa_location_dispatch_aead_generate_nonce(psa_aead_operation_t *operation,
+                                                       uint8_t *nonce,
+                                                       size_t nonce_size,
+                                                       size_t *nonce_length);
 
 /**
  * @brief   Dispatch call of an aead set nonce function to a location specific backend.

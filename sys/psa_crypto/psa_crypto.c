@@ -406,15 +406,26 @@ psa_status_t psa_aead_generate_nonce(psa_aead_operation_t *operation,
         return PSA_ERROR_BAD_STATE;
     }
 
-    *nonce_length = 0;
+    /* This essentially checks if the nonce size is valid.*/
+    status = psa_location_dispatch_aead_generate_nonce(operation, nonce, nonce_size, nonce_length);
+    if (status != PSA_SUCCESS) {
+        psa_aead_abort(operation);
+        return status;
+    }
 
     status = psa_generate_random(nonce, nonce_size);
     if (status != PSA_SUCCESS) {
         psa_aead_abort(operation);
         return status;
     }
-
     *nonce_length = nonce_size;
+
+    status = psa_aead_set_nonce(operation, nonce, *nonce_length);
+    if (status != PSA_SUCCESS) {
+        psa_aead_abort(operation);
+        return status;
+    }
+
     operation->nonce_set = 1;
 
     return status;

@@ -1099,6 +1099,29 @@ psa_status_t psa_algorithm_dispatch_aead_set_lengths(psa_aead_operation_t *opera
     }
 }
 
+psa_status_t psa_algorithm_dispatch_aead_generate_nonce(psa_aead_operation_t *operation,
+                                                        uint8_t *nonce,
+                                                        size_t nonce_size,
+                                                        size_t *nonce_length)
+{
+    switch (operation->op) {
+#  if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305)
+    case PSA_CHACHA20_POLY1305:
+        /* RIOT only supports 12B nonces for ChachaPoly as specified in RFC 7539. */
+        if (nonce_size != 12) {
+            return PSA_ERROR_INVALID_ARGUMENT;
+        }
+        return PSA_SUCCESS;
+#  endif
+    default:
+        (void)operation;
+        (void)nonce;
+        (void)nonce_size;
+        (void)nonce_length;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+}
+
 psa_status_t psa_algorithm_dispatch_aead_set_nonce(psa_aead_operation_t *operation,
                                                    const uint8_t *nonce,
                                                    size_t nonce_length)
