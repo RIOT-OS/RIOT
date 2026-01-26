@@ -18,7 +18,6 @@ psa_status_t psa_aead_chacha20_poly1305_encrypt(const psa_key_attributes_t *attr
         key_buffer_length != CHACHA20POLY1305_KEY_BYTES) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-    /* IoT-TODO: Should I use PSA_AEAD_ENCRYPT_OUTPUT_SIZE instead here? */
     if (ciphertext_size < plaintext_length + CHACHA20POLY1305_TAG_BYTES) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
