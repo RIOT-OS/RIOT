@@ -39,6 +39,15 @@
 #define ADDR (dev->params.addr)
 
 #define ADS1X1X_CONF_TEST_VALUE (1)
+
+/**
+ * @def ADS1X1X_DEFAULT_CONFIG
+ * @brief Config register default value.
+ *
+ * This value is composed of all configuration register bit-field default
+ * values as defined in the datasheet (PGA=010b, MODE=1b, DR=100b, etc.),
+ * packed into a single 16-bit value.
+ */
 #define ADS1X1X_DEFAULT_CONFIG 0x8385
 
 static inline int _read_reg(const i2c_t i2c, const uint8_t addr, uint8_t reg_addr,

@@ -195,6 +195,9 @@ int ads1x1x_convert_to_mv(const ads1x1x_t *dev, int16_t value);
  * @param[in] i2c   I2C device
  *
  * @return zero on success, non zero on error
+ *
+ * @warning This performs a general-call reset, which affects **all I2C devices** on the bus
+ *          that respond to the general-call reset command, not just the ADS1X1X.
  */
 int ads1x1x_reset(i2c_t i2c);
 
