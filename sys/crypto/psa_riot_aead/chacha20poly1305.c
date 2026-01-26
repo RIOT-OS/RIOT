@@ -12,20 +12,22 @@ psa_status_t psa_aead_chacha20_poly1305_encrypt(const psa_key_attributes_t *attr
                                                 size_t ciphertext_size, size_t *ciphertext_length)
 {
     (void)attributes;
-    (void)key_buffer_length;
-    (void)ciphertext_size;
-    (void)ciphertext_length;
 
-    if (nonce_length != CHACHA20POLY1305_NONCE_BYTES) {
+    if (nonce_length != CHACHA20POLY1305_NONCE_BYTES ||
+        tag_length != CHACHA20POLY1305_TAG_BYTES ||
+        key_buffer_length != CHACHA20POLY1305_KEY_BYTES) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-    if (tag_length != CHACHA20POLY1305_TAG_BYTES) {
-        return PSA_ERROR_INVALID_ARGUMENT;
+    /* IoT-TODO: Should I use PSA_AEAD_ENCRYPT_OUTPUT_SIZE instead here? */
+    if (ciphertext_size < plaintext_length + CHACHA20POLY1305_TAG_BYTES) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
     chacha20poly1305_encrypt(ciphertext, plaintext, plaintext_length,
                              additional_data, additional_data_length,
                              key_buffer, nonce);
+
+    *ciphertext_length = plaintext_length + CHACHA20POLY1305_TAG_BYTES;
 
     return PSA_SUCCESS;
 }
@@ -39,14 +41,14 @@ psa_status_t psa_aead_chacha20_poly1305_decrypt(const psa_key_attributes_t *attr
                                                 size_t plaintext_size, size_t *plaintext_length)
 {
     (void)attributes;
-    (void)key_buffer_length;
-    (void)plaintext_size;
 
-    if (nonce_length != CHACHA20POLY1305_NONCE_BYTES) {
+    if (nonce_length != CHACHA20POLY1305_NONCE_BYTES ||
+        tag_length != CHACHA20POLY1305_TAG_BYTES ||
+        key_buffer_length != CHACHA20POLY1305_KEY_BYTES) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-    if (tag_length != CHACHA20POLY1305_TAG_BYTES) {
-        return PSA_ERROR_INVALID_ARGUMENT;
+    if (plaintext_size < ciphertext_length - CHACHA20POLY1305_TAG_BYTES) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
     int status = chacha20poly1305_decrypt(ciphertext, ciphertext_length,
@@ -100,7 +102,26 @@ psa_status_t psa_aead_chacha20_poly1305_set_nonce(psa_aead_chacha20_poly1305_ctx
 
     /* Since the iv_length is 12 here, this effectively sets the nonce. */
     psa_cipher_chacha20_set_iv(&ctx->chacha, nonce, nonce_length);
+
+#if IS_USED(MODULE_PSA_RIOT_CIPHER_CHACHA20)
     poly1305_init_from_chacha(&ctx->chacha.ctx, &ctx->poly);
+#endif
+    
+#if IS_USED(MODULE_PERIPH_CIPHER_CHACHA20)
+    static const uint8_t input[CRYS_CHACHA_BLOCK_SIZE_IN_BYTES] = { 0 };
+    uint8_t output[CRYS_CHACHA_BLOCK_SIZE_IN_BYTES];
+    size_t output_length;
+    psa_cipher_chacha20_update(&ctx->chacha, input, sizeof(input), output, sizeof(output), &output_length);
+
+    /* ciphertext = keystream xor plaintext --> keystream = plaintext xor ciphertext
+     * Also increments counter of Chacha ctx to 1 for further encryption. */
+    uint8_t chacha_keystream[32];
+    for (int i = 0; i < 32; i++) {
+        chacha_keystream[i] = input[i] ^ output[i];
+    }
+
+    poly1305_init(&ctx->poly, chacha_keystream);
+#endif
 
     return PSA_SUCCESS;
 }
@@ -157,8 +178,7 @@ psa_status_t psa_aead_chacha20_poly1305_finish(psa_aead_chacha20_poly1305_ctx_t 
                                                size_t tag_size,
                                                size_t *tag_length)
 {
-    /* IoT-TODO: is this the same as tag length? */
-    if (tag_size < POLY1305_BLOCK_SIZE) {
+    if (tag_size < CHACHA20POLY1305_TAG_BYTES) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
@@ -177,7 +197,7 @@ psa_status_t psa_aead_chacha20_poly1305_finish(psa_aead_chacha20_poly1305_ctx_t 
     poly1305_update(&ctx->poly, (uint8_t *)lengths, sizeof(lengths));
 
     poly1305_finish(&ctx->poly, tag);
-    *tag_length = POLY1305_BLOCK_SIZE;
+    *tag_length = CHACHA20POLY1305_TAG_BYTES;
 
     return PSA_SUCCESS;
 }

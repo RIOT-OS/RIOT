@@ -15,7 +15,13 @@ extern "C" {
 #endif
 
 #if IS_USED(MODULE_PSA_RIOT_AEAD_CHACHA20_POLY1305)
-#include "riot_ciphers.h"
+#  if IS_USED(MODULE_PSA_RIOT_CIPHER_CHACHA20)
+#    include "riot_ciphers.h"
+#  endif
+#  if IS_USED(MODULE_PERIPH_CIPHER_CHACHA20)
+#    include "psa_periph_chacha20_ctx.h"
+#    include "crypto/poly1305.h"
+#  endif
 /* IoT-TODO: maybe union */
 typedef struct {
     /* This uses a modified Chacha20 context to handle

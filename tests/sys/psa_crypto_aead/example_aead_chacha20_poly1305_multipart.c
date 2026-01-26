@@ -19,7 +19,7 @@
 
 /* Test Vector from RFC 7539, https://datatracker.ietf.org/doc/html/rfc7539. */
 
-uint8_t PLAINTEXT[] = {
+static const uint8_t PLAINTEXT[] = {
     0x4c, 0x61, 0x64, 0x69, 0x65, 0x73, 0x20, 0x61, 0x6e, 0x64, 0x20, 0x47, 0x65, 0x6e, 0x74, 0x6c,
     0x65, 0x6d, 0x65, 0x6e, 0x20, 0x6f, 0x66, 0x20, 0x74, 0x68, 0x65, 0x20, 0x63, 0x6c, 0x61, 0x73,
     0x73, 0x20, 0x6f, 0x66, 0x20, 0x27, 0x39, 0x39, 0x3a, 0x20, 0x49, 0x66, 0x20, 0x49, 0x20, 0x63,
@@ -30,23 +30,23 @@ uint8_t PLAINTEXT[] = {
     0x74, 0x2e
 };
 
-uint8_t ADDITIONAL_DATA[] = {
+static const uint8_t ADDITIONAL_DATA[] = {
     0x50, 0x51, 0x52, 0x53,
     0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7
 };
 
-uint8_t KEY_CHACHA20[] = {
+static const uint8_t KEY_CHACHA20[] = {
     0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
     0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
     0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97,
     0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f
 };
 
-uint8_t NONCE[] = {
+static const uint8_t NONCE[] = {
     0x07, 0x00, 0x00, 0x00, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47
 };
 
-uint8_t CIPHERTEXT[] = {
+static const uint8_t CIPHERTEXT[] = {
     0xd3, 0x1a, 0x8d, 0x34, 0x64, 0x8e, 0x60, 0xdb, 0x7b, 0x86, 0xaf, 0xbc, 0x53, 0xef, 0x7e, 0xc2,
     0xa4, 0xad, 0xed, 0x51, 0x29, 0x6e, 0x08, 0xfe, 0xa9, 0xe2, 0xb5, 0xa7, 0x36, 0xee, 0x62, 0xd6,
     0x3d, 0xbe, 0xa4, 0x5e, 0x8c, 0xa9, 0x67, 0x12, 0x82, 0xfa, 0xfb, 0x69, 0xda, 0x92, 0x72, 0x8b,
@@ -57,7 +57,7 @@ uint8_t CIPHERTEXT[] = {
     0x61, 0x16
 };
 
-uint8_t TAG[] = {
+static const uint8_t TAG[] = {
     0x1a, 0xe1, 0x0b, 0x59,
     0x4f, 0x09, 0xe2, 0x6a,
     0x7e, 0x90, 0x2e, 0xcb,
@@ -88,9 +88,11 @@ psa_status_t example_aead_chacha20_poly1305_multipart(void)
     /* KEY IMPORT ------------------------ */
 
     /* ENCRYPT & TAG-GEN ----------------- */
-    const size_t ciphertext_size = PSA_AEAD_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20,
-                                                                alg,
-                                                                sizeof(PLAINTEXT));
+    /* Note: Since the PSA AEAD Multipart Operation seperates ciphertext and tag,
+     * we calculate the ciphertext size with the related cipher macro. */
+    const size_t ciphertext_size = PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20,
+                                                                  alg,
+                                                                  sizeof(PLAINTEXT));
     const size_t tag_size = PSA_AEAD_TAG_LENGTH(PSA_KEY_TYPE_CHACHA20,
                                                 PSA_BYTES_TO_BITS(sizeof(KEY_CHACHA20)),
                                                 alg);
@@ -117,9 +119,7 @@ psa_status_t example_aead_chacha20_poly1305_multipart(void)
     size_t chunk_length = 5;
     size_t bytes_in = 0;
     while (bytes_in < sizeof(ADDITIONAL_DATA)) {
-        if ((sizeof(ADDITIONAL_DATA) - bytes_in) < chunk_length) {
-            chunk_length = sizeof(ADDITIONAL_DATA) - bytes_in;
-        }
+        chunk_length = (sizeof(ADDITIONAL_DATA) - bytes_in) < chunk_length ? (sizeof(ADDITIONAL_DATA) - bytes_in) : chunk_length;
 
         status = psa_aead_update_ad(&operation,
                                     &ADDITIONAL_DATA[bytes_in],
@@ -137,9 +137,7 @@ psa_status_t example_aead_chacha20_poly1305_multipart(void)
     bytes_in = 0;
     size_t bytes_out = 0;
     while (bytes_in < sizeof(PLAINTEXT)) {
-        if ((sizeof(PLAINTEXT) - bytes_in) < chunk_length) {
-            chunk_length = sizeof(PLAINTEXT) - bytes_in;
-        }
+        chunk_length = (sizeof(PLAINTEXT) - bytes_in) < chunk_length ? (sizeof(PLAINTEXT) - bytes_in) : chunk_length;
 
         size_t chunk_out_length;
         status = psa_aead_update(&operation,
@@ -189,9 +187,9 @@ psa_status_t example_aead_chacha20_poly1305_multipart(void)
     /* ENCRYPT & TAG-GEN ----------------- */
 
     /* DECRYPT & VERIFY ------------------ */
-    /* IoT-TODO: This macro is broken
-     * const size_t plaintext_size = PSA_AEAD_DECRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20, alg, sizeof(CIPHERTEXT)); */
-    const size_t plaintext_size = sizeof(PLAINTEXT);
+    /* IoT-TODO: You can't use PSA_CIPHER_DECRYPT_OUTPUT_SIZE here, since
+     * it subtracts the IV length. */
+    const size_t plaintext_size = PSA_CIPHER_DECRYPT_OUTPUT_MAX_SIZE(sizeof(CIPHERTEXT));
     uint8_t plaintext[plaintext_size];
 
     operation = psa_aead_operation_init();
@@ -213,9 +211,7 @@ psa_status_t example_aead_chacha20_poly1305_multipart(void)
     chunk_length = 5;
     bytes_in = 0;
     while (bytes_in < sizeof(ADDITIONAL_DATA)) {
-        if ((sizeof(ADDITIONAL_DATA) - bytes_in) < chunk_length) {
-            chunk_length = sizeof(ADDITIONAL_DATA) - bytes_in;
-        }
+        chunk_length = (sizeof(ADDITIONAL_DATA) - bytes_in) < chunk_length ? (sizeof(ADDITIONAL_DATA) - bytes_in) : chunk_length;
 
         status = psa_aead_update_ad(&operation,
                                     &ADDITIONAL_DATA[bytes_in],
@@ -233,9 +229,7 @@ psa_status_t example_aead_chacha20_poly1305_multipart(void)
     bytes_in = 0;
     bytes_out = 0;
     while (bytes_in < sizeof(CIPHERTEXT)) {
-        if ((sizeof(CIPHERTEXT) - bytes_in) < chunk_length) {
-            chunk_length = sizeof(CIPHERTEXT) - bytes_in;
-        }
+        chunk_length = (sizeof(CIPHERTEXT) - bytes_in) < chunk_length ? (sizeof(CIPHERTEXT) - bytes_in) : chunk_length;
 
         size_t chunk_out_length;
         status = psa_aead_update(&operation,

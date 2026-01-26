@@ -14,9 +14,6 @@
  *
  * @}
  */
-#include "psa/aead/sizes.h"
-#include "psa/error.h"
-#include "psa/key/type.h"
 #include <stdio.h>
 #include "psa/crypto.h"
 
@@ -25,24 +22,24 @@
  *
  *  https://datatracker.ietf.org/doc/html/draft-nir-cfrg-chacha20-poly1305-06#appendix-A.5
  */
-uint8_t KEY_CHACHA20_ONESHOT[] = {
+static const uint8_t KEY_CHACHA20_ONESHOT[] = {
     0x1c, 0x92, 0x40, 0xa5, 0xeb, 0x55, 0xd3, 0x8a,
     0xf3, 0x33, 0x88, 0x86, 0x04, 0xf6, 0xb5, 0xf0,
     0x47, 0x39, 0x17, 0xc1, 0x40, 0x2b, 0x80, 0x09,
     0x9d, 0xca, 0x5c, 0xbc, 0x20, 0x70, 0x75, 0xc0
 };
 
-uint8_t NONCE_CHACHA20_ONESHOT[] = {
+static const uint8_t NONCE_CHACHA20_ONESHOT[] = {
     0x00, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04,
     0x05, 0x06, 0x07, 0x08
 };
 
-uint8_t ADDITIONAL_DATA_ONESHOT[] = {
+static const uint8_t ADDITIONAL_DATA_ONESHOT[] = {
     0xf3, 0x33, 0x88, 0x86, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x4e, 0x91
 };
 
-uint8_t PLAINTEXT_ONESHOT[] = {
+static const uint8_t PLAINTEXT_ONESHOT[] = {
     0x49, 0x6E, 0x74, 0x65, 0x72, 0x6E, 0x65, 0x74, 0x2D, 0x44, 0x72, 0x61, 0x66, 0x74, 0x73, 0x20,
     0x61, 0x72, 0x65, 0x20, 0x64, 0x72, 0x61, 0x66, 0x74, 0x20, 0x64, 0x6F, 0x63, 0x75, 0x6D, 0x65,
     0x6E, 0x74, 0x73, 0x20, 0x76, 0x61, 0x6C, 0x69, 0x64, 0x20, 0x66, 0x6F, 0x72, 0x20, 0x61, 0x20,
@@ -62,7 +59,7 @@ uint8_t PLAINTEXT_ONESHOT[] = {
     0x72, 0x65, 0x73, 0x73, 0x2E, 0x2F, 0xE2, 0x80, 0x9D
 };
 
-uint8_t CIPHERTEXT_ONESHOT[] = {
+static const uint8_t CIPHERTEXT_ONESHOT[] = {
     0x64, 0xA0, 0x86, 0x15, 0x75, 0x86, 0x1A, 0xF4, 0x60, 0xF0, 0x62, 0xC7, 0x9B, 0xE6, 0x43, 0xBD,
     0x5E, 0x80, 0x5C, 0xFD, 0x34, 0x5C, 0xF3, 0x89, 0xF1, 0x08, 0x67, 0x0A, 0xC7, 0x6C, 0x8C, 0xB2,
     0x4C, 0x6C, 0xFC, 0x18, 0x75, 0x5D, 0x43, 0xEE, 0xA0, 0x9E, 0xE9, 0x4E, 0x38, 0x2D, 0x26, 0xB0,
@@ -102,7 +99,7 @@ psa_status_t example_aead_chacha20_poly1305(void)
 
     psa_set_key_algorithm(&attr, alg);
     psa_set_key_usage_flags(&attr, usage);
-    psa_set_key_bits(&attr, 256);
+    psa_set_key_bits(&attr, PSA_BYTES_TO_BITS(sizeof(KEY_CHACHA20_ONESHOT)));
     psa_set_key_type(&attr, PSA_KEY_TYPE_CHACHA20);
 
     status = psa_import_key(&attr, KEY_CHACHA20_ONESHOT, sizeof(KEY_CHACHA20_ONESHOT), &key_id);
@@ -119,7 +116,7 @@ psa_status_t example_aead_chacha20_poly1305(void)
                                                                 sizeof(PLAINTEXT_ONESHOT));
     uint8_t ciphertext[ciphertext_size];
 
-    size_t output_len = 0;
+    size_t output_len;
     status = psa_aead_encrypt(key_id,
                               alg,
                               NONCE_CHACHA20_ONESHOT,
@@ -131,7 +128,6 @@ psa_status_t example_aead_chacha20_poly1305(void)
                               ciphertext,
                               ciphertext_size,
                               &output_len);
-    printf("%lu %lu\n", ciphertext_size, output_len);
 
     if (status != PSA_SUCCESS) {
         psa_destroy_key(key_id);
@@ -139,7 +135,7 @@ psa_status_t example_aead_chacha20_poly1305(void)
         return status;
     }
 
-    if (memcmp(ciphertext, CIPHERTEXT_ONESHOT, sizeof(CIPHERTEXT_ONESHOT))) {
+    if (memcmp(ciphertext, CIPHERTEXT_ONESHOT, sizeof(CIPHERTEXT_ONESHOT)) != 0) {
         psa_destroy_key(key_id);
         puts("CHACHA20POLY1305: wrong ciphertext on encryption\n");
         return PSA_ERROR_DATA_INVALID;
@@ -147,9 +143,7 @@ psa_status_t example_aead_chacha20_poly1305(void)
     /* ENCRYPT & TAG-GEN ----------------- */
 
     /* DECRYPT & VERIFY ------------------ */
-    /* IoT-TODO: This macro is broken
-     * const size_t plaintext_size = PSA_AEAD_DECRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20, alg, sizeof(CIPHERTEXT_ONESHOT)); */
-    const size_t plaintext_size = sizeof(PLAINTEXT_ONESHOT);
+    const size_t plaintext_size = PSA_AEAD_DECRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20, alg, sizeof(CIPHERTEXT_ONESHOT));
     uint8_t plaintext[plaintext_size];
 
     status = psa_aead_decrypt(key_id,
@@ -170,7 +164,7 @@ psa_status_t example_aead_chacha20_poly1305(void)
         return status;
     }
 
-    if (memcmp(plaintext, PLAINTEXT_ONESHOT, sizeof(PLAINTEXT_ONESHOT))) {
+    if (memcmp(plaintext, PLAINTEXT_ONESHOT, sizeof(PLAINTEXT_ONESHOT)) != 0) {
         printf("CHACHA20POLY1305: wrong plaintext on decryption\n");
         return PSA_ERROR_DATA_INVALID;
     }
