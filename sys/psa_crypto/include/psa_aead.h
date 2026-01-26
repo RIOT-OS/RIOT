@@ -106,6 +106,10 @@ psa_status_t psa_aead_aes_256_ccm_decrypt(const psa_key_attributes_t *attributes
 #  endif /* MODULE_PSA_AEAD_AES_256_CCM */
 
 #  if IS_USED(MODULE_PSA_RIOT_AEAD_CHACHA20_POLY1305) || defined(DOXYGEN)
+/**
+* @brief   Low level wrapper function to call a driver for a ChaCha20-Poly1305 encryption.
+*          See @ref psa_aead_encrypt()
+*/
 psa_status_t psa_aead_chacha20_poly1305_encrypt(const psa_key_attributes_t *attributes,
                                                 uint8_t *key_buffer, size_t key_buffer_length,
                                                 uint8_t tag_length, const uint8_t *nonce,
@@ -114,6 +118,10 @@ psa_status_t psa_aead_chacha20_poly1305_encrypt(const psa_key_attributes_t *attr
                                                 size_t plaintext_length, uint8_t *ciphertext,
                                                 size_t ciphertext_size, size_t *ciphertext_length);
 
+/**
+* @brief   Low level wrapper function to call a driver for a ChaCha20-Poly1305 decryption.
+*          See @ref psa_aead_decrypt()
+*/
 psa_status_t psa_aead_chacha20_poly1305_decrypt(const psa_key_attributes_t *attributes,
                                                 uint8_t *key_buffer, size_t key_buffer_length,
                                                 uint8_t tag_length, const uint8_t *nonce,
@@ -122,22 +130,44 @@ psa_status_t psa_aead_chacha20_poly1305_decrypt(const psa_key_attributes_t *attr
                                                 size_t ciphertext_length, uint8_t *plaintext,
                                                 size_t plaintext_size, size_t *plaintext_length);
 
+/**
+* @brief   Low level wrapper function to call a driver for a ChaCha20-Poly1305 encryption setup.
+*          See @ref psa_aead_encrypt_setup()
+*/
 psa_status_t psa_aead_chacha20_poly1305_encrypt_setup(psa_aead_chacha20_poly1305_ctx_t *ctx,
                                                       uint8_t *key,
                                                       size_t key_length);
 
+/**
+* @brief   Low level wrapper function to call a driver for a ChaCha20-Poly1305 decryption setup.
+*          See @ref psa_aead_decrypt_setup()
+*/
 psa_status_t psa_aead_chacha20_poly1305_decrypt_setup(psa_aead_chacha20_poly1305_ctx_t *ctx,
                                                       uint8_t *key,
                                                       size_t key_length);
 
+/**
+* @brief   Low level wrapper function to call a driver to set a ChaCha20-Poly1305 nonce.
+*          See @ref psa_aead_set_nonce()
+*/
 psa_status_t psa_aead_chacha20_poly1305_set_nonce(psa_aead_chacha20_poly1305_ctx_t *ctx,
                                                   const uint8_t *nonce,
                                                   size_t nonce_length);
 
+/**
+* @brief   Low level wrapper function to call a driver to add additional data to a
+*          ChaCha20-Poly1305 operation.
+*          See @ref psa_aead_update_ad()
+*/
 psa_status_t psa_aead_chacha20_poly1305_update_ad(psa_aead_chacha20_poly1305_ctx_t *ctx,
                                                   const uint8_t *ad,
                                                   size_t ad_length);
 
+/**
+* @brief   Low level wrapper function to call a driver to update a ChaCha20-Poly1305 operation
+*          with plaintext/ciphertext data.
+*          See @ref psa_aead_update()
+*/
 psa_status_t psa_aead_chacha20_poly1305_update(psa_aead_chacha20_poly1305_ctx_t *ctx,
                                                size_t setup_done,
                                                psa_encrypt_or_decrypt_t direction,
@@ -147,6 +177,11 @@ psa_status_t psa_aead_chacha20_poly1305_update(psa_aead_chacha20_poly1305_ctx_t 
                                                size_t output_size,
                                                size_t *output_length);
 
+/**
+* @brief   Low level wrapper function to call a driver to finish a ChaCha20-Poly1305 encryption
+*          operation and get the resulting ciphertext and tag.
+*          See @ref psa_aead_finish()
+*/
 psa_status_t psa_aead_chacha20_poly1305_finish(psa_aead_chacha20_poly1305_ctx_t *ctx,
                                                size_t total_ad_length,
                                                size_t current_ciphertext_length,
@@ -157,6 +192,11 @@ psa_status_t psa_aead_chacha20_poly1305_finish(psa_aead_chacha20_poly1305_ctx_t 
                                                size_t tag_size,
                                                size_t *tag_length);
 
+/**
+* @brief   Low level wrapper function to call a driver to finish a ChaCha20-Poly1305 decryption
+*          operation and get the resulting plaintext after verifying the tag.
+*          See @ref psa_aead_verify()
+*/
 psa_status_t psa_aead_chacha20_poly1305_verify(psa_aead_chacha20_poly1305_ctx_t *ctx,
                                                size_t total_ad_length,
                                                size_t current_ciphertext_length,

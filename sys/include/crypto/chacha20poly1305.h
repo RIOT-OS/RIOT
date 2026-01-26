@@ -169,6 +169,11 @@ void chacha20_finish(chacha20_ctx_t *ctx,
                      size_t input_length,
                      uint8_t *output);
 
+/**
+ * @brief Initialize a Poly1305 context from a ChaCha20 context.
+ * @param[in]   chacha_ctx  ChaCha20 context to derive the Poly1305 key from.
+ * @param[out]  poly_ctx    Resulting Poly1305 context.
+ */
 void poly1305_init_from_chacha(chacha20_ctx_t *chacha_ctx,
                                poly1305_ctx_t *poly_ctx);
 #ifdef __cplusplus
