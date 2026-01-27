@@ -1,9 +1,7 @@
-#include <stdio.h>
-#include "psa/crypto.h"
+#include "psa/cipher/types.h"
+#include "psa/error.h"
 #include "crypto/chacha20poly1305.h"
-
-#define ENABLE_DEBUG 0
-#include "debug.h"
+#include "psa_ciphers.h"
 
 psa_status_t psa_aead_chacha20_poly1305_encrypt(const psa_key_attributes_t *attributes,
                                                 uint8_t *key_buffer, size_t key_buffer_length,
@@ -14,25 +12,21 @@ psa_status_t psa_aead_chacha20_poly1305_encrypt(const psa_key_attributes_t *attr
                                                 size_t ciphertext_size, size_t *ciphertext_length)
 {
     (void)attributes;
-    (void)key_buffer_length;
-    (void)tag_length;
-    (void)ciphertext_size;
-    (void)ciphertext_length;
 
-    DEBUG("RIOT ChaCha20Poly1305 AEAD Encrypt\n");
-
-    /* Only 12 and 8 byte nonces are supported. */
-    switch (nonce_length) {
-    case 12:
-    case 8:
-        break;
-    default:
+    if (nonce_length != CHACHA20POLY1305_NONCE_BYTES ||
+        tag_length != CHACHA20POLY1305_TAG_BYTES ||
+        key_buffer_length != CHACHA20POLY1305_KEY_BYTES) {
         return PSA_ERROR_INVALID_ARGUMENT;
+    }
+    if (ciphertext_size < plaintext_length + CHACHA20POLY1305_TAG_BYTES) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
     chacha20poly1305_encrypt(ciphertext, plaintext, plaintext_length,
                              additional_data, additional_data_length,
                              key_buffer, nonce);
+
+    *ciphertext_length = plaintext_length + CHACHA20POLY1305_TAG_BYTES;
 
     return PSA_SUCCESS;
 }
@@ -46,25 +40,23 @@ psa_status_t psa_aead_chacha20_poly1305_decrypt(const psa_key_attributes_t *attr
                                                 size_t plaintext_size, size_t *plaintext_length)
 {
     (void)attributes;
-    (void)key_buffer_length;
-    (void)tag_length;
-    (void)plaintext_size;
 
-    DEBUG("RIOT ChaCha20Poly1305 AEAD Decrypt\n");
-
-    /* Only 12 and 8 byte nonces are supported. */
-    switch (nonce_length) {
-    case 12:
-    case 8:
-        break;
-    default:
+    if (nonce_length != CHACHA20POLY1305_NONCE_BYTES ||
+        tag_length != CHACHA20POLY1305_TAG_BYTES ||
+        key_buffer_length != CHACHA20POLY1305_KEY_BYTES) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
+    if (plaintext_size < ciphertext_length - CHACHA20POLY1305_TAG_BYTES) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
+    }
 
-    chacha20poly1305_decrypt(ciphertext, ciphertext_length,
-                             plaintext, plaintext_length,
-                             additional_data, additional_data_length,
-                             key_buffer, nonce);
+    int status = chacha20poly1305_decrypt(ciphertext, ciphertext_length,
+                                          plaintext, plaintext_length,
+                                          additional_data, additional_data_length,
+                                          key_buffer, nonce);
+    if (status == 0) {
+        return PSA_ERROR_INVALID_SIGNATURE;
+    }
 
     return PSA_SUCCESS;
 }

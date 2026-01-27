@@ -106,6 +106,10 @@ psa_status_t psa_aead_aes_256_ccm_decrypt(const psa_key_attributes_t *attributes
 #endif /* MODULE_PSA_AEAD_AES_256_CCM */
 
 #if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305) || defined(DOXYGEN)
+/**
+* @brief   Low level wrapper function to call a driver for a ChaCha20-Poly1305 encryption.
+*          See @ref psa_aead_encrypt()
+*/
 psa_status_t psa_aead_chacha20_poly1305_encrypt(const psa_key_attributes_t *attributes,
                                                   uint8_t *key_buffer, size_t key_buffer_length,
                                                   uint8_t tag_length, const uint8_t *nonce,
@@ -114,6 +118,10 @@ psa_status_t psa_aead_chacha20_poly1305_encrypt(const psa_key_attributes_t *attr
                                                   size_t plaintext_length, uint8_t *ciphertext,
                                                   size_t ciphertext_size, size_t *ciphertext_length);
 
+/**
+* @brief   Low level wrapper function to call a driver for a ChaCha20-Poly1305 decryption.
+*          See @ref psa_aead_decrypt()
+*/
 psa_status_t psa_aead_chacha20_poly1305_decrypt(const psa_key_attributes_t *attributes,
                                                   uint8_t *key_buffer, size_t key_buffer_length,
                                                   uint8_t tag_length, const uint8_t *nonce,
