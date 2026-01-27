@@ -246,12 +246,29 @@ typedef struct {
 } ndef_t;
 
 /**
- * @brief Pretty prints the NDEF message descriptors in human-readable format.
+ * @brief Returns the current content size of the NDEF message
  *
- * @param[in] ndef_record_descriptors   Pointer to the array of record descriptors
- * @param[in] record_count 				Number of records in the array
+ * @param[in] ndef NDEF message
+ *
+ * @return size_t size of the NDEF message
  */
-void ndef_pretty_print(const ndef_record_desc_t *ndef_record_descriptors, size_t record_count);
+size_t ndef_get_size(const ndef_t *ndef);
+
+/**
+ * @brief Returns the capacity of the NDEF message
+ *
+ * @param[in] ndef NDEF message
+ *
+ * @return size_t capacity of the NDEF message
+ */
+size_t ndef_get_capacity(const ndef_t *ndef);
+
+/**
+ * @brief Pretty prints the NDEF message in human-readable format.
+ *
+ * @param[in] ndef  NDEF message
+ */
+void ndef_pretty_print(const ndef_t *ndef) {
 
 /**
  * @brief Initializes the given NDEF message with the given buffer and buffer size.
@@ -282,14 +299,6 @@ int ndef_record_header_add(ndef_t *ndef, const uint8_t *type, uint8_t type_lengt
     const uint8_t *id, uint8_t id_length, uint32_t payload_length, ndef_record_tnf_t tnf);
 
 /**
- * @brief Returns the current size of the NDEF message
- *
- * @param[in] ndef NDEF message
- * @return size_t Size of the message
- */
-static inline size_t ndef_get_size(const ndef_t *ndef);
-
-/**
  * @brief Removes the last record from the NDEF message
  *
  * @param[in,out] ndef Message to remove the last record from
@@ -308,6 +317,7 @@ void ndef_clear(ndef_t *ndef);
  * @brief Parses the NDEF message and returns the record descriptors
  *
  * @note The array must be large enough to hold all record descriptors.
+ *
  * @param[in]   ndef                    NDEF message to parse
  * @param[out]  record_descriptors      Array of record descriptors
  * @param[in]   record_descriptors_size Size of the array
@@ -323,10 +333,22 @@ int ndef_parse(const ndef_t *ndef, ndef_record_desc_t *record_descriptors,
  *
  * @param[in]   ndef_record         NDEF record to parse
  * @param[out]  record_descriptor   Record descriptor to fill
- *
  */
 void ndef_record_parse(const uint8_t *ndef_record, ndef_record_desc_t *record_descriptor);
 
+/**
+ * @brief Creates an NDEF message from a byte buffer
+ *
+ * @param[out]   ndef        NDEF message
+ * @param[in]    buffer      Byte buffer
+ * @param[in]    buffer_size Size of the buffer
+ *
+ * @retval 0 on success
+ * @retval -1 if the buffer can't be parsed
+ */
+int ndef_from_buffer(ndef_t *ndef, const uint8_t *buffer, size_t buffer_size);
+
+/* MARK: Text*/
 /**
  * @brief NDEF text encoding
  */
@@ -346,6 +368,7 @@ typedef enum {
  * @param[in]       lang_code           Language code
  * @param[in]       lang_code_length    Length of the language code
  * @param[in]       encoding            Encoding of the text
+ *
  * @retval 0                            on success
  * @retval -1                           if writing the payload failed
  */
@@ -353,15 +376,7 @@ int ndef_record_add_text(ndef_t *ndef, const char *text, uint32_t text_length,
                          const char *lang_code, uint8_t lang_code_length,
                          ndef_text_encoding_t encoding);
 
-/**
- * @brief Calculates the size of an NDEF text record
- *
- * @param[in] text_length       Length of the text
- * @param[in] lang_code_length  Length of the language code
- * @return Size of the text record
- */
-size_t ndef_record_calculate_text_size(uint32_t text_length, uint8_t lang_code_length);
-
+/* MARK: URI */
 /**
  * @brief NDEF URI types
  */
@@ -417,6 +432,7 @@ typedef enum {
 int ndef_record_uri_add(ndef_t *ndef, ndef_uri_identifier_code_t identifier_code,
                         const char *uri, uint32_t uri_length);
 
+/* MARK: MIME */
 /**
  * @brief
  *
