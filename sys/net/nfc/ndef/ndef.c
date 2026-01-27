@@ -40,7 +40,25 @@
 #define RECORD_IL_MASK                   (1 << 3)
 #define RECORD_TNF_MASK                  (0b00000111)
 
-void ndef_pretty_print(const ndef_record_desc_t *ndef_record_descriptors, size_t record_count)
+size_t ndef_get_size(const ndef_t *ndef)
+{
+    return (size_t) (ndef->buffer.cursor - ndef->buffer.memory);
+}
+
+size_t ndef_get_capacity(const ndef_t *ndef) {
+    assert(ndef != NULL);
+
+    return (size_t)(ndef->buffer.memory_end - ndef->buffer.memory + 1);
+}
+
+/**
+ * @brief Prints an array of NDEF record descriptors
+ *
+ * @param[in] ndef_record_descriptors   Array of record descriptors
+ * @param[in] record_count              Number of record descriptors in array
+ */
+static void ndef_record_descriptors_pretty_print(const ndef_record_desc_t *ndef_record_descriptors,
+    size_t record_count)
 {
     print_str("----------------\n\n");
     for (size_t i = 0; i < (size_t)record_count; ++i) {
@@ -70,6 +88,12 @@ void ndef_pretty_print(const ndef_record_desc_t *ndef_record_descriptors, size_t
         print_str("Payload: "); print_bytes_hex(record->payload, payload_length); print_str("\n\n");
     }
     print_str("----------------\n");
+}
+
+void ndef_pretty_print(const ndef_t *ndef) {
+    ndef_record_desc_t ndef_record_descriptors[MAX_NDEF_RECORD_COUNT];
+    ndef_parse(ndef, ndef_record_descriptors, MAX_NDEF_RECORD_COUNT);
+    ndef_record_descriptors_pretty_print(ndef_record_descriptors, ndef->record_count);
 }
 
 /**
@@ -272,6 +296,12 @@ static inline size_t ndef_record_calculate_size(uint8_t type_length, uint8_t id_
     return size;
 }
 
+/**
+ * @brief Parses a single NDEF record and returns its record descriptor
+ *
+ * @param[in] ndef_record   the NDEF record
+ * @param[out] record_desc  the NDEF record descriptor
+ */
 static void ndef_record_parse(const uint8_t *ndef_record, ndef_record_desc_t *record_desc)
 {
     assert(ndef_record != NULL);
@@ -347,10 +377,58 @@ int ndef_parse(const ndef_t *ndef, ndef_record_desc_t *record_descriptors,
 
     for (size_t i = 0; i < ndef->record_count; ++i) {
         ndef_record_desc_t *record_desc = &record_descriptors[i];
-        ndef_parse_record(ndef->records[i], record_desc);
+        ndef_record_parse(ndef->records[i], record_desc);
     }
     return 0;
 }
+
+int ndef_from_buffer(ndef_t *ndef, uint8_t *buffer, size_t buffer_size)
+{
+    assert(ndef != NULL);
+
+    ndef_init(ndef, buffer, buffer_size);
+    uint8_t *current_pointer = ndef->buffer.memory;
+    while (current_pointer < ndef->buffer.cursor) {
+        ndef_record_desc_t record_desc;
+        ndef_record_parse(current_pointer, &record_desc);
+
+        ndef->records[ndef->record_count] = current_pointer;
+        ndef->record_count += 1;
+
+        if (record_desc.record_type == NDEF_SHORT_RECORD) {
+            current_pointer += NDEF_RECORD_HEADER_SIZE + NDEF_RECORD_TYPE_LENGTH_SIZE +
+                               SHORT_RECORD_PAYLOAD_LENGTH_SIZE + *(record_desc.type_length);
+
+            if (record_desc.id_length) {
+                current_pointer += NDEF_RECORD_ID_LENGTH_SIZE + *(record_desc.id_length);
+            }
+
+            current_pointer += *(record_desc.payload_length);
+        }
+        else {
+            current_pointer += NDEF_RECORD_HEADER_SIZE + NDEF_RECORD_TYPE_LENGTH_SIZE +
+                               LONG_RECORD_PAYLOAD_LENGTH_SIZE + *(record_desc.type_length);
+
+            if (record_desc.id_length) {
+                current_pointer += NDEF_RECORD_ID_LENGTH_SIZE + *(record_desc.id_length);
+            }
+
+            uint32_t payload_length = ((uint32_t)record_desc.payload_length[0]) << 24 |
+                                     ((uint32_t)record_desc.payload_length[1]) << 16 |
+                                     ((uint32_t)record_desc.payload_length[2]) << 8 |
+                                     ((uint32_t)record_desc.payload_length[3]);
+            current_pointer += payload_length;
+        }
+    }
+
+    if (ndef->record_count > MAX_NDEF_RECORD_COUNT) {
+        LOG_ERROR("NDEF record count exceeds maximum\n");
+        return -1;
+    }
+
+    return 0;
+}
+
 
 /* MARK: MIME */
 int ndef_record_mime_add(ndef_t *ndef, const char *mime_type, uint32_t mime_type_length,
@@ -385,9 +463,9 @@ static inline size_t ndef_record_calculate_mime_size(uint32_t mime_type_length,
 
 const uint8_t ndef_text_record_type[] = { 'T' };
 
-int ndef_record_add_text(ndef_t *message, const char *text, uint32_t text_length,
-                         const char *lang_code,
-                         uint8_t lang_code_length, ndef_text_encoding_t encoding)
+int ndef_record_add_text(ndef_t *ndef, const char *text, uint32_t text_length,
+                         const char *lang_code, uint8_t lang_code_length,
+                         ndef_text_encoding_t encoding)
 {
     if (lang_code_length > MAXIMUM_LANG_CODE_LENGTH) {
         LOG_ERROR("NDEF text record language code is too long");
@@ -417,6 +495,13 @@ int ndef_record_add_text(ndef_t *message, const char *text, uint32_t text_length
     return 0;
 }
 
+/**
+ * @brief Calculates the size of an NDEF text record
+ *
+ * @param[in] text_length       Length of the text
+ * @param[in] lang_code_length  Length of the language code
+ * @return Size of the text record
+ */
 static size_t ndef_record_calculate_text_size(uint32_t text_length, uint8_t lang_code_length)
 {
     size_t payload_size = STATUS_SIZE + lang_code_length + text_length;
@@ -458,3 +543,4 @@ static size_t ndef_record_calculate_uri_size(uint32_t uri_length)
     size_t payload_length = IDENTIFIER_CODE_LENGTH + uri_length;
     return ndef_calculate_record_size(sizeof(ndef_uri_record_type), 0, payload_length);
 }
+
