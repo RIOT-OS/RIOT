@@ -291,6 +291,17 @@ names in uppercase and add the prefix `CONFIG_MODULE_` to all of them.
 - psa_aead_aes_256_ccm_backend_cifra
 - psa_aead_aes_256_ccm_custom_backend
 
+#### AES GCM
+- psa_aead_aes_128_gcm
+- psa_aead_aes_128_gcm_backend_cifra
+- psa_aead_aes_128_gcm_custom_backend
+- psa_aead_aes_192_gcm
+- psa_aead_aes_192_gcm_backend_cifra
+- psa_aead_aes_192_gcm_custom_backend
+- psa_aead_aes_256_gcm
+- psa_aead_aes_256_gcm_backend_cifra
+- psa_aead_aes_256_gcm_custom_backend
+
 ### Ciphers
 - Base: psa_cipher
 
