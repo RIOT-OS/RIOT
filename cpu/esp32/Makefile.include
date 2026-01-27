@@ -312,6 +312,7 @@ CFLAGS += -D_CONST=const
 # TODO no relaxation yet
 ifneq (,$(filter riscv%,$(TARGET_ARCH)))
   CFLAGS += -DCONFIG_IDF_TARGET_ARCH_RISCV
+  CFLAGS += -DQCBOR_DISABLE_FLOAT_HW_USE
   CFLAGS += -mno-relax -mabi=ilp32 -DRISCV_NO_RELAX
   CFLAGS += -fno-jump-tables
   LDGENFLAGS += -DCONFIG_IDF_TARGET_ARCH_RISCV
