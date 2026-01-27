@@ -208,7 +208,7 @@ into the source repository.
 [archived-pull-requests]: https://github.com/RIOT-OS/RIOT/pulls?q=is:pr+label:"State:+archived"
 [uncrustify]: http://uncrustify.sourceforge.net
 
-## Copyright and AI
+## Plagiarism and AI
 
 RIOT itself applies the LGPL license, see [LICENSE.md], to most of its code exclusively,
 authors of PRs are assumed to do so as well (not necessary exclusive).
