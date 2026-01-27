@@ -64,22 +64,23 @@ psa_status_t psa_cipher_chacha20_set_iv(psa_cipher_chacha20_ctx_t *ctx,
     switch (iv_length) {
     case 8:
         /* 8 bytes: the cipher operation uses the original [CHACHA20] definition
-            of ChaCha20: the provided IV is used as the 64-bit nonce, and the 64-bit
-            counter value is set to zero.
-            This is currently not supported, as the current implementation only handles
-            12-byte nonces. To change this, you would need to modify chacha20_ctx_t
-            and functions that are using this type. */
+         * of ChaCha20: the provided IV is used as the 64-bit nonce, and the 64-bit
+         * counter value is set to zero.
+         * This is currently not supported, as the current implementation only handles
+         * 12-byte nonces. To change this, you would need to modify chacha20_ctx_t
+         * and functions that are using this type.
+         */
         status = PSA_ERROR_NOT_SUPPORTED;
         break;
     case 12:
         /* 12 bytes: the provided IV is used as the nonce, and the counter value
-            is set to zero. */
+         * is set to zero. */
         chacha20_setup(&ctx->ctx, ctx->buffer, iv, 0);
         status = PSA_SUCCESS;
         break;
     case 16:
         /* 16 bytes: the first four bytes of the IV are used as the counter value
-            (encoded as little-endian), and the remaining 12 bytes are used as the nonce. */
+         * (encoded as little-endian), and the remaining 12 bytes are used as the nonce. */
         chacha20_setup(&ctx->ctx, ctx->buffer, &iv[4], unaligned_get_u32(iv));
         status = PSA_SUCCESS;
         break;

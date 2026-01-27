@@ -71,13 +71,13 @@ psa_status_t psa_cipher_chacha20_set_iv(psa_cipher_chacha20_ctx_t *ctx,
     switch (iv_length) {
     case 8:
         /* 8 bytes: the cipher operation uses the original [CHACHA20] definition
-            of ChaCha20: the provided IV is used as the 64-bit nonce, and the 64-bit
-            counter value is set to zero. */
+         * of ChaCha20: the provided IV is used as the 64-bit nonce, and the 64-bit
+         * counter value is set to zero. */
         status = PSA_ERROR_NOT_SUPPORTED;
         break;
     case 12:
         /* 12 bytes: the provided IV is used as the nonce, and the counter value
-            is set to zero. */
+         * is set to zero. */
         cryptocell_310_enable();
         periph_status = CRYS_CHACHA_Init(&ctx->ctx.post_setup,
                                          (uint8_t *)iv,
@@ -90,7 +90,7 @@ psa_status_t psa_cipher_chacha20_set_iv(psa_cipher_chacha20_ctx_t *ctx,
         break;
     case 16:
         /* 16 bytes: the first four bytes of the IV are used as the counter value
-            (encoded as little-endian), and the remaining 12 bytes are used as the nonce. */
+         * (encoded as little-endian), and the remaining 12 bytes are used as the nonce. */
         periph_status = CRYS_CHACHA_Init(&ctx->ctx.post_setup,
                                          (uint8_t *)&iv[4],
                                          CRYS_CHACHA_Nonce96BitSize,
