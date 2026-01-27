@@ -463,7 +463,7 @@ static inline size_t ndef_record_calculate_mime_size(uint32_t mime_type_length,
 
 const uint8_t ndef_text_record_type[] = { 'T' };
 
-int ndef_record_add_text(ndef_t *ndef, const char *text, uint32_t text_length,
+int ndef_record_text_add(ndef_t *ndef, const char *text, uint32_t text_length,
                          const char *lang_code, uint8_t lang_code_length,
                          ndef_text_encoding_t encoding)
 {
