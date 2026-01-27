@@ -45,19 +45,10 @@
  * uint8_t buffer[1024];
  *
  * ndef_init(&message, buffer, 1024);
- * ndef_record_add_text(&message, "Hello World", 11, "en", 2, UTF8);
+ * ndef_record_text_add(&message, "Hello World", 11, "en", 2, UTF8);
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * The NDEF message can then be passed to other NFC functions.
- *
- * Parsing an NDEF Message
- * =======================
- *
- * If a buffer of bytes needs to be converted to an NDEF message struct the following snippet
- * can be used
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
  *
  * @{
  *
@@ -372,7 +363,7 @@ typedef enum {
  * @retval 0                            on success
  * @retval -1                           if writing the payload failed
  */
-int ndef_record_add_text(ndef_t *ndef, const char *text, uint32_t text_length,
+int ndef_record_text_add(ndef_t *ndef, const char *text, uint32_t text_length,
                          const char *lang_code, uint8_t lang_code_length,
                          ndef_text_encoding_t encoding);
 
