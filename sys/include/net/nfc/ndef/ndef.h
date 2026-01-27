@@ -259,7 +259,7 @@ size_t ndef_get_capacity(const ndef_t *ndef);
  *
  * @param[in] ndef  NDEF message
  */
-void ndef_pretty_print(const ndef_t *ndef) {
+void ndef_pretty_print(const ndef_t *ndef);
 
 /**
  * @brief Initializes the given NDEF message with the given buffer and buffer size.
