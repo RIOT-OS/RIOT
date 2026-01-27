@@ -58,6 +58,8 @@ psa_status_t psa_aead_chacha20_poly1305_decrypt(const psa_key_attributes_t *attr
         return PSA_ERROR_INVALID_SIGNATURE;
     }
 
+    *plaintext_length = ciphertext_length - CHACHA20POLY1305_TAG_BYTES;
+
     return PSA_SUCCESS;
 }
 
