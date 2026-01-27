@@ -65,7 +65,7 @@ static const uint8_t TAG[] = {
 };
 
 psa_status_t example_aead_chacha20_poly1305_multipart(void)
-{
+{ //
     psa_status_t status = PSA_ERROR_DOES_NOT_EXIST;
 
     /* KEY IMPORT ------------------------ */
