@@ -1,4 +1,4 @@
-/**
+/*
  * SPDX-FileCopyrightText: 2024 TU Dresden
  * SPDX-License-Identifier: LGPL-2.1-only
  */

@@ -1,4 +1,4 @@
-/**
+/*
  * SPDX-FileCopyrightText: 2024 TU Dresden
  * SPDX-License-Identifier: LGPL-2.1-only
  */
@@ -6,15 +6,63 @@
 #pragma once
 
 /**
- * @defgroup    ndef NDEF
+ * @defgroup    net_nfc_ndef    NFC Data Exchange Format (NDEF)
  * @ingroup     net
- * @brief       Serialization for the NFC Data Exchange Format
+ * @brief       Module for the serialization and parsing of NFC Data Exchange Format messages
+ * @see         [NFC Forum NFC Data Exchange Format (NDEF) Technical Specification 1.0](https://archive.org/details/nfcforum-ts-ndef-1.0)
+ * About
+ * =====
+ *
+ * This module provides serialization and parsing of NDEF messages for various NDEF record
+ * types. As the name suggests, the NDEF is exclusively designed and used for NFC as a
+ * high-level data format.
+ *
+ * NDEF Message Format
+ * ===================
+ *
+ * An NDEF message can be understood as a list of NDEF records. Each record starts with a mandatory
+ * header that contains the type of the NDEF message, the length of the payload and an optional ID.
+ * The header is followed by the payload.
+ *
+ * @note NDEF records with IDs are not supported by this module.
+ *
+ * NDEF Record Types
+ * =================
+ *
+ * The NFC Forum provides Record Type Definitions (RTDs) for various NDEF record types. The current
+ * record types supported by this module are:
+ *
+ * - Text
+ * - URI
+ * - MIME
+ *
+ * Creating an NDEF Message
+ * ========================
+ *
+ * An NDEF message with one text record can be added created the following way
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * ndef_t message;
+ * uint8_t buffer[1024];
+ *
+ * ndef_init(&message, buffer, 1024);
+ * ndef_record_add_text(&message, "Hello World", 11, "en", 2, UTF8);
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * The NDEF message can then be passed to other NFC functions.
+ *
+ * Parsing an NDEF Message
+ * =======================
+ *
+ * If a buffer of bytes needs to be converted to an NDEF message struct the following snippet
+ * can be used
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ *
  * @{
  *
  * @file
  * @brief       Typedefs and function definitions for the NFC Data Exchange Format
- * @see         [NFC Forum NFC Data Exchange Format (NDEF) Technical Specification 1.0]
- *              (https://archive.org/details/nfcforum-ts-ndef-1.0)
  *
  * @author      Nico Behrens <nifrabe@outlook.de>
  */
