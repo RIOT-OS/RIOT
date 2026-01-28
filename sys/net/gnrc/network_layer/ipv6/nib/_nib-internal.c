@@ -85,7 +85,9 @@ void _nib_release(void)
 void _evtimer_del(evtimer_msg_event_t *event)
 {
     DEBUG("nib: Remove timer event %p\n", (void *)event);
+    _nib_acquire();
     evtimer_del(&_nib_evtimer, &event->event);
+    _nib_release();
 }
 
 void _evtimer_add_dbg(void *ctx, int16_t type,
@@ -97,6 +99,8 @@ void _evtimer_add_dbg(void *ctx, int16_t type,
 #else
     kernel_pid_t target_pid = KERNEL_PID_LAST;  /* just for testing */
 #endif
+    /* Lock is only precautionary */
+    _nib_acquire();
     _evtimer_del(event);
     event->event.next = NULL;
     event->event.offset = offset;
@@ -105,6 +109,7 @@ void _evtimer_add_dbg(void *ctx, int16_t type,
     DEBUG("nib: Add event %p, ctx=%p, type=%s, offset=%"PRIu32"ms\n",
           (void *)event, ctx, stype, offset);
     evtimer_add_msg(&_nib_evtimer, event, target_pid);
+    _nib_release();
 }
 
 static inline bool _addr_equals(const ipv6_addr_t *addr,
