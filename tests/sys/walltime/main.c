@@ -133,8 +133,5 @@ int main(void)
     };
     walltime_change_subscribe(&sub);
 
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
     return 0;
 }

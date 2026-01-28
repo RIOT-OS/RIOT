@@ -19,7 +19,6 @@
 #include "msg.h"
 
 #include "net/gcoap.h"
-#include "shell.h"
 
 #define MAIN_QUEUE_SIZE (4)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
@@ -33,11 +32,7 @@ int main(void)
     gcoap_cli_init();
     puts("gcoap block handler");
 
-    /* start shell */
     puts("All up, running the shell now");
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
-    /* should never be reached */
+    /* shell starts implicitly after returning */
     return 0;
 }

@@ -20,7 +20,6 @@
 #include "net/ipv6/addr.h"
 #include "net/netif.h"
 #include "net/telnet.h"
-#include "shell.h"
 #include "msg.h"
 
 #define MAIN_QUEUE_SIZE     (8)
@@ -74,11 +73,7 @@ int main(void)
     netifs_print_ipv6("\", \"");
     puts("\"]}");
 
-    /* start shell */
     printf("All up, awaiting connection on port %u\n", CONFIG_TELNET_PORT);
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
-    /* should be never reached */
+    /* shell starts implicitly after returning */
     return 0;
 }
