@@ -116,13 +116,16 @@ static void _netif_list(struct netif *netif)
 #endif
 }
 
-#ifdef MODULE_LWIP_IPV4
 static void _usage_add4(char *cmd)
 {
+    if (!IS_USED(MODULE_LWIP_IPV4)) {
+        return;
+    }
     printf("usage: %s add <interface> <IPv4>/<prefix>\n", cmd);
     printf("usage: %s add <interface> <IPv4>/<prefix> gw <IPv4>\n", cmd);
 }
 
+#ifdef MODULE_LWIP_IPV4
 static void _lwip_prefix_to_subnet(int prefix, ip4_addr_t *subnet)
 {
     uint32_t value = 0;
@@ -213,14 +216,24 @@ static int _lwip_netif_add4(int argc, char **argv)
     sys_unlock_tcpip_core();
     return 0;
 }
+#else /* MODULE_LWIP_IPV4 */
+static int _lwip_netif_add4(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    return 1;
+}
 #endif
 
-#ifdef MODULE_LWIP_IPV6
 static void _usage_add6(char *cmd)
 {
+    if (!IS_USED(MODULE_LWIP_IPV6)) {
+        return;
+    }
     printf("usage: %s add <interface> <IPv6> (prefix not supported)\n", cmd);
 }
 
+#ifdef MODULE_LWIP_IPV6
 static int _lwip_netif_add6(int argc, char **argv)
 {
     struct netif *iface;
@@ -253,16 +266,19 @@ static int _lwip_netif_add6(int argc, char **argv)
 
     return 0;
 }
+#else /* MODULE_LWIP_IPV6 */
+static int _lwip_netif_add6(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    return 1;
+}
 #endif
 
 static void _usage_add(char *cmd)
 {
-#ifdef MODULE_LWIP_IPV4
     _usage_add4(cmd);
-#endif
-#ifdef MODULE_LWIP_IPV6
     _usage_add6(cmd);
-#endif
 }
 
 static void _lwip_netif_help(char *cmd)
@@ -295,7 +311,6 @@ static int _lwip_netif_config(int argc, char **argv)
         if (strcmp("help", argv[1]) == 0) {
             _lwip_netif_help(argv[0]);
         }
-#if defined(MODULE_LWIP_IPV4) || defined(MODULE_LWIP_IPV6)
         else if (strcmp("add", argv[1]) == 0) {
             if (argc != 4 && argc != 6) {
                 printf("error: invalid number of parameters\n");
@@ -303,20 +318,15 @@ static int _lwip_netif_config(int argc, char **argv)
                 return 0;
             }
 
-#ifdef MODULE_LWIP_IPV4
-            if (strchr(argv[3], '.') != NULL) {
+            if (IS_USED(MODULE_LWIP_IPV4) && strchr(argv[3], '.') != NULL) {
                 return _lwip_netif_add4(argc, argv);
             }
-#endif
-#ifdef MODULE_LWIP_IPV6
-            if (strchr(argv[3], ':') != NULL) {
+            if (IS_USED(MODULE_LWIP_IPV6) && strchr(argv[3], ':') != NULL) {
                 return _lwip_netif_add6(argc, argv);
             }
-#endif
             printf("error: use proper IPv4 or IPv6 address\n");
             _usage_add(argv[0]);
         }
-#endif
         else {
             printf("error: invalid subcommand - use help\n");
         }
