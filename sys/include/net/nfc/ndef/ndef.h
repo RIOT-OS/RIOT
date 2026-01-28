@@ -320,14 +320,6 @@ int ndef_parse(const ndef_t *ndef, ndef_record_desc_t *record_descriptors,
                size_t record_descriptors_size);
 
 /**
- * @brief Parses a single NDEF record
- *
- * @param[in]   ndef_record         NDEF record to parse
- * @param[out]  record_descriptor   Record descriptor to fill
- */
-void ndef_record_parse(const uint8_t *ndef_record, ndef_record_desc_t *record_descriptor);
-
-/**
  * @brief Creates an NDEF message from a byte buffer
  *
  * @param[out]   ndef        NDEF message
@@ -337,7 +329,7 @@ void ndef_record_parse(const uint8_t *ndef_record, ndef_record_desc_t *record_de
  * @retval 0 on success
  * @retval -1 if the buffer can't be parsed
  */
-int ndef_from_buffer(ndef_t *ndef, const uint8_t *buffer, size_t buffer_size);
+int ndef_from_buffer(ndef_t *ndef, uint8_t *buffer, size_t buffer_size);
 
 /* MARK: Text*/
 /**
@@ -437,15 +429,6 @@ int ndef_record_uri_add(ndef_t *ndef, ndef_uri_identifier_code_t identifier_code
  */
 int ndef_record_mime_add(ndef_t *ndef, const char *mime_type, uint32_t mime_type_length,
                          const uint8_t *mime_payload, uint32_t mime_payload_length);
-
-/**
- * @brief Calculates the size of an NDEF mime record
- *
- * @param[in] mime_type_length      Length of the MIME type
- * @param[in] mime_payload_length   Length of the MIME payload
- * @return Size of the MIME record
- */
-size_t ndef_record_calculate_mime_size(uint32_t mime_type_length, uint32_t mime_payload_length);
 
 #ifdef __cplusplus
 }
