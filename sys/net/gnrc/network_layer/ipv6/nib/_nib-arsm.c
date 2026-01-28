@@ -110,7 +110,7 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
          * see https://tools.ietf.org/html/rfc6775#section-6.3 */
         !_rtr_sol_on_6lr(netif, icmpv6)) {
         DEBUG("nib: L2 address differs. Setting STALE\n");
-        evtimer_del(&_nib_evtimer, &nce->nud_timeout.event);
+        _evtimer_del(&nce->nud_timeout);
         _set_nud_state(netif, nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
@@ -373,7 +373,7 @@ void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
             DEBUG("nib: Set %s%%%u to STALE\n",
                   ipv6_addr_to_str(addr_str, &nce->ipv6, sizeof(addr_str)),
                   (unsigned)netif->pid);
-            evtimer_del(&_nib_evtimer, &nce->nud_timeout.event);
+            _evtimer_del(&nce->nud_timeout);
             _set_nud_state(netif, nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
         }
         if (_oflag_set((ndp_nbr_adv_t *)icmpv6) ||
@@ -402,7 +402,7 @@ void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
             !_sflag_set((ndp_nbr_adv_t *)icmpv6) &&
             (_get_nud_state(nce) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE) &&
             _tl2ao_changes_nce(nce, tl2ao, netif, l2addr_len)) {
-            evtimer_del(&_nib_evtimer, &nce->nud_timeout.event);
+            _evtimer_del(&nce->nud_timeout);
             _set_nud_state(netif, nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
         }
     }
