@@ -11,7 +11,6 @@
  *
  */
 
-#include "shell.h"
 #include "walltime.h"
 
 static void _time_change_cb(void *ctx, int32_t diff_sec, int16_t diff_ms)
@@ -54,9 +53,6 @@ int main(void)
         .cb = _time_change_cb,
     };
     walltime_change_subscribe(&sub);
-
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

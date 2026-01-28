@@ -18,7 +18,6 @@
 #include <stdio.h>
 
 #include "msg.h"
-#include "shell.h"
 #include "ccn-lite-riot.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/pktdump.h"
@@ -53,7 +52,5 @@ int main(void)
     gnrc_netreg_register(GNRC_NETTYPE_CCN_CHUNK, &dump);
 #endif
 
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }

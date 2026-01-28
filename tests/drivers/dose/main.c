@@ -17,7 +17,6 @@
 
 #include <stdio.h>
 
-#include "shell.h"
 #include "test_utils/expect.h"
 #include "test_utils/netdev_eth_minimal.h"
 #include "init_dev.h"
@@ -56,9 +55,6 @@ int main(void)
 
     /* start the shell */
     puts("Initialization successful - starting the shell now");
-
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

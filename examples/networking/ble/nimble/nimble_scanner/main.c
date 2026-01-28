@@ -80,9 +80,5 @@ int main(void)
     nimble_scanlist_init();
     nimble_scanner_init(&params, nimble_scanlist_update);
 
-    /* start shell */
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
     return 0;
 }
