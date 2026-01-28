@@ -1,6 +1,7 @@
 /*
  * SPDX-FileCopyrightText: 2021 Google LLC
  * SPDX-FileCopyrightText: 2024 Krzysztof Cabaj <kcabaj@gmail.com>
+ * SPDX-FileCopyrightText: 2026 TU Dresden
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
@@ -14,6 +15,7 @@
  *
  * @author      Erik Ekman <eekman@google.com>
  *              Krzysztof Cabaj <kcabaj@gmail.com>
+ *              Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  *
  * @}
  */
