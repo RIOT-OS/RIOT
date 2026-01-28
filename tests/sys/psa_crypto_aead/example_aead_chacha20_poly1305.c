@@ -22,6 +22,9 @@
  *
  *  https://datatracker.ietf.org/doc/html/rfc7539#appendix-A.5
  */
+
+/* Some values are not const, because the Cryptocell backend checks if they are in RAM.
+ * It should be checked if this is actually required. */
 static const uint8_t KEY_CHACHA20_ONESHOT[] = {
     0x1c, 0x92, 0x40, 0xa5, 0xeb, 0x55, 0xd3, 0x8a,
     0xf3, 0x33, 0x88, 0x86, 0x04, 0xf6, 0xb5, 0xf0,
