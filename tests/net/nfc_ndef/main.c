@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2024 TU Dresden
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2024 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #include "net/nfc/ndef/ndef.h"
@@ -15,6 +12,7 @@
 #include <inttypes.h>
 #include <assert.h>
 
+#include "container.h"
 #include "embUnit.h"
 
 /**
@@ -55,8 +53,8 @@ static void test_ndef_text_record(void)
     ndef_t message;
     uint8_t buffer[1024];
 
-    ndef_init(&message, buffer, 1024);
-    ndef_record_add_text(&message, "Hello World", 11, "en", 2, UTF8);
+    ndef_init(&message, buffer, ARRAY_SIZE(buffer));
+    ndef_record_text_add(&message, "Hello World", 11, "en", 2, UTF8);
 
     TEST_ASSERT(compare_ndef_buffers(message.buffer, ndef_text_record_buffer));
 }
@@ -78,8 +76,8 @@ static void test_ndef_uri_record(void)
     ndef_t message;
     uint8_t buffer[1024];
 
-    ndef_init(&message, buffer, 1024);
-    ndef_record_add_uri(&message, NDEF_URI_HTTPS_WWW, "riot-os.org", 11);
+    ndef_init(&message, buffer, ARRAY_SIZE(buffer));
+    ndef_record_uri_add(&message, NDEF_URI_HTTPS_WWW, "riot-os.org", 11);
 
     TEST_ASSERT(compare_ndef_buffers(message.buffer, ndef_uri_record_buffer));
 }
@@ -100,8 +98,8 @@ static void test_ndef_mime_record(void)
     ndef_t message;
     uint8_t buffer[1024];
 
-    ndef_init(&message, buffer, 1024);
-    ndef_record_add_mime(&message, "text/plain", 10, (uint8_t *)"Hello World", 11);
+    ndef_init(&message, buffer, ARRAY_SIZE(buffer));
+    ndef_record_mime_add(&message, "text/plain", 10, (uint8_t *)"Hello World", 11);
 
     TEST_ASSERT(compare_ndef_buffers(message.buffer, ndef_uri_record_buffer));
 }
@@ -129,9 +127,9 @@ static void test_ndef_two_records(void)
     ndef_t message;
     uint8_t buffer[1024];
 
-    ndef_init(&message, buffer, 1024);
-    ndef_record_add_text(&message, "Hello World", 11, "en", 2, UTF8);
-    ndef_record_add_text(&message, "Hej Verden", 10, "da", 2, UTF8);
+    ndef_init(&message, buffer, ARRAY_SIZE(buffer));
+    ndef_record_text_add(&message, "Hello World", 11, "en", 2, UTF8);
+    ndef_record_text_add(&message, "Hej Verden", 10, "da", 2, UTF8);
 
     TEST_ASSERT(compare_ndef_buffers(message.buffer, ndef_two_record_buffer));
 }
@@ -141,9 +139,9 @@ static void test_ndef_remove(void)
     puts("NDEF remove test");
     ndef_t message;
     uint8_t buffer[1024];
-    ndef_init(&message, buffer, 1024);
-    ndef_record_add_text(&message, "Hello World", 11, "en", 2, UTF8);
-    ndef_record_add_text(&message, "Hej Verden", 10, "da", 2, UTF8);
+    ndef_init(&message, buffer, ARRAY_SIZE(buffer));
+    ndef_record_text_add(&message, "Hello World", 11, "en", 2, UTF8);
+    ndef_record_text_add(&message, "Hej Verden", 10, "da", 2, UTF8);
 
     uint8_t ndef_two_record_data[] = {
         0x91, 0x01, 0x0E, 0x54,
@@ -164,7 +162,7 @@ static void test_ndef_remove(void)
 
     TEST_ASSERT(compare_ndef_buffers(message.buffer, ndef_two_record_buffer));
 
-    ndef_remove_last_record(&message);
+    ndef_record_remove_last(&message);
 
     uint8_t ndef_one_record_data[] = {
         0xD1, 0x01, 0x0E, 0x54,
@@ -181,27 +179,6 @@ static void test_ndef_remove(void)
     TEST_ASSERT(compare_ndef_buffers(message.buffer, ndef_one_record_buffer));
 }
 
-static void test_ndef_calculate_size(void)
-{
-    puts("NDEF calculate size test");
-    uint8_t buffer[1024];
-    ndef_t message;
-    ndef_init(&message, buffer, 1024);
-    ndef_record_add_text(&message, "Hello World", 11, "en", 2, UTF8);
-    TEST_ASSERT_EQUAL_INT((uint32_t)(message.buffer.cursor - message.buffer.memory),
-                          ndef_record_calculate_text_size(11, 2));
-    ndef_clear(&message);
-
-    ndef_record_add_uri(&message, NDEF_URI_HTTPS_WWW, "riot-os.org", 11);
-    TEST_ASSERT_EQUAL_INT((uint32_t)(message.buffer.cursor - message.buffer.memory),
-                          ndef_record_calculate_uri_size(11));
-    ndef_clear(&message);
-
-    ndef_record_add_mime(&message, "text/plain", 10, (uint8_t *)"Hello World", 11);
-    TEST_ASSERT_EQUAL_INT((uint32_t)(message.buffer.cursor - message.buffer.memory),
-                          ndef_record_calculate_mime_size(10, 11));
-}
-
 static void test_ndef_pretty_print(void)
 {
     puts("NDEF pretty print test");
@@ -209,12 +186,10 @@ static void test_ndef_pretty_print(void)
     ndef_t message;
     uint8_t buffer[1024];
 
-    ndef_init(&message, buffer, 1024);
-    ndef_record_add_text(&message, "Hello World", 11, "en", 2, UTF8);
+    ndef_init(&message, buffer, ARRAY_SIZE(buffer));
+    ndef_record_text_add(&message, "Hello World", 11, "en", 2, UTF8);
 
-    ndef_record_desc_t record_descriptors[1];
-    ndef_parse(&message, record_descriptors, 1);
-    ndef_pretty_print(record_descriptors, 1);
+    ndef_pretty_print(&message);
 }
 
 static Test *tests_nfc_ndef_tests(void)
@@ -225,7 +200,6 @@ static Test *tests_nfc_ndef_tests(void)
         new_TestFixture(test_ndef_mime_record),
         new_TestFixture(test_ndef_two_records),
         new_TestFixture(test_ndef_remove),
-        new_TestFixture(test_ndef_calculate_size),
         new_TestFixture(test_ndef_pretty_print),
     };
 
