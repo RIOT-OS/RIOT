@@ -1,5 +1,7 @@
 USEMODULE += stdin
 
+DEFAULT_MODULE += auto_init_shell
+
 ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   USEMODULE += shell_cmd_sys
 

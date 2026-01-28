@@ -59,6 +59,11 @@ static void *main_trampoline(void *arg)
 
     int res = main();
 
+    if (IS_USED(MODULE_AUTO_INIT_SHELL)) {
+        extern void auto_init_shell(void);
+        auto_init_shell();
+    }
+
     if (IS_USED(MODULE_TEST_UTILS_MAIN_EXIT_CB)) {
         void test_utils_main_exit_cb(int res);
         test_utils_main_exit_cb(res);

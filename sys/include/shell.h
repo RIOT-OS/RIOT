@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2009-2013 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2009-2013 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -30,15 +27,29 @@
  * USEMODULE += shell
  * ```
  *
- * And run the shell using @ref shell_run_forever e.g. from the `main` thread
- * after everything is set up. This call will never return.
+ * The shell is started automatically on the `main` thread after the `main`
+ * function returns successfully (with return value `0`). This behavior can be
+ * deactivated by disabling the `auto_init_shell` module.
+ *
+ * ```
+ * DISABLE_MODULE += auto_init_shell
+ * ```
+ *
+ * In this case, @ref shell_run_forever has to be called manually from any
+ * thread. This call will never return.
  *
  * ## Builtin Commands
  *
  * The commands `help` and `help_json` are builtins that print the list of
  * available commands: The former prints a human readable table and is always
  * available, the latter requires module `shell_builtin_cmd_help_json` to be
- * used and will give the same info machine readable.
+ * used and will give the same info in a machine-readable JSON form.
+ *
+ * ## Default Commands
+ *
+ * Certain modules provide a shell command to interface (some of) their
+ * functionality. Using the module `shell_cmds_default` will enable the shell
+ * integration of the used modules, if it exists.
  *
  * @{
  *
