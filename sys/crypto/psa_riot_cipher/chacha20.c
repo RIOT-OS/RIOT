@@ -100,37 +100,31 @@ psa_status_t psa_cipher_chacha20_update(psa_cipher_chacha20_ctx_t *ctx,
                                         size_t *output_length)
 {
     DEBUG("RIOT ChaCha20 Cipher update");
-    /* We return full blocks, so we check that we have enough output buffer
-        to fit all full blocks in the combined context and input buffer */
-    if (output_size < (((ctx->buffer_length + input_length) / CHACHA20POLY1305_BLOCK_BYTES) * CHACHA20POLY1305_BLOCK_BYTES)) {
+
+    if (output_size < ((ctx->buffer_length + input_length) / CHACHA20POLY1305_BLOCK_BYTES) * CHACHA20POLY1305_BLOCK_BYTES) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
-    size_t input_index = 0;
-    size_t output_index = 0;
-    /* check if buffer contains data */
-    if (ctx->buffer_length > 0) {
-        /* if yes, fill buffer up and update this block of data */
-        input_index = sizeof(ctx->buffer) - ctx->buffer_length;
-        memcpy(&ctx->buffer[ctx->buffer_length], input, input_index);
-        chacha20_update(&ctx->ctx, ctx->buffer, output);
-        memset(ctx->buffer, 0, sizeof(ctx->buffer));
+    size_t input_idx = 0;
+    size_t output_idx = 0;
+    while (true) {
+        /* Not enough input data remaining for a full block, we store the rest. */
+        if (ctx->buffer_length + input_length < CHACHA20POLY1305_BLOCK_BYTES) {
+            memcpy(&ctx->buffer[ctx->buffer_length], &input[input_idx], input_length);
+            ctx->buffer_length += input_length;
+            input_idx += input_length;
+            break;
+        }
+        /* Process a full block. */
+        memcpy(&ctx->buffer[ctx->buffer_length], &input[input_idx], CHACHA20POLY1305_BLOCK_BYTES - ctx->buffer_length);
+        chacha20_update(&ctx->ctx, ctx->buffer, &output[output_idx]);
+        input_length -= CHACHA20POLY1305_BLOCK_BYTES - ctx->buffer_length;
+        input_idx += CHACHA20POLY1305_BLOCK_BYTES - ctx->buffer_length;
         ctx->buffer_length = 0;
-        output_index = 64;
+        output_idx += CHACHA20POLY1305_BLOCK_BYTES;
     }
 
-    /* if not, update blocks of input */
-    const size_t num_blocks = (input_length - input_index) >> 6;
-    size_t pos = 0;
-
-    for (size_t i = 0; i < num_blocks; i++, pos += 64) {
-        chacha20_update(&ctx->ctx, &input[input_index + pos], &output[output_index + pos]);
-    }
-
-    /* put remaining data into buffer */
-    ctx->buffer_length = input_length - (input_index + pos);
-    memcpy(ctx->buffer, &input[input_index + pos], ctx->buffer_length);
-    *output_length = output_index + pos;
+    *output_length = output_idx;
 
     return PSA_SUCCESS;
 }

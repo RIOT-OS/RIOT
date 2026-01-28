@@ -117,63 +117,42 @@ psa_status_t psa_cipher_chacha20_update(psa_cipher_chacha20_ctx_t *ctx,
                                         size_t *output_length)
 {
     DEBUG("Peripheral ChaCha20 Cipher update");
-    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
 
-    /* We return full blocks, so we check that we have enough output buffer
-        to fit all full blocks in the combined context and input buffer */
-    if (output_size < (((ctx->buffer_length + input_length) / \
-        CRYS_CHACHA_BLOCK_SIZE_IN_BYTES) * CRYS_CHACHA_BLOCK_SIZE_IN_BYTES)) {
+    if (output_size < ((ctx->buffer_length + input_length) / CRYS_CHACHA_BLOCK_SIZE_IN_BYTES) * CRYS_CHACHA_BLOCK_SIZE_IN_BYTES) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
-    size_t input_index = 0;
-    size_t output_index = 0;
-    CRYSError_t periph_status;
-    /* check if buffer contains data */
     cryptocell_310_enable();
-    if (ctx->buffer_length > 0) {
-        /* if yes, fill buffer up and update this block of data */
-        input_index = sizeof(ctx->buffer) - ctx->buffer_length;
-        memcpy(&ctx->buffer[ctx->buffer_length], input, input_index);
-        periph_status = CRYS_CHACHA_Block(  &ctx->ctx.post_setup,
-                                            ctx->buffer,
-                                            64,
-                                            output);
-        status = CRYS_to_psa_error(periph_status);
+    size_t input_idx = 0;
+    size_t output_idx = 0;
+    while (true) {
+        /* Not enough input data remaining for a full block, we store the rest. */
+        if (ctx->buffer_length + input_length < CRYS_CHACHA_BLOCK_SIZE_IN_BYTES) {
+            memcpy(&ctx->buffer[ctx->buffer_length], &input[input_idx], input_length);
+            ctx->buffer_length += input_length;
+            input_idx += input_length;
+            break;
+        }
+        
+        /* Process a full block. */
+        memcpy(&ctx->buffer[ctx->buffer_length], &input[input_idx], CRYS_CHACHA_BLOCK_SIZE_IN_BYTES - ctx->buffer_length);
+        psa_status_t status = CRYS_to_psa_error(CRYS_CHACHA_Block(&ctx->ctx.post_setup,
+                                                                  ctx->buffer,
+                                                                  CRYS_CHACHA_BLOCK_SIZE_IN_BYTES,
+                                                                  &output[output_idx]));
         if (status != PSA_SUCCESS) {
             return status;
         }
-        memset(ctx->buffer, 0, sizeof(ctx->buffer));
-        ctx->buffer_length = 0;
-        output_index = 64;
-    }
-    /* if not, update blocks of input */
-    const uint32_t blocks_length = ((input_length - input_index) / \
-        CRYS_CHACHA_BLOCK_SIZE_IN_BYTES) * CRYS_CHACHA_BLOCK_SIZE_IN_BYTES;
-    /* xcrypt full blocks */
 
-    /* Check if there is at least 1 full block to xcrypt.
-        if blocks_length == 0: CRYS_CHACHA_Block returns PSA_INVALID_ARGUMENT (CRYS_CHACHA_DATA_IN_SIZE_ILLEGAL) */
-    if(blocks_length > 0) {
-        periph_status = CRYS_CHACHA_Block(  &ctx->ctx.post_setup,
-                                        (uint8_t *)&input[input_index],
-                                        blocks_length,
-                                        &output[output_index]);
-        status = CRYS_to_psa_error(periph_status);
-        if (status != PSA_SUCCESS) {
-            cryptocell_310_disable();
-            return status;
-        }
+        input_length -= CRYS_CHACHA_BLOCK_SIZE_IN_BYTES - ctx->buffer_length;
+        input_idx += CRYS_CHACHA_BLOCK_SIZE_IN_BYTES - ctx->buffer_length;
+        ctx->buffer_length = 0;
+        output_idx += CRYS_CHACHA_BLOCK_SIZE_IN_BYTES;
     }
+    *output_length = output_idx;
     cryptocell_310_disable();
 
-    /* put remaining data into buffer */
-    ctx->buffer_length = input_length - (input_index + blocks_length);
-    memcpy(ctx->buffer, &input[input_index + blocks_length], ctx->buffer_length);
-    *output_length = output_index + blocks_length;
-
-    status = PSA_SUCCESS;
-    return status;
+    return PSA_SUCCESS;
 }
 
 psa_status_t psa_cipher_chacha20_finish(psa_cipher_chacha20_ctx_t *ctx,
