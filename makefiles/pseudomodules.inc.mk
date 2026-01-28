@@ -188,6 +188,17 @@ PSEUDOMODULES += gnrc_nettype_udp
 ## @}
 ## @}
 
+## @addtogroup	net_gnrc_pktshark
+## @{
+## @brief	Enable parsing of IPv6 encapsulated IPv4 packets
+PSEUDOMODULES += gnrc_pktshark_4in6
+## @brief	Enable parsing of CoAP messages
+PSEUDOMODULES += gnrc_pktshark_coap
+## @brief	Enable parsing of default protocols
+PSEUDOMODULES += gnrc_pktshark_default
+## @brief	Enable parsing of ICMPv6 messages
+PSEUDOMODULES += gnrc_pktshark_icmpv6
+## @}
 
 PSEUDOMODULES += gnrc_sixloenc
 PSEUDOMODULES += gnrc_sixlowpan_border_router_default
@@ -403,6 +414,7 @@ PSEUDOMODULES += shell_cmd_gnrc_netif
 PSEUDOMODULES += shell_cmd_gnrc_netif_lora
 PSEUDOMODULES += shell_cmd_gnrc_netif_lorawan
 PSEUDOMODULES += shell_cmd_gnrc_pktbuf
+PSEUDOMODULES += shell_cmd_gnrc_pktshark
 PSEUDOMODULES += shell_cmd_gnrc_rpl
 PSEUDOMODULES += shell_cmd_gnrc_sixlowpan_ctx
 PSEUDOMODULES += shell_cmd_gnrc_sixlowpan_frag_stats
