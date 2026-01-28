@@ -1,10 +1,8 @@
 /*
- * Copyright (C) 2021 Google LLC
- *               2024 Krzysztof Cabaj <kcabaj@gmail.com>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Google LLC
+ * SPDX-FileCopyrightText: 2024 Krzysztof Cabaj <kcabaj@gmail.com>
+ * SPDX-FileCopyrightText: 2026 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -17,6 +15,7 @@
  *
  * @author      Erik Ekman <eekman@google.com>
  *              Krzysztof Cabaj <kcabaj@gmail.com>
+ *              Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  *
  * @}
  */
