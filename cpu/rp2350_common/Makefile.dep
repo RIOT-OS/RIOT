@@ -1,0 +1,4 @@
+USEMODULE += periph
+USEPKG += picosdk
+# We tell the build system that common needs to be built
+USEMODULE += rp2350_common

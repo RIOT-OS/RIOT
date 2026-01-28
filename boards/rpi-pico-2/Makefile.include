@@ -1,7 +1,0 @@
-CPU_MODEL       := RP2350
-PORT_LINUX      ?= /dev/ttyACM0
-
-# JLink isnt tested yet on RP2350
-# ifeq ($(PROGRAMMER),jlink)
-#   JLINK_DEVICE = RP2350_M33_0
-# endif
