@@ -187,9 +187,9 @@ psa_status_t example_aead_chacha20_poly1305_multipart(void)
     /* ENCRYPT & TAG-GEN ----------------- */
 
     /* DECRYPT & VERIFY ------------------ */
-    /* IoT-TODO: You can't use PSA_CIPHER_DECRYPT_OUTPUT_SIZE here, since
-     * it subtracts the IV length. */
-    const size_t plaintext_size = PSA_CIPHER_DECRYPT_OUTPUT_MAX_SIZE(sizeof(CIPHERTEXT));
+    const size_t plaintext_size = PSA_CIPHER_DECRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20,
+                                                                 alg,
+                                                                 sizeof(CIPHERTEXT));
     uint8_t plaintext[plaintext_size];
 
     operation = psa_aead_operation_init();

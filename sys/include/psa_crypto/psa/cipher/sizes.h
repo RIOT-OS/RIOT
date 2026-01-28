@@ -150,7 +150,8 @@ extern "C" {
  *          are incompatible.
  */
 #define PSA_CIPHER_DECRYPT_OUTPUT_SIZE(key_type, alg, input_length) \
-    (input_length - PSA_CIPHER_IV_LENGTH(key_type, alg))
+    ((alg == PSA_ALG_CBC_NO_PADDING) ?  (input_length - PSA_CIPHER_IV_LENGTH(key_type, alg)) : \
+                                        (input_length))
 
 /**
  * @brief   A sufficient output buffer size for @ref psa_cipher_decrypt(), for any of the supported
