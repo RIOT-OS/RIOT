@@ -109,12 +109,14 @@ psa_status_t psa_cipher_chacha20_update(psa_cipher_chacha20_ctx_t *ctx,
     size_t input_idx = 0;
     size_t output_idx = 0;
     while (true) {
+        /* Not enough input data remaining for a full block, we store the rest. */
         if (ctx->buffer_length + input_length < CHACHA20POLY1305_BLOCK_BYTES) {
             memcpy(&ctx->buffer[ctx->buffer_length], &input[input_idx], input_length);
             ctx->buffer_length += input_length;
             input_idx += input_length;
             break;
         }
+        /* Process a full block. */
         memcpy(&ctx->buffer[ctx->buffer_length], &input[input_idx], CHACHA20POLY1305_BLOCK_BYTES - ctx->buffer_length);
         chacha20_update(&ctx->ctx, ctx->buffer, &output[output_idx]);
         input_length -= CHACHA20POLY1305_BLOCK_BYTES - ctx->buffer_length;
