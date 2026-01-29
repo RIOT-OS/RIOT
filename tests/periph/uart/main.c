@@ -32,7 +32,7 @@
 #endif
 
 #ifndef UART_BUFSIZE
-#define UART_BUFSIZE        (SHELL_DEFAULT_BUFSIZE)
+#  define UART_BUFSIZE      (CONFIG_SHELL_BUFSIZE)
 #endif
 
 #define PRINTER_PRIO        (THREAD_PRIORITY_MAIN - 1)
