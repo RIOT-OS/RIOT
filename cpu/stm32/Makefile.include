@@ -113,14 +113,19 @@ ifeq (,$(filter STM32MP157Cxx STM32F030x4,$(CPU_LINE)))
   # package so they are hardcoded in RIOTs codebase.
   # For other lines, the IRQs are automatically generated once from the whole
   # list of CMSIS headers available in a given family
-  STM32IRQS_INCLUDE_FILE = $(RIOTCPU)/stm32/include/irqs/$(CPU_FAM)/irqs.h
+  STM32IRQS_INCLUDE_FILE = $(RIOTCPU)/stm32/include/irqs/$(CPU_FAM)/stm32_irqs.h
   BUILDDEPS += $(STM32IRQS_INCLUDE_FILE)
+  INCLUDES += -I$(RIOTCPU)/stm32/include/irqs/$(CPU_FAM)
 endif
 
 # The IRQ header for a given family requires the family headers to be fetched
 # before since it's generated from all CMSIS content of that family
 $(STM32IRQS_INCLUDE_FILE): $(STM32FAM_INCLUDE_FILE)
 	$(Q)$(RIOTBASE)/cpu/stm32/dist/irqs/gen_irqs.py $(STM32CMSIS_INCLUDE_DIR) $(CPU_FAM)
+	@# TODO: remove the following after the 2026.01 release branch has been
+	@#       created.
+	@# Cleaning up any previously generated irqs.h; this file now is stm32_irqs.h
+	-@rm -f $(RIOTCPU)/stm32/include/irqs/$(CPU_FAM)/irqs.h
 
 # Include clock configuration directory
 INCLUDES += -I$(RIOTCPU)/stm32/include/clk
