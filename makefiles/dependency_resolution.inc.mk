@@ -74,6 +74,7 @@ else
 
   # Detect provided / used / optional features that do not exist
   include $(RIOTMAKE)/features_existing.inc.mk
+  -include $(EXTERNAL_CPU_DIRS)/features_existing.inc.mk
   FEATURES_NONEXISTING := $(sort $(filter-out $(FEATURES_EXISTING),$(FEATURES_PROVIDED)))
   ifneq (,$(FEATURES_NONEXISTING))
     $(error "The following non-existing features are provided by the board $(BOARD): $(FEATURES_NONEXISTING)")
