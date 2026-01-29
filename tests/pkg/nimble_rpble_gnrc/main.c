@@ -19,7 +19,6 @@
 #include <stdlib.h>
 
 #include "msg.h"
-#include "shell.h"
 #include "nimble_rpble.h"
 #include "net/bluetil/addr.h"
 
@@ -68,10 +67,6 @@ int main(void)
     /* we need a message queue for the thread running the shell in order to
      * receive potentially fast incoming networking packets (ping) */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
-
-    /* start shell */
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

@@ -16,7 +16,6 @@
  */
 
 #include <stdio.h>
-#include "shell.h"
 
 #include "control.h"
 
@@ -24,8 +23,5 @@ int main(void)
 {
     /* this should start ranging... */
     uwb_core_rng_init();
-    /* define buffer to be used by the shell */
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-    return 1;
+    return 0;
 }
