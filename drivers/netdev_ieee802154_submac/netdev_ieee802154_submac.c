@@ -219,7 +219,7 @@ static void _isr(netdev_t *netdev)
     do {
         flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_CRC_ERROR);
         if (flags & NETDEV_SUBMAC_FLAGS_CRC_ERROR) {
-            DEBUG("IEEE802154 submac:c NETDEV_SUBMAC_FLAGS_CRC_ERROR\n");
+            DEBUG("IEEE802154 submac: _isr(): NETDEV_SUBMAC_FLAGS_CRC_ERROR\n");
             ieee802154_submac_crc_error_cb(submac);
             flags &= ~NETDEV_SUBMAC_FLAGS_CRC_ERROR;
             continue;
