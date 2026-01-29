@@ -637,16 +637,9 @@ psa_status_t psa_algorithm_dispatch_cipher_encrypt_setup(psa_cipher_operation_t 
                                                          const psa_key_slot_t *slot,
                                                          psa_algorithm_t alg)
 {
-    operation->cipher_instance = PSA_ENCODE_CIPHER_OPERATION(alg, attributes->type, attributes->bits);
-
     uint8_t *key_data = NULL;
     size_t *key_bytes = NULL;
-
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
-
-    if (operation->cipher_instance == PSA_INVALID_OPERATION) {
-        return PSA_ERROR_INVALID_ARGUMENT;
-    }
 
     switch (operation->cipher_instance) {
 #  if IS_USED(MODULE_PSA_CIPHER_CHACHA20)
@@ -667,16 +660,9 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt_setup(psa_cipher_operation_t 
                                                          const psa_key_slot_t *slot,
                                                          psa_algorithm_t alg)
 {
-    operation->cipher_instance = PSA_ENCODE_CIPHER_OPERATION(alg, attributes->type, attributes->bits);
-
     uint8_t *key_data = NULL;
     size_t *key_bytes = NULL;
-
     psa_get_key_data_from_key_slot(slot, &key_data, &key_bytes);
-
-    if (operation->cipher_instance == PSA_INVALID_OPERATION) {
-        return PSA_ERROR_INVALID_ARGUMENT;
-    }
 
     switch (operation->cipher_instance) {
 #  if IS_USED(MODULE_PSA_CIPHER_CHACHA20)

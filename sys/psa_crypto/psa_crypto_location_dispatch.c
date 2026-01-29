@@ -265,15 +265,14 @@ static psa_status_t psa_se_cipher_encrypt_decrypt(const psa_drv_se_t *drv,
     }
 
     if (alg == PSA_ALG_CBC_NO_PADDING) {
-        operation.iv_required = 1;
-        operation.default_iv_length = PSA_CIPHER_IV_LENGTH(psa_get_key_type(attributes), alg);
+        /* Note: This previously used psa_generate_iv(), but this is not possible anymore
+         * as the operation has to be properly setup using psa_encrypt/decrypt_setup(). */
+        size_t iv_length = PSA_CIPHER_IV_LENGTH(attributes->type, alg);
 
         if (direction == PSA_CRYPTO_DRIVER_ENCRYPT) {
             /* In case of encryption, we need to generate and set an IV. The IV will be written
-            into the first 16 bytes of the output buffer. */
-            size_t iv_length = 0;
-            status = psa_cipher_generate_iv(&operation, output, operation.default_iv_length,
-                                            &iv_length);
+             * into the first 16 bytes of the output buffer. */
+            status = psa_generate_random(output, iv_length);
 
             status = drv->cipher->p_set_iv(se_ctx, output, iv_length);
             if (status != PSA_SUCCESS) {
@@ -285,12 +284,12 @@ static psa_status_t psa_se_cipher_encrypt_decrypt(const psa_drv_se_t *drv,
         }
         else {
             /* In case of decryption the IV to be used must be provided by the caller and is
-            contained in the first 16 Bytes of the input buffer.  */
-            status = drv->cipher->p_set_iv(se_ctx, input, operation.default_iv_length);
+             * contained in the first 16 Bytes of the input buffer.  */
+            status = drv->cipher->p_set_iv(se_ctx, input, iv_length);
 
             /* Increase input buffer offset to IV length to start decryption
-               with actual cipher text */
-            input_offset += operation.default_iv_length;
+             * with actual cipher text */
+            input_offset += iv_length;
         }
     }
 

@@ -518,6 +518,7 @@ static psa_status_t psa_get_and_lock_key_slot_with_policy(psa_key_id_t id,
 #endif /* MODULE_PSA_KEY_MANAGEMENT */
 
 #if IS_USED(MODULE_PSA_CIPHER)
+/* Is this missing docs? */
 psa_status_t psa_cipher_abort(psa_cipher_operation_t *operation)
 {
     if (!lib_initialized) {
@@ -546,45 +547,56 @@ static psa_status_t psa_cipher_setup(psa_cipher_operation_t *operation,
                                  PSA_KEY_USAGE_ENCRYPT :
                                  PSA_KEY_USAGE_DECRYPT);
 
-    if (!lib_initialized) {
+    if (!lib_initialized ||
+        operation->state != PSA_CIPHER_OP_STATE_INACTIVE) {
         return PSA_ERROR_BAD_STATE;
     }
-
     if (!operation) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-
     if (!PSA_ALG_IS_CIPHER(alg)) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
+    /* Getting the key slot*/
     status = psa_get_and_lock_key_slot_with_policy(key, &slot, usage, alg);
     if (status != PSA_SUCCESS) {
-        psa_cipher_abort(operation);
+        /* Quoting PSA Crypto:
+         * "If psa_cipher_encrypt/decrypt_setup() returns an
+         * error, the operation object is unchanged." */
         unlock_status = psa_unlock_key_slot(slot);
         return status;
     }
-
-    operation->iv_set = 0;
-    if (alg == PSA_ALG_ECB_NO_PADDING) {
-        operation->iv_required = 0;
-    }
-    else {
-        operation->iv_required = 1;
-    }
-    operation->default_iv_length = PSA_CIPHER_IV_LENGTH(slot->attr.type, alg);
-
     psa_key_attributes_t attr = slot->attr;
 
+    /* Setup the cipher operation */
+    psa_cipher_op_t cipher = PSA_ENCODE_CIPHER_OPERATION(alg, attr.type, attr.bits);
+    if (cipher == PSA_INVALID_OPERATION) {
+        *operation = psa_cipher_operation_init();
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+    operation->cipher_instance = cipher;
+    operation->default_iv_length = PSA_CIPHER_IV_LENGTH(attr.type, alg);
+
+    /* Then finally, a call to the backend */
     if (direction == PSA_CRYPTO_DRIVER_ENCRYPT) {
         status = psa_location_dispatch_cipher_encrypt_setup(operation, &attr, slot, alg);
     }
     else if (direction == PSA_CRYPTO_DRIVER_DECRYPT) {
         status = psa_location_dispatch_cipher_decrypt_setup(operation, &attr, slot, alg);
     }
-
     if (status != PSA_SUCCESS) {
-        psa_cipher_abort(operation);
+        *operation = psa_cipher_operation_init();
+        return status;
+    }
+
+    /* Update operation state */
+    if (operation->default_iv_length == 0) {
+        /* PSA Crypto: "If the cipher algorithm does not use an IV,
+         * PSA_CIPHER_IV_LENGTH(key_type, alg) will be zero." */
+        operation->state = PSA_CIPHER_OP_STATE_SETUP_DONE;
+    } else {
+        operation->state = PSA_CIPHER_OP_STATE_ACTIVE;
     }
 
     unlock_status = psa_unlock_key_slot(slot);
@@ -709,23 +721,30 @@ psa_status_t psa_cipher_finish(psa_cipher_operation_t *operation,
 {
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
 
-    if (!lib_initialized) {
+    if (!lib_initialized ||
+        operation->state != PSA_CIPHER_OP_STATE_SETUP_DONE) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
         return PSA_ERROR_BAD_STATE;
     }
-
     if (!operation || !output || !output_length) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-
-    if (operation->iv_required && !operation->iv_set) {
-        psa_cipher_abort(operation);
-        return PSA_ERROR_BAD_STATE;
-    }
+    /*
+     * Currently only Chacha20 is implemented as a multipart cipher.
+     * This cipher does not really care about the total input length,
+     * since it is a stream cipher. For block ciphers, you would need
+     * to check if the total input length is a multiple of the block size.
+     */
 
     status = psa_location_dispatch_cipher_finish(operation, output, output_size, output_length);
     if (status != PSA_SUCCESS) {
-        psa_cipher_abort(operation);
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
+        return status;
     }
+
+    operation->state = PSA_CIPHER_OP_STATE_INACTIVE;
+
     return status;
 }
 
@@ -736,32 +755,35 @@ psa_status_t psa_cipher_generate_iv(psa_cipher_operation_t *operation,
 {
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
 
-    if (!lib_initialized) {
+    if (!lib_initialized ||
+        operation->state != PSA_CIPHER_OP_STATE_ACTIVE) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
         return PSA_ERROR_BAD_STATE;
     }
-
     if (!operation || !iv || !iv_length) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-
-    *iv_length = 0;
-
-    if (!operation->iv_required || operation->iv_set) {
-        return PSA_ERROR_BAD_STATE;
-    }
-
+    /* Generate IV always produces a default length IV */
     if (iv_size < operation->default_iv_length) {
-        psa_cipher_abort(operation);
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
     status = psa_generate_random(iv, iv_size);
     if (status != PSA_SUCCESS) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
         return status;
     }
-
-    operation->iv_set = 1;
+    /* This should not fail */
+    status = psa_cipher_set_iv(operation, iv, iv_size);
+    if (status != PSA_SUCCESS) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
+        return status;
+    }
     *iv_length = iv_size;
+
+    operation->state = PSA_CIPHER_OP_STATE_SETUP_DONE;
 
     return status;
 }
@@ -772,24 +794,23 @@ psa_status_t psa_cipher_set_iv(psa_cipher_operation_t *operation,
 {
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
 
-    if (!lib_initialized) {
+    if (!lib_initialized ||
+        operation->state != PSA_CIPHER_OP_STATE_ACTIVE) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
         return PSA_ERROR_BAD_STATE;
     }
-
     if (!operation || !iv) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
         return PSA_ERROR_INVALID_ARGUMENT;
-    }
-
-    if (!operation->iv_required || operation->iv_set) {
-        return PSA_ERROR_BAD_STATE;
     }
 
     status = psa_location_dispatch_cipher_set_iv(operation, iv, iv_length);
     if (status != PSA_SUCCESS) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
         return status;
     }
 
-    operation->iv_set = 1;
+    operation->state = PSA_CIPHER_OP_STATE_SETUP_DONE;
 
     return status;
 }
@@ -803,20 +824,27 @@ psa_status_t psa_cipher_update(psa_cipher_operation_t *operation,
 {
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
 
-    if (!lib_initialized) {
+    if (!lib_initialized ||
+        operation->state != PSA_CIPHER_OP_STATE_SETUP_DONE) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
         return PSA_ERROR_BAD_STATE;
     }
-
     if (!operation || !input || !output || !output_length) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-
-    if (operation->iv_required && !operation->iv_set) {
-        return PSA_ERROR_BAD_STATE;
-    }
+    /*
+     * Currently only Chacha20 is implemented as a multipart cipher.
+     * This cipher does not really care about the total input length
+     * to this function, since it is virtually unlimited. For other
+     * ciphers, you would need to check the total input length.
+     */
 
     status = psa_location_dispatch_cipher_update(operation, input, input_length,
                                                  output, output_size, output_length);
+    if (status != PSA_SUCCESS) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
+    }
 
     return status;
 }

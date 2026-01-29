@@ -51,6 +51,14 @@ typedef enum {
     PSA_CRYPTO_DRIVER_ENCRYPT
 } psa_encrypt_or_decrypt_t;
 
+typedef enum {
+    PSA_CIPHER_OP_STATE_INACTIVE,     /* after init */
+    PSA_CIPHER_OP_STATE_ACTIVE,       /* after encrypt/decrypt_setup */
+    PSA_CIPHER_OP_STATE_SETUP_DONE,   /* after setting or generating the IV */
+    PSA_CIPHER_OP_STATE_ERROR         /* after an error occured */
+} psa_cipher_operation_state_t;
+
+
 /**
  * @brief   Structure containing the cipher contexts needed by the application.
  */
@@ -90,12 +98,9 @@ typedef struct {
  * @brief   Structure storing a cipher operation context
  */
 struct psa_cipher_operation_s {
-    uint8_t iv_required : 1;   /**< True if algorithm requires IV */
-    uint8_t iv_set : 1;        /**< True if IV was already set */
-    uint8_t default_iv_length; /**< Default IV length for algorithm */
-    psa_algorithm_t alg;       /**< Operation algorithm*/
-    /** Combination of the psa_algorithm_t and psa_key_type_t for a specific implementation. */
-    psa_cipher_op_t cipher_instance;
+    psa_cipher_operation_state_t state; /**< Current state of the Operation */
+    uint8_t default_iv_length;          /**< Default IV length for algorithm */
+    psa_cipher_op_t cipher_instance;    /**< Combination of key and algorithm */
     /** Union containing cipher contexts for the executing backend */
     union cipher_context {
         psa_cipher_context_t cipher_ctx; /**< Cipher context */
