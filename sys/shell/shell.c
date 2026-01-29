@@ -514,7 +514,6 @@ void auto_init_shell(void)
         return;
     }
 
-    puts("starting implicit shell");
     static char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 }
