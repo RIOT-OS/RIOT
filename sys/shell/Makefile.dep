@@ -198,7 +198,7 @@ ifneq (,$(filter shell_cmd_gnrc_sixlowpan_frag_stats,$(USEMODULE)))
 endif
 ifneq (,$(filter shell_cmd_gnrc_udp,$(USEMODULE)))
   USEMODULE += gnrc_udp
-  USEMODULE += gnrc_pktdump
+  USEMODULE += gnrc_pktdump # todo: could be removed, but sock async would be added
   USEMODULE += netutils
 endif
 ifneq (,$(filter shell_cmd_i2c_scan,$(USEMODULE)))
