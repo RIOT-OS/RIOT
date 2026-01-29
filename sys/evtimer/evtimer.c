@@ -37,7 +37,7 @@ static void _add_event_to_list(evtimer_t *evtimer, evtimer_event_t *event)
 
     while (*list) {
         /* Stop when new event time is nearer then next */
-        if (event->offset < (*list)->offset) {
+        if (event->offset <= (*list)->offset) {
             DEBUG("evtimer: next %" PRIu32 " < %" PRIu32 " ms\n",
                   event->offset, (*list)->offset);
             break;
@@ -123,6 +123,8 @@ static void _update_head_offset(evtimer_t *evtimer)
     }
 }
 
+static void _evtimer_handler(void *arg);
+
 void evtimer_add(evtimer_t *evtimer, evtimer_event_t *event)
 {
     unsigned state = irq_disable();
@@ -131,6 +133,10 @@ void evtimer_add(evtimer_t *evtimer, evtimer_event_t *event)
 
     _update_head_offset(evtimer);
     _add_event_to_list(evtimer, event);
+    /* drain zero-offset head immediately */
+    if (evtimer->events && evtimer->events->offset == 0) {
+        _evtimer_handler(evtimer);
+    }
     if (evtimer->events == event) {
         _set_timer(evtimer);
     }
@@ -197,9 +203,11 @@ void evtimer_print(const evtimer_t *evtimer)
     evtimer_event_t *list = evtimer->events;
     int nr = 0;
 
+    unsigned state = irq_disable();
     while (list) {
         nr++;
-        printf("ev #%d offset=%u\n", nr, (unsigned)list->offset);
+        printf("ev #%d offset=%u %p\n", nr, (unsigned)list->offset, list);
         list = list->next;
     }
+    irq_restore(state);
 }
