@@ -89,9 +89,6 @@ static ieee802154_fsm_state_t _tx_end(ieee802154_submac_t *submac, int status,
 {
     int res;
 
-    /* This is required to prevent unused variable warnings */
-    (void) res;
-
     submac->wait_for_ack = false;
 
     res = ieee802154_radio_set_idle(&submac->dev, true);
@@ -100,6 +97,10 @@ static ieee802154_fsm_state_t _tx_end(ieee802154_submac_t *submac, int status,
     /* no need to inform upper layer about ACK transmission */
     if (submac->fsm_state != IEEE802154_FSM_STATE_TX_ACK) {
         submac->cb->tx_done(submac, status, info);
+    }
+    else {
+        DEBUG("IEEE802154 submac: ACK transmission done\n");
+        submac->cb->rx_done(submac);
     }
     return IEEE802154_FSM_STATE_IDLE;
 }
@@ -172,9 +173,22 @@ static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac, uint8_t seq_num)
     submac->csma_retries_nb = 0;
     submac->backoff_mask = (1 << submac->be.min) - 1;
 
+    ieee802154_dev_t *dev = &submac->dev;
+
     DEBUG("IEEE802154 submac: Sending ACK\n");
 
-    return _handle_fsm_ev_request_tx(submac);
+    int res = ieee802154_radio_set_idle(dev, false);
+
+    if (res < 0) {
+        return res;
+    }
+    else {
+        /* write frame to radio */
+        ieee802154_radio_write(dev, submac->psdu);
+        /* do is synchronously so upper layer wouldn't notice */
+        _fsm_state_prepare(submac, IEEE802154_FSM_EV_BH, IEEE802154_FCF_TYPE_ACK);
+        return 0;
+    }
 }
 
 static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802154_fsm_ev_t ev)
@@ -194,7 +208,7 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
     case IEEE802154_FSM_EV_RX_DONE:
         while (ieee802154_radio_set_idle(dev, false) < 0) {}
         submac->rx_len = ieee802154_radio_len(dev);
-        assert(submac->rx_len < IEEE802154_FRAME_LEN_MAX);
+        assert(submac->rx_len <= IEEE802154_FRAME_LEN_MAX);
         res = ieee802154_radio_read(dev, submac->rx_buf, submac->rx_len, &submac->rx_info);
         assert(res == (int)submac->rx_len);
         /* Make sure it's not an ACK frame */
@@ -206,13 +220,13 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
                     (submac->rx_buf[0] & IEEE802154_FCF_ACK_REQ) &&
                     (ieee802154_radio_get_frame_filter_mode(dev, &mode) < 0 ||
                     mode == IEEE802154_FILTER_ACCEPT)) {
-                        res = _handle_fsm_ev_tx_ack(submac, ieee802154_get_seq(submac->rx_buf));
-                        submac->cb->rx_done(submac);
-                        if (res < 0) {
-                            DEBUG("IEEE802154 submac: Sending ACK failed with status: %d\n", res);
-                            return IEEE802154_FSM_STATE_IDLE;
-                        }
-                        return IEEE802154_FSM_STATE_TX_ACK;
+                    if ((res = _handle_fsm_ev_tx_ack(submac, ieee802154_get_seq(submac->rx_buf))) < 0) {
+                        DEBUG("IEEE802154 submac: Sending ACK failed with status: %d\n", res);
+                    }
+                    else {
+                       /* Do not call rx_done yet. ACK must be sent first */
+                       return IEEE802154_FSM_STATE_TX_ACK;
+                    }
                 }
             }
             submac->cb->rx_done(submac);
@@ -290,6 +304,8 @@ static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
 {
     ieee802154_dev_t *dev = &submac->dev;
 
+    ieee802154_fsm_state_t tx_state = IEEE802154_FSM_STATE_INVALID;
+
     switch (ev) {
     case IEEE802154_FSM_EV_BH:
         if (ftype == IEEE802154_FCF_TYPE_DATA
@@ -304,14 +320,16 @@ static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
             if (curr_be < submac->be.max) {
                 submac->backoff_mask = (submac->backoff_mask << 1) | 1;
             }
+            tx_state = IEEE802154_FSM_STATE_TX;
         }
         else if (ftype == IEEE802154_FCF_TYPE_ACK) {
             /* no backoff for ACK frames but wait for SIFSPeriod */
             ztimer_sleep(ZTIMER_USEC, SIFS_PERIOD_US);
+            tx_state = IEEE802154_FSM_STATE_TX_ACK;
         }
 
         while (ieee802154_radio_request_transmit(dev) == -EBUSY) {}
-        return IEEE802154_FSM_STATE_TX;
+        return tx_state;
     case IEEE802154_FSM_EV_RX_DONE:
     case IEEE802154_FSM_EV_CRC_ERROR:
         /* This might happen in case there's a race condition between ACK_TIMEOUT

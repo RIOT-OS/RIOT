@@ -437,6 +437,9 @@ static inline int ieee802154_get_frame_length(ieee802154_submac_t *submac)
  *
  * This functions reads the received PSDU from the device (excluding FCS)
  *
+ * @pre this function MUST be called either inside @ref ieee802154_submac_cb_t::rx_done
+ * or in SLEEP state.
+ *
  * @param[in] submac pointer to the SubMAC descriptor
  * @param[out] buf buffer to write into. If NULL, the packet is discarded
  * @param[in] len length of the buffer
@@ -455,7 +458,9 @@ static inline int ieee802154_read_frame(ieee802154_submac_t *submac, void *buf,
         info->rssi = submac->rx_info.rssi;
         info->lqi = submac->rx_info.lqi;
     }
-    memcpy(buf, submac->rx_buf, submac->rx_len);
+    if (buf != NULL) {
+        memcpy(buf, submac->rx_buf, submac->rx_len);
+    }
     return submac->rx_len;
 }
 
