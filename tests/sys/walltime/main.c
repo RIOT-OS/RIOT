@@ -11,11 +11,13 @@
  *
  */
 
+#include <stdio.h>
 #include <errno.h>
 #include "shell.h"
 #include "time_units.h"
 #include "fmt.h"
 #include "rtc_utils.h"
+
 #include "walltime.h"
 #include "ztimer.h"
 
