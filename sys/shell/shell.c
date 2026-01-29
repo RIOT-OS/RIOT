@@ -523,7 +523,7 @@ void shell_run_once(const shell_command_t *shell_commands,
                     char *line_buf, int len)
 {
     if (IS_USED(MODULE_AUTO_INIT_SHELL)) {
-        /* signal already run shell to main thread */
+        /* signal that the shell has been run to main thread */
         mutex_trylock(&_run_before);
     }
 
