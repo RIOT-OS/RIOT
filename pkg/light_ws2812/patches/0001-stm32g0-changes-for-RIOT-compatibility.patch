@@ -1,0 +1,75 @@
+From c5eaf14a5e26b0f325ab1edb9d0ac599f86519ba Mon Sep 17 00:00:00 2001
+From: Dave VanKampen <david.vankampen@bissell.com>
+Date: Fri, 4 Feb 2022 10:18:39 -0500
+Subject: [PATCH] stm32g0 changes for RIOT compatibility
+
+---
+ light_ws2812_ARM/light_ws2812_cortex.c |  4 ++--
+ light_ws2812_ARM/light_ws2812_cortex.h | 14 ++++++++++++--
+ 2 files changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/light_ws2812_ARM/light_ws2812_cortex.c b/light_ws2812_ARM/light_ws2812_cortex.c
+index a183888..7a21340 100644
+--- a/light_ws2812_ARM/light_ws2812_cortex.c
++++ b/light_ws2812_ARM/light_ws2812_cortex.c
+@@ -34,13 +34,13 @@ void ws2812_sendarray(uint8_t *data,int datlen)
+ 	uint32_t masklo = ws2812_mask_clr;
+ 	volatile uint32_t *set = ws2812_port_set;
+ 	volatile uint32_t *clr = ws2812_port_clr;
+-	uint32_t i;
++	uint32_t i = 0;
+ 	uint32_t curbyte;
+ 
+ 	while (datlen--) {
+ 		curbyte=*data++;
+ 
+-	asm volatile(
++	__asm__ volatile(
+ 			"		lsl %[dat],#24				\n\t"
+ 			"		movs %[ctr],#8				\n\t"
+ 			"ilop%=:							\n\t"
+diff --git a/light_ws2812_ARM/light_ws2812_cortex.h b/light_ws2812_ARM/light_ws2812_cortex.h
+index 6c43cbe..c7389b3 100644
+--- a/light_ws2812_ARM/light_ws2812_cortex.h
++++ b/light_ws2812_ARM/light_ws2812_cortex.h
+@@ -22,6 +22,9 @@
+ #elif defined(LIGHT_WS2812_UC_STM32L0XX)
+   #include "stm32l0xx_hal.h"
+   #define LIGHT_WS2812_STM32
++#elif defined(LIGHT_WS2812_UC_STM32G0XX)
++  #include "stm32g0xx.h"
++  #define LIGHT_WS2812_STM32
+ #elif defined(LIGHT_WS2812_UC_FSL)
+   #include "fsl_port.h"
+   #include "fsl_gpio.h"
+@@ -57,11 +60,16 @@
+ #endif
+ #ifdef LIGHT_WS2812_STM32
+   // This example is for STM32 family
++#if defined(LIGHT_WS2812_UC_STM32L0XX)
+   #define ws2812_port_set ((uint32_t*)&LIGHT_WS2812_GPIO_PORT->BSRR)  // Address of the data port register to set the pin
+   #define ws2812_port_clr ((uint32_t*)&LIGHT_WS2812_GPIO_PORT->BRR) // Address of the data port register to clear the pin
++#elif defined(LIGHT_WS2812_UC_STM32G0XX)
++  #define ws2812_port_set ((uint32_t*)&LIGHT_WS2812_GPIO_PORT->BSRR)  // Address of the data port register to set the pin
++  #define ws2812_port_clr ((uint32_t*)&LIGHT_WS2812_GPIO_PORT->BSRR) // Address of the data port register to clear the pin
++#endif
+ 
+-  #define ws2812_mask_set  LIGHT_WS2812_GPIO_PIN   // Bitmask to set the data out pin
+-  #define ws2812_mask_clr  LIGHT_WS2812_GPIO_PIN   // Bitmask to clear the data out pin
++  #define ws2812_mask_set  1 << LIGHT_WS2812_GPIO_PIN   // Bitmask to set the data out pin
++  #define ws2812_mask_clr  1 << (LIGHT_WS2812_GPIO_PIN+16)   // Bitmask to clear the data out pin
+ #endif
+ #ifdef LIGHT_WS2812_FSL
+   // This example is for Freescale family
+@@ -102,6 +110,8 @@
+ // predictable code execution timing.
+ ///////////////////////////////////////////////////////////////////////
+ 
++#include "clk.h"
++#define F_CPU CLOCK_CORECLOCK
+ #ifndef F_CPU
+ 	#error "Error: F_CPU (CPU clock speed) is not defined"
+ #endif
+-- 
+2.25.1
+

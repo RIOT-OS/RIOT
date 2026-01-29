@@ -1,0 +1,4 @@
+# Put the package dependencies here
+
+# required features
+FEATURES_REQUIRED += periph_gpio
