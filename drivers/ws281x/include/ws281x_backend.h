@@ -27,7 +27,7 @@ extern "C" {
  * @{
  */
 #ifdef MODULE_WS281X_ATMEGA
-#define WS281X_HAVE_INIT                    (1)
+#  define WS281X_HAVE_INIT                  (1)
 #endif
 /** @} */
 
@@ -36,7 +36,7 @@ extern "C" {
  * @{
  */
 #ifdef MODULE_WS281X_ESP32
-#define WS281X_HAVE_INIT                    (1)
+#  define WS281X_HAVE_INIT                  (1)
 #endif
 /** @} */
 
@@ -45,8 +45,8 @@ extern "C" {
  * @{
  */
 #ifdef MODULE_WS281X_VT100
-#define WS281X_HAVE_PREPARE_TRANSMISSION    (1)
-#define WS281X_HAVE_END_TRANSMISSION        (1)
+#  define WS281X_HAVE_PREPARE_TRANSMISSION  (1)
+#  define WS281X_HAVE_END_TRANSMISSION      (1)
 #endif
 /** @} */
 
@@ -55,7 +55,18 @@ extern "C" {
  * @{
  */
 #ifdef MODULE_WS281X_TIMER_GPIO_LL
-#define WS281X_HAVE_INIT                    (1)
+#  define WS281X_HAVE_INIT                  (1)
+#endif
+/** @} */
+
+/**
+ * @name    Properties of the SPI backend.
+ * @{
+ */
+#ifdef MODULE_WS281X_SPI
+#  define WS281X_HAVE_INIT                  (1)
+#  define WS281X_HAVE_PREPARE_TRANSMISSION  (1)
+#  define WS281X_HAVE_END_TRANSMISSION      (1)
 #endif
 /** @} */
 
