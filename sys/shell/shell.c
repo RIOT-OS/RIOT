@@ -514,8 +514,8 @@ void auto_init_shell(void)
         return;
     }
 
-    static char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    static char line_buf[CONFIG_SHELL_BUFSIZE];
+    shell_run(NULL, line_buf, CONFIG_SHELL_BUFSIZE);
 }
 #endif /* MODULE_AUTO_INIT_SHELL */
 

@@ -72,6 +72,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief Default shell buffer size (maximum line length shell can handle)
+ *
+ * @deprecated Use @ref CONFIG_SHELL_BUFSIZE instead. Will be removed after 2026.10.
+ */
+#define SHELL_DEFAULT_BUFSIZE   (128)
+
+/**
  * @defgroup sys_shell_config Shell compile time configurations
  * @ingroup config
  * @{
@@ -98,20 +105,20 @@ extern "C" {
  * @brief Set to 1 to disable shell's echo
  */
 #ifndef CONFIG_SHELL_NO_ECHO
-#define CONFIG_SHELL_NO_ECHO 0
+#  define CONFIG_SHELL_NO_ECHO 0
 #endif
 
 /**
  * @brief Set to 1 to disable shell's prompt
  */
 #ifndef CONFIG_SHELL_NO_PROMPT
-#define CONFIG_SHELL_NO_PROMPT 0
+#  define CONFIG_SHELL_NO_PROMPT 0
 #endif
 
-/** @} */
-
 /**
- * @brief Default shell buffer size (maximum line length shell can handle)
+ * @brief Shell buffer size (maximum line length shell can handle)
+ *
+ * Defaults to 128 bytes.
  *
  * @warning When terminals that buffer input and send the full command line in
  *   one go are used on stdin implementations with fast bursts of data,
@@ -126,7 +133,11 @@ extern "C" {
  *   For example, this affects systems with direct USB stdio (@ref
  *   usbus_cdc_acm_stdio) with the default terminal `pyterm`.
  */
-#define SHELL_DEFAULT_BUFSIZE   (128)
+#ifndef CONFIG_SHELL_BUFSIZE
+#  define CONFIG_SHELL_BUFSIZE (SHELL_DEFAULT_BUFSIZE)
+#endif
+
+/** @} */
 
 /**
  * @brief           Optional hook after readline has triggered.
