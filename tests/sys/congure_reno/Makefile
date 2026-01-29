@@ -10,7 +10,9 @@ INCLUDES += -I$(CURDIR)
 # Use a terminal that does not introduce extra characters into the stream.
 RIOT_TERMINAL ?= socat
 
-CFLAGS += -DSTDIO_UART_RX_BUFSIZE=512  # Adapt to SHELL_BUFSIZE in app
+# keep in sync
+CFLAGS += -DSHELL_DEFAULT_BUFSIZE=512
+CFLAGS += -DSTDIO_UART_RX_BUFSIZE=512
 
 include $(RIOTBASE)/Makefile.include
 

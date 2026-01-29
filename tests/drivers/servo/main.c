@@ -20,14 +20,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "shell.h"
-
 int main(void)
 {
     puts("RIOT RC servo test");
-
-    char buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, buf, sizeof(buf));
 
     return 0;
 }

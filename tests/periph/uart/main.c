@@ -31,11 +31,8 @@
 #include "stdio_uart.h"
 #endif
 
-#ifndef SHELL_BUFSIZE
-#define SHELL_BUFSIZE       (128U)
-#endif
 #ifndef UART_BUFSIZE
-#define UART_BUFSIZE        (128U)
+#define UART_BUFSIZE        (SHELL_DEFAULT_BUFSIZE)
 #endif
 
 #define PRINTER_PRIO        (THREAD_PRIORITY_MAIN - 1)
@@ -494,8 +491,6 @@ int main(void)
     printer_pid = thread_create(printer_stack, sizeof(printer_stack),
                                 PRINTER_PRIO, 0, printer, NULL, "printer");
 
-    /* run the shell */
-    char line_buf[SHELL_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_BUFSIZE);
+
     return 0;
 }
