@@ -32,7 +32,7 @@ typedef cipher_t psa_cipher_aes_192_ctx_t;
 typedef cipher_t psa_cipher_aes_256_ctx_t;
 #endif
 #if IS_USED(MODULE_PSA_RIOT_CIPHER_CHACHA20)
-#include "crypto/chacha20poly1305.h"
+#  include "crypto/chacha20poly1305.h"
 /**
  * @brief This struct is used to handle the discontinuity between the PSA API
  * and the RIOT ChaCha20 API. The PSA API psa_cipher_update() function allows any size
@@ -46,9 +46,9 @@ typedef cipher_t psa_cipher_aes_256_ctx_t;
  * the key in the buffer until it is needed in the RIOT API setup.
  */
 typedef struct {
-    uint8_t buffer[CHACHA20POLY1305_BLOCK_BYTES];   /**< Block buffer */
-    uint8_t buffer_length;                          /**< Current length of the data in buffer */
-    chacha20_ctx_t ctx;                             /**< Context of the RIOT ChaCha20 operation */
+    uint8_t buffer[CHACHA20POLY1305_BLOCK_BYTES]; /**< Block buffer */
+    uint8_t buffer_length;                        /**< Current length of the data in buffer */
+    chacha20_ctx_t ctx;                           /**< Context of the RIOT ChaCha20 operation */
 } psa_cipher_chacha20_ctx_t;
 #endif
 

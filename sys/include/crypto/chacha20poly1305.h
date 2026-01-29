@@ -30,12 +30,12 @@
 extern "C" {
 #endif
 
-#define CHACHA20POLY1305_CONSTANT_BYTES (16U)   /**< Constants length in bytes */
-#define CHACHA20POLY1305_KEY_BYTES      (32U)   /**< Key length in bytes */
-#define CHACHA20POLY1305_COUNTER_BYTES  (4U)    /**< Counter length in bytes */
-#define CHACHA20POLY1305_NONCE_BYTES    (12U)   /**< Nonce length in bytes */
-#define CHACHA20POLY1305_TAG_BYTES      (16U)   /**< Tag length in bytes */
-#define CHACHA20POLY1305_BLOCK_BYTES    (64U)   /**< Block length in bytes */
+#define CHACHA20POLY1305_CONSTANT_BYTES (16U) /**< Constants length in bytes */
+#define CHACHA20POLY1305_KEY_BYTES      (32U) /**< Key length in bytes */
+#define CHACHA20POLY1305_COUNTER_BYTES  (4U)  /**< Counter length in bytes */
+#define CHACHA20POLY1305_NONCE_BYTES    (12U) /**< Nonce length in bytes */
+#define CHACHA20POLY1305_TAG_BYTES      (16U) /**< Tag length in bytes */
+#define CHACHA20POLY1305_BLOCK_BYTES    (64U) /**< Block length in bytes */
 
 /**
  * @brief Context of a ChaCha20 multipart operation
@@ -52,7 +52,7 @@ typedef union {
         uint32_t counter[CHACHA20POLY1305_COUNTER_BYTES / sizeof(uint32_t)];
         /**< Nonce of the ChaCha20 operation */
         uint32_t nonce[CHACHA20POLY1305_NONCE_BYTES / sizeof(uint32_t)];
-    }__attribute__ ((__packed__)) split;    /**< Individual access to ChaCha20 state */
+    } __attribute__((__packed__)) split; /**< Individual access to ChaCha20 state */
 } chacha20_ctx_t;
 
 /**
@@ -63,8 +63,8 @@ typedef union {
      * the same time. This works as long as the first 8 members of state
      * overlap fully or completely not with the first and second key parts
      * from the @ref poly1305_ctx_t struct */
-    chacha20_ctx_t chacha20;   /**< The context of the ChaCha20 operation. */
-    poly1305_ctx_t poly;    /**< Poly1305 state for the MAC */
+    chacha20_ctx_t chacha20; /**< The context of the ChaCha20 operation. */
+    poly1305_ctx_t poly;     /**< Poly1305 state for the MAC */
 } chacha20poly1305_ctx_t;
 
 /**
@@ -124,12 +124,12 @@ int chacha20poly1305_decrypt(const uint8_t *cipher, size_t cipherlen,
  * @param[in]   input_length    Length of the input byte array.
  * @param[out]  output          The resulting encrypted cipher/decrypted message.
 */
-void chacha20_encrypt_decrypt(  const uint8_t *key,
-                                const uint8_t *nonce,
-                                uint32_t counter,
-                                const uint8_t *input,
-                                size_t input_length,
-                                uint8_t *output);
+void chacha20_encrypt_decrypt(const uint8_t *key,
+                              const uint8_t *nonce,
+                              uint32_t counter,
+                              const uint8_t *input,
+                              size_t input_length,
+                              uint8_t *output);
 /**
  * @brief Setup a ChaCha20 encrypt or decrypt multipart operation.
  *
@@ -151,9 +151,9 @@ void chacha20_setup(chacha20_ctx_t *ctx,
  * @param[in]   input           Input buffer containing one block of input data (64B).
  * @param[out]  output          Output buffer. Must be at least length of input buffer.
  */
-void chacha20_update(   chacha20_ctx_t *ctx,
-                        const uint8_t *input,
-                        uint8_t *output);
+void chacha20_update(chacha20_ctx_t *ctx,
+                     const uint8_t *input,
+                     uint8_t *output);
 
 /**
  * @brief Finish a ChaCha20 encrypt or decrypt multipart operation.
@@ -163,10 +163,10 @@ void chacha20_update(   chacha20_ctx_t *ctx,
  * @param[in]   input_length    Length of input buffer. Must be a less than 64B.
  * @param[out]  output          Output buffer. Must be at least length of input buffer.
  */
-void chacha20_finish(   chacha20_ctx_t *ctx,
-                        const uint8_t *input,
-                        size_t input_length,
-                        uint8_t *output);
+void chacha20_finish(chacha20_ctx_t *ctx,
+                     const uint8_t *input,
+                     size_t input_length,
+                     uint8_t *output);
 
 #ifdef __cplusplus
 }

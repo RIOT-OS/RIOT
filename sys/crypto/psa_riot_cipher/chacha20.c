@@ -20,12 +20,12 @@
 #include "psa/crypto.h"
 #include "crypto/chacha20poly1305.h"
 
-#define ENABLE_DEBUG    0
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
-static psa_status_t _setup( psa_cipher_chacha20_ctx_t *ctx,
-                                        uint8_t *key_data,
-                                        size_t key_length)
+static psa_status_t _setup(psa_cipher_chacha20_ctx_t *ctx,
+                           uint8_t *key_data,
+                           size_t key_length)
 {
     DEBUG("RIOT ChaCha20 Cipher setup");
 
@@ -40,16 +40,16 @@ static psa_status_t _setup( psa_cipher_chacha20_ctx_t *ctx,
     return PSA_SUCCESS;
 }
 
-psa_status_t psa_cipher_chacha20_encrypt_setup( psa_cipher_chacha20_ctx_t *ctx,
-                                                uint8_t *key_data,
-                                                size_t key_length)
+psa_status_t psa_cipher_chacha20_encrypt_setup(psa_cipher_chacha20_ctx_t *ctx,
+                                               uint8_t *key_data,
+                                               size_t key_length)
 {
     return _setup(ctx, key_data, key_length);
 }
 
-psa_status_t psa_cipher_chacha20_decrypt_setup( psa_cipher_chacha20_ctx_t *ctx,
-                                                uint8_t *key_data,
-                                                size_t key_length)
+psa_status_t psa_cipher_chacha20_decrypt_setup(psa_cipher_chacha20_ctx_t *ctx,
+                                               uint8_t *key_data,
+                                               size_t key_length)
 {
     return _setup(ctx, key_data, key_length);
 }
@@ -62,30 +62,32 @@ psa_status_t psa_cipher_chacha20_set_iv(psa_cipher_chacha20_ctx_t *ctx,
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     /* See PSA Specification */
     switch (iv_length) {
-        case 8:
-            /* 8 bytes: the cipher operation uses the original [CHACHA20] definition
-            of ChaCha20: the provided IV is used as the 64-bit nonce, and the 64-bit
-            counter value is set to zero.
-            This is currently not supported, as the current implementation only handles
-            12-byte nonces. To change this, you would need to modify chacha20_ctx_t
-            and functions that are using this type. */
-            status = PSA_ERROR_NOT_SUPPORTED;
-            break;
-        case 12:
-            /* 12 bytes: the provided IV is used as the nonce, and the counter value
-            is set to zero. */
-            chacha20_setup(&ctx->ctx, ctx->buffer, iv, 0);
-            status = PSA_SUCCESS;
-            break;
-        case 16:
-            /* 16 bytes: the first four bytes of the IV are used as the counter value
-            (encoded as little-endian), and the remaining 12 bytes are used as the nonce. */
-            chacha20_setup(&ctx->ctx, ctx->buffer, &iv[4], unaligned_get_u32(iv));
-            status = PSA_SUCCESS;
-            break;
-        default:
-            /* It is recommended that implementations do not support other sizes of IV. */
-            status = PSA_ERROR_INVALID_ARGUMENT;
+    case 8:
+        /*
+         * 8 bytes: the cipher operation uses the original [CHACHA20] definition
+         * of ChaCha20: the provided IV is used as the 64-bit nonce, and the 64-bit
+         * counter value is set to zero.
+         * This is currently not supported, as the current implementation only handles
+         * 12-byte nonces. To change this, you would need to modify chacha20_ctx_t
+         * and functions that are using this type.
+         */
+        status = PSA_ERROR_NOT_SUPPORTED;
+        break;
+    case 12:
+        /* 12 bytes: the provided IV is used as the nonce, and the counter value
+         * is set to zero. */
+        chacha20_setup(&ctx->ctx, ctx->buffer, iv, 0);
+        status = PSA_SUCCESS;
+        break;
+    case 16:
+        /* 16 bytes: the first four bytes of the IV are used as the counter value
+         * (encoded as little-endian), and the remaining 12 bytes are used as the nonce. */
+        chacha20_setup(&ctx->ctx, ctx->buffer, &iv[4], unaligned_get_u32(iv));
+        status = PSA_SUCCESS;
+        break;
+    default:
+        /* It is recommended that implementations do not support other sizes of IV. */
+        status = PSA_ERROR_INVALID_ARGUMENT;
     }
     /* Clear key from buffer */
     explicit_bzero(ctx->buffer, sizeof(ctx->buffer));
@@ -170,8 +172,9 @@ psa_status_t psa_cipher_chacha20_encrypt(uint8_t *key_buffer,
     uint8_t *nonce = &output[0];
     uint8_t *data_out = &output[CHACHA20POLY1305_NONCE_BYTES];
     status = psa_generate_random(nonce, CHACHA20POLY1305_NONCE_BYTES);
-    if (status != PSA_SUCCESS)
+    if (status != PSA_SUCCESS) {
         return status;
+    }
 
     chacha20_encrypt_decrypt(key_buffer, nonce, 0, input, input_length, data_out);
 
@@ -202,7 +205,8 @@ psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
     const uint8_t *nonce = &input[0];
     const uint8_t *data_in = &input[CHACHA20POLY1305_NONCE_BYTES];
 
-    chacha20_encrypt_decrypt(key_buffer, nonce, 0, data_in, input_length - CHACHA20POLY1305_NONCE_BYTES, output);
+    chacha20_encrypt_decrypt(key_buffer, nonce, 0, data_in,
+                             input_length - CHACHA20POLY1305_NONCE_BYTES, output);
     *output_length = input_length;
     return PSA_SUCCESS;
 }

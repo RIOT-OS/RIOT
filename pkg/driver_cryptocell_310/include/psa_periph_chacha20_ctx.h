@@ -23,7 +23,6 @@ extern "C" {
 #include "crys_chacha.h"
 #include "kernel_defines.h"
 
-#if IS_USED(MODULE_PERIPH_CIPHER_CHACHA20) || DOXYGEN
 /**
  * @brief This struct is used to handle the discontinuity between the PSA API
  * and the CRYS ChaCha20 API. The PSA API psa_cipher_update() function allows any size
@@ -44,8 +43,6 @@ typedef struct {
         CRYS_CHACHAUserContext_t post_setup;            /**< Context of the CRYS ChaCha20 operation */
     } ctx;                                              /**< Context Setup values */
 } psa_cipher_chacha20_ctx_t;
-
-#endif
 
 #ifdef __cplusplus
 }
