@@ -11,6 +11,8 @@
  *
  */
 
+#include <stdio.h>
+
 #include "walltime.h"
 
 static void _time_change_cb(void *ctx, int32_t diff_sec, int16_t diff_ms)
