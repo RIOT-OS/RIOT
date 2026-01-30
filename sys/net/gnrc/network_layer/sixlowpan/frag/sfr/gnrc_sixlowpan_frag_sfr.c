@@ -445,15 +445,28 @@ void gnrc_sixlowpan_frag_sfr_recv(gnrc_pktsnip_t *pkt, void *ctx,
         DEBUG("6lo sfr: Invalid page %u\n", page);
         gnrc_pktbuf_release(pkt);
     }
-    else if (sixlowpan_sfr_rfrag_is(hdr)) {
+    else if (pkt->size < sizeof(sixlowpan_sfr_t)) {
+        DEBUG("6lo sfr: header too small (%lu bytes < 16 bytes)\n",
+              (long unsigned)pkt->size);
+        gnrc_pktbuf_release(pkt);
+    }
+    else if ((pkt->size >= sizeof(sixlowpan_sfr_rfrag_t)) &&
+             sixlowpan_sfr_rfrag_is(hdr)) {
         _handle_rfrag(netif_hdr, pkt, page);
     }
-    else if (sixlowpan_sfr_ack_is(hdr)) {
+    else if ((pkt->size >= sizeof(sixlowpan_sfr_ack_t)) &&
+             sixlowpan_sfr_ack_is(hdr)) {
         _handle_ack(netif_hdr, pkt, page);
     }
     else {
-        DEBUG("6lo sfr: Unknown dispatch: %02x\n",
-              hdr->disp_ecn & SIXLOWPAN_SFR_DISP_MASK);
+        /* accessing hdr->disp_ecn is safe, as it is within `sixlowpan_sfr_t`
+         * for which the length is checked above and we only reach this
+         * code if `pkt->size` (the allocated size of hdr) is
+         * >= sizeof(sixlowpan_sfr_t). */
+        DEBUG("6lo sfr: Unknown dispatch: %02x or "
+              "dispatch of unexpected size %lu\n",
+              hdr->disp_ecn & SIXLOWPAN_SFR_DISP_MASK,
+              (long unsigned)pkt->size);
         gnrc_pktbuf_release(pkt);
     }
 }
