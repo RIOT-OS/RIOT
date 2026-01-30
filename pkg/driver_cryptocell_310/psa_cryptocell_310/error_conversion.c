@@ -20,6 +20,7 @@
 
 #include "psa_error.h"
 #include "crys_aesccm_error.h"
+#include "crys_chacha_poly_error.h"
 
 psa_status_t CRYS_to_psa_error(CRYSError_t error)
 {
@@ -566,6 +567,22 @@ const char *cryptocell310_status_to_humanly_readable(uint32_t status)
             return "CRYS_AESCCM_IS_NOT_SUPPORTED";
         case CRYS_AESCCM_CCM_MAC_INVALID_ERROR:
             return "CRYS_AESCCM_CCM_MAC_INVALID_ERROR";
+        case CRYS_CHACHA_POLY_ADATA_INVALID_ERROR:
+            return "CRYS_CHACHA_POLY_ADATA_INVALID_ERROR";
+        case CRYS_CHACHA_POLY_DATA_INVALID_ERROR:
+            return "CRYS_CHACHA_POLY_DATA_INVALID_ERROR";
+        case CRYS_CHACHA_POLY_ENC_MODE_INVALID_ERROR:
+            return "CRYS_CHACHA_POLY_ENC_MODE_INVALID_ERROR";
+        case CRYS_CHACHA_POLY_DATA_SIZE_INVALID_ERROR:
+            return "CRYS_CHACHA_POLY_DATA_SIZE_INVALID_ERROR";
+        case CRYS_CHACHA_POLY_GEN_KEY_ERROR:
+            return "CRYS_CHACHA_POLY_GEN_KEY_ERROR";
+        case CRYS_CHACHA_POLY_ENCRYPTION_ERROR:
+            return "CRYS_CHACHA_POLY_ENCRYPTION_ERROR";
+        case CRYS_CHACHA_POLY_AUTH_ERROR:
+            return "CRYS_CHACHA_POLY_AUTH_ERROR";
+        case CRYS_CHACHA_POLY_MAC_ERROR:
+            return "CRYS_CHACHA_POLY_MAC_ERROR";
         default:
             return "Error value not recognized";
     }
