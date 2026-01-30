@@ -29,6 +29,11 @@ static const ieee802154_submac_cb_t _cb;
 
 static const netdev_driver_t netdev_submac_driver;
 
+static uint32_t _isr_flags_get(netdev_ieee802154_submac_t *netdev_submac)
+{
+    return atomic_load_u32(&netdev_submac->isr_flags);
+}
+
 static uint32_t _isr_flags_get_clear(netdev_ieee802154_submac_t *netdev_submac, uint32_t clear)
 {
     return atomic_fetch_and_u32(&netdev_submac->isr_flags, ~clear);
@@ -214,54 +219,50 @@ static void _isr(netdev_t *netdev)
                                                              netdev_ieee802154_submac_t,
                                                              dev);
     ieee802154_submac_t *submac = &netdev_submac->submac;
-
     uint32_t flags;
+
     do {
-        flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_CRC_ERROR);
+        flags = _isr_flags_get_clear(netdev_submac,
+                                     NETDEV_SUBMAC_FLAGS_CRC_ERROR
+                                     | NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT
+                                     | NETDEV_SUBMAC_FLAGS_BH_REQUEST
+                                     | NETDEV_SUBMAC_FLAGS_RX_DONE
+                                     | NETDEV_SUBMAC_FLAGS_TX_DONE);
+
         if (flags & NETDEV_SUBMAC_FLAGS_CRC_ERROR) {
             DEBUG("IEEE802154 submac:c NETDEV_SUBMAC_FLAGS_CRC_ERROR\n");
             ieee802154_submac_crc_error_cb(submac);
             flags &= ~NETDEV_SUBMAC_FLAGS_CRC_ERROR;
-            continue;
         }
 
-        flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT);
         if (flags & NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT) {
             DEBUG("IEEE802154 submac: _isr(): NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT\n");
             ieee802154_submac_ack_timeout_fired(submac);
             flags &= ~NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT;
-            continue;
         }
 
-        flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_BH_REQUEST);
         if (flags & NETDEV_SUBMAC_FLAGS_BH_REQUEST) {
             DEBUG("IEEE802154 submac: _isr(): NETDEV_SUBMAC_FLAGS_BH_REQUEST\n");
             ieee802154_submac_bh_process(submac);
             flags &= ~NETDEV_SUBMAC_FLAGS_BH_REQUEST;
-            continue;
         }
 
-        flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_RX_DONE);
         if (flags & NETDEV_SUBMAC_FLAGS_RX_DONE) {
             DEBUG("IEEE802154 submac: _isr(): NETDEV_SUBMAC_FLAGS_RX_DONE\n");
             ieee802154_submac_rx_done_cb(submac);
             flags &= ~NETDEV_SUBMAC_FLAGS_RX_DONE;
-            /* dispatch to netif */
         }
 
-        flags = _isr_flags_get_clear(netdev_submac, NETDEV_SUBMAC_FLAGS_TX_DONE);
         if (flags & NETDEV_SUBMAC_FLAGS_TX_DONE) {
             DEBUG("IEEE802154 submac: _isr(): NETDEV_SUBMAC_FLAGS_TX_DONE\n");
             ieee802154_submac_tx_done_cb(submac);
             flags &= ~NETDEV_SUBMAC_FLAGS_TX_DONE;
-            /* dispatch to netif */
         }
 
         DEBUG("IEEE802154 submac: _isr_flags_get_clear(): pending flags: %"PRIu32"\n", flags);
         assert(!flags);
-        break;
 
-    } while (1);
+    } while (_isr_flags_get(netdev_submac));
 
     if (netdev_submac->dispatch) {
         /* The SubMAC will not generate further events after calling TX Done or RX Done. */
