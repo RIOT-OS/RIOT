@@ -1,12 +1,8 @@
 /*
- * Copyright (C) 2017 SKF AB
- * Copyright (C) 2016 Phytec Messtechnik GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Phytec Messtechnik GmbH
+ * SPDX-FileCopyrightText: 2017 SKF AB
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
-
 #pragma once
 
 /**
@@ -162,10 +158,26 @@ int kw41zrf_can_switch_to_idle(kw41zrf_t *dev);
 /**
  * @brief   Set sequence state of device
  *
+ * @note    Setting any sequence before the radio is in SEQ_IDLE has no effect.
+ *          Setting IDLE will properly abort any ongoing sequence.
+ *
  * @param[in] dev       kw41zrf device descriptor
  * @param[in] seq       sequence
  */
 void kw41zrf_set_sequence(kw41zrf_t *dev, uint32_t seq);
+
+/**
+ * @brief   Get the current state of device
+ *
+ * @param[in] dev   kw41zrf device descriptor
+ *
+ * @return current state
+ */
+static inline uint8_t kw41zrf_get_sequence(kw41zrf_t *dev)
+{
+    (void)dev;
+    return (ZLL->PHY_CTRL & ZLL_PHY_CTRL_XCVSEQ_MASK) >> ZLL_PHY_CTRL_XCVSEQ_SHIFT;
+}
 
 /**
  * @brief Abort the current autosequence
@@ -187,6 +199,18 @@ static inline void kw41zrf_abort_sequence(kw41zrf_t *dev)
     /* Clear interrupt flags */
     uint32_t irqsts = ZLL->IRQSTS;
     ZLL->IRQSTS = irqsts;
+}
+
+/**
+ * @brief   Abort current sequence and set new sequence state
+ *
+ * @param[in] dev       kw41zrf device descriptor
+ * @param[in] seq       new sequence state to set
+ */
+static inline void kw41zrf_set_sequence_abort(kw41zrf_t *dev, uint32_t seq)
+{
+    kw41zrf_abort_sequence(dev);
+    kw41zrf_set_sequence(dev, seq);
 }
 
 /**
@@ -272,6 +296,19 @@ static inline uint32_t kw41zrf_get_timestamp(kw41zrf_t *dev)
 {
     (void) dev;
     return ZLL->TIMESTAMP;
+}
+
+/**
+ * @brief Checks if an ACK is requested for the transmitting frame
+ *
+ * @param[in] dev       kw41zrf device descriptor
+ *
+ * @return              non-zero if ACK is requested, 0 otherwise
+ */
+static inline uint8_t kw41zrf_ack_requested(kw41zrf_t *dev)
+{
+        (void) dev;
+        return (ZLL->PHY_CTRL & ZLL_PHY_CTRL_RXACKRQD_MASK);
 }
 
 #ifdef __cplusplus
