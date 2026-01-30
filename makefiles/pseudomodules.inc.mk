@@ -547,6 +547,7 @@ PSEUDOMODULES += vfs_auto_mount
 ## backends.
 PSEUDOMODULES += vfs_default
 
+PSEUDOMODULES += walltime_default
 PSEUDOMODULES += walltime_impl_ds1307
 PSEUDOMODULES += walltime_impl_ds3231
 PSEUDOMODULES += walltime_impl_rtc
