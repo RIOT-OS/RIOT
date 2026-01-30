@@ -1,2 +1,6 @@
 USEMODULE += rtc_utils
 USEMODULE += fmt
+
+ifneq (,$(filter walltime_impl_ds1307,$(USEMODULE)))
+  USEMODULE += ds1307
+endif
