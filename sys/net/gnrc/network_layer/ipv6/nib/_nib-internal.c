@@ -27,6 +27,7 @@
 #include "net/gnrc/netif/internal.h"
 #include "net/ipv6/addr.h"
 #include "random.h"
+#include "evtimer_msg.h"
 
 #include "_nib-internal.h"
 #include "_nib-router.h"
@@ -79,6 +80,36 @@ void _nib_acquire(void)
 void _nib_release(void)
 {
     rmutex_unlock(&_nib_mutex);
+}
+
+void _evtimer_del(evtimer_msg_event_t *event)
+{
+    DEBUG("nib: Remove timer event %p\n", (void *)event);
+    _nib_acquire();
+    evtimer_del(&_nib_evtimer, &event->event);
+    _nib_release();
+}
+
+void _evtimer_add_dbg(void *ctx, int16_t type,
+                      evtimer_msg_event_t *event, uint32_t offset,
+                      const char *stype)
+{
+#ifdef MODULE_GNRC_IPV6
+    kernel_pid_t target_pid = gnrc_ipv6_pid;
+#else
+    kernel_pid_t target_pid = KERNEL_PID_LAST;  /* just for testing */
+#endif
+    /* Lock is only precautionary */
+    _nib_acquire();
+    _evtimer_del(event);
+    event->event.next = NULL;
+    event->event.offset = offset;
+    event->msg.type = type;
+    event->msg.content.ptr = ctx;
+    DEBUG("nib: Add event %p, ctx=%p, type=%s, offset=%"PRIu32"ms\n",
+          (void *)event, ctx, stype, offset);
+    evtimer_add_msg(&_nib_evtimer, event, target_pid);
+    _nib_release();
 }
 
 static inline bool _addr_equals(const ipv6_addr_t *addr,
@@ -269,15 +300,15 @@ void _nib_nc_remove(_nib_onl_entry_t *node)
           ipv6_addr_to_str(addr_str, &node->ipv6, sizeof(addr_str)),
           _nib_onl_get_if(node));
     node->mode &= ~(_NC);
-    evtimer_del((evtimer_t *)&_nib_evtimer, &node->snd_na.event);
+    _evtimer_del(&node->snd_na);
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
-    evtimer_del((evtimer_t *)&_nib_evtimer, &node->nud_timeout.event);
+    _evtimer_del(&node->nud_timeout);
 #endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
-    evtimer_del((evtimer_t *)&_nib_evtimer, &node->reply_rs.event);
+    _evtimer_del(&node->reply_rs);
 #endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
-    evtimer_del((evtimer_t *)&_nib_evtimer, &node->addr_reg_timeout.event);
+    _evtimer_del(&node->addr_reg_timeout);
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LR */
     _nbr_flush_pktqueue(node);
     /* remove from cache-out procedure */
@@ -706,7 +737,7 @@ void _nib_offl_remove_prefix(_nib_offl_entry_t *pfx)
     gnrc_netif_t *netif;
 
     /* remove prefix timer */
-    evtimer_del(&_nib_evtimer, &pfx->pfx_timeout.event);
+    _evtimer_del(&pfx->pfx_timeout);
 
     /* get interface associated with prefix */
     netif = gnrc_netif_get_by_pid(_nib_onl_get_if(pfx->next_hop));
