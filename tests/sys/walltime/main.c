@@ -12,6 +12,8 @@
  */
 
 #include "shell.h"
+#include "fmt.h"
+#include "rtc_utils.h"
 #include "walltime.h"
 
 static void _time_change_cb(void *ctx, int32_t diff_sec, int16_t diff_ms)
@@ -45,6 +47,46 @@ static void _add_and_remove_dummy_cb(void)
     walltime_change_unsubscribe(&sub_a);
     walltime_change_unsubscribe(&sub_b);
 }
+
+#define TEST_RES(res, func)                                         \
+    if (res < 0) {                                                  \
+        printf(func " failed (%d) on line %u\n", res, __LINE__);    \
+        goto fail;                                                  \
+    }
+
+static int _cmd_test(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+
+    struct tm now, expect;
+    int res;
+
+    res = scn_time_tm_iso8601(&expect, "2020-01-01 12:34:56", ' ');
+    TEST_RES(res, "parse time");
+    res = walltime_set(&expect);
+    TEST_RES(res, "walltime_set()");
+    res = walltime_get(&now, NULL);
+    TEST_RES(res, "walltime_get()");
+    res = rtc_tm_compare(&now, &expect);
+    TEST_RES(res, "rtc_tm_compare()");
+
+    res = scn_time_tm_iso8601(&expect, "2046-01-01 12:34:56", ' ');
+    TEST_RES(res, "parse time");
+    res = walltime_set(&expect);
+    TEST_RES(res, "walltime_set()");
+    res = walltime_get(&now, NULL);
+    TEST_RES(res, "walltime_get()");
+    res = rtc_tm_compare(&now, &expect);
+    TEST_RES(res, "rtc_tm_compare()");
+
+    puts("TEST PASSED");
+    return res;
+fail:
+    puts("TEST FAILED");
+    return res;
+}
+SHELL_COMMAND(test, "test the walltime backend", _cmd_test);
 
 int main(void)
 {
