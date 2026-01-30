@@ -32,6 +32,9 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+extern void _handle_rtr_timeout(_nib_dr_entry_t *router);
+extern void _handle_search_rtr(gnrc_netif_t *netif);
+
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
@@ -229,6 +232,12 @@ void _handle_snd_ns(_nib_onl_entry_t *nbr)
             if (nbr->ns_sent >= NDP_MAX_UC_SOL_NUMOF) {
                 gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(nbr));
                 _set_unreachable(netif, nbr);
+                /* one of our DR became unreachable, so try find a new one */
+                if (_nib_drl_get(&nbr->ipv6, _nib_onl_get_if(nbr))) {
+                    _handle_rtr_timeout(_nib_drl_get(&nbr->ipv6, _nib_onl_get_if(nbr)));
+                    netif->ipv6.rs_sent = 0;
+                    _handle_search_rtr(netif);
+                }
             }
             /* intentionally falls through */
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE:

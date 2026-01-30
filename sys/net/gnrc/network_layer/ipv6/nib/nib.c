@@ -94,9 +94,9 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                           _nib_onl_entry_t *entry);
 
 static void _handle_pfx_timeout(_nib_offl_entry_t *pfx);
-static void _handle_rtr_timeout(_nib_dr_entry_t *router);
 static void _handle_snd_na(gnrc_pktsnip_t *pkt);
 /* needs to be exported for 6LN's ARO handling */
+void _handle_rtr_timeout(_nib_dr_entry_t *router);
 void _handle_search_rtr(gnrc_netif_t *netif);
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
 static void _handle_rdnss_timeout(sock_udp_ep_t *dns_server);
@@ -1592,7 +1592,7 @@ static void _handle_pfx_timeout(_nib_offl_entry_t *pfx)
     gnrc_netif_release(netif);
 }
 
-static void _handle_rtr_timeout(_nib_dr_entry_t *router)
+void _handle_rtr_timeout(_nib_dr_entry_t *router)
 {
     if ((router->next_hop != NULL) && (router->next_hop->mode & _DRL)) {
         _nib_offl_entry_t *route = NULL;
