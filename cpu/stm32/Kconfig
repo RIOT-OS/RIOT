@@ -10,7 +10,6 @@ menu "STM32 configuration"
 config CPU
     default "stm32" if CPU_STM32
 
-
 menu "STM32 clock configuration"
     depends on CPU_STM32
 

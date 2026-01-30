@@ -36,6 +36,8 @@
 #include "periph/f7/periph_cpu.h"
 #elif defined(CPU_FAM_STM32G0)
 #include "periph/g0/periph_cpu.h"
+#elif defined(CPU_FAM_STM32H7)
+#include "periph/h7/periph_cpu.h"
 #elif defined(CPU_FAM_STM32C0)
 #include "periph/c0/periph_cpu.h"
 #elif defined(CPU_FAM_STM32G4)
@@ -172,6 +174,7 @@ typedef struct {
 #else
 #define USBDEV_NUM_ENDPOINTS            8
 #endif
+/** @} */
 
 /* unify names across STM32 families */
 #ifdef SPI_CR1_CPHA_Msk

@@ -104,6 +104,7 @@ FEATURES_EXISTING := \
     cpu_stm32f7 \
     cpu_stm32g0 \
     cpu_stm32g4 \
+    cpu_stm32h7 \
     cpu_stm32l0 \
     cpu_stm32l1 \
     cpu_stm32l4 \

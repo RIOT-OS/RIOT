@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2025 Technische Universität Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config CPU_FAM_H7
+    bool
+    select CPU_STM32
+    select CPU_CORE_CORTEX_M7
+
+config CPU_FAM
+    default "h7" if CPU_FAM_H7
