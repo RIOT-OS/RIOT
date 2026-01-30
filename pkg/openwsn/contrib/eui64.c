@@ -38,5 +38,4 @@ void eui64_get(uint8_t *addressToWrite)
         _eui64_is_set = true;
     }
     memcpy(addressToWrite, _eui64.uint8, sizeof(_eui64.uint8));
-    memset(addressToWrite, 0, sizeof(eui64_t));
 }
