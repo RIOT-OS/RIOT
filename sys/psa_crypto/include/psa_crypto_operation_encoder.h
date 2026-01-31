@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2022 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2022 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -27,8 +24,8 @@
 extern "C" {
 #endif
 
-#include "psa/crypto.h"
-#include "psa_crypto_slot_management.h"
+#include "psa/aead/algorithm.h"
+#include "psa/cipher/algorithm.h"
 
 /**
  * @brief   Unknown or invalid operation
@@ -56,7 +53,8 @@ typedef enum {
 typedef enum {
     PSA_CCM_AES_128,
     PSA_CCM_AES_192,
-    PSA_CCM_AES_256
+    PSA_CCM_AES_256,
+    PSA_CHACHA20_POLY1305
 } psa_aead_op_t;
 
 /**
@@ -271,8 +269,9 @@ typedef enum {
  * @return  @ref PSA_INVALID_OPERATION  @c alg, @c bits and @c type are not compatible
  */
 #define PSA_ENCODE_AEAD_OPERATION(alg, type, bits) \
-    ((PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_CCM) ? \
-        GET_AES_CCM_OPERATION(type, bits) : PSA_INVALID_OPERATION)
+    ((PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_CCM) ? GET_AES_CCM_OPERATION(type, bits) : \
+     (PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_CHACHA20_POLY1305) ? PSA_CHACHA20_POLY1305 : \
+     PSA_INVALID_OPERATION)
 
 #ifdef __cplusplus
 }

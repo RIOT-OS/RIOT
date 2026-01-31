@@ -21,9 +21,14 @@
  *
  */
 
+#include "psa_crypto_operation_encoder.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "crypto/psa/riot_aeads.h"
+#include "psa/algorithm.h"
+#include "psa/cipher/types.h"
 
 /**
  * @brief   Structure storing an AEAD operation context
@@ -31,7 +36,22 @@ extern "C" {
  * @note    Not implemented, yet
  */
 struct psa_aead_operation_s {
-    int dummy;  /**< Not implemented, yet */
+    uint8_t nonce_set : 1;              /**< True if Nonce was already set */
+    uint8_t lengths_set : 1;            /**< True if lengths were already set */
+    uint8_t setup_done : 1;             /**< True if setup is done, eg. update() was called */
+    size_t ad_length;                   /**< Length of additional data */
+    size_t processed_ad_length;         /**< Length of already processed additional data */
+    size_t message_length;              /**< Length of message data */
+    size_t processed_message_length;    /**< Length of already processed message data */
+    psa_algorithm_t alg;                /**< Operation algorithm*/
+    psa_aead_op_t op;                   /**< Encoded operation */
+    psa_encrypt_or_decrypt_t direction; /**< Direction */
+    /** Union containing AEAD cipher contexts for the executing backend */
+    union aead_context {
+#if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305) || defined(DOXYGEN)
+        psa_aead_chacha20_poly1305_ctx_t chacha20poly1305; /**< ChaCha20 context*/
+#endif
+    } backend_ctx;
 };
 
 /* These are all temporarily defined as some numeric type to prevent errors at compile time.*/
@@ -71,7 +91,10 @@ typedef struct psa_aead_operation_s psa_aead_operation_t;
  * @brief   This macro returns a suitable initializer for an AEAD operation object of type
  *          @ref psa_aead_operation_t.
  */
-#define PSA_AEAD_OPERATION_INIT { 0 }
+#define PSA_AEAD_OPERATION_INIT \
+    {                           \
+        0                       \
+    }
 
 /**
  * @brief   Return an initial value for an AEAD operation object.
