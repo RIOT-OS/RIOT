@@ -55,11 +55,11 @@ static inline uint16_t _link_metric(netstats_nb_t *stats)
         return MRHOF_MAX_PATH_COST;
     }
 
-#if IS_USED(MODULE_GNRC_RPL_MRHOF_ETX)
-    return stats->etx;
-#elif IS_USED(MODULE_GNRC_RPL_MRHOF_LQI)
+#if IS_USED(MODULE_GNRC_RPL_MRHOF_LQI)
     /* 255 = best, 0 = worst LQI; map best to ETX = 1, worst to ETX = 7 */
     return 3 * (0xFF - stats->lqi) + NETSTATS_NB_ETX_DIVISOR;
+#elif IS_USED(MODULE_GNRC_RPL_MRHOF_ETX)
+    return stats->etx;
 #else
     return MRHOF_MAX_PATH_COST;
 #endif
@@ -214,7 +214,7 @@ static uint16_t calc_rank(gnrc_rpl_dodag_t *dodag, uint16_t base_rank)
  * Decision based on
  * * If one parent is not acceptable, the other is better
  * * If one parent is not fresh, the other is better
- * * ETX
+ * * selected metric (default: ETX)
  */
 static int which_parent(gnrc_rpl_parent_t *p1, gnrc_rpl_parent_t *p2)
 {
@@ -269,10 +269,26 @@ static int which_parent(gnrc_rpl_parent_t *p1, gnrc_rpl_parent_t *p2)
 /* prefer dio if dio is grounded dodag */
 int which_dodag(gnrc_rpl_dodag_t *d1, gnrc_rpl_dio_t *dio)
 {
+    /* parent set must not be empty */
+    if ((d1->node_status != GNRC_RPL_ROOT_NODE) && !d1->parents) {
+        return 1;
+    }
+    
+    /* prefer grounded dodag */
     int dio_grounded = dio->g_mop_prf >> GNRC_RPL_GROUNDED_SHIFT;
     if (d1->grounded > dio_grounded) {
         return -1;
     }
+
+    /* prefer dodag with more preferable root */
+    int dio_prf = dio->g_mop_prf & GNRC_RPL_PRF_MASK;
+    if (d1->prf > dio_prf) {
+        return -1;
+    }
+    else if (dio_prf > d1->prf) {
+        return 1;
+    }
+    
     return 1;
 }
 
