@@ -97,6 +97,7 @@ make term
 ```
 
 ## Writing unit tests
+
 ### File structure
 RIOT uses [*embUnit*](http://embunit.sourceforge.net/) for unit testing.
 All unit tests are organized in ``tests/unittests`` and can be built module-wise, if needed.
@@ -133,15 +134,11 @@ The test header ``tests-<modulename>/tests-<module>.h`` of a module you add to `
 
 ```C
 /*
- * Copyright (C) <year> <author>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: <year> <author>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#ifndef TESTS_<MODULE>_H
-#define TESTS_<MODULE>_H
+#pragma once
 
 /**
  * @addtogroup  unittests
@@ -180,7 +177,6 @@ Test *tests_<module>_<header2>_tests(void);
 #endif
 
 /** @} */
-#endif /* TESTS_<MODULE>_H */
 ```
 
 #### Implement tests
@@ -188,11 +184,8 @@ Every ``tests-<modulename>/tests-<module>*.c`` file you add to ``tests/unittests
 
 ```C
 /*
- * Copyright (C) <year> <author>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: <year> <author>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /* clib includes */
