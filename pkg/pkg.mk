@@ -154,22 +154,28 @@ endif
 
 ifneq (,$(GIT_CACHE_RS))
 $(PKG_SOURCE_DIR)/.git: $(PKG_SPARSE_TAG) | $(PKG_CUSTOM_PREPARED)
-	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME)))
+	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME) with git-cache-rs))
 	$(Q)rm -Rf $(PKG_SOURCE_DIR)
 	$(Q)$(GIT_CACHE_RS) clone --commit $(PKG_VERSION) $(addprefix --sparse-add ,$(PKG_SPARSE_PATHS)) -- $(PKG_URL) $(PKG_SOURCE_DIR)
 else ifeq ($(GIT_CACHE_DIR),$(wildcard $(GIT_CACHE_DIR)))
 $(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
-	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME)))
+	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME) with git-cache))
 	$(Q)rm -Rf $(PKG_SOURCE_DIR)
 	$(Q)mkdir -p $(PKG_SOURCE_DIR)
 	$(Q)$(GITCACHE) clone $(PKG_URL) $(PKG_VERSION) $(PKG_SOURCE_DIR)
 else
 # redirect stderr so git sees a pipe and not a terminal see https://github.com/git/git/blob/master/progress.c#L138
 $(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
-	$(if $(QUIETER),,$(info [INFO] cloning without cache $(PKG_NAME)))
+	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME) without cache))
 	$(Q)rm -Rf $(PKG_SOURCE_DIR)
 	$(Q)mkdir -p $(PKG_SOURCE_DIR)
 	$(Q)git init $(GIT_QUIET) $(PKG_SOURCE_DIR)
+	$(Q)if [ -n "$(PKG_SPARSE_PATHS)" ]; then \
+	  # iff the package uses sparse paths, initialize the repository as sparse \
+	  $(if $(QUIETER),,echo "[INFO] using sparse checkout";) \
+	  $(GIT_IN_PKG) sparse-checkout set; \
+	  $(GIT_IN_PKG) sparse-checkout add $(PKG_SPARSE_PATHS); \
+	fi
 	$(Q)$(GIT_IN_PKG) remote add origin $(PKG_URL)
 	$(Q)$(GIT_IN_PKG) config extensions.partialClone origin
 	$(Q)$(GIT_IN_PKG) config advice.detachedHead false
