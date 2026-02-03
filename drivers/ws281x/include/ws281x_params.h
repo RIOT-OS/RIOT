@@ -67,6 +67,46 @@ static const ws281x_params_t ws281x_params[] =
     WS281X_PARAMS
 };
 
+/**
+ * @name    Timing parameters for WS2812/SK6812 RGB LEDs
+ * @{
+ */
+
+/**
+ * @brief   Data transmission time in nanoseconds
+ *
+ * For the SK6812, WS2812 and WS2812b this is 1.25 µs. This is the total time
+ * required to transmit one bit.
+ */
+#ifndef WS281X_T_DATA_NS
+#  define WS281X_T_DATA_NS              (1250U)
+#endif
+
+/**
+ * @brief The high-time of a 1 in nanoseconds.
+ */
+#ifndef WS281X_T_DATA_ONE_NS
+#  define WS281X_T_DATA_ONE_NS          (650U)
+#endif
+
+/**
+ * @brief The high-time of a 0 in nanoseconds.
+ */
+#ifndef WS281X_T_DATA_ZERO_NS
+#  define WS281X_T_DATA_ZERO_NS         (325U)
+#endif
+
+/**
+ * @brief   Time in microseconds to pull the data line low to signal end of data
+ *
+ * For the WS2812 it is ≥ 50µs, for the SK6812 it is ≥ 80µs. We choose 80µs to
+ * be compatible with both.
+ */
+#ifndef WS281X_T_END_US
+#  define WS281X_T_END_US               (80U)
+#endif
+/**@}*/
+
 /** @brief Timer used for WS281x (by the timer_gpio_ll implementation)
  *
  * A single timer is configured for any number of WS281x strands, so this does
