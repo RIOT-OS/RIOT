@@ -35,7 +35,7 @@
 extern ssize_t stdio_write(const void* buffer, size_t len);
 
 NONSTRING
-static const char _hex_chars[16] = "0123456789ABCDEF";
+static const char _hex_chars[] = "0123456789ABCDEF";
 
 static const uint32_t _tenmap[] = {
     0,
