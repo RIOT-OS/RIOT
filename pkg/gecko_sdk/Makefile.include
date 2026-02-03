@@ -1,20 +1,28 @@
+# Gecko SDK contains librail, which is a blob with headers.
+PSEUDOMODULES += gecko_sdk_librail
+PSEUDOMODULES += gecko_sdk_librail_pa
+
 # Using -isystem instead of -I to prevent warnings for the following headers
-INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/common/inc
-INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/emlib/inc
-INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/emlib-extra/inc
+INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/platform/common/inc
+INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/platform/Device/SiliconLabs/$(call uppercase_and_underscore,$(CPU_FAM))/Include
+INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/platform/emlib/inc
+INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/platform/emlib-extra/inc
 
 ifneq (,$(filter gecko_sdk_librail,$(USEMODULE)))
-  ARCHIVES += $(BINDIR)/gecko_sdk_librail.a
-  INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/radio/rail_lib/common
-  INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/radio/rail_lib/chip/efr32/$(EFM32_LIBRAIL_HEADER_NAME)
+  ARCHIVES += $(PKGDIRBASE)/gecko_sdk/dist/platform/radio/rail_lib/autogen/librail_release/librail_$(EFM32_LIBRAIL_BLOB_NAME)_gcc_release.a
+  INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/platform/radio/rail_lib/common
+  INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/platform/radio/rail_lib/chip/efr32/$(EFM32_LIBRAIL_HEADER_NAME)
 endif
 
 ifneq (,$(filter gecko_sdk_librail_pa,$(USEMODULE)))
-  INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/radio/rail_lib/plugin/pa-conversions
-  INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/radio/rail_lib/plugin/pa-conversions/$(EFM32_LIBRAIL_PA_HEADER_NAME)/config
+  INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/platform/radio/rail_lib/plugin/pa-conversions
+  INCLUDES += -isystem$(PKGDIRBASE)/gecko_sdk/dist/platform/radio/rail_lib/plugin/pa-conversions/$(EFM32_LIBRAIL_PA_HEADER_NAME)/config
 endif
 
-ifeq ($(CPU_CORE),cortex-m33)
-  # Disable -Wcast-align globally on cortex-m33 for this package
-  CFLAGS += -Wno-cast-align
+# The em_device.h header requires a global define with the cpu model
+CFLAGS += -D$(call uppercase_and_underscore,$(CPU_MODEL))
+
+# Disable specific warning for non-LLVM toolchains
+ifneq (llvm,$(TOOLCHAIN))
+  CFLAGS += -Wno-int-in-bool-context
 endif
