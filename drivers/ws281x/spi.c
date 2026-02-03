@@ -120,9 +120,11 @@ void ws281x_end_transmission(ws281x_t *dev)
     const uint8_t *non_zero_spi_byte = memchk(_spi_buf, 0x00, sizeof(_spi_buf));
     if (non_zero_spi_byte) {
         size_t led_numof = (non_zero_spi_byte - _spi_buf) / sizeof(ws281x_spi_data_t);
-        led_numof -= (_SPI_RESET_BYTES / sizeof(ws281x_spi_data_t));
-        dev->params.numof = led_numof;
-        DEBUG("Detected %u LEDs in chain\n", (unsigned)dev->params.numof);
+        if (led_numof > (_SPI_RESET_BYTES / sizeof(ws281x_spi_data_t))) {
+            led_numof -= (_SPI_RESET_BYTES / sizeof(ws281x_spi_data_t));
+            dev->params.numof = led_numof;
+            DEBUG("Detected %u LEDs in chain\n", (unsigned)dev->params.numof);
+        }
     }
 #if ENABLE_DEBUG && MODULE_OD
     DEBUG("Received SPI data (%u bytes):\n", (unsigned)_spi_size);
