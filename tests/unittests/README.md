@@ -22,7 +22,7 @@ You then can run the tests by calling
 make term
 ```
 
-or flash them to your board as you would flash any RIOT application to the board (see [Supported Boards](https://www.riot-os.org/boards.html)).
+or flash them to your board as you would [flash any RIOT application](https://guide.riot-os.org/getting-started/flashing/) to the board.
 
 You can debug your tests by running
 
