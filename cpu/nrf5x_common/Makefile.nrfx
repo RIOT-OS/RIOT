@@ -46,15 +46,23 @@ else ifneq (nrf53%, $(CPU_FAM))
 
 endif
 
-# The rust implementation of git-cache is the only one doing
-# a sparse checkout. The others do a full clone, which we need to
-# consider here.
-ifneq (,$(GIT_CACHE_RS))
-  PKG_SOURCE_DIR = $(BUILD_DIR)/nrf5x_nrfx_mdk/$(CPU_FAM)
-  VENDOR_FOLDER = $(PKG_SOURCE_DIR)/vendor
-else
-  PKG_SOURCE_DIR = $(BUILD_DIR)/nrf5x_nrfx_mdk
-  VENDOR_FOLDER = $(PKG_SOURCE_DIR)/$(CPU_FAM)/vendor
+# proactively set the GIT_CACHE_DIR, otherwise we have no choice of knowing
+# whether or not git-cache might be used or not
+GIT_CACHE_DIR ?= $(HOME)/.gitcache
+
+# The current implementation of git-cache always does a full clone
+# and does not care for the sparse paths. To avoid issues changing
+# between different CPU families, the sparse checkouts have to
+# be done in different subfolders to avoid missing file errors.
+
+PKG_SOURCE_DIR = $(BUILD_DIR)/nrf5x_nrfx_mdk/$(CPU_FAM)
+VENDOR_FOLDER = $(PKG_SOURCE_DIR)/vendor
+
+ifeq ($(GIT_CACHE_DIR),$(wildcard $(GIT_CACHE_DIR)))
+  ifeq (,$(GIT_CACHE_RS))
+    PKG_SOURCE_DIR = $(BUILD_DIR)/nrf5x_nrfx_mdk
+    VENDOR_FOLDER = $(PKG_SOURCE_DIR)/$(CPU_FAM)/vendor
+  endif
 endif
 
 PKG_PATCH_DIR = $(RIOTCPU)/nrf5x_common/include/vendor/patches
