@@ -51,4 +51,4 @@ include $(RIOTBASE)/Makefile.include
 # Set a custom channel if needed
 include $(RIOTMAKE)/default-radio-settings.inc.mk
 
-CFLAGS += -DCONFIG_ASSERT_VERBOSE
+CFLAGS += -DCONFIG_ASSERT_VERBOSE=1
