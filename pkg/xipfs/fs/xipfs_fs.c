@@ -442,8 +442,8 @@ static int _format(vfs_mount_t *vfs_mp)
     mutex_lock(mp->execution_mutex);
     mutex_lock(mp->mutex);
     ret = xipfs_format(mp);
-    mutex_lock(mp->mutex);
-    mutex_lock(mp->execution_mutex);
+    mutex_unlock(mp->mutex);
+    mutex_unlock(mp->execution_mutex);
 
     return ret;
 }
@@ -696,16 +696,25 @@ static int copy_file(const char *full_path, void *buf, size_t nbyte) {
     return nbyte;
 }
 
-static const void *xipfs_user_syscalls_table[XIPFS_USER_SYSCALL_MAX] = {
-    [       XIPFS_USER_SYSCALL_PRINTF] = vprintf,
-    [     XIPFS_USER_SYSCALL_GET_TEMP] = get_temperature,
-    [      XIPFS_USER_SYSCALL_ISPRINT] = isprint,
-    [       XIPFS_USER_SYSCALL_STRTOL] = strtol,
-    [      XIPFS_USER_SYSCALL_GET_LED] = get_led,
-    [      XIPFS_USER_SYSCALL_SET_LED] = set_led,
-    [    XIPFS_USER_SYSCALL_COPY_FILE] = copy_file,
-    [XIPFS_USER_SYSCALL_GET_FILE_SIZE] = get_file_size,
-    [       XIPFS_USER_SYSCALL_MEMSET] = memset
+/**
+ * @brief Regular exec exit function.
+ *
+ * This declaration is not a part of the public XIPFS api, but is required
+ * here to perform the appropriate system call.
+ */
+extern void xipfs_exec_exit(int status);
+
+static const void *xipfs_extended_driver_execv_syscalls[XIPFS_SYSCALL_MAX] = {
+    [         XIPFS_SYSCALL_EXIT] = xipfs_exec_exit,
+    [      XIPFS_SYSCALL_VPRINTF] = vprintf,
+    [     XIPFS_SYSCALL_GET_TEMP] = get_temperature,
+    [      XIPFS_SYSCALL_ISPRINT] = isprint,
+    [       XIPFS_SYSCALL_STRTOL] = strtol,
+    [      XIPFS_SYSCALL_GET_LED] = get_led,
+    [      XIPFS_SYSCALL_SET_LED] = set_led,
+    [    XIPFS_SYSCALL_COPY_FILE] = copy_file,
+    [XIPFS_SYSCALL_GET_FILE_SIZE] = get_file_size,
+    [       XIPFS_SYSCALL_MEMSET] = memset
 };
 
 int xipfs_extended_driver_execv(const char *full_path, char *const argv[])
@@ -725,7 +734,7 @@ int xipfs_extended_driver_execv(const char *full_path, char *const argv[])
     }
 
     mutex_lock(mp.execution_mutex);
-    ret = xipfs_execv(&mp, path, argv, xipfs_user_syscalls_table);
+    ret = xipfs_execv(&mp, path, argv, xipfs_extended_driver_execv_syscalls);
     mutex_unlock(mp.execution_mutex);
 
     return ret;
@@ -764,6 +773,27 @@ int svc_dispatch_handler(unsigned int svc_number, unsigned int *svc_args)
     }
 }
 
+/**
+ * @brief Safe exec exit function.
+ *
+ * This declaration is not a part of the public XIPFS api, but is required
+ * here to perform the appropriate system call.
+ */
+extern void xipfs_safe_exec_exit(int status);
+
+static const void *xipfs_extended_driver_safe_execv_syscalls[XIPFS_SYSCALL_MAX] = {
+    [         XIPFS_SYSCALL_EXIT] = xipfs_safe_exec_exit,
+    [      XIPFS_SYSCALL_VPRINTF] = vprintf,
+    [     XIPFS_SYSCALL_GET_TEMP] = get_temperature,
+    [      XIPFS_SYSCALL_ISPRINT] = isprint,
+    [       XIPFS_SYSCALL_STRTOL] = strtol,
+    [      XIPFS_SYSCALL_GET_LED] = get_led,
+    [      XIPFS_SYSCALL_SET_LED] = set_led,
+    [    XIPFS_SYSCALL_COPY_FILE] = copy_file,
+    [XIPFS_SYSCALL_GET_FILE_SIZE] = get_file_size,
+    [       XIPFS_SYSCALL_MEMSET] = memset
+};
+
 int xipfs_extended_driver_safe_execv(const char *full_path, char *const argv[])
 {
     xipfs_mount_t mp;
@@ -781,7 +811,7 @@ int xipfs_extended_driver_safe_execv(const char *full_path, char *const argv[])
     }
 
     mutex_lock(mp.execution_mutex);
-    ret = xipfs_safe_execv(&mp, path, argv, xipfs_user_syscalls_table);
+    ret = xipfs_safe_execv(&mp, path, argv, xipfs_extended_driver_safe_execv_syscalls);
     mutex_unlock(mp.execution_mutex);
 
     return ret;

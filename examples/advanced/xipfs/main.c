@@ -136,7 +136,7 @@ static int drop_file(const file_to_drop_t *file_to_drop) {
 /**
  * @brief Execution in-place demonstrator.
  *
- * This shell command handler will create a file hello-world.fae on /dev/nvme0p0,
+ * This shell command handler will create a file hello-world.fae on /nvme0p0,
  * if none exists yet from the files_to_drop array.
  *
  */

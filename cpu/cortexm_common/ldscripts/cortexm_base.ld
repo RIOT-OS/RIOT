@@ -95,6 +95,12 @@ SECTIONS
         KEEP (*(SORT(.dtors.*)))
         KEEP (*crtend.o(.dtors))
 
+        . = ALIGN(4096);
+        _start_shared_api_code = .;
+        KEEP( *(.shared_api_code))
+        . = ALIGN(4096);
+        _end_shared_api_code = .;
+
         . = ALIGN(4);
         _efixed = .;            /* End of text section */
     } > rom
@@ -177,6 +183,10 @@ SECTIONS
         KEEP (*(SORT(.xfa.*)))
         KEEP (*(.openocd .openocd.*))
         . = ALIGN(4);
+        _start_shared_api_data = .;
+        KEEP( *(.shared_api_data))
+        . = ALIGN(32);
+        _end_shared_api_data = .;
         _erelocate = .;
     } > ram AT> rom
 
