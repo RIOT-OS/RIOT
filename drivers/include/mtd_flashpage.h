@@ -10,7 +10,7 @@
 
 /**
  * @defgroup    drivers_mtd_flashpage MTD wrapper for Flashpage devices
- * @ingroup     drivers_storage
+ * @ingroup     drivers_mtd
  * @brief       Driver for internal flash devices implementing flashpage interface
  *
  * The MTD device created by @ref MTD_FLASHPAGE_INIT_VAL spans the complete

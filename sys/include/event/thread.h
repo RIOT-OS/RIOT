@@ -44,6 +44,32 @@
  * event queue gets its own thread. So higher priority events will always
  * preempt events of lower priority in this case.
  *
+ * Managing Stack Size Requirements
+ * --------------------------------
+ *
+ * A module using the medium priority event queue might require a certain
+ * minimum stack size, say 1024, to operate correctly. Instead of just adding
+ * `CFLAGS += -DDEVENT_THREAD_MEDIUM_STACKSIZE=1024`, it can instead add the
+ * following to its `Makefile.dep`:
+ *
+ * ```Makefile
+ * EVENT_THREAD_MEDIUM_STACKSIZE_MIN += 1024
+ * ```
+ *
+ * In the `Makefile.include` of `sys/event` the highest value of the minimum
+ * requirements declared by any module will be picked and added to the
+ * `CFLAGS`.
+ *
+ * @note    `EVENT_THREAD_LOWEST_STACKSIZE_MIN` and
+ *          `EVENT_THREAD_HIGHEST_STACKSIZE_MIN` always apply to the thread
+ *          managing the lowest and highest priority queue, respectively.
+ * @details  E.g. without the module `event_thread_medium` the lowest priority
+ *          and medium priority queues are both handled by the medium priority
+ *          event thread. In that case, `EVENT_THREAD_LOWEST_STACKSIZE_MIN`
+ *          would ensure a minimum thread statck size on the medium priority
+ *          event thread. With `event_thread_medium` in use, it would instead
+ *          apply to the stack of the dedicated lowest event queue thread.
+ *
  * @{
  *
  * @file

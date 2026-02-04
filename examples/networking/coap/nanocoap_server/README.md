@@ -3,7 +3,7 @@ nanocoap server example
 
 This application is meant to get you started with implementing a CoAP server on RIOT.
 It uses the GNRC or LWIP (including IPv4) network stack through RIOT's
-[sock API](http://doc.riot-os.org/group__net__sock.html).
+[sock API](http://api.riot-os.org/group__net__sock.html).
 
 Usage
 =====

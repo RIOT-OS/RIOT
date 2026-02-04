@@ -33,6 +33,22 @@
 extern "C" {
 #endif
 
+#if defined(DOXYGEN)
+/**
+ * @brief   Configure the LoRa sync word
+ *
+ * The sync word for sx126x is 16 bits long.
+ * Private networks should use 0x1424.
+ * Public networks should use 0x3444.
+ * Using the driver API you only configure 2 nibbles Y and Z to form a sync word 0xY4Z4.
+ * The default chip value is 0x12 (0x1424).
+ *
+ * See https://blog.classycode.com/lora-sync-word-compatibility-between-sx127x-and-sx126x-460324d1787a
+ * for more information and a comparison with sx127x.
+ */
+#  define CONFIG_SX126X_DEFAULT_SYNC_WORD       0x12
+#endif
+
 /**
  * * @note Forward declaration of the SX126x device descriptor
  */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_mynewt_core
  * @{
@@ -16,8 +18,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
-#ifndef OS_OS_DEV_H
-#define OS_OS_DEV_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,5 +40,3 @@ struct os_dev {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* OS_OS_DEV_H */

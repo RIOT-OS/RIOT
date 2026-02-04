@@ -6,6 +6,8 @@
  * details.
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_littlefs2
  * @{
@@ -20,9 +22,6 @@
  * @author      Joshua DeWeese <josh.deweese@gmail.com>
  *
  */
-
-#ifndef LFS_LOG_H
-#define LFS_LOG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -91,5 +90,4 @@ extern "C" {
 
 /** @} */
 
-#endif /* LFS_LOG_H */
 /** @} */

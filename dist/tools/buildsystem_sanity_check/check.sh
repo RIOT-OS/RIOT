@@ -13,6 +13,8 @@
 #
 #
 
+export ENABLE_DOCKER_PINNING_TEST=${ENABLE_DOCKER_PINNING_TEST:-1}
+
 : "${RIOTBASE:="$(cd "$(dirname "$0")/../../../" || exit; pwd)"}"
 
 : "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
@@ -212,6 +214,7 @@ check_cpu_cpu_model_defined_in_makefile_features() {
     patterns+=(-e '^ *\(export\)\? *CPU \??\?=')
     patterns+=(-e '^ *\(export\)\? *CPU_MODEL \??\?=')
     pathspec+=(':!**.md')
+    pathspec+=(':!**.mdx')
     pathspec+=(':!boards/**/Makefile.features')
     pathspec+=(':!cpu/**/Makefile.features')
 
@@ -382,6 +385,10 @@ check_tests_application_path() {
 }
 
 check_pinned_docker_version_is_up_to_date() {
+    if [ "$ENABLE_DOCKER_PINNING_TEST" != "1" ]; then
+        # Skipping docker version test as requested
+        return
+    fi
     local pinned_repo_digest
     local upstream_repo_digest
     pinned_repo_digest="$(awk '/^DOCKER_TESTED_IMAGE_REPO_DIGEST := (.*)$/ { print substr($0, index($0, $3)); exit }' "$RIOTMAKE/docker.inc.mk")"
@@ -393,6 +400,18 @@ check_pinned_docker_version_is_up_to_date() {
         git -C "${RIOTBASE}" grep -n '^DOCKER_TESTED_IMAGE_REPO_DIGEST :=' "$RIOTMAKE/docker.inc.mk" \
             | error_with_message  "Update manifest digest to ${upstream_repo_digest}"
     fi
+}
+
+check_if_cflags_are_touched_at_right_place() {
+    for file in $(git -C "${RIOTBASE}" grep -lE 'CFLAGS[\t ]*\+='); do
+        case $file in
+        */Makefile.dep)
+            # CFLAGS may not be touched in `Makefile.dep`
+            git -C "${RIOTBASE}" grep -nE 'CFLAGS[\t ]*\+=' "$file" \
+                | error_with_message  "A Makefile.dep is for dependency modelling only. Modify CFLAGS in a Makefile.include, in an app's Makefile, or (if only relevant to a single module/package) in the module's/package's Makefile"
+            ;;
+        esac
+    done
 }
 
 error_on_input() {
@@ -418,6 +437,7 @@ all_checks() {
     check_stderr_null
     check_tests_application_path
     check_pinned_docker_version_is_up_to_date
+    check_if_cflags_are_touched_at_right_place
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

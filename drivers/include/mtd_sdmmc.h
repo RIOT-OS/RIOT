@@ -11,7 +11,7 @@
 
 /**
  * @defgroup    drivers_mtd_sdmmc MTD wrapper for SD/MMC devices
- * @ingroup     drivers_storage
+ * @ingroup     drivers_mtd
  * @brief       Driver for SD Memory Cards and MMCs/eMMCs using the MTD interface
  *
  * @{

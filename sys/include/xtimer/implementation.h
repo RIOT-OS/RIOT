@@ -191,11 +191,6 @@ static inline void xtimer_sleep(uint32_t seconds)
     _xtimer_tsleep64(_xtimer_ticks_from_usec64((uint64_t)seconds * US_PER_SEC));
 }
 
-static inline void xtimer_nanosleep(uint32_t nanoseconds)
-{
-    _xtimer_tsleep32(_xtimer_ticks_from_usec(nanoseconds / NS_PER_US));
-}
-
 static inline void xtimer_tsleep32(xtimer_ticks32_t ticks)
 {
     _xtimer_tsleep32(ticks.ticks32);

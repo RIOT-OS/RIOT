@@ -62,6 +62,7 @@ static const struct {
     netopt_t opt;
 } flag_cmds[] = {
     { "6lo", NETOPT_6LO },
+    { "abr", NETOPT_6LO_ABR },
     { "ack_req", NETOPT_ACK_REQ },
     { "gts", NETOPT_GTS_TX },
     { "pan_coord", NETOPT_PAN_COORD },
@@ -888,6 +889,9 @@ static void _netif_list(netif_t *iface)
                                    line_thresh);
 #ifdef MODULE_GNRC_SIXLOWPAN
     line_thresh = _netif_list_flag(iface, NETOPT_6LO, "6LO  ", line_thresh);
+#endif
+#if CONFIG_GNRC_IPV6_NIB_6LBR
+    line_thresh = _netif_list_flag(iface, NETOPT_6LO_ABR, "ABR  ", line_thresh);
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
     line_thresh += _LINE_THRESHOLD + 1; /* enforce linebreak after this option */
@@ -1765,7 +1769,7 @@ static int _netif_add(char *cmd_name, netif_t *iface, int argc, char **argv)
     (void)iface;
     (void)argc;
     (void)argv;
-    printf("error: unable to add IPv6 address.\n");
+    printf("error: GNRC_IPV6 module not enabled.\n");
 
     return 1;
 #endif

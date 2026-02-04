@@ -330,7 +330,8 @@ static inline void gnrc_netreg_entry_init_cb(gnrc_netreg_entry_t *entry,
  * @brief   Registers a thread to the registry.
  *
  * @details The semantics are: Thread gnrc_netreg_entry_t::pid is interested in
- *          packets of protocol @p type with context gnrc_netreg_entry_t::demux_ctx.
+ *          packets or network events of protocol @p type with context
+ *          gnrc_netreg_entry_t::demux_ctx.
  *
  * @param[in] type      Type of the protocol. Must not be < GNRC_NETTYPE_UNDEF or
  *                      >= GNRC_NETTYPE_NUMOF.

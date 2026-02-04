@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_lv_drivers
  * @brief       LVGL Drivers SDL2 configuration headers
@@ -15,9 +17,6 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
-
-#ifndef LV_DRV_CONF_H
-#define LV_DRV_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -80,5 +79,4 @@ extern "C" {
 }
 #endif
 
-#endif /* LV_DRV_CONF_H */
 /** @} */

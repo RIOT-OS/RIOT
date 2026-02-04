@@ -74,15 +74,6 @@ typedef enum {
     GNRC_NETTYPE_SIXLOWPAN,     /**< Protocol is 6LoWPAN */
 #endif
 
-#if IS_USED(MODULE_GNRC_NETTYPE_LORAWAN) || defined(DOXYGEN)
-/**
- * @brief       Protocol is LoRaWAN
- * @deprecated  LoRaWAN payloads do not have a special type anymore and just use
- *              @ref GNRC_NETTYPE_UNDEF. Will be removed after 2024.10 release.
- */
-#define GNRC_NETTYPE_LORAWAN    GNRC_NETTYPE_UNDEF
-#endif
-
     /**
      * @{
      * @name Network layer
@@ -118,6 +109,36 @@ typedef enum {
 #if IS_USED(MODULE_GNRC_NETTYPE_UDP) || defined(DOXYGEN)
     GNRC_NETTYPE_UDP,           /**< Protocol is UDP */
 #endif
+    /** @} */
+
+    /**
+     * @{
+     * @name    Cross-layer network events.
+     *
+     * @brief   Subscription types for protocol-independent events.
+     *          They are used by lower-layers in the network stack to published
+     *          information about the network state.
+     *
+     * @details See @ref net_gnrc_netapi_notify.
+     * }
+     */
+
+    /**
+     * @brief   Reports the reachability of link-layer neighbors.
+     *          Connection-oriented links such as BLE can use this to inform
+     *          the IPv6-layer, e.g., about new connected or disconnected nodes
+     *          and their l2 address.
+     */
+    GNRC_NETTYPE_L2_DISCOVERY,
+    /**
+     * @brief   Reports routing-relevant information, e.g., discovered or
+     *          unreachable nodes, from the IPv6-layer to routing protocol like
+     *          RPL.
+     *
+     * @note    Compared to @ref GNRC_NETTYPE_L2_DISCOVERY, events published to
+     *          this type include the IPv6 address of the node.
+     */
+    GNRC_NETTYPE_L3_ROUTING,
     /** @} */
 
     /**

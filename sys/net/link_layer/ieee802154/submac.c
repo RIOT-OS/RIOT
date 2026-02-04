@@ -29,6 +29,17 @@
 
 #define CSMA_SENDER_BACKOFF_PERIOD_UNIT_US  (320U)
 #define ACK_TIMEOUT_US                      (864U)
+/* 2.4 GHz, 250 kb/s, O-QPSK 62.5 ksymbols/s, 1 / 62 500 s = 16 µs */
+/* 12 symbols -> 12 * 16us = 192us */
+#define SIFS_PERIOD_US                      (192U)
+
+/* internal type for IEEE 802.15.4 frame control field */
+enum ieee802154_fcf {
+    _FCF_BEACON     = IEEE802154_FCF_TYPE_BEACON,
+    _FCF_DATA       = IEEE802154_FCF_TYPE_DATA,
+    _FCF_ACK        = IEEE802154_FCF_TYPE_ACK,
+    _FCF_MACCMD     = IEEE802154_FCF_TYPE_MACCMD
+};
 
 static char *str_states[IEEE802154_FSM_STATE_NUMOF] = {
     "INVALID",
@@ -130,6 +141,34 @@ static int _handle_fsm_ev_request_tx(ieee802154_submac_t *submac)
     }
 }
 
+static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
+                                                 ieee802154_fsm_ev_t ev,
+                                                 enum ieee802154_fcf ftype);
+
+static ieee802154_fsm_state_t _fsm_state_tx(ieee802154_submac_t *submac,
+                                            ieee802154_fsm_ev_t ev);
+
+static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac)
+{
+    ieee802154_dev_t *dev = &submac->dev;
+
+    /* Set state to TX_ON */
+    int res;
+    if ((res = ieee802154_radio_set_idle(dev, false)) < 0) {
+        return res;
+    }
+    if ((res = ieee802154_radio_write(dev, submac->psdu)) < 0) {
+        return res;
+    }
+    /* skip async Tx request */
+    _fsm_state_prepare(submac, IEEE802154_FSM_EV_BH, IEEE802154_FCF_TYPE_ACK);
+    /* wait for Tx done */
+    while (_fsm_state_tx(submac, IEEE802154_FSM_EV_TX_DONE) == IEEE802154_FSM_STATE_INVALID) {
+        DEBUG("IEEE802154 submac: wait until ACK sent\n");
+    }
+    return 0;
+}
+
 static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802154_fsm_ev_t ev)
 {
     ieee802154_dev_t *dev = &submac->dev;
@@ -192,7 +231,16 @@ static ieee802154_fsm_state_t _fsm_state_idle(ieee802154_submac_t *submac, ieee8
 
     switch (ev) {
     case IEEE802154_FSM_EV_REQUEST_TX:
-        if (_handle_fsm_ev_request_tx(submac) < 0) {
+        /* An ACK is sent synchronous to prevent that the upper layer (IPv6)
+           can initiate the next transmission which would fail because the transceiver
+           is still busy. */
+        if (submac->psdu->iol_len == IEEE802154_ACK_FRAME_LEN - IEEE802154_FCS_LEN &&
+            (((uint8_t *)submac->psdu->iol_base)[0] & IEEE802154_FCF_TYPE_ACK) &&
+            submac->psdu->iol_next == NULL) {
+            _handle_fsm_ev_tx_ack(submac);
+            return IEEE802154_FSM_STATE_IDLE;
+        }
+        else if (_handle_fsm_ev_request_tx(submac) < 0) {
             return IEEE802154_FSM_STATE_IDLE;
         }
         return IEEE802154_FSM_STATE_PREPARE;
@@ -218,13 +266,15 @@ static ieee802154_fsm_state_t _fsm_state_idle(ieee802154_submac_t *submac, ieee8
 }
 
 static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
-                                                 ieee802154_fsm_ev_t ev)
+                                                 ieee802154_fsm_ev_t ev,
+                                                 enum ieee802154_fcf ftype)
 {
     ieee802154_dev_t *dev = &submac->dev;
 
     switch (ev) {
     case IEEE802154_FSM_EV_BH:
-        if (!_does_handle_csma(dev)) {
+        if (ftype == IEEE802154_FCF_TYPE_DATA
+            && !_does_handle_csma(dev)) {
             /* delay for an adequate random backoff period */
             uint32_t bp = (random_uint32() & submac->backoff_mask) *
                           submac->csma_backoff_us;
@@ -235,6 +285,10 @@ static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
             if (curr_be < submac->be.max) {
                 submac->backoff_mask = (submac->backoff_mask << 1) | 1;
             }
+        }
+        else if (ftype == IEEE802154_FCF_TYPE_ACK) {
+            /* no backoff for ACK frames but wait for SIFSPeriod */
+            ztimer_sleep(ZTIMER_USEC, SIFS_PERIOD_US);
         }
 
         while (ieee802154_radio_request_transmit(dev) == -EBUSY) {}
@@ -321,9 +375,10 @@ static ieee802154_fsm_state_t _fsm_state_tx(ieee802154_submac_t *submac, ieee802
 
     switch (ev) {
     case IEEE802154_FSM_EV_TX_DONE:
-        res = ieee802154_radio_confirm_transmit(&submac->dev, &info);
-        assert(res >= 0);
-        return _fsm_state_tx_process_tx_done(submac, &info);
+        if ((res = ieee802154_radio_confirm_transmit(&submac->dev, &info)) >= 0) {
+            return _fsm_state_tx_process_tx_done(submac, &info);
+        }
+        break;
     case IEEE802154_FSM_EV_RX_DONE:
     case IEEE802154_FSM_EV_CRC_ERROR:
         /* This might happen in case there's a race condition between ACK_TIMEOUT
@@ -377,27 +432,33 @@ ieee802154_fsm_state_t ieee802154_submac_process_ev(ieee802154_submac_t *submac,
 
     switch (submac->fsm_state) {
     case IEEE802154_FSM_STATE_RX:
+        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_RX + %s\n", str_ev[ev]);
         new_state = _fsm_state_rx(submac, ev);
         break;
     case IEEE802154_FSM_STATE_IDLE:
+        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_IDLE + %s\n", str_ev[ev]);
         new_state = _fsm_state_idle(submac, ev);
         break;
     case IEEE802154_FSM_STATE_PREPARE:
-        new_state = _fsm_state_prepare(submac, ev);
+        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_PREPARE + %s\n", str_ev[ev]);
+        new_state = _fsm_state_prepare(submac, ev, IEEE802154_FCF_TYPE_DATA);
         break;
     case IEEE802154_FSM_STATE_TX:
+        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_TX + %s\n", str_ev[ev]);
         new_state = _fsm_state_tx(submac, ev);
         break;
     case IEEE802154_FSM_STATE_WAIT_FOR_ACK:
+        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_WAIT_FOR_ACK + %s\n", str_ev[ev]);
         new_state = _fsm_state_wait_for_ack(submac, ev);
         break;
     default:
+        DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): INVALID STATE\n");
         new_state = IEEE802154_FSM_STATE_INVALID;
     }
 
     if (new_state == IEEE802154_FSM_STATE_INVALID) {
         _print_debug(submac->fsm_state, new_state, ev);
-        assert(false);
+        new_state = submac->fsm_state;
     }
     submac->fsm_state = new_state;
     return submac->fsm_state;
@@ -408,6 +469,7 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
     ieee802154_fsm_state_t current_state = submac->fsm_state;
 
     if (current_state != IEEE802154_FSM_STATE_RX && current_state != IEEE802154_FSM_STATE_IDLE) {
+        DEBUG("IEEE802154 submac: ieee802154_send(): Sending aborted, current state is %s\n", str_states[current_state]);
         return -EBUSY;
     }
 
@@ -417,6 +479,8 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
 
     uint8_t *buf = iolist->iol_base;
     bool cnf = buf[0] & IEEE802154_FCF_ACK_REQ;
+    bool is_ack = iolist->iol_len == IEEE802154_ACK_FRAME_LEN - IEEE802154_FCS_LEN &&
+                  (buf[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_ACK;
 
     submac->wait_for_ack = cnf;
     submac->psdu = iolist;
@@ -424,8 +488,14 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
     submac->csma_retries_nb = 0;
     submac->backoff_mask = (1 << submac->be.min) - 1;
 
-    if (ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_REQUEST_TX)
+    if (!is_ack && ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_REQUEST_TX)
         != IEEE802154_FSM_STATE_PREPARE) {
+        DEBUG("IEEE802154 submac: ieee802154_send(): Tx frame failed %s\n", str_states[current_state]);
+        return -EBUSY;
+    }
+    if (is_ack && ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_REQUEST_TX)
+             != IEEE802154_FSM_STATE_IDLE) {
+        DEBUG("IEEE802154 submac: ieee802154_send(): Tx ACK failed %s\n", str_states[current_state]);
         return -EBUSY;
     }
     return 0;
@@ -809,6 +879,8 @@ int ieee802154_set_rx(ieee802154_submac_t *submac)
         }
         break;
     default:
+        DEBUG("IEEE802154 submac: ieee802154_set_rx(): Setting RX failed, currently in %s\n",
+              str_states[current_state]);
         break;
     }
 

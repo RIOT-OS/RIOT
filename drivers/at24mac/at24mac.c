@@ -19,6 +19,8 @@
  */
 
 #include <errno.h>
+#include <stdbool.h>
+
 #include "kernel_defines.h"
 
 #include "at24mac.h"

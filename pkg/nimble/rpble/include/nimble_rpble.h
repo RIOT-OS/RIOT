@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    pkg_nimble_rpble RPL-over-BLE for NimBLE
  * @ingroup     pkg_nimble
@@ -81,9 +83,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef NIMBLE_RPBLE_H
-#define NIMBLE_RPBLE_H
 
 #include "nimble_netif.h"
 
@@ -178,5 +177,4 @@ int nimble_rpble_update(const nimble_rpble_ctx_t *ctx);
 }
 #endif
 
-#endif /* NIMBLE_RPBLE_H */
 /** @} */

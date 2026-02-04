@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     lwm2m_objects
  * @defgroup    lwm2m_objects_security Security LwM2M object
@@ -154,9 +156,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef OBJECTS_SECURITY_H
-#define OBJECTS_SECURITY_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -429,5 +428,4 @@ credman_tag_t lwm2m_object_security_get_credential(uint16_t instance_id);
 }
 #endif
 
-#endif /* OBJECTS_SECURITY_H */
 /** @} */

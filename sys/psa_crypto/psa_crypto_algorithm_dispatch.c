@@ -366,9 +366,14 @@ psa_status_t psa_algorithm_dispatch_sign_message(const psa_key_attributes_t *att
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
     case PSA_ECC_ED25519:
         psa_get_public_key_data_from_key_slot(slot, &pub_key_data, &pub_key_bytes);
-        return psa_ecc_ed25519_sign_message(key_data, *key_bytes, pub_key_data, *pub_key_bytes,
-                                            input, input_length,
-                                            signature, signature_size, signature_length);
+        assert(*key_bytes == 32);
+        assert(*pub_key_bytes == 32);
+        if (signature_size < 64) {
+            return PSA_ERROR_BUFFER_TOO_SMALL;
+        }
+        *signature_length = 64;
+        return psa_ecc_ed25519_sign_message(key_data, pub_key_data,
+                                            input, input_length, signature);
 #endif
     default:
         (void)alg;
@@ -467,8 +472,11 @@ psa_status_t psa_algorithm_dispatch_verify_message(const psa_key_attributes_t *a
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
     case PSA_ECC_ED25519:
-        return psa_ecc_ed25519_verify_message(pubkey_data, *pubkey_data_len, input,
-                                        input_length, signature, signature_length);
+        assert(*pubkey_data_len == 32);
+        if (signature_length < 64) {
+            return PSA_ERROR_INVALID_SIGNATURE;
+        }
+        return psa_ecc_ed25519_verify_message(pubkey_data, input, input_length, signature);
 #endif
     default:
         (void)alg;
@@ -525,8 +533,9 @@ psa_status_t psa_algorithm_dispatch_generate_key(   const psa_key_attributes_t *
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
         case PSA_ECC_ED25519:
-            return psa_generate_ecc_ed25519_key_pair(key_data, pubkey_data,
-                                                     key_bytes, pubkey_data_len);
+            *key_bytes = 32;
+            *pubkey_data_len = 32;
+            return psa_generate_ecc_ed25519_key_pair(key_data, pubkey_data);
 #endif
         default:
             (void)status;
@@ -585,8 +594,11 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
 #endif
 #if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
         case PSA_ECC_ED25519:
-            ret = psa_derive_ecc_ed25519_public_key(data, pubkey_data,
-                                                    data_length, pubkey_data_len);
+            if (data_length < 32) {
+                return PSA_ERROR_INVALID_ARGUMENT;
+            }
+            ret = psa_derive_ecc_ed25519_public_key(data, pubkey_data);
+            *pubkey_data_len = 32;
             break;
 #endif
         default:

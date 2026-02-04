@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_lvgl
  * @brief       LVGL configuration macros
@@ -14,9 +16,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef LV_CONF_H
-#define LV_CONF_H
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -24,6 +23,9 @@ extern "C" {
 #include <stdint.h>
 #include "kernel_defines.h"
 #include "lvgl_riot_conf.h"
+
+/* LVGL package requires this definition to confirm that the configuration has been included. */
+#define LV_CONF_H   1
 
 /*====================
    COLOR SETTINGS
@@ -556,5 +558,4 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 }
 #endif
 
-#endif /* LV_CONF_H */
 /** @} */

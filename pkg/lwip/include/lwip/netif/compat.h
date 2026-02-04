@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_lwip
  *
@@ -17,8 +19,6 @@
  *
  * @author  Erik Ekman <eekman@google.com>
  */
-#ifndef LWIP_NETIF_COMPAT_H
-#define LWIP_NETIF_COMPAT_H
 
 #include "bhp/event.h"
 #include "event.h"
@@ -82,5 +82,4 @@ static inline void lwip_netif_dev_release(struct netif *netif)
 }
 #endif
 
-#endif /* LWIP_NETIF_COMPAT_H */
 /** @} */

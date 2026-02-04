@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_mbedtls
  *
@@ -15,9 +17,6 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  *
  */
-
-#ifndef THREADING_ALT_H
-#define THREADING_ALT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,4 +40,3 @@ typedef struct {
 }
 #endif
 /** @} */
-#endif /* THREADING_ALT_H */

@@ -807,11 +807,12 @@ static int _disable_sd_clk(sdhc_dev_t *sdhc_dev)
 {
     sdhc_t *sdhc = sdhc_dev->conf->sdhc;
 
-    /* TODO timeout handling */
     if (sdhc->CCR.bit.SDCLKEN) {
         DEBUG("[sdmmc] disable SDCLK\n");
         /* wait for command/data to go inactive */
-        while (sdhc->PSR.reg & (SDHC_PSR_CMDINHC | SDHC_PSR_CMDINHD)) {}
+        if (_wait_sdhc_busy(sdhc)) {
+            _reset_sdhc(sdhc_dev, SDHC_SRR_SWRSTALL);
+        }
         /* disable the clock to card */
         sdhc->CCR.reg &= ~SDHC_CCR_SDCLKEN;
     }

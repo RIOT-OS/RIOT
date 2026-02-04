@@ -40,7 +40,7 @@ ucontext_t *_native_current_context = NULL;
 
 volatile uintptr_t _native_user_fptr;
 
-static sigset_t _native_sig_set;
+sigset_t _native_sig_set;
 static sigset_t _native_sig_set_dint;
 volatile int _native_pending_signals;
 int _signal_pipe_fd[2];

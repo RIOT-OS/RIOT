@@ -32,6 +32,7 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
 
+#include "modules.h"
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 

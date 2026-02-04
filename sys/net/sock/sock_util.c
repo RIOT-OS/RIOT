@@ -26,15 +26,12 @@
 #include <string.h>
 #include <assert.h>
 
+#include "net/dns.h"
 #include "net/sock/util.h"
 #include "net/iana/portrange.h"
 
 #if MODULE_GNRC_SOCK_UDP || MODULE_LWIP_SOCK_UDP
 #  include "net/sock/udp.h"
-#endif
-
-#if MODULE_DNS
-#  include "net/dns.h"
 #endif
 
 #if MODULE_RANDOM
@@ -287,7 +284,6 @@ int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str)
         return 0;
     }
 
-#  if MODULE_SOCK_DNS || MODULE_SOCK_DNS_MOCK
     int family;
     char hostbuf[CONFIG_SOCK_HOSTPORT_MAXLEN];
     const char *host;
@@ -331,7 +327,6 @@ int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str)
     default:
         return -EINVAL;
     }
-#  endif
     return res;
 }
 

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_uwb_core
  * @{
@@ -16,9 +18,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
-
-#ifndef DPL_DPL_TYPES_H
-#define DPL_DPL_TYPES_H
 
 #include <stdint.h>
 #include <math.h>
@@ -116,5 +115,3 @@ typedef double dpl_float64_t;
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* DPL_DPL_TYPES_H */

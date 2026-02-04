@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_tinyusb
  * @{
@@ -15,9 +17,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef TINYUSB_HW_H
-#define TINYUSB_HW_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,5 +36,4 @@ int tinyusb_hw_init(void);
 }
 #endif
 
-#endif /* TINYUSB_HW_H */
 /** @} */

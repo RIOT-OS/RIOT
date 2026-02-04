@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_uwb_core
  *
@@ -15,9 +17,6 @@
  *
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  */
-
-#ifndef UWB_CORE_H
-#define UWB_CORE_H
 
 #include <stdint.h>
 #include "event.h"
@@ -69,5 +68,4 @@ event_queue_t *uwb_core_get_eventq(void);
 }
 #endif
 
-#endif /* UWB_CORE_H */
 /** @} */

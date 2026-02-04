@@ -11,5 +11,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l011k4 \
     samd10-xmini \
     stk3200 \
+    stm32c0116-dk \
     stm32f030f4-demo \
     #

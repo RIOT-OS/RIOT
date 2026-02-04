@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_openwsn
  * @{
@@ -18,9 +20,6 @@
  *
  * @}
  */
-
-#ifndef SCHEDULER_TYPES_H
-#define SCHEDULER_TYPES_H
 
 #include "opendefs.h"
 #include "scheduler.h"
@@ -52,5 +51,3 @@ typedef struct {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SCHEDULER_TYPES_H */

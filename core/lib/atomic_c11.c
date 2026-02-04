@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015-2016 Eistec AB
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2015-2016 Eistec AB
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -261,14 +258,6 @@ TEMPLATE_ATOMIC_OP_FETCH_N(nand, &, 8, ~) /* __atomic_nand_fetch_8 */
 
 /* ***** Generic versions below ***** */
 
-/* Clang objects if you redefine a builtin.  This little hack allows us to
- * define a function with the same name as an intrinsic. */
-/* Hack origin: http://llvm.org/svn/llvm-project/compiler-rt/trunk/lib/builtins/atomic.c */
-#pragma redefine_extname __atomic_load_c __atomic_load
-#pragma redefine_extname __atomic_store_c __atomic_store
-#pragma redefine_extname __atomic_exchange_c __atomic_exchange
-#pragma redefine_extname __atomic_compare_exchange_c __atomic_compare_exchange
-
 /**
  * @brief Atomic generic load
  *
@@ -376,6 +365,35 @@ bool __atomic_compare_exchange_c(size_t len, void *ptr, void *expected,
     irq_restore(mask);
     return ret;
 }
+
+/**
+ * This built-in function performs an atomic test-and-set operation on the byte
+ * at *ptr. The byte is set to some implementation defined nonzero “set” value
+ * and the return value is true if and only if the previous contents were “set”.
+ * It should be only used for operands of type bool.
+ *
+ * All memory orders are valid.
+ *
+ * @see https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html#index-_005f_005fatomic_005ftest_005fand_005fset
+ *
+ * @param[in,out]   ptr         Value to test and then set
+ * @param[in]       memorder    Ignored
+ *
+ * @retval  true    The value @p ptr was already set
+ * @retval  false   The value @p ptr was previously unset
+ *
+ * @pre     @p ptr points to a value of `bool`
+ */
+bool __atomic_test_and_set_c(void *ptr, int memorder)
+{
+    (void)memorder;
+    bool *target = ptr;
+    unsigned mask = irq_disable();
+    bool retval = *target;
+    *target = true;
+    irq_restore(mask);
+    return retval;
+}
 #if !defined(__llvm__) && !defined(__clang__)
 /* Memory barrier helper function, for platforms without barrier instructions */
 void __sync_synchronize(void) __attribute__((__weak__));
@@ -389,4 +407,15 @@ void __sync_synchronize(void)
     __asm__ volatile ("" : : : "memory");
 }
 #endif
+
+/* Clang objects if you redefine a builtin. This little hack allows us to
+ * define a function with the same name as an intrinsic. */
+/* Hack origin: http://llvm.org/svn/llvm-project/compiler-rt/trunk/lib/builtins/atomic.c */
+/* Note: The rename must come *after* the declaration of the symbol to work in
+ *       GCC. */
+#pragma redefine_extname __atomic_load_c __atomic_load
+#pragma redefine_extname __atomic_store_c __atomic_store
+#pragma redefine_extname __atomic_exchange_c __atomic_exchange
+#pragma redefine_extname __atomic_compare_exchange_c __atomic_compare_exchange
+#pragma redefine_extname __atomic_test_and_set_c __atomic_test_and_set
 /** @} */

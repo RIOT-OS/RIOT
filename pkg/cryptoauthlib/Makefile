@@ -36,8 +36,11 @@ cryptoauth: $(PKG_BUILD_DIR)/Makefile
 	$(MAKE) -C $(PKG_BUILD_DIR)
 	cp $(PKG_BUILD_DIR)/libcryptoauth.a $(BINDIR)/$(PKG_NAME).a
 
+# TODO: Drop `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` once upstream is compatible
+#       with newer cmake (e.g. compilation still succeeds with cmake 4.x)
 $(PKG_BUILD_DIR)/Makefile: $(TOOLCHAIN_FILE)
 	cmake -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
+		  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
 		  -Wno-dev \
 		  -DATCA_NO_HEAP:BOOL=TRUE \
 		  -B$(PKG_BUILD_DIR) \

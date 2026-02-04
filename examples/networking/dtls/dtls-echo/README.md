@@ -30,8 +30,8 @@ For the client:
 # Testings
 ## Boards
 
-Boards that do not support the `../gnrc_networking` example are included
-in the `BOARD_INSUFFICIENT_MEMORY`, plus the board `cc2650stk`.
+Boards that do not support the `dtls-echo` example are included
+in the `Makefile.ci` file.
 
 The code has been tested in the FIT IOT-LAB tesbed with the remote
 `iotlab-m3` and `iotlab-a8-m3` boards and with local `samr21-xpro` boards.

@@ -60,6 +60,7 @@
 
 #include "thread.h"
 #include "net/netopt.h"
+#include "net/gnrc/netapi/notify.h"
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/pkt.h"
 
@@ -88,9 +89,16 @@ extern "C" {
 #define GNRC_NETAPI_MSG_TYPE_GET        (0x0204)
 
 /**
- * @brief   @ref core_msg type for replying to get and set option messages
+ * @brief   @ref core_msg type for replying to get/set option, and notify messages
  */
 #define GNRC_NETAPI_MSG_TYPE_ACK        (0x0205)
+
+/**
+ * @brief   @ref core_msg type for sending a general event notifications to one or more subscribers
+ *
+ * This sends back a @ref GNRC_NETAPI_MSG_TYPE_ACK, so it should be used with `msg_send_receive()`.
+ */
+#define GNRC_NETAPI_MSG_TYPE_NOTIFY     (0x0207)
 
 /**
  * @brief   Data structure to be send for setting (@ref GNRC_NETAPI_MSG_TYPE_SET)
@@ -182,6 +190,24 @@ static inline int gnrc_netapi_dispatch_send(gnrc_nettype_t type, uint32_t demux_
 {
     return gnrc_netapi_dispatch(type, demux_ctx, GNRC_NETAPI_MSG_TYPE_SND, pkt);
 }
+
+/**
+ * @brief   Sends a @ref GNRC_NETAPI_MSG_TYPE_NOTIFY command to all subscribers to
+ *          (@p type, @p demux_ctx).
+ *
+ * @note    This blocks the sender until all registered subscribers have ack'ed the notification
+ *          or sending has failed. The @p data can be freed after the function returned.
+ *
+ * @param[in] type          Type of the targeted network module.
+ * @param[in] demux_ctx     Demultiplexing context for @p type.
+ * @param[in] event         Notification event type.
+ * @param[in] data          Data associated with the event.
+ * @param[in] data_len      Size of @p data.
+ *
+ * @return Number of subscribers to (@p type, @p demux_ctx).
+ */
+int gnrc_netapi_notify(gnrc_nettype_t type, uint32_t demux_ctx, netapi_notify_t event,
+                       void *data, size_t data_len);
 
 /**
  * @brief   Shortcut function for sending @ref GNRC_NETAPI_MSG_TYPE_RCV messages

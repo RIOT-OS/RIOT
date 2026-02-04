@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2016 Sam Kumar <samkumar@berkeley.edu>
- *               2016 University of California, Berkeley
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Sam Kumar <samkumar@berkeley.edu>
+ * SPDX-FileCopyrightText: 2016 University of California, Berkeley
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**

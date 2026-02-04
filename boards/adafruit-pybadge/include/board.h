@@ -107,6 +107,8 @@ extern "C" {
 #define XTIMER_HZ                   (1000000ul)                 /**< Default timer runs at 1MHz */
 /** @} */
 
+#define BOOTLOADER_UF2    1     /**< This board uses the UF2 bootloader */
+
 #ifdef __cplusplus
 }
 #endif

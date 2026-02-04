@@ -343,12 +343,12 @@ static const stm32_usbdev_fs_config_t stm32_usbdev_fs_config[] = {
     {
         .base_addr  = (uintptr_t)USB,
         .rcc_mask   = RCC_APB1ENR_USBEN,
-        .irqn       = USB_LP_CAN1_RX0_IRQn,
-        .apb        = APB1,
         .dm         = GPIO_PIN(PORT_A, 11),
         .dp         = GPIO_PIN(PORT_A, 12),
         .af         = GPIO_AF_UNDEF,
         .disconn    = GPIO_UNDEF,
+        .irqn       = USB_LP_CAN1_RX0_IRQn,
+        .apb        = APB1,
     },
 };
 

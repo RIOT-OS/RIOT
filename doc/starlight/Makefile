@@ -5,13 +5,17 @@ RIOTTOOLS ?= $(RIOTBASE)/dist/tools
 .PHONY: install
 install: integrate_outside_files
 	@echo "Installing starlight..."
-	@npm install --prefix $(CURDIR) --prefer-offline
-	@echo "Starlight installed successfully."
+	@npm ci --prefix $(CURDIR) --prefer-offline --no-fund --no-audit
+	@echo "\nStarlight installed successfully."
 
 .PHONY: build
 build: install
 	@npm run build --prefix $(CURDIR)
 	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/starlight/dist/index.html"
+
+.PHONY: preview
+preview: build
+	@npm run preview --prefix $(CURDIR)
 
 .PHONY: dev
 dev: install
@@ -23,7 +27,7 @@ clean:
 	-@rm -rf node_modules .astro dist
 
 .PHONY: integrate_outside_files
-integrate_outside_files: code_of_conduct governance lostandfound coding_conventions coding_conventions_cpp
+integrate_outside_files: code_of_conduct governance lostandfound coding_conventions coding_conventions_cpp security
 
 .PHONY: code_of_conduct
 code_of_conduct: ../../CODE_OF_CONDUCT.md
@@ -43,10 +47,16 @@ lostandfound: ../../LOSTANDFOUND.md
 
 .PHONY: coding_conventions
 coding_conventions: ../../CODING_CONVENTIONS.md
-	-@echo "Generating Lost and Found documentation..."
+	-@echo "Generating Coding Conventions documentation..."
 	-@sed '1,2d' $< | cat ./templates/CODING_CONVENTIONS.template.md - > ../guides/generated/CODING_CONVENTIONS.md
 
 .PHONY: coding_conventions_cpp
 coding_conventions_cpp: ../../CODING_CONVENTIONS_C++.md
-	-@echo "Generating Lost and Found documentation..."
+	-@echo "Generating C++ Coding Conventions documentation..."
 	-@sed '1,2d' $< | cat ./templates/CODING_CONVENTIONS_CPP.template.md - > ../guides/generated/CODING_CONVENTIONS_CPP.md
+
+.PHONY: security
+security: ../../SECURITY.md
+	-@mkdir -p ../guides/generated
+	-@echo "Generating Security Guidelines..."
+	-@sed '1,2d' $< | cat ./templates/SECURITY.template.md - > ../guides/generated/SECURITY.md

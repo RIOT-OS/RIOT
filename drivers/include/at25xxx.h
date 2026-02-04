@@ -10,7 +10,7 @@
 
 /**
  * @defgroup    drivers_at25xxx AT25xxx family of SPI-EEPROMs
- * @ingroup     drivers_misc
+ * @ingroup     drivers_storage
  *
  * @brief       This driver also support M95xxx, 25AAxxx, 25LCxxx, CAT25xxx & BR25Sxxx families
  * @{

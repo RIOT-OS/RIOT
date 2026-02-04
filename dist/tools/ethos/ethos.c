@@ -119,8 +119,9 @@ void set_blocking(int fd, int should_block)
     tty.c_cc[VTIME] = TTY_TIMEOUT_MS / 100; /* 0.5 seconds read timeout*/
                                             /* in tenths of a second*/
 
-    if (tcsetattr (fd, TCSANOW, &tty) != 0)
+    if (tcsetattr (fd, TCSANOW, &tty) != 0) {
         perror("error setting term attributes");
+    }
 }
 
 /**
@@ -156,35 +157,38 @@ typedef struct {
  **************************************************************************/
 int tun_alloc(char *dev, int flags) {
 
-  struct ifreq ifr = { 0 };
-  int fd, err;
+    struct ifreq ifr = { 0 };
 
-  if( (fd = open("/dev/net/tun", O_RDWR)) < 0 ) {
-    perror("Opening /dev/net/tun");
+    int fd = open("/dev/net/tun", O_RDWR);
+    if (fd < 0) {
+        perror("Opening /dev/net/tun");
+        return fd;
+    }
+
+    ifr.ifr_flags = flags;
+
+    if (*dev) {
+        strncpy(ifr.ifr_name, dev, IFNAMSIZ - 1);
+    }
+
+    int err = ioctl(fd, TUNSETIFF, (void *)&ifr);
+    if (err < 0 ) {
+        perror("ioctl(TUNSETIFF)");
+        close(fd);
+        return err;
+    }
+
+    strcpy(dev, ifr.ifr_name);
+
     return fd;
-  }
-
-  ifr.ifr_flags = flags;
-
-  if (*dev) {
-    strncpy(ifr.ifr_name, dev, IFNAMSIZ - 1);
-  }
-
-  if( (err = ioctl(fd, TUNSETIFF, (void *)&ifr)) < 0 ) {
-    perror("ioctl(TUNSETIFF)");
-    close(fd);
-    return err;
-  }
-
-  strcpy(dev, ifr.ifr_name);
-
-  return fd;
 }
 
 static void _handle_char(serial_t *serial, char c)
 {
-    serial->frame[serial->framebytes] = c;
-    serial->framebytes++;
+    if (serial->framebytes < sizeof(serial->frame)) {
+        serial->frame[serial->framebytes] = c;
+        serial->framebytes++;
+    }
 }
 
 static int _serial_handle_byte(serial_t *serial, char c)
@@ -261,7 +265,7 @@ static void _write_escaped(int fd, char* buf, ssize_t n)
     uint8_t out[SERIAL_BUFFER_SIZE];
     size_t buffered = 0;
 
-    while(n--) {
+    while (n--) {
         unsigned char c = *buf++;
         if (c == LINE_FRAME_DELIMITER || c == LINE_ESC_CHAR) {
             out[buffered++] = LINE_ESC_CHAR;
@@ -307,7 +311,7 @@ static int _parse_baudrate(const char *arg, unsigned *baudrate)
         return 0;
     }
 
-    switch(strtol(arg, (char**)NULL, 10)) {
+    switch (strtol(arg, (char**)NULL, 10)) {
     case 9600:
         *baudrate = B9600;
         break;
@@ -408,11 +412,13 @@ int _tcp_connect(char *host, char *port)
        and) try the next address. */
     for (rp = result; rp != NULL; rp = rp->ai_next) {
         sfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-        if (sfd == -1)
+        if (sfd == -1) {
             continue;
+        }
 
-        if (connect(sfd, rp->ai_addr, rp->ai_addrlen) != -1)
+        if (connect(sfd, rp->ai_addr, rp->ai_addrlen) != -1) {
             break;
+        }
 
         close(sfd);
     }
@@ -536,7 +542,7 @@ int main(int argc, char *argv[])
     fprintf(stderr, "----> ethos: activating serial pass through.\n");
     _send_hello(serial_fd, &serial, LINE_FRAME_TYPE_HELLO);
     int stdin_open = 1;
-    while(1) {
+    while (1) {
         int activity;
         FD_ZERO(&readfds);
         if (stdin_open) {
@@ -544,10 +550,9 @@ int main(int argc, char *argv[])
         }
         FD_SET(tap_fd, &readfds);
         FD_SET(serial_fd, &readfds);
-        activity = select( max_fd + 1 , &readfds , NULL , NULL , NULL);
+        activity = select(max_fd + 1, &readfds, NULL, NULL, NULL);
 
-        if ((activity < 0) && (errno != EINTR))
-        {
+        if ((activity < 0) && (errno != EINTR)) {
             perror("select error");
         }
 

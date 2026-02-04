@@ -42,7 +42,7 @@ static void _init(void)
 static ssize_t _write(const void *buffer, size_t len)
 {
     mutex_lock(&slipdev_mutex);
-    slipdev_write_byte(slipdev_params[0].uart, SLIPDEV_STDIO_START);
+    slipdev_write_byte(slipdev_params[0].uart, SLIPDEV_START_STDIO);
     slipdev_write_bytes(slipdev_params[0].uart, buffer, len);
     slipdev_write_byte(slipdev_params[0].uart, SLIPDEV_END);
     mutex_unlock(&slipdev_mutex);

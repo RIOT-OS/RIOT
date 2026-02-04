@@ -1,5 +1,3 @@
-NATIVEINCLUDES += -I$(RIOTCPU)/native/include/
-
 ifneq (,$(filter periph_can,$(USEMODULE)))
   ifeq (,$(filter libsocketcan,$(USEPKG)))
     # link system libsocketcan if not using the provided package

@@ -1,0 +1,24 @@
+From 978c5e4e60bbe2819de69b779e064ffb85b3a7df Mon Sep 17 00:00:00 2001
+From: crasbe <crasbe@gmail.com>
+Date: Thu, 16 Oct 2025 17:11:53 +0200
+Subject: [PATCH 1/1] RIOT specific changes
+
+---
+ mdk/nrf51.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mdk/nrf51.h b/mdk/nrf51.h
+index 561bffc..7b72b10 100644
+--- a/mdk/nrf51.h
++++ b/mdk/nrf51.h
+@@ -124,7 +124,7 @@ typedef enum {
+ /** @} */ /* End of group Configuration_of_CMSIS */
+
+ #include "core_cm0.h"                           /*!< ARM Cortex-M0 processor and core peripherals                              */
+-#include "system_nrf51.h"                       /*!< nrf51 System                                                              */
++/* #include "system_nrf51.h" */                      /*!< nrf51 System                                                              */
+
+ #ifndef __IM                                    /*!< Fallback for older CMSIS versions                                         */
+   #define __IM   __I
+--
+2.43.0

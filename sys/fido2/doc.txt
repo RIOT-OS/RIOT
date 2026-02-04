@@ -88,7 +88,7 @@
  *
  * **ctap_cbor**
  *
- * Helper containing functionality to parse and encode CBOR messages. Uses the [tinyCBOR](https://doc.riot-os.org/group__pkg__tinycbor.html) pkg.
+ * Helper containing functionality to parse and encode CBOR messages. Uses the [tinyCBOR](https://api.riot-os.org/group__pkg__tinycbor.html) pkg.
  *
  * **ctap_crypto**
  *
@@ -100,7 +100,7 @@
  *
  * Abstraction for Elliptic curve cryptography (ECC) operations. Uses the [micro-ecc](https://api.riot-os.org/group__pkg__micro__ecc.html) pkg.
  *
- * Parsing of cryptographic signatures into ASN.1 DER format. Uses the [tiny-asn1](http://doc.riot-os.org/group__pkg__tiny-asn1.html) pkg.
+ * Parsing of cryptographic signatures into ASN.1 DER format. Uses the [tiny-asn1](http://api.riot-os.org/group__pkg__tiny-asn1.html) pkg.
  *
  * **ctap_mem**
  *

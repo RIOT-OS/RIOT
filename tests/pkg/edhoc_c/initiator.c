@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -20,9 +17,7 @@
 #include <stdio.h>
 
 #include "net/gnrc/netif.h"
-#include "net/ipv6.h"
 #include "net/nanocoap_sock.h"
-#include "shell.h"
 
 #include "edhoc/edhoc.h"
 #include "edhoc_keys.h"
@@ -32,9 +27,6 @@
 #elif IS_USED(MODULE_TINYCRYPT)
 #include "tinycrypt/sha256.h"
 #endif
-
-#define ENABLE_DEBUG        0
-#include "debug.h"
 
 #define COAP_BUF_SIZE     (256U)
 
@@ -114,11 +106,9 @@ static ssize_t _build_coap_pkt(coap_pkt_t *pkt, uint8_t *buf, ssize_t buflen,
     uint8_t token[2] = { 0xDA, 0xEC };
     ssize_t len = 0;
 
-    /* set pkt buffer */
-    pkt->hdr = (coap_hdr_t *)buf;
     /* build header, confirmed message always post */
-    ssize_t hdrlen = coap_build_hdr(pkt->hdr, COAP_TYPE_CON, token,
-                                    sizeof(token), COAP_METHOD_POST, 1);
+    ssize_t hdrlen = coap_build_udp_hdr(buf, buflen, COAP_TYPE_CON, token,
+                                        sizeof(token), COAP_METHOD_POST, 1);
 
     coap_pkt_init(pkt, buf, buflen, hdrlen);
     coap_opt_add_string(pkt, COAP_OPT_URI_PATH, "/.well-known/edhoc", '/');

@@ -22,7 +22,7 @@ You then can run the tests by calling
 make term
 ```
 
-or flash them to your board as you would flash any RIOT application to the board (see [Supported Boards](https://www.riot-os.org/boards.html)).
+or flash them to your board as you would [flash any RIOT application](https://guide.riot-os.org/getting-started/flashing/) to the board.
 
 You can debug your tests by running
 
@@ -97,6 +97,7 @@ make term
 ```
 
 ## Writing unit tests
+
 ### File structure
 RIOT uses [*embUnit*](http://embunit.sourceforge.net/) for unit testing.
 All unit tests are organized in ``tests/unittests`` and can be built module-wise, if needed.
@@ -133,15 +134,11 @@ The test header ``tests-<modulename>/tests-<module>.h`` of a module you add to `
 
 ```C
 /*
- * Copyright (C) <year> <author>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: <year> <author>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#ifndef TESTS_<MODULE>_H
-#define TESTS_<MODULE>_H
+#pragma once
 
 /**
  * @addtogroup  unittests
@@ -180,7 +177,6 @@ Test *tests_<module>_<header2>_tests(void);
 #endif
 
 /** @} */
-#endif /* TESTS_<MODULE>_H */
 ```
 
 #### Implement tests
@@ -188,11 +184,8 @@ Every ``tests-<modulename>/tests-<module>*.c`` file you add to ``tests/unittests
 
 ```C
 /*
- * Copyright (C) <year> <author>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: <year> <author>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /* clib includes */
@@ -330,3 +323,14 @@ The following assertion macros are available via *embUnit*
     </tr>
   </tbody>
 </table>
+
+## Out of Tree Unit Tests
+
+Export the environment variable `EXTERNAL_UNITTEST_DIRS` that contains a space
+separated list of out-of-tree unit tests to also include in the test. The tests
+will be treated the exact same way as tests in this folder and must follow the
+same naming convention (each folder in `EXTERNAL_UNITTEST_DIRS` should have
+`tests-<name>` folders containing the unit tests).
+
+This feature works best with `EXTERNAL_MODULE_DIRS` that contain the code the
+external unit tests should cover.

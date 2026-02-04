@@ -581,25 +581,33 @@ int can_device_calc_bittiming(uint32_t clock, const struct can_bittiming_const *
     timing->phase_seg1 = tseg1 - timing->prop_seg;
     timing->phase_seg2 = tseg2;
 
-    if (!timing->sjw || !timing_const->sjw_max) {
-        timing->sjw = SJW;
-    }
-    else {
-        if (timing->sjw > timing_const->sjw_max) {
+    /* this paper http://www.oertel-halle.de/files/cia99paper.pdf might help to understand SJW */
+    if (!timing->sjw) {
+        if (!timing_const->sjw_max) {
+            /* fallback if no device max value is known */
+            timing->sjw = SJW;
+        }
+        else {
+            /* try to find the max_value start at max */
             timing->sjw = timing_const->sjw_max;
         }
-        if (timing->sjw > tseg2) {
-            timing->sjw = tseg2;
-        }
     }
-
+    if (timing->sjw > timing->phase_seg2) {
+        /* SJW shall not be bigger than phase segment 2 */
+        timing->sjw = timing->phase_seg2;
+    }
+    if (timing->sjw > timing->phase_seg1) {
+        /* SJW shall not be bigger than phase segment 1 */
+        timing->sjw = timing->phase_seg1;
+    }
     timing->brp = best_brp;
 
     timing->bitrate = clock / (timing->brp * (CAN_SYNC_SEG + tseg1 + tseg2));
 
-    DEBUG("bitrate=%" PRIu32 ", sample_point=%" PRIu32 ", brp=%" PRIu32 ", prop_seg=%" PRIu32
-          ", phase_seg1=%" PRIu32 ", phase_seg2=%" PRIu32 "\n", timing->bitrate, timing->sample_point,
-          timing->brp, timing->prop_seg, timing->phase_seg1, timing->phase_seg2);
+    DEBUG("clock=%" PRIu32 ", bitrate=%" PRIu32 ", sample_point=%" PRIu32 ", brp=%" PRIu32
+          ", prop_seg=%" PRIu32", phase_seg1=%" PRIu32 ", phase_seg2=%" PRIu32", sjw=%" PRIu32 "\n",
+          clock, timing->bitrate, timing->sample_point, timing->brp,
+          timing->prop_seg, timing->phase_seg1, timing->phase_seg2, timing->sjw);
 
     return 0;
 }

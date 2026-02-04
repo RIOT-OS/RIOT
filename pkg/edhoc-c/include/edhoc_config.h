@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_edhoc_c
  * @{
@@ -17,9 +19,6 @@
  *
  * @}
  */
-
-#ifndef EDHOC_CONFIG_H
-#define EDHOC_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -117,5 +116,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* EDHOC_CONFIG_H */

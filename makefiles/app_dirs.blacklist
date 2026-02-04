@@ -11,6 +11,8 @@ tests/build_system/external_board_native/external_boards/
 tests/build_system/external_module_dirs/external_modules/
 tests/build_system/external_pkg_dirs/external_pkgs/
 tests/build_system/kconfig/external_modules/
+tests/build_system/external_unittests/external_tests_dir/
+tests/build_system/external_unittests/tests-in_tree
 tests/build_system/kconfig/external_pkgs/
 tests/periph/qdec/boards_modded/
 tests/pkg/openwsn_sock_udp/external_modules/
@@ -18,4 +20,5 @@ tests/pkg/tflite-micro/external_modules/
 tests/pkg/utensor/external_modules/
 tests/pkg/wolfcrypt-ed25519-verify/
 tests/sys/suit_manifest/native_flashpage/
+tests/sys/event_thread_shared/external_modules/
 tests/unittests/

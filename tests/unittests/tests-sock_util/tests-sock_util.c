@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2018 Freie Universität Berlin
- * Copyright (C) 2018 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2018 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -50,9 +47,11 @@
 #define TEST_URL_LONG_HOSTPORT      "https://veryveryvery.long.hostname.that." \
                                     "doesnt.fit.inside.sixtyfour.characters." \
                                     "of.buffer.space/localpart"
-#define TEST_URL_LONG_URLPATH       "http://shorthostname/very/very/long/ " \
-                                    "path/that/doesnt/fit/inside/sixtyfour/" \
-                                    "chars/of/buffer/space"
+#define TEST_URL_LONG_URLPATH       "http://shorthostname/super/duper/"\
+                                    "mega/ultra/collssaly/massively/long/ " \
+                                    "path/that/doesnt/fit/inside/" \
+                                    "one-hundred-and-twentyfour/bytes/" \
+                                    "/of/preallocated/buffer/space"
 
 static char addr[CONFIG_SOCK_URLPATH_MAXLEN];
 static char urlpath[CONFIG_SOCK_URLPATH_MAXLEN];

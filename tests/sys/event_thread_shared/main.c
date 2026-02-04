@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2020 Kaspar Schleiser <kaspar@schleiser.de>
- *               2020 Freie Universität Berlin
- *               2020 Inria
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2020 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2020 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2020 Inria
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -20,10 +17,22 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdio.h>
 
 #include "thread.h"
 #include "event/thread.h"
+
+#if defined(BOARD_NATIVE64) || defined(BOARD_NATIVE32)
+#  define STACKSIZE_EXPECTED 4096
+#else
+#  define STACKSIZE_EXPECTED 567
+#endif
+
+static_assert(EVENT_THREAD_MEDIUM_STACKSIZE == STACKSIZE_EXPECTED,
+              "Selecting highest of the minimum stack size requirements "
+              "declared via `EVENT_THREAD_HIGHEST_STACKSIZE_MIN += <num>` "
+              "must work correctly");
 
 static void _handler_high(event_t *event) {
     (void)event;

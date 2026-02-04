@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     lwm2m_objects
  * @defgroup    lwm2m_objects_light_control Light Control
@@ -104,9 +106,6 @@
  *
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef OBJECTS_LIGHT_CONTROL_H
-#define OBJECTS_LIGHT_CONTROL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -298,5 +297,4 @@ int lwm2m_object_light_control_update_app_type(uint16_t instance_id, const char 
 }
 #endif
 
-#endif /* OBJECTS_LIGHT_CONTROL_H */
 /** @} */

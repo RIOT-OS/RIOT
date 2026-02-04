@@ -60,17 +60,14 @@
                              RADIO_SHORTS_CCABUSY_DISABLE_Msk | \
                              RADIO_SHORTS_TXREADY_START_Msk)
 
-#define MAC_TIMER_CHAN_ACK  (0U)    /**< MAC timer channel for transmitting an ACK frame */
 #define MAC_TIMER_CHAN_IFS  (1U)    /**< MAC timer channel for handling IFS logic */
 
 static uint8_t rxbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
-static uint8_t ack[IEEE802154_ACK_FRAME_LEN];
 
 typedef enum {
     STATE_IDLE,
     STATE_TX,
-    STATE_ACK,
     STATE_RX,
     STATE_CCA_CLEAR,
     STATE_CCA_BUSY,
@@ -419,27 +416,12 @@ static void _set_ifs_timer(bool lifs)
 static void _timer_cb(void *arg, int chan)
 {
     (void)arg;
-    ieee802154_dev_t *dev = nrf802154_hal_dev;
-
-    if (chan == MAC_TIMER_CHAN_ACK) {
-        /* Copy sqn */
-        ack[1] = IEEE802154_FCF_TYPE_ACK;
-        if (cfg.pending) {
-            ack[1] |= IEEE802154_FCF_FRAME_PEND;
-        }
-
-        ack[3] = rxbuf[3];
-
-        NRF_RADIO->PACKETPTR = (uint32_t) &ack;
-        NRF_RADIO->TASKS_TXEN = 1;
-        dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
-    }
-    else if (chan == MAC_TIMER_CHAN_IFS) {
+    if (chan == MAC_TIMER_CHAN_IFS) {
         cfg.ifs = false;
     }
-
     timer_stop(NRF802154_TIMER);
 }
+
 /**
  * @brief   Set radio into DISABLED state
  */
@@ -449,10 +431,6 @@ int nrf802154_init(void)
     /* reset buffer */
     rxbuf[0] = 0;
     txbuf[0] = 0;
-
-    ack[0] = IEEE802154_ACK_FRAME_LEN; /* PSDU length */
-    ack[1] = IEEE802154_FCF_TYPE_ACK; /* FCF */
-    ack[2] = 0; /* FCF */
 
     int result = timer_init(NRF802154_TIMER, TIMER_FREQ, _timer_cb, NULL);
     assert(result >= 0);
@@ -513,10 +491,7 @@ void isr_radio(void)
             break;
         case STATE_RX:
             if (NRF_RADIO->CRCSTATUS) {
-                bool l2filter_passed = _l2filter(rxbuf+1);
-                bool is_auto_ack_en = !IS_ACTIVE(CONFIG_IEEE802154_AUTO_ACK_DISABLE);
                 bool is_ack = rxbuf[1] & IEEE802154_FCF_TYPE_ACK;
-                bool ack_req = rxbuf[1] & IEEE802154_FCF_ACK_REQ;
 
                 /* If radio is in promiscuous mode, indicate packet and
                  * don't event think of sending an ACK frame :) */
@@ -525,26 +500,16 @@ void isr_radio(void)
                     _state = STATE_IDLE;
                     dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
                 }
-                /* If the L2 filter passes, device if the frame is indicated
-                 * directly or if the driver should send an ACK frame before
-                 * the indication */
-                else if (l2filter_passed) {
-                    if (ack_req && is_auto_ack_en) {
-                        timer_set(NRF802154_TIMER, MAC_TIMER_CHAN_ACK, IEEE802154_SIFS_SYMS);
-                        timer_start(NRF802154_TIMER);
-                        _disable();
-                        _state = STATE_ACK;
-                    }
-                    else {
-                        DEBUG("[nrf802154] RX frame doesn't require ACK frame.\n");
-                        _state = STATE_IDLE;
-                        dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
-                    }
-                }
                 /* In case the packet is an ACK and the ACK filter is disabled,
                  * indicate the frame reception */
                 else if (is_ack && !cfg.ack_filter) {
                     DEBUG("[nrf802154] Received ACK.\n");
+                    _state = STATE_IDLE;
+                    dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
+                }
+                /* If the L2 filter passes the frame is indicated directly */
+                else if (_l2filter(rxbuf+1)) {
+                    DEBUG("[nrf802154] RX data frame.\n");
                     _state = STATE_IDLE;
                     dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
                 }
@@ -559,16 +524,6 @@ void isr_radio(void)
                 DEBUG("[nrf802154] CRC fail.\n");
                 dev->cb(dev, IEEE802154_RADIO_INDICATION_CRC_ERROR);
             }
-            break;
-        case STATE_ACK:
-            _state = STATE_IDLE;
-
-            /* We disable the radio to avoid unwanted emissions (see ERRATA
-             * ID 204, "Switching between TX and RX causes unwanted emissions")
-             */
-            _disable();
-            DEBUG("[nrf52840] TX ACK done.");
-            _set_ifs_timer(false);
             break;
         default:
             assert(false);
@@ -757,6 +712,21 @@ static int _set_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_
     return 0;
 }
 
+static int _get_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_t *mode)
+{
+    (void) dev;
+    if (cfg.promisc) {
+        *mode = IEEE802154_FILTER_PROMISC;
+    }
+    else if (!cfg.ack_filter) {
+        *mode = IEEE802154_FILTER_ACK_ONLY;
+    }
+    else {
+        *mode = IEEE802154_FILTER_ACCEPT;
+    }
+    return 0;
+}
+
 static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *bd,
                             int8_t retries)
 {
@@ -810,4 +780,5 @@ static const ieee802154_radio_ops_t nrf802154_ops = {
     .config_addr_filter = _config_addr_filter,
     .config_src_addr_match = _config_src_addr_match,
     .set_frame_filter_mode = _set_frame_filter_mode,
+    .get_frame_filter_mode = _get_frame_filter_mode,
 };

@@ -286,7 +286,7 @@ typedef struct {
      * @return      Negative, if the first parent is preferred.
      */
     int (*parent_cmp)(gnrc_rpl_parent_t *parent1, gnrc_rpl_parent_t *parent2);
-    gnrc_rpl_dodag_t *(*which_dodag)(gnrc_rpl_dodag_t *, gnrc_rpl_dodag_t *); /**< compare for dodags */
+    int (*which_dodag)(gnrc_rpl_dodag_t *, gnrc_rpl_dio_t *); /**< compare for dodags */
 
     /**
      * @brief Reset the state of the objective function.
@@ -330,6 +330,10 @@ struct gnrc_rpl_dodag {
     uint8_t dio_opts;               /**< options in the next DIO
                                          (see @ref GNRC_RPL_REQ_DIO_OPTS "DIO Options") */
     evtimer_msg_event_t dao_event;  /**< DAO TX events (see @ref GNRC_RPL_MSG_TYPE_DODAG_DAO_TX) */
+    /**
+     * floating dodag timeout events (see @ref GNRC_RPL_MSG_TYPE_DODAG_FLOAT_TIMEOUT)
+     */
+    evtimer_msg_event_t float_timeout_event;
     trickle_t trickle;              /**< trickle representation */
 };
 

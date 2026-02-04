@@ -6,3 +6,25 @@ RAM_START_ADDR ?= 0x20000000
 LINKER_SCRIPT ?= cortexm.ld
 
 INCLUDES += -I$(RIOTCPU)/nrf5x_common/include
+
+NRF5XFAM_INCLUDE_DIR = $(BUILD_DIR)/nrf5x_nrfx_mdk/$(CPU_FAM)
+ifneq (,$(filter nrf53%,$(CPU_MODEL)))
+  # The nRF5340 needs some special consideration due to the splitting between
+  # application and network core.
+  ifeq (nrf5340_app,$(CPU_MODEL))
+    NRF5XFAM_INCLUDE_FILE = $(NRF5XFAM_INCLUDE_DIR)/vendor/nrf5340_application.h
+  else ifeq (nrf5340_net,$(CPU_MODEL))
+    NRF5XFAM_INCLUDE_FILE = $(NRF5XFAM_INCLUDE_DIR)/vendor/nrf5340_network.h
+  endif
+else
+  NRF5XFAM_INCLUDE_FILE = $(NRF5XFAM_INCLUDE_DIR)/vendor/$(CPU_FAM).h
+endif
+INCLUDES += -I$(NRF5XFAM_INCLUDE_DIR)
+
+# Fetch all nRF52 vendor headers using the package mechanism. This rule is called all
+# the time to ensure it's correctly updated when versions in the packages are
+# updated.
+$(NRF5XFAM_INCLUDE_FILE): FORCE $(CLEAN)
+	$(Q)+$(MAKE) -f $(RIOTBASE)/cpu/nrf5x_common/Makefile.nrfx
+
+BUILDDEPS += $(NRF5XFAM_INCLUDE_FILE)

@@ -46,3 +46,8 @@ _is_equal = $(if $(and $(findstring $(1),$(2)),$(findstring $(2),$(1))),1,)
 version_is_greater_or_equal = $(or \
     $(call _is_greater,$(call _padded_version,$1),$(call _padded_version,$2)),\
     $(call _is_equal,$(call _padded_version,$1),$(call _padded_version,$2)))
+
+# Get the maximum number of the natural numbers given as $1
+#   $1: A list of natural numbers separated by white space
+#   Return: The value of the highest natural number in $1
+max_number = $(shell echo $1 | awk 'BEGIN{max=0} {for(i=1;i<=NF;i++){x=$$i; if (x > max){max = x}}} END{print max}')

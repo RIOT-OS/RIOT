@@ -1,9 +1,6 @@
 /*
- * Copyright 2019 Marian Buschsieweke
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 Marian Buschsieweke
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -24,7 +21,7 @@
 #include "ws281x_params.h"
 #include "xtimer.h"
 
-static const color_rgb_t rainbow[] = {
+static const ws281x_pixel_t rainbow[] = {
     {.r = 0x94, .g = 0x00, .b = 0xd3},
     {.r = 0x4b, .g = 0x00, .b = 0x82},
     {.r = 0x00, .g = 0x00, .b = 0xff},
@@ -74,8 +71,8 @@ int main(void)
         last_wakeup = xtimer_now();
         for (unsigned i = 0; i < RAINBOW_LEN; i++) {
             for (unsigned j = 0; j < 255; j++) {
-                color_rgb_t col;
-                color_rgb_set_brightness(&rainbow[i], &col, j);
+                ws281x_pixel_t col = {0};
+                color_rgb_set_brightness((const color_rgb_t *)&rainbow[i], (color_rgb_t *)&col, j);
                 for (uint16_t k = 0; k < dev.params.numof; k++) {
                     ws281x_set(&dev, k, col);
                 }
@@ -83,8 +80,8 @@ int main(void)
                 xtimer_periodic_wakeup(&last_wakeup, 10 * US_PER_MS);
             }
             for (unsigned j = 255; j > 0; j--) {
-                color_rgb_t col;
-                color_rgb_set_brightness(&rainbow[i], &col, j);
+                ws281x_pixel_t col = {0};
+                color_rgb_set_brightness((const color_rgb_t *)&rainbow[i], (color_rgb_t *)&col, j);
                 for (uint16_t k = 0; k < dev.params.numof; k++) {
                     ws281x_set(&dev, k, col);
                 }

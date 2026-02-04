@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2014-2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014-2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -84,7 +81,6 @@
 #include <inttypes.h>
 
 #include "kernel_defines.h"
-#include "native_sched.h"
 #include "clist.h"
 
 #ifdef __cplusplus
@@ -379,6 +375,17 @@ static inline int sched_runq_more_than_one(uint8_t prio)
 {
     return clist_more_than_one(&sched_runqueues[prio]);
 }
+
+/**
+ * @brief   Alias for `thread_yield` provided for compatibility with POSIX's
+ *          sched.h
+ *
+ * @see     https://pubs.opengroup.org/onlinepubs/009604299/basedefs/sched.h.html
+ *
+ * @note    Please use `thread_yield()` directly within RIOT. This is only
+ *          provided to get external code compiling.
+ */
+int sched_yield(void);
 
 #ifdef __cplusplus
 }

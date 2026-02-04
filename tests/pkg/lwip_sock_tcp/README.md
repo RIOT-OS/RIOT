@@ -2,7 +2,7 @@ Tests for lwIP's sock_tcp port
 ==============================
 
 This tests the `sock_tcp` port of lwIP. There is no network device needed since
-a [virtual device](http://doc.riot-os.org/group__sys__netdev__test.html) is
+a [virtual device](http://api.riot-os.org/group__sys__netdev__test.html) is
 provided at the backend.
 
 These tests test both IPv4 and IPv6 capabilities. They can be activated by

@@ -3,18 +3,6 @@ title: Managing a Release
 description: This page describes the process of managing a release.
 ---
 
-## Contents
-
-1. [Checklist](#1-checklist)
-2. [Preparation](#2-preparation)
-3. [Feature Freeze and Testing](#3-feature-freeze-and-testing)
-4. [Drafting Release Notes](#4-drafting-release-notes)
-5. [Actual Release](#5-actual-release)
-6. [Other Repositories](#6-other-repositories)
-7. [Important Fixes after Release](#7-important-fixes-after-release)
-8. [Resources](#8-resources)
-9. [Forum post templates](#9-forum-post-templates)
-
 ## 1. Checklist
 
 Steps marked with a :scroll: icon can also be automated with the release manager script.
@@ -63,7 +51,7 @@ A good time to start preparing for the release is two months before the intended
 
 Get in contact with the maintainers, discuss ongoing development and generate a **short** and realistic list of wanted features which should be published to the maintainers mailing list, on agreement. It is worth it to ask around for planned holidays to estimate an appropriate timetable. You should announce a date for the feature freeze and the estimated release date on all mailing lists.
 
-Have a look at the [list of deprecated features](http://doc.riot-os.org/deprecated.html). If any of them are pending removal for the release (or previous releases) you should remove them or assign somebody to remove them.
+Have a look at the [list of deprecated features](http://api.riot-os.org/deprecated.html). If any of them are pending removal for the release (or previous releases) you should remove them or assign somebody to remove them.
 
 During the month of release you should keep track of the development progress, coordinate between pull requests and help to get candidates merged. Shortly before feature freeze you should postpone pull requests that will (obviously) not make it until feature freeze. This SHOULD NOT be commented.
 
@@ -84,7 +72,7 @@ Any bugfixes should be merged into RIOT master and backported into the release b
 
 ### Automatic Freezing and Release Candidate Generation
 
-First create a [classic Token](https://github.com/settings/tokens) and supply it to the `riot-release-manager` script with the `-t <token>` parameter.
+First create a [classic Token](https://github.com/settings/tokens) with the 'repo' permission and supply it to the `riot-release-manager` script with the `-t <token>` parameter.
 
 **Feature Freeze:**
 ```bash
@@ -194,9 +182,9 @@ A point release for a critical issue is best limited to a small number of change
 | Release manager tool | https://github.com/RIOT-OS/RIOT-release-manager |
 | Test automation helper scripts | https://github.com/RIOT-OS/Release-Specs?tab=readme-ov-file#pytest-runner |
 | Pending changes to test automation helper scripts | https://github.com/jia200x/Release-Specs/pulls |
-| Backport automation script | {RIOTBASE}/dist/tools/backport_pr |
+| Backport automation script | https://github.com/RIOT-OS/RIOT/blob/master/dist/tools/backport_pr |
 | Release statistics wiki | https://github.com/RIOT-OS/RIOT/wiki/release-statistics |
-| Release stats script | {RIOTBASE}/dist/tools/release-stats |
+| Release stats script | https://github.com/RIOT-OS/RIOT/blob/master/dist/tools/release-stats |
 | Release management org spreadsheet | https://drive.google.com/open?id=1rKYswFgQGYj4jSA4TBHjg980pAGoaKPj |
 | Release test tracking spreadsheet | https://drive.google.com/open?id=0B384VtEXbD_HRzJSY1NGdnFpWERxb2JFeGdaS09iUjV0TGhN |
 

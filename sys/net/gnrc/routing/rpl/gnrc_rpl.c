@@ -15,12 +15,14 @@
  * @author  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
+#include "net/ipv6/addr.h"
 #include <assert.h>
 #include <string.h>
 #include "kernel_defines.h"
 
 #include "net/icmpv6.h"
 #include "net/ipv6.h"
+#include "net/gnrc/netapi/notify.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc.h"
 #include "mutex.h"
@@ -58,7 +60,12 @@ static xtimer_t _lt_timer;
 static msg_t _lt_msg = { .type = GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE };
 #endif
 static msg_t _msg_q[GNRC_RPL_MSG_QUEUE_SIZE];
-static gnrc_netreg_entry_t _me_reg;
+
+static gnrc_netreg_entry_t _me_icmpv6_reg;
+#ifdef MODULE_GNRC_NETAPI_NOTIFY
+static gnrc_netreg_entry_t _me_routing_reg;
+#endif /* MODULE_GNRC_NETAPI_NOTIFY*/
+
 static mutex_t _inst_id_mutex = MUTEX_INIT;
 static uint8_t _instance_id;
 
@@ -100,10 +107,17 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
          * queue, and registration with netreg can commence. */
         mutex_lock(&eventloop_startup);
 
-        _me_reg.demux_ctx = ICMPV6_RPL_CTRL;
-        _me_reg.target.pid = gnrc_rpl_pid;
-        /* register interest in all ICMPv6 packets */
-        gnrc_netreg_register(GNRC_NETTYPE_ICMPV6, &_me_reg);
+        /* Register interest in all ICMPv6 packets. */
+        _me_icmpv6_reg.demux_ctx = ICMPV6_RPL_CTRL;
+        _me_icmpv6_reg.target.pid = gnrc_rpl_pid;
+        gnrc_netreg_register(GNRC_NETTYPE_ICMPV6, &_me_icmpv6_reg);
+
+#ifdef MODULE_GNRC_NETAPI_NOTIFY
+        /* Register interest in L3 routing info. */
+        _me_routing_reg.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
+        _me_routing_reg.target.pid = gnrc_rpl_pid;
+        gnrc_netreg_register(GNRC_NETTYPE_L3_ROUTING, &_me_routing_reg);
+#endif /* MODULE_GNRC_NETAPI_NOTIFY*/
 
         gnrc_rpl_of_manager_init();
         evtimer_init_msg(&gnrc_rpl_evtimer);
@@ -141,37 +155,14 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, const ipv6_addr_t *
         instance_id = gnrc_rpl_gen_instance_id(local_inst_id);
     }
 
-    gnrc_rpl_dodag_t *dodag = NULL;
     gnrc_rpl_instance_t *inst = gnrc_rpl_root_instance_init(instance_id, dodag_id,
                                                             GNRC_RPL_DEFAULT_MOP);
 
     if (!inst) {
         return NULL;
     }
-
-    dodag = &inst->dodag;
-
-    dodag->dtsn = 1;
-    dodag->prf = 0;
-    dodag->dio_interval_doubl = CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS;
-    dodag->dio_min = CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN;
-    dodag->dio_redun = CONFIG_GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT;
-    dodag->default_lifetime = CONFIG_GNRC_RPL_DEFAULT_LIFETIME;
-    dodag->lifetime_unit = CONFIG_GNRC_RPL_LIFETIME_UNIT;
-    dodag->version = GNRC_RPL_COUNTER_INIT;
-    dodag->grounded = GNRC_RPL_GROUNDED;
-    dodag->node_status = GNRC_RPL_ROOT_NODE;
-    dodag->my_rank = GNRC_RPL_ROOT_RANK;
-    dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_DODAG_CONF;
-
-    if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_PIO)) {
-        dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO;
-    }
-
-    trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_MSG,
-                  (1 << dodag->dio_min), dodag->dio_interval_doubl,
-                  dodag->dio_redun);
-    gnrc_rpl_rpble_update(dodag);
+    gnrc_rpl_dodag_root_init(&inst->dodag);
+    gnrc_rpl_rpble_update(&inst->dodag);
 
     return inst;
 }
@@ -273,6 +264,81 @@ static void _parent_timeout(gnrc_rpl_parent_t *parent)
     evtimer_add_msg(&gnrc_rpl_evtimer, &parent->timeout_event, gnrc_rpl_pid);
 }
 
+/**
+ * @brief   Handles the event that a new neighbor was discovered and is reachable.
+ *
+ * @param[in] addr  The address of the neighbor.
+ */
+static inline void _handle_discovered_neighbor(ipv6_addr_t *addr)
+{
+    /* Send DODAG soliciation message to node. */
+    gnrc_rpl_send_DIS(NULL, addr, NULL, 0);
+}
+
+/**
+ * @brief   Handles the event that a neighbor became unreachable.
+ *
+ * @param[in] addr  The address of the neighbor.
+ */
+static inline void _handle_unreachable_neighbor(ipv6_addr_t *addr)
+{
+    gnrc_rpl_parent_t *parent;
+    int idx = 0;
+
+    /* Iterate through all parents and timeout the ones with matching address.
+     * There can be multiple parents with the same address because the same node
+     * can be a parent in multiple different DODAGs. */
+    while ((idx = gnrc_rpl_parent_iter_by_addr(addr, &parent, idx)) >= 0) {
+        _parent_timeout(parent);
+    }
+}
+
+/**
+ * @brief   Handles a netapi event notification.
+ *
+ * @param[in] notify    The type of notification.
+ */
+static inline void _netapi_notify_event(gnrc_netapi_notify_t *notify)
+{
+    if (!IS_USED(MODULE_GNRC_NETAPI_NOTIFY)) {
+        return;
+    }
+
+    ipv6_addr_t neigh_addr;
+    netapi_notify_t type = notify->event;
+
+    int res = gnrc_netapi_notify_copy_event_data(notify, sizeof(ipv6_addr_t), &neigh_addr);
+
+    if (res != sizeof(ipv6_addr_t)) {
+        DEBUG("RPL: Received invalid data for netapi notify event.\n");
+        return;
+    }
+
+    switch (type) {
+    case NETAPI_NOTIFY_L3_DISCOVERED:
+        _handle_discovered_neighbor(&neigh_addr);
+        break;
+    case NETAPI_NOTIFY_L3_UNREACHABLE:
+        _handle_unreachable_neighbor(&neigh_addr);
+        break;
+    default:
+        break;
+    }
+}
+
+/**
+ * @brief   Handles the timeout for floating DODAG by poisoning all routes.
+ *
+ * @param[in] dodag  Pointer to the dodag.
+ */
+static void _dodag_float_timeout(gnrc_rpl_dodag_t *dodag)
+{
+    if (dodag->grounded != GNRC_RPL_GROUNDED) {
+        gnrc_rpl_poison_routes(dodag);
+    }
+    evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&dodag->float_timeout_event);
+}
+
 static void *_event_loop(void *args)
 {
     msg_t msg, reply;
@@ -323,6 +389,11 @@ static void *_event_loop(void *args)
                     gnrc_rpl_instance_remove(instance);
                 }
                 break;
+            case GNRC_RPL_MSG_TYPE_DODAG_FLOAT_TIMEOUT:
+                DEBUG("RPL: GNRC_RPL_MSG_TYPE_DODAG_FLOAT_TIMEOUT received\n");
+                instance = msg.content.ptr;
+                _dodag_float_timeout(&instance->dodag);
+                break;
             case GNRC_RPL_MSG_TYPE_TRICKLE_MSG:
                 DEBUG("RPL: GNRC_RPL_MSG_TYPE_TRICKLE_MSG received\n");
                 trickle = msg.content.ptr;
@@ -341,6 +412,10 @@ static void *_event_loop(void *args)
                 DEBUG("RPL: reply to unsupported get/set\n");
                 reply.content.value = -ENOTSUP;
                 msg_reply(&msg, &reply);
+                break;
+            case GNRC_NETAPI_MSG_TYPE_NOTIFY:
+                DEBUG("RPL: GNRC_NETAPI_MSG_TYPE_NOTIFY received\n");
+                _netapi_notify_event(msg.content.ptr);
                 break;
             default:
                 break;

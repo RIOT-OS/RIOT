@@ -66,7 +66,7 @@ automatically for networking applications, use `feather-m0-wifi` as board
 and define the required WiFi parameters, for example:
 ```
      CFLAGS='-DWIFI_SSID=\"<ssid>\" -DWIFI_PASS=\"<pass>\"' \
-     make BOARD=feather-m0-wifi -C examples/networking/gnrc/gnrc_networking
+     make BOARD=feather-m0-wifi -C examples/networking/gnrc/networking
 ```
 
 For detailed information about the parameters, see section
@@ -80,7 +80,7 @@ variant of the board automatically for LoRa applications,
 use `feather-m0-lora` as board:
 
 ```
-make BOARD=feather-m0-lora -C examples/networking/gnrc/gnrc_lorawan
+make BOARD=feather-m0-lora -C examples/networking/gnrc/lorawan
 ```
 
 For detailed information about the parameters, see section

@@ -7,6 +7,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         pkg_semtech-loramac
  * @brief           Semtech LoRaMAC timer compatibility definitions
@@ -18,9 +20,6 @@
  * @author          Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author          Francisco Molina <francisco.molina@inria.cl>
  */
-
-#ifndef SEMTECH_LORAMAC_TIMER_H
-#define SEMTECH_LORAMAC_TIMER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -126,5 +125,4 @@ void TimerLowPowerHandler(void);
 }
 #endif
 
-#endif /* SEMTECH_LORAMAC_TIMER_H */
 /** @} */

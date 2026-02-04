@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 Mesotic SAS
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Mesotic SAS
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -240,7 +237,7 @@ static void _enable_gpio(const stm32_usbdev_fs_config_t *conf)
         /* In case the MCU has no internal D+ pullup, a GPIO is used to
          * connect/disconnect from USB bus */
         gpio_init(conf->disconn, GPIO_OUT);
-        gpio_clear(conf->disconn);
+        gpio_write(conf->disconn, (conf->flags & STM32_USBDEV_FS_CONFIG_FLAG_DISCONN_INVERTED));
     }
 }
 
@@ -283,7 +280,7 @@ static inline void _usb_attach(stm32_usbdev_fs_t *usbdev)
 #else
     /* If configuration uses a GPIO for USB connect/disconnect */
     if (conf->disconn != GPIO_UNDEF) {
-        gpio_set(conf->disconn);
+        gpio_write(conf->disconn, !(conf->flags & STM32_USBDEV_FS_CONFIG_FLAG_DISCONN_INVERTED));
     }
 #endif /* USB_BCDR_DPPU */
 }
@@ -301,7 +298,7 @@ static inline void _usb_detach(stm32_usbdev_fs_t *usbdev)
 #else
     /* If configuration uses a GPIO for USB connect/disconnect */
     if (conf->disconn != GPIO_UNDEF) {
-        gpio_clear(conf->disconn);
+        gpio_write(conf->disconn, (conf->flags & STM32_USBDEV_FS_CONFIG_FLAG_DISCONN_INVERTED));
     }
 #endif
 }

@@ -6,8 +6,8 @@
 #pragma once
 
 /**
- * @addtogroup drivers_mtd
  * @defgroup   drivers_mtd_native Native MTD
+ * @ingroup    drivers_mtd
  * @brief      MTD flash emulation for native
  * @{
  */

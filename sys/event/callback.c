@@ -14,7 +14,8 @@ void _event_callback_handler(event_t *event)
 {
     event_callback_t *event_callback = (event_callback_t *) event;
     if (IS_USED(MODULE_EVENT_LOOP_DEBUG)) {
-        printf("event: executing %p->%p(%p)\n",
+        printf("event (pid %u): executing %p->%p(%p)\n",
+               thread_getpid(),
                (void *)event,
                (void *)(uintptr_t)event_callback->callback,
                event_callback->arg);

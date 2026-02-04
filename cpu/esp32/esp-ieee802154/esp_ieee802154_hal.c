@@ -435,6 +435,7 @@ int esp_ieee802154_init(void)
 static const ieee802154_radio_ops_t esp_ieee802154_driver = {
     .caps = IEEE802154_CAP_24_GHZ
           | IEEE802154_CAP_PHY_OQPSK
+          | IEEE802154_CAP_AUTO_ACK
           | IEEE802154_CAP_AUTO_CSMA
           | IEEE802154_CAP_SRC_ADDR_MATCH
 #if _USE_CCA_DONE

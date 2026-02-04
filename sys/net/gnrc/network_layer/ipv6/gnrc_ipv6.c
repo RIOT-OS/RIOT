@@ -29,6 +29,7 @@
 #include "utlist.h"
 
 #include "net/gnrc/ipv6/nib.h"
+#include "net/gnrc/netapi/notify.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/ipv6/whitelist.h"
 #include "net/gnrc/ipv6/blacklist.h"
@@ -171,11 +172,125 @@ static void _dispatch_next_header(gnrc_pktsnip_t *pkt, unsigned nh,
     }
 }
 
+/**
+ * @brief   Find entry in NIB neighbor cache.
+ *
+ * @param[in] l2addr        Layer 2 address of the neighbor.
+ * @param[in] l2addr_len    Length of @p l2addr.
+ * @param[out] ipv6         IPv6 address of the neighbor or NULL.
+ *
+ * @retval  True if a neighbor with @p l2addr was found in the nc.
+ * @retval  False otherwise.
+ */
+static inline bool _find_entry_in_nc(uint8_t *l2addr, uint8_t l2addr_len, ipv6_addr_t *ipv6)
+{
+    void *state = NULL;
+    gnrc_ipv6_nib_nc_t nce;
+
+    while (gnrc_ipv6_nib_nc_iter(0, &state, &nce)) {
+        if (l2util_addr_equal(l2addr, l2addr_len, nce.l2addr, nce.l2addr_len)) {
+            *ipv6 = nce.ipv6;
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief   Handle a link-layer connection-established event.
+ *
+ * @param[in] if_pid        Network interface of the connection.
+ * @param[in] l2addr        L2 address of the node on the connection.
+ * @param[in] l2addr_len    Length of @p l2addr.
+ */
+static inline void _on_l2_connected(kernel_pid_t if_pid, uint8_t *l2addr, uint8_t l2addr_len)
+{
+    (void)if_pid;
+
+    ipv6_addr_t ipv6;
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
+    /* Add neighbor to neighbor cache if interface represents a 6LN. */
+    gnrc_ipv6_nib_nc_set_6ln(if_pid, l2addr, l2addr_len);
+#endif /* CONFIG_GNRC_IPV6_NIB_6LN */
+
+    /* Inform routing layer of new reachable neighbor. */
+    if (_find_entry_in_nc(l2addr, l2addr_len, &ipv6)) {
+        gnrc_netapi_notify(GNRC_NETTYPE_L3_ROUTING, GNRC_NETREG_DEMUX_CTX_ALL,
+                           NETAPI_NOTIFY_L3_DISCOVERED, &ipv6, sizeof(ipv6_addr_t));
+    }
+}
+
+/**
+ * @brief   Handle a link-layer connection-closed event.
+ *
+ * @param[in] if_pid        Network interface of the connection.
+ * @param[in] l2addr        L2 address of the node on the connection.
+ * @param[in] l2addr_len    Length of @p l2addr.
+ */
+static inline void _on_l2_disconnected(kernel_pid_t if_pid, uint8_t *l2addr, uint8_t l2addr_len)
+{
+    (void)if_pid;
+
+    ipv6_addr_t ipv6;
+
+    /* Inform routing layer of unreachable neighbor. This must be done *before* removing
+       the neighbor from the neighbor cache. */
+    if (_find_entry_in_nc(l2addr, l2addr_len, &ipv6)) {
+        gnrc_netapi_notify(GNRC_NETTYPE_L3_ROUTING, GNRC_NETREG_DEMUX_CTX_ALL,
+                           NETAPI_NOTIFY_L3_UNREACHABLE, &ipv6, sizeof(ipv6_addr_t));
+    }
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
+    /* Remove from neighbor cache. */
+    gnrc_ipv6_nib_nc_del_l2(if_pid, l2addr, l2addr_len);
+#endif /* CONFIG_GNRC_IPV6_NIB_ARSM */
+}
+
+/**
+ * @brief   Handles a netapi event notification.
+ *
+ * @param[in] notify    The type of notification.
+ */
+static inline void _netapi_notify_event(gnrc_netapi_notify_t *notify)
+{
+    if (!IS_USED(MODULE_GNRC_NETAPI_NOTIFY)) {
+        return;
+    }
+
+    netapi_notify_l2_connection_t data;
+    netapi_notify_t type = notify->event;
+
+    if (gnrc_netapi_notify_copy_event_data(notify, sizeof(netapi_notify_l2_connection_t),
+                                           &data) <= 0) {
+        DEBUG("ipv6: invalid data on netapi notify event.\n");
+        return;
+    }
+
+    switch (type) {
+    case NETAPI_NOTIFY_L2_NEIGH_CONNECTED:
+        _on_l2_connected(data.if_pid, data.l2addr, data.l2addr_len);
+        break;
+    case NETAPI_NOTIFY_L2_NEIGH_DISCONNECTED:
+        _on_l2_disconnected(data.if_pid, data.l2addr, data.l2addr_len);
+        break;
+    default:
+        break;
+    }
+}
+
 static void *_event_loop(void *args)
 {
     msg_t msg, reply;
-    gnrc_netreg_entry_t me_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
-                                                            thread_getpid());
+
+    /* Register entry for messages in IPv6 context. */
+    gnrc_netreg_entry_t me_ipv6_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                                 thread_getpid());
+#ifdef MODULE_GNRC_NETAPI_NOTIFY
+    /* Register entry for messages in L2 discovery context. */
+    gnrc_netreg_entry_t me_discovery_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                                      thread_getpid());
+#endif /* MODULE_GNRC_NETAPI_NOTIFY */
 
     (void)args;
     msg_init_queue(_msg_q, GNRC_IPV6_MSG_QUEUE_SIZE);
@@ -184,8 +299,14 @@ static void *_event_loop(void *args)
 #ifdef MODULE_GNRC_IPV6_EXT_FRAG
     gnrc_ipv6_ext_frag_init();
 #endif  /* MODULE_GNRC_IPV6_EXT_FRAG */
-    /* register interest in all IPv6 packets */
-    gnrc_netreg_register(GNRC_NETTYPE_IPV6, &me_reg);
+
+    /* Register interest in all IPv6 packets. */
+    gnrc_netreg_register(GNRC_NETTYPE_IPV6, &me_ipv6_reg);
+
+#ifdef MODULE_GNRC_NETAPI_NOTIFY
+    /* Register interest in L2 neighbor discovery info. */
+    gnrc_netreg_register(GNRC_NETTYPE_L2_DISCOVERY, &me_discovery_reg);
+#endif /* MODULE_GNRC_NETAPI_NOTIFY */
 
     /* preinitialize ACK */
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
@@ -212,7 +333,10 @@ static void *_event_loop(void *args)
                 reply.content.value = -ENOTSUP;
                 msg_reply(&msg, &reply);
                 break;
-
+            case GNRC_NETAPI_MSG_TYPE_NOTIFY:
+                DEBUG("ipv6: GNRC_NETAPI_MSG_TYPE_NOTIFY received\n");
+                _netapi_notify_event(msg.content.ptr);
+                break;
 #ifdef MODULE_GNRC_IPV6_EXT_FRAG
             case GNRC_IPV6_EXT_FRAG_RBUF_GC:
                 gnrc_ipv6_ext_frag_rbuf_gc();

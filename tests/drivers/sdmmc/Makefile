@@ -1,3 +1,5 @@
+BOARD ?= same54-xpro
+
 include ../Makefile.drivers_common
 
 USEMODULE += sdmmc

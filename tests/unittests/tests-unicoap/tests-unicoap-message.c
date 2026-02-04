@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2024-2025 Carl Seifert
- * Copyright (C) 2024-2025 TU Dresden
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for
- * more details.
+ * SPDX-FileCopyrightText: 2024-2025 Carl Seifert
+ * SPDX-FileCopyrightText: 2024-2025 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**

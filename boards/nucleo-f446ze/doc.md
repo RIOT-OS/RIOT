@@ -7,6 +7,9 @@
 The Nucleo-F446ZE is a board from ST's Nucleo family supporting a ARM Cortex-M4
 STM32F446ZE microcontroller with 128KiB of RAM and 512KiB of ROM Flash.
 
+You can find general information about the Nucleo144 boards on the
+@ref boards_common_nucleo144 page.
+
 ## Hardware
 
 ![Nucleo144 F446ZE](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/nucleo144-board.png)
@@ -52,38 +55,8 @@ STM32F446ZE microcontroller with 128KiB of RAM and 512KiB of ROM Flash.
 |        | USB       | no        | |
 |        | Timer     | one 32 bit timer      | |
 
-## Flashing the device
+## Flashing the Board
 
-### Flashing the Board Using OpenOCD
-
-The ST Nucleo-F446ZE board includes an on-board ST-LINK V2 programmer. The
-easiest way to program the board is to use OpenOCD. Once you have installed
-OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
-installation instructions), you can flash the board simply by typing
-
-```
-make BOARD=nucleo-f446ze flash
-```
-and debug via GDB by simply typing
-```
-make BOARD=nucleo-f446ze debug
-```
-
-### Flashing the Board Using ST-LINK Removable Media
-
-On-board ST-LINK programmer provides via composite USB device removable media.
-Copying the HEX file causes reprogramming of the board. This task
-could be performed manually; however, the cpy2remed (copy to removable
-media) PROGRAMMER script does this automatically. To program board in
-this manner, use the command:
-```
-make BOARD=nucleo-f446ze PROGRAMMER=cpy2remed flash
-```
-@note This PROGRAMMER requires ST-LINK firmware 2.37.26 or newer. Firmware updates
-could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
-
-## Supported Toolchains
-
-For using the ST Nucleo-F446ZE board we strongly recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
-toolchain.
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the Nucleo-F446ZE is `nucleo-f446ze`.

@@ -279,7 +279,16 @@ static void _spi_acquire(spi_t bus, spi_mode_t mode, spi_clk_t clk)
      * equation is modified to
      * BAUD.reg = ((f_ref + f_bus) / (2 * f_bus) - 1) */
     const uint8_t baud = (gclk_src + clk) / (2 * clk) - 1;
-
+#if ENABLE_DEBUG
+    /* compute actual SPI clock */
+    uint32_t spi_actual = gclk_src / (2U * (baud + 1U));
+    DEBUG("SPI bus %u: requested %lu Hz, gclk %lu Hz, BAUD %u -> actual %lu Hz\n",
+          bus,
+          (unsigned long)clk,
+          (unsigned long)gclk_src,
+          baud,
+          (unsigned long)spi_actual);
+#endif
     /* configure device to be master and set mode and pads,
      *
      * NOTE: we could configure the pads already during spi_init, but for

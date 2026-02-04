@@ -17,7 +17,7 @@ purposes:
 Arduino and RIOT
 ================
 For information on the Arduino support in RIOT please refer to the API
-documentation at http://doc.riot-os.org/group__sys__arduino.html
+documentation at http://api.riot-os.org/group__sys__arduino.html
 
 Usage
 =====

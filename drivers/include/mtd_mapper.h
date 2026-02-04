@@ -10,7 +10,7 @@
 
 /**
  * @defgroup    drivers_mtd_mapper  MTD address mapper
- * @ingroup     drivers_storage
+ * @ingroup     drivers_mtd
  * @brief       Driver for address remap for flash devices
  *
  * This MTD module allows for remapping multiple different regions on a single

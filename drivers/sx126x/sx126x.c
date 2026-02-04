@@ -22,6 +22,8 @@
 
 #include "sx126x_netdev.h"
 
+#include "log.h"
+#include "macros/units.h"
 #include "net/lora.h"
 #include "periph/spi.h"
 
@@ -178,8 +180,8 @@ static int8_t _select_pa_cfg(sx126x_t *dev, int8_t tx_power_dbm,
             }
 #else
             *pa_cfg = &hpa_cfg[0];
-            return 14;
 #endif
+            return 14;
         }
         else if (tx_power_dbm <= 17) {
             *pa_cfg = &hpa_cfg[1];
@@ -291,6 +293,9 @@ static void sx126x_init_default_config(sx126x_t *dev)
     sx126x_set_pkt_type(dev, SX126X_PKT_TYPE_LORA);
     sx126x_set_channel(dev, CONFIG_SX126X_CHANNEL_DEFAULT);
     sx126x_set_tx_power(dev,  CONFIG_SX126X_TX_POWER_DEFAULT, CONFIG_SX126X_RAMP_TIME_DEFAULT);
+#ifdef CONFIG_SX126X_DEFAULT_SYNC_WORD
+    sx126x_set_lora_sync_word(dev, CONFIG_SX126X_DEFAULT_SYNC_WORD);
+#endif
 
     dev->mod_params.bw = (sx126x_lora_bw_t)(CONFIG_LORA_BW_DEFAULT + SX126X_LORA_BW_125);
     dev->mod_params.sf = (sx126x_lora_sf_t)CONFIG_LORA_SF_DEFAULT;
@@ -316,6 +321,35 @@ static void _dio1_isr(void *arg)
     netdev_trigger_event_isr(arg);
 }
 #endif
+
+/**
+ * @brief   Detect whether an SX126x device is actually connected
+ * @param   dev     Initialized device descriptor to use
+ * @pre     @p dev is initialized and the /CS pin has been configured
+ *
+ * This sadly is a bit more involved than one would hope, as no vendor and
+ * model codes are in the register map that can be searched for. Instead,
+ * we write the packet type (or rather modulation type) to be 100% the device
+ * must be configured to use LoRa modulation, then read this back and expect
+ * it to be LoRa. In we also check the device status to be valid, which adds
+ * one more known bit to compare against.
+ */
+static bool _sx126x_detect(sx126x_t *dev)
+{
+    sx126x_pkt_type_t pkt_type = UINT8_MAX;
+    sx126x_chip_status_t radio_status = { 0 };
+    sx126x_set_pkt_type(dev, SX126X_PKT_TYPE_LORA);
+    sx126x_get_status(dev, &radio_status);
+    sx126x_get_pkt_type(dev, &pkt_type);
+
+    if ((pkt_type == SX126X_PKT_TYPE_LORA) && (radio_status.chip_mode)) {
+        return true;
+    }
+    DEBUG("[sx126x] pkt_type = %x, radio_status.chip_mode = %u\n",
+               (unsigned)pkt_type, (unsigned)radio_status.chip_mode);
+    LOG_ERROR("[sx126x] No device detected\n");
+    return false;
+}
 
 int sx126x_init(sx126x_t *dev)
 {
@@ -351,11 +385,7 @@ int sx126x_init(sx126x_t *dev)
     /* Reset the device */
     sx126x_reset(dev);
 
-    /* read status to verify device presence */
-    sx126x_chip_status_t radio_status;
-    sx126x_get_status(dev, &radio_status);
-    if (!radio_status.chip_mode) {
-        DEBUG("[sx126x] error: no device found\n");
+    if (!_sx126x_detect(dev)) {
         return -ENODEV;
     }
 
@@ -379,9 +409,8 @@ int sx126x_init(sx126x_t *dev)
 #endif
 #if IS_USED(MODULE_SX126X_DIO3)
      if (dev->params->dio3_mode == SX126X_DIO3_TCXO) {
-        sx126x_set_dio3_as_tcxo_ctrl(dev, dev->params->u_dio3_arg.tcxo_volt,
-                                     dev->params->u_dio3_arg.tcx0_timeout);
-
+        sx126x_set_dio3_as_tcxo_ctrl(dev, dev->params->dio3_arg.tcxo_volt,
+                                     dev->params->dio3_arg.tcxo_timeout);
         /* Once the command SetDIO3AsTCXOCtrl(...) is sent to the device,
            the register controlling the internal cap on XTA will be automatically
            changed to 0x2F (33.4 pF) to filter any spurious injection which could occur
@@ -434,10 +463,76 @@ int sx126x_init(sx126x_t *dev)
     return res;
 }
 
+sx126x_chip_modes_t sx126x_get_state(const sx126x_t *dev)
+{
+    sx126x_chip_status_t radio_status;
+    sx126x_get_status(dev, &radio_status);
+    return radio_status.chip_mode;
+}
+
+void sx126x_set_state(sx126x_t *dev, sx126x_chip_modes_t state)
+{
+    switch (state) {
+    case SX126X_CHIP_MODE_TX:
+        sx126x_set_tx(dev, 0); /* no TX frame timeout */
+        break;
+    case SX126X_CHIP_MODE_RX: {
+        int timeout = (sx126x_symbol_to_msec(dev, dev->rx_timeout));
+        sx126x_set_rx_tx_fallback_mode(dev, SX126X_FALLBACK_STDBY_XOSC);
+        if (timeout > 0) {
+            sx126x_set_rx(dev, timeout);
+        }
+        else {
+            sx126x_set_rx(dev, SX126X_RX_SINGLE_MODE);
+        }
+    } break;
+    case SX126X_CHIP_MODE_STBY_RC:
+    case SX126X_CHIP_MODE_STBY_XOSC:
+        sx126x_set_standby(dev, state);
+        break;
+    default:
+        break;
+    }
+}
+
 uint32_t sx126x_get_channel(const sx126x_t *dev)
 {
     DEBUG("[sx126x]: sx126x_get_radio_status \n");
     return dev->channel;
+}
+
+/* 9.2.1 Image Calibration for Specific Frequency Bands */
+static void _cal_img(sx126x_t *dev, uint32_t freq)
+{
+    sx126x_chip_modes_t state = sx126x_get_state(dev);
+    /* don't know what to do with frequencies that don't fit in the intervals from the datasheet */
+    if (freq >= MHZ(902) && freq <= MHZ(928)) {
+        /* 902 - 928 MHz band and anything upper */
+        sx126x_cal_img_in_mhz(dev, 902, 928);
+    }
+    else if (freq >= MHZ(863) && freq <= MHZ(870)) {
+        /* 863 - 870 MHz band */
+        sx126x_cal_img_in_mhz(dev, 863, 870);
+    }
+    else if (freq >= MHZ(779) && freq <= MHZ(787)) {
+        /* 779 - 787 MHz band */
+        sx126x_cal_img_in_mhz(dev, 779, 787);
+    }
+    else if (freq >= MHZ(470) && freq <= MHZ(510)) {
+        /* 470 - 510 MHz band */
+        sx126x_cal_img_in_mhz(dev, 470, 510);
+    }
+    else if (freq >= MHZ(430) && freq <= MHZ(440)) {
+        /* 430 - 440 MHz band and anything lower */
+        sx126x_cal_img_in_mhz(dev, 430, 440);
+    }
+    else {
+        /* Contact your Semtech representative for the other optimal calibration settings
+           outside of the given frequency bands. */
+    }
+    /* Image calibration sets the chip mode back to STBY_RC */
+    /* When using DIO3, TCXO switches off. */
+    sx126x_set_state(dev, state);
 }
 
 void sx126x_set_channel(sx126x_t *dev, uint32_t freq)
@@ -445,6 +540,7 @@ void sx126x_set_channel(sx126x_t *dev, uint32_t freq)
     DEBUG("[sx126x]: sx126x_set_channel %" PRIu32 "Hz \n", freq);
     dev->channel = freq;
     sx126x_set_rf_freq(dev, dev->channel);
+    _cal_img(dev, freq);
 }
 
 uint8_t sx126x_get_bandwidth(const sx126x_t *dev)

@@ -705,6 +705,7 @@ static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *b
 
 static const ieee802154_radio_ops_t kw2xrf_ops = {
     .caps =  IEEE802154_CAP_24_GHZ
+          | IEEE802154_CAP_AUTO_ACK
           | IEEE802154_CAP_IRQ_CRC_ERROR
           | IEEE802154_CAP_IRQ_RX_START
           | IEEE802154_CAP_IRQ_TX_DONE

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2024 CNRS, France
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2024 CNRS, France
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -111,8 +108,9 @@ int main(void)
             case ABP2_SAUL:
                 while (saulDev) {
                     int dim = saul_reg_read(saulDev, &saulData);
-                    printf("\nDev: %s\tType: %s" "\n", saulDev->name,
-                            saul_class_to_str(saulDev->driver->type));
+                    printf("\nDev: %s\tType: ", saulDev->name);
+                    saul_class_print(saulDev->driver->type);
+                    puts("");
                     phydat_dump(&saulData, dim);
                     saulDev = saulDev->next;
                 }

@@ -332,12 +332,12 @@ static void _usbdev_init(usbdev_t *dev)
     _poweron(usbdev);
 
     /* Reset peripheral */
-    usbdev->config->device->CTRLA.reg |= USB_CTRLA_SWRST;
+    usbdev->config->device->CTRLA.reg = USB_CTRLA_SWRST;
     while (_syncbusy_swrst(usbdev)) {}
 
     /* Enable USB device */
     usbdev->config->device->DESCADD.reg = (uint32_t)&usbdev->banks;
-    usbdev->config->device->CTRLA.reg |= USB_CTRLA_ENABLE;
+    usbdev->config->device->CTRLA.reg = USB_CTRLA_ENABLE;
     while (_syncbusy_enable(usbdev)) {}
 
     /* Calibration values */

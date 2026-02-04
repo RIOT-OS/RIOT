@@ -39,8 +39,8 @@ Even applications requiring network interface access should be able to work:
 
 ```sh
 sudo dist/tools/tapsetup/tapsetup
-make -C examples/networking/gnrc/gnrc_networking all -j16
-make -C examples/networking/gnrc/gnrc_networking term
+make -C examples/networking/gnrc/networking all -j16
+make -C examples/networking/gnrc/networking term
 ```
 
 ```
@@ -67,4 +67,4 @@ Iface  6  HWaddr: F1:28:23:23:F1:28
 ```
 
 [Vagrantfile]: ./Vagrantfile
-[native]: https://doc.riot-os.org/group__boards__native.html
+[native]: https://api.riot-os.org/group__boards__native.html

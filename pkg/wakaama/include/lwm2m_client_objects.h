@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup         lwm2m_client
  * @{
@@ -15,9 +17,6 @@
  * @file
  * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
-
-#ifndef LWM2M_CLIENT_OBJECTS_H
-#define LWM2M_CLIENT_OBJECTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,5 +67,4 @@ lwm2m_object_t *lwm2m_client_get_acc_ctrl_object(
 }
 #endif
 
-#endif /* LWM2M_CLIENT_OBJECTS_H */
 /** @} */

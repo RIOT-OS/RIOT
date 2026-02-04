@@ -77,6 +77,18 @@ static uint16_t _dflt_route_lifetime_sec(gnrc_rpl_dodag_t *dodag)
             (GNRC_RPL_PARENT_PROBE_INTERVAL / MS_PER_SEC));
 }
 
+void gnrc_rpl_poison_routes(gnrc_rpl_dodag_t *dodag)
+{
+    if (dodag->my_rank != GNRC_RPL_INFINITE_RANK) {
+        DEBUG("RPL: Poison all children routes in DODAG.\n");
+
+        /* Poison routes by advertising infinity rank */
+        dodag->my_rank = GNRC_RPL_INFINITE_RANK;
+        trickle_reset_timer(&dodag->trickle);
+        gnrc_rpl_cleanup_start(dodag);
+    }
+}
+
 bool gnrc_rpl_instance_add(uint8_t instance_id, gnrc_rpl_instance_t **inst)
 {
     *inst = NULL;
@@ -115,24 +127,30 @@ bool gnrc_rpl_instance_remove_by_id(uint8_t instance_id)
 {
     for(uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
         if (gnrc_rpl_instances[i].id == instance_id) {
-            return gnrc_rpl_instance_remove(&gnrc_rpl_instances[i]);
+            gnrc_rpl_instance_remove(&gnrc_rpl_instances[i]);
+            return true;
         }
     }
     return false;
 }
 
-bool gnrc_rpl_instance_remove(gnrc_rpl_instance_t *inst)
+void gnrc_rpl_dodag_remove(gnrc_rpl_dodag_t *dodag)
 {
-    gnrc_rpl_dodag_t *dodag = &inst->dodag;
 #ifdef MODULE_GNRC_RPL_P2P
     gnrc_rpl_p2p_ext_remove(dodag);
 #endif
     gnrc_rpl_dodag_remove_all_parents(dodag);
     trickle_stop(&dodag->trickle);
     evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&dodag->dao_event);
-    evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&inst->cleanup_event);
+    evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&dodag->float_timeout_event);
+    evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&dodag->instance->cleanup_event);
+    memset(dodag, 0, sizeof(gnrc_rpl_dodag_t));
+}
+
+void gnrc_rpl_instance_remove(gnrc_rpl_instance_t *inst)
+{
+    gnrc_rpl_dodag_remove(&inst->dodag);
     memset(inst, 0, sizeof(gnrc_rpl_instance_t));
-    return true;
 }
 
 gnrc_rpl_instance_t *gnrc_rpl_instance_get(uint8_t instance_id)
@@ -143,6 +161,31 @@ gnrc_rpl_instance_t *gnrc_rpl_instance_get(uint8_t instance_id)
         }
     }
     return NULL;
+}
+
+void gnrc_rpl_dodag_root_init(gnrc_rpl_dodag_t *dodag)
+{
+    dodag->dtsn = 1;
+    dodag->prf = 0;
+    dodag->dio_interval_doubl = CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS;
+    dodag->dio_min = CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN;
+    dodag->dio_redun = CONFIG_GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT;
+    dodag->default_lifetime = CONFIG_GNRC_RPL_DEFAULT_LIFETIME;
+    dodag->lifetime_unit = CONFIG_GNRC_RPL_LIFETIME_UNIT;
+    dodag->version = GNRC_RPL_COUNTER_INIT;
+    dodag->grounded = GNRC_RPL_GROUNDED;
+    dodag->node_status = GNRC_RPL_ROOT_NODE;
+    dodag->my_rank = GNRC_RPL_ROOT_RANK;
+    dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_DODAG_CONF;
+    dodag->parents = NULL;
+
+    if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_PIO)) {
+        dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO;
+    }
+
+    trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_MSG,
+                  (1 << dodag->dio_min), dodag->dio_interval_doubl,
+                  dodag->dio_redun);
 }
 
 bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, const ipv6_addr_t *dodag_id,
@@ -171,6 +214,8 @@ bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, const ipv6_addr_t *dodag
     dodag->iface = iface;
     dodag->dao_event.msg.content.ptr = instance;
     dodag->dao_event.msg.type = GNRC_RPL_MSG_TYPE_DODAG_DAO_TX;
+    dodag->float_timeout_event.msg.content.ptr = instance;
+    dodag->float_timeout_event.msg.type = GNRC_RPL_MSG_TYPE_DODAG_FLOAT_TIMEOUT;
 
     if ((netif != NULL) && !(netif->flags & GNRC_NETIF_FLAGS_IPV6_FORWARDING)) {
         gnrc_rpl_leaf_operation(dodag);
@@ -186,6 +231,50 @@ bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, const ipv6_addr_t *dodag
     return true;
 }
 
+/**
+ * @brief   Configures the local node as root for a new floating DODAG.
+ *          The DODAG retains the prefix of the @p dodag old ID.
+ *
+ * @param[in, out] dodag    Pointer to the new dodag.
+ *
+ * @retval  True on success.
+ * @retval  False if no address was found that can be used as ID for the new
+ *          DODAG.
+ * @retval  If @p dodag is null.
+ */
+static bool _float_dodag(gnrc_rpl_dodag_t *dodag)
+{
+    evtimer_event_t *float_event;
+
+    if (!dodag) {
+        return false;
+    }
+
+    DEBUG("RPL: Set local node as root for floating DODAG.\n");
+
+    float_event = (evtimer_event_t *)&dodag->float_timeout_event;
+    evtimer_del(&gnrc_rpl_evtimer, float_event);
+
+    /* Find address on interface that matches the prefix of the old dodag. */
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(dodag->iface);
+    int idx = gnrc_netif_ipv6_addr_match(netif, &dodag->dodag_id);
+    if (idx < 0) {
+        DEBUG("RPL: could not find address to use as DODAGID.");
+        return false;
+    }
+
+    /* Configure node as root. */
+    gnrc_rpl_dodag_root_init(dodag);
+    dodag->dodag_id = netif->ipv6.addrs[idx];
+    dodag->grounded &= !GNRC_RPL_GROUNDED;
+
+    /* Floating dodag should timeout eventually if no new grounded dodag is found. */
+    float_event->offset = CONFIG_GNRC_RPL_DODAG_FLOAT_TIMEOUT;
+    evtimer_add_msg(&gnrc_rpl_evtimer, &dodag->float_timeout_event, gnrc_rpl_pid);
+
+    return true;
+}
+
 void gnrc_rpl_dodag_remove_all_parents(gnrc_rpl_dodag_t *dodag)
 {
     gnrc_rpl_parent_t *elt = NULL;
@@ -194,6 +283,19 @@ void gnrc_rpl_dodag_remove_all_parents(gnrc_rpl_dodag_t *dodag)
         gnrc_rpl_parent_remove(elt);
     }
     dodag->my_rank = GNRC_RPL_INFINITE_RANK;
+}
+
+int gnrc_rpl_parent_iter_by_addr(const ipv6_addr_t *addr, gnrc_rpl_parent_t **parent, int idx)
+{
+    *parent = NULL;
+    for (uint8_t i = idx; i < GNRC_RPL_PARENTS_NUMOF; ++i) {
+        if ((gnrc_rpl_parents[i].state != 0) && ipv6_addr_equal(&gnrc_rpl_parents[i].addr, addr)) {
+            *parent = &gnrc_rpl_parents[i];
+            /* Index to continue search from. */
+            return i + 1;
+        }
+    }
+    return -ENOENT;
 }
 
 bool gnrc_rpl_parent_add_by_addr(gnrc_rpl_dodag_t *dodag, ipv6_addr_t *addr,
@@ -271,10 +373,8 @@ void gnrc_rpl_local_repair(gnrc_rpl_dodag_t *dodag)
 
     dodag->dtsn++;
 
-    if (dodag->my_rank != GNRC_RPL_INFINITE_RANK) {
-        dodag->my_rank = GNRC_RPL_INFINITE_RANK;
-        trickle_reset_timer(&dodag->trickle);
-        gnrc_rpl_cleanup_start(dodag);
+    if ((CONFIG_GNRC_RPL_DODAG_FLOAT_TIMEOUT <= 0) || !_float_dodag(dodag)) {
+        gnrc_rpl_poison_routes(dodag);
     }
 
     if (dodag->parents) {

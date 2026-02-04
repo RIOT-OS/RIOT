@@ -1,9 +1,5 @@
-# Copyright (C) 2024 BISSELL Homecare, Inc.
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
-#
+# SPDX-FileCopyrightText: 2024 BISSELL Homecare, Inc.
+# SPDX-License-Identifier: LGPL-2.1-only
 
 # This file was auto-generated from ST ProductsList.xlsx sheet using the
 # script in cpu/stm32/dist/kconfig/gen_kconfig.py
@@ -18,10 +14,18 @@ config CPU_LINE_STM32C031XX
     bool
     select CPU_FAM_C0
 
+config CPU_LINE_STM32C051XX
+    bool
+    select CPU_FAM_C0
+
 config CPU_LINE_STM32C071XX
     bool
     select CPU_FAM_C0
 
 config CPU_LINE_STM32C091XX
+    bool
+    select CPU_FAM_C0
+
+config CPU_LINE_STM32C092XX
     bool
     select CPU_FAM_C0

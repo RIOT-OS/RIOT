@@ -313,6 +313,7 @@ SECTIONS
     *components/hal/spi_slave_hal_iram.*(.literal .literal.* .text .text.*)
     *components/hal/systimer_hal.*(.literal .literal.* .text .text.*)
     *components/hal/timer_hal.*(.literal.timer_hal_capture_and_get_counter_value .text.timer_hal_capture_and_get_counter_value)
+    *components/hal/wdt_hal_iram.*(.literal .literal.* .text .text.*)
     *components/heap/multi_heap.*(.literal.assert_valid_block .text.assert_valid_block)
     *components/heap/multi_heap.*(.literal.multi_heap_aligned_alloc_impl .text.multi_heap_aligned_alloc_impl)
     *components/heap/multi_heap.*(.literal.multi_heap_aligned_alloc_impl_offs .text.multi_heap_aligned_alloc_impl_offs)
@@ -454,6 +455,7 @@ SECTIONS
     *components/hal/spi_hal_iram.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
     *components/hal/spi_slave_hal_iram.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
     *components/hal/systimer_hal.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
+    *components/hal/wdt_hal_iram.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
     *components/log/log_lock.*(.rodata .rodata.* .sdata2 .sdata2.* .srodata .srodata.*)
 
     _nimble_data_start = ABSOLUTE(.);

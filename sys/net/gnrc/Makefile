@@ -43,6 +43,9 @@ endif
 ifneq (,$(filter gnrc_netapi,$(USEMODULE)))
   DIRS += netapi
 endif
+ifneq (,$(filter gnrc_netapi_notify,$(USEMODULE)))
+  DIRS += netapi/notify
+endif
 ifneq (,$(filter gnrc_netif gnrc_netif_%,$(USEMODULE)))
     DIRS += netif
 endif
@@ -69,6 +72,9 @@ ifneq (,$(filter gnrc_priority_pktqueue,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
   DIRS += pktdump
+endif
+ifneq (,$(filter gnrc_pktshark,$(USEMODULE)))
+  DIRS += pktshark
 endif
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
   DIRS += routing/rpl

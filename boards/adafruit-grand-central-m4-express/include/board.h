@@ -85,6 +85,8 @@ extern "C" {
 #endif
 /** @} */
 
+#define BOOTLOADER_UF2    1     /**< This board uses the UF2 bootloader */
+
 #ifdef __cplusplus
 }
 #endif

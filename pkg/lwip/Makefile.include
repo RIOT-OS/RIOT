@@ -22,6 +22,10 @@ ifneq (,$(filter arch_64bit,$(FEATURES_USED)))
     CFLAGS += -DIPV6_FRAG_COPYHEADER=1
 endif
 
+ifneq (,$(filter lwip_sock_%,$(USEMODULE)))
+  CFLAGS += -DLWIP_SO_RCVTIMEO
+endif
+
 ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib
 endif

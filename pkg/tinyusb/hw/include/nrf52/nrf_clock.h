@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_tinyusb
  * @brief
@@ -19,9 +21,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef NRF52_NRF_CLOCK_H
-#define NRF52_NRF_CLOCK_H
 
 #include <stdbool.h>
 
@@ -105,5 +104,4 @@ static inline void nrf_clock_task_trigger(NRF_CLOCK_Type *reg,
 #endif
 
 #endif /* !DOXYGEN */
-#endif /* NRF52_NRF_CLOCK_H */
 /** @} */

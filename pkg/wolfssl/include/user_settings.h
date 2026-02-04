@@ -1,7 +1,6 @@
-/* user_settings.h : custom configuration for wolfcrypt/wolfSSL */
+#pragma once
 
-#ifndef USER_SETTINGS_H
-#define USER_SETTINGS_H
+/* user_settings.h : custom configuration for wolfcrypt/wolfSSL */
 
 #ifdef __cplusplus
 extern "C" {
@@ -340,5 +339,3 @@ int strncasecmp(const char *s1, const char * s2, size_t sz);
 #define _SAME51_AES_COMPONENT_
 #define _SAME54_AES_COMPONENT_
 #define _SAMR34_AES_COMPONENT_
-
-#endif /* USER_SETTINGS_H */

@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2018 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2018 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -411,7 +408,7 @@ int main(void)
 
     /* initialize configured PCF857X devices */
     for (unsigned i = 0; i < PCF857X_NUM; i++) {
-        if (pcf857x_init(&pcf857x_dev[i], &pcf857x_params[i]) != PCF857X_OK) {
+        if (pcf857x_init(&pcf857x_dev[i], &pcf857x_params[i]) != 0) {
             puts("[Failed]");
             return 1;
         }

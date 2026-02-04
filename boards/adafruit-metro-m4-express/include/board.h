@@ -66,6 +66,8 @@ extern "C" {
 #define MTD_0 mtd_dev_get(0)    /**< MTD device for the 8 MiB QSPI Flash */
 /** @} */
 
+#define BOOTLOADER_UF2    1     /**< This board uses the UF2 bootloader */
+
 #ifdef __cplusplus
 }
 #endif

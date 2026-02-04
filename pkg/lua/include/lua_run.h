@@ -5,6 +5,9 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#pragma once
+
 /**
  * @ingroup  pkg_lua
  * @file
@@ -26,9 +29,6 @@
  * cases, and thus avoids code repetition in applications.
  *
  */
-
-#ifndef LUA_RUN_H
-#define LUA_RUN_H
 
 #include <stdint.h>
 
@@ -219,5 +219,3 @@ extern "C" }
 #endif
 
 /** @} */
-
-#endif /* LUA_RUN_H */

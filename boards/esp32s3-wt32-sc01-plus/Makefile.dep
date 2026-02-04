@@ -1,5 +1,4 @@
 include $(RIOTBOARD)/common/esp32s3/stdio_esp32s3_default.dep.mk
-include $(RIOTBOARD)/common/esp32s3/Makefile.dep
 
 # default to using fatfs on SD card
 ifneq (,$(filter vfs_default,$(USEMODULE)))
@@ -31,3 +30,5 @@ endif
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
+
+USEMODULE += boards_common_esp32s3

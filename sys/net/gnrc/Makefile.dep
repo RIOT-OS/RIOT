@@ -55,7 +55,7 @@ ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
-ifneq (,$(filter gnrc_%,$(filter-out gnrc_lorawan gnrc_lorawan_1_1 gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
+ifneq (,$(filter gnrc_%,$(filter-out gnrc_lorawan gnrc_lorawan_1_1 gnrc_netapi gnrc_netapi_notify gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
   USEMODULE += gnrc
 endif
 
@@ -94,6 +94,7 @@ ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6
   USEMODULE += gnrc_icmpv6
   USEMODULE += gnrc_ipv6_nib
   USEMODULE += trickle
@@ -440,12 +441,47 @@ ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
   USEMODULE += od
 endif
 
+ifneq (,$(filter gnrc_pktshark_%,$(USEMODULE)))
+  USEMODULE += gnrc_pktshark
+endif
+
+ifneq (,$(filter gnrc_pktshark_default,$(USEMODULE)))
+  USEMODULE += gnrc_pktshark_coap
+  USEMODULE += gnrc_pktshark_icmpv6
+  USEMODULE += gnrc_pktshark_4in6
+endif
+
+ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
+  USEMODULE += shell_cmd_gnrc_pktshark
+endif
+
+ifneq (,$(filter auto_init_gnrc_pktshark,$(USEMODULE)))
+  USEMODULE += gnrc_pktshark
+endif
+
+ifneq (,$(filter gnrc_pktshark,$(USEMODULE)))
+  USEMODULE += ipv4_addr
+  USEMODULE += fmt
+  USEMODULE += gnrc_pktbuf
+  USEMODULE += od
+endif
+
+ifneq (,$(filter gnrc_pktshark_coap,$(USEMODULE)))
+  USEMODULE += nanocoap
+  USEMODULE += sock_udp
+endif
+
 ifneq (,$(filter gnrc,$(USEMODULE)))
   USEMODULE += gnrc_netapi
   USEMODULE += gnrc_netreg
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_netif_hdr
   USEMODULE += gnrc_pktbuf
+	ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
+	  ifneq (,$(filter nimble_netif,$(USEMODULE)))
+      USEMODULE += gnrc_netapi_notify
+	  endif
+	endif
   ifneq (,$(filter sock_async, $(USEMODULE)))
     USEMODULE += gnrc_sock_async
   endif
@@ -458,6 +494,10 @@ ifneq (,$(filter gnrc,$(USEMODULE)))
   ifneq (,$(filter sock_tcp, $(USEMODULE)))
     USEMODULE += gnrc_sock_tcp
   endif
+endif
+
+ifneq (,$(filter gnrc_netapi_notify,$(USEMODULE)))
+  USEMODULE += sema_inv
 endif
 
 ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))

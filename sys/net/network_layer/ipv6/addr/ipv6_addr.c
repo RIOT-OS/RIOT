@@ -173,6 +173,19 @@ void ipv6_addrs_print(const ipv6_addr_t *addrs, size_t num,
     }
 }
 
+void ipv6_prefix_print(const ipv6_addr_t *pfx, uint8_t bits)
+{
+    ipv6_addr_t tmp = {};
+    ipv6_addr_init_prefix(&tmp, pfx, bits);
+    ipv6_addr_print(&tmp);
+    if (IS_USED(MODULE_FMT)) {
+        print_str("/");
+        print_u32_dec(bits);
+    } else {
+        printf("/%u", bits);
+    }
+}
+
 /**
  * @}
  */

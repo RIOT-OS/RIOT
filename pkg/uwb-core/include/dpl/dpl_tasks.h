@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_uwb_core
  * @{
@@ -16,9 +18,6 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
-
-#ifndef DPL_DPL_TASKS_H
-#define DPL_DPL_TASKS_H
 
 #include "os/os_task.h"
 
@@ -94,5 +93,3 @@ static inline void dpl_task_yield(void)
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* DPL_DPL_TASKS_H */

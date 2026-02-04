@@ -126,7 +126,7 @@ int pcf857x_init(pcf857x_t *dev, const pcf857x_params_t *params)
     }
 #endif /* MODULE_PCF857X_IRQ */
 
-    int res = PCF857X_OK;
+    int res = 0;
 
     _acquire(dev);
 
@@ -178,7 +178,7 @@ int pcf857x_gpio_init(pcf857x_t *dev, uint8_t pin, gpio_mode_t mode)
     /* write the mode */
     pcf857x_data_t data = dev->modes | dev->out;
     _acquire(dev);
-    if ((res = _write(dev, data)) != PCF857X_OK) {
+    if ((res = _write(dev, data)) != 0) {
         _release(dev);
         return res;
     }
@@ -215,10 +215,10 @@ int pcf857x_gpio_init_int(pcf857x_t *dev, uint8_t pin,
                                           gpio_cb_t isr,
                                           void *arg)
 {
-    int res = PCF857X_OK;
+    int res = 0;
 
     /* initialize the pin */
-    if ((res = pcf857x_gpio_init(dev, pin, mode)) != PCF857X_OK) {
+    if ((res = pcf857x_gpio_init(dev, pin, mode)) != 0) {
         return res;
     }
 
@@ -234,7 +234,7 @@ int pcf857x_gpio_init_int(pcf857x_t *dev, uint8_t pin,
                  return -EINVAL;
     }
 
-    return PCF857X_OK;
+    return 0;
 }
 
 void pcf857x_gpio_irq_enable(pcf857x_t *dev, uint8_t pin)
@@ -443,7 +443,7 @@ static int _read(const pcf857x_t *dev, pcf857x_data_t *data)
         DEBUG_DEV("data=%04x", dev, *data);
     }
 
-    return PCF857X_OK;
+    return 0;
 }
 
 static int _write(const pcf857x_t *dev, pcf857x_data_t data)
@@ -475,5 +475,5 @@ static int _write(const pcf857x_t *dev, pcf857x_data_t data)
        return res;
     }
 
-    return PCF857X_OK;
+    return 0;
 }

@@ -1,5 +1,3 @@
-include $(RIOTBOARD)/common/esp32/Makefile.dep
-
 # enables esp_eth as default network device
 ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += esp_eth
@@ -14,3 +12,5 @@ endif
 ifneq (,$(filter mtd,$(USEMODULE)))
   USEMODULE += mtd_sdmmc_default
 endif
+
+USEMODULE += boards_common_esp32

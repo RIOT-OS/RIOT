@@ -10,7 +10,7 @@
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo-c031c6 board
+ * @brief       Peripheral MCU configuration for the Nucleo-C031C6 board
  *
  * @author      Jason Parker <Jason.Parker@bissell.com>
  */
@@ -69,7 +69,7 @@ static const uart_conf_t uart_config[] = {
         .tx_pin     = GPIO_PIN(PORT_B, 6),
         .rx_af      = GPIO_AF0,
         .tx_af      = GPIO_AF0,
-        .bus        = APB12, //?
+        .bus        = APB12,
         .irqn       = USART1_IRQn,
     },
 };
@@ -88,19 +88,14 @@ static const uart_conf_t uart_config[] = {
  * just define 6 ADC channels, for the Nucleo
  * Arduino header pins A0-A5.
  *
- * To find appropriate device and channel find in the
- * board manual, table showing pin assignments and
- * information about ADC - a text similar to ARD_A[N]_IN[X],
- * where:
- * [N] - describes analog pin number,
- * [X] - describes used channel - indexed from 1,
- * for example ARD_A5_IN16 is channel 16
+ * The appropriate ADC device and channel for each pin
+ * can be found in the board manual in the pin assignment
+ * table. The format of the entries is ARD_A[N]_IN[X], where [N] describes the
+ * analog arduino pin and [Y] describes the used channel - indexed from 1.
+ * For example: ARD_A0_IN11 is Arduino A4, Channel 11.
  *
- * For Nucleo-C031C6 this information is in board manual,
- * Table 11, page 20.
- *
- * STM32C031C6 do not have internal channel for VBAT, more details provided
- * in the MCU datasheet - section 3.14, page 20.
+ * For the Nucleo-C031C6 this information is in the board manual,
+ * Table 11 "ARDUINO connector pinout".
  *
  * @{
  */
@@ -120,15 +115,16 @@ static const adc_conf_t adc_config[] = {
  * @name    PWM configuration
  * @{
  *
- * To find appriopate device and channel find in the MCU datasheet table
- * concerning "Alternate function AF0 to AF7" a text similar to TIM[X]_CH[Y],
- * where:
- * TIM[X] - is device,
- * [Y] - describes used channel (indexed from 0), for example TIM2_CH1 is
- * channel 0 in configuration structure (cc_chan - field),
- * Port column in the table describes connected port.
+ * The appropriate PWM device and channel for each pin can be found
+ * in the MCU datasheet table "Alternate function AF0 to AF7".
+ * The format of the entries is TIM[X]_CH[Y], where TIM[X] is the timer device
+ * and [Y] describes the used channel (indexed from 0). For example TIM2_CH1 is
+ * Timer 2, Channel 1 which corresponds to Channel 0 in the PWM configuration
+ * structure.
+ * The port column in the table describes the connected port.
  *
- * For Nucleo-c031c6 this information is in the MCU datasheet, Table 13, page 35.
+ * For the Nucleo-C031C6 this information can be found in the MCU datasheet,
+ * Table 15 "Port B alternate function mapping (AF0 to AF7)".
  *
  */
 static const pwm_conf_t pwm_config[] = {

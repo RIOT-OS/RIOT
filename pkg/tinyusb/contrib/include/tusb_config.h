@@ -21,6 +21,8 @@
  * THE SOFTWARE.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_tinyusb
  * @{
@@ -30,9 +32,6 @@
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
-
-#ifndef TUSB_CONFIG_H
-#define TUSB_CONFIG_H
 
 /* defined by the application */
 #if __has_include("tinyusb_app_config.h")
@@ -464,5 +463,4 @@ extern "C" {
 #endif
 
 #endif /* !DOXYGEN */
-#endif /* TUSB_CONFIG_H */
 /** @} */

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_openwsn
  * @{
@@ -18,9 +20,6 @@
  *
  * @}
  */
-
-#ifndef OPENWSN_DEBUGPINS_PARAMS_H
-#define OPENWSN_DEBUGPINS_PARAMS_H
 
 #include "board.h"
 #include "openwsn_debugpins.h"
@@ -77,5 +76,3 @@ static const debugpins_config_t openwsn_debugpins_params[] =
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* OPENWSN_DEBUGPINS_PARAMS_H */

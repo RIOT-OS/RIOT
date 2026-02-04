@@ -304,6 +304,15 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             res = sizeof(netopt_enable_t);
             break;
 #endif  /* MODULE_GNRC_SIXLOWPAN_IPHC */
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)
+        case NETOPT_6LO_ABR:
+            assert(opt->data_len == sizeof(netopt_enable_t));
+            *((netopt_enable_t *)opt->data) = (netif->flags & GNRC_NETIF_FLAGS_6LO_ABR)
+                                            ? NETOPT_ENABLE
+                                            : NETOPT_DISABLE;
+            res = sizeof(netopt_enable_t);
+            break;
+#endif
         default:
             break;
     }
@@ -409,6 +418,27 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
             res = sizeof(netopt_enable_t);
             break;
 #endif  /* MODULE_GNRC_SIXLOWPAN_IPHC */
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)
+        case NETOPT_6LO_ABR:
+            assert(opt->data_len == sizeof(netopt_enable_t));
+            if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
+                if (!(netif->flags & GNRC_NETIF_FLAGS_6LO_ABR)) {
+                    /* we were no ABR before,
+                     * as ABR we must not search for routers */
+                    gnrc_ipv6_nib_stop_search_rtr(netif);
+                }
+                netif->flags |= GNRC_NETIF_FLAGS_6LO_ABR;
+            }
+            else {
+                if (netif->flags & GNRC_NETIF_FLAGS_6LO_ABR) {
+                    /* we were a ABR before, better search for (upstream) routers */
+                    gnrc_ipv6_nib_start_search_rtr(netif);
+                }
+                netif->flags &= ~GNRC_NETIF_FLAGS_6LO_ABR;
+            }
+            res = sizeof(netopt_enable_t);
+            break;
+#endif
         case NETOPT_RAWMODE:
             if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
                 netif->flags |= GNRC_NETIF_FLAGS_RAWMODE;
@@ -1922,11 +1952,6 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
             /* try to send anyway */
         }
     }
-    /* hold in case device was busy to not having to rewrite *all* the link
-     * layer implementations in case `gnrc_netif_pktq` is included */
-    if (gnrc_netif_netdev_legacy_api(netif)) {
-        gnrc_pktbuf_hold(pkt, 1);
-    }
 #endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
 
     /* Record send in neighbor statistics if destination is unicast */
@@ -1947,6 +1972,13 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
     /* Split off the TX sync snip */
     gnrc_pktsnip_t *tx_sync = IS_USED(MODULE_GNRC_TX_SYNC)
                             ? gnrc_tx_sync_split(pkt) : NULL;
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+    /* hold in case device was busy to not having to rewrite *all* the link
+     * layer implementations in case `gnrc_netif_pktq` is included */
+    if (gnrc_netif_netdev_legacy_api(netif)) {
+        gnrc_pktbuf_hold(pkt, 1);
+    }
+#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
     int res = netif->ops->send(netif, pkt);
 
     /* For legacy netdevs (no confirm_send) TX is blocking, thus it is always

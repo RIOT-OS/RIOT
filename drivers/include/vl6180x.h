@@ -400,6 +400,7 @@ extern "C"
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "modules.h"
 #include "periph/gpio.h"
 #include "periph/i2c.h"
 

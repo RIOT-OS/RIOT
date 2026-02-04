@@ -84,10 +84,10 @@ your make commands with it (for the BR as well as the device), e.g.:
      $ USEMODULE+=nimble_autoconn_ipsp make BOARD=<BR board>
 
 Plug the BR board on the computer and flash the
-[gnrc_border_router](https://github.com/RIOT-OS/RIOT/tree/master/examples/networking/gnrc_border_router)
+[gnrc_border_router](https://github.com/RIOT-OS/RIOT/tree/master/examples/networking/gnrc/border_router)
 application on it:
 
-    $ make BOARD=<BR board> -C examples/networking/gnrc_border_router flash
+    $ make BOARD=<BR board> -C examples/networking/gnrc/border_router flash
 
 In on terminal, start the network (assuming on the host the virtual port of the
 board is `/dev/ttyACM0`):

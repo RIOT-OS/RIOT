@@ -1,0 +1,140 @@
+From f4d6a4e7aaa52fc85d66d1d452972c216b54f203 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sat, 10 Jan 2026 18:49:47 +0100
+Subject: [PATCH 44/45] esp_wifi: replace wifi_thread_semphr_get_wrapper
+
+ESP-IDF uses `pthread` local storage functions such as `pthread_setspecific` and
+`pthread_getspecific` to store a thread-associated counting semaphore used by
+`libieee80211.a` without creating actual `pthread`s with `pthread_create` function.
+This is realized in ESP-IDF by allocating additional space in the FreeRTOS task control
+block and implementing their own `pthread_setspecific` and `pthread_getspecific`
+to access it.
+
+This type of implementation isn't possible with the RIOT module `pthread` so that the
+`wifi_thread_semphr_get_wrapper` function has to be replaced.
+---
+ components/esp_wifi/esp32/esp_adapter.c   | 5 +++++
+ components/esp_wifi/esp32c3/esp_adapter.c | 5 +++++
+ components/esp_wifi/esp32c6/esp_adapter.c | 5 +++++
+ components/esp_wifi/esp32s2/esp_adapter.c | 5 +++++
+ components/esp_wifi/esp32s3/esp_adapter.c | 5 +++++
+ 5 files changed, 25 insertions(+)
+
+diff --git a/components/esp_wifi/esp32/esp_adapter.c b/components/esp_wifi/esp32/esp_adapter.c
+index 92795986d89..fa1113590f2 100644
+--- a/components/esp_wifi/esp32/esp_adapter.c
++++ b/components/esp_wifi/esp32/esp_adapter.c
+@@ -213,6 +213,10 @@ static void wifi_thread_semphr_free(void* data)
+ 
+ static void * wifi_thread_semphr_get_wrapper(void)
+ {
++#if defined(RIOT_VERSION)
++    extern void *riot_wifi_thread_semphr_get(void);
++    return riot_wifi_thread_semphr_get();
++#else
+     static bool s_wifi_thread_sem_key_init = false;
+     static pthread_key_t s_wifi_thread_sem_key;
+     SemaphoreHandle_t sem = NULL;
+@@ -235,6 +239,7 @@ static void * wifi_thread_semphr_get_wrapper(void)
+ 
+     ESP_LOGV(TAG, "thread sem get: sem=%p", sem);
+     return (void*)sem;
++#endif
+ }
+ 
+ static void * recursive_mutex_create_wrapper(void)
+diff --git a/components/esp_wifi/esp32c3/esp_adapter.c b/components/esp_wifi/esp32c3/esp_adapter.c
+index 59e69b3d785..3e3b616c407 100644
+--- a/components/esp_wifi/esp32c3/esp_adapter.c
++++ b/components/esp_wifi/esp32c3/esp_adapter.c
+@@ -155,6 +155,10 @@ static void wifi_thread_semphr_free(void* data)
+ 
+ static void * wifi_thread_semphr_get_wrapper(void)
+ {
++#if defined(RIOT_VERSION)
++    extern void *riot_wifi_thread_semphr_get(void);
++    return riot_wifi_thread_semphr_get();
++#else
+     static bool s_wifi_thread_sem_key_init = false;
+     static pthread_key_t s_wifi_thread_sem_key;
+     SemaphoreHandle_t sem = NULL;
+@@ -177,6 +181,7 @@ static void * wifi_thread_semphr_get_wrapper(void)
+ 
+     ESP_LOGV(TAG, "thread sem get: sem=%p", sem);
+     return (void*)sem;
++#endif
+ }
+ 
+ static void * recursive_mutex_create_wrapper(void)
+diff --git a/components/esp_wifi/esp32c6/esp_adapter.c b/components/esp_wifi/esp32c6/esp_adapter.c
+index c4b37a1802e..017e35e9858 100644
+--- a/components/esp_wifi/esp32c6/esp_adapter.c
++++ b/components/esp_wifi/esp32c6/esp_adapter.c
+@@ -158,6 +158,10 @@ static void wifi_thread_semphr_free(void *data)
+ 
+ static void *wifi_thread_semphr_get_wrapper(void)
+ {
++#if defined(RIOT_VERSION)
++    extern void *riot_wifi_thread_semphr_get(void);
++    return riot_wifi_thread_semphr_get();
++#else
+     static bool s_wifi_thread_sem_key_init = false;
+     static pthread_key_t s_wifi_thread_sem_key;
+     SemaphoreHandle_t sem = NULL;
+@@ -180,6 +184,7 @@ static void *wifi_thread_semphr_get_wrapper(void)
+ 
+     ESP_LOGV(TAG, "thread sem get: sem=%p", sem);
+     return (void *)sem;
++#endif
+ }
+ 
+ static void *recursive_mutex_create_wrapper(void)
+diff --git a/components/esp_wifi/esp32s2/esp_adapter.c b/components/esp_wifi/esp32s2/esp_adapter.c
+index 7358e324d6e..5e88bb2f5b8 100644
+--- a/components/esp_wifi/esp32s2/esp_adapter.c
++++ b/components/esp_wifi/esp32s2/esp_adapter.c
+@@ -204,6 +204,10 @@ static void wifi_thread_semphr_free(void* data)
+ 
+ static void * wifi_thread_semphr_get_wrapper(void)
+ {
++#if defined(RIOT_VERSION)
++    extern void *riot_wifi_thread_semphr_get(void);
++    return riot_wifi_thread_semphr_get();
++#else
+     static bool s_wifi_thread_sem_key_init = false;
+     static pthread_key_t s_wifi_thread_sem_key;
+     SemaphoreHandle_t sem = NULL;
+@@ -226,6 +230,7 @@ static void * wifi_thread_semphr_get_wrapper(void)
+ 
+     ESP_LOGV(TAG, "thread sem get: sem=%p", sem);
+     return (void*)sem;
++#endif
+ }
+ 
+ static void * recursive_mutex_create_wrapper(void)
+diff --git a/components/esp_wifi/esp32s3/esp_adapter.c b/components/esp_wifi/esp32s3/esp_adapter.c
+index faa5da10182..b082375f6b0 100644
+--- a/components/esp_wifi/esp32s3/esp_adapter.c
++++ b/components/esp_wifi/esp32s3/esp_adapter.c
+@@ -207,6 +207,10 @@ static void wifi_thread_semphr_free(void* data)
+ 
+ static void * wifi_thread_semphr_get_wrapper(void)
+ {
++#if defined(RIOT_VERSION)
++    extern void *riot_wifi_thread_semphr_get(void);
++    return riot_wifi_thread_semphr_get();
++#else
+     static bool s_wifi_thread_sem_key_init = false;
+     static pthread_key_t s_wifi_thread_sem_key;
+     SemaphoreHandle_t sem = NULL;
+@@ -229,6 +233,7 @@ static void * wifi_thread_semphr_get_wrapper(void)
+ 
+     ESP_LOGV(TAG, "thread sem get: sem=%p", sem);
+     return (void*)sem;
++#endif
+ }
+ 
+ static void * recursive_mutex_create_wrapper(void)
+-- 
+2.34.1
+

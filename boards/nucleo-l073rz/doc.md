@@ -2,11 +2,13 @@
 @ingroup     boards_common_nucleo64
 @brief       Support for the STM32 Nucleo-L073RZ
 
-
 ## Overview
 
 The Nucleo-L073RZ is a board from ST's Nucleo family supporting ARM Cortex-M0
 STM32L073RZT6 microcontroller with 20KiB of RAM and 192KiB of Flash.
+
+You can find general information about the Nucleo64 boards on the
+@ref boards_common_nucleo64 page.
 
 ## Pinout
 
@@ -34,15 +36,8 @@ STM32L073RZT6 microcontroller with 20KiB of RAM and 192KiB of Flash.
 | Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/pm0223-stm32-cortexm0-mcus-programming-manual-stmicroelectronics.pdf) |
 | Board Manual | [Board Manual](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/user_manual/DM00105823.pdf) |
 
-## Flashing the Board Using ST-LINK Removable Media
+## Flashing the Board
 
-On-board ST-LINK programmer provides via composite USB device removable media.
-Copying the HEX file causes reprogramming of the board. This task
-could be performed manually; however, the cpy2remed (copy to removable
-media) PROGRAMMER script does this automatically. To program board in
-this manner, use the command:
-```
-make BOARD=nucleo-l073rz PROGRAMMER=cpy2remed flash
-```
-@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
-      can be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the Nucleo-L073RZ is `nucleo-l073rz`.

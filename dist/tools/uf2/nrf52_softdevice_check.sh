@@ -53,7 +53,7 @@ if [ "${SOFTDEVICE}" = "not found" ] && [ "${UF2_SOFTDEV}" != "DROP" ]; then
     echo -e "\033[0;31mNo SoftDevice present on the device, but the compilation is set" \
     "to expect a SoftDevice."
     echo -e "For more information see:" \
-    "https://doc.riot-os.org/group__boards__common__adafruit-nrf52-bootloader.html#ada-nrf52-update"\
+    "https://api.riot-os.org/group__boards__common__adafruit-nrf52-bootloader.html#ada-nrf52-update"\
     "\033[0m"
     exit 1
 fi

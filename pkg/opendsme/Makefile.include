@@ -3,3 +3,6 @@ INCLUDES += -isystem$(PKGDIRBASE)/opendsme
 INCLUDES += -isystem$(RIOTBASE)/pkg/opendsme/include
 
 DIRS += $(RIOTBASE)/pkg/opendsme/contrib
+
+# Disable Auto-ACK (not supported by openDSME)
+CFLAGS += -DCONFIG_IEEE802154_AUTO_ACK_DISABLE=1

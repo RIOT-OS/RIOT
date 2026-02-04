@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -18,7 +15,6 @@
 
 #include <stdio.h>
 
-#include "flash_utils.h"
 #include "phydat.h"
 #include "saul_reg.h"
 #include "xtimer.h"
@@ -45,8 +41,9 @@ int main(void)
 
         while (dev) {
             int dim = saul_reg_read(dev, &res);
-            printf("\nDev: %s\tType: %" PRIsflash "\n", dev->name,
-                   saul_class_to_str(dev->driver->type));
+            printf("\nDev: %s\tType: ", dev->name);
+            saul_class_print(dev->driver->type);
+            puts("");
             phydat_dump(&res, dim);
             dev = dev->next;
         }

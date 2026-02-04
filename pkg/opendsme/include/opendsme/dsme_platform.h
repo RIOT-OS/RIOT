@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_opendsme
  *
@@ -15,9 +17,6 @@
  *
  * @author      José I. Álamos <jose.alamos@haw-hamburg.de>
  */
-
-#ifndef OPENDSME_DSME_PLATFORM_H
-#define OPENDSME_DSME_PLATFORM_H
 
 #include <assert.h>
 #include <stdio.h>
@@ -48,5 +47,4 @@ extern "C" {
 }
 #endif
 
-#endif /* OPENDSME_DSME_PLATFORM_H */
 /** @} */

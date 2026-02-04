@@ -7,6 +7,9 @@
 The Nucleo-F031K6 is a board from ST's Nucleo family supporting ARM Cortex-M0
 STM32F031K6 microcontroller with 4KiB of RAM and 32KiB of Flash.
 
+You can find general information about the Nucleo32 boards on the
+@ref boards_common_nucleo32 page.
+
 ## Pinout
 
 @image html pinouts/nucleo-f031k6-and-more.svg "Pinout for the Nucleo-F031K6 (from ST User Manual, UM1956, https://www.st.com/resource/en/user_manual/um1956-stm32-nucleo32-boards-mb1180-stmicroelectronics.pdf, page 31)" width=25%
@@ -34,15 +37,8 @@ STM32F031K6 microcontroller with 4KiB of RAM and 32KiB of Flash.
 | Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/pm0215-stm32f0-series-cortexm0-programming-manual-stmicroelectronics.pdf) |
 | Board Manual | [Board Manual](https://www.st.com/resource/en/user_manual/um1956-stm32-nucleo32-boards-mb1180-stmicroelectronics.pdf) |
 
-## Flashing the Board Using ST-LINK Removable Media
+## Flashing the Board
 
-On-board ST-LINK programmer provides via composite USB device removable media.
-Copying the HEX file causes reprogramming of the board. This task
-could be performed manually; however, the cpy2remed (copy to removable
-media) PROGRAMMER script does this automatically. To program board in
-this manner, use the command:
-```
-make BOARD=nucleo-f031k6 PROGRAMMER=cpy2remed flash
-```
-@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
-      can be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the Nucleo-F031K6 is `nucleo-f031k6`.

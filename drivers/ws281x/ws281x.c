@@ -31,10 +31,13 @@
 /* Default buffer used in ws281x_params.h. Will be optimized out if unused */
 uint8_t ws281x_buf[WS281X_PARAM_NUMOF * WS281X_BYTES_PER_DEVICE];
 
-void ws281x_set_buffer(void *_dest, uint16_t n, color_rgb_t c)
+void ws281x_set_buffer(void *_dest, uint16_t n, ws281x_pixel_t c)
 {
     uint8_t *dest = _dest;
     dest[WS281X_BYTES_PER_DEVICE * n + WS281X_OFFSET_R] = c.r;
     dest[WS281X_BYTES_PER_DEVICE * n + WS281X_OFFSET_G] = c.g;
     dest[WS281X_BYTES_PER_DEVICE * n + WS281X_OFFSET_B] = c.b;
+#if WS281X_BYTES_PER_DEVICE == 4
+    dest[WS281X_BYTES_PER_DEVICE * n + WS281X_OFFSET_W] = c.w;
+#endif
 }

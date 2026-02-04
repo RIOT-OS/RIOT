@@ -235,7 +235,7 @@ if [ -z "$1" ]; then
     echo "Usage: install.sh <tool>"
     echo "       install.sh gdb <platform>"
     echo "       install.sh qemu <platform>"
-    echo "<tool> = all | esptool | gdb | openocd | qemu |"
+    echo "<tool> = all | gdb | openocd | qemu |"
     echo "         esp8266 | esp32 | esp32c3 | esp32c6 | esp32h2 | esp32s2 | esp32s3"
     echo "<platform> = xtensa | riscv"
     exit 1

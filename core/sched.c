@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2014-2017 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014-2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -367,4 +364,11 @@ void sched_change_priority(thread_t *thread, uint8_t priority)
          */
         thread_yield_higher();
     }
+}
+
+/* for compat with POSIX's sched.h - intended to be used by external code only */
+int sched_yield(void)
+{
+    thread_yield();
+    return 0;
 }

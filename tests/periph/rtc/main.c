@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Lari Lehtomäki
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2015 Lari Lehtomäki
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -138,7 +135,7 @@ int main(void)
     }
 
     time = (struct tm){
-        .tm_year = 2020 - 1900,   /* years are counted from 1900 */
+        .tm_year = 2025 - 1900,   /* years are counted from 1900 */
         .tm_mon  =  1,            /* 0 = January, 11 = December */
         .tm_mday = 28,
         .tm_hour = 23,

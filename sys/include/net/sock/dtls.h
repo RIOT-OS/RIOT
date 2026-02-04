@@ -284,8 +284,9 @@
  * application waits indefinitely for new packets. If we want to timeout this
  * wait period we could alternatively set the `timeout` parameter of the
  * function to a value != @ref SOCK_NO_TIMEOUT. If an error occurs we just
- * ignore it and continue looping. We can reply to an incoming message using
- * its `session`.
+ * ignore it and continue looping. A newly established DTLS session would be
+ * signaled by a return value - @ref SOCK_DTLS_HANDSHAKE, but it is also ignored
+ * here. We can reply to an incoming message using its `session`.
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  * while (1) {

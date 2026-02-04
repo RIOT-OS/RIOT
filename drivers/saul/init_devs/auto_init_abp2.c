@@ -60,7 +60,7 @@ void auto_init_abp2(void)
         saul_entries[(i * 2)].dev = &(abp2_devs[i]);
         saul_entries[(i * 2)].name = abp2_saul_info[i][0].name;
         saul_entries[(i * 2)].driver = &abp2_saul_driver_press;
-        saul_reg_add(&(saul_entries[i]));
+        saul_reg_add(&(saul_entries[(i * 2)]));
 
         /* temperature */
         saul_entries[(i * 2) + 1].dev = &(abp2_devs[i]);

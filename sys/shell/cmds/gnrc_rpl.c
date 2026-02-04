@@ -106,10 +106,7 @@ int _gnrc_rpl_instance_remove(char *arg1)
         return 1;
     }
 
-    if (gnrc_rpl_instance_remove(inst) == false) {
-        printf("error: could not remove instance (%d)\n", instance_id);
-        return 1;
-    }
+    gnrc_rpl_instance_remove(inst);
 
     printf("success: removed instance (%d)\n", instance_id);
     return 0;

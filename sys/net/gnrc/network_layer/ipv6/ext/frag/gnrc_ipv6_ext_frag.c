@@ -423,6 +423,10 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_frag_reass(gnrc_pktsnip_t *pkt)
         DEBUG("ipv6_ext_frag: unable to mark fragmentation header\n");
         goto error_release;
     }
+    else if (pkt->size == 0) {
+        DEBUG("ipv6_ext_frag: fragment empty after removing header\n");
+        goto error_release;
+    }
     fh = fh_snip->data;
     /* search IPv6 header */
     ipv6_snip = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
@@ -522,6 +526,11 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_frag_reass(gnrc_pktsnip_t *pkt)
         /* not divisible by 8*/
         if ((pkt->size & 0x7)) {
             DEBUG("ipv6_ext_frag: fragment length not divisible by 8");
+            goto error_exit;
+        }
+        else if (rbuf->pkt != NULL && rbuf->pkt->size < pkt->size) {
+            DEBUG("ipv6_ext_frag: reassembly buffer too small to fit first "
+                  "fragment\n");
             goto error_exit;
         }
         _set_nh(fh_snip->next, nh);

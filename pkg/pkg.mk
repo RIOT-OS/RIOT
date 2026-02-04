@@ -63,7 +63,8 @@ ifeq ($(QUIET),1)
 endif
 
 GITFLAGS ?= -c user.email=buildsystem@riot -c user.name="RIOT buildsystem"
-GITAMFLAGS ?= $(GIT_QUIET) --no-gpg-sign --ignore-whitespace --whitespace=nowarn
+GITAMFLAGS ?= $(GIT_QUIET)
+GITAMFLAGS += --no-gpg-sign --ignore-whitespace --whitespace=nowarn
 
 .PHONY: all prepare clean distclean FORCE
 

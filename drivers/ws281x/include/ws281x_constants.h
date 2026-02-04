@@ -39,8 +39,12 @@ extern "C" {
  * @brief The high-times in nanoseconds.
  * @{
  */
-#define WS281X_T_DATA_ONE_NS            (650U)
-#define WS281X_T_DATA_ZERO_NS           (325U)
+#ifndef WS281X_T_DATA_ONE_NS
+#  define WS281X_T_DATA_ONE_NS          (650U)
+#endif
+#ifndef WS281X_T_DATA_ZERO_NS
+#  define WS281X_T_DATA_ZERO_NS         (325U)
+#endif
 /**@}*/
 
 /**
@@ -68,6 +72,10 @@ extern "C" {
  * @brief   Offset for the blue color component
  */
 #define WS281X_OFFSET_B                 (2U)
+/**
+ * @brief   Offset for the white color component (only for 4-byte variants)
+ */
+#define WS281X_OFFSET_W                 (3U)
 /**@}*/
 
 #ifdef __cplusplus

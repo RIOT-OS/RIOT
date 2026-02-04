@@ -6,7 +6,7 @@
 [![Mastodon][mastodon-badge]][mastodon-link]
 [![Matrix][matrix-badge]][matrix-link]
 
-<p align="center"><img src="doc/doxygen/src/riot-logo.svg" width="66%"><!--
+<p align="center"><img src="doc/doxygen/src/riot-logo.svg" width="59%"><!--
                           ZZZZZZ
                         ZZZZZZZZZZZZ
                       ZZZZZZZZZZZZZZZZ
@@ -33,7 +33,7 @@
          ZZZZZZZZZZZ               Z
             ZZZZZ                                                           --></p>
 
-# RIOT OS: The friendly Operating System for IoT!
+# RIOT OS: The friendly Operating System for IoT
 
 RIOT is an **open-source microcontroller operating system**, designed to match
 the requirements of Internet of Things (IoT) devices and other embedded devices.
@@ -59,7 +59,7 @@ LGPL code.
 [license-badge]: https://img.shields.io/github/license/RIOT-OS/RIOT
 [license-link]: https://github.com/RIOT-OS/RIOT/blob/master/LICENSE
 [api-badge]: https://img.shields.io/badge/docs-API-informational.svg
-[api-link]: https://doc.riot-os.org/
+[api-link]: https://api.riot-os.org/
 [guide-badge]: https://img.shields.io/badge/docs-Getting_Started_Guide-informational.svg
 [guide-link]: https://guide.riot-os.org/getting-started/installing/
 [mastodon-badge]: https://img.shields.io/badge/social-Mastodon-informational.svg
@@ -81,11 +81,12 @@ LGPL code.
 [getting-started]: https://guide.riot-os.org/getting-started/installing/
 [tutorials]: https://github.com/RIOT-OS/Tutorials
 [riot-course]: https://github.com/RIOT-OS/riot-course
-[api-docs]: https://doc.riot-os.org/
+[api-docs]: https://api.riot-os.org/
 
 ## Features
 
 RIOT provides features including, but not limited to:
+
 - Platforms Supported
   - 200+ boards based on AVR, MSP430, ESP8266, ESP32, RISC-V, ARM7, and ARM Cortex-M
   - The native port allows to run RIOT as-is on Linux and BSD.
@@ -182,7 +183,7 @@ We are more than happy to collaborate with those who share our
 The most convenient way to get RIOT is to clone it via Git
 
 ```console
-$ git clone https://github.com/RIOT-OS/RIOT
+git clone https://github.com/RIOT-OS/RIOT
 ```
 
 this will ensure that you get all the newest features and bug fixes with the
@@ -194,8 +195,8 @@ as ZIP file or tarball. You can also checkout a release in
 a cloned Git repository using
 
 ```console
-$ git pull --tags
-$ git checkout <YYYY.MM>
+git pull --tags
+git checkout <YYYY.MM>
 ```
 
 For more details on our release cycle, check our

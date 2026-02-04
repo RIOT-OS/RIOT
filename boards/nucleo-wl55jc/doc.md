@@ -8,6 +8,9 @@ The Nucleo-W55JC is a board from ST's Nucleo family supporting ARM dual-core
 Cortex-M4/M0 STM ultra-low-power microcontroller with ultra-low-power LPWAN
 radio solution, 64KiB of RAM and 256KiB of Flash.
 
+You can find general information about the Nucleo64 boards on the
+@ref boards_common_nucleo64 page.
+
 ### MCU
 
 
@@ -34,38 +37,8 @@ radio solution, 64KiB of RAM and 256KiB of Flash.
 | Board Schematic | [Board Schematic](https://www.st.com/resource/en/user_manual/dm00622917-stm32wl-nucleo64-board-mb1389-stmicroelectronics.pdf) |
 | Additional Reference | [Developing LoRaWAN Application](https://www.st.com/resource/en/application_note/dm00660451-how-to-build-a-lora-application-with-stm32cubewl-stmicroelectronics.pdf)
 
-## Flashing the device
+## Flashing the Board
 
-### Flashing the Board Using OpenOCD
-
-The ST Nucleo-wl55jc board includes an on-board ST-LINK V2 programmer. The
-easiest way to program the board is to use OpenOCD. Once you have installed
-OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
-installation instructions), you can flash the board simply by typing
-
-```
-make BOARD=nucleo-wl55jc flash
-```
-and debug via GDB by simply typing
-```
-make BOARD=nucleo-wl55jc debug
-```
-
-### Flashing the Board Using ST-LINK Removable Media
-
-On-board ST-LINK programmer provides via composite USB device removable media.
-Copying the HEX file causes reprogramming of the board. This task
-could be performed manually; however, the cpy2remed (copy to removable
-media) PROGRAMMER script does this automatically. To program board in
-this manner, use the command:
-```
-make BOARD=nucleo-wl55jc PROGRAMMER=cpy2remed flash
-```
-@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
-could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
-
-## Supported Toolchains
-
-For using the ST Nucleo-wl55jc board we strongly recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
-toolchain.
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the Nucleo-WL55JC is `nucleo-wl55jc`.

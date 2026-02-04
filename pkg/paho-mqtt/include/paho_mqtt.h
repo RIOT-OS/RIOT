@@ -7,6 +7,8 @@
  *
  */
 
+#pragma once
+
 /**
  * @addtogroup  pkg_paho_mqtt
  * @{
@@ -16,8 +18,6 @@
  *
  * @author      Javier FILEIV <javier.fileiv@gmail.com>
  */
-#ifndef PAHO_MQTT_H
-#define PAHO_MQTT_H
 
 #include "mutex.h"
 #include "thread.h"
@@ -193,5 +193,4 @@ int ThreadStart(Thread *thread, void (*fn)(void *), void *arg);
 }
 #endif
 
-#endif /* PAHO_MQTT_H */
 /** @} */

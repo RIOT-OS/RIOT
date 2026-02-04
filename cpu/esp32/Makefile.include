@@ -312,6 +312,7 @@ CFLAGS += -D_CONST=const
 # TODO no relaxation yet
 ifneq (,$(filter riscv%,$(TARGET_ARCH)))
   CFLAGS += -DCONFIG_IDF_TARGET_ARCH_RISCV
+  CFLAGS += -DQCBOR_DISABLE_FLOAT_HW_USE
   CFLAGS += -mno-relax -mabi=ilp32 -DRISCV_NO_RELAX
   CFLAGS += -fno-jump-tables
   LDGENFLAGS += -DCONFIG_IDF_TARGET_ARCH_RISCV
@@ -371,6 +372,7 @@ else ifeq (esp32c3,$(CPU_FAM))
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.bt_funcs.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.eco3.ld
+  LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.eco3_bt_funcs.ld
 else ifeq (esp32c6,$(CPU_FAM))
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.coexist.ld
   LINKFLAGS += -T$(ESP32_SDK_DIR)/components/esp_rom/$(CPU_FAM)/ld/$(CPU_FAM).rom.newlib.ld
@@ -457,6 +459,12 @@ ifneq (,$(filter esp_jtag,$(USEMODULE)))
   OPENOCD_SKIP_VERIFY = yes
   # Without resets debug target fails with 'Target not examined yet'
   OPENOCD_DBG_EXTRA_CMD += -c 'reset halt'
+endif
+
+ifneq (esptool,$(PROGRAMMER))
+  # we must explicitly include the esptool settings if this is not done via
+  # the PROGRAMMER variable
+  include $(RIOTMAKE)/tools/esptool.inc.mk
 endif
 
 LD_SCRIPTS += $(BINDIR)/memory.ld $(BINDIR)/sections.ld

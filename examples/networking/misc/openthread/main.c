@@ -12,6 +12,8 @@
 
 #include <stdio.h>
 
+#include "shell.h"
+
 #include "ot.h"
 #include "openthread/thread.h"
 
@@ -44,6 +46,9 @@ int main(void)
      * event queue (accessible via openthread_get_evq())
      */
     event_post(openthread_get_evq(), &event_panid);
+
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

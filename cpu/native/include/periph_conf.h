@@ -50,19 +50,6 @@ extern "C" {
 #define TIMER_CHANNEL_NUMOF    (1U)    /**< Number of timer channels */
 /** @} */
 
-/* MARK: - xtimer configuration */
-/**
- * @name `xtimer` configuration
- * @{
- *
- * @ref timer_set_absolute has a high margin for possible underflow if set with
- * value not far in the future. To prevent this, we set high backoff values
- * here.
- */
-#define XTIMER_BACKOFF      200
-#define XTIMER_ISR_BACKOFF  200
-/** @} */
-
 /**
  * @brief UART configuration
  */
@@ -84,7 +71,21 @@ extern "C" {
 #  define QDEC_NUMOF (8U)
 #endif
 
-/* MARK: - SPI configuration (Linux host only) */
+/* MARK: - I2C configuration (mock implementation) */
+/**
+ * @name I2C configuration (mock implementation)
+ * @{
+ */
+#if !defined(I2C_NUMOF) || defined(DOXYGEN)
+/**
+ * @brief Amount of I2C devices
+ *
+ * Can be overridden during compile time with `CFLAGS+=-DI2C_NUMOF=n`.
+ */
+#  define I2C_NUMOF   1
+#endif
+/** @} */
+
 /**
  * @name SPI configuration (Linux host only)
  * @{

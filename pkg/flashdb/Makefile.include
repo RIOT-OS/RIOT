@@ -10,3 +10,27 @@ PSEUDOMODULES += flashdb_vfs
 ifneq (,$(filter flashdb_mtd,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/flashdb/mtd
 endif
+
+CFLAGS += -DFDB_USING_NATIVE_ASSERT
+
+ifneq (,$(filter flashdb_tsdb,$(USEMODULE)))
+  CFLAGS += -DFDB_USING_TSDB
+endif
+
+ifneq (,$(filter flashdb_kvdb_auto_update,$(USEMODULE)))
+  CFLAGS += -DFDB_KV_AUTO_UPDATE
+endif
+
+ifneq (,$(filter flashdb_kvdb,$(USEMODULE)))
+  CFLAGS += -DFDB_USING_KVDB
+endif
+
+ifneq (,$(filter flashdb_mtd,$(USEMODULE)))
+  CFLAGS += -DFDB_USING_FAL_MODE
+else
+  ifeq ($(CPU),native)
+    CFLAGS += -DFDB_USING_FILE_POSIX_MODE
+  else
+    CFLAGS += -DFDB_USING_FILE_LIBC_MODE
+  endif
+endif

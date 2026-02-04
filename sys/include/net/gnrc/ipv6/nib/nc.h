@@ -233,6 +233,36 @@ static inline unsigned gnrc_ipv6_nib_nc_get_ar_state(const gnrc_ipv6_nib_nc_t *e
 int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
                          const uint8_t *l2addr, size_t l2addr_len);
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || defined(DOXYGEN)
+/**
+ * @brief   Adds an unmanaged neighbor entry to the NIB if the interface represents a 6LN node
+ *          and the IPv6 address can be constructed from the L2 address @p l2addr.
+ *
+ * @param[in] iface         The interface to the neighbor.
+ * @param[in] l2addr        The neighbor's layer 2 address.
+ * @param[in] l2addr_len    Length of @p l2addr.
+ *
+ * @retval  0 on success.
+ * @retval  -ENOTSUP if the interface does not represent a 6LN or when
+ *           gnrc_netif_t::device_type of the iface does not support IID conversion.
+ * @retval  -EINVAL when @p addr_len is invalid for the
+ *          gnrc_netif_t::device_type of @p netif.
+ * @retval  -ENOMEM if no space is left in neighbor cache.
+ */
+int gnrc_ipv6_nib_nc_set_6ln(unsigned iface, const uint8_t *l2addr,
+                             size_t l2addr_len);
+#else /* CONFIG_GNRC_IPV6_NIB_6LN */
+static inline int gnrc_ipv6_nib_nc_set_6ln(unsigned iface, const uint8_t *l2addr,
+                                           size_t l2addr_len)
+{
+    (void)iface;
+    (void)l2addr;
+    (void)l2addr_len;
+
+    return -ENOTSUP;
+}
+#endif /* CONFIG_GNRC_IPV6_NIB_6LN */
+
 /**
  * @brief   Deletes neighbor with address @p ipv6 from NIB
  *
@@ -244,6 +274,23 @@ int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
  * If the @p ipv6 can't be found for a neighbor in the NIB nothing happens.
  */
 void gnrc_ipv6_nib_nc_del(const ipv6_addr_t *ipv6, unsigned iface);
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)  || defined(DOXYGEN)
+/**
+ * @brief   Deletes neighbor with link-layer address @p l2addr from NIB.
+ *
+ * @param[in] iface         The interface to the neighbor.
+ * @param[in] l2addr        The neighbor's l2addr address.
+ * @param[in] l2addr_len    Length of @p l2addr.
+ *
+ *
+ * If the @p l2addr can't be found for a neighbor in the NIB nothing happens.
+ *
+ * @retval  True if a neighbor with @p l2addr existed.
+ * @retval  False otherwise.
+ */
+bool gnrc_ipv6_nib_nc_del_l2(unsigned iface, const uint8_t *l2addr, size_t l2addr_len);
+#endif /* CONFIG_GNRC_IPV6_NIB_ARSM */
 
 /**
  * @brief   Mark neighbor with address @p ipv6 as reachable

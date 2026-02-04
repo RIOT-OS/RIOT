@@ -1,0 +1,14 @@
+# include shared STM32 headers
+INCLUDES += -I$(RIOTBOARD)/common/stm32/include
+
+PORT_LINUX ?= /dev/ttyACM0
+
+ROM_OFFSET ?= 0x4000
+TERM_DELAY ?= 2
+
+PROGRAMMER ?= dfu-util
+PROGRAMMERS_SUPPORTED += dfu-util
+DFU_USB_ID ?= 0483:df11
+DFU_USE_DFUSE ?= 1
+
+include $(RIOTMAKE)/tools/usb_board_reset.mk

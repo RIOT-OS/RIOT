@@ -161,7 +161,7 @@ for TTGO T-Beam boards.
 The corresponding board schematics can be found on TinyMicros.com for
 [TTGO T-Beam rev0](http://tinymicros.com/mediawiki/images/b/b9/TTGO_T-Beam_Schematic.pdf)
 and GitHub for
-[TTGO T-Beam V1.0](https://github.com/Xinyuan-LilyGO/LilyGo-LoRa-Series/blob/a45c3b17842c5c377a8bc8475ae529ba0b90f9b4/schematic/LilyGo_TBeam_V1.0.pdf)
+[TTGO T-Beam V1.0](https://github.com/Xinyuan-LilyGO/LilyGo-LoRa-Series/blob/v0.0.1/schematic/LilyGo_TBeam_V1.0.pdf)
 
 [Back to table of contents](#esp32_ttgo_t_beam_toc)
 

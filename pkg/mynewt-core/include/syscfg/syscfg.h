@@ -26,6 +26,8 @@
  * under the License.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_mynewt_core
  * @{
@@ -35,9 +37,6 @@
  *
  * @}
  */
-
-#ifndef SYSCFG_SYSCFG_H
-#define SYSCFG_SYSCFG_H
 
 #include "kernel_defines.h"
 
@@ -127,5 +126,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SYSCFG_SYSCFG_H */

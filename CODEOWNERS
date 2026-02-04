@@ -20,8 +20,7 @@ Cargo.*                                     @chrysn
 /boards/common/slwstk6000b/                 @basilfx
 /boards/common/stm32/                       @aabadie
 /boards/e180-zg120b-tb/                     @basilfx
-/boards/esp*/                               @gschorcht @yegorich
-/boards/hamilton/                           @Hyungsin
+/boards/esp*/                               @gschorcht
 /boards/ikea-tradfri/                       @basilfx
 /boards/lobaro-lorabox/                     @leandrolanzieri
 /boards/nrf*/                               @aabadie
@@ -37,8 +36,8 @@ Cargo.*                                     @chrysn
 /boards/sodaq-sara-aff/                     @leandrolanzieri
 /boards/stk3*00/                            @basilfx
 /boards/openmote*/                          @MrKevinWeiss
-/boards/cc1352p-launchpad                   @luisan00
 /boards/atxmega*/                           @nandojve
+/boards/rpi-pico-2*/                        @AnnsAnns
 
 /core/                                      @kaspar030
 
@@ -62,8 +61,9 @@ Cargo.*                                     @chrysn
 /cpu/stm32*/                                @aabadie @vincent-d
 /cpu/stm32/periph/eth*                      @maribu
 /cpu/stm32/periph/ptp.c                     @maribu
+/cpu/rp2350*/                               @AnnsAnns
 
-/doc/                                       @aabadie @jia200x
+/doc/                                       @aabadie @jia200x @AnnsAnns
 
 /dist/tools/sliptty/                        @miri64
 /dist/tools/dhcpv6-pd_ia/                   @miri64
@@ -71,18 +71,14 @@ Cargo.*                                     @chrysn
 /drivers/ad7746/                            @leandrolanzieri
 /drivers/at24mac/                           @benpicco
 /drivers/at86rf215/                         @benpicco
-/drivers/at86rf2xx/                         @daniel-k @Hyungsin @jia200x @miri64
-/drivers/bh1900nux/                         @wosym
+/drivers/at86rf2xx/                         @jia200x @miri64
 /drivers/bq2429x/                           @jeandudey
 /drivers/cc110x/                            @maribu
 /drivers/cc1xxx_common/                     @maribu
 /drivers/ccs811/                            @gschorcht
-/drivers/dcf77/                             @daexel
-/drivers/dht/                               @wosym
 /drivers/dose/                              @jue89
 /drivers/ds18/                              @leandrolanzieri
 /drivers/itg320x/                           @gschorcht
-/drivers/mcp2515/                           @wosym
 /drivers/mrf24j40/                          @bergzand
 /drivers/pca9685/                           @gschorcht
 /drivers/sht3x/                             @gschorcht
@@ -95,16 +91,15 @@ Cargo.*                                     @chrysn
 /drivers/periph_common/                     @MrKevinWeiss
 /drivers/include/periph/ptp.h               @maribu
 
-/pkg/cryptoauthlib/                         @Einhornhool @PeterKietzmann
-/pkg/libschc/                               @bartmoons @miri64
-/pkg/lua/                                   @jcarrano
+/pkg/cryptoauthlib/                         @Einhornhool
+/pkg/libschc/                               @miri64
 /pkg/lwip/                                  @miri64
 /pkg/gecko_sdk/                             @basilfx
 /pkg/lora-serialization/                    @leandrolanzieri
 /pkg/micropython/                           @bergzand @kaspar030
-/pkg/openthread/                            @Hyungsin @jia200x
+/pkg/openthread/                            @jia200x
 /pkg/semtech-loramac/                       @aabadie @jia200x
-/pkg/tinydtls/                              @rfuentess @leandrolanzieri
+/pkg/tinydtls/                              @leandrolanzieri
 /pkg/tinyvcdiff/                            @jue89
 /pkg/u8g2/                                  @basilfx
 /pkg/ucglib/                                @basilfx
@@ -119,12 +114,12 @@ Cargo.*                                     @chrysn
 /sys/include/net/sock*                      @maribu
 /sys/net/netif/                             @miri64 @jia200x
 /sys/net/gnrc/network_layer/                @miri64
-/sys/net/gnrc/transport_layer/tcp/          @brummer-simon @miri64
+/sys/net/gnrc/transport_layer/tcp/          @miri64
 /sys/net/gnrc/transport_layer/udp/          @miri64
 /sys/net/gnrc/link_layer/lorawan/           @jia200x
 /sys/net/gnrc/netif/                        @miri64 @jia200x
 /sys/net/gnrc/routing/rpl/                  @emmanuelsearch
-/sys/net/                                   @miri64 @PeterKietzmann
+/sys/net/                                   @miri64
 /sys/pm_layered/                            @kaspar030
 /sys/random/fortuna/                        @basilfx
 /sys/riotboot/                              @kaspar030
@@ -138,14 +133,12 @@ Cargo.*                                     @chrysn
 /sys/ztimer/                                @kaspar030 @bergzand
 
 /tests/                                     @leandrolanzieri @aabadie @MichelRottleuthner
-/tests/drivers/candev/                      @wosym
 /tests/drivers/bq2429x/                     @jeandudey
-/tests/drivers/dht/                         @wosym
 /tests/net/gnrc*                            @miri64
 /tests/pkg/lwip*                            @miri64
 /tests/pkg/libschc/                         @miri64
 /tests/net/slip/                            @miri64
-/tests/unittests                            @miri64
+/tests/unittests                            @miri64 @teufelchen1
 /tests/*/tests/*.py                         @miri64
 /tests/cpu/efm32_features/                  @basilfx
 

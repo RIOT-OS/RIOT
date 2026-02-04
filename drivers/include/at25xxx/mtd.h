@@ -10,7 +10,7 @@
 
 /**
  * @defgroup    drivers_mtd_at25xxx MTD wrapper for AT25xxx family of SPI-EEPROMs
- * @ingroup     drivers_storage
+ * @ingroup     drivers_mtd
  * @brief       MTD wrapper for AT25XXX based SPI EEPROMs
  *
  * @{

@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#pragma once
+
 /**
  * @defgroup    pkg_opendsme openDSME - IEEE 802.15.4 DSME
  * @ingroup     pkg
@@ -184,8 +186,6 @@
  * ## MAC configuration
  *
  */
-#ifndef OPENDSME_OPENDSME_H
-#define OPENDSME_OPENDSME_H
 
 #include <stdbool.h>
 #include "byteorder.h"
@@ -278,7 +278,5 @@ int gnrc_netif_opendsme_create(gnrc_netif_t *netif, char *stack, int stacksize,
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* OPENDSME_OPENDSME_H */
 
 /** @} */

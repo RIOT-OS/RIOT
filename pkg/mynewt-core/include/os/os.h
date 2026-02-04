@@ -26,6 +26,8 @@
  * under the License.
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_mynewt_core
  * @{
@@ -35,9 +37,6 @@
  *
  * @}
  */
-
-#ifndef OS_OS_H
-#define OS_OS_H
 
 #include <assert.h>
 #include <stdint.h>
@@ -142,5 +141,3 @@ static inline bool os_hw_is_in_critical(void)
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* OS_OS_H */
