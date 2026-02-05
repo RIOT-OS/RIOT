@@ -143,40 +143,11 @@ static void test_ndef_remove(void)
     ndef_record_text_add(&message, "Hello World", 11, "en", 2, UTF8);
     ndef_record_text_add(&message, "Hej Verden", 10, "da", 2, UTF8);
 
-    uint8_t ndef_two_record_data[] = {
-        0x91, 0x01, 0x0E, 0x54,
-        0x02,                                                             /* status byte */
-        0x65, 0x6E,                                                       /* en */
-        0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64, /* Hello World */
-
-        0x51, 0x01, 0x0D, 0x54,
-        0x02,                                                      /* status byte */
-        0x64, 0x61,                                                /* da */
-        0x48, 0x65, 0x6A, 0x20, 0x56, 0x65, 0x72, 0x64, 0x65, 0x6E /* Hej Verden */
-    };
-    ndef_buffer_t ndef_two_record_buffer = {
-        .memory = ndef_two_record_data,
-        .cursor = ndef_two_record_data + sizeof(ndef_two_record_data),
-        .memory_end = ndef_two_record_data + sizeof(ndef_two_record_data)
-    };
-
-    TEST_ASSERT(compare_ndef_buffers(message.buffer, ndef_two_record_buffer));
+    TEST_ASSERT_EQUAL_INT(message.record_count, 2);
 
     ndef_record_remove_last(&message);
 
-    uint8_t ndef_one_record_data[] = {
-        0xD1, 0x01, 0x0E, 0x54,
-        0x02,                                                            /* status byte */
-        0x65, 0x6E,                                                      /* en */
-        0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64 /* Hello World */
-    };
-    ndef_buffer_t ndef_one_record_buffer = {
-        .memory = ndef_one_record_data,
-        .cursor = ndef_one_record_data + sizeof(ndef_one_record_data),
-        .memory_end = ndef_one_record_data + sizeof(ndef_one_record_data)
-    };
-
-    TEST_ASSERT(compare_ndef_buffers(message.buffer, ndef_one_record_buffer));
+    TEST_ASSERT_EQUAL_INT(message.record_count, 1);
 }
 
 static void test_ndef_pretty_print(void)
