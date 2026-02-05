@@ -64,6 +64,51 @@ static int _decode_value(unsigned val, uint8_t **pkt_pos_ptr, uint8_t *pkt_end);
 static uint32_t _decode_uint(uint8_t *pkt_pos, unsigned nbytes);
 static size_t _encode_uint(uint32_t *val);
 
+bool coap_is_hdr_in_bounds(const coap_pkt_t *pkt, size_t len)
+{
+    assert(pkt->buf);
+    size_t min_len = sizeof(coap_udp_hdr_t);
+
+    if (len < min_len) {
+        return false;
+    }
+
+    if (IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
+        /* coap_pkt_tkl_ext_len() blows an assertion on invalid TKL value, so
+         * we have to rule that out here already. The magic number 15 is the
+         * only invalid value here, as per
+         * https://datatracker.ietf.org/doc/html/rfc8974#section-2.1.
+         * The magic number has no name in the RFC, so adding a named constant
+         * here would rather obfuscate then help when checking the code against
+         * the spec. */
+        if (coap_get_raw_tkl(pkt) == 15) {
+            return false;
+        }
+
+        min_len += coap_pkt_tkl_ext_len(pkt);
+
+        if (len < min_len) {
+            return false;
+        }
+
+        min_len += coap_get_token_len(pkt);
+    }
+    else {
+        uint8_t tkl = coap_get_token_len(pkt);
+
+        /* we have to either allow extendend token lengths fully
+         * (MODULE_NANOCOAP_TOKEN_EXT is used), or not at all */
+        if (tkl > COAP_TOKEN_LENGTH_MAX) {
+            DEBUG("nanocoap: token length invalid\n");
+            return false;
+        }
+
+        min_len += tkl;
+    }
+
+    return (len >= min_len);
+}
+
 /* http://tools.ietf.org/html/rfc7252#section-3
  *  0                   1                   2                   3
  *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -90,25 +135,16 @@ ssize_t coap_parse_udp(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     memset(pkt->opt_crit, 0, sizeof(pkt->opt_crit));
     pkt->snips = NULL;
 
-    if (len < sizeof(coap_udp_hdr_t)) {
+    if (!coap_is_hdr_in_bounds(pkt, len)) {
         DEBUG("msg too short\n");
         return -EBADMSG;
     }
-    else if ((coap_get_code_raw(pkt) == 0) && (len > sizeof(coap_udp_hdr_t))) {
+
+    if ((coap_get_code_raw(pkt) == 0) && (len > sizeof(coap_udp_hdr_t))) {
         DEBUG("empty msg too long\n");
         return -EBADMSG;
     }
 
-    if (IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        if ((coap_get_udp_hdr(pkt)->ver_t_tkl & 0xf) == 15) {
-            DEBUG("nanocoap: token length is reserved value 15,"
-                  "invalid for extended token length field.\n");
-            return -EBADMSG;
-        }
-    } else if (coap_get_token_len(pkt) > COAP_TOKEN_LENGTH_MAX) {
-        DEBUG("nanocoap: token length invalid\n");
-        return -EBADMSG;
-    }
     /* pkt_pos range is validated after options parsing loop below */
     pkt_pos += coap_get_token_len(pkt);
 

@@ -664,6 +664,31 @@ static inline unsigned coap_get_ver(const coap_pkt_t *pkt)
 }
 
 /**
+ * @brief   Get the value of the TKL field of the CoAP UDP header
+ *
+ * @warning This is not the function you are looking for. Use
+ *          @ref coap_hdr_get_token_len instead.
+ * @internal
+ */
+static inline uint8_t coap_hdr_raw_tkl(const coap_udp_hdr_t *hdr)
+{
+    return hdr->ver_t_tkl & 0x0f;
+}
+
+/**
+ * @brief   Get the value of the TKL field of the CoAP header of the given
+ *          packet
+ *
+ * @warning This is not the function you are looking for. Use
+ *          @ref coap_get_token_len instead.
+ * @internal
+ */
+static inline uint8_t coap_get_raw_tkl(const coap_pkt_t *pkt)
+{
+    return coap_hdr_raw_tkl(coap_get_udp_hdr_const(pkt));
+}
+
+/**
  * @brief   Get the size of the extended Token length field
  *          (RFC 8974)
  *
@@ -681,7 +706,7 @@ static inline uint8_t coap_hdr_tkl_ext_len(const coap_udp_hdr_t *hdr)
         return 0;
     }
 
-    switch (hdr->ver_t_tkl & 0xf) {
+    switch (coap_hdr_raw_tkl(hdr)) {
     case 13:
         return 1;
     case 14:
@@ -708,6 +733,28 @@ static inline uint8_t coap_pkt_tkl_ext_len(const coap_pkt_t *pkt)
 {
     return coap_hdr_tkl_ext_len(coap_get_udp_hdr_const(pkt));
 }
+
+/**
+ * @brief   Validate that the header of @p pkt is no longer than
+ *          @p len bytes.
+ *
+ * This function will read at most @p len bytes of `pkt->buf`. It is intended
+ * to do basic validation of untrusted data. It only checks that the variable
+ * length CoAP header fields (such as the CoAP token and the extended TKL
+ * field) are within bounds, but it does not validate the header contents.
+ * Specifically, CoAP Options may still have Option Headers that refer to
+ * memory past @p len bytes.
+ *
+ * @param[in]   pkt     The CoAP packet to validate. (`pkt->buf` must be valid)
+ * @param[in]   len     Length of `pkt->buf` in bytes
+ *
+ * @retval      true    All header fields up to the CoAP token are within bounds
+ * @retval      false   The packet is not valid
+ *
+ * @warning     This function does not look at CoAP Options. They may still
+ *              be out of bounds.
+ */
+bool coap_is_hdr_in_bounds(const coap_pkt_t *pkt, size_t len);
 
 /**
  * @brief   Get the start of data after the header
@@ -825,7 +872,7 @@ static inline size_t coap_hdr_get_token_len(const coap_udp_hdr_t *hdr)
      */
     switch (coap_hdr_tkl_ext_len(hdr)) {
     case 0:
-        return hdr->ver_t_tkl & 0xf;
+        return coap_hdr_raw_tkl(hdr);
     case 1:
         return buf[sizeof(coap_udp_hdr_t)] + 13;
     case 2:
