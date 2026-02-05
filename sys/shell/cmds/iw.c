@@ -71,7 +71,7 @@ static const char *_ssec(wifi_security_mode_t mode)
         case WIFI_SECURITY_MODE_WEP_PSK:
             return "WEP";
         case WIFI_SECURITY_MODE_WPA2_PERSONAL:
-            return "WPA";
+            return "WPA2";
         case WIFI_SECURITY_MODE_WPA2_ENTERPRISE:
             return "WPA2 Enterprise";
         default:
@@ -81,11 +81,17 @@ static const char *_ssec(wifi_security_mode_t mode)
 
 static void _list_ap(void)
 {
-    puts(" SSID                            | SEC             | RSSI  | CHANNEL");
-    puts("---------------------------------+-----------------+-------+--------");
+    puts(" SSID                            | BSSID             | SEC             | RSSI  | CHANNEL");
+    puts("---------------------------------+-------------------+-----------------+-------+--------");
     for (unsigned i = 0; i < _aps.numof; i++) {
-        printf(" %-31s | %-15s | %-5"PRId16" | %-6d \n",
+        printf(" %-32s | %02x:%02x:%02x:%02x:%02x:%02x | %-15s | %-5"PRId16" | %-6d \n",
                _aps.ap[i].ssid,
+               _aps.ap[i].bssid[0],
+               _aps.ap[i].bssid[1],
+               _aps.ap[i].bssid[2],
+               _aps.ap[i].bssid[3],
+               _aps.ap[i].bssid[4],
+               _aps.ap[i].bssid[5],
                _ssec(_aps.ap[i].sec_mode),
                _aps.ap[i].base.strength,
                _aps.ap[i].base.channel);
