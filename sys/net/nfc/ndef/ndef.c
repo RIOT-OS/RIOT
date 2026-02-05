@@ -373,21 +373,25 @@ int ndef_parse(const ndef_t *ndef, ndef_record_desc_t *record_descriptors,
     assert(ndef != NULL);
     assert(record_descriptors != NULL);
 
-    if (ndef->record_count > record_descriptors_size) {
-        LOG_ERROR("Too many records to parse");
-        return -1;
-    }
-
     if (ndef->record_count == 0) {
         LOG_ERROR("No records to parse");
         return -1;
     }
 
-    for (size_t i = 0; i < ndef->record_count; ++i) {
+    int ret;
+    if (ndef->record_count > record_descriptors_size) {
+        LOG_ERROR("Can only parse %u of %u records", record_descriptors_size, 
+            ndef->record_count);
+        ret = -2;
+    } else {
+        ret = 0;
+    }
+
+    for (size_t i = 0; i < record_descriptors_size; ++i) {
         ndef_record_desc_t *record_desc = &record_descriptors[i];
         ndef_record_parse(ndef->records[i], record_desc);
     }
-    return 0;
+    return ret;
 }
 
 int ndef_from_buffer(ndef_t *ndef, uint8_t *buffer, size_t buffer_size)

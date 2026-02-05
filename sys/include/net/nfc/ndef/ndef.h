@@ -327,6 +327,7 @@ void ndef_clear(ndef_t *ndef);
  *
  * @retval 0    on success
  * @retval -1   if the message can't be parsed
+ * @retval -2   if the message was parsed partially
  */
 int ndef_parse(const ndef_t *ndef, ndef_record_desc_t *record_descriptors,
                size_t record_descriptors_size);
