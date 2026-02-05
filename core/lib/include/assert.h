@@ -115,9 +115,6 @@ __NORETURN void _assert_panic(void);
  */
 __NORETURN void _assert_failure(const char *file, unsigned line);
 
-#ifdef NDEBUG
-#  define assert(ignore)((void)0)
-#elif CONFIG_ASSERT_VERBOSE
 /**
  * @brief    abort the program if assertion is false
  *
@@ -156,6 +153,9 @@ __NORETURN void _assert_failure(const char *file, unsigned line);
  *
  * @see http://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html
  */
+#ifdef NDEBUG
+#  define assert(ignore)((void)0)
+#elif CONFIG_ASSERT_VERBOSE
 #  define assert(cond) (_likely(cond) ? (void)0 :  _assert_failure(__FILE__, __LINE__))
 #else /* CONFIG_ASSERT_VERBOSE */
 #  define assert(cond) (_likely(cond) ? (void)0 : _assert_panic())
