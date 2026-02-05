@@ -111,6 +111,9 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   ifneq (,$(filter sntp,$(USEMODULE)))
     USEMODULE += shell_cmd_sntp
   endif
+  ifneq (,$(filter sock_udp,$(USEMODULE)))
+    USEMODULE += shell_cmd_udp
+  endif
   ifneq (,$(filter periph_pm,$(USEMODULE)))
     USEMODULE += shell_cmd_pm
   endif
@@ -286,6 +289,16 @@ ifneq (,$(filter shell_cmd_sntp,$(USEMODULE)))
 endif
 ifneq (,$(filter shell_cmd_suit,$(USEMODULE)))
   USEMODULE += suit_transport_worker
+endif
+ifneq (,$(filter shell_cmd_udp_server,$(USEMODULE)))
+  USEMODULE += od
+  USEMODULE += shell_cmd_udp
+  USEMODULE += sock_async_event
+endif
+ifneq (,$(filter shell_cmd_udp,$(USEMODULE)))
+  USEMODULE += fmt
+  USEMODULE += sock_udp
+  USEMODULE += sock_util
 endif
 ifneq (,$(filter shell_cmd_udptty,$(USEMODULE)))
   USEMODULE += sock_async
