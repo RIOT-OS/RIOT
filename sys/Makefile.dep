@@ -576,6 +576,15 @@ ifneq (,$(filter nanocoap_%,$(USEMODULE)))
   USEMODULE += nanocoap
 endif
 
+# bare nanocoap is supposed to be concerned only with parsing and building of
+# CoAP message and should not care about any networking, but it sadly contains
+# code such as coap_handle_request() that very much is intermixed with
+# networking. Until that get's cleaned up, we have to model the dependency
+# that is there in the code.
+ifneq (,$(filter nanocoap,$(USEMODULE)))
+  USEMODULE += sock_udp
+endif
+
 # include unicoap dependencies
 ifneq (,$(filter unicoap%,$(USEMODULE)))
   include $(RIOTBASE)/sys/net/application_layer/unicoap/Makefile.dep
