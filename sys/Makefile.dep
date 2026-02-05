@@ -717,8 +717,8 @@ ifneq (,$(filter wifi_scan_list,$(USEMODULE)))
   USEMODULE += l2scan_list
 endif
 
-ifneq (,$(filter nfc_ndef,$(USEMODULE)))
-  include $(RIOTBASE)/sys/net/nfc/ndef/Makefile.dep
+ifneq (,$(filter nfc_%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/net/nfc/Makefile.dep
 endif
 
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
