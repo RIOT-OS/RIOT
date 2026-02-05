@@ -37,7 +37,7 @@ extern "C" {
 #  endif
 #endif
 
-#ifdef DOXYGEN
+#ifndef CONFIG_ASSERT_VERBOSE
 /**
  * @brief   Activate verbose output for @ref assert() when defined.
  *
@@ -56,7 +56,9 @@ extern "C" {
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 #  define CONFIG_ASSERT_VERBOSE 0
+#endif
 
+#ifndef DEBUG_ASSERT_BREAKPOINT
 /**
  * @brief   Activate breakpoints for @ref assert() when defined
  *
@@ -70,8 +72,19 @@ extern "C" {
  * execution is stopped directly in the debugger. Otherwise the execution stops
  * in an endless while loop.
  */
-#  define CONFIG_ASSERT_BREAKPOINT 1
-#else
+#  define DEBUG_ASSERT_BREAKPOINT 0
+#endif
+
+#ifndef CONFIG_ASSERT_NO_PANIC
+/**
+ * @brief   Don't panic on a failed assertion, just halt the running thread.
+ *
+ * If the assertion failed in an interrupt, the system will still panic.
+ */
+#  define CONFIG_ASSERT_NO_PANIC 0
+#endif
+
+#ifndef DOXYGEN
 /* we should not include custom headers in standard headers */
 #  define _likely(x)      __builtin_expect((uintptr_t)(x), 1)
 #endif
@@ -176,15 +189,6 @@ __NORETURN void _assert_failure(const char *file, unsigned line);
 #    define static_assert(cond, ...) \
         { enum { static_assert_failed_on_div_by_0 = 1 / (!!(cond)) }; }
 #  endif
-#endif
-
-/**
- * @brief   Don't panic on a failed assertion, just halt the running thread.
- *
- * If the assertion failed in an interrupt, the system will still panic.
- */
-#ifndef CONFIG_ASSERT_NO_PANIC
-#  define CONFIG_ASSERT_NO_PANIC 1
 #endif
 
 #ifdef __cplusplus
