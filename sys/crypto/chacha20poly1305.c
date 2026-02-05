@@ -104,6 +104,27 @@ static void _keystream(chacha20_ctx_t *ctx, uint32_t *key_stream)
     _add_initial(ctx, key_stream);
 }
 
+void _xcrypt(const uint8_t *key,
+             const uint8_t *nonce,
+             uint32_t counter,
+             const uint8_t *input,
+             size_t input_length,
+             uint8_t *output)
+{
+    chacha20_ctx_t ctx;
+    chacha20_setup(&ctx, key, nonce, counter);
+    const size_t num_blocks = input_length >> 6;
+    size_t pos = 0;
+    /* xcrypt full blocks */
+    for (size_t i = 0; i < num_blocks; i++, pos += 64) {
+        chacha20_update(&ctx, &input[pos], &output[pos]);
+    }
+    /* xcrypt remaining bytes */
+    if (input_length - pos) {
+        chacha20_finish(&ctx, &input[pos], input_length - pos, &output[pos]);
+    }
+}
+
 static void _poly1305_padded(poly1305_ctx_t *pctx, const uint8_t *data, size_t len)
 {
     poly1305_update(pctx, data, len);
@@ -137,7 +158,7 @@ void chacha20poly1305_encrypt(uint8_t *cipher, const uint8_t *msg,
                               size_t msglen, const uint8_t *aad, size_t aadlen,
                               const uint8_t *key, const uint8_t *nonce)
 {
-    chacha20_encrypt_decrypt(key, nonce, 1, msg, msglen, cipher);
+    _xcrypt(key, nonce, 1, msg, msglen, cipher);
     /* Generate tag */
     _poly1305_gentag(&cipher[msglen], key, nonce,
                      cipher, msglen, aad, aadlen);
@@ -156,29 +177,8 @@ int chacha20poly1305_decrypt(const uint8_t *cipher, size_t cipherlen,
     if (crypto_equals(cipher + *msglen, mac, CHACHA20POLY1305_TAG_BYTES) == 0) {
         return 0;
     }
-    chacha20_encrypt_decrypt(key, nonce, 1, cipher, cipherlen, msg);
+    _xcrypt(key, nonce, 1, cipher, cipherlen, msg);
     return 1;
-}
-
-void chacha20_encrypt_decrypt(const uint8_t *key,
-                              const uint8_t *nonce,
-                              uint32_t counter,
-                              const uint8_t *input,
-                              size_t input_length,
-                              uint8_t *output)
-{
-    chacha20_ctx_t ctx;
-    chacha20_setup(&ctx, key, nonce, counter);
-    const size_t num_blocks = input_length >> 6;
-    size_t pos = 0;
-    /* xcrypt full blocks */
-    for (size_t i = 0; i < num_blocks; i++, pos += 64) {
-        chacha20_update(&ctx, &input[pos], &output[pos]);
-    }
-    /* xcrypt remaining bytes */
-    if (input_length - pos) {
-        chacha20_finish(&ctx, &input[pos], input_length - pos, &output[pos]);
-    }
 }
 
 void chacha20_setup(chacha20_ctx_t *ctx,
@@ -213,4 +213,13 @@ void chacha20_finish(chacha20_ctx_t *ctx,
         output[j] = input[j] ^ ((uint8_t *)key_stream)[j];
     }
     crypto_secure_wipe(ctx, sizeof(*ctx));
+}
+
+void chacha20_encrypt_decrypt(const uint8_t *input,
+                              uint8_t *output,
+                              const uint8_t *key,
+                              const uint8_t *nonce,
+                              size_t inputlen)
+{
+    _xcrypt(key, nonce, 0, input, inputlen, output);
 }

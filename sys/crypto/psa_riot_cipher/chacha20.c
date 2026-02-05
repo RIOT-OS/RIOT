@@ -176,7 +176,7 @@ psa_status_t psa_cipher_chacha20_encrypt(uint8_t *key_buffer,
         return status;
     }
 
-    chacha20_encrypt_decrypt(key_buffer, nonce, 0, input, input_length, data_out);
+    chacha20_encrypt_decrypt(input, data_out, key_buffer, nonce, input_length);
 
     *output_length = input_length + CHACHA20POLY1305_NONCE_BYTES;
 
@@ -205,8 +205,7 @@ psa_status_t psa_cipher_chacha20_decrypt(uint8_t *key_buffer,
     const uint8_t *nonce = &input[0];
     const uint8_t *data_in = &input[CHACHA20POLY1305_NONCE_BYTES];
 
-    chacha20_encrypt_decrypt(key_buffer, nonce, 0, data_in,
-                             input_length - CHACHA20POLY1305_NONCE_BYTES, output);
+    chacha20_encrypt_decrypt(data_in, output, key_buffer, nonce, input_length - CHACHA20POLY1305_NONCE_BYTES);
     *output_length = input_length;
     return PSA_SUCCESS;
 }

@@ -124,12 +124,11 @@ int chacha20poly1305_decrypt(const uint8_t *cipher, size_t cipherlen,
  * @param[in]   input_length    Length of the input byte array.
  * @param[out]  output          The resulting encrypted cipher/decrypted message.
 */
-void chacha20_encrypt_decrypt(const uint8_t *key,
+void chacha20_encrypt_decrypt(const uint8_t *input,
+                              uint8_t *output,
+                              const uint8_t *key,
                               const uint8_t *nonce,
-                              uint32_t counter,
-                              const uint8_t *input,
-                              size_t input_length,
-                              uint8_t *output);
+                              size_t inputlen);
 /**
  * @brief Setup a ChaCha20 encrypt or decrypt multipart operation.
  *
