@@ -117,7 +117,7 @@ uint8_t si70xx_get_revision(const si70xx_t *dev)
     return in;
 }
 
-static int _test_device(const si70xx_t *dev)
+static int _identify_device(const si70xx_t *dev)
 {
     uint8_t revision = si70xx_get_revision(dev);
 
@@ -132,10 +132,30 @@ static int _test_device(const si70xx_t *dev)
     if (!valid_id) {
         DEBUG("[ERROR] Not a valid Si7006/13/20/21/5x device: %u\n",
               (unsigned)id);
-        return -SI70XX_ERR_NODEV;;
+        return -SI70XX_ERR_NODEV;
     }
 
     return SI70XX_OK;
+}
+
+static int _test_device(const si70xx_t *dev)
+{
+    unsigned int retries = 3;
+    int res;
+
+    while (retries--) {
+        res = _identify_device(dev);
+
+        if (res == SI70XX_OK) {
+            return SI70XX_OK;
+        }
+
+        /* sensor is ready after at most 25 ms after power up, but only wait
+         * after a failed attempt */
+        ztimer_sleep(ZTIMER_MSEC, 25);
+    }
+
+    return res;
 }
 
 int si70xx_init(si70xx_t *dev, const si70xx_params_t *params)
@@ -146,6 +166,7 @@ int si70xx_init(si70xx_t *dev, const si70xx_params_t *params)
     /* setup the i2c bus */
     i2c_acquire(SI70XX_I2C);
 
+    /* detect the peripheral */
     if (_test_device(dev) != SI70XX_OK) {
         DEBUG("[ERROR] No valid device found.\n");
         i2c_release(SI70XX_I2C);
@@ -161,8 +182,8 @@ int si70xx_init(si70xx_t *dev, const si70xx_params_t *params)
 
     i2c_release(SI70XX_I2C);
 
-    /* sensor is ready after at most 25 ms */
-    ztimer_sleep(ZTIMER_MSEC, 25);
+    /* sensor is ready after at most 15 ms after a reset command */
+    ztimer_sleep(ZTIMER_MSEC, 15);
 
     DEBUG("[DEBUG] Device initialized with success.\n");
     return SI70XX_OK;
