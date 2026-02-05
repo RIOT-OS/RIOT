@@ -24,7 +24,7 @@
 #endif
 
 /* Using `#warning` would cause builds with WERROR=1 to fail. A deprecation
- * notice also is not as urgent as warning. So we go for #paramg message here
+ * notice also is not as urgent as warning. So we go for #pragma message here
  * instead.
  */
 #ifdef DEBUG_ASSERT_VERBOSE
