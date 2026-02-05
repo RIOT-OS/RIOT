@@ -37,7 +37,6 @@ USEMODULE += gnrc_rpl
 USEMODULE += auto_init_gnrc_rpl
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
-USEMODULE += shell_cmd_gnrc_udp
 # Add also the shell, some shell commands
 USEMODULE += shell
 USEMODULE += shell_cmds_default
