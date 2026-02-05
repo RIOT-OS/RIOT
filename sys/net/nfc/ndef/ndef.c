@@ -380,7 +380,7 @@ int ndef_parse(const ndef_t *ndef, ndef_record_desc_t *record_descriptors,
 
     int ret;
     if (ndef->record_count > record_descriptors_size) {
-        LOG_ERROR("Can only parse %u of %u records", record_descriptors_size, 
+        LOG_ERROR("Can only parse %zu of %u records", record_descriptors_size, 
             ndef->record_count);
         ret = -2;
     } else {
