@@ -28,6 +28,7 @@ USEMODULE += sock_udp
 USEMODULE += sock_util
 USEMODULE += shell
 USEMODULE += shell_cmds_default
+USEMODULE += shell_cmd_udp_server
 USEMODULE += ps
 USEMODULE += od
 USEMODULE += netdev_default
