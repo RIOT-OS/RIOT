@@ -50,6 +50,18 @@
  *
  * The NDEF message can then be passed to other NFC functions.
  *
+ * Parsing an NDEF Message
+ * =======================
+ *
+ * To convert a buffer of bytes into an NDEF message @ref ndef_from_buffer has to be called.
+ * In the following code example the buffer has a size of 1024 bytes and is filled with a valid byte
+ * representation of an NDEF message.
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * ndef_t message;
+ *
+ * ndef_from_buffer(message, buffer, 1024);
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
  * @{
  *
  * @file
