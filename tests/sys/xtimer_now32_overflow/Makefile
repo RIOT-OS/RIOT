@@ -12,6 +12,7 @@ BOARDS_UNSUPPORTED += \
                    esp32s2-wemos-mini \
                    hamilton \
                    mulle \
+                   msbiot \
                    pinetime \
                    ruuvitag \
                    seeedstudio-gd32 \
