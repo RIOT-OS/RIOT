@@ -17,6 +17,10 @@
  * @brief        This module defines a common layer for handling the lower
  * part of the IEEE 802.15.4 MAC layer.
  *
+ * @todo         Provide a user-defined callback scheme in order to implement
+ * the ieee802154_dev_t:cb function here, rather than adding it redundantly
+ * to each upper-layer implementation.
+ *
  * This layer is responsible for:
  * - Handling CSMA-CA and retransmissions.
  * - Maintaining part of the MAC Information Base, e.g IEEE 802.15.4 addresses,

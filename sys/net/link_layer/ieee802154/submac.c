@@ -89,18 +89,20 @@ static ieee802154_fsm_state_t _tx_end(ieee802154_submac_t *submac, int status,
 {
     int res;
 
+    ieee802154_dev_t *dev = &submac->dev;
+
     submac->wait_for_ack = false;
 
-    res = ieee802154_radio_set_idle(&submac->dev, true);
+    res = ieee802154_radio_set_idle(dev, true);
 
     assert(res >= 0);
-    /* no need to inform upper layer about ACK transmission */
-    if (submac->fsm_state != IEEE802154_FSM_STATE_TX_ACK) {
-        submac->cb->tx_done(submac, status, info);
-    }
-    else {
+    /* notify upper layer after ACK transmission about reception */
+    if (!_does_send_ack(dev) && submac->fsm_state == IEEE802154_FSM_STATE_TX_ACK) {
         DEBUG("IEEE802154 submac: ACK transmission done\n");
         submac->cb->rx_done(submac);
+    }
+    else {
+        submac->cb->tx_done(submac, status, info);
     }
     return IEEE802154_FSM_STATE_IDLE;
 }
@@ -160,6 +162,12 @@ static ieee802154_fsm_state_t _fsm_state_tx(ieee802154_submac_t *submac,
 
 static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac, uint8_t seq_num)
 {
+    ieee802154_dev_t *dev = &submac->dev;
+
+    /* radio sends ack automatically */
+    if (_does_send_ack(dev)) {
+        return 0;
+    }
     uint8_t ack[]
          = { IEEE802154_FCF_TYPE_ACK, 0x00,  seq_num };
     iolist_t iolist = {
@@ -172,8 +180,6 @@ static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac, uint8_t seq_num)
     submac->retrans = 0;
     submac->csma_retries_nb = 0;
     submac->backoff_mask = (1 << submac->be.min) - 1;
-
-    ieee802154_dev_t *dev = &submac->dev;
 
     DEBUG("IEEE802154 submac: Sending ACK\n");
 
@@ -308,6 +314,7 @@ static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
 
     switch (ev) {
     case IEEE802154_FSM_EV_BH:
+        tx_state = IEEE802154_FSM_STATE_TX;
         if (ftype == IEEE802154_FCF_TYPE_DATA
             && !_does_handle_csma(dev)) {
             /* delay for an adequate random backoff period */
@@ -320,9 +327,8 @@ static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
             if (curr_be < submac->be.max) {
                 submac->backoff_mask = (submac->backoff_mask << 1) | 1;
             }
-            tx_state = IEEE802154_FSM_STATE_TX;
         }
-        else if (ftype == IEEE802154_FCF_TYPE_ACK) {
+        else if (!_does_send_ack(dev) && ftype == IEEE802154_FCF_TYPE_ACK) {
             /* no backoff for ACK frames but wait for SIFSPeriod */
             ztimer_sleep(ZTIMER_USEC, SIFS_PERIOD_US);
             tx_state = IEEE802154_FSM_STATE_TX_ACK;
