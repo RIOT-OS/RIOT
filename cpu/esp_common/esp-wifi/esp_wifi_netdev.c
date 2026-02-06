@@ -785,11 +785,12 @@ static int _esp_wifi_set(netdev_t *netdev, netopt_t opt, const void *val, size_t
     switch (opt) {
         case NETOPT_ADDRESS:
             assert(max_len == ETHERNET_ADDR_LEN);
-#ifdef MODULE_ESP_WIFI_AP
-            esp_wifi_set_mac(WIFI_IF_AP, (uint8_t *)val);
-#else /* MODULE_ESP_WIFI_AP */
-            esp_wifi_set_mac(WIFI_IF_STA, (uint8_t *)val);
-#endif /* MODULE_ESP_WIFI_AP */
+            if (IS_USED(MODULE_ESP_WIFI_AP)) {
+                esp_wifi_set_mac(WIFI_IF_AP, (uint8_t *)val);
+            }
+            else {
+                esp_wifi_set_mac(WIFI_IF_STA, (uint8_t *)val);
+            }
             return ETHERNET_ADDR_LEN;
         default:
             return netdev_eth_set(netdev, opt, val, max_len);
