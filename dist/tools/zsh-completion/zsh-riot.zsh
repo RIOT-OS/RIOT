@@ -91,6 +91,22 @@ function _docker_image {
     _describe 'docker_image' _docker_image_vals
 }
 
+function _riot_terminals {
+    local -a _riot_terminal_vals=(
+        "pyterm:RIOT's custom terminal with command line editing and history emulation"
+        "jlink:Connect to a virtual stdio provided by stdio_rtt using JLink"
+        "openocd-rtt:Connect to a virtual stdio provided by stdio_rtt using OpenOCD"
+        "semihosting:Connect to a virtual stdio provided by stdio_semihosting using GDB + OpenOCD/JLink/..."
+        "bootterm:Use the host system's bootterm to connect to the serial console"
+        "miniterm:Use the host system's miniterm to connect to the serial console"
+        "picocom:Use the host system's picocom to connect to the serial console"
+        "socat:Use the host system's socat to provide a rather raw terminal (suitable for testing/scripting)"
+        "native:Only for native32/native64 boards: Run the app natively, without a terminal in front"
+    )
+
+    _describe 'terminal' _riot_terminal_vals
+}
+
 function _riot {
     local -a _std_targets=(
         "all:build the application"
@@ -147,6 +163,7 @@ function _riot {
         'OPENOCD_FTDI_ADAPTER[Select the FTDI adapter config to use with OpenOCD]:ftdi_adapter:_ftdi_adapter'
         'OPENOCD_RESET_USE_CONNECT_ASSERT_SRST[Let OpenOCD attach while reset signal is asserted]:bool:_bools'
         'STATIC_ANALYSIS[Enable static analysis for modules that claim support]:bool:_bools'
+        'RIOT_TERMINAL[Select the terminal program to use]:terminal:_riot_terminals'
     )
 
     _values -w 'variables' $vars
