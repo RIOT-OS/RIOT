@@ -34,6 +34,12 @@ function _bools {
     _describe 'bool' _bool_vals
 }
 
+function _ports {
+    local -a _ports_vals=($(ls /dev/tty*))
+
+    _describe 'port' _ports_vals
+}
+
 function _programmers {
     local -a _programmer_vals=(
         "openocd:use OpenOCD for programming via JTAG/SWD (default for most boards)"
@@ -158,6 +164,7 @@ function _riot {
         'QUIET[Reduce verbosity of build output]:bool:_bools'
         'WERROR[Enable/disable -Werror flag]:bool:_bools'
         'RIOT_CI_BUILD[Behave as in the CI: Less verbose output, reproducible builds, ...]:bool:_bools'
+        'PORT[Serial port connected to the board]:port:_ports'
         'PROGRAMMER[Select the programmer software to flash (debug) with]:programmer:_programmers'
         'OPENOCD_DEBUG_ADAPTER[Select the programmer hardware to use with OpenOCD]:hw_programmer:_hw_programmers'
         'OPENOCD_FTDI_ADAPTER[Select the FTDI adapter config to use with OpenOCD]:ftdi_adapter:_ftdi_adapter'
