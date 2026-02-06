@@ -277,7 +277,10 @@ static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, const void *data, size
         }
     }
     _set_pktsnip(pkt, next, _data, size, type);
-    if (data != NULL) {
+    /* If size == 0, _data is NULL. The call `memcpy(NULL, non-NULL, 0)` looks
+     * harmless (as copying no data to NULL should be fine), but is in fact
+     * undefined behavior. We test here explicitly to ensure correctness. */
+    if ((data != NULL) && (_data != NULL)) {
         memcpy(_data, data, size);
     }
     return pkt;
