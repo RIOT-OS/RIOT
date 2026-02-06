@@ -537,7 +537,15 @@ static void test_pktbuf_realloc_data__shrink(void)
     TEST_ASSERT_NOT_NULL(gnrc_pktbuf_add(NULL, NULL, 4, GNRC_NETTYPE_TEST));
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_pktbuf_realloc_data(pkt, 8));
-    TEST_ASSERT(exp_data == pkt->data);
+    /* gnrc_pktbuf_malloc uses `realloc()` to reallocate the data, which is not
+     * guaranteed to keep the buffer in place. And with ASAN enabled, the
+     * memory is always moved, even when `realloc()` is shrinking it.
+     *
+     * If gnrc_pktbuf_static is used, though, we can rely on the data being
+     * kept in place on shrinking. */
+    if (IS_USED(MODULE_GNRC_PKTBUF_STATIC)) {
+        TEST_ASSERT(exp_data == pkt->data);
+    }
     TEST_ASSERT_NULL(pkt->next);
     TEST_ASSERT_EQUAL_INT(8, pkt->size);
     TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_TEST, pkt->type);
