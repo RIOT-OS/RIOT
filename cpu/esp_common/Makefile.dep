@@ -43,6 +43,11 @@ ifneq (,$(filter esp_wifi_enterprise,$(USEMODULE)))
   USEMODULE += esp_wifi
 endif
 
+ifneq (,$(filter esp_wifi_dynamic_scan,$(USEMODULE)))
+  USEMODULE += esp_wifi
+  USEMODULE += wifi_scan_list
+endif
+
 ifneq (,$(filter netdev_default,$(USEMODULE)))
   ifeq (esp32h2,$(CPU_FAM))
     USEMODULE += esp_ieee802154
