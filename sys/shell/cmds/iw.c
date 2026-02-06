@@ -81,8 +81,8 @@ static const char *_ssec(wifi_security_mode_t mode)
 
 static void _list_ap(void)
 {
-    puts(" SSID                            | BSSID             | SEC             | RSSI  | CHANNEL");
-    puts("---------------------------------+-------------------+-----------------+-------+--------");
+    puts(" SSID                             | BSSID             | SEC             | RSSI  | CHANNEL");
+    puts("----------------------------------+-------------------+-----------------+-------+--------");
     for (unsigned i = 0; i < _aps.numof; i++) {
         printf(" %-32s | %02x:%02x:%02x:%02x:%02x:%02x | %-15s | %-5"PRId16" | %-6d \n",
                _aps.ap[i].ssid,
