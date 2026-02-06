@@ -304,6 +304,15 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             res = sizeof(netopt_enable_t);
             break;
 #endif  /* MODULE_GNRC_SIXLOWPAN_IPHC */
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)
+        case NETOPT_6LO_ABR:
+            assert(opt->data_len == sizeof(netopt_enable_t));
+            *((netopt_enable_t *)opt->data) = (netif->flags & GNRC_NETIF_FLAGS_6LO_ABR)
+                                            ? NETOPT_ENABLE
+                                            : NETOPT_DISABLE;
+            res = sizeof(netopt_enable_t);
+            break;
+#endif
         default:
             break;
     }
@@ -409,6 +418,27 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
             res = sizeof(netopt_enable_t);
             break;
 #endif  /* MODULE_GNRC_SIXLOWPAN_IPHC */
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)
+        case NETOPT_6LO_ABR:
+            assert(opt->data_len == sizeof(netopt_enable_t));
+            if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
+                if (!(netif->flags & GNRC_NETIF_FLAGS_6LO_ABR)) {
+                    /* we were no ABR before,
+                     * as ABR we must not search for routers */
+                    gnrc_ipv6_nib_stop_search_rtr(netif);
+                }
+                netif->flags |= GNRC_NETIF_FLAGS_6LO_ABR;
+            }
+            else {
+                if (netif->flags & GNRC_NETIF_FLAGS_6LO_ABR) {
+                    /* we were a ABR before, better search for (upstream) routers */
+                    gnrc_ipv6_nib_start_search_rtr(netif);
+                }
+                netif->flags &= ~GNRC_NETIF_FLAGS_6LO_ABR;
+            }
+            res = sizeof(netopt_enable_t);
+            break;
+#endif
         case NETOPT_RAWMODE:
             if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
                 netif->flags |= GNRC_NETIF_FLAGS_RAWMODE;

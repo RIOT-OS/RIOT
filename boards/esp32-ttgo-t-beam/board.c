@@ -25,7 +25,7 @@
 
 #define AXP192_I2C_ADDR         (0x34)
 #define AXP192_LDO234_DC23_CTL  (0x12)
-#define AXP192_LDO3OUT_VOL      (0x29)
+#define AXP192_LDO3OUT_VOL      (0x28)
 #define AXP192_LDO3_ON_BIT      (1 << 3)
 
 void board_init(void)

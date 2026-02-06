@@ -441,6 +441,36 @@ ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
   USEMODULE += od
 endif
 
+ifneq (,$(filter gnrc_pktshark_%,$(USEMODULE)))
+  USEMODULE += gnrc_pktshark
+endif
+
+ifneq (,$(filter gnrc_pktshark_default,$(USEMODULE)))
+  USEMODULE += gnrc_pktshark_coap
+  USEMODULE += gnrc_pktshark_icmpv6
+  USEMODULE += gnrc_pktshark_4in6
+endif
+
+ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
+  USEMODULE += shell_cmd_gnrc_pktshark
+endif
+
+ifneq (,$(filter auto_init_gnrc_pktshark,$(USEMODULE)))
+  USEMODULE += gnrc_pktshark
+endif
+
+ifneq (,$(filter gnrc_pktshark,$(USEMODULE)))
+  USEMODULE += ipv4_addr
+  USEMODULE += fmt
+  USEMODULE += gnrc_pktbuf
+  USEMODULE += od
+endif
+
+ifneq (,$(filter gnrc_pktshark_coap,$(USEMODULE)))
+  USEMODULE += nanocoap
+  USEMODULE += sock_udp
+endif
+
 ifneq (,$(filter gnrc,$(USEMODULE)))
   USEMODULE += gnrc_netapi
   USEMODULE += gnrc_netreg

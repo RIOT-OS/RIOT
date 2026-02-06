@@ -108,8 +108,9 @@ int main(void)
             case ABP2_SAUL:
                 while (saulDev) {
                     int dim = saul_reg_read(saulDev, &saulData);
-                    printf("\nDev: %s\tType: %s" "\n", saulDev->name,
-                            saul_class_to_str(saulDev->driver->type));
+                    printf("\nDev: %s\tType: ", saulDev->name);
+                    saul_class_print(saulDev->driver->type);
+                    puts("");
                     phydat_dump(&saulData, dim);
                     saulDev = saulDev->next;
                 }

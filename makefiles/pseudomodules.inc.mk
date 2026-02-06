@@ -91,22 +91,23 @@ PSEUDOMODULES += gcoap_dns
 ## Enable the @ref gcoap_dns_server_proxy_set function
 PSEUDOMODULES += gcoap_dns_proxied
 ## @}
+
 PSEUDOMODULES += fido2_tests
 ## @addtogroup net_dhcpv6_client
 ## @{
+
 ## @defgroup net_gnrc_dhcpv6_client	gnrc_dhcpv6_client: Basic DHCPv6 client implementation in GNRC
-## @{
 PSEUDOMODULES += gnrc_dhcpv6_client
-## @}
+
 ## @defgroup net_gnrc_dhcpv6_client_6lbr gnrc_dhcpv6_client_6lbr: Basic client for GNRC 6LoWPAN BRs
-## @{
 PSEUDOMODULES += gnrc_dhcpv6_client_6lbr
 ## @}
+
 ## @addtogroup net_dhcpv6_client_simple_pd
 ## @{
 PSEUDOMODULES += gnrc_dhcpv6_client_simple_pd
 ## @}
-## @}
+
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_auto_init
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_eui
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_simple
@@ -119,6 +120,7 @@ PSEUDOMODULES += gnrc_ipv6_nib_6lbr
 PSEUDOMODULES += gnrc_ipv6_nib_6ln
 PSEUDOMODULES += gnrc_ipv6_nib_6lr
 PSEUDOMODULES += gnrc_ipv6_nib_dns
+PSEUDOMODULES += gnrc_ipv6_nib_dyn_lladdr
 PSEUDOMODULES += gnrc_ipv6_nib_rio
 PSEUDOMODULES += gnrc_ipv6_nib_router
 PSEUDOMODULES += gnrc_ipv6_nib_rtr_adv_pio_cb
@@ -161,16 +163,6 @@ PSEUDOMODULES += gnrc_nettype_ipv6
 PSEUDOMODULES += gnrc_nettype_ipv6_ext
 ## @}
 
-## @defgroup 	net_gnrc_nettype_lorawan    gnrc_nettype_lorawan
-## Enables @ref GNRC_NETTYPE_LORAWAN
-##
-## @deprecated  LoRaWAN payloads do not have a special type anymore and just use
-##              @ref GNRC_NETTYPE_UNDEF. There is no module needed for that.
-##              This module will be removed after 2024.10 release.
-## @{
-PSEUDOMODULES += gnrc_nettype_lorawan
-## @}
-
 ## @defgroup 	net_gnrc_nettype_ndn        gnrc_nettype_ndn
 ## Enables @ref GNRC_NETTYPE_NDN
 ## @{
@@ -196,6 +188,17 @@ PSEUDOMODULES += gnrc_nettype_udp
 ## @}
 ## @}
 
+## @addtogroup	net_gnrc_pktshark
+## @{
+## @brief	Enable parsing of IPv6 encapsulated IPv4 packets
+PSEUDOMODULES += gnrc_pktshark_4in6
+## @brief	Enable parsing of CoAP messages
+PSEUDOMODULES += gnrc_pktshark_coap
+## @brief	Enable parsing of default protocols
+PSEUDOMODULES += gnrc_pktshark_default
+## @brief	Enable parsing of ICMPv6 messages
+PSEUDOMODULES += gnrc_pktshark_icmpv6
+## @}
 
 PSEUDOMODULES += gnrc_sixloenc
 PSEUDOMODULES += gnrc_sixlowpan_border_router_default
@@ -411,6 +414,7 @@ PSEUDOMODULES += shell_cmd_gnrc_netif
 PSEUDOMODULES += shell_cmd_gnrc_netif_lora
 PSEUDOMODULES += shell_cmd_gnrc_netif_lorawan
 PSEUDOMODULES += shell_cmd_gnrc_pktbuf
+PSEUDOMODULES += shell_cmd_gnrc_pktshark
 PSEUDOMODULES += shell_cmd_gnrc_rpl
 PSEUDOMODULES += shell_cmd_gnrc_sixlowpan_ctx
 PSEUDOMODULES += shell_cmd_gnrc_sixlowpan_frag_stats

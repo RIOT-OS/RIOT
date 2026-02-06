@@ -5,7 +5,7 @@ ifeq (,$(filter native native32 native64,$(BOARD)))
   else ifeq (ethos,$(UPLINK))
     USEMODULE += stdio_ethos
   else ifeq (wifi,$(UPLINK))
-    ifneq (,$(filter esp32 esp8266,$(CPU)))
+    ifneq (,$(filter esp32 esp32s* esp32c* esp8266,$(CPU)))
       USEMODULE += esp_wifi
       ifneq (ble, $(DOWNLINK))
         USEMODULE += esp_now

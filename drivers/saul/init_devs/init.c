@@ -119,6 +119,10 @@ void saul_init_devs(void)
         extern void auto_init_gp2y10xx(void);
         auto_init_gp2y10xx();
     }
+    if (IS_USED(MODULE_GP8XXX)) {
+        extern void auto_init_gp8xxx(void);
+        auto_init_gp8xxx();
+    }
     if (IS_USED(MODULE_GROVE_LEDBAR)) {
         extern void auto_init_grove_ledbar(void);
         auto_init_grove_ledbar();
