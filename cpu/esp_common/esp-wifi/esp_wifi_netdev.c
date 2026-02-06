@@ -595,6 +595,41 @@ static void IRAM_ATTR _esp_wifi_scan_done_cb(void)
 #endif
 }
 
+#ifdef MODULE_ESP_WIFI_DYNAMIC_CONNECT
+static wifi_on_disconnect_result_t _disc_done_cb = NULL;
+#endif
+
+static int _esp_wifi_disc(const wifi_disconnect_request_t *req)
+{
+    (void)req;
+#if IS_USED(MODULE_ESP_WIFI_DYNAMIC_CONNECT)
+    _disc_done_cb = (wifi_on_disconnect_result_t)req->base.disconn_cb;
+
+    /* start disconnect */
+    esp_wifi_disconnect();
+#endif
+    return 0;
+}
+
+static void IRAM_ATTR _esp_wifi_disc_done_cb(uint8_t ch, const uint8_t *ssid, uint8_t ssid_len)
+{
+#if IS_USED(MODULE_ESP_WIFI_DYNAMIC_CONNECT)
+    static char _ssid[WIFI_SSID_LEN_MAX + 1];
+
+    assert(ssid_len < ARRAY_SIZE(_ssid));
+    strncpy(_ssid, (const char *)ssid, ssid_len);
+    _ssid[ssid_len] = 0;
+
+    if (_disc_done_cb) {
+        void *netif = netif_get_by_id(thread_getpid());
+        wifi_disconnect_result_t res = WIFI_DISCONNECT_RESULT_INITIALIZER(ch, _ssid);
+
+        _disc_done_cb(netif, &res);
+        _disc_done_cb = NULL;
+    }
+#endif
+}
+
 /* indicator whether the WiFi interface is started */
 static unsigned _esp_wifi_started = 0;
 
@@ -714,7 +749,11 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
                                       "return value %d", result);
                 }
             }
-
+            else if (IS_USED(MODULE_ESP_WIFI_DYNAMIC_CONNECT)) {
+                _esp_wifi_disc_done_cb(_esp_wifi_channel,
+                                       event->event_info.disconnected.ssid,
+                                       event->event_info.disconnected.ssid_len);
+            }
             break;
 #endif /* MODULE_ESP_WIFI_AP */
 
@@ -923,6 +962,15 @@ static int _esp_wifi_set(netdev_t *netdev, netopt_t opt, const void *val, size_t
                 return ret;
             }
             return sizeof(wifi_scan_request_t);
+        case NETOPT_DISCONNECT:
+            assert(max_len == sizeof(wifi_disconnect_request_t));
+            if (IS_USED(MODULE_ESP_WIFI_AP) || !IS_USED(MODULE_ESP_WIFI_DYNAMIC_CONNECT)) {
+                break;
+            }
+            if ((ret = _esp_wifi_disc((const wifi_disconnect_request_t *)val)) != 0) {
+                return ret;
+            }
+            return sizeof(wifi_disconnect_request_t);
         default:
             return netdev_eth_set(netdev, opt, val, max_len);
     }
