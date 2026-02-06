@@ -207,6 +207,6 @@ static int _udp_cmd(int argc, char **argv)
     }
 }
 
-SHELL_COMMAND(udp, "send data over UDP and listen on UDP ports", _udp_cmd);
+SHELL_COMMAND(udp_posix, "send data over UDP and listen on UDP ports", _udp_cmd);
 
 /** @} */
