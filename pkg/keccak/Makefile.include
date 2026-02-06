@@ -1,0 +1,5 @@
+INCLUDES += -I$(BINDIR)/pkg/keccak/Common
+INCLUDES += -I$(BINDIR)/pkg/keccak/Constructions
+INCLUDES += -I$(BINDIR)/pkg/keccak/Modes
+INCLUDES += -I$(BINDIR)/pkg/keccak/SnP/KeccakP-800/Compact
+INCLUDES += -I$(BINDIR)/pkg/keccak/SnP/KeccakP-1600/Compact64

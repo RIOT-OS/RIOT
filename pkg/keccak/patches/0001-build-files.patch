@@ -1,0 +1,72 @@
+From 684bf5de129c61e5ef68429f19c24071bcba566f Mon Sep 17 00:00:00 2001
+From: Adrian GHC <adrian.ghc@outlook.com>
+Date: Fri, 17 Nov 2017 23:43:29 +0100
+Subject: [PATCH] Necessary changes to the build files
+
+---
+ HighLevel.build                         | 11 +++
+ LowLevel.build                          |  5 ----
+ LowLevel.build                          |  1 ++++
+ Makefile.build                          |  5 +++++
+ 3 files changed, 17 insertions(+), 5 deletions(-)
+
+diff --git a/HighLevel.build b/HighLevel.build
+index f81ec5d..f9b7450 100644
+--- a/HighLevel.build
++++ b/HighLevel.build
+@@ -60,6 +62,17 @@ The fragments below allow to select the desired cryptographic functions (a.k.a.
+     </fragment>
+ 
+     <fragment name="KeccakSponge" inherits="KeccakSpongeWidth200 KeccakSpongeWidth400 KeccakSpongeWidth800 KeccakSpongeWidth1600"/>
++
++	<!-- Custom -->
++	<fragment name="Keccak800" inherits="KeccakSpongeWidth800">
++		<c>Modes/keccak800.c</c>
++		<h>Modes/keccak800.h</h>
++	</fragment>
++
++	<fragment name="Keccak1600" inherits="KeccakSpongeWidth1600">
++		<c>Modes/KeccakHash.c</c>
++		<h>Modes/keccak1600.h</h>
++	</fragment>
+ 
+     <!-- NIST standards -->
+ 
+diff --git a/LowLevel.build b/LowLevel.build
+index 3ea6b72..b26cf4b 100644
+--- a/LowLevel.build
++++ b/LowLevel.build
+@@ -114,15 +114,11 @@ The fragments below allow to select the desired implementation of the permutatio
+ 
+     <!-- *** Low-level services *** -->
+ 
+     <fragment name="optimized">
+-        <h>Common/brg_endian.h</h>
+-        <gcc>-fomit-frame-pointer</gcc>
+         <gcc>-O2</gcc>
++        <gcc>$(CFLAGS)</gcc>
+-        <gcc>-g0</gcc>
+-        <gcc>-march=native</gcc>
+-        <gcc>-mtune=native</gcc>
+     </fragment>
+ 
+     <!-- Keccak-p[200] -->
+ 
+     <fragment name="width200">
+diff --git a/Makefile.build b/Makefile.build
+index fe6b6dc..f65e423 100644
+--- a/Makefile.build
++++ b/Makefile.build
+@@ -166,4 +167,9 @@ http://creativecommons.org/publicdomain/zero/1.0/
+         </product>
+     </group>
+ 
++    <!-- Hashing with Keccak-800 or Keccak-1600 -->
++    <target name="KeccakHashARMv6M.a" inherits="Keccak800 optimized800ARMv6Mu1 Keccak1600 optimized1600ARMv6Mu2"/>
++    <target name="KeccakHashARMv7M.a" inherits="Keccak800 optimized800u2 Keccak1600 inplace1600ARMv7M"/>
++    <target name="KeccakHashNative.a" inherits="Keccak800 optimized800u2 Keccak1600 compact1600"/>
++
+ </build>
+ -- 
+2.14.1.windows.1
+
