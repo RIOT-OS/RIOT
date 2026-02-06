@@ -89,6 +89,9 @@ static ieee802154_fsm_state_t _tx_end(ieee802154_submac_t *submac, int status,
 {
     int res;
 
+    /* This is required to prevent unused variable warnings */
+    (void) res;
+
     ieee802154_dev_t *dev = &submac->dev;
 
     submac->wait_for_ack = false;
