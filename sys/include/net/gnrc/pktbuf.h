@@ -20,6 +20,26 @@
  *          this *will* lead to alignment problems and can potentially result
  *          in segmentation/hard faults and other unexpected behaviour.
  *
+ * # Backends
+ *
+ * There are two backends available: `gnrc_pktbuf_static` and
+ * `gnrc_pktbuf_malloc`. The former is the default and most suitable for
+ * embedded devices, as it works with a static pool of memory. The latter is
+ * mostly useful when debugging allocations with tools like Valgrind on the
+ * `native` board, as it builds upon standard `malloc()`, `realloc()`, and
+ * `free()` that those tools can hook into.
+ *
+ * Since `gnrc_pktbuf_static` is the default, no action is required to use it:
+ * Any code using `gnrc_pktbuf` will automatically pull that in as a dependency.
+ *
+ * To use `gnrc_pktbuf_malloc`, it needs to be selected e.g. by adding
+ * `USEMODULE += gnrc_pktbuf_malloc` to the application's `Makefile`.
+ *
+ * @warning     The `gnrc_pktbuf_malloc` backend has slightly different
+ *              semantics with address sanitation for @ref gnrc_pktbuf_realloc_data
+ *              due to implementation restrictions. This behavior is not well
+ *              tested within production code. Use it with caution!
+ *
  * @{
  *
  * @file
@@ -154,10 +174,17 @@ gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_
  * @pre `(pkt->size > 0) <=> (pkt->data != NULL)`
  * @pre gnrc_pktsnip_t::data of @p pkt is in the packet buffer if it is not NULL.
  *
- * @details If enough memory is available behind it or @p size is smaller than
- *          the original size of the packet then gnrc_pktsnip_t::data of @p pkt will
- *          not be moved. Otherwise, it will be moved. If no space is available
- *          nothing happens.
+ * @warning The memory of `pkt->data` may be moved even when shrinking it.
+ *
+ * @details When `gnrc_pktbuf_malloc` is used, the systems `realloc()` is used
+ *          under the hood to reallocate the data. The standard allows
+ *          `realloc()` to move the data even on shrinking (e.g. to reduce
+ *          fragmentation). With ASAN, `realloc()` will always move the data.
+ *
+ *          When `gnrc_pktbuf_static` is used and enough memory is available
+ *          behind it or @p size is smaller than the original size of the packet
+ *          then gnrc_pktsnip_t::data of @p pkt will not be moved. Otherwise, it
+ *          will be moved. If no space is available nothing happens.
  *
  * @param[in] pkt   A packet part.
  * @param[in] size  The size for @p pkt.
