@@ -71,8 +71,7 @@ void gnrc_sixlowpan_dispatch_recv(gnrc_pktsnip_t *pkt, void *context,
     (void)page;
 #ifndef MODULE_GNRC_IPV6
     type = GNRC_NETTYPE_UNDEF;
-    for (gnrc_pktsnip_t *ptr = pkt; (ptr || (type == GNRC_NETTYPE_UNDEF));
-         ptr = ptr->next) {
+    for (gnrc_pktsnip_t *ptr = pkt; ptr != NULL; ptr = ptr->next) {
         if ((ptr->next) && (ptr->next->type == GNRC_NETTYPE_NETIF)) {
             type = ptr->type;
             break;
