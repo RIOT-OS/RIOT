@@ -115,14 +115,13 @@ int chacha20poly1305_decrypt(const uint8_t *cipher, size_t cipherlen,
 /**
  * @brief Encrypt a plaintext to ciphertext with the ChaCha20 algorithm.
  *
+ * @param[in]   input           Input for the encryption/decryption.
+ * @param[out]  output          The resulting encrypted cipher/decrypted message.
  * @param[in]   key             Key to encrypt/decrypt with, must be
  *                              @ref CHACHA20POLY1305_KEY_BYTES long.
  * @param[in]   nonce           Nonce to use. Must be CHACHA20POLY1305_NONCE_BYTES
  *                              long.
- * @param[in]   counter         Initial counter for the ChaCha20 operation.
- * @param[in]   input           Input for the encryption/decryption.
- * @param[in]   input_length    Length of the input byte array.
- * @param[out]  output          The resulting encrypted cipher/decrypted message.
+ * @param[in]   inputlen        Length of the input byte array.
 */
 void chacha20_encrypt_decrypt(const uint8_t *input,
                               uint8_t *output,

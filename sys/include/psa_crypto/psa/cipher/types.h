@@ -51,6 +51,10 @@ typedef enum {
     PSA_CRYPTO_DRIVER_ENCRYPT
 } psa_encrypt_or_decrypt_t;
 
+/**
+ * @brief   Enum, containing the possible states of a cipher operation as defined
+ *          in the PSA Crypto API specification.
+ */
 typedef enum {
     PSA_CIPHER_OP_STATE_INACTIVE,     /* after init */
     PSA_CIPHER_OP_STATE_ACTIVE,       /* after encrypt/decrypt_setup */
