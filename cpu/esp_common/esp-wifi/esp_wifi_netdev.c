@@ -595,9 +595,124 @@ static void IRAM_ATTR _esp_wifi_scan_done_cb(void)
 #endif
 }
 
-#ifdef MODULE_ESP_WIFI_DYNAMIC_CONNECT
-static wifi_on_disconnect_result_t _disc_done_cb = NULL;
+#ifndef MODULE_ESP_WIFI_AP
+/*
+ * Static configuration for the Station interface
+ */
+static wifi_config_t wifi_config_sta = {
+    .sta = {
+        .ssid = WIFI_SSID,
+#if !defined(MODULE_ESP_WIFI_ENTERPRISE) && defined(WIFI_PASS)
+        .password = WIFI_PASS,
 #endif
+        .channel = 0,
+        .scan_method = WIFI_ALL_CHANNEL_SCAN,
+        .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
+        .threshold.rssi = -127,
+        .threshold.authmode = WIFI_AUTH_OPEN
+    }
+};
+#endif /* MODULE_ESP_WIFI_AP */
+
+#ifdef MODULE_ESP_WIFI_DYNAMIC_CONNECT
+static wifi_on_connect_result_t _conn_done_cb = NULL;
+static wifi_on_disconnect_result_t _disc_done_cb = NULL;
+
+static wifi_connect_request_t _conn_req;
+#endif
+
+static int _esp_wifi_conn(const wifi_connect_request_t *req)
+{
+    (void)req;
+#if IS_USED(MODULE_ESP_WIFI_DYNAMIC_CONNECT)
+#if IS_USED(MODULE_ESP_WIFI_ENTERPRISE)
+    esp_wifi_sta_enterprise_disable();
+#endif
+
+    wifi_config_sta.sta.channel = req->base.channel;
+
+    if (req->cred) {
+        if (*(req->cred) == WIFI_SECURITY_MODE_OPEN) {
+            wifi_config_sta.sta.threshold.authmode = WIFI_AUTH_OPEN;
+        }
+        else if (*(req->cred) == WIFI_SECURITY_MODE_WEP_PSK) {
+            const wifi_security_wep_psk_t *cred = (const wifi_security_wep_psk_t *)req->cred;
+
+            wifi_config_sta.sta.threshold.authmode = WIFI_AUTH_WEP;
+            memcpy(wifi_config_sta.sta.password, cred->psk,
+                   ARRAY_SIZE(wifi_config_sta.sta.password));
+        }
+        else if (*(req->cred) == WIFI_SECURITY_MODE_WPA2_PERSONAL) {
+            const wifi_security_wpa_psk_t *cred = (const wifi_security_wpa_psk_t *)req->cred;
+
+            wifi_config_sta.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
+            strscpy((char *)wifi_config_sta.sta.password, cred->psk,
+                    ARRAY_SIZE(wifi_config_sta.sta.password));
+        }
+#if IS_USED(MODULE_ESP_WIFI_ENTERPRISE)
+       else if (*(req->cred) == WIFI_SECURITY_MODE_WPA2_ENTERPRISE) {
+            const wifi_security_wpa_enterprise_t *cred
+                = (const wifi_security_wpa_enterprise_t *)req->cred;
+
+            wifi_config_sta.sta.threshold.authmode = WIFI_AUTH_WPA2_ENTERPRISE;
+            esp_eap_client_set_username(cred->user, strlen(cred->user));
+            esp_eap_client_set_password(cred->pwd, strlen(cred->pwd));
+            esp_wifi_sta_enterprise_enable();
+        }
+#endif
+        else {
+            return -ENOTSUP;
+        }
+    }
+
+    strscpy((char *)wifi_config_sta.sta.ssid, req->ssid, ARRAY_SIZE(wifi_config_sta.sta.ssid));
+
+    if (esp_wifi_set_config(WIFI_IF_STA, &wifi_config_sta) != ESP_OK) {
+        return -EINVAL;
+    }
+
+    _conn_done_cb = (wifi_on_connect_result_t)req->base.conn_cb;
+    _conn_req = *req;
+
+    /* start connect */
+    esp_wifi_connect();
+#endif
+    return 0;
+}
+
+static void IRAM_ATTR _esp_wifi_conn_done_cb(uint8_t ch, const uint8_t *ssid, uint8_t ssid_len)
+{
+#if IS_USED(MODULE_ESP_WIFI_DYNAMIC_CONNECT)
+    static char _ssid[WIFI_SSID_LEN_MAX + 1];
+
+    assert(ssid_len < ARRAY_SIZE(_ssid));
+    strncpy(_ssid, (const char *)ssid, ssid_len);
+    _ssid[ssid_len] = 0;
+
+    if (_conn_done_cb) {
+        void *netif = netif_get_by_id(thread_getpid());
+        wifi_connect_result_t res = WIFI_CONNECT_RESULT_INITIALIZER(ch, _ssid);
+
+        if (_conn_req.cred) {
+            if (*_conn_req.cred == WIFI_SECURITY_MODE_WEP_PSK) {
+                res.credentials.wep = *((const wifi_security_wep_psk_t *)_conn_req.cred);
+            }
+            else if (*_conn_req.cred == WIFI_SECURITY_MODE_WPA2_PERSONAL) {
+                res.credentials.wpa_psk = *((const wifi_security_wpa_psk_t *)_conn_req.cred);
+            }
+#if IS_USED(MODULE_ESP_WIFI_ENTERPRISE)
+            else if (*_conn_req.cred == WIFI_SECURITY_MODE_WPA2_ENTERPRISE) {
+                res.credentials.wpa_enterprise
+                    = *((const wifi_security_wpa_enterprise_t *)_conn_req.cred);
+            }
+#endif
+        }
+
+        _conn_done_cb(netif, &res);
+        _conn_done_cb = NULL;
+    }
+#endif
+}
 
 static int _esp_wifi_disc(const wifi_disconnect_request_t *req)
 {
@@ -714,6 +829,12 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
 #endif
             /* register RX callback function */
             esp_wifi_internal_reg_rxcb(WIFI_IF_STA, _esp_wifi_rx_cb);
+
+            if (IS_USED(MODULE_ESP_WIFI_DYNAMIC_CONNECT)) {
+                _esp_wifi_conn_done_cb(event->event_info.connected.channel,
+                                       event->event_info.connected.ssid,
+                                       event->event_info.connected.ssid_len);
+            }
 
             _esp_wifi_dev.connected = true;
             _esp_wifi_dev.event_conn++;
@@ -962,6 +1083,15 @@ static int _esp_wifi_set(netdev_t *netdev, netopt_t opt, const void *val, size_t
                 return ret;
             }
             return sizeof(wifi_scan_request_t);
+        case NETOPT_CONNECT:
+            assert(max_len == sizeof(wifi_connect_request_t));
+            if (IS_USED(MODULE_ESP_WIFI_AP) || !IS_USED(MODULE_ESP_WIFI_DYNAMIC_CONNECT)) {
+                break;
+            }
+            if ((ret = _esp_wifi_conn((const wifi_connect_request_t *)val)) != 0) {
+                return ret;
+            }
+            return sizeof(wifi_connect_request_t);
         case NETOPT_DISCONNECT:
             assert(max_len == sizeof(wifi_disconnect_request_t));
             if (IS_USED(MODULE_ESP_WIFI_AP) || !IS_USED(MODULE_ESP_WIFI_DYNAMIC_CONNECT)) {
@@ -1018,25 +1148,6 @@ static const netdev_driver_t _esp_wifi_driver =
     .get = _esp_wifi_get,
     .set = _esp_wifi_set,
 };
-
-#ifndef MODULE_ESP_WIFI_AP
-/*
- * Static configuration for the Station interface
- */
-static wifi_config_t wifi_config_sta = {
-    .sta = {
-        .ssid = WIFI_SSID,
-#if !defined(MODULE_ESP_WIFI_ENTERPRISE) && defined(WIFI_PASS)
-        .password = WIFI_PASS,
-#endif
-        .channel = 0,
-        .scan_method = WIFI_ALL_CHANNEL_SCAN,
-        .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
-        .threshold.rssi = -127,
-        .threshold.authmode = WIFI_AUTH_OPEN
-    }
-};
-#endif /* MODULE_ESP_WIFI_AP */
 
 #if (defined(CPU_ESP8266) && !defined(MODULE_ESP_NOW)) || defined(MODULE_ESP_WIFI_AP)
 /**
