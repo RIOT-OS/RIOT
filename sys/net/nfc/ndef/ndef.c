@@ -109,9 +109,9 @@ void ndef_pretty_print(const ndef_t *ndef) {
  * @note This writes the data of the given buffer and
  * shifts the cursor of the NDEF buffer by the length of the data.
  *
- * @param[in,out]   ndef 		    The NDEF message that gets the data written to its memory
- * @param[in]       data 			Data to write
- * @param[in]       data_length 	Length of the data
+ * @param[in,out]   ndef            The NDEF message that gets the data written to its memory
+ * @param[in]       data            Data to write
+ * @param[in]       data_length     Length of the data
  *
  * @retval Pointer to the memory cursor before the write
  * @retval NULL if the data is too long
@@ -440,7 +440,6 @@ int ndef_from_buffer(ndef_t *ndef, uint8_t *buffer, size_t buffer_size)
 
     return 0;
 }
-
 
 /* MARK: MIME */
 int ndef_record_mime_add(ndef_t *ndef, const char *mime_type, uint32_t mime_type_length,

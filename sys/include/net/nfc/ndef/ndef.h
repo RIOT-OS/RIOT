@@ -279,24 +279,24 @@ void ndef_pretty_print(const ndef_t *ndef);
  * @note The buffer needs to be allocated by the user and has to stay valid for the entire lifetime
  * of the NDEF message struct.
  *
- * @param[out] 	ndef 		    Message to initialize
- * @param[in] 	buffer 			Empty buffer that is used by the NDEF message
- * @param[in] 	buffer_size 	Buffer size
+ * @param[out]  ndef            Message to initialize
+ * @param[in]   buffer          Empty buffer that is used by the NDEF message
+ * @param[in]   buffer_size     Buffer size
  */
 void ndef_init(ndef_t *ndef, uint8_t *buffer, uint32_t buffer_size);
 
 /**
  * @brief Adds an NDEF record header to the end of the NDEF message
  *
- * @param[in,out] 	ndef     		NDEF message
- * @param[in] 		type 			Type of the record
- * @param[in] 		type_length 	Length of the type
- * @param[in] 		id 				ID of the record
- * @param[in] 		id_length 		Length of the ID
- * @param[in] 		payload_length 	Length of the payload
- * @param[in] 		tnf 			Type Name Format of the record
- * @return 			0 if successful
- * @return 			error otherwise
+ * @param[in,out]   ndef            NDEF message
+ * @param[in]       type            Type of the record
+ * @param[in]       type_length     Length of the type
+ * @param[in]       id              ID of the record
+ * @param[in]       id_length       Length of the ID
+ * @param[in]       payload_length  Length of the payload
+ * @param[in]       tnf             Type Name Format of the record
+ * @return 0 if successful
+ * @return error otherwise
  */
 int ndef_record_header_add(ndef_t *ndef, const uint8_t *type, uint8_t type_length,
     const uint8_t *id, uint8_t id_length, uint32_t payload_length, ndef_record_tnf_t tnf);
