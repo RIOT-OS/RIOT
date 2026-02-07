@@ -52,6 +52,14 @@ ifneq (,$(filter esp_wifi_dynamic_connect,$(USEMODULE)))
   USEMODULE += esp_wifi
 endif
 
+ifneq (,$(filter esp_wifi,$(USEMODULE)))
+  ifeq (,$(filter esp_wifi_dynamic_connect,$(USEMODULE)))
+    # use esp_wifi static connect by default if esp_wifi is used and
+    # esp_wifi_dynamic_connect is not used
+    USEMODULE += esp_wifi_static_connect
+  endif
+endif
+
 ifneq (,$(filter netdev_default,$(USEMODULE)))
   ifeq (esp32h2,$(CPU_FAM))
     USEMODULE += esp_ieee802154

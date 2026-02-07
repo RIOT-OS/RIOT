@@ -17,6 +17,7 @@ PSEUDOMODULES += esp_wifi_any
 PSEUDOMODULES += esp_wifi_ap
 PSEUDOMODULES += esp_wifi_dynamic_connect
 PSEUDOMODULES += esp_wifi_dynamic_scan
+PSEUDOMODULES += esp_wifi_static_connect
 
 # Common includes
 

@@ -801,10 +801,12 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
         case SYSTEM_EVENT_STA_START:
             _esp_wifi_started = 1;
             ESP_WIFI_DEBUG("WiFi started");
-            result = esp_wifi_connect();
-            if (result != ESP_OK) {
-                ESP_WIFI_LOG_ERROR("esp_wifi_connect failed with return "
-                                   "value %d", result);
+            if (IS_USED(MODULE_ESP_WIFI_STATIC_CONNECT)) {
+                result = esp_wifi_connect();
+                if (result != ESP_OK) {
+                    ESP_WIFI_LOG_ERROR("esp_wifi_connect failed with return "
+                                       "value %d", result);
+                }
             }
             break;
 
