@@ -84,6 +84,8 @@ static const i2c_conf_t i2c_config[] = {
         .dev = I2C0,
         .sda_pin = GPIO_PIN(PC, 10),
         .scl_pin = GPIO_PIN(PC, 11),
+        .sda_pullup = false,
+        .scl_pullup = false,
         .loc = I2C_ROUTELOC0_SDALOC_LOC15 |
                I2C_ROUTELOC0_SCLLOC_LOC15,
         .cmu = cmuClock_I2C0,
