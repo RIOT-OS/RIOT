@@ -425,9 +425,11 @@ typedef enum {
  * @brief   I2C device configuration.
  */
 typedef struct {
-    I2C_TypeDef *dev;       /**< USART device used */
+    I2C_TypeDef *dev;       /**< I2C device used */
     gpio_t sda_pin;         /**< pin used for SDA */
     gpio_t scl_pin;         /**< pin used for SCL */
+    bool sda_pullup;        /**< pull-up enabled for SDA pin */
+    bool scl_pullup;        /**< pull-up enabled for SCL pin */
 #if defined(_SILICON_LABS_32B_SERIES_0) || defined(_SILICON_LABS_32B_SERIES_1)
     uint32_t loc;           /**< location of I2C pins */
 #endif
