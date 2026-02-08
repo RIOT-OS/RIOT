@@ -1,4 +1,7 @@
 #!/bin/bash
+# SPDX-FileCopyrightText: 2026 Jakob Roch <roch.jakbo@web.de>
+# SPDX-License-Identifier: LGPL-2.1-only
+
 # Script used generate sdkconfig_soc.h from ESP-IDF soc_caps.h
 # by prefixing all defines with "CONFIG_*.
 set -e
@@ -32,7 +35,7 @@ sed -E '
 ' "$SOC_CAPS_FILE" >"$OUTPUT_FILE"
 
 # In case the CPU is of type ESP32s3 the file mpu_caps.h that is included
-# in soc_caps.h has to be parsed aswell.
+# in soc_caps.h has to be parsed as well.
 if [ "$CPU_FAM" = "esp32s3" ]; then
   MPU_CAPS_FILE="$ESP_SDK_DIR/components/soc/$CPU_FAM/include/soc/mpu_caps.h"
   OUTPUT_MPU_FILE="$BINDIR/mpuconfig_caps.h"
