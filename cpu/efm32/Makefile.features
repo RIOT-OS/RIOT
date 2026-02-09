@@ -7,7 +7,7 @@ CPU_CORE = $(EFM32_ARCHITECTURE)
 -include $(RIOTCPU)/efm32/families/$(CPU_FAM)/Makefile.features
 
 # families without MPU
-ifeq (,$(filter efm32zg efm32hg, $(CPU_FAM)))
+ifeq (,$(filter efm32hg efm32tg11b efm32zg, $(CPU_FAM)))
   FEATURES_PROVIDED += cortexm_mpu
 endif
 
