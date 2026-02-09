@@ -78,6 +78,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | RTT         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
 | RTC         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
 | SPI         | 0       | USART0     | MOSI:PE10, MISO:PE11, CLK:PE12 |                       |
+| SPI         | 1       | USART1     | MOSI:PA14, MISO:PC2, CLK:PC15  | Memory LCD            |
 | Timer       | 0       | WTIMER0 + WTIMER1 |           | WTIMER0 is used as prescaler        |
 | Timer       | 1       | TIMER0 + TIMER1   |           | TIMER0 is used as prescaler         |
 | Timer       | 2       | LETIMER0   |                  |                                     |
@@ -101,24 +102,26 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 
 ## Implementation Status
 
-| Device                        | ID         | Supported | Comments                                           |
-|-------------------------------|------------|-----------|----------------------------------------------------|
-| MCU                           | EFM32GG11B | yes       | Power modes supported                              |
-| Low-level driver              | ADC        | yes       |                                                    |
-|                               | DAC        | yes       | VDAC, IDAC is not supported                        |
-|                               | Ethernet   | no        |                                                    |
-|                               | Flash      | yes       |                                                    |
-|                               | GPIO       | yes       | Interrupts are shared across pins (see ref manual) |
-|                               | HW Crypto  | yes       |                                                    |
-|                               | I2C        | yes       |                                                    |
-|                               | PWM        | yes       |                                                    |
-|                               | RTCC       | yes       | As RTT or RTC                                      |
-|                               | SPI        | yes       | Only master mode                                   |
-|                               | Timer      | yes       |                                                    |
-|                               | TRNG       | yes       | True Random Number Generator                       |
-|                               | UART       | yes       | USART is shared with SPI. LEUART baud rate limited |
-|                               | USB        | yes       | Device mode                                        |
-| Temperature + humidity sensor | Si7021     | yes       | Silicon Labs Temperature + Humidity sensor         |
+| Device                        | ID          | Supported | Comments                                              |
+|-------------------------------|-------------|-----------|-------------------------------------------------------|
+| MCU                           | EFM32GG11B  | yes       | Power modes supported                                 |
+| Low-level driver              | ADC         | yes       |                                                       |
+|                               | DAC         | yes       | VDAC, IDAC is not supported                           |
+|                               | Ethernet    | no        |                                                       |
+|                               | Flash       | yes       |                                                       |
+|                               | GPIO        | yes       | Interrupts are shared across pins (see ref manual)    |
+|                               | HW Crypto   | yes       |                                                       |
+|                               | I2C         | yes       |                                                       |
+|                               | PWM         | yes       |                                                       |
+|                               | RTCC        | yes       | As RTT or RTC                                         |
+|                               | SPI         | yes       | Only master mode                                      |
+|                               | Timer       | yes       |                                                       |
+|                               | TRNG        | yes       | True Random Number Generator                          |
+|                               | UART        | yes       | USART is shared with SPI. LEUART baud rate limited    |
+|                               | USB         | yes       | Device mode                                           |
+| LCD driver                    | LS013B7DH06 | no        | Sharp Low Power Memory color LCD (Rev. A0 - A5 board) |
+| LCD driver                    | LPM013M126A | no        | JDI Low Power Memory color LCD (Rev. B0+ boards)      |
+| Temperature + humidity sensor | Si7021      | yes       | Silicon Labs Temperature + Humidity sensor            |
 
 ## Board configuration
 

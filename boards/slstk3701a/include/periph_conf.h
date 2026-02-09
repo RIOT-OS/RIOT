@@ -166,6 +166,17 @@ static const spi_dev_t spi_config[] = {
                USART_ROUTELOC0_CLKLOC_LOC0,
         .cmu = cmuClock_USART0,
         .irq = USART0_RX_IRQn
+    },
+    {
+        .dev = USART1,
+        .mosi_pin = GPIO_PIN(PA, 14),
+        .miso_pin = GPIO_PIN(PC, 2),
+        .clk_pin = GPIO_PIN(PC, 15),
+        .loc = USART_ROUTELOC0_TXLOC_LOC6 |
+               USART_ROUTELOC0_RXLOC_LOC4 |
+               USART_ROUTELOC0_CLKLOC_LOC3,
+        .cmu = cmuClock_USART1,
+        .irq = USART1_RX_IRQn
     }
 };
 

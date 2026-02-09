@@ -91,10 +91,11 @@ extern "C" {
 /**
  * @name    Display configuration
  *
- * Connection to the on-board Sharp Memory LCD (LS013B7DH03).
+ * Connection to the on-board LCD. Rev A0 - A5 boards have a Sharp LS013B7DH06,
+ * display, while Rev B0 boards and newer have a JDI LPM013M126A display.
  * @{
  */
-#define DISP_SPI            SPI_DEV(0)
+#define DISP_SPI            SPI_DEV(1)
 #define DISP_COM_PIN        GPIO_PIN(PA, 11)
 #define DISP_CS_PIN         GPIO_PIN(PC, 14)
 #define DISP_EN_PIN         GPIO_PIN(PA, 9)
