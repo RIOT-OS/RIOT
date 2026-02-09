@@ -30,12 +30,14 @@ static const  saul_gpio_params_t saul_gpio_params[] =
     {
         .name = "LED 0",
         .pin = LED0_PIN,
-        .mode = GPIO_OUT
+        .mode = GPIO_OUT,
+        .flags = SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR
     },
     {
         .name = "LED 1",
         .pin = LED1_PIN,
-        .mode = GPIO_OUT
+        .mode = GPIO_OUT,
+        .flags = SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR
     },
     {
         .name = "Button 1",

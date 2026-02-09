@@ -80,11 +80,11 @@ extern "C" {
  * @name    Macros for controlling the on-board LEDs
  * @{
  */
-#define LED0_ON             gpio_set(LED0_PIN)
-#define LED0_OFF            gpio_clear(LED0_PIN)
+#define LED0_ON             gpio_clear(LED0_PIN)
+#define LED0_OFF            gpio_set(LED0_PIN)
 #define LED0_TOGGLE         gpio_toggle(LED0_PIN)
-#define LED1_ON             gpio_set(LED1_PIN)
-#define LED1_OFF            gpio_clear(LED1_PIN)
+#define LED1_ON             gpio_clear(LED1_PIN)
+#define LED1_OFF            gpio_set(LED1_PIN)
 #define LED1_TOGGLE         gpio_toggle(LED1_PIN)
 /** @} */
 

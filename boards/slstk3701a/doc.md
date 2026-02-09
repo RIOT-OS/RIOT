@@ -90,14 +90,14 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |------------|-----------|-----------|------------|
 | Button     | PB0_PIN   | PC8       |            |
 |            | PB1_PIN   | PC9       |            |
-| LED        | LED0R_PIN | PH10      |            |
-|            | LED0G_PIN | PH11      |            |
-|            | LED0B_PIN | PH12      |            |
-|            | LED1R_PIN | PH13      |            |
-|            | LED1G_PIN | PH14      |            |
-|            | LED1B_PIN | PH15      |            |
-|            | LED0_PIN  | LED0R_PIN |            |
-|            | LED1_PIN  | LED1R_PIN |            |
+| LED        | LED0R_PIN | PH10      | Active low |
+|            | LED0G_PIN | PH11      | Active low |
+|            | LED0B_PIN | PH12      | Active low |
+|            | LED1R_PIN | PH13      | Active low |
+|            | LED1G_PIN | PH14      | Active low |
+|            | LED1B_PIN | PH15      | Active low |
+|            | LED0_PIN  | LED0R_PIN | Active low |
+|            | LED1_PIN  | LED1R_PIN | Active low |
 
 ## Implementation Status
 
