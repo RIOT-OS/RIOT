@@ -71,7 +71,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | ADC         | 1       | ADC0:CH1   |                  | AVDD                                |
 | DAC         | 0       | DAC0:OUT0  | PB11             | AVVD as reference voltage           |
 | I2C         | 0       | I2C0       | SDA:PC0, SCL:PC1 | Normal speed                        |
-| I2C         | 1       | I2C1       | SDA:PC7, SCL:PC5 | Normal speed                        |
+| I2C         | 1       | I2C1       | SDA:PC4, SCL:PC5 | Normal speed                        |
 | I2C         | 2       | I2C2       | SDA:PI4, SCL:PI5 | Normal speed, Sensor I2C bus        |
 | HWCRYPTO    | -       | -          |                  | AES128/AES256, SHA1, SHA224/SHA256  |
 | HWRNG       | -       | TNRG0      |                  | True Random Number Generator (TRNG) |
