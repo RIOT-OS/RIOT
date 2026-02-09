@@ -28,6 +28,7 @@ int walltime_impl_get(struct tm *time, uint16_t *ms)
     if (IS_USED(MODULE_PERIPH_RTC_MS)) {
         rtc_get_time_ms(time, ms);
     } else {
+        *ms = 0;
         rtc_get_time(time);
     }
     return 0;
