@@ -101,23 +101,24 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 
 ## Implementation Status
 
-| Device           | ID         | Supported | Comments                                           |
-|------------------|------------|-----------|----------------------------------------------------|
-| MCU              | EFM32GG11B | yes       | Power modes supported                              |
-| Low-level driver | ADC        | yes       |                                                    |
-|                  | DAC        | yes       | VDAC, IDAC is not supported                        |
-|                  | Ethernet   | no        |                                                    |
-|                  | Flash      | yes       |                                                    |
-|                  | GPIO       | yes       | Interrupts are shared across pins (see ref manual) |
-|                  | HW Crypto  | yes       |                                                    |
-|                  | I2C        | yes       |                                                    |
-|                  | PWM        | yes       |                                                    |
-|                  | RTCC       | yes       | As RTT or RTC                                      |
-|                  | SPI        | yes       | Only master mode                                   |
-|                  | Timer      | yes       |                                                    |
-|                  | TRNG       | yes       | True Random Number Generator                       |
-|                  | UART       | yes       | USART is shared with SPI. LEUART baud rate limited |
-|                  | USB        | yes       | Device mode                                        |
+| Device                        | ID         | Supported | Comments                                           |
+|-------------------------------|------------|-----------|----------------------------------------------------|
+| MCU                           | EFM32GG11B | yes       | Power modes supported                              |
+| Low-level driver              | ADC        | yes       |                                                    |
+|                               | DAC        | yes       | VDAC, IDAC is not supported                        |
+|                               | Ethernet   | no        |                                                    |
+|                               | Flash      | yes       |                                                    |
+|                               | GPIO       | yes       | Interrupts are shared across pins (see ref manual) |
+|                               | HW Crypto  | yes       |                                                    |
+|                               | I2C        | yes       |                                                    |
+|                               | PWM        | yes       |                                                    |
+|                               | RTCC       | yes       | As RTT or RTC                                      |
+|                               | SPI        | yes       | Only master mode                                   |
+|                               | Timer      | yes       |                                                    |
+|                               | TRNG       | yes       | True Random Number Generator                       |
+|                               | UART       | yes       | USART is shared with SPI. LEUART baud rate limited |
+|                               | USB        | yes       | Device mode                                        |
+| Temperature + humidity sensor | Si7021     | yes       | Silicon Labs Temperature + Humidity sensor         |
 
 ## Board configuration
 
