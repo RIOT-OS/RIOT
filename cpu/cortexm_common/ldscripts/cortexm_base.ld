@@ -95,14 +95,15 @@ SECTIONS
         KEEP (*(SORT(.dtors.*)))
         KEEP (*crtend.o(.dtors))
 
-        . = ALIGN(4096);
-        _start_shared_api_code = .;
-        KEEP( *(.shared_api_code))
-        . = ALIGN(4096);
-        _end_shared_api_code = .;
-
         . = ALIGN(4);
         _efixed = .;            /* End of text section */
+    } > rom
+
+    .xipfs_shared_api_code_out :
+    {
+        _xipfs_shared_api_code_out_start = .;
+        *(.xipfs_shared_api_code_in*)
+        _xipfs_shared_api_code_out_end = .;
     } > rom
 
     /*
@@ -183,10 +184,10 @@ SECTIONS
         KEEP (*(SORT(.xfa.*)))
         KEEP (*(.openocd .openocd.*))
         . = ALIGN(4);
-        _start_shared_api_data = .;
-        KEEP( *(.shared_api_data))
+        _xipfs_shared_api_data_start = .;
+        KEEP (*(.xipfs_shared_api_data))
         . = ALIGN(32);
-        _end_shared_api_data = .;
+        _xipfs_shared_api_data_end = .;
         _erelocate = .;
     } > ram AT> rom
 
@@ -255,3 +256,5 @@ SECTIONS
         KEEP(*(SORT(.flash_writable.*)))
     } > rom
 }
+
+ASSERT((_xipfs_shared_api_code_out_end - _xipfs_shared_api_code_out_start) <= 4096, "XIPFS shared api code does not fit into 4096 bytes");
