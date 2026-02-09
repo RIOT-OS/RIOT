@@ -23,7 +23,7 @@
 
 #include "fmt.h"
 #include "net/sock/udp.h"
-#if IS_USED(MODULE_SOCK_ASYNC_EVENT)
+#if IS_USED(MODULE_SHELL_CMD_UDP_SERVER)
 #  include "net/sock/async/event.h"
 #endif
 #include "net/sock/util.h"
