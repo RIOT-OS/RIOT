@@ -29,19 +29,19 @@ extern "C" {
  * @{
  */
 #ifndef CLOCK_HF
-#define CLOCK_HF            cmuSelect_HFXO
+#  define CLOCK_HF          cmuSelect_HFXO
 #endif
 #ifndef CLOCK_CORE_DIV
-#define CLOCK_CORE_DIV      cmuClkDiv_1
+#  define CLOCK_CORE_DIV    cmuClkDiv_1
 #endif
 #ifndef CLOCK_LFA
-#define CLOCK_LFA           cmuSelect_LFXO
+#  define CLOCK_LFA         cmuSelect_LFXO
 #endif
 #ifndef CLOCK_LFB
-#define CLOCK_LFB           cmuSelect_LFXO
+#  define CLOCK_LFB         cmuSelect_LFXO
 #endif
 #ifndef CLOCK_LFE
-#define CLOCK_LFE           cmuSelect_LFXO
+#  define CLOCK_LFE         cmuSelect_LFXO
 #endif
 /** @} */
 
@@ -101,7 +101,7 @@ static const i2c_conf_t i2c_config[] = {
  * @{
  */
 #ifndef RTT_FREQUENCY
-#define RTT_FREQUENCY       (1U)              /* in Hz */
+#  define RTT_FREQUENCY       (1U)            /* in Hz */
 #endif
 /** @} */
 

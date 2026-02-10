@@ -144,7 +144,7 @@ kit.
 It is important that the clock speeds are known to the code, for proper
 calculations of speeds and baud rates. If the HFXO or LFXO are different from
 the speeds above, ensure to pass `EFM32_HFXO_FREQ=freq_in_hz` and
-`EFM32_LFXO_FREQ=freq_in_hz` to your compiler.
+`EFM32_LFXO_FREQ=freq_in_hz` to your compiler defines.
 
 You can override the branch's clock source by adding `CLOCK_LFA=source` to your
 compiler defines, e.g. `CLOCK_LFA=cmuSelect_LFRCO`.
