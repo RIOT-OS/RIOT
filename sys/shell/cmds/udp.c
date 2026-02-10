@@ -163,10 +163,14 @@ static void _stop_server(void)
 static void _start_server(const char *port_str)
 {
     (void)port_str;
+    /* not reachable since all calls are module-guarded */
+    assert(0);
 }
 
 static void _stop_server(void)
 {
+    /* not reachable since all calls are module-guarded */
+    assert(0);
 }
 
 #endif /* MODULE_SHELL_CMD_UDP_SERVER*/
