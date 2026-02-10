@@ -159,10 +159,11 @@ desired, set the clock source to CORELEDIV2.
 this setting. Ensure you do not refer to any low-power peripherals.
 
 ### RTC or RTT
-RIOT-OS has support for *Real-Time Tickers* and *Real-Time Clocks*.
+RIOT-OS has support for *Real-Time Tickers* (RTC) and *Real-Time Clocks*
+(RTCC).
 
 However, this board MCU family has support for a 32-bit *Real-Time Clock and
-Calendar*, which can be configured in ticker mode **or** calendar mode.
+Calendar* (RTCC), which can be configured in ticker mode **or** calendar mode.
 Therefore, only one of both peripherals can be enabled at the same time.
 
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
@@ -185,6 +186,9 @@ inline methods or macros (which have no overhead).
 Another advantage of EMLIB are the included assertions. These assertions ensure
 that peripherals are used properly. To enable this, pass `DEBUG_EFM` to your
 compiler.
+
+EMLIB is licensed by Silicon Labs under the zlib-style license, which permits
+distribution of source.
 
 ### Pin locations
 The EFM32 platform supports peripherals to be mapped to different pins
@@ -231,6 +235,3 @@ make emulate
 For using the Silicon Labs SLSTK3301A starter kit we strongly recommend
 the usage of the [GNU Tools for ARM Embedded Processors](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
 toolchain.
-
-## License information
-Silicon Labs' EMLIB: zlib-style license (permits distribution of source).
