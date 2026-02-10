@@ -46,8 +46,7 @@
 static char server_stack[SERVER_STACKSIZE];
 
 /* accessed from both main and server thread */
-event_queue_t queue;
-static uint16_t server_port = 0;
+static event_queue_t queue;
 static kernel_pid_t server_pid = KERNEL_PID_UNDEF;
 
 static void _server_handler(sock_udp_t *sock, sock_async_flags_t type, void *arg)
@@ -64,7 +63,6 @@ static void _server_handler(sock_udp_t *sock, sock_async_flags_t type, void *arg
         res = sock_udp_recv_buf(sock, &buf, &buf_ctx, 0, &src);
         if (res > 0) {
             printf("Received UDP data from ");
-            // todo: broken in lwip: src.family always set to IPV6 instead of IPV4
             if (sock_udp_ep_fmt(&src, _addr_str, &_port) >= 0) {
                 printf("[%s]:%u\n", _addr_str, _port);
             }
@@ -95,10 +93,10 @@ static event_t _server_stop_event = { .handler = _server_stop_cb };
 
 static void *_server_thread(void *arg)
 {
-    (void)arg;
+    uint16_t port = (uint16_t)(uintptr_t)arg;
 
     sock_udp_ep_t local = SOCK_IP_EP_ANY;
-    local.port = server_port;
+    local.port = port;
     sock_udp_t sock;
 
     if (sock_udp_create(&sock, &local, NULL, 0) < 0) {
@@ -107,9 +105,9 @@ static void *_server_thread(void *arg)
         return NULL;
     }
 
-    printf("Success: started UDP server on port %" PRIu16 "\n", server_port);
+    printf("Success: started UDP server on port %" PRIu16 "\n", port);
 
-    event_queue_init(&queue); // todo: init_detached + claim safer instead?
+    event_queue_claim(&queue);
     sock_udp_event_init(&sock, &queue, _server_handler, NULL);
     _server_should_stop = false;
 
@@ -125,6 +123,9 @@ static void *_server_thread(void *arg)
     return NULL;
 }
 
+/* thread-local to main thread */
+static uint16_t server_port = 0;
+
 static void _start_server(const char *port_str)
 {
     /* check if server is already running */
@@ -133,14 +134,16 @@ static void _start_server(const char *port_str)
         return;
     }
     /* parse port */
-    server_port = atoi(port_str); // todo: instead of global variable, could be passed via event to be thread-safe
+    server_port = atoi(port_str);
     if (server_port == 0) {
         printf("Error: invalid port specified\n");
         return;
     }
+    /* init event queue to be used by server thread */
+    event_queue_init_detached(&queue);
     /* start server */
     server_pid = thread_create(server_stack, sizeof(server_stack), SERVER_PRIO,
-                                0, _server_thread, NULL, "UDP server");
+                                0, _server_thread, (void *)(uintptr_t)server_port, "UDP server");
     if (server_pid <= KERNEL_PID_UNDEF) {
         puts("Error: can not start server thread");
         return;
