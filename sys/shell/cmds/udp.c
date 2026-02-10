@@ -189,8 +189,8 @@ static void _send(const char *addr_str, const char *_data, size_t num,
 
     const void *data = _data;
     size_t data_len = strlen(data);
+    uint8_t data_bytes[SHELL_DEFAULT_BUFSIZE / 2];
     if (data_is_hex) {
-        uint8_t data_bytes[SHELL_DEFAULT_BUFSIZE / 2];
         ssize_t ret = scn_buf_hex(data_bytes, sizeof(data_bytes), data, data_len);
         if (ret < 0) {
             puts("Error: unable to parse hexadecimal data");
