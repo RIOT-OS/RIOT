@@ -206,7 +206,7 @@ installation instructions and some other information can be found
 ### Compiling
 
 ```
-fabian@fabian-ThinkPad-L412:~/myriot/RIOT/examples/basic/hello-world$ BOARD=msbiot make
+RIOT/examples/basic/hello-world$ BOARD=msbiot make
 Building application "hello-world" for "msbiot" with MCU "stm32f4".
 
 "make" -C /home/fabian/myriot/RIOT/boards/msbiot
