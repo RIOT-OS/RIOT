@@ -17,16 +17,16 @@
 #include <errno.h>
 
 #ifdef SOCK_HAS_ASYNC
-# include "net/sock/async.h"
-# ifdef MODULE_SOCK_ASYNC_EVENT
-#   include "net/sock/async/event.h"
-# endif
+#  include "net/sock/async.h"
+#  ifdef MODULE_SOCK_ASYNC_EVENT
+#    include "net/sock/async/event.h"
+#  endif
 #endif
 #include "net/ipv6/addr.h"
 #include "net/iana/portrange.h"
 #include "net/sock/udp.h"
 #ifdef MODULE_ZTIMER_USEC
-# include "ztimer.h"
+#  include "ztimer.h"
 #endif
 #include "mutex.h"
 #include "utlist.h"
@@ -43,8 +43,8 @@
 
 #define _MSG_TYPE_RECV_PKT (0x1601)
 #ifdef MODULE_ZTIMER_USEC
-# define _TIMEOUT_MAGIC     (0xF38A0B63U)
-# define _TIMEOUT_MSG_TYPE  (0x8474)
+#  define _TIMEOUT_MAGIC     (0xF38A0B63U)
+#  define _TIMEOUT_MSG_TYPE  (0x8474)
 #endif /* MODULE_ZTIMER_USEC */
 
 /* sock linked list */
