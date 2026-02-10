@@ -132,7 +132,7 @@ void gnrc_ipv6_nib_init(void)
     _nib_release();
 }
 
-static void _add_static_lladdr(gnrc_netif_t *netif)
+static bool _add_static_lladdr(gnrc_netif_t *netif)
 {
 #ifdef CONFIG_GNRC_IPV6_STATIC_LLADDR
 #if (CONFIG_GNRC_IPV6_STATIC_LLADDR_NETDEV_MASK) > 0
@@ -144,9 +144,16 @@ static void _add_static_lladdr(gnrc_netif_t *netif)
         DEBUG("nib: interface #%u: not setting static link-local address "
                 "(netdev type %u not included)\n",
                 netif->pid, netif->dev->type);
-        return;
+        return false;
     }
 #endif
+
+    if (gnrc_netif_is_6lo(netif)) {
+        DEBUG("nib: interface #%u: not setting static link-local address "
+              "(netdev is 6lo)\n", netif->pid);
+        return false;
+    }
+
     DEBUG("nib: interface #%u: adding static link-local address \"%s\"%s\n",
             netif->pid,
             CONFIG_GNRC_IPV6_STATIC_LLADDR,
@@ -164,29 +171,36 @@ static void _add_static_lladdr(gnrc_netif_t *netif)
             lladdr.u8[15] += netif->pid;
         }
         assert(ipv6_addr_is_link_local(&lladdr));
-        gnrc_netif_ipv6_addr_add_internal(
+        return gnrc_netif_ipv6_addr_add_internal(
                 netif, &lladdr, 64U, GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID
-            );
+               ) >= 0;
     }
 #else
     (void)netif;
 #endif
+
+    return false;
 }
 
-static void _add_dynamic_lladdr(gnrc_netif_t *netif)
+static bool _add_dynamic_lladdr(gnrc_netif_t *netif)
 {
     if (!IS_USED(MODULE_GNRC_IPV6_NIB_DYN_LLADDR)) {
-        return;
+        return false;
+    }
+
+    if (gnrc_netif_is_6lo(netif)) {
+        return false;
     }
 
     ipv6_addr_t lladdr;
     if (!gnrc_ipv6_nib_dyn_lladdr_get(netif, &lladdr)) {
-        return;
+        return false;
     }
 
     assert(ipv6_addr_is_link_local(&lladdr));
-    gnrc_netif_ipv6_addr_add_internal(netif, &lladdr, 64U,
-                                      GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
+    int res = gnrc_netif_ipv6_addr_add_internal(netif, &lladdr, 64U,
+                                                GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
+    return res >= 0;
 }
 
 void gnrc_ipv6_nib_start_search_rtr(gnrc_netif_t *netif)
@@ -218,9 +232,10 @@ void gnrc_ipv6_nib_iface_up(gnrc_netif_t *netif)
     if (gnrc_netif_ipv6_group_join_internal(netif, &ipv6_addr_all_nodes_link_local) < 0) {
         DEBUG("nib: Can't join link-local all-nodes on interface %u\n", netif->pid);
     }
-    _add_static_lladdr(netif);
-    _add_dynamic_lladdr(netif);
-    _auto_configure_addr(netif, &ipv6_addr_link_local_prefix, 64U);
+    if (!_add_static_lladdr(netif) &&
+        !_add_dynamic_lladdr(netif)) {
+        _auto_configure_addr(netif, &ipv6_addr_link_local_prefix, 64U);
+    }
 
     if (_should_search_rtr(netif)) {
         gnrc_ipv6_nib_start_search_rtr(netif);
