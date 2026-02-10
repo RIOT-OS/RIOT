@@ -294,7 +294,7 @@ Done flashing
 ### Debugging
 
 ```
-fabian@fabian-ThinkPad-L412:~/myriot/RIOT/examples/basic/hello-world$ BOARD=msbiot make debug
+RIOT/examples/basic/hello-world$ BOARD=msbiot make debug
 /home/fabian/myriot/RIOT/dist/tools/openocd/openocd.sh debug
 ### Starting Debugging ###
 Open On-Chip Debugger 0.8.0 (2015-03-01-08:19)
