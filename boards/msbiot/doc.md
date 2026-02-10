@@ -226,7 +226,7 @@ Building application "hello-world" for "msbiot" with MCU "stm32f4".
 ### Flashing
 
 ```
-fabian@fabian-ThinkPad-L412:~/myriot/RIOT/examples/basic/hello-world$ BOARD=msbiot make flash
+RIOT/examples/basic/hello-world$ BOARD=msbiot make flash
 Building application "hello-world" for "msbiot" with MCU "stm32f4".
 
 "make" -C /home/fabian/myriot/RIOT/boards/msbiot
