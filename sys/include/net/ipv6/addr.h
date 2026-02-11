@@ -36,7 +36,7 @@ extern "C" {
 /**
  * @brief   Length of an IPv6 address in bit.
  */
-#define IPV6_ADDR_BIT_LEN           (128)
+#define IPV6_ADDR_BIT_LEN (128)
 
 /**
  * @brief   Static initializer for an IPv6 address.
@@ -52,23 +52,30 @@ extern "C" {
  *
  * @return initialized IPv6 address
  */
-#define IPV6_ADDR_INIT(a, b, c, d, e, f, g, h) { .u16 = {   \
-        byteorder_htons_static(a), byteorder_htons_static(b), \
-        byteorder_htons_static(c), byteorder_htons_static(d), \
-        byteorder_htons_static(e), byteorder_htons_static(f), \
-        byteorder_htons_static(g), byteorder_htons_static(h)  \
-    } }
+#define IPV6_ADDR_INIT(a, b, c, d, e, f, g, h) \
+    {                                          \
+        .u16 = {                               \
+            byteorder_htons_static(a),         \
+            byteorder_htons_static(b),         \
+            byteorder_htons_static(c),         \
+            byteorder_htons_static(d),         \
+            byteorder_htons_static(e),         \
+            byteorder_htons_static(f),         \
+            byteorder_htons_static(g),         \
+            byteorder_htons_static(h)          \
+        }                                      \
+    }
 
 #ifdef MODULE_IPV4_ADDR
 /**
  * @brief   Maximum length of an IPv6 address as string.
  */
-#define IPV6_ADDR_MAX_STR_LEN       (sizeof("ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"))
+#  define IPV6_ADDR_MAX_STR_LEN (sizeof("ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"))
 #else
 /**
  * @brief   Maximum length of an IPv6 address as string.
  */
-#define IPV6_ADDR_MAX_STR_LEN       (sizeof("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"))
+#  define IPV6_ADDR_MAX_STR_LEN (sizeof("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"))
 #endif
 
 /**
@@ -86,10 +93,10 @@ extern "C" {
  * @brief Data type to represent an IPv6 address.
  */
 typedef union {
-    uint8_t u8[16];             /**< divided by 16 8-bit words. */
-    network_uint16_t u16[8];    /**< divided by 8 16-bit words. */
-    network_uint32_t u32[4];    /**< divided by 4 32-bit words. */
-    network_uint64_t u64[2];    /**< divided by 2 64-bit words. */
+    uint8_t u8[16];          /**< divided by 16 8-bit words. */
+    network_uint16_t u16[8]; /**< divided by 8 16-bit words. */
+    network_uint32_t u32[4]; /**< divided by 4 32-bit words. */
+    network_uint64_t u64[2]; /**< divided by 2 64-bit words. */
 } ipv6_addr_t;
 
 /**
@@ -97,20 +104,20 @@ typedef union {
  *
  * @see [RFC 4291, section 2.5.2](http://tools.ietf.org/html/rfc4291#section-2.5.2)
  */
-#define IPV6_ADDR_UNSPECIFIED               IPV6_ADDR_INIT(0,0,0,0,0,0,0,0)
+#define IPV6_ADDR_UNSPECIFIED             IPV6_ADDR_INIT(0, 0, 0, 0, 0, 0, 0, 0)
 
 /**
  * @brief   Static initializer for the loopback IPv6 address (::1)
  *
  * @see [RFC 4291, section 2.5.3](http://tools.ietf.org/html/rfc4291#section-2.5.3)
  */
-#define IPV6_ADDR_LOOPBACK                  IPV6_ADDR_INIT(0,0,0,0,0,0,0,1)
+#define IPV6_ADDR_LOOPBACK                IPV6_ADDR_INIT(0, 0, 0, 0, 0, 0, 0, 1)
 /**
  * @brief   Static initializer for the link-local prefix (fe80::/64)
  *
  * @see [RFC 4291, section 2.5.6](http://tools.ietf.org/html/rfc4291#section-2.5.6)
  */
-#define IPV6_ADDR_LINK_LOCAL_PREFIX         IPV6_ADDR_INIT(0xfe80,0,0,0,0,0,0,0)
+#define IPV6_ADDR_LINK_LOCAL_PREFIX       IPV6_ADDR_INIT(0xfe80, 0, 0, 0, 0, 0, 0, 0)
 
 /**
  * @brief   Static initializer for the interface-local all nodes multicast IPv6
@@ -118,7 +125,7 @@ typedef union {
  *
  * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
  */
-#define IPV6_ADDR_ALL_NODES_IF_LOCAL        IPV6_ADDR_INIT(0xff01,0,0,0,0,0,0,1)
+#define IPV6_ADDR_ALL_NODES_IF_LOCAL      IPV6_ADDR_INIT(0xff01, 0, 0, 0, 0, 0, 0, 1)
 
 /**
  * @brief   Static initializer for the link-local all nodes multicast IPv6
@@ -126,7 +133,7 @@ typedef union {
  *
  * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
  */
-#define IPV6_ADDR_ALL_NODES_LINK_LOCAL      IPV6_ADDR_INIT(0xff02,0,0,0,0,0,0,1)
+#define IPV6_ADDR_ALL_NODES_LINK_LOCAL    IPV6_ADDR_INIT(0xff02, 0, 0, 0, 0, 0, 0, 1)
 
 /**
  * @brief   Static initializer for the interface-local all routers multicast IPv6
@@ -134,7 +141,7 @@ typedef union {
  *
  * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
  */
-#define IPV6_ADDR_ALL_ROUTERS_IF_LOCAL      IPV6_ADDR_INIT(0xff01,0,0,0,0,0,0,2)
+#define IPV6_ADDR_ALL_ROUTERS_IF_LOCAL    IPV6_ADDR_INIT(0xff01, 0, 0, 0, 0, 0, 0, 2)
 
 /**
  * @brief   Static initializer for the link-local all routers multicast IPv6
@@ -142,7 +149,7 @@ typedef union {
  *
  * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
  */
-#define IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL    IPV6_ADDR_INIT(0xff02,0,0,0,0,0,0,2)
+#define IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL  IPV6_ADDR_INIT(0xff02, 0, 0, 0, 0, 0, 0, 2)
 
 /**
  * @brief   Static initializer for the site-local all routers multicast IPv6
@@ -150,7 +157,7 @@ typedef union {
  *
  * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
  */
-#define IPV6_ADDR_ALL_ROUTERS_SITE_LOCAL    IPV6_ADDR_INIT(0xff05,0,0,0,0,0,0,2)
+#define IPV6_ADDR_ALL_ROUTERS_SITE_LOCAL  IPV6_ADDR_INIT(0xff05, 0, 0, 0, 0, 0, 0, 2)
 
 /**
  * @brief   Static initializer for the solicited node multicast prefix
@@ -158,7 +165,7 @@ typedef union {
  *
  * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
  */
-#define IPV6_ADDR_SOLICITED_NODE_PREFIX     IPV6_ADDR_INIT(0xff02,0,0,0,0,1,0xff00,0)
+#define IPV6_ADDR_SOLICITED_NODE_PREFIX   IPV6_ADDR_INIT(0xff02, 0, 0, 0, 0, 1, 0xff00, 0)
 
 /**
  * @name    Multicast address flags
@@ -171,21 +178,21 @@ typedef union {
  * @brief   The address is transient, i.e. not well-known, permanently
  *          assigned address by IANA.
  */
-#define IPV6_ADDR_MCAST_FLAG_TRANSIENT      (0x01)
+#define IPV6_ADDR_MCAST_FLAG_TRANSIENT    (0x01)
 
 /**
  * @brief   The address is based on a network prefix
  *
  * @see [RFC 3306, section 4](http://tools.ietf.org/html/rfc3306#section-4)
  */
-#define IPV6_ADDR_MCAST_FLAG_PREFIX_BASED   (0x02)
+#define IPV6_ADDR_MCAST_FLAG_PREFIX_BASED (0x02)
 
 /**
  * @brief   The address embeds the address on the rendezvous point
  *
  * @see [RFC 3956, section 3](http://tools.ietf.org/html/rfc3956#section-3)
  */
-#define IPV6_ADDR_MCAST_FLAG_EMBED_ON_RP    (0x04)
+#define IPV6_ADDR_MCAST_FLAG_EMBED_ON_RP  (0x04)
 /** @} */
 
 /**
@@ -195,8 +202,8 @@ typedef union {
  *
  * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
  */
-#define IPV6_ADDR_MCAST_SCP_IF_LOCAL        (0x1)   /**< interface-local scope */
-#define IPV6_ADDR_MCAST_SCP_LINK_LOCAL      (0x2)   /**< link-local scope */
+#define IPV6_ADDR_MCAST_SCP_IF_LOCAL      (0x1) /**< interface-local scope */
+#define IPV6_ADDR_MCAST_SCP_LINK_LOCAL    (0x2) /**< link-local scope */
 
 /**
  * @brief realm-local scope
@@ -204,11 +211,11 @@ typedef union {
  * @see [RFC 7346, section 3](http://tools.ietf.org/html/rfc7346#section-3) and
  *      [RFC 7346, section 5](http://tools.ietf.org/html/rfc7346#section-5)
  */
-#define IPV6_ADDR_MCAST_SCP_REALM_LOCAL (0x3)
-#define IPV6_ADDR_MCAST_SCP_ADMIN_LOCAL (0x4)      /**< admin-local scope */
-#define IPV6_ADDR_MCAST_SCP_SITE_LOCAL  (0x5)      /**< site-local scope */
-#define IPV6_ADDR_MCAST_SCP_ORG_LOCAL   (0x8)      /**< organization-local scope */
-#define IPV6_ADDR_MCAST_SCP_GLOBAL      (0xe)      /**< global scope */
+#define IPV6_ADDR_MCAST_SCP_REALM_LOCAL   (0x3)
+#define IPV6_ADDR_MCAST_SCP_ADMIN_LOCAL   (0x4) /**< admin-local scope */
+#define IPV6_ADDR_MCAST_SCP_SITE_LOCAL    (0x5) /**< site-local scope */
+#define IPV6_ADDR_MCAST_SCP_ORG_LOCAL     (0x8) /**< organization-local scope */
+#define IPV6_ADDR_MCAST_SCP_GLOBAL        (0xe) /**< global scope */
 /** @} */
 
 /**
@@ -570,7 +577,7 @@ static inline void ipv6_addr_set_multicast(ipv6_addr_t *addr, unsigned int flags
                                            unsigned int scope)
 {
     addr->u8[0] = 0xff;
-    addr->u8[1] = (((uint8_t)flags) << 4) | (((uint8_t) scope) & 0x0f);
+    addr->u8[1] = (((uint8_t)flags) << 4) | (((uint8_t)scope) & 0x0f);
 }
 
 /**
