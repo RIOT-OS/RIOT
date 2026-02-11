@@ -42,6 +42,15 @@
 #include "event/thread.h"
 extern void auto_init_event_thread(void);
 
+#ifdef MODULE_AT86RF2XX
+#  include "at86rf2xx.h"
+#  include "at86rf2xx_params.h"
+#  include "event/thread.h"
+#  define AT86RF2XX_NUM   ARRAY_SIZE(at86rf2xx_params)
+extern void auto_init_event_thread(void);
+static at86rf2xx_bhp_ev_t at86rf2xx_bhp[AT86RF2XX_NUM];
+#endif
+
 #ifdef MODULE_KW2XRF
 #include "kw2xrf.h"
 #include "kw2xrf_params.h"
@@ -66,7 +75,11 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
 
     /* Call the init function of the device (this should be handled by
      * `auto_init`) */
+
+
     ieee802154_dev_t *radio = NULL;
+
+
     (void) radio;
     (void) cb;
     (void) opaque;
@@ -94,6 +107,16 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
     if ((radio = cb(IEEE802154_DEV_TYPE_NRF802154, opaque)) ){
         nrf802154_hal_setup(radio);
         nrf802154_init();
+    }
+#endif
+
+#ifdef MODULE_AT86RF2XX
+    if ((radio = cb(IEEE802154_DEV_TYPE_AT86RF2XX, opaque)) ){
+        for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
+            const at86rf2xx_params_t *p = &at86rf2xx_params[i];
+            at86rf2xx_init_event(&at86rf2xx_bhp[i], p, radio, EVENT_PRIO_HIGHEST);
+            break;
+        }
     }
 #endif
 

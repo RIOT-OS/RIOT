@@ -40,6 +40,11 @@ extern "C" {
 typedef struct ieee802154_radio_ops ieee802154_radio_ops_t;
 
 /**
+ * @brief Forward declaration of radio cipher ops structure.
+ */
+struct ieee802154_radio_cipher_ops;
+
+/**
  * @brief IEEE802.15.4 Radio capabilities
  *
  * These flags represent the hardware capabilities of a given device.
@@ -164,6 +169,10 @@ typedef enum {
      * set if the source address matches one from the table.
      */
     IEEE802154_CAP_SRC_ADDR_MATCH       = BIT19,
+    /**
+     * @brief the devices records timestamps on received frames
+     */
+    IEEE802154_CAP_RX_TIMESTAMP         = BIT20,
 } ieee802154_rf_caps_t;
 
 /**
@@ -390,7 +399,8 @@ typedef struct {
      * The minimum and maximum values are 0 (-174 dBm) and 254 (80 dBm).
      */
     uint8_t rssi;
-    uint8_t lqi;    /**< LQI of the received frame */
+    uint8_t lqi;            /**< LQI of the received frame */
+    uint64_t timestamp;     /**< Timestamp value of a received frame in ns */
 } ieee802154_rx_info_t;
 
 /**
@@ -823,6 +833,13 @@ struct ieee802154_radio_ops {
      */
     int (*config_src_addr_match)(ieee802154_dev_t *dev, ieee802154_src_match_t cmd,
                                  const void *value);
+
+    /**
+     * @brief Radio cipher ops.
+     *
+     * May be NULL if the radio does not support crypto acceleration.
+     */
+    const struct ieee802154_radio_cipher_ops *cipher_ops;
 };
 
 /**
@@ -1351,6 +1368,19 @@ static inline int ieee802154_radio_cca(ieee802154_dev_t *dev)
     while ((res = ieee802154_radio_confirm_cca(dev)) == -EAGAIN) {}
 
     return res;
+}
+
+/**
+ * @brief Retrieve radio cipher ops
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return Radio cipher ops
+ * @return NULL if device has no cipher ops
+ */
+static inline const struct ieee802154_radio_cipher_ops *ieee802154_radio_get_cipher_ops(const ieee802154_dev_t *dev)
+{
+    return dev->driver->cipher_ops;
 }
 
 /**
