@@ -41,11 +41,11 @@ int main(void)
 
     event_periodic_callback_set_count(&a, 6);
     event_periodic_callback_set_count(&b, 3);
-    event_periodic_callback_set_count(&c, 2);
+    event_periodic_callback_set_count(&c, 3);
 
     event_periodic_callback_start(&a,  502);
     event_periodic_callback_start(&b, 1001);
-    event_periodic_callback_start(&c, 1500);
+    event_periodic_callback_start_now(&c, 1500);
 
     ztimer_sleep(ZTIMER_MSEC, 3020);
 
