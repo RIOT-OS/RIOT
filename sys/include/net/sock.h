@@ -102,6 +102,9 @@
 #include <stddef.h>
 #include "iolist.h"
 
+#include "net/ipv4/addr.h"
+#include "net/ipv6/addr.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -185,11 +188,29 @@ typedef struct {
          * @brief IPv6 address mode
          *
          * @note only available if @ref SOCK_HAS_IPV6 is defined.
+         * @deprecated use @ref sock_ip_ep_t::addr::v6 instead. will be removed after release 2027.04
          */
         uint8_t ipv6[16];
+        /**
+         * @brief IPv6 address mode
+         *
+         * @note only available if @ref SOCK_HAS_IPV6 is defined.
+         */
+        ipv6_addr_t v6;
 #endif
-        uint8_t ipv4[4];        /**< IPv4 address mode */
-        uint32_t ipv4_u32;      /**< IPv4 address *in network byte order* */
+        /**
+         * @brief IPv4 address mode
+         *
+         * @deprecated use @ref sock_ip_ep_t::addr::v4 instead. will be removed after release 2027.04
+         */
+        uint8_t ipv4[4];
+        ipv4_addr_t v4;      /**< IPv4 address mode */
+        /**
+         * @brief IPv4 address *in network byte order*
+         *
+         * @deprecated use @ref sock_ip_ep_t::addr::v4::u32 instead. will be removed after release 2027.04
+         */
+        uint32_t ipv4_u32;
     } addr;                 /**< address */
 
     /**
@@ -205,41 +226,64 @@ typedef struct {
     uint16_t netif;
 } sock_ip_ep_t;
 
+/// some usages could be replaced automatically with
+/// search (regex): \(ipv[46]_addr_t \*\)(.*)addr\.ipv([46])
+/// replace: $1ip.addr.v$2
+/// others worthwhile to replace are memcmp/memcpy etc.__builtin_bswap16
+
 /**
  * @brief   Common IP-based transport layer end point
  */
 struct _sock_tl_ep {
-    /**
-     * @brief family of sock_ip_ep_t::addr
-     *
-     * @see @ref net_af
-     */
-    int family;
-
     union {
-#ifdef SOCK_HAS_IPV6
-        /**
-         * @brief IPv6 address mode
-         *
-         * @note only available if @ref SOCK_HAS_IPV6 is defined.
-         */
-        uint8_t ipv6[16];
-#endif
-        uint8_t ipv4[4];        /**< IPv4 address mode */
-        uint32_t ipv4_u32;      /**< IPv4 address *in network byte order* */
-    } addr;                 /**< address */
+        struct {
+            /**
+             * @brief family of _sock_tl_ep::addr
+             *
+             * @see @ref net_af
+             * @deprecated use @ref _sock_tl_ep::ip::family instead. will be removed after release 2027.04
+             */
+            int family;
 
-    /**
-     * @brief   stack-specific network interface ID
-     *
-     * @todo    port to common network interface identifiers in PR #5511.
-     *
-     * Use @ref SOCK_ADDR_ANY_NETIF for any interface.
-     * For reception this is the local interface the message came over,
-     * for transmission, this is the local interface the message should be send
-     * over
-     */
-    uint16_t netif;
+            union {
+        #ifdef SOCK_HAS_IPV6
+                /**
+                 * @brief IPv6 address mode
+                 *
+                 * @note only available if @ref SOCK_HAS_IPV6 is defined.
+                 * @deprecated use @ref _sock_tl_ep::ip::addr::v6 instead. will be removed after release 2027.04
+                 */
+                uint8_t ipv6[16];
+        #endif
+                /**
+                 * @brief IPv4 address mode
+                 *
+                 * @deprecated use @ref _sock_tl_ep::ip::addr::v4 instead. will be removed after release 2027.04
+                 */
+                uint8_t ipv4[4];
+                /**
+                 * @brief IPv4 address *in network byte order*
+                 *
+                 * @deprecated use @ref _sock_tl_ep::ip::addr::v4::u32 instead. will be removed after release 2027.04
+                 */
+                uint32_t ipv4_u32;
+            } addr;                 /**< address */
+
+            /**
+             * @brief   stack-specific network interface ID
+             *
+             * @todo    port to common network interface identifiers in PR #5511.
+             * @deprecated use @ref _sock_tl_ep::ip::netif instead. will be removed after release 2027.04
+             *
+             * Use @ref SOCK_ADDR_ANY_NETIF for any interface.
+             * For reception this is the local interface the message came over,
+             * for transmission, this is the local interface the message should be send
+             * over
+             */
+            uint16_t netif;
+        };
+        sock_ip_ep_t ip;
+    };
     uint16_t port;          /**< transport layer port (in host byte order) */
 };
 
