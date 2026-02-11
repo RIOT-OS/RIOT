@@ -93,8 +93,11 @@ PIN 1 is the bottom-left contact when the header faces you horizontally.
 |                               | SPI        | partially | Only master mode                                               |
 |                               | Timer      | yes       |                                                                |
 |                               | UART       | yes       | USART is shared with SPI. LEUART baud rate limited (see below) |
-|                               | USB        | no        |                                                                |
 | Temperature + humidity sensor | Si7021     | yes       | Silicon Labs Temperature + Humidity sensor                     |
+|                               | Si7210     | no        | Hall-Effect sensor (I2C)                                       |
+| LCD                           | LCD        | no        | 8x28 Segment LCD                                               |
+|                               | LC-Sensor  | no        | Low Energy Sensor Interface (LESENSE)                          |
+|                               | Touch      | no        | Capacitive Touch Slider                                        |
 
 ## Board configuration
 
