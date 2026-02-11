@@ -38,6 +38,27 @@ extern "C" {
  */
 #define IPV6_ADDR_BIT_LEN           (128)
 
+/**
+ * @brief   Static initializer for an IPv6 address.
+
+ * @param[in] a         1st group (16 bits)
+ * @param[in] b         2nd group (16 bits)
+ * @param[in] c         3rd group (16 bits)
+ * @param[in] d         4th group (16 bits)
+ * @param[in] e         5th group (16 bits)
+ * @param[in] f         6th group (16 bits)
+ * @param[in] g         7th group (16 bits)
+ * @param[in] h         8th group (16 bits)
+ *
+ * @return initialized IPv6 address
+ */
+#define IPV6_ADDR_INIT(a, b, c, d, e, f, g, h) { .u16 = {   \
+        byteorder_htons_static(a), byteorder_htons_static(b), \
+        byteorder_htons_static(c), byteorder_htons_static(d), \
+        byteorder_htons_static(e), byteorder_htons_static(f), \
+        byteorder_htons_static(g), byteorder_htons_static(h)  \
+    } }
+
 #ifdef MODULE_IPV4_ADDR
 /**
  * @brief   Maximum length of an IPv6 address as string.
@@ -76,29 +97,20 @@ typedef union {
  *
  * @see [RFC 4291, section 2.5.2](http://tools.ietf.org/html/rfc4291#section-2.5.2)
  */
-#define IPV6_ADDR_UNSPECIFIED               {{ 0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00 }}
+#define IPV6_ADDR_UNSPECIFIED               IPV6_ADDR_INIT(0,0,0,0,0,0,0,0)
 
 /**
  * @brief   Static initializer for the loopback IPv6 address (::1)
  *
  * @see [RFC 4291, section 2.5.3](http://tools.ietf.org/html/rfc4291#section-2.5.3)
  */
-#define IPV6_ADDR_LOOPBACK                  {{ 0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x01 }}
+#define IPV6_ADDR_LOOPBACK                  IPV6_ADDR_INIT(0,0,0,0,0,0,0,1)
 /**
  * @brief   Static initializer for the link-local prefix (fe80::/64)
  *
  * @see [RFC 4291, section 2.5.6](http://tools.ietf.org/html/rfc4291#section-2.5.6)
  */
-#define IPV6_ADDR_LINK_LOCAL_PREFIX         {{ 0xfe, 0x80, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00 }}
+#define IPV6_ADDR_LINK_LOCAL_PREFIX         IPV6_ADDR_INIT(0xfe80,0,0,0,0,0,0,0)
 
 /**
  * @brief   Static initializer for the interface-local all nodes multicast IPv6
@@ -106,10 +118,7 @@ typedef union {
  *
  * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
  */
-#define IPV6_ADDR_ALL_NODES_IF_LOCAL        {{ 0xff, 0x01, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x01 }}
+#define IPV6_ADDR_ALL_NODES_IF_LOCAL        IPV6_ADDR_INIT(0xff01,0,0,0,0,0,0,1)
 
 /**
  * @brief   Static initializer for the link-local all nodes multicast IPv6
@@ -117,10 +126,7 @@ typedef union {
  *
  * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
  */
-#define IPV6_ADDR_ALL_NODES_LINK_LOCAL      {{ 0xff, 0x02, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x01 }}
+#define IPV6_ADDR_ALL_NODES_LINK_LOCAL      IPV6_ADDR_INIT(0xff02,0,0,0,0,0,0,1)
 
 /**
  * @brief   Static initializer for the interface-local all routers multicast IPv6
@@ -128,10 +134,7 @@ typedef union {
  *
  * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
  */
-#define IPV6_ADDR_ALL_ROUTERS_IF_LOCAL      {{ 0xff, 0x01, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x02 }}
+#define IPV6_ADDR_ALL_ROUTERS_IF_LOCAL      IPV6_ADDR_INIT(0xff01,0,0,0,0,0,0,2)
 
 /**
  * @brief   Static initializer for the link-local all routers multicast IPv6
@@ -139,10 +142,7 @@ typedef union {
  *
  * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
  */
-#define IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL    {{ 0xff, 0x02, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x02 }}
+#define IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL    IPV6_ADDR_INIT(0xff02,0,0,0,0,0,0,2)
 
 /**
  * @brief   Static initializer for the site-local all routers multicast IPv6
@@ -150,10 +150,7 @@ typedef union {
  *
  * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
  */
-#define IPV6_ADDR_ALL_ROUTERS_SITE_LOCAL    {{ 0xff, 0x05, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x02 }}
+#define IPV6_ADDR_ALL_ROUTERS_SITE_LOCAL    IPV6_ADDR_INIT(0xff05,0,0,0,0,0,0,2)
 
 /**
  * @brief   Static initializer for the solicited node multicast prefix
@@ -161,10 +158,7 @@ typedef union {
  *
  * @see [RFC 4291, section 2.7](http://tools.ietf.org/html/rfc4291#section-2.7)
  */
-#define IPV6_ADDR_SOLICITED_NODE_PREFIX     {{ 0xff, 0x02, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x00, \
-                                               0x00, 0x00, 0x00, 0x01, \
-                                               0xff, 0x00, 0x00, 0x00 }}
+#define IPV6_ADDR_SOLICITED_NODE_PREFIX     IPV6_ADDR_INIT(0xff02,0,0,0,0,1,0xff00,0)
 
 /**
  * @name    Multicast address flags
