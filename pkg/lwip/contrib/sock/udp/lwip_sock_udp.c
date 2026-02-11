@@ -144,7 +144,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
         size_t addr_len = sizeof(ipv4_addr_t);
         int family = AF_INET;
 
-        if (NETCONNTYPE_ISIPV6(sock->base.conn->type)) {
+        if (IP_IS_V6(&buf->addr)) {
             addr_len = sizeof(ipv6_addr_t);
             family = AF_INET6;
         }
