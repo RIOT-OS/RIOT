@@ -57,7 +57,7 @@
 
 #if defined(EXTI_PR_PR0)
 #  define EXTI_REG_PR           (EXTI->PR)
-#elif defined(EXTI_PR1_PIF0)
+#elif defined(EXTI_PR1_PIF0) || defined(EXTI_PR1_PR)
 #  define EXTI_REG_PR           (EXTI->PR1)
 #else
 #  define EXTI_REG_FPR          (EXTI->FPR1)
@@ -81,6 +81,9 @@
 #elif defined(RCC_APB3ENR_SYSCFGEN)
 #  define SYSFG_CLOCK           APB3
 #  define SYSFG_ENABLE_MASK     RCC_APB3ENR_SYSCFGEN
+#elif defined(RCC_APB4ENR_SYSCFGEN)
+#  define SYSFG_CLOCK          APB4
+#  define SYSFG_ENABLE_MASK     RCC_APB4ENR_SYSCFGEN
 #endif
 
 #if defined(EXTI_EXTICR1_EXTI0)

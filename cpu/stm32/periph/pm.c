@@ -56,6 +56,9 @@
 #define PM_STOP_CONFIG  (0)
 #elif defined(CPU_FAM_STM32U5)
 #define PM_STOP_CONFIG  (0)
+#elif defined(CPU_FAM_STM32H7)
+/* Low power deep sleep with SVOS5 Scale 5 and flash in low power mode if in DSTOP */
+#define PM_STOP_CONFIG  (PWR_CR1_LPDS | PWR_CR1_FLPS | PWR_CR1_SVOS_0)
 #else
 #define PM_STOP_CONFIG  (PWR_CR_LPDS | PWR_CR_FPDS)
 #endif
@@ -81,6 +84,9 @@
 #define PM_STANDBY_CONFIG   (0)
 #elif defined(CPU_FAM_STM32U5)
 #define PM_STANDBY_CONFIG   (0)
+#elif defined(CPU_FAM_STM32H7)
+    /* Set D1 and D2 domains to enter DStandby */
+#  define PM_STANDBY_CONFIG   (PWR_CPUCR_PDDS_D1 | PWR_CPUCR_PDDS_D2 | PWR_CPUCR_PDDS_D3)
 #else
 #define PM_STANDBY_CONFIG   (PWR_CR_PDDS | PWR_CR_CWUF | PWR_CR_CSBF)
 #endif
@@ -103,6 +109,10 @@
 #elif defined(CPU_FAM_STM32MP1)
 #define PWR_CR_REG     PWR->CR1
 #define PWR_WUP_REG    PWR->MCUWKUPENR
+#elif defined(CPU_FAM_STM32H7)
+#  define PWR_CR_REG     PWR->CR1
+#  define PWR_WUP_REG    PWR->WKUPEPR
+#  define PWR_CPUCR_REG  PWR->CPUCR
 #else
 #define PWR_CR_REG     PWR->CR
 #define PWR_WUP_REG    PWR->CSR
@@ -115,8 +125,35 @@ void pm_set(unsigned mode)
     switch (mode) {
 #if !defined(CPU_FAM_STM32MP1)
         case STM32_PM_STANDBY:
-            PWR_CR_REG &= ~(PM_STOP_CONFIG | PM_STANDBY_CONFIG);
-            PWR_CR_REG |= PM_STANDBY_CONFIG;
+#if defined(CPU_FAM_STM32H7)
+           /* 1. D3 follows CPU subsystem modes */
+            PWR_CPUCR_REG &= ~PWR_CPUCR_RUN_D3;
+
+            /* 2. Select Standby for all domains */
+            PWR_CPUCR_REG |= PM_STANDBY_CONFIG;
+
+            /*3. Clear CSSF flag */
+            PWR_CPUCR_REG |= PWR_CPUCR_CSSF;
+
+            /* 3. Disable WKUP4 first */
+            PWR_WUP_REG &= ~PWR_WKUPEPR_WKUPEN4;
+
+            /* 4. Clear wakeup flag */
+            PWR->WKUPCR = PWR_WKUPCR_WKUPC4;
+
+            /* 5. Configure pull-down */
+            PWR_WUP_REG =
+                (PWR_WUP_REG & ~PWR_WKUPEPR_WKUPPUPD4_Msk) |
+                (0x2UL << PWR_WKUPEPR_WKUPPUPD4_Pos);
+
+            /* 6. Rising edge / high-level */
+            PWR_WUP_REG &= ~PWR_WKUPEPR_WKUPP4;
+
+#else
+        PWR_CR_REG &= ~(PM_STOP_CONFIG | PM_STANDBY_CONFIG);
+        PWR_CR_REG |= PM_STANDBY_CONFIG;
+#endif
+
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5) || \
     defined(CPU_FAM_STM32WL)
@@ -131,7 +168,7 @@ void pm_set(unsigned mode)
             /* Clear flags */
             PWR->SCR |= PWR_SCR_CSBF;
 #endif
-            /* Enable WKUP pin to use for wakeup from standby mode */
+            /* Enable WKUP pins to use for wakeup from standby mode */
             PWR_WUP_REG |= PM_EWUP_CONFIG;
             /* Set SLEEPDEEP bit of system control block */
             deep = 1;
@@ -139,7 +176,21 @@ void pm_set(unsigned mode)
             break;
 #endif
         case STM32_PM_STOP:
+#if defined(CPU_FAM_STM32H7)
+            /* 1. D3 follows CPU subsystem modes */
+            PWR_CPUCR_REG &= ~PWR_CPUCR_RUN_D3;
+
+            /* 2. D1, D2 and D3 Stop mode */
+            PWR_CPUCR_REG &= ~(PM_STANDBY_CONFIG);
+
+            /*3. Clear CSSF flag */
+            PWR_CPUCR_REG |= PWR_CPUCR_CSSF;
+
+            /* Reset CR register */
+            PWR_CR_REG &= ~(PM_STOP_CONFIG | PWR_CR1_SVOS_Msk);
+#else
             PWR_CR_REG &= ~(PM_STOP_CONFIG | PM_STANDBY_CONFIG);
+#endif
             PWR_CR_REG |= PM_STOP_CONFIG;
             /* Set SLEEPDEEP bit of system control block */
             deep = 1;
