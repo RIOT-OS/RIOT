@@ -376,8 +376,10 @@ void spi_release(spi_t bus)
     /* disable device and release lock */
     dev(bus)->CR1 = 0;
     dev(bus)->CR2 = SPI_CR2_SETTINGS; /* Clear the DMA and SSOE flags */
+#if CPU_FAM_STM32H7
     dev(bus)->CFG1 = 0;
     dev(bus)->CFG2 = 0;
+#endif
     periph_clk_dis(spi_config[bus].apbbus, spi_config[bus].rccmask);
 #ifdef STM32_PM_STOP
     /* unblock STOP mode */
