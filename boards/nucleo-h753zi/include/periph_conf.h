@@ -75,6 +75,35 @@ static const uart_conf_t uart_config[] = {
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
+/**
+ * @name    PWM configuration
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev      = TIM1,
+        .rcc_mask = RCC_APB2ENR_TIM1EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_E, 9),  .cc_chan = 0},
+                      { .pin = GPIO_PIN(PORT_E, 11), .cc_chan = 1},
+                      { .pin = GPIO_PIN(PORT_E, 13), .cc_chan = 2},
+                      { .pin = GPIO_PIN(PORT_E, 14), .cc_chan = 3} },
+        .af       = GPIO_AF1,
+        .bus      = APB2
+    },
+    {
+        .dev      = TIM4,
+        .rcc_mask = RCC_APB1LENR_TIM4EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_D, 12), .cc_chan = 0},
+                      { .pin = GPIO_PIN(PORT_D, 13), .cc_chan = 1},
+                      { .pin = GPIO_PIN(PORT_D, 14), .cc_chan = 2},
+                      { .pin = GPIO_PIN(PORT_D, 15), .cc_chan = 3} },
+        .af       = GPIO_AF2,
+        .bus      = APB1
+    },
+};
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
