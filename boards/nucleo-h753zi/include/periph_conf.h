@@ -158,6 +158,9 @@ static const adc_conf_t adc_config[] = {
     {GPIO_UNDEF, 2, 18}, /* VREFINT */
 };
 
+/**
+ * @brief   ADC line for internal VBAT channel
+ */
 #define VBAT_ADC            ADC_LINE(17)
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
