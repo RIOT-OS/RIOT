@@ -24,7 +24,7 @@
 #include "assert.h"
 #include "pm_layered.h"
 
-#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7 || CPU_FAM_STM32H7
 #define STM32_DMA_Stream_Type   DMA_Stream_TypeDef
 #define CLOCK                   AHB1
 #define PERIPH_ADDR             PAR
@@ -89,6 +89,7 @@ struct dma_ctx {
     STM32_DMA_Stream_Type *stream;
     mutex_t conf_lock;
     mutex_t sync_lock;
+    mutex_t sync_half_lock;
     uint16_t len;
 };
 
@@ -133,6 +134,19 @@ static inline DMA_Request_TypeDef *dma_req(int stream_n)
 #endif
 
 /**
+ * @brief  Get the DMAMUX channel associated with a DMA stream.
+ *
+ * @param[in] dma  DMA instance identifier.
+ *
+ * @return Pointer to the corresponding DMAMUX_Channel_TypeDef structure.
+ */
+static inline DMAMUX_Channel_TypeDef *dma_req(dma_t dma)
+{
+    DMAMUX_Channel_TypeDef *mux_chans = DMAMUX1_Channel0;
+    return &mux_chans[dma_config[dma].stream];
+}
+
+/**
  * @brief   Get the DMA stream base address
  *
  * @param[in] stream    physical DMA stream
@@ -143,14 +157,14 @@ static inline STM32_DMA_Stream_Type *dma_stream(int stream)
 {
     uint32_t base = (uint32_t)dma_base(stream);
 
-#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7 || CPU_FAM_STM32H7
     return (DMA_Stream_TypeDef *)(base + (0x10 + (0x18 * (stream & 0x7))));
 #else
     return (DMA_Channel_TypeDef *)(base + (0x08 + (0x14 * (stream & 0x7))));
 #endif
 }
 
-#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7 || CPU_FAM_STM32H7
 /**
  * @brief   Select high or low DMA interrupt register based on stream number
  *
@@ -166,7 +180,7 @@ static inline int dma_hl(int stream)
 
 static IRQn_Type dma_get_irqn(int stream)
 {
-#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7 || CPU_FAM_STM32H7
     if (stream < 7) {
         return ((IRQn_Type)((int)DMA1_Stream0_IRQn + stream));
     }
@@ -254,7 +268,7 @@ static inline void dma_isr_enable(int stream)
 
 static inline uint32_t dma_all_flags(dma_t dma)
 {
-#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7 || CPU_FAM_STM32H7
     switch (dma_config[dma].stream & 0x3) {
         case 0: /* 0 and 4 */
             return (DMA_STREAM_IT_MASK);
@@ -272,11 +286,35 @@ static inline uint32_t dma_all_flags(dma_t dma)
 #endif
 }
 
+/**
+ * @brief  Get all active DMA interrupt flags for a DMA stream.
+ *
+ * @param[in] dma  DMA instance identifier.
+ *
+ * @return Bitmask of active DMA interrupt flags for the stream.
+ */
+static int dma_get_all_flags(dma_t dma)
+{
+    DMA_TypeDef *dma_dev = dma_base(dma_config[dma].stream);
+
+#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7 || CPU_FAM_STM32H7
+    /* Clear all flags */
+    if (dma_hl(dma_config[dma].stream) == 0) {
+        return dma_dev->LISR & dma_all_flags(dma);
+    }
+    else {
+        return dma_dev->HISR & dma_all_flags(dma);
+    }
+#else
+    return dma_dev->ISR & dma_all_flags(dma);
+#endif
+}
+
 static void dma_clear_all_flags(dma_t dma)
 {
     DMA_TypeDef *dma_dev = dma_base(dma_config[dma].stream);
 
-#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7 || CPU_FAM_STM32H7
     /* Clear all flags */
     if (dma_hl(dma_config[dma].stream) == 0) {
         dma_dev->LIFCR = dma_all_flags(dma);
@@ -307,6 +345,8 @@ void dma_init(void)
         mutex_init(&dma_ctx[i].conf_lock);
         mutex_init(&dma_ctx[i].sync_lock);
         mutex_lock(&dma_ctx[i].sync_lock);
+        mutex_init(&dma_ctx[i].sync_half_lock);
+        mutex_lock(&dma_ctx[i].sync_half_lock);
         int stream_n = dma_config[i].stream;
         dma_poweron(stream_n);
         dma_isr_enable(stream_n);
@@ -336,7 +376,7 @@ void dma_acquire(dma_t dma)
 
     dma_clear_all_flags(dma);
 
-#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7 || CPU_FAM_STM32H7
     STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
     stream->FCR = 0;
 #endif
@@ -363,7 +403,18 @@ void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
 {
     STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
 
-#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+#if CPU_FAM_STM32H7
+    (void)chan;
+    /* Set channel, data width, inc and mode */
+    uint32_t cr_settings = (DMA_SxCR_TRBUFF) |
+                           (width << DMA_SxCR_MSIZE_Pos) |
+                           (width << DMA_SxCR_PSIZE_Pos) |
+                           (inc_periph << DMA_SxCR_PINC_Pos) |
+                           ((mode & 3) << DMA_SxCR_DIR_Pos);
+    /* Configure FIFO */
+    stream->CONTROL_REG  = cr_settings;
+
+#elif CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
     /* Set channel, data width, inc and mode */
     uint32_t cr_settings = (chan & 0xF) << DMA_SxCR_CHSEL_Pos |
                            (width << DMA_SxCR_MSIZE_Pos) |
@@ -394,29 +445,52 @@ void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
     stream->PERIPH_ADDR = (uint32_t)periph_addr;
 }
 
-void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem)
+static void _dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem,
+                         bool circ, bool sync, bool sync_half)
 {
     STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
     uint32_t ctr_reg = stream->CONTROL_REG;
+    const bool transfer_complete_isr = sync;
+    const bool transfer_half_complete_isr = sync_half;
+    const bool transfer_error_isr = sync | sync_half;
 
 #ifdef DMA_SxCR_MINC
     stream->CONTROL_REG = (ctr_reg & ~(DMA_SxCR_MINC)) |
-                          (incr_mem << DMA_SxCR_MINC_Pos);
+                          (incr_mem << DMA_SxCR_MINC_Pos) |
+                          (circ ? DMA_SxCR_CIRC : 0) |
+                          (transfer_complete_isr ? DMA_SxCR_TCIE : 0) |
+                          (transfer_half_complete_isr ? DMA_SxCR_HTIE : 0) |
+                          (transfer_error_isr ? DMA_SxCR_TEIE : 0);
 #else
     stream->CONTROL_REG = (ctr_reg & ~(DMA_CCR_MINC)) |
-                          (incr_mem << DMA_CCR_MINC_Pos);
+                          (incr_mem << DMA_CCR_MINC_Pos) |
+                          (circ ? DMA_CCR_CIRC : 0) |
+                          (transfer_complete_isr ? DMA_CCR_TCIE : 0) |
+                          (transfer_half_complete_isr ? DMA_CCR_HTIE : 0) |
+                          (transfer_error_isr ? DMA_CCR_TEIE : 0);
 #endif
     stream->MEM_ADDR = (uint32_t)mem;
 
     /* Set length */
     stream->NDTR_REG = len;
     dma_ctx[dma].len = len;
+
+    static const mutex_t locked_mutex = MUTEX_INIT_LOCKED;
+    dma_ctx[dma].sync_lock = locked_mutex;
+    dma_ctx[dma].sync_half_lock = locked_mutex;
+
+    dma_clear_all_flags(dma);
+}
+
+void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem)
+{
+    _dma_prepare(dma, mem, len, incr_mem, false, true, false);
 }
 
 void dma_setup_ext(dma_t dma, dma_burst_t pburst, dma_burst_t mburst,
                    bool fifo, dma_fifo_thresh_t thresh, bool pfctrl)
 {
-#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7 || CPU_FAM_STM32H7
     STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
 
     /* configuraition can be done only if DMA stream is disabled */
@@ -517,9 +591,12 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
     }
 
     uint32_t width = (flags & DMA_DATA_WIDTH_MASK) >> DMA_DATA_WIDTH_SHIFT;
-
+    const bool circ = (flags & DMA_CIRCULAR);
+    const bool sync = !(flags & DMA_WITHOUT_WAIT);
+    const bool sync_half = (flags & DMA_WITH_WAIT_HALF);
     dma_setup(dma, chan, periph_addr, mode, width, inc_periph);
-    dma_prepare(dma, mem_addr, len, inc_mem);
+    _dma_prepare(dma, mem_addr, len, inc_mem, circ, sync, sync_half);
+    dma_req(dma)->CCR |= DMAMUX_CxCR_DMAREQ_ID_Msk & (chan << DMAMUX_CxCR_DMAREQ_ID_Pos);
 
     return 0;
 }
@@ -599,11 +676,41 @@ void dma_wait(dma_t dma)
     mutex_lock(&dma_ctx[dma].sync_lock);
 }
 
+void dma_wait_half(dma_t dma)
+{
+    mutex_lock(&dma_ctx[dma].sync_half_lock);
+}
+
 void dma_isr_handler(dma_t dma)
 {
+    const uint32_t flags = dma_get_all_flags(dma);
+
     dma_clear_all_flags(dma);
 
-    mutex_unlock(&dma_ctx[dma].sync_lock);
+    const bool transfer_complete = flags & (
+        DMA_LISR_TCIF0 | DMA_LISR_TCIF1 | DMA_LISR_TCIF2 | DMA_LISR_TCIF3 |
+        DMA_HISR_TCIF4 | DMA_HISR_TCIF5 | DMA_HISR_TCIF6 | DMA_HISR_TCIF7 );
+
+    const bool transfer_half_complete = flags & (
+        DMA_LISR_HTIF0 | DMA_LISR_HTIF1 | DMA_LISR_HTIF2 | DMA_LISR_HTIF3 |
+        DMA_HISR_HTIF4 | DMA_HISR_HTIF5 | DMA_HISR_HTIF6 | DMA_HISR_HTIF7 );
+
+    if (transfer_complete)
+    {
+        mutex_unlock(&dma_ctx[dma].sync_lock);
+    }
+
+    if (transfer_half_complete)
+    {
+        mutex_unlock(&dma_ctx[dma].sync_half_lock);
+    }
+
+    /* if interrupt generated because of an error */
+    if (transfer_complete == false && transfer_half_complete == false)
+    {
+        mutex_unlock(&dma_ctx[dma].sync_lock);
+        mutex_unlock(&dma_ctx[dma].sync_half_lock);
+    }
 
     cortexm_isr_end();
 }
@@ -678,12 +785,26 @@ void DMA_9_ISR(void)
 }
 #endif
 
+#ifdef DMA_10_ISR
+void DMA_10_ISR(void)
+{
+    dma_isr_handler(10);
+}
+#endif
+
+#ifdef DMA_11_ISR
+void DMA_11_ISR(void)
+{
+    dma_isr_handler(11);
+}
+#endif
+
 #if defined(DMA_SHARED_ISR_0) || defined(DMA_SHARED_ISR_1)
 static int dma_is_isr(dma_t dma)
 {
     DMA_TypeDef *dma_dev = dma_base(dma_config[dma].stream);
 
-#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7 || CPU_FAM_STM32H7
     /* Clear all flags */
     if (dma_hl(dma_config[dma].stream) == 0) {
         return dma_dev->LISR & dma_all_flags(dma);
