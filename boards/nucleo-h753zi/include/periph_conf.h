@@ -107,6 +107,41 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
+ * @name   SPI configuration
+ * @{
+ */
+static const spi_conf_t spi_config[] = {
+    {
+        .dev      = SPI1,
+        .mosi_pin = GPIO_PIN(PORT_B, 5),
+        .miso_pin = GPIO_PIN(PORT_A, 6),
+        .sclk_pin = GPIO_PIN(PORT_A, 5),
+        .cs_pin   = GPIO_PIN(PORT_A, 4), /* For HW NSS */
+        .mosi_af  = GPIO_AF5,
+        .miso_af  = GPIO_AF5,
+        .sclk_af  = GPIO_AF5,
+        .cs_af    = GPIO_AF5,
+        .rccmask  = RCC_APB2ENR_SPI1EN,
+        .apbbus   = APB2
+    },
+    {
+        .dev      = SPI4,
+        .mosi_pin = GPIO_PIN(PORT_E, 6),
+        .miso_pin = GPIO_PIN(PORT_E, 5),
+        .sclk_pin = GPIO_PIN(PORT_E, 2),
+        .cs_pin   = GPIO_PIN(PORT_E, 4), /* For HW NSS */
+        .mosi_af  = GPIO_AF5,
+        .miso_af  = GPIO_AF5,
+        .sclk_af  = GPIO_AF5,
+        .cs_af    = GPIO_AF5,
+        .rccmask  = RCC_APB2ENR_SPI4EN,
+        .apbbus   = APB2
+    }
+};
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
+/** @} */
+
+/**
  * @name    PWM configuration
  * @{
  */
