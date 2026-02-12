@@ -97,7 +97,9 @@ typedef enum {
  */
 #define DMA_INC_SRC_ADDR  (0x04)    /**< DMA increment source address */
 #define DMA_INC_DST_ADDR  (0x08)    /**< DMA increment destination address */
-/* DMA increment source + destination address */
+/**
+ * @brief   DMA increment both source and destination addresses
+ */
 #define DMA_INC_BOTH_ADDR (DMA_INC_SRC_ADDR | DMA_INC_DST_ADDR)
 /** @} */
 
