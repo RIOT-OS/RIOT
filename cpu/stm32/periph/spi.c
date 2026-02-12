@@ -463,8 +463,10 @@ static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
     dma_start(spi_config[bus].rx_dma);
     dma_start(spi_config[bus].tx_dma);
 
+#if CPU_FAM_STM32H7
     dev(bus)->CR1 |= SPI_CR1_SPE;
     dev(bus)->CR1 |= SPI_CR1_CSTART;
+#endif
 
     dma_wait(spi_config[bus].rx_dma);
     dma_wait(spi_config[bus].tx_dma);
