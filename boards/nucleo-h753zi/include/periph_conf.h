@@ -39,7 +39,7 @@ extern "C" {
  */
 static const dma_conf_t dma_config[] = {
     { .stream = 4 },   /* DMA1 Stream 4 - USART3_TX */
-    { .stream = 14 },   /* DMA2 Stream 6 - USART6_TX */
+    { .stream = 14 },  /* DMA2 Stream 6 - USART6_TX */
     { .stream = 6 },   /* DMA1 Stream 6 - USART2_TX */
 };
 
@@ -139,6 +139,27 @@ static const spi_conf_t spi_config[] = {
     }
 };
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
+/** @} */
+
+/**
+ * @name   ADC configuration
+ * @note   STM32H7 ADC is 16-bit, and uses independent clocks
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    {GPIO_PIN(PORT_A, 3), 0, 15},
+    {GPIO_PIN(PORT_C, 0), 1, 10},
+    {GPIO_PIN(PORT_C, 3), 0, 13},
+    {GPIO_PIN(PORT_B, 1), 1, 5},
+    {GPIO_PIN(PORT_C, 2), 0, 12},
+    {GPIO_PIN(PORT_F, 10), 2, 6},
+    {GPIO_UNDEF, 2, 16}, /* Temperature sensor */
+    {GPIO_UNDEF, 2, 17}, /* VBAT */
+    {GPIO_UNDEF, 2, 18}, /* VREFINT */
+};
+
+#define VBAT_ADC            ADC_LINE(17)
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 /**
