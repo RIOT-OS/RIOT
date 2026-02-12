@@ -421,10 +421,12 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         }
         else {
             dma_acquire(uart_config[uart].dma);
-            dev(uart)->CR3 |= USART_CR3_DMAT;
-            dma_transfer(uart_config[uart].dma, uart_config[uart].dma_chan, data,
+            dma_configure(uart_config[uart].dma, uart_config[uart].dma_chan, data,
                          (void *)&dev(uart)->TDR_REG, len, DMA_MEM_TO_PERIPH, DMA_INC_SRC_ADDR);
-
+            dma_start(uart_config[uart].dma);
+            dev(uart)->CR3 |= USART_CR3_DMAT;
+            dma_wait(uart_config[uart].dma);
+            dma_stop(uart_config[uart].dma);
             /* make sure the function is synchronous by waiting for the transfer to
              * finish */
             wait_for_tx_complete(uart);
