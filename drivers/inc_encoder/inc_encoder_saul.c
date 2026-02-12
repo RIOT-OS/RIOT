@@ -21,12 +21,12 @@
 static int read_rpm(const void *dev, phydat_t *res)
 {
     inc_encoder_t *d = (inc_encoder_t *) dev;
-    int32_t mrpm;
+    int32_t mrpm;:
     if (inc_encoder_read_mrpm(d, &mrpm)) {
         /* Read failure */
         return -ECANCELED;
     }
-    res->val[0] = (int16_t) mrpm / 100;
+    res->val[0] = (int16_t) (mrpm / 100);
     res->unit = UNIT_RPM;
     res->scale = -1;
     return 1;
