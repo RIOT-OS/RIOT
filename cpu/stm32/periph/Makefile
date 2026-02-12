@@ -2,7 +2,7 @@ MODULE = periph
 
 # Select the specific implementation for `periph_i2c`
 ifneq (,$(filter periph_i2c,$(USEMODULE)))
-  ifneq (,$(filter $(CPU_FAM),f0 f3 f7 g0 g4 l0 l4 l5 u5 wb wl c0))
+  ifneq (,$(filter $(CPU_FAM),f0 f3 f7 g0 g4 h7 l0 l4 l5 u5 wb wl c0))
     SRC += i2c_1.c
   else ifneq (,$(filter $(CPU_FAM),f1 f2 f4 l1))
     SRC += i2c_2.c
