@@ -133,6 +133,7 @@ static inline DMA_Request_TypeDef *dma_req(int stream_n)
 }
 #endif
 
+#if CPU_FAM_STM32H7
 /**
  * @brief  Get the DMAMUX channel associated with a DMA stream.
  *
@@ -145,6 +146,7 @@ static inline DMAMUX_Channel_TypeDef *dma_req(dma_t dma)
     DMAMUX_Channel_TypeDef *mux_chans = DMAMUX1_Channel0;
     return &mux_chans[dma_config[dma].stream];
 }
+#endif
 
 /**
  * @brief   Get the DMA stream base address
@@ -345,8 +347,10 @@ void dma_init(void)
         mutex_init(&dma_ctx[i].conf_lock);
         mutex_init(&dma_ctx[i].sync_lock);
         mutex_lock(&dma_ctx[i].sync_lock);
+#if CPU_FAM_STM32H7
         mutex_init(&dma_ctx[i].sync_half_lock);
         mutex_lock(&dma_ctx[i].sync_half_lock);
+#endif
         int stream_n = dma_config[i].stream;
         dma_poweron(stream_n);
         dma_isr_enable(stream_n);
@@ -596,7 +600,9 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
     const bool sync_half = (flags & DMA_WITH_WAIT_HALF);
     dma_setup(dma, chan, periph_addr, mode, width, inc_periph);
     _dma_prepare(dma, mem_addr, len, inc_mem, circ, sync, sync_half);
+#if CPU_FAM_STM32H7
     dma_req(dma)->CCR |= DMAMUX_CxCR_DMAREQ_ID_Msk & (chan << DMAMUX_CxCR_DMAREQ_ID_Pos);
+#endif
 
     return 0;
 }
