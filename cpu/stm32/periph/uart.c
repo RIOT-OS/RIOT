@@ -50,6 +50,13 @@
 #define ISR_TC      USART_ISR_TC
 #define TDR_REG     TDR
 #define RDR_REG     RDR
+#elif defined(CPU_FAM_STM32H7)
+#  define ISR_REG     ISR
+#  define ISR_TXE     USART_ISR_TXE_TXFNF
+#  define ISR_RXNE    USART_ISR_RXNE_RXFNE
+#  define ISR_TC      USART_ISR_TC
+#  define TDR_REG     TDR
+#  define RDR_REG     RDR
 #else
 #define ISR_REG     SR
 #define ISR_TXE     USART_SR_TXE

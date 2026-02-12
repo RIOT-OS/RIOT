@@ -75,6 +75,11 @@ static inline void print_str(const char *str)
 #  define GPIOAEN       RCC_APB2ENR_IOPAEN
 #endif
 
+#ifdef RCC_AHB4ENR_GPIOAEN
+#  define GPIO_BUS      AHB4
+#  define GPIOAEN       RCC_AHB4ENR_GPIOAEN
+#endif
+
 /* Bitmask to extract a mode field of the mode register "MODER".
  * Note: Some families provide both, hence #elif */
 #ifdef GPIO_MODER_MODER0_Msk
@@ -328,7 +333,7 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
         return -ENOTSUP;
     }
 
-#ifndef GPIO_PUPDR_PUPDR0
+#if !defined(GPIO_PUPDR_PUPDR0) && !defined(GPIO_PUPDR_PUPD0)
     /* without dedicated pull up / pull down register, pull resistors can only
      * be used with input pins */
     if ((conf.state == GPIO_OUTPUT_OPEN_DRAIN) && (conf.pull != GPIO_FLOATING)) {

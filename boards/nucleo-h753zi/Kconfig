@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2025 Technische Universität Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "nucleo-h753zi" if BOARD_NUCLEO_H753ZI
+
+config BOARD_NUCLEO_H753ZI
+    bool
+    default y
+    select BOARD_COMMON_NUCLEO144
+    select CPU_MODEL_STM32H753ZI
+
+source "$(RIOTBOARD)/common/nucleo144/Kconfig"

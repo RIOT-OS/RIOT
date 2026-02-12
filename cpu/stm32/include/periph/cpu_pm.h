@@ -43,7 +43,11 @@ extern "C" {
 /**
  * @brief   Wake-up pins configuration (CSR register)
  */
-#define PM_EWUP_CONFIG          (0U)
+#  ifdef CPU_FAM_STM32H7
+#    define PM_EWUP_CONFIG     (PWR_WKUPEPR_WKUPEN4) /* Enable WKUP4 pin (BTN0) */
+#  else
+#    define PM_EWUP_CONFIG     (0U)
+#  endif
 #endif
 /** @} */
 

@@ -65,6 +65,16 @@ extern "C" {
 #endif
 /** @} */
 
+/* Provide a CPU_IRQ_NUMOF for STM32H7 family ---
+ * The H7 family typically exposes up to 150 maskable interrupt lines
+ * (NVIC external interrupts). Defining this prevents undefined behavior
+ * where code expects CPU_IRQ_NUMOF to be present.
+ * NOTE: we only add this define; existing logic is left untouched.
+ */
+#if defined(CPU_FAM_STM32H7) && !defined(CPU_IRQ_NUMOF)
+#  define CPU_IRQ_NUMOF                   (150U)
+#endif
+
 /**
  * @brief   Flash page configuration
  * @{

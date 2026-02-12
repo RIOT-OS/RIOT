@@ -52,12 +52,21 @@ static inline uint32_t _wdt_time(uint8_t pre, uint16_t rel)
 
 static inline void _iwdt_unlock(void)
 {
+#ifdef CPU_FAM_STM32H7
+    IWDG1->KR = IWDG_UNLOCK;
+#else
     IWDG->KR = IWDG_UNLOCK;
+#endif
 }
 
 static inline void _iwdt_lock(void)
 {
+
+#ifdef CPU_FAM_STM32H7
+    IWDG1->KR = IWDG_LOCK;
+#else
     IWDG->KR = IWDG_LOCK;
+#endif
 }
 
 static void _set_prescaler(uint8_t prescaler)
@@ -65,7 +74,11 @@ static void _set_prescaler(uint8_t prescaler)
     assert(prescaler <= MAX_PRESCALER);
 
     _iwdt_unlock();
+#ifdef CPU_FAM_STM32H7
+    IWDG1->PR = prescaler;
+#else
     IWDG->PR = prescaler;
+#endif
     _iwdt_lock();
 }
 
@@ -74,7 +87,11 @@ static void _set_reload(uint16_t reload)
     assert(reload <= IWDG_RLR_RL);
 
     _iwdt_unlock();
+#ifdef CPU_FAM_STM32H7
+    IWDG1->RLR = reload;
+#else
     IWDG->RLR = reload;
+#endif
     _iwdt_lock();
 }
 
@@ -97,7 +114,11 @@ static uint16_t _find_reload_value(uint8_t pre, uint32_t rst_time)
 
 void wdt_start(void)
 {
+#ifdef CPU_FAM_STM32H7
+    IWDG1->KR = IWDG_KR_KEY_ENABLE;
+#else
     IWDG->KR = IWDG_KR_KEY_ENABLE;
+#endif
 }
 
 #ifdef CPU_FAM_STM32L4
@@ -109,7 +130,11 @@ void wdt_init(void)
 
 void wdt_kick(void)
 {
+#ifdef CPU_FAM_STM32H7
+    IWDG1->KR = IWDG_KR_KEY_RELOAD;
+#else
     IWDG->KR = IWDG_KR_KEY_RELOAD;
+#endif
 }
 
 void wdt_setup_reboot(uint32_t min_time, uint32_t max_time)
