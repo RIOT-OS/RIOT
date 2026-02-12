@@ -33,6 +33,24 @@ extern "C" {
 #endif
 
 /**
+ * @name    DMA configuration
+ * @note    STM32H7 peripherals (D2 domain) use DMA1/DMA2.
+ * @{
+ */
+static const dma_conf_t dma_config[] = {
+    { .stream = 4 },   /* DMA1 Stream 4 - USART3_TX */
+    { .stream = 14 },   /* DMA2 Stream 6 - USART6_TX */
+    { .stream = 6 },   /* DMA1 Stream 6 - USART2_TX */
+};
+
+#define DMA_0_ISR  isr_dma1_stream4
+#define DMA_1_ISR  isr_dma2_stream6
+#define DMA_2_ISR  isr_dma1_stream6
+
+#define DMA_NUMOF           ARRAY_SIZE(dma_config)
+/** @} */
+
+/**
  * @name    UART configuration
  * @note    STM32H753ZI uses APB1L/APB2 buses (D2 Domain)
  * @{
@@ -46,7 +64,11 @@ static const uart_conf_t uart_config[] = {
         .rx_af      = GPIO_AF7,
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
-        .irqn       = USART3_IRQn
+        .irqn       = USART3_IRQn,
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 0,
+        .dma_chan   = 46 /* DMAMUX_REQ_USART3_TX */
+#endif
     },
     {
         .dev        = USART6,
@@ -56,7 +78,11 @@ static const uart_conf_t uart_config[] = {
         .rx_af      = GPIO_AF7,
         .tx_af      = GPIO_AF7,
         .bus        = APB2,
-        .irqn       = USART6_IRQn
+        .irqn       = USART6_IRQn,
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 1,
+        .dma_chan   = 72 /* DMAMUX_REQ_USART6_TX */
+#endif
     },
     {
         .dev        = USART2,
@@ -66,7 +92,11 @@ static const uart_conf_t uart_config[] = {
         .rx_af      = GPIO_AF7,
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
-        .irqn       = USART2_IRQn
+        .irqn       = USART2_IRQn,
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 2,
+        .dma_chan   = 44 /* DMAMUX_REQ_USART2_TX */
+#endif
     }
 };
 
