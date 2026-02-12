@@ -63,7 +63,8 @@ typedef enum {
     defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
+    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0) || \
+    defined(CPU_FAM_STM32H7)
     I2C_SPEED_FAST_PLUS,    /**< fast plus mode: ~1Mbit/s */
 #endif
 } i2c_speed_t;
@@ -89,7 +90,7 @@ typedef struct {
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L4) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WL) || \
-    defined(CPU_FAM_STM32C0)
+    defined(CPU_FAM_STM32C0) || defined(CPU_FAM_STM32H7)
     uint32_t rcc_sw_mask;   /**< bit to switch I2C clock */
 #endif
 #if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
@@ -105,7 +106,8 @@ typedef struct {
     defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
     defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32G4) || \
     defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
+    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0) || \
+    defined(CPU_FAM_STM32H7)
 /**
  * @brief   Structure for I2C timing register settings
  */
@@ -127,23 +129,47 @@ typedef struct {
  * - STM32F72X: see RM0431, section 26.4.9, p.851, table 149
  * - STM32L0x2: see RM0376, section 27.4.10, p.686, table 117
  * - STM32L4X5/6: see RM0351, section 39.4.9, p.1297, table 234
+ * - STM32H753: see RM0433, section 47.4.10, p.1982, table 389
  *
  * @ref i2c_timing_param_t
  */
 static const i2c_timing_param_t timing_params[] = {
+#  if defined (CPU_FAM_STM32H7) /* HSI input clock 64MHz */
+    [ I2C_SPEED_NORMAL ]    = {
+        .presc  = 4,
+        .scll   = 0x3F,     /* t_SCLL   = 5.0us   */
+        .sclh   = 0x33,     /* t_SCLH   = 4.0us   */
+        .sdadel = 0x1,      /* t_SDADEL = 500ns   */
+        .scldel = 0xF,      /* t_SCLDEL = 1250ns  */
+    }, /* 0x4F10333F */
+    [ I2C_SPEED_FAST ]      = {
+        .presc  = 1,
+        .scll   = 0x27,     /* t_SCLL   = 1250ns  */
+        .sclh   = 0x0F,     /* t_SCLH   = 500ns   */
+        .sdadel = 0x1,      /* t_SDADEL = 250ns   */
+        .scldel = 0xC,      /* t_SCLDEL = 500ns   */
+    }, /* 0x1C100F27 */
+    [ I2C_SPEED_FAST_PLUS ] = {
+        .presc =  1,
+        .scll =   0x09,     /* t_SCLL   = 312.5ns */
+        .sclh =   0x05,     /* t_SCLH   = 187.5ns */
+        .sdadel = 0x1,      /* t_SDADEL = 0ns     */
+        .scldel = 0xC,      /* t_SCLDEL = 187.5ns */
+    }, /* 0x1C100509 */
+#  else
     [ I2C_SPEED_NORMAL ]    = {
         .presc  = 3,
-        .scll   = 0x13,     /* t_SCLL   = 5.0us  */
-        .sclh   = 0xF,      /* t_SCLH   = 4.0us  */
-        .sdadel = 0x2,      /* t_SDADEL = 500ns  */
-        .scldel = 0x4,      /* t_SCLDEL = 1250ns */
+        .scll   = 0x13,     /* t_SCLL   = 5.0us   */
+        .sclh   = 0xF,      /* t_SCLH   = 4.0us   */
+        .sdadel = 0x2,      /* t_SDADEL = 500ns   */
+        .scldel = 0x4,      /* t_SCLDEL = 1250ns  */
     },
     [ I2C_SPEED_FAST ]      = {
         .presc  = 1,
-        .scll   = 0x9,      /* t_SCLL   = 1250ns */
-        .sclh   = 0x3,      /* t_SCLH   = 500ns  */
-        .sdadel = 0x2,      /* t_SDADEL = 250ns  */
-        .scldel = 0x3,      /* t_SCLDEL = 500ns  */
+        .scll   = 0x9,      /* t_SCLL   = 1250ns  */
+        .sclh   = 0x3,      /* t_SCLH   = 500ns   */
+        .sdadel = 0x2,      /* t_SDADEL = 250ns   */
+        .scldel = 0x3,      /* t_SCLDEL = 500ns   */
     },
     [ I2C_SPEED_FAST_PLUS ] = {
         .presc =  0,
@@ -152,18 +178,21 @@ static const i2c_timing_param_t timing_params[] = {
         .sdadel = 0x0,      /* t_SDADEL = 0ns     */
         .scldel = 0x2,      /* t_SCLDEL = 187.5ns */
     }
+#  endif
 };
 #endif  /* CPU_FAM_STM32F0 || CPU_FAM_STM32F3 || CPU_FAM_STM32F7 ||
             CPU_FAM_STM32L0 || CPU_FAM_STM32L4 || CPU_FAM_STM32L5 ||
             CPU_FAM_STM32G0 || CPU_FAM_STM32G4 || CPU_FAM_STM32U5 ||
-            CPU_FAM_STM32WB || CPU_FAM_STM32WL || CPU_FAM_STM32C0 */
+            CPU_FAM_STM32WB || CPU_FAM_STM32WL || CPU_FAM_STM32C0 ||
+            CPU_FAM_STM32H7 */
 
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
     defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
     defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
+    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0) || \
+    defined(CPU_FAM_STM32H7)
 /**
  * @brief   The I2C implementation supports only a limited frame size.
  *          See i2c_1.c

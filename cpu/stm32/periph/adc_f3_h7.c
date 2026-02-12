@@ -25,8 +25,14 @@
 
 #define ADC_SMP_MIN_VAL     (0x2) /*< Sampling time for slow channels
                                       (0x2 = 4.5 ADC clock cycles) */
-#define ADC_SMP_VBAT_VAL    (0x5) /*< Sampling time when the VBat channel
+
+#ifdef CPU_FAM_STM32H7
+#  define ADC_SMP_VBAT_VAL    (0x7) /*< Sampling time when the VBat channel
+                                      is read (0x7 = 810.5 ADC clock cycles) */
+#else
+#  define ADC_SMP_VBAT_VAL    (0x5) /*< Sampling time when the VBat channel
                                       is read (0x5 = 61.5 ADC clock cycles) */
+#endif
 
 /* The sampling time width is 3 bit */
 #define ADC_SMP_BIT_WIDTH    (3)
@@ -56,15 +62,22 @@ static mutex_t locks[ADC_DEVS];
 static inline ADC_TypeDef *dev(adc_t line)
 {
     switch (adc_config[line].dev) {
+#ifdef ADC1_BASE
+        case 0:
+            return (ADC_TypeDef *)(ADC1_BASE);
+            break;
+#endif
 #ifdef ADC2_BASE
         case 1:
             return (ADC_TypeDef *)(ADC2_BASE);
             break;
 #endif
-#ifdef ADC34_COMMON
+#ifdef ADC3_BASE
         case 2:
             return (ADC_TypeDef *)(ADC3_BASE);
             break;
+#endif
+#ifdef ADC4_BASE
         case 3:
             return (ADC_TypeDef *)(ADC4_BASE);
             break;
@@ -102,6 +115,11 @@ int adc_init(adc_t line)
         return -1;
     }
 
+#if CPU_FAM_STM32H7
+    /* Set per_ck (HSI - 64MHz) as ADC kernel peripheral clock */
+    RCC->D3CCIPR |= RCC_D3CCIPR_ADCSEL_1;
+#endif
+
     /* Lock device and enable its peripheral clock */
     prep(line);
 /* On some STM32F3 ADC are grouped by paire (ADC12EN or ADC34EN) so
@@ -116,30 +134,48 @@ int adc_init(adc_t line)
         periph_clk_en(AHB, RCC_AHBENR_ADC34EN);
     }
 #endif
+#if defined(RCC_AHB1ENR_ADC12EN) /* STM32H7 */
+    if (adc_config[line].dev <= 1) {
+        periph_clk_en(AHB1, RCC_AHB1ENR_ADC12EN);
+    }
+#endif
+#if defined(RCC_AHB4ENR_ADC3EN) /* STM32H7 */
+    if (adc_config[line].dev >= 2) {
+        periph_clk_en(AHB4, RCC_AHB4ENR_ADC3EN);
+    }
+#endif
 
     /* Setting ADC clock to HCLK/1 is only allowed if AHB clock
      * prescaler is 1 */
+#ifdef RCC_D1CFGR_HPRE
+    if (!(RCC->D1CFGR & RCC_D1CFGR_HPRE_3)) {
+#else
     if (!(RCC->CFGR & RCC_CFGR_HPRE_3)) {
+#endif
         /* set ADC clock to HCLK/1 */
         if (adc_config[line].dev <= 1) {
             ADC_INSTANCE->CCR |= ADC_CCR_CKMODE_0;
         }
-#ifdef ADC34_COMMON
         if (adc_config[line].dev >= 2) {
+#if defined(ADC3_COMMON)
+            ADC3_COMMON->CCR |= ADC_CCR_CKMODE_0;
+#elif defined(ADC34_COMMON)
             ADC34_COMMON->CCR |= ADC_CCR_CKMODE_0;
-        }
 #endif
+        }
     }
     else {
         /* set ADC clock to HCLK/2 otherwise */
         if (adc_config[line].dev <= 1) {
             ADC_INSTANCE->CCR |= ADC_CCR_CKMODE_1;
         }
-#ifdef ADC34_COMMON
         if (adc_config[line].dev >= 2) {
+#if defined(ADC3_COMMON)
+            ADC3_COMMON->CCR  |= ADC_CCR_CKMODE_1;
+#elif defined(ADC34_COMMON)
             ADC34_COMMON->CCR |= ADC_CCR_CKMODE_1;
-        }
 #endif
+        }
     }
 
     /* Configure the pin */
@@ -148,6 +184,11 @@ int adc_init(adc_t line)
     }
     /* Init ADC line only if it wasn't already initialized */
     if (!(dev(line)->CR & ADC_CR_ADEN)) {
+
+#if CPU_FAM_STM32H7
+        /* take ADC out of deep sleep */
+        dev(line)->CR &= ~(ADC_CR_DEEPPWD);
+#endif
         /* Enable ADC internal voltage regulator and wait for startup period */
         dev(line)->CR |= ADC_CR_ADVREGEN;
         busy_wait_us(ADC_T_ADCVREG_STUP_US * 2);
@@ -160,6 +201,13 @@ int adc_init(adc_t line)
             /* Configure calibration for single ended inputs */
             dev(line)->CR &= ~ADC_CR_ADCALDIF;
         }
+
+#if CPU_FAM_STM32H7
+        /* enable linearity cal, and turn on boost supply */
+        if (adc_config[line].dev <= 2) {
+            dev(line)->CR |= ADC_CR_ADCALLIN | ADC_CR_BOOST;
+        }
+#endif
 
         /* Start automatic calibration and wait for it to complete */
         dev(line)->CR |= ADC_CR_ADCAL;
@@ -176,11 +224,15 @@ int adc_init(adc_t line)
         dev(line)->SQR1 |= (0 & ADC_SQR1_L);
     }
 
-    /* determine the right sampling time */
     uint32_t smp_time = ADC_SMP_MIN_VAL;
     if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
         smp_time = ADC_SMP_VBAT_VAL;
     }
+
+#if CPU_FAM_STM32H7
+    /* Enable the ADC channel's analog switch */
+    dev(line)->PCSEL |= ADC_PCSEL_PCSEL_0 << adc_config[line].chan;
+#endif
 
     /* Configure sampling time for the given channel */
     if (adc_config[line].chan < 10) {
@@ -224,6 +276,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     dev(line)->SQR1 = adc_config[line].chan << ADC_SQR1_SQ1_Pos;
 
     /* Start conversion and wait for it to complete */
+    dev(line)->ISR |= ADC_ISR_EOC;
     dev(line)->CR |= ADC_CR_ADSTART;
     while (!(dev(line)->ISR & ADC_ISR_EOC)) {}
 
