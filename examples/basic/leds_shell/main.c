@@ -97,10 +97,8 @@ SHELL_COMMAND(led, "Switch on/off or toggle on-board LEDs", _led_cmd);
 
 int main(void)
 {
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
     printf("This board has %d LEDs\n", LED_NUMOF);
 
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
+    /* shell starts implicitly after returning */
     return 0;
 }
