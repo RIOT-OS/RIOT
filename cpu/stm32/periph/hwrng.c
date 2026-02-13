@@ -35,7 +35,7 @@ void hwrng_read(void *buf, unsigned int num)
     unsigned int count = 0;
     uint8_t *b = (uint8_t *)buf;
 
-/* Select PLL1Q as RNG clock source for STM32H753ZI. */
+/* Select PLL1Q as RNG clock source for STM32H7 */
 #if defined(CPU_FAM_STM32H7)
     RCC->D2CCIP2R |= RCC_D2CCIP2R_RNGSEL_0;
 #endif
