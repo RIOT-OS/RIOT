@@ -79,7 +79,7 @@ static gnrc_netif_t *_find_upstream_netif(void)
 static void _configure_upstream_netif(gnrc_netif_t *upstream_netif)
 {
     if (IS_ACTIVE(CONFIG_GNRC_DHCPV6_CLIENT_6LBR_STATIC_ROUTE)) {
-        ipv6_addr_t addr = IPV6_ADDR_INIT(0xfe80,0,0,0,0,0,0,0,0,0,0,0,0,0,1);
+        ipv6_addr_t addr = IPV6_ADDR_INIT(0xfe80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
 
         /* set default route to host machine (as set-up in setup_network.sh) */
         gnrc_ipv6_nib_ft_add(NULL, 0, &addr, upstream_netif->pid, 0);

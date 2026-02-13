@@ -43,7 +43,7 @@ static const ipv4_addr_t sock_dns_mock_example_com_addr_ipv4 =
  *        Address represents "2606:2800:220:1:248:1893:25c8:1946".
  */
 static const ipv6_addr_t sock_dns_mock_example_com_addr_ipv6 =
-    IPV6_ADDR_INIT(0x2606,0x2800,0x0220,0x1,0x248,0x1893,0x25c8,0x1946);
+    IPV6_ADDR_INIT(0x2606, 0x2800, 0x0220, 0x0001, 0x0248, 0x1893, 0x25c8, 0x1946);
 
 #ifdef __cplusplus
 }
