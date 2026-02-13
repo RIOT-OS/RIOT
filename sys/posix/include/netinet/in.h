@@ -50,12 +50,12 @@ extern "C" {
 /**
  * IPv6 wildcard address.
  */
-#define IN6ADDR_ANY_INIT        IPV6_ADDR_UNSPECIFIED
+#define IN6ADDR_ANY_INIT        {{ 0 }}
 
 /**
  * IPv6 loopback address.
  */
-#define IN6ADDR_LOOPBACK_INIT   IPV6_ADDR_LOOPBACK
+#define IN6ADDR_LOOPBACK_INIT   {{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }}
 
 /**
  * @name    IPv6 address macros
