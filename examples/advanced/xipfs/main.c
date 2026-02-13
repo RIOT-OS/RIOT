@@ -138,7 +138,6 @@ static int drop_file(const file_to_drop_t *file_to_drop) {
  *
  * This shell command handler will create a file hello-world.fae on /nvme0p0,
  * if none exists yet from the files_to_drop array.
- *
  */
 int drop_files_handler(int argc, char **argv) {
     (void)argc;

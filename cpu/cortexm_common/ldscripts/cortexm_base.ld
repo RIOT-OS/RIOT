@@ -183,11 +183,6 @@ SECTIONS
         *(.data .data.*);
         KEEP (*(SORT(.xfa.*)))
         KEEP (*(.openocd .openocd.*))
-        . = ALIGN(4);
-        _xipfs_shared_api_data_start = .;
-        KEEP (*(.xipfs_shared_api_data))
-        . = ALIGN(32);
-        _xipfs_shared_api_data_end = .;
         _erelocate = .;
     } > ram AT> rom
 
@@ -258,3 +253,4 @@ SECTIONS
 }
 
 ASSERT((_xipfs_shared_api_code_out_end - _xipfs_shared_api_code_out_start) <= 4096, "XIPFS shared api code does not fit into 4096 bytes");
+

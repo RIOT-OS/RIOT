@@ -194,9 +194,9 @@ static void test_xipfs_execv_efault_args_0_null(void);
 static void test_xipfs_extended_driver_execv(void);
 #ifdef XIPFS_ENABLE_SAFE_EXEC_SUPPORT
 
-#ifndef __MPU_PRESENT
-#error "No MPU present"
-#endif
+#  ifndef __MPU_PRESENT
+#    error "No MPU present"
+#  endif
 
 static void test_xipfs_safe_execv_efault_path(void);
 static void test_xipfs_safe_execv_enoent_path_null_char(void);
@@ -2711,14 +2711,13 @@ static void test_xipfs_safe_execv_efault_args_0_null(void)
 
 #endif /* XIPFS_ENABLE_SAFE_EXEC_SUPPORT */
 
-
 #define MINIMAL_FAE_FILENAME "/dev/nvme0p0/minimal.fae"
 
 static void drop_minimal_fae_file(void)
 {
     const uint32_t bytesize = sizeof(minimal_fae)/sizeof(minimal_fae[0]);
 
-    // Drop file into filesystem.
+    /* Drop file into filesystem. */
     int ret = xipfs_extended_driver_new_file(MINIMAL_FAE_FILENAME, bytesize, 1);
     XIPFS_ASSERT(ret >= 0);
 
@@ -2739,7 +2738,7 @@ static void test_xipfs_extended_driver_execv(void)
         MINIMAL_FAE_FILENAME, NULL
     };
 
-    // Actual test
+    /* Actual test */
     int ret = xipfs_extended_driver_execv(MINIMAL_FAE_FILENAME, argv);
     XIPFS_ASSERT(ret == 0);
 
@@ -2758,14 +2757,14 @@ static void test_xipfs_extended_driver_safe_execv(void)
         MINIMAL_FAE_FILENAME, NULL
     };
 
-    // Actual test
+    /* Actual test */
     int ret = xipfs_extended_driver_safe_execv(MINIMAL_FAE_FILENAME, argv);
     /* ARMv8M is not supported for now, then we expect ret == -1. */
-#   if defined(__ARM_ARCH_8M_MAIN__) || defined(__ARM_ARCH_8M_BASE__)
+#  if defined(__ARM_ARCH_8M_MAIN__) || defined(__ARM_ARCH_8M_BASE__)
     XIPFS_ASSERT(ret == -1);
-#   else
+#  else
     XIPFS_ASSERT(ret == 0);
-#   endif
+#  endif
 
     /* clean up */
     ret = xipfs_format(xipfs_nvme0p0);
