@@ -24,6 +24,20 @@ Details steps to test your contribution:
 - the expected success test output
 -->
 
+### Declaration of [Generative AI]-Tool-usage:
+> [!NOTE]
+> Please delete the sentences and parts of them  that are untrue.
+> Please add information (e.g., name tools or technologies) if needed.
+- A LLM was used to produce whole file(s), function(s), codeblocks or snippets.
+- A LLM was used to produce documentation.
+- A LLM was used to check the code.
+- another kind of [Generative AI]-Tool was used to do something. 
+- No [Generative AI]-Tool was used in any way but spellcheck
+
+Tools that were used are:
+none
+
+[Generative AI]: https://en.wikipedia.org/wiki/Generative_artificial_intelligence
 
 ### Issues/PRs references
 
@@ -34,16 +48,3 @@ Please use keywords (e.g., fixes, resolve) with the links to the issues you
 resolved, this way they will be automatically closed when your pull request
 is merged. See https://help.github.com/articles/closing-issues-using-keywords/.
 -->
-
-### Declaration of AI-Toolusage:
- <!-- You may delete the either sentence in case. -->
-- This PR was written using LLM assistance:
-  - [ ] the LLM was tasked to produce whole file(s),
-  - [ ] the LLM was tasked to produce function(s),
-  - [ ] the LLM was tasked to produce codeblocks or snippets,
-  - [ ] the LLM was used to check the code,
-  - [ ] the LLM was used to produce documentation,
-  - [ ] the LLM was used to spellcheck.
-- No LLM ("AI") was used in any way.
-
-Tools that were used are:
