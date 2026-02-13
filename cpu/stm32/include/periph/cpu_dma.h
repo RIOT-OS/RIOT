@@ -97,10 +97,7 @@ typedef enum {
  */
 #define DMA_INC_SRC_ADDR  (0x04)    /**< DMA increment source address */
 #define DMA_INC_DST_ADDR  (0x08)    /**< DMA increment destination address */
-/**
- * @brief   DMA increment both source and destination addresses
- */
-#define DMA_INC_BOTH_ADDR (DMA_INC_SRC_ADDR | DMA_INC_DST_ADDR)
+#define DMA_INC_BOTH_ADDR (DMA_INC_SRC_ADDR | DMA_INC_DST_ADDR) /**< DMA increment source + destination address */
 /** @} */
 
 /**
@@ -111,36 +108,6 @@ typedef enum {
 #define DMA_DATA_WIDTH_HALF_WORD (0x01) /**< Half word width (2 bytes)*/
 #define DMA_DATA_WIDTH_WORD      (0x02) /**< Word width (4 bytes)*/
 /** @} */
-
-/**
- * @brief       Use memory buffer given to DMA as a circular buffer.
- *
- * When this flag is present in the flags arg of calls to `dma_configure()`, the
- * DMA transfer will loop back to the starting address when the end of the given
- * memory buffer is hit. The memory buffer will act as a ring buffer.
- */
-#define DMA_CIRCULAR                (0x10)
-
-/**
- * @brief       Perform DMA operation without wait functionality.
- *
- * When this flag is present in the flags arg of calls to `dma_configure()`, the
- * `dma_wait()` functionality will not be enabled. This saves an interrupt per
- * transfer when waits aren't needed.
- *
- * When this flag is used, `dma_wait()` should not be called to end DMA, as the
- * DMA transfer will never finish. Instead call `dma_stop()` followed by
- * `dma_release()` to end the transfer.
- */
-#define DMA_WITHOUT_WAIT            (0x20)
-
-/**
- * @brief       Perform DMA operation with wait half transfer functionality.
- *
- * When this flag is present in the flags arg of calls to `dma_configure()`, the
- * `dma_wait_half()` functionality will be enabled.
- */
-#define DMA_WITH_WAIT_HALF          (0x40)
 
 #ifdef MODULE_PERIPH_DMA
 /**
@@ -226,13 +193,6 @@ void dma_stop(dma_t dma);
  * @param[in] dma     logical DMA stream
  */
 void dma_wait(dma_t dma);
-
-/**
- * @brief   Wait for the first half of a transfer
- *
- * @param[in] dma     logical DMA stream
- */
-void dma_wait_half(dma_t dma);
 
 /**
  * @brief   Configure a DMA stream for a new transfer

@@ -89,7 +89,6 @@ struct dma_ctx {
     STM32_DMA_Stream_Type *stream;
     mutex_t conf_lock;
     mutex_t sync_lock;
-    mutex_t sync_half_lock;
     uint16_t len;
 };
 
@@ -288,30 +287,6 @@ static inline uint32_t dma_all_flags(dma_t dma)
 #endif
 }
 
-/**
- * @brief  Get all active DMA interrupt flags for a DMA stream.
- *
- * @param[in] dma  DMA instance identifier.
- *
- * @return Bitmask of active DMA interrupt flags for the stream.
- */
-static int dma_get_all_flags(dma_t dma)
-{
-    DMA_TypeDef *dma_dev = dma_base(dma_config[dma].stream);
-
-#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7 || CPU_FAM_STM32H7
-    /* Clear all flags */
-    if (dma_hl(dma_config[dma].stream) == 0) {
-        return dma_dev->LISR & dma_all_flags(dma);
-    }
-    else {
-        return dma_dev->HISR & dma_all_flags(dma);
-    }
-#else
-    return dma_dev->ISR & dma_all_flags(dma);
-#endif
-}
-
 static void dma_clear_all_flags(dma_t dma)
 {
     DMA_TypeDef *dma_dev = dma_base(dma_config[dma].stream);
@@ -347,10 +322,6 @@ void dma_init(void)
         mutex_init(&dma_ctx[i].conf_lock);
         mutex_init(&dma_ctx[i].sync_lock);
         mutex_lock(&dma_ctx[i].sync_lock);
-#if CPU_FAM_STM32H7
-        mutex_init(&dma_ctx[i].sync_half_lock);
-        mutex_lock(&dma_ctx[i].sync_half_lock);
-#endif
         int stream_n = dma_config[i].stream;
         dma_poweron(stream_n);
         dma_isr_enable(stream_n);
@@ -414,7 +385,8 @@ void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
                            (width << DMA_SxCR_MSIZE_Pos) |
                            (width << DMA_SxCR_PSIZE_Pos) |
                            (inc_periph << DMA_SxCR_PINC_Pos) |
-                           ((mode & 3) << DMA_SxCR_DIR_Pos);
+                           ((mode & 3) << DMA_SxCR_DIR_Pos |
+                            DMA_SxCR_TCIE | DMA_SxCR_TEIE);
     /* Configure FIFO */
     stream->CONTROL_REG  = cr_settings;
 
@@ -449,46 +421,23 @@ void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
     stream->PERIPH_ADDR = (uint32_t)periph_addr;
 }
 
-static void _dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem,
-                         bool circ, bool sync, bool sync_half)
+void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem)
 {
     STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
     uint32_t ctr_reg = stream->CONTROL_REG;
-    const bool transfer_complete_isr = sync;
-    const bool transfer_half_complete_isr = sync_half;
-    const bool transfer_error_isr = sync | sync_half;
 
 #ifdef DMA_SxCR_MINC
     stream->CONTROL_REG = (ctr_reg & ~(DMA_SxCR_MINC)) |
-                          (incr_mem << DMA_SxCR_MINC_Pos) |
-                          (circ ? DMA_SxCR_CIRC : 0) |
-                          (transfer_complete_isr ? DMA_SxCR_TCIE : 0) |
-                          (transfer_half_complete_isr ? DMA_SxCR_HTIE : 0) |
-                          (transfer_error_isr ? DMA_SxCR_TEIE : 0);
+                          (incr_mem << DMA_SxCR_MINC_Pos);
 #else
     stream->CONTROL_REG = (ctr_reg & ~(DMA_CCR_MINC)) |
-                          (incr_mem << DMA_CCR_MINC_Pos) |
-                          (circ ? DMA_CCR_CIRC : 0) |
-                          (transfer_complete_isr ? DMA_CCR_TCIE : 0) |
-                          (transfer_half_complete_isr ? DMA_CCR_HTIE : 0) |
-                          (transfer_error_isr ? DMA_CCR_TEIE : 0);
+                          (incr_mem << DMA_CCR_MINC_Pos);
 #endif
     stream->MEM_ADDR = (uint32_t)mem;
 
     /* Set length */
     stream->NDTR_REG = len;
     dma_ctx[dma].len = len;
-
-    static const mutex_t locked_mutex = MUTEX_INIT_LOCKED;
-    dma_ctx[dma].sync_lock = locked_mutex;
-    dma_ctx[dma].sync_half_lock = locked_mutex;
-
-    dma_clear_all_flags(dma);
-}
-
-void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem)
-{
-    _dma_prepare(dma, mem, len, incr_mem, false, true, false);
 }
 
 void dma_setup_ext(dma_t dma, dma_burst_t pburst, dma_burst_t mburst,
@@ -595,11 +544,8 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
     }
 
     uint32_t width = (flags & DMA_DATA_WIDTH_MASK) >> DMA_DATA_WIDTH_SHIFT;
-    const bool circ = (flags & DMA_CIRCULAR);
-    const bool sync = !(flags & DMA_WITHOUT_WAIT);
-    const bool sync_half = (flags & DMA_WITH_WAIT_HALF);
     dma_setup(dma, chan, periph_addr, mode, width, inc_periph);
-    _dma_prepare(dma, mem_addr, len, inc_mem, circ, sync, sync_half);
+    dma_prepare(dma, mem_addr, len, inc_mem);
 #if CPU_FAM_STM32H7
     dma_req(dma)->CCR |= DMAMUX_CxCR_DMAREQ_ID_Msk & (chan << DMAMUX_CxCR_DMAREQ_ID_Pos);
 #endif
@@ -682,41 +628,11 @@ void dma_wait(dma_t dma)
     mutex_lock(&dma_ctx[dma].sync_lock);
 }
 
-void dma_wait_half(dma_t dma)
-{
-    mutex_lock(&dma_ctx[dma].sync_half_lock);
-}
-
 void dma_isr_handler(dma_t dma)
 {
-    const uint32_t flags = dma_get_all_flags(dma);
-
     dma_clear_all_flags(dma);
 
-    const bool transfer_complete = flags & (
-        DMA_LISR_TCIF0 | DMA_LISR_TCIF1 | DMA_LISR_TCIF2 | DMA_LISR_TCIF3 |
-        DMA_HISR_TCIF4 | DMA_HISR_TCIF5 | DMA_HISR_TCIF6 | DMA_HISR_TCIF7 );
-
-    const bool transfer_half_complete = flags & (
-        DMA_LISR_HTIF0 | DMA_LISR_HTIF1 | DMA_LISR_HTIF2 | DMA_LISR_HTIF3 |
-        DMA_HISR_HTIF4 | DMA_HISR_HTIF5 | DMA_HISR_HTIF6 | DMA_HISR_HTIF7 );
-
-    if (transfer_complete)
-    {
-        mutex_unlock(&dma_ctx[dma].sync_lock);
-    }
-
-    if (transfer_half_complete)
-    {
-        mutex_unlock(&dma_ctx[dma].sync_half_lock);
-    }
-
-    /* if interrupt generated because of an error */
-    if (transfer_complete == false && transfer_half_complete == false)
-    {
-        mutex_unlock(&dma_ctx[dma].sync_lock);
-        mutex_unlock(&dma_ctx[dma].sync_half_lock);
-    }
+    mutex_unlock(&dma_ctx[dma].sync_lock);
 
     cortexm_isr_end();
 }
