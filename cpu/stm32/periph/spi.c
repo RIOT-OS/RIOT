@@ -528,14 +528,13 @@ static void _transfer_no_dma(spi_t bus, const void *out, void *in, size_t len)
         }
     }
 
-    // /* wait for transmitter to fully finish */
+    /* wait for transmitter to fully finish */
     while (!(dev(bus)->SR & SPI_SR_TXC)) {}
 
     /* drain remaining RX FIFO */
     while (dev(bus)->SR & SPI_SR_RXP) {
         (void)*RXDR;
     }
-   // DEBUG("SR=0x%" PRIx32 "\n", dev(bus)->SR);
     _wait_for_end(bus);
 #else
     /* we need to recast the data register to uint_8 to force 8-bit access */
@@ -598,7 +597,6 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
 
 #ifdef MODULE_PERIPH_DMA
     if (_use_dma(&spi_config[bus]) && len > CONFIG_SPI_DMA_THRESHOLD_BYTES) {
-        DEBUG("Using DMA\n");
         _transfer_dma(bus, out, in, len);
     }
     else {
