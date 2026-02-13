@@ -129,11 +129,12 @@ typedef struct {
  * - STM32F72X: see RM0431, section 26.4.9, p.851, table 149
  * - STM32L0x2: see RM0376, section 27.4.10, p.686, table 117
  * - STM32L4X5/6: see RM0351, section 39.4.9, p.1297, table 234
+ * - STM32H753: see RM0433, section 47.4.10, p.1982, table 389
  *
  * @ref i2c_timing_param_t
  */
 static const i2c_timing_param_t timing_params[] = {
-#if defined (CPU_FAM_STM32H7) /* HSI input clock 64MHz */
+#  if defined (CPU_FAM_STM32H7) /* HSI input clock 64MHz */
     [ I2C_SPEED_NORMAL ]    = {
         .presc  = 4,
         .scll   = 0x3F,     /* t_SCLL   = 5.0us   */
@@ -155,7 +156,7 @@ static const i2c_timing_param_t timing_params[] = {
         .sdadel = 0x1,      /* t_SDADEL = 0ns     */
         .scldel = 0xC,      /* t_SCLDEL = 187.5ns */
     }, /* 0x1C100509 */
-#else
+#  else
     [ I2C_SPEED_NORMAL ]    = {
         .presc  = 3,
         .scll   = 0x13,     /* t_SCLL   = 5.0us   */
@@ -177,12 +178,13 @@ static const i2c_timing_param_t timing_params[] = {
         .sdadel = 0x0,      /* t_SDADEL = 0ns     */
         .scldel = 0x2,      /* t_SCLDEL = 187.5ns */
     }
-#endif
+#  endif
 };
 #endif  /* CPU_FAM_STM32F0 || CPU_FAM_STM32F3 || CPU_FAM_STM32F7 ||
             CPU_FAM_STM32L0 || CPU_FAM_STM32L4 || CPU_FAM_STM32L5 ||
             CPU_FAM_STM32G0 || CPU_FAM_STM32G4 || CPU_FAM_STM32U5 ||
-            CPU_FAM_STM32WB || CPU_FAM_STM32WL || CPU_FAM_STM32C0 */
+            CPU_FAM_STM32WB || CPU_FAM_STM32WL || CPU_FAM_STM32C0 ||
+            CPU_FAM_STM32H7 */
 
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
     defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32G0) || \

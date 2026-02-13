@@ -63,7 +63,7 @@
 #define I2C_CLOCK_SRC_REG       (RCC->CCIPR1)
 #elif defined(RCC_DCKCFGR2_I2C1SEL)
 #define I2C_CLOCK_SRC_REG       (RCC->DCKCFGR2)
-#elif defined(RCC_D2CCIP2R_I2C123SEL) /* STM32H753ZI */
+#elif defined(RCC_D2CCIP2R_I2C123SEL)
 #  define I2C_CLOCK_SRC_REG     (RCC->D2CCIP2R)
 #endif
 
