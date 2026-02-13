@@ -494,7 +494,6 @@ static void _transfer_no_dma(spi_t bus, const void *out, void *in, size_t len)
         (void)*(volatile uint8_t*)&(dev(bus)->RXDR);
     }
 
-    DEBUG("SR=0x%" PRIx32 "\n", dev(bus)->SR);
     volatile uint8_t *TXDR = (volatile uint8_t*)&(dev(bus)->TXDR);
     volatile uint8_t *RXDR = (volatile uint8_t*)&(dev(bus)->RXDR);
     uint32_t cr2 = 0;
