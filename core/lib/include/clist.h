@@ -444,6 +444,54 @@ static inline void clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
 }
 
 /**
+ * @brief Insert a node into a sorted clist
+ *
+ * This function will insert a @p node into an already @p cmp sorted @p list.
+ * New nodes are added to the right of equal elements.
+ * -> stable insertion sort can be done with @ref clist_lpop
+ *
+ * Complexity
+ *   - Best case O(1): insert before head or after tail.
+ *   - Worst case O(n): insert within the interior of the ring.
+ *
+ * @param[in,out]   list    sorted List to to insert in
+ * @param[in,out]   node    Node which gets inserted.
+ *                              Must not be NULL.
+ * @param[in]       cmp     Comparison function (see @ref clist_sort)
+ */
+static inline void clist_insert_sorted(clist_node_t *list, clist_node_t *node,
+                                       clist_cmp_func_t cmp)
+{
+    if (!list->next) {
+        node->next = node;
+        list->next = node;
+        return;
+    }
+    /* smaller than first */
+    if (cmp(list->next->next, node) > 0) {
+        node->next = list->next->next;
+        list->next->next = node;
+        return;
+    }
+
+    /* bigger than last */
+    if (cmp(list->next, node) <= 0) {
+        node->next = list->next->next;
+        list->next->next = node;
+        list->next = node; /* adjust list to new last element */
+        return;
+    }
+
+    clist_node_t *pos = list->next;
+    /* node must be smaller than last due to previous check */
+    while (cmp(pos->next, node) <= 0) {
+            pos = pos->next;
+    }
+    node->next = pos->next;
+    pos->next = node;
+}
+
+/**
  * @brief   Count the number of items in the given list
  *
  * @param[in]   list    ptr to the clist
