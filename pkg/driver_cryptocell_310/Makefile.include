@@ -12,6 +12,7 @@ endif
 
 CFLAGS += -Wno-cast-align
 
+PSEUDOMODULES += psa_cryptocell_310_aead_chacha20_poly1305
 PSEUDOMODULES += psa_cryptocell_310_aes_cbc
 PSEUDOMODULES += psa_cryptocell_310_aes_ccm
 PSEUDOMODULES += psa_cryptocell_310_aes_common

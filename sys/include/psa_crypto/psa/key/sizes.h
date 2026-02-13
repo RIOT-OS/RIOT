@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2025 TU Dresden
- * Copyright (C) 2021 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2025 TU Dresden
+ * SPDX-FileCopyrightText: 2021 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -35,25 +32,26 @@ extern "C" {
  *          the features chosen at compile-time. They should not be
  *          changed manually.
  */
-#if   (IS_USED(MODULE_PSA_MAC_HMAC_SHA_256))
-#define CONFIG_PSA_MAX_KEY_SIZE 64
-#elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || \
-       IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519) || \
-       IS_USED(MODULE_PSA_CIPHER_AES_256_CBC) || \
-       IS_USED(MODULE_PSA_AEAD_AES_256_CCM) || \
+#if (IS_USED(MODULE_PSA_MAC_HMAC_SHA_256))
+#  define CONFIG_PSA_MAX_KEY_SIZE 64
+#elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) ||             \
+       IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519) ||            \
+       IS_USED(MODULE_PSA_CIPHER_AES_256_CBC) ||                \
+       IS_USED(MODULE_PSA_AEAD_AES_256_CCM) ||                  \
        IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256) || \
-       IS_USED(MODULE_PSA_CIPHER_CHACHA20))
-#define CONFIG_PSA_MAX_KEY_SIZE 32
+       IS_USED(MODULE_PSA_CIPHER_CHACHA20) ||                   \
+       IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305))
+#  define CONFIG_PSA_MAX_KEY_SIZE 32
 #elif (IS_USED(MODULE_PSA_CIPHER_AES_192_CBC) || \
-       IS_USED(MODULE_PSA_AEAD_AES_192_CCM) || \
+       IS_USED(MODULE_PSA_AEAD_AES_192_CCM) ||   \
        IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1))
-#define CONFIG_PSA_MAX_KEY_SIZE 24
+#  define CONFIG_PSA_MAX_KEY_SIZE 24
 #elif (IS_USED(MODULE_PSA_CIPHER_AES_128_CBC)) || \
-      (IS_USED(MODULE_PSA_AEAD_AES_128_CCM)) || \
-      (IS_USED(MODULE_PSA_CIPHER_AES_128_ECB))
-#define CONFIG_PSA_MAX_KEY_SIZE 16
+    (IS_USED(MODULE_PSA_AEAD_AES_128_CCM)) ||     \
+    (IS_USED(MODULE_PSA_CIPHER_AES_128_ECB))
+#  define CONFIG_PSA_MAX_KEY_SIZE 16
 #else
-#define CONFIG_PSA_MAX_KEY_SIZE 0
+#  define CONFIG_PSA_MAX_KEY_SIZE 0
 #endif
 
 /**
@@ -66,12 +64,11 @@ extern "C" {
  *          - for Weierstrass curves: `ceiling(m/8)`-byte string, big-endian
  *            where m is the bit size associated with the curve.
  */
-#define PSA_KEY_EXPORT_ECC_KEY_MAX_SIZE(key_type, key_bits)                  \
-    (size_t)\
-    (PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_TWISTED_EDWARDS ? 32 : \
-    (PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_SECP_R1 ? \
-     PSA_BITS_TO_BYTES(key_bits) : \
-     0))
+#define PSA_KEY_EXPORT_ECC_KEY_MAX_SIZE(key_type, key_bits)                                                                                               \
+    (size_t)(PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_TWISTED_EDWARDS ? 32 :                                                               \
+                                                                                       (PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_SECP_R1 ? \
+                                                                                            PSA_BITS_TO_BYTES(key_bits) :                                 \
+                                                                                            0))
 
 /**
  * @brief   Sufficient output buffer size for @ref psa_export_key().
@@ -109,12 +106,12 @@ extern "C" {
  *          0 if the parameters are a valid combination that is not supported by the implementation.
  *          Unspecified if the parameters are not valid.
  */
-#define PSA_EXPORT_KEY_OUTPUT_SIZE(key_type, key_bits) \
-    (PSA_KEY_TYPE_IS_PUBLIC_KEY(key_type) ? \
-     PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(key_type, key_bits) : \
-     (PSA_KEY_TYPE_IS_ECC(key_type) ? \
-      PSA_KEY_EXPORT_ECC_KEY_MAX_SIZE(key_type, key_bits) :   \
-      0))
+#define PSA_EXPORT_KEY_OUTPUT_SIZE(key_type, key_bits)              \
+    (PSA_KEY_TYPE_IS_PUBLIC_KEY(key_type) ?                         \
+         PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(key_type, key_bits) :    \
+         (PSA_KEY_TYPE_IS_ECC(key_type) ?                           \
+              PSA_KEY_EXPORT_ECC_KEY_MAX_SIZE(key_type, key_bits) : \
+              0))
 
 /**
  * @brief   Check whether the key size is a valid ECC size for key type.
@@ -122,21 +119,21 @@ extern "C" {
  * @param   type key type of of type @ref psa_key_type_t
  * @param   bits Key size of type @ref psa_key_bits_t
  */
-#define PSA_ECC_KEY_SIZE_IS_VALID(type, bits) \
-    (PSA_KEY_TYPE_ECC_GET_FAMILY(type) == PSA_ECC_FAMILY_TWISTED_EDWARDS ?  \
-        (bits == 255) :                                                     \
-    (PSA_KEY_TYPE_ECC_GET_FAMILY(type) == PSA_ECC_FAMILY_SECP_R1 ?          \
-        (bits == 128 || \
-         bits == 192 || \
-         bits == 224 || \
-         bits == 256 || \
-         bits == 384) : \
-    0))
+#define PSA_ECC_KEY_SIZE_IS_VALID(type, bits)                              \
+    (PSA_KEY_TYPE_ECC_GET_FAMILY(type) == PSA_ECC_FAMILY_TWISTED_EDWARDS ? \
+         (bits == 255) :                                                   \
+         (PSA_KEY_TYPE_ECC_GET_FAMILY(type) == PSA_ECC_FAMILY_SECP_R1 ?    \
+              (bits == 128 ||                                              \
+               bits == 192 ||                                              \
+               bits == 224 ||                                              \
+               bits == 256 ||                                              \
+               bits == 384) :                                              \
+              0))
 
 /**
  * @brief   The maximum size of an asymmetric private key.
  */
-#define PSA_MAX_PRIV_KEY_SIZE   (PSA_BYTES_TO_BITS(CONFIG_PSA_MAX_KEY_SIZE))
+#define PSA_MAX_PRIV_KEY_SIZE (PSA_BYTES_TO_BITS(CONFIG_PSA_MAX_KEY_SIZE))
 
 /**
  * @brief   Sufficient buffer size for exporting any asymmetric key pair.
@@ -149,16 +146,16 @@ extern "C" {
  */
 #if (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || \
      IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256))
-#define PSA_EXPORT_KEY_PAIR_MAX_SIZE \
-    (PSA_EXPORT_KEY_OUTPUT_SIZE(PSA_ECC_FAMILY_SECT_R1, 256))
+#  define PSA_EXPORT_KEY_PAIR_MAX_SIZE \
+      (PSA_EXPORT_KEY_OUTPUT_SIZE(PSA_ECC_FAMILY_SECT_R1, 256))
 #elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519))
-#define PSA_EXPORT_KEY_PAIR_MAX_SIZE \
-    (PSA_EXPORT_KEY_OUTPUT_SIZE(PSA_ECC_FAMILY_TWISTED_EDWARDS, 255))
+#  define PSA_EXPORT_KEY_PAIR_MAX_SIZE \
+      (PSA_EXPORT_KEY_OUTPUT_SIZE(PSA_ECC_FAMILY_TWISTED_EDWARDS, 255))
 #elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1))
-#define PSA_EXPORT_KEY_PAIR_MAX_SIZE \
-    (PSA_EXPORT_KEY_OUTPUT_SIZE(PSA_ECC_FAMILY_SECT_R1, 192))
+#  define PSA_EXPORT_KEY_PAIR_MAX_SIZE \
+      (PSA_EXPORT_KEY_OUTPUT_SIZE(PSA_ECC_FAMILY_SECT_R1, 192))
 #else
-#define PSA_EXPORT_KEY_PAIR_MAX_SIZE 0
+#  define PSA_EXPORT_KEY_PAIR_MAX_SIZE 0
 #endif
 
 /**
@@ -175,7 +172,7 @@ extern "C" {
  */
 #define PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(key_type, key_bits)                  \
     (PSA_KEY_TYPE_ECC_GET_FAMILY(key_type) == PSA_ECC_FAMILY_TWISTED_EDWARDS ? 32 : \
-     ((size_t)(2 * PSA_BITS_TO_BYTES(key_bits) + 1)))
+                                                                               ((size_t)(2 * PSA_BITS_TO_BYTES(key_bits) + 1)))
 
 /**
  * @brief   Sufficient output buffer size for @ref psa_export_public_key().
@@ -217,9 +214,9 @@ extern "C" {
  *          @ref PSA_EXPORT_KEY_OUTPUT_SIZE(
  *          @ref PSA_KEY_TYPE_PUBLIC_KEY_OF_KEY_PAIR(@p key_type), @p key_bits).
  */
-#define PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(key_type, key_bits)                           \
+#define PSA_EXPORT_PUBLIC_KEY_OUTPUT_SIZE(key_type, key_bits)                                     \
     (PSA_KEY_TYPE_IS_ECC(key_type) ? PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(key_type, key_bits) : \
-     0)
+                                     0)
 
 /**
  * @brief   Sufficient buffer size for exporting any asymmetric public key.
@@ -233,16 +230,16 @@ extern "C" {
  */
 #if (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || \
      IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256))
-#define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
-    (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_SECT_R1, 256))
+#  define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
+      (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_SECT_R1, 256))
 #elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P192R1))
-#define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
-    (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_SECT_R1, 192))
+#  define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
+      (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_SECT_R1, 192))
 #elif (IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519))
-#define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
-    (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_TWISTED_EDWARDS, 255))
+#  define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE \
+      (PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(PSA_ECC_FAMILY_TWISTED_EDWARDS, 255))
 #else
-#define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE 0
+#  define PSA_EXPORT_PUBLIC_KEY_MAX_SIZE 0
 #endif
 
 /**
@@ -250,21 +247,21 @@ extern "C" {
  *          present, the private key will always be stored in a key slot and PSA Crypto will only
  *          allocate memory for an 8 Byte key slot number.
  */
-#define PSA_MAX_PRIV_KEY_BUFFER_SIZE (PSA_BITS_TO_BYTES(PSA_MAX_PRIV_KEY_SIZE))
+#define PSA_MAX_PRIV_KEY_BUFFER_SIZE    (PSA_BITS_TO_BYTES(PSA_MAX_PRIV_KEY_SIZE))
 
 /**
  * @brief   The maximum size of an asymmetric private key pair.
  */
-#define PSA_MAX_ASYMMETRIC_KEYPAIR_SIZE     (PSA_BITS_TO_BYTES(PSA_MAX_PRIV_KEY_SIZE) + \
-                                             PSA_EXPORT_PUBLIC_KEY_MAX_SIZE)
+#define PSA_MAX_ASYMMETRIC_KEYPAIR_SIZE (PSA_BITS_TO_BYTES(PSA_MAX_PRIV_KEY_SIZE) + \
+                                         PSA_EXPORT_PUBLIC_KEY_MAX_SIZE)
 
 /**
  * @brief   The maximum size of the used key data.
  */
 #if IS_USED(MODULE_PSA_ASYMMETRIC)
-#define PSA_MAX_KEY_DATA_SIZE  (PSA_EXPORT_PUBLIC_KEY_MAX_SIZE)
+#  define PSA_MAX_KEY_DATA_SIZE (PSA_EXPORT_PUBLIC_KEY_MAX_SIZE)
 #else
-#define PSA_MAX_KEY_DATA_SIZE  (CONFIG_PSA_MAX_KEY_SIZE)
+#  define PSA_MAX_KEY_DATA_SIZE (CONFIG_PSA_MAX_KEY_SIZE)
 #endif
 
 /**
