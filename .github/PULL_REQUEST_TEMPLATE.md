@@ -28,6 +28,7 @@ Details steps to test your contribution:
 > [!NOTE]
 > Please delete the sentences and parts of them  that are untrue.
 > Please add information (e.g., name tools or technologies) if needed.
+- A LLM agent generated this entire PR either on behave of a human or selftriggered. 
 - A LLM was used to produce whole file(s), function(s), codeblocks or snippets.
 - A LLM was used to produce documentation.
 - A LLM was used to check the code.
