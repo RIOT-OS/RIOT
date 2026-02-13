@@ -104,6 +104,51 @@ static int nvram_spi_write_9bit_addr(nvram_t *dev, const uint8_t *src, uint32_t 
  */
 static int nvram_spi_read_9bit_addr(nvram_t *dev, uint8_t *dst, uint32_t src, size_t len);
 
+/**
+ * @brief Read a device specific register via a specific SPI command.
+ *
+ * Certain NVRAM commands return internal registers such as
+ * the Status Register or Configuration Register. This function sends the
+ * command and retrieves the register value.
+ *
+ * @param[in]  dev   Pointer to the NVRAM device descriptor.
+ * @param[in]  cmd   Command code corresponding to the register to read
+ * @param[out] value Pointer where the register value will be stored.
+ *
+ * @return <0 on errors
+ */
+static int nvram_spi_read_reg(nvram_t *dev, uint8_t cmd, uint8_t *value);
+
+/**
+ * @brief Write a device specific register via a specific SPI command.
+ *
+ * Certain NVRAM commands write to internal registers such as
+ * configuration or status registers. This function sends the command along
+ * with the value to write. 
+ *
+ * @param[in] dev   Pointer to the NVRAM device descriptor
+ * @param[in] cmd   Command code corresponding to the register to write
+ * @param[in] value Value to write into the register
+ *
+ * @return <0 on errors
+ */
+static int nvram_spi_write_reg(nvram_t *dev, uint8_t cmd, uint8_t value);
+
+/**
+ * @brief Send a device specific command without data transfer.
+ *
+ * Some NVRAM operations are purely command-based and do not read or
+ * write registers or memory. 
+ *
+ * @param[in] dev Pointer to the NVRAM device descriptor
+ * @param[in] cmd Command code to execute
+ *
+ * @return <0 on errors
+ */
+static int nvram_spi_cmd(nvram_t *dev, uint8_t cmd);
+
+
+
 int nvram_spi_init(nvram_t *dev, nvram_spi_params_t *spi_params, size_t size)
 {
     dev->size = size;
@@ -113,6 +158,9 @@ int nvram_spi_init(nvram_t *dev, nvram_spi_params_t *spi_params, size_t size)
     } else {
         dev->write = nvram_spi_write;
         dev->read = nvram_spi_read;
+        dev->read_reg = nvram_spi_read_reg;
+        dev->write_reg = nvram_spi_write_reg;
+        dev->cmd = nvram_spi_cmd;
     }
     dev->extra = spi_params;
 
@@ -237,6 +285,56 @@ static int nvram_spi_read_9bit_addr(nvram_t *dev, uint8_t *dst, uint32_t src, si
 
     /* status contains the number of bytes actually read from the SPI bus. */
     return (int)len;
+}
+
+static int nvram_spi_read_reg(nvram_t *dev, uint8_t cmd, uint8_t *value)
+{
+    nvram_spi_params_t *spi = (nvram_spi_params_t *) dev->extra;
+    
+    /* Acquire exclusive bus access while configuring clock and mode */
+    spi_acquire(spi->spi, spi->cs, SPI_MODE_0, spi->clk);
+    /* Write command */
+    spi_transfer_byte(spi->spi, spi->cs, true, cmd);
+    /* read 1 byte (while still holding the CS line active) */
+    uint8_t dummy = 0x00;
+    *value = spi_transfer_byte(spi->spi, spi->cs, false, dummy);
+    /* Release exclusive bus access */
+    spi_release(spi->spi);
+
+    return 0;
+}
+
+static int nvram_spi_write_reg(nvram_t *dev, uint8_t cmd, uint8_t value)
+{
+    nvram_spi_params_t *spi = (nvram_spi_params_t *) dev->extra;
+
+    /* Acquire exclusive bus access while configuring clock and mode */
+    spi_acquire(spi->spi, spi->cs, SPI_MODE_0, spi->clk);
+    /* Enable writes */
+    spi_transfer_byte(spi->spi, spi->cs, false, NVRAM_SPI_CMD_WREN);
+    /* Make sure we have a minimum gap between transfers */
+    ztimer_spin(ZTIMER_USEC, NVRAM_SPI_CS_TOGGLE_US);
+    /* Write command then value */
+    spi_transfer_byte(spi->spi, spi->cs, true, cmd);
+    spi_transfer_byte(spi->spi, spi->cs, false, value);
+    /* Release exclusive bus access */
+    spi_release(spi->spi);
+
+    return 0;
+}
+
+static int nvram_spi_cmd(nvram_t *dev, uint8_t cmd)
+{
+    nvram_spi_params_t *spi = (nvram_spi_params_t *) dev->extra;
+
+    /* Acquire exclusive bus access while configuring clock and mode */
+    spi_acquire(spi->spi, spi->cs, SPI_MODE_0, spi->clk);
+    /* Write command */
+    spi_transfer_byte(spi->spi, spi->cs, false, cmd);
+    /* Release exclusive bus access */
+    spi_release(spi->spi);
+
+    return 0;
 }
 
 /** @} */
