@@ -14,10 +14,19 @@ else
   DEBUGGER ?= gdb
 endif
 
+FS_NATIVE_MOUNT := $(CURDIR)/native
+CFLAGS += -DFS_NATIVE_MOUNT=\"$(FS_NATIVE_MOUNT)\"
+FS_NATIVE_DIR := $(FS_NATIVE_MOUNT)
+CFLAGS+=-DFS_NATIVE_DIR=\"$(FS_NATIVE_DIR)\"
+export GCOV_PREFIX=$(abspath $(FS_NATIVE_MOUNT))
+export GCOV_PREFIX_STRIP=$(words $(subst /, ,$(BINDIR)))
+GCOV_DIR := $(BINDIR)/gcov_files
 
 export VALGRIND ?= valgrind
 export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
+export GCOV ?= gcov
+export GCOVR ?= gcovr
 
 # basic cflags:
 CFLAGS += -Wall -Wextra $(CFLAGS_DBG) $(CFLAGS_OPT)
@@ -112,11 +121,16 @@ debug-valgrind-server: export VALGRIND_FLAGS ?= --vgdb=yes --vgdb-error=0 -v \
 	--leak-check=full --track-origins=yes --fullpath-after=$(RIOTBASE) \
 	--read-var-info=yes
 term-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
-term-gprof: TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELFFILE)
+term-gprof: TERMPROG = $(ELFFILE)
+term-gprof: TERMENV += GMON_OUT_PREFIX=gmon.out
+term-gcov: TERMPROG = $(ELFFILE)
+
 all-valgrind: CFLAGS += -DHAVE_VALGRIND_H
 all-valgrind: NATIVEINCLUDES += $(shell pkg-config valgrind --cflags)
 all-gprof: CFLAGS += -pg
 all-gprof: LINKFLAGS += -pg
+all-gcov: CFLAGS += --coverage -fprofile-arcs
+all-gcov: LINKFLAGS += --coverage -fprofile-arcs
 
 CFLAGS_ASAN += -fsanitize=address -fno-omit-frame-pointer -DNATIVE_MEMORY
 LINKFLAGS_ASAN += -fsanitize=address -fno-omit-frame-pointer
@@ -145,6 +159,8 @@ all: # do not override first target
 
 all-gprof: all
 
+all-gcov: all
+
 all-asan: all
 
 all-valgrind: all
@@ -167,8 +183,33 @@ term-cachegrind:
 
 term-gprof: term
 
+term-gcov: term
+
 eval-gprof:
 	$(GPROF) $(ELFFILE) $(shell ls -rt gmon.out* | tail -1)
+
+# gcov needs the source file and the .gcno file
+# It is not easy to know the source file by the object file.
+# The trick is to extract the source file by the .d file
+eval-gcov: $(GCOV_DIR)
+	@find $(BINDIR) -name '*.gcno' | while read gcno; do \
+		dep=$$(echo $$gcno | sed 's/\.gcno$$/.d/'); \
+		src=$$(grep '\.c \\' $$dep); \
+		src=$$(echo $$src | sed 's/.* \///; s/\\$$//'); \
+		cd -P $(GCOV_DIR) && $(GCOV) -abcdfHkp $$src $$gcno; \
+	done
+
+$(GCOV_DIR)/gcovr.cfg: $(GCOV_DIR)
+	@echo "root = $(RIOTBASE)" > $@
+	@echo "object-directory = $(BINDIR)" >> $@
+
+eval-gcovr: $(GCOV_DIR)/gcovr.cfg
+	$(GCOVR) --config $(GCOV_DIR)/gcovr.cfg \
+		--html-details --html $(GCOV_DIR)/index.html
+	xdg-open $(GCOV_DIR)/index.html
+
+$(GCOV_DIR):
+	$(Q)mkdir -p $(GCOV_DIR)
 
 eval-cachegrind:
 	$(CGANNOTATE) $(shell ls -rt cachegrind.out* | tail -1)
