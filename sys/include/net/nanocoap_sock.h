@@ -154,11 +154,19 @@ extern "C" {
 #endif
 
 /**
- * @brief   Credman tag used for NanoCoAP
+ * @brief   Credman tag used for NanoCoAP client
  *          Tag together with the credential type (PSK) needs to be unique
  */
 #ifndef CONFIG_NANOCOAP_SOCK_DTLS_TAG
 #define CONFIG_NANOCOAP_SOCK_DTLS_TAG           (0xc0ab)
+#endif
+
+/**
+ * @brief   Credman tag used for NanoCoAP server
+ *          Tag together with the credential type (PSK) needs to be unique
+ */
+#ifndef CONFIG_NANOCOAP_SERVER_SOCK_DTLS_TAG
+#define CONFIG_NANOCOAP_SERVER_SOCK_DTLS_TAG    (0xc0ac)
 #endif
 
 /**

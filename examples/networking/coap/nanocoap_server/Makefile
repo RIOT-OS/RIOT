@@ -11,6 +11,9 @@ RIOTBASE ?= $(CURDIR)/../../../..
 LWIP_IPV4 ?= 0
 LWIP_IPV6 ?= 0
 
+# DTLS support
+USE_DTLS ?= 0
+
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += netdev_default
@@ -91,6 +94,11 @@ ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
   ifneq (,$(filter native native32 native64,$(BOARD)))
     USEMODULE += vfs_auto_format
   endif
+endif
+
+ifeq (1,$(USE_DTLS))
+  USEMODULE += nanocoap_server_dtls
+  USEMODULE += prng_sha256prng
 endif
 
 # Change this to 0 show compiler invocation lines by default:
