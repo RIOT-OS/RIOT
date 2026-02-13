@@ -71,13 +71,14 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | ADC         | 1       | ADC0:CH1   |                  | AVDD                                |
 | DAC         | 0       | DAC0:OUT0  | PB11             | AVVD as reference voltage           |
 | I2C         | 0       | I2C0       | SDA:PC0, SCL:PC1 | Normal speed                        |
-| I2C         | 1       | I2C1       | SDA:PC7, SCL:PC5 | Normal speed                        |
+| I2C         | 1       | I2C1       | SDA:PC4, SCL:PC5 | Normal speed                        |
 | I2C         | 2       | I2C2       | SDA:PI4, SCL:PI5 | Normal speed, Sensor I2C bus        |
 | HWCRYPTO    | -       | -          |                  | AES128/AES256, SHA1, SHA224/SHA256  |
 | HWRNG       | -       | TNRG0      |                  | True Random Number Generator (TRNG) |
 | RTT         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
 | RTC         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
 | SPI         | 0       | USART0     | MOSI:PE10, MISO:PE11, CLK:PE12 |                       |
+| SPI         | 1       | USART1     | MOSI:PA14, MISO:PC2, CLK:PC15  | Memory LCD            |
 | Timer       | 0       | WTIMER0 + WTIMER1 |           | WTIMER0 is used as prescaler        |
 | Timer       | 1       | TIMER0 + TIMER1   |           | TIMER0 is used as prescaler         |
 | Timer       | 2       | LETIMER0   |                  |                                     |
@@ -90,34 +91,37 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |------------|-----------|-----------|------------|
 | Button     | PB0_PIN   | PC8       |            |
 |            | PB1_PIN   | PC9       |            |
-| LED        | LED0R_PIN | PH10      |            |
-|            | LED0G_PIN | PH11      |            |
-|            | LED0B_PIN | PH12      |            |
-|            | LED1R_PIN | PH13      |            |
-|            | LED1G_PIN | PH14      |            |
-|            | LED1B_PIN | PH15      |            |
-|            | LED0_PIN  | LED0R_PIN |            |
-|            | LED1_PIN  | LED1R_PIN |            |
+| LED        | LED0R_PIN | PH10      | Active low |
+|            | LED0G_PIN | PH11      | Active low |
+|            | LED0B_PIN | PH12      | Active low |
+|            | LED1R_PIN | PH13      | Active low |
+|            | LED1G_PIN | PH14      | Active low |
+|            | LED1B_PIN | PH15      | Active low |
+|            | LED0_PIN  | LED0R_PIN | Active low |
+|            | LED1_PIN  | LED1R_PIN | Active low |
 
 ## Implementation Status
 
-| Device           | ID         | Supported | Comments                                           |
-|------------------|------------|-----------|----------------------------------------------------|
-| MCU              | EFM32GG11B | yes       | Power modes supported                              |
-| Low-level driver | ADC        | yes       |                                                    |
-|                  | DAC        | yes       | VDAC, IDAC is not supported                        |
-|                  | Ethernet   | no        |                                                    |
-|                  | Flash      | yes       |                                                    |
-|                  | GPIO       | yes       | Interrupts are shared across pins (see ref manual) |
-|                  | HW Crypto  | yes       |                                                    |
-|                  | I2C        | yes       |                                                    |
-|                  | PWM        | yes       |                                                    |
-|                  | RTCC       | yes       | As RTT or RTC                                      |
-|                  | SPI        | yes       | Only master mode                                   |
-|                  | Timer      | yes       |                                                    |
-|                  | TRNG       | yes       | True Random Number Generator                       |
-|                  | UART       | yes       | USART is shared with SPI. LEUART baud rate limited |
-|                  | USB        | yes       | Device mode                                        |
+| Device                        | ID          | Supported | Comments                                              |
+|-------------------------------|-------------|-----------|-------------------------------------------------------|
+| MCU                           | EFM32GG11B  | yes       | Power modes supported                                 |
+| Low-level driver              | ADC         | yes       |                                                       |
+|                               | DAC         | yes       | VDAC, IDAC is not supported                           |
+|                               | Ethernet    | no        |                                                       |
+|                               | Flash       | yes       |                                                       |
+|                               | GPIO        | yes       | Interrupts are shared across pins (see ref manual)    |
+|                               | HW Crypto   | yes       |                                                       |
+|                               | I2C         | yes       |                                                       |
+|                               | PWM         | yes       |                                                       |
+|                               | RTCC        | yes       | As RTT or RTC                                         |
+|                               | SPI         | yes       | Only master mode                                      |
+|                               | Timer       | yes       |                                                       |
+|                               | TRNG        | yes       | True Random Number Generator                          |
+|                               | UART        | yes       | USART is shared with SPI. LEUART baud rate limited    |
+|                               | USB         | yes       | Device mode                                           |
+| LCD driver                    | LS013B7DH06 | no        | Sharp Low Power Memory color LCD (Rev. A0 - A5 board) |
+| LCD driver                    | LPM013M126A | no        | JDI Low Power Memory color LCD (Rev. B0+ boards)      |
+| Temperature + humidity sensor | Si7021      | yes       | Silicon Labs Temperature + Humidity sensor            |
 
 ## Board configuration
 
