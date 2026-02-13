@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2020 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "slstk3301a" if BOARD_SLSTK3301A
+
+config BOARD_SLSTK3301A
+    bool
+    default y
+    select BOARD_COMMON_SILABS
+    select CPU_MODEL_EFM32TG11B520F128GM80
+
+source "$(RIOTBOARD)/common/silabs/Kconfig"

@@ -6392,7 +6392,9 @@ warning: Member SI70XX_SAUL_INFO (macro definition) of file si70xx_params.h is n
 warning: Member SI70XX_SAUL_INFO (macro definition) of group boards_ublox-c030-u201 is not documented.
 warning: Member SI70XX_WRITE_HEATER_REG (macro definition) of file si70xx_internals.h is not documented.
 warning: Member SI70XX_WRITE_USER_REG (macro definition) of file si70xx_internals.h is not documented.
+warning: Member SI7210_EN_PIN (macro definition) of file board.h is not documented.
 warning: Member SI7210_ENABLED (macro definition) of file board.h is not documented.
+warning: Member SI7210_I2C (macro definition) of file board.h is not documented.
 warning: Member SI7210_I2C (macro definition) of file board.h is not documented.
 warning: Member SIXLOWPAN_ND_OPT_6CTX_FLAGS_MASK (macro definition) of group net_sixlowpan_nd is not documented.
 warning: Member SIXLOWPAN_ND_OPT_6CTX_LEN_MAX (macro definition) of group net_sixlowpan_nd is not documented.
