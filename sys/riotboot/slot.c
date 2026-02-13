@@ -28,6 +28,9 @@
 
 #include "container.h"
 #include "cpu.h"
+#ifdef MODULE_PERIPH_FLASHPAGE
+#  include "periph/flashpage.h"
+#endif
 #include "riotboot/slot.h"
 #include "riotboot/hdr.h"
 
@@ -49,7 +52,7 @@ const unsigned riotboot_slot_numof = ARRAY_SIZE(riotboot_slots);
 
 static void _riotboot_slot_jump_to_image(const riotboot_hdr_t *hdr)
 {
-    cpu_jump_to_image(hdr->start_addr);
+    cpu_jump_to_image(riotboot_hdr_get_start_addr(hdr));
 }
 
 int riotboot_slot_current(void)
@@ -58,7 +61,7 @@ int riotboot_slot_current(void)
 
     for (unsigned i = 0; i < riotboot_slot_numof; i++) {
         const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(i);
-        if (base_addr == hdr->start_addr) {
+        if (base_addr == riotboot_hdr_get_start_addr(hdr)) {
             return i;
         }
     }
@@ -78,7 +81,7 @@ void riotboot_slot_jump(unsigned slot)
 
 uint32_t riotboot_slot_get_image_startaddr(unsigned slot)
 {
-    return riotboot_slot_get_hdr(slot)->start_addr;
+    return riotboot_hdr_get_start_addr(riotboot_slot_get_hdr(slot));
 }
 
 void riotboot_slot_dump_addrs(void)
@@ -88,7 +91,7 @@ void riotboot_slot_dump_addrs(void)
 
         printf("slot %u: metadata: %p image: 0x%08" PRIx32 "\n", slot,
                hdr,
-               hdr->start_addr);
+               riotboot_hdr_get_start_addr(hdr));
     }
 }
 
@@ -102,4 +105,36 @@ const riotboot_hdr_t *riotboot_slot_get_hdr(unsigned slot)
 size_t riotboot_slot_offset(unsigned slot)
 {
     return (size_t)riotboot_slot_get_hdr(slot) - CPU_FLASH_BASE;
+}
+
+void riotboot_slot_confirm(void)
+{
+    int slot = riotboot_slot_current();
+    riotboot_hdr_t riot_hdr = *riotboot_slot_get_hdr(slot);
+    if (riotboot_hdr_is_v2(&riot_hdr)) {
+        riotboot_hdr_set_img_state(&riot_hdr, RIOTBOOT_HDR_IMG_STATE_CONFIRMED);
+        if (memcmp(&riot_hdr, riotboot_slot_get_hdr(slot), sizeof(riot_hdr.v2))) {
+#ifdef MODULE_PERIPH_FLASHPAGE
+            flashpage_write(flashpage_addr(flashpage_page(riotboot_slot_get_hdr(slot))),
+                            &riot_hdr.v2, sizeof(riot_hdr.v2));
+#endif
+        }
+    }
+}
+
+void riotboot_slot_activate_other(bool active)
+{
+    int slot = riotboot_slot_other();
+    riotboot_hdr_t riot_hdr = *riotboot_slot_get_hdr(slot);
+    if (riotboot_hdr_is_v2(&riot_hdr)) {
+        riotboot_hdr_set_img_state(&riot_hdr,
+                                   active ? RIOTBOOT_HDR_IMG_STATE_ACTIVATED
+                                          : RIOTBOOT_HDR_IMG_STATE_DEACTIVATED);
+        if (memcmp(&riot_hdr, riotboot_slot_get_hdr(slot), sizeof(riot_hdr.v2))) {
+#ifdef MODULE_PERIPH_FLASHPAGE
+            flashpage_write(flashpage_addr(flashpage_page(riotboot_slot_get_hdr(slot))),
+                            &riot_hdr.v2, sizeof(riot_hdr.v2));
+#endif
+        }
+    }
 }
