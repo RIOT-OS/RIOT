@@ -9,7 +9,7 @@
 /**
  * @{
  *
- * Implements @ref net_netif for @ref net_lwip
+ * Implements @ref net_netif for @ref pkg_lwip
  *
  * @file
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>

@@ -17,13 +17,16 @@
 #include <errno.h>
 
 #ifdef SOCK_HAS_ASYNC
-#include "net/sock/async.h"
+#  include "net/sock/async.h"
+#  ifdef MODULE_SOCK_ASYNC_EVENT
+#    include "net/sock/async/event.h"
+#  endif
 #endif
 #include "net/ipv6/addr.h"
 #include "net/iana/portrange.h"
 #include "net/sock/udp.h"
 #ifdef MODULE_ZTIMER_USEC
-#include "ztimer.h"
+#  include "ztimer.h"
 #endif
 #include "mutex.h"
 #include "utlist.h"
@@ -40,8 +43,8 @@
 
 #define _MSG_TYPE_RECV_PKT (0x1601)
 #ifdef MODULE_ZTIMER_USEC
-#define _TIMEOUT_MAGIC     (0xF38A0B63U)
-#define _TIMEOUT_MSG_TYPE  (0x8474)
+#  define _TIMEOUT_MAGIC     (0xF38A0B63U)
+#  define _TIMEOUT_MSG_TYPE  (0x8474)
 #endif /* MODULE_ZTIMER_USEC */
 
 /* sock linked list */
@@ -350,7 +353,7 @@ void sock_udp_close(sock_udp_t *sock)
         mutex_unlock(&_sock_list_lock);
         sock->next = NULL;
 #ifdef SOCK_HAS_ASYNC_CTX
-        sock_event_close(sock_udp_get_async_ctx(udp));
+        sock_event_close(sock_udp_get_async_ctx(sock));
 #endif
     }
 }

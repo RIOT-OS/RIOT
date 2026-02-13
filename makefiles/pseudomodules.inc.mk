@@ -419,7 +419,12 @@ PSEUDOMODULES += shell_cmd_gnrc_rpl
 PSEUDOMODULES += shell_cmd_gnrc_sixlowpan_ctx
 PSEUDOMODULES += shell_cmd_gnrc_sixlowpan_frag_stats
 PSEUDOMODULES += shell_cmd_gnrc_txtsnd
+## @defgroup sys_shell_commands_gnrc_udp GNRC UDP shell command
+## @ingroup sys_shell_commands
+## @{
+## @deprecated use @ref sys_shell_commands_udp instead. will be removed after release 2026.10
 PSEUDOMODULES += shell_cmd_gnrc_udp
+## @}
 PSEUDOMODULES += shell_cmd_heap
 PSEUDOMODULES += shell_cmd_i2c_scan
 PSEUDOMODULES += shell_cmd_iw
@@ -448,6 +453,8 @@ PSEUDOMODULES += shell_cmd_sht1x
 PSEUDOMODULES += shell_cmd_sntp
 PSEUDOMODULES += shell_cmd_suit
 PSEUDOMODULES += shell_cmd_sys
+PSEUDOMODULES += shell_cmd_udp
+PSEUDOMODULES += shell_cmd_udp_server
 PSEUDOMODULES += shell_cmd_udptty
 PSEUDOMODULES += shell_cmd_xipfs
 PSEUDOMODULES += shell_cmd_vfs
