@@ -35,6 +35,11 @@ void hwrng_read(void *buf, unsigned int num)
     unsigned int count = 0;
     uint8_t *b = (uint8_t *)buf;
 
+/* Select PLL1Q as RNG clock source for STM32H7 */
+#if defined(CPU_FAM_STM32H7)
+    RCC->D2CCIP2R |= RCC_D2CCIP2R_RNGSEL_0;
+#endif
+
     /* power on and enable the device */
 #if defined(CPU_LINE_STM32F410Rx)
     periph_clk_en(AHB1, RCC_AHB1ENR_RNGEN);
