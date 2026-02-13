@@ -112,12 +112,6 @@ void i2c_init(i2c_t dev)
     gpio_init(i2c_config[dev].scl_pin, GPIO_OD);
     gpio_init(i2c_config[dev].sda_pin, GPIO_OD);
 
-    /* ensure slave is in a known state, which it may not be after a reset */
-    for (int i = 0; i < 9; i++) {
-        gpio_set(i2c_config[dev].scl_pin);
-        gpio_clear(i2c_config[dev].scl_pin);
-    }
-
     /* reset and initialize the peripheral */
     I2C_Init_TypeDef init = I2C_INIT_DEFAULT;
 
