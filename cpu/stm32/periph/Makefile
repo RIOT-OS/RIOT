@@ -13,7 +13,9 @@ endif
 
 # Select the specific implementation for `periph_adc`
 ifneq (,$(filter periph_adc,$(USEMODULE)))
-  ifneq (,$(filter $(CPU_FAM),f4 f7))
+  ifneq (,$(filter $(CPU_FAM),f3 h7))
+    SRC += adc_f3_f7.c
+  else ifneq (,$(filter $(CPU_FAM),f4 f7))
     SRC += adc_f4_f7.c
   else ifneq (,$(filter $(CPU_FAM),f0 g0 c0))
     SRC += adc_f0_g0_c0.c
