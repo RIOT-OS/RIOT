@@ -218,8 +218,8 @@ the original license must be kept, unless the original license states differentl
 [Generative AI] (e.g., Large language models (LLM)) are known to sometimes reproduce
 large amounts of content (code), that was fed into their database as such it might
 produce a copy and the previous sentence must be applied.
-When reworking a PR and copying its code to a new one, the author of that orginal reproduced 
-code still is the original author and their rights to the code must be respected 
+When reworking a PR and copying its code to a new one, the author of that original reproduced
+code still is the original author and their rights to the code must be respected
 such as naming them and keeping the license.
 
 If a PR was written using tooling that is able to reproduce code from a knowlege-base, e.g.,
