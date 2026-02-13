@@ -5,3 +5,5 @@ ifneq (,$(filter nanocoap_dtls,$(USEMODULE)))
   # the initial DTLS handshake may exceed the block size
   DTLS_MAX_BUF ?= $(shell echo $$((${NANOCOAP_BLOCK_FRAME} > 200 ? ${NANOCOAP_BLOCK_FRAME} : 200 )))
 endif
+
+PSEUDOMODULES += nanocoap_server_dtls
