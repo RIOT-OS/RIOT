@@ -1,12 +1,3 @@
 MODULE = u8g2_csrc
 
-CFLAGS += -Wno-overlength-strings
-
-# avoid compilation errors when NDEBUG is defined
-CFLAGS += -Wno-unused-variable
-
-ifeq (llvm,$(TOOLCHAIN))
-  CFLAGS += -Wno-newline-eof
-endif
-
 include $(RIOTBASE)/Makefile.base
