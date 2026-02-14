@@ -532,9 +532,9 @@ static inline void _send_done(dose_t *ctx, bool collision)
 
 static int _confirm_send(netdev_t *dev, void *info)
 {
-    (void)dev;
     (void)info;
-    return -EOPNOTSUPP;
+    dose_t *ctx = container_of(dev, dose_t, netdev);
+    return ctx->tx_result;
 }
 
 static int _send(netdev_t *dev, const iolist_t *iolist)
@@ -543,6 +543,7 @@ static int _send(netdev_t *dev, const iolist_t *iolist)
     int8_t retries = 3;
     size_t pktlen;
     uint16_t crc;
+    ctx->tx_result = -EAGAIN;
 
     /* discard data when interface is in SLEEP mode */
     if (ctx->state == DOSE_STATE_SLEEP) {
@@ -603,7 +604,10 @@ send:
     /* Get out of the SEND state */
     state(ctx, DOSE_SIGNAL_END);
 
-    return pktlen;
+    ctx->tx_result = (int)pktlen;
+    dev->event_callback(dev, NETDEV_EVENT_TX_COMPLETE);
+
+    return 0;
 
 collision:
     _send_done(ctx, true);
