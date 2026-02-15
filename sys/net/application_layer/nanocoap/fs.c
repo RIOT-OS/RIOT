@@ -78,16 +78,16 @@ static int _fill_urlbuf(nanocoap_fs_t *fs, char dst[CONFIG_SOCK_URLPATH_MAXLEN],
 static int nanocoap_fs_unlink(vfs_mount_t *mountp, const char *name)
 {
     nanocoap_fs_t *fs = mountp->private_data;
-    int res;
 
     mutex_lock(&fs->lock);
 
-    if ((res = _fill_urlbuf(fs, fs->urlbuf, name, true))) {
+    int res = _fill_urlbuf(fs, fs->urlbuf, name, true);
+    if (res) {
         goto out;
     }
 
     DEBUG("nanocoap_fs: delete %s\n", fs->urlbuf);
-    res = nanocoap_sock_delete(&fs->sock, fs->urlbuf);
+    res = (int)nanocoap_sock_delete(&fs->sock, fs->urlbuf);
 
 out:
     mutex_unlock(&fs->lock);
@@ -98,7 +98,6 @@ static int nanocoap_fs_open(vfs_file_t *filp, const char *name, int flags, mode_
 {
     nanocoap_fs_t *fs = filp->mp->private_data;
     nanocoap_fs_file_t *file = (void *)filp->private_data.buffer;
-    int res;
 
     (void)mode;
 
@@ -107,7 +106,8 @@ static int nanocoap_fs_open(vfs_file_t *filp, const char *name, int flags, mode_
         return -ENOSYS;
     }
 
-    if ((res = _fill_urlbuf(fs, file->urlbuf, name, false))) {
+    int res = _fill_urlbuf(fs, file->urlbuf, name, false);
+    if (res) {
         return res;
     }
 
@@ -146,6 +146,7 @@ static off_t nanocoap_fs_lseek(vfs_file_t *filp, off_t off, int whence)
     case SEEK_CUR:
         file->offset += off;
         break;
+    default:
     case SEEK_END:
         return -ENOSYS;
     }
@@ -173,29 +174,26 @@ static int _block_cb(void *arg, coap_pkt_t *pkt)
 static int _query_server(nanocoap_sock_t *sock, const char *path,
                          struct stat *restrict arg)
 {
-    uint8_t _buf[CONFIG_NANOCOAP_BLOCK_HEADER_MAX];
-    uint8_t *buf = _buf;
+    coap_builder_t state;
+    int res = nanocoap_sock_builder_init(sock, &state,
+                                         COAP_TYPE_CON, COAP_METHOD_GET);
+    if (res) {
+        return res;
+    }
+    coap_opt_put_uri_pathquery(&state, path);
+    coap_opt_put_uint(&state, COAP_OPT_BLOCK2, 0);
+    res = coap_opt_put_uint(&state, COAP_OPT_SIZE2, 0);
+    if (res) {
+        return res;
+    }
 
-    coap_pkt_t pkt = {
-        .buf = buf,
+    coap_pkt_t pkt =  {
+        .buf = state.buf,
+        .payload = state.buf + state.pos,
+        .payload_len = 0,
     };
 
-    uint16_t lastonum = 0;
-
-    ssize_t hdr_len = coap_build_udp_hdr(_buf, sizeof(_buf), COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET,
-                                         nanocoap_sock_next_msg_id(sock));
-    assume(hdr_len > 0);
-    buf += hdr_len;
-    buf += coap_opt_put_uri_pathquery(buf, &lastonum, path);
-    buf += coap_opt_put_uint(buf, lastonum, COAP_OPT_BLOCK2, 0);
-    buf += coap_opt_put_uint(buf, COAP_OPT_BLOCK2, COAP_OPT_SIZE2, 0);
-
-    assert((uintptr_t)buf - (uintptr_t)_buf < sizeof(_buf));
-
-    pkt.payload = buf;
-    pkt.payload_len = 0;
-
-    return nanocoap_sock_request_cb(sock, &pkt, _block_cb, arg);
+    return (int)nanocoap_sock_request_cb(sock, &pkt, _block_cb, arg);
 }
 
 static int nanocoap_fs_stat(vfs_mount_t *mountp, const char *restrict path,
