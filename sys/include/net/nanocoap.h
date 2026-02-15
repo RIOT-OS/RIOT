@@ -428,6 +428,37 @@ const sock_udp_ep_t *coap_request_ctx_get_remote_udp(const coap_request_ctx_t *c
 const sock_udp_ep_t *coap_request_ctx_get_local_udp(const coap_request_ctx_t *ctx);
 
 /**
+ * @brief   Structure to hold the state for building a CoAP message
+ *
+ * @note    The idea is that this structure supports sequential appendages to
+ *          the message to iteratively build a CoAP message. The `pos` member
+ *          points to the current writing position. Before appending data,
+ *          users must check if that operation would overflow, that is, if
+ *          advancing `pos` by the amount of data to append would exceed the
+ *          buffers capacity given by `size`.
+ *
+ * @warning Do not access the `pos` member for checking the message size, but
+ *          use @ref coap_builder_msg_size to do so with error checks!
+ *
+ * @note    All functions trying to append to the message may set the `size`
+ *          member to `0` to indicate an overflow. This way subsequent appends
+ *          will reliably fail even if they are smaller and would fit. A caller
+ *          may decide to ignore the return value of all append calls except for
+ *          the last without risking overflows, risking to create a corrupted
+ *          message (with skipped parts), or missing to detect errors: They
+ *          only need to either check the return value of the last function
+ *          appending to the builder or - more conveniently - use
+ *          @ref coap_builder_msg_size to get the return value of the response
+ *          handler.
+ */
+typedef struct {
+    uint8_t *buf;           /**< Buffer to build the message into */
+    uint16_t pos;           /**< Position of the next byte to write within `buf` */
+    uint16_t size;          /**< Size of `buf` in bytes */
+    uint16_t last_opt_num;  /**< Number of the last option added (for delta-encoding) */
+} coap_builder_t;
+
+/**
  * @brief   Block1 helper struct
  */
 typedef struct {
@@ -445,7 +476,7 @@ typedef struct {
     size_t start;                   /**< Start offset of the current block  */
     size_t end;                     /**< End offset of the current block    */
     size_t cur;                     /**< Offset of the generated content    */
-    uint8_t *opt;                   /**< Pointer to the placed option       */
+    uint8_t *opt_value;             /**< Pointer to the value of the placed option */
 } coap_block_slicer_t;
 
 #if defined(MODULE_NANOCOAP_RESOURCES) || DOXYGEN
@@ -742,10 +773,6 @@ static inline unsigned coap_get_total_hdr_len(const coap_pkt_t *pkt)
  * @param[in]   pkt     CoAP packet to reply to
  * @return      Length of the response header including token excluding
  *              CoAP options and any payload marker
- *
- * @note    The main use case is the use of @ref coap_block2_build_reply, which
- *          is building the CoAP header of the response after options and
- *          payload have been added.
  */
 static inline unsigned coap_get_response_hdr_len(const coap_pkt_t *pkt)
 {
@@ -1231,13 +1258,12 @@ void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
  * sets/clears it if required.  Doesn't return the number of bytes, as this
  * function overwrites bytes in the packet rather than adding new.
  *
- * @param[in]     slicer      Preallocated slicer struct to use
- * @param[in]     option      option number (block1 or block2)
+ * @param[in,out]   slicer      Preallocated slicer struct to use
  *
- * @return      true if the `more` bit is set in the block option
- * @return      false if the `more` bit is not set the block option
+* @retval      true if the `more` bit is set in the block option
+* @retval      false if the `more` bit is not set the block option
  */
-bool coap_block_finish(coap_block_slicer_t *slicer, uint16_t option);
+bool coap_block_finish(coap_block_slicer_t *slicer);
 
 /**
  * @brief Finish a block1 request
@@ -1248,14 +1274,14 @@ bool coap_block_finish(coap_block_slicer_t *slicer, uint16_t option);
  * sets/clears it if required.  Doesn't return the number of bytes, as this
  * function overwrites bytes in the packet rather than adding new.
  *
- * @param[in]     slicer      Preallocated slicer struct to use
+ * @param[in,out]   slicer      Preallocated slicer struct to use
  *
- * @return      true if the `more` bit is set in the block option
- * @return      false if the `more` bit is not set the block option
+* @retval      true if the `more` bit is set in the block option
+* @retval      false if the `more` bit is not set the block option
  */
 static inline bool coap_block1_finish(coap_block_slicer_t *slicer)
 {
-    return coap_block_finish(slicer, COAP_OPT_BLOCK1);
+    return coap_block_finish(slicer);
 }
 
 /**
@@ -1267,14 +1293,14 @@ static inline bool coap_block1_finish(coap_block_slicer_t *slicer)
  * sets/clears it if required.  Doesn't return the number of bytes, as this
  * function overwrites bytes in the packet rather than adding new.
  *
- * @param[in]     slicer      Preallocated slicer struct to use
+ * @param[in,out]   slicer      Preallocated slicer struct to use
  *
- * @return      true if the `more` bit is set in the block option
- * @return      false if the `more` bit is not set the block option
+* @retval      true if the `more` bit is set in the block option
+* @retval      false if the `more` bit is not set the block option
  */
 static inline bool coap_block2_finish(coap_block_slicer_t *slicer)
 {
-    return coap_block_finish(slicer, COAP_OPT_BLOCK2);
+    return coap_block_finish(slicer);
 }
 
 /**
@@ -1301,36 +1327,80 @@ void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
                             size_t blksize);
 
 /**
- * @brief Add a byte array to a block2 reply.
+ * @brief Add a byte array to a block2 reply when building the response using
+ *        a coap_builder_t structure to assemble the message.
+ *
+ * This function is used to add an array of bytes to a CoAP block2 reply. It
+ * checks which parts of the string should be added to the reply and ignores
+ * parts that are outside the current block2 request.
+ *
+ * @param[in,out]   state   message builder state to use
+ * @param[in,out]   slicer  slicer to use
+ * @param[in]       c       byte array to copy
+ * @param[in]       len     length of the byte array
+ *
+ * @retval          0               Success
+ * @retval          -EOVERFLOW      Not enough space in buffer
+ * @retval          <0              Other error
+ */
+int coap_blockwise_put_bytes(coap_builder_t *state, coap_block_slicer_t *slicer,
+                             const void *c, size_t len);
+
+/**
+ * @brief Add a byte array to a block2 reply when building the response using
+ *        a coap_pkt_t structure to assemble the message,
  *
  * This function is used to add an array of bytes to a CoAP block2 reply. it
  * checks which parts of the string should be added to the reply and ignores
  * parts that are outside the current block2 request.
  *
- * @param[in]   slicer      slicer to use
- * @param[in]   bufpos      pointer to the current payload buffer position
- * @param[in]   c           byte array to copy
- * @param[in]   len         length of the byte array
+ * @param[in,out]   pdu     pkt to assemble the message in
+ * @param[in,out]   slicer  slicer to use
+ * @param[in]       c       byte array to copy
+ * @param[in]       len     length of the byte array
  *
- * @returns     Number of bytes written to @p bufpos
+ * @retval          0               Success
+ * @retval          -EOVERFLOW      Not enough space in buffer
+ * @retval          <0              Other error
  */
-size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
-                                const void *c, size_t len);
+int coap_blockwise_put_bytes_pkt(coap_pkt_t *pdu, coap_block_slicer_t *slicer,
+                                 const void *c, size_t len);
 
 /**
- * @brief Add a single character to a block2 reply.
+ * @brief Add a single character to a block2 reply when building the response
+ *        using a coap_builder_t structure to assemble the message.
  *
  * This function is used to add single characters to a CoAP block2 reply. It
  * checks whether the character should be added to the buffer and ignores it
  * when the character is outside the current block2 request.
  *
- * @param[in]   slicer      slicer to use
- * @param[in]   bufpos      pointer to the current payload buffer position
- * @param[in]   c           character to write
+ * @param[in,out]   state   message builder state to use
+ * @param[in]       slicer  slicer to use
+ * @param[in]       c       character to write
  *
- * @returns     Number of bytes written to @p bufpos
+ * @retval          0               Success
+ * @retval          -EOVERFLOW      Not enough space in buffer
+ * @retval          <0              Other error
  */
-size_t coap_blockwise_put_char(coap_block_slicer_t *slicer, uint8_t *bufpos, char c);
+int coap_blockwise_put_char(coap_builder_t *state, coap_block_slicer_t *slicer, char c);
+
+/**
+ * @brief Add a single character to a block2 reply when building the response
+ *        using a coap_pkt_t structure to assemble the message.
+ *
+ * This function is used to add single characters to a CoAP block2 reply. It
+ * checks whether the character should be added to the buffer and ignores it
+ * when the character is outside the current block2 request.
+ *
+ * @param[in,out]   pdu     coap_pkt_t to build the response in
+ * @param[in]       slicer  slicer to use
+ * @param[in]       c       character to write
+ *
+ * @retval          0               Success
+ * @retval          -EOVERFLOW      Not enough space in buffer
+ * @retval          <0              Other error
+ */
+int coap_blockwise_put_char_pkt(coap_pkt_t *pdu, coap_block_slicer_t *slicer, char c);
 
 /**
  * @brief    Block option getter
@@ -1818,92 +1888,294 @@ ssize_t coap_opt_remove(coap_pkt_t *pkt, uint16_t optnum);
  */
 /**@{*/
 /**
+ * @brief   Initialize @p state for building a message
+ *
+ * @param[in,out]   state       State to initialize
+ * @param[in]       buf         Buffer to write the options to
+ * @param[in]       buf_len     Length of @p buf (in bytes)
+ * @param[in]       header_len  Length of the CoAP header (including Token
+ *                              excluding Options, in bytes)
+ *
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Buffer too small
+ * @retval          <0          Other error
+ *
+ * @note    The CoAP packet header (up to and including the CoAP Token) is not
+ *          written by this function, the caller needs to take care of this.
+ * @internal
+ * @warning This function is intended for internal use. Use
+ *          @ref coap_builder_init_reply when building a response or
+ *          @ref nanocoap_sock_builder_init when building a request.
+ *
+ * @pre     @p state is not `NULL`
+ * @pre     @p buf is not `NULL`
+ */
+int coap_builder_init(coap_builder_t *state, void *buf, size_t buf_len,
+                      size_t header_len);
+
+/**
+ * @brief   Check if building the message failed due to insufficient buffer space
+ * @param[in]   state       The builder state to check
+ *
+ * @retval      true        the assembly of the message was aborted due to
+ *                          lack of buffer space (overflow was prevented)
+ * @retval      false       everything fit into the buffer so far
+ */
+static inline bool coap_builder_has_overflown(const coap_builder_t *state)
+{
+    return (state->size == 0);
+}
+
+/**
+ * @brief   Get the size of the CoAP message in @p state
+ *
+ * @param[in]   state       The builder state to get the message size from
+ *
+ * @retval      -EOVERFLOW  the assembly of the message was aborted due to
+ *                          lack of buffer space (overflow was prevented)
+ * @retval      >=0         Success, the size of the assembled message is
+ *                          returned
+ */
+static inline ssize_t coap_builder_msg_size(const coap_builder_t *state)
+{
+    if (coap_builder_has_overflown(state)) {
+        return -EOVERFLOW;
+    }
+
+    return state->pos;
+}
+
+/**
+ * @brief Get the size of the buffer in @p state
+ *
+ * @param[in]   state   The builder state to get the buffer size from
+ *
+ * @retval      >0      The size of the buffer in @p state
+ * @retval      0       @p state has been marked as invalid, as appending
+ *                      options/payloads as requested would have resulted in
+ *                      a buffer overflow.
+ */
+static inline size_t coap_builder_buf_size(const coap_builder_t *state)
+{
+    return state->size;
+}
+
+/**
+ * @brief Get the remaining free buffer space in @p state
+ *
+ * @param[in]   state   The builder state to get the remaining buffer space from
+ *
+ * @return Number of bytes that can still be appennded to @p state
+ */
+static inline size_t coap_builder_buf_remaining(const coap_builder_t *state)
+{
+    if (state->size > state->pos) {
+        return state->size - state->pos;
+    }
+
+    return 0;
+}
+
+/**
+ * @brief   Initialize @p state for building a response and add the response
+ *          header with matching token and suitable message ID to it.
+ *
+ * @param[in,out]   state       State to initialize
+ * @param[in]       buf         Buffer to write the options to
+ * @param[in]       buf_len     Length of @p buf (in bytes)
+ * @param[in,out]   req         Request to reply to
+ * @param[in]       code        The code (e.g. @ref COAP_CODE_CONTENT) of the
+ *                              reply
+ *
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Buffer too small
+ * @retval          <0          Other error
+ *
+ * @pre     @p state is not `NULL`
+ * @pre     @p buf is not `NULL`
+ *
+ * @note    This already initialized the CoAP response header up to and
+ *          including the CoAP Token. The caller still needs to add CoAP
+ *          Options, CoAP Payload Marker, and a payload as needed.
+ */
+WARN_UNUSED_RESULT
+int coap_builder_init_reply(coap_builder_t *state, void *buf, size_t buf_len,
+                            coap_pkt_t *req, uint8_t code);
+
+/**
+ * @brief   Add a payload marker and payload with bounds checking
+ *
+ * @param[in,out]   state       state to use to build the message
+ * @param[in]       pld         payload to add (may be `NULL` if @p pld_len is 0)
+ * @param[in]       pld_len     length of @p pld in bytes
+ *
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Buffer too small
+ * @retval          <0          Other error
+ *
+ * @pre     @p state is not `NULL`
+ * @pre     @p pld is not `NULL`, unless @p pld_len is 0.
+ *
+ * @note    If at the end of the response handler @ref coap_builder_msg_size is
+ *          used, it is safe to ignore the return value: @p state is marked
+ *          as overflown by setting `state->size` to `0` on overflow.
+ *
+ * @note    This may be called more than once, as @p state tracks whether the
+ *          payload marker has already been added or not.
+ */
+int coap_builder_add_payload(coap_builder_t *state, const void *pld, size_t pld_len);
+
+/**
+ * @brief   Write the payload marker into the current position of @p state
+ *          and allocate @p pld_len bytes of payload after it.
+ *
+ * @param[in,out]   state       The message builder to add the payload to
+ * @param[in]       pld_len     Size of the payload to add in bytes
+ *
+ * @return  Pointer to the allocated payload
+ * @retval  NULL    Failure to allocate the payload
+ *
+ * @post    The caller MUST write exactly @p pld_len bytes of data into
+ *          the return buffer (unless `NULL` is returned)
+ *
+ * @note    If at the end of the response handler @ref coap_builder_msg_size is
+ *          used, it is safe to ignore the return value: @p state is marked
+ *          as overflown by setting `state->size` to `0` on overflow.
+ *
+ * @note    This may be called more than once, as @p state tracks whether the
+ *          payload marker has already been added or not. On the second call
+ *          a pointer to the second allocated chunk is returned.
+ *
+ * @note    Callings with function with @p pld_len set to zero will cause it
+ *          to write the payload marker if needed and return a valid
+ *          (non-`NULL`) pointer. The caller MUST NOT write any data to that
+ *          address, since no memory was allocated.
+ */
+void * coap_builder_allocate_payload(coap_builder_t *state, size_t pld_len);
+
+/**
+ * @brief   Add a payload marker with bounds checking
+ *
+ * @param[in,out]   state       state to use to build the message
+ *
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Buffer too small
+ * @retval          <0          Other error
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
+ */
+static inline int coap_builder_add_payload_marker(coap_builder_t *state)
+{
+    return coap_builder_add_payload(state, NULL, 0);
+}
+
+/**
  * @brief   Insert block option into buffer
  *
- * When calling this function to initialize a packet with a block option, the
- * more flag must be set to prevent the creation of an option with a length too
- * small to contain the size bit.
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       slicer      coap blockwise slicer helper struct
+ * @param[in]       option      option number (block1 or block2)
  *
- * @param[out]  buf         buffer to write to
- * @param[in]   lastonum    number of previous option, must be < @p option
- * @param[in]   slicer      coap blockwise slicer helper struct
- * @param[in]   more        more flag (1 or 0)
- * @param[in]   option      option number (block1 or block2)
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
  *
- * @returns     amount of bytes written to @p buf
+ * @pre     The option most recently added to @p state must be smaller than
+ *          @p option
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-size_t coap_opt_put_block(uint8_t *buf, uint16_t lastonum, coap_block_slicer_t *slicer,
-                          bool more, uint16_t option);
+int coap_opt_put_block(coap_builder_t *state, coap_block_slicer_t *slicer,
+                       uint16_t option);
 
 /**
  * @brief   Insert block1 option into buffer
  *
- * When calling this function to initialize a packet with a block1 option, the
- * more flag must be set to prevent the creation of an option with a length too
- * small to contain the size bit.
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       slicer      coap blockwise slicer helper struct
  *
- * @param[out]  buf         buffer to write to
- * @param[in]   lastonum    number of previous option (for delta calculation),
- *                          must be < 27
- * @param[in]   slicer      coap blockwise slicer helper struct
- * @param[in]   more        more flag (1 or 0)
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
  *
- * @returns     amount of bytes written to @p buf
+ * @pre     The option most recently added to @p state must be smaller than 27.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-static inline size_t coap_opt_put_block1(uint8_t *buf, uint16_t lastonum,
-                                         coap_block_slicer_t *slicer, bool more)
+static inline int coap_opt_put_block1(coap_builder_t *state,
+                                      coap_block_slicer_t *slicer)
 {
-    return coap_opt_put_block(buf, lastonum, slicer, more, COAP_OPT_BLOCK1);
+    return coap_opt_put_block(state, slicer, COAP_OPT_BLOCK1);
 }
 
 /**
  * @brief   Insert block2 option into buffer
  *
- * When calling this function to initialize a packet with a block2 option, the
- * more flag must be set to prevent the creation of an option with a length too
- * small to contain the size bit.
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       slicer      coap blockwise slicer helper struct
  *
- * @param[out]  buf         buffer to write to
- * @param[in]   lastonum    number of previous option (for delta calculation),
- *                          must be < 23
- * @param[in]   slicer      coap blockwise slicer helper struct
- * @param[in]   more        more flag (1 or 0)
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
  *
- * @returns     amount of bytes written to @p buf
+ * @pre     The option most recently added to @p state must be smaller than 23.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-static inline size_t coap_opt_put_block2(uint8_t *buf, uint16_t lastonum,
-                                         coap_block_slicer_t *slicer, bool more)
+static inline int coap_opt_put_block2(coap_builder_t *state,
+                                      coap_block_slicer_t *slicer)
 {
-    return coap_opt_put_block(buf, lastonum, slicer, more, COAP_OPT_BLOCK2);
+    return coap_opt_put_block(state, slicer, COAP_OPT_BLOCK2);
 }
 
 /**
  * @brief   Encode the given uint option into buffer
  *
- * @param[out]  buf         buffer to write to
- * @param[in]   lastonum    number of previous option (for delta calculation),
- *                          or 0 for first option
- * @param[in]   onum        number of option
- * @param[in]   value       value to encode
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       onum        number of option
+ * @param[in]       value       value to encode
  *
- * @returns     amount of bytes written to @p buf
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than
+ *          @p onum.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-size_t coap_opt_put_uint(uint8_t *buf, uint16_t lastonum, uint16_t onum,
-                         uint32_t value);
+int coap_opt_put_uint(coap_builder_t *state, uint16_t onum, uint32_t value);
 
 /**
  * @brief   Insert block1 option into buffer in control usage
  *
- * @param[in]   buf         buffer to write to
- * @param[in]   lastonum    last option number (must be < 27)
- * @param[in]   block       block option attribute struct
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       block       block option attribute struct
  *
- * @returns     amount of bytes written to @p buf
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than 27.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-static inline size_t coap_opt_put_block1_control(uint8_t *buf, uint16_t lastonum,
-                                                 coap_block1_t *block)
+static inline int coap_opt_put_block1_control(coap_builder_t *state,
+                                              coap_block1_t *block)
 {
-    return coap_opt_put_uint(buf, lastonum, COAP_OPT_BLOCK1,
+    return coap_opt_put_uint(state, COAP_OPT_BLOCK1,
                              (block->blknum << 4) | block->szx | (block->more ? 0x8 : 0));
 }
 
@@ -1912,179 +2184,236 @@ static inline size_t coap_opt_put_block1_control(uint8_t *buf, uint16_t lastonum
  *
  * Forces value of block 'more' attribute to zero, per spec.
  *
- * @param[in]   buf         buffer to write to
- * @param[in]   lastonum    last option number (must be < 27)
- * @param[in]   block       block option attribute struct
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       block       block option attribute struct
  *
- * @returns     amount of bytes written to @p buf
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than 23.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-static inline size_t coap_opt_put_block2_control(uint8_t *buf, uint16_t lastonum,
-                                                 coap_block1_t *block)
+static inline int coap_opt_put_block2_control(coap_builder_t *state,
+                                              coap_block1_t *block)
 {
     /* block.more must be zero, so no need to 'or' it in */
-    return coap_opt_put_uint(buf, lastonum, COAP_OPT_BLOCK2,
+    return coap_opt_put_uint(state, COAP_OPT_BLOCK2,
                              (block->blknum << 4) | block->szx);
 }
 
 /**
  * @brief   Insert an CoAP Observe Option into the buffer
  *
- * @param[out]  buf         Buffer to write to
- * @param[in]   lastonum    last option number (must be < 6)
- * @param[in]   obs         observe number to write
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       obs         observe number to write
  *
- * @returns     amount of bytes written to @p buf
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than 6.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-static inline size_t coap_opt_put_observe(uint8_t *buf, uint16_t lastonum,
-                                          uint32_t obs)
+static inline int coap_opt_put_observe(coap_builder_t *state, uint32_t obs)
 {
     obs &= COAP_OBS_MAX_VALUE_MASK; /* trim obs down to 24 bit */
-    return coap_opt_put_uint(buf, lastonum, COAP_OPT_OBSERVE, obs);
+    return coap_opt_put_uint(state, COAP_OPT_OBSERVE, obs);
 }
 
 /**
  * @brief   Encode the given string as multi-part option into buffer
  *
- * @param[out]  buf         buffer to write to
- * @param[in]   lastonum    number of previous option (for delta calculation),
- *                          or 0 if first option
- * @param[in]   optnum      option number to use
- * @param[in]   string      string to encode as option
- * @param[in]   len         length of the string
- * @param[in]   separator   character used in @p string to separate parts
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       optnum      option number to use
+ * @param[in]       string      string to encode as option
+ * @param[in]       len         length of the string
+ * @param[in]       separator   character used in @p string to separate parts
  *
- * @return      number of bytes written to @p buf
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than
+ *          @p optnum.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-size_t coap_opt_put_string_with_len(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
-                                    const char *string, size_t len, char separator);
+int coap_opt_put_string_with_len(coap_builder_t *state, uint16_t optnum,
+                                 const char *string, size_t len, char separator);
 /**
  * @brief   Encode the given string as multi-part option into buffer
  *
- * @param[out]  buf         buffer to write to
- * @param[in]   lastonum    number of previous option (for delta calculation),
- *                          or 0 if first option
- * @param[in]   optnum      option number to use
- * @param[in]   string      string to encode as option
- * @param[in]   separator   character used in @p string to separate parts
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       optnum      option number to use
+ * @param[in]       string      string to encode as option
+ * @param[in]       separator   character used in @p string to separate parts
  *
- * @return      number of bytes written to @p buf
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than
+ *          @p optnum.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-static inline size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum,
-                                         uint16_t optnum,
-                                         const char *string, char separator)
+static inline int coap_opt_put_string(coap_builder_t *state, uint16_t optnum,
+                                      const char *string, char separator)
 {
-    return coap_opt_put_string_with_len(buf, lastonum, optnum,
+    return coap_opt_put_string_with_len(state, optnum,
                                         string, strlen(string), separator);
 }
 
 /**
  * @brief   Convenience function for inserting LOCATION_PATH option into buffer
  *
- * @param[out]  buf         buffer to write to
- * @param[in]   lastonum    number of previous option (for delta calculation),
- *                          or 0 if first option
- * @param[in]   location    ptr to string holding the location
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       location    ptr to string holding the location
  *
- * @returns     amount of bytes written to @p buf
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than 8.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-static inline size_t coap_opt_put_location_path(uint8_t *buf,
-                                                uint16_t lastonum,
-                                                const char *location)
+static inline int coap_opt_put_location_path(coap_builder_t *state,
+                                             const char *location)
 {
-    return coap_opt_put_string(buf, lastonum, COAP_OPT_LOCATION_PATH,
+    return coap_opt_put_string(state, COAP_OPT_LOCATION_PATH,
                                location, '/');
 }
 
 /**
  * @brief   Convenience function for inserting LOCATION_QUERY option into buffer
  *
- * @param[out]  buf         buffer to write to
- * @param[in]   lastonum    number of previous option (for delta calculation),
- *                          or 0 if first option
- * @param[in]   location    ptr to string holding the location
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       location    ptr to string holding the location
  *
- * @returns     amount of bytes written to @p buf
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than 20.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-static inline size_t coap_opt_put_location_query(uint8_t *buf,
-                                                 uint16_t lastonum,
-                                                 const char *location)
+static inline int coap_opt_put_location_query(coap_builder_t *state,
+                                              const char *location)
 {
-    return coap_opt_put_string(buf, lastonum, COAP_OPT_LOCATION_QUERY,
+    return coap_opt_put_string(state, COAP_OPT_LOCATION_QUERY,
                                location, '&');
 }
 
 /**
  * @brief   Convenience function for inserting URI_PATH option into buffer
  *
- * @param[out]  buf         buffer to write to
- * @param[in]   lastonum    number of previous option (for delta calculation),
- *                          or 0 if first option
- * @param[in]   uri         ptr to source URI
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       uri         ptr to source URI
  *
- * @returns     amount of bytes written to @p buf
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than 11.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-static inline size_t coap_opt_put_uri_path(uint8_t *buf, uint16_t lastonum,
-                                           const char *uri)
+static inline int coap_opt_put_uri_path(coap_builder_t *state, const char *uri)
 {
-    return coap_opt_put_string(buf, lastonum, COAP_OPT_URI_PATH, uri, '/');
+    return coap_opt_put_string(state, COAP_OPT_URI_PATH, uri, '/');
 }
 
 /**
  * @brief   Convenience function for inserting URI_QUERY option into buffer
  *
- * @param[out]  buf         buffer to write to
- * @param[in]   lastonum    number of previous option (for delta calculation),
- *                          or 0 if first option
- * @param[in]   uri         ptr to source URI
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       uri_query   ptr to source URI-Query
  *
- * @returns     amount of bytes written to @p buf
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than 15.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-static inline size_t coap_opt_put_uri_query(uint8_t *buf, uint16_t lastonum,
-                                            const char *uri)
+static inline int coap_opt_put_uri_query(coap_builder_t *state,
+                                         const char *uri_query)
 {
-    return coap_opt_put_string(buf, lastonum, COAP_OPT_URI_QUERY, uri, '&');
+    return coap_opt_put_string(state, COAP_OPT_URI_QUERY, uri_query, '&');
 }
 
 /**
  * @brief   Convenience function for inserting URI_PATH and URI_QUERY into buffer
  *          This function will automatically split path and query parameters.
  *
- * @param[out]  buf         buffer to write to
- * @param[in,out] lastonum  number of previous option (for delta calculation),
- *                          or 0 if first option
- *                          May be NULL, then previous option is assumed to be 0.
- * @param[in]   uri         ptr into a source URI, to the first character after
- *                          the authority component
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       uri         ptr into a source URI, to the first character after
+ *                              the authority component
  *
- * @returns     amount of bytes written to @p buf
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than 11.
  *
  * This function may produce two different options (Uri-Path and Uri-Query).
  * Users that need to insert Content-Format, Max-Age or the currently
  * unassigned option 13 need to split their URI themselves and call the
  * respective helper functions.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-size_t coap_opt_put_uri_pathquery(uint8_t *buf, uint16_t *lastonum, const char *uri);
+int coap_opt_put_uri_pathquery(coap_builder_t *state, const char *uri);
 
 /**
  * @brief   Convenience function for inserting PROXY_URI option into buffer
  *
- * @param[out]  buf         buffer to write to
- * @param[in]   lastonum    number of previous option (for delta calculation),
- *                          or 0 if first option
- * @param[in]   uri         ptr to source URI
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       uri         ptr to source URI
  *
- * @returns     amount of bytes written to @p buf
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than 35.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-static inline size_t coap_opt_put_proxy_uri(uint8_t *buf, uint16_t lastonum,
-                                            const char *uri)
+static inline int coap_opt_put_proxy_uri(coap_builder_t *state, const char *uri)
 {
-    return coap_opt_put_string(buf, lastonum, COAP_OPT_PROXY_URI, uri, '\0');
+    return coap_opt_put_string(state, COAP_OPT_PROXY_URI, uri, '\0');
 }
 
 /**
  * @brief   Insert block1 option into buffer (from coap_block1_t)
  *
- * This function is wrapper around @ref coap_put_option_block1(),
+ * This function is wrapper around @ref coap_opt_put_block1(),
  * taking its arguments from a coap_block1_t struct.
  *
  * It will write option Nr. 27 (COAP_OPT_BLOCK1).
@@ -2092,65 +2421,91 @@ static inline size_t coap_opt_put_proxy_uri(uint8_t *buf, uint16_t lastonum,
  * It is safe to be called when @p block1 was generated for a non-blockwise
  * request.
  *
- * @param[in]   pkt_pos     buffer to write to
- * @param[in]   block1      ptr to block1 struct (created by coap_get_block1())
- * @param[in]   lastonum    last option number (must be < 27)
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       block1      ptr to block1 struct (created by coap_get_block1())
  *
- * @returns     amount of bytes written to @p pkt_pos
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than 27.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t lastonum);
+int coap_put_block1_ok(coap_builder_t *state, coap_block1_t *block1);
 
 /**
  * @brief   Insert a CoAP option into buffer
  *
- * This function writes a CoAP option with nr. @p onum to @p buf.
- * It handles calculating the option delta (from @p lastonum), encoding the
- * length from @p olen and copying the option data from @p odata.
+ * This function writes a CoAP option with nr. @p onum to the buffer managed
+ * by @p state and also does proper delta-encoding based on the most recently
+ * added option as per @p state. Both the option header is added and the option
+ * data from @p odata is copied.
  *
- * @param[out]  buf         buffer to write to
- * @param[in]   lastonum    number of previous option (for delta calculation),
- *                          or 0 for first option
- * @param[in]   onum        number of option
- * @param[in]   odata       ptr to raw option data (or NULL)
- * @param[in]   olen        length of @p odata (if any)
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       onum        number of the option to add
+ * @param[in]       odata       ptr to raw option data (or NULL)
+ * @param[in]       olen        length of @p odata (if any)
  *
- * @returns     amount of bytes written to @p buf
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     @p onum is greater than or equal to the option number of the option
+ *          most recently put into @p state.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-size_t coap_put_option(uint8_t *buf, uint16_t lastonum, uint16_t onum, const void *odata, size_t olen);
+int coap_opt_put(coap_builder_t *state, uint16_t onum, const void *odata, size_t olen);
 
 /**
  * @brief   Insert block1 option into buffer
  *
- * @param[out]  buf         buffer to write to
- * @param[in]   lastonum    number of previous option (for delta calculation),
- *                          must be < 27
- * @param[in]   blknum      block number
- * @param[in]   szx         SXZ value
- * @param[in]   more        more flag (1 or 0)
+ * @param[in,out]   state       the data structure used to handle the state
+ * @param[in]       blknum      block number
+ * @param[in]       szx         SXZ value
+ * @param[in]       more        more flag (1 or 0)
  *
- * @returns     amount of bytes written to @p buf
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Not enough space in buffer
+ * @retval          <0          Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than 27.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-static inline size_t coap_put_option_block1(uint8_t *buf, uint16_t lastonum,
-                                            unsigned blknum, unsigned szx, int more)
+static inline int coap_opt_put_block1_raw(coap_builder_t *state,
+                                          unsigned blknum, unsigned szx, int more)
 {
-    return coap_opt_put_uint(buf, lastonum, COAP_OPT_BLOCK1,
+    return coap_opt_put_uint(state, COAP_OPT_BLOCK1,
                              (blknum << 4) | szx | (more ? 0x8 : 0));
 }
 
 /**
  * @brief   Insert content type option into buffer
  *
- * @param[out]  buf             buffer to write to
- * @param[in]   lastonum        number of previous option (for delta
- *                              calculation), or 0 if first option
- * @param[in]   content_type    content type to set
+ * @param[in,out]   state           the data structure used to handle the state
+ * @param[in]       content_type    content type to set
  *
- * @returns     amount of bytes written to @p buf
+ * @retval          0               Success
+ * @retval          -EOVERFLOW      Not enough space in buffer
+ * @retval          <0              Other error
+ *
+ * @pre     The option most recently added to @p state must be smaller than 12.
+ *
+ * @note   If at the end of the response handler @ref coap_builder_msg_size is
+ *         used, it is safe to ignore the return value: @p state is marked
+ *         as overflown by setting `state->size` to `0` on overflow.
  */
-static inline size_t coap_put_option_ct(uint8_t *buf, uint16_t lastonum,
-                                        uint16_t content_type)
+static inline int coap_opt_put_ct(coap_builder_t *state, uint16_t content_type)
 {
-    return coap_opt_put_uint(buf, lastonum, COAP_OPT_CONTENT_FORMAT, content_type);
+    return coap_opt_put_uint(state, COAP_OPT_CONTENT_FORMAT, content_type);
 }
 /**@}*/
 
@@ -2160,30 +2515,6 @@ static inline size_t coap_put_option_ct(uint8_t *buf, uint16_t lastonum,
  * Functions to support sending and receiving messages.
  */
 /**@{*/
-/**
- * @brief   Build reply to CoAP block2 request
- *
- * This function can be used to create a reply to a CoAP block2 request
- * packet. In addition to @ref coap_build_reply, this function checks the
- * block2 option and returns an error message to the client if necessary.
- *
- * @param[in]   pkt         packet to reply to
- * @param[in]   code        reply code (e.g., COAP_CODE_204)
- * @param[out]  rbuf        buffer to write reply to
- * @param[in]   rlen        size of @p rbuf
- * @param[in]   payload_len length of payload
- * @param[in]   slicer      slicer to use
- *
- * @warning Use @ref coap_get_response_hdr_len to determine the size of the
- *          header this will write.
- *
- * @returns     size of reply packet on success
- * @returns     <0 on error
- */
-ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,
-                                uint8_t *rbuf, unsigned rlen, unsigned payload_len,
-                                coap_block_slicer_t *slicer);
-
 /**
  * @brief   Build a CoAP over UDP header
  *
@@ -2292,6 +2623,8 @@ static inline ssize_t coap_build_hdr(coap_udp_hdr_t *hdr, unsigned type, const v
  *     return (uintptr_t)pos - (uintptr_t)buf;
  * }
  * ```
+ *
+ * @deprecated  Use @ref coap_builder_init_reply instead.
  */
 ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
                          uint8_t *rbuf, unsigned rlen, unsigned max_data_len);
@@ -2535,7 +2868,7 @@ ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
  * @retval      <0          other error
  */
 ssize_t coap_reply_simple(coap_pkt_t *pkt,
-                          unsigned code,
+                          uint8_t code,
                           uint8_t *buf, size_t len,
                           uint16_t ct,
                           const void *payload, size_t payload_len);

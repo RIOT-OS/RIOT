@@ -125,9 +125,8 @@
  * actually writing the content, depending on the current position within the
  * overall payload transfer.
  *
- * Finally, use the convenience function coap_block2_build_reply(), which
- * finalizes the packet and calls coap_block2_finish() internally to update
- * the block2 option.
+ * Finally, use the convenience function coap_block2_finish() to update the
+ * block2 option.
  *
  * @{
  *
@@ -564,6 +563,56 @@ static inline void nanocoap_sock_close(nanocoap_sock_t *sock)
     }
 #endif
     sock_udp_close(&sock->udp);
+}
+
+/**
+ * @brief   Initialize @p state for building a request.
+ *
+ * @param[in,out]   sock        nanocoap socket to send the request from
+ * @param[in,out]   state       State to initialize
+ * @param[in]       type        Type of the request (CON/NON for UDP/DTLS transport)
+ * @param[in]       method      Method of the request
+ * @param[in]       token       CoAP Tokent o use
+ * @param[in]       token_len   Length of @p token in bytes
+ *
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Buffer too small
+ * @retval          <0          Other error
+ *
+ * @note    The CoAP packet header (up to and including the CoAP Token) is not
+ *          written by this function, the caller needs to take care of this.
+ *
+ * @pre     @p state is not `NULL`
+ * @pre     @p buf is not `NULL`
+ */
+WARN_UNUSED_RESULT
+int nanocoap_sock_builder_init_token(nanocoap_sock_t *sock, coap_builder_t *state,
+                                     uint8_t type, uint8_t method,
+                                     const void *token, size_t token_len);
+
+/**
+ * @brief   Initialize @p state for building a request.
+ *
+ * @param[in,out]   sock        nanocoap socket to send the request from
+ * @param[in,out]   state       State to initialize
+ * @param[in]       type        Type of the request (CON/NON for UDP/DTLS transport)
+ * @param[in]       method      Method of the request
+ *
+ * @retval          0           Success
+ * @retval          -EOVERFLOW  Buffer too small
+ * @retval          <0          Other error
+ *
+ * @note    The CoAP packet header (up to and including the CoAP Token) is not
+ *          written by this function, the caller needs to take care of this.
+ *
+ * @pre     @p state is not `NULL`
+ * @pre     @p buf is not `NULL`
+ */
+WARN_UNUSED_RESULT
+static inline int nanocoap_sock_builder_init(nanocoap_sock_t *sock, coap_builder_t *state,
+                                             uint8_t type, uint8_t method)
+{
+    return nanocoap_sock_builder_init_token(sock, state, type, method, NULL, 0);
 }
 
 /**
@@ -1030,20 +1079,20 @@ static inline int nanocoap_block_request_connect_url(coap_block_request_t *ctx,
  * @pre     @p ctx was initialized with @ref nanocoap_block_request_connect_url
  *          or manually.
  *
- * @param[in]   ctx     blockwise request context
- * @param[in]   data    payload to send
- * @param[in]   len     payload length
- * @param[in]   more    more blocks after this one
- *                      (will be set automatically if @p len > block size)
- * @param[in]   cb      callback for response
- * @param[in]   arg     callback context
+ * @param[in]   req         blockwise request context
+ * @param[in]   data        payload to send
+ * @param[in]   len         payload length
+ * @param[in]   more        more blocks after this one
+ *                          (will be set automatically if @p len > block size)
+ * @param[in]   callback    callback for response
+ * @param[in]   arg         callback context
  *
  * @return      Number of payload bytes written on success
  *              Negative error on failure
  */
-int nanocoap_sock_block_request(coap_block_request_t *ctx,
+int nanocoap_sock_block_request(coap_block_request_t *req,
                                 const void *data, size_t len, bool more,
-                                coap_request_cb_t cb, void *arg);
+                                coap_request_cb_t callback, void *arg);
 #ifdef __cplusplus
 }
 #endif
