@@ -63,10 +63,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 static inline void init_base(uart_t uart, uint32_t baudrate)
 {
-    /* Fixed baud rate. */
-    assert(baudrate == 115200);
     assert(uart < UART_NUMOF);
-    (void) baudrate;
     const uart_conf_t *cfg = &uart_config[uart];
     /* The RX/TX must be together */
     assert(cfg->pinsel_shift <= 27);
@@ -78,11 +75,15 @@ static inline void init_base(uart_t uart, uint32_t baudrate)
     else {
         LPC_SC->PCLKSEL0 &= ~((uint32_t)0x3 << (cfg->clk_offset * 2));
     }
+    /* PCLKSEL cleared to 00 means PCLK = CCLK / 4 */
+    uint32_t pclk = CLOCK_CORECLOCK / 4;
+    /* calculate divisor: DL = PCLK / (16 * baudrate), with rounding */
+    uint16_t dl = (pclk + (8 * baudrate)) / (16 * baudrate);
     /* set mode to 8N1 and enable access to divisor latch */
     dev(uart)->LCR = ((0x3 << 0) | (1 << 7));
-    /* set baud rate registers (fixed for now) */
-    dev(uart)->DLM = 0;
-    dev(uart)->DLL = 13;
+    /* set baud rate divisor registers */
+    dev(uart)->DLM = (dl >> 8) & 0xFF;
+    dev(uart)->DLL = dl & 0xFF;
     /* enable FIFOs */
     dev(uart)->FCR = 1;
 
@@ -112,10 +113,12 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     assert(uart < UART_NUMOF);
     for (size_t i = 0; i < len; i++) {
-        /* wait for THRE bit to be set */
+        /* wait for transmission holding (THRE) bit to be set */
         while (!(dev(uart)->LSR & (1 << 5))) {}
         dev(uart)->THR = data[i];
     }
+    /* wait for transmission empty (TEMT) bit to be set */
+    while (!(dev(uart)->LSR & (1 << 6))) {}
 }
 
 void uart_poweron(uart_t uart)
