@@ -34,7 +34,7 @@
 #include "net/sock/async/event.h"
 #endif
 #if MODULE_NANOCOAP_SERVER_DTLS
-#include "net/sock/dtls.h"
+#  include "net/sock/dtls.h"
 #endif
 #include "net/sock/udp.h"
 #include "net/sock/util.h"

@@ -145,8 +145,8 @@
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
 #if IS_USED(MODULE_NANOCOAP_DTLS)
-#include "net/credman.h"
-#include "net/sock/dtls.h"
+#  include "net/credman.h"
+#  include "net/sock/dtls.h"
 #endif
 
 #ifdef __cplusplus
@@ -158,7 +158,7 @@ extern "C" {
  *          Tag together with the credential type (PSK) needs to be unique
  */
 #ifndef CONFIG_NANOCOAP_SOCK_DTLS_TAG
-#define CONFIG_NANOCOAP_SOCK_DTLS_TAG           (0xc0ab)
+#  define CONFIG_NANOCOAP_SOCK_DTLS_TAG         (0xc0ab)
 #endif
 
 /**
@@ -166,7 +166,7 @@ extern "C" {
  *          Tag together with the credential type (PSK) needs to be unique
  */
 #ifndef CONFIG_NANOCOAP_SERVER_SOCK_DTLS_TAG
-#define CONFIG_NANOCOAP_SERVER_SOCK_DTLS_TAG    (0xc0ac)
+#  define CONFIG_NANOCOAP_SERVER_SOCK_DTLS_TAG  (0xc0ac)
 #endif
 
 /**
@@ -174,7 +174,7 @@ extern "C" {
  *          Used both for RX and TX, needs to hold payload block + header
  */
 #ifndef CONFIG_NANOCOAP_SERVER_BUF_SIZE
-#define CONFIG_NANOCOAP_SERVER_BUF_SIZE         ((1 << (CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT + 3)) \
+#  define CONFIG_NANOCOAP_SERVER_BUF_SIZE       ((1 << (CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT + 3)) \
                                                  + CONFIG_NANOCOAP_URI_MAX + 16)
 #endif
 
@@ -182,7 +182,7 @@ extern "C" {
  * @brief   CoAP server thread stack size
  */
 #ifndef CONFIG_NANOCOAP_SERVER_STACK_SIZE
-#define CONFIG_NANOCOAP_SERVER_STACK_SIZE       THREAD_STACKSIZE_DEFAULT
+#  define CONFIG_NANOCOAP_SERVER_STACK_SIZE     THREAD_STACKSIZE_DEFAULT
 #endif
 
 /**
@@ -194,7 +194,7 @@ extern "C" {
  * See https://github.com/plgd-dev/go-coap/issues/512
  */
 #ifndef CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN
-#define CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN        (0)
+#  define CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN      (0)
 #endif
 
 /**

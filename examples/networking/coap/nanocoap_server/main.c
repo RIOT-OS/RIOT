@@ -20,8 +20,8 @@
 #include "ztimer.h"
 
 #ifdef MODULE_LWIP_IPV4
-#include "lwip/netif.h"
-#include <arpa/inet.h>
+#  include "lwip/netif.h"
+#  include <arpa/inet.h>
 #endif
 
 #define COAP_INBUF_SIZE (256U)
@@ -30,9 +30,9 @@
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 #if MODULE_NANOCOAP_SERVER_DTLS
-#include "net/credman.h"
-#include "net/dsm.h"
-#include "tinydtls_keys.h"
+#  include "net/credman.h"
+#  include "net/dsm.h"
+#  include "tinydtls_keys.h"
 
 static const uint8_t psk_id_0[] = PSK_DEFAULT_IDENTITY;
 static const uint8_t psk_key_0[] = PSK_DEFAULT_KEY;
