@@ -1104,8 +1104,9 @@ static int _esp_wifi_set(netdev_t *netdev, netopt_t opt, const void *val, size_t
             }
             return sizeof(wifi_disconnect_request_t);
         default:
-            return netdev_eth_set(netdev, opt, val, max_len);
+            break;
     }
+    return netdev_eth_set(netdev, opt, val, max_len);
 }
 
 static void _esp_wifi_isr(netdev_t *netdev)
