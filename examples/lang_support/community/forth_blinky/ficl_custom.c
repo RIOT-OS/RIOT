@@ -5,7 +5,7 @@
 
 #include "ficl.h"
 #include "led.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 static void led0(FICL_VM *pVM)
 {
@@ -26,7 +26,7 @@ static void ms(FICL_VM *pVM)
 #if FICL_ROBUST > 1
     vmCheckStack(pVM, 1, 0);
 #endif
-    xtimer_msleep(POPUNS());
+    ztimer_sleep(ZTIMER_MSEC, POPUNS());
     return;
 }
 
