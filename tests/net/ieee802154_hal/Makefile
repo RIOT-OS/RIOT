@@ -1,9 +1,45 @@
 include ../Makefile.net_common
 
+# Due to missing Kconfig support, whitelist boards that are known to have a
+# working Kconfig dependency resolution.
+# Other boards should still work when running with CONTINUE_ON_EXPECTED_ERRORS=1
+
+BOARD_WHITELIST += adafruit-clue \
+                   adafruit-itsybitsy-nrf52 \
+                   arduino-nano-33-ble \
+                   atmega256rfr2-xpro \
+                   avr-rss2 \
+                   cc2538dk \
+                   derfmega128 \
+                   derfmega256 \
+                   feather-nrf52840 \
+                   microduino-corerf \
+                   native \
+                   nrf52840dk \
+                   nrf52840dongle \
+                   nrf52840-mdk \
+                   nucleo-l152re \
+                   nucleo-f303re \
+                   nucleo-wl55jc \
+                   omote \
+                   openmote-cc2538 \
+                   reel \
+                   remote-pa \
+                   remote-reva \
+                   remote-revb \
+                   samr21-xpro \
+                   pba-d-01-kw2x \
+                   zigduino \
+                   #
+
 ifneq (,$(filter native native32 native64,$(BOARD)))
   ZEP_PORT_BASE ?= 17754
   TERMFLAGS += -z [::1]:$(ZEP_PORT_BASE)
   USEMODULE += socket_zep
+  # the same for Kconfig
+  ifeq (1,$(TEST_KCONFIG))
+    KCONFIG_ADD_CONFIG += $(APPDIR)/app.config.test.native
+  endif
 endif
 
 USEMODULE += od

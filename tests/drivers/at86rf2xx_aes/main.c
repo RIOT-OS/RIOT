@@ -99,11 +99,10 @@
                       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
 #endif
 
-static void _event_cb(netdev_t *dev, netdev_event_t event)
+static void _irq_cb(void *arg)
 {
     /* Ignore interrupts */
-    (void)dev;
-    (void)event;
+    (void)arg;
 }
 
 static void _ecb(at86rf2xx_t *dev,
@@ -135,11 +134,13 @@ static void _cbc(at86rf2xx_t *dev,
 
 int main(void)
 {
-    at86rf2xx_t dev;
+    /* initialize descriptors to zero */
+    ieee802154_dev_t hal = {0};
+    at86rf2xx_t dev = {0};
+
     bool success = true;
-    at86rf2xx_setup(&dev, &at86rf2xx_params[0], 0);
-    dev.netdev.netdev.event_callback = _event_cb;
-    if (dev.netdev.netdev.driver->init(&dev.netdev.netdev) != 0) {
+    int res = at86rf2xx_init(&dev, &at86rf2xx_params[0], &hal, _irq_cb, NULL);
+    if (res < 0) {
         return EXIT_FAILURE;
     }
 

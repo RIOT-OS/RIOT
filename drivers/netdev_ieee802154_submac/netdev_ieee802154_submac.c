@@ -301,9 +301,17 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         /* The Radio HAL uses the IEEE 802.15.4 definition for RSSI.
          * Netdev uses dBm. Therefore we need a translation here */
         netdev_rx_info->rssi = ieee802154_rssi_to_dbm(rx_info.rssi);
-
         netdev_rx_info->lqi = rx_info.lqi;
+
+#if IS_USED(MODULE_NETDEV_IEEE802154_RX_TIMESTAMP)
+        if (ieee802154_radio_has_capability(&submac->dev, IEEE802154_CAP_RX_TIMESTAMP)) {
+            netdev_rx_info->timestamp = rx_info.timestamp;
+            netdev_rx_info->flags |= NETDEV_RX_IEEE802154_INFO_FLAG_TIMESTAMP;
+        }
+#endif
+
     }
+
 #if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC_SOFT_ACK)
     const uint8_t *mhr = buf;
     if ((mhr[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_DATA &&
