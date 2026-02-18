@@ -3,3 +3,7 @@ ifdef CONFIG_SKALD_ADV_CHANNELS
   SKALD_ADV_CHAN := { $(shell echo $(CONFIG_SKALD_ADV_CHANNELS)) }
   CFLAGS += -DSKALD_ADV_CHAN="$(SKALD_ADV_CHAN)"
 endif
+
+ifneq (,$(filter skald_bthome_encrypt,$(USEMODULE)))
+  $(shell $(COLOR_ECHO) "\n\n$(COLOR_YELLOW)\`skald_bthome_encrypt\` currently does not work with Home Assistant!$(COLOR_RESET)\n\n" 1>&2)
+endif

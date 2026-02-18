@@ -46,6 +46,12 @@
 #define ADV_AA                  (0x8e89bed6)    /* access address */
 #define ADV_CRC                 (0x00555555)    /* CRC initializer */
 
+#if IS_USED(MODULE_SKALD_UPDATE_PKT_CB)
+#  define _on_adv_evt_isr       _on_adv_evt_event
+#else
+#  define _on_adv_evt_isr       _on_adv_evt
+#endif
+
 static const uint8_t _adv_chan[] = SKALD_ADV_CHAN;
 
 static netdev_ble_ctx_t _ble_ctx = {
@@ -69,7 +75,10 @@ static void _sched_next(skald_ctx_t *ctx)
     ctx->last += random_uint32_range(JITTER_MIN, JITTER_MAX);
     /* compensate the time passed since the timer triggered last by using the
      * current value of the timer */
-    ztimer_set(ZTIMER_MSEC, &ctx->timer, (ctx->last - ztimer_now(ZTIMER_MSEC)));
+    ztimer_now_t next = (ctx->last > ztimer_now(ZTIMER_MSEC))
+                      ? (ctx->last - ztimer_now(ZTIMER_MSEC))
+                      : 0;
+    ztimer_set(ZTIMER_MSEC, &ctx->timer, next);
 }
 
 static void _on_adv_evt(void *arg)
@@ -81,6 +90,11 @@ static void _on_adv_evt(void *arg)
     if ((ctx->cur_chan < ADV_CHAN_NUMOF) && (_radio->context == NULL)) {
         _radio->context = ctx;
         _ble_ctx.chan = _adv_chan[ctx->cur_chan];
+#if IS_USED(MODULE_SKALD_UPDATE_PKT_CB)
+        if (ctx->update_pkt) {
+            ctx->update_pkt(ctx);
+        }
+#endif
         netdev_ble_set_ctx(_radio, &_ble_ctx);
         netdev_ble_send(_radio, &ctx->pkt);
         ++ctx->cur_chan;
@@ -91,6 +105,23 @@ static void _on_adv_evt(void *arg)
     }
 }
 
+#if IS_USED(MODULE_SKALD_UPDATE_PKT_CB)
+static void _event_handler(event_t *event)
+{
+    skald_ctx_t *ctx = container_of(event, skald_ctx_t, event);
+
+    _on_adv_evt(ctx);
+}
+
+static void _on_adv_evt_event(void *arg)
+{
+    skald_ctx_t *ctx = arg;
+
+    ctx->event.handler = _event_handler;
+    event_post(&ctx->queue, &ctx->event);
+}
+#endif
+
 static void _on_radio_evt(netdev_t *netdev, netdev_event_t event)
 {
     (void)netdev;
@@ -98,7 +129,7 @@ static void _on_radio_evt(netdev_t *netdev, netdev_event_t event)
     if (event == NETDEV_EVENT_TX_COMPLETE) {
         skald_ctx_t *ctx = _radio->context;
         _stop_radio();
-        _on_adv_evt(ctx);
+        _on_adv_evt_isr(ctx);
     }
 }
 
@@ -122,14 +153,20 @@ void skald_adv_start(skald_ctx_t *ctx)
     skald_adv_stop(ctx);
 
     /* initialize advertising context */
-    ctx->timer.callback = _on_adv_evt;
+    ctx->timer.callback = _on_adv_evt_isr;
     ctx->timer.arg = ctx;
     ctx->last = ztimer_now(ZTIMER_MSEC);
     ctx->cur_chan = 0;
     ctx->pkt.flags = (BLE_ADV_NONCON_IND | BLE_LL_FLAG_TXADD);
+#if IS_USED(MODULE_SKALD_UPDATE_PKT_CB)
+    event_queue_init(&ctx->queue);
+#endif
 
     /* start advertising */
     _sched_next(ctx);
+#if IS_USED(MODULE_SKALD_UPDATE_PKT_CB)
+    event_loop(&ctx->queue);
+#endif
 }
 
 void skald_adv_stop(skald_ctx_t *ctx)
