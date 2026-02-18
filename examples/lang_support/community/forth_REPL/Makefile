@@ -20,7 +20,7 @@ USEPKG += ficl
 
 # Modules to include:
 USEMODULE += shell
-USEMODULE += xtimer
+USEMODULE += ztimer_msec
 
 # For now `examples/%/tests" still rely on the test applicaton being reset after
 # a terminal is opened to synchronize.
