@@ -18,14 +18,9 @@
 
 #include <stdio.h>
 
-#include "shell.h"
-
 int main(void)
 {
     puts("STDIO semihosting test application");
-
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

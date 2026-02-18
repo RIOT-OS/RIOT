@@ -18,7 +18,6 @@
 
 #include <stdio.h>
 
-#include "shell.h"
 #include "msg.h"
 
 #define MAIN_QUEUE_SIZE     (8)
@@ -32,11 +31,7 @@ int main(void)
      * receive potentially fast incoming networking packets */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
-    /* start shell */
     puts("All up, running the shell now");
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
-    /* should never be reached */
+    /* shell starts implicitly after returning */
     return 0;
 }
