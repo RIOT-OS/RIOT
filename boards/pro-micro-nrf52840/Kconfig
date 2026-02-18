@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2026 Bas Stottelaar <basstottelaar@gmail.com>
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "pro-micro-nrf52840" if BOARD_PRO_MICRO_NRF52840
+
+config BOARD_PRO_MICRO_NRF52840
+    bool
+    default y
+    select BOARD_COMMON_NRF52
+    select CPU_MODEL_NRF52840XXAA
+
+source "$(RIOTBOARD)/common/nrf52/Kconfig"
