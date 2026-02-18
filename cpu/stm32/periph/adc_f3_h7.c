@@ -42,16 +42,16 @@
 #define ADC_SMPR2_FIRST_CHAN (10)
 
 #ifdef ADC1_COMMON
-#define ADC_INSTANCE    ADC1_COMMON
+#  define ADC_INSTANCE  ADC1_COMMON
 #else
-#define ADC_INSTANCE    ADC12_COMMON
+#  define ADC_INSTANCE  ADC12_COMMON
 #endif
 
 /**
  * @brief   Default VBAT undefined value
  */
 #ifndef VBAT_ADC
-#define VBAT_ADC    ADC_UNDEF
+#  define VBAT_ADC  ADC_UNDEF
 #endif
 
 /**
@@ -91,8 +91,8 @@ static inline ADC_TypeDef *dev(adc_t line)
 static inline void prep(adc_t line)
 {
     mutex_lock(&locks[adc_config[line].dev]);
-/* Enable the clock here only if it will be disabled by done, else just
- * enable it once in adc_init() */
+    /* Enable the clock here only if it will be disabled by done, else just
+     * enable it once in adc_init() */
 #if defined(RCC_AHBENR_ADC1EN)
     periph_clk_en(AHB, RCC_AHBENR_ADC1EN);
 #endif
@@ -100,8 +100,8 @@ static inline void prep(adc_t line)
 
 static inline void done(adc_t line)
 {
-/* On some STM32F3 ADC are grouped by paire (ADC12EN or ADC34EN) so
- * don't disable the clock as the other device may still use it. */
+    /* On some STM32F3 ADC are grouped by paire (ADC12EN or ADC34EN) so
+     * don't disable the clock as the other device may still use it. */
 #if defined(RCC_AHBENR_ADC1EN)
     periph_clk_dis(AHB, RCC_AHBENR_ADC1EN);
 #endif
