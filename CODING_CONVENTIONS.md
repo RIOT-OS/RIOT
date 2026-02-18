@@ -654,8 +654,10 @@ not a string literal`.
 
 ## Git
 
-* Make one commit per change.
-* The first line of the commit message describes the main feature of the commit.
+* Try to group your changes into commits that focus on a certain area,
+  for example: "cpu/stm32: fix ADC resolution check"
+* For more information about using Git and our Commit Conventions see
+  https://github.com/RIOT-OS/RIOT/blob/master/CONTRIBUTING.md#commit-conventions
 
 ## Continuous Integration
 * If the CI tests fail due to errors these errors need to be addressed.
