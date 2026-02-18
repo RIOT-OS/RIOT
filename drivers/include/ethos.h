@@ -116,6 +116,7 @@ typedef struct {
     line_state_t state;     /**< Line status variable */
     unsigned frametype;     /**< type of currently incoming frame */
     mutex_t out_mutex;      /**< mutex used for locking concurrent sends */
+    int tx_result;          /**< result to report in confirm_send() */
 } ethos_t;
 
 /**
