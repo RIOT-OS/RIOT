@@ -99,6 +99,10 @@
       defined(CPU_LINE_STM32GBK1CB)
 #  define VBAT_ADC_SCALE      3
 #  define VBAT_ADC_MIN_MV     1550
+/* h7 */
+#elif defined(CPU_LINE_STM32H723xx) || defined(CPU_LINE_STM32H753xx)
+#  define VBAT_ADC_SCALE      4
+#  define VBAT_ADC_MIN_MV     1360
 /* l4 */
 #elif defined(CPU_LINE_STM32L412xx) || defined(CPU_LINE_STM32L422xx)    || \
       defined(CPU_LINE_STM32L431xx) || defined(CPU_LINE_STM32L432xx)    || \
@@ -146,6 +150,8 @@
  */
 #if defined(CPU_LINE_STM32F373xC) || defined(CPU_LINE_STM32F378xx)
 #  define ADC_CCR_REG (SYSCFG->CFGR1) /* ADCx_COMMON is also defined */
+#elif defined(CPU_FAM_STM32H7)
+#  define ADC_CCR_REG (ADC3_COMMON->CCR) /* STM32H7 uses ADC3 for VBAT */
 #elif defined(ADC_COMMON)
 #  define ADC_CCR_REG (ADC_COMMON->CCR)
 #elif defined(ADC1_COMMON)
