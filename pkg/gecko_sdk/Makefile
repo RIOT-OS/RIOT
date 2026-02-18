@@ -3,6 +3,10 @@ PKG_URL=https://github.com/basilfx/RIOT-gecko-sdk
 PKG_VERSION=91ebaf05d173ba0a9ba86b6e5078f6159ba8bc2a
 PKG_LICENSE=Zlib
 
+RIOTBASE ?= ../../
+
+include $(RIOTBASE)/makefiles/utils/strings.mk
+
 PKG_SPARSE_PATHS += dist/Makefile
 
 PKG_SPARSE_PATHS += dist/platform/common
