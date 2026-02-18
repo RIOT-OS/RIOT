@@ -40,7 +40,7 @@
 #include <string.h>
 #include <errno.h>
 
-#define ENABLE_DEBUG             0
+#define ENABLE_DEBUG             1
 #include "debug.h"
 
 #define _USBUS_MSG_QUEUE_SIZE    (16)
