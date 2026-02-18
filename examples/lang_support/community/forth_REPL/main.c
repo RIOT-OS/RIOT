@@ -13,8 +13,7 @@ int main(void)
     FICL_VM *pVM = ficlNewVM(pSys);
     int ret = ficlEvaluate(pVM, ".ver 2 spaces .( " __DATE__ " ) cr");
 
-    while (ret != VM_USEREXIT && shell_readline(in, sizeof(in)) >= 0)
-    {
+    while (ret != VM_USEREXIT && shell_readline(in, sizeof(in)) >= 0) {
         ret = ficlExec(pVM, in);
     }
 
