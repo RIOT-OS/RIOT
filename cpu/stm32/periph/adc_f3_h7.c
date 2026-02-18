@@ -236,13 +236,15 @@ int adc_init(adc_t line)
 
     /* Configure sampling time for the given channel */
     if (adc_config[line].chan < 10) {
-        dev(line)->SMPR1 = (smp_time << (adc_config[line].chan
-                                        * ADC_SMP_BIT_WIDTH));
+        uint8_t shift = adc_config[line].chan * ADC_SMP_BIT_WIDTH;
+        uint32_t mask = ~(ADC_SMPR1_SMP0 << shift);
+        dev(line)->SMPR1 = (dev(line)->SMPR1 & mask) | (smp_time << shift);
     }
     else {
-        dev(line)->SMPR2 = (smp_time << ((adc_config[line].chan
-                                        - ADC_SMPR2_FIRST_CHAN)
-                                        * ADC_SMP_BIT_WIDTH));
+        uint8_t shift = (adc_config[line].chan - ADC_SMPR2_FIRST_CHAN)
+                                               * ADC_SMP_BIT_WIDTH;
+        uint32_t mask = ~(ADC_SMPR2_SMP10 << shift);
+        dev(line)->SMPR2 = (dev(line)->SMPR2 & mask) | (smp_time << shift);
     }
 
     /* Power off and unlock device again */
