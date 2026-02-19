@@ -9,7 +9,6 @@ CFLAGS += -Wno-array-bounds
 CFLAGS += -Wno-char-subscripts
 CFLAGS += -Wno-cast-align
 CFLAGS += -Wno-format
-CFLAGS += -Wno-format-nonliteral
 CFLAGS += -Wno-misleading-indentation
 CFLAGS += -Wno-shift-negative-value
 CFLAGS += -Wno-sign-compare
