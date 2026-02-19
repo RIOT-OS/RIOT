@@ -86,12 +86,12 @@ static const i2c_conf_t i2c_config[] = {
         .dev = I2C0,
         .sda_pin = MODULE_PIN_P13,
         .scl_pin = MODULE_PIN_P12,
-        .internal_pull_ups = true,
         .loc = I2C_ROUTELOC0_SDALOC_LOC16 |
                I2C_ROUTELOC0_SCLLOC_LOC14,
+        .speed = I2C_SPEED_NORMAL,
         .cmu = cmuClock_I2C0,
         .irq = I2C0_IRQn,
-        .speed = I2C_SPEED_NORMAL
+        .use_internal_pull_ups = true
     }
 };
 
