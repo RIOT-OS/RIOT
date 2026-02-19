@@ -18,6 +18,10 @@ interpreter written in C. Unlike traditional Forths, this
 interpreter is designed to be embedded into other systems
 as a command/macro/development prototype language.
 
+@note     Many of the RIOT features are not directly available to forth code,
+but first need to be exposed to ficl by writing some glue code.
+See examples in examples/lang_support/community/forth_*.
+
 ## Typical use
 
 ```c
