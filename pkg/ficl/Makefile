@@ -9,6 +9,7 @@ include $(RIOTBASE)/pkg/pkg.mk
 CFLAGS += -Wno-array-bounds
 CFLAGS += -Wno-char-subscripts
 CFLAGS += -Wno-cast-align
+CFLAGS += -Wno-format-nonliteral
 CFLAGS += -Wno-shift-negative-value
 CFLAGS += -Wno-sign-compare
 CFLAGS += -Wno-strict-aliasing
