@@ -1,0 +1,3 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    msba2 \
+    stk3200
