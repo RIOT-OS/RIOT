@@ -195,8 +195,10 @@ static void _set_option(at86rf215_t *dev, uint8_t option)
 
     at86rf215_reg_write(dev, dev->BBC->RG_OFDMC, option - 1);
 
+    dev->chan_min = 0;
+    dev->chan_max = _get_max_chan(dev, option);
+
     /* make sure channel config is still valid */
-    dev->num_chans = _get_max_chan(dev, option);
     dev->netdev.chan = at86rf215_chan_valid(dev, dev->netdev.chan);
     at86rf215_reg_write16(dev, dev->RF->RG_CNL, dev->netdev.chan);
 }
