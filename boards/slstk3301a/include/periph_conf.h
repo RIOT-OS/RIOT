@@ -29,19 +29,19 @@ extern "C" {
  * @{
  */
 #ifndef CLOCK_HF
-#  define CLOCK_HF          cmuSelect_HFXO
+#  define CLOCK_HF          cmuSelect_HFXO      /**< Clock for the HF domain */
 #endif
 #ifndef CLOCK_CORE_DIV
-#  define CLOCK_CORE_DIV    cmuClkDiv_1
+#  define CLOCK_CORE_DIV    cmuClkDiv_1         /**< Core clock divider */
 #endif
 #ifndef CLOCK_LFA
-#  define CLOCK_LFA         cmuSelect_LFXO
+#  define CLOCK_LFA         cmuSelect_LFXO      /**< Clock for the LFA domain */
 #endif
 #ifndef CLOCK_LFB
-#  define CLOCK_LFB         cmuSelect_LFXO
+#  define CLOCK_LFB         cmuSelect_LFXO      /**< Clock for the LFB domain */
 #endif
 #ifndef CLOCK_LFE
-#  define CLOCK_LFE         cmuSelect_LFXO
+#  define CLOCK_LFE         cmuSelect_LFXO      /**< Clock for the LFE domain */
 #endif
 /** @} */
 
