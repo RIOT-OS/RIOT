@@ -1,7 +1,7 @@
 PKG_NAME    = qcbor
 PKG_URL     = https://github.com/laurencelundblade/QCBOR
-# v1.2
-PKG_VERSION = 92d3f89030baff4af7be8396c563e6c8ef263622
+# v1.6
+PKG_VERSION = 590a23daf65af068cee81555c597063150e23539
 PKG_LICENSE = BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
@@ -11,6 +11,7 @@ include $(RIOTBASE)/pkg/pkg.mk
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=42145
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90710#c1
 CFLAGS += -Wno-maybe-uninitialized
+CFLAGS += -Wno-type-limits
 
 all:
 	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)
