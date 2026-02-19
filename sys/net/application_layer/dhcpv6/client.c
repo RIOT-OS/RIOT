@@ -131,6 +131,17 @@ static char _thread_stack[DHCPV6_CLIENT_STACK_SIZE];
 static void *_thread(void *args);
 static kernel_pid_t _thread_pid;
 
+static void (*_init_hook)(void) = NULL;
+static uint16_t _dhcpv6_netif = SOCK_ADDR_ANY_NETIF;
+
+void dhcpv6_client_set_init_hook(void (*_hook)(void), uint16_t netif)
+{
+    /* set hook function to call during auto init */
+    _init_hook = _hook;
+    /* specify interface to use for DHCPv6 */
+    _dhcpv6_netif = netif;
+}
+
 void dhcpv6_client_auto_init(void)
 {
     if (_thread_pid <= 0) {
@@ -145,9 +156,21 @@ static void *_thread(void *args)
 {
     (void)args;
     event_queue_t auto_init_event_queue;
+    /* initialize client event queue */
     event_queue_init(&auto_init_event_queue);
-    dhcpv6_client_init(&auto_init_event_queue, SOCK_ADDR_ANY_NETIF);
+    /* initialize DHCPv6 client either on any interface or
+     * (if configured via the init hook) a specific one */
+    dhcpv6_client_init(&auto_init_event_queue, _dhcpv6_netif);
+
+    /* execute init hook if set */
+    if (_init_hook != NULL)
+    {
+        _init_hook();
+    }
+
+    /* start DHCPv6 client */
     dhcpv6_client_start();
+    /* start event loop of DHCPv6 client */
     event_loop(&auto_init_event_queue); /* never returns */
     return NULL;
 }
