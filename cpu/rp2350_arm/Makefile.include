@@ -1,0 +1,18 @@
+# CPU and architecture specific flags
+CFLAGS += -D$(CPU_MODEL)
+CFLAGS += -DROM_START_ADDR=$(ROM_START_ADDR)
+CFLAGS += -DRAM_START_ADDR=$(RAM_START_ADDR)
+
+# Linker flags
+LINKFLAGS += -mcpu=$(CPU_ARCH) -mthumb
+LINKFLAGS += -Wl,--gc-sections
+LINKFLAGS += -Wl,--start-group -lc -lm -Wl,--end-group
+
+# Vector table configuration
+VECTORS_O       ?= $(BINDIR)/cpu/vectors.o
+VECTORS_FILE    := $(RIOTCPU)/rp2350_common/vectors.c
+
+include $(RIOTCPU)/rp2350_common/Makefile.include
+
+# Include the base Cortex-M makefile
+include $(RIOTMAKE)/arch/cortexm.inc.mk

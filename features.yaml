@@ -283,8 +283,10 @@ groups:
         features:
         - name: cpu_rpx0xx
           help: The MCU is part of the Raspberry PI RPx0xx family.
-        - name: cpu_rp2350
-          help: The MCU is a Raspberry Pi RP2350
+        - name: cpu_rp2350_arm
+          help: The MCU is a Raspberry Pi RP2350 Cortex-M33 ARM,
+        - name: cpu_rp2350_riscv
+          help: The MCU is a Raspberry Pi RP2350 Hazard3 RISC-V.
 
       - title: Silicon Laboratories EFM32 Grouping
         features:
@@ -829,6 +831,9 @@ groups:
       help: A RISC-V Core-local Interrupt Controller (CLIC) peripheral is present.
     - name: periph_plic
       help: A RISC-V Platform-local Interrupt Controller (PLIC) peripheral is present.
+    - name: periph_xh3irq
+      help: An XH3IRQ peripheral is present. This is a special interrupt controller
+            for the Hazard3 used by the RP2350.
 
   - title: Cryptographic Features
     help: Hardware acceleration for cryptographic primitives, hardware random
