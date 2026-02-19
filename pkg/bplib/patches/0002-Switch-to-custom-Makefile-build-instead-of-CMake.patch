@@ -1,0 +1,54 @@
+From 54220e2ed17c5aca81ea96cffd43c031cfcbb982 Mon Sep 17 00:00:00 2001
+From: Simon Grund <simon.grund@tuhh.de>
+Date: Sun, 8 Feb 2026 12:42:13 +0100
+Subject: [PATCH 2/5] Switch to custom Makefile build instead of CMake
+
+---
+ riot.mk | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
+ create mode 100644 riot.mk
+
+diff --git a/riot.mk b/riot.mk
+new file mode 100644
+index 00000000..c7f452d4
+--- /dev/null
++++ b/riot.mk
+@@ -0,0 +1,34 @@
++BPLIB_FOLDERS := aa/arp aa/as aa/fwp aa/nc \
++				 bpa/bi bpa/ct bpa/ebp bpa/pdb bpa/pi bpa/stor \
++				 ci/cbor ci/crc ci/eid ci/em ci/mem ci/pl ci/qm ci/rbt ci/time \
++				 cla version
++
++BPLIB_PRIVATE_INCLUDE_DIRS := $(foreach dir,$(BPLIB_FOLDERS),$(dir)/inc) inc
++BPLIB_PRIVATE_INCLUDES := $(foreach dir,$(BPLIB_PRIVATE_INCLUDE_DIRS),-I$(dir))
++
++# Note: We dont compile the bpa/stor
++BPLIB_SOURCES_INIT := $(foreach dir,$(BPLIB_FOLDERS),$(wildcard $(dir)/src/*.c))
++BPLIB_IGNORED_SOURCES := bpa/stor/src/% ci/mem/src/bplib_std_allocator.c
++BPLIB_SOURCES := $(filter-out $(BPLIB_IGNORED_SOURCES),$(BPLIB_SOURCES_INIT))
++
++BPLIB_OBJECTS := $(patsubst %.c,$(BUILDDIR)/%.o,$(BPLIB_SOURCES))
++BPLIB_OBJECT_DIRS := $(foreach dir,$(BPLIB_FOLDERS),$(BUILDDIR)/$(dir)/src)
++
++BPLIB_CFLAGS += $(CFLAGS)
++BPLIB_CFLAGS += -Wno-format
++BPLIB_CFLAGS += -Wno-int-to-pointer-cast
++BPLIB_CFLAGS += -Wno-old-style-definition
++BPLIB_CFLAGS += -Wno-unused-parameter
++BPLIB_CFLAGS += -Wno-cast-function-type
++BPLIB_CFLAGS += -Wno-sign-compare
++
++.PHONY: create_dirs
++
++$(BUILDDIR)/libbplib.a: create_dirs $(BPLIB_OBJECTS)
++	@$(AR) rcs $@ $(BPLIB_OBJECTS)
++
++create_dirs:
++	@mkdir -p $(BPLIB_OBJECT_DIRS)
++
++$(BUILDDIR)/%.o: %.c
++	@$(CC) $(BPLIB_CFLAGS) $(BPLIB_PRIVATE_INCLUDES) $(INCLUDES) -c $< -o $@
+\ No newline at end of file
+-- 
+2.43.0
+
