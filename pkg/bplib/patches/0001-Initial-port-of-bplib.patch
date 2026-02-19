@@ -1,0 +1,898 @@
+From 1788fdf7137246c2e2a3618076df2d1cc7054c66 Mon Sep 17 00:00:00 2001
+From: Simon Grund <simon.grund@tuhh.de>
+Date: Wed, 4 Feb 2026 13:56:09 +0100
+Subject: [PATCH 1/5] Initial port of bplib
+
+Changed all Threading synchronization to RIOT analogs. Changed the time
+module to use vfs. The storage is now only the header, the actual
+implementation is not fixed inside of bplib but must be supplied by the
+user (this could also be a pseudomodule or similar in the package).
+---
+ CMakeLists.txt                    | 14 +++--
+ aa/as/src/bplib_as_internal.c     | 46 ++-------------
+ aa/as/src/bplib_as_internal.h     |  6 +-
+ aa/nc/inc/bplib_nc_rwlock.h       |  9 +--
+ aa/nc/src/bplib_nc_rwlock.c       | 56 ++++++------------
+ bpa/stor/CMakeLists.txt           |  9 ++-
+ bpa/stor/inc/bplib_stor.h         | 12 ++--
+ bpa/stor/src/bplib_stor_cmake.c   |  3 +
+ ci/mem/inc/bplib_mem.h            |  4 +-
+ ci/mem/src/bplib_mem.c            | 11 ++--
+ ci/qm/inc/bplib_qm.h              |  4 +-
+ ci/qm/inc/bplib_qm_waitqueue.h    |  9 +--
+ ci/qm/src/bplib_qm.c              | 15 ++---
+ ci/qm/src/bplib_qm_waitqueue.c    | 94 +++++++++++--------------------
+ ci/time/inc/bplib_time.h          |  2 +
+ ci/time/src/bplib_time_internal.c | 64 +++++++--------------
+ ci/time/src/bplib_time_internal.h |  3 +-
+ version/src/bplib_version.c       |  9 +--
+ 18 files changed, 134 insertions(+), 236 deletions(-)
+ create mode 100644 bpa/stor/src/bplib_stor_cmake.c
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ac07f511..ad0faf66 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -102,6 +102,8 @@ list(APPEND BPLIB_COMPONENTS
+   bplib_crc bplib_version bplib_qm bplib_eid bplib_rbt
+ )
+ 
++separate_arguments(RIOT_INCLUDES)
++
+ foreach(COMPONENT ${BPLIB_COMPONENTS})
+   list(APPEND BPLIB_SRC 
+     $<TARGET_OBJECTS:${COMPONENT}>
+@@ -111,6 +113,10 @@ foreach(COMPONENT ${BPLIB_COMPONENTS})
+     $<TARGET_PROPERTY:${COMPONENT},INTERFACE_INCLUDE_DIRECTORIES>
+   )
+ 
++  # RIOT includes
++  target_include_directories(${COMPONENT} SYSTEM PRIVATE
++      ${RIOT_INCLUDES}
++  )
+ endforeach()
+ 
+ # If building as part of CFE/CFS, then the "IS_CFS_ARCH_BUILD" should be set
+@@ -176,8 +182,8 @@ else()
+ 
+   endif()
+ 
+-  # Build bpcat always
+-  add_subdirectory(app)
++  # Build bpcat always, just not for RIOT :D
++  # add_subdirectory(app)
+ 
+ endif()
+ 
+@@ -230,5 +236,5 @@ if (BPLIB_ENABLE_UNIT_TESTS)
+ endif (BPLIB_ENABLE_UNIT_TESTS)
+ 
+ # Prepare the BPLib Doxygen build.
+-set(BPLIB_API_INCLUDE_DIRECTORIES ${BPLIB_COMPONENT_INCLUDE_DIRS})
+-add_subdirectory(docs/doc-src)
++# set(BPLIB_API_INCLUDE_DIRECTORIES ${BPLIB_COMPONENT_INCLUDE_DIRS})
++# add_subdirectory(docs/doc-src)
+diff --git a/aa/as/src/bplib_as_internal.c b/aa/as/src/bplib_as_internal.c
+index c2347dfc..21f1df0d 100644
+--- a/aa/as/src/bplib_as_internal.c
++++ b/aa/as/src/bplib_as_internal.c
+@@ -37,7 +37,7 @@ BPLib_NodeMibReportsHkTlm_Payload_t    BPLib_AS_NodeReportsPayload;    /** \brie
+ /* =============== */
+ /* Mutex Variables */
+ /* =============== */
+-osal_id_t MutexId;
++mutex_t BPLib_AS_Mutex;
+ BPLib_TIME_MonotonicTime_t InitTime;    /** \brief Time the node was initialized */
+ 
+ /* ==================== */
+@@ -98,55 +98,21 @@ BPLib_Status_t BPLib_AS_SetCounter(BPLib_EID_t EID, BPLib_AS_Counter_t Counter,
+ 
+ BPLib_Status_t BPLib_AS_InitMutex(void)
+ {
+-    uint32 OS_Status;
+-    BPLib_Status_t Status;
+-    char MutexName[BPLIB_AS_MAX_MUTEX_NAME_SIZE];
+-
+-    MutexId = OS_OBJECT_ID_UNDEFINED;
+-    strncpy(MutexName, "BPLib_AS_CounterMut", BPLIB_AS_MAX_MUTEX_NAME_SIZE);
+-
+     /* Instantiate a mutex for AS counters */
+-    OS_Status = OS_MutSemCreate(&MutexId, MutexName, 0);
+-
+-    /* Translate mutex status into BPLib_Status_t */
+-    if (OS_Status == OS_SUCCESS)
+-    {
+-        Status = BPLIB_SUCCESS;
+-    }
+-    else
+-    {
+-        Status = BPLIB_AS_INIT_MUTEX_ERR;
+-    }
++    mutex_init(&BPLib_AS_Mutex);
+ 
+-    return Status;
++    /* Always return success as this cannot fail in RIOT */
++    return BPLIB_SUCCESS;
+ }
+ 
+ void BPLib_AS_LockCounters(void)
+ {
+-    uint32 OS_Status;
+-
+-    OS_Status = OS_MutSemTake(MutexId);
+-    if (OS_Status != OS_SUCCESS)
+-    {
+-        BPLib_EM_SendEvent(BPLIB_AS_TAKE_MUTEX_ERR_EID,
+-                            BPLib_EM_EventType_ERROR,
+-                            "Failed to take from the counter mutex, RC = %d",
+-                            OS_Status);
+-    }
++    mutex_lock(&BPLib_AS_Mutex);
+ }
+ 
+ void BPLib_AS_UnlockCounters(void)
+ {
+-    uint32 OS_Status;
+-
+-    OS_Status = OS_MutSemGive(MutexId);
+-    if (OS_Status != OS_SUCCESS)
+-    {
+-        BPLib_EM_SendEvent(BPLIB_AS_GIVE_MUTEX_ERR_EID,
+-                            BPLib_EM_EventType_ERROR,
+-                            "Failed to give to the counter mutex, RC = %d",
+-                            OS_Status);
+-    }
++    mutex_unlock(&BPLib_AS_Mutex);
+ }
+ 
+ /* Initialize the static MIB reports telemetry values */
+diff --git a/aa/as/src/bplib_as_internal.h b/aa/as/src/bplib_as_internal.h
+index 18c46134..c016f8a3 100644
+--- a/aa/as/src/bplib_as_internal.h
++++ b/aa/as/src/bplib_as_internal.h
+@@ -28,7 +28,7 @@
+ #include "bplib_api_types.h"
+ #include "bplib_as.h"
+ #include "bplib_eventids.h"
+-#include "osapi.h"
++#include "mutex.h" /* use RIOT mutex directly */
+ #include "bplib_eid.h"
+ 
+ /* ======= */
+@@ -47,8 +47,8 @@ extern BPLib_NodeMibReportsHkTlm_Payload_t     BPLib_AS_NodeReportsPayload;
+ /* =============== */
+ /* Mutex Variables */
+ /* =============== */
+-extern osal_id_t MutexId;
+-extern char      MutexName[BPLIB_AS_MAX_MUTEX_NAME_SIZE];
++/* I dont think this name as a global is very good, so I prefixed it */
++extern mutex_t  BPLib_AS_Mutex;
+ 
+ /* =================== */
+ /* Function Prototypes */
+diff --git a/aa/nc/inc/bplib_nc_rwlock.h b/aa/nc/inc/bplib_nc_rwlock.h
+index 2fe65fff..3e5c7a19 100644
+--- a/aa/nc/inc/bplib_nc_rwlock.h
++++ b/aa/nc/inc/bplib_nc_rwlock.h
+@@ -22,7 +22,8 @@
+ 
+ #include "bplib_api_types.h"
+ 
+-#include <pthread.h>
++#include "mutex.h"
++#include "cond.h"
+ 
+ /**
+  * \brief Definition of the read-write lock structure.
+@@ -32,9 +33,9 @@
+  * for readers and writers, and counters for the number of readers and writers.
+  */
+ typedef struct BPLib_NC_RWLock {
+-    pthread_mutex_t Lock;          /**< Mutex to protect shared data */
+-    pthread_cond_t ReadCond;       /**< Condition variable for readers */
+-    pthread_cond_t WriteCond;      /**< Condition variable for writers */
++    mutex_t Lock;          /**< Mutex to protect shared data */
++    cond_t ReadCond;       /**< Condition variable for readers */
++    cond_t WriteCond;      /**< Condition variable for writers */
+     int ReaderCnt;                 /**< Number of active readers */
+     int WriterCnt;               /**< Number of active writers */
+ } BPLib_NC_RWLock_t;
+diff --git a/aa/nc/src/bplib_nc_rwlock.c b/aa/nc/src/bplib_nc_rwlock.c
+index fa8b3533..309defde 100644
+--- a/aa/nc/src/bplib_nc_rwlock.c
++++ b/aa/nc/src/bplib_nc_rwlock.c
+@@ -27,23 +27,9 @@ BPLib_Status_t BPLib_NC_RWLock_Init(BPLib_NC_RWLock_t *RWLock)
+         return BPLIB_NULL_PTR_ERROR;
+     }
+ 
+-    if (pthread_mutex_init(&RWLock->Lock, NULL) != 0)
+-    {
+-        return BPLIB_OS_ERROR;
+-    }
+-
+-    if (pthread_cond_init(&RWLock->ReadCond, NULL) != 0)
+-    {
+-        pthread_mutex_destroy(&RWLock->Lock);
+-        return BPLIB_OS_ERROR;
+-    }
+-
+-    if (pthread_cond_init(&RWLock->WriteCond, NULL) != 0)
+-    {
+-        pthread_mutex_destroy(&RWLock->Lock);
+-        pthread_cond_destroy(&RWLock->ReadCond);
+-        return BPLIB_OS_ERROR;
+-    }
++    mutex_init(&RWLock->Lock);
++    cond_init(&RWLock->ReadCond);
++    cond_init(&RWLock->WriteCond);
+ 
+     RWLock->ReaderCnt = 0;
+     RWLock->WriterCnt = 0;
+@@ -53,14 +39,8 @@ BPLib_Status_t BPLib_NC_RWLock_Init(BPLib_NC_RWLock_t *RWLock)
+ 
+ void BPLib_NC_RWLock_Destroy(BPLib_NC_RWLock_t *RWLock)
+ {
+-    if (RWLock == NULL)
+-    {
+-        return;
+-    }
+-
+-    pthread_mutex_destroy(&RWLock->Lock);
+-    pthread_cond_destroy(&RWLock->ReadCond);
+-    pthread_cond_destroy(&RWLock->WriteCond);
++    // No mutex cleanup in RIOT
++    return;
+ }
+ 
+ void BPLib_NC_RWLock_RLock(BPLib_NC_RWLock_t *RWLock)
+@@ -70,16 +50,16 @@ void BPLib_NC_RWLock_RLock(BPLib_NC_RWLock_t *RWLock)
+         return;
+     }
+ 
+-    pthread_mutex_lock(&RWLock->Lock);
++    mutex_lock(&RWLock->Lock);
+ 
+     while (RWLock->WriterCnt > 0)
+     {
+-        pthread_cond_wait(&RWLock->ReadCond, &RWLock->Lock);
++        cond_wait(&RWLock->ReadCond, &RWLock->Lock);
+     }
+ 
+     RWLock->ReaderCnt++;
+ 
+-    pthread_mutex_unlock(&RWLock->Lock);
++    mutex_unlock(&RWLock->Lock);
+ }
+ 
+ void BPLib_NC_RWLock_RUnlock(BPLib_NC_RWLock_t *RWLock)
+@@ -89,16 +69,16 @@ void BPLib_NC_RWLock_RUnlock(BPLib_NC_RWLock_t *RWLock)
+         return;
+     }
+ 
+-    pthread_mutex_lock(&RWLock->Lock);
++    mutex_lock(&RWLock->Lock);
+ 
+     RWLock->ReaderCnt--;
+ 
+     if (RWLock->ReaderCnt == 0)
+     {
+-        pthread_cond_signal(&RWLock->WriteCond);
++        cond_signal(&RWLock->WriteCond);
+     }
+ 
+-    pthread_mutex_unlock(&RWLock->Lock);
++    mutex_unlock(&RWLock->Lock);
+ }
+ 
+ void BPLib_NC_RWLock_WLock(BPLib_NC_RWLock_t *RWLock)
+@@ -108,16 +88,16 @@ void BPLib_NC_RWLock_WLock(BPLib_NC_RWLock_t *RWLock)
+         return;
+     }
+ 
+-    pthread_mutex_lock(&RWLock->Lock);
++    mutex_lock(&RWLock->Lock);
+ 
+     while (RWLock->ReaderCnt > 0 || RWLock->WriterCnt > 0)
+     {
+-        pthread_cond_wait(&RWLock->WriteCond, &RWLock->Lock);
++        cond_wait(&RWLock->WriteCond, &RWLock->Lock);
+     }
+ 
+     RWLock->WriterCnt++;
+ 
+-    pthread_mutex_unlock(&RWLock->Lock);
++    mutex_unlock(&RWLock->Lock);
+ }
+ 
+ void BPLib_NC_RWLock_WUnlock(BPLib_NC_RWLock_t *RWLock)
+@@ -127,12 +107,12 @@ void BPLib_NC_RWLock_WUnlock(BPLib_NC_RWLock_t *RWLock)
+         return;
+     }
+ 
+-    pthread_mutex_lock(&RWLock->Lock);
++    mutex_lock(&RWLock->Lock);
+ 
+     RWLock->WriterCnt--;
+ 
+-    pthread_cond_broadcast(&RWLock->ReadCond);
+-    pthread_cond_signal(&RWLock->WriteCond);
++    cond_broadcast(&RWLock->ReadCond);
++    cond_signal(&RWLock->WriteCond);
+ 
+-    pthread_mutex_unlock(&RWLock->Lock);
++    mutex_unlock(&RWLock->Lock);
+ }
+diff --git a/bpa/stor/CMakeLists.txt b/bpa/stor/CMakeLists.txt
+index 3a5e7ecc..6732e106 100644
+--- a/bpa/stor/CMakeLists.txt
++++ b/bpa/stor/CMakeLists.txt
+@@ -6,12 +6,11 @@
+ #
+ ##################################################################
+ 
++# We dont want to compile the storage in bplib, that has to be provided by the using application.
++# However the general buildsystem breaks if the library is not an OBJECT, so I add some c file that
++# provides a throwaway function which does nothing and should not get linked.
+ add_library(bplib_stor OBJECT
+-    src/bplib_stor.c
+-    src/bplib_stor_sql.c
+-    src/bplib_stor_sql_store.c
+-    src/bplib_stor_sql_load.c
+-    src/bplib_stor_loadbatch.c
++    src/bplib_stor_cmake.c
+ )
+ 
+ target_include_directories(bplib_stor PUBLIC
+diff --git a/bpa/stor/inc/bplib_stor.h b/bpa/stor/inc/bplib_stor.h
+index 0c7e8b25..1db8fd03 100644
+--- a/bpa/stor/inc/bplib_stor.h
++++ b/bpa/stor/inc/bplib_stor.h
+@@ -29,9 +29,6 @@
+ #include "bplib_cfg.h"
+ #include "bplib_eid.h"
+ #include "bplib_mem.h"
+-#include "bplib_stor_loadbatch.h"
+-
+-#include <sqlite3.h>
+ 
+ #ifndef BPLIB_STOR_INSERTBATCHSIZE
+ #define BPLIB_STOR_INSERTBATCHSIZE 100
+@@ -43,12 +40,13 @@
+ 
+ struct BPLib_BundleCache
+ {
+-    pthread_mutex_t lock;
+-    sqlite3* db;
++    mutex_t lock;
+     BPLib_Bundle_t* InsertBatch[BPLIB_STOR_INSERTBATCHSIZE];
+     size_t InsertBatchSize;
+-    BPLib_STOR_LoadBatch_t ChannelLoadBatches[BPLIB_MAX_NUM_CHANNELS];
+-    BPLib_STOR_LoadBatch_t ContactLoadBatches[BPLIB_MAX_NUM_CONTACTS];
++    /* The load batches are removed for RIOT because they are very implementation dependent
++     * Loading the numbers (which iirc were the row numbers in the blob table) does not really
++     * help if the actual storage implementation uses some other indexing / storage medium.
++    **/
+ 
+     /* Storage-related MIB reports */
+     uint32_t BundleCountStored;
+diff --git a/bpa/stor/src/bplib_stor_cmake.c b/bpa/stor/src/bplib_stor_cmake.c
+new file mode 100644
+index 00000000..e4d36e61
+--- /dev/null
++++ b/bpa/stor/src/bplib_stor_cmake.c
+@@ -0,0 +1,3 @@
++void BPLib_STOR_CMakeIsHappyNow(void) {
++    return;
++}
+\ No newline at end of file
+diff --git a/ci/mem/inc/bplib_mem.h b/ci/mem/inc/bplib_mem.h
+index 192bcdab..a6ab489e 100644
+--- a/ci/mem/inc/bplib_mem.h
++++ b/ci/mem/inc/bplib_mem.h
+@@ -24,7 +24,7 @@
+ #include "bplib_ben_allocator.h"
+ #include "bplib_bblocks.h"
+ 
+-#include <pthread.h>
++#include "mutex.h"
+ 
+ /**
+  ** \brief Defines the size of a memory block user data if used as a bytearray
+@@ -78,7 +78,7 @@ struct BPLib_MEM_Block
+ typedef struct BPLib_MEM_Pool
+ {
+     BPLib_MEM_PoolImpl_t impl; /**< The pool implementation (details hidden) */
+-    pthread_mutex_t lock; /**< Mutex for synchronizing access to the pool */
++    mutex_t lock; /**< Mutex for synchronizing access to the pool */
+ } BPLib_MEM_Pool_t;
+ 
+ /**
+diff --git a/ci/mem/src/bplib_mem.c b/ci/mem/src/bplib_mem.c
+index c94f75f2..43179aa2 100644
+--- a/ci/mem/src/bplib_mem.c
++++ b/ci/mem/src/bplib_mem.c
+@@ -39,7 +39,7 @@ BPLib_Status_t BPLib_MEM_PoolInit(BPLib_MEM_Pool_t* pool, void* init_mem, size_t
+     }
+ 
+     memset(pool, 0, sizeof(BPLib_MEM_Pool_t));
+-    pthread_mutex_init(&pool->lock, NULL);
++    mutex_init(&pool->lock);
+     return BPLib_MEM_PoolImplInit(&pool->impl, init_mem, init_size,
+         sizeof(BPLib_MEM_Block_t));
+ }
+@@ -51,7 +51,6 @@ void BPLib_MEM_PoolDestroy(BPLib_MEM_Pool_t* pool)
+         return;
+     }
+ 
+-    pthread_mutex_destroy(&pool->lock);
+     BPLib_MEM_PoolImplDestroy(&pool->impl);
+     memset(pool, 0, sizeof(BPLib_MEM_Pool_t));
+ }
+@@ -65,9 +64,9 @@ BPLib_MEM_Block_t* BPLib_MEM_BlockAlloc(BPLib_MEM_Pool_t* pool)
+         return NULL;
+     }
+ 
+-    pthread_mutex_lock(&pool->lock);
++    mutex_lock(&pool->lock);
+     block = (BPLib_MEM_Block_t*)(BPLib_MEM_PoolImplAlloc(&pool->impl));
+-    pthread_mutex_unlock(&pool->lock);
++    mutex_unlock(&pool->lock);
+     if (block != NULL)
+     {
+         block->used_len = 0;
+@@ -83,9 +82,9 @@ void BPLib_MEM_BlockFree(BPLib_MEM_Pool_t* pool, BPLib_MEM_Block_t* block)
+         return;
+     }
+ 
+-    pthread_mutex_lock(&pool->lock);
++    mutex_lock(&pool->lock);
+     BPLib_MEM_PoolImplFree(&pool->impl, (void*)block);
+-    pthread_mutex_unlock(&pool->lock);
++    mutex_unlock(&pool->lock);
+ }
+ 
+ BPLib_MEM_Block_t* BPLib_MEM_BlockListAlloc(BPLib_MEM_Pool_t* pool, size_t byte_len)
+diff --git a/ci/qm/inc/bplib_qm.h b/ci/qm/inc/bplib_qm.h
+index e198a4c5..69a277df 100644
+--- a/ci/qm/inc/bplib_qm.h
++++ b/ci/qm/inc/bplib_qm.h
+@@ -28,6 +28,8 @@
+ #include "bplib_cfg.h"
+ #include "bplib_stor.h"
+ 
++#include "mutex.h"
++
+ #define QM_NO_WAIT          0L  /**< Constant representing no wait */
+ #define QM_WAIT_FOREVER    -1L /**< Constant representing an indefinite wait */
+ #define QM_MAX_GEN_WORKERS  8L /**< Constant representing maximum allowed generic workers */
+@@ -53,7 +55,7 @@ struct BPLib_Instance
+     BPLib_MEM_Pool_t pool; /**< Memory pool for this BPLib Instance */
+ 
+     /* Worker Management */
+-    pthread_mutex_t RegisteredWorkersLock; // Move to bplib_os
++    mutex_t RegisteredWorkersLock; // Move to bplib_os
+     BPLib_QM_WorkerState_t RegisteredWorkers[QM_MAX_GEN_WORKERS];
+     size_t NumWorkers;
+ 
+diff --git a/ci/qm/inc/bplib_qm_waitqueue.h b/ci/qm/inc/bplib_qm_waitqueue.h
+index 70027ff3..203ef63b 100644
+--- a/ci/qm/inc/bplib_qm_waitqueue.h
++++ b/ci/qm/inc/bplib_qm_waitqueue.h
+@@ -29,7 +29,8 @@
+ #include <stddef.h>
+ 
+ // TODO: Use bplib_os
+-#include <pthread.h>
++#include "mutex.h"
++#include "sema.h"
+ 
+ /**
+  * @struct BPLib_QM_WaitQueue
+@@ -48,9 +49,9 @@ typedef struct BPLib_QM_WaitQueue
+     int rear; /**< Index of the rear of the queue */
+     size_t size; /**< Current number of elements in the queue */
+     
+-    pthread_mutex_t lock; /**< Mutex for thread synchronization */
+-    pthread_cond_t cv_pull; /**< Condition variable for waiting on pulls */
+-    pthread_cond_t cv_push; /**< Condition variable for waiting on pushes */
++    mutex_t lock; /**< Mutex for thread synchronization */
++    sema_t s_items; /**< Condition variable for waiting on pulls -> now a sema of queue items */
++    sema_t s_slots; /**< Condition variable for waiting on pushes -> now a sema of free capacity */
+ } BPLib_QM_WaitQueue_t;
+ 
+ /**
+diff --git a/ci/qm/src/bplib_qm.c b/ci/qm/src/bplib_qm.c
+index effec911..6e90fcc5 100644
+--- a/ci/qm/src/bplib_qm.c
++++ b/ci/qm/src/bplib_qm.c
+@@ -41,10 +41,7 @@ BPLib_Status_t BPLib_QM_QueueTableInit(BPLib_Instance_t* inst, size_t MaxJobs)
+     }
+ 
+     /* Initialize worker registration state */
+-    if (pthread_mutex_init(&inst->RegisteredWorkersLock, NULL) != 0)
+-    {
+-        return BPLIB_QM_INIT_ERROR;
+-    }
++    mutex_init(&inst->RegisteredWorkersLock);
+ 
+     /* Init Cache */
+     Status = BPLib_STOR_Init(inst);
+@@ -109,7 +106,6 @@ void BPLib_QM_QueueTableDestroy(BPLib_Instance_t* inst)
+     }
+ 
+     /* Worker State Cleanup */
+-    pthread_mutex_destroy(&inst->RegisteredWorkersLock);
+     inst->NumWorkers = 0;
+ 
+     /* Queue Cleanup */
+@@ -136,7 +132,7 @@ BPLib_Status_t BPLib_QM_RegisterWorker(BPLib_Instance_t* inst, int32_t* WorkerID
+         return BPLIB_NULL_PTR_ERROR;
+     }
+ 
+-    pthread_mutex_lock(&inst->RegisteredWorkersLock);
++    mutex_lock(&inst->RegisteredWorkersLock);
+     if (inst->NumWorkers == QM_MAX_GEN_WORKERS)
+     {
+         *WorkerID = -1;
+@@ -149,7 +145,7 @@ BPLib_Status_t BPLib_QM_RegisterWorker(BPLib_Instance_t* inst, int32_t* WorkerID
+         *WorkerID = NewWorkerID;
+         Status = BPLIB_SUCCESS;
+     }
+-    pthread_mutex_unlock(&inst->RegisteredWorkersLock);
++    mutex_unlock(&inst->RegisteredWorkersLock);
+ 
+     return Status;
+ }
+@@ -313,8 +309,9 @@ BPLib_Status_t BPLib_QM_DuctPull(BPLib_Instance_t* Inst, uint32_t EgressID, bool
+             */
+             Status = BPLIB_TIMEOUT;
+         }
+-
+-        return Status;
++        /* Dont do what the comment above says. Since we dont use the loadbatches (at least
++         * not by default, because that uses quite a bit of RAM and traffic is probably rather
++         * low). Instead just continue with the egress after this point */
+     }
+ 
+     /* Pull the bundle from the queue and push it to the 'edge' of BPA 
+diff --git a/ci/qm/src/bplib_qm_waitqueue.c b/ci/qm/src/bplib_qm_waitqueue.c
+index a699d696..06a8f09f 100644
+--- a/ci/qm/src/bplib_qm_waitqueue.c
++++ b/ci/qm/src/bplib_qm_waitqueue.c
+@@ -27,19 +27,7 @@
+ #include <errno.h>
+ #include <stdio.h>
+ 
+-static void ms_to_abstimeout(uint32_t ms, struct timespec *ts)
+-{
+-    if (ts == NULL)
+-    {
+-        return;
+-    }
+-
+-    clock_gettime(CLOCK_REALTIME, ts);
+-    ts->tv_sec += ms / 1000;
+-    ts->tv_nsec += (ms % 1000 * 1000000);
+-    ts->tv_sec += ts->tv_nsec / 1000000000;
+-    ts->tv_nsec %= 1000000000;
+-}
++#include "ztimer.h"
+ 
+ /*******************************************************************************
+ * Exported Functions
+@@ -65,9 +53,9 @@ bool BPLib_QM_WaitQueueInit(BPLib_QM_WaitQueue_t* q, size_t el_size, size_t capa
+     }
+ 
+     // TODO: move to bplib_OS module
+-    pthread_mutex_init(&q->lock, NULL);
+-    pthread_cond_init(&q->cv_push, NULL);
+-    pthread_cond_init(&q->cv_pull, NULL);
++    mutex_init(&q->lock);
++    sema_create(&q->s_slots, capacity);
++    sema_create(&q->s_items, 0);
+     return true;
+ }
+ 
+@@ -87,14 +75,13 @@ void BPLib_QM_WaitQueueDestroy(BPLib_QM_WaitQueue_t* q)
+     q->size = 0;
+ 
+     // TODO: move to bplib_OS module
+-    pthread_mutex_destroy(&q->lock);
+-    pthread_cond_destroy(&q->cv_push);
+-    pthread_cond_destroy(&q->cv_pull);
++    // No mutex cleanup in RIOT
++    sema_destroy(&q->s_slots);
++    sema_destroy(&q->s_items);
+ }
+ 
+ bool BPLib_QM_WaitQueueTryPush(BPLib_QM_WaitQueue_t* q, const void* item, int timeout_ms)
+ {
+-    struct timespec deadline;
+     int rc;
+ 
+     if ((q == NULL) || (item == NULL))
+@@ -102,78 +89,63 @@ bool BPLib_QM_WaitQueueTryPush(BPLib_QM_WaitQueue_t* q, const void* item, int ti
+         return false;
+     }
+ 
+-    ms_to_abstimeout((uint32_t)(timeout_ms), &deadline);
+-    pthread_mutex_lock(&q->lock);
+-    /**** Critical Section Begin ****/
+-
+     /* Wait for queue to be non-full */
+-    while (q->size == q->capacity)
+-    {
+-        rc = pthread_cond_timedwait(&q->cv_push, &q->lock, &deadline);
+-        if (rc != 0)
+-        {
+-            if (rc != ETIMEDOUT)
+-            {
+-                printf(" BPLib_QM_WaitQueueTryPush NON-TIMEOUT ERROR: %s\n", strerror(rc));
+-            }
+-            pthread_mutex_unlock(&q->lock);
+-            return false;
++    rc = sema_wait_timed_ztimer(&q->s_slots, ZTIMER_MSEC, timeout_ms);
++    if (rc != 0) {
++        if (rc != -ETIMEDOUT) {
++            printf(" BPLib_QM_WaitQueueTryPush NON-TIMEOUT ERROR: %s\n", strerror(rc));
+         }
++        return false;
+     }
+ 
++    mutex_lock(&q->lock);
++    /**** Critical Section Begin ****/
++
+     /* Push an item */
+     q->rear = (q->rear  + 1) % q->capacity;
+     memcpy((void*)(((char *)q->storage) + (q->rear*q->el_size)), item, q->el_size);
+     q->size++;
+ 
+-    /* Notify other pulling threads that an item can be pulled. */
+-    pthread_cond_signal(&q->cv_pull);
+-
+     /**** Critical Section End ****/
+-    pthread_mutex_unlock(&q->lock);
++    mutex_unlock(&q->lock);
++
++    /* Notify other pulling threads that an item can be pulled. */
++    sema_post(&q->s_items);
+ 
+     return true;
+ }
+ 
+ bool BPLib_QM_WaitQueueTryPull(BPLib_QM_WaitQueue_t* q, void* ret_item, int timeout_ms)
+ {
+-    struct timespec deadline;
+     int rc;
+ 
+     if ((q == NULL) || (ret_item == NULL))
+     {
+         return false;
+     }
+-
+-    ms_to_abstimeout((uint32_t)(timeout_ms), &deadline);
+-    pthread_mutex_lock(&q->lock);
+-    /**** Critical Section Begin ****/
+  
+     /* Wait for queue to be non-empty */
+-    while (q->size == 0)
+-    {
+-        rc = pthread_cond_timedwait(&q->cv_pull, &q->lock, &deadline);
+-        if (rc != 0)
+-        {
+-            if (rc != ETIMEDOUT)
+-            {
+-                printf(" BPLib_QM_WaitQueueTryPull NON-TIMEOUT ERROR: %s\n", strerror(rc));
+-            }
+-            pthread_mutex_unlock(&q->lock);
+-            return false;
++    rc = sema_wait_timed_ztimer(&q->s_items, ZTIMER_MSEC, timeout_ms);
++    if (rc != 0) {
++        if (rc != -ETIMEDOUT) {
++            printf(" BPLib_QM_WaitQueueTryPull NON-TIMEOUT ERROR: %s\n", strerror(rc));
+         }
++        return false;
+     }
+ 
++    mutex_lock(&q->lock);
++    /**** Critical Section Begin ****/
++
+     /* Pull an item */
+     memcpy(ret_item, (void*)(((char *)q->storage) + (q->front*q->el_size)), q->el_size);
+     q->size--;
+     q->front = (q->front + 1) % (q->capacity); 
+ 
+-    /* Notify other pushing threads that an item can be pushed */
+-    pthread_cond_signal(&q->cv_push);
+-
+     /**** Critical Section End ****/
+-    pthread_mutex_unlock(&q->lock);
++    mutex_unlock(&q->lock);
++
++    /* Notify other pushing threads that an item can be pushed */
++    sema_post(&q->s_slots);
+ 
+     return true;
+ }
+@@ -187,9 +159,9 @@ bool BPLib_QM_WaitQueueIsEmpty(BPLib_QM_WaitQueue_t* q)
+         return false;
+     }
+ 
+-    pthread_mutex_lock(&q->lock);
++    mutex_lock(&q->lock);
+     IsEmpty = (q->size == 0);
+-    pthread_mutex_unlock(&q->lock);
++    mutex_unlock(&q->lock);
+ 
+     return IsEmpty;
+ }
+diff --git a/ci/time/inc/bplib_time.h b/ci/time/inc/bplib_time.h
+index 5e274ec8..b576ea03 100644
+--- a/ci/time/inc/bplib_time.h
++++ b/ci/time/inc/bplib_time.h
+@@ -41,7 +41,9 @@
+ /**
+ ** \brief Time data file name 
+ */
++#ifndef BPLIB_TIME_FILE_NAME 
+ #define BPLIB_TIME_FILE_NAME "/cf/bplib_time.dat"
++#endif
+ 
+ /**
+ ** \brief Length of the time data ring buffers
+diff --git a/ci/time/src/bplib_time_internal.c b/ci/time/src/bplib_time_internal.c
+index 68f0ba53..108a6777 100644
+--- a/ci/time/src/bplib_time_internal.c
++++ b/ci/time/src/bplib_time_internal.c
+@@ -27,6 +27,9 @@
+ /*
+ ** Include
+ */
++#include <errno.h>
++
++#include "vfs_util.h"
+ 
+ #include "bplib_time.h"
+ #include "bplib_time_internal.h"
+@@ -152,61 +155,34 @@ void BPLib_TIME_SetDtnTimeInBuffer(uint64_t DtnTime, uint32_t BootEra)
+ /* Read current time data from file */
+ BPLib_Status_t BPLib_TIME_ReadTimeDataFromFile(void)
+ {
+-    BPLib_Status_t Status = BPLIB_SUCCESS;
+-    int32 OsalStatus;
+-    
+-    /* Try opening existing file or creating new file */
+-    OsalStatus = OS_OpenCreate(&BPLib_TIME_GlobalData.FileHandle, BPLIB_TIME_FILE_NAME, 
+-                                    OS_FILE_FLAG_CREATE, OS_READ_WRITE);
+-    if (OsalStatus == OS_SUCCESS)
+-    {
+-        /* Read time data from file */
+-        OsalStatus = OS_read(BPLib_TIME_GlobalData.FileHandle, (void *) &BPLib_TIME_GlobalData.TimeData, 
++    int res = vfs_file_to_buffer(BPLIB_TIME_FILE_NAME, (void *) &BPLib_TIME_GlobalData.TimeData, 
+                                             sizeof(BPLib_TIME_FileData_t));
+-
+-        /* OSAL should return either 0 (file was just created) or the expected file size */
+-        if (OsalStatus != 0 && OsalStatus != sizeof(BPLib_TIME_FileData_t))
+-        {
+-            Status = BPLIB_TIME_READ_ERROR;
++    if (res != sizeof(BPLib_TIME_FileData_t)) {
++        if (res == -ENOENT) {
++            /* If file not exists try to create it. The successful the reading succeeded
++             * since the 0 initialized buffer was just written and the content is the same
++             * as is currently in memory. */
++            if (BPLib_TIME_WriteTimeDataToFile() == BPLIB_SUCCESS) {
++                return BPLIB_SUCCESS;
++            }
+         }
+ 
+-        (void) OS_close(BPLib_TIME_GlobalData.FileHandle);
+-    }
+-    else 
+-    {
+-        Status = BPLIB_TIME_READ_ERROR;
++        return BPLIB_TIME_READ_ERROR;
+     }
+ 
+-    return Status;
++    return BPLIB_SUCCESS;
+ }
+ 
+ /* Write current time data to file */
+ BPLib_Status_t BPLib_TIME_WriteTimeDataToFile(void)
+ {
+-    BPLib_Status_t Status = BPLIB_SUCCESS;
+-    int32 OsalStatus;
+-
+-    /* Try opening existing file or creating new file */
+-    OsalStatus = OS_OpenCreate(&BPLib_TIME_GlobalData.FileHandle, BPLIB_TIME_FILE_NAME, 
+-                                    OS_FILE_FLAG_CREATE, OS_READ_WRITE);
+-    if (OsalStatus == OS_SUCCESS)
+-    {
+-        /* Dump current time data to file */
+-        OsalStatus = OS_write(BPLib_TIME_GlobalData.FileHandle, 
+-                (void *) &BPLib_TIME_GlobalData.TimeData, sizeof(BPLib_TIME_FileData_t));
+-        if (OsalStatus != sizeof(BPLib_TIME_FileData_t))
+-        {
+-            Status = BPLIB_TIME_WRITE_ERROR;
+-        }
+-
+-        (void) OS_close(BPLib_TIME_GlobalData.FileHandle);
+-    }
+-    else 
+-    {
+-        Status = BPLIB_TIME_WRITE_ERROR;
++    int res = vfs_file_from_buffer(BPLIB_TIME_FILE_NAME, (void *) &BPLib_TIME_GlobalData.TimeData, 
++                                            sizeof(BPLib_TIME_FileData_t));
++    if (res != sizeof(BPLib_TIME_FileData_t)) {
++        return BPLIB_TIME_READ_ERROR;
+     }
+ 
+-    return Status;
++    return BPLIB_SUCCESS;
+ }
+ 
+ /* Get estimated DTN time */
+@@ -251,7 +227,7 @@ uint64_t BPLib_TIME_GetEstimatedDtnTime(BPLib_TIME_MonotonicTime_t MonotonicTime
+ int64_t BPLib_TIME_SafeOffset(int64_t HostEpoch, int64_t DtnEpoch, int64_t Multiplier)
+ {
+     int64_t Offset;
+-    int8 Sign;
++    int Sign;
+ 
+     if (HostEpoch < DtnEpoch)
+     {
+diff --git a/ci/time/src/bplib_time_internal.h b/ci/time/src/bplib_time_internal.h
+index e07bf184..481caf4f 100644
+--- a/ci/time/src/bplib_time_internal.h
++++ b/ci/time/src/bplib_time_internal.h
+@@ -33,7 +33,6 @@
+ 
+ #include "bplib_time.h"
+ #include "bplib_fwp.h"
+-#include "osapi.h"
+ 
+ 
+ /*
+@@ -89,7 +88,7 @@ typedef struct
+ {
+     int64_t   CurrentCf;                /**< \brief Most recent CF */
+     int64_t   EpochOffset;              /**< \brief Offset between host and DTN epochs */
+-    osal_id_t FileHandle;               /**< \brief OSAL handle for time data file */
++    /* FileHandle was removed, is now function local*/
+     BPLib_TIME_InitState_t InitState;   /**< \brief Initialization state of TIME */
+     BPLib_TIME_FileData_t TimeData;     /**< \brief Local copy of time file data */
+ } BPLib_TIME_GlobalData_t;
+diff --git a/version/src/bplib_version.c b/version/src/bplib_version.c
+index a038c10a..ef5bf7a6 100644
+--- a/version/src/bplib_version.c
++++ b/version/src/bplib_version.c
+@@ -28,7 +28,7 @@
+ *************************************************************************/
+ #include "bplib_api_types.h"
+ #include "bplib_version.h"
+-#include "osapi.h" /* for OS_Printf() */
++/* #include "osapi.h" removed, for OS_Printf() */
+ #include <stdio.h> /* for "snprintf()" */
+ 
+ /*************************************************************************
+@@ -44,15 +44,12 @@
+ /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+ int BPLib_PrintVersion(void)
+ {
+-    char VersionString[BPLIB_CFG_MAX_VERSION_STR_LEN];
+-
+-    (void) snprintf(VersionString, BPLIB_CFG_MAX_VERSION_STR_LEN, "v%u.%u.%u-sprint-%u",
++    /* Print the version using printf, which should be provided by RIOT */
++    (void) printf("v%u.%u.%u-sprint-%u",
+         BPLIB_MAJOR_VERSION,
+         BPLIB_MINOR_VERSION,
+         BPLIB_REVISION,
+         BPLIB_BUILD_NUMBER);
+ 
+-    OS_printf("BPLib Version: %s\n", VersionString);
+-
+     return BPLIB_SUCCESS;
+ }
+-- 
+2.43.0
+
