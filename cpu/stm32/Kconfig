@@ -18,12 +18,13 @@ orsource "kconfigs/$(CPU_FAM)/Kconfig.clk"
 
 endmenu
 
-menu "STM32 FDCAN configuration"
-    depends on CPU_STM32
+if CPU_FAM_H7
 
-rsource "kconfigs/$(CPU_FAM)/Kconfig.fdcan"
+    menu "STM32 FDCAN configuration"
+        rsource "kconfigs/h7/Kconfig.fdcan"
+    endmenu
 
-endmenu
+endif
 
 rsource "kconfigs/$(CPU_FAM)/Kconfig"
 rsource "kconfigs/$(CPU_FAM)/Kconfig.lines"
