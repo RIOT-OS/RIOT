@@ -181,7 +181,7 @@ $(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
 	$(Q)$(GITCACHE) clone $(PKG_URL) $(PKG_VERSION) $(PKG_SOURCE_DIR)
 else
 # redirect stderr so git sees a pipe and not a terminal see https://github.com/git/git/blob/master/progress.c#L138
-$(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
+$(PKG_SOURCE_DIR)/.git: $(PKG_SPARSE_TAG) | $(PKG_CUSTOM_PREPARED)
 	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME) without cache))
 	@echo "$(COLOR_YELLOW)[INFO] Consider using git-cache-rs to speed up your build" \
 	  "and reduce network traffic! See:" \
