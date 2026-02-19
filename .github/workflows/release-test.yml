@@ -43,8 +43,27 @@ env:
 # split up native and IoT-LAB tasks to parallelize somewhat and prevent
 # to hit Github Limit of 6h per job.
 jobs:
+  check-secret:
+    runs-on: ubuntu-22.04
+    outputs:
+      secret-configured: ${{ steps.secret-exists-check.outputs.defined }}
+    steps:
+      - name: Check if Secret is configured
+        id: secret-exists-check
+        # check if the secrets are configured before running the tasks
+        # see: https://stackoverflow.com/a/70249520
+        shell: bash
+        run: |
+          if [ "${{ secrets.IOTLABRC }}" != '' ]; then
+            echo "defined=true" >> $GITHUB_OUTPUT;
+          else
+            echo "defined=false" >> $GITHUB_OUTPUT;
+          fi
+
   tasks:
     runs-on: ubuntu-22.04
+    needs: [check-secret]
+    if: needs.check-secret.outputs.secret-configured == 'true'
     timeout-minutes: 360
     strategy:
       fail-fast: false

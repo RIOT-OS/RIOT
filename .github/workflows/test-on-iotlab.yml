@@ -26,8 +26,27 @@ on:
         default: 'master'
 
 jobs:
+  check-secret:
+    runs-on: ubuntu-22.04
+    outputs:
+      secret-configured: ${{ steps.secret-exists-check.outputs.defined }}
+    steps:
+      - name: Check if Secret is configured
+        id: secret-exists-check
+        # check if the secrets are configured before running the tasks
+        # see: https://stackoverflow.com/a/70249520
+        shell: bash
+        run: |
+          if [ "${{ secrets.IOTLABRC }}" != '' ]; then
+            echo "defined=true" >> $GITHUB_OUTPUT;
+          else
+            echo "defined=false" >> $GITHUB_OUTPUT;
+          fi
+
   # Runs all tests on IoT-LAB boards
   compile_and_test_for_board:
+    needs: [check-secret]
+    if: needs.check-secret.outputs.secret-configured == 'true'
     strategy:
       max-parallel: 8
       fail-fast: false
