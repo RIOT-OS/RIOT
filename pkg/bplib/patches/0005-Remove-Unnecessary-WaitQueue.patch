@@ -1,0 +1,67 @@
+From 5622eb449b92fecd4f584b219e5e580cd93554ce Mon Sep 17 00:00:00 2001
+From: Simon Grund <simon.grund@tuhh.de>
+Date: Thu, 19 Feb 2026 20:44:59 +0100
+Subject: [PATCH 5/5] Remove Unnecessary WaitQueue
+
+was initialized but never used. Same for the cache.
+---
+ bpa/stor/inc/bplib_stor.h | 2 --
+ ci/qm/inc/bplib_qm.h      | 2 +-
+ ci/qm/src/bplib_qm.c      | 6 +++---
+ 3 files changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/bpa/stor/inc/bplib_stor.h b/bpa/stor/inc/bplib_stor.h
+index 1db8fd03..ee22c343 100644
+--- a/bpa/stor/inc/bplib_stor.h
++++ b/bpa/stor/inc/bplib_stor.h
+@@ -41,8 +41,6 @@
+ struct BPLib_BundleCache
+ {
+     mutex_t lock;
+-    BPLib_Bundle_t* InsertBatch[BPLIB_STOR_INSERTBATCHSIZE];
+-    size_t InsertBatchSize;
+     /* The load batches are removed for RIOT because they are very implementation dependent
+      * Loading the numbers (which iirc were the row numbers in the blob table) does not really
+      * help if the actual storage implementation uses some other indexing / storage medium.
+diff --git a/ci/qm/inc/bplib_qm.h b/ci/qm/inc/bplib_qm.h
+index d8c907f0..22a30467 100644
+--- a/ci/qm/inc/bplib_qm.h
++++ b/ci/qm/inc/bplib_qm.h
+@@ -61,7 +61,7 @@ struct BPLib_Instance
+ 
+     /* Queues */
+     BPLib_QM_WaitQueue_t GenericWorkerJobs; /**< Queue of jobs */
+-    BPLib_QM_WaitQueue_t BundleCacheList; /**< Queue of bundles in cache */
++    /*BPLib_QM_WaitQueue_t BundleCacheList; *//**< Queue of bundles in cache */
+     BPLib_QM_WaitQueue_t ContactEgressJobs[BPLIB_MAX_NUM_CONTACTS]; /**< Queue of contact egress jobs */
+     BPLib_QM_WaitQueue_t ChannelEgressJobs[BPLIB_MAX_NUM_CHANNELS]; /**< Queue of channel egress jobs */
+ 
+diff --git a/ci/qm/src/bplib_qm.c b/ci/qm/src/bplib_qm.c
+index 6e90fcc5..c2270b4f 100644
+--- a/ci/qm/src/bplib_qm.c
++++ b/ci/qm/src/bplib_qm.c
+@@ -66,10 +66,10 @@ BPLib_Status_t BPLib_QM_QueueTableInit(BPLib_Instance_t* inst, size_t MaxJobs)
+         QueueInit = false;
+     }
+ 
+-    if (!BPLib_QM_WaitQueueInit(&(inst->BundleCacheList), sizeof(BPLib_Bundle_t*), MaxJobs))
++    /*if (!BPLib_QM_WaitQueueInit(&(inst->BundleCacheList), sizeof(BPLib_Bundle_t*), MaxJobs))
+     {
+         QueueInit = false;
+-    }
++    }*/
+ 
+     for (i = 0; i < BPLIB_MAX_NUM_CHANNELS; i++)
+     {
+@@ -110,7 +110,7 @@ void BPLib_QM_QueueTableDestroy(BPLib_Instance_t* inst)
+ 
+     /* Queue Cleanup */
+     BPLib_QM_WaitQueueDestroy(&(inst->GenericWorkerJobs));
+-    BPLib_QM_WaitQueueDestroy(&(inst->BundleCacheList));
++    /*BPLib_QM_WaitQueueDestroy(&(inst->BundleCacheList));*/
+     for (i = 0; i < BPLIB_MAX_NUM_CHANNELS; i++)
+     {
+         BPLib_QM_WaitQueueDestroy(&(inst->ChannelEgressJobs[i]));
+-- 
+2.43.0
+

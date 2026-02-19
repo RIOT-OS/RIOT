@@ -1,0 +1,50 @@
+From c6e7d1b8f755e10cc833985fc4c5033c4e6b26d4 Mon Sep 17 00:00:00 2001
+From: Simon Grund <simon.grund@tuhh.de>
+Date: Sat, 14 Feb 2026 02:28:18 +0100
+Subject: [PATCH 3/5] Fix encoding issue with no additional CRC
+
+CBORD size 0x86 (6 array elements) was hard-coded, but when no CRC is
+used, there is no sixth element, leading to invalid CBOR (which also
+bplib could not decode).
+---
+ ci/cbor/src/bplib_cbor_encode_payload.c | 8 +++++++-
+ ci/qm/inc/bplib_qm.h                    | 2 +-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/ci/cbor/src/bplib_cbor_encode_payload.c b/ci/cbor/src/bplib_cbor_encode_payload.c
+index af51cca5..d4de56f8 100644
+--- a/ci/cbor/src/bplib_cbor_encode_payload.c
++++ b/ci/cbor/src/bplib_cbor_encode_payload.c
+@@ -142,9 +142,15 @@ BPLib_Status_t BPLib_CBOR_EncodePayload(BPLib_Bundle_t* StoredBundle,
+         **  5. Block-Specific Data (ADU)
+         **  6. CRC Value
+         ** 0b100_00110 == 0x86
++        ** For CRC Type "None" no 6th item is needed => 0x85
+         */
+         CurrentOutputBufferAddr = (uintptr_t)(OutputBuffer);
+-        *(uint8_t*)CurrentOutputBufferAddr = 0x86;
++        if (StoredBundle->blocks.PayloadHeader.CrcType == BPLib_CRC_Type_None) {
++            *(uint8_t*)CurrentOutputBufferAddr = 0x85;
++        } else {
++            *(uint8_t*)CurrentOutputBufferAddr = 0x86;
++        }
++        
+         TotalBytesCopied = 1;
+         CurrentOutputBufferAddr++;
+         BytesLeftInOutputBuffer = OutputBufferSize - TotalBytesCopied;
+diff --git a/ci/qm/inc/bplib_qm.h b/ci/qm/inc/bplib_qm.h
+index 69a277df..d8c907f0 100644
+--- a/ci/qm/inc/bplib_qm.h
++++ b/ci/qm/inc/bplib_qm.h
+@@ -32,7 +32,7 @@
+ 
+ #define QM_NO_WAIT          0L  /**< Constant representing no wait */
+ #define QM_WAIT_FOREVER    -1L /**< Constant representing an indefinite wait */
+-#define QM_MAX_GEN_WORKERS  8L /**< Constant representing maximum allowed generic workers */
++#define QM_MAX_GEN_WORKERS  1L /**< Constant representing maximum allowed generic workers */
+ 
+ #ifndef BPLIB_QM_TX_QUEUE_DEPTH
+ #define BPLIB_QM_TX_QUEUE_DEPTH 2048
+-- 
+2.43.0
+
