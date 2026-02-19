@@ -48,6 +48,16 @@
 #  define CONFIG_CAN_DEV 0
 #endif
 
+/**
+ * @brief Standard Filter Number
+ *
+ * Default value is 4, but it can be increased up
+ * to the maximum supported by the CAN controller.
+ */
+#ifndef CONFIG_FDCAN_STD_FILTERS_NUM
+#  define CONFIG_FDCAN_STD_FILTERS_NUM              4
+#endif
+
 #define RX_RINGBUFFER_SIZE 128      /* Needs to be a power of 2! */
 static isrpipe_t rxbuf;
 static uint8_t rx_ringbuf[RX_RINGBUFFER_SIZE];
@@ -97,25 +107,19 @@ static candev_t *_can_t2candev_t(can_t *dev)
 
 static int _send(int argc, char **argv)
 {
-    int ret = 0;
+    int ret;
 
-    can_frame_t frame = {
-        .can_id = 1,
-        .len = 3,
-        .data[0] = 0xAB,
-        .data[1] = 0xCD,
-        .data[2] = 0xEF,
-    };
+    can_frame_t frame = { 0 };   /* zero everything */
 
-    if (argc > 1) {
-        if (argc > 1 + CAN_MAX_DLEN) {
-            printf("Could not send. Maximum CAN-bytes: %d\n", CAN_MAX_DLEN);
-            return -1;
-        }
-        for (int i = 1; i < argc; i++) {
-            frame.data[i - 1] = atoi(argv[i]);
-        }
-        frame.len = argc - 1;
+    if (argc < 2) {
+        puts("Usage: send <can_id> [data bytes...]");
+        return -1;
+    }
+
+    frame.can_id = strtol(argv[1], NULL, 0);
+
+    for (int i = 2; i < argc && frame.len < CAN_MAX_DLEN; i++) {
+        frame.data[frame.len++] = atoi(argv[i]);
     }
 
     ret = candev->driver->send(candev, &frame);
@@ -196,21 +200,83 @@ static int _set_bit_rate(int argc, char **argv)
 
 static int _set_can_filter(int argc, char **argv)
 {
+    if (argc < 2) {
+        puts("Usage: set_filter <can_id> [mask] [mailbox]");
+        return -1;
+    }
+
+    static struct can_filter filter; // static!
+    filter.can_id = strtoul(argv[1], NULL, 0);
+    filter.can_mask = (argc >= 3) ? strtoul(argv[2], NULL, 0) : 0x7FF;
+
+#if (MODULE_CAN_RX_MAILBOX)
+    filter.target_mailbox = (argc >= 4) ? atoi(argv[3]) : 0;
+#endif
+
+    int res = candev->driver->set_filter(candev, &filter);
+    if (res < 0) {
+        puts("Failed to set CAN filter");
+    } else {
+        printf("CAN filter set: ID 0x%" PRIx32 " Mask 0x%" PRIx32 "\n",
+               filter.can_id, filter.can_mask);
+    }
+    return res;
+}
+
+static int _remove_can_filter(int argc, char **argv)
+{
+    if (argc < 2) {
+        puts("Usage: remove_filter <can_id>");
+        return -1;
+    }
+
+    struct can_filter filter;
+
+    /* Only CAN ID is required */
+    filter.can_id = strtoul(argv[1], NULL, 0);
+
+    /* Mask is ignored by remove_filter in most drivers,
+     * but initialize defensively */
+    filter.can_mask = 0x7FF;
+
+#if (MODULE_CAN_RX_MAILBOX)
+    filter.target_mailbox = 0;
+#endif
+
+    int res = candev->driver->remove_filter(candev, &filter);
+    if (res < 0) {
+        puts("Failed to remove CAN filter");
+        return res;
+    }
+
+    printf("CAN filter removed: ID 0x%" PRIx32 "\n", filter.can_id);
+    return 0;
+}
+
+static int _list_filters(int argc, char **argv)
+{
     (void)argc;
     (void)argv;
-    int res = 0;
 
-    struct can_filter filter = {
-        .can_mask = 0x7FF,
-        .can_id = 0x1aa,
-#if (MODULE_CAN_RX_MAILBOX)
-        .target_mailbox = 1,
-#endif
-    };
+    struct can_filter filters[CONFIG_FDCAN_STD_FILTERS_NUM]; // max filters supported
+    int res = candev->driver->get(candev, CANOPT_RX_FILTERS, &filters, sizeof(filters));
+    if (res < 0) {
+        puts("Failed to read CAN filters");
+        return res;
+    }
 
-    res = candev->driver->set(candev, CANOPT_RX_FILTERS, &filter, sizeof(struct can_filter));
+    int nb_filters = res / sizeof(struct can_filter);
+    if (nb_filters == 0) {
+        puts("No CAN filters configured");
+        return 0;
+    }
 
-    return res;
+    for (int i = 0; i < nb_filters; i++) {
+        printf("[%d] CAN Filter ID: 0x%" PRIx32 " Mask: 0x%" PRIx32 "\n",
+               i, filters[i].can_id, filters[i].can_mask);
+    }
+
+    return 0;
 }
 
 static int _power_off(int argc, char **argv)
@@ -243,6 +309,8 @@ static const shell_command_t shell_commands[] = {
     { "set_filter", "set CAN filters", _set_can_filter},
     { "set_bit_rate", "set CAN bit rate", _set_bit_rate},
     { "send", "send some data", _send },
+    {"remove_filter", "remove CAN filter by ID", _remove_can_filter},
+    { "list_filters", "list RX filters", _list_filters},
     { "receive", "receive some data", _receive },
     { NULL, NULL, NULL }
 };
