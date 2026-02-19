@@ -110,8 +110,8 @@ void i2c_init(i2c_t dev)
 
     /* configure the pins, the configurable pull-up ensures the bus is driven
      * high when nothing is connected */
-    gpio_init(i2c_config[dev].scl_pin, i2c_config[dev].internal_pull_ups ? GPIO_OD_PU : GPIO_OD);
-    gpio_init(i2c_config[dev].sda_pin, i2c_config[dev].internal_pull_ups ? GPIO_OD_PU : GPIO_OD);
+    gpio_init(i2c_config[dev].scl_pin, i2c_config[dev].use_internal_pull_ups ? GPIO_OD_PU : GPIO_OD);
+    gpio_init(i2c_config[dev].sda_pin, i2c_config[dev].use_internal_pull_ups ? GPIO_OD_PU : GPIO_OD);
 
     /* ensure slave is in a known state, which it may not be after a reset */
     for (int i = 0; i < 9; i++) {
