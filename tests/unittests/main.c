@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2014 Martine Lenders <mlenders@inf.fu-berlin.de>
  * SPDX-License-Identifier: LGPL-2.1-only
  */
-
+#include <stdlib.h>
 #include "map.h"
 
 #include "embUnit.h"
@@ -10,6 +10,9 @@
 #include "ztimer.h"
 
 #include "test_utils/interactive_sync.h"
+#if IS_USED(MODULE_VFS)
+#include "vfs.h"
+#endif
 
 #define UNCURRY(FUN, ARGS) FUN(ARGS)
 #define RUN_TEST_SUITES(...) MAP(RUN_TEST_SUITE, __VA_ARGS__)
@@ -38,6 +41,11 @@ int main(void)
     xtimer_init();
 #endif
 
+#if IS_USED(MODULE_FS_NATIVE) && IS_USED(MODULE_VFS_DEFAULT)
+    extern void auto_init_vfs(void);
+    auto_init_vfs();
+#endif
+
 #ifdef OUTPUT
     TextUIRunner_setOutputter(OUTPUTTER);
 #endif
@@ -46,5 +54,6 @@ int main(void)
 #ifndef NO_TEST_SUITES
     UNCURRY(RUN_TEST_SUITES, TEST_SUITES)
 #endif
-    return TESTS_END();
+    TESTS_END();
+    exit(0);
 }

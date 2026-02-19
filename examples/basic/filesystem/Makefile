@@ -34,6 +34,6 @@ USEMODULE += constfs
 
 # For LittleFS on real devices, the main stack size has to be
 # increased:
-CFLAGS += -DTHREAD_STACKSIZE_MAIN=2048
+CFLAGS += -DTHREAD_STACKSIZE_MAIN=THREAD_STACKSIZE_LARGE
 
 include $(RIOTBASE)/Makefile.include
