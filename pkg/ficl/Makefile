@@ -1,6 +1,7 @@
 PKG_NAME = ficl
 PKG_URL = https://github.com/jwsadler58/ficl.git
-PKG_VERSION = 68fc76c44d7e1e8aa4fa1faf319fb6591ab3d06b # ficl306-18-g68fc76c
+PKG_VERSION = 778cc2698dccea620d064ad4119936e18e036a32 # ficl306-42-g778cc26
+
 PKG_LICENSE=BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
@@ -8,16 +9,10 @@ include $(RIOTBASE)/pkg/pkg.mk
 CFLAGS += -Wno-array-bounds
 CFLAGS += -Wno-char-subscripts
 CFLAGS += -Wno-cast-align
-CFLAGS += -Wno-format
-CFLAGS += -Wno-misleading-indentation
 CFLAGS += -Wno-shift-negative-value
 CFLAGS += -Wno-sign-compare
 CFLAGS += -Wno-strict-aliasing
 CFLAGS += -Wno-unused-but-set-variable
-CFLAGS += -Wno-unused-function
-CFLAGS += -Wno-unused-parameter
-CFLAGS += -Wno-unused-value
-CFLAGS += -Wno-unused-variable
 
 #
 #   Configuration
@@ -27,7 +22,6 @@ CFLAGS += -DFICL_WANT_FILE=0
 CFLAGS += -DFICL_WANT_FLOAT=0
 CFLAGS += -DFICL_WANT_USER=0
 CFLAGS += -DFICL_WANT_LOCALS=0
-CFLAGS += -DFICL_WANT_DEBUGGER=0
 CFLAGS += -DFICL_WANT_OOP=0
 CFLAGS += -DFICL_ROBUST=2
 CFLAGS += -DFICL_EXTENDED_PREFIX=0
