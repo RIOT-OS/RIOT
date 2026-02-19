@@ -95,6 +95,14 @@ static const struct can_bittiming_const fd_data_bittiming_const = {
     .brp_inc = 1,
 };
 
+fdcan_msg_ram_t fdcan1_msg_ram;
+fdcan_msg_ram_t fdcan2_msg_ram;
+
+can_ram_map_t can_ram_maps[] = {
+    { FDCAN1, &fdcan1_msg_ram },
+    { FDCAN2, &fdcan2_msg_ram }
+};
+
 enum {
     STATUS_ON,
     STATUS_SLEEP,
@@ -115,6 +123,19 @@ static inline uint8_t get_channel(FDCAN_GlobalTypeDef *can)
 static inline uint8_t get_channel_id(FDCAN_GlobalTypeDef *can)
 {
     return get_channel(can) + 1;
+}
+
+/* Return msg ram structure corresponding to FDCAN module */
+static inline fdcan_msg_ram_t *get_msg_ram(FDCAN_GlobalTypeDef *can)
+{
+    for (unsigned int i = 0; i < ARRAY_SIZE(can_ram_maps); i++)
+    {
+        if (can_ram_maps[i].can == can)
+        {
+            return can_ram_maps[i].msg_ram;
+        }
+    }
+    return NULL; /* should never happen if setup correctly */
 }
 
 /* Get current FDCAN channel mode */
@@ -195,8 +216,14 @@ static int set_mode(FDCAN_GlobalTypeDef *can, can_mode_t mode)
             while (!(can->CCCR & FDCAN_CCCR_INIT) && max_loop != 0) {
                 max_loop--;
             }
+            if (max_loop) {
+                max_loop = CAN_MAX_WAIT_CHANGE;
+            }
             /* Enable Configuration changes */
             can->CCCR |= FDCAN_CCCR_CCE;
+            while ( !(can->CCCR & FDCAN_CCCR_CCE) && max_loop != 0) {
+                max_loop--;
+            }
             break;
         default:
             DEBUG("%s: FDCAN%u Unsupported mode\n", __func__, get_channel_id(can));
@@ -220,8 +247,13 @@ void can_init(can_t *dev, const can_conf_t *conf)
     dev->candev.driver = &candev_stm32_driver;
 
     /* Use the PCLK (APB1 peripheral) clock by default as this clock is always available */
+#if CPU_FAM_STM32H7
+    RCC->D2CCIP1R &= ~RCC_D2CCIP1R_FDCANSEL;
+    RCC->D2CCIP1R |= RCC_D2CCIP1R_FDCANSEL_0; /* PLL1_Q as clock source */
+#else
     RCC->CCIPR &= ~RCC_CCIPR_FDCANSEL;
     RCC->CCIPR |= RCC_CCIPR_FDCANSEL_1;
+#endif
 
     /* Compute bittiming values for classic CAN */
     struct can_bittiming timing = { .bitrate = FDCANDEV_STM32_DEFAULT_BITRATE,
@@ -243,14 +275,132 @@ void can_init(can_t *dev, const can_conf_t *conf)
 
     /* Save configuration */
     dev->conf = conf;
-
     /* Reset rx_pin/tx_pin */
     dev->rx_pin = GPIO_UNDEF;
     dev->tx_pin = GPIO_UNDEF;
 }
 
+#if CPU_FAM_STM32H7
+/* Calculate start address for each block in Message RAM */
+static void calculate_message_ram_block_addresses(FDCAN_GlobalTypeDef *can)
+{
+    uint32_t ram_counter;
+    fdcan_msg_ram_t *ram = get_msg_ram(can);
+
+    uint32_t start_address = CONFIG_FDCAN_SRAM_MESSAGE_RAM_OFFSET;
+    ram->msg_ram_offset = start_address;
+    /* Filter List Standard Start Address */
+    can->SIDFC = (can->SIDFC & ~FDCAN_SIDFC_FLSSA) | (start_address << FDCAN_SIDFC_FLSSA_Pos);
+
+    /* Filter List Extended Start Address */
+    start_address += CONFIG_FDCAN_STD_FILTERS_NUM;
+    can->XIDFC = (can->XIDFC & ~FDCAN_XIDFC_FLESA) | (start_address << FDCAN_XIDFC_FLESA_Pos);
+
+    /* Rx FIFO0 Start Address */
+    start_address += CONFIG_FDCAN_EXT_FILTERS_NUM * 2U;
+    can->RXF0C = (can->RXF0C & ~FDCAN_RXF0C_F0SA) | (start_address << FDCAN_RXF0C_F0SA_Pos);
+    can->RXF0C = (can->RXF0C & ~FDCAN_RXF0C_F0S)
+                | (CONFIG_FDCAN_RX_FIFO0_ELEMENTS << FDCAN_RXF0C_F0S_Pos);
+    can->RXESC = (can->RXESC & ~FDCAN_RXESC_F0DS)
+                | (CONFIG_FDCAN_RX_FIFO0_ELEMENT_SIZE << FDCAN_RXESC_F0DS_Pos);
+
+    /* Rx FIFO1 Start Address */
+    start_address += FDCAN_SRAM_RX_FIFO0_SIZE;
+    can->RXF1C = (can->RXF1C & ~FDCAN_RXF1C_F1SA) | (start_address << FDCAN_RXF1C_F1SA_Pos);
+    can->RXF1C = (can->RXF1C & ~FDCAN_RXF1C_F1S)
+                | (CONFIG_FDCAN_RX_FIFO1_ELEMENTS << FDCAN_RXF1C_F1S_Pos);
+    can->RXESC = (can->RXESC & ~FDCAN_RXESC_F1DS)
+                | (CONFIG_FDCAN_RX_FIFO1_ELEMENT_SIZE << FDCAN_RXESC_F1DS_Pos);
+
+    /* Rx Buffers Start Address */
+    start_address += FDCAN_SRAM_RX_FIFO1_SIZE;
+    can->RXBC = (can->RXBC & ~FDCAN_RXBC_RBSA) | (start_address << FDCAN_RXBC_RBSA_Pos);
+    can->RXESC = (can->RXESC & ~FDCAN_RXESC_RBDS)
+                | (CONFIG_FDCAN_RX_BUFFER_ELEMENT_SIZE << FDCAN_RXESC_RBDS_Pos);
+
+    /* Tx Event FIFO Start Address */
+    start_address += FDCAN_SRAM_RX_BUFFER_SIZE;
+    can->TXEFC = (can->TXEFC & ~FDCAN_TXEFC_EFSA) | (start_address << FDCAN_TXEFC_EFSA_Pos);
+    can->TXEFC = (can->TXEFC & ~FDCAN_TXEFC_EFS)
+                | (CONFIG_FDCAN_TX_EVENTS_NUM << FDCAN_TXEFC_EFS_Pos);
+
+    /* Tx Buffer List Start Address */
+    start_address += (CONFIG_FDCAN_TX_EVENTS_NUM * 2U);
+    can->TXBC = (can->TXBC & ~FDCAN_TXBC_TBSA) | (start_address << FDCAN_TXBC_TBSA_Pos);
+    can->TXESC = (can->TXESC & ~FDCAN_TXESC_TBDS)
+                | (CONFIG_FDCAN_TX_ELEMENT_SIZE << FDCAN_TXESC_TBDS_Pos);
+
+     /* Dedicated Tx buffers number */
+    can->TXBC = (can->TXBC & ~FDCAN_TXBC_NDTB)
+                | (CONFIG_FDCAN_TX_BUFFERS_NUM << FDCAN_TXBC_NDTB_Pos);
+
+    /* Tx FIFO/queue elements number */
+    can->TXBC = (can->TXBC & ~FDCAN_TXBC_TFQS)
+                | (CONFIG_FDCAN_TX_FIFO_QUEUE_ELEMENTS << FDCAN_TXBC_TFQS_Pos);
+
+    ram->std_filt_sa = SRAMCAN_BASE + (CONFIG_FDCAN_SRAM_MESSAGE_RAM_OFFSET * 4U);
+    DEBUG("%s: FDCAN%u Message RAM start address is %lx\n",
+          __func__, get_channel_id(can), ram->std_filt_sa);
+
+    ram->ext_filt_sa = ram->std_filt_sa + (CONFIG_FDCAN_STD_FILTERS_NUM * 4U);
+    DEBUG("%s: FDCAN%u Extended Filters start address is %lx\n",
+          __func__, get_channel_id(can), ram->ext_filt_sa);
+
+    ram->rx_fifo0_sa = ram->ext_filt_sa + (CONFIG_FDCAN_EXT_FILTERS_NUM
+                        * 2U * 4U);
+    DEBUG("%s: FDCAN%u Rx FIFO0 start address is %lx\n",
+          __func__, get_channel_id(can), ram->rx_fifo0_sa);
+
+    ram->rx_fifo1_sa = ram->rx_fifo0_sa + (FDCAN_SRAM_RX_FIFO0_SIZE * 4U);
+    DEBUG("%s: FDCAN%u Rx FIFO1 start address is %lx\n",
+          __func__, get_channel_id(can), ram->rx_fifo1_sa);
+
+    ram->rx_buf_sa = ram->rx_fifo1_sa + (FDCAN_SRAM_RX_FIFO1_SIZE * 4U);
+    DEBUG("%s: FDCAN%u Rx Buffers start address is %lx\n",
+          __func__, get_channel_id(can), ram->rx_buf_sa);
+
+    ram->tx_evt_sa = ram->rx_buf_sa + (FDCAN_SRAM_RX_BUFFER_SIZE * 4U);
+    DEBUG("%s: FDCAN%u Tx Events start address is %lx\n",
+          __func__, get_channel_id(can), ram->tx_evt_sa);
+
+    ram->tx_buf_sa = ram->tx_evt_sa + (CONFIG_FDCAN_TX_EVENTS_NUM * 2U * 4U);
+    DEBUG("%s: FDCAN%u Tx Buffers start address is %lx\n",
+          __func__, get_channel_id(can), ram->tx_buf_sa);
+
+    ram->tx_fifo_sa = ram->tx_buf_sa + (FDCAN_SRAM_TX_BUFFER_SIZE * 4U);
+    DEBUG("%s: FDCAN%u Tx FIFO start address is %lx\n",
+          __func__, get_channel_id(can), ram->tx_fifo_sa);
+
+    ram->msg_ram_ea = ram->tx_fifo_sa + (FCDCAN_SRAM_TXFIFOQ_SIZE * 4U);
+    DEBUG("%s: FDCAN%u Message RAM end address is %lx\n",
+          __func__, get_channel_id(can), ram->msg_ram_ea);
+
+    if (ram->msg_ram_ea - ram->msg_ram_offset > FDCAN_SRAM_MESSAGE_RAM_SIZE) {
+        DEBUG("%s: FDCAN%u Message RAM configuration exceeds allocated size\n",
+              __func__, get_channel_id(can));
+    }
+    else {
+        for (ram_counter = ram->std_filt_sa;
+             ram_counter < ram->msg_ram_ea; ram_counter += 4U)
+        {
+            *(uint32_t *)(ram_counter) = 0x00000000;
+        }
+        DEBUG("%s: FDCAN%u Message RAM configuration OK\n",
+              __func__, get_channel_id(can));
+    }
+}
+#endif
+
 /* Get FDCAN message RAM address */
 static uint32_t* get_message_ram(FDCAN_GlobalTypeDef *can) {
+#if CPU_FAM_STM32H7
+    fdcan_msg_ram_t *ram = get_msg_ram(can);
+    DEBUG("%s: FDCAN%u message RAM address is %p\n",
+          __func__, get_channel_id(can),
+          (void*)ram->std_filt_sa
+          );
+    return (uint32_t*)ram->std_filt_sa;
+#else
     /* In case of multiple instances the RAM start address for the FDCANn is computed by end
        of FDCANn-1 address + 4, and the FDCANn end address is computed by FDCANn start
        address + 0x0350 - 4. */
@@ -264,37 +414,75 @@ static uint32_t* get_message_ram(FDCAN_GlobalTypeDef *can) {
         SRAMCAN_BASE
         + (((uint32_t)can - FDCAN1_BASE) >> 10) * FDCAN_SRAM_MESSAGE_RAM_SIZE
         );
+#endif
 }
 
 /* Get FDCAN channel extended filters list message RAM address */
 static uint32_t* get_flesa_message_ram(FDCAN_GlobalTypeDef *can) {
+#if CPU_FAM_STM32H7
+    fdcan_msg_ram_t *ram = get_msg_ram(can);
+    DEBUG("%s: FDCAN%u message RAM address is %p\n",
+          __func__, get_channel_id(can),
+          (void*)ram->ext_filt_sa
+          );
+    return (uint32_t*)ram->ext_filt_sa;
+#else
     DEBUG("%s: FDCAN%u FLESA message RAM address is %p\n",
           __func__, get_channel_id(can),
           (void*)get_message_ram(can) + FDCAN_SRAM_FLESA
           );
 
     return get_message_ram(can) + FDCAN_SRAM_FLESA;
+#endif
 }
 
 /* Get FDCAN channel Rx FIFO message RAM address */
 static uint32_t* get_message_ram_rx_fifo_address(FDCAN_GlobalTypeDef *can,
                                                  uint8_t message_ram_rx_fifo) {
-    DEBUG("%s: FDCAN%u Rx FIFO message RAM address is %p\n",
-          __func__, get_channel_id(can),
+#if CPU_FAM_STM32H7
+    fdcan_msg_ram_t *ram = get_msg_ram(can);
+    if (message_ram_rx_fifo == 0)
+    {
+        DEBUG("%s: FDCAN%u Rx FIFO0 message RAM address is %p\n",
+               __func__, get_channel_id(can),
+              (void*)ram->rx_fifo0_sa
+            );
+        return (uint32_t*)ram->rx_fifo0_sa;
+    } else
+    {
+        DEBUG("%s: FDCAN%u Rx FIFO1 message RAM address is %p\n",
+               __func__, get_channel_id(can),
+              (void*)ram->rx_fifo1_sa
+            );
+        return (uint32_t*)ram->rx_fifo1_sa;
+    }
+#else
+    DEBUG("%s: FDCAN%u Rx FIFO%u message RAM address is %p\n",
+          __func__, get_channel_id(can), message_ram_rx_fifo,
           get_message_ram(can) + FDCAN_SRAM_F0SA + message_ram_rx_fifo * FDCAN_SRAM_RXFIFO_SIZE
           );
-
     return get_message_ram(can) + FDCAN_SRAM_F0SA + message_ram_rx_fifo * FDCAN_SRAM_RXFIFO_SIZE;
+#endif
 }
 
 /* Get FDCAN channel Tx buffers message RAM address */
 static uint32_t* get_message_ram_tx_buffer_address(FDCAN_GlobalTypeDef *can) {
+
+#if CPU_FAM_STM32H7
+    fdcan_msg_ram_t *ram = get_msg_ram(can);
+    DEBUG("%s: FDCAN%u Tx FIFO message RAM address is %p\n",
+          __func__, get_channel_id(can),
+          (void*)ram->tx_buf_sa
+          );
+          return (uint32_t*)ram->tx_buf_sa;
+#else
     DEBUG("%s: FDCAN%u Tx FIFO message RAM address is %p\n",
           __func__, get_channel_id(can),
           get_message_ram(can) + FDCAN_SRAM_TBSA
           );
 
     return get_message_ram(can) + FDCAN_SRAM_TBSA;
+#endif
 }
 
 /** Check if filter is set according to filter ID
@@ -305,54 +493,75 @@ static int filter_is_set(FDCAN_GlobalTypeDef *can, uint8_t filter_id)
 {
     int ret = false;
 
-    if (filter_id < FDCAN_STM32_NB_STD_FILTER) {
+    if (filter_id < FDCAN_STM32_NB_STD_FILTER)
+    {
         DEBUG("%s: FDCAN%u filter %u is a standard filter\n",
               __func__, get_channel_id(can), filter_id);
-        if (filter_id < (can->RXGFC & FDCAN_RXGFC_LSS) >> FDCAN_RXGFC_LSS_Pos) {
+#if CPU_FAM_STM32H7
+        if (filter_id < CONFIG_FDCAN_STD_FILTERS_NUM)
+        {
             DEBUG("%s: Filter %u is lesser than standard filter list size (%lx)\n",
-                  __func__,
-                  filter_id,
-                  (can->RXGFC & FDCAN_RXGFC_LSS) >> FDCAN_RXGFC_LSS_Pos);
-
+                    __func__,
+                    filter_id,
+                    (can->SIDFC & FDCAN_SIDFC_LSS) >> FDCAN_SIDFC_LSS_Pos);
+#else
+        if (filter_id < (can->RXGFC & FDCAN_RXGFC_LSS) >> FDCAN_RXGFC_LSS_Pos)
+        {
+            DEBUG("%s: Filter %u is lesser than standard filter list size (%lx)\n",
+                __func__,
+                filter_id,
+                (can->RXGFC & FDCAN_RXGFC_LSS) >> FDCAN_RXGFC_LSS_Pos);
+#endif
             /* Filter List Standard start at
-               RAM address + FLSSA (0x00) + standard filter offset (4 Bytes * filter_id) */
+            RAM address + FLSSA (0x00) + standard filter offset (4 Bytes * filter_id) */
             uint32_t *fls_ram_address = get_message_ram(can)
                                         + FDCAN_SRAM_FLS_FILTER_SIZE * filter_id;
-
             DEBUG("%s: FDCAN%u ftandard filter message RAM address is %p\n",
-                  __func__, get_channel_id(can),
-                  fls_ram_address
-                  );
+                __func__, get_channel_id(can),
+                fls_ram_address
+                );
 
             if (((*fls_ram_address & FDCAN_SRAM_FLS_SFT) != FDCAN_SRAM_FLS_SFT_DISABLED)
-                || ((*fls_ram_address & FDCAN_SRAM_FLS_SFEC) != FDCAN_SRAM_FLS_SFEC_DISABLED)) {
+                || ((*fls_ram_address & FDCAN_SRAM_FLS_SFEC) != FDCAN_SRAM_FLS_SFEC_DISABLED))
+            {
                 DEBUG("%s: FDCAN%u filter %u is enabled by SFT(%lx) and SFEC(%lx)\n",
-                  __func__, get_channel_id(can),
-                  filter_id,
-                  (*fls_ram_address & FDCAN_SRAM_FLS_SFT),
-                  (*fls_ram_address & FDCAN_SRAM_FLS_SFEC));
+                __func__, get_channel_id(can),
+                filter_id,
+                (*fls_ram_address & FDCAN_SRAM_FLS_SFT),
+                (*fls_ram_address & FDCAN_SRAM_FLS_SFEC));
 
                 ret = true;
             }
-            else {
+            else
+            {
                 DEBUG("%s: FDCAN%u filter %u is disabled by SFT(%lx) and/or SFEC(%lx)\n",
-                  __func__, get_channel_id(can),
-                  filter_id,
-                  (*fls_ram_address & FDCAN_SRAM_FLS_SFT),
-                  (*fls_ram_address & FDCAN_SRAM_FLS_SFEC));
+                __func__, get_channel_id(can),
+                filter_id,
+                (*fls_ram_address & FDCAN_SRAM_FLS_SFT),
+                (*fls_ram_address & FDCAN_SRAM_FLS_SFEC));
             }
         }
     }
-    else {
+    else
+    {
         DEBUG("%s: Filter %u is an extended filter\n", __func__, filter_id);
         /* Real extended filter index */
         filter_id -= FDCAN_STM32_NB_STD_FILTER;
-        if (filter_id < (can->RXGFC & FDCAN_RXGFC_LSE) >> FDCAN_RXGFC_LSE_Pos) {
+#if CPU_FAM_STM32H7
+        if (filter_id < CONFIG_FDCAN_EXT_FILTERS_NUM)
+        {
+            DEBUG("%s: FDCAN%u filter %u is lesser than extended filter list size (%lx)\n",
+                  __func__, get_channel_id(can),
+                  filter_id,
+                  (can->XIDFC & FDCAN_XIDFC_LSE) >> FDCAN_XIDFC_LSE_Pos);
+#else
+        if (filter_id < (can->RXGFC & FDCAN_RXGFC_LSE) >> FDCAN_RXGFC_LSE_Pos)
+        {
             DEBUG("%s: FDCAN%u filter %u is lesser than extended filter list size (%lx)\n",
                   __func__, get_channel_id(can),
                   filter_id,
                   (can->RXGFC & FDCAN_RXGFC_LSE) >> FDCAN_RXGFC_LSE_Pos);
-
+#endif
             /* Filter List Extended start at
                RAM address + FLESA (0x70) + extended filter offset (8 Bytes * filter_id) */
             uint32_t *fle_ram_address_f0 = get_flesa_message_ram(can)
@@ -369,7 +578,8 @@ static int filter_is_set(FDCAN_GlobalTypeDef *can, uint8_t filter_id)
                   fle_ram_address_f1
                   );
 
-            if ((*fle_ram_address_f0 & FDCAN_SRAM_FLE_F0_EFEC) != FDCAN_SRAM_FLE_F0_EFEC_DISABLED) {
+            if ((*fle_ram_address_f0 & FDCAN_SRAM_FLE_F0_EFEC) != FDCAN_SRAM_FLE_F0_EFEC_DISABLED)
+            {
 
                 DEBUG("%s: FDCAN%u filter %u is enabled by EFEC(%lx)\n",
                   __func__, get_channel_id(can),
@@ -377,7 +587,8 @@ static int filter_is_set(FDCAN_GlobalTypeDef *can, uint8_t filter_id)
                   (*fle_ram_address_f0 & FDCAN_SRAM_FLE_F0_EFEC));
                 ret = true;
             }
-            else {
+            else
+            {
                 DEBUG("%s: FDCAN%u filter %u is disabled by EFEC(%lx)\n",
                   __func__, get_channel_id(can),
                   filter_id,
@@ -400,8 +611,9 @@ static int set_standard_filter(FDCAN_GlobalTypeDef *can, uint32_t fr1, uint32_t 
     }
 
     /* Filter List Standard start at
-       RAM address + FLSSA (0x00) + standard filter offset (4 Bytes * filter_id) */
+    RAM address + FLSSA (0x00) + standard filter offset (4 Bytes * filter_id) */
     uint32_t *fls_ram_address = get_message_ram(can) + FDCAN_SRAM_FLS_FILTER_SIZE * filter_id;
+
     DEBUG("%s: FDCAN%u standard filter message RAM address is %p\n",
           __func__, get_channel_id(can),
           fls_ram_address
@@ -445,6 +657,25 @@ static int set_standard_filter(FDCAN_GlobalTypeDef *can, uint32_t fr1, uint32_t 
           *fls_ram_address
           );
 
+#if CPU_FAM_STM32H7
+    /* Set LSS (List Size of Standard filters) according to new filter ID */
+    uint8_t lss_value = (can->SIDFC & FDCAN_SIDFC_LSS) >> FDCAN_SIDFC_LSS_Pos;
+    if (filter_id >= lss_value)
+    {
+        can->SIDFC &= ~FDCAN_SIDFC_LSS;
+        can->SIDFC |= ((filter_id) + 1) << FDCAN_SIDFC_LSS_Pos;
+
+        DEBUG("%s: FDCAN%u new LSS value is %u\n",
+              __func__, get_channel_id(can), filter_id + 1);
+    }
+    else
+    {
+         can->SIDFC |= (lss_value + 1) << FDCAN_SIDFC_LSS_Pos;
+    }
+
+    DEBUG("%s: FDCAN%u new SIDFC value is %lx\n",
+          __func__, get_channel_id(can), can->SIDFC);
+#else
     /* Set LSS (List Size of Standard filters) according to new filter ID */
     if (filter_id >= (can->RXGFC & FDCAN_RXGFC_LSS) >> FDCAN_RXGFC_LSS_Pos) {
         can->RXGFC &= ~FDCAN_RXGFC_LSS;
@@ -456,11 +687,13 @@ static int set_standard_filter(FDCAN_GlobalTypeDef *can, uint32_t fr1, uint32_t 
 
     DEBUG("%s: FDCAN%u new RXGFC value is %lx\n",
           __func__, get_channel_id(can), can->RXGFC);
+#endif
 
     return 0;
 }
 
 /* Set extended filter for 29 bits message ID */
+/* to do for stm32h7 */
 static int set_extended_filter(FDCAN_GlobalTypeDef *can, uint32_t fr1, uint32_t fr2,
                                uint8_t filter_id, uint8_t fifo)
 {
@@ -497,6 +730,25 @@ static int set_extended_filter(FDCAN_GlobalTypeDef *can, uint32_t fr1, uint32_t 
           *fle_ram_address_f1
           );
 
+#if CPU_FAM_STM32H7
+    uint8_t lse_value = (can->XIDFC & FDCAN_XIDFC_LSE) >> FDCAN_XIDFC_LSE_Pos;
+    /* Set LSE (List Size of Extended filters) according to new filter ID */
+    if (filter_id >= lse_value)
+    {
+        can->XIDFC &= ~FDCAN_XIDFC_LSE;
+        can->XIDFC |= (filter_id + 1) << FDCAN_XIDFC_LSE_Pos;
+
+        DEBUG("%s: FDCAN%u new LSE value is %u\n",
+              __func__, get_channel_id(can), filter_id + 1);
+    }
+    else
+    {
+        can->XIDFC |= (lse_value + 1) << FDCAN_XIDFC_LSE_Pos;
+    }
+
+    DEBUG("%s: FDCAN%u new XIDFC value is %lx\n",
+          __func__, get_channel_id(can), can->XIDFC);
+#else
     /* Set LSS (List Size of Extended filters) according to new filter ID */
     if (filter_id >= (can->RXGFC & FDCAN_RXGFC_LSE) >> FDCAN_RXGFC_LSE_Pos) {
         can->RXGFC &= ~FDCAN_RXGFC_LSE;
@@ -508,7 +760,7 @@ static int set_extended_filter(FDCAN_GlobalTypeDef *can, uint32_t fr1, uint32_t 
 
     DEBUG("%s: FDCAN%u new RXGFC value is %lx\n",
           __func__, get_channel_id(can), can->RXGFC);
-
+#endif
     return 0;
 }
 
@@ -557,7 +809,7 @@ static void unset_standard_filter(FDCAN_GlobalTypeDef *can, uint8_t filter_id)
        RAM address + FLSSA (0x00) + standard filter offset (4 Bytes * filter_id) */
     uint32_t *fls_ram_address = get_message_ram(can) + FDCAN_SRAM_FLS_FILTER_SIZE * filter_id;
     /* Disable filter */
-    *fls_ram_address &= ~FDCAN_SRAM_FLS_SFEC;
+    *fls_ram_address = FDCAN_SRAM_FLS_SFT_DISABLED | FDCAN_SRAM_FLS_SFEC_DISABLED;
 
     DEBUG("%s: FDCAN%u standard filter %u value is %lx\n",
           __func__, get_channel_id(can),
@@ -565,13 +817,29 @@ static void unset_standard_filter(FDCAN_GlobalTypeDef *can, uint8_t filter_id)
           *fls_ram_address
           );
 
+#if CPU_FAM_STM32H7
+    /* Update LSS value */
+    uint8_t lss_value = (can->SIDFC & FDCAN_SIDFC_LSS) >> FDCAN_SIDFC_LSS_Pos;
+    if (lss_value > 0) {
+        lss_value--;
+    }
+    else
+    {
+        lss_value = 0;
+    }
+    can->SIDFC &= ~FDCAN_SIDFC_LSS;
+    can->SIDFC |= (lss_value << FDCAN_SIDFC_LSS_Pos);
+    DEBUG("%s: FDCAN%u new LSS value is %lx\n",
+          __func__, get_channel_id(can), (can->SIDFC & FDCAN_SIDFC_LSS) >> FDCAN_SIDFC_LSS_Pos);
+#else
     /* Update LSS value if necessary */
     uint8_t lss_value = (can->RXGFC & FDCAN_RXGFC_LSS) >> FDCAN_RXGFC_LSS_Pos;
     can->RXGFC &= ~FDCAN_RXGFC_LSS;
     can->RXGFC |= lss_value > 0 ? lss_value-- : 0;
+#endif
 
     DEBUG("%s: FDCAN%u new LSS value is %u\n",
-          __func__, get_channel_id(can), filter_id);
+          __func__, get_channel_id(can), lss_value);
 }
 
 static void unset_extended_filter(FDCAN_GlobalTypeDef *can, uint8_t filter_id)
@@ -589,6 +857,22 @@ static void unset_extended_filter(FDCAN_GlobalTypeDef *can, uint8_t filter_id)
           *fle_ram_address_f0
           );
 
+#if CPU_FAM_STM32H7
+    /* Update LSE value */
+    uint8_t lse_value = (can->XIDFC & FDCAN_XIDFC_LSE) >> FDCAN_XIDFC_LSE_Pos;
+    if (lse_value > 0) {
+        lse_value--;
+    }
+    else
+    {
+        lse_value = 0;
+    }
+    can->XIDFC &= ~FDCAN_XIDFC_LSE;
+    can->XIDFC |= (lse_value << FDCAN_XIDFC_LSE_Pos);
+
+    DEBUG("%s: FDCAN%u new LSE value is %u\n",
+          __func__, get_channel_id(can), filter_id);
+#else
     /* Update LSE value */
     uint8_t lse_value = (can->RXGFC & FDCAN_RXGFC_LSE) >> FDCAN_RXGFC_LSE_Pos;
     can->RXGFC &= ~FDCAN_RXGFC_LSE;
@@ -596,6 +880,7 @@ static void unset_extended_filter(FDCAN_GlobalTypeDef *can, uint8_t filter_id)
 
     DEBUG("%s: FDCAN%u new LSE value is %u\n",
           __func__, get_channel_id(can), filter_id);
+#endif
 }
 
 /**
@@ -639,6 +924,26 @@ void candev_stm32_set_pins(can_t *dev, gpio_t tx_pin, gpio_t rx_pin,
     gpio_init_af(tx_pin, af);
 }
 
+static void filter_clear_all(FDCAN_GlobalTypeDef *can)
+{
+    uint32_t *ram = get_message_ram(can);
+    /* Clear standard filters */
+    for (uint8_t i = 0; i < CONFIG_FDCAN_STD_FILTERS_NUM; i++)
+    {
+        uint32_t *fls_ram_address = ram + i * FDCAN_SRAM_FLS_FILTER_SIZE;
+        *fls_ram_address = FDCAN_SRAM_FLS_SFT_DISABLED | FDCAN_SRAM_FLS_SFEC_DISABLED;
+    }
+
+    /* Clear extended filters (only if >0) */
+#if CONFIG_FDCAN_EXT_FILTERS_NUM > 0
+    for (uint32_t i = 0; i < CONFIG_FDCAN_EXT_FILTERS_NUM; i++)
+    {
+        uint32_t *fle_ram_address = ram + CONFIG_FDCAN_STD_FILTERS_NUM + i*2;
+        *fle_ram_address = FDCAN_SRAM_FLE_F0_EFEC_DISABLED | FDCAN_SRAM_FLE_F0_EFEC_DISABLED;
+    }
+#endif
+}
+
 static int _init(candev_t *candev)
 {
     can_t *dev = container_of(candev, can_t, candev);
@@ -653,12 +958,16 @@ static int _init(candev_t *candev)
     dev->isr_flags.isr_tx = 0;
     dev->isr_flags.isr_rx = 0;
 
+#if CPU_FAM_STM32H7
     /* Enable device clock */
-    periph_clk_en(APB1, dev->conf->rcc_mask);
-
+    periph_clk_en(APB12, dev->conf->rcc_mask);
+    DEBUG("%s: FDCAN%u RCC->D2CCIP1R = %lx\n",
+          __func__, get_channel_id(can), RCC->D2CCIP1R);
+#else
+    periph_clk_en(APB1sebd, dev->conf->rcc_mask);
     DEBUG("%s: FDCAN%u RCC->CCIPR = %lx\n",
           __func__, get_channel_id(can), RCC->CCIPR);
-
+#endif
     _status[get_channel(can)] = STATUS_ON;
 
     /* configure pins */
@@ -677,6 +986,11 @@ static int _init(candev_t *candev)
     can->CCCR |= (FDCAN_CCCR_FDOE       /* Enable FD mode */
                   | FDCAN_CCCR_BRSE     /* Enable bitrate switching */
                   | FDCAN_CCCR_TXP);    /* Enable transmit pause */
+#if (CONFIG_FDCAN_TX_FIFO_QUEUE_MODE == 1)
+    can->TXBC |= FDCAN_TXBC_TFQM;  /* Set Tx Queue mode */
+#else
+    can->TXBC &= ~FDCAN_TXBC_TFQM; /* Set Tx FIFO mode */
+#endif
 
 #ifdef STM32_PM_STOP
     pm_block(STM32_PM_STOP);
@@ -689,21 +1003,39 @@ static int _init(candev_t *candev)
 
     can->TXBTIE = FDCAN_TXBTIE_TIE;
 
+#if CPU_FAM_STM32H7
+    can->ILS = FDCAN_ILS_ARAE | FDCAN_ILS_PEAE | FDCAN_ILS_PEAE | FDCAN_ILS_WDIE\
+                | FDCAN_ILS_BOE | FDCAN_ILS_EWE | FDCAN_ILS_TCFL | FDCAN_ILS_TCL\
+                | FDCAN_ILS_HPML;
+    can->ILE |= FDCAN_ILE_EINT0 | FDCAN_ILE_EINT1;
+#else
     can->ILS = FDCAN_ILS_PERR | FDCAN_ILS_SMSG;
     can->ILE |= FDCAN_ILE_EINT0 | FDCAN_ILE_EINT1;
+#endif
 
     DEBUG("%s: FDCAN%u->CCCR =  %lx\n",
           __func__, get_channel_id(can), can->CCCR);
+
+#if CPU_FAM_STM32H7
+    calculate_message_ram_block_addresses(can);
+#endif
+    filter_clear_all(can);
+
+#if CPU_FAM_STM32H7
+    /* Reject non matching standard and extended IDs */
+    can->GFC |= FDCAN_GFC_ANFS | FDCAN_GFC_ANFE;
+    DEBUG("%s: FDCAN%u can->GFC %lx\n", __func__, get_channel_id(can), can->GFC);
+#else
+    /* Reject non matching standard IDs */
+    can->RXGFC |= FDCAN_RXGFC_ANFS;
+    /* Reject non matching extended IDs */
+    can->RXGFC |= FDCAN_RXGFC_ANFE;
+#endif
 
     int res = set_mode(can, MODE_NORMAL);
 
     DEBUG("%s: FDCAN%u init done, return %d\n",
           __func__, get_channel_id(can), res);
-
-    /* Reject non matching standard IDs */
-    can->RXGFC |= FDCAN_RXGFC_ANFS;
-    /* Reject non matching extended IDs */
-    can->RXGFC |= FDCAN_RXGFC_ANFE;
 
     return res;
 }
@@ -829,14 +1161,22 @@ static int _send(candev_t *candev, const can_frame_t *frame)
 
     /* Get free Tx buffer element */
     uint32_t put_index = (can->TXFQS & FDCAN_TXFQS_TFQPI) >> FDCAN_TXFQS_TFQPI_Pos;
-
+     DEBUG("%s: FDCAN%u put_index = %lx\n",
+          __func__, get_channel_id(can), put_index);
     dev->tx_mailbox[put_index] = frame;
 
+#if CPU_FAM_STM32H7
+    uint32_t* tx_buffer_element_t0 = get_message_ram_tx_buffer_address(can)
+                                     + (put_index * FDCAN_TX_ELEMENT_SIZE_WORDS);
+    memset(tx_buffer_element_t0, 0, FDCAN_TX_ELEMENT_SIZE_WORDS * 4);
+#else
     uint32_t* tx_buffer_element_t0 = get_message_ram_tx_buffer_address(can)
                                      + (put_index * FDCAN_SRAM_TXBUFFER_SIZE);
     memset(tx_buffer_element_t0, 0, FDCAN_SRAM_TXBUFFER_SIZE * 4);
+#endif
     uint32_t* tx_buffer_element_t1 = tx_buffer_element_t0 + 1;
     uint32_t* tx_buffer_element_data = tx_buffer_element_t1 + 1;
+
     DEBUG("%s: FDCAN%u tx_buffer_element_t0 = %p\n",
           __func__, get_channel_id(can), tx_buffer_element_t0);
     DEBUG("%s: FDCAN%u tx_buffer_element_t1 = %p\n",
@@ -909,7 +1249,8 @@ static int _send(candev_t *candev, const can_frame_t *frame)
           __func__, get_channel_id(can), *tx_buffer_element_t1);
 
     /* Set data */
-    for (uint8_t byte = 0; byte < frame->len && !rtr_bit; byte++) {
+    for (uint8_t byte = 0; byte < frame->len && !rtr_bit; byte++)
+    {
         *tx_buffer_element_data |= (uint32_t)frame->data[byte] << ((byte % 4) * 8);
         DEBUG("%s: FDCAN%u *tx_buffer_element_data[%u] = %lx\n",
               __func__, get_channel_id(can),
@@ -968,9 +1309,26 @@ static int read_frame(can_t *dev, can_frame_t *frame, int message_ram_rx_fifo)
     else {
         get_index = (can->RXF0S & FDCAN_RXF0S_F0GI) >> FDCAN_RXF0S_F0GI_Pos;
     }
+uint32_t* rx_fifo_element_r0;
 
-    uint32_t* rx_fifo_element_r0 = get_message_ram_rx_fifo_address(can, message_ram_rx_fifo)
-                                   + get_index * FDCAN_SRAM_RXFIFO_ELEMENT_SIZE;
+#if CPU_FAM_STM32H7
+    if (message_ram_rx_fifo)
+    {
+        rx_fifo_element_r0 =
+            get_message_ram_rx_fifo_address(can, message_ram_rx_fifo) +
+            (get_index * FDCAN_RXFIFO1_ELEMENT_SIZE_WORDS);
+    }
+    else
+    {
+        rx_fifo_element_r0 =
+            get_message_ram_rx_fifo_address(can, message_ram_rx_fifo) +
+            (get_index * FDCAN_RXFIFO0_ELEMENT_SIZE_WORDS);
+    }
+#else
+    rx_fifo_element_r0 =
+        get_message_ram_rx_fifo_address(can, message_ram_rx_fifo) +
+        (get_index * FDCAN_SRAM_RXFIFO_ELEMENT_SIZE);
+#endif
     uint32_t* rx_fifo_element_r1 = rx_fifo_element_r0 + 1;
     uint8_t* rx_fifo_element_data = (uint8_t*)rx_fifo_element_r1 + 4;
 
@@ -1129,7 +1487,11 @@ static void turn_off(can_t *dev)
     _status[get_channel(dev->conf->can)] = STATUS_SLEEP;
 
     if (dev->conf->en_deep_sleep_wake_up) {
-        periph_clk_dis(APB1, dev->conf->rcc_mask);
+#if CPU_FAM_STM32H7
+        periph_clk_en(APB12, dev->conf->rcc_mask);
+#else
+        periph_clk_en(APB1, dev->conf->rcc_mask);
+#endif
         enable_gpio_int(dev);
     }
 
@@ -1152,7 +1514,11 @@ static void turn_on(can_t *dev)
         if (dev->conf->en_deep_sleep_wake_up) {
             disable_gpio_int(dev);
         }
+#if CPU_FAM_STM32H7
+        periph_clk_en(APB12, dev->conf->rcc_mask);
+#else
         periph_clk_en(APB1, dev->conf->rcc_mask);
+#endif
     }
 
     _status[get_channel(dev->conf->can)] = STATUS_ON;
@@ -1267,6 +1633,7 @@ static int _set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
                     case CANOPT_STATE_LOOPBACK:
                         DEBUG("%s: FDCAN%u loopback\n", __func__, get_channel_id(can));
                         res = set_mode(can, MODE_INIT);
+                        can->CCCR |= FDCAN_CCCR_TEST;
                         can->TEST |= FDCAN_TEST_LBCK;
                         can->CCCR |= FDCAN_CCCR_MON;
                         res += set_mode(can, MODE_NORMAL);
@@ -1343,18 +1710,25 @@ static int _get(candev_t *candev, canopt_t opt, void *value, size_t max_len)
                 uint8_t nb_enabled_filter = 0;
                 struct can_filter *filter_list = (struct can_filter *)value;
                 size_t filter_list_size = max_len / sizeof(struct can_filter);
-                for (unsigned i = 0; i < FDCAN_STM32_NB_FILTER; i++) {
-                    struct can_filter *filter = filter_list + nb_enabled_filter;
-                    if (filter_is_set(can, i)) {
-                        nb_enabled_filter++;
-                        get_can_filter(can, i, &filter->can_id, &filter->can_mask);
+                for (unsigned i = 0; i < FDCAN_STM32_NB_FILTER; i++)
+                {
+                    if (!filter_is_set(can, i)) {
+                        continue;
                     }
-                    if (filter_list_size <= nb_enabled_filter) {
+                    /* Check space BEFORE writing */
+                    if (nb_enabled_filter >= filter_list_size) {
                         res = -EOVERFLOW;
                         break;
                     }
+
+                    struct can_filter *filter = &filter_list[nb_enabled_filter];
+                    get_can_filter(can,
+                                i,
+                                &filter->can_id,
+                                &filter->can_mask);
+                    nb_enabled_filter++;
                 }
-                if (!res) {
+                if (res >= 0) {
                     res = nb_enabled_filter * sizeof(struct can_filter);
                 }
             }
@@ -1405,7 +1779,8 @@ static int _set_filter(candev_t *candev, const struct can_filter *filter)
                     &&  !(filter->can_mask & ~CAN_SFF_MASK)))) { /* or the filter is standard */
             can_mode_t mode = get_mode(can);
             set_mode(can, MODE_INIT);
-            res = set_filter(can, filter->can_id, filter->can_mask, i, i % FDCAN_STM32_RX_MAILBOXES);
+            res = set_filter(can, filter->can_id, filter->can_mask,\
+                             i, i % FDCAN_STM32_RX_MAILBOXES);
             set_mode(can, mode);
             if (res) {
                 return -EINVAL;
@@ -1478,7 +1853,7 @@ static void tx_irq_handler(can_t *dev)
     FDCAN_GlobalTypeDef *can = dev->conf->can;
     int flags = dev->isr_flags.isr_tx;
 
-    //DEBUG("%s: FDCAN%u tx irq\n", __func__, get_channel_id(can));
+    DEBUG("%s: FDCAN%u tx irq\n", __func__, get_channel_id(can));
 
     if (can->IR & FDCAN_IR_TC) {
         dev->isr_flags.isr_tx |= can->TXBTO;
@@ -1531,17 +1906,9 @@ static void rx_new_message_irq_handler(can_t *dev, uint8_t message_ram_rx_fifo)
     FDCAN_GlobalTypeDef *can = dev->conf->can;
 
     DEBUG("%s: FDCAN%u rx new message irq\n", __func__, get_channel_id(can));
-
     if (!dev->rx_mailbox.is_full) {
         int i = dev->rx_mailbox.write_idx;
         read_frame(dev, &(dev->rx_mailbox.frame[i]), message_ram_rx_fifo);
-
-        if (!dev->isr_flags.isr_rx) {
-            dev->isr_flags.isr_rx |= message_ram_rx_fifo + 1;
-            if (dev->candev.event_callback) {
-                dev->candev.event_callback(candev, CANDEV_EVENT_ISR, NULL);
-            }
-        }
 
         dev->rx_mailbox.write_idx++;
         if (dev->rx_mailbox.write_idx == FDCAN_STM32_RX_MAILBOXES) {
@@ -1549,6 +1916,13 @@ static void rx_new_message_irq_handler(can_t *dev, uint8_t message_ram_rx_fifo)
         }
         if (dev->rx_mailbox.write_idx == dev->rx_mailbox.read_idx) {
             dev->rx_mailbox.is_full = 1;
+        }
+
+        if (!dev->isr_flags.isr_rx) {
+            dev->isr_flags.isr_rx |= message_ram_rx_fifo + 1;
+            if (dev->candev.event_callback) {
+                dev->candev.event_callback(candev, CANDEV_EVENT_ISR, NULL);
+            }
         }
     }
     else {
@@ -1562,10 +1936,8 @@ static void rx_new_message_irq_handler(can_t *dev, uint8_t message_ram_rx_fifo)
 static void rx_isr(can_t *dev)
 {
     DEBUG("_rx_isr: device=%p\n", (void *)dev);
-
     while (dev->rx_mailbox.is_full || dev->rx_mailbox.read_idx != dev->rx_mailbox.write_idx) {
         int i = dev->rx_mailbox.read_idx;
-
         if (dev->candev.event_callback) {
             dev->candev.event_callback(&dev->candev,
                                        CANDEV_EVENT_RX_INDICATION,
