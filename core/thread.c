@@ -32,10 +32,14 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if defined(HAVE_VALGRIND_H)
-#  include <valgrind.h>
-#elif defined(HAVE_VALGRIND_VALGRIND_H)
-#  include <valgrind/valgrind.h>
+#if defined(HAVE_VALGRIND)
+/* __has_include() will only be reached on native and only when valgrind is
+ * enabled, so we do not limit compatibility with embedded toolchains here */
+#  if __has_include(<valgrind/valgrind.h>)
+#    include <valgrind/valgrind.h>
+#  else
+#    include <valgrind.h>
+#  endif
 #else
 #  define   VALGRIND_DISABLE_ERROR_REPORTING    (void)0
 #  define   VALGRIND_ENABLE_ERROR_REPORTING     (void)0
