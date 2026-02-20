@@ -35,9 +35,9 @@ typedef enum {
     /** WRITE command byte, 0b0000 0010 */
     NVRAM_SPI_CMD_WRITE = 0x02,
     /** READ command byte, 0b0000 0011 */
-    NVRAM_SPI_CMD_READ = 0x03,
+    NVRAM_SPI_CMD_READ  = 0x03,
     /** WREN command byte, 0b0000 0110 */
-    NVRAM_SPI_CMD_WREN = 0x06,
+    NVRAM_SPI_CMD_WREN  = 0x06,
 } nvram_spi_commands_t;
 
 /** @brief Delay to wait between toggling CS pin, on most chips this can probably be
@@ -104,15 +104,64 @@ static int nvram_spi_write_9bit_addr(nvram_t *dev, const uint8_t *src, uint32_t 
  */
 static int nvram_spi_read_9bit_addr(nvram_t *dev, uint8_t *dst, uint32_t src, size_t len);
 
+/**
+ * @brief Read a device specific register via a specific SPI command.
+ *
+ * Certain NVRAM commands return internal registers such as
+ * the Status Register or Configuration Register. This function sends the
+ * command and retrieves the register value.
+ *
+ * @param[in]  dev   Pointer to the NVRAM device descriptor.
+ * @param[in]  cmd   Command code corresponding to the register to read
+ * @param[out] value Pointer where the register value will be stored.
+ *
+ * @return <0 on errors
+ */
+static int nvram_spi_read_reg(nvram_t *dev, uint8_t cmd, uint8_t *value);
+
+/**
+ * @brief Write a device specific register via a specific SPI command.
+ *
+ * Certain NVRAM commands write to internal registers such as
+ * configuration or status registers. This function sends the command along
+ * with the value to write.
+ *
+ * @param[in] dev   Pointer to the NVRAM device descriptor
+ * @param[in] cmd   Command code corresponding to the register to write
+ * @param[in] value Value to write into the register
+ *
+ * @return <0 on errors
+ */
+static int nvram_spi_write_reg(nvram_t *dev, uint8_t cmd, uint8_t value);
+
+/**
+ * @brief Send a device specific command without data transfer.
+ *
+ * Some NVRAM operations are purely command-based and do not read or
+ * write registers or memory.
+ *
+ * @param[in] dev Pointer to the NVRAM device descriptor
+ * @param[in] cmd Command code to execute
+ *
+ * @return <0 on errors
+ */
+static int nvram_spi_cmd(nvram_t *dev, uint8_t cmd);
+
+
+
 int nvram_spi_init(nvram_t *dev, nvram_spi_params_t *spi_params, size_t size)
 {
     dev->size = size;
     if (size > 0x100 && spi_params->address_count == 1) {
         dev->write = nvram_spi_write_9bit_addr;
         dev->read = nvram_spi_read_9bit_addr;
-    } else {
+    }
+    else {
         dev->write = nvram_spi_write;
         dev->read = nvram_spi_read;
+        dev->read_reg = nvram_spi_read_reg;
+        dev->write_reg = nvram_spi_write_reg;
+        dev->cmd = nvram_spi_cmd;
     }
     dev->extra = spi_params;
 
@@ -125,7 +174,8 @@ int nvram_spi_init(nvram_t *dev, nvram_spi_params_t *spi_params, size_t size)
 
 static int nvram_spi_write(nvram_t *dev, const uint8_t *src, uint32_t dst, size_t len)
 {
-    nvram_spi_params_t *spi_dev = (nvram_spi_params_t *) dev->extra;
+    nvram_spi_params_t *spi_dev = (nvram_spi_params_t *)dev->extra;
+
     union {
         uint32_t u32;
         char c[4];
@@ -144,8 +194,8 @@ static int nvram_spi_write(nvram_t *dev, const uint8_t *src, uint32_t dst, size_
     /* Write command and address */
     spi_transfer_byte(spi_dev->spi, spi_dev->cs, true, NVRAM_SPI_CMD_WRITE);
     spi_transfer_bytes(spi_dev->spi, spi_dev->cs, true,
-                      &addr.c[sizeof(addr.c) - spi_dev->address_count], NULL,
-                      spi_dev->address_count);
+                       &addr.c[sizeof(addr.c) - spi_dev->address_count], NULL,
+                       spi_dev->address_count);
     /* Write data (we still hold the CS line low in between) */
     spi_transfer_bytes(spi_dev->spi, spi_dev->cs, false, src, NULL, len);
     /* Release exclusive bus access */
@@ -156,7 +206,8 @@ static int nvram_spi_write(nvram_t *dev, const uint8_t *src, uint32_t dst, size_
 
 static int nvram_spi_read(nvram_t *dev, uint8_t *dst, uint32_t src, size_t len)
 {
-    nvram_spi_params_t *spi_dev = (nvram_spi_params_t *) dev->extra;
+    nvram_spi_params_t *spi_dev = (nvram_spi_params_t *)dev->extra;
+
     union {
         uint32_t u32;
         char c[4];
@@ -170,8 +221,8 @@ static int nvram_spi_read(nvram_t *dev, uint8_t *dst, uint32_t src, size_t len)
     /* Write command and address */
     spi_transfer_byte(spi_dev->spi, spi_dev->cs, true, NVRAM_SPI_CMD_READ);
     spi_transfer_bytes(spi_dev->spi, spi_dev->cs, true,
-                               &addr.c[sizeof(addr.c) - spi_dev->address_count],
-                               NULL, spi_dev->address_count);
+                       &addr.c[sizeof(addr.c) - spi_dev->address_count],
+                       NULL, spi_dev->address_count);
     /* Read data (while still holding the CS line active) */
     spi_transfer_bytes(spi_dev->spi, spi_dev->cs, false, NULL, dst, len);
     /* Release exclusive bus access */
@@ -183,9 +234,10 @@ static int nvram_spi_read(nvram_t *dev, uint8_t *dst, uint32_t src, size_t len)
 
 static int nvram_spi_write_9bit_addr(nvram_t *dev, const uint8_t *src, uint32_t dst, size_t len)
 {
-    nvram_spi_params_t *spi_dev = (nvram_spi_params_t *) dev->extra;
+    nvram_spi_params_t *spi_dev = (nvram_spi_params_t *)dev->extra;
     uint8_t cmd;
     uint8_t addr;
+
     cmd = NVRAM_SPI_CMD_WRITE;
 
     /* The upper address bit is mixed into the command byte on certain devices,
@@ -214,9 +266,10 @@ static int nvram_spi_write_9bit_addr(nvram_t *dev, const uint8_t *src, uint32_t 
 
 static int nvram_spi_read_9bit_addr(nvram_t *dev, uint8_t *dst, uint32_t src, size_t len)
 {
-    nvram_spi_params_t *spi_dev = (nvram_spi_params_t *) dev->extra;
+    nvram_spi_params_t *spi_dev = (nvram_spi_params_t *)dev->extra;
     uint8_t cmd;
     uint8_t addr;
+
     cmd = NVRAM_SPI_CMD_READ;
 
     /* The upper address bit is mixed into the command byte on certain devices,
@@ -237,6 +290,56 @@ static int nvram_spi_read_9bit_addr(nvram_t *dev, uint8_t *dst, uint32_t src, si
 
     /* status contains the number of bytes actually read from the SPI bus. */
     return (int)len;
+}
+
+static int nvram_spi_read_reg(nvram_t *dev, uint8_t cmd, uint8_t *value)
+{
+    nvram_spi_params_t *spi = (nvram_spi_params_t *)dev->extra;
+
+    /* Acquire exclusive bus access while configuring clock and mode */
+    spi_acquire(spi->spi, spi->cs, SPI_MODE_0, spi->clk);
+    /* Write command */
+    spi_transfer_byte(spi->spi, spi->cs, true, cmd);
+    /* read 1 byte (while still holding the CS line active) */
+    uint8_t dummy = 0x00;
+    *value = spi_transfer_byte(spi->spi, spi->cs, false, dummy);
+    /* Release exclusive bus access */
+    spi_release(spi->spi);
+
+    return 0;
+}
+
+static int nvram_spi_write_reg(nvram_t *dev, uint8_t cmd, uint8_t value)
+{
+    nvram_spi_params_t *spi = (nvram_spi_params_t *)dev->extra;
+
+    /* Acquire exclusive bus access while configuring clock and mode */
+    spi_acquire(spi->spi, spi->cs, SPI_MODE_0, spi->clk);
+    /* Enable writes */
+    spi_transfer_byte(spi->spi, spi->cs, false, NVRAM_SPI_CMD_WREN);
+    /* Make sure we have a minimum gap between transfers */
+    ztimer_spin(ZTIMER_USEC, NVRAM_SPI_CS_TOGGLE_US);
+    /* Write command then value */
+    spi_transfer_byte(spi->spi, spi->cs, true, cmd);
+    spi_transfer_byte(spi->spi, spi->cs, false, value);
+    /* Release exclusive bus access */
+    spi_release(spi->spi);
+
+    return 0;
+}
+
+static int nvram_spi_cmd(nvram_t *dev, uint8_t cmd)
+{
+    nvram_spi_params_t *spi = (nvram_spi_params_t *)dev->extra;
+
+    /* Acquire exclusive bus access while configuring clock and mode */
+    spi_acquire(spi->spi, spi->cs, SPI_MODE_0, spi->clk);
+    /* Write command */
+    spi_transfer_byte(spi->spi, spi->cs, false, cmd);
+    /* Release exclusive bus access */
+    spi_release(spi->spi);
+
+    return 0;
 }
 
 /** @} */
