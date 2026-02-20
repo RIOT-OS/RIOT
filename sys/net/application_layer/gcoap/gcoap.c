@@ -810,7 +810,7 @@ static size_t _handle_req(gcoap_socket_t *sock, coap_pkt_t *pdu, uint8_t *buf,
 
 static const coap_resource_t *_match_resource_path_iterator(const gcoap_listener_t *listener,
                                                             const coap_resource_t *last,
-                                                            const uint8_t *uri_path)
+                                                            const char *uri_path)
 {
     size_t i;
     if (!last) {
@@ -834,7 +834,7 @@ static int _request_matcher_default(gcoap_listener_t *listener,
                                     const coap_resource_t **resource,
                                     coap_pkt_t *pdu)
 {
-    uint8_t uri[CONFIG_NANOCOAP_URI_MAX];
+    char uri[CONFIG_NANOCOAP_URI_MAX];
     int ret = GCOAP_RESOURCE_NO_PATH;
 
     if (coap_get_uri_path(pdu, uri) <= 0) {
@@ -1672,7 +1672,7 @@ const coap_resource_t *gcoap_get_resource_by_path_iterator(const gcoap_listener_
     const coap_resource_t *resource = last_resource;
 
     while (listener) {
-        if ((resource = _match_resource_path_iterator(listener, resource, (const uint8_t *)uri_path))) {
+        if ((resource = _match_resource_path_iterator(listener, resource, uri_path))) {
             *last_listener = listener;
             return resource;
         }

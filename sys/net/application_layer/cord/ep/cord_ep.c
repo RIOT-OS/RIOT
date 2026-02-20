@@ -86,7 +86,7 @@ static void _on_register(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
     if ((memo->state == GCOAP_MEMO_RESP) &&
         (coap_get_code_raw(pdu) == COAP_CODE_CREATED)) {
         /* read the location header and save the RD details on success */
-        if (coap_get_location_path(pdu, (uint8_t *)_rd_loc,
+        if (coap_get_location_path(pdu, _rd_loc,
                                    sizeof(_rd_loc)) > 0) {
             memcpy(&_rd_remote, remote, sizeof(_rd_remote));
             flag = FLAG_SUCCESS;

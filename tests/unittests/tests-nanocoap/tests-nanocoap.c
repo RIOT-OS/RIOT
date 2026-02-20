@@ -31,26 +31,26 @@ static void test_nanocoap__hdr(void)
     uint16_t msgid = 0xABCD;
     char path[] = "/test/abcd/efgh";
     char loc_path[] = "/foo/bar";
-    unsigned char path_tmp[64] = {0};
+    char path_tmp[64] = {0};
 
-    uint8_t *pktpos = &buf[0];
+    uint8_t *pktpos = buf;
     pktpos += coap_build_udp_hdr(pktpos, sizeof(buf), COAP_TYPE_CON, NULL, 0,
                              COAP_METHOD_GET, msgid);
     pktpos += coap_opt_put_location_path(pktpos, 0, loc_path);
     pktpos += coap_opt_put_uri_path(pktpos, COAP_OPT_LOCATION_PATH, path);
 
     coap_pkt_t pkt;
-    TEST_ASSERT_EQUAL_INT(pktpos - &buf[0], coap_parse_udp(&pkt, &buf[0], pktpos - &buf[0]));
+    TEST_ASSERT_EQUAL_INT(pktpos - buf, coap_parse_udp(&pkt, buf, pktpos - buf));
 
     TEST_ASSERT_EQUAL_INT(msgid, coap_get_id(&pkt));
 
     int res = coap_get_uri_path(&pkt, path_tmp);
     TEST_ASSERT_EQUAL_INT(sizeof(path), res);
-    TEST_ASSERT_EQUAL_STRING((char *)path, (char *)path_tmp);
+    TEST_ASSERT_EQUAL_STRING(path, path_tmp);
 
-    res = coap_get_location_path(&pkt, path_tmp, 64);
+    res = coap_get_location_path(&pkt, path_tmp, sizeof(path_tmp));
     TEST_ASSERT_EQUAL_INT(sizeof(loc_path), res);
-    TEST_ASSERT_EQUAL_STRING((char *)loc_path, (char *)path_tmp);
+    TEST_ASSERT_EQUAL_STRING(loc_path, path_tmp);
 }
 
 /*
@@ -61,29 +61,29 @@ static void test_nanocoap__hdr_2(void)
     uint8_t buf[_BUF_SIZE];
     uint16_t msgid = 0xABCD;
     char path[] = "/test/abcd/efgh?foo=bar&baz=blub";
-    unsigned char path_tmp[64] = {0};
+    char path_tmp[64] = {0};
     char query_tmp[64] = {0};
     char key[8];
     char value[8];
 
-    uint8_t *pktpos = &buf[0];
+    uint8_t *pktpos = buf;
     uint16_t lastonum = 0;
     pktpos += coap_build_udp_hdr(pktpos, sizeof(buf), COAP_TYPE_CON, NULL, 0,
                                  COAP_METHOD_GET, msgid);
     pktpos += coap_opt_put_uri_pathquery(pktpos, &lastonum, path);
 
     coap_pkt_t pkt;
-    TEST_ASSERT_EQUAL_INT(pktpos - &buf[0], coap_parse_udp(&pkt, &buf[0], pktpos - &buf[0]));
+    TEST_ASSERT_EQUAL_INT(pktpos - buf, coap_parse_udp(&pkt, buf, pktpos - buf));
 
     TEST_ASSERT_EQUAL_INT(msgid, coap_get_id(&pkt));
 
     int res = coap_get_uri_path(&pkt, path_tmp);
     TEST_ASSERT_EQUAL_INT(sizeof("/test/abcd/efgh"), res);
-    TEST_ASSERT_EQUAL_STRING("/test/abcd/efgh", (char *)path_tmp);
+    TEST_ASSERT_EQUAL_STRING("/test/abcd/efgh", path_tmp);
 
     res = coap_get_uri_query_string(&pkt, query_tmp, sizeof(query_tmp));
     TEST_ASSERT_EQUAL_INT(sizeof("&foo=bar&baz=blub"), res);
-    TEST_ASSERT_EQUAL_STRING("&foo=bar&baz=blub", (char *)query_tmp);
+    TEST_ASSERT_EQUAL_STRING("&foo=bar&baz=blub", query_tmp);
 
     void *pos = NULL;
 
@@ -120,10 +120,10 @@ static void test_nanocoap__get_req(void)
     size_t total_opt_len = 5;
 
     size_t len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
-                                    &token[0], 2, COAP_METHOD_GET, msgid);
+                                    token, 2, COAP_METHOD_GET, msgid);
     TEST_ASSERT_EQUAL_INT(total_hdr_len, len);
 
-    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+    coap_pkt_init(&pkt, buf, sizeof(buf), len);
 
     TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code_decimal(&pkt));
     TEST_ASSERT_EQUAL_INT(2, coap_get_token_len(&pkt));
@@ -131,12 +131,12 @@ static void test_nanocoap__get_req(void)
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_NON, coap_get_type(&pkt));
     TEST_ASSERT_EQUAL_INT(122, pkt.payload_len);
 
-    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, path, '/');
     TEST_ASSERT_EQUAL_INT(total_opt_len, len);
 
     char uri[10] = {0};
-    coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
-    TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
+    coap_get_uri_path(&pkt, uri);
+    TEST_ASSERT_EQUAL_STRING(path, uri);
 
     len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
     TEST_ASSERT_EQUAL_INT(total_hdr_len + total_opt_len, len);
@@ -158,15 +158,15 @@ static void test_nanocoap__put_req(void)
     size_t accept_opt_len = 2;
 
     size_t len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
-                                    &token[0], 2, COAP_METHOD_PUT, msgid);
+                                    token, 2, COAP_METHOD_PUT, msgid);
     TEST_ASSERT_EQUAL_INT(total_hdr_len, len);
 
-    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+    coap_pkt_init(&pkt, buf, sizeof(buf), len);
 
     TEST_ASSERT_EQUAL_INT(COAP_METHOD_PUT, coap_get_code_decimal(&pkt));
     TEST_ASSERT_EQUAL_INT(122, pkt.payload_len);
 
-    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, path, '/');
     TEST_ASSERT_EQUAL_INT(uri_opt_len, len);
 
     len = coap_opt_add_uint(&pkt, COAP_OPT_CONTENT_FORMAT, COAP_FORMAT_TEXT);
@@ -180,7 +180,7 @@ static void test_nanocoap__put_req(void)
     len = coap_opt_finish(&pkt, COAP_OPT_FINISH_PAYLOAD);
     TEST_ASSERT_EQUAL_INT(total_hdr_len + uri_opt_len + fmt_opt_len + accept_opt_len + 1, len);
     TEST_ASSERT_EQUAL_INT(0xFF, *(pkt.payload - 1));
-    TEST_ASSERT_EQUAL_INT(&buf[0] + _BUF_SIZE - pkt.payload, pkt.payload_len);
+    TEST_ASSERT_EQUAL_INT(buf + _BUF_SIZE - pkt.payload, pkt.payload_len);
 }
 
 /*
@@ -196,17 +196,17 @@ static void test_nanocoap__get_multi_path(void)
     size_t uri_opt_len = 7;
 
     size_t len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
-                                    &token[0], 2, COAP_METHOD_GET, msgid);
+                                    token, 2, COAP_METHOD_GET, msgid);
 
-    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+    coap_pkt_init(&pkt, buf, sizeof(buf), len);
     TEST_ASSERT_EQUAL_INT(len, coap_get_total_hdr_len(&pkt));
 
-    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, path, '/');
     TEST_ASSERT_EQUAL_INT(uri_opt_len, len);
 
     char uri[10] = {0};
-    coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
-    TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
+    coap_get_uri_path(&pkt, uri);
+    TEST_ASSERT_EQUAL_STRING(path, uri);
 }
 
 /*
@@ -222,17 +222,17 @@ static void test_nanocoap__get_path_trailing_slash(void)
     size_t uri_opt_len = 6;
 
     size_t len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
-                                    &token[0], 2, COAP_METHOD_GET, msgid);
+                                    token, 2, COAP_METHOD_GET, msgid);
 
-    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+    coap_pkt_init(&pkt, buf, sizeof(buf), len);
     TEST_ASSERT_EQUAL_INT(len, coap_get_total_hdr_len(&pkt));
 
-    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, path, '/');
     TEST_ASSERT_EQUAL_INT(uri_opt_len, len);
 
     char uri[10] = {0};
-    coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
-    TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
+    coap_get_uri_path(&pkt, uri);
+    TEST_ASSERT_EQUAL_STRING(path, uri);
 }
 /*
  * Builds on get_req test, to test '/' path. This path is the default when
@@ -247,14 +247,14 @@ static void test_nanocoap__get_root_path(void)
     char path[] = "/";
 
     size_t len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
-                                    &token[0], 2, COAP_METHOD_GET, msgid);
+                                    token, 2, COAP_METHOD_GET, msgid);
 
-    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+    coap_pkt_init(&pkt, buf, sizeof(buf), len);
     TEST_ASSERT_EQUAL_INT(len, coap_get_total_hdr_len(&pkt));
 
     char uri[10] = {0};
-    coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
-    TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
+    coap_get_uri_path(&pkt, uri);
+    TEST_ASSERT_EQUAL_STRING(path, uri);
 }
 
 /*
@@ -271,17 +271,17 @@ static void test_nanocoap__get_max_path(void)
     size_t uri_opt_len = 64;
 
     size_t len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
-                                    &token[0], 2, COAP_METHOD_GET, msgid);
+                                    token, 2, COAP_METHOD_GET, msgid);
 
-    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+    coap_pkt_init(&pkt, buf, sizeof(buf), len);
     TEST_ASSERT_EQUAL_INT(len, coap_get_total_hdr_len(&pkt));
 
-    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, path, '/');
     TEST_ASSERT_EQUAL_INT(uri_opt_len, len);
 
     char uri[CONFIG_NANOCOAP_URI_MAX] = {0};
-    coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
-    TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
+    coap_get_uri_path(&pkt, uri);
+    TEST_ASSERT_EQUAL_STRING(path, uri);
 }
 
 /*
@@ -299,16 +299,16 @@ static void test_nanocoap__get_path_too_long(void)
     size_t uri_opt_len = 65;
 
     size_t len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
-                                    &token[0], 2, COAP_METHOD_GET, msgid);
+                                    token, 2, COAP_METHOD_GET, msgid);
 
-    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+    coap_pkt_init(&pkt, buf, sizeof(buf), len);
     TEST_ASSERT_EQUAL_INT(len, coap_get_total_hdr_len(&pkt));
 
-    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, path, '/');
     TEST_ASSERT_EQUAL_INT(uri_opt_len, len);
 
     char uri[CONFIG_NANOCOAP_URI_MAX] = {0};
-    int get_len = coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
+    int get_len = coap_get_uri_path(&pkt, uri);
     TEST_ASSERT_EQUAL_INT(-ENOSPC, get_len);
 }
 
@@ -327,32 +327,32 @@ static void test_nanocoap__get_query(void)
     size_t query_opt_len = 7;
 
     size_t len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
-                                    &token[0], 2, COAP_METHOD_GET, msgid);
+                                    token, 2, COAP_METHOD_GET, msgid);
 
-    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+    coap_pkt_init(&pkt, buf, sizeof(buf), len);
     TEST_ASSERT_EQUAL_INT(len, coap_get_total_hdr_len(&pkt));
 
-    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, path, '/');
     TEST_ASSERT_EQUAL_INT(path_opt_len, len);
 
-    uint8_t *query_pos = &pkt.payload[0];
-    len = coap_opt_add_string(&pkt, COAP_OPT_URI_QUERY, &qs[0], '&');
+    uint8_t *query_pos = pkt.payload;
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_QUERY, qs, '&');
     TEST_ASSERT_EQUAL_INT(query_opt_len, len);
 
     char uri[10] = {0};
-    coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
-    TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
+    coap_get_uri_path(&pkt, uri);
+    TEST_ASSERT_EQUAL_STRING(path, uri);
 
     char query[10] = {0};
     coap_get_uri_query_string(&pkt, query, sizeof(query));
     /* skip initial '&' from coap_get_uri_query_string() */
-    TEST_ASSERT_EQUAL_STRING((char *)qs, &query[1]);
+    TEST_ASSERT_EQUAL_STRING(qs, &query[1]);
 
     /* overwrite query to test buffer-based put */
     coap_opt_put_uri_query(query_pos, COAP_OPT_URI_PATH, qs);
     coap_get_uri_query_string(&pkt, query, sizeof(query));
     /* skip initial '&' from coap_get_uri_query_string() */
-    TEST_ASSERT_EQUAL_STRING((char *)qs, &query[1]);
+    TEST_ASSERT_EQUAL_STRING(qs, &query[1]);
 }
 
 /*
@@ -372,12 +372,12 @@ static void test_nanocoap__get_multi_query(void)
     char value[8];
 
     size_t len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
-                                    &token[0], 2, COAP_METHOD_GET, msgid);
+                                    token, 2, COAP_METHOD_GET, msgid);
 
-    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+    coap_pkt_init(&pkt, buf, sizeof(buf), len);
     TEST_ASSERT_EQUAL_INT(len, coap_get_total_hdr_len(&pkt));
 
-    uint8_t *query_pos = &pkt.payload[0];
+    uint8_t *query_pos = pkt.payload;
     /* first opt header is 2 bytes long */
     ssize_t optlen = coap_opt_add_uri_query(&pkt, key1, val1);
     TEST_ASSERT_EQUAL_INT(8, optlen);
@@ -387,13 +387,13 @@ static void test_nanocoap__get_multi_query(void)
     char query[20] = {0};
     coap_get_uri_query_string(&pkt, query, sizeof(query));
     /* skip initial '&' from coap_get_uri_query_string() */
-    TEST_ASSERT_EQUAL_STRING((char *)qs, &query[1]);
+    TEST_ASSERT_EQUAL_STRING(qs, &query[1]);
 
     /* overwrite query to test buffer-based put */
     coap_opt_put_uri_query(query_pos, COAP_OPT_URI_PATH, qs);
     coap_get_uri_query_string(&pkt, query, sizeof(query));
     /* skip initial '&' from coap_get_uri_query_string() */
-    TEST_ASSERT_EQUAL_STRING((char *)qs, &query[1]);
+    TEST_ASSERT_EQUAL_STRING(qs, &query[1]);
 
     const char *val;
     size_t val_len;
@@ -441,9 +441,9 @@ static void test_nanocoap__add_uri_query2(void)
     size_t query3_opt_len = 4;
 
     size_t len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
-                                    &token[0], 2, COAP_METHOD_GET, msgid);
+                                    token, 2, COAP_METHOD_GET, msgid);
 
-    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+    coap_pkt_init(&pkt, buf, sizeof(buf), len);
     TEST_ASSERT_EQUAL_INT(len, coap_get_total_hdr_len(&pkt));
 
     /* includes key and value */
@@ -452,7 +452,7 @@ static void test_nanocoap__add_uri_query2(void)
     TEST_ASSERT_EQUAL_INT(query1_opt_len, len);
     coap_get_uri_query_string(&pkt, query, sizeof(query));
     /* skip initial '&' from coap_get_uri_query_string() */
-    TEST_ASSERT_EQUAL_STRING((char *)qs1, &query[1]);
+    TEST_ASSERT_EQUAL_STRING(qs1, &query[1]);
 
     /* includes key only */
     memset(query, 0, 20);
@@ -460,7 +460,7 @@ static void test_nanocoap__add_uri_query2(void)
     TEST_ASSERT_EQUAL_INT(query2_opt_len, len);
     coap_get_uri_query_string(&pkt, query, sizeof(query));
     /* skip initial '&' from coap_get_uri_query_string() */
-    TEST_ASSERT_EQUAL_STRING((char *)qs2, &query[1]);
+    TEST_ASSERT_EQUAL_STRING(qs2, &query[1]);
 
     /* includes key only; value not NULL but zero length */
     memset(query, 0, 20);
@@ -468,7 +468,7 @@ static void test_nanocoap__add_uri_query2(void)
     TEST_ASSERT_EQUAL_INT(query3_opt_len, len);
     coap_get_uri_query_string(&pkt, query, sizeof(query));
     /* skip initial '&' from coap_get_uri_query_string() */
-    TEST_ASSERT_EQUAL_STRING((char *)qs3, &query[1]);
+    TEST_ASSERT_EQUAL_STRING(qs3, &query[1]);
 
     /* fails an assert, so only run when disabled */
 #ifdef NDEBUG
@@ -481,7 +481,7 @@ static void test_nanocoap__add_uri_query2(void)
     TEST_ASSERT_EQUAL_INT(query4_opt_len, len);
     coap_get_uri_query_string(&pkt, query, sizeof(query));
     /* skip initial '&' from coap_get_uri_query_string() */
-    TEST_ASSERT_EQUAL_STRING((char *)qs4, &query[1]);
+    TEST_ASSERT_EQUAL_STRING(qs4, &query[1]);
 #endif
 }
 /*
@@ -499,18 +499,18 @@ static void test_nanocoap__option_add_buffer_max(void)
     size_t uri_opt_len = 64;    /* option hdr 2, option value 62 */
 
     ssize_t len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
-                                     &token[0], 2, COAP_METHOD_GET, msgid);
+                                     token, 2, COAP_METHOD_GET, msgid);
 
-    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+    coap_pkt_init(&pkt, buf, sizeof(buf), len);
     TEST_ASSERT_EQUAL_INT(len, coap_get_total_hdr_len(&pkt));
 
-    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, path, '/');
     TEST_ASSERT_EQUAL_INT(uri_opt_len, len);
 
     /* shrink buffer to attempt overfill */
-    coap_pkt_init(&pkt, &buf[0], sizeof(buf) - 1, len);
+    coap_pkt_init(&pkt, buf, sizeof(buf) - 1, len);
 
-    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, path, '/');
     TEST_ASSERT_EQUAL_INT(-ENOSPC, len);
 }
 
@@ -524,9 +524,9 @@ static void __test_option_remove(uint16_t stride)
     uint8_t token[2] = {0xDA, 0xEC};
 
     ssize_t len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
-                                     &token[0], 2, COAP_METHOD_GET, msgid);
+                                     token, 2, COAP_METHOD_GET, msgid);
     /* shrink buffer to attempt overfill */
-    coap_pkt_init(&pkt, &buf[0], sizeof(buf) - 1, len);
+    coap_pkt_init(&pkt, buf, sizeof(buf) - 1, len);
     TEST_ASSERT_EQUAL_INT(len, coap_get_total_hdr_len(&pkt));
 
     /* add seven options of options 1 to 7 */
@@ -685,9 +685,9 @@ static void test_nanocoap__option_remove_no_payload(void)
     uint8_t token[2] = {0xDA, 0xEC};
 
     ssize_t len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
-                                     &token[0], 2, COAP_METHOD_GET, msgid);
+                                     token, 2, COAP_METHOD_GET, msgid);
     /* shrink buffer to attempt overfill */
-    coap_pkt_init(&pkt, &buf[0], sizeof(buf) - 1, len);
+    coap_pkt_init(&pkt, buf, sizeof(buf) - 1, len);
     TEST_ASSERT_EQUAL_INT(len, coap_get_total_hdr_len(&pkt));
 
     len = coap_opt_add_uint(&pkt, 1U, 500U);
@@ -734,7 +734,7 @@ static void test_nanocoap__server_get_req(void)
     coap_pkt_t pkt;
     char path[] = "/riot/value";
 
-    ssize_t res = _read_riot_value_req(&pkt, &buf[0]);
+    ssize_t res = _read_riot_value_req(&pkt, buf);
 
     TEST_ASSERT(res > 0);
     TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code_decimal(&pkt));
@@ -744,8 +744,8 @@ static void test_nanocoap__server_get_req(void)
     TEST_ASSERT_EQUAL_INT(0, pkt.payload_len);
 
     char uri[64] = {0};
-    coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
-    TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
+    coap_get_uri_path(&pkt, uri);
+    TEST_ASSERT_EQUAL_STRING(path, uri);
 }
 
 /* Response for server GET request using coap_reply_simple(). */
@@ -755,10 +755,10 @@ static void test_nanocoap__server_reply_simple(void)
     coap_pkt_t pkt;
     char *payload = "0";
 
-    ssize_t res = _read_riot_value_req(&pkt, &buf[0]);
+    ssize_t res = _read_riot_value_req(&pkt, buf);
 
     coap_reply_simple(&pkt, COAP_CODE_CONTENT, buf, _BUF_SIZE,
-                      COAP_FORMAT_TEXT, (uint8_t *)payload, 1);
+                      COAP_FORMAT_TEXT, payload, 1);
 
     TEST_ASSERT(res > 0);
     TEST_ASSERT_EQUAL_INT(COAP_CODE_CONTENT, coap_get_code_raw(&pkt));
@@ -791,7 +791,7 @@ static void test_nanocoap__server_get_req_con(void)
     uint8_t buf[_BUF_SIZE];
     coap_pkt_t pkt;
 
-    ssize_t res = _read_riot_value_req_con(&pkt, &buf[0]);
+    ssize_t res = _read_riot_value_req_con(&pkt, buf);
 
     TEST_ASSERT(res > 0);
     TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code_decimal(&pkt));
@@ -805,10 +805,10 @@ static void test_nanocoap__server_reply_simple_con(void)
     coap_pkt_t pkt;
     char *payload = "0";
 
-    _read_riot_value_req_con(&pkt, &buf[0]);
+    _read_riot_value_req_con(&pkt, buf);
 
     coap_reply_simple(&pkt, COAP_CODE_CONTENT, buf, _BUF_SIZE,
-                      COAP_FORMAT_TEXT, (uint8_t *)payload, 1);
+                      COAP_FORMAT_TEXT, payload, 1);
 
     TEST_ASSERT_EQUAL_INT(COAP_TYPE_ACK, coap_get_type(&pkt));
 }
@@ -1043,14 +1043,14 @@ static void test_nanocoap__add_path_unterminated_string(void)
     path[path_len] = 'Z';
 
     size_t len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
-                                    &token[0], 2, COAP_METHOD_GET, msgid);
+                                    token, 2, COAP_METHOD_GET, msgid);
 
-    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+    coap_pkt_init(&pkt, buf, sizeof(buf), len);
     TEST_ASSERT_EQUAL_INT(len, coap_get_total_hdr_len(&pkt));
-    coap_opt_add_chars(&pkt, COAP_OPT_URI_PATH, &path[0], path_len, '/');
+    coap_opt_add_chars(&pkt, COAP_OPT_URI_PATH, path, path_len, '/');
 
     char uri[10] = {0};
-    ssize_t parsed_path_len = coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
+    ssize_t parsed_path_len = coap_get_uri_path(&pkt, uri);
 
     /* we subtract one byte for '\0' at the end from parsed_uri_path */
     TEST_ASSERT_EQUAL_INT(path_len, parsed_path_len - 1);
@@ -1069,9 +1069,9 @@ static void test_nanocoap__add_get_proxy_uri(void)
     char proxy_uri[60] = "coap://[2001:db8::1]:5683/.well-known/core";
 
     size_t len = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_NON,
-                                    &token[0], 2, COAP_METHOD_GET, msgid);
+                                    token, 2, COAP_METHOD_GET, msgid);
 
-    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+    coap_pkt_init(&pkt, buf, sizeof(buf), len);
     TEST_ASSERT_EQUAL_INT(len, coap_get_total_hdr_len(&pkt));
 
     len = coap_opt_add_proxy_uri(&pkt, proxy_uri);
@@ -1083,7 +1083,7 @@ static void test_nanocoap__add_get_proxy_uri(void)
     len = coap_get_proxy_uri(&pkt, (char **) &uri);
 
     TEST_ASSERT_EQUAL_INT(strlen(proxy_uri), len);
-    TEST_ASSERT_EQUAL_INT(0, strncmp((char *) proxy_uri, (char *) uri, len));
+    TEST_ASSERT_EQUAL_INT(0, strncmp(proxy_uri, uri, len));
 }
 
 /*
