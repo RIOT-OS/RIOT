@@ -78,16 +78,16 @@ static int _transfer(i2c_t dev, I2C_TransferSeq_TypeDef *transfer)
 
     /* transfer finished, interpret the result */
     switch (i2c_progress[dev]) {
-        case i2cTransferDone:
-            return 0;
-        case i2cTransferUsageFault:
-            return -EINVAL;
-        case i2cTransferAddrNack:
-            return -ENXIO;
-        case i2cTransferArbLost:
-            return -EAGAIN;
-        default:
-            return -EIO;
+    case i2cTransferDone:
+        return 0;
+    case i2cTransferUsageFault:
+        return -EINVAL;
+    case i2cTransferAddrNack:
+        return -ENXIO;
+    case i2cTransferArbLost:
+        return -EAGAIN;
+    default:
+        return -EIO;
     }
 }
 
@@ -108,9 +108,10 @@ void i2c_init(i2c_t dev)
 #endif
     CMU_ClockEnable(i2c_config[dev].cmu, true);
 
-    /* configure the pins */
-    gpio_init(i2c_config[dev].scl_pin, GPIO_OD);
-    gpio_init(i2c_config[dev].sda_pin, GPIO_OD);
+    /* configure the pins, the configurable pull-up ensures the bus is driven
+     * high when nothing is connected */
+    gpio_init(i2c_config[dev].scl_pin, i2c_config[dev].use_internal_pull_ups ? GPIO_OD_PU : GPIO_OD);
+    gpio_init(i2c_config[dev].sda_pin, i2c_config[dev].use_internal_pull_ups ? GPIO_OD_PU : GPIO_OD);
 
     /* ensure slave is in a known state, which it may not be after a reset */
     for (int i = 0; i < 9; i++) {
@@ -122,7 +123,7 @@ void i2c_init(i2c_t dev)
     I2C_Init_TypeDef init = I2C_INIT_DEFAULT;
 
     init.enable = false;
-    init.freq = (uint32_t) i2c_config[dev].speed;
+    init.freq = (uint32_t)i2c_config[dev].speed;
 
     I2C_Reset(i2c_config[dev].dev);
     I2C_Init(i2c_config[dev].dev, &init);
@@ -186,7 +187,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length, uint8
 
     transfer.addr = (address << 1);
     transfer.flags = I2C_FLAG_READ | ((flags & I2C_ADDR10) ? I2C_FLAG_10BIT_ADDR : 0);
-    transfer.buf[0].data = (uint8_t *) data;
+    transfer.buf[0].data = (uint8_t *)data;
     transfer.buf[0].len = length;
 
     /* start a transfer */
@@ -212,9 +213,9 @@ int i2c_read_regs(i2c_t dev, uint16_t address, uint16_t reg,
 
     transfer.addr = (address << 1);
     transfer.flags = I2C_FLAG_WRITE_READ | ((flags & I2C_ADDR10) ? I2C_FLAG_10BIT_ADDR : 0);
-    transfer.buf[0].data = (uint8_t *) &reg_end;
+    transfer.buf[0].data = (uint8_t *)&reg_end;
     transfer.buf[0].len = (flags & I2C_REG16) ? 2 : 1;
-    transfer.buf[1].data = (uint8_t *) data;
+    transfer.buf[1].data = (uint8_t *)data;
     transfer.buf[1].len = length;
 
     /* start a transfer */
@@ -232,7 +233,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data, size_t length
 
     transfer.addr = (address << 1);
     transfer.flags = I2C_FLAG_WRITE | ((flags & I2C_ADDR10) ? I2C_FLAG_10BIT_ADDR : 0);
-    transfer.buf[0].data = (uint8_t *) data;
+    transfer.buf[0].data = (uint8_t *)data;
     transfer.buf[0].len = length;
 
     /* start a transfer */
@@ -258,9 +259,9 @@ int i2c_write_regs(i2c_t dev, uint16_t address, uint16_t reg,
 
     transfer.addr = (address << 1);
     transfer.flags = I2C_FLAG_WRITE_WRITE | ((flags & I2C_ADDR10) ? I2C_FLAG_10BIT_ADDR : 0);
-    transfer.buf[0].data = (uint8_t *) &reg_end;
+    transfer.buf[0].data = (uint8_t *)&reg_end;
     transfer.buf[0].len = (flags & I2C_REG16) ? 2 : 1;
-    transfer.buf[1].data = (uint8_t *) data;
+    transfer.buf[1].data = (uint8_t *)data;
     transfer.buf[1].len = length;
 
     /* start a transfer */
