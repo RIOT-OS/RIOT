@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2023-2025 Lasse Rosenow <lasse.rosenow@haw-hamburg.de>
+# SPDX-FileCopyrightText: 2023-2025 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+menuconfig MODULE_REGISTRY_STORAGE
+    bool "MODULE_REGISTRY_STORAGE"
+    depends on MODULE_REGISTRY
+    help
+        Storage module allowing to store configuration parameters to non-volatile storage.
+
+if MODULE_REGISTRY_STORAGE
+
+config MODULE_REGISTRY_STORAGE_HEAP
+    bool "Heap storage"
+
+config MODULE_REGISTRY_STORAGE_VFS
+    bool "VFS storage"
+
+endif # MODULE_REGISTRY_STORAGE
