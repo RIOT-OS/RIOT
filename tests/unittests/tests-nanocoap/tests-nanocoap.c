@@ -1152,8 +1152,13 @@ static void test_nanocoap__token_length_ext_16(void)
     /* now build the corresponding reply and check that it parses back as
      * expected */
     uint8_t rbuf[sizeof(buf)];
-    ssize_t len = coap_build_reply_header(&pkt, COAP_CODE_DELETED, rbuf,
-                                          sizeof(rbuf), 0, NULL, NULL);
+    /* build first using coap_build_reply() */
+    ssize_t len = coap_build_reply(&pkt, COAP_CODE_DELETED,
+                                   rbuf, sizeof(rbuf), 0);
+    TEST_ASSERT_EQUAL_INT(21, len);
+    /* build again using coap_build_reply_header() */
+    len = coap_build_reply_header(&pkt, COAP_CODE_DELETED, rbuf,
+                                  sizeof(rbuf), 0, NULL, NULL);
     TEST_ASSERT_EQUAL_INT(21, len);
     res = coap_parse_udp(&pkt, rbuf, 21);
     TEST_ASSERT_EQUAL_INT(21, res);
@@ -1201,8 +1206,12 @@ static void test_nanocoap__token_length_ext_269(void)
     /* now build the corresponding reply and check that it parses back as
      * expected */
     uint8_t rbuf[sizeof(buf)];
-    ssize_t len = coap_build_reply_header(&pkt, COAP_CODE_DELETED, rbuf,
-                                          sizeof(rbuf), 0, NULL, NULL);
+    /* build first using coap_build_reply() */
+    ssize_t len = coap_build_reply(&pkt, COAP_CODE_DELETED,
+                                   rbuf, sizeof(rbuf), 0);
+    /* build again using coap_build_reply_header() */
+    len = coap_build_reply_header(&pkt, COAP_CODE_DELETED, rbuf,
+                                  sizeof(rbuf), 0, NULL, NULL);
 
     TEST_ASSERT_EQUAL_INT(275, len);
     res = coap_parse_udp(&pkt, rbuf, 275);
