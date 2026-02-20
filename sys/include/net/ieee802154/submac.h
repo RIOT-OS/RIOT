@@ -17,6 +17,10 @@
  * @brief        This module defines a common layer for handling the lower
  * part of the IEEE 802.15.4 MAC layer.
  *
+ * @todo         Provide a user-defined callback scheme in order to implement
+ * the ieee802154_dev_t:cb function here, rather than adding it redundantly
+ * to each upper-layer implementation.
+ *
  * This layer is responsible for:
  * - Handling CSMA-CA and retransmissions.
  * - Maintaining part of the MAC Information Base, e.g IEEE 802.15.4 addresses,
@@ -30,30 +34,36 @@
  *  |   RX   |        |PREPARE |<--->|   TX   |
  *  |        |   +--->|        |     |        |
  *  +--------+   |    +--------+     +--------+
- *      ^        |        ^              |
- *      |        |        |              |
- *      |        |        |              |
- *      |        |    +--------+         |
- *      |        |    |        |         v
- *      |        |    |WAIT FOR|<--------+
- *      |        |    |  ACK   |         |
- *      |        |    +--------+         |
- *      |        |         |             |
- *      |        |         |             |
- *      |        |         v             |
- *      |        |     +--------+        |
- *      |        +-----|        |        |
- *      |              |  IDLE  |        |
- *      +------------->|        |<-------+
- *                     +--------+
+ *     |  ^      |        ^              |
+ *     |  |      |        |              |
+ *     |  |      |        |              |
+ *     |  |      |    +--------+         |
+ *     |  |      |    |        |         v
+ *     |  |      |    |WAIT FOR|<--------+
+ *     |  |      |    |  ACK   |         |
+ *     |  |      |    +--------+         |
+ *     |  |      |         |             |
+ *     |  |      |         |             |
+ *     |  |      |         v             |
+ *     |  |      |     +--------+        |
+ *     |  |      +-----|        |        |
+ *     |  |            |  IDLE  |        |
+ *     |  +----------->|        |<-------+
+ *     |               +--------+
+ *     |    +--------+     ^
+ *     |    |        |     |
+ *     +--->| TX ACK |-----+
+ *          |        |
+ *          +--------+
  * ```
  *
  * - IDLE: The transceiver is off and therefore cannot receive frames. Sending
  *   frames might be triggered using @ref ieee802154_send. The next SubMAC
  *   state would be PREPARE.
  * - RX: The device is ready to receive frames. In case the SubMAC receives a
- *   frame it will call @ref ieee802154_submac_cb_t::rx_done and immediately go
- *   to IDLE. Same as the IDLE state, it's possible
+ *   frame it will transmit an ACK frame if necessary then call
+ *   @ref ieee802154_submac_cb_t::rx_done and immediately go
+ *   to IDLE or TX ACK. Same as the IDLE state, it's possible
  *   to trigger frames using @ref ieee802154_send.
  * - PREPARE: The frame is already in the framebuffer and waiting to be
  *   transmitted.  This state might handle CSMA-CA backoff timer in case the
@@ -71,22 +81,25 @@
  *   (either triggered by the radio or a timer), the SubMAC goes to either
  *   IDLE if there are no more retransmissions left or no more CSMA-CA
  *   retries or PREPARE otherwise.
+ * - TX ACK: The received frame requires instantanous acknowledgement. Sending
+ *   further frames in this state is not permitted. After ACK transmission is
+ *   completed, the SubMAC will go IDLE.
  *
  * The events that trigger state machine changes are defined in
  * @ref ieee802154_fsm_state_t
  *
  * The following events are valid for each state:
  *
- *  Event/State  | RX | IDLE  | PREPARE | TX | WAIT FOR ACK
- * --------------|----|-------|---------|----|-------------
- * TX_DONE       | -  | -     | -       | X  | -
- * RX_DONE       | X  | X*    | X*      | X* | X
- * CRC_ERROR     | X  | X*    | X*      | X* | X
- * ACK_TIMEOUT   | -  | -     | -       | -  | X
- * BH            | -  | -     | X       | -  | -
- * REQ_TX        | X  | X     | -       | -  | -
- * REQ_SET_RX_ON | -  | X     | -       | -  | -
- * REQ_SET_IDLE  | X  | -     | -       | -  | -
+ *  Event/State  | RX | IDLE  | PREPARE | TX | WAIT FOR ACK | TX ACK |
+ * --------------|----|-------|---------|----|------------------------
+ * TX_DONE       | -  | -     | -       | X  | -            |X
+ * RX_DONE       | X  | X*    | X*      | X* | X            |-
+ * CRC_ERROR     | X  | X*    | X*      | X* | X            |-
+ * ACK_TIMEOUT   | -  | -     | -       | -  | X            |-
+ * BH            | -  | -     | X       | -  | -            |-
+ * REQ_TX        | X  | X     | -       | -  | -            |-
+ * REQ_SET_RX_ON | -  | X     | -       | -  | -            |-
+ * REQ_SET_IDLE  | X  | -     | -       | -  | -            |-
  *
  * *: RX_DONE and CRC_ERROR during these events might be a race condition
  *    between the ACK Timer and the radios RX_DONE event. If this happens, the
@@ -167,6 +180,7 @@ typedef enum {
    IEEE802154_FSM_STATE_PREPARE,        /**< The SubMAC is preparing the next transmission */
    IEEE802154_FSM_STATE_TX,             /**< The SubMAC is currently transmitting a frame */
    IEEE802154_FSM_STATE_WAIT_FOR_ACK,   /**< The SubMAC is waiting for an ACK frame */
+   IEEE802154_FSM_STATE_TX_ACK,         /**< The SubMAC is transmitting an ACK frame */
    IEEE802154_FSM_STATE_NUMOF,          /**< Number of SubMAC FSM states */
 } ieee802154_fsm_state_t;
 
@@ -208,6 +222,9 @@ struct ieee802154_submac {
     ieee802154_fsm_state_t fsm_state;    /**< State of the SubMAC */
     ieee802154_phy_mode_t phy_mode;     /**< IEEE 802.15.4 PHY mode */
     const iolist_t *psdu;               /**< stores the current PSDU */
+    uint8_t rx_buf[IEEE802154_FRAME_LEN_MAX]; /**< stores received frame */
+    size_t rx_len;                      /**< stores length of received frame */
+    ieee802154_rx_info_t rx_info;       /**< stores lqi and rssi of received frame */
 };
 
 /**
@@ -410,16 +427,13 @@ static inline int ieee802154_set_tx_power(ieee802154_submac_t *submac,
 /**
  * @brief Get the received frame length
  *
- * @pre this function MUST be called either inside @ref ieee802154_submac_cb_t::rx_done
- *      or in SLEEP state.
- *
  * @param[in] submac pointer to the SubMAC
  *
  * @return length of the PSDU (excluding FCS length)
  */
 static inline int ieee802154_get_frame_length(ieee802154_submac_t *submac)
 {
-    return ieee802154_radio_len(&submac->dev);
+    return submac->rx_len;
 }
 
 /**
@@ -428,7 +442,7 @@ static inline int ieee802154_get_frame_length(ieee802154_submac_t *submac)
  * This functions reads the received PSDU from the device (excluding FCS)
  *
  * @pre this function MUST be called either inside @ref ieee802154_submac_cb_t::rx_done
- *      or in SLEEP state.
+ * or in SLEEP state.
  *
  * @param[in] submac pointer to the SubMAC descriptor
  * @param[out] buf buffer to write into. If NULL, the packet is discarded
@@ -441,7 +455,17 @@ static inline int ieee802154_get_frame_length(ieee802154_submac_t *submac)
 static inline int ieee802154_read_frame(ieee802154_submac_t *submac, void *buf,
                                         size_t len, ieee802154_rx_info_t *info)
 {
-    return ieee802154_radio_read(&submac->dev, buf, len, info);
+    if (submac->rx_len > len) {
+        return -ENOBUFS;
+    }
+    if (info != NULL) {
+        info->rssi = submac->rx_info.rssi;
+        info->lqi = submac->rx_info.lqi;
+    }
+    if (buf != NULL) {
+        memcpy(buf, submac->rx_buf, submac->rx_len);
+    }
+    return submac->rx_len;
 }
 
 /**
