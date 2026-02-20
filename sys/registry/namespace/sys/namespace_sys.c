@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 #include "kernel_defines.h"
 #include "registry.h"

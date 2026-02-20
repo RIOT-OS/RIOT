@@ -22,7 +22,7 @@
 #include <errno.h>
 #include <assert.h>
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 #include "kernel_defines.h"
 #include "clist.h"
