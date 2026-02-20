@@ -1,15 +1,11 @@
 /*
- * Copyright (C) 2026 TU Dresden
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2026 Technische Universität Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
 
 /**
- * @defgroup     drivers_ieee802154_hal IEEE802.15.4 Radio Hardware Abstraction Layer
  * @ingroup      drivers_netdev
  * @experimental This API is experimental and in an early state - expect
  *               changes!
