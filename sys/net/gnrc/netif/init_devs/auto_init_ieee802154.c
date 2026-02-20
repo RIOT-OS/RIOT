@@ -33,7 +33,6 @@ static netdev_ieee802154_submac_t _rf_netdev[IEEE802154_RADIO_COUNT];
 static char _rf_stacks[IEEE802154_RADIO_COUNT][IEEE802154_MAC_STACKSIZE];
 static gnrc_netif_t _netif[IEEE802154_RADIO_COUNT];
 
-
 void auto_init_ieee802154(void)
 {
     LOG_DEBUG("[auto_init_netif] initializing ieee802154 radio\n");
