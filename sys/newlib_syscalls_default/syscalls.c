@@ -658,7 +658,7 @@ void __wrap___assert_func (const char *file, int line, const char *func, const c
     (void)line;
     (void)func;
     (void)expr;
-#ifdef DEBUG_ASSERT_VERBOSE
+#if CONFIG_ASSERT_VERBOSE
     _assert_failure(file, line);
 #else
     _assert_panic();
