@@ -185,17 +185,17 @@ ssize_t coap_parse_udp(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     return len;
 }
 
-int coap_match_path(const coap_resource_t *resource, const uint8_t *uri)
+int coap_match_path(const coap_resource_t *resource, const char *uri)
 {
     assert(resource && uri);
     int res;
 
     if (resource->methods & COAP_MATCH_SUBTREE) {
         int len = strlen(resource->path);
-        res = strncmp((char *)uri, resource->path, len);
+        res = strncmp(uri, resource->path, len);
     }
     else {
-        res = strcmp((char *)uri, resource->path);
+        res = strcmp(uri, resource->path);
     }
     return res;
 }
@@ -370,7 +370,7 @@ ssize_t coap_opt_get_next(const coap_pkt_t *pkt, coap_optpos_t *opt,
 }
 
 ssize_t coap_opt_get_string(coap_pkt_t *pkt, uint16_t optnum,
-                            uint8_t *target, size_t max_len, char separator)
+                            char *target, size_t max_len, char separator)
 {
     assert(pkt && target && (max_len > 1));
 
@@ -384,7 +384,7 @@ ssize_t coap_opt_get_string(coap_pkt_t *pkt, uint16_t optnum,
         if (part_start == NULL) {
             /* if option was not found still return separator */
             if (opt_pos == NULL) {
-                *target++ = (uint8_t)separator;
+                *target++ = separator;
                 --left;
             }
             break;
@@ -395,7 +395,7 @@ ssize_t coap_opt_get_string(coap_pkt_t *pkt, uint16_t optnum,
             return -ENOSPC;
         }
 
-        *target++ = (uint8_t)separator;
+        *target++ = separator;
         memcpy(target, part_start, opt_len);
         target += opt_len;
         left -= opt_len + 1;
@@ -608,7 +608,7 @@ ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_
 {
     coap_method_flags_t method_flag = coap_method2flag(coap_get_code_detail(pkt));
 
-    uint8_t uri[CONFIG_NANOCOAP_URI_MAX];
+    char uri[CONFIG_NANOCOAP_URI_MAX];
     if (coap_get_uri_path(pkt, uri) <= 0) {
         return -EBADMSG;
     }

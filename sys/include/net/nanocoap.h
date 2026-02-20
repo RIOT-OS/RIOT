@@ -1006,7 +1006,7 @@ int coap_opt_get_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t *value);
  * @return      nr of bytes written to @p target (including '\0')
  */
 ssize_t coap_opt_get_string(coap_pkt_t *pkt, uint16_t optnum,
-                            uint8_t *target, size_t max_len, char separator);
+                            char *target, size_t max_len, char separator);
 
 /**
  * @brief   Convenience function for getting the packet's LOCATION_PATH option
@@ -1024,7 +1024,7 @@ ssize_t coap_opt_get_string(coap_pkt_t *pkt, uint16_t optnum,
  * @returns     nr of bytes written to @p target (including '\0')
  */
 static inline ssize_t coap_get_location_path(coap_pkt_t *pkt,
-                                             uint8_t *target, size_t max_len)
+                                             char *target, size_t max_len)
 {
     return coap_opt_get_string(pkt, COAP_OPT_LOCATION_PATH,
                                target, max_len, '/');
@@ -1046,7 +1046,7 @@ static inline ssize_t coap_get_location_path(coap_pkt_t *pkt,
  * @returns     nr of bytes written to @p target (including '\0')
  */
 static inline ssize_t coap_get_location_query(coap_pkt_t *pkt,
-                                              uint8_t *target, size_t max_len)
+                                              char *target, size_t max_len)
 {
     return coap_opt_get_string(pkt, COAP_OPT_LOCATION_QUERY,
                                target, max_len, '&');
@@ -1066,7 +1066,7 @@ static inline ssize_t coap_get_location_query(coap_pkt_t *pkt,
  * @returns     -ENOSPC     if URI option is larger than CONFIG_NANOCOAP_URI_MAX
  * @returns     nr of bytes written to @p target (including '\0')
  */
-static inline ssize_t coap_get_uri_path(coap_pkt_t *pkt, uint8_t *target)
+static inline ssize_t coap_get_uri_path(coap_pkt_t *pkt, char *target)
 {
     return coap_opt_get_string(pkt, COAP_OPT_URI_PATH, target,
                                CONFIG_NANOCOAP_URI_MAX, '/');
@@ -1089,7 +1089,7 @@ static inline ssize_t coap_get_uri_query_string(coap_pkt_t *pkt, char *target,
                                                 size_t max_len)
 {
     return coap_opt_get_string(pkt, COAP_OPT_URI_QUERY,
-                               (uint8_t *)target, max_len, '&');
+                               target, max_len, '&');
 }
 
 /**
@@ -2571,7 +2571,7 @@ extern ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, \
  * @return <0 if the resource path sorts before the URI
  * @return >0 if the resource path sorts after the URI
  */
-int coap_match_path(const coap_resource_t *resource, const uint8_t *uri);
+int coap_match_path(const coap_resource_t *resource, const char *uri);
 
 #if defined(MODULE_GCOAP) || defined(DOXYGEN)
 /**
