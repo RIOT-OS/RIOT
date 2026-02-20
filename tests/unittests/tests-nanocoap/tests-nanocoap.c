@@ -32,19 +32,56 @@ static void test_nanocoap__hdr(void)
     char path[] = "/test/abcd/efgh";
     char loc_path[] = "/foo/bar";
     char path_tmp[64] = {0};
+    const void *token = NULL;
+    const uint8_t tkl = 0;
+    static const uint8_t msg_expected[] = {
+        /* Ver = 1, T = CON, TKL = 0: */
+        (COAP_V1 << 6) | (COAP_TYPE_CON << 4) | tkl,
+        /* Code = 1 (GET): */
+        COAP_METHOD_GET,
+        /* Message ID = 0xABCD */
+        0xAB, 0xCD,
+        /* empty Token */
+        /* CoAP Option Location-Path: "foo":
+         * delta = 8, len = 3 ("foo") */
+        (COAP_OPT_LOCATION_PATH << 4) | 3,
+        'f', 'o', 'o',
+        /* CoAP Option Location-Path: "bar":
+         * delta = 0 (8-8), len = 3 ("bar") */
+        (0 << 4) | 3,
+        'b', 'a', 'r',
+        /* CoAP Option URI-Path "test":
+         * delta = 3 (11-8), len = 4 ("test") */
+        ((COAP_OPT_URI_PATH - COAP_OPT_LOCATION_PATH) << 4) | 4,
+        't', 'e', 's', 't',
+        /* CoAP Option URI-Path "abcd":
+         * delta = 0 (11-11), len = 4 ("abcd") */
+        (0 << 4) | 4,
+        'a', 'b', 'c', 'd',
+        /* CoAP Option URI-Path "efgh":
+         * delta = 0 (11-11), len = 4 ("efgh") */
+        (0 << 4) | 4,
+        'e', 'f', 'g', 'h',
+    };
 
     uint8_t *pktpos = buf;
-    pktpos += coap_build_udp_hdr(pktpos, sizeof(buf), COAP_TYPE_CON, NULL, 0,
-                             COAP_METHOD_GET, msgid);
+    pktpos += coap_build_udp_hdr(pktpos, sizeof(buf), COAP_TYPE_CON, token, tkl,
+                                 COAP_METHOD_GET, msgid);
+    /* Note: A Location-Path Option in a request makes semantically no sense.
+     *       But the code path tested here is very similar, so it makes sense
+     *       to have them in the same unit test regardless.
+     */
     pktpos += coap_opt_put_location_path(pktpos, 0, loc_path);
     pktpos += coap_opt_put_uri_path(pktpos, COAP_OPT_LOCATION_PATH, path);
 
     coap_pkt_t pkt;
-    TEST_ASSERT_EQUAL_INT(pktpos - buf, coap_parse_udp(&pkt, buf, pktpos - buf));
+    TEST_ASSERT_EQUAL_INT((uintptr_t)buf + sizeof(msg_expected), (uintptr_t)pktpos);
+    TEST_ASSERT(0 == memcmp(buf, msg_expected, sizeof(msg_expected)));
+    TEST_ASSERT_EQUAL_INT(sizeof(msg_expected), coap_parse_udp(&pkt, buf, pktpos - buf));
 
     TEST_ASSERT_EQUAL_INT(msgid, coap_get_id(&pkt));
 
-    int res = coap_get_uri_path(&pkt, path_tmp);
+    ssize_t res = coap_get_uri_path(&pkt, path_tmp);
     TEST_ASSERT_EQUAL_INT(sizeof(path), res);
     TEST_ASSERT_EQUAL_STRING(path, path_tmp);
 
