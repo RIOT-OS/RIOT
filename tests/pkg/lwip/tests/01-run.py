@@ -239,8 +239,8 @@ def test_udpv6_send(board_group, application, env=None):
         receiver.sendline(u"udp server start %d" % port)
         # wait for neighbor discovery to be done
         time.sleep(5)
-        sender.sendline(u"udp send [%s]:%d ab:cd:ef" % (receiver_ip, port))
-        sender.expect_exact("Success: send 3 byte over UDP to [{}]:{}"
+        sender.sendline(u"udp send -b [%s]:%d abcdef" % (receiver_ip, port))
+        sender.expect_exact("Success: sent 3 byte over UDP to [{}]:{}"
                             .format(receiver_ip, port))
         receiver.expect(u"00000000  AB  CD  EF")
 
@@ -395,8 +395,8 @@ def test_triple_send(board_group, application, env=None):
         receiver.sendline(u"tcp server start %d" % tcp_port)
         # wait for neighbor discovery to be done
         time.sleep(5)
-        sender.sendline(u"udp send [%s]:%d 01:23" % (receiver_ip, udp_port))
-        sender.expect_exact(u"Success: send 2 byte over UDP to [%s]:%d" %
+        sender.sendline(u"udp send -b [%s]:%d 0123" % (receiver_ip, udp_port))
+        sender.expect_exact(u"Success: sent 2 byte over UDP to [%s]:%d" %
                             (receiver_ip, udp_port))
         receiver.expect(u"00000000  01  23")
 

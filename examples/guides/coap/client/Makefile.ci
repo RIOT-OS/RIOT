@@ -8,7 +8,9 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega328p-xplained-mini \
     atmega8 \
     bluepill-stm32f030c8 \
+    derfmega128 \
     i-nucleo-lrwan1 \
+    microduino-corerf \
     msb-430 \
     msb-430h \
     nucleo-c031c6 \
@@ -29,9 +31,12 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32c0316-dk \
     stm32f030f4-demo \
     stm32f0discovery \
+    stm32f7508-dk \
     stm32g0316-disco \
     stm32l0538-disco \
+    stm32mp157c-dk2 \
     telosb \
     weact-g030f6 \
     z1 \
+    zigduino \
     #

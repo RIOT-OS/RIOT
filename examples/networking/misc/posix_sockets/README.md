@@ -29,8 +29,8 @@ The shell commands come with online help. Call `help` to see which commands
 exist and what they do.
 
 
-udp send fe80::1 1337 uiaeue
-2015-09-22 14:55:30,686 - INFO # > udp send fe80::1 1337 uiaeue
+udp_posix send fe80::1 1337 uiaeue
+2015-09-22 14:55:30,686 - INFO # > udp_posix send fe80::1 1337 uiaeue
 2015-09-22 14:55:30,690 - INFO # Success: send 6 byte to fe80::1:1337
 
 Running the `help` command on an iotlab-m3:
@@ -38,7 +38,7 @@ Running the `help` command on an iotlab-m3:
 2015-09-22 14:54:54,442 - INFO # help
 2015-09-22 14:54:54,443 - INFO # Command              Description
 2015-09-22 14:54:54,444 - INFO # ---------------------------------------
-2015-09-22 14:54:54,446 - INFO # udp                  send data over UDP and listen on UDP ports
+2015-09-22 14:54:54,446 - INFO # udp_posix            send data over UDP and listen on UDP ports
 2015-09-22 14:54:54,447 - INFO # reboot               Reboot the node
 2015-09-22 14:54:54,449 - INFO # ps                   Prints information about running threads.
 2015-09-22 14:54:54,451 - INFO # mersenne_init        initializes the PRNG
@@ -57,22 +57,22 @@ Running the `ps` command on an iotlab-m3:
 2015-09-22 14:54:57,157 - INFO # 	  2 | main                 | pending  Q |   7 |  1536 (  620) | 0x200002cc
 2015-09-22 14:54:57,164 - INFO # 	  3 | 6lo                  | bl rx    _ |   3 |  1024 (  404) | 0x20003ef8
 2015-09-22 14:54:57,169 - INFO # 	  4 | ipv6                 | bl rx    _ |   4 |  1024 (  436) | 0x20001cc0
-2015-09-22 14:54:57,172 - INFO # 	  5 | udp                  | bl rx    _ |   5 |  1024 (  268) | 0x20004660
+2015-09-22 14:54:57,172 - INFO # 	  5 | udp_posix            | bl rx    _ |   5 |  1024 (  268) | 0x20004660
 2015-09-22 14:54:57,177 - INFO # 	  6 | at86rfxx             | bl rx    _ |   3 |  1024 (  320) | 0x20001888
 2015-09-22 14:54:57,183 - INFO # 	    | SUM                  |            |     |  5888 ( 2184)
 ```
 
-Start a UDP server with `udp server start <udp_port>`:
+Start a UDP server with `udp_posix server start <udp_port>`:
 
 ```
-2015-09-22 14:55:09,563 - INFO # > udp server start 1337
+2015-09-22 14:55:09,563 - INFO # > udp_posix server start 1337
 2015-09-22 14:55:09,564 - INFO # Success: started UDP server on port 1337
 ```
 
-Send a UDP package with `udp send <dst_addr> <dst_port> <data>`:
+Send a UDP package with `udp_posix send <dst_addr> <dst_port> <data>`:
 
 ```
-2015-09-22 14:55:30,686 - INFO # > udp send fe80::3432:4833:46d4:9e06 1337 test
+2015-09-22 14:55:30,686 - INFO # > udp_posix send fe80::3432:4833:46d4:9e06 1337 test
 2015-09-22 14:55:30,690 - INFO # Success: send 4 byte to [fe80::3432:4833:46d4:9e06]:1337
 ```
 

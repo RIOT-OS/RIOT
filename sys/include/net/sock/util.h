@@ -29,7 +29,7 @@
 
 #include "net/sock/config.h"
 
-#if MODULE_GNRC_SOCK_UDP || MODULE_LWIP_SOCK_UDP || DOXYGEN
+#if MODULE_GNRC_SOCK_UDP || MODULE_LWIP_SOCK_UDP || MODULE_OPENWSN_SOCK_UDP || DOXYGEN
 #  include "net/sock/udp.h"
 #  define SOCK_HAS_UDP  1   /**< UDP support is enabled */
 #endif
@@ -42,7 +42,8 @@
 #  include "net/sock/dtls.h"
 #endif
 
-#if MODULE_GNRC_SOCK_UDP || MODULE_LWIP_SOCK_UDP ||MODULE_GNRC_SOCK_TCP || MODULE_LWIP_SOCK_TCP || DOXYGEN
+#if MODULE_GNRC_SOCK_UDP || MODULE_LWIP_SOCK_UDP || MODULE_OPENWSN_SOCK_UDP \
+    || MODULE_GNRC_SOCK_TCP || MODULE_LWIP_SOCK_TCP || DOXYGEN
 #  define HAVE_SOCK_TL_EP   1 /**< Indicates presence of `struct _sock_tl_ep` */
 #endif
 
