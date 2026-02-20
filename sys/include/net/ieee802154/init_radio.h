@@ -49,6 +49,7 @@ static socket_zep_t _socket_zeps[SOCKET_ZEP_MAX];
 #if defined(MODULE_KW2XRF)
 #  include "kw2xrf.h"
 #  include "kw2xrf_params.h"
+#  include "bhp/event.h"
 #  define KW2XRF_NUM   ARRAY_SIZE(kw2xrf_params)
 static kw2xrf_t kw2xrf_dev[KW2XRF_NUM];
 static bhp_event_t kw2xrf_bhp[KW2XRF_NUM];
@@ -58,6 +59,7 @@ static bhp_event_t kw2xrf_bhp[KW2XRF_NUM];
 #if defined(MODULE_MRF24J40)
 #  include "mrf24j40.h"
 #  include "mrf24j40_params.h"
+#  include "bhp/event.h"
 #  define MRF24J40_NUM    ARRAY_SIZE(mrf24j40_params)
 static mrf24j40_t mrf24j40_dev[MRF24J40_NUM];
 static bhp_event_t mrf24j40_bhp[MRF24J40_NUM];
@@ -76,7 +78,7 @@ static bhp_event_t mrf24j40_bhp[MRF24J40_NUM];
  *
  * @retval number of initialized interfaces (should always be one)
  */
-static inline int ieee802154_radio_init(ieee802154_dev_t *dev, int index, event_queue_t *evq)
+static inline int ieee802154_radio_init(ieee802154_dev_t *dev, unsigned index, event_queue_t *evq)
 {
     (void)dev;
     (void)index;
