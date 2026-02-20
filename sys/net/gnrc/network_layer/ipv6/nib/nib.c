@@ -94,9 +94,9 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                           _nib_onl_entry_t *entry);
 
 static void _handle_pfx_timeout(_nib_offl_entry_t *pfx);
-static void _handle_rtr_timeout(_nib_dr_entry_t *router);
 static void _handle_snd_na(gnrc_pktsnip_t *pkt);
 /* needs to be exported for 6LN's ARO handling */
+void _handle_rtr_timeout(_nib_dr_entry_t *router);
 void _handle_search_rtr(gnrc_netif_t *netif);
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
 static void _handle_rdnss_timeout(sock_udp_ep_t *dns_server);
@@ -126,7 +126,7 @@ void gnrc_ipv6_nib_init(void)
     for (evtimer_event_t *ptr = _nib_evtimer.events;
          (ptr != NULL) && (tmp = (ptr->next), 1);
          ptr = tmp) {
-        evtimer_del((evtimer_t *)(&_nib_evtimer), ptr);
+         evtimer_del(&_nib_evtimer, ptr);
     }
     _nib_init();
     _nib_release();
@@ -498,62 +498,98 @@ void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type)
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
         case GNRC_IPV6_NIB_SND_UC_NS:
         case GNRC_IPV6_NIB_SND_MC_NS:
+            DEBUG("nib: event %s, ctx=neighbor %p, time=%"PRIu32"ms\n",
+                  type == GNRC_IPV6_NIB_SND_UC_NS ? "GNRC_IPV6_NIB_SND_UC_NS"
+                                                  : "GNRC_IPV6_NIB_SND_MC_NS",
+                  (void *)ctx, evtimer_now_msec());
             _handle_snd_ns(ctx);
             break;
         case GNRC_IPV6_NIB_REACH_TIMEOUT:
         case GNRC_IPV6_NIB_DELAY_TIMEOUT:
+            DEBUG("nib: event %s, ctx=neighbor %p, time=%"PRIu32"ms\n",
+                   type == GNRC_IPV6_NIB_REACH_TIMEOUT ? "GNRC_IPV6_NIB_REACH_TIMEOUT"
+                                                       : "GNRC_IPV6_NIB_DELAY_TIMEOUT",
+                   (void *)ctx, evtimer_now_msec());
             _handle_state_timeout(ctx);
             break;
         case GNRC_IPV6_NIB_RECALC_REACH_TIME:
+            DEBUG("nib: event GNRC_IPV6_NIB_RECALC_REACH_TIME, ctx=%p, time=%"PRIu32"ms\n",
+                  ctx, evtimer_now_msec());
             _recalc_reach_time(ctx);
             break;
 #endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
         case GNRC_IPV6_NIB_SND_NA:
+            DEBUG("nib: event GNRC_IPV6_NIB_SND_NA, ctx=packet %p, time=%"PRIu32"ms\n",
+                  ctx, evtimer_now_msec());
             _handle_snd_na(ctx);
             break;
         case GNRC_IPV6_NIB_SEARCH_RTR:
+            DEBUG("nib: event GNRC_IPV6_NIB_SEARCH_RTR, ctx=interface %"PRIkernel_pid", time=%"PRIu32"ms\n",
+                  ((gnrc_netif_t *)ctx)->pid, evtimer_now_msec());
             _handle_search_rtr(ctx);
             break;
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
         case GNRC_IPV6_NIB_REPLY_RS:
+            DEBUG("nib: event GNRC_IPV6_NIB_REPLY_RS, ctx=host %p, time=%"PRIu32"ms\n",
+                  ctx, evtimer_now_msec());
             _handle_reply_rs(ctx);
             break;
         case GNRC_IPV6_NIB_SND_MC_RA:
+            DEBUG("nib: event GNRC_IPV6_NIB_SND_MC_RA, ctx=interface %"PRIkernel_pid", time=%"PRIu32"ms\n",
+                  ((gnrc_netif_t *)ctx)->pid, evtimer_now_msec());
             _handle_snd_mc_ra(ctx);
             break;
         case GNRC_IPV6_NIB_ROUTE_TIMEOUT:
+            DEBUG("nib: event GNRC_IPV6_NIB_ROUTE_TIMEOUT, ctx=%p, time=%"PRIu32"ms\n",
+                  ctx, evtimer_now_msec());
             _nib_ft_remove(ctx);
             break;
 #endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
         case GNRC_IPV6_NIB_ADDR_REG_TIMEOUT:
+            DEBUG("nib: event GNRC_IPV6_NIB_ADDR_REG_TIMEOUT, ctx=neighbor %p, time=%"PRIu32"ms\n",
+                  ctx, evtimer_now_msec());
             _nib_nc_remove(ctx);
             break;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LR */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
         case GNRC_IPV6_NIB_ABR_TIMEOUT:
+            DEBUG("nib: event GNRC_IPV6_NIB_ABR_TIMEOUT, ctx=address %p, time=%"PRIu32"ms\n",
+                  ctx, evtimer_now_msec());
             _nib_abr_remove(&((_nib_abr_entry_t *)ctx)->addr);
             break;
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
         case GNRC_IPV6_NIB_PFX_TIMEOUT:
+             DEBUG("nib: event GNRC_IPV6_NIB_PFX_TIMEOUT, ctx=ple %p, timer=%"PRIu32"ms\n",
+                   ctx, evtimer_now_msec());
             _handle_pfx_timeout(ctx);
             break;
         case GNRC_IPV6_NIB_RTR_TIMEOUT:
+            DEBUG("nib: event GNRC_IPV6_NIB_RTR_TIMEOUT, ctx=router %p, timeout=%"PRIu32"ms\n",
+                  ctx, evtimer_now_msec());
             _handle_rtr_timeout(ctx);
             break;
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
         case GNRC_IPV6_NIB_REREG_ADDRESS:
+            DEBUG("nib: event GNRC_IPV6_NIB_REREG_ADDRESS, ctx=address %p, time=%"PRIu32"ms\n",
+                  ctx, evtimer_now_msec());
             _handle_rereg_address(ctx);
             break;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
         case GNRC_IPV6_NIB_DAD:
+            DEBUG("nib: event GNRC_IPV6_NIB_DAD, ctx=address %p, time=%"PRIu32"ms\n",
+                  ctx, evtimer_now_msec());
             _handle_dad(ctx);
             break;
         case GNRC_IPV6_NIB_VALID_ADDR:
+            DEBUG("nib: event GNRC_IPV6_NIB_VALID_ADDR, ctx=address %p, time=%"PRIu32"ms\n",
+                  ctx, evtimer_now_msec());
             _handle_valid_addr(ctx);
             break;
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_DNS)
         case GNRC_IPV6_NIB_RDNSS_TIMEOUT:
+            DEBUG("nib: event GNRC_IPV6_NIB_RDNSS_TIMEOUT, ctx=%p, time=%"PRIu32"ms\n",
+                  ctx, evtimer_now_msec());
             _handle_rdnss_timeout(ctx);
 #endif
         default:
@@ -809,28 +845,23 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     }
 #endif  /* !CONFIG_GNRC_IPV6_NIB_6LBR */
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
+    bool new_dr = !(dr = _nib_drl_get(&ipv6->src, netif->pid));
+    (void)new_dr;
     if (!gnrc_netif_is_6lbr(netif) && rtr_adv->ltime.u16 != 0) {
         uint16_t rtr_ltime = byteorder_ntohs(rtr_adv->ltime);
-
-        dr = _nib_drl_add(&ipv6->src, netif->pid);
-        if (dr != NULL) {
-            _evtimer_add(dr, GNRC_IPV6_NIB_RTR_TIMEOUT, &dr->rtr_timeout,
-                         rtr_ltime * MS_PER_SEC);
-        }
-        else {
+        if (!dr && !(dr = _nib_drl_add(&ipv6->src, netif->pid))) {
             DEBUG("nib: default router list is full. Ignoring RA from %s\n",
-                  ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
+                    ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
             return;
         }
+        _evtimer_add(dr, GNRC_IPV6_NIB_RTR_TIMEOUT, &dr->rtr_timeout,
+                     rtr_ltime * MS_PER_SEC);
         /* UINT16_MAX * 1000 < UINT32_MAX so there are no overflows */
         next_timeout = _min(next_timeout, rtr_ltime * MS_PER_SEC);
     }
-    else {
-        dr = _nib_drl_get(&ipv6->src, netif->pid);
-        if (dr != NULL) {
-            DEBUG("nib: router lifetime was 0. Removing router and routes via it.\n");
-            _handle_rtr_timeout(dr);
-        }
+    else if (rtr_adv->ltime.u16 == 0 && dr) {
+        DEBUG("nib: router lifetime was 0. Removing router and routes via it.\n");
+        _handle_rtr_timeout(dr);
         dr = NULL;
     }
     if (rtr_adv->cur_hl != 0) {
@@ -852,18 +883,6 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     if (rtr_adv->retrans_timer.u32 != 0) {
         netif->ipv6.retrans_time = byteorder_ntohl(rtr_adv->retrans_timer);
     }
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
-    if ((dr != NULL) && gnrc_netif_is_6ln(netif) &&
-        !gnrc_netif_is_6lbr(netif)) {
-        /* (register addresses already assigned but not valid yet)*/
-        for (int i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
-            if ((netif->ipv6.addrs_flags[i] != 0) &&
-                (netif->ipv6.addrs_flags[i] != GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID)) {
-                _handle_rereg_address(&netif->ipv6.addrs[i]);
-            }
-        }
-    }
-#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
     tmp_len = icmpv6_len - sizeof(ndp_rtr_adv_t);
     FOREACH_OPT(rtr_adv, opt, tmp_len) {
         switch (opt->type) {
@@ -926,6 +945,17 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     if (dr == NULL) {
         return;
     }
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
+    /* The host triggers sending NS messages containing an ARO when a new
+       address is configured, when it discovers a new default router, or
+       well before the Registration Lifetime expires.
+       [RFC 6775](https://datatracker.ietf.org/doc/html/rfc6775#section-5.5.1) */
+    else if (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_6lbr(netif)) {
+        if (new_dr && _nib_drl_get(NULL, netif->pid) == dr) {
+            _handle_rereg_addresses_netif(netif);
+        }
+    }
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
 #if IS_ACTIVE(MODULE_DHCPV6_CLIENT)
     uint8_t current_conf_mode = dhcpv6_client_get_conf_mode();
     if (rtr_adv->flags & NDP_RTR_ADV_FLAGS_M) {
@@ -944,7 +974,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     /* stop sending router solicitations
      * see https://tools.ietf.org/html/rfc4861#section-6.3.7 */
     if (!gnrc_netif_is_6lbr(netif)) {
-        evtimer_del(&_nib_evtimer, &netif->ipv6.search_rtr.event);
+        _evtimer_del(&netif->ipv6.search_rtr);
     }
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     if (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_6lbr(netif)) {
@@ -1122,8 +1152,7 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                 return;
             }
             /* cancel validation timer */
-            evtimer_del(&_nib_evtimer,
-                        &tgt_netif->ipv6.addrs_timers[idx].event);
+            _evtimer_del(&tgt_netif->ipv6.addrs_timers[idx]);
             /* _remove_tentative_addr() context switches to `tgt_netif->pid` so
              * release `tgt_netif`. We are done here anyway. */
             gnrc_netif_release(tgt_netif);
@@ -1271,8 +1300,7 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             DEBUG("nib: duplicate address detected, removing target address "
                   "from this interface\n");
             /* cancel validation timer */
-            evtimer_del(&_nib_evtimer,
-                        &tgt_netif->ipv6.addrs_timers[idx].event);
+            _evtimer_del(&tgt_netif->ipv6.addrs_timers[idx]);
             /* _remove_tentative_addr() context switches to `tgt_netif->pid` so
              * release `tgt_netif`. We are done here anyway. */
             gnrc_netif_release(tgt_netif);
@@ -1532,7 +1560,7 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
         return false;
     }
 
-    _probe_nbr(entry, reset);
+    _probe_nbr(entry, reset, NULL);
 
     return false;
 }
@@ -1579,7 +1607,7 @@ static void _handle_pfx_timeout(_nib_offl_entry_t *pfx)
     gnrc_netif_release(netif);
 }
 
-static void _handle_rtr_timeout(_nib_dr_entry_t *router)
+void _handle_rtr_timeout(_nib_dr_entry_t *router)
 {
     if ((router->next_hop != NULL) && (router->next_hop->mode & _DRL)) {
         _nib_offl_entry_t *route = NULL;
@@ -1699,7 +1727,7 @@ static uint32_t _handle_rdnsso(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
             }
         }
         else {
-            evtimer_del(&_nib_evtimer, &_rdnss_timeout.event);
+            _evtimer_del(&_rdnss_timeout);
             _handle_rdnss_timeout(&sock_dns_server);
         }
     }
