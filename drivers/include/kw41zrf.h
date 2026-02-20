@@ -1,11 +1,7 @@
 /*
- * Copyright (C) 2017 SKF AB
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 SKF AB
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
-
 #pragma once
 
 /**
@@ -27,6 +23,7 @@
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
 #include "net/gnrc/nettype.h"
+#include "net/ieee802154/radio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -89,6 +86,18 @@ extern "C" {
 #define KW41ZRF_OUTPUT_POWER_MIN       (-19)
 
 /**
+ * @brief   CCA modes
+ */
+#define KW41ZRF_CCATYPE_MODE1               (1U)  /**< CCA Mode 1 - Energy */
+#define KW41ZRF_CCATYPE_MODE2               (2U)  /**< CCA Mode 2 - Carrier Sense */
+#define KW41ZRF_CCATYPE_MODE3               (3U)  /**< CCA Mode 3 - Combined */
+
+/**
+ * @brief Maximum number of boot retries for the KW41Z radio
+ */
+#define KW41ZRF_MAX_BOOT_RETRIES    (9)
+
+/**
  * @brief ISR callback function type
  */
 typedef void (*kw41zrf_cb_t)(void *arg);
@@ -99,66 +108,59 @@ typedef void (*kw41zrf_cb_t)(void *arg);
  * @extends netdev_ieee802154_t
  */
 typedef struct {
-    netdev_ieee802154_t netdev; /**< netdev parent struct */
     /**
      * @name   device specific fields
      * @{
      */
-    thread_t *thread;           /**< Network driver thread, for providing feedback from IRQ handler */
-    uint32_t tx_warmup_time;    /**< TX warmup time, in event timer ticks */
-    uint32_t rx_warmup_time;    /**< RX warmup time, in event timer ticks */
-    uint32_t rf_osc_en_idle;    /**< RF_OSC_EN bits setting when RF module is in standby */
-    int16_t tx_power;           /**< The current tx-power setting of the device */
-    uint8_t flags;              /**< Internal driver option flags */
-    uint8_t max_retrans;        /**< Maximum number of frame retransmissions
-                                 *   when no Ack frame is received (macMaxFrameRetries) */
-    uint8_t csma_max_backoffs;  /**< Maximum number of CSMA backoffs when
-                                 *   waiting for channel clear (macMaxCsmaBackoffs) */
-    uint8_t csma_min_be;        /**< Minimum backoff exponent (macMinBe) */
-    uint8_t csma_max_be;        /**< Maximum backoff exponent (macMaxBe) */
-    uint8_t idle_seq;           /**< state to return to after sending */
-    uint8_t cca_result;         /**< Used for passing CCA result from ISR to user */
-    uint8_t csma_be;            /**< Counter used internally by send implementation */
-    uint8_t csma_num_backoffs;  /**< Counter used internally by send implementation */
-    uint8_t num_retrans;        /**< Counter used internally by send implementation */
-    uint32_t backoff_delay;     /**< CSMA delay for the current TX operation */
-    uint32_t tx_timeout;        /**< Used to timeout waiting for ACK during TRX */
-    uint8_t pm_blocked;         /**< true if we have blocked a low power mode in the CPU */
-    uint8_t recv_blocked;       /**< blocks moving to XCVSEQ_RECEIVE to prevent
-                                 *   overwriting the RX buffer before the higher
-                                 *   layers have copied it to system RAM */
+    uint32_t rf_osc_en_idle;                /**< RF_OSC_EN bits setting when RF module is in standby */
+    int16_t tx_power;                       /**< The current tx-power setting of the device */
+    ieee802154_filter_mode_t filter_mode;   /**< Current frame filter mode */
+    uint8_t cca_busy;                       /**< CCA busy flag */
+    ieee802154_tx_status_t tx_status;       /**< Status of a transmission */
+    uint8_t pm_blocked;                     /**< true if we have blocked a low power mode in the CPU */
     /** @} */
 } kw41zrf_t;
 
 /**
- * @brief   Setup an KW41ZRF based device state
+ * @brief   Setup KW41Z in order to be used with the IEEE 802.15.4 Radio HAL
  *
- * @param[out] dev          device descriptor
- * @param[in]  index        index of @p params in a global parameter struct array.
- *                          If initialized manually, pass a unique identifier instead.
+ * @note    This functions MUST be called before @ref kw41zrf_init.
+ *
+ * @param[in] hal  pointer to the HAL descriptor associated to the device.
  */
-void kw41zrf_setup(kw41zrf_t *dev, uint8_t index);
+void kw41zrf_hal_setup(ieee802154_dev_t *hal);
 
 /**
  * @brief   Initialize the given KW41ZRF device
  *
- * @param[out] dev          device descriptor
- * @param[in]  cb           irq callback
- *
  * @return                  0 on success
  * @return                  <0 on error
  */
-int kw41zrf_init(kw41zrf_t *dev, kw41zrf_cb_t cb);
+int kw41zrf_init(void);
 
 /**
  * @brief   Reset radio hardware and restore default settings
  *
- * @param[in] dev           device to reset
- *
  * @return 0 on success
  * @return <0 on initialization failure
  */
-int kw41zrf_reset(kw41zrf_t *dev);
+int kw41zrf_reset_hardware(kw41zrf_t *dev);
+
+
+/**
+ * @brief Print ZLL IRQSTS register state
+ */
+void kw41zrf_print_irq_state(void);
+
+/**
+ * @brief Print ZLL PHY_CTRL register state
+ */
+void kw41zrf_print_phy_ctrl(void);
+
+/**
+ * @brief Print ZLL SEQ_CTRL_STS register state
+ */
+void kw41zrf_print_seq_ctrl_sts(void);
 
 #ifdef __cplusplus
 }
