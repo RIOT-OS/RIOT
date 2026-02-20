@@ -14,6 +14,7 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <errno.h>
 #include <string.h>
 
 #include "bcd.h"
@@ -205,5 +206,35 @@ static int _nvram_write(struct nvram *nvram, const uint8_t *src, uint32_t dst,
     i2c_release(dev->i2c);
     return (res == 0) ? (int)size : -1;
 }
+
+#ifdef MODULE_WALLTIME_IMPL_DS1307
+#include "ds1307_params.h"
+
+static ds1307_t walltime_dev;
+static bool _init_done;
+
+void walltime_impl_init(void)
+{
+    _init_done = !ds1307_init(&walltime_dev, &ds1307_params[0]);
+}
+
+int walltime_impl_get(struct tm *time, uint16_t *ms)
+{
+    if (!_init_done) {
+        return -ENODEV;
+    }
+
+    *ms = 0;
+    return ds1307_get_time(&walltime_dev, time);
+}
+
+int walltime_impl_set(struct tm *time)
+{
+    if (!_init_done) {
+        return -ENODEV;
+    }
+    return ds1307_set_time(&walltime_dev, time);
+}
+#endif
 
 /** @} */
