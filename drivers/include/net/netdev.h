@@ -445,6 +445,8 @@ static inline netdev_type_t netdev_get_default_type(void)
     return NETDEV_TINYUSB;
 #elif defined(MODULE_W5500)
     return NETDEV_W5500;
+#else
+    return NETDEV_ANY;
 #endif
 }
 
