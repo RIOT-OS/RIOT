@@ -123,11 +123,12 @@ void gnrc_netif_init_devs(void)
         extern void auto_init_netdev_tap(void);
         auto_init_netdev_tap();
     }
-
+#if defined(IEEE802154_RADIO_COUNT)
     if (IEEE802154_RADIO_COUNT) {
         extern void auto_init_ieee802154(void);
         auto_init_ieee802154();
     }
+#endif
     if (IS_USED(MODULE_NRF24L01P_NG)) {
         extern void auto_init_nrf24l01p_ng(void);
         auto_init_nrf24l01p_ng();
