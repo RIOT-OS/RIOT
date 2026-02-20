@@ -36,13 +36,13 @@
       defined(CPU_LINE_STM32F071xB) || defined(CPU_LINE_STM32F072xB)    || \
       defined(CPU_LINE_STM32F078xx) || defined(CPU_LINE_STM32F091xC)    || \
       defined(CPU_LINE_STM32F098xx)
-#define VBAT_ADC_SCALE        2
-#define VBAT_ADC_MIN_MV       1650
+#  define VBAT_ADC_SCALE      2
+#  define VBAT_ADC_MIN_MV     1650
 /* f2 */
 #elif defined(CPU_LINE_STM32F205xx) || defined(CPU_LINE_STM32F207xx)    || \
       defined(CPU_LINE_STM32F215xx) || defined(CPU_LINE_STM32F217xx)
-#define VBAT_ADC_SCALE        2
-#define VBAT_ADC_MIN_MV       1800
+#  define VBAT_ADC_SCALE      2
+#  define VBAT_ADC_MIN_MV     1800
 /* f3 */
 #elif defined(CPU_LINE_STM32F301x8) || defined(CPU_LINE_STM32F302x8)    || \
       defined(CPU_LINE_STM32F302xC) || defined(CPU_LINE_STM32F302xE)    || \
@@ -52,8 +52,8 @@
       defined(CPU_LINE_STM32F334x8) || defined(CPU_LINE_STM32F358xx)    || \
       defined(CPU_LINE_STM32F373xC) || defined(CPU_LINE_STM32F378xx)    || \
       defined(CPU_LINE_STM32F398xx)
-#define VBAT_ADC_SCALE        2
-#define VBAT_ADC_MIN_MV       1650
+#  define VBAT_ADC_SCALE      2
+#  define VBAT_ADC_MIN_MV     1650
 /* f4 */
 #elif defined(CPU_LINE_STM32F401xC) || defined(CPU_LINE_STM32F401xE)    || \
       defined(CPU_LINE_STM32F410Cx) || defined(CPU_LINE_STM32F410Rx)    || \
@@ -65,12 +65,12 @@
       defined(CPU_LINE_STM32F437xx) || defined(CPU_LINE_STM32F439xx)    || \
       defined(CPU_LINE_STM32F446xx) || defined(CPU_LINE_STM32F469xx)    || \
       defined(CPU_LINE_STM32F479xx)
-#define VBAT_ADC_SCALE        4
-#define VBAT_ADC_MIN_MV       1650
+#  define VBAT_ADC_SCALE      4
+#  define VBAT_ADC_MIN_MV     1650
 #elif defined(CPU_LINE_STM32F405xx) || defined(CPU_LINE_STM32F407xx)    || \
       defined(CPU_LINE_STM32F415xx) || defined(CPU_LINE_STM32F417xx)
-#define VBAT_ADC_SCALE        2
-#define VBAT_ADC_MIN_MV       1650
+#  define VBAT_ADC_SCALE      2
+#  define VBAT_ADC_MIN_MV     1650
 /* f7 */
 #elif defined(CPU_LINE_STM32F722xx) || defined(CPU_LINE_STM32F723xx)    || \
       defined(CPU_LINE_STM32F730xx) || defined(CPU_LINE_STM32F732xx)    || \
@@ -79,8 +79,8 @@
       defined(CPU_LINE_STM32F756xx) || defined(CPU_LINE_STM32F765xx)    || \
       defined(CPU_LINE_STM32F767xx) || defined(CPU_LINE_STM32F769xx)    || \
       defined(CPU_LINE_STM32F777xx) || defined(CPU_LINE_STM32F779xx)
-#define VBAT_ADC_SCALE        4
-#define VBAT_ADC_MIN_MV       1650
+#  define VBAT_ADC_SCALE      4
+#  define VBAT_ADC_MIN_MV     1650
 /* g0 */
 #elif defined(CPU_LINE_STM32G030xx) || defined(CPU_LINE_STM32G031xx)    || \
       defined(CPU_LINE_STM32G041xx) || defined(CPU_LINE_STM32G050xx)    || \
@@ -88,8 +88,8 @@
       defined(CPU_LINE_STM32G070xx) || defined(CPU_LINE_STM32G071xx)    || \
       defined(CPU_LINE_STM32G081xx) || defined(CPU_LINE_STM32G0B0xx)    || \
       defined(CPU_LINE_STM32G0B1xx) || defined(CPU_LINE_STM32G0C1xx)
-#define VBAT_ADC_SCALE        3
-#define VBAT_ADC_MIN_MV       1550
+#  define VBAT_ADC_SCALE      3
+#  define VBAT_ADC_MIN_MV     1550
 /* g4 */
 #elif defined(CPU_LINE_STM32G431xx) || defined(CPU_LINE_STM32G441xx)    || \
       defined(CPU_LINE_STM32G471xx) || defined(CPU_LINE_STM32G473xx)    || \
@@ -97,8 +97,12 @@
       defined(CPU_LINE_STM32G484xx) || defined(CPU_LINE_STM32G491xx)    || \
       defined(CPU_LINE_STM32G4A1xx) || defined(CPU_LINE_STM32G441xx)    || \
       defined(CPU_LINE_STM32GBK1CB)
-#define VBAT_ADC_SCALE        3
-#define VBAT_ADC_MIN_MV       1550
+#  define VBAT_ADC_SCALE      3
+#  define VBAT_ADC_MIN_MV     1550
+/* h7 */
+#elif defined(CPU_LINE_STM32H723xx) || defined(CPU_LINE_STM32H753xx)
+#  define VBAT_ADC_SCALE      4
+#  define VBAT_ADC_MIN_MV     1360
 /* l4 */
 #elif defined(CPU_LINE_STM32L412xx) || defined(CPU_LINE_STM32L422xx)    || \
       defined(CPU_LINE_STM32L431xx) || defined(CPU_LINE_STM32L432xx)    || \
@@ -113,30 +117,30 @@
       defined(CPU_LINE_STM32L4R7xx) || defined(CPU_LINE_STM32L4R9xx)    || \
       defined(CPU_LINE_STM32L4S5xx) || defined(CPU_LINE_STM32L4S7xx)    || \
       defined(CPU_LINE_STM32L4S9xx)
-#define VBAT_ADC_SCALE        3
-#define VBAT_ADC_MIN_MV       1550
+#  define VBAT_ADC_SCALE      3
+#  define VBAT_ADC_MIN_MV     1550
 /* l5 */
 #elif defined(CPU_LINE_STM32L552xx) || defined(CPU_LINE_STM32L562xx)
-#define VBAT_ADC_SCALE        3
-#define VBAT_ADC_MIN_MV       1550
+#  define VBAT_ADC_SCALE      3
+#  define VBAT_ADC_MIN_MV     1550
 /* u5 */
 #elif defined(CPU_LINE_STM32U575xx) || defined(CPU_LINE_STM32U585xx)
-#define VBAT_ADC_SCALE        4
-#define VBAT_ADC_MIN_MV       1650
+#  define VBAT_ADC_SCALE      4
+#  define VBAT_ADC_MIN_MV     1650
 /* wb */
 #elif defined(CPU_LINE_STM32WB10xx) || defined(CPU_LINE_STM32WB15xx)    || \
       defined(CPU_LINE_STM32WB30xx) || defined(CPU_LINE_STM32WB35xx)    || \
       defined(CPU_LINE_STM32WB50xx) || defined(CPU_LINE_STM32WB55xx)    || \
       defined(CPU_LINE_STM32WB5Mxx)
-#define VBAT_ADC_SCALE        3
-#define VBAT_ADC_MIN_MV       1550
+#  define VBAT_ADC_SCALE      3
+#  define VBAT_ADC_MIN_MV     1550
 /* wl */
 #elif defined(CPU_LINE_STM32WL54xx) || defined(CPU_LINE_STM32WL55xx)    || \
       defined(CPU_LINE_STM32WLE4xx) || defined(CPU_LINE_STM32WLE5xx)
-#define VBAT_ADC_SCALE        3
-#define VBAT_ADC_MIN_MV       1550
+#  define VBAT_ADC_SCALE      3
+#  define VBAT_ADC_MIN_MV     1550
 #else
-#error "VBAT: CPU line is not supported so far."
+#  error "VBAT: CPU line is not supported so far."
 #endif
 /** @} */
 
@@ -145,21 +149,23 @@
  * @{
  */
 #if defined(CPU_LINE_STM32F373xC) || defined(CPU_LINE_STM32F378xx)
-#define ADC_CCR_REG (SYSCFG->CFGR1) /* ADCx_COMMON is also defined */
+#  define ADC_CCR_REG (SYSCFG->CFGR1) /* ADCx_COMMON is also defined */
+#elif defined(CPU_FAM_STM32H7)
+#  define ADC_CCR_REG (ADC3_COMMON->CCR) /* STM32H7 uses ADC3 for VBAT */
 #elif defined(ADC_COMMON)
-#define ADC_CCR_REG (ADC_COMMON->CCR)
+#  define ADC_CCR_REG (ADC_COMMON->CCR)
 #elif defined(ADC1_COMMON)
-#define ADC_CCR_REG (ADC1_COMMON->CCR)
+#  define ADC_CCR_REG (ADC1_COMMON->CCR)
 #elif defined(ADC12_COMMON)
-#define ADC_CCR_REG (ADC12_COMMON->CCR)
+#  define ADC_CCR_REG (ADC12_COMMON->CCR)
 #elif defined(ADC123_COMMON)
-#define ADC_CCR_REG (ADC123_COMMON->CCR)
+#  define ADC_CCR_REG (ADC123_COMMON->CCR)
 #elif defined(ADC12_COMMON_NS)
-#define ADC_CCR_REG (ADC12_COMMON_NS->CCR)
+#  define ADC_CCR_REG (ADC12_COMMON_NS->CCR)
 #elif defined(ADC)
-#define ADC_CCR_REG (ADC->CCR)
+#  define ADC_CCR_REG (ADC->CCR)
 #else
-#error "VBAT: CPU line is not supported so far."
+#  error "VBAT: CPU line is not supported so far."
 #endif
 /** @} */
 
@@ -168,20 +174,20 @@
  * @{
  */
 #if defined(ADC_CCR_VBATEN)
-#define VBAT_ENABLE ADC_CCR_VBATEN;
+#  define VBAT_ENABLE ADC_CCR_VBATEN
 #elif defined(ADC_CCR_VBATE)
-#define VBAT_ENABLE ADC_CCR_VBATE;
+#  define VBAT_ENABLE ADC_CCR_VBATE
 #elif defined(ADC_CCR_VBATSEL)
-#define VBAT_ENABLE ADC_CCR_VBATSEL;
+#  define VBAT_ENABLE ADC_CCR_VBATSEL
 #elif defined(SYSCFG_CFGR1_VBAT)
-#define VBAT_ENABLE SYSCFG_CFGR1_VBAT;
+#  define VBAT_ENABLE SYSCFG_CFGR1_VBAT
 #else
-#error "VBAT: CPU line is not supported so far."
+#  error "VBAT: CPU line is not supported so far."
 #endif
 /** @} */
 
 #ifndef CONFIG_VBAT_ADC_VREF_MV
-#define CONFIG_VBAT_ADC_VREF_MV 3300            /**< ADC reference voltage */
+#  define CONFIG_VBAT_ADC_VREF_MV 3300          /**< ADC reference voltage */
 #endif
 
 /**
@@ -196,7 +202,7 @@ int32_t __attribute__((weak)) vref_mv(void) {
 }
 
 #ifndef VBAT_ADC
-#error "VBAT: Add internal VBAT ADC line to adc_config[] and #define VBAT_ADC."
+#  error "VBAT: Add internal VBAT ADC line to adc_config[] and #define VBAT_ADC."
 #endif
 
 int vbat_init(void)
