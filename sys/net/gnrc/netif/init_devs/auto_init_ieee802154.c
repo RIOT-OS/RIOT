@@ -1,10 +1,6 @@
 /*
- * Copyright (C) 2026 TU Dresden
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- *
+ * SPDX-FileCopyrightText: 2026 Technische Universität Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /*
@@ -30,7 +26,7 @@
  */
 #define IEEE802154_MAC_STACKSIZE       (IEEE802154_STACKSIZE_DEFAULT)
 #ifndef IEEE802154_MAC_PRIO
-#define IEEE802154_MAC_PRIO            (GNRC_NETIF_PRIO)
+#  define IEEE802154_MAC_PRIO            (GNRC_NETIF_PRIO)
 #endif
 
 static netdev_ieee802154_submac_t _rf_netdev[IEEE802154_RADIO_COUNT];
