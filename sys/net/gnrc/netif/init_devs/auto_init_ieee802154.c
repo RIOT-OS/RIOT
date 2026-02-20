@@ -26,24 +26,30 @@
  */
 #define IEEE802154_MAC_STACKSIZE       (IEEE802154_STACKSIZE_DEFAULT)
 #ifndef IEEE802154_MAC_PRIO
-#  define IEEE802154_MAC_PRIO            (GNRC_NETIF_PRIO)
+#  define IEEE802154_MAC_PRIO          (GNRC_NETIF_PRIO)
 #endif
 
+#ifdef IEEE802154_RADIO_COUNT
 static netdev_ieee802154_submac_t _rf_netdev[IEEE802154_RADIO_COUNT];
 static char _rf_stacks[IEEE802154_RADIO_COUNT][IEEE802154_MAC_STACKSIZE];
 static gnrc_netif_t _netif[IEEE802154_RADIO_COUNT];
+#elif IS_USED(MODULE_OPENDSME)
+static netdev_ieee802154_submac_t _rf_netdev;
+static char _rf_stacks[IEEE802154_MAC_STACKSIZE];
+static gnrc_netif_t _netif;
+#endif
 
 void auto_init_ieee802154(void)
 {
     LOG_DEBUG("[auto_init_netif] initializing ieee802154 radio\n");
 
 #if IS_USED(MODULE_OPENDSME)
-    ieee802154_radio_init(&_rf_netdev[0].submac.dev, 0, NULL);
-    gnrc_netif_opendsme_create(&_netif[0], _rf_stacks[0],
+    ieee802154_radio_init(&_rf_netdev.submac.dev, 0, NULL);
+    gnrc_netif_opendsme_create(&_netif, _rf_stacks,
                                 IEEE802154_MAC_STACKSIZE,
                                 IEEE802154_MAC_PRIO, "ieee802154",
-                                (netdev_t*) &_rf_netdev[0].submac.dev);
-#else
+                                (netdev_t*) &_rf_netdev.submac.dev);
+#elif defined(IEEE802154_RADIO_COUNT)
     const netdev_type_t type = netdev_get_default_type();
     for (unsigned i = 0; i < IEEE802154_RADIO_COUNT; i++) {
         netdev_register(&_rf_netdev[i].dev.netdev, type, 0);
