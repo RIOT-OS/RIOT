@@ -181,15 +181,13 @@ extern "C" {
  *          This allows the compiler to optimize the code accordingly even when
  *          `NDEBUG` is set / with `DEVELHELP=0`.
  *
- *          @p cond being false will result in undefined behavior.
+ * @warning When `NDEBUG` is set, @p cond being false will result in undefined
+ *          behavior. (With `NDEBUG` not being set, a failed assertion panic
+ *          will occur on @p cond being false instead.)
  *
  * @param[in] cond  Condition that is guaranteed to be true
  */
-#ifdef NDEBUG
-#  define assume(cond) ((cond) ? (void)0 : UNREACHABLE())
-#else
-#  define assume(cond) assert(cond)
-#endif
+#define assume(cond) ((cond) ? (void)0 : (assert(0), UNREACHABLE()))
 
 /**
  * @brief   Wrapper function to silence "comparison is always false due to limited
