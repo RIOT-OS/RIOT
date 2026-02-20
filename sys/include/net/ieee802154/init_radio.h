@@ -21,6 +21,8 @@
 extern "C" {
 #endif
 
+#include "net/ieee802154/radio.h"
+
 /* include available radios */
 #if defined(MODULE_CC2538_RF)
 #  include "cc2538_rf.h"
@@ -77,6 +79,8 @@ static bhp_event_t mrf24j40_bhp[MRF24J40_NUM];
 static inline int ieee802154_radio_init(ieee802154_dev_t *dev, int index, event_queue_t *evq)
 {
     (void)dev;
+    (void)index;
+    (void)evq;
     int res = 0;
     if (!evq) {
         evq = EVENT_PRIO_HIGHEST;
