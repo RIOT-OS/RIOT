@@ -1,0 +1,2 @@
+# Ficl Target: 32 & 64 bit processors
+FEATURES_REQUIRED_ANY += arch_32bit|arch_64bit
