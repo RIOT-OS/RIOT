@@ -1,6 +1,6 @@
 PKG_NAME = ficl
 PKG_URL = https://github.com/jwsadler58/ficl.git
-PKG_VERSION = 778cc2698dccea620d064ad4119936e18e036a32 # ficl306-42-g778cc26
+PKG_VERSION = 3249ff992fa4800595b9e4f7d1024aa919af08f1 # ficl306-76-g3249ff9
 
 PKG_LICENSE=BSD-3-Clause
 
@@ -10,8 +10,6 @@ CFLAGS += -Wno-array-bounds
 CFLAGS += -Wno-char-subscripts
 CFLAGS += -Wno-cast-align
 CFLAGS += -Wno-format-nonliteral
-CFLAGS += -Wno-shift-negative-value
-CFLAGS += -Wno-sign-compare
 CFLAGS += -Wno-strict-aliasing
 CFLAGS += -Wno-unused-but-set-variable
 
