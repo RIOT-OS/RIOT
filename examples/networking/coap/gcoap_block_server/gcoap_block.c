@@ -23,7 +23,7 @@
 #include "net/gcoap.h"
 #include "shell.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static ssize_t _sha256_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
