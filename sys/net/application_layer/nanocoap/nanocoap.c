@@ -617,20 +617,23 @@ ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_
 
     for (unsigned i = 0; i < resources_numof; i++) {
         const coap_resource_t *resource = &resources[i];
-        if (!(resource->methods & method_flag)) {
-            continue;
-        }
 
         int res = coap_match_path(resource, uri);
         if (res != 0) {
             continue;
         }
 
+        if (!(resource->methods & method_flag)) {
+            return coap_build_reply(pkt, COAP_CODE_METHOD_NOT_ALLOWED,
+                                    resp_buf, resp_buf_len, 0);
+        }
+
         ctx->resource = resource;
         return resource->handler(pkt, resp_buf, resp_buf_len, ctx);
     }
 
-    return coap_build_reply(pkt, COAP_CODE_404, resp_buf, resp_buf_len, 0);
+    return coap_build_reply(pkt, COAP_CODE_PATH_NOT_FOUND,
+                            resp_buf, resp_buf_len, 0);
 }
 
 ssize_t coap_build_reply_header(coap_pkt_t *pkt, unsigned code,
