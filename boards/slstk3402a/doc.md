@@ -66,7 +66,8 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | HWRNG      | &mdash; | TNRG0             |                                | Hardware-based true random number generator              |
 | RTT        | &mdash; | RTCC              |                                | 1 Hz interval. Either RTT or RTC (see below)             |
 | RTC        | &mdash; | RTCC              |                                | 1 Hz interval. Either RTC or RTT (see below)             |
-| SPI        | 0       | USART1            | MOSI: PC6, MISO: PC7, CLK: PC8 |                                                          |
+| SPI        | 0       | USART2            | MOSI: PA6, MISO: PA7, CLK: PA8 |                                                          |
+|            | 1       | USART1            | MOSI: PC6, MISO: PC7, CLK: PC8 | On-board LCD                                             |
 | Timer      | 0       | WTIMER0 + WTIMER1 |                                | WTIMER0 is used as prescaler (must be adjacent)          |
 | Timer      | 1       | TIMER0 + TIMER1   |                                | TIMER0 is used as prescaler (must be adjacent)           |
 |            | 2       | LETIMER0          |                                |                                                          |

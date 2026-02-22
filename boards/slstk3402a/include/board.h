@@ -98,7 +98,7 @@ extern "C" {
  * Connection to the on-board Sharp Memory LCD (LS013B7DH03).
  * @{
  */
-#define DISP_SPI            SPI_DEV(0)
+#define DISP_SPI            SPI_DEV(1)
 #define DISP_COM_PIN        GPIO_PIN(PD, 13)
 #define DISP_CS_PIN         GPIO_PIN(PD, 14)
 #define DISP_EN_PIN         GPIO_PIN(PD, 15)
