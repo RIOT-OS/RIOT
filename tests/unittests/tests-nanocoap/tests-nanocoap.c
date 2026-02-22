@@ -1358,6 +1358,51 @@ static void test_nanocoap__out_of_bounds_option(void)
     TEST_ASSERT_EQUAL_INT(-EBADMSG, coap_parse(&pkt, invalid_msg, sizeof(invalid_msg)));
 }
 
+/* Test if coap_build_reply_header() is implemented correctly. */
+static void test_nanocoap__coap_build_reply_header(void)
+{
+    uint8_t request[] = {
+        /* version = 1, type = CON, Token Len = 3 */
+        (COAP_V1 << 6) | (COAP_TYPE_CON << 4) | 3,
+        COAP_METHOD_GET,
+        0x13, 0x37, /* Message ID = 0x1337 */
+        0xca, 0xfe, 0x42, /* Token = 0xcafe42 */
+         /* Option Delta: 11 (11 + 0 = 11 = URI-Path)
+          * Option Length: 3 */
+        (COAP_OPT_URI_PATH << 4) | (3),
+        'f', 'o', 'o'
+    };
+    uint8_t response[64];
+    const uint8_t response_expected[] = {
+        /* version = 1, type = CON, Token Len = 3 */
+        (COAP_V1 << 6) | (COAP_TYPE_ACK << 4) | 3,
+        COAP_CODE_CONTENT,
+        0x13, 0x37, /* Message ID = 0x1337 */
+        0xca, 0xfe, 0x42, /* Token = 0xcafe42 */
+         /* Option Delta: 12 (12 + 0 = 12 = Content-Format)
+          * Option Length: 1 */
+        (COAP_OPT_CONTENT_FORMAT << 4) | (1),
+        COAP_FORMAT_JSON, /* JSON = 50 => fits in one byte */
+        COAP_PAYLOAD_MARKER,
+    };
+    const size_t response_expected_hdr_len = sizeof(response_expected);
+
+
+    coap_pkt_t pkt;
+    TEST_ASSERT_EQUAL_INT(sizeof(request), coap_parse(&pkt, request, sizeof(request)));
+
+    void *payload = NULL;
+    size_t payload_len_max = SIZE_MAX;
+    ssize_t len = coap_build_reply_header(&pkt, COAP_CODE_CONTENT,
+                                          response, sizeof(response),
+                                          COAP_FORMAT_JSON,
+                                          &payload, &payload_len_max);
+    TEST_ASSERT_EQUAL_INT(response_expected_hdr_len, len);
+    TEST_ASSERT_EQUAL_INT(sizeof(response) - response_expected_hdr_len, payload_len_max);
+    TEST_ASSERT_EQUAL_INT((uintptr_t)response + response_expected_hdr_len, (uintptr_t)payload);
+    TEST_ASSERT(0 == memcmp(response, response_expected, response_expected_hdr_len));
+}
+
 Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -1398,6 +1443,7 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__token_length_ext_269),
         new_TestFixture(test_nanocoap___rst_message),
         new_TestFixture(test_nanocoap__out_of_bounds_option),
+        new_TestFixture(test_nanocoap__coap_build_reply_header),
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);
