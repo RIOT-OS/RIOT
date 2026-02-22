@@ -8,7 +8,7 @@
  * @{
  *
  * @file
- * @brief       Test for using Modbus as a client, server or both.
+ * @brief       Test for using Modbus RTU as a client, server or both.
  *
  * @author      Bas Stottelaar <bas.stottelaar@gmail.com>
  *
@@ -69,10 +69,8 @@ static modbus_server_t server_reg;
 static uint8_t server_read_write[COUNT_REGISTERS * 2];
 static modbus_message_t message_server;
 
-#if TEST_CLIENT_UART != TEST_SERVER_UART
 static modbus_message_t message_server_copy;
 static modbus_message_t message_client_copy;
-#endif
 
 /**
  * @brief   Copy the server message
@@ -83,9 +81,9 @@ static modbus_message_t message_client_copy;
  */
 static void copy_message_server(void)
 {
-#if TEST_CLIENT_UART != TEST_SERVER_UART
-    memcpy(&message_server_copy, &message_server, sizeof(modbus_message_t));
-#endif
+    if (TEST_CLIENT_UART != TEST_SERVER_UART) {
+        memcpy(&message_server_copy, &message_server, sizeof(modbus_message_t));
+    }
 }
 
 /**
@@ -97,9 +95,9 @@ static void copy_message_server(void)
  */
 static void copy_message_client(void)
 {
-#if TEST_CLIENT_UART != TEST_SERVER_UART
-    memcpy(&message_client_copy, &message_client, sizeof(modbus_message_t));
-#endif
+    if (TEST_CLIENT_UART != TEST_SERVER_UART) {
+        memcpy(&message_client_copy, &message_client, sizeof(modbus_message_t));
+    }
 }
 
 /**
@@ -112,7 +110,6 @@ static void copy_message_client(void)
  */
 static bool check_loopback_server(void)
 {
-#if TEST_CLIENT_UART != TEST_SERVER_UART
     if (!loopback) {
         return true;
     }
@@ -132,8 +129,6 @@ static bool check_loopback_server(void)
         puts("Failed, server mismatch (count)");
         return false;
     }
-#endif
-
     return true;
 }
 
@@ -147,7 +142,6 @@ static bool check_loopback_server(void)
  */
 static bool check_loopback_client(void)
 {
-#if TEST_CLIENT_UART != TEST_SERVER_UART
     if (!loopback) {
         return true;
     }
@@ -167,9 +161,6 @@ static bool check_loopback_client(void)
         puts("Failed, client mismatch (count)");
         return false;
     }
-    return true;
-#endif
-
     return true;
 }
 
