@@ -91,35 +91,33 @@ static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, co
 {
     (void) context;
 
-    ssize_t p = 0;
+    size_t rsp_len = 0;
     char rsp[16];
     unsigned code = COAP_CODE_EMPTY;
 
-    /* read coap method type in packet */
-    unsigned method_flag = coap_method2flag(coap_get_code_detail(pkt));
-
-    switch(method_flag) {
+    switch (coap_get_code_raw(pkt)) {
+    default:
     case COAP_GET:
         /* write the response buffer with the internal value */
-        p += fmt_u32_dec(rsp, internal_value);
+        rsp_len += fmt_u32_dec(rsp, internal_value);
         code = COAP_CODE_205;
         break;
     case COAP_PUT:
     case COAP_POST:
-        if (pkt->payload_len < 16) {
-            /* convert the payload to an integer and update the internal value */
-            char payload[16] = { 0 };
-            memcpy(payload, (char*)pkt->payload, pkt->payload_len);
-            internal_value = strtol(payload, NULL, 10);
-            code = COAP_CODE_CHANGED;
+        {
+            uint32_t tmp = scn_u32_dec((const char *)pkt->payload, pkt->payload_len);
+            if (tmp <= UINT8_MAX) {
+                internal_value = tmp;
+                code = COAP_CODE_CHANGED;
+            }
+            else {
+                code = COAP_CODE_REQUEST_ENTITY_TOO_LARGE;
+            }
         }
-        else {
-            code = COAP_CODE_REQUEST_ENTITY_TOO_LARGE;
-        }
+        break;
     }
 
-    return coap_reply_simple(pkt, code, buf, len,
-            COAP_FORMAT_TEXT, (uint8_t*)rsp, p);
+    return coap_reply_simple(pkt, code, buf, len, COAP_FORMAT_TEXT, rsp, rsp_len);
 }
 
 ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
