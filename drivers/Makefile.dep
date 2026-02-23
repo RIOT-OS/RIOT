@@ -12,6 +12,10 @@ ifneq (,$(filter ads1x1%,$(USEMODULE)))
   USEMODULE += ads1x1x
 endif
 
+ifneq (,$(filter amg88%,$(USEMODULE)))
+  USEMODULE += amg88xx
+endif
+
 ifneq (,$(filter apds99%,$(USEMODULE)))
   USEMODULE += apds99xx
 endif
