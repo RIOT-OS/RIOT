@@ -263,26 +263,25 @@ void kw2xrf_set_pan(kw2xrf_t *dev, uint16_t pan)
 
 void kw2xrf_set_addr_short(kw2xrf_t *dev, uint16_t addr)
 {
-    uint8_t val_ar[2];
-    val_ar[0] = (addr >> 8);
-    val_ar[1] = (uint8_t)addr;
+    uint16_t tmp;
+    uint8_t *ap = (uint8_t *)&tmp;
+
+    byteorder_htolebufs(ap, addr);
 #ifdef MODULE_SIXLOWPAN
     /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
      * 0 for unicast addresses */
-    val_ar[0] &= 0x7F;
+    ap[0] &= 0x7F;
 #endif
-    kw2xrf_write_iregs(dev, MKW2XDMI_MACSHORTADDRS0_LSB, val_ar,
+    kw2xrf_write_iregs(dev, MKW2XDMI_MACSHORTADDRS0_LSB, ap,
                        IEEE802154_SHORT_ADDRESS_LEN);
 }
 
 void kw2xrf_set_addr_long(kw2xrf_t *dev, uint64_t addr)
 {
     uint64_t tmp;
-    uint8_t *ap = (uint8_t *)(&tmp);
+    uint8_t *ap = (uint8_t *)&tmp;
 
-    for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
-        ap[i] = (addr >> ((IEEE802154_LONG_ADDRESS_LEN - 1 - i) * 8));
-    }
+    byteorder_htolebufll(ap, addr);
 
     kw2xrf_write_iregs(dev, MKW2XDMI_MACLONGADDRS0_0, ap,
                        IEEE802154_LONG_ADDRESS_LEN);

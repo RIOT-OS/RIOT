@@ -575,7 +575,7 @@ static int _config_addr_filter(ieee802154_dev_t *dev, ieee802154_af_cmd_t cmd, c
             kw2xrf_set_addr_short(kw_dev, byteorder_ntohs(*short_addr));
             break;
         case IEEE802154_AF_EXT_ADDR:
-            kw2xrf_set_addr_long(kw_dev, ext_addr->uint64.u64);
+            kw2xrf_set_addr_long(kw_dev, byteorder_ntohll(ext_addr->uint64));
             break;
         case IEEE802154_AF_PANID:
             kw2xrf_set_pan(kw_dev, *pan_id);
