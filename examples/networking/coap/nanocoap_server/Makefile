@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = nanocoap_server
+APPLICATION ?= nanocoap_server
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
