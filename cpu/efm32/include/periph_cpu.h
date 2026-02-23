@@ -19,6 +19,7 @@
 #include "kernel_defines.h"
 #include "mutex.h"
 
+#include "config.h"
 #include "cpu.h"
 #include "cpu_conf.h"
 
@@ -564,13 +565,6 @@ typedef struct {
 #define LETIMER_MAX_VALUE _LETIMER_TOP_MASK  /**< max timer value of LETIMER peripheral */
 #define TIMER_MAX_VALUE _TIMER_TOP_MASK      /**< max timer value of TIMER peripheral */
 /** @} */
-
-/**
- * @brief   Use LETIMER as the base timer for ztimer
- */
-#ifndef CONFIG_EFM32_ZTIMER_USE_LETIMER
-#define CONFIG_EFM32_ZTIMER_USE_LETIMER   0
-#endif
 
 /**
  * @brief   UART device configuration.
