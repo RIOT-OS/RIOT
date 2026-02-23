@@ -71,6 +71,10 @@ void saul_init_devs(void)
         extern void auto_init_adxl345(void);
         auto_init_adxl345();
     }
+    if (IS_USED(MODULE_AMG88XX)) {
+        extern void auto_init_amg88xx(void);
+        auto_init_amg88xx();
+    }
     if (IS_USED(MODULE_APDS99XX)) {
         extern void auto_init_apds99xx(void);
         auto_init_apds99xx();
