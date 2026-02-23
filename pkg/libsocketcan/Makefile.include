@@ -1,1 +1,4 @@
+# libsocketcan.h is needed by common RIOT code
+INCLUDES += -I"$(PKGDIRBASE)/libsocketcan/include"
+# libsocketcan.h is also needed by cpu/native code
 NATIVEINCLUDES += -I"$(PKGDIRBASE)/libsocketcan/include"
