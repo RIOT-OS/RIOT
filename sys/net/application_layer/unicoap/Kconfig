@@ -38,11 +38,41 @@ menu "CoAP Unified Suite (unicoap)"
 
     menu "Behaviors"
 
+        config UNICOAP_CREATE_THREAD
+            bool "Create dedicated thread for unicoap"
+            default y
+            help
+                When this option is turned on, unicoap_init will call thread_create. The unicoap thread will execute unicoap_loop_run. If you want to run unicoap on another thread (e.g., the main thread), disable this option and call unicoap_loop_run yourself.
+
         config UNICOAP_DEBUG_LOGGING
             bool "Enable debug logging"
+            imply UNICOAP_ASSIST
             default n
             help
-                When enabled, debug logs are printed. Helps trace messages through layers.
+                When enabled, debug logs are printed. Helps trace messages through layers. Debug logging includes assistance diagnostics, such as for API misuse.
+
+        config UNICOAP_ASSIST
+            bool "Enable assistance diagnostics (API misuse, warnings, fixits)"
+            default y if UNICOAP_DEBUG_LOGGING
+            help
+                 This is a lighter version of debug logging, where no trace information and artifacts are logged, but only warnings for missing modules, API misuse, and tips for fixing these. unicoap will not honour safety fences, hence you may run into faulty memory behavior if your API usage deviates from the documented one.
+
+        config UNICOAP_PREVENT_OPTIONAL_RESPONSES
+            bool "Prevent sending optional responses"
+            default n
+            help
+                Server only. Prevents unicoap from sending a response if optional, as indicated by the No-Response option. If enabled, responses prepared by the application will be disregarded and not sent.
+
+        config UNICOAP_SOCK_ZERO_COPY_GUARANTEES
+            bool "Zero-copy sock guarantees"
+            help
+                 If enabled, guarantees @ref sock_udp_recv_buf never returns fragmented data, i.e., the entire datagram is always fully retrieved after the first call to @ref sock_udp_recv_buf. Default value: gnrc_sock_udp is used.
+
+        config UNICOAP_GET_LOCAL_ENDPOINTS
+            bool "Retrieve local endpoint"
+            default y
+            help
+                 Instructs the transport drivers to retrieve the local endpoint a PDU arrives at.
 
     endmenu
 
@@ -57,5 +87,91 @@ menu "CoAP Unified Suite (unicoap)"
             default 3
 
     endmenu
+
+    comment "******************"
+    comment "DRIVERS"
+
+        menu "RFC 7252 messaging (CoAP over UDP and DTLS common)"
+
+        comment "******************"
+        comment "BUFFERS"
+
+        config UNICOAP_RFC7252_TRANSMISSIONS_MAX
+            int "Maximum number of parallel RFC 7252 (re-)transmissions"
+            range 0 9999999
+            default 2
+            help
+                  Maximum number of parallel message IDs that are sent and watched for reset and acknowledgment messages. Must not exceed CONFIG_UNICOAP_MEMOS_MAX.
+
+        config UNICOAP_CARBON_COPIES_MAX
+            int "Carbon copies: Maximum number of PDU copies for retransmissions (and piggybacked ACKs in deduplication)"
+            range 0 9999999
+            default 2
+            help
+                 Used for retransmitting CON messages, and storing ACK messages when deduplicating.
+
+        comment "******************"
+        comment "TIMING"
+
+        config UNICOAP_TIMEOUT_ACK_MS
+            int "ACK timeout -> retransmission"
+            range 1 9999999
+            default 2000
+            help
+                 Initial ACK timeout after which a given message will be retransmitted.
+
+        config UNICOAP_RANDOM_FACTOR_1000
+            int "ACK timeout upper bound factor * 1000"
+            range 1000 9999999
+            default 1500
+            help
+                This represents the ACK_RANDOM_FACTOR (RFC 7252, section 4.2, https://tools.ietf.org/html/rfc7252#section-4.2) multiplied by 1000, to avoid floating point arithmetic.
+
+        config UNICOAP_RETRANSMISSIONS_MAX
+            int "Maximum retransmissions"
+            range 1 32
+            default 4
+            help
+                 Maximum number of retransmissions of a confirmable message
+
+    endmenu
+
+    menu "CoAP over UDP"
+        config UNICOAP_UDP_PORT
+            int "UDP port"
+            default 5683
+            range 1 65535
+    endmenu
+
+    menu "CoAP over DTLS"
+        config UNICOAP_DTLS_PORT
+            int "DTLS port"
+            default 5684
+            range 1 65535
+
+        config UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS
+            int "DTLS handshake timeout (ms)"
+            range 0 9999999
+            default 3000
+            help
+                 Timeout for the DTLS handshake process. Set to 0 for infinite time.
+
+        config UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS
+            int "DTLS minimum number of available sessions at any time"
+            range 0 9999999
+            default 1
+            help
+                 Number of minimum available sessions. If the count of available sessions falls below this threshold, the oldest used session will be closed after a timeout time. Set to 0 to deactivate this feature.
+
+        config UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_MS
+            int "DTLS session triage timeout (ms)"
+            range 0 9999999
+            default 15000
+            help
+                 Timeout for freeing up a session when minimum number of available sessions is not given.
+    endmenu
+
+
+    # unicoap_driver_extension_point
 
 endmenu # unicoap

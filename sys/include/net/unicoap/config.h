@@ -33,12 +33,98 @@
  * @{
  */
 /**
- * @brief Enables debug logging in all `unicoap` source files, except where locally overwritten
+ * @brief A configuration option determining whether a dedicated thread is created for `unicoap`
+ * on initialization
+ *
+ * When this option is turned on, @ref unicoap_init will call @ref thread_create. The `unicoap`
+ * thread will execute @ref unicoap_loop_run. If you want to run unicoap on another thread
+ * (e.g., the main thread), disable this option and call @ref unicoap_loop_run yourself.
  *
  * **Default**: enabled
  */
+#if !defined(CONFIG_UNICOAP_CREATE_THREAD) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_CREATE_THREAD 1
+#endif
+
+/**
+ * @brief Enables debug logging in all `unicoap` source files, except where locally overwritten
+ *
+ * **Default**: disabled
+ *
+ * Debug logging includes assistance diagnostics, such as for API misuse.
+ */
 #if !defined(CONFIG_UNICOAP_DEBUG_LOGGING) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_DEBUG_LOGGING 0
+#endif
+
+/**
+ * @brief Catches and prints API misuse
+ *
+ * This is a lighter version of debug logging, where no trace information and artifacts are logged,
+ * but only warnings for missing modules, API misuse, and tips for fixing these.
+ *
+ * **Default:** enabled if @ref CONFIG_UNICOAP_DEBUG_LOGGING is enabled.
+ *
+ * @warning unicoap will not honour safety fences, hence you may run into faulty memory behavior
+ * if your API usage deviates from the documented one.
+ */
+#if !defined(CONFIG_UNICOAP_ASSIST) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_ASSIST CONFIG_UNICOAP_DEBUG_LOGGING
+#endif
+
+#if CONFIG_UNICOAP_DEBUG_LOGGING && !CONFIG_UNICOAP_ASSIST
+#  warning Disabling CONFIG_UNICOAP_ASSIST when CONFIG_UNICOAP_DEBUG_LOGGING is enabled has no effect because debug logging implies emitting asstistance diagnostics.
+#endif
+/** @} */
+
+/* MARK: - Ports and Sockets */
+/**
+ * @name Ports
+ * @{
+ */
+/**
+ * @brief   Default CoAP port
+ */
+#define UNICOAP_DEFAULT_COAP_PORT  (5683)
+
+/**
+ * @brief   Default CoAP secure port
+ */
+#define UNICOAP_DEFAULT_COAPS_PORT (5684)
+
+/**
+ * @brief UDP port
+ * @ingroup net_unicoap_drivers_udp
+ */
+#if !defined(CONFIG_UNICOAP_UDP_PORT) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_UDP_PORT UNICOAP_DEFAULT_COAP_PORT
+#endif
+
+/**
+ * @brief DTLS port
+ * @ingroup net_unicoap_drivers_dtls
+ */
+#if !defined(CONFIG_UNICOAP_DTLS_PORT) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_DTLS_PORT UNICOAP_DEFAULT_COAPS_PORT
+#endif
+
+/**
+ * @brief If enabled, guarantees @ref sock_udp_recv_buf never returns fragmented data, i.e., the
+ * entire datagram is always fully retrieved after the first call to @ref sock_udp_recv_buf.
+ *
+ * **Default**: Set if `gnrc_sock_udp` module is used (automatically used when UDP driver imported)
+ */
+#if !defined(CONFIG_UNICOAP_SOCK_ZERO_COPY_GUARANTEES) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_SOCK_ZERO_COPY_GUARANTEES IS_USED(MODULE_GNRC_SOCK_UDP)
+#endif
+
+/**
+ * @brief Instructs the transport drivers to retrieve the local endpoint a PDU arrives at.
+ *
+ * **Default**: Enabled
+ */
+#if !defined(CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS 1
 #endif
 /** @} */
 
@@ -105,6 +191,50 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
  * @brief Numbers of bits needed to represent a given ETag's length
  */
 #define UNICOAP_ETAG_LENGTH_FIXED_WIDTH 4
+
+/**
+ * @brief Capacity of internal buffers. Set to maximum PDU size.
+ *
+ * **Default**: 128
+ *
+ * @note In certain situations, such as when sending a request unreliably,
+ * this limit has no effect. Internally, it is used for, but is, in the future, not limited to,
+ * retransmission copies.
+ */
+#if !defined(CONFIG_UNICOAP_PDU_SIZE_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_PDU_SIZE_MAX (128)
+#endif
+
+/**
+ * @brief Maximum length of a resource path string. Used for request matching.
+ *
+ * **Default**: 64 characters
+ *
+ * Normally, you could match a request's path against all resources' paths by comparing
+ * the individual `Uri-Path` options present in the request. Re-parsing the options for each
+ * resource the server hosts becomes expensive fast. Therefore, unicoap serializes the `Uri-Path`
+ * and then does consecutive`strncmp` calls.
+ *
+ * @see @ref unicoap_resource_match_path_string
+ * @see @ref unicoap_resource_match_path_options
+ */
+#if !defined(CONFIG_UNIOCOAP_PATH_LENGTH_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNIOCOAP_PATH_LENGTH_MAX (64)
+#endif
+
+static_assert(CONFIG_UNIOCOAP_PATH_LENGTH_MAX > 0,
+              "CONFIG_UNIOCOAP_PATH_LENGTH_MAX is zero: Path buffer too small");
+
+/**
+ * @brief Maximum size of `/.well-known/core` payload.
+ *
+ * **Default**: 120 bytes
+ *
+ * Allowed to exceed the maximum [PDU size](@ref CONFIG_UNICOAP_PDU_SIZE_MAX)
+ */
+#if !defined(CONFIG_UNICOAP_WELL_KNOWN_CORE_SIZE_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_WELL_KNOWN_CORE_SIZE_MAX (120)
+#endif
 /** @} */
 
 /* MARK: - Timing */
@@ -145,15 +275,227 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
  * @brief See @ref  CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH
  */
 #if (CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH == 3)
-#  define UNICOAP_OBS_TICK_EXPONENT (0)
+#  define UNICOAP_OBSERVE_TICK_EXPONENT (0)
 #elif (CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH == 2)
-#  define UNICOAP_OBS_TICK_EXPONENT (6)
+#  define UNICOAP_OBSERVE_TICK_EXPONENT (6)
 #elif (CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH == 1)
-#  define UNICOAP_OBS_TICK_EXPONENT (14)
+#  define UNICOAP_OBSERVE_TICK_EXPONENT (14)
 #else
 #  error CONFIG_UNICOAP_OBSERVE_VALUE_WIDTH must not exceed 3
 #endif
 /** @} */
+
+/* MARK: - Server */
+/**
+ * @name Server
+ * @{
+ */
+/**
+ * @brief Prevents unicoap from sending a response if optional, as indicated by the `No-Response`
+ * option
+ *
+ * If enabled, responses prepared by the application will be disregarded and not sent.
+ *
+ * **Default**: off
+ */
+#if !defined(CONFIG_UNICOAP_PREVENT_OPTIONAL_RESPONSES) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_PREVENT_OPTIONAL_RESPONSES 0
+#endif
+/**
+ * @brief Determines whether `unicoap` registers a default `/.well-known/core` resource.
+ * @see @ref net_unicoap_server
+ *
+ * **Default**: enabled (1)
+ */
+#if !defined(CONFIG_UNICOAP_WELL_KNOWN_CORE) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_WELL_KNOWN_CORE (1)
+#endif
+/** @} */
+
+/* MARK: - RFC 7252 messaging */
+/**
+ * @name RFC 7252 messaging
+ * @{
+ */
+/**
+ * @brief Used to calculate upper bound for timeout
+ *
+ * **Default**: 1500
+ *
+ * This represents the `ACK_RANDOM_FACTOR`
+ * ([RFC 7252, section 4.2](https://tools.ietf.org/html/rfc7252#section-4.2))
+ * multiplied by 1000, to avoid floating point arithmetic.
+ *
+ * @see
+ * @ref CONFIG_UNICOAP_TIMEOUT_ACK_MS
+ */
+#if !defined(CONFIG_UNICOAP_RANDOM_FACTOR_1000) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_RANDOM_FACTOR_1000 (1500)
+#endif
+
+/** @brief Upper bound of range ACK timeouts are selected from */
+#define UNICOAP_TIMEOUT_ACK_RANGE_UPPER \
+    ((uint32_t)CONFIG_UNICOAP_TIMEOUT_ACK_MS * CONFIG_UNICOAP_RANDOM_FACTOR_1000 / 1000)
+
+/**
+ * @brief Initial ACK timeout after which a given message will be retransmitted.
+ *
+ * **Unit**: milliseconds
+ * **Default:** 2000
+ *
+ * @note The timeout doubles for subsequent retries. To avoid synchronization of retransmissions
+ * across hosts, the actual timeout is chosen randomly between
+ * [the ACK timeout](@ref CONFIG_UNICOAP_TIMEOUT_ACK_MS) and
+ * ([ACK timeout](@ref CONFIG_UNICOAP_TIMEOUT_ACK_MS) `*`
+ * [random factor](@ref CONFIG_UNICOAP_RANDOM_FACTOR_1000) / 1000).
+ */
+#if !defined(CONFIG_UNICOAP_TIMEOUT_ACK_MS) || DOXYGEN
+#  define CONFIG_UNICOAP_TIMEOUT_ACK_MS (2000)
+#endif
+
+/**
+ * @brief Maximum number of retransmissions of a confirmable message
+ *
+ * **Default**: 4
+ */
+#if !defined(CONFIG_UNICOAP_RETRANSMISSIONS_MAX) || DOXYGEN
+#  define CONFIG_UNICOAP_RETRANSMISSIONS_MAX (4)
+#endif
+
+static_assert(CONFIG_UNICOAP_RETRANSMISSIONS_MAX < 32,
+              "CONFIG_UNICOAP_RETRANSMISSIONS_MAX must not exceed 31");
+
+/**
+ * @brief Maximum number of parallel message IDs that are sent and watched for reset and
+ * acknowledgment messages
+ *
+ * **Default**: 2 transmissions
+ */
+#if !defined(CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX 2
+#endif
+
+/* TODO: Client and advanced server features: Limit to exchange-layer state objects */
+
+/**
+ * @brief Maximum number of internal buffers unicoap reserves.
+ *
+ * Used for retransmitting `CON` messages, and storing `ACK` messages when deduplicating.
+ * **Default**: 2
+ *
+ * ## Guidance on common scenarios
+ * Developers of apps that serve responses reliably should consider how many clients will request
+ * the same resource at a time. `CON` responses will need to cached, i.e., a carbon copy will be
+ * created. If the client acknowledges the response directly and no retransmission is needed,
+ * the copy will be deleted. Otherwise, the copy is kept until an `ACK` arrives or the
+ * retransmission counter exceeds @ref CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX.
+ *
+ */
+#if !defined(CONFIG_UNICOAP_CARBON_COPIES_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_CARBON_COPIES_MAX (2)
+#endif
+/** @} */
+
+/* MARK: - DTLS */
+/**
+ * @name DTLS
+ * @{
+ */
+/**
+ * @brief   Timeout for the DTLS handshake process. Set to 0 for infinite time
+ *
+ * **Default**: 3 ms
+ */
+#if !defined(CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS (3 * MS_PER_SEC)
+#endif
+
+/**
+ * @brief   Number of minimum available session slots. If the count of available
+ *          sessions falls below this threshold, the oldest used session will be
+ *          closed after a timeout time. Set to 0 to deactivate this feature.
+ *
+ * **Default**: 1
+ */
+#if !defined(CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS (1)
+#endif
+
+/**
+ * @brief   Timeout for freeing up a session when minimum number of available
+ *          sessions is not given.
+ *
+ * **Default**: 15 ms
+ */
+#if !defined(CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS (15 * MS_PER_SEC)
+#endif
+/** @} */
+
+/* MARK: - Stack sizes */
+/**
+ * @name Stack sizes
+ * @{
+ */
+/**
+ * @brief Stack size for module thread
+ */
+#if !defined(UNICOAP_STACK_SIZE) || defined(DOXYGEN)
+
+/**
+ * @brief Extra stack memory to be used when CoAP over DTLS driver is used
+ */
+#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#    define UNICOAP_DTLS_EXTRA_STACKSIZE (THREAD_STACKSIZE_DEFAULT)
+#  else
+#    define UNICOAP_DTLS_EXTRA_STACKSIZE (0)
+#  endif
+
+/**
+ * @brief Stack memory used by `unicoap` thread
+ *
+ * This parameter is relevant if you disable @ref CONFIG_UNICOAP_CREATE_THREAD
+ */
+#  define UNICOAP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE + \
+       CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY + UNICOAP_DTLS_EXTRA_STACKSIZE)
+#endif
+/** @} */
+
+/* TODO: Put the following into the Automatic Block-wise Transfers Group once available */
+
+/**
+ * @brief Block size unicoap will suggest for Block1 and Block2 transfers
+ *
+ * **Default**: 32 bytes
+ */
+#if !defined(CONFIG_UNICOAP_BLOCK_SIZE) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_BLOCK_SIZE (32)
+#endif
+
+#ifndef DOXYGEN
+#  ifdef CONFIG_UNICOAP_BLOCK_SZX
+#    error CONFIG_UNICOAP_BLOCK_SZX must not be configured manually.
+#  endif
+#  if CONFIG_UNICOAP_BLOCK_SIZE == 1024
+#    define CONFIG_UNICOAP_BLOCK_SZX (6)
+#  elif CONFIG_UNICOAP_BLOCK_SIZE == 512
+#    define CONFIG_UNICOAP_BLOCK_SZX (5)
+#  elif CONFIG_UNICOAP_BLOCK_SIZE == 256
+#    define CONFIG_UNICOAP_BLOCK_SZX (4)
+#  elif CONFIG_UNICOAP_BLOCK_SIZE == 128
+#    define CONFIG_UNICOAP_BLOCK_SZX (3)
+#  elif CONFIG_UNICOAP_BLOCK_SIZE == 64
+#    define CONFIG_UNICOAP_BLOCK_SZX (2)
+#  elif CONFIG_UNICOAP_BLOCK_SIZE == 32
+#    define CONFIG_UNICOAP_BLOCK_SZX (1)
+#  elif CONFIG_UNICOAP_BLOCK_SIZE == 16
+#    define CONFIG_UNICOAP_BLOCK_SZX (0)
+#  else
+#    error CONFIG_UNICOAP_BLOCK_SIZE must be 1024, 512, 256, 128, 64, 32, or 16
+#  endif
+#endif
+
+/* TODO: Add static_asserts once other Block-wise parameters are available */
 
 #ifdef __cplusplus
 extern "C" {

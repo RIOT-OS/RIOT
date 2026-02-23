@@ -26,6 +26,203 @@
 #include "debug.h"
 #include "private.h"
 
+size_t unicoap_path_component_count(const unicoap_pathspec_t* path) {
+    size_t count = 0;
+    assert(path);
+    if (!path->_components) {
+        /* Root */
+        return 0;
+    }
+    for (const char** p = path->_components; *p; p += 1) {
+        count += 1;
+    }
+    return count;
+}
+
+void unicoap_path_print(const unicoap_pathspec_t* path) {
+    assert(path);
+    if (!path->_components || !*path->_components) {
+        printf("/");
+        return;
+    }
+    for (const char** p = path->_components; *p; p += 1) {
+        printf("/%s", *p);
+    }
+}
+
+ssize_t unicoap_path_serialize(const unicoap_pathspec_t* path, char* buffer, size_t capacity) {
+    if (capacity == 0) {
+        return -ENOBUFS;
+    }
+    if (!path->_components || !*path->_components) {
+        *buffer = '/';
+        return 1;
+    }
+    size_t og_capacity = capacity;
+    for (const char** component = path->_components; *component; component += 1) {
+        size_t length = strlen(*component);
+        if (capacity < (length + 1)) {
+            return -ENOBUFS;
+        }
+        capacity -= length + 1;
+        *buffer = '/';
+        buffer += 1;
+        memcpy(buffer, *component, length);
+        buffer += length;
+    }
+
+    return og_capacity - capacity;
+}
+
+bool unicoap_path_is_equal(const unicoap_pathspec_t* lhs, const unicoap_pathspec_t* rhs) {
+    assert(lhs);
+    assert(rhs);
+
+    /* If one is a root path, the other must be, too. */
+    if ((!lhs->_components && (!rhs->_components || !*rhs->_components)) ||
+        (!rhs->_components && (!lhs->_components || !*lhs->_components))) {
+        return true;
+    }
+    /* If just one of them is a root path, they cannot be equal. */
+    if (!lhs->_components || !rhs->_components) {
+        return false;
+    }
+
+    const char** l = lhs->_components;
+    const char** r = rhs->_components;
+
+    while (*l && *r) {
+        if (strcmp(*l, *r) != 0) {
+            break;
+        }
+        l += 1;
+        r += 1;
+    }
+
+    /* If we reached the end of both paths simultaneously (NULL), they are equal. */
+    return !*l && !*r;
+}
+
+/** @brief Returns new length of path excluding trailing slashes */
+static inline size_t _trim_trailing_slashes(const char* path, size_t length) {
+    if (length > 0) {
+        size_t i = length - 1;
+        while (i > 0) {
+            if (path[i] == '/') {
+                i -= 1;
+            } else {
+                break;
+            }
+        }
+        return i + 1;
+    } else {
+        return length;
+    }
+}
+
+bool unicoap_path_matches_string(const unicoap_pathspec_t* path,
+                                 const char* string, size_t string_length, bool match_subtree) {
+
+    assert(path);
+    assert(string);
+
+    char* cursor = (char*)string;
+
+    if (path->_components) {
+        for (const char** component = path->_components; *component; component += 1) {
+            size_t path_component_length = strlen(*component);
+
+            /* Ignore duplicate slashes */
+            while (*cursor == '/') {
+                cursor += 1;
+                string_length -= 1;
+            }
+
+            if (string_length == 0) {
+                return false;
+            }
+
+            /* Find end of string component */
+            size_t string_component_length = string_length;
+            for (size_t i = 0; i < string_length; i += 1) {
+                if (cursor[i] == '/') {
+                    string_component_length = i;
+                    break;
+                }
+            }
+
+            if (path_component_length != string_component_length) {
+                return false;
+            }
+
+            if (strncmp(*component, cursor, path_component_length) != 0) {
+                return false;
+            }
+
+            cursor += string_component_length;
+            string_length -= string_component_length;
+        }
+    }
+
+    if (match_subtree) {
+        /* There may be more path components in the string options.
+         * But this is fine as subpaths are allowed. */
+        return true;
+    } else {
+        /* Make sure we read all path components in the string, i.e., the actual path is not longer
+         * than the given path's. */
+        for (size_t i = 0; i < string_length; i += 1) {
+            if (cursor[i] != '/') {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+bool unicoap_path_matches_options(const unicoap_pathspec_t* path,
+                                  const unicoap_options_t* options, bool match_subtree)
+{
+    assert(path);
+    assert(options);
+    assert(options->entries->data);
+    unicoap_options_iterator_t iterator;
+    /* Disqualifying the const here is fine as the iterator is only used locally and options
+     * are not manipulated. As we only have one iterator concept for both mutable and read-only
+     * borrowing access patterns, this is the only way to go. */
+    unicoap_options_iterator_init(&iterator, (unicoap_options_t*)options);
+
+    const char* uri_component = NULL;
+
+    if (path->_components) {
+        for (const char** component = path->_components; *component; component += 1) {
+            size_t path_component_length = strlen(*component);
+
+            int res = -1;
+            if ((res = unicoap_options_get_next_uri_path_component(&iterator, &uri_component)) < 0) {
+                return false;
+            }
+
+            if (path_component_length != (size_t)res) {
+                return false;
+            }
+
+            if (strncmp(*component, uri_component, path_component_length) != 0) {
+                return false;
+            }
+        }
+    }
+
+    if (match_subtree) {
+        /* There may be more Uri-Path options. But this is fine as subpaths are allowed. */
+        return true;
+    } else {
+        /* Make sure we read all options, i.e., the actual path is not longer than the given
+         * paths's. */
+        return unicoap_options_get_next_uri_path_component(&iterator, &uri_component) == -1;
+    }
+}
+
 static inline void iolist_init(iolist_t* iolist, uint8_t* buffer, size_t size, iolist_t* next)
 {
     iolist->iol_base = buffer;
@@ -207,7 +404,7 @@ ssize_t unicoap_pdu_build_options_and_payload(uint8_t* pdu, size_t capacity,
     }
 }
 
-bool unicoap_message_is_response(uint8_t code)
+bool unicoap_message_code_is_response(uint8_t code)
 {
     switch (unicoap_code_class(code)) {
     case UNICOAP_CODE_CLASS_RESPONSE_SUCCESS:
@@ -466,5 +663,85 @@ void unicoap_options_dump_all(const unicoap_options_t* options)
             printf("%02X", value[i]);
         }
         printf(">\n");
+    }
+}
+
+void unicoap_options_print_uri_path(const unicoap_options_t* options)
+{
+    assert(options);
+    unicoap_options_iterator_t iterator;
+    /* Disqualifying the const here is fine as the iterator is only used locally and options
+     * are not manipulated. As we only have one iterator concept for both mutable and read-only
+     * borrowing access patterns, this is the only way to go. */
+    unicoap_options_iterator_init(&iterator, (unicoap_options_t*)options);
+
+    const char* uri_component = NULL;
+    int res = -2;
+    while ((res = unicoap_options_get_next_uri_path_component(&iterator, &uri_component)) >= 0) {
+        printf("/%.*s", (int)res, uri_component);
+    }
+
+    if (res == -2) {
+        /* Root path, so no Uri-Path options. */
+        printf("/");
+    }
+}
+
+void unicoap_print_protocols(unicoap_proto_set_t protocols)
+{
+    if (likely(protocols == UNICOAP_PROTOCOLS_ALLOW_ALL)) {
+        printf("<all>");
+    }
+    else {
+        printf("[ ");
+        for (unicoap_proto_t p = 1; p < (sizeof(unicoap_proto_t) * 8); p += 1) {
+            if (protocols & UNICOAP_PROTOCOL_FLAG(p)) {
+                printf("%s ", unicoap_string_from_proto(p));
+            }
+        }
+        printf("]");
+    }
+}
+
+void unicoap_print_methods(unicoap_method_set_t methods)
+{
+    printf("[ ");
+    for (unicoap_method_t m = 1; m < (sizeof(unicoap_method_t) * 8); m += 1) {
+        if (methods & UNICOAP_METHOD_FLAG(m)) {
+            printf("%s ", unicoap_string_from_method(m));
+        }
+    }
+    printf("]");
+}
+
+void unicoap_print_resource_flags(unicoap_resource_flags_t flags)
+{
+    printf("[ ");
+    if (flags & UNICOAP_RESOURCE_FLAG_RELIABLE) {
+        printf("RELIABLE ");
+    }
+    if (flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE) {
+        printf("MATCH_SUBTREE ");
+    }
+    printf("]");
+}
+
+void unicoap_assist_emit_diagnostic_missing_driver(unicoap_proto_t proto)
+{
+    if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST) || IS_ACTIVE(ENABLE_DEBUG)) {
+        switch (proto) {
+        case UNICOAP_PROTO_UDP:
+            unicoap_assist(API_ERROR("CoAP over UDP driver missing")
+                           FIXIT("USEMODULE += unicoap_driver_udp"));
+            break;
+
+        case UNICOAP_PROTO_DTLS:
+            unicoap_assist(API_ERROR("CoAP over DTLS driver missing")
+                           FIXIT("USEMODULE += unicoap_driver_dtls"));
+            break;
+
+        default:
+            break;
+        }
     }
 }
