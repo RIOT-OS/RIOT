@@ -4,9 +4,9 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-config EFM32_XTIMER_USE_LETIMER
-    bool "Xtimer uses letimer"
-    depends on CPU_COMMON_EFM32 && USEMODULE_XTIMER
+config EFM32_ZTIMER_USE_LETIMER
+    bool "ztimer uses letimer"
+    depends on CPU_COMMON_EFM32 && USEMODULE_ZTIMER
     default n
     help
-        Xtimer will use EFM32 Low Energy Timer as its low level timer.
+        ztimer will use EFM32 Low Energy Timer as its low level timer.

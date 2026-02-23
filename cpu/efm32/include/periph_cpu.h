@@ -566,10 +566,10 @@ typedef struct {
 /** @} */
 
 /**
- * @brief   Use LETIMER as the base timer for XTIMER
+ * @brief   Use LETIMER as the base timer for ztimer
  */
-#ifndef CONFIG_EFM32_XTIMER_USE_LETIMER
-#define CONFIG_EFM32_XTIMER_USE_LETIMER   0
+#ifndef CONFIG_EFM32_ZTIMER_USE_LETIMER
+#define CONFIG_EFM32_ZTIMER_USE_LETIMER   0
 #endif
 
 /**
