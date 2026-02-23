@@ -1155,11 +1155,7 @@ int nanocoap_server(sock_udp_ep_t *local, void *rsp_buf, size_t rsp_buf_len)
     };
 
     if (!local->port) {
-#if MODULE_NANOCOAP_SERVER_DTLS
-        local->port = COAPS_PORT;
-#else
-        local->port = COAP_PORT;
-#endif
+        local->port = CONFIG_NANOCOAP_SERVER_PORT;
     }
 
     ssize_t res = sock_udp_create(&sock, local, NULL, 0);
@@ -1272,11 +1268,7 @@ kernel_pid_t nanocoap_server_start(const sock_udp_ep_t *local)
 
 void auto_init_nanocoap_server(void)
 {
-    sock_udp_ep_t local = {
-        .port = COAP_PORT,
-        .family = AF_INET6,
-    };
-
+    sock_udp_ep_t local = { .family = AF_INET6 };
     nanocoap_server_start(&local);
 }
 

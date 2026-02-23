@@ -170,6 +170,17 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Default CoAP port for the server to listen on
+ */
+#ifndef CONFIG_NANOCOAP_SERVER_PORT
+#  if MODULE_NANOCOAP_SERVER_DTLS
+#    define CONFIG_NANOCOAP_SERVER_PORT   COAPS_PORT
+#  else
+#    define CONFIG_NANOCOAP_SERVER_PORT   COAP_PORT
+#  endif
+#endif
+
+/**
  * @brief   CoAP server work buf size
  *          Used both for RX and TX, needs to hold payload block + header
  */
