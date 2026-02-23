@@ -110,9 +110,10 @@ static const i2c_conf_t i2c_config[] = {
         .scl_pin = GPIO_PIN(PC, 1),
         .loc = I2C_ROUTELOC0_SDALOC_LOC4 |
                I2C_ROUTELOC0_SCLLOC_LOC4,
+        .speed = I2C_SPEED_NORMAL,
         .cmu = cmuClock_I2C0,
         .irq = I2C0_IRQn,
-        .speed = I2C_SPEED_NORMAL
+        .use_internal_pull_ups = true
     },
     {
         .dev = I2C1,
@@ -120,9 +121,10 @@ static const i2c_conf_t i2c_config[] = {
         .scl_pin = GPIO_PIN(PC, 5),
         .loc = I2C_ROUTELOC0_SDALOC_LOC0 |
                I2C_ROUTELOC0_SCLLOC_LOC0,
+        .speed = I2C_SPEED_NORMAL,
         .cmu = cmuClock_I2C1,
         .irq = I2C1_IRQn,
-        .speed = I2C_SPEED_NORMAL
+        .use_internal_pull_ups = true
     },
     {
         .dev = I2C2,
@@ -130,9 +132,10 @@ static const i2c_conf_t i2c_config[] = {
         .scl_pin = GPIO_PIN(PI, 5),
         .loc = I2C_ROUTELOC0_SDALOC_LOC7 |
                I2C_ROUTELOC0_SCLLOC_LOC7,
+        .speed = I2C_SPEED_NORMAL,
         .cmu = cmuClock_I2C2,
         .irq = I2C2_IRQn,
-        .speed = I2C_SPEED_NORMAL
+        .use_internal_pull_ups = true
     }
 };
 
