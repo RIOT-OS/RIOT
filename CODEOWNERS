@@ -69,6 +69,7 @@ Cargo.*                                     @chrysn
 /dist/tools/dhcpv6-pd_ia/                   @miri64
 
 /drivers/ad7746/                            @leandrolanzieri
+/drivers/amg88xx/                           @basilfx
 /drivers/at24mac/                           @benpicco
 /drivers/at86rf215/                         @benpicco
 /drivers/at86rf2xx/                         @jia200x @miri64
