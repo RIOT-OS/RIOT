@@ -229,9 +229,12 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     UART0_Type *dev = uart_config[uart].dev;
 
     for (size_t i = 0; i < len; i++) {
+        /* wait while the TX FIFO is full (TXFF) before writing the next byte */
+        while (dev->UARTFR & UART0_UARTFR_TXFF_Msk) { }
         dev->UARTDR = data[i];
-        while (!(dev->UARTRIS & UART0_UARTRIS_TXRIS_Msk)) { }
     }
+    /* wait for the TX FIFO and shift register to drain (BUSY cleared) */
+    while (dev->UARTFR & UART0_UARTFR_BUSY_Msk) { }
 }
 
 gpio_t uart_pin_rx(uart_t uart)
