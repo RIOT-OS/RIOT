@@ -190,10 +190,22 @@ extern "C" {
 #endif
 
 /**
+ * @brief Extra stack size for server DTLS support
+ */
+#ifndef CONFIG_NANOCOAP_SERVER_DTLS_EXTRA_STACKSIZE
+#  if MODULE_NANOCOAP_SERVER_DTLS
+#    define CONFIG_NANOCOAP_SERVER_DTLS_EXTRA_STACKSIZE THREAD_STACKSIZE_LARGE
+#  else
+#    define CONFIG_NANOCOAP_SERVER_DTLS_EXTRA_STACKSIZE 0
+#  endif
+#endif
+
+/**
  * @brief   CoAP server thread stack size
  */
 #ifndef CONFIG_NANOCOAP_SERVER_STACK_SIZE
-#  define CONFIG_NANOCOAP_SERVER_STACK_SIZE     THREAD_STACKSIZE_DEFAULT
+#  define CONFIG_NANOCOAP_SERVER_STACK_SIZE     (THREAD_STACKSIZE_DEFAULT + \
+                                                 CONFIG_NANOCOAP_SERVER_DTLS_EXTRA_STACKSIZE)
 #endif
 
 /**
