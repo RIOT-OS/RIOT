@@ -17,14 +17,14 @@
 #include <stdio.h>
 
 #include "net/nanocoap_sock.h"
+#include "shell.h"
+#include "thread.h"
 #include "ztimer.h"
 
 #ifdef MODULE_LWIP_IPV4
 #  include "lwip/netif.h"
 #  include <arpa/inet.h>
 #endif
-
-#define COAP_INBUF_SIZE (256U)
 
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
@@ -92,23 +92,21 @@ int main(void)
     char buffer[16];
     inet_ntop(AF_INET, netif_ip_addr4(iface), buffer, 16);
     printf("%s\"]}\n", buffer);
-
-    /* initialize nanocoap server instance for IPv4*/
-    uint8_t buf[COAP_INBUF_SIZE];
-    sock_udp_ep_t local = { .family=AF_INET };
-    nanocoap_server(&local, buf, sizeof(buf));
 #else
     /* print network addresses */
     printf("{\"IPv6 addresses\": [\"");
     netifs_print_ipv6("\", \"");
     puts("\"]}");
-
-    /* initialize nanocoap server instance for IPv6*/
-    uint8_t buf[COAP_INBUF_SIZE];
-    sock_udp_ep_t local = { .family=AF_INET6 };
-    nanocoap_server(&local, buf, sizeof(buf));
 #endif
 
+#if MODULE_SHELL
+    /* start shell */
+    puts("All up, running the shell now");
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(NULL, line_buf, sizeof(line_buf));
+#else
+    thread_sleep();
+#endif
     /* should be never reached */
     return 0;
 }

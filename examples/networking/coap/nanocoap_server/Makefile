@@ -48,6 +48,7 @@ endif
 
 USEMODULE += sock_udp
 
+USEMODULE += nanocoap_server_auto_init
 USEMODULE += nanocoap_sock
 USEMODULE += nanocoap_resources
 
