@@ -95,14 +95,7 @@ int main(void)
 
     /* initialize nanocoap server instance for IPv4*/
     uint8_t buf[COAP_INBUF_SIZE];
-    sock_udp_ep_t local = {
-#if MODULE_NANOCOAP_SERVER_DTLS
-        .port=COAPS_PORT,
-#else
-        .port=COAP_PORT,
-#endif
-        .family=AF_INET
-    };
+    sock_udp_ep_t local = { .family=AF_INET };
     nanocoap_server(&local, buf, sizeof(buf));
 #else
     /* print network addresses */
@@ -112,14 +105,7 @@ int main(void)
 
     /* initialize nanocoap server instance for IPv6*/
     uint8_t buf[COAP_INBUF_SIZE];
-    sock_udp_ep_t local = {
-#if MODULE_NANOCOAP_SERVER_DTLS
-        .port=COAPS_PORT,
-#else
-        .port=COAP_PORT,
-#endif
-        .family=AF_INET6
-    };
+    sock_udp_ep_t local = { .family=AF_INET6 };
     nanocoap_server(&local, buf, sizeof(buf));
 #endif
 
