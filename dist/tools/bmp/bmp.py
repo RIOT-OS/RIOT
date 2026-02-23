@@ -9,8 +9,6 @@
 # @author   Maximilian Deubel <maximilian.deubel@ovgu.de>
 # @author   Bas Stottelaar <basstottelaar@gmail.com>
 
-# Dependencies are also listed in `requirements.txt` for compatibility reasons.
-#
 # /// script
 # requires-python = ">=3.10"
 # dependencies = [
