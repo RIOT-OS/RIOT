@@ -14,6 +14,12 @@ LWIP_IPV6 ?= 0
 # DTLS support
 USE_DTLS ?= 0
 
+# adapt to your needs
+CFLAGS += -DCONFIG_DTLS_CONTEXT_MAX=1
+CFLAGS += -DCONFIG_DTLS_PEER_MAX=3
+CFLAGS += -DCONFIG_DTLS_HANDSHAKE_MAX=3
+CFLAGS += -DNETQ_MAXCNT=6
+
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += netdev_default
