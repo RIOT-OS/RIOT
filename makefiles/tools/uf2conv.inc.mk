@@ -7,6 +7,13 @@ FFLAGS  ?= $(UF2CONV_FLAGS) $(FLASHFILE) --base $(IMAGE_OFFSET)
 
 PREFLASH_DELAY ?= 2
 
+flashfile-format-check:
+	@if ! echo "$(FLASHFILE)" | grep -E '\.(hex|elf)$$'; then \
+		echo "Please use a flashfile format that includes address information (HEX or ELF)."; \
+		exit 1; \
+	fi
+
+
 # Execute the SoftDevice check. It verifies that the SoftDevice is present if
 # needed, that the versions match and that it is not accidentally overridden.
 uf2-softdevice-check:
@@ -17,6 +24,7 @@ uf2-softdevice-check:
 
 ifeq ($(RIOTTOOLS)/uf2/uf2conv.py,$(FLASHER))
   FLASHDEPS += $(FLASHER)
+  FLASHDEPS += flashfile-format-check
   FLASHDEPS += uf2-softdevice-check
 endif
 
