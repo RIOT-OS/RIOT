@@ -26,8 +26,6 @@ extern "C" {
 #define CPU_DEFAULT_IRQ_PRIO 1u
 /** The RP2350 has 52 IRQs, see cpu/rp2350_common/vectors.c for more details */
 #define CPU_IRQ_NUMOF 52u
-/** The Hazard3 core supports 16 PMP entries */
-#define NUM_PMP_ENTRIES 16u
 /** This tells rp2350_common that we are using the RISC-V core */
 #define RP2350_USE_RISCV 1
 

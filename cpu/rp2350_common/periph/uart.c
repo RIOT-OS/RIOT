@@ -130,8 +130,6 @@ void uart_init_pins(uart_t uart)
     /* We reset UART0 here, so we can be sure it is in a known state */
     _reset_uart(uart);
 
-    UART0_Type *dev = uart_config[uart].dev;
-
     /* Set the UART pins to the correct function */
     *calculate_gpio_io_ctrl_register_addr(uart_config[uart].tx_pin) = FUNCTION_SELECT_UART;
     *calculate_gpio_io_ctrl_register_addr(uart_config[uart].rx_pin) = FUNCTION_SELECT_UART;
