@@ -15,17 +15,17 @@
  * @author          Tom Hert <git@annsann.eu>
  */
 
-
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Table 37 FIFO_ST, 1 if not empty*/
+/** Table 37 FIFO_ST, 1 if not empty*/
 #define SIO_FIFO_READ_VALID_BIT 0
-/* TABLE 37, 1 if not full */
+/** TABLE 37, 1 if not full */
 #define SIO_FIFO_SEND_READY_BIT 1
+/** PSM bit for core 1 */
 #define core1_psm_bit 24
 
 /**

@@ -24,6 +24,7 @@
  #include "periph/init.h"
  #include "periph/uart.h"
  #include "periph_conf.h"
+ #include "compat_layer.h"
 
 /**
  * @brief Initialize the CPU, set IRQ priorities, clocks, peripheral
@@ -33,5 +34,5 @@ void cpu_init(void)
     /* rp2350 common startup routine */
     rp2350_init();
     /* initialize the RISC-V core (Interrupts, FPU, etc) */
-    riscv_init();
+    rp_arch_init();
 }

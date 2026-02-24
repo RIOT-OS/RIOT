@@ -1,9 +1,15 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Tom Hert <git@annsann.eu>
+ * SPDX-FileCopyrightText: 2025 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+#include "compat_layer.h"
 #include "periph_cpu.h"
 #include "multicore.h"
 
 extern uint32_t _estack;  /* End of stack based on cortex_m.ld */
 extern uint32_t _sstack; /* Start of stack based on cortex_m.ld */
-extern uint32_t _isr_vectors;
 
 void core1_reset(void) {
     /* We force core1 off via the PSM, this also puts it into reset */
@@ -11,10 +17,11 @@ void core1_reset(void) {
 }
 
 void _core1_trampoline(void) {
-    cortexm_init();
+    rp_arch_init();
 
-    core_1_fn_t function = (core_1_fn_t) core_1_stack[0];
-    void *arg = (void *) core_1_stack[1];
+    uint32_t* core_1_stack_as_u32 = (uint32_t*) (uintptr_t) core_1_stack;
+    core_1_fn_t function = (core_1_fn_t) core_1_stack_as_u32[0];
+    void *arg = (void *) core_1_stack_as_u32[1];
     (*function)(arg);
 }
 
@@ -40,20 +47,8 @@ void core1_init(core_1_fn_t function, void *arg) {
    const uint32_t cmd_sequence[] = {
         0,
         0,
-        1,
-<<<<<<< HEAD
-        /*
-        * This might be a really bad way to do this but I'm a bit unsure how else
-        * to tackle it, the vector_table uses macro magic and I'm unsure how to
-        * get the address, however, the vector table should sit right at the front
-        * of the ROM so *technically* it might be fine
-        */
-        (uint32_t) &_isr_vectors,
-=======
-        /* Get the vector table pointer, this is needed to set the VTOR register on core1 */
-        (uint32_t) rp_get_vector_poiner(),
->>>>>>> 4f7a8d3057 (fixup! cpu/rp2350_arm: multicore support)
-        /*
+        1,        /* Get the vector table pointer, this is needed to set the VTOR register on core1 */
+        (uint32_t) rp_get_vector_poiner(),        /*
          * We allocate a stack "locally" instead of in the linker script
          * since that would require changes to the base cortexm script
          * which sound complicated to do on a per-cpu basis
@@ -75,7 +70,7 @@ void core1_init(core_1_fn_t function, void *arg) {
     /* We iterate through the cmd_sequence till we covered every param
      * (seq does not increase with each loop, thus we need to while loop this)
      */
-    while(seq < 6) {
+    while (seq < 6) {
         uint32_t cmd = cmd_sequence[seq];
         /* If the cmd is 0 we need to drain the READ FIFO first*/
         if (cmd == 0) {
@@ -98,7 +93,7 @@ void core1_init(core_1_fn_t function, void *arg) {
              * is waiting for FIFO space. Though, as I understand it, this shouldn't technically
              * happen since we don't dynamically re-enable core1 (yet :D)
              */
-            __SEV();
+             rp_unblock_core();
         }
 
         /* This is eq. to the SDK multicore_fifo_push_blocking_inline */
@@ -109,7 +104,7 @@ void core1_init(core_1_fn_t function, void *arg) {
         /* Write data since we know we have space */
         SIO->FIFO_WR = cmd;
         /* Send event */
-        __SEV();
+        rp_unblock_core();
 
         /* This is eq. to the SDK multicore_fifo_pop_blocking_inline */
         /* We check whether there are events... */
@@ -119,7 +114,7 @@ void core1_init(core_1_fn_t function, void *arg) {
              * in this scenario as not using WFE causes a double fault crash.
              * https://developer.arm.com/documentation/dui0552/a/the-cortex-m3-instruction-set/miscellaneous-instructions/wfe
              */
-            __WFE();
+             rp_block_core();
         };
 
         /* Get the event since this is our response */

@@ -16,10 +16,11 @@
 
 #include "cpu.h"
 #include "periph_cpu.h"
+#include "compat_layer.h"
 
 void cpu_init(void)
 {
-    cortexm_init();
+    rp_arch_init();
     rp2350_init();
 }
 
