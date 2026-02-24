@@ -54,6 +54,8 @@ size_t ndef_get_capacity(const ndef_t *ndef) {
 #define MAXIMUM_UINT_16_SIZE 6
 /**
  * @brief Prints a 16-bit unsigned integer
+ *
+ * @param[in] n integer to print
  */
 static inline void _print_u16_dec(uint16_t n) {
     char str[MAXIMUM_UINT_16_SIZE];
