@@ -1,14 +1,12 @@
-/*-
- * Implementation by the Keccak, Keyak and Ketje Teams, namely, Guido Bertoni,
- * Joan Daemen, Michaël Peeters, Gilles Van Assche and Ronny Van Keer, hereby
- * denoted as "the implementer".
- *
- * RIOT-OS adaptation by Mathias Tausig
- *
- * This software is released under the Creative Commons CC0 1.0 license.
- * To the extent possible under law, the implementer has waived all copyright
- * and related or neighboring rights to the source code in this file.
- * For more information see: http://creativecommons.org/publicdomain/zero/1.0/
+/*
+ * SPDX-FileCopyrightText: Keccak, Keyak and Ketje Teams
+ * SPDX-FileCopyrightText: Guido Bertoni
+ * SPDX-FileCopyrightText: Joan Daemen
+ * SPDX-FileCopyrightText: Michaël Peeters
+ * SPDX-FileCopyrightText: Gilles Van Assche
+ * SPDX-FileCopyrightText: Ronny Van Keer
+ * SPDX-FileCopyrightText: Mathias Tausig
+ * SPDX-License-Identifier: CC0-1.0
  */
 
 /**
