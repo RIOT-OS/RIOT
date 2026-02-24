@@ -335,6 +335,8 @@ int ndef_parse(const ndef_t *ndef, ndef_record_desc_t *record_descriptors,
 /**
  * @brief Creates an NDEF message from a byte buffer
  *
+ * @note The previous contents of the NDEF message are overwritten.
+ *
  * @param[out]   ndef        NDEF message
  * @param[in]    buffer      Byte buffer
  * @param[in]    buffer_size Size of the buffer
