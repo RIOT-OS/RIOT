@@ -8,17 +8,13 @@
 
 import os
 import sys
-from testrunner import run
+from testrunner import run_check_unittests
 
 
-def testfunc(child):
+if __name__ == "__main__":
     board = os.environ['BOARD']
     # Increase timeout on "real" hardware
     # 16 seconds on `samr21-xpro`
     # >50 seconds on `nrf51dk`
-    timeout = 60 if board not in ['native', 'native32', 'native64'] else -1
-    child.expect(r"OK \(\d+ tests\)", timeout=timeout)
-
-
-if __name__ == "__main__":
-    sys.exit(run(testfunc))
+    timeout = 60 if board not in ['native', 'native32', 'native64'] else 10
+    sys.exit(run_check_unittests(timeout=timeout))
