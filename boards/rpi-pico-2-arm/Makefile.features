@@ -1,0 +1,2 @@
+CPU       := rp2350_arm
+CPU_MODEL := rp2350_cortexm

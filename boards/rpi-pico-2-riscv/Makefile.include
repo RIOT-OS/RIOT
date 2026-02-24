@@ -1,0 +1,8 @@
+PORT_LINUX      ?= /dev/ttyACM0
+
+# JLink has unresolved bugs regarding the RP2350 (as of 23.02.2026)
+# https://forum.segger.com/thread/10038-j-link-edu-not-connecting-to-rp2350
+# https://forum.segger.com/thread/9977-rp2350-extremely-poor-performance-after-flashing
+# ifeq ($(PROGRAMMER),jlink)
+#   JLINK_DEVICE = RP2350_RV32_0
+# endif

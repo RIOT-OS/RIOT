@@ -86,7 +86,8 @@ FEATURES_EXISTING := \
     cpu_nrf53 \
     cpu_nrf9160 \
     cpu_qn908x \
-    cpu_rp2350 \
+    cpu_rp2350_arm \
+    cpu_rp2350_riscv \
     cpu_rpx0xx \
     cpu_sam3 \
     cpu_sam4s \
@@ -258,6 +259,7 @@ FEATURES_EXISTING := \
     periph_wdt \
     periph_wdt_cb \
     periph_wdt_warning_period \
+    periph_xh3irq \
     picolibc \
     pio_i2c \
     puf_sram \

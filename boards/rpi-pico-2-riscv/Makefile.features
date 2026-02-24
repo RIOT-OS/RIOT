@@ -1,0 +1,2 @@
+CPU       := rp2350_riscv
+CPU_MODEL := rp2350_hazard3
