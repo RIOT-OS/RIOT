@@ -76,13 +76,13 @@ To do this, you need to connect the board to your computer
 and use the following command:
 
 ```bash
-PROGRAMMER=openocd BOARD=rpi-pico-2 make flash
+PROGRAMMER=openocd BOARD=rpi-pico-2-arm make flash
 ```
 
 You can then debug your application using GDB with the following command:
 
 ```bash
-PROGRAMMER=openocd BOARD=rpi-pico-2 make debug
+PROGRAMMER=openocd BOARD=rpi-pico-2-arm make debug
 ```
 
 ### Flashing using Picotool
@@ -90,7 +90,7 @@ PROGRAMMER=openocd BOARD=rpi-pico-2 make debug
 Simply connect the board to your computer via USB and use the following command:
 
 ```bash
-BOARD=rpi-pico-2 make flash
+BOARD=rpi-pico-2-arm make flash
 ```
 
 This is the default method for flashing the Raspberry Pi Pico 2.
