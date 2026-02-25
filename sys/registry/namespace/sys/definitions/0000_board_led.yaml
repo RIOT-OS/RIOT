@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=../../../../../dist/tools/registry_gen/schema.json
+# yaml-language-server: $schema=../../../../../dist/tools/registry/schema.json
 id: 0
 name: board_led
 description: Representation of a board LED.
