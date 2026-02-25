@@ -1,0 +1,9 @@
+
+
+config CPU_FAM_U3
+    bool
+    select CPU_STM32
+    select CPU_CORE_CORTEX_M33
+
+config CPU_FAM
+    default "u3" if CPU_FAM_U3

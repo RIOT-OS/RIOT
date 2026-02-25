@@ -291,13 +291,15 @@ else ifeq ($(STM32_TYPE), L)
     endif
   endif
 else ifeq ($(STM32_TYPE), U)
-  ifeq ($(STM32_FAMILY), 5)
+  ifeq ($(STM32_FAMILY), 3)
+     RAM_LEN = 256K
+  else ifeq ($(STM32_FAMILY), 5)
     ifneq (, $(filter $(STM32_MODEL2), 7 8))
       RAM_LEN = 768K
       SRAM4_LEN = 16K
       BACKUP_RAM_ADDR = 0x40036400
       BACKUP_RAM_LEN = 0x2K
-    endif
+     endif
   endif
 else ifeq ($(STM32_TYPE), W)
   ifeq ($(STM32_FAMILY), B)

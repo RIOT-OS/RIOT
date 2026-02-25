@@ -54,7 +54,7 @@
 #define PM_STOP_CONFIG  (PWR_CR1_LPDS | PWR_CR1_FPDS | PWR_CR1_LPUDS)
 #elif defined(CPU_FAM_STM32MP1)
 #define PM_STOP_CONFIG  (0)
-#elif defined(CPU_FAM_STM32U5)
+#elif defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32U3)
 #define PM_STOP_CONFIG  (0)
 #elif defined(CPU_FAM_STM32H7)
 /* Low power deep sleep with SVOS5 Scale 5 and flash in low power mode if in DSTOP */
@@ -82,7 +82,7 @@
 #define PM_STANDBY_CONFIG   (PWR_CR1_PDDS | PWR_CR1_CSBF)
 #elif defined(CPU_FAM_STM32MP1)
 #define PM_STANDBY_CONFIG   (0)
-#elif defined(CPU_FAM_STM32U5)
+#elif defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32U3)
 #define PM_STANDBY_CONFIG   (0)
 #elif defined(CPU_FAM_STM32H7)
     /* Set D1 and D2 domains to enter DStandby */
@@ -95,7 +95,8 @@
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
+    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0) || \
+    defined(CPU_FAM_STM32U3)
 #define PWR_CR_REG     PWR->CR1
 #define PWR_WUP_REG    PWR->CR3
 /* Allow overridable SRAM2 retention mode using CFLAGS */
