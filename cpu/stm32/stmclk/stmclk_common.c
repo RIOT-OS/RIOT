@@ -26,7 +26,7 @@
     defined(CPU_FAM_STM32WL)
 #define REG_PWR_CR          CR1
 #define BIT_CR_DBP          PWR_CR1_DBP
-#elif defined(CPU_FAM_STM32U5)
+#elif defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32U3)
 #define REG_PWR_CR          DBPR
 #define BIT_CR_DBP          PWR_DBPR_DBP
 #elif defined(CPU_FAM_STM32H7)

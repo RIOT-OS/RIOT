@@ -59,9 +59,9 @@ extern "C" {
       defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L4) || \
       defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
       defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5) || \
-      defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32MP1) || \
+      defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32MP1) || \
       defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0) || \
-      defined(CPU_FAM_STM32H7)
+      defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U5)
 #define CLOCK_LSI           (32000U)
 #else
 #error "error: LSI clock speed not defined for your target CPU"
@@ -72,6 +72,7 @@ extern "C" {
         defined(CPU_FAM_STM32L4) || \
         defined(CPU_FAM_STM32L5) || \
         defined(CPU_FAM_STM32U5) || \
+	    defined(CPU_FAM_STM32U3) || \
         defined(CPU_FAM_STM32WB) || \
         defined(CPU_FAM_STM32WL)
             #define APB1_PERIPH_EN              RCC->APB1ENR1
@@ -99,7 +100,8 @@ extern "C" {
 #elif   defined(APB2PERIPH_BASE) || \
         defined(CPU_FAM_STM32F0) || \
         defined(CPU_FAM_STM32L0) || \
-        defined(CPU_FAM_STM32H7)
+        defined(CPU_FAM_STM32H7) || \
+        defined(CPU_FAM_STM32U3) 
             #define APB2_PERIPH_EN              RCC->APB2ENR
 #endif
 
@@ -122,6 +124,8 @@ extern "C" {
 #if     defined(AHBPERIPH_BASE) || \
         defined(CPU_FAM_STM32F3)
             #define AHB_PERIPH_EN               RCC->AHBENR
+#elif   defined(CPU_FAM_STM32U3)
+            #define AHB1_PERIPH_EN              RCC->AHB1ENR2
 #elif   defined(CPU_FAM_STM32MP1)
             /* CPU has AHB1, but no periph enable registers for the bus. */
             #undef AHB1_PERIPH_EN               /* not defined */
@@ -136,7 +140,8 @@ extern "C" {
         defined(CPU_FAM_STM32F3)
             /* CPU has AHB2, but no periph enable registers for the bus. */
             #undef AHB2_PERIPH_EN               /* not defined */
-#elif   defined(CPU_FAM_STM32U5)
+#elif   defined(CPU_FAM_STM32U5) || \
+	    defined(CPU_FAM_STM32U3)
             #define AHB2_PERIPH_EN              RCC->AHB2ENR1
             #define AHB22_PERIPH_EN             RCC->AHB2ENR2
 #elif   defined(CPU_FAM_STM32F4) && defined(RCC_AHB2_SUPPORT)

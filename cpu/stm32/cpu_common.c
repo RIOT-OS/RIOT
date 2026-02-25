@@ -63,6 +63,7 @@ static const uint8_t apbmul[] = {
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32G4) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
+    defined(CPU_FAM_STM32U3) || \
     defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
     [APB12] = 2,
 #endif
@@ -71,6 +72,7 @@ static const uint8_t apbmul[] = {
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32G4) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
+    defined(CPU_FAM_STM32U3) || \
     defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
     [APB12] = 1,
 #endif

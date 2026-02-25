@@ -46,7 +46,7 @@ static gpio_isr_ctx_t isr_ctx[EXTI_NUMOF];
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
     defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0) || \
-    defined(CPU_FAM_STM32H7)
+    defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3) 
 #define EXTI_REG_RTSR       (EXTI->RTSR1)
 #define EXTI_REG_FTSR       (EXTI->FTSR1)
 #define EXTI_REG_PR         (EXTI->PR1)
@@ -269,7 +269,8 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     gpio_init(pin, mode);
 
     /* enable global pin interrupt */
-#if defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5)
+#if defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
+    defined(CPU_FAM_STM32U3)
     NVIC_EnableIRQ(EXTI0_IRQn + pin_num);
 #elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32C0)
@@ -325,7 +326,8 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     EXTI_REG_FTSR |=  ((flank >> 1) << pin_num);
 
 #if defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32C0)
+    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32C0) || \
+    defined(CPU_FAM_STM32U3)
     /* enable specific pin as exti sources */
     EXTI->EXTICR[pin_num >> 2] &= ~(0xf << ((pin_num & 0x03) * 8));
     EXTI->EXTICR[pin_num >> 2] |= (port_num << ((pin_num & 0x03) * 8));
@@ -341,7 +343,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 #if defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5) || \
     defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32MP1) || \
-    defined(CPU_FAM_STM32C0)
+    defined(CPU_FAM_STM32C0) || defined(CPU_FAM_STM32U3)
     /* clear any pending requests */
     EXTI->RPR1 = (1 << pin_num);
     EXTI->FPR1 = (1 << pin_num);
