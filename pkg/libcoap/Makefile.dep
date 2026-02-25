@@ -1,0 +1,11 @@
+USEMODULE += sock_udp
+USEMODULE += sock_aux_local
+USEMODULE += sock_async_event
+
+ifneq (,$(filter libcoap,$(USEPKG)))
+  USEMODULE += libcoap
+endif
+
+ifneq (,$(filter libcoap_oscore,$(USEPKG)))
+  USEMODULE += libcoap_oscore
+endif

@@ -1,0 +1,22 @@
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menu "libcoap_server"
+    depends on USEPKG_LIBCOAP
+
+config LIBCOAP_USE_PSK
+    string "Secret to use for PSK communications"
+    default "secretPSK"
+    depends on USEMODULE_TINYDTLS
+config LIBCOAP_CLIENT_SUPPORT
+    bool "Set to y if ongoing proxy support is required"
+    default n
+if LIBCOAP_CLIENT_SUPPORT
+config LIBCOAP_USE_PSK_ID
+    string "User ID to use for ongoing PSK communications"
+    default "user_abc"
+    depends on USEMODULE_TINYDTLS
+endif # LIBCOAP_CLIENT_SUPPORT
+
+endmenu # libcoap_server

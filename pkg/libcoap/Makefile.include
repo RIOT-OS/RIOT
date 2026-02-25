@@ -1,0 +1,2 @@
+INCLUDES += -I$(PKGDIRBASE)/libcoap \
+            -I$(PKGDIRBASE)/libcoap/include

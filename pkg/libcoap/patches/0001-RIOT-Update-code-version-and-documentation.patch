@@ -1,0 +1,64 @@
+From 8657ad5def1e03a855777687555d38eacde74441 Mon Sep 17 00:00:00 2001
+From: Jon Shallow <supjps-libcoap@jpshallow.com>
+Date: Sat, 13 Dec 2025 16:11:27 +0000
+Subject: [PATCH 1/1] RIOT: Update code version and documentation
+
+---
+ examples/riot/README               | 4 ++--
+ examples/riot/pkg_libcoap/Makefile | 2 +-
+ include/coap3/coap_time.h          | 4 ++++
+ 3 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/examples/riot/README b/examples/riot/README
+index 02fcacff..15a6b2bf 100644
+--- a/examples/riot/README
++++ b/examples/riot/README
+@@ -18,7 +18,7 @@ This will
+ 
+ To run (and/or rebuild) the server application
+ 
+-* cd RIOT/examples-libcoap-server
++* cd RIOT/examples/networking/libcoap/libcoap_server
+ * make RIOT_CI_BUILD=1
+ * make term
+ * (at the shell prompt) coaps start
+@@ -30,7 +30,7 @@ not differ from regular libcoap usage.
+ 
+ To run (and/or rebuild) the client application
+ 
+-* cd RIOT/examples-libcoap-client
++* cd RIOT/examples/networking/libcoap/libcoap_client/
+ * make RIOT_CI_BUILD=1
+ * make term
+ * (at the shell prompt) coapc coap://[ip-6-address]/some/path
+diff --git a/examples/riot/pkg_libcoap/Makefile b/examples/riot/pkg_libcoap/Makefile
+index 13c769b0..ff067df1 100644
+--- a/examples/riot/pkg_libcoap/Makefile
++++ b/examples/riot/pkg_libcoap/Makefile
+@@ -1,6 +1,6 @@
+ PKG_NAME=libcoap
+ PKG_URL=https://github.com/obgm/libcoap
+-PKG_VERSION=0c18ad522887ea70fd3588915e3ee04b633ab3ad
++PKG_VERSION=24db04b45e2c200eba84fc4777bc6d753b24f7cf
+ PKG_LICENSE=BSD-2-Clause
+ 
+ LIBCOAP_BUILD_DIR=$(BINDIR)/pkg/$(PKG_NAME)
+diff --git a/include/coap3/coap_time.h b/include/coap3/coap_time.h
+index c24f9911..b8a1f071 100644
+--- a/include/coap3/coap_time.h
++++ b/include/coap3/coap_time.h
+@@ -227,7 +227,11 @@ coap_time_le(coap_tick_t a, coap_tick_t b) {
+ }
+ 
+ /* Can delay up to 24 hrs before next wakeup (coap_tick_t can be 4 bytes or int64 */
++#if defined(RIOT_VERSION)
++#define COAP_MAX_DELAY_TICKS (24UL * 60 * 60 * COAP_TICKS_PER_SECOND)
++#else /* ! RIOT_VERSION */
+ #define COAP_MAX_DELAY_TICKS (24 * 60 * 60 * COAP_TICKS_PER_SECOND)
++#endif /* ! RIOT_VERSION */
+ 
+ /** @} */
+ 
+-- 
+2.43.0
+

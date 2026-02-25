@@ -60,6 +60,8 @@ Here is a quick overview of the examples available in the RIOT:
 | [gcoap_fileserver](./networking/coap/gcoap_fileserver/README.md) | This example demonstrates the usage of the `gcoap` module to serve files over CoAP. |
 | [gcoap_dtls](./networking/coap/gcoap_dtls/README.md) | This example demonstrates the usage of the `gcoap` module with DTLS. |
 | [nanocoap_server](./networking/coap/nanocoap_server/README.md) | This example demonstrates the usage of the `nanocoap` module, a high-level API for CoAP (Constrained Application Protocol) messaging. |
+| [libcoap_client](./networking/libcoap/libcoap_client/README.md) | This example demonstrates the usage of the `libcoap` module for providing a CoAP client. |
+| [libcoap_server](./networking/libcoap/libcoap_server/README.md) | This example demonstrates the usage of the `libcoap` module for providing a CoAP server. |
 
 ### Bluetooth Low Energy (BLE)
 

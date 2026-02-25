@@ -1,0 +1,17 @@
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menu "tests_libcoap"
+    depends on USEPKG_LIBCOAP
+
+config LIBCOAP_USE_PSK
+    string "Secret to use for PSK communications"
+    default "secretPSK"
+    depends on USEMODULE_TINYDTLS
+config LIBCOAP_USE_PSK_ID
+    string "Identifier (user) to use for PSK communications"
+    default "test_user"
+    depends on USEMODULE_TINYDTLS
+
+endmenu # tests_libcoap
