@@ -243,6 +243,18 @@ extern "C" {
  * @brief   Interface down event
  */
 #define GNRC_IPV6_NIB_IFACE_DOWN            (0x4fd5U)
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES) || defined(DOXYGEN)
+/**
+ * @brief   Temporary address: regenerate
+ *
+ * This message type is for the event of a regeneration of a temporary address.
+ * The expected message context is a valid off-link entry representing the temporary address prefix.
+ *
+ * @see "REGEN_ADVANCE time units before" - https://www.rfc-editor.org/rfc/rfc8981.html#section-3.6
+ */
+#define GNRC_IPV6_NIB_REGEN_TEMP_ADDR       (0x4fd6U)
+#endif
 /** @} */
 
 /**
