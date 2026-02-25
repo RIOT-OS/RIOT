@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RIOT Registry Configuration Schema",
+  "description": "RIOT Registry Schema for runtime configuration",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "The unique identifier of the schema",
+      "type": "integer"
+    },
+    "name": {
+      "description": "The unique name of the schema",
+      "type": "string"
+    },
+    "description": {
+      "description": "Description of the schema",
+      "type": "string"
+    },
+    "items": {
+      "$ref": "#/$defs/schemaItems"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "description",
+    "items"
+  ],
+  "$defs": {
+    "schemaItems": {
+      "description": "Configuration parameters or groups",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The unique identifier of the parameter or group within the schema",
+            "type": "integer"
+          },
+          "name": {
+            "description": "The unique name of the parameter or group within the schema",
+            "type": "string",
+            "not": {
+              "const": "data"
+            }
+          },
+          "description": {
+            "description": "Description of the parameter or group",
+            "type": "string"
+          },
+          "type": {
+            "$ref": "./schema_parameter_type.json"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "group"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "items": {
+                  "$ref": "#/$defs/schemaItems"
+                }
+              },
+              "required": [
+                "items"
+              ]
+            },
+            "else": {
+              "properties": {
+                "constraints": {
+                  "type": "object",
+                  "properties": {
+                    "allowedValues": {
+                      "description": "Only allow specific values",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "forbiddenValues": {
+                      "description": "Forbid specific values",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "minValue": {
+                      "description": "Minimum value",
+                      "type": "integer"
+                    },
+                    "maxValue": {
+                      "description": "Maximum value",
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "oneOf": [
+                    {
+                      "const": "opaque"
+                    },
+                    {
+                      "const": "string"
+                    }
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "size": {
+                  "description": "Size of the parameter value in bytes",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "size"
+              ]
+            }
+          }
+        ],
+        "required": [
+          "id",
+          "name",
+          "description",
+          "type"
+        ]
+      }
+    }
+  }
+}
