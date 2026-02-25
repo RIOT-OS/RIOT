@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=../../../../../dist/tools/registry_gen/schema.json
+# yaml-language-server: $schema=../../../../../dist/tools/registry/schema.json
 id: 1
 name: rgb
 description: Representation of an rgb color.
