@@ -19,14 +19,23 @@ QUIET ?= 1
 TOOLCHAINS_BLACKLIST += llvm
 
 BLOBS += hello-world.fae
+BLOBS += dumper.fae
 
 # Modules to include:
 USEMODULE += shell
 USEMODULE += shell_cmds_default
 USEMODULE += ps
 USEMODULE += saul_default
+USEMODULE += cortexm_svc
+
+FEATURES_REQUIRED += cortexm_mpu
 
 # Use xipfs file system
 USEMODULE += xipfs
+
+# XIPFS MPU support
+CFLAGS += -DXIPFS_ENABLE_SAFE_EXEC_SUPPORT
+# XIPFS MPU ISR stack requirement
+CFLAGS += -DISR_STACKSIZE=1024
 
 include $(RIOTBASE)/Makefile.include

@@ -99,6 +99,13 @@ SECTIONS
         _efixed = .;            /* End of text section */
     } > rom
 
+    .xipfs_shared_api_code_out :
+    {
+        _xipfs_shared_api_code_out_start = .;
+        *(.xipfs_shared_api_code_in*)
+        _xipfs_shared_api_code_out_end = .;
+    } > rom
+
     /*
      * TLS relocations are offsets relative to the address
      * of the first TLS symbol. That means we just need to
@@ -176,7 +183,6 @@ SECTIONS
         *(.data .data.*);
         KEEP (*(SORT(.xfa.*)))
         KEEP (*(.openocd .openocd.*))
-        . = ALIGN(4);
         _erelocate = .;
     } > ram AT> rom
 
@@ -245,3 +251,6 @@ SECTIONS
         KEEP(*(SORT(.flash_writable.*)))
     } > rom
 }
+
+ASSERT((_xipfs_shared_api_code_out_end - _xipfs_shared_api_code_out_start) <= 4096, "XIPFS shared api code does not fit into 4096 bytes");
+
