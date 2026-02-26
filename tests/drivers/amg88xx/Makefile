@@ -1,5 +1,6 @@
 include ../Makefile.drivers_common
 
+USEMODULE += bitfield
 USEMODULE += shell
 USEMODULE += ztimer
 USEMODULE += ztimer_msec

@@ -37,11 +37,11 @@ fast as possible.
 
 ## Expected result
 After successful initialization, a shell is available to interact with the
-sensor.
+sensor. Most notably, the following commands are available to read data from
+the sensor:
 
-* The `read` command reads a single 8x8 thermal frame and displays the values
+* The `read` command reads a single 8x8 thermal frame and prints the values
   in a grid.
-* The `poll` command will do this continuously at the configured interval.
-* The `interrupt` command will configure the sensor to trigger an interrupt
-  when a pixel exceeds a certain threshold, and wait for the interrupt to
-  occur.
+* The `poll [interval]` command does this continuously at the given interval
+  in milliseconds (default: 1000 ms). Use `stop` to cancel.
+* The `temp` command reads the on-chip thermistor temperature.

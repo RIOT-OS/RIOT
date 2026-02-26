@@ -175,8 +175,8 @@ static int _cmd_display(int argc, char **argv)
 
         for (uint16_t y = 0; y < h; y++) {
             for (uint16_t x = 0; x < w; x += ARRAY_SIZE(_pixel_buf)) {
-                uint16_t chunk = (w - x < ARRAY_SIZE(_pixel_buf))
-                               ? (w - x) : ARRAY_SIZE(_pixel_buf);
+                uint16_t chunk = ((unsigned)(w - x) < ARRAY_SIZE(_pixel_buf))
+                               ? (uint16_t)(w - x) : ARRAY_SIZE(_pixel_buf);
                 disp_dev_area_t area = {
                     .x1 = x,
                     .x2 = (uint16_t)(x + chunk - 1),
