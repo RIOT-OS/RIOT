@@ -568,6 +568,9 @@ static inline void nanocoap_sock_close(nanocoap_sock_t *sock)
 /**
  * @brief   Initialize @p state for building a request.
  *
+ * @internal
+ * @warning         This API is intended only for internal use
+ *
  * @param[in,out]   sock        nanocoap socket to send the request from
  * @param[in,out]   state       State to initialize
  * @param[in]       type        Type of the request (CON/NON for UDP/DTLS transport)
@@ -592,6 +595,9 @@ int nanocoap_sock_builder_init_token(nanocoap_sock_t *sock, coap_builder_t *stat
 
 /**
  * @brief   Initialize @p state for building a request.
+ *
+ * @internal
+ * @warning         This API is intended only for internal use
  *
  * @param[in,out]   sock        nanocoap socket to send the request from
  * @param[in,out]   state       State to initialize
