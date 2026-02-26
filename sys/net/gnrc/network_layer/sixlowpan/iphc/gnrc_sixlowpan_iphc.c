@@ -1623,7 +1623,6 @@ static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
     gnrc_pktsnip_t *dispatch, *ptr = pkt->next;
     size_t dispatch_size = 0;
     uint16_t inline_pos = 0;
-    uint8_t nh;
 
     dispatch = NULL;    /* use dispatch as temporary pointer for prev */
     /* determine maximum dispatch size and write protect all headers until
@@ -1668,8 +1667,8 @@ static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
         return NULL;
     }
 
-    nh = ((ipv6_hdr_t *)pkt->next->data)->nh;
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
+    uint8_t nh = ((ipv6_hdr_t *)pkt->next->data)->nh;
     while (_compressible_nh(nh)) {
         ssize_t local_pos = 0;
         if (pkt->next->next == NULL) {
