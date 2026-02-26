@@ -20,6 +20,11 @@ ifneq (,$(OPENOCD_DEBUG_ADAPTER))
   endif
 endif
 
+# Add serial matching command, only if DEBUG_ADAPTER_ID was specified
+ifneq (,$(DEBUG_ADAPTER_ID))
+  OPENOCD_ADAPTER_INIT += -c 'adapter serial $(DEBUG_ADAPTER_ID)'
+endif
+
 # Use the board's custom OpenOCD by default, if present in the file system.
 OPENOCD_CONFIG ?= $(wildcard $(BOARDDIR)/dist/openocd.cfg)
 
