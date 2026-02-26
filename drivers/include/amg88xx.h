@@ -6,15 +6,15 @@
 #pragma once
 
 /**
- * @defgroup    drivers_amg88xx Panasonic AMG88xx Infrared Array Sensor
+ * @defgroup    drivers_amg88xx AMG88xx Infrared Array Sensor
  * @ingroup     drivers_sensors
  * @ingroup     drivers_saul
  * @brief       Driver for Panasonic AMG88xx infrared array sensors.
  *
  * The AMG88xx (Grid-EYE) is a family of 8x8 infrared (thermal) array sensors
  * connected via I2C. It measures temperatures in the range of 0 to 80 or -20
- * to 100 degrees Celsius with a resolution of 0.25 degrees Celsius per pixel
- * (depends on the variant). The on-chip thermistor provides the ambient
+ * to 100 degrees Celsius (depends on the variant) with a resolution of 0.25
+ * degrees Celsius per pixel. The on-chip thermistor provides the ambient
  * temperature with a resolution of 0.0625 degrees Celsius.
  *
  * The sensor outputs a frame of 8x8 pixels, where each pixel represents the
@@ -234,7 +234,8 @@ int amg88xx_get_temperature(const amg88xx_t *dev, int16_t *temperature);
  *
  * Each pixel value is a signed 12-bit value in units of 0.25 deg C.
  *
- * To convert to degrees Celsius, multiply by 0.25.
+ * Use @ref amg88xx_raw_to_temperature to convert a raw pixel value to
+ * centi-degrees Celsius.
  *
  * @param[in]  dev          Device descriptor
  * @param[out] pixels       Buffer for @ref AMG88XX_PIXELS_COUNT pixel values
@@ -242,16 +243,24 @@ int amg88xx_get_temperature(const amg88xx_t *dev, int16_t *temperature);
  * @retval                  0 on success
  * @retval                  -EIO on I2C error
  */
-int amg88xx_get_frame(const amg88xx_t *dev, int16_t *pixels);
+int amg88xx_get_frame(const amg88xx_t *dev, int16_t pixels[AMG88XX_PIXELS_COUNT]);
 
 #if IS_USED(MODULE_PERIPH_GPIO_IRQ) || defined(DOXYGEN)
 /**
  * @brief   Initialize the interrupt pin
  *
+ * The interrupt pin can be used to signal the CPU when the sensor detects
+ * a pixel temperature that exceeds the configured thresholds. The callback
+ * function is called when the interrupt is triggered, with the provided
+ * argument.
+ *
+ * Use @ref amg88xx_set_interrupt and @ref amg88xx_set_interrupt_levels
+ * to enable and configure the interrupt behavior.
+ *
  * @pre     The device must be initialized with @ref amg88xx_init first.
  *
  * @param[in] dev           Device descriptor
- * @param[in] cb            Callback function
+ * @param[in] cb            Callback function when the interrupt is triggered
  * @param[in] arg           Callback argument
  *
  * @retval                  0 on success
@@ -263,6 +272,9 @@ int amg88xx_init_int(amg88xx_t *dev, amg88xx_int_cb_t cb, void *arg);
 
 /**
  * @brief   Enable or disable the interrupt with the given mode
+ *
+ * @note    Use @ref amg88xx_init_int to initialize the interrupt pin and
+ *          callback.
  *
  * @param[in] dev           Device descriptor
  * @param[in] mode          Interrupt mode (absolute or difference)
@@ -291,8 +303,14 @@ int amg88xx_get_interrupt(const amg88xx_t *dev, amg88xx_interrupt_mode_t *mode,
  * @brief   Set the interrupt threshold levels
  *
  * All values are in raw sensor units (0.25 deg C per LSB), using 12-bit
- * sign-magnitude format. For example, a value of 100 corresponds to 25.0 deg C
- * and a value of 40 corresponds to 10.0 deg C.
+ * sign-magnitude format.
+ *
+ * Use @ref amg88xx_temperature_to_raw to convert a temperature in
+ * centi-degrees Celsius to a raw value suitable for the @p upper, @p lower,
+ * and @p hysteresis parameters.
+ *
+ * @note    The interrupt must be enabled with @ref amg88xx_set_interrupt
+ *          before the thresholds have any effect.
  *
  * @param[in] dev           Device descriptor
  * @param[in] upper         Upper threshold level
@@ -308,7 +326,12 @@ int amg88xx_set_interrupt_levels(const amg88xx_t *dev, int16_t upper,
 /**
  * @brief   Get the current interrupt threshold levels
  *
- * All values are in raw sensor units (0.25 deg C per LSB).
+ * All values are in raw sensor units (0.25 deg C per LSB), using 12-bit
+ * sign-magnitude format.
+ *
+ * Use @ref amg88xx_raw_to_temperature to convert the raw values read into
+ * @p upper, @p lower, and @p hysteresis to temperatures in centi-degrees
+ * Celsius.
  *
  * @param[in]  dev          Device descriptor
  * @param[out] upper        Upper threshold level
@@ -333,7 +356,7 @@ int amg88xx_get_interrupt_levels(const amg88xx_t *dev, int16_t *upper,
  * @retval                  0 on success
  * @retval                  -EIO on I2C error
  */
-int amg88xx_get_interrupt_table(const amg88xx_t *dev, uint8_t *table);
+int amg88xx_get_interrupt_table(const amg88xx_t *dev, uint8_t table[8]);
 
 /**
  * @brief   Read the status register
@@ -376,6 +399,39 @@ int amg88xx_clear_status(const amg88xx_t *dev);
  * @retval                  -ENODEV on sensor not found
  */
 int amg88xx_init(amg88xx_t *dev, const amg88xx_params_t *params);
+
+/**
+ * @brief   Convert a raw pixel value to temperature in centi-degrees Celsius
+ *
+ * Pixel values from @ref amg88xx_get_frame are in units of 0.25 deg C per LSB.
+ * This function converts such a value to centi-degrees Celsius (1/100 deg C).
+ *
+ * For example, a value of 100 corresponds to 25.0 deg C and a value of
+ * 40 corresponds to 10.0 deg C.
+ *
+ * @param[in] raw           Raw pixel value (0.25 deg C per LSB)
+ *
+ * @return                  Temperature in centi-degrees Celsius
+ */
+static inline int16_t amg88xx_raw_to_temperature(int16_t raw)
+{
+    return (int16_t)raw * 25;
+}
+
+/**
+ * @brief   Convert a temperature in centi-degrees Celsius to a raw pixel value
+ *
+ * This is the inverse of @ref amg88xx_raw_to_temperature. The result can be
+ * used with @ref amg88xx_set_interrupt_levels.
+ *
+ * @param[in] temperature   Temperature in centi-degrees Celsius
+ *
+ * @return                  Raw pixel value (0.25 deg C per LSB)
+ */
+static inline int16_t amg88xx_temperature_to_raw(int16_t temperature)
+{
+    return (int16_t)(temperature / 25);
+}
 
 #ifdef __cplusplus
 }

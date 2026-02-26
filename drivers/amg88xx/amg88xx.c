@@ -233,14 +233,12 @@ int amg88xx_get_temperature(const amg88xx_t *dev, int16_t *temp)
     return 0;
 }
 
-int amg88xx_get_frame(const amg88xx_t *dev, int16_t *pixels)
+int amg88xx_get_frame(const amg88xx_t *dev, int16_t pixels[AMG88XX_PIXELS_COUNT])
 {
-    uint8_t data[AMG88XX_BYTES_PER_FRAME];
-
     i2c_acquire(AMG88XX_I2C);
 
     if (i2c_read_regs(AMG88XX_I2C, AMG88XX_ADDR, AMG88XX_REG_T01L,
-                      data, AMG88XX_BYTES_PER_FRAME, 0) != 0) {
+                      (uint8_t *)pixels, AMG88XX_BYTES_PER_FRAME, 0) != 0) {
         i2c_release(AMG88XX_I2C);
         DEBUG("[amg88xx] amg88xx_get_frame: cannot read frame\n");
         return -EIO;
@@ -248,8 +246,10 @@ int amg88xx_get_frame(const amg88xx_t *dev, int16_t *pixels)
 
     i2c_release(AMG88XX_I2C);
 
-    for (unsigned i = 0; i < AMG88XX_PIXELS_COUNT; i++) {
-        pixels[i] = _decode_12bit(data[i * 2], data[i * 2 + 1]);
+    uint8_t *raw = (uint8_t *)pixels;
+
+    for (unsigned i = AMG88XX_PIXELS_COUNT; i-- > 0; ) {
+        pixels[i] = _decode_12bit(raw[i * 2], raw[i * 2 + 1]);
     }
 
     return 0;
@@ -382,7 +382,7 @@ int amg88xx_get_interrupt_levels(const amg88xx_t *dev, int16_t *upper,
     return 0;
 }
 
-int amg88xx_get_interrupt_table(const amg88xx_t *dev, uint8_t *table)
+int amg88xx_get_interrupt_table(const amg88xx_t *dev, uint8_t table[8])
 {
     i2c_acquire(AMG88XX_I2C);
 
