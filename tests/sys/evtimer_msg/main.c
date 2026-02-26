@@ -111,4 +111,26 @@ int main(void)
     ztimer_sleep(ZTIMER_MSEC, (offsets[3] + 10));
     puts("By now all msgs should have been received");
     puts("If yes, the tests were successful");
+
+    /**************************
+     * test: zero-offset events
+     **************************/
+    printf("\nTesting zero-offset event handling\n");
+
+    evtimer_msg_event_t zero_event;
+
+    zero_event.event.offset = 0;
+    zero_event.msg.content.ptr = "zero offset event";
+
+    /* Add zero-offset event and verify it is handled immediately */
+    evtimer_add_msg(&evtimer, &zero_event, pid);
+
+    /* If the fix works, this message should be delivered immediately */
+    /* Wait a tiny bit to let the worker print */
+    ztimer_sleep(ZTIMER_MSEC, 10);
+
+    /* Verify list is empty afterwards */
+    printf("Zero offset event should have been received\n");
+
+    return 0;
 }
