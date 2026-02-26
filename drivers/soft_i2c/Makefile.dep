@@ -1,0 +1,9 @@
+FEATURES_REQUIRED += periph_gpio_ll
+FEATURES_REQUIRED_ANY += periph_gpio_ll_open_drain|periph_gpio_ll_switch_dir
+
+USEMODULE += ztimer_usec
+# only used for debugging, but will be garbage collected when not needed
+USEMODULE += tiny_strerror
+
+# by default, auto init the soft I2C
+DEFAULT_MODULE += auto_init_soft_i2c
