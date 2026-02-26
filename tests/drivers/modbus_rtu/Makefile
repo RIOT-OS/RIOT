@@ -1,0 +1,23 @@
+include ../Makefile.drivers_common
+
+USEMODULE += modbus
+USEMODULE += modbus_rtu
+USEMODULE += shell
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
+
+# set default device parameters in case they are undefined
+TEST_BAUDRATE ?= 9600
+TEST_CLIENT_UART ?= 1
+TEST_CLIENT_PIN_RTS ?= GPIO_UNDEF
+TEST_SERVER_UART ?= 2
+TEST_SERVER_PIN_RTS ?= GPIO_UNDEF
+
+# export parameters
+CFLAGS += -DTEST_BAUDRATE=$(TEST_BAUDRATE)
+CFLAGS += -DTEST_CLIENT_UART=$(TEST_CLIENT_UART)
+CFLAGS += -DTEST_CLIENT_PIN_RTS=$(TEST_CLIENT_PIN_RTS)
+CFLAGS += -DTEST_SERVER_UART=$(TEST_SERVER_UART)
+CFLAGS += -DTEST_SERVER_PIN_RTS=$(TEST_SERVER_PIN_RTS)
+
+include $(RIOTBASE)/Makefile.include
