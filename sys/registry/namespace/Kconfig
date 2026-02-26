@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2023-2025 Lasse Rosenow <lasse.rosenow@haw-hamburg.de>
+# SPDX-FileCopyrightText: 2023-2025 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+menuconfig MODULE_REGISTRY_NAMESPACE
+    bool "REGISTRY_NAMESPACE"
+    depends on MODULE_REGISTRY
+    help
+        Namespace module containing default namespaces for the RIOT Registry sys module.
+
+if MODULE_REGISTRY_NAMESPACE
+
+rsource "sys/Kconfig"
+
+endif # MODULE_REGISTRY_NAMESPACE
