@@ -7,9 +7,12 @@ FFLAGS  ?= $(UF2CONV_FLAGS) $(FLASHFILE) --base $(IMAGE_OFFSET)
 
 PREFLASH_DELAY ?= 2
 
+# Enforce FLASHFILE formats that include address information.
+# This ensures correct address offsets even if the flashfile was compile with a different
+# UF2_SOFTDEV value (and thus ROM_OFFSET) than the one that is currently set.
 flashfile-format-check:
 	@if ! echo "$(FLASHFILE)" | grep -E '\.(hex|elf)$$'; then \
-		echo "Please use a flashfile format that includes address information (HEX or ELF)."; \
+		echo "Please use a FLASHFILE format that includes address information (HEX or ELF)."; \
 		exit 1; \
 	fi
 
