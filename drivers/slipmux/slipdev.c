@@ -45,6 +45,7 @@ void slipdev_setup_coap(slipdev_t *dev);
 mutex_t slipdev_mutex = MUTEX_INIT;
 #endif
 
+
 static inline void _slipdev_stdio_add_to_frame(slipdev_t *dev, uint8_t byte)
 {
     if (!IS_USED(MODULE_SLIPDEV_STDIO) ||
@@ -294,13 +295,22 @@ void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index
     dev->config = *params;
     dev->state = 0;
 
-#if IS_USED(MODULE_SLIPDEV_CONFIG)
     /* we only support one coap server at the moment */
     if (index == 0) {
+#if IS_USED(MODULE_SLIPDEV_CONFIG)
         slipdev_setup_coap(dev);
+#endif
+    }
+
+#if IS_USED(MODULE_SLIPDEV_NET)
+    slipdev_setup_net(dev, index);
+#else
+    if (uart_init(dev->config.uart, dev->config.baudrate, _slip_rx_cb,
+                  dev) != UART_OK) {
+        LOG_ERROR("slipdev: error initializing UART %i with baudrate %" PRIu32 "\n",
+                  dev->config.uart, dev->config.baudrate);
     }
 #endif
-    slipdev_setup_net(dev, index);
 }
 
 /** @} */
