@@ -882,17 +882,44 @@ list-ttys:
 doc doc-man doc-latex:
 	$(MAKE) -C $(RIOTBASE) $@
 
+ifeq (, $(DEBUGGER))
+debug:
+	@echo '$$(DEBUGGER) is not set. This means that `make debug` is not'\
+	' supported by your current setup. A common reason is that PROGRAMMER'\
+	' is set to something like flashing via bootloader, where debugging is'\
+	' not possible.'
+	@false
+else
 debug: $(DEBUGDEPS)
 	$(call check_cmd,$(DEBUGGER),Debug program)
 	$(DEBUGGER) $(DEBUGGER_FLAGS)
+endif
 
+ifeq (, $(DEBUGCLIENT))
+debug-client:
+	@echo '$$(DEBUGCLIENT) is not set. This means that `make debug` is not'\
+	' supported by your current setup. A common reason is that PROGRAMMER'\
+	' is set to something like flashing via bootloader, where debugging is'\
+	' not possible.'
+	@false
+else
 debug-client:
 	$(call check_cmd,$(DEBUGCLIENT),Debug client program)
 	$(DEBUGCLIENT) $(DEBUGCLIENT_FLAGS)
+endif
 
+ifeq (, $(DEBUGSERVER))
+debug-server:
+	@echo '$$(DEBUGSERVER) is not set. This means that `make debug` is not'\
+	' supported by your current setup. A common reason is that PROGRAMMER'\
+	' is set to something like flashing via bootloader, where debugging is'\
+	' not possible.'
+	@false
+else
 debug-server:
 	$(call check_cmd,$(DEBUGSERVER),Debug server program)
 	$(DEBUGSERVER) $(DEBUGSERVER_FLAGS)
+endif
 
 ifeq (1,$(EMULATE))
 emulate:
