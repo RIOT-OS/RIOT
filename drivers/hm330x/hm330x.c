@@ -27,12 +27,7 @@
 #include "hm330x_params.h"
 #include "clk.h"
 #include "timex.h"
-
-#if IS_USED(MODULE_ZTIMER_USEC)
-#include "ztimer.h"
-#elif IS_USED(MODULE_XTIMER)
 #include "xtimer.h"
-#endif
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
@@ -132,21 +127,7 @@ void hm330x_reset(hm330x_t *dev)
 {
     if (gpio_is_valid(dev->params.reset_pin)) {
         gpio_clear(dev->params.reset_pin);
-#if IS_USED(MODULE_ZTIMER_USEC)
-        ztimer_sleep(ZTIMER_USEC, HM330X_RESET_TIME_US);
-#elif IS_USED(MODULE_XTIMER)
         xtimer_sleep(HM330X_RESET_TIME_US);
-#else
-        /* each loop iteration is at least 3 instructions, so this tries
-           to approximate the target time based on coreclk(), but
-           a precise time is not needed here */
-        for (uint32_t i = 0;
-             i < HM330X_RESET_TIME_US * (coreclk() / US_PER_SEC / 3);
-             i++) {
-            /* Make sure for loop is not optimized out */
-            __asm__ ("");
-        }
-#endif
         gpio_set(dev->params.reset_pin);
     }
 }
