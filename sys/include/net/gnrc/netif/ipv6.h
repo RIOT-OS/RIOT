@@ -107,6 +107,10 @@ typedef struct {
     netstats_t stats;
 #endif
 #if defined(MODULE_GNRC_IPV6_NIB) || DOXYGEN
+    /**
+     * @brief   IPv6 interface bus event subscription
+     */
+    msg_bus_entry_t netif_sub;
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER) || DOXYGEN
     /**
      * @brief   Route info callback
