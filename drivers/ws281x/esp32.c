@@ -28,6 +28,7 @@
 #include "board.h"
 #include "log.h"
 #include "periph_cpu.h"
+#include "time_units.h"
 
 #include "ws281x.h"
 #include "ws281x_params.h"
