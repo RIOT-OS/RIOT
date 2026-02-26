@@ -98,6 +98,7 @@ ifneq (,$(filter dhcpv6_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter dhcpv6_client,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_dhcpv6_client
   USEMODULE += event
   USEMODULE += event_timeout
   ifneq (,$(filter ztimer,$(USEMODULE)))

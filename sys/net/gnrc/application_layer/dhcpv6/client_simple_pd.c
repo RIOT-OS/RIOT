@@ -24,13 +24,6 @@
 
 #include "net/gnrc/dhcpv6/client/simple_pd.h"
 
-#if IS_USED(MODULE_AUTO_INIT_DHCPV6_CLIENT)
-#error "Module `gnrc_dhcpv6_client_simple_pd` is mutually exclusive to \
-`auto_init_dhcpv6_client`"
-#endif
-
-static char _stack[DHCPV6_CLIENT_STACK_SIZE];
-
 /**
  * @brief   Find upstream network interface
  *
@@ -123,39 +116,25 @@ static void _configure_dhcpv6_client(void)
 /**
  * @brief   The DHCPv6 client thread
  */
-static void *_dhcpv6_cl_simple_pd_thread(void *args)
+static void _dhcpv6_client_simple_pd_init_hook(void)
 {
-    event_queue_t event_queue;
-    gnrc_netif_t *upstream_netif = _find_upstream_netif();
-
-    (void)args;
-    if (upstream_netif == NULL) {
-        LOG_ERROR("DHCPv6: No upstream interface found!\n");
-        return NULL;
-    }
-    _configure_upstream_netif(upstream_netif);
-    /* initialize client event queue */
-    event_queue_init(&event_queue);
-    /* initialize DHCPv6 client on border interface */
-    dhcpv6_client_init(&event_queue, upstream_netif->pid);
     /* configure client to request prefix delegation for WPAN interfaces */
     _configure_dhcpv6_client();
     /* set client configuration mode to stateful */
     dhcpv6_client_set_conf_mode(DHCPV6_CLIENT_CONF_MODE_STATEFUL);
-    /* start DHCPv6 client */
-    dhcpv6_client_start();
-    /* start event loop of DHCPv6 client */
-    event_loop(&event_queue);   /* never returns */
-    return NULL;
 }
 
 void gnrc_dhcpv6_client_simple_pd_init(void)
 {
-    /* start DHCPv6 client thread to request prefix for WPAN */
-    thread_create(_stack, DHCPV6_CLIENT_STACK_SIZE,
-                  DHCPV6_CLIENT_PRIORITY,
-                  0,
-                  _dhcpv6_cl_simple_pd_thread, NULL, "dhcpv6-client");
+    gnrc_netif_t *upstream_netif = _find_upstream_netif();
+
+    if (upstream_netif == NULL) {
+        LOG_ERROR("DHCPv6: No upstream interface found!\n");
+        return ;
+    }
+    _configure_upstream_netif(upstream_netif);
+
+    dhcpv6_client_set_init_hook(_dhcpv6_client_simple_pd_init_hook, upstream_netif->pid);
 }
 
 /** @} */
