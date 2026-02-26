@@ -526,6 +526,10 @@ ifneq (,$(filter nanocoap_server_auto_init,$(USEMODULE)))
   USEMODULE += nanocoap_server
 endif
 
+ifneq (,$(filter nanocoap_server_dtls,$(USEMODULE)))
+  USEMODULE += nanocoap_dtls
+endif
+
 ifneq (,$(filter nanocoap_server_observe,$(USEMODULE)))
   USEMODULE += nanocoap_server_separate
 endif

@@ -33,6 +33,9 @@
 #ifdef MODULE_SOCK_ASYNC_EVENT
 #include "net/sock/async/event.h"
 #endif
+#if MODULE_NANOCOAP_SERVER_DTLS
+#  include "net/sock/dtls.h"
+#endif
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
 #include "random.h"
@@ -1142,19 +1145,31 @@ ssize_t nanocoap_get_blockwise_to_buf(nanocoap_sock_t *sock, const char *path,
 int nanocoap_server(sock_udp_ep_t *local, void *rsp_buf, size_t rsp_buf_len)
 {
     sock_udp_t sock;
+#if MODULE_NANOCOAP_SERVER_DTLS
+    sock_dtls_t sock_dtls;
+    sock_dtls_session_t session;
+#endif
     sock_udp_ep_t remote;
     coap_request_ctx_t ctx = {
         .remote = &remote,
     };
 
     if (!local->port) {
-        local->port = COAP_PORT;
+        local->port = CONFIG_NANOCOAP_SERVER_PORT;
     }
 
     ssize_t res = sock_udp_create(&sock, local, NULL, 0);
     if (res != 0) {
         return res;
     }
+#if MODULE_NANOCOAP_SERVER_DTLS
+    res = sock_dtls_create(&sock_dtls, &sock, CONFIG_NANOCOAP_SERVER_SOCK_DTLS_TAG,
+                           SOCK_DTLS_1_2, SOCK_DTLS_SERVER);
+    if (res != 0) {
+        sock_udp_close(&sock);
+        return res;
+    }
+#endif
 
     void *buf;
     void *buf_ctx = NULL;
@@ -1163,7 +1178,11 @@ int nanocoap_server(sock_udp_ep_t *local, void *rsp_buf, size_t rsp_buf_len)
 
         if (buf_ctx) {
             /* free the buffer */
+#if MODULE_NANOCOAP_SERVER_DTLS
+            res = sock_dtls_recv_buf_aux(&sock_dtls, &session, &buf, &buf_ctx, 0, NULL);
+#else
             res = sock_udp_recv_buf_aux(&sock, &buf, &buf_ctx, 0, NULL, NULL);
+#endif
             assert(res == 0);
         }
 
@@ -1175,8 +1194,13 @@ int nanocoap_server(sock_udp_ep_t *local, void *rsp_buf, size_t rsp_buf_len)
         aux_in_ptr = &aux_in;
 #endif
 
+#if MODULE_NANOCOAP_SERVER_DTLS
+        res = sock_dtls_recv_buf_aux(&sock_dtls, &session, &buf, &buf_ctx, SOCK_NO_TIMEOUT,
+                                     aux_in_ptr);
+#else
         res = sock_udp_recv_buf_aux(&sock, &buf, &buf_ctx, SOCK_NO_TIMEOUT,
                                     &remote, aux_in_ptr);
+#endif
         if (res <= 0) {
             DEBUG("nanocoap: error receiving UDP packet %" PRIdSIZE "\n", res);
             continue;
@@ -1200,12 +1224,20 @@ int nanocoap_server(sock_udp_ep_t *local, void *rsp_buf, size_t rsp_buf_len)
         }
         ctx.local = &aux_in.local;
 #endif
+#if MODULE_NANOCOAP_SERVER_DTLS
+        sock_dtls_session_get_udp_ep(&session, &remote);
+#endif
         if ((res = coap_handle_req(&pkt, rsp_buf, rsp_buf_len, &ctx)) <= 0) {
             DEBUG("nanocoap: error handling request %" PRIdSIZE "\n", res);
             continue;
         }
 
+#if MODULE_NANOCOAP_SERVER_DTLS
+        sock_dtls_send_aux(&sock_dtls, &session, rsp_buf, res,
+                           CONFIG_SOCK_DTLS_TIMEOUT_MS * US_PER_MS, aux_out_ptr);
+#else
         sock_udp_send_aux(&sock, rsp_buf, res, &remote, aux_out_ptr);
+#endif
     }
 
     return 0;
@@ -1236,11 +1268,7 @@ kernel_pid_t nanocoap_server_start(const sock_udp_ep_t *local)
 
 void auto_init_nanocoap_server(void)
 {
-    sock_udp_ep_t local = {
-        .port = COAP_PORT,
-        .family = AF_INET6,
-    };
-
+    sock_udp_ep_t local = { .family = AF_INET6 };
     nanocoap_server_start(&local);
 }
 

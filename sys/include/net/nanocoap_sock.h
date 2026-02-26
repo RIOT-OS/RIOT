@@ -145,8 +145,8 @@
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
 #if IS_USED(MODULE_NANOCOAP_DTLS)
-#include "net/credman.h"
-#include "net/sock/dtls.h"
+#  include "net/credman.h"
+#  include "net/sock/dtls.h"
 #endif
 
 #ifdef __cplusplus
@@ -154,11 +154,30 @@ extern "C" {
 #endif
 
 /**
- * @brief   Credman tag used for NanoCoAP
+ * @brief   Credman tag used for NanoCoAP client
  *          Tag together with the credential type (PSK) needs to be unique
  */
 #ifndef CONFIG_NANOCOAP_SOCK_DTLS_TAG
-#define CONFIG_NANOCOAP_SOCK_DTLS_TAG           (0xc0ab)
+#  define CONFIG_NANOCOAP_SOCK_DTLS_TAG         (0xc0ab)
+#endif
+
+/**
+ * @brief   Credman tag used for NanoCoAP server
+ *          Tag together with the credential type (PSK) needs to be unique
+ */
+#ifndef CONFIG_NANOCOAP_SERVER_SOCK_DTLS_TAG
+#  define CONFIG_NANOCOAP_SERVER_SOCK_DTLS_TAG  (0xc0ac)
+#endif
+
+/**
+ * @brief   Default CoAP port for the server to listen on
+ */
+#ifndef CONFIG_NANOCOAP_SERVER_PORT
+#  if MODULE_NANOCOAP_SERVER_DTLS
+#    define CONFIG_NANOCOAP_SERVER_PORT   COAPS_PORT
+#  else
+#    define CONFIG_NANOCOAP_SERVER_PORT   COAP_PORT
+#  endif
 #endif
 
 /**
@@ -166,15 +185,27 @@ extern "C" {
  *          Used both for RX and TX, needs to hold payload block + header
  */
 #ifndef CONFIG_NANOCOAP_SERVER_BUF_SIZE
-#define CONFIG_NANOCOAP_SERVER_BUF_SIZE         ((1 << (CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT + 3)) \
+#  define CONFIG_NANOCOAP_SERVER_BUF_SIZE       ((1 << (CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT + 3)) \
                                                  + CONFIG_NANOCOAP_URI_MAX + 16)
+#endif
+
+/**
+ * @brief Extra stack size for server DTLS support
+ */
+#ifndef CONFIG_NANOCOAP_SERVER_DTLS_EXTRA_STACKSIZE
+#  if MODULE_NANOCOAP_SERVER_DTLS
+#    define CONFIG_NANOCOAP_SERVER_DTLS_EXTRA_STACKSIZE THREAD_STACKSIZE_LARGE
+#  else
+#    define CONFIG_NANOCOAP_SERVER_DTLS_EXTRA_STACKSIZE 0
+#  endif
 #endif
 
 /**
  * @brief   CoAP server thread stack size
  */
 #ifndef CONFIG_NANOCOAP_SERVER_STACK_SIZE
-#define CONFIG_NANOCOAP_SERVER_STACK_SIZE       THREAD_STACKSIZE_DEFAULT
+#  define CONFIG_NANOCOAP_SERVER_STACK_SIZE     (THREAD_STACKSIZE_DEFAULT + \
+                                                 CONFIG_NANOCOAP_SERVER_DTLS_EXTRA_STACKSIZE)
 #endif
 
 /**
@@ -186,7 +217,7 @@ extern "C" {
  * See https://github.com/plgd-dev/go-coap/issues/512
  */
 #ifndef CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN
-#define CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN        (0)
+#  define CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN      (0)
 #endif
 
 /**
