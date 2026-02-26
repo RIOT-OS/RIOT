@@ -54,17 +54,26 @@ typedef struct {
     int8_t retrans;                     /**< number of frame retransmissions of the last TX */
     bool dispatch;                      /**< whether an event should be dispatched or not */
     netdev_event_t ev;                  /**< event to be dispatched */
+#if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC_LEGACY)
+    netdev_t *legacy;                   /**< For drivers that also implement the old netdev API,
+                                             this pointer shall be set to the netdev_t inside the driver struct,
+                                             to have the old netdev driver's get and set functions,
+                                             supporting device specific netopts. */
+#endif
 } netdev_ieee802154_submac_t;
 
 /**
  * @brief Init the IEEE 802.15.4 SubMAC netdev adoption.
  *
  * @param[in] netdev_submac pointer to the netdev submac descriptor.
+ * @param[in] legacy pointer to an old netdev, set up with the old netdev driver.
+ *
+ * @note @p legacy can be NULL. If not, it should have been set up in *_hal_setup().
  *
  * @return 0 on success.
  * @return negative errno on failure.
  */
-int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac);
+int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac, netdev_t *legacy);
 
 #ifdef __cplusplus
 }

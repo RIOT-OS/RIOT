@@ -31,7 +31,7 @@ int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
     puts("Initializing NRF802154 device");
 
     netdev_register(netdev, NETDEV_CC2538, 0);
-    netdev_ieee802154_submac_init(&nrf802154);
+    netdev_ieee802154_submac_init(&nrf802154, NULL);
 
     /* set the application-provided callback */
     netdev->event_callback = cb;
