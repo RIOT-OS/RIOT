@@ -52,7 +52,9 @@ mutex_t slipdev_mutex = MUTEX_INIT;
 static char coap_stack[COAP_STACKSIZE];
 #endif /* IS_USED(MODULE_SLIPDEV_CONFIG) */
 
+#if IS_USED(MODULE_SLIPDEV_NET)
 static int _check_state(slipdev_t *dev);
+#endif /* IS_USED(MODULE_SLIPDEV_NET) */
 
 static inline void slipdev_lock(void)
 {
@@ -290,6 +292,8 @@ void _slip_rx_cb(void *arg, uint8_t byte)
     }
 }
 
+#if IS_USED(MODULE_SLIPDEV_NET)
+
 static void _poweron(slipdev_t *dev)
 {
     if ((dev->state != SLIPDEV_STATE_STANDBY) &&
@@ -328,6 +332,8 @@ static int _init(netdev_t *netdev)
     return 0;
 }
 
+#endif /* IS_USED(MODULE_SLIPDEV_NET) */
+
 void slipdev_write_bytes(uart_t uart, const uint8_t *data, size_t len)
 {
     for (unsigned j = 0; j < len; j++, data++) {
@@ -347,6 +353,8 @@ void slipdev_write_bytes(uart_t uart, const uint8_t *data, size_t len)
         }
     }
 }
+
+#if IS_USED(MODULE_SLIPDEV_NET)
 
 static int _check_state(slipdev_t *dev)
 {
@@ -509,6 +517,8 @@ static const netdev_driver_t slip_driver = {
 #endif
 };
 
+#endif /* IS_USED(MODULE_SLIPDEV_NET) */
+
 #if IS_USED(MODULE_SLIPDEV_CONFIG)
 static void *_coap_server_thread(void *arg)
 {
@@ -573,9 +583,19 @@ void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index
     /* set device descriptor fields */
     dev->config = *params;
     dev->state = 0;
+
+#if IS_USED(MODULE_SLIPDEV_NET)
     dev->netdev.driver = &slip_driver;
 
     netdev_register(&dev->netdev, NETDEV_SLIPDEV, index);
+#else
+    if (uart_init(dev->config.uart, dev->config.baudrate, _slip_rx_cb,
+                  dev) != UART_OK) {
+        LOG_ERROR("slipdev: error initializing UART %i with baudrate %" PRIu32 "\n",
+                  dev->config.uart, dev->config.baudrate);
+    }
+    (void) index;
+#endif
 }
 
 /** @} */

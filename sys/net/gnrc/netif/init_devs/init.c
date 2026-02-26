@@ -109,7 +109,7 @@ void gnrc_netif_init_devs(void)
         auto_init_sam0_eth();
     }
 
-    if (IS_USED(MODULE_SLIPDEV)) {
+    if (IS_USED(MODULE_SLIPDEV_NET)) {
         extern void auto_init_slipdev(void);
         auto_init_slipdev();
     }
