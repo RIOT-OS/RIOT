@@ -156,6 +156,10 @@ typedef enum {
      */
     IEEE802154_CAP_PHY_MR_FSK           = BIT18,
     /**
+     * @brief LoRa capability mode (not standardized in IEEE 802.15.4)
+     */
+    IEEE802154_CAP_PHY_LORA             = BIT19,
+    /**
      * @brief the device supports source address match table.
      *
      * A Source Address Match table contains source addresses with pending
@@ -163,7 +167,7 @@ typedef enum {
      * Request command from a child node, the Frame Pending bit of the ACK is
      * set if the source address matches one from the table.
      */
-    IEEE802154_CAP_SRC_ADDR_MATCH       = BIT19,
+    IEEE802154_CAP_SRC_ADDR_MATCH       = BIT20,
 } ieee802154_rf_caps_t;
 
 /**
@@ -175,7 +179,8 @@ typedef enum {
     | IEEE802154_CAP_PHY_OQPSK      \
     | IEEE802154_CAP_PHY_MR_OQPSK   \
     | IEEE802154_CAP_PHY_MR_OFDM    \
-    | IEEE802154_CAP_PHY_MR_FSK)    \
+    | IEEE802154_CAP_PHY_MR_FSK     \
+    | IEEE802154_CAP_PHY_LORA)      \
 
 /**
  * @brief Transmission status
@@ -456,14 +461,45 @@ typedef enum {
 } ieee802154_cca_mode_t;
 
 /**
+ * @brief   Derived submac parameters from PHY configuration
+ */
+typedef struct {
+    uint32_t ack_timeout_us;            /**< Ack timeout in µs */
+    uint16_t csma_backoff_us;           /**< CSMA sender backoff period in µs */
+    uint16_t sifs_period_us;            /**< SIFS period in µs */
+} ieee802154_phy_conf_result_t;
+
+/**
  * @brief Holder of the PHY configuration
  */
 typedef struct {
-    ieee802154_phy_mode_t phy_mode; /**< IEEE802.15.4 PHY mode */
-    uint16_t channel;               /**< IEEE802.15.4 channel number */
-    uint8_t page;                   /**< IEEE802.15.4 channel page */
-    int8_t pow;                     /**< TX power in dBm */
+    ieee802154_phy_mode_t phy_mode;     /**< IEEE802.15.4 PHY mode */
+    uint16_t channel;                   /**< IEEE802.15.4 channel number */
+    uint8_t page;                       /**< IEEE802.15.4 channel page */
+    int8_t pow;                         /**< TX power in dBm */
+    ieee802154_phy_conf_result_t res;   /**< PHY configuration deduced parameters */
 } ieee802154_phy_conf_t;
+
+/**
+ * @brief extension for IEEE 802.15.4 OQPSK PHY
+ */
+typedef struct {
+    ieee802154_phy_conf_t super;        /**< common settings */
+} ieee802154_oqpsk_conf_t;
+
+/**
+ * @brief extension for IEEE 802.15.4 BPSK PHY
+ */
+typedef struct {
+    ieee802154_phy_conf_t super;        /**< common settings */
+} ieee802154_bpsk_conf_t;
+
+/**
+ * @brief extension for IEEE 802.15.4 ASK PHY
+ */
+typedef struct {
+    ieee802154_phy_conf_t super;        /**< common settings */
+} ieee802154_ask_conf_t;
 
 /**
  * @brief extension for IEEE 802.15.4g MR-OQPSK PHY
@@ -715,13 +751,13 @@ struct ieee802154_radio_ops {
      * @pre the transceiver state is IDLE.
      *
      * @param[in] dev IEEE802.15.4 device descriptor
-     * @param[in] conf the PHY configuration
+     * @param[in,out] conf the PHY configuration
      *
      * @retval 0        on success
      * @retval -EINVAL  if the configuration is not valid for the device.
      * @retval <0       error, return value is negative errno indicating the cause.
      */
-    int (*config_phy)(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf);
+    int (*config_phy)(ieee802154_dev_t *dev, ieee802154_phy_conf_t *conf);
 
     /**
      * @brief Set number of frame retransmissions
@@ -977,7 +1013,7 @@ static inline int ieee802154_radio_set_cca_mode(ieee802154_dev_t *dev,
  * @return result of @ref ieee802154_radio_ops::config_phy
  */
 static inline int ieee802154_radio_config_phy(ieee802154_dev_t *dev,
-                                              const ieee802154_phy_conf_t *conf)
+                                              ieee802154_phy_conf_t *conf)
 {
     return dev->driver->config_phy(dev, conf);
 }
@@ -1652,6 +1688,8 @@ static inline uint32_t ieee802154_phy_mode_to_cap(
             return IEEE802154_CAP_PHY_MR_OFDM;
         case IEEE802154_PHY_MR_FSK:
             return IEEE802154_CAP_PHY_MR_FSK;
+        case IEEE802154_PHY_LORA:
+            return IEEE802154_CAP_PHY_LORA;
 
         case IEEE802154_PHY_DISABLED:
         default:
@@ -1687,6 +1725,8 @@ static inline ieee802154_phy_mode_t ieee802154_cap_to_phy_mode(uint32_t cap)
             return IEEE802154_PHY_MR_OFDM;
         case IEEE802154_CAP_PHY_MR_FSK:
             return IEEE802154_PHY_MR_FSK;
+        case IEEE802154_CAP_PHY_LORA:
+            return IEEE802154_PHY_LORA;
 
         default:
             break;

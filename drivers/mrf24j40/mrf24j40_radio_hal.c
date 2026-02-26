@@ -249,7 +249,7 @@ static int _set_cca_mode(ieee802154_dev_t *dev, ieee802154_cca_mode_t mode)
     return 0;
 }
 
-static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
+static int _config_phy(ieee802154_dev_t *hal, ieee802154_phy_conf_t *conf)
 {
     mrf24j40_t *dev = hal->priv;
     int8_t pow = conf->pow;
