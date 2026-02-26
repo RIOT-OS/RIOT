@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "bitfield.h"
 #include "shell.h"
 #include "thread.h"
 #include "ztimer.h"
@@ -46,6 +47,11 @@ static amg88xx_t _dev;
  */
 static bool _grid_enabled = true;
 
+/**
+ * @brief   Flag to display grid in raw values (true) or temperature (false)
+ */
+static bool _grid_raw = true;
+
 #if IS_USED(MODULE_PERIPH_GPIO_IRQ)
 static kernel_pid_t _main_pid;
 
@@ -63,22 +69,37 @@ static void _print_grid(const int16_t *pixels, const uint8_t *int_table)
     const unsigned rows = AMG88XX_PIXELS_VERTICAL;
     const unsigned cols = AMG88XX_PIXELS_HORIZONTAL;
 
-    puts("+------+------+------+------+------+------+------+------+");
+    puts("+--------+--------+--------+--------+--------+--------+--------+--------+");
 
     for (unsigned row = 0; row < rows; row++) {
         for (unsigned col = 0; col < cols; col++) {
             unsigned index = (row * cols) + col;
+            bool flagged = (int_table != NULL && bf_isset(int_table, index));
 
-            if (int_table != NULL && ((int_table[row] >> col) & 0x01)) {
-                printf("|(%4" PRId16 ")", pixels[index]);
+            if (_grid_raw) {
+                if (flagged) {
+                    printf("|(%6" PRId16 ")", pixels[index]);
+                }
+                else {
+                    printf("| %6" PRId16 " ", pixels[index]);
+                }
             }
             else {
-                printf("| %4" PRId16 " ", pixels[index]);
+                int16_t temp = amg88xx_raw_to_temperature(pixels[index]);
+                int16_t whole = (int16_t)(temp / 100);
+                int16_t frac = (int16_t)(abs(temp % 100));
+
+                if (flagged) {
+                    printf("|(%3" PRId16 ".%02" PRId16 ")", whole, frac);
+                }
+                else {
+                    printf("| %3" PRId16 ".%02" PRId16 " ", whole, frac);
+                }
             }
         }
 
         puts("|");
-        puts("+------+------+------+------+------+------+------+------+");
+        puts("+--------+--------+--------+--------+--------+--------+--------+--------+");
     }
 }
 
@@ -129,7 +150,7 @@ static int _cmd_poll(int argc, char **argv)
     unsigned interval = AMG88XX_DEFAULT_POLL_MS;
 
     if (argc >= 2) {
-        interval = (unsigned)atoi(argv[1]);
+        interval = atoi(argv[1]);
         if (interval == 0) {
             printf("usage: %s <interval>\n", argv[0]);
             return 1;
@@ -198,7 +219,7 @@ static int _cmd_interrupt(int argc, char **argv)
 {
     if (argc < 4) {
         printf("usage: %s <upper> <lower> <hysteresis>\n", argv[0]);
-        puts("  values in raw units (0.25 deg C)");
+        puts("  values in raw units (0.25 deg C per LSB)");
         puts("  e.g.: interrupt 100 40 8 (25.0 / 10.0 / 2.0 deg C)");
         return 1;
     }
@@ -208,9 +229,9 @@ static int _cmd_interrupt(int argc, char **argv)
         return 1;
     }
 
-    int16_t upper = (int16_t)atoi(argv[1]);
-    int16_t lower = (int16_t)atoi(argv[2]);
-    int16_t hyst = (int16_t)atoi(argv[3]);
+    int16_t upper = atoi(argv[1]);
+    int16_t lower = atoi(argv[2]);
+    int16_t hyst = atoi(argv[3]);
 
     _main_pid = thread_getpid();
 
@@ -229,8 +250,16 @@ static int _cmd_interrupt(int argc, char **argv)
         return 1;
     }
 
-    printf("Interrupt enabled: upper=%" PRId16 " lower=%" PRId16
-           " hyst=%" PRId16 "\n", upper, lower, hyst);
+    int16_t upper_t = amg88xx_raw_to_temperature(upper);
+    int16_t lower_t = amg88xx_raw_to_temperature(lower);
+
+    printf("Interrupt enabled:"
+           " upper=%" PRId16 " (%" PRId16 ".%02" PRId16 " deg C)"
+           " lower=%" PRId16 " (%" PRId16 ".%02" PRId16 " deg C)"
+           " hyst=%" PRId16 " (raw)\n",
+           upper, (int16_t)(upper_t / 100), (int16_t)(abs(upper_t % 100)),
+           lower, (int16_t)(lower_t / 100), (int16_t)(abs(lower_t % 100)),
+           hyst);
 
     puts("Waiting for interrupts...\n");
 
@@ -294,7 +323,6 @@ static int _cmd_mode(int argc, char **argv)
         mode = AMG88XX_MODE_STANDBY_10S;
     }
     else {
-        puts("error: unknown mode");
         printf("usage: %s <normal|sleep|standby60|standby10>\n", argv[0]);
         return 1;
     }
@@ -312,7 +340,7 @@ static int _cmd_mode(int argc, char **argv)
 static int _cmd_grid(int argc, char **argv)
 {
     if (argc < 2) {
-        printf("usage: %s <on|off>\n", argv[0]);
+        printf("usage: %s <on|off|raw|temp>\n", argv[0]);
         return 1;
     }
 
@@ -324,8 +352,16 @@ static int _cmd_grid(int argc, char **argv)
         _grid_enabled = false;
         puts("Grid output disabled");
     }
+    else if (strcmp(argv[1], "raw") == 0) {
+        _grid_raw = true;
+        puts("Grid output set to raw");
+    }
+    else if (strcmp(argv[1], "temp") == 0) {
+        _grid_raw = false;
+        puts("Grid output set to temperature");
+    }
     else {
-        printf("usage: %s <on|off>\n", argv[0]);
+        printf("usage: %s <on|off|raw|temp>\n", argv[0]);
         return 1;
     }
 
@@ -451,8 +487,8 @@ static int _cmd_dump(int argc, char **argv)
 
 SHELL_COMMAND(averaging, "toggle averaging mode (on|off)", _cmd_averaging);
 SHELL_COMMAND(dump, "dump sensor registers", _cmd_dump);
-SHELL_COMMAND(fps, "set frame rate (1 or 10)", _cmd_fps);
-SHELL_COMMAND(grid, "toggle grid output (on|off)", _cmd_grid);
+SHELL_COMMAND(fps, "set frame rate (1|10)", _cmd_fps);
+SHELL_COMMAND(grid, "set grid output (on|off|raw|temp)", _cmd_grid);
 SHELL_COMMAND(mode, "set power mode (normal|sleep|standby60|standby10)", _cmd_mode);
 SHELL_COMMAND(poll, "continuously poll frames (interval)", _cmd_poll);
 SHELL_COMMAND(read, "read a single frame", _cmd_read);
