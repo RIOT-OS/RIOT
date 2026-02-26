@@ -82,7 +82,7 @@ int netutils_get_ipv6(ipv6_addr_t *addr, netif_t **netif, const char *hostname)
 
     /* search for interface ID */
     size_t len = strlen(hostname);
-    char *iface = strchr(hostname, '%');
+    const char *iface = strchr(hostname, '%');
     if (iface) {
         *netif = netif_get_by_name(iface + 1);
         len -= strlen(iface);

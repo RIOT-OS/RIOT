@@ -287,7 +287,7 @@ int sock_tl_name2ep(struct _sock_tl_ep *ep_out, const char *str)
     int family;
     char hostbuf[CONFIG_SOCK_HOSTPORT_MAXLEN];
     const char *host;
-    char *hostend = strchr(str, ':');
+    const char *hostend = strchr(str, ':');
     if (hostend == NULL) {
         host = str;
         ep_out->port = 0;
