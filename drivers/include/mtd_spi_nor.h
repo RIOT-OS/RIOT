@@ -14,8 +14,29 @@
  * @ingroup     drivers_mtd
  * @brief       Driver for serial NOR flash memory technology devices attached via SPI
  *
- * @{
  *
+ * @section mtd_spi_nor_overview Overview
+ * Various manufacturers such as ISSI or Macronix offer small SPI NOR Flash which usually
+ * come in 8-pin packages and are used for persistent data storage.
+ * This driver adds support for these devices with support for RIOT's MTD subsystem.
+ *
+ * @section mtd_spi_nor_usage Usage
+ *
+ * The basic functions of all flash devices can be used by just including the
+ * mtd_spi_nor module.
+ *
+ *      USEMODULE += mtd_spi_nor
+ *
+ * For ISSI and Macronix devices, some data integrity features are provided
+ * to check if program or erase operations were successful.
+ * These features can be activated by specifying the "SPI_NOR_F_CHECK_INTEGRITY" flag in
+ * the "flag" parameter of the mtd_spi_nor_params_t structure.
+ *
+ * \n
+ * Some examples of how to work with the MTD SPI NOR driver can be found in the test for the
+ * driver or in some board definitions such as for the nRF52840DK.
+ *
+ * @{
  * @file
  * @brief       Interface definition for the serial flash memory driver
  *
@@ -29,6 +50,7 @@
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include "mtd.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -37,6 +59,9 @@ extern "C"
 
 /**
  * @brief   SPI NOR flash opcode table
+ *
+ * Manufacturer specific opcodes have a short form of the manufacturer as a prefix,
+ * for example "MX" for "Macronix".
  */
 typedef struct {
     uint8_t rdid;            /**< Read identification (JEDEC ID) */
@@ -52,7 +77,10 @@ typedef struct {
     uint8_t chip_erase;      /**< Chip erase */
     uint8_t sleep;           /**< Deep power down */
     uint8_t wake;            /**< Release from deep power down */
-    /* TODO: enter 4 byte address mode for large memories */
+    uint8_t mx_rdscur;       /**< Read security register (Macronix specific) */
+    uint8_t issi_rderp;      /**< Read extended read parameters register (ISSI specific) */
+    uint8_t issi_clerp;      /**< Clear extended read parameters register (ISSI specific) */
+    uint8_t issi_wrdi;       /**< Write disable (ISSI specific) */
 } mtd_spi_nor_opcode_t;
 
 /**
@@ -94,6 +122,22 @@ typedef struct __attribute__((packed)) {
  * @brief   Flag to set when the device support 64KiB block erase (block_erase_32k opcode)
  */
 #define SPI_NOR_F_SECT_64K  (4)
+
+/**
+ * @brief Enable data integrity checks after program/erase operations
+ * for devices that support it.
+ */
+#define SPI_NOR_F_CHECK_INTEGRETY   (256)
+
+/**
+ * @brief Enable functionality that is specific for Macronix devices.
+ */
+#define SPI_NOR_F_MANUF_MACRONIX    (0xC2)
+
+/**
+ * @brief Enable functionality that is specific for ISSI devices.
+ */
+#define SPI_NOR_F_MANUF_ISSI    (0x9D)
 
 /**
  * @brief Compile-time parameters for a serial flash device
@@ -169,7 +213,8 @@ extern const mtd_desc_t mtd_spi_nor_driver;
  * The numbers were taken from Micron M25P16, but the same opcodes can
  * be found in Macronix MX25L25735E, and multiple other data sheets for
  * different devices, as well as in the Linux kernel, so they seem quite
- * sensible for default values. */
+ * sensible for default values.
+ */
 extern const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default;
 
 /**
