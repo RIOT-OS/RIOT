@@ -120,6 +120,27 @@ size_t riotboot_slot_offset(unsigned slot);
 void riotboot_slot_dump_addrs(void);
 
 /**
+ * @brief   Confirm the currently running image slot
+ *
+ * This function sets the image state to CONFIRMED in the header of the
+ * currently running image, if it is in ACTIVATED state.
+ * It must be called manually if not module `riotboot_hdr_auto_confirm` is used.
+ */
+void riotboot_slot_confirm(void);
+
+/**
+ * @brief  Activate or deactivate the other slot
+ *
+ * This function sets the image state to ACTIVATED or DEACTIVATED  in the header of the
+ * non-running image slot.
+ *
+ * A deactivated slot can be activated but an activated slot cannot be deactivated.
+ *
+ * @param[in]   active  if true, set to ACTIVATED, else set to INACTIVE
+ */
+void riotboot_slot_activate_other(bool active);
+
+/**
  * @brief  Get the size of a slot
  *
  * @param[in]   slot    slot nr to get the size from

@@ -29,6 +29,14 @@ SLOT_RIOT_BINS = $(SLOT0_RIOT_BIN) $(SLOT1_RIOT_BIN)
 $(BINDIR_RIOTBOOT)/%.elf: $(BASELIBS) $(ARCHIVES) $(BINDIR_RIOTBOOT)
 	$(Q)$(_LINK) -o $@
 
+RIOTBOOT_HDR_VERSION ?= -v
+ifneq (,$(filter riotboot_hdr_v1, $(USEMODULE)))
+  RIOTBOOT_HDR_VERSION := $(RIOTBOOT_HDR_VERSION) v1
+endif
+ifneq (,$(filter riotboot_hdr_v2, $(USEMODULE)))
+  RIOTBOOT_HDR_VERSION := $(RIOTBOOT_HDR_VERSION) v2
+endif
+
 # Slot 0 and 1 firmware offset, after header
 SLOT0_IMAGE_OFFSET := $$(($(SLOT0_OFFSET) + $(RIOTBOOT_HDR_LEN)))
 SLOT1_IMAGE_OFFSET := $$(($(SLOT1_OFFSET) + $(RIOTBOOT_HDR_LEN)))
@@ -64,7 +72,7 @@ $(HEADER_TOOL): FORCE
 # It must be always regenerated in case of any changes, so FORCE
 .PRECIOUS: %.bin
 %.hdr: $(HEADER_TOOL) %.bin FORCE
-	$(Q)$(HEADER_TOOL) generate $< $(APP_VER) $$(($(ROM_START_ADDR)+$(OFFSET))) $(RIOTBOOT_HDR_LEN) - > $@
+	$(Q)$(HEADER_TOOL) generate $< $(APP_VER) $$(($(ROM_START_ADDR)+$(OFFSET))) $(RIOTBOOT_HDR_LEN) - $(RIOTBOOT_HDR_VERSION) > $@
 
 $(BINDIR_RIOTBOOT)/slot0.hdr: OFFSET=$(SLOT0_IMAGE_OFFSET)
 $(BINDIR_RIOTBOOT)/slot1.hdr: OFFSET=$(SLOT1_IMAGE_OFFSET)
