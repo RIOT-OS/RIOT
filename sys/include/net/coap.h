@@ -182,64 +182,75 @@ typedef enum {
  * @name    Empty CoAP message code
  * @{
  */
-#define COAP_CODE_EMPTY         (0)
+#define COAP_CODE_EMPTY         (0)             /**< No method/code, used in RST and empty ACKs */
 /** @} */
 
 /**
  * @name    Response message codes: success
  * @{
  */
-#define COAP_CLASS_SUCCESS      (2)
-#define COAP_CODE_CREATED      ((2 << 5) | 1)
-#define COAP_CODE_DELETED      ((2 << 5) | 2)
-#define COAP_CODE_VALID        ((2 << 5) | 3)
-#define COAP_CODE_CHANGED      ((2 << 5) | 4)
-#define COAP_CODE_204          ((2 << 5) | 4)
-#define COAP_CODE_CONTENT      ((2 << 5) | 5)
-#define COAP_CODE_205          ((2 << 5) | 5)
-#define COAP_CODE_CONTINUE     ((2 << 5) | 31)
-#define COAP_CODE_231          ((2 << 5) | 31)
+#define COAP_CLASS_SUCCESS      (2)             /**< Class 2.xx contains response codes
+                                                 *   indicating success */
+#define COAP_CODE_CREATED      ((2 << 5) | 1)   /**< Response Code: 2.01 Created */
+#define COAP_CODE_DELETED      ((2 << 5) | 2)   /**< Response Code: 2.02 Deleted */
+#define COAP_CODE_VALID        ((2 << 5) | 3)   /**< Response Code: 2.03 Valid */
+#define COAP_CODE_CHANGED      ((2 << 5) | 4)   /**< Response Code: 2.04 Changed */
+#define COAP_CODE_204          ((2 << 5) | 4)   /**< Alias for @ref COAP_CODE_CHANGED in case
+                                                 *   you want to annoy code reviewers */
+#define COAP_CODE_CONTENT      ((2 << 5) | 5)   /**< Response Code: 2.05 Content */
+#define COAP_CODE_205          ((2 << 5) | 5)   /**< Alias for @ref COAP_CODE_CONTENT in case
+                                                 *   you want to annoy code reviewers */
+#define COAP_CODE_CONTINUE     ((2 << 5) | 31)  /**< Response Code: 2.31 Continue */
+#define COAP_CODE_231          ((2 << 5) | 31)  /**< Alias for @ref COAP_CODE_CONTINUE in case
+                                                 *   you want to annoy code reviewers */
 /** @} */
 
 /**
  * @name    Response message codes: client error
  * @{
  */
-#define COAP_CLASS_CLIENT_FAILURE             (4)
-#define COAP_CODE_BAD_REQUEST                ((4 << 5) | 0)
-#define COAP_CODE_UNAUTHORIZED               ((4 << 5) | 1)
-#define COAP_CODE_BAD_OPTION                 ((4 << 5) | 2)
-#define COAP_CODE_FORBIDDEN                  ((4 << 5) | 3)
-#define COAP_CODE_PATH_NOT_FOUND             ((4 << 5) | 4)
-#define COAP_CODE_404                        ((4 << 5) | 4)
-#define COAP_CODE_METHOD_NOT_ALLOWED         ((4 << 5) | 5)
-#define COAP_CODE_NOT_ACCEPTABLE             ((4 << 5) | 6)
-#define COAP_CODE_REQUEST_ENTITY_INCOMPLETE  ((4 << 5) | 8)
-#define COAP_CODE_CONFLICT                   ((4 << 5) | 9)
-#define COAP_CODE_PRECONDITION_FAILED        ((4 << 5) | 12)
-#define COAP_CODE_REQUEST_ENTITY_TOO_LARGE   ((4 << 5) | 13)
-#define COAP_CODE_UNSUPPORTED_CONTENT_FORMAT ((4 << 5) | 15)
-#define COAP_CODE_UNPROCESSABLE_ENTITY       ((4 << 5) | 22)
-#define COAP_CODE_TOO_MANY_REQUESTS          ((4 << 5) | 29)
+#define COAP_CLASS_CLIENT_FAILURE             (4)           /**< Class 4.xx contains response
+                                                             *   codes indicating client failure */
+#define COAP_CODE_BAD_REQUEST                ((4 << 5) | 0) /**< Response Code: 4.00 Bad Request */
+#define COAP_CODE_UNAUTHORIZED               ((4 << 5) | 1) /**< Response Code: 4.01 Unauthorized */
+#define COAP_CODE_BAD_OPTION                 ((4 << 5) | 2) /**< Response Code: 4.02 Bad Option */
+#define COAP_CODE_FORBIDDEN                  ((4 << 5) | 3) /**< Response Code: 4.03 Forbidden */
+#define COAP_CODE_PATH_NOT_FOUND             ((4 << 5) | 4) /**< Response Code: 4.04 Not Found */
+#define COAP_CODE_404                        ((4 << 5) | 4) /**< Alias for @ref COAP_CODE_PATH_NOT_FOUND
+                                                             *   when you want to annoy code reviewers */
+#define COAP_CODE_METHOD_NOT_ALLOWED         ((4 << 5) | 5) /**< Response Code: 4.05 Method Not Allowed */
+#define COAP_CODE_NOT_ACCEPTABLE             ((4 << 5) | 6) /**< Response Code: 4.06 Not Acceptable */
+#define COAP_CODE_REQUEST_ENTITY_INCOMPLETE  ((4 << 5) | 8) /**< Response Code: 4.08 Request Entity Incomplete */
+#define COAP_CODE_CONFLICT                   ((4 << 5) | 9) /**< Response Code: 4.09 Conflict */
+#define COAP_CODE_PRECONDITION_FAILED        ((4 << 5) | 12)/**< Response Code: 4.12 Precondition Failed */
+#define COAP_CODE_REQUEST_ENTITY_TOO_LARGE   ((4 << 5) | 13)/**< Response Code: 4.13 Request Entity Too Large */
+#define COAP_CODE_UNSUPPORTED_CONTENT_FORMAT ((4 << 5) | 15)/**< Response Code: 4.15 Unsupported Content Format */
+#define COAP_CODE_UNPROCESSABLE_ENTITY       ((4 << 5) | 22)/**< Response Code: 4.22 Unprocessable Entity */
+#define COAP_CODE_TOO_MANY_REQUESTS          ((4 << 5) | 29)/**< Response Code: 4.29 Too Many Requests */
 /** @} */
 
 /**
  * @name    Response message codes: server error
  * @{
  */
-#define COAP_CLASS_SERVER_FAILURE             (5)
-#define COAP_CODE_INTERNAL_SERVER_ERROR      ((5 << 5) | 0)
-#define COAP_CODE_NOT_IMPLEMENTED            ((5 << 5) | 1)
-#define COAP_CODE_BAD_GATEWAY                ((5 << 5) | 2)
-#define COAP_CODE_SERVICE_UNAVAILABLE        ((5 << 5) | 3)
-#define COAP_CODE_GATEWAY_TIMEOUT            ((5 << 5) | 4)
-#define COAP_CODE_PROXYING_NOT_SUPPORTED     ((5 << 5) | 5)
+#define COAP_CLASS_SERVER_FAILURE             (5)           /**< Class 5.xx contains response
+                                                             *   codes server failure */
+#define COAP_CODE_INTERNAL_SERVER_ERROR      ((5 << 5) | 0) /**< Response Code: 5.00 Internal Server Error */
+#define COAP_CODE_NOT_IMPLEMENTED            ((5 << 5) | 1) /**< Response Code: 5.01 Not Implemented */
+#define COAP_CODE_BAD_GATEWAY                ((5 << 5) | 2) /**< Response Code: 5.02 Bad Gateway */
+#define COAP_CODE_SERVICE_UNAVAILABLE        ((5 << 5) | 3) /**< Response Code: 5.03 Service Unavailable */
+#define COAP_CODE_GATEWAY_TIMEOUT            ((5 << 5) | 4) /**< Response Code: 5.04 Gateway Timeout */
+#define COAP_CODE_PROXYING_NOT_SUPPORTED     ((5 << 5) | 5) /**< Response Code: 5.05 Proxying Not Supported */
 /** @} */
 
 /**
  * @name    Content-Format option codes
  * @anchor  net_coap_format
  * @{
+ */
+/**
+ * @brief   Content-Type `text/plain;charset=utf-8`
+ * @see     [RFC 7242 Section 12.3](https://datatracker.ietf.org/doc/html/rfc7252#section-12.3)
  */
 #define COAP_FORMAT_TEXT                      (0)
 /**
