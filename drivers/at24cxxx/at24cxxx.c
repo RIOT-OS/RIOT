@@ -23,7 +23,7 @@
 
 #include "assert.h"
 #include "macros/utils.h"
-#include "xtimer.h"
+#include "ztimer.h"
 
 #include "at24cxxx_defines.h"
 #include "at24cxxx.h"
@@ -95,7 +95,7 @@ int _read(const at24cxxx_t *dev, uint32_t pos, void *data, size_t len)
         if (--polls == 0) {
             break;
         }
-        xtimer_usleep(AT24CXXX_POLL_DELAY_US);
+        ztimer_sleep(ZTIMER_USEC, AT24CXXX_POLL_DELAY_US);
     }
 
     DEBUG("[at24cxxx] i2c_read_regs(): %d; polls: %d\n", check, polls);
@@ -154,7 +154,7 @@ int _write_page(const at24cxxx_t *dev, uint32_t pos, const void *data, size_t le
         if (--polls == 0) {
             break;
         }
-        xtimer_usleep(AT24CXXX_POLL_DELAY_US);
+        ztimer_sleep(ZTIMER_USEC, AT24CXXX_POLL_DELAY_US);
     }
 
     DEBUG("[at24cxxx] i2c_write_regs(): %d; polls: %d\n", check, polls);

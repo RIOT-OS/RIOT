@@ -1,2 +1,2 @@
 FEATURES_REQUIRED += periph_spi
-USEMODULE += xtimer
+USEMODULE += ztimer_usec
