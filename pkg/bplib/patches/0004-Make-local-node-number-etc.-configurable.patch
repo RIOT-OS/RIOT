@@ -1,7 +1,7 @@
 From 6d82b78289fd602ce3ed2b8be0530106f51348c2 Mon Sep 17 00:00:00 2001
 From: Simon Grund <simon.grund@tuhh.de>
 Date: Sat, 14 Feb 2026 03:24:40 +0100
-Subject: [PATCH 4/5] Make local node number etc. configurable
+Subject: [PATCH 4/6] Make local node number etc. configurable
 
 ---
  inc/bplib_cfg.h | 60 +++++++++++++++++++++++++++++++++++++++++++++++++

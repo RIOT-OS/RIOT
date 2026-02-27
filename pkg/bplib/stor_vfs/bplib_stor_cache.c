@@ -1,11 +1,16 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
 #include "bplib_stor_cache.h"
 
 #include <stdio.h>
 
 #include "list.h"
 
-static cache_list_node_t* get_free_cache_elem(cache_list_t* cache) {
-    // TODO: maybe move empty elements in own list to avoid this O(n) search
+static cache_list_node_t* get_free_cache_elem(cache_list_t* cache)
+{
+    /* TODO: maybe move empty elements in own list to avoid this O(n) search */
     for (unsigned i = 0; i < BUNDLE_CACHE_LEN; i++) {
         if (cache->nodes[i].node == 0) {
             return &cache->nodes[i];
@@ -14,8 +19,10 @@ static cache_list_node_t* get_free_cache_elem(cache_list_t* cache) {
     return NULL;
 }
 
-/* Insert into that point, which is the last node which has an expiry time strictly smaller than expiry */
-static void bplib_cache_insert(clist_node_t* list, cache_list_node_t* new_node) {
+/* Insert into that point, which is the last node
+ * that has an expiry time strictly smaller than expiry */
+static void bplib_cache_insert(clist_node_t* list, cache_list_node_t* new_node)
+{
     /* Case: Empty cache */
     if (list->next == NULL) {
         clist_lpush(list, &new_node->list);
@@ -36,7 +43,7 @@ static void bplib_cache_insert(clist_node_t* list, cache_list_node_t* new_node) 
         if (container_of(node->next, cache_list_node_t, list)->expiry >= new_node->expiry) {
             list_add(node, &new_node->list);
             return;
-        } 
+        }
         node = node->next;
     }
 
@@ -45,7 +52,9 @@ static void bplib_cache_insert(clist_node_t* list, cache_list_node_t* new_node) 
     return;
 }
 
-void bplib_cache_add(cache_list_t* cache, uint64_t node, uint64_t service, uint64_t expiry, uint8_t index) {
+void bplib_cache_add(cache_list_t* cache,
+    uint64_t node, uint64_t service, uint64_t expiry, uint8_t index)
+{
     cache_list_node_t* elem = get_free_cache_elem(cache);
 
     if (elem == NULL) {
@@ -68,10 +77,11 @@ void bplib_cache_add(cache_list_t* cache, uint64_t node, uint64_t service, uint6
     bplib_cache_insert(&cache->list, elem);
 }
 
-int bplib_cache_get(cache_list_t* cache, char* bundle_path) {
+int bplib_cache_get(cache_list_t* cache, char* bundle_path)
+{
     /* Assume bundle_path can fit BPLIB_STOR_PATHLEN characters */
     /* Assume that the channel / contact tables reachable EIDs have not changes since the time
-     * the bundles ids were loaded into the cache. If lifecycle management of the channels / contacts 
+     * the bundles ids were loaded into the cache. If lifecycle management of the channels / contacts
      * is done through BPLib_NC_RemoveApplication / BPLib_NC_ContactTeardown (or the PI version which
      * does the same minus some event sending) bundles in the egress queue are pushed back to storage
      * but not in the LoadBatches. In the FWP provided by the port this is done through the
@@ -87,10 +97,12 @@ int bplib_cache_get(cache_list_t* cache, char* bundle_path) {
     return 0;
 }
 
-void bplib_cache_mark_front_consumed(cache_list_t* cache) {
+void bplib_cache_mark_front_consumed(cache_list_t* cache)
+{
     (void) clist_lpop(&cache->list);
 }
 
-bool bplib_cache_is_empty(cache_list_t* cache) {
+bool bplib_cache_is_empty(cache_list_t* cache)
+{
     return clist_is_empty(&cache->list);
 }

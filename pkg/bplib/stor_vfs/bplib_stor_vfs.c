@@ -69,7 +69,7 @@ BPLib_Status_t BPLib_STOR_StoreBundle(BPLib_Instance_t* Inst, BPLib_Bundle_t* Bu
     *  for this to work with truly all. Each needs 16 digits of hexadecimal numbers plus the
     *  path separators. The file name itself might also be 16 characters long, as it is the delivery
     *  timestamp.
-    **/ 
+    **/
     int res = 0;
     size_t written = 0;
     bool failed = false;
@@ -95,7 +95,7 @@ BPLib_Status_t BPLib_STOR_StoreBundle(BPLib_Instance_t* Inst, BPLib_Bundle_t* Bu
     }
 
     // Write bundle
-    len += sprintf(path + len, "/%" PRIx64 "_", (int64_t) Bundle->blocks.PrimaryBlock.Timestamp.CreateTime + 
+    len += sprintf(path + len, "/%" PRIx64 "_", (int64_t) Bundle->blocks.PrimaryBlock.Timestamp.CreateTime +
                                        (int64_t) Bundle->blocks.PrimaryBlock.Lifetime);
     // See if the file already exists
     for (uint8_t i = 0; i < BPLIB_STOR_MAX_DUPLICATE_CHECKS; i++) {
@@ -110,7 +110,7 @@ BPLib_Status_t BPLib_STOR_StoreBundle(BPLib_Instance_t* Inst, BPLib_Bundle_t* Bu
         }
     }
     len += 2;
-    fd = vfs_open(path, O_CREAT | O_TRUNC | O_WRONLY, 0777); 
+    fd = vfs_open(path, O_CREAT | O_TRUNC | O_WRONLY, 0777);
     if (fd < 0) {
         failed = true;
         goto free_bundle;
@@ -141,7 +141,7 @@ BPLib_Status_t BPLib_STOR_StoreBundle(BPLib_Instance_t* Inst, BPLib_Bundle_t* Bu
     }
 close_file:
     res = vfs_close(fd);
-    
+
 free_bundle:
     // Free bundle since it is now persistent
     BPLib_MEM_BundleFree(&Inst->pool, Bundle);
@@ -198,7 +198,7 @@ static BPLib_Status_t DestroyIterator(struct BundlePathIterator* iterator) {
         if (res < 0) return BPLIB_OS_ERROR;
         iterator->node_open = false;
     }
-    
+
     if (iterator->service_open) {
         res = vfs_closedir(&iterator->service_dir);
         if (res < 0) return BPLIB_OS_ERROR;
@@ -215,11 +215,11 @@ static BPLib_Status_t DestroyIterator(struct BundlePathIterator* iterator) {
 }
 
 /**
- * @brief 
- * 
- * @param iterator 
- * @param DestEIDs 
- * @param NumEIDs 
+ * @brief
+ *
+ * @param iterator
+ * @param DestEIDs
+ * @param NumEIDs
  * @return - 0 when one bundle has been read
  *         - -EAGAIN when one subdirectory is fully traversed but no bundle has been read
  *         - -EINVAL when the state is invalid or null pointers are passed
@@ -297,7 +297,7 @@ static int NextBundlePath(struct BundlePathIterator* iterator,
             return -EAGAIN;
         }
         if (entry.d_name[0] == '.') continue;
-        
+
         decoded = strtoull(entry.d_name, NULL, 16);
         match = false;
         for (i = 0; i < NumEIDs; i++) {
@@ -346,7 +346,7 @@ static int NextBundlePath(struct BundlePathIterator* iterator,
 }
 
 static void FillBundleCache(const BPLib_EID_Pattern_t* DestEIDs,
-    size_t NumEIDs, cache_list_t* cache) 
+    size_t NumEIDs, cache_list_t* cache)
 {
     struct BundlePathIterator iterator = BUNDLE_PATH_ITER_INIT;
     int res;
@@ -513,7 +513,7 @@ BPLib_Status_t BPLib_STOR_EgressForID(BPLib_Instance_t* Inst, uint32_t EgressID,
         CurrBundle->Meta.EgressID = EgressID;
         if (BPLib_QM_WaitQueueTryPush(EgressQueue, &CurrBundle, QM_NO_WAIT) == false)
         {
-            /* If QM couldn't accept the bundle, free it. It will be reloaded 
+            /* If QM couldn't accept the bundle, free it. It will be reloaded
             ** next time.
             */
             BPLib_MEM_BundleFree(&Inst->pool, CurrBundle);
@@ -530,7 +530,7 @@ BPLib_Status_t BPLib_STOR_EgressForID(BPLib_Instance_t* Inst, uint32_t EgressID,
     }
 
     mutex_unlock(&CacheInst->lock);
-    
+
     *NumEgressed = EgressCnt;
     return BPLIB_SUCCESS;
 }

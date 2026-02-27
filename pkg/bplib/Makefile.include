@@ -1,4 +1,3 @@
-# TODO change when moving to pkg
 INCLUDES += -I$(PKGDIRBASE)/bplib/aa/arp/inc
 INCLUDES += -I$(PKGDIRBASE)/bplib/aa/as/inc
 INCLUDES += -I$(PKGDIRBASE)/bplib/aa/fwp/inc
@@ -27,23 +26,26 @@ INCLUDES += -I$(PKGDIRBASE)/bplib/inc
 
 INCLUDES += -I$(PKGDIRBASE)/bplib/version/inc
 
-# Additional includes that came from BPCat / bpnode
+# TODO check includes. Just expose inc folder for user
+
+# Includes not inside the core library, but of the compatibility layer
 INCLUDES += -I$(RIOTPKG)/bplib/fwp/include
 INCLUDES += -I$(RIOTPKG)/bplib/nc/include
 INCLUDES += -I$(RIOTPKG)/bplib/init/include
 
-
+# Conditional modules
 ifneq (,$(filter bplib_cla_ble,$(USEMODULE)))
-INCLUDES += -I$(RIOTPKG)/bplib/cla/ble/include
+  INCLUDES += -I$(RIOTPKG)/bplib/cla/ble/include
 endif
 
 ifneq (,$(filter bplib_cla_udp,$(USEMODULE)))
-INCLUDES += -I$(RIOTPKG)/bplib/cla/udp/include
+  INCLUDES += -I$(RIOTPKG)/bplib/cla/udp/include
 endif
 
 ifneq (,$(filter bplib_stor_vfs,$(USEMODULE)))
-INCLUDES += -I$(RIOTPKG)/bplib/stor_vfs/include
+  INCLUDES += -I$(RIOTPKG)/bplib/stor_vfs/include
 endif
 
+PSEUDOMODULES += bplib_walltime_available
 
 ARCHIVES += $(BINDIR)/libbplib.a

@@ -11,7 +11,7 @@ The remote node ID(s) are adjusted in the `bplib_cla_contactstable`. There you a
 ## Examples
 ### Loopback
 
-To test simple loopback inside the node set the `BPLIB_LOCAL_EID_NODE_NUM` equal to the `DestEID.Node` in the `bplib_pi_channeltable`.
+To test simple loopback inside the node set the `BPLIB_LOCAL_EID_NODE_NUM` equal to the `DestEID.Node`.
 
 When using the `bp 0 "[DATA]"` shell command, the data you entered should go though bplib's internal delivery, since the current node is the destination.
 

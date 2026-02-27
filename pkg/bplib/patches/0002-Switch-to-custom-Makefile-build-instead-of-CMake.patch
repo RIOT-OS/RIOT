@@ -1,7 +1,7 @@
 From 54220e2ed17c5aca81ea96cffd43c031cfcbb982 Mon Sep 17 00:00:00 2001
 From: Simon Grund <simon.grund@tuhh.de>
 Date: Sun, 8 Feb 2026 12:42:13 +0100
-Subject: [PATCH 2/5] Switch to custom Makefile build instead of CMake
+Subject: [PATCH 2/6] Switch to custom Makefile build instead of CMake
 
 ---
  riot.mk | 34 ++++++++++++++++++++++++++++++++++

@@ -1,7 +1,7 @@
 From 1788fdf7137246c2e2a3618076df2d1cc7054c66 Mon Sep 17 00:00:00 2001
 From: Simon Grund <simon.grund@tuhh.de>
 Date: Wed, 4 Feb 2026 13:56:09 +0100
-Subject: [PATCH 1/5] Initial port of bplib
+Subject: [PATCH 1/6] Initial port of bplib
 
 Changed all Threading synchronization to RIOT analogs. Changed the time
 module to use vfs. The storage is now only the header, the actual
