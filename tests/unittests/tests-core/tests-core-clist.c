@@ -363,7 +363,7 @@ static void _prepare_unsorted_clist(size_t len)
  * and adds the buffer elements in ascending memory order to the list. The
  * elements are filled with demo test data that contains duplicates.
  *
- * Afert sorting, it is verified that
+ * After sorting, it is verified that
  * - the resulting list is sorted
  * - the resulting list still has the correct size (no elements lost in sort)
  * - duplicate elements of the input data are still in the original order
@@ -378,6 +378,37 @@ static void test_clist_sort(void)
         clist_sort(list, _cmp);
         TEST_ASSERT(_is_clist_stable_sorted(list));
         TEST_ASSERT_EQUAL_INT(cur_len, clist_count(list));
+    }
+}
+
+/*
+ * This does as test_clist_sort, but sorts the list lpoping node by node
+ * and inserting each into a sorted_list using the insert function.
+ *
+ * This is a insertion sort to test the insert function.
+ *
+ * After sorting, it is verified that
+ * - the resulting list is sorted
+ * - the resulting list still has the correct size (no elements lost in sort)
+ * - duplicate elements of the input data are still in the original order
+ *   (the sort is stable)
+ */
+static void test_clist_insert_sorted(void)
+{
+    clist_node_t *list = &test_clist;
+    clist_node_t *sorted_list = &((clist_node_t){});
+
+    for (size_t cur_len = 0; cur_len < TEST_CLIST_LEN; cur_len++) {
+        /* empty sorted list */
+        sorted_list->next = NULL;
+        _prepare_unsorted_clist(cur_len);
+        clist_node_t * node;
+        /* a simple insertion sort based on insert lpop is stable */
+        while ((node = clist_lpop(list))) {
+            clist_insert_sorted(sorted_list, node, _cmp);
+        }
+        TEST_ASSERT(_is_clist_stable_sorted(sorted_list));
+        TEST_ASSERT_EQUAL_INT(cur_len, clist_count(sorted_list));
     }
 }
 
@@ -470,6 +501,7 @@ Test *tests_core_clist_tests(void)
         new_TestFixture(test_clist_lpoprpush),
         new_TestFixture(test_clist_foreach),
         new_TestFixture(test_clist_sort),
+        new_TestFixture(test_clist_insert_sorted),
         new_TestFixture(test_clist_count),
         new_TestFixture(test_clist_is_empty),
         new_TestFixture(test_clist_special_cardinality),
