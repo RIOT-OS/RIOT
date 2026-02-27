@@ -1,3 +1,14 @@
+/*
+ * NASA Docket No. GSC-19,559-1, and identified as "Delay/Disruption Tolerant Networking
+ * (DTN) Bundle Protocol (BP) v7 Core Flight System (cFS) Application Build 7.0
+ *
+ * SPDX-FileCopyrightText: 2025 United States Government as represented by the Administrator of the
+ * SPDX-FileCopyrightText: National Aeronautics and Space Administration.
+ * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Based on bplib's example implementation in [bplib]/app/bpcat.c
+ */
 #include "bplib_init.h"
 
 #include "bplib_riot_fwp.h"
@@ -5,83 +16,74 @@
 
 #include <inttypes.h>
 
-// TODO check stack size
-#define BPLIB_GENERIC_STACK_SIZE THREAD_STACKSIZE_SMALL
 static char generic_worker_stack[BPLIB_GENERIC_STACK_SIZE];
-
 static char mem_pool[BPLIB_MEMPOOL_LEN] __attribute__ ((aligned (8)));
 
 bplib_instance_data_t bplib_instance_data;
 
-static void* generic_worker(void *)
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
+static void* generic_worker(void * arg)
 {
-    int32_t WorkerID; // THIS ONLY WORKS IF THERE'S ONE WORKER ID!!!
-    BPLib_Status_t rv = BPLib_QM_RegisterWorker(&bplib_instance_data.BPLibInst, &WorkerID);
-    if (rv != BPLIB_SUCCESS)
-    {
-        printf("bplib QM_RegisterWorker failed with %"PRId32"\n", rv);
+    (void) arg;
+    int32_t worker_id; // THIS ONLY WORKS IF THERE'S ONE WORKER ID!!!
+    BPLib_Status_t rv = BPLib_QM_RegisterWorker(&bplib_instance_data.BPLibInst, &worker_id);
+    if (rv != BPLIB_SUCCESS) {
+        DEBUG("bplib QM_RegisterWorker failed with %"PRId32"\n", rv);
         return NULL;
     }
 
-    while (bplib_instance_data.running)
-    {
+    while (bplib_instance_data.running) {
         BPLib_QM_WorkerRunJob(&bplib_instance_data.BPLibInst, 0, BPLIB_GEN_WORKER_TIMEOUT);
     }
     return NULL;
 }
 
-#define DEBUG_NO_CANCEL_INIT 0
-
-// TODO: Documentation. Note: The time functions provided through the NC should be running
-// before this is called
-int bplib_init(void) {
-    BPLib_Status_t BPLibStatus;
+int bplib_init(void)
+{
+    BPLib_Status_t bplib_status;
 
     bplib_instance_data.running = 1;
 
     /* FWP */
-    BPLibStatus = bplib_riot_fwp_init();
-    if (BPLibStatus != BPLIB_SUCCESS)
-    {
+    bplib_status = bplib_riot_fwp_init();
+    if (bplib_status != BPLIB_SUCCESS) {
         return 1;
     }
 
     /* EM */
-    BPLibStatus = BPLib_EM_Init();
-    if (BPLibStatus != BPLIB_SUCCESS)
-    {
+    bplib_status = BPLib_EM_Init();
+    if (bplib_status != BPLIB_SUCCESS) {
         return 2;
     }
 
     /* Time Management */
-    BPLibStatus = BPLib_TIME_Init();
-    if (BPLibStatus != BPLIB_SUCCESS)
-    {
+    bplib_status = BPLib_TIME_Init();
+    if (bplib_status != BPLIB_SUCCESS) {
         return 3;
-    } 
+    }
 
     /* Node Config */
-    BPLibStatus = bplib_riot_nc_init(&bplib_instance_data.ConfigPtrs);
-    if (BPLibStatus != BPLIB_SUCCESS)
-    {
+    bplib_status = bplib_riot_nc_init(&bplib_instance_data.ConfigPtrs);
+    if (bplib_status != BPLIB_SUCCESS) {
         return 4;
     }
 
     /* MEM */
-    BPLibStatus = BPLib_MEM_PoolInit(&bplib_instance_data.BPLibInst.pool, mem_pool,
+    bplib_status = BPLib_MEM_PoolInit(&bplib_instance_data.BPLibInst.pool, mem_pool,
         (size_t)BPLIB_MEMPOOL_LEN);
-    if (BPLibStatus != BPLIB_SUCCESS)
-    {
+    if (bplib_status != BPLIB_SUCCESS) {
         return 5;
     }
 
-    BPLibStatus = BPLib_QM_QueueTableInit(&bplib_instance_data.BPLibInst, BPLIB_QM_MAX_JOBS);
-    if (BPLibStatus != BPLIB_SUCCESS)
-    {
+    /* QM */
+    bplib_status = BPLib_QM_QueueTableInit(&bplib_instance_data.BPLibInst, BPLIB_QM_MAX_JOBS);
+    if (bplib_status != BPLIB_SUCCESS) {
         return 6;
     }
 
-    /* Start Gen Worker */
+    /* Start Generic Worker */
     int rc = thread_create(generic_worker_stack, BPLIB_GENERIC_STACK_SIZE,
         THREAD_PRIORITY_MAIN - 1, 0, generic_worker,
         NULL, "bplib-generic");

@@ -6,12 +6,11 @@ PKG_LICENSE = Apache License 2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
+# ifneq (,$(filter bplib_default_fwp,$(USEMODULE)))
+#   SRC += $(RIOTPKG)/bplib/fwp/bplib_riot_fwp.c
+# endif
 
-
-ifneq (,$(filter bplib_default_fwp,$(USEMODULE)))
-SRC += $(RIOTPKG)/bplib/fwp/bplib_riot_fwp.c
-endif
-
+IGNORE  := bplib_walltime_available
 SUBMODS := $(filter-out $(IGNORE),$(filter bplib_%,$(USEMODULE)))
 
 
@@ -29,6 +28,7 @@ bplib_init:
 bplib_stor_vfs:
 	+"$(MAKE)" -C $(RIOTPKG)/bplib/stor_vfs
 
+# TODO remove
 bplib_cla_ble:
 	+"$(MAKE)" -C $(RIOTPKG)/bplib/cla/ble
 

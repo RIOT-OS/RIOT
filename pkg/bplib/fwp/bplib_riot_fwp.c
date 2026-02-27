@@ -1,40 +1,32 @@
 /*
- * NASA Docket No. GSC-19,559-1, and identified as "Delay/Disruption Tolerant Networking 
+ * NASA Docket No. GSC-19,559-1, and identified as "Delay/Disruption Tolerant Networking
  * (DTN) Bundle Protocol (BP) v7 Core Flight System (cFS) Application Build 7.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this 
- * file except in compliance with the License. You may obtain a copy of the License at 
+ * SPDX-FileCopyrightText: 2025 United States Government as represented by the Administrator of the
+ * SPDX-FileCopyrightText: National Aeronautics and Space Administration.
+ * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
+ * SPDX-License-Identifier: Apache-2.0
  *
- * http://www.apache.org/licenses/LICENSE-2.0 
- *
- * Unless required by applicable law or agreed to in writing, software distributed under 
- * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF 
- * ANY KIND, either express or implied. See the License for the specific language 
- * governing permissions and limitations under the License. The copyright notice to be 
- * included in the software is as follows: 
- *
- * Copyright 2025 United States Government as represented by the Administrator of the 
- * National Aeronautics and Space Administration. All Rights Reserved.
- *
+ * Based on bplib's example implementation in [bplib]/app/src/bpcat_fwp.c
  */
 #include "bplib_riot_fwp.h"
 #include "bplib.h"
 
+/* Signal the vfs based storage when a contact / channel terminates to flush the caches */
 #if MODULE_BPLIB_STOR_VFS
-#include "bplib_stor_vfs.h"
+#  include "bplib_stor_vfs.h"
 #endif
 
-#if MODULE_BPLIB_CLA_UDP
-#include "bplib_cla_udp.h"
+/* If walltime is provided to be set to an accurate value. */
+#if MODULE_BPLIB_WALLTIME_AVAILABLE
+#  include "walltime.h"
 #endif
 
 #include "ztimer64.h"
-#include "walltime.h"
+#include <stdint.h>
 
-// TODO check includes
-#include <stdio.h>
-#include <sys/time.h>
-#include <sys/types.h>
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 static int64_t BPA_TIMEP_GetMonotonicTime(void)
 {
@@ -43,16 +35,20 @@ static int64_t BPA_TIMEP_GetMonotonicTime(void)
 
 static int64_t BPA_TIMEP_GetHostTime(void)
 {
-    uint16_t msec;
-    uint32_t sec = walltime_get_riot(&msec);
-
-    return (int64_t)(sec) * 1000 + (int64_t)(msec);
+#if MODULE_BPLIB_WALLTIME_AVAILABLE
+        uint16_t msec;
+        uint32_t sec = walltime_get_riot(&msec);
+        return (int64_t)(sec) * 1000 + (int64_t)(msec);
+#else
+        return 0;
+#endif
 }
 
 static void BPA_TIMEP_GetHostEpoch(BPLib_TIME_Epoch_t *Epoch)
 {
     if (Epoch != NULL)
     {
+        /* RIOT Epoch: 2020/01/01, 00:00:00 UTC */
         Epoch->Year   = 2020;
         Epoch->Day    = 1;
         Epoch->Hour   = 1;
@@ -64,7 +60,13 @@ static void BPA_TIMEP_GetHostEpoch(BPLib_TIME_Epoch_t *Epoch)
 
 static BPLib_TIME_ClockState_t BPA_TIMEP_GetHostClockState(void)
 {
-    return BPLIB_TIME_CLOCK_VALID;
+    /* Assume valid if walltime is there */
+    if (IS_USED(MODULE_BPLIB_WALLTIME_AVAILABLE)) {
+        return BPLIB_TIME_CLOCK_VALID;
+    }
+    else {
+        return BPLIB_TIME_CLOCK_INVALID;
+    }
 }
 
 static void BPA_PERFLOGP_Entry(uint32_t PerfLogID)
@@ -91,49 +93,57 @@ static BPLib_Status_t BPA_EVP_Init(void)
     return BPLIB_SUCCESS;
 }
 
-static BPLib_Status_t BPA_EVP_SendEvent(uint16_t EventID, BPLib_EM_EventType_t EventType, char const* Spec)
+static BPLib_Status_t BPA_EVP_SendEvent(uint16_t EventID,
+    BPLib_EM_EventType_t EventType, char const* Spec)
 {
-    printf("Event Type: %d, Event ID: %d, Event Text: %s\n", EventID, EventType, Spec);
+    DEBUG("Event Type: %d, Event ID: %d, Event Text: %s\n", EventID, EventType, Spec);
     return BPLIB_SUCCESS;
 }
 
-static BPLib_Status_t BPA_TLMP_SendNodeMibConfigPkt(BPLib_NodeMibConfigHkTlm_Payload_t* NodeMIBConfigTlmPayload)
+static BPLib_Status_t BPA_TLMP_SendNodeMibConfigPkt(
+    BPLib_NodeMibConfigHkTlm_Payload_t* NodeMIBConfigTlmPayload)
 {
     (void) NodeMIBConfigTlmPayload;
     return BPLIB_SUCCESS;
 }
 
-static BPLib_Status_t BPA_TLMP_SendPerSourceMibConfigPkt(BPLib_SourceMibConfigHkTlm_Payload_t* SrcMIBConfigTlmPayload)
+static BPLib_Status_t BPA_TLMP_SendPerSourceMibConfigPkt(
+    BPLib_SourceMibConfigHkTlm_Payload_t* SrcMIBConfigTlmPayload)
 {
     (void) SrcMIBConfigTlmPayload;
     return BPLIB_SUCCESS;
 }
 
-static BPLib_Status_t BPA_TLMP_SendNodeMibReportsPkt(BPLib_NodeMibReportsHkTlm_Payload_t* NodeMIBReportsTlmPayload)
+static BPLib_Status_t BPA_TLMP_SendNodeMibReportsPkt(
+    BPLib_NodeMibReportsHkTlm_Payload_t* NodeMIBReportsTlmPayload)
 {
     (void) NodeMIBReportsTlmPayload;
     return BPLIB_SUCCESS;
 }
 
-static BPLib_Status_t BPA_TLMP_SendNodeMibCounterPkt(BPLib_NodeMibCountersHkTlm_Payload_t* NodeMIBCounterTlmPayload)
+static BPLib_Status_t BPA_TLMP_SendNodeMibCounterPkt(
+    BPLib_NodeMibCountersHkTlm_Payload_t* NodeMIBCounterTlmPayload)
 {
     (void) NodeMIBCounterTlmPayload;
     return BPLIB_SUCCESS;
 }
 
-static BPLib_Status_t BPA_TLMP_SendPerSourceMibCounterPkt(BPLib_SourceMibCountersHkTlm_Payload_t* SrcMIBCounterTlmPayload)
+static BPLib_Status_t BPA_TLMP_SendPerSourceMibCounterPkt(
+    BPLib_SourceMibCountersHkTlm_Payload_t* SrcMIBCounterTlmPayload)
 {
     (void) SrcMIBCounterTlmPayload;
     return BPLIB_SUCCESS;
 }
 
-static BPLib_Status_t BPA_TLMP_SendChannelContactPkt(BPLib_ChannelContactStatHkTlm_Payload_t* ChannelContactTlmPayload)
+static BPLib_Status_t BPA_TLMP_SendChannelContactPkt(
+    BPLib_ChannelContactStatHkTlm_Payload_t* ChannelContactTlmPayload)
 {
     (void) ChannelContactTlmPayload;
     return BPLIB_SUCCESS;
 }
 
-static BPLib_Status_t BPA_TLMP_SendStoragePkt(BPLib_StorageHkTlm_Payload_t* StorTlmPayload)
+static BPLib_Status_t BPA_TLMP_SendStoragePkt(
+    BPLib_StorageHkTlm_Payload_t* StorTlmPayload)
 {
     (void) StorTlmPayload;
     return BPLIB_SUCCESS;

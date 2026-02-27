@@ -1,52 +1,36 @@
 /*
- * NASA Docket No. GSC-19,559-1, and identified as "Delay/Disruption Tolerant Networking 
- * (DTN) Bundle Protocol (BP) v7 Core Flight System (cFS) Application Build 7.0
+ * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
+ * SPDX-License-Identifier: LGPL-2.1-only
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this 
- * file except in compliance with the License. You may obtain a copy of the License at 
- *
- * http://www.apache.org/licenses/LICENSE-2.0 
- *
- * Unless required by applicable law or agreed to in writing, software distributed under 
- * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF 
- * ANY KIND, either express or implied. See the License for the specific language 
- * governing permissions and limitations under the License. The copyright notice to be 
- * included in the software is as follows: 
- *
- * Copyright 2025 United States Government as represented by the Administrator of the 
- * National Aeronautics and Space Administration. All Rights Reserved.
- *
+ * Based on bplib's example implementation in [bplib]/app/src/bpcat_cla.c
  */
 #include "bplib_cla_udp.h"
 #include "bplib_init.h"
 
 #include <inttypes.h>
 
-#define CLA_TIMEOUT              10000
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 static void* cla_udp_out(bplib_cla_udp_t * cla)
 {
-    BPLib_Status_t EgressStatus;
+    BPLib_Status_t egress_status;
     int rc;
     uint8_t buffer[BPLIB_CLA_UDP_BUFLEN] = {0};
-    size_t OutSize;
+    size_t out_size;
 
-    while(cla->running && bplib_instance_data.running)
-    {
-        EgressStatus = BPLib_CLA_Egress(&bplib_instance_data.BPLibInst, cla->contact_id,
-            buffer, &OutSize, BPLIB_CLA_UDP_BUFLEN, CLA_TIMEOUT);
-        if (EgressStatus == BPLIB_SUCCESS)
-        {
-            rc = sock_udp_send(&cla->sock, buffer, OutSize, NULL);
-            if (rc < 0 && rc != -EHOSTUNREACH)
-            {
-                printf("sock_udp_send() failed: %i\n", rc);
+    while (cla->running && bplib_instance_data.running) {
+        egress_status = BPLib_CLA_Egress(&bplib_instance_data.BPLibInst, cla->contact_id,
+            buffer, &out_size, BPLIB_CLA_UDP_BUFLEN, BPLIB_CLA_UDP_TIMEOUT);
+        if (egress_status == BPLIB_SUCCESS) {
+            rc = sock_udp_send(&cla->sock, buffer, out_size, NULL);
+            if (rc < 0 && rc != -EHOSTUNREACH) {
+                DEBUG("sock_udp_send() failed: %i\n", rc);
                 return NULL;
             }
         }
-        else if (EgressStatus != BPLIB_CLA_TIMEOUT)
-        {
-            printf("Error egressing, RC=%"PRId32"\n", EgressStatus);
+        else if (egress_status != BPLIB_CLA_TIMEOUT) {
+            DEBUG("Error egressing, RC=%"PRId32"\n", egress_status);
         }
     }
     return NULL;
@@ -55,24 +39,20 @@ static void* cla_udp_out(bplib_cla_udp_t * cla)
 static void* cla_udp_in(bplib_cla_udp_t * cla)
 {
     uint8_t buffer[BPLIB_CLA_UDP_BUFLEN] = {0};
-    BPLib_Status_t BpStatus;
+    BPLib_Status_t bp_status;
 
-    while(cla->running && bplib_instance_data.running)
-    {
+    while (cla->running && bplib_instance_data.running) {
 
-        int rv = sock_udp_recv(&cla->sock, buffer, BPLIB_CLA_UDP_BUFLEN, CLA_TIMEOUT, NULL);
+        int rv = sock_udp_recv(&cla->sock, buffer, BPLIB_CLA_UDP_BUFLEN, BPLIB_CLA_UDP_TIMEOUT, NULL);
 
-        if (rv > 0)
-        {
-            BpStatus = BPLib_CLA_Ingress(&bplib_instance_data.BPLibInst, cla->contact_id, buffer, rv, 0);
-            if (BpStatus != BPLIB_SUCCESS)
-            {
-                printf("BPLib_CLA_Ingress Fail RC=%"PRId32"\n", BpStatus);
+        if (rv > 0) {
+            bp_status = BPLib_CLA_Ingress(&bplib_instance_data.BPLibInst, cla->contact_id, buffer, rv, 0);
+            if (bp_status != BPLIB_SUCCESS) {
+                DEBUG("BPLib_CLA_Ingress Fail RC=%"PRId32"\n", bp_status);
             }
         }
-        else if (rv < 0 && rv != -ETIMEDOUT)
-        {
-            printf("sock_udp_recv() failed");
+        else if (rv < 0 && rv != -ETIMEDOUT) {
+            DEBUG("sock_udp_recv() failed");
             return NULL;
         }
     }
@@ -80,9 +60,10 @@ static void* cla_udp_in(bplib_cla_udp_t * cla)
     return NULL;
 }
 
-
 int bplib_cla_udp_start(bplib_cla_udp_t* cla, uint32_t contact_id) {
-    if (cla == NULL || cla->running == 1) return -EINVAL;
+    if (cla == NULL || cla->running == 1) {
+        return -EINVAL;
+    }
 
     int rc;
     sock_udp_ep_t local_ep;
@@ -91,7 +72,7 @@ int bplib_cla_udp_start(bplib_cla_udp_t* cla, uint32_t contact_id) {
     if (ipv6_addr_from_str((ipv6_addr_t*) &remote_ep.addr.ipv6,
         bplib_instance_data.ConfigPtrs.ContactsConfigPtr->ContactSet[contact_id].ClaOutAddr) == NULL)
     {
-        printf("Failed to convert IP address [%s]\n",
+        DEBUG("Failed to convert IP address [%s]\n",
             bplib_instance_data.ConfigPtrs.ContactsConfigPtr->ContactSet[contact_id].ClaOutAddr);
         return -EINVAL;
     }
@@ -101,7 +82,7 @@ int bplib_cla_udp_start(bplib_cla_udp_t* cla, uint32_t contact_id) {
     if (ipv6_addr_from_str((ipv6_addr_t*) &local_ep.addr.ipv6,
         bplib_instance_data.ConfigPtrs.ContactsConfigPtr->ContactSet[contact_id].ClaInAddr) == NULL)
     {
-        printf("Failed to convert IP address [%s]\n",
+        DEBUG("Failed to convert IP address [%s]\n",
             bplib_instance_data.ConfigPtrs.ContactsConfigPtr->ContactSet[contact_id].ClaInAddr);
         return -EINVAL;
     }
@@ -112,7 +93,7 @@ int bplib_cla_udp_start(bplib_cla_udp_t* cla, uint32_t contact_id) {
 
     rc = sock_udp_create(&cla->sock, &local_ep, &remote_ep, 0);
     if (rc < 0) {
-        printf("Failed to open socket: %i, %s\n", rc, strerror(rc));
+        DEBUG("Failed to open socket: %i, %s\n", rc, strerror(rc));
         return rc;
     }
 
@@ -139,7 +120,9 @@ int bplib_cla_udp_start(bplib_cla_udp_t* cla, uint32_t contact_id) {
 }
 
 void bplib_cla_udp_stop(bplib_cla_udp_t* cla) {
-    if (cla == NULL || cla->running == 0) return;
+    if (cla == NULL || cla->running == 0) {
+        return;
+    }
 
     cla->running = 0;
 

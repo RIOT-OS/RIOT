@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = bplib-test
+APPLICATION = bplib_cla_udp
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
@@ -35,6 +35,8 @@ USEMODULE += bplib_cla_udp
 
 USEMODULE += netdev_tap
 USEMODULE += shell_cmd_gnrc_netif
+USEMODULE += gnrc_ipv6_default
+USEMODULE += auto_init_gnrc_netif
 
 USEMODULE += vfs_default
 CFLAGS += -DFS_NATIVE_DIR=\"$(CURDIR)/native\"

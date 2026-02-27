@@ -1,0 +1,335 @@
+From 99fedbd097a8c81131d6fb3b0309c62aaa234d69 Mon Sep 17 00:00:00 2001
+From: Simon Grund <simon.grund@tuhh.de>
+Date: Thu, 26 Feb 2026 13:52:05 +0100
+Subject: [PATCH 6/6] Optimize NC and AS
+
+Remove unnecessary tables and conditionally exclude AS unless
+BPLIB_RIOT_INCLUDE_AS is defined. Similar for telemetry from
+NC, with BPLIB_RIOT_INCLUDE_NC_TELEMETRY. In total saves more
+than 20kB of .bss data, and some few kB of .text.
+---
+ aa/as/src/bplib_as.c            | 86 ++++++++++++++++++++++++++++++++-
+ aa/as/src/bplib_as_internal.c   | 41 ++++++++++++++++
+ aa/nc/inc/bplib_nc_directives.h |  3 ++
+ aa/nc/src/bplib_nc.c            | 28 +++++++----
+ aa/nc/src/bplib_nc_directives.c |  8 +++
+ aa/nc/src/bplib_nc_internal.c   |  3 ++
+ aa/nc/src/bplib_nc_internal.h   |  3 ++
+ 7 files changed, 162 insertions(+), 10 deletions(-)
+
+diff --git a/aa/as/src/bplib_as.c b/aa/as/src/bplib_as.c
+index dcadc001..6bc55573 100644
+--- a/aa/as/src/bplib_as.c
++++ b/aa/as/src/bplib_as.c
+@@ -23,6 +23,9 @@
+ /* ======== */
+ 
+ #include "bplib_as.h"
++
++#ifdef BPLIB_RIOT_INCLUDE_AS
++
+ #include "bplib_as_internal.h"
+ #include "bplib_fwp.h"
+ #include "bplib_time.h"
+@@ -541,4 +544,85 @@ BPLib_Status_t BPLib_AS_AddMibArrayKey(const BPLib_EID_Pattern_t* EID_Patterns)
+     }
+ 
+     return Status;
+-}
+\ No newline at end of file
++}
++
++#else /* BPLIB_RIOT_INCLUDE_AS */
++
++BPLib_Status_t BPLib_AS_Init(void)
++{
++    return BPLIB_SUCCESS;
++}
++
++uint32_t BPLib_AS_GetCounter(BPLib_EID_t *EID, BPLib_AS_Counter_t Counter)
++{
++    return 0;
++}
++
++void BPLib_AS_Increment(BPLib_EID_t EID, BPLib_AS_Counter_t Counter, uint32_t Amount)
++{
++    (void) EID;
++    (void) Counter;
++    (void) Amount;
++    return;
++}
++
++void BPLib_AS_Decrement(BPLib_EID_t EID, BPLib_AS_Counter_t Counter, uint32_t Amount)
++{
++    (void) EID;
++    (void) Counter;
++    (void) Amount;
++    return;
++}
++
++BPLib_Status_t BPLib_AS_ResetCounter(uint16_t MibArrayIndex, BPLib_AS_Counter_t Counter)
++{
++    (void) MibArrayIndex;
++    (void) Counter;
++    return BPLIB_SUCCESS;
++}
++
++BPLib_Status_t BPLib_AS_ResetSourceCounters(uint16_t MibArrayIndex)
++{
++    (void) MibArrayIndex;
++    return BPLIB_SUCCESS;
++}
++
++void BPLib_AS_ResetBundleCounters()
++{
++    return;
++}
++
++BPLib_Status_t BPLib_AS_ResetErrorCounters(uint16_t MibArrayIndex)
++{
++    (void) MibArrayIndex;
++    return BPLIB_SUCCESS;
++}
++
++void BPLib_AS_ResetAllCounters(void)
++{
++    return;
++}
++
++BPLib_Status_t BPLib_AS_SendNodeMibCountersHk()
++{
++    return BPLIB_SUCCESS;
++}
++
++BPLib_Status_t BPLib_AS_SendSourceMibCountersHk()
++{
++    return BPLIB_SUCCESS;
++}
++
++BPLib_Status_t BPLib_AS_SendNodeMibReportsHk(BPLib_Instance_t *Inst)
++{
++    (void) Inst;
++    return BPLIB_SUCCESS;
++}
++
++BPLib_Status_t BPLib_AS_AddMibArrayKey(const BPLib_EID_Pattern_t* EID_Patterns)
++{
++    (void) EID_Patterns;
++    return BPLIB_SUCCESS;
++}
++
++#endif /* BPLIB_RIOT_INCLUDE_AS */
+\ No newline at end of file
+diff --git a/aa/as/src/bplib_as_internal.c b/aa/as/src/bplib_as_internal.c
+index 21f1df0d..8e999cc1 100644
+--- a/aa/as/src/bplib_as_internal.c
++++ b/aa/as/src/bplib_as_internal.c
+@@ -26,6 +26,8 @@
+ #include "bplib_as.h"
+ #include "bplib_version.h"
+ 
++#ifdef BPLIB_RIOT_INCLUDE_AS
++
+ /* ================= */
+ /* Telemetry Packets */
+ /* ================= */
+@@ -150,3 +152,42 @@ void BPLib_AS_UpdateReportsHkTlm(BPLib_Instance_t *Inst)
+     BPLib_AS_NodeReportsPayload.BundleCountStored = Inst->BundleStorage.BundleCountStored;
+     BPLib_AS_NodeReportsPayload.KbytesCountStorageAvailable = (BPLIB_MAX_STORED_BUNDLE_BYTES - Inst->BundleStorage.BytesStorageInUse) / 1000;
+ }
++
++#else
++
++uint32_t BPLib_AS_GetCounterImpl(BPLib_EID_t *EID, BPLib_AS_Counter_t Counter)
++{
++    (void) EID;
++    (void) Counter;
++    return 0;
++}
++
++BPLib_Status_t BPLib_AS_SetCounter(BPLib_EID_t EID, BPLib_AS_Counter_t Counter, uint32_t Value)
++{
++    (void) EID;
++    (void) Counter;
++    (void) Value;
++    return BPLIB_SUCCESS;
++}
++
++BPLib_Status_t BPLib_AS_InitMutex(void)
++{
++    return BPLIB_SUCCESS;
++}
++
++void BPLib_AS_LockCounters(void)
++{
++    return;
++}
++
++void BPLib_AS_UnlockCounters(void)
++{
++    return;
++}
++
++void BPLib_AS_InitializeReportsHkTlm(void)
++{
++    return;
++}
++
++#endif
+\ No newline at end of file
+diff --git a/aa/nc/inc/bplib_nc_directives.h b/aa/nc/inc/bplib_nc_directives.h
+index dc15a330..15966e93 100644
+--- a/aa/nc/inc/bplib_nc_directives.h
++++ b/aa/nc/inc/bplib_nc_directives.h
+@@ -38,8 +38,11 @@
+ /* Externs */
+ /* ======= */
+ 
++#ifdef BPLIB_RIOT_INCLUDE_NC_TELEMETRY
+ extern BPLib_SourceMibConfigHkTlm_Payload_t    BPLib_NC_SourceMibConfigPayload;
+ extern BPLib_NodeMibConfigHkTlm_Payload_t      BPLib_NC_NodeMibConfigPayload;
++#endif
++
+ extern BPLib_ChannelContactStatHkTlm_Payload_t BPLib_NC_ChannelContactStatsPayload; /** \brief Global channel contact statistics payload */
+ 
+ /* =================== */
+diff --git a/aa/nc/src/bplib_nc.c b/aa/nc/src/bplib_nc.c
+index 21f5a6e4..b7cfb73f 100644
+--- a/aa/nc/src/bplib_nc.c
++++ b/aa/nc/src/bplib_nc.c
+@@ -58,8 +58,10 @@ BPLib_Status_t BPLib_NC_Init(BPLib_NC_ConfigPtrs_t* ConfigPtrs)
+ {
+     BPLib_Status_t Status;
+ 
++#ifdef BPLIB_RIOT_INCLUDE_NC_TELEMETRY
+     memset((void*) &BPLib_NC_SourceMibConfigPayload,     0, sizeof(BPLib_NC_SourceMibConfigPayload));
+     memset((void*) &BPLib_NC_NodeMibConfigPayload,       0, sizeof(BPLib_NC_NodeMibConfigPayload));
++#endif
+     memset((void*) &BPLib_NC_ChannelContactStatsPayload, 0, sizeof(BPLib_NC_ChannelContactStatsPayload));
+ 
+     /* Initialize the configuration lock */
+@@ -70,18 +72,20 @@ BPLib_Status_t BPLib_NC_Init(BPLib_NC_ConfigPtrs_t* ConfigPtrs)
+     }
+ 
+     /* Capture configuration pointers in the global configuration struct */
++    /* Note: For RIOT, tables which are currently not used in bplib can be NULL */
+     if (ConfigPtrs                     == NULL ||
+         ConfigPtrs->ChanConfigPtr      == NULL ||
+         ConfigPtrs->ContactsConfigPtr  == NULL ||
+-        ConfigPtrs->CrsConfigPtr       == NULL ||
+-        ConfigPtrs->CustodianConfigPtr == NULL ||
+-        ConfigPtrs->CustodyConfigPtr   == NULL ||
+-        ConfigPtrs->MibPnConfigPtr     == NULL ||
+-        ConfigPtrs->MibPsConfigPtr     == NULL ||
+-        ConfigPtrs->ReportConfigPtr    == NULL ||
+-        ConfigPtrs->AuthConfigPtr      == NULL ||
+-        ConfigPtrs->LatConfigPtr       == NULL ||
+-        ConfigPtrs->StorConfigPtr      == NULL)
++        /* ConfigPtrs->CrsConfigPtr       == NULL || */
++        /* ConfigPtrs->CustodianConfigPtr == NULL || */
++        /* ConfigPtrs->CustodyConfigPtr   == NULL || */
++        ConfigPtrs->MibPnConfigPtr     == NULL /* || */
++        /* ConfigPtrs->MibPsConfigPtr     == NULL || */
++        /* ConfigPtrs->ReportConfigPtr    == NULL || */
++        /* ConfigPtrs->AuthConfigPtr      == NULL || */
++        /* ConfigPtrs->LatConfigPtr       == NULL || */
++        /* ConfigPtrs->StorConfigPtr      == NULL */
++        )
+     {
+         Status = BPLIB_NC_INIT_CONFIG_PTRS_ERROR;
+     }
+@@ -104,8 +108,10 @@ BPLib_Status_t BPLib_NC_Init(BPLib_NC_ConfigPtrs_t* ConfigPtrs)
+         BPLib_EID_CopyEids(&BPLIB_EID_INSTANCE, BPLib_NC_ConfigPtrs.MibPnConfigPtr->InstanceEID);
+ 
+         /* Set telemetry values */
++#ifdef BPLIB_RIOT_INCLUDE_NC_TELEMETRY
+         memcpy(&(BPLib_NC_NodeMibConfigPayload.Values), BPLib_NC_ConfigPtrs.MibPnConfigPtr, 
+                                                             sizeof(BPLib_NC_MibPerNodeConfig_t));
++#endif
+ 
+         /* Initialize contact/channel status telemetry with table values */
+         BPLib_NC_UpdateContactHkTlm();
+@@ -170,7 +176,9 @@ BPLib_Status_t BPLib_NC_SetMibNodeConfig(uint32_t MibItem, uint32_t Value)
+                 ** Table update was successful, update the corresponding telemetry value
+                 ** as well
+                 */
++#ifdef BPLIB_RIOT_INCLUDE_NC_TELEMETRY
+                 BPLib_NC_NodeMibConfigPayload.Values.Configs[MibItem] = Value;
++#endif
+             }
+             else
+             {
+@@ -430,8 +438,10 @@ static BPLib_Status_t BPLib_NC_ConfigUpdateUnlocked(void)
+         BPLib_EID_CopyEids(&BPLIB_EID_INSTANCE, BPLib_NC_ConfigPtrs.MibPnConfigPtr->InstanceEID);
+ 
+         /* Update telemetry values */
++#ifdef BPLIB_RIOT_INCLUDE_NC_TELEMETRY
+         memcpy(&(BPLib_NC_NodeMibConfigPayload.Values), BPLib_NC_ConfigPtrs.MibPnConfigPtr, 
+                                                             sizeof(BPLib_NC_MibPerNodeConfig_t));
++#endif
+ 
+         BPLib_EM_SendEvent(BPLIB_NC_TBL_UPDATE_INF_EID,
+                             BPLib_EM_EventType_INFORMATION,
+diff --git a/aa/nc/src/bplib_nc_directives.c b/aa/nc/src/bplib_nc_directives.c
+index 45a002e1..95413215 100644
+--- a/aa/nc/src/bplib_nc_directives.c
++++ b/aa/nc/src/bplib_nc_directives.c
+@@ -1076,7 +1076,11 @@ void BPLib_NC_SendNodeMibConfigHk(void)
+ {
+     BPLib_Status_t Status;
+ 
++#ifdef BPLIB_RIOT_INCLUDE_NC_TELEMETRY
+     Status = BPLib_FWP_ProxyCallbacks.BPA_TLMP_SendNodeMibConfigPkt(&BPLib_NC_NodeMibConfigPayload);
++#else
++    Status = BPLib_FWP_ProxyCallbacks.BPA_TLMP_SendNodeMibConfigPkt(NULL);
++#endif
+ 
+     if (Status != BPLIB_SUCCESS)
+     {
+@@ -1092,7 +1096,11 @@ void BPLib_NC_SendSourceMibConfigHk(void)
+ {
+     BPLib_Status_t Status;
+ 
++#ifdef BPLIB_RIOT_INCLUDE_NC_TELEMETRY
+     Status = BPLib_FWP_ProxyCallbacks.BPA_TLMP_SendPerSourceMibConfigPkt(&BPLib_NC_SourceMibConfigPayload);
++#else
++    Status = BPLib_FWP_ProxyCallbacks.BPA_TLMP_SendPerSourceMibConfigPkt(NULL);
++#endif
+ 
+     if (Status != BPLIB_SUCCESS)
+     {
+diff --git a/aa/nc/src/bplib_nc_internal.c b/aa/nc/src/bplib_nc_internal.c
+index 98475903..f1beb56d 100644
+--- a/aa/nc/src/bplib_nc_internal.c
++++ b/aa/nc/src/bplib_nc_internal.c
+@@ -27,8 +27,11 @@
+ ** Global Data
+ */
+ 
++#ifdef BPLIB_RIOT_INCLUDE_NC_TELEMETRY
+ BPLib_SourceMibConfigHkTlm_Payload_t    BPLib_NC_SourceMibConfigPayload;
+ BPLib_NodeMibConfigHkTlm_Payload_t      BPLib_NC_NodeMibConfigPayload;
++#endif
++
+ BPLib_ChannelContactStatHkTlm_Payload_t BPLib_NC_ChannelContactStatsPayload;
+ 
+ 
+diff --git a/aa/nc/src/bplib_nc_internal.h b/aa/nc/src/bplib_nc_internal.h
+index 68d5e404..4bc97edb 100644
+--- a/aa/nc/src/bplib_nc_internal.h
++++ b/aa/nc/src/bplib_nc_internal.h
+@@ -33,8 +33,11 @@
+ ** Global Data
+ */
+ 
++#ifdef BPLIB_RIOT_INCLUDE_NC_TELEMETRY
+ extern BPLib_SourceMibConfigHkTlm_Payload_t    BPLib_NC_SourceMibConfigPayload;
+ extern BPLib_NodeMibConfigHkTlm_Payload_t      BPLib_NC_NodeMibConfigPayload;
++#endif
++
+ extern BPLib_ChannelContactStatHkTlm_Payload_t BPLib_NC_ChannelContactStatsPayload;
+ 
+ 
+-- 
+2.43.0
+

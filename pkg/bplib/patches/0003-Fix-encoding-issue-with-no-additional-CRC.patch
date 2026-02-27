@@ -1,7 +1,7 @@
 From c6e7d1b8f755e10cc833985fc4c5033c4e6b26d4 Mon Sep 17 00:00:00 2001
 From: Simon Grund <simon.grund@tuhh.de>
 Date: Sat, 14 Feb 2026 02:28:18 +0100
-Subject: [PATCH 3/5] Fix encoding issue with no additional CRC
+Subject: [PATCH 3/6] Fix encoding issue with no additional CRC
 
 CBORD size 0x86 (6 array elements) was hard-coded, but when no CRC is
 used, there is no sixth element, leading to invalid CBOR (which also

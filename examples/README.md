@@ -112,6 +112,14 @@ Here is a quick overview of the examples available in the RIOT:
 | [dtls-echo](./networking/dtls/dtls-echo/README.md) | This example shows how to use TinyDTLS with sock_udp. |
 | [dtls-wolfssl](./networking/dtls/dtls-wolfssl/README.md) | This example demonstrates the usage of the DTLS module with the wolfSSL library. |
 
+### DTN (BPv7)
+
+#### bplib
+
+| Example | Description |
+|---------|-------------|
+| [bplib_cla_udp](./networking/dtn/bplib_cla_udp/README.md) | This example shows the use of bplib with a single UDP contact. |
+
 ### Misc
 
 | Example | Description |

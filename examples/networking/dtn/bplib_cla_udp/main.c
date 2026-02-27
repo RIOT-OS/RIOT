@@ -1,3 +1,7 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
 #include "bplib_init.h"
 #include "bplib_cla_udp.h"
 #include "bplib.h"
@@ -6,71 +10,16 @@
 
 #include <inttypes.h>
 
-BPLib_PI_ChannelTable_t bplib_pi_channeltable = {
-    .Configs = {
-        {
-            .RequestCustody = true,
-            .CrcType = BPLib_CRC_Type_CRC16,
-            .DestEID = {
-                .Scheme = BPLIB_EID_SCHEME_IPN,
-                .IpnSspFormat = BPLIB_EID_IPN_SSP_FORMAT_TWO_DIGIT,
-                .Allocator = 0,
-                .Node = 100,
-                .Service = 60
-            },
-            .ReportToEID = {
-                .Scheme       = BPLIB_EID_SCHEME_DTN,
-                .IpnSspFormat = BPLIB_EID_IPN_SSP_FORMAT_TWO_DIGIT,
-                .Allocator    = 0,
-                .Node         = 0,
-                .Service      = 0
-            },
-            .LocalServiceNumber = 60,
-            .AgeBlkConfig = {
-                .IncludeBlock = false,
-                .BlockNum = 2
-            },
-            .Lifetime = 3600000
-        }
-    }
-};
-
-BPLib_CLA_ContactsTable_t bplib_cla_contactstable =
-{
-    .ContactSet = {
-        {
-            .DestEIDs               = {{
-                                        .Scheme       = BPLIB_EID_SCHEME_IPN,
-                                        .IpnSspFormat = BPLIB_EID_IPN_SSP_FORMAT_TWO_DIGIT,
-                                        .MaxAllocator = 0,
-                                        .MinAllocator = 0,
-                                        .MaxNode      = 1000,
-                                        .MinNode      = 1,
-                                        .MaxService   = 1000,
-                                        .MinService   = 1},},
-            .CLAType                = 1, /*CLA Type, uint32 */
-            .ClaInAddr              = "fd00::9191:11", /* Address to bind to */
-            .ClaOutAddr             = "fd00::9191:13", /* CL out ip address */
-            .ClaInPort              = 4556, /* Port Number, int32 */
-            .ClaOutPort             = 4556,
-            /* The following are NOP , not yet implemented by bplib */
-            .RetransmitTimeout      = 10, /*bundle reforwarding timeout in seconds, uint32*/
-            .CSTimeTrigger          = 10, /*Custody Signal time trigger in seconds, uint32*/
-            .CSSizeTrigger          = 10 /*Custody signal size trigger in bytes, size_t*/
-        },
-    }
-};
-
-
 static bplib_cla_udp_t cla_udp1;
 
-
 char stack_egress[THREAD_STACKSIZE_MEDIUM];
-void* poll_bp(void *) {
+void* poll_bp(void* arg) {
+    (void) arg;
     BPLib_Status_t rv;
     char buffer[256];
     size_t size;
-    while(1) {
+
+    while (1) {
         rv = BPLib_PI_Egress(&bplib_instance_data.BPLibInst, 0, buffer, &size, sizeof(buffer), 1000);
         if (rv == 0) {
             buffer[size] = '\0';
@@ -79,7 +28,6 @@ void* poll_bp(void *) {
             printf("Egress error: %i\n", rv);
         }
     }
-    
 }
 
 /******************************************************************************
@@ -102,6 +50,44 @@ int main(void)
     thread_create(stack_egress, sizeof(stack_egress),
         THREAD_PRIORITY_MAIN - 1, 0, (void* (*)(void*)) poll_bp,
         NULL, "bplib APP IN");
+
+    /* Configure the channel
+     * Note, this has to happen before BPLib_PI_AddApplication
+     * or again after BPLib_PI_RemoveApplication */
+    BPLib_EID_t dest = {
+       .Scheme = BPLIB_EID_SCHEME_IPN,
+       .IpnSspFormat = BPLIB_EID_IPN_SSP_FORMAT_TWO_DIGIT,
+       .Allocator = 0,
+       .Node = 100,
+       .Service = 60
+    };
+    bplib_channel_set_crc_type(0, BPLib_CRC_Type_CRC16);
+    bplib_channel_set_service_no(0, 60);
+    bplib_channel_set_lifetime(0, 3600000);
+    bplib_channel_set_dest_eid(0, dest);
+    bplib_channel_set_report_to_eid(0, BPLIB_EID_DTN_NONE);
+
+    bplib_channel_set_block_include(0, BPLIB_PREVIOUS_NODE_BLOCK, true);
+
+    bplib_channel_set_block_include(0, BPLIB_HOP_COUNT_BLOCK, true);
+    bplib_channel_set_hop_limit(0, 10);
+
+    /* Configure the contact
+     * Note, this has to happen before BPLib_CLA_ContactSetup
+     * or again after BPLib_CLA_ContactTeardown */
+    BPLib_EID_Pattern_t reachable_eids = {
+        .Scheme       = BPLIB_EID_SCHEME_IPN,
+        .IpnSspFormat = BPLIB_EID_IPN_SSP_FORMAT_TWO_DIGIT,
+        .MaxAllocator = 0,
+        .MinAllocator = 0,
+        .MaxNode      = 1000,
+        .MinNode      = 1,
+        .MaxService   = 1000,
+        .MinService   = 1
+    };
+    bplib_contact_set_destinations(0, 0, reachable_eids);
+    bplib_contact_set_out_addr(0, "fd00::9191:13", 4556);
+    bplib_contact_set_in_addr(0, "fd00::9191:11", 4556);
 
     /* Add and start the application level I/O */
     BPLib_PI_AddApplication(0);
