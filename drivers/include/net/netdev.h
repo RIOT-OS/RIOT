@@ -379,6 +379,78 @@ struct netdev {
 };
 
 /**
+ * @brief Returns the current netdev type
+ */
+static inline netdev_type_t netdev_get_default_type(void)
+{
+#if defined(MODULE_CC2538_RF)
+    return NETDEV_CC2538;
+#elif defined(MODULE_ESP_IEEE802154)
+    return NETDEV_ESP_IEEE802154;
+#elif defined(MODULE_NRF802154)
+    return NETDEV_NRF802154;
+#elif defined(MODULE_SOCKET_ZEP)
+    return NETDEV_SOCKET_ZEP;
+#elif defined(MODULE_KW2XRF)
+    return NETDEV_KW2XRF;
+#elif defined(MODULE_MRF24J40)
+    return NETDEV_MRF24J40;
+#elif defined(MODULE_AT86RF215)
+    return NETDEV_AT86RF215;
+#elif defined(MODULE_AT86RF2XX)
+    return NETDEV_AT86RF2XX;
+#elif defined(MODULE_DOSE)
+    return NETDEV_DOSE;
+#elif defined(MODULE_ENC28J60)
+    return NETDEV_ENC28J60;
+#elif defined(MODULE_KW41ZRF)
+    return NETDEV_KW41ZRF;
+#elif defined(MODULE_STM32_ETH)
+    return NETDEV_STM32_ETH;
+#elif defined(MODULE_CC110X)
+    return NETDEV_CC110X;
+#elif defined(MODULE_SX127X)
+    return NETDEV_SX127X;
+#elif defined(MODULE_SAM0_ETH)
+    return NETDEV_SAM0_ETH;
+#elif defined(MODULE_ESP_NOW)
+    return NETDEV_ESP_NOW;
+#elif defined(MODULE_NRF24L01P_NG)
+    return NETDEV_NRF24L01P_NG;
+#elif defined(MODULE_SX126X)
+    return NETDEV_SX126X;
+#elif defined(MODULE_CC2420)
+    return NETDEV_CC2420;
+#elif defined(MODULE_ETHOS)
+    return NETDEV_ETHOS;
+#elif defined(MODULE_SLIPDEV)
+    return NETDEV_SLIPDEV;
+#elif defined(MODULE_NETDEV_TAP)
+    return NETDEV_TAP;
+#elif defined(MODULE_W5100)
+    return NETDEV_W5100;
+#elif defined(MODULE_ENCX24J600)
+    return NETDEV_ENCX24J600;
+#elif defined(MODULE_ATWINC15X0)
+    return NETDEV_ATWINC15X0;
+#elif defined(MODULE_KW2XRF)
+    return NETDEV_KW2XRF;
+#elif defined(MODULE_ESP_ETH)
+    return NETDEV_ESP_ETH;
+#elif defined(MODULE_ESP_WIFI)
+    return NETDEV_ESP_WIFI;
+#elif defined(MODULE_USBUS_CDC_ECM)
+    return NETDEV_CDC_ECM;
+#elif defined(MODULE_TINYUSB_NETDEV)
+    return NETDEV_TINYUSB;
+#elif defined(MODULE_W5500)
+    return NETDEV_W5500;
+#else
+    return NETDEV_ANY;
+#endif
+}
+
+/**
  * @brief   Signal that the @ref netdev_register function registered the device.
  *
  *          This function is called right after @ref netdev_register registered

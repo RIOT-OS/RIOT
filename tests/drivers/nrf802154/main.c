@@ -19,6 +19,7 @@
 
 #include "nrf802154.h"
 #include "init_dev.h"
+#include "net/ieee802154/init_radio.h"
 #include "net/netdev/ieee802154_submac.h"
 #include "shell.h"
 #include "test_utils/netdev_ieee802154_minimal.h"
@@ -37,8 +38,7 @@ int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
     netdev->event_callback = cb;
 
     /* setup and initialize the specific driver */
-    nrf802154_hal_setup(&nrf802154.submac.dev);
-    nrf802154_init();
+    ieee802154_radio_init(&nrf802154.submac.dev, 0, NULL);
 
     /* initialize the device driver */
     int res = netdev->driver->init(netdev);
