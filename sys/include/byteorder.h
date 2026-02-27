@@ -202,24 +202,48 @@ static inline le_uint64_t byteorder_htolll(uint64_t v);
 
 /**
  * @brief          Convert from host byte order to network byte order, 16 bit.
+ * @note           see @ref byteorder_htons_static for a compile-time version
  * @param[in]      v   The integer in host byte order.
  * @returns        `v` converted to network byte order.
  */
 static inline network_uint16_t byteorder_htons(uint16_t v);
 
 /**
+ * @brief          Convert from host byte order to network byte order, 16 bit.
+ * @param[in]      _u16     The integer in host byte order.
+ * @returns        `_u16` converted to network byte order.
+ */
+#define byteorder_htons_static(_u16) { .u16 = htobe16(_u16) }
+
+/**
  * @brief          Convert from host byte order to network byte order, 32 bit.
+ * @note           see @ref byteorder_htonl_static for a compile-time version
  * @param[in]      v   The integer in host byte order.
  * @returns        `v` converted to network byte order.
  */
 static inline network_uint32_t byteorder_htonl(uint32_t v);
 
 /**
+ * @brief          Convert from host byte order to network byte order, 32 bit.
+ * @param[in]      _u32     The integer in host byte order.
+ * @returns        `_u32` converted to network byte order.
+ */
+#define byteorder_htonl_static(_u32) { .u32 = htobe32(_u32) }
+
+/**
  * @brief          Convert from host byte order to network byte order, 64 bit.
+ * @note           see @ref byteorder_htonll_static for a compile-time version
  * @param[in]      v   The integer in host byte order.
  * @returns        `v` converted to network byte order.
  */
 static inline network_uint64_t byteorder_htonll(uint64_t v);
+
+/**
+ * @brief          Convert from host byte order to network byte order, 64 bit.
+ * @param[in]      _u64     The integer in host byte order.
+ * @returns        `_u64` converted to network byte order.
+ */
+#define byteorder_htonll_static(_u64) { .u64 = htobe64(_u64) }
 
 /**
  * @brief          Convert from network byte order to host byte order, 16 bit.
