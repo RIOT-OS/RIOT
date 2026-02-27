@@ -17,15 +17,9 @@
 
 #include <stdio.h>
 
-#include "shell.h"
-
 int main(void)
 {
     puts("AT30TSE75x device driver test");
-
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

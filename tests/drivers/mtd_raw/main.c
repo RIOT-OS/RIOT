@@ -163,9 +163,5 @@ int main(void)
         mtd_power(dev, MTD_POWER_UP);
     }
 
-    /* run the shell */
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
     return 0;
 }
