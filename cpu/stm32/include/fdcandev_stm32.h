@@ -114,20 +114,20 @@ typedef struct {
  */
 #ifdef CPU_FAM_STM32H7
 #  define FDCAN_STM32_TX_MAILBOXES 64
-    /**< Number of frame the driver can transmit simultaneously */
+    /**< Number of frames the driver can transmit simultaneously */
 #else
 #  define FDCAN_STM32_TX_MAILBOXES 12
-    /**< Number of frame the driver can transmit simultaneously */
+    /**< Number of frames the driver can transmit simultaneously */
 #endif
 
 #ifdef CPU_FAM_STM32H7
 #  define FDCAN_STM32_RX_MAILBOXES (128)
-    /**< Maximum number of frame the driver can receive simultaneously.
+    /**< Maximum number of frames the driver can receive simultaneously.
          There are 64 buffers per RxFIFO */
 #else
 #  define FDCAN_STM32_RX_MAILBOXES (FDCANDEV_STM32_CHAN_NUMOF * 6)
-    /**< Maximum number of frame the driver can receive simultaneously.
-         There are 3 buffers per FIFO and 2 FIFO per channel. */
+    /**< Maximum number of frames the driver can receive simultaneously.
+         There are 3 buffers per FIFO and 2 FIFOs per channel. */
 #endif
 /** @} */
 
@@ -190,7 +190,7 @@ typedef struct can can_t;
  * @brief Number of RX FIFO1 elements
  */
 #  ifndef CONFIG_FDCAN_RX_FIFO1_ELEMENTS
-#    define CONFIG_FDCAN_RX_FIFO1_ELEMENTS            0U
+#    define CONFIG_FDCAN_RX_FIFO1_ELEMENTS            4U
 #  endif
 
 /**
@@ -604,7 +604,7 @@ typedef struct {
     uint32_t tx_evt_sa;   /**< Tx Event FIFO Start Address */
     uint32_t tx_buf_sa;   /**< Tx Buffer Start Address */
     uint32_t tx_fifo_sa;  /**< Tx FIFO Start Address */
-    uint32_t msg_ram_ea; /**< End address of Message RAM */
+    uint32_t msg_ram_ea;  /**< End address of Message RAM */
 } fdcan_msg_ram_t;
 
 /** STM32 CAN device descriptor */
@@ -618,17 +618,8 @@ struct can {
         *tx_mailbox[FDCAN_STM32_TX_MAILBOXES];  /**< Tx mailboxes*/
     candev_stm32_rx_mailbox_t rx_mailbox;       /**< Rx mailboxes */
     candev_stm32_isr_t isr_flags;               /**< ISR flags */
-    fdcan_msg_ram_t *msg_ram;                    /**< Message RAM block addresses */
+    fdcan_msg_ram_t *msg_ram;                   /**< Message RAM block addresses */
 };
-
-/**
- * @brief Structure to hold the CAN device
- * and its message RAM configuration
- */
-typedef struct {
-    FDCAN_GlobalTypeDef *can; /**< CAN device */
-    fdcan_msg_ram_t *msg_ram; /**< Message RAM block addresses */
-} can_ram_map_t;
 
 /**
  * @brief Set the pins of an stm32 CAN device
