@@ -441,3 +441,33 @@ int ds3231_disable_bat(const ds3231_t *dev)
 {
     return _clrset(dev, REG_CTRL, 0, CTRL_EOSC, 1, 1);
 }
+
+#ifdef MODULE_WALLTIME_IMPL_DS3231
+#include "ds3231_params.h"
+
+static ds3231_t walltime_dev;
+static bool _init_done;
+
+void walltime_impl_init(void)
+{
+    _init_done = !ds3231_init(&walltime_dev, &ds3231_params[0]);
+}
+
+int walltime_impl_get(struct tm *time, uint16_t *ms)
+{
+    if (!_init_done) {
+        return -ENODEV;
+    }
+
+    *ms = 0;
+    return ds3231_get_time(&walltime_dev, time);
+}
+
+int walltime_impl_set(struct tm *time)
+{
+    if (!_init_done) {
+        return -ENODEV;
+    }
+    return ds3231_set_time(&walltime_dev, time);
+}
+#endif
