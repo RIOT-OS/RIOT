@@ -216,7 +216,8 @@ static int _set_can_filter(int argc, char **argv)
     int res = candev->driver->set_filter(candev, &filter);
     if (res < 0) {
         puts("Failed to set CAN filter");
-    } else {
+    }
+    else {
         printf("CAN filter set: ID 0x%" PRIx32 " Mask 0x%" PRIx32 "\n",
                filter.can_id, filter.can_mask);
     }
@@ -258,24 +259,22 @@ static int _list_filters(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    struct can_filter filters[CONFIG_FDCAN_STD_FILTERS_NUM]; // max filters supported
+    struct can_filter filters[CONFIG_FDCAN_STD_FILTERS_NUM]; /* Max filters supported */
     int res = candev->driver->get(candev, CANOPT_RX_FILTERS, &filters, sizeof(filters));
     if (res < 0) {
         puts("Failed to read CAN filters");
         return res;
     }
-
-    int nb_filters = res / sizeof(struct can_filter);
-    if (nb_filters == 0) {
+    else if (res == 0) {
         puts("No CAN filters configured");
         return 0;
     }
-
-    for (int i = 0; i < nb_filters; i++) {
-        printf("[%d] CAN Filter ID: 0x%" PRIx32 " Mask: 0x%" PRIx32 "\n",
-               i, filters[i].can_id, filters[i].can_mask);
+    else {
+        for (int i = 0; i < res; i++) {
+            printf("[%d] CAN Filter ID: 0x%" PRIx32 " Mask: 0x%" PRIx32 "\n",
+                i, filters[i].can_id, filters[i].can_mask);
+        }
     }
-
     return 0;
 }
 
@@ -309,7 +308,7 @@ static const shell_command_t shell_commands[] = {
     { "set_filter", "set CAN filters", _set_can_filter},
     { "set_bit_rate", "set CAN bit rate", _set_bit_rate},
     { "send", "send some data", _send },
-    {"remove_filter", "remove CAN filter by ID", _remove_can_filter},
+    { "remove_filter", "remove CAN filter by ID", _remove_can_filter},
     { "list_filters", "list RX filters", _list_filters},
     { "receive", "receive some data", _receive },
     { NULL, NULL, NULL }
