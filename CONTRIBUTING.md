@@ -208,6 +208,26 @@ into the source repository.
 [archived-pull-requests]: https://github.com/RIOT-OS/RIOT/pulls?q=is:pr+label:"State:+archived"
 [uncrustify]: http://uncrustify.sourceforge.net
 
+## Plagiarism and AI
+
+RIOT itself applies the LGPL license, see [LICENSE.md], to most of its code exclusively,
+authors of PRs are assumed to do so as well (not necessary exclusive).
+When a PR is published it must also respect all authorship-rights, copyrights and
+licenses of code it uses. If code is copied the original author usually must be named and
+the original license must be kept, unless the original license states differently.
+[Generative AI] (e.g., Large language models (LLM)) are known to sometimes reproduce
+large amounts of content (code), that was fed into their database as such it might
+produce a copy and the previous sentence must be applied.
+When reworking a PR and copying its code to a new one, the author of that original reproduced
+code still is the original author and their rights to the code must be respected
+such as naming them and keeping the license.
+
+If a PR was written using tooling that is able to reproduce code from a knowlege-base, e.g.,
+large language model assisted tools like Copilot, Devin AI or Cursor or LLMs like GPT and Ollama,
+the PR should be marked as such and describe to what extent the tool was used
+(producing whole files, functions, code blocks, documentation, code/spell checking).
+[Generative AI]: https://en.wikipedia.org/wiki/Generative_artificial_intelligence
+
 ## Writing Documentation
 [writing-documentation]: #writing-documentation
 
