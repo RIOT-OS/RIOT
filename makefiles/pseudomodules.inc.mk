@@ -200,6 +200,8 @@ PSEUDOMODULES += gnrc_pktshark_default
 PSEUDOMODULES += gnrc_pktshark_icmpv6
 ## @}
 
+PSEUDOMODULES += gnrc_rpl_mrhof%
+PSEUDOMODULES += gnrc_rpl_of0
 PSEUDOMODULES += gnrc_sixloenc
 PSEUDOMODULES += gnrc_sixlowpan_border_router_default
 PSEUDOMODULES += gnrc_sixlowpan_default
