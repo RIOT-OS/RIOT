@@ -19,6 +19,8 @@
 #include "ztimer.h"
 
 extern psa_status_t example_aead_aes_128_ccm(void);
+extern psa_status_t example_aead_chacha20_poly1305(void);
+extern psa_status_t example_aead_chacha20_poly1305_multipart(void);
 
 int main(void)
 {
@@ -33,13 +35,36 @@ int main(void)
     start = ztimer_now(ZTIMER_USEC);
     status = example_aead_aes_128_ccm();
     printf("Authenticated encryption with associated data AES 128 CCM took %d us\n",
-            (int)(ztimer_now(ZTIMER_USEC) - start));
+           (int)(ztimer_now(ZTIMER_USEC) - start));
     if (status != PSA_SUCCESS) {
         failed = true;
         printf("Authenticated encryption with associated data AES 128 CCM failed: %s\n",
-                psa_status_to_humanly_readable(status));
+               psa_status_to_humanly_readable(status));
     }
+    ztimer_release(ZTIMER_USEC);
 
+    // staging: chacha20-poly1305
+    start = ztimer_now(ZTIMER_USEC);
+    status = example_aead_chacha20_poly1305();
+    printf("Authenticated encryption with associated data CHACHA20-POLY1305 took %d us\n",
+           (int)(ztimer_now(ZTIMER_USEC) - start));
+    if (status != PSA_SUCCESS) {
+        failed = true;
+        printf("Authenticated encryption with associated data CHACHA20-POLY1305 failed: %s\n",
+               psa_status_to_humanly_readable(status));
+    }
+    ztimer_release(ZTIMER_USEC);
+
+    // staging: chachapoly multipart
+    start = ztimer_now(ZTIMER_USEC);
+    status = example_aead_chacha20_poly1305_multipart();
+    printf("Authenticated encryption with associated data CHACHA20-POLY1305 Multipart took %d us\n",
+           (int)(ztimer_now(ZTIMER_USEC) - start));
+    if (status != PSA_SUCCESS) {
+        failed = true;
+        printf("Authenticated encryption with associated data CHACHA20-POLY1305 Multipart failed: %s\n",
+               psa_status_to_humanly_readable(status));
+    }
     ztimer_release(ZTIMER_USEC);
 
     if (failed) {

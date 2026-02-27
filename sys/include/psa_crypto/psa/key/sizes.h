@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2025 TU Dresden
- * Copyright (C) 2021 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2025 TU Dresden
+ * SPDX-FileCopyrightText: 2021 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -25,6 +22,7 @@
 extern "C" {
 #endif
 
+#include "modules.h"
 #include "psa/sizes.h"
 #include "type.h"
 
@@ -42,7 +40,8 @@ extern "C" {
        IS_USED(MODULE_PSA_CIPHER_AES_256_CBC) || \
        IS_USED(MODULE_PSA_AEAD_AES_256_CCM) || \
        IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256) || \
-       IS_USED(MODULE_PSA_CIPHER_CHACHA20))
+       IS_USED(MODULE_PSA_CIPHER_CHACHA20) || \
+       IS_USED(MODULE_PSA_RIOT_AEAD_CHACHA20_POLY1305))
 #define CONFIG_PSA_MAX_KEY_SIZE 32
 #elif (IS_USED(MODULE_PSA_CIPHER_AES_192_CBC) || \
        IS_USED(MODULE_PSA_AEAD_AES_192_CCM) || \

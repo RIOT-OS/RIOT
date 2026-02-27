@@ -41,7 +41,7 @@ extern "C" {
  *
  * @return  The block size for a block cipher, or 1 for a stream cipher.
  */
-#define PSA_BLOCK_CIPHER_BLOCK_LENGTH(type)                                     \
+#define PSA_BLOCK_CIPHER_BLOCK_LENGTH(type) \
     (1u << (((type) >> 8) & 7))
 
 /**
@@ -49,7 +49,7 @@ extern "C" {
  *
  * @details See also @ref PSA_BLOCK_CIPHER_BLOCK_LENGTH().
  */
-#define PSA_BLOCK_CIPHER_BLOCK_MAX_SIZE /* implementation-defined value */
+#define PSA_BLOCK_CIPHER_BLOCK_MAX_SIZE 64
 
 /**
  * @brief   The default IV size for a cipher algorithm, in bytes.
@@ -91,7 +91,7 @@ extern "C" {
  *
  *          See also @ref PSA_CIPHER_IV_LENGTH().
  */
-#define PSA_CIPHER_IV_MAX_SIZE /* implementation-defined value */
+#define PSA_CIPHER_IV_MAX_SIZE 16
 
 /**
  * @brief   The maximum size of the output of @ref psa_cipher_encrypt(), in bytes.
@@ -126,7 +126,10 @@ extern "C" {
  * @param   input_length Size of the input in bytes.
  */
 #define PSA_CIPHER_ENCRYPT_OUTPUT_MAX_SIZE(input_length) \
-    (PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_AES, PSA_ALG_CBC_NO_PADDING, input_length))
+    (PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_AES, PSA_ALG_CBC_NO_PADDING, input_length) \
+    > PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20, PSA_ALG_STREAM_CIPHER, input_length) \
+    ? PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_AES, PSA_ALG_CBC_NO_PADDING, input_length) \
+    : PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_CHACHA20, PSA_ALG_STREAM_CIPHER, input_length))
 
 /**
  * @brief   The maximum size of the output of @ref psa_cipher_decrypt(), in bytes.
@@ -147,7 +150,8 @@ extern "C" {
  *          are incompatible.
  */
 #define PSA_CIPHER_DECRYPT_OUTPUT_SIZE(key_type, alg, input_length) \
-    (input_length - PSA_CIPHER_IV_LENGTH(key_type, alg))
+    ((alg == PSA_ALG_CBC_NO_PADDING) ?  (input_length - PSA_CIPHER_IV_LENGTH(key_type, alg)) : \
+                                        (input_length))
 
 /**
  * @brief   A sufficient output buffer size for @ref psa_cipher_decrypt(), for any of the supported
@@ -183,7 +187,8 @@ extern "C" {
  *          are incompatible.
  */
 #define PSA_CIPHER_UPDATE_OUTPUT_SIZE(key_type, alg, input_length) \
-/* implementation-defined value */
+    ((key_type == PSA_KEY_TYPE_CHACHA20 \
+    && alg == PSA_ALG_STREAM_CIPHER) ? (input_length + 64) : 0)
 
 /**
  * @brief   A sufficient output buffer size for @ref psa_cipher_update(),
@@ -198,7 +203,7 @@ extern "C" {
  * @param input_length  Size of the input in bytes.
  */
 #define PSA_CIPHER_UPDATE_OUTPUT_MAX_SIZE(input_length) \
-/* implementation-defined value */
+    (input_length + 64)
 
 /**
  * @brief   A sufficient output buffer size for @ref psa_cipher_finish().
@@ -218,7 +223,7 @@ extern "C" {
  *          parameters are incompatible.
  */
 #define PSA_CIPHER_FINISH_OUTPUT_SIZE(key_type, alg) \
-/* implementation-defined value */
+    ((key_type == PSA_KEY_TYPE_CHACHA20) ? 64 : 0 )
 
 /**
  * @brief   A sufficient output buffer size for @ref psa_cipher_finish(), for any of the supported
@@ -229,7 +234,7 @@ extern "C" {
  *
  *          See also @ref PSA_CIPHER_FINISH_OUTPUT_SIZE().
  */
-#define PSA_CIPHER_FINISH_OUTPUT_MAX_SIZE /* implementation-defined value */
+#define PSA_CIPHER_FINISH_OUTPUT_MAX_SIZE 64
 
 #ifdef __cplusplus
 }
