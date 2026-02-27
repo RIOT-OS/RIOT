@@ -7,7 +7,7 @@ get_cmd_version() {
         return
     fi
 
-    VERSION_RAW=$( ($@ --version) 2>&1)
+    VERSION_RAW=$( ("$@" --version) 2>&1)
     ERR=$?
     VERSION=$(echo "$VERSION_RAW" | head -n 1)
 
@@ -23,7 +23,7 @@ get_cmd_version() {
 get_define() {
     local cc="$1"
     local line=
-    if command -v "$cc" 2>&1 >/dev/null; then
+    if command -v "$cc" > /dev/null 2>&1; then
         line=$(echo "$3" | "$cc" -x c -include "$2" -E -o - - 2>/dev/null | sed -e '/^[   ]*#/d' -e '/^[  ]*$/d')
     fi
     if [ -z "$line" ]; then
@@ -54,7 +54,7 @@ get_os_info() {
 }
 
 extract_shell_version() {
-    SHELL_NAME=$"(basename $1)"
+    SHELL_NAME="$(basename "$1")"
     SHELL_VERSION="$($1 --version 2>/dev/null)"
     ERR=$?
     if [ $ERR -ne 0 ] ; then # if it does not like the --version switch, it is probably dash
@@ -112,7 +112,7 @@ avr_libc_version() {
 printf "\n"
 printf "%s\n" "RIOT version information"
 printf "%s\n" "----------------------------"
-if [ -d .git ]; then
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     RIOT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
     RIOT_COMMIT_HASH=$(git rev-parse HEAD)
     RIOT_COMMIT_DATE=$(git log -1 --format=%cd --date=short)
