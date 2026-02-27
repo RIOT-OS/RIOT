@@ -1,6 +1,8 @@
 include ../Makefile.drivers_common
 
-USEMODULE += ads1x1x
+USEMODULE += ads101x
+USEMODULE += ads111x
+
 USEMODULE += ztimer
 USEMODULE += ztimer_msec
 
