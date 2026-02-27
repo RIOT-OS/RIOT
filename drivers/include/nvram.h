@@ -75,6 +75,44 @@ typedef struct nvram {
      */
     int (*write)(struct nvram *dev, const uint8_t *src, uint32_t dst, size_t size);
 
+    /**
+     * @brief Pointer to device-specific read_reg function
+     *
+     * Read NVRAM internal registers like configuration/status.
+     *
+     * @param[in]  dev   Pointer to the NVRAM device descriptor
+     * @param[in]  cmd   Command code that triggers the register read
+     * @param[out] value Pointer where the register value will be stored
+     *
+     * @return <0 on errors
+     */
+    int (*read_reg)(struct nvram *dev, uint8_t cmd, uint8_t *value);
+
+    /**
+     * @brief Pointer to device-specific write_reg function
+     *
+     * Write NVRAM internal registers like configuration/status.
+     *
+     * @param[in] dev   Pointer to the NVRAM device descriptor
+     * @param[in] cmd   Command code that triggers the register write
+     * @param[in] value Value to write into the register
+     *
+     * @return <0 on errors
+     */
+    int (*write_reg)(struct nvram *dev, uint8_t cmd, uint8_t value);
+
+    /**
+     * @brief Pointer to device-specific cmd function
+     *
+     * Commands trigger actions on the NVRAM.
+     *
+     * @param[in] dev Pointer to the NVRAM device descriptor
+     * @param[in] cmd Command code to execute
+     *
+     * @return <0 on errors
+     */
+    int (*cmd)(struct nvram *dev, uint8_t cmd);
+
     /** @brief   Device capacity */
     size_t size;
 
