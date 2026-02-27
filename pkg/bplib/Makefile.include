@@ -1,0 +1,51 @@
+INCLUDES += -I$(PKGDIRBASE)/bplib/aa/arp/inc
+INCLUDES += -I$(PKGDIRBASE)/bplib/aa/as/inc
+INCLUDES += -I$(PKGDIRBASE)/bplib/aa/fwp/inc
+INCLUDES += -I$(PKGDIRBASE)/bplib/aa/nc/inc
+
+INCLUDES += -I$(PKGDIRBASE)/bplib/bpa/bi/inc
+INCLUDES += -I$(PKGDIRBASE)/bplib/bpa/ct/inc
+INCLUDES += -I$(PKGDIRBASE)/bplib/bpa/ebp/inc
+INCLUDES += -I$(PKGDIRBASE)/bplib/bpa/pdb/inc
+INCLUDES += -I$(PKGDIRBASE)/bplib/bpa/pi/inc
+INCLUDES += -I$(PKGDIRBASE)/bplib/bpa/stor/inc
+
+INCLUDES += -I$(PKGDIRBASE)/bplib/ci/cbor/inc
+INCLUDES += -I$(PKGDIRBASE)/bplib/ci/crc/inc
+INCLUDES += -I$(PKGDIRBASE)/bplib/ci/eid/inc
+INCLUDES += -I$(PKGDIRBASE)/bplib/ci/em/inc
+INCLUDES += -I$(PKGDIRBASE)/bplib/ci/mem/inc
+INCLUDES += -I$(PKGDIRBASE)/bplib/ci/pl/inc
+INCLUDES += -I$(PKGDIRBASE)/bplib/ci/qm/inc
+INCLUDES += -I$(PKGDIRBASE)/bplib/ci/rbt/inc
+INCLUDES += -I$(PKGDIRBASE)/bplib/ci/time/inc
+
+INCLUDES += -I$(PKGDIRBASE)/bplib/cla/inc
+
+INCLUDES += -I$(PKGDIRBASE)/bplib/inc
+
+INCLUDES += -I$(PKGDIRBASE)/bplib/version/inc
+
+# TODO check includes. Just expose inc folder for user
+
+# Includes not inside the core library, but of the compatibility layer
+INCLUDES += -I$(RIOTPKG)/bplib/fwp/include
+INCLUDES += -I$(RIOTPKG)/bplib/nc/include
+INCLUDES += -I$(RIOTPKG)/bplib/init/include
+
+# Conditional modules
+ifneq (,$(filter bplib_cla_ble,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/bplib/cla/ble/include
+endif
+
+ifneq (,$(filter bplib_cla_udp,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/bplib/cla/udp/include
+endif
+
+ifneq (,$(filter bplib_stor_vfs,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/bplib/stor_vfs/include
+endif
+
+PSEUDOMODULES += bplib_walltime_available
+
+ARCHIVES += $(BINDIR)/libbplib.a

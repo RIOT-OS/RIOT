@@ -1,0 +1,40 @@
+USEPKG += qcbor
+# We need a newer version of QCBOR, >= 1.5.1 (as specified by NASA)
+
+USEMODULE += core_mutex
+USEMODULE += core_thread
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
+USEMODULE += sema
+USEMODULE += vfs_util
+
+# For the default FWP no absolute time source is implied. When absolute
+# time is available and accurate and set in walltime, bplib_walltime_available
+# can be used and walltime will be used.
+# This will impact wheather bundles will be generated with an age block.
+ifneq (,$(filter bplib_default_fwp,$(USEMODULE)))
+  ifneq (,$(filter bplib_walltime_available,$(USEMODULE)))
+    USEMODULE += walltime
+  endif
+
+  USEMODULE += ztimer64
+  USEMODULE += ztimer64_msec
+endif
+
+USEMODULE += bplib_nc
+USEMODULE += bplib_init
+
+ifneq (,$(filter bplib_stor_vfs,$(USEMODULE)))
+  USEMODULE += vfs
+  USEMODULE += printf_long_long
+endif
+
+# TODO remove
+ifneq (,$(filter bplib_cla_ble,$(USEMODULE)))
+  USEPKG += nimble
+  USEMODULE += nimble_autoadv
+endif
+
+ifneq (,$(filter bplib_cla_udp,$(USEMODULE)))
+  USEMODULE += gnrc_sock_udp
+endif
