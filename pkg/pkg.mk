@@ -171,7 +171,7 @@ $(PKG_SOURCE_DIR)/.git: $(PKG_SPARSE_TAG) | $(PKG_CUSTOM_PREPARED)
 	$(Q)$(GIT_CACHE_RS) clone --commit $(PKG_VERSION) $(addprefix --sparse-add ,$(PKG_SPARSE_PATHS)) -- $(PKG_URL) $(PKG_SOURCE_DIR)
 else ifeq ($(GIT_CACHE_DIR),$(wildcard $(GIT_CACHE_DIR)))
 $(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
-	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME) with git-cache with git-cache))
+	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME) with git-cache))
 	@echo "$(COLOR_YELLOW)Warning: git-cache is deprecated and will be" \
 	  "removed after the 2026.04 release! See" \
 	  "https://guides.riot-os.org/build-system/advanced_build_system_tricks/#speed-up-builds-with-git-cache-rs" \
@@ -193,11 +193,12 @@ $(PKG_SOURCE_DIR)/.git: $(PKG_SPARSE_TAG) | $(PKG_CUSTOM_PREPARED)
 	$(Q)if [ -n "$(PKG_SPARSE_PATHS)" ]; then \
 	  # iff the package uses sparse paths, initialize the repository as sparse \
 	  $(if $(QUIETER),,echo "[INFO] using sparse checkout";) \
-	  $(GIT_IN_PKG) sparse-checkout set; \
-	  $(GIT_IN_PKG) sparse-checkout add $(PKG_SPARSE_PATHS); \
+	  $(GIT_IN_PKG) sparse-checkout init --no-cone; \
+	  $(GIT_IN_PKG) sparse-checkout set $(PKG_SPARSE_PATHS); \
 	fi
 	$(Q)$(GIT_IN_PKG) remote add origin $(PKG_URL)
-	$(Q)$(GIT_IN_PKG) config extensions.partialClone origin
+	$(Q)$(GIT_IN_PKG) config remote.origin.promisor true
+	$(Q)$(GIT_IN_PKG) config remote.origin.partialclonefilter blob:none
 	$(Q)$(GIT_IN_PKG) config advice.detachedHead false
 	$(Q)$(GIT_IN_PKG) fetch $(GIT_QUIET) --depth=1 -t --filter=blob:none origin $(PKG_VERSION)
 	$(Q)$(GIT_IN_PKG) checkout $(GIT_QUIET) $(PKG_VERSION) 2>&1 | cat
