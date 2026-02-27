@@ -28,13 +28,18 @@ extern "C" {
 #include "crypto/psa/riot_ciphers.h"
 #include "kernel_defines.h"
 #include "psa/algorithm.h"
+#include "psa_crypto_operation_encoder.h"
 
 #if IS_USED(MODULE_PERIPH_CIPHER_AES_128_CBC)
-#include "psa_periph_aes_ctx.h"
+#  include "psa_periph_aes_ctx.h"
+#endif
+
+#if IS_USED(MODULE_PERIPH_CIPHER_CHACHA20)
+#  include "psa_periph_chacha20_ctx.h"
 #endif
 
 #if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A)
-#include "atca_params.h"
+#  include "atca_params.h"
 #endif
 
 /**
@@ -47,19 +52,34 @@ typedef enum {
 } psa_encrypt_or_decrypt_t;
 
 /**
+ * @brief   Enum, containing the possible states of a cipher operation as defined
+ *          in the PSA Crypto API specification.
+ */
+typedef enum {
+    PSA_CIPHER_OP_STATE_INACTIVE,     /* after init */
+    PSA_CIPHER_OP_STATE_ACTIVE,       /* after encrypt/decrypt_setup */
+    PSA_CIPHER_OP_STATE_SETUP_DONE,   /* after setting or generating the IV */
+    PSA_CIPHER_OP_STATE_ERROR         /* after an error occured */
+} psa_cipher_operation_state_t;
+
+
+/**
  * @brief   Structure containing the cipher contexts needed by the application.
  */
 typedef union {
-#if IS_USED(MODULE_PSA_CIPHER_AES_128_ECB) ||\
-    IS_USED(MODULE_PSA_CIPHER_AES_128_CBC) ||\
+#if IS_USED(MODULE_PSA_CIPHER_AES_128_ECB) || \
+    IS_USED(MODULE_PSA_CIPHER_AES_128_CBC) || \
     defined(DOXYGEN)
-    psa_cipher_aes_128_ctx_t aes_128;   /**< AES 128 context*/
+    psa_cipher_aes_128_ctx_t aes_128; /**< AES 128 context*/
 #endif
 #if IS_USED(MODULE_PSA_CIPHER_AES_192_CBC) || defined(DOXYGEN)
-    psa_cipher_aes_192_ctx_t aes_192;   /**< AES 192 context*/
+    psa_cipher_aes_192_ctx_t aes_192; /**< AES 192 context*/
 #endif
 #if IS_USED(MODULE_PSA_CIPHER_AES_256_CBC) || defined(DOXYGEN)
-    psa_cipher_aes_256_ctx_t aes_256;   /**< AES 256 context*/
+    psa_cipher_aes_256_ctx_t aes_256; /**< AES 256 context*/
+#endif
+#if IS_USED(MODULE_PSA_CIPHER_CHACHA20) || defined(DOXYGEN)
+    psa_cipher_chacha20_ctx_t chacha20; /**< ChaCha20 context*/
 #endif
 } psa_cipher_context_t;
 
@@ -72,27 +92,26 @@ typedef struct {
     /** Structure containing a driver specific cipher context */
     union driver_context {
         unsigned dummy; /**< Make the union non-empty even with no supported algorithms. */
-    #if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A) || defined(DOXYGEN)
-        atca_aes_cbc_ctx_t atca_aes_cbc;    /**< ATCA AES CBC context*/
-    #endif
-    } drv_ctx;  /**< SE specific cipher operation context */
+#if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A) || defined(DOXYGEN)
+        atca_aes_cbc_ctx_t atca_aes_cbc; /**< ATCA AES CBC context*/
+#endif
+    } drv_ctx; /**< SE specific cipher operation context */
 } psa_se_cipher_context_t;
 
 /**
  * @brief   Structure storing a cipher operation context
  */
 struct psa_cipher_operation_s {
-    uint8_t iv_required : 1;        /**< True if algorithm requires IV */
-    uint8_t iv_set : 1;             /**< True if IV was already set */
-    uint8_t default_iv_length;      /**< Default IV length for algorithm */
-    psa_algorithm_t alg;            /**< Operation algorithm*/
+    psa_cipher_operation_state_t state; /**< Current state of the Operation */
+    uint8_t default_iv_length;          /**< Default IV length for algorithm */
+    psa_cipher_op_t cipher_instance;    /**< Combination of key and algorithm */
     /** Union containing cipher contexts for the executing backend */
     union cipher_context {
-        psa_cipher_context_t cipher_ctx;    /**< Cipher context */
+        psa_cipher_context_t cipher_ctx; /**< Cipher context */
 #if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A) || defined(DOXYGEN)
-        psa_se_cipher_context_t se_ctx;     /**< SE Cipher context */
+        psa_se_cipher_context_t se_ctx; /**< SE Cipher context */
 #endif
-    } backend_ctx;  /**< Backend specific cipher context */
+    } backend_ctx; /**< Backend specific cipher context */
 };
 
 /**

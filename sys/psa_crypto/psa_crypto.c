@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -22,7 +19,7 @@
 #include "psa/crypto.h"
 
 #if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
-#include "psa_crypto_slot_management.h"
+#  include "psa_crypto_slot_management.h"
 #endif
 
 #include "psa_crypto_se_driver.h"
@@ -31,13 +28,13 @@
 #include "psa_crypto_algorithm_dispatch.h"
 
 #if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
-#include "psa_crypto_persistent_storage.h"
+#  include "psa_crypto_persistent_storage.h"
 #endif /* MODULE_PSA_PERSISTENT_STORAGE */
 
 #include "random.h"
 #include "kernel_defines.h"
 
-#define ENABLE_DEBUG    0
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**
@@ -81,52 +78,52 @@ static psa_status_t psa_get_and_lock_key_slot_with_policy(psa_key_id_t id,
 const char *psa_status_to_humanly_readable(psa_status_t status)
 {
     switch (status) {
-        case PSA_ERROR_GENERIC_ERROR:
-            return "PSA_ERROR_GENERIC_ERROR";
-        case PSA_ERROR_NOT_SUPPORTED:
-            return "PSA_ERROR_NOT_SUPPORTED";
-        case PSA_ERROR_NOT_PERMITTED:
-            return "PSA_ERROR_NOT_PERMITTED";
-        case PSA_ERROR_BUFFER_TOO_SMALL:
-            return "PSA_ERROR_BUFFER_TOO_SMALL";
-        case PSA_ERROR_ALREADY_EXISTS:
-            return "PSA_ERROR_ALREADY_EXISTS";
-        case PSA_ERROR_DOES_NOT_EXIST:
-            return "PSA_ERROR_DOES_NOT_EXIST";
-        case PSA_ERROR_BAD_STATE:
-            return "PSA_ERROR_BAD_STATE";
-        case PSA_ERROR_INVALID_ARGUMENT:
-            return "PSA_ERROR_INVALID_ARGUMENT";
-        case PSA_ERROR_INSUFFICIENT_MEMORY:
-            return "PSA_ERROR_INSUFFICIENT_MEMORY";
-        case PSA_ERROR_INSUFFICIENT_STORAGE:
-            return "PSA_ERROR_INSUFFICIENT_STORAGE";
-        case PSA_ERROR_COMMUNICATION_FAILURE:
-            return "PSA_ERROR_COMMUNICATION_FAILURE";
-        case PSA_ERROR_STORAGE_FAILURE:
-            return "PSA_ERROR_STORAGE_FAILURE";
-        case PSA_ERROR_DATA_CORRUPT:
-            return "PSA_ERROR_DATA_CORRUPT";
-        case PSA_ERROR_DATA_INVALID:
-            return "PSA_ERROR_DATA_INVALID";
-        case PSA_ERROR_HARDWARE_FAILURE:
-            return "PSA_ERROR_HARDWARE_FAILURE";
-        case PSA_ERROR_CORRUPTION_DETECTED:
-            return "PSA_ERROR_CORRUPTION_DETECTED";
-        case PSA_ERROR_INSUFFICIENT_ENTROPY:
-            return "PSA_ERROR_INSUFFICIENT_ENTROPY";
-        case PSA_ERROR_INVALID_SIGNATURE:
-            return "PSA_ERROR_INVALID_SIGNATURE";
-        case PSA_ERROR_INVALID_PADDING:
-            return "PSA_ERROR_INVALID_PADDING";
-        case PSA_ERROR_INSUFFICIENT_DATA:
-            return "PSA_ERROR_INSUFFICIENT_DATA";
-        case PSA_ERROR_INVALID_HANDLE:
-            return "PSA_ERROR_INVALID_HANDLE";
-        case PSA_SUCCESS:
-            return "PSA_SUCCESS";
-        default:
-            return "Error value not recognized";
+    case PSA_ERROR_GENERIC_ERROR:
+        return "PSA_ERROR_GENERIC_ERROR";
+    case PSA_ERROR_NOT_SUPPORTED:
+        return "PSA_ERROR_NOT_SUPPORTED";
+    case PSA_ERROR_NOT_PERMITTED:
+        return "PSA_ERROR_NOT_PERMITTED";
+    case PSA_ERROR_BUFFER_TOO_SMALL:
+        return "PSA_ERROR_BUFFER_TOO_SMALL";
+    case PSA_ERROR_ALREADY_EXISTS:
+        return "PSA_ERROR_ALREADY_EXISTS";
+    case PSA_ERROR_DOES_NOT_EXIST:
+        return "PSA_ERROR_DOES_NOT_EXIST";
+    case PSA_ERROR_BAD_STATE:
+        return "PSA_ERROR_BAD_STATE";
+    case PSA_ERROR_INVALID_ARGUMENT:
+        return "PSA_ERROR_INVALID_ARGUMENT";
+    case PSA_ERROR_INSUFFICIENT_MEMORY:
+        return "PSA_ERROR_INSUFFICIENT_MEMORY";
+    case PSA_ERROR_INSUFFICIENT_STORAGE:
+        return "PSA_ERROR_INSUFFICIENT_STORAGE";
+    case PSA_ERROR_COMMUNICATION_FAILURE:
+        return "PSA_ERROR_COMMUNICATION_FAILURE";
+    case PSA_ERROR_STORAGE_FAILURE:
+        return "PSA_ERROR_STORAGE_FAILURE";
+    case PSA_ERROR_DATA_CORRUPT:
+        return "PSA_ERROR_DATA_CORRUPT";
+    case PSA_ERROR_DATA_INVALID:
+        return "PSA_ERROR_DATA_INVALID";
+    case PSA_ERROR_HARDWARE_FAILURE:
+        return "PSA_ERROR_HARDWARE_FAILURE";
+    case PSA_ERROR_CORRUPTION_DETECTED:
+        return "PSA_ERROR_CORRUPTION_DETECTED";
+    case PSA_ERROR_INSUFFICIENT_ENTROPY:
+        return "PSA_ERROR_INSUFFICIENT_ENTROPY";
+    case PSA_ERROR_INVALID_SIGNATURE:
+        return "PSA_ERROR_INVALID_SIGNATURE";
+    case PSA_ERROR_INVALID_PADDING:
+        return "PSA_ERROR_INVALID_PADDING";
+    case PSA_ERROR_INSUFFICIENT_DATA:
+        return "PSA_ERROR_INSUFFICIENT_DATA";
+    case PSA_ERROR_INVALID_HANDLE:
+        return "PSA_ERROR_INVALID_HANDLE";
+    case PSA_SUCCESS:
+        return "PSA_SUCCESS";
+    default:
+        return "Error value not recognized";
     }
 }
 
@@ -161,18 +158,18 @@ psa_status_t psa_aead_abort(psa_aead_operation_t *operation)
  * @param   direction       Whether to encrypt or decrypt, see @ref psa_encrypt_or_decrypt_t
  * @return  @ref psa_status_t
  */
-static psa_status_t psa_aead_encrypt_decrypt(   psa_key_id_t key,
-                                                psa_algorithm_t alg,
-                                                const uint8_t * nonce,
-                                                size_t nonce_length,
-                                                const uint8_t * additional_data,
-                                                size_t additional_data_length,
-                                                const uint8_t * input,
-                                                size_t input_length,
-                                                uint8_t * output,
-                                                size_t output_size,
-                                                size_t * output_length,
-                                                psa_encrypt_or_decrypt_t direction)
+static psa_status_t psa_aead_encrypt_decrypt(psa_key_id_t key,
+                                             psa_algorithm_t alg,
+                                             const uint8_t *nonce,
+                                             size_t nonce_length,
+                                             const uint8_t *additional_data,
+                                             size_t additional_data_length,
+                                             const uint8_t *input,
+                                             size_t input_length,
+                                             uint8_t *output,
+                                             size_t output_size,
+                                             size_t *output_length,
+                                             psa_encrypt_or_decrypt_t direction)
 {
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
@@ -207,8 +204,8 @@ static psa_status_t psa_aead_encrypt_decrypt(   psa_key_id_t key,
     }
 
     psa_key_usage_t usage = (direction == PSA_CRYPTO_DRIVER_ENCRYPT ?
-                             PSA_KEY_USAGE_ENCRYPT :
-                             PSA_KEY_USAGE_DECRYPT);
+                                 PSA_KEY_USAGE_ENCRYPT :
+                                 PSA_KEY_USAGE_DECRYPT);
 
     status = psa_get_and_lock_key_slot_with_policy(key, &slot, usage, alg);
     if (status != PSA_SUCCESS) {
@@ -244,17 +241,17 @@ static psa_status_t psa_aead_encrypt_decrypt(   psa_key_id_t key,
     return ((status == PSA_SUCCESS) ? unlock_status : status);
 }
 
-psa_status_t psa_aead_decrypt(  psa_key_id_t key,
-                                psa_algorithm_t alg,
-                                const uint8_t *nonce,
-                                size_t nonce_length,
-                                const uint8_t *additional_data,
-                                size_t additional_data_length,
-                                const uint8_t *ciphertext,
-                                size_t ciphertext_length,
-                                uint8_t *plaintext,
-                                size_t plaintext_size,
-                                size_t *plaintext_length)
+psa_status_t psa_aead_decrypt(psa_key_id_t key,
+                              psa_algorithm_t alg,
+                              const uint8_t *nonce,
+                              size_t nonce_length,
+                              const uint8_t *additional_data,
+                              size_t additional_data_length,
+                              const uint8_t *ciphertext,
+                              size_t ciphertext_length,
+                              uint8_t *plaintext,
+                              size_t plaintext_size,
+                              size_t *plaintext_length)
 {
     return psa_aead_encrypt_decrypt(key, alg, nonce, nonce_length, additional_data,
                                     additional_data_length, ciphertext, ciphertext_length,
@@ -272,17 +269,17 @@ psa_status_t psa_aead_decrypt_setup(psa_aead_operation_t *operation,
     return PSA_ERROR_NOT_SUPPORTED;
 }
 
-psa_status_t psa_aead_encrypt(  psa_key_id_t key,
-                                psa_algorithm_t alg,
-                                const uint8_t *nonce,
-                                size_t nonce_length,
-                                const uint8_t *additional_data,
-                                size_t additional_data_length,
-                                const uint8_t *plaintext,
-                                size_t plaintext_length,
-                                uint8_t *ciphertext,
-                                size_t ciphertext_size,
-                                size_t *ciphertext_length)
+psa_status_t psa_aead_encrypt(psa_key_id_t key,
+                              psa_algorithm_t alg,
+                              const uint8_t *nonce,
+                              size_t nonce_length,
+                              const uint8_t *additional_data,
+                              size_t additional_data_length,
+                              const uint8_t *plaintext,
+                              size_t plaintext_length,
+                              uint8_t *ciphertext,
+                              size_t ciphertext_size,
+                              size_t *ciphertext_length)
 {
     return psa_aead_encrypt_decrypt(key, alg, nonce, nonce_length, additional_data,
                                     additional_data_length, plaintext, plaintext_length,
@@ -300,13 +297,13 @@ psa_status_t psa_aead_encrypt_setup(psa_aead_operation_t *operation,
     return PSA_ERROR_NOT_SUPPORTED;
 }
 
-psa_status_t psa_aead_finish(   psa_aead_operation_t *operation,
-                                uint8_t *ciphertext,
-                                size_t ciphertext_size,
-                                size_t *ciphertext_length,
-                                uint8_t *tag,
-                                size_t tag_size,
-                                size_t *tag_length)
+psa_status_t psa_aead_finish(psa_aead_operation_t *operation,
+                             uint8_t *ciphertext,
+                             size_t ciphertext_size,
+                             size_t *ciphertext_length,
+                             uint8_t *tag,
+                             size_t tag_size,
+                             size_t *tag_length)
 {
     (void)operation;
     (void)ciphertext;
@@ -318,10 +315,10 @@ psa_status_t psa_aead_finish(   psa_aead_operation_t *operation,
     return PSA_ERROR_NOT_SUPPORTED;
 }
 
-psa_status_t psa_aead_generate_nonce(   psa_aead_operation_t *operation,
-                                        uint8_t *nonce,
-                                        size_t nonce_size,
-                                        size_t *nonce_length)
+psa_status_t psa_aead_generate_nonce(psa_aead_operation_t *operation,
+                                     uint8_t *nonce,
+                                     size_t nonce_size,
+                                     size_t *nonce_length)
 {
     (void)operation;
     (void)nonce;
@@ -330,9 +327,9 @@ psa_status_t psa_aead_generate_nonce(   psa_aead_operation_t *operation,
     return PSA_ERROR_NOT_SUPPORTED;
 }
 
-psa_status_t psa_aead_set_lengths(  psa_aead_operation_t *operation,
-                                    size_t ad_length,
-                                    size_t plaintext_length)
+psa_status_t psa_aead_set_lengths(psa_aead_operation_t *operation,
+                                  size_t ad_length,
+                                  size_t plaintext_length)
 {
     (void)operation;
     (void)ad_length;
@@ -350,12 +347,12 @@ psa_status_t psa_aead_set_nonce(psa_aead_operation_t *operation,
     return PSA_ERROR_NOT_SUPPORTED;
 }
 
-psa_status_t psa_aead_update(   psa_aead_operation_t *operation,
-                                const uint8_t *input,
-                                size_t input_length,
-                                uint8_t *output,
-                                size_t output_size,
-                                size_t *output_length)
+psa_status_t psa_aead_update(psa_aead_operation_t *operation,
+                             const uint8_t *input,
+                             size_t input_length,
+                             uint8_t *output,
+                             size_t output_size,
+                             size_t *output_length)
 {
     (void)operation;
     (void)input;
@@ -376,12 +373,12 @@ psa_status_t psa_aead_update_ad(psa_aead_operation_t *operation,
     return PSA_ERROR_NOT_SUPPORTED;
 }
 
-psa_status_t psa_aead_verify(   psa_aead_operation_t *operation,
-                                uint8_t *plaintext,
-                                size_t plaintext_size,
-                                size_t *plaintext_length,
-                                const uint8_t *tag,
-                                size_t tag_length)
+psa_status_t psa_aead_verify(psa_aead_operation_t *operation,
+                             uint8_t *plaintext,
+                             size_t plaintext_size,
+                             size_t *plaintext_length,
+                             const uint8_t *tag,
+                             size_t tag_length)
 {
     (void)operation;
     (void)plaintext;
@@ -451,9 +448,9 @@ psa_status_t psa_asymmetric_encrypt(psa_key_id_t key,
  *          @ref PSA_ERROR_NOT_PERMITTED
  *          @ref PSA_ERROR_INVALID_ARGUMENT  If @c requested_alg is not a valid algorithm
  */
-static psa_status_t psa_key_policy_permits( const psa_key_policy_t *policy,
-                                            psa_key_type_t type,
-                                            psa_algorithm_t requested_alg)
+static psa_status_t psa_key_policy_permits(const psa_key_policy_t *policy,
+                                           psa_key_type_t type,
+                                           psa_algorithm_t requested_alg)
 {
     if (requested_alg == 0) {
         return PSA_ERROR_INVALID_ARGUMENT;
@@ -509,7 +506,7 @@ static psa_status_t psa_get_and_lock_key_slot_with_policy(psa_key_id_t id,
     }
 
     if (alg != 0) {
-        status = psa_key_policy_permits( &slot->attr.policy, slot->attr.type, alg);
+        status = psa_key_policy_permits(&slot->attr.policy, slot->attr.type, alg);
         if (status != PSA_SUCCESS) {
             *p_slot = NULL;
             psa_unlock_key_slot(slot);
@@ -521,6 +518,7 @@ static psa_status_t psa_get_and_lock_key_slot_with_policy(psa_key_id_t id,
 #endif /* MODULE_PSA_KEY_MANAGEMENT */
 
 #if IS_USED(MODULE_PSA_CIPHER)
+/* Is this missing docs? */
 psa_status_t psa_cipher_abort(psa_cipher_operation_t *operation)
 {
     if (!lib_initialized) {
@@ -537,57 +535,68 @@ psa_status_t psa_cipher_abort(psa_cipher_operation_t *operation)
  *          See @ref psa_cipher_encrypt_setup(...)
  *          See @ref psa_cipher_decrypt_setup(...)
  */
-static psa_status_t psa_cipher_setup(   psa_cipher_operation_t *operation,
-                                        psa_key_id_t key,
-                                        psa_algorithm_t alg,
-                                        psa_encrypt_or_decrypt_t direction)
+static psa_status_t psa_cipher_setup(psa_cipher_operation_t *operation,
+                                     psa_key_id_t key,
+                                     psa_algorithm_t alg,
+                                     psa_encrypt_or_decrypt_t direction)
 {
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_key_slot_t *slot;
     psa_key_usage_t usage = (direction == PSA_CRYPTO_DRIVER_ENCRYPT ?
-                             PSA_KEY_USAGE_ENCRYPT :
-                             PSA_KEY_USAGE_DECRYPT);
+                                 PSA_KEY_USAGE_ENCRYPT :
+                                 PSA_KEY_USAGE_DECRYPT);
 
-    if (!lib_initialized) {
+    if (!lib_initialized ||
+        operation->state != PSA_CIPHER_OP_STATE_INACTIVE) {
         return PSA_ERROR_BAD_STATE;
     }
-
     if (!operation) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-
     if (!PSA_ALG_IS_CIPHER(alg)) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
+    /* Getting the key slot*/
     status = psa_get_and_lock_key_slot_with_policy(key, &slot, usage, alg);
     if (status != PSA_SUCCESS) {
-        psa_cipher_abort(operation);
+        /* Quoting PSA Crypto:
+         * "If psa_cipher_encrypt/decrypt_setup() returns an
+         * error, the operation object is unchanged." */
         unlock_status = psa_unlock_key_slot(slot);
         return status;
     }
-
-    operation->iv_set = 0;
-    if (alg == PSA_ALG_ECB_NO_PADDING) {
-        operation->iv_required = 0;
-    }
-    else {
-        operation->iv_required = 1;
-    }
-    operation->default_iv_length = PSA_CIPHER_IV_LENGTH(slot->attr.type, alg);
-
     psa_key_attributes_t attr = slot->attr;
 
+    /* Setup the cipher operation */
+    psa_cipher_op_t cipher = PSA_ENCODE_CIPHER_OPERATION(alg, attr.type, attr.bits);
+    if (cipher == PSA_INVALID_OPERATION) {
+        *operation = psa_cipher_operation_init();
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+    operation->cipher_instance = cipher;
+    operation->default_iv_length = PSA_CIPHER_IV_LENGTH(attr.type, alg);
+
+    /* Then finally, a call to the backend */
     if (direction == PSA_CRYPTO_DRIVER_ENCRYPT) {
         status = psa_location_dispatch_cipher_encrypt_setup(operation, &attr, slot, alg);
     }
     else if (direction == PSA_CRYPTO_DRIVER_DECRYPT) {
         status = psa_location_dispatch_cipher_decrypt_setup(operation, &attr, slot, alg);
     }
-
     if (status != PSA_SUCCESS) {
-        psa_cipher_abort(operation);
+        *operation = psa_cipher_operation_init();
+        return status;
+    }
+
+    /* Update operation state */
+    if (operation->default_iv_length == 0) {
+        /* PSA Crypto: "If the cipher algorithm does not use an IV,
+         * PSA_CIPHER_IV_LENGTH(key_type, alg) will be zero." */
+        operation->state = PSA_CIPHER_OP_STATE_SETUP_DONE;
+    } else {
+        operation->state = PSA_CIPHER_OP_STATE_ACTIVE;
     }
 
     unlock_status = psa_unlock_key_slot(slot);
@@ -600,14 +609,14 @@ static psa_status_t psa_cipher_setup(   psa_cipher_operation_t *operation,
  *          See @ref psa_cipher_encrypt(...)
  *          See @ref psa_cipher_decrypt(...)
  */
-static psa_status_t psa_cipher_encrypt_decrypt( psa_key_id_t key,
-                                                psa_algorithm_t alg,
-                                                const uint8_t *input,
-                                                size_t input_length,
-                                                uint8_t *output,
-                                                size_t output_size,
-                                                size_t *output_length,
-                                                psa_encrypt_or_decrypt_t direction)
+static psa_status_t psa_cipher_encrypt_decrypt(psa_key_id_t key,
+                                               psa_algorithm_t alg,
+                                               const uint8_t *input,
+                                               size_t input_length,
+                                               uint8_t *output,
+                                               size_t output_size,
+                                               size_t *output_length,
+                                               psa_encrypt_or_decrypt_t direction)
 {
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
@@ -626,8 +635,8 @@ static psa_status_t psa_cipher_encrypt_decrypt( psa_key_id_t key,
     }
 
     psa_key_usage_t usage = (direction == PSA_CRYPTO_DRIVER_ENCRYPT ?
-                             PSA_KEY_USAGE_ENCRYPT :
-                             PSA_KEY_USAGE_DECRYPT);
+                                 PSA_KEY_USAGE_ENCRYPT :
+                                 PSA_KEY_USAGE_DECRYPT);
 
     status = psa_get_and_lock_key_slot_with_policy(key, &slot, usage, alg);
     if (status != PSA_SUCCESS) {
@@ -640,8 +649,8 @@ static psa_status_t psa_cipher_encrypt_decrypt( psa_key_id_t key,
 
     if (((alg == PSA_ALG_CBC_NO_PADDING) || (alg == PSA_ALG_ECB_NO_PADDING)) &&
         (input_length % PSA_BLOCK_CIPHER_BLOCK_LENGTH(slot->attr.type))) {
-            unlock_status = psa_unlock_key_slot(slot);
-            return PSA_ERROR_INVALID_ARGUMENT;
+        unlock_status = psa_unlock_key_slot(slot);
+        return PSA_ERROR_INVALID_ARGUMENT;
     }
 
     if (direction == PSA_CRYPTO_DRIVER_ENCRYPT) {
@@ -710,11 +719,33 @@ psa_status_t psa_cipher_finish(psa_cipher_operation_t *operation,
                                size_t output_size,
                                size_t *output_length)
 {
-    (void)operation;
-    (void)output;
-    (void)output_size;
-    (void)output_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
+    if (!lib_initialized ||
+        operation->state != PSA_CIPHER_OP_STATE_SETUP_DONE) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
+        return PSA_ERROR_BAD_STATE;
+    }
+    if (!operation || !output || !output_length) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+    /*
+     * Currently only Chacha20 is implemented as a multipart cipher.
+     * This cipher does not really care about the total input length,
+     * since it is a stream cipher. For block ciphers, you would need
+     * to check if the total input length is a multiple of the block size.
+     */
+
+    status = psa_location_dispatch_cipher_finish(operation, output, output_size, output_length);
+    if (status != PSA_SUCCESS) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
+        return status;
+    }
+
+    operation->state = PSA_CIPHER_OP_STATE_INACTIVE;
+
+    return status;
 }
 
 psa_status_t psa_cipher_generate_iv(psa_cipher_operation_t *operation,
@@ -724,32 +755,35 @@ psa_status_t psa_cipher_generate_iv(psa_cipher_operation_t *operation,
 {
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
 
-    if (!lib_initialized) {
+    if (!lib_initialized ||
+        operation->state != PSA_CIPHER_OP_STATE_ACTIVE) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
         return PSA_ERROR_BAD_STATE;
     }
-
     if (!operation || !iv || !iv_length) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-
-    *iv_length = 0;
-
-    if (!operation->iv_required || operation->iv_set) {
-        return PSA_ERROR_BAD_STATE;
-    }
-
+    /* Generate IV always produces a default length IV */
     if (iv_size < operation->default_iv_length) {
-        psa_cipher_abort(operation);
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
     status = psa_generate_random(iv, iv_size);
     if (status != PSA_SUCCESS) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
         return status;
     }
-
-    operation->iv_set = 1;
+    /* This should not fail */
+    status = psa_cipher_set_iv(operation, iv, iv_size);
+    if (status != PSA_SUCCESS) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
+        return status;
+    }
     *iv_length = iv_size;
+
+    operation->state = PSA_CIPHER_OP_STATE_SETUP_DONE;
 
     return status;
 }
@@ -758,10 +792,27 @@ psa_status_t psa_cipher_set_iv(psa_cipher_operation_t *operation,
                                const uint8_t *iv,
                                size_t iv_length)
 {
-    (void)operation;
-    (void)iv;
-    (void)iv_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
+    if (!lib_initialized ||
+        operation->state != PSA_CIPHER_OP_STATE_ACTIVE) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
+        return PSA_ERROR_BAD_STATE;
+    }
+    if (!operation || !iv) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+
+    status = psa_location_dispatch_cipher_set_iv(operation, iv, iv_length);
+    if (status != PSA_SUCCESS) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
+        return status;
+    }
+
+    operation->state = PSA_CIPHER_OP_STATE_SETUP_DONE;
+
+    return status;
 }
 
 psa_status_t psa_cipher_update(psa_cipher_operation_t *operation,
@@ -771,13 +822,31 @@ psa_status_t psa_cipher_update(psa_cipher_operation_t *operation,
                                size_t output_size,
                                size_t *output_length)
 {
-    (void)operation;
-    (void)input;
-    (void)input_length;
-    (void)output;
-    (void)output_size;
-    (void)output_length;
-    return PSA_ERROR_NOT_SUPPORTED;
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
+    if (!lib_initialized ||
+        operation->state != PSA_CIPHER_OP_STATE_SETUP_DONE) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
+        return PSA_ERROR_BAD_STATE;
+    }
+    if (!operation || !input || !output || !output_length) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
+    /*
+     * Currently only Chacha20 is implemented as a multipart cipher.
+     * This cipher does not really care about the total input length
+     * to this function, since it is virtually unlimited. For other
+     * ciphers, you would need to check the total input length.
+     */
+
+    status = psa_location_dispatch_cipher_update(operation, input, input_length,
+                                                 output, output_size, output_length);
+    if (status != PSA_SUCCESS) {
+        operation->state = PSA_CIPHER_OP_STATE_ERROR;
+    }
+
+    return status;
 }
 
 #endif /* MODULE_PSA_CIPHER */
@@ -1116,11 +1185,11 @@ static psa_status_t psa_validate_key_for_key_generation(psa_key_type_t type, siz
     if (PSA_KEY_TYPE_IS_UNSTRUCTURED(type)) {
         return psa_validate_unstructured_key_size(type, bits);
     }
-#if IS_USED(MODULE_PSA_ASYMMETRIC)
+#  if IS_USED(MODULE_PSA_ASYMMETRIC)
     else if (PSA_KEY_TYPE_IS_ECC_KEY_PAIR(type)) {
         return PSA_ECC_KEY_SIZE_IS_VALID(type, bits) ? PSA_SUCCESS : PSA_ERROR_INVALID_ARGUMENT;
     }
-#endif
+#  endif
     /* TODO: add validation for other key types */
     return PSA_ERROR_NOT_SUPPORTED;
 }
@@ -1158,13 +1227,13 @@ static psa_status_t psa_validate_key_attributes(const psa_key_attributes_t *attr
             return PSA_ERROR_INVALID_ARGUMENT;
         }
     }
-#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+#  if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
     else {
         if (!psa_is_valid_key_id(key, 1)) {
             return PSA_ERROR_INVALID_ARGUMENT;
         }
     }
-#endif /* MODULE_PSA_PERSISTENT_STORAGE */
+#  endif /* MODULE_PSA_PERSISTENT_STORAGE */
 
     status = psa_validate_key_policy(&attributes->policy);
     if (status != PSA_SUCCESS) {
@@ -1220,7 +1289,7 @@ static psa_status_t psa_start_key_creation(psa_key_creation_method_t method,
         slot->attr.id = key_id;
     }
 
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+#  if IS_USED(MODULE_PSA_SECURE_ELEMENT)
     /* Find a free slot on a secure element and store SE slot number in key_data */
     if (*p_drv != NULL) {
         psa_key_slot_number_t *slot_number = psa_key_slot_get_slot_number(slot);
@@ -1230,7 +1299,7 @@ static psa_status_t psa_start_key_creation(psa_key_creation_method_t method,
         }
         /* TODO: Start transaction for persistent key storage */
     }
-#endif /* CONFIG_PSA_SECURE_ELEMENT */
+#  endif /* CONFIG_PSA_SECURE_ELEMENT */
 
     (void)method;
     return PSA_SUCCESS;
@@ -1253,11 +1322,11 @@ static psa_status_t psa_finish_key_creation(psa_key_slot_t *slot, psa_se_drv_dat
     if (PSA_KEY_LIFETIME_IS_VOLATILE(slot->attr.lifetime)) {
         *key_id = slot->attr.id;
     }
-#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+#  if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
     else {
         status = psa_persist_key_slot_in_storage(slot);
     }
-#endif /* MODULE_PSA_PERSISTENT_STORAGE */
+#  endif /* MODULE_PSA_PERSISTENT_STORAGE */
 
     (void)driver;
     psa_status_t unlock_status = psa_unlock_key_slot(slot);
@@ -1304,16 +1373,16 @@ psa_status_t psa_destroy_key(psa_key_id_t key)
         return PSA_ERROR_CORRUPTION_DETECTED;
     }
 
-#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+#  if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
     if (!PSA_KEY_LIFETIME_IS_VOLATILE(slot->attr.lifetime)) {
         status = psa_destroy_persistent_key(key);
         if (status != PSA_SUCCESS) {
             DEBUG("PSA destroy key: Persistent key destruction failed: %s\n",
-                                            psa_status_to_humanly_readable(status));
+                  psa_status_to_humanly_readable(status));
             return PSA_ERROR_STORAGE_FAILURE;
         }
     }
-#endif /* MODULE_PSA_PERSISTENT_STORAGE */
+#  endif /* MODULE_PSA_PERSISTENT_STORAGE */
 
     return psa_wipe_key_slot(slot);
 }
@@ -1327,10 +1396,10 @@ psa_status_t psa_destroy_key(psa_key_id_t key)
  *          @ref PSA_ERROR_INVALID_ARGUMENT
  */
 static psa_status_t psa_builtin_export_key(const uint8_t *key_buffer,
-                                                size_t key_buffer_size,
-                                                uint8_t *data,
-                                                size_t data_size,
-                                                size_t *data_length)
+                                           size_t key_buffer_size,
+                                           uint8_t *data,
+                                           size_t data_size,
+                                           size_t *data_length)
 {
     if (!key_buffer || !data || !data_length) {
         return PSA_ERROR_INVALID_ARGUMENT;
@@ -1391,8 +1460,8 @@ psa_status_t psa_export_key(psa_key_id_t key,
     }
 
     if (!PSA_KEY_TYPE_IS_ECC(slot->attr.type) ||
-           (PSA_KEY_TYPE_ECC_GET_FAMILY(slot->attr.type) != PSA_ECC_FAMILY_TWISTED_EDWARDS &&
-            PSA_KEY_TYPE_ECC_GET_FAMILY(slot->attr.type) != PSA_ECC_FAMILY_SECP_R1)) {
+        (PSA_KEY_TYPE_ECC_GET_FAMILY(slot->attr.type) != PSA_ECC_FAMILY_TWISTED_EDWARDS &&
+         PSA_KEY_TYPE_ECC_GET_FAMILY(slot->attr.type) != PSA_ECC_FAMILY_SECP_R1)) {
         /* key export is currently only supported for ed25519 and secp_r1 keys */
         status = PSA_ERROR_NOT_SUPPORTED;
         unlock_status = psa_unlock_key_slot(slot);
@@ -1419,11 +1488,11 @@ psa_status_t psa_export_key(psa_key_id_t key,
  * @return  @ref PSA_SUCCESS
  *          @ref PSA_ERROR_INVALID_ARGUMENT
  */
-static psa_status_t psa_builtin_export_public_key( const uint8_t *key_buffer,
-                                                   size_t key_buffer_size,
-                                                   uint8_t *data,
-                                                   size_t data_size,
-                                                   size_t *data_length)
+static psa_status_t psa_builtin_export_public_key(const uint8_t *key_buffer,
+                                                  size_t key_buffer_size,
+                                                  uint8_t *data,
+                                                  size_t data_size,
+                                                  size_t *data_length)
 {
     if (key_buffer_size == 0 || data_size == 0) {
         return PSA_ERROR_INVALID_ARGUMENT;
@@ -1877,7 +1946,6 @@ psa_status_t psa_mac_compute(psa_key_id_t key,
 
     unlock_status = psa_unlock_key_slot(slot);
     return ((status == PSA_SUCCESS) ? unlock_status : status);
-
 }
 
 psa_status_t psa_mac_verify(psa_key_id_t key,
@@ -2145,7 +2213,6 @@ psa_status_t psa_sign_message(psa_key_id_t key,
                               size_t signature_size,
                               size_t *signature_length)
 {
-
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_status_t unlock_status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_key_slot_t *slot;
