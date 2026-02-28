@@ -12,6 +12,8 @@
 #include <inttypes.h>
 #include <assert.h>
 
+#include "log.h"
+
 #include "container.h"
 #include "embUnit.h"
 
@@ -138,7 +140,7 @@ static void test_ndef_remove(void)
 {
     puts("NDEF remove test");
     ndef_t message;
-    uint8_t buffer[1024];
+    static uint8_t buffer[1024];
     ndef_init(&message, buffer, ARRAY_SIZE(buffer));
     ndef_record_text_add(&message, "Hello World", 11, "en", 2, UTF8);
     ndef_record_text_add(&message, "Hej Verden", 10, "da", 2, UTF8);
@@ -147,6 +149,89 @@ static void test_ndef_remove(void)
 
     ndef_record_remove_last(&message);
 
+    TEST_ASSERT_EQUAL_INT(message.record_count, 1);
+}
+
+static void test_ndef_from_buffer(void)
+{
+    puts("NDEF from buffer test");
+    ndef_t message;
+
+    /* the buffer contains an NDEF message with two records */
+    static uint8_t buffer[] = {
+        0x91, 0x01, 0x0E, 0x54,
+        0x02,                                                             /* status byte */
+        0x65, 0x6E,                                                       /* en */
+        0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64, /* Hello World */
+
+        0x51, 0x01, 0x0D, 0x54,
+        0x02,                                                             /* status byte */
+        0x64, 0x61,                                                       /* da */
+        0x48, 0x65, 0x6A, 0x20, 0x56, 0x65, 0x72, 0x64, 0x65, 0x6E        /* Hej Verden */
+    };
+
+    TEST_ASSERT_EQUAL_INT(ndef_from_buffer(&message, buffer, sizeof(buffer)), 0);
+    TEST_ASSERT_EQUAL_INT(ndef_get_size(&message), sizeof(buffer));
+    TEST_ASSERT_EQUAL_INT(message.record_count, 2);
+}
+
+static void test_ndef_long_record(void) {
+    static uint8_t buffer[] = {
+        0xC1, 0x01,
+        0x00, 0x00, 0x01, 0xC0, /* payload length of 448 (MSB, 4 bytes) */
+        0x54,
+        0x02,                                                             /* status byte */
+        0x65, 0x6E,                                                       /* en */
+        0x4C, 0X6F, 0X72, 0X65, 0X6D, 0X20, 0X69, 0X70, 0X73, 0X75,       /* Lorem ipsum */
+        0X6D, 0X20, 0X64, 0X6F, 0X6C, 0X6F, 0X72, 0X20, 0X73, 0X69,
+        0X74, 0X20, 0X61, 0X6D, 0X65, 0X74, 0X2C, 0X20, 0X63, 0X6F,
+        0X6E, 0X73, 0X65, 0X63, 0X74, 0X65, 0X74, 0X75, 0X72, 0X20,
+        0X61, 0X64, 0X69, 0X70, 0X69, 0X73, 0X63, 0X69, 0X6E, 0X67,
+        0X20, 0X65, 0X6C, 0X69, 0X74, 0X2C, 0X20, 0X73, 0X65, 0X64,
+        0X20, 0X64, 0X6F, 0X20, 0X65, 0X69, 0X75, 0X73, 0X6D, 0X6F,
+        0X64, 0X20, 0X74, 0X65, 0X6D, 0X70, 0X6F, 0X72, 0X20, 0X69,
+        0X6E, 0X63, 0X69, 0X64, 0X69, 0X64, 0X75, 0X6E, 0X74, 0X20,
+        0X75, 0X74, 0X20, 0X6C, 0X61, 0X62, 0X6F, 0X72, 0X65, 0X20,
+        0X65, 0X74, 0X20, 0X64, 0X6F, 0X6C, 0X6F, 0X72, 0X65, 0X20,
+        0X6D, 0X61, 0X67, 0X6E, 0X61, 0X20, 0X61, 0X6C, 0X69, 0X71,
+        0X75, 0X61, 0X2E, 0X20, 0X55, 0X74, 0X20, 0X65, 0X6E, 0X69,
+        0X6D, 0X20, 0X61, 0X64, 0X20, 0X6D, 0X69, 0X6E, 0X69, 0X6D,
+        0X20, 0X76, 0X65, 0X6E, 0X69, 0X61, 0X6D, 0X2C, 0X20, 0X71,
+        0X75, 0X69, 0X73, 0X20, 0X6E, 0X6F, 0X73, 0X74, 0X72, 0X75,
+        0X64, 0X20, 0X65, 0X78, 0X65, 0X72, 0X63, 0X69, 0X74, 0X61,
+        0X74, 0X69, 0X6F, 0X6E, 0X20, 0X75, 0X6C, 0X6C, 0X61, 0X6D,
+        0X63, 0X6F, 0X20, 0X6C, 0X61, 0X62, 0X6F, 0X72, 0X69, 0X73,
+        0X20, 0X6E, 0X69, 0X73, 0X69, 0X20, 0X75, 0X74, 0X20, 0X61,
+        0X6C, 0X69, 0X71, 0X75, 0X69, 0X70, 0X20, 0X65, 0X78, 0X20,
+        0X65, 0X61, 0X20, 0X63, 0X6F, 0X6D, 0X6D, 0X6F, 0X64, 0X6F,
+        0X20, 0X63, 0X6F, 0X6E, 0X73, 0X65, 0X71, 0X75, 0X61, 0X74,
+        0X2E, 0X20, 0X44, 0X75, 0X69, 0X73, 0X20, 0X61, 0X75, 0X74,
+        0X65, 0X20, 0X69, 0X72, 0X75, 0X72, 0X65, 0X20, 0X64, 0X6F,
+        0X6C, 0X6F, 0X72, 0X20, 0X69, 0X6E, 0X20, 0X72, 0X65, 0X70,
+        0X72, 0X65, 0X68, 0X65, 0X6E, 0X64, 0X65, 0X72, 0X69, 0X74,
+        0X20, 0X69, 0X6E, 0X20, 0X76, 0X6F, 0X6C, 0X75, 0X70, 0X74,
+        0X61, 0X74, 0X65, 0X20, 0X76, 0X65, 0X6C, 0X69, 0X74, 0X20,
+        0X65, 0X73, 0X73, 0X65, 0X20, 0X63, 0X69, 0X6C, 0X6C, 0X75,
+        0X6D, 0X20, 0X64, 0X6F, 0X6C, 0X6F, 0X72, 0X65, 0X20, 0X65,
+        0X75, 0X20, 0X66, 0X75, 0X67, 0X69, 0X61, 0X74, 0X20, 0X6E,
+        0X75, 0X6C, 0X6C, 0X61, 0X20, 0X70, 0X61, 0X72, 0X69, 0X61,
+        0X74, 0X75, 0X72, 0X2E, 0X20, 0X45, 0X78, 0X63, 0X65, 0X70,
+        0X74, 0X65, 0X75, 0X72, 0X20, 0X73, 0X69, 0X6E, 0X74, 0X20,
+        0X6F, 0X63, 0X63, 0X61, 0X65, 0X63, 0X61, 0X74, 0X20, 0X63,
+        0X75, 0X70, 0X69, 0X64, 0X61, 0X74, 0X61, 0X74, 0X20, 0X6E,
+        0X6F, 0X6E, 0X20, 0X70, 0X72, 0X6F, 0X69, 0X64, 0X65, 0X6E,
+        0X74, 0X2C, 0X20, 0X73, 0X75, 0X6E, 0X74, 0X20, 0X69, 0X6E,
+        0X20, 0X63, 0X75, 0X6C, 0X70, 0X61, 0X20, 0X71, 0X75, 0X69,
+        0X20, 0X6F, 0X66, 0X66, 0X69, 0X63, 0X69, 0X61, 0X20, 0X64,
+        0X65, 0X73, 0X65, 0X72, 0X75, 0X6E, 0X74, 0X20, 0X6D, 0X6F,
+        0X6C, 0X6C, 0X69, 0X74, 0X20, 0X61, 0X6E, 0X69, 0X6D, 0X20,
+        0X69, 0X64, 0X20, 0X65, 0X73, 0X74, 0X20, 0X6C, 0X61, 0X62,
+        0X6F, 0X72, 0X75, 0X6D, 0X2E
+    };
+
+    ndef_t message;
+    TEST_ASSERT_EQUAL_INT(ndef_from_buffer(&message, buffer, sizeof(buffer)), 0);
+    TEST_ASSERT_EQUAL_INT(ndef_get_size(&message), sizeof(buffer));
     TEST_ASSERT_EQUAL_INT(message.record_count, 1);
 }
 
@@ -171,6 +256,8 @@ static Test *tests_nfc_ndef_tests(void)
         new_TestFixture(test_ndef_mime_record),
         new_TestFixture(test_ndef_two_records),
         new_TestFixture(test_ndef_remove),
+        new_TestFixture(test_ndef_from_buffer),
+        new_TestFixture(test_ndef_long_record),
         new_TestFixture(test_ndef_pretty_print),
     };
 

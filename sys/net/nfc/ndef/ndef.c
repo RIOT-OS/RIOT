@@ -73,7 +73,7 @@ static void ndef_record_descriptors_pretty_print(const ndef_record_desc_t *ndef_
     size_t record_count)
 {
     print_str("----------------\n\n");
-    for (size_t i = 0; i < (size_t)record_count; ++i) {
+    for (size_t i = 0; i < record_count; ++i) {
         const ndef_record_desc_t *record = &ndef_record_descriptors[i];
         print_str("Record "); print_u32_dec(i); print_str("\n");
         print_str("----\n");
@@ -104,7 +104,7 @@ static void ndef_record_descriptors_pretty_print(const ndef_record_desc_t *ndef_
 
 void ndef_pretty_print(const ndef_t *ndef) {
     ndef_record_desc_t ndef_record_descriptors[CONFIG_NDEF_MAX_RECORD_COUNT];
-    ndef_parse(ndef, ndef_record_descriptors, CONFIG_NDEF_MAX_RECORD_COUNT);
+    ndef_parse(ndef, ndef_record_descriptors, ndef->record_count);
     ndef_record_descriptors_pretty_print(ndef_record_descriptors, ndef->record_count);
 }
 
@@ -399,18 +399,28 @@ int ndef_parse(const ndef_t *ndef, ndef_record_desc_t *record_descriptors,
     return ret;
 }
 
+static inline bool is_last_record(const ndef_record_desc_t *desc) {
+    return *(desc->header) & RECORD_ME_MASK;
+}
+
 int ndef_from_buffer(ndef_t *ndef, uint8_t *buffer, size_t buffer_size)
 {
     assert(ndef != NULL);
 
     ndef_init(ndef, buffer, buffer_size);
     uint8_t *current_pointer = ndef->buffer.memory;
-    while (current_pointer < ndef->buffer.cursor) {
+    uint8_t *end = current_pointer + buffer_size;
+    while (current_pointer < end) {
         ndef_record_desc_t record_desc;
         ndef_record_parse(current_pointer, &record_desc);
 
         ndef->records[ndef->record_count] = current_pointer;
         ndef->record_count += 1;
+
+        if (ndef->record_count > CONFIG_NDEF_MAX_RECORD_COUNT) {
+            LOG_ERROR("Too many NDEF records\n");
+            return -1;
+        }
 
         if (record_desc.record_type == NDEF_RECORD_SHORT) {
             current_pointer += NDEF_RECORD_HEADER_SIZE + NDEF_RECORD_TYPE_LENGTH_SIZE +
@@ -431,19 +441,21 @@ int ndef_from_buffer(ndef_t *ndef, uint8_t *buffer, size_t buffer_size)
             }
 
             uint32_t payload_length = ((uint32_t)record_desc.payload_length[0]) << 24 |
-                                     ((uint32_t)record_desc.payload_length[1]) << 16 |
-                                     ((uint32_t)record_desc.payload_length[2]) << 8 |
-                                     ((uint32_t)record_desc.payload_length[3]);
+                                      ((uint32_t)record_desc.payload_length[1]) << 16 |
+                                      ((uint32_t)record_desc.payload_length[2]) << 8  |
+                                      ((uint32_t)record_desc.payload_length[3]);
+
             current_pointer += payload_length;
+        }
+
+        if (is_last_record(&record_desc)) {
+            ndef->buffer.cursor = current_pointer;
+            return 0;
         }
     }
 
-    if (ndef->record_count > CONFIG_NDEF_MAX_RECORD_COUNT) {
-        LOG_ERROR("NDEF record count exceeds maximum\n");
-        return -1;
-    }
-
-    return 0;
+    LOG_ERROR("Buffer contains an invalid NDEF message\n");
+    return -1;
 }
 
 /* MARK: MIME */
