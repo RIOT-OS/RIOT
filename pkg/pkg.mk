@@ -194,7 +194,7 @@ $(PKG_SOURCE_DIR)/.git: $(PKG_SPARSE_TAG) | $(PKG_CUSTOM_PREPARED)
 	  # iff the package uses sparse paths, initialize the repository as sparse \
 	  $(if $(QUIETER),,echo "[INFO] using sparse checkout";) \
 	  $(GIT_IN_PKG) sparse-checkout init --no-cone; \
-	  $(GIT_IN_PKG) sparse-checkout set $(PKG_SPARSE_PATHS); \
+	  $(GIT_IN_PKG) sparse-checkout set "$(PKG_SPARSE_PATHS)"; \
 	fi
 	$(Q)$(GIT_IN_PKG) remote add origin $(PKG_URL)
 	$(Q)$(GIT_IN_PKG) config remote.origin.promisor true
