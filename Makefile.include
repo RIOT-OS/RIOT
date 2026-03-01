@@ -986,6 +986,14 @@ ifeq (, $(filter help generate-Makefile.ci, $(MAKECMDGOALS)))
     EXPECT_ERRORS := 1
   endif
 
+BOARDS_SUPPORTED += $(BOARD_WHITELIST)
+BOARDS_UNSUPPORTED += $(BOARD_BLACKLIST)
+
+ifneq (, $(BOARD_WHITELIST)$(BOARD_BLACKLIST))
+  $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)BOARD_WHITELIST has been renamed to BOARDS_SUPPORTED and BOARD_BLACKLIST to BOARDS_UNSUPPORTED.$(COLOR_RESET)" 1>&2)
+  $(shell $(COLOR_ECHO) "The contents of BOARD_WHITELIST have been appended to BOARDS_SUPPORTED and the contents of BOARD_BLACKLIST to BOARDS_UNSUPPORTED for compatibility." 1>&2)
+endif
+
   # Test if any used feature conflict with another one.
   ifneq (,$(FEATURES_CONFLICTING))
     $(shell $(COLOR_ECHO) "$(COLOR_RED)The following features conflict:$(COLOR_RESET)"\
@@ -995,21 +1003,21 @@ ifeq (, $(filter help generate-Makefile.ci, $(MAKECMDGOALS)))
     endif
     EXPECT_ERRORS := 1
   endif
-
-  # If there is a whitelist, then test if the board is whitelisted.
-  ifneq (, $(BOARD_WHITELIST))
-    ifeq (, $(filter $(BOARD_WHITELIST), $(BOARD)))
-      $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected BOARD=$(BOARD) is not whitelisted:$(COLOR_RESET) $(BOARD_WHITELIST)" 1>&2)
+  # If there is a list of supported boards, then test if the board is supported.
+  ifneq (,$(strip $(BOARDS_SUPPORTED)))
+    ifeq (, $(filter $(BOARDS_SUPPORTED), $(BOARD)))
+      $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected BOARD=$(BOARD) is not listed in BOARDS_SUPPORTED$(COLOR_RESET)." 1>&2)
+      $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)When the list BOARDS_SUPPORTED is not empty, only boards explicitly listed there are supported.$(COLOR_RESET)" 1>&2)
+      $(shell $(COLOR_ECHO) "BOARDS_SUPPORTED = \"$(BOARDS_SUPPORTED)\"" 1>&2)
       EXPECT_ERRORS := 1
     endif
   endif
 
-  # If there is a blacklist, then test if the board is blacklisted.
-  ifneq (, $(BOARD_BLACKLIST))
-    ifneq (, $(filter $(BOARD_BLACKLIST), $(BOARD)))
-      $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected BOARD=$(BOARD) is blacklisted:$(COLOR_RESET) $(BOARD_BLACKLIST)" 1>&2)
-      EXPECT_ERRORS := 1
-    endif
+  # If there is a list of unsupported boards, then test if the board is unsupported.
+  ifneq (,$(filter $(BOARDS_UNSUPPORTED),$(BOARD)))
+    $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected BOARD=$(BOARD) is listed in BOARDS_UNSUPPORTED.$(COLOR_RESET)" 1>&2)
+    $(shell $(COLOR_ECHO) "BOARDS_UNSUPPORTED = $(BOARDS_UNSUPPORTED)" 1>&2)
+    EXPECT_ERRORS := 1
   endif
 
   #  test if toolchain is supported.

@@ -4,7 +4,7 @@ include ../Makefile.pkg_common
 USEPKG += cmsis
 USEMODULE += cmsis-dsp
 
-BOARD_WHITELIST := \
+BOARDS_SUPPORTED := \
   airfy-beacon \
   arduino-due \
   b-u585i-iot02a \

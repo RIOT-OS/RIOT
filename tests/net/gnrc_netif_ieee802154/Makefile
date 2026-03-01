@@ -1,4 +1,4 @@
-BOARD_WHITELIST = native32 native64 derfmega256 avr-rss2 atmega256rfr2-xpro nrf52840dongle
+BOARDS_SUPPORTED = native32 native64 derfmega256 avr-rss2 atmega256rfr2-xpro nrf52840dongle
 
 include ../Makefile.net_common
 
