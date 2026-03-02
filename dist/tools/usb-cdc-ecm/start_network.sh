@@ -4,6 +4,13 @@ USB_CDC_ECM_DIR="$(dirname "$(readlink -f "$0")")"
 
 INTERFACE_CHECK_COUNTER=5  # 5 attempts to find usb interface
 
+# This address is assigned to the CDC-ECM interface of the host
+IPV6_LOCAL=${IPV6_LOCAL:-"fe80::1/64"}
+# This address is assigned to the host
+IPV6_GLOBAL=${IPV6_GLOBAL:-"fd00:dead:beef::1/128"}
+# This address should be assigned to the CDC-ECM interface of the border router
+IPV6_ROUTE_NEXT_HOP=${IPV6_ROUTE_NEXT_HOP:-"fe80::2"}
+
 find_interface() {
     INTERFACE=$(ls -A /sys/bus/usb/drivers/cdc_ether/*/net/ 2>/dev/null)
     INTERFACE_CHECK=$(echo -n "${INTERFACE}" | head -c1 | wc -c)
@@ -19,7 +26,11 @@ find_interface() {
 }
 
 echo "Waiting for network interface."
-find_interface
+if [ -z "${INTERFACE}" ]; then
+    find_interface
+else
+    INTERFACE_CHECK=1
+fi
 
 if [ "${INTERFACE_CHECK}" -eq 0 ]; then
     echo "Unable to find network interface"
@@ -32,44 +43,60 @@ setup_interface() {
     sysctl -w net.ipv6.conf."${INTERFACE}".forwarding=1
     sysctl -w net.ipv6.conf."${INTERFACE}".accept_ra=0
     ip link set "${INTERFACE}" up
-    ip a a fe80::1/64 dev "${INTERFACE}"
-    ip a a fd00:dead:beef::1/128 dev lo
+    ip a a "${IPV6_LOCAL}" dev "${INTERFACE}"
+    ip a a "${IPV6_GLOBAL}" dev lo
 }
 
 cleanup_interface() {
-    ip a d fe80::1/64 dev "${INTERFACE}"
-    ip a d fd00:dead:beef::1/128 dev lo
-    ip route del "${PREFIX}" via fe80::2 dev "${INTERFACE}"
+    ip route del "${PREFIX}" via "${IPV6_ROUTE_NEXT_HOP}" dev "${INTERFACE}"
+}
+
+stop_radvd() {
+    if [ -n "${RADVD_ADDR}" ]; then
+        ${RADVD} -d
+        ip a d "${RADVD_ADDR}" dev "${INTERFACE}"
+    fi
+}
+
+stop_dhcpdv6() {
+    if [ -n "${DHCPD_PIDFILE}" ]; then
+        kill "$(cat "${DHCPD_PIDFILE}")"
+        rm "${DHCPD_PIDFILE}"
+        ip route del "${PREFIX}" via "${IPV6_ROUTE_NEXT_HOP}" dev "${INTERFACE}"
+    fi
+}
+
+stop_uhcpd() {
+    if [ -n "${UHCPD_PID}" ]; then
+        kill "${UHCPD_PID}"
+        ip route del "${PREFIX}" via "${IPV6_ROUTE_NEXT_HOP}" dev "${INTERFACE}"
+    fi
 }
 
 cleanup() {
     echo "Cleaning up..."
+    stop_radvd
+    stop_dhcpdv6
+    stop_uhcpd
     cleanup_interface
-    if [ -n "${UHCPD_PID}" ]; then
-        kill "${UHCPD_PID}"
-    fi
-    if [ -n "${DHCPD_PIDFILE}" ]; then
-        kill "$(cat "${DHCPD_PIDFILE}")"
-        rm "${DHCPD_PIDFILE}"
-    fi
     trap "" INT QUIT TERM EXIT
 }
 
 start_uhcpd() {
-    ip route add "${PREFIX}" via fe80::2 dev "${INTERFACE}"
+    ip route add "${PREFIX}" via "${IPV6_ROUTE_NEXT_HOP}" dev "${INTERFACE}"
     ${UHCPD} "${INTERFACE}" "${PREFIX}" > /dev/null &
     UHCPD_PID=$!
 }
 
 start_dhcpd() {
-    ip route add "${PREFIX}" via fe80::2 dev "${INTERFACE}"
+    ip route add "${PREFIX}" via "${IPV6_ROUTE_NEXT_HOP}" dev "${INTERFACE}"
     DHCPD_PIDFILE=$(mktemp)
     ${DHCPD} -d -p "${DHCPD_PIDFILE}" "${INTERFACE}" "${PREFIX}" 2> /dev/null
 }
 
 start_radvd() {
-    ADDR=$(echo "${PREFIX}" | sed -e 's/::\//::1\//')
-    ip a a "${ADDR}" dev "${INTERFACE}"
+    RADVD_ADDR=$(echo "${PREFIX}" | sed -e 's/::\//::1\//')
+    ip a a "${RADVD_ADDR}" dev "${INTERFACE}"
     sysctl net.ipv6.conf."${INTERFACE}".accept_ra=2
     sysctl net.ipv6.conf."${INTERFACE}".accept_ra_rt_info_max_plen=64
     ${RADVD} -c "${INTERFACE}" "${PREFIX}"
