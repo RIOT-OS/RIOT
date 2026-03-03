@@ -82,6 +82,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     seeeduino_xiao \
     sensebox_samd21 \
     serpente \
+    slstk3301a \
     slstk3400a \
     slstk3401a \
     sltb001a \

@@ -25,6 +25,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     seeedstudio-gd32 \
     sipeed-longan-nano \
     sipeed-longan-nano-tft \
+    slstk3301a \
     slstk3400a \
     stk3200 \
     stm32f0discovery \
