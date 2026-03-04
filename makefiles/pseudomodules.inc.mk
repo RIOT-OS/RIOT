@@ -355,6 +355,12 @@ PSEUDOMODULES += psa_riot_hashes_sha_512_224
 PSEUDOMODULES += psa_riot_hashes_sha_512_256
 PSEUDOMODULES += psa_riot_hashes_hmac_sha256
 PSEUDOMODULES += fortuna_reseed
+
+# Runtime Configuration Registry Modules are Pseudomodules unless stated otherwise
+PSEUDOMODULES += registry_%
+# Core Registry Sys Schemas
+NO_PSEUDOMODULES += registry_namespace_sys
+
 PSEUDOMODULES += riotboot_%
 PSEUDOMODULES += rtt_cmd
 PSEUDOMODULES += saul_adc
