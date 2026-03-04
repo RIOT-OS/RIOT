@@ -350,19 +350,21 @@ void ztimer_init(void)
 #  if (ZTIMER_TIMER_FREQ != FREQ_1MHZ) || CONFIG_ZTIMER_PERIPH_TIMER_FORCE_CONVERSION
 #    if (ZTIMER_TIMER_FREQ == FREQ_250KHZ) && !(CONFIG_ZTIMER_PERIPH_TIMER_FORCE_CONVERSION)
     if (IS_ACTIVE(DEVELHELP) && ((periph_timer_freq < 237500) || (periph_timer_freq > 262500))) {
-        LOG_WARNING("ZTIMER_USEC from %" PRIu32 " Hz clock with \"left-shift by 2\" frequency conversion\n",
-                    periph_timer_freq);
+        LOG_WARNING(
+            "ZTIMER_USEC from %" PRIu32 " Hz clock with \"left-shift by 2\" frequency conversion\n",
+            periph_timer_freq);
     }
-    LOG_DEBUG("ztimer_init(): ZTIMER_USEC convert_shift %lu to 1000000\n",
+    LOG_DEBUG("ztimer_init(): ZTIMER_USEC convert_shift %" PRIu32 " to 1000000\n",
               periph_timer_freq);
     ztimer_convert_shift_up_init(&_ztimer_convert_shift_usec,
                                  ZTIMER_USEC_BASE, 2);
 #    elif (ZTIMER_TIMER_FREQ == FREQ_500KHZ) && !(CONFIG_ZTIMER_PERIPH_TIMER_FORCE_CONVERSION)
     if (IS_ACTIVE(DEVELHELP) && ((periph_timer_freq < 487500) || (periph_timer_freq > 512500))) {
-        LOG_WARNING("ZTIMER_USEC from %" PRIu32 " Hz clock with \"left-shift by 1\" frequency conversion\n",
-                    periph_timer_freq);
+        LOG_WARNING(
+            "ZTIMER_USEC from %" PRIu32 " Hz clock with \"left-shift by 1\" frequency conversion\n",
+            periph_timer_freq);
     }
-    LOG_DEBUG("ztimer_init(): ZTIMER_USEC convert_shift %lu to 1000000\n",
+    LOG_DEBUG("ztimer_init(): ZTIMER_USEC convert_shift %" PRIu32 " to 1000000\n",
               periph_timer_freq);
     ztimer_convert_shift_up_init(&_ztimer_convert_shift_usec,
                                  ZTIMER_USEC_BASE, 1);
