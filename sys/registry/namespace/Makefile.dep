@@ -1,0 +1,7 @@
+ifneq (,$(filter registry_namespace_sys%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/registry/namespace/sys/Makefile.dep
+endif
+
+ifneq (,$(filter registry_namespace_tests%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/registry/namespace/tests/Makefile.dep
+endif

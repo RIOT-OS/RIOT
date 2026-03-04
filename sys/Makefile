@@ -131,6 +131,9 @@ endif
 ifneq (,$(filter netutils,$(USEMODULE)))
   DIRS += net/netutils
 endif
+ifneq (,$(filter registry,$(USEMODULE)))
+  DIRS += registry
+endif
 ifneq (,$(filter sema,$(USEMODULE)))
   DIRS += sema
 endif
