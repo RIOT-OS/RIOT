@@ -26,27 +26,27 @@ extern "C" {
 #endif
 
 #ifndef MAX31343_PARAM_I2C
-#define MAX31343_PARAM_I2C        I2C_DEV(0)
+#define MAX31343_PARAM_I2C        I2C_DEV(0)	/**< Default I2C bus */
 #endif
 
 #ifndef MAX31343_PARAM_USE_SQW
-#define MAX31343_PARAM_USE_SQW      (0)
+#define MAX31343_PARAM_USE_SQW      (0)			/**< Disable SQW output by default */
 #endif
 
 #ifndef MAX31343_PARAM_SQW_FREQ
-#define MAX31343_PARAM_SQW_FREQ     (MAX31343_SQW_1HZ)
+#define MAX31343_PARAM_SQW_FREQ     (MAX31343_SQW_1HZ)	/**< Default SQW frequency */
 #endif
 
 #ifndef MAX31343_PARAM_USE_TEMP_AUTOMODE
-#define MAX31343_PARAM_USE_TEMP_AUTOMODE   (0)
+#define MAX31343_PARAM_USE_TEMP_AUTOMODE   (0)	/**< Disable temp automode by default */
 #endif
 
 #ifndef MAX31343_PARAM_TEMP_AUTOMODE_ENABLE
-#define MAX31343_PARAM_TEMP_AUTOMODE_ENABLE (1)
+#define MAX31343_PARAM_TEMP_AUTOMODE_ENABLE (1)	/**< Enable automode when configured */
 #endif
 
 #ifndef MAX31343_PARAM_TEMP_TTSINT
-#define MAX31343_PARAM_TEMP_TTSINT  (MAX31343_TTSINT_16S)
+#define MAX31343_PARAM_TEMP_TTSINT  (MAX31343_TTSINT_16S)	/**< Default conversion interval */
 #endif
 
 #ifndef MAX31343_PARAMS
@@ -57,7 +57,7 @@ extern "C" {
     .use_temp_automode = MAX31343_PARAM_USE_TEMP_AUTOMODE,  \
     .temp_automode_enable = MAX31343_PARAM_TEMP_AUTOMODE_ENABLE, \
     .temp_ttsint = MAX31343_PARAM_TEMP_TTSINT,              \
-}
+}                                                           /**< Default parameter set */
 #endif
 
 /**
