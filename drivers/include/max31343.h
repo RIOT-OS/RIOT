@@ -4,8 +4,13 @@
  */
 
 /**
+ * @defgroup    drivers_max31343  MAX31343 I2C RTC driver
+ * @ingroup     drivers_sensors
+ * @brief       Driver for the MAX31343 I2C real-time clock with integrated MEMS oscillator
+ * @{
+ *
  * @file
- * @brief       Driver interface for the MAX31343 I2C real-time clock with integrated MEMS oscillator
+ * @brief       Driver interface for the MAX31343 I2C real-time clock
  *
  * @author      Jakob Müller <ja.mueller@tuhh.de>
  */
