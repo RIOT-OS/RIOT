@@ -220,9 +220,9 @@ FEATURES_EXISTING := \
     periph_pwm \
     periph_qdec \
     periph_rtc \
+    periph_rtc_external \
     periph_rtc_mem \
     periph_rtc_ms \
-    periph_rtc_external \
     periph_rtt \
     periph_rtt_overflow \
     periph_rtt_set_counter \

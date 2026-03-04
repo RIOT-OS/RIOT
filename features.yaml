@@ -752,6 +752,8 @@ groups:
             time broken down into year, month, day, hour, minute, second.
     - name: periph_rtc_ms
       help: The RTC peripheral can provide sub-second timestamps.
+    - name: periph_rtc_external
+      help: The RTC peripheral is provided by an external device driver, not by the MCU hardware.
     - name: periph_rtt
       help: An Real Time Timer (RTT) (a.k.a. Real Time Counter) peripheral is
             present. This timer is similar to `periph_timer`, except for using
