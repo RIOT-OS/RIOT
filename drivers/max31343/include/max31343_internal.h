@@ -12,6 +12,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 /* Fixed I2C address */
@@ -87,3 +91,7 @@
 
 /* D_TRICKLE bits [1:0]: resistor select */
 #define MAX31343_TRICKLE_D_RES_MASK (0x03U)
+
+#ifdef __cplusplus
+}
+#endif
