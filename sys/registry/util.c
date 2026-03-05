@@ -5,8 +5,7 @@
  */
 
 /**
- * @defgroup    sys_registry_util RIOT Registry utilities
- * @ingroup     sys_registry
+ * @ingroup     sys_registry_util
  * @brief       RIOT Registry Util module providing utility functions
  * @{
  *

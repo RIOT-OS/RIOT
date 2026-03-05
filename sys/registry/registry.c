@@ -5,7 +5,6 @@
  */
 
 /**
- * @defgroup    sys_registry RIOT Registry
  * @ingroup     sys_registry
  * @brief       RIOT Registry for runtime configuration of modules
  * @{
