@@ -79,7 +79,7 @@ typedef struct _registry_namespace_t registry_namespace_t;
 typedef struct _registry_schema_t registry_schema_t;
 
 /**
- * @brief  Instance of a schema containing its configuration parameters
+ * @brief  Instance of a schema containing its configuration parameter
  * values see @p _registry_schema_instance_t.
  */
 typedef struct _registry_schema_instance_t registry_schema_instance_t;
