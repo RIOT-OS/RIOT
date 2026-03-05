@@ -215,7 +215,7 @@ struct _registry_instance_t {
                                           configuration parameters of the schema. */
     const registry_schema_t *schema; /**< Configuration Schema that the
                                           Registry Instance belongs to. */
-    registry_apply_cb_t apply_cb;    /**< Will be called after @ref registry_apply()
+    registry_apply_cb_t apply_cb;    /**< Will be called when @ref registry_apply()
                                           was called on this instance. */
     void *context;                   /**< Optional context used by the instance */
 };
@@ -423,7 +423,7 @@ typedef registry_error_t (*registry_export_cb_t)(
 #define REGISTRY_EXPORT_SELF                          1
 
 /**
- * @brief This mode exports the given node plus 1 - n levels of children.
+ * @brief This mode exports the given node plus n-1 levels of children.
  */
 #define REGISTRY_EXPORT_WITH_N_LEVELS_OF_CHILDREN(_n) (_n + 1)
 
