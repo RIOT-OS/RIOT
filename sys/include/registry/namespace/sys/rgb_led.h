@@ -23,9 +23,6 @@ extern "C" {
 
 #include "registry.h"
 
-/* RGB-LED */
-#if IS_USED(MODULE_REGISTRY_NAMESPACE_SYS_RGB_LED) || IS_ACTIVE(DOXYGEN)
-
 /**
  * @brief Parameter descriptor for the "red" parameter of the RGB-LED schema.
  */
@@ -50,21 +47,19 @@ extern registry_schema_t registry_sys_rgb_led;
  * @brief Schema instance struct of a RGB-LED schema.
  */
 typedef struct {
-    uint8_t red;       /**< Red color. */
-    uint8_t green;     /**< Green color. */
-    uint8_t blue;      /**< Blue color. */
+    uint8_t red;   /**< Red color. */
+    uint8_t green; /**< Green color. */
+    uint8_t blue;  /**< Blue color. */
 } registry_sys_rgb_led_instance_t;
 
 /**
- * @brief Parameter indices for the RGB-LED schema.
+ * @brief Parameter IDs for the RGB-LED schema.
  */
 typedef const enum {
     REGISTRY_SYS_RGB_LED_RED,   /**< Red color. */
     REGISTRY_SYS_RGB_LED_GREEN, /**< Green color. */
     REGISTRY_SYS_RGB_LED_BLUE,  /**< Blue color. */
-} registry_sys_rgb_led_indices_t;
-
-#endif
+} registry_sys_rgb_led_ids_t;
 
 #ifdef __cplusplus
 }
