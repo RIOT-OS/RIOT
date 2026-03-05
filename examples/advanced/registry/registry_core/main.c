@@ -106,7 +106,7 @@ int main(void)
         registry_apply(&parameter_node);
 
         /* Sleep for 1 second and then do it again*/
-        ztimer_sleep(ZTIMER_MSEC, 1000);
+        ztimer_sleep(ZTIMER_SEC, 1);
     }
 
     return 0;
