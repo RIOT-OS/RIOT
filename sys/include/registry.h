@@ -182,9 +182,9 @@ typedef const enum {
 } registry_apply_cb_scope_t;
 
 /**
- * @brief The callback must be implemented by users of a configuration schema.
+ * @brief The callback must be implemented by consumers of a configuration schema.
  *
- * This callback is called when the registry notifies the user,
+ * This callback is called when the registry notifies the consumer,
  * that a configuration parameter value has changed.
  *
  * @param[in] scope Scope of what will be applied (a parameter, a group or the whole instance).
@@ -202,9 +202,9 @@ typedef registry_error_t (*registry_apply_cb_t)(
 /**
  * @brief Instance of a schema containing its configuration parameters values.
  *
- * The instance of a configuration schema is created by users that
- * need to expose runtime configurations.
- * The users also need to implement the @p apply_cb
+ * The instance of a configuration schema is created by consumers of that schema
+ * who need to expose runtime configurations.
+ * The consumers also need to implement the @p apply_cb
  * function to get informed when configuration changes.
  */
 struct _registry_schema_instance_t {
