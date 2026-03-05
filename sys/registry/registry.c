@@ -36,13 +36,13 @@ XFA_INIT_CONST(registry_namespace_t *, _registry_namespaces_xfa);
 
 registry_error_t registry_add_schema_instance(
     const registry_schema_t *schema,
-    const registry_instance_t *instance)
+    const registry_schema_instance_t *instance)
 {
     assert(schema != NULL);
     assert(instance != NULL);
 
     /* add schema to instance */
-    (*((registry_instance_t *)instance)).schema = schema;
+    (*((registry_schema_instance_t *)instance)).schema = schema;
 
     /* get instances length to determine the id of the new instance */
     size_t count = clist_count((clist_node_t *)&schema->instances);
@@ -116,7 +116,7 @@ static registry_error_t _apply_export_cb(const registry_node_t *node, const void
 {
     (void)context;
 
-    const registry_instance_t *instance;
+    const registry_schema_instance_t *instance;
 
     switch (node->type) {
     /* The apply function is only called for instance and below */
@@ -171,7 +171,7 @@ registry_error_t registry_apply(const registry_node_t *node)
 }
 
 static registry_error_t _registry_export_parameter(
-    const registry_instance_t *instance,
+    const registry_schema_instance_t *instance,
     const registry_parameter_t *parameter,
     const registry_export_cb_t export_cb,
     const void *context)
@@ -190,7 +190,7 @@ static registry_error_t _registry_export_parameter(
 }
 
 static registry_error_t _registry_export_group(
-    const registry_instance_t *instance,
+    const registry_schema_instance_t *instance,
     const registry_group_t *group,
     const registry_export_cb_t export_cb,
     const uint8_t tree_traversal_depth,
@@ -245,7 +245,7 @@ static registry_error_t _registry_export_group(
 }
 
 static registry_error_t _registry_export_instance(
-    const registry_instance_t *instance,
+    const registry_schema_instance_t *instance,
     const registry_export_cb_t export_cb,
     const uint8_t tree_traversal_depth,
     const void *context)
@@ -329,7 +329,7 @@ static registry_error_t _registry_export_schema(
 
         do {
             node = node->next;
-            registry_instance_t *instance = container_of(node, registry_instance_t, node);
+            registry_schema_instance_t *instance = container_of(node, registry_schema_instance_t, node);
 
             if (!instance) {
                 return -REGISTRY_ERROR_SCHEMA_HAS_NO_INSTANCE;

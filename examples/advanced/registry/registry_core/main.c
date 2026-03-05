@@ -39,7 +39,7 @@ static registry_sys_board_led_instance_t board_led_instance_0_data = {
     .enabled = 0,
 };
 
-static registry_instance_t board_led_instance = {
+static registry_schema_instance_t board_led_instance = {
     .data = &board_led_instance_0_data,
     .apply_cb = &board_led_instance_apply_cb,
 };

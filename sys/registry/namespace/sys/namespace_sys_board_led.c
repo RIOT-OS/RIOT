@@ -34,7 +34,7 @@
 
 /* Mapping */
 static void mapping(const registry_parameter_id_t parameter_id,
-                    const registry_instance_t *instance,
+                    const registry_schema_instance_t *instance,
                     void **val, size_t *val_len)
 {
     registry_sys_board_led_instance_t *_instance =
