@@ -5,8 +5,7 @@
  */
 
 /**
- * @defgroup    sys_registry_init RIOT Registry initialization
- * @ingroup     sys_registry
+ * @ingroup     sys_registry_init
  * @brief       RIOT Registry Init module providing init functions
  * @{
  *
