@@ -6,7 +6,7 @@
 
 /**
  * @defgroup    sys_registry_namespace_sys_rgb_led RIOT Registry Schema: RGB_LED
- * @ingroup     sys
+ * @ingroup     sys_registry_namespace_sys
  * @brief       RIOT Registry RGB_LED Schema representing the basic structure of an RGB LED
  * @{
  *

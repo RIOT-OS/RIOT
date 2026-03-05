@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    sys_registry_error RIOT Registry Error
- * @ingroup     sys
+ * @ingroup     sys_registry
  * @brief       RIOT Registry module providing all possible registry specific error codes
  * @{
  *
