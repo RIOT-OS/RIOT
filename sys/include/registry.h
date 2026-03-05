@@ -206,8 +206,8 @@ typedef registry_error_t (*registry_apply_cb_t)(
  * function to get informed when configuration changes.
  */
 struct _registry_instance_t {
-    clist_node_t node;               /**< Linked list node pointing to the next schema instance. */
-    const registry_instance_id_t id; /**< ID of the instance within the scope of it's schema */
+    clist_node_t node;                      /**< Linked list node pointing to the next schema instance. */
+    const registry_schema_instance_id_t id; /**< ID of the instance within the scope of it's schema */
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     const char *const name;          /**< String describing the instance. */
 #endif                               /* CONFIG_REGISTRY_ENABLE_META_NAME */

@@ -48,7 +48,7 @@ registry_error_t registry_add_schema_instance(
     size_t count = clist_count((clist_node_t *)&schema->instances);
 
     /* set id of new instance to the instance count */
-    *(registry_instance_id_t *)&instance->id = count;
+    *(registry_schema_instance_id_t *)&instance->id = count;
 
     /* add instance to schema */
     clist_rpush((clist_node_t *)&schema->instances, (clist_node_t *)&instance->node);
