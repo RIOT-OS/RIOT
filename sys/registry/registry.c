@@ -71,7 +71,7 @@ registry_error_t registry_get(const registry_node_t *node, registry_value_t *val
 
     const registry_parameter_t *parameter = node->value.parameter.parameter;
 
-    parameter->schema->mapping(
+    parameter->schema->get_parameter_value_from_instance(
         parameter->id, node->value.parameter.instance, &intern_val, &intern_val_len);
 
     /* update buf pointer in registry_value_t to point
@@ -99,7 +99,7 @@ registry_error_t registry_set(const registry_node_t *node, const void *buf, cons
 
     const registry_parameter_t *parameter = node->value.parameter.parameter;
 
-    parameter->schema->mapping(
+    parameter->schema->get_parameter_value_from_instance(
         parameter->id, node->value.parameter.instance, &intern_val, &intern_val_len);
 
     if (buf_len > intern_val_len) {

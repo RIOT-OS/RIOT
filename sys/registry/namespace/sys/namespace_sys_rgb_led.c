@@ -32,10 +32,11 @@
 
 #if IS_USED(MODULE_REGISTRY_NAMESPACE_SYS_RGB_LED) || IS_ACTIVE(DOXYGEN)
 
-/* Mapping */
-static void mapping(const registry_parameter_id_t parameter_id,
-                    const registry_schema_instance_t *instance,
-                    void **val, size_t *val_len)
+/* Get parameter value from instance */
+static void get_parameter_value_from_instance(
+    const registry_parameter_id_t parameter_id,
+    const registry_schema_instance_t *instance,
+    void **val, size_t *val_len)
 {
     registry_sys_rgb_led_instance_t *_instance =
         (registry_sys_rgb_led_instance_t *)instance->data;
@@ -108,7 +109,7 @@ registry_schema_t registry_sys_rgb_led = {
     .description = "",
 #  endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .namespace = &registry_sys,
-    .mapping = mapping,
+    .get_parameter_value_from_instance = get_parameter_value_from_instance,
     .groups = NULL,
     .groups_len = 0,
     .parameters = (const registry_parameter_t *[]){
