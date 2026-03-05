@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    sys_registry_namespace_sys_board_led RIOT Registry Schema: BOARD_LED
- * @ingroup     sys
+ * @ingroup     sys_registry_namespace_sys
  * @brief       RIOT Registry BOARD_LED Schema representing the basic structure of a BOARD LED
  * @{
  *

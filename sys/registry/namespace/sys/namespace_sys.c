@@ -5,10 +5,9 @@
  */
 
 /**
- * @defgroup    sys_registry_schema RIOT Registry Schema
- * @ingroup     sys
- * @brief       RIOT Registry Schema module providing common sys configuration
-                schemas for the RIOT Registry sys module
+ * @defgroup    sys_registry_namespace_sys RIOT Registry Sys Namespace
+ * @ingroup     sys_registry
+ * @brief       RIOT Registry Namespace Sys module
  * @{
  *
  * @file

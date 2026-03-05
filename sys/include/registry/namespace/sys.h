@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    sys_registry_namespace_sys RIOT Registry Sys Namespace
- * @ingroup     sys
+ * @ingroup     sys_registry
  * @brief       RIOT Registry Namespace Sys module
  * @{
  *
