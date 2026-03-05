@@ -44,7 +44,7 @@ typedef uint32_t registry_schema_id_t;
  * @brief Identifier of a schema instance.
  * It is unique within the scope of its parent configuration schema.
  */
-typedef uint16_t registry_instance_id_t;
+typedef uint16_t registry_schema_instance_id_t;
 
 /**
  * @brief Identifier of a configuration group or parameter.
