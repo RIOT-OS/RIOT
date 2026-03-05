@@ -29,17 +29,17 @@
 #include "registry/namespace/sys/board_led.h"
 #include "ztimer.h"
 
-registry_error_t board_led_instance_apply_cb(
+static registry_error_t board_led_instance_apply_cb(
     const registry_apply_cb_scope_t scope,
     const registry_group_or_parameter_id_t *group_or_parameter_id,
     const void *context);
 
 /* This belongs into the BOARD or Driver for example */
-registry_sys_board_led_instance_t board_led_instance_0_data = {
+static registry_sys_board_led_instance_t board_led_instance_0_data = {
     .enabled = 0,
 };
 
-registry_instance_t board_led_instance = {
+static registry_instance_t board_led_instance = {
     .data = &board_led_instance_0_data,
     .apply_cb = &board_led_instance_apply_cb,
 };
@@ -48,7 +48,7 @@ registry_instance_t board_led_instance = {
  * If interacting with configurations of drivers then this callback should be
  * implemented by the driver itself. For custom application logic, we need to
  * define this for ourselves. */
-registry_error_t board_led_instance_apply_cb(
+static registry_error_t board_led_instance_apply_cb(
     const registry_apply_cb_scope_t scope,
     const registry_group_or_parameter_id_t *group_or_parameter_id,
     const void *context)
