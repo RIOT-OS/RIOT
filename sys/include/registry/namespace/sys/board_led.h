@@ -23,9 +23,6 @@ extern "C" {
 
 #include "registry.h"
 
-/* BOARD-LED */
-#if IS_USED(MODULE_REGISTRY_NAMESPACE_SYS_BOARD_LED) || IS_ACTIVE(DOXYGEN)
-
 /**
  * @brief Parameter descriptor for the "enabled" parameter of the board LED schema.
  */
@@ -40,17 +37,15 @@ extern registry_schema_t registry_sys_board_led;
  * @brief Schema instance data struct of a board LED schema.
  */
 typedef struct {
-    bool enabled;      /**< Whether the LED is enabled. */
+    bool enabled; /**< Whether the LED is enabled. */
 } registry_sys_board_led_instance_t;
 
 /**
- * @brief Parameter indices for the board LED schema.
+ * @brief Parameter IDs for the board LED schema.
  */
 typedef const enum {
     REGISTRY_SYS_BOARD_LED_ENABLED, /**< Enabled state. */
-} registry_sys_board_led_indices_t;
-
-#endif
+} registry_sys_board_led_ids_t;
 
 #ifdef __cplusplus
 }
