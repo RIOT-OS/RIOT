@@ -80,9 +80,9 @@ typedef struct _registry_schema_t registry_schema_t;
 
 /**
  * @brief  Instance of a schema containing its configuration parameters
- * values see @p _registry_instance_t.
+ * values see @p _registry_schema_instance_t.
  */
-typedef struct _registry_instance_t registry_instance_t;
+typedef struct _registry_schema_instance_t registry_schema_instance_t;
 
 /**
  * @brief  Data structure of a configuration group see @p _registry_group_t.
@@ -142,20 +142,20 @@ typedef enum {
 typedef struct {
     registry_node_type_t type; /**< The type of the node */
     union {
-        const registry_namespace_t *namespace; /**< Pointer to the configuration namespace */
-        const registry_schema_t *schema;       /**< Pointer to a configuration schema */
-        const registry_instance_t *instance;   /**< Pointer to a schema instance */
+        const registry_namespace_t *namespace;      /**< Pointer to the configuration namespace */
+        const registry_schema_t *schema;            /**< Pointer to a configuration schema */
+        const registry_schema_instance_t *instance; /**< Pointer to a schema instance */
         struct {
-            const registry_instance_t *instance; /**< Pointer to a schema instance */
-            const registry_group_t *group;       /**< Pointer to a configuration group */
-        } group;                                 /**< A configuration group
+            const registry_schema_instance_t *instance; /**< Pointer to a schema instance */
+            const registry_group_t *group;              /**< Pointer to a configuration group */
+        } group;                                        /**< A configuration group
                                                       depends on an instance */
         struct {
-            const registry_instance_t *instance;   /**< Pointer to a schema instance */
-            const registry_parameter_t *parameter; /**< Pointer to a configuration parameter */
-        } parameter;                               /**< A configuration parameter
+            const registry_schema_instance_t *instance; /**< Pointer to a schema instance */
+            const registry_parameter_t *parameter;      /**< Pointer to a configuration parameter */
+        } parameter;                                    /**< A configuration parameter
                                                         depends on an instance */
-    } value;                                       /**< The location inside of the
+    } value;                                            /**< The location inside of the
                                                         configuration tree */
 } registry_node_t;
 
@@ -207,7 +207,7 @@ typedef registry_error_t (*registry_apply_cb_t)(
  * The users also need to implement the @p apply_cb
  * function to get informed when configuration changes.
  */
-struct _registry_instance_t {
+struct _registry_schema_instance_t {
     clist_node_t node;                      /**< Linked list node pointing to the next schema instance. */
     const registry_schema_instance_id_t id; /**< ID of the instance within the scope of it's schema */
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
@@ -215,8 +215,8 @@ struct _registry_instance_t {
 #endif                               /* CONFIG_REGISTRY_ENABLE_META_NAME */
     const void *const data;          /**< Generated struct containing all
                                           configuration parameters of the schema. */
-    const registry_schema_t *schema; /**< Configuration Schema that the
-                                          Registry Instance belongs to. */
+    const registry_schema_t *schema; /**< Configuration schema that the
+                                          instance belongs to. */
     registry_apply_cb_t apply_cb;    /**< Will be called when @ref registry_apply()
                                           was called on this instance. */
     void *context;                   /**< Optional context used by the instance */
@@ -237,7 +237,7 @@ struct _registry_group_t {
     const char *const description;                 /**< String describing the configuration group
                                                         with more details. */
 #endif                                             /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
-    const registry_schema_t *const schema;         /**< Configuration Schema that the
+    const registry_schema_t *const schema;         /**< Configuration schema that the
                                                         configuration group belongs to. */
     const registry_group_t **const groups;         /**< Array of pointers to all the configuration
                                                         groups that belong to this group. */
@@ -290,7 +290,7 @@ struct _registry_schema_t {
     const registry_namespace_t *const namespace;   /**< Configuration Namespace that the
                                                         Configuration Schema belongs to. */
     clist_node_t instances;                        /**< Linked list of schema instances
-                                                        @ref registry_instance_t. */
+                                                        @ref registry_schema_instance_t. */
     const registry_group_t **const groups;         /**< Array of pointers to all the configuration
                                                         groups that belong to this schema. */
     const size_t groups_len;                       /**< Size of groups array. */
@@ -307,7 +307,7 @@ struct _registry_schema_t {
      * @param[out] val_len Pointer to length of the buffer to store the current value.
      */
     void (*const mapping)(const registry_parameter_id_t parameter_id,
-                          const registry_instance_t *instance,
+                          const registry_schema_instance_t *instance,
                           void **val,
                           size_t *val_len);
 };
@@ -357,7 +357,7 @@ void registry_init(void);
  */
 registry_error_t registry_add_schema_instance(
     const registry_schema_t *schema,
-    const registry_instance_t *instance);
+    const registry_schema_instance_t *instance);
 
 /**
  * @brief Gets the current value of a parameter that belongs to an instance
