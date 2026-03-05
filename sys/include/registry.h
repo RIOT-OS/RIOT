@@ -174,9 +174,11 @@ typedef struct {
  * @brief The different scopes of a registry @p apply_cb function.
  */
 typedef const enum {
-    REGISTRY_APPLY_INSTANCE = 0,
-    REGISTRY_APPLY_GROUP,
-    REGISTRY_APPLY_PARAMETER,
+    REGISTRY_APPLY_INSTANCE = 0, /**< Apply new values of all parameters that
+                                      belong to a specified schema instance. */
+    REGISTRY_APPLY_GROUP,        /**< Apply new values of all parameters that
+                                      belong to a specified group */
+    REGISTRY_APPLY_PARAMETER,    /**< Apply the new value of a specific parameter */
 } registry_apply_cb_scope_t;
 
 /**
