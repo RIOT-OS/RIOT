@@ -303,17 +303,27 @@ struct _registry_schema_t {
     const size_t parameters_len;                   /**< Size of parameters array. */
 
     /**
-     * @brief Mapping to connect configuration parameter IDs with the address in the storage.
+     * @brief Get the value of a configuration parameter of a specific schema
+     *        instance.
+     *
+     * A configuration schema has many parameters and a configuration schema
+     * instance stores their concrete values in a struct provided in the `data`
+     * field. With this function it is possible to get a pointer to the values
+     * of this struct based on the ID of the configuration parameter.
+     * This way it is possible for the registry to make the connection between
+     * the configuration schema meta-data and the actual data in the schema
+     * instances.
      *
      * @param[in] parameter_id ID of the parameter that contains the value.
-     * @param[in] instance Pointer to the instance of the schema, that contains the parameter.
+     * @param[in] instance Pointer to the schema instance, that contains the parameter.
      * @param[out] val Pointer to buffer containing the new value.
      * @param[out] val_len Pointer to length of the buffer to store the current value.
      */
-    void (*const mapping)(const registry_parameter_id_t parameter_id,
-                          const registry_schema_instance_t *instance,
-                          void **val,
-                          size_t *val_len);
+    void (*const get_parameter_value_from_instance)(
+        const registry_parameter_id_t parameter_id,
+        const registry_schema_instance_t *instance,
+        void **val,
+        size_t *val_len);
 };
 
 /**
