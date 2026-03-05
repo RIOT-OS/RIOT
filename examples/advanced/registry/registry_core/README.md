@@ -1,7 +1,7 @@
 # Registry Core
 
 This application demonstrates the most basic usage of the RIOT Registry.
-It implements a RGB LED schema and continuously changes its value every second.
+It implements a BOARD LED schema and continuously changes its value every second.
 
 ## Usage
 
