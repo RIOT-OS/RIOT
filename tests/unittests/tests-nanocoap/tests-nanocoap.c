@@ -143,6 +143,37 @@ static void test_nanocoap__hdr_2(void)
 }
 
 /*
+ * Unit tests for the CoAP header bounds check
+ */
+static void test_nanocoap__hdr_bounds_check(void)
+{
+    uint8_t valid_hdr[] = {
+        (COAP_V1 << 6) | (COAP_TYPE_CON << 4) | 3, /* version = 1, type = CON, TKL = 3 */
+        COAP_METHOD_GET,
+        0x13, 0x37, /* Message ID = 0x1337 */
+        0xca, 0xfe, 0x42, /* Token = 0xcafe42 */
+    };
+
+    coap_pkt_t pkt = { .buf = valid_hdr };
+    TEST_ASSERT(coap_is_hdr_in_bounds(&pkt, sizeof(valid_hdr)));
+    TEST_ASSERT_EQUAL_INT(sizeof(valid_hdr), coap_parse_udp(&pkt, valid_hdr, sizeof(valid_hdr)));
+    /* without the last byte, the header becomes invalid */
+    TEST_ASSERT(!coap_is_hdr_in_bounds(&pkt, sizeof(valid_hdr) - 1));
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, coap_parse_udp(&pkt, valid_hdr, sizeof(valid_hdr) - 1));
+
+    uint8_t invalid_hdr[] = {
+        (COAP_V1 << 6) | (COAP_TYPE_CON << 4) | 13, /* version = 1, type = CON, TKL = 13 */
+        COAP_METHOD_GET,
+        0xac, 0xdc, /* Message ID = 0xacdc */
+     };
+
+     pkt.buf = invalid_hdr;
+    TEST_ASSERT(!coap_is_hdr_in_bounds(&pkt, sizeof(invalid_hdr)));
+
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, coap_parse_udp(&pkt, invalid_hdr, sizeof(invalid_hdr)));
+}
+
+/*
  * Client GET request with simple path. Test request generation.
  * Request /time resource from libcoap example
  */
@@ -1332,6 +1363,7 @@ Test *tests_nanocoap_tests(void)
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_nanocoap__hdr),
         new_TestFixture(test_nanocoap__hdr_2),
+        new_TestFixture(test_nanocoap__hdr_bounds_check),
         new_TestFixture(test_nanocoap__get_req),
         new_TestFixture(test_nanocoap__put_req),
         new_TestFixture(test_nanocoap__get_multi_path),
