@@ -31,11 +31,6 @@ extern "C" {
 #endif
 
 /**
- * @ingroup drivers_max31343
- * @{
- */
-
-/**
  * @brief Device descriptor for the MAX31343 RTC.
  *
  * Holds the runtime state of a MAX31343 device instance.
