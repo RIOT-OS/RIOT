@@ -155,10 +155,10 @@ DOCKER_RUN_FLAGS += --platform linux/amd64
 # allow setting make args from command line like '-j'
 DOCKER_MAKE_ARGS ?=
 
-# Resolve symlink of /etc/localtime to its real path
-# This is a workaround for docker on macOS, for more information see:
-# https://github.com/docker/for-mac/issues/2396
-ETC_LOCALTIME = $(realpath /etc/localtime)
+# Extract timezone name from /etc/localtime, for passing to the container. This
+# avoids mounting /etc/localtime which fails for some container runtimes under
+# macOS.
+HOST_TIMEZONE = $(shell readlink /etc/localtime 2>/dev/null | sed 's|.*/zoneinfo/||')
 
 # Fetch the number of jobs from the MAKEFLAGS
 # With $MAKE_VERSION < 4.2, the amount of parallelism is not available in
@@ -290,13 +290,13 @@ DOCKER_APPDIR = $(DOCKER_RIOTPROJECT)/$(BUILDRELPATH)
 
 
 # Directory mapping in docker and directories environment variable configuration
-DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(ETC_LOCALTIME),/etc/localtime,ro)
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(RIOTBASE),$(DOCKER_RIOTBASE))
 # Selective components of Cargo to ensure crates are not re-downloaded (and
 # subsequently rebuilt) on every run. Not using all of ~/.cargo as ~/.cargo/bin
 # would be run by Cargo and that'd be very weird.
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(HOME)/.cargo/registry,$(DOCKER_BUILD_ROOT)/.cargo/registry)
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(HOME)/.cargo/git,$(DOCKER_BUILD_ROOT)/.cargo/git)
+DOCKER_VOLUMES_AND_ENV += -e 'TZ=$(HOST_TIMEZONE)'
 DOCKER_VOLUMES_AND_ENV += -e 'RIOTBASE=$(DOCKER_RIOTBASE)'
 DOCKER_VOLUMES_AND_ENV += -e 'CCACHE_BASEDIR=$(DOCKER_RIOTBASE)'
 
