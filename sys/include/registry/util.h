@@ -27,8 +27,8 @@ extern "C" {
  * @brief Convenience function to parse a configuration parameter value from
  * a string.
  *
- * @param[in] src Pointer of the input value.
- * @param[out] dest Pointer to the output buffer.
+ * @param[in] src Pointer of the input value. Must not be NULL.
+ * @param[out] dest Pointer to the output buffer. Must not be NULL.
  * @param[in] dest_len Length of @p dest.
  * @param[in] dest_type Type of the output value.
  *
