@@ -43,7 +43,7 @@ registry_namespace_t registry_sys = {
     .name = "sys",
 #endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
-    .description = "Sys namespace",
+    .description = "System namespace",
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schemas = _schemas,
     .schemas_len = ARRAY_SIZE(_schemas),

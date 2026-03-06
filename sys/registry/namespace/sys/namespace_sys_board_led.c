@@ -32,7 +32,7 @@
 #include "registry/namespace/sys/board_led.h"
 
 /* Get parameter value from instance */
-static void get_parameter_value_from_instance(
+static void _get_parameter_value_from_instance(
     const registry_parameter_id_t parameter_id,
     const registry_schema_instance_t *instance,
     void **val, size_t *val_len)
@@ -55,7 +55,7 @@ const registry_parameter_t registry_sys_board_led_enabled = {
     .name = "enabled",
 #endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
-    .description = "State of the board LED.",
+    .description = "Whether the board LED is enabled",
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_sys_board_led,
     .type = REGISTRY_TYPE_BOOL,
@@ -69,7 +69,7 @@ registry_schema_t registry_sys_board_led = {
     .name = "board_led",
 #endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
-    .description = "Representation of a board LED.",
+    .description = "A board LED.",
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .namespace = &registry_sys,
     .get_parameter_value_from_instance = get_parameter_value_from_instance,
