@@ -44,10 +44,6 @@ int registry_util_convert_str_to_value(
 
     char *eptr = NULL;
 
-    if (!src) {
-        return -EINVAL;
-    }
-
     switch (dest_type) {
     case REGISTRY_TYPE_NONE:
         return -EINVAL;
