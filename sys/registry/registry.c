@@ -29,7 +29,6 @@
 #include "registry.h"
 #include "registry/util.h"
 
-/* Implementation of the module */
 
 XFA_INIT_CONST(registry_namespace_t *, _registry_namespaces_xfa);
 
@@ -41,7 +40,7 @@ registry_error_t registry_add_schema_instance(
     assert(instance != NULL);
 
     /* add schema to instance */
-    (*((registry_schema_instance_t *)instance)).schema = schema;
+    ((registry_schema_instance_t *)instance)->schema = schema;
 
     /* get instances length to determine the id of the new instance */
     size_t count = clist_count((clist_node_t *)&schema->instances);
@@ -223,7 +222,7 @@ static registry_error_t _registry_export_group(
                 instance, group->groups[i], export_cb,
                 new_tree_traversal_depth, context);
 
-            if (!(rc == REGISTRY_ERROR_NONE)) {
+            if (rc != REGISTRY_ERROR_NONE) {
                 return rc;
             }
         }
@@ -242,7 +241,7 @@ static registry_error_t _registry_export_group(
     return rc;
 }
 
-static registry_error_t _registry_export_instance(
+static registry_error_t _registry_export_schema_instance(
     const registry_schema_instance_t *instance,
     const registry_export_cb_t export_cb,
     const uint8_t tree_traversal_depth,
