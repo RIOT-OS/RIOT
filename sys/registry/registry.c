@@ -408,9 +408,9 @@ registry_error_t registry_export(
                 return rc;
             }
         }
+        return rc;
     }
-    else {
-        switch (node->type) {
+    switch (node->type) {
         case REGISTRY_NODE_NAMESPACE:
             rc = _registry_export_namespace(node->value.namespace, export_cb, tree_traversal_depth,
                                             context);
