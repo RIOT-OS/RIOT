@@ -125,20 +125,19 @@ static registry_error_t _apply_export_cb(const registry_node_t *node, const void
 
     case REGISTRY_NODE_INSTANCE:
         instance = node->value.instance;
-        return instance->apply_cb(
-            REGISTRY_APPLY_INSTANCE, NULL, instance->context);
+        return instance->apply_cb(NULL, instance);
 
     case REGISTRY_NODE_GROUP:
         instance = node->value.group.instance;
         return instance->apply_cb(
-            REGISTRY_APPLY_GROUP, &node->value.group.group->id,
-            instance->context);
+            &node->value.group.group->id,
+            instance);
 
     case REGISTRY_NODE_PARAMETER:
         instance = node->value.parameter.instance;
         return instance->apply_cb(
-            REGISTRY_APPLY_PARAMETER, &node->value.parameter.parameter->id,
-            instance->context);
+            &node->value.parameter.parameter->id,
+            instance);
     }
 
     return REGISTRY_ERROR_NONE;
