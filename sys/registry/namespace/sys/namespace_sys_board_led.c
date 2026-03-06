@@ -31,8 +31,6 @@
 
 #include "registry/namespace/sys/board_led.h"
 
-#if IS_USED(MODULE_REGISTRY_NAMESPACE_SYS_BOARD_LED) || IS_ACTIVE(DOXYGEN)
-
 /* Get parameter value from instance */
 static void get_parameter_value_from_instance(
     const registry_parameter_id_t parameter_id,
@@ -53,12 +51,12 @@ static void get_parameter_value_from_instance(
 /* Schema parameters */
 const registry_parameter_t registry_sys_board_led_enabled = {
     .id = REGISTRY_SYS_BOARD_LED_ENABLED,
-#  if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "enabled",
-#  endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
-#  if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "State of the board LED.",
-#  endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_sys_board_led,
     .type = REGISTRY_TYPE_BOOL,
     .count = 1,
@@ -67,12 +65,12 @@ const registry_parameter_t registry_sys_board_led_enabled = {
 /* Schema */
 registry_schema_t registry_sys_board_led = {
     .id = REGISTRY_SYS_BOARD_LED,
-#  if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "board_led",
-#  endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
-#  if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "Representation of a board LED.",
-#  endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .namespace = &registry_sys,
     .get_parameter_value_from_instance = get_parameter_value_from_instance,
     .groups = NULL,
@@ -82,5 +80,3 @@ registry_schema_t registry_sys_board_led = {
     },
     .parameters_len = 1,
 };
-
-#endif /* MODULE_REGISTRY_NAMESPACE_SYS_BOARD_LED */

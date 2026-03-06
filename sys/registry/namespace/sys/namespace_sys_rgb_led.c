@@ -31,8 +31,6 @@
 
 #include "registry/namespace/sys/rgb_led.h"
 
-#if IS_USED(MODULE_REGISTRY_NAMESPACE_SYS_RGB_LED) || IS_ACTIVE(DOXYGEN)
-
 /* Get parameter value from instance */
 static void get_parameter_value_from_instance(
     const registry_parameter_id_t parameter_id,
@@ -63,12 +61,12 @@ static void get_parameter_value_from_instance(
 /* Schema parameters */
 const registry_parameter_t registry_sys_rgb_led_red = {
     .id = REGISTRY_SYS_RGB_LED_RED,
-#  if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "red",
-#  endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
-#  if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#  endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_sys_rgb_led,
     .type = REGISTRY_TYPE_UINT8,
     .count = 1,
@@ -76,12 +74,12 @@ const registry_parameter_t registry_sys_rgb_led_red = {
 
 const registry_parameter_t registry_sys_rgb_led_green = {
     .id = REGISTRY_SYS_RGB_LED_GREEN,
-#  if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "green",
-#  endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
-#  if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#  endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_sys_rgb_led,
     .type = REGISTRY_TYPE_UINT8,
     .count = 1,
@@ -89,12 +87,12 @@ const registry_parameter_t registry_sys_rgb_led_green = {
 
 const registry_parameter_t registry_sys_rgb_led_blue = {
     .id = REGISTRY_SYS_RGB_LED_BLUE,
-#  if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "blue",
-#  endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
-#  if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#  endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .schema = &registry_sys_rgb_led,
     .type = REGISTRY_TYPE_UINT8,
     .count = 1,
@@ -103,12 +101,12 @@ const registry_parameter_t registry_sys_rgb_led_blue = {
 /* Schema */
 registry_schema_t registry_sys_rgb_led = {
     .id = REGISTRY_SYS_RGB_LED,
-#  if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "rgb_led",
-#  endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
-#  if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#  endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .namespace = &registry_sys,
     .get_parameter_value_from_instance = get_parameter_value_from_instance,
     .groups = NULL,
@@ -120,5 +118,3 @@ registry_schema_t registry_sys_rgb_led = {
     },
     .parameters_len = 3,
 };
-
-#endif /* MODULE_REGISTRY_NAMESPACE_SYS_RGB_LED */
