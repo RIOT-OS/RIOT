@@ -410,28 +410,28 @@ registry_error_t registry_export(
         }
         return rc;
     }
+
     switch (node->type) {
-        case REGISTRY_NODE_NAMESPACE:
-            rc = _registry_export_namespace(node->value.namespace, export_cb, tree_traversal_depth,
-                                            context);
-            break;
-        case REGISTRY_NODE_SCHEMA:
-            rc = _registry_export_schema(node->value.schema, export_cb, tree_traversal_depth,
-                                         context);
-            break;
-        case REGISTRY_NODE_INSTANCE:
-            rc = _registry_export_schema_instance(node->value.instance, export_cb, tree_traversal_depth,
-                                                  context);
-            break;
-        case REGISTRY_NODE_GROUP:
-            rc = _registry_export_group(node->value.group.instance, node->value.group.group,
-                                        export_cb, tree_traversal_depth, context);
-            break;
-        case REGISTRY_NODE_PARAMETER:
-            rc = _registry_export_parameter(node->value.parameter.instance,
-                                            node->value.parameter.parameter, export_cb, context);
-            break;
-        }
+    case REGISTRY_NODE_NAMESPACE:
+        rc = _registry_export_namespace(node->value.namespace, export_cb, tree_traversal_depth,
+                                        context);
+        break;
+    case REGISTRY_NODE_SCHEMA:
+        rc = _registry_export_schema(node->value.schema, export_cb, tree_traversal_depth,
+                                     context);
+        break;
+    case REGISTRY_NODE_INSTANCE:
+        rc = _registry_export_schema_instance(node->value.instance, export_cb, tree_traversal_depth,
+                                              context);
+        break;
+    case REGISTRY_NODE_GROUP:
+        rc = _registry_export_group(node->value.group.instance, node->value.group.group,
+                                    export_cb, tree_traversal_depth, context);
+        break;
+    case REGISTRY_NODE_PARAMETER:
+        rc = _registry_export_parameter(node->value.parameter.instance,
+                                        node->value.parameter.parameter, export_cb, context);
+        break;
     }
 
     return rc;
