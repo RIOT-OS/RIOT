@@ -29,7 +29,6 @@
 #include "registry.h"
 #include "registry/util.h"
 
-
 XFA_INIT_CONST(registry_namespace_t *, _registry_namespaces_xfa);
 
 registry_error_t registry_add_schema_instance(
@@ -332,7 +331,7 @@ static registry_error_t _registry_export_schema(
                 return -REGISTRY_ERROR_SCHEMA_HAS_NO_INSTANCE;
             }
 
-            rc = _registry_export_instance(instance, export_cb, new_tree_traversal_depth, context);
+            rc = _registry_export_schema_instance(instance, export_cb, new_tree_traversal_depth, context);
 
             if (!(rc == REGISTRY_ERROR_NONE)) {
                 return rc;
@@ -421,8 +420,8 @@ registry_error_t registry_export(
                                          context);
             break;
         case REGISTRY_NODE_INSTANCE:
-            rc = _registry_export_instance(node->value.instance, export_cb, tree_traversal_depth,
-                                           context);
+            rc = _registry_export_schema_instance(node->value.instance, export_cb, tree_traversal_depth,
+                                                  context);
             break;
         case REGISTRY_NODE_GROUP:
             rc = _registry_export_group(node->value.group.instance, node->value.group.group,
