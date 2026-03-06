@@ -32,7 +32,7 @@
 #include "registry/namespace/sys/rgb_led.h"
 
 /* Get parameter value from instance */
-static void get_parameter_value_from_instance(
+static void _get_parameter_value_from_instance(
     const registry_parameter_id_t parameter_id,
     const registry_schema_instance_t *instance,
     void **val, size_t *val_len)
@@ -108,7 +108,7 @@ registry_schema_t registry_sys_rgb_led = {
     .description = "",
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .namespace = &registry_sys,
-    .get_parameter_value_from_instance = get_parameter_value_from_instance,
+    .get_parameter_value_from_instance = _get_parameter_value_from_instance,
     .groups = NULL,
     .groups_len = 0,
     .parameters = (const registry_parameter_t *[]){
