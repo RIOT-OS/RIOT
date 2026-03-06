@@ -7,7 +7,7 @@ menuconfig MODULE_REGISTRY
     help
         RIOT Registry module for handling runtime configurations.
 
-if MODULE_REGISTRY
+if USEMODULE_REGISTRY
 
 config REGISTRY_ENABLE_META_NAME
     bool "Include name string in schemas"
@@ -15,4 +15,4 @@ config REGISTRY_ENABLE_META_NAME
 config REGISTRY_ENABLE_META_DESCRIPTION
     bool "Include description string in schemas"
 
-endif # MODULE_REGISTRY
+endif # USEMODULE_REGISTRY
