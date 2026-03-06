@@ -30,18 +30,21 @@ extern "C" {
 
 /**
  * @brief Identifier of a configuration namespace.
+ *
  * It is unique within the scope of the RIOT registry itself.
  */
 typedef uint8_t registry_namespace_id_t;
 
 /**
  * @brief Identifier of a configuration schema.
+ *
  * It is unique within the scope of its parent configuration namespace.
  */
 typedef uint32_t registry_schema_id_t;
 
 /**
  * @brief Identifier of a schema instance.
+ *
  * It is unique within the scope of its parent configuration schema.
  */
 typedef uint16_t registry_schema_instance_id_t;
@@ -58,12 +61,14 @@ typedef uint8_t registry_group_or_parameter_id_t;
 
 /**
  * @brief Identifier of a configuration group.
+ *
  * It is unique within the scope of its parent schema instance.
  */
 typedef registry_group_or_parameter_id_t registry_group_id_t;
 
 /**
  * @brief Identifier of a configuration parameter.
+ *
  * It is unique within the scope of its parent schema instance.
  */
 typedef registry_group_or_parameter_id_t registry_parameter_id_t;
@@ -120,6 +125,7 @@ typedef enum {
 
 /**
  * @brief The type of a registry node.
+ *
  * A registry node points to a namespace, schema, instance, group or parameter.
  */
 typedef enum {
@@ -171,33 +177,30 @@ typedef struct {
 } registry_value_t;
 
 /**
- * @brief The different scopes of a registry @p apply_cb function.
- */
-typedef const enum {
-    REGISTRY_APPLY_INSTANCE = 0, /**< Apply new values of all parameters that
-                                      belong to a specified schema instance. */
-    REGISTRY_APPLY_GROUP,        /**< Apply new values of all parameters that
-                                      belong to a specified group */
-    REGISTRY_APPLY_PARAMETER,    /**< Apply the new value of a specific parameter */
-} registry_apply_cb_scope_t;
-
-/**
  * @brief The callback must be implemented by consumers of a configuration schema.
  *
  * This callback is called when the registry notifies the consumer,
  * that a configuration parameter value has changed.
  *
- * @param[in] scope Scope of what will be applied (a parameter, a group or the whole instance).
- * @param[in] group_or_parameter_id ID of the group or parameter to apply changes to,
+ * It is possible to apply all parameters of a schema instance at once,
+ * by setting @p group_or_parameter_id to NULL.
+ * This is useful to let the consumer of a configuration schema apply multiple
+ * parameter values at once. For example in case of an RGB-LED, to change the
+ * color from red to blue, the parameters "red" and "blue" need to be changed
+ * at the same time, otherwise the RGB-LED will be purple for a short period
+ * of time.
+ *
+ * @param[in] group_or_parameter_id Optional ID of the group or parameter to apply changes to,
  *                                  applies the whole instance on NULL.
- * @param[in] context Context of the instance.
+ * @param[in] instance Pointer to the schema instance that will be applied.
+ *                     Contains a context object and a pointer to the data struct
+ *                     that contains the configuration parameter values.
  *
  * @return 0 on success, non-zero on failure.
  */
 typedef registry_error_t (*registry_apply_cb_t)(
-    const registry_apply_cb_scope_t scope,
     const registry_group_or_parameter_id_t *group_or_parameter_id,
-    const void *context);
+    const registry_schema_instance_t *instance);
 
 /**
  * @brief Instance of a schema containing its configuration parameters values.
@@ -208,8 +211,10 @@ typedef registry_error_t (*registry_apply_cb_t)(
  * function to get informed when configuration changes.
  */
 struct _registry_schema_instance_t {
-    clist_node_t node;                      /**< Linked list node pointing to the next schema instance. */
-    const registry_schema_instance_id_t id; /**< ID of the instance within the scope of it's schema */
+    clist_node_t node;                      /**< Linked list node pointing to
+                                                 the next schema instance. */
+    const registry_schema_instance_id_t id; /**< ID of the instance within
+                                                 the scope of it's schema */
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     const char *const name; /**< String describing the instance. */
 #endif                      /* CONFIG_REGISTRY_ENABLE_META_NAME */
