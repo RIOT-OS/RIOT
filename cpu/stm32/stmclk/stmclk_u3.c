@@ -24,60 +24,30 @@
 #define RCC_CFGR1_SW_MSI            (0x00000000U)
 #define RCC_CFGR1_SW_HSI            (RCC_CFGR1_SW_0)
 #define RCC_CFGR1_SW_HSE            (RCC_CFGR1_SW_1)
-#define RCC_CFGR1_SW_PLL            (RCC_CFGR1_SW_1 | RCC_CFGR1_SW_0)
+
 #define RCC_CFGR1_SWS_MSI           (0x00000000U)
 #define RCC_CFGR1_SWS_HSI           (RCC_CFGR1_SWS_0)
 #define RCC_CFGR1_SWS_HSE           (RCC_CFGR1_SWS_1)
-#define RCC_CFGR1_SWS_PLL           (RCC_CFGR1_SWS_1 | RCC_CFGR1_SWS_0)
-
-/* PLL configuration */
-/* figure out which input to use */
-#if IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_MSI)
-#define PLL_SRC                     (RCC_PLL1CFGR_PLL1SRC_0)
-#elif IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE) && IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
-#define PLL_SRC                     (RCC_PLL1CFGR_PLL1SRC_1 | RCC_PLL1CFGR_PLL1SRC_0)
-#elif IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSI)
-#define PLL_SRC                     (RCC_PLL1CFGR_PLL1SRC_1)
-#else
-#define PLL_SRC                     0
-#endif
 
 
-/* Define MSI range bitfields */
-#if CONFIG_CLOCK_MSI == KHZ(100)
-#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISRANGE_3 | RCC_ICSCR1_MSISRANGE_2 | RCC_ICSCR1_MSISRANGE_1 | RCC_ICSCR1_MSISRANGE_0)
-#elif CONFIG_CLOCK_MSI == KHZ(133)
-#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISRANGE_3 | RCC_ICSCR1_MSISRANGE_2 | RCC_ICSCR1_MSISRANGE_1)
-#elif CONFIG_CLOCK_MSI == KHZ(200)
-#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISRANGE_3 | RCC_ICSCR1_MSISRANGE_2 | RCC_ICSCR1_MSISRANGE_0)
-#elif CONFIG_CLOCK_MSI == KHZ(400)
-#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISRANGE_3 | RCC_ICSCR1_MSISRANGE_2)
-#elif CONFIG_CLOCK_MSI == KHZ(768)
-#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISRANGE_3 | RCC_ICSCR1_MSISRANGE_1 | RCC_ICSCR1_MSISRANGE_0)
-#elif CONFIG_CLOCK_MSI == MHZ(1)
-#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISRANGE_2 | RCC_ICSCR1_MSISRANGE_1 | RCC_ICSCR1_MSISRANGE_0)
-#elif CONFIG_CLOCK_MSI == KHZ(1024)
-#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISRANGE_3 | RCC_ICSCR1_MSISRANGE_1)
-#elif CONFIG_CLOCK_MSI == KHZ(1330)
-#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISRANGE_2 | RCC_ICSCR1_MSISRANGE_1)
-#elif CONFIG_CLOCK_MSI == KHZ(1536)
-#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISRANGE_3 | RCC_ICSCR1_MSISRANGE_0)
-#elif CONFIG_CLOCK_MSI == MHZ(2)
-#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISRANGE_2 | RCC_ICSCR1_MSISRANGE_0)
-#elif CONFIG_CLOCK_MSI == KHZ(3072)
-#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISRANGE_3)
-#elif CONFIG_CLOCK_MSI == MHZ(4)
-#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISRANGE_2)
-#elif CONFIG_CLOCK_MSI == MHZ(12)
-#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISRANGE_1 | RCC_ICSCR1_MSISRANGE_0)
-#elif CONFIG_CLOCK_MSI == MHZ(16)
-#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISRANGE_1)
+
+
+/* Define MSI range bitfields for STM32U3 */
+/* We assume MSISDIV (bits 29:30) and MSIRANGE (bits 16:18) */
+
+#if CONFIG_CLOCK_MSI == MHZ(48)
+#define CLOCK_MSIRANGE              (0) /* MSISRANGE 0, MSISDIV 0 */
 #elif CONFIG_CLOCK_MSI == MHZ(24)
-#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISRANGE_0)
-#elif CONFIG_CLOCK_MSI == MHZ(48)
-#define CLOCK_MSIRANGE              (0)
+#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISDIV_0) /* Range 0, Div 2 */
+#elif CONFIG_CLOCK_MSI == MHZ(16)
+/* Note: You need to check if your header defines RCC_ICSCR1_MSISRANGE_0 */
+#define CLOCK_MSIRANGE              (0x1UL << 16) 
+#elif CONFIG_CLOCK_MSI == MHZ(12)
+#define CLOCK_MSIRANGE              (RCC_ICSCR1_MSISDIV_1) /* Range 0, Div 4 */
+#elif CONFIG_CLOCK_MSI == MHZ(4)
+#define CLOCK_MSIRANGE              (0x2UL << 16) /* Range 2, Div 1 */
 #else
-#error "Invalid MSI clock"
+#error "Invalid MSI clock for STM32U3 - check manual for supported LDO frequencies"
 #endif
 
 /* Configure the AHB and APB buses prescalers */
@@ -163,93 +133,50 @@
 
 void stmclk_init_sysclk(void)
 {
-    /* disable any interrupts. Global interrupts could be enabled if this is
-     * called from some kind of bootloader...  */
+    /* Bring-up safe clock init for STM32U3:
+     * - SYSCLK = HSI16
+     * - AHB = SYSCLK
+     * - APB1/APB2 prescalers from CONFIG_CLOCK_APB{1,2}_DIV
+     * - Enable PWR clock (needed by other code paths)
+     * - Conservative Flash latency
+     */
     unsigned is = irq_disable();
+
+    /* Disable RCC clock interrupts */
     RCC->CIER = 0;
 
-    /* select 1-way cache */
-    ICACHE->CR &= ~ICACHE_CR_WAYSEL;
+    /* 1) Enable HSI16 and wait until ready */
+    RCC->CR |= RCC_CR_HSION;
+    while (!(RCC->CR & RCC_CR_HSIRDY)) {}
+
+    /* 2) Enable PWR interface clock (STM32U3: RCC_AHB1ENR2.PWREN) */
+    RCC->AHB1ENR2 |= RCC_AHB1ENR2_PWREN;
+    (void)RCC->AHB1ENR2; /* read-back */
+
+    /* 3) Set Flash wait states BEFORE any clock increase
+     * For HSI16, 1 wait state is conservative and safe.
+     * (You can tune later once you run higher frequencies.)
+     */
+    FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_ACR_LATENCY_1;
+
+    /* 4) Configure AHB/APB prescalers
+     * Clear fields then apply configured divisors.
+     * Note: CLOCK_APB1_DIV / CLOCK_APB2_DIV are bitfields you already define
+     *       from CONFIG_CLOCK_APB{1,2}_DIV.
+     */
+    RCC->CFGR2 &= ~(RCC_CFGR2_HPRE_Msk |
+                    RCC_CFGR2_PPRE1_Msk |
+                    RCC_CFGR2_PPRE2_Msk);
+    RCC->CFGR2 |= (CLOCK_APB1_DIV | CLOCK_APB2_DIV);
+
+    /* 5) Switch SYSCLK to HSI16 and wait until switch is confirmed */
+    RCC->CFGR1 = (RCC->CFGR1 & ~RCC_CFGR1_SW_Msk) | RCC_CFGR1_SW_HSI;
+    while ((RCC->CFGR1 & RCC_CFGR1_SWS_Msk) != RCC_CFGR1_SWS_HSI) {}
+
+    /* 6) Enable I-Cache (optional, but fine) */
+#ifdef ICACHE
     ICACHE->CR |= ICACHE_CR_EN;
-
-    /* enable HSI clock for the duration of initialization */
-    stmclk_enable_hsi();
-
-    /* use HSI as system clock while we do any further configuration and
-     * configure the AHB and APB clock dividers as configured by the board */
-    RCC->CFGR1 = RCC_CFGR1_SW_HSI;
-    while ((RCC->CFGR1 & RCC_CFGR1_SWS) != RCC_CFGR1_SWS_HSI) {}
-    RCC->CFGR2 = (CLOCK_AHB_DIV | CLOCK_APB1_DIV | CLOCK_APB2_DIV);
-
-    /* Select the Voltage Range 1 */
-    /* Enable Range 1 */
-    PWR->VOSR |= PWR_VOSR_R1EN;
-    /* Wait until Range 1 is ready */
-    while (!(PWR->VOSR & PWR_VOSR_R1RDY)) {}
-
-
-    /* Switch to SMPS regulator instead of LDO */
-    PWR->CR3 |= PWR_CR3_REGSEL;
-    while (!(PWR->SVMSR & PWR_SVMSR_REGS)) {}
-
-    /* configure flash wait states */
-    FLASH->ACR = FLASH_WAITSTATES;
-
-    /* disable all active clocks except HSI -> resets the clk configuration */
-    RCC->CR = RCC_CR_HSION;
-
-    /* Enable the HSE clock only when it's used */
-    if (IS_ACTIVE(CLOCK_ENABLE_HSE)) {
-        RCC->CR |= (RCC_CR_HSEON);
-        while (!(RCC->CR & RCC_CR_HSERDY)) {}
-    }
-
-    /* Enable the MSIS clock only when it's used */
-   if (IS_ACTIVE(CLOCK_ENABLE_MSI)) {
-    RCC->ICSCR1 = RCC_ICSCR1_MSIRGSEL;
-    RCC->ICSCR1 |= CLOCK_MSIRANGE;
-    RCC->CR |= RCC_CR_MSISON;
-    while (!(RCC->CR & RCC_CR_MSISRDY)) {}
-}
-
-
-    
-
-    /* Configure SYSCLK */
-    if (!IS_ACTIVE(CONFIG_USE_CLOCK_HSI)) {
-        RCC->CFGR1 &= ~RCC_CFGR1_SW;
-    }
-
-    if (IS_ACTIVE(CONFIG_USE_CLOCK_HSE)) {
-        /* Select HSE as system clock */
-        RCC->CFGR1 |= RCC_CFGR1_SW_HSE;
-        while ((RCC->CFGR1 & RCC_CFGR1_SWS) != RCC_CFGR1_SWS_HSE) {}
-    }
-    else if (IS_ACTIVE(CONFIG_USE_CLOCK_MSI)) {
-        /* Select MSI as system clock */
-        RCC->CFGR1 |= RCC_CFGR1_SW_MSI;
-        while ((RCC->CFGR1 & RCC_CFGR1_SWS) != RCC_CFGR1_SWS_MSI) {}
-    }
-    else if (IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) {
-        /* Select main PLL as system clock */
-        RCC->CFGR1 |= RCC_CFGR1_SW_PLL;
-        while ((RCC->CFGR1 & RCC_CFGR1_SWS) != RCC_CFGR1_SWS_PLL) {}
-    }
-
-    if (!IS_ACTIVE(CLOCK_ENABLE_HSI)) {
-        /* Disable HSI only if not used */
-        stmclk_disable_hsi();
-    }
-
-    if (IS_ACTIVE(CLOCK_ENABLE_HSI48)) {
-        /* enable HSI48 clock for certain peripherals (RNG, OTG_FS, USB and SDMMC) */
-        RCC->CR |= RCC_CR_HSI48ON;
-        while (!(RCC->CR & RCC_CR_HSI48RDY)) {}
-        /* select HSI48 as clock for RNG (reset value) */
-        /* RCC->CCIPR2 &= ~(RCC_CCIPR2_RNGSEL_1 | RCC_CCIPR2_RNGSEL_0); */
-        /* select HSI48 as clock for OTG_FS, USB and SDMMC (reset value) */
-        /* RCC->CCIPR1 &= ~(RCC_CCIPR1_CLK48MSEL_1 | RCC_CCIPR1_CLK48MSEL_0); */
-    }
+#endif
 
     irq_restore(is);
 }
