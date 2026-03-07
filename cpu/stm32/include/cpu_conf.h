@@ -81,7 +81,7 @@ extern "C" {
  */
 #if defined(CPU_FAM_STM32U5)
 #define FLASHPAGE_SIZE                  (8192U)
-#elif defined(CPU_FAM_STM32WB)
+#elif defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32U3)
 #define FLASHPAGE_SIZE                  (4096U)
 #elif defined(CPU_LINE_STM32F091xC) || defined(CPU_LINE_STM32F072xB) \
    || defined(CPU_LINE_STM32F030xC) || defined(CPU_LINE_STM32F103xE) \
@@ -179,7 +179,8 @@ extern "C" {
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
+    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0) || \
+    defined(CPU_FAM_STM32U3)
 #define FLASHPAGE_WRITE_BLOCK_SIZE            (8U)
 typedef uint64_t stm32_flashpage_block_t;
 #elif defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
@@ -195,7 +196,8 @@ typedef uint16_t stm32_flashpage_block_t;
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0)
+    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0) || \
+    defined(CPU_FAM_STM32U3)
 #define FLASHPAGE_WRITE_BLOCK_ALIGNMENT       (8U)
 #else
 /* Writing should be always 4 bytes aligned */

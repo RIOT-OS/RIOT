@@ -56,6 +56,8 @@ def list_cpu_lines(cmsis_dir, cpu_fam):
         headers.remove("partition_stm32l5xx.h")
     if "partition_stm32u5xx.h" in headers:
         headers.remove("partition_stm32u5xx.h")
+    if "partition_stm32u3xx.h" in headers:
+        headers.remove("partition_stm32u3xx.h")
     headers.remove("stm32{}xx.h".format(cpu_fam))
     headers.remove("system_stm32{}xx.h".format(cpu_fam))
     return sorted([header.split(".")[0] for header in headers])
@@ -146,7 +148,7 @@ def main(args):
             "cpu_lines": [
                 {
                     "line": cpu_line.upper().replace("X", "x"),
-                    "irq_numof": 126,
+                    "irq_numof": 125,
                 }
                 for cpu_line in cpu_lines
             ]
