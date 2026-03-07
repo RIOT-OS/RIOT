@@ -125,7 +125,8 @@ extern "C" {
         defined(CPU_FAM_STM32F3)
             #define AHB_PERIPH_EN               RCC->AHBENR
 #elif   defined(CPU_FAM_STM32U3)
-            #define AHB1_PERIPH_EN              RCC->AHB1ENR2
+            #define AHB1_PERIPH_EN              RCC->AHB1ENR1
+            #define AHB12_PERIPH_EN              RCC->AHB1ENR2
 #elif   defined(CPU_FAM_STM32MP1)
             /* CPU has AHB1, but no periph enable registers for the bus. */
             #undef AHB1_PERIPH_EN               /* not defined */
@@ -199,7 +200,7 @@ typedef enum {
     APB1,           /**< APB1 bus */
 #endif
 #if defined(APB12_PERIPH_EN)
-    APB12,          /**< AHB1 bus, second register */
+    APB12,          /**< APB1 bus, second register */
 #endif
 #if defined(APB2_PERIPH_EN)
     APB2,           /**< APB2 bus */
@@ -216,6 +217,8 @@ typedef enum {
 #if defined(AHB1_PERIPH_EN)
     AHB1,           /**< AHB1 bus */
 #endif
+#if defined(AHB12_PERIPH_EN)
+    AHB12,           /**< AHB1 bus */
 #if defined(AHB2_PERIPH_EN)
     AHB2,           /**< AHB2 bus */
 #endif

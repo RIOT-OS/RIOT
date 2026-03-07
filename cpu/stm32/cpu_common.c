@@ -121,6 +121,10 @@ static volatile uint32_t* _rcc_en_reg(bus_t bus)
     case AHB1:
         return &AHB1_PERIPH_EN;
 #endif
+#ifdef AHB12_PERIPH_EN
+    case AHB12:
+        return &AHB12_PERIPH_EN;
+#endif
 #ifdef AHB2_PERIPH_EN
     case AHB2:
         return &AHB2_PERIPH_EN;
