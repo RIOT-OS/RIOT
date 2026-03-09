@@ -49,58 +49,133 @@ int registry_util_convert_str_to_value(
         return -EINVAL;
 
     case REGISTRY_TYPE_OPAQUE:
-        fmt_hex_bytes(dest, src);
+        if (dest_len >= strlen(src) / 1) {
+            fmt_hex_bytes(dest, src);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_STRING:
-        if (strlen(src) + 1 > dest_len) {
+        if (dest_len >= strlen(src) + 1) {
+            fmt_str((char *)dest, src);
+        }
+        else {
+            /* Dest buffer is too small */
             return -EINVAL;
         }
-        fmt_str((char *)dest, src);
         break;
 
     case REGISTRY_TYPE_BOOL:
-        *(bool *)dest = strtol(src, &eptr, 0);
+        if (dest_len >= 1) {
+            *(bool *)dest = strtol(src, &eptr, 0);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_UINT8:
-        *(uint8_t *)dest = strtoul(src, &eptr, 0);
+        if (dest_len >= 1) {
+            *(uint8_t *)dest = strtoul(src, &eptr, 0);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_UINT16:
-        *(uint16_t *)dest = strtoul(src, &eptr, 0);
+        if (dest_len >= 2) {
+            *(uint16_t *)dest = strtoul(src, &eptr, 0);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_UINT32:
-        *(uint32_t *)dest = scn_u32_dec(src, strlen(src));
+        if (dest_len >= 4) {
+            *(uint32_t *)dest = scn_u32_dec(src, strlen(src));
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_UINT64:
-        *(uint64_t *)dest = strtoull(src, &eptr, 0);
+        if (dest_len >= 8) {
+            *(uint64_t *)dest = strtoull(src, &eptr, 0);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_INT8:
-        *(int8_t *)dest = strtol(src, &eptr, 0);
+        if (dest_len >= 1) {
+            *(int8_t *)dest = strtol(src, &eptr, 0);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_INT16:
-        *(int16_t *)dest = strtol(src, &eptr, 0);
+        if (dest_len >= 2) {
+            *(int16_t *)dest = strtol(src, &eptr, 0);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_INT32:
-        *(int32_t *)dest = strtol(src, &eptr, 0);
+        if (dest_len >= 4) {
+            *(int32_t *)dest = strtol(src, &eptr, 0);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_INT64:
-        *(int64_t *)dest = strtoll(src, &eptr, 0);
+        if (dest_len >= 8) {
+            *(int64_t *)dest = strtoll(src, &eptr, 0);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_FLOAT32:
-        *(float *)dest = strtof(src, &eptr);
+        if (dest_len >= 4) {
+            *(float *)dest = strtof(src, &eptr);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_FLOAT64:
-        *(double *)dest = strtod(src, &eptr);
+        if (dest_len >= 8) {
+            *(double *)dest = strtod(src, &eptr);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
     }
 
@@ -125,62 +200,140 @@ int registry_util_convert_value_to_str(
         return -EINVAL;
 
     case REGISTRY_TYPE_OPAQUE:
-        str_len = fmt_bytes_hex(dest, src->buf, src->buf_len);
+        if (dest_len >= src->buf_len * 2) {
+            str_len = fmt_bytes_hex(dest, src->buf, src->buf_len);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_STRING:
-        str_len = fmt_str(dest, (char *)src->buf);
+        if (dest_len >= src->buf_len) {
+            str_len = fmt_str(dest, (char *)src->buf);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_BOOL:
-        /* There is no fmt_bool_dec, so we use this instead */
-        str_len = fmt_s16_dec(dest, *(bool *)src->buf);
+        if (dest_len >= 1) {
+            /* There is no fmt_bool_dec, so we use this instead */
+            str_len = fmt_s16_dec(dest, *(bool *)src->buf);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_UINT8:
-        /* There is no fmt_u8_dec, so we use this instead */
-        str_len = fmt_u16_dec(dest, *(uint8_t *)src->buf);
+        if (dest_len >= 1) {
+            /* There is no fmt_u8_dec, so we use this instead */
+            str_len = fmt_u16_dec(dest, *(uint8_t *)src->buf);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_UINT16:
-        str_len = fmt_u16_dec(dest, *(uint16_t *)src->buf);
+        if (dest_len >= 2) {
+            str_len = fmt_u16_dec(dest, *(uint16_t *)src->buf);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_UINT32:
-        str_len = fmt_u32_dec(dest, *(uint32_t *)src->buf);
+        if (dest_len >= 4) {
+            str_len = fmt_u32_dec(dest, *(uint32_t *)src->buf);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_UINT64:
-        str_len = fmt_u64_dec(dest, *(uint64_t *)src->buf);
+        if (dest_len >= 8) {
+            str_len = fmt_u64_dec(dest, *(uint64_t *)src->buf);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_INT8:
-        /* There is no fmt_s8_dec, so we use this instead */
-        str_len = fmt_s16_dec(dest, *(int8_t *)src->buf);
+        if (dest_len >= 1) {
+            /* There is no fmt_s8_dec, so we use this instead */
+            str_len = fmt_s16_dec(dest, *(int8_t *)src->buf);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_INT16:
-        str_len = fmt_s16_dec(dest, *(int16_t *)src->buf);
+        if (dest_len >= 2) {
+            str_len = fmt_s16_dec(dest, *(int16_t *)src->buf);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_INT32:
-        str_len = fmt_s32_dec(dest, *(int32_t *)src->buf);
+        if (dest_len >= 4) {
+            str_len = fmt_s32_dec(dest, *(int32_t *)src->buf);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_INT64:
-        str_len = fmt_s64_dec(dest, *(int64_t *)src->buf);
+        if (dest_len >= 8) {
+            str_len = fmt_s64_dec(dest, *(int64_t *)src->buf);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_FLOAT32:
-        str_len = fmt_float(
-            dest,
-            *(float *)src->buf,
-            REGISTRY_UTIL_FORMAT_FLOAT_PRECISION);
+        if (dest_len >= 4) {
+            str_len = fmt_float(
+                dest,
+                *(float *)src->buf,
+                REGISTRY_UTIL_FORMAT_FLOAT_PRECISION);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
 
     case REGISTRY_TYPE_FLOAT64:
-        /* There is no fmt_double, so we use this instead */
-        str_len = sprintf(dest, "%f", *(double *)src->buf);
+        if (dest_len >= 8) {
+            /* There is no fmt_double, so we use this instead */
+            str_len = sprintf(dest, "%f", *(double *)src->buf);
+        }
+        else {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
         break;
     }
 
