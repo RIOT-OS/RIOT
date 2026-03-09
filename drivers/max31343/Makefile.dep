@@ -1,16 +1,1 @@
 FEATURES_REQUIRED += periph_i2c
-
-# The Makefile.dep is evaluated multiple times, fall back to the internal RTC
-# if the `periph_rtc_external` has not been set yet.
-ifneq (,$(filter periph_rtc, $(FEATURES_PROVIDED)))
-    ifeq (,$(filter periph_rtc_external, $(FEATURES_PROVIDED)))
-      CFLAGS += -DUSE_INTERNAL_RTC
-    endif
-else
-  FEATURES_PROVIDED += periph_rtc
-endif
-
-# avoid duplicated entries
-ifeq (,$(filter periph_rtc_external, $(FEATURES_PROVIDED)))
-  FEATURES_PROVIDED += periph_rtc_external
-endif

@@ -13,6 +13,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
+#include <stdio.h>
 #include "bcd.h"
 #include "max31343.h"
 #include "max31343_params.h"
@@ -203,6 +204,7 @@ int max31343_init(max31343_t *dev, const max31343_params_t *params)
 
 int max31343_get_time(const max31343_t *dev, struct tm *time)
 {
+    puts("max31343_get_time called");
     assert(dev);
     assert(time);
 
