@@ -1,19 +1,19 @@
 # yaml-language-server: $schema=../../../../../dist/tools/registry_gen/schema.json
 id: 1
 name: rgb
-description: Representation of an rgb color.
+description: An RGB-LED
 items:
   - id: 0
     name: red
-    description: Intensity of the red color of the rgb LED.
+    description: The red component of the color
     type: uint8
 
   - id: 1
     name: green
-    description: Intensity of the green color of the rgb lamp.
+    description: The green component of the color
     type: uint8
 
   - id: 2
     name: blue
-    description: Intensity of the blue color of the rgb lamp.
+    description: The blue component of the color
     type: uint8
