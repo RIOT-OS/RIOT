@@ -23,6 +23,10 @@ extern "C" {
 
 #include "registry.h"
 
+#ifndef REGISTRY_UTIL_FORMAT_FLOAT_PRECISION
+#  define REGISTRY_UTIL_FORMAT_FLOAT_PRECISION 6
+#endif
+
 /**
  * @brief Convenience function to parse a configuration parameter value from
  * a string.
