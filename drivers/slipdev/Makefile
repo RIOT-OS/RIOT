@@ -1,7 +1,11 @@
-# exclude submodule sources from *.c wildcard source selection
-SRC := $(filter-out stdio.c,$(wildcard *.c))
+SRC := slipdev.c net.c
 
-# enable submodules
-SUBMODULES := 1
+ifneq (,$(filter slipdev_stdio,$(USEMODULE)))
+	SRC += stdio.c
+endif
+
+ifneq (,$(filter slipdev_config,$(USEMODULE)))
+	SRC += coap.c
+endif
 
 include $(RIOTBASE)/Makefile.base
