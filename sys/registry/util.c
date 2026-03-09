@@ -24,14 +24,14 @@
 #include <inttypes.h>
 #include <assert.h>
 
-#define ENABLE_DEBUG 0
-#include "debug.h"
 #include "base64.h"
 #include "kernel_defines.h"
-
 #include "registry.h"
 #include "registry/util.h"
 #include "fmt.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 int registry_util_convert_str_to_value(
     const char *src,
@@ -49,19 +49,14 @@ int registry_util_convert_str_to_value(
         return -EINVAL;
 
     case REGISTRY_TYPE_OPAQUE:
-        size_t base64_decode_len;
-        if (base64_decode(src, strlen(src), dest, &base64_decode_len) !=
-                BASE64_SUCCESS &&
-            base64_decode_len <= dest_len) {
-            return -EINVAL;
-        }
+        fmt_hex_bytes(dest, src);
         break;
 
     case REGISTRY_TYPE_STRING:
         if (strlen(src) + 1 > dest_len) {
             return -EINVAL;
         }
-        strcpy((char *)dest, src);
+        fmt_str((char *)dest, src);
         break;
 
     case REGISTRY_TYPE_BOOL:
@@ -77,7 +72,7 @@ int registry_util_convert_str_to_value(
         break;
 
     case REGISTRY_TYPE_UINT32:
-        *(uint32_t *)dest = strtoul(src, &eptr, 0);
+        *(uint32_t *)dest = scn_u32_dec(src, strlen(src));
         break;
 
     case REGISTRY_TYPE_UINT64:
@@ -130,88 +125,75 @@ int registry_util_convert_value_to_str(
         return -EINVAL;
 
     case REGISTRY_TYPE_OPAQUE:
-        if (base64_encode(src->buf, src->buf_len, dest, &str_len) != BASE64_SUCCESS || str_len > dest_len - 1) {
-            /* If dest is NULL, the length is returned */
-            if (dest != NULL) {
-                return -EINVAL;
-            }
-        }
-        else {
-            dest[str_len] = '\0';
-        }
+        str_len = fmt_bytes_hex(dest, src->buf, src->buf_len);
         break;
 
     case REGISTRY_TYPE_STRING:
-        char *str_val = (char *)src->buf;
-
-        str_len = strlen(str_val);
-
-        if (str_len > dest_len - 1) {
-            /* If dest is NULL, the length is returned */
-            if (dest != NULL) {
-                return -EINVAL;
-            }
-        }
-        else {
-            strcpy(dest, str_val);
-        }
+        str_len = fmt_str(dest, (char *)src->buf);
         break;
 
     case REGISTRY_TYPE_BOOL:
-        str_len = snprintf(dest, dest_len, "%" PRId8, *(bool *)src->buf);
+        /* There is no fmt_bool_dec, so we use this instead */
+        str_len = fmt_s16_dec(dest, *(bool *)src->buf);
         break;
 
     case REGISTRY_TYPE_UINT8:
-        str_len = snprintf(dest, dest_len, "%" PRIu8, *(uint8_t *)src->buf);
+        /* There is no fmt_u8_dec, so we use this instead */
+        str_len = fmt_u16_dec(dest, *(uint8_t *)src->buf);
         break;
 
     case REGISTRY_TYPE_UINT16:
-        str_len = snprintf(dest, dest_len, "%" PRIu16, *(uint16_t *)src->buf);
+        str_len = fmt_u16_dec(dest, *(uint16_t *)src->buf);
         break;
 
     case REGISTRY_TYPE_UINT32:
-        str_len = snprintf(dest, dest_len, "%" PRIu32, *(uint32_t *)src->buf);
+        str_len = fmt_u32_dec(dest, *(uint32_t *)src->buf);
         break;
 
     case REGISTRY_TYPE_UINT64:
-        str_len = snprintf(dest, dest_len, "%" PRIu64, *(uint64_t *)src->buf);
+        str_len = fmt_u64_dec(dest, *(uint64_t *)src->buf);
         break;
 
     case REGISTRY_TYPE_INT8:
-        str_len = snprintf(dest, dest_len, "%" PRId8, *(int8_t *)src->buf);
+        /* There is no fmt_s8_dec, so we use this instead */
+        str_len = fmt_s16_dec(dest, *(int8_t *)src->buf);
         break;
 
     case REGISTRY_TYPE_INT16:
-        str_len = snprintf(dest, dest_len, "%" PRId16, *(int16_t *)src->buf);
+        str_len = fmt_s16_dec(dest, *(int16_t *)src->buf);
         break;
 
     case REGISTRY_TYPE_INT32:
-        str_len = snprintf(dest, dest_len, "%" PRId32, *(int32_t *)src->buf);
+        str_len = fmt_s32_dec(dest, *(int32_t *)src->buf);
         break;
 
     case REGISTRY_TYPE_INT64:
-        str_len = snprintf(dest, dest_len, "%" PRId64, *(int64_t *)src->buf);
+        str_len = fmt_s64_dec(dest, *(int64_t *)src->buf);
         break;
 
     case REGISTRY_TYPE_FLOAT32:
-        str_len = sprintf(dest, "%f", *(float *)src->buf);
-        if (str_len > dest_len - 1) {
-            /* If dest is NULL, the length is returned */
-            if (dest != NULL) {
-                return -EINVAL;
-            }
-        }
+        str_len = fmt_float(
+            dest,
+            *(float *)src->buf,
+            REGISTRY_UTIL_FORMAT_FLOAT_PRECISION);
         break;
 
     case REGISTRY_TYPE_FLOAT64:
+        /* There is no fmt_double, so we use this instead */
         str_len = sprintf(dest, "%f", *(double *)src->buf);
-        if (str_len > dest_len - 1) {
-            /* If dest is NULL, the length is returned */
-            if (dest != NULL) {
-                return -EINVAL;
-            }
-        }
         break;
+    }
+
+    if (dest != NULL) {
+        /* return error, if the dest buffer is too small */
+        if (str_len > dest_len) {
+            return -EINVAL;
+        }
+
+        /* Add \n terminator only if the output buffer has space for it */
+        if (str_len < dest_len) {
+            dest[str_len] = '\0';
+        }
     }
 
     return str_len;
