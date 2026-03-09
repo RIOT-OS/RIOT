@@ -1,2 +1,15 @@
 USEMODULE += rtc_utils
 USEMODULE += fmt
+
+ifneq (,$(filter walltime_impl_ds1307,$(USEMODULE)))
+  USEMODULE += ds1307
+endif
+
+ifneq (,$(filter walltime_impl_ds3231,$(USEMODULE)))
+  USEMODULE += ds3231
+endif
+
+ifneq (,$(filter walltime_impl_rtc,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_rtc
+  FEATURES_OPTIONAL += periph_rtc_ms
+endif
