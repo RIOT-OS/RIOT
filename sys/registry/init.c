@@ -16,12 +16,12 @@
  * @}
  */
 
-#define ENABLE_DEBUG 0
-#include "debug.h"
-
 #include "registry.h"
 
 #include "auto_init_utils.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 XFA_USE_CONST(registry_namespace_t *, _registry_namespaces_xfa);
 
