@@ -25,6 +25,7 @@ When running `bp 0 "[DATA]"` now, the bundle should be delivered to the other in
 
 TBD, have to test myself first, but from the logic just expand on the 2 devices. Either have the B node have 2 CLA entries and start both of them at the same time, or:
 
-Send from A to B as in the previous exapmle, stop the CLA, alter the table such that the connection now points to C and start the CLA again. Bundles should be stored using the `vfs` when no link is available and when the link to C is established, all bundles from the storage should be forwarded to B (according to the configuration of the table).
+Send from A to B as in the previous example, stop the CLA, alter the table such that the connection now points to C and start the CLA again.
+Bundles should be stored using the `vfs` when no link is available and when the link to C is established, all bundles from the storage should be forwarded to B (according to the configuration of the table).
 
 This is the whole point of DTN, to allow store-and-forward transfer, without direct end-to-end paths always available.

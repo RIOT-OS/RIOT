@@ -2,7 +2,18 @@
  * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
  * SPDX-License-Identifier: LGPL-2.1-only
  */
-#include "bplib_stor_cache.h"
+/**
+ * @ingroup     pkg_bplib_storage_vfs
+ * 
+ * @{
+ *
+ * @file
+ * @brief       Cache for VFS Based storage, ordered egress
+ * @author      Simon Grund <mail@simongrund.de>
+ *
+ * @}
+ */
+#include "cache.h"
 
 #include <stdio.h>
 
@@ -10,8 +21,8 @@
 
 static cache_list_node_t* get_free_cache_elem(cache_list_t* cache)
 {
-    /* TODO: maybe move empty elements in own list to avoid this O(n) search */
-    for (unsigned i = 0; i < BUNDLE_CACHE_LEN; i++) {
+    /* TODO: move empty elements in own list to avoid this O(n) search */
+    for (unsigned i = 0; i < CONFIG_BPLIB_EGRESS_CACHE_LEN; i++) {
         if (cache->nodes[i].node == 0) {
             return &cache->nodes[i];
         }
@@ -52,7 +63,7 @@ static void bplib_cache_insert(clist_node_t* list, cache_list_node_t* new_node)
     return;
 }
 
-void bplib_cache_add(cache_list_t* cache,
+int bplib_cache_add(cache_list_t* cache,
     uint64_t node, uint64_t service, uint64_t expiry, uint8_t index)
 {
     cache_list_node_t* elem = get_free_cache_elem(cache);
@@ -64,8 +75,9 @@ void bplib_cache_add(cache_list_t* cache,
         if (container_of(old, cache_list_node_t, list)->expiry > expiry) {
             clist_rpop(&cache->list);
             elem = container_of(old, cache_list_node_t, list);
-        } else {
-            return;
+        }
+        else {
+            return 1;
         }
     }
 
@@ -75,24 +87,26 @@ void bplib_cache_add(cache_list_t* cache,
     elem->service = service;
 
     bplib_cache_insert(&cache->list, elem);
+
+    if (elem == NULL) {
+        return 2;
+    }
+    else {
+        return 0;
+    }
 }
 
 int bplib_cache_get(cache_list_t* cache, char* bundle_path)
 {
     /* Assume bundle_path can fit BPLIB_STOR_PATHLEN characters */
-    /* Assume that the channel / contact tables reachable EIDs have not changes since the time
-     * the bundles ids were loaded into the cache. If lifecycle management of the channels / contacts
-     * is done through BPLib_NC_RemoveApplication / BPLib_NC_ContactTeardown (or the PI version which
-     * does the same minus some event sending) bundles in the egress queue are pushed back to storage
-     * but not in the LoadBatches. In the FWP provided by the port this is done through the
-     * bplib_stor_vfs_contact_changed and bplib_stor_vfs_channel_changed functions */
     clist_node_t * node = clist_lpeek(&cache->list);
     if (node == NULL) {
         bundle_path[0] = '\0';
         return 1;
     }
     cache_list_node_t * entry = container_of(node, cache_list_node_t, list);
-    sprintf(bundle_path, BPLIB_STOR_MOUNTPOINT BPLIB_STOR_DIRNAME "/%"PRIx64"/%"PRIx64"/%"PRIx64"_%02"PRIx8,
+    sprintf(bundle_path, CONFIG_BPLIB_STOR_BASE 
+        "/%"PRIx64"/%"PRIx64"/%"PRIx64"_%02"PRIx8,
         entry->node, entry->service, entry->expiry, entry->index);
     return 0;
 }

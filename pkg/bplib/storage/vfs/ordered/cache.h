@@ -3,21 +3,31 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 #pragma once
-
+/**
+ * @ingroup     pkg_bplib_storage_vfs
+ * @brief       Cache for ordered egress
+ *
+ * @see pkg_bplib_storage for more information
+ *
+ * @{
+ *
+ * @file
+ * @brief       clist based cache ordered by expiry time
+ *
+ * @author      Simon Grund <mail@simongrund.de>
+ */
 #include "clist.h"
 
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "bplib_mem.h"
+#include "bplib.h"
+
+#include "bplib_stor_vfs.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* The length of the cache in memory, to reduce frequent and inefficient vfs iterations.
- * Since the list is iterated to find an unused element this should not be huge. */
-#define BUNDLE_CACHE_LEN    (8)
 
 /**
  * @brief Bundle Cache element. Contains the filepath (the node/allocator and service),
@@ -54,7 +64,9 @@ typedef struct {
     /** @brief Head pointer of the clist */
     clist_node_t list;
     /** @brief Collection of possible cache nodes */
-    cache_list_node_t nodes[BUNDLE_CACHE_LEN];
+    cache_list_node_t nodes[CONFIG_BPLIB_EGRESS_CACHE_LEN];
+    /** @brief Wheather all bundles in the storage are in the queue */
+    bool all_bundles_queued;
 } cache_list_t;
 
 /**
@@ -68,8 +80,12 @@ typedef struct {
  * @param service Destinatione service ID of the bundle
  * @param expiry Expiry DTN time of the bundle
  * @param index Index in the storage, in case the above do not uniquely identify a bundle.
+ * 
+ * @return 1 if the new entry was NOT stored, since the cache is full with more urgent bundles
+ *         2 if the new entry was stored and replaced another entry
+ *         0 if the new entry was stored but without replacement
  */
-void bplib_cache_add(cache_list_t* cache,
+int bplib_cache_add(cache_list_t* cache,
     uint64_t node, uint64_t service, uint64_t expiry, uint8_t index);
 
 /**
@@ -100,3 +116,5 @@ bool bplib_cache_is_empty(cache_list_t* cache);
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */

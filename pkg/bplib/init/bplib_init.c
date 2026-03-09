@@ -9,6 +9,18 @@
  *
  * Based on bplib's example implementation in [bplib]/app/bpcat.c
  */
+
+/**
+ * @ingroup     pkg_bplib_init
+ * @{
+ *
+ * @file
+ * @brief       Initialization wrapper for bplib.
+ *
+ * @author      Simon Grund <mail@simongrund.de>
+ *
+ * @}
+ */
 #include "bplib_init.h"
 
 #include "bplib_riot_fwp.h"
@@ -16,8 +28,8 @@
 
 #include <inttypes.h>
 
-static char generic_worker_stack[BPLIB_GENERIC_STACK_SIZE];
-static char mem_pool[BPLIB_MEMPOOL_LEN] __attribute__ ((aligned (8)));
+static char generic_worker_stack[CONFIG_BPLIB_GENERIC_STACK_SIZE];
+static char mem_pool[CONFIG_BPLIB_MEMPOOL_LEN] __attribute__ ((aligned (8)));
 
 bplib_instance_data_t bplib_instance_data;
 
@@ -35,7 +47,7 @@ static void* generic_worker(void * arg)
     }
 
     while (bplib_instance_data.running) {
-        BPLib_QM_WorkerRunJob(&bplib_instance_data.BPLibInst, 0, BPLIB_GEN_WORKER_TIMEOUT);
+        BPLib_QM_WorkerRunJob(&bplib_instance_data.BPLibInst, 0, CONFIG_BPLIB_GEN_WORKER_TIMEOUT);
     }
     return NULL;
 }
@@ -72,19 +84,19 @@ int bplib_init(void)
 
     /* MEM */
     bplib_status = BPLib_MEM_PoolInit(&bplib_instance_data.BPLibInst.pool, mem_pool,
-        (size_t)BPLIB_MEMPOOL_LEN);
+        (size_t)CONFIG_BPLIB_MEMPOOL_LEN);
     if (bplib_status != BPLIB_SUCCESS) {
         return 5;
     }
 
-    /* QM */
-    bplib_status = BPLib_QM_QueueTableInit(&bplib_instance_data.BPLibInst, BPLIB_QM_MAX_JOBS);
+    /* QM. The last arg is 0 since it (BPLIB_QM_MAX_JOBS) is now a compile time constant */
+    bplib_status = BPLib_QM_QueueTableInit(&bplib_instance_data.BPLibInst, 0);
     if (bplib_status != BPLIB_SUCCESS) {
         return 6;
     }
 
     /* Start Generic Worker */
-    int rc = thread_create(generic_worker_stack, BPLIB_GENERIC_STACK_SIZE,
+    int rc = thread_create(generic_worker_stack, CONFIG_BPLIB_GENERIC_STACK_SIZE,
         THREAD_PRIORITY_MAIN - 1, 0, generic_worker,
         NULL, "bplib-generic");
     if (rc < 0) {

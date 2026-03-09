@@ -3,6 +3,29 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 #pragma once
+/**
+ * @defgroup pkg_bplib_cla_udp UDP CLA Implementation
+ * @ingroup pkg_bplib_cla
+ * @brief Implementation of the UDPCL.
+ *
+ * # About
+ * Sends bundles via UDP, according to the legacy UDPCL. This legacy UDPCL
+ * literally sends the bundles directly as UDP payload.
+ *
+ * To use this, call bplib_cla_udp_start(). Addresses will be taken from
+ * the @ref pkg_bplib_nc tables, so bplib_contact_set_out_addr() and
+ * bplib_contact_set_in_addr() need to be configured before.
+ * Now the CLA is ready to receive but bplib does not know this contact is
+ * active, so you also have to call BPLib_CLA_ContactSetup() and
+ * BPLib_CLA_ContactStart().
+ *
+ * @{
+ *
+ * @file
+ * @brief       UDPCL implementation.
+ *
+ * @author      Simon Grund <mail@simongrund.de>
+ */
 
 #include <stdint.h>
 
@@ -16,19 +39,21 @@ extern "C" {
 /**
  * @brief   Size of the send AND receive buffer, each.
  */
-#ifndef BPLIB_CLA_UDP_BUFLEN
-#  define BPLIB_CLA_UDP_BUFLEN      (4096)
+#ifndef CONFIG_BPLIB_CLA_UDP_BUFLEN
+#  define CONFIG_BPLIB_CLA_UDP_BUFLEN      (1024)
 #endif
 
 /**
  * @brief   The CLA polling from the socket and from bplib is stopped after this time [ms]
  */
-#ifndef BPLIB_CLA_UDP_TIMEOUT
-#  define BPLIB_CLA_UDP_TIMEOUT     (10000)
+#ifndef CONFIG_BPLIB_CLA_UDP_TIMEOUT
+#  define CONFIG_BPLIB_CLA_UDP_TIMEOUT     (10000)
 #endif
 
-#define BPLIB_CLA_UDP_RX_STACK_SIZE (THREAD_STACKSIZE_MEDIUM + BPLIB_CLA_UDP_BUFLEN)
-#define BPLIB_CLA_UDP_TX_STACK_SIZE (THREAD_STACKSIZE_MEDIUM + BPLIB_CLA_UDP_BUFLEN)
+/** @brief RX stack size, including receive buffer */
+#define BPLIB_CLA_UDP_RX_STACK_SIZE (THREAD_STACKSIZE_MEDIUM + CONFIG_BPLIB_CLA_UDP_BUFLEN)
+/** @brief TX stack size, including egress buffer */
+#define BPLIB_CLA_UDP_TX_STACK_SIZE (THREAD_STACKSIZE_MEDIUM + CONFIG_BPLIB_CLA_UDP_BUFLEN)
 
 /**
  * @brief Holds an instance of a UDP CLA, including its stacks.
@@ -37,11 +62,11 @@ extern "C" {
  * functions
  */
 typedef struct {
-    /** @brief Wheather the CLA is running */
+    /** @brief Whether the CLA is running */
     volatile int running;
     /** @brief Stack of the egress thread (bplib -> sock send) */
     char stack_tx[BPLIB_CLA_UDP_TX_STACK_SIZE];
-    /** @brief Stock of the ingress thread (sock revc -> bplib) */
+    /** @brief Stock of the ingress thread (sock recv -> bplib) */
     char stack_rx[BPLIB_CLA_UDP_RX_STACK_SIZE];
 
     /** @brief Index of the contact in the contact table */
@@ -81,3 +106,5 @@ void bplib_cla_udp_stop(bplib_cla_udp_t* cla);
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */

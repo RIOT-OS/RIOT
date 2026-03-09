@@ -5,7 +5,7 @@ APPLICATION = bplib_cla_udp
 BOARD ?= native
 
 # This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/../../../../..
+RIOTBASE ?= $(CURDIR)/../../../..
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
@@ -29,10 +29,10 @@ USEMODULE += shell_cmd_ps
 SRC += main.c
 
 USEPKG += bplib
-USEMODULE += bplib_default_fwp
-USEMODULE += bplib_stor_vfs
-USEMODULE += bplib_cla_udp
+USEMODULE += bplib_stor_vfs_unordered   # Unordered (by time) storage
+USEMODULE += bplib_cla_udp              # UDPCL
 
+# Netif for UDPCL
 USEMODULE += netdev_tap
 USEMODULE += shell_cmd_gnrc_netif
 USEMODULE += gnrc_ipv6_default

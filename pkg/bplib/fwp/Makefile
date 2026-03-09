@@ -1,3 +1,3 @@
-MODULE = bplib_default_fwp
+MODULE = bplib_fwp
 
 include $(RIOTBASE)/Makefile.base

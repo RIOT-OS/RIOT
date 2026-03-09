@@ -26,9 +26,6 @@ INCLUDES += -I$(PKGDIRBASE)/bplib/inc
 
 INCLUDES += -I$(PKGDIRBASE)/bplib/version/inc
 
-# TODO check includes. Just expose inc folder for user
-
-# Includes not inside the core library, but of the compatibility layer
 INCLUDES += -I$(RIOTPKG)/bplib/fwp/include
 INCLUDES += -I$(RIOTPKG)/bplib/nc/include
 INCLUDES += -I$(RIOTPKG)/bplib/init/include
@@ -42,10 +39,14 @@ ifneq (,$(filter bplib_cla_udp,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/bplib/cla/udp/include
 endif
 
-ifneq (,$(filter bplib_stor_vfs,$(USEMODULE)))
-  INCLUDES += -I$(RIOTPKG)/bplib/stor_vfs/include
+ifneq (,$(filter bplib_stor_vfs_%,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/bplib/storage/vfs/include
 endif
 
+PSEUDOMODULES += bplib_barebones
 PSEUDOMODULES += bplib_walltime_available
+PSEUDOMODULES += bplib_include_nc_telemetry
+PSEUDOMODULES += bplib_include_as
+PSEUDOMODULES += bplib_no_vfs
 
 ARCHIVES += $(BINDIR)/libbplib.a

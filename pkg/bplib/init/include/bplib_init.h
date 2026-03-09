@@ -4,6 +4,34 @@
  */
 #pragma once
 
+/**
+ * @defgroup pkg_bplib_init Initialization
+ * @ingroup pkg_bplib
+ * @brief Initialization wrapper for bplib.
+ *
+ * # About
+ * Allows initializing and terminating the bplib stack using just two functions
+ * bplib_init() and bplib_terminate(). Initialization will init all of bplib's
+ * modules and start the generic worker thread.
+ *
+ * This module owns the memory pool used for bundle allocation in a static
+ * array. Its size can be configured with CONFIG_BPLIB_MEMPOOL_LEN.
+ *
+ * All defines in this module can be overwritten by CFLAGS definitions.
+ *
+ * @note Since this module initializes also bplib's time module, if an accurate
+ *       time source is available (through walltime using the provided
+ *       @ref pkg_bplib_fwp, or a custom NC implementation), it has to be set
+ *       BEFORE the call of bplib_init().
+ *
+ * @{
+ *
+ * @file
+ * @brief       Initialization wrapper for bplib.
+ *
+ * @author      Simon Grund <mail@simongrund.de>
+ */
+
 #include "bplib.h"
 
 #ifdef __cplusplus
@@ -16,32 +44,26 @@ extern "C" {
  * needs the raw bundle size (sizeof BPLib_BBlocks_t), which is not CBOR encoded,
  * and is quite big.
  */
-#ifndef BPLIB_MEMPOOL_LEN
-#  define BPLIB_MEMPOOL_LEN         20000u
-#endif
-
-/**
- * @brief Length of the job queue. The job queue together with it's worker thread
- * is used to move bundles to the different ingress / egress points.
- */
-#ifndef BPLIB_QM_MAX_JOBS
-#  define BPLIB_QM_MAX_JOBS         32
+#ifndef CONFIG_BPLIB_MEMPOOL_LEN
+#  define CONFIG_BPLIB_MEMPOOL_LEN         8192
 #endif
 
 /**
  * @brief Time after which the job queue worker (generic worker) times out. If bplib
  * is terminated this amount of time [in ms] may pass, before this thread is terminated.
  */
-#ifndef BPLIB_GEN_WORKER_TIMEOUT
-#  define BPLIB_GEN_WORKER_TIMEOUT  1000u
+#ifndef CONFIG_BPLIB_GEN_WORKER_TIMEOUT
+#  define CONFIG_BPLIB_GEN_WORKER_TIMEOUT  1000u
 #endif
 
 /**
  * @brief Stack size of the generic bplib worker thread.
  * From experiments this can be pretty small.
+ *
+ * This is not currently configurable through Kconfig.
  */
-#ifndef BPLIB_GENERIC_STACK_SIZE
-#  define BPLIB_GENERIC_STACK_SIZE  THREAD_STACKSIZE_SMALL
+#ifndef CONFIG_BPLIB_GENERIC_STACK_SIZE
+#  define CONFIG_BPLIB_GENERIC_STACK_SIZE  THREAD_STACKSIZE_SMALL
 #endif
 
 /**
@@ -76,7 +98,7 @@ int bplib_init(void);
 /**
  * @brief Terminates bplib.
  *
- * The BPLib_CLA_ContactStop and BPLib_PI_StopApplication and respective teardown funcions
+ * The BPLib_CLA_ContactStop and BPLib_PI_StopApplication and respective teardown functions
  * should also be called, before this function.
  *
  * Ensures all of the CLAs terminate as well.
@@ -86,3 +108,5 @@ void bplib_terminate(void);
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */

@@ -3,6 +3,52 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 #pragma once
+/**
+ * @defgroup pkg_bplib_nc NC (Node Config) wrapper
+ * @ingroup pkg_bplib
+ * @brief A wrapper for the NC operations.
+ *
+ * # About
+ * The NC contains the configuration of the node. In NASA's bpnode
+ * implementations this is done through special tables, here we just use
+ * static arrays for every configuration table.
+ *
+ * The arrays are hidden and exposed only via the setter functions in this
+ * module, because, again, some members of configuration tables are not
+ * implemented yet on the bplib side.
+ *
+ * The functions can only be called when a channel or contact is stopped.
+ * This means the usual lifecycle of a channel / contact is as follows:
+ *
+ * 1. Configure the channel / contact with the functions in this module.
+ * 2. Call BPLib_PI_AddApplication() and BPLib_PI_StartApplication() or
+ *    BPLib_CLA_ContactSetup() and BPLib_CLA_ContactStart() respectively.
+ *    During that time the contact is active. It can only be changed again
+ *    using functions in this module when
+ * 3. Call BPLib_PI_StopApplication() and BPLib_PI_RemoveApplication() or
+ *    BPLib_CLA_ContactStop() and BPLib_CLA_ContactTeardown().
+ * 4. goto 1 if the channel should be changed, for example when a new neighbor
+ *    has been discovered.
+ *
+ * ## Optimizations
+ *
+ * bplib forces many tables in the NC which are not currently implemented.
+ * These have been removed and allowed to be NULL inside of bplib. When the
+ * features for these tables get implemented in bplib, and the port is reworked
+ * they have to be added back.
+ *
+ * In NC, like in @ref pkg_bplib_fwp, there are more counter tables, which take
+ * up several KB of space. These are disabled by default and can be enable
+ * again with the `bplib_include_nc_telemetry` pseudomodule.
+ *
+ *
+ * @{
+ *
+ * @file
+ * @brief       A wrapper for the NC operations.
+ *
+ * @author      Simon Grund <mail@simongrund.de>
+ */
 
 #include "bplib.h"
 
@@ -13,10 +59,13 @@ extern "C" {
 /**
  * @brief Max sequence number, after which it wraps back to 0.
  */
-#ifndef BPLIB_MAX_SEQ_NUM
-#  define BPLIB_MAX_SEQ_NUM 1000000
+#ifndef CONFIG_BPLIB_MAX_SEQ_NUM
+#  define CONFIG_BPLIB_MAX_SEQ_NUM 1000000
 #endif
 
+/**
+ * @brief block type indicator for bplib_channel_set_block_*() functions
+ */
 typedef enum {
     BPLIB_PREVIOUS_NODE_BLOCK = 0,
     BPLIB_BUNDLE_AGE_BLOCK = 1,
@@ -124,7 +173,7 @@ BPLib_Status_t bplib_channel_set_dest_eid(
  * Note: This may be set to BPLIB_EID_DTN_NONE for the null endpoint.
  *
  * @param channel Index of the channel
- * @param dest_eid Report-to EID.
+ * @param report_eid Report-to EID.
  * @return BPLIB_SUCCESS on success
  * @return BPLIB_INVALID_CHAN_ID_ERR if channel >= BPLIB_MAX_NUM_CHANNELS
  * @return BPLIB_APP_STATE_ERR if the channel / app is not in removed state
@@ -135,7 +184,7 @@ BPLib_Status_t bplib_channel_set_report_to_eid(
 /**
  * @brief Set if a block should be part of the bundle.
  *
- * @note Wheather the BPLIB_BUNDLE_AGE_BLOCK is present depends on wheather
+ * @note Whether the BPLIB_BUNDLE_AGE_BLOCK is present depends on weather
  *       an accurate DTN time can be provided, this function has no effect.
  *
  * @note The BPLIB_PAYLOAD_BLOCK can also not be turned off.
@@ -178,7 +227,7 @@ BPLib_Status_t bplib_channel_set_block_crc_type(
  *
  * @param channel Index of the channel
  * @param block Selector of a canonical block
- * @param type CRC type to use
+ * @param num Block number to set
  * @return BPLIB_SUCCESS on success
  * @return BPLIB_INVALID_CHAN_ID_ERR if channel >= BPLIB_MAX_NUM_CHANNELS
  * @return BPLIB_APP_STATE_ERR if the channel / app is not in removed state
@@ -195,7 +244,7 @@ BPLib_Status_t bplib_channel_set_block_num(
  *
  * @param channel Index of the channel
  * @param block Selector of a canonical block
- * @param type CRC type to use
+ * @param flags Block flags to set
  * @return BPLIB_SUCCESS on success
  * @return BPLIB_INVALID_CHAN_ID_ERR if channel >= BPLIB_MAX_NUM_CHANNELS
  * @return BPLIB_APP_STATE_ERR if the channel / app is not in removed state
@@ -262,3 +311,5 @@ BPLib_Status_t bplib_contact_set_in_addr(uint32_t contact,
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */

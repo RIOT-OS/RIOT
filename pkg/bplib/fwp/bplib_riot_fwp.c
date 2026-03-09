@@ -9,11 +9,22 @@
  *
  * Based on bplib's example implementation in [bplib]/app/src/bpcat_fwp.c
  */
+
+/**
+ * @ingroup     pkg_bplib_fwp
+ * @{
+ *
+ * @file
+ * @brief       Default FWP.
+ * @author      Simon Grund <mail@simongrund.de>
+ *
+ * @}
+ */
 #include "bplib_riot_fwp.h"
 #include "bplib.h"
 
 /* Signal the vfs based storage when a contact / channel terminates to flush the caches */
-#if MODULE_BPLIB_STOR_VFS
+#if defined(MODULE_BPLIB_STOR_VFS_ORDERED) || defined(MODULE_BPLIB_STOR_VFS_UNORDERED)
 #  include "bplib_stor_vfs.h"
 #endif
 
@@ -157,6 +168,9 @@ static BPLib_Status_t BPA_ADUP_AddApplication(uint32_t ChanId)
 
 static BPLib_Status_t BPA_ADUP_StartApplication(uint32_t ChanId)
 {
+#if defined(MODULE_BPLIB_STOR_VFS_ORDERED) || defined(MODULE_BPLIB_STOR_VFS_UNORDERED)
+        bplib_stor_vfs_channel_changed(ChanId);
+#endif
     (void) ChanId;
     return BPLIB_SUCCESS;
 }
@@ -169,9 +183,7 @@ static BPLib_Status_t BPA_ADUP_StopApplication(uint32_t ChanId)
 
 static BPLib_Status_t BPA_ADUP_RemoveApplication(uint32_t ChanId)
 {
-    if (IS_USED(MODULE_BPLIB_STOR_VFS)) {
-        bplib_stor_vfs_channel_changed(ChanId);
-    }
+    (void) ChanId;
     return BPLIB_SUCCESS;
 }
 
@@ -184,6 +196,9 @@ static BPLib_Status_t BPA_CLAP_ContactSetup(uint32_t ContactId, BPLib_CLA_Contac
 
 static BPLib_Status_t BPA_CLAP_ContactStart(uint32_t ContactId)
 {
+#if defined(MODULE_BPLIB_STOR_VFS_ORDERED) || defined(MODULE_BPLIB_STOR_VFS_UNORDERED)
+        bplib_stor_vfs_contact_changed(ContactId);
+#endif
     (void) ContactId;
     return BPLIB_SUCCESS;
 }
@@ -196,9 +211,7 @@ static BPLib_Status_t BPA_CLAP_ContactStop(uint32_t ContactId)
 
 static void BPA_CLAP_ContactTeardown(uint32_t ContactId)
 {
-    if (IS_USED(MODULE_BPLIB_STOR_VFS)) {
-        bplib_stor_vfs_contact_changed(ContactId);
-    }
+    (void) ContactId;
     return;
 }
 

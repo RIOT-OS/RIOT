@@ -2,6 +2,18 @@
  * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
  * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+ /**
+ * @ingroup     pkg_bplib_nc
+ * @{
+ *
+ * @file
+ * @brief       A wrapper for the NC operations.
+ *
+ * @author      Simon Grund <mail@simongrund.de>
+ *
+ * @}
+ */
 #include "bplib_riot_nc.h"
 #include "bplib.h"
 
@@ -18,7 +30,7 @@ static BPLib_NC_MibPerNodeConfig_t  MibPnTbl = {
 
     .Configs = {
         /* PARAM_BUNDLE_SIZE_NO_FRAGMENT      */ BPLIB_MAX_BUNDLE_LEN,
-        /* PARAM_SET_MAX_SEQUENCE NUM         */ BPLIB_MAX_SEQ_NUM,
+        /* PARAM_SET_MAX_SEQUENCE NUM         */ CONFIG_BPLIB_MAX_SEQ_NUM,
         /* PARAM_SET_MAX_PAYLOAD_LENGTH       */ BPLIB_MAX_PAYLOAD_SIZE,
         /* PARAM_SET_MAX_BUNDLE_LENGTH        */ BPLIB_MAX_BUNDLE_LEN,
         /* PARAM_SET_NODE_DTN_TIME            */ 0,

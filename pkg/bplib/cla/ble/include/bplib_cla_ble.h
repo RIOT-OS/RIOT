@@ -3,16 +3,82 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 #pragma once
-
+/**
+ * @defgroup pkg_bplib_cla_ble BLE L2CAP CLA Implementation
+ * @ingroup pkg_bplib_cla
+ * @brief Implementation of a basic CLA over BLE L2CAP.
+ *
+ * # About
+ * Sends bundles via BLE, between two, statically connected devices.
+ *
+ * To use this, call bplib_cla_ble_start(). The remote MAC address of the
+ * client will be taken from the @ref pkg_bplib_nc tables, so
+ * bplib_contact_set_out_addr() needs to be configured before. The server
+ * currently accepts any connection.
+ *
+ * Now the CLA is ready to receive but bplib does not know this contact is
+ * active, so you also have to call BPLib_CLA_ContactSetup() and
+ * BPLib_CLA_ContactStart(). For a extended BLE CLA which also handles
+ * discovery these functions should be called from within the CLA. They
+ * are excluded for now since, especially for the server and "active"
+ * contact is not configured and any connection is accepted. So, the
+ * reachable EIDs are now known to be valid for this connection.
+ *
+ * @{
+ *
+ * @file
+ * @brief       BLE CLA implementation.
+ *
+ * @author      Simon Grund <mail@simongrund.de>
+ */
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int bplib_cla_ble_start(uint32_t task_id);
+/** @brief Timeout after all CLA threads are stopped after bplib_cla_ble_stop, in ms */
+#ifndef CONFIG_BPLIB_CLA_BLE_TIMEOUT
+#  define CONFIG_BPLIB_CLA_BLE_TIMEOUT  10000
+#endif
+
+/** @brief MTU of an L2CAP message. Nimble's MSYS has to have enough buffer space. */
+#ifndef CONFIG_BPLIB_CLA_BLE_MTU
+#  define CONFIG_BPLIB_CLA_BLE_MTU      1000
+#endif
+
+/** @brief L2CAP CID to use. */
+#ifndef CONFIG_BPLIB_CLA_BLE_CID
+#  define CONFIG_BPLIB_CLA_BLE_CID      0xabc1
+#endif
+
+/**
+ * @brief Start the CLA on BLE.
+ *
+ * No bundles are sent until BPLib_CLA_ContactSetup and BPLib_CLA_ContactStart
+ * are called.
+ *
+ * @param contact_id The contact table index. This table should contain the
+ *        destination MAC address to connect to
+ * @param client true of the CLA should send bundles, false if it should receive
+ *        bundles. Bidirectional connection are currently not supported.
+ * @return 0 on success
+ *         1 when the CLA is already started
+ *         negative errno codes from thread creation attempts if these fail.
+ */
+int bplib_cla_ble_start(uint32_t contact_id, bool client);
+
+/**
+ * @brief Stops the CLA, and the BLE connection.
+ *
+ * May take up to CONFIG_BPLIB_CLA_BLE_TIMEOUT until the threads are stopped, since
+ * they wait (timed) for bplib functions.
+ */
 void bplib_cla_ble_stop(void);
 
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */

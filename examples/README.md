@@ -119,6 +119,7 @@ Here is a quick overview of the examples available in the RIOT:
 | Example | Description |
 |---------|-------------|
 | [bplib_cla_udp](./networking/dtn/bplib_cla_udp/README.md) | This example shows the use of bplib with a single UDP contact. |
+| [bplib_cla_ble](./networking/dtn/bplib_cla_ble/README.md) | This example shows the use of bplib with a BLE L2CAP CLA. |
 
 ### Misc
 
