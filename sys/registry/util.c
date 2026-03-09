@@ -158,43 +158,43 @@ int registry_util_convert_value_to_str(
         break;
 
     case REGISTRY_TYPE_BOOL:
-        str_len = snprintf(dest, dest_len, " %" PRId8, *(bool *)src->buf);
+        str_len = snprintf(dest, dest_len, "%" PRId8, *(bool *)src->buf);
         break;
 
     case REGISTRY_TYPE_UINT8:
-        str_len = snprintf(dest, dest_len, " %" PRIu8, *(uint8_t *)src->buf);
+        str_len = snprintf(dest, dest_len, "%" PRIu8, *(uint8_t *)src->buf);
         break;
 
     case REGISTRY_TYPE_UINT16:
-        str_len = snprintf(dest, dest_len, " %" PRIu16, *(uint16_t *)src->buf);
+        str_len = snprintf(dest, dest_len, "%" PRIu16, *(uint16_t *)src->buf);
         break;
 
     case REGISTRY_TYPE_UINT32:
-        str_len = snprintf(dest, dest_len, " %" PRIu32, *(uint32_t *)src->buf);
+        str_len = snprintf(dest, dest_len, "%" PRIu32, *(uint32_t *)src->buf);
         break;
 
     case REGISTRY_TYPE_UINT64:
-        str_len = snprintf(dest, dest_len, " %" PRIu64, *(uint64_t *)src->buf);
+        str_len = snprintf(dest, dest_len, "%" PRIu64, *(uint64_t *)src->buf);
         break;
 
     case REGISTRY_TYPE_INT8:
-        str_len = snprintf(dest, dest_len, " %" PRId8, *(int8_t *)src->buf);
+        str_len = snprintf(dest, dest_len, "%" PRId8, *(int8_t *)src->buf);
         break;
 
     case REGISTRY_TYPE_INT16:
-        str_len = snprintf(dest, dest_len, " %" PRId16, *(int16_t *)src->buf);
+        str_len = snprintf(dest, dest_len, "%" PRId16, *(int16_t *)src->buf);
         break;
 
     case REGISTRY_TYPE_INT32:
-        str_len = snprintf(dest, dest_len, " %" PRId32, *(int32_t *)src->buf);
+        str_len = snprintf(dest, dest_len, "%" PRId32, *(int32_t *)src->buf);
         break;
 
     case REGISTRY_TYPE_INT64:
-        str_len = snprintf(dest, dest_len, " %" PRId64, *(int64_t *)src->buf);
+        str_len = snprintf(dest, dest_len, "%" PRId64, *(int64_t *)src->buf);
         break;
 
     case REGISTRY_TYPE_FLOAT32:
-        str_len = sprintf(dest, " %f", *(float *)src->buf);
+        str_len = sprintf(dest, "%f", *(float *)src->buf);
         if (str_len > dest_len - 1) {
             /* If dest is NULL, the length is returned */
             if (dest != NULL) {
@@ -204,7 +204,7 @@ int registry_util_convert_value_to_str(
         break;
 
     case REGISTRY_TYPE_FLOAT64:
-        str_len = sprintf(dest, " %f", *(double *)src->buf);
+        str_len = sprintf(dest, "%f", *(double *)src->buf);
         if (str_len > dest_len - 1) {
             /* If dest is NULL, the length is returned */
             if (dest != NULL) {
