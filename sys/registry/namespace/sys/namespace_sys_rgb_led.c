@@ -23,13 +23,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define ENABLE_DEBUG 0
-#include "debug.h"
 #include "kernel_defines.h"
 #include "registry.h"
 #include "registry/namespace/sys.h"
 
 #include "registry/namespace/sys/rgb_led.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 /* Get parameter value from instance */
 static void _get_parameter_value_from_instance(

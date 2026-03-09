@@ -20,14 +20,15 @@
 
 #include <stdio.h>
 
-#define ENABLE_DEBUG 0
-#include "debug.h"
 #include "kernel_defines.h"
 #include "registry.h"
 
 #include "registry/namespace/sys.h"
 #include "registry/namespace/sys/rgb_led.h"
 #include "registry/namespace/sys/board_led.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 static const registry_schema_t *_schemas[] = {
 #if IS_USED(MODULE_REGISTRY_NAMESPACE_SYS_RGB_LED)
