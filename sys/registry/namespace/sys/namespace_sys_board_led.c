@@ -69,7 +69,7 @@ registry_schema_t registry_sys_board_led = {
     .name = "board_led",
 #endif /* CONFIG_REGISTRY_ENABLE_META_NAME */
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
-    .description = "A board LED.",
+    .description = "A board LED",
 #endif /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     .namespace = &registry_sys,
     .get_parameter_value_from_instance = _get_parameter_value_from_instance,
