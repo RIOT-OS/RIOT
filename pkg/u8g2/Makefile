@@ -1,6 +1,6 @@
 PKG_NAME=u8g2
-PKG_URL=https://github.com/olikraus/u8g2
-PKG_VERSION=41e43b4abaeaa0da88f161d3e9bc37d36ff5259a # v2.36.18
+PKG_URL=https://github.com/basilfx/u8g2
+PKG_VERSION=a6adc01549b218652f2365de28c2271b4b74e8c1 # v2.36.18
 PKG_LICENSE=BSD-2-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
