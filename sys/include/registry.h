@@ -223,7 +223,10 @@ struct _registry_schema_instance_t {
                                           with more details. */
 #endif                               /* CONFIG_REGISTRY_ENABLE_META_DESCRIPTION */
     const void *const data;          /**< Generated struct containing all
-                                          configuration parameters of the schema. */
+                                          configuration parameters of the schema.
+                                          Usually generated from schema YAML 
+                                          files using the "make registry generate"
+                                          command. */
     const registry_schema_t *schema; /**< Configuration schema that the
                                           instance belongs to. */
     registry_apply_cb_t apply_cb;    /**< Will be called when @ref registry_apply()
