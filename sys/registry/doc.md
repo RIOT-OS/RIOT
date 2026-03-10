@@ -123,7 +123,7 @@ This is possible using the `registry_add_schema_instance` function, providing th
 ```c
 int registry_add_schema_instance(
     const registry_schema_t *schema,
-    const registry_instance_t *instance,
+    const registry_schema_instance_t *instance,
 );
 ```
 
