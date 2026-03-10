@@ -37,10 +37,8 @@
 void slipdev_setup_net(slipdev_t *dev, uint8_t index);
 void slipdev_setup_coap(slipdev_t *dev);
 
-#if (IS_USED(MODULE_SLIPDEV_STDIO) || IS_USED(MODULE_SLIPDEV_CONFIG))
-/* For synchronization with stdio/config threads */
+/* For synchronization between stdio/config/net threads */
 mutex_t slipdev_mutex = MUTEX_INIT;
-#endif
 
 static inline void _slipdev_stdio_add_to_frame(slipdev_t *dev, uint8_t byte)
 {
@@ -289,7 +287,7 @@ void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index
 {
     /* set device descriptor fields */
     dev->config = *params;
-    dev->state = 0;
+    dev->state = SLIPDEV_STATE_NONE;
 
     /* we only support one coap server at the moment */
     if ((index == 0) && IS_USED(MODULE_SLIPDEV_CONFIG)) {
