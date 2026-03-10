@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2026 Technische Universität Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -157,18 +154,16 @@ int main(void)
 
     while (1) {
         if (qmi8658_read_acc(&dev, &acc_value) == 0) {
-            printf("Accelerometer x: %i y: %i z: %i\n", acc_value.x,
-                   acc_value.y,
-                   acc_value.z);
+            printf("Accelerometer x: %i y: %i z: %i\n",
+                   acc_value.x, acc_value.y, acc_value.z);
         }
         else {
             puts("[ERROR] reading accelerometer!\n");
         }
 
         if (qmi8658_read_gyro(&dev, &gyro_value) == 0) {
-            printf("Gyroscope x: %i y: %i z: %i\n", gyro_value.x,
-                   gyro_value.y,
-                   gyro_value.z);
+            printf("Gyroscope x: %i y: %i z: %i\n",
+                   gyro_value.x, gyro_value.y, gyro_value.z);
         }
         else {
             puts("[ERROR] reading gyroscope!\n");
