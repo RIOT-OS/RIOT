@@ -162,8 +162,8 @@ typedef struct {
  * @extends netdev_t
  */
 typedef struct {
+#if IS_USED(MODULE_SLIPDEV_NET)
     netdev_t netdev;                        /**< parent class */
-    slipdev_params_t config;                /**< configuration parameters */
     chunk_ringbuf_t rb;                     /**< Ringbuffer to store received networking frames.*/
                                             /* Written to from interrupts (with irq_disable */
                                             /* to prevent any simultaneous writes),         */
@@ -171,12 +171,15 @@ typedef struct {
                                             /* loop at _isr.                                */
 
     uint8_t rxmem[CONFIG_SLIPDEV_BUFSIZE];  /**< memory used by RX buffer */
+#endif
 
 #if IS_USED(MODULE_SLIPDEV_CONFIG)
     chunk_ringbuf_t rb_config;                      /**< Ringbuffer stores received configuration frames */
     uint8_t rxmem_config[CONFIG_SLIPDEV_BUFSIZE];   /**< memory used by RX buffer */
     kernel_pid_t coap_server_pid;                   /**< The PID of the CoAP server */
 #endif
+
+    slipdev_params_t config;                /**< configuration parameters */
     /**
      * @brief   Device state
      * @see     [Device state definitions](@ref slipdev_state_t)

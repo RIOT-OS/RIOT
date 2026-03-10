@@ -89,6 +89,7 @@ static inline bool _slipdev_config_add_to_frame(slipdev_t *dev, uint8_t byte)
 
 static inline bool _slipdev_net_start_frame(slipdev_t *dev, uint8_t byte)
 {
+#ifdef MODULE_SLIPDEV_NET
     /* try to create new ip frame */
     if (!crb_start_chunk(&dev->rb)) {
         DEBUG("slipmux: can't start new net frame, drop frame\n");
@@ -99,23 +100,36 @@ static inline bool _slipdev_net_start_frame(slipdev_t *dev, uint8_t byte)
         crb_end_chunk(&dev->rb, false);
         return 0;
     }
+#else
+    (void)dev;
+    (void)byte;
+#endif
     return 1;
 }
 
 static inline void _slipdev_net_end_frame(slipdev_t *dev)
 {
+#ifdef MODULE_SLIPDEV_NET
     crb_end_chunk(&dev->rb, true);
     netdev_trigger_event_isr(&dev->netdev);
+#else
+    (void)dev;
+#endif
 }
 
 static inline bool _slipdev_net_add_to_frame(slipdev_t *dev, uint8_t byte)
 {
+#ifdef MODULE_SLIPDEV_NET
     /* discard frame if byte can't be added */
     if (!crb_add_byte(&dev->rb, byte)) {
         DEBUG("slipmux: net rx buffer full, drop frame\n");
         crb_end_chunk(&dev->rb, false);
         return 0;
     }
+#else
+    (void)dev;
+    (void)byte;
+#endif
     return 1;
 }
 
