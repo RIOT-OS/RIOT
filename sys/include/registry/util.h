@@ -23,6 +23,10 @@ extern "C" {
 
 #include "registry.h"
 
+/**
+ * @brief Specifies the number of digits after decimal point when converting
+ *        float or double registry values to strings.
+ */
 #ifndef REGISTRY_UTIL_FORMAT_FLOAT_PRECISION
 #  define REGISTRY_UTIL_FORMAT_FLOAT_PRECISION 6
 #endif
