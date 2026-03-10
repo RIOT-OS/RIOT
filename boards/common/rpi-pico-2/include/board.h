@@ -7,7 +7,7 @@
 #pragma once
 
 /**
- * @ingroup         boards_rpi_pico_2_arm
+ * @ingroup         boards_rpi_pico_2
  * @{
  *
  * @file
