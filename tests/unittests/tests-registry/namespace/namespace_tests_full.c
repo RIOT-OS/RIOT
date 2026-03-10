@@ -1,13 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2023-2025 Lasse Rosenow <lasse.rosenow@haw-hamburg.de>
- * SPDX-FileCopyrightText: 2023-2025 HAW Hamburg
+ * SPDX-FileCopyrightText: 2023-2026 Lasse Rosenow <lasse.rosenow@haw-hamburg.de>
+ * SPDX-FileCopyrightText: 2023-2026 HAW Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
- * @defgroup    sys_registry_namespace_tests_full RIOT Registry Schema: Full
- * @ingroup     sys
- * @brief       RIOT Registry Full Schema using all possible data types of the riot registry
+ * @brief       RIOT Registry Full Schema using all possible data types of the
+ *              riot registry
  * @{
  *
  * @file
@@ -22,12 +21,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 #include "kernel_defines.h"
 #include "registry.h"
 #include "tests.h"
 #include "tests/full.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 /* Mapping */
 static void _get_parameter_value_from_instance(
