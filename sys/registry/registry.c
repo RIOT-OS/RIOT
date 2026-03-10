@@ -104,7 +104,7 @@ registry_error_t registry_set(const registry_node_t *node, const void *buf, cons
         return -REGISTRY_ERROR_BUF_LEN_TOO_LARGE;
     }
 
-    /* call handler to apply the new value to the correct parameter in the instance of the schema */
+    /* copy buffer to apply the new value to the correct instance of the schema */
     memcpy(intern_val, buf, buf_len);
 
     return REGISTRY_ERROR_NONE;
