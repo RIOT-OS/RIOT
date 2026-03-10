@@ -1,11 +1,13 @@
 /*
- * SPDX-FileCopyrightText: 2023-2025 Lasse Rosenow <lasse.rosenow@haw-hamburg.de>
- * SPDX-FileCopyrightText: 2023-2025 HAW Hamburg
+ * SPDX-FileCopyrightText: 2023-2026 Lasse Rosenow <lasse.rosenow@haw-hamburg.de>
+ * SPDX-FileCopyrightText: 2023-2026 HAW Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+#pragma once
+
 /**
- * @defgroup    unittests
+ * @ingroup     unittests
  * @brief       Unittests for the ``registry`` module
  * @{
  *
@@ -13,8 +15,6 @@
  *
  * @author      Lasse Rosenow <lasse.rosenow@haw-hamburg.de>
  */
-
-#pragma once
 
 #include "embUnit.h"
 

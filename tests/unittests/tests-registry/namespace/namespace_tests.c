@@ -1,13 +1,12 @@
 /*
- * SPDX-FileCopyrightText: 2023-2025 Lasse Rosenow <lasse.rosenow@haw-hamburg.de>
- * SPDX-FileCopyrightText: 2023-2025 HAW Hamburg
+ * SPDX-FileCopyrightText: 2023-2026 Lasse Rosenow <lasse.rosenow@haw-hamburg.de>
+ * SPDX-FileCopyrightText: 2023-2026 HAW Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
- * @defgroup    sys_registry_namespace_tests RIOT Registry Tests Namespace
- * @ingroup     tests
- * @brief       RIOT Registry Namespace Tests module providing common tests configuration schemas for the RIOT Registry sys module
+ * @brief       RIOT Registry "tests" namespace providing configuration
+ *              schemas for testint the "registry" sys module
  * @{
  *
  * @file
@@ -18,15 +17,15 @@
  */
 
 #include <stdio.h>
-
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 #include "kernel_defines.h"
 #include "registry.h"
 
 #include "tests.h"
 #include "tests/full.h"
 #include "tests/nested.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 static const registry_schema_t *_schemas[] = {
     &registry_tests_full,
