@@ -444,6 +444,7 @@ int ds3231_disable_bat(const ds3231_t *dev)
 
 #ifdef MODULE_WALLTIME_IMPL_DS3231
 #include "ds3231_params.h"
+#include "walltime.h"
 
 static ds3231_t walltime_dev;
 static bool _init_done;
@@ -470,4 +471,30 @@ int walltime_impl_set(struct tm *time)
     }
     return ds3231_set_time(&walltime_dev, time);
 }
-#endif
+
+#  ifdef MODULE_DS3231_INT
+int walltime_impl_alarm_set(struct tm *time, walltime_alarm_cb_t cb, void *arg)
+{
+    if (!_init_done) {
+        return -ENODEV;
+    }
+
+    if (!cb) {
+        return ds3231_toggle_alarm_1(&walltime_dev, false);
+    }
+
+    int res = ds3231_set_alarm_1(&walltime_dev, time, DS3231_AL1_TRIG_D_H_M_S);
+    if (res) {
+        return res;
+    }
+
+    /* clear stale interrupt flag */
+    uint8_t status;
+    _read(&walltime_dev, REG_STATUS, &status, 1, 1, 0);
+    status &= ~STAT_A1F;
+    _write(&walltime_dev, REG_STATUS, &status, 1, 0, 1);
+
+    return gpio_init_int(walltime_dev.int_pin, GPIO_IN, GPIO_FALLING, cb, arg);
+}
+#  endif /* MODULE_DS3231_INT */
+#endif /* MODULE_WALLTIME_IMPL_DS3231 */
