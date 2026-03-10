@@ -23,6 +23,13 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+/**
+ * @brief Registry auto init priority
+ */
+#ifndef AUTO_INIT_PRIO_MOD_REGISTRY
+#  define AUTO_INIT_PRIO_MOD_REGISTRY 2000
+#endif
+
 XFA_USE_CONST(registry_namespace_t *, _registry_namespaces_xfa);
 
 void registry_init(void)
@@ -35,4 +42,4 @@ void registry_init(void)
     }
 }
 
-AUTO_INIT(registry_init, 2000);
+AUTO_INIT(registry_init, AUTO_INIT_PRIO_MOD_REGISTRY);
