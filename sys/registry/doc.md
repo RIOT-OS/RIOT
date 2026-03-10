@@ -1,5 +1,4 @@
-@defgroup    sys_registry    RIOT Registry
-@ingroup     sys
+@ingroup     sys_registry
 @brief       RIOT Registry module for handling runtime configurations
 
 @warning This implementation is not complete and not yet thoroughly tested.
