@@ -31,20 +31,39 @@
 
 XFA_USE(vfs_mount_t, vfs_mountpoints_xfa);
 
-#define UINT32_T_MAX_STRING_LEN     (10)
-
 /* dir path needs to be as long as mount point + psa_key_id_t as string */
-#define STRING_PATH_LEN             (strlen(vfs_mountpoints_xfa[0].mount_point) + \
-                                     UINT32_T_MAX_STRING_LEN)
+#ifndef CONFIG_PSA_CRYPTO_MAX_PATH_LEN
+#  define CONFIG_PSA_CRYPTO_MAX_PATH_LEN 64
+#endif
+
+/**
+ * @brief       Build the VFS path to the given key id and store it in @p path
+ * @param[out]  path    The formatted path (on success)
+ * @param[in]   id      The key to build the path for
+ * @retval      true    Success, @p path contains the _fmt_path
+ * @retval      false   Failure, @p path too small
+ *
+ * @post        If `true` is returned, @p path contains the path to the key.
+ *              Otherwise, @p path contains garbage.
+ */
+static bool _fmt_path(char path[CONFIG_PSA_CRYPTO_MAX_PATH_LEN], psa_key_id_t id)
+{
+    unsigned len = snprintf(path, CONFIG_PSA_CRYPTO_MAX_PATH_LEN, "%s/%d",
+                             vfs_mountpoints_xfa[0].mount_point, (int)id);
+
+    return (len < CONFIG_PSA_CRYPTO_MAX_PATH_LEN);
+}
 
 psa_status_t psa_write_encoded_key_slot_to_file(psa_key_id_t id,
-                                                     uint8_t* input,
-                                                     size_t input_len)
+                                                uint8_t* input,
+                                                size_t input_len)
 {
     /* dir path needs to be as long as mount point + psa_key_id_t as string */
-    char string_path[STRING_PATH_LEN];
+    char string_path[CONFIG_PSA_CRYPTO_MAX_PATH_LEN];
 
-    sprintf(string_path, "%s/%d", vfs_mountpoints_xfa[0].mount_point, (int) id);
+    if (!_fmt_path(string_path, id)) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
+    }
 
     /* Check whether file already exists */
     int fd = vfs_open(string_path, O_RDWR, 0);
@@ -80,9 +99,12 @@ psa_status_t psa_read_encoded_key_slot_from_file(psa_key_id_t id,
                                                      size_t output_size,
                                                      size_t *output_data_len)
 {
-    char string_path[STRING_PATH_LEN];
+    /* dir path needs to be as long as mount point + psa_key_id_t as string */
+    char string_path[CONFIG_PSA_CRYPTO_MAX_PATH_LEN];
 
-    sprintf(string_path, "%s/%d", vfs_mountpoints_xfa[0].mount_point, (int) id);
+    if (!_fmt_path(string_path, id)) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
+    }
 
     int fd = vfs_open(string_path, O_RDONLY, 0);
 
@@ -114,9 +136,12 @@ psa_status_t psa_destroy_persistent_key(psa_key_id_t key_id)
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    char string_path[STRING_PATH_LEN];
+    /* dir path needs to be as long as mount point + psa_key_id_t as string */
+    char string_path[CONFIG_PSA_CRYPTO_MAX_PATH_LEN];
 
-    sprintf(string_path, "%s/%d", vfs_mountpoints_xfa[0].mount_point, (int) key_id);
+    if (!_fmt_path(string_path, key_id)) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
+    }
 
     int fd = vfs_unlink(string_path);
     if (fd < 0) {
