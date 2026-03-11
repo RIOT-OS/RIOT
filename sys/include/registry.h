@@ -73,54 +73,34 @@ typedef registry_group_or_parameter_id_t registry_group_id_t;
  */
 typedef registry_group_or_parameter_id_t registry_parameter_id_t;
 
-/**
- * @brief Data structure of a configuration namespace see @p _registry_namespace_t.
- */
+/** @cond INTERNAL */
 typedef struct _registry_namespace_t registry_namespace_t;
-
-/**
- * @brief Data structure of a configuration schema see @p _registry_schema_t.
- */
 typedef struct _registry_schema_t registry_schema_t;
-
-/**
- * @brief  Instance of a schema containing its configuration parameter
- * values see @p _registry_schema_instance_t.
- */
 typedef struct _registry_schema_instance_t registry_schema_instance_t;
-
-/**
- * @brief  Data structure of a configuration group see @p _registry_group_t.
- */
 typedef struct _registry_group_t registry_group_t;
-
-/**
- * @brief Data structure of a configuration parameter see @p _registry_parameter_t.
- */
 typedef struct _registry_parameter_t registry_parameter_t;
+/** @endcond */
 
 /**
  * @brief Supported data types used by configuration parameters of the registry.
  */
 typedef enum {
-    REGISTRY_TYPE_NONE = 0, /**< No type specified */
+    REGISTRY_TYPE_OPAQUE = 1, /**< OPAQUE. */
+    REGISTRY_TYPE_STRING = 2, /**< String. */
+    REGISTRY_TYPE_BOOL = 3,   /**< Boolean. */
 
-    REGISTRY_TYPE_OPAQUE, /**< OPAQUE. */
-    REGISTRY_TYPE_STRING, /**< String. */
-    REGISTRY_TYPE_BOOL,   /**< Boolean. */
+    REGISTRY_TYPE_UINT8 = 4,  /**< 8-bits unsigned integer. */
+    REGISTRY_TYPE_UINT16 = 5, /**< 16-bits unsigned integer. */
+    REGISTRY_TYPE_UINT32 = 6, /**< 32-bits unsigned integer. */
+    REGISTRY_TYPE_UINT64 = 7, /**< 64-bits unsigned integer. */
 
-    REGISTRY_TYPE_UINT8,  /**< 8-bits unsigned integer. */
-    REGISTRY_TYPE_UINT16, /**< 16-bits unsigned integer. */
-    REGISTRY_TYPE_UINT32, /**< 32-bits unsigned integer. */
-    REGISTRY_TYPE_UINT64, /**< 64-bits unsigned integer. */
+    REGISTRY_TYPE_INT8 = 8,   /**< 8-bits signed integer. */
+    REGISTRY_TYPE_INT16 = 9,  /**< 16-bits signed integer. */
+    REGISTRY_TYPE_INT32 = 10, /**< 32-bits signed integer. */
+    REGISTRY_TYPE_INT64 = 11, /**< 64-bits signed integer. */
 
-    REGISTRY_TYPE_INT8,  /**< 8-bits signed integer. */
-    REGISTRY_TYPE_INT16, /**< 16-bits signed integer. */
-    REGISTRY_TYPE_INT32, /**< 32-bits signed integer. */
-    REGISTRY_TYPE_INT64, /**< 64-bits signed integer. */
-
-    REGISTRY_TYPE_FLOAT32, /**< 32-bits float. */
-    REGISTRY_TYPE_FLOAT64, /**< 64-bits float. */
+    REGISTRY_TYPE_FLOAT32 = 12, /**< 32-bits float. */
+    REGISTRY_TYPE_FLOAT64 = 13, /**< 64-bits float. */
 } registry_type_t;
 
 /**
@@ -211,7 +191,7 @@ typedef registry_error_t (*registry_apply_cb_t)(
  * The consumers also need to implement the @p apply_cb
  * function to get informed when configuration changes.
  */
-struct _registry_schema_instance_t {
+typedef struct _registry_schema_instance_t {
     clist_node_t node;                      /**< Linked list node pointing to
                                                  the next schema instance. */
     const registry_schema_instance_id_t id; /**< ID of the instance within
@@ -233,7 +213,7 @@ struct _registry_schema_instance_t {
     registry_apply_cb_t apply_cb;    /**< Will be called when @ref registry_apply()
                                           was called on this instance. */
     void *context;                   /**< Optional context used by the instance */
-};
+} registry_schema_instance_t;
 
 /**
  * @brief Data structure of a configuration group.
@@ -241,7 +221,7 @@ struct _registry_schema_instance_t {
  * A configuration group contains further configuration groups and/or configuration parameters.
  * It has an ID that is unique within the scope of its parent configuration schema.
  */
-struct _registry_group_t {
+typedef struct _registry_group_t {
     const registry_group_id_t id; /**< Integer representing the ID of the configuration group. */
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     const char *const name; /**< String describing the configuration group. */
@@ -258,7 +238,7 @@ struct _registry_group_t {
     const registry_parameter_t **const parameters; /**< Array of pointers to all the configuration
                                                         parameters that belong to this group. */
     const size_t parameters_len;                   /**< Size of parameters array. */
-};
+} registry_group_t;
 
 /**
  * @brief Data structure of a configuration parameter.
@@ -266,7 +246,7 @@ struct _registry_group_t {
  * A configuration parameter mostly holds the type information for a configuration value.
  * It has an ID that is unique within the scope of its parent configuration schema.
  */
-struct _registry_parameter_t {
+typedef struct _registry_parameter_t {
     const registry_parameter_id_t id; /**< Integer representing the ID of
                                            the configuration parameter. */
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
@@ -280,7 +260,7 @@ struct _registry_parameter_t {
                                                 configuration parameter belongs to. */
     const registry_type_t type;            /**< Type of the configuration parameter. */
     const size_t count;                    /**< Number of elements (1 for scalar, >1 for array). */
-};
+} registry_parameter_t;
 
 /**
  * @brief Data structure of a configuration schema.
@@ -291,7 +271,7 @@ struct _registry_parameter_t {
  * configuration parameter values.
  * It has an ID that is unique within the scope of its parent configuration namespace.
  */
-struct _registry_schema_t {
+typedef struct _registry_schema_t {
     const registry_schema_id_t id; /**< Integer representing the ID of the schema. */
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     const char *const name; /**< String describing the schema. */
@@ -333,7 +313,7 @@ struct _registry_schema_t {
         const registry_schema_instance_t *instance,
         void **val,
         size_t *val_len);
-};
+} registry_schema_t;
 
 /**
  * @brief Data structure of a configuration namespace.
@@ -343,7 +323,7 @@ struct _registry_schema_t {
  * and schemas defined by applications running on RIOT.
  * It has an ID that is unique within the scope of the RIOT registry itself.
  */
-struct _registry_namespace_t {
+typedef struct _registry_namespace_t {
     const registry_namespace_id_t id; /**< Integer representing the ID of the namespace. */
 #if IS_ACTIVE(CONFIG_REGISTRY_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     const char *const name; /**< String describing the configuration namespace. */
@@ -355,7 +335,7 @@ struct _registry_namespace_t {
     const registry_schema_t **const schemas; /**< Array of pointers to all the configuration
                                                   schemas that belong to this namespace. */
     const size_t schemas_len;                /**< Size of schemas array. */
-};
+} registry_namespace_t;
 
 /**
  * @brief Add a namespace to the cross-file-array containing all
@@ -438,17 +418,19 @@ typedef registry_error_t (*registry_export_cb_t)(
 
 /**
  * @brief This mode exports every children of the given node including all
- *        nested children.
+ *        nested children when calling the @p registry_export function.
  */
 #define REGISTRY_EXPORT_ALL                           0
 
 /**
- * @brief This mode only exports the given node.
+ * @brief This mode only exports the given node  when calling the
+ *        @p registry_export function.
  */
 #define REGISTRY_EXPORT_SELF                          1
 
 /**
- * @brief This mode exports the given node plus n-1 levels of children.
+ * @brief This mode exports the given node plus n-1 levels of children  when
+ *        calling the @p registry_export function.
  */
 #define REGISTRY_EXPORT_WITH_N_LEVELS_OF_CHILDREN(_n) (_n + 1)
 
