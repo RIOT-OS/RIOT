@@ -39,6 +39,9 @@ include $(RIOTMAKE)/tools/gdb.inc.mk
 # GCC's static analysis tools can be enabled using -fanalyzer
 CFLAGS_STATIC_ANALYSIS := -fanalyzer
 
+# this needs to be recursively evaluated
+RCFLAGS_WRITE_SARIF = -fdiagnostics-set-output=sarif:file='$$@.sarif'
+
 # Data address spaces starts at zero for all supported architectures. This fixes
 # compilation at least on MSP430 and AVR.
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105523
