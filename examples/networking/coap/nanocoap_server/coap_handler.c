@@ -49,68 +49,75 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, c
 {
     (void)context;
     coap_block_slicer_t slicer;
+    coap_builder_t state;
     coap_block2_init(pkt, &slicer);
-    uint8_t *payload = buf + coap_get_response_hdr_len(pkt);
+    int err;
+    err = coap_builder_init_reply(&state, buf, len, pkt, COAP_CODE_CONTENT);
+    if (err) {
+        return err;
+    }
 
-    uint8_t *bufpos = payload;
-
-    bufpos += coap_put_option_ct(bufpos, 0, COAP_FORMAT_TEXT);
-    bufpos += coap_opt_put_block2(bufpos, COAP_OPT_CONTENT_FORMAT, &slicer, 1);
-    *bufpos++ = COAP_PAYLOAD_MARKER;
+    /* Note the implicit error handling: If adding an option / payload fails,
+     * state.size is set to 0 and all subsequent operations fail as well. At the
+     * end of the function, `coap_builder_msg_size()` returns -EOVERFLOW and
+     * passes on the error correctly. We could also check the return value if
+     * we don't want to spent more resources on processing a request, but we
+     * opt to optimize for the common case instead of the edge case here. */
+    coap_opt_put_ct(&state, COAP_FORMAT_TEXT);
+    coap_opt_put_block2(&state, &slicer);
 
     /* Add actual content */
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, block2_intro, sizeof(block2_intro)-1);
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_VERSION, strlen(RIOT_VERSION));
-    bufpos += coap_blockwise_put_char(&slicer, bufpos, ')');
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, block2_board, sizeof(block2_board)-1);
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, block2_mcu, sizeof(block2_mcu)-1);
-    bufpos += coap_blockwise_put_bytes(&slicer, bufpos, (uint8_t*)RIOT_CPU, strlen(RIOT_CPU));
-    /* To demonstrate individual chars */
-    bufpos += coap_blockwise_put_char(&slicer, bufpos, ' ');
-    bufpos += coap_blockwise_put_char(&slicer, bufpos, 'M');
-    bufpos += coap_blockwise_put_char(&slicer, bufpos, 'C');
-    bufpos += coap_blockwise_put_char(&slicer, bufpos, 'U');
-    bufpos += coap_blockwise_put_char(&slicer, bufpos, '.');
+    coap_builder_add_payload_marker(&state);
+    coap_blockwise_put_bytes(&state, &slicer, block2_intro, sizeof(block2_intro)-1);
+    coap_blockwise_put_bytes(&state, &slicer, RIOT_VERSION, strlen(RIOT_VERSION));
+    coap_blockwise_put_char(&state, &slicer, ')');
+    coap_blockwise_put_bytes(&state, &slicer,  block2_board, sizeof(block2_board)-1);
+    coap_blockwise_put_bytes(&state, &slicer, RIOT_BOARD, strlen(RIOT_BOARD));
+    coap_blockwise_put_bytes(&state, &slicer, block2_mcu, sizeof(block2_mcu)-1);
+    coap_blockwise_put_bytes(&state, &slicer, RIOT_CPU, strlen(RIOT_CPU));
 
-    unsigned payload_len = bufpos - payload;
-    return coap_block2_build_reply(pkt, COAP_CODE_205,
-                                   buf, len, payload_len, &slicer);
+    /* To demonstrate individual chars */
+    coap_blockwise_put_char(&state, &slicer, ' ');
+    coap_blockwise_put_char(&state, &slicer, 'M');
+    coap_blockwise_put_char(&state, &slicer, 'C');
+    coap_blockwise_put_char(&state, &slicer, 'U');
+    coap_blockwise_put_char(&state, &slicer, '.');
+
+    coap_block2_finish(&slicer);
+    return coap_builder_msg_size(&state);
 }
 
 static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
 {
     (void) context;
 
-    ssize_t p = 0;
+    size_t rsp_len = 0;
     char rsp[16];
     unsigned code = COAP_CODE_EMPTY;
 
-    /* read coap method type in packet */
-    unsigned method_flag = coap_method2flag(coap_get_code_detail(pkt));
-
-    switch(method_flag) {
+    switch (coap_get_code_raw(pkt)) {
+    default:
     case COAP_GET:
         /* write the response buffer with the internal value */
-        p += fmt_u32_dec(rsp, internal_value);
+        rsp_len += fmt_u32_dec(rsp, internal_value);
         code = COAP_CODE_205;
         break;
     case COAP_PUT:
     case COAP_POST:
-        if (pkt->payload_len < 16) {
-            /* convert the payload to an integer and update the internal value */
-            char payload[16] = { 0 };
-            memcpy(payload, (char*)pkt->payload, pkt->payload_len);
-            internal_value = strtol(payload, NULL, 10);
-            code = COAP_CODE_CHANGED;
+        {
+            uint32_t tmp = scn_u32_dec((const char *)pkt->payload, pkt->payload_len);
+            if (tmp <= UINT8_MAX) {
+                internal_value = tmp;
+                code = COAP_CODE_CHANGED;
+            }
+            else {
+                code = COAP_CODE_REQUEST_ENTITY_TOO_LARGE;
+            }
         }
-        else {
-            code = COAP_CODE_REQUEST_ENTITY_TOO_LARGE;
-        }
+        break;
     }
 
-    return coap_reply_simple(pkt, code, buf, len,
-            COAP_FORMAT_TEXT, (uint8_t*)rsp, p);
+    return coap_reply_simple(pkt, code, buf, len, COAP_FORMAT_TEXT, rsp, rsp_len);
 }
 
 ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
@@ -150,21 +157,26 @@ ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_request_
         result_len = SHA256_DIGEST_LENGTH * 2;
     }
 
-    ssize_t reply_len = coap_build_reply(pkt, result, buf, len, 0);
-    if (reply_len <= 0) {
-        return reply_len;
+    coap_builder_t state;
+    int err = coap_builder_init_reply(&state, buf, len, pkt, result);
+    if (err) {
+        return err;
     }
 
-    uint8_t *pkt_pos = pkt->buf + reply_len;
     if (blockwise) {
-        pkt_pos += coap_opt_put_block1_control(pkt_pos, 0, &block1);
+        coap_opt_put_block1_control(&state, &block1);
     }
     if (result_len) {
-        *pkt_pos++ = 0xFF;
-        pkt_pos += fmt_bytes_hex((char *)pkt_pos, digest, sizeof(digest));
+        /* two hex chars per byte */
+        size_t pld_len = 2 * sizeof(digest);
+        char *pld = coap_builder_allocate_payload(&state, pld_len);
+        if (!pld) {
+            return -EOVERFLOW;
+        }
+        fmt_bytes_hex(pld, digest, sizeof(digest));
     }
 
-    return pkt_pos - pkt->buf;
+    return coap_builder_msg_size(&state);
 }
 
 NANOCOAP_RESOURCE(echo) {
@@ -263,39 +275,31 @@ static ssize_t _time_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_req
         break;
     }
 
-    const size_t estimated_data_len =
-        4       /* Max Observe Option size */
-        + 1     /* payload marker */
-        + 10    /* strlen("4294967295"), 4294967295 == UINT32_MAX */
-        + 1;    /* '\n' */
-    ssize_t hdr_len = coap_build_reply(pkt, COAP_CODE_CONTENT, buf, len, estimated_data_len);
-
-    if (hdr_len < 0) {
+    coap_builder_t state;
+    int err = coap_builder_init_reply(&state, buf, len, pkt, COAP_CODE_CONTENT);
+    if (err) {
         /* we undo any potential registration if we cannot reply */
         nanocoap_unregister_observer(context, pkt);
-        return len;
+        return err;
     }
-
-    if (hdr_len == 0) {
-        /* no response required, probably because of no-response option matching
-         * the response class */
-        return 0;
-    }
-
-    /* coap_build_reply() is a bit goofy: It returns the size of the written
-     * header + `estiamted_data_len`, so we have to subtract it again to obtain
-     * the size of data written. */
-    uint8_t *pos = buf + hdr_len - estimated_data_len;
 
     if (registered) {
-        uint16_t last_opt = 0;
-        pos += coap_opt_put_observe(pos, last_opt, now);
+        coap_opt_put_observe(&state, now);
     }
-    *pos++ = COAP_PAYLOAD_MARKER;
-    pos += fmt_u32_dec((void *)pos, now);
-    *pos++ = '\n';
 
-    return (uintptr_t)pos - (uintptr_t)buf;
+    /* Calculate payload size first. One extra byte for line break. */
+    size_t pld_len = fmt_u32_dec(NULL, now) + 1;
+    char *pld = coap_builder_allocate_payload(&state, pld_len);
+    if (!pld) {
+        /* undo any potential registration on error */
+        nanocoap_unregister_observer(context, pkt);
+        return -EOVERFLOW;
+    }
+    /* Now calling fmt_u32_dec() again to actually write the payload */
+    pld += fmt_u32_dec(pld, now);
+    *pld = '\n';
+
+    return coap_builder_msg_size(&state);
 }
 
 NANOCOAP_RESOURCE(time) {
@@ -307,15 +311,23 @@ static void _notify_observer_handler(event_t *ev)
     (void)ev;
     uint32_t now = ztimer_now(ZTIMER_MSEC);
     uint8_t buf[32];
-    uint8_t *pos = buf;
-    uint16_t last_opt = 0;
-    pos += coap_opt_put_observe(pos, last_opt, now);
-    *pos++ = COAP_PAYLOAD_MARKER;
-    pos += fmt_u32_dec((void *)pos, now);
-    *pos++ = '\n';
+    coap_builder_t state;
+    if (coap_builder_init(&state, buf, sizeof(buf), 0)) {
+        return;
+    }
+    if (coap_opt_put_observe(&state, now)) {
+        return;
+    }
+    char pld[11]; /* == strlen("4294967295") + 1 == strlen(#UINT32_MAX) + 1*/
+    size_t pld_len = fmt_u32_dec(pld, now);
+    pld[pld_len++] = '\n';
+    if (coap_builder_add_payload(&state, pld, pld_len)) {
+        return;
+    }
+
     iolist_t data = {
         .iol_base = buf,
-        .iol_len = (uintptr_t)pos - (uintptr_t)buf,
+        .iol_len = coap_builder_msg_size(&state),
     };
 
     /* `NANOCOAP_RESOURCE(time)` expends to XFA magic adding an entry named

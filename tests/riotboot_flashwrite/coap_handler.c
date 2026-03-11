@@ -15,7 +15,7 @@ ssize_t _flashwrite_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_requ
 {
     riotboot_flashwrite_t *writer = coap_request_ctx_get_context(ctx);
 
-    uint32_t result = COAP_CODE_204;
+    uint8_t result = COAP_CODE_204;
 
     coap_block1_t block1;
     int blockwise = coap_get_block1(pkt, &block1);
@@ -63,15 +63,15 @@ ssize_t _flashwrite_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, coap_requ
         riotboot_flashwrite_finish(writer);
     }
 
-    ssize_t reply_len = coap_build_reply(pkt, result, buf, len, 0);
-    if (reply_len <= 0) {
-        return reply_len;
+    coap_builder_t state;
+    int res = coap_builder_init_reply(&state, buf, len, pkt, result);
+    if (res) {
+        return res;
     }
 
-    uint8_t *pkt_pos = pkt->buf + reply_len;
-    pkt_pos += coap_put_block1_ok(pkt_pos, &block1, 0);
+    coap_put_block1_ok(&state, &block1);
 
-    return pkt_pos - pkt->buf;
+    return coap_builder_msg_size(&state);
 }
 
 NANOCOAP_RESOURCE(flashwrite) {
