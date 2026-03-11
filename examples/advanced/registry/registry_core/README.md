@@ -1,6 +1,6 @@
-# Registry Core
+# Runtime Config Core
 
-This application demonstrates the most basic usage of the RIOT Registry.
+This application demonstrates the most basic usage of the Runtime config.
 It implements a BOARD LED schema and continuously changes its value every second.
 
 ## Usage

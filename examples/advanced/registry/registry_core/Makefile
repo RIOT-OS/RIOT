@@ -1,5 +1,5 @@
 # name of the application
-APPLICATION = registry_example_core
+APPLICATION = runtime_config_example_core
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
@@ -8,8 +8,8 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../../../..
 
 # required modules
-# enable board_led schema (sys/board_led) of the riot registry
-USEMODULE += registry_namespace_sys_board_led
+# enable board_led schema (sys/board_led) of the Runtime config
+USEMODULE += runtime_config_namespace_sys_board_led
 # enable the ztimer to turn the led on and off every second
 USEMODULE += ztimer_sec
 

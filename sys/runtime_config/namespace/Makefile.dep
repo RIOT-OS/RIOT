@@ -1,0 +1,3 @@
+ifneq (,$(filter runtime_config_namespace_sys%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/runtime_config/namespace/sys/Makefile.dep
+endif

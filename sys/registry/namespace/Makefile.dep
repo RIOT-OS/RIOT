@@ -1,3 +1,0 @@
-ifneq (,$(filter registry_namespace_sys%,$(USEMODULE)))
-  include $(RIOTBASE)/sys/registry/namespace/sys/Makefile.dep
-endif

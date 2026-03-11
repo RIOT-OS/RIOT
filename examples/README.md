@@ -128,7 +128,6 @@ Here is a quick overview of the examples available in the RIOT:
 | [sock_tcp_echo](./networking/misc/sock_tcp_echo/README.md) | This is a simple TCP echo server / client that uses the SOCK API. |
 | [lwip_ipv4](./networking/misc/lwip_ipv4/README.md) | This is a simple UDP client / server using LWIP for IPv4. |
 
-
 ## Advanced Examples
 
 | Example | Description |
@@ -144,7 +143,7 @@ Here is a quick overview of the examples available in the RIOT:
 | [senml_saul](./advanced/senml_saul/README.md) | This example demonstrates the usage of the SAUL (Sensor Actuator Uber Layer) module with the SenML (Sensor Measurement Lists) format. |
 | [opendsme](./advanced/opendsme/README.md) | This example demonstrates the usage of the OpenDSME module in RIOT. |
 | [xipfs](./advanced/xipfs/README.md) | This example demonstrates the usage of XIPFS for creating and executing an executable file. |
-| [registry_core](./advanced/registry/registry_core/README.md) | This example demonstrates the most basic usage of the RIOT Registry. |
+| [runtime_config_core](./advanced/registry/runtime_config_core/README.md) | This example demonstrates the most basic usage of the Runtime config module. |
 
 ## Examples from Guides
 
