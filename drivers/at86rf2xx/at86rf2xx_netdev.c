@@ -32,6 +32,7 @@
 
 #include "architecture.h"
 #include "iolist.h"
+#include "macros/utils.h"
 
 #include "net/eui64.h"
 #include "net/ieee802154.h"
@@ -688,11 +689,14 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
         case NETOPT_TX_POWER:
             assert(len <= sizeof(int16_t));
-            netdev_ieee802154->txpower = *((const int16_t *)val);
+            int16_t txpower = *((const int16_t *)val);
+            txpower = MAX(txpower, -(int16_t)AT86RF2XX_TXPOWER_OFF);
+            txpower = MIN(txpower,  (int16_t)(AT86RF2XX_TXPOWER_MAX - AT86RF2XX_TXPOWER_OFF));
+            netdev_ieee802154->txpower = txpower;
 #if AT86RF2XX_HAVE_SUBGHZ
-            at86rf2xx_configure_phy(dev, dev->netdev.chan, dev->page, *((const int16_t *)val));
+            at86rf2xx_configure_phy(dev, dev->netdev.chan, dev->page, txpower);
 #else
-            at86rf2xx_configure_phy(dev, dev->netdev.chan, 0, *((const int16_t *)val));
+            at86rf2xx_configure_phy(dev, dev->netdev.chan, 0, txpower);
 #endif
             res = sizeof(uint16_t);
             break;

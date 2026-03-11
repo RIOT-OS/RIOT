@@ -163,8 +163,6 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page, int16
     /* we must be in TRX_OFF before changing the PHY configuration */
     uint8_t prev_state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
     (void) page;
-    (void) chan;
-    (void) txpower;
 
 #if AT86RF2XX_HAVE_SUBGHZ
     /* The TX power register must be updated after changing the channel if
