@@ -143,7 +143,10 @@ typedef enum {
  * It can point to a namespace, schema, instance, group or parameter.
  * The configuration group and the configuration parameter contain a pointer to a
  * schema instance, because they are children of a specific schema instance
- * in the configuration tree.
+ * in the configuration tree. The schema instance contains the actual values of 
+ * configuration parameters.
+ * 
+ * 
  */
 typedef struct {
     registry_node_type_t type; /**< The type of the node */
