@@ -58,7 +58,6 @@ psa_status_t psa_write_encoded_key_slot_to_file(psa_key_id_t id,
                                                 uint8_t* input,
                                                 size_t input_len)
 {
-    /* dir path needs to be as long as mount point + psa_key_id_t as string */
     char string_path[CONFIG_PSA_CRYPTO_MAX_PATH_LEN];
 
     if (!_fmt_path(string_path, id)) {
@@ -99,7 +98,6 @@ psa_status_t psa_read_encoded_key_slot_from_file(psa_key_id_t id,
                                                      size_t output_size,
                                                      size_t *output_data_len)
 {
-    /* dir path needs to be as long as mount point + psa_key_id_t as string */
     char string_path[CONFIG_PSA_CRYPTO_MAX_PATH_LEN];
 
     if (!_fmt_path(string_path, id)) {
@@ -136,7 +134,6 @@ psa_status_t psa_destroy_persistent_key(psa_key_id_t key_id)
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-    /* dir path needs to be as long as mount point + psa_key_id_t as string */
     char string_path[CONFIG_PSA_CRYPTO_MAX_PATH_LEN];
 
     if (!_fmt_path(string_path, key_id)) {
