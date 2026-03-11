@@ -157,6 +157,7 @@ export default defineConfig({
             "build-system/build-in-docker",
             "build-system/advanced_build_system_tricks",
             "build-system/debugging_aids",
+            "build-system/static_analysis",
           ],
         },
         {
