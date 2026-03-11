@@ -28,6 +28,24 @@ extern "C" {
 #include "modules.h"
 #include "registry/error.h"
 
+#ifndef CONFIG_REGISTRY_ENABLE_META_NAME || IS_ACTIVE(DOXYGEN)
+/**
+ * @brief Enables the "name" field inside the @p registry_namespace_t,
+ *        @p registry_schema_t, @p registry_schema_instance_t,
+ *        @p registry_parameter_t or @p registry_group_t structs.
+ */
+#  define CONFIG_REGISTRY_ENABLE_META_NAME 0
+#endif
+
+#ifndef CONFIG_REGISTRY_ENABLE_META_DESCRIPTION || IS_ACTIVE(DOXYGEN)
+/**
+ * @brief Enables the "description" field inside the @p registry_namespace_t,
+ *        @p registry_schema_t, @p registry_schema_instance_t,
+ *        @p registry_parameter_t or @p registry_group_t structs.
+ */
+#  define CONFIG_REGISTRY_ENABLE_META_DESCRIPTION 0
+#endif
+
 /**
  * @brief Identifier of a configuration namespace.
  *
