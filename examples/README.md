@@ -143,7 +143,7 @@ Here is a quick overview of the examples available in the RIOT:
 | [senml_saul](./advanced/senml_saul/README.md) | This example demonstrates the usage of the SAUL (Sensor Actuator Uber Layer) module with the SenML (Sensor Measurement Lists) format. |
 | [opendsme](./advanced/opendsme/README.md) | This example demonstrates the usage of the OpenDSME module in RIOT. |
 | [xipfs](./advanced/xipfs/README.md) | This example demonstrates the usage of XIPFS for creating and executing an executable file. |
-| [runtime_config_core](./advanced/registry/runtime_config_core/README.md) | This example demonstrates the most basic usage of the Runtime config module. |
+| [runtime_config_core](./advanced/runtime_config/runtime_config_core/README.md) | This example demonstrates the most basic usage of the Runtime config module. |
 
 ## Examples from Guides
 

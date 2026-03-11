@@ -1,14 +1,13 @@
-@ingroup     sys_runtime_config
+@defgroup    sys_runtime_config    Runtime config
+@ingroup     sys
 @brief       Runtime config module for handling runtime configurations
 
 @warning This implementation is not complete and not yet thoroughly tested.
          Please do not use this module in production, as it may introduce security issues.
 
-## Abstract
-
 This module provides a system level runtime configuration system for RIOT.
 
-A runtime configuration system is in charge of providing a mechanism to set and get the values of `Configuration Parameters` that are used during the execution of the firmware, as well as a way to persist these values. Runtime configurations are deployment-specific and can be changed on a per node basis.
+A runtime configuration system is in charge of providing a mechanism to set and get the values of configuration parameters that are used during the execution of the firmware, as well as a way to persist these values. Runtime configurations are deployment-specific and can be changed on a per node basis.
 Appropriate management tools could also enable the configuration of nodes.
 
 Examples of runtime configurations are:
@@ -25,39 +24,37 @@ The main advantages of having such a system are:
 
 - Easy to apply per-node configuration during deployment
 - No need to implement a special mechanism for per-node configurations during firmware updates (only in the case of migration), as the parameters persist.
-- Common interface for modules to expose their runtime Configuration Parameters and handle them
-- Common interface for storing Configuration Parameters in non-volatile storage devices
+- Common interface for modules to expose their runtime configuration parameters and handle them
+- Common interface for storing configuration parameters in non-volatile storage devices
 
 ## Design
 
 ### Architecture
 
-The proposed architecture, as shown below, is formed by one or more Applications or Configuration Managers and the Runtime config.
-The Runtime config acts as a common interface to access Runtime Configurations and store them in non-volatile storage.
-All runtime configurations can be accessed either from the RIOT application using the provided Runtime config interfaces or through the interfaces exposed by the Configuration Managers.
-A RIOT Application may interact with a Configuration Manager in order to modify access control rules or enable different exposed interfaces.
+The proposed architecture, as shown below, is formed by one or more applications or configuration managers and the runtime config API.
+The runtime config API acts as a common interface to access runtime configurations and store them in non-volatile storage.
+All runtime configurations can be accessed either from the RIOT application using the provided runtime config interfaces or through the interfaces exposed by the configuration managers.
+A RIOT application may interact with a configuration manager in order to modify access control rules or enable different exposed interfaces.
 
 #### Path Based Configuration Managers (Needs `int_path or string_path` extension)
 
-These Configuration Managers are a simple representation of the default configuration structure of the Runtime config.
-They use either the `int_path` or the `string_path` extension module to expose the parameters using a path.
+These configuration managers mirror the internal structure of the RIOT runtime
+configuration tree.
+They use either the `int_path` or the `string_path` extension module to expose the parameters via a path of either strings or integers.
 
 #### Custom Schema Based Configuration Managers
 
-These Configuration Managers have their own configuration structure (custom predefined object models etc.) and can not automatically be mapped to / from the Runtime config itself.
-To make them work, a custom mapping module needs to be implemented, which maps each Configuration Parameter from the runtime config module to the correct format of the Configuration Manager.
+These configuration managers have their own configuration structure (custom predefined object models etc.) and can not automatically be mapped to / from the runtime config schemas.
+To make them work, a custom mapping module needs to be implemented per configuration manager, which maps each configuration parameter from the RIOT runtime config module to the correct format of the configuration manager.
 
 ![design_architecture](https://github.com/RIOT-OS/RIOT/assets/10547444/26830a26-882a-422c-ba20-abfa4e07ce8c)
 
-### Namespaces and Storages
+### Configuration Structure
 
-> [!NOTE]
-> Storages are part of a follow-up PR
-
-The Runtime config interacts with RIOT modules via `Configuration Schemas`, and with non-volatile storages via `Storages`.
+The runtime config system interacts with RIOT modules via `Configuration Schemas`, and with non-volatile storages via `Storages`.
 This way the functionality of the Runtime config is independent of the functionality of a `module` or `storage` implementation.
 It is possible to get or set the values of `Configuration Parameters`.
-It is also possible to transactionally apply configurations or export their values to a buffer or print them.
+It is also possible to apply configurations, export their values to a buffer or print them.
 To persist Configuration Values, it is possible to store them in non-volatile storages.
 
 Any mechanism of security (`access control`, `encryption` of configurations) is `not` directly in the scope of the runtime config module but in the Configuration Managers and the specific implementations of the `Configuration Schemas` and `Storages`.
@@ -77,6 +74,10 @@ The `MTD` Storage internally uses the RIOT `MTD` driver and the `VFS` Storage in
 The Runtime config is split into multiple components as can be seen in the graphic below:
 
 #### Runtime Config Core
+
+```makefile
+USEMODULE += runtime_config
+```
 
 This component holds the most basic functionality of the Runtime config.
 It allows to `set` and `get` Configuration Values, transactionally `apply` them to make the changes come into effect and `export` all Configuration Parameters that exist in a given `Configuration Namespace`, `Configuration Schema` or `Configuration Group`.
@@ -115,15 +116,34 @@ This is possible using the `RUNTIME_CONFIG_ADD_NAMESPACE` macro, providing the n
 
 #### Add Configuration Schema Instances
 
-To implement runtime configuration functionality into a module, it is necessary to add a `Configuration Schema Instance` of the needed `Configuration Schema`.
+To expose runtime configurations, it is necessary to add a `Configuration Schema Instance` of the needed `Configuration Schema`.
 
 This is possible using the `runtime_config_add_schema_instance` function, providing the `Configuration Schema` and the `Configuration Schema Instance` as arguments.
 
 ```c
-int runtime_config_add_schema_instance(
-    const runtime_config_schema_t *schema,
-    const runtime_config_schema_instance_t *instance,
-);
+#include "runtime_config.h"
+#include "runtime_config/namespace/sys.h"
+#include "runtime_config/namespace/sys/board_led.h"
+
+static runtime_config_error_t board_led_instance_apply_cb(
+    const runtime_config_group_or_parameter_id_t *group_or_parameter_id,
+    const runtime_config_schema_instance_t *instance)
+{
+    /* Handle configuration changes */
+
+    return 0;
+}
+
+static runtime_config_sys_board_led_instance_t board_led_instance_data = {
+    .enabled = 0,
+};
+
+static runtime_config_schema_instance_t board_led_instance = {
+    .data = &board_led_instance_data,
+    .apply_cb = &board_led_instance_apply_cb,
+};
+
+runtime_config_add_schema_instance(&runtime_config_sys_board_led, &board_led_instance);
 ```
 
 #### Get configurations

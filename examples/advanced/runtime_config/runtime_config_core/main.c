@@ -29,20 +29,6 @@
 #include "runtime_config/namespace/sys/board_led.h"
 #include "ztimer.h"
 
-static runtime_config_error_t board_led_instance_apply_cb(
-    const runtime_config_group_or_parameter_id_t *group_or_parameter_id,
-    const runtime_config_schema_instance_t *instance);
-
-/* This belongs into the BOARD or Driver for example */
-static runtime_config_sys_board_led_instance_t board_led_instance_0_data = {
-    .enabled = 0,
-};
-
-static runtime_config_schema_instance_t board_led_instance = {
-    .data = &board_led_instance_0_data,
-    .apply_cb = &board_led_instance_apply_cb,
-};
-
 /* This callback gets called, when new configurations shall be applied.
  * If interacting with configurations of drivers then this callback should be
  * implemented by the driver itself. For custom application logic, we need to
@@ -71,6 +57,16 @@ static runtime_config_error_t board_led_instance_apply_cb(
 
     return 0;
 }
+
+/* This belongs into the BOARD or Driver for example */
+static runtime_config_sys_board_led_instance_t board_led_instance_data = {
+    .enabled = 0,
+};
+
+static runtime_config_schema_instance_t board_led_instance = {
+    .data = &board_led_instance_data,
+    .apply_cb = &board_led_instance_apply_cb,
+};
 
 /* This belongs into our main application */
 int main(void)
