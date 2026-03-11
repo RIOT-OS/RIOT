@@ -86,6 +86,11 @@ ifeq (1,$(STATIC_ANALYSIS))
   endif
 endif
 
+WRITE_SARIF ?= 0
+ifeq (1,$(WRITE_SARIF))
+  RCFLAGS += $(RCFLAGS_WRITE_SARIF)
+endif
+
 compile-commands: | $(DIRS:%=COMPILE-COMMANDS--%)
 	$(file >$(BINDIR)/$(MODULE)/compile_cmds.txt,SRC: $(sort $(SRC) $(SRC_NO_LTO)))
 	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,SRC_NO_LTO: $(sort $(SRC_NO_LTO)))
@@ -155,7 +160,7 @@ OBJ_DEPS += $(RIOTBUILD_CONFIG_HEADER_C)
 
 $(OBJC): $(BINDIR)/$(MODULE)/%.o: %.c $(OBJ_DEPS) | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
 	$(Q)$(CCACHE) $(CC) \
-		$(CFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
+		$(CFLAGS) $(RCFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
 ifneq (,$(SHOULD_RUN_KCONFIG))
 	$(Q)$(FIXDEP) $(@:.o=.d) $@ $(KCONFIG_SYNC_DIR) > $(@:.o=.tmp)
 	$(Q)mv $(@:.o=.tmp) $(@:.o=.d)
@@ -163,7 +168,7 @@ endif
 
 $(GENOBJC): %.o: %.c $(OBJ_DEPS) | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
 	$(Q) $(CCACHE) $(CC) \
-		$(CFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $<
+		$(CFLAGS) $(RCFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $<
 ifneq (,$(SHOULD_RUN_KCONFIG))
 	$(Q)$(FIXDEP) $(@:.o=.d) $@ $(KCONFIG_SYNC_DIR) > $(@:.o=.tmp)
 	$(Q)mv $(@:.o=.tmp) $(@:.o=.d)
@@ -171,7 +176,7 @@ endif
 
 $(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.$(SRCXXEXT) $(OBJ_DEPS) | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
 	$(Q)$(CCACHE) $(CXX) \
-		$(CXXFLAGS) $(CXXINCLUDES) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
+		$(CXXFLAGS) $(RCFLAGS) $(CXXINCLUDES) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
 ifneq (,$(SHOULD_RUN_KCONFIG))
 	$(Q)$(FIXDEP) $(@:.o=.d) $@ $(KCONFIG_SYNC_DIR) > $(@:.o=.tmp)
 	$(Q)mv $(@:.o=.tmp) $(@:.o=.d)
