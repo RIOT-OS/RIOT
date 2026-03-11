@@ -9,8 +9,8 @@
  * @{
  *
  * @file
- * @brief       RIOT registry core minimal example application to demonstrate
- *              how to use the RIOT registry without any of its extensions.
+ * @brief       Runtime config core minimal example application to demonstrate
+ *              how to use the Runtime config without any of its extensions.
  *
  * @author      Lasse Rosenow <lasse.rosenow@haw-hamburg.de>
  *
@@ -24,21 +24,21 @@
 #include "periph_cpu.h"
 #include "led.h"
 #include "board.h"
-#include "registry.h"
-#include "registry/namespace/sys.h"
-#include "registry/namespace/sys/board_led.h"
+#include "runtime_config.h"
+#include "runtime_config/namespace/sys.h"
+#include "runtime_config/namespace/sys/board_led.h"
 #include "ztimer.h"
 
-static registry_error_t board_led_instance_apply_cb(
-    const registry_group_or_parameter_id_t *group_or_parameter_id,
-    const registry_schema_instance_t *instance);
+static runtime_config_error_t board_led_instance_apply_cb(
+    const runtime_config_group_or_parameter_id_t *group_or_parameter_id,
+    const runtime_config_schema_instance_t *instance);
 
 /* This belongs into the BOARD or Driver for example */
-static registry_sys_board_led_instance_t board_led_instance_0_data = {
+static runtime_config_sys_board_led_instance_t board_led_instance_0_data = {
     .enabled = 0,
 };
 
-static registry_schema_instance_t board_led_instance = {
+static runtime_config_schema_instance_t board_led_instance = {
     .data = &board_led_instance_0_data,
     .apply_cb = &board_led_instance_apply_cb,
 };
@@ -47,16 +47,16 @@ static registry_schema_instance_t board_led_instance = {
  * If interacting with configurations of drivers then this callback should be
  * implemented by the driver itself. For custom application logic, we need to
  * define this for ourselves. */
-static registry_error_t board_led_instance_apply_cb(
-    const registry_group_or_parameter_id_t *group_or_parameter_id,
-    const registry_schema_instance_t *instance)
+static runtime_config_error_t board_led_instance_apply_cb(
+    const runtime_config_group_or_parameter_id_t *group_or_parameter_id,
+    const runtime_config_schema_instance_t *instance)
 {
-    const registry_sys_board_led_instance_t instance_data = *(const registry_sys_board_led_instance_t *)instance->data;
+    const runtime_config_sys_board_led_instance_t instance_data = *(const runtime_config_sys_board_led_instance_t *)instance->data;
 
     /* Either apply all parameters of the instance or only the given parameter.
      * For a single LED there is no difference as it only has one parameter. */
     if ((group_or_parameter_id == NULL) ||
-        (*group_or_parameter_id == REGISTRY_SYS_BOARD_LED_ENABLED)) {
+        (*group_or_parameter_id == RUNTIME_CONFIG_SYS_BOARD_LED_ENABLED)) {
         /* Get the correct field from the instance_data variable */
         bool led_state = instance_data.enabled;
         /* Turn the LED on or off depending on the led_state */
@@ -75,10 +75,10 @@ static registry_error_t board_led_instance_apply_cb(
 /* This belongs into our main application */
 int main(void)
 {
-    registry_init();
+    runtime_config_init();
 
     /* init schemas */
-    registry_add_schema_instance(&registry_sys_board_led, &board_led_instance);
+    runtime_config_add_schema_instance(&runtime_config_sys_board_led, &board_led_instance);
 
     bool board_led_enabled = false;
 
@@ -86,21 +86,21 @@ int main(void)
         /* Invert the BOARD LED, to make it turn on and off on each subsequent cycle */
         board_led_enabled = !board_led_enabled;
 
-        /* Create registry_node_t for the board_led_parameter */
-        const registry_node_t parameter_node = {
-            .type = REGISTRY_NODE_PARAMETER,
+        /* Create runtime_config_node_t for the board_led_parameter */
+        const runtime_config_node_t parameter_node = {
+            .type = RUNTIME_CONFIG_NODE_PARAMETER,
             .value.parameter = {
                 .instance = &board_led_instance,
-                .parameter = &registry_sys_board_led_enabled,
+                .parameter = &runtime_config_sys_board_led_enabled,
             },
         };
 
-        /* Set new registry value */
-        registry_set(&parameter_node, &board_led_enabled, sizeof(board_led_enabled));
+        /* Set new runtime config value */
+        runtime_config_set(&parameter_node, &board_led_enabled, sizeof(board_led_enabled));
 
-        /* Apply the registry value to change the LED state
+        /* Apply the runtime config value to change the LED state
          * (in this case calls the apply_cb function: "board_led_instance_apply_cb") */
-        registry_apply(&parameter_node);
+        runtime_config_apply(&parameter_node);
 
         /* Sleep for 1 second and then do it again*/
         ztimer_sleep(ZTIMER_SEC, 1);
