@@ -162,7 +162,7 @@ typedef enum {
  * in the configuration tree. The schema instance contains the actual values of
  * configuration parameters.
  */
-struct {
+typedef struct {
     runtime_config_node_type_t type; /**< The type of the node */
     union {
         const runtime_config_namespace_t *namespace;      /**< Pointer to the configuration namespace */
@@ -185,7 +185,7 @@ struct {
 /**
  * @brief Basic representation of a configuration parameter value.
  */
-struct {
+typedef struct {
     size_t count;               /**< Number of elements (1 for scalar, >1 for array). */
     runtime_config_type_t type; /**< The type of the configuration parameter value. */
     const void *buf;            /**< Pointer to the buffer containing the value
