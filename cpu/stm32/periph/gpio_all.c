@@ -256,7 +256,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     periph_clk_en(APB2, RCC_APB2ENR_SYSCFGCOMPEN);
 #elif defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32C0)
     periph_clk_en(APB12, RCC_APBENR2_SYSCFGEN);
-#elif defined(CPU_FAM_STM32U5)
+#elif defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32U3)
     periph_clk_en(APB3, RCC_APB3ENR_SYSCFGEN);
 #elif defined(CPU_FAM_STM32H7)
     periph_clk_en(APB4, RCC_APB4ENR_SYSCFGEN);
@@ -361,7 +361,7 @@ void isr_exti(void)
 {
 #if defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5) || \
     defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32MP1) || \
-    defined(CPU_FAM_STM32C0)
+    defined(CPU_FAM_STM32C0) || defined(CPU_FAM_STM32U3)
     /* get all interrupts handled by this ISR */
     uint32_t pending_rising_isr = (EXTI->RPR1 & EXTI_MASK);
     uint32_t pending_falling_isr = (EXTI->FPR1 & EXTI_MASK);
