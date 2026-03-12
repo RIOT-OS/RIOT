@@ -49,18 +49,28 @@ extern runtime_config_schema_t runtime_config_sys_rgb_led;
  * @brief Schema instance struct of a RGB-LED schema.
  */
 typedef struct {
-    uint8_t red;   /**< Red color. */
-    uint8_t green; /**< Green color. */
-    uint8_t blue;  /**< Blue color. */
+    /** Red color. */
+    uint8_t red;
+
+    /** Green color. */
+    uint8_t green;
+
+    /** Blue color. */
+    uint8_t blue;
 } runtime_config_sys_rgb_led_instance_t;
 
 /**
  * @brief Parameter IDs for the RGB-LED schema.
  */
 typedef const enum {
-    RUNTIME_CONFIG_SYS_RGB_LED_RED,   /**< Red color. */
-    RUNTIME_CONFIG_SYS_RGB_LED_GREEN, /**< Green color. */
-    RUNTIME_CONFIG_SYS_RGB_LED_BLUE,  /**< Blue color. */
+    /** Red color. */
+    RUNTIME_CONFIG_SYS_RGB_LED_RED,
+
+    /** Green color. */
+    RUNTIME_CONFIG_SYS_RGB_LED_GREEN,
+
+    /** Blue color. */
+    RUNTIME_CONFIG_SYS_RGB_LED_BLUE,
 } runtime_config_sys_rgb_led_ids_t;
 
 #ifdef __cplusplus

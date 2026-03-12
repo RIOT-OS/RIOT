@@ -39,14 +39,16 @@ extern runtime_config_schema_t runtime_config_sys_board_led;
  * @brief Schema instance data struct of a board LED schema.
  */
 typedef struct {
-    bool enabled; /**< Whether the LED is enabled. */
+    /** Whether the LED is enabled. */
+    bool enabled;
 } runtime_config_sys_board_led_instance_t;
 
 /**
  * @brief Parameter IDs for the board LED schema.
  */
 typedef const enum {
-    RUNTIME_CONFIG_SYS_BOARD_LED_ENABLED, /**< Enabled state. */
+    /** Enabled state. */
+    RUNTIME_CONFIG_SYS_BOARD_LED_ENABLED,
 } runtime_config_sys_board_led_ids_t;
 
 #ifdef __cplusplus
