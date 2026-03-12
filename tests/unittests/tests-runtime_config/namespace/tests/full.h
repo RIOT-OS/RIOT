@@ -40,11 +40,11 @@ extern runtime_config_schema_t runtime_config_tests_full;
 
 typedef struct {
     uint8_t value;
-} runtime_config_tests_full_instance_opaque_t;
+} custom_user_provided_struct_t;
 
 typedef struct {
     clist_node_t node;
-    runtime_config_tests_full_instance_opaque_t opaque;
+    custom_user_provided_struct_t custom_struct;
     char string[50];
     bool boolean;
     uint8_t u8;
