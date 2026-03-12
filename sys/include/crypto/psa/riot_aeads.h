@@ -14,6 +14,8 @@
 extern "C" {
 #endif
 
+#include "kernel_defines.h"
+
 #if IS_USED(MODULE_PSA_RIOT_AEAD_CHACHA20_POLY1305)
 #  if IS_USED(MODULE_PSA_RIOT_CIPHER_CHACHA20)
 #    include "riot_ciphers.h"

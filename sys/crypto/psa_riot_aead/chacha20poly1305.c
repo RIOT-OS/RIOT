@@ -1,3 +1,4 @@
+#include "psa/aead/types.h"
 #include "psa/cipher/types.h"
 #include "psa/error.h"
 #include "crypto/chacha20poly1305.h"
@@ -137,7 +138,7 @@ psa_status_t psa_aead_chacha20_poly1305_update_ad(psa_aead_chacha20_poly1305_ctx
 }
 
 psa_status_t psa_aead_chacha20_poly1305_update(psa_aead_chacha20_poly1305_ctx_t *ctx,
-                                               size_t setup_done,
+                                               psa_aead_operation_state_t op_state,
                                                psa_encrypt_or_decrypt_t direction,
                                                const uint8_t *input,
                                                size_t input_length,
@@ -145,7 +146,7 @@ psa_status_t psa_aead_chacha20_poly1305_update(psa_aead_chacha20_poly1305_ctx_t 
                                                size_t output_size,
                                                size_t *output_length)
 {
-    if (!setup_done) {
+    if (op_state != PSA_AEAD_OP_STATE_MSG_IN) {
         /* When this function is called, no more additional data can be added.
          * So we pad the given ad to a full 16 byte (Poly) block. */
         static const uint8_t padding[15] = { 0 };

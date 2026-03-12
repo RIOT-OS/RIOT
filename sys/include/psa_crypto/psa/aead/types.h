@@ -30,22 +30,31 @@ extern "C" {
 #include "psa/algorithm.h"
 #include "psa/cipher/types.h"
 
+//todo: docs
+// additional information if encryption or decryption and if lengths were set
+typedef enum {
+    PSA_AEAD_OP_STATE_INACTIVE,     /* after init */
+    PSA_AEAD_OP_STATE_LENGTHS_REQ,  /* mostly optinal: only if lengths are required */
+    PSA_AEAD_OP_STATE_NONCE_REQ,    /* awaiting nonce to be set */
+    PSA_AEAD_OP_STATE_AAD_IN,
+    PSA_AEAD_OP_STATE_MSG_IN,
+    PSA_AEAD_OP_STATE_ERROR,        /* after an error occured */
+} psa_aead_operation_state_t;
+
 /**
  * @brief   Structure storing an AEAD operation context
  *
  * @note    Not implemented, yet
  */
 struct psa_aead_operation_s {
-    uint8_t nonce_set : 1;              /**< True if Nonce was already set */
-    uint8_t lengths_set : 1;            /**< True if lengths were already set */
-    uint8_t setup_done : 1;             /**< True if setup is done, eg. update() was called */
+    psa_aead_operation_state_t state;
+    psa_encrypt_or_decrypt_t direction; /**< Direction */
     size_t ad_length;                   /**< Length of additional data */
     size_t processed_ad_length;         /**< Length of already processed additional data */
     size_t message_length;              /**< Length of message data */
     size_t processed_message_length;    /**< Length of already processed message data */
     psa_algorithm_t alg;                /**< Operation algorithm*/
     psa_aead_op_t op;                   /**< Encoded operation */
-    psa_encrypt_or_decrypt_t direction; /**< Direction */
     /** Union containing AEAD cipher contexts for the executing backend */
     union aead_context {
 #if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305) || defined(DOXYGEN)
