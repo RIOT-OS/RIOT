@@ -59,6 +59,7 @@ Checks: "clang-analyzer-*,
          linuxkernel-*,
          -bugprone-reserved-identifier,
          -bugprone-easily-swappable-parameters,
+         -readability-identifier-length,
         "
 WarningsAsErrors: "bugprone-*,
                    portability-*,
