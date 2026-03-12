@@ -351,8 +351,7 @@ AUTO_INIT(psa_crypto_init,
 #endif
 #if IS_USED(MODULE_SLIPMUX) && !IS_USED(MODULE_SLIPDEV_NET)
 extern void slipmux_init(void);
-AUTO_INIT(slipmux_init,
-          AUTO_INIT_PRIO_MOD_SLIPDEV);
+AUTO_INIT(slipmux_init, AUTO_INIT_PRIO_MOD_SLIPDEV);
 #endif
 
 void auto_init(void)
