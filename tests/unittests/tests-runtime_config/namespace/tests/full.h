@@ -39,12 +39,8 @@ extern const runtime_config_parameter_t runtime_config_tests_full_f64;
 extern runtime_config_schema_t runtime_config_tests_full;
 
 typedef struct {
-    uint8_t value;
-} custom_user_provided_struct_t;
-
-typedef struct {
     clist_node_t node;
-    custom_user_provided_struct_t custom_struct;
+    void opaque[10];
     char string[50];
     bool boolean;
     uint8_t u8;
