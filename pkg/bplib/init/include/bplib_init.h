@@ -58,12 +58,12 @@ extern "C" {
 
 /**
  * @brief Stack size of the generic bplib worker thread.
- * From experiments this can be pretty small.
- *
- * This is not currently configurable through Kconfig.
+ * 
+ * On a nRF52840dk, it used around 1400 in one instance, depending on what
+ * the worker does. In another instance the SMALL stacksize was enough.
  */
 #ifndef CONFIG_BPLIB_GENERIC_STACK_SIZE
-#  define CONFIG_BPLIB_GENERIC_STACK_SIZE  THREAD_STACKSIZE_SMALL
+#  define CONFIG_BPLIB_GENERIC_STACK_SIZE  THREAD_STACKSIZE_LARGE
 #endif
 
 /**

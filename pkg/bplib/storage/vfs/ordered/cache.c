@@ -113,7 +113,9 @@ int bplib_cache_get(cache_list_t* cache, char* bundle_path)
 
 void bplib_cache_mark_front_consumed(cache_list_t* cache)
 {
-    (void) clist_lpop(&cache->list);
+    clist_node_t * node = clist_lpop(&cache->list);
+    cache_list_node_t * entry = container_of(node, cache_list_node_t, list);
+    entry->node = 0;
 }
 
 bool bplib_cache_is_empty(cache_list_t* cache)
