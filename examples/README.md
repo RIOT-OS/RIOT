@@ -137,6 +137,7 @@ Here is a quick overview of the examples available in the RIOT:
 | [usbus_minimal](./advanced/usbus_minimal/README.md) | This is a minimalistic example for RIOT's USB stack. |
 | [suit_update](./advanced/advanced/suit_update/README.md) | This example shows how to integrate SUIT-compliant firmware updates into a RIOT application. |
 | [thread_duel](./advanced/thread_duel/README.md) | This is a thread duel application to show RIOTs abilities to run multiple-threads concurrently, even if they are neither cooperative nor dividable into different scheduler priorities, by using the optional round-robin scheduler module. |
+| [modbus_saul](./advanced/modbus_saul/README.md) | This example shows how to build a Modbus RTU server in RIOT together with the SAUL |
 | [posix_select](./advanced/posix_select/README.md) | This example is a showcase for RIOT's POSIX select support |
 | [psa_crypto](./advanced/psa_crypto/README.md) | Basic functions of the PSA Crypto API |
 | [pio_blink](./advanced/pio_blink/README.md) | How to use the PIO peripheral on the RaspberryPi Pico to blink an LED. |
