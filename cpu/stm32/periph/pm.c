@@ -54,7 +54,9 @@
 #define PM_STOP_CONFIG  (PWR_CR1_LPDS | PWR_CR1_FPDS | PWR_CR1_LPUDS)
 #elif defined(CPU_FAM_STM32MP1)
 #define PM_STOP_CONFIG  (0)
-#elif defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32U3)
+#elif defined(CPU_FAM_STM32U3)
+#define PM_STOP_CONFIG  (PWR_CR1_LPMS_0) 
+#elif defined(CPU_FAM_STM32U5) 
 #define PM_STOP_CONFIG  (0)
 #elif defined(CPU_FAM_STM32H7)
 /* Low power deep sleep with SVOS5 Scale 5 and flash in low power mode if in DSTOP */
