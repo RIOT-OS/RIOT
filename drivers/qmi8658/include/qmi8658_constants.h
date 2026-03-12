@@ -22,7 +22,58 @@
 extern "C" {
 #endif
 
-/* define here the addresses, register and constants of the driver */
+/**
+ * @name    QMI8658 registers
+ * @{
+ */
+#define QMI8658_REG_RESET           (0x60)
+#define QMI8658_REG_WHO_AM_I        (0x00)
+#define QMI8658_REG_REVISION_ID     (0x01)
+#define QMI8658_REG_CTRL1           (0x02)
+#define QMI8658_REG_CTRL2           (0x03)
+#define QMI8658_REG_CTRL3           (0x04)
+#define QMI8658_REG_CTRL5           (0x06)
+#define QMI8658_REG_CTRL7           (0x08)
+#define QMI8658_REG_CTRL8           (0x09)
+#define QMI8658_REG_CTRL9           (0x0A)
+#define QMI8658_REG_STATUSINT       (0x2D)
+#define QMI8658_REG_STATUS0         (0x2E)
+#define QMI8658_REG_STATUS1         (0x2F)
+/* Accelerometer output registers */
+#define QMI8658_REG_AX_L            (0x35)
+#define QMI8658_REG_AX_H            (0x36)
+#define QMI8658_REG_AY_L            (0x37)
+#define QMI8658_REG_AY_H            (0x38)
+#define QMI8658_REG_AZ_L            (0x39)
+#define QMI8658_REG_AZ_H            (0x3A)
+/* Gyroscope output registers */
+#define QMI8658_REG_GX_L            (0x3B)
+#define QMI8658_REG_GX_H            (0x3C)
+#define QMI8658_REG_GY_L            (0x3D)
+#define QMI8658_REG_GY_H            (0x3E)
+#define QMI8658_REG_GZ_L            (0x3F)
+#define QMI8658_REG_GZ_H            (0x40)
+
+/**
+ * @name    QMI8658 register values
+ * @{
+ */
+#define QMI8658_RESET_VALUE         (0xB0)
+#define QMI8658_WHO_AM_I_VALUE      (0x05)
+
+/**
+ * @name    Helper masks and offsets
+ * @{
+ */
+#define QMI8658_CTRL_FS_SHIFT       (4)
+#define QMI8658_STATUS0_ACC_MASK    (0x01)
+#define QMI8658_STATUS0_GYRO_MASK   (0x02)
+
+/**
+ * @brief   Reset wait interval in ms
+ */
+#define QMI8658_RESET_WAIT_MS       (15)
+
 
 #ifdef __cplusplus
 }

@@ -30,12 +30,32 @@ extern "C" {
  * @name    Set default configuration parameters
  * @{
  */
-#ifndef QMI8658_PARAM_PARAM1
-#define QMI8658_PARAM_PARAM1
+#ifndef QMI8658_PARAM_I2C
+#define QMI8658_PARAM_I2C       I2C_DEV(0)
+#endif
+#ifndef QMI8658_PARAM_ADDR
+#define QMI8658_PARAM_ADDR      0x6B                        /**< I2C slave address. Set to 0x6A if SDO/SA0 is pulled high */
+#endif
+#ifndef QMI8658_PARAM_ACC_ODR
+#define QMI8658_PARAM_ACC_ODR   QMI8658_DATA_RATE_1KHZ      /**< Acceleromter output data rate.*/
+#endif
+#ifndef QMI8658_PARAM_ACC_FS
+#define QMI8658_PARAM_ACC_FS    QMI8658_ACC_FS_2G           /**< Acceleromter full scale */
+#endif
+#ifndef QMI8658_PARAM_GYRO_ODR
+#define QMI8658_PARAM_GYRO_ODR  QMI8658_DATA_RATE_1KHZ      /**< Gyroscope output data rate */
+#endif
+#ifndef QMI8658_PARAM_GYRO_FS
+#define QMI8658_PARAM_GYRO_FS   QMI8658_GYRO_FS_256DPS      /**< Gyroscope full scale */
 #endif
 
 #ifndef QMI8658_PARAMS
-#define QMI8658_PARAMS
+#define QMI8658_PARAMS      {   .i2c        = QMI8658_PARAM_I2C,        \
+                                .addr       = QMI8658_PARAM_ADDR,       \
+                                .acc_odr    = QMI8658_PARAM_ACC_ODR,    \
+                                .gyro_odr   = QMI8658_PARAM_GYRO_ODR,   \
+                                .acc_fs     = QMI8658_PARAM_ACC_FS,     \
+                                .gyro_fs    = QMI8658_PARAM_GYRO_FS,}
 #endif
 /**@}*/
 
