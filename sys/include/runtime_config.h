@@ -142,13 +142,23 @@ typedef enum {
 /**
  * @brief The type of a runtime config node.
  *
- * A runtime config node points to a namespace, schema, instance, group or parameter.
+ * A runtime config node points to a namespace, schema, instance, group or
+ * parameter.
  */
 typedef enum {
+    /** The node points to @p runtime_config_namespace_t */
     RUNTIME_CONFIG_NODE_NAMESPACE = 0,
+
+    /** The node points to @p runtime_config_schema_t */
     RUNTIME_CONFIG_NODE_SCHEMA,
+
+    /** The node points to @p runtime_config_schema_instance_t */
     RUNTIME_CONFIG_NODE_INSTANCE,
+
+    /** The node points to @p runtime_config_group_t */
     RUNTIME_CONFIG_NODE_GROUP,
+
+    /** The node points to @p runtime_config_parameter_t */
     RUNTIME_CONFIG_NODE_PARAMETER,
 } runtime_config_node_type_t;
 
@@ -157,40 +167,62 @@ typedef enum {
  * runtime configuration tree.
  *
  * It can point to a namespace, schema, instance, group or parameter.
- * The configuration group and the configuration parameter contain a pointer to a
- * schema instance, because they are children of a specific schema instance
+ * The configuration group and the configuration parameter contain a pointer to
+ * a schema instance, because they are children of a specific schema instance
  * in the configuration tree. The schema instance contains the actual values of
  * configuration parameters.
  */
 typedef struct {
-    runtime_config_node_type_t type; /**< The type of the node */
+    /** The type of the node */
+    runtime_config_node_type_t type;
+
+    /** The location inside of the configuration tree */
     union {
-        const runtime_config_namespace_t *namespace;      /**< Pointer to the configuration namespace */
-        const runtime_config_schema_t *schema;            /**< Pointer to a configuration schema */
-        const runtime_config_schema_instance_t *instance; /**< Pointer to a schema instance */
+        /** Pointer to the configuration namespace */
+        const runtime_config_namespace_t *namespace;
+
+        /** Pointer to a configuration schema */
+        const runtime_config_schema_t *schema;
+
+        /** Pointer to a schema instance */
+        const runtime_config_schema_instance_t *instance;
+
+        /** A configuration group depends on an instance */
         struct {
-            const runtime_config_schema_instance_t *instance; /**< Pointer to a schema instance */
-            const runtime_config_group_t *group;              /**< Pointer to a configuration group */
-        } group;                                              /**< A configuration group
-                                                      depends on an instance */
+            /** Pointer to a schema instance */
+            const runtime_config_schema_instance_t *instance;
+
+            /** Pointer to a configuration group */
+            const runtime_config_group_t *group;
+        } group;
+
+        /** A configuration parameter depends on an instance */
         struct {
-            const runtime_config_schema_instance_t *instance; /**< Pointer to a schema instance */
-            const runtime_config_parameter_t *parameter;      /**< Pointer to a configuration parameter */
-        } parameter;                                          /**< A configuration parameter
-                                                        depends on an instance */
-    } value;                                                  /**< The location inside of the
-                                                        configuration tree */
+            /** Pointer to a schema instance */
+            const runtime_config_schema_instance_t *instance;
+
+            /** Pointer to a configuration parameter */
+            const runtime_config_parameter_t *parameter;
+        } parameter;
+
+    } value;
 } runtime_config_node_t;
 
 /**
  * @brief Basic representation of a configuration parameter value.
  */
 typedef struct {
-    size_t count;               /**< Number of elements (1 for scalar, >1 for array). */
-    runtime_config_type_t type; /**< The type of the configuration parameter value. */
-    const void *buf;            /**< Pointer to the buffer containing the value
-                               of the configuration parameter. */
-    size_t buf_len;             /**< Length of the buffer. */
+    /** Number of elements (1 for scalar, >1 for array). */
+    size_t count;
+
+    /** The type of the configuration parameter value. */
+    runtime_config_type_t type;
+
+    /** Pointer to the buffer containing the value of the configuration parameter. */
+    const void *buf;
+
+    /** Length of the buffer. */
+    size_t buf_len;
 } runtime_config_value_t;
 
 /**
@@ -207,11 +239,12 @@ typedef struct {
  * at the same time, otherwise the RGB-LED will be purple for a short period
  * of time.
  *
- * @param[in] group_or_parameter_id Optional ID of the group or parameter to apply changes to,
- *                                  applies the whole instance on NULL.
+ * @param[in] group_or_parameter_id Optional ID of the group or parameter to
+ *                                  apply changes to, applies the whole instance
+ *                                  on NULL.
  * @param[in] instance Pointer to the schema instance that will be applied.
- *                     Contains a context object and a pointer to the data struct
- *                     that contains the configuration parameter values.
+ *                     Contains a context object and a pointer to the data
+ *                     struct that contains the configuration parameter values.
  *
  * @return 0 on success, non-zero on failure.
  */
@@ -228,52 +261,71 @@ typedef runtime_config_error_t (*runtime_config_apply_cb_t)(
  * function to get informed when configuration changes.
  */
 struct runtime_config_schema_instance {
-    clist_node_t node;                            /**< Linked list node pointing to
-                                                 the next schema instance. */
-    const runtime_config_schema_instance_id_t id; /**< ID of the instance within
-                                                 the scope of it's schema */
+    /** Linked list node pointing to the next schema instance. */
+    clist_node_t node;
+
+    /** ID of the instance within the scope of it's schema */
+    const runtime_config_schema_instance_id_t id;
+
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
-    const char *const name; /**< String describing the instance. */
-#endif                      /* RUNTIME_CONFIG_ENABLE_META_NAME */
+    /** String describing the instance. */
+    const char *const name;
+#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
+
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
-    const char *const description;         /**< String describing the configuration group
-                                          with more details. */
-#endif                                     /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
-    const void *const data;                /**< Generated struct containing all
-                                          configuration parameters of the schema.
-                                          Usually generated from schema YAML
-                                          files using the "make runtime_config generate"
-                                          command. */
-    const runtime_config_schema_t *schema; /**< Configuration schema that the
-                                          instance belongs to. */
-    runtime_config_apply_cb_t apply_cb;    /**< Will be called when @ref runtime_config_apply()
-                                          was called on this instance. */
-    void *context;                         /**< Optional context used by the instance */
+    /** String describing the configuration group with more details. */
+    const char *const description;
+#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+
+    /** Generated struct containing all configuration parameters of the schema.
+     * Usually generated from schema YAML files using the "make runtime_config
+     * generate" command. */
+    const void *const data;
+
+    /** Configuration schema that the instance belongs to. */
+    const runtime_config_schema_t *schema;
+
+    /** Will be called when @ref runtime_config_apply() was called on this instance. */
+    runtime_config_apply_cb_t apply_cb;
+
+    /** Optional context used by the instance */
+    void *context;
 };
 
 /**
  * @brief Data structure of a configuration group.
  *
- * A configuration group contains further configuration groups and/or configuration parameters.
- * It has an ID that is unique within the scope of its parent configuration schema.
+ * A configuration group contains further configuration groups and/or
+ * configuration parameters. It has an ID that is unique within the scope
+ * of its parent configuration schema.
  */
 struct runtime_config_group {
-    const runtime_config_group_id_t id; /**< Integer representing the ID of the configuration group. */
+    /** Integer representing the ID of the configuration group. */
+    const runtime_config_group_id_t id;
+
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
-    const char *const name; /**< String describing the configuration group. */
-#endif                      /* RUNTIME_CONFIG_ENABLE_META_NAME */
+    /** String describing the configuration group. */
+    const char *const name;
+#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
-    const char *const description;                       /**< String describing the configuration group
-                                                        with more details. */
-#endif                                                   /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
-    const runtime_config_schema_t *const schema;         /**< Configuration schema that the
-                                                        configuration group belongs to. */
-    const runtime_config_group_t **const groups;         /**< Array of pointers to all the configuration
-                                                        groups that belong to this group. */
-    const size_t groups_len;                             /**< Size of groups array. */
-    const runtime_config_parameter_t **const parameters; /**< Array of pointers to all the configuration
-                                                        parameters that belong to this group. */
-    const size_t parameters_len;                         /**< Size of parameters array. */
+    /** String describing the configuration group with more details. */
+    const char *const description;
+#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+
+    /** Configuration schema that the configuration group belongs to. */
+    const runtime_config_schema_t *const schema;
+
+    /** Array of pointers to all the configuration groups that belong to this group. */
+    const runtime_config_group_t **const groups;
+
+    /** Size of groups array. */
+    const size_t groups_len;
+
+    /** Array of pointers to all the configuration parameters that belong to this group. */
+    const runtime_config_parameter_t **const parameters;
+
+    /** Size of parameters array. */
+    const size_t parameters_len;
 };
 
 /**
@@ -283,19 +335,27 @@ struct runtime_config_group {
  * It has an ID that is unique within the scope of its parent configuration schema.
  */
 struct runtime_config_parameter {
-    const runtime_config_parameter_id_t id; /**< Integer representing the ID of
-                                           the configuration parameter. */
+    /** Integer representing the ID of the configuration parameter. */
+    const runtime_config_parameter_id_t id;
+
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
-    const char *const name; /**< String describing the configuration parameter. */
-#endif                      /* RUNTIME_CONFIG_ENABLE_META_NAME */
+    /** String describing the configuration parameter. */
+    const char *const name;
+#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
+
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
-    const char *const description;               /**< String describing the configuration
-                                                parameter with more details. */
-#endif                                           /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
-    const runtime_config_schema_t *const schema; /**< Configuration Schema that the
-                                                configuration parameter belongs to. */
-    const runtime_config_type_t type;            /**< Type of the configuration parameter. */
-    const size_t count;                          /**< Number of elements (1 for scalar, >1 for array). */
+    /** String describing the configuration parameter with more details. */
+    const char *const description;
+#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+
+    /** Configuration Schema that the configuration parameter belongs to. */
+    const runtime_config_schema_t *const schema;
+
+    /** Type of the configuration parameter. */
+    const runtime_config_type_t type;
+
+    /** Number of elements (1 for scalar, >1 for array). */
+    const size_t count;
 };
 
 /**
@@ -308,24 +368,34 @@ struct runtime_config_parameter {
  * It has an ID that is unique within the scope of its parent configuration namespace.
  */
 struct runtime_config_schema {
-    const runtime_config_schema_id_t id; /**< Integer representing the ID of the schema. */
+    /** Integer representing the ID of the schema. */
+    const runtime_config_schema_id_t id;
+
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
-    const char *const name; /**< String describing the schema. */
-#endif                      /* RUNTIME_CONFIG_ENABLE_META_NAME */
+    /** String describing the schema. */
+    const char *const name;
+#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
-    const char *const description;                       /**< String describing the schema with
-                                                        more details. */
-#endif                                                   /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
-    const runtime_config_namespace_t *const namespace;   /**< Configuration Namespace that the
-                                                        Configuration Schema belongs to. */
-    clist_node_t instances;                              /**< Linked list of schema instances
-                                                        @ref runtime_config_schema_instance_t. */
-    const runtime_config_group_t **const groups;         /**< Array of pointers to all the configuration
-                                                        groups that belong to this schema. */
-    const size_t groups_len;                             /**< Size of groups array. */
-    const runtime_config_parameter_t **const parameters; /**< Array of pointers to all the configuration
-                                                        parameters that belong to this schema. */
-    const size_t parameters_len;                         /**< Size of parameters array. */
+    /** String describing the schema with more details. */
+    const char *const description;
+#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+       /** Configuration Namespace that the Configuration Schema belongs to. */
+    const runtime_config_namespace_t *const namespace;
+
+    /** Linked list of schema instances @ref runtime_config_schema_instance_t. */
+    clist_node_t instances;
+
+    /** Array of pointers to all the configuration groups that belong to this schema. */
+    const runtime_config_group_t **const groups;
+
+    /** Size of groups array. */
+    const size_t groups_len;
+
+    /** Array of pointers to all the configuration parameters that belong to this schema. */
+    const runtime_config_parameter_t **const parameters;
+
+    /** Size of parameters array. */
+    const size_t parameters_len;
 
     /**
      * @brief Get the value of a configuration parameter of a specific schema
@@ -360,17 +430,24 @@ struct runtime_config_schema {
  * It has an ID that is unique within the scope of the Runtime config itself.
  */
 struct runtime_config_namespace {
-    const runtime_config_namespace_id_t id; /**< Integer representing the ID of the namespace. */
+    /** Integer representing the ID of the namespace. */
+    const runtime_config_namespace_id_t id;
+
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
-    const char *const name; /**< String describing the configuration namespace. */
-#endif                      /* RUNTIME_CONFIG_ENABLE_META_NAME */
+    /** String describing the configuration namespace. */
+    const char *const name;
+#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
+
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
-    const char *const description;                 /**< String describing the configuration
-                                                  namespace with more details. */
-#endif                                             /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
-    const runtime_config_schema_t **const schemas; /**< Array of pointers to all the configuration
-                                                  schemas that belong to this namespace. */
-    const size_t schemas_len;                      /**< Size of schemas array. */
+    /** String describing the configuration namespace with more details. */
+    const char *const description;
+#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+
+    /** Array of pointers to all the configuration schemas that belong to this namespace. */
+    const runtime_config_schema_t **const schemas;
+
+    /** Size of schemas array. */
+    const size_t schemas_len;
 };
 
 /**
