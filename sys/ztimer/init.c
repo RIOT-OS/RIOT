@@ -384,7 +384,7 @@ void ztimer_init(void)
 
     /* warm-up time if set and needed */
     if (IS_USED(MODULE_ZTIMER_AUTO_ADJUST) &&
-        !(CONFIG_ZTIMER_USEC_ADJUST_SET && CONFIG_ZTIMER_USEC_ADJUST_SLEEP)) {
+        !(CONFIG_ZTIMER_USEC_ADJUST_SET != 0 && CONFIG_ZTIMER_USEC_ADJUST_SLEEP != 0)) {
         if (CONFIG_ZTIMER_AUTO_ADJUST_SETTLE) {
             ztimer_sleep(ZTIMER_USEC, CONFIG_ZTIMER_AUTO_ADJUST_SETTLE);
         }
@@ -398,7 +398,7 @@ void ztimer_init(void)
 #  endif
 
     /* calculate or set 'adjust_set' */
-    if (CONFIG_ZTIMER_USEC_ADJUST_SET) {
+    if (CONFIG_ZTIMER_USEC_ADJUST_SET != 0) {
         ZTIMER_USEC->adjust_set = CONFIG_ZTIMER_USEC_ADJUST_SET;
     }
     else if (IS_USED(MODULE_ZTIMER_AUTO_ADJUST)) {
@@ -411,7 +411,7 @@ void ztimer_init(void)
     }
 
     /* calculate or set 'adjust_sleep' */
-    if (CONFIG_ZTIMER_USEC_ADJUST_SLEEP) {
+    if (CONFIG_ZTIMER_USEC_ADJUST_SLEEP != 0) {
         ZTIMER_USEC->adjust_sleep = CONFIG_ZTIMER_USEC_ADJUST_SLEEP;
     }
     else if (IS_USED(MODULE_ZTIMER_AUTO_ADJUST)) {
