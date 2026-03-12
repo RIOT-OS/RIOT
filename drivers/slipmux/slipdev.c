@@ -43,7 +43,6 @@ void slipdev_setup_coap(slipdev_t *dev);
 /* For synchronization between stdio/config/net threads */
 mutex_t slipdev_mutex = MUTEX_INIT;
 
-
 static inline void _slipdev_stdio_add_to_frame(slipdev_t *dev, uint8_t byte)
 {
     if (!IS_USED(MODULE_SLIPDEV_STDIO) ||
@@ -314,7 +313,7 @@ void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index
 
     if (IS_USED(MODULE_SLIPDEV_NET)) {
         slipdev_setup_net(dev, index);
-    } 
+    }
     else {
         if (uart_init(dev->config.uart, dev->config.baudrate, _slip_rx_cb,
                       dev) != UART_OK) {
