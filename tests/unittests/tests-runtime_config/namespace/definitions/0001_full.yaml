@@ -4,9 +4,9 @@ name: rgb
 description: Representation of an rgb color.
 items:
   - id: 0
-    name: opaque
-    description: Opaque data type property.
-    type: opaque
+    name: bytes
+    description: Bytes data type property.
+    type: bytes
     size: 50
 
   - id: 1

@@ -23,7 +23,7 @@ extern "C" {
 #include "runtime_config.h"
 
 /* FULL */
-extern const runtime_config_parameter_t runtime_config_tests_full_opaque;
+extern const runtime_config_parameter_t runtime_config_tests_full_bytes;
 extern const runtime_config_parameter_t runtime_config_tests_full_string;
 extern const runtime_config_parameter_t runtime_config_tests_full_boolean;
 extern const runtime_config_parameter_t runtime_config_tests_full_u8;
@@ -40,7 +40,7 @@ extern runtime_config_schema_t runtime_config_tests_full;
 
 typedef struct {
     clist_node_t node;
-    void opaque[10];
+    void bytes[10];
     char string[50];
     bool boolean;
     uint8_t u8;
@@ -56,7 +56,7 @@ typedef struct {
 } runtime_config_tests_full_instance_t;
 
 typedef enum {
-    RUNTIME_CONFIG_TESTS_FULL_OPAQUE,
+    RUNTIME_CONFIG_TESTS_FULL_BYTES,
     RUNTIME_CONFIG_TESTS_FULL_STRING,
     RUNTIME_CONFIG_TESTS_FULL_BOOLEAN,
     RUNTIME_CONFIG_TESTS_FULL_U8,

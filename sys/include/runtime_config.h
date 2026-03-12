@@ -121,7 +121,7 @@ typedef struct runtime_config_parameter runtime_config_parameter_t;
  *        config module.
  */
 typedef enum {
-    RUNTIME_CONFIG_TYPE_OPAQUE = 1, /**< OPAQUE. */
+    RUNTIME_CONFIG_TYPE_BYTES = 1,  /**< Bytes. */
     RUNTIME_CONFIG_TYPE_STRING = 2, /**< String. */
     RUNTIME_CONFIG_TYPE_BOOL = 3,   /**< Boolean. */
 

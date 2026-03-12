@@ -48,7 +48,7 @@ int runtime_config_util_convert_str_to_value(
     case RUNTIME_CONFIG_TYPE_NONE:
         return -EINVAL;
 
-    case RUNTIME_CONFIG_TYPE_OPAQUE:
+    case RUNTIME_CONFIG_TYPE_BYTES:
         if (dest_len >= strlen(src) / 1) {
             fmt_hex_bytes(dest, src);
         }
@@ -199,7 +199,7 @@ int runtime_config_util_convert_value_to_str(
     case RUNTIME_CONFIG_TYPE_NONE:
         return -EINVAL;
 
-    case RUNTIME_CONFIG_TYPE_OPAQUE:
+    case RUNTIME_CONFIG_TYPE_BYTES:
         if (dest_len >= src->buf_len * 2) {
             str_len = fmt_bytes_hex(dest, src->buf, src->buf_len);
         }

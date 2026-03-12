@@ -40,9 +40,9 @@ static void _get_parameter_value_from_instance(
         (runtime_config_tests_full_instance_t *)instance->data;
 
     switch (parameter_id) {
-    case RUNTIME_CONFIG_TESTS_FULL_OPAQUE:
-        *val = &_instance->opaque;
-        *val_len = sizeof(_instance->opaque);
+    case RUNTIME_CONFIG_TESTS_FULL_BYTES:
+        *val = &_instance->bytes;
+        *val_len = sizeof(_instance->bytes);
         break;
 
     case RUNTIME_CONFIG_TESTS_FULL_STRING:
@@ -108,16 +108,16 @@ static void _get_parameter_value_from_instance(
 }
 
 /* Schema parameters */
-const runtime_config_parameter_t runtime_config_tests_full_opaque = {
-    .id = RUNTIME_CONFIG_TESTS_FULL_OPAQUE,
+const runtime_config_parameter_t runtime_config_tests_full_bytes = {
+    .id = RUNTIME_CONFIG_TESTS_FULL_BYTES,
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
-    .name = "opaque",
+    .name = "bytes",
 #endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
 #endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_tests_full,
-    .type = RUNTIME_CONFIG_TYPE_OPAQUE,
+    .type = RUNTIME_CONFIG_TYPE_BYTES,
     .count = 1,
 };
 
@@ -291,7 +291,7 @@ runtime_config_schema_t runtime_config_tests_full = {
     .groups = NULL,
     .groups_len = 0,
     .parameters = (const runtime_config_parameter_t *[]){
-        &runtime_config_tests_full_opaque,
+        &runtime_config_tests_full_bytes,
         &runtime_config_tests_full_string,
         &runtime_config_tests_full_boolean,
         &runtime_config_tests_full_u8,
