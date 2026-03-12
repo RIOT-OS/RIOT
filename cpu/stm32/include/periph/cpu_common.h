@@ -218,7 +218,8 @@ typedef enum {
     AHB1,           /**< AHB1 bus */
 #endif
 #if defined(AHB12_PERIPH_EN)
-    AHB12,           /**< AHB1 bus */
+    AHB12,           /**< AHB12 bus */
+#endif
 #if defined(AHB2_PERIPH_EN)
     AHB2,           /**< AHB2 bus */
 #endif
