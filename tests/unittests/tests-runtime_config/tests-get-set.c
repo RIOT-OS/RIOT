@@ -34,7 +34,8 @@
 #include "namespace/tests.h"
 #include "namespace/tests/full.h"
 
-#define FLOAT_MAX_CHAR_COUNT  ((FLT_MAX_10_EXP + 1) + 1 + 1 + 6) // (FLT_MAX_10_EXP + 1) + sign + dot + 6 decimal places
+/* (FLT_MAX_10_EXP + 1) + sign + dot + 6 decimal places */
+#define FLOAT_MAX_CHAR_COUNT  ((FLT_MAX_10_EXP + 1) + 1 + 1 + 6) 
 #define DOUBLE_MAX_CHAR_COUNT ((DBL_MAX_10_EXP + 1) + 1 + 1 + 6) // (DBL_MAX_10_EXP + 1) + sign + dot + 6 decimal places
 
 static runtime_config_error_t apply_cb(
@@ -368,7 +369,7 @@ static void tests_runtime_config_zero_values(void)
     TEST_ASSERT_EQUAL_STRING(input_f64_string, output_f64_string);
 }
 
-static void tests_runtime_config_max_values(void)
+static void tests_runtime_config_ensure_that_max_values_can_be_set_and_get(void)
 {
     runtime_config_value_t output;
 
@@ -378,17 +379,19 @@ static void tests_runtime_config_max_values(void)
     };
 
     /* opaque */
-    const runtime_config_tests_full_instance_opaque_t input_opaque = {
-        .value = UINT8_MAX,
+    const struct custom_struct_one_field_t = {
+       uint8_t foo;
     };
 
-    node.value.parameter.parameter = &runtime_config_tests_full_opaque;
+    struct custom_struct_one_field_t custom_data_short = {foo = UINT8_MAX};
+    
+    node.value.parameter.parameter = &custom_struct_one_field_t;
 
-    runtime_config_set(&node, &input_opaque, sizeof(input_opaque));
+    runtime_config_set(&node, &custom_data_short, sizeof(custom_data_short));
     runtime_config_get(&node, &output);
 
-    TEST_ASSERT_EQUAL_INT(input_opaque.value,
-                          ((runtime_config_tests_full_instance_opaque_t *)output.buf)->value);
+    TEST_ASSERT_EQUAL_INT(UINT8_MAX,
+                          ((custom_struct_one_field_t *)output.buf)->foo);
 
     /* string */
     char input_string[sizeof(test_full_instance_1_data.string)] = { 0 };
