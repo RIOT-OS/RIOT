@@ -91,11 +91,11 @@ typedef runtime_config_group_or_parameter_id_t runtime_config_group_id_t;
 typedef runtime_config_group_or_parameter_id_t runtime_config_parameter_id_t;
 
 /** @cond INTERNAL */
-typedef struct _runtime_config_namespace_t runtime_config_namespace_t;
-typedef struct _runtime_config_schema_t runtime_config_schema_t;
-typedef struct _runtime_config_schema_instance_t runtime_config_schema_instance_t;
-typedef struct _runtime_config_group_t runtime_config_group_t;
-typedef struct _runtime_config_parameter_t runtime_config_parameter_t;
+typedef struct runtime_config_namespace runtime_config_namespace_t;
+typedef struct runtime_config_schema runtime_config_schema_t;
+typedef struct runtime_config_schema_instance runtime_config_schema_instance_t;
+typedef struct runtime_config_group runtime_config_group_t;
+typedef struct runtime_config_parameter runtime_config_parameter_t;
 /** @endcond */
 
 /**
@@ -209,7 +209,7 @@ typedef runtime_config_error_t (*runtime_config_apply_cb_t)(
  * The consumers also need to implement the @p apply_cb
  * function to get informed when configuration changes.
  */
-typedef struct _runtime_config_schema_instance_t {
+typedef struct runtime_config_schema_instance {
     clist_node_t node;                            /**< Linked list node pointing to
                                                  the next schema instance. */
     const runtime_config_schema_instance_id_t id; /**< ID of the instance within
@@ -239,7 +239,7 @@ typedef struct _runtime_config_schema_instance_t {
  * A configuration group contains further configuration groups and/or configuration parameters.
  * It has an ID that is unique within the scope of its parent configuration schema.
  */
-typedef struct _runtime_config_group_t {
+typedef struct runtime_config_group {
     const runtime_config_group_id_t id; /**< Integer representing the ID of the configuration group. */
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     const char *const name; /**< String describing the configuration group. */
@@ -264,7 +264,7 @@ typedef struct _runtime_config_group_t {
  * A configuration parameter mostly holds the type information for a configuration value.
  * It has an ID that is unique within the scope of its parent configuration schema.
  */
-typedef struct _runtime_config_parameter_t {
+typedef struct runtime_config_parameter {
     const runtime_config_parameter_id_t id; /**< Integer representing the ID of
                                            the configuration parameter. */
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
@@ -289,7 +289,7 @@ typedef struct _runtime_config_parameter_t {
  * configuration parameter values.
  * It has an ID that is unique within the scope of its parent configuration namespace.
  */
-typedef struct _runtime_config_schema_t {
+typedef struct runtime_config_schema {
     const runtime_config_schema_id_t id; /**< Integer representing the ID of the schema. */
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     const char *const name; /**< String describing the schema. */
@@ -341,7 +341,7 @@ typedef struct _runtime_config_schema_t {
  * and schemas defined by applications running on RIOT.
  * It has an ID that is unique within the scope of the Runtime config itself.
  */
-typedef struct _runtime_config_namespace_t {
+typedef struct runtime_config_namespace {
     const runtime_config_namespace_id_t id; /**< Integer representing the ID of the namespace. */
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     const char *const name; /**< String describing the configuration namespace. */
