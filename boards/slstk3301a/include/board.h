@@ -33,7 +33,7 @@ extern "C" {
  * LETIMER is used.
  * @{
  */
-#if IS_ACTIVE(CONFIG_EFM32_XTIMER_USE_LETIMER)
+#if IS_ACTIVE(CONFIG_EFM32_ZTIMER_USE_LETIMER)
 #  define CONFIG_ZTIMER_USEC_DEV            (TIMER_DEV(1))  /**< Timer peripheral for ztimer */
 #  define CONFIG_ZTIMER_USEC_BASE_FREQ      (32768UL)       /**< Running at 32.768 kHz */
 #  define CONFIG_ZTIMER_USEC_WIDTH          (16)            /**< Running on a 16-bit timer */

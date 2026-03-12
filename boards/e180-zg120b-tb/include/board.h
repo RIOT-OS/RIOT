@@ -20,28 +20,32 @@
 #include "periph_conf.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
+#include "periph/timer.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @name    Xtimer configuration
+ * @name    ztimer configuration
  *
  * The timer runs at 250 kHz to increase accuracy, or at 32.768 kHz if
  * LETIMER is used.
  * @{
  */
-#if IS_ACTIVE(CONFIG_EFM32_XTIMER_USE_LETIMER)
-#define XTIMER_DEV          (TIMER_DEV(1))
-#define XTIMER_HZ           (32768UL)
-#define XTIMER_WIDTH        (16)
+#if IS_ACTIVE(CONFIG_EFM32_ZTIMER_USE_LETIMER)
+#  define CONFIG_ZTIMER_USEC_DEV            (TIMER_DEV(1))  /**< Timer peripheral for ztimer */
+#  define CONFIG_ZTIMER_USEC_BASE_FREQ      (32768UL)       /**< Running at 32.768 kHz */
+#  define CONFIG_ZTIMER_USEC_WIDTH          (16)            /**< Running on a 16-bit timer */
+#  define CONFIG_ZTIMER_USEC_ADJUST_SET     (37)            /**< Overhead for ztimer_set */
+#  define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   (37)            /**< Overhead for ztimer_sleep */
 #else
-#define XTIMER_DEV          (TIMER_DEV(0))
-#define XTIMER_HZ           (250000UL)
-#define XTIMER_WIDTH        (16)
+#  define CONFIG_ZTIMER_USEC_DEV            (TIMER_DEV(0))  /**< Timer peripheral for ztimer */
+#  define CONFIG_ZTIMER_USEC_BASE_FREQ      (250000UL)      /**< Running at 250 kHz */
+#  define CONFIG_ZTIMER_USEC_WIDTH          (16)            /**< Running on a 16-bit timer */
+#  define CONFIG_ZTIMER_USEC_ADJUST_SET     (24)            /**< Overhead for ztimer_set */
+#  define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   (24)            /**< Overhead for ztimer_sleep */
 #endif
-#define XTIMER_CHAN         (0)
 /** @} */
 
 /**

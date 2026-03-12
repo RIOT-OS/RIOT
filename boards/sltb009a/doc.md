@@ -77,8 +77,9 @@ PIN 1 is the top-left contact.
 | RTT         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
 | RTC         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
 | SPI         | 0       | USART3     | MOSI:PA0, MISO:PA1, CLK:PA2 |                          |
-| Timer       | 0       | TIMER0 + TIMER1 |             | TIMER0 is used as prescaler         |
-| Timer       | 1       | LETIMER0   |                  |                                     |
+| Timer       | 0       | WTIMER0 + WTIMER1 |           | WTIMER0 is used as prescaler        |
+| Timer       | 1       | TIMER0 + TIMER1   |           | TIMER0 is used as prescaler         |
+| Timer       | 2       | LETIMER0   |                  |                                     |
 | UART        | 0       | USART0     | RX:PE6, TX:PE7   | Default STDIO                       |
 | UART        | 1       | UART0      | RX:PC5, TX:PC4   |                                     |
 
