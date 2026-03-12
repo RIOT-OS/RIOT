@@ -30,6 +30,7 @@ extern "C" {
  * @brief   Enable sensor flags
  */
 enum {
+    QMI8658_DISABLE_ALL = 0,
     QMI8658_ENABLE_ACC  = 1,
     QMI8658_ENABLE_GYRO = 2
 };
@@ -122,7 +123,7 @@ int qmi8658_init(qmi8658_t *dev, const qmi8658_params_t *params);
  *
  * @param[inout] dev                Device descriptor of the driver
  * @param[in]    sensor_flags       Bitstring containing flags of all sensors that should be enabled 
- *                                  Options: (QMI8658_ENABLE_ACC, QMI8658_ENABLE_GYRO)
+ *                                  Options: (QMI8658_ENABLE_ACC, QMI8658_ENABLE_GYRO, QMI8658_DISABLE_ALL)
  *
  * @warning                         Sensors that are not explicity given in @p sensor_flags will be disabled
  *
@@ -142,6 +143,30 @@ int qmi8658_enable_sensors(qmi8658_t* dev, uint8_t sensor_flags);
  * @return -ENODATA if no new data available
  */
 int qmi8658_read_acc(const qmi8658_t *dev, qmi8658_3d_data_t *data);
+
+/**
+ * @brief   Read gyroscope data in dps
+ *
+ * @param[in] dev    Device descriptor of the driver
+ * @param[out] data  Gyroscope data buffer
+ *
+ * @return 0 on success
+ * @return -EIO on i2c communication error
+ * @return -ENODATA if no new data available
+ */
+int qmi8658_read_gyro(const qmi8658_t *dev, qmi8658_3d_data_t *data);
+
+/**
+ * @brief   Read temperature data in degC x 100
+ *
+ * @param[in] dev    Device descriptor of the driver
+ * @param[out] data  Temperature data buffer
+ *
+ * @return 0 on success
+ * @return -EIO on i2c communication error
+ * @return -ENODATA if no new data available
+ */
+int qmi8658_read_temp(const qmi8658_t *dev, int16_t *data);
 
 #ifdef __cplusplus
 }

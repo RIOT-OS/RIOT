@@ -39,6 +39,9 @@ extern "C" {
 #define QMI8658_REG_STATUSINT       (0x2D)
 #define QMI8658_REG_STATUS0         (0x2E)
 #define QMI8658_REG_STATUS1         (0x2F)
+/* Temperature output registers */
+#define QMI8658_REG_TEMP_L          (0x33)
+#define QMI8658_REG_TEMP_H          (0x34)
 /* Accelerometer output registers */
 #define QMI8658_REG_AX_L            (0x35)
 #define QMI8658_REG_AX_H            (0x36)
@@ -62,18 +65,27 @@ extern "C" {
 #define QMI8658_WHO_AM_I_VALUE      (0x05)
 
 /**
- * @name    Helper masks and offsets
- * @{
- */
-#define QMI8658_CTRL_FS_SHIFT       (4)
-#define QMI8658_STATUS0_ACC_MASK    (0x01)
-#define QMI8658_STATUS0_GYRO_MASK   (0x02)
+* @name    Helper masks and offsets
+* @{
+*/
+#define QMI8658_CTRL_FS_SHIFT           (4)
+#define QMI8658_CTRL1_ADDR_AI_MASK      (1 << 6)
+#define QMI8658_STATUS0_ACC_MASK        (1 << 0)
+#define QMI8658_STATUS0_GYRO_MASK       (1 << 1)
+#define QMI8658_TEMP_SCALE_FACTOR       (256)
 
 /**
  * @brief   Reset wait interval in ms
  */
 #define QMI8658_RESET_WAIT_MS       (15)
 
+/**
+ * @brief   Sensor IDs
+*/
+enum {
+    QMI8658_SENSOR_ACC = 0,
+    QMI8658_SENSOR_GYRO
+};
 
 #ifdef __cplusplus
 }
