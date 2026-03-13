@@ -86,6 +86,7 @@ runtime_config_error_t runtime_config_set(const runtime_config_node_t *node, con
 {
     assert(node != NULL);
     assert(buf != NULL);
+    assert(buf_len > 0);
 
     if (node->type != RUNTIME_CONFIG_NODE_PARAMETER) {
         return -RUNTIME_CONFIG_ERROR_NODE_INVALID;
@@ -113,6 +114,7 @@ runtime_config_error_t runtime_config_set(const runtime_config_node_t *node, con
 static runtime_config_error_t _apply_export_cb(const runtime_config_node_t *node, const void *context)
 {
     (void)context;
+
     assert(node != NULL);
 
     const runtime_config_schema_instance_t *instance;

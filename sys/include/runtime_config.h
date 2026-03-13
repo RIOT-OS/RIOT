@@ -171,6 +171,14 @@ typedef enum {
  * a schema instance, because they are children of a specific schema instance
  * in the configuration tree. The schema instance contains the actual values of
  * configuration parameters.
+ *
+ * The main use-case of this node is to make the @p runtime_config_get and
+ * @p runtime_config_set functions more ergonomic.
+ * Using this struct we can have other configuration identifiers such as
+ * an array of the IDs in the configuration tree or an array of the names in
+ * the configuration tree that together point to a specific location in that
+ * tree be converted to a @p runtime_config_note_t and then just pass them to
+ * whatever function we want to use them inside.
  */
 typedef struct {
     /** The type of the node */
@@ -480,6 +488,7 @@ runtime_config_error_t runtime_config_add_schema_instance(
  *        of a configuration schema.
  *
  * @param[in]  node A location within the runtime configuration tree.
+ *                  Must be of the type "RUNTIME_CONFIG_NODE_PARAMETER".
  * @param[out] value Pointer to a uninitialized @ref runtime_config_value_t struct.
  *
  * @return 0 on success, non-zero on failure.
@@ -493,6 +502,7 @@ runtime_config_error_t runtime_config_get(
  *        to an instance of a configuration schema.
  *
  * @param[in] node A location within the runtime configuration tree.
+ *                 Must be of the type "RUNTIME_CONFIG_NODE_PARAMETER".
  * @param[in] buf Pointer to the new value for the configuration parameter.
  * @param[in] buf_len Length of the buffer.
  *
@@ -505,7 +515,7 @@ runtime_config_error_t runtime_config_set(
 
 /**
  * @brief Applies every configuration parameter within the given configuration
- *        location (@p node) of the runtime configuration tree.
+ *        location (@p runtime_config_node_t) of the runtime configuration tree.
  *
  * @param[in] node Optional location within the runtime configuration tree.
  *                 Applies all existing configurations on NULL.
@@ -550,7 +560,7 @@ typedef runtime_config_error_t (*runtime_config_export_cb_t)(
 
 /**
  * @brief Exports every configuration parameter within the given configuration
- *        location (@p node) of the runtime configuration tree.
+ *        location (@p runtime_config_node_t) of the runtime configuration tree.
  *
  * @param[in] node A location within the runtime configuration tree.
  * @param[in] export_cb Exporting callback function will be called for each
