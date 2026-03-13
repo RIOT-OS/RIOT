@@ -26,7 +26,6 @@
 #include "net/sock/dns.h"
 #include "net/sock/udp.h"
 #include "random.h"
-#include "string_utils.h"
 #include "uri_parser.h"
 
 #include "net/gcoap/dns.h"
@@ -312,9 +311,13 @@ ssize_t gcoap_dns_server_proxy_get(char *proxy, size_t proxy_len)
     ssize_t res = 0;
     mutex_lock(&_client_mutex);
     if (_dns_server_uri_isset()) {
-        res = strscpy(proxy, _proxy, proxy_len);
-        if (res == -E2BIG) {
+        res = (ssize_t)strlen(_proxy);
+        if ((size_t)res >= proxy_len) {
             res = -ENOBUFS;
+        }
+        else {
+            strncpy(proxy, _proxy, proxy_len - 1);
+            proxy[res] = '\0';
         }
     }
     mutex_unlock(&_client_mutex);
