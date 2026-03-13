@@ -91,7 +91,6 @@
 #include "periph/gpio.h"
 #include "ws281x_backend.h"
 #include "ws281x_constants.h"
-#include "xtimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -134,7 +133,6 @@ typedef struct {
     ws281x_params_t params;   /**< Parameters of the LED chain */
 } ws281x_t;
 
-#if defined(WS281X_HAVE_INIT) || defined(DOXYGEN)
 /**
  * @brief   Initialize an WS281x RGB LED chain
  *
@@ -146,12 +144,6 @@ typedef struct {
  * @retval  -EIO    Failed to initialize the data GPIO pin
  */
 int ws281x_init(ws281x_t *dev, const ws281x_params_t *params);
-#else
-static inline int ws281x_init(ws281x_t *dev, const ws281x_params_t *params) {
-    dev->params = *params;
-    return 0;
-}
-#endif
 
 /**
  * @brief   Writes the color data of the user supplied buffer
@@ -183,21 +175,13 @@ static inline int ws281x_init(ws281x_t *dev, const ws281x_params_t *params) {
  */
 void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size);
 
-#if defined(WS281X_HAVE_PREPARE_TRANSMISSION) || defined(DOXYGEN)
 /**
  * @brief   Sets up everything needed to write data to the WS281X LED chain
  *
  * @param   dev     Device descriptor of the LED chain to write to
  */
 void ws281x_prepare_transmission(ws281x_t *dev);
-#else
-static inline void ws281x_prepare_transmission(ws281x_t *dev)
-{
-    (void)dev;
-}
-#endif
 
-#if defined(WS281X_HAVE_END_TRANSMISSION) || defined(DOXYGEN)
 /**
  * @brief   Ends the transmission to the WS2812/SK6812 LED chain
  *
@@ -207,13 +191,6 @@ static inline void ws281x_prepare_transmission(ws281x_t *dev)
  * it simply waits for 80µs to send the end of transmission signal.
  */
 void ws281x_end_transmission(ws281x_t *dev);
-#else
-static inline void ws281x_end_transmission(ws281x_t *dev)
-{
-    (void)dev;
-    xtimer_usleep(WS281X_T_END_US);
-}
-#endif
 
 /**
  * @brief   Sets the color of an LED in the given data buffer
