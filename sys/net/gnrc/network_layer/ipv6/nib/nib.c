@@ -93,6 +93,9 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                           gnrc_pktsnip_t *pkt, gnrc_ipv6_nib_nc_t *nce,
                           _nib_onl_entry_t *entry);
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES) || defined(DOXYGEN)
+static void _handle_regen_temp_addr(_nib_offl_entry_t *pfx);
+#endif
 static void _handle_pfx_timeout(_nib_offl_entry_t *pfx);
 static void _handle_rtr_timeout(_nib_dr_entry_t *router);
 static void _handle_snd_na(gnrc_pktsnip_t *pkt);
@@ -538,6 +541,11 @@ void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type)
         case GNRC_IPV6_NIB_PFX_TIMEOUT:
             _handle_pfx_timeout(ctx);
             break;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+        case GNRC_IPV6_NIB_REGEN_TEMP_ADDR:
+            _handle_regen_temp_addr(ctx);
+            break;
+#endif
         case GNRC_IPV6_NIB_RTR_TIMEOUT:
             _handle_rtr_timeout(ctx);
             break;
@@ -1552,6 +1560,18 @@ static void _handle_snd_na(gnrc_pktsnip_t *pkt)
 #endif  /* MODULE_GNRC_IPV6 */
 }
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+static void _handle_regen_temp_addr(_nib_offl_entry_t *pfx) {
+    DEBUG("nib: Temporary address regeneration event for temporary address prefix %s/%u\n",
+          ipv6_addr_to_str(addr_str, &pfx->pfx, sizeof(addr_str)),
+          pfx->pfx_len);
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(pfx->next_hop));
+    assert(netif != NULL);
+
+    _regen_temp_addr(netif, &pfx->pfx, 0, "");
+}
+#endif
+
 static void _handle_pfx_timeout(_nib_offl_entry_t *pfx)
 {
     gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(pfx->next_hop));
@@ -1573,6 +1593,31 @@ static void _handle_pfx_timeout(_nib_offl_entry_t *pfx)
                 netif->ipv6.addrs_flags[i] |= GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED;
             }
         }
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+        if (pfx->flags & _PFX_SLAAC) {
+            /* Remove regen event from temporary addresses (the current temporary address should have one scheduled).
+             * It would log a warning because pref_lft too short,
+             * or - if the SLAAC prefix became preferred again meanwhile -
+             * regenerate an address,
+             * but at whatever time the event is currently scheduled for.
+             * -> Definitely cleaner to not even call the event. */
+
+            /* Get ta_pfx (_nib_offl_entry_t), delete evtimer
+             * do not remove the temporary address (itself or through its prefix),
+             * but only the regen event,
+             * because the temporary address is deprecated but not invalidated/removed yet.
+             */
+
+            //alternative way to get ta_pfx: _iter_slaac_prefix_to_temp_addr + _nib_offl_get_match
+            _nib_offl_entry_t *ptr = (_nib_offl_entry_t *)NULL;
+            while ((ptr = _nib_offl_iter(ptr))) {
+                if (ptr->pfx_len == IPV6_ADDR_BIT_LEN
+                    && ipv6_addr_match_prefix(&ptr->pfx, &pfx->pfx) >= SLAAC_PREFIX_LENGTH) {
+                    _evtimer_del(&ptr->regen_temp_addr);
+                }
+            }
+        }
+#endif
         _evtimer_add(pfx, GNRC_IPV6_NIB_PFX_TIMEOUT, &pfx->pfx_timeout,
                      pfx->valid_until - now);
     }
@@ -1760,8 +1805,20 @@ static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
     DEBUG("     - Preferred lifetime: %" PRIu32 "\n",
           byteorder_ntohl(pio->pref_ltime));
 
-    if (pio->flags & NDP_OPT_PI_FLAGS_A) {
+    if (pio->flags & NDP_OPT_PI_FLAGS_A
+        && pio->prefix_len == SLAAC_PREFIX_LENGTH
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+        && (gnrc_netif_ipv6_addr_pfx_idx(netif, &pio->prefix, pio->prefix_len) < 0)
+        /* do not cause generation of another temporary address
+         * if the prefix is already known */
+#endif
+        ) {
         _auto_configure_addr(netif, &pio->prefix, pio->prefix_len);
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+        if (_generate_temporary_addr(netif, &pio->prefix, pref_ltime, 0, NULL) < 0) {
+            LOG_WARNING("nib: Temporary address generation failed when handling PIO.\n");
+        }
+#endif
     }
     if ((pio->flags & (NDP_OPT_PI_FLAGS_A | NDP_OPT_PI_FLAGS_L))
         || _multihop_p6c(netif, abr)) {
