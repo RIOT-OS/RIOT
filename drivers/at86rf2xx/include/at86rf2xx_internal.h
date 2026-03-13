@@ -28,9 +28,9 @@
 #include "at86rf2xx.h"
 
 #if AT86RF2XX_IS_PERIPH
-#include <string.h>
-#include "irq.h"
-#include "time_units.h"
+#  include <string.h>
+#  include "irq.h"
+#  include "time_units.h"
 #endif
 #include "at86rf2xx_registers.h"
 
@@ -42,20 +42,20 @@ extern "C" {
  * @brief Max. allowed transmit power for the transceiver after adding the power off offset
  */
 #ifdef MODULE_AT86RF212B
-#define AT86RF2XX_TXPOWER_MAX_INDEX           (36)
+#  define AT86RF2XX_TXPOWER_MAX_INDEX           (36)
 #elif MODULE_AT86RF233
-#define AT86RF2XX_TXPOWER_MAX_INDEX           (21)
+#  define AT86RF2XX_TXPOWER_MAX_INDEX           (21)
 #else
-#define AT86RF2XX_TXPOWER_MAX_INDEX           (20)
+#  define AT86RF2XX_TXPOWER_MAX_INDEX           (20)
 #endif
 
 /**
  * @brief Transmit power offset
  */
 #ifdef MODULE_AT86RF212B
-#define AT86RF2XX_TXPOWER_OFF_OFFSET           (25)
+#  define AT86RF2XX_TXPOWER_OFF_OFFSET           (25)
 #else
-#define AT86RF2XX_TXPOWER_OFF_OFFSET           (17)
+#  define AT86RF2XX_TXPOWER_OFF_OFFSET           (17)
 #endif
 
 /**
