@@ -1,0 +1,83 @@
+From 7fee4b2dd84bca533754a1d441dbbe487891e303 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Tue, 19 Apr 2022 17:17:07 +0200
+Subject: [PATCH 1/2] src/csp_buffer: buffer/skbuf statically defined data size
+
+---
+ include/csp/csp_types.h | 11 ++---------
+ src/csp_buffer.c        |  9 ++++-----
+ 2 files changed, 6 insertions(+), 14 deletions(-)
+
+diff --git a/include/csp/csp_types.h b/include/csp/csp_types.h
+index 045e469..94b974a 100644
+--- a/include/csp/csp_types.h
++++ b/include/csp/csp_types.h
+@@ -154,14 +154,7 @@ typedef struct csp_packet_s {
+ 	 * When using the csp_buffer API, the size of the data part is set by
+ 	 * csp_buffer_init(), and can later be accessed by csp_buffer_data_size()
+ 	 */
+-	union {
+-		/** Access data as uint8_t. */
+-		uint8_t data[0];
+-		/** Access data as uint16_t */
+-		uint16_t data16[0];
+-		/** Access data as uint32_t */
+-		uint32_t data32[0];
+-	};
++	uint8_t data[CSP_BUFFER_SIZE];
+ 
+ } csp_packet_t;
+ 
+@@ -172,7 +165,7 @@ typedef struct csp_packet_s {
+    The overhead is the difference between the total buffer size (returned by csp_buffer_size()) and the data part
+    of the #csp_packet_t (returned by csp_buffer_data_size()).
+ */
+-#define CSP_BUFFER_PACKET_OVERHEAD      (sizeof(csp_packet_t) - sizeof(((csp_packet_t *)0)->data))
++#define CSP_BUFFER_PACKET_OVERHEAD      (sizeof(csp_packet_t) - CSP_BUFFER_SIZE)
+ 
+ /** Forward declaration of CSP interface, see #csp_iface_s for details. */
+ typedef struct csp_iface_s csp_iface_t;
+diff --git a/src/csp_buffer.c b/src/csp_buffer.c
+index 75d82ef..f777cd2 100644
+--- a/src/csp_buffer.c
++++ b/src/csp_buffer.c
+@@ -13,16 +13,15 @@
+ typedef struct csp_skbf_s {
+ 	unsigned int refcount;
+ 	void * skbf_addr;
+-	char skbf_data[];  // -> csp_packet_t
++	char skbf_data[sizeof(csp_packet_t)];
+ } csp_skbf_t;
+ 
+-#define SKBUF_SIZE CSP_BUFFER_ALIGN *((sizeof(csp_skbf_t) + CSP_BUFFER_SIZE + CSP_BUFFER_PACKET_OVERHEAD + (CSP_BUFFER_ALIGN - 1)) / CSP_BUFFER_ALIGN)
++#define SKBUF_SIZE CSP_BUFFER_ALIGN * ((sizeof(csp_skbf_t)+ (CSP_BUFFER_ALIGN - 1)) / CSP_BUFFER_ALIGN)
+ 
+ // Queue of free CSP buffers
+ static csp_queue_handle_t csp_buffers;
+ 
+ void csp_buffer_init(void) {
+-
+ 	/**
+ 	 * Chunk of memory allocated for CSP buffers:
+ 	 * This is marked as .noinit, because csp buffers can never be assumed zeroed out
+@@ -126,7 +125,7 @@ void csp_buffer_free(void * packet) {
+ 		return;
+ 	}
+ 
+-	csp_skbf_t * buf = (void *)(((uint8_t *)packet) - sizeof(csp_skbf_t));
++	csp_skbf_t * buf = (void *)(((uint8_t *)packet) + sizeof(csp_packet_t) - sizeof(csp_skbf_t));
+ 
+ 	if (((uintptr_t)buf % CSP_BUFFER_ALIGN) > 0) {
+ 		csp_dbg_errno = CSP_DBG_ERR_CORRUPT_BUFFER;
+@@ -171,7 +170,7 @@ int csp_buffer_remaining(void) {
+ }
+ 
+ size_t csp_buffer_size(void) {
+-	return (CSP_BUFFER_SIZE + CSP_BUFFER_PACKET_OVERHEAD);
++	return sizeof(csp_packet_t);
+ }
+ 
+ size_t csp_buffer_data_size(void) {
+-- 
+2.32.0
+
