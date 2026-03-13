@@ -149,7 +149,7 @@ typedef struct {
 /**
  * @brief   Initialize the given device
  *
- * @param[inout] dev        Device descriptor of the driver
+ * @param[in]    dev        Device descriptor of the driver
  * @param[in]    params     Initialization parameters
  *
  * @retval  0 on success
