@@ -39,23 +39,23 @@ extern "C" {
 #endif
 
 /**
- * @brief Max. allowed transmit power for the transceiver
+ * @brief Max. allowed transmit power for the transceiver after adding the power off offset
  */
 #ifdef MODULE_AT86RF212B
-#define AT86RF2XX_TXPOWER_MAX           (36)
+#define AT86RF2XX_TXPOWER_MAX_INDEX           (36)
 #elif MODULE_AT86RF233
-#define AT86RF2XX_TXPOWER_MAX           (21)
+#define AT86RF2XX_TXPOWER_MAX_INDEX           (21)
 #else
-#define AT86RF2XX_TXPOWER_MAX           (20)
+#define AT86RF2XX_TXPOWER_MAX_INDEX           (20)
 #endif
 
 /**
  * @brief Transmit power offset
  */
 #ifdef MODULE_AT86RF212B
-#define AT86RF2XX_TXPOWER_OFF           (25)
+#define AT86RF2XX_TXPOWER_OFF_OFFSET           (25)
 #else
-#define AT86RF2XX_TXPOWER_OFF           (17)
+#define AT86RF2XX_TXPOWER_OFF_OFFSET           (17)
 #endif
 
 /**

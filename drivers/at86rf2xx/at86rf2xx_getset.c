@@ -135,26 +135,27 @@ void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan)
 static inline void _set_txpower(const at86rf2xx_t *dev, int16_t txpower, uint8_t channel)
 {
     (void) channel;
-    txpower += AT86RF2XX_TXPOWER_OFF;
+    int16_t txpower_index = txpower;
+    txpower_index += AT86RF2XX_TXPOWER_OFF_OFFSET;
 
-    if (txpower < 0) {
-        txpower = 0;
+    if (txpower_index < 0) {
+        txpower_index = 0;
     }
-    else if (txpower > AT86RF2XX_TXPOWER_MAX) {
-        txpower = AT86RF2XX_TXPOWER_MAX;
+    else if (txpower_index > AT86RF2XX_TXPOWER_MAX_INDEX) {
+        txpower_index = AT86RF2XX_TXPOWER_MAX_INDEX;
     }
 #if AT86RF2XX_HAVE_SUBGHZ
     if (channel == 0) {
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
-                            dbm_to_tx_pow_868[txpower]);
+                            dbm_to_tx_pow_868[txpower_index]);
     }
     else if (channel < 11) {
         at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
-                            dbm_to_tx_pow_915[txpower]);
+                            dbm_to_tx_pow_915[txpower_index]);
     }
 #else
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
-                        dbm_to_tx_pow[txpower]);
+                        dbm_to_tx_pow[txpower_index]);
 #endif
 }
 
