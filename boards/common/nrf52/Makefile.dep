@@ -1,3 +1,9 @@
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_nrf_temperature
 endif
+
+ifneq (,$(filter boards_common_adafruit-nrf52-bootloader,$(USEMODULE)))
+  # if this only gets included in the 2nd round of dependency resolution
+  # we will already have included stdio_uart by default
+  include $(RIOTBOARD)/common/adafruit-nrf52-bootloader/Makefile.dep
+endif
