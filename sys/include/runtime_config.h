@@ -215,7 +215,7 @@ typedef struct {
     /** Number of elements (1 for scalar, >1 for array). */
     size_t count;
 
-    /** The type of the configuration parameter value. */
+    /** The type of the configuration parameter value such as uint8_t or float. */
     runtime_config_type_t type;
 
     /** Pointer to the buffer containing the value of the configuration parameter. */
