@@ -289,13 +289,14 @@ static int _len(ieee802154_dev_t *hal)
     mutex_lock(&dev->lock);
     uint8_t phr = at86rf2xx_peek_rx_len(dev);
     mutex_unlock(&dev->lock);
-    return (phr & 0x7f) - 2;
+    return (phr & 0x7f) - IEEE802154_FCS_LEN;
 }
 
 static int _off(ieee802154_dev_t *hal)
 {
     DEBUG("at86rf2xx_rf_ops: off\n");
     at86rf2xx_t *dev = hal->priv;
+
     mutex_lock(&dev->lock);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE, AT86RF2XX_STATE_FORCE_TRX_OFF);
 
@@ -336,6 +337,7 @@ static int _request_cca(at86rf2xx_t *dev)
 {
     DEBUG("at86rf2xx_rf_ops: request_cca\n");
     uint8_t reg;
+
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE, AT86RF2XX_TRX_STATE__FORCE_PLL_ON);
     at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_ON);
 
@@ -352,7 +354,6 @@ static int _request_cca(at86rf2xx_t *dev)
 static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
 {
     at86rf2xx_t *dev = hal->priv;
-
     int res = -ENOTSUP;
 
     mutex_lock(&dev->lock);
@@ -387,6 +388,7 @@ static int _confirm_transmit(at86rf2xx_t *dev, ieee802154_tx_info_t *info)
 {
     DEBUG("at86rf2xx_rf_ops: confirm_transmit\n");
     uint8_t status = at86rf2xx_get_status(dev);
+
     if (status == AT86RF2XX_STATE_BUSY_TX_ARET || status == AT86RF2XX_STATE_BUSY_TX) {
         return -EAGAIN;
     }
@@ -487,6 +489,7 @@ static int _set_cca_threshold(ieee802154_dev_t *hal, int8_t threshold)
 static int _set_cca_mode(ieee802154_dev_t *hal, ieee802154_cca_mode_t mode)
 {
     (void)hal;
+
     if (mode != IEEE802154_CCA_MODE_ED_THRESHOLD) {
         DEBUG("at86rf2xx_rf_ops: CCA mode not supported\n");
         return -ENOTSUP;
@@ -635,10 +638,9 @@ int at86rf2xx_init(at86rf2xx_t *dev, const at86rf2xx_params_t *params, ieee80215
                    void (*cb)(void *), void *ctx)
 {
     uint8_t tmp;
-
     (void)tmp;
-
     (void)at86rf2xx_periph;
+
     mutex_init(&dev->lock);
     mutex_lock(&dev->lock);
 #if AT86RF2XX_IS_PERIPH
