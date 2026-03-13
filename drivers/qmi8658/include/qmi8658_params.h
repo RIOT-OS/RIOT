@@ -18,9 +18,8 @@
  * @author      Yahia Abdella <yahia.abdella@tuhh.de>
  */
 
-#include "board.h"
 #include "qmi8658.h"
-#include "qmi8658_constants.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,6 +60,9 @@ extern "C" {
                                 .acc_fs             = QMI8658_PARAM_ACC_FS,         \
                                 .gyro_fs            = QMI8658_PARAM_GYRO_FS,}
 #endif
+#ifndef QMI8658_SAUL_INFO
+#define QMI8658_SAUL_INFO            { .name = "qmi8658" }
+#endif
 /**@}*/
 
 /**
@@ -69,6 +71,14 @@ extern "C" {
 static const qmi8658_params_t qmi8658_params[] =
 {
     QMI8658_PARAMS
+};
+
+/**
+ * @brief   Additional meta information to keep in the SAUL registry
+ */
+static const saul_reg_info_t qmi8658_saul_info[] =
+{
+    QMI8658_SAUL_INFO
 };
 
 #ifdef __cplusplus

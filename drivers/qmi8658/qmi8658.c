@@ -27,7 +27,7 @@
 #include "qmi8658.h"
 #include "qmi8658_constants.h"
 
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define BUS         (dev->params.i2c)
