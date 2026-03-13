@@ -4,27 +4,27 @@ include ../Makefile.build_system_common
 
 # Normally all boards using `cortexm_common/ldscripts/cortexm.ld` linkerscript
 # Only tested on these ones for the moment
-BOARD_WHITELIST += iotlab-a8-m3
-BOARD_WHITELIST += iotlab-m3
-BOARD_WHITELIST += samr21-xpro
+BOARDS_SUPPORTED += iotlab-a8-m3
+BOARDS_SUPPORTED += iotlab-m3
+BOARDS_SUPPORTED += samr21-xpro
 # Normally all boards using `kinetis/ldscripts/kinetis.ld` linkerscript
-BOARD_WHITELIST += frdm-kw41z
-BOARD_WHITELIST += frdm-k64f
-BOARD_WHITELIST += frdm-k22f
-BOARD_WHITELIST += mulle
-BOARD_WHITELIST += pba-d-01-kw2x
-BOARD_WHITELIST += teensy31
+BOARDS_SUPPORTED += frdm-kw41z
+BOARDS_SUPPORTED += frdm-k64f
+BOARDS_SUPPORTED += frdm-k22f
+BOARDS_SUPPORTED += mulle
+BOARDS_SUPPORTED += pba-d-01-kw2x
+BOARDS_SUPPORTED += teensy31
 # Boards using a bootloader and ROM_OFFSET by default
-BOARD_WHITELIST += arduino-mkr1000
-BOARD_WHITELIST += arduino-mkrfox1200
-BOARD_WHITELIST += arduino-mkrzero
-BOARD_WHITELIST += blackpill-stm32f103c8
-BOARD_WHITELIST += blackpill-stm32f103cb
-BOARD_WHITELIST += bluepill-stm32f103c8
-BOARD_WHITELIST += bluepill-stm32f103cb
-BOARD_WHITELIST += feather-m0
-BOARD_WHITELIST += opencm904
-BOARD_WHITELIST += spark-core
+BOARDS_SUPPORTED += arduino-mkr1000
+BOARDS_SUPPORTED += arduino-mkrfox1200
+BOARDS_SUPPORTED += arduino-mkrzero
+BOARDS_SUPPORTED += blackpill-stm32f103c8
+BOARDS_SUPPORTED += blackpill-stm32f103cb
+BOARDS_SUPPORTED += bluepill-stm32f103c8
+BOARDS_SUPPORTED += bluepill-stm32f103cb
+BOARDS_SUPPORTED += feather-m0
+BOARDS_SUPPORTED += opencm904
+BOARDS_SUPPORTED += spark-core
 
 include $(RIOTBASE)/Makefile.include
 

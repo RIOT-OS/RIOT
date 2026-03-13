@@ -28,7 +28,7 @@
 # Only generate the dependencies when the board is not disabled
 # This will allow comparing with the output of `info-boards-supported` more easily
 dependency-debug:
-ifneq (,$(filter-out $(BOARD_BLACKLIST),$(filter $(if $(BOARD_WHITELIST),$(BOARD_WHITELIST), %),$(BOARD))))
+ifneq (,$(filter-out $(BOARDS_UNSUPPORTED),$(filter $(if $(BOARDS_SUPPORTED),$(BOARDS_SUPPORTED), %),$(BOARD))))
 	$(call file_save_dependencies_variables,dependencies_info)
 	@:
 else

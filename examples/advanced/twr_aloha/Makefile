@@ -41,7 +41,7 @@ USEMODULE += event_periodic
 USEMODULE += test_utils_result_output
 
 # Collision between defines of Silabs SDK and mynewt-core
-BOARD_BLACKLIST := xg23-pk6068a
+BOARDS_UNSUPPORTED := xg23-pk6068a
 
 # All uwb-core applications need to enable `-fms-extensions`
 CFLAGS += -fms-extensions

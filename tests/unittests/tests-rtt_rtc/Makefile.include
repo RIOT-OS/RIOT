@@ -6,7 +6,7 @@ CFLAGS += -DMOCK_RTT_MAX_VALUE=0xFFFF
 
 # mulle always enables periph_rtt.
 # This clashes with mock_rtt.
-BOARD_BLACKLIST := mulle
+BOARDS_UNSUPPORTED := mulle
 
 # esp32 enables periph_rtc by default.
 # This clashes with rtt_rtc,

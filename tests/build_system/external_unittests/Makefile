@@ -1,7 +1,7 @@
 # Run this only on native64 / native, as this rather tests the build system
 # than the code actually run.
 
-BOARD_WHITELIST := native native64
+BOARDS_SUPPORTED := native native64
 
 EXTERNAL_UNITTEST_DIRS := $(CURDIR)/external_tests_dir
 

@@ -2,7 +2,7 @@
 APPLICATION = rust_gcoap
 
 # TODO: Fix bug in docker image
-BOARD_BLACKLIST := native32 native64 native
+BOARDS_UNSUPPORTED := native32 native64 native
 
 # The name of crate (as per Cargo.toml package name, but with '-' replaced with '_')
 #
