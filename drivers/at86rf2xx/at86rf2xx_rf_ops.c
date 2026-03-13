@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2023 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2026 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -32,7 +29,7 @@
 #include "thread.h"
 #include "atomic_utils.h"
 #if IS_USED(MODULE_AT86RF2XX_AES_SPI)
-#include "at86rf2xx_aes.h"
+#  include "at86rf2xx_aes.h"
 #endif
 
 #define ENABLE_DEBUG (0)
@@ -433,7 +430,7 @@ static int _confirm_set_trx_state(at86rf2xx_t *dev)
     return 0;
 }
 
-static int _confirm_cca(at86rf2xx_t *dev)
+static int _confirm_cca(at86rf2xx_t *dev, void *ctx)
 {
     DEBUG("at86rf2xx_rf_ops: confirm_cca\n");
     uint8_t reg;
@@ -446,7 +443,8 @@ static int _confirm_cca(at86rf2xx_t *dev)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
                         AT86RF2XX_IRQ_STATUS_MASK__TRX_END | AT86RF2XX_IRQ_STATUS_MASK__RX_START);
     at86rf2xx_set_state(dev, AT86RF2XX_PHY_STATE_RX);
-    return !!(reg & AT86RF2XX_TRX_STATUS_MASK__CCA_STATUS);
+    *((bool *)ctx) = (reg & AT86RF2XX_TRX_STATUS_MASK__CCA_STATUS) != 0;
+    return 0;
 }
 
 static int _confirm_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
@@ -466,7 +464,7 @@ static int _confirm_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
         res = _confirm_set_trx_state(dev);
         break;
     case IEEE802154_HAL_OP_CCA:
-        res = _confirm_cca(dev);
+        res = _confirm_cca(dev, ctx);
         break;
     default:
         assert(false);
@@ -756,18 +754,21 @@ void at86rf2xx_irq_handler(ieee802154_dev_t *hal)
     uint8_t state;
 
     /* Read the state before locking the mutex to capture the current state of the radio.
-     * This operation should be fine, because it only performs a reading operation and doesn't change the radio state.
+     * This operation should be fine, because it only performs a reading
+     * operation and doesn't change the radio state.
      * This solves the bug where the radio thread is blocked by the submac thread:
-     * The radio is in RX and still hasn't received the IRQ for RX_DONE. When the radio
-     * isn't busy anymore, it could happen that the submac is able to get the mutex before the
-     * IRQ arrives and the radio thread is blocked because of the mutex even with higher priority. After the submac is done, the
-     * radio thread is unlocked but the radio is in the TX state instead of RX. Therefore the radio
-     * dispatches a CONFIRM_TX_DONE event which is actually an RX_DONE event, which causes an assertion in the submac.
+     * The radio is in RX and still hasn't received the IRQ for RX_DONE.
+     * When the radio isn't busy anymore, it could happen that the submac is
+     * able to get the mutex before the IRQ arrives and the radio thread is
+     * blocked because of the mutex even with higher priority.
+     * After the submac is done, the radio thread is unlocked but the radio is
+     * in the TX state instead of RX. Therefore the radio dispatches a
+     * CONFIRM_TX_DONE event which is actually an RX_DONE event, which causes
+     * an assertion in the submac.
      */
     state = at86rf2xx_get_status(dev);
     /* If transceiver is sleeping register access is impossible and frames are
-     * lost anyway, so return immediately.
-     */
+     * lost anyway, so return immediately.*/
     if (state == AT86RF2XX_STATE_SLEEP) {
         return;
     }
@@ -829,9 +830,9 @@ static const ieee802154_radio_ops_t at86rf2xx_ops = {
             | IEEE802154_CAP_IRQ_TX_DONE
 #if ! IS_ACTIVE(AT86RF2XX_BASIC_MODE)
             | IEEE802154_CAP_FRAME_RETRANS
-#if AT86RF2XX_HAVE_RETRIES
+#  if AT86RF2XX_HAVE_RETRIES
             | IEEE802154_CAP_FRAME_RETRANS_INFO
-#endif
+#  endif
 #endif
 
 #if AT86RF2XX_IS_PERIPH
@@ -870,7 +871,7 @@ static const ieee802154_radio_ops_t at86rf2xx_ops = {
  *
  * Flow Diagram Manual p. 52 / 63
  */
-#if AT86RF2XX_HAVE_RETRIES
+#  if AT86RF2XX_HAVE_RETRIES
 ISR(TRX24_TX_START_vect){
     /* __enter_isr(); is not necessary as there is nothing which causes a
      * thread_yield and the interrupt can not be interrupted by an other ISR */
@@ -878,7 +879,7 @@ ISR(TRX24_TX_START_vect){
 
     dev->tx_retries ++;
 }
-#endif
+#  endif
 
 /**
  * @brief  Transceiver PLL Lock
