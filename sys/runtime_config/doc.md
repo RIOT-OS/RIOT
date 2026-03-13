@@ -52,7 +52,7 @@ They use either the `int_path` or the `string_path` extension module to expose t
 These configuration managers have their own configuration structure (custom predefined object models etc.) and can not automatically be mapped to / from the runtime config schemas.
 To make them work, a custom mapping module needs to be implemented per configuration manager, which maps each configuration parameter from the RIOT runtime config module to the correct format of the configuration manager.
 
-![design_architecture](https://github.com/RIOT-OS/RIOT/assets/10547444/26830a26-882a-422c-ba20-abfa4e07ce8c)
+<img src="https://github.com/RIOT-OS/RIOT/assets/10547444/26830a26-882a-422c-ba20-abfa4e07ce8c" style="width: 800px; max-width: 100%" alt="design_architecture" />
 
 ### Configuration Structure
 
@@ -72,7 +72,7 @@ the `LED Strip` Configuration Schema to expose common LED Strip Configuration Pa
 Also, there are two Storages available: `MTD` and `VFS`.
 The `MTD` Storage internally uses the RIOT `MTD` driver and the `VFS` Storage internally uses the RIOT `VFS` module.
 
-![design_namespaces_and_storages](https://github.com/user-attachments/assets/49b066bc-5419-454a-9797-c0972b3bc83b)
+<img src="https://github.com/user-attachments/assets/49b066bc-5419-454a-9797-c0972b3bc83b" style="width: 800px; max-width: 100%" alt="design_namespaces_and_storages" />
 
 ### Components
 
@@ -94,7 +94,7 @@ Furthermore it is possible to `add` `Configuration Namespaces` or `Configuration
 The `Configuration Namespaces` such as `SYS` or `APP` and their respective `Configuration Schemas` are not part of the runtime config module itself.
 It is possible to `add` custom `Configuration Namespaces` depending on the given needs.
 
-![design_runtime_config](https://github.com/user-attachments/assets/473cef24-39b8-4539-b754-53146a497521)
+<img src="https://github.com/user-attachments/assets/473cef24-39b8-4539-b754-53146a497521" style="width: 800px; max-width: 100%" alt="design_runtime_config" />
 
 ## API
 
@@ -105,7 +105,7 @@ On the left-hand side are setup functions to `add` `Configuration Namespaces` an
 
 The functionality of these functions is explained in the following paragraphs.
 
-![api_structure](https://github.com/user-attachments/assets/588cb389-250a-4797-a78e-a76c4efe18fb)
+<img src="https://github.com/user-attachments/assets/588cb389-250a-4797-a78e-a76c4efe18fb" style="width: 800px; max-width: 100%" alt="api_structure" />
 
 ### Usage
 
