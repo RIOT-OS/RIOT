@@ -730,4 +730,8 @@ ifneq (,$(filter wifi_scan_list,$(USEMODULE)))
   USEMODULE += l2scan_list
 endif
 
+ifneq (,$(filter runtime_config%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/runtime_config/Makefile.dep
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
