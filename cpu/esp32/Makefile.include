@@ -481,4 +481,13 @@ $(BINDIR)/sections.ld: $(RIOTCPU)/$(CPU)/vendor/ld/$(CPU_FAM)/sections.ld.in \
 	$(Q)$(CC) $(INCLUDES) -include '$(BINDIR)/riotbuild/riotbuild.h' \
 				$(LDGENFLAGS) -I$(RIOTCPU)/$(CPU)/vendor/ld -C -P -x c -E $< -o $@
 
+SDKCONFIG_SOC_SCRIPT = $(RIOTTOOLS)/esptools/gen_sdkconfig_soc.sh
+SDKCONFIG_SOC_H = $(BINDIR)/sdkconfig_soc.h
+
+$(SDKCONFIG_SOC_H): $(BINDIR)/riotbuild/riotbuild.h pkg-prepare
+	$(Q)$(SDKCONFIG_SOC_SCRIPT) $(CPU_FAM) $(ESP32_SDK_DIR) $(BINDIR)
+
+BUILDDEPS += $(SDKCONFIG_SOC_H)
+CFLAGS += -I$(BINDIR)
+
 $(BOOTLOADER_BIN):
