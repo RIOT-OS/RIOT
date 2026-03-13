@@ -500,12 +500,17 @@ static int _set_cca_mode(ieee802154_dev_t *hal, ieee802154_cca_mode_t mode)
 static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
 {
     at86rf2xx_t *dev = hal->priv;
+    uint16_t channel = conf->channel;
+    uint8_t page = conf->page;
+    int8_t txpower = conf->pow;
 
-    if (conf->pow < 0 || conf->pow > AT86RF2XX_TXPOWER_MAX) {
+    if (txpower < (-AT86RF2XX_TXPOWER_OFF_OFFSET)
+        || (txpower + AT86RF2XX_TXPOWER_OFF_OFFSET) > AT86RF2XX_TXPOWER_MAX_INDEX) {
         return -EINVAL;
     }
+
     mutex_lock(&dev->lock);
-    at86rf2xx_configure_phy(dev, conf->channel, conf->page, conf->pow);
+    at86rf2xx_configure_phy(dev, channel, page, txpower);
     mutex_unlock(&dev->lock);
     return 0;
 }
