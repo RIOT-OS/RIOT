@@ -545,7 +545,7 @@ static const uint16_t pll_frac_lt[16] = {
     2048, 12288, 22528, 32768
 };
 
-static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
+static int _config_phy(ieee802154_dev_t *dev, ieee802154_phy_conf_t *conf)
 {
     kw2xrf_t *kw_dev = dev->priv;
     kw2xrf_set_tx_power(kw_dev, conf->pow);
