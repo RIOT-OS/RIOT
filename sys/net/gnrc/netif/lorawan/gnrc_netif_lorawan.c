@@ -29,6 +29,7 @@
 #include "net/loramac.h"
 #include "net/gnrc/lorawan/region.h"
 #include "net/gnrc/netreg.h"
+#include "string_utils.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -260,13 +261,6 @@ static void _reset(gnrc_netif_t *netif)
     netif->lorawan.flags = 0;
 }
 
-static void _memcpy_reversed(uint8_t *dst, uint8_t *src, size_t size)
-{
-    for (size_t i = 0; i < size; i++) {
-        dst[size - i - 1] = src[i];
-    }
-}
-
 netdev_t *gnrc_lorawan_get_netdev(gnrc_lorawan_t *mac)
 {
     gnrc_netif_t *netif = container_of(mac, gnrc_netif_t, lorawan.mac);
@@ -307,8 +301,8 @@ static int _init(gnrc_netif_t *netif)
 
     /* Initialize default keys, address and EUIs */
     memcpy(netif->lorawan.appskey, _appskey, sizeof(_appskey));
-    _memcpy_reversed(netif->lorawan.deveui, _deveui, sizeof(_deveui));
-    _memcpy_reversed(netif->lorawan.joineui, _joineui, sizeof(_joineui));
+    memcpy_reversed(netif->lorawan.deveui, _deveui, sizeof(_deveui));
+    memcpy_reversed(netif->lorawan.joineui, _joineui, sizeof(_joineui));
     memcpy(netif->lorawan.nwkkey, _nwkkey, sizeof(_nwkkey));
     memcpy(netif->lorawan.fnwksintkey, _fnwksintkey, sizeof(_fnwksintkey));
 
@@ -502,14 +496,14 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
         break;
     case NETOPT_ADDRESS_LONG:
         assert(opt->data_len == LORAMAC_DEVEUI_LEN);
-        _memcpy_reversed(netif->lorawan.deveui, opt->data,
-                         LORAMAC_DEVEUI_LEN);
+        memcpy_reversed(netif->lorawan.deveui, opt->data,
+                        LORAMAC_DEVEUI_LEN);
         break;
     case NETOPT_LORAWAN_APPEUI:
     case NETOPT_LORAWAN_JOINEUI:
         assert(opt->data_len == LORAMAC_JOINEUI_LEN);
-        _memcpy_reversed(netif->lorawan.joineui, opt->data,
-                         LORAMAC_JOINEUI_LEN);
+        memcpy_reversed(netif->lorawan.joineui, opt->data,
+                        LORAMAC_JOINEUI_LEN);
         break;
 #if IS_USED(MODULE_GNRC_LORAWAN_1_1)
     case NETOPT_LORAWAN_NWKKEY:
@@ -522,18 +516,18 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
         break;
     case NETOPT_LORAWAN_FNWKSINTKEY:
         assert(opt->data_len == LORAMAC_FNWKSINTKEY_LEN);
-        _memcpy_reversed(netif->lorawan.fnwksintkey, opt->data,
-                         LORAMAC_FNWKSINTKEY_LEN);
+        memcpy_reversed(netif->lorawan.fnwksintkey, opt->data,
+                        LORAMAC_FNWKSINTKEY_LEN);
         break;
     case NETOPT_LORAWAN_SNWKSINTKEY:
         assert(opt->data_len == LORAMAC_SNWKSINTKEY_LEN);
-        _memcpy_reversed(netif->lorawan.snwksintkey, opt->data,
-                         LORAMAC_SNWKSINTKEY_LEN);
+        memcpy_reversed(netif->lorawan.snwksintkey, opt->data,
+                        LORAMAC_SNWKSINTKEY_LEN);
         break;
     case NETOPT_LORAWAN_NWKSENCKEY:
         assert(opt->data_len == LORAMAC_NWKSENCKEY_LEN);
-        _memcpy_reversed(netif->lorawan.nwksenckey, opt->data,
-                         LORAMAC_NWKSKEY_LEN);
+        memcpy_reversed(netif->lorawan.nwksenckey, opt->data,
+                        LORAMAC_NWKSKEY_LEN);
         break;
 #else
     case NETOPT_LORAWAN_APPKEY:
