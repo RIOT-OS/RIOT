@@ -258,11 +258,11 @@ int mpu9x50_read_gyro(const mpu9x50_t *dev, mpu9x50_results_t *output)
     i2c_release(DEV_I2C);
 
     /* Normalize data according to configured full scale range */
-    temp = byteorder_lebuftohs(&data[0]);
+    temp = byteorder_bebuftohs(&data[0]);
     output->x_axis = (temp * fsr) / MAX_VALUE;
-    temp = byteorder_lebuftohs(&data[2]);
+    temp = byteorder_bebuftohs(&data[2]);
     output->y_axis = (temp * fsr) / MAX_VALUE;
-    temp = byteorder_lebuftohs(&data[4]);
+    temp = byteorder_bebuftohs(&data[4]);
     output->z_axis = (temp * fsr) / MAX_VALUE;
 
     return 0;
@@ -290,11 +290,11 @@ int mpu9x50_read_accel(const mpu9x50_t *dev, mpu9x50_results_t *output)
     i2c_release(DEV_I2C);
 
     /* Normalize data according to configured full scale range */
-    temp = byteorder_lebuftohs(&data[0]);
+    temp = byteorder_bebuftohs(&data[0]);
     output->x_axis = (temp * fsr) / MAX_VALUE;
-    temp = byteorder_lebuftohs(&data[2]);
+    temp = byteorder_bebuftohs(&data[2]);
     output->y_axis = (temp * fsr) / MAX_VALUE;
-    temp = byteorder_lebuftohs(&data[4]);
+    temp = byteorder_bebuftohs(&data[4]);
     output->z_axis = (temp * fsr) / MAX_VALUE;
 
     return 0;
