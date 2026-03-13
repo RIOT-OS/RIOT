@@ -113,7 +113,8 @@ runtime_config_error_t runtime_config_set(const runtime_config_node_t *node, con
 static runtime_config_error_t _apply_export_cb(const runtime_config_node_t *node, const void *context)
 {
     (void)context;
-   assert(node != NULL);
+    assert(node != NULL);
+
     const runtime_config_schema_instance_t *instance;
 
     switch (node->type) {
