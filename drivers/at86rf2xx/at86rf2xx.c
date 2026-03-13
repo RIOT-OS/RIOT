@@ -28,7 +28,7 @@
 #include "at86rf2xx_registers.h"
 #include "at86rf2xx_internal.h"
 #if IS_USED(MODULE_AT86RF2XX_AES_SPI)
-#include "at86rf2xx_aes.h"
+#  include "at86rf2xx_aes.h"
 #endif
 
 #define ENABLE_DEBUG 0
