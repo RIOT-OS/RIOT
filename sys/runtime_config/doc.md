@@ -41,7 +41,7 @@ The runtime config API acts as a common interface to access runtime configuratio
 All runtime configurations can be accessed either from the RIOT application using the provided runtime config interfaces or through the interfaces exposed by the configuration managers.
 A RIOT application may interact with a configuration manager in order to modify access control rules or enable different exposed interfaces.
 
-#### Path Based Configuration Managers (Needs `int_path or string_path` extension)
+#### Path Based Configuration Managers (Needs `int_path` or `string_path` extension)
 
 These configuration managers mirror the internal structure of the RIOT runtime
 configuration tree.
@@ -107,9 +107,9 @@ The functionality of these functions is explained in the following paragraphs.
 
 <img src="https://github.com/user-attachments/assets/588cb389-250a-4797-a78e-a76c4efe18fb" style="width: 800px; max-width: 100%" alt="api_structure" />
 
-### Usage
+## Usage
 
-#### Add Namespaces
+### Add Namespaces
 
 To be able to use `Configuration Schemas` and their `Parameters` etc. it is necessary to add a `Configuration Namespace` that contains the required `Configuration Schemas`.
 
@@ -119,7 +119,7 @@ This is possible using the `RUNTIME_CONFIG_ADD_NAMESPACE` macro, providing the n
 #define RUNTIME_CONFIG_ADD_NAMESPACE(_name, _namespace)
 ```
 
-#### Add Configuration Schema Instances
+### Add Configuration Schema Instances
 
 To expose runtime configurations, it is necessary to add a `Configuration Schema Instance` of the needed `Configuration Schema`.
 
@@ -151,7 +151,7 @@ static runtime_config_schema_instance_t board_led_instance = {
 runtime_config_add_schema_instance(&runtime_config_sys_board_led, &board_led_instance);
 ```
 
-#### Get configurations
+### Get configurations
 
 A Configuration Value can be retrieved using the `runtime_config_get` function.
 The function takes the `runtime_config_node_t` and a `runtime_config_value_t` pointer (to return the value) as its arguments.
@@ -163,7 +163,7 @@ int runtime_config_get(
 );
 ```
 
-#### Set configurations
+### Set configurations
 
 A Configuration Value can be set using the `runtime_config_set` function.
 The function takes the `runtime_config_node_t`, a `void*` buffer and the buffer size as its arguments.
@@ -179,7 +179,7 @@ int runtime_config_set(
 );
 ```
 
-#### Apply configurations
+### Apply configurations
 
 Once the value(s) of one or multiple `Configuration Parameter(s)` are changed by the `runtime_config_set` function, they still need to be applied, so that the new values are taken into effect.
 
@@ -193,7 +193,7 @@ This way the module gets notified, when the `Configuration Parameter` has been a
 int runtime_config_apply(const runtime_config_node_t *node);
 ```
 
-#### Export configurations
+### Export configurations
 
 Some times it is convenient to have a way to see what `Configuration Namespaces`, `Configuration Schemas`, `Configuration Schema Instances`, `Configuration Groups` or `Configuration Parameters` are available within our current Runtime config deployment.
 To get this information there is the `runtime_config_export` function.
