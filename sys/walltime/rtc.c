@@ -20,6 +20,7 @@
 
 #include "periph/rtc.h"
 #include "modules.h"
+#include "walltime.h"
 
 #ifdef MODULE_WALLTIME_IMPL_RTC
 
@@ -38,6 +39,21 @@ int walltime_impl_set(struct tm *time)
 {
     rtc_set_time(time);
     return 0;
+}
+
+int walltime_impl_alarm_set(struct tm *time, walltime_alarm_cb_t cb, void *arg)
+{
+    if (cb) {
+        return rtc_set_alarm(time, cb, arg);
+    } else {
+        rtc_clear_alarm();
+        return 0;
+    }
+}
+
+int walltime_impl_alarm_get(struct tm *time)
+{
+    return rtc_get_alarm(time);
 }
 
 #endif

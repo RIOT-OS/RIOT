@@ -15,6 +15,7 @@
  * @}
  */
 
+#include <errno.h>
 #include <stdint.h>
 #include <time.h>
 
@@ -41,6 +42,23 @@ int walltime_impl_set(struct tm *time)
 {
     ztimer_offset = rtc_mktime(time) - ztimer_now(ZTIMER_MSEC) / 1000;
     return 0;
+}
+
+__attribute__((weak))
+int walltime_impl_alarm_set(struct tm *time, walltime_alarm_cb_t cb, void *arg)
+{
+    (void)time;
+    (void)cb;
+    (void)arg;
+
+    return -ENOTSUP;
+}
+
+__attribute__((weak))
+int walltime_impl_alarm_get(struct tm *time)
+{
+    (void)time;
+    return -ENOTSUP;
 }
 
 __attribute__((weak))

@@ -31,3 +31,8 @@ ifneq (,$(filter vfs_default,$(USEMODULE)))
   endif
   USEMODULE += mtd
 endif
+
+ifneq (,$(filter walltime_default,$(USEMODULE)))
+  USEMODULE += walltime_impl_rtc
+  USEMODULE += ztimer_no_periph_rtt
+endif

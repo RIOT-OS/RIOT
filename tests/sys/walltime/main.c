@@ -11,10 +11,13 @@
  *
  */
 
+#include <errno.h>
 #include "shell.h"
+#include "time_units.h"
 #include "fmt.h"
 #include "rtc_utils.h"
 #include "walltime.h"
+#include "ztimer.h"
 
 static void _time_change_cb(void *ctx, int32_t diff_sec, int16_t diff_ms)
 {
@@ -54,6 +57,11 @@ static void _add_and_remove_dummy_cb(void)
         goto fail;                                                  \
     }
 
+static void _unlock(void *ctx)
+{
+    mutex_unlock(ctx);
+}
+
 static int _cmd_test(int argc, char **argv)
 {
     (void)argc;
@@ -79,6 +87,34 @@ static int _cmd_test(int argc, char **argv)
     TEST_RES(res, "walltime_get()");
     res = rtc_tm_compare(&now, &expect);
     TEST_RES(res, "rtc_tm_compare()");
+
+    mutex_t lock = MUTEX_INIT_LOCKED;
+    uint32_t now_ms = ztimer_now(ZTIMER_MSEC);
+
+    now.tm_sec += 5;
+    res = walltime_set_alarm(&now, _unlock, &lock);
+    if (res != -ENOTSUP) {
+        TEST_RES(res, "walltime_set_alarm()");
+
+        struct tm alarm;
+        res = walltime_get_alarm(&alarm);
+        if (res != -ENOTSUP) {
+            TEST_RES(res, "walltime_get_alarm()");
+            res = rtc_tm_compare(&now, &alarm);
+            TEST_RES(res, "rtc_tm_compare()");
+        }
+
+        puts("wait for alarm");
+
+        res = ztimer_mutex_lock_timeout(ZTIMER_MSEC, &lock, 6 * MS_PER_SEC);
+        TEST_RES(res, "wait for alarm");
+
+        int diff = 5 * MS_PER_SEC - (ztimer_now(ZTIMER_MSEC) - now_ms);
+        if (diff < -1000) {
+            printf("alarm %d ms early\n", -diff);
+            goto fail;
+        }
+    }
 
     puts("TEST PASSED");
     return res;
