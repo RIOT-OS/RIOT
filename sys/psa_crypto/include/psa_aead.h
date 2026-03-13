@@ -21,6 +21,7 @@
 #  define PSA_AEAD_H
 
 #include "psa/aead/types.h"
+#include <stdint.h>
 #  ifdef __cplusplus
 extern "C" {
 #  endif
@@ -170,8 +171,7 @@ psa_status_t psa_aead_chacha20_poly1305_update_ad(psa_aead_chacha20_poly1305_ctx
 *          See @ref psa_aead_update()
 */
 psa_status_t psa_aead_chacha20_poly1305_update(psa_aead_chacha20_poly1305_ctx_t *ctx,
-                                               psa_aead_operation_state_t op_state,
-                                               psa_encrypt_or_decrypt_t direction,
+                                               uint8_t op_state,
                                                const uint8_t *input,
                                                size_t input_length,
                                                uint8_t *output,

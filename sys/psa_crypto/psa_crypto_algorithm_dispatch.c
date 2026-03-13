@@ -1171,7 +1171,6 @@ psa_status_t psa_algorithm_dispatch_aead_update(psa_aead_operation_t *operation,
     case PSA_CHACHA20_POLY1305:
         return psa_aead_chacha20_poly1305_update(&operation->backend_ctx.chacha20poly1305,
                                                  operation->state,
-                                                 operation->direction,
                                                  input,
                                                  input_length,
                                                  output,

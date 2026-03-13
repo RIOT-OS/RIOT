@@ -22,6 +22,7 @@
  */
 
 #include "psa_crypto_operation_encoder.h"
+#include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,31 +31,39 @@ extern "C" {
 #include "psa/algorithm.h"
 #include "psa/cipher/types.h"
 
-//todo: docs
-// additional information if encryption or decryption and if lengths were set
-typedef enum {
-    PSA_AEAD_OP_STATE_INACTIVE,     /* after init */
-    PSA_AEAD_OP_STATE_LENGTHS_REQ,  /* mostly optinal: only if lengths are required */
-    PSA_AEAD_OP_STATE_NONCE_REQ,    /* awaiting nonce to be set */
-    PSA_AEAD_OP_STATE_AAD_IN,
-    PSA_AEAD_OP_STATE_MSG_IN,
-    PSA_AEAD_OP_STATE_ERROR,        /* after an error occured */
-} psa_aead_operation_state_t;
+/* 
+ * These states along with some information about the direction
+ * (encryption/decryption) and whether the lengths have been set
+ * get stored in the AEAD operation object in a single uint8.
+ * The information is encoded as follows (counting from LSB):
+ * - bit 1:     direction (dec=0, enc=1 - in accordance to
+ *                         psa_encrypt_or_decrypt_t)
+ * - bit 2:     were lengths set?
+ * - bits 3-8:  state of the operation
+ */
+#define PSA_AEAD_OP_STATE_INACTIVE    (0 << 2)
+#define PSA_AEAD_OP_STATE_LENGTHS_REQ (1 << 2)
+#define PSA_AEAD_OP_STATE_NONCE_REQ   (2 << 2)
+#define PSA_AEAD_OP_STATE_AAD_IN      (3 << 2)
+#define PSA_AEAD_OP_STATE_MSG_IN      (4 << 2)
+#define PSA_AEAD_OP_STATE_ERROR       (5 << 2)
+/* Use these masks with bitwise and (&) on the operation state to
+ * extract information from it, without having to use magic numbers. */
+#define PSA_AEAD_OP_STATE_MASK        (0xFC)
+#define PSA_AEAD_OP_DIRECTION_MASK    (1)
+#define PSA_AEAD_OP_LENGHTS_MASK      (2)
+#define PSA_AEAD_OP_CONFIG_MASK       (3)
 
 /**
  * @brief   Structure storing an AEAD operation context
- *
- * @note    Not implemented, yet
  */
 struct psa_aead_operation_s {
-    psa_aead_operation_state_t state;
-    psa_encrypt_or_decrypt_t direction; /**< Direction */
-    size_t ad_length;                   /**< Length of additional data */
-    size_t processed_ad_length;         /**< Length of already processed additional data */
-    size_t message_length;              /**< Length of message data */
-    size_t processed_message_length;    /**< Length of already processed message data */
-    psa_algorithm_t alg;                /**< Operation algorithm*/
-    psa_aead_op_t op;                   /**< Encoded operation */
+    uint8_t state;                   /**< Encoded state of the operation */
+    size_t ad_length;                /**< Length of additional data */
+    size_t processed_ad_length;      /**< Length of already processed additional data */
+    size_t message_length;           /**< Length of message data */
+    size_t processed_message_length; /**< Length of already processed message data */
+    psa_aead_op_t op;                /**< Encoded operation */
     /** Union containing AEAD cipher contexts for the executing backend */
     union aead_context {
 #if IS_USED(MODULE_PSA_AEAD_CHACHA20_POLY1305) || defined(DOXYGEN)

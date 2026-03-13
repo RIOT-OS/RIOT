@@ -3,6 +3,8 @@
 #include "psa/error.h"
 #include "crypto/chacha20poly1305.h"
 #include "psa_ciphers.h"
+#include <stdint.h>
+#include <stdio.h>
 
 psa_status_t psa_aead_chacha20_poly1305_encrypt(const psa_key_attributes_t *attributes,
                                                 uint8_t *key_buffer, size_t key_buffer_length,
@@ -108,7 +110,7 @@ psa_status_t psa_aead_chacha20_poly1305_set_nonce(psa_aead_chacha20_poly1305_ctx
 #if IS_USED(MODULE_PSA_RIOT_CIPHER_CHACHA20)
     poly1305_init_from_chacha(&ctx->chacha.ctx, &ctx->poly);
 #endif
-    
+
 #if IS_USED(MODULE_PERIPH_CIPHER_CHACHA20)
     static const uint8_t input[CRYS_CHACHA_BLOCK_SIZE_IN_BYTES] = { 0 };
     uint8_t output[CRYS_CHACHA_BLOCK_SIZE_IN_BYTES];
@@ -138,15 +140,14 @@ psa_status_t psa_aead_chacha20_poly1305_update_ad(psa_aead_chacha20_poly1305_ctx
 }
 
 psa_status_t psa_aead_chacha20_poly1305_update(psa_aead_chacha20_poly1305_ctx_t *ctx,
-                                               psa_aead_operation_state_t op_state,
-                                               psa_encrypt_or_decrypt_t direction,
+                                               uint8_t op_state,
                                                const uint8_t *input,
                                                size_t input_length,
                                                uint8_t *output,
                                                size_t output_size,
                                                size_t *output_length)
 {
-    if (op_state != PSA_AEAD_OP_STATE_MSG_IN) {
+    if ((op_state & PSA_AEAD_OP_STATE_MASK) != PSA_AEAD_OP_STATE_MSG_IN) {
         /* When this function is called, no more additional data can be added.
          * So we pad the given ad to a full 16 byte (Poly) block. */
         static const uint8_t padding[15] = { 0 };
@@ -160,7 +161,7 @@ psa_status_t psa_aead_chacha20_poly1305_update(psa_aead_chacha20_poly1305_ctx_t 
     }
 
     /* No matter which direction, Poly always uses the ciphertext as input. */
-    if (direction == PSA_CRYPTO_DRIVER_ENCRYPT) {
+    if ((op_state & PSA_AEAD_OP_DIRECTION_MASK) == PSA_CRYPTO_DRIVER_ENCRYPT) {
         poly1305_update(&ctx->poly, output, *output_length);
     }
     else {

@@ -20,6 +20,7 @@
 #include "psa/cipher/types.h"
 #include "psa/error.h"
 #include "psa/key/type.h"
+#include <stdint.h>
 #include <stdio.h>
 #include "psa/crypto.h"
 
@@ -302,7 +303,7 @@ psa_status_t psa_aead_encrypt_decrypt_setup(psa_aead_operation_t *operation,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
     if (!lib_initialized ||
-        operation->state != PSA_AEAD_OP_STATE_INACTIVE) {
+        (operation->state & PSA_AEAD_OP_STATE_MASK) != PSA_AEAD_OP_STATE_INACTIVE) {
         return PSA_ERROR_BAD_STATE;
     }
     if (!PSA_ALG_IS_AEAD(alg)) {
@@ -323,9 +324,6 @@ psa_status_t psa_aead_encrypt_decrypt_setup(psa_aead_operation_t *operation,
         return status;
     }
 
-    // todo
-    operation->direction = direction;
-
     if (direction == PSA_CRYPTO_DRIVER_ENCRYPT) {
         status = psa_location_dispatch_aead_encrypt_setup(operation, &slot->attr, slot, alg);
     }
@@ -340,10 +338,10 @@ psa_status_t psa_aead_encrypt_decrypt_setup(psa_aead_operation_t *operation,
     if (alg == PSA_ALG_CCM) {
         /* CCM algorithms require psa_aead_set_lengths() to be called
          * before psa_aead_generate_nonce() or psa_aead_set_nonce(). */
-        operation->state = PSA_AEAD_OP_STATE_LENGTHS_REQ;
+        operation->state = PSA_AEAD_OP_STATE_LENGTHS_REQ | direction;
     }
     else {
-        operation->state = PSA_AEAD_OP_STATE_NONCE_REQ;
+        operation->state = PSA_AEAD_OP_STATE_NONCE_REQ | direction;
     }
 
     unlock_status = psa_unlock_key_slot(slot);
@@ -376,8 +374,8 @@ psa_status_t psa_aead_set_lengths(psa_aead_operation_t *operation,
     /* the operation must either be in the lengths
      * required or nonce required state */
     if (!lib_initialized ||
-        (operation->state != PSA_AEAD_OP_STATE_LENGTHS_REQ &&
-         operation->state != PSA_AEAD_OP_STATE_NONCE_REQ)) {
+        ((operation->state & PSA_AEAD_OP_STATE_MASK) != PSA_AEAD_OP_STATE_LENGTHS_REQ &&
+         (operation->state & PSA_AEAD_OP_STATE_MASK) != PSA_AEAD_OP_STATE_NONCE_REQ)) {
         operation->state = PSA_AEAD_OP_STATE_ERROR;
         return PSA_ERROR_BAD_STATE;
     }
@@ -390,7 +388,7 @@ psa_status_t psa_aead_set_lengths(psa_aead_operation_t *operation,
 
     operation->message_length = plaintext_length;
     operation->ad_length = ad_length;
-    operation->state = PSA_AEAD_OP_STATE_NONCE_REQ;
+    operation->state = PSA_AEAD_OP_STATE_NONCE_REQ | (operation->state & PSA_AEAD_OP_CONFIG_MASK) | 2;
 
     return status;
 }
@@ -406,7 +404,7 @@ psa_status_t psa_aead_generate_nonce(psa_aead_operation_t *operation,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
     if (!lib_initialized ||
-        operation->state != PSA_AEAD_OP_STATE_NONCE_REQ) {
+        (operation->state & PSA_AEAD_OP_STATE_MASK) != PSA_AEAD_OP_STATE_NONCE_REQ) {
         operation->state = PSA_AEAD_OP_STATE_ERROR;
         return PSA_ERROR_BAD_STATE;
     }
@@ -435,7 +433,7 @@ psa_status_t psa_aead_generate_nonce(psa_aead_operation_t *operation,
         return status;
     }
 
-    operation->state = PSA_AEAD_OP_STATE_AAD_IN;
+    operation->state = PSA_AEAD_OP_STATE_AAD_IN | (operation->state & PSA_AEAD_OP_CONFIG_MASK);
 
     return status;
 }
@@ -450,7 +448,7 @@ psa_status_t psa_aead_set_nonce(psa_aead_operation_t *operation,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
     if (!lib_initialized ||
-        operation->state != PSA_AEAD_OP_STATE_NONCE_REQ) {
+        (operation->state & PSA_AEAD_OP_STATE_MASK) != PSA_AEAD_OP_STATE_NONCE_REQ) {
         operation->state = PSA_AEAD_OP_STATE_ERROR;
         return PSA_ERROR_BAD_STATE;
     }
@@ -466,7 +464,7 @@ psa_status_t psa_aead_set_nonce(psa_aead_operation_t *operation,
         return status;
     }
 
-    operation->state = PSA_AEAD_OP_STATE_AAD_IN;
+    operation->state = PSA_AEAD_OP_STATE_AAD_IN | (operation->state & PSA_AEAD_OP_CONFIG_MASK);
 
     return status;
 }
@@ -481,21 +479,19 @@ psa_status_t psa_aead_update_ad(psa_aead_operation_t *operation,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
     if (!lib_initialized ||
-        operation->state != PSA_AEAD_OP_STATE_AAD_IN) {
+        (operation->state & PSA_AEAD_OP_STATE_MASK) != PSA_AEAD_OP_STATE_AAD_IN) {
         operation->state = PSA_AEAD_OP_STATE_ERROR;
         return PSA_ERROR_BAD_STATE;
     }
 
-    // todo
     size_t new_total = operation->processed_ad_length + input_length;
     /* total input_length to psa_aead_update_ad() is greater than the additional data length that 
      * was previously specified with psa_aead_set_lengths() or is too large for the chosen AEAD 
      * algorithm. 
      */
-    if (operation->alg == PSA_ALG_CCM && (new_total > operation->ad_length)) {
+    if ((operation->state & PSA_AEAD_OP_LENGHTS_MASK) && (new_total > operation->ad_length)) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-    // end todo
 
     status = psa_location_dispatch_aead_update_ad(operation, input, input_length);
     if (status != PSA_SUCCESS) {
@@ -521,23 +517,20 @@ psa_status_t psa_aead_update(psa_aead_operation_t *operation,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
     if (!lib_initialized ||
-        (operation->state != PSA_AEAD_OP_STATE_AAD_IN &&
-         operation->state != PSA_AEAD_OP_STATE_MSG_IN)) {
+        ((operation->state & PSA_AEAD_OP_STATE_MASK) != PSA_AEAD_OP_STATE_AAD_IN &&
+         (operation->state & PSA_AEAD_OP_STATE_MASK) != PSA_AEAD_OP_STATE_MSG_IN)) {
         operation->state = PSA_AEAD_OP_STATE_ERROR;
         return PSA_ERROR_BAD_STATE;
     }
 
-    // todo
-    if (operation->alg == PSA_ALG_CCM) {
+    if (operation->state & PSA_AEAD_OP_LENGHTS_MASK) {
         if (operation->processed_ad_length < operation->ad_length) {
             return PSA_ERROR_INVALID_ARGUMENT;
         }
-
         if (input_length + operation->processed_message_length > operation->message_length) {
             return PSA_ERROR_INVALID_ARGUMENT;
         }
     }
-    // end todo
 
     status = psa_location_dispatch_aead_update(operation, input, input_length, output, output_size, output_length);
     if (status != PSA_SUCCESS) {
@@ -546,7 +539,7 @@ psa_status_t psa_aead_update(psa_aead_operation_t *operation,
     }
 
     operation->processed_message_length += input_length;
-    operation->state = PSA_AEAD_OP_STATE_MSG_IN;
+    operation->state = PSA_AEAD_OP_STATE_MSG_IN | (operation->state & PSA_AEAD_OP_CONFIG_MASK);
 
     return status;
 }
@@ -565,8 +558,8 @@ psa_status_t psa_aead_finish(psa_aead_operation_t *operation,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
     if (!lib_initialized ||
-        (operation->state != PSA_AEAD_OP_STATE_AAD_IN &&
-         operation->state != PSA_AEAD_OP_STATE_MSG_IN)) {
+        ((operation->state & PSA_AEAD_OP_STATE_MASK) != PSA_AEAD_OP_STATE_AAD_IN &&
+         (operation->state & PSA_AEAD_OP_STATE_MASK) != PSA_AEAD_OP_STATE_MSG_IN)) {
         operation->state = PSA_AEAD_OP_STATE_ERROR;
         return PSA_ERROR_BAD_STATE;
     }
@@ -574,8 +567,7 @@ psa_status_t psa_aead_finish(psa_aead_operation_t *operation,
         operation->state = PSA_AEAD_OP_STATE_ERROR;
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-    // todo
-    if (operation->direction != PSA_CRYPTO_DRIVER_ENCRYPT) {
+    if ((operation->state & PSA_AEAD_OP_DIRECTION_MASK) != PSA_CRYPTO_DRIVER_ENCRYPT) {
         return PSA_ERROR_BAD_STATE;
     }
 
@@ -604,8 +596,8 @@ psa_status_t psa_aead_verify(psa_aead_operation_t *operation,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
     if (!lib_initialized ||
-        (operation->state != PSA_AEAD_OP_STATE_AAD_IN &&
-         operation->state != PSA_AEAD_OP_STATE_MSG_IN)) {
+        ((operation->state & PSA_AEAD_OP_STATE_MASK) != PSA_AEAD_OP_STATE_AAD_IN &&
+         (operation->state & PSA_AEAD_OP_STATE_MASK) != PSA_AEAD_OP_STATE_MSG_IN)) {
         operation->state = PSA_AEAD_OP_STATE_ERROR;
         return PSA_ERROR_BAD_STATE;
     }
@@ -613,9 +605,7 @@ psa_status_t psa_aead_verify(psa_aead_operation_t *operation,
         operation->state = PSA_AEAD_OP_STATE_ERROR;
         return PSA_ERROR_INVALID_ARGUMENT;
     }
-
-    //todo
-    if (operation->direction != PSA_CRYPTO_DRIVER_DECRYPT) {
+    if ((operation->state & PSA_AEAD_OP_DIRECTION_MASK) != PSA_CRYPTO_DRIVER_DECRYPT) {
         return PSA_ERROR_BAD_STATE;
     }
 
@@ -625,6 +615,8 @@ psa_status_t psa_aead_verify(psa_aead_operation_t *operation,
         operation->state = PSA_AEAD_OP_STATE_ERROR;
         return status;
     }
+
+    operation->state = PSA_AEAD_OP_STATE_INACTIVE;
 
     return status;
 }
