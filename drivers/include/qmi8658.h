@@ -9,9 +9,31 @@
 #pragma once
 
 /**
- * @defgroup    drivers_qmi8658 QMI8658 IMU
+ * @defgroup    drivers_qmi8658 QMI8658 6D MEMS IMU
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver for the QMI8658 6D MEMS inertial measurement unit (IMU)
+ *
+ * This driver provides @ref drivers_saul capabilities.
+ *
+ * # About
+ * This module provides a device driver for the QMI8658 interial measurement unit 
+ * (IMU) by QST. This driver exposes accelerometer, gyroscope and temperature sensor 
+ * data in several operating modes of the device (qmi8658_mode_t).
+ *
+ * # Configuration
+ * This driver is configurable via the parameters in qmi8658_params.h:
+ * - Acceleromter output data rate (in normal and low power mode)
+ * - Acceleromter value full scale
+ * - Gyroscope output data rate
+ * - Gyroscope value full scale
+ *
+ * # Usage
+ * Use the qmi8658_init() function to initialize the device. This will configure the
+ * device but not enable any sensors. Use qmi8658_set_mode() to select an operating
+ * for the device, which enables the corresponding sensors in the chosen power mode.
+ * Now the sensor values can be polled using the functions qmi8658_read_acc(),
+ * qmi8658_read_gyro() and qmi8658_read_temp().
  *
  * @{
  *
