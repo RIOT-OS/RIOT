@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include "architecture.h"
+#include "macros/utils.h"
 #include "riotboot/flashwrite.h"
 #include "riotboot/slot.h"
 #include "od.h"
@@ -204,8 +205,8 @@ int riotboot_flashwrite_invalidate_latest(void)
 {
     int _slot_to_revert;
 
-    _slot_to_revert = (riotboot_slot_get_hdr(riotboot_slot_other())->version
-                       > riotboot_slot_get_hdr(riotboot_slot_current())->version)
+    _slot_to_revert = (riotboot_hdr_get_version(riotboot_slot_get_hdr(riotboot_slot_other())) >
+                       riotboot_hdr_get_version(riotboot_slot_get_hdr(riotboot_slot_current())))
                       ? riotboot_slot_other() : riotboot_slot_current();
     return riotboot_flashwrite_invalidate(_slot_to_revert);
 }
@@ -220,6 +221,7 @@ int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
     uint8_t *slot_start = (uint8_t *)riotboot_slot_get_hdr(state->target_slot);
 
 #if IS_ACTIVE(CONFIG_RIOTBOOT_FLASHWRITE_RAW)
+    len = MIN(len, RIOTBOOT_FLASHPAGE_BUFFER_SIZE);
     memcpy(state->firstblock_buf, bytes, len);
     flashpage_write(slot_start, state->firstblock_buf,
                     RIOTBOOT_FLASHPAGE_BUFFER_SIZE);
