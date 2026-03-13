@@ -627,6 +627,36 @@ size_t ieee802154_set_frame_hdr(uint8_t *buf, const uint8_t *src, size_t src_len
 size_t ieee802154_get_frame_hdr_len(const uint8_t *mhr);
 
 /**
+ * @brief   Get length of source address.
+ *
+ * @param[in] mhr   MAC header.
+ *
+ * @return  Length of source address
+ *          or 0 if malformed or there is no source address.
+ */
+uint8_t ieee802154_get_src_len(const uint8_t *mhr);
+
+/**
+ * @brief   Get pointer to source address in MAC header.
+ *
+ * @param[in] mhr   MAC header.
+ *
+ * @return  Pointer to source address in MAC header
+ *          or NULL if malformed or there is no source address.
+ */
+const uint8_t *ieee802154_get_src_ptr(const uint8_t *mhr);
+
+/**
+ * @brief   Get pointer to source PAN in MAC header.
+ *
+ * @param[in] mhr   MAC header.
+ *
+ * @return  Pointer to source PAN in MAC header
+ *          or NULL if malformed or there is no source PAN.
+ */
+const uint8_t *ieee802154_get_src_pan_ptr(const uint8_t *mhr);
+
+/**
  * @brief   Gets source address from MAC header.
  *
  * @pre (@p src != NULL) && (@p src_pan != NULL)
@@ -639,6 +669,35 @@ size_t ieee802154_get_frame_hdr_len(const uint8_t *mhr);
  * @return  -EINVAL, if @p mhr contains unexpected flags.
  */
 int ieee802154_get_src(const uint8_t *mhr, uint8_t *src, le_uint16_t *src_pan);
+
+/**
+ * @brief   Get length of destination address.
+ *
+ * @param[in]   mhr   MAC header.
+ * @return      Length of destination address
+ *              or 0 if malformed or there is no destination address.
+ */
+uint8_t ieee802154_get_dst_len(const uint8_t *mhr);
+
+/**
+ * @brief   Get pointer to destination address in MAC header.
+ *
+ * @param[in] mhr   MAC header.
+ *
+ * @return  Pointer to destination address in MAC header
+ *          or NULL if malformed or there is no destination address.
+ */
+const uint8_t *ieee802154_get_dst_ptr(const uint8_t *mhr);
+
+/**
+ * @brief   Get pointer to destination PAN in MAC header.
+ *
+ * @param[in] mhr   MAC header.
+ *
+ * @return  Pointer to destination PAN in MAC header
+ *          or NULL if malformed or there is no destination PAN.
+ */
+const uint8_t *ieee802154_get_dst_pan_ptr(const uint8_t *mhr);
 
 /**
  * @brief   Gets destination address from MAC header.
