@@ -168,14 +168,16 @@ found [here](https://github.com/RIOT-OS/RIOT/tree/master/tests/drivers/mpu9x50).
 |:--------------------- |:------------------------------------------------------------------------------------------------- |
 | Type                  | Nine-Axis MotionTracking Device (Gyro, Accel and Compass)                                         |
 | Vendor                | Invensense                                                                                        |
-| Product Specification | [Product Specification](https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-9150-Datasheet.pdf)    |
-| Register Map          | [Register Map](https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-9150-Register-Map.pdf)             |
+| Product Specification | [Product Specification]                                                                           |
+| Register Map          | [Register Map]                                                                                    |
 | Driver                | @ref drivers_mpu9x50                                                                              |
 | I²C Device            | I2C1 (Mapped to I2C_0 in RIOT)                                                                    |
 | SCL                   | PB6                                                                                               |
 | SDA                   | PB7                                                                                               |
 | IRQ Line              | PB11                                                                                              |
 
+[Product Specification]: https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-9150-Datasheet.pdf
+[Register Map]: https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-9150-Register-Map.pdf
 
 ### Other components
 
@@ -195,27 +197,16 @@ documentation of your used tools.
 
 ### Prerequisites
 
-We strongly recommend the usage of the [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded) toolchain for the MSB-IoT.
-Support for other toolchains was not tested!
-
 RIOT's provided functionality for debugging and flashing the MSB-IoT is based
 on the [Open On-Chip Debugger](http://openocd.org/) tool. A wiki page with
 installation instructions and some other information can be found
 [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD).
 
 
-### Quick start
-
-For a quick getting started guide you can stick to the steps explained on
-[this page](https://github.com/RIOT-OS/RIOT/wiki/Getting-started-with-STM32F%5B0%7C3%7C4%5Ddiscovery-boards). Just make sure to use "msbiot" as the
-respective board name.
-
-
 ### Compiling
 
 ```
-fabian@fabian-ThinkPad-L412:~/myriot/RIOT/examples/basic/hello-world$ BOARD=msbiot
-make
+RIOT/examples/basic/hello-world$ BOARD=msbiot make
 Building application "hello-world" for "msbiot" with MCU "stm32f4".
 
 "make" -C /home/fabian/myriot/RIOT/boards/msbiot
@@ -235,8 +226,7 @@ Building application "hello-world" for "msbiot" with MCU "stm32f4".
 ### Flashing
 
 ```
-fabian@fabian-ThinkPad-L412:~/myriot/RIOT/examples/basic/hello-world$ BOARD=msbiot
-make flash
+RIOT/examples/basic/hello-world$ BOARD=msbiot make flash
 Building application "hello-world" for "msbiot" with MCU "stm32f4".
 
 "make" -C /home/fabian/myriot/RIOT/boards/msbiot
@@ -304,8 +294,7 @@ Done flashing
 ### Debugging
 
 ```
-fabian@fabian-ThinkPad-L412:~/myriot/RIOT/examples/basic/hello-world$ BOARD=msbiot
-make debug
+RIOT/examples/basic/hello-world$ BOARD=msbiot make debug
 /home/fabian/myriot/RIOT/dist/tools/openocd/openocd.sh debug
 ### Starting Debugging ###
 Open On-Chip Debugger 0.8.0 (2015-03-01-08:19)
@@ -329,15 +318,23 @@ reset_handler () at /home/fabian/myriot/RIOT/cpu/stm32f4/startup.c:54
 (gdb)
 ```
 
+### Using RTT as STDIO
+
+By default `stdio_rtt` is used. So just connect the ST-Link and type
+`BOARD=msbiot make term` and you'll get the serial console.
 
 ### Using the UART for STDIO
 
-The MCU's USART2 is set as the default input/output for the MSB-IoT inside
-RIOT (mapped to UART_0). It is initialized and configured automatically for
-every RIOT application and can be used for communication with your computer. The
-easiest way is to use an USB to TTL adapter:
+The MCU's USART2 that is routed to the pin headers is mapped as `UART_0` and
+the default UART for when `stdio_uart` is used. Since `stdio_rtt` is the default
+you need to use
 
-Step 1: Connect your adapter and the boards pin strip with RX<=>PA02,
-TX<=>PA03 and GND<=>GND
+```
+USEMODULE=stdio_uart BOARD=msbio make flash term
+```
 
-Step 2: Done. The MCUs USART2 is used as STDIO.
+Note that you need to rebuild and flash the app when switching the stdio
+backend.
+
+Connect your adapter and the boards pin strip with RX<=>PA02, TX<=>PA03 and
+GND<=>GND
