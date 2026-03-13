@@ -27,62 +27,62 @@
 
 /* Set to 1 to use on board LEDs to show RX/TX activity */
 #ifndef KW41ZRF_ENABLE_LEDS
-#define KW41ZRF_ENABLE_LEDS     (0)
+#  define KW41ZRF_ENABLE_LEDS     (0)
 #endif
 
 #if KW41ZRF_ENABLE_LEDS
 /* For LED macros */
-#include "board.h"
-#if !defined(KW41ZRF_LED_RX_ON)
-#if defined(LED0_ON)
-#define KW41ZRF_LED_RX_ON       LED0_ON
-#define KW41ZRF_LED_RX_OFF      LED0_OFF
-#else /* defined(LED0_ON) */
-#define KW41ZRF_LED_RX_ON
-#define KW41ZRF_LED_RX_OFF
-#endif /* defined(LED0_ON) */
-#endif /* !defined(KW41ZRF_LED_RX_ON) */
-#if !defined(KW41ZRF_LED_TX_ON)
-#if defined(LED1_ON)
+#  include "board.h"
+#  if !defined(KW41ZRF_LED_RX_ON)
+#    if defined(LED0_ON)
+#      define KW41ZRF_LED_RX_ON       LED0_ON
+#      define KW41ZRF_LED_RX_OFF      LED0_OFF
+#    else /* defined(LED0_ON) */
+#      define KW41ZRF_LED_RX_ON
+#     define KW41ZRF_LED_RX_OFF
+#    endif /* defined(LED0_ON) */
+#  endif /* !defined(KW41ZRF_LED_RX_ON) */
+#  if !defined(KW41ZRF_LED_TX_ON)
+#    if defined(LED1_ON)
 /* Separate TX LED */
-#define KW41ZRF_LED_TX_ON       LED1_ON
-#define KW41ZRF_LED_TX_OFF      LED1_OFF
-#elif defined(LED0_ON)
+#      define KW41ZRF_LED_TX_ON       LED1_ON
+#      define KW41ZRF_LED_TX_OFF      LED1_OFF
+#    elif defined(LED0_ON)
 /* Combined RX+TX in one LED */
-#define KW41ZRF_LED_TX_ON       LED0_ON
-#define KW41ZRF_LED_TX_OFF      LED0_OFF
-#else /* defined(LEDx_ON) */
-#define KW41ZRF_LED_TX_ON
-#define KW41ZRF_LED_TX_OFF
-#endif /* defined(LEDx_ON) */
-#endif /* !defined(KW41ZRF_LED_TX_ON) */
-#if !defined(KW41ZRF_LED_NDSM_ON)
-#if defined(LED2_ON)
-#define KW41ZRF_LED_NDSM_ON     LED2_ON
-#define KW41ZRF_LED_NDSM_OFF    LED2_OFF
-#else /* defined(LEDx_ON) */
-#define KW41ZRF_LED_NDSM_ON
-#define KW41ZRF_LED_NDSM_OFF
-#endif /* defined(LEDx_ON) */
-#endif /* !defined(KW41ZRF_LED_NDSM_ON) */
-#if !defined(KW41ZRF_LED_IRQ_ON)
-#if defined(LED3_ON)
-#define KW41ZRF_LED_IRQ_ON      LED3_ON
-#define KW41ZRF_LED_IRQ_OFF     LED3_OFF
-#else /* defined(LEDx_ON) */
-#define KW41ZRF_LED_IRQ_ON
-#define KW41ZRF_LED_IRQ_OFF
-#endif /* defined(LEDx_ON) */
-#endif /* !defined(KW41ZRF_LED_IRQ_ON) */
+#      define KW41ZRF_LED_TX_ON       LED0_ON
+#      define KW41ZRF_LED_TX_OFF      LED0_OFF
+#    else /* defined(LEDx_ON) */
+#      define KW41ZRF_LED_TX_ON
+#      define KW41ZRF_LED_TX_OFF
+#    endif /* defined(LEDx_ON) */
+#  endif /* !defined(KW41ZRF_LED_TX_ON) */
+#  if !defined(KW41ZRF_LED_NDSM_ON)
+#    if defined(LED2_ON)
+#      define KW41ZRF_LED_NDSM_ON     LED2_ON
+#      define KW41ZRF_LED_NDSM_OFF    LED2_OFF
+#    else /* defined(LEDx_ON) */
+#      define KW41ZRF_LED_NDSM_ON
+#      define KW41ZRF_LED_NDSM_OFF
+#    endif /* defined(LEDx_ON) */
+#  endif /* !defined(KW41ZRF_LED_NDSM_ON) */
+#  if !defined(KW41ZRF_LED_IRQ_ON)
+#    if defined(LED3_ON)
+#      define KW41ZRF_LED_IRQ_ON      LED3_ON
+#      define KW41ZRF_LED_IRQ_OFF     LED3_OFF
+#    else /* defined(LEDx_ON) */
+#      define KW41ZRF_LED_IRQ_ON
+#      define KW41ZRF_LED_IRQ_OFF
+#    endif /* defined(LEDx_ON) */
+#  endif /* !defined(KW41ZRF_LED_IRQ_ON) */
 #else /* KW41ZRF_ENABLE_LEDS */
-#define KW41ZRF_LED_NDSM_ON
-#define KW41ZRF_LED_NDSM_OFF
-#define KW41ZRF_LED_TX_ON
-#define KW41ZRF_LED_TX_OFF
-#define KW41ZRF_LED_RX_ON
-#define KW41ZRF_LED_RX_OFF
-#define KW41ZRF_LED_IRQ_ON
-#define KW41ZRF_LED_IRQ_OFF
+#  define KW41ZRF_LED_NDSM_ON
+#  define KW41ZRF_LED_NDSM_OFF
+#  define KW41ZRF_LED_TX_ON
+#  define KW41ZRF_LED_TX_OFF
+#  define KW41ZRF_LED_RX_ON
+#  define KW41ZRF_LED_RX_OFF
+#  define KW41ZRF_LED_IRQ_ON
+#  define KW41ZRF_LED_IRQ_OFF
 #endif /* KW41ZRF_ENABLE_LEDS */
 
 #ifdef __cplusplus
