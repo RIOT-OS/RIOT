@@ -1,0 +1,9 @@
+# Enable "registry_storage" module for all storage modules
+ifneq (,$(filter registry_storage_%,$(USEMODULE)))
+  USEMODULE += registry_storage
+endif
+
+# Enable "registry_int_path" module for some storage modules
+ifneq (,$(filter registry_storage_vfs,$(USEMODULE)))
+  USEMODULE += registry_int_path
+endif

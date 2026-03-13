@@ -1,0 +1,61 @@
+{
+  "description": "Type of the parameter or group",
+  "oneOf": [
+    {
+      "const": "group",
+      "cType": ""
+    },
+    {
+      "const": "opaque",
+      "cType": "void *"
+    },
+    {
+      "const": "string",
+      "cType": "char *"
+    },
+    {
+      "const": "bool",
+      "cType": "bool"
+    },
+    {
+      "const": "uint8",
+      "cType": "uint8_t"
+    },
+    {
+      "const": "uint16",
+      "cType": "uint16_t"
+    },
+    {
+      "const": "uint32",
+      "cType": "uint32_t"
+    },
+    {
+      "const": "uint64",
+      "cType": "uint64_t"
+    },
+    {
+      "const": "int8",
+      "cType": "int8_t"
+    },
+    {
+      "const": "int16",
+      "cType": "int16_t"
+    },
+    {
+      "const": "int32",
+      "cType": "int32_t"
+    },
+    {
+      "const": "int64",
+      "cType": "int64_t"
+    },
+    {
+      "const": "float32",
+      "cType": "float"
+    },
+    {
+      "const": "float64",
+      "cType": "double"
+    }
+  ]
+}
