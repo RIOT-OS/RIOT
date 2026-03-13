@@ -1,4 +1,8 @@
-SRC := slipdev.c net.c
+SRC := slipdev.c auto_init.c
+
+ifneq (,$(filter slipdev_net,$(USEMODULE)))
+	SRC += net.c
+endif
 
 ifneq (,$(filter slipdev_stdio,$(USEMODULE)))
 	SRC += stdio.c

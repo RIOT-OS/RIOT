@@ -94,6 +94,12 @@ extern "C" {
  */
 #define AUTO_INIT_PRIO_MOD_MCI                          1100
 #endif
+#ifndef AUTO_INIT_PRIO_MOD_SLIPDEV
+/**
+ * @brief   Slipdev/Slipmux priority
+ */
+#define AUTO_INIT_PRIO_MOD_SLIPDEV                      1105
+#endif
 #ifndef AUTO_INIT_PRIO_MOD_PROFILING
 /**
  * @brief   profiling priority
