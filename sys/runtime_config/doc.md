@@ -4,6 +4,11 @@
 
 @warning This implementation is not complete and not yet thoroughly tested.
          Please do not use this module in production, as it may introduce security issues.
+         Missing features are:
+         - A code generator that transpiles YAML schemas to C code
+         - Persistent storage extension
+         - Int path extension
+         - String path extension
 
 This module provides a system level runtime configuration system for RIOT.
 
