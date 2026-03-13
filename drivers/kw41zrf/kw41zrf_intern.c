@@ -187,10 +187,8 @@ void kw41zrf_set_sequence(kw41zrf_t *dev, uint32_t seq)
     }
 
     ZLL->PHY_CTRL = (ZLL->PHY_CTRL & ~(ZLL_PHY_CTRL_XCVSEQ_MASK | ZLL_PHY_CTRL_SEQMSK_MASK)) | seq;
-
     while (((ZLL->SEQ_CTRL_STS & ZLL_SEQ_CTRL_STS_XCVSEQ_ACTUAL_MASK) >>
         ZLL_SEQ_CTRL_STS_XCVSEQ_ACTUAL_SHIFT) != (ZLL_PHY_CTRL_XCVSEQ_MASK & seq)) {}
-
     if (back_to_sleep) {
         kw41zrf_set_power_mode(dev, KW41ZRF_POWER_DSM);
     }
