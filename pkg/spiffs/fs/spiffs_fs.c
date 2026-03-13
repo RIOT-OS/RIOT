@@ -236,7 +236,8 @@ static int _statvfs(vfs_mount_t *mountp, const char *restrict path, struct statv
     }
 
     buf->f_bsize = sizeof(uint8_t);  /* block size */
-    buf->f_frsize = sizeof(uint8_t); /* fundamental block size */
+    buf->f_frsize = fs_desc->dev->page_size /* fundamental block size */
+                  * fs_desc->dev->pages_per_sector;
     buf->f_blocks = total;           /* Blocks total */
     buf->f_bfree = total - used;     /* Blocks free */
     buf->f_bavail = total - used;    /* Blocks available to non-privileged processes */
@@ -339,6 +340,27 @@ static int _fsync(vfs_file_t *filp)
     return spiffs_err_to_errno(ret);
 }
 
+static void spiffs_stat_to_stat(const spiffs_stat *in, struct stat *out)
+{
+    /* ignored: in->name,pix,type;*/
+    out->st_ino = in->obj_id;
+    out->st_size = in->size;
+    out->st_mode = S_IFREG;
+}
+
+static int _stat(vfs_mount_t *mountp, const char *path, struct stat *buf)
+{
+    spiffs_desc_t *fs_desc = mountp->private_data;
+    spiffs_stat stat;
+    s32_t ret;
+
+    ret = SPIFFS_stat(&fs_desc->fs, path, &stat);
+
+    spiffs_stat_to_stat(&stat, buf);
+
+    return spiffs_err_to_errno(ret);
+}
+
 static int _fstat(vfs_file_t *filp, struct stat *buf)
 {
     spiffs_desc_t *fs_desc = filp->mp->private_data;
@@ -347,15 +369,7 @@ static int _fstat(vfs_file_t *filp, struct stat *buf)
 
     ret = SPIFFS_fstat(&fs_desc->fs, filp->private_data.value, &stat);
 
-    if (ret < 0) {
-        return ret;
-    }
-    /* stat.name; */
-    buf->st_ino = stat.obj_id;
-    /* stat.pix; */
-    buf->st_size = stat.size;
-    /* stat.type;*/
-    buf->st_mode = S_IFREG;
+    spiffs_stat_to_stat(&stat, buf);
 
     return spiffs_err_to_errno(ret);
 }
@@ -509,6 +523,7 @@ static const vfs_file_system_ops_t spiffs_fs_ops = {
     .unlink = _unlink,
     .rename = _rename,
     .statvfs = _statvfs,
+    .stat = _stat,
 };
 
 static const vfs_file_ops_t spiffs_file_ops = {
