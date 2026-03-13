@@ -274,6 +274,9 @@ static int _qmi8658_read_sensor(const qmi8658_t *dev, qmi8658_3d_data_t *data, q
     case QMI8658_SENSOR_GYRO:
         data_reg = QMI8658_REG_GX_L;
         break;
+    default:
+        return EINVAL;
+        break;
     }
 
     i2c_acquire(BUS);
