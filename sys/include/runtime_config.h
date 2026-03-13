@@ -427,7 +427,7 @@ struct runtime_config_schema {
  * A configuration namespace contains configuration schemas.
  * It exists to prevent ID collisions between RIOT internal configuration schemas
  * and schemas defined by applications running on RIOT.
- * It has an ID that is unique within the scope of the Runtime config itself.
+ * It has an ID that is unique within the scope of the runtime config itself.
  */
 struct runtime_config_namespace {
     /** Integer representing the ID of the namespace. */
@@ -507,7 +507,8 @@ runtime_config_error_t runtime_config_set(
  * @brief Applies every configuration parameter within the given configuration
  *        location (@p node) of the runtime configuration tree.
  *
- * @param[in] node A location within the runtime configuration tree.
+ * @param[in] node Optional location within the runtime configuration tree.
+ *                 Applies all existing configurations on NULL.
  *
  * @return 0 on success, non-zero on failure.
  */
