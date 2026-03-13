@@ -17,8 +17,8 @@
  * This driver provides @ref drivers_saul capabilities.
  *
  * # About
- * This module provides a device driver for the QMI8658 interial measurement unit 
- * (IMU) by QST. This driver exposes accelerometer, gyroscope and temperature sensor 
+ * This module provides a device driver for the QMI8658 interial measurement unit
+ * (IMU) by QST. This driver exposes accelerometer, gyroscope and temperature sensor
  * data in several operating modes of the device (qmi8658_mode_t).
  *
  * # Configuration
@@ -52,21 +52,21 @@ extern "C" {
 /**
  * @brief   Data rate settings
  *
- * Actual data rates are slightly lower when gyroscope is enabled. 
+ * Actual data rates are slightly lower when gyroscope is enabled.
  * If the selected accelerometer ODR is higher than 1kHz, enabling
- * the accelerometer will implicitly enable the gyroscope as required 
+ * the accelerometer will implicitly enable the gyroscope as required
  * by hardware design.
  */
 enum {
-    QMI8658_DATA_RATE_8KHZ     = 0x00,
-    QMI8658_DATA_RATE_4KHZ     = 0x01,
-    QMI8658_DATA_RATE_2KHZ     = 0x02,
-    QMI8658_DATA_RATE_1KHZ     = 0x03,
-    QMI8658_DATA_RATE_500HZ    = 0x04,
-    QMI8658_DATA_RATE_250HZ    = 0x05,
-    QMI8658_DATA_RATE_125HZ    = 0x06,
-    QMI8658_DATA_RATE_62_5HZ   = 0x07,
-    QMI8658_DATA_RATE_31_25HZ  = 0x08,
+    QMI8658_DATA_RATE_8KHZ      = 0x00,
+    QMI8658_DATA_RATE_4KHZ      = 0x01,
+    QMI8658_DATA_RATE_2KHZ      = 0x02,
+    QMI8658_DATA_RATE_1KHZ      = 0x03,
+    QMI8658_DATA_RATE_500HZ     = 0x04,
+    QMI8658_DATA_RATE_250HZ     = 0x05,
+    QMI8658_DATA_RATE_125HZ     = 0x06,
+    QMI8658_DATA_RATE_62_5HZ    = 0x07,
+    QMI8658_DATA_RATE_31_25HZ   = 0x08,
 };
 
 /**
@@ -75,17 +75,17 @@ enum {
  * Available Accelerometer ODRs when low power mode is activated.
  */
 enum {
-    QMI8658_ACC_LOWPWR_DATA_RATE_128HZ      = 0x0C,
-    QMI8658_ACC_LOWPWR_DATA_RATE_21HZ       = 0x0D,
-    QMI8658_ACC_LOWPWR_DATA_RATE_11HZ       = 0x0E,
-    QMI8658_ACC_LOWPWR_DATA_RATE_3HZ        = 0x0F
+    QMI8658_ACC_LOWPWR_DATA_RATE_128HZ  = 0x0C,
+    QMI8658_ACC_LOWPWR_DATA_RATE_21HZ   = 0x0D,
+    QMI8658_ACC_LOWPWR_DATA_RATE_11HZ   = 0x0E,
+    QMI8658_ACC_LOWPWR_DATA_RATE_3HZ    = 0x0F
 };
 
 /**
  * @brief   Accelerometer full scale
  */
 enum {
-    QMI8658_ACC_FS_2G  = 0,
+    QMI8658_ACC_FS_2G = 0,
     QMI8658_ACC_FS_4G,
     QMI8658_ACC_FS_8G,
     QMI8658_ACC_FS_16G
@@ -95,7 +95,7 @@ enum {
  * @brief   Gyroscope full scale
  */
 enum {
-    QMI8658_GYRO_FS_16DPS    = 0,
+    QMI8658_GYRO_FS_16DPS = 0,
     QMI8658_GYRO_FS_32DPS,
     QMI8658_GYRO_FS_64DPS,
     QMI8658_GYRO_FS_128DPS,
@@ -108,13 +108,13 @@ enum {
 /**
  * @brief   QMI8658 operating modes
  */
- typedef enum {
+typedef enum {
     QMI8658_POWER_DOWN,         /**< All functional blocks off, minimal power consumption */
     QMI8658_NORMAL_ACC,         /**< Accelerometer only mode */
     QMI8658_NORMAL_GYRO,        /**< Gyroscope only mode */
     QMI8658_NORMAL_ACC_GYRO,    /**< IMU mode (Accelerometer + Gyroscope) */
     QMI8658_LOWPWR_ACC          /**< Low power mode (Accelerometer only) */
- } qmi8658_mode_t;
+} qmi8658_mode_t;
 
 /**
  * @brief   Device initialization parameters
@@ -166,7 +166,7 @@ int qmi8658_init(qmi8658_t *dev, const qmi8658_params_t *params);
  * @retval  0 on success
  * @retval  -EIO on on i2c communication error
  */
-int qmi8658_set_mode(const qmi8658_t* dev, qmi8658_mode_t mode);
+int qmi8658_set_mode(const qmi8658_t *dev, qmi8658_mode_t mode);
 
 /**
  * @brief   Read accelerometer data in mg

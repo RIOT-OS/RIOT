@@ -24,6 +24,7 @@
 static int read_acc(const void *dev, phydat_t *res)
 {
     int ret = qmi8658_read_acc((const qmi8658_t *)dev, (qmi8658_3d_data_t *)res->val);
+
     if (ret < 0) {
         return -ECANCELED;
     }
@@ -37,6 +38,7 @@ static int read_acc(const void *dev, phydat_t *res)
 static int read_gyro(const void *dev, phydat_t *res)
 {
     int ret = qmi8658_read_gyro((const qmi8658_t *)dev, (qmi8658_3d_data_t *)res->val);
+
     if (ret < 0) {
         return -ECANCELED;
     }

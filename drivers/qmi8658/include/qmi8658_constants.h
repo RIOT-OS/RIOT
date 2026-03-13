@@ -65,9 +65,9 @@ extern "C" {
 #define QMI8658_WHO_AM_I_VALUE      (0x05)
 
 /**
-* @name    Helper masks and offsets
-* @{
-*/
+ * @name    Helper masks and offsets
+ * @{
+ */
 #define QMI8658_CTRL_FS_SHIFT                       (4)
 #define QMI8658_CTRL1_ADDR_AI_MASK                  (1 << 6)
 #define QMI8658_CTRL1_SENSOR_DISABLE_MASK           (1 << 0)
@@ -84,7 +84,7 @@ extern "C" {
 /**
  * @brief   Sensor IDs
  * @{
-*/
+ */
 typedef enum {
     QMI8658_SENSOR_ACC = 0,
     QMI8658_SENSOR_GYRO
