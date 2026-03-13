@@ -52,13 +52,13 @@ extern "C" {
 #endif
 
 #ifndef QMI8658_PARAMS
-#define QMI8658_PARAMS      {   .i2c                = QMI8658_PARAM_I2C,            \
-                                .addr               = QMI8658_PARAM_ADDR,           \
-                                .acc_odr            = QMI8658_PARAM_ACC_ODR,        \
-                                .acc_lowpwr_odr     = QMI8658_PARAM_ACC_LOWPWR_ODR, \
-                                .gyro_odr           = QMI8658_PARAM_GYRO_ODR,       \
-                                .acc_fs             = QMI8658_PARAM_ACC_FS,         \
-                                .gyro_fs            = QMI8658_PARAM_GYRO_FS,}
+#define QMI8658_PARAMS      {   .i2c = QMI8658_PARAM_I2C,            \
+                                .addr = QMI8658_PARAM_ADDR,           \
+                                .acc_odr = QMI8658_PARAM_ACC_ODR,        \
+                                .acc_lowpwr_odr = QMI8658_PARAM_ACC_LOWPWR_ODR, \
+                                .gyro_odr = QMI8658_PARAM_GYRO_ODR,       \
+                                .acc_fs = QMI8658_PARAM_ACC_FS,         \
+                                .gyro_fs = QMI8658_PARAM_GYRO_FS, }
 #endif
 #ifndef QMI8658_SAUL_INFO
 #define QMI8658_SAUL_INFO            { .name = "qmi8658" }
