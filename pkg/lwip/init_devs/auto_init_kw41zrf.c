@@ -20,7 +20,6 @@
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-
 static lwip_netif_t netif;
 static netdev_ieee802154_submac_t kw41zrf_netdev;
 
