@@ -68,24 +68,37 @@ extern "C" {
 * @name    Helper masks and offsets
 * @{
 */
-#define QMI8658_CTRL_FS_SHIFT           (4)
-#define QMI8658_CTRL1_ADDR_AI_MASK      (1 << 6)
-#define QMI8658_STATUS0_ACC_MASK        (1 << 0)
-#define QMI8658_STATUS0_GYRO_MASK       (1 << 1)
-#define QMI8658_TEMP_SCALE_FACTOR       (256)
+#define QMI8658_CTRL_FS_SHIFT                       (4)
+#define QMI8658_CTRL1_ADDR_AI_MASK                  (1 << 6)
+#define QMI8658_CTRL1_SENSOR_DISABLE_MASK           (1 << 0)
+#define QMI8658_STATUS0_ACC_MASK                    (1 << 0)
+#define QMI8658_STATUS0_GYRO_MASK                   (1 << 1)
+#define QMI8658_TEMP_SCALE_FACTOR                   (256)
 
 /**
  * @brief   Reset wait interval in ms
+ * @{
  */
 #define QMI8658_RESET_WAIT_MS       (15)
 
 /**
  * @brief   Sensor IDs
+ * @{
 */
-enum {
+typedef enum {
     QMI8658_SENSOR_ACC = 0,
     QMI8658_SENSOR_GYRO
-};
+} qmi8658_sensor_id_t;
+
+/**
+ * @brief   Enable sensor flags
+ * @{
+ */
+typedef enum {
+    QMI8658_DISABLE_ALL = 0,
+    QMI8658_ENABLE_ACC  = 1,
+    QMI8658_ENABLE_GYRO = 2
+} qmi8658_enable_flag_t;
 
 #ifdef __cplusplus
 }

@@ -18,15 +18,14 @@
  * @}
  */
 
-#include "periph/i2c.h"
-#include "qmi8658.h"
-#include "qmi8658_constants.h"
-#include "qmi8658_params.h"
-#include "ztimer.h"
 #include <assert.h>
 #include <stdint.h>
 #include <sys/errno.h>
+#include "periph/i2c.h"
+#include "ztimer.h"
 #include "log.h"
+#include "qmi8658.h"
+#include "qmi8658_constants.h"
 
 #define ENABLE_DEBUG 1
 #include "debug.h"
@@ -34,19 +33,23 @@
 #define BUS         (dev->params.i2c)
 #define ADDR        (dev->params.addr)
 
-/**
+/*
  * order in array [0, 1, 2, 3] is
  * QMI8658_ACC_FS_2G, QMI8658_ACC_FS_4G, QMI8658_ACC_FS_8G, QMI8658_ACC_FS_16G
  */
 static const int16_t range_acc[] = { 2000, 4000, 8000, 16000 };
 
-/**
+/*
  * order in array [0, 1, 2, 3, 4, 5, 6, 7] is
- *  QMI8658_GYRO_FS_16DPS, QMI8658_GYRO_FS_32DPS, QMI8658_GYRO_FS_64DPS,
- *  QMI8658_GYRO_FS_128DPS, QMI8658_GYRO_FS_256DPS, QMI8658_GYRO_FS_512DPS,
- *  QMI8658_GYRO_FS_1024DPS, QMI8658_GYRO_FS_2048DPS
+ * QMI8658_GYRO_FS_16DPS, QMI8658_GYRO_FS_32DPS, QMI8658_GYRO_FS_64DPS,
+ * QMI8658_GYRO_FS_128DPS, QMI8658_GYRO_FS_256DPS, QMI8658_GYRO_FS_512DPS,
+ * QMI8658_GYRO_FS_1024DPS, QMI8658_GYRO_FS_2048DPS
  */
 static const int16_t range_gyro[] = { 160, 320, 640, 1280, 2560, 5120, 10240, 20480 };
+
+/* Forward declarations */
+static int _qmi8658_read_sensor(const qmi8658_t *dev, qmi8658_3d_data_t *data, qmi8658_sensor_id_t sensor);
+static int _qmi8658_set_sensors(const qmi8658_t* dev, qmi8658_enable_flag_t sensor_enable_flags);
 
 int qmi8658_init(qmi8658_t *dev, const qmi8658_params_t *params)
 {
@@ -85,13 +88,6 @@ int qmi8658_init(qmi8658_t *dev, const qmi8658_params_t *params)
     /* Enable address auto increment */
     res = i2c_write_reg(BUS, ADDR, QMI8658_REG_CTRL1, QMI8658_CTRL1_ADDR_AI_MASK, 0);
 
-    /* Set acc odr / full scale */
-    tmp = dev->params.acc_odr | (dev->params.acc_fs << QMI8658_CTRL_FS_SHIFT);
-    res += i2c_write_reg(BUS, ADDR, QMI8658_REG_CTRL2, tmp, 0);
-    /* Set gyro odr / full scale */
-    tmp = dev->params.gyro_odr | (dev->params.gyro_fs << QMI8658_CTRL_FS_SHIFT);
-    res += i2c_write_reg(BUS, ADDR, QMI8658_REG_CTRL3, tmp, 0);
-
     i2c_release(BUS);
 
     if (res < 0) {
@@ -104,80 +100,92 @@ int qmi8658_init(qmi8658_t *dev, const qmi8658_params_t *params)
     return 0;
 }
 
-int qmi8658_enable_sensors(qmi8658_t* dev, uint8_t sensor_flags)
+int qmi8658_set_mode(const qmi8658_t* dev, qmi8658_mode_t mode)
 {
     assert(dev);
 
-    int res;
+    DEBUG("[LOG] qmi8658_set_mode: %i\n", mode);
 
-    /* If Accelerometer ODR is higher than 1kHz, Gyroscope hast to be enabled*/
-    if ((dev->params.acc_odr < QMI8658_DATA_RATE_1KHZ) && (sensor_flags & QMI8658_ENABLE_ACC)) {
-        LOG_INFO("qmi8658_enable_sensors(): High accelerometer ODR is set, automatically enabling gyroscope.\n");
-        sensor_flags |= QMI8658_ENABLE_GYRO;
+    uint8_t reg_ctrl2_value = 0;
+    uint8_t reg_ctrl3_value = 0;
+    qmi8658_enable_flag_t sensor_enable_flags = QMI8658_DISABLE_ALL;
+    int res = 0;
+
+    /* Disable sensors first */
+    res = _qmi8658_set_sensors(dev, QMI8658_DISABLE_ALL);
+    if (res < 0) {
+        DEBUG("[ERROR] qmi8658_set_mode: Disable sensors\n");
+        return -EIO;
     }
 
     i2c_acquire(BUS);
 
-    res = i2c_write_reg(BUS, ADDR, QMI8658_REG_CTRL7, sensor_flags & 0x03, 0);
-    
+    switch (mode) {
+    case QMI8658_POWER_DOWN:
+        res = i2c_write_reg(BUS, ADDR, QMI8658_REG_CTRL1, QMI8658_CTRL1_SENSOR_DISABLE_MASK, 0);
+        break;
+
+    case QMI8658_NORMAL_ACC:
+        /* Set acc odr / full scale */
+        reg_ctrl2_value = dev->params.acc_odr | (dev->params.acc_fs << QMI8658_CTRL_FS_SHIFT);
+        /* Enable Acc */
+        sensor_enable_flags = QMI8658_ENABLE_ACC;
+        /* If Accelerometer ODR is higher than 1kHz, Gyroscope has to be enabled */
+        if (dev->params.acc_odr < QMI8658_DATA_RATE_1KHZ) {
+            LOG_INFO("qmi8658_enable_sensors(): High accelerometer ODR is set, automatically enabling gyroscope.\n");
+            /* Set gyro odr / full scale */
+            reg_ctrl3_value = dev->params.gyro_odr | (dev->params.gyro_fs << QMI8658_CTRL_FS_SHIFT);
+            sensor_enable_flags |= QMI8658_ENABLE_GYRO;
+        }
+        break;
+
+    case QMI8658_LOWPWR_ACC:
+        /* Set acc low power odr / full scale */
+        reg_ctrl2_value = dev->params.acc_lowpwr_odr | (dev->params.acc_fs << QMI8658_CTRL_FS_SHIFT);
+        /* Enable Acc */
+        sensor_enable_flags = QMI8658_ENABLE_ACC;
+        break;
+
+    case QMI8658_NORMAL_GYRO:
+        /* Set gyro odr / full scale */
+        reg_ctrl3_value = dev->params.gyro_odr | (dev->params.gyro_fs << QMI8658_CTRL_FS_SHIFT);
+        /* Enable Gyro */
+        sensor_enable_flags = QMI8658_ENABLE_GYRO;
+        break;
+
+    case QMI8658_NORMAL_ACC_GYRO:
+        /* Set acc odr / full scale */
+        reg_ctrl2_value = dev->params.acc_odr | (dev->params.acc_fs << QMI8658_CTRL_FS_SHIFT);
+        /* Set gyro odr / full scale */
+        reg_ctrl3_value = dev->params.gyro_odr | (dev->params.gyro_fs << QMI8658_CTRL_FS_SHIFT);
+        /* Enable Acc and Gyro */
+        sensor_enable_flags = QMI8658_ENABLE_ACC | QMI8658_ENABLE_GYRO;
+        break;
+    }
+
+    if (mode != QMI8658_POWER_DOWN) {
+        /* Clear sensor disable */
+        res += i2c_write_reg(BUS, ADDR, QMI8658_REG_CTRL1, QMI8658_CTRL1_ADDR_AI_MASK, 0);
+    }
+    if (reg_ctrl2_value != 0) {
+        res += i2c_write_reg(BUS, ADDR, QMI8658_REG_CTRL2, reg_ctrl2_value, 0);
+    }
+    if (reg_ctrl3_value != 0) {
+        res += i2c_write_reg(BUS, ADDR, QMI8658_REG_CTRL3, reg_ctrl3_value, 0);
+    }
+
     i2c_release(BUS);
-    
+
     if (res < 0) {
-        DEBUG("[ERROR] qmi8658_enable_sensors\n");
+        DEBUG("[ERROR] qmi8658_set_mode\n");
         return -EIO;
     }
 
-    DEBUG("[LOG] qmi8658_enable_sensors: sensors enabled\n");
-
-    return 0;
-}
-
-static int _qmi8658_read_sensor(const qmi8658_t *dev, qmi8658_3d_data_t *data, uint8_t sensor)
-{
-    int res;
-    uint8_t tmp;
-    uint8_t tmp_arr[6];
-
-    uint8_t status_mask;
-    uint8_t data_reg;
-    switch (sensor) {
-        case QMI8658_SENSOR_ACC:
-            status_mask = QMI8658_STATUS0_ACC_MASK;
-            data_reg = QMI8658_REG_AX_L;
-            break;
-        case QMI8658_SENSOR_GYRO:
-            status_mask = QMI8658_STATUS0_GYRO_MASK;
-            data_reg = QMI8658_REG_GX_L;
-            break;
-        default:
-            return -EINVAL;
-    }
-
-    i2c_acquire(BUS);
-
-    /* Check if data is available */
-    i2c_read_reg(BUS, ADDR, QMI8658_REG_STATUS0, &tmp, 0);
-    DEBUG("[LOG] qmi8658_read_sensor: status: %x\n", tmp);
-    if (!(tmp & status_mask)) {
-        i2c_release(BUS);
-        LOG_WARNING("qmi8658_read_sensor(): No data available.\n");
-        return -ENODATA;
-    }
-
-    /* 6 byte burst read, register address is incremented automatically */
-    res = i2c_read_regs(BUS, ADDR, data_reg, tmp_arr, 6, 0);
-    
-    i2c_release(BUS);
-    
+    res = _qmi8658_set_sensors(dev, sensor_enable_flags);
     if (res < 0) {
-        DEBUG("[ERROR] qmi8658_read_sensor\n");
+        DEBUG("[ERROR] qmi8658_set_mode: Disable sensors\n");
         return -EIO;
     }
-
-    /* Write raw data to buffer */
-    data->x = (int16_t)(tmp_arr[0] | (tmp_arr[1] << 8));
-    data->y = (int16_t)(tmp_arr[2] | (tmp_arr[3] << 8));
-    data->z = (int16_t)(tmp_arr[4] | (tmp_arr[5] << 8));
 
     return 0;
 }
@@ -239,6 +247,66 @@ int qmi8658_read_temp(const qmi8658_t *dev, int16_t *data)
     *data = (int16_t)(tmp[0] | (tmp[1] << 8));
     /* Scale raw data to degC x 100 range */
     *data = (int16_t)(((int32_t)(*data) * 100) / QMI8658_TEMP_SCALE_FACTOR);
+
+    return 0;
+}
+
+static int _qmi8658_read_sensor(const qmi8658_t *dev, qmi8658_3d_data_t *data, qmi8658_sensor_id_t sensor)
+{
+    int res;
+    uint8_t tmp;
+    uint8_t tmp_arr[6];
+
+    uint8_t data_reg;
+    switch (sensor) {
+    case QMI8658_SENSOR_ACC:
+        data_reg = QMI8658_REG_AX_L;
+        break;
+    case QMI8658_SENSOR_GYRO:
+        data_reg = QMI8658_REG_GX_L;
+        break;
+    }
+
+    i2c_acquire(BUS);
+
+    /* Check if data is available */
+    i2c_read_reg(BUS, ADDR, QMI8658_REG_STATUS0, &tmp, 0);
+    DEBUG("[LOG] qmi8658_read_sensor: status: %x\n", tmp);
+
+    /* 6 byte burst read, register address is incremented automatically */
+    res = i2c_read_regs(BUS, ADDR, data_reg, tmp_arr, 6, 0);
+    
+    i2c_release(BUS);
+    
+    if (res < 0) {
+        DEBUG("[ERROR] qmi8658_read_sensor\n");
+        return -EIO;
+    }
+
+    /* Write raw data to buffer */
+    data->x = (int16_t)(tmp_arr[0] | (tmp_arr[1] << 8));
+    data->y = (int16_t)(tmp_arr[2] | (tmp_arr[3] << 8));
+    data->z = (int16_t)(tmp_arr[4] | (tmp_arr[5] << 8));
+
+    return 0;
+}
+
+static int _qmi8658_set_sensors(const qmi8658_t* dev, qmi8658_enable_flag_t sensor_enable_flags)
+{
+    int res;
+
+    DEBUG("[LOG] Set sensor enable flags %x\n", sensor_enable_flags);
+
+    i2c_acquire(BUS);
+
+    res = i2c_write_reg(BUS, ADDR, QMI8658_REG_CTRL7, sensor_enable_flags & 0x03, 0);
+    
+    i2c_release(BUS);
+    
+    if (res < 0) {
+        DEBUG("[ERROR] qmi8658_enable_sensors\n");
+        return -EIO;
+    }
 
     return 0;
 }
