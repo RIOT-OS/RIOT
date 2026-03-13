@@ -1,15 +1,15 @@
 # Fuzzing
 
-Automated fuzzing tests for RIOT network applications.
+Automated fuzzing tests for RIOT applications.
 
 ## Setup
 
 The following additional dependencies are required:
 
-* [afl][afl homepage]
+* [afl++][afl++ homepage]
 * [libasan][sanitizers github] (optional but recommended)
 
-## Writing a fuzzing application
+## Writing a network fuzzing application
 
 The fuzzing setup relies heavily on RIOT's [netapi][netapi doc]
 interface, or more generally RIOT's message passing algorithm. RIOT
@@ -81,6 +81,6 @@ Parallel fuzzing is supported through `FLAGS_FOR_AFL`, e.g.:
 	FLAGS_FOR_AFL="-S fuzzer02" make -C fuzzing/gnrc_tcp/ fuzz
 
 [sanitizers github]: https://github.com/google/sanitizers
-[afl homepage]: http://lcamtuf.coredump.cx/afl/
+[afl++ homepage]: https://aflplus.plus/
 [netapi doc]: https://riot-os.org/api/netapi_8h.html
 [afl-fuzz approach]: https://github.com/google/AFL/blob/ca01f9a4c4ccb59d349c729ad3018e339f9aae0c/README.md#2-the-afl-fuzz-approach
