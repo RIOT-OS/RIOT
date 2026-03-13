@@ -4,6 +4,7 @@ CPU_CORE = cortex-m0plus
 CPU_MODELS_WITHOUT_HWRNG += samr30%
 
 FEATURES_PROVIDED += periph_gpio_fast_read
+FEATURES_PROVIDED += periph_gpio_read_output
 FEATURES_PROVIDED += periph_uart_collision
 
 # Low Power SRAM is *not* retained during Backup Sleep.
