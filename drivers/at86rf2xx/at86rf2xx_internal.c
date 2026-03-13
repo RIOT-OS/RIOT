@@ -23,11 +23,11 @@
 #include "at86rf2xx_registers.h"
 
 #if !AT86RF2XX_IS_PERIPH
-#include "periph/spi.h"
-#include "periph/gpio.h"
+#  include "periph/spi.h"
+#  include "periph/gpio.h"
 
-#define SPIDEV          (dev->params.spi)
-#define CSPIN           (dev->params.cs_pin)
+#  define SPIDEV          (dev->params.spi)
+#  define CSPIN           (dev->params.cs_pin)
 
 static inline void getbus(const at86rf2xx_t *dev)
 {

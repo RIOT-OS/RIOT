@@ -41,8 +41,8 @@
 
 /* we need no peripherals for memory mapped radios */
 #if !defined(MODULE_AT86RFA1) && !defined(MODULE_AT86RFR2)
-#include "periph/spi.h"
-#include "periph/gpio.h"
+#  include "periph/spi.h"
+#  include "periph/gpio.h"
 #endif
 
 #ifdef __cplusplus
@@ -60,16 +60,16 @@ extern "C" {
  */
 #ifdef MODULE_AT86RF212B
 /* the AT86RF212B has a sub-1GHz radio */
-#define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN_SUBGHZ)
-#define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX_SUBGHZ)
-#define AT86RF2XX_DEFAULT_CHANNEL       (CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL)
+#  define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN_SUBGHZ)
+#  define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX_SUBGHZ)
+#  define AT86RF2XX_DEFAULT_CHANNEL       (CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL)
 /* Page 2 is O-QPSK 100 kbit/s (channel 0), or 250 kbit/s (channels 1-10) */
-#define AT86RF2XX_DEFAULT_PAGE          (CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE)
+#  define AT86RF2XX_DEFAULT_PAGE          (CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE)
 #else
-#define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN)
-#define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX)
-#define AT86RF2XX_DEFAULT_CHANNEL       (CONFIG_IEEE802154_DEFAULT_CHANNEL)
-#define AT86RF2XX_DEFAULT_PAGE          (0)
+#  define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN)
+#  define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX)
+#  define AT86RF2XX_DEFAULT_CHANNEL       (CONFIG_IEEE802154_DEFAULT_CHANNEL)
+#  define AT86RF2XX_DEFAULT_PAGE          (0)
 /* Only page 0 is supported in the 2.4 GHz band */
 #endif
 /** @} */
@@ -113,27 +113,27 @@ extern "C" {
  * @brief   Whether there is a periph version of the radio
  */
 #if IS_USED(MODULE_AT86RFA1) || IS_USED(MODULE_AT86RFR2)
-#define AT86RF2XX_IS_PERIPH (1)
+#  define AT86RF2XX_IS_PERIPH (1)
 #else
-#define AT86RF2XX_IS_PERIPH (0)
+#  define AT86RF2XX_IS_PERIPH (0)
 #endif
 
 /**
  * @brief   ED Register
  */
 #if defined(MODULE_AT86RF231) || IS_ACTIVE(AT86RF2XX_PERIPH)
-#define AT86RF2XX_HAVE_ED_REGISTER (1)
+#  define AT86RF2XX_HAVE_ED_REGISTER (1)
 #else
-#define AT86RF2XX_HAVE_ED_REGISTER (0)
+#  define AT86RF2XX_HAVE_ED_REGISTER (0)
 #endif
 
 /**
  * @brief   Support for SubGHz bands
  */
 #ifdef MODULE_AT86RF212B
-#define AT86RF2XX_HAVE_SUBGHZ (1)
+#  define AT86RF2XX_HAVE_SUBGHZ (1)
 #else
-#define AT86RF2XX_HAVE_SUBGHZ (0)
+#  define AT86RF2XX_HAVE_SUBGHZ (0)
 #endif
 
 #if defined(DOXYGEN) || defined(MODULE_AT86RF232) || defined(MODULE_AT86RF233) || defined(MODULE_AT86RFR2)
@@ -143,9 +143,9 @@ extern "C" {
  * The AT86RF2XX_HAVE_RETRIES flag enables support for NETOPT_TX_RETRIES NEEDED
  * operation.
  */
-#define AT86RF2XX_HAVE_RETRIES             (1)
+#  define AT86RF2XX_HAVE_RETRIES             (1)
 #else
-#define AT86RF2XX_HAVE_RETRIES             (0)
+#  define AT86RF2XX_HAVE_RETRIES             (0)
 #endif
 
 /**
@@ -155,18 +155,18 @@ extern "C" {
  * counter. Only the at86rf232 and the at86rf233 support this register.
  */
 #if AT86RF2XX_HAVE_RETRIES && defined(AT86RF2XX_REG__XAH_CTRL_2)
-#define AT86RF2XX_HAVE_RETRIES_REG         (1)
+#  define AT86RF2XX_HAVE_RETRIES_REG         (1)
 #else
-#define AT86RF2XX_HAVE_RETRIES_REG         (0)
+#  define AT86RF2XX_HAVE_RETRIES_REG         (0)
 #endif
 
 /**
  * @brief   TX Start IRQ
  */
 #ifdef AT86RF2XX_REG__IRQ_MASK1
-#define AT86RF2XX_HAVE_TX_START_IRQ        (1)
+#  define AT86RF2XX_HAVE_TX_START_IRQ        (1)
 #else
-#define AT86RF2XX_HAVE_TX_START_IRQ        (0)
+#  define AT86RF2XX_HAVE_TX_START_IRQ        (0)
 #endif
 
 /**
@@ -177,13 +177,13 @@ extern "C" {
  * See Section 11.2 of the at86rf233 reference manual. (RND_VALUE)
  */
 #if defined(MODULE_AT86RF233) || defined(MODULE_AT86RF231) || defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
-#ifndef AT86RF2XX_RANDOM_NUMBER_GENERATOR
-#define AT86RF2XX_RANDOM_NUMBER_GENERATOR  (1)
-#endif
+#  ifndef AT86RF2XX_RANDOM_NUMBER_GENERATOR
+#    define AT86RF2XX_RANDOM_NUMBER_GENERATOR  (1)
+#  endif
 #else
-#ifndef AT86RF2XX_RANDOM_NUMBER_GENERATOR
-#define AT86RF2XX_RANDOM_NUMBER_GENERATOR  (0)
-#endif
+#  ifndef AT86RF2XX_RANDOM_NUMBER_GENERATOR
+#    define AT86RF2XX_RANDOM_NUMBER_GENERATOR  (0)
+#  endif
 #endif
 
 /**
@@ -195,11 +195,11 @@ extern "C" {
  * generation (Section 8.4 and Section 11.2).
  */
 #if defined(MODULE_AT86RF233) || defined(MODULE_AT86RFR2)
-#ifndef AT86RF2XX_SMART_IDLE_LISTENING
-#define AT86RF2XX_SMART_IDLE_LISTENING     (1)
-#endif
+#  ifndef AT86RF2XX_SMART_IDLE_LISTENING
+#    define AT86RF2XX_SMART_IDLE_LISTENING     (1)
+#  endif
 #else
-#define AT86RF2XX_SMART_IDLE_LISTENING     (0)
+#  define AT86RF2XX_SMART_IDLE_LISTENING     (0)
 #endif
 
 /**
@@ -237,24 +237,24 @@ extern "C" {
 /**
  * @brief Internal radio state equivalent to RX_ON
  */
-#define AT86RF2XX_PHY_STATE_RX       AT86RF2XX_STATE_RX_ON
+#  define AT86RF2XX_PHY_STATE_RX       AT86RF2XX_STATE_RX_ON
 /**
  * @brief Internal radio state equivalent to RX_BUSY
  */
-#define AT86RF2XX_PHY_STATE_RX_BUSY  AT86RF2XX_STATE_BUSY_RX
+#  define AT86RF2XX_PHY_STATE_RX_BUSY  AT86RF2XX_STATE_BUSY_RX
 /**
  * @brief Internal radio state equivalent to TX_ON
  */
-#define AT86RF2XX_PHY_STATE_TX       AT86RF2XX_STATE_PLL_ON
+#  define AT86RF2XX_PHY_STATE_TX       AT86RF2XX_STATE_PLL_ON
 /**
  * @brief Internal radio state equivalent to TX_BUSY
  */
-#define AT86RF2XX_PHY_STATE_TX_BUSY  AT86RF2XX_STATE_BUSY_TX
+#  define AT86RF2XX_PHY_STATE_TX_BUSY  AT86RF2XX_STATE_BUSY_TX
 #else
-#define AT86RF2XX_PHY_STATE_RX       AT86RF2XX_STATE_RX_AACK_ON
-#define AT86RF2XX_PHY_STATE_RX_BUSY  AT86RF2XX_STATE_BUSY_RX_AACK
-#define AT86RF2XX_PHY_STATE_TX       AT86RF2XX_STATE_TX_ARET_ON
-#define AT86RF2XX_PHY_STATE_TX_BUSY  AT86RF2XX_STATE_BUSY_TX_ARET
+#  define AT86RF2XX_PHY_STATE_RX       AT86RF2XX_STATE_RX_AACK_ON
+#  define AT86RF2XX_PHY_STATE_RX_BUSY  AT86RF2XX_STATE_BUSY_RX_AACK
+#  define AT86RF2XX_PHY_STATE_TX       AT86RF2XX_STATE_TX_ARET_ON
+#  define AT86RF2XX_PHY_STATE_TX_BUSY  AT86RF2XX_STATE_BUSY_TX_ARET
 #endif /* IS_ACTIVE(AT86RF2XX_BASIC_MODE) */
 
 #if AT86RF2XX_IS_PERIPH
