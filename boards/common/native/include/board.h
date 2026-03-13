@@ -88,7 +88,7 @@ void _native_LED_RED_TOGGLE(void);
  * @{
  */
 #ifndef FS_NATIVE_DIR
-#define FS_NATIVE_DIR           "native"  /**< Folder on the host fs exported to RIOT */
+#define FS_NATIVE_DIR           "native_fs"  /**< Folder on the host fs exported to RIOT */
 #endif
 /** @} */
 
