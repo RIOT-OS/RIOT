@@ -50,6 +50,15 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup drivers_qmi8658_config     QMI8658 IMU driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
+ */
+#ifndef CONFIG_QMI8658_PARAM_I2C
+#define CONFIG_QMI8658_PARAM_I2C                    0x6B    /**< I2C slave address. Set to 0x6A if SDO/SA0 is pulled high */
+#endif
+
+/**
  * @brief   Data rate settings
  *
  * Actual data rates are slightly lower when gyroscope is enabled.
