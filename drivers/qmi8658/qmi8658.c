@@ -56,6 +56,16 @@ int qmi8658_init(qmi8658_t *dev, const qmi8658_params_t *params)
 {
     assert(dev && params);
 
+    /* Make sure configuration is valid */
+    assert(
+        params->acc_odr < QMI8658_DATA_RATE_31_25HZ &&
+        params->acc_lowpwr_odr < QMI8658_ACC_LOWPWR_DATA_RATE_3HZ &&
+        params->acc_lowpwr_odr > QMI8658_ACC_LOWPWR_DATA_RATE_128HZ &&
+        params->acc_fs < QMI8658_ACC_FS_16G &&
+        params->gyro_odr < QMI8658_DATA_RATE_31_25HZ &&
+        params->gyro_fs < QMI8658_GYRO_FS_2048DPS
+        );
+
     uint8_t tmp;
     int res;
 
@@ -144,7 +154,7 @@ int qmi8658_set_mode(const qmi8658_t *dev, qmi8658_mode_t mode)
     case QMI8658_LOWPWR_ACC:
         /* Set acc low power odr / full scale */
         reg_ctrl2_value = dev->params.acc_lowpwr_odr | (dev->params.acc_fs <<
-                                                            QMI8658_CTRL_FS_SHIFT);
+                                                        QMI8658_CTRL_FS_SHIFT);
         /* Enable Acc */
         sensor_enable_flags = QMI8658_ENABLE_ACC;
         break;
