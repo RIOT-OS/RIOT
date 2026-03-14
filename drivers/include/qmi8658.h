@@ -50,9 +50,7 @@ extern "C" {
 #endif
 
 /**
- * @defgroup drivers_qmi8658_config     QMI8658 IMU driver compile configuration
- * @ingroup config_drivers_sensors
- * @{
+ * @brief       QMI8658 IMU driver compile configuration
  */
 #ifndef CONFIG_QMI8658_PARAM_I2C
 #define CONFIG_QMI8658_PARAM_I2C                    0x6B    /**< I2C slave address. Set to 0x6A if SDO/SA0 is pulled high */
@@ -119,7 +117,7 @@ enum {
  */
 typedef enum {
     QMI8658_POWER_DOWN,         /**< All functional blocks off, minimal power consumption */
-    QMI8658_NORMAL_ACC,         /**< Accelerometer only mode */
+    QMI8658_NORMAL_ACC,         /**< Accelerometer only mode (if ODR <= 1kHz, otherwise Gyro is also enabled)*/
     QMI8658_NORMAL_GYRO,        /**< Gyroscope only mode */
     QMI8658_NORMAL_ACC_GYRO,    /**< IMU mode (Accelerometer + Gyroscope) */
     QMI8658_LOWPWR_ACC          /**< Low power mode (Accelerometer only) */
