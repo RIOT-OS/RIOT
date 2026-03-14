@@ -33,7 +33,7 @@ extern "C" {
 #define QMI8658_PARAM_I2C                   I2C_DEV(0)                              /**< I2C device */
 #endif
 #ifndef QMI8658_PARAM_ADDR
-#define QMI8658_PARAM_ADDR                  0x6B                                    /**< I2C slave address. Set to 0x6A if SDO/SA0 is pulled high */
+#define QMI8658_PARAM_ADDR                  CONFIG_QMI8658_PARAM_I2C                /**< I2C slave address. Set to 0x6A if SDO/SA0 is pulled high */
 #endif
 #ifndef QMI8658_PARAM_ACC_ODR
 #define QMI8658_PARAM_ACC_ODR               QMI8658_DATA_RATE_1KHZ                  /**< Acceleromter output data rate.*/

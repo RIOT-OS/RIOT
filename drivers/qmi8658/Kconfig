@@ -4,10 +4,16 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-config MODULE_QMI8658
-    bool "drivers_qmi8658"
-    depends on TEST_KCONFIG
-    depends on HAS_PERIPH_I2C
-    select MODULE_PERIPH_I2C
-    select MODULE_ZTIMER
-    select MODULE_ZTIMER_MSEC
+menu "QMI8658 driver"
+    depends on USEMODULE_QMI8658
+
+config QMI8658_PARAM_I2C
+    hex "Default I2C address"
+    range 0x6A 0x6B
+    default 0x6B
+    help
+        The address value depends on the state of SDO/SA0 pin.
+        SDO/SA0 low: 0x6B
+        SDO/SA0 high: 0x6A
+
+endmenu # QMI8658 driver
