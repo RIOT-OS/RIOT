@@ -187,7 +187,7 @@ int qmi8658_set_mode(const qmi8658_t *dev, qmi8658_mode_t mode)
         res += i2c_write_reg(BUS, ADDR, QMI8658_REG_CTRL3, reg_ctrl3_value, 0);
     }
 
-    /* Filters need 3/ODR seconds to settle (Datasheet section 7.3)*/
+    /* Filters need 3/ODR seconds to settle (Datasheet section 7.3) */
     if (mode != QMI8658_LOWPWR_ACC) {
         /* Worst case in normal mode is around 100ms at ODR = 31.25Hz */
         ztimer_sleep(ZTIMER_MSEC, 100);
