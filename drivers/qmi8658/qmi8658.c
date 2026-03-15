@@ -20,7 +20,7 @@
 
 #include <assert.h>
 #include <stdint.h>
-#include <sys/errno.h>
+#include <errno.h>
 #include "periph/i2c.h"
 #include "ztimer.h"
 #include "log.h"
