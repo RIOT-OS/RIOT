@@ -43,6 +43,13 @@ extern "C" {
 typedef void (*walltime_change_cb_t)(void *ctx, int32_t diff_sec, int16_t diff_ms);
 
 /**
+ * @brief Signature for alarm Callback
+ *
+ * @param[in] arg           optional argument to put the callback in the right context
+ */
+typedef void(*walltime_alarm_cb_t)(void *arg);
+
+/**
  * @brief   Time change notification subscription
  * @{
  */
@@ -116,6 +123,33 @@ uint32_t walltime_get_riot(uint16_t *ms);
 time_t walltime_get_unix(uint16_t *ms);
 
 /**
+ * @brief Set an alarm for RTC to the specified value.
+ *
+ * @note Any already set alarm will be overwritten.
+ *
+ * @param[in] time      The value to trigger an alarm when hit.
+ * @param[in] cb        Callback executed when alarm is hit.
+ *                      Set this to NULL to clear the alarm.
+ * @param[in] arg       Argument passed to callback when alarm is hit.
+ *
+ * @retval  0           success
+ * @retval  -EINVAL     @p time was invalid (e.g. in the past, out of range)
+ * @retval  <0          other error (negative errno code to indicate cause)
+ */
+int walltime_set_alarm(struct tm *time, walltime_alarm_cb_t cb, void *arg);
+
+/**
+ * @brief Gets the current alarm setting
+ *
+ * @param[out]  time    Pointer to structure to receive alarm time
+ *
+ * @retval  0           success
+ * @retval  -EINVAL     no alarm is configured
+ * @retval  <0          other error (negative errno code to indicate cause)
+ */
+int walltime_get_alarm(struct tm *time);
+
+/**
  * @brief   Get seconds elapsed since last reset
  *
  * @note    The @p full option will only have an effect if @ref BACKUP_RAM
@@ -150,6 +184,33 @@ int walltime_impl_set(struct tm *time);
  * @returns 0 on success
  */
 int walltime_impl_get(struct tm *time, uint16_t *ms);
+
+/**
+ * @brief   Backend implementation to set the alarm
+ *
+ * @note    The @p time value is normalized by the upper layer.
+ *
+ * @param[in] time      The value to trigger an alarm when hit.
+ * @param[in] cb        Callback executed when alarm is hit.
+ *                      Set this to NULL to clear the alarm.
+ * @param[in] arg       Argument passed to callback when alarm is hit.
+ *
+ * @retval  0           success
+ * @retval  -EINVAL     @p time was invalid (e.g. in the past, out of range)
+ * @retval  <0          other error (negative errno code to indicate cause)
+ */
+int walltime_impl_alarm_set(struct tm *time, walltime_alarm_cb_t cb, void *arg);
+
+/**
+ * @brief Gets the current alarm setting
+ *
+ * @param[out]  time    Pointer to structure to receive alarm time
+ *
+ * @retval  0           success
+ * @retval  -EINVAL     no alarm is configured
+ * @retval  <0          other error (negative errno code to indicate cause)
+ */
+int walltime_impl_alarm_get(struct tm *time);
 
 #ifdef __cplusplus
 }

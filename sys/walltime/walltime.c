@@ -124,6 +124,17 @@ int walltime_get(struct tm *time, uint16_t *ms)
     return res;
 }
 
+int walltime_set_alarm(struct tm *time, walltime_alarm_cb_t cb, void *arg)
+{
+    rtc_tm_normalize(time);
+    return walltime_impl_alarm_set(time, cb, arg);
+}
+
+int walltime_get_alarm(struct tm *time)
+{
+    return walltime_impl_alarm_get(time);
+}
+
 uint32_t walltime_uptime(bool full)
 {
     uint32_t now = walltime_get_riot(NULL);
