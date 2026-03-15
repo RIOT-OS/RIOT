@@ -29,13 +29,14 @@ extern "C" {
 /**
  * @name    Xtimer configuration
  *
- * The timer runs at 250 kHz.
+ * The timer runs at 250 kHz to increase accuracy.
  * @{
  */
-#define XTIMER_DEV          (TIMER_DEV(0))
-#define XTIMER_HZ           (250000UL)
-#define XTIMER_WIDTH        (16)
-#define XTIMER_CHAN         (0)
+#define CONFIG_ZTIMER_USEC_DEV              (TIMER_DEV(0))  /**< Timer peripheral for ztimer */
+#define CONFIG_ZTIMER_USEC_BASE_FREQ        (250000UL)      /**< Running at 250 kHz */
+#define CONFIG_ZTIMER_USEC_WIDTH            (16)            /**< Running on a 16-bit timer */
+#define CONFIG_ZTIMER_USEC_ADJUST_SET       (56)            /**< Overhead for ztimer_set */
+#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP     (64)            /**< Overhead for ztimer_sleep */
 /** @} */
 
 /**
