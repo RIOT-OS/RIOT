@@ -1,8 +1,6 @@
-PKG_SOURCE_LOCAL=~/work/CryptoService
 PKG_NAME = cryptoservice
-PKG_URL = git@github.com:LP-HAW/CryptoService.git
-# PKG_VERSION = bd22261a3bde77c4865621165137f7d43446a89b
-PKG_VERSION = feature/nrf9160dk-target-integration
+PKG_URL = git@github.com:janthies/CryptoService.git
+PKG_VERSION = cd7affe3eee2f180ef1bdb196e47a1f545e034c2
 PKG_LICENSE = unknown
 
 include $(RIOTBASE)/pkg/pkg.mk
@@ -15,7 +13,7 @@ CMAKE_MINIMAL_VERSION = 3.30.0
 FLAGS += -Wno-cast-align
 
 ifneq (,$(filter nrf9160dk-ns,$(BOARD)))
-  FLAGS += -DTOOLCHAINPATH=/home/lena/apps/gcc-arm-11.2-2022.02-x86_64-arm-none-eabi/bin
+  FLAGS += -DTOOLCHAINPATH=/usr/bin
   FLAGS += -DCMAKE_TOOLCHAIN_FILE=cmake/armGNU.cmake
 endif
 

@@ -1,7 +1,6 @@
-PKG_SOURCE_LOCAL=~/work/riot-tee
 PKG_NAME=riot-tee
 PKG_URL=https://github.com/Einhornhool/riot-tee
-PKG_VERSION=4b79ef4d339ee789d9520ca46c128be46592454e
+PKG_VERSION=b25ae2d6f929b535b2026b7d28ab296ff76dff4d
 PKG_LICENSE=GPL-v3.0
 
 include $(RIOTBASE)/pkg/pkg.mk
@@ -12,10 +11,10 @@ CMAKE_MINIMAL_VERSION = 3.30.0
 
 TEE_CFLAGS += -Wno-strict-prototypes
 TEE_CFLAGS += -Wno-old-style-definition
-TEE_CFLAGS += -DTOOLCHAINPATH=/home/lena/apps/gcc-arm-11.2-2022.02-x86_64-arm-none-eabi/bin
+TEE_CFLAGS += -DTOOLCHAINPATH=/usr/bin
 TEE_CFLAGS += -DRIOT_CRYPTOSERVICE=$(RIOTBASE)/build/pkg/cryptoservice
 
-TOOLCHAIN_FILE=$(PKG_SOURCE_DIR)/xcompile-toolchain.cmake
+TOOLCHAIN_FILE=$(PKG_BUILD_DIR)/xcompile-toolchain.cmake
 
 all: $(PKG_BUILD_DIR)/Makefile
 	$(MAKE) -C $(PKG_BUILD_DIR)
@@ -23,6 +22,7 @@ all: $(PKG_BUILD_DIR)/Makefile
 	cp $(PKG_BUILD_DIR)/nsc_lib.o $(BINDIR)/riot-tee
 
 $(PKG_BUILD_DIR)/Makefile: $(TOOLCHAIN_FILE)
+	git -C $(PKG_SOURCE_DIR) submodule update --init --recursive
 	cmake \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DCMAKE_C_FLAGS=$(TEE_CFLAGS) \
@@ -30,10 +30,9 @@ $(PKG_BUILD_DIR)/Makefile: $(TOOLCHAIN_FILE)
 		-B$(PKG_BUILD_DIR) \
 		-H$(PKG_SOURCE_DIR)
 
-$(TOOLCHAIN_FILE): git-download
+$(TOOLCHAIN_FILE): | ..cmake_version_supported
+	mkdir -p $(PKG_BUILD_DIR)
 	$(RIOTTOOLS)/cmake/generate-xcompile-toolchain.sh > $(TOOLCHAIN_FILE)
-
-git-download: | ..cmake_version_supported
 
 ..cmake_version_supported:
 	@ # Remove '-rcX' from version as they are not well handled
