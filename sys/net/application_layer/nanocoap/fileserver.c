@@ -486,7 +486,6 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                &block2);
     coap_block_slicer_init(&slicer, block2.blknum, coap_szx2size(block2.szx));
     coap_opt_add_block2(pdu, &slicer, true);
-    coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
 
     size_t root_len = root ? strlen(root) : 0;
     const char *root_dir = &request->namebuf[root_len];
@@ -505,6 +504,9 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 
         if (slicer.cur) {
             coap_blockwise_put_char_pkt(pdu, &slicer, ',');
+        } else {
+            /* no payload written yet - set payload marker */
+            coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
         }
         coap_blockwise_put_char_pkt(pdu, &slicer, '<');
         coap_blockwise_put_bytes_pkt(pdu, &slicer, resource_dir, resource_dir_len);
