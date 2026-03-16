@@ -1,2 +1,1 @@
 INCLUDES += -I$(RIOTBOARD)/nrf9160dk/include
-INCLUDES += -I$(RIOTBASE)/build/pkg/nrfx/mdk/
