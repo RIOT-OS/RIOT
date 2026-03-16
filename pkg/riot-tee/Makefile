@@ -1,6 +1,7 @@
+PKG_SOURCE_LOCAL ?= $(wildcard $(HOME)/work/riot-tee)
 PKG_NAME=riot-tee
-PKG_URL=https://github.com/Einhornhool/riot-tee
-PKG_VERSION=b25ae2d6f929b535b2026b7d28ab296ff76dff4d
+PKG_URL=git@github.com:janthies/riot-tee.git
+PKG_VERSION=ac0fbeb72c926089aa60c7fcc6fe177476590aaf
 PKG_LICENSE=GPL-v3.0
 
 include $(RIOTBASE)/pkg/pkg.mk

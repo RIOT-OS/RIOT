@@ -1,3 +1,4 @@
+PKG_SOURCE_LOCAL ?= $(wildcard $(HOME)/work/CryptoService)
 PKG_NAME = cryptoservice
 PKG_URL = git@github.com:janthies/CryptoService.git
 PKG_VERSION = cd7affe3eee2f180ef1bdb196e47a1f545e034c2
