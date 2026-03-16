@@ -145,6 +145,32 @@ static void test_libc_endian(void)
 }
 /** @} */
 
+static void test_libc_memxor(void)
+{
+    uint8_t src[] = { 0xf0, 0x0f, 0x00, 0xff, 0xff };
+    uint8_t dst[] = { 0x0f, 0xf0, 0xff, 0x00, 0xff };
+    const uint8_t exp[] = { 0xff, 0xff, 0xff, 0xff, 0x00 };
+    memxor(dst, src, sizeof(src));
+    TEST_ASSERT(!memcmp(dst, exp, sizeof(exp)));
+
+    uint8_t dst_overlap_forward[] = { 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0x0f };
+    memxor(dst_overlap_forward, dst_overlap_forward + 1, sizeof(exp));
+    TEST_ASSERT(!memcmp(dst_overlap_forward, exp, sizeof(exp)));
+
+    uint8_t dst_overlap_backward[] = { 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0x0f };
+    memxor(dst_overlap_backward + 1, dst_overlap_backward, sizeof(exp));
+    TEST_ASSERT(!memcmp(dst_overlap_backward + 1, exp, sizeof(exp)));
+}
+
+static void test_libc_memcpy_reversed(void)
+{
+    uint8_t src[] = { 0x01, 0x02, 0x03, 0x04, 0x05 };
+    uint8_t dst[sizeof(src)];
+    const uint8_t exp[] = { 0x05, 0x04, 0x03, 0x02, 0x01 };
+    memcpy_reversed(dst, src, sizeof(src));
+    TEST_ASSERT(!memcmp(dst, exp, sizeof(exp)));
+}
+
 Test *tests_libc_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -154,6 +180,8 @@ Test *tests_libc_tests(void)
         new_TestFixture(test_libc_reverse_buf3),
         new_TestFixture(test_libc_reverse_buf4),
         new_TestFixture(test_libc_endian),
+        new_TestFixture(test_libc_memxor),
+        new_TestFixture(test_libc_memcpy_reversed),
     };
 
     EMB_UNIT_TESTCALLER(libc_tests, NULL, NULL, fixtures);

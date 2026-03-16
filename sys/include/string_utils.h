@@ -190,6 +190,29 @@ const void *memchk(const void *data, uint8_t c, size_t len);
  */
 void reverse_buf(void *buf, size_t len);
 
+/**
+ * @brief   XOR the bytes of two buffers and store the result in @p dst
+ *
+ * The buffers may overlap.
+ * It is assumed that @p dst can hold at least @p size bytes.
+ *
+ * @param[in,out]   dst     Destination buffer
+ * @param[in]       src     Source buffer
+ * @param[in]       size    Number of bytes to XOR
+ */
+void memxor(void *dst, void* src, size_t size);
+
+/**
+ * @brief   Copies @p src to @p dst in reverse order.
+ *
+ * It is assumed the @p dst can hold at least @p size bytes.
+ *
+ * @param[out]      dst     Destination buffer
+ * @param[in]       src     Source buffer
+ * @param[in]       size    Number of bytes to copy
+ */
+void memcpy_reversed(void *restrict dst, const void *restrict src, size_t size);
+
 #ifdef __cplusplus
 }
 #endif
