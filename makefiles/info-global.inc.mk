@@ -92,8 +92,8 @@ define board_unsatisfied_features
   endif
 endef
 
-BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
-BOARDS := $(filter-out $(BOARD_BLACKLIST), $(BOARDS))
+BOARDS := $(filter $(if $(BOARDS_SUPPORTED), $(BOARDS_SUPPORTED), %), $(BOARDS))
+BOARDS := $(filter-out $(BOARDS_UNSUPPORTED), $(BOARDS))
 
 BOARDS_WITH_MISSING_FEATURES :=
 BOARDS_FEATURES_MISSING :=

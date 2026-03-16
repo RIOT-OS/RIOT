@@ -64,14 +64,14 @@ include $(RIOTBASE)/Makefile.include
 
 Sometimes it is necessary to exclude boards because they don't provide a
 required functionality or don't have sufficient memory. RIOT's build system
-looks for the macros `BOARD_BLACKLIST`, `BOARD_WHITELIST`, and
+looks for the macros `BOARDS_UNSUPPORTED`, `BOARDS_SUPPORTED`, and
 `BOARD_INSUFFICIENT_MEMORY`. Any board name that is not included in
-`BOARD_WHITELIST` will issue a message that one has to expect errors if they
+`BOARDS_SUPPORTED` will issue a message that one has to expect errors if they
 build the application for the board referred by that name. The list can also be
 used by a CI system to not build the application for this board at all. A board
-that is included in `BOARD_BLACKLIST` will show the same behavior. The build
-system evaluates `BOARD_WHITELIST` first and then `BOARD_BLACKLIST`. The
-`BOARD_INSUFFICIENT_MEMORY` macro is similar to `BOARD_BLACKLIST` but will
+that is included in `BOARDS_UNSUPPORTED` will show the same behavior. The build
+system evaluates `BOARDS_SUPPORTED` first and then `BOARDS_UNSUPPORTED`. The
+`BOARD_INSUFFICIENT_MEMORY` macro is similar to `BOARDS_UNSUPPORTED` but will
 build in any case. A CI system can use the information provided by the
 `BOARD_INSUFFICIENT_MEMORY` macro to skip the linking step in the build
 process, since some linkers will issue an error if the code won't fit the

@@ -19,11 +19,11 @@ ifneq (, $(_BOARD_ALIAS_USED))
   # use real board name instead of alias from here on
   # we need to use override in case BOARD was specified on the command line
   override BOARD := $(_board)
-  _whitelist := $(BOARD_WHITELIST)
-  _blacklist := $(BOARD_BLACKLIST)
+  _boards_supported := $(BOARDS_SUPPORTED)
+  _boards_unsupported := $(BOARDS_UNSUPPORTED)
   _test_blacklist := $(TEST_ON_CI_BLACKLIST)
-  BOARD_WHITELIST += $(if $(filter $(_alias),$(_whitelist)), $(_board))
-  BOARD_BLACKLIST += $(if $(filter $(_alias),$(_blacklist)), $(_board))
+  BOARDS_SUPPORTED += $(if $(filter $(_alias),$(_boards_supported)), $(_board))
+  BOARDS_UNSUPPORTED += $(if $(filter $(_alias),$(_boards_unsupported)), $(_board))
   TEST_ON_CI_BLACKLIST += $(if $(filter $(_alias),$(_test_blacklist)), $(_board))
   # inform the user about the alias
   ifeq (native,$(_alias))
