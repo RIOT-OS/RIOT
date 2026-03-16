@@ -5,7 +5,10 @@ NON_SECURE_IMAGE = $(BINDIR)/$(APPLICATION).elf
 MERGED_HEX = $(BINDIR)/$(APPLICATION)_merged.hex
 MERGED_BIN = $(BINDIR)/$(APPLICATION)_merged.bin
 
-MERGEHEX = /usr/bin/mergehex
+MERGEHEX := $(shell which mergehex)
+ifeq ($(MERGEHEX),)
+  $(error mergehex not found in PATH)
+endif
 
 merged_hex: link
 	@echo "[MERGEHEX] $(SECURE_IMAGE) and $(NON_SECURE_IMAGE) -> $(MERGED_HEX)"
