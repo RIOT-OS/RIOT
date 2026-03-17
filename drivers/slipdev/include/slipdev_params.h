@@ -20,9 +20,7 @@
 
 #include "board.h"
 #include "slipdev.h"
-#ifdef MODULE_SLIPDEV_STDIO
 #include "stdio_uart.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,22 +31,15 @@ extern "C" {
  * @{
  */
 #ifndef SLIPDEV_PARAM_UART
-# ifndef MODULE_SLIPDEV_STDIO
-#  ifdef MODULE_USBUS_CDC_ACM
-#   define SLIPDEV_PARAM_UART       UART_DEV(0)
-#  else
-#   define SLIPDEV_PARAM_UART       UART_DEV(1)
-#  endif
-# else  /* MODULE_SLIPDEV_STDIO */
+# ifdef MODULE_STDIO_UART
+#  define SLIPDEV_PARAM_UART        UART_DEV(1)
+# else
 #  define SLIPDEV_PARAM_UART        STDIO_UART_DEV
-# endif /* MODULE_SLIPDEV_STDIO */
+# endif
 #endif  /* SLIPDEV_PARAM_UART */
+
 #ifndef SLIPDEV_PARAM_BAUDRATE
-# ifndef MODULE_SLIPDEV_STDIO
-#  define SLIPDEV_PARAM_BAUDRATE    (115200U)
-# else  /* MODULE_SLIPDEV_STDIO */
-#  define SLIPDEV_PARAM_BAUDRATE    (STDIO_UART_BAUDRATE)
-# endif /* MODULE_SLIPDEV_STDIO */
+# define SLIPDEV_PARAM_BAUDRATE     STDIO_UART_BAUDRATE
 #endif  /* SLIPDEV_PARAM_BAUDRATE */
 
 #ifndef SLIPDEV_PARAMS
