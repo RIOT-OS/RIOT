@@ -7,7 +7,7 @@
 #
 
 menu "SLIPDEV driver"
-    depends on USEMODULE_SLIPDEV
+    depends on USEMODULE_SLIPMUX
 
 config SLIPDEV_BUFSIZE_EXP
     int "Buffer size (as exponent of 2^n)"

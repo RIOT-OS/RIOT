@@ -196,7 +196,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t max_le
 static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
     (void)netdev;
-    (void)value;
     (void)max_len;
     switch (opt) {
     case NETOPT_IS_WIRED:

@@ -1,6 +1,7 @@
 # Put board specific dependencies here
 ifeq (,$(filter native native32 native64,$(BOARD)))
   ifeq (slip,$(UPLINK))
+    USEMODULE += slipdev_net
     USEMODULE += slipdev_stdio
   else ifeq (ethos,$(UPLINK))
     USEMODULE += stdio_ethos
