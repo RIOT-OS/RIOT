@@ -95,7 +95,7 @@ int cst816s_init(cst816s_t *dev, const cst816s_params_t *params,
         _cst816s_reset(dev);
     }
 
-    if (gpio_is_valid(dev->params->irq) && cb) {
+    if (gpio_is_valid(dev->params->irq)) {
         if (gpio_init_int(dev->params->irq, GPIO_IN,
                           dev->params->irq_flank,
                           _gpio_irq, dev) < 0) {
