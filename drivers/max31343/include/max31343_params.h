@@ -1,7 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2026 Jakob Müller <ja.mueller@tuhh.de>
+ * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup    drivers_max31343_config  MAX31343 compile-time configuration
@@ -15,8 +17,6 @@
  * @author      Jakob Müller <ja.mueller@tuhh.de>
  */
 
-#pragma once
-
 #include "board.h"
 #include "periph/i2c.h"
 #include "max31343.h"
@@ -26,27 +26,27 @@ extern "C" {
 #endif
 
 #ifndef MAX31343_PARAM_I2C
-#define MAX31343_PARAM_I2C        I2C_DEV(0)	/**< Default I2C bus */
+#  define MAX31343_PARAM_I2C        I2C_DEV(0)	/**< Default I2C bus */
 #endif
 
 #ifndef MAX31343_PARAM_SQW_FREQ
-#define MAX31343_PARAM_SQW_FREQ     (MAX31343_SQW_1HZ)	/**< Default SQW frequency */
+#  define MAX31343_PARAM_SQW_FREQ     (MAX31343_SQW_1HZ)	/**< Default SQW frequency */
 #endif
 
 #ifndef MAX31343_PARAM_TRICKLE_ENABLE
-#define MAX31343_PARAM_TRICKLE_ENABLE  false    /**< Default trickle charger disabled */
+#  define MAX31343_PARAM_TRICKLE_ENABLE  false    /**< Default trickle charger disabled */
 #endif
 
 #ifndef MAX31343_PARAM_TRICKLE_DIODE
-#define MAX31343_PARAM_TRICKLE_DIODE  MAX31343_TRICKLE_DIODE_SCHOTTKY   /**< Default trickle charger diode */
+#  define MAX31343_PARAM_TRICKLE_DIODE  MAX31343_TRICKLE_DIODE_SCHOTTKY   /**< Default trickle charger diode */
 #endif
 
 #ifndef MAX31343_PARAM_TRICKLE_RES
-#define MAX31343_PARAM_TRICKLE_RES  MAX31343_TRICKLE_RES_11K    /**< Default trickle charger resistor */
+#  define MAX31343_PARAM_TRICKLE_RES  MAX31343_TRICKLE_RES_11K    /**< Default trickle charger resistor */
 #endif
 
 #ifndef MAX31343_PARAMS
-#define MAX31343_PARAMS {                                   \
+#  define MAX31343_PARAMS {                                 \
     .i2c = MAX31343_PARAM_I2C,                              \
     .sqw_freq = MAX31343_PARAM_SQW_FREQ,                    \
     .trickle_enable = MAX31343_PARAM_TRICKLE_ENABLE,        \

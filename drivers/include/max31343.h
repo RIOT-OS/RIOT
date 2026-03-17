@@ -1,7 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2026 Jakob Müller <ja.mueller@tuhh.de>
+ * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup    drivers_max31343  MAX31343 I2C RTC driver
@@ -15,15 +17,13 @@
  * @author      Jakob Müller <ja.mueller@tuhh.de>
  */
 
-#pragma once
-
 #include <stdint.h>
 #include <time.h>
 #include <stdbool.h>
 
 #include "periph/i2c.h"
 #ifndef USE_INTERNAL_RTC
-#include "periph/rtc.h"
+#  include "periph/rtc.h"
 #endif
 
 #ifdef __cplusplus
@@ -65,14 +65,14 @@ typedef enum {
  * The values correspond to the TTSINT field (TS_Config[5:3]).
  */
 typedef enum {
-    MAX31343_TTSINT_1S   = 0x0, /**< update temperature every 1 s   */
-    MAX31343_TTSINT_2S   = 0x1, /**< update temperature every 2 s   */
-    MAX31343_TTSINT_4S   = 0x2, /**< update temperature every 4 s   */
-    MAX31343_TTSINT_8S   = 0x3, /**< update temperature every 8 s   */
-    MAX31343_TTSINT_16S  = 0x4, /**< update temperature every 16 s  */
-    MAX31343_TTSINT_32S  = 0x5, /**< update temperature every 32 s  */
-    MAX31343_TTSINT_64S  = 0x6, /**< update temperature every 64 s  */
-    MAX31343_TTSINT_128S = 0x7, /**< update temperature every 128 s */
+    MAX31343_TTSINT_1S   = 0x0, /**< update temperature every 1s   */
+    MAX31343_TTSINT_2S   = 0x1, /**< update temperature every 2s   */
+    MAX31343_TTSINT_4S   = 0x2, /**< update temperature every 4s   */
+    MAX31343_TTSINT_8S   = 0x3, /**< update temperature every 8s   */
+    MAX31343_TTSINT_16S  = 0x4, /**< update temperature every 16s  */
+    MAX31343_TTSINT_32S  = 0x5, /**< update temperature every 32s  */
+    MAX31343_TTSINT_64S  = 0x6, /**< update temperature every 64s  */
+    MAX31343_TTSINT_128S = 0x7, /**< update temperature every 128s */
 } max31343_ttsint_t;
 
 /**
@@ -82,9 +82,9 @@ typedef enum {
  * Corresponds to D_TRICKLE bits [1:0].
  */
 typedef enum {
-    MAX31343_TRICKLE_RES_3K  = 0x0U,  /**< 3 kΩ  */
-    MAX31343_TRICKLE_RES_6K  = 0x2U,  /**< 6 kΩ  */
-    MAX31343_TRICKLE_RES_11K = 0x3U,  /**< 11 kΩ */
+    MAX31343_TRICKLE_RES_3K  = 0x0U,  /**< 3 kOhm  */
+    MAX31343_TRICKLE_RES_6K  = 0x2U,  /**< 6 kOhm  */
+    MAX31343_TRICKLE_RES_11K = 0x3U,  /**< 11 kOhm */
 } max31343_trickle_res_t;
 
 /**

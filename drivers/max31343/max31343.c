@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2026 Jakob Müller <ja.mueller@tuhh.de>
+ * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 

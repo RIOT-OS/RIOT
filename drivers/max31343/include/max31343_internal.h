@@ -1,7 +1,9 @@
 /*
- * SPDX-FileCopyrightText: 2026 Jakob Müller <ja.mueller@tuhh.de>
+ * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @file
@@ -9,8 +11,6 @@
  *
  * @author      Jakob Müller <ja.mueller@tuhh.de>
  */
-
-#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,7 +57,8 @@ extern "C" {
 
 #define MAX31343_STATUS_A1F         (1U << 0)   /**< Alarm 1 flag in status register */
 #define MAX31343_STATUS_A2F         (1U << 1)   /**< Alarm 2 flag in status register */
-#define MAX31343_STATUS_OSF         (1U << 6)   /**< Oscillator stop flag; set on power-on, cleared by writing time registers */
+#define MAX31343_STATUS_OSF         (1U << 6)   /**< Oscillator stop flag; set on power-on,
+                                                    cleared by writing time registers */
 
 #define MAX31343_INTEN_A1IE         (1U << 0)   /**< Alarm 1 interrupt enable bit */
 #define MAX31343_INTEN_A2IE         (1U << 1)   /**< Alarm 2 interrupt enable bit */
@@ -65,10 +66,12 @@ extern "C" {
 #define MAX31343_REG_TRICKLE        (0x19U)         /**< Trickle charger configuration register */
 #define MAX31343_TRICKLE_TCHE_SHIFT (4U)            /**< TCHE field shift in trickle register */
 #define MAX31343_TRICKLE_TCHE_MASK  (0xF0U)         /**< TCHE field mask in trickle register */
-#define MAX31343_TRICKLE_TCHE_ENABLE (0x5U)         /**< Only value that enables trickle charger; all other values disable it */
+#define MAX31343_TRICKLE_TCHE_ENABLE (0x5U)         /**< Only value that enables trickle charger;
+                                                        all other values disable it */
 #define MAX31343_TRICKLE_D_MASK     (0x0FU)         /**< D_TRICKLE field mask */
 #define MAX31343_TRICKLE_D_CHARGER_OFF (1U << 3)    /**< Charger path disable bit (0=ON, 1=OFF) */
-#define MAX31343_TRICKLE_D_DIODE    (1U << 2)       /**< Diode select bit (0=no diode, 1=with diode) */
+#define MAX31343_TRICKLE_D_DIODE    (1U << 2)       /**< Diode select bit (0=no diode,
+                                                        1=with diode) */
 #define MAX31343_TRICKLE_D_RES_MASK (0x03U)         /**< Resistor selection field mask */
 
 #ifdef __cplusplus
