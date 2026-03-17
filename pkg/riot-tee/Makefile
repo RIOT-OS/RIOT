@@ -5,6 +5,7 @@ PKG_VERSION=ac0fbeb72c926089aa60c7fcc6fe177476590aaf
 PKG_LICENSE=GPL-v3.0
 
 include $(RIOTBASE)/pkg/pkg.mk
+include $(RIOTBASE)/makefiles/riot-tee-layout.mk
 
 .PHONY: all..cmake_version_supported
 
@@ -18,16 +19,27 @@ TEE_CFLAGS += -DRIOT_CRYPTOSERVICE=$(RIOTBASE)/build/pkg/cryptoservice
 TOOLCHAIN_FILE=$(PKG_BUILD_DIR)/xcompile-toolchain.cmake
 
 all: $(PKG_BUILD_DIR)/Makefile
+	"$(MAKE)" -C $(RIOTBASE)/pkg/tf-m/
 	$(MAKE) -C $(PKG_BUILD_DIR)
 	mkdir -p $(BINDIR)/riot-tee
 	cp $(PKG_BUILD_DIR)/nsc_lib.o $(BINDIR)/riot-tee
 
-$(PKG_BUILD_DIR)/Makefile: $(TOOLCHAIN_FILE)
+LAYOUT_MK := $(RIOTBASE)/makefiles/riot-tee-layout.mk
+
+$(PKG_BUILD_DIR)/Makefile: $(TOOLCHAIN_FILE) $(LAYOUT_MK)
+	@rm -rf $(PKG_BUILD_DIR)/CMakeCache.txt
 	git -C $(PKG_SOURCE_DIR) submodule update --init --recursive
 	cmake \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DCMAKE_C_FLAGS=$(TEE_CFLAGS) \
 		-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
+		-DTEE_FLASH_START=$(TEE_FLASH_START) \
+		-DTEE_FLASH_SIZE=$(TEE_FLASH_SIZE) \
+		-DTEE_RAM_SIZE=$(TEE_RAM_SIZE) \
+		-DFIRST_NS_FLASH_REGION=$(FIRST_NS_FLASH_REGION) \
+		-DFIRST_NS_RAM_REGION=$(FIRST_NS_RAM_REGION) \
+		-DNSC_FLASH_REGION=$(NSC_FLASH_REGION) \
+		-DTFM_PATH=$(RIOTBASE)/build/pkg/tf-m \
 		-B$(PKG_BUILD_DIR) \
 		-H$(PKG_SOURCE_DIR)
 
