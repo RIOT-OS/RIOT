@@ -5,11 +5,12 @@ RAM_LEN ?= 0x40000
 ifneq (,$(filter nrf9160dk-ns,$(BOARD)))
 $(info $$RIOTBOARD is [$(BOARD)])
 
-export SECURE_FLASH_SIZE = 0x20000
+include $(RIOTMAKE)/riot-tee-layout.mk
 
-RAM_LEN = 0x2a000
-ROM_LEN = 0xE0000
-RAM_START_ADDR ?= 0x20016000
+export SECURE_FLASH_SIZE
+ROM_LEN = $(NS_FLASH_SIZE)
+RAM_LEN = $(NS_RAM_SIZE)
+RAM_START_ADDR ?= $(NS_RAM_START)
 ROM_OFFSET = $(SECURE_FLASH_SIZE)
 endif
 
