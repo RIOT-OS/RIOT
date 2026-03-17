@@ -29,34 +29,29 @@ extern "C" {
 #define MAX31343_PARAM_I2C        I2C_DEV(0)	/**< Default I2C bus */
 #endif
 
-#ifndef MAX31343_PARAM_USE_SQW
-#define MAX31343_PARAM_USE_SQW      (0)			/**< Disable SQW output by default */
-#endif
-
 #ifndef MAX31343_PARAM_SQW_FREQ
 #define MAX31343_PARAM_SQW_FREQ     (MAX31343_SQW_1HZ)	/**< Default SQW frequency */
 #endif
 
-#ifndef MAX31343_PARAM_USE_TEMP_AUTOMODE
-#define MAX31343_PARAM_USE_TEMP_AUTOMODE   (0)	/**< Disable temp automode by default */
+#ifndef MAX31343_PARAM_TRICKLE_ENABLE
+#define MAX31343_PARAM_TRICKLE_ENABLE  false    /**< Default trickle charger disabled */
 #endif
 
-#ifndef MAX31343_PARAM_TEMP_AUTOMODE_ENABLE
-#define MAX31343_PARAM_TEMP_AUTOMODE_ENABLE (1)	/**< Enable automode when configured */
+#ifndef MAX31343_PARAM_TRICKLE_DIODE
+#define MAX31343_PARAM_TRICKLE_DIODE  MAX31343_TRICKLE_DIODE_SCHOTTKY   /**< Default trickle charger diode */
 #endif
 
-#ifndef MAX31343_PARAM_TEMP_TTSINT
-#define MAX31343_PARAM_TEMP_TTSINT  (MAX31343_TTSINT_16S)	/**< Default conversion interval */
+#ifndef MAX31343_PARAM_TRICKLE_RES
+#define MAX31343_PARAM_TRICKLE_RES  MAX31343_TRICKLE_RES_11K    /**< Default trickle charger resistor */
 #endif
 
 #ifndef MAX31343_PARAMS
 #define MAX31343_PARAMS {                                   \
     .i2c = MAX31343_PARAM_I2C,                              \
-    .use_sqw = MAX31343_PARAM_USE_SQW,                      \
     .sqw_freq = MAX31343_PARAM_SQW_FREQ,                    \
-    .use_temp_automode = MAX31343_PARAM_USE_TEMP_AUTOMODE,  \
-    .temp_automode_enable = MAX31343_PARAM_TEMP_AUTOMODE_ENABLE, \
-    .temp_ttsint = MAX31343_PARAM_TEMP_TTSINT,              \
+    .trickle_enable = MAX31343_PARAM_TRICKLE_ENABLE,        \
+    .trickle_diode = MAX31343_PARAM_TRICKLE_DIODE,          \
+    .trickle_res = MAX31343_PARAM_TRICKLE_RES,              \
 }                                                           /**< Default parameter set */
 #endif
 

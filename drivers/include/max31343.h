@@ -65,14 +65,14 @@ typedef enum {
  * The values correspond to the TTSINT field (TS_Config[5:3]).
  */
 typedef enum {
-    MAX31343_TTSINT_1S = 0x0,
-    MAX31343_TTSINT_2S = 0x1,
-    MAX31343_TTSINT_4S = 0x2,
-    MAX31343_TTSINT_8S = 0x3,
-    MAX31343_TTSINT_16S = 0x4,
-    MAX31343_TTSINT_32S = 0x5,
-    MAX31343_TTSINT_64S = 0x6,
-    MAX31343_TTSINT_128S = 0x7,
+    MAX31343_TTSINT_1S   = 0x0, /**< update temperature every 1 s   */
+    MAX31343_TTSINT_2S   = 0x1, /**< update temperature every 2 s   */
+    MAX31343_TTSINT_4S   = 0x2, /**< update temperature every 4 s   */
+    MAX31343_TTSINT_8S   = 0x3, /**< update temperature every 8 s   */
+    MAX31343_TTSINT_16S  = 0x4, /**< update temperature every 16 s  */
+    MAX31343_TTSINT_32S  = 0x5, /**< update temperature every 32 s  */
+    MAX31343_TTSINT_64S  = 0x6, /**< update temperature every 64 s  */
+    MAX31343_TTSINT_128S = 0x7, /**< update temperature every 128 s */
 } max31343_ttsint_t;
 
 /**
@@ -104,17 +104,15 @@ typedef enum {
 /**
  * @brief Configuration parameters for MAX31343 initialization.
  *
- * These parameters allow optional default configuration during
- * device initialization. Features are only configured if the
- * corresponding @c use_* flag is set.
+ * These parameters are applied once during max31343_init().
+ * Runtime changes can be made using the individual setter functions.
  */
 typedef struct {
-    i2c_t i2c;                       /**< I2C bus the device is connected to */
-    bool use_sqw;                    /**< enable SQW output on init */
-    max31343_sqw_freq_t sqw_freq;    /**< SQW output frequency */
-    bool use_temp_automode;          /**< configure temp automode on init */
-    bool temp_automode_enable;       /**< enable or disable automode */
-    max31343_ttsint_t temp_ttsint;   /**< temperature conversion interval */
+    i2c_t i2c;                              /**< I2C bus the device is connected to */
+    max31343_sqw_freq_t sqw_freq;           /**< SQW output frequency */
+    bool trickle_enable;                    /**< enable trickle charger on init */
+    max31343_trickle_diode_t trickle_diode; /**< trickle charger diode path */
+    max31343_trickle_res_t trickle_res;     /**< trickle charger series resistor */
 } max31343_params_t;
 
 /**
@@ -272,29 +270,36 @@ int max31343_set_sqw(const max31343_t *dev, max31343_sqw_freq_t freq);
  * @retval  0       Success
  * @retval -EIO     I2C communication error
  */
-int max31343_get_temp_centi_c(const max31343_t *dev, int16_t *temp_centi);
+int max31343_get_temp(const max31343_t *dev, int16_t *temp_centi);
+
 /**
- * @brief Configure and enable or disable the trickle charger.
+ * @brief Enable the trickle charger.
  *
- * When @p enable is true the TCHE field is set to 0x5 (the only magic
- * value that activates the charger per the datasheet) and D_TRICKLE is
- * composed from @p diode and @p res.
- * When @p enable is false the entire register is written as 0x00,
- * disabling the charger regardless of the other parameters.
+ * The trickle charger can be used to slowly charge a supercapacitor or
+ * rechargeable backup battery connected to VBAT. The charging current is
+ * determined by the selected diode path and series resistor:
+ * I = (VCC - V_diode - V_BAT) / R
  *
- * @param[in] dev     Device descriptor.
- * @param[in] enable  true  = enable trickle charger,
- *                    false = disable trickle charger.
- * @param[in] diode   Diode path selection (ignored when @p enable is false).
- * @param[in] res     Resistor selection   (ignored when @p enable is false).
+ * @param[in] dev    device descriptor
+ * @param[in] diode  diode path selection
+ * @param[in] res    series resistor selection
  *
  * @retval  0       Success
  * @retval -EIO     I2C communication error
  */
-int max31343_set_trickle_charger(const max31343_t *dev,
-                                 bool enable,
-                                 max31343_trickle_diode_t diode,
-                                 max31343_trickle_res_t res);
+int max31343_trickle_charge_enable(const max31343_t *dev,
+                                   max31343_trickle_diode_t diode,
+                                   max31343_trickle_res_t res);
+
+/**
+ * @brief Disable the trickle charger.
+ *
+ * @param[in] dev  device descriptor
+ *
+ * @retval  0       Success
+ * @retval -EIO     I2C communication error
+ */
+int max31343_trickle_charge_disable(const max31343_t *dev);
 
 /**
  * @brief Configure automatic temperature conversion mode and interval.

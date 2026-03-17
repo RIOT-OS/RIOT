@@ -13,7 +13,6 @@
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
-#include <stdio.h>
 #include "bcd.h"
 #include "max31343.h"
 #include "max31343_params.h"
@@ -183,20 +182,21 @@ int max31343_init(max31343_t *dev, const max31343_params_t *params)
         return res;
     }
 
-    if (params->use_sqw) {
-        res = max31343_set_sqw(dev, params->sqw_freq);
-        if (res != 0) {
-            return res;
-        }
+    res = max31343_set_sqw(dev, params->sqw_freq);
+    if (res != 0) {
+        return res;
     }
 
-    if (params->use_temp_automode) {
-        res = max31343_temp_set_automode(dev,
-                                         params->temp_automode_enable,
-                                         params->temp_ttsint);
-        if (res != 0) {
-            return res;
-        }
+    if (params->trickle_enable) {
+        res = max31343_trickle_charge_enable(dev,
+                                             params->trickle_diode,
+                                             params->trickle_res);
+    }
+    else {
+        res = max31343_trickle_charge_disable(dev);
+    }
+    if (res != 0) {
+        return res;
     }
 
     return time_lost ? -ENODATA : 0;
@@ -204,7 +204,6 @@ int max31343_init(max31343_t *dev, const max31343_params_t *params)
 
 int max31343_get_time(const max31343_t *dev, struct tm *time)
 {
-    puts("max31343_get_time called");
     assert(dev);
     assert(time);
 
@@ -398,7 +397,7 @@ int max31343_set_sqw(const max31343_t *dev, max31343_sqw_freq_t freq)
     return res;
 }
 
-int max31343_get_temp_centi_c(const max31343_t *dev, int16_t *temp_centi)
+int max31343_get_temp(const max31343_t *dev, int16_t *temp_centi)
 {
     assert(dev);
     assert(temp_centi);
@@ -418,24 +417,25 @@ int max31343_get_temp_centi_c(const max31343_t *dev, int16_t *temp_centi)
     return 0;
 }
 
-int max31343_set_trickle_charger(const max31343_t *dev,
-                                 bool enable,
-                                 max31343_trickle_diode_t diode,
-                                 max31343_trickle_res_t res)
+int max31343_trickle_charge_enable(const max31343_t *dev,
+                                   max31343_trickle_diode_t diode,
+                                   max31343_trickle_res_t res)
 {
     assert(dev);
 
-    uint8_t reg = 0x00U;
-
-    if (enable) {
-        uint8_t tche     = (uint8_t)(MAX31343_TRICKLE_TCHE_ENABLE
-                                             << MAX31343_TRICKLE_TCHE_SHIFT);
-        uint8_t d_trickle = (uint8_t)(((uint8_t)diode << 2)
-                                      | ((uint8_t)res & MAX31343_TRICKLE_D_RES_MASK));
-        reg = (uint8_t)(tche | (d_trickle & MAX31343_TRICKLE_D_MASK));
-    }
+    uint8_t tche = (uint8_t)(MAX31343_TRICKLE_TCHE_ENABLE << MAX31343_TRICKLE_TCHE_SHIFT);
+    uint8_t d_trickle = (uint8_t)(((uint8_t)diode << 2)
+                                  | ((uint8_t)res & MAX31343_TRICKLE_D_RES_MASK));
+    uint8_t reg = (uint8_t)(tche | (d_trickle & MAX31343_TRICKLE_D_MASK));
 
     return _write_reg(dev, MAX31343_REG_TRICKLE, reg, 1, 1);
+}
+
+int max31343_trickle_charge_disable(const max31343_t *dev)
+{
+    assert(dev);
+
+    return _write_reg(dev, MAX31343_REG_TRICKLE, 0x00U, 1, 1);
 }
 
 int max31343_temp_set_automode(const max31343_t *dev, bool enable, max31343_ttsint_t ttsint)
