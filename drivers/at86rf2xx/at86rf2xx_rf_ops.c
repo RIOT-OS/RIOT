@@ -15,17 +15,16 @@
  * @}
  */
 
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 #include "at86rf2xx.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
 #include "macros/utils.h"
 #include "net/ieee802154/radio.h"
 #include "sched.h"
-#include <stdatomic.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
 #include "thread.h"
 #include "atomic_utils.h"
 #if IS_USED(MODULE_AT86RF2XX_AES_SPI)

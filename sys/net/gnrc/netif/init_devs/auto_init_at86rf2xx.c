@@ -50,7 +50,12 @@ void auto_init_at86rf2xx(void)
     for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
         LOG_DEBUG("[auto_init_netif] initializing at86rf2xx #%u\n", i);
 
-        at86rf2xx_init_event(&at86rf2xx_bhp[i], &at86rf2xx_params[i], &at86rf2xx_netdev[i].submac.dev, EVENT_PRIO_HIGHEST);
+        int res;
+        if ((res = at86rf2xx_init_event(&at86rf2xx_bhp[i], &at86rf2xx_params[i],
+                                         &at86rf2xx_netdev[i].submac.dev, EVENT_PRIO_HIGHEST))) {
+            LOG_ERROR("at86rf2xx #%u init failed: %i\n", i, res);
+            continue;
+        }
         netdev_register(&at86rf2xx_netdev[i].dev.netdev, NETDEV_AT86RF2XX, i);
         netdev_ieee802154_submac_init(&at86rf2xx_netdev[i]);
 #if defined(MODULE_GNRC_GOMACH)
