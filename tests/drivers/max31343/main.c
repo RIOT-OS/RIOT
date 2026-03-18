@@ -200,7 +200,7 @@ static int _cmd_temp(int argc, char **argv)
     (void)argc; (void)argv;
 
     int16_t centi;
-    int res = max31343_get_temp_centi_c(&_dev, &centi);
+    int res = max31343_get_temp(&_dev, &centi);
     if (res != 0) {
         printf("error: get_temp failed (%d)\n", res);
         return 1;
@@ -238,9 +238,7 @@ static int _cmd_sqw(int argc, char **argv)
 static int _cmd_trickle(int argc, char **argv)
 {
     if (argc == 2 && argv[1][0] == '0') {
-        int res = max31343_set_trickle_charger(&_dev, false,
-                                               MAX31343_TRICKLE_DIODE_SCHOTTKY,
-                                               MAX31343_TRICKLE_RES_3K);
+        int res = max31343_trickle_charge_disable(&_dev);
         if (res != 0) {
             printf("error: set_trickle failed (%d)\n", res);
             return 1;
@@ -264,7 +262,7 @@ static int _cmd_trickle(int argc, char **argv)
         return 1;
     }
 
-    int res = max31343_set_trickle_charger(&_dev, true,
+    int res = max31343_trickle_charge_enable(&_dev,
                                            (max31343_trickle_diode_t)diode,
                                            (max31343_trickle_res_t)res_sel);
     if (res != 0) {
@@ -340,7 +338,7 @@ static int _cmd_test(int argc, char **argv)
 
     /*
      * The MAX31343 only latches a written time at the next internal 1 Hz
-     * tick boundary.  Waiting two full second guarantees the new value is
+     * tick boundary. Waiting two full second guarantees the new value is
      * committed before we read it back.
      */
     ztimer_sleep(ZTIMER_SEC, 2);
@@ -357,9 +355,9 @@ static int _cmd_test(int argc, char **argv)
      * writes back tm_wday / tm_yday / tm_isdst, which is undefined behaviour
      * on a const object (and a BusFault if it lives in flash).
      *
-     * Expected window: [ref, ref + 3 s].  The lower bound guards against the
+     * Expected window: [ref, ref + 3s]. The lower bound guards against the
      * chip returning a time before what we wrote; the upper bound gives slack
-     * for the 1 s latch delay plus two I2C round-trips.
+     * for the 1s latch delay plus two I2C round-trips.
      */
     struct tm ref_copy = _ref_time;
     ref_copy.tm_isdst  = 0;
@@ -433,7 +431,7 @@ static int _cmd_test(int argc, char **argv)
 
     puts("[test] testing temperature read...");
     int16_t centi;
-    res = max31343_get_temp_centi_c(&_dev, &centi);
+    res = max31343_get_temp(&_dev, &centi);
     if (res != 0) {
         printf("[test] FAIL: get_temp_centi_c returned %d\n", res);
         return 1;

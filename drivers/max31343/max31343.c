@@ -99,19 +99,14 @@ static void _encode_time_regs(const struct tm *t, uint8_t raw[MAX31343_TIME_LEN]
     uint8_t year2 = (uint8_t)(year_full % 100);
 
     raw[0] = (uint8_t)(bcd_from_byte((uint8_t)t->tm_sec) & 0x7FU);
-
     raw[1] = (uint8_t)(bcd_from_byte((uint8_t)t->tm_min) & 0x7FU);
-
     raw[2] = (uint8_t)(bcd_from_byte((uint8_t)t->tm_hour) & 0x3FU);
-
     raw[3] = (uint8_t)(((uint8_t)t->tm_wday + 1U) & 0x07U);
-
     raw[4] = (uint8_t)(bcd_from_byte((uint8_t)t->tm_mday) & 0x3FU);
 
     uint8_t m = (uint8_t)(t->tm_mon + 1);
     uint8_t m_bcd = (uint8_t)(bcd_from_byte(m) & 0x1FU);
     raw[5] = (uint8_t)(m_bcd | MAX31343_MONTH_CENTURY);
-
     raw[6] = bcd_from_byte(year2);
 }
 
@@ -252,27 +247,27 @@ int max31343_set_alarm(const max31343_t *dev, const struct tm *time)
         return res;
     }
 
-    uint8_t a[MAX31343_ALM1_LEN];
+    uint8_t alarm_reg[MAX31343_ALM1_LEN];
 
-    a[0] = (uint8_t)(bcd_from_byte((uint8_t) time->tm_sec) & 0x7FU);
-    a[1] = (uint8_t)(bcd_from_byte((uint8_t) time->tm_min) & 0x7FU);
-    a[2] = (uint8_t)(bcd_from_byte((uint8_t) time->tm_hour) & 0x3FU);
+    alarm_reg[0] = (uint8_t)(bcd_from_byte((uint8_t) time->tm_sec) & 0x7FU);
+    alarm_reg[1] = (uint8_t)(bcd_from_byte((uint8_t) time->tm_min) & 0x7FU);
+    alarm_reg[2] = (uint8_t)(bcd_from_byte((uint8_t) time->tm_hour) & 0x3FU);
 
-    a[3] = (uint8_t)(bcd_from_byte((uint8_t) time->tm_mday) & 0x3FU);
+    alarm_reg[3] = (uint8_t)(bcd_from_byte((uint8_t) time->tm_mday) & 0x3FU);
 
     uint8_t mon = (uint8_t)(time->tm_mon + 1);
-    a[4] = (uint8_t)(bcd_from_byte(mon) & 0x1FU);
+    alarm_reg[4] = (uint8_t)(bcd_from_byte(mon) & 0x1FU);
 
     int year_full = time->tm_year + 1900;
     uint8_t year2 = (uint8_t)(year_full % 100);
-    a[5] = bcd_from_byte(year2);
+    alarm_reg[5] = bcd_from_byte(year2);
 
     i2c_acquire(dev->i2c);
 
     /* Disable alarm interrupt before writing registers */
     res = _alarm1_set_enable(dev, false);
     if (res == 0) {
-        res = _write_regs(dev, MAX31343_REG_ALM1_SEC, a, sizeof(a), 0, 0);
+        res = _write_regs(dev, MAX31343_REG_ALM1_SEC, alarm_reg, sizeof(alarm_reg), 0, 0);
     }
     i2c_release(dev->i2c);
     return res;
@@ -283,27 +278,27 @@ int max31343_get_alarm(const max31343_t *dev, struct tm *time)
     assert(dev);
     assert(time);
 
-    uint8_t a[MAX31343_ALM1_LEN];
-    int res = _read_regs(dev, MAX31343_REG_ALM1_SEC, a, sizeof(a), 1, 1);
+    uint8_t alarm_reg[MAX31343_ALM1_LEN];
+    int res = _read_regs(dev, MAX31343_REG_ALM1_SEC, alarm_reg, sizeof(alarm_reg), 1, 1);
     if (res != 0) {
         return res;
     }
 
-    if ((a[0] & MAX31343_ALM_MASK_BIT) || (a[1] & MAX31343_ALM_MASK_BIT) ||
-        (a[2] & MAX31343_ALM_MASK_BIT) || (a[3] & MAX31343_ALM_MASK_BIT) ||
-        (a[4] & (MAX31343_ALM_MASK_BIT | MAX31343_ALM_DY_DT))) {
+    if ((alarm_reg[0] & MAX31343_ALM_MASK_BIT) || (alarm_reg[1] & MAX31343_ALM_MASK_BIT) ||
+        (alarm_reg[2] & MAX31343_ALM_MASK_BIT) || (alarm_reg[3] & MAX31343_ALM_MASK_BIT) ||
+        (alarm_reg[4] & (MAX31343_ALM_MASK_BIT | MAX31343_ALM_DY_DT))) {
         return -ENOENT;
     }
 
     memset(time, 0, sizeof(*time));
 
-    time->tm_sec = bcd_to_byte(a[0] & 0x7FU);
-    time->tm_min = bcd_to_byte(a[1] & 0x7FU);
-    time->tm_hour = bcd_to_byte(a[2] & 0x3FU);
-    time->tm_mday = bcd_to_byte(a[3] & 0x3FU);
-    time->tm_mon = bcd_to_byte(a[4] & 0x1FU) - 1;
+    time->tm_sec = bcd_to_byte(alarm_reg[0] & 0x7FU);
+    time->tm_min = bcd_to_byte(alarm_reg[1] & 0x7FU);
+    time->tm_hour = bcd_to_byte(alarm_reg[2] & 0x3FU);
+    time->tm_mday = bcd_to_byte(alarm_reg[3] & 0x3FU);
+    time->tm_mon = bcd_to_byte(alarm_reg[4] & 0x1FU) - 1;
 
-    int year = bcd_to_byte(a[5]);
+    int year = bcd_to_byte(alarm_reg[5]);
     time->tm_year = (2000 + year) - 1900;
 
     time->tm_isdst = -1;
