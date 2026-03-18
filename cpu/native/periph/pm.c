@@ -12,8 +12,10 @@
  */
 
 #include <err.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "periph/pm.h"
 #include "native_internal.h"
@@ -70,6 +72,22 @@ void pm_off(void)
 #ifdef MODULE_VFS_DEFAULT
     extern void auto_unmount_vfs(void);
     auto_unmount_vfs();
+#endif
+    /* When compiled with gcov coverage instrumentation, explicitly flush
+     * profiling data and call _exit() to bypass the libc atexit chain.
+     * Rationale: libc exit() triggers __asan_handle_no_return() before running
+     * atexit handlers, which poisons the stack; gcov's own atexit handler then
+     * runs on poisoned stack and fails to write .gcda files.  By calling
+     * __gcov_dump() ourselves first (while the stack is still clean) and then
+     * using _exit() to skip atexit, we avoid both ASan and signal issues.
+     * _native_in_isr = 1 prevents native_signal_action() from hijacking the
+     * return address via _native_sig_leave_tramp during the dump. */
+#ifdef __GCOV__
+    {
+        extern void __gcov_dump(void);
+        __gcov_dump();
+        _exit(_native_retval);
+    }
 #endif
     real_exit(_native_retval);
 }
