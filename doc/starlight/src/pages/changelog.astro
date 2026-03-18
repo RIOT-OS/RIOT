@@ -1,9 +1,14 @@
 ---
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
-import { LinkButton, LinkCard, FileTree } from "@astrojs/starlight/components";
+import { LinkButton, LinkCard } from "@astrojs/starlight/components";
 import { getCollection } from "astro:content";
 
 const changelog = await getCollection("changelog");
+
+// Sort the changelog array, so that the latest release comes first
+const sortedChangelog = changelog.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
 ---
 
 <StarlightPage
@@ -23,7 +28,7 @@ const changelog = await getCollection("changelog");
   <!-- Add a gap between the rss-feed button and the link-cards -->
   <div style={{ height: "0.5rem" }}></div>
   {
-    changelog.map((entry) => (
+    sortedChangelog.map((entry) => (
       <LinkCard
         title={`${entry.data.release}${entry.data.codeName ? ` "${entry.data.codeName}"` : ""}`}
         href={`/changelog/${entry.data.slug}`}
