@@ -1,6 +1,7 @@
 PKG_NAME     = mosquitto_rsmb
 PKG_URL      = https://github.com/eclipse/mosquitto.rsmb
 PKG_VERSION  = 36fd4ba9433da172f0af580eb6c1a3139b63c355
+PKG_LEGAL_STATUS=licensed
 PKG_LICENSE  = EPL-1.0
 
 # manually set some RIOT env vars, so this Makefile can be called stand-alone
