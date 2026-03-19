@@ -1,6 +1,7 @@
 PKG_NAME := mspdebug
 PKG_URL := https://github.com/dlbeer/mspdebug
 PKG_VERSION := 985b390ba22f4229aeca9f02e273a54eb4a76a9a
+PKG_LEGAL_STATUS=licensed
 PKG_LICENSE := GPL-2.0-only
 
 # manually set some RIOT env vars, so this Makefile can be called stand-alone
