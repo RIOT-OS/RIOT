@@ -1,6 +1,7 @@
 PKG_NAME=UF2
 PKG_URL=https://github.com/microsoft/uf2.git
 PKG_VERSION=b19ac9ad613e11a062e4d00845e2b80e6b0ad29f
+PKG_LEGAL_STATUS=licensed
 PKG_LICENSE=MIT
 
 RIOTBASE ?= $(CURDIR)/../../..
