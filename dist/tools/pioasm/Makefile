@@ -2,6 +2,7 @@ PKG_NAME=pioasm
 PKG_URL=https://github.com/raspberrypi/pico-sdk.git
 # release SDK 1.5.0
 PKG_VERSION=2ccab115de0d42d31d6611cca19ef0cd0d2ccaa7
+PKG_LEGAL_STATUS=licensed
 PKG_LICENSE=BSD-3-Clause
 
 RIOTBASE ?= $(CURDIR)/../../..
