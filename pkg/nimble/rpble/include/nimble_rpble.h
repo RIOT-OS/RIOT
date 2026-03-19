@@ -166,7 +166,7 @@ int nimble_rpble_eventcb(nimble_netif_eventcb_t cb);
  *
  * @note    This function is meant to be called only by the RPL implementation
  *
- * @param[in] ctx       current DODAG state
+ * @param[in] ctx       current DODAG state or NULL if the DODAG was cleared.
 
  * @return  0 on success
  * @return  -EALREADY if the given context did not change
