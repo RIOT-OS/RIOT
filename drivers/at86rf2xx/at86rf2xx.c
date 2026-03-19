@@ -97,9 +97,15 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
         at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
     }
 
-    /* enable safe mode (protect RX FIFO until reading data starts) */
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
-                        AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);
+    /**
+     * enable safe mode (protect RX FIFO until reading data starts)
+     *
+     * NOTE: sub-ghz settings in TRX_CTRL_2 are configured in
+     *       at86rf2xx_configure_phy() so use read-modify-write
+     */
+    tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
+    tmp |= AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE;
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2, tmp);
 
 #if !AT86RF2XX_IS_PERIPH
     /* don't populate masked interrupt flags to IRQ_STATUS register */
