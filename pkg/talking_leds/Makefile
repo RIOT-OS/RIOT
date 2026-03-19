@@ -1,6 +1,7 @@
 PKG_NAME=talking_leds
 PKG_URL=https://github.com/fabriziop/TalkingLED
 PKG_VERSION=8ae4f2d0b736aa338f24e097dbaf876fbb385dbd
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
