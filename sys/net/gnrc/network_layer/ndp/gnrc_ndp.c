@@ -290,12 +290,11 @@ void gnrc_ndp_nbr_sol_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
     gnrc_netif_acquire(netif);
     do {    /* XXX hidden goto */
         /* check if there is a fitting source address to target */
-        if (src == NULL) {
+        if (!src) {
             src = gnrc_netif_ipv6_addr_best_src(netif, tgt, false);
         }
-
         /* add SL2AO based on interface and source address */
-        if ((src != NULL) && !ipv6_addr_is_unspecified(src)) {
+        if (src && !ipv6_addr_is_unspecified(src)) {
             l2src_len = _get_l2src(netif, l2src);
 
             if (l2src_len > 0) {
@@ -356,9 +355,14 @@ void gnrc_ndp_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
     gnrc_netif_acquire(netif);
     do {    /* XXX: hidden goto */
         int tgt_idx;
+        const ipv6_addr_t *src;
 
         if ((tgt_idx = gnrc_netif_ipv6_addr_idx(netif, tgt)) < 0) {
             DEBUG("ndp: tgt not assigned to interface. Abort sending\n");
+            break;
+        }
+        if (!(src = gnrc_netif_ipv6_addr_best_src(netif, dst, true))) {
+            DEBUG("ndp: no VALID link-local source address found for NA\n");
             break;
         }
         if (gnrc_netif_is_rtr(netif) && gnrc_netif_is_rtr_adv(netif)) {
@@ -412,7 +416,7 @@ void gnrc_ndp_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
         }
         pkt = hdr;
         /* add remaining headers */
-        hdr = _build_headers(netif, NULL, &real_dst, pkt);
+        hdr = _build_headers(netif, src, &real_dst, pkt);
         if (hdr == NULL) {
             DEBUG("ndp: error adding lower-layer headers.\n");
             break;
@@ -420,8 +424,8 @@ void gnrc_ndp_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
         else {
             pkt = hdr;
             if (gnrc_netapi_dispatch_send(GNRC_NETTYPE_NDP,
-                                                       GNRC_NETREG_DEMUX_CTX_ALL,
-                                                       pkt) == 0) {
+                                          GNRC_NETREG_DEMUX_CTX_ALL,
+                                          pkt) == 0) {
                 DEBUG("ndp: unable to send neighbor advertisement\n");
                 break;
             }
@@ -446,8 +450,7 @@ void gnrc_ndp_rtr_sol_send(gnrc_netif_t *netif, const ipv6_addr_t *dst)
           ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
     gnrc_netif_acquire(netif);
     do {    /* XXX: hidden goto */
-        ipv6_addr_t *src = NULL;
-
+        const ipv6_addr_t *src = NULL;
         /* add SL2AO => check if there is a fitting source address to target */
         if ((src = gnrc_netif_ipv6_addr_best_src(netif, dst, false)) != NULL) {
             uint8_t l2src[8];
@@ -460,6 +463,9 @@ void gnrc_ndp_rtr_sol_send(gnrc_netif_t *netif, const ipv6_addr_t *dst)
                     break;
                 }
             }
+        }
+        else {
+            src = &ipv6_addr_unspecified;
         }
         /* add router solicitation header */
         hdr = gnrc_ndp_rtr_sol_build(pkt);
@@ -516,36 +522,30 @@ void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
             }
             pkt = hdr;
         }
-        if (src == NULL) {
-            /* get address from source selection algorithm.
-             * Only link local addresses may be used (RFC 4861 section 4.1) */
-            src = gnrc_netif_ipv6_addr_best_src(netif, dst, true);
-
-            if (src == NULL) {
-                DEBUG("ndp rtr: no VALID source address found for RA\n");
-                break;
-            }
+        /* get address from source selection algorithm.
+         * Only link local addresses may be used (RFC 4861 section 4.1) */
+        if (!src && !(src = gnrc_netif_ipv6_addr_best_src(netif, dst, true))) {
+            DEBUG("ndp rtr: no VALID source address found for RA\n");
+            break;
         }
         /* add SL2A for source address */
-        if (src != NULL) {
-            DEBUG(" - SL2A\n");
-            uint8_t l2src[8];
-            size_t l2src_len;
-            /* optimization note: MAY also be omitted to facilitate in-bound load balancing over
-             * replicated interfaces.
-             * source: https://tools.ietf.org/html/rfc4861#section-6.2.3 */
-            l2src_len = _get_l2src(netif, l2src);
-            if (l2src_len > 0) {
-                /* add source address link-layer address option */
-                hdr = gnrc_ndp_opt_sl2a_build(l2src, l2src_len, pkt);
+        DEBUG(" - SL2A\n");
+        uint8_t l2src[8];
+        size_t l2src_len;
+        /* optimization note: MAY also be omitted to facilitate in-bound load balancing over
+            * replicated interfaces.
+            * source: https://tools.ietf.org/html/rfc4861#section-6.2.3 */
+        l2src_len = _get_l2src(netif, l2src);
+        if (l2src_len > 0) {
+            /* add source address link-layer address option */
+            hdr = gnrc_ndp_opt_sl2a_build(l2src, l2src_len, pkt);
 
-                if (hdr == NULL) {
-                    DEBUG("ndp: error allocating Source Link-layer address "
-                          "option.\n");
-                    break;
-                }
-                pkt = hdr;
+            if (hdr == NULL) {
+                DEBUG("ndp: error allocating Source Link-layer address "
+                        "option.\n");
+                break;
             }
+            pkt = hdr;
         }
         if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_CUR_HL) {
             cur_hl = netif->cur_hl;
