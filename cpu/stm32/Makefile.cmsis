@@ -39,6 +39,7 @@ PKG_VERSION_wb=d1b860584dfe24d40d455ae624ed14600dfa93c9
 PKG_VERSION_wl=baa994d7bd83d7984675d6fce847cb7538118bf0
 
 PKG_VERSION=$(PKG_VERSION_$(CPU_FAM))
+PKG_LEGAL_STATUS=licensed
 PKG_LICENSE=Apache-2
 
 # Store the cloned repositories under the stm32 directory to prevent downloads
