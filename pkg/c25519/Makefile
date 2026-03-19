@@ -2,11 +2,9 @@ PKG_NAME    = c25519
 PKG_URL     = https://www.dlbeer.co.nz/downloads
 PKG_VERSION = 2017-10-05
 PKG_EXT     = zip
-# The author of this package states that this package
-# should be in public domain, which is legally not a license but more a
-# state a historic work can reach, cf this statement:
-# https://wiki.spdx.org/view/Legal_Team/Decisions/Dealing_with_Public_Domain_within_SPDX_Files
-# The following license field is therefore set to empty.
+# Yielded into public domain by the author.
+# Proof of public domain status: https://www.dlbeer.co.nz/oss/c25519.html (see "License" section)
+PKG_LEGAL_STATUS = public-domain
 PKG_LICENSE =
 PKG_SHA512  = dbfb4285837ab2ea3d99c448b22877cc7a139ccbaebb1de367e2bec1fd562fe629b389d86603915448078b8fd7e631c8fc9a7d126eb889a1ba0c17611369b190
 
