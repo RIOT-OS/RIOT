@@ -2,6 +2,7 @@ PKG_NAME=flashdb
 PKG_URL=https://github.com/armink/FlashDB.git
 # 2.2.0
 PKG_VERSION=65a87640bf816effc84ca161f5254878677232b8
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
