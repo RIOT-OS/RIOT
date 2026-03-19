@@ -25,8 +25,17 @@ endif
 ifeq (,$(PKG_VERSION))
   $(error PKG_VERSION not defined)
 endif
-ifeq (,$(PKG_LICENSE))
-  $(error PKG_LICENSE not defined)
+ifeq (public-domain,$(PKG_LEGAL_STATUS))
+  ifneq (,$(PKG_LICENSE))
+    $(error PKG_LICENSE defined which contradicts PKG_LEGAL_STATUS in public domain, \
+			see https://wiki.spdx.org/view/Legal_Team/Decisions/Dealing_with_Public_Domain_within_SPDX_Files)
+  endif
+else ifeq (licensed,$(PKG_LEGAL_STATUS))
+  ifeq (,$(PKG_LICENSE))
+    $(error PKG_LICENSE not defined but package declared as licensed)
+  endif
+else
+  $(error Unsupported PKG_LEGAL_STATUS=$(PKG_LEGAL_STATUS))
 endif
 
 ifneq (, $(PKG_MIRROR_URL))
