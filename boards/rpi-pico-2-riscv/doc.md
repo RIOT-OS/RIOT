@@ -1,4 +1,10 @@
-@defgroup    boards_rpi_pico_2_riscv Raspberry Pi Pico 2
+@defgroup boards_rpi_pico_2_riscv Raspberry Pi Pico 2 Hazard3 RISC-V
+@ingroup boards_rpi_pico_2
+@brief Support for the RP2350 based Raspberry Pi Pico Hazard3 RISC-V board
+
+See @ref boards_rpi_pico_2 for further information.
+
+@defgroup    boards_rpi_pico_2 Raspberry Pi Pico 2
 @ingroup     boards
 @brief       Support for the RP2350 RISCV based Raspberry Pi Pico board
 
