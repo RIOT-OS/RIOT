@@ -1,6 +1,7 @@
 PKG_NAME     = PyCortexMDebug
 PKG_URL      = https://github.com/bnahill/PyCortexMDebug
 PKG_VERSION  = ce371500500a9168729f04b9dcad5f84440deadd
+PKG_LEGAL_STATUS=licensed
 PKG_LICENSE  = GPL-3.0-only
 
 # manually set some RIOT env vars, so this Makefile can be called stand-alone
