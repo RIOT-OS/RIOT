@@ -1,6 +1,7 @@
 PKG_NAME     = setsid
 PKG_URL      = https://github.com/tzvetkoff/setsid-macosx
 PKG_VERSION  = e5b851df41591021baf5cf88d4e41572baf8e08b
+PKG_LEGAL_STATUS=licensed
 PKG_LICENSE  = BSD-2-Clause
 
 # manually set some RIOT env vars, so this Makefile can be called stand-alone
