@@ -1,6 +1,7 @@
 PKG_NAME=driver_bme680
 PKG_URL=https://github.com/RIOT-OS-pkgmirror/BME680_driver
 PKG_VERSION=63bb5336db4659519860832be2738c685133aa33
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
