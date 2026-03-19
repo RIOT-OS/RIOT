@@ -2,6 +2,7 @@ PKG_NAME=corejson
 PKG_URL=https://github.com/FreeRTOS/coreJSON
 # v3.0.2
 PKG_VERSION=caf540ccdb98e8f96a6f557075cb607288384938
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
