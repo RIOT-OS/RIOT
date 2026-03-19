@@ -3,6 +3,7 @@ PKG_NAME=hacl
 # The mirror was promoted from backup to main URL because upstream was deleted
 PKG_URL=https://github.com/RIOT-OS-pkgmirror/hacl-c_archived
 PKG_VERSION=aac05f5094fc92569169d5a2af54c12387160634
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
