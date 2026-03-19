@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: 2023-2026 Lasse Rosenow <lasse.rosenow@haw-hamburg.de>
+# SPDX-FileCopyrightText: 2023-2026 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+menuconfig MODULE_REGISTRY
+    bool "REGISTRY"
+    help
+        RIOT Registry module for handling runtime configurations.
+
+if USEMODULE_REGISTRY
+
+config REGISTRY_ENABLE_META_NAME
+    bool "Include name string in schemas"
+
+config REGISTRY_ENABLE_META_DESCRIPTION
+    bool "Include description string in schemas"
+
+endif # USEMODULE_REGISTRY
