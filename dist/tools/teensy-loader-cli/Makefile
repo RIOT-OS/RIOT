@@ -1,4 +1,5 @@
 PKG_NAME=teensy-loader-cli
+PKG_LEGAL_STATUS=licensed
 PKG_LICENSE=GPL-3.0-only
 
 # get sources from repository
