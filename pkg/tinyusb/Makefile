@@ -3,6 +3,7 @@ PKG_URL=https://github.com/hathach/tinyusb
 # TinyUSB 0.15.0
 PKG_VERSION=86c416d4c0fb38432460b3e11b08b9de76941bf5
 
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
