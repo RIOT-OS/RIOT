@@ -672,8 +672,6 @@ int at86rf2xx_init(at86rf2xx_t *dev, const at86rf2xx_params_t *params, ieee80215
     }
 
     at86rf2xx_set_state(dev, AT86RF2XX_STATE_FORCE_TRX_OFF);
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
-                        AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);
 
 #if !AT86RF2XX_IS_PERIPH
     /* don't populate masked interrupt flags to IRQ_STATUS register */
