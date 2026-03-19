@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = nanocoap_server
+APPLICATION ?= nanocoap_server
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
@@ -10,6 +10,15 @@ RIOTBASE ?= $(CURDIR)/../../../..
 # use GNRC by default
 LWIP_IPV4 ?= 0
 LWIP_IPV6 ?= 0
+
+# DTLS support
+USE_DTLS ?= 0
+
+# adapt to your needs
+CFLAGS += -DCONFIG_DTLS_CONTEXT_MAX=1
+CFLAGS += -DCONFIG_DTLS_PEER_MAX=3
+CFLAGS += -DCONFIG_DTLS_HANDSHAKE_MAX=3
+CFLAGS += -DNETQ_MAXCNT=6
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
@@ -45,6 +54,7 @@ endif
 
 USEMODULE += sock_udp
 
+USEMODULE += nanocoap_server_auto_init
 USEMODULE += nanocoap_sock
 USEMODULE += nanocoap_resources
 
@@ -91,6 +101,11 @@ ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
   ifneq (,$(filter native native32 native64,$(BOARD)))
     USEMODULE += vfs_auto_format
   endif
+endif
+
+ifeq (1,$(USE_DTLS))
+  USEMODULE += nanocoap_server_dtls
+  USEMODULE += prng_sha256prng
 endif
 
 # Change this to 0 show compiler invocation lines by default:
