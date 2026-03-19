@@ -1,6 +1,7 @@
 PKG_NAME=umorse
 PKG_URL=https://github.com/smlng/uMorse
 PKG_VERSION=ad941aa786d8ae4371016a30c4ca8ed5ccb39e3e
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
