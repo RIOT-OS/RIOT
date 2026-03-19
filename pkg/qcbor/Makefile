@@ -2,6 +2,7 @@ PKG_NAME    = qcbor
 PKG_URL     = https://github.com/laurencelundblade/QCBOR
 # v1.6
 PKG_VERSION = 590a23daf65af068cee81555c597063150e23539
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE = BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
