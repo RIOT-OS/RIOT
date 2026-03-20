@@ -1306,6 +1306,15 @@ static void _test_ieee802154_sec_encrypt_decrypt_replay_protection(ieee802154_se
                                                                    uint16_t src_pan, const uint8_t *src, size_t src_len,
                                                                    const uint8_t *src_long)
 {
+    (void)ctx;
+    (void)dst_pan;
+    (void)dst;
+    (void)dst_len;
+    (void)src_pan;
+    (void)src;
+    (void)src_len;
+    (void)src_long;
+#if MODULE_IEEE802154_SECURITY_REPLAY_PROTECTION
     uint8_t frame[IEEE802154_FRAME_LEN_MAX] = { 0 };
     uint8_t mic[IEEE802154_SEC_MAX_MAC_SIZE] = { 0 };
     uint8_t mic_len = sizeof(mic);
@@ -1348,6 +1357,7 @@ static void _test_ieee802154_sec_encrypt_decrypt_replay_protection(ieee802154_se
                                            &payload_dec, &payload_dec_size,
                                            &mic_dec, &mic_dec_size);
     TEST_ASSERT(dec == -IEEE802154_SEC_FRAME_COUNTER_REPLAY);
+#endif
 }
 
 static void test_ieee802154_sec_explicit_default_key_none_long(void)
