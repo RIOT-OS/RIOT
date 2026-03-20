@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2026 ML!PA Consulting GmbH.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -75,7 +72,7 @@
  * As you can see from the picture above, this implementation stores a frame counter per key, because it is easier to update
  * only one link with a new key instead of updating all links with a new key, which could be error prone.
  *
- * @author Fabian Hüßler <fabian.huessler@ovgu.de>
+ * @author Fabian Hüßler <fabian.huessler@mlpa.com>
  * @}
  */
 
@@ -572,14 +569,12 @@ static void _init_peer_lookup(ieee802154_sec_peer_lookup_t *peer_lookup,
 
 /* get key lookup descriptor vgl. 9.2.2 KeyDescriptor lookup procedure */
 static ieee802154_sec_key_lookup_t *_get_key_lookup(ieee802154_sec_context_t *ctx,
-                                                    ieee802154_sec_peer_descriptor_t peer,
                                                     const uint8_t *pan,
                                                     const uint8_t *addr,
                                                     uint8_t addr_len,
                                                     uint8_t key_mode,
                                                     ieee802154_sec_key_identifier_t *identifier)
 {
-    (void)peer; /* select key by peer ? */
     ieee802154_sec_key_lookup_t *l, *out = NULL;
     if (key_mode == IEEE802154_SEC_SCF_KEYMODE_IMPLICIT) {
         if (!pan || !addr || !addr_len) {
@@ -785,15 +780,9 @@ int ieee802154_sec_encrypt_frame(ieee802154_sec_context_t *ctx,
         identifier.key_index = ctx->key_index;
         memcpy(identifier.key_source, ctx->key_source,
                _key_source_size(ctx->key_id_mode));
-        ieee802154_sec_peer_t *dev = _get_peer(
-            ctx,
-            ieee802154_get_dst_pan_ptr(header),
-            ieee802154_get_dst_ptr(header),
-            ieee802154_get_dst_len(header));
         /* attempt to find the encryption key */
         ieee802154_sec_key_lookup_t *key = _get_key_lookup(
             ctx,
-            dev ? dev - ctx->devstore.peers : IEEE802154_SEC_NO_IDENT,
             ieee802154_get_dst_pan_ptr(header),
             ieee802154_get_dst_ptr(header),
             ieee802154_get_dst_len(header),
@@ -881,11 +870,6 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
     *mic_size = mac_size;
     *mic = header + frame_size - mac_size;
     {
-        CTX_LOCK(ctx);
-        ieee802154_sec_peer_t *dev = _get_peer(ctx,
-            ieee802154_get_src_pan_ptr(header),
-            ieee802154_get_src_ptr(header),
-            ieee802154_get_src_len(header));
         ieee802154_sec_key_identifier_t identifier;
         if (key_mode != IEEE802154_SEC_SCF_KEYMODE_IMPLICIT) {
             identifier.key_index = _get_aux_key_index(key_mode, aux->key_id);
@@ -893,10 +877,10 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
                    _get_aux_key_source(key_mode, aux->key_id),
                    _key_source_size(key_mode));
         }
+        CTX_LOCK(ctx);
         /* attempt to find key descriptor */
         ieee802154_sec_key_lookup_t *key = _get_key_lookup(
             ctx,
-            dev ? dev - ctx->devstore.peers : IEEE802154_SEC_NO_IDENT,
             ieee802154_get_src_pan_ptr(header),
             ieee802154_get_src_ptr(header),
             ieee802154_get_src_len(header),
@@ -908,6 +892,10 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
             return -IEEE802154_SEC_NO_KEY;
         }
 #if IS_USED(MODULE_IEEE802154_SECURITY_REPLAY_PROTECTION)
+            ieee802154_sec_peer_t *dev = _get_peer(ctx,
+                ieee802154_get_src_pan_ptr(header),
+                ieee802154_get_src_ptr(header),
+                ieee802154_get_src_len(header));
         if (!dev) {
             /* The device has to exist and must be known by long address. */
             /* If it would not have to exist, an attacker could replay any frame by creating an arbitrary device. */
@@ -1008,7 +996,7 @@ int ieee802154_sec_key_lookup_implicit(ieee802154_sec_context_t *ctx,
     CTX_LOCK(ctx);
     /* check for duplicate */
     ieee802154_sec_key_lookup_t *tmp =  _get_key_lookup(
-        ctx, IEEE802154_SEC_NO_IDENT,
+        ctx,
         tmp_lookup.key_lookup.implicit.dev_pan_id,
         tmp_lookup.key_lookup.implicit.dev_addr,
         addr_len,
@@ -1070,7 +1058,7 @@ int ieee802154_sec_key_lookup_explicit(ieee802154_sec_context_t *ctx,
     CTX_LOCK(ctx);
     /* check for duplicate */
     ieee802154_sec_key_lookup_t *tmp = _get_key_lookup(
-        ctx, IEEE802154_SEC_NO_IDENT,
+        ctx,
         0, NULL, 0,
         tmp_lookup.key_mode,
         &identifier);
