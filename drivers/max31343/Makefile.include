@@ -1,8 +1,3 @@
 USEMODULE_INCLUDES_max31343 := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_max31343)
 
-ifneq (,$(filter periph_rtc,$(FEATURES_PROVIDED)))
-  ifeq (,$(filter periph_rtc_external,$(FEATURES_PROVIDED)))
-    CFLAGS += -DUSE_INTERNAL_RTC
-  endif
-endif

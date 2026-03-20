@@ -465,111 +465,31 @@ int max31343_temp_set_automode(const max31343_t *dev, bool enable, max31343_ttsi
     return res;
 }
 
-#ifndef USE_INTERNAL_RTC
-static max31343_t dev;
-static bool _rtc_inited;
+#ifdef MODULE_WALLTIME_IMPL_MAX31343
 
-static int _ensure_init(void)
+static max31343_t _walltime_dev;
+static bool _walltime_init_done;
+
+void walltime_impl_init(void)
 {
-    if (_rtc_inited) {
-        return 0;
-    }
-    int res = max31343_init(&dev, &max31343_params[0]);
-    if (res == 0 || res == -ENODATA) {
-        _rtc_inited = true;
-    }
-    return res;
+    int res = max31343_init(&_walltime_dev, &max31343_params[0]);
+    _walltime_init_done = (res == 0 || res == -ENODATA);
 }
 
-void rtc_init(void)
+int walltime_impl_get(struct tm *time, uint16_t *ms)
 {
-    (void)_ensure_init();
+    if (!_walltime_init_done) {
+        return -ENODEV;
+    }
+    *ms = 0;
+    return max31343_get_time(&_walltime_dev, time);
 }
 
-int rtc_get_time(struct tm *t)
+int walltime_impl_set(struct tm *time)
 {
-    if (!t) {
-        return -EINVAL;
+    if (!_walltime_init_done) {
+        return -ENODEV;
     }
-    int res = _ensure_init();
-    if (res != 0) {
-        return res;
-    }
-    return max31343_get_time(&dev, t);
+    return max31343_set_time(&_walltime_dev, time);
 }
-
-int rtc_set_time(struct tm *time)
-{
-    if (!time) {
-        return -EINVAL;
-    }
-    int res = _ensure_init();
-    if (res != 0) {
-        return res;
-    }
-    return max31343_set_time(&dev, time);
-}
-
-int rtc_get_time_ms(struct tm *time, uint16_t *ms)
-{
-    if (!time || !ms) {
-        return -EINVAL;
-    }
-    int res = rtc_get_time(time);
-    if (res == 0) {
-        *ms = 0;  /* MAX31343 does not support sub-second precision */
-    }
-    return res;
-}
-
-int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
-{
-    /* NOTE: Interrupt-driven alarm callbacks are not supported.
-     * The INT pin must be handled externally via GPIO by the caller.
-     * cb and arg are intentionally ignored. */
-    (void)cb;
-    (void)arg;
-
-    if (!time) {
-        return -EINVAL;
-    }
-    int res = _ensure_init();
-    if (res != 0) {
-        return res;
-    }
-    return max31343_set_alarm(&dev, time);
-}
-
-int rtc_get_alarm(struct tm *time)
-{
-    if (!time) {
-        return -EINVAL;
-    }
-    int res = _ensure_init();
-    if (res != 0) {
-        return res;
-    }
-    return max31343_get_alarm(&dev, time);
-}
-
-void rtc_clear_alarm(void)
-{
-    if (_rtc_inited) {
-        (void)max31343_clear_alarm(&dev);
-    }
-}
-
-void rtc_poweron(void)
-{
-    if (_rtc_inited) {
-        (void)max31343_poweron(&dev);
-    }
-}
-
-void rtc_poweroff(void)
-{
-    if (_rtc_inited) {
-        (void)max31343_poweroff(&dev);
-    }
-}
-#endif /* USE_INTERNAL_RTC */
+#endif /* MODULE_WALLTIME_IMPL_MAX31343 */
