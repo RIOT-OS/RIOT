@@ -6,6 +6,7 @@ else
   PKG_VERSION=8af155076c6c62d9766ede640cf3f29fa73a4b53
   #release tag: WAMR-2.1.1
 endif
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=Apache-2.0
 
 PKG_CUSTOM_PREPARED = CHECK_VERSION

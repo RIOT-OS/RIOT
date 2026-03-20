@@ -1,6 +1,7 @@
 PKG_NAME=cmsis
 PKG_URL=https://github.com/ARM-software/CMSIS_5
 PKG_VERSION=2b7495b8535bdcb306dac29b9ded4cfb679d7e5c  # 5.9.0
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=Apache-2.0
 
 CMSIS_NN_MODULES =                 \

@@ -1,6 +1,7 @@
 PKG_NAME=mcufont
 PKG_URL=https://github.com/mcufont/mcufont
 PKG_VERSION=9f3aa41b231195e7b2b59f78d8f01d06460b6d35
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk

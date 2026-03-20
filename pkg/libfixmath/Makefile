@@ -1,6 +1,7 @@
 PKG_NAME     := libfixmath
 PKG_VERSION  := b987044c73dcaba496bb5bc86e69d134cd8790ec
 PKG_URL      := https://github.com/PetteriAimonen/libfixmath
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE  := MIT
 
 include $(RIOTBASE)/pkg/pkg.mk

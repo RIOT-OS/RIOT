@@ -2,6 +2,7 @@ PKG_NAME=nrf5x_nrfx_mdk
 PKG_URL=https://github.com/NordicSemiconductor/nrfx
 # Release 3.14.0
 PKG_VERSION=11f57e578c7feea13f21c79ea0efab2630ac68c7
+PKG_LEGAL_STATUS=licensed
 PKG_LICENSE=BSD-3-Clause
 
 # CPU Family specific vendor header files

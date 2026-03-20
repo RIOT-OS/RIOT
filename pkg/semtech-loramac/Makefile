@@ -1,6 +1,7 @@
 PKG_NAME=semtech-loramac
 PKG_URL=https://github.com/Lora-net/LoRaMac-node.git
 PKG_VERSION=1cdd9ccec4c9f05b616e7112059be4a9e358c571
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk

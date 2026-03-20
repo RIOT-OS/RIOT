@@ -1,6 +1,7 @@
 PKG_NAME=mynewt-core
 PKG_URL=https://github.com/apache/mynewt-core.git
 PKG_VERSION=de203365f207dda658657a7525253e02f68503a1
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
