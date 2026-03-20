@@ -187,8 +187,9 @@ int max31343_poweroff(const max31343_t *dev);
 /**
  * @brief Set alarm time registers.
  *
- * Writes the alarm time to the device and disables the alarm interrupt (A1IE).
- * The alarm interrupt is NOT automatically re-enabled by this function.
+ * Writes the alarm time to the device. The alarm interrupt (A1IE) is
+ * disabled before writing and must be explicitly re-enabled afterwards
+ * using max31343_alarm_enable(), as required by the datasheet.
  *
  * @param[in] dev   device descriptor
  * @param[in] time  alarm time to store
