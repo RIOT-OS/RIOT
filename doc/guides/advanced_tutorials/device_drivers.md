@@ -133,14 +133,14 @@ look like this (`tmpabc_params.h`):
  * @{
  */
 #ifndef TMPABC_PARAM_I2C
-#define TMPABC_PARAM_I2C        (I2C_DEV(0))
+#  define TMPABC_PARAM_I2C      (I2C_DEV(0))
 #endif
 #ifndef TMPABC_PARAM_ADDR
-#define TMPABC_PARAM_ADDR       (0xab)
+#  define TMPABC_PARAM_ADDR     (0xab)
 #endif
 
 #ifndef TMPABC_PARAMS
-#define TMPABC_PARAMS           { .i2c  = TMPABC_PARAM_I2C \
+#  define TMPABC_PARAMS         { .i2c  = TMPABC_PARAM_I2C \
                                   .addr = TMPABC_PARAM_ADDR }
 #endif
 /** @} */
@@ -221,7 +221,7 @@ to [sensors group](https://api.riot-os.org/group__config__drivers__sensors.htmls
  * ....
  */
 #ifndef TMP00X_I2C_ADDRESS
-#define TMP00X_I2C_ADDRESS       (0x40)
+#  define TMP00X_I2C_ADDRESS     (0x40)
 #endif
 ....
 /** @} */
