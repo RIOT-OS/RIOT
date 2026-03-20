@@ -19,57 +19,37 @@
 #include "max31343_internal.h"
 #include "periph/i2c.h"
 
-static int _read_regs(const max31343_t *dev, uint8_t reg, void *buf, size_t len,
-                      int acquire, int release)
+static int _read_regs(const max31343_t *dev, uint8_t reg, void *buf, size_t len)
 {
     assert(dev);
     assert(buf);
     assert(len > 0);
-
-    if (acquire) {
-        i2c_acquire(dev->i2c);
-    }
 
     int res = i2c_read_regs(dev->i2c, MAX31343_I2C_ADDR, reg, buf, len, 0);
-    if (release) {
-        i2c_release(dev->i2c);
-    }
-
     return (res < 0) ? -EIO : 0;
 }
 
-static int _write_regs(const max31343_t *dev, uint8_t reg, const void *buf, size_t len,
-                       int acquire, int release)
+static int _write_regs(const max31343_t *dev, uint8_t reg, const void *buf, size_t len)
 {
     assert(dev);
     assert(buf);
     assert(len > 0);
 
-    if (acquire) {
-        i2c_acquire(dev->i2c);
-    }
-
     int res = i2c_write_regs(dev->i2c, MAX31343_I2C_ADDR, reg, buf, len, 0);
-    if (release) {
-        i2c_release(dev->i2c);
-    }
-
     return (res < 0) ? -EIO : 0;
 }
 
-static inline int _read_reg(const max31343_t *dev, uint8_t reg, uint8_t *val,
-                            int acquire, int release)
+static inline int _read_reg(const max31343_t *dev, uint8_t reg, uint8_t *val)
 {
-    return _read_regs(dev, reg, val, 1, acquire, release);
+    return _read_regs(dev, reg, val, 1);
 }
 
-static inline int _write_reg(const max31343_t *dev, uint8_t reg, uint8_t val,
-                             int acquire, int release)
+static inline int _write_reg(const max31343_t *dev, uint8_t reg, uint8_t val)
 {
-    return _write_regs(dev, reg, &val, 1, acquire, release);
+    return _write_regs(dev, reg, &val, 1);
 }
 
-static int _validate_tm_for_set(const struct tm *t)
+static int _validate_tm(const struct tm *t)
 {
     assert(t);
 
@@ -79,6 +59,16 @@ static int _validate_tm_for_set(const struct tm *t)
         t->tm_mday < 1 || t->tm_mday > 31 ||
         t->tm_mon < 0 || t->tm_mon > 11) {
         return -ERANGE;
+    }
+
+    return 0;
+}
+
+static int _validate_tm_for_set(const struct tm *t)
+{
+    int res = _validate_tm(t);
+    if (res != 0) {
+        return res;
     }
 
     int year = t->tm_year + 1900;
@@ -142,7 +132,7 @@ static void _decode_time_regs(const uint8_t raw[MAX31343_TIME_LEN], struct tm *t
 static int _alarm1_set_enable(const max31343_t *dev, bool en)
 {
     uint8_t ie = 0;
-    int res = _read_reg(dev, MAX31343_REG_INT_EN, &ie, 0, 0);
+    int res = _read_reg(dev, MAX31343_REG_INT_EN, &ie);
     if (res != 0) {
         return res;
     }
@@ -153,7 +143,7 @@ static int _alarm1_set_enable(const max31343_t *dev, bool en)
         ie &= (uint8_t)~MAX31343_INTEN_A1IE;
     }
 
-    return _write_reg(dev, MAX31343_REG_INT_EN, ie, 0, 0);
+    return _write_reg(dev, MAX31343_REG_INT_EN, ie);
 }
 
 int max31343_init(max31343_t *dev, const max31343_params_t *params)
@@ -165,7 +155,9 @@ int max31343_init(max31343_t *dev, const max31343_params_t *params)
     dev->i2c = params->i2c;
 
     uint8_t status;
-    int res = _read_reg(dev, MAX31343_REG_STATUS, &status, 1, 1);
+    i2c_acquire(dev->i2c);
+    int res = _read_reg(dev, MAX31343_REG_STATUS, &status);
+    i2c_release(dev->i2c);
     if (res != 0) {
         return res;
     }
@@ -203,22 +195,16 @@ int max31343_get_time(const max31343_t *dev, struct tm *time)
     assert(time);
 
     uint8_t raw[MAX31343_TIME_LEN];
-    int res = _read_regs(dev, MAX31343_REG_TIME0, raw, sizeof(raw), 1, 1);
+    i2c_acquire(dev->i2c);
+    int res = _read_regs(dev, MAX31343_REG_TIME0, raw, sizeof(raw));
+    i2c_release(dev->i2c);
     if (res != 0) {
         return res;
     }
 
     _decode_time_regs(raw, time);
 
-    if (time->tm_sec < 0 || time->tm_sec > 59 ||
-        time->tm_min < 0 || time->tm_min > 59 ||
-        time->tm_hour < 0 || time->tm_hour > 23 ||
-        time->tm_mday < 1 || time->tm_mday > 31 ||
-        time->tm_mon < 0 || time->tm_mon > 11) {
-        return -EIO;
-    }
-
-    return 0;
+    return _validate_tm(time) == 0 ? 0 : -EIO;
 }
 
 int max31343_set_time(const max31343_t *dev, const struct tm *time)
@@ -234,7 +220,10 @@ int max31343_set_time(const max31343_t *dev, const struct tm *time)
     uint8_t raw[MAX31343_TIME_LEN] = {0};
     _encode_time_regs(time, raw);
 
-    return _write_regs(dev, MAX31343_REG_TIME0, raw, sizeof(raw), 1, 1);
+    i2c_acquire(dev->i2c);
+    res = _write_regs(dev, MAX31343_REG_TIME0, raw, sizeof(raw));
+    i2c_release(dev->i2c);
+    return res;
 }
 
 int max31343_set_alarm(const max31343_t *dev, const struct tm *time)
@@ -267,7 +256,7 @@ int max31343_set_alarm(const max31343_t *dev, const struct tm *time)
     /* Disable alarm interrupt before writing registers */
     res = _alarm1_set_enable(dev, false);
     if (res == 0) {
-        res = _write_regs(dev, MAX31343_REG_ALM1_SEC, alarm_reg, sizeof(alarm_reg), 0, 0);
+        res = _write_regs(dev, MAX31343_REG_ALM1_SEC, alarm_reg, sizeof(alarm_reg));
     }
     i2c_release(dev->i2c);
     return res;
@@ -279,7 +268,9 @@ int max31343_get_alarm(const max31343_t *dev, struct tm *time)
     assert(time);
 
     uint8_t alarm_reg[MAX31343_ALM1_LEN];
-    int res = _read_regs(dev, MAX31343_REG_ALM1_SEC, alarm_reg, sizeof(alarm_reg), 1, 1);
+    i2c_acquire(dev->i2c);
+    int res = _read_regs(dev, MAX31343_REG_ALM1_SEC, alarm_reg, sizeof(alarm_reg));
+    i2c_release(dev->i2c);
     if (res != 0) {
         return res;
     }
@@ -325,7 +316,7 @@ int max31343_clear_alarm(const max31343_t *dev)
 
     if (res == 0) {
         uint8_t st;
-        (void) _read_reg(dev, MAX31343_REG_STATUS, &st, 0, 0);
+        (void) _read_reg(dev, MAX31343_REG_STATUS, &st);
     }
 
     i2c_release(dev->i2c);
@@ -340,10 +331,10 @@ int max31343_poweron(const max31343_t *dev)
 
     i2c_acquire(dev->i2c);
 
-    int res = _read_reg(dev, MAX31343_REG_RTC_CFG1, &cfg1, 0, 0);
+    int res = _read_reg(dev, MAX31343_REG_RTC_CFG1, &cfg1);
     if (res == 0) {
         cfg1 |= MAX31343_RTC_CFG1_ENOSC;
-        res = _write_reg(dev, MAX31343_REG_RTC_CFG1, cfg1, 0, 0);
+        res = _write_reg(dev, MAX31343_REG_RTC_CFG1, cfg1);
     }
 
     i2c_release(dev->i2c);
@@ -359,10 +350,10 @@ int max31343_poweroff(const max31343_t *dev)
 
     i2c_acquire(dev->i2c);
 
-    int res = _read_reg(dev, MAX31343_REG_RTC_CFG1, &cfg1, 0, 0);
+    int res = _read_reg(dev, MAX31343_REG_RTC_CFG1, &cfg1);
     if (res == 0) {
         cfg1 &= (uint8_t)~MAX31343_RTC_CFG1_ENOSC;
-        res = _write_reg(dev, MAX31343_REG_RTC_CFG1, cfg1, 0, 0);
+        res = _write_reg(dev, MAX31343_REG_RTC_CFG1, cfg1);
     }
 
     i2c_release(dev->i2c);
@@ -381,11 +372,11 @@ int max31343_set_sqw(const max31343_t *dev, max31343_sqw_freq_t freq)
     uint8_t cfg2 = 0;
     i2c_acquire(dev->i2c);
 
-    int res = _read_reg(dev, MAX31343_REG_RTC_CFG2, &cfg2, 0, 0);
+    int res = _read_reg(dev, MAX31343_REG_RTC_CFG2, &cfg2);
     if (res == 0) {
         cfg2 = (uint8_t)((cfg2 & ~MAX31343_RTC_CFG2_SQW_HZ_MASK) |
                           ((uint8_t)freq & MAX31343_RTC_CFG2_SQW_HZ_MASK));
-        res = _write_reg(dev, MAX31343_REG_RTC_CFG2, cfg2, 0, 0);
+        res = _write_reg(dev, MAX31343_REG_RTC_CFG2, cfg2);
     }
 
     i2c_release(dev->i2c);
@@ -398,7 +389,9 @@ int max31343_get_temp(const max31343_t *dev, int16_t *temp_centi)
     assert(temp_centi);
 
     uint8_t buf[2] = {0};
-    int res = _read_regs(dev, MAX31343_REG_TEMP_MSB, buf, sizeof(buf), 1, 1);
+    i2c_acquire(dev->i2c);
+    int res = _read_regs(dev, MAX31343_REG_TEMP_MSB, buf, sizeof(buf));
+    i2c_release(dev->i2c);
     if (res != 0) {
         return res;
     }
@@ -423,14 +416,20 @@ int max31343_trickle_charge_enable(const max31343_t *dev,
                                   | ((uint8_t)res & MAX31343_TRICKLE_D_RES_MASK));
     uint8_t reg = (uint8_t)(tche | (d_trickle & MAX31343_TRICKLE_D_MASK));
 
-    return _write_reg(dev, MAX31343_REG_TRICKLE, reg, 1, 1);
+    i2c_acquire(dev->i2c);
+    int ret = _write_reg(dev, MAX31343_REG_TRICKLE, reg);
+    i2c_release(dev->i2c);
+    return ret;
 }
 
 int max31343_trickle_charge_disable(const max31343_t *dev)
 {
     assert(dev);
 
-    return _write_reg(dev, MAX31343_REG_TRICKLE, 0x00U, 1, 1);
+    i2c_acquire(dev->i2c);
+    int res = _write_reg(dev, MAX31343_REG_TRICKLE, 0x00U);
+    i2c_release(dev->i2c);
+    return res;
 }
 
 int max31343_temp_set_automode(const max31343_t *dev, bool enable, max31343_ttsint_t ttsint)
@@ -445,7 +444,7 @@ int max31343_temp_set_automode(const max31343_t *dev, bool enable, max31343_ttsi
 
     i2c_acquire(dev->i2c);
 
-    int res = _read_reg(dev, MAX31343_REG_TS_CONFIG, &ts, 0, 0);
+    int res = _read_reg(dev, MAX31343_REG_TS_CONFIG, &ts);
     if (res == 0) {
         if (enable) {
             ts |= MAX31343_TS_AUTOMODE;
@@ -458,7 +457,7 @@ int max31343_temp_set_automode(const max31343_t *dev, bool enable, max31343_ttsi
         ts |= (uint8_t)(((uint8_t)ttsint << MAX31343_TS_TTSINT_SHIFT)
                 & MAX31343_TS_TTSINT_MASK);
 
-        res = _write_reg(dev, MAX31343_REG_TS_CONFIG, ts, 0, 0);
+        res = _write_reg(dev, MAX31343_REG_TS_CONFIG, ts);
     }
 
     i2c_release(dev->i2c);
