@@ -61,7 +61,7 @@ typedef struct ieee802154_radio_cipher_ops {
      * @brief   Function to set the encryption key for the
      *          next cipher operation
      *
-     * @param[in]       dev         Will be @ref ieee802154_sec_context_t::ieee802154_sec_dev_t
+     * @param[in]       dev         Security context device
      * @param[in]       key         Key to be used for the next cipher operation
      * @param[in]       key_size    key size in bytes
      */
@@ -71,7 +71,7 @@ typedef struct ieee802154_radio_cipher_ops {
     /**
      * @brief   Function type to compute CBC-MAC
      *
-     * @param[in]       dev         Will be @ref ieee802154_sec_context_t::ieee802154_sec_dev_t
+     * @param[in]       dev         Security context device
      * @param[in]       cipher      Output cipher blocks
      * @param[in, out]  iv          in: IV; out: computed MIC
      * @param[in]       plain       Input plain blocks
@@ -85,7 +85,7 @@ typedef struct ieee802154_radio_cipher_ops {
     /**
      * @brief   Function type to perform ECB encryption
      *
-     * @param[in]       dev         Will be @ref ieee802154_sec_context_t::ieee802154_sec_dev_t
+     * @param[in]       dev         Security context device
      * @param[out]      cipher      Output cipher blocks
      * @param[in]       plain       Input plain blocks
      * @param[in]       nblocks     Number of blocks
@@ -484,6 +484,9 @@ typedef struct ieee802154_sec_peer_lookup {
     ieee802154_sec_key_descriptor_t key;
 } ieee802154_sec_peer_lookup_t;
 
+/**
+ * @brief   Lookup table for peers
+ */
 typedef struct ieee802154_sec_peer_lookup_table {
     /**
      * @brief   Bitmask that shows which slots are occupied

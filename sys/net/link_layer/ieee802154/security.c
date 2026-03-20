@@ -32,7 +32,7 @@
  * @verbatim
  *  +------------------+        +-----------------------------------------------------+
  *  | secKeyDescriptor +-       | secKeyIdLookupDescriptor (implicit)                 | <-- externally provisioned
- *  +------------------+ \      +-----------------------------------------------------+     network key
+ *  +------------------+ \      +-----------------------------------------------------+     device key
  *  | byte key[]       |  \     | byte key_mode = IEEE802154_SEC_SCF_KEYMODE_IMPLICIT |
  *  +------------------+   \    | byte dev_mode                                       |
  *  |                       \   | byte dev_pan_id[2]                                  |
@@ -43,7 +43,7 @@
  *  |
  *  |   +------------------+        +-----------------------------------------------------------+
  *  |   | secKeyDescriptor +-       | secKeyIdLookupDescriptor (explicit)                       | <-- externally provisioned
- *  |   +------------------+ \      +-----------------------------------------------------------+     device key
+ *  |   +------------------+ \      +-----------------------------------------------------------+     network key
  *  |   | byte key[]       |  \     | byte key_mode = IEEE802154_SEC_SCF_KEYMODE_INDEX or       |
  *  |   +------------------+   \    |                 IEEE802154_SEC_SCF_KEYMODE_SHORT_INDEX or |
  *  |   |                       \   |                 IEEE802154_SEC_SCF_KEYMODE_HW_INDEX       |
@@ -123,8 +123,8 @@ for (size_t i = 0; i < (nbits); i++) {                                          
                     CONFIG_IEEE802154_SEC_DEFAULT_DEVSTORE_SIZE, code)          \
 }
 
-#define LOCK(ctx)   { DEBUG_SEC("try lock context: %p\n", ctx); mutex_lock(&ctx->lock); }
-#define UNLOCK(ctx) { mutex_unlock(&ctx->lock); DEBUG_SEC("unlocked context: %p\n", ctx); }
+#define CTX_LOCK(ctx)   { DEBUG_SEC("try lock context: %p\n", ctx); mutex_lock(&ctx->lock); }
+#define CTX_UNLOCK(ctx) { mutex_unlock(&ctx->lock); DEBUG_SEC("unlocked context: %p\n", ctx); }
 
 const ieee802154_radio_cipher_ops_t ieee802154_radio_cipher_ops = {
     .set_key = NULL,
@@ -743,12 +743,12 @@ void ieee802154_sec_init(ieee802154_sec_context_t *ctx,
     }
     else {
         /* no persistent storage or failure */
-        LOCK(ctx);
+        CTX_LOCK(ctx);
         memset(&ctx->key_lookup_table, 0, sizeof(ctx->key_lookup_table));
         memset(&ctx->peer_lookup_table, 0, sizeof(ctx->peer_lookup_table));
         memset(&ctx->keystore, 0, sizeof(ctx->keystore));
         memset(&ctx->devstore, 0, sizeof(ctx->devstore));
-        UNLOCK(ctx);
+        CTX_UNLOCK(ctx);
         /* add an explicit default key */
         /* implicit key cannot be added without a known peer address */
         /* default key mode and security level are independent of that */
@@ -774,12 +774,12 @@ int ieee802154_sec_encrypt_frame(ieee802154_sec_context_t *ctx,
     ieee802154_sec_scf_seclevel_t sec_level;
     ieee802154_sec_key_identifier_t identifier;
     {
-        LOCK(ctx);
+        CTX_LOCK(ctx);
         key_mode = ctx->key_id_mode;
         sec_level = ctx->security_level;
         if (sec_level == IEEE802154_SEC_SCF_SECLEVEL_NONE) {
             *mic_size = 0;
-            UNLOCK(ctx);
+            CTX_UNLOCK(ctx);
             return IEEE802154_SEC_OK;
         }
         identifier.key_index = ctx->key_index;
@@ -800,7 +800,7 @@ int ieee802154_sec_encrypt_frame(ieee802154_sec_context_t *ctx,
             key_mode,
             &identifier);
         if (!key) {
-            UNLOCK(ctx);
+            CTX_UNLOCK(ctx);
             DEBUG_SEC("key not found\n");
             return -IEEE802154_SEC_NO_KEY;
         }
@@ -809,14 +809,14 @@ int ieee802154_sec_encrypt_frame(ieee802154_sec_context_t *ctx,
         if (fc == 0xFFFFFFFF) {
             /* Letting the frame counter overflow is explicitly prohibited by the specification.
             (see 9.4.2) */
-            UNLOCK(ctx);
+            CTX_UNLOCK(ctx);
             DEBUG_SEC("Frame counter would overflow\n");
             return -IEEE802154_SEC_FRAME_COUNTER_OVERFLOW;
         }
         key->fc++;
         key_mode = key->key_mode;
         _set_key(ctx, k->key);
-        UNLOCK(ctx);
+        CTX_UNLOCK(ctx);
     }
     /* write the auxiliary header */
     ieee802154_sec_aux_t *aux = (ieee802154_sec_aux_t *)(header + *header_size);
@@ -881,7 +881,7 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
     *mic_size = mac_size;
     *mic = header + frame_size - mac_size;
     {
-        LOCK(ctx);
+        CTX_LOCK(ctx);
         ieee802154_sec_peer_t *dev = _get_peer(ctx,
             ieee802154_get_src_pan_ptr(header),
             ieee802154_get_src_ptr(header),
@@ -903,7 +903,7 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
             key_mode,
             &identifier);
         if (!key) {
-            UNLOCK(ctx);
+            CTX_UNLOCK(ctx);
             DEBUG_SEC("key not found\n");
             return -IEEE802154_SEC_NO_KEY;
         }
@@ -912,7 +912,7 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
             /* The device has to exist and must be known by long address. */
             /* If it would not have to exist, an attacker could replay any frame by creating an arbitrary device. */
             /* If it exists, it is trusted and a lookup descriptor is created for tracking key usage and frame counter. */
-            UNLOCK(ctx);
+            CTX_UNLOCK(ctx);
             DEBUG_SEC("device not found\n");
             return -IEEE802154_SEC_NO_DEV;
         }
@@ -923,7 +923,7 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
             key->key);
         if (!dev_lookup) {
             if (_peer_lookup(ctx, dev - ctx->devstore.peers, key->key, true) != IEEE802154_SEC_OK) {
-                UNLOCK(ctx);
+                CTX_UNLOCK(ctx);
                 DEBUG_SEC("peer lookup table full\n");
                 return -IEEE802154_SEC_NO_DEV;
             }
@@ -935,7 +935,7 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
         }
         /* check frame counter to fend replay attacks */
         if (frame_counter < dev_lookup->fc) {
-            UNLOCK(ctx);
+            CTX_UNLOCK(ctx);
             DEBUG_SEC("Frame counter indicates replay\n");
             return -IEEE802154_SEC_FRAME_COUNTER_REPLAY;
         }
@@ -944,14 +944,14 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
         memcpy_reversed(src_address, dev->long_addr, sizeof(dev->long_addr));
 #else
         if (ieee802154_get_src_len(header) != IEEE802154_LONG_ADDRESS_LEN) {
-            UNLOCK(ctx);
+            CTX_UNLOCK(ctx);
             DEBUG_SEC("No long source address\n");
             return -IEEE802154_SEC_NO_DEV;
         }
         memcpy_reversed(src_address, ieee802154_get_src_ptr(header), IEEE802154_LONG_ADDRESS_LEN);
 #endif
         _set_key(ctx, ctx->keystore.keys[key->key].key);
-        UNLOCK(ctx);
+        CTX_UNLOCK(ctx);
     }
     const uint8_t *a = header;
     uint8_t *c = *payload;
@@ -1005,7 +1005,7 @@ int ieee802154_sec_key_lookup_implicit(ieee802154_sec_context_t *ctx,
     ieee802154_sec_key_lookup_t tmp_lookup;
     dev_pan_id = byteorder_htols(dev_pan_id).u16; /* save in little endian */
     _init_key_lookup_implicit(&tmp_lookup, dev_mode, (uint8_t *)&dev_pan_id, dev_addr);
-    LOCK(ctx);
+    CTX_LOCK(ctx);
     /* check for duplicate */
     ieee802154_sec_key_lookup_t *tmp =  _get_key_lookup(
         ctx, IEEE802154_SEC_NO_IDENT,
@@ -1021,13 +1021,13 @@ int ieee802154_sec_key_lookup_implicit(ieee802154_sec_context_t *ctx,
             bf_unset(ctx->key_lookup_table.mask, tmp - ctx->key_lookup_table.key_lookup);
             memset(tmp, 0, sizeof(*tmp));
         }
-        UNLOCK(ctx);
+        CTX_UNLOCK(ctx);
         return IEEE802154_SEC_OK;
     }
     /* allocate a key */
     ieee802154_sec_key_descriptor_t k = _add_key(ctx, key_mat);
     if (k == IEEE802154_SEC_NO_IDENT) {
-        UNLOCK(ctx);
+        CTX_UNLOCK(ctx);
         DEBUG_SEC("keystore full\n");
         return -IEEE802154_SEC_NO_KEY;
     }
@@ -1037,12 +1037,12 @@ int ieee802154_sec_key_lookup_implicit(ieee802154_sec_context_t *ctx,
                          CONFIG_IEEE802154_SEC_DEFAULT_KEYLOOKUP_SIZE);
     if (l < 0) {
         _remove_key(ctx, k);
-        UNLOCK(ctx);
+        CTX_UNLOCK(ctx);
         DEBUG_SEC("key lookup table full\n");
         return -IEEE802154_SEC_NO_KEY;
     }
     ctx->key_lookup_table.key_lookup[l] = tmp_lookup;
-    UNLOCK(ctx);
+    CTX_UNLOCK(ctx);
     return IEEE802154_SEC_OK;
 }
 
@@ -1067,7 +1067,7 @@ int ieee802154_sec_key_lookup_explicit(ieee802154_sec_context_t *ctx,
     identifier.key_index = tmp_lookup.key_lookup.explicit.key_index;
     memcpy(identifier.key_source, tmp_lookup.key_lookup.explicit.key_source,
            _key_source_size(tmp_lookup.key_mode));
-    LOCK(ctx);
+    CTX_LOCK(ctx);
     /* check for duplicate */
     ieee802154_sec_key_lookup_t *tmp = _get_key_lookup(
         ctx, IEEE802154_SEC_NO_IDENT,
@@ -1081,13 +1081,13 @@ int ieee802154_sec_key_lookup_explicit(ieee802154_sec_context_t *ctx,
             bf_unset(ctx->key_lookup_table.mask, tmp - ctx->key_lookup_table.key_lookup);
             memset(tmp, 0, sizeof(*tmp));
         }
-        UNLOCK(ctx);
+        CTX_UNLOCK(ctx);
         return IEEE802154_SEC_OK;
     }
     /* allocate a key */
     ieee802154_sec_key_descriptor_t k = _add_key(ctx, key_mat);
     if (k == IEEE802154_SEC_NO_IDENT) {
-        UNLOCK(ctx);
+        CTX_UNLOCK(ctx);
         DEBUG_SEC("keystore full\n");
         return -IEEE802154_SEC_NO_KEY;
     }
@@ -1097,14 +1097,14 @@ int ieee802154_sec_key_lookup_explicit(ieee802154_sec_context_t *ctx,
                          CONFIG_IEEE802154_SEC_DEFAULT_KEYLOOKUP_SIZE);
     if (l < 0) {
         _remove_key(ctx, k);
-        UNLOCK(ctx);
+        CTX_UNLOCK(ctx);
         DEBUG_SEC("key lookup table full\n");
         return -IEEE802154_SEC_NO_KEY;
     }
     ctx->key_lookup_table.key_lookup[l] = tmp_lookup;
     /* device bit in key descriptor should be set during pairings phase,
        see ieee802154_sec_peer_dev() */
-    UNLOCK(ctx);
+    CTX_UNLOCK(ctx);
     return IEEE802154_SEC_OK;
 }
 
@@ -1122,7 +1122,7 @@ int ieee802154_sec_peer(ieee802154_sec_context_t *ctx,
                          bool add)
 {
     assert(long_addr); /* must know the long address */
-    LOCK(ctx);
+    CTX_LOCK(ctx);
     pan_id = byteorder_htols(pan_id).u16; /* save in little endian */
     ieee802154_sec_peer_t tmp_dev;
     _init_peer(&tmp_dev, (uint8_t *)&pan_id, short_addr, long_addr);
@@ -1137,18 +1137,18 @@ int ieee802154_sec_peer(ieee802154_sec_context_t *ctx,
             _remove_peer(ctx, tmp - ctx->devstore.peers);
         }
         *tmp = tmp_dev; /* update pan and short address */
-        UNLOCK(ctx);
+        CTX_UNLOCK(ctx);
         return IEEE802154_SEC_OK;
     }
     int d = bf_get_unset(ctx->devstore.mask,
                          CONFIG_IEEE802154_SEC_DEFAULT_DEVSTORE_SIZE);
     if (d < 0) {
-        UNLOCK(ctx);
+        CTX_UNLOCK(ctx);
         DEBUG_SEC("device store full\n");
         return -IEEE802154_SEC_NO_DEV;
     }
     ctx->devstore.peers[d] = tmp_dev;
-    UNLOCK(ctx);
+    CTX_UNLOCK(ctx);
     return IEEE802154_SEC_OK;
 }
 
@@ -1196,14 +1196,14 @@ int ieee802154_sec_update(ieee802154_sec_context_t *ctx,
                                        NULL, false);
     if (sec_key_index) {
         if (ieee802154_sec_key_lookup_explicit(ctx, sec_key_mode,
-                                            sec_key_index, sec_key_source,
-                                            new, true) != IEEE802154_SEC_OK) {
+                                               sec_key_index, sec_key_source,
+                                               new, true) != IEEE802154_SEC_OK) {
             DEBUG_SEC("failed to update key\n");
             return -IEEE802154_SEC_NO_KEY;
         }
 
     }
-    LOCK(ctx);
+    CTX_LOCK(ctx);
     if (sec_key_index) {
         ctx->key_index = sec_key_index;
         memcpy(ctx->key_source, sec_key_source, _key_source_size(sec_key_mode));
@@ -1211,6 +1211,6 @@ int ieee802154_sec_update(ieee802154_sec_context_t *ctx,
     /* update on success */
     ctx->security_level = sec_level;
     ctx->key_id_mode = sec_key_mode;
-    UNLOCK(ctx);
+    CTX_UNLOCK(ctx);
     return IEEE802154_SEC_OK;
 }
