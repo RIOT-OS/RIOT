@@ -27,10 +27,22 @@
 #include "net/eui_provider.h"
 #include "net/netdev.h"
 #include "net/netdev/eth.h"
+#include "time_units.h"
 #include "usb/usbus/cdc/ecm.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+/**
+ * @brief Timeout [us] for sending a packet down the bus.
+ *
+ * Packet sending blocks until the host issues an IN token. If the host is
+ * misbehaving and doesn't do that, we will time out instead of stalling the
+ * netif thread and any others that sync with it.
+ */
+#ifndef CONFIG_USBUS_CDC_ECM_TX_TIMEOUT_US
+#  define CONFIG_USBUS_CDC_ECM_TX_TIMEOUT_US    (50 * US_PER_MS)
+#endif
 
 static const netdev_driver_t netdev_driver_cdcecm;
 
@@ -75,7 +87,11 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     size_t usb_remain = cdcecm->ep_in->maxpacketsize;
     DEBUG("CDC_ECM_netdev: cur iol: %d\n", iolist->iol_len);
     while (len) {
-        mutex_lock(&cdcecm->out_lock);
+        if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &cdcecm->out_lock,
+                                      CONFIG_USBUS_CDC_ECM_TX_TIMEOUT_US) != 0) {
+            DEBUG("out_lock timeout!\n");
+            return -EBUSY;
+        }
         if (cdcecm->active_iface != 1) {
             /* Link went down while waiting. */
             mutex_unlock(&cdcecm->out_lock);
@@ -125,7 +141,11 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     }
     /* Zero length USB packet required */
     if ((iolist_size(iolist_start) % cdcecm->ep_in->maxpacketsize) == 0) {
-        mutex_lock(&cdcecm->out_lock);
+        if (ztimer_mutex_lock_timeout(ZTIMER_USEC, &cdcecm->out_lock,
+                                      CONFIG_USBUS_CDC_ECM_TX_TIMEOUT_US) != 0) {
+            DEBUG("out_lock timeout!\n");
+            return -EBUSY;
+        }
         if (cdcecm->active_iface != 1) {
             /* Link went down while waiting. */
             mutex_unlock(&cdcecm->out_lock);
