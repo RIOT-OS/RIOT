@@ -540,12 +540,14 @@ typedef struct ieee802154_sec_context {
      * This data structure should be stored in persistent storage.
      */
     ieee802154_sec_key_table_t keystore;
+#if IS_USED(MODULE_IEEE802154_SECURITY_REPLAY_PROTECTION)
     /**
      * @brief   Peer device lookup table
      *
      * This data structure should be stored in persistent storage.
      */
     ieee802154_sec_peer_lookup_table_t peer_lookup_table;
+#endif
     /**
      * @brief   Peer device table
      *

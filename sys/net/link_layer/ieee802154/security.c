@@ -558,15 +558,6 @@ static void _init_key_lookup_explicit(ieee802154_sec_key_lookup_t *key_lookup,
     key_lookup->fc = 0;
 }
 
-static void _init_peer_lookup(ieee802154_sec_peer_lookup_t *peer_lookup,
-                              ieee802154_sec_peer_descriptor_t peer,
-                              ieee802154_sec_key_descriptor_t key)
-{
-    peer_lookup->peer = peer;
-    peer_lookup->key = key;
-    peer_lookup->fc = 0;
-}
-
 /* get key lookup descriptor vgl. 9.2.2 KeyDescriptor lookup procedure */
 static ieee802154_sec_key_lookup_t *_get_key_lookup(ieee802154_sec_context_t *ctx,
                                                     const uint8_t *pan,
@@ -650,6 +641,16 @@ static ieee802154_sec_peer_t *_get_peer(ieee802154_sec_context_t *ctx,
     return out;
 }
 
+#if IS_USED(MODULE_IEEE802154_SECURITY_REPLAY_PROTECTION)
+static void _init_peer_lookup(ieee802154_sec_peer_lookup_t *peer_lookup,
+                              ieee802154_sec_peer_descriptor_t peer,
+                              ieee802154_sec_key_descriptor_t key)
+{
+    peer_lookup->peer = peer;
+    peer_lookup->key = key;
+    peer_lookup->fc = 0;
+}
+
 static ieee802154_sec_peer_lookup_t *_get_peer_lookup(ieee802154_sec_context_t *ctx,
                                                       ieee802154_sec_peer_descriptor_t peer,
                                                       ieee802154_sec_key_descriptor_t key)
@@ -690,6 +691,7 @@ int _peer_lookup(ieee802154_sec_context_t *ctx,
     ctx->peer_lookup_table.peer_lookup[l] = tmp_lookup;
     return IEEE802154_SEC_OK;
 }
+#endif
 
 static ieee802154_sec_key_descriptor_t _add_key(ieee802154_sec_context_t *ctx,
                                                 const uint8_t *key)
@@ -740,8 +742,10 @@ void ieee802154_sec_init(ieee802154_sec_context_t *ctx,
         /* no persistent storage or failure */
         CTX_LOCK(ctx);
         memset(&ctx->key_lookup_table, 0, sizeof(ctx->key_lookup_table));
-        memset(&ctx->peer_lookup_table, 0, sizeof(ctx->peer_lookup_table));
         memset(&ctx->keystore, 0, sizeof(ctx->keystore));
+#if IS_USED(MODULE_IEEE802154_SECURITY_REPLAY_PROTECTION)
+        memset(&ctx->peer_lookup_table, 0, sizeof(ctx->peer_lookup_table));
+#endif
         memset(&ctx->devstore, 0, sizeof(ctx->devstore));
         CTX_UNLOCK(ctx);
         /* add an explicit default key */
@@ -879,8 +883,7 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
         }
         CTX_LOCK(ctx);
         /* attempt to find key descriptor */
-        ieee802154_sec_key_lookup_t *key = _get_key_lookup(
-            ctx,
+        ieee802154_sec_key_lookup_t *key = _get_key_lookup(ctx,
             ieee802154_get_src_pan_ptr(header),
             ieee802154_get_src_ptr(header),
             ieee802154_get_src_len(header),
@@ -891,11 +894,11 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
             DEBUG_SEC("key not found\n");
             return -IEEE802154_SEC_NO_KEY;
         }
-#if IS_USED(MODULE_IEEE802154_SECURITY_REPLAY_PROTECTION)
-            ieee802154_sec_peer_t *dev = _get_peer(ctx,
+        ieee802154_sec_peer_t *dev = _get_peer(ctx,
                 ieee802154_get_src_pan_ptr(header),
                 ieee802154_get_src_ptr(header),
                 ieee802154_get_src_len(header));
+#if IS_USED(MODULE_IEEE802154_SECURITY_REPLAY_PROTECTION)
         if (!dev) {
             /* The device has to exist and must be known by long address. */
             /* If it would not have to exist, an attacker could replay any frame by creating an arbitrary device. */
@@ -931,12 +934,17 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
         dev_lookup->fc = frame_counter + 1;
         memcpy_reversed(src_address, dev->long_addr, sizeof(dev->long_addr));
 #else
-        if (ieee802154_get_src_len(header) != IEEE802154_LONG_ADDRESS_LEN) {
+        if (dev) {
+            memcpy_reversed(src_address, dev->long_addr, sizeof(dev->long_addr));
+        }
+        else if (ieee802154_get_src_len(header) == IEEE802154_LONG_ADDRESS_LEN) {
+            memcpy_reversed(src_address, ieee802154_get_src_ptr(header), IEEE802154_LONG_ADDRESS_LEN);
+        }
+        else {
             CTX_UNLOCK(ctx);
             DEBUG_SEC("No long source address\n");
             return -IEEE802154_SEC_NO_DEV;
         }
-        memcpy_reversed(src_address, ieee802154_get_src_ptr(header), IEEE802154_LONG_ADDRESS_LEN);
 #endif
         _set_key(ctx, ctx->keystore.keys[key->key].key);
         CTX_UNLOCK(ctx);
@@ -1119,9 +1127,11 @@ int ieee802154_sec_peer(ieee802154_sec_context_t *ctx,
                                            tmp_dev.long_addr, IEEE802154_LONG_ADDRESS_LEN);
     if (tmp) {
         if (!add) {
+#if IS_USED(MODULE_IEEE802154_SECURITY_REPLAY_PROTECTION)
             while (_get_peer_lookup(ctx, tmp - ctx->devstore.peers, IEEE802154_SEC_NO_IDENT)) {
                 _peer_lookup(ctx, tmp - ctx->devstore.peers, IEEE802154_SEC_NO_IDENT, false);
             };
+#endif
             _remove_peer(ctx, tmp - ctx->devstore.peers);
         }
         *tmp = tmp_dev; /* update pan and short address */
