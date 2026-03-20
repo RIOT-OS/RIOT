@@ -471,6 +471,7 @@ static const struct at86rf215_BBC_regs BBC1_regs = {
 #define RF_STATE_RX         0x5     /* Receive */
 #define RF_STATE_TRANSITION 0x6     /* State transition in progress */
 #define RF_STATE_RESET      0x7     /* Transceiver is in state RESET or SLEEP */
+#define RF_STATE_SLEEP      0x7     /* Transceiver is in state RESET or SLEEP */
 /** @} */
 
 /** offset (in Hz) for CCF0 in 2.4 GHz mode */
