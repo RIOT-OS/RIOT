@@ -124,6 +124,18 @@ void cpu_switch_context_exit(void)
     if (sched_num_threads <= 1) {
         extern unsigned _native_retval;
         DEBUG_CPU("cpu_switch_context_exit: last task has ended. exiting.\n");
+        /* When compiled with gcov coverage instrumentation, explicitly flush
+         * profiling data and call _exit() to bypass the libc atexit chain.
+         * See pm_off() in periph/pm.c for the full rationale. */
+#    ifdef __GCOV__
+        {
+            extern void __gcov_dump(void);
+            _native_in_isr = 1;
+            _native_interrupts_enabled = false;
+            __gcov_dump();
+            _exit(_native_retval);
+        }
+#    endif
         real_exit(_native_retval);
     }
 # endif
