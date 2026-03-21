@@ -52,7 +52,7 @@ extern "C" {
  */
 #ifndef CONFIG_QMI8658_PARAM_I2C
 /* I2C slave address. Set to 0x6A if SDO/SA0 is pulled high */
-#define CONFIG_QMI8658_PARAM_I2C    0x6B
+#  define CONFIG_QMI8658_PARAM_I2C    0x6B
 #endif
 /** @} */
 
