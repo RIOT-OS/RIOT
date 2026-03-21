@@ -89,7 +89,7 @@ int qmi8658_init(qmi8658_t *dev, const qmi8658_params_t *params)
     res = i2c_read_reg(QMI8658_BUS, QMI8658_ADDR, QMI8658_REG_WHO_AM_I, &tmp, 0);
     if (res < 0 || tmp != QMI8658_WHO_AM_I_VALUE) {
         i2c_release(QMI8658_BUS);
-        DEBUG("[ERROR] qmi8658_init: WHO_AM_I\n");
+        DEBUG("[ERROR] qmi8658_init: Failed to read WHO_AM_I value (or read incorrect value)\n");
         return -EIO;
     }
 
@@ -99,7 +99,7 @@ int qmi8658_init(qmi8658_t *dev, const qmi8658_params_t *params)
     i2c_release(QMI8658_BUS);
 
     if (res < 0) {
-        DEBUG("[ERROR] qmi8658_init: Config\n");
+        DEBUG("[ERROR] qmi8658_init: Failed to configure serial interface\n");
         return -EIO;
     }
 
@@ -112,7 +112,7 @@ int qmi8658_set_mode(const qmi8658_t *dev, qmi8658_mode_t mode)
 {
     assert(dev);
 
-    DEBUG("[LOG] qmi8658_set_mode: %i\n", mode);
+    DEBUG("[LOG] qmi8658_set_mode: mode = %i\n", mode);
 
     uint8_t reg_ctrl2_value = 0;
     uint8_t reg_ctrl3_value = 0;
@@ -122,7 +122,7 @@ int qmi8658_set_mode(const qmi8658_t *dev, qmi8658_mode_t mode)
     /* Disable sensors first */
     res = _qmi8658_set_sensors(dev, QMI8658_DISABLE_ALL);
     if (res < 0) {
-        DEBUG("[ERROR] qmi8658_set_mode: Disable sensors\n");
+        DEBUG("[ERROR] qmi8658_set_mode: Failed to disable sensors\n");
         return -EIO;
     }
 
@@ -201,15 +201,17 @@ int qmi8658_set_mode(const qmi8658_t *dev, qmi8658_mode_t mode)
     i2c_release(QMI8658_BUS);
 
     if (res < 0) {
-        DEBUG("[ERROR] qmi8658_set_mode\n");
+        DEBUG("[ERROR] qmi8658_set_mode: Failed to write sensor settings\n");
         return -EIO;
     }
 
     res = _qmi8658_set_sensors(dev, sensor_enable_flags);
     if (res < 0) {
-        DEBUG("[ERROR] qmi8658_set_mode: Disable sensors\n");
+        DEBUG("[ERROR] qmi8658_set_mode: Failed to enable sensors\n");
         return -EIO;
     }
+
+    LOG_INFO("qmi8658_set_mode(): QMI8658 mode set.\n");
 
     return 0;
 }
@@ -220,7 +222,7 @@ int qmi8658_read_acc(const qmi8658_t *dev, qmi8658_3d_data_t *data)
 
     int res = _qmi8658_read_sensor(dev, data, QMI8658_SENSOR_ACC);
     if (res < 0) {
-        DEBUG("[ERROR] qmi8658_read_acc\n");
+        DEBUG("[ERROR] qmi8658_read_acc: failed to read sensor\n");
         return res;
     }
 
@@ -238,7 +240,7 @@ int qmi8658_read_gyro(const qmi8658_t *dev, qmi8658_3d_data_t *data)
 
     int res = _qmi8658_read_sensor(dev, data, QMI8658_SENSOR_GYRO);
     if (res < 0) {
-        DEBUG("[ERROR] qmi8658_read_gyro\n");
+        DEBUG("[ERROR] qmi8658_read_gyro: failed to read sensor\n");
         return res;
     }
 
@@ -263,7 +265,7 @@ int qmi8658_read_temp(const qmi8658_t *dev, int16_t *data)
     i2c_release(QMI8658_BUS);
 
     if (res < 0) {
-        DEBUG("[ERROR] qmi8658_read_temp\n");
+        DEBUG("[ERROR] qmi8658_read_temp: failed to read sensor\n");
         return -EIO;
     }
 
@@ -300,7 +302,7 @@ static int _qmi8658_read_sensor(const qmi8658_t *dev, qmi8658_3d_data_t *data,
 
     /* Check if data is available */
     i2c_read_reg(QMI8658_BUS, QMI8658_ADDR, QMI8658_REG_STATUS0, &tmp, 0);
-    DEBUG("[LOG] qmi8658_read_sensor: status: %x\n", tmp);
+    DEBUG("[LOG] _qmi8658_read_sensor: status = %x\n", tmp);
 
     /* 6 byte burst read, register address is incremented automatically */
     res = i2c_read_regs(QMI8658_BUS, QMI8658_ADDR, data_reg, tmp_arr, 6, 0);
@@ -308,7 +310,6 @@ static int _qmi8658_read_sensor(const qmi8658_t *dev, qmi8658_3d_data_t *data,
     i2c_release(QMI8658_BUS);
 
     if (res < 0) {
-        DEBUG("[ERROR] qmi8658_read_sensor\n");
         return -EIO;
     }
 
@@ -324,7 +325,7 @@ static int _qmi8658_set_sensors(const qmi8658_t *dev, qmi8658_enable_flag_t sens
 {
     int res;
 
-    DEBUG("[LOG] Set sensor enable flags %x\n", sensor_enable_flags);
+    DEBUG("[LOG] _qmi8658_set_sensors: Set sensor enable flags %x\n", sensor_enable_flags);
 
     i2c_acquire(QMI8658_BUS);
 
@@ -333,7 +334,7 @@ static int _qmi8658_set_sensors(const qmi8658_t *dev, qmi8658_enable_flag_t sens
     i2c_release(QMI8658_BUS);
 
     if (res < 0) {
-        DEBUG("[ERROR] qmi8658_enable_sensors\n");
+        DEBUG("[ERROR] _qmi8658_set_sensors: Failed to set sensor flags\n");
         return -EIO;
     }
 
