@@ -141,7 +141,7 @@ int qmi8658_set_mode(const qmi8658_t *dev, qmi8658_mode_t mode)
         /* If Accelerometer ODR is higher than 1kHz, Gyroscope has to be enabled */
         if (dev->params.acc_odr < QMI8658_DATA_RATE_1KHZ) {
             LOG_INFO(
-                "qmi8658_enable_sensors(): High accelerometer ODR is set, automatically enabling gyroscope.\n");
+                "qmi8658_set_mode(): High accelerometer ODR is set, automatically enabling gyroscope.\n");
             /* Set gyro odr / full scale */
             reg_ctrl3_value = dev->params.gyro_odr | (dev->params.gyro_fs << QMI8658_CTRL_FS_SHIFT);
             sensor_enable_flags |= QMI8658_ENABLE_GYRO;
@@ -171,6 +171,10 @@ int qmi8658_set_mode(const qmi8658_t *dev, qmi8658_mode_t mode)
         /* Enable Acc and Gyro */
         sensor_enable_flags = QMI8658_ENABLE_ACC | QMI8658_ENABLE_GYRO;
         break;
+    default:
+        i2c_release(QMI8658_BUS);
+        LOG_ERROR("qmi8658_set_mode(): Invalid mode.\n");
+        return -EINVAL;
     }
 
     if (mode != QMI8658_POWER_DOWN) {
@@ -187,11 +191,11 @@ int qmi8658_set_mode(const qmi8658_t *dev, qmi8658_mode_t mode)
     /* Filters need 3/ODR seconds to settle (Datasheet section 7.3) */
     if (mode != QMI8658_LOWPWR_ACC) {
         /* Worst case in normal mode is around 100ms at ODR = 31.25Hz */
-        ztimer_sleep(ZTIMER_MSEC, 100);
+        ztimer_sleep(ZTIMER_MSEC, QMI8658_NORMAL_FILTER_WAIT_MS);
     }
     else {
         /* Worst case in low power mode is around 1s at ODR = 3Hz */
-        ztimer_sleep(ZTIMER_MSEC, 1000);
+        ztimer_sleep(ZTIMER_MSEC, QMI8658_LOWPWR_FILTER_WAIT_MS);
     }
 
     i2c_release(QMI8658_BUS);
@@ -288,7 +292,7 @@ static int _qmi8658_read_sensor(const qmi8658_t *dev, qmi8658_3d_data_t *data,
         data_reg = QMI8658_REG_GX_L;
         break;
     default:
-        return EINVAL;
+        return -EINVAL;
         break;
     }
 

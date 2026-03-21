@@ -171,7 +171,8 @@ int qmi8658_init(qmi8658_t *dev, const qmi8658_params_t *params);
  * @param[in]   mode        New mode
  *
  * @retval  0 on success
- * @retval  -EIO on on i2c communication error
+ * @retval  -EINVAL if invalid mode is given
+ * @retval  -EIO on i2c communication error
  */
 int qmi8658_set_mode(const qmi8658_t *dev, qmi8658_mode_t mode);
 
@@ -183,7 +184,6 @@ int qmi8658_set_mode(const qmi8658_t *dev, qmi8658_mode_t mode);
  *
  * @retval 0 on success
  * @retval -EIO on i2c communication error
- * @retval -ENODATA if no new data available
  */
 int qmi8658_read_acc(const qmi8658_t *dev, qmi8658_3d_data_t *data);
 
