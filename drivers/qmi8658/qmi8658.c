@@ -94,7 +94,8 @@ int qmi8658_init(qmi8658_t *dev, const qmi8658_params_t *params)
     }
 
     /* Enable address auto increment */
-    res = i2c_write_reg(QMI8658_BUS, QMI8658_ADDR, QMI8658_REG_CTRL1, QMI8658_CTRL1_ADDR_AI_MASK, 0);
+    res = i2c_write_reg(QMI8658_BUS, QMI8658_ADDR, QMI8658_REG_CTRL1, QMI8658_CTRL1_ADDR_AI_MASK,
+                        0);
 
     i2c_release(QMI8658_BUS);
 
@@ -130,7 +131,8 @@ int qmi8658_set_mode(const qmi8658_t *dev, qmi8658_mode_t mode)
 
     switch (mode) {
     case QMI8658_POWER_DOWN:
-        res = i2c_write_reg(QMI8658_BUS, QMI8658_ADDR, QMI8658_REG_CTRL1, QMI8658_CTRL1_SENSOR_DISABLE_MASK, 0);
+        res = i2c_write_reg(QMI8658_BUS, QMI8658_ADDR, QMI8658_REG_CTRL1,
+                            QMI8658_CTRL1_SENSOR_DISABLE_MASK, 0);
         break;
 
     case QMI8658_NORMAL_ACC:
@@ -179,7 +181,8 @@ int qmi8658_set_mode(const qmi8658_t *dev, qmi8658_mode_t mode)
 
     if (mode != QMI8658_POWER_DOWN) {
         /* Clear sensor disable */
-        res += i2c_write_reg(QMI8658_BUS, QMI8658_ADDR, QMI8658_REG_CTRL1, QMI8658_CTRL1_ADDR_AI_MASK, 0);
+        res += i2c_write_reg(QMI8658_BUS, QMI8658_ADDR, QMI8658_REG_CTRL1,
+                             QMI8658_CTRL1_ADDR_AI_MASK, 0);
     }
     if (reg_ctrl2_value != 0) {
         res += i2c_write_reg(QMI8658_BUS, QMI8658_ADDR, QMI8658_REG_CTRL2, reg_ctrl2_value, 0);
@@ -329,7 +332,8 @@ static int _qmi8658_set_sensors(const qmi8658_t *dev, qmi8658_enable_flag_t sens
 
     i2c_acquire(QMI8658_BUS);
 
-    res = i2c_write_reg(QMI8658_BUS, QMI8658_ADDR, QMI8658_REG_CTRL7, sensor_enable_flags & 0x03, 0);
+    res = i2c_write_reg(QMI8658_BUS, QMI8658_ADDR, QMI8658_REG_CTRL7, sensor_enable_flags & 0x03,
+                        0);
 
     i2c_release(QMI8658_BUS);
 
