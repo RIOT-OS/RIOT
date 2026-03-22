@@ -155,7 +155,7 @@ static void _read_cb(void *arg)
     }
     _read_measurements(dev, &dev->_data);
     dev->_data.timestamp = ztimer_now(ZTIMER_USEC);
-    ztimer_set(ZTIMER_USEC, &dev->_timer, SGP30_RECOMMENDED_SAMPLING_PERIOD);
+    event_timeout_set(&dev->_timeout, SGP30_RECOMMENDED_SAMPLING_PERIOD);
 }
 #endif
 
@@ -166,7 +166,7 @@ int sgp30_start_air_quality(sgp30_t *dev)
 
 #ifdef MODULE_SGP30_STRICT
     if (ret == 0) {
-        ztimer_set(ZTIMER_USEC, &dev->_timer, SGP30_AIR_QUALITY_INIT_DELAY_US);
+        event_timeout_set(&dev->_timeout, SGP30_AIR_QUALITY_INIT_DELAY_US);
     }
 #endif
     return ret ? -EPROTO : 0;
@@ -178,8 +178,9 @@ int sgp30_init(sgp30_t *dev, const sgp30_params_t *params)
     dev->params = *params;
 #ifdef MODULE_SGP30_STRICT
     dev->ready = false;
-    dev->_timer.callback = _read_cb;
-    dev->_timer.arg = dev;
+    event_callback_init(&dev->_event, _read_cb, dev);
+    event_timeout_init(&dev->_timeout, CONFIG_SGP30_STRICT_EVENT_THREAD_QUEUE,
+                       (event_t *)&dev->_event);
 #endif
 
     /* delay while powering up */
@@ -226,7 +227,7 @@ int sgp30_reset(sgp30_t *dev)
     int ret = _rx_tx_data(dev, SGP30_CMD_SOFT_RESET, NULL, 0, SGP30_DELAY_SOFT_RESET, false);
 #ifdef MODULE_SGP30_STRICT
     if (ret == 0) {
-        ztimer_remove(ZTIMER_USEC, &dev->_timer);
+        event_timeout_clear(&dev->_timeout);
         dev->ready = false;
     }
 #endif
