@@ -48,6 +48,12 @@
 #include "periph/i2c.h"
 #include "ztimer.h"
 
+#ifdef MODULE_SGP30_STRICT
+#include "event/thread.h"
+#include "event/callback.h"
+#include "event/timeout.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -87,7 +93,8 @@ typedef struct {
     sgp30_params_t params;      /**< parameters of the sensor device */
 #ifdef MODULE_SGP30_STRICT
     bool ready;                 /**< if initialization phase is over*/
-    ztimer_t _timer;            /**< timer */
+    event_callback_t _event;    /**< event callback */
+    event_timeout_t _timeout;   /**< event timeout */
     sgp30_data_t _data;         /**< internal current data */
 #endif
 } sgp30_t;
