@@ -8,9 +8,7 @@
 #   - Without Docker: lcov and genhtml must be installed on the host, and the
 #     host gcov must be compatible with the GCC version used to compile.
 #   - With BUILD_IN_DOCKER=1: only Docker is required.  lcov is installed
-#     automatically inside a temporary ubuntu:22.04 container whose GCC 11
-#     toolchain matches the riotbuild compiler, avoiding .gcda format
-#     mismatches that occur when the host gcov version differs.
+#     automatically inside the riotbuild container.
 
 COVERAGE_OUTPUT ?= coverage
 
@@ -25,9 +23,6 @@ all-coverage: all
 .PHONY: coverage coverage/run coverage/collect coverage/html \
         coverage/report-docker coverage/clean
 
-# Docker RIOTBASE path embedded in .gcda files; remap to the host path.
-# docker.inc.mk sets this to $(DOCKER_BUILD_ROOT)/riotbase when BUILD_IN_DOCKER=1.
-# Provide a fallback for the non-Docker case.
 DOCKER_RIOTBASE ?= /data/riotbuild/riotbase
 
 # Top-level target: build → run → report.
@@ -35,9 +30,8 @@ DOCKER_RIOTBASE ?= /data/riotbuild/riotbase
 # When BUILD_IN_DOCKER=1 the build + run steps execute inside the riotbuild
 # container (via ..in-docker-container).  DOCKER_MAKECMDGOALS is overridden so
 # Docker only runs 'all-coverage coverage/run'; the reporting step is handled
-# afterwards by coverage/report-docker which spins up a separate ubuntu:22.04
-# container that has the same GCC 11 toolchain and can therefore read the
-# .gcda files produced by riotbuild without format errors.
+# afterwards by coverage/report-docker which installs lcov inside the same
+# riotbuild container and generates the HTML report.
 ifeq ($(BUILD_IN_DOCKER),1)
   ifneq (,$(filter coverage,$(MAKECMDGOALS)))
     override DOCKER_MAKECMDGOALS := all-coverage coverage/run
@@ -54,17 +48,14 @@ _COV_DOCKER_OUTDIR  := $(_COV_DOCKER_APPDIR)/$(COVERAGE_OUTPUT)
 coverage: ..in-docker-container coverage/report-docker
 	@$(COLOR_ECHO) "$(COLOR_GREEN)Coverage report: $(COVERAGE_OUTPUT)/index.html$(COLOR_RESET)"
 
-# Run lcov and genhtml inside a temporary ubuntu:22.04 container.
-# - The container runs as root so apt-get install works without extra setup.
-# - ubuntu:22.04 ships GCC 11 as the default toolchain, matching riotbuild, so
-#   gcov reads the .gcda files without any version-mismatch errors.
-# - RIOTBASE is bind-mounted at DOCKER_RIOTBASE (the same path used during the
-#   build), so all embedded source paths resolve correctly for genhtml.
+# Run lcov and genhtml inside the riotbuild container.
+# RIOTBASE is bind-mounted at DOCKER_RIOTBASE (the same path used during the
+# build), so all embedded source paths resolve correctly for genhtml.
 coverage/report-docker:
 	@$(COLOR_ECHO) "$(COLOR_GREEN)Collecting coverage and generating HTML report (in Docker)...$(COLOR_RESET)"
 	$(Q)$(DOCKER) run --rm --platform linux/amd64 \
 	    -v '$(RIOTBASE):$(DOCKER_RIOTBASE)' \
-	    ubuntu:22.04 \
+	    $(DOCKER_IMAGE) \
 	    bash -c "\
 	        apt-get update -qq \
 	        && apt-get install -qq -y --no-install-recommends lcov \
@@ -104,7 +95,6 @@ GCOV_TOOL_FLAG = $(if $(filter-out gcov,$(GCOV_TOOL)),--gcov-tool $(GCOV_TOOL),)
 
 # Collect coverage data from .gcda / .gcno artefacts.
 # --ignore-errors source     : skip source files not found on the host
-# --substitute               : remap Docker paths to the host RIOTBASE
 coverage/collect:
 	@$(COLOR_ECHO) "$(COLOR_GREEN)Collecting coverage data...$(COLOR_RESET)"
 	@command -v lcov >/dev/null 2>&1 || \
@@ -115,7 +105,6 @@ coverage/collect:
 	         --output-file $(COVERAGE_OUTPUT).info \
 	         --exclude '*/tests/*' \
 	         --exclude '/usr/*' \
-	         --substitute 's|$(DOCKER_RIOTBASE)|$(RIOTBASE)|g' \
 	         --ignore-errors mismatch,unsupported,source,version \
 	         $(GCOV_TOOL_FLAG) \
 	         --quiet

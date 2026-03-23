@@ -74,10 +74,9 @@ a replacement for static analysis.
   (`apt install lcov` / `brew install lcov`).  On macOS the system `gcov`
   is LLVM-based and incompatible with GCC `.gcda` files; install GCC via
   Homebrew (`brew install gcc`) so that a compatible `gcov` is available.
-- **With `BUILD_IN_DOCKER=1`**: only Docker is required.  The build and run
-  steps execute inside the `riotbuild` container; a separate `ubuntu:22.04`
-  container (which provides GCC 11, matching `riotbuild`) then runs
-  `lcov`/`genhtml`, avoiding `.gcda` format mismatches entirely.
+- **With `BUILD_IN_DOCKER=1`**: only Docker is required.  Both the build and
+  the report steps run inside the `riotbuild` container, so the `gcov` version
+  always matches the compiler.
 
 ### How to Use
 
@@ -96,12 +95,3 @@ a replacement for static analysis.
 
 2. Open `coverage/index.html` in a browser to view the report.
 
-### Sub-targets
-
-| Target | Description |
-|---|---|
-| `coverage/run` | Run the binary to produce `.gcda` files |
-| `coverage/collect` | Run `lcov` to collect coverage data |
-| `coverage/html` | Run `genhtml` to produce the HTML report |
-| `coverage/report-docker` | Run collect + html inside a Docker container |
-| `coverage/clean` | Remove `.gcda`/`.gcno` files and the report directory |
