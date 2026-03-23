@@ -94,4 +94,3 @@ a replacement for static analysis.
    ```
 
 2. Open `coverage/index.html` in a browser to view the report.
-
