@@ -22,9 +22,6 @@
 #include <stdbool.h>
 
 #include "periph/i2c.h"
-#ifndef USE_INTERNAL_RTC
-#  include "periph/rtc.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {

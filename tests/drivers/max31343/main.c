@@ -31,14 +31,13 @@
 
 static max31343_t _dev;
 
-/* 2026-01-01T00:00:00 – a fixed reference time inside the chip's valid range */
 static const struct tm _ref_time = {
     .tm_sec   = 0,
     .tm_min   = 0,
     .tm_hour  = 0,
-    .tm_wday  = 4,   /* Thursday */
-    .tm_mday  = 1,
-    .tm_mon   = 0,   /* January */
+    .tm_wday  = 1,   /* Thursday */
+    .tm_mday  = 9,
+    .tm_mon   = 10,   /* January */
     .tm_year  = 126, /* 2026 */
     .tm_isdst = -1,
 };

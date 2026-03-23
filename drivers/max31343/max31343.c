@@ -25,8 +25,7 @@ static int _read_regs(const max31343_t *dev, uint8_t reg, void *buf, size_t len)
     assert(buf);
     assert(len > 0);
 
-    int res = i2c_read_regs(dev->i2c, MAX31343_I2C_ADDR, reg, buf, len, 0);
-    return (res < 0) ? -EIO : 0;
+    return i2c_read_regs(dev->i2c, MAX31343_I2C_ADDR, reg, buf, len, 0);
 }
 
 static int _write_regs(const max31343_t *dev, uint8_t reg, const void *buf, size_t len)
@@ -35,8 +34,7 @@ static int _write_regs(const max31343_t *dev, uint8_t reg, const void *buf, size
     assert(buf);
     assert(len > 0);
 
-    int res = i2c_write_regs(dev->i2c, MAX31343_I2C_ADDR, reg, buf, len, 0);
-    return (res < 0) ? -EIO : 0;
+    return i2c_write_regs(dev->i2c, MAX31343_I2C_ADDR, reg, buf, len, 0);
 }
 
 static inline int _read_reg(const max31343_t *dev, uint8_t reg, uint8_t *val)
@@ -88,15 +86,15 @@ static void _encode_time_regs(const struct tm *t, uint8_t raw[MAX31343_TIME_LEN]
     int year_full = t->tm_year + 1900;
     uint8_t year2 = (uint8_t)(year_full % 100);
 
-    raw[0] = (uint8_t)(bcd_from_byte((uint8_t)t->tm_sec) & 0x7FU);
-    raw[1] = (uint8_t)(bcd_from_byte((uint8_t)t->tm_min) & 0x7FU);
-    raw[2] = (uint8_t)(bcd_from_byte((uint8_t)t->tm_hour) & 0x3FU);
-    raw[3] = (uint8_t)(((uint8_t)t->tm_wday + 1U) & 0x07U);
-    raw[4] = (uint8_t)(bcd_from_byte((uint8_t)t->tm_mday) & 0x3FU);
+    raw[0] = bcd_from_byte(t->tm_sec);
+    raw[1] = bcd_from_byte(t->tm_min);
+    raw[2] = bcd_from_byte(t->tm_hour);
+    raw[3] = (t->tm_wday + 1U);
+    raw[4] = bcd_from_byte(t->tm_mday);
 
-    uint8_t m = (uint8_t)(t->tm_mon + 1);
-    uint8_t m_bcd = (uint8_t)(bcd_from_byte(m) & 0x1FU);
-    raw[5] = (uint8_t)(m_bcd | MAX31343_MONTH_CENTURY);
+    uint8_t m = (t->tm_mon + 1);
+    uint8_t m_bcd = (bcd_from_byte(m) & 0x1FU);
+    raw[5] = (m_bcd | MAX31343_MONTH_CENTURY);
     raw[6] = bcd_from_byte(year2);
 }
 
