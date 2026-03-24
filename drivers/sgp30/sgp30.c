@@ -211,7 +211,7 @@ int sgp30_init(sgp30_t *dev, const sgp30_params_t *params)
         DEBUG_PUTS("\n");
     }
 
-       /* start air quality measurement */
+    /* start air quality measurement */
     if (sgp30_start_air_quality(dev)) {
         DEBUG_PUTS("[sgp30]: could not start air quality measurements ");
         return -1;
@@ -235,7 +235,7 @@ int sgp30_reset(sgp30_t *dev)
 
 int sgp30_read_serial_number(sgp30_t *dev, uint8_t *buf, size_t len)
 {
-    (void) len;
+    (void)len;
     assert(dev && buf && (len == SGP30_SERIAL_ID_LEN));
     uint8_t frame[9];
     if (_rx_tx_data(dev, SGP30_CMD_READ_SERIAL, (uint8_t *)frame, sizeof(frame),
@@ -244,7 +244,7 @@ int sgp30_read_serial_number(sgp30_t *dev, uint8_t *buf, size_t len)
         return -EPROTO;
     }
     /* the serial id is in big endian format */
-    uint16_t tmp[SGP30_SERIAL_ID_LEN/2];
+    uint16_t tmp[SGP30_SERIAL_ID_LEN / 2];
     if (_get_uint16_and_check_crc(&frame[0], &tmp[2]) ||
         _get_uint16_and_check_crc(&frame[3], &tmp[1]) ||
         _get_uint16_and_check_crc(&frame[6], &tmp[0])) {
