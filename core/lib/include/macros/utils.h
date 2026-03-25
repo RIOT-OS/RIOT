@@ -22,17 +22,32 @@ extern "C" {
 /**
  * @brief   Concatenate the tokens @p a and @p b
  */
-#define CONCAT(a, b) a ## b
+#define CONCAT_NOEXPAND(a, b) a ## b
+
+/**
+ * @brief   Concatenate the tokens @p a and @p b with expansion
+ */
+#define CONCAT(a, b) CONCAT_NOEXPAND(a, b)
 
 /**
  * @brief   Concatenate the tokens @p a , @p b , and @p c
  */
-#define CONCAT3(a, b, c) a ## b ## c
+#define CONCAT3_NOEXPAND(a, b, c) a ## b ## c
+
+/**
+ * @brief   Concatenate the tokens @p a , @p b , and @p c with expansion
+ */
+#define CONCAT3(a, b, c) CONCAT3_NOEXPAND(a, b, c)
 
 /**
  * @brief   Concatenate the tokens @p a , @p b , @p c , and @p d
  */
-#define CONCAT4(a, b, c, d) a ## b ## c ## d
+#define CONCAT4_NOEXPAND(a, b, c, d) a ## b ## c ## d
+
+/**
+ * @brief   Concatenate the tokens @p a , @p b , @p c , and @p d with expansion
+ */
+#define CONCAT4(a, b, c, d) CONCAT4_NOEXPAND(a, b, c, d)
 
 /* For compatibility with vendor headers, only provide MAX() and MIN() if not
  * provided. (The alternative approach of using #undef has the downside that
