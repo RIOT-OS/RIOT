@@ -58,6 +58,14 @@
 extern "C" {
 #endif
 
+
+/**
+ * @brief   The event queue if 'sgp30_strict' is used
+ */
+#ifndef SGP30_STRICT_EVENT_THREAD_QUEUE
+#define SGP30_STRICT_EVENT_THREAD_QUEUE     EVENT_PRIO_MEDIUM
+#endif
+
 /**
  * @brief     Set of measured values
  */
