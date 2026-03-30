@@ -10,7 +10,7 @@
  * @{
  *
  * @file
- * @brief       Board specific definitions for the Arduino Uno board
+ * @brief       Board specific definitions for the Arduino Nano board
  *
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */
@@ -20,6 +20,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @name MTD configuration
+ * @{
+ */
+#define MTD_0 mtd_dev_get(0)
+/** @} */
 
 #ifdef __cplusplus
 }
