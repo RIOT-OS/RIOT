@@ -72,6 +72,13 @@ extern "C" {
 #define BTN0_INT_FLANK      GPIO_FALLING
 /** @} */
 
+/**
+ * @name MTD configuration
+ * @{
+ */
+#define MTD_0 mtd_dev_get(0)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
