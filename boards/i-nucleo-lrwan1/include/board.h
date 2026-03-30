@@ -43,6 +43,13 @@ extern "C" {
 #define SX127X_PARAM_PASELECT               (SX127X_PA_BOOST)
 /** @} */
 
+/**
+ * @name MTD configuration
+ * @{
+ */
+#define MTD_0 mtd_dev_get(0)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
