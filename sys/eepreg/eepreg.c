@@ -23,7 +23,7 @@
 #include <string.h>
 
 #include "eepreg.h"
-#include "periph/eeprom.h"
+#include "mtd.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -39,16 +39,16 @@ static const char eepreg_magic[] = "RIOTREG";
 #define REG_START          (EEPROM_RESERV_CPU_LOW + EEPROM_RESERV_BOARD_LOW)
 #define REG_MAGIC_LOC      (REG_START)
 #define REG_END_PTR_LOC    (REG_MAGIC_LOC + MAGIC_SIZE)
-#define REG_ENT1_LOC       (REG_END_PTR_LOC + EEPREG_PTR_LEN)
-#define DAT_START          (EEPROM_SIZE - EEPROM_RESERV_CPU_HI \
+#define REG_ENT1_LOC(mtd)  (REG_END_PTR_LOC + eepreg_ptr_len(mtd))
+#define DAT_START(mtd)     (eepreg_size(mtd) - EEPROM_RESERV_CPU_HI \
                             - EEPROM_RESERV_BOARD_HI - 1)
 
-static inline uint32_t _read_meta_uint(uint32_t loc)
+static inline uint32_t _read_meta_uint(mtd_dev_t *dev, uint32_t loc)
 {
     uint8_t data[4];
     uint32_t ret;
 
-    eeprom_read(loc, data, EEPREG_PTR_LEN);
+    mtd_read(dev, data, loc, eepreg_ptr_len(dev));
 
     /* unused array members will be discarded */
     ret = ((uint32_t)data[0] << 24)
@@ -57,43 +57,43 @@ static inline uint32_t _read_meta_uint(uint32_t loc)
           | ((uint32_t)data[3]);
 
     /* bit shift to discard unused array members */
-    ret >>= 8 * (4 - EEPREG_PTR_LEN);
+    ret >>= 8 * (4 - eepreg_ptr_len(dev));
 
     return ret;
 }
 
-static inline void _write_meta_uint(uint32_t loc, uint32_t val)
+static inline void _write_meta_uint(mtd_dev_t *dev, uint32_t loc, uint32_t val)
 {
     uint8_t data[4];
 
-    val <<= 8 * (4 - EEPREG_PTR_LEN);
+    val <<= 8 * (4 - eepreg_ptr_len(dev));
 
     data[0] = (uint8_t)(val >> 24);
     data[1] = (uint8_t)(val >> 16);
     data[2] = (uint8_t)(val >> 8);
     data[3] = (uint8_t)val;
 
-    eeprom_write(loc, data, EEPREG_PTR_LEN);
+    mtd_write(dev, data, loc, eepreg_ptr_len(dev));
 }
 
-static inline uint32_t _get_reg_end(void)
+static inline uint32_t _get_reg_end(mtd_dev_t *dev)
 {
-    return _read_meta_uint(REG_END_PTR_LOC);
+    return _read_meta_uint(dev, REG_END_PTR_LOC);
 }
 
-static inline void _set_reg_end(uint32_t loc)
+static inline void _set_reg_end(mtd_dev_t *dev, uint32_t loc)
 {
-    _write_meta_uint(REG_END_PTR_LOC, loc);
+    _write_meta_uint(dev, REG_END_PTR_LOC, loc);
 }
 
-static inline uint32_t _get_last_loc(uint32_t reg_end)
+static inline uint32_t _get_last_loc(mtd_dev_t *dev, uint32_t reg_end)
 {
-    if (reg_end == REG_ENT1_LOC) {
+    if (reg_end == REG_ENT1_LOC(dev)) {
         /* no entries yet */
-        return DAT_START;
+        return DAT_START(dev);
     }
 
-    return _read_meta_uint(reg_end - EEPREG_PTR_LEN);
+    return _read_meta_uint(dev, reg_end - eepreg_ptr_len(dev));
 }
 
 static inline uint32_t _calc_free_space(uint32_t reg_end, uint32_t last_loc)
@@ -101,49 +101,51 @@ static inline uint32_t _calc_free_space(uint32_t reg_end, uint32_t last_loc)
     return last_loc - reg_end;
 }
 
-static inline uint8_t _get_meta_len(uint32_t meta_loc)
+static inline uint8_t _get_meta_len(mtd_dev_t *dev, uint32_t meta_loc)
 {
-    return eeprom_read_byte(meta_loc);
+    uint8_t byte;
+    mtd_read(dev, &byte, meta_loc, 1);
+    return byte;
 }
 
-static inline void _set_meta_len(uint32_t meta_loc, uint8_t meta_len)
+static inline void _set_meta_len(mtd_dev_t *dev, uint32_t meta_loc, uint8_t meta_len)
 {
-    eeprom_write_byte(meta_loc, meta_len);
+    mtd_write(dev, &meta_len, meta_loc, 1);
 }
 
-static inline uint32_t _get_data_loc(uint32_t meta_loc, uint8_t meta_len)
+static inline uint32_t _get_data_loc(mtd_dev_t *dev, uint32_t meta_loc, uint8_t meta_len)
 {
     /* data location is at the end of meta-data */
-    return _read_meta_uint(meta_loc + meta_len - EEPREG_PTR_LEN);
+    return _read_meta_uint(dev, meta_loc + meta_len - eepreg_ptr_len(dev));
 }
 
-static inline void _set_data_loc(uint32_t meta_loc, uint8_t meta_len,
+static inline void _set_data_loc(mtd_dev_t *dev, uint32_t meta_loc, uint8_t meta_len,
                                  uint32_t data_loc)
 {
     /* data location is at the end of meta-data */
-    _write_meta_uint(meta_loc + meta_len - EEPREG_PTR_LEN, data_loc);
+    _write_meta_uint(dev, meta_loc + meta_len - eepreg_ptr_len(dev), data_loc);
 }
 
-static inline uint8_t _calc_name_len(uint8_t meta_len)
+static inline uint8_t _calc_name_len(mtd_dev_t *dev, uint8_t meta_len)
 {
     /* entry contents: meta-data length, name, data pointer */
-    return meta_len - ENT_LEN_SIZ - EEPREG_PTR_LEN;
+    return meta_len - ENT_LEN_SIZ - eepreg_ptr_len(dev);
 }
 
-static inline void _get_name(uint32_t meta_loc, char *name, uint8_t meta_len)
+static inline void _get_name(mtd_dev_t *dev, uint32_t meta_loc, char *name, uint8_t meta_len)
 {
     /* name is after entry length */
-    eeprom_read(meta_loc + ENT_LEN_SIZ, (uint8_t *)name,
-                _calc_name_len(meta_len));
+    mtd_read(dev, name, meta_loc + ENT_LEN_SIZ,
+             _calc_name_len(dev, meta_len));
 }
 
-static inline int _cmp_name(uint32_t meta_loc, const char *name,
+static inline int _cmp_name(mtd_dev_t *dev, uint32_t meta_loc, const char *name,
                             uint8_t meta_len)
 {
     /* name is after entry length */
     uint32_t loc = meta_loc + ENT_LEN_SIZ;
 
-    uint8_t len = _calc_name_len(meta_len);
+    uint8_t len = _calc_name_len(dev, meta_len);
 
     uint8_t offset;
     for (offset = 0; offset < len; offset++) {
@@ -152,7 +154,9 @@ static inline int _cmp_name(uint32_t meta_loc, const char *name,
             return 0;
         }
 
-        if (eeprom_read_byte(loc + offset) != (uint8_t)name[offset]) {
+        uint8_t byte;
+        mtd_read(dev, &byte, loc + offset, 1);
+        if (byte != (uint8_t)name[offset]) {
             /* non-matching character */
             return 0;
         }
@@ -167,15 +171,15 @@ static inline int _cmp_name(uint32_t meta_loc, const char *name,
     return 0;
 }
 
-static inline uint32_t _get_meta_loc(const char *name)
+static inline uint32_t _get_meta_loc(mtd_dev_t *dev, const char *name)
 {
-    uint32_t meta_loc = REG_ENT1_LOC;
-    uint32_t reg_end = _get_reg_end();
+    uint32_t meta_loc = REG_ENT1_LOC(dev);
+    uint32_t reg_end = _get_reg_end(dev);
 
     while (meta_loc < reg_end) {
-        uint8_t meta_len = _get_meta_len(meta_loc);
+        uint8_t meta_len = _get_meta_len(dev, meta_loc);
 
-        if (_cmp_name(meta_loc, name, meta_len)) {
+        if (_cmp_name(dev, meta_loc, name, meta_len)) {
             return meta_loc;
         }
 
@@ -186,28 +190,28 @@ static inline uint32_t _get_meta_loc(const char *name)
     return (uint32_t)UINT_MAX;
 }
 
-static inline uint32_t _get_data_len(uint32_t meta_loc, uint32_t data_loc)
+static inline uint32_t _get_data_len(mtd_dev_t *dev, uint32_t meta_loc, uint32_t data_loc)
 {
     uint32_t prev_loc;
-    if (meta_loc == REG_ENT1_LOC) {
-        prev_loc = DAT_START;
+    if (meta_loc == REG_ENT1_LOC(dev)) {
+        prev_loc = DAT_START(dev);
     }
     else {
         /* previous entry data pointer is just before this entry */
-        prev_loc = _read_meta_uint(meta_loc - EEPREG_PTR_LEN);
+        prev_loc = _read_meta_uint(dev, meta_loc - eepreg_ptr_len(dev));
     }
 
     return prev_loc - data_loc;
 }
 
-static inline int _new_entry(const char *name, uint32_t data_len)
+static inline int _new_entry(mtd_dev_t *dev, const char *name, uint32_t data_len)
 {
-    uint32_t reg_end = _get_reg_end();
-    uint32_t last_loc = _get_last_loc(reg_end);
+    uint32_t reg_end = _get_reg_end(dev);
+    uint32_t last_loc = _get_last_loc(dev, reg_end);
     uint32_t free_space = _calc_free_space(reg_end, last_loc);
 
     uint8_t name_len = (uint8_t)strlen(name);
-    uint8_t meta_len = ENT_LEN_SIZ + name_len + EEPREG_PTR_LEN;
+    uint8_t meta_len = ENT_LEN_SIZ + name_len + eepreg_ptr_len(dev);
 
     /* check to see if there is enough room */
     if (free_space < meta_len + data_len) {
@@ -215,21 +219,21 @@ static inline int _new_entry(const char *name, uint32_t data_len)
     }
 
     /* set the length of the meta-data */
-    _set_meta_len(reg_end, meta_len);
+    _set_meta_len(dev, reg_end, meta_len);
 
     /* write name of entry */
-    eeprom_write(reg_end + ENT_LEN_SIZ, (uint8_t *)name, name_len);
+    mtd_write(dev, name, reg_end + ENT_LEN_SIZ, name_len);
 
     /* set the location of the data */
-    _set_data_loc(reg_end, meta_len, last_loc - data_len);
+    _set_data_loc(dev, reg_end, meta_len, last_loc - data_len);
 
     /* update end of the registry */
-    _set_reg_end(reg_end + meta_len);
+    _set_reg_end(dev, reg_end + meta_len);
 
     return 0;
 }
 
-static inline void _move_data(uint32_t oldpos, uint32_t newpos, uint32_t len)
+static inline void _move_data(mtd_dev_t *dev, uint32_t oldpos, uint32_t newpos, uint32_t len)
 {
     for (uint32_t count = 0; count < len; count++) {
         uint32_t offset;
@@ -243,35 +247,35 @@ static inline void _move_data(uint32_t oldpos, uint32_t newpos, uint32_t len)
             offset = len - count;
         }
 
-        uint8_t byte = eeprom_read_byte(oldpos + offset);
-
-        eeprom_write_byte(newpos + offset, byte);
+        uint8_t byte;
+        mtd_read(dev, &byte, oldpos + offset, 1);
+        mtd_write(dev, &byte, newpos + offset, 1);
     }
 }
 
-int eepreg_add(uint32_t *pos, const char *name, uint32_t len)
+int eepreg_add(mtd_dev_t *dev, uint32_t *pos, const char *name, uint32_t len)
 {
-    int ret = eepreg_check();
+    int ret = eepreg_check(dev);
     if (ret == -ENOENT) {
         /* reg does not exist, so make a new one */
-        eepreg_reset();
+        eepreg_reset(dev);
     }
     else if (ret < 0) {
         DEBUG("[eepreg_add] eepreg_check failed\n");
         return ret;
     }
 
-    uint32_t reg_end = _get_reg_end();
+    uint32_t reg_end = _get_reg_end(dev);
 
-    uint32_t meta_loc = _get_meta_loc(name);
+    uint32_t meta_loc = _get_meta_loc(dev, name);
 
     if (meta_loc == (uint32_t)UINT_MAX) {
         /* entry does not exist, so make a new one */
 
         /* location of the new data */
-        *pos = _get_last_loc(reg_end) - len;
+        *pos = _get_last_loc(dev, reg_end) - len;
 
-        if (_new_entry(name, len) < 0) {
+        if (_new_entry(dev, name, len) < 0) {
             DEBUG("[eepreg_add] not enough space for %s\n", name);
             return -ENOSPC;
         }
@@ -279,9 +283,9 @@ int eepreg_add(uint32_t *pos, const char *name, uint32_t len)
         return 0;
     }
 
-    *pos = _get_data_loc(meta_loc, _get_meta_len(meta_loc));
+    *pos = _get_data_loc(dev, meta_loc, _get_meta_len(dev, meta_loc));
 
-    if (len != _get_data_len(meta_loc, *pos)) {
+    if (len != _get_data_len(dev, meta_loc, *pos)) {
         DEBUG("[eepreg_add] %s already exists with different length\n", name);
         return -EADDRINUSE;
     }
@@ -289,34 +293,34 @@ int eepreg_add(uint32_t *pos, const char *name, uint32_t len)
     return 0;
 }
 
-int eepreg_read(uint32_t *pos, const char *name)
+int eepreg_read(mtd_dev_t *dev, uint32_t *pos, const char *name)
 {
-    int ret = eepreg_check();
+    int ret = eepreg_check(dev);
     if (ret < 0) {
         DEBUG("[eepreg_read] eepreg_check failed\n");
         return ret;
     }
 
-    uint32_t meta_loc = _get_meta_loc(name);
+    uint32_t meta_loc = _get_meta_loc(dev, name);
 
     if (meta_loc == (uint32_t)UINT_MAX) {
         DEBUG("[eepreg_read] no entry for %s\n", name);
         return -ENOENT;
     }
 
-    *pos = _get_data_loc(meta_loc, _get_meta_len(meta_loc));
+    *pos = _get_data_loc(dev, meta_loc, _get_meta_len(dev, meta_loc));
 
     return 0;
 }
 
-int eepreg_write(uint32_t *pos, const char *name, uint32_t len)
+int eepreg_write(mtd_dev_t *dev, uint32_t *pos, const char *name, uint32_t len)
 {
-    uint32_t reg_end = _get_reg_end();
+    uint32_t reg_end = _get_reg_end(dev);
 
-    int ret = eepreg_check();
+    int ret = eepreg_check(dev);
     if (ret == -ENOENT) {
         /* reg does not exist, so make a new one */
-        eepreg_reset();
+        eepreg_reset(dev);
     }
     else if (ret < 0) {
         DEBUG("[eepreg_write] eepreg_check failed\n");
@@ -324,9 +328,9 @@ int eepreg_write(uint32_t *pos, const char *name, uint32_t len)
     }
 
     /* location of the new data */
-    *pos = _get_last_loc(reg_end) - len;
+    *pos = _get_last_loc(dev, reg_end) - len;
 
-    if (_new_entry(name, len) < 0) {
+    if (_new_entry(dev, name, len) < 0) {
         DEBUG("[eepreg_write] not enough space for %s\n", name);
         return -ENOSPC;
     }
@@ -334,47 +338,47 @@ int eepreg_write(uint32_t *pos, const char *name, uint32_t len)
     return 0;
 }
 
-int eepreg_rm(const char *name)
+int eepreg_rm(mtd_dev_t *dev, const char *name)
 {
-    int ret = eepreg_check();
+    int ret = eepreg_check(dev);
     if (ret < 0) {
         DEBUG("[eepreg_rm] eepreg_check failed\n");
         return ret;
     }
 
-    uint32_t meta_loc = _get_meta_loc(name);
+    uint32_t meta_loc = _get_meta_loc(dev, name);
 
     if (meta_loc == (uint32_t)UINT_MAX) {
         DEBUG("[eepreg_rm] no entry for %s\n", name);
         return -ENOENT;
     }
 
-    uint32_t reg_end = _get_reg_end();
-    uint32_t last_loc = _get_last_loc(reg_end);
+    uint32_t reg_end = _get_reg_end(dev);
+    uint32_t last_loc = _get_last_loc(dev, reg_end);
 
-    uint8_t meta_len = _get_meta_len(meta_loc);
+    uint8_t meta_len = _get_meta_len(dev, meta_loc);
     uint32_t tot_meta_len = reg_end - meta_loc;
 
-    uint32_t data_loc = _get_data_loc(meta_loc, meta_len);
-    uint32_t data_len = _get_data_len(meta_loc, data_loc);
+    uint32_t data_loc = _get_data_loc(dev, meta_loc, meta_len);
+    uint32_t data_len = _get_data_len(dev, meta_loc, data_loc);
 
     /* data_loc is above last_loc due to descending order */
     uint32_t tot_data_len = data_loc - last_loc;
 
-    _move_data(meta_loc + meta_len, meta_loc, tot_meta_len);
+    _move_data(dev, meta_loc + meta_len, meta_loc, tot_meta_len);
 
-    _move_data(last_loc, last_loc + data_len, tot_data_len);
+    _move_data(dev, last_loc, last_loc + data_len, tot_data_len);
 
     reg_end -= meta_len;
-    _set_reg_end(reg_end);
+    _set_reg_end(dev, reg_end);
 
     /* update data locations */
     while (meta_loc < reg_end) {
-        meta_len = _get_meta_len(meta_loc);
-        data_loc = _get_data_loc(meta_loc, meta_len);
+        meta_len = _get_meta_len(dev, meta_loc);
+        data_loc = _get_data_loc(dev, meta_loc, meta_len);
 
         /* addition due to descending order */
-        _set_data_loc(meta_loc, meta_len, data_loc + data_len);
+        _set_data_loc(dev, meta_loc, meta_len, data_loc + data_len);
 
         meta_loc += meta_len;
     }
@@ -382,32 +386,32 @@ int eepreg_rm(const char *name)
     return 0;
 }
 
-int eepreg_iter(eepreg_iter_cb_t cb, void *arg)
+int eepreg_iter(mtd_dev_t *dev, eepreg_iter_cb_t cb, void *arg)
 {
-    uint32_t reg_end = _get_reg_end();
+    uint32_t reg_end = _get_reg_end(dev);
 
-    int ret = eepreg_check();
+    int ret = eepreg_check(dev);
     if (ret < 0) {
         DEBUG("[eepreg_len] eepreg_check failed\n");
         return ret;
     }
 
-    uint32_t meta_loc = REG_ENT1_LOC;
+    uint32_t meta_loc = REG_ENT1_LOC(dev);
     while (meta_loc < reg_end) {
-        uint8_t meta_len = _get_meta_len(meta_loc);
+        uint8_t meta_len = _get_meta_len(dev, meta_loc);
 
         /* size of memory allocation */
-        uint8_t name_len = _calc_name_len(meta_len);
+        uint8_t name_len = _calc_name_len(dev, meta_len);
 
         char name[name_len + 1];
 
         /* terminate string */
         name[name_len] = '\0';
 
-        _get_name(meta_loc, name, meta_len);
+        _get_name(dev, meta_loc, name, meta_len);
 
         /* execute callback */
-        ret = cb(name, arg);
+        ret = cb(dev, name, arg);
 
         if (ret < 0) {
             DEBUG("[eepreg_iter] callback reports failure\n");
@@ -415,7 +419,7 @@ int eepreg_iter(eepreg_iter_cb_t cb, void *arg)
         }
 
         /* only advance if cb didn't delete entry */
-        if (_cmp_name(meta_loc, name, meta_len)) {
+        if (_cmp_name(dev, meta_loc, name, meta_len)) {
             meta_loc += meta_len;
         }
     }
@@ -423,13 +427,12 @@ int eepreg_iter(eepreg_iter_cb_t cb, void *arg)
     return 0;
 }
 
-int eepreg_check(void)
+int eepreg_check(mtd_dev_t *dev)
 {
     char magic[MAGIC_SIZE];
 
     /* get magic number from EEPROM */
-    if (eeprom_read(REG_MAGIC_LOC, (uint8_t *)magic, MAGIC_SIZE)
-        != MAGIC_SIZE) {
+    if (mtd_read(dev, magic, REG_MAGIC_LOC, MAGIC_SIZE)) {
 
         DEBUG("[eepreg_check] EEPROM read error\n");
         return -EIO;
@@ -444,54 +447,53 @@ int eepreg_check(void)
     return 0;
 }
 
-int eepreg_reset(void)
+int eepreg_reset(mtd_dev_t *dev)
 {
     /* write new registry magic number */
-    if (eeprom_write(REG_MAGIC_LOC, (uint8_t *)eepreg_magic, MAGIC_SIZE)
-        != MAGIC_SIZE) {
+    if (mtd_write(dev, eepreg_magic, REG_MAGIC_LOC, MAGIC_SIZE)) {
 
         DEBUG("[eepreg_reset] EEPROM write error\n");
         return -EIO;
     }
 
     /* new registry has no entries */
-    _set_reg_end(REG_ENT1_LOC);
+    _set_reg_end(dev, REG_ENT1_LOC(dev));
 
     return 0;
 }
 
-int eepreg_len(uint32_t *len, const char *name)
+int eepreg_len(mtd_dev_t *dev, uint32_t *len, const char *name)
 {
-    int ret = eepreg_check();
+    int ret = eepreg_check(dev);
     if (ret < 0) {
         DEBUG("[eepreg_len] eepreg_check failed\n");
         return ret;
     }
 
-    uint32_t meta_loc = _get_meta_loc(name);
+    uint32_t meta_loc = _get_meta_loc(dev, name);
 
     if (meta_loc == (uint32_t)UINT_MAX) {
         DEBUG("[eepreg_len] no entry for %s\n", name);
         return -ENOENT;
     }
 
-    uint32_t data_loc = _get_data_loc(meta_loc, _get_meta_len(meta_loc));
+    uint32_t data_loc = _get_data_loc(dev, meta_loc, _get_meta_len(dev, meta_loc));
 
-    *len = _get_data_len(meta_loc, data_loc);
+    *len = _get_data_len(dev, meta_loc, data_loc);
 
     return 0;
 }
 
-int eepreg_free(uint32_t *len)
+int eepreg_free(mtd_dev_t *dev, uint32_t *len)
 {
-    int ret = eepreg_check();
+    int ret = eepreg_check(dev);
     if (ret < 0) {
         DEBUG("[eepreg_free] eepreg_check failed\n");
         return ret;
     }
 
-    uint32_t reg_end = _get_reg_end();
-    uint32_t last_loc = _get_last_loc(reg_end);
+    uint32_t reg_end = _get_reg_end(dev);
+    uint32_t last_loc = _get_last_loc(dev, reg_end);
     *len = _calc_free_space(reg_end, last_loc);
 
     return 0;
