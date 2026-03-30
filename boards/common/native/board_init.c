@@ -35,6 +35,12 @@ mtd_native_dev_t mtd0_dev = {
 MTD_XFA_ADD(mtd0_dev.base, 0);
 #endif
 
+#if MODULE_MTD_EEPROM
+#include "mtd_eeprom.h"
+static mtd_eeprom_t eeprom_mtd = MTD_EEPROM_INIT_VAL;
+MTD_XFA_ADD(eeprom_mtd, 1);
+#endif
+
 #ifdef MODULE_VFS_DEFAULT
 #include "vfs_default.h"
 
