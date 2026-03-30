@@ -52,6 +52,13 @@ extern "C" {
 #define SX127X_PARAM_TX_SWITCH              GPIO_PIN(PORT_A, 4)
 /** @} */
 
+/**
+ * @name MTD configuration
+ * @{
+ */
+#define MTD_0 mtd_dev_get(0)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
