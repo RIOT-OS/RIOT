@@ -95,6 +95,10 @@ export default defineConfig({
           ],
         },
         {
+          label: "Supported Boards",
+          link: "boards",
+        },
+        {
           label: "Tutorials",
           items: [
             {
@@ -202,7 +206,12 @@ export default defineConfig({
   vite: {
     server: {
       fs: {
-        allow: ["./", "../doxygen", "../../release-notes.txt"],
+        allow: [
+          "./",
+          "../doxygen",
+          "../../release-notes.txt",
+          "../../boards",
+        ],
       },
     },
   },

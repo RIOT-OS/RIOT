@@ -1,0 +1,99 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+import { getCollection } from "astro:content";
+
+const boards = await getCollection("boards");
+
+// Sort the boards alphabetically by title
+const sortedBoards = boards.sort((a, b) =>
+  a.data.title.localeCompare(b.data.title),
+);
+---
+
+<StarlightPage
+  frontmatter={{
+    title: "RIOT Boards",
+    description: "Complete list of supported RIOT boards with documentation",
+  }}
+>
+  <label for="riot-boards-search"><strong>Filter boards</strong></label>
+  <input
+    id="riot-boards-search"
+    type="search"
+    placeholder="Type to filter boards (e.g. arduino, stm32, nrf)"
+    style={{ width: "100%", margin: "0.5rem 0 1rem 0", padding: "0.5rem" }}
+  />
+  <p id="riot-boards-no-results" hidden>No board entries match this filter.</p>
+
+  <div style={{ marginBottom: "1rem" }}>
+    <p>
+      Explore the comprehensive documentation for all supported RIOT boards.
+      Each board has detailed information about its features, pinout, and usage.
+    </p>
+  </div>
+
+  <CardGrid>
+    {
+      sortedBoards.map((entry) => {
+        const boardId = entry.id.replace("boards/", "");
+        const description = entry.data.description || "Board documentation";
+        return (
+          <div
+            data-riot-board-item
+            data-riot-board-name={`${entry.data.title} ${boardId} ${description}`.toLowerCase()}
+          >
+            <LinkCard
+              title={entry.data.title}
+              href={`/boards/${boardId}`}
+              description={description}
+            />
+          </div>
+        );
+      })
+    }
+  </CardGrid>
+
+  <script>
+    const searchInput = document.getElementById(
+      "riot-boards-search",
+    ) as HTMLInputElement | null;
+    const noResults = document.getElementById(
+      "riot-boards-no-results",
+    ) as HTMLElement | null;
+    const items = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-riot-board-item]"),
+    );
+
+    /**
+     * Filters the board entries based on the search input. It checks if the
+     * search query is a substring of the board's title, ID,
+     * or description (all converted to lowercase for case-insensitive matching).
+     * If no entries match the filter, it shows a "no results" message.
+     */
+    function updateFilter() {
+      const query = (searchInput && searchInput.value ? searchInput.value : "")
+        .toLowerCase()
+        .trim();
+      let visible = 0;
+
+      for (const item of items) {
+        const haystack = item.getAttribute("data-riot-board-name") || "";
+        const matches = query.length === 0 || haystack.indexOf(query) !== -1;
+        item.hidden = !matches;
+        if (matches) {
+          visible += 1;
+        }
+      }
+
+      if (noResults) {
+        noResults.hidden = visible !== 0;
+      }
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener("input", updateFilter);
+      updateFilter();
+    }
+  </script>
+</StarlightPage>
