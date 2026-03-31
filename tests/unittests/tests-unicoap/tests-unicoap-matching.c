@@ -56,7 +56,7 @@ static void _test_root_with_options(bool match_subtree) {
     TEST_ASSERT_EQUAL_INT(unicoap_resource_match_path_options(&r, &options), match_subtree);
 }
 
-static void test_root_with_options(void) {printf("test_root_with_options\n");
+static void test_root_with_options(void) {
     _test_root_with_options(false);
 }
 
