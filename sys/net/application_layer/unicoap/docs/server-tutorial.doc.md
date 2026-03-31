@@ -139,7 +139,8 @@ static int handle_hello_request(unicoap_message_t* message, const unicoap_aux_t*
 
 Inside `handle_hello_request` we're going to log the request initially. We use
 @ref unicoap_string_from_method to get a string representation of the CoAP method, i.e., the CoAP
-message code, and @ref unicoap_message_payload_get_size for the number of payload bytes.
+message code, and @ref unicoap_message_t::unicoap_message_payload_get_size
+for the number of payload bytes.
 This will log a messaging like `GET /, 0 bytes`.
 
 ```c
@@ -222,7 +223,7 @@ Now we can craft our response. Proper responses have their `Content-Format` opti
 in our case `text/plain`. Setting options can fail, e.g., due to insufficient buffer capacity, hence
 we do that first.
 We allocate options on the stack through @ref UNICOAP_OPTIONS_ALLOC and set the format with
-@ref unicoap_options_set_content_format.
+@ref unicoap_options_t::unicoap_options_set_content_format.
 
 @remark
 Note that the buffer capacity we specify when allocating
