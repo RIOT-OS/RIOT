@@ -52,6 +52,21 @@ typedef struct {
     /**
      * @brief Pointer to contiguously stored character pointers to null-terminated strings
      * @private
+     *
+     * The last component must point to `NULL`.
+     *
+     * ## Example
+     * `/a1/b2`
+     *
+     * ```
+     * [ ptr1, ptr2, ptr3 ]
+     *   |     |     \___________
+     *   |     \__________       \
+     *   |                \      |
+     *   'a', '1', 0/NULL |      0/NULL
+     *                    |
+     *                    'b', '2', 0/NULL
+     * ```
      */
     const char** _components;
 } unicoap_pathspec_t;
