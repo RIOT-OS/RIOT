@@ -147,6 +147,7 @@ bool unicoap_path_matches_options(const unicoap_pathspec_t* path,
  * @param[in] path Path object to match against
  * @param[in] string String path, not necessarily null-terminated, with path components separated by
  * possibly multiple slash separators (`/`)
+ * @param string_length Number of UTF-8 code units aka. bytes in @p string (excluding terminator)
  * @param match_subtree A boolean determining whether @p string is
  * permitted to have more path components than the given @p path.
  * If `false`, both @p path and @p string must have exactly the same number of path components.
@@ -154,7 +155,7 @@ bool unicoap_path_matches_options(const unicoap_pathspec_t* path,
  * This function ignores trailing slashes in @p string
  */
 bool unicoap_path_matches_string(const unicoap_pathspec_t* path,
-                                 const char* string, size_t _string_length, bool match_subtree);
+                                 const char* string, size_t string_length, bool match_subtree);
 
 /**
  * @brief Writes path into buffer, with path components separated by `/`
