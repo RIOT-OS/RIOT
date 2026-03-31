@@ -3,7 +3,7 @@ import asyncio
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
-from aiocoap import CON, NON, GET, PUT, POST, DELETE, PATCH, iPATCH, FETCH, Context, Message
+from aiocoap import Reliable, Unreliable, GET, PUT, POST, DELETE, PATCH, iPATCH, FETCH, Context, Message
 import aiocoap.resource as resource
 
 LOG_PREFIX = Path(__file__).name
@@ -33,7 +33,7 @@ def _get(_list, i, default):
 
 
 def message_type(arg):
-    return {"CON": CON, "NON": NON}[arg]
+    return {"CON": Reliable, "NON": Unreliable}[arg]
 
 
 def method(arg):
@@ -102,7 +102,7 @@ async def main():
     elif args.observe_cancel:
         observeValue = 1
 
-    tell(f"using {message_type(args.type)} {method(args.method)} request")
+    tell(f"using {args.type} {method(args.method)} request")
     tell(f"timeout set to {args.timeout}s")
 
     port = 5600
@@ -117,7 +117,7 @@ async def main():
     })
 
     request = Message(
-        mtype=message_type(args.type),
+        transport_tuning=message_type(args.type),
         code=method(args.method),
         uri=args.uri,
         payload=bytes(args.payload, 'utf-8') if args.payload else "",
