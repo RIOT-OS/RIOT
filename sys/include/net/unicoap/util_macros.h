@@ -127,42 +127,51 @@
 #endif
 
 #ifndef DOXYGEN
-/* Here we check every every path component passed to UNICOAP_PATH for its type and if it's NULL.
- * We use _Generic as that built-in maps NULL to void*, which is a type we can just not
- * support as the controlling type in _Generic. We do however support char* and const char*.
+/* Here we check every every path component passed to UNICOAP_PATH for its type and if it's NULL
+ * at compile time. We use _Generic as that built-in maps NULL to void*, which is a type we can
+ * just not support as the controlling type in _Generic. We do however support char* and const char*.
  */
 /* The placeholder type used as to fill the list of components to 16  */
 struct __unicoap_placeholder_type { int _dummy; };
 #  define __UNICOAP_PLACEHOLDER (struct __unicoap_placeholder_type){ 0 }
 
 /** @brief Applies @p _f to all of the 16 arguments and returns comma-separated */
-#  define __unicoap_map_list_16( \
+#  define __unicoap_or_16( \
       _f, \
       _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, \
       ... \
   ) \
-    _f(_1), _f(_2), _f(_3), _f(_4), _f(_5), _f(_6), _f(_7), _f(_8), _f(_9), _f(_10), \
-    _f(_11), _f(_12), _f(_13), _f(_14), _f(_15), _f(_16)
+    _f(_1) | _f(_2) | _f(_3) | _f(_4) | _f(_5) | _f(_6) | _f(_7) | _f(_8) | _f(_9) | _f(_10) | \
+    _f(_11) | _f(_12) | _f(_13) | _f(_14) | _f(_15) | _f(_16)
+
+/* Why do we produce an OR sequence of zeroes? We could also produce a list of discarded values,
+ * but discarding values in round brackets (discard, discard, ..., real) does not produce
+ * a constant (compile-time) expression. So instead, we produce 0 | 0 | ... | 0,
+ * and then call _UNICOAP_TRY_CHECK_PATH_COMPONENTS(__VA_ARGS__) ? V : V at the call site,
+ * where we discard the result (zero) by using the same value V in both branches of the ternary
+ * expression. This way we 'use' that (zero) value in the eyes of the compiler, but also
+ * disregard it. After all, we only care that _UNICOAP_TRY_CHECK_PATH_COMPONENTS produces an
+ * an expression that can be compiled. The value does not matter -- hence 0 in every branch below.
+ */
 
 #  if defined(_UNICOAP_GENERIC_CONTROLLING_TYPE_AVAILABLE)
 #    define __UNICOAP_CHECK_PATH_COMPONENT(x) _Generic((x), \
-        char *: (void)0, \
-        const char *: (void)0, \
-        struct __unicoap_placeholder_type: (void)0 \
+        char *: 0, \
+        const char *: 0, \
+        struct __unicoap_placeholder_type: 0 \
      )
 #  else
-#    define __UNICOAP_CHECK_PATH_COMPONENT(x) (void)0
+#    define __UNICOAP_CHECK_PATH_COMPONENT(x) 0
 #  endif
 
-#  define _UNICOAP_TRY_CHECK_PATH_COMPONENTS(...) ((void)( \
-    __unicoap_map_list_16( \
+#  define _UNICOAP_TRY_CHECK_PATH_COMPONENTS(...) \
+    (__unicoap_or_16( \
         __UNICOAP_CHECK_PATH_COMPONENT, __VA_ARGS__, \
         __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER,\
         __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER,\
         __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER,\
         __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER \
-    )) \
-)
+    ))
 #endif
 
 #ifdef __cplusplus

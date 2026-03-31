@@ -86,10 +86,10 @@ static_assert(sizeof(unicoap_pathspec_t) == sizeof(char*),
  * `UNICOAP_PATH("foo", "bar")` corresponds to `/foo/bar`. To create the root path `/`, use
  * @ref UNICOAP_PATH_ROOT instead.
  */
-#define UNICOAP_PATH(...) ( \
-    _UNICOAP_TRY_CHECK_PATH_COMPONENTS(__VA_ARGS__), \
-    (unicoap_path_t) { ._components = (const char*[]) { __VA_ARGS__, NULL } } \
-)
+
+#define UNICOAP_PATH(...) \
+     ((unicoap_pathspec_t) { ._components = (const char*[]) { __VA_ARGS__, \
+        _UNICOAP_TRY_CHECK_PATH_COMPONENTS(__VA_ARGS__) ? NULL : NULL } })
 
 /** @brief The root path `/` */
 #define UNICOAP_PATH_ROOT \

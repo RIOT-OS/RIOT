@@ -21,6 +21,12 @@
 
 #include "net/unicoap.h"
 
+/* Test if UNICOAP_JOB and UNICOAP_PATH produce constant expressions. */
+
+static void my_handler(unicoap_job_t* job) { (void)job; }
+static unicoap_job_t _job = UNICOAP_JOB(my_handler);
+static unicoap_pathspec_t _path = UNICOAP_PATH("t");
+
 #define _MATCH_STRING(resource, string) \
     unicoap_resource_match_path_string(resource, string, static_strlen(string))
 
@@ -266,6 +272,9 @@ static void test_path_object_longer_is_equal(void) {
 
 Test* tests_unicoap_matching(void)
 {
+    (void)_job;
+    (void)_path;
+
     EMB_UNIT_TESTFIXTURES(fixtures){
         new_TestFixture(test_root_with_string),
         new_TestFixture(test_root_with_string_subtree),
