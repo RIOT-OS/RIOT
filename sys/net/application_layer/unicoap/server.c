@@ -161,7 +161,7 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
             /* handler does not want to send response (provided, No-Response is set at all) */
             /* the decision whether to honour No-Response must be made by the handler */
 
-            if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST) || IS_ACTIVE(ENABLE_DEBUG)) {
+            if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
                 unicoap_assist(API_MISUSE("handler did not respond")
                                FIXIT("set USEMODULE += unicoap_deferred_response and"
                                      "call unicoap_defer_response")
@@ -210,7 +210,7 @@ int unicoap_send_response(unicoap_message_t* response, unicoap_request_context_t
     assert(context);
     assert(context->resource);
 
-    if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST) || IS_ACTIVE(ENABLE_DEBUG)) {
+    if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
         if (!context->_packet) {
             unicoap_assist(API_MISUSE("cannot send response, already sent"));
             return -ECANCELED;
