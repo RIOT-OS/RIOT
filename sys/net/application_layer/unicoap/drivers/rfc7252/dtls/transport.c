@@ -238,7 +238,8 @@ int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
 
     if (unlikely(local)) {
         sock_dtls_aux_tx_t aux_tx = { .flags = SOCK_AUX_SET_LOCAL, .local = *local };
-        res = sock_dtls_sendv_aux(&_dtls_socket, session, iolist, 500000, &aux_tx);
+        res = sock_dtls_sendv_aux(&_dtls_socket, session, iolist,
+                                  CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS * US_PER_MS, &aux_tx);
     }
     else {
         res = sock_dtls_sendv_aux(&_dtls_socket, session, iolist,
