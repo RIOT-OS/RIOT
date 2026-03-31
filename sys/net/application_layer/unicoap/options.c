@@ -866,8 +866,7 @@ ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* itera
     const uint8_t* _name = NULL;
     const uint8_t* component = NULL;
     ssize_t res = -1;
-    while ((res =unicoap_options_get_next_by_number(iterator, number,
-                                                    (const uint8_t**)&component)) >= 0) {
+    while ((res = unicoap_options_get_next_by_number(iterator, number, &component)) >= 0) {
         assert(component);
         _name = component;
 
