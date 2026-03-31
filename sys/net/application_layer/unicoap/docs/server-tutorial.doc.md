@@ -62,8 +62,7 @@ Note that you will need to supply an identifier. Let's
 call it `hello`. You can give it any name you want, as long as it is a unique C
 variable name. Each resource must be assigned a path. This will be the part that follows the
 host/domain and port in the CoAP URI. To assign a path, set the @ref unicoap_resource_t.path
-property to a static null-terminated UTF-8 string literal that starts with a leading slash.
-Since we want to define a root instance, we set it to `/`.
+property to @ref UNICOAP_PATH_ROOT or a custom path using @ref UNICOAP_PATH.
 
 ```c
 UNICOAP_RESOURCE(hello) {

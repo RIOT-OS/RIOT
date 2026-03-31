@@ -77,11 +77,11 @@ static_assert(sizeof(unicoap_pathspec_t) == sizeof(char*),
               "unicoap_pathspec_t is of unexpected size. Please file a bug report.");
 
 /**
- * @brief Construct a path
+ * @brief Constructs a path
  *
  * @params Path components as string literals
  *
- * `PATH("foo", "bar")` corresponds to `/foo/bar`. To create the root path `/`, use
+ * `UNICOAP_PATH("foo", "bar")` corresponds to `/foo/bar`. To create the root path `/`, use
  * @ref UNICOAP_PATH_ROOT instead.
  */
 #define UNICOAP_PATH(...) \
