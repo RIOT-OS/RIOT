@@ -15,8 +15,11 @@ import sys
 from pathlib import Path
 LOG_PREFIX = Path(__file__).name
 
-tell = lambda message: print(f"{LOG_PREFIX}: {message}")
-complain = lambda message: print(f"{LOG_PREFIX}: error: {message}", file=sys.stderr)
+def tell(message):
+    print(f"{LOG_PREFIX}: {message}")
+
+def complain(message):
+    print(f"{LOG_PREFIX}: error: {message}", file=sys.stderr)
 
 print(
     "usage: {}".format(Path(__file__).name) +
