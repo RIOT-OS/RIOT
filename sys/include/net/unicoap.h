@@ -66,7 +66,7 @@ void* _unicoap_loop_run(void* arg);
  * @warning You must not call this function when @ref CONFIG_UNICOAP_CREATE_THREAD is enabled.
  * If @ref CONFIG_UNICOAP_CREATE_THREAD is enabled, this function is not defined.
  *
- * @returns Never
+ * Never returns (because @ref event_queue_t does not allow that...)
  */
 static inline void unicoap_loop_run(void)
 {

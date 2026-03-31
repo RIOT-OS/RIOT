@@ -79,7 +79,7 @@ static_assert(sizeof(unicoap_pathspec_t) == sizeof(char*),
 /**
  * @brief Constructs a path
  *
- * @params Path components as string literals
+ * @param ... Path components as string literals
  *
  * You must not pass a `NULL` path component.
  *
@@ -736,7 +736,7 @@ static inline bool unicoap_resource_match_path_options(const unicoap_resource_t*
 #define UNICOAP_METHOD_FLAG(method)        (1 << (method))
 
 /**
- * @brief Macro that builds a bit field where the i-th bit indicates the i-th request method (`0.0i`)
+ * @brief Macro that builds a bit field where the i-th bit indicates the i-th request method `0.0i`
  * @see @ref unicoap_resource_t.flags
  *
  * Use this macro to create a bitfield of allowed methods for a given

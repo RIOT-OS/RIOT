@@ -116,7 +116,6 @@ int unicoap_resource_handle_well_known_core(unicoap_message_t* message, const un
     return unicoap_send_response(message, ctx);
 }
 
-
 int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resource_t* resource)
 {
     assert(packet);

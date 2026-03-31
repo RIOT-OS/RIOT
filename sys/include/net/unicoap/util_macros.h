@@ -24,7 +24,6 @@
 
 #  define _CONCAT3(a, b, c)                      CONCAT3(a, b, c)
 
-
 /* This is best explained by the following two examples.
  *  --> denotes a proprocessor evaluation step.
  *

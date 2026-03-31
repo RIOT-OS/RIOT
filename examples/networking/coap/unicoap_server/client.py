@@ -2,18 +2,19 @@
 
 import logging
 import asyncio
-from argparse import ArgumentParser
-
-from aiocoap import CON, NON, GET, PUT, POST, DELETE, PATCH, iPATCH, FETCH, Context, Message
-import aiocoap.resource as resource
-from aiocoap.transports.tinydtls import DTLSClientConnection
+import sys
+from pathlib import Path
+LOG_PREFIX = Path(__file__).name
 
 # For debug logging, uncomment this line
 # logging.basicConfig(level=logging.DEBUG)
 
-import sys
-from pathlib import Path
-LOG_PREFIX = Path(__file__).name
+from argparse import ArgumentParser
+from aiocoap import CON, NON, GET, PUT, POST, DELETE, PATCH, iPATCH, FETCH, Context, Message
+import aiocoap.resource as resource
+from aiocoap.transports.tinydtls import DTLSClientConnection
+
+
 
 def tell(message):
     print(f"{LOG_PREFIX}: {message}")
