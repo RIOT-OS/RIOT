@@ -4,7 +4,7 @@ ifneq (,$(filter slipdev_net,$(USEMODULE)))
   SRC += net.c
 endif
 
-ifneq (,$(filter slipdev_stdio,$(USEMODULE)))
+ifneq (,$(filter stdio_slipdev,$(USEMODULE)))
   SRC += stdio.c
 endif
 

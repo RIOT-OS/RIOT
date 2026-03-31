@@ -22,14 +22,14 @@ static char coap_stack[COAP_STACKSIZE];
 
 static inline void _slipdev_lock(void)
 {
-    if (IS_USED(MODULE_SLIPDEV_STDIO) || IS_USED(MODULE_SLIPDEV_NET)) {
+    if (IS_USED(MODULE_STDIO_SLIPDEV) || IS_USED(MODULE_SLIPDEV_NET)) {
         mutex_lock(&slipdev_mutex);
     }
 }
 
 static inline void _slipdev_unlock(void)
 {
-    if (IS_USED(MODULE_SLIPDEV_STDIO) || IS_USED(MODULE_SLIPDEV_NET)) {
+    if (IS_USED(MODULE_STDIO_SLIPDEV) || IS_USED(MODULE_SLIPDEV_NET)) {
         mutex_unlock(&slipdev_mutex);
     }
 }

@@ -23,7 +23,7 @@
 #include "slipdev_params.h"
 #include "net/eui_provider.h"
 
-/* XXX: BE CAREFUL ABOUT USING OUTPUT WITH MODULE_SLIPDEV_STDIO IN SENDING
+/* XXX: BE CAREFUL ABOUT USING OUTPUT WITH MODULE_STDIO_SLIPDEV IN SENDING
  * FUNCTIONALITY! MIGHT CAUSE DEADLOCK!!!1!! */
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -42,7 +42,7 @@ mutex_t slipdev_mutex = MUTEX_INIT;
 
 static inline void _slipdev_stdio_add_to_frame(slipdev_t *dev, uint8_t byte)
 {
-    if (!IS_USED(MODULE_SLIPDEV_STDIO) ||
+    if (!IS_USED(MODULE_STDIO_SLIPDEV) ||
         dev->config.uart != slipdev_params[0].uart) {
         return;
     }

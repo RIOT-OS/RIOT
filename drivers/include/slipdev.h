@@ -22,7 +22,7 @@
  *
  * To enable this stdio implementation, select
  *
- *     USEMODULE += slipdev_stdio
+ *     USEMODULE += stdio_slipdev
  *
  * @see         drivers_slipdev
  */

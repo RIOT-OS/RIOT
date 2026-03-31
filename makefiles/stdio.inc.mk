@@ -1,5 +1,4 @@
 STDIO_MODULES = \
-  slipdev_stdio \
   stdio_cdc_acm \
   stdio_ethos \
   stdio_native \
@@ -7,6 +6,7 @@ STDIO_MODULES = \
   stdio_null \
   stdio_rtt \
   stdio_semihosting \
+  stdio_slipdev \
   stdio_uart \
   stdio_udp \
   stdio_telnet \
@@ -101,7 +101,7 @@ endif
 
 # enable stdout buffering for modules that benefit from sending out buffers in larger chunks
 ifneq (,$(filter picolibc,$(USEMODULE)))
-  ifneq (,$(filter stdio_cdc_acm stdio_ethos slipdev_stdio stdio_semihosting stdio_tinyusb_cdc_acm,$(USEMODULE)))
+  ifneq (,$(filter stdio_cdc_acm stdio_ethos stdio_slipdev stdio_semihosting stdio_tinyusb_cdc_acm,$(USEMODULE)))
     USEMODULE += picolibc_stdout_buffered
   endif
 endif

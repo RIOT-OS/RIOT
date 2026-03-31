@@ -8,7 +8,7 @@ ifneq (,$(filter slipdev_net,$(USEMODULE)))
   USEMODULE += netdev_register
 endif
 
-ifneq (,$(filter slipdev_stdio,$(USEMODULE)))
+ifneq (,$(filter stdio_slipdev,$(USEMODULE)))
   USEMODULE += isrpipe
 endif
 
@@ -18,4 +18,8 @@ ifneq (,$(filter slipdev_config,$(USEMODULE)))
   USEMODULE += gnrc_ipv6
   USEMODULE += nanocoap_sock
   USEMODULE += nanocoap_resources
+endif
+
+ifneq (,$(filter slipdev_stdio,$(USEMODULE)))
+  $(error The module slipdev_stdio got replaced by stdio_slipdev. It no longer pulls in slip networking. If you need slip networking add the module slipdev_net)
 endif
