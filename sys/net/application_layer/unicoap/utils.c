@@ -33,6 +33,11 @@ size_t unicoap_path_component_count(const unicoap_pathspec_t* path) {
         /* Root */
         return 0;
     }
+
+    /* Disallow first component to be NULL. For empty path (root), _components is supposed to
+     * be NULL. */
+    assert(path->_components[0]);
+
     for (const char** p = path->_components; *p; p += 1) {
         count += 1;
     }
@@ -41,10 +46,15 @@ size_t unicoap_path_component_count(const unicoap_pathspec_t* path) {
 
 void unicoap_path_print(const unicoap_pathspec_t* path) {
     assert(path);
-    if (!path->_components || !*path->_components) {
+    if (!path->_components) {
         printf("/");
         return;
     }
+
+    /* Disallow first component to be NULL. For empty path (root), _components is supposed to
+     * be NULL. */
+    assert(path->_components[0]);
+
     for (const char** p = path->_components; *p; p += 1) {
         printf("/%s", *p);
     }
@@ -54,10 +64,15 @@ ssize_t unicoap_path_serialize(const unicoap_pathspec_t* path, char* buffer, siz
     if (capacity == 0) {
         return -ENOBUFS;
     }
-    if (!path->_components || !*path->_components) {
+    if (!path->_components) {
         *buffer = '/';
         return 1;
     }
+
+    /* Disallow first component to be NULL. For empty path (root), _components is supposed to
+     * be NULL. */
+    assert(path->_components[0]);
+
     size_t og_capacity = capacity;
     for (const char** component = path->_components; *component; component += 1) {
         size_t length = strlen(*component);
@@ -79,8 +94,8 @@ bool unicoap_path_is_equal(const unicoap_pathspec_t* lhs, const unicoap_pathspec
     assert(rhs);
 
     /* If one is a root path, the other must be, too. */
-    if ((!lhs->_components && (!rhs->_components || !*rhs->_components)) ||
-        (!rhs->_components && (!lhs->_components || !*lhs->_components))) {
+    if ((!lhs->_components && !rhs->_components) ||
+        (!rhs->_components && !lhs->_components)) {
         return true;
     }
     /* If just one of them is a root path, they cannot be equal. */
@@ -129,6 +144,10 @@ bool unicoap_path_matches_string(const unicoap_pathspec_t* path,
     char* cursor = (char*)string;
 
     if (path->_components) {
+        /* Disallow first component to be NULL. For empty path (root), _components is supposed to
+         * be NULL. */
+        assert(path->_components[0]);
+
         for (const char** component = path->_components; *component; component += 1) {
             size_t path_component_length = strlen(*component);
 
@@ -195,6 +214,10 @@ bool unicoap_path_matches_options(const unicoap_pathspec_t* path,
     const char* uri_component = NULL;
 
     if (path->_components) {
+        /* Disallow first component to be NULL. For empty path (root), _components is supposed to
+         * be NULL. */
+        assert(path->_components[0]);
+
         for (const char** component = path->_components; *component; component += 1) {
             size_t path_component_length = strlen(*component);
 

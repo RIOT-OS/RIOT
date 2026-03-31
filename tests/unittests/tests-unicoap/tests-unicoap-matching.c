@@ -224,10 +224,6 @@ static void test_path_object(void) {
 
     const unicoap_pathspec_t my_root = UNICOAP_PATH_ROOT;
     TEST_ASSERT_EQUAL_INT(my_root._components, NULL);
-
-    const unicoap_pathspec_t my_root2 = UNICOAP_PATH(NULL);
-    const char* my_root2_layout[] = { NULL };
-    TEST_ASSERT_EQUAL_INT(memcmp(my_root2._components, my_root2_layout, sizeof(my_root2_layout)), 0);
 }
 
 static void test_path_object_is_root(void) {
@@ -236,9 +232,6 @@ static void test_path_object_is_root(void) {
 
     const unicoap_pathspec_t my_root = UNICOAP_PATH_ROOT;
     _TEST_ASSERT_TRUE(unicoap_path_is_root(&my_root));
-
-    const unicoap_pathspec_t my_root2 = UNICOAP_PATH(NULL);
-    _TEST_ASSERT_TRUE(unicoap_path_is_root(&my_root2));
 
     const unicoap_pathspec_t my_path2 = UNICOAP_PATH("foo", "bar", "zoo");
     _TEST_ASSERT_FALSE(unicoap_path_is_root(&my_path2));
@@ -251,29 +244,18 @@ static void test_path_object_component_count(void) {
     const unicoap_pathspec_t my_root = UNICOAP_PATH_ROOT;
     TEST_ASSERT_EQUAL_INT(unicoap_path_component_count(&my_root), 0);
 
-    const unicoap_pathspec_t my_root2 = UNICOAP_PATH(NULL);
-    TEST_ASSERT_EQUAL_INT(unicoap_path_component_count(&my_root2), 0);
-
     const unicoap_pathspec_t my_path2 = UNICOAP_PATH("foo", "bar", "zoo");
     TEST_ASSERT_EQUAL_INT(unicoap_path_component_count(&my_path2), 3);
 }
 
 static void test_path_object_root_is_equal(void) {
     _TEST_ASSERT_TRUE(path_is_equal(UNICOAP_PATH_ROOT, UNICOAP_PATH_ROOT));
-    _TEST_ASSERT_TRUE(path_is_equal(UNICOAP_PATH_ROOT, UNICOAP_PATH(NULL)));
-    _TEST_ASSERT_TRUE(path_is_equal(UNICOAP_PATH_ROOT, UNICOAP_PATH(NULL, "a")));
-    _TEST_ASSERT_TRUE(path_is_equal(UNICOAP_PATH(NULL), UNICOAP_PATH_ROOT));
-    _TEST_ASSERT_TRUE(path_is_equal(UNICOAP_PATH(NULL, "a"), UNICOAP_PATH_ROOT));
-    _TEST_ASSERT_TRUE(path_is_equal(UNICOAP_PATH(NULL), UNICOAP_PATH(NULL)));
-    _TEST_ASSERT_TRUE(path_is_equal(UNICOAP_PATH(NULL, "x"), UNICOAP_PATH(NULL, "a")));
     _TEST_ASSERT_FALSE(path_is_equal(UNICOAP_PATH_ROOT, UNICOAP_PATH("a")));
-    _TEST_ASSERT_FALSE(path_is_equal(UNICOAP_PATH(NULL), UNICOAP_PATH("a")));
 }
 
-static void test_path_object_subtree_is_equal(void) {
+static void test_path_object_longer_is_equal(void) {
     _TEST_ASSERT_TRUE(path_is_equal(UNICOAP_PATH("a"), UNICOAP_PATH("a")));
     _TEST_ASSERT_FALSE(path_is_equal(UNICOAP_PATH("a"), UNICOAP_PATH("a", "b")));
-    _TEST_ASSERT_FALSE(path_is_equal(UNICOAP_PATH("a", NULL), UNICOAP_PATH("a", "b")));
     _TEST_ASSERT_FALSE(path_is_equal(UNICOAP_PATH("a", "c"), UNICOAP_PATH("a", "b")));
     _TEST_ASSERT_TRUE(path_is_equal(UNICOAP_PATH("a", "b"), UNICOAP_PATH("a", "b")));
     _TEST_ASSERT_FALSE(path_is_equal(UNICOAP_PATH("a", "b", "c"), UNICOAP_PATH("a", "b")));
@@ -301,7 +283,7 @@ Test* tests_unicoap_matching(void)
         new_TestFixture(test_path_object_is_root),
         new_TestFixture(test_path_object_component_count),
         new_TestFixture(test_path_object_root_is_equal),
-        new_TestFixture(test_path_object_subtree_is_equal),
+        new_TestFixture(test_path_object_longer_is_equal),
     };
 
     EMB_UNIT_TESTCALLER(test_unicoap, NULL, NULL, fixtures);

@@ -84,6 +84,20 @@
  */
 #define UNICOAP_BITFIELD(...) __unicoap_create_bitfield(__VA_ARGS__,,,,,,,,,,,,,,,) 0
 
+#ifndef DOXYGEN
+#  if defined(__has_extension)
+#    if __has_extension(c_generic_selection_with_controlling_type)
+#      define _UNICOAP_GENERIC_CONTROLLING_TYPE_AVAILABLE 1
+#    endif
+#  endif
+
+#  if !defined(_UNICOAP_GENERIC_CONTROLLING_TYPE_AVAILABLE) \
+    && defined(__GNUC__) \
+    && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 9))
+#    define _UNICOAP_GENERIC_CONTROLLING_TYPE_AVAILABLE 1
+#  endif
+#endif
+
 /* unicoap_job_t wraps event_t so that changing the internal event loop to something else later
  * won't induce a source-breaking change. Hence, an initializer is required to hide that complexity.
  * To allow compile-time initialization, we use a UNICOAP_JOB macro. A static inline function
@@ -96,26 +110,59 @@
  * function pointer, we had to come up with a macro that typechecks the argument to detect
  * mismatches in the function pointer type. This is what the following macro does.
  *
- * It uses __builtin_choose_expr as a compile-time ternary expression and
- * __builtin_types_compatible_p to verify that the given argument really matches the expected
- * type. What is not possible, however, is diagnosing the error.
- * FIXME: _UNICOAP_TRY_TYPECHECK_JOB_FUNC: Emit diagnostic in case of type mismatch.
+ * It uses _Generic as a compile-time switch expression to verify that the given argument really
+ * matches the expected type.
  *
+ * We may, in the future, also allow void (*)(event_t*) as job function type, which is as simple
+ * as adding another controlling type case to _Generic in _UNICOAP_TRY_TYPECHECK_JOB_FUNC.
  */
 #ifndef DOXYGEN
-#  if defined(__has_builtin)
-#    if __has_builtin(__builtin_types_compatible_p) && __has_builtin(__builtin_choose_expr)
-#      define _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) \
-          __builtin_choose_expr( \
-              __builtin_types_compatible_p(__typeof__(void (unicoap_job_t* job)), __typeof__(func)), \
-                  (void (*)(event_t*))func, \
-              ((void)0)/* unicoap_job func has incompatible type, must be void (unicoap_job_t* job) */)
-#    endif
-#  endif
-
-#  if !defined(_UNICOAP_TRY_TYPECHECK_JOB_FUNC)
+#  if defined(_UNICOAP_GENERIC_CONTROLLING_TYPE_AVAILABLE)
+#    define _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) _Generic((func), \
+        void (*)(unicoap_job_t*): (void (*)(event_t*))func \
+     )
+#  else
 #    define _UNICOAP_TRY_TYPECHECK_JOB_FUNC(func) (void (*)(event_t*))func
 #  endif
+#endif
+
+#ifndef DOXYGEN
+/* Here we check every every path component passed to UNICOAP_PATH for its type and if it's NULL.
+ * We use _Generic as that built-in maps NULL to void*, which is a type we can just not
+ * support as the controlling type in _Generic. We do however support char* and const char*.
+ */
+/* The placeholder type used as to fill the list of components to 16  */
+struct __unicoap_placeholder_type { int _dummy; };
+#  define __UNICOAP_PLACEHOLDER (struct __unicoap_placeholder_type){ 0 }
+
+/** @brief Applies @p _f to all of the 16 arguments and returns comma-separated */
+#  define __unicoap_map_list_16( \
+      _f, \
+      _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, \
+      ... \
+  ) \
+    _f(_1), _f(_2), _f(_3), _f(_4), _f(_5), _f(_6), _f(_7), _f(_8), _f(_9), _f(_10), \
+    _f(_11), _f(_12), _f(_13), _f(_14), _f(_15), _f(_16)
+
+#  if defined(_UNICOAP_GENERIC_CONTROLLING_TYPE_AVAILABLE)
+#    define __UNICOAP_CHECK_PATH_COMPONENT(x) _Generic((x), \
+        char *: (void)0, \
+        const char *: (void)0, \
+        struct __unicoap_placeholder_type: (void)0 \
+     )
+#  else
+#    define __UNICOAP_CHECK_PATH_COMPONENT(x) (void)0
+#  endif
+
+#  define _UNICOAP_TRY_CHECK_PATH_COMPONENTS(...) ((void)( \
+    __unicoap_map_list_16( \
+        __UNICOAP_CHECK_PATH_COMPONENT, __VA_ARGS__, \
+        __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER,\
+        __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER,\
+        __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER,\
+        __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER, __UNICOAP_PLACEHOLDER \
+    )) \
+)
 #endif
 
 #ifdef __cplusplus
