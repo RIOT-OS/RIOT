@@ -8,7 +8,8 @@ from aiocoap import CON, NON, GET, PUT, POST, DELETE, PATCH, iPATCH, FETCH, Cont
 import aiocoap.resource as resource
 from aiocoap.transports.tinydtls import DTLSClientConnection
 
-logging.basicConfig(level=logging.DEBUG)
+# For debug logging, uncomment this line
+# logging.basicConfig(level=logging.DEBUG)
 
 import sys
 from pathlib import Path
