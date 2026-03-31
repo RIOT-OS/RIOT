@@ -74,7 +74,7 @@ For example, consider a resource `/gelato/flavours/menu`. This path would be wri
 as `UNICOAP_PATH("gelato", "flavours", "menu")` using @ref UNICOAP_PATH. Never include a slash
 within one path component, i.e., never specify `UNICOAP_PATH("gelato/flavours", "menu")`.
 Requiring you to specify each path component (`gelato`, `flavour`, and `menu`) separately
-alleviates the need to parse the otherwise necessary string at runtime. 
+alleviates the need to parse the otherwise necessary string at runtime.
 
 Next, we must specify what CoAP methods (akin to HTTP methods) we want to allow. Therefore, we list
 all methods permitted as parameters to the @ref UNICOAP_METHODS macro. You cannot leave
@@ -283,7 +283,7 @@ Through `.iol_next = &suffix`, we chain the suffix behind the middle part and us
 `list.iol_next = &name_chunk` appends this chain of two chunks to the first chunk. Our vector is
 done and we can finally send the response after having set the status and message payload. unicoap
 supports multiple slightly different ways to use the API to respond to reduce boilerplate.
-Find an extended explanation in @ref net_unicoap_server. 
+Find an extended explanation in @ref net_unicoap_server.
 
 ```c
 unicoap_message_payload_set_chunks(message, &list);
