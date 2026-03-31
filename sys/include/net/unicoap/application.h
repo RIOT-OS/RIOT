@@ -311,6 +311,9 @@ bool unicoap_response_is_optional(unicoap_options_t* options, unicoap_status_t s
  * @param[in,out] context Request context to respond in
  *
  * This function's return value can be used as a return value in @ref unicoap_request_handler_t.
+ * If this function fails, you may retry or send another response instead. You can call
+ * this method in the given context for as long as it keeps failing. Once it succeeds,
+ * the context is consumed and is longer eligible for further `send_response` calls.
  *
  * @retval Zero on success.
  * @retval Negative integer on error

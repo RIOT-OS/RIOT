@@ -128,7 +128,8 @@ There are multiple techniques for responding.
   Please be aware any processing performed inside this handler is executed in the server's
   processing loop and will thus block it. Given an expensive operation, we encourage you to switch
   to the third technique. Nevertheless, this should be the preferred response technique for most
-  applications.
+  applications. @ref unicoap_send_response can fail, and you are responsible for handling that
+  error. You may retry to send it, or to send an Internal Server Error or similar codes instead.
 
    ```c
    int my_request_handler(
