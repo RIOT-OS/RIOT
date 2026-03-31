@@ -1,12 +1,9 @@
 /*
- * Copyright (C) 2013 INRIA
- *               2015 Kaspar Schleiser <kaspar@schleiser.de>
- *               2016 Eistec AB
- *               2018-21 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2013 INRIA
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2016 Eistec AB
+ * SPDX-FileCopyrightText: 2018-21 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
