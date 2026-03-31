@@ -153,6 +153,12 @@ bool unicoap_path_matches_options(const unicoap_pathspec_t* path,
  * If `false`, both @p path and @p string must have exactly the same number of path components.
  *
  * This function ignores trailing slashes in @p string
+ *
+ * @remark The only thing the path object is used for, and in the foreseeable future will be,
+ * is the resource definition. And in that context, the path is interpreted to be relative
+ * to the root. Consequently, it's fine to allow both `"a"` and `"/a"` to match `UNICOAP_PATH("a")`.
+ * Furthermore, this a resource matching function, so that context /interpretation is baked into
+ * the API.
  */
 bool unicoap_path_matches_string(const unicoap_pathspec_t* path,
                                  const char* string, size_t string_length, bool match_subtree);
@@ -674,6 +680,12 @@ int unicoap_listener_deregister(unicoap_listener_t* listener);
  *
  * @note Multiple consecutive slashes are treated as one.
  * https://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap03.html#tag_03_266
+ *
+ * @remark The only thing the path object is used for, and in the foreseeable future will be,
+ * is the resource definition. And in that context, the path is interpreted to be relative
+ * to the root. Consequently, it's fine to allow both `"a"` and `"/a"` to match `UNICOAP_PATH("a")`.
+ * Furthermore, this a resource matching function, so that context /interpretation is baked into
+ * the API.
  *
  * @returns A boolean value indicating whether the specified path matches the resource definition.
  */
