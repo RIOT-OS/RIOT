@@ -485,12 +485,14 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
         case 0:
             *resource_ptr = resource;
             *listener_ptr = listener;
-            _SERVER_DEBUG("<");
+
             if (IS_ACTIVE(ENABLE_DEBUG)) {
+                _SERVER_DEBUG("<");
                 unicoap_path_print(&resource->path);
+                DEBUG("%s>: found\n",
+                     (*resource_ptr)->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE ? "/**" : "");
             }
-            DEBUG("%s>: found\n",
-                 (*resource_ptr)->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE ? "/**" : "");
+
             return 0;
         default:
             _SERVER_DEBUG("error: resource matcher failed\n");
