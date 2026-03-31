@@ -1,26 +1,25 @@
 #!/usr/bin/env python3
-
-import logging
 import asyncio
 import sys
-from pathlib import Path
-LOG_PREFIX = Path(__file__).name
-
-# For debug logging, uncomment this line
-# logging.basicConfig(level=logging.DEBUG)
-
 from argparse import ArgumentParser
+from pathlib import Path
 from aiocoap import CON, NON, GET, PUT, POST, DELETE, PATCH, iPATCH, FETCH, Context, Message
 import aiocoap.resource as resource
-from aiocoap.transports.tinydtls import DTLSClientConnection
 
+LOG_PREFIX = Path(__file__).name
+
+# For debug logging, uncomment these lines
+# import logging
+# logging.basicConfig(level=logging.DEBUG)
 
 
 def tell(message):
     print(f"{LOG_PREFIX}: {message}")
 
+
 def complain(message):
     print(f"{LOG_PREFIX}: error: {message}", file=sys.stderr)
+
 
 print(
     "usage: {}".format(Path(__file__).name) +
