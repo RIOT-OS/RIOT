@@ -1,6 +1,4 @@
-@defgroup    sys_runtime_config    Runtime config
-@ingroup     sys
-@brief       Runtime config module for handling runtime configurations
+@addtogroup  sys_runtime_config    Runtime config
 
 @warning This implementation is not complete and not yet thoroughly tested.
          Please do not use this module in production, as it may introduce security issues.

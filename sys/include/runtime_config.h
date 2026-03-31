@@ -7,8 +7,8 @@
 #pragma once
 
 /**
- * @defgroup    sys_runtime_config_core Runtime config core
- * @ingroup     sys_runtime_config
+ * @defgroup    sys_runtime_config Runtime config
+ * @ingroup     sys
  * @brief       Runtime config module for handling configurations at runtime
  * @{
  *
