@@ -234,14 +234,6 @@ int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
         }
     }
 
-    // todo: not needed, already done in _dtls_authenticate, or session is already established?!
-    // /* prepare session */
-    // sock_dtls_session_set_udp_ep(session, remote);
-    // dsm_state_t session_state = dsm_store(&_dtls_socket, session, SESSION_STATE_HANDSHAKE, true);
-    // if (session_state == NO_SPACE) {
-    //     return -1;
-    // }
-
     _DTLS_DEBUG("started sending\n");
 
     if (unlikely(local)) {
