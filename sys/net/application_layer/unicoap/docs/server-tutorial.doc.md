@@ -70,6 +70,12 @@ UNICOAP_RESOURCE(hello) {
 };
 ```
 
+For example, consider a resource `/gelato/flavours/menu`. This path would be written
+as `UNICOAP_PATH("gelato", "flavours", "menu")` using @ref UNICOAP_PATH. Never include a slash
+within one path component, i.e., never specify `UNICOAP_PATH("gelato/flavours", "menu")`.
+Requiring you to specify each path component (`gelato`, `flavour`, and `menu`) separately
+alleviates the need to parse the otherwise necessary string at runtime. 
+
 Next, we must specify what CoAP methods (akin to HTTP methods) we want to allow. Therefore, we list
 all methods permitted as parameters to the @ref UNICOAP_METHODS macro. You cannot leave
 @ref unicoap_resource_t.methods empty. If you later send a request that does not match the set of
