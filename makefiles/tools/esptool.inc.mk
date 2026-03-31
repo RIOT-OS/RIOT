@@ -1,6 +1,10 @@
-ESPTOOL_VERSION = 5.0.0
-ESPTOOL_VENV = $(RIOTTOOLS)/esptools/venv
+ifeq (1,$(INSIDE_DOCKER))
+  ESPTOOL_VENV = $(RIOTTOOLS)/esptools/venv_docker
+else
+  ESPTOOL_VENV = $(RIOTTOOLS)/esptools/venv
+endif
 ESPTOOL = $(ESPTOOL_VENV)/bin/esptool
+ESPTOOL_VERSION = 5.0.0
 
 # ESP-IDF uses dio as flash mode for esptool.py when qout or qio mode are
 # configured to always boot in dual SPI mode
