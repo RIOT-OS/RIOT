@@ -128,7 +128,7 @@ static void _test_long_with_string(bool match_subtree) {
     /*
     char test_buffer[20] = {};
 
-    ssize_t res = unicoap_path_serialize(&r.path, test_buffer, sizeof(test_buffer));
+    ssize_t res = unicoap_path_stringify(&r.path, test_buffer, sizeof(test_buffer));
     TEST_ASSERT_EQUAL_INT(res, static_strlen("/a123/a567"));
     printf("'%.*s'\n", (int)res, test_buffer);
 

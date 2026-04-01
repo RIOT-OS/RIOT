@@ -236,7 +236,7 @@ void unicoap_listener_register(unicoap_listener_t* listener)
             if (!listener->resources[i].methods) {
                 char path[CONFIG_UNIOCOAP_PATH_LENGTH_MAX];
                 ssize_t length =
-                    unicoap_path_serialize(&listener->resources[i].path, path, sizeof(path));
+                    unicoap_path_stringify(&listener->resources[i].path, path, sizeof(path));
                 if (length < 0) {
                     continue;
                 }

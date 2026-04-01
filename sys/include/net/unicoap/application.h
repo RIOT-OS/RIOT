@@ -182,7 +182,7 @@ bool unicoap_path_matches_string(const unicoap_pathspec_t* path,
  * error number
  * @retval `-ENOBUFS` if buffer lacks capacity to store path
  */
-ssize_t unicoap_path_serialize(const unicoap_pathspec_t* path, char* buffer, size_t capacity);
+ssize_t unicoap_path_stringify(const unicoap_pathspec_t* path, char* buffer, size_t capacity);
 
 /**
  * @brief Prints given path object as serialized path

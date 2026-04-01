@@ -60,7 +60,7 @@ void unicoap_path_print(const unicoap_pathspec_t* path) {
     }
 }
 
-ssize_t unicoap_path_serialize(const unicoap_pathspec_t* path, char* buffer, size_t capacity) {
+ssize_t unicoap_path_stringify(const unicoap_pathspec_t* path, char* buffer, size_t capacity) {
     if (capacity == 0) {
         return -ENOBUFS;
     }
