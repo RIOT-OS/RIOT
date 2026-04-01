@@ -36,18 +36,20 @@
 #define CST816S_YMAX    240
 #endif
 
-uint16_t _cst816s_height(const touch_dev_t *touch_dev)
+static uint16_t _cst816s_height(const touch_dev_t *touch_dev)
 {
     const cst816s_t *dev = (const cst816s_t *)touch_dev;
+
     assert(dev);
     (void)dev;  /* avoid compilation problems with NDEBUG */
 
     return CST816S_YMAX;
 }
 
-uint16_t _cst816s_width(const touch_dev_t *touch_dev)
+static uint16_t _cst816s_width(const touch_dev_t *touch_dev)
 {
     const cst816s_t *dev = (const cst816s_t *)touch_dev;
+
     assert(dev);
     (void)dev;  /* avoid compilation problems with NDEBUG */
 
@@ -62,22 +64,27 @@ uint8_t _cst816s_touches(const touch_dev_t *touch_dev, touch_t *touches, size_t 
     assert(dev);
 
     cst816s_touch_data_t data;
-    cst816s_read(dev, &data);
-    uint8_t ret = (data.action == CST816S_TOUCH_DOWN);
+    if (cst816s_read(dev, &data) < 0) {
+        return 0;   /* No data from device, assume no touch points */
+    }
+    if (!data.valid) {
+        return 0;
+    }
 
-    if (ret && touches != NULL) {
+    if (touches != NULL) {
         touches[0].x = data.x;
         touches[0].y = data.y;
 
         DEBUG("X: %i, Y: %i\n", touches[0].x, touches[0].y);
     }
 
-    return ret;
+    return data.valid;
 }
 
 void _cst816s_set_event_callback(const touch_dev_t *touch_dev, touch_event_cb_t cb, void *arg)
 {
     cst816s_t *dev = (cst816s_t *)touch_dev;
+
     assert(dev);
 
     dev->cb = (cst816s_irq_cb_t)cb;
@@ -85,8 +92,8 @@ void _cst816s_set_event_callback(const touch_dev_t *touch_dev, touch_event_cb_t 
 }
 
 const touch_dev_driver_t cst816s_touch_dev_driver = {
-    .height     = _cst816s_height,
-    .width      = _cst816s_width,
-    .touches    = _cst816s_touches,
+    .height = _cst816s_height,
+    .width = _cst816s_width,
+    .touches = _cst816s_touches,
     .set_event_callback = _cst816s_set_event_callback,
 };

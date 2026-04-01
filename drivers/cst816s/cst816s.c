@@ -27,19 +27,20 @@
 #include "debug.h"
 
 const char *cst816s_gesture_str[] = {
-    [CST816S_GESTURE_NONE]         = "none",
-    [CST816S_GESTURE_SLIDE_DOWN]   = "slide down",
-    [CST816S_GESTURE_SLIDE_UP]     = "slide up",
-    [CST816S_GESTURE_SLIDE_LEFT]   = "slide left",
-    [CST816S_GESTURE_SLIDE_RIGHT]  = "slide right",
+    [CST816S_GESTURE_NONE] = "none",
+    [CST816S_GESTURE_SLIDE_DOWN] = "slide down",
+    [CST816S_GESTURE_SLIDE_UP] = "slide up",
+    [CST816S_GESTURE_SLIDE_LEFT] = "slide left",
+    [CST816S_GESTURE_SLIDE_RIGHT] = "slide right",
     [CST816S_GESTURE_SINGLE_CLICK] = "single click",
     [CST816S_GESTURE_DOUBLE_CLICK] = "double click",
-    [CST816S_GESTURE_LONG_PRESS]   = "long press",
+    [CST816S_GESTURE_LONG_PRESS] = "long press",
 };
 
 static void _gpio_irq(void *arg)
 {
     cst816s_t *dev = arg;
+
     assert(dev);
 
     if (dev->cb) {
@@ -70,10 +71,11 @@ int cst816s_read(const cst816s_t *dev, cst816s_touch_data_t *data)
         return res;
     }
 
-    data->gesture = buf[1];
-    data->action = buf[3] >> 6;
-    data->x = ((buf[3] & 0x0f) << 8) | buf[4];
-    data->y = ((buf[5] & 0x0f) << 8) | buf[6];
+    data->gesture = buf[1];                         /* Gesture ID */
+    data->valid = buf[2] > 0;                       /* Number of touch points */
+    data->action = buf[3] >> 6;                     /* Current touch event */
+    data->x = ((buf[3] & 0x0f) << 8) | buf[4];      /* X coordinate */
+    data->y = ((buf[5] & 0x0f) << 8) | buf[6];      /* Y coordinate */
 
     return 0;
 }
@@ -91,7 +93,7 @@ int cst816s_init(cst816s_t *dev, const cst816s_params_t *params,
         _cst816s_reset(dev);
     }
 
-    if (gpio_is_valid(dev->params->irq) && cb) {
+    if (gpio_is_valid(dev->params->irq)) {
         if (gpio_init_int(dev->params->irq, GPIO_IN,
                           dev->params->irq_flank,
                           _gpio_irq, dev) < 0) {
