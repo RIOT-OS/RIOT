@@ -22,12 +22,14 @@
 extern "C" {
 #endif
 
+#include "errno.h"
+
 /**
  * @brief Runtime configuration module specific error codes.
  */
 typedef enum {
     RUNTIME_CONFIG_ERROR_NONE = 0,
-    RUNTIME_CONFIG_ERROR_INVALID_ARGUMENT,
+    RUNTIME_CONFIG_ERROR_INVALID_ARGUMENT = EINVAL,
     RUNTIME_CONFIG_ERROR_NAMESPACE_NOT_FOUND,
     RUNTIME_CONFIG_ERROR_SCHEMA_NOT_FOUND,
     RUNTIME_CONFIG_ERROR_INSTANCE_NOT_FOUND,
