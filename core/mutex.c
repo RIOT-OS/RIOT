@@ -109,7 +109,7 @@ bool mutex_lock_internal(mutex_t *mutex, bool block)
 #if IS_USED(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE) \
         || IS_USED(MODULE_CORE_MUTEX_DEBUG)
         thread_t *me = thread_get_active();
-        mutex->owner = me->pid;
+        mutex->owner = me ? me->pid : KERNEL_PID_UNDEF;
 #endif
 #if IS_USED(MODULE_CORE_MUTEX_DEBUG)
         mutex->owner_calling_pc = pc;
