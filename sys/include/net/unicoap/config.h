@@ -398,7 +398,12 @@ static_assert(CONFIG_UNICOAP_RETRANSMISSIONS_MAX < 32,
 
 /* MARK: - DTLS */
 /**
- * @name DTLS
+ * @addtogroup net_unicoap_drivers_dtls
+ *
+ * @{
+ * */
+/**
+ * @name Session establishment
  * @{
  */
 /**
@@ -430,6 +435,7 @@ static_assert(CONFIG_UNICOAP_RETRANSMISSIONS_MAX < 32,
 #if !defined(CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS (15 * MS_PER_SEC)
 #endif
+/** @} */
 /** @} */
 
 /* MARK: - Stack sizes */
