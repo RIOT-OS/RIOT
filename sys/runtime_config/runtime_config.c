@@ -210,20 +210,15 @@ static runtime_config_error_t _runtime_config_export_group(
 
     /* export all children of the given configuration group
      * if available and within tree_traversal_depth bounds */
-    if (tree_traversal_depth == 1) {
+    if (tree_traversal_depth == RUNTIME_CONFIG_EXPORT_SELF) {
         return RUNTIME_CONFIG_ERROR_NONE;
     }
     else {
-        uint8_t new_tree_traversal_depth = tree_traversal_depth;
-        if (tree_traversal_depth > 1) {
-            new_tree_traversal_depth--;
-        }
-
         /* group */
         for (size_t i = 0; i < group->groups_len; i++) {
             rc = _runtime_config_export_group(
                 instance, group->groups[i], export_cb,
-                new_tree_traversal_depth, context);
+                tree_traversal_depth - 1, context);
 
             if (rc != RUNTIME_CONFIG_ERROR_NONE) {
                 return rc;
@@ -261,20 +256,15 @@ static runtime_config_error_t _runtime_config_export_schema_instance(
 
     /* export all groups or parameters of the given configuration schema instance
      * if available and within tree_traversal_depth bounds */
-    if (tree_traversal_depth == 1) {
+    if (tree_traversal_depth == RUNTIME_CONFIG_EXPORT_SELF) {
         return RUNTIME_CONFIG_ERROR_NONE;
     }
     else {
-        uint8_t new_tree_traversal_depth = tree_traversal_depth;
-        if (tree_traversal_depth > 1) {
-            new_tree_traversal_depth--;
-        }
-
         /* groups */
         for (size_t i = 0; i < instance->schema->groups_len; i++) {
             rc = _runtime_config_export_group(
                 instance, instance->schema->groups[i], export_cb,
-                new_tree_traversal_depth, context);
+                tree_traversal_depth - 1, context);
 
             if (!(rc == RUNTIME_CONFIG_ERROR_NONE)) {
                 return rc;
@@ -312,15 +302,10 @@ static runtime_config_error_t _runtime_config_export_schema(
 
     /* export all instances of the given configuration schema
      * if available and within tree_traversal_depth bounds */
-    if (tree_traversal_depth == 1) {
+    if (tree_traversal_depth == RUNTIME_CONFIG_EXPORT_SELF) {
         return RUNTIME_CONFIG_ERROR_NONE;
     }
     else {
-        uint8_t new_tree_traversal_depth = tree_traversal_depth;
-        if (tree_traversal_depth > 1) {
-            new_tree_traversal_depth--;
-        }
-
         clist_node_t *node = schema->instances.next;
 
         if (!node) {
@@ -335,7 +320,7 @@ static runtime_config_error_t _runtime_config_export_schema(
                 return -RUNTIME_CONFIG_ERROR_SCHEMA_HAS_NO_INSTANCE;
             }
 
-            rc = _runtime_config_export_schema_instance(instance, export_cb, new_tree_traversal_depth, context);
+            rc = _runtime_config_export_schema_instance(instance, export_cb, tree_traversal_depth - 1, context);
 
             if (!(rc == RUNTIME_CONFIG_ERROR_NONE)) {
                 return rc;
@@ -363,20 +348,15 @@ static runtime_config_error_t _runtime_config_export_namespace(
 
     /* export all configuration schemas of the given namespace
      * if available and within tree_traversal_depth bounds */
-    if (tree_traversal_depth == 1) {
+    if (tree_traversal_depth == RUNTIME_CONFIG_EXPORT_SELF) {
         return RUNTIME_CONFIG_ERROR_NONE;
     }
     else {
-        uint8_t new_tree_traversal_depth = tree_traversal_depth;
-        if (tree_traversal_depth > 1) {
-            new_tree_traversal_depth--;
-        }
-
         for (size_t i = 0; i < namespace->schemas_len; i++) {
             const runtime_config_schema_t *child = namespace->schemas[i];
 
             rc = _runtime_config_export_schema(
-                child, export_cb, new_tree_traversal_depth, context);
+                child, export_cb, tree_traversal_depth - 1, context);
 
             if (!(rc == RUNTIME_CONFIG_ERROR_NONE)) {
                 return rc;
@@ -398,7 +378,7 @@ runtime_config_error_t runtime_config_export(
     if (node == NULL) {
         /* don't export anything if tree_traversal depth is 1,
          * because 1 means only export exact match and that would be NULL */
-        if (tree_traversal_depth == 1) {
+        if (tree_traversal_depth == RUNTIME_CONFIG_EXPORT_SELF) {
             return RUNTIME_CONFIG_ERROR_NONE;
         }
         /* export all namespaces */
