@@ -62,12 +62,12 @@ static void _get_parameter_value_from_instance(
 /* Schema parameters */
 const runtime_config_parameter_t runtime_config_sys_rgb_led_red = {
     .id = RUNTIME_CONFIG_SYS_RGB_LED_RED,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "red",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "The red component of the color",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_sys_rgb_led,
     .type = RUNTIME_CONFIG_TYPE_UINT8,
     .count = 1,
@@ -75,12 +75,12 @@ const runtime_config_parameter_t runtime_config_sys_rgb_led_red = {
 
 const runtime_config_parameter_t runtime_config_sys_rgb_led_green = {
     .id = RUNTIME_CONFIG_SYS_RGB_LED_GREEN,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "green",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "The green component of the color",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_sys_rgb_led,
     .type = RUNTIME_CONFIG_TYPE_UINT8,
     .count = 1,
@@ -88,12 +88,12 @@ const runtime_config_parameter_t runtime_config_sys_rgb_led_green = {
 
 const runtime_config_parameter_t runtime_config_sys_rgb_led_blue = {
     .id = RUNTIME_CONFIG_SYS_RGB_LED_BLUE,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "blue",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "The blue component of the color",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_sys_rgb_led,
     .type = RUNTIME_CONFIG_TYPE_UINT8,
     .count = 1,
@@ -102,12 +102,12 @@ const runtime_config_parameter_t runtime_config_sys_rgb_led_blue = {
 /* Schema */
 runtime_config_schema_t runtime_config_sys_rgb_led = {
     .id = RUNTIME_CONFIG_SYS_RGB_LED,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "rgb_led",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "An RGB-LED",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .namespace = &runtime_config_sys,
     .get_parameter_value_from_instance = _get_parameter_value_from_instance,
     .groups = NULL,

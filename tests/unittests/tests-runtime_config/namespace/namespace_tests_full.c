@@ -110,12 +110,12 @@ static void _get_parameter_value_from_instance(
 /* Schema parameters */
 const runtime_config_parameter_t runtime_config_tests_full_bytes = {
     .id = RUNTIME_CONFIG_TESTS_FULL_BYTES,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "bytes",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_tests_full,
     .type = RUNTIME_CONFIG_TYPE_BYTES,
     .count = 1,
@@ -123,12 +123,12 @@ const runtime_config_parameter_t runtime_config_tests_full_bytes = {
 
 const runtime_config_parameter_t runtime_config_tests_full_string = {
     .id = RUNTIME_CONFIG_TESTS_FULL_STRING,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "string",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_tests_full,
     .type = RUNTIME_CONFIG_TYPE_STRING,
     .count = 1,
@@ -136,12 +136,12 @@ const runtime_config_parameter_t runtime_config_tests_full_string = {
 
 const runtime_config_parameter_t runtime_config_tests_full_boolean = {
     .id = RUNTIME_CONFIG_TESTS_FULL_BOOLEAN,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "boolean",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_tests_full,
     .type = RUNTIME_CONFIG_TYPE_BOOL,
     .count = 1,
@@ -149,12 +149,12 @@ const runtime_config_parameter_t runtime_config_tests_full_boolean = {
 
 const runtime_config_parameter_t runtime_config_tests_full_u8 = {
     .id = RUNTIME_CONFIG_TESTS_FULL_U8,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "u8",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_tests_full,
     .type = RUNTIME_CONFIG_TYPE_UINT8,
     .count = 1,
@@ -162,12 +162,12 @@ const runtime_config_parameter_t runtime_config_tests_full_u8 = {
 
 const runtime_config_parameter_t runtime_config_tests_full_u16 = {
     .id = RUNTIME_CONFIG_TESTS_FULL_U16,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "u16",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_tests_full,
     .type = RUNTIME_CONFIG_TYPE_UINT16,
     .count = 1,
@@ -175,12 +175,12 @@ const runtime_config_parameter_t runtime_config_tests_full_u16 = {
 
 const runtime_config_parameter_t runtime_config_tests_full_u32 = {
     .id = RUNTIME_CONFIG_TESTS_FULL_U32,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "u32",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_tests_full,
     .type = RUNTIME_CONFIG_TYPE_UINT32,
     .count = 1,
@@ -188,12 +188,12 @@ const runtime_config_parameter_t runtime_config_tests_full_u32 = {
 
 const runtime_config_parameter_t runtime_config_tests_full_u64 = {
     .id = RUNTIME_CONFIG_TESTS_FULL_U64,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "u64",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_tests_full,
     .type = RUNTIME_CONFIG_TYPE_UINT64,
     .count = 1,
@@ -201,12 +201,12 @@ const runtime_config_parameter_t runtime_config_tests_full_u64 = {
 
 const runtime_config_parameter_t runtime_config_tests_full_i8 = {
     .id = RUNTIME_CONFIG_TESTS_FULL_I8,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "i8",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_tests_full,
     .type = RUNTIME_CONFIG_TYPE_INT8,
     .count = 1,
@@ -214,12 +214,12 @@ const runtime_config_parameter_t runtime_config_tests_full_i8 = {
 
 const runtime_config_parameter_t runtime_config_tests_full_i16 = {
     .id = RUNTIME_CONFIG_TESTS_FULL_I16,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "i16",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_tests_full,
     .type = RUNTIME_CONFIG_TYPE_INT16,
     .count = 1,
@@ -227,12 +227,12 @@ const runtime_config_parameter_t runtime_config_tests_full_i16 = {
 
 const runtime_config_parameter_t runtime_config_tests_full_i32 = {
     .id = RUNTIME_CONFIG_TESTS_FULL_I32,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "i32",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_tests_full,
     .type = RUNTIME_CONFIG_TYPE_INT32,
     .count = 1,
@@ -240,12 +240,12 @@ const runtime_config_parameter_t runtime_config_tests_full_i32 = {
 
 const runtime_config_parameter_t runtime_config_tests_full_i64 = {
     .id = RUNTIME_CONFIG_TESTS_FULL_I64,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "i64",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_tests_full,
     .type = RUNTIME_CONFIG_TYPE_INT64,
     .count = 1,
@@ -253,12 +253,12 @@ const runtime_config_parameter_t runtime_config_tests_full_i64 = {
 
 const runtime_config_parameter_t runtime_config_tests_full_f32 = {
     .id = RUNTIME_CONFIG_TESTS_FULL_F32,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "f32",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_tests_full,
     .type = RUNTIME_CONFIG_TYPE_FLOAT32,
     .count = 1,
@@ -266,12 +266,12 @@ const runtime_config_parameter_t runtime_config_tests_full_f32 = {
 
 const runtime_config_parameter_t runtime_config_tests_full_f64 = {
     .id = RUNTIME_CONFIG_TESTS_FULL_F64,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "f64",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_tests_full,
     .type = RUNTIME_CONFIG_TYPE_FLOAT64,
     .count = 1,
@@ -280,12 +280,12 @@ const runtime_config_parameter_t runtime_config_tests_full_f64 = {
 /* Schema */
 runtime_config_schema_t runtime_config_tests_full = {
     .id = RUNTIME_CONFIG_TESTS_FULL,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "full",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .namespace = &runtime_config_tests,
     .get_parameter_value_from_instance = _get_parameter_value_from_instance,
     .groups = NULL,

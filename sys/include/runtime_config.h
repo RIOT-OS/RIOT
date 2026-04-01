@@ -28,22 +28,22 @@ extern "C" {
 #include "modules.h"
 #include "runtime_config/error.h"
 
-#ifndef RUNTIME_CONFIG_ENABLE_META_NAME
+#ifndef CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME
 /**
  * @brief Enables the "name" field inside the @p runtime_config_namespace_t,
  *        @p runtime_config_schema_t, @p runtime_config_schema_instance_t,
  *        @p runtime_config_parameter_t or @p runtime_config_group_t structs.
  */
-#  define RUNTIME_CONFIG_ENABLE_META_NAME 0
+#  define CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME 0
 #endif
 
-#ifndef RUNTIME_CONFIG_ENABLE_META_DESCRIPTION
+#ifndef CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION
 /**
  * @brief Enables the "description" field inside the @p runtime_config_namespace_t,
  *        @p runtime_config_schema_t, @p runtime_config_schema_instance_t,
  *        @p runtime_config_parameter_t or @p runtime_config_group_t structs.
  */
-#  define RUNTIME_CONFIG_ENABLE_META_DESCRIPTION 0
+#  define CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION 0
 #endif
 
 /**
@@ -275,15 +275,15 @@ struct runtime_config_schema_instance {
     /** ID of the instance within the scope of it's schema */
     runtime_config_schema_instance_id_t id;
 
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     /** String describing the instance. */
     const char *const name;
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
 
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     /** String describing the configuration group with more details. */
     const char *const description;
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
 
     /** Generated struct containing all configuration parameters of the schema.
      * Usually generated from schema YAML files using the "make runtime_config
@@ -311,14 +311,14 @@ struct runtime_config_group {
     /** Integer representing the ID of the configuration group. */
     const runtime_config_group_id_t id;
 
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     /** String describing the configuration group. */
     const char *const name;
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     /** String describing the configuration group with more details. */
     const char *const description;
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
 
     /** Configuration schema that the configuration group belongs to. */
     const runtime_config_schema_t *const schema;
@@ -346,15 +346,15 @@ struct runtime_config_parameter {
     /** Integer representing the ID of the configuration parameter. */
     const runtime_config_parameter_id_t id;
 
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     /** String describing the configuration parameter. */
     const char *const name;
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
 
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     /** String describing the configuration parameter with more details. */
     const char *const description;
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
 
     /** Configuration Schema that the configuration parameter belongs to. */
     const runtime_config_schema_t *const schema;
@@ -379,14 +379,14 @@ struct runtime_config_schema {
     /** Integer representing the ID of the schema. */
     const runtime_config_schema_id_t id;
 
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     /** String describing the schema. */
     const char *const name;
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     /** String describing the schema with more details. */
     const char *const description;
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
        /** Configuration Namespace that the Configuration Schema belongs to. */
     const runtime_config_namespace_t *const namespace;
 
@@ -441,15 +441,15 @@ struct runtime_config_namespace {
     /** Integer representing the ID of the namespace. */
     const runtime_config_namespace_id_t id;
 
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     /** String describing the configuration namespace. */
     const char *const name;
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
 
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     /** String describing the configuration namespace with more details. */
     const char *const description;
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
 
     /** Array of pointers to all the configuration schemas that belong to this namespace. */
     const runtime_config_schema_t **const schemas;

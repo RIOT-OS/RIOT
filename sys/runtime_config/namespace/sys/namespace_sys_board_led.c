@@ -52,12 +52,12 @@ static void _get_parameter_value_from_instance(
 /* Schema parameters */
 const runtime_config_parameter_t runtime_config_sys_board_led_enabled = {
     .id = RUNTIME_CONFIG_SYS_BOARD_LED_ENABLED,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "enabled",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "Whether the board LED is enabled",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schema = &runtime_config_sys_board_led,
     .type = RUNTIME_CONFIG_TYPE_BOOL,
     .count = 1,
@@ -66,12 +66,12 @@ const runtime_config_parameter_t runtime_config_sys_board_led_enabled = {
 /* Schema */
 runtime_config_schema_t runtime_config_sys_board_led = {
     .id = RUNTIME_CONFIG_SYS_BOARD_LED,
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "board_led",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "A board LED",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .namespace = &runtime_config_sys,
     .get_parameter_value_from_instance = _get_parameter_value_from_instance,
     .groups = NULL,

@@ -67,9 +67,9 @@ static runtime_config_tests_full_instance_t test_full_instance_1_data = {
 };
 
 static runtime_config_schema_instance_t test_full_instance_1 = {
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME)
     .name = "test-full-1",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
     .data = &test_full_instance_1_data,
     .apply_cb = &apply_cb,
 };

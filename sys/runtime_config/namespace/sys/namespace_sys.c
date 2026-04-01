@@ -40,12 +40,12 @@ static const runtime_config_schema_t *_schemas[] = {
 };
 
 runtime_config_namespace_t runtime_config_sys = {
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     .name = "sys",
-#endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
-#if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_NAME */
+#if IS_ACTIVE(CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
     .description = "Contains configurations exposed by RIOT modules",
-#endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
+#endif /* CONFIG_RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schemas = _schemas,
     .schemas_len = ARRAY_SIZE(_schemas),
 };
