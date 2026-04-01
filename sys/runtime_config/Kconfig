@@ -15,4 +15,7 @@ config RUNTIME_CONFIG_ENABLE_META_NAME
 config RUNTIME_CONFIG_ENABLE_META_DESCRIPTION
     bool "Include description string in schemas"
 
+config RUNTIME_CONFIG_UTIL_FORMAT_FLOAT_PRECISION
+    int "The precision used when converting float values to a string for output"
+
 endif # USEMODULE_RUNTIME_CONFIG
