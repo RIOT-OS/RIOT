@@ -1,7 +1,8 @@
 @addtogroup  sys_runtime_config    Runtime config
 
 @warning This implementation is not complete and not yet thoroughly tested.
-         Please do not use this module in production, as it may introduce security issues.
+         Please do not use this module in production, as it is missing major
+         features and may contain bugs.
          Missing features are:
          - A code generator that transpiles YAML schemas to C code
          - Persistent storage extension
