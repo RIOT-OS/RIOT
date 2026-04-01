@@ -41,7 +41,12 @@ else
   endif
 endif
 
+# Import unicoap
 USEMODULE += unicoap
+
+# Import sever submodule
+USEMODULE += unicoap_server
+# Cross-file CoAP resource definitions
 USEMODULE += unicoap_resources_xfa
 
 # This module is needed for CoAP over UDP

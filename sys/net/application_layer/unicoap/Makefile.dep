@@ -27,15 +27,30 @@ ifneq (,$(filter unicoap,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_unicoap
 endif
 
+# This variable ensures the "Missing server" warning gets printed only once
+_UNICOAP_MISSING_SERVER ?= 0
+
+# If someone imports XFA submodule, we don't silently import server submodule, we complain!
+ifneq (,$(filter unicoap_resources_xfa,$(USEMODULE)))
+  ifeq (,$(filter unicoap_server,$(USEMODULE)))
+    ifeq (0, $(_UNICOAP_MISSING_SERVER))
+      $(warning XFA CoAP resource support imported, but not server?)
+      $(info +++ FIXIT: Makefile: Add USEMODULE += unicoap_server to import server)
+      $(info +++ FIXIT: Makefile: Remove USEMODULE += unicoap_resources_xfa to remove XFA dependency)
+		endif
+    _UNICOAP_MISSING_SERVER = 1
+	endif
+endif
+
 # This variable ensures the "No drivers" warning gets printed only once
 _UNICOAP_MISSING_DRIVER ?= 0
 
 ifeq (,$(filter %_udp %_dtls %_tcp %_tls %_websocket %_websocket_tls %_rfc7252_common_pdu %_rfc7252_pdu,$(filter unicoap_driver_%,$(USEMODULE))))
   ifeq (0, $(_UNICOAP_MISSING_DRIVER))
     $(warning No drivers imported, did you forget to import a driver?)
-    $(info +++ FIXIT: Makefile: USEMODULE += unicoap_driver_dtls for CoAP over DTLS driver)
-    $(info +++ FIXIT: Makefile: USEMODULE += unicoap_driver_udp for CoAP over UDP driver)
-    $(info +++ FIXIT: Makefile: USEMODULE += unicoap_driver_rfc7252_pdu for CoAP over UDP/DTLS PDU parser only)
+    $(info +++ FIXIT: Makefile: Add USEMODULE += unicoap_driver_dtls for CoAP over DTLS driver)
+    $(info +++ FIXIT: Makefile: Add USEMODULE += unicoap_driver_udp for CoAP over UDP driver)
+    $(info +++ FIXIT: Makefile: Add USEMODULE += unicoap_driver_rfc7252_pdu for CoAP over UDP/DTLS PDU parser only)
     # MARK: unicoap_driver_extension_point
   endif
   _UNICOAP_MISSING_DRIVER = 1

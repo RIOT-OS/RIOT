@@ -3,6 +3,8 @@
 @brief    Register CoAP resources and handle requests asynchronously
 @{
 
+Module. Specify `USEMODULE += unicoap_server` in your application's Makefile.
+
 A CoAP resource behaves similar to an HTTP endpoint.
 
 ## Registering a Resource

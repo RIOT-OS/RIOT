@@ -17,6 +17,7 @@ and DTLS, we need to add the respective drivers in the `Makefile`.
 
 ```makefile
 USEMODULE += unicoap
+USEMODULE += unicoap_server
 USEMODULE += unicoap_driver_udp
 USEMODULE += unicoap_driver_dtls
 ```

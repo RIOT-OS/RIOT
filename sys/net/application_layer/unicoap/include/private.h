@@ -145,11 +145,31 @@ typedef struct {
      */
     mutex_t lock;
 
+#if IS_USED(MODULE_UNICOAP_SERVER)
     /** @brief Groups of resources */
     unicoap_listener_t* listeners;
+#endif
 
     /* TODO: Client and advanced server features: Exchange-layer state objects */
 } unicoap_state_t;
+
+static inline void unicoap_set_listeners(unicoap_state_t* state, unicoap_listener_t* listeners) {
+#if IS_USED(MODULE_UNICOAP_SERVER)
+    state->listeners = listeners;
+#else
+    (void)state;
+    (void)listeners;
+#endif
+}
+
+static inline unicoap_listener_t* unicoap_get_listeners(unicoap_state_t* state) {
+#if IS_USED(MODULE_UNICOAP_SERVER)
+    return state->listeners;
+#else
+    (void)state;
+    return NULL;
+#endif
+}
 
 /** @brief Initializes the CoAP over UDP driver on the given @p queue */
 int unicoap_init_udp(event_queue_t* queue);
