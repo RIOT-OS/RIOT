@@ -105,7 +105,7 @@ static_assert(sizeof(unicoap_pathspec_t) == sizeof(char*),
  */
 static inline bool unicoap_path_is_root(const unicoap_pathspec_t* path) {
     assert(path);
-    return path->_components == NULL || *path->_components == NULL;
+    return path->_components == NULL;
 }
 
 /**
