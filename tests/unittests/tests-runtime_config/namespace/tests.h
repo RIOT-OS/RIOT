@@ -7,12 +7,11 @@
 #pragma once
 
 /**
- * @defgroup    sys_runtime_config_namespace_tests Runtime config Tests Namespace
+ * @defgroup    sys_runtime_config_namespace_tests Runtime configuration "Tests" namespace
  * @ingroup     tests
- * @brief       Runtime config Namespace Tests module
+ * @brief       Runtime configuration "tests" namespace providing configuration
+ *              schemas for testing the runtime_config sys module
  * @{
- *
- * This module provides common test schemas for the Runtime config sys module
  *
  * @file
  *

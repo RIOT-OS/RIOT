@@ -9,7 +9,7 @@
  * @{
  *
  * @file
- * @brief       Unittest entry point for the runtime config test group
+ * @brief       Unittest entry point for the runtime configuration test group
  *
  * @author      Lasse Rosenow <lasse.rosenow@haw-hamburg.de>
  *

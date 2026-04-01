@@ -356,9 +356,9 @@ PSEUDOMODULES += psa_riot_hashes_sha_512_256
 PSEUDOMODULES += psa_riot_hashes_hmac_sha256
 PSEUDOMODULES += fortuna_reseed
 
-# Runtime Config Modules are Pseudomodules unless stated otherwise
+# Runtime configuration modules are pseudomodules unless stated otherwise
 PSEUDOMODULES += runtime_config_%
-# Core Runtime Config Sys Schemas
+# Runtime configuration sys schemas
 NO_PSEUDOMODULES += runtime_config_namespace_sys
 
 PSEUDOMODULES += riotboot_%

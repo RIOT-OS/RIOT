@@ -9,8 +9,8 @@
  * @{
  *
  * @file
- * @brief       Runtime config core minimal example application to demonstrate
- *              how to use the Runtime config without any of its extensions.
+ * @brief       Runtime configuration core minimal example application to demonstrate
+ *              how to use the "Runtime configuration" module without any of its extensions.
  *
  * @author      Lasse Rosenow <lasse.rosenow@haw-hamburg.de>
  *
@@ -91,10 +91,10 @@ int main(void)
             },
         };
 
-        /* Set new runtime config value */
+        /* Set new runtime configuration value */
         runtime_config_set(&parameter_node, &board_led_enabled, sizeof(board_led_enabled));
 
-        /* Apply the runtime config value to change the LED state
+        /* Apply the runtime configuration value to change the LED state
          * (in this case calls the apply_cb function: "board_led_instance_apply_cb") */
         runtime_config_apply(&parameter_node);
 

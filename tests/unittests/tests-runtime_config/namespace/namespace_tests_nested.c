@@ -5,8 +5,8 @@
  */
 
 /**
- * @brief       Runtime config Nested Schema representing different nesting
- *              levels of a configuration schema
+ * @brief       Runtime configuration "nested" schema representing different
+ *              nesting levels of a configuration schema
  * @{
  *
  * @file

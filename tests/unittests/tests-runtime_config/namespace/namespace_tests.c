@@ -5,8 +5,8 @@
  */
 
 /**
- * @brief       Runtime config "tests" namespace providing configuration
- *              schemas for testint the runtime_config sys module
+ * @brief       Runtime configuration "tests" namespace providing configuration
+ *              schemas for testing the runtime_config sys module
  * @{
  *
  * @file

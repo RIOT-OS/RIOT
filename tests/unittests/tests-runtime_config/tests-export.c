@@ -116,7 +116,7 @@ static runtime_config_error_t export_namespace_cb(const runtime_config_node_t *n
 
 static void test_runtime_config_setup(void)
 {
-    /* init runtime config module */
+    /* init runtime configuration module */
     runtime_config_init();
 
     /* add schema instances */

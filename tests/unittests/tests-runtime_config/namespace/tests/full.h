@@ -7,8 +7,8 @@
 #pragma once
 
 /**
- * @brief       Runtime config Full Schema using all possible data types of the
- *              Runtime config
+ * @brief       Runtime configuration "full" schema using all possible data types
+ *              of the "Runtime configuration" module
  * @{
  *
  * @file

@@ -76,7 +76,7 @@ static runtime_config_schema_instance_t test_full_instance_1 = {
 
 static void test_runtime_config_setup(void)
 {
-    /* init runtime config module */
+    /* init runtime configuration module */
     runtime_config_init();
 
     /* add schema instances */

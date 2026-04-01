@@ -110,7 +110,7 @@ static runtime_config_schema_instance_t test_nested_instance_instance_test = {
 
 static void test_runtime_config_setup(void)
 {
-    /* init runtime config module */
+    /* init runtime configuration module */
     runtime_config_init();
 
     /* add schema instances */
