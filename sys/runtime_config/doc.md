@@ -12,7 +12,7 @@
 This module provides a system-level runtime configuration system for RIOT.
 
 A runtime configuration system is in charge of providing a mechanism to set and get the values of configuration parameters that are used during the execution of the firmware, as well as a way to persist these values. Runtime configurations are deployment-specific and can be changed on a per-node basis.
-Appropriate management tools could also enable the configuration of nodes.
+Appropriate management tools can also enable to remotely configure RIOT nodes.
 
 Examples of runtime configurations are:
 
@@ -22,14 +22,11 @@ Examples of runtime configurations are:
 - System state variables
 - RGB-LED colors
 
-These parameters might have constraints, like a specific order to be applied (due to interdependencies) or value boundaries.
+The runtime configuration system allows to:
 
-The main advantages of having such a system are:
-
-- Easy to apply per-node configuration during deployment
-- No need to implement a special mechanism for per-node configurations during firmware updates (only in the case of migration), as the parameters persist.
-- Common interface for modules to expose their runtime configuration parameters and handle them
-- Common interface for storing configuration parameters in non-volatile storage devices
+- **apply** multiple configurations at once
+- **persist** configurations to non-volatile storage
+- **expose** configurations to external configuration management tools such as a CLI, or a network based remote tool
 
 ## Design
 
