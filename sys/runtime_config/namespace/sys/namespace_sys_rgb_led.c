@@ -8,7 +8,8 @@
 
 /**
  * @ingroup     sys_runtime_config_namespace_sys_rgb_led
- * @brief       Runtime config RGB_LED Schema representing the basic structure of an RGB LED
+ * @brief       Runtime configuration "RGB_LED Schema" representing the basic
+ *              structure of an RGB LED
  * @{
  *
  * @file

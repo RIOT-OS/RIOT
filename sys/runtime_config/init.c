@@ -6,7 +6,7 @@
 
 /**
  * @ingroup     sys_runtime_config_init
- * @brief       Runtime config init module providing init functions
+ * @brief       Runtime configuration init module providing init functions
  * @{
  *
  * @file
@@ -24,7 +24,7 @@
 #include "debug.h"
 
 /**
- * @brief Runtime config auto init priority
+ * @brief Runtime configuration auto init priority
  */
 #ifndef AUTO_INIT_PRIO_MOD_RUNTIME_CONFIG
 #  define AUTO_INIT_PRIO_MOD_RUNTIME_CONFIG 2000

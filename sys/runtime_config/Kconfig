@@ -5,7 +5,7 @@
 menuconfig MODULE_RUNTIME_CONFIG
     bool "RUNTIME_CONFIG"
     help
-        Runtime config module for handling runtime configurations.
+        Runtime configuration module for handling runtime configurations.
 
 if USEMODULE_RUNTIME_CONFIG
 

@@ -9,12 +9,11 @@
 #pragma once
 
 /**
- * @defgroup    sys_runtime_config_namespace_sys Runtime config "sys" namespace
+ * @defgroup    sys_runtime_config_namespace_sys Runtime configuration "sys"
+ *              namespace
  * @ingroup     sys_runtime_config
- * @brief       Runtime config namespace "sys" module
+ * @brief       Runtime configuration namespace "sys" module
  * @{
- *
- * This module provides common sys configuration schemas for the runtime config sys module
  *
  * @file
  *

@@ -6,7 +6,7 @@
 
 /**
  * @ingroup     sys_runtime_config_util
- * @brief       Runtime config Util module providing utility functions
+ * @brief       Runtime configuration "Util" module providing utility functions
  * @{
  *
  * @file

@@ -9,9 +9,11 @@
 #pragma once
 
 /**
- * @defgroup    sys_runtime_config_namespace_sys_rgb_led Runtime config schema: RGB_LED
+ * @defgroup    sys_runtime_config_namespace_sys_rgb_led Runtime configuration
+ *              schema: RGB_LED
  * @ingroup     sys_runtime_config_namespace_sys
- * @brief       Runtime config RGB_LED schema representing the basic structure of an RGB LED
+ * @brief       Runtime configuration RGB_LED schema representing the basic
+ *              structure of an RGB LED
  * @{
  *
  * @file

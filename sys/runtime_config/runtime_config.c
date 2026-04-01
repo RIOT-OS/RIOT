@@ -6,7 +6,7 @@
 
 /**
  * @ingroup     sys_runtime_config
- * @brief       Runtime config for runtime configuration of modules
+ * @brief       Runtime configuration for runtime configuration of modules
  * @{
  *
  * @file
@@ -63,7 +63,7 @@ runtime_config_error_t runtime_config_get(const runtime_config_node_t *node, run
         return -RUNTIME_CONFIG_ERROR_NODE_INVALID;
     }
 
-    /* get pointer to runtime config internal value buffer and length */
+    /* get pointer to internal value buffer and length */
     void *intern_val = NULL;
     size_t intern_val_len;
 
@@ -92,7 +92,7 @@ runtime_config_error_t runtime_config_set(const runtime_config_node_t *node, con
         return -RUNTIME_CONFIG_ERROR_NODE_INVALID;
     }
 
-    /* get pointer to the runtime config internal value buffer and length */
+    /* get pointer to the internal value buffer and length */
     void *intern_val = NULL;
     size_t intern_val_len;
 

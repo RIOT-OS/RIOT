@@ -8,7 +8,7 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../../../..
 
 # required modules
-# enable board_led schema (sys/board_led) of the Runtime config
+# enable board_led schema (sys/board_led) of the Runtime configuration module
 USEMODULE += runtime_config_namespace_sys_board_led
 # enable the ztimer to turn the led on and off every second
 USEMODULE += ztimer_sec

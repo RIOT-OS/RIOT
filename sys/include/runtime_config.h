@@ -7,9 +7,9 @@
 #pragma once
 
 /**
- * @defgroup    sys_runtime_config Runtime config
+ * @defgroup    sys_runtime_config Runtime configuration
  * @ingroup     sys
- * @brief       Runtime config module for handling configurations at runtime
+ * @brief       Runtime configuration module for handling configurations at runtime
  * @{
  *
  * @file
@@ -49,7 +49,7 @@ extern "C" {
 /**
  * @brief Identifier of a configuration namespace.
  *
- * It is unique within the scope of the Runtime config itself.
+ * It is unique within the scope of the runtime configuration system itself.
  */
 typedef uint8_t runtime_config_namespace_id_t;
 
@@ -92,27 +92,27 @@ typedef runtime_config_group_or_parameter_id_t runtime_config_group_id_t;
 typedef runtime_config_group_or_parameter_id_t runtime_config_parameter_id_t;
 
 /**
- * @brief Forward declaration of runtime config namespace struct.
+ * @brief Forward declaration of runtime configuration namespace struct.
  */
 typedef struct runtime_config_namespace runtime_config_namespace_t;
 
 /**
- * @brief Forward declaration of runtime config schema struct.
+ * @brief Forward declaration of runtime configuration schema struct.
  */
 typedef struct runtime_config_schema runtime_config_schema_t;
 
 /**
- * @brief Forward declaration of runtime config schema instance struct.
+ * @brief Forward declaration of runtime configuration schema instance struct.
  */
 typedef struct runtime_config_schema_instance runtime_config_schema_instance_t;
 
 /**
- * @brief Forward declaration of runtime config group struct.
+ * @brief Forward declaration of runtime configuration group struct.
  */
 typedef struct runtime_config_group runtime_config_group_t;
 
 /**
- * @brief Forward declaration of runtime config parameter struct.
+ * @brief Forward declaration of runtime configuration parameter struct.
  */
 typedef struct runtime_config_parameter runtime_config_parameter_t;
 
@@ -140,9 +140,9 @@ typedef enum {
 } runtime_config_type_t;
 
 /**
- * @brief The type of a runtime config node.
+ * @brief The type of a runtime configuration node.
  *
- * A runtime config node points to a namespace, schema, instance, group or
+ * A runtime configuration node points to a namespace, schema, instance, group or
  * parameter.
  */
 typedef enum {
@@ -163,7 +163,7 @@ typedef enum {
 } runtime_config_node_type_t;
 
 /**
- * @brief A runtime config node represents a specific location within the
+ * @brief A runtime configuration node represents a specific location within the
  * runtime configuration tree.
  *
  * It can point to a namespace, schema, instance, group or parameter.
@@ -236,7 +236,7 @@ typedef struct {
 /**
  * @brief The callback must be implemented by consumers of a configuration schema.
  *
- * This callback is called when the runtime config module notifies the consumer,
+ * This callback is called when the runtime configuration module notifies the consumer,
  * that a configuration parameter value has changed.
  *
  * It is possible to apply all parameters of a schema instance at once,
@@ -433,9 +433,10 @@ struct runtime_config_schema {
  * @brief Data structure of a configuration namespace.
  *
  * A configuration namespace contains configuration schemas.
- * It exists to prevent ID collisions between RIOT internal configuration schemas
- * and schemas defined by applications running on RIOT.
- * It has an ID that is unique within the scope of the runtime config itself.
+ * It exists to prevent ID collisions between RIOT internal configuration
+ * schemas and schemas defined by applications running on RIOT.
+ * It has an ID that is unique within the scope of the runtime configuration
+ * itself.
  */
 struct runtime_config_namespace {
     /** Integer representing the ID of the namespace. */
@@ -459,15 +460,15 @@ struct runtime_config_namespace {
 };
 
 /**
- * @brief Add a namespace to the cross-file-array containing all runtime config
- *        namespaces.
+ * @brief Add a namespace to the cross-file-array containing all runtime
+ *        configuration namespaces.
  */
 #define RUNTIME_CONFIG_ADD_NAMESPACE(_name, _namespace)                          \
     XFA_USE_CONST(runtime_config_namespace_t *, _runtime_config_namespaces_xfa); \
     XFA_ADD_PTR(_runtime_config_namespaces_xfa, _name, _name, &_namespace)
 
 /**
- * @brief Initializes the Runtime config.
+ * @brief Initializes the runtime configuration system.
  */
 void runtime_config_init(void);
 
@@ -529,7 +530,7 @@ runtime_config_error_t runtime_config_apply(const runtime_config_node_t *node);
  * @brief Callback definition of the @p runtime_config_export function.
  *
  * This callback will be called for each location inside of the
- * configuration tree that is within the scope of the runtime config node passed
+ * configuration tree that is within the scope of the runtime configuration node passed
  * on to the @p runtime_config_export function.
  *
  * @param[in] node A location within the runtime configuration tree.

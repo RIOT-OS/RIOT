@@ -52,7 +52,7 @@ They use either the `int_path` or the `string_path` extension module to expose t
 These configuration managers have their own configuration structure (custom predefined object models etc.) and can not automatically be mapped to / from the runtime configuration schemas.
 To make them work, a custom mapping module needs to be implemented per configuration manager, which maps each configuration parameter from the RIOT runtime configuration module to the correct format of the configuration manager.
 
-<img src="https://github.com/RIOT-OS/RIOT/assets/10547444/26830a26-882a-422c-ba20-abfa4e07ce8c" style="width: 800px; max-width: 100%" alt="design_architecture" />
+<img src="./architecture.svg" style="width: 800px; max-width: 100%" alt="design_architecture" />
 
 ### Configuration Structure
 
@@ -72,7 +72,7 @@ the `LED Strip` Configuration Schema to expose common LED Strip Configuration Pa
 Also, there are two Storages available: `MTD` and `VFS`.
 The `MTD` Storage internally uses the RIOT `MTD` driver and the `VFS` Storage internally uses the RIOT `VFS` module.
 
-<img src="https://github.com/user-attachments/assets/49b066bc-5419-454a-9797-c0972b3bc83b" style="width: 800px; max-width: 100%" alt="design_namespaces_and_storages" />
+<img src="./namespaces_and_storages.svg" style="width: 800px; max-width: 100%" alt="design_namespaces_and_storages" />
 
 ### Components
 
@@ -84,7 +84,7 @@ The Runtime configuration system is split into multiple components as can be see
 USEMODULE += runtime_config
 ```
 
-This component holds the most basic functionality of the Runtime config.
+This component holds the most basic functionality of the runtime configuration system.
 It allows to `set` and `get` Configuration Values, transactionally `apply` them to make the changes come into effect and `export` all Configuration Parameters that exist in a given `Configuration Namespace`, `Configuration Schema` or `Configuration Group`.
 
 Furthermore it is possible to `add` `Configuration Namespaces` or `Configuration Schema Instances`.
@@ -94,18 +94,18 @@ Furthermore it is possible to `add` `Configuration Namespaces` or `Configuration
 The `Configuration Namespaces` such as `SYS` or `APP` and their respective `Configuration Schemas` are not part of the runtime configuration module itself.
 It is possible to `add` custom `Configuration Namespaces` depending on the given needs.
 
-<img src="https://github.com/user-attachments/assets/473cef24-39b8-4539-b754-53146a497521" style="width: 800px; max-width: 100%" alt="design_runtime_config" />
+<img src="./runtime_config.svg" style="width: 800px; max-width: 100%" alt="design_runtime_config" />
 
 ## API
 
-The graphic below shows the API of the Runtime config.
+The graphic below shows the API of the runtime configuration system.
 The top shows the Core API to manage Configuration Parameters.
 On the right-hand side are functions to `set` and `get` Configuration Parameters, transactionally `apply` them and `export` them to a buffer or terminal.
 On the left-hand side are setup functions to `add` `Configuration Namespaces` and `Configuration Schema Instances`.
 
 The functionality of these functions is explained in the following paragraphs.
 
-<img src="https://github.com/user-attachments/assets/588cb389-250a-4797-a78e-a76c4efe18fb" style="width: 800px; max-width: 100%" alt="api_structure" />
+<img src="./api_structure.svg" style="width: 800px; max-width: 100%" alt="api_structure" />
 
 ## Usage
 

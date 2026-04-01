@@ -7,9 +7,9 @@
 #pragma once
 
 /**
- * @defgroup    sys_runtime_config_util Runtime config utilities
+ * @defgroup    sys_runtime_config_util Runtime configuration utilities
  * @ingroup     sys_runtime_config
- * @brief       Runtime config Util module providing utility functions
+ * @brief       Runtime configuration "Util" module providing utility functions
  * @{
  *
  * @file
@@ -25,7 +25,7 @@ extern "C" {
 
 /**
  * @brief Specifies the number of digits after decimal point when converting
- *        float or double runtime config values to strings.
+ *        float or double runtime configuration values to strings.
  */
 #ifndef CONFIG_RUNTIME_CONFIG_UTIL_FORMAT_FLOAT_PRECISION
 #  define CONFIG_RUNTIME_CONFIG_UTIL_FORMAT_FLOAT_PRECISION 6

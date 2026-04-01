@@ -1,6 +1,6 @@
 # Runtime Configuration Core
 
-This application demonstrates the most basic usage of the Runtime config.
+This application demonstrates the most basic usage of the `Runtime configuration` module.
 It implements a BOARD LED schema and continuously changes its value every second.
 
 ## Usage

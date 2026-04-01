@@ -7,10 +7,10 @@
 #pragma once
 
 /**
- * @defgroup    sys_runtime_config_error Runtime config error
+ * @defgroup    sys_runtime_config_error Runtime configuration error
  * @ingroup     sys_runtime_config
- * @brief       Runtime config module providing runtime config module specific
- *              error codes
+ * @brief       Runtime configuration "Error" module providing runtime
+ *              configuration module specific error codes
  * @{
  *
  * @file
@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Runtime config module specific error codes.
+ * @brief Runtime configuration module specific error codes.
  */
 typedef enum {
     RUNTIME_CONFIG_ERROR_NONE = 0,

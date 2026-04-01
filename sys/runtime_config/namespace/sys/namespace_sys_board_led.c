@@ -8,7 +8,8 @@
 
 /**
  * @ingroup     sys_runtime_config_namespace_sys_board_led
- * @brief       Runtime config BOARD_LED Schema representing the basic structure of a BOARD LED
+ * @brief       Runtime configuration "BOARD_LED Schema" representing the basic
+ *              structure of a BOARD LED
  * @{
  *
  * @file

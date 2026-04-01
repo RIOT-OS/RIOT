@@ -8,7 +8,7 @@
 
 /**
  * @ingroup     sys_runtime_config_namespace_sys
- * @brief       Runtime config Namespace Sys module
+ * @brief       Runtime configuration "Sys Namespace" module
  * @{
  *
  * @file
