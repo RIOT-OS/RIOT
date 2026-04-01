@@ -83,16 +83,23 @@
  */
 #define UNICOAP_BITFIELD(...) __unicoap_create_bitfield(__VA_ARGS__,,,,,,,,,,,,,,,) 0
 
+/* _Generic can also be available as a language extension before C11, so we check those first */
 #ifndef DOXYGEN
+/* clang */
 #  if defined(__has_extension)
 #    if __has_extension(c_generic_selection_with_controlling_type)
 #      define _UNICOAP_GENERIC_CONTROLLING_TYPE_AVAILABLE 1
 #    endif
 #  endif
 
-#  if !defined(_UNICOAP_GENERIC_CONTROLLING_TYPE_AVAILABLE) \
-    && defined(__GNUC__) \
+/* GCC */
+#  if !defined(_UNICOAP_GENERIC_CONTROLLING_TYPE_AVAILABLE) && defined(__GNUC__) \
     && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 9))
+#    define _UNICOAP_GENERIC_CONTROLLING_TYPE_AVAILABLE 1
+#  endif
+
+/* C11 */
+#  if !defined(_UNICOAP_GENERIC_CONTROLLING_TYPE_AVAILABLE) && __STDC_VERSION__ >= 201112L
 #    define _UNICOAP_GENERIC_CONTROLLING_TYPE_AVAILABLE 1
 #  endif
 #endif
