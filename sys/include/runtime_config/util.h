@@ -33,10 +33,12 @@ extern "C" {
 
 /**
  * @brief Convenience function to parse a configuration parameter value from
- * a string.
+ *        a string.
  *
  * @param[in] src Pointer of the input value. Must not be NULL.
  * @param[out] dest Pointer to the output buffer. Must not be NULL.
+ *                  Might still be written to even if the function
+ *                  returns -EINVAL.
  * @param[in] dest_len Length of @p dest.
  * @param[in] dest_type Type of the output value.
  *
@@ -50,7 +52,7 @@ int runtime_config_util_convert_str_to_value(
 
 /**
  * @brief Convenience function to transform a configuration parameter value into
- * its representation as a string.
+ *        its representation as a string.
  *
  * @param[in] src Pointer to the value to be converted.
  * @param[out] dest Buffer to store the output string.

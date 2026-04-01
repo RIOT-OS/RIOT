@@ -571,13 +571,15 @@ typedef runtime_config_error_t (*runtime_config_tree_traversal_cb_t)(
  *
  * @param[in] node A location within the runtime configuration tree.
  * @param[in] tree_traversal_cb Callback function that will be called for
- * each namespace, schema, instance, group and parameter that are within the
- * @p tree_traversal_depth and specified @p node.
+ *                              each namespace, schema, instance, group and
+ *                              parameter that are within the
+ *                              @p tree_traversal_depth and specified @p node.
  * @param[in] tree_traversal_depth Defines how deeply nested child
- * groups / parameters will be shown:
- * 0 to show all children.
- * 1 to only show the exact match.
- * n > 1 to show the exact match plus n - 1 levels of children.
+ *                                 groups / parameters will be shown:
+ *                                 0 to show all children,
+ *                                 1 to only show the exact match,
+ *                                 and n > 1 to show the exact match plus n - 1
+ *                                 levels of children.
  * @param[in] context Context that will be passed to @p tree_traversal_cb.
  *
  * @return 0 on success, non-zero on failure.
