@@ -273,7 +273,7 @@ struct runtime_config_schema_instance {
     clist_node_t node;
 
     /** ID of the instance within the scope of it's schema */
-    const runtime_config_schema_instance_id_t id;
+    runtime_config_schema_instance_id_t id;
 
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_NAME) || IS_ACTIVE(DOXYGEN)
     /** String describing the instance. */
@@ -480,8 +480,8 @@ void runtime_config_init(void);
  * @return 0 on success, non-zero on failure.
  */
 runtime_config_error_t runtime_config_add_schema_instance(
-    const runtime_config_schema_t *schema,
-    const runtime_config_schema_instance_t *instance);
+    runtime_config_schema_t *schema,
+    runtime_config_schema_instance_t *instance);
 
 /**
  * @brief Gets the current value of a parameter that belongs to an instance

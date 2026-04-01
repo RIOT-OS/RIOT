@@ -33,23 +33,23 @@
 XFA_INIT_CONST(runtime_config_namespace_t *, _runtime_config_namespaces_xfa);
 
 runtime_config_error_t runtime_config_add_schema_instance(
-    const runtime_config_schema_t *schema,
-    const runtime_config_schema_instance_t *instance)
+    runtime_config_schema_t *schema,
+    runtime_config_schema_instance_t *instance)
 {
     assert(schema != NULL);
     assert(instance != NULL);
 
     /* add schema to instance */
-    ((runtime_config_schema_instance_t *)instance)->schema = schema;
+    instance->schema = schema;
 
     /* get instances length to determine the id of the new instance */
-    size_t count = clist_count((clist_node_t *)&schema->instances);
+    size_t count = clist_count(&schema->instances);
 
     /* set id of new instance to the instance count */
-    *(runtime_config_schema_instance_id_t *)&instance->id = count;
+    instance->id = count;
 
     /* add instance to schema */
-    clist_rpush((clist_node_t *)&schema->instances, (clist_node_t *)&instance->node);
+    clist_rpush(&schema->instances, &instance->node);
 
     return RUNTIME_CONFIG_ERROR_NONE;
 }
