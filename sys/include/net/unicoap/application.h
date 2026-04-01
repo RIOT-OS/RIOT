@@ -59,13 +59,11 @@ typedef struct {
      * `/a1/b2`
      *
      * ```
-     * [ ptr1, ptr2, ptr3 ]
-     *   |     |     \___________
-     *   |     \__________       \
-     *   |                \      |
-     *   'a', '1', 0/NULL |      0/NULL
-     *                    |
-     *                    'b', '2', 0/NULL
+     * [ ptr1, ptr2, 0/NULL ]
+     *   |     |
+     *   |     \_______________
+     *   |                     \
+     *   'a', '1', 0/NULL       'b', '2', 0/NULL
      * ```
      */
     const char** _components;
