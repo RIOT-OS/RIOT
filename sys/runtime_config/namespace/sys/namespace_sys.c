@@ -44,7 +44,7 @@ runtime_config_namespace_t runtime_config_sys = {
     .name = "sys",
 #endif /* RUNTIME_CONFIG_ENABLE_META_NAME */
 #if IS_ACTIVE(RUNTIME_CONFIG_ENABLE_META_DESCRIPTION) || IS_ACTIVE(DOXYGEN)
-    .description = "System namespace",
+    .description = "Contains configurations exposed by RIOT modules",
 #endif /* RUNTIME_CONFIG_ENABLE_META_DESCRIPTION */
     .schemas = _schemas,
     .schemas_len = ARRAY_SIZE(_schemas),
