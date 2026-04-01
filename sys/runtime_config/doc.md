@@ -9,9 +9,9 @@
          - Int path extension
          - String path extension
 
-This module provides a system level runtime configuration system for RIOT.
+This module provides a system-level runtime configuration system for RIOT.
 
-A runtime configuration system is in charge of providing a mechanism to set and get the values of configuration parameters that are used during the execution of the firmware, as well as a way to persist these values. Runtime configurations are deployment-specific and can be changed on a per node basis.
+A runtime configuration system is in charge of providing a mechanism to set and get the values of configuration parameters that are used during the execution of the firmware, as well as a way to persist these values. Runtime configurations are deployment-specific and can be changed on a per-node basis.
 Appropriate management tools could also enable the configuration of nodes.
 
 Examples of runtime configurations are:
@@ -37,7 +37,7 @@ The main advantages of having such a system are:
 
 The proposed architecture, as shown below, is formed by one or more applications or configuration managers and the runtime config API.
 The runtime config API acts as a common interface to access runtime configurations and store them in non-volatile storage.
-All runtime configurations can be accessed either from the RIOT application using the provided runtime config interfaces or through the interfaces exposed by the configuration managers.
+All runtime configurations can be accessed from the RIOT application either using the provided runtime config interfaces or through the interfaces exposed by the configuration managers.
 A RIOT application may interact with a configuration manager in order to modify access control rules or enable different exposed interfaces.
 
 #### Path Based Configuration Managers (Needs `int_path` or `string_path` extension)
