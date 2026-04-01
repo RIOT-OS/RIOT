@@ -14,7 +14,6 @@ endif
 # MARK: unicoap_driver_extension_point
 
 ifneq (,$(filter unicoap_server,$(USEMODULE)))
-  $(info See server)
   DIRS += server
 endif
 
