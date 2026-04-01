@@ -177,6 +177,7 @@ static runtime_config_error_t _runtime_config_export_parameter(
     const void *context)
 {
     assert(parameter != NULL);
+    assert(instance != NULL);
 
     const runtime_config_node_t export_node = {
         .type = RUNTIME_CONFIG_NODE_PARAMETER,
@@ -197,6 +198,7 @@ static runtime_config_error_t _runtime_config_export_group(
     const void *context)
 {
     assert(group != NULL);
+    assert(instance != NULL);
 
     /* export the given configuration group */
     const runtime_config_node_t export_node = {
