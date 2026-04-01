@@ -9,7 +9,7 @@
  * @{
  *
  * @file
- * @brief       Unittests for runtime_config_export
+ * @brief       Unittests for runtime_config_traverse_config_tree
  *
  * @author      Lasse Rosenow <lasse.rosenow@haw-hamburg.de>
  *
@@ -127,7 +127,7 @@ static void test_runtime_config_teardown(void)
 {
 }
 
-static void tests_runtime_config_export_parameter(void)
+static void tests_runtime_config_traverse_parameter(void)
 {
     const runtime_config_parameter_id_t parameter_id = RUNTIME_CONFIG_TESTS_NESTED_PARAMETER;
 
@@ -141,12 +141,12 @@ static void tests_runtime_config_export_parameter(void)
         },
     };
 
-    runtime_config_export(&node, &export_parameter_cb, 0, &parameter_id);
+    runtime_config_traverse_config_tree(&node, &export_parameter_cb, 0, &parameter_id);
 
     TEST_ASSERT(successful);
 }
 
-static void tests_runtime_config_export_group(void)
+static void tests_runtime_config_traverse_group(void)
 {
     const runtime_config_node_t node = {
         .type = RUNTIME_CONFIG_NODE_GROUP,
@@ -160,13 +160,13 @@ static void tests_runtime_config_export_group(void)
     const runtime_config_group_id_t group_id = RUNTIME_CONFIG_TESTS_NESTED_GROUP;
 
     successful = false;
-    runtime_config_export(&node, &export_group_cb, 0, &group_id);
+    runtime_config_traverse_config_tree(&node, &export_group_cb, 0, &group_id);
     TEST_ASSERT(successful);
 
     /* check that siblings get NOT exported */
     const runtime_config_parameter_id_t sibling_parameter_id = RUNTIME_CONFIG_TESTS_NESTED_PARAMETER;
     successful = false;
-    runtime_config_export(&node, &export_parameter_cb, 0, &sibling_parameter_id);
+    runtime_config_traverse_config_tree(&node, &export_parameter_cb, 0, &sibling_parameter_id);
     TEST_ASSERT_EQUAL_INT(false, successful);
 
     /* check if children get exported */
@@ -174,21 +174,21 @@ static void tests_runtime_config_export_group(void)
 
     /* tree_traversal_depth 0 => infinite => parameter gets exported */
     successful = false;
-    runtime_config_export(&node, &export_parameter_cb, 0, &child_parameter_id);
+    runtime_config_traverse_config_tree(&node, &export_parameter_cb, 0, &child_parameter_id);
     TEST_ASSERT(successful);
 
     /* tree_traversal_depth 1 => only group => parameter gets NOT exported */
     successful = false;
-    runtime_config_export(&node, &export_parameter_cb, 1, &child_parameter_id);
+    runtime_config_traverse_config_tree(&node, &export_parameter_cb, 1, &child_parameter_id);
     TEST_ASSERT_EQUAL_INT(false, successful);
 
     /* tree_traversal_depth 2 => group + 1 level more => parameter gets exported */
     successful = false;
-    runtime_config_export(&node, &export_parameter_cb, 2, &child_parameter_id);
+    runtime_config_traverse_config_tree(&node, &export_parameter_cb, 2, &child_parameter_id);
     TEST_ASSERT(successful);
 }
 
-static void tests_runtime_config_export_instance(void)
+static void tests_runtime_config_traverse_instance(void)
 {
     const runtime_config_node_t node = {
         .type = RUNTIME_CONFIG_NODE_INSTANCE,
@@ -197,14 +197,14 @@ static void tests_runtime_config_export_instance(void)
 
     /* check if instance gets exported */
     successful = false;
-    runtime_config_export(&node, &export_instance_cb, 0, NULL);
+    runtime_config_traverse_config_tree(&node, &export_instance_cb, 0, NULL);
     TEST_ASSERT(successful);
 
     /* check if group gets exported */
     const runtime_config_group_id_t group_id = RUNTIME_CONFIG_TESTS_NESTED_GROUP;
 
     successful = false;
-    runtime_config_export(&node, &export_group_cb, 0, &group_id);
+    runtime_config_traverse_config_tree(&node, &export_group_cb, 0, &group_id);
     TEST_ASSERT(successful);
 
     /* check if parameter get exported */
@@ -212,21 +212,21 @@ static void tests_runtime_config_export_instance(void)
 
     /* tree_traversal_depth 0 => infinite => parameter gets exported */
     successful = false;
-    runtime_config_export(&node, &export_parameter_cb, 0, &child_parameter_id);
+    runtime_config_traverse_config_tree(&node, &export_parameter_cb, 0, &child_parameter_id);
     TEST_ASSERT(successful);
 
     /* tree_traversal_depth 2 => only instance and group => parameter gets NOT exported */
     successful = false;
-    runtime_config_export(&node, &export_parameter_cb, 2, &child_parameter_id);
+    runtime_config_traverse_config_tree(&node, &export_parameter_cb, 2, &child_parameter_id);
     TEST_ASSERT_EQUAL_INT(false, successful);
 
     /* tree_traversal_depth 3 => instance, group and parameter => parameter gets exported */
     successful = false;
-    runtime_config_export(&node, &export_parameter_cb, 3, &child_parameter_id);
+    runtime_config_traverse_config_tree(&node, &export_parameter_cb, 3, &child_parameter_id);
     TEST_ASSERT(successful);
 }
 
-static void tests_runtime_config_export_schema(void)
+static void tests_runtime_config_traverse_schema(void)
 {
     const runtime_config_node_t node = {
         .type = RUNTIME_CONFIG_NODE_SCHEMA,
@@ -235,19 +235,19 @@ static void tests_runtime_config_export_schema(void)
 
     /* check if schema gets exported */
     successful = false;
-    runtime_config_export(&node, &export_schema_cb, 0, NULL);
+    runtime_config_traverse_config_tree(&node, &export_schema_cb, 0, NULL);
     TEST_ASSERT(successful);
 
     /* check if instance gets exported */
     successful = false;
-    runtime_config_export(&node, &export_instance_cb, 0, NULL);
+    runtime_config_traverse_config_tree(&node, &export_instance_cb, 0, NULL);
     TEST_ASSERT(successful);
 
     /* check if group gets exported */
     const runtime_config_group_id_t group_id = RUNTIME_CONFIG_TESTS_NESTED_GROUP;
 
     successful = false;
-    runtime_config_export(&node, &export_group_cb, 0, &group_id);
+    runtime_config_traverse_config_tree(&node, &export_group_cb, 0, &group_id);
     TEST_ASSERT(successful);
 
     /* check if parameter get exported */
@@ -255,21 +255,21 @@ static void tests_runtime_config_export_schema(void)
 
     /* tree_traversal_depth 0 => infinite => parameter gets exported */
     successful = false;
-    runtime_config_export(&node, &export_parameter_cb, 0, &child_parameter_id);
+    runtime_config_traverse_config_tree(&node, &export_parameter_cb, 0, &child_parameter_id);
     TEST_ASSERT(successful);
 
     /* tree_traversal_depth 3 => only schema, instance and group => parameter gets NOT exported */
     successful = false;
-    runtime_config_export(&node, &export_parameter_cb, 3, &child_parameter_id);
+    runtime_config_traverse_config_tree(&node, &export_parameter_cb, 3, &child_parameter_id);
     TEST_ASSERT_EQUAL_INT(false, successful);
 
     /* tree_traversal_depth 4 => schema, instance, group and parameter => parameter gets exported */
     successful = false;
-    runtime_config_export(&node, &export_parameter_cb, 4, &child_parameter_id);
+    runtime_config_traverse_config_tree(&node, &export_parameter_cb, 4, &child_parameter_id);
     TEST_ASSERT(successful);
 }
 
-static void tests_runtime_config_export_namespace(void)
+static void tests_runtime_config_traverse_namespace(void)
 {
     const runtime_config_node_t node = {
         .type = RUNTIME_CONFIG_NODE_NAMESPACE,
@@ -278,24 +278,24 @@ static void tests_runtime_config_export_namespace(void)
 
     /* check if namespace gets exported */
     successful = false;
-    runtime_config_export(&node, &export_namespace_cb, 0, NULL);
+    runtime_config_traverse_config_tree(&node, &export_namespace_cb, 0, NULL);
     TEST_ASSERT(successful);
 
     /* check if schema gets exported */
     successful = false;
-    runtime_config_export(&node, &export_schema_cb, 0, NULL);
+    runtime_config_traverse_config_tree(&node, &export_schema_cb, 0, NULL);
     TEST_ASSERT(successful);
 
     /* check if instance gets exported */
     successful = false;
-    runtime_config_export(&node, &export_instance_cb, 0, NULL);
+    runtime_config_traverse_config_tree(&node, &export_instance_cb, 0, NULL);
     TEST_ASSERT(successful);
 
     /* check if group gets exported */
     const runtime_config_group_id_t group_id = RUNTIME_CONFIG_TESTS_NESTED_GROUP;
 
     successful = false;
-    runtime_config_export(&node, &export_group_cb, 0, &group_id);
+    runtime_config_traverse_config_tree(&node, &export_group_cb, 0, &group_id);
     TEST_ASSERT(successful);
 
     /* check if parameter get exported */
@@ -303,48 +303,48 @@ static void tests_runtime_config_export_namespace(void)
 
     /* tree_traversal_depth 0 => infinite => parameter gets exported */
     successful = false;
-    runtime_config_export(&node, &export_parameter_cb, 0, &child_parameter_id);
+    runtime_config_traverse_config_tree(&node, &export_parameter_cb, 0, &child_parameter_id);
     TEST_ASSERT(successful);
 
     /* tree_traversal_depth 4 => only namespace, schema, instance and group => parameter gets NOT exported */
     successful = false;
-    runtime_config_export(&node, &export_parameter_cb, 4, &child_parameter_id);
+    runtime_config_traverse_config_tree(&node, &export_parameter_cb, 4, &child_parameter_id);
     TEST_ASSERT_EQUAL_INT(false, successful);
 
     /* tree_traversal_depth 5 => namespace, schema, instance, group and parameter => parameter gets exported */
     successful = false;
-    runtime_config_export(&node, &export_parameter_cb, 5, &child_parameter_id);
+    runtime_config_traverse_config_tree(&node, &export_parameter_cb, 5, &child_parameter_id);
     TEST_ASSERT(successful);
 }
 
-static void tests_runtime_config_export_all(void)
+static void tests_runtime_config_traverse_all(void)
 {
     /* check if namespace gets exported */
     successful = false;
-    runtime_config_export(NULL, &export_namespace_cb, 0, NULL);
+    runtime_config_traverse_config_tree(NULL, &export_namespace_cb, 0, NULL);
     TEST_ASSERT(successful);
 
     /* tree_traversal_depth 1 => nothing gets exported because node == NULL */
     /* => no namespace was specified and 1 means only export the exact match (NULL) */
     successful = false;
-    runtime_config_export(NULL, &export_namespace_cb, 1, NULL);
+    runtime_config_traverse_config_tree(NULL, &export_namespace_cb, 1, NULL);
     TEST_ASSERT_EQUAL_INT(false, successful);
 
     /* check if schema gets exported */
     successful = false;
-    runtime_config_export(NULL, &export_schema_cb, 0, NULL);
+    runtime_config_traverse_config_tree(NULL, &export_schema_cb, 0, NULL);
     TEST_ASSERT(successful);
 
     /* check if instance gets exported */
     successful = false;
-    runtime_config_export(NULL, &export_instance_cb, 0, NULL);
+    runtime_config_traverse_config_tree(NULL, &export_instance_cb, 0, NULL);
     TEST_ASSERT(successful);
 
     /* check if group gets exported */
     const runtime_config_group_id_t group_id = RUNTIME_CONFIG_TESTS_NESTED_GROUP;
 
     successful = false;
-    runtime_config_export(NULL, &export_group_cb, 0, &group_id);
+    runtime_config_traverse_config_tree(NULL, &export_group_cb, 0, &group_id);
     TEST_ASSERT(successful);
 
     /* check if parameter get exported */
@@ -352,37 +352,37 @@ static void tests_runtime_config_export_all(void)
 
     /* tree_traversal_depth 0 => infinite => parameter gets exported */
     successful = false;
-    runtime_config_export(NULL, &export_parameter_cb, 0, &child_parameter_id);
+    runtime_config_traverse_config_tree(NULL, &export_parameter_cb, 0, &child_parameter_id);
     TEST_ASSERT(successful);
 
     /* tree_traversal_depth 1 => nothing gets exported because node == NULL */
     /* => not even a namespace was specified and 1 means only export the exact match (NULL) */
     successful = false;
-    runtime_config_export(NULL, &export_parameter_cb, 1, &child_parameter_id);
+    runtime_config_traverse_config_tree(NULL, &export_parameter_cb, 1, &child_parameter_id);
     TEST_ASSERT_EQUAL_INT(false, successful);
 
     /* tree_traversal_depth 5 => root, namespace, schema, instance, group */
     /* => parameter gets NOT exported */
     successful = false;
-    runtime_config_export(NULL, &export_parameter_cb, 5, &child_parameter_id);
+    runtime_config_traverse_config_tree(NULL, &export_parameter_cb, 5, &child_parameter_id);
     TEST_ASSERT_EQUAL_INT(false, successful);
 
     /* tree_traversal_depth 6 => root, namespace, schema, instance, group and parameter */
     /* => parameter gets exported */
     successful = false;
-    runtime_config_export(NULL, &export_parameter_cb, 6, &child_parameter_id);
+    runtime_config_traverse_config_tree(NULL, &export_parameter_cb, 6, &child_parameter_id);
     TEST_ASSERT(successful);
 }
 
-Test *tests_runtime_config_export_tests(void)
+Test *tests_runtime_config_traverse_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures){
-        new_TestFixture(tests_runtime_config_export_parameter),
-        new_TestFixture(tests_runtime_config_export_group),
-        new_TestFixture(tests_runtime_config_export_instance),
-        new_TestFixture(tests_runtime_config_export_schema),
-        new_TestFixture(tests_runtime_config_export_namespace),
-        new_TestFixture(tests_runtime_config_export_all),
+        new_TestFixture(tests_runtime_config_traverse_parameter),
+        new_TestFixture(tests_runtime_config_traverse_group),
+        new_TestFixture(tests_runtime_config_traverse_instance),
+        new_TestFixture(tests_runtime_config_traverse_schema),
+        new_TestFixture(tests_runtime_config_traverse_namespace),
+        new_TestFixture(tests_runtime_config_traverse_all),
     };
 
     EMB_UNIT_TESTCALLER(runtime_config_tests, test_runtime_config_setup, test_runtime_config_teardown, fixtures);

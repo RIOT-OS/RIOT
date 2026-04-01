@@ -85,7 +85,7 @@ USEMODULE += runtime_config
 ```
 
 This component holds the most basic functionality of the runtime configuration system.
-It allows to `set` and `get` Configuration Values, transactionally `apply` them to make the changes come into effect and `export` all Configuration Parameters that exist in a given `Configuration Namespace`, `Configuration Schema` or `Configuration Group`.
+It allows to `set` and `get` Configuration Values, transactionally `apply` them to make the changes come into effect and `list` all Configuration Parameters that exist in a given `Configuration Namespace`, `Configuration Schema` or `Configuration Group`.
 
 Furthermore it is possible to `add` `Configuration Namespaces` or `Configuration Schema Instances`.
 
@@ -100,7 +100,7 @@ It is possible to `add` custom `Configuration Namespaces` depending on the given
 
 The graphic below shows the API of the runtime configuration system.
 The top shows the Core API to manage Configuration Parameters.
-On the right-hand side are functions to `set` and `get` Configuration Parameters, transactionally `apply` them and `export` them to a buffer or terminal.
+On the right-hand side are functions to `set` and `get` Configuration Parameters, transactionally `apply` them and `list` them to a buffer or terminal.
 On the left-hand side are setup functions to `add` `Configuration Namespaces` and `Configuration Schema Instances`.
 
 The functionality of these functions is explained in the following paragraphs.
@@ -193,19 +193,19 @@ This way the module gets notified, when the `Configuration Parameter` has been a
 int runtime_config_apply(const runtime_config_node_t *node);
 ```
 
-### Export configurations
+### List available configurations
 
 Some times it is convenient to have a way to see what `Configuration Namespaces`, `Configuration Schemas`, `Configuration Schema Instances`, `Configuration Groups` or `Configuration Parameters` are available within our current Runtime configuration deployment.
-To get this information there is the `runtime_config_export` function.
+To get this information there is the `runtime_config_traverse_config_tree` function.
 
-This function exports every `Configuration Object` currently available in the runtime configuration tree within the scope of the provided `runtime_config_node_t` argument.
+This function lists every `Configuration Object` currently available in the runtime configuration tree within the scope of the provided `runtime_config_node_t` argument.
 
-When a node in the schema is exported, it will be passed on to the `export_cb` handler provided as an argument of each `runtime_config_export*` function.
+Each traversed node will be passed on to the `tree_traversal_cb` handler provided as an argument of each `runtime_config_traverse_config_tree` function.
 
 ```c
-int runtime_config_export(
+int runtime_config_traverse_config_tree(
     const runtime_config_node_t *node,
-    const runtime_config_export_cb_t export_cb,
+    const runtime_config_tree_traversal_cb_t tree_traversal_cb,
     const uint8_t tree_traversal_depth,
     const void *context
 );

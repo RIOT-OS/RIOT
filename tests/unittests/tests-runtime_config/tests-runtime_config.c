@@ -22,11 +22,11 @@
 
 Test *tests_runtime_config_get_set_tests(void);
 Test *tests_runtime_config_apply_tests(void);
-Test *tests_runtime_config_export_tests(void);
+Test *tests_runtime_config_traverse_config_tree_tests(void);
 
 void tests_runtime_config(void)
 {
     TESTS_RUN(tests_runtime_config_get_set_tests());
     TESTS_RUN(tests_runtime_config_apply_tests());
-    TESTS_RUN(tests_runtime_config_export_tests());
+    TESTS_RUN(tests_runtime_config_traverse_config_tree_tests());
 }

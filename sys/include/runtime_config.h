@@ -527,58 +527,64 @@ runtime_config_error_t runtime_config_set(
 runtime_config_error_t runtime_config_apply(const runtime_config_node_t *node);
 
 /**
- * @brief Callback definition of the @p runtime_config_export function.
+ * @brief Callback definition of the @p runtime_config_traverse_config_tree
+ *        function.
  *
  * This callback will be called for each location inside of the
- * configuration tree that is within the scope of the runtime configuration node passed
- * on to the @p runtime_config_export function.
+ * configuration tree that is within the scope of the runtime configuration node
+ * passed on to the @p runtime_config_traverse_config_tree function.
  *
  * @param[in] node A location within the runtime configuration tree.
- * @param[in] context Context that is passed by the @p runtime_config_export function.
+ * @param[in] context Context that is passed by the
+ *                    @p runtime_config_traverse_config_tree function.
  *
  * @return 0 on success, non-zero on failure.
  */
-typedef runtime_config_error_t (*runtime_config_export_cb_t)(
+typedef runtime_config_error_t (*runtime_config_tree_traversal_cb_t)(
     const runtime_config_node_t *node,
     const void *context);
 
 /**
- * @brief This mode exports every children of the given node including all
- *        nested children when calling the @p runtime_config_export function.
+ * @brief In this mode the function traverses through every children of the
+ *        given node including all sub-children when calling the
+ *        @p runtime_config_traverse_config_tree function.
  */
-#define RUNTIME_CONFIG_EXPORT_ALL                           0
+#define RUNTIME_CONFIG_TRAVERSE_ALL                                0
 
 /**
- * @brief This mode only exports the given node  when calling the
- *        @p runtime_config_export function.
+ * @brief In this mode the function only traverses through the given node when
+ *        calling the @p runtime_config_traverse_config_tree function.
  */
-#define RUNTIME_CONFIG_EXPORT_SELF                          1
+#define RUNTIME_CONFIG_TRAVERSE_SINGLE_NODE                        1
 
 /**
- * @brief This mode exports the given node plus n-1 levels of children  when
- *        calling the @p runtime_config_export function.
+ * @brief This mode traverses through the tree until the given node plus n-1
+ *        levels of children when calling the
+ *        @p runtime_config_traverse_config_tree function.
  */
-#define RUNTIME_CONFIG_EXPORT_WITH_N_LEVELS_OF_CHILDREN(_n) (_n + 1)
+#define RUNTIME_CONFIG_TRAVERSE_TREE_WITH_N_LEVELS_OF_CHILDREN(_n) (_n + 1)
 
 /**
- * @brief Exports every configuration parameter within the given configuration
- *        location (@p runtime_config_node_t) of the runtime configuration tree.
+ * @brief Iterates over every configuration parameter within the given
+ *        configuration location (@p runtime_config_node_t) of the runtime
+ *        configuration tree.
  *
  * @param[in] node A location within the runtime configuration tree.
- * @param[in] export_cb Exporting callback function will be called for each
- * namespace, schema, instance, group and parameter that are in scope.
+ * @param[in] tree_traversal_cb Callback function that will be called for
+ * each namespace, schema, instance, group and parameter that are within the
+ * @p tree_traversal_depth and specified @p node.
  * @param[in] tree_traversal_depth Defines how deeply nested child
  * groups / parameters will be shown:
  * 0 to show all children.
  * 1 to only show the exact match.
  * n > 1 to show the exact match plus n - 1 levels of children.
- * @param[in] context Context that will be passed to @p export_cb.
+ * @param[in] context Context that will be passed to @p tree_traversal_cb.
  *
  * @return 0 on success, non-zero on failure.
  */
-runtime_config_error_t runtime_config_export(
+runtime_config_error_t runtime_config_traverse_config_tree(
     const runtime_config_node_t *node,
-    const runtime_config_export_cb_t export_cb,
+    const runtime_config_tree_traversal_cb_t tree_traversal_cb,
     const uint8_t tree_traversal_depth,
     const void *context);
 
