@@ -317,7 +317,7 @@ int runtime_config_util_convert_value_to_str(
             str_len = fmt_float(
                 dest,
                 *(float *)src->buf,
-                RUNTIME_CONFIG_UTIL_FORMAT_FLOAT_PRECISION);
+                CONFIG_RUNTIME_CONFIG_UTIL_FORMAT_FLOAT_PRECISION);
         }
         else {
             /* Dest buffer is too small */

@@ -27,8 +27,8 @@ extern "C" {
  * @brief Specifies the number of digits after decimal point when converting
  *        float or double runtime config values to strings.
  */
-#ifndef RUNTIME_CONFIG_UTIL_FORMAT_FLOAT_PRECISION
-#  define RUNTIME_CONFIG_UTIL_FORMAT_FLOAT_PRECISION 6
+#ifndef CONFIG_RUNTIME_CONFIG_UTIL_FORMAT_FLOAT_PRECISION
+#  define CONFIG_RUNTIME_CONFIG_UTIL_FORMAT_FLOAT_PRECISION 6
 #endif
 
 /**
