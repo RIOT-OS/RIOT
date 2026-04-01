@@ -379,11 +379,11 @@ static void tests_runtime_config_ensure_that_max_values_can_be_set_and_get(void)
     };
 
     /* bytes */
-    const struct custom_struct_one_field_t = {
-       uint8_t foo;
+    struct custom_struct_one_field_t {
+        uint8_t foo;
     };
 
-    struct custom_struct_one_field_t custom_data_short = {foo = UINT8_MAX};
+    struct custom_struct_one_field_t custom_data_short = { .foo = UINT8_MAX };
 
     node.value.parameter.parameter = &custom_struct_one_field_t;
 
@@ -521,12 +521,12 @@ Test *tests_runtime_config_get_set_tests(void)
 {
     (void)tests_runtime_config_min_values;
     (void)tests_runtime_config_zero_values;
-    (void)tests_runtime_config_max_values;
+    (void)tests_runtime_config_ensure_that_max_values_can_be_set_and_get;
 
     EMB_UNIT_TESTFIXTURES(fixtures){
         new_TestFixture(tests_runtime_config_min_values),
         new_TestFixture(tests_runtime_config_zero_values),
-        new_TestFixture(tests_runtime_config_max_values),
+        new_TestFixture(tests_runtime_config_ensure_that_max_values_can_be_set_and_get),
     };
 
     EMB_UNIT_TESTCALLER(runtime_config_tests, test_runtime_config_setup, test_runtime_config_teardown, fixtures);
