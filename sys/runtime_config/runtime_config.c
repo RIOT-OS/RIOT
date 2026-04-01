@@ -318,10 +318,6 @@ static runtime_config_error_t _runtime_config_export_schema(
             node = node->next;
             runtime_config_schema_instance_t *instance = container_of(node, runtime_config_schema_instance_t, node);
 
-            if (!instance) {
-                return -RUNTIME_CONFIG_ERROR_SCHEMA_HAS_NO_INSTANCE;
-            }
-
             rc = _runtime_config_export_schema_instance(instance, export_cb, tree_traversal_depth - 1, context);
 
             if (!(rc == RUNTIME_CONFIG_ERROR_NONE)) {
