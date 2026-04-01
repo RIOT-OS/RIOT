@@ -248,14 +248,6 @@ typedef struct {
      * @private
      */
     void* _packet;
-
-    /**
-     * @brief Internal
-     *
-     * @warning This is an internal property. Do not access from your application!
-     * @private
-     */
-    void* _memo;
 } unicoap_request_context_t;
 
 /**
