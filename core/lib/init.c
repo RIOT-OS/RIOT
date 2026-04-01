@@ -49,6 +49,10 @@ static void *main_trampoline(void *arg)
 {
     (void)arg;
 
+#if MODULE_VFS
+    vfs_bind_stdio();
+#endif
+
     if (IS_USED(MODULE_AUTO_INIT)) {
         auto_init();
     }
@@ -133,8 +137,4 @@ void early_init(void)
     }
 
     stdio_init();
-
-#if MODULE_VFS
-    vfs_bind_stdio();
-#endif
 }
