@@ -504,7 +504,8 @@ runtime_config_error_t runtime_config_get(
  * @param[in] node A location within the runtime configuration tree.
  *                 Must be of the type "RUNTIME_CONFIG_NODE_PARAMETER".
  * @param[in] buf Pointer to the new value for the configuration parameter.
- * @param[in] buf_len Length of the buffer.
+ *                Must not be NULL.
+ * @param[in] buf_len Length of the buffer. Must be larger than 0.
  *
  * @return 0 on success, non-zero on failure.
  */
