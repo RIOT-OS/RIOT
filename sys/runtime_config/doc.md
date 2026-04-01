@@ -1,4 +1,4 @@
-@addtogroup  sys_runtime_config    Runtime config
+@addtogroup  sys_runtime_config    Runtime configuration
 
 @warning This implementation is not complete and not yet thoroughly tested.
          Please do not use this module in production, as it is missing major
@@ -35,9 +35,9 @@ The main advantages of having such a system are:
 
 ### Architecture
 
-The proposed architecture, as shown below, is formed by one or more applications or configuration managers and the runtime config API.
-The runtime config API acts as a common interface to access runtime configurations and store them in non-volatile storage.
-All runtime configurations can be accessed from the RIOT application either using the provided runtime config interfaces or through the interfaces exposed by the configuration managers.
+The architecture, as shown below, is formed by one or more applications or configuration managers and the runtime configuration API.
+The runtime configuration API acts as a common interface to access runtime configurations and store them in non-volatile storage.
+All runtime configurations can be accessed from the RIOT application either using the provided runtime configuration interfaces or through the interfaces exposed by the configuration managers.
 A RIOT application may interact with a configuration manager in order to modify access control rules or enable different exposed interfaces.
 
 #### Path Based Configuration Managers (Needs `int_path` or `string_path` extension)
@@ -52,24 +52,24 @@ They use either the `int_path` or the `string_path` extension module to expose t
 
 @warning There are no "Path Based Configuration Managers" implemented yet.
 
-These configuration managers have their own configuration structure (custom predefined object models etc.) and can not automatically be mapped to / from the runtime config schemas.
-To make them work, a custom mapping module needs to be implemented per configuration manager, which maps each configuration parameter from the RIOT runtime config module to the correct format of the configuration manager.
+These configuration managers have their own configuration structure (custom predefined object models etc.) and can not automatically be mapped to / from the runtime configuration schemas.
+To make them work, a custom mapping module needs to be implemented per configuration manager, which maps each configuration parameter from the RIOT runtime configuration module to the correct format of the configuration manager.
 
 <img src="https://github.com/RIOT-OS/RIOT/assets/10547444/26830a26-882a-422c-ba20-abfa4e07ce8c" style="width: 800px; max-width: 100%" alt="design_architecture" />
 
 ### Configuration Structure
 
-The runtime config system interacts with RIOT modules via `Configuration Schemas`, and with non-volatile storages via `Storages`.
-This way the functionality of the Runtime config is independent of the functionality of a `module` or `storage` implementation.
+The runtime configuration system interacts with RIOT modules via `Configuration Schemas`, and with non-volatile storages via `Storages`.
+This way the functionality of the runtime configuration is independent of the functionality of a `module` or `storage` implementation.
 It is possible to get or set the values of `Configuration Parameters`.
 It is also possible to apply configurations, export their values to a buffer or print them.
 To persist Configuration Values, it is possible to store them in non-volatile storages.
 
-Any mechanism of security (`access control`, `encryption` of configurations) is `not` directly in the scope of the runtime config module but in the Configuration Managers and the specific implementations of the `Configuration Schemas` and `Storages`.
+Any mechanism of security (`access control`, `encryption` of configurations) is `not` directly in the scope of the runtime configuration module but in the Configuration Managers and the specific implementations of the `Configuration Schemas` and `Storages`.
 
 The graphic below shows an example of two `Configuration Namespaces` (SYS and APP).
 The `APP` namespace contains a application specific `My app` Configuration Schema and the `SYS` namespace specifies a `WLAN` and a `LED Strip` Configuration Schema.
-The application `My app` uses the custom `My app` Configuration Schema to expose custom Configuration Parameters to the Runtime config and the drivers `WS2812`, `SK6812` and `UCS1903` contain instances of
+The application `My app` uses the custom `My app` Configuration Schema to expose custom Configuration Parameters to the Runtime configuration and the drivers `WS2812`, `SK6812` and `UCS1903` contain instances of
 the `LED Strip` Configuration Schema to expose common LED Strip Configuration Parameters.
 
 Also, there are two Storages available: `MTD` and `VFS`.
@@ -79,9 +79,9 @@ The `MTD` Storage internally uses the RIOT `MTD` driver and the `VFS` Storage in
 
 ### Components
 
-The Runtime config is split into multiple components as can be seen in the graphic below:
+The Runtime configuration system is split into multiple components as can be seen in the graphic below:
 
-#### Runtime Config Core
+#### Runtime Configuration Core
 
 ```makefile
 USEMODULE += runtime_config
@@ -92,9 +92,9 @@ It allows to `set` and `get` Configuration Values, transactionally `apply` them 
 
 Furthermore it is possible to `add` `Configuration Namespaces` or `Configuration Schema Instances`.
 
-#### Runtime Config Namespace
+#### Runtime Configuration Namespace
 
-The `Configuration Namespaces` such as `SYS` or `APP` and their respective `Configuration Schemas` are not part of the runtime config module itself.
+The `Configuration Namespaces` such as `SYS` or `APP` and their respective `Configuration Schemas` are not part of the runtime configuration module itself.
 It is possible to `add` custom `Configuration Namespaces` depending on the given needs.
 
 <img src="https://github.com/user-attachments/assets/473cef24-39b8-4539-b754-53146a497521" style="width: 800px; max-width: 100%" alt="design_runtime_config" />
@@ -198,7 +198,7 @@ int runtime_config_apply(const runtime_config_node_t *node);
 
 ### Export configurations
 
-Some times it is convenient to have a way to see what `Configuration Namespaces`, `Configuration Schemas`, `Configuration Schema Instances`, `Configuration Groups` or `Configuration Parameters` are available within our current Runtime config deployment.
+Some times it is convenient to have a way to see what `Configuration Namespaces`, `Configuration Schemas`, `Configuration Schema Instances`, `Configuration Groups` or `Configuration Parameters` are available within our current Runtime configuration deployment.
 To get this information there is the `runtime_config_export` function.
 
 This function exports every `Configuration Object` currently available in the runtime configuration tree within the scope of the provided `runtime_config_node_t` argument.
