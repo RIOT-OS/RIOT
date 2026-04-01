@@ -37,14 +37,14 @@ static runtime_config_error_t board_led_instance_apply_cb(
     const runtime_config_group_or_parameter_id_t *group_or_parameter_id,
     const runtime_config_schema_instance_t *instance)
 {
-    const runtime_config_sys_board_led_instance_t instance_data = *(const runtime_config_sys_board_led_instance_t *)instance->data;
+    const runtime_config_sys_board_led_instance_t *instance_data = (const runtime_config_sys_board_led_instance_t *)instance->data;
 
     /* Either apply all parameters of the instance or only the given parameter.
      * For a single LED there is no difference as it only has one parameter. */
     if ((group_or_parameter_id == NULL) ||
         (*group_or_parameter_id == RUNTIME_CONFIG_SYS_BOARD_LED_ENABLED)) {
         /* Get the correct field from the instance_data variable */
-        bool led_state = instance_data.enabled;
+        bool led_state = instance_data->enabled;
         /* Turn the LED on or off depending on the led_state */
         if (led_state == true) {
             /* This is the apply_cb function of instance 0, so we toggle LED 0 as well */
