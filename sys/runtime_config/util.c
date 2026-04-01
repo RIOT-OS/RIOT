@@ -49,132 +49,132 @@ int runtime_config_util_convert_str_to_value(
         return -EINVAL;
 
     case RUNTIME_CONFIG_TYPE_BYTES:
-        if (dest_len >= strlen(src) / 1) {
-            fmt_hex_bytes(dest, src);
-        }
-        else {
+        if (dest_len < strlen(src) / 1) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            fmt_hex_bytes(dest, src);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_STRING:
-        if (dest_len >= strlen(src) + 1) {
-            fmt_str((char *)dest, src);
-        }
-        else {
+        if (dest_len < strlen(src) + 1) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            fmt_str((char *)dest, src);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_BOOL:
-        if (dest_len >= 1) {
-            *(bool *)dest = strtol(src, &eptr, 0);
-        }
-        else {
+        if (dest_len < 1) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            *(bool *)dest = strtol(src, &eptr, 0);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_UINT8:
-        if (dest_len >= 1) {
-            *(uint8_t *)dest = strtoul(src, &eptr, 0);
-        }
-        else {
+        if (dest_len < 1) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            *(uint8_t *)dest = strtoul(src, &eptr, 0);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_UINT16:
-        if (dest_len >= 2) {
-            *(uint16_t *)dest = strtoul(src, &eptr, 0);
-        }
-        else {
+        if (dest_len < 2) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            *(uint16_t *)dest = strtoul(src, &eptr, 0);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_UINT32:
-        if (dest_len >= 4) {
-            *(uint32_t *)dest = scn_u32_dec(src, strlen(src));
-        }
-        else {
+        if (dest_len < 4) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            *(uint32_t *)dest = scn_u32_dec(src, strlen(src));
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_UINT64:
-        if (dest_len >= 8) {
-            *(uint64_t *)dest = strtoull(src, &eptr, 0);
-        }
-        else {
+        if (dest_len < 8) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            *(uint64_t *)dest = strtoull(src, &eptr, 0);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_INT8:
-        if (dest_len >= 1) {
-            *(int8_t *)dest = strtol(src, &eptr, 0);
-        }
-        else {
+        if (dest_len < 1) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            *(int8_t *)dest = strtol(src, &eptr, 0);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_INT16:
-        if (dest_len >= 2) {
-            *(int16_t *)dest = strtol(src, &eptr, 0);
-        }
-        else {
+        if (dest_len < 2) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            *(int16_t *)dest = strtol(src, &eptr, 0);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_INT32:
-        if (dest_len >= 4) {
-            *(int32_t *)dest = strtol(src, &eptr, 0);
-        }
-        else {
+        if (dest_len < 4) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            *(int32_t *)dest = strtol(src, &eptr, 0);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_INT64:
-        if (dest_len >= 8) {
-            *(int64_t *)dest = strtoll(src, &eptr, 0);
-        }
-        else {
+        if (dest_len < 8) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            *(int64_t *)dest = strtoll(src, &eptr, 0);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_FLOAT32:
-        if (dest_len >= 4) {
-            *(float *)dest = strtof(src, &eptr);
-        }
-        else {
+        if (dest_len < 4) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            *(float *)dest = strtof(src, &eptr);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_FLOAT64:
-        if (dest_len >= 8) {
-            *(double *)dest = strtod(src, &eptr);
-        }
-        else {
+        if (dest_len < 8) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            *(double *)dest = strtod(src, &eptr);
         }
         break;
     }
@@ -200,139 +200,139 @@ int runtime_config_util_convert_value_to_str(
         return -EINVAL;
 
     case RUNTIME_CONFIG_TYPE_BYTES:
-        if (dest_len >= src->buf_len * 2) {
-            str_len = fmt_bytes_hex(dest, src->buf, src->buf_len);
-        }
-        else {
+        if (dest_len < src->buf_len * 2) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            str_len = fmt_bytes_hex(dest, src->buf, src->buf_len);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_STRING:
-        if (dest_len >= src->buf_len) {
-            str_len = fmt_str(dest, (char *)src->buf);
-        }
-        else {
+        if (dest_len < src->buf_len) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            str_len = fmt_str(dest, (char *)src->buf);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_BOOL:
-        if (dest_len >= 1) {
-            /* There is no fmt_bool_dec, so we use this instead */
-            str_len = fmt_s16_dec(dest, *(bool *)src->buf);
-        }
-        else {
+        if (dest_len < 1) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            /* There is no fmt_bool_dec, so we use this instead */
+            str_len = fmt_s16_dec(dest, *(bool *)src->buf);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_UINT8:
-        if (dest_len >= 1) {
-            /* There is no fmt_u8_dec, so we use this instead */
-            str_len = fmt_u16_dec(dest, *(uint8_t *)src->buf);
-        }
-        else {
+        if (dest_len < 1) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            /* There is no fmt_u8_dec, so we use this instead */
+            str_len = fmt_u16_dec(dest, *(uint8_t *)src->buf);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_UINT16:
-        if (dest_len >= 2) {
-            str_len = fmt_u16_dec(dest, *(uint16_t *)src->buf);
-        }
-        else {
+        if (dest_len < 2) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            str_len = fmt_u16_dec(dest, *(uint16_t *)src->buf);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_UINT32:
-        if (dest_len >= 4) {
-            str_len = fmt_u32_dec(dest, *(uint32_t *)src->buf);
-        }
-        else {
+        if (dest_len < 4) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            str_len = fmt_u32_dec(dest, *(uint32_t *)src->buf);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_UINT64:
-        if (dest_len >= 8) {
-            str_len = fmt_u64_dec(dest, *(uint64_t *)src->buf);
-        }
-        else {
+        if (dest_len < 8) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            str_len = fmt_u64_dec(dest, *(uint64_t *)src->buf);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_INT8:
-        if (dest_len >= 1) {
-            /* There is no fmt_s8_dec, so we use this instead */
-            str_len = fmt_s16_dec(dest, *(int8_t *)src->buf);
-        }
-        else {
+        if (dest_len < 1) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            /* There is no fmt_s8_dec, so we use this instead */
+            str_len = fmt_s16_dec(dest, *(int8_t *)src->buf);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_INT16:
-        if (dest_len >= 2) {
-            str_len = fmt_s16_dec(dest, *(int16_t *)src->buf);
-        }
-        else {
+        if (dest_len < 2) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            str_len = fmt_s16_dec(dest, *(int16_t *)src->buf);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_INT32:
-        if (dest_len >= 4) {
-            str_len = fmt_s32_dec(dest, *(int32_t *)src->buf);
-        }
-        else {
+        if (dest_len < 4) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            str_len = fmt_s32_dec(dest, *(int32_t *)src->buf);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_INT64:
-        if (dest_len >= 8) {
-            str_len = fmt_s64_dec(dest, *(int64_t *)src->buf);
-        }
-        else {
+        if (dest_len < 8) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            str_len = fmt_s64_dec(dest, *(int64_t *)src->buf);
         }
         break;
 
     case RUNTIME_CONFIG_TYPE_FLOAT32:
-        if (dest_len >= 4) {
+        if (dest_len < 4) {
+            /* Dest buffer is too small */
+            return -EINVAL;
+        }
+        else {
             str_len = fmt_float(
                 dest,
                 *(float *)src->buf,
                 CONFIG_RUNTIME_CONFIG_UTIL_FORMAT_FLOAT_PRECISION);
         }
-        else {
-            /* Dest buffer is too small */
-            return -EINVAL;
-        }
         break;
 
     case RUNTIME_CONFIG_TYPE_FLOAT64:
-        if (dest_len >= 8) {
-            /* There is no fmt_double, so we use this instead */
-            str_len = sprintf(dest, "%f", *(double *)src->buf);
-        }
-        else {
+        if (dest_len < 8) {
             /* Dest buffer is too small */
             return -EINVAL;
+        }
+        else {
+            /* There is no fmt_double, so we use this instead */
+            str_len = sprintf(dest, "%f", *(double *)src->buf);
         }
         break;
     }
