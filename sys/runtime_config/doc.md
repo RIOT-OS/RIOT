@@ -42,11 +42,15 @@ A RIOT application may interact with a configuration manager in order to modify 
 
 #### Path Based Configuration Managers (Needs `int_path` or `string_path` extension)
 
+@warning There are no "Path Based Configuration Managers" implemented yet.
+
 These configuration managers mirror the internal structure of the RIOT runtime
 configuration tree.
 They use either the `int_path` or the `string_path` extension module to expose the parameters via a path of either strings or integers.
 
 #### Custom Schema Based Configuration Managers
+
+@warning There are no "Path Based Configuration Managers" implemented yet.
 
 These configuration managers have their own configuration structure (custom predefined object models etc.) and can not automatically be mapped to / from the runtime config schemas.
 To make them work, a custom mapping module needs to be implemented per configuration manager, which maps each configuration parameter from the RIOT runtime config module to the correct format of the configuration manager.
