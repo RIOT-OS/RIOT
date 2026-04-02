@@ -49,7 +49,7 @@ static unicoap_listener_t _default_listener = {
 #endif /* IS_USED(MODULE_UNICOAP_SERVER) */
 
 #if IS_USED(MODULE_UNICOAP_SERVER_STATIC_RESOURCES)
-XFA_INIT_CONST(unicoap_resource_t, unicoap_server_static_resources);
+XFA_INIT_CONST(unicoap_resource_t, unicoap_resources_xfa);
 #endif
 
 static unicoap_state_t _state = {

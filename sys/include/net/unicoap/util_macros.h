@@ -22,7 +22,9 @@
 #ifndef DOXYGEN
 #  define UNICOAP_CODE_CLASS_DETAIL_FORMAT "%u.%02u"
 
-#  define _CONCAT3(a, b, c)                      CONCAT3(a, b, c)
+#  define _CONCAT2(a, b) a ## b
+
+#  define _CONCAT3(a, b, c) CONCAT3(a, b, c)
 
 /* This is best explained by the following two examples.
  *  --> denotes a proprocessor evaluation step.
@@ -65,7 +67,7 @@
 #  define __unicoap_two_empty_args_ ~,
 
 #  define __unicoap_bit(offset, ...) \
-      __unicoap_create_bit_or_nothing(offset, CONCAT(__unicoap_two_empty_args_, offset))
+      __unicoap_create_bit_or_nothing(offset, _CONCAT2(__unicoap_two_empty_args_, offset))
 
 #  define __unicoap_create_bitfield(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, \
                                     _15, _16, ...)                                               \
