@@ -163,12 +163,12 @@ menu "CoAP Unified Suite (unicoap)"
             help
                  Number of minimum available sessions. If the count of available sessions falls below this threshold, the oldest used session will be closed after a timeout time. Set to 0 to deactivate this feature.
 
-        config UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_MS
+        config UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS
             int "DTLS session triage timeout (ms)"
             range 0 9999999
             default 15000
             help
-                 Timeout for freeing up a session when minimum number of available sessions is not given.
+                  Timeout for freeing up a session when minimum number of available session slots is not available anymore.
     endmenu
 
 
