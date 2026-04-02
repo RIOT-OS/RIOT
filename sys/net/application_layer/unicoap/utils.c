@@ -118,23 +118,6 @@ bool unicoap_path_is_equal(const unicoap_pathspec_t* lhs, const unicoap_pathspec
     return !*l && !*r;
 }
 
-/** @brief Returns new length of path excluding trailing slashes */
-static inline size_t _trim_trailing_slashes(const char* path, size_t length) {
-    if (length > 0) {
-        size_t i = length - 1;
-        while (i > 0) {
-            if (path[i] == '/') {
-                i -= 1;
-            } else {
-                break;
-            }
-        }
-        return i + 1;
-    } else {
-        return length;
-    }
-}
-
 bool unicoap_path_matches_string(const unicoap_pathspec_t* path,
                                  const char* string, size_t string_length, bool match_subtree) {
 
