@@ -522,7 +522,7 @@ PSEUDOMODULES += unicoap_driver_rfc7252_pdu
 PSEUDOMODULES += unicoap_sock_support
 
 # XFA support for CoAP resource definitions in unicoap server
-PSEUDOMODULES += unicoap_server_static_resources
+PSEUDOMODULES += unicoap_server_resource_declarations
 
 PSEUDOMODULES += usbus_urb
 PSEUDOMODULES += vdd_lc_filter_%

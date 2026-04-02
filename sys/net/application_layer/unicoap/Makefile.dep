@@ -31,12 +31,12 @@ endif
 _UNICOAP_MISSING_SERVER ?= 0
 
 # If someone imports XFA submodule, we don't silently import server submodule, we complain!
-ifneq (,$(filter unicoap_server_static_resources,$(USEMODULE)))
+ifneq (,$(filter unicoap_server_resource_declarations,$(USEMODULE)))
   ifeq (,$(filter unicoap_server,$(USEMODULE)))
     ifeq (0, $(_UNICOAP_MISSING_SERVER))
       $(warning XFA CoAP resource support imported, but not server?)
       $(info +++ FIXIT: Makefile: Add USEMODULE += unicoap_server to import server)
-      $(info +++ FIXIT: Makefile: Remove USEMODULE += unicoap_server_static_resources to remove XFA dependency)
+      $(info +++ FIXIT: Makefile: Remove USEMODULE += unicoap_server_resource_declarations to remove XFA dependency)
     endif
     _UNICOAP_MISSING_SERVER = 1
 	endif

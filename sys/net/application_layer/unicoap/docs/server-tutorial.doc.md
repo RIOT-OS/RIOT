@@ -47,10 +47,10 @@ In `main.c`, we include `unicoap`.
 
 Let's define a CoAP resource. To define a new resource statically (at compile-time), we
 use the @ref UNICOAP_RESOURCE macro. To make that work, we need to import the
-@ref net_unicoap_server_static_resources module in our `Makefile`.
+@ref net_unicoap_server_resource_declarations module in our `Makefile`.
 
 ```makefile
-USEMODULE += unicoap_server_static_resources
+USEMODULE += unicoap_server_resource_declarations
 ```
 
 ```c

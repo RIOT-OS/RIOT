@@ -48,7 +48,7 @@ static unicoap_listener_t _default_listener = {
 };
 #endif /* IS_USED(MODULE_UNICOAP_SERVER) */
 
-#if IS_USED(MODULE_UNICOAP_SERVER_STATIC_RESOURCES)
+#if IS_USED(MODULE_UNICOAP_SERVER_RESOURCE_DECLARATIONS)
 XFA_INIT_CONST(unicoap_resource_t, unicoap_resources_xfa);
 #endif
 
@@ -174,7 +174,7 @@ kernel_pid_t unicoap_init(void)
 
     mutex_init(&_state.lock);
 
-#if IS_USED(MODULE_UNICOAP_SERVER_STATIC_RESOURCES)
+#if IS_USED(MODULE_UNICOAP_SERVER_RESOURCE_DECLARATIONS)
     /* add CoAP resources from XFA */
     XFA_USE_CONST(unicoap_resource_t, unicoap_resources_xfa);
     static unicoap_listener_t _xfa_listener = {

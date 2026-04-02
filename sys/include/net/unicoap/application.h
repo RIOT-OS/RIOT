@@ -453,7 +453,7 @@ struct unicoap_resource {
 /** @} */
 
 /**
- * @addtogroup net_unicoap_server_static_resources
+ * @addtogroup net_unicoap_server_resource_declarations
  * @{
  */
 /* MARK: - Defining a static CoAP resource */
@@ -461,7 +461,7 @@ struct unicoap_resource {
  * @name Defining a static CoAP resource
  * @{
  */
-#if IS_USED(MODULE_UNICOAP_SERVER_STATIC_RESOURCES) || defined(DOXYGEN)
+#if IS_USED(MODULE_UNICOAP_SERVER_RESOURCE_DECLARATIONS) || defined(DOXYGEN)
 /**
  * @brief Declares a static CoAP resource
  *
@@ -477,7 +477,7 @@ struct unicoap_resource {
 #else
 #  define UNICOAP_RESOURCE(name)                                                                   \
       static_assert(false,                                                                         \
-                    "The unicoap_server_static_resources module is missing, resource cannot be registered"); \
+                    "The unicoap_server_resource_declarations module is missing, resource cannot be registered"); \
       unicoap_resource_t CONCAT(unicoap_resource_, name) =
 #endif
 /** @} */
@@ -492,7 +492,7 @@ struct unicoap_resource {
  * @brief Builds a string in Constrained RESTful Environments (CoRE) Link Format
  *
  * You use this method to build a stringified list of resources registered with `unicoap`.
- * To register a resource, use @ref unicoap_listener_register or @ref net_unicoap_server_static_resources.
+ * To register a resource, use @ref unicoap_listener_register or @ref net_unicoap_server_resource_declarations.
  * The string generated contains only resources available using the specified transport. When
  * handling a request destined for `/.well-known/core`, you should call this method with the
  * transport you received the request over.

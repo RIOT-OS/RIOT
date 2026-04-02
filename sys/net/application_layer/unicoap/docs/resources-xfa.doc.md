@@ -1,9 +1,9 @@
-@defgroup net_unicoap_server_static_resources Static Resource Definitions
+@defgroup net_unicoap_server_resource_declarations Static Resource Definitions
 @ingroup  net_unicoap_server
 @brief    Define CoAP resources at compile time
 @{
 
-Module. Specify `USEMODULE += unicoap_server_static_resources` in your application's Makefile.
+Module. Specify `USEMODULE += unicoap_server_resource_declarations` in your application's Makefile.
 
 Use @ref UNICOAP_RESOURCE to define resources across files as follows. The name you supply for
 the resource must be unique among resource definitions but has otherwise no meaning. It is

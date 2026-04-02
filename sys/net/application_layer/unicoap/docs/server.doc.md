@@ -11,7 +11,7 @@ A CoAP resource behaves similar to an HTTP endpoint.
 
 You can either declare a resource using static cross-file arrays (1) or manually at runtime (2).
 
-1. This technique requires the @ref net_unicoap_server_static_resources module (XFA = cross-file arrays).
+1. This technique requires the @ref net_unicoap_server_resource_declarations module (XFA = cross-file arrays).
    The identifier you specify with the @ref UNICOAP_RESOURCE macro just needs to be unique,
    but isn't used otherwise. You will need to specify a path and a set of allowed request methods
    using @ref UNICOAP_METHODS.
