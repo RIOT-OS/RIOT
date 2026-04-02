@@ -37,7 +37,7 @@ ifneq (,$(filter unicoap_resources_xfa,$(USEMODULE)))
       $(warning XFA CoAP resource support imported, but not server?)
       $(info +++ FIXIT: Makefile: Add USEMODULE += unicoap_server to import server)
       $(info +++ FIXIT: Makefile: Remove USEMODULE += unicoap_resources_xfa to remove XFA dependency)
-		endif
+    endif
     _UNICOAP_MISSING_SERVER = 1
 	endif
 endif

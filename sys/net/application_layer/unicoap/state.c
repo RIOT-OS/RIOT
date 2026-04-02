@@ -260,18 +260,18 @@ int unicoap_listener_deregister(unicoap_listener_t* listener)
 {
     assert(listener);
 
-    unicoap_listener_t* l = unicoap_get_listeners(&_state);
-    if (l == listener) {
+    unicoap_listener_t* current = unicoap_get_listeners(&_state);
+    if (current == listener) {
         unicoap_set_listeners(&_state, listener->next);
         return 0;
     }
 
-    while (l) {
-        if (l->next == listener) {
-            l->next = listener->next;
+    while (current) {
+        if (current->next == listener) {
+            current->next = listener->next;
             return 0;
         }
-        l = l->next;
+        current = current->next;
     }
     return -ENOENT;
 }
