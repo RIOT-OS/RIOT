@@ -34,10 +34,6 @@
 #include "namespace/tests.h"
 #include "namespace/tests/full.h"
 
-/* (FLT_MAX_10_EXP + 1) + sign + dot + 6 decimal places */
-#define FLOAT_MAX_CHAR_COUNT  ((FLT_MAX_10_EXP + 1) + 1 + 1 + 6)
-#define DOUBLE_MAX_CHAR_COUNT ((DBL_MAX_10_EXP + 1) + 1 + 1 + 6) // (DBL_MAX_10_EXP + 1) + sign + dot + 6 decimal places
-
 static runtime_config_error_t apply_cb(
     const runtime_config_group_or_parameter_id_t *group_or_parameter_id,
     const runtime_config_schema_instance_t *instance)
@@ -206,12 +202,7 @@ static void tests_runtime_config_min_values(void)
     runtime_config_set(&node, &input_f32, sizeof(input_f32));
     runtime_config_get(&node, &output);
 
-    char input_f32_string[FLOAT_MAX_CHAR_COUNT + 1] = { 0 };
-    char output_f32_string[FLOAT_MAX_CHAR_COUNT + 1] = { 0 };
-    sprintf(input_f32_string, "%f", input_f32);
-    sprintf(output_f32_string, "%f", *(float *)output.buf);
-
-    TEST_ASSERT_EQUAL_STRING(input_f32_string, output_f32_string);
+    TEST_ASSERT(input_f32 == *(float *)output.buf);
 
     /* f64 */
     const double input_f64 = DBL_MIN;
@@ -220,12 +211,7 @@ static void tests_runtime_config_min_values(void)
     runtime_config_set(&node, &input_f64, sizeof(input_f64));
     runtime_config_get(&node, &output);
 
-    char input_f64_string[DOUBLE_MAX_CHAR_COUNT + 1] = { 0 };
-    char output_f64_string[DOUBLE_MAX_CHAR_COUNT + 1] = { 0 };
-    sprintf(input_f64_string, "%f", input_f64);
-    sprintf(output_f64_string, "%f", *(double *)output.buf);
-
-    TEST_ASSERT_EQUAL_STRING(input_f64_string, output_f64_string);
+    TEST_ASSERT(input_f64 == *(double *)output.buf);
 }
 
 static void tests_runtime_config_zero_values(void)
@@ -348,12 +334,7 @@ static void tests_runtime_config_zero_values(void)
     runtime_config_set(&node, &input_f32, sizeof(input_f32));
     runtime_config_get(&node, &output);
 
-    char input_f32_string[FLOAT_MAX_CHAR_COUNT + 1] = { 0 };
-    char output_f32_string[FLOAT_MAX_CHAR_COUNT + 1] = { 0 };
-    sprintf(input_f32_string, "%f", input_f32);
-    sprintf(output_f32_string, "%f", *(float *)output.buf);
-
-    TEST_ASSERT_EQUAL_STRING(input_f32_string, output_f32_string);
+    TEST_ASSERT(input_f32 == *(float *)output.buf);
 
     /* f64 */
     const double input_f64 = 0.0;
@@ -362,12 +343,7 @@ static void tests_runtime_config_zero_values(void)
     runtime_config_set(&node, &input_f64, sizeof(input_f64));
     runtime_config_get(&node, &output);
 
-    char input_f64_string[DOUBLE_MAX_CHAR_COUNT + 1] = { 0 };
-    char output_f64_string[DOUBLE_MAX_CHAR_COUNT + 1] = { 0 };
-    sprintf(input_f64_string, "%f", input_f64);
-    sprintf(output_f64_string, "%f", *(double *)output.buf);
-
-    TEST_ASSERT_EQUAL_STRING(input_f64_string, output_f64_string);
+    TEST_ASSERT(input_f64 == *(double *)output.buf);
 }
 
 static void tests_runtime_config_ensure_that_max_values_can_be_set_and_get(void)
@@ -496,12 +472,7 @@ static void tests_runtime_config_ensure_that_max_values_can_be_set_and_get(void)
     runtime_config_set(&node, &input_f32, sizeof(input_f32));
     runtime_config_get(&node, &output);
 
-    char input_f32_string[FLOAT_MAX_CHAR_COUNT + 1] = { 0 };
-    char output_f32_string[FLOAT_MAX_CHAR_COUNT + 1] = { 0 };
-    sprintf(input_f32_string, "%f", input_f32);
-    sprintf(output_f32_string, "%f", *(float *)output.buf);
-
-    TEST_ASSERT_EQUAL_STRING(input_f32_string, output_f32_string);
+    TEST_ASSERT(input_f32 == *(float *)output.buf);
 
     /* f64 */
     const double input_f64 = DBL_MAX;
@@ -510,12 +481,7 @@ static void tests_runtime_config_ensure_that_max_values_can_be_set_and_get(void)
     runtime_config_set(&node, &input_f64, sizeof(input_f64));
     runtime_config_get(&node, &output);
 
-    char input_f64_string[DOUBLE_MAX_CHAR_COUNT + 1] = { 0 };
-    char output_f64_string[DOUBLE_MAX_CHAR_COUNT + 1] = { 0 };
-    sprintf(input_f64_string, "%f", input_f64);
-    sprintf(output_f64_string, "%f", *(double *)output.buf);
-
-    TEST_ASSERT_EQUAL_STRING(input_f64_string, output_f64_string);
+    TEST_ASSERT(input_f64 == *(double *)output.buf);
 }
 
 Test *tests_runtime_config_get_set_tests(void)
