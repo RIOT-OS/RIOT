@@ -1,6 +1,6 @@
-@defgroup net_unicoap_server_resource_declarations Static Resource Definitions
+@defgroup net_unicoap_server_resource_declarations CoAP Resource Declarations
 @ingroup  net_unicoap_server
-@brief    Define CoAP resources at compile time
+@brief    Declare CoAP resources at compile time
 @{
 
 Module. Specify `USEMODULE += unicoap_server_resource_declarations` in your application's Makefile.
