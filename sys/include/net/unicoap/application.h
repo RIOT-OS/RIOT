@@ -453,29 +453,31 @@ struct unicoap_resource {
 /** @} */
 
 /**
- * @addtogroup net_unicoap_resources_xfa
+ * @addtogroup net_unicoap_server_static_resources
  * @{
  */
-/* MARK: - Defining a cross-file resource */
+/* MARK: - Defining a static CoAP resource */
 /**
- * @name Defining a cross-file resource
+ * @name Defining a static CoAP resource
  * @{
  */
-#if IS_USED(MODULE_UNICOAP_RESOURCES_XFA) || defined(DOXYGEN)
+#if IS_USED(MODULE_UNICOAP_SERVER_STATIC_RESOURCES) || defined(DOXYGEN)
 /**
- * @brief CoAP cross-file resource definition
+ * @brief Declares a static CoAP resource
  *
- * @param name  internal name of the resource entry, must be unique
+ * @param name  Internal name of the resource entry, must be unique
+ *
+ * Places resource definition in cross-file array (XFA) of resources read upon initialization.
  *
  * You must supply a constant initializer following the macro invocation.
  * The name you supply is needed for technical reasons but has otherwise no meaning.
  */
 #  define UNICOAP_RESOURCE(name) \
-      XFA_CONST(unicoap_resource_t, unicoap_resources_xfa, 0) CONCAT(unicoap_resource_, name) =
+      XFA_CONST(unicoap_resource_t, unicoap_server_static_resources, 0) CONCAT(unicoap_resource_, name) =
 #else
 #  define UNICOAP_RESOURCE(name)                                                                   \
       static_assert(false,                                                                         \
-                    "The unicoap_resources_xfa module is missing, resource cannot be registered"); \
+                    "The unicoap_server_static_resources module is missing, resource cannot be registered"); \
       unicoap_resource_t CONCAT(unicoap_resource_, name) =
 #endif
 /** @} */
@@ -490,7 +492,7 @@ struct unicoap_resource {
  * @brief Builds a string in Constrained RESTful Environments (CoRE) Link Format
  *
  * You use this method to build a stringified list of resources registered with `unicoap`.
- * To register a resource, use @ref unicoap_listener_register or @ref net_unicoap_resources_xfa.
+ * To register a resource, use @ref unicoap_listener_register or @ref net_unicoap_server_static_resources.
  * The string generated contains only resources available using the specified transport. When
  * handling a request destined for `/.well-known/core`, you should call this method with the
  * transport you received the request over.

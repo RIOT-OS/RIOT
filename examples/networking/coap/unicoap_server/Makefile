@@ -47,7 +47,7 @@ USEMODULE += unicoap
 # Import sever submodule
 USEMODULE += unicoap_server
 # Cross-file CoAP resource definitions
-USEMODULE += unicoap_resources_xfa
+USEMODULE += unicoap_server_static_resources
 
 # This module is needed for CoAP over UDP
 USEMODULE += unicoap_driver_udp
