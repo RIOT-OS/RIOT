@@ -150,7 +150,7 @@
 struct __unicoap_placeholder_type { int _dummy; };
 #  define __UNICOAP_PLACEHOLDER (struct __unicoap_placeholder_type){ 0 }
 
-/** @brief Applies @p _f to all of the 16 arguments and returns comma-separated */
+/** @brief Applies @p _f to all of the 16 arguments and returns OR'd application of @p _f to all */
 #  define __unicoap_or_16( \
       _f, \
       _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, \
