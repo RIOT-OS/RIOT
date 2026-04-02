@@ -132,6 +132,15 @@
 #  endif
 #endif
 
+
+#ifndef DOXYGEN
+/* This macro can cause a static assertion failure from within an expression without an additional
+ * statement. It encapsulates the static_assert in a sizeof(struct { ... }) expression, and it
+ * discards that value by multiplying with 0. */
+#  define __unicoap_diagnose(condition, message) \
+    (0 * sizeof(struct { static_assert(condition, message); int dummy; }))
+#endif
+
 #ifndef DOXYGEN
 /* Here we check every every path component passed to UNICOAP_PATH for its type and if it's NULL
  * at compile time. We use _Generic as that built-in maps NULL to void*, which is a type we can
@@ -160,14 +169,17 @@ struct __unicoap_placeholder_type { int _dummy; };
  * an expression that can be compiled. The value does not matter -- hence 0 in every branch below.
  */
 
+#  define __UNICOAP_CHECK_PATH_COMPONENT_NONEMTPY(x) \
+    __unicoap_diagnose(sizeof(x) > 1, "Empty string literals as path components are disallowed.")
+
 #  if defined(_UNICOAP_GENERIC_CONTROLLING_TYPE_AVAILABLE)
 #    define __UNICOAP_CHECK_PATH_COMPONENT(x) _Generic((x), \
         char *: 0, \
         const char *: 0, \
         struct __unicoap_placeholder_type: 0 \
-     )
+     ) | __UNICOAP_CHECK_PATH_COMPONENT_NONEMTPY(x)
 #  else
-#    define __UNICOAP_CHECK_PATH_COMPONENT(x) 0
+#    define __UNICOAP_CHECK_PATH_COMPONENT(x) __UNICOAP_CHECK_PATH_COMPONENT_NONEMTPY(x)
 #  endif
 
 #  define _UNICOAP_TRY_CHECK_PATH_COMPONENTS(...) \
