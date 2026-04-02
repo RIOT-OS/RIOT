@@ -36,7 +36,7 @@ const unicoap_resource_t _unicoap_default_resources[] = {
     /* (unicoap_resource_t) */ { .path = UNICOAP_PATH_RESOURCE_DISCOVERY,
                                  .handler = unicoap_resource_handle_well_known_core,
                                  .methods = UNICOAP_METHODS(UNICOAP_METHOD_GET) }
-#  endif
+#  endif /* CONFIG_UNICOAP_WELL_KNOWN_CORE */
 };
 
 static unicoap_listener_t _default_listener = {
@@ -46,7 +46,7 @@ static unicoap_listener_t _default_listener = {
     .link_encoder = unicoap_resource_encode_link,
     .next = NULL,
 };
-#endif
+#endif /* IS_USED(MODULE_UNICOAP_SERVER) */
 
 #if IS_USED(MODULE_UNICOAP_RESOURCES_XFA)
 XFA_INIT_CONST(unicoap_resource_t, unicoap_resources_xfa);
