@@ -49,9 +49,7 @@ static runtime_config_error_t apply_cb(
 }
 
 static runtime_config_tests_full_instance_t test_full_instance_1_data = {
-    .bytes = {
-        .value = 7,
-    },
+    .bytes = { 7 },
     .string = "hello world",
     .boolean = true,
     .u8 = 9,
@@ -97,17 +95,19 @@ static void tests_runtime_config_min_values(void)
     };
 
     /* bytes */
-    const runtime_config_tests_full_instance_bytes_t input_bytes = {
-        .value = 0,
-    };
+    typedef struct {
+        uint8_t foo;
+    } custom_struct_one_field_t;
+
+    custom_struct_one_field_t custom_data_short = { .foo = UINT8_MAX };
 
     node.value.parameter.parameter = &runtime_config_tests_full_bytes;
 
-    runtime_config_set(&node, &input_bytes, sizeof(input_bytes));
+    runtime_config_set(&node, &custom_data_short, sizeof(custom_data_short));
     runtime_config_get(&node, &output);
 
-    TEST_ASSERT_EQUAL_INT(input_bytes.value,
-                          ((runtime_config_tests_full_instance_bytes_t *)output.buf)->value);
+    TEST_ASSERT_EQUAL_INT(custom_data_short.foo,
+                          ((custom_struct_one_field_t *)output.buf)->foo);
 
     /* string */
     const char input_string[] = "";
@@ -238,17 +238,18 @@ static void tests_runtime_config_zero_values(void)
     };
 
     /* bytes */
-    const runtime_config_tests_full_instance_bytes_t input_bytes = {
-        .value = 0,
-    };
+    typedef struct {
+        uint8_t foo;
+    } custom_struct_one_field_t;
+
+    custom_struct_one_field_t custom_data_short = { .foo = 0 };
 
     node.value.parameter.parameter = &runtime_config_tests_full_bytes;
 
-    runtime_config_set(&node, &input_bytes, sizeof(input_bytes));
+    runtime_config_set(&node, &custom_data_short, sizeof(custom_data_short));
     runtime_config_get(&node, &output);
 
-    TEST_ASSERT_EQUAL_INT(input_bytes.value,
-                          ((runtime_config_tests_full_instance_bytes_t *)output.buf)->value);
+    TEST_ASSERT_EQUAL_INT(0, ((custom_struct_one_field_t *)output.buf)->foo);
 
     /* string */
     const char input_string[] = "";
@@ -379,13 +380,13 @@ static void tests_runtime_config_ensure_that_max_values_can_be_set_and_get(void)
     };
 
     /* bytes */
-    struct custom_struct_one_field_t {
+    typedef struct {
         uint8_t foo;
-    };
+    } custom_struct_one_field_t;
 
-    struct custom_struct_one_field_t custom_data_short = { .foo = UINT8_MAX };
+    custom_struct_one_field_t custom_data_short = { .foo = UINT8_MAX };
 
-    node.value.parameter.parameter = &custom_struct_one_field_t;
+    node.value.parameter.parameter = &runtime_config_tests_full_bytes;
 
     runtime_config_set(&node, &custom_data_short, sizeof(custom_data_short));
     runtime_config_get(&node, &output);

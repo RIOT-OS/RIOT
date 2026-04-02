@@ -374,7 +374,7 @@ static void tests_runtime_config_traverse_all(void)
     TEST_ASSERT(successful);
 }
 
-Test *tests_runtime_config_traverse_tests(void)
+Test *tests_runtime_config_traverse_config_tree_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures){
         new_TestFixture(tests_runtime_config_traverse_parameter),

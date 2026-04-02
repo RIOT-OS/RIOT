@@ -42,7 +42,7 @@ extern runtime_config_schema_t runtime_config_tests_full;
 
 typedef struct {
     clist_node_t node;
-    void bytes[10];
+    uint8_t bytes[10];
     char string[50];
     bool boolean;
     uint8_t u8;
