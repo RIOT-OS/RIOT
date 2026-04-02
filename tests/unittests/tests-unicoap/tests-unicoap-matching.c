@@ -229,7 +229,7 @@ static void test_path_object(void) {
     TEST_ASSERT_EQUAL_INT(memcmp(my_path2._components, my_path2_layout, sizeof(my_path2_layout)), 0);
 
     const unicoap_pathspec_t my_root = UNICOAP_PATH_ROOT;
-    TEST_ASSERT_EQUAL_INT(my_root._components, NULL);
+    TEST_ASSERT_NULL(my_root._components);
 }
 
 static void test_path_object_is_root(void) {
