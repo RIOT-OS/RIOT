@@ -473,7 +473,7 @@ struct unicoap_resource {
  * The name you supply is needed for technical reasons but has otherwise no meaning.
  */
 #  define UNICOAP_RESOURCE(name) \
-      XFA_CONST(unicoap_resource_t, unicoap_server_static_resources, 0) CONCAT(unicoap_resource_, name) =
+      XFA_CONST(unicoap_resource_t, unicoap_resources_xfa, 0) CONCAT(unicoap_resource_, name) =
 #else
 #  define UNICOAP_RESOURCE(name)                                                                   \
       static_assert(false,                                                                         \

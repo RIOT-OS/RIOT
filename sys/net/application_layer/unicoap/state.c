@@ -176,12 +176,12 @@ kernel_pid_t unicoap_init(void)
 
 #if IS_USED(MODULE_UNICOAP_SERVER_STATIC_RESOURCES)
     /* add CoAP resources from XFA */
-    XFA_USE_CONST(unicoap_resource_t, unicoap_server_static_resources);
+    XFA_USE_CONST(unicoap_resource_t, unicoap_resources_xfa);
     static unicoap_listener_t _xfa_listener = {
-        .resources = unicoap_server_static_resources,
+        .resources = unicoap_resources_xfa,
     };
 
-    _xfa_listener.resource_count = XFA_LEN(unicoap_resource_t, unicoap_server_static_resources);
+    _xfa_listener.resource_count = XFA_LEN(unicoap_resource_t, unicoap_resources_xfa);
     unicoap_listener_register(&_xfa_listener);
     _SERVER_DEBUG("registered %" PRIuSIZE " XFA resources\n", _xfa_listener.resource_count);
 #endif
