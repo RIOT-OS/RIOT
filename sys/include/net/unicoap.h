@@ -128,5 +128,3 @@ int unicoap_loop_enqueue(unicoap_job_t* job);
 #ifdef __cplusplus
 }
 #endif
-
-
