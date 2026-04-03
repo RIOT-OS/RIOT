@@ -23,8 +23,8 @@
 #include "uri_parser.h"
 #include "net/netif.h"
 #include "net/unicoap/transport.h"
-#include "net/unicoap/application.h"
 #include "net/unicoap/message.h"
+#include "net/unicoap/server.h"
 
 #if IS_USED(MODULE_DNS)
 #  include "net/dns.h"

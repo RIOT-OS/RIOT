@@ -13,8 +13,12 @@
 #include "net/unicoap/config.h" /* IWYU pragma: export */
 #include "net/unicoap/message.h" /* IWYU pragma: export */
 #include "net/unicoap/options.h" /* IWYU pragma: export */
-#include "net/unicoap/application.h" /* IWYU pragma: export */
 #include "net/unicoap/transport.h" /* IWYU pragma: export */
+#include "net/unicoap/server.h" /* IWYU pragma: export */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @addtogroup net_unicoap
@@ -27,9 +31,9 @@
  * @author Carl Seifert <carl.seifert1@mailbox.tu-dresden.de>
  */
 
-/* MARK: - Controlling the unicoap instance */
+/* MARK: - Managing the unicoap instance */
 /**
- * @name Controlling the unicoap instance
+ * @name Managing the unicoap instance
  * @{
  */
 /**
@@ -119,12 +123,10 @@ typedef struct {
 int unicoap_loop_enqueue(unicoap_job_t* job);
 /** @} */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
-/** @} */
+

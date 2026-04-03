@@ -23,8 +23,8 @@
 
 /**
  * @file
- * @brief   High-level CoAP client and sever API
- * @ingroup net_unicoap
+ * @brief   Server APIs
+ * @ingroup net_unicoap_server
  * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
@@ -32,9 +32,14 @@
 extern "C" {
 #endif
 
-/* MARK: - Utilities */
 /**
- * @name Utilities
+ * @addtogroup net_unicoap_server
+ * @{
+ */
+
+/* MARK: - Specifying and inspecting resource paths */
+/**
+ * @name Specifying and inspecting resource paths
  * @{
  */
 /**
@@ -189,47 +194,21 @@ ssize_t unicoap_path_stringify(const unicoap_pathspec_t* path, char* buffer, siz
  * @note The path can be of arbitrary length.
  */
 void unicoap_path_print(const unicoap_pathspec_t* path);
-
-/**
- * @brief Auxiliary exchange information
- */
-typedef struct {
-    /**
-     * @brief The remote CoAP endpoint in this exchange
-     */
-    const unicoap_endpoint_t* remote;
-
-    /**
-     * @brief The local CoAP endpoint in this exchange
-     */
-    const unicoap_endpoint_t* local;
-
-    /**
-     * @brief Message properties
-     */
-    const unicoap_message_properties_t* properties;
-} unicoap_aux_t;
 /** @} */
 
-/**
- * @addtogroup net_unicoap_server
- * @{
- */
-/* MARK: - Responding to requests */
-/**
- * @name Responding to requests
- * @{
- */
 #ifndef DOXYGEN
 /* Forward declaration */
 struct unicoap_resource;
 #endif
 
-/**
- * @brief Resource typealias
- */
+/** @brief CoAP resource */
 typedef struct unicoap_resource unicoap_resource_t;
 
+/* MARK: - Reacting to CoAP requests */
+/**
+ * @name Reacting to CoAP requests
+ * @{
+ */
 /**
  * @brief Request context used to send a response to a given request
  */
@@ -268,7 +247,7 @@ typedef struct {
  *
  */
 typedef int (*unicoap_request_handler_t)(unicoap_message_t* request, const unicoap_aux_t* aux,
-                                          unicoap_request_context_t* ctx, void* arg);
+                                         unicoap_request_context_t* ctx, void* arg);
 
 /**
  * @brief Determines if the client is interested in a response
@@ -452,37 +431,6 @@ struct unicoap_resource {
 };
 /** @} */
 
-/**
- * @addtogroup net_unicoap_server_resource_declarations
- * @{
- */
-/* MARK: - Defining a static CoAP resource */
-/**
- * @name Defining a static CoAP resource
- * @{
- */
-#if IS_USED(MODULE_UNICOAP_SERVER_RESOURCE_DECLARATIONS) || defined(DOXYGEN)
-/**
- * @brief Declares a static CoAP resource
- *
- * @param name  Internal name of the resource entry, must be unique
- *
- * Places resource definition in cross-file array (XFA) of resources read upon initialization.
- *
- * You must supply a constant initializer following the macro invocation.
- * The name you supply is needed for technical reasons but has otherwise no meaning.
- */
-#  define UNICOAP_RESOURCE(name) \
-      XFA_CONST(unicoap_resource_t, unicoap_resources_xfa, 0) CONCAT(unicoap_resource_, name) =
-#else
-#  define UNICOAP_RESOURCE(name)                                                                   \
-      static_assert(false,                                                                         \
-                    "The unicoap_server_resource_declarations module is missing, resource cannot be registered"); \
-      unicoap_resource_t CONCAT(unicoap_resource_, name) =
-#endif
-/** @} */
-/** @} */
-
 /* MARK: - Resource discovery */
 /**
  * @name Resource discovery
@@ -563,9 +511,9 @@ ssize_t unicoap_resource_encode_link(const unicoap_resource_t* resource, char* b
                                      size_t capacity, unicoap_link_encoder_ctx_t* context);
 /** @} */
 
-/* MARK: - Matching request to resources */
+/* MARK: - Matching requests and resources */
 /**
- * @name Matching request to resources
+ * @name Matching requests and resources
  * @{
  */
 /**
@@ -589,7 +537,7 @@ typedef int (*unicoap_request_matcher_t)(const unicoap_listener_t* listener,
                                          const unicoap_message_t* request,
                                          const unicoap_endpoint_t* endpoint);
 /**
- * @brief   A modular collection of resources for a server
+ * @brief A modular collection of resources for a server
  */
 struct unicoap_listener {
     /**
@@ -717,6 +665,7 @@ static inline bool unicoap_resource_match_path_options(const unicoap_resource_t*
 }
 /** @} */
 
+/* MARK: - Matching methods and protocols */
 /**
  * @name Matching methods and protocols
  * @{
@@ -809,7 +758,38 @@ static inline bool unicoap_match_proto(unicoap_proto_set_t protocols, unicoap_pr
 /** @} */
 /** @} */
 
-#if !defined(DOXYGEN)
+/**
+ * @addtogroup net_unicoap_server_resource_declarations
+ * @{
+ */
+/* MARK: - Declaring a CoAP resource at compile time */
+/**
+ * @name Declaring a CoAP resource at compile time
+ * @{
+ */
+/**
+ * @brief Declares a static CoAP resource
+ *
+ * @param name  Internal name of the resource entry, must be unique
+ *
+ * Places resource definition in cross-file array (XFA) of resources read upon initialization.
+ *
+ * You must supply a constant initializer following the macro invocation.
+ * The name you supply is needed for technical reasons but has otherwise no meaning.
+ */
+#if IS_USED(MODULE_UNICOAP_SERVER_RESOURCE_DECLARATIONS) || defined(DOXYGEN)
+#  define UNICOAP_RESOURCE(name) \
+      XFA_CONST(unicoap_resource_t, unicoap_resources_xfa, 0) CONCAT(unicoap_resource_, name) =
+#else
+#  define UNICOAP_RESOURCE(name)                                                                   \
+      static_assert(false,                                                                         \
+                    "The unicoap_server_resource_declarations module is missing, resource cannot be registered"); \
+      unicoap_resource_t CONCAT(unicoap_resource_, name) =
+#endif
+/** @} */
+/** @} */
+
+#ifndef DOXYGEN
 extern uint8_t unicoap_receiver_buffer[CONFIG_UNICOAP_PDU_SIZE_MAX];
 #endif
 

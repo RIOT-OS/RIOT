@@ -457,6 +457,33 @@ int unicoap_transport_dtls_remove_socket(sock_dtls_t* socket)
 #  endif
 #endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN) */
 /** @} */
+
+/* MARK: - Utils */
+/**
+ * @name Utils
+ * @{
+ */
+/**
+ * @brief Auxiliary exchange information
+ */
+typedef struct {
+    /**
+     * @brief The remote CoAP endpoint in this exchange
+     */
+    const unicoap_endpoint_t* remote;
+
+    /**
+     * @brief The local CoAP endpoint in this exchange
+     */
+    const unicoap_endpoint_t* local;
+
+    /**
+     * @brief Message properties
+     */
+    const unicoap_message_properties_t* properties;
+} unicoap_aux_t;
+/** @} */
+
 /** @} */
 
 #ifdef __cplusplus

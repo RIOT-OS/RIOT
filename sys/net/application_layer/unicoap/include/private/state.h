@@ -14,7 +14,7 @@
 #include "event.h"
 #include "container.h"
 
-#include "net/unicoap/application.h"
+#include "net/unicoap/server.h"
 
 #include "private/packet.h"
 

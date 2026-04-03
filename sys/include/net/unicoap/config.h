@@ -428,7 +428,7 @@ static_assert(CONFIG_UNICOAP_RETRANSMISSIONS_MAX < 32,
 
 /**
  * @brief   Timeout for freeing up a session when minimum number of available
- *          sessions is not given.
+ *          session slots is not available anymore.
  *
  * **Default**: 15 ms
  */
