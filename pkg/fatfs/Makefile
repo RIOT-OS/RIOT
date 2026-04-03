@@ -4,6 +4,7 @@ PKG_NAME=fatfs
 PKG_URL=https://github.com/RIOT-OS/FatFS
 # r0.15
 PKG_VERSION=dab28e92fb4a2bea604771ede126251b9d35692a
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=BSD-1-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk

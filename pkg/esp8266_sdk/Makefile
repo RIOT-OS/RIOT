@@ -2,6 +2,7 @@ PKG_NAME=esp8266_sdk
 PKG_URL=https://github.com/espressif/ESP8266_RTOS_SDK
 # This is a version in the v3.1 release branch, between 3.1 and 3.1.1.
 PKG_VERSION=913a06a9ac3b2f18009e8fee8f092ca9ffeccd38
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
