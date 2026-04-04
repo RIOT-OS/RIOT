@@ -393,7 +393,7 @@ This is a (non-exhaustive) list of reasons you can ask for mediation:
 - You disagree with other contributors/maintainers on how RIOT should evolve
     - E.g. there are competing pull requests that cover highly related use
       cases and there is a disagreement which should be preferred
-    - A pull requests results (or resulted) deliberately in a regression for a
+    - A pull request results (or resulted) deliberately in a regression for a
       particular use case, e.g. by doing a different trade-off that benefits
       another use case
     - A feature relevant for your use case has been deprecated/removed
