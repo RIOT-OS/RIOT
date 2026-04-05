@@ -140,21 +140,7 @@ def main(args):
     """Main function."""
     cpu_lines = list_cpu_lines(args.cmsis_dir, args.cpu_fam)
 
-    # STM32U3: IRQ count is fixed and cannot be reliably parsed
-    # Follow the same approach as STM32U5
-    if args.cpu_fam == "u3":
-        context = {
-            "cpu_fam": args.cpu_fam,
-            "cpu_lines": [
-                {
-                    "line": cpu_line.upper().replace("X", "x"),
-                    "irq_numof": 125,
-                }
-                for cpu_line in cpu_lines
-            ]
-        }
-        generate_irqs(context)
-        return
+    
     context = {
         "cpu_fam": args.cpu_fam,
         "cpu_lines": [

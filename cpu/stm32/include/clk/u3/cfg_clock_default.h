@@ -1,3 +1,19 @@
+
+#pragma once
+
+/**
+ * @ingroup     cpu_stm32
+ * @{
+ *
+ * @file
+ * @brief       Default STM32U3 clock configuration (bring-up)
+ *
+ * This configuration is intentionally conservative for early bring-up.
+ * By default it uses HSI (16 MHz) as SYSCLK and disables PLL usage.
+ *
+ * @author      <Adarsh Nair Mullachery>
+ * @}
+ */
 /* cpu/stm32/include/clk/u3/cfg_clock_default.h */
 #pragma once
 

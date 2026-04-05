@@ -6,7 +6,8 @@
  *
  * @file
  * @brief       Minimal peripheral configuration for STM32U385 (bring-up)
- *
+ * 
+ * @author      Adarsh Nair Mullachery
  * This file is intentionally minimal to allow first successful boot
  * and GPIO operation (blinky).
  */

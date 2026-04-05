@@ -1,16 +1,11 @@
-/*
- 
- */
-
 /**
  * @ingroup     cpu_stm32
  * @{
  *
  * @file
- * @brief       Implementation of STM32 clock configuration for U3 family
+ * @brief       STM32U3 clock initialization
  *
- * 
- * @}
+ * @author      Adarsh Nair Mullachery 
  */
 
 #include "cpu.h"
