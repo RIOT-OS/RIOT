@@ -1,4 +1,7 @@
-
+/*
+ * SPDX-FileCopyrightText: 2026 Adarsh Nair Mullachery
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
 
 config CPU_FAM_U3
     bool

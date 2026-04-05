@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Adarsh Nair Mullachery
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 # CPU models
 
 config CPU_MODEL_STM32U385CG

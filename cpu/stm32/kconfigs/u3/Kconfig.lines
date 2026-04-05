@@ -1,7 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Adarsh Nair Mullachery
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
 
-# This file was auto-generated from ST ProductsList.xlsx sheet using the
-# script in cpu/stm32/dist/kconfig/gen_kconfig.py
-# See cpu/stm32/dist/kconfig/README.md for details
 
 # CPU lines
 config CPU_LINE_STM32U385XX

@@ -1,5 +1,15 @@
 #pragma once
 
+/**
+ * @ingroup     cpu_stm32
+ * @{
+ *
+ * @file
+ * @brief       STM32U3 family specific peripheral CPU definitions
+ *
+ * @author      Adarsh Nair
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
