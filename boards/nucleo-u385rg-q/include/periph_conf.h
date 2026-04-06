@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
 #pragma once
 
 /**
@@ -8,8 +11,6 @@
  * @brief       Minimal peripheral configuration for STM32U385 (bring-up)
  * 
  * @author      Adarsh Nair Mullachery
- * This file is intentionally minimal to allow first successful boot
- * and GPIO operation (blinky).
  */
 
 #include "periph_cpu.h"
@@ -20,8 +21,6 @@ extern "C" {
 #endif
 
 /* No UART, SPI, I2C, PWM, USB yet */
-
-
 
 /** @} */
 /**
@@ -58,10 +57,13 @@ static const uart_conf_t uart_config[] = {
     }
 };
 
-
 #define UART_0_ISR isr_usart1
 #define UART_NUMOF (1)
+
+/** @} */
 
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */

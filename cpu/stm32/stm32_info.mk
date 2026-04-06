@@ -86,10 +86,10 @@ else ifeq (c0,$(CPU_FAM))
 else ifeq (l5,$(CPU_FAM))
   CPU_CORE = cortex-m33
   SVD_MODEL := STM32L$(STM32_MODEL)
-else ifeq (u5,$(CPU_FAM))
+else ifeq (u3,$(CPU_FAM))
   CPU_CORE = cortex-m33
   SVD_MODEL := STM32U$(STM32_MODEL)
-else ifeq (u3,$(CPU_FAM))
+else ifeq (u5,$(CPU_FAM))
   CPU_CORE = cortex-m33
   SVD_MODEL := STM32U$(STM32_MODEL)
 else

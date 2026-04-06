@@ -299,7 +299,7 @@ else ifeq ($(STM32_TYPE), U)
       SRAM4_LEN = 16K
       BACKUP_RAM_ADDR = 0x40036400
       BACKUP_RAM_LEN = 0x2K
-     endif
+    endif
   endif
 else ifeq ($(STM32_TYPE), W)
   ifeq ($(STM32_FAMILY), B)
