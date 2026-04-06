@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2016-17 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2016-2017 Freie Universität Berlin
  * SPDX-FileCopyrightText: 2018 Otto-von-Guericke-Universität Magdeburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */

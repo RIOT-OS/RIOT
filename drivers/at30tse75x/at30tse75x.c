@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Daniel Krebs
+ * SPDX-FileCopyrightText: 2015 Daniel Krebs
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
