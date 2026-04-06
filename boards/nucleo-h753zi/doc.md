@@ -9,7 +9,7 @@ STM32H753ZI microcontroller with 1 MiB of RAM and 2 MiB of Flash.
 
 ## Pinout
 
-"Pinout for the Nucleo-H753ZI (from STM user manual, UM2607, https://www.st.com/resource/en/user_manual/um2407-stm32h7-nucleo144-boards-mb1364-stmicroelectronics.pdf, page 38)"
+@image html pinouts/nucleo-h753zi.svg "Pinout for the Nucleo-H753ZI (from STM user manual UM2407, https://www.st.com/resource/en/user_manual/um2407-stm32h7-nucleo144-boards-mb1364-stmicroelectronics.pdf, page 38)" width=50%
 
 ### MCU
 
