@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2013 INRIA
  * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
  * SPDX-FileCopyrightText: 2016 Eistec AB
- * SPDX-FileCopyrightText: 2018-21 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2018-2021 Freie Universität Berlin
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
