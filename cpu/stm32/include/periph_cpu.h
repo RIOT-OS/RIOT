@@ -50,10 +50,10 @@
 #include "periph/l4/periph_cpu.h"
 #elif defined(CPU_FAM_STM32L5)
 #include "periph/l5/periph_cpu.h"
-#elif defined(CPU_FAM_STM32U5)
-#include "periph/u5/periph_cpu.h"
 #elif defined(CPU_FAM_STM32U3)
 #include "periph/u3/periph_cpu.h"
+#elif defined(CPU_FAM_STM32U5)
+#include "periph/u5/periph_cpu.h"
 #elif defined(CPU_FAM_STM32WB)
 #include "periph/wb/periph_cpu.h"
 #elif defined(CPU_FAM_STM32WL)

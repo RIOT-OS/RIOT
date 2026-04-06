@@ -19,15 +19,15 @@ still be incomplete or untested.
 
 ### MCU
 
-| MCU               | STM32U385RG |
-|:------------------|:------------|
-| Family            | ARM Cortex-M33 |
-| Vendor            | STMicroelectronics |
-| RAM               | 640KiB |
-| Flash             | 1MiB |
-| Frequency         | up to 96MHz |
-| FPU               | yes |
-| TrustZone         | yes |
+| MCU               | STM32U385RG          |
+|:------------------|:---------------------|
+| Family            | ARM Cortex-M33       |
+| Vendor            | STMicroelectronics   |
+| RAM               | 640KiB               |
+| Flash             | 1MiB                 |
+| Frequency         | up to 96MHz          |
+| FPU               | yes                  |
+| TrustZone         | yes                  |
 | Datasheet         | [Datasheet](https://www.st.com/resource/en/datasheet/stm32u375ce.pdf) |
 | Reference Manual  | [Reference Manual](https://www.st.com/resource/en/reference_manual/rm0487-stm32u3-series-armbased-32bit-mcus-stmicroelectronics.pdf) |
 | Programming Manual| [Programming Manual](https://www.st.com/resource/en/programming_manual/pm0264-stm32-cortexm33-mcus-and-mpus-programming-manual-stmicroelectronics.pdf) |

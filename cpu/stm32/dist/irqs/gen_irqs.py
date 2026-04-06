@@ -139,8 +139,6 @@ def generate_irqs(context):
 def main(args):
     """Main function."""
     cpu_lines = list_cpu_lines(args.cmsis_dir, args.cpu_fam)
-
-    
     context = {
         "cpu_fam": args.cpu_fam,
         "cpu_lines": [

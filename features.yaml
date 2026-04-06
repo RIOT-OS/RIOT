@@ -330,10 +330,10 @@ groups:
           help: The MCU has an STM32 L5 MCU
         - name: cpu_stm32mp1
           help: The MCU has an STM32 MP1 MCU
-        - name: cpu_stm32u5
-          help: The MCU has an STM32 U5 MCU
         - name: cpu_stm32u3
           help: The MCU has an STM32 U3 MCU
+        - name: cpu_stm32u5
+          help: The MCU has an STM32 U5 MCU
         - name: cpu_stm32wb
           help: The MCU has an STM32 WB MCU
         - name: cpu_stm32wl
