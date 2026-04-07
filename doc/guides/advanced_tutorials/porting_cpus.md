@@ -18,7 +18,7 @@ usually consists of:
 - documentation and tests that make the port maintainable.
 
 This document focuses on the CPU side. For the board side, also refer to the
-existing RIOT guide on porting boards.
+existing RIOT guide on [porting boards](https://guide.riot-os.org/advanced_tutorials/porting_boards/).
 
 :::note
 A CPU port defines what the MCU family can do. A board port defines which of
@@ -29,14 +29,17 @@ those features are actually available on a specific board.
 
 A typical CPU port has a file structure similar to the following:
 
+Entries marked with `*` are optional and depend on the CPU family and reuse
+strategy. Entries without `*` are typically required for a minimal CPU port.
+
 ```text
 cpu/foo
 ├── include
 │   ├── cpu_conf.h
 │   ├── periph_cpu.h
-│   └── vendor
-├── ldscripts
-├── periph
+│   └── vendor*
+├── ldscripts*
+├── periph*
 │   ├── gpio.c
 │   ├── i2c.c
 │   ├── spi.c
@@ -44,14 +47,14 @@ cpu/foo
 ├── vectors
 │   └── vectors_<model>.c
 ├── Makefile
-├── Makefile.dep
-├── Makefile.features
+├── Makefile.dep*
+├── Makefile.features*
 ├── Makefile.include
 └── cpu.c
 ```
 
-Not every subdirectory is mandatory, but most non-trivial ports will need at
-least these elements.
+Not every subdirectory is mandatory; use the `*` markers above to distinguish
+optional components.
 
 ## Porting Workflow
 
@@ -74,13 +77,6 @@ The following sections describe the individual files and their purpose.
 The top-level CPU `Makefile` defines the CPU module and may include common
 subdirectories that are shared with other CPUs.
 
-Typical responsibilities:
-
-- define `MODULE = cpu`,
-- include `$(RIOTBASE)/Makefile.base`,
-- optionally add subdirectories such as `periph/`, `vectors/`, or a common CPU
-  family directory.
-
 Example:
 
 ```makefile
@@ -96,11 +92,6 @@ This file expresses build-time dependencies for the CPU. It is the right place
 for conditional module additions that depend on the selected CPU model,
 `USEMODULE`, or board features.
 
-Typical responsibilities:
-
-- pull in common CPU-family dependency files,
-- select required helper modules
-
 Example:
 
 ```makefile
@@ -113,14 +104,9 @@ endif
 
 ### `Makefile.features`
 
-This file declares what the CPU provides to the rest of RIOT.
-
-Typical responsibilities:
-
-- define `CPU_CORE` (for example `cortex-m4f`),
-- include common family feature files,
-- populate `FEATURES_PROVIDED` with the peripherals actually implemented by the
-  CPU port.
+This file declares what the CPU provides to the rest of RIOT by defining the
+CPU architecture, including common family feature files as well as defining
+the implemented peripherals with `FEATURES_PROVIDED`.
 
 Example:
 
@@ -134,20 +120,13 @@ FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 ```
 
-Only advertise features that are actually implemented and usable. Since the availability of some features can depend on the specific `CPU_MODEL`, conditional statements might be required here as well.
+Only advertise features that are actually implemented and usable. Since the
+availability of some features can depend on the specific `CPU_MODEL`,
+conditional statements might be required here as well.
 
 ### `Makefile.include`
 
 This file contains low-level build configuration for the CPU.
-
-Typical responsibilities:
-
-- add include paths via `INCLUDES += -I...`,
-- define `LINKER_SCRIPT`,
-- define the object containing the interrupt vector table via `VECTORS_O`,
-- define ROM and RAM layout (`ROM_START_ADDR`, `ROM_LEN`, `RAM_START_ADDR`,
-  `RAM_LEN`) of the `CPU_MODEL`,
-- optionally define debugger and flashing helpers.
 
 Example:
 
@@ -167,13 +146,6 @@ For Cortex-M devices, this file often also ties the CPU port to the generic
 `cpu.c` contains `cpu_init()`, which performs the minimum hardware and runtime
 initialization needed before RIOT starts normal execution.
 
-Typical responsibilities:
-
-- call generic core initialization for the architecture,
-- set interrupt priorities and interrupt grouping if required,
-- configure clocks or clock assumptions used by the CPU port,
-- perform any CPU-local setup that must happen before peripherals are used.
-
 A minimal shape often looks like this:
 
 ```c
@@ -191,7 +163,8 @@ belongs into the board port, and driver-specific initialization belongs into the
 corresponding peripheral implementation.
 
 :::note
-Refer to the Technical Reference Manual of the target CPU for details on implementing the boot process.
+Refer to the Technical Reference Manual of the target CPU for details on
+implementing the boot process.
 :::
 
 ### `vectors/`
@@ -294,8 +267,12 @@ specific MCU implementation.
 ### `include/vendor/`
 
 Vendor HAL headers can be placed here or integrated via RIOT's package
-mechanism. Keeping vendor code clearly separated from the actual RIOT port helps
-maintenance and updates.
+mechanism. Vendor SDKs can range from thousands to millions of lines of code,
+so it is usually better to pull them in on demand (or from shared family-common
+locations) instead of copying full SDK trees into every new port. Keeping
+vendor code separated from the actual RIOT port helps with maintenance and
+updates. Good references are existing CPU families such as STM32, nRF52, and 
+EFM32, which keep vendor content modular and reused across multiple boards.
 
 ## Registering the CPU Feature
 
@@ -604,12 +581,17 @@ Bring up the CPU with the smallest possible configuration first:
 ### Reuse common code
 
 If the MCU belongs to an already supported architecture or family, reuse the
-existing common code where possible. For this case, a base directory (e.g. `cpu/<CPU_FAM>_common`) should be created that contains all shared/common configurations. This drastically reduces maintenance and lowers the
-risk of subtle startup or interrupt bugs.
+existing common code where possible. For this case, a base directory
+(e.g. `cpu/<CPU_FAM>_common`) should be created that contains all shared/common
+configurations. This drastically reduces maintenance and lowers the risk of
+subtle startup or interrupt bugs.
 
 ### Refer to the manual of the target CPU
 
-Many CPUs are shipped with detailed manuals containing register-level information about peripherals, clock trees, the boot sequence, interrupt handling, and more. This information should be read, understood, and then mapped to the RIOT framework.
+Many CPUs are shipped with detailed manuals containing register-level
+information about peripherals, clock trees, the boot sequence, interrupt
+handling, and more. This information should be read, understood, and then mapped
+to the RIOT framework.
 
 ### Keep board details out of the CPU driver
 
@@ -639,3 +621,5 @@ Useful first tests are:
 - RIOT peripheral APIs in `drivers/include/periph/`
 - architecture-common code such as `cpu/cortexm_common/` when porting
   Cortex-M-based MCUs
+- merged RIOT PRs adding CPU support, for reference and pattern matching:
+  <https://github.com/RIOT-OS/RIOT/pulls?q=is%3Apr+is%3Amerged+%22cpu%2F%22+%22boards%2F%22>
