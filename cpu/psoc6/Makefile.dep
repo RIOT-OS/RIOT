@@ -1,0 +1,9 @@
+USEMODULE += ztimer_usec
+
+ifneq (,$(filter nimble,$(USEPKG)))
+  USEMODULE += nimble_host
+  USEMODULE += nimble_transport_hci_h4
+  USEMODULE += psoc6_ble_nimble
+endif
+
+include $(RIOTCPU)/cortexm_common/Makefile.dep

@@ -1,0 +1,3 @@
+USEMODULE += psoc6_ble_nimble
+
+include $(RIOTCPU)/cortexm_common/Makefile.dep

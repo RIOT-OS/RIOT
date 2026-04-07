@@ -1,0 +1,21 @@
+FLASHFILE ?= $(HEXFILE) 
+
+PROGRAMMER ?= openocd
+PROGRAMMERS_SUPPORTED += openocd
+
+OPENOCD_DEBUG_ADAPTER ?= dap
+OPENOCD_TRANSPORT ?= swd
+OPENOCD_CONFIG = $(RIOTBOARD)/infineon-psoc-62/dist/openocd.cfg
+
+# optional path to ModusToolbox OpenOCD 
+# Example:
+#   make BOARD=infineon-psoc-62 \
+#        MTB_OPENOCD_BASE=/opt/Tools/ModusToolboxProgtools-1.6/openocd flash
+MTB_OPENOCD_BASE ?=
+ifneq (,$(MTB_OPENOCD_BASE))
+  OPENOCD ?= $(MTB_OPENOCD_BASE)/bin/openocd -s $(MTB_OPENOCD_BASE)/scripts
+endif
+
+# The board can become un-flashable after some execution,
+# use connect_assert_srst to always be able to flash or reset the board.
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
