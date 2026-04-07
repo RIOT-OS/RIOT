@@ -1,4 +1,4 @@
-BOARD ?= infineon-psoc-62
+BOARD ?= infineon-cy8ckit-062s2-ai
 
 include ../Makefile.drivers_common
 
