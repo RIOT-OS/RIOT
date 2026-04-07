@@ -1,4 +1,7 @@
-# Porting a New CPU to RIOT
+---
+title: Porting CPUs
+description: Guide on how to port new CPU families to RIOT-OS
+---
 
 This guide was created during the process of porting a new MCU family
 (Infineon PSoC-6) to RIOT. It is intended as a practical companion to RIOT's
@@ -636,4 +639,3 @@ Useful first tests are:
 - RIOT peripheral APIs in `drivers/include/periph/`
 - architecture-common code such as `cpu/cortexm_common/` when porting
   Cortex-M-based MCUs
-
