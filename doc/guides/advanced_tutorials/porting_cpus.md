@@ -22,9 +22,9 @@ A CPU port defines what the MCU family can do. A board port defines which of
 those features are actually available on a specific board.
 :::
 
-## CPU Port Structure
+## CPU Port File Structure
 
-A typical CPU port has a structure similar to the following:
+A typical CPU port has a file structure similar to the following:
 
 ```text
 cpu/foo
