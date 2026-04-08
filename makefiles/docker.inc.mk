@@ -312,6 +312,7 @@ DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTBOARD,,riotboard)
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTMAKE,,riotmake)
 
 # Add GIT_CACHE_DIR if the directory exists
+GIT_CACHE_DIR ?= $(HOME)/.gitcache
 DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),$(call docker_volume,$(GIT_CACHE_DIR),$(DOCKER_BUILD_ROOT)/gitcache))
 DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),-e 'GIT_CACHE_DIR=$(DOCKER_BUILD_ROOT)/gitcache')
 
