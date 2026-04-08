@@ -83,7 +83,7 @@ void openthread_bootstrap(void)
 
     kw41zrf_hal_setup(&kw41zrf_netdev.submac.dev);
     kw41zrf_init();
-    netdev_t *netdev = &kw41zrf_netdev.netdev.netdev;
+    netdev_t *netdev = &kw41zrf_netdev.dev.netdev;
 #endif
 #ifdef MODULE_CC2538_RF
     netdev_register(&cc2538_rf_netdev.dev.netdev, NETDEV_CC2538, 0);
