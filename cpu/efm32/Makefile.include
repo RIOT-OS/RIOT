@@ -19,9 +19,6 @@ INCLUDES += -I$(RIOTCPU)/efm32/include/drivers
 # include EFM32 specific vendor headers
 INCLUDES += -I$(RIOTCPU)/efm32/include/vendor
 
-# arm_math.h is required by vendor headers and is located in CMSIS DSP includes
-INCLUDES += -I$(PKGDIRBASE)/cmsis/CMSIS/DSP/Include
-
 # include cortexm_common
 LINKER_SCRIPT = cortexm.ld
 
