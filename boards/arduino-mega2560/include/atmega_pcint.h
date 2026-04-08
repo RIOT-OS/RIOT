@@ -1,12 +1,24 @@
+/*
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 #pragma once
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define ATMEGA_PCINT_MAP_PCINT0 GPIO_PIN(PORT_B, 0), GPIO_PIN(PORT_B, 1), GPIO_PIN(PORT_B, 2), GPIO_PIN(PORT_B, 3), GPIO_PIN(PORT_B, 4), GPIO_PIN(PORT_B, 5), GPIO_PIN(PORT_B, 6), GPIO_PIN(PORT_B, 7)
-#define ATMEGA_PCINT_MAP_PCINT1 GPIO_PIN(PORT_E, 0), GPIO_PIN(PORT_J, 0), GPIO_PIN(PORT_J, 1), GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF
-#define ATMEGA_PCINT_MAP_PCINT2 GPIO_PIN(PORT_K, 0), GPIO_PIN(PORT_K, 1), GPIO_PIN(PORT_K, 2), GPIO_PIN(PORT_K, 3), GPIO_PIN(PORT_K, 4), GPIO_PIN(PORT_K, 5), GPIO_PIN(PORT_K, 6), GPIO_PIN(PORT_K, 7)
+#define ATMEGA_PCINT_MAP_PCINT0 GPIO_PIN(PORT_B, 0), GPIO_PIN(PORT_B, 1), GPIO_PIN(PORT_B, 2),\
+                                GPIO_PIN(PORT_B, 3), GPIO_PIN(PORT_B, 4), GPIO_PIN(PORT_B, 5),\
+                                GPIO_PIN(PORT_B, 6), GPIO_PIN(PORT_B, 7)
+
+#define ATMEGA_PCINT_MAP_PCINT1 GPIO_PIN(PORT_E, 0), GPIO_PIN(PORT_J, 0), GPIO_PIN(PORT_J, 1),\
+                                GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF
+
+#define ATMEGA_PCINT_MAP_PCINT2 GPIO_PIN(PORT_K, 0), GPIO_PIN(PORT_K, 1), GPIO_PIN(PORT_K, 2),\
+                                GPIO_PIN(PORT_K, 3), GPIO_PIN(PORT_K, 4), GPIO_PIN(PORT_K, 5),\
+                                GPIO_PIN(PORT_K, 6), GPIO_PIN(PORT_K, 7)
 
 #ifdef __cplusplus
 }
