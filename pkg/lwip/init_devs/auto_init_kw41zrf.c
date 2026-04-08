@@ -28,10 +28,9 @@ void auto_init_kw41zrf(void)
     DEBUG("[auto_init_netif] initializing kw41zrf #%u\n", 0);
 
     netdev_register(&kw41zrf_netdev.dev.netdev, NETDEV_KW41ZRF, 0);
-    netdev_ieee802154_submac_init(&kw41zrf_netdev);
-
-    kw41zrf_hal_setup(&kw41zrf_netdev.submac.dev);
     kw41zrf_init();
+    netdev_ieee802154_submac_init(&kw41zrf_netdev);
+    kw41zrf_hal_setup(&kw41zrf_netdev.submac.dev);
 
     if (lwip_add_6lowpan(&netif, &kw41zrf_netdev.dev.netdev) == NULL) {
         DEBUG("Could not add kw41zrf device\n");
