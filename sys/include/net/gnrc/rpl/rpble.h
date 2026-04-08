@@ -31,6 +31,12 @@ extern "C" {
 static inline void gnrc_rpl_rpble_update(const gnrc_rpl_dodag_t *dodag)
 {
     nimble_rpble_ctx_t ctx;
+
+    if (dodag == NULL) {
+        nimble_rpble_update(NULL);
+        return;
+    }
+
     ctx.inst_id = dodag->instance->id;
     memcpy(ctx.dodag_id, &dodag->dodag_id, 16);
     ctx.version = dodag->version;

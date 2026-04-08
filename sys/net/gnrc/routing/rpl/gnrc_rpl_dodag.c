@@ -85,6 +85,7 @@ void gnrc_rpl_poison_routes(gnrc_rpl_dodag_t *dodag)
         /* Poison routes by advertising infinity rank */
         dodag->my_rank = GNRC_RPL_INFINITE_RANK;
         trickle_reset_timer(&dodag->trickle);
+        gnrc_rpl_rpble_update(NULL);
         gnrc_rpl_cleanup_start(dodag);
     }
 }
