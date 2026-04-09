@@ -27,3 +27,6 @@ PSEUDOMODULES += configuration_delta_encoding_decoding
 
 # be able to export sub items which don't have a backend configured
 PSEUDOMODULES += configuration_key_subkey
+
+# shell command to do configuration commands
+PSEUDOMODULES += configuration_shell_command

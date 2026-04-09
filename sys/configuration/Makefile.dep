@@ -43,3 +43,7 @@ endif
 ifneq (,$(filter configuration_key_subkey,$(USEMODULE)))
   USEMODULE += configuration_handler_parent
 endif
+
+ifneq (,$(filter configuration_shell_command,$(USEMODULE)))
+  USEMODULE += shell
+endif
