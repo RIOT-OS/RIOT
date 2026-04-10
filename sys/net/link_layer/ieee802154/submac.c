@@ -48,7 +48,9 @@ static char *str_states[IEEE802154_FSM_STATE_NUMOF] = {
     "PREPARE",
     "TX",
     "WAIT_FOR_ACK",
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
     "TX_ACK",
+#endif /* MODULE_IEEE802154_SUBMAC_SOFT_ACK */
 };
 
 static char *str_ev[IEEE802154_FSM_EV_NUMOF] = {
@@ -68,10 +70,12 @@ static inline bool _does_handle_ack(ieee802154_dev_t *dev)
            ieee802154_radio_has_irq_ack_timeout(dev);
 }
 
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
 static inline bool _does_send_ack(ieee802154_dev_t *dev)
 {
     return ieee802154_radio_has_capability(dev, IEEE802154_CAP_AUTO_ACK);
 }
+#endif /* MODULE_IEEE802154_SUBMAC_SOFT_ACK */
 
 static inline bool _does_handle_csma(ieee802154_dev_t *dev)
 {
@@ -99,12 +103,15 @@ static ieee802154_fsm_state_t _tx_end(ieee802154_submac_t *submac, int status,
     res = ieee802154_radio_set_idle(dev, true);
 
     assert(res >= 0);
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
     /* notify upper layer after ACK transmission about reception */
     if (!_does_send_ack(dev) && submac->fsm_state == IEEE802154_FSM_STATE_TX_ACK) {
         DEBUG("IEEE802154 submac: ACK transmission done\n");
         submac->cb->rx_done(submac);
     }
-    else {
+    else
+#endif /* MODULE_IEEE802154_SUBMAC_SOFT_ACK */
+    {
         submac->cb->tx_done(submac, status, info);
     }
     return IEEE802154_FSM_STATE_IDLE;
@@ -162,7 +169,7 @@ static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
 
 static ieee802154_fsm_state_t _fsm_state_tx(ieee802154_submac_t *submac,
                                             ieee802154_fsm_ev_t ev);
-
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
 static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac, uint8_t seq_num)
 {
     ieee802154_dev_t *dev = &submac->dev;
@@ -199,6 +206,7 @@ static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac, uint8_t seq_num)
         return 0;
     }
 }
+#endif /* MODULE_IEEE802154_SUBMAC_SOFT_ACK */
 
 static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802154_fsm_ev_t ev)
 {
@@ -222,6 +230,7 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
         assert(res == (int)submac->rx_len);
         /* Make sure it's not an ACK frame */
         if (ieee802154_radio_len(dev) > (int)IEEE802154_MIN_FRAME_LEN) {
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
             /* sending ACK if radio does not support auto-ACK */
             if (!_does_send_ack(dev)) {
                 ieee802154_filter_mode_t mode;
@@ -238,6 +247,7 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
                     }
                 }
             }
+#endif /* MODULE_IEEE802154_SUBMAC_SOFT_ACK */
             submac->cb->rx_done(submac);
             return IEEE802154_FSM_STATE_IDLE;
         }
@@ -331,12 +341,13 @@ static ieee802154_fsm_state_t _fsm_state_prepare(ieee802154_submac_t *submac,
                 submac->backoff_mask = (submac->backoff_mask << 1) | 1;
             }
         }
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
         else if (!_does_send_ack(dev) && ftype == IEEE802154_FCF_TYPE_ACK) {
             /* no backoff for ACK frames but wait for SIFSPeriod */
             ztimer_sleep(ZTIMER_USEC, SIFS_PERIOD_US);
             tx_state = IEEE802154_FSM_STATE_TX_ACK;
         }
-
+#endif /* MODULE_IEEE802154_SUBMAC_SOFT_ACK */
         while (ieee802154_radio_request_transmit(dev) == -EBUSY) {}
         return tx_state;
     case IEEE802154_FSM_EV_RX_DONE:
@@ -471,6 +482,7 @@ static ieee802154_fsm_state_t _fsm_state_wait_for_ack(ieee802154_submac_t *subma
     return IEEE802154_FSM_STATE_INVALID;
 }
 
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
 static ieee802154_fsm_state_t _fsm_state_tx_ack(ieee802154_submac_t *submac,
                                                 ieee802154_fsm_ev_t ev)
 {
@@ -492,6 +504,7 @@ static ieee802154_fsm_state_t _fsm_state_tx_ack(ieee802154_submac_t *submac,
 
     return IEEE802154_FSM_STATE_INVALID;
 }
+#endif /* MODULE_IEEE802154_SUBMAC_SOFT_ACK */
 
 ieee802154_fsm_state_t ieee802154_submac_process_ev(ieee802154_submac_t *submac,
                                                     ieee802154_fsm_ev_t ev)
@@ -519,10 +532,12 @@ ieee802154_fsm_state_t ieee802154_submac_process_ev(ieee802154_submac_t *submac,
         DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_WAIT_FOR_ACK + %s\n", str_ev[ev]);
         new_state = _fsm_state_wait_for_ack(submac, ev);
         break;
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)
     case IEEE802154_FSM_STATE_TX_ACK:
         DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): IEEE802154_FSM_STATE_TX_ACK + %s\n", str_ev[ev]);
         new_state = _fsm_state_tx_ack(submac, ev);
         break;
+#endif /* MODULE_IEEE802154_SUBMAC_SOFT_ACK */
     default:
         DEBUG("IEEE802154 submac: ieee802154_submac_process_ev(): INVALID STATE\n");
         new_state = IEEE802154_FSM_STATE_INVALID;
