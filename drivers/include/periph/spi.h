@@ -23,7 +23,7 @@
  * `spi_release()` functions.
  *
  * This interface supports both software and hardware chip select lines. This is
- * reflected by the cpi_cs_t type, which overloads the gpio_t type with platform
+ * reflected by the spi_cs_t type, which overloads the gpio_t type with platform
  * specific values for defining platform dependent hardware chip select lines.
  *
  * Some devices have however very uncommon requirements on the usage and the
@@ -45,6 +45,31 @@
  * 3. `spi_acquire()` needs to be called for each new transaction. This function
  *    configures the bus with specific parameters (clock, mode) for the duration
  *    of that transaction.
+ *
+ * # Default Configuration and Dealing with Multiple SPI Buses
+ *
+ * Many advanced microcontrollers feature multiple SPI buses and some devices,
+ * such as the Nordic Semiconductor nRF52 family, even allow arbitrary pin
+ * assignments for the SPI peripherals.
+ *
+ * RIOT boards provide sane defaults for bus and pin assignments on Development
+ * Boards. The first SPI controller `SPI_DEV(0)` is assigned to
+ * the SPI pins marked on the board. Often that corresponds to the
+ * Arduino headers or other manufacturer standardized pinouts.
+ *
+ * If there are additional devices such as a display, flash memory, sensor,
+ * etc. present on the board, a higher number SPI controller will be selected,
+ * e.g. `SPI_DEV(1)` or `SPI_DEV(2)`.
+ * The exact assignment depends on the number of SPI controllers and
+ * organization of peripherals as well as the capabilities of the individual
+ * controller. Some controllers support faster transfer rate or special
+ * operating modes. More details are documented in the
+ * `periph_conf.h` file of the specific board.
+ *
+ * If you wish to modify the default configuration for your application,
+ * take a look at the
+ * [guides page](https://doc.riot-os.org/advanced_tutorials/creating_application/#modifying-board-defaults-of-peripherals)
+ * about creating applications.
  *
  * # (Low-) Power Implications
  *
