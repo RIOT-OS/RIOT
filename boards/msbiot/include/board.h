@@ -30,7 +30,7 @@ extern "C" {
 #define CC110X_PARAM_CS         GPIO_PIN(PORT_B, 12)    /**< CS pin of CC1101 */
 #define CC110X_PARAM_GDO0       GPIO_PIN(PORT_C, 4)     /**< GDO0 pin of CC1101 */
 #define CC110X_PARAM_GDO2       GPIO_PIN(PORT_C, 5)     /**< GDO2 pin of CC1101 */
-/*
+/**
  * @brief SPI clock (reduced to work around hw bug)
  */
 #define CC110X_PARAM_SPI_CLOCK  SPI_CLK_1MHZ

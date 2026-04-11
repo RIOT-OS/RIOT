@@ -54,7 +54,7 @@
  * @name User button configuration
  * @{
  */
-#define BUTTON1             GPIO_PIN(PORT_B,2)
+#define BUTTON1             GPIO_PIN(PORT_B, 2)
 /** @} */
 
 /**
@@ -62,9 +62,9 @@
  * @{
  */
 #define CC3000_SPI          SPI_DEV(0)
-#define CC3000_CS           GPIO_PIN(PORT_B,12)
-#define CC3000_EN           GPIO_PIN(PORT_B,8)
-#define CC3000_INT          GPIO_PIN(PORT_B,11)
+#define CC3000_CS           GPIO_PIN(PORT_B, 12)
+#define CC3000_EN           GPIO_PIN(PORT_B, 8)
+#define CC3000_INT          GPIO_PIN(PORT_B, 11)
 /** @} */
 
 /**
@@ -72,7 +72,7 @@
  * @{
  */
 #define EXTFLASH_SPI        SPI_DEV(0)
-#define EXTFLASH            GPIO_PIN(PORT_B,9)
+#define EXTFLASH            GPIO_PIN(PORT_B, 9)
 /** @} */
 
 #ifdef __cplusplus

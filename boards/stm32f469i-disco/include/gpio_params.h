@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2021 luisan00
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 #pragma once
 
 #include "board.h"
