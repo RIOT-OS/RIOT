@@ -90,7 +90,6 @@ void board_init(void)
 {
     int status;
 
-
     /* Initialize power control pins */
     power_pins_init();
 
@@ -105,7 +104,6 @@ void board_init(void)
 
     /* Turn on AVDD for reading voltages */
     gpio_set(MULLE_POWER_AVDD);
-
 
     /* NVRAM requires xtimer for timing */
     ztimer_init();

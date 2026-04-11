@@ -48,7 +48,7 @@ extern "C" {
  * purposes.
  */
 #ifndef ADC_GPIOS
-#define ADC_GPIOS   { GPIO0 , GPIO2 , GPIO4 , GPIO12, GPIO13, GPIO14, \
+#define ADC_GPIOS   { GPIO0, GPIO2, GPIO4, GPIO12, GPIO13, GPIO14, \
                       GPIO15, GPIO25, GPIO26, GPIO27, GPIO32, GPIO33, \
                       GPIO34, GPIO35, GPIO36, GPIO39 }
 #endif
