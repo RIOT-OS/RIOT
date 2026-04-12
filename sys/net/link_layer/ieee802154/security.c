@@ -649,6 +649,30 @@ static ieee802154_sec_peer_t *_get_peer(ieee802154_sec_context_t *ctx,
     return out;
 }
 
+#if IS_USED(MODULE_IEEE802154_SECURITY_REPLAY_PROTECTION_TOFU)
+static ieee802154_sec_peer_descriptor_t _add_peer(ieee802154_sec_context_t *ctx,
+                                                  const uint8_t *pan,
+                                                  const uint8_t *short_addr,
+                                                  const uint8_t *long_addr)
+{
+    ieee802154_sec_peer_t tmp_peer;
+    _init_peer(&tmp_peer, pan, short_addr, long_addr);
+    /* check for duplicate */
+    ieee802154_sec_peer_t *tmp = _get_peer(ctx, pan, long_addr, IEEE802154_LONG_ADDRESS_LEN);
+    if (tmp) {
+        return tmp - ctx->config.devstore.peers;
+    }
+    /* allocate a peer descriptor */
+    int d = bf_get_unset(ctx->config.devstore.mask,
+                         CONFIG_IEEE802154_SEC_DEFAULT_DEVSTORE_SIZE);
+    if (d < 0) {
+        return IEEE802154_SEC_NO_IDENT;
+    }
+    ctx->config.devstore.peers[d] = tmp_peer;
+    return d;
+}
+#endif
+
 #if IS_USED(MODULE_IEEE802154_SECURITY_REPLAY_PROTECTION)
 static void _init_peer_lookup(ieee802154_sec_peer_lookup_t *peer_lookup,
                               ieee802154_sec_peer_descriptor_t peer,
@@ -905,16 +929,31 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
             return -IEEE802154_SEC_NO_KEY;
         }
         ieee802154_sec_peer_t *dev = _get_peer(ctx,
-                ieee802154_get_src_pan_ptr(header),
-                ieee802154_get_src_ptr(header),
-                ieee802154_get_src_len(header));
+            ieee802154_get_src_pan_ptr(header),
+            ieee802154_get_src_ptr(header),
+            ieee802154_get_src_len(header));
 #if IS_USED(MODULE_IEEE802154_SECURITY_REPLAY_PROTECTION)
+#if IS_USED(MODULE_IEEE802154_SECURITY_REPLAY_PROTECTION_TOFU)
         if (!dev) {
-            /* The device has to exist and must be known by long address.
-             * If it would not have to exist, an attacker could replay any frame by creating
-             * an arbitrary device with a new source address.
-             * If it exists, it is trusted and a lookup descriptor is created for tracking the
-             * frame counter. */
+            /* Add device on first encounter TOFU (Trust On First Use).
+             * An attacker cannot replay a frame with a new device address, because the
+             * source address is part of the nonce.
+             * But long address must be used. */
+            if (ieee802154_get_src_len(header) == IEEE802154_LONG_ADDRESS_LEN) {
+                ieee802154_sec_peer_descriptor_t d = _add_peer(ctx,
+                    ieee802154_get_src_pan_ptr(header),
+                    NULL,
+                    ieee802154_get_src_ptr(header));
+                if (d == IEEE802154_SEC_NO_IDENT) {
+                    CTX_UNLOCK(ctx);
+                    DEBUG_SEC("device table full\n");
+                    return -IEEE802154_SEC_NO_DEV;
+                }
+                dev = &ctx->config.devstore.peers[d];
+            }
+        }
+#endif
+        if (!dev) {
             CTX_UNLOCK(ctx);
             DEBUG_SEC("device not found\n");
             return -IEEE802154_SEC_NO_DEV;

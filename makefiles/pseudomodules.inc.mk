@@ -247,6 +247,7 @@ PSEUDOMODULES += gnrc_sock_check_reuse
 PSEUDOMODULES += gnrc_txtsnd
 PSEUDOMODULES += ieee802154_security
 PSEUDOMODULES += ieee802154_security_replay_protection
+PSEUDOMODULES += ieee802154_security_replay_protection_tofu
 PSEUDOMODULES += ieee802154_submac
 PSEUDOMODULES += ipv4
 PSEUDOMODULES += ipv6
