@@ -24,7 +24,6 @@ extern "C" {
 
 /* No UART, SPI, I2C, PWM, USB yet */
 
-/** @} */
 /**
  * @name    Timer configuration
  * @{
@@ -44,6 +43,10 @@ static const timer_conf_t timer_config[] = {
 #define TIMER_0_ISR        isr_tim2
 /** @} */
 
+/**
+ * @name    UART configuration
+ * @{
+ */
 static const uart_conf_t uart_config[] = {
     {
         .dev = USART1,
@@ -61,7 +64,6 @@ static const uart_conf_t uart_config[] = {
 
 #define UART_0_ISR isr_usart1
 #define UART_NUMOF (1)
-
 /** @} */
 
 #ifdef __cplusplus
