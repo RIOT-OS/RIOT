@@ -33,21 +33,21 @@
   LED_FADE_EXPAND(led)
 
 #define LED_FADE_EXPAND(led)                  \
-  for(k = 0; k < 800; ++k) {                  \
+  for (k = 0; k < 800; ++k) {                 \
     j = k > 400 ? 800 - k : k;                \
     led##_ON;                                 \
-    for(i = 0; i < j; ++i) {                  \
-      __asm__("nop");                             \
+    for (i = 0; i < j; ++i) {                 \
+      __asm__("nop");                         \
     }                                         \
     led##_OFF;                                \
-    for(i = 0; i < 400 - j; ++i) {            \
-      __asm__("nop");                             \
+    for (i = 0; i < 400 - j; ++i) {           \
+      __asm__("nop");                         \
     }                                         \
   }
 
 #define LED_RAINBOW()                         \
   volatile int i;                             \
-  int k,j;                                    \
+  int k, j;                                   \
   LED_FADE_EXPAND(LED3);                      \
   LED_FADE_EXPAND(LED0);                      \
   LED_FADE_EXPAND(LED4);                      \

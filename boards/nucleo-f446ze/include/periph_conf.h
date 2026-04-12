@@ -193,7 +193,7 @@ static const adc_conf_t adc_config[] = {
     { .pin = GPIO_PIN(PORT_B, 0), .dev = 2, .chan =  9 }, /* ADC123_IN9   */
     { .pin = GPIO_PIN(PORT_C, 1), .dev = 2, .chan = 15 }, /* ADC3_IN15    */
     { .pin = GPIO_PIN(PORT_C, 0), .dev = 2, .chan =  8 }, /* ADC3_IN8     */
-    { .pin = GPIO_UNDEF, 	  .dev = 0, .chan = 18 }, /* VBAT */
+    { .pin = GPIO_UNDEF,          .dev = 0, .chan = 18 }, /* VBAT */
 };
 
 /**
