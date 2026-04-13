@@ -21,7 +21,7 @@
  */
 
 #include "kernel_defines.h"
-
+#include "net/ieee802154/init_radio.h"
 /**
  * @brief   Initializes network devices
  */
@@ -47,11 +47,6 @@ void gnrc_netif_init_devs(void)
         auto_init_atwinc15x0();
     }
 
-    if (IS_USED(MODULE_MRF24J40)) {
-        extern void auto_init_mrf24j40(void);
-        auto_init_mrf24j40();
-    }
-
     if (IS_USED(MODULE_CC110X)) {
         extern void auto_init_cc110x(void);
         auto_init_cc110x();
@@ -75,11 +70,6 @@ void gnrc_netif_init_devs(void)
     if (IS_USED(MODULE_ESP_ETH)) {
         extern void auto_init_esp_eth(void);
         auto_init_esp_eth();
-    }
-
-    if (IS_USED(MODULE_ESP_IEEE802154)) {
-        extern void auto_init_esp_ieee802154(void);
-        auto_init_esp_ieee802154();
     }
 
     /* don't change the order of auto_init_esp_now and auto_init_esp_wifi */
@@ -114,19 +104,9 @@ void gnrc_netif_init_devs(void)
         auto_init_slipdev();
     }
 
-    if (IS_USED(MODULE_CC2538_RF)) {
-        extern void auto_init_cc2538_rf(void);
-        auto_init_cc2538_rf();
-    }
-
     if (IS_USED(MODULE_XBEE)) {
         extern void auto_init_xbee(void);
         auto_init_xbee();
-    }
-
-    if (IS_USED(MODULE_KW2XRF)) {
-        extern void auto_init_kw2xrf(void);
-        auto_init_kw2xrf();
     }
 
     if (IS_USED(MODULE_KW41ZRF)) {
@@ -143,11 +123,12 @@ void gnrc_netif_init_devs(void)
         extern void auto_init_netdev_tap(void);
         auto_init_netdev_tap();
     }
-
-    if (IS_USED(MODULE_SOCKET_ZEP)) {
-        extern void auto_init_socket_zep(void);
-        auto_init_socket_zep();
+#if defined(IEEE802154_RADIO_COUNT)
+    if (IEEE802154_RADIO_COUNT) {
+        extern void auto_init_ieee802154(void);
+        auto_init_ieee802154();
     }
+#endif
     if (IS_USED(MODULE_NRF24L01P_NG)) {
         extern void auto_init_nrf24l01p_ng(void);
         auto_init_nrf24l01p_ng();
@@ -165,11 +146,6 @@ void gnrc_netif_init_devs(void)
     if (IS_USED(MODULE_SX127X) && !IS_USED(MODULE_SEMTECH_LORAMAC)) {
         extern void auto_init_sx127x(void);
         auto_init_sx127x();
-    }
-
-    if (IS_USED(MODULE_NRF802154)) {
-        extern void auto_init_nrf802154(void);
-        auto_init_nrf802154();
     }
 
     if (IS_USED(MODULE_SX126X) && !IS_USED(MODULE_SEMTECH_LORAMAC)) {

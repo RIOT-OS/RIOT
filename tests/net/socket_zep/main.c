@@ -21,10 +21,10 @@
 
 #include "byteorder.h"
 #include "net/ieee802154.h"
+#include "net/ieee802154/init_radio.h"
 #include "net/netdev/ieee802154_submac.h"
 #include "sched.h"
 #include "socket_zep.h"
-#include "socket_zep_params.h"
 #include "socket_zep_params.h"
 #include "test_utils/expect.h"
 #include "thread.h"
@@ -37,7 +37,6 @@
 
 static uint8_t _recvbuf[RECVBUF_SIZE];
 static msg_t _msg_queue[MSG_QUEUE_SIZE];
-static socket_zep_t _dev;
 static netdev_ieee802154_submac_t _socket_zep_netdev;
 static kernel_pid_t _main_pid;
 
@@ -54,8 +53,7 @@ static void test_init(void)
     netdev_register(&_socket_zep_netdev.dev.netdev, NETDEV_SOCKET_ZEP, 0);
     netdev->event_callback = _event_cb;
     netdev_ieee802154_submac_init(&_socket_zep_netdev);
-    socket_zep_hal_setup(&_dev, &_socket_zep_netdev.submac.dev);
-    socket_zep_setup(&_dev, p);
+    ieee802154_radio_init(&_socket_zep_netdev.submac.dev, 0, NULL);
     expect(netdev->driver->init(netdev) >= 0);
     _print_info(netdev);
 }

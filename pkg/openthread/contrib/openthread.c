@@ -17,6 +17,7 @@
  */
 
 #include "openthread/platform/alarm-milli.h"
+#include "net/ieee802154/init_radio.h"
 #include "openthread/platform/uart.h"
 #include "ot.h"
 #include "random.h"
@@ -29,14 +30,6 @@
 
 #ifdef MODULE_KW41ZRF
 #include "kw41zrf.h"
-#endif
-
-#ifdef MODULE_CC2538_RF
-#include "cc2538_rf.h"
-#endif
-
-#ifdef MODULE_NRF802154
-#include "nrf802154.h"
 #endif
 
 #if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC)
@@ -54,8 +47,8 @@
 #define OPENTHREAD_NETIF_NUMOF        (1U)
 #endif
 
-#ifdef MODULE_CC2538_RF
-static netdev_ieee802154_submac_t cc2538_rf_netdev;
+#ifdef IEEE802154_RADIO_COUNT
+static netdev_ieee802154_submac_t submac_netdev;
 #endif
 
 #ifdef MODULE_AT86RF2XX
@@ -64,10 +57,6 @@ static at86rf2xx_t at86rf2xx_dev;
 
 #ifdef MODULE_KW41ZRF
 static kw41zrf_t kw41z_dev;
-#endif
-
-#ifdef MODULE_NRF802154
-static netdev_ieee802154_submac_t nrf802154_netdev;
 #endif
 
 static uint8_t rx_buf[OPENTHREAD_NETDEV_BUFLEN];
@@ -85,19 +74,12 @@ void openthread_bootstrap(void)
     kw41zrf_setup(&kw41z_dev, 0);
     netdev_t *netdev = &kw41z_dev.netdev.netdev;
 #endif
-#ifdef MODULE_CC2538_RF
-    netdev_register(&cc2538_rf_netdev.dev.netdev, NETDEV_CC2538, 0);
-    netdev_ieee802154_submac_init(&cc2538_rf_netdev);
-    cc2538_rf_hal_setup(&cc2538_rf_netdev.submac.dev);
-    cc2538_init();
+#ifdef IEEE802154_RADIO_COUNT
+    const netdev_type_t type = netdev_get_default_type();
+    netdev_register(&submac_netdev.dev.netdev, type, 0);
+    netdev_ieee802154_submac_init(&submac_netdev);
+    ieee802154_radio_init(&submac_netdev.submac.dev, 0, NULL);
     netdev_t *netdev = &cc2538_rf_netdev.dev.netdev;
-#endif
-#ifdef MODULE_NRF802154
-    netdev_register(&nrf802154_netdev.dev.netdev, NETDEV_NRF802154, 0);
-    netdev_ieee802154_submac_init(&nrf802154_netdev);
-    nrf802154_hal_setup(&nrf802154_netdev.submac.dev);
-    nrf802154_init();
-    netdev_t *netdev = &nrf802154_netdev.dev.netdev;
 #endif
 
     openthread_radio_init(netdev, tx_buf, rx_buf);
