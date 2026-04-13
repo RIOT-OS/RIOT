@@ -5,10 +5,12 @@
  * License v2. See the file LICENSE for more details.
  */
 
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <math.h>
 #include <unistd.h>
@@ -17,8 +19,12 @@
 #define CONFIG_USE_NUMERIC_NAMES 1
 #endif
 
+#define DEFAULT_RANGE 25
+#define DELIM "\t ;,"
+
 struct node {
-    char name[8];
+    char name[16];
+    char extra[24];
     int x;
     int y;
     unsigned r;
@@ -194,7 +200,11 @@ static void _print_distance(struct node *nodes, unsigned num, bool recursive, bo
 
     if (recursive) {
         for (unsigned i = 0; i < num; ++i) {
-            printf("%s\n", nodes[i].name);
+            printf("%s", nodes[i].name);
+            if (*nodes[i].extra) {
+                printf(" := %s", nodes[i].extra);
+            }
+            puts("");
         }
     }
 
@@ -230,6 +240,7 @@ static void _print_help(const char *name)
                     " [-r <range>]"
                     " [-v <variance of range>]"
                     " [-n <nodes>]"
+                    " [-f <file>]"
                     " [-b][-g]"
                     "\n", name);
 
@@ -240,25 +251,116 @@ static void _print_help(const char *name)
     puts("\t-r <range>\tRadio range of the nodes");
     puts("\t-v <variance>\tmaximal random variance of radio range");
     puts("\t-n <nodes>\tnumber of nodes in the topology");
+    puts("\t-f <file>\tread world from file instead of generating it randomly\n");
     puts("\t-b\t\tbinary links: link quality is rounded to 100% or 0%");
     puts("\t-g\t\tnodes are organized as a grid");
+}
+
+static bool _is_empty(const char *line)
+{
+    while (*line) {
+        if (!isspace(*line++)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static struct node *_get_node_by_name(struct world *w, const char *name)
+{
+    for (unsigned i = 0; i < w->num_nodes; ++i) {
+        if (!strcmp(w->nodes[i].name, name)) {
+            return &w->nodes[i];
+        }
+    }
+
+    return NULL;
+}
+
+static int _from_file(struct world *w, FILE *file)
+{
+    char *line = NULL;
+    size_t len = 0;
+
+
+    unsigned linenum = 0;
+    while (getline(&line, &len, file) >= 0) {
+        ++linenum;
+
+        /* skip comments & empty lines */
+        if (*line == '#' || _is_empty(line)) {
+            continue;
+        }
+
+        char *name = strtok(line, DELIM);
+        char *xpos = strtok(NULL, DELIM);
+        char *ypos = strtok(NULL, DELIM);
+        char *range = strtok(NULL, DELIM);
+
+        /* check if node is already stored */
+        struct node *n = _get_node_by_name(w, name);
+        if (n == NULL) {
+            w->nodes = reallocarray(w->nodes, ++w->num_nodes, sizeof(*w->nodes));
+            n = &w->nodes[w->num_nodes - 1];
+        }
+
+        /* store name */
+        strncpy(n->name, name, sizeof(n->name) - 1);
+        if (strlen(name) >= sizeof(n->name)) {
+            fprintf(stderr, "warning: '%s' truncated to '%s'\n", name, n->name);
+        }
+
+        /* node definition with pinned MAC */
+        if (!strcmp(xpos, ":=")) {
+            strncpy(n->extra, ypos, sizeof(n->extra) - 1);
+            continue;
+        }
+
+        if (xpos) {
+            n->x = atoi(xpos);
+        } else {
+            fprintf(stderr, "error on line %d: '%s' has no position\n", linenum, name);
+            return -1;
+        }
+        if (ypos) {
+            n->y = atoi(ypos);
+        }
+        if (range) {
+            n->r = atoi(range);
+        } else {
+            n->r = DEFAULT_RANGE;
+        }
+
+        if (n->x + n->r > w->w) {
+            w->w = n->x + n->r;
+        }
+        if (n->y + n->r > w->h) {
+            w->h = n->y + n->r;
+        }
+    }
+
+    free(line);
+
+    return 0;
 }
 
 int main(int argc, char** argv)
 {
     const char *progname = argv[0];
+    char *worldmap = NULL;
 
     unsigned width  = 100;
     unsigned height = 100;
     unsigned seed   = time(NULL);
-    unsigned range  = 25;
+    unsigned range  = DEFAULT_RANGE;
     unsigned var    = 0;
     unsigned num    = 10;
     bool binary     = false;
     bool grid       = false;
     char c;
 
-    while ((c = getopt(argc, argv, "s:w:h:r:v:n:bg")) != -1) {
+    while ((c = getopt(argc, argv, "s:w:h:r:v:n:f:bg")) != -1) {
         switch (c) {
         case 'b':
             binary = true;
@@ -284,6 +386,9 @@ int main(int argc, char** argv)
         case 'n':
             num = atoi(optarg);
             break;
+        case 'f':
+            worldmap = optarg;
+            break;
         default:
             _print_help(progname);
             exit(1);
@@ -295,7 +400,26 @@ int main(int argc, char** argv)
     struct world w = {
         .grid = grid,
     };
-    world_gen(&w, num, width, height, range, var);
+
+    if (worldmap) {
+        FILE *file;
+        if (strcmp(worldmap, "-")) {
+            file = fopen(worldmap, "r");
+        } else {
+            file = stdin;
+        }
+        if (!file) {
+            fprintf(stderr, "can't open %s\n", worldmap);
+            return -1;
+        }
+        int res = _from_file(&w, file);
+        fclose(file);
+        if (res) {
+            return res;
+        }
+    } else {
+        world_gen(&w, num, width, height, range, var);
+    }
 
     printf("# seed = %u\n", seed);
     puts("# Connections");
