@@ -1,1 +1,15 @@
+
+# eepreg works with other `mtd_%` subsystems than `mtd_eeprom` too as not all
+# microcontrollers have built-in EEPROMs. However at least one `mtd_%`
+# subsystem has to be configured, otherwise fall back to requiring the internal
+# EEPROM. This makes sure the automatic feature resolution of the CI only
+# tries to compile the test for boards that it would work on.
+# Checking the USEMODULE before adding to it makes sure we don't test in the
+# first round of dependency resolution to avoid false-negatives.
+ifneq (,$(filter mtd,$(USEMODULE)))
+  ifeq (,$(filter mtd_%,$(USEMODULE)))
+    USEMODULE += mtd_eeprom
+  endif
+endif
+
 USEMODULE += mtd
