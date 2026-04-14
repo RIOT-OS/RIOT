@@ -75,11 +75,7 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
 
     /* Call the init function of the device (this should be handled by
      * `auto_init`) */
-
-
     ieee802154_dev_t *radio = NULL;
-
-
     (void) radio;
     (void) cb;
     (void) opaque;
