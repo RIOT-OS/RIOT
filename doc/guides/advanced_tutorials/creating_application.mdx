@@ -194,6 +194,37 @@ ifneq (,$(filter native native32 native64,$(BOARD)))
 endif
 ```
 
+## Modifying Board-Defaults of Peripherals
+
+Sometimes the default configuration of CPU peripherals from the board's
+`periph_conf.h` file does not fit the need of the application. This can be due
+to custom pin mapping or collosions, additional or different controllers
+required, or other reasons.
+
+Usually it is not desirable to modify the default board configuration in the
+RIOT folder, but rather to keep the custom configuration close to the
+application itself.
+Therefore, a custom `periph_conf.h` file can be created in the base directory
+of the application, as shown in the file tree below.
+
+<FileTree>
+- apps
+    - my_app
+        - Makefile
+        - main.c
+        - periph_conf.h
+- RIOT/
+    - boards
+        - specific_board
+            - include
+                - periph_conf.h
+</FileTree>
+
+It is usually a good idea to copy the `periph_conf.h` file from the board you
+are working with as a starting point and then applying the modifications. This
+ensures that all the other peripherals are still working as intended and gives
+you a reliable starting point.
+
 ## Helper Tools
 
 To help you start writing an application within RIOT, the build system provides
