@@ -21,8 +21,40 @@
  * The simple interface provides capabilities to initialize and configure
  * the serial communication module, which automatically enables for receiving
  * data, as well as writing data to the UART port, which means transmitting
- * data. The UART device and the corresponding pins need to be mapped in
- * `RIOT/boards/ * /include/periph_conf.h`. Furthermore, you need to select the
+ * data.
+ *
+ * # Default Configuration and Dealing with Multiple UARTs
+ *
+ * Many advanced microcontrollers feature multiple UARTs and some devices,
+ * such as the Nordic Semiconductor nRF52 family, even allow arbitrary pin
+ * assignments for the peripherals.
+ *
+ * RIOT boards provide sane defaults for bus and pin assignments on Development
+ * Boards. The first UART `UART_DEV(0)` is assigned to
+ * the UART pins marked on the board (RX and TX). Often that corresponds to the
+ * Arduino headers or other manufacturer standardized pinouts.
+ * By default the @p UART_DEV(0) device of each board is initialized and mapped
+ * to STDIO in RIOT which is used for standard input/output functions like
+ * `printf()` or `puts()` with a default baudrate of 115200 and 8-N-1 mode.
+ *
+ * If there are additional UARTs present and logically accessible on the board,
+ * you can access them with `UART_DEV(1)`, `UART_DEV(2)`, etc.
+ * Usually not all UARTs are configured for all boards.
+ * The exact assignment depends on the number of UARTs and
+ * organization of peripherals as well as the capabilities of the individual
+ * controller. Some controllers support faster transfer rate or special
+ * operating modes. More details are documented in the
+ * `periph_conf.h` file of the specific board.
+ *
+ * If you wish to modify the default configuration for your application,
+ * take a look at the
+ * [guides page](https://doc.riot-os.org/advanced_tutorials/creating_application/#modifying-board-defaults-of-peripherals)
+ * about creating applications.
+ *
+ * # Using the additional UART(s)
+ *
+ * As the UARTs other than the default `UART_DEV(0)`, are typically not
+ * configured yet, you need to select the
  * symbol rate for initialization which is typically {9600, 19200, 38400, 57600,
  * 115200} baud. Additionally, you should register a callback function that is
  * executed in interrupt context when data is being received. The driver will
@@ -33,10 +65,6 @@
  * specific callback function. The transmit function can be implemented in any
  * way. You can also configure parity, the number of data and stop bits, i.e.
  * such combinations as 8-E-1, 7-N-2 etc. 8-N-1 mode is set by default.
- *
- * By default the @p UART_DEV(0) device of each board is initialized and mapped
- * to STDIO in RIOT which is used for standard input/output functions like
- * `printf()` or `puts()`.
  *
  * # (Low-) Power Implications
  *
