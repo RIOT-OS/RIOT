@@ -128,18 +128,18 @@ ssize_t coap_parse_udp(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     pkt->buf = buf;
     coap_udp_hdr_t *hdr = (coap_udp_hdr_t *)buf;
 
-    uint8_t *pkt_pos = coap_hdr_data_ptr(hdr);
-    uint8_t *pkt_end = buf + len;
-
     pkt->payload = NULL;
     pkt->payload_len = 0;
     memset(pkt->opt_crit, 0, sizeof(pkt->opt_crit));
     pkt->snips = NULL;
 
     if (!coap_is_hdr_in_bounds(pkt, len)) {
-        DEBUG("msg too short\n");
+        DEBUG("msg malformed\n");
         return -EBADMSG;
     }
+
+    uint8_t *pkt_pos = coap_hdr_data_ptr(hdr);
+    uint8_t *pkt_end = buf + len;
 
     if ((coap_get_code_raw(pkt) == 0) && (len > sizeof(coap_udp_hdr_t))) {
         DEBUG("empty msg too long\n");
