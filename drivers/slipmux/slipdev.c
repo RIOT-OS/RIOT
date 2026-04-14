@@ -23,7 +23,7 @@
 #include "slipdev_params.h"
 #include "net/eui_provider.h"
 
-/* XXX: BE CAREFUL ABOUT USING OUTPUT WITH MODULE_SLIPDEV_STDIO IN SENDING
+/* XXX: BE CAREFUL ABOUT USING OUTPUT WITH MODULE_STDIO_SLIPDEV IN SENDING
  * FUNCTIONALITY! MIGHT CAUSE DEADLOCK!!!1!! */
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -37,14 +37,12 @@
 void slipdev_setup_net(slipdev_t *dev, uint8_t index);
 void slipdev_setup_coap(slipdev_t *dev);
 
-#if (IS_USED(MODULE_SLIPDEV_STDIO) || IS_USED(MODULE_SLIPDEV_CONFIG))
-/* For synchronization with stdio/config threads */
+/* For synchronization between stdio/config/net threads */
 mutex_t slipdev_mutex = MUTEX_INIT;
-#endif
 
 static inline void _slipdev_stdio_add_to_frame(slipdev_t *dev, uint8_t byte)
 {
-    if (!IS_USED(MODULE_SLIPDEV_STDIO) ||
+    if (!IS_USED(MODULE_STDIO_SLIPDEV) ||
         dev->config.uart != slipdev_params[0].uart) {
         return;
     }
@@ -91,6 +89,7 @@ static inline bool _slipdev_config_add_to_frame(slipdev_t *dev, uint8_t byte)
 
 static inline bool _slipdev_net_start_frame(slipdev_t *dev, uint8_t byte)
 {
+#ifdef MODULE_SLIPDEV_NET
     /* try to create new ip frame */
     if (!crb_start_chunk(&dev->rb)) {
         DEBUG("slipmux: can't start new net frame, drop frame\n");
@@ -101,23 +100,36 @@ static inline bool _slipdev_net_start_frame(slipdev_t *dev, uint8_t byte)
         crb_end_chunk(&dev->rb, false);
         return 0;
     }
+#else
+    (void)dev;
+    (void)byte;
+#endif
     return 1;
 }
 
 static inline void _slipdev_net_end_frame(slipdev_t *dev)
 {
+#ifdef MODULE_SLIPDEV_NET
     crb_end_chunk(&dev->rb, true);
     netdev_trigger_event_isr(&dev->netdev);
+#else
+    (void)dev;
+#endif
 }
 
 static inline bool _slipdev_net_add_to_frame(slipdev_t *dev, uint8_t byte)
 {
+#ifdef MODULE_SLIPDEV_NET
     /* discard frame if byte can't be added */
     if (!crb_add_byte(&dev->rb, byte)) {
         DEBUG("slipmux: net rx buffer full, drop frame\n");
         crb_end_chunk(&dev->rb, false);
         return 0;
     }
+#else
+    (void)dev;
+    (void)byte;
+#endif
     return 1;
 }
 
@@ -289,15 +301,23 @@ void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index
 {
     /* set device descriptor fields */
     dev->config = *params;
-    dev->state = 0;
+    dev->state = SLIPDEV_STATE_NONE;
 
-#if IS_USED(MODULE_SLIPDEV_CONFIG)
     /* we only support one coap server at the moment */
-    if (index == 0) {
+    if ((index == 0) && IS_USED(MODULE_SLIPDEV_CONFIG)) {
         slipdev_setup_coap(dev);
     }
-#endif
-    slipdev_setup_net(dev, index);
+
+    if (IS_USED(MODULE_SLIPDEV_NET)) {
+        slipdev_setup_net(dev, index);
+    }
+    else {
+        if (uart_init(dev->config.uart, dev->config.baudrate, _slip_rx_cb,
+                      dev) != UART_OK) {
+            LOG_ERROR("slipdev: error initializing UART %i with baudrate %" PRIu32 "\n",
+                      dev->config.uart, dev->config.baudrate);
+        }
+    }
 }
 
 /** @} */

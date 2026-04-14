@@ -49,7 +49,7 @@ extern "C" {
  * @brief   slipdev configuration
  *
  * The first element in this array will be used to multiplex stdio if
- * `slipdev_stdio` is included.
+ * `stdio_slipdev` is included.
  */
 static const slipdev_params_t slipdev_params[] = {
     SLIPDEV_PARAMS

@@ -26,14 +26,14 @@ void _slip_rx_cb(void *arg, uint8_t byte);
 
 static inline void _slipdev_lock(void)
 {
-    if (IS_USED(MODULE_SLIPDEV_STDIO) || IS_USED(MODULE_SLIPDEV_CONFIG)) {
+    if (IS_USED(MODULE_STDIO_SLIPDEV) || IS_USED(MODULE_SLIPDEV_CONFIG)) {
         mutex_lock(&slipdev_mutex);
     }
 }
 
 static inline void _slipdev_unlock(void)
 {
-    if (IS_USED(MODULE_SLIPDEV_STDIO) || IS_USED(MODULE_SLIPDEV_CONFIG)) {
+    if (IS_USED(MODULE_STDIO_SLIPDEV) || IS_USED(MODULE_SLIPDEV_CONFIG)) {
         mutex_unlock(&slipdev_mutex);
     }
 }
@@ -79,7 +79,7 @@ static int _init(netdev_t *netdev)
 static int _check_state(slipdev_t *dev)
 {
     /* power states not supported when multiplexing stdio / configuration */
-    if (IS_USED(MODULE_SLIPDEV_STDIO) || IS_USED(MODULE_SLIPDEV_CONFIG)) {
+    if (IS_USED(MODULE_STDIO_SLIPDEV) || IS_USED(MODULE_SLIPDEV_CONFIG)) {
         return 0;
     }
 
@@ -154,10 +154,10 @@ static void _isr(netdev_t *netdev)
     }
 }
 
-#if !(IS_USED(MODULE_SLIPDEV_STDIO) ||  IS_USED(MODULE_SLIPDEV_CONFIG))
+#if !(IS_USED(MODULE_STDIO_SLIPDEV) || IS_USED(MODULE_SLIPDEV_CONFIG))
 static int _set_state(slipdev_t *dev, netopt_state_t state)
 {
-    if (IS_USED(MODULE_SLIPDEV_STDIO)) {
+    if (IS_USED(MODULE_STDIO_SLIPDEV) || IS_USED(MODULE_SLIPDEV_CONFIG)) {
         return -ENOTSUP;
     }
 
@@ -191,12 +191,11 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t max_le
         return -ENOTSUP;
     }
 }
-#endif /* !(MODULE_SLIPDEV_STDIO || MODULE_SLIPDEV_CONFIG) */
+#endif /* !(MODULE_STDIO_SLIPDEV || MODULE_SLIPDEV_CONFIG) */
 
 static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
     (void)netdev;
-    (void)value;
     (void)max_len;
     switch (opt) {
     case NETOPT_IS_WIRED:
@@ -230,7 +229,7 @@ static const netdev_driver_t slip_driver = {
     .isr = _isr,
     .get = _get,
     .confirm_send = _confirm_send,
-#if (IS_USED(MODULE_SLIPDEV_STDIO) || IS_USED(MODULE_SLIPDEV_CONFIG))
+#if (IS_USED(MODULE_STDIO_SLIPDEV) || IS_USED(MODULE_SLIPDEV_CONFIG))
     .set = netdev_set_notsup,
 #else
     .set = _set,
