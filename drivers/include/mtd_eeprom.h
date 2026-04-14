@@ -8,6 +8,23 @@
 /**
  * @defgroup    drivers_mtd_eeprom MTD wrapper for internal EEPROM devices
  * @ingroup     drivers_mtd
+ * @brief       Driver for internal EEPROM devices implementing the MTD interface
+ *
+ * This header exposes the MTD implementation of RIOT for internal EEPROMs.
+ * Supported CPUs must provide the feature @c periph_eeprom and define the
+ * internal EEPROM size as @c EEPROM_SIZE.
+ * Supported boards must allocate the EEPROM MTD device by using the @ref MTD_EEPROM_INIT_VAL.
+ *
+ * Compared to external EEPROM like e.g. @ref drivers_mtd_at24cxxx, internal EEPROM is typically
+ * not organized in pages. Thus, the default MTD adaptation assumes 1 sector with 1 page having
+ * the size of the whole EEPROM. If a new CPU comes with EEPROM, which actually is divided in pages,
+ * the configurables @ref MTD_EEPROM_SECTORS_NUMOF, @ref MTD_EEPROM_PAGES_PER_SECTOR,
+ * and @ref MTD_EEPROM_PAGE_SIZE should be adjusted accordingly. If the layer above MTD
+ * e.g. filesystem requires multiple pages or a certain page size, then @ref MTD_EEPROM_PAGES_PER_SECTOR to
+ *
+ * @verbatim
+ * EEPROM_SIZE / <required page size or number of pages>
+ * @endverbatim
  *
  * @{
  *
