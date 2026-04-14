@@ -49,7 +49,6 @@
  * i2c_release(dev);
  * ```
  *
- *
  * @section   sec_i2c_pull Pull Resistors
  *
  * The I2C signal lines SDA/SCL need external pull-up resistors which connect
@@ -72,6 +71,30 @@
  * For more details refer to section 7.1 in:<br>
  * http://www.nxp.com/documents/user_manual/UM10204.pdf
  *
+ * @section sec_i2c_defaultconf Default Configuration and Dealing with Multiple I2C Buses
+ *
+ * Many advanced microcontrollers feature multiple I2C buses and some devices,
+ * such as the Nordic Semiconductor nRF52 family, even allow arbitrary pin
+ * assignments for the peripherals.
+ *
+ * RIOT boards provide sane defaults for bus and pin assignments on Development
+ * Boards. The first I2C controller `I2C_DEV(0)` is assigned to
+ * the I2C pins marked on the board. Often that corresponds to the
+ * Arduino headers or other manufacturer standardized pinouts.
+ *
+ * If there are additional devices such as a display, memory, sensor,
+ * etc. present on the board, a higher number I2C controller will be selected,
+ * e.g. `I2C_DEV(1)` or `I2C_DEV(2)`.
+ * The exact assignment depends on the number of I2C controllers and
+ * organization of peripherals as well as the capabilities of the individual
+ * controller. Some controllers support faster transfer rate or special
+ * operating modes. More details are documented in the
+ * `periph_conf.h` file of the specific board.
+ *
+ * If you wish to modify the default configuration for your application,
+ * take a look at the
+ * [guides page](https://doc.riot-os.org/advanced_tutorials/creating_application/#modifying-board-defaults-of-peripherals)
+ * about creating applications.
  *
  * @section   sec_i2c_pm (Low-) power implications
  *
