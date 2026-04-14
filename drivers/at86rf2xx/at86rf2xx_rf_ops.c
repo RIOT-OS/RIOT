@@ -217,7 +217,7 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t size, ieee802154_rx_in
         info->rssi = RSSI_BASE_VAL + ed;
         DEBUG("[at86rf2xx] LQI:%d high is good, RSSI:%d high is either good or "
               "too much interference.\n", info->lqi, info->rssi);
-#if AT86RF2XX_IS_PERIPH
+#if AT86RF2XX_IS_PERIPH && IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)
         /* AT86RF2XX_IS_PERIPH means the MCU is ATmegaRFR2 that has symbol counter */
         {
             uint32_t rx_sc;
@@ -836,7 +836,7 @@ static const ieee802154_radio_ops_t at86rf2xx_ops = {
 #  endif
 #endif
 
-#if AT86RF2XX_IS_PERIPH
+#if AT86RF2XX_IS_PERIPH && IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)
             | IEEE802154_CAP_RX_TIMESTAMP
 #endif
             | IEEE802154_CAP_PHY_OQPSK
