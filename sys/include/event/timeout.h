@@ -88,7 +88,7 @@ void event_timeout_init(event_timeout_t *event_timeout, event_queue_t *queue,
  * @note: the used event_timeout struct must stay valid until after the timeout
  *        event has been processed!
  *
- * @param[in]   event_timeout   event_timout context object to use
+ * @param[in]   event_timeout   event_timeout context object to use
  * @param[in]   timeout         timeout in microseconds or the ztimer_clock_t
  *                              ticks units
  */
@@ -109,7 +109,7 @@ void event_timeout_clear(event_timeout_t *event_timeout);
 /**
  * @brief   Check if a timeout event is scheduled to be executed in the future
  *
- * @param[in]   event_timeout   event_timout context object to use
+ * @param[in]   event_timeout   event_timeout context object to use
  * @return      true if the event is scheduled, false otherwise
  */
 static inline bool event_timeout_is_pending(const event_timeout_t *event_timeout)
