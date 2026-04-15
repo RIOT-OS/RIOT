@@ -18,20 +18,35 @@
  *
  */
 
+#include <stdint.h>
 #include <stdio.h>
 #include <inttypes.h>
 
 #include "assert.h"
 #include "atomic_utils.h"
+#include "panic.h"
 #include "rmutex.h"
 #include "thread.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static int _lock(rmutex_t *rmutex, int trylock)
+/* default rmutex max value,
+ * might be reduced for debugging purposes*/
+#ifndef CONFIG_RIOT_RMUTEX_MAX
+#define CONFIG_RIOT_RMUTEX_MAX UINT16_MAX
+#endif
+
+static int _lock(rmutex_t *rmutex, uint16_t max, int trylock)
 {
     kernel_pid_t owner;
+
+    /* max == 0 capacity is always exceeded */
+    assert(max > 0);
+    if (max == 0) {
+        /* this is for NDEBUG handling of max == 0*/
+        return 0;
+    }
 
     /* try to lock the mutex */
     DEBUG("rmutex %" PRIi16 " : trylock\n", thread_getpid());
@@ -106,6 +121,15 @@ static int _lock(rmutex_t *rmutex, int trylock)
 
     DEBUG("rmutex %" PRIi16 " : increasing refs\n", thread_getpid());
 
+    /* due parameter max check we can be sure that max is always > 0 *
+     * -> refcount is > 0 at any of the following returns */
+
+    /* ensure we don't exceed refcount capacity */
+    if (rmutex->refcount >= max) {
+        /* refcount capacity reached or exceeded */
+        return 0;
+    }
+
     /* increase the refcount */
     rmutex->refcount++;
 
@@ -114,12 +138,24 @@ static int _lock(rmutex_t *rmutex, int trylock)
 
 void rmutex_lock(rmutex_t *rmutex)
 {
-    _lock(rmutex, 0);
+    if (!_lock(rmutex, CONFIG_RIOT_RMUTEX_MAX, 0)) {
+        core_panic(PANIC_ASSERT_FAIL, "rmutex refcount overflow");
+    }
 }
 
 int rmutex_trylock(rmutex_t *rmutex)
 {
-    return _lock(rmutex, 1);
+    return _lock(rmutex, CONFIG_RIOT_RMUTEX_MAX, 1);
+}
+
+int rmutex_lock_max(rmutex_t *rmutex, uint16_t max)
+{
+    return _lock(rmutex, max, 0);
+}
+
+int rmutex_trylock_max(rmutex_t *rmutex, uint16_t max)
+{
+    return _lock(rmutex, max, 1);
 }
 
 void rmutex_unlock(rmutex_t *rmutex)
