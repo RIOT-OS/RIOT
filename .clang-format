@@ -69,11 +69,13 @@ DisableFormat: false
 ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: false
 
-IncludeBlocks: Preserve
+IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex: '.*'
+  - Regex: '^<.*>$'
     Priority: 1
-IncludeIsMainRegex: '(Test)?$'
+  - Regex: '^".*"'
+    Priority: 2
+IncludeIsMainRegex: '^$'
 IndentCaseLabels: false
 IndentGotoLabels: false
 IndentPPDirectives: AfterHash
@@ -99,7 +101,7 @@ PenaltyReturnTypeOnItsOwnLine: 60
 
 PointerAlignment: Right
 ReflowComments: false
-SortIncludes: false
+SortIncludes: true
 SortUsingDeclarations: false
 SpaceAfterCStyleCast: false
 SpaceAfterTemplateKeyword: true
