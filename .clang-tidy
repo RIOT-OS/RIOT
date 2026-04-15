@@ -39,9 +39,23 @@
 # Fine Tuning
 # -----------
 #
-# - readability-function-cognitive-complexity.IgnoreMacros: 'true':
-#       Otherwise the use of `DEBUG()...` will be penalized, even though it
-#       helps both in debugging and to document the code.
+# - readability-function-cognitive-complexity.IgnoreMacros: `true`:
+#       Otherwise the use of `DEBUG()` will be penalized, even though it
+#       helps both with debugging and with documenting the code.
+# - readability-identifier-length:
+#       Disabled because of too many false positives.. E.g., `fd` for file
+#       descriptors or `id` for IDs will be flagged, but are sensible variables
+#       names when the scope is the function body
+# - readability-magic-numbers:
+#       Disabled because of too many false positives. E.g. in
+#       ```
+#       size_t byte_pos = bitpos / 8;
+#       size_t byte_mask = 1U << (bitpos & 7);
+#       ```
+#       the numbers `8` and `7` are considered to be magic, but the code is
+#       still self-explanatory. Adding `#define BITS_PER_BYTE 8` and
+#       `#define BIT_POS_IN_BYTE_MASK 7` to silence the warning would not
+#       improve the readability here, but instead reduce it.
 #
 # Warning
 # -------
@@ -60,6 +74,7 @@ Checks: "clang-analyzer-*,
          -bugprone-reserved-identifier,
          -bugprone-easily-swappable-parameters,
          -readability-identifier-length,
+         -readability-magic-numbers
         "
 WarningsAsErrors: "bugprone-*,
                    portability-*,
