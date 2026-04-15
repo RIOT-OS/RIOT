@@ -21,10 +21,10 @@
 
 #include "board.h"
 #include "eepreg.h"
-#include "mtd.h"
+#include "mtd_default.h"
 
 #ifndef TEST_EEPREG_MTD
-#  define TEST_EEPREG_MTD       MTD_0
+#  define TEST_EEPREG_MTD       (&mtd_eeprom.base)
 #endif
 
 /* works anyway only up to 4GiB because of 32bit position in API */

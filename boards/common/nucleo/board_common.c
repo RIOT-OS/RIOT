@@ -18,6 +18,6 @@
 #include "mtd_eeprom.h"
 
 #if MODULE_MTD_EEPROM
-static mtd_eeprom_t eeprom_mtd = MTD_EEPROM_INIT_VAL;
-MTD_XFA_ADD(eeprom_mtd, 0);
+mtd_eeprom_t mtd_eeprom = MTD_EEPROM_INIT_VAL;
+MTD_XFA_ADD(mtd_eeprom, 0);
 #endif /* MODULE_MTD_EEPROM */
