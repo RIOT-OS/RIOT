@@ -64,33 +64,23 @@ the counters to be flushed to `.gcda` files.  `lcov` and `genhtml` then
 combine those files with the static `.gcno` graphs to produce an HTML report
 showing which lines and branches were executed.
 
-Coverage measurement is dynamic — it only counts code that actually runs
-during the test execution, making it a complement to unit tests rather than
-a replacement for static analysis.
+Coverage measurement is dynamic - it only counts code that actually runs
 
 ### Prerequisites
 
-- **Without Docker**: `lcov` must be installed on the host
-  (`apt install lcov` / `brew install lcov`).  On macOS the system `gcov`
-  is LLVM-based and incompatible with GCC `.gcda` files; install GCC via
-  Homebrew (`brew install gcc`) so that a compatible `gcov` is available.
-- **With `BUILD_IN_DOCKER=1`**: only Docker is required.  Both the build and
-  the report steps run inside the `riotbuild` container, so the `gcov` version
-  always matches the compiler.
+`lcov` must be installed on the host (`apt install lcov` / `brew install lcov`).
+On macOS the system `gcov` is LLVM-based and incompatible with GCC `.gcda` files;
+install GCC via Homebrew (`brew install gcc`) so that a compatible `gcov` is available.
 
 ### How to Use
 
 1. From any native application directory (e.g. `tests/unittests`):
 
    ```sh
-   # Without Docker (host lcov required)
    make coverage BOARD=native
 
-   # With Docker (recommended — no host toolchain needed)
-   BUILD_IN_DOCKER=1 make coverage BOARD=native
-
    # Run coverage for a specific unit-test suite
-   BUILD_IN_DOCKER=1 make coverage BOARD=native UNIT_TESTS=tests-fmt
+   make coverage BOARD=native UNIT_TESTS=tests-fmt
    ```
 
 2. Open `coverage/index.html` in a browser to view the report.
