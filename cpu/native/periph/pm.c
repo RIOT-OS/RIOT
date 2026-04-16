@@ -86,7 +86,7 @@ void pm_off(void)
 #endif
 #ifdef __GCOV__
     native_gcov_exit();
-    /* unreachable — native_gcov_exit() does not return */
+    /* unreachable - native_gcov_exit() does not return */
 #else
     real_exit(_native_retval);
 #endif
