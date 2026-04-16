@@ -282,11 +282,31 @@ kernel_pid_t thread_create(char *stack,
                            const char *name);
 
 /**
- * @brief       Retrieve a thread control block by PID.
- * @pre         @p pid is valid
+ * @brief       Retrieve a thread control block by PID without bounds checking
  * @param[in]   pid         Thread to retrieve.
  * @return      The thread identified by @p pid
- * @retval      `NULL`      no thread at the given valid PID is active.
+ * @retval      NULL        Thread identified by @p pid does not exist
+ *
+ * @pre         The caller has checked that @p pid is valid
+ * @warning     RIOT does not provide any means to synchronize access to the
+ *              thread control block with the life cycle of the thread. Most
+ *              threads will never exit and are created before any application
+ *              logic is running.
+ *
+ * A safe access would be:
+ *
+ * ```c
+ * unsigned irq_state = irq_disable();
+ * assert(pid_is_valid(pid));
+ * thread_t *t = thread_get_unchecked(pid);
+ * if (t) {
+ *     do_something_with_thread(t);
+ * }
+ * else {
+ *     LOG_ERROR("Thread %" PRIkernel_pid " does not exist\n", pid);
+ * }
+ * irq_restore(irq_state);
+ * ```
  */
 static inline thread_t *thread_get_unchecked(kernel_pid_t pid)
 {
@@ -298,7 +318,26 @@ static inline thread_t *thread_get_unchecked(kernel_pid_t pid)
  * @details     This is a bound-checked variant of accessing `sched_threads[pid]` directly.
  *              If you know that the PID is valid, then don't use this function.
  * @param[in]   pid   Thread to retrieve.
- * @return      `NULL` if the PID is invalid or there is no such thread.
+ * @return      The thread identified by @p pid
+ * @retval      NULL        @p pid is out of bounds or the thread does not exist
+ * @warning     RIOT does not provide any means to synchronize access to the
+ *              thread control block with the life cycle of the thread. Most
+ *              threads will never exit and are created before any application
+ *              logic is running.
+ *
+ * A safe access would be:
+ *
+ * ```c
+ * unsigned irq_state = irq_disable();
+ * thread_t *t = thread_get(pid);
+ * if (t) {
+ *     do_something_with_thread(t);
+ * }
+ * else {
+ *     LOG_ERROR("Thread %" PRIkernel_pid " does not exist or is out of bounds\n", pid);
+ * }
+ * irq_restore(irq_state);
+ * ```
  */
 static inline thread_t *thread_get(kernel_pid_t pid)
 {
