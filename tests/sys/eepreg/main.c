@@ -24,7 +24,7 @@
 #include "mtd_default.h"
 
 #ifndef TEST_EEPREG_MTD
-#  define TEST_EEPREG_MTD       (&mtd_eeprom.base)
+#  define TEST_EEPREG_MTD       MTD_EEPROM
 #endif
 
 /* works anyway only up to 4GiB because of 32bit position in API */

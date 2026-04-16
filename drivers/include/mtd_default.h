@@ -48,6 +48,7 @@ extern mtd_emulated_t mtd_emulated_dev0;
 
 #if defined(MODULE_MTD_EEPROM)
 extern mtd_eeprom_t mtd_eeprom;
+#  define MTD_EEPROM (&mtd_eeprom.base)
 #endif
 
 #ifdef __cplusplus
