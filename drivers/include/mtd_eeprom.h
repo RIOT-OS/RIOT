@@ -20,7 +20,8 @@
  * the size of the whole EEPROM. If a new CPU comes with EEPROM, which actually is divided in pages,
  * the configurables @ref MTD_EEPROM_SECTORS_NUMOF, @ref MTD_EEPROM_PAGES_PER_SECTOR,
  * and @ref MTD_EEPROM_PAGE_SIZE should be adjusted accordingly. If the layer above MTD
- * e.g. filesystem requires multiple pages or a certain page size, then @ref MTD_EEPROM_PAGES_PER_SECTOR to
+ * e.g. filesystem requires multiple pages or a certain page size,
+ * then @ref MTD_EEPROM_PAGES_PER_SECTOR should be adjusted.
  *
  * @verbatim
  * EEPROM_SIZE / <required page size or number of pages>
