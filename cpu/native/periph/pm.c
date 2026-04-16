@@ -34,6 +34,17 @@
 
 unsigned _native_retval = EXIT_SUCCESS;
 
+#ifdef __GCOV__
+void native_gcov_exit(void)
+{
+    extern void __gcov_dump(void);
+    _native_in_isr = 1;
+    _native_interrupts_enabled = false;
+    __gcov_dump();
+    _exit(_native_retval);
+}
+#endif
+
 static void _native_sleep(void)
 {
     _native_pending_syscalls_up(); /* no switching here */
@@ -73,23 +84,12 @@ void pm_off(void)
     extern void auto_unmount_vfs(void);
     auto_unmount_vfs();
 #endif
-    /* When compiled with gcov coverage instrumentation, explicitly flush
-     * profiling data and call _exit() to bypass the libc atexit chain.
-     * Rationale: libc exit() triggers __asan_handle_no_return() before running
-     * atexit handlers, which poisons the stack; gcov's own atexit handler then
-     * runs on poisoned stack and fails to write .gcda files.  By calling
-     * __gcov_dump() ourselves first (while the stack is still clean) and then
-     * using _exit() to skip atexit, we avoid both ASan and signal issues.
-     * _native_in_isr = 1 prevents native_signal_action() from hijacking the
-     * return address via _native_sig_leave_tramp during the dump. */
 #ifdef __GCOV__
-    {
-        extern void __gcov_dump(void);
-        __gcov_dump();
-        _exit(_native_retval);
-    }
-#endif
+    native_gcov_exit();
+    /* unreachable — native_gcov_exit() does not return */
+#else
     real_exit(_native_retval);
+#endif
 }
 
 void pm_reboot(void)
