@@ -22,10 +22,10 @@ OTHER_CLASSIFIERS = [
     [re.compile(r"^(drivers\/include\/.*|sys\/include\/.*)$"), "public-headers"],
     [re.compile(r"^(Kconfig|kconfigs\/.*|pkg\/Kconfig|sys\/Kconfig|drivers\/Kconfig)$"), "kconfig"],
     [re.compile(r"^(.*\.cff|doc\/.*|.*\.md|.*\.txt)$"), "doc"],
-    [re.compile(r"^(CODEOWNERS|.mailmap|.gitignore|.github\/.*)$"), "git"],
+    [re.compile(r"^(CODEOWNERS|\.mailmap|\.gitignore|\.github|\.gitattributes)$"), "git"],
     [re.compile(r"^(\.murdock|dist\/ls\/.*|\.drone.yml)$"), "ci-murdock"],
     [re.compile(r"^(\.bandit|\.drone.yml)$"), "ci-other"],
-    [re.compile(r"^(dist\/.*|Vagrantfile)$"), "tools"],
+    [re.compile(r"^(dist\/.*|Vagrantfile|\.clang-format|\.clang-tidy)$"), "tools"],
 ]
 
 REGEX_MODULE = re.compile(r"^(boards\/common|core|cpu|drivers|sys)\/")
