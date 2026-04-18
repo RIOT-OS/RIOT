@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2019 Daniele Lacamera
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 /* Created from wolfssl-examples test certificate+keys, ECC/RSA. 28/08/2019 */
 
 #ifdef MODULE_WOLFCRYPT_ECC

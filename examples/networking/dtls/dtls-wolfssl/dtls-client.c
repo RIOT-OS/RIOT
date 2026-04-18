@@ -71,8 +71,9 @@ static inline unsigned int my_psk_client_cb(WOLFSSL* ssl, const char* hint,
         int b = 0x01;
 
         for (i = 0; i < 32; i++, b += 0x22) {
-            if (b >= 0x100)
+            if (b >= 0x100) {
                 b = 0x01;
+            }
             key[i] = b;
         }
 
@@ -143,31 +144,34 @@ static int _client_cmd(int argc, char **argv)
     wolfSSL_CTX_set_psk_client_callback(sk->ctx, my_psk_client_cb);
 #endif
 
-    if (sock_dtls_session_create(sk) < 0)
+    if (sock_dtls_session_create(sk) < 0) {
         return -1;
+    }
     wolfSSL_dtls_set_timeout_init(sk->ssl, 5);
     LOG(LOG_INFO, "connecting to server...\n");
     /* attempt to connect until the connection is successful */
     do {
         ret = wolfSSL_connect(sk->ssl);
         if ((ret != SSL_SUCCESS)) {
-            if(wolfSSL_get_error(sk->ssl, ret) == SOCKET_ERROR_E) {
+            if (wolfSSL_get_error(sk->ssl, ret) == SOCKET_ERROR_E) {
                 LOG(LOG_WARNING, "Socket error: reconnecting...\n");
                 sock_dtls_session_destroy(sk);
                 connect_timeout = 0;
-                if (sock_dtls_session_create(sk) < 0)
+                if (sock_dtls_session_create(sk) < 0) {
                     return -1;
+                }
             }
             if ((wolfSSL_get_error(sk->ssl, ret) == WOLFSSL_ERROR_WANT_READ) &&
                     (connect_timeout++ >= max_connect_timeouts)) {
                 LOG(LOG_WARNING, "Server not responding: reconnecting...\n");
                 sock_dtls_session_destroy(sk);
                 connect_timeout = 0;
-                if (sock_dtls_session_create(sk) < 0)
+                if (sock_dtls_session_create(sk) < 0) {
                     return -1;
+                }
             }
         }
-    } while(ret != SSL_SUCCESS);
+    } while (ret != SSL_SUCCESS);
 
     /* set remote endpoint */
     sock_dtls_set_endpoint(sk, &remote);

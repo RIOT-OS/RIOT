@@ -38,14 +38,16 @@ static ssize_t _echo_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_req
                              (uint8_t *)sub_uri, sub_uri_len);
 }
 
-static ssize_t _riot_board_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
+static ssize_t _riot_board_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+                                   coap_request_ctx_t *context)
 {
     (void)context;
     return coap_reply_simple(pkt, COAP_CODE_205, buf, len,
             COAP_FORMAT_TEXT, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
 }
 
-static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
+static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+                                    coap_request_ctx_t *context)
 {
     (void)context;
     coap_block_slicer_t slicer;
@@ -87,7 +89,8 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, c
     return coap_builder_msg_size(&state);
 }
 
-static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
+static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+                                   coap_request_ctx_t *context)
 {
     (void) context;
 
@@ -208,7 +211,8 @@ static void _send_response(void *ctx)
                                   response, sizeof(response));
 }
 
-static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, coap_request_ctx_t *context)
+static ssize_t _separate_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+                                 coap_request_ctx_t *context)
 {
     static event_timeout_t event_timeout;
     static event_callback_t event_timed = EVENT_CALLBACK_INIT(_send_response, &_separate_ctx);
