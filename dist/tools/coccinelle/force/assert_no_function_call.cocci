@@ -90,26 +90,4 @@ expression value;
 + bool tmp = f(args);
 + (void)tmp;
 + assert(!tmp);
-|
-- assume(f(args) == value);
-+ /* TODO: replace C23 typeof() with type by hand for portability */
-+ typeof(f(args)) tmp = f(args);
-+ (void)tmp;
-+ assume(tmp == value);
-|
-- assume(value == f(args));
-+ /* TODO: replace C23 typeof() with type by hand for portability */
-+ typeof(f(args)) tmp = f(args);
-+ (void)tmp;
-+ assume(tmp == value);
-|
-- assume(f(args));
-+ bool tmp = f(args);
-+ (void)tmp;
-+ assume(tmp);
-|
-- assume(!f(args));
-+ bool tmp = f(args);
-+ (void)tmp;
-+ assume(!tmp);
 )
