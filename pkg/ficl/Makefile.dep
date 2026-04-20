@@ -1,0 +1,5 @@
+# Ficl Target: 32 & 64 bit processors
+FEATURES_REQUIRED_ANY += arch_32bit|arch_64bit
+
+# Ficl uses sprintf() with format non literal
+FEATURES_BLACKLIST += arch_avr8

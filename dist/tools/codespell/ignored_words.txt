@@ -192,3 +192,6 @@ emac
 
 # For some reason it looked at some binary dump and found this to be a word...
 joo
+
+# ANS (American National Standard) ==> AND
+ans
