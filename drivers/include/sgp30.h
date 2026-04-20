@@ -58,12 +58,11 @@
 extern "C" {
 #endif
 
-
 /**
  * @brief   The event queue if 'sgp30_strict' is used
  */
-#ifndef SGP30_STRICT_EVENT_THREAD_QUEUE
-#define SGP30_STRICT_EVENT_THREAD_QUEUE     EVENT_PRIO_MEDIUM
+#ifndef CONFIG_SGP30_STRICT_EVENT_THREAD_QUEUE
+#define CONFIG_SGP30_STRICT_EVENT_THREAD_QUEUE     EVENT_PRIO_MEDIUM
 #endif
 
 /**
