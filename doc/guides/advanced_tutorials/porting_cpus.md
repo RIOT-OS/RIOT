@@ -127,7 +127,7 @@ conditional statements might be required here as well.
 
 ### Makefile.include
 
-This file contains low-level build configuration and additional compiler and 
+This file contains low-level build configuration and additional compiler and
 linker search paths for the CPU.
 
 #### Example:
@@ -279,7 +279,7 @@ mechanism. Vendor SDKs can range from thousands to millions of lines of code,
 so it is usually better to pull them in on demand (or from shared family-common
 locations) instead of copying full SDK trees into every new port. Keeping
 vendor code separated from the actual RIOT port helps with maintenance and
-updates. Good references are existing CPU families such as STM32, nRF52, and 
+updates. Good references are existing CPU families such as STM32, nRF52, and
 EFM32, which keep vendor content modular and reused across multiple boards.
 
 ## Registering the CPU Feature
@@ -606,7 +606,7 @@ If the MCU belongs to an already supported architecture or family, reuse the
 existing common code where possible. In this case, a base directory
 (e.g. `cpu/<CPU_FAM>_common`) should be created that contains all shared/common
 configurations. This drastically reduces maintenance and lowers the risk of
-subtle startup or interrupt bugs, as well as code divergation issues in the 
+subtle startup or interrupt bugs, as well as code divergation issues in the
 future.
 
 ### Refer to the manual of the target CPU
