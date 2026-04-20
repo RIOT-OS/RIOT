@@ -183,7 +183,6 @@ int sgp30_init(sgp30_t *dev, const sgp30_params_t *params)
     dev->ready = false;
     event_callback_init(&dev->_event, _read_cb, dev);
     event_timeout_init(&dev->_timeout, SGP30_STRICT_EVENT_THREAD_QUEUE, (event_t *)&dev->_event);
-#error
 #endif
 
     /* delay while powering up */
