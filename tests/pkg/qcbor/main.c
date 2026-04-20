@@ -16,6 +16,7 @@
  */
 
 #include "qcbor.h"
+#include "qcbor_spiffy_decode.h"
 #include <string.h>
 #include "embUnit.h"
 
@@ -29,14 +30,15 @@
             0: false,
             -999: "hello world"
         },
-        true
+        true,
+        1.5
     ]
 */
 static const uint8_t expected[] = {
-    0x85, 0xF6, 0x1A, 0x00, 0x01, 0xE2, 0x40, 0x3A, 0x00, 0x01, 0xE2, 0x3F,
+    0x86, 0xF6, 0x1A, 0x00, 0x01, 0xE2, 0x40, 0x3A, 0x00, 0x01, 0xE2, 0x3F,
     0xA3, 0x20, 0x47, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x00, 0x00, 0xF4,
     0x39, 0x03, 0xE6, 0x6B, 0x68, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x77, 0x6F,
-    0x72, 0x6C, 0x64, 0xF5};
+    0x72, 0x6C, 0x64, 0xF5, 0xF9, 0x3E, 0x00 };
 static uint8_t buf[sizeof(expected)];
 
 static void test_qcbor_encode(void)
@@ -62,6 +64,7 @@ static void test_qcbor_encode(void)
                               UsefulBuf_FROM_SZ_LITERAL("hello world"));
     QCBOREncode_CloseMap(&encode_context);
     QCBOREncode_AddBool(&encode_context, true);
+    QCBOREncode_AddFloat(&encode_context, 1.5);
     QCBOREncode_CloseArray(&encode_context);
     error = QCBOREncode_Finish(&encode_context, &encoded_cbor);
     TEST_ASSERT_EQUAL_INT(QCBOR_SUCCESS, error);
@@ -109,6 +112,10 @@ static void test_qcbor_decode(void)
     error = QCBORDecode_GetNext(&decode_context, &cbor_item);
     TEST_ASSERT_EQUAL_INT(QCBOR_SUCCESS, error);
     TEST_ASSERT_EQUAL_INT(QCBOR_TYPE_TRUE, cbor_item.uDataType);
+    uint64_t val;
+    /* trigger the use of `feclearexcept` and `fetestexcept` */
+    QCBORDecode_GetUInt64ConvertAll(&decode_context, QCBOR_TYPE_FLOAT, &val);
+    TEST_ASSERT_EQUAL_INT(2, val);
     error = QCBORDecode_Finish(&decode_context);
     TEST_ASSERT_EQUAL_INT(QCBOR_SUCCESS, error);
 }
