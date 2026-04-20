@@ -16,37 +16,12 @@ int main(void) { return 0; }
 #include "services/gatt/ble_svc_gatt.h"
 
 #include "gatt_svr.h"
-#include "periph/i2c.h"
-#include "bmi270_r.h"
-#include "bmi2.h"
-#include "bmi2_defs.h"
 
 static volatile bool _connected = false;
 static volatile bool _notify_enabled = false;
-
-static bmi270_t _bmi;
 static uint8_t _own_addr_type;
 
-static char _imu_stack[THREAD_STACKSIZE_DEFAULT];
-
 static int _gap_event(struct ble_gap_event *event, void *arg);
-
-/* Small cooperative wait helper for this port. */
-static void _busy_wait_us(uint32_t usec)
-{
-    for (volatile uint32_t i = 0; i < usec * 4U; i++) {
-        __asm__ volatile ("nop");
-    }
-}
-
-/* Keep yielding so NimBLE RX can run while we delay. */
-static void _delay_ms_cooperative(uint32_t ms)
-{
-    while (ms--) {
-        _busy_wait_us(1000U);
-        thread_yield();
-    }
-}
 
 /* Start undirected connectable advertising. */
 static void _start_adv(void)
@@ -131,73 +106,6 @@ static int _gap_event(struct ble_gap_event *event, void *arg)
     }
 }
 
-/* IMU task: sample at 20 Hz and notify current dominant axis. */
-static void *_imu_thread(void *arg)
-{
-    (void)arg;
-
-    int rc;
-    i2c_init(0);
-
-    i2c_acquire(0);
-    rc = bmi270_init_i2c(&_bmi, 0, BMI2_I2C_PRIM_ADDR);
-    i2c_release(0);
-    if (rc != 0) {
-        return NULL;
-    }
-
-    i2c_acquire(0);
-    rc = bmi270_config_default(&_bmi);
-    i2c_release(0);
-    if (rc != 0) {
-        return NULL;
-    }
-
-    struct bmi2_sens_config cfg = { 0 };
-    cfg.type = BMI2_ACCEL;
-    cfg.cfg.acc.odr = BMI2_ACC_ODR_50HZ;
-    cfg.cfg.acc.range = BMI2_ACC_RANGE_8G;
-
-    i2c_acquire(0);
-    rc = bmi2_set_sensor_config(&cfg, 1, &(_bmi.sensor));
-    i2c_release(0);
-    if (rc != 0) {
-        return NULL;
-    }
-
-    puts("[IMU] ready");
-
-    while (1) {
-        bmi270_data_t data;
-
-        i2c_acquire(0);
-        rc = bmi270_read(&_bmi, &data);
-        i2c_release(0);
-
-        if ((rc == 0) && _connected && _notify_enabled) {
-            int16_t x = data.sensor_data.acc.x;
-            int16_t y = data.sensor_data.acc.y;
-            int16_t z = data.sensor_data.acc.z;
-
-            int16_t ax = (x < 0) ? -x : x;
-            int16_t ay = (y < 0) ? -y : y;
-            int16_t az = (z < 0) ? -z : z;
-
-            char axis = 'x';
-            if (ay > ax && ay > az) {
-                axis = 'y';
-            }
-            else if (az > ax && az > ay) {
-                axis = 'z';
-            }
-
-            (void)gatt_svr_notify_axis(axis);
-        }
-
-        _delay_ms_cooperative(50);
-    }
-}
-
 int main(void)
 {
     /* nimble_riot_init already synced before main runs. */
@@ -216,12 +124,6 @@ int main(void)
     assert(rc == 0);
 
     _start_adv();
-
-    kernel_pid_t imu_pid = thread_create(_imu_stack, sizeof(_imu_stack),
-                                         THREAD_PRIORITY_MAIN + 2,
-                                         THREAD_CREATE_STACKTEST,
-                                         _imu_thread, NULL, "imu");
-    assert(imu_pid > KERNEL_PID_UNDEF);
 
     while (1) {
         thread_sleep();

@@ -5,7 +5,7 @@ include ../Makefile.drivers_common
 ifneq (,$(filter cortex-m4f,$(CPU_CORE)))
 USEMODULE += periph_uart stdio_uart periph_gpio nimble_host psoc6_ble_nimble
 USEMODULE += nimble_transport_hci_h4 nimble_host core_thread nimble_svc_gap nimble_svc_gatt
-USEMODULE += nimble xtimer ztimer periph_timer periph_i2c bmi270
+USEMODULE += nimble xtimer ztimer periph_timer
 USEPKG += nimble
 
 SRC += main.c gatt_svr.c
