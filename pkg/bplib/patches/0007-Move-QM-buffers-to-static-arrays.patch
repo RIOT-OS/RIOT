@@ -1,0 +1,99 @@
+From fcf3585e44d9904405eeaf254960b16ceb9aa1c9 Mon Sep 17 00:00:00 2001
+From: Simon Grund <simon.grund@tuhh.de>
+Date: Fri, 27 Feb 2026 20:54:05 +0100
+Subject: [PATCH 7/8] Move QM buffers to static arrays
+
+---
+ ci/qm/src/bplib_qm.c           | 18 +++++++++++++++++-
+ ci/qm/src/bplib_qm_waitqueue.c | 12 ++++++++----
+ 2 files changed, 25 insertions(+), 5 deletions(-)
+
+diff --git a/ci/qm/src/bplib_qm.c b/ci/qm/src/bplib_qm.c
+index c2270b4f..354923f7 100644
+--- a/ci/qm/src/bplib_qm.c
++++ b/ci/qm/src/bplib_qm.c
+@@ -29,8 +29,21 @@
+ 
+ #define BPLIB_QM_RUNJOB_PERF_ID  0x7F
+ 
++#ifndef BPLIB_QM_MAX_JOBS
++#  define BPLIB_QM_MAX_JOBS         32
++#endif
++
++typedef struct {
++    char buffer_generic[sizeof(BPLib_QM_Job_t) * BPLIB_QM_MAX_JOBS];
++    char buffers_channels[BPLIB_MAX_NUM_CHANNELS][sizeof(BPLib_Bundle_t*) * BPLIB_QM_TX_QUEUE_DEPTH];
++    char buffers_contacts[BPLIB_MAX_NUM_CONTACTS][sizeof(BPLib_Bundle_t*) * BPLIB_QM_TX_QUEUE_DEPTH];
++} static_qm_buffers_t;
++
++static static_qm_buffers_t qm_buffers;
++
+ BPLib_Status_t BPLib_QM_QueueTableInit(BPLib_Instance_t* inst, size_t MaxJobs)
+ {
++    (void) MaxJobs;
+     bool QueueInit;
+     int i;
+     BPLib_Status_t Status;
+@@ -61,7 +74,8 @@ BPLib_Status_t BPLib_QM_QueueTableInit(BPLib_Instance_t* inst, size_t MaxJobs)
+     QueueInit = true;
+ 
+     /* Initialize the job queue */
+-    if (!BPLib_QM_WaitQueueInit(&(inst->GenericWorkerJobs), sizeof(BPLib_QM_Job_t), MaxJobs))
++    inst->GenericWorkerJobs.storage = qm_buffers.buffer_generic;
++    if (!BPLib_QM_WaitQueueInit(&(inst->GenericWorkerJobs), sizeof(BPLib_QM_Job_t), BPLIB_QM_MAX_JOBS))
+     {
+         QueueInit = false;
+     }
+@@ -73,6 +87,7 @@ BPLib_Status_t BPLib_QM_QueueTableInit(BPLib_Instance_t* inst, size_t MaxJobs)
+ 
+     for (i = 0; i < BPLIB_MAX_NUM_CHANNELS; i++)
+     {
++        inst->ChannelEgressJobs[i].storage = qm_buffers.buffers_channels[i];
+         if (!BPLib_QM_WaitQueueInit(&(inst->ChannelEgressJobs[i]), sizeof(BPLib_Bundle_t*), BPLIB_QM_TX_QUEUE_DEPTH))
+         {
+             QueueInit = false;
+@@ -81,6 +96,7 @@ BPLib_Status_t BPLib_QM_QueueTableInit(BPLib_Instance_t* inst, size_t MaxJobs)
+ 
+     for (i = 0; i < BPLIB_MAX_NUM_CONTACTS; i++)
+     {
++        inst->ContactEgressJobs[i].storage = qm_buffers.buffers_contacts[i];
+         if (!BPLib_QM_WaitQueueInit(&(inst->ContactEgressJobs[i]), sizeof(BPLib_Bundle_t*), BPLIB_QM_TX_QUEUE_DEPTH))
+         {
+             QueueInit = false;
+diff --git a/ci/qm/src/bplib_qm_waitqueue.c b/ci/qm/src/bplib_qm_waitqueue.c
+index 06a8f09f..f83cf7c6 100644
+--- a/ci/qm/src/bplib_qm_waitqueue.c
++++ b/ci/qm/src/bplib_qm_waitqueue.c
+@@ -45,12 +45,16 @@ bool BPLib_QM_WaitQueueInit(BPLib_QM_WaitQueue_t* q, size_t el_size, size_t capa
+     q->rear = capacity - 1;
+     q->size = 0;
+ 
+-    q->storage = calloc(capacity, el_size);
++    /* Dynamic memory allocation is removed here for the port. This is fine since the
++     * size of the QM queues is constant at compile time, and this function that
++     * normally allocates the queue is only called in bplib_qm.c, where static buffers
++     * are provided. The free() has also been removed. */
++    /*q->storage = calloc(capacity, el_size);
+     if (q->storage == NULL)
+     {
+         fprintf(stderr, "calloc() for WaitQueue backing failed\n");
+         return false;
+-    }
++    }*/
+ 
+     // TODO: move to bplib_OS module
+     mutex_init(&q->lock);
+@@ -66,8 +70,8 @@ void BPLib_QM_WaitQueueDestroy(BPLib_QM_WaitQueue_t* q)
+         return;
+     }
+ 
+-    free(q->storage);
+-    q->storage = NULL;
++    /* free(q->storage);
++    q->storage = NULL; */
+     q->el_size = 0;
+     q->capacity = 0;
+     q->front = 0;
+-- 
+2.43.0
+

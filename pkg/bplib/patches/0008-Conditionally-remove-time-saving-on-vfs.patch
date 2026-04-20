@@ -1,0 +1,70 @@
+From d30a1e403ebfedb9a6d71f10603e51e48feed378 Mon Sep 17 00:00:00 2001
+From: Simon Grund <simon.grund@tuhh.de>
+Date: Thu, 5 Mar 2026 21:16:34 +0100
+Subject: [PATCH 8/8] Conditionally remove time saving on vfs
+
+---
+ ci/time/src/bplib_time_internal.c | 33 ++++++++++++++++++++++++++++---
+ 1 file changed, 30 insertions(+), 3 deletions(-)
+
+diff --git a/ci/time/src/bplib_time_internal.c b/ci/time/src/bplib_time_internal.c
+index e2bcc0be..244507f7 100644
+--- a/ci/time/src/bplib_time_internal.c
++++ b/ci/time/src/bplib_time_internal.c
+@@ -33,7 +33,34 @@
+ #include "bplib_time_internal.h"
+ #include "bplib_fwp.h"
+ 
+-#include "vfs_util.h"
++#ifndef CONFIG_BPLIB_TIME_FILE_NAME
++#  define CONFIG_BPLIB_TIME_FILE_NAME "/nvm0/time.dat"
++#endif
++
++#ifndef MODULE_BPLIB_NO_VFS
++#  include "vfs_util.h"
++#else
++
++/* Stub the vfs function to always return the success conditions */
++#  include <stddef.h>
++
++static inline int vfs_file_from_buffer(const char *file, const void *buf, size_t len)
++{
++    (void) file;
++    (void) buf;
++    (void) len;
++    return 0;
++}
++
++static inline int vfs_file_to_buffer(const char *file, void *buf, size_t len)
++{
++    (void) file;
++    (void) buf;
++    (void) len;
++    return sizeof(BPLib_TIME_FileData_t);
++}
++
++#endif
+ 
+ /*
+ ** Function Definitions
+@@ -154,7 +181,7 @@ void BPLib_TIME_SetDtnTimeInBuffer(uint64_t DtnTime, uint32_t BootEra)
+ /* Read current time data from file */
+ BPLib_Status_t BPLib_TIME_ReadTimeDataFromFile(void)
+ {
+-    int res = vfs_file_to_buffer(BPLIB_TIME_FILE_NAME, (void *) &BPLib_TIME_GlobalData.TimeData, 
++    int res = vfs_file_to_buffer(CONFIG_BPLIB_TIME_FILE_NAME, (void *) &BPLib_TIME_GlobalData.TimeData, 
+                                             sizeof(BPLib_TIME_FileData_t));
+     if (res != sizeof(BPLib_TIME_FileData_t)) {
+         if (res == -ENOENT) {
+@@ -174,7 +201,7 @@ BPLib_Status_t BPLib_TIME_ReadTimeDataFromFile(void)
+ /* Write current time data to file */
+ BPLib_Status_t BPLib_TIME_WriteTimeDataToFile(void)
+ {
+-    int res = vfs_file_from_buffer(BPLIB_TIME_FILE_NAME, (void *) &BPLib_TIME_GlobalData.TimeData, 
++    int res = vfs_file_from_buffer(CONFIG_BPLIB_TIME_FILE_NAME, (void *) &BPLib_TIME_GlobalData.TimeData, 
+                                             sizeof(BPLib_TIME_FileData_t));
+     if (res != sizeof(BPLib_TIME_FileData_t)) {
+         return BPLIB_TIME_READ_ERROR;
+-- 
+2.43.0
+

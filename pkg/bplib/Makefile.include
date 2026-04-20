@@ -1,0 +1,56 @@
+# --------------------------- bplib core files ---------------------------------
+# Note: bplib headers included as system headers to avoid CLANG complaining
+# about documentation issues.
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/aa/arp/inc
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/aa/as/inc
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/aa/fwp/inc
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/aa/nc/inc
+
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/bpa/bi/inc
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/bpa/ct/inc
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/bpa/ebp/inc
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/bpa/pdb/inc
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/bpa/pi/inc
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/bpa/stor/inc
+
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/ci/cbor/inc
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/ci/crc/inc
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/ci/eid/inc
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/ci/em/inc
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/ci/mem/inc
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/ci/pl/inc
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/ci/qm/inc
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/ci/rbt/inc
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/ci/time/inc
+
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/cla/inc
+
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/inc
+
+INCLUDES += -isystem$(PKGDIRBASE)/bplib/version/inc
+
+# -------------------- Abstraction Layer Modules -------------------------------
+INCLUDES += -I$(RIOTPKG)/bplib/fwp/include
+INCLUDES += -I$(RIOTPKG)/bplib/nc/include
+INCLUDES += -I$(RIOTPKG)/bplib/init/include
+
+# Conditional modules
+ifneq (,$(filter bplib_cla_ble,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/bplib/cla/ble/include
+endif
+
+ifneq (,$(filter bplib_cla_udp,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/bplib/cla/udp/include
+endif
+
+ifneq (,$(filter bplib_stor_vfs_%,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/bplib/storage/vfs/include
+endif
+
+PSEUDOMODULES += bplib_barebones
+PSEUDOMODULES += bplib_walltime_available
+PSEUDOMODULES += bplib_include_nc_telemetry
+PSEUDOMODULES += bplib_include_as
+PSEUDOMODULES += bplib_no_vfs
+
+ARCHIVES += $(BINDIR)/libbplib.a
