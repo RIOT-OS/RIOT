@@ -18,7 +18,7 @@ usually consists of:
 - documentation and tests that make the port maintainable.
 
 This document focuses on the CPU side. For the board side, also refer to the
-existing RIOT guide on [porting boards](https://guide.riot-os.org/advanced_tutorials/porting_boards/).
+existing RIOT guide on [porting boards](/advanced_tutorials/porting_boards/).
 
 :::note
 A CPU port defines what the MCU family can do. A board port defines which of
@@ -32,26 +32,26 @@ A typical CPU port has a file structure similar to the following:
 Entries marked with `*` are optional and depend on the CPU family and reuse
 strategy. Entries without `*` are typically required for a minimal CPU port.
 
-```text
-cpu/foo
-├── include
-│   ├── cpu_conf.h
-│   ├── periph_cpu.h
-│   └── vendor*
-├── ldscripts*
-├── periph*
-│   ├── gpio.c
-│   ├── i2c.c
-│   ├── spi.c
-│   └── ...
-├── vectors
-│   └── vectors_<model>.c
-├── Makefile
-├── Makefile.dep*
-├── Makefile.features*
-├── Makefile.include
-└── cpu.c
-```
+{% filetree %}
+- cpu/foo
+  - include
+    - cpu_conf.h
+    - periph_cpu.h
+    - vendor*
+  - ldscripts*
+  - periph*
+    - gpio.c
+    - i2c.c
+    - spi.c
+    - …
+  - vectors
+    - vectors_<model>.c
+  - Makefile
+  - Makefile.dep*
+  - Makefile.features*
+  - Makefile.include
+  - cpu.c
+{% /filetree %}
 
 Not every subdirectory is mandatory; use the `*` markers above to distinguish
 optional components.
@@ -61,7 +61,7 @@ optional components.
 A practical CPU porting workflow usually looks like this:
 
 1. create the CPU directory and build-system files,
-2. add startup support and a working `cpu_init()`,
+2. add startup support and a working `cpu_init()` function,
 3. provide CPU and peripheral configuration headers,
 4. add the interrupt vector table,
 5. implement the required peripherals one by one,
@@ -72,12 +72,13 @@ The following sections describe the individual files and their purpose.
 
 ## Build System Files
 
-### `Makefile`
+### Makefile
 
 The top-level CPU `Makefile` defines the CPU module and may include common
-subdirectories that are shared with other CPUs.
+subdirectories that are shared with other CPUs. `$(RIOTCPU)` is the `cpu/`
+subdirectory of the RIOT basefolder `$(RIOTBASE)`.
 
-Example:
+#### Example:
 
 ```makefile
 MODULE = cpu
@@ -86,13 +87,13 @@ DIRS = $(RIOTCPU)/cortexm_common periph
 include $(RIOTBASE)/Makefile.base
 ```
 
-### `Makefile.dep`
+### Makefile.dep
 
 This file expresses build-time dependencies for the CPU. It is the right place
 for conditional module additions that depend on the selected CPU model,
 `USEMODULE`, or board features.
 
-Example:
+#### Example:
 
 ```makefile
 include $(RIOTCPU)/cortexm_common/Makefile.dep
@@ -102,13 +103,13 @@ ifneq (,$(filter periph_uart,$(USEMODULE)))
 endif
 ```
 
-### `Makefile.features`
+### Makefile.features
 
 This file declares what the CPU provides to the rest of RIOT by defining the
 CPU architecture, including common family feature files as well as defining
-the implemented peripherals with `FEATURES_PROVIDED`.
+the implemented peripherals with `FEATURES_PROVIDED` in alphabetical order.
 
-Example:
+#### Example:
 
 ```makefile
 CPU_CORE = cortex-m4f
@@ -124,27 +125,32 @@ Only advertise features that are actually implemented and usable. Since the
 availability of some features can depend on the specific `CPU_MODEL`,
 conditional statements might be required here as well.
 
-### `Makefile.include`
+### Makefile.include
 
-This file contains low-level build configuration for the CPU.
+This file contains low-level build configuration and additional compiler and 
+linker search paths for the CPU.
 
-Example:
+#### Example:
 
 ```makefile
 INCLUDES += -I$(RIOTCPU)/foo/include
+INCLUDES += -I$(RIOTCPU)/vendor/include
 LINKER_SCRIPT = $(RIOTCPU)/foo/ldscripts/foo.ld
 VECTORS_O = $(CPU_OBJ)/vectors/vectors_$(CPU_MODEL).o
 ```
 
 For Cortex-M devices, this file often also ties the CPU port to the generic
-`cortexm_common` startup and linker support.
+`cortexm_common` startup and linker support. The same pattern is common on
+other architectures as well (for example `riscv_common` for RISC-V based
+ports).
 
 ## Core CPU Files
 
-### `cpu.c`
+### cpu.c
 
-`cpu.c` contains `cpu_init()`, which performs the minimum hardware and runtime
-initialization needed before RIOT starts normal execution.
+The `cpu.c` file contains the `cpu_init()` function, which performs the
+minimum hardware and runtime initialization needed before RIOT starts its
+normal operation.
 
 A minimal shape often looks like this:
 
@@ -167,7 +173,7 @@ Refer to the Technical Reference Manual of the target CPU for details on
 implementing the boot process.
 :::
 
-### `vectors/`
+### vectors/
 
 This directory contains the interrupt vector table for the supported CPU model.
 Without a correct vector table, the CPU will usually fault immediately after
@@ -179,9 +185,9 @@ Typical responsibilities:
 - define the `Reset_Handler`,
 - provide weak default handlers for all supported interrupts,
 - match the IRQ numbering expected by
-  `CPU_IRQ_NUMOF`.
+  `CPU_IRQ_NUMOF` defined in `include/cpu_conf.h`.
 
-### `ldscripts/`
+### ldscripts/
 
 This directory holds CPU-specific linker scripts if the CPU cannot directly use
 an existing common linker script.
@@ -192,7 +198,7 @@ Typical responsibilities:
 - place sections such as `.text`, `.data`, `.bss`, interrupt vectors, and stack,
 - cooperate with RIOT's startup assumptions.
 
-### `include/cpu_conf.h`
+### include/cpu_conf.h
 
 This header provides CPU-wide configuration.
 
@@ -219,8 +225,10 @@ Example structure:
 The exact contents depend on the architecture and MCU family, but this file is
 usually where RIOT learns which vendor header to use and how many interrupts the
 CPU exposes.
+Remember that only vendor headers included in the search paths defined by
+the `Makefile.include` can be found by the compiler!
 
-### `include/periph_cpu.h`
+### include/periph_cpu.h
 
 This header provides CPU-specific peripheral types and helper macros.
 
@@ -264,7 +272,7 @@ The exact contents depend on the CPU family, but this file usually contains the
 CPU-local building blocks that make the generic RIOT peripheral API usable for a
 specific MCU implementation.
 
-### `include/vendor/`
+### include/vendor/
 
 Vendor HAL headers can be placed here or integrated via RIOT's package
 mechanism. Vendor SDKs can range from thousands to millions of lines of code,
@@ -279,7 +287,7 @@ EFM32, which keep vendor content modular and reused across multiple boards.
 The CPU should be added to `features.yaml` so the build system can resolve the
 feature name consistently.
 
-Example:
+#### Example:
 
 ```yaml
 - title: Example MCU Grouping
@@ -326,7 +334,8 @@ The GPIO driver provides the basic digital pin interface for RIOT.
 
 - `gpio_init()` for input/output modes,
 - `gpio_init_int()` for edge-triggered interrupts,
-- `gpio_read()`, `gpio_set()`, `gpio_clear()`, `gpio_toggle()`,
+- `gpio_read()`, `gpio_set()`, `gpio_clear()`, `gpio_toggle()` for discrete
+  pin state manipulation,
 - `gpio_irq_enable()` and `gpio_irq_disable()` if interrupt support is enabled,
 - pin-to-port decoding helpers if the CPU uses packed GPIO identifiers.
 
@@ -341,7 +350,8 @@ The GPIO driver provides the basic digital pin interface for RIOT.
 - preload the output latch if needed before switching a pin to output mode,
 - configure interrupt trigger type and store callback context for
   `gpio_init_int()`,
-- dispatch the registered callback from the ISR.
+- dispatch the registered callback from the ISR. Keep the ISR short. It should
+  typically acknowledge the interrupt and call the registered callback.
 
 ### Example register-level init sketch
 
@@ -359,25 +369,23 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 }
 ```
 
-Keep the ISR short. It should typically acknowledge the interrupt and call the
-registered callback.
-
 ## UART
 
 **RIOT API:** `drivers/include/periph/uart.h`
 
-UART is used for standard I/O, shell access, and device communication. In RIOT,
-receive handling is interrupt-driven.
+The UART is used for standard I/O, shell access, and device communication.
+In RIOT, receive handling is interrupt-driven.
 
-As a side note, UART setup usually reuses parts of the GPIO implementation:
-pin muxing, GPIO direction defaults, and optional RTS/CTS handling all rely on
+As a side note, the UART setup usually reuses parts of the GPIO implementation:
+Pin muxing, GPIO direction defaults, and optional RTS/CTS handling all rely on
 the underlying pin configuration support being correct.
 
 ### Typical functionality to implement
 
-- `uart_init()`,
-- `uart_write()`,
-- `uart_poweron()` and `uart_poweroff()`,
+- `uart_init()` for the peripheral initialization,
+- `uart_write()`, `uart_read()` for input and output,
+- `uart_poweron()` and `uart_poweroff()` for enabling and disabling the
+  peripheral,
 - optional helpers such as reconfiguration or RX start interrupt support if the
   corresponding modules are enabled.
 
@@ -393,7 +401,7 @@ the underlying pin configuration support being correct.
 - unmask the peripheral interrupt and connect it to the NVIC if receive support
   is enabled,
 - enable RX/TX and keep `uart_poweroff()` and `uart_poweron()` transparent to
-  upper layers.
+  the upper layers.
 
 ### Example register-level init sketch
 
@@ -421,9 +429,17 @@ external RIOT API should remain unchanged.
 
 **RIOT API:** `drivers/include/periph/timer.h`
 
-Timers are foundational in RIOT because higher layers such as `ztimer` and
-scheduler services depend on them. A reliable timer driver is therefore one of
-the most important parts of a CPU port.
+Timers are foundational in RIOT because higher level modules such as `ztimer`
+and scheduler services depend on them. A reliable timer driver is therefore one
+of the most important parts of a CPU port.
+
+Most Cortex-M MCUs expose multiple timer classes: core `SysTick`, general
+purpose timers (often 16-bit or 32-bit), and sometimes low-power timers running
+from a slower always-on clock. For `periph_timer`, prefer a dedicated general
+purpose timer, compare/interrupt support, and enough width for the expected
+timing range. `SysTick` is usually better kept for core/system use and is often
+too limited (single instance, 24-bit counter, core-clock coupling) for robust
+peripheral timing.
 
 ### Typical functionality to implement
 
@@ -473,8 +489,8 @@ Mistakes here often break `ztimer`, sleeping, or scheduling in subtle ways.
 **RIOT API:** `drivers/include/periph/spi.h`
 
 RIOT's SPI API is transaction-based because an SPI bus is a shared resource.
-This means the driver is expected to configure and power the peripheral around
-`spi_acquire()` / `spi_release()`.
+This means the peripheral driver is expected to configure and power the
+peripheral within `spi_acquire()` / `spi_release()`.
 
 GPIO support is also important here: SPI buses reuse GPIO handling for pin mux
 setup, optional manual chip-select lines, and some reconfiguration paths.
@@ -499,6 +515,10 @@ setup, optional manual chip-select lines, and some reconfiguration paths.
   `spi_release()`.
 
 ### Generic high-level shape
+
+The following snippet is an example of how the SPI API is called from
+application or device driver code. It is not CPU-port implementation code
+from `cpu/<cpu>/periph/spi.c`.
 
 ```c
 spi_init(bus);
@@ -575,16 +595,19 @@ Bring up the CPU with the smallest possible configuration first:
 - boot to `cpu_init()`,
 - confirm the vector table works,
 - get `examples/basic/hello-world` running over UART,
+- if UART output is missing, toggle an LED at key checkpoints in startup and
+  `cpu_init()` to localize where execution stops,
 - validate one timer instance so `ztimer` works,
 - then implement the remaining peripherals incrementally.
 
 ### Reuse common code
 
 If the MCU belongs to an already supported architecture or family, reuse the
-existing common code where possible. For this case, a base directory
+existing common code where possible. In this case, a base directory
 (e.g. `cpu/<CPU_FAM>_common`) should be created that contains all shared/common
 configurations. This drastically reduces maintenance and lowers the risk of
-subtle startup or interrupt bugs.
+subtle startup or interrupt bugs, as well as code divergation issues in the 
+future.
 
 ### Refer to the manual of the target CPU
 
