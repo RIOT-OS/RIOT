@@ -185,6 +185,19 @@ of recognised exceptions where we can (or even must) rely on extensions include:
     else {
         println("DEBUG ELSE");
     }
+
+    /* for multiline conditions: instead of: */
+    if (this_really_long_boolean_expression_it_barely_fits_in_a_single_line &&
+        this_is_another_very_long_expression) {
+        do_something();
+    }
+
+    /* write: */
+    if (this_really_long_boolean_expression_it_barely_fits_in_a_single_line &&
+        this_is_another_very_long_expression)
+    {
+        do_something();
+    }
 ```
 * Commas are always followed by a space.
 * For complex statements it is always good to use more parentheses - or split up
