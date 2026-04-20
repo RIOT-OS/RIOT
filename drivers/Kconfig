@@ -9,6 +9,7 @@ rsource "motor_driver/Kconfig"
 endmenu # Actuator Device Drivers
 
 menu "Display Device Drivers"
+rsource "gc9a01/Kconfig"
 rsource "ili9341/Kconfig"
 rsource "lcd/Kconfig"
 rsource "st77xx/Kconfig"
