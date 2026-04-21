@@ -1,4 +1,4 @@
-name: Guide Docs Build Test
+name: Guide Build Test
 
 on:
   pull_request:
@@ -12,7 +12,7 @@ on:
       - 'release-notes.txt'
 
 jobs:
-  build-docs:
+  build-guide:
     runs-on: ubuntu-latest
     defaults:
       run:
