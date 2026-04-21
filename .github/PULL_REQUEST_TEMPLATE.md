@@ -24,6 +24,21 @@ Details steps to test your contribution:
 - the expected success test output
 -->
 
+### Declaration of [Generative AI]-Tool-usage:
+> [!NOTE]
+> Please delete the sentences and parts of them  that are untrue.
+> Please add information (e.g., name tools or technologies) if needed.
+- A LLM agent generated this entire PR either on behave of a human or selftriggered.
+- A LLM was used to produce whole file(s), function(s), codeblocks or snippets.
+- A LLM was used to produce documentation.
+- A LLM was used to check the code.
+- another kind of [Generative AI]-Tool was used to do something. 
+- No [Generative AI]-Tool was used in any way but spellcheck
+
+Tools that were used are:
+none
+
+[Generative AI]: https://en.wikipedia.org/wiki/Generative_artificial_intelligence
 
 ### Issues/PRs references
 
