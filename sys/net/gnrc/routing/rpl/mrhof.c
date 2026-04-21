@@ -28,15 +28,15 @@
 #include "debug.h"
 
 /**
- * Retrieve parent statistics from the netstats neighbor module
+ * Retrieve statistics from the netstats neighbor module
  */
-static bool _mrhof_get_stats(gnrc_rpl_parent_t *parent, netstats_nb_t *out)
+static bool _mrhof_get_stats(kernel_pid_t iface_parent, ipv6_addr_t addr, netstats_nb_t *out)
 {
     gnrc_ipv6_nib_nc_t nce;
 
-    gnrc_netif_t *iface = gnrc_netif_get_by_pid(parent->dodag->iface);
+    gnrc_netif_t *iface = gnrc_netif_get_by_pid(iface_parent);
 
-    if (gnrc_ipv6_nib_get_next_hop_l2addr(&parent->addr, iface, NULL, &nce)) {
+    if (gnrc_ipv6_nib_get_next_hop_l2addr(&addr, iface, NULL, &nce)) {
         return false;
     }
 
@@ -63,11 +63,11 @@ static inline uint16_t _link_metric(netstats_nb_t *stats)
 }
 
 /**
- * Retrieve the full path cost of a parent
+ * Retrieve the full path cost
  */
-static uint16_t _mrhof_get_path_cost(gnrc_rpl_parent_t *parent, netstats_nb_t *stats)
+static uint16_t _mrhof_get_path_cost(uint16_t rank, netstats_nb_t *stats)
 {
-    return parent->rank + _link_metric(stats);
+    return rank + _link_metric(stats);
 }
 
 /**
@@ -76,7 +76,7 @@ static uint16_t _mrhof_get_path_cost(gnrc_rpl_parent_t *parent, netstats_nb_t *s
 static bool _mrhof_is_acceptable(gnrc_rpl_parent_t *parent, netstats_nb_t *stats)
 {
     return (_link_metric(stats) < MRHOF_MAX_LINK_METRIC) &&
-           (_mrhof_get_path_cost(parent, stats) < MRHOF_MAX_PATH_COST);
+           (_mrhof_get_path_cost(parent->rank, stats) < MRHOF_MAX_PATH_COST);
 }
 
 /**
@@ -169,27 +169,24 @@ static uint16_t calc_rank(gnrc_rpl_dodag_t *dodag, uint16_t base_rank)
     uint16_t cost_rank, minhoprankincr = dodag->instance->min_hop_rank_inc;
 
     /* Determine the path cost through the preferred parent */
-    if (!_mrhof_get_stats(dodag->parents, &elt_stats)) {
+    if (!_mrhof_get_stats(dodag->iface, dodag->parents->addr, &elt_stats)) {
         DEBUG("MRHOF: No stats for parent, assuming max rank\n");
         return GNRC_RPL_INFINITE_RANK;
     }
 
     /* calculate rank for path through the preferred parent */
-    cost_rank = _mrhof_get_path_cost(dodag->parents, &elt_stats);
+    cost_rank = _mrhof_get_path_cost(dodag->parents->rank, &elt_stats);
 
     /* Determine the Rank of the member of the parent set with the highest
      * advertised Rank, rounded to the next higher integral Rank, i.e.,
      * to MinHopRankIncrease * (1 + floor(Rank/MinHopRankIncrease)).
      */
     LL_FOREACH(dodag->parents, elt) {
-        if (cnt >= MRHOF_PARENT_SET_SIZE) {
-            break;
-        }
-        _mrhof_get_stats(elt, &elt_stats);
+        _mrhof_get_stats(elt->dodag->iface, elt->addr, &elt_stats);
         /* Only include parent in the parent set if the statistics are acceptable
          * and the path cost is not significantly worse than the current preferred parent */
         if (_mrhof_is_acceptable(elt, &elt_stats) && \
-            (_mrhof_get_path_cost(elt, &elt_stats) <= cost_rank + MRHOF_PARENT_SWITCH_THRESHOLD)) {
+            (_mrhof_get_path_cost(elt->rank, &elt_stats) <= cost_rank + MRHOF_PARENT_SWITCH_THRESHOLD)) {
             uint8_t new_dagrank = elt->rank / minhoprankincr;
             if (max_dagrank < new_dagrank) {
                 max_dagrank = new_dagrank;
@@ -223,7 +220,7 @@ static int which_parent(gnrc_rpl_parent_t *p1, gnrc_rpl_parent_t *p2)
     assert(p1->dodag->iface == p2->dodag->iface);
     gnrc_netif_t *netif = gnrc_netif_get_by_pid(p1->dodag->iface);
 
-    if (!_mrhof_get_stats(p1, &p1_stats) || !_mrhof_get_stats(p2, &p2_stats)) {
+    if (!_mrhof_get_stats(p1->dodag->iface, p1->addr, &p1_stats) || !_mrhof_get_stats(p2->dodag->iface, p2->addr, &p2_stats)) {
         return 0;
     }
 
@@ -239,8 +236,8 @@ static int which_parent(gnrc_rpl_parent_t *p1, gnrc_rpl_parent_t *p2)
         return cmp;
     }
 
-    uint16_t p1_path_cost = _mrhof_get_path_cost(p1, &p1_stats);
-    uint16_t p2_path_cost = _mrhof_get_path_cost(p2, &p2_stats);
+    uint16_t p1_path_cost = _mrhof_get_path_cost(p1->rank, &p1_stats);
+    uint16_t p2_path_cost = _mrhof_get_path_cost(p2->rank, &p2_stats);
 
     /* Compare ETX of parents */
     if (p1_path_cost > p2_path_cost) {
@@ -263,8 +260,13 @@ static int which_parent(gnrc_rpl_parent_t *p1, gnrc_rpl_parent_t *p2)
     return -1;
 }
 
-/* prefer dio if dio is grounded dodag */
-int which_dodag(gnrc_rpl_dodag_t *d1, gnrc_rpl_dio_t *dio)
+/**
+ * Decision based on
+ * * whether dodag is grounded
+ * * wether root more preferable
+ * * selected metric (default: ETX)
+ */
+static int which_dodag(gnrc_rpl_dodag_t *d1, gnrc_rpl_dio_t *dio, kernel_pid_t dio_iface, ipv6_addr_t dio_addr)
 {
     /* parent set must not be empty */
     if ((d1->node_status != GNRC_RPL_ROOT_NODE) && !d1->parents) {
@@ -285,8 +287,34 @@ int which_dodag(gnrc_rpl_dodag_t *d1, gnrc_rpl_dio_t *dio)
     else if (dio_prf > d1->prf) {
         return 1;
     }
-    
-    return 1;
+
+    /* prefer dodag with lesser resulting rank */
+    // get neighbour stats
+    netstats_nb_t d1_stats, dio_stats;
+    gnrc_rpl_parent_t *d1_parent = d1->parents;
+    if (d1_parent == NULL) {
+        return 1;
+    }
+    if (!_mrhof_get_stats(d1_parent->dodag->iface, d1_parent->addr, &d1_stats) || !_mrhof_get_stats(dio_iface, dio_addr, &dio_stats)) {
+        return -1;
+    }
+
+    // get path cost
+    uint16_t d1_path_cost = _mrhof_get_path_cost(d1_parent->rank, &d1_stats);
+    uint16_t dio_rank = byteorder_ntohs(dio->rank);
+    uint16_t dio_path_cost = _mrhof_get_path_cost(dio_rank, &dio_stats);
+
+    // compare while using hysteresis
+    if (d1_path_cost > dio_path_cost) {
+        if (dio_path_cost + MRHOF_PARENT_SWITCH_THRESHOLD < d1_path_cost) {
+            return 1;
+        }
+        else {
+            return -1;
+        }
+    }
+
+    return -1;
 }
 
 static gnrc_rpl_of_t gnrc_rpl_mrhof = {

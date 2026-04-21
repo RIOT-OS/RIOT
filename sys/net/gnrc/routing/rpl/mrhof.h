@@ -36,12 +36,7 @@ extern "C" {
 /**
  * @brief   Highest path cost
  */
-#define MRHOF_MAX_PATH_COST           32768
-
-/**
- * @brief   Number of possible parents
- */
-#define MRHOF_PARENT_SET_SIZE             3
+#define MRHOF_MAX_PATH_COST           3276
 
 /**
  * @brief   Return the address to the MRH objective function

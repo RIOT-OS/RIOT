@@ -537,7 +537,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
 
         case (GNRC_RPL_OPT_DODAG_CONF):
             DEBUG("RPL: DODAG CONF DIO option parsed\n");
-            *included_opts |= ((uint32_t) 1) << GNRC_RPL_OPT_DODAG_CONF;
+            bit_set32(included_opts, GNRC_RPL_OPT_DODAG_CONF);
             dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_DODAG_CONF;
             gnrc_rpl_opt_dodag_conf_t *dc = (gnrc_rpl_opt_dodag_conf_t *) opt;
             gnrc_rpl_of_t *of = gnrc_rpl_get_of_for_ocp(byteorder_ntohs(dc->ocp));
@@ -637,7 +637,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
             break;
         case (GNRC_RPL_OPT_TRANSIT):
             DEBUG("RPL: RPL TRANSIT INFO DAO option parsed\n");
-            *included_opts |= ((uint32_t) 1) << GNRC_RPL_OPT_TRANSIT;
+            bit_set32(included_opts, GNRC_RPL_OPT_TRANSIT);
             gnrc_rpl_opt_transit_t *transit = (gnrc_rpl_opt_transit_t *) opt;
             if (first_target == NULL) {
                 DEBUG("RPL: Encountered a RPL TRANSIT DAO option without "
@@ -917,7 +917,8 @@ static void _recv_DIO_for_different_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_di
     }
 
     /* decide between old and new dodag */
-    if (gnrc_rpl_get_of0()->which_dodag(dodag, dio) > 0) {
+    const gnrc_rpl_of_t *of = gnrc_rpl_get_of_for_ocp(CONFIG_GNRC_RPL_DEFAULT_OCP);
+    if (of->which_dodag(dodag, dio, iface, *src) > 0) {
         DEBUG("RPL: switch to new DODAG.\n");
         gnrc_rpl_dodag_remove(dodag);
         _recv_DIO_for_new_dodag(inst, dio, iface, src, len);
