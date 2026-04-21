@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2019 University of Applied Sciences Emden / Leer
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 University of Applied Sciences Emden / Leer
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -173,10 +170,10 @@ int ph_oem_set_i2c_address(ph_oem_t *dev, uint8_t addr);
  *          The default is @ref PH_OEM_IRQ_BOTH.
  *
  *          @note Also provide the @ref gpio_mode_t as a CFLAG in your makefile.
- *          Most likely @ref GPIO_IN. If the pin is to sensitive use
- *          @ref GPIO_IN_PU for @ref PH_OEM_IRQ_FALLING or
- *          @ref GPIO_IN_PD for @ref PH_OEM_IRQ_RISING and
- *          @ref PH_OEM_IRQ_BOTH. The default is @ref GPIO_IN_PD
+ *          Most likely `GPIO_IN`. If the pin is too sensitive use
+ *          `GPIO_IN_PU` for @ref PH_OEM_IRQ_FALLING or
+ *          `GPIO_IN_PD` for @ref PH_OEM_IRQ_RISING and
+ *          @ref PH_OEM_IRQ_BOTH. The default is `GPIO_IN_PD`.
  *
  *
  * @param[in] dev       device descriptor
