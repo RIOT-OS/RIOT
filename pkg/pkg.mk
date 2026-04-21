@@ -51,13 +51,6 @@ endif
 
 PKG_SOURCE_LOCAL ?= $(PKG_SOURCE_LOCAL_$(shell echo $(PKG_NAME) | tr a-z- A-Z_))
 
-# git-cache specific management: GIT_CACHE_DIR is exported only
-# when cloning the repository.
-GITCACHE ?= $(RIOTTOOLS)/git/git-cache
-GIT_CACHE_DIR ?= $(HOME)/.gitcache
-include $(RIOTBASE)/makefiles/utils/variables.mk
-$(call target-export-variables,$(PKG_BUILDDIR)/.git,GIT_CACHE_DIR)
-
 # Check if git-cache-rs is installed in the local default directory and if so,
 # set the `GIT_CACHE_RS` variable to use it.
 DEFAULT_GIT_CACHE_RS ?= $(HOME)/.cargo/bin/git-cache
@@ -169,16 +162,6 @@ $(PKG_SOURCE_DIR)/.git: $(PKG_SPARSE_TAG) | $(PKG_CUSTOM_PREPARED)
 	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME) with git-cache-rs))
 	$(Q)rm -Rf $(PKG_SOURCE_DIR)
 	$(Q)$(GIT_CACHE_RS) clone --commit $(PKG_VERSION) $(addprefix --sparse-add ,$(PKG_SPARSE_PATHS)) -- $(PKG_URL) $(PKG_SOURCE_DIR)
-else ifeq ($(GIT_CACHE_DIR),$(wildcard $(GIT_CACHE_DIR)))
-$(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
-	$(if $(QUIETER),,$(info [INFO] cloning $(PKG_NAME) with git-cache))
-	@echo "$(COLOR_YELLOW)Warning: git-cache is deprecated and will be" \
-	  "removed after the 2026.04 release! See" \
-	  "https://guides.riot-os.org/build-system/advanced_build_system_tricks/#speed-up-builds-with-git-cache-rs" \
-	  "for more information.$(COLOR_RESET)"
-	$(Q)rm -Rf $(PKG_SOURCE_DIR)
-	$(Q)mkdir -p $(PKG_SOURCE_DIR)
-	$(Q)$(GITCACHE) clone $(PKG_URL) $(PKG_VERSION) $(PKG_SOURCE_DIR)
 else
 # redirect stderr so git sees a pipe and not a terminal see https://github.com/git/git/blob/master/progress.c#L138
 $(PKG_SOURCE_DIR)/.git: $(PKG_SPARSE_TAG) | $(PKG_CUSTOM_PREPARED)
@@ -193,7 +176,8 @@ $(PKG_SOURCE_DIR)/.git: $(PKG_SPARSE_TAG) | $(PKG_CUSTOM_PREPARED)
 	$(Q)if [ -n "$(PKG_SPARSE_PATHS)" ]; then \
 	  # iff the package uses sparse paths, initialize the repository as sparse \
 	  $(if $(QUIETER),,echo "[INFO] using sparse checkout";) \
-	  $(GIT_IN_PKG) sparse-checkout set --no-cone -- $(foreach p,$(PKG_SPARSE_PATHS),"$(p)"); \
+	  $(GIT_IN_PKG) sparse-checkout init --no-cone; \
+	  $(GIT_IN_PKG) sparse-checkout set -- $(foreach p,$(PKG_SPARSE_PATHS),"$(p)"); \
 	fi
 	$(Q)$(GIT_IN_PKG) remote add origin $(PKG_URL)
 	$(Q)$(GIT_IN_PKG) config remote.origin.promisor true
