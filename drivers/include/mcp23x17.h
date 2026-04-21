@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 Gunar Schorcht
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 Gunar Schorcht
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -75,7 +72,7 @@
  * - Module `mcp23017` enables the `mcp23x17_i2c` module automatically.
  * - Module `mcp23s17` enables the `mcp23x17_spi` module automatically.
  * - Module `mcp23x17_irq` enables the `mcp23x17_irq_medium` module
- *   automatically if no other ``mcp23x17_irq_*` module is enabled.
+ *   automatically if no other `mcp23x17_irq_*` module is enabled.
  *
  * ## Expander GPIOs
  *
@@ -183,8 +180,8 @@
  * so there are no restrictions on execution time or bus access.
  *
  * To be able to handle interrupts in thread context, a separate event
- * thread is used, see section [The Interrupt Context Problem]
- * (#mcp23x17_interrupt_context_problem).
+ * thread is used, see section
+ * [The Interrupt Context Problem](#mcp23x17_interrupt_context_problem).
  * Therefore, enabling interrupts requires more RAM and interrupts have to
  * be explicitly enabled with the module `mcp23x17_irq_<priority>`.
  * `priority` can be one `medium` or `highest`, which correspond
@@ -221,7 +218,7 @@
  * ## The Interrupt Context Problem {#mcp23x17_interrupt_context_problem}
  *
  * Handling an interrupt of a MCP23x17 expander requires the driver to access
- * the device directly via I2Cor SPI. However, the mutex-based synchronization
+ * the device directly via I2C or SPI. However, the mutex-based synchronization
  * of I2C and SPI accesses do not work in the interrupt context. Therefore the
  * ISR must not access the MCP23x17 expander device directly. Rather, the ISR
  * must only indicate the occurrence of the interrupt which has to be handled
@@ -315,7 +312,7 @@
  * |:------------------------------|:--------------------------|:--------------|
  * | SPI Address Offset            | #MCP23X17_PARAM_SPI_ADDR  | 0             |
  * | SPI Device Identifier         | #MCP23X17_PARAM_SPI_DEV   | SPI_DEV(0)    |
- * | SPI Clock rRate               | #MCP23X17_PARAM_SPI_CLK   | SPI_CLK_10MHZ |
+ * | SPI Clock Rate                | #MCP23X17_PARAM_SPI_CLK   | SPI_CLK_10MHZ |
  * | SPI Chip Select GPIO          | #MCP23X17_PARAM_SPI_CS    | GPIO_PIN(0,0) |
  * | SPI Device `INTA`/`INTB` GPIO | #MCP23X17_PARAM_SPI_INT   | GPIO_PIN(0,1) |
  * |                               |                           |               |

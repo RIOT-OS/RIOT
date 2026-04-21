@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 Gilles DOFFE <gdoffe@gmail.com>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Gilles DOFFE <gdoffe@gmail.com>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -62,7 +59,7 @@
  *  - X4 mode : signals A and B, rising and falling edges (all cases)
  *
  * The mapping/configuration of QDEC devices (timers) and the used pins has to be
- * done in the board configuration (the board's `periph_conf.h).
+ * done in the board configuration (the board's `periph_conf.h`).
  *
  * When using the QDEC interface, first thing you have to do is initialize the
  * QDEC device with the targeted mode. Once the device is initialized,
