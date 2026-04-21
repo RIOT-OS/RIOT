@@ -1,41 +1,41 @@
 name: Build Docs
 
 on:
-    push:
-        branches:
-            - master
-        paths:
-            - 'doc/guides/**'
-            - 'doc/starlight/**'
-            - 'CODE_OF_CONDUCT.md'
-            - 'GOVERNANCE.md'
-            - 'CONTRIBUTING.md'
-            - 'CODING_CONVENTIONS*.md'
-            - 'SECURITY.md'
-            - 'release-notes.txt'
+  push:
+    branches:
+      - master
+    paths:
+      - 'doc/guides/**'
+      - 'doc/starlight/**'
+      - 'CODE_OF_CONDUCT.md'
+      - 'GOVERNANCE.md'
+      - 'CONTRIBUTING.md'
+      - 'CODING_CONVENTIONS*.md'
+      - 'SECURITY.md'
+      - 'release-notes.txt'
 
 jobs:
-    build-docs:
-        runs-on: ubuntu-latest
-        defaults:
-            run:
-                working-directory: doc/starlight
-        steps:
-          - name: Checkout repository
-            uses: actions/checkout@v4
-          - name: Set up Node.js
-            uses: actions/setup-node@v6
-            with:
-                node-version: '25.x'
-          - name: Build documentation
-            run: make build
-          - name: Deploy to riot-os.org server
-            uses: burnett01/rsync-deployments@v8
-            with:
-              switches: -avzr --delete
-              path: doc/starlight/dist/
-              remote_path: /
-              remote_host: ${{ secrets.SSH_GUIDES_REMOTE_HOST }}
-              remote_port: ${{ secrets.SSH_GUIDES_REMOTE_PORT }}
-              remote_user: ${{ secrets.SSH_GUIDES_REMOTE_USER }}
-              remote_key: ${{ secrets.SSH_GUIDES_PRIVATE_KEY }}
+  build-docs:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: doc/starlight
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+            node-version: '25.x'
+      - name: Build documentation
+        run: make build
+      - name: Deploy to riot-os.org server
+        uses: burnett01/rsync-deployments@v8
+        with:
+          switches: -avzr --delete
+          path: doc/starlight/dist/
+          remote_path: /
+          remote_host: ${{ secrets.SSH_GUIDES_REMOTE_HOST }}
+          remote_port: ${{ secrets.SSH_GUIDES_REMOTE_PORT }}
+          remote_user: ${{ secrets.SSH_GUIDES_REMOTE_USER }}
+          remote_key: ${{ secrets.SSH_GUIDES_PRIVATE_KEY }}
