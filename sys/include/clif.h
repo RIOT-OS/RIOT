@@ -183,7 +183,7 @@ ssize_t clif_encode_link(const clif_t *link, char *buf, size_t maxlen);
  * @return CLIF_NOT_FOUND if the string is malformed
  */
 ssize_t clif_decode_link(clif_t *link, clif_attr_t *attrs, unsigned attrs_len,
-                         const char *buf, size_t maxlen);
+                         char *buf, size_t maxlen);
 
 /**
  * @brief   Adds a given @p target to a given buffer @p buf using link format
@@ -270,9 +270,29 @@ ssize_t clif_add_link_separator(char *buf, size_t maxlen);
  *                          beginning of it
  *
  * @return length of the target if found
- * @return CLIF_NOT_FOUND if no valid target is found
+ * @retval CLIF_NOT_FOUND   no valid target is found
  */
-ssize_t clif_get_target(const char *input, size_t input_len, char **output);
+ssize_t clif_get_target_const(const char *input, size_t input_len, const char **output);
+
+/**
+ * @brief   Same as @ref clif_get_target_const but with non-`const` memory
+ *
+ * @pre `input != NULL`
+ *
+ * @param[in]  input        string where to look for the target. It should only
+ *                          be ONE link. Must not be NULL.
+ * @param[in]  input_len    length of @p input.
+ * @param[out] output       if a target is found this will point to the
+ *                          beginning of it
+ *
+ * @return length of the target if found
+ * @retval CLIF_NOT_FOUND   no valid target is found
+ */
+static inline ssize_t clif_get_target(char *input, size_t input_len, char **output)
+{
+    return clif_get_target_const(input, input_len, (const char **)output);
+}
+
 /**
  * @brief   Looks for the first attribute in a given link.
  *
