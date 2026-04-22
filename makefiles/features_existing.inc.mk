@@ -144,6 +144,7 @@ FEATURES_EXISTING := \
     periph_adc \
     periph_adc_continuous \
     periph_aead_aes_128_ccm \
+    periph_aead_chacha20_poly1305 \
     periph_can \
     periph_cipher_aes_128_cbc \
     periph_cipher_chacha20 \
