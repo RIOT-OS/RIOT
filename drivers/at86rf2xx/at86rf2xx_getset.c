@@ -163,11 +163,12 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page, int16
     (void) chan;
     (void) txpower;
 
+    uint8_t trx_ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
+
 #if AT86RF2XX_HAVE_SUBGHZ
     /* The TX power register must be updated after changing the channel if
      * moving between bands. */
 
-    uint8_t trx_ctrl2 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_2);
     uint8_t rf_ctrl0 = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RF_CTRL_0);
 
     /* Clear previous configuration for PHY mode */
@@ -192,9 +193,13 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev, uint8_t chan, uint8_t page, int16
         rf_ctrl0 |= AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__1DB;
     }
 
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2, trx_ctrl2);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__RF_CTRL_0, rf_ctrl0);
 #endif
+
+    /* enable safe mode (protect RX FIFO until reading data starts) */
+    trx_ctrl2 |= AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE;
+
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2, trx_ctrl2);
 
     uint8_t phy_cc_cca = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_CC_CCA);
     /* Clear previous configuration for channel number */
