@@ -69,6 +69,15 @@
 #define FLASH_SR_REG            (FLASH->SR)
 #endif
 
+/* Flash status register error flags */
+#if defined(CPU_FAM_STM32G4)
+#  define FLASH_SR_ERRORS        (FLASH_SR_OPERR | FLASH_SR_PROGERR | \
+                                  FLASH_SR_WRPERR | FLASH_SR_PGAERR | \
+                                  FLASH_SR_SIZERR | FLASH_SR_PGSERR | \
+                                  FLASH_SR_MISERR | FLASH_SR_FASTERR | \
+                                  FLASH_SR_RDERR | FLASH_SR_OPTVERR)
+#endif
+
 void _unlock(void)
 {
     if (CNTRL_REG & CNTRL_REG_LOCK) {
@@ -92,6 +101,16 @@ void _wait_for_pending_operations(void)
         DEBUG("[flash-common] waiting for any pending operation to finish\n");
         while (FLASH_SR_REG & FLASH_SR_BSY) {}
     }
+
+#if defined(CPU_FAM_STM32G4)
+    /* Check FLASH operation error flags */
+    uint32_t error = (FLASH_SR_REG & FLASH_SR_ERRORS);
+    /* Clear error programming flags */
+    if (error != 0) {
+        DEBUG("[flash-common] flash error flags set: 0x%" PRIx32 "\n", error);
+        FLASH_SR_REG = error;
+    }
+#endif
 
     /* Clear 'end of operation' bit in status register, for other STM32 boards
        this bit is set only if EOPIE is set, which is currently not done */
