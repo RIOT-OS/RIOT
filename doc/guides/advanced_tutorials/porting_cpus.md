@@ -640,7 +640,7 @@ Useful first tests are:
 
 ## Further Reading
 
-- RIOT guide: board porting (`doc/guides/advanced_tutorials/porting_boards.md`)
+- RIOT guide: [board porting](/advanced_tutorials/porting_boards)
 - RIOT peripheral APIs in `drivers/include/periph/`
 - architecture-common code such as `cpu/cortexm_common/` when porting
   Cortex-M-based MCUs
