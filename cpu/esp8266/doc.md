@@ -1200,10 +1200,8 @@ following.
 1. Start in first terminal window a terminal program which connects to the
 port of the ESP8266 module as console window:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-term1> python -m serial.tools.miniterm &lt;port&gt; 115200
+make BOARD=esp8266-esp-12x term
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-where `&lt;port&gt;` is the serial interface to which the ESP8266 module is connected,
-e.g., `/dev/ttyUSB0`.
 
 2. Start GDB with the application in a second terminal window:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
