@@ -6,6 +6,32 @@
 
 .PHONY: mosquitto_rsmb
 
+.PHONY: tools-check
+
+tools-check:
+	@set -e; \
+	missing=0; \
+	check() { \
+		name="$$1"; \
+		hint="$$2"; \
+		if command -v "$$name" >/dev/null 2>&1; then \
+			printf "[OK] %s\n" "$$name"; \
+		else \
+			printf "[MISSING] %s\n" "$$name"; \
+			if [ -n "$$hint" ]; then printf "  hint: %s\n" "$$hint"; fi; \
+			missing=1; \
+		fi; \
+	}; \
+	check python3 "Install Python 3 and ensure it is in PATH."; \
+	check git "Install Git and ensure it is in PATH."; \
+	check make "Install GNU make (e.g., via your distro/MSYS2/WSL)."; \
+	check arm-none-eabi-gcc "Install the ARM embedded toolchain (arm-none-eabi-gcc)."; \
+	check openocd "Install OpenOCD if you flash using OpenOCD-based programmers."; \
+	check pyserial-miniterm "Install pyserial if you use serial terminal helpers: pip install pyserial"; \
+	if [ "$$missing" -ne 0 ]; then \
+		exit 1; \
+	fi
+
 # target for building the bossac binary
 $(RIOTTOOLS)/bossa-$(BOSSA_VERSION)/bossac:
 	@echo "[INFO] bossac $(BOSSA_VERSION) binary not found - building it from source"
