@@ -4,7 +4,8 @@ PKG_URL=https://github.com/NordicSemiconductor/nrfx
 PKG_VERSION=11f57e578c7feea13f21c79ea0efab2630ac68c7
 PKG_LICENSE=BSD-3-Clause
 
-# CPU Family specific vendor header files
+# CPU Family specific vendor header files using sparse checkout, since the
+# repository is multiple 100MBs big.
 ifeq (nrf51, $(CPU_FAM))
   PKG_SPARSE_PATHS  = mdk/nrf51.h
   PKG_SPARSE_PATHS += mdk/nrf51_bitfields.h
@@ -46,18 +47,26 @@ else ifneq (nrf53%, $(CPU_FAM))
 
 endif
 
-# Create a subdirectory for each family to avoid issues with the sparse
-# checkout used in `pkg/pkg.mk`. The full NRFX repository is multiple 100MBs
-# big, so we really don't want to clone it every time.
+# Since we do not want to pull all the vendor headers for all CPU families,
+# we create a separate subdirectory for each one. That assures that it will
+# be patched correctly every time, otherwise the files fetched on the second
+# run will not be patched.
 PKG_SOURCE_DIR = $(BUILD_DIR)/nrf5x_nrfx_mdk/$(CPU_FAM)
-VENDOR_FOLDER = $(PKG_SOURCE_DIR)/vendor
-
 PKG_PATCH_DIR = $(RIOTCPU)/nrf5x_common/include/vendor/patches
+
+VENDOR_FOLDER = $(PKG_SOURCE_DIR)/vendor
+NRFX_VENDOR_HEADERS := $(addprefix $(VENDOR_FOLDER)/, $(notdir $(PKG_SPARSE_PATHS)))
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-# The sparse checkout keeps the path, but we need to have the headers in a
-# subfolder called "vendor".
-all:
-	@mkdir -p $(VENDOR_FOLDER)
-	@cp -u $(addprefix $(PKG_SOURCE_DIR)/, $(PKG_SPARSE_PATHS)) $(VENDOR_FOLDER)
+all: $(NRFX_VENDOR_HEADERS)
+
+$(PKG_PREPARED): $(VENDOR_FOLDER)
+
+# Make sure the folder REALLY exists before trying to copy to it.
+$(VENDOR_FOLDER): | $(PKG_PATCHED)
+	$(Q)mkdir -p $(VENDOR_FOLDER)
+
+# The package has to be done with the patching before we try to copy the headers.
+$(VENDOR_FOLDER)/%: $(PKG_PATCHED) | $(VENDOR_FOLDER)
+	@cp $(PKG_SOURCE_DIR)/mdk/$* $@
