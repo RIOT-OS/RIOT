@@ -20,7 +20,7 @@ flashfile-format-check:
 # Execute the SoftDevice check. It verifies that the SoftDevice is present if
 # needed, that the versions match and that it is not accidentally overridden.
 uf2-softdevice-check:
-	@UF2_SOFTDEV=$(UF2_SOFTDEV) $(RIOTTOOLS)/uf2/nrf52_softdevice_check.sh
+	@UF2_SOFTDEV=$(UF2_SOFTDEV) UF2_MOUNTPOINT=$(UF2_MOUNTPOINT) $(RIOTTOOLS)/uf2/nrf52_softdevice_check.sh
 	@if [ $$? -ne 0 ]; then \
 		exit 1; \
   fi

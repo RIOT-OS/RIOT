@@ -58,6 +58,20 @@ for in common mounting locations. If the device is not mounted, the flashing
 process fails. Please configure automounting in this case or refer to the
 [`adafruit-nrfutil` Programmer](@ref ada-nrf52-adafruit-nrfutil).
 
+#### Set a Custom Mounting Point
+
+If the UF2 mass storage device cannot be detected automatically or if multiple
+UF2 devices are connected at the same time, you can explicitly specify the
+mountpoint by setting `UF2_MOUNTPOINT` to the path that contains
+`INFO_UF2.TXT`.
+
+Example:
+```sh
+make UF2_MOUNTPOINT=/media/$USER/FEATHER52840 BOARD=adafruit-feather-nrf52840-express -C examples/basic/hello-world flash
+```
+
+#### Handling the SoftDevice
+
 The board definitions with RIOT retain the SoftDevice firmware blob shipped with
 the original Adafruit nRF52 Bootloader that is used by i.a. Arduino and
 CircuitPython but not used by RIOT. If you want to override the SoftDevice
