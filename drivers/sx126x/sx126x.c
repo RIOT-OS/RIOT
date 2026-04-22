@@ -342,13 +342,6 @@ static void sx126x_init_default_config(sx126x_t *dev)
     sx126x_cfg_rx_boosted(dev, false);
 }
 
-#if IS_ACTIVE(SX126X_SPI)
-static void _dio1_isr(void *arg)
-{
-    netdev_trigger_event_isr(arg);
-}
-#endif
-
 /**
  * @brief   Detect whether an SX126x device is actually connected
  * @param   dev     Initialized device descriptor to use
