@@ -1,0 +1,60 @@
+name: Deploy Guides to RIOT-OS.org Server
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'doc/guides/**'
+      - 'doc/starlight/**'
+      - 'CODE_OF_CONDUCT.md'
+      - 'GOVERNANCE.md'
+      - 'CONTRIBUTING.md'
+      - 'CODING_CONVENTIONS*.md'
+      - 'SECURITY.md'
+      - 'release-notes.txt'
+
+jobs:
+  check-secret:
+    runs-on: ubuntu-latest
+    outputs:
+      secret-configured: ${{ steps.secret-exists-check.outputs.defined }}
+    steps:
+      - name: Check if Secret is configured
+        id: secret-exists-check
+        # check if the secrets are configured before running the tasks
+        # see: https://stackoverflow.com/a/70249520
+        shell: bash
+        run: |
+          if [ "${{ secrets.SSH_GUIDES_PRIVATE_KEY }}" != '' ]; then
+            echo "defined=true" >> $GITHUB_OUTPUT;
+          else
+            echo "defined=false" >> $GITHUB_OUTPUT;
+          fi
+
+  deploy-guide:
+    runs-on: ubuntu-latest
+    needs: [check-secret]
+    if: needs.check-secret.outputs.secret-configured == 'true'
+    defaults:
+      run:
+        working-directory: doc/starlight
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+            node-version: '25.x'
+      - name: Build documentation
+        run: make build
+      - name: Deploy to riot-os.org server
+        uses: burnett01/rsync-deployments@v8
+        with:
+          switches: -avzr --delete
+          path: doc/starlight/dist/
+          remote_path: /
+          remote_host: ${{ secrets.SSH_GUIDES_REMOTE_HOST }}
+          remote_port: ${{ secrets.SSH_GUIDES_REMOTE_PORT }}
+          remote_user: ${{ secrets.SSH_GUIDES_REMOTE_USER }}
+          remote_key: ${{ secrets.SSH_GUIDES_PRIVATE_KEY }}
