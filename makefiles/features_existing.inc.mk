@@ -152,6 +152,7 @@ FEATURES_EXISTING := \
     periph_cpuid \
     periph_cryptocell_310 \
     periph_dac \
+    periph_dac_play \
     periph_dma \
     periph_ecc_ed25519 \
     periph_ecc_p192r1 \
