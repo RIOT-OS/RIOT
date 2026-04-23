@@ -18,6 +18,10 @@ Steps marked with a :scroll: icon can also be automated with the release manager
 - [ ] Gather features to push from contributors, and apply milestone label
 - [ ] Go through list of deprecated features and make sure pending removals are applied
 - [ ] Familiarise with release specs and tests, incl open issues, deprecations, api changes, and PRs
+- [ ] Check if the release will impact other repositories such as the
+      the [Tutorial](https://github.com/RIOT-OS/Tutorials),
+      the [RIOT Course](https://github.com/RIOT-OS/riot-course) or
+      the [RIOT Exercises](https://github.com/netd-tud/riot-exercises).
 
 **Soft Feature Freeze**
 - [ ] Post about soft feature freeze to the forum
@@ -25,7 +29,6 @@ Steps marked with a :scroll: icon can also be automated with the release manager
 - [ ] Familiarise with nearly-merged, high impact PRs, and contact the contributors to ask them to hold
 
 **Hard Feature Freeze**
-
 Do the below actions iteratively, generating new release candidates, until all release specs tests pass.
 - [ ] Generate branch and tag for release candidate :scroll:
 - [ ] Add [branch protection rules](https://github.com/RIOT-OS/RIOT/settings/branches) for the release branch (if you don't have permissions ask an [admin](https://github.com/orgs/RIOT-OS/teams/admin) or [owner](https://github.com/orgs/RIOT-OS/teams/owners)). :warning: A new rule has to be added manually for each release, since the Github Merge Queue cannot be enabled for branches that are protected with a wildcard rule for some reason. You might need to ask for help from one of the RIOT-OS GitHub admins for that.
@@ -44,6 +47,10 @@ Do the below actions iteratively, generating new release candidates, until all r
 - [ ] Release either manually or using the release manager script :scroll:
 - [ ] Inform about the release on the forum
 - [ ] Update the [release statistics](https://github.com/RIOT-OS/RIOT/wiki/release-statistics)
+- [ ] Bump the RIOT version in the [Tutorial](https://github.com/RIOT-OS/Tutorials),
+      the [RIOT Course](https://github.com/RIOT-OS/riot-course),
+      the [RIOT Exercises](https://github.com/netd-tud/riot-exercises) and
+      the [RIOT Build Container](https://github.com/RIOT-OS/riotdocker/blob/master/.github/workflows/build.yml).
 
 ## 2. Preparation
 
