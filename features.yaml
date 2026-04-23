@@ -665,6 +665,8 @@ groups:
       help: The ADC peripheral can be left on between measurements.
     - name: periph_dac
       help: A DAC peripheral is present.
+    - name: periph_dac_play
+      help: The DAC peripheral implements playing multiple samples in the background.
 
   - title: Integrated Connectivity
     help: Peripheral network and communication interfaces.
