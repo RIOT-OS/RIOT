@@ -5,7 +5,7 @@ USEPKG += lua
 # This application uses getchar and thus expects input from stdio
 USEMODULE += stdin
 
-BOARD_WHITELIST += native32 native64 samr21-xpro
+BOARDS_SUPPORTED += native32 native64 samr21-xpro
 
 # currently fails with a Floating point exception - see #495
 TEST_ON_CI_BLACKLIST += native32 native64

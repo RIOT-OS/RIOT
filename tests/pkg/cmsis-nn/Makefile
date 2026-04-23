@@ -11,7 +11,7 @@ BLOBS += input
 # This package only works with Cortex M23, M3, M33, M4 and M7 CPUs, but there
 # is no easy way provided by the build system to filter them at that level
 # (cpu_core_cortexm is the only feature available) for the moment.
-BOARD_WHITELIST := \
+BOARDS_SUPPORTED := \
   b-l475e-iot01a \
   b-u585i-iot02a \
   iotlab-m3 \

@@ -1,7 +1,7 @@
 BOARD ?= sltb001a
 include ../Makefile.cpu_common
 
-BOARD_WHITELIST := ikea-tradfri \
+BOARDS_SUPPORTED := ikea-tradfri \
                    slstk3401a \
                    slstk3402a \
                    sltb001a \

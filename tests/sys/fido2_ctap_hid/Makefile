@@ -3,7 +3,7 @@ BOARD ?= nrf52840dk
 
 include ../Makefile.sys_common
 
-BOARD_WHITELIST = \
+BOARDS_SUPPORTED = \
   nrf52840dk \
   nrf52840dongle \
   adafruit-feather-nrf52840-sense

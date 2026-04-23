@@ -3,7 +3,7 @@ BOARD ?= pba-d-01-kw2x
 
 include ../Makefile.drivers_common
 
-BOARD_WHITELIST :=  \
+BOARDS_SUPPORTED :=  \
 					pba-d-01-kw2x \
 					#
 
