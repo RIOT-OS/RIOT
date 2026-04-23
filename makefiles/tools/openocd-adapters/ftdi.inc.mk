@@ -29,6 +29,6 @@ ifeq (tigard,$(OPENOCD_FTDI_ADAPTER))
   # If the user provided a programmer serial, we also use that to detect the
   # TTY.
   ifneq (,$(SERIAL))
-    TTY_SELECT_CMD += --serial "$(SERIAL)"
+    TTY_BOARD_FILTER += --serial "$(SERIAL)"
   endif
 endif
