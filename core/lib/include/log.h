@@ -88,11 +88,17 @@ enum {
 #define LOG(level, ...) do { \
         _Pragma("clang diagnostic push") \
         _Pragma("clang diagnostic ignored \"-Wtautological-compare\"") \
-        if ((level) <= LOG_LEVEL) LOG_WRITE((level), __VA_ARGS__); } while (0U) \
+        if ((level) <= LOG_LEVEL) { \
+            LOG_WRITE((level), __VA_ARGS__); \
+        } \
+        } while (0U) \
         _Pragma("clang diagnostic pop")
 #else
 #define LOG(level, ...) do { \
-        if ((level) <= LOG_LEVEL) LOG_WRITE((level), __VA_ARGS__); } while (0U)
+        if ((level) <= LOG_LEVEL) { \
+            LOG_WRITE((level), __VA_ARGS__); \
+        } \
+        } while (0U)
 #endif /* __clang__ */
 
 /**

@@ -61,7 +61,8 @@ static const credman_credential_t credential = {
 static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
                             size_t maxlen, coap_link_encoder_ctx_t *context);
 static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
-static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
+static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len,
+                                   coap_request_ctx_t *ctx);
 #if IS_USED(MODULE_PERIPH_RTC)
 static ssize_t _rtc_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
 #endif
@@ -205,7 +206,8 @@ static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_re
     return 0;
 }
 
-static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx)
+static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                                   coap_request_ctx_t *ctx)
 {
     (void)ctx;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);

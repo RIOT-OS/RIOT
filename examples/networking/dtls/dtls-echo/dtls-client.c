@@ -239,8 +239,9 @@ static int _read_from_peer_handler(struct dtls_context_t *ctx,
     (void) session;
 
     printf("Client: got DTLS Data App -- ");
-    for (size_t i = 0; i < len; i++)
+    for (size_t i = 0; i < len; i++) {
         printf("%c", data[i]);
+    }
     puts(" --");
 
     /*

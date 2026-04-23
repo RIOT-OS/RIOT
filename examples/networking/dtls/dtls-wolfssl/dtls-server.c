@@ -51,8 +51,9 @@ static inline unsigned int my_psk_server_cb(WOLFSSL* ssl, const char* identity,
     (void)key_max_len;
 
     /* see internal.h MAX_PSK_ID_LEN for PSK identity limit */
-    if (strncmp(identity, kIdentityStr, strlen(kIdentityStr)) != 0)
+    if (strncmp(identity, kIdentityStr, strlen(kIdentityStr)) != 0) {
         return 0;
+    }
 
     if (wolfSSL_GetVersion(ssl) < WOLFSSL_TLSV1_3) {
         /* test key in hex is 0x1a2b3c4d , in decimal 439,041,101 , we're using
@@ -69,8 +70,9 @@ static inline unsigned int my_psk_server_cb(WOLFSSL* ssl, const char* identity,
         int b = 0x01;
 
         for (i = 0; i < 32; i++, b += 0x22) {
-            if (b >= 0x100)
+            if (b >= 0x100) {
                 b = 0x01;
+            }
             key[i] = b;
         }
 
@@ -126,14 +128,15 @@ static int _server_cmd(int argc, char **argv)
     }
 
     LOG(LOG_INFO, "Listening on %d\n", SERVER_PORT);
-    while(1) {
+    while (1) {
         /* Wait until a new client connects */
         ret = wolfSSL_accept(sk->ssl);
         if (ret != SSL_SUCCESS) {
             if (wolfSSL_get_error(sk->ssl, ret) != WOLFSSL_ERROR_WANT_READ) {
                 sock_dtls_session_destroy(sk);
-                if (sock_dtls_session_create(sk) < 0)
+                if (sock_dtls_session_create(sk) < 0) {
                     return -1;
+                }
             }
             continue;
         }
