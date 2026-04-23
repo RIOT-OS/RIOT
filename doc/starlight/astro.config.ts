@@ -1,3 +1,10 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Tom Hert <git@annsann.eu>
+ * SPDX-FileCopyrightText: 2026 Lasse Rosenow <Lasse.Rosenow@haw-hamburg.de>
+ * SPDX-FileCopyrightText: 2026 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import rehypeGithubEmoji from "rehype-github-emoji";
