@@ -1,3 +1,10 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Lasse Rosenow <Lasse.Rosenow@haw-hamburg.de>
+ * SPDX-FileCopyrightText: 2026 Tom Hert <git@annsann.eu>
+ * SPDX-FileCopyrightText: 2026 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 import { defineCollection } from "astro:content";
 import { type Loader } from "astro/loaders";
 import { docsSchema } from "@astrojs/starlight/schema";

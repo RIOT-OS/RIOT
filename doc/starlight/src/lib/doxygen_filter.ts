@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Tom Hert <git@annsann.eu>
+ * SPDX-FileCopyrightText: 2026 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 /**
  * Clean up text by removing leading/trailing asterisks and quotes.
  * @param value The text to clean.
