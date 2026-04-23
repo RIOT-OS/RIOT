@@ -13,4 +13,8 @@ endif
 
 # MARK: unicoap_driver_extension_point
 
+ifneq (,$(filter unicoap_server,$(USEMODULE)))
+  DIRS += server
+endif
+
 include $(RIOTBASE)/Makefile.base
