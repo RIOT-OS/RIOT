@@ -7,6 +7,7 @@
 # directory for more details.
 
 import sys
+import os
 from testrunner import run
 
 
@@ -14,18 +15,22 @@ VALUE = 42
 STRING = 'test'
 
 STRING_FORMAT = '{}{}Logging value \'{}\' and string \'{}\''
+WTF = '\033[1;36m'
 ERROR = '\033[1;31m'
 WARNING = '\033[1;33m'
 INFO = '\033[1m'
 DEBUG = '\033[0;32m'
 RESET = '\033[0m'
 
-LEVELS = [ERROR, WARNING, INFO, DEBUG]
+LEVELS = [DEBUG, INFO, WARNING, ERROR, WTF]
 
 
 def testfunc(child):
     for level in LEVELS:
         child.expect_exact(STRING_FORMAT.format(RESET, level, VALUE, STRING))
+
+    if os.environ.get('BOARD', 'native') == 'native':
+        child.expect_exact('native: exiting')
 
 
 if __name__ == "__main__":
