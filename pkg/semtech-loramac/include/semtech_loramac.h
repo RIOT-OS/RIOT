@@ -169,7 +169,7 @@ uint8_t semtech_loramac_join(semtech_loramac_t *mac, uint8_t type);
  * @return SEMTECH_LORAMAC_TX_DONE when the message was transmitted
  * @return SEMTECH_LORAMAC_NOT_JOINED when the network is not joined
  * @return SEMTECH_LORAMAC_BUSY when the mac is already active (join or tx in progress)
- * @return SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED when the send is rejected because of dutycycle restriction
+ * @return SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED send is rejected because of dutycycle restriction
  * @return SEMTECH_LORAMAC_TX_ERROR when an invalid parameter is given
  * @return SEMTECH_LORAMAC_TX_CNF_FAILED when message was transmitted but no ACK was received
  */
@@ -529,18 +529,20 @@ void semtech_loramac_get_channels_mask(semtech_loramac_t *mac, uint16_t *mask);
 
 #ifdef MODULE_PERIPH_EEPROM
 /**
- * @brief   The magic number used to identify the LoRaWAN configuration
+ * @brief   The magic string used to identify the LoRaWAN configuration
  */
 #ifndef SEMTECH_LORAMAC_EEPROM_MAGIC
-#define SEMTECH_LORAMAC_EEPROM_MAGIC        {0x52, 0x49, 0x4F, 0x54} /* RIOT */
+#define SEMTECH_LORAMAC_EEPROM_MAGIC        "LORA"
 #endif
 
 /**
- * @brief   The magic number length used to identify the LoRaWAN configuration
+ * @brief   The magic string length used to identify the LoRaWAN configuration
  */
 #ifndef SEMTECH_LORAMAC_EEPROM_MAGIC_LEN
-#define SEMTECH_LORAMAC_EEPROM_MAGIC_LEN    4
+#define SEMTECH_LORAMAC_EEPROM_MAGIC_LEN    sizeof(SEMTECH_LORAMAC_EEPROM_MAGIC)
 #endif
+
+#ifndef MODULE_EEPREG
 
 /**
  * @brief   Start position of LoRaWAN configuration stored in eeprom
@@ -548,6 +550,93 @@ void semtech_loramac_get_channels_mask(semtech_loramac_t *mac, uint16_t *mask);
 #ifndef SEMTECH_LORAMAC_EEPROM_START
 #define SEMTECH_LORAMAC_EEPROM_START        (0)
 #endif
+
+/**
+ * @brief End position of LoRaWAN configuration stored in eeprom
+*/
+#ifndef SEMTECH_LORAMAC_EEPROM_END
+#define SEMTECH_LORAMAC_EEPROM_END \
+    (SEMTECH_LORAMAC_EEPROM_START + SEMTECH_LORAMAC_EEPROM_LEN)
+#endif
+
+/**
+ * @brief LoRaWAN configuration length
+*/
+#ifndef SEMTECH_LORAMAC_EEPROM_LEN
+#define SEMTECH_LORAMAC_EEPROM_LEN         \
+    (                                      \
+        SEMTECH_LORAMAC_EEPROM_MAGIC_LEN + \
+        LORAMAC_DEVEUI_LEN +               \
+        LORAMAC_APPEUI_LEN +               \
+        LORAMAC_APPKEY_LEN +               \
+        LORAMAC_APPSKEY_LEN +              \
+        LORAMAC_NWKSKEY_LEN +              \
+        LORAMAC_DEVADDR_LEN +              \
+        LORAMAC_UPLINK_COUNTER_LEN +       \
+        LORAMAC_RX2_FREQ_LEN +             \
+        LORAMAC_RX2_DR_LEN +               \
+        SEMTECH_LORAMAC_JOINSTATE_LEN      \
+    )
+#endif
+
+/**
+ * @brief EEPROM Uplink Counter Offset
+*/
+#ifndef SEMTECH_LORAMAC_EEPROM_UPLINK_COUNTER_OFFSET
+#define SEMTECH_LORAMAC_EEPROM_UPLINK_COUNTER_OFFSET \
+    (\
+        SEMTECH_LORAMAC_EEPROM_MAGIC_LEN +  \
+        LORAMAC_DEVEUI_LEN +                \
+        LORAMAC_APPEUI_LEN +                \
+        LORAMAC_APPKEY_LEN +                \
+        LORAMAC_APPSKEY_LEN +               \
+        LORAMAC_NWKSKEY_LEN +               \
+        LORAMAC_DEVADDR_LEN                 \
+    )
+#endif
+
+#else /* MODULE_EEPREG is defined */
+/**
+ * @brief LoRaWAN configuration length.
+ * Note: for eepreg the magic string is not included
+*/
+#ifndef SEMTECH_LORAMAC_EEPROM_LEN
+#define SEMTECH_LORAMAC_EEPROM_LEN         \
+    (                                      \
+        LORAMAC_DEVEUI_LEN +               \
+        LORAMAC_APPEUI_LEN +               \
+        LORAMAC_APPKEY_LEN +               \
+        LORAMAC_APPSKEY_LEN +              \
+        LORAMAC_NWKSKEY_LEN +              \
+        LORAMAC_DEVADDR_LEN +              \
+        LORAMAC_UPLINK_COUNTER_LEN +       \
+        LORAMAC_RX2_FREQ_LEN +             \
+        LORAMAC_RX2_DR_LEN +               \
+        SEMTECH_LORAMAC_JOINSTATE_LEN      \
+    )
+#endif
+
+/**
+ * @brief EEPROM Uplink Counter Offset
+*/
+#ifndef SEMTECH_LORAMAC_EEPROM_UPLINK_COUNTER_OFFSET
+#define SEMTECH_LORAMAC_EEPROM_UPLINK_COUNTER_OFFSET \
+    (\
+        LORAMAC_DEVEUI_LEN +                \
+        LORAMAC_APPEUI_LEN +                \
+        LORAMAC_APPKEY_LEN +                \
+        LORAMAC_APPSKEY_LEN +               \
+        LORAMAC_NWKSKEY_LEN +               \
+        LORAMAC_DEVADDR_LEN                 \
+    )
+#endif
+
+#endif /* MODULE_EEPREG is defined */
+
+/**
+ * @brief Join state length
+*/
+#define SEMTECH_LORAMAC_JOINSTATE_LEN       (1U)
 
 /**
  * @brief   Saves the current LoRaWAN configuration to the internal EEPROM
@@ -560,7 +649,7 @@ void semtech_loramac_save_config(semtech_loramac_t *mac);
  * @brief   Erases any stored LoRaWAN configuration from the internal EEPROM
  */
 void semtech_loramac_erase_config(void);
-#endif
+#endif // MODULE_PERIPH_EEPROM
 
 #ifdef __cplusplus
 }

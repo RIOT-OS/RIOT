@@ -639,6 +639,22 @@ extern "C" {
 #define LORAMAC_NETWORK_ID_LEN                  (3U)
 
 /**
+ * @brief Uplink Counter length in bytes
+*/
+#define LORAMAC_UPLINK_COUNTER_LEN              (4U)
+
+/**
+ * @brief RX2 frequency length in bytes
+*/
+#define LORAMAC_RX2_FREQ_LEN                    (4U)
+
+/**
+ * @brief RX2 data rate length in bytes
+*/
+#define LORAMAC_RX2_DR_LEN                      (1U)
+
+
+/**
  * @brief   Channel mask length
  *
  *          Must match CHANNELS_MASK_SIZE in src/mac/region/RegionXXYYY.c
