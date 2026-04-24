@@ -224,6 +224,8 @@ groups:
         help: The MCU has an ARM Cortex-M CPU (any family)
       - name: cpu_stm32
         help: The MCU has an STM32 MCU
+      - name: cpu_psoc6
+        help: The MCU is an Infineon PSoC 6 family MCU
 
       groups:
       - title: Atmel / Microchip SAM Grouping
