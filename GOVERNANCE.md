@@ -223,12 +223,12 @@ moderator, it may be someone else). The agenda for the VMA is collected before t
 be bashed at the start of the meeting. The notes of the VMA will be published publicly in the RIOT
 forum.
 
-The Weekly Coordinational Meeting is a closed meeting among maintainers. It usually serves as a
-small communal get-together of maintainers on a regular basis. Smaller maintenance decisions are
+The Weekly Coordinational Meeting is an open meeting among maintainers and contributors. It usually serves as a
+small communal get-together on a regular basis. Smaller maintenance decisions are
 made during these meetings, but also short term admistrative tasks are discussed. The Weekly
-Coordinational Meeting usually takes place every Friday at 10:00 in a virtual space, such as a video
+Coordinational Meeting usualy takes place every Friday at 15:00 Berlin time in a virtual space, such as a video
 conference. A maintainer that feels responsible for it shares the link to the meeting as well as a
-proposed agenda, which may be amended by other maintainers, usually a day in advance.
+proposed agenda on the RIOT forum, which may be amended by other maintainers, usually a day in advance.
 
 ## Code of Conduct
 
