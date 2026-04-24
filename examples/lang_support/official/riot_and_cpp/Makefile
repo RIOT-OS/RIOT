@@ -13,7 +13,7 @@ RIOTBASE ?= $(CURDIR)/../../../..
 #EXTERNAL_BOARD_DIRS ?= $(CURDIR)/../../../thirdparty_boards
 
 # Uncomment this to enable scheduler statistics for ps:
-#CFLAGS += -DSCHEDSTATISTICS
+#USEMODULE += schedstatistics
 
 # If you want to use native with valgrind, you should recompile native
 # with the target all-valgrind instead of all:
