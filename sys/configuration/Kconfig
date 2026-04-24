@@ -1,0 +1,18 @@
+# Copyright (c) 2023 ML!PA Consulting GmbH
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_CONFIGURATION
+    bool "Runtime Configuration Module"
+    help
+        Backend agnostic runtime configuration module.
+
+if MODULE_CONFIGURATION
+
+config CONFIGURATION_DEPTH_MAX
+    int "Maximum number of nested configuration items"
+
+endif # MODULE_CONFIGURATION
