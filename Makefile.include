@@ -482,6 +482,11 @@ LINKFLAGS += -L$(RIOTBASE)/core/ldscripts
 # include undefined behaviour sanitizer (UBSAN) support
 include $(RIOTMAKE)/ubsan.inc.mk
 
+# include gcov-based code coverage support (native only)
+ifneq (,$(filter native native32 native64,$(BOARD)))
+  include $(RIOTMAKE)/coverage.inc.mk
+endif
+
 # Tell ccache to pass the original file to the compiler, instead of passing the
 # preprocessed code. Without this setting, the compilation will fail with
 # -Wimplicit-fallthrough warnings even when the fall through case is properly

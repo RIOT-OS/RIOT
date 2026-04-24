@@ -50,3 +50,37 @@ The default is `trap`, or `msg_exit` if available (currently, on native:gnu only
 
 2. build with `UBSAN_MODE=[trap|msg_exit|msg_recover] make all-ubsan` to
    override the ubsan mode.
+
+## Code Coverage (gcov)
+
+RIOT contains Makefile convenience support for gcov-based code coverage
+reporting on the `native` board.
+
+### Overview
+
+When built with `-fprofile-arcs -ftest-coverage`, GCC injects execution
+counters into every branch of the compiled code.  Running the binary causes
+the counters to be flushed to `.gcda` files.  `lcov` and `genhtml` then
+combine those files with the static `.gcno` graphs to produce an HTML report
+showing which lines and branches were executed.
+
+Coverage measurement is dynamic - it only counts code that actually runs
+
+### Prerequisites
+
+`lcov` must be installed on the host (`apt install lcov` / `brew install lcov`).
+On macOS the system `gcov` is LLVM-based and incompatible with GCC `.gcda` files;
+install GCC via Homebrew (`brew install gcc`) so that a compatible `gcov` is available.
+
+### How to Use
+
+1. From any native application directory (e.g. `tests/unittests`):
+
+   ```sh
+   make coverage BOARD=native
+
+   # Run coverage for a specific unit-test suite
+   make coverage BOARD=native UNIT_TESTS=tests-fmt
+   ```
+
+2. Open `coverage/index.html` in a browser to view the report.
