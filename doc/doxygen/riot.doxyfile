@@ -1481,7 +1481,11 @@ HTML_EXTRA_FILES       = src/css/bootstrap.min.css \
                          src/js/riot-doxy.js \
                          ../../sys/net/application_layer/unicoap/docs/unicoap-layers.svg \
                          ../../sys/net/application_layer/unicoap/docs/unicoap-layers-comms.svg \
-                         ../../sys/net/application_layer/unicoap/docs/unicoap-layers-comms-apis.svg
+                         ../../sys/net/application_layer/unicoap/docs/unicoap-layers-comms-apis.svg\
+                         ../../sys/runtime_config/docs/api_structure.svg\
+                         ../../sys/runtime_config/docs/architecture.svg\
+                         ../../sys/runtime_config/docs/namespaces_and_storages.svg\
+                         ../../sys/runtime_config/docs/runtime_config.svg
 
 # The HTML_COLORSTYLE tag can be used to specify if the generated HTML output
 # should be rendered with a dark or light theme.
