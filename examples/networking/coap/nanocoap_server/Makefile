@@ -82,7 +82,7 @@ ifneq (,$(filter $(BOARD),$(HIGH_MEMORY_BOARDS)))
   USEMODULE += event_timeout_ztimer
   USEMODULE += nanocoap_server_observe
   USEMODULE += nanocoap_server_separate
-
+  USEMODULE += nanocoap_server_event_thread
   # enable fileserver
   USEMODULE += nanocoap_fileserver
   USEMODULE += vfs_default
