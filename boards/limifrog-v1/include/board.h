@@ -48,6 +48,13 @@ extern "C" {
 #define LIS3MDL_PARAM_ADDR       (0x28)
 /** @} */
 
+/**
+ * @name MTD configuration
+ * @{
+ */
+#define MTD_0 mtd_dev_get(0)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

@@ -58,6 +58,7 @@
 
 #include <stdint.h>
 
+#include "mtd.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
 
@@ -102,17 +103,39 @@ extern "C" {
 #endif
 
 /**
- * @brief   Size in bytes of pointer meta-data in EEPROM
+ * @brief   EEPROM registry size
+ *
+ * @param[in]       dev     the EEPROM MTD to access
+ *
+ * @return  the size of the EEPROM registry
  */
-#if (EEPROM_SIZE > 0x1000000)
-#define EEPREG_PTR_LEN    (4U)
-#elif (EEPROM_SIZE > 0x10000)
-#define EEPREG_PTR_LEN    (3U)
-#elif (EEPROM_SIZE > 0x100)
-#define EEPREG_PTR_LEN    (2U)
-#else
-#define EEPREG_PTR_LEN    (1U)
-#endif
+static inline uint32_t eepreg_size(mtd_dev_t *dev)
+{
+    /* works anyway only up to 4GiB because of 32bit position in API */
+    return dev->sector_count * dev->pages_per_sector * dev->page_size;
+}
+
+/**
+ * @brief   EEPROM registry pointer length
+ *
+ * @param[in]       dev     the EEPROM MTD to access
+ *
+ * @return  the length of an EEPROM registry address
+ */
+static inline uint8_t eepreg_ptr_len(mtd_dev_t *dev)
+{
+    uint32_t size = eepreg_size(dev);
+    if (size > 0x1000000) {
+        return 4U;
+    }
+    if (size > 0x10000) {
+        return 3U;
+    }
+    if (size > 0x100) {
+        return 2U;
+    }
+    return 1U;
+}
 
 /**
  * @brief   Signature of callback for iterating over entries in EEPROM registry
@@ -123,7 +146,7 @@ extern "C" {
  * @return    0 on success
  * @return    < 0 on failure
  */
-typedef int (*eepreg_iter_cb_t)(char *name, void *arg);
+typedef int (*eepreg_iter_cb_t)(mtd_dev_t *dev, char *name, void *arg);
 
 /**
  * @brief   Load or write meta-data in EEPROM registry
@@ -134,6 +157,7 @@ typedef int (*eepreg_iter_cb_t)(char *name, void *arg);
  * remaining. Requesting a different length for an existent entry returns an
  * error.
  *
+ * @param[in] dev     the EEPROM MTD to access
  * @param[out] pos    pointer to position variable
  * @param[in] name    name of entry to load or write
  * @param[in] len     requested amount of data storage
@@ -143,13 +167,14 @@ typedef int (*eepreg_iter_cb_t)(char *name, void *arg);
  * @return    -ENOSPC on insufficient EEPROM for entry
  * @return    -EADDRINUSE on existing entry with different length
  */
-int eepreg_add(uint32_t *pos, const char *name, uint32_t len);
+int eepreg_add(mtd_dev_t *dev, uint32_t *pos, const char *name, uint32_t len);
 
 /**
  * @brief   Read position meta-data from EEPROM registry
  *
  * This is similar to eepreg_add, except it never writes meta-data.
  *
+ * @param[in] dev     the EEPROM MTD to access
  * @param[out] pos    pointer to position variable
  * @param[in] name    name of entry to load
  *
@@ -157,7 +182,7 @@ int eepreg_add(uint32_t *pos, const char *name, uint32_t len);
  * @return    -EIO on EEPROM I/O error
  * @return    -ENOENT on non-existent registry or entry
  */
-int eepreg_read(uint32_t *pos, const char *name);
+int eepreg_read(mtd_dev_t *dev, uint32_t *pos, const char *name);
 
 /**
  * @brief   Write meta-data to EEPROM registry
@@ -167,6 +192,7 @@ int eepreg_read(uint32_t *pos, const char *name);
  * If multiple entries with the same name exist, eepreg functions will find
  * the oldest. Mainly intended for use by migration utilities.
  *
+ * @param[in] dev     the EEPROM MTD to access
  * @param[out] pos    pointer to position variable
  * @param[in] name    name of entry to write
  * @param[in] len     requested amount of data storage
@@ -175,7 +201,7 @@ int eepreg_read(uint32_t *pos, const char *name);
  * @return    -EIO on EEPROM I/O error
  * @return    -ENOSPC on insufficient EEPROM for entry
  */
-int eepreg_write(uint32_t *pos, const char *name, uint32_t len);
+int eepreg_write(mtd_dev_t *dev, uint32_t *pos, const char *name, uint32_t len);
 
 /**
  * @brief   Remove entry from EEPROM registry and free space
@@ -186,13 +212,14 @@ int eepreg_write(uint32_t *pos, const char *name, uint32_t len);
  * Warning: this is a read/write intensive operation! Mainly intended for use
  * by migration utilities.
  *
+ * @param[in] dev     the EEPROM MTD to access
  * @param[in] name    name of entry to remove
  *
  * @return    0 on success
  * @return    -EIO on EEPROM I/O error
  * @return    -ENOENT on non-existent registry or entry
  */
-int eepreg_rm(const char *name);
+int eepreg_rm(mtd_dev_t *dev, const char *name);
 
 /**
  * @brief   Iterate over meta-data entries in EEPROM registry
@@ -205,6 +232,7 @@ int eepreg_rm(const char *name);
  * @note   It is safe for the callback to remove the entry it is called with,
  * or to add new entries.
  *
+ * @param[in] dev    the EEPROM MTD to access
  * @param[in] cb     callback to iterate over entries
  * @param[in] arg    argument for cb
  *
@@ -213,16 +241,18 @@ int eepreg_rm(const char *name);
  * @return    -ENOENT on non-existent registry
  * @return    return value of cb when cb returns < 0
  */
-int eepreg_iter(eepreg_iter_cb_t cb, void *arg);
+int eepreg_iter(mtd_dev_t *dev, eepreg_iter_cb_t cb, void *arg);
 
 /**
  * @brief   Check for the presence of meta-data registry
+ *
+ * @param[in] dev    the EEPROM MTD to access
  *
  * @return    0 on success
  * @return    -EIO on EEPROM I/O error
  * @return    -ENOENT on non-existent registry
  */
-int eepreg_check(void);
+int eepreg_check(mtd_dev_t *dev);
 
 /**
  * @brief   Clear existing meta-data registry
@@ -230,10 +260,12 @@ int eepreg_check(void);
  * This removes any existing meta-data registry by writing a new registry with
  * no entries.
  *
+ * @param[in] dev    the EEPROM MTD to access
+ *
  * @return    0 on success
  * @return    -EIO on EEPROM I/O error
  */
-int eepreg_reset(void);
+int eepreg_reset(mtd_dev_t *dev);
 
 /**
  * @brief   Calculate data length from meta-data in EEPROM registry
@@ -241,6 +273,7 @@ int eepreg_reset(void);
  * @note   This information is typically already available to code that has
  * called eepreg_add.
  *
+ * @param[in] dev    the EEPROM MTD to access
  * @param[out] len    pointer to length variable
  * @param[in] name    name of entry to load or write
  *
@@ -248,18 +281,19 @@ int eepreg_reset(void);
  * @return    -EIO on EEPROM I/O error
  * @return    -ENOENT on non-existent registry or entry
  */
-int eepreg_len(uint32_t *len, const char *name);
+int eepreg_len(mtd_dev_t *dev, uint32_t *len, const char *name);
 
 /**
  * @brief   Calculate length of remaining EEPROM free space
  *
+ * @param[in] dev    the EEPROM MTD to access
  * @param[out] len    pointer to length variable
  *
  * @return    0 on success
  * @return    -EIO on EEPROM I/O error
  * @return    -ENOENT on non-existent registry
  */
-int eepreg_free(uint32_t *len);
+int eepreg_free(mtd_dev_t *dev, uint32_t *len);
 
 #ifdef __cplusplus
 }

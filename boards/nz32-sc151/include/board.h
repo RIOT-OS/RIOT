@@ -33,6 +33,13 @@ extern "C" {
 #define LED0_PORT_NUM       PORT_B
  /** @} */
 
+/**
+ * @name MTD configuration
+ * @{
+ */
+#define MTD_0 mtd_dev_get(0)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
