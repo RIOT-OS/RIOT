@@ -100,7 +100,7 @@ void rmutex_lock(rmutex_t *rmutex);
  *
  * @param[in] rmutex Recursive mutex object to lock. Has to be
  *                   initialized first. Must not be NULL.
- * @param[in] max    maximum recursion depth.
+ * @param[in] max    maximum recursion depth, must be > 0.
  *
  * @retval 1 if the mutex was unlocked, now it is locked.
  * @retval 0 if the mutex was locked or the recursion depth has been exceeded.
