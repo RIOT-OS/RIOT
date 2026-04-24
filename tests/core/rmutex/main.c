@@ -15,28 +15,29 @@
  * @}
  */
 
-#include <stdint.h>
 #include <inttypes.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "rmutex.h"
 #include "thread.h"
 
-#define THREAD_NUMOF            (5U)
+#define THREAD_NUMOF (5U)
 
 static char stacks[THREAD_NUMOF][THREAD_STACKSIZE_SMALL + THREAD_EXTRA_STACKSIZE_PRINTF];
 
-static const uint8_t prios[THREAD_NUMOF] = {THREAD_PRIORITY_MAIN - 1, 4, 5, 2, 4};
-static const uint8_t depth[THREAD_NUMOF] = {5, 3, 3, 4, 5};
+static const uint8_t prios[THREAD_NUMOF] = { THREAD_PRIORITY_MAIN - 1, 4, 5, 2, 4 };
+static const uint16_t depth[THREAD_NUMOF] = { 5, 3, 3, 4, 5 };
 
 static rmutex_t testlock;
 
-static void lock_recursive(uint8_t current_depth, uint8_t max_depth)
+static void lock_recursive(uint16_t current_depth, uint16_t max_depth)
 {
     thread_t *t = thread_get_active();
 
     printf("T%i (prio %i, depth %i): trying to lock rmutex now\n",
-        (int)t->pid, (int)t->priority, (int)current_depth);
+           (int)t->pid, (int)t->priority, (int)current_depth);
     rmutex_lock(&testlock);
 
     printf("T%i (prio %i, depth %i): locked rmutex now\n",
@@ -63,11 +64,44 @@ static void *lockme(void *arg)
     return NULL;
 }
 
+static void lock_recursive_max(uint16_t current_depth, uint16_t max_depth)
+{
+    thread_t *t = thread_get_active();
+
+    printf("T%i (prio %i, depth %i): trying to lock rmutex now\n",
+           (int)t->pid, (int)t->priority, (int)current_depth);
+
+    if (rmutex_lock_max(&testlock, max_depth)) {
+        printf("T%i (prio %i, depth %i): locked rmutex now\n",
+               (int)t->pid, (int)t->priority, (int)current_depth);
+
+        lock_recursive_max(current_depth + 1, max_depth);
+        thread_yield();
+        rmutex_unlock(&testlock);
+        printf("T%i (prio %i, depth %i): unlocked rmutex\n",
+               (int)t->pid, (int)t->priority, (int)current_depth);
+    }
+    else {
+        printf("T%i (prio %i, depth %i): did not lock rmutex\n",
+               (int)t->pid, (int)t->priority, (int)current_depth);
+    }
+}
+
+static void *lockme_max(void *arg)
+{
+    uintptr_t depth = (uintptr_t)arg;
+
+    lock_recursive_max(0, depth);
+
+    return NULL;
+}
+
 int main(void)
 {
-    puts("Recursive Mutex test");
+    puts("Recursive Mutex Test");
     puts("Please refer to the README.md for more information\n");
 
+    puts("Test 1 BEGIN");
     rmutex_init(&testlock);
 
     /* lock mutex, so that spawned threads have to wait */
@@ -75,7 +109,7 @@ int main(void)
     /* create threads */
     for (unsigned i = 0; i < THREAD_NUMOF; i++) {
         thread_create(stacks[i], sizeof(stacks[i]), prios[i], 0,
-                      lockme, (void*)(intptr_t)depth[i], "t");
+                      lockme, (void *)(intptr_t)depth[i], "t");
     }
     /* allow threads to lock the mutex */
     printf("main: unlocking recursive mutex\n");
@@ -83,7 +117,26 @@ int main(void)
     rmutex_unlock(&testlock);
 
     rmutex_lock(&testlock);
-    puts("\nTest END, check the order of priorities above.");
+    puts("\nTest 1 END, check the order of priorities above.");
+
+    /* After the first test the schedule entries and stacks are unused,
+     * so they will be reused. Ensure they are empty. */
+    memset(stacks, 0, sizeof(stacks));
+    puts("Rerunning the test using rmutex_lock_max(..)\n");
+
+    puts("Test 2 BEGIN");
+    /* create threads */
+    for (unsigned i = 0; i < THREAD_NUMOF; i++) {
+        thread_create(stacks[i], sizeof(stacks[i]), prios[i], 0,
+                      lockme_max, (void *)(intptr_t)depth[i], "t");
+    }
+    /* allow threads to lock the mutex */
+    printf("main: unlocking recursive mutex\n");
+
+    rmutex_unlock(&testlock);
+
+    rmutex_lock(&testlock);
+    puts("\nTest 2 END, check the order of priorities above.");
 
     return 0;
 }
