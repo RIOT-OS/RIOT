@@ -1,0 +1,540 @@
+From ad2b96d84214dd7a4f0c1837d13ff991eba1ba00 Mon Sep 17 00:00:00 2001
+From: Jon Shallow <supjps-libcoap@jpshallow.com>
+Date: Wed, 22 Apr 2026 17:59:59 +0100
+Subject: [PATCH 1/1] RIOT: Add help documentation
+
+General documentation tidy up.
+---
+ examples/riot/examples_libcoap_client/Kconfig |  3 +-
+ .../examples_libcoap_client/client_coap.c     | 30 ++++++++++++++++---
+ .../examples_libcoap_client/client_coap.h     | 16 +++++++---
+ examples/riot/examples_libcoap_client/main.c  |  9 ++----
+ examples/riot/examples_libcoap_server/Kconfig |  3 +-
+ examples/riot/examples_libcoap_server/main.c  |  9 ++----
+ .../examples_libcoap_server/server_coap.c     | 15 ++++++++--
+ .../examples_libcoap_server/server_coap.h     | 16 +++++++---
+ examples/riot/pkg_libcoap/Kconfig             |  5 ++--
+ examples/riot/pkg_libcoap/Makefile            | 12 ++++----
+ examples/riot/pkg_libcoap/Makefile.dep        |  4 ---
+ examples/riot/tests_pkg_libcoap/Kconfig       |  3 +-
+ .../riot/tests_pkg_libcoap/libcoap-test.c     | 19 ++++++++----
+ .../riot/tests_pkg_libcoap/libcoap-test.h     | 17 +++++++----
+ examples/riot/tests_pkg_libcoap/main.c        |  6 ++--
+ .../riot/tests_pkg_libcoap/tests/01-run.py    |  9 ++----
+ src/coap_mem.c                                | 19 +++++-------
+ 17 files changed, 119 insertions(+), 76 deletions(-)
+
+diff --git a/examples/riot/examples_libcoap_client/Kconfig b/examples/riot/examples_libcoap_client/Kconfig
+index e9123a1a..4e494cc4 100644
+--- a/examples/riot/examples_libcoap_client/Kconfig
++++ b/examples/riot/examples_libcoap_client/Kconfig
+@@ -1,7 +1,6 @@
+-#
+ # SPDX-FileCopyrightText: 2023-2026 Jon Shallow <supjps-libcoap@jpshallow.com>
+ # SPDX-License-Identifier: BSD-2-Clause
+-#
++
+ menu "libcoap_client"
+     depends on USEPKG_LIBCOAP
+ 
+diff --git a/examples/riot/examples_libcoap_client/client_coap.c b/examples/riot/examples_libcoap_client/client_coap.c
+index d29bc8cc..0574900e 100644
+--- a/examples/riot/examples_libcoap_client/client_coap.c
++++ b/examples/riot/examples_libcoap_client/client_coap.c
+@@ -3,11 +3,19 @@
+  * SPDX-License-Identifier: BSD-2-Clause
+  */
+ 
+-/*
+- * client_coap.c -- RIOT client example
++/**
++ * @ingroup     examples
++ * @{
++ *
++ * @file
++ * @brief       libcoap Client Example Implementation
+  *
+  * This file is part of the CoAP library libcoap. Please see README for terms
+  * of use.
++ *
++ * @author      Jon Shallow <supjps-libcoap@jpshallow.com>
++ *
++ * @}
+  */
+ 
+ #include <thread.h>
+@@ -127,11 +135,23 @@ void client_coap_init(int argc, char **argv)
+     char portbuf[8];
+     unsigned int wait_ms = 0;
+     int result = -1;
+-#define BUFSIZE 100
+-    unsigned char buf[BUFSIZE];
++    unsigned char buf[100];
+     int res;
+     const char *coap_uri = COAP_CLIENT_URI;
+ 
++    if (argc > 1 && (strcmp(argv[1], "--help") == 0 ||
++        strcmp(argv[1], "help")) == 0) {
++        printf("usage: %s [<coap uri>]\n", argv[0]);
++        printf("      <coap_uri> is optional which is of the form\n"
++             "      <scheme><host>[:<port>][<path>][?<query>\n"
++             "      <scheme> is one of coap:// or coaps://\n"
++             "      <host> is in [ipv6] or [ipv6%%interface] format\n"
++             "      <port> is optional, default is 5683 (coap) or 5684 (coaps)\n"
++             "      <path> is optional\n"
++             "      <query> is optional\n"
++             );
++        return;
++    }
+     if (argc > 1) {
+         coap_uri = argv[1];
+     }
+@@ -148,6 +168,8 @@ void client_coap_init(int argc, char **argv)
+         goto fail;
+     }
+ 
++    coap_log_info("Sending request '%s'\n", coap_uri);
++
+     snprintf(portbuf, sizeof(portbuf), "%d", uri.port);
+     snprintf((char *)buf, sizeof(buf), "%*.*s", (int)uri.host.length,
+              (int)uri.host.length, (const char *)uri.host.s);
+diff --git a/examples/riot/examples_libcoap_client/client_coap.h b/examples/riot/examples_libcoap_client/client_coap.h
+index ced7ac9b..aa9dc59f 100644
+--- a/examples/riot/examples_libcoap_client/client_coap.h
++++ b/examples/riot/examples_libcoap_client/client_coap.h
+@@ -3,15 +3,23 @@
+  * SPDX-License-Identifier: BSD-2-Clause
+  */
+ 
+-/*
+- * client-coap.h -- RIOT client example
++#pragma once
++
++/**
++ * @ingroup     examples
++ * @{
++ *
++ * @file
++ * @brief       libcoap Client Example Implementation
+  *
+  * This file is part of the CoAP library libcoap. Please see README for terms
+  * of use.
++ *
++ * @author      Jon Shallow <supjps-libcoap@jpshallow.com>
++ *
++ * @}
+  */
+ 
+-#pragma once
+-
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+diff --git a/examples/riot/examples_libcoap_client/main.c b/examples/riot/examples_libcoap_client/main.c
+index d7a11777..632f99c7 100644
+--- a/examples/riot/examples_libcoap_client/main.c
++++ b/examples/riot/examples_libcoap_client/main.c
+@@ -11,7 +11,7 @@
+  * @file
+  * @brief       Example application for libcoap client
+  *
+- * @author      Raul Fuentes <>
++ * @author      Raul Fuentes <> <raul.fuentes-samaniego@inria.fr>
+  *
+  * @}
+  */
+@@ -28,10 +28,7 @@ static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
+ 
+ extern int client_coap_init(int argc, char **argv);
+ 
+-static const shell_command_t shell_commands[] = {
+-    { "coapc", "Start a libcoap client", client_coap_init },
+-    { NULL, NULL, NULL }
+-};
++SHELL_COMMAND(coapc, "Start a libcoap client", client_coap_init);
+ 
+ int main(void)
+ {
+@@ -44,7 +41,7 @@ int main(void)
+     puts("All up, running the shell now");
+     char line_buf[SHELL_DEFAULT_BUFSIZE];
+ 
+-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
++    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+ 
+     /* should be never reached */
+     return 0;
+diff --git a/examples/riot/examples_libcoap_server/Kconfig b/examples/riot/examples_libcoap_server/Kconfig
+index 6d8dc4f9..2c66b3d5 100644
+--- a/examples/riot/examples_libcoap_server/Kconfig
++++ b/examples/riot/examples_libcoap_server/Kconfig
+@@ -1,7 +1,6 @@
+-#
+ # SPDX-FileCopyrightText: 2023-2026 Jon Shallow <supjps-libcoap@jpshallow.com>
+ # SPDX-License-Identifier: BSD-2-Clause
+-#
++
+ menu "libcoap_server"
+     depends on USEPKG_LIBCOAP
+ 
+diff --git a/examples/riot/examples_libcoap_server/main.c b/examples/riot/examples_libcoap_server/main.c
+index 7cd42a36..980177d6 100644
+--- a/examples/riot/examples_libcoap_server/main.c
++++ b/examples/riot/examples_libcoap_server/main.c
+@@ -11,7 +11,7 @@
+  * @file
+  * @brief       Example application for libcoap server
+  *
+- * @author      Raul Fuentes <>
++ * @author      Raul Fuentes <> <raul.fuentes-samaniego@inria.fr>
+  *
+  * @}
+  */
+@@ -28,10 +28,7 @@ static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
+ 
+ extern int server_coap_init(int argc, char **argv);
+ 
+-static const shell_command_t shell_commands[] = {
+-    { "coaps", "Start a libcoap server", server_coap_init },
+-    { NULL, NULL, NULL }
+-};
++SHELL_COMMAND(coaps, "Start a libcoap server", server_coap_init);
+ 
+ int main(void)
+ {
+@@ -44,7 +41,7 @@ int main(void)
+     puts("All up, running the shell now");
+     char line_buf[SHELL_DEFAULT_BUFSIZE];
+ 
+-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
++    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+ 
+     /* should be never reached */
+     return 0;
+diff --git a/examples/riot/examples_libcoap_server/server_coap.c b/examples/riot/examples_libcoap_server/server_coap.c
+index 6015445a..d38d99aa 100644
+--- a/examples/riot/examples_libcoap_server/server_coap.c
++++ b/examples/riot/examples_libcoap_server/server_coap.c
+@@ -3,11 +3,19 @@
+  * SPDX-License-Identifier: BSD-2-Clause
+  */
+ 
+-/*
+- * server_coap.c -- RIOT example
++/**
++ * @ingroup     examples
++ * @{
++ *
++ * @file
++ * @brief       libcoap Server Example Implementation
+  *
+  * This file is part of the CoAP library libcoap. Please see README for terms
+  * of use.
++ *
++ * @author      Jon Shallow <supjps-libcoap@jpshallow.com>
++ *
++ * @}
+  */
+ 
+ #include "coap_config.h"
+@@ -270,7 +278,8 @@ static void stop_server(void)
+ 
+ void server_coap_init(int argc, char **argv)
+ {
+-    if (argc < 2) {
++    if (argc < 2 || strcmp(argv[1], "--help") == 0 ||
++        strcmp(argv[1], "help") == 0) {
+         printf("usage: %s start|stop\n", argv[0]);
+         return;
+     }
+diff --git a/examples/riot/examples_libcoap_server/server_coap.h b/examples/riot/examples_libcoap_server/server_coap.h
+index f0f75005..2199dd07 100644
+--- a/examples/riot/examples_libcoap_server/server_coap.h
++++ b/examples/riot/examples_libcoap_server/server_coap.h
+@@ -3,15 +3,23 @@
+  * SPDX-License-Identifier: BSD-2-Clause
+  */
+ 
+-/*
+- * server_coap.h -- RIOT client example
++#pragma once
++
++/**
++ * @ingroup     examples
++ * @{
++ *
++ * @file
++ * @brief       libcoap Server Example Implementation
+  *
+  * This file is part of the CoAP library libcoap. Please see README for terms
+  * of use.
++ *
++ * @author      Jon Shallow <supjps-libcoap@jpshallow.com>
++ *
++ * @}
+  */
+ 
+-#pragma once
+-
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+diff --git a/examples/riot/pkg_libcoap/Kconfig b/examples/riot/pkg_libcoap/Kconfig
+index eac27072..85f1c297 100644
+--- a/examples/riot/pkg_libcoap/Kconfig
++++ b/examples/riot/pkg_libcoap/Kconfig
+@@ -1,7 +1,6 @@
+-#
+ # SPDX-FileCopyrightText:  2019 HAW Hamburg
+ # SPDX-License-Identifier: BSD-2-Clause
+-#
++
+ menu "libcoap"
+     depends on USEPKG_LIBCOAP
+ 
+@@ -239,7 +238,7 @@ config LIBCOAP_MAX_LG_XMITS
+ 
+ config LIBCOAP_MAX_STRING_SIZE
+     int "Max size of string memory allocation"
+-    default 64
++    default 120
+     help
+         The maximum size of a supported string.
+ 
+diff --git a/examples/riot/pkg_libcoap/Makefile b/examples/riot/pkg_libcoap/Makefile
+index 5ebd916b..aac6273d 100644
+--- a/examples/riot/pkg_libcoap/Makefile
++++ b/examples/riot/pkg_libcoap/Makefile
+@@ -1,7 +1,7 @@
+ PKG_NAME=libcoap
+ PKG_URL=https://github.com/obgm/libcoap
+-# develop branch as of 20th April 2026
+-PKG_VERSION=86b778167a554bd4add3b9282893df1fc22c2366
++# develop branch as of 22nd April 2026
++PKG_VERSION=244b0c2be4b3d30e62f0c13a51a845046b3e69ac
+ PKG_LICENSE=BSD-2-Clause
+ 
+ LIBCOAP_BUILD_DIR=$(BINDIR)/pkg/$(PKG_NAME)
+@@ -10,12 +10,14 @@ LIBCOAP_INCLUDE_DIR=$(RIOTBASE)/build/pkg/$(PKG_NAME)/include/coap3
+ 
+ include $(RIOTBASE)/pkg/pkg.mk
+ 
++LIBCOAP_MODULES = libcoap
++
+ ifneq (,$(filter libcoap_oscore,$(USEMODULE)))
+-    all: libcoap libcoap_oscore
+-else
+-    all: libcoap
++    LIBCOAP_MODULES += libcoap_oscore
+ endif
+ 
++all: $(LIBCOAP_MODULES)
++
+ libcoap:
+ 	$(QQ)@cp $(LIBCOAP_SOURCE_DIR)/coap_config.h.riot $(LIBCOAP_SOURCE_DIR)/coap_config.h
+ 	$(QQ)"$(MAKE)" -C $(LIBCOAP_SOURCE_DIR)/src -f $(CURDIR)/Makefile.libcoap
+diff --git a/examples/riot/pkg_libcoap/Makefile.dep b/examples/riot/pkg_libcoap/Makefile.dep
+index d6d42a46..1a90859a 100644
+--- a/examples/riot/pkg_libcoap/Makefile.dep
++++ b/examples/riot/pkg_libcoap/Makefile.dep
+@@ -5,7 +5,3 @@ USEMODULE += sock_async_event
+ ifneq (,$(filter libcoap,$(USEPKG)))
+   USEMODULE += libcoap
+ endif
+-
+-ifneq (,$(filter libcoap_oscore,$(USEPKG)))
+-  USEMODULE += libcoap_oscore
+-endif
+diff --git a/examples/riot/tests_pkg_libcoap/Kconfig b/examples/riot/tests_pkg_libcoap/Kconfig
+index 2cca767e..ccc8ccf9 100644
+--- a/examples/riot/tests_pkg_libcoap/Kconfig
++++ b/examples/riot/tests_pkg_libcoap/Kconfig
+@@ -1,7 +1,6 @@
+-#
+ # SPDX-FileCopyrightText: 2023-2026 Jon Shallow <supjps-libcoap@jpshallow.com>
+ # SPDX-License-Identifier: BSD-2-Clause
+-#
++
+ menu "tests_libcoap"
+     depends on USEPKG_LIBCOAP
+ 
+diff --git a/examples/riot/tests_pkg_libcoap/libcoap-test.c b/examples/riot/tests_pkg_libcoap/libcoap-test.c
+index d5aafc6d..e0929d12 100644
+--- a/examples/riot/tests_pkg_libcoap/libcoap-test.c
++++ b/examples/riot/tests_pkg_libcoap/libcoap-test.c
+@@ -3,11 +3,19 @@
+  * SPDX-License-Identifier: BSD-2-Clause
+  */
+ 
+-/*
+- * libcoap-test.c -- RIOT example
++/**
++ * @ingroup     tests
++ * @{
++ *
++ * @file
++ * @brief       libcoap Test
+  *
+  * This file is part of the CoAP library libcoap. Please see README for terms
+  * of use.
++ *
++ * @author      Jon Shallow <supjps-libcoap@jpshallow.com>
++ *
++ * @}
+  */
+ 
+ #include "coap_config.h"
+@@ -28,9 +36,9 @@
+ #  define COAP_USE_PSK_ID NULL
+ #endif /* CONFIG_LIBCOAP_USE_PSK_ID */
+ 
+-static int quit;
++static volatile int quit;
+ 
+-#define INDEX "This is a DTLS loopback test client/server made with libcoap\n"
++#define INDEX "This is DTLS loopback test client/server made with libcoap's response\n"
+ 
+ static void hnd_get_index(coap_resource_t *resource, coap_session_t  *session,
+                           const coap_pdu_t *request, const coap_string_t *query,
+@@ -175,8 +183,7 @@ static int coap_client_init(coap_context_t *ctx)
+     char portbuf[8];
+     coap_optlist_t *optlist = NULL;
+ 
+-#define BUFSIZE 100
+-    unsigned char buf[BUFSIZE];
++    unsigned char buf[100];
+     int res;
+     const char *coap_uri = "coaps://[::1]";
+ 
+diff --git a/examples/riot/tests_pkg_libcoap/libcoap-test.h b/examples/riot/tests_pkg_libcoap/libcoap-test.h
+index af53a0b9..0f4d4a3c 100644
+--- a/examples/riot/tests_pkg_libcoap/libcoap-test.h
++++ b/examples/riot/tests_pkg_libcoap/libcoap-test.h
+@@ -3,16 +3,23 @@
+  * SPDX-License-Identifier: BSD-2-Clause
+  */
+ 
+-/*
+- * libcoap-test.h -- RIOT client example
++#pragma once
++
++/**
++ * @ingroup     tests
++ * @{
++ *
++ * @file
++ * @brief       libcoap Test
+  *
+  * This file is part of the CoAP library libcoap. Please see README for terms
+  * of use.
++ *
++ * @author      Jon Shallow <supjps-libcoap@jpshallow.com>
++ *
++ * @}
+  */
+ 
+-
+-#pragma once
+-
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+diff --git a/examples/riot/tests_pkg_libcoap/main.c b/examples/riot/tests_pkg_libcoap/main.c
+index e1608714..deadc6f3 100644
+--- a/examples/riot/tests_pkg_libcoap/main.c
++++ b/examples/riot/tests_pkg_libcoap/main.c
+@@ -5,13 +5,13 @@
+  */
+ 
+ /**
+- * @ingroup     examples
++ * @ingroup     tests
+  * @{
+  *
+  * @file
+- * @brief       Example test application for libcoap
++ * @brief       Test for libcoap
+  *
+- * @author      Raul Fuentes <>
++ * @author      Raul Fuentes <raul.fuentes-samaniego@inria.fr>
+  *
+  * @}
+  */
+diff --git a/examples/riot/tests_pkg_libcoap/tests/01-run.py b/examples/riot/tests_pkg_libcoap/tests/01-run.py
+index 57ff7858..50b51b26 100755
+--- a/examples/riot/tests_pkg_libcoap/tests/01-run.py
++++ b/examples/riot/tests_pkg_libcoap/tests/01-run.py
+@@ -1,17 +1,14 @@
+ #!/usr/bin/env python3
+ 
+-#  Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
+-#
+-# This file is subject to the terms and conditions of the GNU Lesser
+-# General Public License v2.1. See the file LICENSE in the top level
+-# directory for more details.
++# SPDX-FileCopyrightText: 2020 Otto-von-Guericke-Universität Magdeburg
++# SPDX-License-Identifier: BSD-2-Clause
+ 
+ import sys
+ from testrunner import run
+ 
+ 
+ def testfunc(child):
+-    child.expect_exact("This is a DTLS loopback test client/server made with libcoap\r\n")
++    child.expect_exact("This is DTLS loopback test client/server made with libcoap's response\r\n")
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/src/coap_mem.c b/src/coap_mem.c
+index 0d8f8a94..f7efa2f6 100644
+--- a/src/coap_mem.c
++++ b/src/coap_mem.c
+@@ -46,7 +46,7 @@ static int fail_counts[COAP_MEM_TAG_LAST];
+  * memory blocks.
+  */
+ #ifndef COAP_MAX_STRING_SIZE
+-#define COAP_MAX_STRING_SIZE     (64U)
++#define COAP_MAX_STRING_SIZE     (120U)
+ #endif /* COAP_MAX_STRING_SIZE */
+ 
+ /**
+@@ -220,29 +220,26 @@ static int fail_counts[COAP_MEM_TAG_LAST];
+ #endif /* ! COAP_SERVER_SUPPORT */
+ #endif /* COAP_MAX_LG_XMITS */
+ 
+-/* The memstr is the storage for holding coap_string_t structure
+- * together with its contents. */
+-union memstr_t {
+-  coap_string_t s;
+-  char buf[sizeof(coap_string_t) + COAP_MAX_STRING_SIZE];
++/* The memstr is the storage for holding coap_string_t contents. */
++struct memstr_t {
++  char buf[COAP_MAX_STRING_SIZE];
+ };
+ 
+ /* The attrstr is the storage for holding coap_string_t structures to
+  * serve as attribute names or values. As these are typically short,
+  * they are stored in a different arena than generic strings. */
+-union attrstr_t {
+-  coap_string_t s;
+-  char buf[sizeof(coap_string_t) + COAP_MAX_ATTRIBUTE_SIZE];
++struct attrstr_t {
++  char buf[COAP_MAX_ATTRIBUTE_SIZE];
+ };
+ 
+-static union memstr_t string_storage_data[COAP_MAX_STRINGS];
++static struct memstr_t string_storage_data[COAP_MAX_STRINGS];
+ static memarray_t string_storage;
+ 
+ #if COAP_SERVER_SUPPORT
+ static coap_endpoint_t endpoint_storage_data[COAP_MAX_ENDPOINTS];
+ static memarray_t endpoint_storage;
+ 
+-static union attrstr_t attr_storage_data[COAP_MAX_ATTRIBUTE_STRINGS];
++static struct attrstr_t attr_storage_data[COAP_MAX_ATTRIBUTE_STRINGS];
+ static memarray_t attr_storage;
+ 
+ static coap_attr_t resattr_storage_data[COAP_MAX_ATTRIBUTES];
+-- 
+2.43.0
+
