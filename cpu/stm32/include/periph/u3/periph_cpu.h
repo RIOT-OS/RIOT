@@ -87,23 +87,6 @@ extern "C" {
 #endif
 /** @} */
 
-
-
-/**
- * @name   Non-secure flash key symbols (@c FLASH_KEY1 / @c FLASH_KEY2)
- * @{
- * @note   STM32U3 CMSIS names @c FLASH->KEYR and the mask
- *         @c FLASH_KEYR_KEY_Msk, not 32-bit unlock values for the key
- *         sequence. RM0487 uses the same words as e.g. STM32G4 (see vendor
- *         @c FLASH_KEY1 / @c FLASH_KEY2 there); the U3 device headers do not
- *         define them.
- */
-#if defined(CPU_FAM_STM32U3) && !defined(FLASH_KEY1) && !defined(FLASH_KEY2)
-#  define FLASH_KEY1   ((uint32_t)0x45670123U)
-#  define FLASH_KEY2   ((uint32_t)0xCDEF89ABU)
-#endif
-/** @} */
-
 #endif /* ndef DOXYGEN */
 
 #ifdef __cplusplus
