@@ -1,0 +1,7 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    stk3200 \
+    #
+
+BOARD_BLACKLIST := \
+    atmega256rfr2-xpro \ # Doesn't support strtoull, strtoll and strtof
+    #
