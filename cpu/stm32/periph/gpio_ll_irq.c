@@ -37,6 +37,16 @@
 #define EXTI_NUMOF          (16U)
 #define EXTI_MASK           (0xFFFF)
 
+#if defined(CPU_FAM_STM32U3)
+/* STM32U3: one NVIC line per EXTI (see stm32u3xxxx.h IRQn_Type, e.g. EXTI0_IRQn) */
+static const IRQn_Type _stm32u3_exti_irqn[EXTI_NUMOF] = {
+    EXTI0_IRQn,  EXTI1_IRQn,  EXTI2_IRQn,  EXTI3_IRQn,
+    EXTI4_IRQn,  EXTI5_IRQn,  EXTI6_IRQn,  EXTI7_IRQn,
+    EXTI8_IRQn,  EXTI9_IRQn,  EXTI10_IRQn, EXTI11_IRQn,
+    EXTI12_IRQn, EXTI13_IRQn, EXTI14_IRQn, EXTI15_IRQn,
+};
+#endif
+
 #if defined(EXTI_SWIER_SWI0) || defined(EXTI_SWIER_SWIER0)
 #  define EXTI_REG_SWIER        (EXTI->SWIER)
 #elif defined(EXTI_SWIER1_SWI0) || defined(EXTI_SWIER1_SWIER0)
@@ -72,7 +82,11 @@
 #  define EXTI_REG_IMR          (EXTI->IMR1)
 #endif
 
-#if defined(RCC_APB2ENR_SYSCFGCOMPEN)
+/* STM32U3: SYSCFG is on APB3, RCC_APB3ENR_SYSCFGEN in CMSIS (e.g. stm32u385xx.h) */
+#if defined(CPU_FAM_STM32U3) && defined(RCC_APB3ENR_SYSCFGEN)
+#  define SYSFG_CLOCK           APB3
+#  define SYSFG_ENABLE_MASK     RCC_APB3ENR_SYSCFGEN
+#elif defined(RCC_APB2ENR_SYSCFGCOMPEN)
 #  define SYSFG_CLOCK           APB2
 #  define SYSFG_ENABLE_MASK     RCC_APB2ENR_SYSCFGCOMPEN
 #elif defined(RCC_APB2ENR_SYSCFGEN)
@@ -128,6 +142,8 @@ static IRQn_Type get_irqn(uint8_t pin)
      * MCU family gets added */
 #if defined(CPU_FAM_STM32L5) ||  defined(CPU_FAM_STM32U5)
     return EXTI0_IRQn + pin;
+#elif defined(CPU_FAM_STM32U3)
+    return _stm32u3_exti_irqn[pin];
 #elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32C0)
     if (pin < 2) {
