@@ -45,6 +45,43 @@
 #endif /* ndef USB1_PMAADDR */
 
 /**
+ * @brief   Map legacy F1 USB `USB_EP_*` / `CNTR` / `EPTX` symbol names to USB DRD
+ *          (CHEP / CNTR) names in STM32U3 CMSIS headers.
+ * @{
+ */
+#if defined(CPU_FAM_STM32U3) || defined(CPU_LINE_STM32U385xx) || \
+    defined(CPU_LINE_STM32U385XX)
+#ifndef USB_CNTR_FRES
+#  define USB_CNTR_FRES             USB_CNTR_USBRST
+#endif
+#  ifndef USB_EPTX_DTOG1
+#    define USB_EPTX_DTOG1          USB_CHEP_TX_DTOG1
+#    define USB_EPTX_DTOG2          USB_CHEP_TX_DTOG2
+#    define USB_EPRX_DTOG1          USB_CHEP_RX_DTOG1
+#    define USB_EPRX_DTOG2          USB_CHEP_RX_DTOG2
+#  endif
+#  ifndef USB_EPTX_STAT
+#    define USB_EPTX_STAT           USB_CHEP_TX_STTX
+#  endif
+#  ifndef USB_EPRX_STAT
+#    define USB_EPRX_STAT           USB_CHEP_RX_STRX
+#  endif
+#  ifndef USB_EP_DTOG_TX
+#    define USB_EP_DTOG_TX          USB_CHEP_DTOG_TX
+#  endif
+#  ifndef USB_EP_DTOG_RX
+#    define USB_EP_DTOG_RX          USB_CHEP_DTOG_RX
+#  endif
+#  ifndef USB_EP_CTR_TX
+#    define USB_EP_CTR_TX           USB_CHEP_VTTX
+#  endif
+#  ifndef USB_EP_CTR_RX
+#    define USB_EP_CTR_RX           USB_CHEP_VTRX
+#  endif
+#endif /* U3 / U385 */
+/** @} */
+
+/**
  * There are two schemes for accessing the packet buffer area (PMA) from the CPU:
  *
  * - 2 x 16 bit/word access scheme where two 16-bit half-words per word can be
@@ -74,6 +111,13 @@
 #define _PMA_ACCESS_SCHEME      (1)     /* 1 x 16-bit/word */
 #define _PMA_ACCESS_STEP_SIZE   (2)     /* Step size in 16-bit half-words when
                                          * accessing the PMA SRAM from CPU */
+#elif defined(CPU_LINE_STM32U385xx) || defined(CPU_LINE_STM32U385XX)
+
+#define _ENDPOINT_NUMOF         (8)
+#define _PMA_SRAM_SIZE          (2048)  /* see USB_DRD_PMA_SIZE in device header */
+#define _PMA_ACCESS_SCHEME      (2)     /* 2 x 16-bit/word (USB DRD FS PMA) */
+#define _PMA_ACCESS_STEP_SIZE   (1)     /* Step in 16-bit half-words when
+                                         * accessing the PMA from CPU */
 #else
 #error "STM32 line is not supported"
 #endif
@@ -97,10 +141,19 @@ static uint8_t* _app_pbuf[_ENDPOINT_NUMOF];
 /* Forward declaration for the usb device driver */
 const usbdev_driver_t driver;
 
+/* STM32U3: USB full-speed is USB DRD (not legacy USB_TypeDef) — only this family */
+#if defined(CPU_FAM_STM32U3) || defined(CPU_LINE_STM32U385xx) || \
+    defined(CPU_LINE_STM32U385XX)
+static USB_DRD_TypeDef *_global_regs(const stm32_usbdev_fs_config_t *conf)
+{
+    return (USB_DRD_TypeDef *)conf->base_addr;
+}
+#else
 static USB_TypeDef *_global_regs(const stm32_usbdev_fs_config_t *conf)
 {
     return (USB_TypeDef *)conf->base_addr;
 }
+#endif
 
 #if _PMA_ACCESS_SCHEME == 1
 
@@ -276,7 +329,10 @@ static inline void _usb_attach(stm32_usbdev_fs_t *usbdev)
 #ifdef USB_BCDR_DPPU
     /* Enable DP pullup to signal connection */
     _global_regs(conf)->BCDR |= USB_BCDR_DPPU;
+#if defined(CRS) && defined(CRS_ISR_ESYNCF) && !defined(CPU_FAM_STM32U3)
+    /* Synchronize 48MHz clock: not all families use CRS the same for USB */
     while (!(CRS->ISR & CRS_ISR_ESYNCF)) {}
+#endif
 #else
     /* If configuration uses a GPIO for USB connect/disconnect */
     if (conf->disconn != GPIO_UNDEF) {
@@ -399,7 +455,13 @@ static void _usbdev_init(usbdev_t *dev)
     /* Enable USB IRQ */
     NVIC_EnableIRQ(conf->irqn);
     /* fill USB SRAM with zeroes */
-    memset((uint8_t*)USB1_PMAADDR, 0, 1024);
+#if defined(CPU_FAM_STM32U3) || defined(CPU_LINE_STM32U385xx) || \
+    defined(CPU_LINE_STM32U385XX)
+    /* U3 USB DRD PMA is 2 KiB; other lines keep the historical clear size */
+    memset((uint8_t *)USB1_PMAADDR, 0, _PMA_SRAM_SIZE);
+#else
+    memset((uint8_t *)USB1_PMAADDR, 0, 1024);
+#endif
 }
 
 static usbdev_ep_t *_get_ep(stm32_usbdev_fs_t *usbdev, unsigned num,
