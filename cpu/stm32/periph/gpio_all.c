@@ -40,13 +40,22 @@
  * @brief   Allocate memory for one callback and argument per EXTI channel
  */
 static gpio_isr_ctx_t isr_ctx[EXTI_NUMOF];
+#if defined(CPU_FAM_STM32U3)
+/* STM32U3: one IRQn per EXTI line (stm32u3xxxx.h: EXTI0_IRQn - EXTI15_IRQn) */
+static const IRQn_Type _stm32u3_exti_irqn[EXTI_NUMOF] = {
+    EXTI0_IRQn,  EXTI1_IRQn,  EXTI2_IRQn,  EXTI3_IRQn,
+    EXTI4_IRQn,  EXTI5_IRQn,  EXTI6_IRQn,  EXTI7_IRQn,
+    EXTI8_IRQn,  EXTI9_IRQn,  EXTI10_IRQn, EXTI11_IRQn,
+    EXTI12_IRQn, EXTI13_IRQn, EXTI14_IRQn, EXTI15_IRQn,
+};
+#endif
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
-    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
+    defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32U5) || \
     defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0) || \
-    defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3) 
+    defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32L5) 
 #define EXTI_REG_RTSR       (EXTI->RTSR1)
 #define EXTI_REG_FTSR       (EXTI->FTSR1)
 #define EXTI_REG_PR         (EXTI->PR1)
@@ -256,7 +265,9 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     periph_clk_en(APB2, RCC_APB2ENR_SYSCFGCOMPEN);
 #elif defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32C0)
     periph_clk_en(APB12, RCC_APBENR2_SYSCFGEN);
-#elif defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32U5)
+#elif defined(CPU_FAM_STM32U3)
+    periph_clk_en(APB3, RCC_APB3ENR_SYSCFGEN);
+#elif defined(CPU_FAM_STM32U5)
     periph_clk_en(APB3, RCC_APB3ENR_SYSCFGEN);
 #elif defined(CPU_FAM_STM32H7)
     periph_clk_en(APB4, RCC_APB4ENR_SYSCFGEN);
@@ -269,9 +280,10 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     gpio_init(pin, mode);
 
     /* enable global pin interrupt */
-#if defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
-    defined(CPU_FAM_STM32U5)
+#if defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5)
     NVIC_EnableIRQ(EXTI0_IRQn + pin_num);
+#elif defined(CPU_FAM_STM32U3)
+    NVIC_EnableIRQ(_stm32u3_exti_irqn[pin_num]);
 #elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32C0)
     if (pin_num < 2) {
