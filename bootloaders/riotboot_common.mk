@@ -17,6 +17,7 @@ DISABLE_MODULE += pm_layered
 
 # avoid using stdio
 USEMODULE += stdio_null
+USEMODULE += riotboot_bootloader
 
 # RIOT codebase
 RIOTBASE ?= $(CURDIR)/../..
