@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+
+# CPU lines
+config CPU_LINE_STM32U385XX
+    bool
+    select CPU_FAM_U3
