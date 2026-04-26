@@ -172,6 +172,24 @@ void stmclk_init_sysclk(void)
     ICACHE->CR |= ICACHE_CR_EN;
 #endif
 
+    /* 7) 48 MHz domain for HWRNG / USB FS (RM0487, matches HAL: HSI48 → ICLK → USB1) */
+    if (IS_ACTIVE(CLOCK_ENABLE_HSI48)) {
+        RCC->CR |= RCC_CR_HSI48ON;
+        while (!(RCC->CR & RCC_CR_HSI48RDY)) {}
+
+        /* ICLK = HSI48, USB1 = ICLK (48 MHz at the USB1 digital block) */
+#if defined(RCC_CCIPR1_ICLKSEL)
+        RCC->CCIPR1 &= (uint32_t) ~RCC_CCIPR1_ICLKSEL;
+#endif
+#if defined(RCC_CCIPR1_USB1SEL)
+        RCC->CCIPR1 &= (uint32_t) ~RCC_CCIPR1_USB1SEL;
+#endif
+        /* RNG kernel = HSI48 (reset / RM0487); keep explicit if bootloader repointed */
+#if defined(RCC_CCIPR2_RNGSEL)
+        RCC->CCIPR2 &= (uint32_t) ~RCC_CCIPR2_RNGSEL;
+#endif
+    }
+
     irq_restore(is);
 }
 
