@@ -111,7 +111,8 @@ extern "C" {
             #undef APB3_PERIPH_EN               /* not defined */
 #elif   defined(APB3PERIPH_BASE) || \
         defined(APB3PERIPH_BASE_S) || \
-        defined(CPU_FAM_STM32H7)
+        defined(CPU_FAM_STM32H7) || \
+        defined(CPU_FAM_STM32U3)
             #define APB3_PERIPH_EN              RCC->APB3ENR
 #endif
 
