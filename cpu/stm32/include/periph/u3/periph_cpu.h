@@ -87,16 +87,7 @@ extern "C" {
 #endif
 /** @} */
 
-/**
- * @name   RCC APB3 clock enable (cpu_common.h bus @c APB3)
- * @{
- * @note RM0487: @c RCC_APB3ENR gates SYSCFG, LPUART1, I2C3, LPTIM, etc. CMSIS
- *       exposes @c RCC->APB3ENR (not a made-up name).
- */
-#if defined(CPU_FAM_STM32U3) && !defined(APB3_PERIPH_EN)
-#  define APB3_PERIPH_EN   (RCC->APB3ENR)
-#endif
-/** @} */
+
 
 /**
  * @name   Non-secure flash key symbols (@c FLASH_KEY1 / @c FLASH_KEY2)
