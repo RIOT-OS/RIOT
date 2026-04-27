@@ -38,7 +38,8 @@ static DmacDescriptor DMA_DESCRIPTOR_ATTRS writeback[CONFIG_DMA_NUMOF];
 static uint32_t channels_free = (1LLU << CONFIG_DMA_NUMOF) - 1;
 
 struct dma_ctx {
-    mutex_t sync_lock;
+    dma_cb_t cb;
+    void *ctx;
 };
 
 struct dma_ctx dma_ctx[CONFIG_DMA_NUMOF];
@@ -56,9 +57,7 @@ static void _poweron(void)
 void dma_init(void)
 {
     _poweron();
-    for (unsigned i = 0; i < CONFIG_DMA_NUMOF; i++) {
-        mutex_init(&dma_ctx[i].sync_lock);
-    }
+
     /* Enable all priorities with RR scheduling */
     DMAC->CTRL.reg = DMAC_CTRL_LVLEN0 |
                      DMAC_CTRL_LVLEN1 |
@@ -99,8 +98,6 @@ dma_t dma_acquire_channel(void)
         channel = bitarithm_lsb(channels_free);
         /* Clear channel bit */
         channels_free &= ~(1 << channel);
-        /* ensure the sync lock is locked */
-        mutex_trylock(&dma_ctx[channel].sync_lock);
     }
     irq_restore(state);
     return channel;
@@ -145,7 +142,12 @@ static inline DmacDescriptor *_get_next_descriptor(const DmacDescriptor *descr)
     return (DmacDescriptor *)descr->DESCADDR.reg;
 }
 
-void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, bool irq)
+void dma_set_cb_arg(dma_t dma, void *ctx)
+{
+    dma_ctx[dma].ctx = ctx;
+}
+
+void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, dma_cb_t cb, void *ctx)
 {
 #ifdef REG_DMAC_CHID
     /* Ensure that this set of register writes is atomic */
@@ -156,7 +158,7 @@ void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, bool irq)
                         (prio << DMAC_CHCTRLB_LVL_Pos);
     /* Clear everything in case a previous user left it configured */
     DMAC->CHINTENCLR.reg = 0xFF;
-    if (irq) {
+    if (cb) {
         DMAC->CHINTENSET.reg = DMAC_CHINTENSET_TCMPL;
     }
     irq_restore(state);
@@ -165,10 +167,13 @@ void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, bool irq)
                                      (trigger << DMAC_CHCTRLA_TRIGSRC_Pos);
     DMAC->Channel[dma].CHPRILVL.reg = prio;
     DMAC->Channel[dma].CHINTENCLR.reg = 0xFF;
-    if (irq) {
+    if (cb) {
         DMAC->Channel[dma].CHINTENSET.reg = DMAC_CHINTENSET_TCMPL;
     }
 #endif
+
+    dma_ctx[dma].cb = cb;
+    dma_ctx[dma].ctx = ctx;
 }
 
 void dma_prepare(dma_t dma, uint8_t width, const void *src, void *dst,
@@ -293,12 +298,6 @@ void dma_start(dma_t dma)
 #endif
 }
 
-void dma_wait(dma_t dma)
-{
-    DEBUG("[DMA]: mutex lock: %u\n", dma);
-    mutex_lock(&dma_ctx[dma].sync_lock);
-}
-
 void dma_cancel(dma_t dma)
 {
     DEBUG("[DMA]: Cancelling active transfer: %u\n", dma);
@@ -326,8 +325,8 @@ void isr_dmac(void)
     /* Clear the pending interrupt flags for this channel by writing the
      * channel ID together with the flags to clear */
     DMAC->INTPEND.reg = status;
-    if (status & DMAC_INTPEND_TCMPL) {
-        mutex_unlock(&dma_ctx[dma].sync_lock);
+    if ((status & DMAC_INTPEND_TCMPL) && dma_ctx[dma].cb) {
+        dma_ctx[dma].cb(dma_ctx[dma].ctx);
     }
     DEBUG("[DMA] IRQ: %u: %x\n", dma, status);
     cortexm_isr_end();
