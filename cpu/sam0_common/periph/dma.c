@@ -140,6 +140,11 @@ static inline void _set_next_descriptor(DmacDescriptor *descr, void *next)
     descr->DESCADDR.reg = (uint32_t)next;
 }
 
+static inline DmacDescriptor *_get_next_descriptor(const DmacDescriptor *descr)
+{
+    return (DmacDescriptor *)descr->DESCADDR.reg;
+}
+
 void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, bool irq)
 {
 #ifdef REG_DMAC_CHID
@@ -202,8 +207,8 @@ void dma_prepare_dst(dma_t dma, void *dst, size_t num, bool incr)
     _set_next_descriptor(descr, NULL);
 }
 
-void _fmt_append(DmacDescriptor *descr, DmacDescriptor *next,
-                 const void *src, void *dst, size_t num)
+static void _fmt_append(DmacDescriptor *descr, DmacDescriptor *next,
+                        const void *src, void *dst, size_t num)
 {
     /* Configure the full descriptor besides the BTCTRL data */
     _set_next_descriptor(descr, next);
@@ -244,6 +249,34 @@ void dma_append_dst(dma_t dma, DmacDescriptor *next, void *dst, size_t num,
     next->BTCTRL.reg = (descr->BTCTRL.reg & ~DMAC_BTCTRL_DSTINC) |
                        (incr << DMAC_BTCTRL_DSTINC_Pos);
     _fmt_append(descr, next, (void *)descr->SRCADDR.reg, dst, num);
+}
+
+void dma_enable_loop(dma_t dma)
+{
+    DmacDescriptor *first = &descriptors[dma];
+    DmacDescriptor *last = first;
+    while (_get_next_descriptor(last)) {
+        last = _get_next_descriptor(last);
+        if (last == first) {
+            /* loop already exists */
+            return;
+        }
+    }
+    _set_next_descriptor(last, first);
+}
+
+void dma_disable_loop(dma_t dma)
+{
+    DmacDescriptor *first = &descriptors[dma];
+    DmacDescriptor *last = first;
+    while (_get_next_descriptor(last) != first) {
+        last = _get_next_descriptor(last);
+        if (last == NULL) {
+            /* loop already disabled */
+            return;
+        }
+    }
+    _set_next_descriptor(last, NULL);
 }
 
 void dma_start(dma_t dma)

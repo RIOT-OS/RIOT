@@ -1308,6 +1308,20 @@ void dma_append_dst(dma_t dma, DmacDescriptor *next, void *dst, size_t num,
                     bool incr);
 
 /**
+ * @brief   Make the DMA transfer repeat indefinitely
+ *
+ * @param   dma     DMA channel reference
+ */
+void dma_enable_loop(dma_t dma);
+
+/**
+ * @brief   Disable DMA transfer looping
+ *
+ * @param   dma     DMA channel reference
+ */
+void dma_disable_loop(dma_t dma);
+
+/**
  * @brief   Start a DMA transfer.
  *
  * @param   dma     DMA channel reference
