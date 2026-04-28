@@ -639,12 +639,6 @@ static inline bool unicoap_resource_match_path_string(const unicoap_resource_t* 
  * @param[in] resource Resource to check for matching path
  * @param[in] options Options to read URI path from
  *
- * @remark
- * If you want to call this function in a loop, consider reading the Uri-Path with
- * @ref unicoap_options_t::unicoap_options_copy_uri_path and then calling
- * @ref unicoap_resource_match_path_string repeatedly. This is useful when you want to match a
- * given request against a number of resources.
- *
  * This function obeys the @ref UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE flag.
  *
  * @returns A boolean value indicating whether the given resource matches the path in @p options.

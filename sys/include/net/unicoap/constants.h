@@ -413,8 +413,6 @@ static_assert(sizeof(unicoap_status_t) == sizeof(uint8_t),
  */
 /**
  * @brief CoAP option number
- *
- * These option numbers are not valid in signaling messages.
  */
 typedef enum {
     /**

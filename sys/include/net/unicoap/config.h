@@ -202,17 +202,11 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
 #  define CONFIG_UNICOAP_PDU_SIZE_MAX (128)
 #endif
 
+// todo: not true anymore it seems, only used for unicoap assist
 /**
- * @brief Maximum length of a resource path string. Used for request matching.
+ * @brief Maximum length of a resource path string. Only used for @ref CONFIG_UNICOAP_ASSIST.
  *
  * **Default**: 64 characters
- *
- * Normally, you could match a request's path against all resources' paths by comparing
- * the individual `Uri-Path` options present in the request. Re-parsing the options for each
- * resource the server hosts becomes expensive fast. Therefore, unicoap serializes the `Uri-Path`
- * and then does consecutive`strncmp` calls.
- *
- * @see @ref unicoap_resource_match_path_string and @ref unicoap_resource_match_path_options
  */
 #if !defined(CONFIG_UNICOAP_PATH_LENGTH_MAX) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_PATH_LENGTH_MAX (64)

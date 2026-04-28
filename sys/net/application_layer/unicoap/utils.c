@@ -91,8 +91,7 @@ bool unicoap_path_is_equal(const unicoap_pathspec_t* lhs, const unicoap_pathspec
     assert(rhs);
 
     /* If one is a root path, the other must be, too. */
-    if ((!lhs->_components && !rhs->_components) ||
-        (!rhs->_components && !lhs->_components)) {
+    if ((!lhs->_components && !rhs->_components)) {
         return true;
     }
     /* If just one of them is a root path, they cannot be equal. */
