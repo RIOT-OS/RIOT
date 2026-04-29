@@ -1,5 +1,5 @@
 ---
-title: Terminal Programs Configuration
+title: Terminal Program Configuration
 description: How to configure popular terminal programs for correct display of newlines
 ---
 
@@ -40,6 +40,13 @@ that will make them correctly display newlines.
     - Start with `--eol CR` parameter.
 - Via RIOT build system:
     - `RIOT_TERMINAL=miniterm make term`
+
+:::note
+You can install miniterm by installing `pyserial`. The preferred method
+for most Linux distributions is to install `python3-serial` with your
+package manager. If that is not possible or desired, you can also install
+`pyserial` with `pipx`.
+:::
 
 ## picocom
 
