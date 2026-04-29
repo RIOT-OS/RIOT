@@ -3,6 +3,8 @@ title: Porting CPUs
 description: Guide on how to port new CPU families to RIOT-OS
 ---
 
+import { FileTree } from '@astrojs/starlight/components';
+
 This guide was created during the process of porting a new MCU family
 (Infineon PSoC-6) to RIOT. It is intended as a practical companion to RIOT's
 existing board-porting documentation and focuses on the structure of a CPU port.
@@ -32,7 +34,7 @@ A typical CPU port has a file structure similar to the following:
 Entries marked with `*` are optional and depend on the CPU family and reuse
 strategy. Entries without `*` are typically required for a minimal CPU port.
 
-{% filetree %}
+<FileTree>
 - cpu/foo
   - include
     - cpu_conf.h
@@ -51,7 +53,7 @@ strategy. Entries without `*` are typically required for a minimal CPU port.
   - Makefile.features*
   - Makefile.include
   - cpu.c
-{% /filetree %}
+</FileTree>
 
 Not every subdirectory is mandatory; use the `*` markers above to distinguish
 optional components.
