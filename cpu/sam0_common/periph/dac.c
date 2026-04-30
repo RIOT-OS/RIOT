@@ -126,6 +126,9 @@ int8_t dac_init(dac_t line)
 #if CONFIG_SAM0_DAC_RUN_ON_STANDBY && defined(DAC_DACCTRL_RUNSTDBY)
                            | DAC_DACCTRL_RUNSTDBY
 #endif
+#ifdef DAC_DACCTRL_LEFTADJ
+                           | DAC_DACCTRL_LEFTADJ
+#endif
                            ;
 
 #ifdef DAC_DACCTRL_REFRESH
@@ -144,6 +147,9 @@ int8_t dac_init(dac_t line)
     DAC->CTRLB.reg = DAC_VREF
 #ifdef DAC_CTRLB_EOEN
                    | DAC_CTRLB_EOEN
+#endif
+#ifdef DAC_CTRLB_LEFTADJ
+                   | DAC_CTRLB_LEFTADJ
 #endif
                    ;
 
