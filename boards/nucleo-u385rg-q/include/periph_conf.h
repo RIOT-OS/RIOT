@@ -15,6 +15,11 @@
  * @author      Adarsh Nair Mullachery
  */
 
+/* Nucleo board provides 32.768 kHz LSE for RTC (same as other Nucleo-U boards) */
+#ifndef CONFIG_BOARD_HAS_LSE
+#define CONFIG_BOARD_HAS_LSE 1
+#endif
+
 #include "periph_cpu.h"
 #include "clk_conf.h"
 
