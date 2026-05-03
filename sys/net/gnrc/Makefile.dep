@@ -146,6 +146,7 @@ ifneq (,$(filter gnrc_netif_ieee802154_mac,$(USEMODULE)))
   USEMODULE += ieee802154_submac
   USEMODULE += random
   USEMODULE += netdev
+  USEMODULE += netdev_new_api
 endif
 
 ifneq (,$(filter gnrc_netif_bus,$(USEMODULE)))
