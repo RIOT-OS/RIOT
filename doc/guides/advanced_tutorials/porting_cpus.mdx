@@ -3,7 +3,7 @@ title: Porting CPUs
 description: Guide on how to port new CPU families to RIOT-OS
 ---
 
-import { FileTree } from '@astrojs/starlight/components';
+import FileTree from '@components/FileTree.astro';
 
 This guide was created during the process of porting a new MCU family
 (Infineon PSoC-6) to RIOT. It is intended as a practical companion to RIOT's
@@ -47,7 +47,7 @@ strategy. Entries without `*` are typically required for a minimal CPU port.
     - spi.c
     - …
   - vectors
-    - vectors_<model>.c
+    - vectors_\<model\>.c
   - Makefile
   - Makefile.dep*
   - Makefile.features*
@@ -647,4 +647,4 @@ Useful first tests are:
 - architecture-common code such as `cpu/cortexm_common/` when porting
   Cortex-M-based MCUs
 - merged RIOT PRs adding CPU support, for reference and pattern matching:
-  <https://github.com/RIOT-OS/RIOT/pulls?q=is%3Apr+is%3Amerged+%22cpu%2F%22+%22boards%2F%22>
+  [see GitHub](https://github.com/RIOT-OS/RIOT/pulls?q=is%3Apr+is%3Amerged+%22cpu%2F%22+%22boards%2F%22)
