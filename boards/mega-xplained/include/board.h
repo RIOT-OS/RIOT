@@ -121,13 +121,6 @@ extern "C" {
 #define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
 /** @} */
 
-/**
- * @name MTD configuration
- * @{
- */
-#define MTD_0 mtd_dev_get(0)
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif

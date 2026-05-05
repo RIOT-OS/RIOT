@@ -48,13 +48,6 @@ extern "C" {
 #define PIR_MOTION_MODE     GPIO_IN_PU
 /** @} */
 
-/**
- * @name MTD configuration
- * @{
- */
-#define MTD_0 mtd_dev_get(0)
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif

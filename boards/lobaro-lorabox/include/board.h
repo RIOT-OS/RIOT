@@ -61,13 +61,6 @@ extern "C" {
 #define SX127X_PARAM_DIO3               GPIO_PIN(PORT_B, 7)
 /** @} */
 
-/**
- * @name MTD configuration
- * @{
- */
-#define MTD_0 mtd_dev_get(0)
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif

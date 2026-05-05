@@ -75,13 +75,6 @@ extern "C" {
 #define BTN0_MODE           GPIO_IN_PU              /**< User button pin mode */
 /** @} */
 
-/**
- * @name MTD configuration
- * @{
- */
-#define MTD_0 mtd_dev_get(0)
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
