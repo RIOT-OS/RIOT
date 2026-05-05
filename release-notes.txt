@@ -1,3 +1,538 @@
+RIOT-2026.04 "Fire Rizzlease 🫪👍" - Release Notes
+============================
+
+RIOT is a multi-threading operating system which enables soft real-time
+capabilities and comes with support for a range of devices that are typically
+found in the Internet of Things: 8-bit and 16-bit microcontrollers as well as
+light-weight 32-bit processors.
+
+RIOT is based on the following design principles: energy-efficiency, soft
+real-time capabilities, small memory footprint, modularity, and uniform API
+access, independent of the underlying hardware (with partial POSIX compliance).
+
+RIOT is developed by an international open-source community which is
+independent of specific vendors (e.g. similarly to the Linux community) and is
+licensed with a non-viral copyleft license (LGPLv2.1), which allows indirect
+business models around the free open-source software platform provided by RIOT.
+
+
+About this release
+==================
+
+You can also read the changelog [on our guide site](https://guide.riot-os.org/changelog/).
+
+The 2026.04 release includes:
+
+- RIOT is now synced to [Codeberg](https://codeberg.org/riot/riot) (#21997) 🏔️.
+
+- Added support for the pro-micro-nrf52840 (#22089), slstk3301a (#22069) and stm32h7 (#21978) 🤖.
+
+- The Guide Site continues to evolve, becoming the default entry point for new users,
+    replacing doxygen. Including more tutorials and an experimental
+    [Supported Boards](https://guide.riot-os.org/boards/) section 👽.
+    The doxygen documentation remains in place for the API and is accessible
+    at https://api.riot-os.org/
+
+- Removed _over a million lines of vendor code_ from the EFM32 family,
+    replacing it with a pkg/gecko_sdk dependency (#22040) 🧹.
+
+- The Raspberry Pi Pico 2 / RP2350 has been improved so much,
+    you could write
+    [a thesis about it](https://inet.haw-hamburg.de/thesis/completed/ba_hert_tom.pdf/view),
+    including unified abstractions between RISC-V and ARM and more (#21753) 🐸.
+
+- Added drivers for the amg88xx (#22104) and ADS1X1X (#21694) 🚎.
+
+125 pull requests, composed of 229 commits, have been merged since the
+last release, and 9 issues have been solved. 27 people contributed with
+code in 84 days. 1878 files have been touched with 25007 (+) insertions and
+**1141523** deletions (-).
+
+
+Notations used below
+====================
+
+    + means new feature/item
+    * means modified feature/item
+    - means removed feature/item
+
+
+New features and changes
+========================
+
+Core
+----
+
+* core/compiler_hints.h: improve assume() (#22061)
+* core/lib/macros: CONCAT with expansion (#22153)
+
+System Libraries
+----------------
+
++ cdc/ecm: add TX timeout (#22116)
++ sys/event/periodic_callback: add _start_now (#22070)
+* cdc/ecm: check link status after obtaining out_lock (#22000)
+* sys/event: fix event thread stack size propagation (#22038)
+* sys/shell/cmds: improvement of iw scan command (#22051)
+* sys/usbus: cdc_ecm: handle link up / link down events (#21999)
+* sys/ztimer64/xtimer_compat: also provide fallback options when
+  ztimer64 is used (#21958)
+
+Networking
+----------
+
++ gnrc/ipv6/nib: add `gnrc_ipv6_nib_dyn_lladdr_get()` (#22013)
++ gnrc/ipv6/nib: make ABR run-time configurable (#21081)
++ gnrc/ipv6/nib: only add a single link-local address (#22073)
++ gnrc_pktshark: add new module to pretty-print network traffic (#21284)
++ sys/shell: add generic udp command (#22049)
++ sys/string_utils: memxor memrcpy (#22136)
+* drivers/[s-z]*: change license headers to SPDX format (#22167)
+* sys/net/gnrc/netif: enable static analysis (#22055)
+* sys/net/link_layer/ieee802154: split out some header utilities (#22140)
+
+Packages
+--------
+
+* pkg/qcbor: bump version (#22110)
+* pkg/u8g2: bump version (#22081)
+
+Boards
+------
+
++ boards/pro-micro-nrf52840: add support (#22089)
++ boards/slstk3301a: add support (#22069)
++ cpu/stm32: add support for STM32H7 (#21978)
++ cpu/stm32h7, boards/nucleo-h753zi: add support for more peripherals (#22076)
++ RP2350: Add RISCV, Unify RP2350, Update UART, Add XH3IRQ Interrupt
+  Controller (#21753)
+* boards/common/nrf52: include adafruit-nrf52-bootloader dependency
+  early (#22124)
+* boards/native: use 'nvm0' for native fs folder name (#22134)
+* boards: migrate EFM32-based board config to ztimer (#22099)
+* sys/walltime: implement alarm functions (#22123)
+
+CPU
+---
+
++ cpu/samd5x: support for using ext_osc + xosc + fdpll (#22012)
++ drivers/ws281x: add SPI backend (#22003)
+* cpu/efm32: remove i2c clock 'reset' (#22077)
+* cpu/efm32: replace vendor files with the ones from pkg/gecko_sdk (#22040)
+* cpu/esp32: fix compilation for GCC 15.2 on ESP32x RISC-V SoCs (#22017)
+* cpu/lpc1768: improve UART driver (#22082)
+* cpu/rpx0xx: wait for transmission to be completed (#22097)
+* cpu/sam0_common: update SAML21-based compat headers (#22074)
+* cpu/stm32: simplify handling of generated IRQ header (#21964)
+* drivers/ws281x: support rgbw (#21990)
+* pkg/pkg.mk: enable sparse checkout for non-cache (#22039)
+
+Device Drivers
+--------------
+
++ drivers/amg88xx: add support (#22104)
++ drivers: add a common driver for ADS1X1X (#21694)
+* drivers/[a-e]*: Change license headers to SPDX format (#22162)
+* drivers/[f-h]*: change license headers to SPDX format (#22163)
+* drivers/[p-r]*: change license headers to SPDX format (#22166)
+* drivers/slipdev: make default param selection less insane (#22142)
+* drivers/slipdev: Split out networking/coap into files (#22118)
+
+Documentation
+-------------
+
++ boards/nucleo-h753zi: add pinout to documentation (#22176)
++ doc/starlight: add unit tests to tutorials (#22042)
++ doc: add declaration of AI tools (#22169)
++ doc: Add README & Update Starlight (#22101)
++ doc: explain use of static analysis (#22127)
+* doc/starlight: Update to astro v6 (#22145)
+* doc: Fix riot svg logo color and optimize svgs, also replace png logo
+  with svg logo in guides (#22008)
+
+Build System / Tooling
+----------------------
+
++ dist/tools/zsh-completion: add PORT variable (#22060)
++ make: add enableable sarif output (#22122)
++ makefiles/arch/native: add debug server config (#22107)
+* dist/tools/bmp: remove requirements.txt (#22098)
+* makefiles/tools/openocd-adapters: use non-deprecated 'adapter serial' (#22108)
+* tools/uf2conv: enforce .hex or .elf flashfile format (#22100)
+
+Testing
+-------
+
+* .github/workflows: do not run workflows on forks (#22085)
+* ci: sync repo to codeberg (#21997)
+* gh-actions: deploy guides to main riot-os.org server as well (#21993)
+* tests/unittests: Update link to flashing guide in README (#22043)
+* tests: Use common run_check_unittest (#22102)
+
+API Changes
+-----------
+
+* sys/net/nanocoap: use `char *` as type for `char *` arguments (#22093)
+
+Uncategorized
+-------------
+
++ CODING_CONVENTIONS: Add reference to Commit Conventions (#22087)
++ release-notes.txt: add 2026.01 release notes (#22044)
+* ci/deploy_docs: stop deploying to gh_pages (#22011)
+
+And 12 minor changes.
+
+
+Deprecations
+============
+
+Deprecations (1)
+----------------
+
+* dist/tools: deprecate `git-cache` script, embrace `git-cache-rs` (#22045)
+
+
+Bug fixes (43)
+==============
+
+* cpu/efm32: add configurable i2c pull-up (#22065)
+* cpu/stm32h7,boards/nucleo-h753zi: Add support for `periph_vbat`, fix
+  ADC bug (#22084)
+* deploy_docs.yml: add SECURITY.md (#21994)
+* sys/net/nanocoap: add missing dependency to sock_udp (#22047)
+* sys/walltime: add automatic test, more backends (#22031)
+* boards/slstk3402a: expose SPI1 for on-board LCD (#22080)
+* boards/slstk3701a: fix pin configuration issues (#22068)
+* build system: handle unsupported `make debug*` (#22106)
+* ci/sync: only sync on master pushes (avoid merge queue branches) (#21998)
+* core/init: don't call vfs_bind_stdio() in early init (#22170)
+* cpu/esp8266: Fix crashes of the ESP866 when rebooting with or
+  disconnecting from WiFi (#22014)
+* cpu/esp8266: fix the crashes on startup in vendor code (#22010)
+* cpu/native: Fix `make all-valgrind` (#22046)
+* cpu/native: fix syscall return values for fwrite() and getpid() (#22144)
+* dist/tools/usb-cdc-ecm: script fixes (#22001)
+* doc/CONTRIBUTING.md: fix typo (#22174)
+* drivers/atwinc15x0: fix a potential buffer overflow on stack (#22041)
+* drivers/cst816s: Fix touch_dev compatibility (#22141)
+* drivers/mpu9x50: fix wrong byte-order for gyro and accel reads (#22135)
+* drivers/netdev_ieee802154_submac: fix do-while loop in ISR (#22002)
+* examples/basic/filesystem: don't set main stack size on native (#22132)
+* gnrc_sixlowpan_frag_sfr: check length before dispatching (#22027)
+* how_to_doc.md: Spell and wording fixes (#21995)
+* kw2xrf/Radio HAL: fixed endianness setting of short addressing (#22057)
+* makefiles/tools: enhance miniterm path finding in serial.inc.mk
+  [backport 2026.04] (#22219)
+* makefiles/tools: fix esptool installation for riotdocker (#22159)
+* makefiles: use TZ instead of mounting /etc/localtime for Docker (#22120)
+* pkg/libsocketcan: fix build on native (#22095)
+* pkg/lvgl: Fix configuration header and compilation issue (#22005)
+* pkg/lvgl: Fix LVGL bug when using SDL on native (#22139)
+* pkg/lwip/sock_udp: correctly report IP family in dual-stack scenario (#22072)
+* pkg/pkg.mk: Evaluate Sparse Paths for Non-Cache too (#22088)
+* pkg/pkg.mk: fix sparse checkout initialization (#22113)
+* si70xx: retry device identification (#22052)
+* sys/net/gnrc/pktbuf_malloc: fix undefined behavior (#22054)
+* sys/net/gnrc_sixlowpan: fix a possible NULL ptr dereference (#22066)
+* sys/net/nanocoap: fix message corruption `coap_build_reply()` (#22094)
+* sys/net/nanocoap: fix most pressing API flaws (#22096)
+* sys/net/nanocoap: make bounds tests more robust (#22048)
+* sys/net/nanocoap_fileserver: only set payload marker if payload
+  exists (#22133)
+* sys/suit: check length of URL in suit_worker_trigger() (#22143)
+* sys/ztimer: fix boolean logic on constant ints (#22131)
+* tests/unittests: Fix tests with gnrc_pktbuf_malloc + ASAN (#22058)
+
+
+Known issues
+============
+
+Network related issues (54)
+---------------------------
+
+* 6lo: RIOT does not receive packets from Linux when short_addr is set (#11033)
+* Address registration handling inappropriate (#15867)
+* app/netdev: application stops working after receiving frames with
+  assertion or completely without error (#8271)
+* at86rf2xx: Dead lock when sending while receiving (#8242)
+* cpu/esp8266: Tracking open problems of esp_wifi netdev driver (#10861)
+* DHCPv6 client: Handling of NotOnLink incorrect (#20349)
+* dist/tools/sliptty/start_network.sh: IPv6 connectivity is broken on
+  PC (#14689)
+* driver/mrf24j40: blocks shell input with auto_init_gnrc_netif (#12943)
+* drivers/at86rf215: Incorrect channel number set for subGHz (#15906)
+* DTLS examples cannot send message to localhost (#14315)
+* Emcute cannot create a double-byte name (#12642)
+* ethernet: Missing multicast addr assignment (#13493)
+* ethos: fails to respond to first message. (#11988)
+* ethos: Unable to handle fragmented IPv6 packets from Linux kernel (#12264)
+* example/gnrc_border_router cannot answer after some time (#19578)
+* examples/cord_ep: Dead lock when (re-)registering in callback
+  function (#12884)
+* examples/gnrc_border_router: esp_wifi crashes on disconnect (#14679)
+* Forwarding a packet back to its link layer source should not be
+  allowed (#5051)
+* gcoap example request on tap I/F fails with NIB issue (#8199)
+* gcoap: Suspected crosstalk between requests (possible NULL call) (#14390)
+* Global IPv6 addresses remain deprecated after receiving RA (#19846)
+* gnrc ipv6: multicast packets are not dispatched to the upper layers (#5230)
+* gnrc/ipv6: "invalid payload length" - corrupted IPv6 header when
+  ENABLE_DEBUG=1 in mbox.c (#20390)
+* gnrc_border_router stops routing after a while (#16398)
+* gnrc_border_router: Kconfig and C disagree about number of addresses
+  per interface (#19947)
+* gnrc_icmpv6_echo: flood-pinging another node leads to leaks in own
+  packet buffer (#12565)
+* gnrc_ipv6: Multicast is not forwarded if routing node listens to the
+  address (#4527)
+* gnrc_netif_pktq leaks memory (#17924)
+* gnrc_rpl: missing bounds checks in _parse_options (#16085)
+* gnrc_rpl: nib route not updated when topology / DODAG changes (#17327)
+* gnrc_rpl: takes unusually long time to start routing packets (#19147)
+* gnrc_sock_udp: Possible Race condition on copy in application buffer (#10389)
+* gnrc_tcp: gnrc_tcp_recv() never generates -ECONNABORTED (#17896)
+* ieee802154_submac: IPv6 fragmentation broken (#16998)
+* LoRaWan node ISR stack overflowed (#14962)
+* LWIP TCP Communication Error (#19676)
+* lwip, submac: deadlock on user transmission (#21843)
+* lwip_sock_tcp / sock_async: received events before calling
+  sock_accept() are lost due to race condition. (#16303)
+* Missing drop implementations in netdev_driver_t::recv (#10410)
+* Neighbor Discovery not working after router reboot when using SLAAC (#11038)
+* netdev_ieee802154: Mismatch between radio ll address and in memory
+  address (#10380)
+* nrf52: Not able to add global or ULA address to interface (#13280)
+* nrfmin: communication not possible after multicast ping with no
+  interval (#11405)
+* ping6 is failing when testing with cc2538dk (#13997)
+* pkg/lwip: race condition (data loss) in async connection setup (#21874)
+* pkg/tinydtls: auxiliary data API does not work for async sockets (#16054)
+* Removing a TNT global address then adding a new one does not work (#20318)
+* samr30 xpro doesn't seem to use its radio ok (#12761)
+* scan-build errors found during 2019.07 testing (#11852)
+* stale border router does not get replaced (#12210)
+* test/lwip: enabling both, IPv4 and IPv6, results in unexpected
+  behavior (#18097)
+* tests/lwip: does not compile for IPv4 on 6LoWPAN-based boards. (#17162)
+* two nodes livelock sending neighbor solicitations back and forth
+  between each other (#16670)
+* xbee: setting PAN ID sometimes fails (#10338)
+
+Timer related issues (5)
+------------------------
+
+* misc issues with tests/trickle (#9052)
+* periph/timer: `timer_set()` underflow safety check (tracking issue) (#13072)
+* periph_timer: systematic proportional error in timer_set (#10545)
+* saml21 system time vs rtc (#10523)
+* sys/newlib: gettimeofday() returns time since boot, not current wall
+  time. (#9187)
+
+Drivers related issues (13)
+---------------------------
+
+* at86rf2xx: Simultaneous use of different transceiver types is not
+  supported (#4876)
+* cpu/msp430: GPIO driver doesn't work properly (#9419)
+* drivers/at86rf215: not returning RX/IDLE after a while of operation
+  with RPL/UDP (#21685)
+* drivers/at86rf215: The activation of the address match interrupt is
+  missing in the at86rf215_reset function (#20505)
+* examples/dtls-wolfssl not working on pba-d-01-kw2x (#13527)
+* fail to send data to can bus (#12371)
+* mdt_erase success, but vfs_format resets board (esp32-heltec-
+  lora32-v2) (#14506)
+* periph/spi: Switching between CPOL=0,1 problems on Kinetis with
+  software CS (#6567)
+* periph: GPIO drivers are not thread safe (#4866)
+* PWM: Single-phase initialization creates flicker (#15121)
+* STM32: SPI clock not returning to idle state and generating
+  additional clock cycles (#11104)
+* TCP client  cannot  send read only data (#16541)
+* tests/periph_flashpage: unexpected behavior on nucleo-l4r5zi (#17599)
+
+Native related issues (5)
+-------------------------
+
+* examples/micropython: floating point exception while testing on
+  native (#15870)
+* native not float safe (#495)
+* native: tlsf: early malloc will lead to a crash (#5796)
+* VFS_READ show correct data on every SECOND request only (#21470)
+* ztimer doesn't wake up on native if the pm_layered module is used (#21083)
+
+Other platforms related issues (11)
+-----------------------------------
+
+* Failing tests on FE310 (Hifive1b) (#13086)
+* boards/hifive1: flashing issue (#13104)
+* cpu/sam0: flashpage write / read cycle produces different results
+  depending on code layout in flash (#14929)
+* esp32-wroom-32: tests/netstats_l2 failing sometimes (#14237)
+* gcoap/esp8266: Stack overflow with gcoap example (#13606)
+* Interrupt callback function is instantly called on samd51 after
+  setting it from within interrupt callback function (#19861)
+* MPU doesn't work on cortex-m0+ (#14822)
+* newlib-nano: Printf formatting does not work properly for some
+  numeric types (#1891)
+* periph_timer: Test coverage & broken on STM32F767ZI (#15072)
+* riscv: ISR stack is too small for ENABLE_DEBUG in core files (#16395)
+* stm32f7: Large performance difference between stm32f746 and stm32f767 (#14728)
+
+Build system related issues (7)
+-------------------------------
+
+* Build dependencies - processing order issues (#9913)
+* dist/tools/cppcheck/cppchck.sh: errors when running with Cppcheck
+  1.89 (#12771)
+* EXTERNAL_MODULE_DIRS silently ignores non-existent entries (#17696)
+* Kconfig: Unable to set Kconfig boolean variables with default true to
+  false (#21785)
+* make: ccache leads to differing binaries (#14264)
+* make: use of immediate value of variables before they have their
+  final value (#8913)
+* makefiles: `make term` does not print `stderr` output of child
+  process. (#21808)
+
+Other issues (77)
+-----------------
+
+* [nRF5x] `periph_uart` unreliable with GCC 9.3.1 (#21842)
+* [tracking] Bugs found by the peripheral selftest (#20071)
+* [Tracking] Failures found with testing on real hardware for release (#21882)
+* [Tracking] Fix failures of test-on-iotlab (#20791)
+* [TRACKING] sys/shell refactoring. (#12105)
+* [tracking] unnecessary use of floating point arithmetic (#19614)
+* _NVIC_SystemReset stuck in infinite loop when calling pm_reboot
+  through shell after flashing with J-Link (#13044)
+* `make term` no longer works with JLinkExe v6.94 (#16022)
+* arduino-nano issue (#22156)
+* at86rf215 stops receiving until sending a packet (#19653)
+* b-l072z-lrwan1: tests/ztimer_overhead: test failure (#19224)
+* backport_pr: Only works for when fork is in user (not in
+  organization) (#18486)
+* benchmark_udp: hammering with low interval causes issues (#16808)
+* boards/esp32-wroom-32: tests/mtd_raw flakey (#16130)
+* Builds fail when different execstack options are around in objects (#18522)
+* Can't build relic with benchmarks or tests (#12897)
+* CC2538-CC2592EM has a very weak transmit power (#17543)
+* cpp: Exception handling undefined (#17523)
+* cpu/stm32: fix STM32G4 flash writes failing after motor driver init (#22151)
+* cpu/stm32: some tests are failing on CM33 (l5, u5) (#17439)
+* doc/boards: information concerning access to RIOT shell (#17453)
+* doxygen: CSS hack to hide doc breaks on older browsers (#21312)
+* edbg: long lines flooded over serial become garbled (#14548)
+* examples / tests: LoRa tests fail on platforms that don't support
+  LoRa (#14520)
+* examples/gcoap: client broken (#19379)
+* Fixing warnings in RIOT static test (#22216)
+* flashing issue on frdm-k64f (#15903)
+* frdm-k22f failing tests/periph_flashpage (#17057)
+* frdm-k22f fails tests/periph_timer (#19543)
+* Freeze into semtech_loramac_send call (pkg/semtech-loramac) (#18790)
+* gcoap: gcoap_req_send and related should return negative for errors (#19393)
+* gnrc_ipv6_nib: Neighbor Solicitation ping-pong (#18164)
+* I2C Crashes Kernel on Raspberry Pi Pico (#21187)
+* ieee802154_security: Nonce is reused after reboot (#16844)
+* kconfiglib.py choice override of menuconfig bug (#19069)
+* LVGL tests produce unaligned code, fail to build (#20110)
+* lwip: drivers/at86rf2xx/at86rf2xx_netdev.c invalid state during TCP
+  disconnect (#17209)
+* lwip: invalid state transition on ieee802154_submac users (#17208)
+* Making the newlib thread-safe (#4488)
+* mcuboot: flashes but no output (#17524)
+* MTD is confusing (#17663)
+* openDSME example application does not work reliable out of the box
+  with nRF52840 MDK Dongles (#21922)
+* Order of auto_init functions (#13541)
+* periph_rtt: rtt_set_alarm() blocks IRQ for 80 plus usec on STM32 (#19520)
+* pkg/tinydtls: Multiple issues (#16108)
+* Potential race condition in compile_and_test_for_board.py (#12621)
+* RIOT is saw-toothing in energy consumption (even when idling) (#5009)
+* riotboot: ECC faults (eg. in STM32L5 or STM32WB) not handled
+  gracefully (#17874)
+* rust-gcoap example is incompatible with littlefs2 (#17817)
+* Samr30/gpio: Erasing then write mux can generate spurious IRQ (#19993)
+* samr34-xpro: some tests failing (#19223)
+* sock_dtls: unable to send big messages (#17996)
+* spurious IRQs in `periph_timer` (#18976)
+* Starlight: "Supported Boards" Known Issues (#22203)
+* stdio UART input truncated (#21564)
+* stdio_ethos: infinite shell loop (#17972)
+* stdio_tinyusb_cdc_acm hangs with picolibc (#19277)
+* STM32 Nucleo boards improperly clocked (#19778)
+* STM32F4-discovery + mrf24j40 not working (#19711)
+* sys/riotboot: documentation issues (#11243)
+* sys/usb/usbus/cdc/ecm: interface thread blocked when connected host
+  interface is down (#21098)
+* tests/lwip target board for python test is hardcoded to native (#6533)
+* tests/periph_flashpage: failing on stm32l475ve (#17280)
+* tests/pkg/relic is failing on samr21-xpro when built using llvm (#19903)
+* tests/pkg_libhydrogen: test fails on master for the samr21-xpro with
+  LLVM (#15066)
+* tests/pkg_libschc: Failing test_reassemble_success_ack_always (#19445)
+* tests/riotboot does not pass on iotlab-m3 (#22006)
+* tests/test_tools: test fails while testing on samr21-xpro/iotlab-m3 (#15888)
+* tests: broken with stdio_rtt if auto_init is disabled (#13120)
+* tests: some tests don't work with `newlib` lock functions. (#12732)
+* tracking: failing tests with stdio_cdc_acm (#21231)
+* Types in `byteorder.h` need a cleanup (#14737)
+* USB identifiers with funny characters create mojibake (#17776)
+* usbus/msc: wrong error handling and behavior after usb reset (#19478)
+* Use of multiple CAN bus on compatible boards (#14801)
+* ztimer is incompatible with real-time requirements (#18883)
+* ztimer_periodic: occasional lockups (#21374)
+
+There are 172 known issues in this release
+
+Fixed Issues since the last release (2026.01)
+=============================================
+
+- Cannot build examples using the module "sock_tcp" (#22228)
+- pkg/micropython: test appears to be broken (#22207)
+- nimble does not compile on nrf52 (#22111)
+- drivers/mpu9x50: regression (#21663)
+- rpl, rpble: handle closed connection to parent(s) (#21574)
+- dist/tools: script falsely accuses headers without C symbols of
+  lacking `extern "C"` decl (#21394)
+- [TRACKING] Fixes for automatic tests of ESP32 boards. (#12763)
+- nrfmin: driver not included in buildtest (anymore) (#12115)
+- stm32f103xx: I2C has no internal pullups and af config (#10395)
+
+9 fixed issues since last release (2026.01)
+
+
+Acknowledgements
+================
+We would like to thank all companies that provided us with hardware for porting
+and testing RIOT. Further thanks go to companies and institutions that
+directly sponsored development time. And finally, big thanks to all of you
+contributing in so many different ways to make RIOT worthwhile!
+
+
+More information
+================
+http://www.riot-os.org
+
+
+Discussions
+===========
+* Join the RIOT Matrix room at: #riot-os:matrix.org
+* Join the RIOT Forum at: forum.riot-os.org
+* Follow us on Mastodon: floss.social/@RIOT_OS
+
+
+License
+=======
+* The code developed by the RIOT community is licensed under the GNU Lesser
+  General Public License (LGPL) version 2.1 as published by the Free Software
+  Foundation.
+* Some external sources and packages are published under a separate license.
+
+All code files contain licensing information.
+
+
 RIOT-2026.01 "GroundhogLoop" - Release Notes
 ============================
 RIOT is a multi-threading operating system which enables soft real-time
