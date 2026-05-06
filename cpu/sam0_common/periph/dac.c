@@ -16,6 +16,7 @@
  */
 
 #include <assert.h>
+#include <errno.h>
 
 #include "cpu.h"
 #include "periph/dac.h"
@@ -32,6 +33,13 @@
 #define CONFIG_SAM0_DAC_RUN_ON_STANDBY 0
 #endif
 
+static dma_t tx_dma[DAC_NUMOF] = {
+    0xff,
+#if DAC_NUMOF == 2
+    0xff,
+#endif
+};
+
 static void _dac_init_clock(dac_t line)
 {
     sam0_gclk_enable(DAC_CLOCK);
@@ -47,6 +55,11 @@ static void _dac_init_clock(dac_t line)
 #endif
 
     dac_poweron(line);
+}
+
+uint32_t dac_get_freq(void)
+{
+    return sam0_gclk_freq(DAC_CLOCK) / 12;
 }
 
 static inline bool _ext_vref(void)
@@ -184,6 +197,63 @@ void dac_set(dac_t line, uint16_t value)
     _sync();
     DAC->DATA.reg = DAC_VAL(value);
 #endif
+}
+
+int dac_play_setup(dac_t line, dma_cb_t cb, void *arg)
+{
+    uint8_t dmac_id;
+#ifdef DAC_DMAC_ID_EMPTY_1
+    dmac_id = line
+            ? DAC_DMAC_ID_EMPTY_1
+            : DAC_DMAC_ID_EMPTY_0;
+#else
+    dmac_id = DAC_DMAC_ID_EMPTY;
+#endif
+
+    if (tx_dma[line] != UINT8_MAX) {
+        return -EEXIST;
+    }
+
+    tx_dma[line] = dma_acquire_channel();
+    if (tx_dma[line] == UINT8_MAX) {
+        return -ENOMEM;
+    }
+
+    dma_setup(tx_dma[line], dmac_id, 0, cb, arg);
+
+    return 0;
+}
+
+void dac_play_teardown(dac_t line)
+{
+    if (tx_dma[line] == UINT8_MAX) {
+        return;
+    }
+
+    dma_cancel(tx_dma[line]);
+    dma_disable_loop(tx_dma[line]);
+    dma_release_channel(tx_dma[line]);
+    tx_dma[line] = UINT8_MAX;
+}
+
+void dac_play(dac_t line, const uint16_t *buf, size_t len, uint8_t flags)
+{
+    void *dst;
+#ifdef DAC_SYNCBUSY_DATA1
+    dst = (void *)&DAC->DATA[line].reg;
+#else
+    dst = (void *)&DAC->DATA.reg;
+#endif
+
+    /* source buffer will be set by dac_play() */
+    dma_prepare(tx_dma[line], DMAC_BTCTRL_BEATSIZE_HWORD_Val,
+                buf + len, dst, len, DMA_INCR_SRC);
+
+    if (flags & DAC_PLAY_LOOPED) {
+        dma_enable_loop(tx_dma[line]);
+    }
+
+    dma_start(tx_dma[line]);
 }
 
 void dac_poweron(dac_t line)
