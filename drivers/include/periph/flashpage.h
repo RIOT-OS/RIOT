@@ -270,8 +270,12 @@ void flashpage_write(void *target_addr, const void *data, size_t len);
  * @param[in]  page     page to read
  * @param[out] data     memory to write the page to, MUST be FLASHPAGE_SIZE
  *                      byte
+ * @param[in] offset    offset in the page to start reading from
+ * @param[in] len       length of the data to be read.
+ *
+ * @pre     @p offset + @p len MUST be less than or equal to FLASHPAGE_SIZE.
  */
-void flashpage_read(unsigned page, void *data);
+void flashpage_read(unsigned page, void *data, size_t offset, size_t len);
 
 /**
  * @brief   Verify the given page against the given data
@@ -279,11 +283,15 @@ void flashpage_read(unsigned page, void *data);
  * @param[in] page      page to verify
  * @param[in] data      data to compare page against, MUST be FLASHPAGE_SIZE
  *                      byte of data
+ * @param[in] offset    offset in the page to start comparing from
+ * @param[in] len       length of the data to be verified.
+ *
+ * @pre     @p offset + @p len MUST be less than or equal to FLASHPAGE_SIZE.
  *
  * @return              FLASHPAGE_OK if data in the page is identical to @p data
  * @return              FLASHPAGE_NOMATCH if data and page content diverge
  */
-int flashpage_verify(unsigned page, const void *data);
+int flashpage_verify(unsigned page, const void *data, size_t offset, size_t len);
 
 /**
  * @brief   Write the given page and verify the results
@@ -383,8 +391,12 @@ void flashpage_rwwee_write(void *target_addr, const void *data, size_t len);
  * @param[in]  page     RWWEE page to read
  * @param[out] data     memory to write the RWWEE page to, MUST be FLASHPAGE_SIZE
  *                      byte
+ * @param[in] offset    offset in the RWWEE page to start reading from
+ * @param[in] len       length of the data to be read.
+ *
+ * @pre     @p offset + @p len MUST be less than or equal to FLASHPAGE_SIZE.
  */
-void flashpage_rwwee_read(unsigned page, void *data);
+void flashpage_rwwee_read(unsigned page, void *data, size_t offset, size_t len);
 
 /**
  * @brief   Verify the given RWWEE page against the given data
@@ -392,11 +404,15 @@ void flashpage_rwwee_read(unsigned page, void *data);
  * @param[in] page      RWWEE page to verify
  * @param[in] data      data to compare RWWEE page against, MUST be FLASHPAGE_SIZE
  *                      byte of data
+ * @param[in] offset    offset in the RWWEE page to start comparing from
+ * @param[in] len       length of the data to be verified.
+ *
+ * @pre     @p offset + @p len MUST be less than or equal to FLASHPAGE_SIZE.
  *
  * @return              FLASHPAGE_OK if data in the RWWEE page is identical to @p data
  * @return              FLASHPAGE_NOMATCH if data and RWWEE page content diverge
  */
-int flashpage_rwwee_verify(unsigned page, const void *data);
+int flashpage_rwwee_verify(unsigned page, const void *data, size_t offset, size_t len);
 
 /**
  * @brief   Write the given RWWEE page and verify the results

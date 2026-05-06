@@ -174,7 +174,7 @@ static int cmd_read(int argc, char **argv)
         return 1;
     }
 
-    flashpage_read(page, page_mem);
+    flashpage_read(page, page_mem, 0, sizeof(page_mem));
     printf("Read flash page %i into local page buffer\n", page);
     dump_local();
 
@@ -377,7 +377,7 @@ static int cmd_test_reserved(int argc, char **argv)
 
     printf("Reserved page num: %u \n", page);
 
-    flashpage_read(page, page_mem);
+    flashpage_read(page, page_mem, 0, sizeof(page_mem));
 
     /* test is running for the first time so initialize flash */
     if (memcmp(sig, &page_mem[1], sizeof(sig)) != 0) {
