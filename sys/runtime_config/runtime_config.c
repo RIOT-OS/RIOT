@@ -38,6 +38,10 @@ runtime_config_error_t runtime_config_add_schema_instance(
     assert(schema != NULL);
     assert(schema_instance != NULL);
 
+    if (schema == NULL || schema_instance == NULL) {
+        return RUNTIME_CONFIG_ERROR_INVALID_ARGUMENT;
+    }
+
     /* add schema to instance */
     schema_instance->schema = schema;
 
@@ -61,6 +65,10 @@ runtime_config_error_t runtime_config_get(
     assert(node != NULL);
     assert(buf != NULL);
     assert(buf_len != NULL);
+
+    if (node == NULL || buf == NULL || buf_len == NULL) {
+        return RUNTIME_CONFIG_ERROR_INVALID_ARGUMENT;
+    }
 
     if (node->type != RUNTIME_CONFIG_NODE_TYPE_PARAMETER) {
         return RUNTIME_CONFIG_ERROR_NODE_INVALID;
@@ -92,6 +100,10 @@ runtime_config_error_t runtime_config_set(
     assert(buf != NULL);
     assert(buf_len > 0);
 
+    if (node == NULL || buf == NULL || buf_len == 0) {
+        return RUNTIME_CONFIG_ERROR_INVALID_ARGUMENT;
+    }
+
     if (node->type != RUNTIME_CONFIG_NODE_TYPE_PARAMETER) {
         return RUNTIME_CONFIG_ERROR_NODE_INVALID;
     }
@@ -105,11 +117,13 @@ runtime_config_error_t runtime_config_set(
     parameter->schema->get_parameter_value_from_instance(
         parameter->id, node->as_parameter.schema_instance, &intern_val, &intern_val_len);
 
+    /* Validate buffer bounds */
     if (buf_len != intern_val_len) {
         if (buf_len > intern_val_len) {
             return RUNTIME_CONFIG_ERROR_BUF_LEN_TOO_LARGE;
         }
 
+        /* Allow undersized buffers ONLY for string or byte arrays */
         if (buf_len < intern_val_len &&
             parameter->type != RUNTIME_CONFIG_TYPE_BYTES &&
             parameter->type != RUNTIME_CONFIG_TYPE_STRING) {
@@ -237,7 +251,7 @@ static runtime_config_error_t _runtime_config_traverse_group_tree(
             rc = _runtime_config_traverse_parameter_tree(
                 schema_instance, group->parameters[i], tree_traversal_cb, context);
 
-            if (!(rc == RUNTIME_CONFIG_ERROR_NONE)) {
+            if (rc != RUNTIME_CONFIG_ERROR_NONE) {
                 return rc;
             }
         }
@@ -270,7 +284,7 @@ static runtime_config_error_t _runtime_config_traverse_schema_tree_instance(
                 schema_instance, schema_instance->schema->groups[i], tree_traversal_cb,
                 tree_traversal_depth - 1, context);
 
-            if (!(rc == RUNTIME_CONFIG_ERROR_NONE)) {
+            if (rc != RUNTIME_CONFIG_ERROR_NONE) {
                 return rc;
             }
         }
@@ -280,7 +294,7 @@ static runtime_config_error_t _runtime_config_traverse_schema_tree_instance(
             rc = _runtime_config_traverse_parameter_tree(
                 schema_instance, schema_instance->schema->parameters[i], tree_traversal_cb, context);
 
-            if (!(rc == RUNTIME_CONFIG_ERROR_NONE)) {
+            if (rc != RUNTIME_CONFIG_ERROR_NONE) {
                 return rc;
             }
         }
@@ -326,7 +340,7 @@ static runtime_config_error_t _runtime_config_traverse_schema_tree(
                 tree_traversal_depth - 1,
                 context);
 
-            if (!(rc == RUNTIME_CONFIG_ERROR_NONE)) {
+            if (rc != RUNTIME_CONFIG_ERROR_NONE) {
                 return rc;
             }
         } while (node != schema->instances.next);
@@ -359,7 +373,7 @@ static runtime_config_error_t _runtime_config_traverse_namespace_tree(
             rc = _runtime_config_traverse_schema_tree(
                 child, tree_traversal_cb, tree_traversal_depth - 1, context);
 
-            if (!(rc == RUNTIME_CONFIG_ERROR_NONE)) {
+            if (rc != RUNTIME_CONFIG_ERROR_NONE) {
                 return rc;
             }
         }
@@ -374,6 +388,12 @@ runtime_config_error_t runtime_config_traverse_config_tree(
     const uint8_t tree_traversal_depth,
     const void *context)
 {
+    assert(tree_traversal_cb != NULL);
+
+    if (tree_traversal_cb == NULL) {
+        return RUNTIME_CONFIG_ERROR_INVALID_ARGUMENT;
+    }
+
     runtime_config_error_t rc = RUNTIME_CONFIG_ERROR_NONE;
 
     if (node == NULL) {
@@ -391,7 +411,7 @@ runtime_config_error_t runtime_config_traverse_config_tree(
                 namespace, tree_traversal_cb,
                 tree_traversal_depth - 1, context);
 
-            if (!(rc == RUNTIME_CONFIG_ERROR_NONE)) {
+            if (rc != RUNTIME_CONFIG_ERROR_NONE) {
                 return rc;
             }
         }
