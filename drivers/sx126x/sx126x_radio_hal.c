@@ -184,6 +184,10 @@ void sx126x_hal_event_handler(ieee802154_dev_t *hal)
 {
     sx126x_t *dev = hal->priv;
     sx126x_irq_mask_t irq_mask;
+    const sx126x_irq_mask_t rx_mask = SX126X_IRQ_SYNC_WORD_VALID
+                                     | SX126X_IRQ_HEADER_VALID
+                                     | SX126X_IRQ_HEADER_ERROR
+                                     | SX126X_IRQ_CRC_ERROR;
 
     SX126X_CHECK_API(sx126x_get_and_clear_irq_status(dev, &irq_mask), /* no return */);
     SX126X_DEBUG(dev, "sx126x_hal_event_handler(): 0x%"PRIx16"\n", irq_mask);
@@ -192,11 +196,15 @@ void sx126x_hal_event_handler(ieee802154_dev_t *hal)
         NVIC_EnableIRQ(SUBGHZ_Radio_IRQn);
 #endif
     }
+
+    dev->incoming = rx_mask & irq_mask;
+
     if (irq_mask & SX126X_IRQ_TX_DONE) {
         SX126X_DEBUG(dev, "hal: SX126X_IRQ_TX_DONE\n");
         hal->cb(hal, IEEE802154_RADIO_CONFIRM_TX_DONE);
     }
     else if (irq_mask & SX126X_IRQ_RX_DONE) {
+        dev->incoming = 0;
         SX126X_DEBUG(dev, "hal: SX126X_IRQ_RX_DONE\n");
         uint8_t mhdr[IEEE802154_MAX_HDR_LEN];
         sx126x_rx_buffer_status_t rx_buffer_status;
@@ -218,7 +226,7 @@ void sx126x_hal_event_handler(ieee802154_dev_t *hal)
             SX126X_DEBUG(dev, "hal: RX (%s) frame\n", is_ack ? "ACK" : (is_data ? "DATA" : "UNKNOWN"));
             hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
         }
-        /* If radio is in promiscuos mode, indicate packet and
+        /* If radio is in promiscuous mode, indicate packet and
          * don't event think of sending an ACK frame :) */
         else if (dev->promisc) {
             SX126X_DEBUG(dev, "hal: Promiscuous mode is enabled.\n");
@@ -271,6 +279,11 @@ static int _write(ieee802154_dev_t *hal, const iolist_t *iolist)
 {
     sx126x_t *dev = hal->priv;
     size_t pos = 0;
+
+    if (dev->incoming) {
+        return -EBUSY;
+    }
+
     /* Full buffer used for Tx */
     SX126X_CHECK_API(sx126x_set_buffer_base_address(dev, SX126X_TX_BUFFER_OFFSET, SX126X_RX_BUFFER_OFFSET),
                      return -EIO);
@@ -331,6 +344,9 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
 
     case IEEE802154_HAL_OP_CCA:
         SX126X_DEBUG(dev, "hal: HAL_OP_CCA (CAD Detection state)\n");
+        if (dev->incoming) {
+            return -EBUSY;
+        }
         dev->cad_detected = false;
         _set_state(dev, SX126X_STATE_STANDBY);
         SX126X_CHECK_API(sx126x_set_cad(dev), return -EIO);

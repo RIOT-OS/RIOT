@@ -260,6 +260,7 @@ struct sx126x {
     bool ack_filter     : 1;                /**< whether the ACK filter is activated or not */
     bool promisc        : 1;                /**< whether the device is in promiscuous mode or not */
     bool pending        : 1;                /**< whether there pending bit should be set in the ACK frame or not */
+    bool incoming       : 1;                /**< whether currently a frame is demodulated */
     uint8_t short_addr[IEEE802154_SHORT_ADDRESS_LEN];   /**< Short (2 bytes) device address */
     uint8_t long_addr[IEEE802154_LONG_ADDRESS_LEN];     /**< Long (8 bytes) device address */
     uint16_t pan_id;                                    /**< PAN ID */
