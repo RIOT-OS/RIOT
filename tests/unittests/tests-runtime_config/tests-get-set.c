@@ -652,6 +652,37 @@ static void tests_runtime_config_cannot_use_too_large_buffer(void)
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_BUF_LEN_TOO_LARGE, res);
 }
 
+static void tests_runtime_config_cannot_use_null_arguments(void)
+{
+    runtime_config_error_t res;
+    void *output;
+    size_t output_len;
+    uint32_t val = 123;
+
+    runtime_config_node_t node = RUNTIME_CONFIG_NODE_PARAMETER(&test_full_instance_1, &runtime_config_tests_full_u32);
+
+    /* Test runtime_config_get NULL checks */
+    res = runtime_config_get(NULL, &output, &output_len);
+    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_INVALID_ARGUMENT, res);
+
+    res = runtime_config_get(&node, NULL, &output_len);
+    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_INVALID_ARGUMENT, res);
+
+    res = runtime_config_get(&node, &output, NULL);
+    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_INVALID_ARGUMENT, res);
+
+    /* Test runtime_config_set NULL checks */
+    res = runtime_config_set(NULL, &val, sizeof(val));
+    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_INVALID_ARGUMENT, res);
+
+    res = runtime_config_set(&node, NULL, sizeof(val));
+    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_INVALID_ARGUMENT, res);
+
+    /* Also check for buf_len 0, since that also is INVALID */
+    res = runtime_config_set(&node, &val, 0);
+    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_INVALID_ARGUMENT, res);
+}
+
 Test *tests_runtime_config_get_set_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures){
@@ -661,6 +692,7 @@ Test *tests_runtime_config_get_set_tests(void)
         new_TestFixture(tests_runtime_config_cannot_get_set_invalid_node_type),
         new_TestFixture(tests_runtime_config_cannot_use_too_small_buffer),
         new_TestFixture(tests_runtime_config_cannot_use_too_large_buffer),
+        new_TestFixture(tests_runtime_config_cannot_use_null_arguments),
     };
 
     EMB_UNIT_TESTCALLER(runtime_config_tests, test_runtime_config_setup, test_runtime_config_teardown, fixtures);
