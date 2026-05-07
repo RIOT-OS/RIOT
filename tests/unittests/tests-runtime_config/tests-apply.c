@@ -130,9 +130,10 @@ static void tests_runtime_config_apply_parameter(void)
         &test_nested_instance_parameter_test,
         &runtime_config_tests_nested_parameter);
 
-    runtime_config_apply(&node);
+    const runtime_config_error_t res = runtime_config_apply(&node);
 
     TEST_ASSERT(successful);
+    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 }
 
 static void tests_runtime_config_apply_group(void)
@@ -144,9 +145,10 @@ static void tests_runtime_config_apply_group(void)
         &test_nested_instance_group_test,
         &runtime_config_tests_nested_group);
 
-    runtime_config_apply(&node);
+    const runtime_config_error_t res = runtime_config_apply(&node);
 
     TEST_ASSERT(successful);
+    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 }
 
 static void tests_runtime_config_apply_instance(void)
@@ -156,9 +158,10 @@ static void tests_runtime_config_apply_instance(void)
     const runtime_config_node_t node = RUNTIME_CONFIG_NODE_SCHEMA_INSTANCE(
         &test_nested_instance_instance_test);
 
-    runtime_config_apply(&node);
+    const runtime_config_error_t res = runtime_config_apply(&node);
 
     TEST_ASSERT(successful);
+    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 }
 
 static void tests_runtime_config_apply_schema(void)
@@ -168,9 +171,10 @@ static void tests_runtime_config_apply_schema(void)
     const runtime_config_node_t node = RUNTIME_CONFIG_NODE_SCHEMA(
         &runtime_config_tests_nested);
 
-    runtime_config_apply(&node);
+    const runtime_config_error_t res = runtime_config_apply(&node);
 
     TEST_ASSERT(successful);
+    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 }
 
 static void tests_runtime_config_apply_namespace(void)
@@ -180,21 +184,24 @@ static void tests_runtime_config_apply_namespace(void)
     const runtime_config_node_t node = RUNTIME_CONFIG_NODE_NAMESPACE(
         &runtime_config_tests);
 
-    runtime_config_apply(&node);
+    const runtime_config_error_t res = runtime_config_apply(&node);
 
     TEST_ASSERT(successful);
+    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 }
 
 static void tests_runtime_config_apply_all(void)
 {
     successful = false;
-    runtime_config_apply(NULL);
+
+    const runtime_config_error_t res = runtime_config_apply(NULL);
+
     TEST_ASSERT(successful);
+    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 }
 
 Test *tests_runtime_config_apply_tests(void)
 {
-
     EMB_UNIT_TESTFIXTURES(fixtures){
         new_TestFixture(tests_runtime_config_apply_parameter),
         new_TestFixture(tests_runtime_config_apply_group),
