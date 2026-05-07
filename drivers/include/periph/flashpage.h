@@ -288,8 +288,8 @@ void flashpage_read(unsigned page, void *data, size_t offset, size_t len);
  *
  * @pre     @p offset + @p len MUST be less than or equal to FLASHPAGE_SIZE.
  *
- * @return              FLASHPAGE_OK if data in the page is identical to @p data
- * @return              FLASHPAGE_NOMATCH if data and page content diverge
+ * @retval              FLASHPAGE_OK if data in the page is identical to @p data
+ * @retval              FLASHPAGE_NOMATCH if data and page content diverge
  */
 int flashpage_verify(unsigned page, const void *data, size_t offset, size_t len);
 
@@ -302,8 +302,8 @@ int flashpage_verify(unsigned page, const void *data, size_t offset, size_t len)
  * @param[in] data      data to write to the page, MUST be FLASHPAGE_SIZE
  *                      byte.
  *
- * @return              FLASHPAGE_OK on success
- * @return              FLASHPAGE_NOMATCH if data and page content diverge
+ * @retval              FLASHPAGE_OK on success
+ * @retval              FLASHPAGE_NOMATCH if data and page content diverge
  */
 int flashpage_write_and_verify(unsigned page, const void *data);
 
@@ -409,8 +409,8 @@ void flashpage_rwwee_read(unsigned page, void *data, size_t offset, size_t len);
  *
  * @pre     @p offset + @p len MUST be less than or equal to FLASHPAGE_SIZE.
  *
- * @return              FLASHPAGE_OK if data in the RWWEE page is identical to @p data
- * @return              FLASHPAGE_NOMATCH if data and RWWEE page content diverge
+ * @retval              FLASHPAGE_OK if data in the RWWEE page is identical to @p data
+ * @retval              FLASHPAGE_NOMATCH if data and RWWEE page content diverge
  */
 int flashpage_rwwee_verify(unsigned page, const void *data, size_t offset, size_t len);
 
@@ -424,8 +424,8 @@ int flashpage_rwwee_verify(unsigned page, const void *data, size_t offset, size_
  * @param[in] data      data to write to the RWWEE page, MUST be FLASHPAGE_SIZE
  *                      byte.
  *
- * @return              FLASHPAGE_OK on success
- * @return              FLASHPAGE_NOMATCH if data and RWWEE page content diverge
+ * @retval              FLASHPAGE_OK on success
+ * @retval              FLASHPAGE_NOMATCH if data and RWWEE page content diverge
  */
 int flashpage_rwwee_write_and_verify(unsigned page, const void *data);
 
