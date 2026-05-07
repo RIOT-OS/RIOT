@@ -277,7 +277,7 @@ also that it is up-to-date with the upstream repository.
 
 ### Work on branches
 
-Avoid opening PR from the `master` branch of your fork to the master branch of
+Avoid opening a PR from the `master` branch of your fork to the master branch of
 the RIOT upstream repository: update your master branch and start a new branch
 from it.
 
@@ -287,10 +287,11 @@ $ git pull --rebase https://github.com/RIOT-OS/RIOT.git
 $ git checkout -b <new branch>
 ```
 
-Do your changes, commit, update with latest upstream master
+You can then do your changes, commit them and push them to your local repository
+by using the following command:
 
 ```console
-$ git push
+$ git push origin <your branch>
 ```
 
 ### Add fixup commits during review
@@ -311,50 +312,47 @@ $ git commit --fixup <prefix2 commit hash>
 
 ### Squash commits after review
 
-*** Note: If the static tests warn you about a no-merge keyword, please look
-at [our commit conventions][commit-conventions].
+During the course of a Pull Request, a lot of `fixup!` commits can accumulate.
+To keep the project commit history clean, these commits have to be combined
+(squashed) into sensible commits. This is a good opportunity to take a look
+again at again our [commit conventions].
 
-Squashing a commit is done using the rebase subcommand of git in interactive
-mode:
+***Note:*** The static tests will warn you about no-merge keywords such as
+`fixup` or `DONOTMERGE`. These commits have to be squashed or removed before a
+merge is permitted.
 
-```console
-$ git rebase master -i
-```
+***Watch out:*** Don't squash your commits unless a maintainer asks you to do it.
 
-You can find information on rebasing in
+Otherwise the history of review changes is lost and for large PRs, it
+makes it difficult for the reviewer to follow them. It might also happen that
+you introduce a regression and won't be able to recover your working state from
+previous commits.
+
+Squashing a commit is done using the `rebase` subcommand of git in interactive
+mode, you can find information on rebasing in the
 [GitHub rebase documentation][about-git-rebase].
 
 [about-git-rebase]: https://help.github.com/articles/about-git-rebase/
+
+The safest method to squash your commits is to find out the last commit hash
+of the `master` branch with `git merge-base HEAD master`.
+
+You can then execute `git rebase -i <last master hash>`, which will show you
+all the commits you have made since in a text editor. You can select, drop,
+reorder and squash the commits here.
 
 If you used [fixup commits](#add-fixup-commits-during-review) during the review
 phase, squashing commits can be performed in a single command:
 
 ```console
-$ git rebase -i --autosquash
+$ git rebase -i --autosquash <last master hash>
 ```
 
-***Watch out: Don't squash your commit until a maintainer asks you to do it.***
+If you encounter a merge conflict, it is generally easiest to use a merge tool
+like [meld](https://meldmerge.org/) or the built-in merge tool of your editor
+or IDE.
 
-Otherwise the history of review changes is lost and for large PRs, it
-makes it difficult for the reviewer to follow them. It might also happen that
-you introduce regression and won't be able to recover them from previous
-commits.
-
-If you encounter a merge conflict you could either resolve it by hand with an
-editor and use
-
-```console
-$ git add -p
-```
-
-To add your changes or use a merge tool like [meld](https://meldmerge.org/) to
-resolve your merge conflict.
-
-```console
-$ git mergetool
-```
-
-After the merge conflict is resolved you can continue to rebase by using
+After the merge conflict is resolved you can continue the rebase by using
 
 ```console
 $ git rebase --continue
@@ -364,7 +362,35 @@ Once squashing is done, you will have to force push your branch to update the
 PR:
 
 ```console
-$ git push --force-with-lease
+$ git push origin <your branch> --force-with-lease
+```
+
+### Manually rebasing
+
+A maintainer might ask you to rebase your Pull Request for various
+reasons. Sometimes the development on the `master` branch has progressed,
+making a rebase in your Pull Request necessary to apply upstream changes.
+
+First, you have to sync your fork to the upstream `master` branch.
+You can do that by visiting your fork on https://github.com/username/RIOT.
+You will find a message such as
+`This branch is 4 commits behind RIOT-OS/RIOT:master.`. To the right of this
+message there is a `Sync Fork` button that allows you to `Update Branch`.
+
+Once the `master` branch of your fork has been updated, you can use
+`git pull master` in your console to fetch the latest changes.
+
+To perform the rebase, you have to be on your development branch, so if
+necessary checkout to your branch and run `git rebase master`.
+
+Ideally, no conflicts should arise. If that happens, take a look at the
+previous section.
+
+You then have to force push your updated branch to the remote repository by
+using the following command:
+
+```console
+$ git push origin <your branch> --force-with-lease
 ```
 
 ## Mediating Conflicts
