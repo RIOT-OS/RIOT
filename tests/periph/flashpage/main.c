@@ -91,7 +91,7 @@ static int getpage(const char *str)
 #ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
 static void memdump(void *addr, size_t len)
 {
-    od_hex_dump	(addr, len, LINE_LEN);
+    od_hex_dump(addr, len, LINE_LEN);
 }
 
 static void dump_local(void)
@@ -520,7 +520,8 @@ static int cmd_test_rwwee(int argc, char **argv)
         return 1;
     }
 
-    fill += (page % ('z' - 'a')); // Make each page slightly different by changing starting char for easier comparison by eye
+    /* Make each page slightly different by changing starting char for easier comparison by eye */
+    fill += (page % ('z' - 'a'));
 
     for (unsigned i = 0; i < sizeof(page_mem); i++) {
         page_mem[i] = (uint8_t)fill++;
