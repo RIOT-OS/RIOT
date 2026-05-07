@@ -3,84 +3,290 @@ title: Porting Packages
 description: Guide on how to port new libraries to RIOT OS
 ---
 
-What are packages?  RIOT packages:
- - pull a specific tested version most often from the (a) origin source
- - patch them to match the RIOT architecture
- - provide a specific tested configuration (such configuration may enable
-   or disable features)
- - integrate the packages build process into the RIOT one
- - they have RIOT tests and/or examples to test/build them
+import FileTree from '@components/FileTree.astro';
 
-## Using Packages
-To add a package to the list of compiled modules you have to add it to the
-`USEPKG` macro in your application's Makefile:
+
+This guide provides porting information for libraries and applications to use
+with RIOT (to build an external module). RIOT generally distinguishes between
+modules and packages, where modules are part of the source tree and packages
+are pulled in from external sources and repositories.
+The reason for using external packages is to avoid maintaining foreign code
+as part of the RIOT project and also to avoid potential license issues.
+
+RIOT welcomes new and useful packages. If you'd like to share your work,
+consider [contributing](https://github.com/RIOT-OS/RIOT/tree/master/CONTRIBUTING.md).
+
+Since you are now the specialist for this specific package, it would be nice
+if you stay contactable for some time after the port, so there is a knowledgeable
+person available to help with potential issues that surface later on.
+
+## Structure of a package
+
+If you'd like to add a package to RIOT, you need to add a directory with the
+name of your package to the `pkg/` directory.
+The directory structure should look like this, and the files marked with an
+asterisk are mandatory.
+
+<FileTree>
+
+- \<pkgname\>
+    - patches
+        - 0001-your-fancy-changes.patch
+    - doc.md*
+    - Makefile*
+    - Makefile.dep
+    - Makefile.include
+
+</FileTree>
+
+### doc.md (required)
+
+To help people use your package, it is required to add a `doc.md` Markdown file
+to your package folder. Many packages have configuration options, other
+dependencies or limitations that might make it non-trivial to use for someone
+who is not yet familiar with the package.
+
+### Makefile (required)
+
+The `Makefile` describes how to fetch the upstream application,
+apply the patch(es) and how to build the package as a RIOT module.
+Two general templates for acquiring a package via git or downloading it via
+http are provided in `pkg/Makefile.git` and `pkg/Makefile.http`.
+You will have to define a set of variables prefixed with `PKG_` in the
+`Makefile`, which are described in more detail in the respective templates.
+
+Depending on the code quality of the package, you might have to disable some
+compiler warnings when building the package by extending the `CFLAGS` variable,
+for example:
 
 ```makefile
-USEPKG += <pkg_name>
+CFLAGS += -Wno-sign-compare
+CFLAGS += -Wno-strict-aliasing
 ```
 
-When the package can be built out-of-source, the source code of external
-packages is fetched in a global location in:
+### Makefile.include
 
-```makefile
-$(PKGDIRBASE)/$(PKG_NAME)
-```
-
-When out-of-source build is not possible (for example because the package
-build system doesn't allow it), the source code is fetched in the build
-directory of the application under:
-
-```makefile
-$(BINDIR)/pkg/$(PKG_NAME)
-```
-
-In this case, the source and the build directory are the same (currently,
-this only applies to the micropython package).
-
-## Porting an external library
-
-### Structure of a package
-
-This module provides porting information for libraries and applications to use
-with RIOT (to build an external module). If you'd like to add a package to RIOT
-you need to add a directory with the name of your package to this directory.
-This directory should contain at least one file:
-
-**Makefile**: A Makefile describing how to get the upstream application,
-apply the patch and how to build the package as a RIOT module.
-A rough template for several methods of acquiring a package is provided in
-`pkg/Makefile.git` and `pkg/Makefile.http`.
-
-If your port or the package provide header files, you need to update the
-`INCLUDES` variable in the package's `Makefile.include`:
+If your port or the package provide header files which you want to include
+from RIOT or application code, you need to extend the
+`INCLUDES` variable in the package's `Makefile.include`. This file is optional.
 
 ```makefile
 INCLUDES += -I$(RIOTPKG)/<pkg_name>/include # headers provided by the port
 INCLUDES += -I$(PKGDIRBASE)/<pkg_name> # headers provided by the package
 ```
 
+To avoid `clang` checking the documentation and integrety of the external
+headers, you can use `-Isystem$(PKGDIRBASE)/<pkg_name>` instead. This will
+treat the headers as system headers and not headers that are part of your
+code.
+
+### Makefile.dep
+
+The `Makefile.dep` is evaluated during the compilation of the RIOT application
+and can be used to pull additional dependencies that are required by your
+package. This file is optional.
+
+### patches/
+
 Patch files can be included in a `patches` directory in the package dir.
 These are applied to the upstream package to make it build with RIOT.
+The patch files should follow the general scheme `000x-descriptive-title.patch`,
+some examples are given below.
 
-### Creating a patch with git
+```
+0001-Initial-Changes.patch
+0002-Fix-encoding-issues.patch
+0003-Add-RIOT-porting-layer.patch
+...
+```
+
+See [Creating a Patch with git](#creating-a-patch-with-git) for more
+information about how to create a patch.
+
+### Additional Sources and Headers
+
+Your package folder can also contain additional source or header files that
+are required for the package to work.
+Due to the heterogenous nature of external packages, this is highly specific
+to the package in question. It is best to look at other packages and their
+use of additional source or header files to understand how to use this
+feature.
+
+To include the additional headers, you have to create a `Makefile.include` as
+discussed above.
+
+## Using git to fetch Packages
+
+***TODO:*** This section should have more information about how `pkg/pkg.mk` works
+internally and the steps of preparing a package.
+
+### Using Sparse Checkout
+
+Some repositories can have a considerable size (hundreds of megabytes or even
+gigabytes) when often only some files are required.
+To avoid having to pull the repository on every fresh rebuild, you can specify
+the files you want to use by setting the `PKG_SPARSE_PATHS` variable.
+
+You can either specify subdirectories of the external repository or individual
+files:
+
+```makefile
+PKG_SPARSE_PATHS += dist/Makefile         # individual file
+PKG_SPARSE_PATHS += dist/platform/common  # folder
+```
+
+If you are using an old version of git, you might observe that more files are
+copied to your `build/<pkgname>` subdirectory than you have specified. This is
+normal and caused by git evaluating the given paths as patterns.
+
+### Using a Local Copy for Development
+
+The build system will always pull a fresh copy of the package from the git
+repository linked in your package's `Makefile`.
+
+This can make the development challenging, as every local change will be
+overridden by a new compile run, leading to data loss and potentially the loss
+of many hours of work.
+
+To avoid having to set up a separate development repository, you can temporarily
+specify a local folder using the `PKG_SOURCE_LOCAL` variable in your package's
+`Makefile` or by setting `PKG_SOURCE_LOCAL_<pkgname>` in your environment.
+
+```shell
+PKG_SOURCE_LOCAL_<pkgname>=~/customized_package_folder make -C tests/pkg/<pkgname>
+```
+
+It is recommended to specify an absolute path to avoid path confusion, depending
+on the `make` call you used and the current folder your shell is in.
+
+While in theory you can also set `PKG_SOURCE_LOCAL` in the environment, this is
+not recommended as it will affect *all* packages and therefore lead to
+compilation issues for many microcontrollers, which rely on packages for vendor
+files etc.
+
+:::note
+Remember to remove the `PKG_SOURCE_LOCAL` variable from your package's
+`Makefile` before submitting a Pull Request!
+:::
+
+### Using a Mirror URL
+
+Not all packages are hosted on GitHub, which offers nearly unlimited bandwidth
+for storing and fetching packages. Some are hosted on small servers that are
+easily overloaded or are unreliable.
+
+In that case, you can ask the maintainers to host a mirror on
+[the RIOT OS pkgmirror](https://github.com/RIOT-OS-pkgmirror). You should
+still set `PKG_URL` to the original repository URL, but you can set
+`PKG_MIRROR_URL` to the mirror's URL.
+
+The `PKG_USE_MIRROR` variable works as a switch to select between the original
+`PKG_URL` when set to `0` and the `PKG_MIRROR_URL` when set to `1`.
+
+Please note that mirroring a repository should remain the exception.
+
+### Building In-Source and Out-of-Source
+
+Packages come with a variety of different build systems and different
+integration approaches. The default approach is called out-of-source building.
+The git repository will be cloned into `PKG_SOURCE_DIR`. The default path
+for it is `$(PKGDIRBASE)/$(PKG_NAME)`.
+If your package has to be built separately from the RIOT build process, for
+example when the package is using CMake, the separate `PKG_BUILD_DIR`
+directory should be used for the build process. The default path for
+it is `$(BINDIR)/pkg-build/$(PKG_NAME)`.
+If no separate build process is required, the `PKG_BUILD_DIR` can be left
+unused.
+
+Below is a typical file tree for out-of-source building.
+`PKGDIRBASE` is typically set to `$(BUILD_DIR)/pkg` and `BUILD_DIR`
+is set to `$(RIOTBASE)/build`.
+
+<FileTree>
+- $(RIOTBASE)
+  - examples
+    - \<application\>
+      - bin = $(BINDIRBASE)
+        - \<board\> = $(BINDIR)
+          - pkg-build
+            - \<pkgname\> = $(PKG_BUILD_DIR)
+  - build = $(BUILD_DIR)
+    - pkg = $(PKGDIRBASE)
+      - \<pkgname\> = $(PKG_SOURCE_DIR)
+
+</FileTree>
+
+:::note
+You can change `PKG_SOURCE_DIR` and `PKG_BUILD_DIR` in your package's
+`Makefile`, but you should not change `PKGDIRBASE`, `BINDIR` or
+`BUILD_DIR`, as this can quickly lead to unforeseen side effects.
+:::
+
+If your package can not be build out-of-source, you can set the
+`PKG_BUILD_OUT_OF_SOURCE` variable to `0`. This will cause the buildsystem
+to set `$(PKG_BUILD_DIR) = $(PKG_SOURCE_DIR) = $(BINDIR)/pkg/$(PKG_NAME)`.
+
+The `PKG_SOURCE_DIR` can be changed, while the `PKG_BUILD_DIR` is fixed.
+
+<FileTree>
+
+- $(RIOTBASE)
+  - examples
+    - \<application\>
+      - bin = $(BINDIRBASE)
+        - \<board\> = $(BINDIR)
+          - pkg
+            - \<pkgname\> = $(PKG_SOURCE_DIR) = $(PKG_BUILD_DIR)
+
+</FileTree>
+
+Special precautions have been taken to avoid deleting source files, when the
+`clean` target is called, so only intermediate build files are deleted.
+
+In-source builds are the exception and only very few packages require it.
+
+## Using http to fetch Packages
+
+If your package is not available in form of a repository, you can base your
+package's `Makefile` on the `pkg/Makefile.http` example and fill out the
+individual build steps that are required by your package.
+
+The http-based process is lacking many of the quality-of-life features that
+the git-based process offers. For example, the automatic patching is currently
+only supported for git-based packages and has to be implemented manually
+for http based packages.
+
+## Creating a Patch with git
 
 Assuming your upstream library resides in a git repository, you can create the
 patch files as follows:
  - checkout the targeted version of the upstream application
- - create a new branch (e.g. `riot-port`)
+ - create a new branch (e.g. `riot-port` by executing `git checkout -b riot-port`)
  - conduct necessary changes (e.g. edit, add, or remove some files)
- - commit your changes using `git commit`
+ - commit your changes using `git commit`. Remember to add a detailed
+   description in your commit, as this will be added to the patch as well.
  - create the patch files using `git format-patch -n riot-port`
- - move the resulting patch files to the patches directory of your package.
+ - move the resulting patch files to the `patches/` directory of your package
+ - see [patches/](#patches) for more information about how to name your
+   patch files
 
-### Packages outside of RIOTPKG
+Try to keep the patches of reasonable size to help with the review process.
+Patches often have to be updated when changes in the upstream repository were
+made and having specific patches can make the update process a lot easier.
+
+If you have discovered any bugs or changes that the upstream repository would
+also benefit from, you should of course create a Pull Request at the upstream
+repository and keep the patch singled out. Once your Pull Request was merged,
+you can remove the individual patch file.
+
+## Packages outside of RIOTPKG
 
 It can be beneficial to create packages outside of the RIOT tree. For example
 if one is working on new packages that aren't ready to be committed to
 upstream or if an application needs its own unique packages. For this, one
 can use the `EXTERNAL_PKG_DIRS` make variable. It works similar to the way
 [external modules](https://guide.riot-os.org/advanced_tutorials/creating_modules/#modules-outside-of-riotbase)
-are handled. In your application's Makefile, in addition to adding the package
+are handled. In your application's `Makefile`, in addition to adding the package
 name to `USEPKG` as shown above, add the path to a folder that contains your
 external packages:
 
@@ -94,11 +300,8 @@ The path is allowed to be relative to the application's directory.
 The name of an external package must be unique (both in regard to
 other external packages, as well to native RIOT packages). Additionally, the
 directory containing the packages must match the package name, e.g. package
-`foo`must be located in `<PATH_IN_EXTERNAL_PKG_DIRS>/foo`.
+`foo` must be located in `<PATH_IN_EXTERNAL_PKG_DIRS>/foo`.
 :::
 
 An example can be found in
 [`tests/build_system/external_pkg_dirs`](https://github.com/RIOT-OS/RIOT/tree/master/tests/build_system/external_pkg_dirs)
-
-RIOT welcomes new and useful packages. If you'd like to share your work,
-consider [contributing](https://github.com/RIOT-OS/RIOT/tree/master/CONTRIBUTING.md).
