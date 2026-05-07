@@ -110,6 +110,7 @@ extern "C" {
             /* CPU has APB3, but no periph enable registers for the bus. */
             #undef APB3_PERIPH_EN               /* not defined */
 #elif   defined(APB3PERIPH_BASE) || \
+        defined(APB3PERIPH_BASE_NS) || \
         defined(APB3PERIPH_BASE_S) || \
         defined(CPU_FAM_STM32H7) || \
         defined(CPU_FAM_STM32U3)

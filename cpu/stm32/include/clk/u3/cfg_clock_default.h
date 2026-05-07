@@ -73,8 +73,13 @@ extern "C" {
 #  define CONFIG_CLOCK_APB2_DIV (1)
 #endif
 
+#ifndef CONFIG_CLOCK_APB3_DIV
+#  define CONFIG_CLOCK_APB3_DIV (1)
+#endif
+
 #define CLOCK_APB1 (CLOCK_AHB / CONFIG_CLOCK_APB1_DIV)
 #define CLOCK_APB2 (CLOCK_AHB / CONFIG_CLOCK_APB2_DIV)
+#define CLOCK_APB3 (CLOCK_AHB / CONFIG_CLOCK_APB3_DIV)
 
 #ifdef __cplusplus
 }

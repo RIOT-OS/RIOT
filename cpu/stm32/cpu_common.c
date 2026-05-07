@@ -79,9 +79,16 @@ static const uint8_t apbmul[] = {
 #endif
 #if defined(APB2_PERIPH_EN)
 #if (CLOCK_APB2 < CLOCK_CORECLOCK)
-    [APB2] = 2
+    [APB2] = 2,
 #else
-    [APB2] = 1
+    [APB2] = 1,
+#endif
+#endif
+#if defined(APB3_PERIPH_EN) && defined(CLOCK_APB3)
+#if (CLOCK_APB3 < CLOCK_CORECLOCK)
+    [APB3] = 2,
+#else
+    [APB3] = 1,
 #endif
 #endif
 };
@@ -372,9 +379,14 @@ uint32_t periph_apb_clk(bus_t bus)
     if (bus == APB2) {
         return CLOCK_APB2;
     }
+#ifdef CLOCK_APB3
+    if (bus == APB3) {
+        return CLOCK_APB3;
+    }
+#endif /* CLOCK_APB3 */
 #else
     (void)bus;
-#endif
+#endif /* CLOCK_APB2 */
     return CLOCK_APB1;
 }
 

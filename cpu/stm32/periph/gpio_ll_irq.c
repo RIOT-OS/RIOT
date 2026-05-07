@@ -37,16 +37,6 @@
 #define EXTI_NUMOF          (16U)
 #define EXTI_MASK           (0xFFFF)
 
-#if defined(CPU_FAM_STM32U3)
-/* STM32U3: one NVIC line per EXTI (see stm32u3xxxx.h IRQn_Type, e.g. EXTI0_IRQn) */
-static const IRQn_Type _stm32u3_exti_irqn[EXTI_NUMOF] = {
-    EXTI0_IRQn,  EXTI1_IRQn,  EXTI2_IRQn,  EXTI3_IRQn,
-    EXTI4_IRQn,  EXTI5_IRQn,  EXTI6_IRQn,  EXTI7_IRQn,
-    EXTI8_IRQn,  EXTI9_IRQn,  EXTI10_IRQn, EXTI11_IRQn,
-    EXTI12_IRQn, EXTI13_IRQn, EXTI14_IRQn, EXTI15_IRQn,
-};
-#endif
-
 #if defined(EXTI_SWIER_SWI0) || defined(EXTI_SWIER_SWIER0)
 #  define EXTI_REG_SWIER        (EXTI->SWIER)
 #elif defined(EXTI_SWIER1_SWI0) || defined(EXTI_SWIER1_SWIER0)
@@ -140,10 +130,9 @@ static IRQn_Type get_irqn(uint8_t pin)
 {
     /* TODO: Come up with a way that this doesn't need updates whenever a new
      * MCU family gets added */
-#if defined(CPU_FAM_STM32L5) ||  defined(CPU_FAM_STM32U5)
+#if defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
+    defined(CPU_FAM_STM32U5)
     return EXTI0_IRQn + pin;
-#elif defined(CPU_FAM_STM32U3)
-    return _stm32u3_exti_irqn[pin];
 #elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32C0)
     if (pin < 2) {
