@@ -14,6 +14,22 @@ software and hardware timers are supported.
 
 Lets take a look at how we can use modules in RIOT and where to find them.
 
+## About Modules and Packages
+
+RIOT generally distinguishes between modules and packages, where modules are
+part of the source tree and packages are pulled in from external sources and
+repositories.
+The reason for using external packages is to avoid maintaining foreign code
+as part of the RIOT project and also to avoid potential license issues.
+
+External packages are sometimes patched by the RIOT build system to interact
+with the built-in functions that RIOT provides rather than what might have
+originally been intended.
+
+While the goal is to work with external packages as seamlessly as possible,
+the integration can be less elegant or straight forward to use compared to
+the built-in modules.
+
 ## Step 1: Finding Modules
 
 RIOT provides a number of modules that you can use in your application,
@@ -88,3 +104,21 @@ ztimer_sleep(ZTIMER_SEC, 3);
 
 That's it! You have successfully used a module in RIOT with just a few lines of
 code.
+
+## Step 3: Using Packages
+
+As previously discussed, RIOT provides some external packages that you can
+include in your application.
+
+You can include a package, for example `mcufont`, by adding this line to your
+`Makefile`:
+
+```makefile
+USEPKG += mcufont
+```
+
+Using packages is often more challenging than using modules. Some packages
+require additional `CFLAGS` or other configuration flags to function as
+intended. So the best strategy for using a package is to look at examples or
+tests that use it. The package tests can be found in the `examples/pkg`
+subdirectory.
