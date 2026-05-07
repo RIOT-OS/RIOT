@@ -63,7 +63,7 @@ runtime_config_error_t runtime_config_get(
     assert(buf_len != NULL);
 
     if (node->type != RUNTIME_CONFIG_NODE_TYPE_PARAMETER) {
-        return -RUNTIME_CONFIG_ERROR_NODE_INVALID;
+        return RUNTIME_CONFIG_ERROR_NODE_INVALID;
     }
 
     /* get pointer to internal value buffer and length */
@@ -93,7 +93,7 @@ runtime_config_error_t runtime_config_set(
     assert(buf_len > 0);
 
     if (node->type != RUNTIME_CONFIG_NODE_TYPE_PARAMETER) {
-        return -RUNTIME_CONFIG_ERROR_NODE_INVALID;
+        return RUNTIME_CONFIG_ERROR_NODE_INVALID;
     }
 
     /* get pointer to the internal value buffer and length */
@@ -105,8 +105,16 @@ runtime_config_error_t runtime_config_set(
     parameter->schema->get_parameter_value_from_instance(
         parameter->id, node->as_parameter.schema_instance, &intern_val, &intern_val_len);
 
-    if (buf_len > intern_val_len) {
-        return -RUNTIME_CONFIG_ERROR_BUF_LEN_TOO_LARGE;
+    if (buf_len != intern_val_len) {
+        if (buf_len > intern_val_len) {
+            return RUNTIME_CONFIG_ERROR_BUF_LEN_TOO_LARGE;
+        }
+
+        if (buf_len < intern_val_len &&
+            parameter->type != RUNTIME_CONFIG_TYPE_BYTES &&
+            parameter->type != RUNTIME_CONFIG_TYPE_STRING) {
+            return RUNTIME_CONFIG_ERROR_BUF_LEN_TOO_SMALL;
+        }
     }
 
     /* copy buffer to apply the new value to the correct instance of the schema */

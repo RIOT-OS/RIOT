@@ -96,10 +96,8 @@ static void tests_runtime_config_min_values(void)
     void *output;
     size_t output_len;
 
-    runtime_config_node_t node = {
-        .type = RUNTIME_CONFIG_NODE_TYPE_PARAMETER,
-        .as_parameter.schema_instance = &test_full_instance_1,
-    };
+    /* The parameter is NULL, because we will set it specifically for each test case below */
+    runtime_config_node_t node = RUNTIME_CONFIG_NODE_PARAMETER(&test_full_instance_1, NULL);
 
     /* bytes */
     typedef struct {
@@ -267,10 +265,8 @@ static void tests_runtime_config_zero_values(void)
     void *output;
     size_t output_len;
 
-    runtime_config_node_t node = {
-        .type = RUNTIME_CONFIG_NODE_TYPE_PARAMETER,
-        .as_parameter.schema_instance = &test_full_instance_1,
-    };
+    /* The parameter is NULL, because we will set it specifically for each test case below */
+    runtime_config_node_t node = RUNTIME_CONFIG_NODE_PARAMETER(&test_full_instance_1, NULL);
 
     /* bytes */
     typedef struct {
@@ -440,10 +436,8 @@ static void tests_runtime_config_ensure_that_max_values_can_be_set_and_get(void)
     void *output;
     size_t output_len;
 
-    runtime_config_node_t node = {
-        .type = RUNTIME_CONFIG_NODE_TYPE_PARAMETER,
-        .as_parameter.schema_instance = &test_full_instance_1,
-    };
+    /* The parameter is NULL, because we will set it specifically for each test case below */
+    runtime_config_node_t node = RUNTIME_CONFIG_NODE_PARAMETER(&test_full_instance_1, NULL);
 
     /* bytes */
     typedef struct {
@@ -613,12 +607,60 @@ static void tests_runtime_config_ensure_that_max_values_can_be_set_and_get(void)
     TEST_ASSERT(input_f64 == *(double *)output);
 }
 
+static void tests_runtime_config_cannot_get_set_invalid_node_type(void)
+{
+    runtime_config_error_t res;
+    void *output;
+    size_t output_len;
+
+    /* A node targeting something other than a parameter */
+    runtime_config_node_t node = RUNTIME_CONFIG_NODE_GROUP(&test_full_instance_1, NULL);
+
+    /* Ensure get fails with invalid node error */
+    res = runtime_config_get(&node, &output, &output_len);
+    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NODE_INVALID, res);
+
+    /* Ensure set fails with invalid node error */
+    uint32_t val = 123;
+    res = runtime_config_set(&node, &val, sizeof(val));
+    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NODE_INVALID, res);
+}
+
+static void tests_runtime_config_cannot_use_too_small_buffer(void)
+{
+    runtime_config_error_t res;
+
+    runtime_config_node_t node = RUNTIME_CONFIG_NODE_PARAMETER(&test_full_instance_1, &runtime_config_tests_full_u32);
+
+    uint16_t too_small_buffer = 0;
+
+    /* Ensure passing a strictly smaller buffer trips the bounds check */
+    res = runtime_config_set(&node, &too_small_buffer, sizeof(too_small_buffer));
+    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_BUF_LEN_TOO_SMALL, res);
+}
+
+static void tests_runtime_config_cannot_use_too_large_buffer(void)
+{
+    runtime_config_error_t res;
+
+    runtime_config_node_t node = RUNTIME_CONFIG_NODE_PARAMETER(&test_full_instance_1, &runtime_config_tests_full_u8);
+
+    uint32_t too_large_buffer = 0;
+
+    /* Ensure passing a strictly larger buffer trips the bounds check */
+    res = runtime_config_set(&node, &too_large_buffer, sizeof(too_large_buffer));
+    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_BUF_LEN_TOO_LARGE, res);
+}
+
 Test *tests_runtime_config_get_set_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures){
         new_TestFixture(tests_runtime_config_min_values),
         new_TestFixture(tests_runtime_config_zero_values),
         new_TestFixture(tests_runtime_config_ensure_that_max_values_can_be_set_and_get),
+        new_TestFixture(tests_runtime_config_cannot_get_set_invalid_node_type),
+        new_TestFixture(tests_runtime_config_cannot_use_too_small_buffer),
+        new_TestFixture(tests_runtime_config_cannot_use_too_large_buffer),
     };
 
     EMB_UNIT_TESTCALLER(runtime_config_tests, test_runtime_config_setup, test_runtime_config_teardown, fixtures);
