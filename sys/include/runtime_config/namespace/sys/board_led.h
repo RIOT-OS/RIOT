@@ -9,8 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_runtime_config_namespace_sys_board_led Runtime configuration
- *              schema: BOARD_LED
+ * @defgroup    sys_runtime_config_namespace_sys_board_led Schema: BOARD_LED
  * @ingroup     sys_runtime_config_namespace_sys
  * @brief       Runtime configuration BOARD_LED schema representing the basic
  *              structure of a BOARD LED

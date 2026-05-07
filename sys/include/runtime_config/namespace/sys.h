@@ -9,8 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_runtime_config_namespace_sys Runtime configuration "sys"
- *              namespace
+ * @defgroup    sys_runtime_config_namespace_sys Namespace: "sys"
  * @ingroup     sys_runtime_config
  * @brief       Runtime configuration namespace "sys" module
  * @{

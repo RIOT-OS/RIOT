@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_runtime_config_namespace_tests Runtime configuration "Tests" namespace
+ * @defgroup    sys_runtime_config_namespace_tests Namesp"Tests"
  * @ingroup     tests
  * @brief       Runtime configuration "tests" namespace providing configuration
  *              schemas for testing the runtime_config sys module

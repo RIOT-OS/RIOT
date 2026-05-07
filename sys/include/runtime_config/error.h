@@ -7,7 +7,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_runtime_config_error Runtime configuration error
+ * @defgroup    sys_runtime_config_error Error
  * @ingroup     sys_runtime_config
  * @brief       Runtime configuration "Error" module providing runtime
  *              configuration module specific error codes
