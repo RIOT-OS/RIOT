@@ -40,6 +40,16 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+/* STM32U3 CMSIS exposes PMA base as USB_DRD_PMAADDR, not legacy USB_PMAADDR */
+#if defined(CPU_LINE_STM32U385xx)
+#ifndef USB_PMAADDR
+#define USB_PMAADDR             USB_DRD_PMAADDR
+#endif
+#ifndef USB1_PMAADDR
+#define USB1_PMAADDR            USB_DRD_PMAADDR
+#endif
+#endif
+
 #ifndef USB1_PMAADDR
 #define USB1_PMAADDR USB_PMAADDR
 #endif /* ndef USB1_PMAADDR */
@@ -49,8 +59,7 @@
  *          (CHEP / CNTR) names in STM32U3 CMSIS headers.
  * @{
  */
-#if defined(CPU_FAM_STM32U3) || defined(CPU_LINE_STM32U385xx) || \
-    defined(CPU_LINE_STM32U385XX)
+#if defined(CPU_LINE_STM32U385xx)
 #ifndef USB_CNTR_FRES
 #  define USB_CNTR_FRES             USB_CNTR_USBRST
 #endif
@@ -111,7 +120,7 @@
 #define _PMA_ACCESS_SCHEME      (1)     /* 1 x 16-bit/word */
 #define _PMA_ACCESS_STEP_SIZE   (2)     /* Step size in 16-bit half-words when
                                          * accessing the PMA SRAM from CPU */
-#elif defined(CPU_LINE_STM32U385xx) || defined(CPU_LINE_STM32U385XX)
+#elif defined(CPU_LINE_STM32U385xx)
 
 #define _ENDPOINT_NUMOF         (8)
 #define _PMA_SRAM_SIZE          (2048)  /* see USB_DRD_PMA_SIZE in device header */
@@ -142,8 +151,7 @@ static uint8_t* _app_pbuf[_ENDPOINT_NUMOF];
 const usbdev_driver_t driver;
 
 /* STM32U3: USB full-speed is USB DRD (not legacy USB_TypeDef) — only this family */
-#if defined(CPU_FAM_STM32U3) || defined(CPU_LINE_STM32U385xx) || \
-    defined(CPU_LINE_STM32U385XX)
+#if defined(CPU_LINE_STM32U385xx)
 static USB_DRD_TypeDef *_global_regs(const stm32_usbdev_fs_config_t *conf)
 {
     return (USB_DRD_TypeDef *)conf->base_addr;
@@ -440,8 +448,12 @@ static void _usbdev_init(usbdev_t *dev)
     _global_regs(conf)->CNTR &= ~USB_CNTR_FRES;
     /* Clear interrupt register */
     _global_regs(conf)->ISTR = 0x0000;
+#if !defined(CPU_LINE_STM32U385xx)
+    /* Legacy USB_FS: BTABLE selects buffer-table offset inside PMA SRAM.
+     * USB DRD FS on STM32U3 has no BTABLE register; table is fixed at PMA base 0 */
     /* Set BTABLE at start of USB SRAM */
     _global_regs(conf)->BTABLE = 0x0000;
+#endif
     /* Set default address after reset */
     _global_regs(conf)->DADDR = USB_DADDR_EF;
     /* Unmask the interrupt in the NVIC */
@@ -455,8 +467,7 @@ static void _usbdev_init(usbdev_t *dev)
     /* Enable USB IRQ */
     NVIC_EnableIRQ(conf->irqn);
     /* fill USB SRAM with zeroes */
-#if defined(CPU_FAM_STM32U3) || defined(CPU_LINE_STM32U385xx) || \
-    defined(CPU_LINE_STM32U385XX)
+#if defined(CPU_LINE_STM32U385xx)
     /* U3 USB DRD PMA is 2 KiB; other lines keep the historical clear size */
     memset((uint8_t *)USB1_PMAADDR, 0, _PMA_SRAM_SIZE);
 #else
