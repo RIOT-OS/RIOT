@@ -52,7 +52,21 @@ static runtime_config_error_t apply_group_cb(
     return RUNTIME_CONFIG_ERROR_NONE;
 }
 
-static bool successful = false;
+typedef struct {
+    uint32_t namespace;
+    uint32_t schema;
+    uint32_t instance;
+    uint32_t group;
+    uint32_t group_parameter;
+    uint32_t parameter;
+} node_counter_t;
+
+static node_counter_t node_counter;
+
+static void reset_node_counter(void)
+{
+    memset(&node_counter, 0, sizeof(node_counter));
+}
 
 static runtime_config_tests_nested_instance_t test_nested_instance_data = {
     .parameter = 9,
@@ -68,66 +82,56 @@ static runtime_config_schema_instance_t test_nested_instance_1 = {
     .apply_group_or_parameter_cb = apply_group_cb,
 };
 
-static runtime_config_error_t export_parameter_cb(const runtime_config_node_t *node,
-                                                  const void *context)
+static runtime_config_error_t traverse_cb(
+    const runtime_config_node_t *node,
+    const void *context)
 {
     (void)context;
 
-    if (node->type == RUNTIME_CONFIG_NODE_TYPE_PARAMETER && node->as_parameter.parameter != NULL &&
-        node->as_parameter.parameter->id == *(runtime_config_parameter_id_t *)context &&
-        node->as_parameter.schema_instance == &test_nested_instance_1) {
-        successful = true;
-    }
+    switch (node->type) {
+    case RUNTIME_CONFIG_NODE_TYPE_PARAMETER:
+        if (node->as_parameter.parameter->schema->id != RUNTIME_CONFIG_TESTS_NESTED) {
+            /* We only consider the nested schema for this test */
+            return RUNTIME_CONFIG_ERROR_NONE;
+        }
+        if (node->as_parameter.parameter->id == RUNTIME_CONFIG_TESTS_NESTED_PARAMETER) {
+            node_counter.parameter++;
+        }
+        if (node->as_parameter.parameter->id == RUNTIME_CONFIG_TESTS_NESTED_GROUP_PARAMETER) {
+            node_counter.group_parameter++;
+        }
+        break;
 
-    return RUNTIME_CONFIG_ERROR_NONE;
-}
+    case RUNTIME_CONFIG_NODE_TYPE_GROUP:
+        if (node->as_group.group->schema->id != RUNTIME_CONFIG_TESTS_NESTED) {
+            /* We only consider the nested schema for this test */
+            return RUNTIME_CONFIG_ERROR_NONE;
+        }
+        if (node->as_group.group->id == RUNTIME_CONFIG_TESTS_NESTED_GROUP) {
+            node_counter.group++;
+        }
 
-static runtime_config_error_t export_group_cb(const runtime_config_node_t *node,
-                                              const void *context)
-{
-    (void)context;
+        break;
 
-    if (node->type == RUNTIME_CONFIG_NODE_TYPE_GROUP && node->as_group.group != NULL &&
-        node->as_group.group->id == *(runtime_config_group_id_t *)context) {
-        successful = true;
-    }
+    case RUNTIME_CONFIG_NODE_TYPE_SCHEMA_INSTANCE:
+        if (node->as_schema_instance->schema->id != RUNTIME_CONFIG_TESTS_NESTED) {
+            /* We only consider the nested schema for this test */
+            return RUNTIME_CONFIG_ERROR_NONE;
+        }
+        node_counter.instance++;
+        break;
 
-    return RUNTIME_CONFIG_ERROR_NONE;
-}
+    case RUNTIME_CONFIG_NODE_TYPE_SCHEMA:
+        if (node->as_schema->id != RUNTIME_CONFIG_TESTS_NESTED) {
+            /* We only consider the nested schema for this test */
+            return RUNTIME_CONFIG_ERROR_NONE;
+        }
+        node_counter.schema++;
+        break;
 
-static runtime_config_error_t export_instance_cb(const runtime_config_node_t *node,
-                                                 const void *context)
-{
-    (void)context;
-
-    if (node->type == RUNTIME_CONFIG_NODE_TYPE_SCHEMA_INSTANCE && node->as_schema_instance == &test_nested_instance_1) {
-        successful = true;
-    }
-
-    return RUNTIME_CONFIG_ERROR_NONE;
-}
-
-static runtime_config_error_t export_schema_cb(const runtime_config_node_t *node,
-                                               const void *context)
-{
-    (void)context;
-
-    if (node->type == RUNTIME_CONFIG_NODE_TYPE_SCHEMA && node->as_schema != NULL &&
-        node->as_schema == &runtime_config_tests_nested) {
-        successful = true;
-    }
-
-    return RUNTIME_CONFIG_ERROR_NONE;
-}
-
-static runtime_config_error_t export_namespace_cb(const runtime_config_node_t *node,
-                                                  const void *context)
-{
-    (void)context;
-
-    if (node->type == RUNTIME_CONFIG_NODE_TYPE_NAMESPACE && node->as_namespace != NULL &&
-        node->as_namespace == &runtime_config_tests) {
-        successful = true;
+    case RUNTIME_CONFIG_NODE_TYPE_NAMESPACE:
+        node_counter.namespace++;
+        break;
     }
 
     return RUNTIME_CONFIG_ERROR_NONE;
@@ -148,17 +152,18 @@ static void test_runtime_config_teardown(void)
 
 static void tests_runtime_config_traverse_parameter(void)
 {
-    const runtime_config_parameter_id_t parameter_id = RUNTIME_CONFIG_TESTS_NESTED_PARAMETER;
-
-    successful = false;
-
     const runtime_config_node_t node = RUNTIME_CONFIG_NODE_PARAMETER(
         &test_nested_instance_1,
         &runtime_config_tests_nested_parameter);
 
-    const runtime_config_error_t res = runtime_config_traverse_config_tree(&node, &export_parameter_cb, 0, &parameter_id);
-
-    TEST_ASSERT(successful);
+    reset_node_counter();
+    const runtime_config_error_t res = runtime_config_traverse_config_tree(&node, &traverse_cb, 0, NULL);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 }
 
@@ -169,40 +174,37 @@ static void tests_runtime_config_traverse_group(void)
         &test_nested_instance_1,
         &runtime_config_tests_nested_group);
 
-    /* check if group gets exported */
-    const runtime_config_group_id_t group_id = RUNTIME_CONFIG_TESTS_NESTED_GROUP;
-
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_group_cb, 0, &group_id);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 0 => group + everything under it gets called */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 0, NULL);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* check that siblings get NOT exported */
-    const runtime_config_parameter_id_t sibling_parameter_id = RUNTIME_CONFIG_TESTS_NESTED_PARAMETER;
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_parameter_cb, 0, &sibling_parameter_id);
-    TEST_ASSERT_EQUAL_INT(false, successful);
+    /* tree_traversal_depth 1 => only group gets called */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 1, NULL);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* check if children get exported */
-    const runtime_config_parameter_id_t child_parameter_id = RUNTIME_CONFIG_TESTS_NESTED_GROUP_PARAMETER;
-
-    /* tree_traversal_depth 0 => infinite => parameter gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_parameter_cb, 0, &child_parameter_id);
-    TEST_ASSERT(successful);
-    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
-
-    /* tree_traversal_depth 1 => only group => parameter gets NOT exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_parameter_cb, 1, &child_parameter_id);
-    TEST_ASSERT_EQUAL_INT(false, successful);
-    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
-
-    /* tree_traversal_depth 2 => group + 1 level more => parameter gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_parameter_cb, 2, &child_parameter_id);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 2 => group + 1 level => nested parameter is called */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 2, NULL);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 }
 
@@ -212,39 +214,48 @@ static void tests_runtime_config_traverse_instance(void)
     const runtime_config_node_t node = RUNTIME_CONFIG_NODE_SCHEMA_INSTANCE(
         &test_nested_instance_1);
 
-    /* check if instance gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_instance_cb, 0, NULL);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 0 => instance + everything below gets called */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 0, NULL);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* check if group gets exported */
-    const runtime_config_group_id_t group_id = RUNTIME_CONFIG_TESTS_NESTED_GROUP;
-
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_group_cb, 0, &group_id);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 1 => only instance gets called */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 1, NULL);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* check if parameter get exported */
-    const runtime_config_parameter_id_t child_parameter_id = RUNTIME_CONFIG_TESTS_NESTED_GROUP_PARAMETER;
-
-    /* tree_traversal_depth 0 => infinite => parameter gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_parameter_cb, 0, &child_parameter_id);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 2 => instance + 1 level (nested parameter is not called) */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 2, NULL);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* tree_traversal_depth 2 => only instance and group => parameter gets NOT exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_parameter_cb, 2, &child_parameter_id);
-    TEST_ASSERT_EQUAL_INT(false, successful);
-    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
-
-    /* tree_traversal_depth 3 => instance, group and parameter => parameter gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_parameter_cb, 3, &child_parameter_id);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 3 => instance + everything below in this case */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 3, NULL);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 }
 
@@ -254,45 +265,59 @@ static void tests_runtime_config_traverse_schema(void)
     const runtime_config_node_t node = RUNTIME_CONFIG_NODE_SCHEMA(
         &runtime_config_tests_nested);
 
-    /* check if schema gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_schema_cb, 0, NULL);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 0 => schema + everything below gets called */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 0, NULL);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* check if instance gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_instance_cb, 0, NULL);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 1 => only schema gets called */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 1, NULL);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* check if group gets exported */
-    const runtime_config_group_id_t group_id = RUNTIME_CONFIG_TESTS_NESTED_GROUP;
-
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_group_cb, 0, &group_id);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 2 => schema + 1 level (instance is called) */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 2, NULL);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* check if parameter get exported */
-    const runtime_config_parameter_id_t child_parameter_id = RUNTIME_CONFIG_TESTS_NESTED_GROUP_PARAMETER;
-
-    /* tree_traversal_depth 0 => infinite => parameter gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_parameter_cb, 0, &child_parameter_id);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 3 => schema + 2 level (nested parameter is not called) */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 3, NULL);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* tree_traversal_depth 3 => only schema, instance and group => parameter gets NOT exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_parameter_cb, 3, &child_parameter_id);
-    TEST_ASSERT_EQUAL_INT(false, successful);
-    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
-
-    /* tree_traversal_depth 4 => schema, instance, group and parameter => parameter gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_parameter_cb, 4, &child_parameter_id);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 4 => schema + everything below in this case */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 4, NULL);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 }
 
@@ -302,51 +327,70 @@ static void tests_runtime_config_traverse_namespace(void)
     const runtime_config_node_t node = RUNTIME_CONFIG_NODE_NAMESPACE(
         &runtime_config_tests);
 
-    /* check if namespace gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_namespace_cb, 0, NULL);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 0 => namespace + everything below gets called */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 0, NULL);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* check if schema gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_schema_cb, 0, NULL);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 1 => only namespace gets called */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 1, NULL);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* check if instance gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_instance_cb, 0, NULL);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 2 => namespace + 1 level (schema is called) */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 2, NULL);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* check if group gets exported */
-    const runtime_config_group_id_t group_id = RUNTIME_CONFIG_TESTS_NESTED_GROUP;
-
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_group_cb, 0, &group_id);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 3 => namespace + 2 level (schema and instance) */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 3, NULL);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* check if parameter get exported */
-    const runtime_config_parameter_id_t child_parameter_id = RUNTIME_CONFIG_TESTS_NESTED_GROUP_PARAMETER;
-
-    /* tree_traversal_depth 0 => infinite => parameter gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_parameter_cb, 0, &child_parameter_id);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 4 => namespace + 3 level (nested parameter is not called) */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 4, NULL);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* tree_traversal_depth 4 => only namespace, schema, instance and group => parameter gets NOT exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_parameter_cb, 4, &child_parameter_id);
-    TEST_ASSERT_EQUAL_INT(false, successful);
-    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
-
-    /* tree_traversal_depth 5 => namespace, schema, instance, group and parameter => parameter gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(&node, &export_parameter_cb, 5, &child_parameter_id);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 5 => namespace + everything below in this case */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(&node, &traverse_cb, 5, NULL);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 }
 
@@ -354,67 +398,81 @@ static void tests_runtime_config_traverse_all(void)
 {
     runtime_config_error_t res;
 
-    /* check if namespace gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(NULL, &export_namespace_cb, 0, NULL);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 0 => root + everything below gets called */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(NULL, &traverse_cb, 0, NULL);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* tree_traversal_depth 1 => nothing gets exported because node == NULL */
-    /* => no namespace was specified and 1 means only export the exact match (NULL) */
-    successful = false;
-    res = runtime_config_traverse_config_tree(NULL, &export_namespace_cb, 1, NULL);
-    TEST_ASSERT_EQUAL_INT(false, successful);
+    /* tree_traversal_depth 1 => nothing gets called */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(NULL, &traverse_cb, 1, NULL);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* check if schema gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(NULL, &export_schema_cb, 0, NULL);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 2 => root + 1 level (namespace is called) */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(NULL, &traverse_cb, 2, NULL);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* check if instance gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(NULL, &export_instance_cb, 0, NULL);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 3 => root + 2 level (namespace and schema) */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(NULL, &traverse_cb, 3, NULL);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* check if group gets exported */
-    const runtime_config_group_id_t group_id = RUNTIME_CONFIG_TESTS_NESTED_GROUP;
-
-    successful = false;
-    res = runtime_config_traverse_config_tree(NULL, &export_group_cb, 0, &group_id);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 4 => root + 3 level (namespace, schema and instance) */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(NULL, &traverse_cb, 4, NULL);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* check if parameter get exported */
-    const runtime_config_parameter_id_t child_parameter_id = RUNTIME_CONFIG_TESTS_NESTED_GROUP_PARAMETER;
-
-    /* tree_traversal_depth 0 => infinite => parameter gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(NULL, &export_parameter_cb, 0, &child_parameter_id);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 5 => root + 4 level (nested parameter is not called) */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(NULL, &traverse_cb, 5, NULL);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(0, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 
-    /* tree_traversal_depth 1 => nothing gets exported because node == NULL */
-    /* => not even a namespace was specified and 1 means only export the exact match (NULL) */
-    successful = false;
-    res = runtime_config_traverse_config_tree(NULL, &export_parameter_cb, 1, &child_parameter_id);
-    TEST_ASSERT_EQUAL_INT(false, successful);
-    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
-
-    /* tree_traversal_depth 5 => root, namespace, schema, instance, group */
-    /* => parameter gets NOT exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(NULL, &export_parameter_cb, 5, &child_parameter_id);
-    TEST_ASSERT_EQUAL_INT(false, successful);
-    TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
-
-    /* tree_traversal_depth 6 => root, namespace, schema, instance, group and parameter */
-    /* => parameter gets exported */
-    successful = false;
-    res = runtime_config_traverse_config_tree(NULL, &export_parameter_cb, 6, &child_parameter_id);
-    TEST_ASSERT(successful);
+    /* tree_traversal_depth 6 => root + everything below in this case */
+    reset_node_counter();
+    res = runtime_config_traverse_config_tree(NULL, &traverse_cb, 6, NULL);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.namespace);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.schema);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.instance);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.group_parameter);
+    TEST_ASSERT_EQUAL_INT(1, node_counter.parameter);
     TEST_ASSERT_EQUAL_INT(RUNTIME_CONFIG_ERROR_NONE, res);
 }
 
