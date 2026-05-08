@@ -8,7 +8,8 @@
     "files.associations": {
         "Makefile.*": "makefile",
         "*.mk": "makefile",
-        "*.sketch": "cpp"
+        "*.sketch": "cpp",
+        "*.mdx": "markdown",
     },
     "[shellscript][c][cpp]": {
         "editor.tabSize": 4,
@@ -21,5 +22,6 @@
     "[javascript][typescript]": {
         "editor.tabSize": 2,
         "editor.insertSpaces": true
-    }
+    },
+    "cmake.ignoreCMakeListsMissing": true
 }
