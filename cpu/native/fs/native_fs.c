@@ -85,8 +85,10 @@ static int _mount(vfs_mount_t *mountp)
         real_mkdir(parent, 0777);
     }
 
-    real_mkdir(_prefix_path(mountp, ""), 0777);
-    res = errno == EEXIST ? 0 : -errno;
+    res = real_mkdir(_prefix_path(mountp, ""), 0777);
+    if (res < 0) {
+        res = (errno == EEXIST) ? 0 : -errno;
+    }
 
     mutex_unlock(&_lock);
     return res;
