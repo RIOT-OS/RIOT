@@ -1,6 +1,45 @@
 ifneq (,$(filter unicoap,$(USEMODULE)))
   # Vectored data support
   USEMODULE += iolist
+
+  # Allocated buffer element lists
+  USEMODULE += bitfield
+
+  # Message ID generation
+  USEMODULE += random
+
+  # Retransmissions, etc
+  USEMODULE += ztimer
+  USEMODULE += ztimer_msec
+
+  # Event loop
+  USEMODULE += event_thread
+  USEMODULE += event_callback
+  USEMODULE += event_timeout_ztimer
+
+  # Synchronous methods
+  USEMODULE += sema
+
+  USEMODULE += netif
+  USEMODULE += ipv6_addr
+  USEMODULE += ipv4_addr
+
+  DEFAULT_MODULE += auto_init_unicoap
+endif
+
+# This variable ensures the "Missing server" warning gets printed only once
+_UNICOAP_MISSING_SERVER ?= 0
+
+# If someone imports XFA submodule, we don't silently import server submodule, we complain!
+ifneq (,$(filter unicoap_server_resource_declarations,$(USEMODULE)))
+  ifeq (,$(filter unicoap_server,$(USEMODULE)))
+    ifeq (0, $(_UNICOAP_MISSING_SERVER))
+      $(warning XFA CoAP resource support imported, but not server?)
+      $(info +++ FIXIT: Makefile: Add USEMODULE += unicoap_server to import server)
+      $(info +++ FIXIT: Makefile: Remove USEMODULE += unicoap_server_resource_declarations to remove XFA dependency)
+    endif
+    _UNICOAP_MISSING_SERVER = 1
+	endif
 endif
 
 # This variable ensures the "No drivers" warning gets printed only once
@@ -9,9 +48,9 @@ _UNICOAP_MISSING_DRIVER ?= 0
 ifeq (,$(filter %_udp %_dtls %_tcp %_tls %_websocket %_websocket_tls %_rfc7252_common_pdu %_rfc7252_pdu,$(filter unicoap_driver_%,$(USEMODULE))))
   ifeq (0, $(_UNICOAP_MISSING_DRIVER))
     $(warning No drivers imported, did you forget to import a driver?)
-    $(info +++ FIXIT: Makefile: USEMODULE += unicoap_driver_dtls for CoAP over DTLS driver)
-    $(info +++ FIXIT: Makefile: USEMODULE += unicoap_driver_udp for CoAP over UDP driver)
-    $(info +++ FIXIT: Makefile: USEMODULE += unicoap_driver_rfc7252_pdu for CoAP over UDP/DTLS PDU parser only)
+    $(info +++ FIXIT: Makefile: Add USEMODULE += unicoap_driver_dtls for CoAP over DTLS driver)
+    $(info +++ FIXIT: Makefile: Add USEMODULE += unicoap_driver_udp for CoAP over UDP driver)
+    $(info +++ FIXIT: Makefile: Add USEMODULE += unicoap_driver_rfc7252_pdu for CoAP over UDP/DTLS PDU parser only)
     # MARK: unicoap_driver_extension_point
   endif
   _UNICOAP_MISSING_DRIVER = 1
@@ -33,14 +72,32 @@ ifneq (,$(filter unicoap_driver_udp,$(USEMODULE)))
   # CoAP over UDP uses RFC 7252 messaging layer
   USEMODULE += unicoap_driver_rfc7252_common
 
-  # FIXME: upcoming PR: CoAP over UDP driver implementation
+  # We're using the sock API
+  USEMODULE += unicoap_sock_support
+  USEMODULE += sock_udp
 endif
 
 ifneq (,$(filter unicoap_driver_dtls,$(USEMODULE)))
   # CoAP over DTLS uses RFC 7252 messaging layer
   USEMODULE += unicoap_driver_rfc7252_common
 
-  # FIXME: upcoming PR: CoAP over DTLS driver implementation
+  # We're using the sock API
+  USEMODULE += unicoap_sock_support
+  USEMODULE += sock_dtls
+
+  # DTLS stuff
+  USEMODULE += tinydtls_sock_dtls
+  USEPKG += tinydtls
+  USEMODULE += prng_sha1prng
+  USEMODULE += dsm
+  USEMODULE += ztimer_usecf
 endif
 
 # MARK: unicoap_driver_extension_point
+
+ifneq (,$(filter unicoap_sock_support,$(USEMODULE)))
+  USEMODULE += sock_async
+  USEMODULE += sock_async_event
+  USEMODULE += sock_aux_local
+  USEMODULE += sock_util
+endif

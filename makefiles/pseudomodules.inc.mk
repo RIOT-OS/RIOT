@@ -613,6 +613,12 @@ PSEUDOMODULES += unicoap_driver_rfc7252_common
 # Alias for unicoap_driver_rfc7252_common_pdu, and is hence a pseudomodule
 PSEUDOMODULES += unicoap_driver_rfc7252_pdu
 
+# Common sock dependencies of sock-based CoAP drivers in unicoap
+PSEUDOMODULES += unicoap_sock_support
+
+# XFA support for CoAP resource definitions in unicoap server
+PSEUDOMODULES += unicoap_server_resource_declarations
+
 PSEUDOMODULES += usbus_urb
 
 PSEUDOMODULES += vdd_lc_filter_%
