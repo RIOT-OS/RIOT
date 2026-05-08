@@ -43,6 +43,11 @@ static runtime_config_error_t apply_schema_instance_cb(
 {
     (void)schema_instance;
 
+    /* We can't communicate success if the calling test forgot to reset the static */
+    if (successful) {
+        return RUNTIME_CONFIG_ERROR_INVALID_ARGUMENT;
+    }
+
     successful = true;
 
     return RUNTIME_CONFIG_ERROR_NONE;
@@ -59,6 +64,11 @@ static runtime_config_error_t apply_parameter_cb(
 {
     (void)schema_instance;
 
+    /* We can't communicate success if the calling test forgot to reset the static */
+    if (successful) {
+        return RUNTIME_CONFIG_ERROR_INVALID_ARGUMENT;
+    }
+
     if (group_or_parameter_id == parameter_id) {
         successful = true;
     }
@@ -71,6 +81,11 @@ static runtime_config_error_t apply_group_cb(
     const runtime_config_group_or_parameter_id_t group_or_parameter_id)
 {
     (void)schema_instance;
+
+    /* We can't communicate success if the calling test forgot to reset the static */
+    if (successful) {
+        return RUNTIME_CONFIG_ERROR_INVALID_ARGUMENT;
+    }
 
     if (group_or_parameter_id == group_id) {
         successful = true;
