@@ -29,14 +29,6 @@
 #include "at86rf2xx_params.h"
 #endif
 
-#ifdef MODULE_CC2538_RF
-#include "cc2538_rf.h"
-#endif
-
-#ifdef MODULE_NRF802154
-#include "nrf802154.h"
-#endif
-
 #define LOG_LEVEL LOG_NONE
 #include "log.h"
 
@@ -49,11 +41,9 @@
 static at86rf2xx_t at86rf2xx_dev;
 #endif
 #else
-#ifdef MODULE_CC2538_RF
-static ieee802154_dev_t cc2538_rf_dev;
-#endif
-#ifdef MODULE_NRF802154
-static ieee802154_dev_t nrf802154_hal_dev;
+#ifdef IEEE802154_RADIO_COUNT
+#include "net/ieee802154/init_radio.h"
+static ieee802154_dev_t ieee802154_dev;
 #endif
 #endif
 
@@ -79,15 +69,9 @@ void* _radio_init_dev(void)
         at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0], 0);
     #endif
 #else
-    #ifdef MODULE_CC2538_RF
-        dev = &cc2538_rf_dev;
-        cc2538_rf_hal_setup(dev);
-        cc2538_init();
-    #endif
-    #ifdef MODULE_NRF802154
-        dev = &nrf802154_hal_dev;
-        nrf802154_hal_setup(dev);
-        nrf802154_init();
+    #ifdef IEEE802154_RADIO_COUNT
+        dev = &ieee802154_dev;
+        ieee802154_radio_init(dev, 0, NULL);
     #endif
 #endif
     return dev;
