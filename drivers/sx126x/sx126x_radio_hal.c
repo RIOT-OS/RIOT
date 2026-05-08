@@ -423,7 +423,7 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t max_size, ieee802154_r
     if (rx_buffer_status.pld_len_in_bytes > max_size) {
         return -ENOBUFS;
     }
-    if (rx_buffer_status.pld_len_in_bytes < IEEE802154_ACK_FRAME_LEN) {
+    if (rx_buffer_status.pld_len_in_bytes < IEEE802154_MIN_FRAME_LEN) {
         return -EBADMSG;
     }
     SX126X_CHECK_API(sx126x_read_buffer(dev, rx_buffer_status.buffer_start_pointer,
