@@ -29,7 +29,14 @@ const sortedBoards = boards.sort((a, b) =>
     id="riot-boards-search"
     type="search"
     placeholder="Type to filter boards (e.g. arduino, stm32, nrf)"
-    style={{ width: "100%", margin: "0.5rem 0 1rem 0", padding: "0.5rem" }}
+    style={{
+      width: "100%",
+      margin: "0.5rem 0 1rem 0",
+      padding: "0.5rem 0.8rem",
+      background: "transparent",
+      border: "1px solid var(--sl-color-text-accent)",
+      borderRadius: "8px",
+    }}
   />
   <p id="riot-boards-no-results" hidden>No board entries match this filter.</p>
 
