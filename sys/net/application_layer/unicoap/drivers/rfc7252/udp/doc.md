@@ -5,13 +5,10 @@
 
 Module. Specify `USEMODULE += unicoap_driver_udp` in your application's Makefile.
 
-<!--
-FIXME: undefined references, upcoming PR
 To change the UDP port `unicoap` is listening on, modify @ref CONFIG_UNICOAP_UDP_PORT.
 The CoAP over UDP driver uses the same socket both for client and server functionality.
 
 @see @ref UNICOAP_PROTO_UDP
--->
 @see @ref unicoap_rfc7252_message_type_t
 
 This is the dependency graph of this driver:
