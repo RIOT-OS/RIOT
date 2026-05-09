@@ -53,16 +53,6 @@
 #define FLASH_CR_PER           (FLASH_NSCR_PER)
 #define FLASH_CR_BKER          (FLASH_NSCR_BKER)
 #define FLASH_CR_PG            (FLASH_NSCR_PG)
-#elif defined(CPU_FAM_STM32U3)
-/* Page erase via CR (PNB + BKER + PER + STRT); no FLASH->AR on STM32U3 */
-#define CNTRL_REG              (FLASH->CR)
-#define CNTRL_REG_LOCK         (FLASH_CR_LOCK)
-#define FLASH_CR_PNB           (FLASH_CR_PNB)
-#define FLASH_CR_PNB_Pos       (FLASH_CR_PNB_Pos)
-#define FLASH_CR_STRT          (FLASH_CR_STRT)
-#define FLASH_CR_PER           (FLASH_CR_PER)
-#define FLASH_CR_BKER          (FLASH_CR_BKER)
-#define FLASH_CR_PG            (FLASH_CR_PG)
 #elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
       defined(CPU_FAM_STM32F7)
 #define FLASHPAGE_DIV          (4U)
@@ -71,6 +61,7 @@
 #define FLASH_CR_PNB_Pos       (FLASH_CR_SNB_Pos)
 #define CNTRL_REG              (FLASH->CR)
 #else
+/* L4, WB, G4, G0, WL, C0, STM32U3, …: FLASH->CR; bit macros are FLASH_CR_* in CMSIS*/
 #define CNTRL_REG              (FLASH->CR)
 #define CNTRL_REG_LOCK         (FLASH_CR_LOCK)
 #endif
