@@ -1358,25 +1358,25 @@ ATOMIC_FETCH_OP_IMPL(and, &, u64, uint64_t)
 static inline atomic_bit_u8_t atomic_bit_u8(volatile uint8_t *dest,
                                             uint8_t bit)
 {
-    atomic_bit_u8_t result = { .dest = dest, .mask = 1U << bit };
+    atomic_bit_u8_t result = { .dest = dest, .mask = (uint8_t)(1U << bit) };
     return result;
 }
 static inline atomic_bit_u16_t atomic_bit_u16(volatile uint16_t *dest,
                                               uint8_t bit)
 {
-    atomic_bit_u16_t result = { .dest = dest, .mask = 1U << bit };
+    atomic_bit_u16_t result = { .dest = dest, .mask = (uint16_t)(1U << bit) };
     return result;
 }
 static inline atomic_bit_u32_t atomic_bit_u32(volatile uint32_t *dest,
                                               uint8_t bit)
 {
-    atomic_bit_u32_t result = { .dest = dest, .mask = 1UL << bit };
+    atomic_bit_u32_t result = { .dest = dest, .mask = (uint32_t)(1UL << bit) };
     return result;
 }
 static inline atomic_bit_u64_t atomic_bit_u64(volatile uint64_t *dest,
                                               uint8_t bit)
 {
-    atomic_bit_u64_t result = { .dest = dest, .mask = 1ULL << bit };
+    atomic_bit_u64_t result = { .dest = dest, .mask = (uint64_t)(1ULL << bit) };
     return result;
 }
 static inline void atomic_set_bit_u8(atomic_bit_u8_t bit)
