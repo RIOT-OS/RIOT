@@ -27,6 +27,34 @@ ifneq (,$(filter unicoap,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_unicoap
 endif
 
+# This variable ensures the "Missing client" warning gets printed only once
+_UNICOAP_MISSING_CLIENT ?= 0
+
+# If someone imports XFA submodule, we don't silently import server submodule, we complain!
+ifneq (,$(filter unicoap_client_uri,$(USEMODULE)))
+  ifeq (,$(filter unicoap_client,$(USEMODULE)))
+    ifeq (0, $(_UNICOAP_MISSING_CLIENT))
+      $(warning URI support in client imported, but not client?)
+      $(info +++ FIXIT: Makefile: Add USEMODULE += unicoap_client to import client)
+      $(info +++ FIXIT: Makefile: Remove USEMODULE += unicoap_client_uri to remove URI module)
+    endif
+    _UNICOAP_MISSING_CLIENT = 1
+	endif
+endif
+
+ifneq (,$(filter unicoap_client_uri,$(USEMODULE)))
+	# We need URI parsing support with CoAP-specific tricks,
+	# e.g., understanding URI schemes and specific host formats
+	# such as .ble.arpa(.)
+  USEMODULE += uri_parser
+
+  # To support UNICOAP_DESTINATION_URI (uses DNS resolution and
+  # UNICOAP_DESTINATION_HOST (uses DNS resolution and Service Binding Records)
+  USEMODULE += dns
+  USEMODULE += sock_dns
+  USEMODULE += sock_async
+endif
+
 # This variable ensures the "Missing server" warning gets printed only once
 _UNICOAP_MISSING_SERVER ?= 0
 

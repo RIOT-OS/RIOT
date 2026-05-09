@@ -158,7 +158,7 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
 
         unicoap_endpoint_t endpoint = { .proto = UNICOAP_PROTO_DTLS };
         sock_dtls_session_get_udp_ep(&session, unicoap_endpoint_get_dtls(&endpoint));
-        unicoap_exchange_release_endpoint_state(&endpoint);
+        unicoap_exchange_notify_all(&endpoint, unicoap_layer_notification_async_failure_from_errno(ECONNABORTED), NULL);
     }
 
     return;
