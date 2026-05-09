@@ -201,8 +201,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4) || \
     defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL)
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
+    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32U5)
     switch (uart_config[uart].type) {
         case STM32_USART:
             uart_init_usart(uart, baudrate);
@@ -332,9 +332,13 @@ static inline void uart_init_usart(uart_t uart, uint32_t baudrate)
 
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4) || \
     defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL)
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
+    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32U5)
 #ifdef CPU_FAM_STM32L5
+#define RCC_CCIPR_LPUART1SEL_0  RCC_CCIPR1_LPUART1SEL_0
+#define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR1_LPUART1SEL_1
+#define CCIPR                   CCIPR1
+#elif CPU_FAM_STM32U3
 #define RCC_CCIPR_LPUART1SEL_0  RCC_CCIPR1_LPUART1SEL_0
 #define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR1_LPUART1SEL_1
 #define CCIPR                   CCIPR1
