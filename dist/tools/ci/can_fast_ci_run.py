@@ -26,7 +26,7 @@ OTHER_CLASSIFIERS = [
     [re.compile(r"^\.github/.*$"), "github"],
     [re.compile(r"^(\.murdock|dist\/ls\/.*|\.drone.yml)$"), "ci-murdock"],
     [re.compile(r"^(\.bandit|\.drone.yml)$"), "ci-other"],
-    [re.compile(r"^(dist\/.*|Vagrantfile|\.clang-format|\.clang-tidy)$"), "tools"],
+    [re.compile(r"^(dist\/.*|Vagrantfile|\.clang-format|\.clang-tidy|\.vscode/.*)$"), "tools"],
 ]
 
 REGEX_MODULE = re.compile(r"^(boards\/common|core|cpu|drivers|sys)\/")
