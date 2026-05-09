@@ -65,6 +65,11 @@ typedef struct {
 #endif
 
     /**
+     * @brief Exchange-layer state
+     */
+    void* exchange;
+
+    /**
      * @brief Copy of confirmable message PDU for retransmission
      */
     uint8_t* pdu;
@@ -292,6 +297,30 @@ static inline void _transmission_free(_transmission_t* transmission)
      * session establishments. */
 }
 
+static inline void _transmission_free_notif(_transmission_t* transmission, unicoap_layer_notification_t type)
+{
+    void* exchange = transmission->exchange;
+    _transmission_free(transmission);
+    if (exchange) {
+        unicoap_exchange_notify(exchange, type, NULL);
+    }
+}
+
+void unicoap_messaging_notify_rfc7252(void* state, unicoap_layer_notification_t type, void* arg) {
+    _transmission_t* transmission = (_transmission_t*)state;
+    if ((type & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE)
+        || (type == UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE)) {
+        MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "[NOTIF] exchange layer released state\n",
+                             transmission->id);
+        /* TODO: Advanced features: cannot _always_ release transmission if exchange layer releases. */
+        _transmission_free_notif(transmission, UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE);
+    } else if (type == UNICOAP_LAYER_NOTIFICATION_STATE_ALLOC) {
+        MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "[NOTIF] exchange layer allocated state\n",
+                             transmission->id);
+        transmission->exchange = arg;
+    }
+}
+
 static int _sendv(iolist_t* list, const unicoap_endpoint_t* remote, const unicoap_endpoint_t* local,
                   const unicoap_sock_dtls_session_t* dtls_session)
 {
@@ -393,7 +422,8 @@ static inline void _handle_ack(const unicoap_endpoint_t* remote, uint16_t id)
     _transmission_t* transmission = _transmission_find(remote, id);
     if (transmission) {
         DEBUG("stopping retransmission\n");
-        _transmission_free(transmission);
+        _transmission_free_notif(transmission, UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE);
+
     }
     else {
         DEBUG("no message with ID, ignoring\n");
@@ -408,15 +438,14 @@ static void _handle_reset(const unicoap_endpoint_t* remote, uint16_t id)
 
     if (transmission) {
         DEBUG("\n");
-        _transmission_free(transmission);
+        _transmission_free_notif(transmission, -ECONNRESET);
     }
     else {
         DEBUG(", no message with ID, ignoring\n");
     }
 }
 
-static void _on_ack_timeout(unicoap_scheduled_event_t* _event)
-{
+static void _on_ack_timeout(unicoap_scheduled_event_t* _event) {
     _transmission_t* transmission = container_of(_event, _transmission_t, ack_timeout);
     assert(transmission);
     assert(transmission->pdu);
@@ -453,8 +482,12 @@ static void _on_ack_timeout(unicoap_scheduled_event_t* _event)
     return;
 
 error:
-    /* TODO: Client: Signal failure to application waiting for response */
+    assert(res < 0);
     MESSAGING_7252_DEBUG("error while on ACK timeout\n");
+    /* As per unicoap notification rules do not send ASYNC_FAILURE notification when
+     * still in synchronous call from exchange layer. Hence, _transmission_free instead
+     * of _transmission_free_notif. */
+    _transmission_free(transmission);
     return;
 }
 
@@ -621,7 +654,7 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool trun
     case UNICOAP_PREPROCESSING_SUCCESS_RESPONSE: {
         _transmission_t* transmission = _transmission_find(packet->remote, _get_id(packet));
         if (transmission) {
-            _transmission_free(transmission);
+            _transmission_free_notif(transmission, UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE);
 
             if (_get_type(packet) == UNICOAP_TYPE_CON) {
                 MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT
@@ -707,7 +740,7 @@ static void _format_separate(unicoap_packet_t* packet, unicoap_messaging_flags_t
               flags & UNICOAP_MESSAGING_FLAG_RELIABLE ? UNICOAP_TYPE_CON : UNICOAP_TYPE_NON);
 }
 
-int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_flags_t flags)
+int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_flags_t flags, void* exchange)
 {
     assert(packet);
     assert(packet->remote);
@@ -733,7 +766,16 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
 
     switch (_get_type(packet)) {
     case UNICOAP_TYPE_NON:
-        /* TODO: Client: remember message ID and watch out for RSTs */
+        if (flags & UNICOAP_MESSAGING_FLAG_TRACK) {
+            /* Only allocate state here if there's interest in
+             * the transmission's outcome. For responses, we don't
+             * want to litter the transmissions array with NON transmissions.
+             * We don't know when we'd need to free them, so either they
+             * hang around forever or we'd need to set another timer.
+             * Hence, only watch NON transmissions (i.e., watch for RSTs)
+             * in client exchanges. The exchange layer sets the TRACK flag in this case. */
+            transmission = _transmission_create(packet->remote, packet);
+        }
         break;
 
     case UNICOAP_TYPE_CON:
@@ -776,15 +818,23 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
     }
 
     if (transmission) {
-        MESSAGING_7252_DEBUG("created <carbon_copy size=%i>\n", res);
-        transmission->pdu_size = res;
+        /* Only set PDU size and notify exchange layer if sending went well. */
+        if (transmission->pdu) {
+            MESSAGING_7252_DEBUG("created <carbon_copy size=%i>\n", res);
+            transmission->pdu_size = res;
+        }
+        if ((transmission->exchange = exchange)) {
+            unicoap_exchange_notify(exchange,
+                                    UNICOAP_LAYER_NOTIFICATION_STATE_ALLOC, transmission);
+        }
     }
     return 0;
 
 error:
     MESSAGING_7252_DEBUG("sending failed\n");
     if (transmission) {
-        _transmission_free(transmission);
+        assert(transmission->exchange == NULL);
+        _transmission_free_notif(transmission, unicoap_layer_notification_async_failure_from_errno(-res));
     }
     return res;
 }
@@ -808,6 +858,7 @@ void unicoap_messaging_print_rfc7252_state(void)
         printf("\t\t\t- remaining_retransmissions=%u\n", transmission->remaining_retransmissions);
         printf("\t\t\t- pdu=<carbon_copy at %p>\n", transmission->pdu);
         printf("\t\t\t- pdu_size=%" PRIuSIZE "\n", transmission->pdu_size);
+        printf("\t\t\t- exchange=%p\n", transmission->exchange);
     }
 #endif /* CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0 */
 

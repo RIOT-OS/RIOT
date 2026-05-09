@@ -252,13 +252,127 @@ static inline struct _sock_tl_ep* _unicoap_endpoint_get_tl(unicoap_endpoint_t* e
 #endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN) */
 /** @} */
 
+/* MARK: - Request destinations */
+/**
+ * @name Request destinations
+ * @{
+ */
+
+/**
+ * @brief Resource identifier type
+ */
+typedef enum {
+    /** @brief Endpoint */
+    UNICOAP_DESTINATION_ENDPOINT = 0,
+
+    /** @brief Hostname */
+    UNICOAP_DESTINATION_HOST = 1,
+
+    /** @brief URI (Uniform Resource Identifier) */
+    UNICOAP_DESTINATION_URI = 2,
+} __attribute__((__packed__)) unicoap_destination_type_t;
+
+/**
+ * @brief A type abstracting over CoAP resource identifiers
+ */
+typedef struct {
+    /** @brief Representation data */
+    union {
+        /** @brief Endpoint itself, if identified by @ref UNICOAP_DESTINATION_ENDPOINT  */
+        unicoap_endpoint_t* endoint;
+
+        /** @brief URI string, if identified by @ref UNICOAP_DESTINATION_URI  */
+        const char* uri;
+
+        /** @brief Hostname, if identified by @ref UNICOAP_DESTINATION_HOST */
+        const char* host;
+    } body;
+
+    /** @brief The type of this identifier */
+    unicoap_destination_type_t type : 3;
+} unicoap_destination_t;
+
+/**
+ * @brief Creates destination identifier from endpoint
+ *
+ * @param endpoint Endpoint to create destination from
+ *
+ * @returns New resource identifier from endpoint
+ */
+static inline unicoap_destination_t unicoap_destination_endpoint(unicoap_endpoint_t* endpoint)
+{
+    return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_ENDPOINT,
+                                    .body.endoint = endpoint };
+}
+
+/**
+ * @brief Creates destination identifier from hostname
+ *
+ * @param host Null-terminated host to create destination from
+ *
+ * @returns New resource identifier from endpoint
+ */
+static inline unicoap_destination_t unicoap_destination_host_string(const char* host)
+{
+    return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_ENDPOINT,
+                                    .body.host = host };
+}
+
+/**
+ * @brief Creates destination identifier from URI string
+ *
+ * @param uri Null-terminated Uniform Resource Rdentifier
+ *
+ * @returns New resource identifier from URI
+ */
+static inline unicoap_destination_t unicoap_destination_uri_string(const char* uri)
+{
+    return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_URI,
+                                    .body.uri = (char*)uri };
+}
+/** @} */
+
 /* MARK: - Conversions and Tools */
 /**
  * @name Conversions and Tools
  * @{
  */
 
-/* TODO: Client: URI */
+/**
+ * @brief Converts a given scheme string like `coap+tcp` to the corresponding protocol identifier.
+ *
+ * @param[in] scheme    Scheme string
+ * @param scheme_length Length of scheme string
+ * @param[in] host      Optional Host string
+ * @param[in] length    Scheme string length, must be zero if @p host is `NULL` or empty (i.e., points to 0x00)
+ *
+ * @return `0` for valid schemes
+ * @return `-1` if the scheme is invalid or unknown
+ */
+int unicoap_proto_from_scheme_and_host(const char* scheme, size_t scheme_length, const char* host, size_t length);
+
+/**
+ * @brief Converts a given null-terminated scheme string like `coap+tcp` to the corresponding protocol identifier.
+ *
+ * @param[in] scheme    Null-terminated scheme string
+ * @param[in] host      Null-terminated host string
+ *
+ * @return `0` for valid schemes
+ * @return `-1` if the scheme is invalid or unknown
+ */
+static inline int unicoap_transport_proto_from_scheme_and_host_string(const char* scheme, const char* host)
+{
+    return unicoap_proto_from_scheme_and_host(scheme, strlen(scheme), host, strlen(host));
+}
+
+/**
+ * @brief Returns scheme from protocol number
+ *
+ * @param proto Protocol number
+ * @returns Null-terminated transport scheme string
+ * @returns `NULL` if protocol number is unknown
+ */
+const char* unicoap_scheme_from_proto(unicoap_proto_t proto);
 
 /**
  * @brief Returns scheme from protocol number
@@ -481,6 +595,66 @@ typedef struct {
 } unicoap_aux_t;
 /** @} */
 
+/** @} */
+
+/**
+ * @addtogroup net_unicoap_client_uri
+ * @{
+ */
+/* MARK: - Manually parsing a CoAP URI */
+/**
+ * @name Manually parsing a CoAP URI
+ * @{
+ */
+/**
+ * @brief Populates endpoint and CoAP options with URI parser result
+ *
+ * Internally called by @ref unicoap_uri_parse
+ *
+ * @param[in,out] parsed Parser result (port will be set based on scheme, if unspecified)
+ * @param[in,out] endpoint Pre-allocated endpoint
+ * @param[in,out] options Pre-initialized options (nullable). If `NULL`, no options will be extracted from URI
+ *
+ * @returns `0` on success
+ * @return `-1` or negative errno on error
+ */
+int unicoap_uri_populate(uri_parser_result_t* parsed, unicoap_endpoint_t* endpoint,
+                         unicoap_options_t* options);
+
+/**
+ * @brief Parses CoAP URI, initializes given endpoint and sets options
+ *
+ * URI must be absolute, including CoAP scheme.
+ *
+ * @param[in,out] uri URI string, does **not** need to be null-terminated
+ * @param[in,out] uri_length URI string length
+ * @param[in,out] endpoint Pre-allocated endpoint
+ * @param[in,out] options Pre-initialized options (nullable). If `NULL`, no options will be extracted from URI
+ *
+ * @returns `0` on success
+ * @return `-1` or negative errno on error
+ */
+int unicoap_uri_parse(const char* uri, size_t uri_length, unicoap_endpoint_t* endpoint,
+                      unicoap_options_t* options);
+
+/**
+ * @brief Parses null-terminated CoAP URI, initializes given endpoint and sets options
+ *
+ * URI must be absolute, including CoAP scheme.
+ *
+ * @param[in,out] uri Null-terminated URI string
+ * @param[in,out] endpoint Pre-allocated endpoint
+ * @param[in,out] options Pre-initialized options (nullable). If `NULL`, no options will be extracted from URI
+ *
+ * @returns `0` on success
+ * @return `-1` or negative errno on error
+ */
+static inline int unicoap_uri_parse_string(const char* uri, unicoap_endpoint_t* endpoint,
+                                           unicoap_options_t* options)
+{
+    return unicoap_uri_parse(uri, strlen(uri), endpoint, options);
+}
+/** @} */
 /** @} */
 
 #ifdef __cplusplus

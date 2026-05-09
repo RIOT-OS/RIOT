@@ -527,6 +527,9 @@ PSEUDOMODULES += unicoap_sock_support
 # XFA support for CoAP resource definitions in unicoap server
 PSEUDOMODULES += unicoap_server_resource_declarations
 
+# URI support in unicoap client API
+PSEUDOMODULES += unicoap_client_uri
+
 PSEUDOMODULES += usbus_urb
 PSEUDOMODULES += vdd_lc_filter_%
 ## @defgroup pseudomodule_vfs_auto_format vfs_auto_format
