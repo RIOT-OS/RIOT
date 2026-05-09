@@ -96,6 +96,7 @@ export default defineConfig({
           items: [
             { label: "Introduction", slug: "index" },
             "general/structure",
+            "general/contributing",
             "general/vision",
             "general/governance",
             "general/security",
