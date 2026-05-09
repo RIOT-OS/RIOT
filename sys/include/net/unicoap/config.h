@@ -231,6 +231,16 @@ static_assert(CONFIG_UNICOAP_PATH_LENGTH_MAX > 0,
 #if !defined(CONFIG_UNICOAP_WELL_KNOWN_CORE_SIZE_MAX) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_WELL_KNOWN_CORE_SIZE_MAX (120)
 #endif
+
+/**
+ * @brief Maximum number of pending requests started using the client API
+ *
+ ***Default**: 2
+ *
+ */
+#if !defined(CONFIG_UNICOAP_CLIENT_MEMOS_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_CLIENT_MEMOS_MAX (2)
+#endif
 /** @} */
 
 /* MARK: - Timing */
@@ -251,6 +261,16 @@ static_assert(CONFIG_UNICOAP_PATH_LENGTH_MAX > 0,
  * @brief `DEFAULT_LEISURE` constant for multicast delay calculation
  */
 #define UNICOAP_DEFAULT_LEISURE (5)
+
+/**
+ * @brief Default time to wait for a response
+ *
+ * **Unit**: milliseconds
+ * **Default**: 10000
+ */
+#if !defined(CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS (10000)
+#endif
 /** @} */
 
 /* MARK: - Resource observation */

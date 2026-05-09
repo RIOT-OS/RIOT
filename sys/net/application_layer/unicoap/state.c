@@ -58,6 +58,8 @@ static unicoap_state_t _state = {
 kernel_pid_t _unicoap_pid = KERNEL_PID_UNDEF;
 static event_queue_t _queue;
 
+/* MARK: - State */
+
 static inline void _lock(void) {
     mutex_lock(&_state.lock);
 }
@@ -72,6 +74,172 @@ void unicoap_state_lock(void) {
 
 void unicoap_state_unlock(void) {
     _unlock();
+}
+
+static unicoap_client_memo_t* _alloc_client(void) {
+#if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
+    /* Find empty slot in list of transactions */
+    for (int i = 0; i < (int)ARRAY_SIZE(_state.client_memos); i += 1) {
+        if (_state.client_memos[i].super.endpoint.proto == UNICOAP_PROTO_UNSPECIFIED) {
+            return &_state.client_memos[i];
+        }
+    }
+#endif
+    _STATE_DEBUG("[client] no space to alloc\n");
+    return NULL;
+}
+
+static void _free(unicoap_memo_t* memo) {
+#if UNICOAP_HAVE_MESSAGING_STATE
+    /* On the exchange layer, we're hiding the actual reason from the driver. It should
+     * not matter to the messaging layer whether we release state because of an error or because
+     * the state object is released as usual. Should the messaging layer rely on this
+     * information, the exchange-messaging abstraction has a design flaw. */
+    if (memo->messaging.state) {
+        unicoap_messaging_notify(memo->messaging.state, UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE,
+                                 NULL, memo->endpoint.proto);
+    }
+#endif
+    unicoap_event_cancel(&memo->exchange.timeout);
+    memset(memo, 0, sizeof(*memo));
+}
+
+static inline bool _is_client(const unicoap_memo_t* memo) {
+    (void)memo;
+#if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
+    return (uintptr_t)memo >= (uintptr_t)&_state.client_memos[0] &&
+        (uintptr_t)memo <= (uintptr_t)&_state.client_memos[ARRAY_SIZE(_state.client_memos) - 1];
+#else
+    return false;
+#endif
+}
+
+static inline size_t _client_index(unicoap_client_memo_t* memo) {
+    /* debugging-only */
+#if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
+    return ((uintptr_t)memo - (uintptr_t)_state.client_memos) / sizeof(*_state.client_memos);
+#else
+    (void)memo;
+    assert(false);
+    return 0;
+#endif
+}
+
+static void _deinit_client(unicoap_client_memo_t* memo) {
+    _STATE_DEBUG("[client #%" PRIuSIZE "] release\n", _client_index(memo));
+    memo->callback._any = NULL;
+    memo->callback_arg = NULL;
+    memo->flags = 0;
+}
+
+unicoap_client_memo_t* unicoap_client_memo_create(const unicoap_endpoint_t* endpoint) {
+    assert(endpoint);
+    assert(endpoint->proto != UNICOAP_PROTO_UNSPECIFIED);
+    _lock();
+    unicoap_client_memo_t* memo = _alloc_client();
+    if (memo) {
+        _STATE_DEBUG("[client #%" PRIuSIZE "] alloc\n", _client_index(memo));
+        memo->super.endpoint = *endpoint;
+    }
+    _unlock();
+    return memo;
+}
+
+void unicoap_client_memo_free(unicoap_client_memo_t* memo) {
+    _deinit_client(memo);
+    _free(&memo->super);
+}
+
+unicoap_client_memo_t* unicoap_client_memo_find(const unicoap_endpoint_t* endpoint,
+                                                  const uint8_t* token, size_t token_length) {
+    (void)endpoint;
+    (void)token;
+    (void)token_length;
+    assert(endpoint);
+    assert(token);
+
+#if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
+    for (int i = 0; i < (int)ARRAY_SIZE(_state.client_memos); i += 1) {
+        unicoap_client_memo_t* memo = &_state.client_memos[i];
+
+        if (unicoap_endpoint_is_equal(&memo->super.endpoint, endpoint) &&
+            token_length == sizeof(memo->token) &&
+            memcmp(memo->token, token, token_length) == 0) {
+            return memo;
+        }
+    }
+#endif
+    return NULL;
+}
+
+void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, void* arg) {
+    if (!state) { return; }
+    unicoap_memo_t* memo = (unicoap_memo_t*)state;
+    if (memo->endpoint.proto == UNICOAP_PROTO_UNSPECIFIED) {
+        _STATE_DEBUG("[NOTIF] use of released state obj\n");
+        return;
+    }
+    assert(memo->endpoint.proto != UNICOAP_PROTO_UNSPECIFIED);
+    if (type & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE) {
+        _STATE_DEBUG("[NOTIF] messaging layer encountered error %i\n",
+                     unicoap_layer_notification_async_failure_to_errno(type));
+#if UNICOAP_HAVE_MESSAGING_STATE
+        memo->messaging.state = NULL;
+#endif
+    } else if (type == UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE) {
+        _STATE_DEBUG("[NOTIF] messaging layer released state\n");
+#if UNICOAP_HAVE_MESSAGING_STATE
+        memo->messaging.state = NULL;
+#endif
+    } else if (type == UNICOAP_LAYER_NOTIFICATION_STATE_ALLOC) {
+        _STATE_DEBUG("[NOTIF] messaging layer allocated state\n");
+        assert(arg);
+#if UNICOAP_HAVE_MESSAGING_STATE
+        memo->messaging.state = arg;
+#endif
+    }
+
+    if (_is_client(memo)) {
+        if (type & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE) {
+            unicoap_client_callback_failure(unicoap_client_memo_of_super(memo),
+                                          unicoap_layer_notification_async_failure_to_errno(type));
+            unicoap_client_memo_free(unicoap_client_memo_of_super(memo));
+        }
+    }
+}
+
+void unicoap_exchange_notify_all(const unicoap_endpoint_t* endpoint, unicoap_layer_notification_t type, void* arg) {
+    unicoap_memo_t* memo = NULL;
+    (void)memo;
+    (void)endpoint;
+    (void)type;
+    (void)arg;
+#if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
+    for (int i = 0; i < CONFIG_UNICOAP_CLIENT_MEMOS_MAX; i += 1) {
+        memo = &_state.client_memos[i].super;
+        if (unicoap_endpoint_is_equal(endpoint, &memo->endpoint)) {
+            unicoap_exchange_notify(memo, type, arg);
+        }
+    }
+#endif
+}
+
+void unicoap_messaging_notify(void* state, unicoap_layer_notification_t type, void* arg, unicoap_proto_t proto) {
+    assert(proto != UNICOAP_PROTO_UNSPECIFIED);
+    if (!state) { return; }
+    (void)arg;
+    (void)type;
+    switch (proto) {
+#if IS_USED(MODULE_UNICOAP_DRIVER_UDP)
+        case UNICOAP_PROTO_UDP:
+        case UNICOAP_PROTO_DTLS: {
+            extern void unicoap_messaging_notify_rfc7252(void* state, unicoap_layer_notification_t type);
+            return unicoap_messaging_notify_rfc7252(state, type);
+        }
+#endif
+        default:
+            break;
+    }
 }
 
 /* MARK: - Event Scheduling on Internal Queue */
@@ -285,7 +453,7 @@ static void _debug_packet(const unicoap_packet_t* packet) {
     DEBUG("\n");
 }
 
-int unicoap_messaging_send(unicoap_packet_t* packet, unicoap_messaging_flags_t flags) {
+int unicoap_messaging_send(unicoap_packet_t* packet, unicoap_messaging_flags_t flags, void* exchange) {
     (void)packet;
     (void)flags;
 
@@ -300,7 +468,7 @@ int unicoap_messaging_send(unicoap_packet_t* packet, unicoap_messaging_flags_t f
 #if IS_USED(MODULE_UNICOAP_DRIVER_RFC7252_COMMON)
     case UNICOAP_PROTO_UDP:
     case UNICOAP_PROTO_DTLS:
-        return unicoap_messaging_send_rfc7252(packet, flags);
+        return unicoap_messaging_send_rfc7252(packet, flags, exchange);
 #endif
     /* MARK: unicoap_driver_extension_point */
     default:
@@ -324,34 +492,66 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
 
     switch (unicoap_code_class(packet->message->code)) {
     case UNICOAP_CODE_CLASS_REQUEST: {
-        if (truncated) {
-            _SERVER_DEBUG("truncated, not processing, sending Size1\n");
-            UNICOAP_OPTIONS_ALLOC(response_options, 5);
-            unicoap_options_set_size1(&response_options, CONFIG_UNICOAP_BLOCK_SIZE);
-            unicoap_response_init_with_options(message, UNICOAP_STATUS_REQUEST_ENTITY_TOO_LARGE,
-                                               NULL, 0, &response_options);
-            unicoap_messaging_send(packet, UNICOAP_MESSAGING_FLAGS_DEFAULT);
-            return UNICOAP_PREPROCESSING_ERROR_REQUEST;
-        }
+        if (IS_USED(MODULE_UNICOAP_SERVER)) {
+            if (truncated) {
+                _SERVER_DEBUG("truncated, not processing, sending Size1\n");
+                UNICOAP_OPTIONS_ALLOC(response_options, 5);
+                unicoap_options_set_size1(&response_options, CONFIG_UNICOAP_BLOCK_SIZE);
+                unicoap_response_init_with_options(message, UNICOAP_STATUS_REQUEST_ENTITY_TOO_LARGE,
+                                                   NULL, 0, &response_options);
+                unicoap_messaging_send(packet, UNICOAP_MESSAGING_FLAGS_DEFAULT, NULL);
+                return UNICOAP_PREPROCESSING_ERROR_REQUEST;
+            }
 
-        const unicoap_resource_t* resource = NULL;
-        const unicoap_listener_t* listener = NULL;
-        if ((res = unicoap_resource_find(packet, &resource, &listener)) != 0) {
-            unicoap_response_init_empty(message, res < 0 ? UNICOAP_STATUS_INTERNAL_SERVER_ERROR :
-                                                           (unicoap_status_t)res);
-            unicoap_messaging_send(packet, UNICOAP_MESSAGING_FLAGS_DEFAULT);
-            return UNICOAP_PREPROCESSING_ERROR_REQUEST;
+            const unicoap_resource_t* resource = NULL;
+            const unicoap_listener_t* listener = NULL;
+            if ((res = unicoap_resource_find(packet, &resource, &listener)) != 0) {
+                unicoap_response_init_empty(message, res < 0 ? UNICOAP_STATUS_INTERNAL_SERVER_ERROR :
+                                            (unicoap_status_t)res);
+                unicoap_messaging_send(packet, UNICOAP_MESSAGING_FLAGS_DEFAULT, NULL);
+                return UNICOAP_PREPROCESSING_ERROR_REQUEST;
+            }
+            arg->resource = resource;
+            *flags = _messaging_flags_resource(resource->flags);
+            return UNICOAP_PREPROCESSING_SUCCESS_REQUEST;
+        } else {
+            return UNICOAP_PREPROCESSING_ERROR_UNSUPPORTED;
         }
-        arg->resource = resource;
-        *flags = _messaging_flags_resource(resource->flags);
-        return UNICOAP_PREPROCESSING_SUCCESS_REQUEST;
     }
 
     case UNICOAP_CODE_CLASS_RESPONSE_SUCCESS:
     case UNICOAP_CODE_CLASS_RESPONSE_CLIENT_FAILURE:
-    case UNICOAP_CODE_CLASS_RESPONSE_SERVER_FAILURE:
-        /* TODO: Client: Process response */
-        return UNICOAP_PREPROCESSING_ERROR_RESPONSE_UNEXPECTED;
+    case UNICOAP_CODE_CLASS_RESPONSE_SERVER_FAILURE: {
+        if (IS_USED(MODULE_UNICOAP_CLIENT)) {
+            unicoap_client_memo_t* memo = unicoap_client_memo_find(packet->remote,
+                packet->properties.token, packet->properties.token_length);
+
+            if (!memo) {
+                if (unicoap_options_contains(packet->message->options, UNICOAP_OPTION_OBSERVE)) {
+                    /* We are no longer interested in notifications */
+                    _CLIENT_DEBUG("received unknown NON notification\n");
+                    return UNICOAP_PREPROCESSING_ERROR_NOTIFICATION_UNEXPECTED;
+                }
+                else {
+                    _CLIENT_DEBUG("received unknown response\n");
+                    return UNICOAP_PREPROCESSING_ERROR_RESPONSE_UNEXPECTED;
+                }
+            }
+
+            if (truncated) {
+                _CLIENT_DEBUG("truncated, not processing\n");
+                unicoap_client_callback_failure(memo, -ENOBUFS);
+                unicoap_client_memo_free(memo);
+                return UNICOAP_PREPROCESSING_ERROR_TRUNCATED;
+            }
+            unicoap_event_cancel(&memo->super.exchange.timeout);
+            arg->client = memo;
+            *flags = _messaging_flags_client(memo->flags);
+            return UNICOAP_PREPROCESSING_SUCCESS_RESPONSE;
+        } else {
+            return UNICOAP_PREPROCESSING_ERROR_UNSUPPORTED;
+        }
+    }
 
     case UNICOAP_CODE_CLASS_SIGNAL:
         /* TODO: Signaling */
@@ -365,30 +565,24 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
 
 int unicoap_exchange_process(unicoap_packet_t* packet, unicoap_exchange_arg_t arg) {
     switch (unicoap_code_class(packet->message->code)) {
-    case UNICOAP_CODE_CLASS_REQUEST:
-        return unicoap_server_process_request(packet, arg.resource);
+        case UNICOAP_CODE_CLASS_REQUEST:
+            return IS_USED(MODULE_UNICOAP_SERVER) ?
+                unicoap_server_process_request(packet, arg.resource) : -ENOTSUP;
 
-    case UNICOAP_CODE_CLASS_RESPONSE_SUCCESS:
-    case UNICOAP_CODE_CLASS_RESPONSE_CLIENT_FAILURE:
-    case UNICOAP_CODE_CLASS_RESPONSE_SERVER_FAILURE:
-        /* TODO: Client: Process response */
-        return -1;
+        case UNICOAP_CODE_CLASS_RESPONSE_SUCCESS:
+        case UNICOAP_CODE_CLASS_RESPONSE_CLIENT_FAILURE:
+        case UNICOAP_CODE_CLASS_RESPONSE_SERVER_FAILURE:
+            return IS_USED(MODULE_UNICOAP_CLIENT) ?
+                unicoap_client_process_response(packet, arg.client) : -ENOTSUP;
 
-    case UNICOAP_CODE_CLASS_SIGNAL:
-        /* TODO: Signaling */
-        return -1;
+        case UNICOAP_CODE_CLASS_SIGNAL:
+            /* TODO: Signaling */
+            return -1;
 
-    default:
-        UNREACHABLE();
-        return -1;
+        default:
+            UNREACHABLE();
+            return -1;
     }
-}
-
-int unicoap_exchange_release_endpoint_state(const unicoap_endpoint_t* endpoint) {
-    (void)endpoint;
-    /* TODO: Client and advanced server features: Elaborate state management */
-    /* TODO: Observe: Remove potential registrations */
-    return -ENOENT;
 }
 
 /* These must be in state.c as it reads the _state object. */

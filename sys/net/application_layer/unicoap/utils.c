@@ -704,6 +704,15 @@ void unicoap_print_resource_flags(unicoap_resource_flags_t flags) {
     printf("]");
 }
 
+void unicoap_print_client_flags(unicoap_client_flags_t flags)
+{
+    printf("[ ");
+    if (flags & UNICOAP_CLIENT_FLAG_RELIABLE) {
+        printf("RELIABLE ");
+    }
+    printf("]");
+}
+
 void unicoap_assist_emit_diagnostic_missing_driver(unicoap_proto_t proto) {
     if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
         switch (proto) {

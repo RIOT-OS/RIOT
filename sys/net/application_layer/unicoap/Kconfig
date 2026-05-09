@@ -4,7 +4,25 @@ menu "CoAP Unified Suite (unicoap)"
     comment "******************"
     comment "SUITE"
 
+    menu "Timing"
+
+        config UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS
+            int "Time to wait for a response (ms)"
+            range 1 9999999
+            default 10000
+            help
+                Client only
+
+    endmenu
+
     menu "Buffers"
+
+        config UNICOAP_CLIENT_MEMOS_MAX
+            int "Maximum parallel exchanges"
+            range 0 9999999
+            default 2
+            help
+                Maximum number of pending requests started using the client API.
 
         config UNICOAP_OPTIONS_MAX
             int "Maximum number of options in a message"
