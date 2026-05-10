@@ -2,14 +2,15 @@
  * SPDX-FileCopyrightText: 2026 Baptiste Le Duc <baptiste.leduc@etik.com>
  * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
+
 /**
  * @{
  *
  * @file
  * @author  Baptiste Le Duc <baptiste.leduc@etik.com>
  */
-
-#pragma once
 
 #ifdef __cplusplus
 extern "C" {
