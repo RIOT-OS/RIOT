@@ -55,6 +55,57 @@ static const uart_conf_t uart_config[] = {
 
 #define UART_NUMOF      ARRAY_SIZE(uart_config)
 
+/**
+ * @name    Timer configuration
+ *
+ * The RP2350 provides two independent 64-bit microsecond timers (TIMER0,
+ * TIMER1). Each has four compare channels (ALARM0..3) wired to separate
+ * NVIC IRQs. We expose only TIMER0 here; alarm matches are on the lower
+ * 32 bits of the counter, so timer_read() / timer_set_absolute() use a
+ * 32-bit wraparound window of ~71 minutes at 1 MHz.
+ * @{
+ */
+#define PERIPH_TIMER_PROVIDES_SET   /**< use the driver-provided timer_set */
+
+/**
+ * @brief   Per-channel timer configuration (one IRQ per ALARM)
+ */
+typedef struct {
+    IRQn_Type irqn;                 /**< NVIC IRQ for this alarm channel */
+} timer_channel_conf_t;
+
+/**
+ * @brief   Timer device configuration
+ */
+typedef struct {
+    TIMER0_Type *dev;               /**< pointer to TIMER register block */
+    const timer_channel_conf_t *ch; /**< per-channel configuration array */
+    uint8_t ch_numof;               /**< number of compare channels */
+} timer_conf_t;
+
+static const timer_channel_conf_t timer0_channel_config[] = {
+    { .irqn = TIMER0_IRQ_0_IRQn },
+    { .irqn = TIMER0_IRQ_1_IRQn },
+    { .irqn = TIMER0_IRQ_2_IRQn },
+    { .irqn = TIMER0_IRQ_3_IRQn },
+};
+
+static const timer_conf_t timer_config[] = {
+    {
+        .dev = TIMER0,
+        .ch = timer0_channel_config,
+        .ch_numof = ARRAY_SIZE(timer0_channel_config),
+    },
+};
+
+#define TIMER_0_ISRA    isr_timer0_0
+#define TIMER_0_ISRB    isr_timer0_1
+#define TIMER_0_ISRC    isr_timer0_2
+#define TIMER_0_ISRD    isr_timer0_3
+
+#define TIMER_NUMOF     ARRAY_SIZE(timer_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
