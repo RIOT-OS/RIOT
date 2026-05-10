@@ -1,6 +1,6 @@
 PKG_NAME=radiolib
 PKG_URL=https://github.com/jgromes/RadioLib
-PKG_VERSION=f403b9c3d735bbd467ee92c1baf8ea216b608125
+PKG_VERSION=f403b9c3d735bbd467ee92c1baf8ea216b608125 # v7.6.0
 PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
