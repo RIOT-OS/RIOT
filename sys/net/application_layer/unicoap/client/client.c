@@ -191,7 +191,7 @@ int _unicoap_open_request(unicoap_message_t* request,
                                     request->options);
 
             if (res < 0) {
-                _CLIENT_DEBUG("URI/DNS/options failure\n");
+                _CLIENT_DEBUG("URI/DNS/options failure (%i, %s)\n", res, strerror(-res));
                 return res;
             }
 
@@ -209,7 +209,7 @@ int _unicoap_open_request(unicoap_message_t* request,
         unicoap_endpoint_t endpoint = { ._tl_ep = { .port = UNICOAP_DEFAULT_COAP_PORT } };
         // FIXME: SVCB?
         if ((res = dns_query(destination->body.host, &endpoint._tl_ep, 0)) < 0) {
-            _URI_DEBUG("error: DNS resolution of '%s' failed: %i\n", destination->body.host, res);
+            _CLIENT_DEBUG("DNS resolution of '%s' failed: %i\n", destination->body.host, res);
             return res;
         }
         return unicoap_client_send_request_body(request, &endpoint, callback,
