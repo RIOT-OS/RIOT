@@ -234,7 +234,7 @@ void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, voi
 #endif
     }
 
-    if (_is_client(memo)) {
+    if (IS_USED(MODULE_UNICOAP_CLIENT) && _is_client(memo)) {
         if (type & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE) {
             unicoap_client_callback_failure(unicoap_client_memo_of_super(memo),
                                           unicoap_layer_notification_async_failure_to_errno(type));
