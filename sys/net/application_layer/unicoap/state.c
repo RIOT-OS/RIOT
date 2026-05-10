@@ -130,6 +130,9 @@ static void _deinit_client(unicoap_client_memo_t* memo) {
     memo->callback._any = NULL;
     memo->callback_arg = NULL;
     memo->flags = 0;
+#if IS_ACTIVE(CONFIG_UNICOAP_CLIENT_CANCELLABLE)
+    memo->reference_id = 0;
+#endif
 }
 
 unicoap_client_memo_t* unicoap_client_memo_create(const unicoap_endpoint_t* endpoint) {
@@ -150,7 +153,7 @@ void unicoap_client_memo_free(unicoap_client_memo_t* memo) {
     _free(&memo->super);
 }
 
-unicoap_client_memo_t* unicoap_client_memo_find(const unicoap_endpoint_t* endpoint,
+unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* endpoint,
                                                   const uint8_t* token, size_t token_length) {
     (void)endpoint;
     (void)token;
@@ -159,7 +162,7 @@ unicoap_client_memo_t* unicoap_client_memo_find(const unicoap_endpoint_t* endpoi
     assert(token);
 
 #if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
-    for (int i = 0; i < (int)ARRAY_SIZE(_state.client_memos); i += 1) {
+    for (size_t i = 0; i < (size_t)ARRAY_SIZE(_state.client_memos); i += 1) {
         unicoap_client_memo_t* memo = &_state.client_memos[i];
 
         if (unicoap_endpoint_is_equal(&memo->super.endpoint, endpoint) &&
@@ -170,6 +173,38 @@ unicoap_client_memo_t* unicoap_client_memo_find(const unicoap_endpoint_t* endpoi
     }
 #endif
     return NULL;
+}
+
+unicoap_client_memo_t* unicoap_client_memo_find_refno(int refno) {
+    assert(refno > 0);
+#if IS_ACTIVE(CONFIG_UNICOAP_CLIENT_CANCELLABLE)
+    /* First bit is sign bit, then 3 bits for min index and then 12 bits of randomness.
+     * For 16 or fewer memos, we thus don't have to search at all. */
+    size_t index_min = (refno & 0x7000) >> 12;
+    uint16_t reference_id = refno & 0xfff;
+    _STATE_DEBUG("refno=%i (min_client_ix=#%" PRIuSIZE ", refid=%u)\n", refno, index_min, reference_id);
+#  if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
+    for (size_t i = index_min; i < (size_t)ARRAY_SIZE(_state.client_memos); i += 1) {
+        unicoap_client_memo_t* memo = &_state.client_memos[i];
+        if (memo->reference_id == reference_id) {
+            return memo;
+        }
+    }
+#  endif
+#endif
+    return NULL;
+}
+
+int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo) {
+    assert(memo);
+#if IS_ACTIVE(CONFIG_UNICOAP_CLIENT_CANCELLABLE)
+    memo->reference_id = random_uint32_range(1, UINT16_MAX) & 0xfff;
+    int refno = memo->reference_id | (MIN(_client_index(memo), 0x7) << 12);
+    _STATE_DEBUG("refno=%i (min_client_ix=#%" PRIuSIZE ", refid=%u)\n", refno, MIN(_client_index(memo), 0x7), memo->reference_id);
+    return refno;
+#else
+    return 0;
+#endif
 }
 
 void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, void* arg) {
@@ -518,7 +553,7 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
     case UNICOAP_CODE_CLASS_RESPONSE_CLIENT_FAILURE:
     case UNICOAP_CODE_CLASS_RESPONSE_SERVER_FAILURE: {
         if (IS_USED(MODULE_UNICOAP_CLIENT)) {
-            unicoap_client_memo_t* memo = unicoap_client_memo_find(packet->remote,
+            unicoap_client_memo_t* memo = unicoap_client_memo_find_token(packet->remote,
                 packet->properties.token, packet->properties.token_length);
 
             if (!memo) {

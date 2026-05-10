@@ -222,6 +222,20 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
 #if !defined(CONFIG_UNICOAP_CLIENT_MEMOS_MAX) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_CLIENT_MEMOS_MAX (2)
 #endif
+
+/**
+ * @brief Cancellable requests
+ *
+ * If enabled, @ref unicoap_client_send_request_async will return a positive refno
+ * that can be used to cancel the request using @ref unicoap_client_cancel if still pending.
+ *
+ ***Default**: disabled
+ */
+#if !defined(CONFIG_UNICOAP_CLIENT_CANCELLABLE) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_CLIENT_CANCELLABLE 0
+#endif
+
+
 /** @} */
 
 /* MARK: - Timing */
