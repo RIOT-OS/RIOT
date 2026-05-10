@@ -1,0 +1,3 @@
+INCLUDES += -isystem$(PKGDIRBASE)/radiolib/src
+
+DIRS += $(RIOTBASE)/pkg/radiolib/contrib
