@@ -190,7 +190,7 @@ int unicoap_server_send_response_body(unicoap_packet_t* packet,
                                       const unicoap_resource_t* resource)
 {
     int res = 0;
-    if ((res = unicoap_messaging_send(packet, _messaging_flags_resource(resource->flags), memo)) < 0) {
+    if ((res = unicoap_messaging_send(packet, _messaging_flags_resource(resource->flags), NULL)) < 0) {
         _SERVER_DEBUG("error: could not send response\n");
         goto error;
     }
