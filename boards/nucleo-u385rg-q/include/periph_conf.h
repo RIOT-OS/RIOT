@@ -27,7 +27,33 @@
 extern "C" {
 #endif
 
-/* No SPI or PWM yet */
+/* No PWM yet */
+
+/**
+ * @name   SPI configuration
+ * @{
+ * @note  Arduino D11/D12/D13 (MOSI/MISO/SCK) on Nucleo-U: PA7/PA6/PA5. SPI1 on
+ *        APB2; clock gate @ref RCC_APB2ENR_SPI1EN in stm32u385xx.h. Alternate
+ *        function AF5 for SPI1 on port A (RM0487 AF table).
+ */
+static const spi_conf_t spi_config[] = {
+    {
+        .dev = SPI1,
+        .mosi_pin = GPIO_PIN(PORT_A, 7),
+        .miso_pin = GPIO_PIN(PORT_A, 6),
+        .sclk_pin = GPIO_PIN(PORT_A, 5),
+        .cs_pin = GPIO_UNDEF,
+        .mosi_af = GPIO_AF5,
+        .miso_af = GPIO_AF5,
+        .sclk_af = GPIO_AF5,
+        .cs_af = GPIO_AF5,
+        .rccmask = RCC_APB2ENR_SPI1EN,
+        .apbbus = APB2,
+    },
+};
+
+#define SPI_NUMOF ARRAY_SIZE(spi_config)
+/** @} */
 
 /**
  * @name I2C configuration

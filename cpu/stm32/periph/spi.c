@@ -36,6 +36,15 @@
 #include "debug.h"
 
 /**
+ * @brief SPI variants with CFG1/CFG2/TXDR/RXDR (not legacy DR + BR in CR1)
+ *
+ * Same programming model as STM32H7; STM32U3 uses this SPI IP as well.
+ */
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
+#define STM32_SPI_USE_MODERN_REGS   1
+#endif
+
+/**
  * @brief   Number of bits to shift the BR value in the CR1 register
  */
 #define BR_SHIFT            (3U)
@@ -84,7 +93,7 @@ static uint8_t _get_prescaler(const spi_conf_t *conf, uint32_t clock)
 
     uint8_t prescaler = 0;
     uint32_t prescaled_clock = bus_clock >> 1;
-#if CPU_FAM_STM32H7
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
     const uint8_t prescaler_max = SPI_CFG1_MBR_Msk >> SPI_CFG1_MBR_Pos;
 #else
     const uint8_t prescaler_max = SPI_CR1_BR_Msk >> SPI_CR1_BR_Pos;
@@ -276,7 +285,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
           periph_apb_clk(spi_config[bus].apbbus) >> (br + 1),
           (unsigned)br);
 
-#if CPU_FAM_STM32H7
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
 
     uint32_t cr1 = 0;
     if (cs != SPI_HWCS_MASK) {
@@ -364,7 +373,7 @@ void spi_release(spi_t bus)
     /* disable device and release lock */
     dev(bus)->CR1 = 0;
     dev(bus)->CR2 = SPI_CR2_SETTINGS; /* Clear the DMA and SSOE flags */
-#if CPU_FAM_STM32H7
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
     dev(bus)->CFG1 = 0;
     dev(bus)->CFG2 = 0;
 #endif
@@ -378,7 +387,7 @@ void spi_release(spi_t bus)
 
 static inline void _wait_for_end(spi_t bus)
 {
-#if CPU_FAM_STM32H7
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
     /* Wait until End Of Transfer */
     while (!(dev(bus)->SR & SPI_SR_EOT)) {}
     /* Clear EOT by writing 1 to IFC register */
@@ -401,7 +410,7 @@ static inline void _wait_for_end(spi_t bus)
 static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
 {
     uint8_t tmp = 0;
-#if CPU_FAM_STM32H7
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
 
     dev(bus)->IFCR = 0xFFFFFFFF;
 
@@ -451,7 +460,7 @@ static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
     dma_start(spi_config[bus].rx_dma);
     dma_start(spi_config[bus].tx_dma);
 
-#if CPU_FAM_STM32H7
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
     dev(bus)->CR1 |= SPI_CR1_SPE;
     dev(bus)->CR1 |= SPI_CR1_CSTART;
 #endif
@@ -459,7 +468,7 @@ static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
     dma_wait(spi_config[bus].rx_dma);
     dma_wait(spi_config[bus].tx_dma);
 
-#if defined(DMA_CCR_EN) || defined(CPU_FAM_STM32H7)
+#if defined(DMA_CCR_EN) || defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
     dma_stop(spi_config[bus].rx_dma);
     dma_stop(spi_config[bus].tx_dma);
 #endif
@@ -472,7 +481,7 @@ static void _transfer_no_dma(spi_t bus, const void *out, void *in, size_t len)
     const uint8_t *outbuf = out;
     uint8_t *inbuf = in;
 
-#if CPU_FAM_STM32H7
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
 
     dev(bus)->IFCR = 0xFFFFFFFF;
 
@@ -573,7 +582,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         gpio_clear((gpio_t)cs);
     }
     else {
-#if CPU_FAM_STM32H7
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
         dev(bus)->CFG2 |= SPI_CFG2_SSOE;
 #else
         dev(bus)->CR2 |= SPI_CR2_SSOE;
@@ -597,7 +606,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
             gpio_set((gpio_t)cs);
         }
         else {
-#if CPU_FAM_STM32H7
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
             dev(bus)->CFG2 &= ~(SPI_CFG2_SSOE);
 #else
             dev(bus)->CR2 &= ~(SPI_CR2_SSOE);
