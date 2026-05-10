@@ -51,7 +51,6 @@ int unicoap_client_callback_success(unicoap_client_memo_t* memo, const unicoap_p
 
     /* TODO: Block-wise callback */
     if (callback.response) {
-        printf("callback at %p\n", callback.response);
         _UNICOAP_CHECKPOINT;
         return callback.response(packet->message, &aux, 0, arg);
     }
@@ -168,7 +167,6 @@ int _unicoap_open_request(unicoap_message_t* request,
     int res = 0;
     switch (destination->type) {
     case UNICOAP_DESTINATION_URI:
-            printf("callback at %p\n", callback.response);
         if (IS_USED(MODULE_UNICOAP_CLIENT_URI)) {
             if (!request->options) {
                 request->options = (unicoap_options_t *)alloca(sizeof(unicoap_options_t));

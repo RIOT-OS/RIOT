@@ -313,6 +313,10 @@ void unicoap_messaging_notify_rfc7252(void* state, unicoap_layer_notification_t 
         MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "[NOTIF] exchange layer released state\n",
                              transmission->id);
         /* TODO: Advanced features: cannot _always_ release transmission if exchange layer releases. */
+        /* For example, if we never see an ACK for a CON request,
+         * but then get response (CON or NON), the exchange layer will handle the response and
+         * thereby cancel any retransmissions of the request because we release state here once
+         * the exchange layer does. */
         _transmission_free_notif(transmission, UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE);
     } else if (type == UNICOAP_LAYER_NOTIFICATION_STATE_ALLOC) {
         MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "[NOTIF] exchange layer allocated state\n",
@@ -652,21 +656,17 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool trun
     /* This is a response the exchange layer expected.
      * We may have attached a transmission, free that transmission here. */
     case UNICOAP_PREPROCESSING_SUCCESS_RESPONSE: {
-        _transmission_t* transmission = _transmission_find(packet->remote, _get_id(packet));
-        if (transmission) {
-            _transmission_free_notif(transmission, UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE);
+        /* Releasing the transmission when receiving an ACK is done in _process_messaging_layer. */
+        if (_get_type(packet) == UNICOAP_TYPE_CON) {
+            MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT
+                                 "sending empty ACK for expected response\n", _get_id(packet));
 
-            if (_get_type(packet) == UNICOAP_TYPE_CON) {
-                MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT
-                                     "sending empty ACK for expected response\n", _get_id(packet));
-
-                /* We're going to need the response below, don't override it. */
-                unicoap_message_t* message = packet->message;
-                unicoap_message_t m = *packet->message;
-                packet->message = &m;
-                _acknowledge(packet);
-                packet->message = message;
-            }
+            /* We're going to need the response below, don't override it. */
+            unicoap_message_t* message = packet->message;
+            unicoap_message_t m = *packet->message;
+            packet->message = &m;
+            _acknowledge(packet);
+            packet->message = message;
         }
         break;
     }
