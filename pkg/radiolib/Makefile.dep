@@ -29,3 +29,5 @@ CXXEXFLAGS += -Wno-reorder
 CXXEXFLAGS += -Wno-address
 CXXEXFLAGS += -Wno-sign-compare
 CXXEXFLAGS += -Wno-unused-function
+CXXEXFLAGS += -Wno-missing-braces
+CXXEXFLAGS += -Wno-overloaded-virtual
