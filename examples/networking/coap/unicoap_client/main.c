@@ -50,6 +50,7 @@ static const credman_credential_t credential = {
 
 static int _print_usage(char** argv) {
     printf("usage: %s <get|post|put|delete|fetch|path|ipatch> [-r] <URI> [<UTF-8 payload>]\n", argv[0]);
+    printf("          cancel <refno>\n");
     printf("Options: (default: unreliable)\n");
     printf("    -r   send reliably (send CON instead of NON over RFC7252 over UDP/DTLS)\n");
     printf("    -t   print response as UTF-8 if Content-Format is absent\n");
@@ -110,6 +111,17 @@ static int _cli(int argc, char** argv) {
         goto help;
     }
 
+    if (strcmp(argv[1], "cancel") == 0) {
+        if (argc != 3) {
+            printf("error: invalid arguments\n");
+            goto help;
+        }
+        if ((res = unicoap_client_cancel(atoi(argv[2]))) < 0) {
+            printf("cancelling request failed (%i, %s)\n", res, strerror(-res));
+        }
+        return res;
+    }
+
     int method = -1;
     for (size_t i = 0; i < ARRAY_SIZE(methods) && method == -1; i++) {
         if (strcmp(argv[1], methods[i]) == 0) {
@@ -166,6 +178,7 @@ static int _cli(int argc, char** argv) {
             printf("sending request failed (error %i, %s)\n", res, strerror(-res));
             return res;
         }
+        printf("request refno=%i\n", res);
         return 0;
     }
 

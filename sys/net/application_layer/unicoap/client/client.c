@@ -147,11 +147,37 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
     if ((res = unicoap_client_send_request_part(&packet, memo, flags)) < 0) {
         goto error;
     }
+    if (memo) {
+        return unicoap_client_memo_assign_refno(memo);
+    }
     return 0;
 
 error:
     unicoap_client_memo_free(memo);
     return res;
+}
+
+int unicoap_client_cancel(int refno) {
+    if (IS_ACTIVE(CONFIG_UNICOAP_CLIENT_CANCELLABLE)) {
+        if (refno <= 0) {
+            return -EINVAL;
+        }
+        unicoap_client_memo_t* memo = unicoap_client_memo_find_refno(refno);
+        if (!memo) {
+            _CLIENT_DEBUG("no request with refno %i\n", refno);
+            return -ENOENT;
+        }
+        _CLIENT_DEBUG("cancelling request with refno %i\n", refno);
+        unicoap_client_callback_failure(memo, -ECANCELED);
+        unicoap_client_memo_free(memo);
+        return 0;
+    } else {
+        if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
+            unicoap_assist(API_MISUSE("request cancellation not supported")
+                               FIXIT("enable CONFIG_UNICOAP_CLIENT_CANCELLABLE"));
+        }
+        return -ENOTSUP;
+    }
 }
 
 /* MARK: - URI */
