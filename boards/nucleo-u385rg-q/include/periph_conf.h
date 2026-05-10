@@ -27,7 +27,35 @@
 extern "C" {
 #endif
 
-/* No SPI, I2C, or PWM yet */
+/* No SPI or PWM yet */
+
+/**
+ * @name I2C configuration
+ * @{
+ * @note Nucleo Arduino connector D14/D15 = PB9/PB8 (SDA/SCL). I2C1 on APB1,
+ *       AF4 per RM0487 / alternate-function tables (same convention as other
+ *       STM32 Nucleo boards). Kernel clock: RCC CCIPR1 I2C1SEL — leave @c 0 to
+ *       keep reset default (typically PCLK1); OR @ref RCC_CCIPR1_I2C1SEL if a
+ *       different RM0487 setting is required.
+ */
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev = I2C1,
+        .speed = I2C_SPEED_NORMAL,
+        .scl_pin = GPIO_PIN(PORT_B, 8),
+        .sda_pin = GPIO_PIN(PORT_B, 9),
+        .scl_af = GPIO_AF4,
+        .sda_af = GPIO_AF4,
+        .bus = APB1,
+        .rcc_mask = RCC_APB1ENR1_I2C1EN,
+        .rcc_sw_mask = 0,
+        .irqn = I2C1_ER_IRQn,
+    },
+};
+
+#define I2C_0_ISR isr_i2c1_er
+#define I2C_NUMOF ARRAY_SIZE(i2c_config)
+/** @} */
 
 /**
  * @name    Timer configuration
