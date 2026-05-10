@@ -26,3 +26,9 @@ ifneq (,$(filter lvgl,$(USEPKG)))
 endif
 
 USEMODULE += native_drivers
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  ifneq (,$(filter periph_gpio_mock,$(USEMODULE)))
+    USEMODULE += saul_gpio
+  endif
+endif
