@@ -19,4 +19,13 @@ USEMODULE += ztimer_msec
 USEMODULE += ztimer_usec
 
 USEMODULE += cpp11-compat
-CXXEXFLAGS += -Wno-unused-parameter -Wno-pedantic -Wno-missing-field-initializers -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Wno-unused-variable -Wno-reorder -Wno-address -Wno-sign-compare -Wno-unused-function
+CXXEXFLAGS += -Wno-unused-parameter
+CXXEXFLAGS += -Wno-pedantic
+CXXEXFLAGS += -Wno-missing-field-initializers
+CXXEXFLAGS += -Wno-unused-but-set-variable
+CXXEXFLAGS += -Wno-maybe-uninitialized
+CXXEXFLAGS += -Wno-unused-variable
+CXXEXFLAGS += -Wno-reorder
+CXXEXFLAGS += -Wno-address
+CXXEXFLAGS += -Wno-sign-compare
+CXXEXFLAGS += -Wno-unused-function
