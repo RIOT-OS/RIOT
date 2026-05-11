@@ -51,9 +51,12 @@ endif
 
 PKG_SOURCE_LOCAL ?= $(PKG_SOURCE_LOCAL_$(shell echo $(PKG_NAME) | tr a-z- A-Z_))
 
-# Check if git-cache-rs is installed in the local default directory and if so,
-# set the `GIT_CACHE_RS` variable to use it.
-DEFAULT_GIT_CACHE_RS ?= $(HOME)/.cargo/bin/git-cache
+# If CARGO_HOME is set, use it to search for `git-cache-rs` (git-cache),
+# otherwise try the local default directory. The git-cache can also be set
+# directly with GIT_CACHE_RS.
+CARGO_HOME ?= $(HOME)/.cargo
+
+DEFAULT_GIT_CACHE_RS ?= $(CARGO_HOME)/bin/git-cache
 ifeq ($(DEFAULT_GIT_CACHE_RS),$(wildcard $(DEFAULT_GIT_CACHE_RS)))
   GIT_CACHE_RS ?= $(DEFAULT_GIT_CACHE_RS)
 endif
