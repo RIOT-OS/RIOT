@@ -44,7 +44,7 @@ env:
 # to hit Github Limit of 6h per job.
 jobs:
   check-secret:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     outputs:
       secret-configured: ${{ steps.secret-exists-check.outputs.defined }}
     steps:
@@ -87,7 +87,7 @@ jobs:
         echo '${{ secrets.IOTLABRC }}' > ~/.iotlabrc
     - name: Setup SSH agent
       if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
-      uses: webfactory/ssh-agent@v0.9.0
+      uses: webfactory/ssh-agent@v0.10.0
       with:
         ssh-private-key: ${{ secrets.IOTLAB_PRIVATE_KEY }}
     - name: Fetch host keys from IoT-LAB sites
@@ -115,7 +115,7 @@ jobs:
         fetch-depth: 1
         ref: ${{ github.event.inputs.riot_version }}
     - name: Set up Python 3.8
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: 3.8
     - name: Install Python dependencies
@@ -190,7 +190,7 @@ jobs:
         mkdir test-reports/
         junit2html ${REPORT_XML} ${REPORT_NAME}.html
         cp ${REPORT_XML} ${REPORT_NAME}.xml
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       if: always()
       with:
         name: Test-Reports-${{ matrix.pytest_mark }}

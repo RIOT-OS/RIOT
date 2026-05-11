@@ -19,7 +19,7 @@ jobs:
         working-directory: doc/starlight
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
