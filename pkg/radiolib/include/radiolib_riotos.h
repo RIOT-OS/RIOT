@@ -89,13 +89,13 @@ public:
 
     /**
       @brief Return elapsed time in milliseconds.
-      @return  Milliseconds since boot.
+      @return  Current milliseconds count.
     */
     RadioLibTime_t millis() override;
 
     /**
       @brief Return elapsed time in microseconds.
-      @return  Microseconds since boot.
+      @return  Current microseconds count.
     */
     RadioLibTime_t micros() override;
 
