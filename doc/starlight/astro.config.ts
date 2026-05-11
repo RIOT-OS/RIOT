@@ -182,7 +182,6 @@ export default defineConfig({
           label: "Miscellaneous",
           items: [
             "misc/dev_best_practices",
-            "misc/roadmap",
             "misc/lost_and_found",
             "misc/release_cycle",
             "misc/managing-a-release",
