@@ -27,8 +27,6 @@
 extern "C" {
 #endif
 
-/* No PWM yet */
-
 /**
  * @name   SPI configuration
  * @{
@@ -86,20 +84,48 @@ static const i2c_conf_t i2c_config[] = {
 /**
  * @name    Timer configuration
  * @{
+ * @note    TIM2 is reserved for @ref pwm_config (User LED / TIM2_CH1 on PA5).
+ *          TIM3 is used here as the RIOT timer backend (general-purpose timer).
  */
 static const timer_conf_t timer_config[] = {
     {
-        .dev = TIM2,
-        .max = 0xffffffff,              /* 32-bit timer */
-        .rcc_mask = RCC_APB1ENR1_TIM2EN,
+        .dev = TIM3,
+        .max = 0xffffffff,
+        .rcc_mask = RCC_APB1ENR1_TIM3EN,
         .bus = APB1,
-        .irqn = TIM2_IRQn,
+        .irqn = TIM3_IRQn,
     }
 };
 
 #define TIMER_NUMOF        ARRAY_SIZE(timer_config)
 
-#define TIMER_0_ISR        isr_tim2
+#define TIMER_0_ISR        isr_tim3
+/** @} */
+
+/**
+ * @name    PWM configuration
+ *
+ * TIM2 channel mapping follows the MCU alternate-function table (RM0487).
+ * TIM2_CH1 on PA5 uses AF1 and connects to the green User LED (same pin as
+ * Arduino D13 when SPI1 is not in use; see boards/common/nucleo64/doc.md).
+ *
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    {
+        .dev = TIM2,
+        .rcc_mask = RCC_APB1ENR1_TIM2EN,
+        .chan = { { .pin = GPIO_PIN(PORT_A, 5) /* User LED */, .cc_chan = 0 },
+                  { .pin = GPIO_UNDEF, .cc_chan = 0 },
+                  { .pin = GPIO_UNDEF, .cc_chan = 0 },
+                  { .pin = GPIO_UNDEF, .cc_chan = 0 } },
+        .af = GPIO_AF1,
+        .bus = APB1,
+    },
+};
+
+#define PWM_NUMOF ARRAY_SIZE(pwm_config)
+
 /** @} */
 
 /**
