@@ -10,6 +10,7 @@ RADIOLIB_MODULES = \
                     radiolib_utils \
                     radiolib_physicallayer \
                     radiolib_lr11x0 \
+                    radiolib_sx127x \
 					#
 
 CXXUWFLAGS += -Wcast-align -Wunused-parameter -Wdeprecated-copy
@@ -18,6 +19,7 @@ DIR_radiolib_core          = src
 DIR_radiolib_utils         = src/utils
 DIR_radiolib_physicallayer = src/protocols/PhysicalLayer
 DIR_radiolib_lr11x0        = src/modules/LR11x0
+DIR_radiolib_sx127x        = src/modules/SX127x
 
 .PHONY: radiolib_%
 

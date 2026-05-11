@@ -12,6 +12,7 @@ USEMODULE += radiolib_core
 USEMODULE += radiolib_utils
 USEMODULE += radiolib_physicallayer
 USEMODULE += radiolib_lr11x0
+USEMODULE += radiolib_sx127x
 
 # timing
 USEMODULE += ztimer
