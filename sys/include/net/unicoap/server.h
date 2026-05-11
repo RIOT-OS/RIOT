@@ -294,6 +294,23 @@ int unicoap_send_response(unicoap_message_t* response, unicoap_request_context_t
  * @return Status code
  */
 unicoap_status_t unicoap_response_status_from_errno(int _errno);
+
+/**
+ * @brief Sends a notification to registered observerd
+ *
+ * Sends the message to clients that have registered for resource observation notifications from this
+ * resource.
+ * @pre The given resource must have @ref UNICOAP_RESOURCE_FLAG_OBSERVABLE.
+ *
+ * Consumes @p response .
+ *
+ * @param[in,out] response Response message to send
+ * @param[in] resource The resource to send the notification from
+ *
+ * @returns Zero on success.
+ * @returns Negative integer on error
+ */
+int unicoap_send_notification(unicoap_message_t* response, const unicoap_resource_t* resource);
 /** @} */
 
 /* MARK: - Registering CoAP resources */
@@ -309,10 +326,10 @@ unicoap_status_t unicoap_response_status_from_errno(int _errno);
  */
 typedef enum {
     /**
-     * @brief Sets the type of the message to confirmable (`CON`),
+     * @brief Sets the type of the response to confirmable (`CON`),
      * if an unreliable transport is used.
      *
-     * This flag is ignored with reliable transports. For unreliable transports, a message
+     * This flag is ignored with reliable transports. For unreliable transports, a response
      * sent with this flag will require an acknowledgement to be sent from the CoAP
      * peer.
      *
@@ -327,6 +344,22 @@ typedef enum {
      * would match a resource with this flag and path `/laniakea/milky-way`.
      */
     UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE = 0x4000,
+
+    /**
+     * @brief Allows clients to register for notifications from the given resource
+     */
+    UNICOAP_RESOURCE_FLAG_OBSERVABLE = 0x0200,
+
+    /**
+     * @brief Sets the type of the notification to reliable (`CON`),
+     * if an unrealiable transport is used.
+     *
+     * This flag is ignored with reliable transports. For unreliable transports, a notification
+     * sent with this flag will require an acknowledgement to be sent from the CoAP
+     * peer.
+     *
+     */
+    UNICOAP_RESOURCE_FLAG_NOTIFY_RELIABLY = 0x0100,
 
     /* TODO: Advanced features */
 } unicoap_resource_flags_t;

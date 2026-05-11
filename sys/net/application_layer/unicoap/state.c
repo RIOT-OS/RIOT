@@ -76,6 +76,14 @@ void unicoap_state_unlock(void) {
     _unlock();
 }
 
+unicoap_observation_registration_t* unicoap_state_observation_registrations(void) {
+    return _state.observation_registrations;
+}
+
+unicoap_endpoint_t* unicoap_state_observers(void) {
+    return _state.observers;
+}
+
 static unicoap_client_memo_t* _alloc_client(void) {
 #if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
     /* Find empty slot in list of transactions */
@@ -481,7 +489,7 @@ static void _debug_packet(const unicoap_packet_t* packet) {
     DEBUG_ENDPOINT(packet->remote);
 
     if (packet->local) {
-        DEBUG("\n\tlocal=");
+        DEBUG("\n\t local=");
         DEBUG_ENDPOINT(packet->local);
     }
 

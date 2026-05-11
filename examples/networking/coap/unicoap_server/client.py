@@ -141,7 +141,6 @@ async def main():
 
             async for r in pr.observation:
                 tell("notification: %s\n%r" % (r, r.payload))
-                break
 
         await protocol.shutdown()
 

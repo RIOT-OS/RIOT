@@ -17,8 +17,16 @@ ifneq (,$(filter unicoap_server,$(USEMODULE)))
   DIRS += server
 endif
 
+ifneq (,$(filter unicoap_server_observation,$(USEMODULE)))
+  DIRS += server/observation
+endif
+
 ifneq (,$(filter unicoap_client,$(USEMODULE)))
   DIRS += client
+endif
+
+ifneq (,$(filter unicoap_client_observation,$(USEMODULE)))
+  DIRS += client/observation
 endif
 
 include $(RIOTBASE)/Makefile.base
