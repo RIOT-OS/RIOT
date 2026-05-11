@@ -5,7 +5,7 @@
 
 "Area: BLE":
   - changed-files:
-    - any-glob-to-any-file: 
+    - any-glob-to-any-file:
       - "pkg/nimble/**/*"
       - "sys/net/ble/**/*"
       - "sys/include/net/bluetil/**/*"
@@ -204,7 +204,7 @@
   - changed-files:
     - any-glob-to-any-file:
       - "cpu/msp*/**/*"
-    - "makefiles/arch/msp430.inc.mk"
+      - "makefiles/arch/msp430.inc.mk"
 
 "Platform: RISC-V":
   - changed-files:
