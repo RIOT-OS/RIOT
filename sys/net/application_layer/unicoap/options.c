@@ -983,8 +983,9 @@ int unicoap_options_add_uint(unicoap_options_t* options, unicoap_option_number_t
 int unicoap_options_set_observe_generated(unicoap_options_t* options)
 {
     /* generate notification value */
-    return unicoap_options_set_observe(
-        options, (ztimer_now(ZTIMER_MSEC) >> UNICOAP_OBSERVE_TICK_EXPONENT) & 0xFFFFFF);
+    uint32_t seqno = (ztimer_now(ZTIMER_MSEC) >> UNICOAP_OBSERVE_TICK_EXPONENT) & 0xFFFFFF;
+    _OPTIONS_DEBUG("set Observe=%" PRIu32 "\n", seqno);
+    return unicoap_options_set_observe(options, seqno);
 }
 
 ssize_t unicoap_options_swap_storage(unicoap_options_t* options, uint8_t* destination,

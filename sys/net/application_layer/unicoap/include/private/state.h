@@ -327,6 +327,9 @@ static inline bool unicoap_callback_is_present(const unicoap_callback_t callback
     return !!callback._any;
 }
 
+#define UNICOAP_CLIENT_MEMO_STORE_OPTIONS \
+    IS_ACTIVE(CONFIG_UNICOAP_CLIENT_CANCELLABLE) && IS_USED(MODULE_UNICOAP_CLIENT_OBSERVATION)
+
 /**
  * @brief Client exchange
  */
@@ -346,11 +349,34 @@ typedef struct {
     uint16_t reference_id;
 #endif
 
+#if UNICOAP_CLIENT_MEMO_STORE_OPTIONS
+    uint8_t options_storage[CONFIG_UNICOAP_OPTIONS_BUFFER_CLIENT_MEMO_CAPACITY];
+    unicoap_options_t options;
+#endif
+
     /**
      * @brief Request flags from application, from the original call to `unicoap_send_request_*
      */
     unicoap_client_flags_t flags;
 } unicoap_client_memo_t;
+
+static inline unicoap_options_t* unicoap_client_memo_options(unicoap_client_memo_t* memo) {
+    (void)memo;
+#if UNICOAP_CLIENT_MEMO_STORE_OPTIONS
+    return &memo->options;
+#else
+    return NULL;
+#endif
+}
+
+static inline uint8_t* unicoap_client_memo_options_storage(unicoap_client_memo_t* memo) {
+    (void)memo;
+#if UNICOAP_CLIENT_MEMO_STORE_OPTIONS
+    return memo->options_storage;
+#else
+    return NULL;
+#endif
+}
 
 /**
  * @brief Returns client memo of common memo state object

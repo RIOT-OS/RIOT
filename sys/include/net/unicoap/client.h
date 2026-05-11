@@ -55,6 +55,16 @@ typedef enum {
      *
      */
     UNICOAP_CLIENT_FLAG_RELIABLE = 0x0001,
+
+    /**
+     * @brief If present on a callback-based function, the callback will be called asynchronously for every
+     * CoAP Observe notification arriving at the client.
+     *
+     * **Default**: disabled.
+     *
+     * @see [Observe (RFC 7641)](https://datatracker.ietf.org/doc/html/rfc7641)
+     */
+    UNICOAP_CLIENT_FLAG_OBSERVE = 0x0100,
 } unicoap_client_flags_t;
 
 /**
@@ -314,6 +324,33 @@ static inline int unicoap_send_request(unicoap_message_t* request,
  * The client callback will be called with `-ECANCELLED`
  */
 int unicoap_client_cancel(int refno);
+
+/**
+ * @brief Cancels request and resource observation by reference number
+ * @param refno Reference number
+ * @returns Zero on success, negative error number otherwise
+ * @retval -EINVAL Invalid refno
+ * @retval -ENOENT No request with given refno is known
+ *
+ * Client callback will be called with `GET` response from server.
+ * Sends a CoAP request with token used in notifications and options from original request.
+ */
+int unicoap_client_cancel_observation(int refno);
+
+/**
+ * @brief Cancels request and resource observation by token and endpoint
+ * @param endpoint Remote server endpoint
+ * @param[in] token Request token used in original registration request
+ * @param token_length Length of @p token
+ * @returns Zero on success, negative error number otherwise
+ * @retval -EINVAL Invalid refno
+ * @retval -ENOENT No request with given refno is known
+ *
+ * Sends a CoAP request with token used in notifications and options from original request.
+ * Client callback will be called with `GET` response from server.
+ */
+int unicoap_client_cancel_observation_token(const unicoap_endpoint_t* endpoint,
+                                            const uint8_t* token, size_t token_length);
 /** @} */
 
 /** @} */

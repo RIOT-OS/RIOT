@@ -341,6 +341,17 @@ static inline unicoap_messaging_flags_t _messaging_flags_client(unicoap_client_f
 int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resource_t* resource);
 
 /**
+ * @brief Sends entire response/notification body, may be split into parts and then sent
+ *
+ * @param[in,out] packet Response/notification packet to send
+ * @param[in] resource mandatory resource which is sending this response
+ *
+ * @returns Zero on success, negative integer otherwise
+ */
+int unicoap_server_send_body(unicoap_packet_t* packet, const unicoap_resource_t* resource,
+                                      unicoap_messaging_flags_t messaging_flags);
+
+/**
  * @brief Sends entire response body, may be split into parts and then sent
  *
  * @param[in,out] packet Response packet to send
@@ -348,8 +359,29 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
  *
  * @returns Zero on success, negative integer otherwise
  */
-int unicoap_server_send_response_body(unicoap_packet_t* packet,
-                                      const unicoap_resource_t* resource);
+static inline int unicoap_server_send_response_body(unicoap_packet_t* packet,
+                                                    const unicoap_resource_t* resource
+) {
+    return unicoap_server_send_body(packet, resource, _messaging_flags_resource(resource->flags));
+}
+
+/**
+ * @brief Sends entire notification body, may be split into parts and then sent
+ *
+ * @param[in,out] packet Notification packet to send
+ * @param[in] resource mandatory resource which is sending this response
+ *
+ * @returns Zero on success, negative integer otherwise
+ */
+static inline int unicoap_server_send_notification_body(unicoap_packet_t* packet,
+                                                        const unicoap_resource_t* resource
+) {
+    unicoap_messaging_flags_t flags = _messaging_flags_resource(resource->flags);
+    return unicoap_server_send_body(packet, resource,
+                                    (resource->flags & UNICOAP_RESOURCE_FLAG_NOTIFY_RELIABLY)
+                                     ? flags | UNICOAP_MESSAGING_FLAG_RELIABLE
+                                     : flags & ~UNICOAP_MESSAGING_FLAG_RELIABLE);
+}
 /** @} */
 
 /* MARK: - Private exchange-layer client API */

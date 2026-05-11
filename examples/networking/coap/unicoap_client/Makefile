@@ -49,6 +49,9 @@ USEMODULE += unicoap_client
 # URI support
 USEMODULE += unicoap_client_uri
 
+# Observation support
+USEMODULE += unicoap_observation
+
 # This module is needed for CoAP over UDP
 USEMODULE += unicoap_driver_udp
 

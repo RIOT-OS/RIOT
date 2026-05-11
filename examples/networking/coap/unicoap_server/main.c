@@ -17,6 +17,9 @@
 /* This is needed for netifs_print_ipv6 in main below. */
 #include "net/netif.h"
 
+/* Include timer for resource notifications in this simple example. */
+#include "ztimer.h"
+
 /* If you need CoAP over DTLS support, you need to include extra dependencies. What's more,
  * you'll also need to load a DTLS credential for message encryption and verification.
  * The `IS_USED(MODULE_UNICOAP_DRIVER_DTLS)` below checks if the @ref net_unicoap_drivers_dtls
@@ -44,6 +47,26 @@ static const credman_credential_t credential = {
 };
 #endif /* IS_USED(MODULE_UNICOAP_DRIVER_DTLS) */
 
+#include <stdio.h>
+#include "thread.h"
+
+void print_current_thread_name(void)
+{
+    /* Retrieve the active thread control block */
+    const thread_t *current_thread = thread_get_active();
+
+    /* Get the name of the thread */
+    const char *name = thread_get_name(current_thread);
+
+    if (name != NULL) {
+        printf("Current thread name: %s\n", name);
+    }
+    else {
+        printf("Thread name not available (DEVELHELP not enabled)\n");
+    }
+}
+
+
 static int handle_hello_request(unicoap_message_t* message, const unicoap_aux_t* aux,
                                 unicoap_request_context_t* ctx, void* arg) {
     (void)aux;
@@ -51,7 +74,7 @@ static int handle_hello_request(unicoap_message_t* message, const unicoap_aux_t*
 
     printf("app: %s /, %" PRIuSIZE " bytes\n",
            unicoap_string_from_method(message->method),
-           unicoap_message_payload_get_size(message));
+           unicoap_message_payload_get_size(message));print_current_thread_name();
 
     /* String literals in C are null-terminated. For null-terminated string, we can use the
      * _string message initializers. */
@@ -80,7 +103,7 @@ UNICOAP_RESOURCE(hello) {
      * In this case, we don't want to loose our precious greeting along the way.
      * To send confirmable messages (CON) over UDP or DTLS, we pass the
      * @ref UNICOAP_RESOURCE_FLAG_RELIABLE flag. */
-    .flags = UNICOAP_RESOURCE_FLAG_RELIABLE,
+    .flags = UNICOAP_RESOURCE_FLAG_RELIABLE | UNICOAP_RESOURCE_FLAG_OBSERVABLE | UNICOAP_RESOURCE_FLAG_NOTIFY_RELIABLY,
 
     /* You must declare what CoAP methods you want to allow for each resource. */
     .methods = UNICOAP_METHODS(UNICOAP_METHOD_GET, UNICOAP_METHOD_PUT, UNICOAP_METHOD_POST),
@@ -191,6 +214,37 @@ UNICOAP_RESOURCE(greeting) {
     .handler_arg = NULL
 };
 
+static size_t next_greeting = 0;
+static const char* greetings[] = {
+    "Hi!", "Hola!", "Bonjour!", "Hallo!", "Ciao!", "Merhaba!", "Szia!", "Hej!"
+};
+
+static void notify_clients(unicoap_job_t* job);
+
+static unicoap_job_t notify_job = UNICOAP_JOB(notify_clients);
+static void notify_clients_enqueue(void* arg) {
+    (void)arg;
+    unicoap_loop_enqueue(&notify_job);
+}
+
+static ztimer_t notify_timer = { .callback = notify_clients_enqueue };
+
+static void notify_clients(unicoap_job_t* job) {
+    (void)job;
+    puts("sending new hello notification\n");
+    print_current_thread_name();
+
+    int res = 0;
+    unicoap_message_t response;
+    unicoap_response_init_string(&response, UNICOAP_STATUS_CONTENT, greetings[next_greeting]);
+    next_greeting = (next_greeting + 1) % ARRAY_SIZE(greetings);
+
+    if ((res = unicoap_send_notification(&response, &unicoap_resource_hello)) < 0) {
+        printf("sending notification failed (%i, %s)\n", res, strerror(-res));
+    }
+    ztimer_set(ZTIMER_MSEC, &notify_timer, 3 * MS_PER_SEC);
+}
+
 int main(void) {
     /* By default, unicoap_init() is automatically called for you before main().
      * This is because auto_init_unicoap is part of the DEFAULT_MODULE makefile variable.
@@ -288,6 +342,8 @@ int main(void) {
     printf("app: interfaces have ipv6=[ ");
     netifs_print_ipv6(", ");
     printf(" ]\n");
+
+    ztimer_set(ZTIMER_MSEC, &notify_timer, 3 * MS_PER_SEC);
 
     /* By default, unicoap_init() will create a background thread. If you do not want that,
      * set CONFIG_UNICOAP_CREATE_THREAD to 0 and run the processing loop on a thread of your choice.

@@ -396,6 +396,7 @@ static ssize_t _build_and_send_pdu(unicoap_packet_t* packet, uint8_t* carbon_cop
      */
 
     if (carbon_copy) {
+        MESSAGING_7252_DEBUG("building into carbon copy\n");
         if ((size = unicoap_pdu_build_rfc7252(carbon_copy, sizeof(_state.carbon_copies[0]),
                                               packet->message, &packet->properties)) < 0) {
             lists[0].iol_base = NULL;
@@ -407,6 +408,7 @@ static ssize_t _build_and_send_pdu(unicoap_packet_t* packet, uint8_t* carbon_cop
         lists[0].iol_len = size;
         lists[0].iol_next = NULL;
     } else {
+//        MESSAGING_7252_DEBUG("building into vector %p %p %p\n", header, packet, packet->message);
         if ((size = unicoap_pdu_buildv_rfc7252(header, sizeof(header), packet->message,
                                                &packet->properties, lists)) < 0) {
             return size;
@@ -748,7 +750,7 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
     uint8_t* carbon_copy = NULL;
     _transmission_t* transmission = NULL;
 
-    if (packet->properties.is_notification) {
+    if (packet->properties.observe) {
         /* notification, always use separate response style */
         _format_separate(packet, flags);
     }
