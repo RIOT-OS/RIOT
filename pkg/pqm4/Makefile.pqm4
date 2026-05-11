@@ -1,0 +1,45 @@
+# Build the ML-DSA-44 m4f variant + supporting Keccak/SHAKE files as a single
+# RIOT module named "pqm4". Source paths are relative to pqm4 root
+# ($(PKG_SOURCE_DIR)). The two RIOT-side glue source files live in
+# pkg/pqm4/ and are pulled in via vpath.
+
+NO_AUTO_SRC := 1
+MODULE      := pqm4
+
+# ML-DSA-44 m4f variant - C source
+SRC := \
+    crypto_sign/ml-dsa-44/m4f/packing.c \
+    crypto_sign/ml-dsa-44/m4f/poly.c \
+    crypto_sign/ml-dsa-44/m4f/polyvec.c \
+    crypto_sign/ml-dsa-44/m4f/rounding.c \
+    crypto_sign/ml-dsa-44/m4f/sign.c \
+    crypto_sign/ml-dsa-44/m4f/smallpoly.c \
+    crypto_sign/ml-dsa-44/m4f/symmetric-shake.c \
+    mupq/common/fips202.c
+
+# Preprocessed assembly (.S) - includes macros.i via cpp
+ASSMSRC := \
+    crypto_sign/ml-dsa-44/m4f/ntt.S \
+    crypto_sign/ml-dsa-44/m4f/smallntt_769.S \
+    common/keccakf1600.S
+
+# Plain GAS (.s) - no cpp, only inline .macro/.endm
+ASMSRC := \
+    crypto_sign/ml-dsa-44/m4f/pointwise_mont.s \
+    crypto_sign/ml-dsa-44/m4f/vector.s
+
+# RIOT-side glue compiled into the same pqm4 module
+SRC += riot-hal.c riot-randombytes.c
+vpath riot-hal.c $(RIOTPKG)/pqm4
+vpath riot-randombytes.c $(RIOTPKG)/pqm4
+
+# pqm4 sources expect this define (matches mupq/mk/config.mk default)
+CFLAGS += -DPQM4
+
+# disable warnings for `pqm4` sources
+CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wno-unused-but-set-variable
+CFLAGS += -Wno-sign-compare
+CFLAGS += -Wno-shift-count-overflow
+
+include $(RIOTBASE)/Makefile.base

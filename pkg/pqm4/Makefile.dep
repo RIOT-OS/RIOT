@@ -1,0 +1,4 @@
+USEMODULE += random
+
+# pqm4's m4f variant is used for this package, which requires an FPU
+FEATURES_REQUIRED += cortexm_fpu

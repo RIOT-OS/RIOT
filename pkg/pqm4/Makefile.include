@@ -1,0 +1,7 @@
+# Headers consumed by the application (api.h, params.h, randombytes.h, hal.h)
+INCLUDES += -I$(PKGDIRBASE)/pqm4/crypto_sign/ml-dsa-44/m4f
+INCLUDES += -I$(PKGDIRBASE)/pqm4/mupq/common
+INCLUDES += -I$(PKGDIRBASE)/pqm4/mupq/pqclean/common
+INCLUDES += -I$(PKGDIRBASE)/pqm4/common
+
+CFLAGS += -DPQM4
