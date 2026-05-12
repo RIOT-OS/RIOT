@@ -233,7 +233,7 @@ dependencies = [
 [[package]]
 name = "embassy-executor-riot"
 version = "0.1.0"
-source = "git+https://gitlab.com/etonomy/riot-module-examples#09fa2d45e92ca4e46da7f18af3db3d1bcec238d3"
+source = "git+https://codeberg.org/RIOT/rust-module-examples#934940b60df9177d60e9bd9b062546a20d48182d"
 dependencies = [
  "embassy-executor",
  "riot-sys",

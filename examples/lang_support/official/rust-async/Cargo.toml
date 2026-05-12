@@ -10,7 +10,7 @@ crate-type = ["staticlib"]
 [dependencies]
 riot-wrappers = { version = "0.9", features = [ "set_panic_handler", "provide_critical_section_1_0", "panic_handler_format" ] }
 
-embassy-executor-riot = { git = "https://gitlab.com/etonomy/riot-module-examples" }
+embassy-executor-riot = { git = "https://codeberg.org/RIOT/rust-module-examples" }
 embassy-executor = "0.5"
 embassy-futures = "0.1.1"
 static_cell = "2.0.0"
