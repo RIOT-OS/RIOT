@@ -225,36 +225,34 @@ void timer_stop(tim_t dev)
     DEV(dev)->PAUSE = 1;
 }
 
-/* Indices passed to _isr() by the four per-channel ISR thunks below.
- * TIMER_DEV_0 is the tim_t device index (only TIMER0 is currently
- * exposed). ALARM_CH_0..3 are the alarm channel indices, mapping 1:1
- * onto the hardware's ALARM0..ALARM3 registers. These are function-
- * call indices, not register bit positions; the picosdk
- * TIMER_INTE_ALARM_x_BITS macros (1 << x) are bit masks for writes
- * to the INTE register and are a different concept. */
-#define TIMER_DEV_0     0
-#define ALARM_CH_0      0
-#define ALARM_CH_1      1
-#define ALARM_CH_2      2
-#define ALARM_CH_3      3
+/* RP2350 TIMER0 has four independent IRQ lines (one per alarm channel).
+ * The two integer args to _isr() are runtime function-call indices,
+ * not register bit positions: the first is the tim_t device index
+ * (always 0 here since only TIMER0 is exposed, TIMER_NUMOF == 1), and
+ * the second is the alarm channel index 0..3 (mapping 1:1 onto the
+ * hardware's ALARM0..ALARM3 registers). Same pattern as the rpx0xx
+ * (RP2040) timer driver. */
 
-/* RP2350 TIMER0 has four independent IRQ lines (one per alarm channel). */
+/* timer 0 IRQ0 */
 void TIMER_0_ISRA(void)
 {
-    _isr(TIMER_DEV_0, ALARM_CH_0);
+    _isr(0, 0);
 }
 
+/* timer 0 IRQ1 */
 void TIMER_0_ISRB(void)
 {
-    _isr(TIMER_DEV_0, ALARM_CH_1);
+    _isr(0, 1);
 }
 
+/* timer 0 IRQ2 */
 void TIMER_0_ISRC(void)
 {
-    _isr(TIMER_DEV_0, ALARM_CH_2);
+    _isr(0, 2);
 }
 
+/* timer 0 IRQ3 */
 void TIMER_0_ISRD(void)
 {
-    _isr(TIMER_DEV_0, ALARM_CH_3);
+    _isr(0, 3);
 }
