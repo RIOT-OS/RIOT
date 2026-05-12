@@ -1,7 +1,7 @@
 From 123962fa0ad5825ee483059ecb3eb537574db611 Mon Sep 17 00:00:00 2001
 From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
 Date: Sun, 19 Oct 2025 16:58:11 +0200
-Subject: [PATCH 6/6] use buffered output
+Subject: [PATCH 6/7] use buffered output
 
 ---
  printf.c | 55 ++++++++++++++++++++++++++++++++++++++++++-------------

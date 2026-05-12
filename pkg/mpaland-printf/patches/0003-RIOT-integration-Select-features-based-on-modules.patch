@@ -1,7 +1,7 @@
 From 811f4148888fdd11209c485a78212916eec96822 Mon Sep 17 00:00:00 2001
 From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
 Date: Sat, 11 May 2024 18:38:51 +0200
-Subject: [PATCH 3/6] RIOT integration: Select features based on modules
+Subject: [PATCH 3/7] RIOT integration: Select features based on modules
 
 Using module `printf_float` adds support for printing floats, using
 module `printf_long_long` adds support for printing `long long` or

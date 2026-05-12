@@ -1,7 +1,7 @@
 From 92cd53951e322e8c300f5d799f46e660c978631b Mon Sep 17 00:00:00 2001
 From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
 Date: Sat, 11 May 2024 17:51:38 +0200
-Subject: [PATCH 4/6] Wrapper targets: Add endpoints for -Wl,wrap=...
+Subject: [PATCH 4/7] Wrapper targets: Add endpoints for -Wl,wrap=...
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

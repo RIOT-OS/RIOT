@@ -1,7 +1,7 @@
 From a97c23e94ad0f0d69562921777ef797bab598b4b Mon Sep 17 00:00:00 2001
 From: Marian Buschsieweke <marian.buschsieweke@posteo.net>
 Date: Sat, 11 May 2024 17:51:01 +0200
-Subject: [PATCH 2/6] RIOT integration
+Subject: [PATCH 2/7] RIOT integration
 
 Use stdio_write() from stdio_base.h for output
 ---

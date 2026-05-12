@@ -1,7 +1,7 @@
 From 63de35a842b4d9c11ffc05f71027fa70d3292069 Mon Sep 17 00:00:00 2001
 From: Marian Buschsieweke <marian.buschsieweke@ml-pa.com>
 Date: Fri, 22 Aug 2025 10:32:04 +0200
-Subject: [PATCH 5/6] Change %p formatting to match glibc
+Subject: [PATCH 5/7] Change %p formatting to match glibc
 
 Taken from https://github.com/mpaland/printf/pull/90
 ---
