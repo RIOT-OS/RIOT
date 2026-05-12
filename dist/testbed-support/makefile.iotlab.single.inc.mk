@@ -215,6 +215,14 @@ else
 
 endif
 
+define iotlab-flash-recipe
+  $(call check_cmd,$(FLASHER),Flash program)
+  $(PROGRAMMER_FLASH)
+  $(call check_cmd,$(RESET),Reset program)
+  $(PROGRAMMER_RESET)
+endef
+flash-recipe = $(iotlab-flash-recipe)
+
 ifneq (,$(filter firefly iotlab-a8-m3 zigduino,$(BOARD)))
   # Debugger not supported on these boards
   DEBUGGER =
