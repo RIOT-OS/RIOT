@@ -40,9 +40,9 @@ Two examples are provided:
 There are [additional examples] available on GitLab,
 maintained in coordination with the riot-wrappers crate.
 
-[coap-message-demos]: https://gitlab.com/chrysn/coap-message-demos
-[riot-module-examples]: https://gitlab.com/etonomy/riot-module-examples
-[additional examples]: https://gitlab.com/etonomy/riot-examples/
+[coap-message-demos]: https://codeberg.org/chrysn/coap-tools
+[riot-module-examples]: https://codeberg.org/RIOT/rust-module-examples
+[additional examples]: https://codeberg.org/RIOT/rust-examples
 
 ## IDE / Editor Setup
 
