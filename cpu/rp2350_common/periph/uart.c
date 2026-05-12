@@ -261,13 +261,14 @@ void uart_poweroff(uart_t uart)
 /* Counter of single-byte UART RX errors (parity/break/framing). The
  * previous driver printed via puts() inside the ISR. This is a
  * preventive change rather than a fix for an observed bug: at
- * 115200 baud a single puts() takes ~4 ms (about 46 byte-times),
- * which exceeds the inter-byte budget (~87 us), so a single fire
- * would stall the ISR long enough to overrun the next several bytes.
- * We replace it with a counter so the ISR stays bounded-time, and
- * pass the byte through to the rx_cb anyway: bit-level corruption is
- * recoverable at the protocol layer, byte loss is harder to recover
- * from because it desyncs framing. */
+ * 115200 baud a single puts() of the original 56-byte string takes
+ * about 4.9 ms (~56 byte-times at ~87 us per byte), which exceeds
+ * the inter-byte budget, so a single fire would stall the ISR long
+ * enough to overrun the next several bytes. We replace it with a
+ * counter so the ISR stays bounded-time, and pass the byte through
+ * to the rx_cb anyway: bit-level corruption is recoverable at the
+ * protocol layer, byte loss is harder to recover from because it
+ * desyncs framing. */
 volatile uint32_t rp2350_uart_rx_error_count;
 
 void isr_handler(uint8_t num)
