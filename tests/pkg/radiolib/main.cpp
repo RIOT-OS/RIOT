@@ -8,7 +8,11 @@
  * @{
  *
  * @file
- * @brief       Test application for the radiolib package
+ * @brief       RadioLib SX1276 PingPong test for b-l072z-lrwan1
+ *
+ * Build as Ping sender (initiator) : make PING=1
+ * Build as Pong sender (responder) : make (default)
+ * Enable debug output:      make CFLAGS+=-DENABLE_DEBUG=1
  *
  * @author      Baptiste Le Duc <baptiste.leduc@etik.com>
  *
@@ -20,12 +24,13 @@
 #include "radiolib_riotos.h"
 #include <RadioLib.h>
 
-/* Build with -DRADIOLIB_TEST_TX to transmit, otherwise receive */
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 static RiotHal hal(SPI_DEV(1), SPI_CLK_5MHZ);
 
 /**
- * SX1276 has the following connections:
+ * SX1276 connections on b-l072z-lrwan1:
  * NSS pin:   PA.15
  * DIO0 pin:  PB.4
  * RESET pin: PC.0
@@ -39,6 +44,53 @@ static SX1276 radio = new Module(
     SX127X_PARAM_DIO1
 );
 
+namespace {
+
+bool send(const char *msg)
+{
+    DEBUG("[SX1276] Sending: %s....", msg);
+    int state = radio.transmit(msg);
+    if (state == RADIOLIB_ERR_NONE) {
+        DEBUG("done\n");
+        return true;
+    } else if (state == RADIOLIB_ERR_PACKET_TOO_LONG) {
+        puts("packet too long!");
+    } else if (state == RADIOLIB_ERR_TX_TIMEOUT) {
+        puts("TX timeout!");
+    } else {
+        printf("failed, code %d\n", state);
+    }
+    return false;
+}
+
+bool recv(void)
+{
+    uint8_t buf[256];
+
+    int state = radio.receive(buf, sizeof(buf) - 1);
+    if (state == RADIOLIB_ERR_NONE) {
+        size_t len = radio.getPacketLength();
+        if (len > sizeof(buf) - 1) {
+            len = sizeof(buf) - 1;
+        }
+        buf[len] = '\0';
+        printf("[SX1276] Received: %s\n", (char *)buf);
+        DEBUG("[SX1276] RSSI:      %.2f dBm\n", radio.getRSSI());
+        DEBUG("[SX1276] SNR:       %.2f dB\n", radio.getSNR());
+        DEBUG("[SX1276] Freq err:  %.2f Hz\n", radio.getFrequencyError());
+        return true;
+    } else if (state == RADIOLIB_ERR_RX_TIMEOUT) {
+        DEBUG("[SX1276] RX timeout!\n");
+    } else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
+        puts("[SX1276] CRC error!");
+    } else {
+        printf("[SX1276] RX failed, code %d\n", state);
+    }
+    return false;
+}
+
+} /* namespace */
+
 int main(void)
 {
     printf("[SX1276] Initializing ... ");
@@ -49,56 +101,20 @@ int main(void)
     }
     puts("success!");
 
-#ifdef RADIOLIB_TEST_TX
-    int count = 0;
-    while (1) {
-        char buf[32];
-        snprintf(buf, sizeof(buf), "Hello RIOT! #%d", count++);
-
-        printf("[SX1276] Transmitting: %s ... ", buf);
-        state = radio.transmit((uint8_t *)buf, strlen(buf));
-
-        if (state == RADIOLIB_ERR_NONE) {
-            printf("done, datarate: %.2f bps\n", radio.getDataRate());
-        } else if (state == RADIOLIB_ERR_PACKET_TOO_LONG) {
-            puts("packet too long!");
-        } else if (state == RADIOLIB_ERR_TX_TIMEOUT) {
-            puts("TX timeout!");
-        } else {
-            printf("failed, code %d\n", state);
-        }
-
-        hal.delay(1000);
+    state = radio.setFrequency(868.0);
+    if (state != RADIOLIB_ERR_NONE) {
+        printf("[SX1276] setFrequency failed, code %d\n", state);
+        return -1;
     }
 
-#else /* receive */
     while (true) {
-        printf("[SX1276] Waiting for packet ... ");
-
-        uint8_t buf[256];
-        size_t len = sizeof(buf);
-        state = radio.receive(buf, len);
-
-        if (state == RADIOLIB_ERR_NONE) {
-            size_t rxlen = radio.getPacketLength();
-            if (rxlen >= len){
-                rxlen = len - 1 ;
-            }
-            buf[rxlen] = '\0';
-            puts("success!");
-            printf("[SX1276] Data:  %s\n", (char *)buf);
-            printf("[SX1276] RSSI:  %.2f dBm\n", radio.getRSSI());
-            printf("[SX1276] SNR:   %.2f dB\n", radio.getSNR());
-            printf("[SX1276] Freq error: %.2f Hz\n", radio.getFrequencyError());
-        } else if (state == RADIOLIB_ERR_RX_TIMEOUT) {
-            puts("timeout");
-        } else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
-            puts("CRC error!");
-        } else {
-            printf("failed, code %d\n", state);
-        }
-    }
+#if defined(PING)
+        if (!send("Ping")) { continue; }
+        recv();
+        hal.delay(10000);
+#else
+        if (!recv()) { continue; }
+        send("Pong");
 #endif
-
-    return 0;
+    }
 }
