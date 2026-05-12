@@ -187,7 +187,7 @@ dependencies = [
 [[package]]
 name = "coap-message-demos"
 version = "0.4.0"
-source = "git+https://gitlab.com/chrysn/coap-message-demos/#c5b883e198a0cf6d0239ca26393e09321887a446"
+source = "git+https://codeberg.org/chrysn/coap-tools#c5b883e198a0cf6d0239ca26393e09321887a446"
 dependencies = [
  "coap-handler",
  "coap-handler-implementations",
@@ -726,7 +726,7 @@ checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
 [[package]]
 name = "riot-coap-handler-demos"
 version = "0.2.0"
-source = "git+https://gitlab.com/etonomy/riot-module-examples/#09fa2d45e92ca4e46da7f18af3db3d1bcec238d3"
+source = "git+https://codeberg.org/RIOT/rust-module-examples#09fa2d45e92ca4e46da7f18af3db3d1bcec238d3"
 dependencies = [
  "ciborium-io",
  "ciborium-ll",
