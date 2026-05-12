@@ -1,8 +1,10 @@
-#
 # This file allows specifying a local folder using PKG_SOURCE_LOCAL.
 #
 # Every clean or prepare will remove $(PKG_SOURCE_DIR) and copy over
 # $(PKG_SOURCE_LOCAL).  This is intended to be used during package development.
+#
+# You can find more information about the usage of this feature on the guide
+# site: https://doc.riot-os.org/advanced_tutorials/porting_packages
 #
 # WARNING: any local changes made to $(PKG_SOURCE_DIR) *will* get lost!
 
@@ -14,10 +16,10 @@ prepare: $(PKG_SOURCE_DIR)/.prepared
 	@true
 
 $(PKG_SOURCE_DIR)/.prepared:
-	rm -Rf $(PKG_SOURCE_DIR)
-	mkdir -p $$(dirname $(PKG_SOURCE_DIR))
-	cp -a $(PKG_SOURCE_LOCAL) $(PKG_SOURCE_DIR)
-	touch $@
+	@rm -Rf $(PKG_SOURCE_DIR)
+	@mkdir -p $$(dirname $(PKG_SOURCE_DIR))
+	@cp -a $(PKG_SOURCE_LOCAL) $(PKG_SOURCE_DIR)
+	@touch $@
 
 clean::
 	@rm -f $(PKG_SOURCE_DIR)/.prepared

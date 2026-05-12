@@ -49,8 +49,6 @@ else
   PKG_BUILD_DIR = $(PKG_SOURCE_DIR)
 endif
 
-PKG_SOURCE_LOCAL ?= $(PKG_SOURCE_LOCAL_$(shell echo $(PKG_NAME) | tr a-z- A-Z_))
-
 # If CARGO_HOME is set, use it to search for `git-cache-rs` (git-cache),
 # otherwise try the local default directory. The git-cache can also be set
 # directly with GIT_CACHE_RS.
@@ -61,8 +59,21 @@ ifeq ($(DEFAULT_GIT_CACHE_RS),$(wildcard $(DEFAULT_GIT_CACHE_RS)))
   GIT_CACHE_RS ?= $(DEFAULT_GIT_CACHE_RS)
 endif
 
-# allow overriding package source with local folder (useful during development)
+# The PKG_SOURCE_LOCAL and PKG_SOURCE_LOCAL_pkgname variables can be used to
+# override the package source with a local folder, which is useful during
+# development.
+ifeq ("environment", "$(origin PKG_SOURCE_LOCAL)")
+  $(info $(COLOR_YELLOW)Warning: You set a global PKG_SOURCE_LOCAL in the\
+	 environment. This can have effects on all packages! Consider using\
+	 PKG_SOURCE_LOCAL_$(PKG_NAME) instead!$(COLOR_RESET))
+endif
+
+PKG_SOURCE_LOCAL ?= $(PKG_SOURCE_LOCAL_$(shell echo $(PKG_NAME) | tr a-z- A-Z_))
+
 ifneq (,$(PKG_SOURCE_LOCAL))
+  $(info $(COLOR_YELLOW)Warning: PKG_SOURCE_LOCAL in use! Remember to remove it\
+	 before committing!$(COLOR_RESET))
+
   include $(RIOTBASE)/pkg/local.mk
 else
 
