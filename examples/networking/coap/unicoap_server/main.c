@@ -235,7 +235,7 @@ static void notify_clients(unicoap_job_t* job) {
     print_current_thread_name();
 
     int res = 0;
-    unicoap_message_t response;
+    unicoap_message_t response = {};
     unicoap_response_init_string(&response, UNICOAP_STATUS_CONTENT, greetings[next_greeting]);
     next_greeting = (next_greeting + 1) % ARRAY_SIZE(greetings);
 
