@@ -1,0 +1,25 @@
+name: First-time contributor greeting
+
+on:
+  pull_request:
+
+permissions:
+  pull-requests: write
+
+jobs:
+  greet:
+    if: ${{ github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment on PR
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const user = context.payload.pull_request.user.login;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: `Hey @${user}, thank you for your first contribution! We really appreciate it! If you haven't already, please take a look at [our contributing guidelines](https://github.com/RIOT-OS/RIOT/blob/master/CONTRIBUTING.md) before the review process starts. Also, due to how the GitHub review system works, please avoid force-pushing or squashing your commits unless asked to by a maintainer (or unless your commit is still in "draft commit" stage). Your pull request will be reviewed as soon as possible.`
+            });
