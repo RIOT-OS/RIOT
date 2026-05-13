@@ -107,6 +107,10 @@ export default defineConfig({
           link: "boards",
         },
         {
+          label: "Supported CPUs",
+          link: "cpus",
+        },
+        {
           label: "Tutorials",
           items: [
             {

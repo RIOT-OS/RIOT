@@ -13,9 +13,20 @@ import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 import path from "node:path";
 import {
-  extractBoardTitleFromDoxygen,
+  extractDoxygenGroupFromDoxygen,
+  extractDoxygenGroupTitleFromDoxygen,
   transformDoxygenMarkdown,
 } from "./lib/doxygen_filter";
+
+const DoxygenDocSchema = z.object({
+  title: z.string(),
+  description: z.string().nullish(),
+  doxygenGroup: z.string(),
+  githubFolder: z.string(),
+  editUrl: z.string(),
+  includeInOverview: z.boolean(),
+  parentId: z.string().nullable(),
+});
 
 export const collections = {
   docs: defineCollection({
@@ -23,8 +34,12 @@ export const collections = {
     schema: docsSchema(),
   }),
   boards: defineCollection({
-    loader: boardsLoader(),
-    schema: docsSchema(),
+    loader: doxygenDocLoader("../../boards", "boards"),
+    schema: DoxygenDocSchema
+  }),
+  cpus: defineCollection({
+    loader: doxygenDocLoader("../../cpu", "cpu"),
+    schema: DoxygenDocSchema
   }),
   changelog: defineCollection({
     loader: changelogLoader(),
@@ -40,66 +55,97 @@ export const collections = {
 };
 
 /**
- * Load board documentation from doc.md files in the boards directory.
- * Each board directory should contain a doc.md file with markdown content.
- * Extracts board titles from @defgroup directives like riot-index does.
+ * Load documentation from doc*.md files in the specified directory.
+ * Each subdirectory may contain one or more files matching the pattern
+ * `doc*.md` (e.g. `doc.md`, `doc-extra.md`). Extracts titles from
+ * `@defgroup` directives like riot-index does.
+ *
+ * @param dir The folder from which to load the doc*.md files.
+ * @param doxygenGroupPrefix The prefix with which the doxygen group of these docs starts
  */
-export function boardsLoader(): Loader {
+function doxygenDocLoader(dir: string, doxygenGroupPrefix: string): Loader {
   return {
-    name: "boards-loader",
+    name: `${doxygenGroupPrefix}-loader`,
     load: async (context): Promise<void> => {
-      const boardsDir = "../../boards";
-
       try {
-        // Read all directories in the boards folder
-        const entries = await fs.readdir(boardsDir, { withFileTypes: true });
-        const boardDirs = entries.filter((entry) => entry.isDirectory());
+        // Read all directories in the `dir` folder
+        const entries = await fs.readdir(dir, { withFileTypes: true });
+        const docDirs = entries.filter((entry) => entry.isDirectory());
 
-        for (const boardDir of boardDirs) {
-          const boardName = boardDir.name;
-          const docPath = path.join(boardsDir, boardName, "doc.md");
+        for (const docDir of docDirs) {
+          const docName = docDir.name;
+          const docDirPath = path.join(dir, docName);
 
-          // Check if doc.md exists for this board
+          // Find all doc*.md files in this directory
+          let docFiles: string[];
           try {
+            const dirEntries = await fs.readdir(docDirPath, {
+              withFileTypes: true,
+            });
+            docFiles = dirEntries
+              .filter(
+                (entry) => entry.isFile() && entry.name.endsWith("doc.md"),
+              )
+              .map((entry) => entry.name)
+              // Sort so iteration order is deterministic across platforms
+              .sort();
+          } catch (error) {
+            console.debug(
+              `Failed to read directory for ${doxygenGroupPrefix} "${docName}", skipping...`,
+            );
+            continue;
+          }
+
+          if (docFiles.length === 0) {
+            console.debug(
+              `Tried to load documentation for ${doxygenGroupPrefix} "${docName}" but it doesn't contain any doc*.md files, skipping...`,
+            );
+            continue;
+          }
+
+          for (const docFile of docFiles) {
+            const docPath = path.join(docDirPath, docFile);
+            const baseName = path.basename(docFile, ".md");
+            const isParent = baseName === "doc";
+            const id = isParent ? docName : `${docName}/${baseName}`;
+
             const docContent = await fs.readFile(docPath, "utf-8");
 
             // Parse frontmatter out of the markdown content if it exists
-            let markdown = docContent;
-            const fallbackTitle = boardName.replace(/-/g, " ");
-            const title = extractBoardTitleFromDoxygen(
+            const markdown = docContent;
+            const fallbackTitle = docName.replace(/-/g, " ");
+            const title = extractDoxygenGroupTitleFromDoxygen(
               docContent,
+              doxygenGroupPrefix,
               fallbackTitle,
             );
             const filteredMarkdown = transformDoxygenMarkdown(markdown);
 
             // Parse @brief directives for description (take the first one as description)
             const descriptionMatch = docContent.match(/@brief\s+(.+)/);
-            const description = descriptionMatch
-              ? descriptionMatch[1].trim()
-              : "";
-
-            // Create entry ID
-            const entryId = `boards/${boardName}`;
+            const description = descriptionMatch?.[1].trim();
 
             // Add entry to content collection
             context.store.set({
-              id: entryId,
+              id: id,
+              filePath: docPath.replaceAll("../", ""),
               data: {
                 title: title,
                 description: description,
+                doxygenGroup: extractDoxygenGroupFromDoxygen(docContent, doxygenGroupPrefix),
+                githubFolder: docDirPath.replaceAll("../", ""),
+                // Only the parent appears in the overview; children are hidden
+                // and reached via their parent's childrenIds.
+                includeInOverview: isParent,
+                parentId: isParent ? null : docName,
               },
               body: filteredMarkdown,
               rendered: await context.renderMarkdown(filteredMarkdown),
             });
-          } catch (error) {
-            console.debug(
-              `Tried to load documentation for board "${boardName}" but it doesn't contain a doc.md file, skipping...`,
-            );
-            continue;
           }
         }
       } catch (error) {
-        console.error("Error loading boards:", error);
+        console.error(`Error loading ${doxygenGroupPrefix}:`, error);
       }
     },
   };
@@ -175,8 +221,8 @@ export function changelogLoader(): Loader {
             const date = new Date(release);
 
             // Extract the release code name from the heading if it exists
-            const codeName =
-              currentReleaseHeading.match(/"([^"]+)"/)?.[1] || null;
+            const codeName = currentReleaseHeading.match(/"([^"]+)"/)?.[1] ||
+              null;
 
             // Extract current release content
             const currentReleaseContent = lines
