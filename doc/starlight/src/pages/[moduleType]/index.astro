@@ -1,0 +1,174 @@
+---
+/*
+ * SPDX-FileCopyrightText: 2026 Lasse Rosenow <Lasse.Rosenow@haw-hamburg.de>
+ * SPDX-FileCopyrightText: 2026 Tom Hert <git@annsann.eu>
+ * SPDX-FileCopyrightText: 2026 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { getCollection } from "astro:content";
+import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+export async function getStaticPaths() {
+  const moduleTypes = ["boards", "cpus"] as const;
+
+  return moduleTypes.map((moduleType) => {
+    switch (moduleType) {
+      case "boards":
+        return {
+          params: {
+            moduleType: moduleType,
+          },
+          props: {
+            title: "RIOT Boards",
+            description:
+              "Complete list of supported RIOT boards with documentation",
+            searchTitle: "Filter Boards",
+            searchPlaceholder:
+              "Type to filter boards (e.g. arduino, stm32, nrf)",
+            contentDescription: `Explore the comprehensive documentation for all supported RIOT boards.
+                                 Each board has detailed information about its features, pinout, and usage.`,
+            moduleDescriptionFallback: "Board Documentation",
+          },
+        };
+
+      case "cpus":
+        return {
+          params: {
+            moduleType: moduleType,
+          },
+          props: {
+            title: "RIOT CPUs",
+            description:
+              "Complete list of supported RIOT CPUs with documentation",
+            searchTitle: "Filter CPUs",
+            searchPlaceholder: "Type to filter CPUs (e.g. RISC-V, ARM, ESP32)",
+            contentDescription: `Explore the comprehensive documentation for all supported RIOT CPUs.
+                                 Each CPU has detailed information about its features, pinout, and usage.`,
+            moduleDescriptionFallback: "CPU Documentation",
+          },
+        };
+    }
+  });
+}
+
+// The type of the module such as `boards` or `cpus`
+const moduleType = Astro.params.moduleType;
+
+// Modules are either a collection of boards or cpus
+const modules = await getCollection(moduleType);
+
+// Sort the modules alphabetically by title
+const sortedModules = modules
+  .sort((a, b) => a.data.title.localeCompare(b.data.title))
+  .filter((module) => module.data.includeInOverview);
+
+const {
+  title,
+  description,
+  searchTitle,
+  searchPlaceholder,
+  contentDescription,
+  moduleDescriptionFallback,
+} = Astro.props;
+---
+
+<StarlightPage
+  frontmatter={{
+    title: title,
+    description: description,
+  }}
+>
+  <label for="riot-module-search"><strong>{searchTitle}</strong></label>
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: "1rem",
+      marginTop: "0.5rem",
+    }}
+  >
+    <input
+      id="riot-module-search"
+      type="search"
+      placeholder={searchPlaceholder}
+      style={{
+        width: "100%",
+        margin: "0",
+        padding: "0.5rem 0.8rem",
+        background: "transparent",
+        border: "1px solid var(--sl-color-text-accent)",
+        borderRadius: "8px",
+      }}
+    />
+    <div id="riot-module-no-results" hidden style={{ marginTop: 0 }}>
+      No entries match this filter.
+    </div>
+
+    <div style={{ marginTop: 0 }}>{contentDescription}</div>
+  </div>
+
+  <CardGrid>
+    {
+      sortedModules.map((module) => {
+        return (
+          <div
+            data-riot-module-item
+            data-riot-module-name={`${module.data.title} ${module.id} ${module.data.description}`.toLowerCase()}
+          >
+            <LinkCard
+              title={module.data.title}
+              description={module.data.description || moduleDescriptionFallback}
+              href={`${moduleType}/${module.id}`}
+            />
+          </div>
+        );
+      })
+    }
+  </CardGrid>
+
+  <script>
+    const searchInput = document.getElementById(
+      "riot-module-search",
+    ) as HTMLInputElement | null;
+    const noResults = document.getElementById(
+      "riot-module-no-results",
+    ) as HTMLElement | null;
+    const items = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-riot-module-item]"),
+    );
+
+    /**
+     * Filters the module entries based on the search input. It checks if the
+     * search query is a substring of the modules title, ID,
+     * or description (all converted to lowercase for case-insensitive matching).
+     * If no entries match the filter, it shows a "no results" message.
+     */
+    function updateFilter() {
+      const query = searchInput?.value.toLowerCase().trim() ?? "";
+      let visible = 0;
+
+      for (const item of items) {
+        const haystack = item.getAttribute("data-riot-module-name") || "";
+        const matches = query.length === 0 || haystack.indexOf(query) !== -1;
+        item.hidden = !matches;
+        if (matches) {
+          visible += 1;
+        }
+      }
+
+      if (noResults) {
+        noResults.hidden = visible !== 0;
+      }
+    }
+
+    if (searchInput) {
+      // Update filter on input change
+      searchInput.addEventListener("input", updateFilter);
+
+      // Update filter on initial load and browser navigations
+      window.addEventListener("pageshow", updateFilter);
+    }
+  </script>
+</StarlightPage>

@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2026 Tom Hert <git@annsann.eu>
+ * SPDX-FileCopyrightText: 2026 Lasse Rosenow <Lasse.Rosenow@haw-hamburg.de>
  * SPDX-FileCopyrightText: 2026 HAW Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
@@ -64,19 +65,45 @@ function getCalloutLabel(command: string): string | null {
 }
 
 /**
- * Extract a title for a board from the Doxygen documentation content.
+ * Extract a Doxygen group from the Doxygen documentation content.
+ *
  * @param content The raw Doxygen markdown content of the board documentation.
- *              This is expected to contain a `@defgroup` directive with the board's title.
+ *                This is expected to contain a `@defgroup` directive with the board's title.
+ * @param groupPrefix A prefix string that the group name starts with.
+ * @returns The extracted group or undefined if no group could be extracted.
+ */
+export function extractDoxygenGroupFromDoxygen(
+  text: string,
+  groupPrefix: string,
+): string | undefined {
+  const defgroup_match = text.match(
+    new RegExp(`@defgroup\\s+(${groupPrefix}_[A-Za-z0-9._-]+)\\s+`),
+  );
+  const doxygen_group_raw = defgroup_match?.[1];
+  const doxygen_group = doxygen_group_raw?.replaceAll("_", "__");
+
+  return doxygen_group;
+}
+
+/**
+ * Extract a title of a Doxygen group from the Doxygen documentation content.
+ *
+ * @param content The raw Doxygen markdown content of the board documentation.
+ *                This is expected to contain a `@defgroup` directive with the board's title.
+ * @param groupPrefix A prefix string that the group name starts with.
  * @param fallback A fallback title to use if no title can be extracted from the Doxygen content.
- *              This is typically derived from the board name.
+ *                 This is typically derived from the board name.
  * @returns The extracted title, or the fallback if no title could be extracted.
  */
-export function extractBoardTitleFromDoxygen(
+export function extractDoxygenGroupTitleFromDoxygen(
   content: string,
+  groupPrefix: string,
   fallback: string,
 ): string {
   const lines = content.split("\n");
-  const defgroupPattern = /@defgroup\s+boards_[A-Za-z0-9._-]+\s+(.+)$/;
+  const defgroupPattern = new RegExp(
+    `@defgroup\\s+${groupPrefix}_[A-Za-z0-9._-]+\\s+(.+)$`
+  );
 
   for (let i = 0; i < lines.length; i++) {
     const match = lines[i].match(defgroupPattern);
@@ -150,7 +177,9 @@ function transformImageLine(line: string): string | null {
   const optionless = imageArgs
     .replace(/\s+[A-Za-z0-9_-]+\s*=\s*[^\s]+/g, "")
     .trim();
-  const caption = stripAsterisksAndQuotes(quotedCaption?.[1] || optionless || "Image");
+  const caption = stripAsterisksAndQuotes(
+    quotedCaption?.[1] || optionless || "Image",
+  );
   return "![" + caption + "](" + imagePath + ")";
 }
 
