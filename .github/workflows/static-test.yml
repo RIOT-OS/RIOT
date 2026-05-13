@@ -17,6 +17,7 @@ on:
 
 jobs:
   static-tests:
+    if: "${{ github.event.pull_request.labels.*.name != 'CI: skip static test' }}"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@main
