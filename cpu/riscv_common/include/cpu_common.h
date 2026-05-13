@@ -6,9 +6,7 @@
 #pragma once
 
 /**
- * @defgroup    cpu_riscv_common RISC-V common
- * @ingroup     cpu
- * @brief       Common implementations and headers for the RISC-V CPU
+ * @ingroup     cpu_riscv_common
  * @{
  *
  * @file

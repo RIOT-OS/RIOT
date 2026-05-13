@@ -571,14 +571,15 @@ from these definitions.
 
 In the following example, only one I2C bus is defined:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+```c
 #define I2C0_SPEED     I2C_SPEED_FAST
 #define I2C0_SDA       GPIO4
 #define I2C0_SCL       GPIO5
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
 A configuration with two I2C buses would look like the following:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+```c
 #define I2C0_SPEED     I2C_SPEED_FAST
 #define I2C0_SDA       GPIO4
 #define I2C0_SCL       GPIO5
@@ -586,7 +587,7 @@ A configuration with two I2C buses would look like the following:
 #define I2C1_SPEED     I2C_SPEED_NORMAL
 #define I2C1_SDA       GPIO2
 #define I2C1_SCL       GPIO14
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 All these configurations can be overridden by an
 [application-specific board configuration](#esp8266_application_specific_board_configuration).
@@ -617,9 +618,9 @@ To define other GPIOs as PWM channels, just overwrite the definition of
 `#PWM0_GPIOS` in an
 [application-specific board configuration](#esp8266_application_specific_board_configuration)
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+```c
 #define PWM0_GPIOS { GPIO12, GPIO13, GPIO14, GPIO15 }
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 [Back to table of contents](#esp8266_toc)
 
@@ -973,13 +974,14 @@ preprocessor directive as the **last** line.
 For example to override the default definition of the GPIOs that are
 used as PWM channels, the application-specific board configuration
 file `$APPDIR/board.h` could look like the following:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 #ifdef CPU_ESP8266
 #define PWM0_GPIOS { GPIO12, GPIO13, GPIO14, GPIO15 }
 #endif
 
 #include_next "board.h"
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 It is important to ensure that the application-specific board
 configuration `$APPDIR/board.h` is included first. Insert the following
@@ -991,7 +993,8 @@ INCLUDES += -I$(APPDIR)
 @note To make such application-specific board configurations dependent
 on the ESP8266 MCU or a particular ESP8266 board, you should always
 enclose these definitions in the following constructs
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 #ifdef CPU_ESP8266
 ...
 #endif
@@ -999,7 +1002,7 @@ enclose these definitions in the following constructs
 #ifdef BOARD_ESP8266_ESP-12X
 ...
 #endif
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 [Back to table of contents](#esp8266_toc)
 
@@ -1017,13 +1020,14 @@ that, add the `include_next` preprocessor directive as the **last** line.
 For example, to override a GPIO used for LIS3DH sensor, the
 application-specific driver parameter file `$APPDIR/<device>_params.h`
 could look like the following:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 #ifdef CPU_ESP8266
 #define LIS3DH_PARAM_INT2           (GPIO_PIN(0, 4))
 #endif
 
 #include_next "lis3dh_params.h"
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 It is important to ensure that the application-specific driver parameter
 file `$APPDIR/<device>_params.h` is included first. Insert the following
@@ -1035,7 +1039,8 @@ INCLUDES += -I$(APPDIR)
 @note To make such application-specific board configurations
 dependent on the ESP8266 MCU or a particular ESP8266 board, you should
 always enclose these definitions in the following constructs:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 #ifdef CPU_ESP8266
 ...
 #endif
@@ -1043,7 +1048,7 @@ always enclose these definitions in the following constructs:
 #ifdef BOARD_ESP8266_ESP-12X
 ...
 #endif
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 [Back to table of contents](#esp8266_toc)
 
@@ -1273,14 +1278,14 @@ source code level, you have to ensure that the function you want to debug is
 located in RAM. For that purpose, add the `IRAM` attribute to that function,
 for example:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+```c
 #include "esp/common_macros.h"
 ...
 void IRAM my_func(void)
 {
     ...
 }
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 Then you should be able to set a breakpoint to this function using command `bp`
 and to execute it stepwise after break.

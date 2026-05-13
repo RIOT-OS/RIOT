@@ -6,9 +6,7 @@
 #pragma once
 
 /**
- * @defgroup    cpu_lpc23xx     NXP LPC23XX
- * @ingroup     cpu
- * @brief       NXP LPC23XX family specific code
+ * @ingroup cpu_lpc23xx
  * @{
  */
 
