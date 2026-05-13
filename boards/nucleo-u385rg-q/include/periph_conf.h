@@ -158,6 +158,8 @@ static const uart_conf_t uart_config[] = {
  *       A0=PA0/IN5, A1=PA1/IN6, A2=PA4/IN9, A3=PB0/IN15, A4=PC1/IN2, A5=PC0/IN1.
  *       All lines use ADC1 (@c dev 0). PC0/PC1 are also Arduino I2C3 on the
  *       connector; this board’s default I2C is I2C1 on PB8/PB9.
+ * @note VBAT is routed to internal input ADC1_IN18 (RM0487, “Analog-to-digital
+ *       converter” internal channel table).
  */
 static const adc_conf_t adc_config[] = {
     { .pin = GPIO_PIN(PORT_A, 0), .dev = 0, .chan = 5 },   /* A0  ADC1_IN5  */
@@ -166,7 +168,10 @@ static const adc_conf_t adc_config[] = {
     { .pin = GPIO_PIN(PORT_B, 0), .dev = 0, .chan = 15 },  /* A3  ADC1_IN15 */
     { .pin = GPIO_PIN(PORT_C, 1), .dev = 0, .chan = 2 },   /* A4  ADC1_IN2  */
     { .pin = GPIO_PIN(PORT_C, 0), .dev = 0, .chan = 1 },   /* A5  ADC1_IN1  */
+    { .pin = GPIO_UNDEF, .dev = 0, .chan = 18 },           /* VBAT ADC1_IN18 */
 };
+
+#define VBAT_ADC            ADC_LINE(6) /**< VBAT ADC line */
 
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */

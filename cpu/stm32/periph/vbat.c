@@ -123,8 +123,9 @@
 #elif defined(CPU_LINE_STM32L552xx) || defined(CPU_LINE_STM32L562xx)
 #  define VBAT_ADC_SCALE      3
 #  define VBAT_ADC_MIN_MV     1550
-/* u5 */
-#elif defined(CPU_LINE_STM32U575xx) || defined(CPU_LINE_STM32U585xx)
+/* u5, u3 (same internal VBAT divider / RM0487 guidance as U5 class) */
+#elif defined(CPU_LINE_STM32U575xx) || defined(CPU_LINE_STM32U585xx) || \
+      defined(CPU_LINE_STM32U385xx)
 #  define VBAT_ADC_SCALE      4
 #  define VBAT_ADC_MIN_MV     1650
 /* wb */
