@@ -6,8 +6,8 @@
 
 ![LoraBox](https://www.lobaro.com/wp/wp-content/uploads/2017/03/Lobaro_wMBUS_LoRaWAN_Bridge.jpg)
 
-
 ### MCU
+
 | MCU                   | stm32l151cb-a                             |
 |:--------------------- |:----------------------------------------- |
 | Family                | ARM Cortex-M3                             |
@@ -36,14 +36,15 @@
 | Color  | green |
 | Pin    | P1   |
 
-
 ## Flashing
+
 ### Connections
+
 To flash using the STM32 ROM bootloader on the board, use the provided UART-USB
 bridge and connect it to the *Config* port. The *Config* port pinout is the
 following:
 
-```
+```text
 ---------------     ---------------
 | 1 2 3 4 5 6 |     | x x x x x x |
 ---------------     ---------------
@@ -58,14 +59,18 @@ following:
 ```
 
 ### STM32 Loader
+
 To flash RIOT on the board, after connection the UART-USB bridge, just run:
-```
+
+```shell
 BOARD=lobaro-lorabox make flash
 ```
+
 This uses the stm32loader script to erase the memory and flash it interfacing
 with the STM32 ROM bootloader.
 
 ### Lobaro Tool
+
 Another way of interfacing with the STM32 ROM bootloader is using the **Lobaro Maintenance Tool** provided
 [online](https://www.lobaro.com/lobaro-maintenance-tool/) for free for Linux,
 Mac & Windows. It allows flashing and accessing the UART.
@@ -73,17 +78,21 @@ Mac & Windows. It allows flashing and accessing the UART.
 ![LobaroTool](https://www.lobaro.com/wp/wp-content/uploads/2018/03/Lobaro_Tool_FirmwareUpdateFeature.png)
 
 ## Connecting via Serial
+
 The default UART port is the USART1, the same that is used for flashing, so it
 is available on the *Config* port. The default port is /dev/ttyUSB0. To access
 the port run:
-```
+
+```shell
 BOARD=lobaro-lorabox make term
 ```
+
 **Note:** If you want to access the port with a different application please
 keep in mind that RTS must be set to '0' and DTR to '1' as the provided UART-USB
 bridge seems to invert this lines.
 
 ## SX1272 radio
+
 Please note that the board has a Semtech SX1272 radio. This means that when the
 semtech-loramac package or the sx127x driver are used the correct driver version
 (sx1272) must be selected.

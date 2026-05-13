@@ -19,9 +19,9 @@ on-board components:
 - 2 user buttons
 - 3 user LEDs
 
-@image html "https://files.seeedstudio.com/wiki/GD32VF103/img/GD32VF-103VBT6-pin.jpg" "Seeedstudio GD32 RISC-V Dev Board" width=600
+<img src="https://files.seeedstudio.com/wiki/GD32VF103/img/GD32VF-103VBT6-pin.jpg" alt="Seeedstudio GD32 RISC-V Dev Board" width=600 />
 
-## Hardware:
+## Hardware
 
 | MCU         | GD32VF103VBT6                          | Supported |
 |:----------- |:-------------------------------------- | --------- |
@@ -55,7 +55,7 @@ on-board components:
 
 The general pin layout is shown below.
 
-@image html "https://raw.githubusercontent.com/SeeedDocument/GD32VF103/master/img/GD32VF-103VBT6-c.jpg" "Seeedstudio GD32 RISC-V Dev Board Pinout" width=600
+<img src="https://raw.githubusercontent.com/SeeedDocument/GD32VF103/master/img/GD32VF-103VBT6-c.jpg" alt="Seeedstudio GD32 RISC-V Dev Board Pinout" width=600 />
 
 The following tables show the connection of the on-board components with the
 MCU pins and their configuration in RIOT sorted by RIOT peripherals and
@@ -145,22 +145,28 @@ All other pins are either not broken out or have no special usage.
 
 ## Flashing the Device
 
-The board is flashed via a JTAG interface with OpenOCD (at least
-[release version 0.12.0](https://github.com/openocd-org/openocd/tree/9ea7f3d647c8ecf6b0f1424002dfc3f4504a162c)).
+The board is flashed via a JTAG interface using OpenOCD v0.12.0 or higher.
+Refer to <https://doc.riot-os.org/misc/openocd/> for more information about
+building and installing OpenOCD.
 By default, an FTDI adapter according to the configuration defined in
 [`interface/openocd-usb.cfg`](https://github.com/openocd-org/openocd/blob/9ea7f3d647c8ecf6b0f1424002dfc3f4504a162c/tcl/interface/ftdi/openocd-usb.cfg)
 is assumed.
-```
+
+```shell
 BOARD=seeedstudio-gd32 make -C examples/basic/hello-world flash
 ```
+
 To use an FTDI adapter with a different configuration, the configuration can be
 defined using the variable `OPENOCD_FTDI_ADAPTER`, for example:
-```
+
+```shell
 OPENOCD_FTDI_ADAPTER=tigar BOARD=seeedstudio-gd32 make -C examples/basic/hello-world flash
 ```
+
 If another adapter is used, it can be specified using variable
 `OPENOCD_DEBUG_ADAPTER`, for example for a Segger J-Link adapter:
-```
+
+```shell
 OPENOCD_DEBUG_ADAPTER=jlink BOARD=seeedstudio-gd32 make -C examples/basic/hello-world flash
 ```
 
@@ -172,7 +178,8 @@ the index of the CDC ACM interface, which is 0 by default.
 
 To use the first UART interface for `stdio` instead, the `stdio_uart` module
 has to be enabled:
-```
+
+```shell
 USEMODULE=stdio_uart BOARD=seeedstudio-gd32 make -C examples/basic/hello-world flash
 ```
 
@@ -182,11 +189,14 @@ external USB-to-UART interface is used, this interface is mapped to
 interface, which is 0 by default.
 
 Use the `term` target to connect to the board using `/dev/ttyUSB0`:
-```
+
+```shell
 BOARD=seeedstudio-gd32 make -C examples/basic/hello-world term PORT=/dev/ttyUSB0
 ```
+
 If the UART interface index of the USB-to-UART interface is not 0, use
 the following command to connect:
-```
+
+```shell
 BOARD=seeedstudio-gd32 make -C examples/basic/hello-world term PORT=/dev/ttyUSB<n>
 ```

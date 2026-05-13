@@ -12,7 +12,7 @@ You can find general information about the Nucleo144 boards on the
 
 ## Pinout
 
-@image html pinouts/nucleo-l496zg.svg "Pinout for the Nucleo-L496ZG (from STM user manual, UM2179, https://www.st.com/resource/en/user_manual/um2179-stm32-nucleo144-boards-mb1312-stmicroelectronics.pdf, page 31)" width=55%
+<img src="pinouts/nucleo-l496zg.svg" alt="Pinout for the Nucleo-L496ZG (from STM user manual, UM2179, https://www.st.com/resource/en/user_manual/um2179-stm32-nucleo144-boards-mb1312-stmicroelectronics.pdf, page 31)" width=55% />
 
 ### MCU
 
@@ -25,7 +25,7 @@ You can find general information about the Nucleo144 boards on the
 | Frequency  | up to 80MHz        |
 | FPU        | yes                |
 | Timers     | 16 (2x watchdog, 1 SysTick, 11x 16-bit, 2x 32-bit) |
-| ADCs       | 3x 12-bit (24 channels |
+| ADCs       | 3x 12-bit (24 channels) |
 | UARTs      | 6 (5x UARTs and one Low-Power UART) |
 | SPIs       | 3                  |
 | I2Cs       | 4                  |

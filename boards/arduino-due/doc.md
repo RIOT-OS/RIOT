@@ -4,33 +4,26 @@
 
 \section arduino_due Arduino-Due
 
-## Table of Contents {#arduino_due_toc}
-
-1. [Overview](#arduino_due_overview)
-2. [Hardware](#arduino_due_hardware)
-    1. [MCU](#atmel_sam3x8e_mcu)
-    2. [Board Configuration](#arduino_due_board_configuration)
-    3. [Board Pinout](#arduino_due_pinout)
-3. [Flashing the Device](#arduino_due_flashing)
-
-## Overview {#arduino_due_overview}
+## Overview
 
 The Arduino Due is a microcontroller board based on the Atmel SAM3X8E ARM Cortex-M3 CPU.
 It is the first Arduino board based on a 32-bit ARM core microcontroller.
 
-\image html "https://store.arduino.cc/cdn/shop/files/A000062_00.front_1000x750.jpg" "Arduino Due board" width=750px
+<img src="https://store.arduino.cc/cdn/shop/files/A000062_00.front_1000x750.jpg" alt="Arduino Due board" width=750px />
 
-## Hardware {#arduino_due_hardware}
+## Hardware
 
-### MCU {#atmel_sam3x8e_mcu}
+### MCU
 
 The board features a SAM3X8E MCU (ARM Cortex-M3) running at up to 84MHz.
 It embeds 96 KiB of SRAM and 512 KiB of flash memory.
 The board reference manual is available [here](https://docs.arduino.cc/resources/datasheets/A000062-datasheet.pdf)
 and the MCU datasheet is available [here](https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-11057-32-bit-Cortex-M3-Microcontroller-SAM3X-SAM3A_Datasheet.pdf).
 
-### Board configuration {#arduino_due_board_configuration}
+### Board configuration
+
 The Arduino Due provides the following features:
+
 - 54 I/Os (of which 12 PWM outputs)
 - 12 analog inputs
 - 4 UARTs
@@ -44,15 +37,18 @@ The Arduino Due provides the following features:
 - A reset button
 - An erase button
 
-### Board pinout {#arduino_due_pinout}
+### Board pinout
 
-\image html "https://content.arduino.cc/assets/Pinout-Due_latest.png" "Arduino Due pinout"
+<img src="https://content.arduino.cc/assets/Pinout-Due_latest.png" alt="Arduino Due pinout" style="max-width: 100%" />
 
 The board schematics are available [here](https://docs.arduino.cc/resources/schematics/A000056-schematics.pdf).
 
-## Flashing the device {#arduino_due_flashing}
+## Flashing the device
+
 Flashing RIOT on the Arduino Due is quite straight forward as it relies on
 the preinstalled arduino bootloader. Connect your board using the programming
 port to your host computer and type:
 
-`make BOARD=arduino-due flash`
+```shell
+make BOARD=arduino-due flash
+```

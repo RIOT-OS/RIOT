@@ -14,7 +14,7 @@ ROM Flash.
 
 ## Pinout
 
-@image html pinouts/stm32l476g-disco.svg "Pinout for the stm32l476g-disco (from STM board manual)" width=50%
+<img src="pinouts/stm32l476g-disco.svg" alt="Pinout for the stm32l476g-disco (from STM board manual)" width=50% />
 
 ### MCU
 
@@ -39,18 +39,11 @@ ROM Flash.
 | Programming Manual | [Programming Manual](http://www.st.com/content/ccc/resource/technical/document/programming_manual/6c/3a/cb/e7/e4/ea/44/9b/DM00046982.pdf/files/DM00046982.pdf/jcr:content/translations/en.DM00046982.pdf) |
 | Board Manual   | [Board Manual](https://www.st.com/resource/en/user_manual/um1879-discovery-kit-with-stm32l476vg-mcu-stmicroelectronics.pdf) |
 
-## Flashing the Board Using ST-LINK Removable Media
+## Flashing the Board
 
-On-board ST-LINK programmer provides via composite USB device removable media.
-Copying the HEX file causes reprogramming of the board. This task
-could be performed manually; however, the cpy2remed (copy to removable
-media) PROGRAMMER script does this automatically. To program board in
-this manner, use the command:
-```
-make BOARD=stm32l476g-disco PROGRAMMER=cpy2remed flash
-```
-@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
-      can be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the STM32L479G-DISCO is `stm32l476g-disco`.
 
 ## Accessing RIOT shell
 

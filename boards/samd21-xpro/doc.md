@@ -9,15 +9,12 @@ featuring an ATSAMD21J18A SoC. The SoC includes a SAMD21 ARM Cortex-M0+ micro-
 controller. For programming the MCU comes with 32Kb of RAM and 256Kb of flash
 memory.
 
-The samd21-xpro is available from various hardware vendors for ~30USD (as of
-2017 May).
-
 ## Hardware
 
 ![samd21-xpro image](http://www.microchip.com/_ImagedCopy/ATSAMD21-XPRO_angle.jpg)
 
-
 ### MCU
+
 | MCU        | ATSAMD21J18A      |
 |:------------- |:--------------------- |
 | Family | ARM Cortex-M0+    |
@@ -44,7 +41,6 @@ The samd21-xpro is available from various hardware vendors for ~30USD (as of
 | LED0   | PB30 |
 | SW0 (button) | PA15 |
 
-
 ## Implementation Status
 
 | Device | ID        | Supported | Comments  |
@@ -67,24 +63,33 @@ Connect the device to your Micro-USB cable using the port labeled as *DEBUG
 USB*.
 
 The standard method for flashing RIOT to the samd21-xpro is using [edbg](https://github.com/ataradov/edbg).
-by calling: `make BOARD=samd21-xpro -C tests/leds flash`
+by calling:
+
+```shell
+make BOARD=samd21-xpro -C tests/leds flash
+```
 
 Note that on Linux, you will need libudev-dev package to be installed.
 
 Users can also use openOCD to flash and/or debug the board using:
-`PROGRAMMER=openocd make BOARD=samd21-xpro -C tests/leds flash`
+
+```shell
+PROGRAMMER=openocd make BOARD=samd21-xpro -C tests/leds flash
+```
 
 On Linux you will have to add a **udev** rule for hidraw, like
-```
-bash
+
+```shell
 echo 'KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0664", GROUP="plugdev"' \
     | sudo tee -a /etc/udev/rules.d/99-usb.rules
 sudo service udev restart
 ```
 
 ### Arch Linux
+
 With yaourt:
-```
+
+```shell
 yaourt -S libudev0
 yaourt -S hidapi-git
 yaourt -S openocd-git
@@ -92,8 +97,7 @@ yaourt -S openocd-git
 ```
 
 ### Ubuntu
+
 Although this refers to setting up the SAMR21, this guide is still very
 helpful to understanding how to set up a solid RIOT development environment for
-the SAMD21: http://watr.li/samr21-dev-setup-ubuntu.html
-
-## Known Issues / Problems
+the SAMD21: <http://watr.li/samr21-dev-setup-ubuntu.html>

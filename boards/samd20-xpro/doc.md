@@ -13,8 +13,8 @@ memory.
 
 ![samd20-xpro image](https://keilpack.azureedge.net/content/Keil.SAMD20_DFP.1.1.1/Boards/Atmel/SAMD20-XPRO/Documents/SAMD20-XPRO_large.png)
 
-
 ### MCU
+
 | MCU            | ATSAMD20J18A      |
 |:-------------- |:--------------------------------- |
 | Family         | ARM Cortex-M0+                    |
@@ -46,25 +46,34 @@ memory.
 Connect the device to your Micro-USB cable using the port labeled as *DEBUG
 USB*.
 
-The standard method for flashing RIOT to the samd20-xpro is using [edbg](https://github.com/ataradov/edbg).
-by calling: `make BOARD=samd20-xpro -C tests/leds flash`
+The standard method for flashing RIOT to the samd20-xpro is using
+[edbg](https://github.com/ataradov/edbg) by calling:
+
+```shell
+make BOARD=samd20-xpro -C tests/leds flash
+```
 
 Note that on Linux, you will need libudev-dev package to be installed.
 
 Users can also use openOCD to flash and/or debug the board using:
-`PROGRAMMER=openocd make BOARD=samd20-xpro -C tests/leds flash`
+
+```shell
+PROGRAMMER=openocd make BOARD=samd20-xpro -C tests/leds flash
+```
 
 On Linux you will have to add a **udev** rule for hidraw, like
-```
-bash
+
+```shell
 echo 'KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0664", GROUP="plugdev"' \
     | sudo tee -a /etc/udev/rules.d/99-usb.rules
 sudo service udev restart
 ```
 
 ### Arch Linux
+
 With yaourt:
-```
+
+```shell
 yaourt -S libudev0
 yaourt -S hidapi-git
 yaourt -S openocd-git
@@ -72,8 +81,7 @@ yaourt -S openocd-git
 ```
 
 ### Ubuntu
+
 Although this refers to setting up the SAMR21, this guide is still very
 helpful to understanding how to set up a solid RIOT development environment for
-the SAMD20: http://watr.li/samr21-dev-setup-ubuntu.html
-
-## Known Issues / Problems
+the SAMD20: <http://watr.li/samr21-dev-setup-ubuntu.html>

@@ -17,9 +17,10 @@ You can find general information about the Nucleo64 boards on the
 
 ## Pinout
 
-@image html pinouts/nucleo-f334r8.svg "Pinout for the nucleo-F334R8 (from user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 31)" width=50%
+<img src="pinouts/nucleo-f334r8.svg" alt="Pinout for the nucleo-F334R8 (from user manual UM1724, <http://www.st.com/resource/en/user_manual/dm00105823.pdf>, page 31)" width=50% />
 
 ### MCU
+
 | MCU        | STM32F334R8       |
 |:---------- |:----------------- |
 | Family     | ARM Cortex-M4F    |
@@ -41,9 +42,8 @@ You can find general information about the Nucleo64 boards on the
 | Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/dm00046982.pdf) |
 | Board Manual | [Board Manual](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/user_manual/DM00105823.pdf)|
 
-
-
 ## Implementation Status
+
 | Device | ID        | Supported | Comments  |
 |:------------- |:------------- |:------------- |:------------- |
 | MCU        | STM32F334R8   | partly    | Energy saving modes not fully utilized |
@@ -54,7 +54,6 @@ You can find general information about the Nucleo64 boards on the
 |        | SPI       | one SPI       | |
 |        | USB       | no        | |
 |        | Timer     | one 32 timer      | |
-
 
 ## Flashing the Board
 

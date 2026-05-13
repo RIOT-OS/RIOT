@@ -16,7 +16,7 @@ You can find general information about the Nucleo64 boards on the
 
 ## Pinout
 
-@image html pinouts/nucleo-f411re.svg "Pinout for the Nucleo-F411RE (from STM user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 32)" width=50%
+<img src="pinouts/nucleo-f411re.svg" alt="Pinout for the Nucleo-F411RE (from STM user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 32)" width=50% />
 
 ### MCU
 
@@ -47,7 +47,7 @@ You can find general information about the Nucleo64 boards on the
 |:------------- |:------------- |:------------- |:------------- |
 | MCU        | STM32F411RE   | partly    | Energy saving modes not fully utilized |
 | Low-level driver | GPIO    | yes       | |
-|        | PWM       | yes (7 pins available))   |  |
+|        | PWM       | yes (7 pins available)   |  |
 |        | UART      | 3 UARTs       | USART2 via STLink/USB or D0(RX)/D1(TX), USART1 on PA10(RX)/PA9(TX) and USART6 on PA12(RX)/PA11(TX) |
 |        | I2C       | 1 I2C     | |
 |        | SPI       | 1 SPI     | |

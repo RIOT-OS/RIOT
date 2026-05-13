@@ -9,8 +9,9 @@ uses PyOCD by default.
 
 To flash the board, use `BOARD=<nrf52 board>` with the `make` command.<br/>
 Example with `hello-world` application:
-```
-    make BOARD=<nrf52 board> -C examples/basic/hello-world flash
+
+```shell
+make BOARD=<nrf52 board> -C examples/basic/hello-world flash
 ```
 
 OpenOCD can also be used to flash nrf52 boards (except thingy52 and ruuvitag
@@ -20,12 +21,14 @@ support for nrf52 but versions built against the current development version
 can be used.
 
 To flash the board with OpenOCD, use the `PROGRAMMER` variable:
-```
-    PROGRAMMER=openocd make BOARD=<nrf52 board> -C examples/basic/hello-world flash
+
+```shell
+PROGRAMMER=openocd make BOARD=<nrf52 board> -C examples/basic/hello-world flash
 ```
 
 It is also possible to use the SWD interface of a ST-LINK/V2 in-circuit
 debugger/programmer with OpenOCD to flash a nrf52 board:
-```
-    PROGRAMMER=openocd OPENOCD_DEBUG_ADAPTER=stlink make BOARD=<nrf52 board> -C examples/basic/hello-world flash
+
+```shell
+PROGRAMMER=openocd OPENOCD_DEBUG_ADAPTER=stlink make BOARD=<nrf52 board> -C examples/basic/hello-world flash
 ```

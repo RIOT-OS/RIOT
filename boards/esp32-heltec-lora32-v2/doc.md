@@ -10,18 +10,7 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 \section esp32_heltec_lora32_v2 Heltec WiFi LoRa 32 V2
 
-## Table of Contents {#esp32_heltec_lora32_v2_toc}
-
-1. [Overview](#esp32_heltec_lora32_v2_overview)
-2. [Hardware](#esp32_heltec_lora32_v2_hardware)
-    1. [MCU](#esp32_heltec_lora32_v2_mcu)
-    2. [Board Configuration](#esp32_heltec_lora32_v2_board_configuration)
-    3. [Board Pinout](#esp32_heltec_lora32_v2_pinout)
-    4. [Using the OLED Display](#esp32_heltec_lora32_v2_oled_display)
-    5. [Optional Hardware Configurations](#esp32_heltec_lora32_v2_optional_hardware)
-3. [Flashing the Device](#esp32_heltec_lora32_v2_flashing)
-
-## Overview {#esp32_heltec_lora32_v2_overview}
+## Overview
 
 Heltec WiFi LoRa 32 V2 is an ESP32 development board with 8 MB Flash that uses
 the EPS32 chip directly. It integrates
@@ -33,27 +22,14 @@ Since the board is
 [open source hardware](https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series),
 a number of clones are available.
 
-@image html "https://heltec.org/wp-content/uploads/2024/07/wifi-lora-32-v2-1.png" "Heltec WiFi Lora 32 V2" width=400px
+<img src="https://heltec.org/wp-content/uploads/2024/07/wifi-lora-32-v2-1.png" alt="Heltec WiFi Lora 32 V2" width=400px />
 
-[Back to table of contents](#esp32_heltec_lora32_v2_toc)
+## Hardware
 
-## Hardware {#esp32_heltec_lora32_v2_hardware}
-
-This section describes
-
-- the [MCU](#esp32_heltec_lora32_v2_mcu),
-- the default [board configuration](#esp32_heltec_lora32_v2_board_configuration),
-- [optional hardware configurations](#esp32_heltec_lora32_v2_optional_hardware),
-- the [board pinout](#esp32_heltec_lora32_v2_pinout).
-
-[Back to table of contents](#esp32_heltec_lora32_v2_toc)
-
-### MCU {#esp32_heltec_lora32_v2_mcu}
+### MCU
 
 Most features of the board are provided by the ESP32 SoC. For detailed
 information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
-
-[Back to table of contents](#esp32_heltec_lora32_v2_toc)
 
 ### Board Configuration {#esp32_heltec_lora32_v2_board_configuration}
 
@@ -99,7 +75,7 @@ overridden by \ref esp32_application_specific_configurations
 |:----------------|:-------|:--------|:--------------|
 | BTN0            | GPIO0  | low active  | |
 | LED0            | GPIO25 | high active | |
-| ADC             | GPIO36, GPIO39, GPIO37, GPIO38,\n GPIO0, GPIO2, GPIO12, GPIO13,\n GPIO4, GPIO15 | | \ref esp32_adc_channels "ADC Channels" |
+| ADC             | GPIO36, GPIO39, GPIO37, GPIO38,<br> GPIO0, GPIO2, GPIO12, GPIO13,<br> GPIO4, GPIO15 | | \ref esp32_adc_channels "ADC Channels" |
 | DAC             | | | \ref esp32_dac_channels "DAC Channels" |
 | PWM_DEV(0)      | GPIO25, GPIO2, GPIO17 | | \ref esp32_pwm_channels "PWM Channels" |
 | PWM_DEV(1)      | GPIO22, GPIO23 | | \ref esp32_pwm_channels "PWM Channels" |
@@ -114,7 +90,8 @@ overridden by \ref esp32_application_specific_configurations
 | UART_DEV(1):TxD | GPIO10 | not available in **qout** and **qio** flash mode | \ref esp32_uart_interfaces "UART interfaces" |
 | UART_DEV(1):RxD | GPIO9  | not available in **qout** and **qio** flash mode | \ref esp32_uart_interfaces "UART interfaces" |
 | OLED RESET      | GPIO16 | | |
-\n
+
+<br>
 @note
 - The configuration of ADC channels contains all ESP32 GPIOs that can be used
   as ADC channels.
@@ -124,19 +101,20 @@ overridden by \ref esp32_application_specific_configurations
 For detailed information about the configuration of ESP32 boards, see
 section \ref esp32_peripherals "Common Peripherals".
 
-[Back to table of contents](#esp32_heltec_lora32_v2_toc)
-
-### Using the OLED Display {#esp32_heltec_lora32_v2_oled_display}
+### Using the OLED Display
 
 The 0.96-inch OLED display with 128x64 pixels uses the widely used SSD1306
 controller. It is connected via `I2C_DEV(0)`. It can be used with the `pkg/u8g2`
 package. For this purpose, the `pkg/u8g2` package has to be used in the
 application Makefile
+
 ```makefile
 USEPKG += u8g2
 ```
+
 and function `u8g2_Setup_ssd1306_i2c_128x64_noname_f` has to be called to
 setup the right driver, for example:
+
 ```c
 #include "u8g2.h"
 #include "u8x8_riotos.h"
@@ -158,17 +136,17 @@ u8g2_SetI2CAddress(&u8g2, SSD1306_I2C_ADDR);
 u8g2_InitDisplay(&u8g2);
 u8g2_SetPowerSave(&u8g2, 0);
 ```
+
 The `tests/pkg/u8g2` test application is a good example of how to use the
 `pkg/u8g2` package. It can be compiled for the board with the following command:
+
 ```shell
 TEST_OUTPUT=4 TEST_I2C=0 TEST_ADDR=0x3c TEST_PIN_RESET=GPIO16 \
 TEST_DISPLAY=u8g2_Setup_ssd1306_i2c_128x64_noname_f \
 BOARD=esp32-heltec-lora32-v2 make -C tests/pkg/u8g2/ flash
 ```
 
-[Back to table of contents](#esp32_heltec_lora32_v2_toc)
-
-### Optional Hardware Configurations {#esp32_heltec_lora32_v2_optional_hardware}
+### Optional Hardware Configurations
 
 MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet
 network interface modules have been tested with the board. You could use
@@ -192,6 +170,7 @@ the following code in your \ref esp32_application_specific_configurations
 
 #endif
 ```
+
 For other parameters, the default values defined by the drivers can be used.
 
 @note The **RESET** signal of MRF24J40 and ENC28J60 based modules can also
@@ -199,9 +178,7 @@ be connected to the **RST** pin of the board
 (see \ref esp32_heltec_lora_32_v2_pinout_img "pinout") to keep the configured
 GPIO free for other purposes.
 
-[Back to table of contents](#esp32_heltec_lora32_v2_toc)
-
-### Board Pinout {#esp32_heltec_lora32_v2_pinout}
+### Board Pinout
 
 The following figure shows the pinout of the defined default configuration
 for Heltec WiFi LoRa 32 V2 boards. The light green GPIOs are not used
@@ -214,19 +191,17 @@ The corresponding board schematics can be found [here for SX1276 version](https:
 and [here for SX1278 version](https://resource.heltec.cn/download/WiFi_LoRa_32/V2/WiFi_LoRa_32_V2(433%2C470-510).PDF).
 
 \anchor esp32_heltec_lora_32_v2_pinout_img
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Heltec_WiFi_LoRa_32_V2_pinout_v2.png" "WiFi LoRa 32 V2 Pintout Diagram"
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Heltec_WiFi_LoRa_32_V2_pinout_v2.png" alt="WiFi LoRa 32 V2 Pintout Diagram" />
 
-[Back to table of contents](#esp32_heltec_lora32_v2_toc)
-
-## Flashing the Device {#esp32_heltec_lora32_v2_flashing}
+## Flashing the Device
 
 Flashing RIOT is quite easy. The board has a Micro-USB connector with
 reset/boot/flash logic. Just connect the board to your host computer and
 type using the programming port:
+
 ```shell
-make flash BOARD=esp32-heltec-lora32-v2 ...
+BOARD=esp32-heltec-lora32-v2 make flash ...
 ```
+
 For detailed information about ESP32 as well as configuring and compiling RIOT
 for ESP32 boards, see \ref esp32_riot.
-
-[Back to table of contents](#esp32_heltec_lora32_v2_toc)

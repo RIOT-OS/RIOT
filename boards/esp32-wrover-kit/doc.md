@@ -10,19 +10,7 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 \section esp32_wrover_kit ESP-WROVER-KIT V3
 
-## Table of Contents {#esp32_wrover_kit_toc}
-
-1. [Overview](#esp32_wrover_kit_overview)
-2. [Hardware](#esp32_wrover_kit_hardware)
-    1. [MCU](#esp32_wrover_kit_mcu)
-    2. [Board Configuration](#esp32_wrover_kit_board_configuration)
-    3. [Board Pinout](#esp32_wrover_kit_pinout)
-    4. [Optional Hardware Configurations](#esp32_wrover_kit_optional_hardware)
-3. [Flashing the Device](#esp32_wrover_kit_flashing)
-4. [On-Chip Debugging with the device](#esp32_wrover_kit_debugging)
-5. [Other Documentation Resources](#esp32_wrover_kit_other-resources)
-
-## Overview  {#esp32_wrover_kit_overview}
+## Overview
 
 The Espressif ESP-WROVER-KIT is a development board that uses the ESP32-WROVER
 module which includes a built-in 4 MByte SPI RAM. Most important features of
@@ -39,27 +27,14 @@ Furthermore, many GPIOs are broken out for extension. The USB bridge based on
 FDI FT2232HL provides a JTAG interface for OCD debugging through the USB
 interface.
 
-@image html "https://dl.espressif.com/dl/schematics/pictures/esp-wrover-kit-v3.jpg" "ESP-WROVER-KIT V3" width=500px
+<img src="https://dl.espressif.com/dl/schematics/pictures/esp-wrover-kit-v3.jpg" alt="ESP-WROVER-KIT V3" width=500px />
 
-[Back to table of contents](#esp32_wrover_kit_toc)
+## Hardware
 
-## Hardware {#esp32_wrover_kit_hardware}
-
-This section describes
-
-- the [MCU](#esp32_wrover_kit_mcu),
-- the default [board configuration](#esp32_wrover_kit_board_configuration),
-- [optional hardware configurations](#esp32_wrover_kit_optional_hardware),
-- the [board pinout](#esp32_wrover_kit_pinout).
-
-[Back to table of contents](#esp32_wrover_kit_toc)
-
-### MCU {#esp32_wrover_kit_mcu}
+### MCU
 
 Most features of the board are provided by the ESP32 SoC. For detailed
 information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
-
-[Back to table of contents](#esp32_wrover_kit_toc)
 
 ### Board Configuration {#esp32_wrover_kit_board_configuration}
 
@@ -79,7 +54,7 @@ configuration can be overridden by
 
 These abbreviations are used in subsequent tables:
 
-*SDC* = SD-Card interface is used (module **periph_sdmmc** is enabled)\n
+*SDC* = SD-Card interface is used (module **periph_sdmmc** is enabled)<br>
 *CAM* = Camera is plugged in/used
 
 <center>
@@ -174,7 +149,8 @@ on used hardware.
 | GPIO35 | ADC_LINE(1)            | ADC_LINE(1)         | ADC_LINE(1)         | CAMERA_D7                  | |
 | GPIO36 | ADC_LINE(2)            | ADC_LINE(2)         | ADC_LINE(2)         | CAMERA_D4                  | |
 | GPIO39 | ADC_LINE(3)            | ADC_LINE(3)         | ADC_LINE(3)         | CAMERA_D5                  | |
-\n
+
+<br>
 
 </center>
 
@@ -203,9 +179,7 @@ on used hardware.
 For detailed information about the configuration of ESP32 boards, see
 section Peripherals in \ref esp32_riot.
 
-[Back to table of contents](#esp32_wrover_kit_toc)
-
-### Optional Hardware Configurations  {#esp32_wrover_kit_optional_hardware}
+### Optional Hardware Configurations
 
 MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet network
 interface modules have been tested with the board. You could use the following
@@ -229,6 +203,7 @@ code in your \ref esp32_application_specific_configurations
 
 #endif
 ```
+
 For other parameters, the default values defined by the drivers can be used.
 
 @note
@@ -238,8 +213,6 @@ For other parameters, the default values defined by the drivers can be used.
 - The **RESET** signal of MRF24J40 and ENC28J60 based modules can also be
   connected to the **RST** pin of the board (see \ref esp32_wrover_kit_pinout
   "pinout") to keep the configured GPIO free for other purposes.
-
-[Back to table of contents](#esp32_wrover_kit_toc)
 
 ### Board Pinout  {#esp32_wrover_kit_pinout}
 
@@ -253,16 +226,16 @@ more information.
 The corresponding board schematic can be found
 [here](https://dl.espressif.com/dl/schematics/ESP-WROVER-KIT_SCH-3.pdf).
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/ESP-WROVER-KIT_V3_pinout.png" "ESP32-WROVER-KIT V3 Pinout"
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/ESP-WROVER-KIT_V3_pinout.png" alt="ESP32-WROVER-KIT V3 Pinout" />
 
-## Flashing the Device  {#esp32_wrover_kit_flashing}
+## Flashing the Device
 
 Flashing RIOT is quite straight forward. The board has a Micro-USB connector
 with reset/boot/flash logic. Just connect the board using the programming port
 to your host computer and type:
 
 ```shell
-make flash BOARD=esp32-wrover-kit ...
+BOARD=esp32-wrover-kit make flash ...
 ```
 
 The USB bridge is based on FDI FT2232HL and offers two USB interfaces:
@@ -275,14 +248,13 @@ Therefore, you have to declare the USB interface in the make command. For
 example, if the ESP32-WROVER-KIT is connected to the host computer through the
 USB interfaces `/dev/ttyUSB0` and `/dev/ttyUSB1`, the make command would be
 used as following:
+
 ```shell
-make flash BOARD=esp32-wrover-kit PORT=/dev/ttyUSB1 ...
+BOARD=esp32-wrover-kit PORT=/dev/ttyUSB1 make flash ...
 ```
 
 For detailed information about ESP32 as well as configuring and compiling RIOT
 for ESP32 boards, see \ref esp32_riot.
-
-[Back to table of contents](#esp32_wrover_kit_toc)
 
 ## On-Chip Debugging with the Device {#esp32_wrover_kit_debugging}
 
@@ -294,6 +266,7 @@ for details on how to setup and how to use ESP-WROVER-Kit V3 and OpenOCD.
 
 To use the JTAG interface, the `esp_jtag` module has to be enabled for
 compilation.
+
 ```shell
 USEMODULE=esp_jtag make flash BOARD=esp32-wrover-kit ...
 ```
@@ -302,12 +275,14 @@ To flash and debug using OpenOCD, the precompiled version of OpenOCD for
 ESP32 has to be installed using the install script while being in RIOT's
 root directory, see also section
 [Using Local Toolchain Installation](#esp32_local_toolchain_installation).
+
 ```shell
 dist/tools/esptool/install.sh openocd
 ```
 
 Before OpenOCD can then be used, the `PATH` variable has to be set correctly
 and the `OPENOCD` variable has to be exported using the following command.
+
 ```shell
 . dist/tools/esptool/export.sh openocd
 ```
@@ -315,11 +290,14 @@ and the `OPENOCD` variable has to be exported using the following command.
 Once the `PATH` variable and the `OPENOCD` variable are set, OpenOCD can be used
 
 - to flash the application using command
+
   ```shell
   PROGRAMMER=openocd USEMODULE=esp_jtag make flash BOARD=esp32-wrover-kit ...
   ```
+
 - to start a debugging session (the board will be reset, but not flashed)
   using command
+
   ```shell
   PROGRAMMER=openocd USEMODULE=esp_jtag make debug BOARD=esp32-wrover-kit ...
   ```
@@ -330,9 +308,7 @@ by setting the `PROGRAMMER` variable to `openocd`.
 method for flashing with `esptool.py` can still be used. In that case, the
 `flash` target is made without setting the `PROGRAMMER` variable.
 
-[Back to table of contents](#esp32_wrover_kit_toc)
-
-## Other Documentation Resources  {#esp32_wrover_kit_other-resources}
+## Other Documentation Resources
 
 There is a comprehensive
 [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-wrover-kit-v3.html)

@@ -14,6 +14,7 @@ The display, RGB LEDs, buttons and accelerometer of this board are currently not
 The [Adafruit PyBadge LC](https://www.adafruit.com/product/3939) and
 [Adafruit EdgeBadge](https://www.adafruit.com/product/4400)) are
 variants of the Pybadge with small differences:
+
 - EdgeBadge provides an extra microphone (not supported)
 - PyBadgeLC only have one Neopixel LED (instead of 5)
 Both are compatible with the PyBadge RIOT port and the current port can easily
@@ -24,8 +25,9 @@ be adapted/extended with their respective differences.
 Connect the board via USB and use `BOARD=adafruit-pybadge` with the `make` command;
 this uses the Arduino style bootloader preprogrammed on the board.<br/>
 Example with `hello-world` application:
-```
-     make BOARD=adafruit-pybadge -C examples/basic/hello-world flash
+
+```shell
+make BOARD=adafruit-pybadge -C examples/basic/hello-world flash
 ```
 
 In case of a crash of the firmware, one has to manually reset the board in

@@ -219,6 +219,7 @@ Therefore, only one of both peripherals can be enabled at the same time.
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
 
 ### Hardware crypto
+
 This MCU is equipped with a hardware-accelerated crypto peripheral that can
 speed up AES128, AES256, SHA1, SHA256 and several other cryptographic
 computations.
@@ -259,32 +260,28 @@ board so that flashing and debugging is very easy.
 
 Flashing is supported by RIOT-OS using the command below:
 
-```
-make flash
+```shell
+BOARD=slstk3701a make flash
 ```
 
 To run the GDB debugger, use the command:
 
-```
-make debug
+```shell
+BOARD=slstk3701a make debug
 ```
 
 Or, to connect with your own debugger:
 
-```
-make debug-server
+```shell
+BOARD=slstk3701a make debug-server
 ```
 
 Some boards have (limited) support for emulation, which can be started with:
 
+```shell
+BOARD=slstk3701a make emulate
 ```
-make emulate
-```
-
-## Supported Toolchains
-For using the Silicon Labs SLSTK3701A starter kit we strongly recommend
-the usage of the [GNU Tools for ARM Embedded Processors](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
-toolchain.
 
 ## License information
+
 Silicon Labs' EMLIB: zlib-style license (permits distribution of source).

@@ -10,17 +10,7 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 \section esp32_olimex-esp32-evb Olimex ESP32-EVB and ESP32-GATEWAY
 
-## Table of Contents {#esp32_olimex_esp32_evb_toc}
-
-1. [Overview](#esp32_olimex_esp32_evb_overview)
-2. [Hardware](#esp32_olimex_esp32_evb_hardware)
-    1. [MCU](#esp32_olimex_esp32_evb_mcu)
-    2. [Board Configuration](#esp32_olimex_esp32_evb_board_configuration)
-    3. [Board Pinout](#esp32_olimex_esp32_evb_pinout)
-    4. [Optional Hardware Configurations](#esp32_olimex_esp32_evb_optional_hardware)
-3. [Flashing the Device](#esp32_olimex_esp32_evb_flashing)
-
-## Overview {#esp32_olimex_esp32_evb_overview}
+## Overview
 
 [Olimex ESP32-EVB](https://github.com/OLIMEX/ESP32-EVB) and
 [Olimex ESP32-GATEWAY](https://github.com/OLIMEX/ESP32-GATEWAY) are
@@ -41,31 +31,19 @@ for soldering iron or breadboards.
 Because of the differences in the on-board hardware, it is necessary to
 add the following line to the makefile of the application to use the
 according configuration for Olimex ESP32-GATEWAY:
+
 ```makefile
 USEMODULE += olimex_esp32_gateway
 ```
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Olimex_ESP32-EVB_GATEWAY.png" "Olimex ESP32-EVB (left) and Olimex ESP32-GATEWAY (right)"
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Olimex_ESP32-EVB_GATEWAY.png" alt="Olimex ESP32-EVB (left) and Olimex ESP32-GATEWAY (right)" />
 
-[Back to table of contents](#esp32_olimex_esp32_evb_toc)
+## Hardware
 
-## Hardware {#esp32_olimex_esp32_evb_hardware}
-
-This section describes
-
-- the [MCU](#esp32_olimex_esp32_evb_mcu),
-- the default [board configuration](#esp32_olimex_esp32_evb_board_configuration),
-- [optional hardware configurations](#esp32_olimex_esp32_evb_optional_hardware),
-- the [board pinout](#esp32_olimex_esp32_evb_pinout).
-
-[Back to table of contents](#esp32_olimex_esp32_evb_toc)
-
-### MCU {#esp32_olimex_esp32_evb_mcu}
+### MCU
 
 Most features of the board are provided by the ESP32 SoC. For detailed
 information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
-
-[Back to table of contents](#esp32_olimex_esp32_evb_toc)
 
 ### Board Configuration {#esp32_olimex_esp32_evb_board_configuration}
 
@@ -86,7 +64,7 @@ overridden by \ref esp32_application_specific_configurations
 "application-specific configurations".
 
 <center>
-Pin    | Configuration\n ESP32-EVB | Configuration\n ESP32-GATEWAY | Remarks / Prerequisites | Configuration
+Pin    | Configuration<br> ESP32-EVB | Configuration<br> ESP32-GATEWAY | Remarks / Prerequisites | Configuration
 :------|:------------------|:-----------------|-|-|
 GPIO13 | I2C_DEV(0):SDA    | SDMMC_DEV(0):DAT3 | on ESP32-EVB available at [UEXT1](https://www.olimex.com/Products/Modules/UEXT) | \ref esp32_i2c_interfaces "I2C Interfaces", \ref esp32_sdmmc_interfaces "SDMMC Interfaces"
 GPIO16 | I2C_DEV(0):SCL    | I2C_DEV(0):SCL   | on ESP32-EVB available at [UEXT1](https://www.olimex.com/Products/Modules/UEXT) | \ref esp32_i2c_interfaces "I2C Interfaces"
@@ -117,15 +95,17 @@ GPIO25 | EMAC_RMII:RXD0    | EMAC_RMII:RXD0   | LAN interface | \ref esp32_ether
 GPIO26 | EMAC_RMII:RXD1    | EMAC_RMII:RXD1   | LAN interface | \ref esp32_ethernet_network_interface "Ethernet MAC"
 GPIO27 | EMAC_RMII:RX_DV   | EMAC_RMII:RX_DV  | LAN interface | \ref esp32_ethernet_network_interface "Ethernet MAC"
 </center>
-\n
+<br>
 
 @note
 To use the board configuration for Olimex-ESP32-GATEWAY, it is necessary
 to add the following line to makefile of the application:
-\n
+<br>
+
 ```makefile
 USEMODULE += olimex_esp32_gateway
 ```
+
 - GPIO9 and GIOP10 can only be used in **dout** and **dio**
   \ref esp32_flash_modes "flash modes".
 - It might be necessary to remove the SD card or the peripheral hardware
@@ -136,9 +116,7 @@ USEMODULE += olimex_esp32_gateway
 For detailed information about the configuration of ESP32 boards, see
 section \ref esp32_peripherals "Common Peripherals".
 
-[Back to table of contents](#esp32_olimex_esp32_evb_toc)
-
-### Optional Hardware Configurations {#esp32_olimex_esp32_evb_optional_hardware}
+### Optional Hardware Configurations
 
 MRF24J40-based IEEE 802.15.4 radio modules have been tested with the board.
 You could use the following code in your
@@ -156,6 +134,7 @@ You could use the following code in your
 
 #endif
 ```
+
 For other parameters, the default values defined by the drivers can be used.
 
 @note
@@ -167,8 +146,6 @@ For other parameters, the default values defined by the drivers can be used.
 - The **RESET** signal of MRF24J40 based modules can also be connected
   to the **RST** pin of the board (see \ref esp32_olimex_esp32_evb_pinout_img
   "pinout") to keep the configured GPIO free for other purposes.
-
-[Back to table of contents](#esp32_olimex_esp32_evb_toc)
 
 ### Board Pinout {#esp32_olimex_esp32_evb_pinout}
 
@@ -184,20 +161,18 @@ The corresponding board schematics can be found on GitHub for
 [Olimex ESP32-GATEWAY](https://github.com/OLIMEX/ESP32-GATEWAY/raw/master/HARDWARE/Hardware%20revision%20C/ESP32-GATEWAY_Rev_C.pdf).
 
 \anchor esp32_olimex_esp32_evb_pinout_img
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Olimex_ESP32-EVB_pinout.png" "Olimex ESP32-EVB pinout"
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Olimex_ESP32-GATEWAY_pinout.png" "Olimex ESP32-GATEWAY pinout"
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Olimex_ESP32-EVB_pinout.png" alt="Olimex ESP32-EVB pinout" />
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Olimex_ESP32-GATEWAY_pinout.png" alt="Olimex ESP32-GATEWAY pinout" />
 
-[Back to table of contents](#esp32_olimex_esp32_evb_toc)
-
-## Flashing the Device {#esp32_olimex_esp32_evb_flashing}
+## Flashing the Device
 
 Flashing RIOT is quite easy. The board has a Micro-USB connector with
 reset/boot/flash logic. Just connect the board to your host computer and
 type using the programming port:
+
 ```shell
-make flash BOARD=esp32-olimex-evb ...
+BOARD=esp32-olimex-evb make flash ...
 ```
+
 For detailed information about ESP32 as well as configuring and compiling
 RIOT for ESP32 boards, see \ref esp32_riot.
-
-[Back to table of contents](#esp32_olimex_esp32_evb_toc)

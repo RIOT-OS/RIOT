@@ -17,7 +17,7 @@ on-board components:
 - 3 user LEDs
 - 0.96\" TFT display 160 x 80 pixel (optional)
 
-@image html "https://wiki.sipeed.com/hardware/assets/Longan/nano/Longan_nano.124.jpg" "Sipeed Longan Nano" width=600
+<img src="https://wiki.sipeed.com/hardware/assets/Longan/nano/Longan_nano.124.jpg" alt="Sipeed Longan Nano" width=600 />
 
 ## Hardware
 
@@ -53,7 +53,7 @@ on-board components:
 
 The general pin layout is shown below.
 
-@image html "https://longan.sipeed.com/assets/longan_nano_pinout_v1.1.0_w5676_h4000_large.png" "Sipeed Longan Nano Pinout" width=800
+<img src="https://longan.sipeed.com/assets/longan_nano_pinout_v1.1.0_w5676_h4000_large.png" alt="Sipeed Longan Nano Pinout" width=800 />
 
 The following tables show the connection of the on-board components with the
 MCU pins and their configuration in RIOT sorted by RIOT peripherals and
@@ -99,12 +99,13 @@ by pins.
 
 (*) The availability of these peripherals depend on the use of other peripherals.
 
-\n
+<br>
 @note For the Sipeed Longan Nano board version with TFT display, the
       `sipeed-longan-nano-tft` board definition has to be used.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=sipeed-longan-nano-tft make ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 | Pin  | Board Function | RIOT Function 1 | RIOT Function 2 | RIOT Function 3 |
 |:-----|:---------------|:----------------|:----------------|:----------------|
@@ -158,17 +159,18 @@ peripheral configurations, their index may vary.
 The board is flashed via the in-ROM DFU bootloader by default.
 To enter bootloader mode, hold the BOOT0 button while pressing the RESET button.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```shell
 BOARD=sipeed-longan-nano make -C examples/basic/hello-world flash
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 After flashing you need to leave bootloader mode again by pressing the RESET button.
 
 @note For the Sipeed Longan Nano board version with TFT display, the
       `sipeed-longan-nano-tft` board definition has to be used.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=sipeed-longan-nano-tft make -C examples/basic/hello-world flash
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 ### Using an external debug adapter
 
@@ -177,28 +179,33 @@ The board can also be flashed via a JTAG interface with OpenOCD (at least
 By default, an FTDI adapter according to the configuration defined in
 [`interface/openocd-usb.cfg`](https://github.com/openocd-org/openocd/blob/9ea7f3d647c8ecf6b0f1424002dfc3f4504a162c/tcl/interface/ftdi/openocd-usb.cfg)
 is assumed.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 PROGRAMMER=openocd BOARD=sipeed-longan-nano make -C examples/basic/hello-world flash
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 To use an FTDI adapter with a different configuration, the configuration can be
 defined using the variable `OPENOCD_FTDI_ADAPTER`, for example:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 PROGRAMMER=openocd OPENOCD_FTDI_ADAPTER=tigard BOARD=sipeed-longan-nano make -C examples/basic/hello-world flash
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
 If another adapter is used, it can be specified using variable
 `OPENOCD_DEBUG_ADAPTER`, for example for a Segger J-Link adapter:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 PROGRAMMER=openocd OPENOCD_DEBUG_ADAPTER=jlink BOARD=sipeed-longan-nano make -C examples/basic/hello-world flash
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 ## Using the TFT Display
 
 To use the display of the Sipeed Longan Nano board version with TFT display,
 the `sipeed_longan_nano_tft` board definition has to be used, for example:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=sipeed-longan-nano-tft make -C tests/drivers/st7735 flash
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 ## Accessing STDIO
 
@@ -208,9 +215,10 @@ the index of the CDC ACM interface, which is 0 by default.
 
 To use the first UART interface for `stdio` instead, the `stdio_uart` module
 has to be enabled:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 USEMODULE=stdio_uart BOARD=sipeed-longan-nano make -C examples/basic/hello-world flash
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 The `stdio` is then directly accessible through the first UART interface. If an
 external USB-to-UART interface is used, this interface is mapped to
@@ -218,11 +226,14 @@ external USB-to-UART interface is used, this interface is mapped to
 interface, which is 0 by default.
 
 Use the `term` target to connect to the board using `/dev/ttyUSB0`:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=sipeed-longan-nano make -C examples/basic/hello-world term PORT=/dev/ttyUSB0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
 If the UART interface index of the USB-to-UART interface is not 0, use
 the following command to connect:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=sipeed-longan-nano make -C examples/basic/hello-world term PORT=/dev/ttyUSB<n>
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```

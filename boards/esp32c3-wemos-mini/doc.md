@@ -10,16 +10,7 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 \section esp32c3_wemos_mini Wemos ESP32-C3 mini
 
-## Table of Contents {#esp32c3_wemos_mini_toc}
-
-1. [Overview](#esp32c3_wemos_mini_overview)
-2. [Hardware](#esp32c3_wemos_mini_hardware)
-    1. [MCU](#esp32c3_wemos_mini_mcu)
-    2. [Board Configuration](#esp32c3_wemos_mini_board_configuration)
-    3. [Board Pinout](#esp32c3_wemos_mini_pinout)
-3. [Flashing the Device](#esp32c3_wemos_mini_flashing)
-
-## Overview {#esp32c3_wemos_mini_overview}
+## Overview
 
 The Wemos ESP32-C3 mini board is an interesting development kit as it uses
 in the stackable Wemos LOLIN D1 Mini format. Thus, all
@@ -36,39 +27,27 @@ for ESP8266 can also be used with ESP32-C3. Examples for such shields are:
 This makes it possible to create different hardware configurations without
 the need for a soldering iron or a breadboard.
 
-@image html "https://www.wemos.cc/en/latest/_images/c3_mini_v2.1.0_1_16x16.jpg" "Wemos ESP32-C3 mini board" width=250px
+<img src="https://www.wemos.cc/en/latest/_images/c3_mini_v2.1.0_1_16x16.jpg" alt="Wemos ESP32-C3 mini board" width=250px />
 
 This stackable platform was tested in an RIOT application with:
 
-- MRF24J40 IEEE 802.15.4 radio Shield (contact gunar@schorcht.net for more information)
+- MRF24J40 IEEE 802.15.4 radio Shield (contact <gunar@schorcht.net> for more information)
 - [BMP180 Pressure Sensor Shield](http://www.esp8266learning.com/wemos-mini-bmp180-shield.php)
 
 This application is a good example how easy it is with this board to create
 different hardware applications.
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Wemos_ESP32-C3_mini_application.jpg" "RIOT application with MRF24J40 Radio and a BMP180 Pressure Sensor" width=450px
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Wemos_ESP32-C3_mini_application.jpg" alt="RIOT application with MRF24J40 Radio and a BMP180 Pressure Sensor" width=450px />
 
-[Back to table of contents](#esp32c3_wemos_mini_toc)
+## Hardware
 
-## Hardware {#esp32c3_wemos_mini_hardware}
-
-This section describes
-
-- the [MCU](#esp32c3_wemos_mini_mcu),
-- the default [board configuration](#esp32c3_wemos_mini_board_configuration),
-- the [board pinout](#esp32c3_wemos_mini_pinout).
-
-[Back to table of contents](#esp32c3_wemos_mini_toc)
-
-### MCU {#esp32c3_wemos_mini_mcu}
+### MCU
 
 Most features of the board are provided by the ESP32-C3 SoC. For detailed
 information about the ESP32-C3 variant (family) and ESP32x SoCs,
 see section \ref esp32_mcu_esp32 "ESP32 SoC Series".
 
-[Back to table of contents](#esp32c3_wemos_mini_toc)
-
-### Board Configuration {#esp32c3_wemos_mini_board_configuration}
+### Board Configuration
 
 The Wemos ESP32-C3 mini board has no special hardware on board with the
 exception of a single pin RGB-LED.
@@ -82,9 +61,11 @@ determined by activating a pseudo module for the corresponding version:
 
 To specify which board version is used, simply add the variable
 definition `USEMODULE=...` to the make command line, for example:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 USEMODULE=esp32c3_wemos_mini_v1_0_0 BOARD=esp32c3-wemos-min make ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
 If the board version is not specified, version v2.1.0 is used by default.
 
 Almost all GPIOs are broken out and can be used for different peripherals:
@@ -132,48 +113,47 @@ SPI_DEV(0):CS0  | GPIO5  | GPIO5  | SPI2_HOST (FSPI) is used | \ref esp32_spi_in
 UART_DEV(0):TxD | GPIO21 | GPIO21 | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
 UART_DEV(0):RxD | GPIO20 | GPIO20 | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
 </center>
-\n
+<br>
 @note The configuration of ADC channels contains all ESP32-C3 GPIOs that could
       be used as ADC channels.
 
 For detailed information about the peripheral configurations of ESP32-C3
 boards, see section \ref esp32_peripherals "Common Peripherals".
 
-[Back to table of contents](#esp32c3_wemos_mini_toc)
-
-### Board Pinout {#esp32c3_wemos_mini_pinout}
+### Board Pinout
 
 The following figures show the pinouts as configured by default board
 definition.
 
-@image html https://gitlab.com/gschorcht/RIOT.wiki-Images/-/raw/master/esp32/Wemos_ESP32-C3_mini_pinout_v2.png "Wemos EPS32-C3 mini Pinout"
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/-/raw/master/esp32/Wemos_ESP32-C3_mini_pinout_v2.png" alt="Wemos EPS32-C3 mini Pinout" />
 
 The corresponding board schematics can be found:
 
 - [Wemos ESP32-C3 mini v1.0.0](https://www.wemos.cc/en/latest/_static/files/sch_c3_mini_v1.0.0.pdf)
 - [Wemos ESP32-C3 mini v2.1.0](https://www.wemos.cc/en/latest/_static/files/sch_c3_mini_v2.1.0.pdf)
 
-[Back to table of contents](#esp32c3_wemos_mini_toc)
-
-## Flashing the Device {#esp32c3_wemos_mini_flashing}
+## Flashing the Device
 
 The USB-C connector of the board is directly connected to the USB Serial/JTAG
 interface of the ESP32-C3 SoC. It can be used to program the board and to debug
 the application. Just connect the board to your host computer and use the
 following command:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-make flash BOARD=esp32c3-devkit ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
+BOARD=esp32c3-devkit make flash ...
+```
 
 The make system will resets the board to restart the board into download mode.
 In some special cases this reset does not work so that the programmer cannot
 connect to the board and the flashing is aborted with a timeout:
-```
+
+```text
 Serial port /dev/ttyACM0
 Connecting...
 ...
 serial.serialutil.SerialTimeoutException: Write timeout
 ```
+
 In this case, restart the board manually in download mode by pressing and
 releasing the RESET button while holding down the BOOT button.
 
@@ -182,5 +162,3 @@ the reset button (RST) to start your application.
 
 For detailed information about ESP32-C3 as well as configuring and compiling
 RIOT for ESP32-C3 boards, see \ref esp32_riot.
-
-[Back to table of contents](#esp32c3_wemos_mini_toc)

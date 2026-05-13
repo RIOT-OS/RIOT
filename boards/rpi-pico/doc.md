@@ -10,7 +10,7 @@ some unique peripheral (the Programmable IO).
 
 ## Hardware
 
-@image html https://www.raspberrypi.com/documentation/computers/images/pico.png "Raspberry Pi Pico" width=50%
+<img src="https://www.raspberrypi.com/documentation/computers/images/pico.png" alt="Raspberry Pi Pico" width=50% />
 
 ### MCU
 
@@ -66,19 +66,19 @@ will present itself as a storage medium to the system, to which a UF2 file
 can be copied perform the flashing of the device. This can be automated by
 running:
 
-```
-make BOARD=rpi-pico flash
+```shell
+BOARD=rpi-pico make flash
 ```
 
 This is default flashing option using picotool PROGRAMMER.
 
 ### Flashing the Board Using OpenOCD
 
-Currently (June 2021), only two methods for debugging via OpenOCD are supported:
+Currently (May 2026), only two methods for debugging via OpenOCD are supported:
 
 1. Using a bit-banging low-level adapter, e.g. via the GPIOs of a Raspberry Pi 4B
 2. Using a virtual CMSIS-DAP adapter provided by the second CPU core via
-   https://github.com/majbthrd/pico-debug
+   <https://github.com/majbthrd/pico-debug>
 
 Option 2 requires no additional hardware however, you need to
 first "flash" the gimme-cache variant of [pico-debug](https://github.com/majbthrd/pico-debug)
@@ -88,8 +88,8 @@ button of the Pico and copy the `pico-debug-gimmecache.uf2` from the
 formatted drive the bootloader provides. Once this drive is unmounted again, this will result in
 the Raspberry Pi Pico showing up as CMSIS-DAP debugger. Afterwards run:
 
-```
-make BOARD=rpi-pico PROGRAMMER=openocd flash
+```shell
+BOARD=rpi-pico PROGRAMMER=openocd make flash
 ```
 
 @warning    The `rpi-pico` virtual debugger is not persistent and needs to be "flashed" into RAM
@@ -102,8 +102,8 @@ make BOARD=rpi-pico PROGRAMMER=openocd flash
 Connect the Board to an Segger J-Link debugger, e.g. the EDU mini debugger is relatively affordable,
 but limited to educational purposes. Afterwards run:
 
-```
-make BOARD=rpi-pico PROGRAMMER=jlink flash
+```shell
+BOARD=rpi-pico PROGRAMMER=jlink make flash
 ```
 
 ## Accessing RIOT shell
@@ -114,15 +114,15 @@ The default baud rate is 115 200.
 
 The simplest way to connect to the shell is the execution of the command:
 
-```
-make BOARD=rpi-pico term
+```shell
+BOARD=rpi-pico make term
 ```
 
 @warning Raspberry Pi Pico board is not 5V tolerant. Use voltage divider or logic level shifter when connecting to 5V UART.
 
 ## On-Chip Debugging
 
-There are currently (June 2021) few hardware options for debugging the Raspberry Pi Pico:
+There are currently (May 2026) few hardware options for debugging the Raspberry Pi Pico:
 
 1. Via J-Link using one of Seggers debuggers
 2. Via OpenOCD using a low-level bit-banging debugger (e.g. a Raspberry Pi 4B with the GPIOs
@@ -134,8 +134,8 @@ In addition, a software-only option is possible using
 RAM for this debugger, hence just "flash" the "gimme-cache" flavor into RAM using the UF2
 bootloader. Once this is done, debugging is as simple as running:
 
-```
-make BOARD=rpi-pico debug
+```shell
+BOARD=rpi-pico make debug
 ```
 
 ***Beware:*** The `rpi-pico` virtual debugger is not persistent and needs to be "flashed"

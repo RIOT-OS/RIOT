@@ -12,7 +12,7 @@ You can find general information about the Nucleo64 boards on the
 
 ## Pinout
 
-@image html pinouts/nucleo-l053r8.svg "Pinout for the Nucleo-L053r8 (from STM user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 33)" width=50%
+<img src="pinouts/nucleo-l053r8.svg" alt="Pinout for the Nucleo-L053r8 (from STM user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 33)" width=50% />
 
 ### MCU
 
@@ -33,7 +33,6 @@ You can find general information about the Nucleo64 boards on the
 | Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/rm0367-ultralowpower-stm32l0x3-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)|
 | Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/pm0223-stm32-cortexm0-mcus-programming-manual-stmicroelectronics.pdf)|
 | Board Manual | [Board Manual](https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf)|
-
 
 ## Flashing the Board
 

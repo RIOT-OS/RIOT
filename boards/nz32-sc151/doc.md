@@ -10,12 +10,11 @@ schematic for there board can be found
 
 ## Hardware
 
-![st-
-nucleo-l1](http://wiki.modtronix.com/lib/exe/fetch.php?media=products:nz-
-stm32:nz32-sc151-r1_pinout_diagram_782.jpg)
-
+<!-- TODO: This image does not exist anymore -->
+![st-nucleo-l1](http://wiki.modtronix.com/lib/exe/fetch.php?media=products:nz-stm32:nz32-sc151-r1_pinout_diagram_782.jpg)
 
 ### MCU
+
 | MCU        | STM32L151RC |
 |:------------- |:--------------------- |
 | Family | ARM Cortex-M3     |
@@ -64,7 +63,7 @@ the UART3 pins PB11 (RX3) and PB10 (TX3).
 The standard method for flashing RIOT to the nz32-sc151 is using dfu. On
 linux you must get dfu-util package v.8.0 or newer. You can try:
 
-```
+```shell
 sudo apt-get install dfu-util
 ```
 
@@ -76,7 +75,7 @@ http://dfu-util.sourceforge.net/build.html).
 Once dfu-util is installed you can just flash as a normal board, although
 sudo privileges are required.
 
-```
+```shell
 sudo make BOARD=nz32-sc151 flash
 ```
 

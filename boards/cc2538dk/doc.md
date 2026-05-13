@@ -29,15 +29,16 @@ microcontroller with an IEEE802.15.4 radio.
 | Datasheet         | [Datasheet](http://www.ti.com/lit/gpn/cc2538) (pdf file) |
 | Reference Manual  | [Reference Manual](http://www.ti.com/lit/pdf/swru319) |
 
-
-##  Flashing and Debugging
+## Flashing and Debugging
 
 By default, RIOT will attempt to flash the MCU via the USB UART using a
 Python script named [cc2538-bsl](https://github.com/JelmerT/cc2538-bsl).
 Hold down the SELECT pushbutton while pressing RESET to activate the MCU's
 internal bootloader, then run:
 
-`make flash`
+```shell
+BOARD=cc2538dk make flash
+```
 
 Activating this bootloader is NOT enabled if the flash content is in factory
 default state (e.g. after unboxing). To set the bits in the CCA accordingly you
@@ -62,87 +63,13 @@ for details.
 RIOT will use /dev/ttyUSB1 by default, but if the UART is given a different
 device name, you can specity it to RIOT using the PORT variable:
 
-`make PORT=/dev/ttyUSB2 flash`
+```shell
+BOARD=cc2538dk PORT=/dev/ttyUSB2 make flash
+```
 
 To flash using a Segger JLink JTAG adapter you need to install Segger's
 JLinkExe tool, then specify `PROGRAMMER=jlink` when flashing:
 
-`make PROGRAMMER=jlink flash`
-
-
-# Mac OSX **El Capitan** users
-Be prevented that you'll need to disable Apple's System Integrity Protection
-to allow FTDI unsigned drivers to be loaded on your Mac.
-
-@warning    Caution, turning off the SIP may compromise your systems security and integrity.
-            See [developer.apple.com](https://developer.apple.com/documentation/security/disabling_and_enabling_system_integrity_protection) for details.
-
-
-To do this, reboot in recovery mode, by pressing simultaneously `cmd + R`
-while booting.
-Then, on the recovery mode go to Utilities/Terminal and type:
-
+```shell
+BOARD=cc2538dk PROGRAMMER=jlink make flash
 ```
-# csrutil status
-```
-
-If you see something like:
-
-```
-System Integrity Protection status: enabled.
-```
-
-You should disable it by typing:
-
-```
-# csrutil disable
-```
-
-then reboot
-
-```
-# reboot
-```
-
-and be sure that your System Integrity Protection is disabled
-
-```
-$ csrutil status
-System Integrity Protection status: disabled.
-```
-
-Afterwards you'll be able to install this
-[driver](https://cdn.sparkfun.com/assets/learn_tutorials/7/4/FTDIUSBSerialDriver_v2_3.dmg).
-
-If everything goes OK reboot your Mac and then edit
-`/System/Library/Extensions/FTDIUSBSerialDriver.kext/Contents/Info.plist` with a
-text editor.
-Add the following block somewhere under `IOKitPersonalities`:
-```
-<key>TI_XDS100v3</key>
-<dict>
-<key>CFBundleIdentifier</key>
-  <string>com.FTDI.driver.FTDIUSBSerialDriver</string>
-  <key>IOClass</key>
-  <string>FTDIUSBSerialDriver</string>
-  <key>IOProviderClass</key>
-  <string>IOUSBInterface</string>
-  <key>bConfigurationValue</key>
-  <integer>1</integer>
-  <key>bInterfaceNumber</key>
-  <integer>1</integer>
-  <key>idProduct</key>
-  <integer>42705</integer>
-  <key>idVendor</key>
-  <integer>1027</integer>
-</dict>
-```
-
-Reboot again and then type:
-
-```
-$ sudo kextload /System/Library/Extensions/FTDIUSBSerialDriver.kext
-```
-
-If everything worked, the XDS will be enumerated as
-`/dev/tty.usbserial-<serial-number>`

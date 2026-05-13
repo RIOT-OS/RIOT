@@ -2,12 +2,9 @@
 @ingroup    boards
 @brief      Support for the Firefly board
 
-Zolertia Firefly platform
-============================================
+## Zolertia Firefly platform
 
-\htmlonly<style>div.image img[src="http://i.imgur.com/m2acovV.png?1"]
-{width:400px;}</style>\endhtmlonly
-@image html "http://i.imgur.com/m2acovV.png?1" "Firefly"
+<img src="https://i.imgur.com/m2acovV.png" width="400px" />
 
 The Firefly platform (Revision A) is a IoT Hardware development platform based
 on TI's CC2538 system on chip (SoC), featuring an ARM Cortex-M3 with 512KiB
@@ -23,9 +20,8 @@ following goodies:
 - Built-in battery charger (500mA), Energy Harvesting and Solar Panels to be connected to standards LiPo batteries.
 - Power input with 2.3-5.1VDC depending on battery or USB supply
 
+## Port Features
 
-Port Features
-=============
 In terms of hardware support, the following drivers have been implemented for
 the CC2538 System-on-Chip:
 
@@ -47,42 +43,41 @@ And under work or pending at CC2538 base CPU:
 - USB (in CDC-ACM).
 - uDMA Controller.
 
-Requirements
-============
+## Requirements
 
 - Toolchain to compile RIOT for the CC2538
 - Drivers to enable your host to communicate with the platform
 - Built-in BSL programming over USB using cc2538-bsl (included)
 
+### Install a Toolchain
 
-Install a Toolchain
--------------------
 The toolchain used to build is arm-gcc, to check if it is currently installed run:
 
-    $ arm-none-eabi-gcc -v
-    Using built-in specs.
-    Target: arm-none-eabi
-    Configured with: /scratch/julian/lite-respin/eabi/src/gcc-4.3/configure
-    ...
-    (skip)
-    ...
-    Thread model: single
-    gcc version 4.3.2 (Sourcery G++ Lite 2008q3-66)
+```text
+$ arm-none-eabi-gcc -v
+Using built-in specs.
+Target: arm-none-eabi
+Configured with: /scratch/julian/lite-respin/eabi/src/gcc-4.3/configure
+...
+(skip)
+...
+Thread model: single
+gcc version 4.3.2 (Sourcery G++ Lite 2008q3-66)
+```
 
 Else install from <https://launchpad.net/gcc-arm-embedded>
 
+### Drivers
 
-Drivers
--------
 The Firefly features a CP2104 serial-to-USB module, the driver is commonly found in most OS, but if required it can be downloaded
 from <https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers>
 
-
 ### For the CC2538EM (USB CDC-ACM)
+
 The Firefly has built-in support for USB 2.0 USB, Vendor and Product IDs are the following:
 
-  * VID 0x0451
-  * PID 0x16C8
+- VID 0x0451
+- PID 0x16C8
 
 On Linux and macOS this is straightforward, on windows you need to install the following driver:
 
@@ -91,6 +86,7 @@ On Linux and macOS this is straightforward, on windows you need to install the f
 And replace the IDs accordingly.
 
 ### Device Enumerations
+
 For the UART, serial line settings are 115200 8N1, no flow control.
 
 Once all drivers have been installed correctly:
@@ -106,18 +102,17 @@ On Linux:
 - Firefly over CP2104: `ttyUSB0`
 - Firefly over USB driver (in CDC-ACM): `ttyACMn` (n=0, 1, ....)
 
-Emulator
-========
+## Emulator
 
 To emulate this board you need an updated version of
 [renode](https://github.com/renode/renode) installed, at least version 1.9.
 
-```
+```shell
 BOARD=firefly make all emulate
 ```
 
-More Reading
-============
+## More Reading
+
 1. [Zolertia Firefly website][remote-site]
 2. [Zolertia Wiki page][zolertia-wiki]
 3. [CC2538 System-on-Chip Solution for 2.4-GHz IEEE 802.15.4 and ZigBee applications (SWRU319B)][cc2538]

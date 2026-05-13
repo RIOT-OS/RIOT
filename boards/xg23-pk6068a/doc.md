@@ -3,6 +3,7 @@
 @brief      Support for the xG23-PK6068A board.
 
 ## Overview
+
 The EFR32xG23 (xG23) Pro Kit is designed to support the development of Wireless
 IoT devices based on Sub-GHz wireless protocols. The Pro Kit includes a radio
 board that provides a complete reference design for the EFR32xG23 Wireless SoC,
@@ -16,6 +17,7 @@ expansion header.
 ## Hardware
 
 ### MCU
+
 | MCU             | EFR32ZG23                                                                                        |
 |-----------------|--------------------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M33                                                                                   |
@@ -57,8 +59,8 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | PC1  | 4   | 3   | PA10 |
 | VMCU | 2   | 1   | GND  |
 
-
 ### Peripheral mapping
+
 | Peripheral | Number  | Hardware        | Pins                           | Comments                         | Min. Power Mode |
 |------------|---------|-----------------|--------------------------------|----------------------------------|-----------------|
 | I2C        | 0       | I2C0            | SDA: PC7,  CLK: PC5            |                                  | EM1             |
@@ -70,6 +72,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |            | 1       | IADC0           | IN+: PA0, IN-:PA5              | Differential, V_ref: 2 * 1.21V   | EM1             |
 
 ### User interface
+
 | Peripheral | Mapped to | Pin  | Comments   |
 |------------|-----------|------|------------|
 | Button     | PB0       | PB1  |            |
@@ -78,6 +81,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |            | LED1      | PD3  | Yellow LED |
 
 ## Implementation Status
+
 | Device                        | ID          | Supported | Comments                                                       |
 |-------------------------------|-------------|-----------|----------------------------------------------------------------|
 | MCU                           | EFR32ZG     | yes       | Power modes supported                                          |
@@ -95,26 +99,28 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | Temperature + humidity sensor | Si7021      | yes       | Silicon Labs Temperature + Humidity sensor                     |
 
 ## Flashing the device
+
 To flash, [SEGGER JLink](https://www.segger.com/jlink-software.html) is
 required.
 
 Flashing is supported by RIOT-OS using the command below:
 
-```
-make flash
+```shell
+BOARD=xg23-pk6068a make flash
 ```
 
 To run the GDB debugger, use the command:
 
-```
-make debug
+```shell
+BOARD=xg23-pk6068a make debug
 ```
 
 Or, to connect with your own debugger:
 
-```
-make debug-server
+```shell
+BOARD=xg23-pk6068a make debug-server
 ```
 
 ## License information
+
 Silicon Labs' EMLIB: zlib-style license (permits distribution of source).

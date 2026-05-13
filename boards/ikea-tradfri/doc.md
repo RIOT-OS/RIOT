@@ -3,6 +3,7 @@
 @brief      Support for the IKEA TRÅDFRI modules
 
 ## Overview
+
 The IKEA TRÅDFRI is a small board found in different IKEA TRÅDFRI products.
 The board contains an EFR32 microcontroller and a 2MBit SPI NOR Flash.
 
@@ -12,6 +13,7 @@ More information about the module can be found on this
 ## Hardware
 
 ##
+
 | MCU             | EFR32MG1P132F256GM32                                                                    |
 |-----------------|-----------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M4F                                                                          |
@@ -34,11 +36,13 @@ More information about the module can be found on this
 | Manual          | [Manual](https://www.silabs.com/documents/public/reference-manuals/efr32xg1-rm.pdf)     |
 
 ### Module versions
+
 There are currently two types of modules available. The older module is labeled
 ICC-1 and the newer one ICC-A-1. The main difference, is that pin PF3 is now
 used to enable the SPI NOR Flash, and not exposed anymore.
 
 ### Pinout
+
 Pin 1 is on the top-left side with only 6 contacts.
 
 |      | PIN | PIN |      |
@@ -57,6 +61,7 @@ Pin 1 is on the top-left side with only 6 contacts.
 **Note**: On the ICC-A-1 module, PF3 is not exposed anymore.
 
 ### Peripheral mapping
+
 | Peripheral | Number  | Hardware        | Pins                              | Comments                                            |
 |------------|---------|-----------------|-----------------------------------|-----------------------------------------------------|
 | ADC        | 0       | ADC0            | CHAN0: internal temperature       | Ports are fixed, 14/16-bit resolution not supported |
@@ -70,12 +75,14 @@ Pin 1 is on the top-left side with only 6 contacts.
 |            | 1       | LEUART0         | RX: PB15, TX: PB14                | Baud rate limited (see below)                       |
 
 ### User interface
+
 | Peripheral | Mapped to | Pin  | Comments |
 |------------|-----------|------|----------|
 | LED        | LED0      | PB13 |          |
 |            | LED1      | PA1  |          |
 
 ## Implementation Status
+
 | Device           | ID         | Supported | Comments                                                       |
 |------------------|------------|-----------|----------------------------------------------------------------|
 | MCU              | EFR32MG1P  | yes       | Power modes supported                                          |
@@ -94,6 +101,7 @@ Pin 1 is on the top-left side with only 6 contacts.
 ## Board configuration
 
 ### UART selection
+
 By default the UART peripheral is used for the TX/RX pins, however the pinout
 is compatible with LEUART also. You can switch from UART to LEUART by compiling
 with `EFM32_USE_LEUART=1`.
@@ -101,6 +109,7 @@ with `EFM32_USE_LEUART=1`.
 **Note**: LEUART is not working on the ICC-1 module.
 
 ### Clock selection
+
 There are several clock sources that are available for the different
 peripherals. You are advised to read
 [AN0004.1](https://www.silabs.com/documents/public/application-notes/an0004.1-efm32-cmu.pdf)
@@ -138,6 +147,7 @@ You can override the branch's clock source by adding `CLOCK_LFA=source` to
 your compiler defines, e.g. `CLOCK_LFA=cmuSelect_LFRCO`.
 
 ### Low-power peripherals
+
 The low-power UART is capable of providing an UART peripheral using a low-speed
 clock. When the LFB clock source is the LFRCO or LFXO, it can still be used in
 EM2. However, this limits the baud rate to 9600 baud. If a higher baud rate is
@@ -147,6 +157,7 @@ desired, set the clock source to CORELEDIV2.
 this setting. Ensure you do not refer to any low-power peripherals.
 
 ### RTC or RTT
+
 RIOT-OS has support for *Real-Time Tickers* and *Real-Time Clocks*.
 
 However, this board MCU family has support for a 32-bit *Real-Time Clock and
@@ -156,6 +167,7 @@ Therefore, only one of both peripherals can be enabled at the same time.
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
 
 ### Hardware crypto
+
 This MCU is equipped with a hardware-accelerated crypto peripheral that can
 speed up AES128, AES256, SHA1, SHA256 and several other cryptographic
 computations.
@@ -163,6 +175,7 @@ computations.
 A peripheral driver interface is proposed, but not yet implemented.
 
 ### Usage of EMLIB
+
 This port makes uses of EMLIB by Silicon Labs to abstract peripheral registers.
 While some overhead is to be expected, it ensures proper setup of devices,
 provides chip errata and simplifies development. The exact overhead depends on
@@ -175,6 +188,7 @@ that peripherals are used properly. To enable this, pass `DEBUG_EFM` to your
 compiler.
 
 ### Pin locations
+
 The EFM32 platform supports peripherals to be mapped to different pins
 (predefined locations). The definitions in `periph_conf.h` mostly consist of a
 location number and the actual pins. The actual pins are required to configure
@@ -188,37 +202,34 @@ This MCU has extended pin mapping support. Each pin of a peripheral can be
 connected separately to one of the predefined pins for that peripheral.
 
 ## Flashing the device
+
 To flash, [SEGGER JLink](https://www.segger.com/jlink-software.html) is
 required.
 
 Flashing is supported by RIOT-OS using the command below:
 
-```
-make flash
+```shell
+BOARD=ikea-tradfri make flash
 ```
 
 To run the GDB debugger, use the command:
 
-```
-make debug
+```shell
+BOARD=ikea-tradfri make debug
 ```
 
 Or, to connect with your own debugger:
 
-```
-make debug-server
+```shell
+BOARD=ikea-tradfri make debug-server
 ```
 
 Some boards have (limited) support for emulation, which can be started with:
 
+```shell
+BOARD=ikea-tradfri make emulate
 ```
-make emulate
-```
-
-## Supported Toolchains
-For using the Silicon Labs STK3600 starter kit we strongly recommend
-the usage of the [GNU Tools for ARM Embedded Processors](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
-toolchain.
 
 ## License information
+
 Silicon Labs' EMLIB: zlib-style license (permits distribution of source).

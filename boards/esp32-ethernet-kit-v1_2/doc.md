@@ -12,15 +12,7 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 \section esp32-ethernet-kit-v1_2 Espressif ESP32-Ethernet-Kit v1.2
 
-## Table of Contents {#esp32_ethernet_kit_v1_2_toc}
-
-1. [Overview](#esp32_ethernet_kit_v1_2_overview)
-2. [Hardware](#esp32_ethernet_kit_v1_2_hardware)
-    1. [Board Configuration](#esp32_ethernet_kit_v1_2_board_configuration)
-    2. [Board Pinout](#esp32_ethernet_kit_v1_2_pinout)
-3. [Other Documentation Resources](#esp32_ethernet_kit_v1_2_other-resources)
-
-## Overview {#esp32_ethernet_kit_v1_2_overview}
+## Overview
 
 The Espressif [ESP32-Ethernet-Kit](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-ethernet-kit.html) is a development board that uses the ESP32-WROVER-E module. Most important features of the board are
 
@@ -30,20 +22,11 @@ The Espressif [ESP32-Ethernet-Kit](https://docs.espressif.com/projects/esp-idf/e
 Furthermore, some GPIOs are broken out for extension. The USB bridge based on FDI FT2232HL provides a JTAG interface for OCD debugging through the USB interface.
 For flashing and debugging the board, see \ref boards_esp32_esp-ethernet-kit common board documentation.
 
-@image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/_images/esp32-ethernet-kit-v1.2.jpg" "ESP32-Ethernet-Kit V1.2" width=500
+<img src="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/_images/esp32-ethernet-kit-v1.2.jpg" alt="ESP32-Ethernet-Kit V1.2" width=500 />
 
-[Back to table of contents](#esp32_ethernet_kit_v1_2_toc)
+## Hardware
 
-## Hardware {#esp32_ethernet_kit_v1_2_hardware}
-
-This section describes
-
-- the default [board configuration](#esp32_ethernet_kit_v1_2_board_configuration),
-- the [board pinout](#esp32_ethernet_kit_v1_2_pinout).
-
-[Back to table of contents](#esp32_ethernet_kit_v1_2_toc)
-
-### Board Configuration {#esp32_ethernet_kit_v1_2_board_configuration}
+### Board Configuration
 
 ESP32-Ethernet-Kit v1.2 has the following on-board components
 
@@ -72,13 +55,11 @@ SPI_DEV(0):CS0  | GPIO15  | HSPI is used | \ref esp32_spi_interfaces "SPI Interf
 UART_DEV(0):TxD | GPIO1  | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
 UART_DEV(0):RxD | GPIO3  | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
 </center>
-\n
+<br>
 @note
 SPI_DEV(0) is not available if module `esp_jtag` is used. For the SPI_DEV(0) pins to work properly, the function switches (DIP switches) for the JTAG signals must be set to OFF.
 
-[Back to table of contents](#esp32_ethernet_kit_v1_2_toc)
-
-### Board Pinout {#esp32_ethernet_kit_v1_2_pinout}
+### Board Pinout
 
 The board schematic can be found [here](https://dl.espressif.com/dl/schematics/SCH_ESP32-Ethernet-Kit_A_V1.2_20200528.pdf).
 
@@ -86,10 +67,6 @@ By default, only 4 bidirectional GPIO pins are unused: GPIO2, GPIO4, GPIO32, GPI
 and I2C, but they can also be used for SPI or another serial port. By disabling the JTAG interface on the board,
 another 4 GPIOs can be made available (GPIO12, GPIO13, GPIO14, GPIO15).
 
-[Back to table of contents](#esp32_ethernet_kit_v1_2_toc)
-
-## Other Documentation Resources {#esp32_ethernet_kit_v1_2_other-resources}
+## Other Documentation Resources
 
 There is a comprehensive [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-ethernet-kit.html) for the ESP32-Ethernet-Kit with a lot information about hardware configuration.
-
-[Back to table of contents](#esp32_ethernet_kit_v1_2_toc)

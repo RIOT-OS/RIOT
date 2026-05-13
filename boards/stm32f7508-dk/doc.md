@@ -12,6 +12,7 @@ is identical.
 
 As a result, the main features available on this board are shared with the ones
 provided by the STM32F746G-DISCO:
+
 - a 4.3\" RGB 480×272 color LCD-TFT with capacitive touch screen,
 - an ethernet port
 - 2 user USB ports (FS and HS)
@@ -35,23 +36,8 @@ Current hardware support:
 | External Quad-SPI Flash | - | |
 | External SDRAM | - | |
 
-## Flashing the device
+## Flashing the Board
 
-The STM32F750N8-DK board includes an on-board ST-LINK programmer and can be
-flashed using OpenOCD.
-The board can be flashed with:
-
-```
-make BOARD=stm32f750n8-dk flash
-```
-
-and debug via GDB with
-```
-make BOARD=stm32f750n8-dk debug
-```
-
-## Supported Toolchains
-
-For using the STM32F750N8-DK board we recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
-toolchain.
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the STM32F750N8-DK is `stm32f750n8-dk`.

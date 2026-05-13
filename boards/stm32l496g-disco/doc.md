@@ -9,6 +9,7 @@ is an evaluation board with the ARM Cortex-M4 based ultra-low power
 microcontroller STM32L496AG with 320KB of RAM and 1MB of ROM Flash.
 
 The main features of this board are:
+
 - 1.54 RGB 240 x 240 pixel TFT color LCD display with capacitive touch screen,
 - SAI audio codec, with stereo output, including analog microphone input
 - Stereo digital microphones
@@ -19,7 +20,7 @@ The main features of this board are:
 - Stereo headset jack
 - micso-SD card connector
 
-## Current Hardware Support:
+## Current Hardware Support
 
 | Feature                 | Support | Remark |
 |------------------------ |:-:| --------------------- |
@@ -39,7 +40,7 @@ The main features of this board are:
 | External Quad-SPI Flash | - | QSPI peripheral is not yet supported |
 | SD Card Interface       | - | SDMMC1 on PC8..PC13/PD2 |
 
-## Board Configuration (sorted by peripheral):
+## Board Configuration (sorted by peripheral)
 
 | RIOT Peripheral   | GPIO | Connector pin | Remark    |
 |:------------------|:----:|:--------------|:----------|
@@ -79,6 +80,7 @@ The main features of this board are:
 | UART_DEV(2) TX    | PB6  | STmod+ TX, Pmod TX   | USART1 TX (*2)  |
 | UART_DEV(2) CTS   | PG11 | STmod+ CTS, Pmod CTS | USART1 CTS (*2) |
 | UART_DEV(2) RTS   | PG12 | STmod+ RTS, Pmod RTS | USART1 RTS (*2) |
+
 <br>
 
 @note
@@ -88,7 +90,7 @@ The main features of this board are:
        SB6, SB7, SB8 must be closed to connect USART1 to STmod+ and Pmod
        (default).
 
-## Board Configuration (sorted by connectors):
+## Board Configuration (sorted by connectors)
 
 | Connector       | RIOT Peripheral   | GPIO | Remark     |
 |:----------------|:------------------|:----:|:-----------|
@@ -134,6 +136,7 @@ The main features of this board are:
 | STmod+ UART TX  | UART_DEV(2) TX    | PB6  | USART1 TX (*2)  |
 | ST-Link         | UART_DEV(0) RX    | PD6  | USART2 RX  |
 | ST-Link         | UART_DEV(0) TX    | PA2  | USART2 TX  |
+
 <br>
 
 @note
@@ -143,22 +146,8 @@ The main features of this board are:
        SB6, SB7, SB8 must be closed to connect USART1 to STmod+ and Pmod
        (default).
 
-## Flashing the device
+## Flashing the Board
 
-The STM32L496G-DISCO board includes an on-board ST-LINK programmer and can be
-flashed using OpenOCD. The board can be flashed with:
-
-```
-make BOARD=stm32l496g-disco flash
-```
-
-and debug via GDB with
-```
-make BOARD=stm32l496g-disco debug
-```
-
-## Supported Toolchains
-
-For using the STM32L496G-DISCO board we recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
-toolchain.
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the STM32L496GDISCOVERY is `stm32l496g-discovery`.

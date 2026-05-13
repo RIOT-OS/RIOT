@@ -10,21 +10,12 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 \section esp32s2_lilygo_ttgo_t8 LILYGO TTGO T8 ESP32-S2
 
-## Table of Contents {#esp32s2_lilygo_ttgo_t8_toc}
-
-1. [Overview](#esp32s2_lilygo_ttgo_t8_overview)
-2. [Hardware](#esp32s2_lilygo_ttgo_t8_hardware)
-    1. [MCU](#esp32s2_lilygo_ttgo_t8_mcu)
-    2. [Board Configuration](#esp32s2_lilygo_ttgo_t8_board_configuration)
-    3. [Board Pinout](#esp32s2_lilygo_ttgo_t8_pinout)
-3. [Flashing the Device](#esp32s2_lilygo_ttgo_t8_flashing)
-
-## Overview {#esp32s2_lilygo_ttgo_t8_overview}
+## Overview
 
 The Espressif LILYGO TTGO T8 ESP32-S2 (also known as LilyGo T-Display S2) is
 a ESP32-S2 board with an OLED Display and a TF Card slot.
 
-\image html https://ae01.alicdn.com/kf/H8062f551fe7b4233809294d4a5b1d45d1.jpg "LILYGO TTGO T8 ESP32-S2" width=600px
+<img src="https://ae01.alicdn.com/kf/H8062f551fe7b4233809294d4a5b1d45d1.jpg" alt="LILYGO TTGO T8 ESP32-S2" width=600px />
 
 The board has following main features:
 
@@ -37,27 +28,15 @@ SD Card slot         | yes
 32.768KHz Crystal    | yes
 OLED display ST77789 | yes
 
-[Back to table of contents](#esp32s2_lilygo_ttgo_t8_toc)
+## Hardware
 
-## Hardware {#esp32s2_lilygo_ttgo_t8_hardware}
-
-This section describes
-
-- the [MCU](#esp32s2_lilygo_ttgo_t8_mcu),
-- the default [board configuration](#esp32s2_lilygo_ttgo_t8_board_configuration),
-- the [board pinout](#esp32s2_lilygo_ttgo_t8_pinout).
-
-[Back to table of contents](#esp32s2_lilygo_ttgo_t8_toc)
-
-### MCU {#esp32s2_lilygo_ttgo_t8_mcu}
+### MCU
 
 Most features of the board are provided by the ESP32-S2 SoC. For detailed
 information about the ESP32-S2 SoC variant (family) and ESP32x SoCs,
 see section \ref esp32_mcu_esp32 "ESP32 SoC Series".
 
-[Back to table of contents](#esp32s2_lilygo_ttgo_t8_toc)
-
-### Board Configuration {#esp32s2_lilygo_ttgo_t8_board_configuration}
+### Board Configuration
 
 The LILYGO TTGO T8 ESP32-S2 board uses the `SPI_DEV(0)` (FSPI) for the
 OLED Display. The GPIOs of `SPI_DEV(0)` are therefore not broken out.
@@ -107,25 +86,21 @@ UART_DEV(0) RxD | GPIO44 | Console | \ref esp32_uart_interfaces "UART interfaces
 USB D-          | GPIO19 | if USB-to-UART bridge is not used | |
 USB D+          | GPIO20 | if USB-to-UART bridge is not used | |
 </center>
-\n
+<br>
 
 For detailed information about the peripheral configurations of ESP32-S2
 boards, see section \ref esp32_peripherals "Common Peripherals".
-
-[Back to table of contents](#esp32s2_lilygo_ttgo_t8_toc)
 
 ### Board Pinout {#esp32s2_lilygo_ttgo_t8_pinout}
 
 The following figure shows the pinout as configured by the board
 definition.
 
-@image html https://ae01.alicdn.com/kf/H4a77f8684c144384a165d7a89476c602q.jpg "LILYGO TTGO T8 ESP32-S2 Pinout" width=900px
+<img src="https://ae01.alicdn.com/kf/H4a77f8684c144384a165d7a89476c602q.jpg" alt="LILYGO TTGO T8 ESP32-S2 Pinout" width=900px />
 
 The corresponding board schematics can be found [here](https://github.com/Xinyuan-LilyGO/LilyGo-T-Display-S2/raw/master/schematic/ESP32_S2-Display.pdf)
 
-[Back to table of contents](#esp32s2_lilygo_ttgo_t8_toc)
-
-## Flashing the Device {#esp32s2_lilygo_ttgo_t8_flashing}
+## Flashing the Device
 
 Flashing RIOT is quite easy. The board has an USB-C connector which is either
 connected to the USB-to-UART bridge (default) with a built-in reset/boot/flash
@@ -137,9 +112,10 @@ see section \ref esp32s2_lilygo_ttgo_t8_pinout "Pinout".
 
 Just connect the board to your host computer and type using the programming
 port:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=esp32s2-liligo-ttgo-t8 make flash ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 For detailed information about ESP32-S2 as well as configuring and compiling
 RIOT for ESP32-S2 boards, see \ref esp32_riot.
@@ -155,9 +131,9 @@ mode of the bootloader, provided that the eFuses `JTAG_SEL_ENABLE` and
 For this purpose, connect the board to your host computer and enter the
 following command using the programming port:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```shell
 USEMODULE=esp32s2-lilygo-ttgo-t8-usb BOARD=esp32s2-liligo-ttgo-t8 make flash ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 If RIOT is already on the device, it should automatically reset the device
 and enter the bootloader download mode. If
@@ -168,5 +144,3 @@ and enter the bootloader download mode. If
 
 the download mode has to be forced before by pressing the Reset (RST) button
 while holding the BOOT (BOT) button.
-
-[Back to table of contents](#esp32s2_lilygo_ttgo_t8_toc)

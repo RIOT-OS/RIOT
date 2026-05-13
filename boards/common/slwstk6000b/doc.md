@@ -3,6 +3,7 @@
 @brief       Support for the Silicon Labs SLWSTK6000B starter kit
 
 ## Overview
+
 Silicon Labs Mighty Gecko Wireless Starter Kit is equipped with the EFM32
 microcontroller. It is specifically designed for low-power applications, having
 energy-saving peripherals, different energy modes and short wake-up times.
@@ -13,6 +14,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 ## Hardware
 
 ### MCU
+
 The MCU depends on the module used.
 
 | Module     | MCU                     |
@@ -38,6 +40,7 @@ The MCU depends on the module used.
 **Note:** not all MCUs are supported by RIOT-OS out of the box.
 
 ## Implementation Status
+
 | Device           | ID                    | Supported | Comments                                                       |
 |------------------|-----------------------|-----------|----------------------------------------------------------------|
 | MCU              | EFR32MG1P/12P/13P/14P | yes       | Power modes supported                                          |
@@ -56,6 +59,7 @@ The MCU depends on the module used.
 ## Board configuration
 
 ### Board controller
+
 The starter kit is equipped with a Board Controller. This controller provides a
 virtual serial port. The boardcontroller is enabled via a GPIO pin.
 
@@ -70,6 +74,7 @@ controller firmware installed.
 expects data from the MCU with the same settings.
 
 ### Advanced Energy Monitor
+
 This development kit has an Advanced Energy Monitor. It can be connected to the
 Simplicity Studio development software.
 
@@ -88,6 +93,7 @@ defaults to GDB debug symbols, but Simplicity Studio requires DWARF-2 debug
 symbols (`-gdwarf-2` for GCC).
 
 ### Clock selection
+
 There are several clock sources that are available for the different
 peripherals. You are advised to read
 [AN0004.1](https://www.silabs.com/documents/public/application-notes/an0004.1-efm32-cmu.pdf)
@@ -126,6 +132,7 @@ You can override the branch's clock source by adding `CLOCK_LFA=source` to your
 compiler defines, e.g. `CLOCK_LFA=cmuSelect_LFRCO`.
 
 ### Low-power peripherals
+
 The low-power UART is capable of providing an UART peripheral using a low-speed
 clock. When the LFB clock source is the LFRCO or LFXO, it can still be used in
 EM2. However, this limits the baud rate to 9600 baud. If a higher baud rate is
@@ -135,6 +142,7 @@ desired, set the clock source to CORELEDIV2.
 this setting. Ensure you do not refer to any low-power peripherals.
 
 ### RTC or RTT
+
 RIOT-OS has support for *Real-Time Tickers* and *Real-Time Clocks*.
 
 However, this board MCU family has support for a 32-bit *Real-Time Clock and
@@ -144,6 +152,7 @@ Therefore, only one of both peripherals can be enabled at the same time.
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
 
 ### Hardware crypto
+
 This MCU is equipped with a hardware accelerated crypto peripheral that can
 speed up AES128, AES256, SHA1, SHA256 and several other cryptographic
 computations.
@@ -151,6 +160,7 @@ computations.
 A peripheral driver interface for RIOT-OS is proposed, but not yet implemented.
 
 ### Usage of EMLIB
+
 This port makes uses of EMLIB by Silicon Labs to abstract peripheral registers.
 While some overhead is to be expected, it ensures proper setup of devices,
 provides chip errata and simplifies development. The exact overhead depends on
@@ -163,6 +173,7 @@ that peripherals are used properly. To enable this, pass `DEBUG_EFM` to your
 compiler.
 
 ### Pin locations
+
 The EFM32 platform supports peripherals to be mapped to different pins
 (predefined locations). The definitions in `periph_conf.h` mostly consist of a
 location number and the actual pins. The actual pins are required to configure
@@ -176,37 +187,34 @@ This MCU has extended pin mapping support. Each pin of a peripheral can be
 connected separately to one of the predefined pins for that peripheral.
 
 ## Flashing the device
+
 To flash, [SEGGER JLink](https://www.segger.com/jlink-software.html) is
 required.
 
 Flashing is supported by RIOT-OS using the command below:
 
-```
-make flash
+```shell
+BOARD=slwstk6000b make flash
 ```
 
 To run the GDB debugger, use the command:
 
-```
-make debug
+```shell
+BOARD=slwstk6000b make debug
 ```
 
 Or, to connect with your own debugger:
 
-```
-make debug-server
+```shell
+BOARD=slwstk6000b make debug-server
 ```
 
 Some boards have (limited) support for emulation, which can be started with:
 
+```shell
+BOARD=slwstk6000b make emulate
 ```
-make emulate
-```
-
-## Supported Toolchains
-For using the Silicon Labs SLWSTK6000B starter kit we strongly recommend the
-usage of the [GNU Tools for ARM Embedded Processors](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
-toolchain.
 
 ## License information
+
 Silicon Labs' EMLIB: zlib-style license (permits distribution of source).

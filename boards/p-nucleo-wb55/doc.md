@@ -19,7 +19,7 @@ You can find general information about the Nucleo64 boards on the
 
 ## Pinout
 
-@image html pinouts/p-nucleo-wb55.svg "Pinout for the p-nucleo-wb55" width=50%
+<img src="pinouts/p-nucleo-wb55.svg" alt="Pinout for the p-nucleo-wb55" width=50% />
 
 ### MCU
 
@@ -68,7 +68,6 @@ The board name for the P-Nucleo-WB55 is `p-nucleo-wb55`.
 | -----  | ------ | ------ | ------ |
 | Color  | blue   | green  | red    |
 | Pin    | PB5    | PB0    | PB1    |
-
 
 ## Implementation Status
 

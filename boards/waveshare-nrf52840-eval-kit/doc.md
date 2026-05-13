@@ -32,7 +32,7 @@ is an evaluation board for the nRF52840 SoC with the following on-board componen
 Using the onboard Arduino and Raspberry Pi compatible headers, both Arduino
 shields and Raspberry Pi HATs can be used at the same time.
 
-## Hardware:
+## Hardware
 
 | MCU        | NRF52840                             |
 |:---------- |:------------------------------------ |
@@ -136,13 +136,16 @@ On a Linux host, this interface is mapped to `/dev/ttyUSB<n>` where `<n>` is
 the index of the UART interface which is 0 by default.
 
 Use the `term` target to connect to the board serial port using `/dev/ttyUSB0`:
+
+```shell
+make BOARD=waveshare-nrf52840-eval-kit -C examples/basic/hello-world term
 ```
-    make BOARD=waveshare-nrf52840-eval-kit -C examples/basic/hello-world term
-```
+
 If the UART interface index of board's USB to UART bridge is not 0, use
 the following command to connect to the board serial port:
-```
-    make BOARD=waveshare-nrf52840-eval-kit -C examples/basic/hello-world PORT=/dev/ttyUSB<n> term
+
+```shell
+make BOARD=waveshare-nrf52840-eval-kit -C examples/basic/hello-world PORT=/dev/ttyUSB<n> term
 ```
 
 ## RESET Pin Configuration
@@ -150,8 +153,10 @@ the following command to connect to the board serial port:
 On nRF52840 boards, the RESET pin is not configured out-of-the box.
 This means, that simply nothing happens if the RESET button is pressed. To
 change this, RIOT provides a little tool in `dist/tools/nrf52_resetpin_cfg`:
-```
+
+```shell
 RESET_PIN='GPIO_PIN\(0,18\)' make BOARD=waveshare-nrf52840-eval-kit -C dist/tools/nrf52_resetpin_cfg/ flash
 ```
+
 Simply compile, flash, and run that tool on your board, and the reset pin should
 work for the time being.

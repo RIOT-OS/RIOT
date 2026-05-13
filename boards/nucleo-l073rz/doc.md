@@ -12,7 +12,7 @@ You can find general information about the Nucleo64 boards on the
 
 ## Pinout
 
-@image html pinouts/nucleo-l073rz.svg "Pinout for the Nucleo-L073RZ (from STM user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 33)" width=50%
+<img src="pinouts/nucleo-l073rz.svg" alt="Pinout for the Nucleo-L073RZ (from STM user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 33)" width=50% />
 
 ### MCU
 

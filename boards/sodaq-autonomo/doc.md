@@ -14,8 +14,8 @@ The Autonomo is available from the SODAQ [shop](http://shop.sodaq.com/).
 
 ![sodaq-autonomo image](https://support.sodaq.com/Boards/Autonomo/sodaq_autonomo.png)
 
-
 ### MCU
+
 | MCU        | ATSAMD21J18A      |
 |:------------- |:--------------------- |
 | Family | ARM Cortex-M0+        |
@@ -40,7 +40,6 @@ The Autonomo is available from the SODAQ [shop](http://shop.sodaq.com/).
 |:------ |:--- |
 | LED0   | PA19 |
 
-
 ## Implementation Status
 
 Please refer to [this tracker](https://github.com/RIOT-OS/RIOT/issues/1646)
@@ -63,8 +62,6 @@ this board.
 |        | RTC       | yes       | |
 |        | RNG       | no        | no HW module |
 |        | Timer     | yes       | |
-
-
 
 ## Features of the board
 
@@ -94,14 +91,14 @@ Besides the SAMD21 the board has the following features:
 
 Use `BOARD=sodaq-autonomo` with the `make` command.<br/>
 Example with `hello-world` application:
-```
-     make BOARD=sodaq-autonomo -C examples/basic/hello-world flash
+
+```shell
+make BOARD=sodaq-autonomo -C examples/basic/hello-world flash
 ```
 
-@note     If the application crashes, automatic reflashing via USB, as explained
-          above won't be possible. In this case, the board must be set in
-          bootloader mode by double tapping the reset button before running the
-          flash command.
+@note   If the application crashes, automatic reflashing via USB won't be
+        possible. In this case, the board must be set in bootloader mode by
+        double tapping the reset button before running the flash command.
 
 ## Accessing STDIO via UART
 
@@ -110,16 +107,3 @@ STDIO of RIOT is directly available over the USB port.
 The `TERM_DELAY` environment variable can be used to add a delay (in second)
 before opening the serial terminal. The default value is 2s which should be
 enough in most of the situation.
-
-## Supported Toolchains
-
-To build software for the autonomo board we strongly recommend the usage of
-the [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded) toolchain.
-
-## Known Issues / Problems
-
-### Stack sizes
-The default stack sizes have not been tuned properly yet. If in doubt why
-your application crashes try increasing the default stack sizes and use `ps` to
-find out how much stack is being used.
-Tracked in https://github.com/RIOT-OS/RIOT/issues/2228

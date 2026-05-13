@@ -227,31 +227,28 @@ The board provides a on-board J-Link debugger through the micro USB board so
 that flashing and debugging is very easy.
 
 Flashing is supported by RIOT-OS using the command below:
-```
-make flash
+
+```shell
+BOARD=sltb009a make flash
 ```
 
 To run the GDB debugger, use the command:
-```
-make debug
+
+```shell
+BOARD=sltb009a make debug
 ```
 
 Or, to connect with your own debugger:
-```
-make debug-server
+
+```shell
+BOARD=sltb009a make debug-server
 ```
 
 Some boards have (limited) support for emulation, which can be started with:
-```
-make emulate
-```
 
-## Supported Toolchains
-
-For using the Silicon Labs SLTB009A starter kit we strongly recommend
-the usage of the
-[GNU Tools for ARM Embedded Processors](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
-toolchain.
+```shell
+BOARD=sltb009a make emulate
+```
 
 ## License information
 

@@ -10,17 +10,7 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 \section esp32_mh_et_live_minikit MH-ET LIVE MiniKit for ESP32
 
-## Table of Contents {#esp32_mh_et_live_minikit_toc}
-
-1. [Overview](#esp32_mh_et_live_minikit_overview)
-2. [Hardware](#esp32_mh_et_live_minikit_hardware)
-    1. [MCU](#esp32_mh_et_live_minikit_mcu)
-    2. [Board Configuration](#esp32_mh_et_live_minikit_board_configuration)
-    3. [Board Pinout](#esp32_mh_et_live_minikit_pinout)
-    4. [Optional Hardware Configurations](#esp32_mh_et_live_minikit_optional_hardware)
-3. [Flashing the Device](#esp32_mh_et_live_minikit_flashing)
-
-## Overview {#esp32_mh_et_live_minikit_overview}
+## Overview
 
 The MH-ET LIVE MiniKit for ESP32 uses the ESP32-WROOM-32 module. It is a very
 interesting development kit as it uses in the stackable Wemos D1 Mini format.
@@ -39,38 +29,25 @@ the need for a soldering iron or a breadboard.
 MH-ET LIVE MiniKit for ESP32 belongs to the class of general purpose boards
 where most ESP32 pins are broken out for easier access.
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/MH-ET_LIVE_D1_mini_ESP32_2.png" "MH-ET LIVE MiniKit for ESP32" width=250px
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/MH-ET_LIVE_D1_mini_ESP32_2.png" alt="MH-ET LIVE MiniKit for ESP32" width=250px />
 
 This stackable platform was tested in an RIOT application with:
 
 - [Micro SD-Card Shield](https://docs.wemos.cc/en/latest/d1_mini_shield/micro_sd.html)
-- MRF24J40 IEEE 802.15.4 radio Shield (contact gunar@schorcht.net for more information)
+- MRF24J40 IEEE 802.15.4 radio Shield (contact <gunar@schorcht.net> for more information)
 - BMP180 Pressure Sensor Shield
 
 This application is a good example how easy it is with this board to create
 different hardware applications.
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/MH-ET_LIVE_D1_mini_ESP32_5.png" "RIOT application with SD-Card, MRF24J40 Radio, and BMP180 Pressure Sensor"
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/MH-ET_LIVE_D1_mini_ESP32_5.png" alt="RIOT application with SD-Card, MRF24J40 Radio, and BMP180 Pressure Sensor" />
 
-[Back to table of contents](#esp32_mh_et_live_minikit_toc)
+## Hardware
 
-## Hardware {#esp32_mh_et_live_minikit_hardware}
-
-This section describes
-
-- the [MCU](#esp32_mh_et_live_minikit_mcu),
-- the default [board configuration](#esp32_mh_et_live_minikit_board_configuration),
-- [optional hardware configurations](#esp32_mh_et_live_minikit_optional_hardware),
-- the [board pinout](#esp32_mh_et_live_minikit_pinout).
-
-[Back to table of contents](#esp32_mh_et_live_minikit_toc)
-
-### MCU {#esp32_mh_et_live_minikit_mcu}
+### MCU
 
 Most features of the board are provided by the ESP32 SoC. For detailed
 information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
-
-[Back to table of contents](#esp32_mh_et_live_minikit_toc)
 
 ### Board Configuration {#esp32_mh_et_live_minikit_board_configuration}
 
@@ -125,9 +102,7 @@ optional hardware is used.
 For detailed information about the configuration of ESP32 boards, see
 section \ref esp32_peripherals "Common Peripherals".
 
-[Back to table of contents](#esp32_mh_et_live_minikit_toc)
-
-### Optional Hardware Configurations {#esp32_mh_et_live_minikit_optional_hardware}
+### Optional Hardware Configurations
 
 ENC28J60-based Ethernet network interface modules have been tested with the
 board. You could use the following code in your
@@ -141,14 +116,13 @@ board. You could use the following code in your
 #  define ENC28J80_PARAM_RESET    GPIO12    /* ENC28J80 RESET signal */
 #endif
 ```
+
 For **ENC28J80_PARAM_SPI** the default parameter defined by the driver can
 be used.
 
 @note The **RESET** signal of ENC28J60 based modules can also be connected
 to the **RST** pin of the board (see \ref esp32_mh_et_live_minikit_pinout_img
 "pinout") to keep the configured GPIO free for other purposes.
-
-[Back to table of contents](#esp32_mh_et_live_minikit_toc)
 
 ### Board Pinout {#esp32_mh_et_live_minikit_pinout}
 
@@ -163,19 +137,17 @@ The corresponding board schematic can be found
 [here](https://i.imgur.com/EpE4dGj.jpg)
 
 \anchor esp32_mh_et_live_minikit_pinout_img
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/MH-ET_LIVE_D1_mini_ESP32_pinout.png" "MH-ET LIVE MiniKit for ESP32 pinout"
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/MH-ET_LIVE_D1_mini_ESP32_pinout.png" alt="MH-ET LIVE MiniKit for ESP32 pinout" />
 
-[Back to table of contents](#esp32_mh_et_live_minikit_toc)
-
-## Flashing the Device {#esp32_mh_et_live_minikit_flashing}
+## Flashing the Device
 
 Flashing RIOT is quite easy. The board has a Micro-USB connector with a
 reset/boot/flash logic. Just connect the board to your host computer using
 the programming port and type:
+
 ```shell
-make flash BOARD=esp32-mh-et-live-minikit ...
+BOARD=esp32-mh-et-live-minikit make flash ...
 ```
+
 For detailed information about ESP32 as well as configuring and compiling
 RIOT for ESP32 boards, see \ref esp32_riot.
-
-[Back to table of contents](#esp32_mh_et_live_minikit_toc)

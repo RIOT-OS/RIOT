@@ -10,17 +10,7 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 \section esp32_wemos_lolin_d32_pro Wemos LOLIN D32 Pro
 
-## Table of Contents {#esp32_wemos_lolin_d32_pro_toc}
-
-1. [Overview](#esp32_wemos_lolin_d32_pro_overview)
-2. [Hardware](#esp32_wemos_lolin_d32_pro_hardware)
-    1. [MCU](#esp32_wemos_lolin_d32_pro_mcu)
-    2. [Board Configuration](#esp32_wemos_lolin_d32_pro_board_configuration)
-    3. [Board Pinout](#esp32_wemos_lolin_d32_pro_pinout)
-    4. [Optional Hardware Configurations](#esp32_wemos_lolin_d32_pro_optional_hardware)
-3. [Flashing the Device](#esp32_wemos_lolin_d32_pro_flashing)
-
-## Overview {#esp32_wemos_lolin_d32_pro_overview}
+## Overview
 
 Wemos LOLIN D32 Pro is a development board that uses the ESP32-WROVER module
 which has a built-in 4 MByte SPI RAM. Most important features of the board are
@@ -32,28 +22,14 @@ which has a built-in 4 MByte SPI RAM. Most important features of the board are
 Wemos LOLIN D32 Pro belongs to the class of general purpose boards where most
 ESP32 pins are broken out for easier access.
 
-@image html
-"https://docs.wemos.cc/en/latest/_static/boards/d32_pro_v2.0.0_1_16x16.jpg" "Wemos LOLIN D32 PRO" width=400px
+<img src="https://docs.wemos.cc/en/latest/_static/boards/d32_pro_v2.0.0_1_16x16.jpg" alt="Wemos LOLIN D32 PRO" width=400px />
 
-[Back to table of contents](#esp32_wemos_lolin_d32_pro_toc)
+## Hardware
 
-## Hardware {#esp32_wemos_lolin_d32_pro_hardware}
-
-This section describes
-
-- the [MCU](#esp32_wemos_lolin_d32_pro_mcu),
-- the default [board configuration](#esp32_wemos_lolin_d32_pro_board_configuration),
-- [optional hardware configurations](#esp32_wemos_lolin_d32_pro_optional_hardware),
-- the [board pinout](#esp32_wemos_lolin_d32_pro_pinout).
-
-[Back to table of contents](#esp32_wemos_lolin_d32_pro_toc)
-
-### MCU {#esp32_wemos_lolin_d32_pro_mcu}
+### MCU
 
 Most features of the board are provided by the ESP32 SoC. For detailed
 information about the ESP32, see section \ref esp32_mcu_esp32 "MCU ESP32".
-
-[Back to table of contents](#esp32_wemos_lolin_d32_pro_toc)
 
 ### Board Configuration {#esp32_wemos_lolin_d32_pro_board_configuration}
 
@@ -104,16 +80,15 @@ GPIO32 is used as **TFT_LED** signal and ADC_LINE(4) is not available.
 @note When the TFT display is connected, add the following line to the
 makefile of the application to enable the according default board and
 peripheral configuration:
-\n
+<br>
+
 ```makefile
 USEMODULE += esp_lolin_tft
 ```
 
 For detailed information about the configuration of ESP32 boards, see section \ref esp32_peripherals "Common Peripherals".
 
-[Back to table of contents](#esp32_wemos_lolin_d32_pro_toc)
-
-### Optional Hardware Configurations {#esp32_wemos_lolin_d32_pro_optional_hardware}
+### Optional Hardware Configurations
 
 MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet
 network interface modules have been tested with the board. You could use
@@ -137,6 +112,7 @@ the following code in your \ref esp32_application_specific_configurations
 
 #endif
 ```
+
 For other parameters, the default values defined by the drivers can be used.
 
 @note
@@ -147,8 +123,6 @@ For other parameters, the default values defined by the drivers can be used.
   connected to the **RST** pin of the board (see
   \ref esp32_wemos_lolin_d32_pro_pinout_img "pinout") to keep the configured
   GPIO free for other purposes.
-
-[Back to table of contents](#esp32_wemos_lolin_d32_pro_toc)
 
 ### Board Pinout {#esp32_wemos_lolin_d32_pro_pinout}
 
@@ -163,19 +137,17 @@ The corresponding board schematic can be found
 [here](https://docs.wemos.cc/en/latest/_static/files/sch_d32_pro_v2.0.0.pdf).
 
 \anchor esp32_wemos_lolin_d32_pro_pinout_img
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Wemos_LOLIN_D32_PRO_pinout.png" "Wemos LOLIN D32 PRO pinout"
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Wemos_LOLIN_D32_PRO_pinout.png" alt="Wemos LOLIN D32 PRO pinout" />
 
-[Back to table of contents](#esp32_wemos_lolin_d32_pro_toc)
-
-## Flashing the Device {#esp32_wemos_lolin_d32_pro_flashing}
+## Flashing the Device
 
 Flashing RIOT is quite easy. The board has a Micro-USB connector with
 reset/boot/flash logic. Just connect the board to your host computer
 using the programming port and type:
+
 ```shell
-make flash BOARD=esp32-wemos-lolin-d32-pro ...
+BOARD=esp32-wemos-lolin-d32-pro make flash ...
 ```
+
 For detailed information about ESP32 as well as configuring and compiling
 RIOT for ESP32 boards, see \ref esp32_riot.
-
-[Back to table of contents](#esp32_wemos_lolin_d32_pro_toc)
