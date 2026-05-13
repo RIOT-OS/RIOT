@@ -38,7 +38,16 @@ else ifeq ($(CPU_CORE),cortex-m3)
 else ifeq ($(CPU_CORE),cortex-m33)
   CPU_ARCH := armv8m
   FEATURES_PROVIDED += cortexm_stack_limit
-  RUST_TARGET = thumbv8m.main-none-eabihf
+  # Final value to be set in Makefile.include when we know if
+  # USEMODULE=cortexm_fpu is set
+  #
+  # (*Usually* we know ahead of time, so the variable doubles as an indicator
+  # to see that Rust support *is* present. We get away with the trick of using
+  # a dummy value here as long as we can be sure that no matter the chosen
+  # modules, there *will* be a target that we can set. If that changes or this
+  # trick gets needed more often, we might need to reconsider where RUST_TARGET
+  # is set.)
+  RUST_TARGET = to-be-set-later
 else ifeq ($(CPU_CORE),cortex-m4)
   CPU_ARCH := armv7m
   RUST_TARGET = thumbv7em-none-eabi
