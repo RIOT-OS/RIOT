@@ -15,7 +15,8 @@ You can also use the `STM32CubeProgrammer` software to update the firmware.
 ## Flashing the Board Using OpenOCD
 
 The ST Nucleo32, 64 and 144 boards include an on-board ST-LINK programmer
-and can be flashed using OpenOCD (use version 0.11.0 at least).
+and can be flashed using OpenOCD (look [here](https://doc.riot-os.org/misc/openocd/)
+for installation instructions and use version 0.11.0 at least).
 OpenOCD is the standard programmer for all Nucleo boards, so no explicit
 `PROGRAMMER` environment variable has to be set.
 
@@ -39,19 +40,9 @@ supported by the latest release. For example the STM32C0 series is not yet
 supported by OpenOCD 0.12.0, resulting in the following error message:
 `Warn : Cannot identify target as an STM32G0/G4/L4/L4+/L5/U5/WB/WL family device.`.
 
-Furthermore, some distributions ship even older versions, which might not have
-support for new devices or for the ST-Link V3 that is built-in on new
-generation Nucleos, resulting in a diffuse LibUSB error message such as this:
+Old versions of OpenOCD also do not support the new ST-Link V3, which can
+lead to diffuse LibUSB error messages such as this:
 `Error: libusb_open() failed with LIBUSB_ERROR_ACCESS`.
-If you have a recent OpenOCD version, you can check if your user is
-in the `dialout` and/or `plugdev` group and therefore has the appropriate
-access rights.
-
-In either of the first two cases you have to compile the latest OpenOCD
-sources for your system and manually update the
-`/etc/udev/rules.d/60-openocd.rules` file with the
-file provided in the `contrib` subfolder of the OpenOCD repository.
-Please refer to the OpenOCD documentation for further information.
 :::
 
 ## Flashing the Board Using the ST-LINK Mass Storage Device
