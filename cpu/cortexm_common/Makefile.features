@@ -38,7 +38,7 @@ else ifeq ($(CPU_CORE),cortex-m3)
 else ifeq ($(CPU_CORE),cortex-m33)
   CPU_ARCH := armv8m
   FEATURES_PROVIDED += cortexm_stack_limit
-  #RUST_TARGET = thumbv8m.main-none-eabi
+  RUST_TARGET = thumbv8m.main-none-eabihf
 else ifeq ($(CPU_CORE),cortex-m4)
   CPU_ARCH := armv7m
   RUST_TARGET = thumbv7em-none-eabi
