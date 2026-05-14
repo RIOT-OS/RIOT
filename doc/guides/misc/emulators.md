@@ -23,10 +23,10 @@ The boards with emulator supported can be listed using the
 `info-emulated-boards` target:
 
 ```shell
-$ make info-emulated-boards
+make info-emulated-boards
 ```
 
-### Features
+## Features
 
 Be aware that not all hardware features provided by a board - and described as
 such in the build system by `FEATURES_PROVIDED` - are implemented in emulators.
@@ -35,7 +35,7 @@ implemented by the renode driver.
 So you may expect some failures when running advanced applications on the
 emulator.
 
-### Usage
+## Usage
 
 All emulators can be used the same way. Just add `EMULATE=1` to the command
 line.
@@ -43,19 +43,19 @@ line.
 To start an emulator and connect to the serial port of the emulated board, run:
 
 ```shell
-$ EMULATE=1 make BOARD=<board> -C <application directory> all term
+EMULATE=1 make BOARD=<board> -C <application directory> all term
 ```
 
 To start an emulator with a GDB server and connect a GDB client to it, run:
 
 ```shell
-$ EMULATE=1 make BOARD=<board> -C <application directory> all debug
+EMULATE=1 make BOARD=<board> -C <application directory> all debug
 ```
 
 To start an automatic test script with the emulated board, run:
 
 ```shell
-$ EMULATE=1 make BOARD=<board> -C <test application directory> all test
+EMULATE=1 make BOARD=<board> -C <test application directory> all test
 ```
 
 The `EMULATOR_SERIAL_PORT` variable can be used to specify a custom serial port

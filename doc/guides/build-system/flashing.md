@@ -264,8 +264,8 @@ DEBUG_ADAPTER_ID = $(\
 - You can now add `makefile.pre` to `RIOT_MAKEFILES_GLOBAL_PRE` as an environment
   variable or on each `make` call:
 
-```sh
-$ RIOT_MAKEFILES_GLOBAL_PRE=/path/to/makefile.pre make -C examples/basic/hello-world flash term
+```shell
+RIOT_MAKEFILES_GLOBAL_PRE=/path/to/makefile.pre make -C examples/basic/hello-world flash term
 ```
 
 :::note
@@ -388,10 +388,13 @@ endif
 
 The array of board serial numbers has to be edited to match your local boards.
 The serial numbers used here is the USB device serial number as reported by
-the debugger hardware. With the `make list-ttys` it is reported as the 'serial':
+the debugger hardware. With the `make list-ttys` it is reported as the `serial`:
 
-```sh
-$ make list-ttys
+```shell
+make list-ttys
+```
+
+```text
 path         | driver  | vendor                   | model                                | model_db              | serial                   | ctime
 -------------|---------|--------------------------|--------------------------------------|-----------------------|--------------------------|---------
 /dev/ttyUSB0 | cp210x  | Silicon Labs             | CP2102 USB to UART Bridge Controller | CP210x UART Bridge    | 0001                     | 15:58:13

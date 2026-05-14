@@ -108,7 +108,7 @@ It is possible to check if your code follows these conventions:
 
 * You can [uncrustify] `.c` and `.h` files:
 
-  ```console
+  ```shell
   uncrustify -c $RIOTBASE/uncrustify-riot.cfg --no-backup <your file>
   ```
 
@@ -122,7 +122,7 @@ It is possible to check if your code follows these conventions:
   *Watch out:* the command below will rebase your branch on your master branch,
   so make sure they can be rebased (e.g. there's no potential conflict).
 
-  ```console
+  ```shell
   make static-test
   ```
 
@@ -136,7 +136,7 @@ It is possible to check if your code follows these conventions:
 * Each commit should target changes of specific parts/modules of RIOT. The
   commits use the following pattern:
 
-  ```
+  ```text
   area of code: description of changes
   ```
 
@@ -144,7 +144,7 @@ It is possible to check if your code follows these conventions:
   changes.
   For example:
 
-  ```
+  ```text
   periph/timer: Document that set_absolute is expected to wrap
 
   Most timers are implemented this way already, and keeping (documenting)
@@ -223,7 +223,7 @@ General documentation pages are written in Markdown and located in
 To generate the documentation, simply run the following
 from the base directory of the RIOT source code.
 
-```console
+```shell
 make doc
 ```
 
@@ -250,7 +250,7 @@ from the [RIOT main GitHub page][riot-github].
 
 If it's your first time with git, configure your name and emails:
 
-```console
+```shell
 git config --global user.name = "<your name here>"
 git config --global user.email = "<your email address here>"
 ```
@@ -258,14 +258,14 @@ git config --global user.email = "<your email address here>"
 Then clone locally your fork of RIOT (replace `account name` with your actual
 login on GitHub):
 
-```console
+```shell
 git clone git@github.com:<account name>/RIOT.git
 ```
 
 You can keep any branch of your local repository up-to-date with the upstream
 master branch with the following commands:
 
-```console
+```shell
 git checkout <branch name>
 git pull --rebase https://github.com/RIOT-OS/RIOT.git
 ```
@@ -281,7 +281,7 @@ Avoid opening a PR from the `master` branch of your fork to the master branch of
 the RIOT upstream repository: update your master branch and start a new branch
 from it.
 
-```console
+```shell
 git checkout master
 git pull --rebase https://github.com/RIOT-OS/RIOT.git
 git checkout -b <new branch>
@@ -290,7 +290,7 @@ git checkout -b <new branch>
 You can then do your changes, commit them and push them to your local repository
 by using the following command:
 
-```console
+```shell
 git push origin <your branch>
 ```
 
@@ -305,7 +305,7 @@ Let's say your PR contains 3 commits with comments: `prefix1: change 1`,
 Instead of committing changes in `prefix2` in a 4th commit `prefix2: change 4`,
 you can use the `--fixup` option:
 
-```console
+```shell
 git add /path/of/prefix2
 git commit --fixup <prefix2 commit hash>
 ```
@@ -344,7 +344,7 @@ reorder and squash the commits here.
 If you used [fixup commits](#add-fixup-commits-during-review) during the review
 phase, squashing commits can be performed in a single command:
 
-```console
+```shell
 git rebase -i --autosquash <last master hash>
 ```
 
@@ -354,14 +354,14 @@ or IDE.
 
 After the merge conflict is resolved you can continue the rebase by using
 
-```console
+```shell
 git rebase --continue
 ```
 
 Once squashing is done, you will have to force push your branch to update the
 PR:
 
-```console
+```shell
 git push origin <your branch> --force-with-lease
 ```
 
@@ -389,7 +389,7 @@ previous section.
 You then have to force push your updated branch to the remote repository by
 using the following command:
 
-```console
+```shell
 git push origin <your branch> --force-with-lease
 ```
 
