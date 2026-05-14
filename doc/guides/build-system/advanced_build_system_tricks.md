@@ -121,6 +121,7 @@ recommended and easiest to use [**rustup**, installed as described
 on its project website].
 
 You can then proceed to install `git-cache-rs` by executing
+
 ```sh
 cargo install git-cache
 ```
@@ -174,16 +175,19 @@ all the boards compiled in the `NEWBIN` and `OLDBIN` and compare them.
 For boards that do not have a complementary partner, a warning is generated.
 You can use it like that:
 
-```sh
-$ cd RIOT/test/test_something
+```shell
+cd RIOT/test/test_something
 
-$ git checkout master
-$ BINDIRBASE=master-bin BOARD=native64 make all
+git checkout master
+BINDIRBASE=master-bin BOARD=native64 make all
 
-$ git checkout my-branch
-$ BINDIRBASE=my-branch-bin BOARD=native64 make all
+git checkout my-branch
+BINDIRBASE=my-branch-bin BOARD=native64 make all
 
-$ OLDBIN=master-bin NEWBIN=my-branch-bin make info-buildsizes-diff
+OLDBIN=master-bin NEWBIN=my-branch-bin make info-buildsizes-diff
+```
+
+```text
 text    data    bss     dec     BOARD/BINDIRBASE
 
 0       0       0       0       native64    **← this line contains the diff**

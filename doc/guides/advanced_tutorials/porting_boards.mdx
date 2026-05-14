@@ -283,7 +283,7 @@ functions. This offset can be compensated for.
 It can be measured by running `tests/sys/ztimer_overhead` on your board, i.e:
 
 ```bash
-$ BOARD=my-new-board make -C tests/sys/ztimer_overhead flash term
+BOARD=my-new-board make -C tests/sys/ztimer_overhead flash term
 ```
 
 This should give the following output:
