@@ -12,15 +12,7 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 \section esp32_esp-ethernet-kit-v1_1 Espressif ESP32-Ethernet-Kit V1.1
 
-## Table of Contents {#esp32_esp-ethernet-kit-v1_1_toc}
-
-1. [Overview](#esp32_ethernet_kit_v1_1_overview)
-2. [Hardware](#esp32_ethernet_kit_v1_1_hardware)
-    1. [Board Configuration](#esp32_ethernet_kit_v1_1_board_configuration)
-    2. [Board Pinout](#esp32_ethernet_kit_v1_1_pinout)
-3. [Other Documentation Resources](#esp32_ethernet_kit_v1_1_other-resources)
-
-## Overview {#esp32_esp-ethernet-kit-v1_1_overview}
+## Overview
 
 The Espressif [ESP32-Ethernet-Kit](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-ethernet-kit-v1.1.html) is a development board that uses the ESP32-WROVER-B module. Most important features of the board are
 
@@ -30,20 +22,11 @@ The Espressif [ESP32-Ethernet-Kit](https://docs.espressif.com/projects/esp-idf/e
 Furthermore, some GPIOs are broken out for extension. The USB bridge based on FDI FT2232HL provides a JTAG interface for OCD debugging through the USB interface.
 For flashing and debugging the board, see \ref boards_esp32_esp-ethernet-kit common board documentation.
 
-@image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/_images/esp32-ethernet-kit-v1.1.png" "ESP32-Ethernet-Kit V1.1" width=500
+<img src="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/_images/esp32-ethernet-kit-v1.1.png" alt="ESP32-Ethernet-Kit V1.1" width=500 />
 
-[Back to table of contents](#esp32_ethernet_kit_v1_1_toc)
+## Hardware
 
-## Hardware {#esp32_esp-ethernet-kit-v1_1_hardware}
-
-This section describes
-
-- the default [board configuration](#esp32_ethernet_kit_v1_1_board_configuration),
-- the [board pinout](#esp32_ethernet_kit_v1_1_pinout).
-
-[Back to table of contents](#esp32_ethernet_kit_v1_1_toc)
-
-### Board Configuration {#esp32_esp-ethernet-kit-v1_1_board_configuration}
+### Board Configuration
 
 ESP32-Ethernet-Kit v1.1 has the following on-board components
 
@@ -53,8 +36,7 @@ ESP32-Ethernet-Kit v1.1 has the following on-board components
 For detailed information about the configuration of ESP32 boards, see
 section Peripherals in \ref esp32_riot.
 
-@note
-Only a few GPIOs are broken out and available for external hardware on ESP32-Ethernet-Kit boards. Which GPIOs are available as peripherals depends on used modules.
+@note Only a few GPIOs are broken out and available for external hardware on ESP32-Ethernet-Kit boards. Which GPIOs are available as peripherals depends on used modules.
 
 <center>
 Function        | GPIOs  | Remarks |Configuration
@@ -72,13 +54,11 @@ SPI_DEV(0):CS0  | GPIO15  | HSPI is used | \ref esp32_spi_interfaces "SPI Interf
 UART_DEV(0):TxD | GPIO1  | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
 UART_DEV(0):RxD | GPIO3  | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
 </center>
-\n
+<br>
 @note
 SPI_DEV(0) is not available if module `esp_jtag` is used. For the SPI_DEV(0) pins to work properly, the function switches (DIP switches) for the JTAG signals must be set to OFF.
 
-[Back to table of contents](#esp32_ethernet_kit_v1_1_toc)
-
-### Board Pinout {#esp32_esp-ethernet-kit-v1_1_pinout}
+### Board Pinout
 
 The board schematic can be found [here](https://dl.espressif.com/dl/schematics/SCH_ESP32-ETHERNET-KIT_A_V1.1_20190711.pdf).
 
@@ -86,10 +66,6 @@ By default, only 4 bidirectional GPIO pins are unused: GPIO2, GPIO4, GPIO32, GPI
 and I2C, but they can also be used for SPI or another serial port. By disabling the JTAG interface on the board,
 another 4 GPIOs can be made available (GPIO12, GPIO13, GPIO14, GPIO15).
 
-[Back to table of contents](#esp32_ethernet_kit_v1_1_toc)
-
-## Other Documentation Resources {#esp32_esp-ethernet-kit-v1_1_other-resources}
+## Other Documentation Resources
 
 There is a comprehensive [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-ethernet-kit-v1.1.html) for the ESP32-Ethernet-Kit with a lot information about hardware configuration.
-
-[Back to table of contents](#esp32_ethernet_kit_v1_1_toc)

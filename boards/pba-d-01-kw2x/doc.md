@@ -3,9 +3,10 @@
 @brief       Support for the phyWAVE evaluation board
 
 ## Manufacturer
+
 Designed and produced by PHYTEC Messtechnik GmbH, D-55129 Mainz.
 [Homepage](http://www.phytec.de) | Ordering information via mail at
-contact@phytec.de
+<contact@phytec.de>
 
 ## Overview
 
@@ -15,7 +16,6 @@ The board provides 2 USB ports. The one next to the white imprint *cmsis-dap*
 is meant for development (debug and flash). The second one, next to the golden
 *PHYTEC* imprint, is connected to the USB peripheral of the MCU and may be used
 by a firmware (currently not supported).
-
 
 The implementation status of the phyWAVE and phyNODE peripherals are listed
 below. You can find links to the corresponding Pull Requests which may give you
@@ -38,7 +38,7 @@ The actual pin configuration of the board for RIOT can be found in
 
 @note Not all signals and pins are compatible with Arduino Uno R3.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```text
                              _X1____________________
                             |                   D15 |___DIO21, PE19, I2C0 SCL
                             |                   D14 |___DIO20, PE18, I2C0 SDA
@@ -61,7 +61,7 @@ The actual pin configuration of the board for RIOT can be found in
  DIO14, PE1, ADC, I2CSCL ___| A5                 D0 |___DIO7,  PD2,  UART2 RX
                              -----------------------
                              Arduino Uno R3 Connector
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 ## Implementation Status
 

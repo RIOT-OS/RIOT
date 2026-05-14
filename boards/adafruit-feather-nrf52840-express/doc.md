@@ -19,24 +19,30 @@ Flashing the Feather nRF52840 is described in the
 common [Adafruit nRF52 Bootloader](@ref boards_common_adafruit-nrf52-bootloader) section.
 
 Example with `hello-world` application:
-```sh
+
+```shell
 make BOARD=adafruit-feather-nrf52840-express -C examples/basic/hello-world flash
 ```
 
 ### Terminal
+
 To connect a terminal to the Feather, RIOT chooses `stdio_cdc_acm` per default.
 This lets you access the Feather directly over USB.
 
 You have several alternative possibilities to connect to the board.
 
 1. With
+
    ```makefile
    USEMODULE += stdio_uart
    ```
+
    and an FTDI adapter connected to the Feather's RX and TX ports you can use
    UART-based terminals to connect to the feather
 2. With
+
    ```makefile
    USEMODULE += stdio_rtt
    ```
+
    you can use the Segger J-Link Programmer as a serial interface to the device.

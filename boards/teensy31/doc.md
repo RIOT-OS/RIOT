@@ -25,8 +25,9 @@ microcontroller. See [Datasheet](http://cache.freescale.com/files/32bit/doc/data
 
 2. Use `BOARD=teensy31` with the `make` command. This works for Teensy 3.1 & 3.2<br/>
    Example with `hello-world` application:
-```
-     make BOARD=teensy31 -C examples/basic/hello-world flash
+
+```shell
+make BOARD=teensy31 -C examples/basic/hello-world flash
 ```
 
 ### Accessing STDIO via UART

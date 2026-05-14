@@ -16,9 +16,10 @@ You can find general information about the Nucleo64 boards on the
 
 ## Pinout
 
-@image html pinouts/nucleo-f070rb.svg "Pinout for the Nucleo-F070RB (from user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 28)" width=50%
+<img src="pinouts/nucleo-f070rb.svg" alt="Pinout for the Nucleo-F070RB (from user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 28)" width=50% />
 
 ### MCU
+
 | MCU                   | STM32F070RB                                                                           |
 |:--------------------- |:------------------------------------------------------------------------------------- |
 | Family                | ARM Cortex-M0                                                                         |
@@ -40,9 +41,8 @@ You can find general information about the Nucleo64 boards on the
 | Programming Manual    | [Programming Manual](http://www.st.com/resource/en/programming_manual/dm00051352.pdf) |
 | Board Manual          | [Board Manual](http://www.st.com/resource/en/user_manual/dm00105823.pdf)              |
 
-
-
 ## Implementation Status
+
 | Device | ID        | Supported | Comments  |
 |:------------- |:------------- |:------------- |:------------- |
 | MCU        | STM32F070RB   | partly    | Energy saving modes not fully utilized |
@@ -54,7 +54,6 @@ You can find general information about the Nucleo64 boards on the
 |        | SPI       | no        | |
 |        | USB       | no        | |
 |        | Timer     | 3 16 bit timers       | |
-
 
 ## Flashing the Board
 

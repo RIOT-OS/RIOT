@@ -10,7 +10,7 @@ low-cost and easy to use breakout and development boards for the ESP8266.
 Both SparkFun ESP8266 Thing boards are relatively simple boards. The pins
 are simply broken out to two parallel, breadboard-compatible rows.
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Sparkfun_Thing_x.png" "SparkFun ESP8266 Thing (left) / SparkFun ESP8266 Thing DEV (right)"
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Sparkfun_Thing_x.png" alt="SparkFun ESP8266 Thing (left) / SparkFun ESP8266 Thing DEV (right)" />
 
 ## Hardware
 
@@ -38,7 +38,7 @@ WiFi        | built in
 Vcc         | 2.5 - 3.6 V
 Datasheet   | [Datasheet](https://www.espressif.com/sites/default/files/documentation/0a-esp8266ex_datasheet_en.pdf)
 Technical Reference | [Technical Reference](https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf)
-Board Schematic | [ESP8266 Thing](https://cdn.sparkfun.com/datasheets/Wireless/WiFi/SparkFun_ESP8266_Thing.pdf)\n [ESP8266 Thing Dev](https://cdn.sparkfun.com/datasheets/Wireless/WiFi/ESP8266-Thing-Dev-v10.pdf)
+Board Schematic | [ESP8266 Thing](https://cdn.sparkfun.com/datasheets/Wireless/WiFi/SparkFun_ESP8266_Thing.pdf)<br> [ESP8266 Thing Dev](https://cdn.sparkfun.com/datasheets/Wireless/WiFi/ESP8266-Thing-Dev-v10.pdf)
 
 </center>
 
@@ -75,11 +75,11 @@ the LED outputs must be inverted by the application.
 
 The following figures show the mapping of these pin holes to RIOT pins.
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Sparkfun_Thing_pinout.png" "SparkFun Thin Pinout"
-\n
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Sparkfun_Thing_pinout.png" alt="SparkFun Thin Pinout" />
+<br>
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Sparkfun_Thing_Dev_pinout.png" "SparkFun Thin Dev Pinout"
-\n
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Sparkfun_Thing_Dev_pinout.png" alt="SparkFun Thin Dev Pinout" />
+<br>
 
 Flash SPI pins including GPIO9 and GPIO10 are not broken out. The
 SparkFun Thing board has solder pads for these pins at the bottom layer.
@@ -98,9 +98,10 @@ SparkFun Thing board, please refer the
 
 Both boards have a reset/flash/boot logic on-board so that flashing is
 quite simple. To flash the RIOT image just type:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-make flash BOARD=esp8266-sparkfun-thing ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
+BOARD=esp8266-sparkfun-thing make flash ...
+```
 
 For detailed information about ESP8266 as well as configuring and compiling
 RIOT for ESP8266 boards, see \ref esp8266_riot.

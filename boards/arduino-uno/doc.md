@@ -9,6 +9,7 @@ electronics and embedded coding. It is based on Atmel's AVR architecture and
 sports an ATmega328p MCU. It is like many Arduinos extensible by using shields.
 
 ### MCU
+
 | MCU                          | ATmega328p            |
 |:---------------------------- |:--------------------- |
 | Family                       | AVR/ATmega            |
@@ -26,10 +27,13 @@ sports an ATmega328p MCU. It is like many Arduinos extensible by using shields.
 | Board Manual                 | [Board Manual](https://www.arduino.cc/en/Main/ArduinoBoardUno) |
 
 ## Flashing the device
+
 Flashing RIOT on the Arduino Uno is quite straight forward, just connect your
 Arduino Uno using the programming port to your host computer and type:
 
-`make BOARD=arduino-uno flash`
+```shell
+BOARD=arduino-uno make flash
+```
 
 This should take care of everything!
 
@@ -42,9 +46,11 @@ More pins can be used for hardware interrupts using the Pin Change
 Interrupt feature. See @ref boards_common_atmega for details.
 
 ## Caution
+
 Don't expect having a working network stack due to very limited resources.
 
 ## On-Chip Debugging
+
 On-Chip Debugging on the Arduino Uno is not supported via the usual JTAG
 interface used in ATmega MCUs with higher pin counts, but via debugWIRE. While
 debugWIRE has the advantage of only using the RESET pin to transfer data, the
@@ -55,7 +61,9 @@ reproduced, limited on chip debugging is possible on the Arduino Uno
 nonetheless.
 
 ### Prerequisites
+
 #### Debugging Hardware
+
 In order to be able to use On-Chip Debugging you will need the AVR Dragon, which
 is the ~~cheapest~~ least expensive programmer and debugger available that
 supports programming via SPI ("normal ISP"), High Voltage Serial Programming,
@@ -63,6 +71,7 @@ and Parallel Programming, as well as debugging via JTAG, debugWIRE, PDI and
 aWire. So at least can use it for just about every AVR device.
 
 #### Board Modifications
+
 On the Arduino Uno the RESET pin of the MCU is connected to a 100 nF capacitor,
 which in turn is connected to the ATmega16U2 (or an CH340 TTL Adapter in case of
 most clones). This allows the device to be automatically reset when you
@@ -81,10 +90,12 @@ Keep in mind that the capacitor will likely be destroyed when removed by force
 and it will be difficult to restore the auto-reset feature of the clones.
 
 #### Software
+
 You need to have [AVaRICE](e539724b20) installed. Some
 distros have this packaged already.
 
 #### Fuses
+
 In order to use On-Chip Debugging, the `DWEN` bit in the high fuse needs to be
 enabled (set to zero). The exact fuse settings for debugging and the default
 fuse setting are these:
@@ -98,12 +109,15 @@ fuse setting are these:
 You can enable debugWIRE debugging by running (replace `<PROGRAMMER>` by the
 name of your programmer, e.g. `dragon_isp` in case of the AVR Dragon):
 
-    avrdude -p m328p -c <PROGRAMMER> -U hfuse:w:0x9e:m
+```shell
+avrdude -p m328p -c <PROGRAMMER> -U hfuse:w:0x9e:m
+```
 
 And disable debugging via:
 
-    avrdude -p m328p -c <PROGRAMMER> -U hfuse:w:0xde:m
-
+```shell
+avrdude -p m328p -c <PROGRAMMER> -U hfuse:w:0xde:m
+```
 
 @note   You can use a different ISP to enable debugging, but disabling it
         again will only work with the AVR Dragon: The ISP will require the RESET
@@ -116,9 +130,12 @@ And disable debugging via:
         AVR Dragon or another plan on how to disable debugging again.
 
 ### Debugging
+
 With the AVR Dragon, debugging is as simple as running:
 
-    make BOARD=arduino-uno debug
+```shell
+make BOARD=arduino-uno debug
+```
 
 @warning    For flashing the device via ISP, avrdude will temporarily disable
             debugWIRE. If AVaRICE complains that synchronization with the device
@@ -129,7 +146,9 @@ The memory map of the ELF file does not take the bootloader into account. The
 author of this text used an ISP to program the Arduino Uno during debugging to
 avoid any issues. You might want to do the same, e.g. via:
 
-    make BOARD=arduino-uno PROGRAMMER=dragon_isp flash
+```shell
+make BOARD=arduino-uno PROGRAMMER=dragon_isp flash
+```
 
 @warning    Flashing via ISP overwrites the bootloader. But you can restore it
             easily using the ISP. Consult the Arduino documentation on how to
@@ -143,6 +162,7 @@ avoid any issues. You might want to do the same, e.g. via:
             the correct value.
 
 ### Breakpoints / Watchpoints
+
 The ATmega328P only has a single hardware break point and zero watchpoints. The
 single hardware breakpoint is used for single-stepping. As a result neither
 breakpoints nor watchpoints can be used. AVaRICE tries to emulate breakpoints

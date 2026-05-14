@@ -27,6 +27,7 @@ The STDIO is directly accessible via the USB port. On a Linux host, it's
 generally mapped to `/dev/ttyACM0`.
 
 Use the `term` target to connect to the board serial port<br/>
-```
-    make BOARD=nrf9160dk -C examples/basic/hello-world term
+
+```shell
+make BOARD=nrf9160dk -C examples/basic/hello-world term
 ```

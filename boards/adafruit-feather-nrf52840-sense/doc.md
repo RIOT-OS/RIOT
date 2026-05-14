@@ -25,6 +25,7 @@ Details to the Flashing process can be found in the common
 Both use the same flasher, bootloader, and terminal settings.
 
 Example with `hello-world` application:
-```sh
+
+```shell
 make BOARD=adafruit-feather-nrf52840-sense -C examples/basic/hello-world flash term
 ```

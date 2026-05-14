@@ -17,8 +17,9 @@ powered by an Atmel SAMD21 microcontroller.
 
 Use `BOARD=arduino-mkrfox1200` with the `make` command.<br/>
 Example with `hello-world` application:
-```
-     make BOARD=arduino-mkrfox1200 -C examples/basic/hello-world flash
+
+```shell
+make BOARD=arduino-mkrfox1200 -C examples/basic/hello-world flash
 ```
 
 @note     If the application crashes, automatic reflashing via USB, as explained

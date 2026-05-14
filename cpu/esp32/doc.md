@@ -2110,7 +2110,7 @@ level as well.
 When debugging, the GPIOs used for the JTAG interface must not be used for
 anything else.
 
-Some ESP32 boards like the \ref esp32_wrover_kit_toc "ESP-WROVER-KIT V3" or the
+Some ESP32 boards like the \ref boards_esp32_esp-wrover-kit "ESP-WROVER-KIT V3" or the
 \ref esp32-ethernet-kit-v1_0 "ESP32-Ethernet-Kit " have a USB bridge with
 JTAG interface on-board that can be directly used for JTAG debugging.
 

@@ -12,14 +12,14 @@ You can find general information about the Nucleo32 boards on the
 
 ## Pinout
 
-@image html pinouts/nucleo-f031k6-and-more.svg "Pinout for the Nucleo-F303K8 (from ST User Manual, UM1956, https://www.st.com/resource/en/user_manual/um1956-stm32-nucleo32-boards-mb1180-stmicroelectronics.pdf, page 31)" width=25%
+<img src="pinouts/nucleo-f031k6-and-more.svg" alt="Pinout for the Nucleo-F303K8 (from ST User Manual, UM1956, https://www.st.com/resource/en/user_manual/um1956-stm32-nucleo32-boards-mb1180-stmicroelectronics.pdf, page 31)" width=25% />
 
 ## Hardware
 
 ![nucleo image](https://www.st.com/bin/ecommerce/api/image.PF262496.en.feature-description-include-personalized-no-cpn-medium.jpg)
 
-
 ### MCU
+
 | MCU        | STM32F303K8           |
 |:---------- |:--------------------- |
 | Family     | ARM Cortex-M4F        |
@@ -40,9 +40,8 @@ You can find general information about the Nucleo32 boards on the
 | Programming Manual | [Programming Manual](http://www.st.com/web/en/resource/technical/document/programming_manual/DM00046982.pdf) |
 | Board Manual   | [Board Manual](https://www.st.com/resource/en/user_manual/dm00231744.pdf)|
 
-
-
 ## Implementation Status
+
 | Device | ID        | Supported | Comments  |
 |:------------- |:------------- |:------------- |:------------- |
 | MCU        | STM32F303K8   | partly    | Energy saving modes not fully utilized |
@@ -53,7 +52,6 @@ You can find general information about the Nucleo32 boards on the
 |        | SPI       | two SPI   | |
 |        | USB       | no        | |
 |        | Timer     | one 32 timer  | |
-
 
 ## Flashing the Board
 

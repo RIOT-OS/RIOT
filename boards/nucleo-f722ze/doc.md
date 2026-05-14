@@ -12,7 +12,7 @@ You can find general information about the Nucleo144 boards on the
 
 ## Pinout
 
-@image html pinouts/nucleo-f446ze-and-f722ze.svg "Pinout for the Nucleo-F722ZE (from STM user manual, UM1974, http://www.st.com/resource/en/user_manual/dm00244518.pdf, page 35)" width=50%
+<img src="pinouts/nucleo-f446ze-and-f722ze.svg" alt="Pinout for the Nucleo-F722ZE (from STM user manual, UM1974, http://www.st.com/resource/en/user_manual/dm00244518.pdf, page 35)" width=50% />
 
 ### MCU
 
@@ -35,7 +35,6 @@ You can find general information about the Nucleo144 boards on the
 | Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/rm0431-stm32f72xxx-and-stm32f73xxx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)|
 | Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/pm0253-stm32f7-series-and-stm32h7-series-cortexm7-processor-programming-manual-stmicroelectronics.pdf)|
 | Board Manual | [Board Manual](https://www.st.com/resource/en/user_manual/dm00244518-stm32-nucleo-144-boards-stmicroelectronics.pdf)|
-
 
 ## Flashing the Board
 

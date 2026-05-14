@@ -10,16 +10,7 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 \section esp32h2_devkit ESP32-H2-DevKitM-1
 
-## Table of Contents {#esp32h2_devkit_toc}
-
--# [Overview](#esp32h2_devkit_overview)
--# [Hardware](#esp32h2_devkit_hardware)
-    -# [MCU](#esp32h2_devkit_mcu)
-    -# [Board Configuration](#esp32h2_devkit_board_configuration)
-    -# [Board Pinout](#esp32h2_devkit_pinout)
--# [Flashing the Device](#esp32h2_devkit_flashing)
-
-## Overview {#esp32h2_devkit_overview}
+## Overview
 
 The Espressif ESP32-H2-DevKitM-1 board uses the ESP32-H2-MINI-1x module.
 
@@ -28,30 +19,17 @@ limited, the ESP32-H2-DevKitM-1 should also work for most other ESP32-H2 boards.
 Any modifications required for specific applications could be overridden by
 \ref esp32_application_specific_configurations "application-specific board configuration".
 
-\image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32h2/_images/esp32-h2-devkitm-1_v1.2_callouts.png" "Espressif ESP32-H2-DevKitM-1" width=800px
+<img src="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32h2/_images/esp32-h2-devkitm-1_v1.2_callouts.png" alt="Espressif ESP32-H2-DevKitM-1" width=800px />
 
-[Back to table of contents](#esp32h2_devkit_toc)
+## Hardware
 
-## Hardware {#esp32h2_devkit_hardware}
-
-This section describes
-
-- the [MCU](#esp32h2_devkit_mcu),
-- the default [board configuration](#esp32h2_devkit_board_configuration),
-- [optional hardware configurations](#esp32h2_devkit_optional_hardware),
-- the [board pinout](#esp32h2_devkit_pinout).
-
-[Back to table of contents](#esp32h2_devkit_toc)
-
-### MCU {#esp32h2_devkit_mcu}
+### MCU
 
 Most features of the board are provided by the ESP32-H2 SoC. For detailed
 information about the ESP32-H2 variant (family) and ESP32x SoCs,
 see section \ref esp32_mcu_esp32 "ESP32 SoC Series".
 
-[Back to table of contents](#esp32h2_devkit_toc)
-
-### Board Configuration {#esp32h2_devkit_board_configuration}
+### Board Configuration
 
 ESP32-H2-DevKitM-1 boards have no special hardware on board with the exception
 of a WS2812-compatible RGB-LED.
@@ -110,7 +88,7 @@ UART_DEV(0):RxD | GPIO23 | Console (configuration is fixed) | \ref esp32_uart_in
 USB D-            | GPIO26 | | |
 USB D+            | GPIO26 | | |
 </center>
-\n
+<br>
 @note
 - The configuration of ADC channels contains all ESP32-H2 GPIOs that could
   be used as ADC channels.
@@ -120,31 +98,27 @@ USB D+            | GPIO26 | | |
 For detailed information about the peripheral configurations of ESP32-H2
 boards, see section \ref esp32_peripherals "Common Peripherals".
 
-[Back to table of contents](#esp32h2_devkit_toc)
-
-### Board Pinout {#esp32h2_devkit_pinout}
+### Board Pinout
 
 The following figures show the pinout as configured by default board
 definition.
 
-@image html https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32h2/_images/esp32-h2-devkitm-1-v1.2_pinlayout.png "EPS32-H2-DevKitM-1 Pinout"
+<img src="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32h2/_images/esp32-h2-devkitm-1-v1.2_pinlayout.png" alt="EPS32-H2-DevKitM-1 Pinout" />
 
 The corresponding board schematics can be found:
 
 - [ESP32-H2-DevKitM-1 v1.2](https://dl.espressif.com/dl/schematics/esp32-h2-devkitm-1_v1.2_schematics.pdf)
 - [ESP32-H2-DevKitM-1 v1.3](https://dl.espressif.com/dl/schematics/esp32-h2-devkitm-1_v1.3_schematics.pdf)
 
-[Back to table of contents](#esp32h2_devkit_toc)
-
-## Flashing the Device {#esp32h2_devkit_flashing}
+## Flashing the Device
 
 Flashing RIOT is quite easy. The board has a Micro-USB connector with
 reset/boot/flash logic. Just connect the board to your host computer
 and type using the programming port:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-make flash BOARD=esp32h2-devkit ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
+BOARD=esp32h2-devkit make flash ...
+```
+
 For detailed information about ESP32-H2 as well as configuring and compiling
 RIOT for ESP32-H2 boards, see \ref esp32_riot.
-
-[Back to table of contents](#esp32h2_devkit_toc)

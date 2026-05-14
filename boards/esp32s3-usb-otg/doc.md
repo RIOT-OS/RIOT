@@ -10,16 +10,7 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 \section esp32s3_usb_otg ESP32-S3-USB-OTG
 
-## Table of Contents {#esp32s3_usb_otg_toc}
-
-1. [Overview](#esp32s3_usb_otg_overview)
-2. [Hardware](#esp32s3_usb_otg_hardware)
-    1. [MCU](#esp32s3_usb_otg_mcu)
-    2. [Board Configuration](#esp32s3_usb_otg_board_configuration)
-3. [Flashing the Device](#esp32s3_usb_otg_flashing)
-4. [Using STDIO](#esp32s3_usb_otg_stdio)
-
-## Overview {#esp32s3_usb_otg_overview}
+## Overview
 
 The Espressif ESP32-S3-USB-OTG is a development board designed for the
 development of applications that use the USB interface. For this purpose
@@ -28,7 +19,7 @@ it is equipped with two USB type A ports:
 - `USB_DEV` male port that is used to connect the board as a USB device to a host.
 - `USB_HOST` female port that is used to connect other USB devices to the board.
 
-\image html "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/_images/pic_board_top_lable.png" "Espressif ESP32-S3-USB-OTG" width=600px
+<img src="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/_images/pic_board_top_lable.png" alt="Espressif ESP32-S3-USB-OTG" width=600px />
 
 @note RIOT-OS does only support the `USB_DEV` port, that is the board can only
       be used as USB device.
@@ -46,24 +37,15 @@ The main features of the board are:
 | SD Card Slot                   | yes            |
 | LCD Color Display 240 x 240    | yes            |
 
-## Hardware {#esp32s3_usb_otg_hardware}
+## Hardware
 
-This section describes
-
-- the [MCU](#esp32s3_usb_otg_mcu),
-- the default [board configuration](#esp32s3_usb_otg_board_configuration),
-
-[Back to table of contents](#esp32s3_usb_otg_toc)
-
-### MCU {#esp32s3_usb_otg_mcu}
+### MCU
 
 Most features of the board are provided by the ESP32-S3 SoC. For detailed
 information about the ESP32-S3 SoC variant (family) and ESP32x SoCs,
 see section \ref esp32_mcu_esp32 "ESP32 SoC Series".
 
-[Back to table of contents](#esp32s3_usb_otg_toc)
-
-### Board Configuration {#esp32s3_usb_otg_board_configuration}
+### Board Configuration
 
 The Espressif ESP32-S3-USB-OTG is a development board that uses the
 ESP32-S3-MINI-1 module. Most important features of the board are
@@ -102,7 +84,7 @@ SPI_DEV(1):CS0    | GPIO34 | SD_DATA3 | \ref esp32_spi_interfaces "SPI Interface
 UART_DEV(0):TxD   | GPIO43 | USB-to-UART bridge | \ref esp32_uart_interfaces "UART interfaces"
 UART_DEV(0):RxD   | GPIO44 | USB-to-UART bridge | \ref esp32_uart_interfaces "UART interfaces"
 </center>
-\n
+<br>
 
 @note
 SPI_DEV(1) is only configured if the `sdcard_spi` module is explicitly added to
@@ -116,9 +98,7 @@ boards, see section \ref esp32_peripherals "Common Peripherals".
 The corresponding board schematic can be found
 [here](https://docs.espressif.com/projects/espressif-esp-dev-kits/en/latest/_static/esp32-s3-usb-otg/schematics/SCH_ESP32-S3_USB_OTG.pdf)
 
-[Back to table of contents](#esp32s3_usb_otg_toc)
-
-## Flashing the Device {#esp32s3_usb_otg_flashing}
+## Flashing the Device
 
 There are two options to flash the board:
 
@@ -129,21 +109,24 @@ There are two options to flash the board:
 
 To flash the board via the USB Serial/JTAG interface just connect the board
 with the `USB_DEV` port to your host computer and use the following command:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=esp32s3_usb_otg make flash ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 Usually the make system resets the board before flashing to enable the
 USB Serial/JTAG controller and to reboot the ESP32-S3 in download mode.
 
 In some very special cases this reset does not work and the programmer cannot
 connect to the card, so the flashing is aborted with a timeout:
-```
+
+```text
 Serial port /dev/ttyACM0
 Connecting...
 ...
 serial.serialutil.SerialTimeoutException: Write timeout
 ```
+
 This can happen either if RIOT is not yet installed or if the USB port was
 previously used with the USB OTG controller, for example with USBUS or tinyUSB.
 In this case, restart the board manually into download mode by pressing and
@@ -162,16 +145,14 @@ Flashing RIOT using the USB-to-UART bridge is quite easy. The board has a
 Micro-USB connector with reset/boot/flash logic. Just connect the board to
 your host computer and type using the programming port:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```shell
 BOARD=esp32s3-usb-otg make flash ... PORT=/dev/ttyUSB0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 For detailed information about ESP32-S3 as well as configuring and compiling
 RIOT for ESP32-S3 boards, see \ref esp32_riot.
 
-[Back to table of contents](#esp32s3_usb_otg_toc)
-
-## Using STDIO {#esp32s3_usb_otg_stdio}
+## Using STDIO
 
 By default, the `USB_DEV` port and the USB Serial/JTAG interface are used for
 the STDIO (module `stdio_usb_serial_jtag`). If the USB port is used by the
@@ -180,6 +161,7 @@ USBUS stack or the tinyUSB stack, implicitly the module `stdio_cdc_acm` or
 
 Alternatively, the USB-to-UART bridge and `UART_DEV(0)` could be used for the
 STDIO. Simply add `stdio_uart` to the list of used modules for this purpose:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=esp32s3-usb-otg USEMODULE=stdio_uart make flash ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```

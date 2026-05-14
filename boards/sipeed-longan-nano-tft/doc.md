@@ -13,7 +13,7 @@ that is equipped with a TFT display with the following on-board components:
 - 3 user LEDs
 - 0.96\" TFT display 160 x 80 pixel
 
-@image html "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/1/114992425_1.jpg" "Sipeed Longan Nano" width=600
+<img src="https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/1/114992425_1.jpg" alt="Sipeed Longan Nano" width=600 />
 
 Detailed information about the board configuration and flashing can be found
 in the \ref sipeed_longan_nano "Sipeed Longan Nano" documentation.

@@ -116,8 +116,8 @@ Olimex MSP430-JTAG-Tiny is assumed, which is among the less expensive options.
 Once the board is firmly connected in the battery holder and the JTAG cable is
 connected, just run
 
-```
-make BOARD=msb-430 flash
+```shell
+BOARD=msb-430 make flash
 ```
 
 in the application's directory.
@@ -130,7 +130,7 @@ stdio is available via the UART interface with `RXD = P3.7`
 The easiest way is to connect an USB TTL adapter (such as the cheap `cp210x`
 or `ch341` based adapters) to the battery holder board as follows:
 
-```
+```text
 TTL adapter    MSB-430 Battery Holder Board
 -----------    ----------------------------
 

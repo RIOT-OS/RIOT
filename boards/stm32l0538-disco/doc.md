@@ -14,7 +14,7 @@ The board also provides an on-board 2.04\" E-paper display (not supported yet).
 
 ## Pinout
 
-@image html pinouts/stm32l0538-disco.svg "Pinout for the stm32l0538-disco (from STM board manual)" width=50%
+<img src="pinouts/stm32l0538-disco.svg" alt="Pinout for the stm32l0538-disco (from STM board manual)" width=50% />
 
 ### MCU
 
@@ -51,27 +51,25 @@ The board also provides an on-board 2.04\" E-paper display (not supported yet).
 The board can be flashed using OpenOCD via the on-board ST-Link adapter.
 Then use the following command:
 
-    make BOARD=stm32l0538-disco -C examples/basic/hello-world flash
-
-## Flashing the Board Using ST-LINK Removable Media
-
-On-board ST-LINK programmer provides via composite USB device removable media.
-Copying the HEX file causes reprogramming of the board. This task
-could be performed manually; however, the cpy2remed (copy to removable
-media) PROGRAMMER script does this automatically. To program board in
-this manner, use the command:
+```shell
+make BOARD=stm32l0538-disco -C examples/basic/hello-world flash
 ```
-make BOARD=stm32l0538-disco PROGRAMMER=cpy2remed flash
-```
-@note This PROGRAMMER was tested using ST-LINK firmware 2.37.26. Firmware updates
-could be found on [this STM webpage](https://www.st.com/en/development-tools/stsw-link007.html).
+
+## Flashing the Board
+
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the STM32L0538-DISCO is `stm32l0538-disco`.
+Can't add a suggestion here.
 
 ### STDIO
 
 STDIO is connected to pins PA9 (TX) and PA10 (RX) so an USB to UART adapter is
 required. Use the `term` target to open a terminal:
 
-    make BOARD=stm32l0538-disco -C examples/basic/hello-world term
+```shell
+make BOARD=stm32l0538-disco -C examples/basic/hello-world term
+```
 
 If an external ST-Link adapter is used, RX and TX pins can be directly connected
 to it. In this case, STDIO is available on /dev/ttyACMx (Linux case).

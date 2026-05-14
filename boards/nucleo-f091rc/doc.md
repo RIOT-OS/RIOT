@@ -16,9 +16,10 @@ You can find general information about the Nucleo64 boards on the
 
 ## Pinout
 
-@image html pinouts/nucleo-f091rc.svg "Pinout for the Nucleo-F091RC (from user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 29)" width=50%
+<img src="pinouts/nucleo-f091rc.svg" alt="Pinout for the Nucleo-F091RC (from user manual UM1724, http://www.st.com/resource/en/user_manual/dm00105823.pdf, page 29)" width=50% />
 
 ### MCU
+
 | MCU        | STM32F091RC       |
 |:---------- |:----------------- |
 | Family     | ARM Cortex-M0     |
@@ -40,10 +41,12 @@ You can find general information about the Nucleo64 boards on the
 | Board Manual | [Board Manual](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/user_manual/DM00105823.pdf) |
 
 ### RIOT static pin mapping
+
 please refer to [this](https://docs.google.com/spreadsheets/d/1gnxsux5WpFrn-33Ivb9nGgTBqooqgDYxRkhZms-cvsc/edit?usp=sharing)
 document for the pin mapping as implemenented in `boards/nucleo-f091/include/periph_conf.h`
 
 ### User Interface
+
 1 Button:
 
 | NAME  | USER  |
@@ -57,8 +60,8 @@ document for the pin mapping as implemenented in `boards/nucleo-f091/include/per
 | Color  | green |
 | Pin    | PA5   |
 
-
 ## Implementation Status
+
 | Device | ID        | Supported | Comments  |
 |:------------- |:------------- |:------------- |:------------- |
 | MCU        | STM32F091RC   | partly    | Energy saving modes not fully utilized |
@@ -69,7 +72,6 @@ document for the pin mapping as implemenented in `boards/nucleo-f091/include/per
 |        | SPI       | no        | |
 |        | USB       | no        | |
 |        | Timer     | full      | |
-
 
 ## Flashing the Board
 

@@ -9,6 +9,7 @@ is an evaluation board supporting a ARM Cortex-M7 STM32F746NG microcontroller
 with 340KB of RAM and 1MB of ROM Flash.
 
 As main features, this board provides:
+
 - a 4.3\" RGB 480×272 color LCD-TFT with capacitive touch screen,
 - an ethernet port
 - 2 user USB ports (FS and HS)
@@ -33,23 +34,8 @@ Current hardware support:
 | External SDRAM | X | |
 | SD Card Interface | x | SDMMC1 on PC8..PC13 and PD2 |
 
-## Flashing the device
+## Flashing the Board
 
-The STM32F746G-DISCO board includes an on-board ST-LINK programmer and can be
-flashed using OpenOCD.
-The board can be flashed with:
-
-```
-make BOARD=stm32f746g-disco flash
-```
-
-and debug via GDB with
-```
-make BOARD=stm32f746g-disco debug
-```
-
-## Supported Toolchains
-
-For using the STM32F746G-DISCO board we recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
-toolchain.
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the STM32F746G-DISCO is `stm32f746g-disco`.

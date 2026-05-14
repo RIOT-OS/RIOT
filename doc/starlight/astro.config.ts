@@ -193,6 +193,7 @@ export default defineConfig({
             "misc/managing-a-release",
             "misc/emulators",
             "misc/terminal_config",
+            "misc/openocd",
             "misc/how_to_doc",
           ],
         },

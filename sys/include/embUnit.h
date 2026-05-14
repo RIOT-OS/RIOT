@@ -13,7 +13,7 @@
  *
  * @see https://sourceforge.net/projects/embunit
  *
- * @note Please refer to https://github.com/RIOT-OS/RIOT/wiki/Testing-RIOT
+ * @note Please refer to https://doc.riot-os.org/advanced_tutorials/unittests/
  * @note If mocking would be helpful for your unit test, you can also have a look at @ref pkg_fff.
  *
  * @author Martine Lenders <mlenders@inf.fu-berlin.de>

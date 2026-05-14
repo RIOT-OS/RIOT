@@ -21,38 +21,43 @@ square pin on the adapter connecting with the square pin on the board.
    WARNING: setting the fuses incorrectly can brick your board!
 
    If using the Buspirate:
-```
-     avrdude -p m1284p -c buspirate -P /dev/ttyUSB0 -U efuse:w:0xFF:m
-     avrdude -p m1284p -c buspirate -P /dev/ttyUSB0 -U hfuse:w:0x99:m
-     avrdude -p m1284p -c buspirate -P /dev/ttyUSB0 -U lfuse:w:0xE2:m
-```
+
+   ```shell
+   avrdude -p m1284p -c buspirate -P /dev/ttyUSB0 -U efuse:w:0xFF:m
+   avrdude -p m1284p -c buspirate -P /dev/ttyUSB0 -U hfuse:w:0x99:m
+   avrdude -p m1284p -c buspirate -P /dev/ttyUSB0 -U lfuse:w:0xE2:m
+   ```
 
    If using the Atmel-ICE:
-```
-     avrdude -p m1284p -c atmelice -U efuse:w:0xFF:m
-     avrdude -p m1284p -c atmelice -U hfuse:w:0x99:m
-     avrdude -p m1284p -c atmelice -U lfuse:w:0xE2:m
-```
+
+   ```shell
+   avrdude -p m1284p -c atmelice -U efuse:w:0xFF:m
+   avrdude -p m1284p -c atmelice -U hfuse:w:0x99:m
+   avrdude -p m1284p -c atmelice -U lfuse:w:0xE2:m
+   ```
 
 2. After the fuses are set, flash the application.
 
    If using the Buspirate:
-```
-     BOARD=mega-xplained make -C examples/basic/hello-world flash
-```
+
+   ```shell
+   BOARD=mega-xplained make -C examples/basic/hello-world flash
+   ```
 
    If using the Atmel-ICE:
-```
-     BOARD=mega-xplained PROGRAMMER=atmelice make -C examples/basic/hello-world flash
-```
+
+   ```shell
+   BOARD=mega-xplained PROGRAMMER=atmelice make -C examples/basic/hello-world flash
+   ```
 
 ### Accessing STDIO via UART
 
 STDIO can be accessed through the USB connector. The on-board UART-USB
 adapter is not affected by flashing. It shows up as /dev/ttyACM0 on Linux.
 It will be used automatically with `make term`:
-```
-     BOARD=mega-xplained make -C examples/basic/hello-world term
+
+```shell
+BOARD=mega-xplained make -C examples/basic/hello-world term
 ```
 
 ### Pin Change Interrupts

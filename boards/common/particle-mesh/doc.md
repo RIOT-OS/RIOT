@@ -14,15 +14,17 @@ Using the [Particle Mesh debugger](https://docs.particle.io/datasheets/accessori
 the board can be flashed with PyOCD programmer via a DAPLink.
 
 PyOCD can be installed using Python package manager:
-```
-    pip install pyocd --user -U
+
+```shell
+pip install pyocd --user -U
 ```
 
 To flash the board, use `BOARD=<board name>` (with board name in {particle-argon,
 particle-boron, particle-xenon}) with the `make` command.<br/>
 Example with `hello-world` application:
-```
-    make BOARD=particle-xenon -C examples/basic/hello-world flash
+
+```shell
+make BOARD=particle-xenon -C examples/basic/hello-world flash
 ```
 
 In this case, OpenOCD can also be used. For the moment, the latest stable
@@ -30,8 +32,9 @@ version of OpenOCD (0.10) doesn't contain any support for nrf52 but versions
 built against the actual development version can be used.
 
 To flash the board with OpenOCD, use the `PROGRAMMER` variable:
-```
-    PROGRAMMER=openocd make BOARD=<board name> -C examples/basic/hello-world flash
+
+```shell
+PROGRAMMER=openocd make BOARD=<board name> -C examples/basic/hello-world flash
 ```
 
 #### Alternative flashing procedure: Particle bootloader and DFU-Util
@@ -70,8 +73,9 @@ Then, the checksum is only calculated over the memory region that contains the i
 
 The on-board reset button doesn't work, so to trigger a reset of the board, use
 the `reset` target with `make`:
-```
-    make BOARD=<board name> -C examples/basic/hello-world reset
+
+```shell
+make BOARD=<board name> -C examples/basic/hello-world reset
 ```
 
 ### STDIO configuration

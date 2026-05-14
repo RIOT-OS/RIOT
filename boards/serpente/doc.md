@@ -7,7 +7,7 @@
 The [Serpente boards](https://serpente.solder.party/) are low-cost development boards designed
 to be used with Adafruit’s CircuitPython.
 
-Three versions of the board board exist, but they all the same except for the USB connector.
+Three versions of the board board exist, but they are all the same except for the USB connector.
 The standard Serpente board contains a female USB Type-C connector, the Serpente Plug C
 contains a male USB Type-C connector, and the Serpente Plug uses the board itself as a Type-A USB plug.
 
@@ -18,14 +18,15 @@ and dirty, yet flexible, prototyping tools.
 
 ### Pinout
 
-\image html https://serpente.solder.party/r2/pinout.png width=66%
+<img src="https://serpente.solder.party/r2/pinout.png" width=66% />
 
 ### Flash the board
 
 Use `BOARD=serpente` with the `make` command.<br/>
 Example with `micropython` application:
-```
-     make BOARD=serpente -C examples/lang_support/community/micropython flash
+
+```shell
+make BOARD=serpente -C examples/lang_support/community/micropython flash
 ```
 
 RIOT will automatically trigger a reset to the bootloader, but this only works if RIOT is still

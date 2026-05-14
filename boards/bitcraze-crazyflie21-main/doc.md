@@ -40,20 +40,28 @@ The [Board Schematics][board-schematics] show which pins are connected to the mo
 [mcu-ref]: https://www.st.com/resource/en/reference_manual/dm00031020-stm32f405-415-stm32f407-417-stm32f427-437-and-stm32f429-439-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf
 
 ### Flash the board
+
 Prerequisites:
+
 - the Crazyflie NRF firmware runs on the NRF [instructions](https://www.bitcraze.io/documentation/repository/crazyflie2-nrf-firmware/master/build/build/)
 - the original Crazyflie bootloader runs on the STM32 [instructions](https://www.bitcraze.io/documentation/repository/crazyflie-firmware/master/development/dfu/#bootloader-recovery)
 - `dfu-util` is installed
 - the Crazyflie's battery is disconnected
 
 To flash the board:
+
 - navigate to the folder of the app you want to flash
 - Hold down the power button on the Crazyflie
 - connect via usb to your computer
 - keep holding down the button for four seconds until the blink rate changes (the mcu is now in DFU mode)
-- flash the board by running `BOARD=bitcraze-crazyflie21-main make all flash`
+- flash the board by running:
+
+  ```shell
+  BOARD=bitcraze-crazyflie21-main make all flash
+  ```
 
 ### STDIO
+
 By default, STDIO is implemented via the native USB interface.
 In order to use STDIO over UART connect your UART adapter as follows:
 
@@ -64,9 +72,11 @@ In order to use STDIO over UART connect your UART adapter as follows:
 | GND       | GND          |
 
 Now flash the board with stdio over UART:
-```
+
+```shell
 USEMODULE=stdio_uart BOARD=bitcraze-crazyflie21-main make all flash
 ```
 
 ### Known Issues
- - `timer_set()`: the callback is never called for timeouts of only one tick.
+
+- `timer_set()`: the callback is never called for timeouts of only one tick.

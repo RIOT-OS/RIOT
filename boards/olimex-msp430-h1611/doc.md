@@ -72,8 +72,8 @@ among the less expensive options.
 Once the jumper is correctly placed in either `P_IN` or in `P_OUT` and the
 JTAG cable is connected just run
 
-```
-make BOARD=olimex-msp430-h1611 flash
+```shell
+BOARD=olimex-msp430-h1611 make flash
 ```
 
 ## Using the shell
@@ -84,7 +84,7 @@ stdio is available via the UART interface with `TXD = P3.6`
 The easiest way is to connect an USB TTL adapter (such as the cheap `cp210x`
 or `ch341` based adapters) as follows:
 
-```
+```text
 TTL adapter    Olimex MSP430-H1611
 -----------    -------------------
 

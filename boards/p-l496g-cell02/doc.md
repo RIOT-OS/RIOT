@@ -8,16 +8,11 @@ The ST [P-L496G-CELL02](https://www.st.com/en/evaluation-tools/p-l496g-cell02.ht
 is an evaluation board supporting a ARM Cortex-M4 STM32L496AG microcontroller
 with 320Kb of RAM and 1Mb of ROM Flash.
 
-## Flashing the device
+## Flashing the Board
 
-The P-L496G-CELL02 board includes an on-board ST-LINK programmer and can be
-flashed using OpenOCD.
-
-To flash this board, just use the following command:
-
-```
-make BOARD=p-l496g-cell02 flash -C examples/basic/hello-world
-```
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the P-L496G-CELL2 is `p-l496g-cell02`.
 
 ### STDIO
 
@@ -25,4 +20,6 @@ STDIO is available via the ST-Link programmer.
 
 Use the `term` target to open a terminal:
 
-    make BOARD=p-l496g-cell02 -C examples/basic/hello-world term
+```shell
+make BOARD=p-l496g-cell02 -C examples/basic/hello-world term
+```

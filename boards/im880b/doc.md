@@ -6,8 +6,8 @@
 
 ![LoraBox](https://www.wireless-solutions.de/images/stories/products/im880a.png)
 
-
 ### MCU
+
 | MCU                   | stm32l151cb-a                             |
 |:--------------------- |:----------------------------------------- |
 | Family                | ARM Cortex-M3                             |
@@ -30,42 +30,48 @@
 ### User Interface
 
 ## Flashing
+
 As no usb connector is present on the device an external programmer must
 be connected to the board for flashing. You can use JTAG or STLINK programmer.
 
- *  JTAG:
- *    - JTDO: PB_3 / P39
- *    - JTDI: PA_15 / P38
- *    - JTCK: PA_14 / P37
- *    - JTMS: PA_13 / P34
+* JTAG:
+* * JTDO: PB_3 / P39
+* * JTDI: PA_15 / P38
+* * JTCK: PA_14 / P37
+* * JTMS: PA_13 / P34
 
- *  STLINK:
- *    - NRST: NRST / P7
- *    - SWCLK: PA_14 / P37
- *    - SWDAT: PA_13 / P34
+* STLINK:
+* * NRST: NRST / P7
+* * SWCLK: PA_14 / P37
+* * SWDAT: PA_13 / P34
 
 ### STM32 Loader
+
 To flash RIOT on the board, after connecting the UART-USB bridge, just run:
-```
+
+```shell
 BOARD=im880b make flash
 ```
+
 This uses the stm32loader script to erase the memory and flash it interfacing
 with the STM32 ROM bootloader.
 
 ## Connecting via Serial
+
 The default UART port is the USART1, there is no usb connection a USB/TTL
 converter must be used to connect to the board TX & RX pins. The default
 port is /dev/ttyUSB0. The pin connections are:
 
- *  USART1:
- *    - TX: PA_9 / P30
- *    - RX: PA_10 / P31
+* USART1:
+  * TX: PA_9 / P30
+  * RX: PA_10 / P31
 
-```
+```shell
 BOARD=im880b make term
 ```
 
 ## SX1272 radio
+
 Please note that the board has a Semtech SX1272 radio. This means that when the
 semtech-loramac package or the sx127x driver are used the correct driver version
 (sx1272) must be selected.

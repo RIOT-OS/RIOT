@@ -24,6 +24,7 @@
 ![IoT-LAB M3 Architecture](https://github.com/iot-lab/iot-lab/wiki/Images/archiopenm3.png)
 
 ### [Board schematics](http://github.com/iot-lab/iot-lab/wiki/Docs/openm3-schematics.pdf)
+
 , wiring, pinouts, etc...
 
 ## Implementation Status
@@ -52,9 +53,10 @@
 See [ARM Family](https://github.com/RIOT-OS/RIOT/wiki/Family:-ARM)
 
 Working:
-* [gcc-arm-embedded](https://github.com/RIOT-OS/RIOT/wiki/Family:-ARM#gcc-
+
+* [gcc-arm-embedded](<https://github.com/RIOT-OS/RIOT/wiki/Family:-ARM#gcc->
 arm-embedded-toolchain)
-* [gcc-linaro](https://github.com/RIOT-OS/RIOT/wiki/Family:-ARM#linaro-
+* [gcc-linaro](<https://github.com/RIOT-OS/RIOT/wiki/Family:-ARM#linaro->
 toolchain)
 
 ### Programming and Debugging
@@ -67,21 +69,25 @@ RIOT.
 When starting the debugger with `make debug BOARD=iotlab-m3` GDB connects to
 openocd, loads the elf-file and puts the MCU into halt state. Before setting
 breakpoints it is sometimes needed to use the following workflow
-```
+
+```text
 bash
 monitor reset run
 monitor reset halt
 b <breakpoint>
 c
 ```
+
 For best debugging experience also change the `-Os` flag in
 `Makefile.include`'s `CFLAGS` variable to `-O0`.
 
 ## Details
+
 The M3 Open Node can reset, debug and program the STM32 on JTAG through the
 FTDI2322H connected to the USB. This component allows also a UART link to the
 STM32. The Open Node connector gives access to 3 STM32/GPIO and the STM32/I2C.
 Two power lines are accessible on this connector:
+
 * a + 5.0 volts for the board power supply
 * a 3.3 volts for the consumption monitoring of the STM32, the RF component
 and the sensors
@@ -91,7 +97,7 @@ Open node connector. The powering of the board is then assumed by a battery or
 by the USB connector  The choice of the power input is done electronically
 (power management).
 
-![IoT-LAB M3 architecture](https://www.iot-lab.info/wp-
+![IoT-LAB M3 architecture](<https://www.iot-lab.info/wp->
 content/uploads/2013/10/archiopenm3.png)
 
 ## Debugging
@@ -100,7 +106,8 @@ For debugging you need to open a terminal. Here you simply have to call `make
 debug` - assuming that the current directory is your application directory. It
 establishes an openocd connection to the device and starts gdb connected to the
 openocd instance. For example, it should look something like this
-```
+
+```text
 [user@host RIOT]$ cd examples/basic/default/
 [user@host default]$ BOARD=iotlab-m3 make
 Building application default for iotlab-m3 w/ MCU stm32f1.
@@ -147,7 +154,8 @@ seems necessary to prepend a `monitor reset run` before executing continue.
 In general you can
 use openocd commands prepended by `monitor`.
 In the case the node crashes it can be reset with the following sequence
-```
+
+```text
 Bash
 (gdb) monitor reset halt
 (gdb) monitor reset run
@@ -156,5 +164,5 @@ Bash
 ## Troubleshooting
 
 For terminal output on macOS (`make term`) you need to install a driver:
-http://www.ftdichip.com/Drivers/VCP.htm
-http://www.ftdichip.com/Drivers/VCP.htm
+<http://www.ftdichip.com/Drivers/VCP.htm>
+<http://www.ftdichip.com/Drivers/VCP.htm>

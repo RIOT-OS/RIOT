@@ -12,7 +12,7 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 ## Overview {#esp32s2-wemos-mini_overview}
 
-\image html "https://www.wemos.cc/en/latest/_images/s2_mini_v1.0.0_4_16x9.jpg" "Wemos S2 mini" width=600px
+<img src="https://www.wemos.cc/en/latest/_images/s2_mini_v1.0.0_4_16x9.jpg" alt="Wemos S2 mini" width=600px />
 
 Documentation for the board can be found on the vendor page:
 
@@ -24,9 +24,10 @@ Documentation for the board can be found on the vendor page:
 Flashing RIOT is quite easy. The board has a Micro-USB connector with
 reset/boot/flash logic. Just connect the board to your host computer
 and type using the programming port:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
 BOARD=esp32s2-wemos-mini make flash
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 If RIOT is already on the device, it should automatically enter bootloader mode.
 If this does not work or the device is stuck in some other mode, you can force
@@ -35,5 +36,3 @@ button.
 
 For detailed information about ESP32-S2 as well as configuring and compiling
 RIOT for ESP32-S2 boards, see \ref esp32_riot.
-
-[Back to table of contents](#esp32s2-wemos-mini_toc)

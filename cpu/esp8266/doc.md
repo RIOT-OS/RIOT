@@ -270,7 +270,7 @@ docker run -i -t -u $UID -v $(pwd):/data/riotbuild riotbuild
 directory of the `riotbuild` user in the Docker. That is, the output
 of compilations in RIOT Docker are also accessible on the host system.
 
-Please refer the [RIOT wiki](https://github.com/RIOT-OS/RIOT/wiki/Use-Docker-to-build-RIOT)
+Please refer to [Build in Docker](https://doc.riot-os.org/build-system/build-in-docker/)
 on how to use the Docker image to compile RIOT OS.
 
 [Back to table of contents](#esp8266_toc)

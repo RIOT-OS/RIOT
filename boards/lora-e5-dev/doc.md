@@ -19,6 +19,7 @@ The board also includes a JST battery connector as well as control over the
 external power lines which can be enabled or disabled by software.
 
 ### MCU
+
 | MCU        |   STM32WL5EJC                                             |
 |:---------- |:--------------------------------------------------------- |
 | Family     | ARM Cortex-M4                                             |
@@ -32,7 +33,7 @@ external power lines which can be enabled or disabled by software.
 | Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/rm0461-stm32wlex-advanced-armbased-32bit-mcus-with-subghz-radio-solution-stmicroelectronics.pdf) |
 | Board Manual   | [Board Manual](https://www.st.com/resource/en/data_brief/nucleo-wl55jc.pdf) |
 | Board Schematic | [Board Schematic](https://files.seeedstudio.com/products/113990934/LoRa-E5%20Dev%20Board%20v1.0.pdf) |
-| LoRa-E5 STM32WL5EJC Module wiki | https://wiki.seeedstudio.com/LoRa-E5_STM32WLE5JC_Module/#2-develop-with-stm32cube-mcu-package |
+| LoRa-E5 STM32WL5EJC Module wiki | <https://wiki.seeedstudio.com/LoRa-E5_STM32WLE5JC_Module/#2-develop-with-stm32cube-mcu-package> |
 
 ### Pinout
 
@@ -83,8 +84,8 @@ GUI and setting the RDP option byte to `AA`
 
 Alternatively you can use the STM32_Programer_CLI:
 
-```
-$ STM32_Programmer_CLI --connect port=swd --readunprotect
+```shell
+STM32_Programmer_CLI --connect port=swd --readunprotect
 ```
 
 #### Programming with an external ST-LINK
@@ -97,7 +98,7 @@ for more details). An example is seen in the following image:
 
 ![LoRa-E5 Dev ST-LINK](https://stm32python.gitlab.io/fr-version-lora/site/assets/images/lora/seeestudio_lora_e5_dev_connection.png)
 
-```
+```text
      CN4                                       LoRa-E5 Dev
                                             (Dark Blue Header)
 Pin 1: VDD_TARGET            N/C
@@ -110,7 +111,7 @@ Pin 6: SWO                   N/C
 
 Flashing can then be performed seamlessly with OpenOCD:
 
-```
+```shell
 BOARD=lora-e5-dev make flash
 ```
 
@@ -119,15 +120,16 @@ BOARD=lora-e5-dev make flash
 The default serial connection is through the USB-C port mapping to PB7 (RX) and
 PB6 (TX) UART pins (a second UART and an LPUART interface is also exposed).
 
-```
+```shell
 BOARD=lora-e5-dev make term
 ```
+
 ### Debugging
 
 For Debugging an external programmer is required, connected as depicted in
 the above picture, then the debugger can be attached with:
 
-```
+```shell
 BOARD=lora-e5-dev make debug
 ```
 

@@ -15,8 +15,8 @@ boards where all ESP8266EX pins are broken out for easier access. The
 board can either be soldered directly to a PCB or it can be used with
 a breadboard.
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Olimex-MOD-DEV.png" "Olimex MOD-WIFI-ESP8266-DEV"
-\n
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Olimex-MOD-DEV.png" alt="Olimex MOD-WIFI-ESP8266-DEV" />
+<br>
 
 The board provides some pads for an UEXT interface. UEXT interface
 (introduced by Olimex) can be used to connect different peripherals
@@ -27,7 +27,7 @@ UART, SPI and I2C. For more information about UEXT, see
 Together with the Olimex ESP8266-EVB evaluation board, a development
 platform for IoT devices is available.
 
-@image html "https://www.olimex.com/Products/IoT/ESP8266-EVB/images/ESP8266-EVB.jpg" "Olimex ESP8266-EVB"
+<img src="https://www.olimex.com/Products/IoT/ESP8266-EVB/images/ESP8266-EVB.jpg" alt="Olimex ESP8266-EVB" />
 
 ## Hardware
 
@@ -64,8 +64,8 @@ Olimex MOD-WIFI-ESP8266-DEV has 22 pin holes that can be soldered to PCB
 or used with a breadboard. The following figure shows the mapping of these
 pin holes to RIOT pins.
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Olimex-MOD-DEV_pins.png" "Olimex MOD-WIFI-ESP8266-DEV pin mapping"
-\n
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Olimex-MOD-DEV_pins.png" alt="Olimex MOD-WIFI-ESP8266-DEV pin mapping" />
+<br>
 
 Since GPIOs 6, 7, 8, and 11 are used for flash memory, they cannot be used
 for other purposes. Furthermore, when flash mode `qout` or `qio` is used for
@@ -89,9 +89,10 @@ by solder bridges, only GPIO0 needs to be pulled down while the device
 is being reset with the RSTB pin.
 
 To flash the RIOT image just type:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-make flash BOARD=esp8266-olimex-mod ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
+BOARD=esp8266-olimex-mod make flash ...
+```
 
 For detailed information about ESP8266 as well as configuring and compiling
 RIOT for ESP8266 boards, see \ref esp8266_riot.

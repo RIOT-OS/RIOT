@@ -2,14 +2,14 @@
 @ingroup     boards
 @brief       Support for the nRF52 DK
 
-## Overview:
+## Overview
 
 The
 [nRF52 DK](https://www.nordicsemi.com/Products/Development-hardware/nRF52-DK)
 is a development board featuring the nRF52832 MCU with Arduino compatible
 pin headers and an integrated J-Link programmer, debugger and UART adapter.
 
-## Hardware:
+## Hardware
 
 ![nRF52 DK](https://www.nordicsemi.com/-/media/Images/Products/DevKits/nRF52-Series/nRF52-DK/nRF52-DK/nRF52-DK-prod-page.png)
 
@@ -44,7 +44,7 @@ this, RIOT provides a little tool in `dist/tools/nrf52_resetpin_cfg`.
 Simply compile, flash, and run that tool on your board, and the reset pin should
 work for the time being.
 
-## Current measurement:
+## Current measurement
 
 There are two pins for current measurement on board. Don't connect these pins
 to GND!. The left pin is at 3.3V level and the right pin is connected to V33.
@@ -60,6 +60,7 @@ The STDIO is directly accessible via the USB port. On a Linux host, it's
 generally mapped to `/dev/ttyACM0`.
 
 Use the `term` target to connect to the board serial port<br/>
-```
-    make BOARD=nrf52dk -C examples/basic/hello-world term
+
+```shell
+BOARD=nrf52dk make -C examples/basic/hello-world term
 ```

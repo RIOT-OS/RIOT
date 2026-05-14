@@ -11,6 +11,9 @@ MCU nominally has 64 KiB flash, most [actually have 128 KiB flash][Flashsize].
 There are also versions that only report to have 32 KiB, but actually have
 64 KiB.
 
+\warning Be aware that *a lot* of these boards have fake STM32 chips,
+which may or may not work with RIOT.
+
 ## Pinout
 
 ![pinout](pinouts/pinout-bluepill.svg)
@@ -47,41 +50,18 @@ There are also versions that only report to have 32 KiB, but actually have
 | Timer | yes       |
 | CAN   | no        |
 
-
 ## Flashing
 
-To program and debug the board you need a SWD capable debugger. The
-easiest way is using [OpenOCD][OpenOCD]. By default RIOT uses the hardware
-reset signal and connects to the chip under reset for flashing. This is
-required to reliably connect to the device even when the MCU is in a low power
-mode. Therefore not only SWDIO and SWCLK, but also the RST pin of your
-debugger need to be connected to the board. Once the device is connected to
-the debugger and OpenOCD is installed, you can flash the device with:
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the STM32F030C8 based Bluepill is `bluepill-stm32f030c8` and
+for the STM32030C8 based Blackpill `blackpill-stm32f103c8`.
 
-    $ make BOARD=bluepill-stm32f103c8 flash
+Be aware the the boards come with either the `C8` or the `CB` version of the microcontroller,
+the former has 64 KiB flash while the latter has 128 KiB.
 
-Or for the blackpill with:
-
-    $ make BOARD=blackpill-stm32f103c8 flash
-
-### Additional Flash
-
-Typically, the STM32F103C8 does actually have 128 KiB flash. To make use of
-this, just flash with
-
-    $ make BOARD=bluepill-stm32f103cb flash
-
-Or for the blackpill with:
-
-    $ make BOARD=blackpill-stm32f103cb flash
-
-This sets the `CPU_MODEL` make variable to `stm32f103cb`, the default
-value is `stm32f103c8`. These two CPU models basically only have one
-major difference, the former has 128 KiB flash while the latter has 64
-KiB.
-
-In order to flash the *cb variant onto *c8 hardware requires OpenOCD in version
-0.11 or later.
+For the `CB` variants, you have to use the board names `bluepill-stm32f030cb` and
+`blackpill-stm32f103cb`, respectively.
 
 ## Connecting via Serial
 
@@ -133,8 +113,6 @@ The board is sold under different names. On some sites it is called
 `bluepill` or `blue pill`. On others you might find it by searching for
 `stm32f103c8` or `stm32f103c8t6`.
 
-Try [eBay][eBay] or [AliExpress][AliExpress].
-
 ## Further reading
 
 - [Blue Pill Wiki](https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/index.php?title=Blue_Pill)
@@ -144,10 +122,5 @@ Try [eBay][eBay] or [AliExpress][AliExpress].
 [Datasheet]: http://www.st.com/content/ccc/resource/technical/document/datasheet/33/d4/6f/1d/df/0b/4c/6d/CD00161566.pdf/files/CD00161566.pdf/jcr:content/translations/en.CD00161566.pdf
 [Flashsize]:
 https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/index.php?title=Blue_Pill#128_KB_flash_on_C8_version
-[eBay]: https://www.ebay.com/sch/i.html?_nkw=stm32f103c8
-[AliExpress]: https://www.aliexpress.com/wholesale?SearchText=STM32F103C8T6
-[OpenOCD]: https://github.com/RIOT-OS/RIOT/wiki/OpenOCD
 [USB]:
 https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/index.php?title=Blue_Pill#Hardware_installation
-[imgTop]:
-https://web.archive.org/web/20190428082446/http://wiki.stm32duino.com/images/thumb/1/19/STM32_Blue_Pill_top.jpg/800px-STM32_Blue_Pill_top.jpg

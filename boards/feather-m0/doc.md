@@ -11,6 +11,7 @@ All the feather M0 boards are built based on the same Atmel SAMD21G18A
 microcontroller. See @ref cpu_samd21.
 
 Several types of Feather M0 boards exist:
+
 - [Feather M0 WiFi](https://learn.adafruit.com/adafruit-feather-m0-wifi-atwinc1500/)
 - [Feather M0 BLE](https://learn.adafruit.com/adafruit-feather-m0-bluefruit-le/overview)
 - [Feather M0 Adalogger](https://learn.adafruit.com/adafruit-feather-m0-adalogger/)
@@ -42,6 +43,7 @@ printf("Bat: %dV\n", vbat);
 
 Use `BOARD=feather-m0` with the `make` command.<br/>
 Example with `hello-world` application:
+
 ```shell
 make BOARD=feather-m0 -C examples/basic/hello-world flash
 ```
@@ -57,13 +59,14 @@ make BOARD=feather-m0 -C examples/basic/hello-world flash
           bootloader. Otherwise the bootloader has to be enabled by double
           tapping the reset button.<br/>
           Upgrade instructions can be found at Adafruit:
-          https://learn.adafruit.com/installing-circuitpython-on-samd21-boards/installing-the-uf2-bootloader
+          <https://learn.adafruit.com/installing-circuitpython-on-samd21-boards/installing-the-uf2-bootloader>
 
 ### Using the WiFi interface
 
 To enable the WiFi interface of the Feather M0 WiFi variant of the board
 automatically for networking applications, use `feather-m0-wifi` as board
 and define the required WiFi parameters, for example:
+
 ```shell
 CFLAGS='-DWIFI_SSID=\"<ssid>\" -DWIFI_PASS=\"<pass>\"' \
 make BOARD=feather-m0-wifi -C examples/networking/gnrc/networking

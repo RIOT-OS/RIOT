@@ -20,7 +20,7 @@ The board features an RGB LED, a user/reset button as well as 12 configurable ex
 
 ### Pinout
 
-\image html https://wiki.makerdiary.com/nrf52840-mdk-usb-dongle/assets/images/nrf52840-mdk-usb-dongle-pinout.png width=66%
+<img src="https://wiki.makerdiary.com/nrf52840-mdk-usb-dongle/assets/images/nrf52840-mdk-usb-dongle-pinout.png" width=66% />
 
 ### Links
 

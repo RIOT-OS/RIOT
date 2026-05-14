@@ -16,9 +16,10 @@ You can find general information about the Nucleo144 boards on the
 
 ## Pinout
 
-@image html pinouts/nucleo-f303ze.svg "Pinout for the Nucleo-F303ZE (from STM user board manual, M1974, http://www.st.com/resource/en/user_manual/dm00244518.pdf, page 33)" width=55%
+<img src="pinouts/nucleo-f303ze.svg" alt="Pinout for the Nucleo-F303ZE (from STM user board manual, M1974, http://www.st.com/resource/en/user_manual/dm00244518.pdf, page 33)" width=55% />
 
 ### MCU
+
 | MCU        | STM32F303ZE       |
 |:---------- |:----------------- |
 | Family     | ARM Cortex-M4F    |
@@ -41,9 +42,8 @@ You can find general information about the Nucleo144 boards on the
 | Programming Manual | [Programming Manual](http://www.st.com/web/en/resource/technical/document/programming_manual/DM00046982.pdf) |
 | Board Manual | [Board Manual](https://www.st.com/resource/en/user_manual/dm00244518.pdf) |
 
-
-
 ## Implementation Status
+
 | Device | ID        | Supported | Comments  |
 |:------------- |:------------- |:------------- |:------------- |
 | MCU        | STM32F303ZE   | partly    | Energy saving modes not fully utilized |

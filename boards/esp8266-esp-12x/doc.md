@@ -11,8 +11,8 @@ set of generic boards that either use one of the AI-Tinker ESP-12x ESP8266
 modules or are compatible with them. ESP-12x stands for different versions
 of the ESP-12 module: ESP-12, ESP-12E, ESP-12E and ESP-12S.
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/ESP-12F_Module.png" "ESP8266 ESP-12F module" width=250px
-\n
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/ESP-12F_Module.png" alt="ESP8266 ESP-12F module" width=250px />
+<br>
 
 Common examples for this type of boards are the
 [WEMOS LOLIN D1 mini V2](#esp8266_wemos_lolin_d1_mini), the
@@ -53,9 +53,11 @@ Technical Reference | [Technical Reference](https://www.espressif.com/sites/defa
 
 Flashing RIOT is quite straight forward, just connect the board using the
 programming port to your host computer and type:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-make flash BOARD=esp8266-esp-12x ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
+BOARD=esp8266-esp-12x make flash ...
+```
+
 For detailed information about ESP8266 as well as configuring and compiling
 RIOT for ESP8266 boards, see \ref esp8266_riot.
 
@@ -70,14 +72,14 @@ shield, and various sensor and actuator shields, see
 information. This makes it possible to create different hardware configurations
 without the need for a soldering iron or a breadboard.
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Wemos_D1_mini_Stack.png" "WEMOS LOLIN D1 mini stack example" width=400px
-\n
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Wemos_D1_mini_Stack.png" alt="WEMOS LOLIN D1 mini stack example" width=400px />
+<br>
 
 There is also a MRF24J40 shield that can be used to extend the board with
 an IEEE 802.15.4 radio module, the standard networking technology in RIOT.
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Wemos_MRF24J40_Shield.png" "MRF24J40 shield for WEMOS LOLIN D1 mini" width=280px
-\n
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Wemos_MRF24J40_Shield.png" alt="MRF24J40 shield for WEMOS LOLIN D1 mini" width=280px />
+<br>
 
 There are several versions of WEMOS LOLIN D1 mini, which only differ in the
 size of the flash memory and the MCU version used. All versions have a
@@ -95,12 +97,11 @@ D1 mini V3   | ESP8266EX |  4 MByte | PCB     | |
 D1 mini Lite | ESP8285   |  1 MByte | PCB     | |
 D1 mini Pro  | ESP8266EX | 16 MByte | ceramic | |
 </center>
-\n
 
 Following image shows the pinout of all WEMOS LOLIN D1 mini boards. It is
 compatible with the WEMOS LOLIN D32 Pro ESP32 board.
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Wemos_D1_mini_pinout.png" "WEMOS LOLIN D1 mini pinout"
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Wemos_D1_mini_pinout.png" alt="WEMOS LOLIN D1 mini pinout" />
 
 ## NodeMCU DEVKIT {#esp8266_nodemcu_devkit_esp8266}
 
@@ -114,12 +115,12 @@ uses ESP-12E module and breaks out all available GPIO pins. It has a
 Micro-USB port including a flash/boot/reset logic which makes flashing
 much easier.
 
-@image html "https://raw.githubusercontent.com/nodemcu/nodemcu-devkit-v1.0/master/Documents/NodeMCU_DEVKIT_1.0.jpg" "NodeMCE DEVKIT V1.0" width=500px
-\n
+<img src="https://raw.githubusercontent.com/nodemcu/nodemcu-devkit-v1.0/master/Documents/NodeMCU_DEVKIT_1.0.jpg" alt="NodeMCE DEVKIT V1.0" width=500px />
+<br>
 
 Following image shows the pinout of NodeMCU DEVKIT boards.
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/NodeMCU_pinout.png" "NodeMCE DEVKIT V1.0 pinout"
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/NodeMCU_pinout.png" alt="NodeMCE DEVKIT V1.0 pinout" />
 
 ## Adafruit Feather HUZZAH ESP8266 {#esp8266_adafruit_feather_huzzah_esp8266}
 
@@ -132,9 +133,9 @@ available GPIO pins. It has one additional LED connected to GPIO0 and a
 Micro-USB port including a flash/boot/reset logic which makes flashing much
 easier.
 
-@image html "https://cdn-shop.adafruit.com/640x480/2821-04.jpg" "Adafruit Feather HUZZAH ESP8266" width=500px
-\n
+<img src="https://cdn-shop.adafruit.com/640x480/2821-04.jpg" alt="Adafruit Feather HUZZAH ESP8266" width=500px />
+<br>
 
 Following image shows the pinout of Adafruit Feather HUZZAH ESP8266.
 
-@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Adafruit_Huzzah_ESP8266_pinout.png" "Adafruit Feather HUZZAH ESP8266 pinout"
+<img src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Adafruit_Huzzah_ESP8266_pinout.png" alt="Adafruit Feather HUZZAH ESP8266 pinout" />

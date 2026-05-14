@@ -13,10 +13,12 @@ The ATmega328p has two internal oscillators, one clocked at 8MHz and one at
 8MHz oscillator can be used. This allows the ATmega328p to be operated without
 any external components at a supply voltage anywhere between 2.7V and 5.5V.
 
-\htmlonly<style>div.image img[src="https://github.com/maribu/images/raw/master/ATmega328p.jpg"]{width:600px;}</style>\endhtmlonly
-@image html "https://github.com/maribu/images/raw/master/ATmega328p.jpg" "ATmega328p DIP package on a breadboard"<br>
+<img src="https://github.com/maribu/images/raw/master/ATmega328p.jpg" width="600px" />
+<img src="https://github.com/maribu/images/raw/master/ATmega328p.jpg" alt="ATmega328p DIP package on a breadboard" />
+<br>
 
 ### MCU
+
 | MCU           | ATmega328p                                    |
 |:------------- |:--------------------------------------------- |
 | Family        | AVR/ATmega                                    |
@@ -35,10 +37,11 @@ any external components at a supply voltage anywhere between 2.7V and 5.5V.
 
 ### Pinout
 
-\htmlonly<style>div.image img[src="https://camo.githubusercontent.com/c55beef2f138da61fe671a1e4a307ff4ffbc318d/68747470733a2f2f692e696d6775722e636f6d2f715849456368542e6a7067"]{width:100%;}</style>\endhtmlonly
-@image html "https://camo.githubusercontent.com/c55beef2f138da61fe671a1e4a307ff4ffbc318d/68747470733a2f2f692e696d6775722e636f6d2f715849456368542e6a7067" "Pinout of the ATmega328p"<br>
+<img src="https://camo.githubusercontent.com/c55beef2f138da61fe671a1e4a307ff4ffbc318d/68747470733a2f2f692e696d6775722e636f6d2f715849456368542e6a7067" width="100%" />
+<img src="https://camo.githubusercontent.com/c55beef2f138da61fe671a1e4a307ff4ffbc318d/68747470733a2f2f692e696d6775722e636f6d2f715849456368542e6a7067" alt="Pinout of the ATmega328p" />
+<br>
 
-All credit for above pinout image goes to https://github.com/MCUdude/MiniCore#pinout
+All credit for above pinout image goes to <https://github.com/MCUdude/MiniCore#pinout>
 
 ### Clock Frequency
 
@@ -124,11 +127,15 @@ experience, but also causes significant wear.
 In order to enable debugWIRE run (replace `<PROGRAMMER>` with the programmer you
 use, e.g. with `dragon_isp` if you use the AVR Dragon):
 
-    avrdude -c <PROGRAMMER> -p m328p -U hfuse:w:0x99:m
+```shell
+avrdude -c <PROGRAMMER> -p m328p -U hfuse:w:0x99:m
+```
 
 You can disable it again via:
 
-    avrdude -c <PROGRAMMER> -p m328p -U hfuse:w:0xd9:m
+```shell
+avrdude -c <PROGRAMMER> -p m328p -U hfuse:w:0xd9:m
+```
 
 @warning    As the reset pin is repurposed for debugWIRE, a regular ISP will
             not be able to disable the debugWIRE interface anymore. The AVR
@@ -142,7 +149,9 @@ very same way it needs to be connected for programming (see above). Once the
 MCU is connected and debugWIRE is enabled via the fuse settings, you can start
 debugging via:
 
-    make debug
+```shell
+BOARD=atmega328p make debug
+```
 
 If this fails after flashing the ATmega328P, it is like due to debugWIRE
 being temporary disabled by avrdude in order to use the ISP feature. Perform a
@@ -156,4 +165,5 @@ cold boot and the ATmega328P will have debugWIRE enabled again.
             the correct value.
 
 ## Caution
+
 Don't expect having a working network stack due to very limited resources ;-)

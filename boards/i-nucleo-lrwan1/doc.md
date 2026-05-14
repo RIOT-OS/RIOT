@@ -26,7 +26,9 @@ of the JP6 connector.
 
 By default, the flash on the microcontroller is write protected so before being
 able to flash it, one needs to unlock using the following:
+
 - Apply the following patch to the `openocd.sh` script:
+
 ```diff
 diff --git a/dist/tools/openocd/openocd.sh b/dist/tools/openocd/openocd.sh
 index c59a1939a2..0c359e438c 100755
@@ -45,12 +47,16 @@ index c59a1939a2..0c359e438c 100755
              -c 'flash write_image erase \"${IMAGE_FILE}\" ${IMAGE_OFFSET} ${IMAGE_TYPE}' \
              ${OPENOCD_PRE_VERIFY_CMDS} \
 ```
+
 - Run make flash:
-```sh
+
+```shell
 make BOARD=i-nucleo-lrwan1 -C examples/basic/hello-world flash
 ```
+
   The command will fail but after that the memory will be unlocked after a
   power cycle. The line added above in `openocd.sh` can also be removed.
+
 - Unplug the board and replug-it: the board is now flashable normally.
 
 Note that this unlock procedure only needs to be done once.

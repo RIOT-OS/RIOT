@@ -2,12 +2,8 @@
 @ingroup     boards
 @brief       Support for the STM32F4Discovery board
 
-## Overview
-
-See [this page](https://github.com/RIOT-OS/RIOT/wiki/Getting-started-with-STM32F%5B0%7C3%7C4%5Ddiscovery-boards)
-for a quick getting started guide.
-
 ## Hardware
+
 ![Stm32f4discovery with RIOT pin names](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/stm32f4discovery_pinout_RIOT.png)
 
 ### MCU
@@ -37,17 +33,6 @@ for a quick getting started guide.
 [programming-manual]: https://www.st.com/resource/en/programming_manual/dm00046982.pdf
 [board-manual]: https://www.st.com/resource/en/user_manual/dm00039084.pdf
 
-## Flashing
-
-After connecting the board to your computer using the Mini USB port, `cd` to
-the directory of the app you intend to flash and run:
-
-```
-make BOARD=stm32f4discovery flash
-```
-
-@note   You will need to have OpenOCD installed, e.g. `sudo apt install openocd`
-
 ## STDIO
 
 By default, STDIO is implemented via the native USB interface.
@@ -62,7 +47,7 @@ time.)
 Afterwards, simply run (with the current working directory of your terminal
 set to directory of the app you flashed):
 
-```
+```shell
 make BOARD=stm32f4discovery term
 ```
 
@@ -80,7 +65,7 @@ Now flash with stdio over UART by selecting the module `stdio_uart` and connect
 to the serial. You can do both by running in a terminal (and the working
 directory set to the directory of the app you want to run):
 
-```
+```shell
 USEMODULE=stdio_uart make BOARD=stm32f4discovery flash term
 ```
 
@@ -133,7 +118,7 @@ sample with up to 1.6kHz.
 
 [lis3dsh-datasheet]: http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00040962.pdf
 
-#### Pin Config:
+#### Pin Config
 
 | Pin / Bus             | Function                  |
 |:--------------------- |:------------------------- |
@@ -158,7 +143,7 @@ The STM32F4discovery board contains a on-board MEMS audio sensor.
 
 [mp45dt02-datasheet]: http://www.mouser.com/pdfdocs/STM_MP45DT02_Datasheet.PDF
 
-#### Pin Config:
+#### Pin Config
 
 | Pin / Interface           | Function                  |
 |:------------------------- |:------------------------- |
@@ -178,7 +163,7 @@ speaker driver.
 | Vendor        | Cirrus Logic                      |
 | Datasheet     | [Datasheet][cs43l22-datasheet]    |
 
-#### Pin Config:
+#### Pin Config
 
 | Pin / Interface / Bus     | Function                  |
 |:------------------------- |:------------------------- |
@@ -198,65 +183,32 @@ speaker driver.
 
 [cs43l22-datasheet]: http://www.cirrus.com/en/pubs/proDatasheet/CS43L22_F2.pdf
 
-## Supported Toolchains
+## Flashing the Board
 
-For using the STM32F4discovery board we strongly recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
-toolchain.
+A detailed description about the flashing process can be found on the
+[guides page](https://guide.riot-os.org/board_specific/stm32/).
+The board name for the STM32F4 Discovery is `stm32f4discovery`.
 
-# Alternative way to flash
-
-## Using openocd to flash the RIOT binary to the board
-
-1. Compile your code to have a .hex file
-2. Connect the board with the mini usb cable, on the debugger side to your PC
-3. run openocd with `$ sudo /usr/local/bin/openocd -f interface/stlink-v2.cfg
--f target/stm32f4x_stlink.cfg`
-4. in a new terminal connect: `telnet 127.0.0.1 4444`
-5. run:
-```
-> flash banks
-#0 : stm32f4x.flash (stm32f2x) at 0x08000000, size 0x00100000, buswidth 0,
-chipwidth 0
-
-> halt
-target state: halted
-target halted due to debug-request, current mode: Thread
-xPSR: 0x21000000 pc: 0x0800251a msp: 0x20000c4c
-
-> flash write_image erase unlock /home/c/git/RIOT-
-OS/RIOT/examples/ipc_pingpong/bin/stm32f4discovery/ipc_pingpong.hex 0
-auto erase enabled
-auto unlock enabled
-target state: halted
-target halted due to breakpoint, current mode: Thread
-xPSR: 0x61000000 pc: 0x20000042 msp: 0x20000c4c
-wrote 16384 bytes from file /home/c/git/RIOT-
-OS/RIOT/examples/ipc_pingpong/bin/stm32f4discovery/ipc_pingpong.hex in 1.200528s
-(13.327 KiB/s)
-
-> reset
-```
-The board is now flashed with your RIOT binary
-
-# Emulator
+## Emulator
 
 To emulate this board you need an updated version of
 [renode](https://github.com/renode/renode) installed, at least version 1.11.
 
-```
+```shell
 EMULATE=1 BOARD=stm32f4discovery make all term
 ```
 
-## Known Issues / Problems
+### Known Issues / Problems
 
-### I2C
+#### I2C
+
 When connecting an I2C device and a logic analyzer to an I2C port at the same
 time, the internal pull-up resistors are not sufficient for stable bus
 operation. You probably have to connect external pull-ups to both bus lines. 10K
 is a good value to start with.
 
-### macOS & make term
+#### macOS & make term
+
 If you want the terminal to work using `make term` command and get a message
 about missing tty device install the driver from
-https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers .
+<https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers>

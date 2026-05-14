@@ -4,8 +4,8 @@
 
 ## Overview
 
-@image html https://raw.githubusercontent.com/maribu/images/master/CC2538-CC2592-DK-front.jpeg "Front side of the CC2538-CC2592-DK board" width=50%
-@image html https://raw.githubusercontent.com/maribu/images/master/CC2538-CC2592-DK-back.jpeg "Back side of the CC2538-CC2592-DK board" width=50%
+<img src="https://raw.githubusercontent.com/maribu/images/master/CC2538-CC2592-DK-front.jpeg" alt="Front side of the CC2538-CC2592-DK board" width=50% />
+<img src="https://raw.githubusercontent.com/maribu/images/master/CC2538-CC2592-DK-back.jpeg" alt="Back side of the CC2538-CC2592-DK board" width=50% />
 
 The generic CC2538-CC2592-DK board can obtained from various vendors in the
 typical [online][buy-cc2538-cc2592-dk-1] [shops][buy-cc2538-cc2592-dk-2].
@@ -40,20 +40,20 @@ The boards seem to be based on the schematics provided by
 
 ### Schematics
 
-<img src="https://raw.githubusercontent.com/maribu/images/master/CC2538-CC2592-DK-schematic.svg" alt="Schematics of the CC2538-CC2592-DK board" style="width: 100%;">
+<img src="https://raw.githubusercontent.com/maribu/images/master/CC2538-CC2592-DK-schematic.svg" alt="Schematics of the CC2538-CC2592-DK board" style="width: 100%;" />
 
 [Download schematics from author's repo][schematics].
 
 [schematics]: https://github.com/knowic/CC2538_CC2592_DK/blob/main/CC2538_CC2592_DK_1V3.pdf
 
-##  Flashing
+## Flashing
 
 Prior to flashing the bootloader needs to be entered. For this, hold the
 "SELECT" button, press the "RESET" button, then release the "SELECT"
 button. Now run
 
-```
-make BOARD=generic-cc2538-cc2592-dk flash
+```shell
+BOARD=generic-cc2538-cc2592-dk make flash
 ```
 
 @note   Flashing via J-Link would also be possible by passing
@@ -64,8 +64,8 @@ make BOARD=generic-cc2538-cc2592-dk flash
 The board features an CP2102 USB to UART bridge that is used for stdio by
 default. Just use
 
-```
-make BOARD=generic-cc2538-cc2592-dk term
+```shell
+BOARD=generic-cc2538-cc2592-dk make term
 ```
 
 ## Debugging
@@ -73,8 +73,8 @@ make BOARD=generic-cc2538-cc2592-dk term
 Assuming an J-Link (e.g. the J-Link EDU Mini) debugger is connected, debugging
 is as simple as:
 
-```
-make BOARD=generic-cc2538-cc2592-dk debug
+```shell
+BOARD=generic-cc2538-cc2592-dk make debug
 ```
 
 @note   By default OpenOCD is used for debugging. While debugging works fine

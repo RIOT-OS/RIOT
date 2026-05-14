@@ -42,14 +42,14 @@ through the USB Micro-USB connector. Once either TI Uniflash or OpenOCD are
 installed just connect the board using the Micro-USB port to your computer and
 type:
 
-```
-make flash BOARD=cc2650-launchpad
+```shell
+BOARD=cc2650-launchpad make flash
 ```
 
 To use OpenOCD instead of uniflash we need to set the `PROGRAMMER` environment
 variable, this is to enable OpenOCD instead of Uniflash.
 
-```
+```shell
 export PROGRAMMER=openocd
 ```
 

@@ -12,7 +12,7 @@ You can find general information about the Nucleo64 boards on the
 
 ## Pinout
 
-@image html pinouts/nucleo-c031c6.svg "Pinout for the Nucleo-C031C6 (from STM user manual UM2953, https://www.st.com/resource/en/user_manual/um2953-stm32-nucleo64-board-mb1717-stmicroelectronics.pdf, page 19)" width=50%
+<img src="pinouts/nucleo-c031c6.svg" alt="Pinout for the Nucleo-C031C6 (from STM user manual UM2953, https://www.st.com/resource/en/user_manual/um2953-stm32-nucleo64-board-mb1717-stmicroelectronics.pdf, page 19)" width=50% />
 
 ### MCU
 

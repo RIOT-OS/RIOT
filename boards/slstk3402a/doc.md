@@ -3,6 +3,7 @@
 @brief      Support for Silicon Labs SLSTK3402A starter kit
 
 ## Overview
+
 Silicon Labs EFM32 Pearl Gecko PG12 Starter Kit is equipped with the EFM32
 microcontroller. It is specifically designed for low-power applications, having
 energy-saving peripherals, different energy modes and short wake-up times.
@@ -13,6 +14,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 ## Hardware
 
 ### MCU
+
 | MCU             | EFM32PG12B500F1024GL125                                                                          |
 |-----------------|--------------------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M4F                                                                                   |
@@ -37,6 +39,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 | Board Schematic | Can be downloaded using Silicon Labs' Simplicity Studio                                          |
 
 ### Pinout
+
 This is the pinout of the expansion header on the right side of the board.
 PIN 1 is the bottom-left contact when the header faces  you horizontally.
 
@@ -58,6 +61,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 **Note:** some pins are connected to the board controller, when enabled!
 
 ### Peripheral mapping
+
 | Peripheral | Number  | Hardware          | Pins                           | Comments                                                 |
 |------------|---------|-------------------|--------------------------------|----------------------------------------------------------|
 | ADC        | 0       | ADC0              | CHAN0: internal temperature    | Ports are fixed, 14/16-bit resolution not supported      |
@@ -75,6 +79,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |            | 1       | LEUART0           | RX: PD11, TX: PD10             | Baud rate limited (see below)                            |
 
 ### User interface
+
 | Peripheral | Mapped to | Pin | Comments   |
 |------------|-----------|-----|------------|
 | Button     | PB0       | PF6 |            |
@@ -83,6 +88,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |            | LED1      | PF5 | Yellow LED |
 
 ## Implementation Status
+
 | Device                        | ID          | Supported | Comments                                                       |
 |-------------------------------|-------------|-----------|----------------------------------------------------------------|
 | MCU                           | EFM32PG12B  | yes       | Power modes supported                                          |
@@ -104,6 +110,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 ## Board configuration
 
 ### Board controller
+
 The starter kit is equipped with a Board Controller. This controller provides a
 virtual serial port. The board controller is enabled via a GPIO pin.
 
@@ -123,6 +130,7 @@ this pin is initialized by your application if you want to control the low
 power LCD.
 
 ### Advanced Energy Monitor
+
 This development kit has an Advanced Energy Monitor. It can be connected to the
 Simplicity Studio development software.
 
@@ -141,6 +149,7 @@ defaults to GDB debug symbols, but Simplicity Studio requires DWARF-2 debug
 symbols (`-gdwarf-2` for GCC).
 
 ### Clock selection
+
 There are several clock sources that are available for the different
 peripherals. You are advised to read [AN0004.0](https://www.silabs.com/documents/public/application-notes/an0004.0-efm32-cmu.pdf)
 to get familiar with the different clocks.
@@ -178,6 +187,7 @@ You can override the branch's clock source by adding `CLOCK_LFA=source` to your
 compiler defines, e.g. `CLOCK_LFA=cmuSelect_LFRCO`.
 
 ### Low-power peripherals
+
 The low-power UART is capable of providing an UART peripheral using a low-speed
 clock. When the LFB clock source is the LFRCO or LFXO, it can still be used in
 EM2. However, this limits the baud rate to 9600 baud. If a higher baud rate is
@@ -187,6 +197,7 @@ desired, set the clock source to CORELEDIV2.
 this setting. Ensure you do not refer to any low-power peripherals.
 
 ### RTC or RTT
+
 RIOT-OS has support for *Real-Time Tickers* and *Real-Time Clocks*.
 
 However, this board MCU family has support for a 32-bit *Real-Time Clock and
@@ -196,6 +207,7 @@ Therefore, only one of both peripherals can be enabled at the same time.
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
 
 ### Hardware crypto
+
 This MCU is equipped with a hardware-accelerated crypto peripheral that can
 speed up AES128, AES256, SHA1, SHA256 and several other cryptographic
 computations.
@@ -203,6 +215,7 @@ computations.
 A peripheral driver interface is proposed, but not yet implemented.
 
 ### Usage of EMLIB
+
 This port makes uses of EMLIB by Silicon Labs to abstract peripheral registers.
 While some overhead is to be expected, it ensures proper setup of devices,
 provides chip errata and simplifies development. The exact overhead depends on
@@ -215,6 +228,7 @@ that peripherals are used properly. To enable this, pass `DEBUG_EFM` to your
 compiler.
 
 ### Pin locations
+
 The EFM32 platform supports peripherals to be mapped to different pins
 (predefined locations). The definitions in `periph_conf.h` mostly consist of a
 location number and the actual pins. The actual pins are required to configure
@@ -228,37 +242,34 @@ This MCU has extended pin mapping support. Each pin of a peripheral can be
 connected separately to one of the predefined pins for that peripheral.
 
 ## Flashing the device
+
 To flash, [SEGGER JLink](https://www.segger.com/jlink-software.html) is
 required.
 
 Flashing is supported by RIOT-OS using the command below:
 
-```
-make flash
+```shell
+BOARD=slstk3402a make flash
 ```
 
 To run the GDB debugger, use the command:
 
-```
-make debug
+```shell
+BOARD=slstk3402a make debug
 ```
 
 Or, to connect with your own debugger:
 
-```
-make debug-server
+```shell
+BOARD=slstk3402a make debug-server
 ```
 
 Some boards have (limited) support for emulation, which can be started with:
 
+```shell
+BOARD=slstk3402a make emulate
 ```
-make emulate
-```
-
-## Supported Toolchains
-For using the Silicon Labs SLSTK3402A starter kit we strongly recommend
-the usage of the [GNU Tools for ARM Embedded Processors](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
-toolchain.
 
 ## License information
+
 Silicon Labs' EMLIB: zlib-style license (permits distribution of source).
