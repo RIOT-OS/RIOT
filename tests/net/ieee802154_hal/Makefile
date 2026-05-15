@@ -62,6 +62,7 @@ USEMODULE += ps
 USEMODULE += event_thread
 USEMODULE += event_callback
 USEMODULE += xtimer
+USEMODULE += ztimer_msec
 USEMODULE += netdev_default
 
 include $(RIOTBASE)/Makefile.include
