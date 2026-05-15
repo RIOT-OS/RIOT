@@ -403,7 +403,9 @@ int _config_addr_filter(ieee802154_dev_t *dev, ieee802154_af_cmd_t cmd, const vo
         break;
     case IEEE802154_AF_EXT_ADDR:
         eui64_t addr;
-        addr.uint64.u64 = byteorder_swapll(*(uint64_t *)value);
+        uint64_t tmp;
+        memcpy(&tmp, value, sizeof(uint64_t));
+        addr.uint64.u64 = byteorder_swapll(tmp);
         kw41zrf_set_addr_long(&intern_dev, &addr);
         break;
     case IEEE802154_AF_PANID:
