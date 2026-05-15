@@ -269,6 +269,9 @@ static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
         case IEEE802154_DEV_TYPE_ESP_IEEE802154:
             printf("esp_ieee802154");
             break;
+        case IEEE802154_DEV_TYPE_AT86RF215:
+            printf("at86rf215");
+            break;
     }
 
     puts(".");
@@ -319,9 +322,11 @@ static int _init(void)
     expect(res >= 0);
 
     /* Set PHY configuration */
-    ieee802154_phy_conf_t conf = { .channel=CONFIG_IEEE802154_DEFAULT_CHANNEL,
-                                   .page=CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE,
-                                   .pow=CONFIG_IEEE802154_DEFAULT_TXPOWER};
+    ieee802154_phy_conf_t conf = {  .phy_mode=CONFIG_IEEE802154_DEFAULT_PHY_MODE,
+                                    .channel=CONFIG_IEEE802154_DEFAULT_CHANNEL,
+                                    .page=CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE,
+                                    .pow=CONFIG_IEEE802154_DEFAULT_TXPOWER
+                                 };
 
     res = ieee802154_radio_config_phy(&_radio, &conf);
     expect(res >= 0);
