@@ -210,7 +210,7 @@ static int _ads1x1x_init_test(i2c_t i2c, uint8_t addr)
 int ads1x1x_init(ads1x1x_t *dev, const ads1x1x_params_t *params)
 {
     assert(dev && params);
-    assert(dev->params.bits_res > ADS1X1X_BITS_RES_UNDEF && params->dr != ADS1X1X_DATAR_UNDEF);
+    assert(params->bits_res > ADS1X1X_BITS_RES_UNDEF && params->dr != ADS1X1X_DATAR_UNDEF);
 
     DEBUG("[ads1x1x] init - i2c=%d, addr=0x%02x\n", params->i2c, params->addr);
 
