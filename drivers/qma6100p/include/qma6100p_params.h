@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2025 Baptiste Le Duc <baptiste.leduc38@gmail.com>
+ * SPDX-FileCopyrightText: 2025 Baptiste Le Duc <baptiste.leduc@etik.com>
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
@@ -12,7 +12,7 @@
  * @file
  * @brief       Default configuration for the QST QMA6100P accelerometer
  *
- * @author      Baptiste Le Duc <baptiste.leduc38@gmail.com>
+ * @author      Baptiste Le Duc <baptiste.leduc@etik.com>
  */
 
 #include "periph/i2c.h"
