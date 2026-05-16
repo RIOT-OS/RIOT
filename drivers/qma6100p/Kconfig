@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2020 Freie Universitaet Berlin
+# SPDX-FileCopyrightText: 2020 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
+menu "MMA8X5X driver"
+    depends on USEMODULE_MMA8X5X
+
+config MMA8X5X_I2C_ADDRESS
+    hex "Default I2C address"
+    range 0x1C 0x1D
+    default 0x1D
+    help
+        The address value depends on the state of SA0 Address Pin
+        in the case of MMA845x series sensors.
+        For more details refer Table 1 in datasheet
+        (MMA8451Q/MMA8452Q/MMA8453Q)
+        Default value corresponds to SA0 connected to VCC.
+
+endmenu # MMA8X5X driver
