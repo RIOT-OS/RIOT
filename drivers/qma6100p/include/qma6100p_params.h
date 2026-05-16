@@ -48,13 +48,13 @@ extern "C" {
 
 
 /**
- * @def QMA6100P_PARAM_ADDR
+ * @def QMA6100P_PARAM_I2C_ADDR
  * @brief Default I2C address: must be defined by the board depending on AD0 pin wiring.
  *        Use @ref QMA6100P_I2C_ADDR_LOW (0x12) when AD0 is connected to GND,
  *        or @ref QMA6100P_I2C_ADDR_HIGH (0x13) when AD0 is connected to VDD.
  */
-#ifndef QMA6100P_PARAM_ADDR
-#  define QMA6100P_PARAM_ADDR       (GPIO_UNDEF)
+#ifndef QMA6100P_PARAM_I2C_ADDR
+#  define QMA6100P_PARAM_I2C_ADDR       (GPIO_UNDEF)
 #endif
 
 /**
@@ -104,7 +104,7 @@ extern "C" {
  */
 #ifndef QMA6100P_PARAMS
 #  define QMA6100P_PARAMS           { .i2c     = QMA6100P_PARAM_I2C,     \
-                                      .addr    = QMA6100P_PARAM_ADDR,    \
+                                      .addr    = QMA6100P_PARAM_I2C_ADDR,    \
                                       .rate    = QMA6100P_PARAM_RATE,    \
                                       .range   = QMA6100P_PARAM_RANGE,   \
                                       .mclk    = QMA6100P_PARAM_MCLK,    \
