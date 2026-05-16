@@ -76,8 +76,6 @@ extern "C" {
 /**
  * @def QMA6100P_PARAM_MCLK
  * @brief Default master clock frequency selection.
- *        Determines the actual ODR values — use QMA6100P_PM_MCLK_51K2
- *        unless power consumption must be reduced.
  */
 #ifndef QMA6100P_PARAM_MCLK
 #  define QMA6100P_PARAM_MCLK       (QMA6100P_PM_MCLK_51K2)

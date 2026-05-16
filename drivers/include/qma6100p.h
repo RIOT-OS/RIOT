@@ -15,20 +15,20 @@
  * initialization the accelerometer will make measurements at periodic times.
  * The measurements period and scale range can be determined by accelerometer
  * initialization.
- * This driver only implements basic functionality (i.e. no support
- * for external interrupt pins).
+ * This driver only implements basic functionality: data-ready interrupt
+ * support only (no tap, motion, step, or FIFO interrupts).
  *
  * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file
- * @brief       Interface definition for the MMA8x5x accelerometer driver.
+ * @brief       Interface definition for the QMA6100P accelerometer driver.
  *
- * @author      Johann Fischer <j.fischer@phytec.de>
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Baptiste Le Duc <baptiste.leduc@etik.com>
  */
 
 #include <stdint.h>
+#include "periph/gpio.h"
 #include "periph/i2c.h"
 
 #ifdef __cplusplus
@@ -36,153 +36,220 @@ extern "C" {
 #endif
 
 /**
- * @brief Named return values
- */
-enum {
-    ADS1X1X_OK          = 0,    /**< Operation successful */
-    ADS1X1X_NOI2C       = -1,   /**< I2C communication error */
-    ADS1X1X_NODEV       = -2,   /**< No device found on the bus */
-    ADS1X1X_NODATA      = -3,   /**< No data available */
-    ADS1X1X_INVALID_ARG = -4,   /**< Invalid argument */
-    ADS1X1X_GPIO_ERROR  = -5    /**< GPIO error */
-};
-
-/**
- * @brief   Available range options
- */
-enum {
-    MMA8X5X_RANGE_2G = 0,           /**< +/- 2 g Full Scale Range */
-    MMA8X5X_RANGE_4G = 1,           /**< +/- 4 g Full Scale Range */
-    MMA8X5X_RANGE_8G = 2            /**< +/- 8 g Full Scale Range */
-};
-
-/**
  * @brief   Named return values
  */
 enum {
-    MMA8X5X_OK          =  0,       /**< everything was fine */
-    MMA8X5X_DATA_READY  =  1,       /**< new data ready to be read */
-    MMA8X5X_NOI2C       = -1,       /**< I2C communication failed */
-    MMA8X5X_NODEV       = -2,       /**< no MMA8X5X device found on the bus */
-    MMA8X5X_NODATA      = -3        /**< no data available */
+    QMA6100P_OK          =  0,  /**< everything was fine */
+    QMA6100P_DATA_READY  =  1,  /**< new data ready to be read */
+    QMA6100P_NOI2C       = -1,  /**< I2C communication failed */
+    QMA6100P_NODEV       = -2,  /**< no QMA6100P device found on the bus */
+    QMA6100P_NODATA      = -3,  /**< no data available */
+    QMA6100P_INVALID_ARG = -4,  /**< invalid argument */
+    QMA6100P_GPIO_ERROR  = -5,  /**< GPIO error */
 };
+
+/**
+ * @brief   Full-scale range selection for the QMA6100P accelerometer
+ *
+ * Values map directly to bits[3:0] of the RANGE register (0x0F).
+ * Higher range = lower sensitivity.
+ */
+typedef enum {
+    QMA6100P_RANGE_2G          = 0x01, /**< ±2g  — sensitivity 4096 LSB/g */
+    QMA6100P_RANGE_4G          = 0x02, /**< ±4g  — sensitivity 2048 LSB/g */
+    QMA6100P_RANGE_8G          = 0x04, /**< ±8g  — sensitivity 1024 LSB/g */
+    QMA6100P_RANGE_16G         = 0x08, /**< ±16g — sensitivity  512 LSB/g */
+    QMA6100P_RANGE_32G         = 0x0F, /**< ±32g — sensitivity  256 LSB/g */
+} qma6100p_range_t;
+
+/**
+ * @brief   Output data rate selection
+ *
+ * Values map directly to bits[4:0] of the ODR register (0x10).
+ * Assumes MCLK=51.2KHz (default after init sequence).
+ */
+typedef enum {
+    QMA6100P_ODR_100HZ  = 0x00, /**< 100 Hz (default) */
+    QMA6100P_ODR_200HZ  = 0x01, /**< 200 Hz */
+    QMA6100P_ODR_400HZ  = 0x02, /**< 400 Hz */
+    QMA6100P_ODR_800HZ  = 0x03, /**< 800 Hz */
+    QMA6100P_ODR_1600HZ = 0x04, /**< 1600 Hz */
+    QMA6100P_ODR_50HZ   = 0x05, /**< 50 Hz */
+    QMA6100P_ODR_25HZ   = 0x06, /**< 25 Hz */
+    QMA6100P_ODR_12HZ5  = 0x07, /**< 12.5 Hz */
+} qma6100p_odr_t;
+
+/**
+ * @brief   INT pin active level
+ */
+typedef enum {
+    QMA6100P_INT_PIN_ACTIVE_HIGH = 0, /**< INT pin active HIGH on interrupt */
+    QMA6100P_INT_PIN_ACTIVE_LOW  = 1, /**< INT pin active LOW on interrupt */
+} qma6100p_int_pin_active_level_t;
+
+/**
+ * @brief   INT pin output mode
+ */
+typedef enum {
+    QMA6100P_INT_PIN_PUSH_PULL  = 0, /**< INT pin configured as push-pull */
+    QMA6100P_INT_PIN_OPEN_DRAIN = 1, /**< INT pin configured as open drain */
+} qma6100p_int_pin_mode_t;
+
+/**
+ * @brief   INT latch mode
+ */
+typedef enum {
+    QMA6100P_INT_NON_LATCH = 0, /**< INT pulse clears automatically */
+    QMA6100P_INT_LATCH     = 1, /**< INT held until acknowledged via @ref qma6100p_ack_int */
+} qma6100p_int_latch_t;
+
+/**
+ * @brief   INT status clear behavior
+ */
+typedef enum {
+    QMA6100P_INT_CLR_ON_ANY_READ = 0, /**< INT_STATUS bits cleared on any read */
+    QMA6100P_INT_CLR_ON_LATCH    = 1, /**< INT_STATUS bits cleared only if latched */
+} qma6100p_int_clear_t;
+
+/**
+ * @brief   QMA6100P interrupt callback
+ */
+typedef void (*qma6100p_int_cb_t)(void *);
+
+/**
+ * @brief   Interrupt configuration parameters
+ */
+typedef struct {
+    gpio_t interrupt_pin;                             /**< GPIO connected to INT pin */
+    qma6100p_int_pin_active_level_t active_level_int; /**< active level of INT pin */
+    qma6100p_int_pin_mode_t pin_mode_int;             /**< push-pull or open drain for INT */
+    qma6100p_int_latch_t interrupt_latch;             /**< interrupt pulse behavior of INT */
+    qma6100p_int_clear_t interrupt_clear_behavior;    /**< interrupt status clear behavior */
+} qma6100p_int_params_t;
+
+/**
+ * @brief   Interrupt descriptor
+ */
+typedef struct {
+    qma6100p_int_params_t params; /**< interrupt configuration */
+    qma6100p_int_cb_t cb;         /**< callback function */
+    void *arg;                    /**< callback argument */
+} qma6100p_int_t;
 
 /**
  * @brief   Configuration parameters
  */
 typedef struct {
-    i2c_t i2c;                  /**< I2C bus the device is connected to */
-    uint8_t addr;               /**< I2C bus address of the device */
-    uint8_t rate;               /**< sampling rate to use */
-    uint8_t range;              /**< scale range to use */
-    uint8_t offset[3];          /**< data offset in X, Y, and Z direction */
-} mma8x5x_params_t;
+    i2c_t i2c;              /**< I2C bus the device is connected to */
+    uint8_t addr;           /**< I2C address (@ref QMA6100P_I2C_ADDR_AD0_LOW or _HIGH) */
+    qma6100p_odr_t rate;    /**< output data rate */
+    qma6100p_range_t range; /**< full-scale range */
+    uint8_t offset[3];      /**< user offset correction for X, Y, Z [applied at init] */
+} qma6100p_params_t;
 
 /**
- * @brief   Device descriptor for MMA8x5x accelerometers
+ * @brief   Device descriptor for QMA6100P accelerometer
  */
 typedef struct {
-    mma8x5x_params_t params;    /**< device configuration parameters */
-} mma8x5x_t;
+    qma6100p_params_t params; /**< device configuration parameters */
+} qma6100p_t;
 
 /**
- * @brief   Data type for the result data
+ * @brief   Raw 14-bit acceleration data (ADC counts)
  */
 typedef struct {
-    int16_t x;                  /**< acceleration in X direction */
-    int16_t y;                  /**< acceleration in Y direction */
-    int16_t z;                  /**< acceleration in Z direction */
-} mma8x5x_data_t;
+    int16_t x; /**< raw ADC counts in X direction */
+    int16_t y; /**< raw ADC counts in Y direction */
+    int16_t z; /**< raw ADC counts in Z direction */
+} qma6100p_raw_data_t;
 
 /**
- * @brief   Initialize the MMA8x5x accelerometer driver.
+ * @brief   Converted acceleration data in g
+ */
+typedef struct {
+    float x; /**< acceleration in X direction [g] */
+    float y; /**< acceleration in Y direction [g] */
+    float z; /**< acceleration in Z direction [g] */
+} qma6100p_data_t;
+/**
+ * @brief   Initialize the QMA6100P accelerometer driver.
+ *
+ * Applies offset correction from @p params, sets ODR and range, then
+ * puts the device into active mode.
  *
  * @param[out] dev          device descriptor of accelerometer to initialize
  * @param[in]  params       configuration parameters
  *
- * @return                  MMA8X5X_OK on success
- * @return                  MMA8X5X_NOI2C if initialization of I2C bus failed
- * @return                  MMA8X5X_NODEV if accelerometer test failed
+ * @return                  QMA6100P_OK on success
+ * @return                  QMA6100P_NOI2C if initialization of I2C bus failed
+ * @return                  QMA6100P_NODEV if accelerometer test failed
  */
-int mma8x5x_init(mma8x5x_t *dev, const mma8x5x_params_t *params);
-
-/**
- * @brief   Set user offset correction
- *
- * Offset correction registers will be erased after accelerometer reset.
- *
- * @param[out] dev          device descriptor of accelerometer to initialize
- * @param[in]  x            offset correction value for x-axis
- * @param[in]  y            offset correction value for y-axis
- * @param[in]  z            offset correction value for z-axis
- */
-void mma8x5x_set_user_offset(const mma8x5x_t *dev, int8_t x, int8_t y, int8_t z);
+int qma6100p_init(qma6100p_t *dev, const qma6100p_params_t *params);
 
 /**
  * @brief   Set active mode, this enables periodic measurements
  *
- * @param[out] dev          device descriptor of accelerometer to reset
+ * @param[in]  dev          device descriptor of accelerometer
  */
-void mma8x5x_set_active(const mma8x5x_t *dev);
+void qma6100p_set_active(const qma6100p_t *dev);
 
 /**
  * @brief   Set standby mode.
  *
  * @param[in]  dev          device descriptor of accelerometer
  */
-void mma8x5x_set_standby(const mma8x5x_t *dev);
+void qma6100p_set_standby(const qma6100p_t *dev);
 
 /**
  * @brief   Check for new set of measurement data
  *
  * @param[in]  dev          device descriptor of accelerometer
  *
- * @return                  MMA8X5X_DATA_READY if new sample is ready
- * @return                  MMA8X5X_NODATA if nothing is available
+ * @return                  QMA6100P_DATA_READY if new sample is ready
+ * @return                  QMA6100P_NODATA if nothing is available
  */
-int mma8x5x_is_ready(const mma8x5x_t *dev);
+int qma6100p_is_ready(const qma6100p_t *dev);
 
 /**
- * @brief   Read accelerometer's data
- *
- * Acceleration will be calculated as:<br>
- *     \f$ a = \frac{value \cdot 1000}{1024} \cdot mg \f$ if full scale is set
- *     to 2g<br>
- *     \f$ a = \frac{value \cdot 1000}{512} \cdot mg \f$ if full scale is set to
- *     4g<br>
- *     \f$ a = \frac{value \cdot 1000}{256} \cdot mg \f$ if full scale is set to
- *     8g<br>
+ * @brief   Read raw accelerometer data (ADC counts)
  *
  * @param[in]  dev          device descriptor of accelerometer
- * @param[out] data         the current acceleration data [in mg]
+ * @param[out] data         raw ADC counts per axis
  */
-void mma8x5x_read(const mma8x5x_t *dev, mma8x5x_data_t *data);
+void qma6100p_read_raw(const qma6100p_t *dev, qma6100p_raw_data_t *data);
 
 /**
- * @brief   Configure motion detection interrupt
+ * @brief   Read accelerometer data converted to g
  *
- * User needs to configure MCU side of the selected int pin.  mma8x5x will set
- * the pin to low on interrupt.  Before another interrupt can occur, the
- * current interrupt must be acknowledged using @p mma8x5x_ack_int().
+ * Converts raw counts using the configured range sensitivity.
  *
- * @param[in]   dev         device descriptor of accelerometer
- * @param[in]   int_pin     select mma8x5x int pin (1 or 2)
- * @param[in]   threshold   motion detection threshold (see datasheet)
+ * @param[in]  dev          device descriptor of accelerometer
+ * @param[out] data         acceleration in g per axis
  */
-void mma8x5x_set_motiondetect(const mma8x5x_t *dev, uint8_t int_pin, uint8_t threshold);
+void qma6100p_read(const qma6100p_t *dev, qma6100p_data_t *data);
+/**
+ * @brief   Configure data-ready interrupt
+ *
+ * @param[in]  dev          device descriptor of accelerometer
+ * @param[in]  int_params   interrupt configuration parameters
+ * @param[in]  cb           callback invoked on interrupt
+ * @param[in]  arg          argument passed to callback
+ *
+ * @return                  QMA6100P_OK on success
+ * @return                  QMA6100P_GPIO_ERROR if GPIO initialization failed
+ */
+int qma6100p_set_int(const qma6100p_t *dev, const qma6100p_int_params_t *int_params,
+                     qma6100p_int_cb_t cb, void *arg);
 
 /**
- * @brief   Acknowledge motion detection interrupt
+ * @brief   Acknowledge interrupt
  *
- * Acknowledges (clears) a motion detection interrupt.
- * See @ref mma8x5x_set_motiondetect().
+ * Clears the interrupt status register. Do not call from within an ISR
+ * as this performs an I2C transaction.
  *
- * @warning: this does incur an I2C write, thus should not be done from within
- *           the ISR.
- *
- * @param[in]   dev         device descriptor of accelerometer
+ * @param[in]  dev          device descriptor of accelerometer
  */
-void mma8x5x_ack_int(const mma8x5x_t *dev);
+void qma6100p_ack_int(const qma6100p_t *dev);
 
 #ifdef __cplusplus
 }
