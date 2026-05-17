@@ -80,6 +80,18 @@ typedef enum {
 } qma6100p_odr_t;
 
 /**
+ * @brief  Mode selection
+ *
+ * Work mode is controlled by PM_REGISTER (0x11) and can be set through I2C commands.
+ *
+ * @warning By default, QMA6100P is in intermediate state after power on but it shouldn't be keep for any applications.
+ */
+typedef enum {
+    QMA6100P_MODE_INTERMEDIATE = 0, /**< After power on state, shouldn't be keep */
+    QMA6100P_MODE_ACTIVE = 1, /**< Processes the interrupts and send data to results registers */
+    QMA6100P_MODE_ULPS = 2 , /**< Ultra-Low Power State */
+} qma6100p_mode_t;
+/**
  * @brief   INT pin active level
  */
 typedef enum {
@@ -145,6 +157,7 @@ typedef struct {
     qma6100p_odr_t rate;    /**< output data rate */
     qma6100p_range_t range; /**< full-scale range */
     uint8_t offset[3];      /**< user offset correction for X, Y, Z [applied at init] */
+    qma6100p_mode_t mode;   /**< operating mode */
 } qma6100p_params_t;
 
 /**
@@ -187,11 +200,16 @@ typedef struct {
 int qma6100p_init(qma6100p_t *dev, const qma6100p_params_t *params);
 
 /**
- * @brief   Set active mode, this enables periodic measurements
+ * @brief   Set operating mode.
  *
- * @param[in]  dev          device descriptor of accelerometer
+ * @param[in,out]  dev       device descriptor of accelerometer
+ * @param[in]      mode      mode to set (@ref QMA6100P_MODE_ACTIVE or @ref QMA6100P_MODE_INTERMEDIATE)
+ *
+ * @return                   QMA6100P_OK on success
+ * @return                   QMA6100P_NOI2C if I2C transaction failed
+ * @return                   QMA6100P_NODEV if device not found on bus
  */
-void qma6100p_set_active(const qma6100p_t *dev);
+int qma6100p_set_mode(qma6100p_t *dev, qma6100p_mode_t mode);
 
 /**
  * @brief   Set standby mode.

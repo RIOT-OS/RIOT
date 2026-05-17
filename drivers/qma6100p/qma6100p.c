@@ -30,6 +30,9 @@
 #define BUS                 (dev->params.i2c)
 #define ADDR                (dev->params.addr)
 
+/** Print out a message that function is not yet implemented */
+#define NOT_YET_IMPLEMENTED()     DEBUG("%s not yet implemented\n", __func__)
+
 static inline int _read_reg(i2c_t i2c, uint8_t addr, uint8_t reg_addr,
                             uint8_t *reg_value)
 {
@@ -98,7 +101,88 @@ int qma6100p_init(qma6100p_t *dev, const qma6100p_params_t *params)
         return res;
     }
 
-    DEBUG("[qma6100p] init: successful\n");
     dev->params = *params;
+
+    res = qma6100p_set_mode(dev, params->mode);
+    if (res < 0) {
+        return res;
+    }
+
+    DEBUG("[qma6100p] init: successful\n");
     return QMA6100P_OK;
+}
+
+/* TODO: implement qma6100p_disable_set_interrupt (during interrupt feature support) */
+static int qma6100p_disable_set_interrupt(const qma6100p_t *dev)
+{
+    (void) dev;
+    NOT_YET_IMPLEMENTED();
+    return 0;
+}
+
+/* TODO: test and add named macros for the ULPS register sequence (0x46, 0x4A) */
+static int qma6100p_enter_ulps_mode(const qma6100p_t *dev)
+{
+    int res;
+
+    res = _write_reg(BUS, ADDR, QMA6100P_REG_PM, 0x87);
+    if (res < 0) {
+        return res;
+    }
+
+    res = _write_reg(BUS, ADDR, 0x46, 0x0F);
+    if (res < 0) {
+        return res;
+    }
+
+    res = _write_reg(BUS, ADDR, 0x4A, 0x00);
+    if (res < 0) {
+        return res;
+    }
+
+    res = qma6100p_disable_set_interrupt(dev);
+    if (res < 0) {
+        DEBUG("[qma6100p] enter_ulps_mode - error failed to disable set interrupt\n");
+        return res;
+    }
+
+    return res;
+}
+
+int qma6100p_set_mode(qma6100p_t *dev, qma6100p_mode_t mode)
+{
+    int res;
+    uint8_t pm;
+
+    assert(dev);
+
+    i2c_acquire(BUS);
+
+    res = _read_reg(BUS, ADDR, QMA6100P_REG_PM, &pm);
+    if (res < 0) {
+        DEBUG("[qma6100p] set_mode - error: failed to read PM register\n");
+        goto out;
+    }
+
+    pm &= ~QMA6100P_PM_MODE_MASK;
+    if (mode == QMA6100P_MODE_ULPS) {
+        res = qma6100p_enter_ulps_mode(dev);
+        if (res < 0) {
+            DEBUG("[qma6100p] set_mode - error: failed to enter ulps mode\n");
+            goto out;
+        }
+    }
+
+    pm |= mode;
+    res = _write_reg(BUS, ADDR, QMA6100P_REG_PM, pm);
+    if (res < 0) {
+        DEBUG("[qma6100p] set_mode - error: failed to write PM register\n");
+        goto out;
+    }
+
+    dev->params.mode = mode;
+
+out:
+    i2c_release(BUS);
+    return res;
 }

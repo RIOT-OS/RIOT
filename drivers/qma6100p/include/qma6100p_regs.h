@@ -95,7 +95,7 @@ extern "C"
  * Default 0x00 after POR — device is in standby. Write MODE=1 to activate.
  * @{
  */
-#define QMA6100P_PM_MODE            (1 << 7) /**< 0=standby (POR default), 1=active */
+#define QMA6100P_PM_MODE_MASK       (1 << 7) /**< mask for mode bit */
 /* bit6 RESERVED */
 #define QMA6100P_PM_SINC_SHIFT      (4)
 #define QMA6100P_PM_SINC_MASK       (0x03 << QMA6100P_PM_SINC_SHIFT) /**< T_RSTB_SINC[1:0] */

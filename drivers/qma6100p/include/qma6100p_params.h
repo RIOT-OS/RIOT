@@ -83,6 +83,14 @@ extern "C" {
 #endif
 
 /**
+ * @def QMA6100P_PARAM_MODE
+ * @brief Default mode
+ */
+#ifndef QMA6100P_PARAM_MODE
+#  define QMA6100P_PARAM_MODE     (QMA6100P_MODE_ACTIVE)
+#endif
+
+/**
  * @def QMA6100P_PARAM_INT_PIN
  * @brief Default interrupt pin. Set to GPIO_UNDEF to disable interrupt-driven
  *        operation and use polling instead.
@@ -135,7 +143,8 @@ extern "C" {
                                       .addr    = QMA6100P_PARAM_I2C_ADDR,    \
                                       .rate    = QMA6100P_PARAM_RATE,    \
                                       .range   = QMA6100P_PARAM_RANGE,   \
-                                      .offset  = QMA6100P_PARAM_OFFSET }
+                                      .offset  = QMA6100P_PARAM_OFFSET,  \
+                                      .mode    = QMA6100P_PARAM_MODE }
 #endif
 
 /**
