@@ -1,1 +1,20 @@
+ifneq (,$(filter lpc1768_eth_auto,$(USEMODULE)))
+  USEMODULE += lpc1768_eth_link_up
+endif
+
+ifneq (,$(filter lpc1768_eth_link_up,$(USEMODULE)))
+  USEMODULE += ztimer_periodic
+endif
+
+ifneq (,$(filter lpc1768_eth,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_eth
+  FEATURES_REQUIRED += periph_gpio
+
+  USEMODULE += iolist
+  USEMODULE += netdev_eth
+  USEMODULE += netdev_new_api
+  USEMODULE += ztimer_msec
+  USEMODULE += ztimer_usec
+endif
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep
