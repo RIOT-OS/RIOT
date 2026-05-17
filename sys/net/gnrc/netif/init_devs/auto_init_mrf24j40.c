@@ -54,8 +54,8 @@ void auto_init_mrf24j40(void)
 
         /* Init Bottom Half Processor (with events module) and radio */
         bhp_event_init(&mrf24j40_bhp[i], &_netif[i].evq[GNRC_NETIF_EVQ_INDEX_PRIO_HIGH], &mrf24j40_radio_irq_handler, &mrf24j40_netdev[i].submac.dev);
-        mrf24j40_init(&mrf24j40_devs[i], (mrf24j40_params_t*) p,&mrf24j40_netdev[i].submac.dev,
-                        bhp_event_isr_cb, &mrf24j40_bhp[i]);
+        mrf24j40_init(&mrf24j40_devs[i], (mrf24j40_params_t*) p, &mrf24j40_netdev[i].submac.dev,
+                      bhp_event_isr_cb, &mrf24j40_bhp[i]);
 
         netdev_register(&mrf24j40_netdev[i].dev.netdev, NETDEV_MRF24J40, i);
         netdev_ieee802154_submac_init(&mrf24j40_netdev[i]);
