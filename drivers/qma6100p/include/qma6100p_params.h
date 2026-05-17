@@ -74,11 +74,11 @@ extern "C" {
 #endif
 
 /**
- * @def QMA6100P_PARAM_MCLK
- * @brief Default master clock frequency selection.
+ * @def QMA6100P_PARAM_OFFSET
+ * @brief Default per-axis calibration offset (X, Y, Z) in raw LSB units
  */
-#ifndef QMA6100P_PARAM_MCLK
-#  define QMA6100P_PARAM_MCLK       (QMA6100P_PM_MCLK_51K2)
+#ifndef QMA6100P_PARAM_OFFSET
+#  define QMA6100P_PARAM_OFFSET     { 0, 0, 0 }
 #endif
 
 /**
