@@ -54,7 +54,8 @@ extern "C" {
  *        or @ref QMA6100P_I2C_ADDR_HIGH (0x13) when AD0 is connected to VDD.
  */
 #ifndef QMA6100P_PARAM_I2C_ADDR
-#  define QMA6100P_PARAM_I2C_ADDR       (GPIO_UNDEF)
+#  define QMA6100P_PARAM_I2C_ADDR_UNDEF (GPIO_UNDEF)
+#  define QMA6100P_PARAM_I2C_ADDR       (QMA6100P_I2C_ADDR_LOW)
 #endif
 
 /**
