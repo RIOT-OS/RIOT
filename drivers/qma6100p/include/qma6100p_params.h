@@ -87,15 +87,42 @@ extern "C" {
  *        operation and use polling instead.
  */
 #ifndef QMA6100P_PARAM_INT_PIN
-#  define QMA6100P_PARAM_INT_PIN    (GPIO_UNDEF)
+#  define QMA6100P_PARAM_INT_PIN_UNDEF (GPIO_UNDEF)
+#  define QMA6100P_PARAM_INT_PIN    (QMA6100P_PARAM_INT_PIN_UNDEF)
 #endif
 
 /**
- * @def QMA6100P_PARAM_OFFSET
- * @brief Default per-axis calibration offset (X, Y, Z) in raw LSB units
+ * @def QMA6100P_PARAM_INT_ACTIVE_LEVEL
+ * @brief Default interrupt pin active level.
  */
-#ifndef QMA6100P_PARAM_OFFSET
-#  define QMA6100P_PARAM_OFFSET     { 0, 0, 0 }
+#ifndef QMA6100P_PARAM_INT_ACTIVE_LEVEL
+#  define QMA6100P_PARAM_INT_ACTIVE_LEVEL (QMA6100P_INT_ACTIVE_HIGH)
+#endif
+
+/**
+ * @def QMA6100P_PARAM_INT_PIN_MODE
+ * @brief Default interrupt pin output mode (push-pull or open-drain).
+ */
+#ifndef QMA6100P_PARAM_INT_PIN_MODE
+#  define QMA6100P_PARAM_INT_PIN_MODE     (QMA6100P_INT_PUSH_PULL)
+#endif
+
+/**
+ * @def QMA6100P_PARAM_INT_LATCH
+ * @brief Default interrupt latch mode. Non-latched clears automatically;
+ *        latched holds until the status register is read.
+ */
+#ifndef QMA6100P_PARAM_INT_LATCH
+#  define QMA6100P_PARAM_INT_LATCH        (QMA6100P_INT_LATCH_NONE)
+#endif
+
+/**
+ * @def QMA6100P_PARAM_INT_CLEAR
+ * @brief Default interrupt clear behavior. Controls whether any read of
+ *        the status registers (0x09–0x0D) clears all pending interrupts.
+ */
+#ifndef QMA6100P_PARAM_INT_CLEAR
+#  define QMA6100P_PARAM_INT_CLEAR        (QMA6100P_INT_CLEAR_ON_READ)
 #endif
 
 /**
@@ -107,11 +134,20 @@ extern "C" {
                                       .addr    = QMA6100P_PARAM_I2C_ADDR,    \
                                       .rate    = QMA6100P_PARAM_RATE,    \
                                       .range   = QMA6100P_PARAM_RANGE,   \
-                                      .mclk    = QMA6100P_PARAM_MCLK,    \
-                                      .int_pin = QMA6100P_PARAM_INT_PIN, \
                                       .offset  = QMA6100P_PARAM_OFFSET }
 #endif
 
+/**
+ * @def QMA6100P_INT_PARAMS
+ * @brief Default interrupt configuration parameters structure for QMA6100P devices
+ */
+#ifndef QMA6100P_INT_PARAMS
+#  define QMA6100P_INT_PARAMS         { .interrupt_pin            = QMA6100P_PARAM_INT_PIN,          \
+                                        .active_level_int          = QMA6100P_PARAM_INT_ACTIVE_LEVEL, \
+                                        .pin_mode_int              = QMA6100P_PARAM_INT_PIN_MODE,     \
+                                        .interrupt_latch           = QMA6100P_PARAM_INT_LATCH,        \
+                                        .interrupt_clear_behavior  = QMA6100P_PARAM_INT_CLEAR }
+#endif
 /**
  * @def QMA6100P_SAUL_INFO
  * @brief Additional SAUL registry information
