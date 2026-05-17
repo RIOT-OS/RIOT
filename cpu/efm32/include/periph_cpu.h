@@ -652,6 +652,17 @@ typedef struct {
 } uart_conf_t;
 
 /**
+ * @brief   Ethernet peripheral configuration
+ */
+typedef struct {
+    gpio_t phy_en_pin;      /**< PHY power enable, GPIO_UNDEF if unused */
+    gpio_t phy_rst_pin;     /**< PHY reset, GPIO_UNDEF if unused */
+    uint32_t routeloc1;     /**< Pre-shifted bits for ETH->ROUTELOC1 */
+    uint16_t speed;         /**< Default link speed (MII BMCR speed/duplex bits) */
+    uint8_t phy_addr;       /**< MIIM address */
+} eth_conf_t;
+
+/**
  * @brief   CPU provides own pm_off() function
  */
 #define PROVIDES_PM_OFF
