@@ -15,8 +15,6 @@
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
 
-#ifdef MODULE_SAM0_ETH
-
 #include "net/gnrc/netif/ethernet.h"
 #include "sam0_eth_netdev.h"
 #include "include/init_devs.h"
@@ -33,8 +31,4 @@ void auto_init_sam0_eth(void)
     gnrc_netif_ethernet_create(&_netif, stack, GNRC_NETIF_STACKSIZE_DEFAULT,
                                GNRC_NETIF_PRIO, "sam0_eth", &sam0eth);
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_SAM0_ETH */
 /** @} */
