@@ -230,6 +230,7 @@ export default defineConfig({
                 label: "New Features",
                 items: [
                   "advanced_tutorials/creating_modules",
+                  "advanced_tutorials/porting_cpus",
                   "advanced_tutorials/porting_boards",
                   "advanced_tutorials/porting_packages",
                   "advanced_tutorials/device_drivers",
