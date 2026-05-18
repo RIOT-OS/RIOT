@@ -8,7 +8,7 @@
  *
  */
 
-/*
+/**
  * @ingroup     sys_auto_init_gnrc_netif
  * @{
  *

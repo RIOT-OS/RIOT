@@ -17,8 +17,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifdef MODULE_ATWINC15X0
-
 #include "log.h"
 #include "atwinc15x0.h"
 #include "atwinc15x0_params.h"
@@ -67,8 +65,4 @@ void auto_init_atwinc15x0(void)
                                    &dev[i].netdev);
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_ATWINC15X0 */
 /** @} */
