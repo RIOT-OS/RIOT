@@ -76,9 +76,9 @@ typedef struct {
  * @param[in,out] dev  device descriptor
  * @param[in] params   device configuration
  *
- * @return TMP117_OK on success
- * @return TMP117_NODEV if no device is found on the bus
- * @return TMP117_NOI2C if other error occurs
+ * @retval TMP117_OK on success
+ * @retval TMP117_NODEV if no device is found on the bus
+ * @retval TMP117_NOI2C if other error occurs
  */
 int tmp117_init(tmp117_t *dev, const tmp117_params_t *params);
 
