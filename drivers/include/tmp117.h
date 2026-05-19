@@ -11,9 +11,7 @@
  * @brief       Device driver for tmp117 temperature sensor
  *
  * @{
- *
  * @file
- *
  * @author      Léo Cordier <leo.cordier@univ-grenoble-alpes.fr>
  */
 
