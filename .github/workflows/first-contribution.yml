@@ -1,14 +1,31 @@
 name: First-time contributor greeting
 
 on:
-  pull_request:
+  # It's safe to use pull_request_target here, because we aren't checking out
+  # code from the pull request branch.
+  # See https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - ready_for_review
+      - synchronize
 
 permissions:
   pull-requests: write
 
 jobs:
   greet:
-    if: ${{ github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR' }}
+    # Copied from https://github.com/llvm/llvm-project/blob/main/.github/workflows/new-prs.yml
+    # FIRST_TIME_CONTRIBUTOR appears to be buggy and can not be directly
+    # checked for some unknown reason.
+    if: >-
+      (github.event.action == 'opened') &&
+      (github.event.pull_request.author_association != 'COLLABORATOR') &&
+      (github.event.pull_request.author_association != 'CONTRIBUTOR') &&
+      (github.event.pull_request.author_association != 'MANNEQUIN') &&
+      (github.event.pull_request.author_association != 'MEMBER') &&
+      (github.event.pull_request.author_association != 'OWNER')
     runs-on: ubuntu-latest
     steps:
       - name: Comment on PR
