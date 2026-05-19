@@ -14,7 +14,6 @@
 extern "C" {
 #endif
 
-
 /**
  * @brief   Default configuration parameters for TMP117 sensors
  * @{
