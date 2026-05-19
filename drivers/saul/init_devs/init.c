@@ -327,6 +327,10 @@ void saul_init_devs(void)
         extern void auto_init_sht3x(void);
         auto_init_sht3x();
     }
+    if (IS_USED(MODULE_SHT4X)) {
+        extern void auto_init_sht4x(void);
+        auto_init_sht4x();
+    }
     if (IS_USED(MODULE_SHTCX)) {
         extern void auto_init_shtcx(void);
         auto_init_shtcx();
