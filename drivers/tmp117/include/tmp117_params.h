@@ -36,7 +36,7 @@ extern "C" {
 
 
 #ifndef TMP117_PARAMS
-#define TMP117_PARAMS         { .i2c  = TMP117_PARAM_I2C, \
+#  define TMP117_PARAMS       { .i2c  = TMP117_PARAM_I2C, \
 		.addr = TMP117_PARAM_ADDR, \
 		.conv_mode = TMP117_PARAM_CONV_MODE, \
 		.conv_cycle = TMP117_PARAM_CONV_CYCLE, \
