@@ -2,7 +2,7 @@
 
 This is a basic test for TMP117 driver.
 
-# Usage
+## Usage
 
 This test initialize the sensor (address: 0x90) withe the following paramters:
 	
