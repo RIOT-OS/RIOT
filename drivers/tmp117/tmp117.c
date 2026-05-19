@@ -32,7 +32,8 @@
 
 /* Implementation of the module */
 
-int _write_16_reg(tmp117_t *dev,uint8_t reg_addr, uint16_t value){
+int _write_16_reg(tmp117_t *dev,uint8_t reg_addr, uint16_t value
+{
 	uint8_t tmp_buf[2];
 
 	//reorganising value
