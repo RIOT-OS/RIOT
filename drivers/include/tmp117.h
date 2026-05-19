@@ -26,7 +26,7 @@ extern "C" {
  */
 enum {
     TMP117_OK          =  0,       /**< everything was fine */
-	TMP117_DATAREADY   =  1,	   /**< data is ready to be read*/
+    TMP117_DATAREADY   =  1,       /**< data is ready to be read */
     TMP117_NOI2C       = -1,       /**< I2C communication failed */
     TMP117_NODEV       = -2,       /**< no TMP117 device found on the bus */
     TMP117_NODATA      = -3        /**< no data available */
