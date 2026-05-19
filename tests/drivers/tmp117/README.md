@@ -1,4 +1,4 @@
-# Test Application for tmp117 sensor
+## Test Application for TMP117 Sensor
 
 This is a basic test for TMP117 driver.
 
