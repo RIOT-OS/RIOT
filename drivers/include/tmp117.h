@@ -15,7 +15,6 @@
  * @author      Léo Cordier <leo.cordier@univ-grenoble-alpes.fr>
  */
 
-/* Add header includes here */
 #include "periph/i2c.h"
 
 #ifdef __cplusplus
