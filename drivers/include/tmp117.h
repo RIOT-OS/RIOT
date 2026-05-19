@@ -6,7 +6,7 @@
 #pragma once
 
 /**
- * @defgroup    driver TMP117 sensor
+ * @defgroup    driver_tmp117
  * @ingroup     drivers_sensors
  * @brief       Device driver for TMP117 temperature sensor
  *
