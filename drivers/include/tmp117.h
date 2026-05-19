@@ -8,7 +8,7 @@
 /**
  * @defgroup    driver TMP117 sensor
  * @ingroup     drivers_sensors
- * @brief       Device driver for tmp117 temperature sensor
+ * @brief       Device driver for TMP117 temperature sensor
  *
  * @{
  * @file
