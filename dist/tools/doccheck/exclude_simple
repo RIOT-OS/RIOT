@@ -2597,7 +2597,6 @@ warning: Member HDC1000_TRES_MSK (macro definition) of file hdc1000_regs.h is no
 warning: Member HDC1010_PARAM_ADDR (macro definition) of file board.h is not documented.
 warning: Member HDC1010_PARAM_I2C (macro definition) of file board.h is not documented.
 warning: Member HDC1010_PIN_DRDY (macro definition) of file board.h is not documented.
-warning: Member HFXO_FREQ (macro definition) of file periph_conf.h is not documented.
 warning: Member HMC5883L_PARAM_DEV (macro definition) of file hmc5883l_params.h is not documented.
 warning: Member HMC5883L_PARAM_DOR (macro definition) of file hmc5883l_params.h is not documented.
 warning: Member HMC5883L_PARAM_GAIN (macro definition) of file hmc5883l_params.h is not documented.
@@ -3084,7 +3083,6 @@ warning: Member LED_RED_OFF (macro definition) of file board.h is not documented
 warning: Member LED_RED_ON (macro definition) of file board.h is not documented.
 warning: Member LED_RED_PIN (macro definition) of file board.h is not documented.
 warning: Member LED_RED_TOGGLE (macro definition) of file board.h is not documented.
-warning: Member LFXO_FREQ (macro definition) of file periph_conf.h is not documented.
 warning: Member LINEFILL (macro definition) of file ColorTextColors.h is not documented.
 warning: Member LIS2DH12_CLICK_THS_LIR (macro definition) of file lis2dh12_registers.h is not documented.
 warning: Member LIS2DH12_CTRL_REG2_FDS (macro definition) of file lis2dh12_registers.h is not documented.

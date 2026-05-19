@@ -28,10 +28,7 @@ extern "C" {
  * @name    Clock configuration
  * @{
  */
-#define HFXO_FREQ           (39000000UL)
 #define CMU_HFXOINIT        CMU_HFXOINIT_DEFAULT
-
-#define LFXO_FREQ           (32768UL)
 #define CMU_LFXOINIT        CMU_LFXOINIT_DEFAULT
 
 static const clk_mux_t clk_mux_config[] = {

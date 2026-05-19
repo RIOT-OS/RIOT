@@ -98,6 +98,23 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | LCD driver                    | LS013B7DH03 | yes       | Sharp Low Power Memory LCD via the U8g2 package                |
 | Temperature + humidity sensor | Si7021      | yes       | Silicon Labs Temperature + Humidity sensor                     |
 
+## Board configuration
+
+### Clock selection
+There are several clock sources that are available for the different
+peripherals. You are advised to read [AN0004.0](https://www.silabs.com/documents/public/application-notes/an0004.0-efm32-cmu.pdf)
+to get familiar with the different clocks.
+
+| Source | Internal | Speed      | Comments                           |
+|--------|----------|------------|------------------------------------|
+| HFXO   | No       | 39 MHz     |                                    |
+| LFXO   | No       | 32.768 kHz |                                    |
+
+It is important that the clock speeds are known to the code, for proper
+calculations of speeds and baud rates. If the HFXO or LFXO are different from
+the speeds above, ensure to pass `HFXO_FREQ=freq_in_hz` and
+`LFXO_FREQ=freq_in_hz` to your compiler defines.
+
 ## Flashing the device
 
 To flash, [SEGGER JLink](https://www.segger.com/jlink-software.html) is
