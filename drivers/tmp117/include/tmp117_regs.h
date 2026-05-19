@@ -25,7 +25,7 @@ extern "C" {
  * @{
  */
 #define TMP117_REG_TEMP_RESULT       (0x00) /**< temperature register address */
-#define TMP117_REG_CONFIG		     (0x01) /**< configuration register address */
+#define TMP117_REG_CONFIG            (0x01) /**< configuration register address */
 #define TMP117_REG_TEMP_HIGH_LIMIT   (0x02) /**< high temperature limit register address */
 #define TMP117_REG_TEMP_LOW_LIMIT    (0x03) /**< low temperature limit register address */
 #define TMP117_REG_EEPROM_UNLOCK     (0x04) /**< EEPROM unlock register address */
@@ -41,20 +41,20 @@ extern "C" {
  * @name    TMP117 shift mask
  * @{
  */
-#define TMP117_DATA_READY_SHIFT    	13  /**< data ready bit shift in configuration register */
-#define TMP117_CONV_MODE_SHIFT    	10  /**< conversion mode bits shift in configuration register */
-#define TMP117_CONV_CYCLE_SHIFT   	7   /**< conversion cycle bits shift in configuration register */
-#define TMP117_AVG_SHIFT    		5   /**< averaging bits shift in configuration register */
+#define TMP117_DATA_READY_SHIFT     13  /**< data ready bit shift in configuration register */
+#define TMP117_CONV_MODE_SHIFT      10  /**< conversion mode bits shift in configuration register */
+#define TMP117_CONV_CYCLE_SHIFT     7   /**< conversion cycle bits shift in configuration register */
+#define TMP117_AVG_SHIFT            5   /**< averaging bits shift in configuration register */
 /** @} */
 
 /**
  * @name    TMP117 field mask
  * @{
  */
-#define TMP117_CONV_MODE_MASK      	(0x3 << TMP117_CONV_MODE_SHIFT)  /**< conversion mode bits mask in configuration register */
-#define TMP117_CONV_CYCLE_MASK      (0x7 << TMP117_CONV_CYCLE_SHIFT) /**< conversion cycle bits mask in configuration register */
-#define TMP117_AVG_MASK      		(0x3 << TMP117_AVG_SHIFT)        /**< averaging bits mask in configuration register */
-#define TMP117_DATA_READY_MASK      (0x1 << TMP117_DATA_READY_SHIFT) /**< data ready bit mask in configuration register */
+#define TMP117_CONV_MODE_MASK       (0x3 << TMP117_CONV_MODE_SHIFT)     /**< conversion mode bits mask in configuration register */
+#define TMP117_CONV_CYCLE_MASK      (0x7 << TMP117_CONV_CYCLE_SHIFT)    /**< conversion cycle bits mask in configuration register */
+#define TMP117_AVG_MASK             (0x3 << TMP117_AVG_SHIFT)           /**< averaging bits mask in configuration register */
+#define TMP117_DATA_READY_MASK      (0x1 << TMP117_DATA_READY_SHIFT)    /**< data ready bit mask in configuration register */
 
 /** @} */
 
