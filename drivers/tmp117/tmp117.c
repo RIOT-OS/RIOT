@@ -112,7 +112,7 @@ int tmp117_read_temperature(tmp117_t *dev, int *temperature){
 		goto release;
 	}
 
-	*temperature = (value * 25600) / 32768; //converting raw value to centi-degrees
+	*temperature = (((uint32_t) value) * 25600UL) / 32768UL; /* converting raw value to centi-degrees */
 
 	res = TMP117_OK;
 
