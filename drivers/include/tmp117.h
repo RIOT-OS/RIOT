@@ -67,7 +67,7 @@ typedef struct {
 typedef struct {
 	tmp117_params_t params;
 	uint8_t is_initialized;
-}tmp117_t;
+} tmp117_t;
 
 
 /**
