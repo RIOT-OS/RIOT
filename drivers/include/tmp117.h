@@ -21,8 +21,6 @@
 extern "C" {
 #endif
 
-/* Declare the API of the module */
-
 /**
  * @brief   Named return values
  */
