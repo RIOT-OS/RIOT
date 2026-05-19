@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2026 LIG-Geopred
+ * SPDX-FileCopyrightText: 2026 UGA
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
