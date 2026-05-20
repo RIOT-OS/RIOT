@@ -4,7 +4,7 @@
  */
 
 /**
- * @ingroup     module_tmp117
+ * @ingroup     drivers_tmp117
  * @{
  *
  * @file
@@ -52,7 +52,7 @@ static int _read_16_reg(tmp117_t *dev, uint8_t reg_addr, uint16_t *value)
     uint8_t tmp_buf[2];
 
     if (i2c_read_regs(dev->params.i2c, dev->params.addr, reg_addr, tmp_buf, 2, 0)) {
-        printf("[tmp117] unable to read reg %02X\n", reg_addr);
+    	DEBUG("[tmp117] unable to read reg %02X\n", reg_addr);
         return TMP117_NOI2C;
     }
 
@@ -76,19 +76,19 @@ int tmp117_init(tmp117_t *dev, const tmp117_params_t *params)
     uint16_t reg = 0;
 
 
-    status = _read_16_reg(dev, TMP117_REG_dev->params.i2cICE_ID, &reg);
+    status = _read_16_reg(dev, TMP117_REG_DEVICE_ID, &reg);
 
     //checking if sensor is a tmp117
-    if (status < 0 || reg != TMP117_REG_dev->params.i2cICE_ID_DEFAULT_VAL) {
-        printf("[tmp117] init - error: unable to communicate with the device "
+    if (status < 0 || reg != TMP117_REG_DEVICE_ID_DEFAULT_VAL) {
+    	DEBUG("[tmp117] init - error: unable to communicate with the device "
                "(reg=%x)\n", reg);
-        res = TMP117_NOdev->params.i2c;
+        res = TMP117_NOI2C;
         goto release;
     }
 
     //writing configuration register
     if (_write_16_reg(dev, TMP117_REG_CONFIG, DEFAULT_CONFIG_VALUE)) {
-        printf("[tmp117] init - error: unable to set configuration \n");
+    	DEBUG("[tmp117] init - error: unable to set configuration \n");
         goto release;
     }
 
@@ -110,7 +110,7 @@ int tmp117_read_temperature(tmp117_t *dev, int *temperature)
     i2c_acquire(dev->params.i2c);
 
     if (_read_16_reg(dev, TMP117_REG_TEMP_RESULT, &value)) {
-        printf("[tmp117] read - error: unable to read temperature \n");
+    	DEBUG("[tmp117] read - error: unable to read temperature \n");
         goto release;
     }
 
@@ -131,7 +131,7 @@ int tmp117_set_conversion_mode(tmp117_t *dev, tmp117_conv_mode_t mode)
     i2c_acquire(dev->params.i2c);
 
     if (_read_16_reg(dev, TMP117_REG_CONFIG, &value)) {
-        printf("[tmp117] set conv mode - error: unable to read conf reg \n");
+    	DEBUG("[tmp117] set conv mode - error: unable to read conf reg \n");
         goto release;
     }
 
@@ -142,7 +142,7 @@ int tmp117_set_conversion_mode(tmp117_t *dev, tmp117_conv_mode_t mode)
 
     //writing configuration register
     if (_write_16_reg(dev, TMP117_REG_CONFIG, value)) {
-        printf("[tmp117] set conv mode - error: unable to set configuration \n");
+    	DEBUG("[tmp117] set conv mode - error: unable to set configuration \n");
         goto release;
     }
 
@@ -163,7 +163,7 @@ int tmp117_set_conversion_cycle(tmp117_t *dev, tmp117_conv_cycle_t cycle)
     i2c_acquire(dev->params.i2c);
 
     if (_read_16_reg(dev, TMP117_REG_CONFIG, &value)) {
-        printf("[tmp117] set conv cycle - error: unable to read conf reg \n");
+    	DEBUG("[tmp117] set conv cycle - error: unable to read conf reg \n");
         goto release;
     }
 
@@ -174,7 +174,7 @@ int tmp117_set_conversion_cycle(tmp117_t *dev, tmp117_conv_cycle_t cycle)
 
     //writing configuration register
     if (_write_16_reg(dev, TMP117_REG_CONFIG, value)) {
-        printf("[tmp117] set conv cycle - error: unable to set configuration \n");
+    	DEBUG("[tmp117] set conv cycle - error: unable to set configuration \n");
         goto release;
     }
 
@@ -195,7 +195,7 @@ int tmp117_set_averaging(tmp117_t *dev, tmp117_avg_t avg)
     i2c_acquire(dev->params.i2c);
 
     if (_read_16_reg(dev, TMP117_REG_CONFIG, &value)) {
-        printf("[tmp117] set averaging - error: unable to read conf reg \n");
+    	DEBUG("[tmp117] set averaging - error: unable to read conf reg \n");
         goto release;
     }
 
@@ -206,7 +206,7 @@ int tmp117_set_averaging(tmp117_t *dev, tmp117_avg_t avg)
 
     //writing configuration register
     if (_write_16_reg(dev, TMP117_REG_CONFIG, value)) {
-        printf("[tmp117] set averaging - error: unable to set configuration \n");
+        DEBUG("[tmp117] set averaging - error: unable to set configuration \n");
         goto release;
     }
 
@@ -227,7 +227,7 @@ int tmp117_is_data_ready(tmp117_t *dev)
     i2c_acquire(dev->params.i2c);
 
     if (_read_16_reg(dev, TMP117_REG_CONFIG, &value)) {
-        printf("[tmp117] is data ready - error: unable to read conf reg \n");
+        DEBUG("[tmp117] is data ready - error: unable to read conf reg \n");
         goto release;
     }
 
