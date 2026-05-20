@@ -28,6 +28,7 @@
 
 typedef struct {
     const char *input;
+    int len;
     int expected_result;
     iec62056_obis_t obis;
 } test_obis_input_t;
@@ -51,18 +52,28 @@ typedef struct {
 } test_telegram_ctx_t;
 
 static const test_obis_input_t id_tests[] = {
-    { "1-2:3.4.5.6", 0, { 1, 2, 3, 4, 5, 6 } },
-    { "2:3.4.5.6", 0, { 255, 2, 3, 4, 5, 6 } },
-    { "1-3.4.5.6", 0, { 1, 255, 3, 4, 5, 6 } },
-    { "1-2:3.4.5", 0, { 1, 2, 3, 4, 5, 255 } },
-    { "3.4", 0, { 255, 255, 3, 4, 255, 255 } },
-    { "", -1, { 0 } },
-    { "256-2:3.4.5.6", -1, { 0 } },
-    { "1-256:3.4.5.6", -1, { 0 } },
-    { "1-2:256.4.5.6", -1, { 0 } },
-    { "1-2:3.256.5.6", -1, { 0 } },
-    { "1-2:3.4.256.6", -1, { 0 } },
-    { "1-2:3.4.5.256", -1, { 0 } },
+    { "1-2:3.4.5.6", -1, 0, { 1, 2, 3, 4, 5, 6 } },
+    { "2:3.4.5.6", -1, 0, { 255, 2, 3, 4, 5, 6 } },
+    { "1-3.4.5.6", -1, 0, { 1, 255, 3, 4, 5, 6 } },
+    { "1-2:3.4.5", -1, 0, { 1, 2, 3, 4, 5, 255 } },
+    { "3.4", -1, 0, { 255, 255, 3, 4, 255, 255 } },
+
+    /* unparsable */
+    { "", -1, -1, { 0 } },
+    { "256-2:3.4.5.6", -1, -1, { 0 } },
+    { "1-256:3.4.5.6", -1, -1, { 0 } },
+    { "1-2:256.4.5.6", -1, -1, { 0 } },
+    { "1-2:3.256.5.6", -1, -1, { 0 } },
+    { "1-2:3.4.256.6", -1, -1, { 0 } },
+    { "1-2:3.4.5.256", -1, -1, { 0 } },
+
+    /* out of bounds */
+    { "123", 1, -1, { 0 } },
+    { "123", 2, -1, { 0 } },
+    { "1234", 1, -1, { 0 } },
+    { "1234", 2, -1, { 0 } },
+    { "12-3.4.5", 1, -1, { 0 } },
+    { "12-3.4.5", 2, -1, { 0 } },
 };
 
 static const test_register_input_t register_tests[] = {
@@ -279,7 +290,8 @@ static void test_iec62056_obis(void)
     for (size_t i = 0; i < ARRAY_SIZE(id_tests); i++) {
         iec62056_obis_t obis;
         memset(&obis, 0, sizeof(iec62056_obis_t));
-        int res = iec62056_obis_from_string(&obis, id_tests[i].input, strlen(id_tests[i].input));
+        size_t len = id_tests[i].len == -1 ? strlen(id_tests[i].input) : (size_t)id_tests[i].len;
+        int res = iec62056_obis_from_string(&obis, id_tests[i].input, len);
         TEST_ASSERT_EQUAL_INT(res, id_tests[i].expected_result);
         if (res == 0) {
             TEST_ASSERT_EQUAL_INT(0, memcmp(&id_tests[i].obis, &obis, sizeof(iec62056_obis_t)));
