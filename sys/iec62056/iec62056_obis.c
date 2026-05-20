@@ -64,60 +64,79 @@ static const char *_get_obis_group_value(const char *str, const char *end_of_str
 
 int iec62056_obis_from_string(iec62056_obis_t *obis, const char *str, size_t len)
 {
-    /* Convert a string with format "1-2:3.4.5" into a iec62056_obis_t struct */
+    /* convert a string with format "1-2:3.4.5*6" into a iec62056_obis_t struct */
     const char *end_of_str = &str[len];
-    unsigned scan_group = 0; /* 0 = scan_group A, 5 = scan_group f */
-    int res = 0;
-    char previous_separator = '\0';
+    unsigned scan_group = 0;
 
     memset(obis, 255, sizeof(iec62056_obis_t));
+
     do {
         uint8_t value = 0;
 
         str = _get_obis_group_value(str, end_of_str, &value);
+
         if (!str) {
-            res = -1;
-            break;
+            return -1;
         }
 
-        /* Past end_of_str, use a NUL sentinel — the dispatch below already
-         * treats a non-separator as either "trailing F group" (scan_group==5)
-         * or as a parse error. */
+        /* past end_of_str, use a NUL sentinel, which either goes into E or
+         * in F, depending on the scan_group */
         char separator = (str < end_of_str) ? *str : '\0';
-        if ((separator == '-') && (scan_group == 0)) {
+
+        if (separator == '-' && scan_group < 1) {
             obis->a = value;
             scan_group = 1;
         }
-        else if ((separator == ':') && (scan_group < 2)) {
+        else if (separator == ':' && scan_group < 2) {
+            if (scan_group < 1) {
+                /* group B cannot exist without group A */
+                return -1;
+            }
             obis->b = value;
             scan_group = 2;
         }
-        else if ((separator == '.') && scan_group < 3) {
+        else if (separator == '.' && scan_group < 3) {
+            if (scan_group != 0 && scan_group < 2) {
+                /* group C cannot exist without group B if group A is present */
+                return -1;
+            }
             obis->c = value;
             scan_group = 3;
         }
-        else if ((previous_separator == '.') && (scan_group < 5)) {
-            if (scan_group == 3) {
-                obis->d = value;
+        else if (separator == '.' && scan_group < 4) {
+            if (scan_group < 3) {
+                /* group D cannot exist without group C */
+                return -1;
             }
-            else if (scan_group == 4) {
-                obis->e = value;
-            }
-            scan_group++;
+            obis->d = value;
+            scan_group = 4;
         }
-        else if (((previous_separator != '.') && (scan_group > 2))
-                 || (scan_group == 5)) {
+        else if ((separator == '*' || separator == '\0') && scan_group < 5) {
+            if (scan_group < 4) {
+                /* group E cannot exist without group D */
+                return -1;
+            }
+            obis->e = value;
+            scan_group = 5;
+        }
+        else if (separator == '\0' && scan_group < 6) {
+            if (scan_group < 5) {
+                /* group F cannot exist without group D */
+                return -1;
+            }
+
             obis->f = value;
-            break;
+            scan_group = 6;
         }
         else {
-            res = -1;
-            break;
+            /* reject any garbage */
+            return -1;
         }
+
         str++;
-        previous_separator = separator;
     } while (str < end_of_str);
-    return res;
+
+    return 0;
 }
 
 bool iec62056_obis_equal(const iec62056_obis_t *first, const iec62056_obis_t *second,

@@ -75,7 +75,15 @@ typedef struct {
 /**
  * @brief Parse an OBIS string to @ref iec62056_obis_t object
  *
- * @param[out] obis             Obis struct to parse into
+ * The input string should be in the format `A-B:C.D.E*F` where A-F are
+ * numeric values (0-255). Groups may be omitted if not applicable, such as
+ * `1-2:3.4.5` (F defaults to 255) or `3.4.5` (A and B default to 255, F
+ * defaults to 255).
+ *
+ * The usable values of A-F are defined in IEC 62056-61, but this function
+ * does not enforce any specific value ranges for the groups.
+ *
+ * @param[out] obis             OBIS struct to parse into
  * @param[in] str               String to parse from
  * @param[in] len               Length in bytes of the string
  *
@@ -87,8 +95,8 @@ int iec62056_obis_from_string(iec62056_obis_t *obis, const char *str, size_t len
 /**
  * @brief Check two @ref iec62056_obis_t structs for equality
  *
- * @param[in] first             First obis struct to compare
- * @param[in] second            Second obis struct to compare
+ * @param[in] first             First OBIS struct to compare
+ * @param[in] second            Second OBIS struct to compare
  * @param[in] include_channel   Whether to include the channel in the comparison
  *
  * @retval true if the two structs represent the same address
@@ -109,9 +117,8 @@ bool iec62056_obis_equal(const iec62056_obis_t *first, const iec62056_obis_t *se
  *
  * @retval The initialized obis struct
  */
-static inline iec62056_obis_t iec62056_obis_init(uint8_t a, uint8_t b, uint8_t c, uint8_t d,
-                                                 uint8_t e,
-                                                 uint8_t f)
+static inline iec62056_obis_t iec62056_obis_init(uint8_t a, uint8_t b, uint8_t c,
+                                                 uint8_t d, uint8_t e, uint8_t f)
 {
     return (iec62056_obis_t){ a, b, c, d, e, f };
 }
