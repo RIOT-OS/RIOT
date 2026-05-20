@@ -597,7 +597,15 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
     }
 
     /* skip the ZEP header, just copy payload without FCS */
-    memcpy(buf, zep + 1, res);
+    const void *payload = zep + 1;
+    memcpy(buf, payload, res);
+
+    uint16_t crc = unaligned_get_u16((uint8_t *)payload + res);
+    if (crc16_ccitt_kermit_calc(payload, res) != crc) {
+        DEBUG("socket_zep::read: crc mismatch!\n");
+        return -EINVAL;
+    }
+
     return res;
 }
 
