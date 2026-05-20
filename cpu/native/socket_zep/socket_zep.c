@@ -491,7 +491,7 @@ static int _write(ieee802154_dev_t *dev, const iolist_t *iolist)
 
     for (unsigned i = 0; i < n; i++) {
         memcpy(out, iolist->iol_base, iolist->iol_len);
-        chksum = crc16_ccitt_false_update(chksum, iolist->iol_base, iolist->iol_len);
+        chksum = crc16_ccitt_kermit_update(chksum, iolist->iol_base, iolist->iol_len);
         out += iolist->iol_len;
         iolist = iolist->iol_next;
     }
