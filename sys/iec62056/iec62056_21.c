@@ -316,7 +316,7 @@ int iec62056_21_dataset_parse_register_to_float(const iec62056_21_dataset_t *dat
         return res;
     }
 
-    *value = (float)mantissa * pow(10, scaling);
+    *value = (float)mantissa * powf(10, (float)scaling);
     return 0;
 }
 
@@ -339,6 +339,8 @@ int iec62056_21_dataset_parse_register_unit(const iec62056_21_dataset_t *dataset
                                             char *register_unit,
                                             size_t register_unit_max_length)
 {
+    assert(register_unit_max_length > 0);
+
     const char *end_of_register = &dataset->value[dataset->value_length];
     const char *unit = memchr(dataset->value, '*', dataset->value_length);
 

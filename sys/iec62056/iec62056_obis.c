@@ -29,9 +29,12 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static const char *digitnsep(const char *str, size_t n)
+static const char *digitnsep(const char *str, const char *end_of_str, size_t n)
 {
     while (n--) {
+        if (str >= end_of_str) {
+            return str;
+        }
         if (!fmt_is_digit(*str)) {
             return str;
         }
@@ -40,11 +43,11 @@ static const char *digitnsep(const char *str, size_t n)
     return NULL;
 }
 
-static const char *_get_obis_group_value(const char *str, uint8_t *dest)
+static const char *_get_obis_group_value(const char *str, const char *end_of_str, uint8_t *dest)
 {
-    const char *separator_pos = digitnsep(str, 4);
+    const char *separator_pos = digitnsep(str, end_of_str, 4);
 
-    if (!separator_pos) {
+    if (!separator_pos || separator_pos == str) {
         return NULL;
     }
 
@@ -71,13 +74,16 @@ int iec62056_obis_from_string(iec62056_obis_t *obis, const char *str, size_t len
     do {
         uint8_t value = 0;
 
-        str = _get_obis_group_value(str, &value);
+        str = _get_obis_group_value(str, end_of_str, &value);
         if (!str) {
             res = -1;
             break;
         }
 
-        char separator = *str;
+        /* Past end_of_str, use a NUL sentinel — the dispatch below already
+         * treats a non-separator as either "trailing F group" (scan_group==5)
+         * or as a parse error. */
+        char separator = (str < end_of_str) ? *str : '\0';
         if ((separator == '-') && (scan_group == 0)) {
             obis->a = value;
             scan_group = 1;
