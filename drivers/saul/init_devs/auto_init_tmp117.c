@@ -24,7 +24,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define TMP117_NUM     ARRAY_SIZE(tmp117_params)
+#define TMP117_NUM     (unsigned)(sizeof((tmp117_params)) / sizeof((tmp117_params)[0]))
 
 /**
  * @brief   Allocate memory for the device descriptors

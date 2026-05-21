@@ -99,7 +99,7 @@ int tmp117_read_temperature(tmp117_t *dev, int16_t *value);
  * @brief Update the conversion mode of the sensor.
  *
  * @param[in, out] dev device descriptor
- * @param[in] conversion mode value
+ * @param[in] mode conversion mode value
  *
  * @return TMP117_OK on success
  * @return TMP117_I2C if other error occurs
@@ -110,7 +110,7 @@ int tmp117_set_conversion_mode(tmp117_t *dev, tmp117_conv_mode_t mode);
  * @brief Update the conversion cycle of the sensor.
  *
  * @param[in, out] dev device descriptor
- * @param[in] conversion cycle value
+ * @param[in] cycle conversion cycle value
  *
  * @return TMP117_OK on success
  * @return TMP117_I2C if other error occurs
@@ -121,7 +121,7 @@ int tmp117_set_conversion_cycle(tmp117_t *dev, tmp117_conv_cycle_t cycle);
  * @brief Update the averaging value of the sensor.
  *
  * @param[in, out] dev device descriptor
- * @param[in] averaging value
+ * @param[in] avg averaging value
  *
  * @return TMP117_OK on success
  * @return TMP117_I2C if other error occurs
