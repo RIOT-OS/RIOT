@@ -1,4 +1,8 @@
 /*
+ * SPDX-FileCopyrightText: 2017 Freie Universität Berlin
+ * SPDX-FileCopyrightText: 2017 OTA keys S.A.
+ * SPDX-FileCopyrightText: 2017 HAW-Hamburg
+ * SPDX-FileCopyrightText: 2020 Inria
  * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
@@ -10,7 +14,14 @@
  * @file
  * @brief       STM32U3 clock initialization
  *
- * @author      Adarsh Nair Mullachery
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Nick van IJzendoorn <nijzendoorn@engineering-spirit.nl>
+ * @author      Vincent Dupont <vincent@otakeys.com>
+ * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
+ * @author      Francisco Molina <francois-xavier.molina@inria.fr>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Adarsh Nair Mullachery <adarsh.mullachery@tuhh.de>
+ * @}
  */
 
 #include "cpu.h"
@@ -29,8 +40,8 @@
 #define RCC_CFGR1_SWS_HSI           (RCC_CFGR1_SWS_0)
 #define RCC_CFGR1_SWS_HSE           (RCC_CFGR1_SWS_1)
 
-/* Define MSI range bitfields for STM32U3 */
-/* We assume MSISDIV (bits 29:30) and MSIRANGE (bits 16:18) */
+/* Define MSI range bitfields for STM32U3 
+ * Configure MSI range and divider per RM0487 */
 #if CONFIG_CLOCK_MSI == MHZ(48)
 #  define CLOCK_MSIRANGE              (0) /* MSISRANGE 0, MSISDIV 0 */
 #elif CONFIG_CLOCK_MSI == MHZ(24)
@@ -79,13 +90,8 @@
 #  define CLOCK_ENABLE_HSI48          0
 #endif
 
-/* Check if PLL is required
- * - When PLLQ is used as 48MHz clock source
- */
-
 /* Check if HSE is required:
  * - When used as system clock
- * - When used as PLL input clock
  */
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || \
     (IS_ACTIVE(CLOCK_ENABLE_PLL) && IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE))
@@ -101,7 +107,6 @@
 
 /* Check if HSI RC with 16 MHz is required:
  * - When used as system clock
- * - When used as PLL input clock
  */
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HSI) || \
     (IS_ACTIVE(CLOCK_ENABLE_PLL) && IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSI))
@@ -112,7 +117,7 @@
 
 /* Check if MSI is required
  * - When used as system clock
- * - When used as PLL input clock
+ * - When used for 48MHz clock domain
  */
 #if IS_ACTIVE(CONFIG_USE_CLOCK_MSI) || \
     (IS_ACTIVE(CLOCK_ENABLE_PLL) && IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_MSI)) || \
@@ -122,7 +127,7 @@
 #  define CLOCK_ENABLE_MSI            0
 #endif
 
-/* Deduct the needed flash wait states from the core clock frequency */
+/* Define the required flash wait states based on the core clock frequency */
 #define FLASH_WAITSTATES FLASH_ACR_LATENCY_2
 
 void stmclk_init_sysclk(void)
@@ -139,52 +144,69 @@ void stmclk_init_sysclk(void)
     /* Disable RCC clock interrupts */
     RCC->CIER = 0;
 
-    /* 1) Enable HSI16 and wait until ready */
+    //* 1) Enable required oscillators based on configuration */
+#if IS_ACTIVE(CLOCK_ENABLE_HSE)
+    RCC->CR |= RCC_CR_HSEON;
+    while (!(RCC->CR & RCC_CR_HSERDY)) {}
+#endif
+
+#if IS_ACTIVE(CLOCK_ENABLE_HSI)
     RCC->CR |= RCC_CR_HSION;
     while (!(RCC->CR & RCC_CR_HSIRDY)) {}
+#endif
+
+#if IS_ACTIVE(CLOCK_ENABLE_MSI)
+    /* Apply MSI range to ICSCR1 before enabling */
+    RCC->ICSCR1 = (RCC->ICSCR1 & ~(RCC_ICSCR1_MSISRANGE_Msk | RCC_ICSCR1_MSISDIV_Msk)) | CLOCK_MSIRANGE;
+    RCC->CR |= RCC_CR_MSISON;
+    while (!(RCC->CR & RCC_CR_MSIRDY)) {}
+#endif
 
     /* 2) Enable PWR interface clock (STM32U3: RCC_AHB1ENR2.PWREN) */
     RCC->AHB1ENR2 |= RCC_AHB1ENR2_PWREN;
     (void)RCC->AHB1ENR2; /* read-back */
 
-    /* 3) Set Flash wait states BEFORE any clock increase
-     * For HSI16, 1 wait state is conservative and safe.
-     * (You can tune later once you run higher frequencies.)
-     */
-    FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_ACR_LATENCY_1;
+    /* 3) Set Flash wait states BEFORE any clock increase */
+    FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAITSTATES;
 
-    /* 4) Configure AHB/APB prescalers
-     * Clear fields then apply configured divisors.
-     * Note: CLOCK_APB1_DIV / CLOCK_APB2_DIV are bitfields you already define
-     *       from CONFIG_CLOCK_APB{1,2}_DIV.
-     */
+    /* 4) Configure AHB/APB prescalers */
     RCC->CFGR2 &= ~(RCC_CFGR2_HPRE_Msk |
                     RCC_CFGR2_PPRE1_Msk |
                     RCC_CFGR2_PPRE2_Msk);
     RCC->CFGR2 |= (CLOCK_APB1_DIV | CLOCK_APB2_DIV);
 
-    /* 5) Switch SYSCLK to HSI16 and wait until switch is confirmed */
+    /* 5) Switch SYSCLK to the configured source */
+#if IS_ACTIVE(CONFIG_USE_CLOCK_HSE)
+    RCC->CFGR1 = (RCC->CFGR1 & ~RCC_CFGR1_SW_Msk) | RCC_CFGR1_SW_HSE;
+    while ((RCC->CFGR1 & RCC_CFGR1_SWS_Msk) != RCC_CFGR1_SWS_HSE) {}
+#elif IS_ACTIVE(CONFIG_USE_CLOCK_MSI)
+    RCC->CFGR1 = (RCC->CFGR1 & ~RCC_CFGR1_SW_Msk) | RCC_CFGR1_SW_MSI;
+    while ((RCC->CFGR1 & RCC_CFGR1_SWS_Msk) != RCC_CFGR1_SWS_MSI) {}
+#elif IS_ACTIVE(CONFIG_USE_CLOCK_HSI)
     RCC->CFGR1 = (RCC->CFGR1 & ~RCC_CFGR1_SW_Msk) | RCC_CFGR1_SW_HSI;
     while ((RCC->CFGR1 & RCC_CFGR1_SWS_Msk) != RCC_CFGR1_SWS_HSI) {}
+#else
+#error "No valid system clock source defined in board configuration!"
+#endif
 
-    /* 6) Enable I-Cache (optional, but fine) */
+    /* 4) Configure AHB/APB prescalers */
 #ifdef ICACHE
     ICACHE->CR |= ICACHE_CR_EN;
 #endif
 
-    /* 7) 48 MHz domain for HWRNG / USB FS (RM0487, matches HAL: HSI48 → ICLK → USB1) */
+    /* 7) Configure 48 MHz domain for HWRNG / USB FS */
     if (IS_ACTIVE(CLOCK_ENABLE_HSI48)) {
         RCC->CR |= RCC_CR_HSI48ON;
         while (!(RCC->CR & RCC_CR_HSI48RDY)) {}
 
-        /* ICLK = HSI48, USB1 = ICLK (48 MHz at the USB1 digital block) */
+        /* Route HSI48 to ICLK and USB1 */
 #if defined(RCC_CCIPR1_ICLKSEL)
         RCC->CCIPR1 &= (uint32_t) ~RCC_CCIPR1_ICLKSEL;
 #endif
 #if defined(RCC_CCIPR1_USB1SEL)
         RCC->CCIPR1 &= (uint32_t) ~RCC_CCIPR1_USB1SEL;
 #endif
-        /* RNG kernel = HSI48 (reset / RM0487); keep explicit if bootloader repointed */
+        /* Ensure RNG kernel clock source is HSI48 per RM0487 */
 #if defined(RCC_CCIPR2_RNGSEL)
         RCC->CCIPR2 &= (uint32_t) ~RCC_CCIPR2_RNGSEL;
 #endif
