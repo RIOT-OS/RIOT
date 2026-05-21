@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 
-#include "board.h"
 #include "ztimer.h"
 
 #include "tmp117.h"
@@ -18,7 +17,7 @@ int main(void)
 {
 
     tmp117_t tmp117;
-    int raw_temp;
+    int16_t raw_temp;
 
     ztimer_sleep(ZTIMER_MSEC, 1000);
     printf("################################\n");

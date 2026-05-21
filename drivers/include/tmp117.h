@@ -17,6 +17,7 @@
 
 #include "periph/i2c.h"
 #include <errno.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,7 +93,7 @@ int tmp117_init(tmp117_t *dev, const tmp117_params_t *params);
  * @return TMP117_OK on success
  * @return TMP117_I2C if other error occurs
  */
-int tmp117_read_temperature(tmp117_t *dev, int *value);
+int tmp117_read_temperature(tmp117_t *dev, int16_t *value);
 
 /**
  * @brief Update the conversion mode of the sensor.

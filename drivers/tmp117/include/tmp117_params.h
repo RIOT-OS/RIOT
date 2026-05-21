@@ -19,6 +19,7 @@
 
 #include "board.h"
 #include "tmp117.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,12 +55,28 @@ extern "C" {
 #endif
 /** @} */
 
+#ifndef TMP117_SAUL_INFO
+/**
+ * @brief   The SAUL info to register the TMP117 device driver instances with
+ */
+#define TMP117_SAUL_INFO           { .name = "tmp117" }
+#endif
+/**@}*/
+
 /**
  * @brief   Allocation of TMP117 configuration
  */
 static const tmp117_params_t tmp117_params[] =
 {
     TMP117_PARAMS
+};
+
+/**
+ * @brief   Additional meta information to keep in the SAUL registry
+ */
+static const saul_reg_info_t tmp117_saul_info[] =
+{
+    TMP117_SAUL_INFO
 };
 
 #ifdef __cplusplus
