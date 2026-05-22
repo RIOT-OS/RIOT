@@ -506,7 +506,7 @@ sx126x_chip_modes_t sx126x_get_state(const sx126x_t *dev)
     return radio_status.chip_mode;
 }
 
-void sx126x_set_state(sx126x_t *dev, sx126x_chip_modes_t state)
+int sx126x_set_state(sx126x_t *dev, sx126x_chip_modes_t state)
 {
     /* check for errors */
     sx126x_errors_mask_t error = 0;
@@ -556,6 +556,7 @@ void sx126x_set_state(sx126x_t *dev, sx126x_chip_modes_t state)
         SX126X_DEBUG(dev, "after set state: device error 0x%04x before setting state\n", error);
     }
     SX126X_CHECK_API(sx126x_clear_device_errors(dev), /* no return */);
+    return (error) ? -EIO : 0;
 }
 
 uint32_t sx126x_get_channel(const sx126x_t *dev)

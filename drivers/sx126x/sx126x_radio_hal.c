@@ -111,8 +111,7 @@ static int _set_state(sx126x_t *dev, sx126x_state_t state)
     switch (state) {
     case SX126X_STATE_STANDBY:
         SX126X_DEBUG(dev, "hal: set STATE_STANDBY\n");
-        sx126x_set_state(dev, SX126X_CHIP_MODE_STBY_XOSC);
-        break;
+        return sx126x_set_state(dev, SX126X_CHIP_MODE_STBY_XOSC);
 
     case SX126X_STATE_RX:
         SX126X_DEBUG(dev, "hal: set STATE_RX\n");
@@ -122,8 +121,7 @@ static int _set_state(sx126x_t *dev, sx126x_state_t state)
             dev->params->set_rf_mode(dev, SX126X_RF_MODE_RX);
         }
 #endif
-        sx126x_set_state(dev, SX126X_CHIP_MODE_RX);
-        break;
+        return sx126x_set_state(dev, SX126X_CHIP_MODE_RX);
 
     case SX126X_STATE_TX:
         SX126X_DEBUG(dev, "hal: set STATE_TX\n");
@@ -132,8 +130,7 @@ static int _set_state(sx126x_t *dev, sx126x_state_t state)
             dev->params->set_rf_mode(dev, dev->params->tx_pa_mode);
         }
 #endif
-        sx126x_set_state(dev, SX126X_CHIP_MODE_TX);
-        break;
+        return sx126x_set_state(dev, SX126X_CHIP_MODE_TX);
 
     case SX126X_STATE_CAD:
         SX126X_DEBUG(dev, "hal: set STATE_CCA\n");
@@ -144,7 +141,7 @@ static int _set_state(sx126x_t *dev, sx126x_state_t state)
     default:
         return -ENOTSUP;
     }
-    return sizeof(sx126x_state_t);
+    return 0;
 }
 
 static int _get_state(sx126x_t *dev, void *val)
@@ -314,11 +311,13 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
     sx126x_t *dev = hal->priv;
     (void)ctx;
     switch (op) {
+    default:
+        return -ENOTSUP;
     case IEEE802154_HAL_OP_TRANSMIT:
         dev->pending = false;
         int cca = ieee802154_radio_cca(hal);
         if (cca > 0) {
-            _set_state(dev, SX126X_STATE_TX);
+            return _set_state(dev, SX126X_STATE_TX);
         }
         else {
             sx126x_state_t state;
@@ -332,15 +331,12 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
                 return -EBUSY;
             }
         }
-        break;
 
     case IEEE802154_HAL_OP_SET_RX:
-        _set_state(dev, SX126X_STATE_RX);
-        break;
+        return _set_state(dev, SX126X_STATE_RX);
 
     case IEEE802154_HAL_OP_SET_IDLE:
-        _set_state(dev, SX126X_STATE_STANDBY);
-        break;
+        return _set_state(dev, SX126X_STATE_STANDBY);
 
     case IEEE802154_HAL_OP_CCA:
         SX126X_DEBUG(dev, "hal: HAL_OP_CCA (CAD Detection state)\n");
@@ -348,9 +344,9 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
             return -EBUSY;
         }
         dev->cad_detected = false;
-        _set_state(dev, SX126X_STATE_STANDBY);
+        int err = _set_state(dev, SX126X_STATE_STANDBY);
         SX126X_CHECK_API(sx126x_set_cad(dev), return -EIO);
-        break;
+        return err;
     }
     return 0;
 }
@@ -488,8 +484,7 @@ static int _request_on(ieee802154_dev_t *hal)
 {
     (void)hal;
     sx126x_t *dev = hal->priv;
-    _set_state(dev, SX126X_STATE_STANDBY);
-    return 0;
+    return _set_state(dev, SX126X_STATE_STANDBY);
 }
 
 static int _confirm_on(ieee802154_dev_t *hal)

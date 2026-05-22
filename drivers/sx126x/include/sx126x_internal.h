@@ -42,8 +42,10 @@ sx126x_chip_modes_t sx126x_get_state(const sx126x_t *dev);
  *
  * @param[in]   dev                     Device descriptor of the driver
  * @param[in]   state                   State to set
+ * @retval      0                       Success
+ * @retval      -EIO                    Chip reported back an error
  */
-void sx126x_set_state(sx126x_t *dev, sx126x_chip_modes_t state);
+int sx126x_set_state(sx126x_t *dev, sx126x_chip_modes_t state);
 
 /**
  * @brief   Check whether the device model is sx1261
