@@ -1,7 +1,8 @@
 BOARD ?= rpi-pico-2-arm
 
 # The test pokes RP2350-specific registers and the rp2350_common
-# UART driver directly. Limit to boards that use the rp2350_common BSP.
+# UART driver directly via an external GP8-GP9 jumper. Limit to
+# boards that use the rp2350_common BSP.
 BOARDS_SUPPORTED := rpi-pico-2-arm rpi-pico-2-riscv
 
 # This test stresses the UART RX FIFO under sustained 115200-baud

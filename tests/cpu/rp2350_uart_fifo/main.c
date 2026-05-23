@@ -8,12 +8,12 @@
  * @{
  *
  * @file
- * @brief   RP2350 UART FIFO / ISR drain self-test (internal loopback).
+ * @brief   RP2350 UART FIFO / ISR drain self-test (external loopback).
  *
  * Sends a 64-byte burst on UART_DEV(1) at 115200 baud and verifies all
- * 64 bytes come back via the RX callback. Uses the UART internal
- * loopback path so the test does not depend on external GP8/GP9
- * wiring or the board console bridge.
+ * 64 bytes come back via the RX callback. Requires a physical jumper
+ * connecting the test UART's TX pin to its own RX pin on the same
+ * board (GP8 <-> GP9 on rpi-pico-2-*).
  *
  * Without the RX FIFO enabled (FEN), the 1-byte holding register
  * cannot absorb a 64-byte burst at 115200 baud; bytes get dropped.
@@ -64,7 +64,6 @@ int main(void)
     while (!(dev->UARTFR & UART_UARTFR_RXFE_BITS)) {
         (void)dev->UARTDR;
     }
-    dev->UARTCR |= UART_UARTCR_LBE_BITS;
 
     uint8_t tx_buf[BURST_SIZE];
     for (size_t i = 0; i < BURST_SIZE; i++) {
@@ -85,7 +84,7 @@ int main(void)
     }
 
     if (memcmp(tx_buf, rx_buf, BURST_SIZE) != 0) {
-        puts("FAIL: byte mismatch");
+        puts("FAIL: byte mismatch (check the GP8-GP9 jumper)");
         return 1;
     }
 
