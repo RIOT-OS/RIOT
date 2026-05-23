@@ -33,7 +33,7 @@ extern "C" {
 /**
  * @brief   Unknown or invalid operation
  */
-#define PSA_INVALID_OPERATION     (0xFF)
+#define PSA_INVALID_OPERATION (0xFF)
 
 /**
  * @brief   Enum encoding available cipher operations.
@@ -56,7 +56,10 @@ typedef enum {
 typedef enum {
     PSA_CCM_AES_128,
     PSA_CCM_AES_192,
-    PSA_CCM_AES_256
+    PSA_CCM_AES_256,
+    PSA_GCM_AES_128,
+    PSA_GCM_AES_192,
+    PSA_GCM_AES_256
 } psa_aead_op_t;
 
 /**
@@ -88,10 +91,10 @@ typedef enum {
  * @return  @ref psa_asym_key_t
  * @return  @ref PSA_INVALID_OPERATION  @c bits is not compatible with SECP_R1 curves
  */
-#define PSA_ENCODE_ECC_KEY_TYPE_SECPR1(bits) \
+#define PSA_ENCODE_ECC_KEY_TYPE_SECPR1(bits)            \
     ((bits == 256) || (bits == 520) ? PSA_ECC_P256_R1 : \
      (bits == 192) || (bits == 392) ? PSA_ECC_P192_R1 : \
-     PSA_INVALID_OPERATION)
+                                      PSA_INVALID_OPERATION)
 
 /**
  * @brief   Combine a Twisted Edwards key type with a given key size (private or public key).
@@ -101,9 +104,9 @@ typedef enum {
  * @return  @ref psa_asym_key_t
  * @return  @ref PSA_INVALID_OPERATION  @c bits is not compatible with Twisted Edwards curves
  */
-#define PSA_ENCODE_ECC_KEY_TYPE_EDWARDS(bits) \
+#define PSA_ENCODE_ECC_KEY_TYPE_EDWARDS(bits)           \
     ((bits == 255) || (bits == 256) ? PSA_ECC_ED25519 : \
-     PSA_INVALID_OPERATION)
+                                      PSA_INVALID_OPERATION)
 
 /**
  * @brief   Map an ECC key to a given curve according to its type and size.
@@ -114,10 +117,10 @@ typedef enum {
  * @return  @ref psa_asym_key_t
  * @return  @ref PSA_INVALID_OPERATION  @c curve and @c bits are incompatible
  */
-#define PSA_ENCODE_ECC_KEY_TYPE(bits, curve) \
-    ((curve == PSA_ECC_FAMILY_SECP_R1) ? PSA_ENCODE_ECC_KEY_TYPE_SECPR1(bits) : \
+#define PSA_ENCODE_ECC_KEY_TYPE(bits, curve)                                             \
+    ((curve == PSA_ECC_FAMILY_SECP_R1)         ? PSA_ENCODE_ECC_KEY_TYPE_SECPR1(bits) :  \
      (curve == PSA_ECC_FAMILY_TWISTED_EDWARDS) ? PSA_ENCODE_ECC_KEY_TYPE_EDWARDS(bits) : \
-     PSA_INVALID_OPERATION)
+                                                 PSA_INVALID_OPERATION)
 
 /**
  * @brief Combine key type and size with a PSA_ALG_CBC_NO_PADDING algorithm
@@ -128,13 +131,13 @@ typedef enum {
  * @return  @ref psa_cipher_op_t
  * @return  @ref PSA_INVALID_OPERATION  @c alg, @c bits and @c type are not compatible
  */
-#define GET_CBC_NO_PADDING_OPERATION(type, bits) \
-    ((type == PSA_KEY_TYPE_AES) ? \
-     ((bits == 128) ? PSA_CBC_NO_PAD_AES_128 : \
-     (bits == 192) ? PSA_CBC_NO_PAD_AES_192 : \
-     (bits == 256) ? PSA_CBC_NO_PAD_AES_256 : \
-     PSA_INVALID_OPERATION) : \
-     PSA_INVALID_OPERATION)
+#define GET_CBC_NO_PADDING_OPERATION(type, bits)   \
+    ((type == PSA_KEY_TYPE_AES) ?                  \
+         ((bits == 128) ? PSA_CBC_NO_PAD_AES_128 : \
+          (bits == 192) ? PSA_CBC_NO_PAD_AES_192 : \
+          (bits == 256) ? PSA_CBC_NO_PAD_AES_256 : \
+                          PSA_INVALID_OPERATION) : \
+         PSA_INVALID_OPERATION)
 
 /**
  * @brief Combine key type and size with a PSA_ALG_CCM algorithm
@@ -145,13 +148,30 @@ typedef enum {
  * @return  @ref psa_aead_op_t
  * @return  @ref PSA_INVALID_OPERATION  @c alg, @c bits and @c type are not compatible
  */
-#define GET_AES_CCM_OPERATION(type, bits) \
-    ((type == PSA_KEY_TYPE_AES) ? \
-     ((bits == 128) ? PSA_CCM_AES_128 : \
-     (bits == 192) ? PSA_CCM_AES_192 : \
-     (bits == 256) ? PSA_CCM_AES_256 : \
-     PSA_INVALID_OPERATION) : \
-     PSA_INVALID_OPERATION)
+#define GET_AES_CCM_OPERATION(type, bits)          \
+    ((type == PSA_KEY_TYPE_AES) ?                  \
+         ((bits == 128) ? PSA_CCM_AES_128 :        \
+          (bits == 192) ? PSA_CCM_AES_192 :        \
+          (bits == 256) ? PSA_CCM_AES_256 :        \
+                          PSA_INVALID_OPERATION) : \
+         PSA_INVALID_OPERATION)
+
+/**
+ * @brief Combine key type and size with a PSA_ALG_GCM algorithm
+ *
+ * @param type Key type of type @ref psa_key_type_t
+ * @param bits Size of the used key of type @ref psa_key_bits_t
+ *
+ * @return  @ref psa_aead_op_t
+ * @return  @ref PSA_INVALID_OPERATION  @c alg, @c bits and @c type are not compatible
+ */
+#define GET_AES_GCM_OPERATION(type, bits)          \
+    ((type == PSA_KEY_TYPE_AES) ?                  \
+         ((bits == 128) ? PSA_GCM_AES_128 :        \
+          (bits == 192) ? PSA_GCM_AES_192 :        \
+          (bits == 256) ? PSA_GCM_AES_256 :        \
+                          PSA_INVALID_OPERATION) : \
+         PSA_INVALID_OPERATION)
 
 /**
  * @brief Combine key type and size with a PSA_ALG_CBC_PKCS7 algorithm
@@ -162,9 +182,9 @@ typedef enum {
  * @return  @ref psa_cipher_op_t
  * @return  @ref PSA_INVALID_OPERATION  @c alg, @c bits and @c type are not compatible
  */
-#define GET_CBC_PKCS7_OPERATION(type, bits) \
+#define GET_CBC_PKCS7_OPERATION(type, bits)                                               \
     (((alg == PSA_ALG_CBC_PKCS7) && (type == PSA_KEY_TYPE_AES)) ? PSA_CBC_PKCS7_AES_256 : \
-     PSA_INVALID_OPERATION)
+                                                                  PSA_INVALID_OPERATION)
 
 /**
  * @brief Combine key type and size with a PSA_ALG_CFB algorithm
@@ -223,9 +243,9 @@ typedef enum {
  * @return  @ref psa_cipher_op_t
  * @return  @ref PSA_INVALID_OPERATION  @c alg, @c bits and @c type are not compatible
  */
-#define GET_STREAM_CIPHER_OPERATION(type, bits) \
+#define GET_STREAM_CIPHER_OPERATION(type, bits)                                        \
     (((type == PSA_KEY_TYPE_CHACHA20) && (bits == 256)) ? PSA_STREAM_CIPHER_CHACHA20 : \
-     PSA_INVALID_OPERATION)
+                                                          PSA_INVALID_OPERATION)
 
 /**
  * @brief Combine key type and size with a PSA_ALG_XTS algorithm
@@ -249,16 +269,16 @@ typedef enum {
  * @return  @ref psa_cipher_op_t
  * @return  @ref PSA_INVALID_OPERATION  @c alg, @c bits and @c type are not compatible
  */
-#define PSA_ENCODE_CIPHER_OPERATION(alg, type, bits) \
+#define PSA_ENCODE_CIPHER_OPERATION(alg, type, bits)                              \
     ((alg == PSA_ALG_CBC_NO_PADDING) ? GET_CBC_NO_PADDING_OPERATION(type, bits) : \
-     (alg == PSA_ALG_CBC_PKCS7) ? GET_CBC_PKCS7_OPERATION(type, bits) : \
-     (alg == PSA_ALG_CFB) ? GET_CFB_OPERATION(type, bits) : \
-     (alg == PSA_ALG_CTR) ? GET_CTR_OPERATION(type, bits) : \
+     (alg == PSA_ALG_CBC_PKCS7)      ? GET_CBC_PKCS7_OPERATION(type, bits) :      \
+     (alg == PSA_ALG_CFB)            ? GET_CFB_OPERATION(type, bits) :            \
+     (alg == PSA_ALG_CTR)            ? GET_CTR_OPERATION(type, bits) :            \
      (alg == PSA_ALG_ECB_NO_PADDING) ? GET_ECB_NO_PADDING_OPERATION(type, bits) : \
-     (alg == PSA_ALG_OFB) ? GET_OFB_OPERATION(type, bits) : \
-     (alg == PSA_ALG_STREAM_CIPHER) ? GET_STREAM_CIPHER_OPERATION(type, bits) : \
-     (alg == PSA_ALG_XTS) ? GET_XTS_OPERATION(type, bits) : \
-     PSA_INVALID_OPERATION)
+     (alg == PSA_ALG_OFB)            ? GET_OFB_OPERATION(type, bits) :            \
+     (alg == PSA_ALG_STREAM_CIPHER)  ? GET_STREAM_CIPHER_OPERATION(type, bits) :  \
+     (alg == PSA_ALG_XTS)            ? GET_XTS_OPERATION(type, bits) :            \
+                                       PSA_INVALID_OPERATION)
 
 /**
  * @brief   Map algorithm, key size and type to a specific operation.
@@ -270,9 +290,12 @@ typedef enum {
  * @return  @ref psa_aead_op_t
  * @return  @ref PSA_INVALID_OPERATION  @c alg, @c bits and @c type are not compatible
  */
-#define PSA_ENCODE_AEAD_OPERATION(alg, type, bits) \
+#define PSA_ENCODE_AEAD_OPERATION(alg, type, bits)                \
     ((PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_CCM) ? \
-        GET_AES_CCM_OPERATION(type, bits) : PSA_INVALID_OPERATION)
+         GET_AES_CCM_OPERATION(type, bits) :                      \
+     (PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_GCM) ? \
+         GET_AES_GCM_OPERATION(type, bits) :                      \
+         PSA_INVALID_OPERATION)
 
 #ifdef __cplusplus
 }

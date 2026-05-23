@@ -9,3 +9,4 @@ ifneq (,$(filter psa_cifra_%, $(USEMODULE)))
 endif
 
 PSEUDOMODULES += psa_cifra_aes_ccm
+PSEUDOMODULES += psa_cifra_aes_gcm

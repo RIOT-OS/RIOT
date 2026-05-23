@@ -89,6 +89,17 @@ extern "C" {
 #define PSA_AES_CCM_TAG_MAX_SIZE (16)
 
 /**
+ * @brief   A sufficient buffer size for storing the tag output by @ref psa_aead_finish(),
+ *          for AES key types and GCM algorithms.
+ *
+ * @details If the size of the tag buffer is at least this large, it is guaranteed that
+ *          @ref psa_aead_finish() will not fail due to an insufficient buffer size.
+ *
+ *          See also @ref PSA_AEAD_TAG_LENGTH().
+ */
+#define PSA_AES_GCM_TAG_MAX_SIZE (16)
+
+/**
  * @brief   A sufficient plaintext buffer size for @ref psa_aead_decrypt(), in bytes.
  *
  * @details If the size of the plaintext buffer is at least this large, it is guaranteed that
@@ -202,7 +213,7 @@ extern "C" {
 #define PSA_AEAD_NONCE_LENGTH(key_type, alg) \
     ((PSA_BLOCK_CIPHER_BLOCK_LENGTH(key_type) == 16 && \
         ((PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_CCM) || \
-        (PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_CCM))) || \
+        (PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_GCM))) || \
         (key_type == PSA_KEY_TYPE_CHACHA20 && \
         PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_CHACHA20_POLY1305) ? \
         12 : 0)
