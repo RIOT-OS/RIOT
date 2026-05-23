@@ -135,7 +135,7 @@ static const pwm_conf_t pwm_config[] = {
  */
 static const uart_conf_t uart_config[] = {
     {
-        /* Arduino D0/D1 (RX/TX) */
+        /* ST-Link Virtual COM Port (STDIO, UART_DEV(0)) — USART1 on PA9/PA10 */
         .dev        = USART1,
         .rcc_mask   = RCC_APB2ENR_USART1EN,
         .rx_pin     = GPIO_PIN(PORT_A, 10),
@@ -148,7 +148,7 @@ static const uart_conf_t uart_config[] = {
         .clk_src    = 0, /* Use APB clock */
     },
     {
-        /* ST-Link Virtual COM Port (Default terminal) */
+        /* LPUART1 on PA2/PA3 */
         .dev        = LPUART1,
         .rcc_mask   = RCC_APB3ENR_LPUART1EN,
         .rx_pin     = GPIO_PIN(PORT_A, 3),
@@ -162,8 +162,8 @@ static const uart_conf_t uart_config[] = {
     }
 };
 
-#define UART_0_ISR          isr_lpuart1
-#define UART_1_ISR          isr_usart1
+#define UART_0_ISR          (isr_usart1)
+#define UART_1_ISR          (isr_lpuart1)
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
