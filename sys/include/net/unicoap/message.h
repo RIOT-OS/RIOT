@@ -466,6 +466,7 @@ static inline void unicoap_message_init_empty(unicoap_message_t* message, uint8_
     message->options = NULL;
     message->payload = NULL;
     message->payload_size = 0;
+    message->payload_representation = UNICOAP_PAYLOAD_CONTIGUOUS;
 }
 
 /**
@@ -494,6 +495,7 @@ static inline void unicoap_message_init(unicoap_message_t* message, uint8_t code
     message->options = NULL;
     message->payload = payload;
     message->payload_size = payload_size;
+    message->payload_representation = UNICOAP_PAYLOAD_CONTIGUOUS;
 }
 
 /**
@@ -525,6 +527,7 @@ static inline void unicoap_message_init_string(unicoap_message_t* message, uint8
     message->options = NULL;
     message->payload = (uint8_t*)payload;
     message->payload_size = payload ? strlen(payload) : 0;
+    message->payload_representation = UNICOAP_PAYLOAD_CONTIGUOUS;
 }
 
 /**
@@ -560,6 +563,7 @@ static inline void unicoap_message_init_with_options(unicoap_message_t* message,
     message->options = options;
     message->payload = payload;
     message->payload_size = payload_size;
+    message->payload_representation = UNICOAP_PAYLOAD_CONTIGUOUS;
 }
 
 /**
