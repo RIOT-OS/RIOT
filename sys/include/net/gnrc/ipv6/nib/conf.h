@@ -64,7 +64,7 @@ extern "C" {
 #      endif
 #      ifndef CONFIG_GNRC_IPV6_NIB_NUMOF
          /* only needs to store default router */
-#        define CONFIG_GNRC_IPV6_NIB_NUMOF           (1)
+#        define CONFIG_GNRC_IPV6_NIB_NUMOF           (1 + IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES))
 #      endif
 #    endif
 #  endif
@@ -197,6 +197,14 @@ extern "C" {
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_SLAAC
 #  define CONFIG_GNRC_IPV6_NIB_SLAAC                  1
+#endif
+
+/**
+ * @brief Use temporary addresses (rfc8981)
+ * @see [RFC 8981](https://www.rfc-editor.org/rfc/rfc8981.html)
+ */
+#ifndef CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES
+#define CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES 0
 #endif
 
 /**

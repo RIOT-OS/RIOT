@@ -90,6 +90,19 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
 void gnrc_ipv6_nib_pl_del(unsigned iface,
                           const ipv6_addr_t *pfx, unsigned pfx_len);
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES) || defined(DOXYGEN)
+/**
+ * @brief Check whether the prefix list has a prefix as specified
+ * @param[in] iface The interface @p pfx is expected to be on (0 for any).
+ * @param[in] pfx The prefix to check for.
+ * @param[in] pfx_len Length of @p pfx in bits.
+ * @return true if such prefix is present, false otherwise
+ */
+bool gnrc_ipv6_nib_pl_has_prefix(const unsigned int iface, const ipv6_addr_t *pfx,
+                                 const uint8_t pfx_len);
+
+#endif
+
 /**
  * @brief   Iterates over all prefix list entries in the NIB.
  *
