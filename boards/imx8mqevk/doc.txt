@@ -1,0 +1,89 @@
+/**
+@defgroup    boards_imx8mqevk NXP i.MX8 MQ EVK evaluation board
+@ingroup     boards
+@brief       Support for the NXP i.MX8 MQ EVK evaluation board.
+
+## Overview
+
+The i.MX8 MQ EVK board` features a Quad Cortex A53 running at up to 1.GHz and
+a Cortex M4 running at up to 266MHz. This board supports only introduces the
+CM4 part as the CA53 will run either Android or Linux. As the CM4 doesn't have
+a dedicated ROM, RIOT can be started from U-boot (if RIOT binary image is load
+on the SD card or eMMC) or from Linux userspace.
+
+This board is available around ~450$ from NXP website.
+
+
+## Hardware
+
+![imx8mqevk image](https://www.microchip.com/_ImagedCopy/ATSAML21-XPRO-B_angle.jpg)
+
+
+### MCU
+| MCU        | IMX8MQ6      |
+|:------------- |:--------------------- |
+| Family | ARM Cortex-M4F    |
+| Vendor | NXP |
+| RAM        | 32Kb |
+| Flash      | 0 Kb             |
+| Frequency  | up to 266MHz |
+| FPU        | yes                |
+| Timers | 8 (16-bit)    |
+| ADCs       | 1x 12-bit (20 channels)           |
+| UARTs      | max 6 (shared with CA53)               |
+| SPIs       | max 6 (see UART)                  |
+| I2Cs       | max 6 (see UART)              |
+| Vcc        | 1.8V - 3.6V           |
+| Datasheet  | [Datasheet](https://www.nxp.com/design/development-boards/i.mx-evaluation-and-development-boards/evaluation-kit-for-the-i.mx-8m-applications-processor:MCIMX8M-EVK) | registration required |
+| Board Manual   | [Board Manual](https://www.nxp.com/design/development-boards/i.mx-evaluation-and-development-boards/evaluation-kit-for-the-i.mx-8m-applications-processor:MCIMX8M-EVK)| registration required |
+
+
+## Implementation Status
+
+| Device | ID        | Supported | Comments  |
+|:------------- |:------------- |:------------- |:------------- |
+| MCU        | imx8mq6    | yes    | |
+| Low-level driver | GPIO    | yes       | |
+|        | PWM       | no            | |
+|        | UART      | yes           | |
+|        | I2C       | no        | |
+|        | SPI       | no        | |
+|        | USB       | no        | |
+|        | RTT       | no        | |
+|        | RTC       | no        |  |
+|        | RNG       | no        |  |
+|        | Timer     | yes           | |
+|               | ADC           | no           | |
+
+
+
+## Flashing the device
+
+Connect the device to J1601 connector near the SD card using a JLink probe.
+
+JLink software version V6.46 or newer is required to flash and debug this MCU.
+3 JLinkExe scripts are part of the board support and allow
+- reset the device using make reset
+- flash the device using make flash
+- start a debugging session using make debug 
+
+
+boot RIOT from U-boot:
+Copy your RIOT binary image (.bin) to your U-boot partition in eMMC or SD card.
+Start the board and step in U-boot by pressing any key during startup.
+run the following commands:
+fatload mmc X:1 0x7e0000 riot.bin
+bootaux 0x7e0000
+
+Replaces X with 0 (eMMC) or 1 (SD)
+```
+
+## Supported Toolchains
+
+gcc-arm-embedded
+
+
+## Known Issues / Problems
+TBD
+
+ */
