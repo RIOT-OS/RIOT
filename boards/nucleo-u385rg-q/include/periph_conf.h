@@ -116,9 +116,10 @@ static const pwm_conf_t pwm_config[] = {
         .dev = TIM2,
         .rcc_mask = RCC_APB1ENR1_TIM2EN,
         .chan = { { .pin = GPIO_PIN(PORT_A, 5) /* User LED */, .cc_chan = 0 },
-                  { .pin = GPIO_UNDEF, .cc_chan = 0 },
-                  { .pin = GPIO_UNDEF, .cc_chan = 0 },
-                  { .pin = GPIO_UNDEF, .cc_chan = 0 } },
+                  { .pin = GPIO_PIN(PORT_B, 3),  .cc_chan = 1 }, /* CH2: Arduino D3 */
+                  { .pin = GPIO_PIN(PORT_B, 10), .cc_chan = 2 }, /* CH3: Arduino D6 */
+                  { .pin = GPIO_PIN(PORT_B, 11), .cc_chan = 3 }  /* CH4: Standard extension */
+                },
         .af = GPIO_AF1,
         .bus = APB1,
     },
@@ -134,21 +135,36 @@ static const pwm_conf_t pwm_config[] = {
  */
 static const uart_conf_t uart_config[] = {
     {
-        .dev = USART1,
-        .rcc_mask = RCC_APB2ENR_USART1EN,
-        .rx_pin = GPIO_PIN(PORT_A, 10),
-        .tx_pin = GPIO_PIN(PORT_A, 9),
-        .rx_af = GPIO_AF7,
-        .tx_af = GPIO_AF7,
-        .bus = APB2,
-        .irqn = USART1_IRQn,
-        .type = STM32_USART,
-        .clk_src = 0, /* Use APB clock */
+        /* Arduino D0/D1 (RX/TX) */
+        .dev        = USART1,
+        .rcc_mask   = RCC_APB2ENR_USART1EN,
+        .rx_pin     = GPIO_PIN(PORT_A, 10),
+        .tx_pin     = GPIO_PIN(PORT_A, 9),
+        .rx_af      = GPIO_AF7,
+        .tx_af      = GPIO_AF7,
+        .bus        = APB2,
+        .irqn       = USART1_IRQn,
+        .type       = STM32_USART,
+        .clk_src    = 0, /* Use APB clock */
+    },
+    {
+        /* ST-Link Virtual COM Port (Default terminal) */
+        .dev        = LPUART1,
+        .rcc_mask   = RCC_APB3ENR_LPUART1EN,
+        .rx_pin     = GPIO_PIN(PORT_A, 3),
+        .tx_pin     = GPIO_PIN(PORT_A, 2),
+        .rx_af      = GPIO_AF8,
+        .tx_af      = GPIO_AF8,
+        .bus        = APB3,
+        .irqn       = LPUART1_IRQn,
+        .type       = STM32_LPUART,
+        .clk_src    = 0,
     }
 };
 
-#define UART_0_ISR isr_usart1
-#define UART_NUMOF (1)
+#define UART_0_ISR          isr_lpuart1
+#define UART_1_ISR          isr_usart1
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
