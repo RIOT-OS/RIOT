@@ -39,7 +39,7 @@ static saul_reg_t saul_entries[TMP117_NUM];
 /**
  * @brief   Define the number of saul info
  */
-#define TMP117_INFO_NUM    ARRAY_SIZE(tmp117_saul_info)
+#define TMP117_INFO_NUM    (unsigned)(sizeof((tmp117_saul_info)) / sizeof((tmp117_saul_info)[0]))
 
 /**
  * @brief   Reference the driver struct
