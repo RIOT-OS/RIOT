@@ -105,16 +105,17 @@ int tmp117_read_temperature(tmp117_t *dev, int16_t *temperature)
 {
     int res = TMP117_NOI2C;
 
-    uint16_t value;
+    int16_t value;
 
     i2c_acquire(dev->params.i2c);
 
-    if (_read_16_reg(dev, TMP117_REG_TEMP_RESULT, &value)) {
+    if (_read_16_reg(dev, TMP117_REG_TEMP_RESULT, (uint16_t *)&value)) {
         DEBUG("[tmp117] read - error: unable to read temperature \n");
         goto release;
     }
 
-    *temperature = (((uint32_t)value) * 25600UL) / 32768UL;  /* converting raw value to centi-degrees */
+    //   *temperature = (((uint32_t)value) * 25600UL) / 32768UL;  /* converting raw value to centi-degrees */
+    *temperature = (((int32_t)value) * 100)  >> 7;  /* converting raw value to centi-degrees */
 
     res = TMP117_OK;
 
