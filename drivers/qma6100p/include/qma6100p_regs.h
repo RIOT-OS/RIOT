@@ -19,6 +19,17 @@
 extern "C" {
 #endif
 
+#define BIT(n)                 (1UL << (n))
+#define GENMASK(h, l)          (((1UL << ((h) - (l) + 1)) - 1) << (l))
+
+#define FIELD_CLEAR(mask, reg) ((reg) &= ~(mask))
+#define FIELD_PREP(mask, val)  (((val) << __builtin_ctz(mask)) & (mask))
+#define FIELD_SET(mask, val, reg)       \
+    do {                                \
+        FIELD_CLEAR(mask, reg);         \
+        (reg) |= FIELD_PREP(mask, val); \
+    } while (0)
+
 /**
  * @name    Register addresses (QST-PD-B002-22 Table 14 / section 9)
  * @{
@@ -58,21 +69,21 @@ extern "C" {
  * @name    Data LSB registers (0x01 / 0x03 / 0x05)
  * @{
  */
-#define QMA6100P_NEWDATA_FLAG       (1 << 0) /**< 1 = channel updated since last read */
+#define QMA6100P_NEWDATA_FLAG       BIT(0) /**< 1 = channel updated since last read */
 /** @} */
 
 /**
  * @name    INT_ST2 (0x0B) — data-ready status
  * @{
  */
-#define QMA6100P_INT_ST2_DATA_INT   (1 << 4) /**< data-ready interrupt active */
+#define QMA6100P_INT_ST2_DATA_INT   BIT(4) /**< data-ready interrupt active */
 /** @} */
 
 /**
  * @name    RANGE (0x0F) — full-scale range and filter select
  * @{
  */
-#define QMA6100P_RANGE_MASK         (0x0F)
+#define QMA6100P_RANGE_MASK         GENMASK(3, 0)
 /* bits[5:4] RESERVED, must be 0 */
 #define QMA6100P_RANGE_LPF_HPF      (1 << 6) /**< 0=LPF mode, 1=HPF mode (affects NLPF in ODR) */
 /** @} */
@@ -82,9 +93,8 @@ extern "C" {
  * NLPF[2:0] in bits[7:5], ODR[4:0] in bits[4:0].
  * @{
  */
-#define QMA6100P_ODR_MASK           (0x1F)      /**< ODR bits[4:0] mask */
-#define QMA6100P_NLPF_SHIFT         (5)         /**< NLPF field shift */
-#define QMA6100P_NLPF_MASK          (0x07 << 5) /**< NLPF bits[7:5] mask */
+#define QMA6100P_ODR_MASK           GENMASK(4, 0) /**< ODR bits[4:0] mask */
+#define QMA6100P_NLPF_MASK          GENMASK(7, 5) /**< NLPF bits[7:5] mask */
 /* NLPF when RANGE[LPF_HPF]=0 (LPF mode): 000=off, 100=1, x01=2, x10=4, x11=8 */
 /* NLPF when RANGE[LPF_HPF]=1 (HPF mode): 000=off, 001=ODR/10, 010=ODR/25, etc. */
 /** @} */
@@ -94,33 +104,28 @@ extern "C" {
  * Default 0x00 after POR — device is in standby. Write MODE=1 to activate.
  * @{
  */
-#define QMA6100P_PM_MODE_MASK       (1 << 7) /**< mask for mode bit */
-/* bit6 RESERVED */
-#define QMA6100P_PM_SINC_SHIFT      (4)
-#define QMA6100P_PM_SINC_MASK       (0x03 << QMA6100P_PM_SINC_SHIFT) /**< T_RSTB_SINC[1:0] */
-#define QMA6100P_PM_SINC_3MCLK      (0x00 << QMA6100P_PM_SINC_SHIFT)
-#define QMA6100P_PM_SINC_4MCLK      (0x01 << QMA6100P_PM_SINC_SHIFT)
-#define QMA6100P_PM_SINC_6MCLK      (0x02 << QMA6100P_PM_SINC_SHIFT)
-#define QMA6100P_PM_SINC_8MCLK      (0x03 << QMA6100P_PM_SINC_SHIFT)
-#define QMA6100P_PM_MCLK_MASK       (0x0F) /**< MCLK[3:0] */
-#define QMA6100P_PM_MCLK_51K2       (0x04) /**< 51.2 kHz — recommended default */
-#define QMA6100P_PM_MCLK_25K6       (0x05)
-#define QMA6100P_PM_MCLK_12K8       (0x06)
-#define QMA6100P_PM_MCLK_6K4        (0x07)
+#define QMA6100P_PM_MODE_MASK       BIT(7) /**< mask for mode bit */
+/**
+ * @name MCLK bits PM[3:0] - Master clock frequency
+ * 51.2 kHz Default after the power on.
+ * @{
+ */
+#define QMA6100P_PM_MCLK_MASK       GENMASK(3, 0) /**< Mask for the mclk bit */
+/** @} */
 /** @} */
 
 /**
  * @name    INT_EN1 (0x17) — data-ready interrupt enable
  * @{
  */
-#define QMA6100P_INT_EN1_DATA       (1 << 4) /**< data-ready interrupt enable */
+#define QMA6100P_INT_EN1_DATA       BIT(4) /**< data-ready interrupt enable */
 /** @} */
 
 /**
  * @name    INT1_MAP1 (0x1A) / INT2_MAP1 (0x1C) — route data-ready to INT pin
  * @{
  */
-#define QMA6100P_INT_MAP1_DATA      (1 << 4) /**< route data-ready to INTx pin */
+#define QMA6100P_INT_MAP1_DATA      BIT(4) /**< route data-ready to INTx pin */
 /** @} */
 
 /**
@@ -128,19 +133,19 @@ extern "C" {
  * Default 0x05 = INT1 active-high push-pull, INT2 active-high push-pull.
  * @{
  */
-#define QMA6100P_INTPIN_INT1_LVL    (1 << 0) /**< 0=active-low, 1=active-high */
-#define QMA6100P_INTPIN_INT1_OD     (1 << 1) /**< 0=push-pull, 1=open-drain */
-#define QMA6100P_INTPIN_INT2_LVL    (1 << 2) /**< 0=active-low, 1=active-high */
-#define QMA6100P_INTPIN_INT2_OD     (1 << 3) /**< 0=push-pull, 1=open-drain */
+#define QMA6100P_INTPIN_INT1_LVL    BIT(0) /**< 0=active-low, 1=active-high */
+#define QMA6100P_INTPIN_INT1_OD     BIT(1) /**< 0=push-pull, 1=open-drain */
+#define QMA6100P_INTPIN_INT2_LVL    BIT(2) /**< 0=active-low, 1=active-high */
+#define QMA6100P_INTPIN_INT2_OD     BIT(3) /**< 0=push-pull, 1=open-drain */
 /** @} */
 
 /**
  * @name    INT_CFG (0x21) — interrupt latch / shadow / interface config
  * @{
  */
-#define QMA6100P_INT_CFG_LATCH_INT  (1 << 0) /**< 0=non-latch, 1=latch mode */
-#define QMA6100P_INT_CFG_SHADOW_DIS (1 << 6) /**< 1=disable shadowing for accel data */
-#define QMA6100P_INT_CFG_INT_RD_CLR (1 << 7) /**< 1=any read 0x09-0x0D clears all ints */
+#define QMA6100P_INT_CFG_LATCH_INT  BIT(0) /**< 0=non-latch, 1=latch mode */
+#define QMA6100P_INT_CFG_SHADOW_DIS BIT(6) /**< 1=disable shadowing for accel data */
+#define QMA6100P_INT_CFG_INT_RD_CLR BIT(7) /**< 1=any read 0x09-0x0D clears all ints */
 /** @} */
 
 /**
