@@ -3,6 +3,12 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+/**
+ * @file
+ * @author Jason Linehan <patientulysses@gmail.com>
+ * @author Christian Mehlis <mehlis@inf.fu-berlin.de>
+ */
+
 #include <limits.h>
 #include <stdarg.h>
 #include <stdbool.h>

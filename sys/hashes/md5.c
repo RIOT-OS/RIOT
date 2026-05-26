@@ -1,6 +1,7 @@
 /*
  * SPDX-FileCopyrightText: 2003-2005 by Christopher R. Hertel
- * SPDX-License-Identifier: NONE
+ * SPDX-FileCopyrightText: 2015 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**

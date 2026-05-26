@@ -1,6 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2020 Ayman El Didi
- * SPDX-License-Identifier: NONE
+ * SPDX-License-Identifier: CC0
  */
 
 /**

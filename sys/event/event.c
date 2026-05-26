@@ -1,5 +1,7 @@
 /*
  * SPDX-FileCopyrightText: 2017 Inria
+ * SPDX-FileCopyrightText: 2017 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 

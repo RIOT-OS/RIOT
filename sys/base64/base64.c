@@ -1,6 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2014 Hochschule für Angewandte Wissenschaften Hamburg (HAW)
+ * SPDX-FileCopyrightText: 2014 HAW Hamburg
  * SPDX-FileCopyrightText: 2014 Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
+ * SPDX-FileCopyrightText: 2020 Otto-von-Guericke-Universität Magdeburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 

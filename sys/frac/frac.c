@@ -3,6 +3,17 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+/**
+ *@ingroup sys_frac
+ * @{
+ * @file
+ * @brief    Integer fraction function implementations
+ *
+ * @author   Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ *
+ * @}
+ */
+
 #include <stdint.h>
 #include <stdio.h>
 #include <inttypes.h>

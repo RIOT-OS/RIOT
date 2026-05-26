@@ -1,3 +1,10 @@
 # SPDX-FileCopyrightText: 2022 Benjamin Valentin
 # SPDX-License-Identifier: LGPL-2.1-only
 
+config DEBUG_IRQ_DISABLE_THRESHOLD
+    int "Suppress Threshold"
+    default 1
+    depends on USEMODULE_DEBUG_IRQ_DISABLE
+    help
+        Threshold (in CPU ticks) below which periods with IRQs disabled are not printed.
+        Use this to prevent *a lot* of output when debugging.

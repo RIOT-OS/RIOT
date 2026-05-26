@@ -1,3 +1,7 @@
 # SPDX-FileCopyrightText: 2022 HAW Hamburg
 # SPDX-License-Identifier: LGPL-2.1-only
 
+config CHUNK_NUM_MAX
+    int "Maximum number of chunks to store"
+    depends on USEMODULE_CHUNKED_RINGBUFFER
+    default 4

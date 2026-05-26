@@ -1,3 +1,27 @@
 # SPDX-FileCopyrightText: 2020 HAW Hamburg
 # SPDX-License-Identifier: LGPL-2.1-only
 
+menu "zero entropy source module"
+    depends on USEMODULE_ENTROPY_SOURCE_ZERO_ENTROPY
+
+config ENTROPY_SOURCE_ZERO_HMIN
+    int "Estimated entropy per sample (byte)"
+    default 58982
+    help
+        This is a dummy default value for testing. The zero entropy module does not
+        contain any entropy at all.
+
+config ENTROPY_SOURCE_ZERO_HEALTH_TEST
+    bool "Enable health test"
+    default y
+    help
+        Enable health test by default. Testing is the only purpose of this module.
+
+config ENTROPY_SOURCE_ZERO_COND
+    bool "Enable conditioning"
+    help
+        Disable conditioning by default. Conditioning is useless for zeros only. The von
+        Neumann extractor would never finish and wait for the stop criterion given by
+        @ref CONFIG_ENTROPY_SOURCE_NEUMANN_ABORT.
+
+endmenu # zero entropy source module

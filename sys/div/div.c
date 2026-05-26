@@ -3,6 +3,13 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+/**
+ * @ingroup     sys_div
+ * @{
+ * @file
+ * @brief    Integer division function implementations
+ */
+
 #include <stdint.h>
 #include <stdio.h>
 #include "div.h"

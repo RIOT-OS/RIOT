@@ -1,6 +1,15 @@
 /*
- * SPDX-FileCopyrightText: 2019 , HAW Hamburg.
+ * SPDX-FileCopyrightText: 2019 HAW Hamburg.
  * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+/**
+ * @ingroup sys_app_metadata
+ * @{
+ * @file
+ * @brief   Prints application metadata such as BOARD, CPU, OS_VERSION.
+ * @author  Kevin Weiss <kevin.weiss@haw-hamburg.de>
+ * @}
  */
 
 #include <stdio.h>

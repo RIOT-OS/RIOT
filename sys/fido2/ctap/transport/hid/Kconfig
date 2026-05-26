@@ -1,3 +1,14 @@
 # SPDX-FileCopyrightText: 2021 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
+if USEMODULE_FIDO2_CTAP_TRANSPORT_HID
+
+config FIDO2_CTAP_TRANSPORT_HID_TRANSACTION_TIMEOUT
+    int "CTAPHID Transaction timeout in milliseconds"
+    default 500
+    help
+        A CTAPHID transaction has to be completed within a specified period
+        of time to prevent the authenticator from being locked by a
+        stalling application.
+
+endif # USEMODULE_FIDO2_CTAP_TRANSPORT_HID

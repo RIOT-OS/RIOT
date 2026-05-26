@@ -1,3 +1,6 @@
 # SPDX-FileCopyrightText: 2021 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
+if USEMODULE_CONGURE_TEST
+rsource "Kconfig.config"
+endif   # USEMODULE_CONGURE_TEST

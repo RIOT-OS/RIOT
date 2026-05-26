@@ -1,3 +1,10 @@
 # SPDX-FileCopyrightText: 2021 Freie Universität Berlin
 # SPDX-License-Identifier: LGPL-2.1-only
 
+menu "CongURE congestion control abstraction"
+    depends on USEMODULE_CONGURE
+
+rsource "abe/Kconfig"
+rsource "test/Kconfig"
+
+endmenu # CongURE congestion control abstraction
