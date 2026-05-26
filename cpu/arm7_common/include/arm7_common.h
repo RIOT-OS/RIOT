@@ -7,9 +7,7 @@
 #pragma once
 
 /**
- * @defgroup    cpu_arm7_common ARM7 CPU common
- * @brief       Common implementations and headers for ARM based micro-controllers
- * @ingroup     cpu
+ * @ingroup     cpu_arm7_common
  * @{
  */
 

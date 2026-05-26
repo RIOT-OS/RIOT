@@ -746,14 +746,18 @@ version `LOG_TAG_*` of these macros can be used to produce tagged log output.
 If the `LOG_*` macros are used, the function which generates the log message
 is used in the tag while a `tag` parameter is used for the `LOG_TAG_*` macros.
 For example,
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 LOG_ERROR("error message");
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
 generates a log message in which the name of the calling function is used as
 tag. With
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 LOG_TAG_ERROR("mod", "error message");
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
 a log message with string `mod` in the tag is generated.
 
 The `esp_log_startup` module can be used to enable additional information
@@ -819,9 +823,9 @@ details, see:
 
 #ADC_GPIOS in the board-specific peripheral configuration defines the
 list of GPIOs that can be used as ADC channels on the board, for example:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+```c
 #define ADC_GPIOS   { GPIO0, GPIO2, GPIO4 }
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 Thereby the order of the listed GPIOs determines the mapping between the
 ADC lines of the RIOT and the GPIOs. The maximum number of GPIOs in the
@@ -838,9 +842,9 @@ from the #ADC_GPIOS definition.
 
 With the function #adc_set_attenuation an attenuation of the input signal
 can be defined separately for each ADC channel.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+```c
 extern int adc_set_attenuation(adc_t line, adc_attenuation_t atten);
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 This leads to different measurable maximum values for the voltage at the input.
 The higher the attenuation is, the higher the voltage measured at the input
@@ -881,9 +885,9 @@ the `#DAC_GPIOS` macro in the board-specific peripheral configuration.
 The specified GPIOs in the list must match the predefined GPIOs that can be
 used as DAC channels on the respective ESP32x SoC.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+```c
 #define DAC_GPIOS   { GPIO25, GPIO26 }
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 This configuration can be changed by
 [application-specific configurations](#esp32_application_specific_configurations).
@@ -916,7 +920,8 @@ the definition of
 
 where `n` can be 0 or 1. If they are not defined, the I2C interface
 I2C_DEV(n) is not used, for example:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 #define I2C0_SPEED  I2C_SPEED_FAST
 #define I2C0_SCL    GPIO22
 #define I2C0_SDA    GPIO21
@@ -924,7 +929,7 @@ I2C_DEV(n) is not used, for example:
 #define I2C1_SPEED  I2C_SPEED_NORMAL
 #define I2C1_SCL    GPIO13
 #define I2C1_SDA    GPIO16
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 The board-specific pin configuration of I2C interfaces can be changed by
 [application specific configurations](#esp32_application_specific_configurations)
@@ -1007,10 +1012,11 @@ done in the board-specific peripheral configuration by defining the
 macros `PWM0_GPIOS`, `PWM1_GPIOS`, `PWM2_GPIOS` and `PWM3_GPIOS` These
 macros specify the GPIOs that are used as channels for the 4 possible
 virtual PWM devices PWM_DEV(0) ... PWM_DEV(3) in RIOT, for example:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 #define PWM0_GPIOS  { GPIO0, GPIO2, GPIO4, GPIO16, GPIO17 }
 #define PWM1_GPIOS  { GPIO27, GPIO32, GPIO33 }
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 This configuration can be changed by
 [application-specific configurations](#esp32_application_specific_configurations).
@@ -1079,7 +1085,8 @@ used for slot 0 and the flash, slot 0 cannot be used on ESP32 variant.
 
 The board-specific configuration is realized by defining the array
 @ref sdmmc_config
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 static const sdmmc_conf_t sdmmc_config[] = {
     {
         .slot = SDMMC_SLOT_1,
@@ -1088,11 +1095,13 @@ static const sdmmc_conf_t sdmmc_config[] = {
         ...
     },
 }
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
 and the macro `SDMMC_NUMOF`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 #define SDMMC_NUMOF 1
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 where the value of @ref SDMMC_NUMOF must correspond to the number of elements
 in @ref sdmmc_config.
@@ -1146,7 +1155,8 @@ the definition of
 
 where `n` can be 0 and 1. If they are not defined, the according SPI interface
 SPI_DEV(n) is not used, for example:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 #define SPI0_CTRL   SPI3_HOST   // VSPI could also be used on ESP32 variant
 #define SPI0_SCK    GPIO18      // SCK  signal
 #define SPI0_MISO   GPIO19      // MISO signal
@@ -1158,7 +1168,7 @@ SPI_DEV(n) is not used, for example:
 #define SPI1_MISO   GPIO12      // MISO Camera
 #define SPI1_MOSI   GPIO13      // MOSI Camera
 #define SPI1_CS0    GPIO15      // CS0  Camera
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 The pin configuration of SPI interfaces can be changed by
 [application specific configurations](#esp32_application_specific_configurations)
@@ -1265,10 +1275,11 @@ board-specific peripheral configuration by
 
 where `n` can be in range of 0 and UART_NUMOF_MAX-1. If they are not defined,
 the according UART interface UART_DEV(n) is not used, for example:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 #define UART1_TX    GPIO10  // TxD signal of UART_DEV(1)
 #define UART1_RX    GPIO9   // RxD signal of UART_DEV(1)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 The pin configuration of UART interfaces can be changed by
 [application specific configurations](#esp32_application_specific_configurations)
@@ -1337,10 +1348,11 @@ in board specific peripheral configuration by
 - `#CAN_RX`, the GPIO used as RX transceiver signal.
 
 Example:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 #define CAN_TX      GPIO10      // CAN TX transceiver signal
 #define CAN_RX      GPIO9       // CAN RX transceiver signal
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 If the pin configuration is not defined, the following default configuration
 is used which can be overridden by the application, see section
@@ -1518,10 +1530,11 @@ that purpose, use
   data in section `.rtc.data`.
 
 For example:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 static int _i_value __attribute__((section(".rtc.bss")));      // set to 0 at power on
 static int _u_value __attribute__((section(".rtc.data"))) = 1; // initialized
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 [Back to table of contents](#esp32_toc)
 
@@ -1587,9 +1600,11 @@ USEMODULE += esp_spiffs
 When SPIFFS is enabled, the MTD system drive is formatted with SPIFFS the
 first time the system is started. The start address of the MTD system drive
 in the SPI flash memory is defined by the board configuration:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 #define SPI_FLASH_DRIVE_START  0x200000
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
 If this start address is set to 0, as in the default board configuration,
 the first possible multiple of 0x100000 (1 MiB) will be used in the free
 SPI flash memory determined from the partition table.
@@ -2012,13 +2027,14 @@ add the `include_next` preprocessor directive as the **last** line.
 For example to override the default definition of the GPIOs that are used as
 PWM channels, the application-specific board configuration file
 `$APPDIR/board.h` could look like the following:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 #ifdef CPU_ESP32
 #define PWM0_CHANNEL_GPIOS { GPIO12, GPIO13, GPIO14, GPIO15 }
 #endif
 
 #include_next "board.h"
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 It is important that the application-specific board
 configuration `$APPDIR/board.h` is included first. Insert the following
@@ -2030,7 +2046,8 @@ INCLUDES += -I$(APPDIR)
 @note To make such application-specific board configurations dependent on a
       certain ESP32x SoC variant (family) or a particular ESP32x board, you
       should always enclose these definitions in the following constructs
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 #ifdef CPU_FAM_ESP32            // specific ESP32x SoC variant (family)
 ...
 #endif
@@ -2038,7 +2055,7 @@ INCLUDES += -I$(APPDIR)
 #ifdef BOARD_ESP32_WROVER_KIT   // specific ESP32x board
 ...
 #endif
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 [Back to table of contents](#esp32_toc)
 
@@ -2056,13 +2073,14 @@ to include driver's original `<device>_params.h` after that, add the
 For example, to override a GPIO used for LIS3DH sensor, the
 application-specific driver parameter file `$APPDIR/<device>_params.h`
 could look like the following:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 #ifdef CPU_FAM_ESP32
 #define LIS3DH_PARAM_INT2           (GPIO_PIN(0, 4))
 #endif
 
 #include_next "lis3dh_params.h"
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 It is important to ensure that the application-specific driver parameter file
 `$APPDIR/<device>_params.h` is included first. Insert the following line as
@@ -2074,7 +2092,8 @@ INCLUDES += -I$(APPDIR)
 @note To make such application-specific board configurations dependent on a
       certain ESP32x SoC variant (family) or a particular ESP32x board, you
       should always enclose these definitions in the following constructs
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+
+```c
 #ifdef CPU_FAM_ESP32            // specific ESP32x SoC variant (family)
 ...
 #endif
@@ -2082,7 +2101,7 @@ INCLUDES += -I$(APPDIR)
 #ifdef BOARD_ESP32_WROVER_KIT   // specific ESP32x board
 ...
 #endif
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 [Back to table of contents](#esp32_toc)
 
@@ -2183,14 +2202,17 @@ installed.
 
 To use QEMU for ESP32x SoCs, an application has to be built with `esp_qemu` module
 enabled, for example with local toolchain installation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
-$ USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/sys/shell/
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
+USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/sys/shell/
+```
+
 or with RIOT Docker build image
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
-$ BUILD_IN_DOCKER=1 DOCKER="sudo docker" \
-  USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/sys/shell/
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```shell
+BUILD_IN_DOCKER=1 DOCKER="sudo docker" \
+USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/sys/shell/
+```
 
 Instead of flashing the image to the target hardware, a binary image named
 `qemu_flash_image.bin` is created in the target directory. In addition, two ROM
@@ -2200,33 +2222,36 @@ without having the hardware. The binary image `qemu_flash_image.bin`
 represents a 4 MByte Flash image.
 
 To start QEMU for ESP32x SoCs, the following command has to be used.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
-$ qemu-system-<arch> \
+
+```shell
+qemu-system-<arch> \
     -s -machine <esp32x_variant> \
     -display none \
     -drive file=<path_to_image>/qemu_flash_image.bin,if=mtd,format=raw \
     -serial tcp::5555,server,nowait
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
 with
 
 - `arch` = `xtensa` | `riscv32` and
 - `esp32x_variant` = `esp32` | `esp32s3` | `esp32c3`.
 
 For example, for an ESP32, QEMU can be started with command:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
-$ qemu-system-xtensa \
+
+```shell
+qemu-system-xtensa \
     -s -machine esp32 \
     -display none \
     -drive file=tests/sys/shell/bin/esp32-wroom-32/qemu_flash_image.bin,if=mtd,format=raw \
     -serial tcp::5555,server,nowait
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 To interact with the application on the emulated ESP32x SoC in QEMU, a second
 terminal is required in which the `telnet` command is used to communicate
 with the application on `localhost` using TCP port 5555:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
-$ telnet localhost 5555
+```shell
+telnet localhost 5555
 
 Trying 127.0.0.1...
 Connected to localhost.
@@ -2242,12 +2267,13 @@ Command              Description
 bufsize              Get the shell's buffer size
 start_test           starts a test
 ...
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 To debug the application in QEMU for a ESP32x SoC, another terminal is required
 in which the corresponding GDB hast to be started:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
-$ xtensa-esp32-elf-gdb tests/sys/shell//bin/esp32-wroom-32/tests_shell.elf
+
+```shell
+xtensa-esp32-elf-gdb tests/sys/shell//bin/esp32-wroom-32/tests_shell.elf
 
 GNU gdb (crosstool-NG crosstool-ng-1.22.0-80-g6c4433a5) 7.10
 Copyright (C) 2015 Free Software Foundation, Inc.
@@ -2259,27 +2285,28 @@ Remote debugging using :1234
 pm_set (mode=2) at cpu/esp32/periph/pm.c:117
 117	        return;
 (gdb)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 QEMU for ESP32x SoCs can also be used in RIOT Docker build image. For that purpose
 QEMU has to be started in the Docker container, for example:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
-$ sudo docker run --rm -i -t -u $UID -v $(pwd):/data/riotbuild riot/riotbuild
+
+```shell
+sudo docker run --rm -i -t -u $UID -v $(pwd):/data/riotbuild riot/riotbuild
 riotbuild@container-id:~$ USEMODULE=esp_qemu make flash BOARD=esp32-wroom-32 -C tests/sys/shell/
 riotbuild@container-id:~$ qemu-system-xtensa \
     -s -machine esp32 \
     -display none \
     -drive file=tests/sys/shell/bin/esp32-wroom-32/qemu_flash_image.bin,if=mtd,format=raw \
     -serial tcp::5555,server,nowait
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 In a second and a third terminal, you need to execute a shell in the same RIOT
 Docker container where QEMU was started. The required container ID
 `<container-id>` is shown in the prompt of the terminal in which QEMU
 was started.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
-$ sudo docker docker exec -it <container-id> bash
+```shell
+sudo docker docker exec -it <container-id> bash
 riotbuild@container-id:~$telnet localhost 5555
 
 Trying 127.0.0.1...
@@ -2289,10 +2316,10 @@ Escape character is '^]'.
 main(): This is RIOT! (Version: 2022.04)
 test_shell.
 >
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.bash
-$ sudo docker docker exec -it <container-id> bash
+```shell
+sudo docker docker exec -it <container-id> bash
 riotbuild@container-id:~$ xtensa-esp32-elf-gdb tests/sys/shell//bin/esp32-wroom-32/tests_shell.elf
 
 GNU gdb (crosstool-NG crosstool-ng-1.22.0-80-g6c4433a5) 7.10
@@ -2305,6 +2332,6 @@ Remote debugging using :1234
 pm_set (mode=2) at cpu/esp32/periph/pm.c:117
 117	        return;
 (gdb)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 [Back to table of contents](#esp32_toc)
