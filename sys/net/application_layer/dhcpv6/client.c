@@ -1110,7 +1110,10 @@ static bool _parse_reply(uint8_t *rep, size_t len, uint8_t request_type)
                 break;
 #endif  /* IS_USED(MODULE_DHCPV6_CLIENT_DNS) */
             case DHCPV6_OPT_IA_PD:
-                if (_parse_ia_pd_option((dhcpv6_opt_ia_pd_t *)opt)) {
+                if (_opt_len(opt) < sizeof(dhcpv6_opt_ia_pd_t)) {
+                    DEBUG("DHCPv6 client: IA_PD option underflow minimum size\n");
+                    return false;
+                } else if (_parse_ia_pd_option((dhcpv6_opt_ia_pd_t *)opt)) {
                      /* No error occurred */
                      break;
                  } else {
@@ -1118,7 +1121,10 @@ static bool _parse_reply(uint8_t *rep, size_t len, uint8_t request_type)
                      return false;
                  }
             case DHCPV6_OPT_IA_NA:
-                 if (_parse_ia_na_option((dhcpv6_opt_ia_na_t *)opt)) {
+                 if (_opt_len(opt) < sizeof(dhcpv6_opt_ia_na_t)) {
+                    DEBUG("DHCPv6 client: IA_NA option underflow minimum size\n");
+                    return false;
+                 } else if (_parse_ia_na_option((dhcpv6_opt_ia_na_t *)opt)) {
                      /* No error occurred */
                      break;
                  } else {
