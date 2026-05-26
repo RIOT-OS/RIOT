@@ -1,8 +1,18 @@
 /*
- * main.c
+ * SPDX-FileCopyrightText: 2026 UGA
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+/**
+ * @ingroup     tests
+ * @{
  *
- *  Created on: 19 mai 2026
- *      Author: leo
+ * @file
+ * @brief       Test application for the TMP117 sensor driver
+ *
+ * @author      léo cordier <leo.cordier@univ-grenoble-alpes.fr>
+ *
+ * @}
  */
 
 #include <stdio.h>
@@ -15,29 +25,28 @@
 
 int main(void)
 {
-
     tmp117_t tmp117;
     int16_t raw_temp;
 
     ztimer_sleep(ZTIMER_MSEC, 1000);
-    printf("################################\n");
-    printf("####### TMP117 test app ########\n");
-    printf("################################\n\n");
+    puts("################################");
+    puts("####### TMP117 test app ########");
+    puts("################################\n");
 
-    printf("Initializing tmp117 sensor ...");
+    puts("Initializing tmp117 sensor ...");
 
     if (tmp117_init(&tmp117, tmp117_params) != TMP117_OK) {
         return -1;
     }
 
-    printf("  done.\n\n");
+    puts("  done.\n");
 
     while (1) {
         if (tmp117_read_temperature(&tmp117, &raw_temp) == TMP117_OK) {
             printf("temperature : %02d.%02d°C\n", raw_temp / 100, raw_temp % 100);
         }
         else {
-            printf("[tmp117] error : unable to read temperature\n");
+            puts("[tmp117 test] error : unable to read temperature\n");
             break;
         }
 

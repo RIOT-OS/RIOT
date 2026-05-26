@@ -6,13 +6,13 @@
 #pragma once
 
 /**
- * @defgroup    driver_tmp117
+ * @defgroup    drivers_tmp117
  * @ingroup     drivers_sensors
  * @brief       Device driver parameters for TMP117 temperature sensor
  *
  * @{
  * @file
- * @author      Léo Cordier <leo.cordier@univ-grenoble-alpes.fr>
+ * @author      léo cordier <leo.cordier@univ-grenoble-alpes.fr>
  */
 
 
