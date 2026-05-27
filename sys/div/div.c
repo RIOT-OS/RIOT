@@ -8,6 +8,10 @@
  * @{
  * @file
  * @brief    Integer division function implementations
+ *
+ * @author   Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ *
+ * @}
  */
 
 #include <stdint.h>

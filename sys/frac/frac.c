@@ -4,7 +4,7 @@
  */
 
 /**
- *@ingroup sys_frac
+ * @ingroup sys_frac
  * @{
  * @file
  * @brief    Integer fraction function implementations

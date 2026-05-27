@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: 2008 D. J. Bernstein  (dedicated to the public domain)
- * SPDX-FileCopyrightText: 2015 René Kijewski  <rene.kijewski@fu-berlin.de>
+ * SPDX-FileCopyrightText: 2008 D. J. Bernstein (dedicated to the public domain)
+ * SPDX-FileCopyrightText: 2015 René Kijewski <rene.kijewski@fu-berlin.de>
  * SPDX-FileCopyrightText: 2018 Koen Zandberg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
