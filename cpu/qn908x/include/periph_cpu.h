@@ -375,14 +375,6 @@ typedef struct {
 /** @} */
 
 /**
- * @name    Define macros for sda and scl pins.
- * @{
- */
-#define i2c_pin_sda(dev) i2c_config[dev].pin_sda
-#define i2c_pin_scl(dev) i2c_config[dev].pin_scl
-/** @} */
-
-/**
  * @brief   Use some common SPI functions
  * @{
  */

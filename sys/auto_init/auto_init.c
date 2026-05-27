@@ -242,6 +242,11 @@ extern void ndn_init(void);
 AUTO_INIT(ndn_init,
           AUTO_INIT_PRIO_MOD_NDN);
 #endif
+#if IS_USED(MODULE_SOFT_I2C)
+extern void auto_init_soft_i2c(void);
+AUTO_INIT(auto_init_soft_i2c,
+          AUTO_INIT_PRIO_MOD_SOFT_I2C);
+#endif
 /* initialize sensors and actuators */
 #if IS_USED(MODULE_SHT1X)
 /* The sht1x module needs to be initialized regardless of SAUL being used,

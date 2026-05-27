@@ -368,6 +368,16 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
     return result;
 }
 
+gpio_t i2c_pin_sda(i2c_t dev)
+{
+    return i2c_config[dev].sda;
+}
+
+gpio_t i2c_pin_scl(i2c_t dev)
+{
+    return i2c_config[dev].scl;
+}
+
 int direct_i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
                     size_t len,
                     uint8_t flags)
