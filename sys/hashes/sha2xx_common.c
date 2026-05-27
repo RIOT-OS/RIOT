@@ -4,7 +4,7 @@
  * SPDX-FileCopyrightText: 2016 Martin Landsmann <martin.landsmann@haw-hamburg.de>
  * SPDX-FileCopyrightText: 2016 OTA keys S.A.
  * SPDX-FileCopyrightText: 2020 HAW Hamburg
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  */
 
 /**

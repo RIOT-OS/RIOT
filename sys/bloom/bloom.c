@@ -4,6 +4,8 @@
  */
 
 /**
+ * @brief Bloom filter implementation
+ *
  * @file
  * @author Jason Linehan <patientulysses@gmail.com>
  * @author Christian Mehlis <mehlis@inf.fu-berlin.de>
