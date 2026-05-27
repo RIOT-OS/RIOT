@@ -180,10 +180,19 @@ static int picolibc_stdout_queued;
 
 static void _picolibc_flush(void)
 {
-    if (picolibc_stdout_queued) {
-        stdio_write(picolibc_stdout, picolibc_stdout_queued);
-        picolibc_stdout_queued = 0;
+    char *pos = picolibc_stdout;
+    char *end = pos + picolibc_stdout_queued;
+    while (pos < end) {
+        size_t left = (size_t)end - (size_t)pos;
+        ssize_t written = stdio_write(pos, left);
+        if (written < 0) {
+            /* failed to flush, drop data */
+            break;
+        }
+        pos += written;
     }
+
+    picolibc_stdout_queued = 0;
 }
 
 static int picolibc_put(char c, FILE *file)
