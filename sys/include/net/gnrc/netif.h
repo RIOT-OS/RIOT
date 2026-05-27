@@ -469,7 +469,7 @@ gnrc_netif_t *gnrc_netif_get_by_pid(kernel_pid_t pid);
  *                      addresses assigned to @p netif. May not be `NULL`
  * @param[in] max_len   Number of *bytes* available in @p addrs. Must be at
  *                      least `sizeof(ipv6_addr_t)`. It is recommended to use
- *                      @p CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF `* sizeof(ipv6_addr_t)
+ *                      @p CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF `* sizeof(ipv6_addr_t)`
  *                      here (and have @p addrs of the according length).
  *
  * @return  Size of the array of addresses in @p addrs on success.
@@ -555,7 +555,7 @@ static inline int gnrc_netif_ipv6_addr_remove(const gnrc_netif_t *netif,
  *                      is joined to. May not be `NULL`
  * @param[in] max_len   Number of *bytes* available in @p groups. Must be at
  *                      least `sizeof(ipv6_addr_t)`. It is recommended to use
- *                      @p GNRC_NETIF_IPV6_GROUPS_NUMOF `* sizeof(ipv6_addr_t)
+ *                      @p GNRC_NETIF_IPV6_GROUPS_NUMOF `* sizeof(ipv6_addr_t)`
  *                      here (and have @p groups of the according length).
  *
  * @return  Number of addresses in @p groups times `sizeof(ipv6_addr_t)` on

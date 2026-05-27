@@ -69,9 +69,9 @@ typedef struct {
  *                          be greater then @p valid_ltime.
  *
  * @return  0, on success.
- * @return  -EINVAL, if @p pfx was fe80::` or multicast,
- *          @p pfx_len was == 0, the first @p pfx_len bits of @ pfx were 0,
- *          or if pref_ltime > valid_ltime.
+ * @return  -EINVAL, if @p pfx was `fe80::` or multicast,
+ *          @p pfx_len was == 0, the first @p pfx_len bits of @p pfx were 0,
+ *          or if @p pref_ltime > @p valid_ltime.
  * @return  -ENOMEM, if no space was left in the prefix list.
  */
 int gnrc_ipv6_nib_pl_set(unsigned iface,

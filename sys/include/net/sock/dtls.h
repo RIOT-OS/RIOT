@@ -60,7 +60,7 @@
  * a module that implements
  * this API in our applications Makefile. For example the module that
  * implements this API for [tinydtls](@ref pkg_tinydtls) is called
- * `tinydtls_sock_dtls'.
+ * `tinydtls_sock_dtls`.
  *
  * The corresponding [pkg](@ref pkg) providing the DTLS implementation will be
  * automatically included so there is no need to use `USEPKG` to add the pkg

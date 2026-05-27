@@ -93,7 +93,7 @@ gnrc_pktsnip_t *gnrc_ndp_nbr_adv_build(const ipv6_addr_t *tgt, uint8_t flags,
 /**
  * @brief   Builds a router solicitation message for sending.
  *
- * @see `[RFC 4861, section 4.1](https://tools.ietf.org/html/rfc4861#section-4.1")
+ * @see [RFC 4861, section 4.1](https://tools.ietf.org/html/rfc4861#section-4.1")
  *
  * @param[in] options   Options to append to the router solicitation.
  *                      May be NULL for none.
@@ -106,7 +106,7 @@ gnrc_pktsnip_t *gnrc_ndp_rtr_sol_build(gnrc_pktsnip_t *options);
 /**
  * @brief   Builds a router advertisement message for sending.
  *
- * @see `[RFC 4861, section 4.2](https://tools.ietf.org/html/rfc4861#section-4.2")
+ * @see [RFC 4861, section 4.2](https://tools.ietf.org/html/rfc4861#section-4.2")
  *
  * @note    The source address for the packet MUST be the link-local address
  *          of the interface.

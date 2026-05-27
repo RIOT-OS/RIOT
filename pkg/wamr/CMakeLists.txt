@@ -16,7 +16,7 @@ if (DEFINED WAMR_CONFIG)
 endif ()
 
 # Build as X86_32 by default, change to "AARCH64[sub]", "ARM[sub]", "THUMB[sub]", "XTENSA"
-# if we want to support arm, thumb, xtensa
+# in case we want to support arm, thumb, xtensa
 if (NOT DEFINED WAMR_BUILD_TARGET)
   set (WAMR_BUILD_TARGET "X86_32")
 endif ()
