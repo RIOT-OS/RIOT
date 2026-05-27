@@ -15,10 +15,10 @@
  * @author      Baptiste Le Duc <baptiste.leduc@etik.com>
  */
 
-#include "periph/i2c.h"
 #include "periph/gpio.h"
-#include "saul_reg.h"
+#include "periph/i2c.h"
 #include "qma6100p.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,8 +34,8 @@ extern "C" {
  * Determined by the AD0 pin level.
  * @{
  */
-#define QMA6100P_I2C_ADDR_LOW       (0x12) /**< AD0 connected to GND */
-#define QMA6100P_I2C_ADDR_HIGH      (0x13) /**< AD0 connected to VDD */
+#define QMA6100P_I2C_ADDR_LOW  (0x12) /**< AD0 connected to GND */
+#define QMA6100P_I2C_ADDR_HIGH (0x13) /**< AD0 connected to VDD */
 /** @} */
 
 /**
@@ -43,9 +43,8 @@ extern "C" {
  * @brief Default I2C bus
  */
 #ifndef QMA6100P_PARAM_I2C
-#  define QMA6100P_PARAM_I2C        (I2C_DEV(0))
+#  define QMA6100P_PARAM_I2C (I2C_DEV(0))
 #endif
-
 
 /**
  * @def QMA6100P_PARAM_I2C_ADDR
@@ -63,7 +62,7 @@ extern "C" {
  * @brief Default output data rate
  */
 #ifndef QMA6100P_PARAM_RATE
-#  define QMA6100P_PARAM_RATE       (QMA6100P_ODR_100HZ)
+#  define QMA6100P_PARAM_RATE (QMA6100P_ODR_100HZ)
 #endif
 
 /**
@@ -71,7 +70,7 @@ extern "C" {
  * @brief Default full-scale range
  */
 #ifndef QMA6100P_PARAM_RANGE
-#  define QMA6100P_PARAM_RANGE      (QMA6100P_RANGE_2G)
+#  define QMA6100P_PARAM_RANGE (QMA6100P_RANGE_2G)
 #endif
 
 /**
@@ -79,7 +78,7 @@ extern "C" {
  * @brief Default per-axis calibration offset (X, Y, Z) in raw LSB units
  */
 #ifndef QMA6100P_PARAM_OFFSET
-#  define QMA6100P_PARAM_OFFSET     { 0, 0, 0 }
+#  define QMA6100P_PARAM_OFFSET { 0, 0, 0 }
 #endif
 
 /**
@@ -87,7 +86,7 @@ extern "C" {
  * @brief Default mode
  */
 #ifndef QMA6100P_PARAM_MODE
-#  define QMA6100P_PARAM_MODE     (QMA6100P_MODE_ACTIVE)
+#  define QMA6100P_PARAM_MODE (QMA6100P_MODE_ACTIVE)
 #endif
 
 /**
@@ -97,7 +96,7 @@ extern "C" {
  */
 #ifndef QMA6100P_PARAM_INT_PIN
 #  define QMA6100P_PARAM_INT_PIN_UNDEF (GPIO_UNDEF)
-#  define QMA6100P_PARAM_INT_PIN    (QMA6100P_PARAM_INT_PIN_UNDEF)
+#  define QMA6100P_PARAM_INT_PIN       (QMA6100P_PARAM_INT_PIN_UNDEF)
 #endif
 
 /**
@@ -113,7 +112,7 @@ extern "C" {
  * @brief Default interrupt pin output mode (push-pull or open-drain).
  */
 #ifndef QMA6100P_PARAM_INT_PIN_MODE
-#  define QMA6100P_PARAM_INT_PIN_MODE     (QMA6100P_INT_PUSH_PULL)
+#  define QMA6100P_PARAM_INT_PIN_MODE (QMA6100P_INT_PUSH_PULL)
 #endif
 
 /**
@@ -122,7 +121,7 @@ extern "C" {
  *        latched holds until the status register is read.
  */
 #ifndef QMA6100P_PARAM_INT_LATCH
-#  define QMA6100P_PARAM_INT_LATCH        (QMA6100P_INT_LATCH_NONE)
+#  define QMA6100P_PARAM_INT_LATCH (QMA6100P_INT_LATCH_NONE)
 #endif
 
 /**
@@ -131,7 +130,7 @@ extern "C" {
  *        the status registers (0x09–0x0D) clears all pending interrupts.
  */
 #ifndef QMA6100P_PARAM_INT_CLEAR
-#  define QMA6100P_PARAM_INT_CLEAR        (QMA6100P_INT_CLEAR_ON_READ)
+#  define QMA6100P_PARAM_INT_CLEAR (QMA6100P_INT_CLEAR_ON_READ)
 #endif
 
 /**
@@ -139,12 +138,12 @@ extern "C" {
  * @brief Default configuration parameters structure for QMA6100P devices
  */
 #ifndef QMA6100P_PARAMS
-#  define QMA6100P_PARAMS           { .i2c     = QMA6100P_PARAM_I2C,     \
-                                      .addr    = QMA6100P_PARAM_I2C_ADDR,    \
-                                      .rate    = QMA6100P_PARAM_RATE,    \
-                                      .range   = QMA6100P_PARAM_RANGE,   \
-                                      .offset  = QMA6100P_PARAM_OFFSET,  \
-                                      .mode    = QMA6100P_PARAM_MODE }
+#  define QMA6100P_PARAMS { .i2c = QMA6100P_PARAM_I2C,       \
+                            .addr = QMA6100P_PARAM_I2C_ADDR, \
+                            .rate = QMA6100P_PARAM_RATE,     \
+                            .range = QMA6100P_PARAM_RANGE,   \
+                            .offset = QMA6100P_PARAM_OFFSET, \
+                            .mode = QMA6100P_PARAM_MODE }
 #endif
 
 /**
@@ -152,34 +151,32 @@ extern "C" {
  * @brief Default interrupt configuration parameters structure for QMA6100P devices
  */
 #ifndef QMA6100P_INT_PARAMS
-#  define QMA6100P_INT_PARAMS         { .interrupt_pin            = QMA6100P_PARAM_INT_PIN,          \
-                                        .active_level_int          = QMA6100P_PARAM_INT_ACTIVE_LEVEL, \
-                                        .pin_mode_int              = QMA6100P_PARAM_INT_PIN_MODE,     \
-                                        .interrupt_latch           = QMA6100P_PARAM_INT_LATCH,        \
-                                        .interrupt_clear_behavior  = QMA6100P_PARAM_INT_CLEAR }
+#  define QMA6100P_INT_PARAMS { .interrupt_pin = QMA6100P_PARAM_INT_PIN,             \
+                                .active_level_int = QMA6100P_PARAM_INT_ACTIVE_LEVEL, \
+                                .pin_mode_int = QMA6100P_PARAM_INT_PIN_MODE,         \
+                                .interrupt_latch = QMA6100P_PARAM_INT_LATCH,         \
+                                .interrupt_clear_behavior = QMA6100P_PARAM_INT_CLEAR }
 #endif
 /**
  * @def QMA6100P_SAUL_INFO
  * @brief Additional SAUL registry information
  */
 #ifndef QMA6100P_SAUL_INFO
-#  define QMA6100P_SAUL_INFO        { .name = "qma6100p" }
+#  define QMA6100P_SAUL_INFO { .name = "qma6100p" }
 #endif
 /** @} */
 
 /**
  * @brief   QMA6100P defaults if not defined for a board or application
  */
-static const qma6100p_params_t qma6100p_params[] =
-{
+static const qma6100p_params_t qma6100p_params[] = {
     QMA6100P_PARAMS
 };
 
 /**
  * @brief   Additional meta information to keep in the SAUL registry
  */
-static const saul_reg_info_t qma6100p_saul_info[] =
-{
+static const saul_reg_info_t qma6100p_saul_info[] = {
     QMA6100P_SAUL_INFO
 };
 

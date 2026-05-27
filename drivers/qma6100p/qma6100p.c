@@ -17,21 +17,20 @@
 
 #include <assert.h>
 
+#include "periph/gpio.h"
+#include "periph/i2c.h"
 #include "qma6100p_params.h"
 #include "qma6100p_regs.h"
-
-#include "periph/i2c.h"
-#include "periph/gpio.h"
 #include "ztimer.h"
 
-#define ENABLE_DEBUG        1
+#define ENABLE_DEBUG 1
 #include "debug.h"
 
-#define BUS                 (dev->params.i2c)
-#define ADDR                (dev->params.addr)
+#define BUS                   (dev->params.i2c)
+#define ADDR                  (dev->params.addr)
 
 /** Print out a message that function is not yet implemented */
-#define NOT_YET_IMPLEMENTED()     DEBUG("%s not yet implemented\n", __func__)
+#define NOT_YET_IMPLEMENTED() DEBUG("%s not yet implemented\n", __func__)
 
 static inline int _read_reg(i2c_t i2c, uint8_t addr, uint8_t reg_addr,
                             uint8_t *reg_value)
@@ -115,7 +114,7 @@ int qma6100p_init(qma6100p_t *dev, const qma6100p_params_t *params)
 /* TODO: implement qma6100p_disable_set_interrupt (during interrupt feature support) */
 static int qma6100p_disable_set_interrupt(const qma6100p_t *dev)
 {
-    (void) dev;
+    (void)dev;
     NOT_YET_IMPLEMENTED();
     return 0;
 }

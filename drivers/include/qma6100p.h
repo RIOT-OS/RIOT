@@ -28,6 +28,7 @@
  */
 
 #include <stdint.h>
+
 #include "periph/gpio.h"
 #include "periph/i2c.h"
 
@@ -39,13 +40,13 @@ extern "C" {
  * @brief   Named return values
  */
 enum {
-    QMA6100P_OK          =  0,  /**< everything was fine */
-    QMA6100P_DATA_READY  =  1,  /**< new data ready to be read */
-    QMA6100P_NOI2C       = -1,  /**< I2C communication failed */
-    QMA6100P_NODEV       = -2,  /**< no QMA6100P device found on the bus */
-    QMA6100P_NODATA      = -3,  /**< no data available */
-    QMA6100P_INVALID_ARG = -4,  /**< invalid argument */
-    QMA6100P_GPIO_ERROR  = -5,  /**< GPIO error */
+    QMA6100P_OK = 0,           /**< everything was fine */
+    QMA6100P_DATA_READY = 1,   /**< new data ready to be read */
+    QMA6100P_NOI2C = -1,       /**< I2C communication failed */
+    QMA6100P_NODEV = -2,       /**< no QMA6100P device found on the bus */
+    QMA6100P_NODATA = -3,      /**< no data available */
+    QMA6100P_INVALID_ARG = -4, /**< invalid argument */
+    QMA6100P_GPIO_ERROR = -5,  /**< GPIO error */
 };
 
 /**
@@ -55,11 +56,11 @@ enum {
  * Higher range = lower sensitivity.
  */
 typedef enum {
-    QMA6100P_RANGE_2G          = 0x01, /**< ±2g  — sensitivity 4096 LSB/g */
-    QMA6100P_RANGE_4G          = 0x02, /**< ±4g  — sensitivity 2048 LSB/g */
-    QMA6100P_RANGE_8G          = 0x04, /**< ±8g  — sensitivity 1024 LSB/g */
-    QMA6100P_RANGE_16G         = 0x08, /**< ±16g — sensitivity  512 LSB/g */
-    QMA6100P_RANGE_32G         = 0x0F, /**< ±32g — sensitivity  256 LSB/g */
+    QMA6100P_RANGE_2G = 0x01,  /**< ±2g  — sensitivity 4096 LSB/g */
+    QMA6100P_RANGE_4G = 0x02,  /**< ±4g  — sensitivity 2048 LSB/g */
+    QMA6100P_RANGE_8G = 0x04,  /**< ±8g  — sensitivity 1024 LSB/g */
+    QMA6100P_RANGE_16G = 0x08, /**< ±16g — sensitivity  512 LSB/g */
+    QMA6100P_RANGE_32G = 0x0F, /**< ±32g — sensitivity  256 LSB/g */
 } qma6100p_range_t;
 
 /**
@@ -69,14 +70,14 @@ typedef enum {
  * Assumes MCLK=51.2KHz (default after init sequence).
  */
 typedef enum {
-    QMA6100P_ODR_100HZ  = 0x00, /**< 100 Hz (default) */
-    QMA6100P_ODR_200HZ  = 0x01, /**< 200 Hz */
-    QMA6100P_ODR_400HZ  = 0x02, /**< 400 Hz */
-    QMA6100P_ODR_800HZ  = 0x03, /**< 800 Hz */
+    QMA6100P_ODR_100HZ = 0x00,  /**< 100 Hz (default) */
+    QMA6100P_ODR_200HZ = 0x01,  /**< 200 Hz */
+    QMA6100P_ODR_400HZ = 0x02,  /**< 400 Hz */
+    QMA6100P_ODR_800HZ = 0x03,  /**< 800 Hz */
     QMA6100P_ODR_1600HZ = 0x04, /**< 1600 Hz */
-    QMA6100P_ODR_50HZ   = 0x05, /**< 50 Hz */
-    QMA6100P_ODR_25HZ   = 0x06, /**< 25 Hz */
-    QMA6100P_ODR_12HZ5  = 0x07, /**< 12.5 Hz */
+    QMA6100P_ODR_50HZ = 0x05,   /**< 50 Hz */
+    QMA6100P_ODR_25HZ = 0x06,   /**< 25 Hz */
+    QMA6100P_ODR_12HZ5 = 0x07,  /**< 12.5 Hz */
 } qma6100p_odr_t;
 
 /**
@@ -88,22 +89,22 @@ typedef enum {
  */
 typedef enum {
     QMA6100P_MODE_INTERMEDIATE = 0, /**< After power on state, shouldn't be keep */
-    QMA6100P_MODE_ACTIVE = 1, /**< Processes the interrupts and send data to results registers */
-    QMA6100P_MODE_ULPS = 2 , /**< Ultra-Low Power State */
+    QMA6100P_MODE_ACTIVE = 1,       /**< Processes the interrupts and send data to results registers */
+    QMA6100P_MODE_ULPS = 2,         /**< Ultra-Low Power State */
 } qma6100p_mode_t;
 /**
  * @brief   INT pin active level
  */
 typedef enum {
     QMA6100P_INT_PIN_ACTIVE_HIGH = 0, /**< INT pin active HIGH on interrupt */
-    QMA6100P_INT_PIN_ACTIVE_LOW  = 1, /**< INT pin active LOW on interrupt */
+    QMA6100P_INT_PIN_ACTIVE_LOW = 1,  /**< INT pin active LOW on interrupt */
 } qma6100p_int_pin_active_level_t;
 
 /**
  * @brief   INT pin output mode
  */
 typedef enum {
-    QMA6100P_INT_PIN_PUSH_PULL  = 0, /**< INT pin configured as push-pull */
+    QMA6100P_INT_PIN_PUSH_PULL = 0,  /**< INT pin configured as push-pull */
     QMA6100P_INT_PIN_OPEN_DRAIN = 1, /**< INT pin configured as open drain */
 } qma6100p_int_pin_mode_t;
 
@@ -112,7 +113,7 @@ typedef enum {
  */
 typedef enum {
     QMA6100P_INT_NON_LATCH = 0, /**< INT pulse clears automatically */
-    QMA6100P_INT_LATCH     = 1, /**< INT held until acknowledged via @ref qma6100p_ack_int */
+    QMA6100P_INT_LATCH = 1,     /**< INT held until acknowledged via @ref qma6100p_ack_int */
 } qma6100p_int_latch_t;
 
 /**
@@ -120,7 +121,7 @@ typedef enum {
  */
 typedef enum {
     QMA6100P_INT_CLR_ON_ANY_READ = 0, /**< INT_STATUS bits cleared on any read */
-    QMA6100P_INT_CLR_ON_LATCH    = 1, /**< INT_STATUS bits cleared only if latched */
+    QMA6100P_INT_CLR_ON_LATCH = 1,    /**< INT_STATUS bits cleared only if latched */
 } qma6100p_int_clear_t;
 
 /**

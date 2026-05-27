@@ -16,8 +16,7 @@
  */
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /**
@@ -83,9 +82,9 @@ extern "C"
  * NLPF[2:0] in bits[7:5], ODR[4:0] in bits[4:0].
  * @{
  */
-#define QMA6100P_ODR_MASK    (0x1F)       /**< ODR bits[4:0] mask */
-#define QMA6100P_NLPF_SHIFT  (5)          /**< NLPF field shift */
-#define QMA6100P_NLPF_MASK   (0x07 << 5) /**< NLPF bits[7:5] mask */
+#define QMA6100P_ODR_MASK           (0x1F)      /**< ODR bits[4:0] mask */
+#define QMA6100P_NLPF_SHIFT         (5)         /**< NLPF field shift */
+#define QMA6100P_NLPF_MASK          (0x07 << 5) /**< NLPF bits[7:5] mask */
 /* NLPF when RANGE[LPF_HPF]=0 (LPF mode): 000=off, 100=1, x01=2, x10=4, x11=8 */
 /* NLPF when RANGE[LPF_HPF]=1 (HPF mode): 000=off, 001=ODR/10, 010=ODR/25, etc. */
 /** @} */
@@ -103,8 +102,8 @@ extern "C"
 #define QMA6100P_PM_SINC_4MCLK      (0x01 << QMA6100P_PM_SINC_SHIFT)
 #define QMA6100P_PM_SINC_6MCLK      (0x02 << QMA6100P_PM_SINC_SHIFT)
 #define QMA6100P_PM_SINC_8MCLK      (0x03 << QMA6100P_PM_SINC_SHIFT)
-#define QMA6100P_PM_MCLK_MASK       (0x0F)   /**< MCLK[3:0] */
-#define QMA6100P_PM_MCLK_51K2       (0x04)   /**< 51.2 kHz — recommended default */
+#define QMA6100P_PM_MCLK_MASK       (0x0F) /**< MCLK[3:0] */
+#define QMA6100P_PM_MCLK_51K2       (0x04) /**< 51.2 kHz — recommended default */
 #define QMA6100P_PM_MCLK_25K6       (0x05)
 #define QMA6100P_PM_MCLK_12K8       (0x06)
 #define QMA6100P_PM_MCLK_6K4        (0x07)

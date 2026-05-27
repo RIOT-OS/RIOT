@@ -17,19 +17,18 @@
 
 #include <stdio.h>
 
+#include "board.h"
+#include "periph/gpio.h"
 #include "qma6100p.h"
 #include "qma6100p_params.h"
 #include "ztimer.h"
-#include "board.h"
-#include "periph/gpio.h"
 
-#define SLEEP_S    (5U)
+#define SLEEP_S (5U)
 
 static qma6100p_t dev;
 
 int main(void)
 {
-
 #ifdef T1000E_3V3_ACC_EN_PIN
     gpio_init(T1000E_3V3_ACC_EN_PIN, GPIO_OUT);
     gpio_set(T1000E_3V3_ACC_EN_PIN);
