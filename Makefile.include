@@ -288,7 +288,7 @@ endif
 # of greater ROM consumption.
 VERBOSE_ASSERT ?= 0
 ifeq ($(VERBOSE_ASSERT),1)
-  CFLAGS += -DDEBUG_ASSERT_VERBOSE
+  CFLAGS += -DCONFIG_ASSERT_VERBOSE=1
   DEVELHELP := 1
 endif
 

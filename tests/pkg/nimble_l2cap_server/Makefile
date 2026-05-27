@@ -15,6 +15,6 @@ include $(RIOTBASE)/tests/pkg/nimble_l2cap_server/nimble.inc.mk
 # which is not needed in a production environment but helps in the
 # development process:
 CFLAGS += -DLOG_LEVEL=LOG_ALL
-CFLAGS += -DDEBUG_ASSERT_VERBOSE
+CFLAGS += -DCONFIG_ASSERT_VERBOSE=1
 
 include $(RIOTBASE)/Makefile.include
