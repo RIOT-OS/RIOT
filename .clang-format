@@ -106,14 +106,9 @@ SortUsingDeclarations: false
 SpaceAfterCStyleCast: false
 SpaceAfterTemplateKeyword: true
 SpaceBeforeAssignmentOperators: true
-# HACK: We want a space in front of the "{" in:
-#
-#    NANOCOAP_RESOURCE(board) { .path = "/echo", .methods = COAP_GET, ... };
-#
-# Cpp11BracedList isn't meant for that, but there aren't any Cpp11BraceList in
-# C code anyway, so it abusing this won't create any conflicts with actuall C++
-# braced lists.
-SpaceBeforeCpp11BracedList: true
+# This results in consistently having no space after a
+# type cast, even when a braced initializer list comes
+SpaceBeforeCpp11BracedList: false
 SpaceBeforeCtorInitializerColon: true
 SpaceBeforeInheritanceColon: true
 SpaceBeforeParens: ControlStatementsExceptForEachMacros
