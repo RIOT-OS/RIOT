@@ -23,3 +23,7 @@ include $(RIOTMAKE)/arch/cortexm.inc.mk
 
 # The Black Magic Probe has tested to work fine on SAMD5x
 PROGRAMMERS_SUPPORTED += bmp
+
+# The same OpenOCD configuration can be used for probably all SAMD5x boards.
+# We do allow the board to override it, though, just in case.
+OPENOCD_CONFIG ?= $(RIOTCPU)/samd5x/dist/openocd.cfg
