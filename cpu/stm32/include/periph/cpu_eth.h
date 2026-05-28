@@ -134,7 +134,7 @@ typedef struct eth_dma_desc {
  * | `0b00` | Checksum insertion disabled                                                   |
  * | `0b01` | Calculate and insert checksum in IPv4 header                                  |
  * | `0b10` | Calculate and insert IPv4 checksum, insert pre-calculated payload checksum    |
- * | `0b11  | Calculated and insert both IPv4 and payload checksum                          |
+ * | `0b11` | Calculated and insert both IPv4 and payload checksum                          |
  */
 #define TX_DESC_STAT_CIC                    (BIT22 | BIT23)
 #define TX_DESC_STAT_CIC_NO_HW_CHECKSUM     (0)             /**< Do not compute checksums in hardware */

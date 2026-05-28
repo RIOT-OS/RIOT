@@ -920,7 +920,7 @@ The GPIOs in this configuration can be overridden by
 ## SD-Card Device {#esp8266_sd_card_device}
 
 ESP8266 port of RIOT is preconfigured for RIOT applications that use the
-\ref drivers_sdcard_spi "SPI SD-Card driver.
+\ref drivers_sdcard_spi "SPI SD-Card driver".
 To use SPI SD-Card driver, the `sdcard_spi` module has to be added to
 a makefile:
 
