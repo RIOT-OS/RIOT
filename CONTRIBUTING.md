@@ -15,7 +15,7 @@ If you have questions, please write a post over at our [forum] or chat on
 `#riot-os:matrix.org` on [Matrix].
 
 As a reminder, all contributors are expected to follow our
-[Code of Conduct](CODE_OF_CONDUCT.md).
+[Code of Conduct](https://guide.riot-os.org/general/code_of_conduct/).
 
 [forum]: https://forum.riot-os.org
 [Matrix]: https://matrix.to/#/#riot-os:matrix.org
@@ -128,7 +128,7 @@ It is possible to check if your code follows these conventions:
 
   Use it before opening a PR to perform last time checks.
 
-[coding-conventions]: CODING_CONVENTIONS.md
+[coding-conventions]: https://guide.riot-os.org/c_tutorials/coding_conventions/
 
 ### Commit conventions
 [commit conventions]: #commit-conventions
@@ -431,6 +431,6 @@ Note: Violations of our [code of conduct][code-of-conduct] should be reported
       to [email-coc]. See our [code of conduct][code-of-conduct] for more
       details.
 
-[code-of-conduct]: CODE_OF_CONDUCT.md
+[code-of-conduct]: https://guide.riot-os.org/general/code_of_conduct/
 [email-mediator]: mailto:mediation@riot-os.org
 [email-coc]: mailto:conduct@riot-os.org
