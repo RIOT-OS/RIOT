@@ -30,12 +30,8 @@ static void test_base64_01_encode_string(void)
     char base64_out[sizeof(expected_encoding)];
 
     /*
-    * @Note
-    * The first encoding attempt fails, but reveals the required out size.
-    *
-    * This size is a lower bound estimation,
-    * thus it can require few more bytes then the actual used size for the output.
-    */
+     * The first encoding attempt fails, but reveals the required out size.
+     */
     int ret = base64_encode(data_in, data_in_size, NULL, &base64_out_size);
 
     TEST_ASSERT_EQUAL_INT(BASE64_ERROR_BUFFER_OUT_SIZE, ret);
@@ -188,15 +184,14 @@ static void test_base64_05_decode_larger(void)
 static void test_base64_06_stream_encode(void)
 {
     /*
-    * @Note
-    * In this test we divide the `stream_encode[]` input for the encoding
-    * into several portions (chunks).
-    *
-    * Every chunk is encoded and appended to the base64 `encode_result[]`.
-    * To enable appending further, the chunks MUST be dividable by 3.
-    * Only the final chunk MAY be prime to 3. (it is in this test)
-    *
-    */
+     * In this test we divide the `stream_encode[]` input for the encoding
+     * into several portions (chunks).
+     *
+     * Every chunk is encoded and appended to the base64 `encode_result[]`.
+     * To enable appending further, the chunks MUST be dividable by 3.
+     * Only the final chunk MAY be prime to 3. (it is in this test)
+     *
+     */
 
     static const char stream_encode[] =
         "Peter Piper picked a peck of pickled peppers.\n"
@@ -245,12 +240,13 @@ static void test_base64_06_stream_encode(void)
 
 static void test_base64_07_stream_decode(void)
 {
-    /* @Note
-    * Here we decode the base64 string `encoded[]`
-    *
-    * Every base64 chunk is decoded and appended to `stream_decoded[]`.
-    * The chunks passed to decode MUST be dividable by 4.
-    */
+
+    /*
+     * Here we decode the base64 string `encoded[]`
+     *
+     * Every base64 chunk is decoded and appended to `stream_decoded[]`.
+     * The chunks passed to decode MUST be dividable by 4.
+     */
 
     static const char encoded[] =
         "UGV0ZXIgUGlwZXIgcGlja2VkIGEgcGVjayBvZiBwaWNrbGVkIH"
@@ -338,7 +334,7 @@ static void test_base64_09_encode_size_determination(void)
     size_t element_base64_out_size = expected_out_size;
     unsigned char element_base64_out[expected_out_size];
 
-    // test 20 bytes input, expected 28 bytes output
+    /* test 20 bytes input, expected 28 bytes output */
     size_t required_out_size = 0;
     int ret = base64_encode(buffer, buffer_size,
                             element_base64_out, &required_out_size);
@@ -352,7 +348,7 @@ static void test_base64_09_encode_size_determination(void)
     TEST_ASSERT_EQUAL_INT(BASE64_SUCCESS, ret);
     TEST_ASSERT_EQUAL_INT(expected_out_size, element_base64_out_size);
 
-    // test 19 bytes input, expected 28 bytes output
+    /* test 19 bytes input, expected 28 bytes output */
     required_out_size = 0;
     ret = base64_encode(buffer, 19,
                         element_base64_out, &required_out_size);
@@ -360,7 +356,7 @@ static void test_base64_09_encode_size_determination(void)
     TEST_ASSERT_EQUAL_INT(BASE64_ERROR_BUFFER_OUT_SIZE, ret);
     TEST_ASSERT_EQUAL_INT(required_out_size, expected_out_size);
 
-    // test 18 bytes input, expected 24 bytes output
+    /* test 18 bytes input, expected 24 bytes output */
     expected_out_size = 24;
     required_out_size = 0;
     ret = base64_encode(buffer, 18,
@@ -369,7 +365,7 @@ static void test_base64_09_encode_size_determination(void)
     TEST_ASSERT_EQUAL_INT(BASE64_ERROR_BUFFER_OUT_SIZE, ret);
     TEST_ASSERT_EQUAL_INT(required_out_size, expected_out_size);
 
-    // test 17 bytes input, expected 24 bytes output
+    /* test 17 bytes input, expected 24 bytes output */
     expected_out_size = 24;
     required_out_size = 0;
     ret = base64_encode(buffer, 17,
@@ -418,12 +414,8 @@ static void test_base64_11_urlsafe_encode_int(void)
     char base64_out[sizeof(expected_encoding) + 2];
 
     /*
-    * @Note
-    * The first encoding attempt fails, but reveals the required out size.
-    *
-    * This size is a lower bound estimation,
-    * thus it can require few more bytes then the actual used size for the output.
-    */
+     * The first encoding attempt fails, but reveals the required out size.
+     */
     int ret = base64url_encode(&data_in, sizeof(data_in), NULL, &base64_out_size);
 
     TEST_ASSERT_EQUAL_INT(BASE64_ERROR_BUFFER_OUT_SIZE, ret);
