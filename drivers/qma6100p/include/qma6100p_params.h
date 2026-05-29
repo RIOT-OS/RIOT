@@ -13,6 +13,7 @@
  * @brief       Default configuration for the QST QMA6100P accelerometer
  *
  * @author      Baptiste Le Duc <baptiste.leduc@etik.com>
+ * @author      Léandre Le Duc <leandre.leduc38@gmail.com>
  */
 
 #include "periph/gpio.h"
@@ -53,8 +54,7 @@ extern "C" {
  *        or @ref QMA6100P_I2C_ADDR_HIGH (0x13) when AD0 is connected to VDD.
  */
 #ifndef QMA6100P_PARAM_I2C_ADDR
-#  define QMA6100P_PARAM_I2C_ADDR_UNDEF (GPIO_UNDEF)
-#  define QMA6100P_PARAM_I2C_ADDR       (QMA6100P_I2C_ADDR_LOW)
+#  define QMA6100P_PARAM_I2C_ADDR (QMA6100P_I2C_ADDR_LOW)
 #endif
 
 /**
@@ -95,7 +95,7 @@ extern "C" {
  *        operation and use polling instead.
  */
 #ifndef QMA6100P_PARAM_INT_PIN
-#  define QMA6100P_PARAM_INT_PIN_UNDEF (GPIO_UNDEF)
+#  define QMA6100P_PARAM_INT_PIN_UNDEF (GPIO_UNDEF) /**< fallback when board has no INT pin */
 #  define QMA6100P_PARAM_INT_PIN       (QMA6100P_PARAM_INT_PIN_UNDEF)
 #endif
 
@@ -104,7 +104,7 @@ extern "C" {
  * @brief Default interrupt pin active level.
  */
 #ifndef QMA6100P_PARAM_INT_ACTIVE_LEVEL
-#  define QMA6100P_PARAM_INT_ACTIVE_LEVEL (QMA6100P_INT_ACTIVE_HIGH)
+#  define QMA6100P_PARAM_INT_ACTIVE_LEVEL (QMA6100P_INTPIN_ACTIVE_HIGH)
 #endif
 
 /**
@@ -112,7 +112,7 @@ extern "C" {
  * @brief Default interrupt pin output mode (push-pull or open-drain).
  */
 #ifndef QMA6100P_PARAM_INT_PIN_MODE
-#  define QMA6100P_PARAM_INT_PIN_MODE (QMA6100P_INT_PUSH_PULL)
+#  define QMA6100P_PARAM_INT_PIN_MODE (QMA6100P_INTPIN_PUSH_PULL)
 #endif
 
 /**
@@ -121,7 +121,7 @@ extern "C" {
  *        latched holds until the status register is read.
  */
 #ifndef QMA6100P_PARAM_INT_LATCH
-#  define QMA6100P_PARAM_INT_LATCH (QMA6100P_INT_LATCH_NONE)
+#  define QMA6100P_PARAM_INT_LATCH (QMA6100P_INT_CFG_NON_LATCH)
 #endif
 
 /**
@@ -130,9 +130,23 @@ extern "C" {
  *        the status registers (0x09–0x0D) clears all pending interrupts.
  */
 #ifndef QMA6100P_PARAM_INT_CLEAR
-#  define QMA6100P_PARAM_INT_CLEAR (QMA6100P_INT_CLEAR_ON_READ)
+#  define QMA6100P_PARAM_INT_CLEAR (QMA6100P_INT_CFG_CLR_ON_ANY_READ)
 #endif
 
+/**
+ * @def QMA6100P_PARAM_INT_SHADOW
+ * @brief Default shadow mode for acceleration data registers
+ */
+#ifndef QMA6100P_PARAM_INT_SHADOW
+#  define QMA6100P_PARAM_INT_SHADOW (QMA6100P_INT_CFG_SHADOW_DIS)
+#endif
+
+/**
+ * @def QMA6100P_PARAM_INT_PIN_NUM
+ * @brief QMA6100P interrupt output pin routed to the MCU */
+#ifndef QMA6100P_PARAM_INT_PIN_NUM
+#  define QMA6100P_PARAM_INT_PIN_NUM (QMA6100P_INT1)
+#endif
 /**
  * @def QMA6100P_PARAMS
  * @brief Default configuration parameters structure for QMA6100P devices
@@ -151,11 +165,13 @@ extern "C" {
  * @brief Default interrupt configuration parameters structure for QMA6100P devices
  */
 #ifndef QMA6100P_INT_PARAMS
-#  define QMA6100P_INT_PARAMS { .interrupt_pin = QMA6100P_PARAM_INT_PIN,             \
-                                .active_level_int = QMA6100P_PARAM_INT_ACTIVE_LEVEL, \
-                                .pin_mode_int = QMA6100P_PARAM_INT_PIN_MODE,         \
-                                .interrupt_latch = QMA6100P_PARAM_INT_LATCH,         \
-                                .interrupt_clear_behavior = QMA6100P_PARAM_INT_CLEAR }
+#  define QMA6100P_INT_PARAMS { .interrupt_pin = QMA6100P_PARAM_INT_PIN,              \
+                                .active_level_int = QMA6100P_PARAM_INT_ACTIVE_LEVEL,  \
+                                .pin_mode_int = QMA6100P_PARAM_INT_PIN_MODE,          \
+                                .interrupt_latch = QMA6100P_PARAM_INT_LATCH,          \
+                                .interrupt_clear_behavior = QMA6100P_PARAM_INT_CLEAR, \
+                                .interrupt_shadow = QMA6100P_PARAM_INT_SHADOW,        \
+                                .interrupt_pin_num = QMA6100P_PARAM_INT_PIN_NUM }
 #endif
 /**
  * @def QMA6100P_SAUL_INFO
