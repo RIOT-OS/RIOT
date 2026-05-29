@@ -24,6 +24,13 @@ ifneq (,$(filter stm32_eth,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter lwip_app_lwiperf,$(USEMODULE)))
+  USEMODULE += lwip_tcp
+  ifneq (,$(filter lwip_ipv4,$(USEMODULE)))
+    USEMODULE += lwip_arp
+  endif
+endif
+
 ifneq (,$(filter lwip_ipv6_autoconfig lwip_ipv6_mld,$(USEMODULE)))
   USEMODULE += lwip_ipv6
 endif
