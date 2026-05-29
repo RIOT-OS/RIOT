@@ -126,6 +126,17 @@ extern "C" {
 /** @} */
 
 /**
+ * @name Resolution - Range associated resolution used to convert in g in ug/LSB
+ * @{
+ */
+#define QMA6100P_2G_RESOLUTION           (244)  /**< Resolution for a +- 2g range */
+#define QMA6100P_4G_RESOLUTION           (488)  /**< Resolution for a +- 4g range */
+#define QMA6100P_8G_RESOLUTION           (977)  /**< Resolution for a +- 8g range */
+#define QMA6100P_16G_RESOLUTION          (1950) /**< Resolution for a +- 16g range */
+#define QMA6100P_32G_RESOLUTION          (3810) /**< Resolution for a +- 32g range */
+/** @} */
+
+/**
  * @name    ODR (0x10) masks — output data rate and filter
  * ODR[4:0] in bits[4:0], NLPF[2:0] in bits[7:5]
  *

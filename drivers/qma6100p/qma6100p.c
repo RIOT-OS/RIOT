@@ -17,9 +17,11 @@
  */
 
 #include <assert.h>
+#include <stdint.h>
 
 #include "periph/gpio.h"
 #include "periph/i2c.h"
+#include "qma6100p.h"
 #include "qma6100p_params.h"
 #include "qma6100p_regs.h"
 #include "ztimer.h"
@@ -333,6 +335,127 @@ int qma6100p_init(qma6100p_t *dev, const qma6100p_params_t *params)
     }
 
     return QMA6100P_OK;
+}
+
+/**
+ * @brief Convert read output data into a 14 bit signed data.
+ *
+ * Merge two uint8_t register getting all [7:0] from @p msb and
+ * [7:2] from @p lsb and convert it into a int16_t signed value.
+ *
+ * @param  lsb[in]      lsb of the data register
+ * @param  msb[in]      msb of the datat register
+ *
+ * @return 14 bits signed data
+ */
+static inline int16_t _to_signed14(uint8_t lsb, uint8_t msb)
+{
+    uint16_t raw = (uint16_t)msb << 8 | lsb;
+    return (int16_t)((int16_t)raw >> 2);
+}
+
+/**
+ * @brief Read the raw output data of the device and write them in the given buffer
+ *
+ * @param[in,out] dev         device descriptor
+ * @param[out]    data        raw data buffer
+ *
+ * @return  0 on success
+ * @return  negative error code on I2C failure
+ */
+int qma6100p_read_raw(const qma6100p_t *dev, qma6100p_raw_data_t *data)
+{
+    assert(dev && data);
+
+    int res = QMA6100P_DATA_READY;
+    uint8_t buf[6];
+    uint8_t new_data;
+
+    i2c_acquire(BUS);
+
+    /* Burst read 6 bytes to ensure atomic update of X/Y/Z samples (avoid LSB/MSB mismatch) */
+    res = i2c_read_regs(BUS, ADDR, QMA6100P_REG_DX_LSB, buf, 6, 0);
+    if (res < 0) {
+        goto out;
+    }
+
+    new_data =
+        (buf[0] | buf[2] | buf[4]) & QMA6100P_NEWDATA_FLAG_MASK;
+
+    if (!new_data) {
+        res = QMA6100P_NODATA;
+        goto out;
+    }
+
+    data->x = _to_signed14(buf[0], buf[1]);
+    data->y = _to_signed14(buf[2], buf[3]);
+    data->z = _to_signed14(buf[4], buf[5]);
+
+out:
+    i2c_release(BUS);
+    return res;
+}
+
+/**
+ * @brief Converts to ug a raw data value given the full scale range
+ *
+ * Multiplies the raw 14-bit signed ADC value by the resolution (ug/LSB)
+ * corresponding to the configured full scale range.
+ *
+ * @param raw_value raw data to convert in ug
+ * @param range     full scale range used
+ *
+ * @return converted to ug value
+ */
+static int32_t _convert_to_ug(int16_t raw_value, qma6100p_range_t range)
+{
+    int32_t resolution = QMA6100P_2G_RESOLUTION;
+
+    switch (range) {
+    case (QMA6100P_RANGE_2G):
+        resolution = QMA6100P_2G_RESOLUTION;
+        break;
+
+    case (QMA6100P_RANGE_4G):
+        resolution = QMA6100P_4G_RESOLUTION;
+        break;
+
+    case (QMA6100P_RANGE_8G):
+        resolution = QMA6100P_8G_RESOLUTION;
+        break;
+
+    case (QMA6100P_RANGE_16G):
+        resolution = QMA6100P_16G_RESOLUTION;
+        break;
+
+    case (QMA6100P_RANGE_32G):
+        resolution = QMA6100P_32G_RESOLUTION;
+        break;
+    default:
+        resolution = QMA6100P_2G_RESOLUTION;
+        break;
+    }
+    return raw_value * resolution;
+}
+
+int qma6100p_read(const qma6100p_t *dev, qma6100p_data_t *data)
+{
+    assert(dev && data);
+
+    int res;
+    qma6100p_raw_data_t raw_data;
+
+    res = qma6100p_read_raw(dev, &raw_data);
+    if (res < 0) {
+        DEBUG("[qma6100p] read: read raw data failed (%d)\n", res);
+        return res;
+    }
+
+    data->x = _convert_to_ug(raw_data.x, dev->params.range);
+    data->y = _convert_to_ug(raw_data.y, dev->params.range);
+    data->z = _convert_to_ug(raw_data.z, dev->params.range);
+
+    return res;
 }
 
 /**
