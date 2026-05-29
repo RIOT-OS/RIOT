@@ -24,7 +24,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 /**
- * @defgroup    sys_utlist utlist
+ * @defgroup    sys_ut utlist: basic linked list operations
  * @ingroup     sys
  * @brief       Basic linked list operation definitions
  * @{

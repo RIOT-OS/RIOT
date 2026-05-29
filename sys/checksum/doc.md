@@ -7,7 +7,7 @@ General Public License v2.1. See the file LICENSE in the top level
 directory for more details.
 -->
 
-@defgroup    sys_checksum Checksum
+@defgroup    sys_checksum checksum: Checksum
 @ingroup     sys_hashes
 @brief       Checksum function libraries
 
