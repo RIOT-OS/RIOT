@@ -201,7 +201,7 @@ static void on_pingreq(sock_udp_ep_t *remote)
 
 static void on_pingresp(void)
 {
-    /** @todo: trigger update something like a 'last seen' value */
+    /** @todo trigger update something like a 'last seen' value */
 }
 
 static void send_ping(void)

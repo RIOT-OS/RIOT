@@ -356,7 +356,7 @@ static void _irq_handler(event_t* event)
 }
 
 /*
- * @warning: It is expected that the I2C bus is already acquired when the
+ * @warning  It is expected that the I2C bus is already acquired when the
  *           function is called. However, it is released by this function
  *           before the function returns.
  */

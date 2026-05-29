@@ -12,7 +12,7 @@
 #
 # The script takes a long time
 #
-# @author: Gaëtan Harter <gaetan.harter@fu-berlin.de>
+# @author  Gaëtan Harter <gaetan.harter@fu-berlin.de>
 
 : "${RIOTBASE:="$(cd "$(dirname "$0")/../../../" || exit; pwd)"}"
 

@@ -85,7 +85,7 @@ void event_timeout_init(event_timeout_t *event_timeout, event_queue_t *queue,
  * after @p timeout microseconds (if using @ref xtimer) or the @ref
  * ztimer_clock_t ticks.
  *
- * @note: the used event_timeout struct must stay valid until after the timeout
+ * @note  the used event_timeout struct must stay valid until after the timeout
  *        event has been processed!
  *
  * @param[in]   event_timeout   event_timeout context object to use

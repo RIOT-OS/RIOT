@@ -517,10 +517,10 @@ osaStatus_t OSA_EventDestroy(osaEventId_t eventId);
  *
  * This function  allocates memory for and initializes a message queue. Message queue elements are hardcoded as void*.
  *
- * @param msgNo :number of messages the message queue should accommodate.
+ * @param msgNo  number of messages the message queue should accommodate.
  *               This parameter should not exceed osNumberOfMessages defined in OSAbstractionConfig.h.
  *
-* @return:  Handler to access the queue for put and get operations. If message queue
+* @return  Handler to access the queue for put and get operations. If message queue
  *         creation failed, return NULL.
  */
 osaMsgQId_t OSA_MsgQCreate(uint32_t  msgNo);

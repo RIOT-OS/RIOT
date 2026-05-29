@@ -292,7 +292,7 @@ void gnrc_tcp_abort(gnrc_tcp_tcb_t *tcb);
  *
  * @pre @p queue must not be NULL
  *
- * @note: Blocks until all currently opened connections maintained
+ * @note  Blocks until all currently opened connections maintained
  *        by @p queue were closed.
  *
  * @param[in,out] queue   TCB queue to stop listening

@@ -253,7 +253,7 @@ static inline void ztimer64_set_msg(ztimer64_clock_t *clock, ztimer64_t *timer,
  * Similar to msg_receive(), but with a timeout parameter.
  * The function will return after waiting at most until @p target.
  *
- * @note: This might function might leave a message with type MSG_ZTIMER64 in the
+ * @note  This might function might leave a message with type MSG_ZTIMER64 in the
  *        thread's message queue, which must be handled (ignored).
  *
  * @param[in]   clock           ztimer64 clock to operate on
@@ -273,7 +273,7 @@ int ztimer64_msg_receive_until(ztimer64_clock_t *clock, msg_t *msg,
  * Similar to msg_receive(), but with a timeout parameter.
  * The function will return after waiting at most @p timeout ticks.
  *
- * @note: This might function might leave a message with type MSG_ZTIMER64 in the
+ * @note  This might function might leave a message with type MSG_ZTIMER64 in the
  *        thread's message queue, which must be handled (ignored).
  *
  * @param[in]   clock           ztimer64 clock to operate on
@@ -339,7 +339,7 @@ static inline void ztimer64_sleep(ztimer64_clock_t *clock, uint64_t duration)
 /**
  * @brief   Busy-wait until specified target time
  *
- * @note: This blocks lower priority threads. Use only for *very* short delays.
+ * @note  This blocks lower priority threads. Use only for *very* short delays.
  *
  * @param[in]   clock           ztimer64 clock to use
  * @param[in]   target          time when spinning should end, in @p clock time
