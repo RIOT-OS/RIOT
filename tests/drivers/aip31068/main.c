@@ -67,11 +67,11 @@ static void _init_progress_bar(aip31068_t* dev, uint8_t row);
  * line will be reserved completely for the progress bar. Any text written to
  * that line will be overwritten by the progress bar on an update.
  *
- * @note: Auto scroll will be disabled and the display will be scrolled to
+ * @note  Auto scroll will be disabled and the display will be scrolled to
  *        its original position. Don't use scrolling when using the
  *        progressbar, otherwise it won't display correctly.
  *
- * @note: Text insertion mode will be set to LEFT_TO_RIGHT.
+ * @note  Text insertion mode will be set to LEFT_TO_RIGHT.
  *
  * @param[in] dev       Device descriptor of the AIP31068
  * @param[in] enabled   Enable or disable
@@ -90,7 +90,7 @@ static void _set_progress_bar_row(uint8_t row);
 /**
  * @brief Set the progress of the progress bar and draw the update.
  *
- * @note: This function changes the cursor position. You will have to use
+ * @note  This function changes the cursor position. You will have to use
  *        setCursorPosition in order to return to your required cursor position.
  *
  * @param[in] dev       Device descriptor of the AIP31068

@@ -60,7 +60,7 @@ typedef struct {
 /**
  * @brief   Initialize a periodic event timeout
  *
- * @note: On init the periodic event is to to run forever.
+ * @note  On init the periodic event is to to run forever.
  *
  * @param[in]       event_periodic  event_periodic object to initialize
  * @param[in]       clock           the clock to configure this timer on
@@ -77,12 +77,12 @@ void event_periodic_init(event_periodic_t *event_periodic, ztimer_clock_t *clock
  * This will make the event as configured in @p event_periodic be triggered
  * at every interval ticks (based on event_periodic->clock).
  *
- * @note: the used event_periodic struct must stay valid until after the timeout
+ * @note  the used event_periodic struct must stay valid until after the timeout
  *        event has been processed!
  *
- * @note: this function does not touch the current count value.
+ * @note  this function does not touch the current count value.
  *
- * @note: the periodic event will start without delay.
+ * @note  the periodic event will start without delay.
  *
  * @param[in]   event_periodic   event_timout context object to use
  * @param[in]   interval         period length for the event
@@ -99,10 +99,10 @@ static inline void event_periodic_start_now(event_periodic_t *event_periodic, ui
  * This will make the event as configured in @p event_periodic be triggered
  * at every interval ticks (based on event_periodic->clock).
  *
- * @note: the used event_periodic struct must stay valid until after the timeout
+ * @note  the used event_periodic struct must stay valid until after the timeout
  *        event has been processed!
  *
- * @note: this function does not touch the current count value.
+ * @note  this function does not touch the current count value.
  *
  * @param[in]   event_periodic   event_timout context object to use
  * @param[in]   interval         period length for the event

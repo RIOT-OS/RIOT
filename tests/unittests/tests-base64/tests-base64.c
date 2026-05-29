@@ -30,7 +30,7 @@ static void test_base64_01_encode_string(void)
     char base64_out[sizeof(expected_encoding)];
 
     /*
-    * @Note:
+    * @Note
     * The first encoding attempt fails, but reveals the required out size.
     *
     * This size is a lower bound estimation,
@@ -188,7 +188,7 @@ static void test_base64_05_decode_larger(void)
 static void test_base64_06_stream_encode(void)
 {
     /*
-    * @Note:
+    * @Note
     * In this test we divide the `stream_encode[]` input for the encoding
     * into several portions (chunks).
     *
@@ -245,7 +245,7 @@ static void test_base64_06_stream_encode(void)
 
 static void test_base64_07_stream_decode(void)
 {
-    /* @Note:
+    /* @Note
     * Here we decode the base64 string `encoded[]`
     *
     * Every base64 chunk is decoded and appended to `stream_decoded[]`.
@@ -418,7 +418,7 @@ static void test_base64_11_urlsafe_encode_int(void)
     char base64_out[sizeof(expected_encoding) + 2];
 
     /*
-    * @Note:
+    * @Note
     * The first encoding attempt fails, but reveals the required out size.
     *
     * This size is a lower bound estimation,

@@ -207,7 +207,7 @@ static inline void clist_lpoprpush(clist_node_t *list)
 /**
  * @brief Returns first element in list
  *
- * @note: Complexity: O(1)
+ * @note Complexity: O(1)
  *
  * @param[in]   list        The list to work upon.
  * @returns     first (leftmost) list element, or NULL if list is empty
@@ -223,7 +223,7 @@ static inline clist_node_t *clist_lpeek(const clist_node_t *list)
 /**
  * @brief Returns last element in list
  *
- * @note: Complexity: O(1)
+ * @note Complexity: O(1)
  *
  * @param[in]   list        The list to work upon.
  * @returns     last (rightmost) list element, or NULL if list is empty

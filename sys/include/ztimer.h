@@ -514,7 +514,7 @@ void ztimer_set_msg(ztimer_clock_t *clock, ztimer_t *timer, uint32_t offset,
  * Similar to msg_receive(), but with a timeout parameter.
  * The function will return after waiting at most @p timeout ticks.
  *
- * @note: This might function might leave a message with type MSG_ZTIMER in the
+ * @note  This might function might leave a message with type MSG_ZTIMER in the
  *        thread's message queue, which must be handled (ignored).
  *
  * @param[in]   clock           ztimer clock to operate on
@@ -734,7 +734,7 @@ void ztimer_sleep(ztimer_clock_t *clock, uint32_t duration);
 /**
  * @brief   Busy-wait specified duration
  *
- * @note: This blocks lower priority threads. Use only for *very* short delays.
+ * @note  This blocks lower priority threads. Use only for *very* short delays.
  *
  * @param[in]   clock           ztimer clock to use
  * @param[in]   duration        duration to spin, in @p clock time units

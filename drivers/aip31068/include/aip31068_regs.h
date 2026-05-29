@@ -25,7 +25,7 @@ extern "C"
 /**
  * @brief Clears entire display and sets cursor to position (0, 0).
  *
- * @note: Also changes AIP31068_BIT_ENTRY_MODE_INCREMENT to 1
+ * @note  Also changes AIP31068_BIT_ENTRY_MODE_INCREMENT to 1
  */
 #define AIP31068_CMD_CLEAR_DISPLAY          0x01
 
