@@ -78,6 +78,8 @@ extern "C" {
 #define QMA6100P_REG_CHIP_STATE          (0x45) /**< Chip state */
 #define QMA6100P_REG_ULPS                (0x46) /**< ULPS control register */
 #define QMA6100P_REG_TST0_ANA            (0x4A) /**< Analog test register 0 */
+#define QMA6100P_REG_AFE_ANA             (0x56) /**< Analog front-end config */
+#define QMA6100P_REG_TST1_ANA            (0x5F) /**< Analog test register 1 */
 /** @} */
 
 /**
@@ -90,7 +92,6 @@ extern "C" {
 #define QMA6100P_REG_INT2_MAP1           (0x1C) /**< INT2 map: no_mot/FIFO/data/q_tap/any_mot */
 #define QMA6100P_REG_INTPIN_CONF         (0x20) /**< INT pin config (OD/LVL) */
 #define QMA6100P_REG_INT_CFG             (0x21) /**< Interrupt latch/shadow/I2C config */
-/** @} */
 /** @} */
 
 /**
@@ -141,22 +142,22 @@ extern "C" {
  * @name    PM (0x11) masks — power management
  * @{
  */
-#define QMA6100P_PM_MODE_MASK            BIT(7)                           /**< active/standby mode bit mask */
-#define QMA6100P_PM_MCLK_MASK            GENMASK(3, 0)                    /**< MCLK[3:0] */
+#define QMA6100P_PM_MODE_MASK            BIT(7)        /**< active/standby mode bit mask */
+#define QMA6100P_PM_MCLK_MASK            GENMASK(3, 0) /**< MCLK[3:0] */
 /** @} */
 
 /**
  * @name    INT_EN1 (0x17) masks — data-ready interrupt enable
  * @{
  */
-#define QMA6100P_INT_EN1_DATA_MASK            BIT(4) /**< data-ready interrupt enable */
+#define QMA6100P_INT_EN1_DATA_MASK       BIT(4) /**< data-ready interrupt enable */
 /** @} */
 
 /**
  * @name    INT1_MAP1 (0x1A) / INT2_MAP1 (0x1C) masks — route data-ready to INT pin
  * @{
  */
-#define QMA6100P_INT_MAP1_DATA_MASK           BIT(4) /**< route data-ready to INTx pin */
+#define QMA6100P_INT_MAP1_DATA_MASK      BIT(4) /**< route data-ready to INTx pin */
 /** @} */
 
 /**
@@ -164,10 +165,10 @@ extern "C" {
  * Default 0x05 = INT1 active-high push-pull, INT2 active-high push-pull
  * @{
  */
-#define QMA6100P_INTPIN_INT1_LVL_MASK         BIT(0) /**< INT1 active level mask (@ref qma6100p_int_active_level_t) */
-#define QMA6100P_INTPIN_INT1_OD_MASK          BIT(1) /**< INT1 output mode mask (@ref qma6100p_int_pin_mode_t) */
-#define QMA6100P_INTPIN_INT2_LVL_MASK         BIT(2) /**< INT2 active level mask (@ref qma6100p_int_active_level_t) */
-#define QMA6100P_INTPIN_INT2_OD_MASK          BIT(3) /**< INT2 output mode mask (@ref qma6100p_int_pin_mode_t) */
+#define QMA6100P_INTPIN_INT1_LVL_MASK    BIT(0) /**< INT1 active level mask (@ref qma6100p_int_active_level_t) */
+#define QMA6100P_INTPIN_INT1_OD_MASK     BIT(1) /**< INT1 output mode mask (@ref qma6100p_int_pin_mode_t) */
+#define QMA6100P_INTPIN_INT2_LVL_MASK    BIT(2) /**< INT2 active level mask (@ref qma6100p_int_active_level_t) */
+#define QMA6100P_INTPIN_INT2_OD_MASK     BIT(3) /**< INT2 output mode mask (@ref qma6100p_int_pin_mode_t) */
 /** @} */
 
 /**
@@ -179,11 +180,51 @@ extern "C" {
 #define QMA6100P_INT_CFG_LATCH_MASK      BIT(0) /**< INT latch mode mask (@ref qma6100p_int_latch_t) */
 /** @} */
 
+#define QMA6100P_INT_CFG_CLR_MASK        BIT(7) /**< INT_STATUS clear behavior bit mask */
+#define QMA6100P_INT_CFG_CLR_ON_LATCH    (0)    /**< INT_STATUS bits cleared only if latched */
+#define QMA6100P_INT_CFG_CLR_ON_ANY_READ (1)    /**< INT_STATUS bits cleared on any read */
+/** @} */
+
 /**
- * @name    SW_RESET (0x36) — soft reset
+ * @name   INT latch mode
+ * @{
+ */
+#define QMA6100P_INT_CFG_LATCH_MASK      BIT(0) /**< INT latch mode bit mask */
+#define QMA6100P_INT_CFG_NON_LATCH       (0)    /**< INT pulse clears automatically */
+#define QMA6100P_INT_CFG_LATCH           (1)    /**< INT held until ack via @ref qma6100p_ack_int */
+/** @} */
+
+/**
+ * @name   INT shadowing function mode
+ * @{
+ */
+
+#define QMA6100P_INT_CFG_SHADOW_MASK     BIT(6) /**< data shadowing disable bit mask */
+#define QMA6100P_INT_CFG_SHADOW_EN       (0)    /**< shadowing enabled (default) */
+#define QMA6100P_INT_CFG_SHADOW_DIS      (1)    /**< shadowing disabled */
+/** @} */
+
+/**
+ * @name    NVM_REGISTER (0x33) - Non Volatile Memory state
+ *
+ * @{
+ */
+#define QMA6100P_NVM_LOAD_DONE           BIT(0) /**< set to 1 when NVM loading is done */
+#define QMA6100P_NVM_RDY                 BIT(2) /**< set to 1 when NVM is ready, and programming NVIM is done */
+/** @} */
+
+/**
+ * @name    SW_RESET (0x36)
  * @{
  */
 #define QMA6100P_SW_RESET_VAL            (0xB6) /**< trigger soft reset */
+/** @} */
+
+/**
+ * @name TST1_ANA_REGISTER (0x5F) - Take control mode setting
+ * @{
+ */
+#define QMA6100P_ANA_TST1_TMODE          BIT(7) /**< Bit mask of the tmode */
 /** @} */
 
 #ifdef __cplusplus

@@ -30,7 +30,6 @@
 
 #include <stdint.h>
 
-#include "periph/gpio.h"
 #include "periph/i2c.h"
 
 #ifdef __cplusplus
@@ -95,6 +94,20 @@ typedef enum {
 } qma6100p_mode_t;
 
 /**
+ * @brief Master Clock selection
+ *
+ * Master clock is controlled by PM_REGISTER (0x11) and can be set through I2C commands.
+ *
+ * @note By default, QMA6100P has a 51K2 after init sequence.
+ */
+typedef enum {
+    QMA6100P_PM_MCLK_51K2 = 4, /**< 51.2 kHz Default after the power on */
+    QMA6100P_PM_MCLK_25K6 = 5, /**< 25.6 kHz */
+    QMA6100P_PM_MCLK_12K8 = 6, /**< 12.8 kHz */
+    QMA6100P_PM_MCLK_6K4 = 7,  /**< 6.4 kHz */
+} qma6100p_mclk_t;
+
+/**
  * @brief   QMA6100P interrupt callback
  */
 typedef void (*qma6100p_int_cb_t)(void *);
@@ -103,7 +116,7 @@ typedef void (*qma6100p_int_cb_t)(void *);
  * @brief   INT pin output mode (INTPIN_CONF, 0x20)
  */
 typedef enum {
-    QMA6100P_INTPIN_PUSH_PULL  = 0, /**< INT pin push-pull mode */
+    QMA6100P_INTPIN_PUSH_PULL = 0,  /**< INT pin push-pull mode */
     QMA6100P_INTPIN_OPEN_DRAIN = 1, /**< INT pin open-drain mode */
 } qma6100p_int_pin_mode_t;
 
@@ -111,7 +124,7 @@ typedef enum {
  * @brief   INT pin active level (INTPIN_CONF, 0x20)
  */
 typedef enum {
-    QMA6100P_INTPIN_ACTIVE_LOW  = 0, /**< INT pin active LOW on interrupt */
+    QMA6100P_INTPIN_ACTIVE_LOW = 0,  /**< INT pin active LOW on interrupt */
     QMA6100P_INTPIN_ACTIVE_HIGH = 1, /**< INT pin active HIGH on interrupt */
 } qma6100p_int_active_level_t;
 
@@ -120,14 +133,14 @@ typedef enum {
  */
 typedef enum {
     QMA6100P_INT_CFG_NON_LATCH = 0, /**< INT pulse clears automatically */
-    QMA6100P_INT_CFG_LATCH     = 1, /**< INT held until ack via @ref qma6100p_ack_int */
+    QMA6100P_INT_CFG_LATCH = 1,     /**< INT held until ack via @ref qma6100p_ack_int */
 } qma6100p_int_latch_t;
 
 /**
  * @brief   INT_STATUS clear behavior (INT_CFG, 0x21)
  */
 typedef enum {
-    QMA6100P_INT_CFG_CLR_ON_LATCH    = 0, /**< INT_STATUS bits cleared only if latched */
+    QMA6100P_INT_CFG_CLR_ON_LATCH = 0,    /**< INT_STATUS bits cleared only if latched */
     QMA6100P_INT_CFG_CLR_ON_ANY_READ = 1, /**< INT_STATUS bits cleared on any read */
 } qma6100p_int_clr_t;
 
@@ -135,7 +148,7 @@ typedef enum {
  * @brief   Data shadowing mode (INT_CFG, 0x21)
  */
 typedef enum {
-    QMA6100P_INT_CFG_SHADOW_EN  = 0, /**< shadowing enabled (default) */
+    QMA6100P_INT_CFG_SHADOW_EN = 0,  /**< shadowing enabled (default) */
     QMA6100P_INT_CFG_SHADOW_DIS = 1, /**< shadowing disabled */
 } qma6100p_int_shadow_t;
 
@@ -151,7 +164,7 @@ typedef enum {
  * @brief   Interrupt configuration parameters
  */
 typedef struct {
-    gpio_t interrupt_pin;                        /**< MCU GPIO connected to the QMA6100P INT pin */
+    gpio_t interrupt_pin;                         /**< MCU GPIO connected to the QMA6100P INT pin */
     qma6100p_int_active_level_t active_level_int; /**< active level of INT pin */
     qma6100p_int_pin_mode_t pin_mode_int;         /**< INT pin output mode */
     qma6100p_int_latch_t interrupt_latch;         /**< latch mode */
@@ -177,6 +190,7 @@ typedef struct {
     uint8_t addr;           /**< I2C address (@ref QMA6100P_I2C_ADDR_LOW or _HIGH) */
     qma6100p_odr_t rate;    /**< output data rate */
     qma6100p_range_t range; /**< full-scale range */
+    qma6100p_mclk_t mclk;   /**< master clock */
     uint8_t offset[3];      /**< user offset correction for X, Y, Z [applied at init] */
     qma6100p_mode_t mode;   /**< operating mode */
 } qma6100p_params_t;
@@ -233,13 +247,6 @@ int qma6100p_init(qma6100p_t *dev, const qma6100p_params_t *params);
  * @return                   QMA6100P_NODEV if device not found on bus
  */
 int qma6100p_set_mode(qma6100p_t *dev, qma6100p_mode_t mode);
-
-/**
- * @brief   Set standby mode
- *
- * @param[in]  dev          device descriptor of accelerometer
- */
-void qma6100p_set_standby(const qma6100p_t *dev);
 
 /**
  * @brief   Check for new set of measurement data

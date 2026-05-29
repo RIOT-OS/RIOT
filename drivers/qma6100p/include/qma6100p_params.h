@@ -16,7 +16,6 @@
  * @author      Léandre Le Duc <leandre.leduc38@gmail.com>
  */
 
-#include "periph/gpio.h"
 #include "periph/i2c.h"
 #include "qma6100p.h"
 #include "saul_reg.h"
@@ -71,6 +70,14 @@ extern "C" {
  */
 #ifndef QMA6100P_PARAM_RANGE
 #  define QMA6100P_PARAM_RANGE (QMA6100P_RANGE_2G)
+#endif
+
+/**
+ * @def QMA6100P_PARAM_MCLK
+ * @brief Default master clock frequency
+ */
+#ifndef QMA6100P_PARAM_MCLK
+#  define QMA6100P_PARAM_MCLK (QMA6100P_PM_MCLK_51K2)
 #endif
 
 /**
@@ -156,6 +163,7 @@ extern "C" {
                             .addr = QMA6100P_PARAM_I2C_ADDR, \
                             .rate = QMA6100P_PARAM_RATE,     \
                             .range = QMA6100P_PARAM_RANGE,   \
+                            .mclk = QMA6100P_PARAM_MCLK,     \
                             .offset = QMA6100P_PARAM_OFFSET, \
                             .mode = QMA6100P_PARAM_MODE }
 #endif

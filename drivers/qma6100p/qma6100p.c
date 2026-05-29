@@ -11,6 +11,7 @@
  * @brief       Driver for the 3-axis QMA6100P accelerometer
  *
  * @author      Baptiste Le Duc <baptiste.leduc@etik.com>
+ * @author      Léandre Le Duc <leandre.leduc38@gmail.com>
  *
  * @}
  */
@@ -21,6 +22,7 @@
 #include "periph/i2c.h"
 #include "qma6100p_params.h"
 #include "qma6100p_regs.h"
+#include "ztimer.h"
 
 #define ENABLE_DEBUG 1
 #include "debug.h"
@@ -143,6 +145,162 @@ out:
     return res;
 }
 
+/**
+ * @brief Execute the device soft reset
+ *
+ * @param[in] dev  device descriptor
+ *
+ * @return  0 on success
+ * @return  negative error code on failure
+ *
+ * @warning I2C bus must be acquired by the caller
+ */
+static int _soft_reset(const qma6100p_t *dev)
+{
+    int res;
+
+    WRITE_REG(QMA6100P_REG_SW_RESET, QMA6100P_SW_RESET_VAL, out);
+
+    ztimer_sleep(ZTIMER_MSEC, 1);
+
+    WRITE_REG(QMA6100P_REG_SW_RESET, 0x00, out);
+
+    uint8_t nvm_status;
+
+    /* Wait for OTP to load */
+    do {
+        READ_REG(QMA6100P_REG_NVM, nvm_status, out);
+    } while (!(nvm_status & (QMA6100P_NVM_LOAD_DONE | QMA6100P_NVM_RDY)));
+
+out:
+    return res;
+}
+
+/**
+ * @brief Execute the init sequence as described in the section 6.3 of the spec.
+ *
+ * @param[in] dev  device descriptor
+ *
+ * @return  0 on success
+ * @return  negative error code on failure
+ */
+static int _qma6100p_run_init_seq(const qma6100p_t *dev)
+{
+    int res;
+
+    i2c_acquire(BUS);
+
+    uint8_t chip_state;
+    do {
+        res = _soft_reset(dev);
+        if (res < 0) {
+            goto out;
+        }
+        READ_REG(QMA6100P_REG_CHIP_STATE, chip_state, out);
+    } while ((chip_state >> 4) != 0x0C);
+
+    WRITE_REG(QMA6100P_REG_PM, 0x80, out);
+    WRITE_REG(QMA6100P_REG_PM, 0x84, out);
+
+    WRITE_REG(QMA6100P_REG_TST0_ANA, 0x20, out);
+    WRITE_REG(QMA6100P_REG_AFE_ANA, 0x01, out);
+    WRITE_REG(QMA6100P_REG_TST1_ANA, 0x80, out);
+
+    ztimer_sleep(ZTIMER_MSEC, 1);
+
+    WRITE_REG(QMA6100P_REG_TST1_ANA, 0x00, out);
+
+out:
+    i2c_release(BUS);
+    return res;
+}
+
+/**
+ * @brief Configure full scale range of the device
+ *
+ *
+ * @param[in,out] dev         device descriptor
+ * @param[in]     range       requested scale range
+ *
+ * @return  0 on success
+ * @return  negative error code on I2C failure
+ *
+ * @warning I2C bus must be acquired by the caller
+ */
+static int _qma6100p_set_range(const qma6100p_t *dev, qma6100p_range_t range)
+{
+    int res;
+    uint8_t range_reg;
+
+    READ_REG(QMA6100P_REG_RANGE, range_reg, out);
+
+    FIELD_SET(QMA6100P_RANGE_MASK, range, range_reg);
+
+    WRITE_REG(QMA6100P_REG_RANGE, range_reg, out);
+
+out:
+    return res;
+}
+
+/**
+ * @brief Configure output data rate.
+ *
+ *
+ * @param[in,out] dev         device descriptor
+ * @param[in]     odr         requested output data rate
+ *
+ * @return  0 on success
+ * @return  negative error code on I2C failure
+ *
+ * @warning I2C bus must be acquired by the caller
+ */
+static int _qma6100p_set_odr(const qma6100p_t *dev, qma6100p_odr_t odr)
+{
+    int res;
+    uint8_t odr_reg;
+
+    READ_REG(QMA6100P_REG_ODR, odr_reg, out);
+
+    FIELD_SET(QMA6100P_ODR_MASK, odr, odr_reg);
+
+    WRITE_REG(QMA6100P_REG_ODR, odr_reg, out);
+
+out:
+    return res;
+}
+
+/**
+ * @brief Set all the common parameter requested by the user
+ *
+ * Sets full scale range, output data range from @p params
+ *
+ * @param[in,out] dev         device descriptor
+ * @param[in]     params      configuration parameters
+ *
+ * @return  0 on success
+ * @return  negative error code on I2C failure
+ */
+static int _qma6100p_set_common_params(const qma6100p_t *dev, const qma6100p_params_t *params)
+{
+    int res;
+
+    i2c_acquire(BUS);
+
+    res = _qma6100p_set_odr(dev, params->rate);
+    if (res < 0) {
+        goto out;
+    }
+
+    res = _qma6100p_set_range(dev, params->range);
+    if (res < 0) {
+        goto out;
+    }
+
+out:
+    i2c_release(BUS);
+    return res;
+}
+
 int qma6100p_init(qma6100p_t *dev, const qma6100p_params_t *params)
 {
     assert(dev && params);
@@ -154,15 +312,26 @@ int qma6100p_init(qma6100p_t *dev, const qma6100p_params_t *params)
     if (res < 0) {
         return res;
     }
-
     dev->params = *params;
 
-    res = qma6100p_set_mode(dev, params->mode);
+    res = _qma6100p_run_init_seq(dev);
     if (res < 0) {
+        DEBUG("[qma6100p] init: init sequence failed (%d)\n", res);
         return res;
     }
 
-    DEBUG("[qma6100p] init: successful\n");
+    res = qma6100p_set_mode(dev, params->mode);
+    if (res < 0) {
+        DEBUG("[qma6100p] init: set mode failed (%d)\n", res);
+        return res;
+    }
+
+    res = _qma6100p_set_common_params(dev, params);
+    if (res < 0) {
+        DEBUG("[qma6100p] init: set common parameters failed (%d)\n", res);
+        return res;
+    }
+
     return QMA6100P_OK;
 }
 
