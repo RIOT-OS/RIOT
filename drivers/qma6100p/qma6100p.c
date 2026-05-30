@@ -201,8 +201,13 @@ static int _qma6100p_run_init_seq(const qma6100p_t *dev)
         READ_REG(QMA6100P_REG_CHIP_STATE, chip_state, out);
     } while ((chip_state >> 4) != 0x0C);
 
-    WRITE_REG(QMA6100P_REG_PM, 0x80, out);
-    WRITE_REG(QMA6100P_REG_PM, 0x84, out);
+    uint8_t pm = 0;
+
+    FIELD_SET(QMA6100P_PM_MODE_MASK, QMA6100P_MODE_ACTIVE, pm);
+    WRITE_REG(QMA6100P_REG_PM, pm, out);
+
+    FIELD_SET(pm, QMA6100P_PM_MCLK_51K2, pm);
+    WRITE_REG(QMA6100P_REG_PM, pm, out);
 
     WRITE_REG(QMA6100P_REG_TST0_ANA, 0x20, out);
     WRITE_REG(QMA6100P_REG_AFE_ANA, 0x01, out);
