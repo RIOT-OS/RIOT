@@ -26,12 +26,17 @@
 #define ADC_SMP_MIN_VAL     (0x2) /*< Sampling time for slow channels
                                       (0x2 = 4.5 ADC clock cycles) */
 
-#ifdef CPU_FAM_STM32H7
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
 #  define ADC_SMP_VBAT_VAL    (0x7) /*< Sampling time when the VBat channel
                                       is read (0x7 = 810.5 ADC clock cycles) */
 #else
 #  define ADC_SMP_VBAT_VAL    (0x5) /*< Sampling time when the VBat channel
                                       is read (0x5 = 61.5 ADC clock cycles) */
+#endif
+
+#if defined(CPU_FAM_STM32U3)
+/* Give internal VBAT path time to settle before conversion. */
+#  define ADC_T_VBAT_STAB_US   (10U)
 #endif
 
 /* The sampling time width is 3 bit */
@@ -157,6 +162,17 @@ int adc_init(adc_t line)
     }
 #endif
 
+#if defined(CPU_FAM_STM32U3)
+    /* The U3 ADC has no CKMODE field; the kernel clock comes straight from
+     * RCC->CCIPR2 (HCLK) with no divider. At full HCLK the per-cycle sampling
+     * window is too short for the high-impedance internal channels (VBAT,
+     * VREFINT, temperature), so their sample-and-hold capacitor never fully
+     * charges and conversions read systematically low. Apply an ADC prescaler
+     * to lengthen each sampling cycle. */
+    ADC_INSTANCE->CCR = (ADC_INSTANCE->CCR & ~ADC_CCR_PRESC)
+                      | ADC_CCR_PRESC_2; /* divide ADC clock by 8 */
+#endif
+
 #if !defined(CPU_FAM_STM32U3)
     /* Setting ADC clock to HCLK/1 is only allowed if AHB clock
      * prescaler is 1 */
@@ -263,6 +279,13 @@ int adc_init(adc_t line)
     if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
         smp_time = ADC_SMP_VBAT_VAL;
     }
+#if defined(VREFINT_ADC)
+    /* VREFINT is a high-impedance internal source and needs a long sampling
+     * time, just like VBAT. */
+    if (line == VREFINT_ADC) {
+        smp_time = ADC_SMP_VBAT_VAL;
+    }
+#endif
 
 #if CPU_FAM_STM32H7
     /* Enable the ADC channel's analog switch */
@@ -306,7 +329,20 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     /* check if this is the VBAT line */
     if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
         vbat_enable();
+#if defined(CPU_FAM_STM32U3)
+        busy_wait_us(ADC_T_VBAT_STAB_US);
+#endif
     }
+#if defined(VREFINT_ADC) && defined(ADC_CCR_VREFEN)
+    /* Enable the internal voltage reference path so the VREFINT channel is
+     * driven and not left floating during the conversion. */
+    if (line == VREFINT_ADC) {
+        ADC_INSTANCE->CCR |= ADC_CCR_VREFEN;
+#if defined(CPU_FAM_STM32U3)
+        busy_wait_us(ADC_T_VBAT_STAB_US);
+#endif
+    }
+#endif
 
     /* Set resolution */
 #if defined(CPU_FAM_STM32U3)
@@ -320,6 +356,16 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     /* Specify channel for regular conversion */
     dev(line)->SQR1 = adc_config[line].chan << ADC_SQR1_SQ1_Pos;
 
+#if defined(CPU_FAM_STM32U3)
+    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+        /* Discard first conversion after enabling VBAT path. */
+        dev(line)->ISR |= ADC_ISR_EOC;
+        dev(line)->CR |= ADC_CR_ADSTART;
+        while (!(dev(line)->ISR & ADC_ISR_EOC)) {}
+        (void)dev(line)->DR;
+    }
+#endif
+
     /* Start conversion and wait for it to complete */
     dev(line)->ISR |= ADC_ISR_EOC;
     dev(line)->CR |= ADC_CR_ADSTART;
@@ -332,6 +378,11 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
         vbat_disable();
     }
+#if defined(VREFINT_ADC) && defined(ADC_CCR_VREFEN)
+    if (line == VREFINT_ADC) {
+        ADC_INSTANCE->CCR &= ~ADC_CCR_VREFEN;
+    }
+#endif
 
     /* Power off and unlock device again */
     done(line);
