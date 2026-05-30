@@ -55,7 +55,7 @@ static const IRQn_Type _stm32u3_exti_irqn[EXTI_NUMOF] = {
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32U5) || \
     defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0) || \
-    defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32L5) 
+    defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32L5)
 #define EXTI_REG_RTSR       (EXTI->RTSR1)
 #define EXTI_REG_FTSR       (EXTI->FTSR1)
 #define EXTI_REG_PR         (EXTI->PR1)

@@ -47,7 +47,7 @@
 #  define EXTI_REG_PR       (EXTI->PR1)
 #  define EXTI_REG_IMR      (EXTI->IMR1)
 #elif defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32U3) ||  \
-      defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32U5) 
+      defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32U5)
 #  define EXTI_REG_RTSR     (EXTI->RTSR1)
 #  define EXTI_REG_FTSR     (EXTI->FTSR1)
 #  define EXTI_REG_PR       (EXTI->RPR1)
@@ -96,7 +96,7 @@
 /* interrupt line name mapping */
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32U3) 
+    defined(CPU_FAM_STM32U3)
 #  define IRQN              (RTC_IRQn)
 #  define ISR_NAME          isr_rtc
 #elif defined(CPU_FAM_STM32G0)

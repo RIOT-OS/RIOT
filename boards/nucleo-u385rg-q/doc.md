@@ -47,4 +47,3 @@ The following has been verified:
 - Basic bring-up
 - GPIO
 - LED blinking
-

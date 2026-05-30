@@ -11,7 +11,7 @@
  *
  * @file
  * @brief       Minimal peripheral configuration for STM32U385 (bring-up)
- * 
+ *
  * @author      Adarsh Nair Mullachery
  */
 
