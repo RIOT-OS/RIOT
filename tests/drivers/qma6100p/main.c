@@ -15,10 +15,9 @@
  * @}
  */
 
+#include <inttypes.h>
 #include <stdio.h>
 
-#include "board.h"
-#include "periph/gpio.h"
 #include "qma6100p.h"
 #include "qma6100p_params.h"
 #include "ztimer.h"
@@ -29,23 +28,31 @@ static qma6100p_t dev;
 
 int main(void)
 {
-#ifdef T1000E_3V3_ACC_EN_PIN
-    gpio_init(T1000E_3V3_ACC_EN_PIN, GPIO_OUT);
-    gpio_set(T1000E_3V3_ACC_EN_PIN);
-    ztimer_sleep(ZTIMER_MSEC, 10);
-#endif
+    qma6100p_data_t data;
+    int res;
 
     ztimer_sleep(ZTIMER_SEC, SLEEP_S);
     puts("QMA6100P accelerometer driver test\n");
     printf("Initializing QMA6100P at I2C_DEV(%d)... ",
            (int)qma6100p_params[0].i2c);
 
-    if (qma6100p_init(&dev, &qma6100p_params[0]) == QMA6100P_OK) {
-        puts("[OK]\n");
+    res = qma6100p_init(&dev, &qma6100p_params[0]);
+    if (res < 0) {
+        printf("Init FAILED: %d \n", res);
+        return 1;
     }
-    else {
-        puts("[FAILED]");
-        return -1;
+    puts("[OK]\n");
+
+    for (;;) {
+        res = qma6100p_read(&dev, &data);
+        if (res == QMA6100P_DATA_READY) {
+            printf("X: %" PRId32 " ug, Y: %" PRId32 " ug, Z: %" PRId32 " ug\n",
+                   data.x, data.y, data.z);
+        }
+        else if (res == QMA6100P_NO_NEW_DATA) {
+            printf("No new data\n");
+        }
+        ztimer_sleep(ZTIMER_MSEC, 100);
     }
     return 0;
 }

@@ -42,11 +42,11 @@ extern "C" {
 enum {
     QMA6100P_OK = 0,           /**< everything was fine */
     QMA6100P_DATA_READY = 1,   /**< new data ready to be read */
+    QMA6100P_NO_NEW_DATA = 2,  /**< no new data available (normal polling state) */
     QMA6100P_NOI2C = -1,       /**< I2C communication failed */
     QMA6100P_NODEV = -2,       /**< no QMA6100P device found on the bus */
-    QMA6100P_NODATA = -3,      /**< no data available */
-    QMA6100P_INVALID_ARG = -4, /**< invalid argument */
-    QMA6100P_GPIO_ERROR = -5,  /**< GPIO error */
+    QMA6100P_INVALID_ARG = -3, /**< invalid argument */
+    QMA6100P_GPIO_ERROR = -4,  /**< GPIO error */
 };
 
 /**
