@@ -8,7 +8,7 @@
  * @{
  *
  * @file
- * @brief       qma6100p adaption to the RIOT actuator/sensor interface
+ * @brief       QMA6100P adaption to the RIOT actuator/sensor interface
  *
  * @author      Baptiste Le Duc <baptiste.leduc@etik.com>
  * @author      Léandre Le Duc <leandre.leduc38@gmail.com>
