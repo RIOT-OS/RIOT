@@ -34,7 +34,7 @@ static int saul_qma6100p_read(const void *dev, phydat_t *data)
 
     data->unit = UNIT_G_FORCE;
     data->scale = -6;
-    if (res == QMA6100P_NODATA) {
+    if (res == QMA6100P_NO_NEW_DATA) {
         return 0;
     }
 
