@@ -24,16 +24,22 @@
 static int saul_qma6100p_read(const void *dev, phydat_t *data)
 {
     int res;
-
-    memset(data, 0, sizeof(*data));
     const qma6100p_t *mydev = (const qma6100p_t *)dev;
-    res = qma6100p_read(mydev, (qma6100p_data_t *)(&data->val));
+    qma6100p_data_t qma6100p_data;
+    memset(data, 0, sizeof(*data));
+
+    res = qma6100p_read(mydev, &qma6100p_data);
     if (res < 0) {
         return res;
     }
 
+    data->val[0] = (int16_t)(qma6100p_data.x / 1000);
+    data->val[1] = (int16_t)(qma6100p_data.y / 1000);
+    data->val[2] = (int16_t)(qma6100p_data.z / 1000);
+
     data->unit = UNIT_G_FORCE;
-    data->scale = -6;
+    data->scale = -3;
+
     if (res == QMA6100P_NO_NEW_DATA) {
         return 0;
     }

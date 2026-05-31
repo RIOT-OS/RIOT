@@ -216,9 +216,9 @@ typedef struct {
  * @brief   Converted acceleration data in g
  */
 typedef struct {
-    int16_t x; /**< acceleration in X direction [ug] */
-    int16_t y; /**< acceleration in Y direction [ug] */
-    int16_t z; /**< acceleration in Z direction [ug] */
+    int32_t x; /**< acceleration in X direction [ug] */
+    int32_t y; /**< acceleration in Y direction [ug] */
+    int32_t z; /**< acceleration in Z direction [ug] */
 } qma6100p_data_t;
 
 /**
