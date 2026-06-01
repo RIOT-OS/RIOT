@@ -1,5 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2025 Baptiste Le Duc <baptiste.leduc@etik.com>
+ * SPDX-FileCopyrightText: 2026 Léandre Le Duc <leandre.leduc38@gmail.com>
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
