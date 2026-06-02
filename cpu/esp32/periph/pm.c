@@ -140,8 +140,8 @@ void pm_set(unsigned mode)
 
 #if SOC_PM_SUPPORT_RTC_SLOW_MEM_PD
     /* Labels for RTC slow memory that are defined in the linker script */
-    extern int _rtc_bss_rtc_start;
-    extern int _rtc_bss_rtc_end;
+    extern uint8_t _rtc_bss_rtc_start;
+    extern uint8_t _rtc_bss_rtc_end;
 
     /*
      * Activate the Power Domain for slow RTC memory when the .rtc.bss
