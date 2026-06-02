@@ -22,8 +22,10 @@
 #include "atomic_utils.h"
 #include "byteorder.h"
 #include "errno.h"
+#include "luid.h"
 #include "net/ethernet/hdr.h"
 #include "net/ethertype.h"
+#include "net/eui_provider.h"
 #include "net/l2util.h"
 #include "openthread/platform/diag.h"
 #include "openthread/platform/radio.h"
@@ -37,7 +39,10 @@
 typedef struct openthread_device {
     ieee802154_dev_t *dev;
     ieee802154_phy_conf_t phy_conf;
-    uint8_t _ext_addr;
+    /* locally set, not factory set */
+    eui64_t factory_eui;
+    eui64_t _ext_addr;
+    network_uint16_t _short_addr;
     int8_t rssi;
 } openthread_device_t;
 
@@ -94,9 +99,9 @@ static int _set_power(int16_t power)
 }
 
 /* set IEEE802.15.4 PAN ID */
-static int _set_panid(uint16_t *panid)
+static int _set_panid(uint16_t panid)
 {
-    return _ot_dev.dev->driver->config_addr_filter(_ot_dev.dev, IEEE802154_AF_PANID, panid);
+    return _ot_dev.dev->driver->config_addr_filter(_ot_dev.dev, IEEE802154_AF_PANID, &panid);
 }
 
 /* set extended HW address */
@@ -107,9 +112,10 @@ static int _set_ext_addr(uint8_t *ext_addr)
 }
 
 /* set short address */
-static int _set_short_addr(uint16_t addr)
+static int _set_short_addr(network_uint16_t short_addr)
 {
-    return _ot_dev.dev->driver->config_addr_filter(_ot_dev.dev, IEEE802154_AF_SHORT_ADDR, &addr);
+    memcpy(&_ot_dev._short_addr, &short_addr, IEEE802154_SHORT_ADDRESS_LEN);
+    return _ot_dev.dev->driver->config_addr_filter(_ot_dev.dev, IEEE802154_AF_SHORT_ADDR, &short_addr);
 }
 
 /* set the state of promiscuous mode */
@@ -156,15 +162,16 @@ int openthread_radio_init(ieee802154_dev_t *dev, uint8_t *tb, uint8_t *rb, uint8
         return res;
     }
 
-    /* generate long and short address */
-    // eui64_t ext_addr;
-    // eui_short_from_eui64(,&ext_addr);
-
-    // /* set address filter */
-    // ieee802154_radio_config_addr_filter(_dev, IEEE802154_AF_SHORT_ADDR, );
-    // ieee802154_radio_config_addr_filter(_dev, IEEE802154_AF_EXT_ADDR, );
-    uint16_t panid = CONFIG_IEEE802154_DEFAULT_PANID;
-    ieee802154_radio_config_addr_filter(_ot_dev.dev, IEEE802154_AF_PANID, &panid);
+    /* generate long and short address*/
+    luid_base(&_ot_dev.factory_eui, IEEE802154_LONG_ADDRESS_LEN);
+    eui64_set_local(&_ot_dev.factory_eui);
+    eui64_clear_group(&_ot_dev.factory_eui);
+    eui_short_from_eui64(&_ot_dev._ext_addr, &_ot_dev._short_addr);
+    
+    /* set address filter */
+    _set_ext_addr((uint8_t*) &_ot_dev.factory_eui);
+    _set_short_addr(_ot_dev._short_addr);
+    _set_panid(CONFIG_IEEE802154_DEFAULT_PANID);
 
     /* set cca threashold to default */
     ieee802154_radio_set_cca_threshold(_ot_dev.dev, CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
@@ -291,14 +298,11 @@ int8_t otPlatRadioGetReceiveSensitivity(otInstance *aInstance)
 
 void otPlatRadioGetIeeeEui64(otInstance *aInstance, uint8_t *aIeee64Eui64)
 {
-    //uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+    (void) aInstance;
+    DEBUG("openthread: otPlatRadioGetIeeeEui64 requested factory eui64, but is locally set\n");
 
-    (void)aInstance;
-    //TODO
-    //_dev->driver->get(_dev, NETOPT_ADDRESS_LONG, addr, sizeof(addr));
-
-    l2util_ipv6_iid_from_addr(0, &_ot_dev._ext_addr, sizeof(eui64_t),
-                              (eui64_t *)aIeee64Eui64);
+    /* currently returns generated, but static eui64 based on cpuid for most devices */
+    memcpy(aIeee64Eui64, (uint8_t *) &_ot_dev.factory_eui, IEEE802154_LONG_ADDRESS_LEN);
 }
 
 /* OpenThread will call this for setting PAN ID */
@@ -306,7 +310,7 @@ void otPlatRadioSetPanId(otInstance *aInstance, uint16_t panid)
 {
     (void)aInstance;
     DEBUG("openthread: otPlatRadioSetPanId: setting PAN ID to %04x\n", panid);
-    _set_panid(&panid);
+    _set_panid(panid);
 }
 
 /* OpenThread will call this for setting extended address */
@@ -314,6 +318,8 @@ void otPlatRadioSetExtendedAddress(otInstance *aInstance, const otExtAddress *aE
 {
     (void)aInstance;
     DEBUG("openthread: otPlatRadioSetExtendedAddress\n");
+    
+    /* OpenThread stores aExtAddress in little endian */
     char reversed_addr[IEEE802154_LONG_ADDRESS_LEN];
     for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
         reversed_addr[i] = (uint8_t)((uint8_t *)aExtAddress)[IEEE802154_LONG_ADDRESS_LEN - 1 - i];
@@ -332,7 +338,8 @@ void otPlatRadioSetShortAddress(otInstance *aInstance, uint16_t aShortAddress)
 {
     (void)aInstance;
     DEBUG("openthread: otPlatRadioSetShortAddress: setting address to %04x\n", aShortAddress);
-    _set_short_addr(((aShortAddress & 0xff) << 8) | ((aShortAddress >> 8) & 0xff));
+    /* change byte order from little-endian to big-endian */
+    _set_short_addr(byteorder_htons(aShortAddress));
 }
 
 /* optional */
