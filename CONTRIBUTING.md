@@ -74,10 +74,12 @@ the following steps:
   1. Your code is merged in RIOT master branch when it passes review.
 
 Be sure to read the [general tips] below.
+If you are using AI tools, please also read [our AI Policy][ai-policy].
 
 [open-an-issue]: https://github.com/RIOT-OS/RIOT/issues?q=state:open+type:issue+label:"Type:+bug"
 [labels]: https://github.com/RIOT-OS/RIOT/wiki/RIOT%27s-labeling-system
 [open-a-pull-request]: https://help.github.com/articles/using-pull-requests
+[ai-policy]: https://doc.riot-os.org/general/ai_policy
 
 ### General Tips
 [general tips]: #general-tips

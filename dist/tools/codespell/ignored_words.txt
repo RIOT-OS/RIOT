@@ -195,3 +195,6 @@ joo
 
 # ANS (American National Standard) ==> AND
 ans
+
+# Variant of Implementer
+implementor
