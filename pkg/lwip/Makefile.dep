@@ -110,6 +110,10 @@ ifneq (,$(filter lwip_dhcp_auto,$(USEMODULE)))
   USEMODULE += lwip_dhcp
 endif
 
+ifneq (,$(filter lwip_dhcp,$(USEMODULE)))
+  USEMODULE += lwip_udp
+endif
+
 # if an actual netdev is used, we need lwip_netdev to integrate it
 ifneq (,$(filter lwip_ethernet lwip_sixlowpan,$(USEMODULE)))
   USEMODULE += lwip_netdev
