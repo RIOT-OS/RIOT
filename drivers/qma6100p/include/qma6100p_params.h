@@ -17,6 +17,7 @@
  * @author      Léandre Le Duc <leandre.leduc38@gmail.com>
  */
 
+#include "board.h"
 #include "periph/i2c.h"
 #include "qma6100p.h"
 #include "saul_reg.h"
@@ -35,9 +36,15 @@ extern "C" {
  * Determined by the AD0 pin level.
  * @{
  */
-#define QMA6100P_I2C_ADDR_LOW  (0x12) /**< AD0 connected to GND */
-#define QMA6100P_I2C_ADDR_HIGH (0x13) /**< AD0 connected to VDD */
+#define QMA6100P_I2C_ADDR_LOW        (0x12) /**< AD0 connected to GND */
+#define QMA6100P_I2C_ADDR_HIGH       (0x13) /**< AD0 connected to VDD */
 /** @} */
+
+/**
+* @def QMA6100P_PARAM_INT_PIN_UNDEF
+* @brief   INT pin default: should be defined by the board or the app.
+*/
+#define QMA6100P_PARAM_INT_PIN_UNDEF (GPIO_UNDEF)
 
 /**
  * @def QMA6100P_PARAM_I2C
@@ -103,8 +110,7 @@ extern "C" {
  *        operation and use polling instead.
  */
 #ifndef QMA6100P_PARAM_INT_PIN
-#  define QMA6100P_PARAM_INT_PIN_UNDEF (GPIO_UNDEF) /**< fallback when board has no INT pin */
-#  define QMA6100P_PARAM_INT_PIN       (QMA6100P_PARAM_INT_PIN_UNDEF)
+#  define QMA6100P_PARAM_INT_PIN (QMA6100P_PARAM_INT_PIN_UNDEF)
 #endif
 
 /**
@@ -192,10 +198,17 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   QMA6100P defaults if not defined for a board or application
+ * @brief   QMA6100P defaults params if not defined for a board or application
  */
 static const qma6100p_params_t qma6100p_params[] = {
     QMA6100P_PARAMS
+};
+
+/**
+ * @brief   QMA6100P defaults interrupt params if not defined for a board or application
+ */
+static const qma6100p_int_params_t qma6100p_int_params[] = {
+    QMA6100P_INT_PARAMS
 };
 
 /**
