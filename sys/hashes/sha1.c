@@ -4,10 +4,6 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-/* This code is public-domain - it is based on libcrypt
- * placed in the public domain by Wei Dai and other contributors.
- */
-
 /**
  * @ingroup     sys_hashes_sha1
 
