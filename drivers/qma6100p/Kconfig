@@ -1,19 +1,154 @@
-# SPDX-FileCopyrightText: 2020 Freie Universitaet Berlin
-# SPDX-FileCopyrightText: 2020 HAW Hamburg
+# SPDX-FileCopyrightText: 2026 Baptiste Le Duc <baptiste.leduc@etik.com>
+# SPDX-FileCopyrightText: 2026 Léandre Le Duc <leandre.leduc38@gmail.com>
 # SPDX-License-Identifier: LGPL-2.1-only
 
-menu "MMA8X5X driver"
-    depends on USEMODULE_MMA8X5X
+menu "QMA6100P driver"
+    depends on USEMODULE_QMA6100P
 
-config MMA8X5X_I2C_ADDRESS
+config QMA6100P_I2C_ADDR
     hex "Default I2C address"
-    range 0x1C 0x1D
-    default 0x1D
+    range 0x12 0x13
+    default 0x12
     help
-        The address value depends on the state of SA0 Address Pin
-        in the case of MMA845x series sensors.
-        For more details refer Table 1 in datasheet
-        (MMA8451Q/MMA8452Q/MMA8453Q)
-        Default value corresponds to SA0 connected to VCC.
+        QMA6100P I2C address depends on the state of the AD0 pin.
+        Default value (0x12) corresponds to AD0 connected to GND.
+        Use 0x13 when AD0 is connected to VDD.
 
-endmenu # MMA8X5X driver
+choice
+    bool "Output data rate"
+    default QMA6100P_ODR_100HZ
+    help
+        Select the output data rate (ODR).
+config QMA6100P_ODR_100HZ
+    bool "100 Hz"
+config QMA6100P_ODR_200HZ
+    bool "200 Hz"
+config QMA6100P_ODR_400HZ
+    bool "400 Hz"
+config QMA6100P_ODR_800HZ
+    bool "800 Hz"
+config QMA6100P_ODR_1600HZ
+    bool "1600 Hz"
+config QMA6100P_ODR_50HZ
+    bool "50 Hz"
+config QMA6100P_ODR_25HZ
+    bool "25 Hz"
+config QMA6100P_ODR_12HZ5
+    bool "12.5 Hz"
+endchoice
+
+choice
+    bool "Full-scale range"
+    default QMA6100P_RANGE_2G
+    help
+        Select the full-scale measurement range. Higher range reduces
+        sensitivity (LSB/g).
+config QMA6100P_RANGE_2G
+    bool "±2g (4096 LSB/g)"
+config QMA6100P_RANGE_4G
+    bool "±4g (2048 LSB/g)"
+config QMA6100P_RANGE_8G
+    bool "±8g (1024 LSB/g)"
+config QMA6100P_RANGE_16G
+    bool "±16g (512 LSB/g)"
+config QMA6100P_RANGE_32G
+    bool "±32g (256 LSB/g)"
+endchoice
+
+choice
+    bool "Master clock frequency"
+    default QMA6100P_PM_MCLK_51K2
+    help
+        Select the internal master clock frequency. Affects the achievable
+        output data rates. Assumes MCLK=51.2kHz (default
+        after init sequence).
+config QMA6100P_PM_MCLK_51K2
+    bool "51.2 kHz (default)"
+config QMA6100P_PM_MCLK_25K6
+    bool "25.6 kHz"
+config QMA6100P_PM_MCLK_12K8
+    bool "12.8 kHz"
+config QMA6100P_PM_MCLK_6K4
+    bool "6.4 kHz"
+endchoice
+
+choice
+    bool "Operating mode"
+    default QMA6100P_MODE_ACTIVE
+    help
+        Select the default operating mode after initialization.
+config QMA6100P_MODE_ACTIVE
+    bool "Active"
+config QMA6100P_MODE_ULPS
+    bool "Ultra-Low Power State (ULPS)"
+endchoice
+
+choice
+    bool "Interrupt pin active level"
+    default QMA6100P_INTPIN_ACTIVE_HIGH
+    help
+        Select the active level of the INT pin (INTPIN_CONF register).
+config QMA6100P_INTPIN_ACTIVE_HIGH
+    bool "Active high"
+config QMA6100P_INTPIN_ACTIVE_LOW
+    bool "Active low"
+endchoice
+
+choice
+    bool "Interrupt pin output mode"
+    default QMA6100P_INTPIN_PUSH_PULL
+    help
+        Select the output driver mode of the INT pin.
+config QMA6100P_INTPIN_PUSH_PULL
+    bool "Push-pull"
+config QMA6100P_INTPIN_OPEN_DRAIN
+    bool "Open-drain"
+endchoice
+
+choice
+    bool "Interrupt latch mode"
+    default QMA6100P_INT_CFG_NON_LATCH
+    help
+        Non-latching: INT pulse clears automatically.
+        Latching: INT is held until acknowledged via qma6100p_ack_int().
+config QMA6100P_INT_CFG_NON_LATCH
+    bool "Non-latching (auto-cleared)"
+config QMA6100P_INT_CFG_LATCH
+    bool "Latching (held until acknowledged)"
+endchoice
+
+choice
+    bool "Interrupt clear behavior"
+    default QMA6100P_INT_CFG_CLR_ON_ANY_READ
+    help
+        Select when INT_STATUS bits are cleared.
+config QMA6100P_INT_CFG_CLR_ON_ANY_READ
+    bool "Clear on any register read"
+config QMA6100P_INT_CFG_CLR_ON_LATCH
+    bool "Clear only when latched"
+endchoice
+
+choice
+    bool "Acceleration data shadow mode"
+    default QMA6100P_INT_CFG_SHADOW_DIS
+    help
+        When enabled, high and low bytes of each axis are frozen together
+        until both are read, preventing torn reads.
+config QMA6100P_INT_CFG_SHADOW_DIS
+    bool "Shadow disabled"
+config QMA6100P_INT_CFG_SHADOW_EN
+    bool "Shadow enabled"
+endchoice
+
+choice
+    bool "QMA6100P interrupt output pin"
+    default QMA6100P_INT1
+    help
+        Select which QMA6100P interrupt output pin is routed to the MCU GPIO.
+config QMA6100P_INT1
+    bool "INT1"
+config QMA6100P_INT2
+    bool "INT2"
+endchoice
+
+endmenu # QMA6100P driver
