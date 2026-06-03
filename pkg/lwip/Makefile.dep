@@ -18,8 +18,11 @@ ifneq (,$(filter sock_udp,$(USEMODULE)))
   USEMODULE += lwip_sock_udp
 endif
 
-ifneq (,$(filter stm32_eth,$(USEMODULE)))
-  ifneq (,$(filter lwip_dhcp_auto,$(USEMODULE)))
+# if lwip_dhcp_auto or lwip_ipv6 is used, enable link up detection:
+# - lwip_dhcp_auto needs link up events to trigger the DHCP process
+# - lwip_ipv6 needs link up events to perform duplicate address detection
+ifneq (,$(filter lwip_dhcp_auto lwip_ipv6,$(USEMODULE)))
+  ifneq (,$(filter stm32_eth,$(USEMODULE)))
     USEMODULE += stm32_eth_link_up
   endif
 endif

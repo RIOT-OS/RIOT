@@ -52,12 +52,6 @@ ifneq (,$(filter stm32_eth,$(USEMODULE)))
   USEMODULE += netdev_new_api
   USEMODULE += ztimer
   USEMODULE += ztimer_msec
-
-  # lwip IPv6 supports needs link up events to perform duplicate address
-  # detection
-  ifneq (,$(filter lwip_ipv6,$(USEMODULE)))
-    USEMODULE += stm32_eth_link_up
-  endif
 endif
 
 ifneq (,$(filter lcd_parallel_ll_mcu,$(USEMODULE)))
