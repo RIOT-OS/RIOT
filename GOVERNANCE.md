@@ -119,11 +119,23 @@ their project duties.
 Maintainers may also be removed after being inactive, upon failure to fulfill their Maintainer
 responsibilities or because of violating the Code of Conduct. This also includes actively,
 persistently, and intentionally trying to harm or successfully harming the code base of RIOT.
-Especially, but not limited to, endangering the security or safety of RIOT. Inactivity is defined as
-a period of very low or no activity in the project. A yearly maintainer ping, an e-mail sent to
-inactive maintainers, determines if the maintainer is still willing to fulfill their project duties.
-During this process, the list of maintainers is reviewed. On failure to reply to the maintainer ping
-within the specified amount of time (usually a month), the maintainer will be removed.
+Especially, but not limited to, endangering the security or safety of RIOT.
+
+#### Retiring a Maintainer
+
+A maintainer who has not shown a single interaction in a pull request or issue that took more than
+5 minutes of effort over a period of 2 years will be retired. On retirement, all permissions to
+the repository will be revoked. The reason is that any account can be compromised. For maintainers
+that make active use of the permissions, this risk is justified.
+
+A retired maintainer will keep their permissions in the forum and their access to the internal
+maintainer matrix room. In addition, a retired maintainer may return to active maintainer duty
+at any point in time by reaching out to an admin to restore their permissions. A retired
+maintainer who returned to active duty can be retired again under the same rules, with the
+following exception: during a grace period of 3 months, starting from the point in time when
+the permissions have been restored, the maintainer should not be retired again due to inactivity.
+
+A maintainer may choose to retire at any point in time by reaching out to a RIOT admin.
 
 ### Release Managers
 
