@@ -170,6 +170,12 @@ groups:
               used for other purposes.
       - name: esp_ble
         help: An ESP32x Bluetooth LE transceiver is present.
+    - title: LPC1768 Specific Features
+      features:
+      - name: lpc1768_eth
+        help: The LPC1768 MCU has an Ethernet MAC peripheral. Note that this does
+              not necessarily mean that the board has an Ethernet PHY connected to
+              it.
     - title: nordic nRF Specific Features
       features:
       - name: radio_nrf802154

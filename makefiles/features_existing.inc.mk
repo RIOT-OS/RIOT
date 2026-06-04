@@ -135,6 +135,7 @@ FEATURES_EXISTING := \
     gecko_sdk_librail_nonfpu \
     highlevel_stdio \
     libstdcpp \
+    lpc1768_eth \
     motor_driver \
     netif \
     netif_ethernet \

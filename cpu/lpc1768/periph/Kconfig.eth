@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: 2026 Bas Stottelaar <basstottelaar@gmail.com>
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config LPC1768_ETH_AN_TIMEOUT_MS
+    int "Auto-negotiation timeout"
+    depends on CPU_MODEL_LPC1768 && USEMODULE_LPC1768_ETH_AUTO
+    default 5000
+    help
+        Timeout for PHY auto-negotiation completion, in milliseconds.
+
+config LPC1768_ETH_LINK_POLL_MS
+    int "Link state poll interval"
+    depends on CPU_MODEL_LPC1768 && USEMODULE_LPC1768_ETH_LINK_UP
+    default 1000
+    help
+        Poll interval for checking the link state, in milliseconds.
+
+config LPC1768_ETH_PHY_TIMEOUT_US
+    int "PHY operations timeout"
+    depends on CPU_MODEL_LPC1768 && USEMODULE_LPC1768_ETH
+    default 1000
+    help
+        Timeout for PHY operations, in microseconds.
+
+config LPC1768_ETH_RX_BUF_NUMOF
+    int "Receive buffers"
+    depends on CPU_MODEL_LPC1768 && USEMODULE_LPC1768_ETH
+    default 4
+    help
+        Number of receive buffers. The combination of this and the number of
+        transmit buffers must fit in memory.
+
+config LPC1768_ETH_TX_BUF_NUMOF
+    int "Transmit buffers"
+    depends on CPU_MODEL_LPC1768 && USEMODULE_LPC1768_ETH
+    default 4
+    help
+        Number of transmit buffers. The combination of this and the number of
+        receive buffers must fit in memory.

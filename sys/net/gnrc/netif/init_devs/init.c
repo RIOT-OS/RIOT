@@ -104,6 +104,11 @@ void gnrc_netif_init_devs(void)
         auto_init_dose();
     }
 
+    if (IS_USED(MODULE_LPC1768_ETH)) {
+        extern void auto_init_lpc1768_eth(void);
+        auto_init_lpc1768_eth();
+    }
+
     if (IS_USED(MODULE_SAM0_ETH)) {
         extern void auto_init_sam0_eth(void);
         auto_init_sam0_eth();
