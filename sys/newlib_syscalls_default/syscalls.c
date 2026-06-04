@@ -242,6 +242,7 @@ pid_t _getpid(void)
  *
  * @return      the process ID of the current thread
  */
+__attribute__((used)) /* fixes linker errors when building with LTO */
 pid_t _getpid_r(struct _reent *ptr)
 {
     (void) ptr;
@@ -257,7 +258,8 @@ pid_t _getpid_r(struct _reent *ptr)
  *
  * @return      TODO
  */
-__attribute__ ((weak))
+__attribute__((weak))
+__attribute__((used)) /* fixes linker errors when building with LTO */
 int _kill_r(struct _reent *r, pid_t pid, int sig)
 {
     (void) pid;
