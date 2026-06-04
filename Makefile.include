@@ -186,6 +186,12 @@ OS_ARCH = $(word 2, $(UNAME))
 # set python path, e.g. for tests
 PYTHONPATH := $(RIOTBASE)/dist/pythonlibs/:$(PYTHONPATH)
 
+# Set python3 frontend capable of PEP 723 inline script metadata. Users may
+# choose `pipx run` or just `python3` instead. In case of just `python3`, there
+# will be no PEP 723 support and users will just have to install the right
+# python modules beforehand.
+PYTHON3_WITH_PEP723 ?= uv run
+
 # Basic utilities included before anything else
 include $(RIOTMAKE)/utils/checks.mk
 
@@ -877,7 +883,7 @@ cleanterm: $(TERMDEPS)
 	$(TERMPROG) $(TERMFLAGS) $(TERMTEE)
 
 list-ttys:
-	$(Q)$(RIOTTOOLS)/usb-serial/ttys.py
+	$(Q)$(PYTHON3_WITH_PEP723) $(RIOTTOOLS)/usb-serial/ttys.py
 
 doc doc-man doc-latex:
 	$(MAKE) -C $(RIOTBASE) $@
