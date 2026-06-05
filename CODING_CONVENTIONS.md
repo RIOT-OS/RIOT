@@ -706,7 +706,7 @@ not a string literal`.
 * [PEP 723 Inline script metadata](https://peps.python.org/pep-0723/) **SHOULD**
   be used for runnable scripts to declare dependencies
 * Calls to the python executables from the build system **MUST** be done with
-  the wrapper `PYTHON3_WITH_PEP723` if the have PEP 723 annotations.
+  the wrapper `PYTHON3_WITH_PEP723` if they have PEP 723 annotations.
     * E.g. to run `dist/tools/fancy/fancy.py` use the following snippet:
       `$(Q)$(PYTHON3_WITH_PEP723) $(RIOTTOOLS)/fancy/fancy.py`
     * In the CI, `PYTHON3_WITH_PEP723` is overwritten as `python3` and the
