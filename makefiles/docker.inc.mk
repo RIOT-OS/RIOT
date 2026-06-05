@@ -36,7 +36,8 @@ export DOCKER_MAKECMDGOALS := $(filter $(DOCKER_MAKECMDGOALS_POSSIBLE),$(MAKECMD
 
 # Docker creates the files .dockerinit and .dockerenv in the root directory of
 # the container, we check for the files to determine if we are inside a container.
-ifneq (,$(wildcard /.dockerinit /.dockerenv))
+# Podman uses /run/.containerenv instead.
+ifneq (,$(wildcard /.dockerinit /.dockerenv /run/.containerenv))
   export INSIDE_DOCKER := 1
 else
   export INSIDE_DOCKER := 0
