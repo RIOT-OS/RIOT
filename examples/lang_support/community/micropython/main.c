@@ -21,7 +21,8 @@
 
 #include "micropython.h"
 #include "py/stackctrl.h"
-#include "lib/utils/pyexec.h"
+#include "py/misc.h"
+#include "shared/runtime/pyexec.h"
 
 #include "blob/boot.py.h"
 
@@ -50,7 +51,10 @@ int main(void)
          */
         if (coldboot) {
             puts("-- Executing boot.py");
-            mp_do_str((const char *)boot_py, boot_py_len);
+            vstr_t vstr;
+            vstr_init_fixed_buf(&vstr, boot_py_len, (char *)boot_py);
+            vstr.len = boot_py_len;
+            pyexec_vstr(&vstr, false);
             puts("-- boot.py exited. Starting REPL..");
             coldboot = 0;
         }
