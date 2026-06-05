@@ -1,18 +1,14 @@
 PKG_NAME=micropython
-PKG_URL=https://github.com/kaspar030/micropython
-PKG_VERSION=c7e947df88cf5b05f9e20dbeb10d5b4a9eae65a6
+PKG_URL=https://github.com/micropython/micropython
+# v1.28.0
+PKG_VERSION=e0e9fbb17ed6fd06bb76e266ae554784c9c80804
 PKG_LICENSE=MIT
-
-CFLAGS += -Wno-implicit-fallthrough -Wno-unused-parameter -Wno-error
-
-# Micropython build system doesn't support (yet) out-of-source builds
-# so clone and build micropython within the application build directory
-PKG_BUILD_OUT_OF_SOURCE = 0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-# Note: We have to explicitly override CC, as otherwise micropython will
-# set its own CC.
+# MicroPython's build system does not integrate well with RIOT-OS, so we just
+# call it directly from the Makefile. We have to explicitly override CC, as
+# otherwise MicroPython will set its own CC.
 all:
 	@mkdir -p $(PKG_BUILD_DIR)/tmp
-	BUILD=$(PKG_BUILD_DIR) "$(MAKE)" CC=$(CC) -C $(PKG_SOURCE_DIR)/ports/riot
+	$(QQ)"$(MAKE)" -C $(RIOTBASE)/pkg/micropython/contrib CC=$(CC) TOP=$(PKG_SOURCE_DIR) BUILD=$(PKG_BUILD_DIR)
