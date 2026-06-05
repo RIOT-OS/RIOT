@@ -2,9 +2,9 @@
  * @defgroup   sys_malloc_monitor Heap Memory Usage Monitor
  * @ingroup    sys_memory_management
  * @brief      This module allows to monitor the dynamic memory usage of a certain piece of code.
- * @warning    This module automatically selects @ref sys_malloc_ts and naturally
- *             incurs a certain runtime overhead. It is not meant for production usage.
- * @author      Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
+ * @warning    This module automatically selects @ref sys_malloc_ts (on targets other than `native`)
+ *             and naturally incurs a certain runtime overhead. It is not meant for production usage.
+ * @author     Mikolai Gütschow <mikolai.guetschow@tu-dresden.de>
  *
  * # Description
  *
