@@ -147,7 +147,7 @@ BOARD=board_name make dependency-debug
 Or with the "quick" version used by murdock to know supported boards (this is an incomplete resolution, details in `makefiles/dependencies_debug.inc.mk`) to a `dependencies_info-boards-supported_board_name` file:
 
 ```sh
-BOARDS=board_name DEPENDENCY_DEBUG=1 make info-boards-supported
+BOARDS=board_name DEPENDENCY_DEBUG=1 make info-boards-supported -j
 ```
 
 For more configuration and usage details, see in the file defining the targets `makefiles/dependencies_debug.inc.mk`.
