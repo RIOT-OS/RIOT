@@ -236,7 +236,10 @@ GLOBAL_GOALS += info-boards-features-blacklisted \
                 generate-Makefile.ci \
                 #
 
-ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))
+PRIVATE_GLOBAL_GOALS := info-boards-collect \
+                        #
+
+ifneq (,$(filter $(GLOBAL_GOALS) $(PRIVATE_GLOBAL_GOALS),$(MAKECMDGOALS)))
   include $(RIOTMAKE)/info-global.inc.mk
 else
 
