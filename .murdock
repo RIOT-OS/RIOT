@@ -243,7 +243,7 @@ get_supported_boards() {
         export BOARDS="${QUICKBUILD_BOARDS}"
     fi
 
-    local boards="$(make --no-print-directory -C$appdir info-boards-supported 2>/dev/null || echo broken)"
+    local boards="$(make --no-print-directory -C$appdir -j2 info-boards-supported 2>/dev/null || echo broken)"
 
     export BOARDS="${BOARDS_}"
 
@@ -345,7 +345,7 @@ compile() {
     [ "$board" = "makefile_broken" ] && {
         echo "$0: There seems to be a problem in \"$appdir\" while getting supported boards!"
         echo "$0: testing \"make -C$appdir info-boards-supported\"..."
-        make -C$appdir info-boards-supported && echo "$0: success. no idea what's wrong." || echo "$0: failed!"
+        make -C$appdir info-boards-supported -j && echo "$0: success. no idea what's wrong." || echo "$0: failed!"
         exit 1
     }
 
