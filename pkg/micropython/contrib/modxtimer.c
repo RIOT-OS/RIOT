@@ -17,8 +17,6 @@
 
 #include "py/mpconfig.h"
 
-#if MICROPY_PY_XTIMER
-
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -27,6 +25,8 @@
 #include "mp_riot.h"
 
 #include "xtimer.h"
+
+#if MICROPY_PY_XTIMER
 
 typedef struct _mp_obj_xtimer_t {
     mp_obj_base_t base;
@@ -80,8 +80,7 @@ static MP_DEFINE_CONST_OBJ_TYPE(
     MP_QSTR_xtimer,
     MP_TYPE_FLAG_NONE,
     make_new, mp_xtimer_make_new,
-    locals_dict, &xtimer_locals_dict
-    );
+    locals_dict, &xtimer_locals_dict);
 
 static const mp_rom_map_elem_t mp_module_xtimer_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_xtimer) },

@@ -64,7 +64,7 @@ static const mp_rom_map_elem_t machine_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_ADC), MP_ROM_PTR(&machine_adc_type) },
 #endif
 
-    // reset causes
+    /* reset causes */
     /*{ MP_ROM_QSTR(MP_QSTR_PWRON_RESET), MP_ROM_INT(REASON_DEFAULT_RST) },*/
 };
 
@@ -77,4 +77,4 @@ const mp_obj_module_t mp_module_machine = {
 
 MP_REGISTER_MODULE(MP_QSTR_machine, mp_module_machine);
 
-#endif // MICROPY_PY_MACHINE
+#endif /* MICROPY_PY_MACHINE */

@@ -42,4 +42,4 @@ const mp_obj_module_t mp_module_riot = {
 
 MP_REGISTER_MODULE(MP_QSTR_riot, mp_module_riot);
 
-#endif // MICROPY_PY_RIOT
+#endif /* MICROPY_PY_RIOT */

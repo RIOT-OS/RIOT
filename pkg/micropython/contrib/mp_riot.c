@@ -39,9 +39,9 @@ static xtimer_t _tick_timer = { .callback = _mp_riot_tick, .arg = &_tick_timer }
 
 void mp_riot_init(char *heap, size_t heap_size)
 {
-    #if MICROPY_ENABLE_GC
+#if MICROPY_ENABLE_GC
     gc_init(heap, heap + heap_size);
-    #endif
+#endif
 
     mp_init();
 }

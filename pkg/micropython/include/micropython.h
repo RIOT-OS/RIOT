@@ -30,7 +30,7 @@ extern "C" {
  * Use a reasonable default heap size.
  */
 #ifndef MP_RIOT_HEAPSIZE
-  #define MP_RIOT_HEAPSIZE      (16U*1024)
+#  define MP_RIOT_HEAPSIZE      (16U*1024)
 #endif
 
 /**
@@ -38,7 +38,7 @@ extern "C" {
  *          unexpected stack usage
  */
 #ifndef MP_STACK_SAFEAREA
-  #define MP_STACK_SAFEAREA     (128U)
+#  define MP_STACK_SAFEAREA     (128U)
 #endif
 
 /**

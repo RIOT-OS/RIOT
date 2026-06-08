@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+#pragma once
+
 /**
  * @ingroup     pkg_micropython
  * @{
@@ -28,7 +30,7 @@
 
 // Usually passed from Makefile
 #ifndef MICROPY_HEAP_SIZE
-#define MICROPY_HEAP_SIZE (16 * 1024)
+#  define MICROPY_HEAP_SIZE (16 * 1024)
 #endif
 
 #define MICROPY_ENABLE_SOURCE_LINE          (1)
@@ -60,19 +62,16 @@
 #define MICROPY_PY_MACHINE                  (1)
 #define MICROPY_PY_MACHINE_PIN_MAKE_NEW     mp_pin_make_new
 #define MICROPY_PY_STRUCT                   (1)
-// Include SPI when enabled in RIOT
 #ifdef MODULE_PERIPH_SPI
-#define MICROPY_PY_MACHINE_SPI              (1)
+#  define MICROPY_PY_MACHINE_SPI            (1)
 #endif
-// Include ADC when enabled in RIOT
 #ifdef MODULE_PERIPH_ADC
-#define MICROPY_PY_MACHINE_ADC              (1)
+#  define MICROPY_PY_MACHINE_ADC            (1)
 #endif
 #define MICROPY_PY_MACHINE_SPI_MAKE_NEW machine_hw_spi_make_new
 #ifdef CONFIG_NETWORKING
-// If we have networking, we likely want errno comfort
 #define MICROPY_PY_UERRNO                   (1)
-#define MICROPY_PY_USOCKET                  (1)
+#  define MICROPY_PY_USOCKET                (1)
 #endif
 #define MICROPY_EPOCH_IS_1970                       (1)
 #define MICROPY_PY_TIME                             (1)
@@ -98,8 +97,8 @@
 
 #define MICROPY_MODULE_FROZEN_STR           (0)
 
-typedef intptr_t mp_int_t;       // must be pointer size
-typedef uintptr_t mp_uint_t; // must be pointer size
+typedef intptr_t mp_int_t;   /* must be pointer size */
+typedef uintptr_t mp_uint_t; /* must be pointer size */
 typedef long mp_off_t;
 
 #define MICROPY_BEGIN_ATOMIC_SECTION()      irq_disable()

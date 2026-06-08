@@ -18,15 +18,8 @@
 #pragma once
 
 /**
- * @ingroup     pkg_micropython
- * @{
+ * @brief   RIOT ISR callback for MicroPython
  *
- * @file
- * @brief       MicroPython RIOT port helper declarations
- *
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
- *
- * @}
+ * @param[in] callback    Info to pass on to the callback.
  */
-
 void mp_riot_isr_callback(void *callback);

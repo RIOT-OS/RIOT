@@ -3,8 +3,6 @@
 @brief    MicroPython - Python for microcontrollers
 @see      https://micropython.org
 
-# MicroPython RIOT package
-
 "MicroPython is a lean and efficient implementation of the Python 3
  programming language that includes a small subset of the Python standard
  library and is optimised to run on microcontrollers and in constrained
@@ -66,23 +64,23 @@ information.
 ### thread_getpid()
 
 ```python
->>> import riot
->>> print(riot.thread_getpid())
+import riot
+print(riot.thread_getpid())
 ```
 
 ### xtimer
 
 ```python
->>> import xtimer
->>>
->>> a = 0
->>> def inc_a():
->>>   global a
->>>   a += 1
->>>
->>> t = xtimer.xtimer(inc_a)
->>> t.set(100000)
->>> print(a)
+import xtimer
+
+a = 0
+def inc_a():
+  global a
+  a += 1
+
+t = xtimer.xtimer(inc_a)
+t.set(100000)
+print(a)
 ```
 
 ## How to use
