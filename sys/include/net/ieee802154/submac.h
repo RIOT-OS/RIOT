@@ -174,6 +174,19 @@ typedef struct {
 } ieee802154_submac_cb_t;
 
 /**
+ * @brief IEEE 802.15.4 SubMAC transmission options.
+ */
+typedef enum {
+    IEEE802154_SUBMAC_TX_OPT_NONE        = 0,
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA)
+    IEEE802154_SUBMAC_TX_OPT_NO_CSMA_CA  = BIT0,
+#endif
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS)
+    IEEE802154_SUBMAC_TX_OPT_NO_RETRANS  = BIT1,
+#endif
+} ieee802154_submac_tx_opts_t;
+
+/**
  * @brief Internal SubMAC FSM state machine events
  */
 typedef enum {
@@ -231,6 +244,10 @@ struct ieee802154_submac {
     uint8_t retrans;                    /**< current number of retransmissions */
     bool wait_for_ack;                  /**< SubMAC is waiting for an ACK frame */
 #endif
+#if IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_CSMA_CA) || \
+    IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_FRAME_RETRANS)
+    uint8_t tx_opts;
+#endif
     uint16_t ack_timeout_us;            /**< ACK timeout in µs */
     uint16_t panid;                     /**< IEEE 802.15.4 PAN ID */
     uint16_t channel_num;               /**< IEEE 802.15.4 channel number */
@@ -258,6 +275,25 @@ struct ieee802154_submac {
  *         @ref ieee802154_submac_cb_t::tx_done
  */
 int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist);
+
+/**
+ * @brief Transmit an IEEE 802.15.4 PSDU
+ *
+ * This function performs an IEEE 802.15.4 transmission,
+ * same as ieee802154_send but with tx opts
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ * @param[in] iolist pointer to the PSDU frame (without FCS)
+ * @param[in] tx_opts  Transmission options (bitwise OR combination).
+ *
+ * @return 0 on success
+ * @return -EBUSY if the SubMAC is not in RX or IDLE state or if called inside
+ *         @ref ieee802154_submac_cb_t::rx_done or
+ *         @ref ieee802154_submac_cb_t::tx_done
+ */
+int ieee802154_send_ext(ieee802154_submac_t *submac,
+                       const iolist_t *iolist,
+                       ieee802154_submac_tx_opts_t tx_opts);
 
 /**
  * @brief Set the IEEE 802.15.4 short address

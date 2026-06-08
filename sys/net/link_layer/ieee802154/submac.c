@@ -822,6 +822,13 @@ int ieee802154_submac_process_ev(ieee802154_submac_t *submac,
 
 int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
 {
+    return ieee802154_send_ext(submac, iolist, IEEE802154_SUBMAC_TX_OPT_NONE);
+}
+
+int ieee802154_send_ext(ieee802154_submac_t *submac,
+                        const iolist_t *iolist,
+                        ieee802154_submac_tx_opts_t tx_opts)
+{
     if (iolist == NULL) {
         return 0;
     }
@@ -835,10 +842,12 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
     _set_csma_retries_nb(submac, 0);
     _set_csma_backoff_mask(submac, (1 << _get_csma_be_min(submac)) - 1);
     submac->tx_ftype = buf[0] & IEEE802154_FCF_TYPE_MASK;
+    submac->tx_opts = tx_opts;
 
     int res = ieee802154_submac_process_ev(submac, IEEE802154_FSM_EV_REQUEST_TX);
 
     if (res < 0) {
+        submac->tx_opts = IEEE802154_SUBMAC_TX_OPT_NONE;
         DEBUG("IEEE802154 submac: ieee802154_send(): Tx frame failed (%d)\n", res);
     }
     return res;
