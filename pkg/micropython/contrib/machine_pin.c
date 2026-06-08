@@ -57,11 +57,10 @@ static mp_obj_t machine_pin_obj_init_helper(machine_pin_obj_t *self, size_t n_ar
         { MP_QSTR_value, MP_ARG_KW_ONLY | MP_ARG_OBJ, {.u_obj = mp_const_none}},
     };
 
-    // parse args
     mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
     mp_arg_parse_all(n_args, pos_args, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
 
-    // get io mode
+    /*get io mode */
     uint mode = args[ARG_mode].u_int;
 
     int ret = gpio_init(self->pin, mode);
@@ -69,7 +68,7 @@ static mp_obj_t machine_pin_obj_init_helper(machine_pin_obj_t *self, size_t n_ar
         mp_raise_ValueError("invalid pin");
     }
 
-    // get initial value
+    /* get initial value */
     if (args[ARG_value].u_obj != MP_OBJ_NULL) {
         (void)gpio_write(self->pin, mp_obj_is_true(args[ARG_value].u_obj));
     }
@@ -93,7 +92,7 @@ mp_obj_t mp_pin_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_kw,
     pin->pin = wanted_pin;
 
     if (n_args > 1 || n_kw > 0) {
-        // pin mode given, so configure this GPIO
+        /* pin mode given, so configure this GPIO */
         mp_map_t kw_args;
         mp_map_init_fixed_table(&kw_args, n_kw, args + n_args);
         machine_pin_obj_init_helper(pin, n_args - 1, args + 1, &kw_args);

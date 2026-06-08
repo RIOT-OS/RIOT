@@ -36,33 +36,30 @@ typedef struct _machine_hw_spi_obj_t {
 
 static machine_hw_spi_obj_t machine_hw_spi_obj[SPI_NUMOF];
 
-// Convert a MP polarity and phase to a RIOT enum value
+/* Convert a MP polarity and phase to a RIOT enum value */
 static spi_mode_t _to_riot_mode(bool polarity, bool phase)
 {
     if (polarity) {
         if (phase) {
             return SPI_MODE_3;
-        }
-        else {
+        } else {
             return SPI_MODE_2;
         }
-    }
-    else {
+    } else {
         if (phase) {
             return SPI_MODE_1;
-        }
-        else {
+        } else {
             return SPI_MODE_0;
         }
     }
 }
 
-static uint8_t _phase(spi_mode_t mode)
+static uint8_t _spi_phase(spi_mode_t mode)
 {
     return (mode == SPI_MODE_1 || mode == SPI_MODE_3) ? 1 : 0;
 }
 
-static bool _polarity(spi_mode_t mode)
+static bool _spi_polarity(spi_mode_t mode)
 {
     return (mode == SPI_MODE_2 || mode == SPI_MODE_3) ? 1 : 0;
 }
@@ -73,7 +70,7 @@ static void machine_hw_spi_print(const mp_print_t *print, mp_obj_t self_in,
     machine_hw_spi_obj_t *self = MP_OBJ_TO_PTR(self_in);
     mp_printf(print, "SPI(id=%u, baudrate=%u, polarity=%u, phase=%u, sck=?, mosi=?, miso=?)",
               self->bus, self->baudrate,
-              _polarity(self->mode), _phase(self->mode));
+              _spi_polarity(self->mode), _spi_phase(self->mode));
 }
 
 static void machine_hw_spi_init(mp_obj_base_t *self_in, size_t n_args,
@@ -115,8 +112,8 @@ mp_obj_t machine_hw_spi_make_new(const mp_obj_type_t *type, size_t n_args,
     };
 
     mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
-    mp_arg_parse_all_kw_array(n_args, n_kw, all_args,
-                              MP_ARRAY_SIZE(allowed_args), allowed_args, args);
+    mp_arg_parse_all_kw_array(n_args, n_kw, all_args, MP_ARRAY_SIZE(allowed_args),
+                              allowed_args, args);
 
     // here we would check the sck/mosi/miso pins and configure them,
     // but it's not supported with RIOT
@@ -141,7 +138,6 @@ mp_obj_t machine_hw_spi_make_new(const mp_obj_type_t *type, size_t n_args,
     return MP_OBJ_FROM_PTR(self);
 }
 
-// Nothing to deinit here
 static void machine_hw_spi_deinit(mp_obj_base_t *self_in)
 {
     (void)self_in;

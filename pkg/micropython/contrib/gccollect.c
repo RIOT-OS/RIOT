@@ -27,9 +27,9 @@ void gc_collect(void)
 {
     gc_collect_start();
 
-    // Spill the callee-saved registers onto the stack so that they are scanned
-    // as part of the stack below, then scan from the current stack pointer up
-    // to the top of the stack recorded at startup.
+    /* Spill the callee-saved registers onto the stack so that they are scanned
+     * as part of the stack below, then scan from the current stack pointer up
+     * to the top of the stack recorded at startup. */
     jmp_buf regs;
     setjmp(regs);
 
@@ -40,4 +40,4 @@ void gc_collect(void)
     gc_collect_end();
 }
 
-#endif // MICROPY_ENABLE_GC
+#endif /* MICROPY_ENABLE_GC */

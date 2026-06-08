@@ -27,20 +27,23 @@
 
 #if MICROPY_PY_MACHINE
 
-static mp_obj_t machine_reset(void) {
+static mp_obj_t machine_reset(void)
+{
     pm_reboot();
     return mp_const_none;
 }
 static MP_DEFINE_CONST_FUN_OBJ_0(machine_reset_obj, machine_reset);
 
-static mp_obj_t machine_reset_cause(void) {
+static mp_obj_t machine_reset_cause(void)
+{
     printf("Warning: %s is not implemented\n", __func__);
     return MP_OBJ_NEW_SMALL_INT(42);
 }
 static MP_DEFINE_CONST_FUN_OBJ_0(machine_reset_cause_obj, machine_reset_cause);
 
 #ifdef MODULE_PERIPH_CPUID
-static mp_obj_t machine_unique_id(void) {
+static mp_obj_t machine_unique_id(void)
+{
     uint8_t chipid[CPUID_LEN];
     cpuid_get(chipid);
     return mp_obj_new_bytes(chipid, CPUID_LEN);

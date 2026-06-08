@@ -30,5 +30,4 @@ const char riot_help_text[] =
     "  CTRL-D        -- on a blank line, do a soft reset of the board\n"
     " (all probably not working in this initial port)\n"
     "\n"
-    "For further help on a specific object, type help(obj)\n"
-;
+    "For further help on a specific object, type help(obj)\n";

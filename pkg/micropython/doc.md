@@ -23,13 +23,13 @@ the command line to configure MicroPython:
 
 Example on the command line:
 
-```console
+```shell
 MP_RIOT_HEAPSIZE=2048 make -C examples/lang_support/community/micropython
 ```
 
 ## Implementation details
 
-This package builds upstream MicroPython. The RIOT port itself lives in this 
+This package builds upstream MicroPython. The RIOT port itself lives in this
 package's `contrib/` directory. It is compiled with MicroPython's own build
 system, and is based on MicroPython's `ports/minimal` with some extra modules
 enabled.

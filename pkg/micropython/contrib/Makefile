@@ -22,9 +22,15 @@ INC += -I$(TOP)/shared/readline
 INC += -I$(BUILD)
 INC += $(INCLUDES)
 
-Wno = -Wno-vla -Wno-unused-parameter -Wno-pedantic -Wno-sign-compare
+CFLAGS += -std=gnu11
+CFLAGS += -DNDEBUG
+CFLAGS += $(INC)
 
-CFLAGS += -std=gnu11 -DNDEBUG $(INC) $(Wno)
+# disable some warnings that would otherwise error out
+CFLAGS += -Wno-vla
+CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wno-pedantic
+CFLAGS += -Wno-sign-compare
 
 SRC_C = $(filter-out modtime_riot.c, $(wildcard *.c)) \
   extmod/machine_spi.c \
