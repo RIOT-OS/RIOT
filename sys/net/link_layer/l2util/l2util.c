@@ -350,7 +350,7 @@ char *l2util_addr_to_str(const uint8_t *addr, size_t addr_len, char *out)
     return res;
 }
 
-size_t l2util_addr_from_str(const char *str, uint8_t *out)
+size_t l2util_addr_from_str_sized(const char *str, void *_addr, size_t addr_size)
 {
     /* Walk over str from the end. */
     /* Take two chars a time as one hex value (%hhx). */
@@ -358,46 +358,61 @@ size_t l2util_addr_from_str(const char *str, uint8_t *out)
     /* Every non-hexadimal character is a delimiter. */
     /* Leading, tailing and adjacent delimiters are forbidden. */
     const char *end_str = str;
-    uint8_t *out_end = out;
+    uint8_t *addr = _addr;
+    uint8_t *addr_end = addr;
     size_t count = 0;
     int assert_cell = 1;
 
-    assert(out != NULL);
+    assert(addr != NULL);
     if ((str == NULL) || (str[0] == '\0')) {
         return 0;
     }
+
     /* find end of string */
     while (end_str[1]) {
         ++end_str;
     }
+
     while (end_str >= str) {
-        int a = 0, b = _dehex(*end_str--, -1);
+        int a = 0;
+        int b = _dehex(*end_str--, -1);
 
         if (b < 0) {
             if (assert_cell) {
                 return 0;
             }
-            else {
-                assert_cell = 1;
-                continue;
-            }
+
+            assert_cell = 1;
+            continue;
         }
         assert_cell = 0;
         if (end_str >= str) {
             a = _dehex(*end_str--, 0);
         }
         count++;
-        *out_end++ = (a << 4) | b;
+
+        if (count > addr_size) {
+            return 0;
+        }
+
+        *addr_end++ = (a << 4) | b;
     }
+
     if (assert_cell) {
         return 0;
     }
+
     /* out is reversed */
-    while (out < --out_end) {
-        uint8_t tmp = *out_end;
-        *out_end = *out;
-        *out++ = tmp;
+    while (addr < --addr_end) {
+        uint8_t tmp = *addr_end;
+        *addr_end = *addr;
+        *addr++ = tmp;
     }
     return count;
+}
+
+size_t l2util_addr_from_str(const char *str, uint8_t out[L2UTIL_ADDR_MAX_LEN])
+{
+    return l2util_addr_from_str_sized(str, out, L2UTIL_ADDR_MAX_LEN);
 }
 /** @} */

@@ -27,6 +27,7 @@
 
 #include <stdint.h>
 
+#include "compiler_hints.h"
 #include "net/eui64.h"
 #include "net/ndp.h"
 
@@ -177,18 +178,41 @@ char *l2util_addr_to_str(const uint8_t *addr, size_t addr_len, char *out);
  * @details The input format must be like `xx:xx:xx:xx` where `xx` will be the
  *          bytes of @p addr in hexadecimal representation.
  *
- * @pre `(out != NULL)`
- * @pre @p out **MUST** have allocated at least
- *      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes.
+ * @pre     `(out != NULL)`
+ * @pre     @p out **MUST** have allocated at least @ref L2UTIL_ADDR_MAX_LEN
+ *          bytes.
+ * @pre     @p str must be `\0` terminated
  *
- * @param[in] str       A string of colon-separated hexadecimals.
- * @param[out] out      The resulting hardware address. Must at least have
+ * @param[in]   str         A string of colon-separated hexadecimals.
+ * @param[out]  addr        The resulting hardware address.
+ * @param[in]   addr_size   Size of @p addr
+ *
+ * @return  Actual length of @p out on success (may be less than @p addr_size)
+ * @retval  0           Invalid input
+ */
+ACCESS(write_only, 2, 3)
+size_t l2util_addr_from_str_sized(const char *str, void *addr, size_t addr_size);
+
+/**
+ * @brief   Parses a string of colon-separated hexadecimals to a hardware
+ *          address.
+ *
+ * @details The input format must be like `xx:xx:xx:xx` where `xx` will be the
+ *          bytes of @p addr in hexadecimal representation.
+ *
+ * @pre     `(out != NULL)`
+ * @pre     @p out **MUST** have allocated at least @ref L2UTIL_ADDR_MAX_LEN
+ *          bytes.
+ * @pre     @p str must be `\0` terminated
+ *
+ * @param[in]   str     A string of colon-separated hexadecimals.
+ * @param[out]  out     The resulting hardware address. Must at least have
  *                      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes allocated.
  *
  * @return  Actual length of @p out on success.
- * @return  0, on failure.
+ * @retval  0           Invalid input
  */
-size_t l2util_addr_from_str(const char *str, uint8_t *out);
+size_t l2util_addr_from_str(const char *str, uint8_t out[L2UTIL_ADDR_MAX_LEN]);
 
 /**
  * @brief   Checks if two l2 addresses are equal.
