@@ -446,7 +446,9 @@ static void test_l2util_addr_from_str(void)
     static const uint8_t ethernet_l2addr[] = ETHERNET_SRC;
     static const uint8_t ieee802154_l2addr_long[] = IEEE802154_LONG_SRC;
     static const uint8_t ieee802154_l2addr_short[] = IEEE802154_SHORT_SRC;
-    uint8_t out[GNRC_NETIF_L2ADDR_MAXLEN];
+    uint8_t out[L2UTIL_ADDR_MAX_LEN + 1];
+    const uint8_t canary = 0x67;
+    out[L2UTIL_ADDR_MAX_LEN] = canary;
 
     TEST_ASSERT_EQUAL_INT(0, l2util_addr_from_str("", out));
     TEST_ASSERT_EQUAL_INT(sizeof(ethernet_l2addr),
@@ -458,10 +460,17 @@ static void test_l2util_addr_from_str(void)
                                                    out));
     TEST_ASSERT_EQUAL_INT(0, memcmp(ieee802154_l2addr_long, out,
                                     sizeof(ieee802154_l2addr_long)));
+    TEST_ASSERT_EQUAL_INT(0,
+                          l2util_addr_from_str_sized("3E:E6:B5:0F:19:22:FD:0A",
+                                                     out,
+                                                     6));
     TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_short),
                           l2util_addr_from_str("FD:0A", out));
     TEST_ASSERT_EQUAL_INT(0, memcmp(ieee802154_l2addr_short, out,
                                     sizeof(ieee802154_l2addr_short)));
+    TEST_ASSERT_EQUAL_INT(0, l2util_addr_from_str("01:02:03:04:05:06:07:08:09",
+                                                  out));
+    TEST_ASSERT_EQUAL_INT(canary, out[L2UTIL_ADDR_MAX_LEN]);
 }
 
 TestRef test_l2util(void)
