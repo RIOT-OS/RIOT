@@ -163,12 +163,10 @@ int adc_init(adc_t line)
 #endif
 
 #if defined(CPU_FAM_STM32U3)
-    /* The U3 ADC has no CKMODE field; the kernel clock comes straight from
-     * RCC->CCIPR2 (HCLK) with no divider. At full HCLK the per-cycle sampling
-     * window is too short for the high-impedance internal channels (VBAT,
-     * VREFINT, temperature), so their sample-and-hold capacitor never fully
-     * charges and conversions read systematically low. Apply an ADC prescaler
-     * to lengthen each sampling cycle. */
+    /* STM32U3 ADC kernel clock is derived directly from HCLK without a CKMODE 
+     * divider. To ensure sufficient sample-and-hold time for high-impedance 
+     * internal channels (VBAT, VREFINT, TSENSE) at maximum HCLK frequencies, 
+     * a clock prescaler is applied. */
     ADC_INSTANCE->CCR = (ADC_INSTANCE->CCR & ~ADC_CCR_PRESC)
                       | ADC_CCR_PRESC_2; /* divide ADC clock by 8 */
 #endif
@@ -280,8 +278,7 @@ int adc_init(adc_t line)
         smp_time = ADC_SMP_VBAT_VAL;
     }
 #if defined(VREFINT_ADC)
-    /* VREFINT is a high-impedance internal source and needs a long sampling
-     * time, just like VBAT. */
+    /* VREFINT requires maximum sampling time due to high internal impedance */
     if (line == VREFINT_ADC) {
         smp_time = ADC_SMP_VBAT_VAL;
     }
@@ -334,8 +331,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
 #endif
     }
 #if defined(VREFINT_ADC) && defined(ADC_CCR_VREFEN)
-    /* Enable the internal voltage reference path so the VREFINT channel is
-     * driven and not left floating during the conversion. */
+    /* Enable internal voltage reference path (VREFINT) */
     if (line == VREFINT_ADC) {
         ADC_INSTANCE->CCR |= ADC_CCR_VREFEN;
 #if defined(CPU_FAM_STM32U3)
@@ -358,7 +354,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
 
 #if defined(CPU_FAM_STM32U3)
     if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
-        /* Discard first conversion after enabling VBAT path. */
+        /* Discard dummy conversion to clear residual charge after enabling path */
         dev(line)->ISR |= ADC_ISR_EOC;
         dev(line)->CR |= ADC_CR_ADSTART;
         while (!(dev(line)->ISR & ADC_ISR_EOC)) {}

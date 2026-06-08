@@ -46,7 +46,7 @@ extern "C" {
 #define ADC_T_ADCVREG_STUP_US   (20U)
 
 /**
- * @brief   Mask of @c ADC_CFGR1.RES bits — used by @ref adc_f3_h7.c @c adc_sample()
+ * @brief   Mask of @c ADC_CFGR1.RES bits — used by @ref adc_f3_h7_u3.c @c adc_sample()
  */
 #define ADC_CFGR_RES            ADC_CFGR1_RES_Msk
 
