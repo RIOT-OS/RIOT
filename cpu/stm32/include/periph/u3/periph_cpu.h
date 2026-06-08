@@ -132,7 +132,7 @@ typedef enum {
 #endif
 /** @} */
 
-#endif /* ndef DOXYGEN */
+#endif /* DOXYGEN */
 
 #ifdef __cplusplus
 }

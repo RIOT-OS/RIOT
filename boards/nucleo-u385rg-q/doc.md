@@ -11,9 +11,8 @@ with TrustZone, 640KiB of RAM, and 1MiB of Flash.
 You can find general information about the Nucleo-64 boards on the
 @ref boards_common_nucleo64 page.
 
-This RIOT port currently provides initial support for the board.
-Basic bring-up and LED blinking have been verified. Other peripherals may
-still be incomplete or untested.
+This RIOT port has moved past initial bring-up and now supports a range of the
+MCU's peripherals (see [Supported Features](#supported-features) below).
 
 ## Hardware
 
@@ -40,10 +39,44 @@ A detailed description of the flashing process can be found on the
 
 The board name for the NUCLEO-U385RG-Q is `nucleo-u385rg-q`.
 
-## Status
+## Accessing RIOT shell
 
-The following has been verified:
+Default RIOT shell access uses the VCP (Virtual COM Port) over the USB interface
+provided by the on-board ST-LINK programmer. ST-LINK is connected to the
+microcontroller's USART1 (`UART_DEV(0)`, STDIO).
 
-- Basic bring-up
-- GPIO
-- LED blinking
+The default baud rate is 115200.
+
+If a physical connection to USART1 is needed, connect a UART interface to pins
+PA9 (USART1 TX) and PA10 (USART1 RX).
+
+## Supported Features
+
+The peripherals below are configured for this board (see `Makefile.features`
+and `include/periph_conf.h`). "Status" reflects whether the peripheral has been
+verified on hardware:
+
+| Peripheral | Status   | Configuration on this board                                  |
+|:-----------|:---------|:-------------------------------------------------------------|
+| GPIO       | working  | including external interrupts (EXTI)                         |
+| UART       | working  | USART1 on PA9/PA10 (ST-LINK VCP, STDIO)                       |
+| LPUART     | working  | LPUART1 on PA2/PA3                                            |
+| ADC        | working  | ADC1, Arduino A0–A5, plus internal VBAT and VREFINT channels  |
+| PWM        | working  | TIM2 — CH1 User LED (PA5), CH2 PB3 (D3), CH3 PB10 (D6), CH4 PB11 |
+| Timer      | working  | TIM3 (general-purpose RIOT timer backend)                    |
+| RTC        | working  | uses on-board 32.768 kHz LSE                                 |
+| SPI        | untested | SPI1 on PA7/PA6/PA5 (MOSI/MISO/SCK), Arduino D11/D12/D13 — WIP, debugging in progress |
+| I2C        | untested | I2C1 on PB8/PB9 (SCL/SDA), Arduino D15/D14 — WIP, debugging in progress |
+| USB device | untested | USB DRD FS, D+/D− on PA12/PA11 — WIP, debugging in progress   |
+
+@note   SPI, I2C, and USB are configured and compile, but are not yet verified
+        on hardware (a known bug is being worked on). The remaining peripherals
+        above have been confirmed working.
+
+Arduino-style abstractions inherited from the common Nucleo-64 support are also
+provided: `arduino_pins`, `arduino_analog`, `arduino_i2c`, `arduino_spi`,
+`arduino_uart`, and `arduino_shield_uno`.
+
+@note   TIM2 is reserved for PWM (User LED on TIM2_CH1/PA5), so TIM3 is used as
+        the RIOT timer backend. PWM CH1 and SPI1 share the green User LED pin
+        (PA5); avoid using both simultaneously.
