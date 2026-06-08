@@ -710,9 +710,10 @@ static inline char *gnrc_netif_addr_to_str(const uint8_t *addr, size_t addr_len,
  * @return  Actual length of @p out on success.
  * @return  0, on failure.
  */
-static inline size_t gnrc_netif_addr_from_str(const char *str, uint8_t *out)
+static inline size_t gnrc_netif_addr_from_str(const char *str,
+                                              uint8_t out[GNRC_NETIF_L2ADDR_MAXLEN])
 {
-    return l2util_addr_from_str(str, out);
+    return l2util_addr_from_str_sized(str, out, GNRC_NETIF_L2ADDR_MAXLEN );
 }
 
 /**
