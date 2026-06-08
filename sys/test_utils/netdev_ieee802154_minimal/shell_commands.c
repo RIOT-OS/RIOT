@@ -189,7 +189,7 @@ static int cmd_txtsnd(int argc, char **argv)
     case 4:
         break;
     case 5:
-        res = l2util_addr_from_str(argv[idx++], pan.u8);
+        res = l2util_addr_from_str_sized(argv[idx++], pan.u8, sizeof(pan));
         if ((res == 0) || (res > sizeof(pan))) {
             txtsnd_usage(argv[0]);
             return 1;
