@@ -1150,6 +1150,13 @@ typedef enum {
 } dma_incr_t;
 
 /**
+ * @brief   Signature of event callback functions triggered from interrupts
+ *
+ * @param[in] arg       optional context for the callback
+ */
+typedef void (*dma_cb_t)(void *arg);
+
+/**
  * @brief   Initialize DMA
  */
 void dma_init(void);
@@ -1179,9 +1186,18 @@ void dma_release_channel(dma_t dma);
  * @param   dma     DMA channel reference
  * @param   trigger Trigger to use for this DMA channel
  * @param   prio    Channel priority
- * @param   irq     Whether to enable the interrupt handler for this channel
+ * @param   cb
+ * @param   ctx
  */
-void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, bool irq);
+void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, dma_cb_t cb, void *ctx);
+
+/**
+ * @brief   Release a previously acquired DMA channel
+ *
+ * @param   dma     DMA channel to release
+ * @param   ctx
+ */
+void dma_set_cb_arg(dma_t dma, void *ctx);
 
 /**
  * @brief   Prepare the DMA channel for an individual transfer.
@@ -1308,22 +1324,25 @@ void dma_append_dst(dma_t dma, DmacDescriptor *next, void *dst, size_t num,
                     bool incr);
 
 /**
+ * @brief   Make the DMA transfer repeat indefinitely
+ *
+ * @param   dma     DMA channel reference
+ */
+void dma_enable_loop(dma_t dma);
+
+/**
+ * @brief   Disable DMA transfer looping
+ *
+ * @param   dma     DMA channel reference
+ */
+void dma_disable_loop(dma_t dma);
+
+/**
  * @brief   Start a DMA transfer.
  *
  * @param   dma     DMA channel reference
  */
 void dma_start(dma_t dma);
-
-/**
- * @brief   Wait for a DMA channel to finish the transfer.
- *
- * This function uses a blocking mutex to wait for the transfer to finish
- *
- * @note Use only with DMA channels of which the interrupt is enabled
- *
- * @param   dma     DMA channel reference
- */
-void dma_wait(dma_t dma);
 
 /**
  * @brief   Cancel an active DMA transfer

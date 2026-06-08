@@ -125,6 +125,50 @@ void dac_poweron(dac_t line);
  */
 void dac_poweroff(dac_t line);
 
+/**
+ * @brief   Get the sample rate of the DAC in Hz
+ */
+uint32_t dac_get_freq(void);
+
+/**
+ * @brief   Options for @ref dac_play
+ * @{
+ */
+#define DAC_PLAY_LOOPED     (1 << 0)    /**< keep playing the sample buffer in a loop */
+/** @} */
+
+/**
+ * @brief   Configure DAC line for playing sample buffer
+ *
+ * @param[in]   line        DAC line to configure
+ * @param[in]   cb          Callback to be executed when the current sample buffer
+ *                          is done. Will be executed in interrupt context.
+ *                          May be NULL.
+ * @param[in]   arg         Callback argument
+ *
+ * @retval      0           Success
+ * @retval      -EEXIST     Line has already been configured
+ * @retval      -ENOMEM     Can't allocate resources for playback
+ */
+int dac_play_setup(dac_t line, dma_cb_t cb, void *arg);
+
+/**
+ * @brief   Start playing sample buffer
+ *
+ * @param[in]   line        DAC line to user for playing
+ * @param[in]   buf         Sample buffer to play
+ * @param[in]   len         Number of samples to play
+ * @param[in]   flags       Playback options
+ */
+void dac_play(dac_t line, const uint16_t *buf, size_t len, uint8_t flags);
+
+/**
+ * @brief   Release DAC line
+ *
+ * @param[in]   line        DAC line to release
+ */
+void dac_play_teardown(dac_t line);
+
 #ifdef __cplusplus
 }
 #endif
