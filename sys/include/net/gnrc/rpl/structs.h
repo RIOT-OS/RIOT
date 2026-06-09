@@ -286,7 +286,7 @@ typedef struct {
      * @return      Negative, if the first parent is preferred.
      */
     int (*parent_cmp)(gnrc_rpl_parent_t *parent1, gnrc_rpl_parent_t *parent2);
-    int (*which_dodag)(gnrc_rpl_dodag_t *, gnrc_rpl_dio_t *); /**< compare for dodags */
+    int (*which_dodag)(gnrc_rpl_dodag_t *, gnrc_rpl_dio_t *, kernel_pid_t iface, ipv6_addr_t addr); /**< compare for dodags */
 
     /**
      * @brief Reset the state of the objective function.
