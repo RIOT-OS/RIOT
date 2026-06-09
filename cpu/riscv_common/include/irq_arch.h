@@ -38,8 +38,8 @@ extern "C" {
  *          the trap. This is useful for debugging, but causes heavy performance
  *          degradation.
  */
-#ifndef PRINT_VERBOSE_TRAP_INFO
-#  define PRINT_VERBOSE_TRAP_INFO 0
+#ifndef CONFIG_PRINT_VERBOSE_TRAP_INFO
+#  define CONFIG_PRINT_VERBOSE_TRAP_INFO 0
 #endif
 
 extern volatile int riscv_in_isr;
