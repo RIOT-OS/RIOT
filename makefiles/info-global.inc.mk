@@ -145,10 +145,10 @@ info-boards-features-missing: bin/.INFO_BOARDS_FEATURES_MISSING $(BOARD_CANDIDAT
 	@cat bin/.INFO_BOARDS_FEATURES_MISSING | sort | column -t
 
 info-boards-features-blacklisted: bin/.INFO_BOARDS_FEATURES_BLACKLISTED $(BOARD_CANDIDATES)
-	@cat bin/.INFO_BOARDS_FEATURES_BLACKLISTED | column -t
+	@cat bin/.INFO_BOARDS_FEATURES_BLACKLISTED | sort | column -t
 
 info-boards-features-conflicting: bin/.INFO_BOARDS_FEATURES_CONFLICTING $(BOARD_CANDIDATES)
-	@cat bin/.INFO_BOARDS_FEATURES_CONFLICTING | column -t
+	@cat bin/.INFO_BOARDS_FEATURES_CONFLICTING | sort | column -t
 
 generate-Makefile.ci:
 	@$(RIOTTOOLS)/insufficient_memory/create_makefile.ci.sh
