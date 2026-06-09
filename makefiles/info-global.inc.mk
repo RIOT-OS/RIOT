@@ -139,10 +139,10 @@ $(SUPPORT_FILES):
 	@$(MAKE) BOARD=$* INFO_OVERRIDE=1 info-boards-collect --no-print-directory
 
 info-boards-supported: bin/.INFO_BOARDS_SUPPORTED $(BOARD_CANDIDATES)
-	@cat bin/.INFO_BOARDS_SUPPORTED |  sort | xargs echo
+	@cat bin/.INFO_BOARDS_SUPPORTED | sort | xargs echo
 
 info-boards-features-missing: bin/.INFO_BOARDS_FEATURES_MISSING $(BOARD_CANDIDATES)
-	@cat bin/.INFO_BOARDS_FEATURES_MISSING | column -t
+	@cat bin/.INFO_BOARDS_FEATURES_MISSING | sort | column -t
 
 info-boards-features-blacklisted: bin/.INFO_BOARDS_FEATURES_BLACKLISTED $(BOARD_CANDIDATES)
 	@cat bin/.INFO_BOARDS_FEATURES_BLACKLISTED | column -t
@@ -157,7 +157,7 @@ generate-Makefile.ci:
 # This target is run as a submake command by the `.board-result-%` for each
 # board in a new environment, since the evaluation of the features is only done
 # for one board at a time and the results are saved in temporary files.
-# These files are then evaluated by the `info-boards-*` targets.
+# These files are then printed by the `info-boards-*` targets.
 PHONY: info-boards-collect
 info-boards-collect:
 	@if [ ! -z '$(BOARDS)' ]; then \
