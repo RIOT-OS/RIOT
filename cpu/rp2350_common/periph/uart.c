@@ -35,8 +35,10 @@ static uint32_t uartcr;
 void _irq_enable(uart_t uart)
 {
     UART0_Type *dev = uart_config[uart].dev;
-    /* We set the UART Receive Interrupt Mask (Bit 4) [See p979 UART 12.1] */
-    dev->UARTIMSC = UART_UARTIMSC_RXIM_BITS;
+    /* Enable RX FIFO-trigger interrupt (RXIM) and RX timeout interrupt
+     * (RTIM). RTIM asserts when the FIFO is non-empty but below the
+     * trigger level for ~32 baud-clocks (12.1.6 Interrupts). */
+    dev->UARTIMSC = UART_UARTIMSC_RXIM_BITS | UART_UARTIMSC_RTIM_BITS;
     /* Enable the IRQ */
     rp_irq_enable(uart_config[uart].irqn);
 }
@@ -83,6 +85,10 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
      * the initialization code here
      * based on Table 1035 page 976 */
     dev->UARTLCR_H = (uint32_t)data_bits << 5;
+
+    /* Enable RX/TX FIFOs (FEN bit in UARTLCR_H).
+     * See 12.1.3 Operation (FIFO vs. character mode) & 12.1.8 UARTLCR_H. */
+    atomic_set(&dev->UARTLCR_H, UART_UARTLCR_H_FEN_BITS);
 
     if (stop_bits == UART_STOP_BITS_2) {
         atomic_set(&dev->UARTLCR_H, UART0_UARTLCR_H_STP2_Msk);
@@ -171,7 +177,10 @@ int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg)
         /* clear any pending data and IRQ to avoid receiving a garbage char */
         uint32_t status = dev->UARTRIS;
         dev->UARTICR = status;
-        (void)dev->UARTDR;
+        /* Drain the RX FIFO */
+        while (!(dev->UARTFR & UART_UARTFR_RXFE_BITS)) {
+            (void)dev->UARTDR;
+        }
         atomic_set(&dev->UARTCR, UART_UARTCR_RXE_BITS);
     }
 
@@ -183,11 +192,15 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     assert((unsigned)uart < UART_NUMOF);
     UART0_Type *dev = uart_config[uart].dev;
 
+    /* For each byte: wait while TX FIFO is full, then write to UARTDR.
+     * After the last byte: wait for UARTFR.BUSY to clear so the caller
+     * can rely on "all bytes have left the wire" once uart_write
+     * returns. See RP2350 datasheet section 12.1.8 UARTFR. */
     for (size_t i = 0; i < len; i++) {
+        while (dev->UARTFR & UART_UARTFR_TXFF_BITS) { }
         dev->UARTDR = data[i];
-        /* Wait until the TX FIFO is empty before sending the next byte */
-        while (!(dev->UARTRIS & UART0_UARTRIS_TXRIS_Msk)) { }
     }
+    while (dev->UARTFR & UART_UARTFR_BUSY_BITS) { }
 }
 
 void uart_poweron(uart_t uart)
@@ -241,12 +254,13 @@ void isr_handler(uint8_t num)
     uint32_t status = dev->UARTMIS;
     atomic_set(&dev->UARTICR, status);
 
-    if (status & UART_UARTMIS_RXMIS_BITS) {
-        uint32_t data = dev->UARTDR;
-        if (data & (UART0_UARTDR_BE_Msk | UART0_UARTDR_PE_Msk | UART0_UARTDR_FE_Msk)) {
-            puts("[rpx0xx] uart RX error (parity, break, or framing error");
-        }
-        else {
+    /* Drain the entire RX FIFO on each fire. */
+    if (status & (UART_UARTMIS_RXMIS_BITS | UART_UARTMIS_RTMIS_BITS)) {
+        while (!(dev->UARTFR & UART_UARTFR_RXFE_BITS)) {
+            uint32_t data = dev->UARTDR;
+            if (data & (UART0_UARTDR_BE_Msk | UART0_UARTDR_PE_Msk | UART0_UARTDR_FE_Msk)) {
+                DEBUG("[rp2350] uart RX error (parity, break, or framing error)");
+            }
             ctx[num].rx_cb(ctx[num].arg, (uint8_t)data);
         }
     }
