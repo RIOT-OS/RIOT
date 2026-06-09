@@ -130,7 +130,7 @@ static int _twr_handler(int argc, char **argv)
         for (int i = 2; i < argc; i++) {
             char *arg = argv[i];
             if (arg[0] != '-') {
-                size_t addr_len = l2util_addr_from_str(arg, addr);
+                size_t addr_len = l2util_addr_from_str_sized(arg, addr, sizeof(addr));
                 if (addr_len != 2) {
                     puts("[Error]: unable to parse address.\n"
                          "Must be of format [0-9a-fA-F]{2}(:[0-9a-fA-F]{2})*\n"
