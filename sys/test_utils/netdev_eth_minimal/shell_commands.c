@@ -69,7 +69,7 @@ static int _print_txtsnd_usage(char *cmd) {
 static int cmd_txtsnd(int argc, char **argv)
 {
     ethernet_hdr_t header;
-    int res;
+    size_t addr_len;
 
     if (4 != argc) {
         return _print_txtsnd_usage(argv[0]);
@@ -82,9 +82,9 @@ static int cmd_txtsnd(int argc, char **argv)
     }
 
     /* build Ethernet header */
-    res = l2util_addr_from_str(argv[2], header.dst);
-    if (!res) {
-        puts("Could not parse address");
+    addr_len = l2util_addr_from_str_sized(argv[2], header.dst, sizeof(header.dst));
+    if (addr_len != sizeof(header.dst)) {
+        printf("\"%s\" is not a valid Ethernet address\n", argv[2]);
         return _print_txtsnd_usage(argv[0]);
     }
 
@@ -107,7 +107,7 @@ static int cmd_txtsnd(int argc, char **argv)
     io_header.iol_next = &io_data;
 
     /* send */
-    res = dev->driver->send(dev, &io_header);
+    int res = dev->driver->send(dev, &io_header);
     if (res < 0) {
         puts("txtsnd: Could not send");
         return 1;
