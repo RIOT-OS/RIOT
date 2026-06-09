@@ -1,7 +1,7 @@
-From 101d684f1759aa8aef4d49bbb1e2eebdbaa41afb Mon Sep 17 00:00:00 2001
+From 63de35a842b4d9c11ffc05f71027fa70d3292069 Mon Sep 17 00:00:00 2001
 From: Marian Buschsieweke <marian.buschsieweke@ml-pa.com>
 Date: Fri, 22 Aug 2025 10:32:04 +0200
-Subject: [PATCH] Change %p formatting to match glibc
+Subject: [PATCH 5/7] Change %p formatting to match glibc
 
 Taken from https://github.com/mpaland/printf/pull/90
 ---
@@ -10,7 +10,7 @@ Taken from https://github.com/mpaland/printf/pull/90
  2 files changed, 26 insertions(+), 17 deletions(-)
 
 diff --git a/printf.c b/printf.c
-index efdee81..50a4ddf 100644
+index 3659477..be372d8 100644
 --- a/printf.c
 +++ b/printf.c
 @@ -824,19 +824,25 @@ static int _vsnprintf(out_fct_type out, char* buffer, const size_t maxlen, const
@@ -49,7 +49,7 @@ index efdee81..50a4ddf 100644
          break;
        }
 diff --git a/test/test_suite.cpp b/test/test_suite.cpp
-index 5507c3b..740771a 100644
+index 5507c3b..a198d56 100644
 --- a/test/test_suite.cpp
 +++ b/test/test_suite.cpp
 @@ -1361,36 +1361,39 @@ TEST_CASE("pointer", "[]" ) {
@@ -101,5 +101,5 @@ index 5507c3b..740771a 100644
  
  
 -- 
-2.43.0
+2.39.5
 
