@@ -261,7 +261,9 @@ void isr_handler(uint8_t num)
             if (data & (UART0_UARTDR_BE_Msk | UART0_UARTDR_PE_Msk | UART0_UARTDR_FE_Msk)) {
                 DEBUG("[rp2350] uart RX error (parity, break, or framing error)");
             }
-            ctx[num].rx_cb(ctx[num].arg, (uint8_t)data);
+            else {
+                ctx[num].rx_cb(ctx[num].arg, (uint8_t)data);
+            }
         }
     }
 }
