@@ -6,7 +6,7 @@
 
 The NUCLEO-U385RG-Q is a board from ST's Nucleo-64 family supporting the
 STM32U385RG ultra-low-power microcontroller based on an ARM Cortex-M33 core
-with TrustZone, 640KiB of RAM, and 1MiB of Flash.
+with TrustZone, 256KiB of RAM, and 1MiB of Flash.
 
 You can find general information about the Nucleo-64 boards on the
 @ref boards_common_nucleo64 page.
@@ -22,7 +22,7 @@ MCU's peripherals (see [Supported Features](#supported-features) below).
 |:------------------|:---------------------|
 | Family            | ARM Cortex-M33       |
 | Vendor            | STMicroelectronics   |
-| RAM               | 640KiB               |
+| RAM               | 256KiB               |
 | Flash             | 1MiB                 |
 | Frequency         | up to 96MHz          |
 | FPU               | yes                  |
