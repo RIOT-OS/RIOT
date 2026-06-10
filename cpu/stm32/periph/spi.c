@@ -481,7 +481,53 @@ static void _transfer_no_dma(spi_t bus, const void *out, void *in, size_t len)
     const uint8_t *outbuf = out;
     uint8_t *inbuf = in;
 
-#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
+#if defined(CPU_FAM_STM32U3)
+
+    dev(bus)->IFCR = 0xFFFFFFFF;
+
+    /* drain any stale RX bytes */
+    while (dev(bus)->SR & SPI_SR_RXP) {
+        (void)*(volatile uint8_t*)&(dev(bus)->RXDR);
+    }
+
+    /* recast to uint8_t to force 8-bit (single frame) access */
+    volatile uint8_t *TXDR = (volatile uint8_t*)&(dev(bus)->TXDR);
+    volatile uint8_t *RXDR = (volatile uint8_t*)&(dev(bus)->RXDR);
+
+    /* Continuous mode (TSIZE = 0): a fixed-count transfer auto-suspends when the
+     * frame counter reaches len, truncating the last received frame. End the
+     * transfer with CSUSP, which stops on a frame boundary. */
+    dev(bus)->CR2 = 0;
+    dev(bus)->CR1 |= SPI_CR1_SPE;
+    dev(bus)->CR1 |= SPI_CR1_CSTART;
+
+    /* RXP drains most frames; the last few (below the FIFO threshold) are
+     * exposed only through the RX FIFO packing level (RXPLVL). */
+    size_t tx = 0, rx = 0;
+    while ((tx < len) || (rx < len)) {
+        if ((tx < len) && (dev(bus)->SR & SPI_SR_TXP)) {
+            *TXDR = outbuf ? outbuf[tx] : 0;
+            tx++;
+        }
+        if (rx < len) {
+            uint32_t sr = dev(bus)->SR;
+            if ((sr & SPI_SR_RXP) ||
+                (((len - rx) < 4) && (sr & SPI_SR_RXPLVL_Msk))) {
+                uint8_t in = *RXDR;
+                if (inbuf) {
+                    inbuf[rx] = in;
+                }
+                rx++;
+            }
+        }
+    }
+
+    dev(bus)->CR1 |= SPI_CR1_CSUSP;
+    while (!(dev(bus)->SR & SPI_SR_SUSP)) {}
+    dev(bus)->IFCR = SPI_IFCR_SUSPC;
+    dev(bus)->CR1 &= ~SPI_CR1_SPE;
+
+#elif defined(CPU_FAM_STM32H7)
 
     dev(bus)->IFCR = 0xFFFFFFFF;
 
