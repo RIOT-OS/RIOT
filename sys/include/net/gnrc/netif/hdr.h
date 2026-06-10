@@ -24,6 +24,7 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "compiler_hints.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/pktbuf.h"
@@ -204,8 +205,9 @@ static inline uint8_t *gnrc_netif_hdr_get_src_addr(const gnrc_netif_hdr_t *hdr)
  *
  * @param[in] hdr           header to write to
  * @param[in] addr          new source address
- * @param[in] addr_len      *addr* length
+ * @param[in] addr_len      length of @p addr in bytes
  */
+ACCESS(read_only, 2, 3)
 static inline void gnrc_netif_hdr_set_src_addr(gnrc_netif_hdr_t *hdr,
                                                const uint8_t *addr,
                                                uint8_t addr_len)
@@ -235,8 +237,9 @@ static inline uint8_t *gnrc_netif_hdr_get_dst_addr(const gnrc_netif_hdr_t *hdr)
  *
  * @param[in] hdr           header to write to
  * @param[in] addr          new destination address
- * @param[in] addr_len      *addr* length
+ * @param[in] addr_len      length of @p addr in bytes
  */
+ACCESS(read_only, 2, 3)
 static inline void gnrc_netif_hdr_set_dst_addr(gnrc_netif_hdr_t *hdr,
                                                const uint8_t *addr,
                                                uint8_t addr_len)
@@ -365,6 +368,8 @@ static inline int gnrc_netif_hdr_ipv6_iid_from_dst(const gnrc_netif_t *netif,
  * @return  The generic network layer header on success.
  * @return  NULL on error.
  */
+ACCESS(read_only, 1, 2)
+ACCESS(read_only, 3, 4)
 gnrc_pktsnip_t *gnrc_netif_hdr_build(const uint8_t *src, uint8_t src_len,
                                      const uint8_t *dst, uint8_t dst_len);
 

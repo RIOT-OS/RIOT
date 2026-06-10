@@ -33,41 +33,49 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "sched.h"
-#include "msg.h"
-#ifdef MODULE_GNRC_NETIF_BUS
-#include "msg_bus.h"
-#endif
+#include "compiler_hints.h"
 #include "event.h"
-#include "net/ipv6/addr.h"
+#include "msg.h"
 #include "net/gnrc/netapi.h"
-#include "net/gnrc/pkt.h"
 #include "net/gnrc/netif/conf.h"
-#if IS_USED(MODULE_GNRC_NETIF_LORAWAN)
-#include "net/gnrc/netif/lorawan.h"
-#endif
-#if IS_USED(MODULE_GNRC_NETIF_6LO)
-#include "net/gnrc/netif/6lo.h"
-#endif
-#if defined(MODULE_GNRC_NETIF_DEDUP) && (GNRC_NETIF_L2ADDR_MAXLEN > 0)
-#include "net/gnrc/netif/dedup.h"
-#endif
 #include "net/gnrc/netif/flags.h"
-#if IS_USED(MODULE_GNRC_NETIF_IPV6)
-#include "net/gnrc/netif/ipv6.h"
-#endif
-#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
-#include "net/gnrc/netif/pktq/type.h"
-#endif
+#include "net/gnrc/pkt.h"
+#include "net/ipv6/addr.h"
 #include "net/l2util.h"
 #include "net/ndp.h"
 #include "net/netdev.h"
-#include "net/netopt.h"
-#ifdef MODULE_NETSTATS_L2
-#include "net/netstats.h"
-#endif
-#include "rmutex.h"
 #include "net/netif.h"
+#include "net/netopt.h"
+#include "rmutex.h"
+#include "sched.h"
+
+#ifdef MODULE_GNRC_NETIF_BUS
+#  include "msg_bus.h"
+#endif
+
+#if IS_USED(MODULE_GNRC_NETIF_LORAWAN)
+#  include "net/gnrc/netif/lorawan.h"
+#endif
+
+#if IS_USED(MODULE_GNRC_NETIF_6LO)
+#  include "net/gnrc/netif/6lo.h"
+#endif
+
+#if defined(MODULE_GNRC_NETIF_DEDUP) && (GNRC_NETIF_L2ADDR_MAXLEN > 0)
+#  include "net/gnrc/netif/dedup.h"
+#endif
+
+#if IS_USED(MODULE_GNRC_NETIF_IPV6)
+#  include "net/gnrc/netif/ipv6.h"
+#endif
+
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+#  include "net/gnrc/netif/pktq/type.h"
+#endif
+
+#ifdef MODULE_NETSTATS_L2
+#  include "net/netstats.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -409,6 +417,7 @@ void gnrc_netif_init_devs(void);
  * @return  0 on success
  * @return  negative number on error
  */
+ACCESS(write_only, 2, 3)
 int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
                       char priority, const char *name, netdev_t *dev,
                       const gnrc_netif_ops_t *ops);

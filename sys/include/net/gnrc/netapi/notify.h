@@ -35,6 +35,7 @@
 extern "C" {
 #endif
 
+#include "compiler_hints.h"
 #include "net/gnrc/netif/conf.h"
 #include "sema_inv.h"
 
@@ -95,6 +96,7 @@ static inline void gnrc_netapi_notify_ack(sema_inv_t *ack)
  * @retval                  -EINVAL if the data in @p notify is invalid or doesn't match the expected
  *                          data length.
  */
+ACCESS(write_only, 3, 2)
 int gnrc_netapi_notify_copy_event_data(gnrc_netapi_notify_t *notify, uint8_t data_len, void *data);
 
 #ifdef __cplusplus
