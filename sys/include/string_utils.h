@@ -1,9 +1,7 @@
 /*
- * Copyright (C) 2022 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2022 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-FileCopyrightText: 2022-2026 ML!PA Consulting GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -20,11 +18,12 @@
  * @file
  * @brief       Utility functions that are missing in `string.h`
  *
- * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@posteo.net>
+ * @author      Fabian Hüßler <fabian.huessler@ml-pa.com>
+ * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
 #include <assert.h>
-#include <errno.h>
 #include <stdint.h>
 /* if explicit_bzero() is provided by standard C lib, it may be defined in
  * either `string.h` or `strings.h`, so just include both here */
@@ -32,6 +31,7 @@
 #include <strings.h>
 #include <sys/types.h>
 
+#include "compiler_hints.h"
 #include "flash_utils.h"
 #include "modules.h"
 
@@ -56,6 +56,7 @@ typedef struct {
  * @param[in]   buffer  destination buffer
  * @param[in]   len     size of the destination buffer
  */
+ACCESS(write_only, 2, 3)
 static inline void string_writer_init(string_writer_t *sw, void *buffer, size_t len)
 {
     assert(buffer && len);
@@ -90,12 +91,12 @@ static inline const char *string_writer_str(const string_writer_t *sw)
 /**
  * @brief   internal helper macro
  */
-#if IS_ACTIVE(HAS_FLASH_UTILS_ARCH)
-#define __swprintf flash_swprintf
-#else
-#define __swprintf swprintf
-__attribute__ ((format (printf, 2, 3)))
-#endif
+#  if IS_ACTIVE(HAS_FLASH_UTILS_ARCH)
+#    define __swprintf flash_swprintf
+#  else
+#    define __swprintf swprintf
+__attribute__((format(printf, 2, 3)))
+#  endif
 int __swprintf(string_writer_t *sw, FLASH_ATTR const char *restrict format, ...);
 #else
 /**
@@ -114,12 +115,12 @@ int swprintf(string_writer_t *sw, FLASH_ATTR const char *restrict format, ...);
 #endif /* DOXYGEN */
 
 #if IS_ACTIVE(HAS_FLASH_UTILS_ARCH)
-#define swprintf(sw, fmt, ...) flash_swprintf(sw, TO_FLASH(fmt), ## __VA_ARGS__)
+#  define swprintf(sw, fmt, ...) flash_swprintf(sw, TO_FLASH(fmt), ##__VA_ARGS__)
 #endif
 
 /* explicit_bzero is provided if:
  * - glibc is used as C lib (only with board natvie)
- * - newlib is used and __BSD_VISIBILE is set
+ * - newlib is used and __BSD_VISIBLE is set
  *      - except for ESP8266, which is using an old version of newlib without it
  * - picolibc is used and __BSD_VISIBLE is set
  *
@@ -151,23 +152,24 @@ static inline void explicit_bzero(void *dest, size_t n_bytes)
 #endif
 
 /**
- * @brief Copy the string, or as much of it as fits, into the dest buffer.
+ * @brief   Copy the string, or as much of it as fits, into the dest buffer.
  *
  * Preferred to `strncpy` since it always returns a valid string, and doesn't
  * unnecessarily force the tail of the destination buffer to be zeroed.
  * If the zeroing is desired, it's likely cleaner to use `strscpy` with an
  * overflow test, then just memset the tail of the dest buffer.
  *
- * @param[out] dest     Where to copy the string to
+ * @param[out]  dest    Where to copy the string to
  * @param[in]   src     Where to copy the string from
- * @param[in] count     Size of destination buffer
+ * @param[in]   count   Size of destination buffer
  *
- * @pre       The destination buffer is at least one byte large, as
- *            otherwise the terminating zero byte won't fit
+ * @pre         The destination buffer is at least one byte large, as
+ *              otherwise the terminating zero byte won't fit
  *
- * @return the number of characters copied (not including the trailing zero)
+ * @return  the number of characters copied (not including the trailing zero)
  * @retval  -E2BIG      the destination buffer wasn't big enough
  */
+ACCESS(write_only, 1, 3)
 ssize_t strscpy(char *dest, const char *src, size_t count);
 
 /**
@@ -177,17 +179,19 @@ ssize_t strscpy(char *dest, const char *src, size_t count);
  * @param[in]   c       The byte to check of
  * @param[in]   len     Size of the buffer
  *
- * @return NULL if the entire buffer is filled with @p c
+ * @retval      NULL    the entire buffer is filled with @p c
  * @return pointer to the first non-matching byte
  */
+ACCESS(read_only, 1, 3)
 const void *memchk(const void *data, uint8_t c, size_t len);
 
 /**
  * @brief   Reverse the order of bytes in a buffer
  *
- * @param[in, out]  buf     The buffer to reverse
+ * @param[in,out]   buf     The buffer to reverse
  * @param[in]       len     Size of the buffer
  */
+ACCESS(read_write, 1, 2)
 void reverse_buf(void *buf, size_t len);
 
 /**
@@ -200,7 +204,9 @@ void reverse_buf(void *buf, size_t len);
  * @param[in]       src     Source buffer
  * @param[in]       size    Number of bytes to XOR
  */
-void memxor(void *dst, void* src, size_t size);
+ACCESS(read_write, 1, 3)
+ACCESS(read_only, 2, 3)
+void memxor(void *dst, void *src, size_t size);
 
 /**
  * @brief   Copies @p src to @p dst in reverse order.
@@ -211,6 +217,8 @@ void memxor(void *dst, void* src, size_t size);
  * @param[in]       src     Source buffer
  * @param[in]       size    Number of bytes to copy
  */
+ACCESS(write_only, 1, 3)
+ACCESS(read_only, 2, 3)
 void memcpy_reversed(void *restrict dst, const void *restrict src, size_t size);
 
 #ifdef __cplusplus
