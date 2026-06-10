@@ -100,6 +100,7 @@ export default defineConfig({
             "general/vision",
             "general/governance",
             "general/security",
+            "general/ai_policy",
           ],
         },
         {
@@ -219,12 +220,7 @@ export default defineConfig({
   vite: {
     server: {
       fs: {
-        allow: [
-          "./",
-          "../doxygen",
-          "../../release-notes.txt",
-          "../../boards",
-        ],
+        allow: ["./", "../doxygen", "../../release-notes.txt", "../../boards"],
       },
     },
   },

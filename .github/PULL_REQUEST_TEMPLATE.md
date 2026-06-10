@@ -45,11 +45,11 @@ If AI/LLM was used please declare it here, and provide the following information
 
 Example:
 AI-Tools / LLMs that were used are:
-- Claude Code for code generation, with user review
+- Claude Code with Claude Opus 4.8 for code generation, with user review
 - GitHub Copilot for inline suggestions during code writing
 - ChatGPT for documentation generation, with user review
 
-Note that, as long as you declare the use of AI/LLM tools transparently with full authorship and responsibility over your contribution, there is no issue with using them for your contribution.
+For further details, please refer to our AI policy: https://doc.riot-os.org/general/ai_policy
 -->
 
 AI-Tools / LLMs that were used are:

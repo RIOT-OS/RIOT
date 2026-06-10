@@ -38,5 +38,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: prNumber,
-              body: `Hey @${user}, thank you for your first contribution! We really appreciate it! If you haven't already, please take a look at [our contributing guidelines](https://github.com/RIOT-OS/RIOT/blob/master/CONTRIBUTING.md) before the review process starts. Also, due to how the GitHub review system works, please avoid force-pushing or squashing your commits unless asked to by a maintainer (or unless your commit is still in "draft commit" stage). Your pull request will be reviewed as soon as possible.`
+              body: `Hey @${user}, thank you for your first contribution! We really appreciate it! If you haven't already, please take a look at [our contributing guidelines](https://github.com/RIOT-OS/RIOT/blob/master/CONTRIBUTING.md) before the review process starts. Also, due to how the GitHub review system works, please avoid force-pushing or squashing your commits unless asked to by a maintainer (or unless your commit is still in "draft commit" stage). Lastly, make sure to comply with [our AI Policy](https://doc.riot-os.org/general/ai_policy/) when using AI. Your pull request will be reviewed as soon as possible.`
             });
