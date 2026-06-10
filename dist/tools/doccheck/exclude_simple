@@ -8413,7 +8413,7 @@ boards/esp32s2-wemos-mini/doc.md:38: warning: unable to resolve reference to 'es
 drivers/include/ph_oem.h:177: warning: unable to resolve reference to 'GPIO_IN_PU' for \ref command
 drivers/include/ph_oem.h:178: warning: unable to resolve reference to 'GPIO_IN_PD' for \ref command
 drivers/include/ph_oem.h:179: warning: unable to resolve reference to 'GPIO_IN_PD' for \ref command
-sys/include/net/gnrc/netif.h:210: warning: Potential recursion while resolving \ref command!
+sys/include/net/gnrc/netif.h:218: warning: Potential recursion while resolving \ref command!
 sys/include/net/ieee802154_security.h:69: warning: unable to resolve reference to 'ieee802154_sec_context_t::ieee802154_sec_dev_t' for \ref command
 sys/include/net/ieee802154_security.h:83: warning: unable to resolve reference to 'ieee802154_sec_context_t::ieee802154_sec_dev_t' for \ref command
 sys/include/net/ieee802154_security.h:59: warning: unable to resolve reference to 'ieee802154_sec_context_t::ieee802154_sec_dev_t' for \ref command
