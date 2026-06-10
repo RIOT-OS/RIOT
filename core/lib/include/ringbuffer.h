@@ -21,6 +21,8 @@
  * @}
  */
 
+#include "compiler_hints.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -51,6 +53,7 @@ typedef struct {
  * @param[in]    buffer    Buffer to use by rb.
  * @param[in]    bufsize   `sizeof (buffer)`
  */
+ACCESS(write_only, 2, 3)
 static inline void ringbuffer_init(ringbuffer_t *__restrict rb, char *buffer,
                                    unsigned bufsize)
 {
@@ -81,6 +84,7 @@ int ringbuffer_add_one(ringbuffer_t *__restrict rb, char c);
  * @param[in]       n     Maximum number of elements to add.
  * @returns         Number of elements actually added. 0 if rb is full.
  */
+ACCESS(read_only, 2, 3)
 unsigned ringbuffer_add(ringbuffer_t *__restrict rb, const char *buf,
                         unsigned n);
 
@@ -98,6 +102,7 @@ int ringbuffer_get_one(ringbuffer_t *__restrict rb);
  * @param[in]       n     Read at most n elements.
  * @returns         Number of elements actually read.
  */
+ACCESS(write_only, 2, 3)
 unsigned ringbuffer_get(ringbuffer_t *__restrict rb, char *buf, unsigned n);
 
 /**
@@ -153,6 +158,7 @@ int ringbuffer_peek_one(const ringbuffer_t *__restrict rb);
  * @param[in]       n     Read at most n elements.
  * @returns         Same as ringbuffer_get()
  */
+ACCESS(write_only, 2, 3)
 unsigned ringbuffer_peek(const ringbuffer_t *__restrict rb, char *buf,
                          unsigned n);
 
