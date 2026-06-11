@@ -14,6 +14,9 @@ ifneq (,$(filter nrf_shared_serial_irq,$(USEMODULE)))
 DIRS += shared_irq
 endif
 # build one of the radio drivers, if enabled
+ifneq (,$(filter nrf802154,$(USEMODULE)))
+  DIRS += radio/nrf802154
+endif
 ifneq (,$(filter nrfble,$(USEMODULE)))
   DIRS += radio/nrfble
 endif

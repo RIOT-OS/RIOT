@@ -14,4 +14,8 @@ FEATURES_PROVIDED += periph_timer_poll
 FEATURES_PROVIDED += periph_timer_query_freqs
 FEATURES_PROVIDED += periph_uart_modecfg
 
+# Radio related features
+FEATURES_PROVIDED += radio_nrf802154
+FEATURES_PROVIDED += netif
+
 include $(RIOTCPU)/cortexm_common/Makefile.features
