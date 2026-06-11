@@ -21,7 +21,7 @@
 #include "macros/units.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
-#include "timex.h"
+#include "time_units.h"
 
 #include "periph/timer.h"
 
