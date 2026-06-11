@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2026 Inria
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config CPU_FAM_NRF54L
+    bool
+
+## CPU Models
+config CPU_MODEL_NRF54L15XXAA
+    bool
+    select CPU_CORE_CORTEX_M33
+    select CPU_FAM_NRF54L
+
+## CPU common symbols
+config CPU_FAM
+    default "nrf54l" if CPU_FAM_NRF54L
+
+config CPU_MODEL
+    default "nrf54l15xxaa" if CPU_MODEL_NRF54L15XXAA
+
+config CPU
+    default "nrf54l" if CPU_FAM_NRF54L
+
+source "$(RIOTCPU)/nrf5x_common/Kconfig"

@@ -51,7 +51,66 @@
 #  define UART_TYPE         NRF_UART_Type
 #endif
 
-#define RAM_MASK        (0x20000000)
+/* The baudrate enumeration uses the UARTE_ prefix on families that have an
+ * EasyDMA UARTE (nRF52 and newer) and the UART_ prefix on the nRF51, which has
+ * no UARTE peripheral. */
+#ifdef UARTE_PRESENT
+#  define BAUD(x)           UARTE_BAUDRATE_BAUDRATE_Baud ## x
+#else
+#  define BAUD(x)           UART_BAUDRATE_BAUDRATE_Baud ## x
+#endif
+
+/* The nRF54L moved the EasyDMA tasks of the (UART)E peripheral into dedicated
+ * DMA register groups. The RX/TX start and stop tasks also exist on the older
+ * UART/UARTE peripherals, so these accessors are defined for all families. */
+#ifdef CPU_FAM_NRF54L
+#  define TASKS_RXSTART(d)  (d)->TASKS_DMA.RX.START
+#  define TASKS_RXSTOP(d)   (d)->TASKS_DMA.RX.STOP
+#  define TASKS_TXSTART(d)  (d)->TASKS_DMA.TX.START
+#  define TASKS_TXSTOP(d)   (d)->TASKS_DMA.TX.STOP
+#else
+#  define TASKS_RXSTART(d)  (d)->TASKS_STARTRX
+#  define TASKS_RXSTOP(d)   (d)->TASKS_STOPRX
+#  define TASKS_TXSTART(d)  (d)->TASKS_STARTTX
+#  define TASKS_TXSTOP(d)   (d)->TASKS_STOPTX
+#endif
+
+/* EasyDMA buffer registers, events, interrupt and short masks. On the nRF54L
+ * these moved into DMA register groups, the older UARTE families keep the flat
+ * RXD/TXD layout. */
+#ifdef UARTE_PRESENT
+#  ifdef CPU_FAM_NRF54L
+#    define RXD_PTR(d)              (d)->DMA.RX.PTR
+#    define RXD_MAXCNT(d)           (d)->DMA.RX.MAXCNT
+#    define RXD_AMOUNT(d)           (d)->DMA.RX.AMOUNT
+#    define TXD_PTR(d)              (d)->DMA.TX.PTR
+#    define TXD_MAXCNT(d)           (d)->DMA.TX.MAXCNT
+#    define EVENTS_RXEND(d)         (d)->EVENTS_DMA.RX.END
+#    define EVENTS_TXEND(d)         (d)->EVENTS_DMA.TX.END
+#    define INTEN_RXEND_Msk         UARTE_INTENSET_DMARXEND_Msk
+#    define INTEN_TXEND_Msk         UARTE_INTENSET_DMATXEND_Msk
+#    define SHORT_RXEND_RXSTART_Msk UARTE_SHORTS_DMA_RX_END_DMA_RX_START_Msk
+#  else
+#    define RXD_PTR(d)              (d)->RXD.PTR
+#    define RXD_MAXCNT(d)           (d)->RXD.MAXCNT
+#    define RXD_AMOUNT(d)           (d)->RXD.AMOUNT
+#    define TXD_PTR(d)              (d)->TXD.PTR
+#    define TXD_MAXCNT(d)           (d)->TXD.MAXCNT
+#    define EVENTS_RXEND(d)         (d)->EVENTS_ENDRX
+#    define EVENTS_TXEND(d)         (d)->EVENTS_ENDTX
+#    define INTEN_RXEND_Msk         UARTE_INTENSET_ENDRX_Msk
+#    define INTEN_TXEND_Msk         UARTE_INTENSET_ENDTX_Msk
+#    define SHORT_RXEND_RXSTART_Msk UARTE_SHORTS_ENDRX_STARTRX_Msk
+#  endif
+#endif
+
+/* The nRF54L UARTE has no TXSTARTED event, which the non-blocking TX path
+ * relies on, so non-blocking mode is only supported on the older families. */
+#if defined(MODULE_PERIPH_UART_NONBLOCKING) && !defined(CPU_FAM_NRF54L)
+#  define UART_NONBLOCKING   (1)
+#else
+#  define UART_NONBLOCKING   (0)
+#endif
 
 /**
  * @brief Chunk size used for transferring data from ROM [in bytes]
@@ -68,9 +127,9 @@ static uart_isr_ctx_t isr_ctx[UART_NUMOF];
 static uint8_t rx_buf[UART_NUMOF];
 #endif
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if UART_NONBLOCKING
 
-#include "tsrb.h"
+#  include "tsrb.h"
 /**
  * @brief   Allocate for tx ring buffers
  */
@@ -134,8 +193,15 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     isr_ctx[uart].rx_cb = rx_cb;
     isr_ctx[uart].arg = arg;
 
+#ifdef UARTE_CONFIG_FRAMESIZE_Msk
+    /* the nRF54L UARTE must be disabled to be reconfigured and has a mandatory
+     * FRAMESIZE field that has to be kept at 8 bit (no parity, 1 stop bit) */
+    dev->ENABLE = ENABLE_OFF;
+    dev->CONFIG = (UARTE_CONFIG_FRAMESIZE_8bit << UARTE_CONFIG_FRAMESIZE_Pos);
+#else
     /* reset configuration registers */
     dev->CONFIG = 0;
+#endif
 
     /* configure RX pin */
     if (rx_cb) {
@@ -168,52 +234,52 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* select baudrate */
     switch (baudrate) {
     case 1200:
-        dev->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud1200;
+        dev->BAUDRATE = BAUD(1200);
         break;
     case 2400:
-        dev->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud2400;
+        dev->BAUDRATE = BAUD(2400);
         break;
     case 4800:
-        dev->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud4800;
+        dev->BAUDRATE = BAUD(4800);
         break;
     case 9600:
-        dev->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud9600;
+        dev->BAUDRATE = BAUD(9600);
         break;
     case 14400:
-        dev->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud14400;
+        dev->BAUDRATE = BAUD(14400);
         break;
     case 19200:
-        dev->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud19200;
+        dev->BAUDRATE = BAUD(19200);
         break;
     case 28800:
-        dev->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud28800;
+        dev->BAUDRATE = BAUD(28800);
         break;
     case 38400:
-        dev->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud38400;
+        dev->BAUDRATE = BAUD(38400);
         break;
     case 57600:
-        dev->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud57600;
+        dev->BAUDRATE = BAUD(57600);
         break;
     case 76800:
-        dev->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud76800;
+        dev->BAUDRATE = BAUD(76800);
         break;
     case 115200:
-        dev->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud115200;
+        dev->BAUDRATE = BAUD(115200);
         break;
     case 230400:
-        dev->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud230400;
+        dev->BAUDRATE = BAUD(230400);
         break;
     case 250000:
-        dev->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud250000;
+        dev->BAUDRATE = BAUD(250000);
         break;
     case 460800:
-        dev->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud460800;
+        dev->BAUDRATE = BAUD(460800);
         break;
     case 921600:
-        dev->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud921600;
+        dev->BAUDRATE = BAUD(921600);
         break;
     case 1000000:
-        dev->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud1M;
+        dev->BAUDRATE = BAUD(1M);
         break;
     default:
         return UART_NOBAUD;
@@ -222,25 +288,26 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* enable the UART device */
     set_power(uart, true);
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if UART_NONBLOCKING
     /* set up the TX buffer */
     tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
 #endif
 
     if (rx_cb) {
 #ifdef UARTE_PRESENT
-        dev->RXD.MAXCNT = 1;
-        dev->RXD.PTR = (uint32_t)&rx_buf[uart];
-        dev->INTENSET = UARTE_INTENSET_ENDRX_Msk;
-        dev->SHORTS |= UARTE_SHORTS_ENDRX_STARTRX_Msk;
-        dev->TASKS_STARTRX = 1;
+        RXD_MAXCNT(dev) = 1;
+        RXD_PTR(dev) = (uint32_t)&rx_buf[uart];
+        EVENTS_RXEND(dev) = 0;
+        dev->INTENSET = INTEN_RXEND_Msk;
+        dev->SHORTS |= SHORT_RXEND_RXSTART_Msk;
+        TASKS_RXSTART(dev) = 1;
 #else
         dev->INTENSET = UART_INTENSET_RXDRDY_Msk;
-        dev->TASKS_STARTRX = 1;
+        TASKS_RXSTART(dev) = 1;
 #endif
     }
 
-    if (rx_cb || IS_USED(MODULE_PERIPH_UART_NONBLOCKING)) {
+    if (rx_cb || UART_NONBLOCKING) {
 #if  defined(CPU_NRF53) || defined(CPU_NRF9160)
         shared_irq_register_uart(dev, uart_isr_handler, (void *)(uintptr_t)uart);
 #else
@@ -256,7 +323,7 @@ void uart_poweron(uart_t uart)
 
     set_power(uart, true);
     if (isr_ctx[uart].rx_cb) {
-        uart_config[uart].dev->TASKS_STARTRX = 1;
+        TASKS_RXSTART(uart_config[uart].dev) = 1;
     }
 }
 
@@ -264,7 +331,7 @@ void uart_poweroff(uart_t uart)
 {
     assume((unsigned)uart < UART_NUMOF);
 
-    uart_config[uart].dev->TASKS_STOPRX = 1;
+    TASKS_RXSTOP(uart_config[uart].dev) = 1;
     set_power(uart, false);
 }
 
@@ -311,8 +378,13 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
         return UART_NOMODE;
     }
 
-    /* Do not modify hardware flow control */
-    uint32_t conf = uart_config[uart].dev->CONFIG & CONFIG_HWFC_Msk;
+    /* Do not modify hardware flow control (nor the mandatory frame size on
+     * families that expose it, e.g. the nRF54L) */
+    uint32_t keep = CONFIG_HWFC_Msk;
+#ifdef UARTE_CONFIG_FRAMESIZE_Msk
+    keep |= UARTE_CONFIG_FRAMESIZE_Msk;
+#endif
+    uint32_t conf = uart_config[uart].dev->CONFIG & keep;
 
 #ifdef CONFIG_STOP_Msk
     if (stop_bits == UART_STOP_BITS_2) {
@@ -332,19 +404,21 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 #ifdef UARTE_PRESENT
 static void _write_buf(uart_t uart, const uint8_t *data, size_t len)
 {
-    uart_config[uart].dev->EVENTS_ENDTX = 0;
-    if (IS_USED(MODULE_PERIPH_UART_NONBLOCKING)) {
-        uart_config[uart].dev->INTENSET = UARTE_INTENSET_ENDTX_Msk;
+    UART_TYPE *dev = uart_config[uart].dev;
+
+    EVENTS_TXEND(dev) = 0;
+    if (UART_NONBLOCKING) {
+        dev->INTENSET = INTEN_TXEND_Msk;
     }
     /* set data to transfer to DMA TX pointer */
-    uart_config[uart].dev->TXD.PTR = (uint32_t)data;
-    uart_config[uart].dev->TXD.MAXCNT = len;
+    TXD_PTR(dev) = (uint32_t)data;
+    TXD_MAXCNT(dev) = len;
     /* start transmission */
-    uart_config[uart].dev->TASKS_STARTTX = 1;
+    TASKS_TXSTART(dev) = 1;
     /* wait for the end of transmission */
-    if (!IS_USED(MODULE_PERIPH_UART_NONBLOCKING)) {
-        while (uart_config[uart].dev->EVENTS_ENDTX == 0) {}
-        uart_config[uart].dev->TASKS_STOPTX = 1;
+    if (!UART_NONBLOCKING) {
+        while (EVENTS_TXEND(dev) == 0) {}
+        TASKS_TXSTOP(dev) = 1;
     }
 }
 
@@ -355,7 +429,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         /* Device is powered down. Writing anyway would deadlock */
         return;
     }
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if UART_NONBLOCKING
     for (size_t i = 0; i < len; i++) {
         /* in IRQ or interrupts disabled */
         if (irq_is_in() || __get_PRIMASK()) {
@@ -413,17 +487,17 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
 static void irq_handler(uart_t uart)
 {
-    if (uart_config[uart].dev->EVENTS_ENDRX) {
-        uart_config[uart].dev->EVENTS_ENDRX = 0;
+    if (EVENTS_RXEND(uart_config[uart].dev)) {
+        EVENTS_RXEND(uart_config[uart].dev) = 0;
 
         /* make sure we actually received new data */
-        if (uart_config[uart].dev->RXD.AMOUNT != 0) {
+        if (RXD_AMOUNT(uart_config[uart].dev) != 0) {
             /* Process received byte */
             isr_ctx[uart].rx_cb(isr_ctx[uart].arg, rx_buf[uart]);
         }
     }
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if UART_NONBLOCKING
     if (uart_config[uart].dev->EVENTS_ENDTX) {
         /* reset flags and idsable ISR on EVENTS_ENDTX */
         uart_config[uart].dev->EVENTS_ENDTX = 0;

@@ -1,0 +1,17 @@
+CPU_CORE = cortex-m33
+CPU_FAM  = nrf54l
+
+# Put defined MCU peripherals here (in alphabetical order)
+# Note: nrf5x_common/Makefile.features is not included on purpose, as most of
+# the features listed there (flashpage, rtt, ...) are not yet supported on the
+# nRF54L family
+FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_gpio periph_gpio_irq
+FEATURES_PROVIDED += periph_rtt_overflow
+FEATURES_PROVIDED += periph_spi_gpio_mode
+FEATURES_PROVIDED += periph_timer_periodic
+FEATURES_PROVIDED += periph_timer_poll
+FEATURES_PROVIDED += periph_timer_query_freqs
+FEATURES_PROVIDED += periph_uart_modecfg
+
+include $(RIOTCPU)/cortexm_common/Makefile.features
