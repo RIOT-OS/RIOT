@@ -10,7 +10,7 @@ a RISC-V coprocessor (FLPR), 1.5 MB of RRAM non-volatile memory, 256 KB of
 SRAM and a 2.4 GHz multiprotocol radio (Bluetooth LE, 802.15.4, ...).
 
 Currently, only the Cortex-M33 application core is supported by RIOT. The
-radio can be used in IEEE 802.15.4 mode.
+radio can be used with IEEE 802.15.4 and BLE modes.
 
 The board features four LEDs (active high), four user buttons/switches and a
 reset button.
