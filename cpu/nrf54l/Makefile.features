@@ -18,6 +18,10 @@ FEATURES_PROVIDED += periph_uart_modecfg
 
 # Radio related features
 FEATURES_PROVIDED += radio_nrf802154
+FEATURES_PROVIDED += radio_nrfble
 FEATURES_PROVIDED += netif
+
+FEATURES_CONFLICT += radio_nrf802154:radio_nrfble
+FEATURES_CONFLICT_MSG += "Multiplexing the nRF radio between different radio modes is not supported."
 
 include $(RIOTCPU)/cortexm_common/Makefile.features
