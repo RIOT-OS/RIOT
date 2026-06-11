@@ -16,4 +16,8 @@ FEATURES_PROVIDED += periph_uart_modecfg
 # periph_uart_nonblocking is not provided: the nRF54L UARTE has no TXSTARTED
 # event, which the non-blocking implementation in nrf5x_common relies on
 
+# Radio related features
+FEATURES_PROVIDED += radio_nrf802154
+FEATURES_PROVIDED += netif
+
 include $(RIOTCPU)/cortexm_common/Makefile.features

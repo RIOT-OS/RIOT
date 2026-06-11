@@ -152,7 +152,13 @@ static const pwm_conf_t pwm_config[] = {
  * @{
  */
 #define RTT_MAX_VALUE       (0xffffffff)         /**< 32bit of the 52bit counter */
-#define RTT_FREQUENCY       (1000000U)           /**< in Hz, fixed by hardware */
+#define RTT_CLOCK_FREQUENCY (1000000U)           /**< in Hz, SYSCOUNTER frequency */
+#define RTT_MAX_FREQUENCY   (1000000U)           /**< in Hz, no prescaler available */
+#define RTT_MIN_FREQUENCY   (1000000U)           /**< in Hz, no prescaler available */
+
+#ifndef RTT_FREQUENCY
+#  define RTT_FREQUENCY     (1000000U)           /**< in Hz, fixed by hardware */
+#endif
 /** @} */
 
 #ifdef __cplusplus
