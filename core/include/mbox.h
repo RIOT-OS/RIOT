@@ -18,8 +18,9 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#include "list.h"
 #include "cib.h"
+#include "compiler_hints.h"
+#include "list.h"
 #include "msg.h"
 
 #ifdef __cplusplus
@@ -55,6 +56,7 @@ enum {
  * @param[in]   queue       array of msg_t used as queue
  * @param[in]   queue_size  number of msg_t objects in queue
  */
+ACCESS(write_only, 2, 3)
 static inline void mbox_init(mbox_t *mbox, msg_t *queue,
                              unsigned int queue_size)
 {
