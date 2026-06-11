@@ -22,4 +22,4 @@ peripherals available:
 | I2C           | supported (TWIM2x, TWIM30 instances)            |
 | PWM           | supported (PWM2x instances)                     |
 | RTT (GRTC)    | supported (1 MHz, lower 32 bit of SYSCOUNTER)   |
-| Radio         | supported (IEEE 802.15.4 via nrf802154)         |
+| Radio         | supported (802.15.4 nrf802154, BLE adv nrfble)  |

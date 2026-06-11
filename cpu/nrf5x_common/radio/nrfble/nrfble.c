@@ -30,6 +30,21 @@
 #define ENABLE_DEBUG            0
 #include "debug.h"
 
+#ifdef CPU_FAM_NRF54L
+/* Compatibility wrapper for the nRF54L family: the radio peripheral has two
+ * interrupt lines (the application core uses line 0) and the END event/short
+ * was replaced by PHYEND (last bit sent or received on air) */
+#define RADIO_IRQn                      RADIO_0_IRQn
+#define isr_radio                       isr_radio_0
+#define INTENSET                        INTENSET00
+#define INTENCLR                        INTENCLR00
+#define RADIO_INTENSET_DISABLED_Msk     RADIO_INTENSET00_DISABLED_Msk
+#define RADIO_INTENSET_ADDRESS_Msk      RADIO_INTENSET00_ADDRESS_Msk
+#define RADIO_INTENCLR_DISABLED_Msk     RADIO_INTENCLR00_DISABLED_Msk
+#define RADIO_INTENCLR_ADDRESS_Msk      RADIO_INTENCLR00_ADDRESS_Msk
+#define RADIO_SHORTS_END_DISABLE_Msk    RADIO_SHORTS_PHYEND_DISABLE_Msk
+#endif
+
 /* driver specific device configuration */
 #define CONF_MODE               RADIO_MODE_MODE_Ble_1Mbit
 #define CONF_LEN                (8U)
@@ -157,7 +172,16 @@ static void _set_context(netdev_ble_ctx_t *ctx)
         NRF_RADIO->BASE0   = (uint32_t)((ctx->aa.raw[0] << 8) |
                                         (ctx->aa.raw[1] << 16) |
                                         (ctx->aa.raw[2] << 24));
+#ifdef CPU_FAM_NRF54L
+        /* the whitening IV moved into the DATAWHITE register, which also
+         * holds the whitening polynomial (preset for BLE on reset and
+         * preserved here); bit 6 of the initial value is no longer
+         * hardwired to 1, so it must be set explicitly */
+        NRF_RADIO->DATAWHITE = (NRF_RADIO->DATAWHITE & ~RADIO_DATAWHITE_IV_Msk) |
+                               (0x40 | ctx->chan);
+#else
         NRF_RADIO->DATAWHITEIV = ctx->chan;
+#endif
         NRF_RADIO->CRCINIT = (ctx->crc & NETDEV_BLE_CRC_MASK);
     }
     else {
@@ -165,6 +189,52 @@ static void _set_context(netdev_ble_ctx_t *ctx)
     }
 }
 
+#ifdef CPU_FAM_NRF54L
+/* the nRF54L TXPOWER register holds an encoded value instead of the raw dBm
+ * value, so the configured dBm value is tracked here for the getter */
+static int16_t _txpower_dbm = NRFBLE_TXPOWER_DEFAULT;
+
+static int16_t _nrfble_get_txpower(void)
+{
+    return _txpower_dbm;
+}
+
+static void _nrfble_set_txpower(int16_t power)
+{
+    if (power > 2) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Pos4dBm;
+        _txpower_dbm = 4;
+    }
+    else if (power > -2) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_0dBm;
+        _txpower_dbm = 0;
+    }
+    else if (power > -6) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg4dBm;
+        _txpower_dbm = -4;
+    }
+    else if (power > -10) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg8dBm;
+        _txpower_dbm = -8;
+    }
+    else if (power > -14) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg12dBm;
+        _txpower_dbm = -12;
+    }
+    else if (power > -18) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg16dBm;
+        _txpower_dbm = -16;
+    }
+    else if (power > -25) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg20dBm;
+        _txpower_dbm = -20;
+    }
+    else {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg28dBm;
+        _txpower_dbm = -28;
+    }
+}
+#else
 static int16_t _nrfble_get_txpower(void)
 {
     int8_t p = (int8_t)NRF_RADIO->TXPOWER;
@@ -201,6 +271,7 @@ static void _nrfble_set_txpower(int16_t power)
         NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg30dBm;
     }
 }
+#endif
 
 /**
  * @brief   Radio interrupt routine
@@ -247,11 +318,17 @@ static int _nrfble_init(netdev_t *dev)
     (void)dev;
     assert(_nrfble_dev.driver && _nrfble_dev.event_callback);
 
+#ifdef CPU_FAM_NRF54L
+    /* the nRF54L radio has no POWER register, trigger a soft reset instead */
+    NRF_RADIO->TASKS_SOFTRESET = 1;
+#else
     /* power cycle the radio to reset it */
     NRF_RADIO->POWER = 0;
     NRF_RADIO->POWER = 1;
-    /* configure variable parameters to default values */
-    NRF_RADIO->TXPOWER = NRFBLE_TXPOWER_DEFAULT;
+#endif
+    /* configure variable parameters to default values (the setter is used,
+     * as the encoding of the TXPOWER register is family specific) */
+    _nrfble_set_txpower(NRFBLE_TXPOWER_DEFAULT);
     /* always send from and listen to logical address 0 */
     NRF_RADIO->TXADDRESS = 0x00UL;
     NRF_RADIO->RXADDRESSES = 0x01UL;
