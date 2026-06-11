@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- *               2018 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-FileCopyrightText: 2018 Freie Universität Berlin
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -22,9 +19,13 @@
 
 #include <unistd.h>
 
-#include "modules.h"
+#include "compiler_hints.h"
 #include "isrpipe.h"
-#include "xfa.h"
+#include "modules.h"
+
+#if defined(MODULE_STDIO_DISPATCH)
+#  include "xfa.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +35,7 @@ extern "C" {
 /**
  * @brief Buffer size for STDIO
  */
-#define STDIO_RX_BUFSIZE    (64)
+#  define STDIO_RX_BUFSIZE (64)
 #endif
 
 enum {
@@ -43,7 +44,7 @@ enum {
     STDIO_RTT,                  /**< stdio via Segger RTT */
     STDIO_SEMIHOSTING,          /**< stdio via Semihosting */
     STDIO_USBUS_CDC_ACM,        /**< stdio via USB CDC ACM (usbus) */
-    STDIO_TINYUSB_CDC_ACM,      /**< tdio via USB CDC ACM (TinyUSB) */
+    STDIO_TINYUSB_CDC_ACM,      /**< stdio via USB CDC ACM (TinyUSB) */
     STDIO_ESP32_SERIAL_JTAG,    /**< stdio via ESP32 debug Serial/JTAG */
     STDIO_NIMBLE,               /**< stdio via BLE (NimBLE) */
     STDIO_UDP,                  /**< stdio via UDP */
@@ -70,8 +71,8 @@ typedef struct {
      * @param[in]   src     buffer to read from
      * @param[in]   len     nr of bytes to write
      *
-     * @return nr of bytes written
-     * @return <0 on error
+     * @return  nr of bytes written
+     * @retval      <0      on error
      */
     ssize_t (*write)(const void *src, size_t len);
 } stdio_provider_t;
@@ -108,30 +109,34 @@ int stdio_available(void);
 void stdio_clear_stdin(void);
 
 /**
- * @brief read @p len bytes from stdio uart into @p buffer
+ * @brief   Read @p len bytes from the STDIN into @p buffer
  *
  * @param[out]  buffer  buffer to read into
  * @param[in]   max_len nr of bytes to read
  *
- * @return nr of bytes read
- * @return <0 on error
+ * @return  nr of bytes read
+ * @retval      <0      on error
  */
-ssize_t stdio_read(void* buffer, size_t max_len);
+ACCESS(write_only, 1, 2)
+ssize_t stdio_read(void *buffer, size_t max_len);
 
 /**
- * @brief write @p len bytes from @p buffer into STDOUT
+ * @brief  Write @p len bytes from @p buffer into STDOUT
  *
  * @note Depending on the stdio backend(s) used, not all bytes might
  * be written to stdout and accounted for if multiple backends are
- * active, as not all stdout backends will do a blocking write.
+ * @note Depending on the stdio backend(s) used and if multiple backends are
+ *       active, it is possible that not all bytes will be written to stdout
+ *       as not all backends support blocking writes.
  *
  * @param[in]   buffer  buffer to read from
  * @param[in]   len     nr of bytes to write
  *
- * @return nr of bytes written
- * @return <0 on error
+ * @return  nr of bytes written
+ * @retval      <0      on error
  */
-ssize_t stdio_write(const void* buffer, size_t len);
+ACCESS(read_only, 1, 2)
+ssize_t stdio_write(const void *buffer, size_t len);
 
 /**
  * @brief Disable stdio and detach stdio providers
