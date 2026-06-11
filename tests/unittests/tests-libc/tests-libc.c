@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+#include <endian.h>
+#include <errno.h>
 #include <stdint.h>
 #include <string.h>
-#include <endian.h>
-#include "string_utils.h"
 
+#include "string_utils.h"
 #include "tests-libc.h"
 
 static void test_libc_strscpy(void)
