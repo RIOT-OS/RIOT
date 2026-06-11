@@ -46,9 +46,15 @@ NRFX_HEADERS_nrf53 += mdk/nrf5340_network_bitfields.h
 NRFX_HEADERS_nrf53 += mdk/nrf5340_network_name_change.h
 NRFX_HEADERS_nrf53 += mdk/nrf5340_network_peripherals.h
 
+NRFX_HEADERS_nrf54l  = mdk/nrf54l15_types.h
+NRFX_HEADERS_nrf54l += mdk/nrf54l15_global.h
+NRFX_HEADERS_nrf54l += mdk/nrf54l15_application.h
+NRFX_HEADERS_nrf54l += mdk/nrf54l15_application_peripherals.h
+
 # The sparse checkout always contains the headers of all CPU families, so that
 # switching between CPU families does not require fetching the package again.
-NRFX_SPARSE_PATHS = $(NRFX_HEADERS_nrf51) $(NRFX_HEADERS_nrf52) $(NRFX_HEADERS_nrf53)
+NRFX_SPARSE_PATHS = $(NRFX_HEADERS_nrf51) $(NRFX_HEADERS_nrf52) $(NRFX_HEADERS_nrf53) \
+                    $(NRFX_HEADERS_nrf54l)
 
 # A full checkout contains the vendor headers as well. If one is already
 # present, keep it instead of replacing it with a sparse checkout.
