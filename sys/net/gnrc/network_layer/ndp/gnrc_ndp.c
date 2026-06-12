@@ -240,7 +240,8 @@ gnrc_pktsnip_t *gnrc_ndp_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next)
     return pkt;
 }
 
-gnrc_pktsnip_t *gnrc_ndp_opt_rdnss_build(uint32_t ltime, ipv6_addr_t *addrs,
+gnrc_pktsnip_t *gnrc_ndp_opt_rdnss_build(uint32_t ltime,
+                                         const ipv6_addr_t *addrs,
                                          unsigned addrs_num,
                                          gnrc_pktsnip_t *next)
 {

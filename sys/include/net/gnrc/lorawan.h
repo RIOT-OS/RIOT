@@ -23,6 +23,7 @@
  * @author  Francisco Molina <femolina@uc.cl>
  */
 
+#include "compiler_hints.h"
 #include "gnrc_lorawan_internal.h"
 #include "assert.h"
 
@@ -243,6 +244,7 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
  *            not successful.
  * @param[in] size size of the PSDU
  */
+ACCESS(read_write, 2, 3)
 void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *data,
                                    size_t size);
 

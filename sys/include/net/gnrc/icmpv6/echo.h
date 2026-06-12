@@ -23,6 +23,7 @@
 #include <inttypes.h>
 
 #include "byteorder.h"
+#include "compiler_hints.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/ipv6/hdr.h"
@@ -45,8 +46,9 @@ extern "C" {
  * @return  The echo message on success
  * @return  NULL, on failure
  */
+ACCESS(read_only, 4, 5)
 gnrc_pktsnip_t *gnrc_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
-                                       uint8_t *data, size_t data_len);
+                                       const void *data, size_t data_len);
 
 /**
  * @brief   ICMPv6 echo request handler

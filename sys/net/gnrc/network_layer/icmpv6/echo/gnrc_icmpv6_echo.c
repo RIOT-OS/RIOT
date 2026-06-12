@@ -26,7 +26,7 @@
 #include "debug.h"
 
 gnrc_pktsnip_t *gnrc_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
-                                       uint8_t *data, size_t data_len)
+                                       const void *data, size_t data_len)
 {
     gnrc_pktsnip_t *pkt;
     icmpv6_echo_t *echo;

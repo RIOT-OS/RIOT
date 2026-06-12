@@ -18,8 +18,8 @@
  * @author  Jose Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
 
+#include "compiler_hints.h"
 #include "net/gnrc/lorawan.h"
-
 #include "ztimer.h"
 
 #ifdef __cplusplus
@@ -65,13 +65,15 @@ typedef struct {
  *  This getter function exists to allow if (IS_USED(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
- * @param[in] lw_netif      pointer to the interface descriptor
- * @param[in] key           pointer to the app key
- * @param[in] len           length of the app key
- * @return 0 on success
- * @return <0 on failure
+ * @param[in,out]   lw_netif  pointer to the interface descriptor
+ * @param[in]       key       pointer to the app key
+ * @param[in]       len       length of the app key
+ * @retval          0         success
+ * @retval          <0        failure
  */
-static inline int gnrc_netif_lorawan_set_appkey(gnrc_netif_lorawan_t *lw_netif, const uint8_t *key,
+ACCESS(read_only, 2, 3)
+static inline int gnrc_netif_lorawan_set_appkey(gnrc_netif_lorawan_t *lw_netif,
+                                                const uint8_t *key,
                                                 size_t len)
 {
     (void)lw_netif;
@@ -112,12 +114,13 @@ static inline uint8_t * gnrc_netif_lorawan_get_appkey(gnrc_netif_lorawan_t *lw_n
  *  This getter function exists to allow if (IS_USED(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
- * @param[in] lw_netif      pointer to the interface descriptor
- * @param[in] key           pointer to the serving network session integrity key
- * @param[in] len           length of serving network session integrity key
- * @return 0 on success
- * @return <0 on failure
+ * @param[in,out]   lw_netif  pointer to the interface descriptor
+ * @param[in]       key       pointer to the serving network session integrity key
+ * @param[in]       len       length of serving network session integrity key
+ * @retval          0         success
+ * @retval          <0        failure
  */
+ACCESS(read_only, 2, 3)
 static inline int gnrc_netif_lorawan_set_snwksintkey(gnrc_netif_lorawan_t *lw_netif,
                                                      const uint8_t *key, size_t len)
 {
@@ -140,12 +143,13 @@ static inline int gnrc_netif_lorawan_set_snwksintkey(gnrc_netif_lorawan_t *lw_ne
  *  This getter function exists to allow if (IS_USED(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
- * @param[in] lw_netif      pointer to the interface descriptor
- * @param[in] key           pointer to the network session encryption key
- * @param[in] len           length of network session encryption key
- * @return 0 on success
- * @return <0 on failure
+ * @param[in,out]   lw_netif  pointer to the interface descriptor
+ * @param[in]       key       pointer to the network session encryption key
+ * @param[in]       len       length of network session encryption key
+ * @retval          0         success
+ * @retval          <0        failure
  */
+ACCESS(read_only, 2, 3)
 static inline int gnrc_netif_lorawan_set_nwksenckey(gnrc_netif_lorawan_t *lw_netif,
                                                     const uint8_t *key, size_t len)
 {

@@ -25,17 +25,16 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include "compiler_hints.h"
 #include "net/gnrc/ipv6/nib/abr.h"
 #include "net/gnrc/ipv6/nib/ft.h"
 #include "net/gnrc/ipv6/nib/nc.h"
 #include "net/gnrc/ipv6/nib/pl.h"
-
+#include "net/gnrc/netif.h"
+#include "net/gnrc/pkt.h"
 #include "net/icmpv6.h"
 #include "net/ipv6/addr.h"
 #include "net/ipv6/hdr.h"
-#include "net/gnrc/ipv6/nib/nc.h"
-#include "net/gnrc/netif.h"
-#include "net/gnrc/pkt.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -412,6 +411,7 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
  *                          packet.
  * @param[in] icmpv6_len    The number of bytes at @p icmpv6.
  */
+ACCESS(read_only, 3, 4)
 void gnrc_ipv6_nib_handle_pkt(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                               const icmpv6_hdr_t *icmpv6, size_t icmpv6_len);
 

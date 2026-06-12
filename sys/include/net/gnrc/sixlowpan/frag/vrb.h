@@ -25,14 +25,15 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "compiler_hints.h"
 #include "modules.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/sixlowpan/config.h"
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG
-#include "net/gnrc/sixlowpan/frag.h"
-#endif /* MODULE_GNRC_SIXLOWPAN_FRAG */
 #include "net/gnrc/sixlowpan/frag/rb.h"
-#include "timex.h"
+
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG
+#  include "net/gnrc/sixlowpan/frag.h"
+#endif /* MODULE_GNRC_SIXLOWPAN_FRAG */
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,6 +80,7 @@ typedef struct {
  * @return  A new VRB entry.
  * @return  NULL, if VRB is full.
  */
+ACCESS(read_only, 3, 4)
 gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
         const gnrc_sixlowpan_frag_rb_base_t *base,
         gnrc_netif_t *out_netif, const uint8_t *out_dst, size_t out_dst_len);
@@ -121,6 +123,7 @@ void gnrc_sixlowpan_frag_vrb_gc(void);
  * @return  NULL, if there is no entry in the VRB that could be identified
  *          by the given parameters.
  */
+ACCESS(read_only, 1, 2)
 gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
         const uint8_t *src, size_t src_len, unsigned src_tag);
 
@@ -137,6 +140,7 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
  * @return  The VRB entry with `vrb->super.dst == src` and `vrb->out_tag == tag`.
  * @return  NULL, if there is no entry in the VRB that has these values.
  */
+ACCESS(read_only, 2, 3)
 gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_reverse(
         const gnrc_netif_t *netif, const uint8_t *src, size_t src_len,
         unsigned tag);

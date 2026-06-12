@@ -21,8 +21,8 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include "compiler_hints.h"
 #include "modules.h"
-
 #include "net/gnrc/netif.h"
 #include "net/l2util.h"
 #include "net/netopt.h"
@@ -513,6 +513,7 @@ netopt_t gnrc_netif_get_l2addr_opt(const gnrc_netif_t *netif);
  * @return  `-EINVAL`, when @p addr_len is invalid for the
  *          gnrc_netif_t::device_type of @p netif.
  */
+ACCESS(read_only, 2, 3)
 int gnrc_netif_eui64_from_addr(const gnrc_netif_t *netif,
                                const uint8_t *addr, size_t addr_len,
                                eui64_t *eui64);
@@ -586,6 +587,7 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif);
  * @return  `-EINVAL`, when @p addr_len is invalid for the
  *          gnrc_netif_t::device_type of @p netif.
  */
+ACCESS(read_only, 2, 3)
 int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
                                   const uint8_t *addr, size_t addr_len,
                                   eui64_t *iid);
