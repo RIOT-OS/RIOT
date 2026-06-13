@@ -162,7 +162,7 @@ static int fortuna_pseudo_random_data(fortuna_state_t *state, uint8_t *out,
 void _reseed_callback(void *arg)
 {
     fortuna_state_t *state = (fortuna_state_t *) arg;
-    state->needs_reseed = 1;
+    atomic_store_u8(&state->needs_reseed, 1);
 }
 
 static void _reseed_timer_set(fortuna_state_t *state)
