@@ -179,7 +179,7 @@ typedef struct {
 /**
  * @brief Type definition of a Fortuna seed file.
  */
-typedef uint32_t fortuna_seed_t[FORTUNA_SEED_SIZE];
+typedef uint8_t fortuna_seed_t[FORTUNA_SEED_SIZE];
 
 /**
  * @brief   Initialize the Fortuna PRNG state.

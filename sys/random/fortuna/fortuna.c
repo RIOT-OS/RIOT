@@ -295,7 +295,7 @@ int fortuna_add_random_event(fortuna_state_t *state, const uint8_t *data,
 }
 
 /*
- * Corresponds to section 9.6.2.
+ * Corresponds to section 9.6.1.
  */
 int fortuna_write_seed(fortuna_state_t *state, fortuna_seed_t *out)
 {
