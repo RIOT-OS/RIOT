@@ -35,6 +35,8 @@
  *   https://crypto.stackexchange.com/q/56390 for more information.
  */
 
+#include <stdint.h>
+
 #include "mutex.h"
 #if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
 #if IS_USED(MODULE_ZTIMER_MSEC)
@@ -86,17 +88,22 @@ extern "C" {
  * @note Requires `fortuna_reseed` module.
  */
 #ifndef FORTUNA_RESEED_INTERVAL_MS
-#define FORTUNA_RESEED_INTERVAL_MS  100
+#define FORTUNA_RESEED_INTERVAL_MS  (100)
 #endif
 #endif
 
 /**
  * @brief Reseed limit in bytes. After this number of bytes, the PRNG must be
  *        reseeded. Per section 9.4.4, the recommended value is 2^20 bytes
- *        (=1 MB). Set to zero to disable this security feature.
+ *        (=1 MB), but it is limited by SIZE_MAX. Set to zero to disable this
+ *        security feature.
  */
 #ifndef FORTUNA_RESEED_LIMIT
-#define FORTUNA_RESEED_LIMIT        (1U << 20)
+#  if (1UL << 20) < SIZE_MAX
+#    define FORTUNA_RESEED_LIMIT    (1UL << 20)
+#  else
+#    define FORTUNA_RESEED_LIMIT    (SIZE_MAX)
+#  endif
 #endif
 
 /**
