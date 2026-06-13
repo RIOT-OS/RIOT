@@ -133,8 +133,11 @@ typedef enum {
  * @brief   Data shadowing mode (INT_CFG, 0x21)
  */
 typedef enum {
-    QMA6100P_INT_CFG_SHADOW_EN = 0,  /**< shadowing enabled (default) */
-    QMA6100P_INT_CFG_SHADOW_DIS = 1, /**< shadowing disabled */
+    QMA6100P_INT_CFG_SHADOW_EN = 0,  /**< shadowing enabled: lock the MSB content while the
+                                          LSB is read so both bytes belong to the same sample,
+                                          preserving acceleration data integrity (default) */
+    QMA6100P_INT_CFG_SHADOW_DIS = 1, /**< shadowing disabled: no lock, MSB/LSB may come from
+                                          different samples */
 } qma6100p_int_shadow_t;
 
 /**
