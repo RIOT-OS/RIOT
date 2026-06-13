@@ -149,14 +149,6 @@ typedef enum {
 } qma6100p_int_pin_num_t;
 
 /**
- * @brief   Interrupt descriptor
- */
-typedef struct {
-    qma6100p_int_cb_t cb; /**< callback function */
-    void *arg;            /**< callback argument */
-} qma6100p_int_t;
-
-/**
  * @brief   Configuration parameters
  */
 typedef struct {
@@ -176,7 +168,6 @@ typedef struct {
  */
 typedef struct {
     qma6100p_params_t params; /**< Device configuration parameters */
-    qma6100p_int_t interrupt; /**< Device interrupt descriptor */
 } qma6100p_t;
 
 /**
@@ -256,8 +247,8 @@ int qma6100p_read(const qma6100p_t *dev, qma6100p_data_t *data);
  * @param[in,out] dev        device descriptor of accelerometer
  * @param[in]     line       INT line to route the data-ready event to
  *                           (@ref QMA6100P_INT1 or @ref QMA6100P_INT2)
- * @param[in]     interrupt  interrupt descriptor (@ref qma6100p_int_t): callback
- *                           and callback argument
+ * @param[in]     cb         callback invoked when the data-ready event fires
+ * @param[in]     arg        argument passed to @p cb
  *
  * @return                   QMA6100P_OK on success
  * @return                   QMA6100P_GPIO_ERROR if the line's GPIO is unwired or initialization failed
@@ -268,7 +259,7 @@ int qma6100p_read(const qma6100p_t *dev, qma6100p_data_t *data);
  * @warning The callback is invoked from interrupt context, keep it short
  */
 int qma6100p_set_data_ready_int(qma6100p_t *dev, qma6100p_int_pin_num_t line,
-                                const qma6100p_int_t *interrupt);
+                                qma6100p_int_cb_t cb, void *arg);
 
 #ifdef __cplusplus
 }

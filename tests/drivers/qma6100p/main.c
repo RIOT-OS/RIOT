@@ -90,8 +90,6 @@ static inline unsigned int _measure_irq_hz(void)
     return irq_count - before;
 }
 
-static const qma6100p_int_t interrupt = { .cb = callback };
-
 int main(void)
 {
     int res;
@@ -126,7 +124,7 @@ int main(void)
             goto out;
         }
 
-        res = qma6100p_set_data_ready_int(&dev, QMA6100P_INT1, &interrupt);
+        res = qma6100p_set_data_ready_int(&dev, QMA6100P_INT1, callback, NULL);
         if (res < 0) {
             printf("FAILED to enable data-ready int (res=%d)\n", res);
             goto out;

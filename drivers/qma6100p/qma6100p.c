@@ -735,9 +735,9 @@ out:
 }
 
 int qma6100p_set_data_ready_int(qma6100p_t *dev, qma6100p_int_pin_num_t line,
-                                const qma6100p_int_t *interrupt)
+                                qma6100p_int_cb_t cb, void *arg)
 {
-    assert(dev && interrupt && interrupt->cb);
+    assert(dev && cb);
 
     gpio_t pin = (line == QMA6100P_INT2) ? dev->params.int2_pin
                                          : dev->params.int1_pin;
@@ -774,10 +774,9 @@ out:
     }
 
     gpio_flank_t flank = (QMA6100P_PARAM_INT_ACTIVE_LEVEL == QMA6100P_INTPIN_ACTIVE_HIGH) ? GPIO_RISING : GPIO_FALLING;
-    if (gpio_init_int(pin, GPIO_IN, flank, interrupt->cb, interrupt->arg) < 0) {
+    if (gpio_init_int(pin, GPIO_IN, flank, cb, arg) < 0) {
         return QMA6100P_GPIO_ERROR;
     }
 
-    dev->interrupt = *interrupt;
     return QMA6100P_OK;
 }
