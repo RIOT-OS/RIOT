@@ -76,7 +76,7 @@ static void _read(uint8_t *out, size_t bytes)
         /* advance bytes and buffer */
         bytes -= chunk;
         out += chunk;
-    } while (bytes > FORTUNA_RESEED_LIMIT);
+    } while (bytes > 0);
 }
 
 void random_init_by_array(uint32_t init_key[], int key_length)
