@@ -454,7 +454,7 @@ out:
  */
 static int32_t _convert_to_ug(int16_t raw_value, qma6100p_range_t range)
 {
-    int32_t resolution = QMA6100P_2G_RESOLUTION;
+    int32_t resolution;
 
     switch (range) {
     case (QMA6100P_RANGE_2G):
@@ -557,24 +557,23 @@ out:
 /**
  * @brief Configure interrupt behavior in INT_CFG register
  *
- * Sets latch mode, status clear behavior, and data shadowing from @p int_params
+ * Sets the data shadowing mode from @ref qma6100p_params_t::interrupt_shadow
  *
- * @param[in,out] dev         device descriptor
- * @param[in]     int_params  interrupt parameters
+ * @param[in,out] dev  device descriptor
  *
  * @return  0 on success
  * @return  negative error code on I2C failure
  *
  * @warning I2C bus must be acquired by the caller
  */
-static int _set_int_params(qma6100p_t *dev, qma6100p_int_params_t int_params)
+static int _set_int_params(qma6100p_t *dev)
 {
     int res = QMA6100P_OK;
     uint8_t int_reg;
 
     READ_REG(QMA6100P_REG_INT_CFG, int_reg, out);
 
-    FIELD_SET(QMA6100P_INT_CFG_SHADOW_MASK, int_params.interrupt_shadow, int_reg);
+    FIELD_SET(QMA6100P_INT_CFG_SHADOW_MASK, dev->params.interrupt_shadow, int_reg);
 
     WRITE_REG(QMA6100P_REG_INT_CFG, int_reg, out);
 
@@ -646,17 +645,17 @@ out:
  * and writes @p map_reg with the corresponding INTx_MAP1 register address
  *
  * @param[in]  dev      device descriptor
- * @param[in]  params   interrupt parameters (@ref qma6100p_int_params_t)
+ * @param[in]  pin_num  QMA6100P INT pin to configure (@ref QMA6100P_INT1 or @ref QMA6100P_INT2)
  * @param[out] map_reg  INTx_MAP1 register address for the selected pin
  *
  * @return  0 on success
- * @return  QMA6100P_INVALID_ARG if interrupt_pin_num is invalid
+ * @return  QMA6100P_INVALID_ARG if pin_num is invalid
  * @return  negative error code on I2C failure
  *
  * @warning I2C bus must be acquired by the caller
  */
 static int _set_intpin_conf(const qma6100p_t *dev,
-                            const qma6100p_int_params_t *params,
+                            qma6100p_int_pin_num_t pin_num,
                             uint8_t *map_reg)
 {
     int res;
@@ -664,21 +663,21 @@ static int _set_intpin_conf(const qma6100p_t *dev,
 
     READ_REG(QMA6100P_REG_INTPIN_CONF, reg, out);
 
-    switch (params->interrupt_pin_num) {
+    switch (pin_num) {
     case QMA6100P_INT1:
         *map_reg = QMA6100P_REG_INT1_MAP1;
-        FIELD_SET(QMA6100P_INTPIN_INT1_LVL_MASK, params->active_level_int, reg);
-        FIELD_SET(QMA6100P_INTPIN_INT1_OD_MASK, params->pin_mode_int, reg);
+        FIELD_SET(QMA6100P_INTPIN_INT1_LVL_MASK, QMA6100P_PARAM_INT_ACTIVE_LEVEL, reg);
+        FIELD_SET(QMA6100P_INTPIN_INT1_OD_MASK, QMA6100P_PARAM_INT_PIN_MODE, reg);
         break;
     case QMA6100P_INT2:
         *map_reg = QMA6100P_REG_INT2_MAP1;
-        FIELD_SET(QMA6100P_INTPIN_INT2_LVL_MASK, params->active_level_int, reg);
-        FIELD_SET(QMA6100P_INTPIN_INT2_OD_MASK, params->pin_mode_int, reg);
+        FIELD_SET(QMA6100P_INTPIN_INT2_LVL_MASK, QMA6100P_PARAM_INT_ACTIVE_LEVEL, reg);
+        FIELD_SET(QMA6100P_INTPIN_INT2_OD_MASK, QMA6100P_PARAM_INT_PIN_MODE, reg);
         break;
     default:
         res = QMA6100P_INVALID_ARG;
         DEBUG("[qma6100p] %s: pin_num %d invalid, choose %d or %d\n",
-              __func__, params->interrupt_pin_num, QMA6100P_INT1, QMA6100P_INT2);
+              __func__, pin_num, QMA6100P_INT1, QMA6100P_INT2);
         goto out;
     }
 
@@ -735,11 +734,15 @@ out:
     return res;
 }
 
-int qma6100p_set_data_ready_int(qma6100p_t *dev, const qma6100p_int_t *interrupt)
+int qma6100p_set_data_ready_int(qma6100p_t *dev, qma6100p_int_pin_num_t line,
+                                const qma6100p_int_t *interrupt)
 {
     assert(dev && interrupt && interrupt->cb);
 
-    if (!gpio_is_valid(interrupt->params.interrupt_pin)) {
+    gpio_t pin = (line == QMA6100P_INT2) ? dev->params.int2_pin
+                                         : dev->params.int1_pin;
+
+    if (!gpio_is_valid(pin)) {
         return QMA6100P_GPIO_ERROR;
     }
 
@@ -747,12 +750,12 @@ int qma6100p_set_data_ready_int(qma6100p_t *dev, const qma6100p_int_t *interrupt
 
     i2c_acquire(BUS);
 
-    int res = _set_int_params(dev, interrupt->params);
+    int res = _set_int_params(dev);
     if (res < 0) {
         goto out;
     }
 
-    res = _set_intpin_conf(dev, &interrupt->params, &map_reg);
+    res = _set_intpin_conf(dev, line, &map_reg);
     if (res < 0) {
         goto out;
     }
@@ -770,9 +773,8 @@ out:
         return res;
     }
 
-    gpio_flank_t flank = (interrupt->params.active_level_int == QMA6100P_INTPIN_ACTIVE_HIGH) ? GPIO_RISING : GPIO_FALLING;
-    if (gpio_init_int(interrupt->params.interrupt_pin, GPIO_IN, flank,
-                      interrupt->cb, interrupt->arg) < 0) {
+    gpio_flank_t flank = (QMA6100P_PARAM_INT_ACTIVE_LEVEL == QMA6100P_INTPIN_ACTIVE_HIGH) ? GPIO_RISING : GPIO_FALLING;
+    if (gpio_init_int(pin, GPIO_IN, flank, interrupt->cb, interrupt->arg) < 0) {
         return QMA6100P_GPIO_ERROR;
     }
 

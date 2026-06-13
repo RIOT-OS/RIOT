@@ -117,15 +117,4 @@ config QMA6100P_INT_CFG_SHADOW_EN
     bool "Shadow enabled"
 endchoice
 
-choice
-    bool "QMA6100P interrupt output pin"
-    default QMA6100P_INT1
-    help
-        Select which QMA6100P interrupt output pin is routed to the MCU GPIO.
-config QMA6100P_INT1
-    bool "INT1"
-config QMA6100P_INT2
-    bool "INT2"
-endchoice
-
 endmenu # QMA6100P driver
