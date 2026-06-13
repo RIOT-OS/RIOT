@@ -21,10 +21,8 @@
 #include <stdio.h>
 
 #include "qma6100p.h"
+#include "sema.h"
 #include "thread.h"
-#include "thread_flags.h"
-
-/* verification: lower ODR to prove the data-ready ISR is locked to the data rate */
 
 static const qma6100p_odr_t rates[] = {
     QMA6100P_ODR_12HZ5,
@@ -38,15 +36,14 @@ static const unsigned expect_hz[] = { 12, 25, 100 };
 #include "qma6100p_params.h"
 #include "ztimer.h"
 
-#define SLEEP_1S        (1U)
+#define SLEEP_1S (1U)
 
-/* thread flag raised by the data-ready ISR to wake the reader thread */
-#define FLAG_DATA_READY (1U << 0)
+/* waited on by the reader thread, posted by the data-ready ISR to wake it */
+static sema_t data_ready = SEMA_CREATE_LOCKED();
 
 /* incremented in ISR context on every data-ready interrupt */
 static volatile unsigned irq_count;
 
-static kernel_pid_t reader_pid = KERNEL_PID_UNDEF;
 static char reader_stack[THREAD_STACKSIZE_MAIN];
 
 static qma6100p_t dev;
@@ -55,8 +52,9 @@ static void callback(void *args)
 {
     (void)args;
     irq_count++;
-    if (reader_pid != KERNEL_PID_UNDEF) {
-        thread_flags_set(thread_get(reader_pid), FLAG_DATA_READY);
+    /* cap at 1 to make the semaphore binary */
+    if (sema_get_value(&data_ready) == 0) {
+        sema_post(&data_ready);
     }
 }
 
@@ -67,7 +65,7 @@ static void *reader_thread(void *arg)
     qma6100p_data_t data;
 
     while (1) {
-        thread_flags_wait_any(FLAG_DATA_READY);
+        sema_wait(&data_ready);
 
         int res = qma6100p_read(&dev, &data);
         assert(res != QMA6100P_NO_NEW_DATA); /**<interrupt-driven: a wake must always carry fresh data */
@@ -156,9 +154,9 @@ int main(void)
 
     /* stream samples: ISR signals the reader thread, which reads over I2C */
     puts("\n--- interrupt-driven streaming ---");
-    reader_pid = thread_create(reader_stack, sizeof(reader_stack),
-                               THREAD_PRIORITY_MAIN - 1, 0,
-                               reader_thread, NULL, "qma_reader");
+    kernel_pid_t reader_pid = thread_create(reader_stack, sizeof(reader_stack),
+                                            THREAD_PRIORITY_MAIN - 1, 0,
+                                            reader_thread, NULL, "qma_reader");
     if (reader_pid < 0) {
         puts("Failed to create reader thread");
         res = 1;
