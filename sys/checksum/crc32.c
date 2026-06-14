@@ -9,6 +9,8 @@
  */
 
 /**
+ * @ingroup     sys_checksum_crc32
+ *
  * @{
  *
  * @file

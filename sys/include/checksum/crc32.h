@@ -36,7 +36,7 @@ extern "C" {
  * @param[in] buf   The data to checksum
  * @param[in] size  Length of the data in bytes
  *
- * @return 32 bit sized hash in the interval [0..2^32]
+ * @return 32 bit sized hash in the interval [0..2^32-1]
  */
 ACCESS(read_only, 1, 2)
 uint32_t crc32(const void *buf, size_t size);

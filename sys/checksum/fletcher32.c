@@ -35,7 +35,7 @@ void fletcher32_init(fletcher32_ctx_t *ctx)
 
 uint32_t fletcher32_finish(fletcher32_ctx_t *ctx)
 {
-    /* Second reduction step to reduce sums to 8 bits */
+    /* Second reduction step to reduce sums to 16 bits */
     _reduce(ctx);
     return (ctx->sum2 << 16) | ctx->sum1;
 }

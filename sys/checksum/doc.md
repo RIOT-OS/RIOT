@@ -31,3 +31,7 @@ advantage by using a look-up table that provides the checksum for every
 possible byte-value. It thus trades of memory against speed. If your
 platform is rather small equipped in memory you should prefer the
 @ref sys_checksum_ucrc16 version.
+
+It is worth noting that the checksumming algorithms provided should not be used
+for security purposes (e.g. integrity or authentication), since they are not
+cryptographically secure.

@@ -46,7 +46,7 @@ typedef struct {
  *
  * @param buf input buffer to hash
  * @param words length of buffer, in 16 bit words
- * @return 32 bit sized hash in the interval [1..2^32]
+ * @return 32 bit sized hash in the interval [1..2^32-1]
  */
 uint32_t fletcher32(const uint16_t *buf, size_t words);
 
