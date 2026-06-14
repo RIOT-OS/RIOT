@@ -94,7 +94,6 @@ static int base64_encode_base(const void *data_in, size_t data_in_size,
     const uint8_t *in = data_in;
     const uint8_t *end = in + data_in_size;
     uint8_t *out = base64_out;
-    size_t required_size = base64_estimate_encode_size(data_in_size);
 
     if (in == NULL) {
         return BASE64_ERROR_DATA_IN;
@@ -104,6 +103,12 @@ static int base64_encode_base(const void *data_in, size_t data_in_size,
         *base64_out_size = 0;
         return BASE64_SUCCESS;
     }
+
+    if (!base64_can_estimate_encode_size(data_in_size)) {
+        return BASE64_ERROR_OVERFLOW;
+    }
+
+    size_t required_size = base64_estimate_encode_size(data_in_size);
 
     if (*base64_out_size < required_size) {
         *base64_out_size = required_size;
@@ -227,7 +232,6 @@ int base64_decode(const void *base64_in, size_t base64_in_size,
 {
     uint8_t *out = data_out;
     const uint8_t *in = base64_in;
-    size_t required_size = base64_estimate_decode_size(base64_in_size);
 
     if (in == NULL) {
         return BASE64_ERROR_DATA_IN;
@@ -237,6 +241,8 @@ int base64_decode(const void *base64_in, size_t base64_in_size,
         *data_out_size = 0;
         return BASE64_SUCCESS;
     }
+
+    size_t required_size = base64_estimate_decode_size(base64_in_size);
 
     if (*data_out_size < required_size) {
         *data_out_size = required_size;
