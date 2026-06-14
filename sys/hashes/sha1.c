@@ -1,13 +1,7 @@
 /*
- * Copyright (C) 2016 Oliver Hahm <oliver.hahm@inria.fr>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
-
-/* This code is public-domain - it is based on libcrypt
- * placed in the public domain by Wei Dai and other contributors.
+ * SPDX-FileCopyrightText: 2016 Oliver Hahm <oliver.hahm@inria.fr>
+ * SPDX-FileCopyrightText: Implementation based on libcrypt that was released by Wei Dai et al. into the public domain.
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
