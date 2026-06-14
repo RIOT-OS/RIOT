@@ -92,7 +92,6 @@ static int base64_encode_base(const void *data_in, size_t data_in_size,
 {
     const uint8_t padding = urlsafe ? 0 : '=';
     const uint8_t *in = data_in;
-    const uint8_t *end = in + data_in_size;
     uint8_t *out = base64_out;
 
     if (in == NULL) {
@@ -120,6 +119,8 @@ static int base64_encode_base(const void *data_in, size_t data_in_size,
     }
 
     *base64_out_size = required_size;
+
+    const uint8_t *end = in + data_in_size;
 
     while (in < end - 2) {
         encode_three_bytes(out, in[0], in[1], in[2], urlsafe);
@@ -230,8 +231,8 @@ static void decode_four_codes(uint8_t *out, const uint8_t *src)
 int base64_decode(const void *base64_in, size_t base64_in_size,
                   void *data_out, size_t *data_out_size)
 {
-    uint8_t *out = data_out;
     const uint8_t *in = base64_in;
+    uint8_t *out = data_out;
 
     if (in == NULL) {
         return BASE64_ERROR_DATA_IN;
