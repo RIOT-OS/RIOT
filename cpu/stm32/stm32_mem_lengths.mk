@@ -292,8 +292,6 @@ else ifeq ($(STM32_TYPE), L)
   endif
 else ifeq ($(STM32_TYPE), U)
   ifeq ($(STM32_FAMILY), 3)
-    # STM32U375/U385 lines have 256K SRAM. Higher-memory U3 parts
-    # (e.g. STM32U3B5/U3C5) have up to 640K — add them here when supported.
     ifneq (, $(filter $(STM32_MODEL2), 7 8))
       RAM_LEN = 256K
     endif
