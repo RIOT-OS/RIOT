@@ -233,6 +233,11 @@ int base64_decode(const void *base64_in, size_t base64_in_size,
         return BASE64_ERROR_DATA_IN;
     }
 
+    if (base64_in_size == 0) {
+        *data_out_size = 0;
+        return BASE64_SUCCESS;
+    }
+
     if (*data_out_size < required_size) {
         *data_out_size = required_size;
         return BASE64_ERROR_BUFFER_OUT_SIZE;
