@@ -1,9 +1,6 @@
 /*
- * Copyright 2015 Eistec AB
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2015 Eistec AB
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -35,7 +32,7 @@ void fletcher32_init(fletcher32_ctx_t *ctx)
 
 uint32_t fletcher32_finish(fletcher32_ctx_t *ctx)
 {
-    /* Second reduction step to reduce sums to 8 bits */
+    /* Second reduction step to reduce sums to 16 bits */
     _reduce(ctx);
     return (ctx->sum2 << 16) | ctx->sum1;
 }

@@ -1,9 +1,6 @@
 /*
- * Copyright 2016 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2016 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -25,7 +22,7 @@
 #include "kernel_defines.h"
 #include "checksum/crc16_ccitt.h"
 
-static const uint16_t crc_ccitt_lookuptable[256] = {
+static const uint16_t _crc_ccitt_lookuptable[256] = {
     0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf,
     0x8c48, 0x9dc1, 0xaf5a, 0xbed3, 0xca6c, 0xdbe5, 0xe97e, 0xf8f7,
     0x1081, 0x0108, 0x3393, 0x221a, 0x56a5, 0x472c, 0x75b7, 0x643e,
@@ -100,7 +97,7 @@ uint16_t crc16_ccitt_kermit_update(uint16_t crc, const unsigned char *buf, size_
     while (len--) {
         uint8_t e = crc ^= *buf++;
         if (IS_USED(MODULE_CRC16_FAST)) {
-            crc = (crc >> 8) ^ crc_ccitt_lookuptable[e];
+            crc = (crc >> 8) ^ _crc_ccitt_lookuptable[e];
         } else {
             uint8_t f = e ^ (e << 4);
             crc = (crc >> 8)
