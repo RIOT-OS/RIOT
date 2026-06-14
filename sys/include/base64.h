@@ -20,16 +20,18 @@
  */
 
 #include <stddef.h> /* for size_t */
+#include <stdbool.h> /* for bool */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define BASE64_SUCCESS                (0)  /**< return value for success                       */
-#define BASE64_ERROR_BUFFER_OUT       (-1) /**< error value for invalid output buffer pointer  */
-#define BASE64_ERROR_BUFFER_OUT_SIZE  (-2) /**< error value for invalid output buffer size     */
-#define BASE64_ERROR_DATA_IN          (-3) /**< error value for invalid input buffer           */
-#define BASE64_ERROR_DATA_IN_SIZE     (-4) /**< error value for invalid input buffer size      */
+#define BASE64_SUCCESS                  (0)  /**< return value for success                       */
+#define BASE64_ERROR_BUFFER_OUT         (-1) /**< error value for invalid output buffer pointer  */
+#define BASE64_ERROR_BUFFER_OUT_SIZE    (-2) /**< error value for invalid output buffer size     */
+#define BASE64_ERROR_DATA_IN            (-3) /**< error value for invalid input buffer           */
+#define BASE64_ERROR_DATA_IN_SIZE       (-4) /**< error value for invalid input buffer size      */
+#define BASE64_ERROR_OVERFLOW           (-5) /**< error value for buffer overflow                */
 
 /**
  * @brief Estimates the amount of bytes needed for decoding @p base64_in_size
@@ -44,15 +46,33 @@ static inline size_t base64_estimate_decode_size(size_t base64_in_size)
 }
 
 /**
- * @brief Estimates the length of the resulting string after encoding
- * @p data_in_size bytes into base64.
+ * @brief   Estimates the length of the resulting string after encoding
+ *          @p data_in_size bytes into base64.
  *
- * @param[in] data_in_size Amount of bytes to be encoded
+ * @pre     @p data_in_size must be smaller than ~75% of the SIZE_MAX to
+ *          prevent integer overflow in the calculation of the return value.
+ *
+ * @param[in]   data_in_size        Amount of bytes to be encoded
+ *
  * @return Amount of characters the output string is estimated to have
  */
 static inline size_t base64_estimate_encode_size(size_t data_in_size)
 {
     return (4 * ((data_in_size + 2) / 3));
+}
+
+/**
+ * @brief   Checks if the given size of data can return a valid estimate for
+ *          the size without an integer overflow.
+ *
+ * @param[in]   data_in_size        Amount of bytes to be encoded
+ *
+ * @retval  true if the given size can be encoded to base64.
+ * @retval  false if the given size would overflow
+ */
+static inline bool base64_can_estimate_encode_size(size_t data_in_size)
+{
+    return (data_in_size <= (SIZE_MAX / 4) * 3);
 }
 
 /**
@@ -71,6 +91,7 @@ static inline size_t base64_estimate_encode_size(size_t data_in_size)
             BASE64_ERROR_BUFFER_OUT if `base64_out` equals NULL
                                     but the `base64_out_size` is sufficient,
             BASE64_ERROR_DATA_IN if `data_in` equals NULL.
+            BASE64_ERROR_OVERFLOW if `data_in_size` is too large to be encoded to base64.
  */
 int base64_encode(const void *data_in, size_t data_in_size,
                   void *base64_out, size_t *base64_out_size);
@@ -97,6 +118,7 @@ int base64_encode(const void *data_in, size_t data_in_size,
             BASE64_ERROR_BUFFER_OUT if `base64_out` equals NULL
                                     but the `base64_out_size` is sufficient,
             BASE64_ERROR_DATA_IN if `data_in` equals NULL.
+            BASE64_ERROR_OVERFLOW if `data_in_size` is too large to be encoded to base64.
  */
 int base64url_encode(const void *data_in, size_t data_in_size,
                      void *base64_out, size_t *base64_out_size);
