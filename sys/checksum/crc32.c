@@ -19,7 +19,7 @@
 #include "kernel_defines.h"
 #include "checksum/crc32.h"
 
-const uint32_t crc32_tab[] = {
+static const uint32_t _crc32_tab[] = {
     0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
     0xe963a535, 0x9e6495a3, 0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,
     0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91, 0x1db71064, 0x6ab020f2,
@@ -68,7 +68,7 @@ const uint32_t crc32_tab[] = {
 static inline uint32_t crc32_for_byte(uint32_t result)
 {
     if (IS_USED(MODULE_CRC32_FAST)) {
-        return crc32_tab[result & 0xFF] ^ (result >> 8);
+        return _crc32_tab[result & 0xFF] ^ (result >> 8);
     }
 
     const uint32_t polynomial = 0xEDB88320L;
