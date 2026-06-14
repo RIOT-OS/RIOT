@@ -80,7 +80,8 @@ int raw_can_abort(int ifnum, int handle);
  * @brief Subscribe to a CAN filter
  *
  * This function must be called if a user thread @p pid wants to receive the CAN frame matching @p filter
- * on the interface @p ifnum.
+ * This function must be called if a user thread @p pid wants to receive the
+ * CAN frame matching @p filter on the interface @p ifnum.
  * The user thread will then receive msg via IPC on reception of frame matching @p filters.
  *
  * @param[in] ifnum      the interface number to listen
@@ -91,7 +92,8 @@ int raw_can_abort(int ifnum, int handle);
  * @return the @p ifnum on success
  * @return < 0 on error
  */
-int raw_can_subscribe_rx(int ifnum, struct can_filter *filter, kernel_pid_t pid, void *param);
+int raw_can_subscribe_rx(int ifnum, const struct can_filter *filter,
+                         kernel_pid_t pid, void *param);
 
 /**
  * @brief Unsubscribe from reception for the given CAN @p filter on @p pid thread
@@ -104,7 +106,7 @@ int raw_can_subscribe_rx(int ifnum, struct can_filter *filter, kernel_pid_t pid,
  * @return 0 on success
  * @return < 0 on error
  */
-int raw_can_unsubscribe_rx(int ifnum, struct can_filter *filter, kernel_pid_t pid, void *param);
+int raw_can_unsubscribe_rx(int ifnum, const struct can_filter *filter, kernel_pid_t pid, void *param);
 
 /**
  * @brief Free a received frame
@@ -162,7 +164,8 @@ int raw_can_send_mbox(int ifnum, const can_frame_t *frame, mbox_t *mbox);
  *
  * This function must be called if a user thread waiting on @p mbox wants to receive
  * the CAN frame matching @p filter on the interface @p ifnum.
- * The user thread will then receive msg via mailbox IPC on reception of frame matching @p filters.
+ * The user thread will then receive msg via mailbox IPC on reception of
+ * frame matching @p filters.
  *
  * Currently only single frame ID (i.e. filters->can_mask = 0xFFFFFFFF) are supported.
  *
@@ -174,7 +177,8 @@ int raw_can_send_mbox(int ifnum, const can_frame_t *frame, mbox_t *mbox);
  * @return the @p ifnum on success
  * @return < 0 on error
  */
-int raw_can_subscribe_rx_mbox(int ifnum, struct can_filter *filter, mbox_t *mbox, void *param);
+int raw_can_subscribe_rx_mbox(int ifnum, const struct can_filter *filter,
+                              mbox_t *mbox, void *param);
 
 /**
  * @brief Unsubscribe from reception for the given CAN @p filter and @p mbox
@@ -187,7 +191,8 @@ int raw_can_subscribe_rx_mbox(int ifnum, struct can_filter *filter, mbox_t *mbox
  * @return 0 on success
  * @return < 0 on error
  */
-int raw_can_unsubscribe_rx_mbox(int ifnum, struct can_filter *filter, mbox_t *mbox, void *param);
+int raw_can_unsubscribe_rx_mbox(int ifnum, const struct can_filter *filter,
+                                mbox_t *mbox, void *param);
 #endif
 
 /**
@@ -251,7 +256,10 @@ candev_dev_t *raw_can_get_dev_by_ifnum(int ifnum);
  *                           if not set, the default value of 87.5% is used
  * @return 0 on success
  * @return 1 if the bitrate/sample_point couple can not be reached precisely but the bitrate is set
- * @return < 0  on error
+ * @retval 0    on success
+ * @retval 1    if the bitrate/sample_point couple can not be reached precisely
+ *              but the bitrate is set
+ * @retval <0   on error
  */
 int raw_can_set_bitrate(int ifnum, uint32_t bitrate, uint32_t sample_point);
 

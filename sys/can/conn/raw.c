@@ -39,7 +39,7 @@
 #define CONN_CAN_ISOTP_TIMEOUT_TX_CONF_US   (1 * US_PER_SEC)
 #endif
 
-int conn_can_raw_create(conn_can_raw_t *conn, struct can_filter *filter, size_t count,
+int conn_can_raw_create(conn_can_raw_t *conn, const struct can_filter *filter, size_t count,
                         int ifnum, int flags)
 {
     assert(conn != NULL);
@@ -71,7 +71,7 @@ int conn_can_raw_create(conn_can_raw_t *conn, struct can_filter *filter, size_t 
     return conn_can_raw_set_filter(conn, filter, count);
 }
 
-int conn_can_raw_set_filter(conn_can_raw_t *conn, struct can_filter *filter, size_t count)
+int conn_can_raw_set_filter(conn_can_raw_t *conn, const struct can_filter *filter, size_t count)
 {
     assert(conn != NULL);
     assert(filter != NULL || count == 0);
