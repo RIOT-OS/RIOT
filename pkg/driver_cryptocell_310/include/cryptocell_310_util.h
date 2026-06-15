@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -21,6 +18,10 @@
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifdef CPU_NRF52
+#  define CHECK_POINTER_DMA_ACCESS(p) ((unsigned int)p >= 0x20000000 ? (unsigned int)p < 0x40000000 : 0)
 #endif
 
 /**
@@ -45,7 +46,7 @@ void cryptocell_310_disable(void);
  *          Should be called on every const input that will be passed
  *          on to the CryptoCell peripheral.
  */
-static inline bool cryptocell_310_data_within_ram(const uint8_t* data)
+static inline bool cryptocell_310_data_within_ram(const uint8_t *data)
 {
     return ((int)data >= CPU_RAM_BASE && (int)data < CPU_RAM_BASE + CPU_RAM_SIZE);
 }

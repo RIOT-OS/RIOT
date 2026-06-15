@@ -38,7 +38,6 @@ psa_status_t psa_cipher_cbc_aes_128_encrypt(const psa_key_attributes_t *attribut
     DEBUG("RIOT AES 128 Cipher");
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_cipher_operation_t operation = psa_cipher_operation_init();
-    size_t iv_length = 0;
     size_t required_output_buf_size = PSA_CIPHER_ENCRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_AES,
                                         PSA_ALG_CBC_NO_PADDING, input_length);
 
@@ -46,14 +45,14 @@ psa_status_t psa_cipher_cbc_aes_128_encrypt(const psa_key_attributes_t *attribut
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
-    operation.iv_required = 1;
-    operation.default_iv_length = PSA_CIPHER_IV_LENGTH(attributes->type, alg);
-    *output_length = 0;
-
-    status = psa_cipher_generate_iv(&operation, output, operation.default_iv_length, &iv_length);
+    size_t iv_length = PSA_CIPHER_IV_LENGTH(attributes->type, alg);
+    /* Note: We cannot use psa_generate_iv() here, because to use that function,
+     * the operation has to be properly setup using psa_encrypt/decrypt_setup() */
+    status = psa_generate_random(output, iv_length);
     if (status != PSA_SUCCESS) {
         return status;
     }
+    *output_length = 0;
 
     return cbc_aes_common_encrypt_decrypt(&operation.backend_ctx.cipher_ctx.aes_128, key_buffer,
                                     key_buffer_size, output, input, input_length,
@@ -79,12 +78,11 @@ psa_status_t psa_cipher_cbc_aes_128_decrypt(const psa_key_attributes_t *attribut
         return PSA_ERROR_BUFFER_TOO_SMALL;
     }
 
-    operation.iv_required = 1;
-    operation.default_iv_length = PSA_CIPHER_IV_LENGTH(attributes->type, alg);
+    size_t iv_length = PSA_CIPHER_IV_LENGTH(attributes->type, alg);
     *output_length = 0;
 
     return cbc_aes_common_encrypt_decrypt(&operation.backend_ctx.cipher_ctx.aes_128, key_buffer,
-                                    key_buffer_size, input, input + operation.default_iv_length,
-                                    input_length - operation.default_iv_length, output,
+                                    key_buffer_size, input, input + iv_length,
+                                    input_length - iv_length, output,
                                     output_length, PSA_CRYPTO_DRIVER_DECRYPT);
 }
