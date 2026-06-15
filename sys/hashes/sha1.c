@@ -89,7 +89,7 @@ static void sha1_add_uncounted(sha1_context *s, uint8_t data)
 {
     uint8_t *const b = (uint8_t *) s->buffer;
 
-#ifdef __BIG_ENDIAN__
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     b[s->buffer_offset] = data;
 #else
     b[s->buffer_offset ^ 3] = data;

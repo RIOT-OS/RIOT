@@ -22,13 +22,13 @@
 
 #include "hashes/sha512_common.h"
 
-#ifdef __BIG_ENDIAN__
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 /* Copy a vector of big-endian uint32_t into a vector of bytes */
 #define be64enc_vect memcpy
 
 /* Copy a vector of bytes into a vector of big-endian uint32_t */
 #define be64dec_vect memcpy
-#else /* !__BIG_ENDIAN__ */
+#else /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 
 /*
  * Encode a length ceil(len/8) vector of (uint64_t) into a length len vector of
