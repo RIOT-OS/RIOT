@@ -45,8 +45,10 @@ extern "C" {
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "psa/crypto_values.h"
-#include "psa/crypto_types.h"
+#include "psa/algorithm.h"
+#include "psa/error.h"
+#include "psa/key/lifetime.h"
+#include "psa/cipher/types.h"
 
 /**
  * @brief   Maximum size of persistent driver data in bytes
