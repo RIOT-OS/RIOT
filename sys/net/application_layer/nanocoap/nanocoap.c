@@ -789,7 +789,7 @@ ssize_t coap_build_udp_hdr(void *buf, size_t buf_len, uint8_t type,
 {
     assert(!(type & ~0x3));
 
-    uint16_t tkl_ext;
+    uint16_t tkl_ext = 0;
     uint8_t tkl_ext_len, tkl;
 
     if (token_len > 268 && IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
