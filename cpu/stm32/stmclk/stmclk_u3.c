@@ -166,6 +166,11 @@ void stmclk_init_sysclk(void)
     RCC->AHB1ENR2 |= RCC_AHB1ENR2_PWREN;
     (void)RCC->AHB1ENR2; /* read-back */
 
+    /* select VCORE voltage scaling range 1 */
+    PWR->VOSR = (PWR->VOSR & ~(PWR_VOSR_R1EN | PWR_VOSR_R2EN)) | PWR_VOSR_R1EN;
+    for (volatile uint32_t to = 0; !(PWR->VOSR & PWR_VOSR_R1RDY) && to < 100000;
+         to++) {}
+
     /* 3) Set Flash wait states BEFORE any clock increase */
     FLASH->ACR = (FLASH->ACR & ~FLASH_ACR_LATENCY) | FLASH_WAITSTATES;
 
