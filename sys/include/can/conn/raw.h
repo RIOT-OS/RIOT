@@ -52,11 +52,11 @@ extern "C" {
  * @brief   RAW CAN connection
  */
 typedef struct conn_can_raw {
-    int ifnum;                 /**< Interface number of the can device */
-    int flags;                 /**< Config flags for that conn object */
-    size_t count;              /**< number of filters set */
-    struct can_filter *filter; /**< list of filter */
-    mbox_t mbox;               /**< mbox */
+    int ifnum;                          /**< Interface number of the can device */
+    int flags;                          /**< Config flags for that conn object */
+    size_t count;                       /**< number of filters set */
+    const struct can_filter *filter;    /**< list of filter */
+    mbox_t mbox;                        /**< mbox */
     /**
      * message queue
      */
