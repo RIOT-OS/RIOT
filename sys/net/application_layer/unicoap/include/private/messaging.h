@@ -1,0 +1,441 @@
+/*
+ * SPDX-FileCopyrightText: 2024-2026 Carl Seifert
+ * SPDX-FileCopyrightText: 2024-2026 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+#pragma once
+
+#include <stdint.h>
+
+#include "net/unicoap.h"
+
+/**
+ * @addtogroup net_unicoap_private
+ * @{
+ */
+
+/**
+ * @file
+ * @brief  Messaging API
+ * @author Carl Seifert <carl.seifert@tu-dresden.de>
+ */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* MARK: - Private Messaging API */
+/**
+ * @name Private Messaging API
+ * @{
+ */
+
+/**
+ * @brief Messaging layer result after initial treatment of an inbound message
+ *
+ * ```
+ *             /
+ *             |      Application
+ *             /          /|\
+ *     Stack  <            |   API
+ *             \          \|/
+ *             |  Request/response layer  ------+
+ *             \           ^                     \   Events
+ *                         |                     /   (truncated, expected, deferred, ...)
+ *             /  Messaging layer (driver)  <---+
+ *             |           ^
+ *             /           |
+    Driver(s) <      Parser (driver)
+ *             \           ^
+ *             |           |
+ *             \     Network (driver)
+ *
+ * Fig. 1: Inbound message path through the stack
+ * ```
+ *
+ * @remark You can always use a compile-time bitwise OR to check for multiple flags to check
+ * for generally acceptable or unacceptable messages.
+ */
+
+/**
+ * @brief Flags for sending a message communicated by the unicoap stack to the messaging driver
+ *
+ * Each time the stack wants to send a message, @ref unicoap_messaging_send will be called, which,
+ * in turn, invokes the messaging driver implementation.
+ *
+ * @warning Bits other than those defined as enum cases are RFU. Do not use them or make
+ * assumptions on their value.
+ *
+ * These flags are intended for messaging and transmission options. Messaging options may change
+ * the CoAP message flow (e.g., waiting for an acknowledgement) or transmission
+ * behavior (e.g., using an optional reliability layer of the underlying transport protocol or
+ * implementation).
+ *
+ * ### Relationship with Exchange-Layer Flags
+ * Messaging flags are provided as part of client and resource flags. The
+ * (TODO: ref) unicoap_client_flags_t and @ref unicoap_resource_flags_t are separated into
+ * - exchange flags needed for features building on top the request/response level and
+ * - messaging flags.
+ *
+ * The stack communicates only the messaging flags to the driver, in the form of this bitfield.
+ */
+typedef enum {
+
+    /**
+     * @brief Messaging flag indicating the stack wants this message to be transmitted reliably
+     *
+     * For transport protocol that already provide reliability, the messaging driver can ignore this
+     * flag. If the CoAP messaging layer of your driver supports optional reliability, such as the
+     * RFC 7252 driver, turn on this behavior if you are given this flag.
+     *
+     * ## Example
+     * The RFC 7252 (CoAP over UDP and DTLS) supports optional reliability in the form of
+     * confirmable message. In contrast to non-confirmable messages, confirmable messages
+     * elicit an acknowledgement message sent by the receiver. The sender retransmits the original
+     * confirmable message using an exponential back-of mechanism until it receives the
+     * acknowledgement.
+     */
+    UNICOAP_MESSAGING_FLAG_RELIABLE = 0x01,
+
+    /**
+     * @brief Instructs the messaging layer to keep track of potential transmissions
+     * related to this packet
+     *
+     * Usually, the exchange layer will use this flag in case the application is interested
+     * in keeping track of the outcome. In case the messaging layer needs to track messages
+     * anyway, the presence or absence of this flag must be ignored. Its absence does
+     * not mean the transmission shall not be tracked, it may however be tracked.
+     * If this flag is present, the messaging layer should track the outcome. If it generally
+     * does not support tracking transmissions or tracking is not applicable,
+     * it must ignore this flag.
+     *
+     * ## RFC 7252 Example
+     * TL;DR: Ignore for outgoing `CON`s, allocate state for outgoing `NON`s only if flag is set.
+     *
+     * In RFC 7252 transmissions, state must be kept for `CON` messages sent to wait for
+     * corresponding `ACK`s. In this case, this flag has no meaning as the RFC 7252 messaging
+     * layer will _always_ track this transmission, i.e., watch out for ACKs/RSTs.
+     *
+     * However, if a NON is sent, tracking is generally not desirable, i.e., watching out for
+     * `RST`s will occupy state memory that would need to remain for an extended period of time.
+     * Hence, the exchange layer only expresses its intent to track this transmission using this
+     * flag if the packet is a client request that has a callback associated with it.
+     * In this case, the RFC 7252 messaging layer can release these state objects when it sees
+     * the response. If there's no client callback, watching for `RST`s serves no use as
+     * there would be no way to inform the application that the transmission has failed anyway.
+     * Given an application callback, `RST`s can be used to inform the application the
+     * transmission and, hence, the exchange have failed.
+     */
+    UNICOAP_MESSAGING_FLAG_TRACK = 0x80,
+
+    /* MARK: unicoap_driver_extension_point */
+} __attribute__((__packed__)) unicoap_messaging_flags_t;
+
+/**
+ * @brief The messaging flags the stack uses when no source for messaging flags is available
+ *
+ * These flags are used if the server needs to send a 4.04 Path Not Found response,
+ * or the message is truncated.
+ */
+#define UNICOAP_MESSAGING_FLAGS_DEFAULT (0)
+
+/**
+ * @brief Argument passed to exchange-layer processing function
+ */
+typedef union {
+    /** @brief Resource */
+    const unicoap_resource_t* resource;
+    unicoap_client_memo_t* client;
+} unicoap_exchange_arg_t;
+
+/**
+ * @brief Result of @ref unicoap_exchange_preprocess
+ */
+typedef enum {
+    /**
+     * @brief The given message's code class is not valid
+     *
+     * Currently considered valid:
+     *  - `0.xx` Requests, except `0.00`
+     *  - `2.xx`, `4.xx`, and `5.xx` Responses
+     *  - `7.xx` Signals
+     */
+    UNICOAP_PREPROCESSING_ERROR_INVALID_CODE_CLASS = -0x1001,
+
+    /**
+     * @brief The given message cannot be processed due to being unsupported
+     */
+    UNICOAP_PREPROCESSING_ERROR_UNSUPPORTED = -0x1002,
+
+    /**
+     * @brief The given message is unexpected and cannot be processed
+     *
+     * There's no known client exchange running.
+     */
+    UNICOAP_PREPROCESSING_ERROR_RESPONSE_UNEXPECTED = -0x1004,
+
+    /**
+     * @brief Unexpected notification, no known client exchange (observation)
+     *
+     * There's no known client exchange, i.e., observation, running.
+     */
+    UNICOAP_PREPROCESSING_ERROR_NOTIFICATION_UNEXPECTED = -0x100c,
+
+    /**
+     * @brief The given message is truncated and can thus not be handled.
+     */
+    UNICOAP_PREPROCESSING_ERROR_TRUNCATED = -0x1010,
+
+    /**
+     * @brief The given message cannot be handled, disregarded
+     */
+    UNICOAP_PREPROCESSING_ERROR_REQUEST = -0x1020,
+
+    /**
+     * @brief The given message can be processed
+     *
+     * There's an active client exchange.
+     */
+    UNICOAP_PREPROCESSING_SUCCESS_RESPONSE = 0x1001,
+
+    /**
+     * @brief The given message can be processed
+     *
+     * There's a resource that can handle this request
+     */
+    UNICOAP_PREPROCESSING_SUCCESS_REQUEST = 0x1002,
+
+} unicoap_preprocessing_result_t;
+
+/**
+ * @brief Performs initial processing of a CoAP packet after it has been parsed
+ *
+ * The processing of a CoAP message is divided into two parts: preprocessing and the actual
+ * processing. This design was chosen to allow the messaging driver to implement networking logic
+ * in between.
+ *
+ * *Example:*
+ * The RFC 7252 messaging driver sends an ACK for every confirmable response received at the client.
+ * Waiting for the application to handle the response could delay the ACK, possibly lead to
+ * retransmissions or even open a timing-based side channel.
+ *
+ * @param[in,out] packet Packet received
+ * @param[out] flags Messaging flags associated with resource or client exchange
+ * @param[out] arg Argument to be passed to the processor
+ * @param truncated A boolean value indicating whether the given PDU was truncated, but could still
+ *                  be parsed (i.e., a valid message)
+ *
+ * @returns @ref unicoap_preprocessing_result_t
+ */
+unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* packet,
+                                                           unicoap_messaging_flags_t* flags,
+                                                           unicoap_exchange_arg_t* arg,
+                                                           bool truncated);
+
+/**
+ * @brief Processes message
+ *
+ * Call this after you have preprocessed the message using @ref unicoap_exchange_preprocess.
+ *
+ * @param[in,out] packet CoAP packet
+ * @param[in] arg Argument returned (via out parameter) by @ref unicoap_exchange_preprocess
+ *
+ * @retval Zero if processing succeeds
+ * @retval Negative error number if processing failed
+ */
+int unicoap_exchange_process(unicoap_packet_t* packet, unicoap_exchange_arg_t arg);
+
+/**
+ * @brief Internal RFC 7252 messaging inbound processor
+ * @param[in] pdu Buffer containing PDU
+ * @param size Size of PDU in bytes
+ * @param truncated A boolean value indicating whether the message has been truncated by the
+ *                  transport layer
+ * @param[in] packet Packet to process
+ *
+ * @returns Negative error number in case of a failure, zero otherwise.
+ *
+ * This function forwards the `truncated` characteristic to the exchange layer, which can handle
+ * that scenario appropriately, such as by setting a Size option.
+ *
+ * @remark While it is not advised to call private API, you might want to consider calling this
+ * function in a very constrained environment or when using `sock` is not an option.
+ */
+int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool truncated,
+                                      unicoap_packet_t* packet);
+
+/* MARK: unicoap_driver_extension_point */
+
+/**
+ * @brief Forwards packet to messaging layer and the corresponding driver for further message
+ * processing, encoding, and transport I/O.
+ *
+ * The driver needs to encode the given message into a serialized PDU and use its own means
+ * of transmitting the packet to the packet's remote endpoint.
+ *
+ * This function calls the individual driver messaging implementation.
+ *
+ * @param[in,out] packet Packet to send
+ * @param flags Messaging flags
+ * @returns Zero on success or negative error value. See @ref unicoap_messaging_send_rfc7252.
+ */
+int unicoap_messaging_send(unicoap_packet_t* packet, unicoap_messaging_flags_t flags, void* exchange);
+
+/** @brief Sends CoAP over UDP or DTLS packet, see @ref unicoap_messaging_send */
+int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_flags_t flags, void* exchange);
+
+/**
+ * @brief Generates new token
+ *
+ * Token will be @ref CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH bytes long.
+ *
+ * @param[in,out] token Buffer for generated token, must have a
+ * minimum capacity of @ref CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH
+ */
+void unicoap_generate_token(uint8_t* token);
+
+/**
+ * @brief Retrieves the part of a resource flags bitfield relevant for the messaging driver.
+ *
+ * @param resource_flags Resource flags
+ * @return Messaging flags extracted from the given bitfield
+ */
+static inline unicoap_messaging_flags_t
+_messaging_flags_resource(unicoap_resource_flags_t resource_flags)
+{
+    /* We documented other flags are RFU, hence downcasting to the messaging
+     flags bitfield width is fine here */
+    return (unicoap_messaging_flags_t)resource_flags;
+}
+
+/**
+ * @brief Retrieves the part of a client flags bitfield releveant for the messaging driver.
+ *
+ * @param client_flags Client flags
+ * @return Messaging flags extracted from the given bitfield
+ */
+static inline unicoap_messaging_flags_t _messaging_flags_client(unicoap_client_flags_t client_flags) {
+    /* We documented other flags are RFU, hence downcasting to the messaging
+     flags bitfield width is fine here */
+    return (unicoap_messaging_flags_t)client_flags;
+}
+/** @}  */
+
+/* MARK: - Private Exchange-Layer Server API */
+/**
+ * @name Server
+ * @{
+ */
+/**
+ * @brief Informs the unicoap server a new packet has been preprocessed and can be handled.
+ *
+ * This function handles block-wise transfers.
+ *
+ * @param[in,out] packet Packet that will be processed by the server
+ * @param[in,out] resource Resource
+ *
+ * @retval `0` on success
+ * @retval Negative errno on failure
+ */
+int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resource_t* resource);
+
+/**
+ * @brief Sends entire response/notification body, may be split into parts and then sent
+ *
+ * @param[in,out] packet Response/notification packet to send
+ * @param[in] resource mandatory resource which is sending this response
+ *
+ * @returns Zero on success, negative integer otherwise
+ */
+int unicoap_server_send_body(unicoap_packet_t* packet, const unicoap_resource_t* resource,
+                                      unicoap_messaging_flags_t messaging_flags);
+
+/**
+ * @brief Sends entire response body, may be split into parts and then sent
+ *
+ * @param[in,out] packet Response packet to send
+ * @param[in] resource mandatory resource which is sending this response
+ *
+ * @returns Zero on success, negative integer otherwise
+ */
+static inline int unicoap_server_send_response_body(unicoap_packet_t* packet,
+                                                    const unicoap_resource_t* resource
+) {
+    return unicoap_server_send_body(packet, resource, _messaging_flags_resource(resource->flags));
+}
+
+/**
+ * @brief Sends entire notification body, may be split into parts and then sent
+ *
+ * @param[in,out] packet Notification packet to send
+ * @param[in] resource mandatory resource which is sending this response
+ *
+ * @returns Zero on success, negative integer otherwise
+ */
+static inline int unicoap_server_send_notification_body(unicoap_packet_t* packet,
+                                                        const unicoap_resource_t* resource
+) {
+    unicoap_messaging_flags_t flags = _messaging_flags_resource(resource->flags);
+    return unicoap_server_send_body(packet, resource,
+                                    (resource->flags & UNICOAP_RESOURCE_FLAG_NOTIFY_RELIABLY)
+                                     ? flags | UNICOAP_MESSAGING_FLAG_RELIABLE
+                                     : flags & ~UNICOAP_MESSAGING_FLAG_RELIABLE);
+}
+/** @} */
+
+/* MARK: - Private exchange-layer client API */
+/**
+ * @name Client
+ * @{
+ */
+/**
+ * @brief Informs the unicoap client a new packet has been preprocessed and can be handled.
+ *
+ * This function handles block-wise transfers.
+ *
+ * @param[in,out] packet Packet that will be processed by the client
+ * @param[in,out] memo Mandatory pointer to memo variable, memo itself can be `NULL`
+ * @param[in] arg Resource
+ *
+ * @return `0` on success
+ * @returns Negative errno on failure
+ */
+int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_memo_t* memo);
+
+/**
+ * @brief Sends part of request body, such as single request in a block-wise transfer
+ *
+ * @param packet Packet to send
+ * @param memo Optional memo
+ * @param profile Optional profile, such as OSCORE security context
+ * @param client_flags Request flags
+ *
+ * @returns Zero on success or negative integer on error
+ */
+int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_memo_t* memo,
+                                     unicoap_client_flags_t client_flags);
+
+/**
+ * @brief Sends entire request body, may be split into parts and then sent
+ *
+ * @param request Request body to send
+ * @param endpoint Remote endpoint (server)
+ * @param callback Optional application callback
+ * @param callback_arg Optional argument passed to @p callback
+ * @param flags Request flags
+ * @param profile Optional profile, such as OSCORE security context
+ *
+ * @returns Zero on success, negative integer otherwise
+ */
+int unicoap_client_send_request_body(unicoap_message_t* request,
+                                     unicoap_endpoint_t* endpoint,
+                                     unicoap_callback_t callback, void* callback_arg,
+                                     unicoap_client_flags_t flags);
+/** @} */
+
+#ifdef __cplusplus
+}
+#endif
+
+/** @} */
