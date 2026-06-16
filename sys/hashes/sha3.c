@@ -213,7 +213,7 @@ static void xor64(UINT8 *x, UINT64 u)
         u >>= 8;
     }
 }
-#endif
+#endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
 
 /*
    ================================================================
@@ -224,15 +224,15 @@ static void xor64(UINT8 *x, UINT64 u)
 #define ROL64(a, offset) ((((UINT64)a) << offset) ^ (((UINT64)a) >> (64 - offset)))
 #define i(x, y) ((x) + 5 * (y))
 
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    #define readLane(x, y)          (((tKeccakLane *)state)[i(x, y)])
-    #define writeLane(x, y, lane)   (((tKeccakLane *)state)[i(x, y)]) = (lane)
-    #define XORLane(x, y, lane)     (((tKeccakLane *)state)[i(x, y)]) ^= (lane)
-#else
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     #define readLane(x, y)          load64((UINT8 *)state + sizeof(tKeccakLane) * i(x, y))
     #define writeLane(x, y, lane)   store64((UINT8 *)state + sizeof(tKeccakLane) * i(x, y), lane)
     #define XORLane(x, y, lane)     xor64((UINT8 *)state + sizeof(tKeccakLane) * i(x, y), lane)
-#endif
+#else /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+    #define readLane(x, y)          (((tKeccakLane *)state)[i(x, y)])
+    #define writeLane(x, y, lane)   (((tKeccakLane *)state)[i(x, y)]) = (lane)
+    #define XORLane(x, y, lane)     (((tKeccakLane *)state)[i(x, y)]) ^= (lane)
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 
 /**
  * Function that computes the linear feedback shift register (LFSR) used to
