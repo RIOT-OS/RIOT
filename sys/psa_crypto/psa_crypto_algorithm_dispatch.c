@@ -531,13 +531,16 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
             ret = PSA_ERROR_NOT_SUPPORTED;
             break;
         }
-#ifndef BOARD_NRF9160DK_NS
-        if ((ret == PSA_SUCCESS)){
-            /* save private key data */
+        /*
+         * For a sealed key the backend has already stored it as an opaque
+         * sealed blob (and key_bytes is NULL), so only the plaintext private
+         * key of a non-sealed local key pair is saved here.
+         */
+        if (ret == PSA_SUCCESS &&
+            PSA_KEY_LIFETIME_GET_LOCATION(attributes->lifetime) != PSA_KEY_LOCATION_LOCAL_SEALED) {
             memcpy(key_data, data, data_length);
             *key_bytes = data_length;
         }
-#endif
         return ret;
     }
     return psa_builtin_import_key(attributes, data, data_length, key_data, key_data_size, key_bytes, bits);
