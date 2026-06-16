@@ -13,7 +13,7 @@ NRF_RAM_REGION_SIZE   := 0x2000
 # === Layout inputs ===
 BL_FLASH_SIZE         ?= 0x0
 TEE_FLASH_SIZE        ?= 0x20000 # needs to be 32KB aligned
-TEE_RAM_SIZE          ?= 0x16000 # needs to be 8KB aligned 
+TEE_RAM_SIZE          ?= 0x16000 # needs to be 8KB aligned
 
 # === Derived values ===
 SECURE_FLASH_SIZE     := $(shell printf "0x%X" $$(($(BL_FLASH_SIZE) + $(TEE_FLASH_SIZE))))
