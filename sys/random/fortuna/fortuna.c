@@ -15,15 +15,19 @@
  */
 
 #include <string.h>
+
 #include "fortuna.h"
 #include "kernel_defines.h"
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
-#include "atomic_utils.h"
-#if IS_USED(MODULE_ZTIMER_MSEC)
-#include "ztimer.h"
-#else
-#include "xtimer.h"
+#if FORTUNA_CLEANUP
+#  include "crypto/helper.h"
 #endif
+#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+#  include "atomic_utils.h"
+#  if IS_USED(MODULE_ZTIMER_MSEC)
+#    include "ztimer.h"
+#  else
+#    include "xtimer.h"
+#  endif
 #endif
 
 /**
@@ -66,7 +70,7 @@ static void fortuna_reseed_finish(fortuna_state_t *state)
     fortuna_increment_counter(state);
 
 #if FORTUNA_CLEANUP
-    memset(&state->scratchpad, 0, sizeof(state->scratchpad));
+    crypto_secure_wipe(&state->scratchpad, sizeof(state->scratchpad));
 #endif
 }
 
@@ -88,7 +92,7 @@ static int fortuna_generate_blocks(fortuna_state_t *state, uint8_t *out,
 
     if (res != CIPHER_INIT_SUCCESS) {
 #if FORTUNA_CLEANUP
-        memset(&state->scratchpad, 0, sizeof(state->scratchpad));
+        crypto_secure_wipe(&state->scratchpad, sizeof(state->scratchpad));
 #endif
         return -2;
     }
@@ -103,7 +107,7 @@ static int fortuna_generate_blocks(fortuna_state_t *state, uint8_t *out,
     }
 
 #if FORTUNA_CLEANUP
-    memset(&state->scratchpad, 0, sizeof(state->scratchpad));
+    crypto_secure_wipe(&state->scratchpad, sizeof(state->scratchpad));
 #endif
 
     return 0;
@@ -134,7 +138,7 @@ static int fortuna_pseudo_random_data(fortuna_state_t *state, uint8_t *out,
 
     if (fortuna_generate_blocks(state, out, blocks)) {
 #if FORTUNA_CLEANUP
-        memset(buf, 0, sizeof(buf));
+        crypto_secure_wipe(buf, sizeof(buf));
 #endif
         return -3;
     }
@@ -145,7 +149,7 @@ static int fortuna_pseudo_random_data(fortuna_state_t *state, uint8_t *out,
     if (remaining) {
         if (fortuna_generate_blocks(state, buf, 1)) {
 #if FORTUNA_CLEANUP
-            memset(buf, 0, sizeof(buf));
+            crypto_secure_wipe(buf, sizeof(buf));
 #endif
             return -3;
         }
@@ -156,13 +160,13 @@ static int fortuna_pseudo_random_data(fortuna_state_t *state, uint8_t *out,
     /* switch to a new key to avoid later compromises of this output */
     if (fortuna_generate_blocks(state, state->gen.key, 2)) {
 #if FORTUNA_CLEANUP
-        memset(buf, 0, sizeof(buf));
+        crypto_secure_wipe(buf, sizeof(buf));
 #endif
         return -3;
     }
 
 #if FORTUNA_CLEANUP
-    memset(buf, 0, sizeof(buf));
+    crypto_secure_wipe(buf, sizeof(buf));
 #endif
 
     return 0;
@@ -258,7 +262,7 @@ int fortuna_random_data(fortuna_state_t *state, uint8_t *out, size_t bytes)
 #endif
 
 #if FORTUNA_CLEANUP
-        memset(buf, 0, sizeof(buf));
+        crypto_secure_wipe(buf, sizeof(buf));
 #endif
     }
 
