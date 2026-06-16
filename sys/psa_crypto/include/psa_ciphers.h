@@ -29,7 +29,7 @@ extern "C" {
 #include "psa/crypto_contexts.h"
 
 /**
- * @brief   Low level wrapper function to call a driver for an AES 128 CBC encryption.
+ * @brief   Low level wrapper function to call a driver for an AES 128 ECB encryption.
  *          See @ref psa_cipher_encrypt()
  *
  * @param attributes
@@ -54,7 +54,7 @@ psa_status_t psa_cipher_ecb_aes_128_encrypt(const psa_key_attributes_t *attribut
                                             size_t *output_length);
 
 /**
- * @brief   Low level wrapper function to call a driver for an AES 128 CBC decryption.
+ * @brief   Low level wrapper function to call a driver for an AES 128 ECB decryption.
  *          See @ref psa_cipher_decrypt()
  *
  * @param attributes
