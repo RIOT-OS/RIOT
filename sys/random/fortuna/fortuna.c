@@ -40,17 +40,29 @@ static inline void fortuna_increment_counter(fortuna_state_t *state)
 }
 
 /*
- * Corresponds to section 9.4.2.
+ * Corresponds to section 9.4.2 (step 1/3).
  */
-static void fortuna_reseed(fortuna_state_t *state, const uint8_t *seed,
-                           size_t length)
+static void fortuna_reseed_init(fortuna_state_t *state)
 {
     sha256_init(&state->scratchpad.sha256);
     sha256_update(&state->scratchpad.sha256, state->gen.key, 32);
-    sha256_update(&state->scratchpad.sha256, seed, length);
-    sha256_final(&state->scratchpad.sha256, state->gen.key);
+}
 
-    /* if the generator was unseeded, this will mark it as seeded */
+/*
+ * Corresponds to section 9.4.2 (step 2/3).
+ */
+static void fortuna_reseed_update(fortuna_state_t *state, const uint8_t *seed,
+                                  size_t length)
+{
+    sha256_update(&state->scratchpad.sha256, seed, length);
+}
+
+/*
+ * Corresponds to section 9.4.2 (step 3/3).
+ */
+static void fortuna_reseed_finish(fortuna_state_t *state)
+{
+    sha256_final(&state->scratchpad.sha256, state->gen.key);
     fortuna_increment_counter(state);
 
 #if FORTUNA_CLEANUP
@@ -211,7 +223,7 @@ int fortuna_init(fortuna_state_t *state)
  */
 int fortuna_random_data(fortuna_state_t *state, uint8_t *out, size_t bytes)
 {
-    uint8_t buf[FORTUNA_POOLS * 32];
+    uint8_t buf[32];
 
 #if FORTUNA_LOCK
     mutex_lock(&state->lock);
@@ -225,21 +237,21 @@ int fortuna_random_data(fortuna_state_t *state, uint8_t *out, size_t bytes)
     if (state->pools[0].len >= FORTUNA_MIN_POOL_SIZE) {
 #endif
         state->reseeds++;
-        size_t len = 0;
+
+        fortuna_reseed_init(state);
 
         for (int i = 0; i < (int) FORTUNA_POOLS; i++) {
             /* pool i is included if 2^i divides the reseed counter */
             if ((state->reseeds & (((uint32_t)1 << i) - 1)) == 0) {
-                sha256_final(&state->pools[i].ctx, &buf[len]);
+                /* pools are written to via fortuna_add_random_event */
+                sha256_final(&state->pools[i].ctx, buf);
                 sha256_init(&state->pools[i].ctx);
                 state->pools[i].len = 0;
-
-                /* append length of SHA-256 hash */
-                len += 32;
+                fortuna_reseed_update(state, buf, 32);
             }
         }
 
-        fortuna_reseed(state, buf, len);
+        fortuna_reseed_finish(state);
 
 #if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
         _reseed_timer_set(state);
@@ -310,7 +322,9 @@ int fortuna_update_seed(fortuna_state_t *state, fortuna_seed_t *inout)
 #endif
 
     /* reseed using the provided seed */
-    fortuna_reseed(state, (uint8_t *)inout, FORTUNA_SEED_SIZE);
+    fortuna_reseed_init(state);
+    fortuna_reseed_update(state, (uint8_t *)inout, FORTUNA_SEED_SIZE);
+    fortuna_reseed_finish(state);
 
 #if FORTUNA_LOCK
     mutex_unlock(&state->lock);
