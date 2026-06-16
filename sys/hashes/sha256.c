@@ -137,6 +137,9 @@ void hmac_sha256_final(hmac_context_t *ctx, void *digest)
     sha256_final(&ctx->c_in, tmp);
     sha2xx_update(&ctx->c_out, tmp, SHA256_DIGEST_LENGTH);
     sha256_final(&ctx->c_out, digest);
+
+    /* Securely wipe sensitive data */
+    crypto_secure_wipe(tmp, sizeof(tmp));
 }
 
 void hmac_sha256(const void *key, size_t key_length,
