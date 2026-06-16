@@ -29,8 +29,6 @@ static const uint8_t hash_sha256[] = {
 
 static void test_psa_hash_sha256_gen(void)
 {
-    psa_crypto_init();
-
     TEST_ASSERT_PSA_SUCCESS(psa_hash_compare(PSA_ALG_SHA_256, msg, msg_len, hash_sha256, sizeof(hash_sha256)));
 }
 

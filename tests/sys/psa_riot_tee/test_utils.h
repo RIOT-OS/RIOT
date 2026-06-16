@@ -7,15 +7,10 @@
  */
 
 /**
- * @ingroup
- * @defgroup       <name> <description>
- * @{
- *
- * @file        test_utils.h
- * @brief
+ * @file
+ * @brief       Shared declarations for the PSA RIOT TEE tests
  *
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
- *
  */
 
 #ifndef TEST_UTILS_H
@@ -48,4 +43,3 @@ Test* tests_psa_hash_sha256_gen(void);
 #endif
 
 #endif /* TEST_UTILS_H */
-/** @} */
