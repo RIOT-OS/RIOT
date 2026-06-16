@@ -29,7 +29,7 @@ extern "C" {
  * @brief   Compatibility wrapper for nRF9160
  */
 #ifdef NRF_FICR_S
-#ifdef BOARD_NRF9160DK_NS
+#ifdef NRF_TRUSTZONE_NONSECURE
 
 #if !defined(NRF_FICR_NS)
     #define NRF_FICR_NS_BASE 0x2003E000

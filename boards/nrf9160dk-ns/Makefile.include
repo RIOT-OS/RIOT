@@ -1,1 +1,5 @@
 INCLUDES += -I$(RIOTBOARD)/nrf9160dk/include
+
+# This board runs as the ARM TrustZone-M non-secure image, so shared nRF/Cortex-M
+# CPU code must select the non-secure peripheral aliases (NRF_x_NS).
+CFLAGS += -DNRF_TRUSTZONE_NONSECURE

@@ -135,7 +135,7 @@ extern uint32_t _sstack;
  *          If RIOT runs in non-secure mode, this return value must point
  *          to non-secure mode and and the non-secure exception stack.
  */
-#ifdef BOARD_NRF9160DK_NS
+#ifdef NRF_TRUSTZONE_NONSECURE
 #define EXCEPT_RET_TASK_MODE        (0xffffffbc)
 #else
 #define EXCEPT_RET_TASK_MODE        (0xfffffffd)

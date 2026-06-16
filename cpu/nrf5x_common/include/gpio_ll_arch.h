@@ -47,7 +47,7 @@ extern "C" {
 
 /* Compatibility wrapper defines for nRF9160 */
 #ifdef NRF_P0_S
-#ifdef BOARD_NRF9160DK_NS
+#ifdef NRF_TRUSTZONE_NONSECURE
 #define NRF_P0 NRF_P0_NS
 #else
 #define NRF_P0 NRF_P0_S

@@ -40,7 +40,7 @@
 #include "periph_cpu.h"
 
 #ifdef NRF_GPIOTE0_S
-#ifdef BOARD_NRF9160DK_NS
+#ifdef NRF_TRUSTZONE_NONSECURE
 #define NRF_GPIOTE NRF_GPIOTE0_NS
 #else
 #define NRF_GPIOTE NRF_GPIOTE0_S

@@ -28,7 +28,7 @@
 /* get the IRQ configuration */
 #ifdef NRF_RTC0_S
 #if (RTT_DEV == 0)
-#ifdef BOARD_NRF9160DK_NS
+#ifdef NRF_TRUSTZONE_NONSECURE
 #define DEV             NRF_RTC0_NS
 #else
 #define DEV             NRF_RTC0_S

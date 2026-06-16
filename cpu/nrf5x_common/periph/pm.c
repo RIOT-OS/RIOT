@@ -24,7 +24,7 @@
 #include "cpu.h"
 
 #ifdef NRF_POWER_S
-#ifdef BOARD_NRF9160DK_NS
+#ifdef NRF_TRUSTZONE_NONSECURE
 #define NRF_POWER NRF_POWER_NS
 #else
 #define NRF_POWER NRF_POWER_S
