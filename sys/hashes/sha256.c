@@ -48,6 +48,7 @@
 #include <string.h>
 #include <assert.h>
 
+#include "crypto/helper.h"
 #include "hashes/sha256.h"
 #include "hashes/sha2xx_common.h"
 
@@ -118,6 +119,12 @@ void hmac_sha256_init(hmac_context_t *ctx, const void *key, size_t key_length)
     sha256_init(&ctx->c_out);
     sha2xx_update(&ctx->c_out, o_key_pad, SHA256_INTERNAL_BLOCK_SIZE);
 
+    /*
+     * Securely wipe sensitive data
+     */
+    crypto_secure_wipe(k, sizeof(k));
+    crypto_secure_wipe(i_key_pad, sizeof(i_key_pad));
+    crypto_secure_wipe(o_key_pad, sizeof(o_key_pad));
 }
 
 void hmac_sha256_update(hmac_context_t *ctx, const void *data, size_t len)
