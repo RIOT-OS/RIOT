@@ -73,6 +73,11 @@ psa_status_t psa_ecc_p256r1_sign_hash(  const psa_key_attributes_t *attributes,
                                         size_t signature_size, size_t *signature_length)
 {
     (void)alg;
+
+    if (signature_size < CYS_ECC_P256_SIG_SIZE) {
+        return PSA_ERROR_BUFFER_TOO_SMALL;
+    }
+
     psa_status_t status = PSA_ERROR_NOT_SUPPORTED;
     psa_key_location_t location = PSA_KEY_LIFETIME_GET_LOCATION(attributes->lifetime);
 
@@ -93,7 +98,6 @@ psa_status_t psa_ecc_p256r1_sign_hash(  const psa_key_attributes_t *attributes,
 
     *signature_length = CYS_ECC_P256_SIG_SIZE;
 
-    (void)signature_size;
     (void)key_buffer_size;
     return PSA_SUCCESS;
 }

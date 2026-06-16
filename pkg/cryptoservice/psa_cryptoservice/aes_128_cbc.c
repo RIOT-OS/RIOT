@@ -12,7 +12,9 @@ psa_status_t psa_cipher_cbc_aes_128_encrypt(const psa_key_attributes_t *attribut
                                             size_t output_size,
                                             size_t *output_length)
 {
-    (void)key_buffer_size;
+    if (key_buffer_size != CYS_AES_128_KEY_SIZE) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
 
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     psa_cipher_operation_t operation = psa_cipher_operation_init();
@@ -49,7 +51,9 @@ psa_status_t psa_cipher_cbc_aes_128_decrypt(const psa_key_attributes_t *attribut
                                             size_t output_size,
                                             size_t *output_length)
 {
-    (void)key_buffer_size;
+    if (key_buffer_size != CYS_AES_128_KEY_SIZE) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
 
     size_t required_output_buf_size = PSA_CIPHER_DECRYPT_OUTPUT_SIZE(PSA_KEY_TYPE_AES,
                                         PSA_ALG_CBC_NO_PADDING, input_length);
@@ -57,6 +61,11 @@ psa_status_t psa_cipher_cbc_aes_128_decrypt(const psa_key_attributes_t *attribut
 
     if (output_size < required_output_buf_size) {
         return PSA_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    /* the ciphertext must at least contain the prepended IV */
+    if (input_length < iv_length) {
+        return PSA_ERROR_INVALID_ARGUMENT;
     }
 
     psa_status_t status = CYS_aes_128_cbc_decrypt(key_buffer, input, input + iv_length, input_length - iv_length, output);
