@@ -137,6 +137,8 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
     uint32_t scale, prescale;
     lpc23xx_pclk_scale(CLOCK_PCLK, freq, &scale, &prescale);
 
+    unsigned irq_state = irq_disable();
+
     /* save the callback */
     isr_ctx[tim].cb = cb;
     isr_ctx[tim].arg = arg;
@@ -149,6 +151,7 @@ int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
     dev->PR = prescale - 1;
     /* enable timer */
     dev->TCR = 1;
+    irq_restore(irq_state);
     return 0;
 }
 
