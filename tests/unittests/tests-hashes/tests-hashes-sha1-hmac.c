@@ -111,10 +111,26 @@ static void test_hashes_sha1_hmac(void)
                                            _hmac_key5, sizeof(_hmac_key5)) == 0);
 }
 
+static void test_hashes_sha1_hmac_wipe(void)
+{
+    sha1_context ctx;
+    uint8_t digest[SHA1_DIGEST_LENGTH];
+    static const uint8_t zeros_key[SHA1_BLOCK_LENGTH];
+    static const uint8_t zeros_hash[SHA1_DIGEST_LENGTH];
+
+    sha1_init_hmac(&ctx, _hmac_key1, sizeof(_hmac_key1));
+    sha1_update(&ctx, (unsigned char *)TEST1_HMAC, strlen(TEST1_HMAC));
+    sha1_final_hmac(&ctx, digest);
+
+    TEST_ASSERT(memcmp(ctx.key_buffer, zeros_key, sizeof(ctx.key_buffer)) == 0);
+    TEST_ASSERT(memcmp(ctx.inner_hash, zeros_hash, sizeof(ctx.inner_hash)) == 0);
+}
+
 Test *tests_hashes_sha1_hmac_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_hashes_sha1_hmac),
+        new_TestFixture(test_hashes_sha1_hmac_wipe),
     };
 
     EMB_UNIT_TESTCALLER(test_hashes_sha1_hmac, NULL, NULL, fixtures);
