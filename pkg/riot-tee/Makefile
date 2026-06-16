@@ -19,14 +19,17 @@ TEE_CFLAGS += -DRIOT_CRYPTOSERVICE=$(RIOTBASE)/build/pkg/cryptoservice
 TOOLCHAIN_FILE=$(PKG_BUILD_DIR)/xcompile-toolchain.cmake
 
 all: $(PKG_BUILD_DIR)/Makefile
-	"$(MAKE)" -C $(RIOTBASE)/pkg/tf-m/
 	$(MAKE) -C $(PKG_BUILD_DIR)
 	mkdir -p $(BINDIR)/riot-tee
 	cp $(PKG_BUILD_DIR)/nsc_lib.o $(BINDIR)/riot-tee
 
 LAYOUT_MK := $(RIOTBASE)/makefiles/riot-tee-layout.mk
 
+# tf-m must be prepared before cmake configures: riot-tee's CMakeLists lists the
+# cc3xx driver sources (under build/pkg/tf-m) as add_library sources, so they
+# have to exist in build/pkg/tf-m before this configure step runs.
 $(PKG_BUILD_DIR)/Makefile: $(TOOLCHAIN_FILE) $(LAYOUT_MK)
+	"$(MAKE)" -C $(RIOTBASE)/pkg/tf-m/
 	@rm -rf $(PKG_BUILD_DIR)/CMakeCache.txt
 	git -C $(PKG_SOURCE_DIR) submodule update --init --recursive
 	cmake \
