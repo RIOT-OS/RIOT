@@ -81,7 +81,7 @@ extern "C" {
 
 #if IS_USED(MODULE_FORTUNA_RESEED) || DOXYGEN
 /**
- * @brief Reseed interval in us. After this interval, the PRNG must be
+ * @brief Reseed interval in ms. After this interval, the PRNG must be
  *        reseeded. Per section 9.5.5, the recommended value is 100ms. Set to
  *        zero to disable this security feature.
  *
@@ -163,6 +163,10 @@ typedef struct {
     fortuna_generator_t gen;
     fortuna_pool_t pools[FORTUNA_POOLS];
     uint32_t reseeds;
+    union {
+        sha256_context_t sha256;
+        cipher_context_t cipher;
+    } scratchpad;
 #if FORTUNA_LOCK
     mutex_t lock;
 #endif
