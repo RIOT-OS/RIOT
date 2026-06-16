@@ -1,6 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2016 Brandon Lin
- * SPDX-FileCopyrightText: 2016-2018 Bas Stottelaar
+ * SPDX-FileCopyrightText: 2016-2026 Bas Stottelaar <basstottelaar@gmail.com>
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
