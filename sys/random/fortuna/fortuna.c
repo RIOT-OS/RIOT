@@ -45,18 +45,16 @@ static inline void fortuna_increment_counter(fortuna_state_t *state)
 static void fortuna_reseed(fortuna_state_t *state, const uint8_t *seed,
                            size_t length)
 {
-    sha256_context_t ctx;
-
-    sha256_init(&ctx);
-    sha256_update(&ctx, state->gen.key, 32);
-    sha256_update(&ctx, seed, length);
-    sha256_final(&ctx, state->gen.key);
+    sha256_init(&state->scratchpad.sha256);
+    sha256_update(&state->scratchpad.sha256, state->gen.key, 32);
+    sha256_update(&state->scratchpad.sha256, seed, length);
+    sha256_final(&state->scratchpad.sha256, state->gen.key);
 
     /* if the generator was unseeded, this will mark it as seeded */
     fortuna_increment_counter(state);
 
 #if FORTUNA_CLEANUP
-    memset(&ctx, 0, sizeof(ctx));
+    memset(&state->scratchpad, 0, sizeof(state->scratchpad));
 #endif
 }
 
@@ -67,25 +65,25 @@ static void fortuna_reseed(fortuna_state_t *state, const uint8_t *seed,
 static int fortuna_generate_blocks(fortuna_state_t *state, uint8_t *out,
                                    size_t blocks)
 {
-    cipher_context_t cipher;
-
     /* check if generator has been seeded */
     if (state->gen.counter.split.l == 0 && state->gen.counter.split.h == 0) {
         return -1;
     }
 
     /* initialize cipher based on state */
-    int res = aes_init(&cipher, state->gen.key, FORTUNA_AES_KEY_SIZE);
+    int res = aes_init(&state->scratchpad.cipher, state->gen.key,
+                       FORTUNA_AES_KEY_SIZE);
 
     if (res != CIPHER_INIT_SUCCESS) {
 #if FORTUNA_CLEANUP
-        memset(&cipher, 0, sizeof(cipher));
+        memset(&state->scratchpad, 0, sizeof(state->scratchpad));
 #endif
         return -2;
     }
 
     for (size_t i = 0; i < blocks; i++) {
-        res = aes_encrypt(&cipher, state->gen.counter.bytes, out + (i * 16));
+        res = aes_encrypt(&state->scratchpad.cipher, state->gen.counter.bytes,
+                          out + (i * 16));
         if (res != 1) {
             return -3;
         }
@@ -93,7 +91,7 @@ static int fortuna_generate_blocks(fortuna_state_t *state, uint8_t *out,
     }
 
 #if FORTUNA_CLEANUP
-    memset(&cipher, 0, sizeof(cipher));
+    memset(&state->scratchpad, 0, sizeof(state->scratchpad));
 #endif
 
     return 0;
