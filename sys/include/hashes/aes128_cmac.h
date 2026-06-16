@@ -74,6 +74,8 @@ void aes128_cmac_update(aes128_cmac_context_t *ctx,
 /**
  * @brief Finalizes the CMAC message digest
  *
+ * Internal key material will be wiped after this function is called.
+ *
  * @param[in] ctx     Pointer to the AES128 CMAC context
  * @param[out] digest Result location
  */

@@ -107,6 +107,8 @@ void sha1_init_hmac(sha1_context *ctx, const void *key, size_t key_length);
 /**
  * @brief Finalizes the SHA-1 message digest with MAC
  *
+ * Internal key material will be wiped after this function is called.
+ *
  * @param[in] ctx     Pointer to the SHA-1 context
  * @param[out] digest Result location, must be 20 byte
  */
