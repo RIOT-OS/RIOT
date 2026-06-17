@@ -42,9 +42,10 @@ Steps:
 
 1. `make -C examples/lang_support/community/micropython flash`
 2. `cd examples/lang_support/community/micropython/bin/${BOARD}/pkg/micropython`
-3. `git apply $(RIOTBASE)/pkg/micropython/patches/testing/slow_uart_writes.patch`
-4. `cd tests`
-5. `./run-tests --target pyboard --device ${PORT}`
+3. `cd tests`
+4. `python3 run-tests.py -t <port>`
+
+The default baud rate is 115200. The test will switch the interpreter into raw REPL mode for testing.
 
 ## MicroPython modules
 
