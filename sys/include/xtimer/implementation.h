@@ -173,7 +173,7 @@ static inline void xtimer_spin(xtimer_ticks32_t ticks) {
 
 static inline void xtimer_msleep(uint32_t milliseconds)
 {
-    _xtimer_tsleep64(_xtimer_ticks_from_usec64(milliseconds * US_PER_MS));
+    _xtimer_tsleep64(_xtimer_ticks_from_usec64((uint64_t)milliseconds * US_PER_MS));
 }
 
 static inline void xtimer_usleep(uint32_t microseconds)
