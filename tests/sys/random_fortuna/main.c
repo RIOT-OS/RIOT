@@ -296,11 +296,24 @@ static void test_fortuna_update_seed__update(void)
 {
     fortuna_seed_t seed;
     uint8_t out[4];
+    int unchanged;
 
     memset(seed, 0xAB, sizeof(seed));
 
     TEST_ASSERT_EQUAL_INT(0, fortuna_update_seed(&state, &seed));
     TEST_ASSERT_EQUAL_INT(0, fortuna_random_data(&state, out, sizeof(out)));
+
+    /* seed must have been overwritten with fresh random bytes */
+    unchanged = 1;
+
+    for (size_t i = 0; i < sizeof(seed); i++) {
+        if (seed[i] != 0xAB) {
+            unchanged = 0;
+            break;
+        }
+    }
+
+    TEST_ASSERT(!unchanged);
 }
 
 static void test_fortuna_update_seed__wipe(void)
