@@ -228,7 +228,7 @@ int fortuna_add_random_event(fortuna_state_t *state, const uint8_t *data,
  * shutdown).
  *
  * @param[in,out] state     PRNG state
- * @param[out]    data      pointer to output buffer for the seed
+ * @param[out]    out       pointer to output buffer for the seed
  *
  * @return                  zero on success
  */
@@ -242,7 +242,7 @@ int fortuna_write_seed(fortuna_state_t *state, fortuna_seed_t *out);
  * available.
  *
  * @param[in,out] state     PRNG state
- * @param[in,out] data      pointer to input and output buffer for the seed
+ * @param[in,out] inout     pointer to input and output buffer for the seed
  *
  * @return                  zero on success
  */
