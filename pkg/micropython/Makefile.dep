@@ -1,5 +1,6 @@
 USEMODULE += xtimer
 USEMODULE += stdin
+USEMODULE += libc_gettimeofday
 
 # MicroPython does not compile for 8 and 16 bit architectures
 FEATURES_BLACKLIST += arch_8bit arch_16bit

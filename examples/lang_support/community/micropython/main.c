@@ -71,7 +71,9 @@ int main(void)
                 }
             }
         }
-        puts("soft reboot");
+
+        /* the MicroPython test suite expects \r\n */
+        printf("soft reboot\r\n");
     }
 
     return 0;

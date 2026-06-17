@@ -48,19 +48,16 @@ void mp_riot_init(char *heap, size_t heap_size)
 
 mp_lexer_t *mp_lexer_new_from_file(qstr filename)
 {
-    puts("mp_lexer_new_from_file() stub");
     return NULL;
 }
 
 mp_import_stat_t mp_import_stat(const char *path)
 {
-    puts("mp_import_stat() stub");
     return MP_IMPORT_STAT_NO_EXIST;
 }
 
 mp_obj_t mp_builtin_open(size_t n_args, const mp_obj_t *args, mp_map_t *kwargs)
 {
-    puts("mp_builtin_open() stub");
     return mp_const_none;
 }
 

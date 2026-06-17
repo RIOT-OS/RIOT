@@ -11,6 +11,8 @@ INCLUDES += -I$(RIOTBASE)/pkg/micropython/contrib
 INCLUDES += -I$(PKGDIRBASE)/micropython
 # generated headers (genhdr/) are placed in the per-application build dir
 INCLUDES += -I$(BINDIR)/pkg-build/micropython
+# Ensure the directory exists before any other package compiles with this INCLUDES
+$(shell mkdir -p $(BINDIR)/pkg-build/micropython)
 
 # include archive
 ARCHIVES += $(BINDIR)/micropython.a
