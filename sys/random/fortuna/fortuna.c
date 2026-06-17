@@ -21,7 +21,7 @@
 #if FORTUNA_CLEANUP
 #  include "crypto/helper.h"
 #endif
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+#if IS_USED(MODULE_FORTUNA_RESEED) && FORTUNA_RESEED_INTERVAL_MS > 0
 #  include "atomic_utils.h"
 #  include "ztimer.h"
 #endif
@@ -168,7 +168,7 @@ static int fortuna_pseudo_random_data(fortuna_state_t *state, uint8_t *out,
     return 0;
 }
 
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+#if IS_USED(MODULE_FORTUNA_RESEED) && FORTUNA_RESEED_INTERVAL_MS > 0
 void _reseed_callback(void *arg)
 {
     fortuna_state_t *state = (fortuna_state_t *) arg;
@@ -201,8 +201,8 @@ int fortuna_init(fortuna_state_t *state)
         sha256_init(&state->pools[i].ctx);
     }
 
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
-    /* reseed time init if required */
+#if IS_USED(MODULE_FORTUNA_RESEED) && FORTUNA_RESEED_INTERVAL_MS > 0
+    /* reseed timer init if required */
     _reseed_timer_init(state);
 #endif
 
@@ -226,7 +226,7 @@ int fortuna_random_data(fortuna_state_t *state, uint8_t *out, size_t bytes)
 #endif
 
     /* reseed the generator if needed, before returning data */
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+#if IS_USED(MODULE_FORTUNA_RESEED) && FORTUNA_RESEED_INTERVAL_MS > 0
     if (state->pools[0].len >= FORTUNA_MIN_POOL_SIZE &&
         atomic_load_u8(&state->needs_reseed)) {
 #else
@@ -249,7 +249,7 @@ int fortuna_random_data(fortuna_state_t *state, uint8_t *out, size_t bytes)
 
         fortuna_reseed_finish(state);
 
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+#if IS_USED(MODULE_FORTUNA_RESEED) && FORTUNA_RESEED_INTERVAL_MS > 0
         _reseed_timer_set(state);
 #endif
 
