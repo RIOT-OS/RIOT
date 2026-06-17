@@ -37,13 +37,12 @@
 
 #include <stdint.h>
 
-#include "mutex.h"
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
-#  include "ztimer.h"
-#endif
-
 #include "crypto/aes.h"
 #include "hashes/sha256.h"
+#include "mutex.h"
+#if IS_USED(MODULE_FORTUNA_RESEED)
+#  include "ztimer.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,7 +54,7 @@ extern "C" {
  *       state. The recommended value is 32, as discussed in section 9.5.2.
  */
 #ifndef FORTUNA_POOLS
-#define FORTUNA_POOLS               (32U)
+#  define FORTUNA_POOLS                 (32U)
 #endif
 
 /**
@@ -64,7 +63,7 @@ extern "C" {
  *        9.5.5, a suitable value of 64 bytes is suggested.
  */
 #ifndef FORTUNA_MIN_POOL_SIZE
-#define FORTUNA_MIN_POOL_SIZE       (64U)
+#  define FORTUNA_MIN_POOL_SIZE         (64U)
 #endif
 
 /**
@@ -72,7 +71,7 @@ extern "C" {
  *        default value of 64 bytes is suggested by section 9.6.1.
  */
 #ifndef FORTUNA_SEED_SIZE
-#define FORTUNA_SEED_SIZE           (64U)
+#  define FORTUNA_SEED_SIZE             (64U)
 #endif
 
 #if IS_USED(MODULE_FORTUNA_RESEED) || DOXYGEN
@@ -83,9 +82,9 @@ extern "C" {
  *
  * @note Requires `fortuna_reseed` module.
  */
-#ifndef FORTUNA_RESEED_INTERVAL_MS
-#define FORTUNA_RESEED_INTERVAL_MS  (100)
-#endif
+#  ifndef FORTUNA_RESEED_INTERVAL_MS
+#    define FORTUNA_RESEED_INTERVAL_MS  (100)
+#  endif
 #endif
 
 /**
@@ -96,9 +95,9 @@ extern "C" {
  */
 #ifndef FORTUNA_RESEED_LIMIT
 #  if (1UL << 20) < SIZE_MAX
-#    define FORTUNA_RESEED_LIMIT    (1UL << 20)
+#    define FORTUNA_RESEED_LIMIT        (1UL << 20)
 #  else
-#    define FORTUNA_RESEED_LIMIT    (SIZE_MAX)
+#    define FORTUNA_RESEED_LIMIT        (SIZE_MAX)
 #  endif
 #endif
 
@@ -111,7 +110,7 @@ extern "C" {
  *        effects can be found at https://crypto.stackexchange.com/a/5736.
  */
 #ifndef FORTUNA_AES_KEY_SIZE
-#define FORTUNA_AES_KEY_SIZE        (16U)
+#  define FORTUNA_AES_KEY_SIZE          (16U)
 #endif
 
 /**
@@ -121,7 +120,7 @@ extern "C" {
  * @note  The implementation is not thread-safe when FORTUNA_LOCK is disabled.
  */
 #ifndef FORTUNA_LOCK
-#define FORTUNA_LOCK                (1)
+#  define FORTUNA_LOCK                  (1)
 #endif
 
 /**
@@ -129,7 +128,7 @@ extern "C" {
  *        variables to prevent leaking sensitive information.
  */
 #ifndef FORTUNA_CLEANUP
-#define FORTUNA_CLEANUP             (1)
+#  define FORTUNA_CLEANUP               (1)
 #endif
 
 /**
@@ -168,7 +167,7 @@ typedef struct {
 #if FORTUNA_LOCK
     mutex_t lock;
 #endif
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+#if IS_USED(MODULE_FORTUNA_RESEED) && FORTUNA_RESEED_INTERVAL_MS > 0
     ztimer_t reseed_timer;
     uint8_t needs_reseed;
 #endif
