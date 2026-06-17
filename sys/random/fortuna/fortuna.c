@@ -23,11 +23,7 @@
 #endif
 #if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
 #  include "atomic_utils.h"
-#  if IS_USED(MODULE_ZTIMER_MSEC)
-#    include "ztimer.h"
-#  else
-#    include "xtimer.h"
-#  endif
+#  include "ztimer.h"
 #endif
 
 /**
@@ -182,11 +178,7 @@ void _reseed_callback(void *arg)
 static void _reseed_timer_set(fortuna_state_t *state)
 {
     atomic_store_u8(&state->needs_reseed, 0);
-#if IS_USED(MODULE_ZTIMER_MSEC)
     ztimer_set(ZTIMER_MSEC, &state->reseed_timer, FORTUNA_RESEED_INTERVAL_MS);
-#else
-    xtimer_set(&state->reseed_timer, FORTUNA_RESEED_INTERVAL_MS * US_PER_MS);
-#endif
 }
 
 static void _reseed_timer_init(fortuna_state_t *state) {

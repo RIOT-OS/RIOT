@@ -39,11 +39,7 @@
 
 #include "mutex.h"
 #if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
-#if IS_USED(MODULE_ZTIMER_MSEC)
-#include "ztimer.h"
-#else
-#include "xtimer.h"
-#endif
+#  include "ztimer.h"
 #endif
 
 #include "crypto/aes.h"
@@ -171,11 +167,7 @@ typedef struct {
     mutex_t lock;
 #endif
 #if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
-#if IS_USED(MODULE_ZTIMER_MSEC)
     ztimer_t reseed_timer;
-#else
-    xtimer_t reseed_timer;
-#endif
     uint8_t needs_reseed;
 #endif
 } fortuna_state_t;
