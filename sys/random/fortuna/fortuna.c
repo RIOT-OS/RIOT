@@ -1,8 +1,17 @@
+/*
+ * SPDX-FileCopyrightText: 2016 Brandon Lin
+ * SPDX-FileCopyrightText: 2016-2018 Bas Stottelaar
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 /**
- * @brief Fortuna PRNG implementation.
+ * @{
+ * @file
  *
- * The MIT License applies to this software. See the included LICENSE.txt file
- * for more information.
+ * @brief   Fortuna CSPRNG implementation.
+ *
+ * @author  Bas Stottelaar <basstottelaar@gmail.com>
+ * @}
  */
 
 #include <string.h>
