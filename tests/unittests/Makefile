@@ -93,3 +93,10 @@ endif
 ifeq (,$(filter gnrc_sock,$(USEMODULE)))
   CFLAGS +=-I$(RIOTBASE)/sys/net/gnrc/sock/include
 endif
+
+# Don't require write access to the current folder just for the MTD test on
+# native
+ifneq (,$(filter native%,$(BOARD)))
+  MTD_NATIVE_FILENAME ?= $(BINDIR)/MEMORY.bin
+  CFLAGS += -DMTD_NATIVE_FILENAME=\"$(MTD_NATIVE_FILENAME)\"
+endif
