@@ -1,1 +1,4 @@
+# SPDX-FileCopyrightText: 2024 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
 ARCHIVES += $(BINDIR)/pkg-build/riot-tee/api/libriot_tee_api.a

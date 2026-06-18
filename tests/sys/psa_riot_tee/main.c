@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2024 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 #include "test_utils.h"
 
 int main(void)

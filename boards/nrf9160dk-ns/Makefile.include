@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2021 Mesotic SAS
+# SPDX-License-Identifier: LGPL-2.1-only
+
 INCLUDES += -I$(RIOTBOARD)/nrf9160dk/include
 
 # This board runs as the ARM TrustZone-M non-secure image, so shared nRF/Cortex-M

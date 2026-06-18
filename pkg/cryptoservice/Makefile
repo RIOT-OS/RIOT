@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
 PKG_SOURCE_LOCAL ?= $(wildcard $(HOME)/work/CryptoService)
 PKG_NAME = cryptoservice
 PKG_URL = git@github.com:janthies/CryptoService.git

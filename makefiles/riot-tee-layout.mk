@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
 # Central memory layout for nRF9160 TrustZone configuration.
 # This is the single source of truth for all flash/RAM partitioning.
 # All other files (linker scripts, SPU config, RIOT app offsets) derive from these values.

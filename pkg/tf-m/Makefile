@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
 PKG_SOURCE_LOCAL ?= $(wildcard $(HOME)/work/repos/tf-m-github)
 PKG_NAME=tf-m
 PKG_URL=git@github.com:Einhornhool/trusted-firmware-m.git

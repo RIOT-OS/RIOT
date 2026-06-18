@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 HAW Hamburg
+# SPDX-License-Identifier: LGPL-2.1-only
+
 ifdef SECURE_FLASH_SIZE
 
 SECURE_IMAGE = $(BINDIR)/pkg-build/riot-tee/riot-tee.elf
