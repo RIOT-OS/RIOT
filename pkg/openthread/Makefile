@@ -2,6 +2,7 @@ PKG_NAME=openthread
 PKG_URL=https://github.com/openthread/openthread.git
 # thread-reference-20200818
 PKG_VERSION=54b31928cf65803a9cd83c9f97061b64e465aaf7
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk

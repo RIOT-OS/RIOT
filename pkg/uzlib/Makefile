@@ -2,6 +2,7 @@ PKG_NAME=uzlib
 PKG_URL=https://github.com/pfalcon/uzlib
 # v2.9.5
 PKG_VERSION=27e4f4c15ba30c2cfc89575159e8efb50f95037e
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=zlib
 
 include $(RIOTBASE)/pkg/pkg.mk

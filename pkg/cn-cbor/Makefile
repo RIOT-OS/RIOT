@@ -2,6 +2,7 @@ PKG_NAME=cn-cbor
 PKG_URL=https://github.com/jimsch/cn-cbor
 # 1.0.0
 PKG_VERSION=821797f9421c04dc783561dc465066857839e108
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk

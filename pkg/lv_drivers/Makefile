@@ -2,6 +2,7 @@ PKG_NAME=lv_drivers
 PKG_URL=https://github.com/lvgl/lv_drivers.git
 # 8.2.0
 PKG_VERSION=49c4b178494625efefb07891d1c8b9c13914edff
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk

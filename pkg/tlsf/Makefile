@@ -1,7 +1,8 @@
 PKG_NAME=tlsf
 PKG_URL=https://github.com/mattconte/tlsf
 PKG_VERSION=a1f743ffac0305408b39e791e0ffb45f6d9bc777
-PKG_LICENSE=BSD
+PKG_LEGAL_STATUS = licensed
+PKG_LICENSE=BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
 

@@ -2,7 +2,10 @@ PKG_NAME    = c25519
 PKG_URL     = https://www.dlbeer.co.nz/downloads
 PKG_VERSION = 2017-10-05
 PKG_EXT     = zip
-PKG_LICENSE = PD
+# Yielded into public domain by the author.
+# Proof of public domain status: https://www.dlbeer.co.nz/oss/c25519.html (see "License" section)
+PKG_LEGAL_STATUS = public-domain
+PKG_LICENSE =
 PKG_SHA512  = dbfb4285837ab2ea3d99c448b22877cc7a139ccbaebb1de367e2bec1fd562fe629b389d86603915448078b8fd7e631c8fc9a7d126eb889a1ba0c17611369b190
 
 PKG_SOURCE_DIR ?= $(PKGDIRBASE)/$(PKG_NAME)

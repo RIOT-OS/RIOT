@@ -1,6 +1,7 @@
 PKG_NAME=ubasic
 PKG_URL=https://github.com/adamdunkels/ubasic
 PKG_VERSION=cc07193c231e21ecb418335aba5b199a08d4685c
+PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
