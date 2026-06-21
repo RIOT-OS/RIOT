@@ -119,6 +119,9 @@ endif
 # use efm32_coretemp if the feature is used
 USEMODULE += $(filter efm32_coretemp, $(FEATURES_USED))
 
+# use efm32_eth if the feature is used
+USEMODULE += $(filter efm32_eth, $(FEATURES_USED))
+
 # use lpc1768_eth if the feature is used
 USEMODULE += $(filter lpc1768_eth, $(FEATURES_USED))
 
