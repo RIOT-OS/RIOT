@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-
 /**
  * @ingroup     drivers_lis331dlh
  * @{
