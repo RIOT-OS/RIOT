@@ -11,7 +11,7 @@ int main(void)
 
     puts("LIS331DLH driver test");
 
-    if (lis331dlh_init(&dev, &lis331dlh_params[0]) != LIS331DLH_OK) {
+    if (lis331dlh_init(&dev, &lis331dlh_params[0]) != 0) {
         puts("LIS331DLH init failed");
         return 1;
     }
@@ -19,7 +19,7 @@ int main(void)
     puts("LIS331DLH init OK");
 
     while (1) {
-        if (lis331dlh_read(&dev, &data) == LIS331DLH_OK) {
+        if (lis331dlh_read_xyz(&dev, &data) == 0) {
             printf("X=%d Y=%d Z=%d\n", data.x, data.y, data.z);
         }
         else {
