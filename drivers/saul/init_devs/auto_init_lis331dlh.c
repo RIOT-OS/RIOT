@@ -1,4 +1,5 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Anastasiia
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
