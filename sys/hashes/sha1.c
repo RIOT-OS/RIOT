@@ -1,6 +1,7 @@
 /*
  * SPDX-FileCopyrightText: 2016 Oliver Hahm <oliver.hahm@inria.fr>
- * SPDX-FileCopyrightText: Implementation based on libcrypt that was released by Wei Dai et al. into the public domain.
+ * SPDX-FileCopyrightText: Implementation based on libcrypt that was released
+ *                         by Wei Dai et al. into the public domain.
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
