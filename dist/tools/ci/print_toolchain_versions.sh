@@ -20,6 +20,15 @@ get_cmd_version() {
     printf "%s" "$VERSION"
 }
 
+collect_issue() {
+    local issues_ref="$1"
+    local label="$2"
+    local version="$3"
+    if [ "$version" = "missing" ] || echo "$version" | grep -q '^error:'; then
+        eval "$issues_ref=\"${!issues_ref}\n- ${label}: ${version}\""
+    fi
+}
+
 get_define() {
     local cc="$1"
     local line=
@@ -199,5 +208,21 @@ for c in \
 done
 printf "%25s: %s\n" "flake8" "$(get_cmd_version "python3 -Wignore -m flake8")"
 printf "%25s: %s\n" "coccinelle" "$(get_cmd_version spatch)"
+
+ISSUES=""
+collect_issue ISSUES "python3" "$(get_cmd_version python3)"
+collect_issue ISSUES "git" "$(get_cmd_version git)"
+collect_issue ISSUES "make" "$(get_cmd_version ${MAKE})"
+collect_issue ISSUES "arm-none-eabi-gcc" "$(get_cmd_version arm-none-eabi-gcc)"
+collect_issue ISSUES "openocd" "$(get_cmd_version openocd)"
+
+if [ -n "$ISSUES" ]; then
+    printf "\n"
+    printf "%s\n" "Potential issues"
+    printf "%s\n" "----------------"
+    printf "%b\n" "$ISSUES" | sed '/^$/d'
+    printf "%s\n" ""
+    printf "%s\n" "Install the missing tools and re-run 'make print-versions' to verify."
+fi
 
 exit 0
