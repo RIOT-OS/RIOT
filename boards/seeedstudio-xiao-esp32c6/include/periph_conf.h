@@ -1,4 +1,5 @@
 /*
+ * SPDX-FileCopyrightText: 2025 Gunar Schorcht
  * SPDX-FileCopyrightText: 2026 Stepan Konoplev
  * SPDX-License-Identifier: LGPL-2.1-only
  */
@@ -63,8 +64,6 @@ extern "C" {
 #endif
 /** @} */
 
-
-
 /**
  * @name    ADC channel configuration
  * @{
@@ -114,7 +113,6 @@ extern "C" {
 #define UART0_TXD   GPIO16              /**< UART TxD pin */
 #define UART0_RXD   GPIO17              /**< UART RxD pin */
 /** @} */
-
 
 /* Include common peripheral definitions */
 #include "periph_conf_common.h"

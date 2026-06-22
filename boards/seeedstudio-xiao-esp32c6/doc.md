@@ -1,4 +1,6 @@
 <!--
+SPDX-FileCopyrightText: 2025 Gunar Schorcht
+SPDX-FileCopyrightText: 2025 David Picard
 SPDX-FileCopyrightText: 2026 Stepan Konoplev
 SPDX-License-Identifier: LGPL-2.1-only
 -->
@@ -69,23 +71,20 @@ The following table shows the default board configuration.
 This configuration can be overridden by \ref esp32_application_specific_configurations
 "application-specific configurations".
 
-<center>
-Function        | Pin                                      | Configuration
-:---------------|:-----------------------------------------|:-------------
-BUTTON0(Boot)   | GPIO9                                    | GPIO9 is a [strapping pin](https://docs.espressif.com/projects/esptool/en/latest/esp32c6/advanced-topics/boot-mode-selection.html)
-LED0            | GPIO15                                   | User LED (low active)
-ADC/LP_GPIO     | GPIO0, GPIO1, GPIO2                      | \ref esp32_adc_channels "ADC Channels"
-PWM_DEV(0)      | GPIO0, GPIO1, GPIO2                      | \ref esp32_pwm_channels "PWM Channels"
-I2C_DEV(0):SDA  | GPIO22                                   | \ref esp32_i2c_interfaces "I2C Interfaces"
-I2C_DEV(0):SCL  | GPIO23                                   | \ref esp32_i2c_interfaces "I2C Interfaces"
-SPI_DEV(0):SCK  | GPIO19                                   | \ref esp32_spi_interfaces "SPI Interfaces"
-SPI_DEV(0):MISO | GPIO20                                   | \ref esp32_spi_interfaces "SPI Interfaces"
-SPI_DEV(0):MOSI | GPIO18                                   | \ref esp32_spi_interfaces "SPI Interfaces"
-SPI_DEV(0):CS0  | GPIO21                                   | \ref esp32_spi_interfaces "SPI Interfaces"
-UART_DEV(0):TxD | GPIO16                                   | \ref esp32_uart_interfaces "UART interfaces"
-UART_DEV(0):RxD | GPIO17                                   | \ref esp32_uart_interfaces "UART interfaces"
-</center>
-<br>
+Function        | Pin                 | Configuration
+:---------------|:--------------------|:-------------
+BUTTON0(Boot)   | GPIO9               | GPIO9 is a [strapping pin](https://docs.espressif.com/projects/esptool/en/latest/esp32c6/advanced-topics/boot-mode-selection.html)
+LED0            | GPIO15              | User LED (low active)
+ADC/LP_GPIO     | GPIO0, GPIO1, GPIO2 | \ref esp32_adc_channels "ADC Channels"
+PWM_DEV(0)      | GPIO0, GPIO1, GPIO2 | \ref esp32_pwm_channels "PWM Channels"
+I2C_DEV(0):SDA  | GPIO22              | \ref esp32_i2c_interfaces "I2C Interfaces"
+I2C_DEV(0):SCL  | GPIO23              | \ref esp32_i2c_interfaces "I2C Interfaces"
+SPI_DEV(0):SCK  | GPIO19              | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(0):MISO | GPIO20              | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(0):MOSI | GPIO18              | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(0):CS0  | GPIO21              | \ref esp32_spi_interfaces "SPI Interfaces"
+UART_DEV(0):TxD | GPIO16              | \ref esp32_uart_interfaces "UART interfaces"
+UART_DEV(0):RxD | GPIO17              | \ref esp32_uart_interfaces "UART interfaces"
 
 For detailed information about the peripheral configurations of ESP32-C6
 boards, see section \ref esp32_peripherals "Common Peripherals".
@@ -106,9 +105,9 @@ switch accordingly at startup.
 To use the external U.FL antenna instead, enable the
 `CONFIG_XIAO_ESP32C6_EXT_ANTENNA` option, for example by adding
 
-​```
+```Makefile
 CFLAGS += -DCONFIG_XIAO_ESP32C6_EXT_ANTENNA=1
-​```
+```
 
 to the application's Makefile.
 
@@ -121,16 +120,14 @@ by a battery or to charge the battery through its USB port.
 
 For connecting a battery to your XIAO, it's recommend using a qualified rechargeable 3.7V lithium battery.
 When soldering the battery, carefully distinguish between the positive and negative terminals.
-The negative electrode pad should be located on the left side near the silk screen marking "D8,"
-while the positive electrode pad should be located on the right side near the silk screen marking "D5."
+The negative electrode pad should be located on the left side near the silk screen marking "D8",
+while the positive electrode pad should be located on the right side near the silk screen marking "D5".
 
 @note When the board is powered from the battery, no voltage is present on
       the 5V pin.
 
 @note The XIAO ESP32C6 has a red indicator light for battery charging, similar to the XIAO ESP32S3:
-
 The red light behavior for the XIAO ESP32C6 is as follows:
-
 - When no battery is connected:
   - The red light turns on when the Type-C cable is connected and turns off after 30 seconds.
 - When a battery is connected and the Type-C cable is plugged in for charging:
@@ -142,7 +139,7 @@ To monitor the battery voltage on the XIAO ESP32C6, similar to the XIAO ESP32C3,
 you'll need to solder a 200k resistor in a 1:2 configuration.
 This setup reduces the voltage by half, allowing safe monitoring through the A0 analog port.
 
-Sample Code can be found at [battery sample code](https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/#sample-code)
+Sample Code can be found in [The Seeed Wiki](https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/#sample-code).
 
 ### Deep Sleep and Wake-up
 

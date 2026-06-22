@@ -1,4 +1,5 @@
 /*
+ * SPDX-FileCopyrightText: 2025 David Picard
  * SPDX-FileCopyrightText: 2026 Stepan Konoplev
  * SPDX-License-Identifier: LGPL-2.1-only
  */
