@@ -1,3 +1,5 @@
-USEMODULE += stdio_usb_serial_jtag
+ifeq (,$(filter stdio_%,$(USEMODULE)))
+  USEMODULE += stdio_usb_serial_jtag
+endif
 
 USEMODULE += boards_common_esp32c6
