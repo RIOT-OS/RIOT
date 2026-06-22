@@ -4,8 +4,8 @@ This is a basic test for TMP117 driver.
 
 ## Usage
 
-This test initialize the sensor (address: 0x90) withe the following paramters:
-	
+This test initialize the sensor (address: 0x90) with the following parameters:
+
 * conversion mode : continuous
 * conversion cycle : 1s
 * averaging : 8 samples

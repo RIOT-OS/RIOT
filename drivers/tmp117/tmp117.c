@@ -15,7 +15,6 @@
  * @}
  */
 
-
 #include <assert.h>
 
 #include "tmp117.h"
@@ -25,11 +24,9 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-
 #define DEFAULT_CONFIG_VALUE    (dev->params.conv_mode << \
-    TMP117_CONV_MODE_SHIFT | dev->params.conv_cycle << \
+                                 TMP117_CONV_MODE_SHIFT | dev->params.conv_cycle << \
                                  TMP117_CONV_CYCLE_SHIFT | dev->params.avg << TMP117_AVG_SHIFT)
-
 
 static int _write_16_reg(tmp117_t *dev, uint8_t reg_addr, uint16_t value)
 {
@@ -45,7 +42,6 @@ static int _write_16_reg(tmp117_t *dev, uint8_t reg_addr, uint16_t value)
     }
 
     return TMP117_OK;
-
 }
 
 static int _read_16_reg(tmp117_t *dev, uint8_t reg_addr, uint16_t *value)
@@ -63,7 +59,6 @@ static int _read_16_reg(tmp117_t *dev, uint8_t reg_addr, uint16_t *value)
     return TMP117_OK;
 }
 
-
 int tmp117_init(tmp117_t *dev, const tmp117_params_t *params)
 {
     int status;
@@ -75,7 +70,6 @@ int tmp117_init(tmp117_t *dev, const tmp117_params_t *params)
 
     i2c_acquire(dev->params.i2c);
     uint16_t reg = 0;
-
 
     status = _read_16_reg(dev, TMP117_REG_DEVICE_ID, &reg);
 
@@ -99,7 +93,6 @@ int tmp117_init(tmp117_t *dev, const tmp117_params_t *params)
 release:
     i2c_release(dev->params.i2c);
     return res;
-
 }
 
 int tmp117_read_temperature(tmp117_t *dev, int16_t *temperature)
@@ -136,10 +129,8 @@ int tmp117_set_conversion_mode(tmp117_t *dev, tmp117_conv_mode_t mode)
         goto release;
     }
 
-
     conf_reg &= ~TMP117_CONV_MODE_MASK;
     conf_reg |= mode << TMP117_CONV_MODE_SHIFT;
-
 
     /* writing configuration register */
     if (_write_16_reg(dev, TMP117_REG_CONFIG, conf_reg)) {
@@ -149,7 +140,6 @@ int tmp117_set_conversion_mode(tmp117_t *dev, tmp117_conv_mode_t mode)
 
     dev->params.conv_mode = mode;
     res = TMP117_OK;
-
 
 release:
     i2c_release(dev->params.i2c);
@@ -168,20 +158,16 @@ int tmp117_set_conversion_cycle(tmp117_t *dev, tmp117_conv_cycle_t cycle)
         goto release;
     }
 
-
     conf_reg &= ~TMP117_CONV_CYCLE_MASK;
     conf_reg |= cycle << TMP117_CONV_CYCLE_SHIFT;
-
 
     /* writing configuration register */
     if (_write_16_reg(dev, TMP117_REG_CONFIG, conf_reg)) {
         DEBUG("[tmp117] set conv cycle - error: unable to set configuration \n");
         goto release;
     }
-
     dev->params.conv_cycle = cycle;
     res = TMP117_OK;
-
 
 release:
     i2c_release(dev->params.i2c);
@@ -200,20 +186,16 @@ int tmp117_set_averaging(tmp117_t *dev, tmp117_avg_t avg)
         goto release;
     }
 
-
     conf_reg &= ~TMP117_AVG_MASK;
     conf_reg |= avg << TMP117_AVG_SHIFT;
-
 
     /* writing configuration register */
     if (_write_16_reg(dev, TMP117_REG_CONFIG, conf_reg)) {
         DEBUG("[tmp117] set averaging - error: unable to set configuration \n");
         goto release;
     }
-
     dev->params.avg = avg;
     res = TMP117_OK;
-
 
 release:
     i2c_release(dev->params.i2c);

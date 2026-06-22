@@ -8,13 +8,13 @@
 /**
  * @defgroup    drivers_tmp117
  * @ingroup     drivers_sensors
- * @brief       Device driver parameters for TMP117 temperature sensor
+ * @brief       Driver for TMP117 temperature sensor
  *
  * @{
  * @file
+ * @brief		Registers definition for the TMP117 temperature sensor
  * @author      léo cordier <leo.cordier@univ-grenoble-alpes.fr>
  */
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,7 +35,6 @@ extern "C" {
 #define TMP117_REG_EEPROM_3          (0x08) /**< EEPROM 3 register address */
 #define TMP117_REG_DEVICE_ID         (0x0F) /**< device ID register address */
 /** @} */
-
 
 /**
  * @name    TMP117 shift mask
@@ -58,9 +57,6 @@ extern "C" {
 
 /** @} */
 
-
-
-
 /**
  * @name    TMP117 registers - default values
  * @{
@@ -69,7 +65,8 @@ extern "C" {
 #define TMP117_REG_DEVICE_ID_DEFAULT_VAL         (0x0117) /**< default value of tmp117 device id register */
 /** @} */
 
-
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */

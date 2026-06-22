@@ -17,6 +17,7 @@
 #include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
+#include "container.h"
 
 #include "tmp117.h"
 #include "tmp117_params.h"
@@ -24,7 +25,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define TMP117_NUM     (unsigned)(sizeof((tmp117_params)) / sizeof((tmp117_params)[0]))
+#define TMP117_NUM     ARRAY_SIZE(tmp117_params)
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -39,13 +40,12 @@ static saul_reg_t saul_entries[TMP117_NUM];
 /**
  * @brief   Define the number of saul info
  */
-#define TMP117_INFO_NUM    (unsigned)(sizeof((tmp117_saul_info)) / sizeof((tmp117_saul_info)[0]))
+#define TMP117_INFO_NUM     ARRAY_SIZE(tmp117_saul_info)
 
 /**
  * @brief   Reference the driver struct
  */
 extern const saul_driver_t tmp117_saul_driver;
-
 
 void auto_init_tmp117(void)
 {

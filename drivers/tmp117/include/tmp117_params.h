@@ -8,14 +8,13 @@
 /**
  * @defgroup    drivers_tmp117
  * @ingroup     drivers_sensors
- * @brief       Device driver parameters for TMP117 temperature sensor
+ * @brief       Driver for TMP117 temperature sensor
  *
  * @{
  * @file
+ * @brief		Parameters definition for the TMP117 temperature sensor
  * @author      léo cordier <leo.cordier@univ-grenoble-alpes.fr>
  */
-
-
 
 #include "board.h"
 #include "tmp117.h"
@@ -30,28 +29,27 @@ extern "C" {
  * @{
  */
 #ifndef TMP117_PARAM_I2C
-#  define TMP117_PARAM_I2C      (I2C_DEV(0))
+#  define TMP117_PARAM_I2C      (I2C_DEV(0))                /**< default TMP117 i2c peripheral */
 #endif
 #ifndef TMP117_PARAM_ADDR
-#  define TMP117_PARAM_ADDR     (0x48)
+#  define TMP117_PARAM_ADDR     (0x48)                      /**< default TMP117 i2c address */
 #endif
 #ifndef TMP117_PARAM_CONV_MODE
-#  define TMP117_PARAM_CONV_MODE    TMP117_CONV_CC
+#  define TMP117_PARAM_CONV_MODE    TMP117_CONV_CC          /**< default TMP117 conversion mode */
 #endif
 #ifndef TMP117_PARAM_CONV_CYCLE
-#  define TMP117_PARAM_CONV_CYCLE   TMP117_CONV_CYCLE_1_S
+#  define TMP117_PARAM_CONV_CYCLE   TMP117_CONV_CYCLE_1_S   /**< default TMP117 conversion cycle */
 #endif
 #ifndef TMP117_PARAM_AVG
-#  define TMP117_PARAM_AVG          TMP117_AVG_8
+#  define TMP117_PARAM_AVG          TMP117_AVG_8            /**< default TMP117 averaging */
 #endif
-
 
 #ifndef TMP117_PARAMS
 #  define TMP117_PARAMS       { .i2c = TMP117_PARAM_I2C, \
                                 .addr = TMP117_PARAM_ADDR, \
                                 .conv_mode = TMP117_PARAM_CONV_MODE, \
                                 .conv_cycle = TMP117_PARAM_CONV_CYCLE, \
-                                .avg = TMP117_PARAM_AVG }
+                                .avg = TMP117_PARAM_AVG }   /**< default TMP117 parameters */
 #endif
 /** @} */
 
@@ -82,3 +80,5 @@ static const saul_reg_info_t tmp117_saul_info[] =
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */

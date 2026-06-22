@@ -8,10 +8,11 @@
 /**
  * @defgroup    drivers_tmp117
  * @ingroup     drivers_sensors
- * @brief       Device driver for TMP117 temperature sensor
+ * @brief       Driver for TMP117 temperature sensor
  *
  * @{
  * @file
+ * @brief		Parameters definition for the TMP117 temperature sensor
  * @author      léo cordier <leo.cordier@univ-grenoble-alpes.fr>
  */
 
@@ -34,12 +35,18 @@ enum {
     TMP117_NODATA       = -ENODATA  /**< no data available */
 };
 
+/**
+ * @brief   TMP117 conversion modes
+ */
 typedef enum {
-    TMP117_CONV_CC  = 0,    /**< continous conversion mode */
+    TMP117_CONV_CC  = 0,    /**< continuous conversion mode */
     TMP117_CONV_SD  = 1,    /**< shutdown conversion mode */
     TMP117_CONV_OS  = 3     /**< one shot conversion mode */
 } tmp117_conv_mode_t;
 
+/**
+ * @brief   TMP117 conversion cycle
+ */
 typedef enum {
     TMP117_CONV_CYCLE_15_MS     = 0,    /**< 15.5ms conversion cycle */
     TMP117_CONV_CYCLE_125_MS    = 1,    /**< 125ms conversion cycle */
@@ -51,6 +58,9 @@ typedef enum {
     TMP117_CONV_CYCLE_16_S      = 7,    /**< 16s conversion cycle */
 } tmp117_conv_cycle_t;
 
+/**
+ * @brief   TMP117 averaging value
+ */
 typedef enum {
     TMP117_NO_AVG   = 0,    /**< no averaging */
     TMP117_AVG_8    = 1,    /**< 8 Averaged conversions */
@@ -58,19 +68,24 @@ typedef enum {
     TMP117_AVG_64   = 3,    /**< 64 Averaged conversions */
 } tmp117_avg_t;
 
+/**
+ * @brief   TMP117 parameters structure
+ */
 typedef struct {
-    i2c_t i2c;
-    uint8_t addr;
+    i2c_t i2c;                      /**< i2c peripheral */
+    uint8_t addr;                   /**< i2c address */
     tmp117_conv_mode_t conv_mode;   /**< conversion mode */
     tmp117_conv_cycle_t conv_cycle; /**< conversion cycle time */
     tmp117_avg_t avg;               /**< data averaging*/
 }tmp117_params_t;
 
+/**
+ * @brief   TMP117 sensor structure
+ */
 typedef struct {
     tmp117_params_t params;
     bool is_initialized;
 } tmp117_t;
-
 
 /**
  * @brief   Initializes a TMP117 device
