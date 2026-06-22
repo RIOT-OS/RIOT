@@ -34,23 +34,6 @@ static int _read_reg(const lis331dlh_t *dev, uint8_t reg, uint8_t *val)
     return res;
 }
 
-static int _read_axis(const lis331dlh_t *dev, uint8_t reg, int16_t *out)
-{
-    uint8_t low = 0;
-    uint8_t high = 0;
-
-    if (_read_reg(dev, reg, &low) != 0) {
-        return -1;
-    }
-
-    if (_read_reg(dev, reg + 1, &high) != 0) {
-        return -1;
-    }
-
-    *out = (int16_t)((high << 8) | low);
-    return 0;
-}
-
 int lis331dlh_init(lis331dlh_t *dev, const lis331dlh_params_t *params)
 {
     uint8_t who_am_i = 0;
@@ -86,13 +69,20 @@ int lis331dlh_init(lis331dlh_t *dev, const lis331dlh_params_t *params)
 
 int lis331dlh_read_xyz(const lis331dlh_t *dev, lis331dlh_data_t *data)
 {
-    if (_read_axis(dev, LIS331DLH_REG_OUT_X_L, &data->x) != 0) {
+    uint8_t raw[6];
+
+    i2c_acquire(dev->params->i2c);
+    int res = i2c_read_regs(dev->params->i2c, dev->params->addr,
+                            LIS331DLH_REG_OUT_X_L, raw, sizeof(raw), 0);
+    i2c_release(dev->params->i2c);
+
+    if (res != 0) {
         return -1;
     }
 
-    if (_read_axis(dev, LIS331DLH_REG_OUT_X_L + 2, &data->y) != 0) {
-        return -1;
-    }
+    data->x = (int16_t)((raw[1] << 8) | raw[0]);
+    data->y = (int16_t)((raw[3] << 8) | raw[2]);
+    data->z = (int16_t)((raw[5] << 8) | raw[4]);
 
-    return _read_axis(dev, LIS331DLH_REG_OUT_X_L + 4, &data->z);
+    return 0;
 }
