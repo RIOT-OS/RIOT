@@ -43,4 +43,23 @@ Build environment: GCC, CLang versions (you can run the following command from
 the RIOT base directory: make print-versions).
 -->
 
+### Declaration of AI-Tools / LLMs usage:
+
+<!--
+If AI/LLM was used please declare it here, and provide the following information:
+- which AI/LLM tool(s) were used (e.g., ChatGPT, Claude Code, GitHub Copilot, etc.)
+- to what degree these tool(s) were used in relation to the issue (e.g., finding, debugging, isolating, reproducing, documenting, etc.)
+
+Example:
+AI-Tools / LLMs that were used are:
+- Claude Code (Opus 4.8 high) for finding the issue
+- GitHub Copilot for isolating the issue in a minimal example
+- ChatGPT for issue text generation, with user review
+
+For further details, please refer to our AI policy: https://doc.riot-os.org/general/ai_policy
+-->
+
+AI-Tools / LLMs that were used are:
+- none
+
 <!-- Thanks for contributing! -->
