@@ -49,6 +49,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "compiler_hints.h"
 #include "cpu_conf.h"
 #include "kernel_defines.h"
 
@@ -105,6 +106,8 @@ int flash_strcmp(const char *ram, FLASH_ATTR const char *flash);
  *          von-Neumann architectures or Harvard architectures that also map
  *          their flash into the data address space.
  */
+ACCESS(read_only, 1, 3)
+ACCESS(read_only, 2, 3)
 int flash_strncmp(const char *ram, FLASH_ATTR const char *flash, size_t n);
 
 /**
@@ -132,6 +135,8 @@ char * flash_strcpy(char *ram, FLASH_ATTR const char *flash);
  *          von-Neumann architectures or Harvard architectures that also map
  *          their flash into the data address space.
  */
+ACCESS(write_only, 1, 3)
+ACCESS(read_only, 2, 3)
 char * flash_strncpy(char *ram, FLASH_ATTR const char *flash, size_t n);
 
 /**
@@ -177,6 +182,7 @@ int flash_vfprintf(FILE *stream, FLASH_ATTR const char *flash, va_list args);
  *          von-Neumann architectures or Harvard architectures that also map
  *          their flash into the data address space.
  */
+ACCESS(write_only, 1, 2)
 int flash_snprintf(char *buf, size_t buf_len, FLASH_ATTR const char *flash, ...);
 
 /**
@@ -186,6 +192,7 @@ int flash_snprintf(char *buf, size_t buf_len, FLASH_ATTR const char *flash, ...)
  *          von-Neumann architectures or Harvard architectures that also map
  *          their flash into the data address space.
  */
+ACCESS(write_only, 1, 2)
 int flash_vsnprintf(char *buf, size_t buf_len, FLASH_ATTR const char *flash,
                     va_list args);
 
