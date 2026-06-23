@@ -147,7 +147,7 @@ _docker_is_podman = $(shell $(DOCKER) --version | grep podman 2>/dev/null)
 # - remove container on exit
 # - set username/UID to executor
 DOCKER_USER ?= $$(id -u):$$(id -g)
-DOCKER_USER_OPT = $(if $(_docker_is_podman),--userns keep-id,--user $(DOCKER_USER))
+DOCKER_USER_OPT = $(if $(_docker_is_podman),,--user $(DOCKER_USER))
 DOCKER_RUN_FLAGS ?= --rm --tty $(DOCKER_USER_OPT)
 
 # Explicitly set the platform to what the image is expecting
