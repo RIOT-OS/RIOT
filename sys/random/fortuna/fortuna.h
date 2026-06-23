@@ -116,6 +116,8 @@ extern "C" {
 /**
  * @brief Use a mutex to lock concurrent access when running sensitive
  *        operations in multi-threaded applications.
+ *
+ * @note  The implementation is not thread-safe when FORTUNA_LOCK is disabled.
  */
 #ifndef FORTUNA_LOCK
 #  define FORTUNA_LOCK                  (1)
