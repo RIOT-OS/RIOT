@@ -8,7 +8,7 @@ ifneq (,$(filter prng_fortuna,$(USEMODULE)))
   ifneq (,$(filter fortuna_reseed,$(USEMODULE)))
     USEMODULE += atomic_utils
     USEMODULE += ztimer
-		USEMODULE += ztimer_msec
+    USEMODULE += ztimer_msec
   endif
 endif
 
