@@ -46,25 +46,19 @@ The Seeed Studio ESP32-C6 Xiao board has a reset button and a bootloader
 button, as well as a user LED on GPIO15.
 After reset, the bootloader button may be used by the application.
 
-To select the board, add the following to the make command line:
-
-```shell
-make BOARD=seeedstudio-xiao-esp32c6
-```
-
 GPIO overview:
 
 - 1 x UART
-- 1 x LP_UART  (not supported)
+- 1 x LP_UART (not supported)
 - 1 x I2C
 - 1 x LP_I2C (not supported)
 - 1 x SPI
-- 11 x GPIO(PWM only 3 defined by default)
+- 11 x GPIO (only 3 PWM channels are defined by default)
 - 7 x ADC (3 usable)
 - 1 x SDIO (not supported)
 
 The purpose for which a GPIO is used depends on which module
-or function is used first. For example, if module `periph_spi` is not used,
+or function is used first. For example, if the `periph_spi` module is not used,
 the GPIOs listed in SPI configuration can be used for other purposes.
 
 The following table shows the default board configuration.
@@ -104,29 +98,31 @@ switch accordingly at startup.
 
 To use the external U.FL antenna instead, enable the
 `CONFIG_XIAO_ESP32C6_EXT_ANTENNA` option, for example by adding
-
+the following line to the application's Makefile:
 ```Makefile
 CFLAGS += -DCONFIG_XIAO_ESP32C6_EXT_ANTENNA=1
 ```
-
-to the application's Makefile.
 
 @note The external antenna path has not been tested due to a missing external antenna.
 
 ### Battery Usage
 
-The XIAO ESP32C6 series features a built-in power management chip, allowing it to be powered independently
-by a battery or to charge the battery through its USB port.
+The XIAO ESP32C6 series features a built-in power management chip, allowing
+it to be powered independently by a battery or to charge the battery through
+its USB port.
 
-For connecting a battery to your XIAO, it's recommend using a qualified rechargeable 3.7V lithium battery.
-When soldering the battery, carefully distinguish between the positive and negative terminals.
-The negative electrode pad should be located on the left side near the silk screen marking "D8",
-while the positive electrode pad should be located on the right side near the silk screen marking "D5".
+For connecting a battery to your XIAO, it's recommend using a qualified
+rechargeable 3.7V lithium battery. When soldering the battery, carefully
+distinguish between the positive and negative terminals. The negative
+electrode pad should be located on the left side near the silk screen
+marking "D8", while the positive electrode pad should be located on the
+right side near the silk screen marking "D5".
 
 @note When the board is powered from the battery, no voltage is present on
       the 5V pin.
 
-@note The XIAO ESP32C6 has a red indicator light for battery charging, similar to the XIAO ESP32S3:
+@note The XIAO ESP32C6 has a red indicator light for battery charging,
+similar to the XIAO ESP32S3:
 The red light behavior for the XIAO ESP32C6 is as follows:
 - When no battery is connected:
   - The red light turns on when the Type-C cable is connected and turns off after 30 seconds.

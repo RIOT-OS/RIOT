@@ -106,7 +106,7 @@ extern "C" {
  *
  * Seeed Studio XIAO ESP32-C6 provides only 1 UART interface.
  *
- * UART_DEV(0) uses fixed standard configuration.<br>
+ * UART_DEV(0) uses fixed standard configuration.
  *
  * @{
  */

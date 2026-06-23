@@ -49,7 +49,7 @@ extern "C" {
  * @brief   Default button GPIO mode definition
  *
  * The pin is actually pulled up by an external resistor on the board.
- * As a consequence, the pin mode should be #GPIO_IN.
+ * As a consequence, the pin mode should be GPIO_IN.
  * The internal pull-up resistor is not enabled on purpose
  * because it would decrease the total pull-up resistor value.
  */
