@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2014 Hochschule für Angewandte Wissenschaften Hamburg (HAW)
- * Copyright (C) 2014 Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
- *               2020 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2014 Hochschule für Angewandte Wissenschaften Hamburg (HAW)
+ * SPDX-FileCopyrightText: 2014 Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
+ * SPDX-FileCopyrightText: 2020 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -92,9 +89,7 @@ static int base64_encode_base(const void *data_in, size_t data_in_size,
 {
     const uint8_t padding = urlsafe ? 0 : '=';
     const uint8_t *in = data_in;
-    const uint8_t *end = in + data_in_size;
     uint8_t *out = base64_out;
-    size_t required_size = base64_estimate_encode_size(data_in_size);
 
     if (in == NULL) {
         return BASE64_ERROR_DATA_IN;
@@ -104,6 +99,12 @@ static int base64_encode_base(const void *data_in, size_t data_in_size,
         *base64_out_size = 0;
         return BASE64_SUCCESS;
     }
+
+    if (!base64_can_estimate_encode_size(data_in_size)) {
+        return BASE64_ERROR_OVERFLOW;
+    }
+
+    size_t required_size = base64_estimate_encode_size(data_in_size);
 
     if (*base64_out_size < required_size) {
         *base64_out_size = required_size;
@@ -115,6 +116,8 @@ static int base64_encode_base(const void *data_in, size_t data_in_size,
     }
 
     *base64_out_size = required_size;
+
+    const uint8_t *end = in + data_in_size;
 
     while (in < end - 2) {
         encode_three_bytes(out, in[0], in[1], in[2], urlsafe);
@@ -225,13 +228,19 @@ static void decode_four_codes(uint8_t *out, const uint8_t *src)
 int base64_decode(const void *base64_in, size_t base64_in_size,
                   void *data_out, size_t *data_out_size)
 {
-    uint8_t *out = data_out;
     const uint8_t *in = base64_in;
-    size_t required_size = base64_estimate_decode_size(base64_in_size);
+    uint8_t *out = data_out;
 
     if (in == NULL) {
         return BASE64_ERROR_DATA_IN;
     }
+
+    if (base64_in_size == 0) {
+        *data_out_size = 0;
+        return BASE64_SUCCESS;
+    }
+
+    size_t required_size = base64_estimate_decode_size(base64_in_size);
 
     if (*data_out_size < required_size) {
         *data_out_size = required_size;
