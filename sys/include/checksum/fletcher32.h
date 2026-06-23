@@ -20,6 +20,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "compiler_hints.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,6 +48,7 @@ typedef struct {
  *
  * @return 32 bit sized hash in the interval [1..2^32-1]
  */
+ACCESS(read_only, 1, 2)
 uint32_t fletcher32(const uint16_t *buf, size_t words);
 
 /**
@@ -68,7 +71,8 @@ void fletcher32_init(fletcher32_ctx_t *ctx);
  * @param[in]       data    Data to add to the context
  * @param[in]       words   Length of the data in 16 bit words
  */
-void fletcher32_update(fletcher32_ctx_t *ctx, const void *data, size_t words);
+ACCESS(read_only, 2, 3)
+void fletcher32_update(fletcher32_ctx_t *ctx, const uint16_t *data, size_t words);
 
 /**
  * @brief Finalize the checksum operation and return the checksum
