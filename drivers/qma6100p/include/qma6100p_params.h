@@ -145,12 +145,21 @@ extern "C" {
 #endif
 
 /**
- * @def QMA6100P_PARAM_INT_PIN
- * @brief Default interrupt pin. Set to GPIO_UNDEF to disable interrupt-driven
- *        operation and use polling instead.
+ * @def QMA6100P_PARAM_INT1_PIN
+ * @brief MCU GPIO connected to the QMA6100P INT1 pin. Set to GPIO_UNDEF to
+ *        disable interrupt-driven operation on this line and use polling instead.
  */
-#ifndef QMA6100P_PARAM_INT_PIN
-#  define QMA6100P_PARAM_INT_PIN (QMA6100P_PARAM_INT_PIN_UNDEF)
+#ifndef QMA6100P_PARAM_INT1_PIN
+#  define QMA6100P_PARAM_INT1_PIN (QMA6100P_PARAM_INT_PIN_UNDEF)
+#endif
+
+/**
+ * @def QMA6100P_PARAM_INT2_PIN
+ * @brief MCU GPIO connected to the QMA6100P INT2 pin. Set to GPIO_UNDEF to
+ *        disable interrupt-driven operation on this line and use polling instead.
+ */
+#ifndef QMA6100P_PARAM_INT2_PIN
+#  define QMA6100P_PARAM_INT2_PIN (QMA6100P_PARAM_INT_PIN_UNDEF)
 #endif
 /**
  * @def QMA6100P_PARAM_INT_ACTIVE_LEVEL
@@ -192,41 +201,19 @@ extern "C" {
 #endif
 
 /**
- * @def QMA6100P_PARAM_INT_PIN_NUM
- * @brief QMA6100P interrupt output pin routed to the MCU
- */
-#if IS_ACTIVE(CONFIG_QMA6100P_INT1)
-#  define QMA6100P_PARAM_INT_PIN_NUM (QMA6100P_INT1)
-#elif IS_ACTIVE(CONFIG_QMA6100P_INT2)
-#  define QMA6100P_PARAM_INT_PIN_NUM (QMA6100P_INT2)
-#endif
-#ifndef QMA6100P_PARAM_INT_PIN_NUM
-#  define QMA6100P_PARAM_INT_PIN_NUM (QMA6100P_INT1)
-#endif
-
-/**
  * @def QMA6100P_PARAMS
  * @brief Default configuration parameters structure for QMA6100P devices
  */
 #ifndef QMA6100P_PARAMS
-#  define QMA6100P_PARAMS { .i2c = QMA6100P_PARAM_I2C,       \
-                            .addr = QMA6100P_PARAM_I2C_ADDR, \
-                            .rate = QMA6100P_PARAM_RATE,     \
-                            .range = QMA6100P_PARAM_RANGE,   \
-                            .mclk = QMA6100P_PARAM_MCLK,     \
-                            .mode = QMA6100P_PARAM_MODE }
-#endif
-
-/**
- * @def QMA6100P_INT_PARAMS
- * @brief Default interrupt configuration parameters structure for QMA6100P devices
- */
-#ifndef QMA6100P_INT_PARAMS
-#  define QMA6100P_INT_PARAMS { .interrupt_pin = QMA6100P_PARAM_INT_PIN,             \
-                                .active_level_int = QMA6100P_PARAM_INT_ACTIVE_LEVEL, \
-                                .pin_mode_int = QMA6100P_PARAM_INT_PIN_MODE,         \
-                                .interrupt_shadow = QMA6100P_PARAM_INT_SHADOW,       \
-                                .interrupt_pin_num = QMA6100P_PARAM_INT_PIN_NUM }
+#  define QMA6100P_PARAMS { .i2c = QMA6100P_PARAM_I2C,           \
+                            .addr = QMA6100P_PARAM_I2C_ADDR,     \
+                            .int1_pin = QMA6100P_PARAM_INT1_PIN, \
+                            .int2_pin = QMA6100P_PARAM_INT2_PIN, \
+                            .rate = QMA6100P_PARAM_RATE,         \
+                            .range = QMA6100P_PARAM_RANGE,       \
+                            .mclk = QMA6100P_PARAM_MCLK,         \
+                            .mode = QMA6100P_PARAM_MODE,         \
+                            .interrupt_shadow = QMA6100P_PARAM_INT_SHADOW }
 #endif
 
 /**
@@ -243,13 +230,6 @@ extern "C" {
  */
 static const qma6100p_params_t qma6100p_params[] = {
     QMA6100P_PARAMS
-};
-
-/**
- * @brief   QMA6100P defaults interrupt params if not defined for a board or application
- */
-static const qma6100p_int_params_t qma6100p_int_params[] = {
-    QMA6100P_INT_PARAMS
 };
 
 /**
