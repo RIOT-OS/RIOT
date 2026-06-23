@@ -169,7 +169,7 @@ static int fortuna_pseudo_random_data(fortuna_state_t *state, uint8_t *out,
 }
 
 #if IS_USED(MODULE_FORTUNA_RESEED) && FORTUNA_RESEED_INTERVAL_MS > 0
-void _reseed_callback(void *arg)
+static void _reseed_callback(void *arg)
 {
     fortuna_state_t *state = (fortuna_state_t *) arg;
     atomic_store_u8(&state->needs_reseed, 1);
