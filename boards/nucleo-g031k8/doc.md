@@ -61,9 +61,13 @@ to do this is to use STM32CubeProgrammer, which is available for Linux,
 Mac (x86 and ARM) and Windows on the
 [ST website](https://www.st.com/en/development-tools/stm32cubeprog.html).
 
+@warning If your program crashes after startup, it might become impossible to
+         reset and flash the microcontroller if the software reset
+         is enabled! The microcontroller would be bricked in this case.<br/>
+         You can try to power up the microcontroller with the BOOT0 pin pulled
+         high to enter the bootloader and then connect with e.g.
+         STM32CubeProgrammer to erase the flash memory. This suggestion
+         is not tested yet!
+
 @note STM32CubeProgrammer v2.22 from February 2026 has a bug that prevents
 writing the Option Bytes. Use an older or newer version instead!
-
-Alternatively, you can write a program that sets the `FLASH_OPTR` register.
-For more information, please refer to the STM32G0x1 Reference Manual
-linked in the table above.
