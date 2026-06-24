@@ -5,95 +5,16 @@
         info-boards-features-conflicting \
         #
 
-BOARDDIR_GLOBAL := $(BOARDDIR)
-USEMODULE_GLOBAL := $(USEMODULE)
-USEPKG_GLOBAL := $(USEPKG)
-FEATURES_REQUIRED_GLOBAL := $(FEATURES_REQUIRED)
-FEATURES_REQUIRED_ANY_GLOBAL := $(FEATURES_REQUIRED_ANY)
-FEATURES_OPTIONAL_GLOBAL := $(FEATURES_OPTIONAL)
-FEATURES_CONFLICT_GLOBAL := $(FEATURES_CONFLICT)
-FEATURES_CONFLICT_MSG_GLOBAL := $(FEATURES_MSG_CONFLICT)
-DISABLE_MODULE_GLOBAL := $(DISABLE_MODULE)
-DEFAULT_MODULE_GLOBAL := $(DEFAULT_MODULE)
-FEATURES_BLACKLIST_GLOBAL := $(FEATURES_BLACKLIST)
-
-define board_unsatisfied_features
-  # BOARD might have been overwritten by `board_alias.ink.mk`
-  # To be able to re-set it here, we need to use override again
-  override BOARD    := $(1)
-  USEMODULE         := $(USEMODULE_GLOBAL)
-  USEPKG            := $(USEPKG_GLOBAL)
-  DISABLE_MODULE    := $(DISABLE_MODULE_GLOBAL)
-  DEFAULT_MODULE    := $(DEFAULT_MODULE_GLOBAL)
-  FEATURES_REQUIRED := $(FEATURES_REQUIRED_GLOBAL)
-  FEATURES_REQUIRED_ANY := $(FEATURES_REQUIRED_ANY_GLOBAL)
-  FEATURES_OPTIONAL := $(FEATURES_OPTIONAL_GLOBAL)
-  FEATURES_CONFLICT := $(FEATURES_CONFLICT_GLOBAL)
-  FEATURES_CONFLICT_MSG := $(FEATURES_CONFLICT_MSG_GLOBAL)
-  FEATURES_BLACKLIST:= $(FEATURES_BLACKLIST_GLOBAL)
-
-  # Find matching board folder
-  BOARDDIR := $$(word 1,$$(foreach dir,$$(BOARDSDIRS),$$(wildcard $$(dir)/$$(BOARD)/.)))
-
-  # Remove board specific variables set by Makefile.features/Makefile.dep
-  FEATURES_PROVIDED :=
-  FEATURES_USED :=
-
-  # Undefine variables that must not be defined when starting.
-  # Some are sometime set as `?=`
-  undefine CPU
-  undefine CPU_MODEL
-  undefine CPU_ARCH
-  undefine CPU_CORE
-  undefine CPU_FAM
-  undefine RUST_TARGET
-  undefine BOARD_VERSION
-
-  include $(RIOTBASE)/Makefile.features
-  # always select provided architecture features
-  FEATURES_REQUIRED += $$(filter arch_%,$$(FEATURES_PROVIDED))
-  # always select CPU core features
-  FEATURES_REQUIRED += $$(filter cpu_core_%,$$(FEATURES_PROVIDED))
-  # FEATURES_USED must be populated first in this case so that dependency
-  # resolution can take optional features into account during the first pass.
-  # Also: This allows us to skip resolution if already a missing feature is
-  # detected
-  include $(RIOTMAKE)/features_check.inc.mk
-  ifneq (,$$(FEATURES_MISSING))
-    # Skip full dependency resolution, as even without optional modules features
-    # and architecture specific limitations already some features are missing
-    BOARDS_FEATURES_MISSING += "$$(BOARD) $$(FEATURES_MISSING)"
-    BOARDS_WITH_MISSING_FEATURES += $$(BOARD)
-  else
-    # add default modules
-    include $(RIOTMAKE)/defaultmodules_regular.inc.mk
-    USEMODULE += $$(filter-out $$(DISABLE_MODULE),$$(DEFAULT_MODULE))
-
-    include $(RIOTMAKE)/dependency_resolution.inc.mk
-
-    ifneq (,$$(FEATURES_MISSING))
-      BOARDS_FEATURES_MISSING += "$$(BOARD) $$(FEATURES_MISSING)"
-      BOARDS_WITH_MISSING_FEATURES += $$(BOARD)
-    endif
-
-    ifneq (,$$(FEATURES_USED_BLACKLISTED))
-      BOARDS_FEATURES_USED_BLACKLISTED += "$$(BOARD) $$(FEATURES_USED_BLACKLISTED)"
-      BOARDS_WITH_BLACKLISTED_FEATURES += $$(BOARD)
-    endif
-
-    ifneq (,$$(FEATURES_CONFLICTING))
-      BOARDS_FEATURES_CONFLICTING += "$$(BOARD) $$(FEATURES_CONFLICTING)"
-      BOARDS_WITH_CONFLICTING_FEATURES += $$(BOARD)
-    endif
+ifneq (,$(filter info-boards-collect, $(MAKECMDGOALS)))
+  ifneq (1,$(INFO_OVERRIDE))
+    $(error info-boards-collect should not be called directly!)
   endif
-
-  ifneq (,$$(DEPENDENCY_DEBUG))
-    $$(call file_save_dependencies_variables,dependencies_info-boards-supported)
-  endif
-endef
+endif
 
 BOARDS := $(filter $(if $(BOARDS_SUPPORTED), $(BOARDS_SUPPORTED), %), $(BOARDS))
 BOARDS := $(filter-out $(BOARDS_UNSUPPORTED), $(BOARDS))
+
+BOARD_CANDIDATES := $(addprefix .board-result-,$(BOARDS))
 
 BOARDS_WITH_MISSING_FEATURES :=
 BOARDS_FEATURES_MISSING :=
@@ -102,16 +23,67 @@ BOARDS_FEATURES_USED_BLACKLISTED :=
 BOARDS_FEATURES_CONFLICTING :=
 BOARDS_WITH_CONFLICTING_FEATURES :=
 
-$(foreach board,$(BOARDS),$(eval $(call board_unsatisfied_features,$(board))))
-BOARDS := $(filter-out $(BOARDS_WITH_MISSING_FEATURES) \
-                       $(BOARDS_WITH_BLACKLISTED_FEATURES) \
-                       $(BOARDS_WITH_CONFLICTING_FEATURES), $(BOARDS))
+ifneq (, $(filter info-boards-collect,$(MAKECMDGOALS)))
+  # Find matching board folder
+  BOARDDIR := $(word 1,$(foreach dir,$(BOARDSDIRS),$(wildcard $(dir)/$(BOARD)/.)))
+
+  # Remove board specific variables set by Makefile.features/Makefile.dep
+  FEATURES_PROVIDED :=
+  FEATURES_USED :=
+
+  include $(RIOTBASE)/Makefile.features
+  # always select provided architecture features
+  FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
+  # always select CPU core features
+  FEATURES_REQUIRED += $(filter cpu_core_%,$(FEATURES_PROVIDED))
+  # FEATURES_USED must be populated first in this case so that dependency
+  # resolution can take optional features into account during the first pass.
+  # Also: This allows us to skip resolution if already a missing feature is
+  # detected
+  include $(RIOTMAKE)/features_check.inc.mk
+  ifneq (,$(FEATURES_MISSING))
+    # Skip full dependency resolution, as even without optional modules features
+    # and architecture specific limitations already some features are missing
+    BOARDS_FEATURES_MISSING += "$(BOARD) $(FEATURES_MISSING)"
+    BOARDS_WITH_MISSING_FEATURES += $(BOARD)
+  else
+    # add default modules
+    include $(RIOTMAKE)/defaultmodules_regular.inc.mk
+    USEMODULE += $(filter-out $(DISABLE_MODULE),$(DEFAULT_MODULE))
+
+    include $(RIOTMAKE)/dependency_resolution.inc.mk
+
+    ifneq (,$(FEATURES_MISSING))
+      BOARDS_FEATURES_MISSING += "$(BOARD) $(FEATURES_MISSING)"
+      BOARDS_WITH_MISSING_FEATURES += $(BOARD)
+    endif
+
+    ifneq (,$(FEATURES_USED_BLACKLISTED))
+      BOARDS_FEATURES_USED_BLACKLISTED += "$(BOARD) $(FEATURES_USED_BLACKLISTED)"
+      BOARDS_WITH_BLACKLISTED_FEATURES += $(BOARD)
+    endif
+
+    ifneq (,$(FEATURES_CONFLICTING))
+      BOARDS_FEATURES_CONFLICTING += "$(BOARD) $(FEATURES_CONFLICTING)"
+      BOARDS_WITH_CONFLICTING_FEATURES += $(BOARD)
+    endif
+  endif
+
+  ifneq (,$(DEPENDENCY_DEBUG))
+    $(call file_save_dependencies_variables,dependencies_info-boards-supported)
+  endif
+
+  BOARDS := $(filter-out $(BOARDS_WITH_MISSING_FEATURES) \
+                         $(BOARDS_WITH_BLACKLISTED_FEATURES) \
+                         $(BOARDS_WITH_CONFLICTING_FEATURES), $(BOARD))
+endif
 
 info-buildsizes-diff: SHELL=bash
 info-buildsizes-diff:
 	@echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
 	COMMON_BOARDS=(); ONLY_OLD=(); ONLY_NEW=(); \
-	for board in $(BOARDS); do \
+	SUPPORTED_BOARDS="$($(MAKE) info-boards-supported --no-print-directory -j)"; \
+	for board in $(SUPPORTED_BOARDS); do \
 	  if [[ -e "$${OLDBIN}/$${board}" && -e "$${NEWBIN}/$${board}" ]]; then \
 	    COMMON_BOARDS+=($${board}); \
 	  elif [[ -e "$${OLDBIN}/$${board}" ]]; then \
@@ -148,21 +120,55 @@ info-buildsizes-diff:
 	  $(COLOR_ECHO) "$(COLOR_YELLOW)Boards in NEWBIN without complementary OLDBIN: $${ONLY_NEW[*]}$(COLOR_RESET)"; \
 	fi;
 
-info-boards-supported:
-	@echo $(BOARDS)
 
-info-boards-features-missing:
-	@for f in $(BOARDS_FEATURES_MISSING); do echo $${f}; done | column -t
+# Temporary files that contain the information gathered by the submake
+# processes started for each individual board. These reside in the `bin/`
+# subdirectory so they are removed by `make (dist)clean` and ignored by git.
+SUPPORT_FILES := bin/.INFO_BOARDS_SUPPORTED
+SUPPORT_FILES += bin/.INFO_BOARDS_FEATURES_MISSING
+SUPPORT_FILES += bin/.INFO_BOARDS_FEATURES_BLACKLISTED
+SUPPORT_FILES += bin/.INFO_BOARDS_FEATURES_CONFLICTING
 
-info-boards-features-blacklisted:
-	@for f in $(BOARDS_FEATURES_USED_BLACKLISTED); do echo $${f}; done | column -t
+.PHONY: $(SUPPORT_FILES)
+$(SUPPORT_FILES):
+	@rm -rf $@
+	@mkdir -p bin/
+	@touch $@
 
-info-boards-features-conflicting:
-	@for f in $(BOARDS_FEATURES_CONFLICTING); do echo $${f}; done | column -t
+.board-result-%:
+	@$(MAKE) BOARD=$* INFO_OVERRIDE=1 info-boards-collect --no-print-directory
+
+info-boards-supported: bin/.INFO_BOARDS_SUPPORTED $(BOARD_CANDIDATES)
+	@cat bin/.INFO_BOARDS_SUPPORTED | sort | xargs echo
+
+info-boards-features-missing: bin/.INFO_BOARDS_FEATURES_MISSING $(BOARD_CANDIDATES)
+	@cat bin/.INFO_BOARDS_FEATURES_MISSING | sort | column -t
+
+info-boards-features-blacklisted: bin/.INFO_BOARDS_FEATURES_BLACKLISTED $(BOARD_CANDIDATES)
+	@cat bin/.INFO_BOARDS_FEATURES_BLACKLISTED | sort | column -t
+
+info-boards-features-conflicting: bin/.INFO_BOARDS_FEATURES_CONFLICTING $(BOARD_CANDIDATES)
+	@cat bin/.INFO_BOARDS_FEATURES_CONFLICTING | sort | column -t
 
 generate-Makefile.ci:
 	@$(RIOTTOOLS)/insufficient_memory/create_makefile.ci.sh
 
 
-# Reset BOARDSDIR so unchanged for makefiles included after
-BOARDDIR := $(BOARDDIR_GLOBAL)
+# This target is run as a submake command by the `.board-result-%` for each
+# board in a new environment, since the evaluation of the features is only done
+# for one board at a time and the results are saved in temporary files.
+# These files are then printed by the `info-boards-*` targets.
+PHONY: info-boards-collect
+info-boards-collect:
+	@if [ ! -z '$(BOARDS)' ]; then \
+	  echo '$(BOARDS) ' >> bin/.INFO_BOARDS_SUPPORTED; \
+	fi
+	@if [ ! -z '$(BOARDS_FEATURES_MISSING)' ]; then \
+	  echo $(BOARDS_FEATURES_MISSING) >> bin/.INFO_BOARDS_FEATURES_MISSING; \
+	fi;
+	@if [ ! -z '$(BOARDS_FEATURES_USED_BLACKLISTED)' ]; then \
+	  echo $(BOARDS_FEATURES_USED_BLACKLISTED) >> bin/.INFO_BOARDS_FEATURES_BLACKLISTED; \
+	fi;
+	@if [ ! -z '$(BOARDS_FEATURES_CONFLICTING)' ]; then \
+	  echo $(BOARDS_FEATURES_CONFLICTING) >> bin/.INFO_BOARDS_FEATURES_CONFLICTING; \
+	fi;
