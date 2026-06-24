@@ -1,4 +1,11 @@
 INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 
+include $(RIOTBASE)/makefiles/utils/ansi.mk
+include $(RIOTBASE)/makefiles/color.inc.mk
+
+MSG="Warning: This board is deprecated and the support for it will be removed"\
+    "after the 2026.07 Release."
+$(shell $(COLOR_ECHO) "$(COLOR_YELLOW)$(MSG)$(COLOR_RESET)" 1>&2)
+
 # Setup of programmer and serial is shared between STM32 based boards
 include $(RIOTMAKE)/boards/stm32.inc.mk
