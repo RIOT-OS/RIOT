@@ -25,7 +25,6 @@
 #include <string.h>
 
 #include "bitfield.h"
-#include "evtimer_msg.h"
 #include "sched.h"
 #include "mutex.h"
 #include "net/eui64.h"
@@ -277,10 +276,7 @@ uint32_t _evtimer_lookup(const void *ctx, uint16_t type);
  *
  * @param[in] event Representation of the event.
  */
-static inline void _evtimer_del(evtimer_msg_event_t *event)
-{
-    evtimer_del(&_nib_evtimer, &event->event);
-}
+void _evtimer_del(evtimer_msg_event_t *event);
 
 /**
  * @brief   Adds an event to the event timer
@@ -289,22 +285,21 @@ static inline void _evtimer_del(evtimer_msg_event_t *event)
  * @param[in] type      [Type of the event](@ref net_gnrc_ipv6_nib_msg).
  * @param[in,out] event Representation of the event.
  * @param[in] offset    Offset in milliseconds to the event.
+ * @param[in] stype     @p type as a string
  */
-static inline void _evtimer_add(void *ctx, int16_t type,
-                                evtimer_msg_event_t *event, uint32_t offset)
-{
-#ifdef MODULE_GNRC_IPV6
-    kernel_pid_t target_pid = gnrc_ipv6_pid;
-#else
-    kernel_pid_t target_pid = KERNEL_PID_LAST;  /* just for testing */
-#endif
-    _evtimer_del(event);
-    event->event.next = NULL;
-    event->event.offset = offset;
-    event->msg.type = type;
-    event->msg.content.ptr = ctx;
-    evtimer_add_msg(&_nib_evtimer, event, target_pid);
-}
+void _evtimer_add_dbg(void *ctx, int16_t type,
+                      evtimer_msg_event_t *event, uint32_t offset,
+                      const char *stype);
+
+/**
+ * @brief   Use this macro instead of @ref _evtimer_add_dbg
+ *
+ * @param[in] ctx       The context of the event
+ * @param[in] type      [Type of the event](@ref net_gnrc_ipv6_nib_msg).
+ * @param[in,out] event Representation of the event.
+ * @param[in] offset    Offset in milliseconds to the event.
+ */
+#define _evtimer_add(ctx, type, event, offset) _evtimer_add_dbg(ctx, type, event, offset, #type)
 
 /**
  * @brief   Initializes NIB internally

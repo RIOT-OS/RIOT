@@ -32,6 +32,9 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+extern void _handle_rtr_timeout(_nib_dr_entry_t *router);
+extern void _handle_search_rtr(gnrc_netif_t *netif);
+
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
@@ -65,7 +68,7 @@ void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
     gnrc_ndp_nbr_sol_send(tgt, netif, src, dst, ext_opt);
 }
 
-void _snd_uc_ns(_nib_onl_entry_t *nbr, bool reset)
+void _snd_uc_ns(_nib_onl_entry_t *nbr, bool reset, const ipv6_addr_t *src)
 {
     gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(nbr));
 
@@ -81,7 +84,7 @@ void _snd_uc_ns(_nib_onl_entry_t *nbr, bool reset)
 #else   /* CONFIG_GNRC_IPV6_NIB_ARSM */
     (void)reset;
 #endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
-    _snd_ns(&nbr->ipv6, netif, NULL, &nbr->ipv6);
+    _snd_ns(&nbr->ipv6, netif, src, &nbr->ipv6);
     _evtimer_add(nbr, GNRC_IPV6_NIB_SND_UC_NS, &nbr->nud_timeout,
                  netif->ipv6.retrans_time);
     gnrc_netif_release(netif);
@@ -110,7 +113,7 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
          * see https://tools.ietf.org/html/rfc6775#section-6.3 */
         !_rtr_sol_on_6lr(netif, icmpv6)) {
         DEBUG("nib: L2 address differs. Setting STALE\n");
-        evtimer_del(&_nib_evtimer, &nce->nud_timeout.event);
+        _evtimer_del(&nce->nud_timeout);
         _set_nud_state(netif, nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
@@ -223,12 +226,18 @@ void _handle_snd_ns(_nib_onl_entry_t *nbr)
                 _nib_nc_remove(nbr);
                 return;
             }
-            _probe_nbr(nbr, false);
+            _probe_nbr(nbr, false, NULL);
             break;
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_PROBE:
             if (nbr->ns_sent >= NDP_MAX_UC_SOL_NUMOF) {
                 gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(nbr));
                 _set_unreachable(netif, nbr);
+                /* one of our DR became unreachable, so try find a new one */
+                if (_nib_drl_get(&nbr->ipv6, _nib_onl_get_if(nbr))) {
+                    _handle_rtr_timeout(_nib_drl_get(&nbr->ipv6, _nib_onl_get_if(nbr)));
+                    netif->ipv6.rs_sent = 0;
+                    _handle_search_rtr(netif);
+                }
             }
             /* intentionally falls through */
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE:
@@ -243,7 +252,7 @@ void _handle_snd_ns(_nib_onl_entry_t *nbr)
                  */
                 (_get_ar_state(nbr) == GNRC_IPV6_NIB_NC_INFO_AR_STATE_GC) ||
                 (nbr->info & GNRC_IPV6_NIB_NC_INFO_IS_ROUTER)) {
-                _probe_nbr(nbr, false);
+                _probe_nbr(nbr, false, NULL);
             }
             break;
         default:
@@ -266,14 +275,14 @@ void _handle_state_timeout(_nib_onl_entry_t *nbr)
             _set_nud_state(netif, nbr, new_state);
             if (new_state == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_PROBE) {
                 DEBUG("nib: Timeout DELAY state\n");
-                _probe_nbr(nbr, true);
+                _probe_nbr(nbr, true, NULL);
             }
             break;
         }
     }
 }
 
-void _probe_nbr(_nib_onl_entry_t *nbr, bool reset)
+void _probe_nbr(_nib_onl_entry_t *nbr, bool reset, const ipv6_addr_t *src)
 {
     const uint16_t state = _get_nud_state(nbr);
 
@@ -285,7 +294,8 @@ void _probe_nbr(_nib_onl_entry_t *nbr, bool reset)
             break;
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE:
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE: {
-                gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(nbr));
+            gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(nbr));
+            if (!gnrc_netif_is_6ln(netif)) {
                 uint32_t next_ns = _evtimer_lookup(nbr,
                                                    GNRC_IPV6_NIB_SND_MC_NS);
 
@@ -328,10 +338,54 @@ void _probe_nbr(_nib_onl_entry_t *nbr, bool reset)
                 }
                 gnrc_netif_release(netif);
             }
+            else if (!(_get_ar_state(nbr) & GNRC_IPV6_NIB_NC_INFO_AR_STATE_REGISTERED)) {
+                /* The UNREACHABLE state is an extension when multicast NS are sent.
+                   In sixlowpan one does not send multicast NS, so just delete
+                   the neighbor cache entry unless it is supposed to be deleted by
+                   registration timeout */
+                _nib_nc_remove(nbr);
+            }
             break;
+        }
+        case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_DELAY:
+            /* _probe_nbr() will be called from _handle_state_timeout() soon. */
+            break;
+        case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE:
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_PROBE:
+        case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE:
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+        {
+            gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(nbr));
+            gnrc_netif_acquire(netif);
+            _nib_dr_entry_t *dr = _nib_drl_get(NULL, _nib_onl_get_if(nbr));
+            /* An ARO will be added in _snd_ns() */
+            if (dr && gnrc_netif_is_6ln(netif) && dr->next_hop == nbr) {
+                int idx;
+                if (src && (idx = gnrc_netif_ipv6_addr_idx(netif, src)) >= 0) {
+                    src = &netif->ipv6.addrs[idx];
+                }
+                else {
+                    /* go through offlink entries
+                       and pick the one for which the next hop is the default router */
+                    _nib_offl_entry_t *offl = NULL;
+                    while ((offl = _nib_offl_iter(offl))) {
+                        /* find the best matching source address towards the offlink destination
+                           and pick this as source address to send the NS from
+                           and renew address registration */
+                        if (ipv6_addr_is_unspecified(&offl->next_hop->ipv6)) {
+                            /* Unspecified means default router */
+                            src = gnrc_netif_ipv6_addr_best_src(netif, &offl->pfx, false);
+                            break;
+                        }
+                    }
+                }
+            }
+            gnrc_netif_release(netif);
+        }
+#endif
+            /* fall through */
         default:
-            _snd_uc_ns(nbr, reset);
+            _snd_uc_ns(nbr, reset, src);
             break;
     }
 }
@@ -373,7 +427,7 @@ void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
             DEBUG("nib: Set %s%%%u to STALE\n",
                   ipv6_addr_to_str(addr_str, &nce->ipv6, sizeof(addr_str)),
                   (unsigned)netif->pid);
-            evtimer_del(&_nib_evtimer, &nce->nud_timeout.event);
+            _evtimer_del(&nce->nud_timeout);
             _set_nud_state(netif, nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
         }
         if (_oflag_set((ndp_nbr_adv_t *)icmpv6) ||
@@ -402,7 +456,7 @@ void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
             !_sflag_set((ndp_nbr_adv_t *)icmpv6) &&
             (_get_nud_state(nce) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE) &&
             _tl2ao_changes_nce(nce, tl2ao, netif, l2addr_len)) {
-            evtimer_del(&_nib_evtimer, &nce->nud_timeout.event);
+            _evtimer_del(&nce->nud_timeout);
             _set_nud_state(netif, nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
         }
     }

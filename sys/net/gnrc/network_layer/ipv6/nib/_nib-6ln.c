@@ -22,6 +22,7 @@
 
 #include "_nib-6ln.h"
 #include "_nib-6lr.h"
+#include "_nib-slaac.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -116,6 +117,7 @@ uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
               aro->eui64.uint8[3], aro->eui64.uint8[4], aro->eui64.uint8[5],
               aro->eui64.uint8[6], aro->eui64.uint8[7]);
         if (icmpv6->type == ICMPV6_NBR_ADV) {
+            assert(nce);
             if (!_is_iface_eui64(netif, &aro->eui64)) {
                 DEBUG("nib: ARO EUI-64 is not mine, ignoring ARO\n");
                 return _ADDR_REG_STATUS_IGNORE;
@@ -133,25 +135,34 @@ uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                                                sizeof(addr_str)), netif->pid);
                         return _ADDR_REG_STATUS_IGNORE;
                     }
-                    /* if ltime 1min, reschedule NS in 30sec, otherwise 1min
-                     * before timeout */
-                    rereg_time = (ltime == 1U) ? (30 * MS_PER_SEC) :
-                                 (ltime - 1U) * SEC_PER_MIN * MS_PER_SEC;
+                    if (ltime > 0) {
+                        /* if ltime 1min, reschedule NS in 30sec, otherwise 1min
+                         * before timeout */
+                        rereg_time = (ltime == 1U) ? (30 * MS_PER_SEC) :
+                                     (ltime - 1U) * SEC_PER_MIN * MS_PER_SEC;
+                    }
+                    else {
+                        DEBUG("nib: ARO lifetime in NA is not supposed to be 0. "
+                              "Ignoring ARO.\n");
+                         return _ADDR_REG_STATUS_IGNORE;
+                    }
                     DEBUG("nib: Address registration of %s successful. "
                           "Scheduling re-registration in %" PRIu32 "ms\n",
                           ipv6_addr_to_str(addr_str, &ipv6->dst,
                                            sizeof(addr_str)), rereg_time);
-                    netif->ipv6.addrs_flags[idx] &= ~GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK;
-                    netif->ipv6.addrs_flags[idx] |= GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID;
+                     _handle_valid_addr(&netif->ipv6.addrs[idx]);
                     _evtimer_add(&netif->ipv6.addrs[idx],
                                  GNRC_IPV6_NIB_REREG_ADDRESS,
                                  &netif->ipv6.addrs_timers[idx],
                                  rereg_time);
-                    gnrc_netif_ipv6_bus_post(netif, GNRC_IPV6_EVENT_ADDR_VALID,
-                                  &netif->ipv6.addrs[idx]);
                     break;
                 }
-                case SIXLOWPAN_ND_STATUS_DUP:
+                /* Address registration errors are not sent back to the source address
+                   of the NS due to a possible risk of L2 address collision. Instead,
+                   the NA is sent to the link-local IPv6 address with the Interface ID
+                   part derived from the EUI-64 field of the ARO as per [RFC4944].
+                   [RFC 6775](https://datatracker.ietf.org/doc/html/rfc6775#section-6.5.2) */
+                case SIXLOWPAN_ND_STATUS_DUP: {
                     DEBUG("nib: Address registration reports duplicate. "
                           "Removing address %s%%%u\n",
                           ipv6_addr_to_str(addr_str,
@@ -160,23 +171,25 @@ uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                     gnrc_netif_ipv6_addr_remove_internal(netif, &ipv6->dst);
                     /* TODO: generate new address */
                     break;
+                }
                 case SIXLOWPAN_ND_STATUS_NC_FULL: {
-                        DEBUG("nib: Router's neighbor cache is full. "
-                              "Searching new router for DAD\n");
-                        _nib_dr_entry_t *dr = _nib_drl_get(&ipv6->src, netif->pid);
-                        assert(dr != NULL); /* otherwise we wouldn't be here */
-                        _nib_drl_remove(dr);
-                        if (_nib_drl_iter(NULL) == NULL) { /* no DRL left */
-                            netif->ipv6.rs_sent = 0;
-                            /* search (hopefully) new router */
-                            _handle_search_rtr(netif);
-                        }
-                        else {
-                            assert(dr->next_hop != NULL);
-                            _handle_rereg_address(&ipv6->dst);
-                        }
+                    DEBUG("nib: Router's neighbor cache is full\n");
+                    _nib_dr_entry_t *dr = _nib_drl_get(&ipv6->src, netif->pid);
+                    assert(dr != NULL); /* otherwise we wouldn't be here */
+                    _nib_drl_remove(dr);
+                    if (_nib_drl_iter(NULL) == NULL) { /* no DRL left */
+                        DEBUG("nib: Searching new router for DAD\n");
+                        netif->ipv6.rs_sent = 0;
+                        /* search (hopefully) new router */
+                        _handle_search_rtr(netif);
+                    }
+                    else {
+                        DEBUG("nib: Using a different router for DAD\n");
+                        assert(dr->next_hop != NULL);
+                        _handle_rereg_addresses_netif(netif);
                     }
                     break;
+                }
             }
             return aro->status;
         }
@@ -196,18 +209,6 @@ uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     return _ADDR_REG_STATUS_IGNORE;
 }
 
-static inline bool _is_tentative(const gnrc_netif_t *netif, int idx)
-{
-    return (gnrc_netif_ipv6_addr_get_state(netif, idx) &
-            GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE);
-}
-
-static inline bool _is_valid(const gnrc_netif_t *netif, int idx)
-{
-    return (gnrc_netif_ipv6_addr_get_state(netif, idx) ==
-            GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
-}
-
 void _handle_rereg_address(const ipv6_addr_t *addr)
 {
     gnrc_netif_t *netif = gnrc_netif_get_by_ipv6_addr(addr);
@@ -221,44 +222,54 @@ void _handle_rereg_address(const ipv6_addr_t *addr)
 
     gnrc_netif_acquire(netif);
     _nib_dr_entry_t *router = _nib_drl_get(NULL, netif->pid);
-    const bool router_reachable = (router != NULL) &&
-                                  _is_reachable(router->next_hop);
-    if (router_reachable) {
-        assert((unsigned)netif->pid == _nib_onl_get_if(router->next_hop));
+    int idx;
+    if (ipv6_addr_is_unspecified(addr) ||
+        (idx = gnrc_netif_ipv6_addr_idx(netif, addr)) < 0) {
+        DEBUG("nib: Couldn't re-register. Address was probably removed\n");
+    }
+    else if (!router || !_is_reachable(router->next_hop)) {
+        DEBUG("nib: Couldn't re-register. Router was probably removed\n");
+        /* The router should actually not be unreachable,
+           because this case should be handled by NUD. */
+        netif->ipv6.rs_sent = 0;
+        _handle_search_rtr(netif);
+    }
+    else if (_get_nud_state(router->next_hop) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_DELAY ||
+             _get_nud_state(router->next_hop) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_PROBE) {
+        /* the timer polls every netif->ipv6.retrans_time ms if NUD
+            can be done using that address */
+        DEBUG("nib: Rescheduling with %s\n",
+              ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
+        _evtimer_add(&netif->ipv6.addrs[idx],
+                     GNRC_IPV6_NIB_REREG_ADDRESS,
+                     &netif->ipv6.addrs_timers[idx],
+                     netif->ipv6.retrans_time);
+    }
+    else {
         DEBUG("nib: Re-registering %s",
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
         DEBUG(" with upstream router %s\n",
-              ipv6_addr_to_str(addr_str, &router->next_hop->ipv6,
-                               sizeof(addr_str)));
-        _snd_ns(&router->next_hop->ipv6, netif, addr, &router->next_hop->ipv6);
+              ipv6_addr_to_str(addr_str, &router->next_hop->ipv6, sizeof(addr_str)));
+        _evtimer_del(&router->next_hop->nud_timeout);
+        _set_nud_state(netif, router->next_hop, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_PROBE);
+        _probe_nbr(router->next_hop, true, addr);
     }
-    else {
-        DEBUG("nib: Couldn't re-register %s, no current router found.\n",
-              ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
-        netif->ipv6.rs_sent = 0;
-        _handle_search_rtr(netif);
-        goto out;
-    }
+    gnrc_netif_release(netif);
+}
 
-    int idx = gnrc_netif_ipv6_addr_idx(netif, addr);
-    assert(idx >= 0);
-
-    if (_is_valid(netif, idx) || (_is_tentative(netif, idx) &&
-        (gnrc_netif_ipv6_addr_dad_trans(netif, idx) < SIXLOWPAN_ND_REG_TRANSMIT_NUMOF))) {
-        uint32_t retrans_time;
-
-        if (_is_valid(netif, idx)) {
-            retrans_time = SIXLOWPAN_ND_MAX_RS_SEC_INTERVAL * MS_PER_SEC;
+void _handle_rereg_addresses_netif(gnrc_netif_t *netif)
+{
+    gnrc_netif_acquire(netif);
+    for (int i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
+        uint8_t flags = netif->ipv6.addrs_flags[i] & GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK;
+        if (flags != 0 &&
+            flags != GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED &&
+            flags != GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID) {
+            if (!ipv6_addr_is_link_local(&netif->ipv6.addrs[i])) {
+                _handle_rereg_address(&netif->ipv6.addrs[i]);
+            }
         }
-        else {
-            retrans_time = netif->ipv6.retrans_time;
-            /* increment encoded retransmission count */
-            netif->ipv6.addrs_flags[idx]++;
-        }
-        _evtimer_add(&netif->ipv6.addrs[idx], GNRC_IPV6_NIB_REREG_ADDRESS,
-                     &netif->ipv6.addrs_timers[idx], retrans_time);
     }
-out:
     gnrc_netif_release(netif);
 }
 
