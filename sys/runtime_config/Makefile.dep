@@ -1,0 +1,11 @@
+ifneq (,$(filter runtime_config_namespace%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/runtime_config/namespace/Makefile.dep
+endif
+
+ifneq (,$(filter runtime_config_util%,$(USEMODULE)))
+  USEMODULE += base64
+endif
+
+ifneq (,$(filter runtime_config_%,$(USEMODULE)))
+  USEMODULE += runtime_config
+endif
