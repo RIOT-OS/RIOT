@@ -17,7 +17,7 @@ You can find general information about the Nucleo32 boards on the
 
 ## Pinout
 
-<img src="pinouts/nucleo-g031k8-and-more.svg" alt="Pinout for the Nucleo-G031K8 (from ST User Manual, UM2591, https://www.st.com/resource/en/user_manual/um2591-stm32g0-nucleo32-board-mb1455-stmicroelectronics.pdf, page 16)" width=25% />
+<img src="pinouts/nucleo-g031k8.svg" alt="Pinout for the Nucleo-G031K8 (from ST User Manual, UM2591, https://www.st.com/resource/en/user_manual/um2591-stm32g0-nucleo32-board-mb1455-stmicroelectronics.pdf, page 16)" width=25% />
 
 ## MCU
 
