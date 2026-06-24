@@ -1,6 +1,7 @@
 APPLICATION ?= tests_$(notdir $(patsubst %/,%,$(CURDIR)))
 BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
+RIOTMAKE ?= $(RIOTBASE)/makefiles
 QUIET ?= 1
 # DEVELHELP enabled by default for all tests, set 0 to disable
 DEVELHELP ?= 1
