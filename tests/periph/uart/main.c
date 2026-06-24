@@ -19,6 +19,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "clk.h"
 #include "bitfield.h"
 #include "msg.h"
 #include "periph/uart.h"
@@ -28,14 +29,14 @@
 #include "ztimer.h"
 
 #ifdef MODULE_STDIO_UART
-#include "stdio_uart.h"
+#  include "stdio_uart.h"
 #endif
 
 #ifndef SHELL_BUFSIZE
-#define SHELL_BUFSIZE       (128U)
+#  define SHELL_BUFSIZE     (128U)
 #endif
 #ifndef UART_BUFSIZE
-#define UART_BUFSIZE        (128U)
+#  define UART_BUFSIZE      (128U)
 #endif
 
 #define PRINTER_PRIO        (THREAD_PRIORITY_MAIN - 1)
@@ -45,15 +46,15 @@
 
 /* if stdio is not done via UART, allow to use the stdio UART for the test */
 #ifndef MODULE_STDIO_UART
-#undef STDIO_UART_DEV
+#  undef STDIO_UART_DEV
 #endif
 
 #ifndef STDIO_UART_DEV
-#define STDIO_UART_DEV      (UART_UNDEF)
+#  define STDIO_UART_DEV    (UART_UNDEF)
 #endif
 
 #ifndef STX
-#define STX 0x2
+#  define STX               (0x2)
 #endif
 
 static char *_endline = "\n";
@@ -61,6 +62,29 @@ static char *_endline = "\n";
 static void _write_newline(uart_t dev)
 {
     uart_write(dev, (uint8_t *)_endline, strlen(_endline));
+}
+
+static void _delay_ms(uint32_t msec)
+{
+    if (IS_USED(MODULE_ZTIMER)) {
+        ztimer_sleep(ZTIMER_MSEC, msec);
+    }
+    else {
+        /*
+         * As fallback for freshly ported boards with no timer drivers written
+         * yet, we just use the CPU to delay execution and assume that roughly
+         * 20 CPU cycles are spend per loop iteration.
+         *
+         * Note that the volatile qualifier disables compiler optimizations for
+         * all accesses to the counter variable. Without volatile, modern
+         * compilers would detect that the loop is only wasting CPU cycles and
+         * optimize it out - but here the wasting of CPU cycles is desired.
+         */
+        uint32_t loops = (coreclk() / 20) / 1000;
+        for (volatile uint32_t j = 0; j < msec; j++) {
+            for (volatile uint32_t i = 0; i < loops; i++) { }
+        }
+    }
 }
 
 typedef struct {
@@ -136,7 +160,7 @@ static int _self_test(uart_t dev, unsigned baud)
 
     uart_write(dev, (uint8_t*)test_string, sizeof(test_string));
     /* wait 1ms for rx callback to be triggered by HW */
-    ztimer_sleep(ZTIMER_MSEC, 1);
+    _delay_ms(1);
     for (unsigned i = 0; i < sizeof(test_string); ++i) {
         int c = ringbuffer_get_one(&ctx[dev].rx_buf);
         if (c == -1) {
@@ -230,7 +254,7 @@ static void sleep_test(int num, uart_t uart)
 {
     printf("UARD_DEV(%i): test uart_poweron() and uart_poweroff()  ->  ", num);
     uart_poweroff(uart);
-    ztimer_sleep(ZTIMER_MSEC, POWEROFF_DELAY_MS);
+    _delay_ms(POWEROFF_DELAY_MS);
     uart_poweron(uart);
     puts("[OK]");
 }
@@ -327,24 +351,24 @@ static int cmd_mode(int argc, char **argv)
 
     argv[3][0] &= ~0x20;
     switch (argv[3][0]) {
-        case 'N':
-            parity = UART_PARITY_NONE;
-            break;
-        case 'E':
-            parity = UART_PARITY_EVEN;
-            break;
-        case 'O':
-            parity = UART_PARITY_ODD;
-            break;
-        case 'M':
-            parity = UART_PARITY_MARK;
-            break;
-        case 'S':
-            parity = UART_PARITY_SPACE;
-            break;
-        default:
-            printf("Error: Invalid parity (%c).\n", argv[3][0]);
-            return 1;
+    case 'N':
+        parity = UART_PARITY_NONE;
+        break;
+    case 'E':
+        parity = UART_PARITY_EVEN;
+        break;
+    case 'O':
+        parity = UART_PARITY_ODD;
+        break;
+    case 'M':
+        parity = UART_PARITY_MARK;
+        break;
+    case 'S':
+        parity = UART_PARITY_SPACE;
+        break;
+    default:
+        printf("Error: Invalid parity (%c).\n", argv[3][0]);
+        return 1;
     }
 
     stop_bits_arg = atoi(argv[4]) - 1;
@@ -468,7 +492,7 @@ int main(void)
          "data will be outputted via STDIO. So the easiest way to test an \n"
          "UART interface, is to simply connect the RX with the TX pin. Then \n"
          "you can send data on that interface and you should see the data \n"
-         "being printed to STDOUT\n\n"
+         "being printed to STDOUT.\n\n"
          "NOTE: all strings need to be '\\n' terminated!\n");
 
     /* do sleep test for UART used as STDIO. There is a possibility that the
