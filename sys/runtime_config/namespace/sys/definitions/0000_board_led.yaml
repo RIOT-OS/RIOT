@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../../../../../dist/tools/runtime_config_gen/schema.json
+id: 0
+name: board_led
+description: A board LED.
+items:
+  - id: 0
+    name: enabled
+    description: Whether the board LED is enabled
+    type: bool

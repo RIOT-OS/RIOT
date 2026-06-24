@@ -357,6 +357,13 @@ PSEUDOMODULES += psa_riot_hashes_sha_512_224
 PSEUDOMODULES += psa_riot_hashes_sha_512_256
 PSEUDOMODULES += psa_riot_hashes_hmac_sha256
 PSEUDOMODULES += fortuna_reseed
+PSEUDOMODULES += runtime_config_%
+
+# Runtime configuration modules are pseudomodules unless stated otherwise
+PSEUDOMODULES += runtime_config_%
+# Runtime configuration sys schemas
+NO_PSEUDOMODULES += runtime_config_namespace_sys
+
 PSEUDOMODULES += riotboot_%
 PSEUDOMODULES += rtt_cmd
 PSEUDOMODULES += saul_adc
@@ -445,6 +452,7 @@ PSEUDOMODULES += shell_cmd_openwsn
 PSEUDOMODULES += shell_cmd_pm
 PSEUDOMODULES += shell_cmd_ps
 PSEUDOMODULES += shell_cmd_random
+PSEUDOMODULES += shell_cmd_runtime_config
 PSEUDOMODULES += shell_cmd_rtc
 PSEUDOMODULES += shell_cmd_rtt
 PSEUDOMODULES += shell_cmd_saul_reg
