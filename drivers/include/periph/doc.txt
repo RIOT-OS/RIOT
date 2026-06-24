@@ -64,7 +64,7 @@
  * | `periph_rtc`       | `periph_init`     | None (no concurrency whatsoever)                                              |
  * | `periph_rtt`       | `periph_init`     | None (no concurrency whatsoever)                                              |
  * | `periph_spi`       | `periph_init`     | Full Thread Safety (except for initialization)                                |
- * | `periph_timer`     | user / driver     | Yes, except for concurrent initialization of the same timer                   |
+ * | `periph_timer`     | user / driver     | Yes, except for re-initialization of an active timer                         |
  * | `periph_uart`      | user / driver     | Partial (no concurrent use of the same UART device allowed)                   |
  * | `periph_usbdev`    | user / driver (*) | Full Thread Safety (except for initialization)                                |
  * | `periph_vbat`      | `periph_init`     | None (no concurrency whatsoever)                                              |
