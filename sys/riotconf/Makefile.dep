@@ -1,0 +1,8 @@
+USEMODULE += checksum
+USEMODULE += mtd_write_page
+USEMODULE += od
+USEMODULE += mtd_mapper
+
+ifneq (,$(filter riotconf_slot_print,$(USEMODULE)))
+  USEMODULE += od
+endif
