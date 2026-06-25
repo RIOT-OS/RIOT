@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_dhcpv6 Dynamic Host Configuration Protocol for IPv6 (DHCPv6)
+ * @defgroup    net_dhcpv6 dhcpv6: Dynamic Host Configuration Protocol for IPv6 (DHCPv6)
  * @ingroup     net_ipv6
  * @brief       DHCPv6 definitions
  * @{

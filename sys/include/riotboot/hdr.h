@@ -11,7 +11,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_riotboot_hdr RIOT header helpers and tools
+ * @defgroup    sys_riotboot_hdr riotboot_hdr: RIOT header helpers and tools
  * @ingroup     sys
  * @{
  *

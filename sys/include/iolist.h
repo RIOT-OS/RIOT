@@ -11,7 +11,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_iolist iolist scatter / gather IO
+ * @defgroup    sys_iolist iolist: scatter / gather IO
  * @ingroup     sys
  * @brief       Provides linked-list scatter / gather IO
  *

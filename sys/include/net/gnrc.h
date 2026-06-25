@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_gnrc    Generic (GNRC) network stack
+ * @defgroup    net_gnrc    gnrc: Generic (GNRC) network stack
  * @ingroup     net
  * @brief       RIOT's modular default IP network stack.
  * @see         [Martine Lenders' master thesis](https://www.riot-os.org/assets/pdfs/mlenders_msc.pdf)

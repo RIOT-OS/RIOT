@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_c11_atomics_cpp_compat C++ compatibility with C11 atomics
+ * @defgroup    sys_c11_atomics_cpp_compat c11_atomics_cpp_compat: C++ compatibility with C11 atomics
  * @ingroup     cpp
  * @brief       C++ compatibility of default C11 atomics types
  *

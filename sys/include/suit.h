@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_suit SUIT secure firmware OTA upgrade infrastructure
+ * @defgroup    sys_suit suit: SUIT secure firmware OTA upgrade infrastructure
  * @ingroup     sys
  * @brief       SUIT manifest handling
  *

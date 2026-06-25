@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_dsm DTLS Session Management (DSM)
+ * @defgroup    net_dsm dsm: DTLS Session Management (DSM)
  * @ingroup     net net_dtls
  * @brief       This module provides functionality to store and retrieve session
  *              information of DTLS connections.

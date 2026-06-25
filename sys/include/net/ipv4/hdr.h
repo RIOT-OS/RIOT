@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_ipv4_hdr    IPv4 header
+ * @defgroup    net_ipv4_hdr    ipv4_hdr: IPv4 header
  * @ingroup     net_ipv4
  * @brief       IPv4 header types and helper functions
  * @{

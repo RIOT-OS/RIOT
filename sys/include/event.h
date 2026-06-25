@@ -11,7 +11,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_event Event Queue
+ * @defgroup    sys_event event: Event Queue
  * @ingroup     sys
  * @brief       Provides an Event loop
  *

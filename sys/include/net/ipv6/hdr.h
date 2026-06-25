@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_ipv6_hdr    IPv6 header
+ * @defgroup    net_ipv6_hdr    ipv6_hdr: IPv6 header
  * @ingroup     net_ipv6
  * @brief       IPv6 header types and helper functions
  * @{

@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_ntp_packet NTP Packet
+ * @defgroup    net_ntp_packet ntp_packet: NTP Packet
  * @ingroup     net
  * @brief       The NTP packet module provides functionality to manipulate the NTP header
  * @{

@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_gnrc_pktqueue Packet queue
+ * @defgroup    net_gnrc_pktqueue gnrc_pktqueue: Packet queue
  * @ingroup     net_gnrc
  * @brief       @ref gnrc_pktsnip_t queue
  * @{

@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_ethernet Ethernet
+ * @defgroup    net_ethernet ethernet: Ethernet
  * @ingroup     net
  * @brief       Provides Ethernet header and helper functions
  * @{

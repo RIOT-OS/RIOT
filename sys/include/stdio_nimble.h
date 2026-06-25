@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup     sys_stdio_nimble STDIO over NimBLE
+ * @defgroup     sys_stdio_nimble stdio_nimble: STDIO over NimBLE
  * @ingroup      sys_stdio
  *
  * @experimental This feature is experimental as some use-cases, such as examples/advanced/twr_aloha, show

@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_riotboot_usb_dfu   Initialization of USB Device Firmware
+ * @defgroup    sys_riotboot_usb_dfu   riotboot_usb_dfu: Initialization of USB Device Firmware
  *                                     Upgrade for riotboot
  * @ingroup     sys
  * @{

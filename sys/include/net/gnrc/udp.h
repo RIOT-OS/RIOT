@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_gnrc_udp UDP
+ * @defgroup    net_gnrc_udp gnrc_udp: UDP
  * @ingroup     net_gnrc
  * @brief       GNRC's implementation of the UDP protocol
  *

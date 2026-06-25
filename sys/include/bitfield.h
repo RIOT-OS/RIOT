@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_bitfield Bitfields
+ * @defgroup    sys_bitfield bitfield: Bitfields module
  * @ingroup     sys
  * @brief       Bitfields of arbitrary length
  *

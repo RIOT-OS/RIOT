@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_picolibc PicoLibc system call
+ * @defgroup    sys_picolibc picolibc: PicoLibc system call
  * @ingroup     sys
  * @brief       PicoLibc system call
  * @{

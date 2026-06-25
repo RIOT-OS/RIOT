@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_gnrc_tcp TCP
+ * @defgroup    net_gnrc_tcp gnrc_tcp: TCP
  * @ingroup     net_gnrc
  * @brief       RIOT's TCP implementation for the GNRC network stack.
  *

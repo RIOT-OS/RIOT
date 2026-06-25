@@ -7,7 +7,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_string_utils    Utility functions that are missing in `string.h`
+ * @defgroup    sys_string_utils    string_utils:  Utility functions that are missing in `string.h`
  * @ingroup     sys
  *
  * This header provides utility functions that the standard C libs `string.h`

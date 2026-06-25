@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_ztimer_periph_rtc  ztimer periph/rtc backend
+ * @defgroup    sys_ztimer_periph_rtc  ztimer_periph_rtc: ztimer periph/rtc backend
  * @ingroup     sys_ztimer
  * @brief       ztimer periph/rtc backend
  *

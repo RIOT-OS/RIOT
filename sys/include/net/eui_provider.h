@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_eui_provider    IEEE EUI-48/64 provider
+ * @defgroup    net_eui_provider    eui_provider: IEEE EUI-48/64 provider
  * @ingroup     net
  * @brief       MAC address management
  *

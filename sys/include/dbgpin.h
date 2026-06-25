@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_dbgpin Direct pin control for debugging/profiling
+ * @defgroup    sys_dbgpin dbgpin: Direct pin control for debugging/profiling
  * @ingroup     sys
  *
  * @warning     This module does not verify the given pin number, so make sure

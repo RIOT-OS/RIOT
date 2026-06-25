@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_xtimer xtimer high level timer abstraction layer (deprecated)
+ * @defgroup    sys_xtimer xtimer: high level timer abstraction layer (deprecated)
  * @ingroup     sys
  * @brief       Provides a high level timer module to register
  *              timers, get current system time, and let a thread sleep for

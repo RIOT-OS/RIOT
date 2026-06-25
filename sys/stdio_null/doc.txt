@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_stdio_null  STDIO null driver
+ * @defgroup    sys_stdio_null  stdio_null: STDIO null driver
  * @ingroup     sys_stdio
  *
  * @brief       Dummy implementation of the stdio interface.

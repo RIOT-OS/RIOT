@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_emcute MQTT-SN Client (emCute)
+ * @defgroup    net_emcute emcute: MQTT-SN Client (emCute)
  * @ingroup     net
  * @brief       emCute, the MQTT-SN implementation for RIOT
  *

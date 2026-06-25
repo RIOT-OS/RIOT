@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_ztimer_convert_muldiv64 plain 64bit carithmetic
+ * @defgroup    sys_ztimer_convert_muldiv64 ztimer_convert_muldiv64: plain 64bit carithmetic
  * @ingroup     sys_ztimer_convert
  * @brief       ztimer frequency conversion module (64bit arithmetic)
  *

@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_ztimer ztimer high level timer abstraction layer
+ * @defgroup    sys_ztimer ztimer: high level timer abstraction layer
  * @ingroup     sys
  * @brief       High level timer abstraction layer
  *

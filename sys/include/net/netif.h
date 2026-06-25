@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup    net_netif   Network interfaces
+ * @defgroup    net_netif   netif: Network interfaces
  * @ingroup     net
  * @brief       Common network interface API
  *

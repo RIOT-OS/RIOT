@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup  sys_ztimer_convert_frac ztimer_convert_frac frequency conversion layer
+ * @defgroup  sys_ztimer_convert_frac ztimer_convert_frac: frequency conversion layer
  * @ingroup   sys_ztimer_convert
  * @brief     Translates between clock tick rates
  *

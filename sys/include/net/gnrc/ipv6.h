@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_gnrc_ipv6 IPv6
+ * @defgroup    net_gnrc_ipv6 gnrc_ipv6: IPv6
  * @ingroup     net_gnrc
  * @brief       GNRC's IPv6 implementation
  *

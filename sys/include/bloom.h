@@ -111,7 +111,7 @@
  */
 
 /**
- * @defgroup    sys_bloom Bloom filter
+ * @defgroup    sys_bloom bloom: Bloom filter
  * @ingroup     sys
  * @brief       Bloom filter library
  * @{

@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_saul_reg SAUL registry
+ * @defgroup    sys_saul_reg saul_reg: SAUL registry
  * @ingroup     sys
  * @brief       Global sensor/actuator registry for SAUL devices
  *

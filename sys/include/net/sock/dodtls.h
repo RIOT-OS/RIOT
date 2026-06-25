@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_sock_dodtls     DNS over DTLS sock API
+ * @defgroup    net_sock_dodtls     sock_dodtls: Sock DNS over DTLS client
  * @ingroup     net_sock
  *
  * @brief       Sock DNS over DTLS client

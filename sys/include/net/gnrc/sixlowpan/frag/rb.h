@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup net_gnrc_sixlowpan_frag_rb 6LoWPAN reassembly buffer
+ * @defgroup net_gnrc_sixlowpan_frag_rb gnrc_sixlowpan_frag_rb: 6LoWPAN reassembly buffer
  * @ingroup  net_gnrc_sixlowpan_frag
  * @brief    6LoWPAN reassembly buffer
  * @{

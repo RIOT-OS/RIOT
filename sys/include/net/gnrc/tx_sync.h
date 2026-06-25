@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_gnrc_tx_sync    Helpers for synchronizing with transmission.
+ * @defgroup    net_gnrc_tx_sync    gnrc_tx_sync: Helpers for synchronizing with transmission.
  * @ingroup     net_gnrc
  * @brief       This allows upper layers to wait for a transmission to complete
  *              (or fail) and for passing up data about the transmission.

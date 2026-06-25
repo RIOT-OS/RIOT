@@ -6,7 +6,7 @@
  * directory for more details.
  */
 /**
- * @addtogroup unittests_cpp
+ * @addtogroup sys_cppunit
  * @{
  * @file
  * @brief RIOT unit tests for C++ assertion macros for @ref pkg_fff
