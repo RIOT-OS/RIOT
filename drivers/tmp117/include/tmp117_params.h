@@ -53,11 +53,11 @@ extern "C" {
 #endif
 /** @} */
 
-#ifndef TMP117_SAUL_INFO
 /**
  * @brief   The SAUL info to register the TMP117 device driver instances with
  */
-#define TMP117_SAUL_INFO           { .name = "tmp117" }
+#ifndef TMP117_SAUL_INFO
+#  define TMP117_SAUL_INFO    { .name = "tmp117" }
 #endif
 /**@}*/
 

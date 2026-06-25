@@ -38,7 +38,7 @@ static tmp117_t tmp117_devs[TMP117_NUM];
 static saul_reg_t saul_entries[TMP117_NUM];
 
 /**
- * @brief   Define the number of saul info
+ * @brief   Define the number of SAUL info
  */
 #define TMP117_INFO_NUM     ARRAY_SIZE(tmp117_saul_info)
 
@@ -52,10 +52,10 @@ void auto_init_tmp117(void)
     assert(TMP117_NUM == TMP117_INFO_NUM);
 
     for (unsigned i = 0; i < TMP117_NUM; i++) {
-        LOG_DEBUG("[auto_init_saul] initializing tmp117 #%u\n", i);
+        LOG_DEBUG("[auto_init_saul] initializing TMP117 #%u\n", i);
 
         if (tmp117_init(&tmp117_devs[i], &tmp117_params[i]) != TMP117_OK) {
-            LOG_ERROR("[auto_init_saul] error initializing tmp117 #%u\n", i);
+            LOG_ERROR("[auto_init_saul] error initializing TMP117 #%u\n", i);
             continue;
         }
         saul_entries[i].dev = &(tmp117_devs[i]);

@@ -40,20 +40,28 @@ extern "C" {
  * @name    TMP117 shift mask
  * @{
  */
-#define TMP117_DATA_READY_SHIFT     13  /**< data ready bit shift in configuration register */
-#define TMP117_CONV_MODE_SHIFT      10  /**< conversion mode bits shift in configuration register */
-#define TMP117_CONV_CYCLE_SHIFT     7   /**< conversion cycle bits shift in configuration register */
-#define TMP117_AVG_SHIFT            5   /**< averaging bits shift in configuration register */
+/** @brief data ready bit shift in configuration register */
+#define TMP117_DATA_READY_SHIFT     13
+/** @brief conversion mode bits shift in configuration register */
+#define TMP117_CONV_MODE_SHIFT      10
+/** @brief conversion cycle bits shift in configuration register */
+#define TMP117_CONV_CYCLE_SHIFT     7
+/** @brief averaging bits shift in configuration register */
+#define TMP117_AVG_SHIFT            5
 /** @} */
 
 /**
  * @name    TMP117 field mask
  * @{
  */
-#define TMP117_CONV_MODE_MASK       (0x3 << TMP117_CONV_MODE_SHIFT)     /**< conversion mode bits mask in configuration register */
-#define TMP117_CONV_CYCLE_MASK      (0x7 << TMP117_CONV_CYCLE_SHIFT)    /**< conversion cycle bits mask in configuration register */
-#define TMP117_AVG_MASK             (0x3 << TMP117_AVG_SHIFT)           /**< averaging bits mask in configuration register */
-#define TMP117_DATA_READY_MASK      (0x1 << TMP117_DATA_READY_SHIFT)    /**< data ready bit mask in configuration register */
+/** @brief conversion mode bits mask in configuration register */
+#define TMP117_CONV_MODE_MASK       (0x3 << TMP117_CONV_MODE_SHIFT)
+/** @brief conversion cycle bits mask in configuration register */
+#define TMP117_CONV_CYCLE_MASK      (0x7 << TMP117_CONV_CYCLE_SHIFT)
+/** @brief averaging bits mask in configuration register */
+#define TMP117_AVG_MASK             (0x3 << TMP117_AVG_SHIFT)
+/** @brief data ready bit mask in configuration register */
+#define TMP117_DATA_READY_MASK      (0x1 << TMP117_DATA_READY_SHIFT)
 
 /** @} */
 
@@ -61,8 +69,8 @@ extern "C" {
  * @name    TMP117 registers - default values
  * @{
  */
-
-#define TMP117_REG_DEVICE_ID_DEFAULT_VAL         (0x0117) /**< default value of tmp117 device id register */
+/** @brief default value of TMP117 device id register */
+#define TMP117_REG_DEVICE_ID_DEFAULT_VAL (0x0117)
 /** @} */
 
 #ifdef __cplusplus

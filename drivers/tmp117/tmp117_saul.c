@@ -30,7 +30,7 @@ static int _read_temp(const void *dev, phydat_t *data)
         return -ECANCELED;
     }
     data->unit = UNIT_TEMP_C;
-    data->scale = -2;                   /* centi-degrees */
+    data->scale = -2; /* centi-degrees */
 
     return 1;
 }

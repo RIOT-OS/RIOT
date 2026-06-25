@@ -8,7 +8,7 @@
  * @{
  *
  * @file
- * @brief       tmp117 driver implementation
+ * @brief       TMP117 driver implementation
  *
  * @author      léo cordier <leo.cordier@univ-grenoble-alpes.fr>
  *

@@ -28,14 +28,12 @@ int main(void)
     tmp117_t tmp117;
     int16_t raw_temp;
 
-    ztimer_sleep(ZTIMER_MSEC, 1000);
-    puts("################################");
-    puts("####### TMP117 test app ########");
-    puts("################################\n");
+    puts("Test for the TMP117 temperature sensor\n");
 
-    puts("Initializing tmp117 sensor ...");
+    puts("Initializing tmp117 sensor...");
 
     if (tmp117_init(&tmp117, tmp117_params) != TMP117_OK) {
+    	puts("  failed.\n");
         return -1;
     }
 
@@ -43,10 +41,10 @@ int main(void)
 
     while (1) {
         if (tmp117_read_temperature(&tmp117, &raw_temp) == TMP117_OK) {
-            printf("temperature : %02d.%02d°C\n", raw_temp / 100, raw_temp % 100);
+            printf("Temperature : %02d.%02d°C\n", raw_temp / 100, raw_temp % 100);
         }
         else {
-            puts("[tmp117 test] error : unable to read temperature\n");
+            puts("ERROR: unable to read temperature\n");
             break;
         }
 

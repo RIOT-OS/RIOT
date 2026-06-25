@@ -77,7 +77,7 @@ typedef struct {
     tmp117_conv_mode_t conv_mode;   /**< conversion mode */
     tmp117_conv_cycle_t conv_cycle; /**< conversion cycle time */
     tmp117_avg_t avg;               /**< data averaging*/
-}tmp117_params_t;
+} tmp117_params_t;
 
 /**
  * @brief   TMP117 sensor structure
@@ -102,55 +102,55 @@ int tmp117_init(tmp117_t *dev, const tmp117_params_t *params);
 /**
  * @brief Reads the temperature from the sensor.
  *
- * @param[in, out] dev device descriptor
+ * @param[in,out] dev device descriptor
  * @param[out] value read value in centi-celsius
  *
- * @return TMP117_OK on success
- * @return TMP117_I2C if other error occurs
+ * @retval TMP117_OK on success
+ * @retval TMP117_I2C if other error occurs
  */
 int tmp117_read_temperature(tmp117_t *dev, int16_t *value);
 
 /**
  * @brief Update the conversion mode of the sensor.
  *
- * @param[in, out] dev device descriptor
+ * @param[in,out] dev device descriptor
  * @param[in] mode conversion mode value
  *
- * @return TMP117_OK on success
- * @return TMP117_I2C if other error occurs
+ * @retval TMP117_OK on success
+ * @retval TMP117_I2C if other error occurs
  */
 int tmp117_set_conversion_mode(tmp117_t *dev, tmp117_conv_mode_t mode);
 
 /**
  * @brief Update the conversion cycle of the sensor.
  *
- * @param[in, out] dev device descriptor
+ * @param[in,out] dev device descriptor
  * @param[in] cycle conversion cycle value
  *
- * @return TMP117_OK on success
- * @return TMP117_I2C if other error occurs
+ * @retval TMP117_OK on success
+ * @retval TMP117_I2C if other error occurs
  */
 int tmp117_set_conversion_cycle(tmp117_t *dev, tmp117_conv_cycle_t cycle);
 
 /**
  * @brief Update the averaging value of the sensor.
  *
- * @param[in, out] dev device descriptor
+ * @param[in,out] dev device descriptor
  * @param[in] avg averaging value
  *
- * @return TMP117_OK on success
- * @return TMP117_I2C if other error occurs
+ * @retval TMP117_OK on success
+ * @retval TMP117_I2C if other error occurs
  */
 int tmp117_set_averaging(tmp117_t *dev, tmp117_avg_t avg);
 
 /**
  * @brief Check if the sensor have a new temperature measure available.
  *
- * @param[in, out] dev device descriptor
+ * @param[in,out] dev device descriptor
  *
- * @return TMP117_DATAREADY a new data is available
- * @return TMP117_OK no new data available
- * @return TMP117_I2C if other error occurs
+ * @retval TMP117_DATAREADY a new data is available
+ * @retval TMP117_OK no new data available
+ * @retval TMP117_I2C if other error occurs
  */
 int tmp117_is_data_ready(tmp117_t *dev);
 
