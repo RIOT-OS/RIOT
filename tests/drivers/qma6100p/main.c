@@ -31,7 +31,7 @@ static const qma6100p_odr_t rates[] = {
 };
 static const unsigned expect_hz[] = { 12, 25, 100 };
 
-#define QMA6100P_PARAM_RATE rates[0]
+#define QMA6100P_PARAM_RATE QMA6100P_ODR_12HZ5
 
 #include "qma6100p_params.h"
 #include "ztimer.h"

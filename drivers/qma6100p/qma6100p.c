@@ -392,8 +392,8 @@ int qma6100p_init(qma6100p_t *dev, const qma6100p_params_t *params)
  * Merge two uint8_t register getting all [7:0] from @p msb and
  * [7:2] from @p lsb and convert it into a int16_t signed value.
  *
- * @param  lsb[in]      lsb of the data register
- * @param  msb[in]      msb of the datat register
+ * @param[in]  lsb      lsb of the data register
+ * @param[in]  msb      msb of the data register
  *
  * @return 14 bits signed data
  */
