@@ -41,7 +41,7 @@
  * @warning Requires in calling scope: `int res`, label `out_label`, macros `BUS` and `ADDR`
  *          On failure, `res` holds the error code and execution jumps to `out_label`
 */
-#define READ_REG(reg_addr, reg_val, out_label)                                     \
+#define QMA_READ_REG(reg_addr, reg_val, out_label)                                     \
     do {                                                                           \
         res = _read_reg(BUS, ADDR, (reg_addr), &(reg_val));                        \
         if (res < 0) {                                                             \
@@ -56,7 +56,7 @@
  * @warning Requires in calling scope: `int res`, label `out_label`, macros `BUS` and `ADDR`
  *          On failure, `res` holds the error code and execution jumps to `out_label`
 */
-#define WRITE_REG(reg_addr, reg_val, out_label)                                     \
+#define QMA_WRITE_REG(reg_addr, reg_val, out_label)                                     \
     do {                                                                            \
         res = _write_reg(BUS, ADDR, (reg_addr), (reg_val));                         \
         if (res < 0) {                                                              \
@@ -167,11 +167,11 @@ static int _soft_reset(const qma6100p_t *dev)
 {
     int res;
 
-    WRITE_REG(QMA6100P_REG_SW_RESET, QMA6100P_SW_RESET_VAL, out);
+    QMA_WRITE_REG(QMA6100P_REG_SW_RESET, QMA6100P_SW_RESET_VAL, out);
 
     ztimer_sleep(ZTIMER_MSEC, 1);
 
-    WRITE_REG(QMA6100P_REG_SW_RESET, 0x00, out);
+    QMA_WRITE_REG(QMA6100P_REG_SW_RESET, 0x00, out);
 
     uint8_t nvm_status;
 
@@ -180,7 +180,7 @@ static int _soft_reset(const qma6100p_t *dev)
     unsigned retries = QMA6100P_OTP_LOAD_RETRIES;
 
     do {
-        READ_REG(QMA6100P_REG_NVM, nvm_status, out);
+        QMA_READ_REG(QMA6100P_REG_NVM, nvm_status, out);
         if ((nvm_status & (QMA6100P_NVM_LOAD_DONE | QMA6100P_NVM_RDY)) ==
             (QMA6100P_NVM_LOAD_DONE | QMA6100P_NVM_RDY)) {
             break;
@@ -216,25 +216,25 @@ static int _qma6100p_run_init_seq(const qma6100p_t *dev)
         if (res < 0) {
             goto out;
         }
-        READ_REG(QMA6100P_REG_CHIP_STATE, chip_state, out);
+        QMA_READ_REG(QMA6100P_REG_CHIP_STATE, chip_state, out);
     } while ((chip_state >> 4) != 0x0C);
 
     uint8_t pm = 0;
 
     /* Enters Active Mode */
     FIELD_SET(QMA6100P_PM_MODE_MASK, 1, pm);
-    WRITE_REG(QMA6100P_REG_PM, pm, out);
+    QMA_WRITE_REG(QMA6100P_REG_PM, pm, out);
 
     FIELD_SET(QMA6100P_PM_MCLK_MASK, QMA6100P_PM_MCLK_51K2, pm);
-    WRITE_REG(QMA6100P_REG_PM, pm, out);
+    QMA_WRITE_REG(QMA6100P_REG_PM, pm, out);
 
-    WRITE_REG(QMA6100P_REG_TST0_ANA, 0x20, out);
-    WRITE_REG(QMA6100P_REG_AFE_ANA, 0x01, out);
-    WRITE_REG(QMA6100P_REG_TST1_ANA, 0x80, out);
+    QMA_WRITE_REG(QMA6100P_REG_TST0_ANA, 0x20, out);
+    QMA_WRITE_REG(QMA6100P_REG_AFE_ANA, 0x01, out);
+    QMA_WRITE_REG(QMA6100P_REG_TST1_ANA, 0x80, out);
 
     ztimer_sleep(ZTIMER_MSEC, 1);
 
-    WRITE_REG(QMA6100P_REG_TST1_ANA, 0x00, out);
+    QMA_WRITE_REG(QMA6100P_REG_TST1_ANA, 0x00, out);
 
 out:
     i2c_release(BUS);
@@ -258,11 +258,11 @@ static int _qma6100p_set_range(const qma6100p_t *dev, qma6100p_range_t range)
     int res;
     uint8_t range_reg;
 
-    READ_REG(QMA6100P_REG_RANGE, range_reg, out);
+    QMA_READ_REG(QMA6100P_REG_RANGE, range_reg, out);
 
     FIELD_SET(QMA6100P_RANGE_MASK, range, range_reg);
 
-    WRITE_REG(QMA6100P_REG_RANGE, range_reg, out);
+    QMA_WRITE_REG(QMA6100P_REG_RANGE, range_reg, out);
 
 out:
     return res;
@@ -285,11 +285,11 @@ static int _qma6100p_set_odr(const qma6100p_t *dev, qma6100p_odr_t odr)
     int res;
     uint8_t odr_reg;
 
-    READ_REG(QMA6100P_REG_ODR, odr_reg, out);
+    QMA_READ_REG(QMA6100P_REG_ODR, odr_reg, out);
 
     FIELD_SET(QMA6100P_ODR_MASK, odr, odr_reg);
 
-    WRITE_REG(QMA6100P_REG_ODR, odr_reg, out);
+    QMA_WRITE_REG(QMA6100P_REG_ODR, odr_reg, out);
 
 out:
     return res;
@@ -311,11 +311,11 @@ static int _qma6100p_set_mclk(const qma6100p_t *dev, qma6100p_mclk_t mclk)
     int res;
     uint8_t pm_reg;
 
-    READ_REG(QMA6100P_REG_PM, pm_reg, out);
+    QMA_READ_REG(QMA6100P_REG_PM, pm_reg, out);
 
     FIELD_SET(QMA6100P_PM_MCLK_MASK, mclk, pm_reg);
 
-    WRITE_REG(QMA6100P_REG_PM, pm_reg, out);
+    QMA_WRITE_REG(QMA6100P_REG_PM, pm_reg, out);
 
 out:
     return res;
@@ -526,7 +526,7 @@ int qma6100p_read(const qma6100p_t *dev, qma6100p_data_t *data)
 static int _disable_all_interrupt(const qma6100p_t *dev)
 {
     int res;
-    WRITE_REG(QMA6100P_REG_INT_EN1, 0x00, out);
+    QMA_WRITE_REG(QMA6100P_REG_INT_EN1, 0x00, out);
 out:
     return res;
 }
@@ -545,9 +545,9 @@ static int _enter_ulps_mode(const qma6100p_t *dev)
 
     i2c_acquire(BUS);
 
-    WRITE_REG(QMA6100P_REG_PM, 0x87, out);
-    WRITE_REG(QMA6100P_REG_ULPS, 0x0F, out);
-    WRITE_REG(QMA6100P_REG_TST0_ANA, 0x00, out);
+    QMA_WRITE_REG(QMA6100P_REG_PM, 0x87, out);
+    QMA_WRITE_REG(QMA6100P_REG_ULPS, 0x0F, out);
+    QMA_WRITE_REG(QMA6100P_REG_TST0_ANA, 0x00, out);
 
     res = _disable_all_interrupt(dev);
     if (res < 0) {
@@ -577,11 +577,11 @@ static int _set_int_params(qma6100p_t *dev)
     int res = QMA6100P_OK;
     uint8_t int_reg;
 
-    READ_REG(QMA6100P_REG_INT_CFG, int_reg, out);
+    QMA_READ_REG(QMA6100P_REG_INT_CFG, int_reg, out);
 
     FIELD_SET(QMA6100P_INT_CFG_SHADOW_MASK, dev->params.interrupt_shadow, int_reg);
 
-    WRITE_REG(QMA6100P_REG_INT_CFG, int_reg, out);
+    QMA_WRITE_REG(QMA6100P_REG_INT_CFG, int_reg, out);
 
 out:
     return res;
@@ -659,7 +659,7 @@ static int _set_intpin_conf(const qma6100p_t *dev,
     int res;
     uint8_t reg;
 
-    READ_REG(QMA6100P_REG_INTPIN_CONF, reg, out);
+    QMA_READ_REG(QMA6100P_REG_INTPIN_CONF, reg, out);
 
     switch (pin_num) {
     case QMA6100P_INT1:
@@ -679,7 +679,7 @@ static int _set_intpin_conf(const qma6100p_t *dev,
         goto out;
     }
 
-    WRITE_REG(QMA6100P_REG_INTPIN_CONF, reg, out);
+    QMA_WRITE_REG(QMA6100P_REG_INTPIN_CONF, reg, out);
 
 out:
     return res;
@@ -701,9 +701,9 @@ static int _route_data_ready_int(const qma6100p_t *dev, uint8_t map_reg)
     int res;
     uint8_t reg;
 
-    READ_REG(map_reg, reg, out);
+    QMA_READ_REG(map_reg, reg, out);
     FIELD_SET(QMA6100P_INT_MAP1_DATA_MASK, 1, reg);
-    WRITE_REG(map_reg, reg, out);
+    QMA_WRITE_REG(map_reg, reg, out);
 
 out:
     return res;
@@ -724,9 +724,9 @@ static int _enable_data_ready_int(const qma6100p_t *dev)
     int res;
     uint8_t reg;
 
-    READ_REG(QMA6100P_REG_INT_EN1, reg, out);
+    QMA_READ_REG(QMA6100P_REG_INT_EN1, reg, out);
     FIELD_SET(QMA6100P_INT_EN1_DATA_MASK, 1, reg);
-    WRITE_REG(QMA6100P_REG_INT_EN1, reg, out);
+    QMA_WRITE_REG(QMA6100P_REG_INT_EN1, reg, out);
 
 out:
     return res;
