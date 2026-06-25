@@ -132,19 +132,6 @@ extern "C" {
 #endif
 
 /**
- * @def QMA6100P_PARAM_MODE
- * @brief Default operating mode
- */
-#if IS_ACTIVE(CONFIG_QMA6100P_MODE_ACTIVE)
-#  define QMA6100P_PARAM_MODE (QMA6100P_MODE_ACTIVE)
-#elif IS_ACTIVE(CONFIG_QMA6100P_MODE_ULPS)
-#  define QMA6100P_PARAM_MODE (QMA6100P_MODE_ULPS)
-#endif
-#ifndef QMA6100P_PARAM_MODE
-#  define QMA6100P_PARAM_MODE (QMA6100P_MODE_ACTIVE)
-#endif
-
-/**
  * @def QMA6100P_PARAM_INT1_PIN
  * @brief MCU GPIO connected to the QMA6100P INT1 pin. Set to GPIO_UNDEF to
  *        disable interrupt-driven operation on this line and use polling instead.
@@ -212,7 +199,6 @@ extern "C" {
                             .rate = QMA6100P_PARAM_RATE,         \
                             .range = QMA6100P_PARAM_RANGE,       \
                             .mclk = QMA6100P_PARAM_MCLK,         \
-                            .mode = QMA6100P_PARAM_MODE,         \
                             .interrupt_shadow = QMA6100P_PARAM_INT_SHADOW }
 #endif
 

@@ -73,17 +73,6 @@ config QMA6100P_PM_MCLK_6K4
 endchoice
 
 choice
-    bool "Operating mode"
-    default QMA6100P_MODE_ACTIVE
-    help
-        Select the default operating mode after initialization.
-config QMA6100P_MODE_ACTIVE
-    bool "Active"
-config QMA6100P_MODE_ULPS
-    bool "Ultra-Low Power State (ULPS)"
-endchoice
-
-choice
     bool "Interrupt pin active level"
     default QMA6100P_INTPIN_ACTIVE_HIGH
     help

@@ -29,6 +29,7 @@
  * @author      Léandre Le Duc <leandre.leduc38@gmail.com>
  */
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "periph/i2c.h"
@@ -48,6 +49,7 @@ enum {
     QMA6100P_NODEV = -2,       /**< no QMA6100P device found on the bus */
     QMA6100P_INVALID_ARG = -3, /**< invalid argument */
     QMA6100P_GPIO_ERROR = -4,  /**< GPIO error */
+    QMA6100P_TIMEOUT = -5,     /**< operation timed out */
 };
 
 /**
@@ -80,19 +82,6 @@ typedef enum {
     QMA6100P_ODR_25HZ = 0x06,   /**< 25 Hz */
     QMA6100P_ODR_12HZ5 = 0x07,  /**< 12.5 Hz */
 } qma6100p_odr_t;
-
-/**
- * @brief  Mode selection
- *
- * Work mode is controlled by PM_REGISTER (0x11) and can be set through I2C commands
- *
- * @warning By default, QMA6100P is in intermediate state after power on but it shouldn't be keep for any applications
- */
-typedef enum {
-    QMA6100P_MODE_INTERMEDIATE = 0, /**< After power on state, shouldn't be keep */
-    QMA6100P_MODE_ACTIVE = 1,       /**< Processes the interrupts and send data to results registers */
-    QMA6100P_MODE_ULPS = 2,         /**< Ultra-Low Power State */
-} qma6100p_mode_t;
 
 /**
  * @brief Master Clock selection
@@ -159,7 +148,6 @@ typedef struct {
     qma6100p_odr_t rate;                    /**< output data rate */
     qma6100p_range_t range;                 /**< full-scale range */
     qma6100p_mclk_t mclk;                   /**< master clock */
-    qma6100p_mode_t mode;                   /**< operating mode */
     qma6100p_int_shadow_t interrupt_shadow; /**< acceleration data shadow mode */
 } qma6100p_params_t;
 
@@ -191,8 +179,10 @@ typedef struct {
 /**
  * @brief   Initialize the QMA6100P accelerometer driver
  *
- * Runs the init sequence, sets ODR, range and master clock from @p params,
- * then puts the device into the configured mode
+ * Runs the init sequence, sets ODR, range and master clock from @p params.
+ *
+ * The device is left in active mode; call @ref qma6100p_set_low_power
+ * afterwards to enter Ultra-Low Power State (ULPS) if needed.
  *
  * @param[out] dev          device descriptor of accelerometer to initialize
  * @param[in]  params       configuration parameters
@@ -204,16 +194,28 @@ typedef struct {
 int qma6100p_init(qma6100p_t *dev, const qma6100p_params_t *params);
 
 /**
- * @brief   Set operating mode
+ * @brief   Enter Ultra-Low Power State (ULPS)
  *
- * @param[in,out]  dev       device descriptor of accelerometer
- * @param[in]      mode      mode to set (@ref QMA6100P_MODE_ACTIVE or @ref QMA6100P_MODE_INTERMEDIATE)
+ * @param[in,out]  dev        device descriptor of accelerometer
  *
  * @return                   QMA6100P_OK on success
  * @return                   QMA6100P_NOI2C if I2C transaction failed
  * @return                   QMA6100P_NODEV if device not found on bus
  */
-int qma6100p_set_mode(qma6100p_t *dev, qma6100p_mode_t mode);
+int qma6100p_set_low_power(qma6100p_t *dev);
+
+/**
+ * @brief   Enter active mode
+ *
+ * Exits Ultra-Low Power State (ULPS) and restores the configured parameters.
+ *
+ * @param[in,out]  dev        device descriptor of accelerometer
+ *
+ * @return                   QMA6100P_OK on success
+ * @return                   QMA6100P_NOI2C if I2C transaction failed
+ * @return                   QMA6100P_NODEV if device not found on bus
+ */
+int qma6100p_set_active_mode(qma6100p_t *dev);
 
 /**
  * @brief   Read raw accelerometer data (ADC counts)

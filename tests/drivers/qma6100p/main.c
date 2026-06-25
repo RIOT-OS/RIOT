@@ -88,53 +88,66 @@ static inline unsigned int _measure_irq_hz(void)
     return irq_count - before;
 }
 
-int main(void)
+/* (Re)initialize the device at @p rate and enable the data-ready interrupt on
+ * INT1. Each test calls this so it does not depend on any prior test state. */
+static int _setup(qma6100p_odr_t rate)
+{
+    qma6100p_params_t p = *qma6100p_params; /* mutable copy */
+    p.rate = rate;
+
+    int res = qma6100p_init(&dev, &p);
+    if (res < 0) {
+        return res;
+    }
+
+    if (dev.params.rate != rate) {
+        return -1;
+    }
+
+    return qma6100p_set_data_ready_int(&dev, QMA6100P_INT1, callback, NULL);
+}
+
+static int test_init(void)
 {
     int res;
-
-    ztimer_sleep(ZTIMER_SEC, SLEEP_1S);
-    puts("=== QMA6100P accelerometer driver test ===");
     printf("[init] I2C_DEV(%d) addr 0x%02x ... ",
            (int)qma6100p_params[0].i2c, qma6100p_params[0].addr);
 
     res = qma6100p_init(&dev, &qma6100p_params[0]);
     if (res < 0) {
-        printf("FAILED (%d)\n", res);
-        return 1;
+        printf("[init] FAILED (res=%d)\n", res);
+        return res;
     }
     puts("OK");
 
     assert(dev.params.rate == QMA6100P_ODR_12HZ5);
 
+    return res;
+}
+
+static int test_data_ready(void)
+{
+    int res;
+
     puts("\n--- data-ready interrupt rate sweep ---");
     for (unsigned int i = 0; i < ARRAY_SIZE(rates); i++) {
-        unsigned int try;
-        qma6100p_params_t p = *qma6100p_params; /* mutable copy */
-        p.rate = rates[i];
-
         printf("[ODR %u/%u] set rate -> %u Hz ... ",
                i + 1, (unsigned)ARRAY_SIZE(rates), expect_hz[i]);
 
-        res = qma6100p_init(&dev, &p);
-        if (res < 0 || dev.params.rate != rates[i]) {
-            printf("FAILED to apply rate (res=%d)\n", res);
-            res = -1;
-            goto out;
-        }
-
-        res = qma6100p_set_data_ready_int(&dev, QMA6100P_INT1, callback, NULL);
+        res = _setup(rates[i]);
         if (res < 0) {
-            printf("FAILED to enable data-ready int (res=%d)\n", res);
-            goto out;
+            printf("[ODR %u/%u] FAILED to set up (res=%d)\n",
+                   i + 1, (unsigned)ARRAY_SIZE(rates), res);
+            return res;
         }
         puts("OK");
 
         res = -1;
-        for (try = 0; try < 3; try++) {
+        for (unsigned int try = 0; try < 3; try++) {
             unsigned hz = _measure_irq_hz();
             int pass = (expect_hz[i] - 1 <= hz && hz <= expect_hz[i] + 1);
             printf("  try %u/3: measured %u Hz (expect ~%u) -> %s\n",
-                   try + 1, hz, expect_hz[i], pass ? "PASS" : "off");
+                   try + 1, hz, expect_hz[i], pass ? "PASS" : "FAIL");
             if (pass) {
                 res = 0;
                 break;
@@ -144,22 +157,114 @@ int main(void)
         if (res < 0) {
             printf("[ODR %u/%u] FAILED: rate never matched ~%u Hz\n",
                    i + 1, (unsigned)ARRAY_SIZE(rates), expect_hz[i]);
-            goto out;
+            return res;
         }
         printf("[ODR %u/%u] PASS (~%u Hz)\n",
                i + 1, (unsigned)ARRAY_SIZE(rates), expect_hz[i]);
     }
 
-    puts("\n=== ALL TESTS PASSED ===");
+    return res;
+}
 
-    /* stream samples: ISR signals the reader thread, which reads over I2C */
+static int test_ulps(void)
+{
+    const qma6100p_odr_t rate = QMA6100P_ODR_100HZ;
+    const unsigned expect_hz = 100;
+
+    puts("\n--- ULPS mode test ---");
+
+    int res = _setup(rate);
+    if (res < 0) {
+        printf("[ULPS] FAILED to set up (res=%d)\n", res);
+        return res;
+    }
+
+    /* enter ULPS: IRQs must stop */
+    res = qma6100p_set_low_power(&dev);
+    if (res < 0) {
+        printf("[ULPS] FAILED to enter ULPS (res=%d)\n", res);
+        return res;
+    }
+
+    irq_count = 0;
+    unsigned hz = _measure_irq_hz();
+
+    printf("[ULPS] in ULPS: %u IRQs/s (expect 0) -> %s\n",
+           hz, hz == 0 ? "PASS" : "FAIL");
+    if (hz != 0) {
+        return -1;
+    }
+
+    /* wake up: ULPS disables all interrupts, so re-enable data-ready */
+    res = qma6100p_set_active_mode(&dev);
+    if (res < 0) {
+        printf("[ULPS] FAILED to exit ULPS (res=%d)\n", res);
+        return res;
+    }
+    res = qma6100p_set_data_ready_int(&dev, QMA6100P_INT1, callback, NULL);
+    if (res < 0) {
+        printf("[ULPS] FAILED to re-enable data-ready int after wake (res=%d)\n", res);
+        return res;
+    }
+
+    irq_count = 0;
+    unsigned hz_after = _measure_irq_hz();
+
+    int pass_wake = (expect_hz - 1 <= hz_after && hz_after <= expect_hz + 1);
+    printf("[ULPS] after wake: %u IRQs/s (expect ~%u) -> %s\n",
+           hz_after, expect_hz, pass_wake ? "PASS" : "FAIL");
+    if (!pass_wake) {
+        return -1;
+    }
+
+    return res;
+}
+
+static int test_streaming(void)
+{
     puts("\n--- interrupt-driven streaming ---");
+
+    int res = _setup(rates[ARRAY_SIZE(rates) - 1]);
+    if (res < 0) {
+        printf("[stream] FAILED to set up (res=%d)\n", res);
+        return res;
+    }
+
     kernel_pid_t reader_pid = thread_create(reader_stack, sizeof(reader_stack),
                                             THREAD_PRIORITY_MAIN - 1, 0,
                                             reader_thread, NULL, "qma_reader");
     if (reader_pid < 0) {
-        puts("Failed to create reader thread");
-        res = 1;
+        puts("[stream] FAILED to create reader thread");
+        return -1;
+    }
+
+    return 0;
+}
+
+int main(void)
+{
+    int res;
+
+    ztimer_sleep(ZTIMER_SEC, SLEEP_1S);
+    puts("=== QMA6100P accelerometer driver test ===");
+
+    res = test_init();
+    if (res < 0) {
+        goto out;
+    }
+    res = test_data_ready();
+    if (res < 0) {
+        goto out;
+    }
+
+    res = test_ulps();
+    if (res < 0) {
+        goto out;
+    }
+
+    /* run last: the reader thread it spawns runs forever */
+    res = test_streaming();
+    if (res < 0) {
         goto out;
     }
 
