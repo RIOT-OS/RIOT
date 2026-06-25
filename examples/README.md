@@ -139,6 +139,13 @@ Here is a quick overview of the examples available in the RIOT:
 | [lwiperf](./networking/misc/lwiperf/README.md) | This is a lwIP benchmark application, providing an iPerf client and server. |
 
 
+### Zigbee
+
+| Example | Description |
+|---------|-------------|
+| [zigbee-lightbulb](./networking/zigbee-lightbulb/README.md) | This application allows a microcontroller to perform as a lightbulb using ZBOSS in RIOT. |
+| [zigbee-remote](./networking/zigbee-remote/README.md) | This application allows a microcontroller to perform as a remote control using ZBOSS in RIOT. |
+
 ## Advanced Examples
 
 | Example | Description |
