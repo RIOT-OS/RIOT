@@ -88,10 +88,22 @@ size_t iolist_to_iovec(const iolist_t *iolist, struct iovec *iov, unsigned *coun
  * @param[out]  dst     Destination buffer
  * @param[in]   len     Size of the destination buffer
  *
- * @returns iolist_size(iolist) on success
- *          -ENOBUFS if the buffer is too small
+ * @return iolist_size(iolist) on success
+ * @retval -ENOBUFS if the buffer is too small
  */
 ssize_t iolist_to_buffer(const iolist_t *iolist, void *dst, size_t len);
+
+/**
+ * @brief   Copies the bytes from a buffer to the iolist
+ *
+ * @param[out]  iolist  iolist to read from
+ * @param[in]   src     Source buffer
+ * @param[in]   len     Size of the source buffer
+ *
+ * @return @p len on success
+ * @retval -ENOBUFS if the iolist is too small
+ */
+ssize_t iolist_from_buffer(iolist_t *iolist, const void *src, size_t len);
 
 #ifdef __cplusplus
 }
