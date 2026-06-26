@@ -83,8 +83,8 @@ typedef enum {
  * @param[in]   cipher          Already initialized cipher struct
  * @param[in]   auth_data       Additional data to authenticate in MAC
  * @param[in]   auth_data_len   Length of additional data, max (2^16 - 2^8)
- * @param[in]   mac_length      length of the appended MAC (between 4 and 16 - only
- *                              even values)
+ * @param[in]   mac_length      length of the appended MAC (between 4 and 16 -
+ *                              only even values)
  * @param[in]   length_encoding maximal supported length of plaintext
  *                              (2^(8*length_enc)).
  * @param[in]   nonce           Nounce for ctr mode encryption
