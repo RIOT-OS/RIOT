@@ -58,7 +58,7 @@ extern "C" {
  * length of *Q* in bytes, which encodes the payload length of a message in
  * bytes.
  *
- * Hence, the payload must be no larger than `pow(2, 8 * q) - 1` bytes in size.
+ * Hence, the payload must be no larger than `2^(8 * q) - 1` bytes in size.
  *
  * The value of *q* also determines the length of the nonce, as the sum of both
  * must be 15. Since a nonce cannot be reused, the parameter *q* controls a
