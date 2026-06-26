@@ -329,7 +329,8 @@ ssize_t cipher_decrypt_ocb(const cipher_t *cipher,
                            uint8_t output[input_len - tag_len])
 {
     /* Check for two possible errors:
-     * 1. input_len < tag_len (due overflow input_len - tag_len will be large)
+     * 1. input_len < tag_len (due the wrap around,
+          (input_len - tag_len) will be large)
      * 2. input_len fitting into `size_t` but not into `ssize_t`
      *    (this should be possible, but better safe than sorry)
      */
