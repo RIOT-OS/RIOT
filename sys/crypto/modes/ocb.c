@@ -332,7 +332,7 @@ ssize_t cipher_decrypt_ocb(const cipher_t *cipher,
      * 1. input_len < tag_len (due the wrap around,
           (input_len - tag_len) will be large)
      * 2. input_len fitting into `size_t` but not into `ssize_t`
-     *    (this should be possible, but better safe than sorry)
+     *    (this should not be possible, but better safe than sorry)
      */
     if ((input_len - tag_len) > (size_t)SSIZE_MAX) {
         return OCB_ERR_INVALID_DATA_LENGTH;
