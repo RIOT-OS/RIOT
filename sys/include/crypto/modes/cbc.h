@@ -67,7 +67,7 @@ ssize_t cipher_encrypt_cbc(const cipher_t *cipher, const uint8_t iv[16],
  * @return      number of decrypted bytes written to @p output
  */
 ACCESS(read_only, 3, 4)
-ACCESS(write_only,5, 4)
+ACCESS(write_only, 5, 4)
 ssize_t cipher_decrypt_cbc(const cipher_t *cipher, const uint8_t iv[16],
                            const void *input, size_t input_len, void *output);
 
