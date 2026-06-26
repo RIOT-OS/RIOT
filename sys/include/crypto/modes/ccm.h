@@ -52,7 +52,7 @@ extern "C" {
 #define CCM_MAC_MAX_LEN                     16
 
 /**
- * @brief   Parameter defining the maximum supported payload length
+ * @brief   Parameters defining the maximum supported payload length
  *
  * This is named *q* in the [CCM specification][CCM spec] and controls the
  * length of *Q* in bytes, which encodes the payload length of a message in
