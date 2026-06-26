@@ -33,7 +33,7 @@ bool crypto_equals(const uint8_t *a, const uint8_t *b, size_t len)
     diff |= (diff >> 4) | (diff << 4);
     ++diff;
 
-    return (diff);
+    return (bool)diff;
 }
 
 /* Compiler should not be allowed to optimize this */
