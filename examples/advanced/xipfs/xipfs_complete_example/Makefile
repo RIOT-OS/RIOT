@@ -1,11 +1,10 @@
-# name of your application
-APPLICATION = xipfs
+APPLICATION = xipfs_complete_example
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= dwm1001
 
 # This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/../../..
+RIOTBASE ?= $(CURDIR)/../../../../
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
@@ -17,9 +16,6 @@ QUIET ?= 1
 
 # XIPFS is currently not compatible with the llvm toolchain
 TOOLCHAINS_BLACKLIST += llvm
-
-BLOBS += hello-world.fae
-BLOBS += dumper.fae
 
 # Modules to include:
 USEMODULE += shell
@@ -37,5 +33,7 @@ USEMODULE += xipfs
 CFLAGS += -DXIPFS_ENABLE_SAFE_EXEC_SUPPORT
 # XIPFS MPU ISR stack requirement
 CFLAGS += -DISR_STACKSIZE=1024
+
+BLOBS += nvme0p0.flash
 
 include $(RIOTBASE)/Makefile.include

@@ -1,0 +1,40 @@
+# name of your application
+APPLICATION = xipfs_memory_image
+
+# If no BOARD is found in the environment, use this default:
+BOARD ?= dwm1001
+
+# This has to be the absolute path to the RIOT base directory:
+RIOTBASE ?= $(CURDIR)/../../../../
+
+# Comment this out to disable code in RIOT that does safety checking
+# which is not needed in a production environment but helps in the
+# development process:
+DEVELHELP ?= 1
+
+# Change this to 0 show compiler invocation lines by default:
+QUIET ?= 1
+
+# XIPFS is currently not compatible with the llvm toolchain
+TOOLCHAINS_BLACKLIST += llvm
+
+# Modules to include:
+USEMODULE += shell
+USEMODULE += shell_cmds_default
+USEMODULE += ps
+USEMODULE += saul_default
+USEMODULE += cortexm_svc
+
+FEATURES_REQUIRED += cortexm_mpu
+
+# Use xipfs file system
+USEMODULE += xipfs
+
+# XIPFS MPU support
+CFLAGS += -DXIPFS_ENABLE_SAFE_EXEC_SUPPORT
+# XIPFS MPU ISR stack requirement
+CFLAGS += -DISR_STACKSIZE=1024
+
+BLOBS += nvme0p0.flash
+
+include $(RIOTBASE)/Makefile.include

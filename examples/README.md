@@ -153,7 +153,9 @@ Here is a quick overview of the examples available in the RIOT:
 | [twr_aloha](./advanced/twr_aloha/README.md) | This example allows testing different two-way ranging algorithms between two boards supporting a dw1000 device. This makes use of the uwb-core pkg. |
 | [senml_saul](./advanced/senml_saul/README.md) | This example demonstrates the usage of the SAUL (Sensor Actuator Uber Layer) module with the SenML (Sensor Measurement Lists) format. |
 | [opendsme](./advanced/opendsme/README.md) | This example demonstrates the usage of the OpenDSME module in RIOT. |
-| [xipfs](./advanced/xipfs/README.md) | This example demonstrates the usage of XIPFS for creating and executing an executable file. |
+| [xipfs_minimal_example](./advanced/xipfs/xipfs_minimal_example/README.md) | This example demonstrates a simple usage of XiPFS for creating and executing an executable file. |
+| [xipfs_memory_image_example](./advanced/xipfs/xipfs_memory_image_example/README.md) | This example demonstrates how to embed a pre-made off-board XiPFS mount point memory image. |
+| [xipfs_complete_example](./advanced/xipfs/xipfs_complete_example/README.md) | This example demonstrates how to use various XiPFS mount points from code. |
 
 ## Examples from Guides
 
