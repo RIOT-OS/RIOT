@@ -137,6 +137,12 @@ ssize_t cipher_encrypt_ccm(const cipher_t *cipher,
  * @param[in]   input_len        length of the input data, [0, 2^32]
  * @param[out]  output           pointer to allocated memory for decrypted data. It
  *                               has to be of size data_len - mac_length.
+ *
+ * @pre     2 <= @p length_encoding <= 8
+ * @pre     @p length_encoding + @p nonce_len == 15
+ * @pre     @p mac_length is even and 4 <= @p mac_length <= 16
+ * @pre     @p auth_data_len < 2^64 (you won't exceed this with `size_t`)
+ *
  * @retval  CCM_ERR_INVALID_NONCE_LENGTH    @p nonce_len invalid
  * @retval  CCM_ERR_INVALID_CBC_MAC         Computed MAC did not match provided
  *                                          (data integrity compromised)
