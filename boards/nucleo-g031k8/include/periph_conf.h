@@ -23,6 +23,25 @@ extern "C" {
 #endif
 
 /**
+ * @name    Timer configuration
+ * @{
+ */
+static const timer_conf_t timer_config[] = {
+    {
+        .dev      = TIM3,
+        .max      = 0x0000ffff,
+        .rcc_mask = RCC_APBENR1_TIM3EN,
+        .bus      = APB1,
+        .irqn     = TIM3_IRQn
+    }
+};
+
+#define TIMER_0_ISR         isr_tim3
+
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
+/** @} */
+
+/**
  * @name    UART configuration
  * @{
  */
