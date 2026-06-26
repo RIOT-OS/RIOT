@@ -163,26 +163,33 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     int pin_mask = _pin_mask(pin);
 
     /* make sure pin mode is applicable */
-    if (mode > 0x7) {
+    if (mode & ~MODE_PINCFG_MASK) {
         return -1;
     }
 
     /* set pin direction */
-    if (mode & 0x2) {
+    if (mode & PORT_PINCFG_INEN) {
+        /* input */
         if (IS_ACTIVE(MODULE_PERIPH_GPIO_FAST_READ)) {
             port->CTRL.reg |= pin_mask;
         }
         port->DIRCLR.reg = pin_mask;
     }
     else {
+        /* output */
         if (IS_ACTIVE(MODULE_PERIPH_GPIO_FAST_READ)) {
             port->CTRL.reg &= ~pin_mask;
         }
         port->DIRSET.reg = pin_mask;
+
+        /* enable input to read back output level */
+        if (IS_ACTIVE(MODULE_PERIPH_GPIO_READ_OUTPUT)) {
+            mode |= PORT_PINCFG_INEN;
+        }
     }
 
     /* configure the pin cfg */
-    port->PINCFG[pin_pos].reg = (mode & MODE_PINCFG_MASK);
+    port->PINCFG[pin_pos].reg = mode;
 
     /* and set pull-up/pull-down if applicable */
     if (mode == GPIO_IN_PU) {
@@ -207,11 +214,11 @@ bool gpio_read(gpio_t pin)
         port = _port(pin);
     }
 
-    if (port->DIR.reg & mask) {
-        return (port->OUT.reg & mask) ? 1 : 0;
-    }
-    else {
-        return (port->IN.reg & mask) ? 1 : 0;
+    if (IS_ACTIVE(MODULE_PERIPH_GPIO_READ_OUTPUT) ||
+        !(port->DIR.reg & mask)) {
+        return port->IN.reg & mask;
+    } else {
+        return port->OUT.reg & mask;
     }
 }
 

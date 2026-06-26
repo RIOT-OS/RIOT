@@ -1,6 +1,7 @@
 CPU_CORE = cortex-m0plus
 
 FEATURES_PROVIDED += periph_gpio_fast_read
+FEATURES_PROVIDED += periph_gpio_read_output
 
 ifeq (,$(filter samd20%,$(CPU_MODEL)))
   FEATURES_PROVIDED += periph_uart_collision
