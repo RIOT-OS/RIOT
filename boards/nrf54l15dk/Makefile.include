@@ -1,0 +1,5 @@
+# Default to /dev/ttyACM1 on Linux
+PORT ?= /dev/ttyACM1
+
+# include this module into the build
+INCLUDES += -I$(RIOTBOARD)/nrf54l15dk/include

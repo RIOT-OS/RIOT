@@ -4,11 +4,11 @@
  */
 
 /**
- * @ingroup     drivers_nrf52_802154
+ * @ingroup     drivers_nrf5x_802154
  * @{
  *
  * @file
- * @brief       Implementation of the IEEE 802.15.4 for nRF52 radios
+ * @brief       Implementation of the IEEE 802.15.4 for nRF5x radios
  *
  * @author      José I. Alamos <jose.alamos@haw-hamburg.de>
  * @}
@@ -35,8 +35,29 @@
 /* Set timer period to 16 us (IEEE 802.15.4 symbol time) */
 #define TIMER_FREQ          (62500UL)
 
+#ifdef CPU_FAM_NRF54L
+/* Compatibility wrapper for the nRF54L family: the radio peripheral has two
+ * interrupt lines (the application core uses line 0), the MODECNF0 register
+ * was renamed to TIMING, MHRMATCHMAS to MHRMATCHMASK and the POWER register
+ * was removed */
+#define RADIO_IRQn                      RADIO_0_IRQn
+#define isr_radio                       isr_radio_0
+#define INTENSET                        INTENSET00
+#define MODECNF0                        TIMING
+#define MHRMATCHMAS                     MHRMATCHMASK
+#define RADIO_MODECNF0_RU_Msk           RADIO_TIMING_RU_Msk
+#define RADIO_INTENSET_END_Msk          RADIO_INTENSET00_END_Msk
+#define RADIO_INTENSET_FRAMESTART_Msk   RADIO_INTENSET00_FRAMESTART_Msk
+#define RADIO_INTENSET_CCAIDLE_Msk      RADIO_INTENSET00_CCAIDLE_Msk
+#define RADIO_INTENSET_CCABUSY_Msk      RADIO_INTENSET00_CCABUSY_Msk
+#endif
+
 #define TX_POWER_MIN        (-40)                               /* in dBm */
+#ifdef CPU_FAM_NRF54L
+#define TX_POWER_MAX        (8)                                 /* in dBm */
+#else
 #define TX_POWER_MAX        ((int)RADIO_TXPOWER_TXPOWER_Max)    /* in dBm */
+#endif
 
 /**
  * @brief Default nrf802154 radio shortcuts
@@ -93,6 +114,27 @@ static struct {
 static const ieee802154_radio_ops_t nrf802154_ops;
 static ieee802154_dev_t *nrf802154_hal_dev;
 
+#ifdef CPU_FAM_NRF54L
+/* the nRF54L radio has no POWER register, so only the HFXO requests are
+ * tracked here */
+static bool _powered;
+
+static void _power_on(void)
+{
+    if (!_powered) {
+        clock_hfxo_request();
+        _powered = true;
+    }
+}
+
+static void _power_off(void)
+{
+    if (_powered) {
+        _powered = false;
+        clock_hfxo_release();
+    }
+}
+#else
 static void _power_on(void)
 {
     if (NRF_RADIO->POWER == 0) {
@@ -108,6 +150,7 @@ static void _power_off(void)
         clock_hfxo_release();
     }
 }
+#endif
 
 static bool _l2filter(uint8_t *mhr)
 {
@@ -366,6 +409,43 @@ static int set_cca_threshold(ieee802154_dev_t *dev, int8_t threshold)
     return 0;
 }
 
+#ifdef CPU_FAM_NRF54L
+/* on the nRF54L the TXPOWER register holds an encoded value instead of the
+ * raw dBm value, so the closest supported level is looked up */
+static void _set_txpower(int16_t txpower)
+{
+    static const struct {
+        int16_t dbm;
+        uint32_t val;
+    } _txpower_lut[] = {
+        { 8, RADIO_TXPOWER_TXPOWER_Pos8dBm },
+        { 7, RADIO_TXPOWER_TXPOWER_Pos7dBm },
+        { 6, RADIO_TXPOWER_TXPOWER_Pos6dBm },
+        { 5, RADIO_TXPOWER_TXPOWER_Pos5dBm },
+        { 4, RADIO_TXPOWER_TXPOWER_Pos4dBm },
+        { 3, RADIO_TXPOWER_TXPOWER_Pos3dBm },
+        { 2, RADIO_TXPOWER_TXPOWER_Pos2dBm },
+        { 1, RADIO_TXPOWER_TXPOWER_Pos1dBm },
+        { 0, RADIO_TXPOWER_TXPOWER_0dBm },
+        { -4, RADIO_TXPOWER_TXPOWER_Neg4dBm },
+        { -8, RADIO_TXPOWER_TXPOWER_Neg8dBm },
+        { -12, RADIO_TXPOWER_TXPOWER_Neg12dBm },
+        { -16, RADIO_TXPOWER_TXPOWER_Neg16dBm },
+        { -20, RADIO_TXPOWER_TXPOWER_Neg20dBm },
+        { -40, RADIO_TXPOWER_TXPOWER_Neg40dBm },
+    };
+
+    DEBUG("[nrf802154]: Setting TX power to %i\n", txpower);
+
+    for (unsigned i = 0; i < ARRAY_SIZE(_txpower_lut); i++) {
+        if (txpower >= _txpower_lut[i].dbm) {
+            NRF_RADIO->TXPOWER = _txpower_lut[i].val;
+            return;
+        }
+    }
+    NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg40dBm;
+}
+#else
 static void _set_txpower(int16_t txpower)
 {
     DEBUG("[nrf802154]: Setting TX power to %i\n", txpower);
@@ -397,6 +477,7 @@ static void _set_txpower(int16_t txpower)
         NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg40dBm;
     }
 }
+#endif
 
 static void _set_ifs_timer(bool lifs)
 {
@@ -439,7 +520,9 @@ int nrf802154_init(void)
 
     /* power off peripheral (but do not release the HFXO as we never requested
      * it so far) */
+#ifndef CPU_FAM_NRF54L
     NRF_RADIO->POWER = 0;
+#endif
 
     return 0;
 }
