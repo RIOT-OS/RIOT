@@ -115,7 +115,7 @@ ssize_t cipher_encrypt_ocb(const cipher_t *cipher,
  * @pre         @p nonce has not been used with the same key before
  * @pre         1 <= @p tag_len <= 16
  * @pre         @p input_len >= @p tag_len
- * @pre         @p input_len - @p tag_len <= `SSIZE_MAX`
+ * @pre         (@p input_len - @p tag_len) <= `SSIZE_MAX`
  * @pre         @p nonce_len <= 15
  *
  * @return      Number of bytes written to @p output or negative error code
