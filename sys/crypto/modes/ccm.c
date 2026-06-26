@@ -135,11 +135,8 @@ static int ccm_compute_adata_mac(const cipher_t *cipher, const uint8_t *auth_dat
         }
 
         uint8_t auth_data_len_in_encoded =
-            (auth_data_len >=
-             (uint32_t)CCM_BLOCK_SIZE -
-                 len_encoding) ?
-                ((uint32_t)CCM_BLOCK_SIZE -
-                 len_encoding) :
+            (auth_data_len >= (uint32_t)CCM_BLOCK_SIZE - len_encoding) ?
+                ((uint32_t)CCM_BLOCK_SIZE - len_encoding) :
                 auth_data_len;
         memcpy(auth_data_encoded + len_encoding, auth_data,
                auth_data_len_in_encoded);
