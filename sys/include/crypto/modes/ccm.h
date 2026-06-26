@@ -107,7 +107,7 @@ typedef enum {
  * @pre     2 <= @p length_encoding <= 8
  * @pre     @p length_encoding + @p nonce_len == 15
  * @pre     @p mac_length is even and 4 <= @p mac_length <= 16
- * @pre     @p auth_data_len < 2^{64} (you won't exceed this with `size_t`)
+ * @pre     @p auth_data_len < 2^64 (you won't exceed this with `size_t`)
  */
 ACCESS(read_only, 2, 3)
 ACCESS(read_only, 6, 7)
