@@ -163,7 +163,7 @@ int cipher_encrypt(const cipher_t *cipher, const uint8_t *input,
  * *
  *
  * @param[in]   cipher  Already initialized cipher struct
- * @param[in]   input   pointer to input data (of size BLOCKS_SIZE) to decrypt
+ * @param[in]   input   pointer to input data (of size `BLOCK_SIZE`) to decrypt
  * @param[out]  output  pointer to allocated memory for decrypted data. It
  *                      has to be of size `BLOCK_SIZE`
  *
