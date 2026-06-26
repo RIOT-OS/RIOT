@@ -37,6 +37,10 @@ static void _cb(void *arg)
 
 int isrpipe_read_timeout(isrpipe_t *isrpipe, uint8_t *buffer, size_t count, uint32_t timeout)
 {
+    if (!count) {
+        return 0;
+    }
+
     int res = tsrb_get(&isrpipe->tsrb, buffer, count);
     if (res > 0) {
         return res;

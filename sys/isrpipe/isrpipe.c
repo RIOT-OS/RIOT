@@ -50,8 +50,13 @@ int isrpipe_read(isrpipe_t *isrpipe, uint8_t *buffer, size_t count)
 {
     int res;
 
+    if (!count) {
+        return 0;
+    }
+
     while (!(res = tsrb_get(&isrpipe->tsrb, buffer, count))) {
         mutex_lock(&isrpipe->mutex);
     }
+
     return res;
 }

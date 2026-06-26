@@ -140,6 +140,12 @@ static void test_read_then_write(void)
     TEST_ASSERT_EQUAL_INT(1, thread_kill_zombie(reader_pid));
 }
 
+static void test_read_zero(void)
+{
+    /* reading zero bytes is a no-op and should not block */
+    TEST_ASSERT_EQUAL_INT(0, isrpipe_read(&_pipe, NULL, 0));
+}
+
 static void test_overflow(void)
 {
     int res;
@@ -223,6 +229,7 @@ Test *tests_isrpipe_tests(void)
         new_TestFixture(test_init),
         new_TestFixture(test_write_then_read),
         new_TestFixture(test_read_then_write),
+        new_TestFixture(test_read_zero),
         new_TestFixture(test_overflow),
         new_TestFixture(test_underflow),
         new_TestFixture(test_write_one),

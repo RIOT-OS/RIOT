@@ -52,7 +52,8 @@ int isrpipe_read_timeout(isrpipe_t *isrpipe, uint8_t *buf, size_t count, uint32_
  * timeout or when @p count bytes have been received.
  *
  * A timeout only occurs if no data is received within @p timeout microseconds.
- * Each time a byte or burst of bytes is received, the timeout is reset.
+ * Each time a byte or burst of bytes is received, the timeout is reset. This
+ * means the worst-case total wait is @p count times @p timeout microseconds.
  *
  * @note If a timeout occurs, some bytes may have been read out of the pipe and
  * placed into @p buf.
