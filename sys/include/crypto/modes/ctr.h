@@ -44,7 +44,7 @@ extern "C" {
  *          that used the same key and nonce.
  *
  * @pre             @p nonce_len < 16
- * @pre             @p length < `pow(2, 16 - nonce_len)`
+ * @pre             @p length < `2^(16 - nonce_len)`
  * @pre             The first @p nonce_len bytes of @p nonce_counter have been
  *                  initialized with a nonce that has not been used yet with
  *                  the same key, the remaining bytes are zero.
