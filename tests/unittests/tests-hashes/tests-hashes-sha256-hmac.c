@@ -332,6 +332,24 @@ static void test_hashes_hmac_sha256_ite_hash_PRF6_split(void)
                  "9b09ffa71b942fcb27635fbcd5b0e944bfdc63644f0713938a7f51535c3a35e2", hmac));
 }
 
+static void test_hashes_hmac_sha256_wipe(void)
+{
+    hmac_context_t ctx;
+    unsigned char key[20];
+    static unsigned char hmac[SHA256_DIGEST_LENGTH];
+    static const hmac_context_t zeros;
+
+    memset(key, 0x0b, sizeof(key));
+
+    hmac_sha256_init(&ctx, key, sizeof(key));
+    hmac_sha256_update(&ctx, "Hi There", 8);
+    hmac_sha256_final(&ctx, hmac);
+
+    TEST_ASSERT(compare_str_vs_digest(
+                 "b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7", hmac));
+    TEST_ASSERT(memcmp(&ctx, &zeros, sizeof(ctx)) == 0);
+}
+
 Test *tests_hashes_sha256_hmac_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -350,6 +368,7 @@ Test *tests_hashes_sha256_hmac_tests(void)
         new_TestFixture(test_hashes_hmac_sha256_ite_hash_PRF5),
         new_TestFixture(test_hashes_hmac_sha256_ite_hash_PRF6),
         new_TestFixture(test_hashes_hmac_sha256_ite_hash_PRF6_split),
+        new_TestFixture(test_hashes_hmac_sha256_wipe),
     };
 
     EMB_UNIT_TESTCALLER(hashes_sha256_tests, NULL, NULL,
