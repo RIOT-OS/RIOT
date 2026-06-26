@@ -54,7 +54,7 @@ static ssize_t ccm_compute_cbc_mac(const cipher_t *cipher, const uint8_t iv[16],
     do {
         uint8_t block_size_input = (length - offset > block_size) ?
                                        block_size :
-                                       length - offset;
+                                       (length - offset);
 
         /* CBC-Mode: XOR plaintext with ciphertext of (n-1)-th block */
         for (int i = 0; i < block_size_input; ++i) {
