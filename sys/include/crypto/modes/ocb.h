@@ -80,7 +80,7 @@ extern "C" {
  *
  * @pre         @p nonce has not been used with the same key before
  * @pre         1 <= @p tag_len <= 16
- * @pre         @p input_len + @p tag_len <= `SSIZE_MAX`
+ * @pre         (@p input_len + @p tag_len) <= `SSIZE_MAX`
  * @pre         @p nonce_len <= 15
  *
  * @return      Number of bytes written to @p output or negative error code
