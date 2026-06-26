@@ -159,7 +159,7 @@ int cipher_encrypt(const cipher_t *cipher, const uint8_t *input,
                    uint8_t *output);
 
 /**
- * @brief   Decrypt data of BLOCK_SIZE length
+ * @brief   Decrypt data of `BLOCK_SIZE` length
  * *
  *
  * @param[in]   cipher  Already initialized cipher struct
