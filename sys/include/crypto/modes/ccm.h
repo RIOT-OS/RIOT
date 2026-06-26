@@ -95,6 +95,11 @@ typedef enum {
  * @param[out]  output          pointer to allocated memory for encrypted data.
  *                              It has to be of size data_len + mac_length.
  *
+ * @pre     2 <= @p length_encoding <= 8
+ * @pre     @p length_encoding + @p nonce_len == 15
+ * @pre     @p mac_length is even and 4 <= @p mac_length <= 16
+ * @pre     @p auth_data_len < 2^64 (you won't exceed this with `size_t`)
+ *
  * @retval  CCM_ERR_INVALID_NONCE_LENGTH    @p nonce_len invalid
  * @retval  CCM_ERR_INVALID_DATA_LENGTH     @p input_len invalid
  * @retval  CCM_ERR_INVALID_LENGTH_ENCODING @p length_encoding invalid
