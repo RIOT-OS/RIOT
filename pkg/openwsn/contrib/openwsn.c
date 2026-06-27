@@ -37,6 +37,10 @@
 #include "nrf802154.h"
 #endif
 
+#ifdef MODULE_KW41ZRF
+#include "kw41zrf.h"
+#endif
+
 #define LOG_LEVEL LOG_NONE
 #include "log.h"
 
@@ -54,6 +58,9 @@ static ieee802154_dev_t cc2538_rf_dev;
 #endif
 #ifdef MODULE_NRF802154
 static ieee802154_dev_t nrf802154_hal_dev;
+#endif
+#ifdef MODULE_KW41ZRF
+static ieee802154_dev_t kw41zrf_hal_dev;
 #endif
 #endif
 
@@ -89,6 +96,12 @@ void* _radio_init_dev(void)
         nrf802154_hal_setup(dev);
         nrf802154_init();
     #endif
+    #ifdef MODULE_KW41ZRF
+        dev = &kw41zrf_hal_dev;
+        kw41zrf_hal_setup(&kw41zrf_hal_dev);
+        kw41zrf_init();
+    #endif
+
 #endif
     return dev;
 }

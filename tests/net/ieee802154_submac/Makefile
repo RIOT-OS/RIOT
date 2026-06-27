@@ -12,6 +12,7 @@ USEMODULE += eui_provider
 USEMODULE += ieee802154
 USEMODULE += ieee802154_submac
 USEMODULE += ztimer_usec
+USEMODULE += ztimer_msec
 
 ifneq (,$(filter native native32 native64,$(BOARD)))
   USE_ZEP = 1
@@ -19,7 +20,6 @@ ifneq (,$(filter native native32 native64,$(BOARD)))
 endif
 
 CFLAGS += -DEVENT_THREAD_MEDIUM_STACKSIZE=1024
-
 include $(RIOTBASE)/Makefile.include
 
 ifneq (,$(filter bhp,$(USEMODULE)))
