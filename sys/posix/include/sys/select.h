@@ -44,15 +44,11 @@ __extension__
 #endif
 
 #include "bitfield.h"
+#include "thread_flags.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief   @ref core_thread_flags for POSIX select
- */
-#define POSIX_SELECT_THREAD_FLAG    (1U << 3)
 
 #ifndef CPU_NATIVE
 

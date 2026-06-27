@@ -36,7 +36,6 @@
 #include "fragmenter.h"
 #include "schc.h"
 
-#define THREAD_FLAG_TX_END  (1U << 4)
 #define FRAG_WIN_SIZE_MAX   (8U)
 #define TIMEOUT_EVENTS_MAX  (4U)
 

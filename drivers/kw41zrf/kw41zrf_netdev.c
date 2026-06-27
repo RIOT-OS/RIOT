@@ -58,9 +58,6 @@ static atomic_bool irq_is_queued = false;
 /* True while blocking the netdev thread waiting for some operation to finish */
 static bool blocking_for_irq = false;
 
-/* Set this to a flag bit that is not used by the MAC implementation */
-#define KW41ZRF_THREAD_FLAG_ISR (1u << 8)
-
 static void kw41zrf_irq_handler(void *arg)
 {
     netdev_t *netdev = arg;

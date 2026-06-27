@@ -23,7 +23,6 @@
 #include "thread.h"
 #include "thread_flags.h"
 
-#define CST816S_THREAD_FLAG     (1 << 8)
 #define CST816S_NUM_TOUCHES     5
 
 static void _cb(void *arg)

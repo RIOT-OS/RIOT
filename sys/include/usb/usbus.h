@@ -111,18 +111,6 @@ extern "C" {
 #define USBUS_TNAME                 "usbus"
 
 /**
- * @name USBUS thread flags
- *
- * Thread flags used by the USBUS thread. @ref THREAD_FLAG_EVENT is also used,
- * but defined elsewhere
- * @{
- */
-#define USBUS_THREAD_FLAG_USBDEV    (0x02)  /**< usbdev esr needs handling */
-#define USBUS_THREAD_FLAG_USBDEV_EP (0x04)  /**< One or more endpoints requires
-                                                 servicing */
-/** @} */
-
-/**
  * @name USBUS handler subscription flags
  *
  * @{
