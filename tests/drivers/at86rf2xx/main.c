@@ -20,41 +20,27 @@
 #include "at86rf2xx.h"
 #include "at86rf2xx_params.h"
 #include "at86rf2xx_internal.h"
+#include "event/thread.h"
 #include "init_dev.h"
 #include "net/ieee802154.h"
-#include "net/netdev/ieee802154.h"
+#include "net/ieee802154/radio.h"
+#include "net/netdev/ieee802154_submac.h"
 #include "shell.h"
 #include "test_utils/netdev_ieee802154_minimal.h"
 #include "test_utils/expect.h"
 
-static at86rf2xx_t at86rf2xx[AT86RF2XX_NUM];
+static at86rf2xx_bhp_ev_t at86rf2xx_bhp[AT86RF2XX_NUM];
+static netdev_ieee802154_submac_t at86rf2xx_netdev[AT86RF2XX_NUM];
 
 #if AT86RF2XX_RANDOM_NUMBER_GENERATOR
-void random_net_api(uint8_t idx, uint32_t *value)
-{
-    netdev_ieee802154_t *dev = &at86rf2xx[idx].netdev;
-    dev->netdev.driver->get(&dev->netdev, NETOPT_RANDOM, value, sizeof(uint32_t));
-    int retval = dev->netdev.driver->get(&dev->netdev, NETOPT_RANDOM,
-                                         value, sizeof(uint32_t));
-    if (retval < 0) {
-        printf("get(NETOPT_RANDOM) failed: %s\n", strerror(-retval));
-    }
-    else {
-        expect(retval == sizeof(*value));
-    }
-}
-
 int random_by_at86rf2xx(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
     for (unsigned int i = 0; i < AT86RF2XX_NUM; i++) {
         uint32_t test = 0;
-        at86rf2xx_get_random(&at86rf2xx[i], (uint8_t *)&test, sizeof(test));
+        at86rf2xx_get_random(&at86rf2xx_bhp[i].dev, (uint8_t *)&test, sizeof(test));
         printf("Random number for device %u via native API: %" PRIx32 "\n", i, test);
-        test = 0;
-        random_net_api(i, &test);
-        printf("Random number for device %u via netopt: %" PRIx32 "\n", i, test);
     }
     return 0;
 }
@@ -72,13 +58,15 @@ int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
     for (unsigned i = 0; i < AT86RF2XX_NUM; i++) {
         printf("%d out of %u\n", i + 1, (unsigned)AT86RF2XX_NUM);
         /* setup the specific driver */
-        at86rf2xx_setup(&at86rf2xx[i], &at86rf2xx_params[i], i);
+        at86rf2xx_init_event(&at86rf2xx_bhp[i], &at86rf2xx_params[i], &at86rf2xx_netdev[i].submac.dev, EVENT_PRIO_HIGHEST);
 
+        netdev_register(&at86rf2xx_netdev[i].dev.netdev, NETDEV_AT86RF2XX, i);
+        netdev_ieee802154_submac_init(&at86rf2xx_netdev[i]);
         /* set the application-provided callback */
-        at86rf2xx[i].netdev.netdev.event_callback = cb;
+        at86rf2xx_netdev[i].dev.netdev.event_callback = cb;
 
         /* initialize the device driver */
-        int res = at86rf2xx[i].netdev.netdev.driver->init(&at86rf2xx[i].netdev.netdev);
+        int res = at86rf2xx_netdev[i].dev.netdev.driver->init(&at86rf2xx_netdev[i].dev.netdev);
         if (res != 0) {
             return -1;
         }
