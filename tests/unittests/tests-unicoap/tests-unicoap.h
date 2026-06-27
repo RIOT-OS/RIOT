@@ -14,7 +14,7 @@
 /**
  * @file
  * @brief  Unit tests for the unified CoAP framework
- * @author Carl Seifert <carl.seifert1@mailbox.tu-dresden.de>
+ * @author Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
 #include "embUnit.h"
@@ -34,6 +34,12 @@
 
 #  define _TEST_ASSERT_EQUAL_POINTER(a, b) \
     TEST_ASSERT_EQUAL_INT((uintptr_t)a, (uintptr_t)b)
+
+#  define _TEST_ASSERT_TRUE(a) \
+    TEST_ASSERT_EQUAL_INT(a, true)
+
+#  define _TEST_ASSERT_FALSE(a) \
+    TEST_ASSERT_EQUAL_INT(a, false)
 
 #  define _BYTES(...) ((uint8_t[]){ __VA_ARGS__ })
 

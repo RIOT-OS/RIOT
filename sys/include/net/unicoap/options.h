@@ -1,10 +1,7 @@
 /*
- * Copyright (C) 2024-2025 Carl Seifert
- * Copyright (C) 2024-2025 TU Dresden
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for
- * more details.
+ * SPDX-FileCopyrightText: 2024-2026 Carl Seifert
+ * SPDX-FileCopyrightText: 2024-2026 TU Dresden
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -56,7 +53,7 @@
 /**
  * @file
  * @brief  Options header
- * @author Carl Seifert <carl.seifert1@mailbox.tu-dresden.de>
+ * @author Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
 #ifdef __cplusplus
@@ -679,6 +676,15 @@ ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* itera
  * @param[in] options Options
  */
 void unicoap_options_dump_all(const unicoap_options_t* options);
+
+/**
+ * @brief Iterates over all `Uri-Path` options and prints the resulting path using `printf`.
+ * @param[in] options Options
+ *
+ * The resulting path will always start with a leading `/`. The root path (no `Uri-Path` options)
+ * will result in just the path component separator `/` being printed.
+ */
+void unicoap_options_print_uri_path(const unicoap_options_t* options);
 /** @} */
 
 /* MARK: - Strings */

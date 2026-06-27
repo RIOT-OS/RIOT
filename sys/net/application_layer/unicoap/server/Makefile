@@ -1,3 +1,3 @@
-MODULE = unicoap_driver_dtls
+MODULE = unicoap_server
 
 include $(RIOTBASE)/Makefile.base

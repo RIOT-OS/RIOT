@@ -8,7 +8,7 @@
  * @file
  * @ingroup unittests
  * @brief   Unit tests for PDU parsers
- * @author  Carl Seifert <carl.seifert1@mailbox.tu-dresden.de>
+ * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
 #include <stdio.h>
