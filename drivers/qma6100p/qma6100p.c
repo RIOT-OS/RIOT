@@ -341,6 +341,7 @@ static int _soft_reset(const qma6100p_t *dev)
             (QMA6100P_NVM_LOAD_DONE | QMA6100P_NVM_RDY)) {
             break;
         }
+        ztimer_sleep(ZTIMER_MSEC, 1);
     } while (--retries);
 
     if (!retries) {
