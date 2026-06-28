@@ -26,12 +26,17 @@
 #define ADC_SMP_MIN_VAL     (0x2) /*< Sampling time for slow channels
                                       (0x2 = 4.5 ADC clock cycles) */
 
-#ifdef CPU_FAM_STM32H7
+#if defined(CPU_FAM_STM32H7) || defined(CPU_FAM_STM32U3)
 #  define ADC_SMP_VBAT_VAL    (0x7) /*< Sampling time when the VBat channel
                                       is read (0x7 = 810.5 ADC clock cycles) */
 #else
 #  define ADC_SMP_VBAT_VAL    (0x5) /*< Sampling time when the VBat channel
                                       is read (0x5 = 61.5 ADC clock cycles) */
+#endif
+
+#if defined(CPU_FAM_STM32U3)
+/* Give internal VBAT path time to settle before conversion. */
+#  define ADC_T_VBAT_STAB_US   (10U)
 #endif
 
 /* The sampling time width is 3 bit */
@@ -115,6 +120,13 @@ int adc_init(adc_t line)
         return -1;
     }
 
+#if defined(CPU_FAM_STM32U3)
+    /* Independent analog supply for ADC analog front-end */
+    PWR->SVMCR |= PWR_SVMCR_ASV;
+    /* ADC kernel clock: clear ADCDACSEL so HCLK is selected */
+    RCC->CCIPR2 &= ~RCC_CCIPR2_ADCDACSEL;
+#endif
+
 #if CPU_FAM_STM32H7
     /* Set per_ck (HSI - 64MHz) as ADC kernel peripheral clock */
     RCC->D3CCIPR |= RCC_D3CCIPR_ADCSEL_1;
@@ -144,7 +156,22 @@ int adc_init(adc_t line)
         periph_clk_en(AHB4, RCC_AHB4ENR_ADC3EN);
     }
 #endif
+#if defined(RCC_AHB2ENR1_ADC12EN) /* STM32U3 */
+    if (adc_config[line].dev <= 1) {
+        periph_clk_en(AHB2, RCC_AHB2ENR1_ADC12EN);
+    }
+#endif
 
+#if defined(CPU_FAM_STM32U3)
+    /* STM32U3 ADC kernel clock is derived directly from HCLK without a CKMODE 
+     * divider. To ensure sufficient sample-and-hold time for high-impedance 
+     * internal channels (VBAT, VREFINT, TSENSE) at maximum HCLK frequencies, 
+     * a clock prescaler is applied. */
+    ADC_INSTANCE->CCR = (ADC_INSTANCE->CCR & ~ADC_CCR_PRESC)
+                      | ADC_CCR_PRESC_2; /* divide ADC clock by 8 */
+#endif
+
+#if !defined(CPU_FAM_STM32U3)
     /* Setting ADC clock to HCLK/1 is only allowed if AHB clock
      * prescaler is 1 */
 #ifdef RCC_D1CFGR_HPRE
@@ -177,6 +204,7 @@ int adc_init(adc_t line)
 #endif
         }
     }
+#endif /* !defined(CPU_FAM_STM32U3) — U3: no CKMODE in ADC_CCR; clock from RCC->CCIPR2 */
 
     /* Configure the pin */
     if (adc_config[line].pin != GPIO_UNDEF) {
@@ -189,10 +217,22 @@ int adc_init(adc_t line)
         /* take ADC out of deep sleep */
         dev(line)->CR &= ~(ADC_CR_DEEPPWD);
 #endif
+#if defined(CPU_FAM_STM32U3)
+        /* take ADC out of deep sleep */
+        dev(line)->CR &= ~(ADC_CR_DEEPPWD);
+#endif
         /* Enable ADC internal voltage regulator and wait for startup period */
+#if defined(CPU_FAM_STM32U3)
+        dev(line)->ISR |= ADC_ISR_LDORDY;
+#endif
         dev(line)->CR |= ADC_CR_ADVREGEN;
+#if defined(CPU_FAM_STM32U3)
+        while (!(dev(line)->ISR & ADC_ISR_LDORDY)) {}
+#else
         busy_wait_us(ADC_T_ADCVREG_STUP_US * 2);
+#endif
 
+#if defined(ADC_CR_ADCALDIF) && !defined(CPU_FAM_STM32U3)
         if (dev(line)->DIFSEL & (1 << adc_config[line].chan)) {
             /* Configure calibration for differential inputs */
             dev(line)->CR |= ADC_CR_ADCALDIF;
@@ -201,6 +241,7 @@ int adc_init(adc_t line)
             /* Configure calibration for single ended inputs */
             dev(line)->CR &= ~ADC_CR_ADCALDIF;
         }
+#endif
 
 #if CPU_FAM_STM32H7
         /* enable linearity cal, and turn on boost supply */
@@ -219,6 +260,14 @@ int adc_init(adc_t line)
         /* Enable ADC and wait for it to be ready */
         dev(line)->CR |= ADC_CR_ADEN;
         while ((dev(line)->ISR & ADC_ISR_ADRDY) == 0) {}
+#if defined(CPU_FAM_STM32U3)
+        /* STM32U3 may drop ADEN once during enable; re-assert if needed */
+        if (!(dev(line)->CR & ADC_CR_ADEN)) {
+            dev(line)->ISR |= ADC_ISR_ADRDY;
+            dev(line)->CR |= ADC_CR_ADEN;
+            while ((dev(line)->ISR & ADC_ISR_ADRDY) == 0) {}
+        }
+#endif
 
         /* Set sequence length to 1 conversion */
         dev(line)->SQR1 |= (0 & ADC_SQR1_L);
@@ -228,9 +277,18 @@ int adc_init(adc_t line)
     if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
         smp_time = ADC_SMP_VBAT_VAL;
     }
+#if defined(VREFINT_ADC)
+    /* VREFINT requires maximum sampling time due to high internal impedance */
+    if (line == VREFINT_ADC) {
+        smp_time = ADC_SMP_VBAT_VAL;
+    }
+#endif
 
 #if CPU_FAM_STM32H7
     /* Enable the ADC channel's analog switch */
+    dev(line)->PCSEL |= ADC_PCSEL_PCSEL_0 << adc_config[line].chan;
+#endif
+#if defined(CPU_FAM_STM32U3)
     dev(line)->PCSEL |= ADC_PCSEL_PCSEL_0 << adc_config[line].chan;
 #endif
 
@@ -268,14 +326,41 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     /* check if this is the VBAT line */
     if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
         vbat_enable();
+#if defined(CPU_FAM_STM32U3)
+        busy_wait_us(ADC_T_VBAT_STAB_US);
+#endif
     }
+#if defined(VREFINT_ADC) && defined(ADC_CCR_VREFEN)
+    /* Enable internal voltage reference path (VREFINT) */
+    if (line == VREFINT_ADC) {
+        ADC_INSTANCE->CCR |= ADC_CCR_VREFEN;
+#if defined(CPU_FAM_STM32U3)
+        busy_wait_us(ADC_T_VBAT_STAB_US);
+#endif
+    }
+#endif
 
     /* Set resolution */
+#if defined(CPU_FAM_STM32U3)
+    dev(line)->CFGR1 &= ~(uint32_t)ADC_CFGR_RES;
+    dev(line)->CFGR1 |= (uint32_t)res;
+#else
     dev(line)->CFGR &= ~ADC_CFGR_RES;
     dev(line)->CFGR |= res;
+#endif
 
     /* Specify channel for regular conversion */
     dev(line)->SQR1 = adc_config[line].chan << ADC_SQR1_SQ1_Pos;
+
+#if defined(CPU_FAM_STM32U3)
+    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+        /* Discard dummy conversion to clear residual charge after enabling path */
+        dev(line)->ISR |= ADC_ISR_EOC;
+        dev(line)->CR |= ADC_CR_ADSTART;
+        while (!(dev(line)->ISR & ADC_ISR_EOC)) {}
+        (void)dev(line)->DR;
+    }
+#endif
 
     /* Start conversion and wait for it to complete */
     dev(line)->ISR |= ADC_ISR_EOC;
@@ -289,6 +374,11 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
         vbat_disable();
     }
+#if defined(VREFINT_ADC) && defined(ADC_CCR_VREFEN)
+    if (line == VREFINT_ADC) {
+        ADC_INSTANCE->CCR &= ~ADC_CCR_VREFEN;
+    }
+#endif
 
     /* Power off and unlock device again */
     done(line);
