@@ -27,6 +27,7 @@ SERVER_PORT = 1883
 MODES = set(["pub", "sub", "sub_w_reg"])
 INTER_PACKET_GAP = 0.07
 TIMEOUT = 1
+TOPIC_MAX_LEN = 249
 
 
 class MQTTSNServer(Automaton):
@@ -456,13 +457,24 @@ def get_host_lladdr(tap):
         return res
 
 
+def check_will_topic_overflow_releases_txlock(child, gw_addr):
+    utils.test_utils_interactive_sync_shell(child,
+                                            TEST_INTERACTIVE_RETRIES,
+                                            TEST_INTERACTIVE_DELAY)
+    will_topic = "/" + ("x" * TOPIC_MAX_LEN)
+    for _ in range(2):
+        child.sendline("con {} {} msg".format(gw_addr, will_topic))
+        child.expect_exact("error: unable to connect to {}".format(gw_addr))
+
+
 def testfunc(child):
     tap = get_bridge(os.environ["TAP"])
     lladdr = get_host_lladdr(tap)
+    gw_addr = "[{}%{}]:{}".format(lladdr, tap, SERVER_PORT)
 
     time.sleep(1)
     DATA_MAX_LEN = 512 - 9  # PUBLISH + 2 byte extra for length
-    TOPIC_MAX_LEN = 249     # see Makefile
+    check_will_topic_overflow_releases_txlock(child, gw_addr)
     for test_params in [
         {"qos_level": 0, "mode": "sub", "topic_name": "/test",
          "data_len_start": 0, "data_len_end": DATA_MAX_LEN,
