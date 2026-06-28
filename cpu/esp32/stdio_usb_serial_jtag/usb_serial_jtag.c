@@ -56,7 +56,7 @@ static void _serial_intr_handler(void *arg)
     /* read data if available */
     while (IS_USED(MODULE_STDIO_USB_SERIAL_JTAG_RX) &&
            usb_serial_jtag_ll_rxfifo_data_available()) {
-        isrpipe_write_one(&stdin_isrpipe, USB_SERIAL_JTAG.ep1.rdwr_byte);
+        stdio_rx_write_one(USB_SERIAL_JTAG.ep1.rdwr_byte);
     }
 
     /* write data if there is a free stop */

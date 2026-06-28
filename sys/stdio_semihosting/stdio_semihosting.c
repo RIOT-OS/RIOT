@@ -146,13 +146,14 @@ static bool _read_cb(void *arg)
 {
     uint8_t buffer[STDIO_RX_BUFSIZE];
 
+    (void)arg;
     if (!_semihosting_connected()) {
         return true;
     }
 
     int bytes = _semihosting_read(buffer, sizeof(buffer));
     if (bytes > 0) {
-        isrpipe_write(arg, buffer, bytes);
+        stdio_rx_write(buffer, bytes);
     }
 
     return true;
@@ -169,7 +170,7 @@ static void _init(void) {
         return;
     }
 
-    ztimer_periodic_init(ZTIMER_MSEC, &stdin_timer, _read_cb, &stdin_isrpipe,
+    ztimer_periodic_init(ZTIMER_MSEC, &stdin_timer, _read_cb, NULL,
                          STDIO_SEMIHOSTING_POLL_RATE_MS);
     ztimer_periodic_start(&stdin_timer);
     _init_done = true;
