@@ -100,7 +100,7 @@ void i2c_init(i2c_t dev)
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
     defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L4) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32H7)
+    defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32H7)
     /* select I2C clock source */
     I2C_CLOCK_SRC_REG |= i2c_config[dev].rcc_sw_mask;
 #endif

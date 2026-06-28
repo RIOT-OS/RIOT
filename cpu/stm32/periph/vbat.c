@@ -123,8 +123,9 @@
 #elif defined(CPU_LINE_STM32L552xx) || defined(CPU_LINE_STM32L562xx)
 #  define VBAT_ADC_SCALE      3
 #  define VBAT_ADC_MIN_MV     1550
-/* u5 */
-#elif defined(CPU_LINE_STM32U575xx) || defined(CPU_LINE_STM32U585xx)
+/* u5, u3 (same internal VBAT divider / RM0487 guidance as U5 class) */
+#elif defined(CPU_LINE_STM32U575xx) || defined(CPU_LINE_STM32U585xx) || \
+      defined(CPU_LINE_STM32U385xx)
 #  define VBAT_ADC_SCALE      4
 #  define VBAT_ADC_MIN_MV     1650
 /* wb */
@@ -191,15 +192,69 @@
 #endif
 
 /**
- * @brief   Override this function if you know how to retrieve the accurate
- *          ADC supply voltage in mV for your board. The default behaviour is
- *          to return @ref CONFIG_VBAT_ADC_VREF_MV.
- *          Once there is a driver to sample VREFINT, this function is likely
- *          to be changed.
+ * @brief   VREF+ value (mV) at which VREFINT_CAL was measured in production.
+ *          For the STM32U5/U3 analog family this is 3000 mV (datasheet).
  */
+#ifndef VREFINT_CAL_VREF_MV
+#  define VREFINT_CAL_VREF_MV     3000
+#endif
+
+/**
+ * @brief   Datasheet-typical VREFINT value (mV), used as a fallback.
+ */
+#ifndef VREFINT_TYP_MV
+#  define VREFINT_TYP_MV          1212
+#endif
+
+/**
+ * @brief   Address of the factory VREFINT calibration word.
+ *
+ * For STM32U3 this is 0x0BFA07A5 (calibrated at Vref+ = 3.0 V, 30 degC).
+ * If undefined, vref_mv() uses the datasheet-typical VREFINT.
+ */
+#if defined(CPU_FAM_STM32U3) && !defined(VREFINT_CAL_ADDR)
+#  define VREFINT_CAL_ADDR  ((const uint16_t *)0x0BFA07A5UL)
+#endif
+
+/**
+ * @brief   Return the ADC reference voltage (VREF+ / VDDA) in mV.
+ *
+ * Derives VDDA ratiometrically when VREFINT_ADC is available:
+ * VDDA = VREFINT_CAL_VREF_MV * VREFINT_CAL / VREFINT_DATA
+ *
+ * Falls back to @ref CONFIG_VBAT_ADC_VREF_MV on out-of-bounds error.
+ */
+#if defined(VREFINT_ADC) && defined(ADC_CCR_VREFEN)
+int32_t vref_mv(void)
+{
+    /* Sample internal reference to derive VDDA ratiometrically */
+    int32_t raw = adc_sample(VREFINT_ADC, VBAT_ADC_RES);
+    int32_t vdda = CONFIG_VBAT_ADC_VREF_MV;
+
+    if (raw > 0) {
+#if defined(VREFINT_CAL_ADDR)
+        uint16_t cal = *(volatile uint16_t *)(VREFINT_CAL_ADDR);
+        if (cal != 0 && cal != 0xFFFF) {
+            vdda = ((int32_t)VREFINT_CAL_VREF_MV * cal) / raw;
+        } else {
+            vdda = ((int32_t)VREFINT_TYP_MV * VBAT_ADC_MAX) / raw;
+        }
+#else
+        vdda = ((int32_t)VREFINT_TYP_MV * VBAT_ADC_MAX) / raw;
+#endif
+    }
+
+    /* Clamp to realistic STM32 operating voltage bounds */
+    if (vdda < 2000 || vdda > 3600) {
+        vdda = CONFIG_VBAT_ADC_VREF_MV;
+    }
+    return vdda;
+}
+#else
 int32_t __attribute__((weak)) vref_mv(void) {
     return CONFIG_VBAT_ADC_VREF_MV;
 }
+#endif
 
 #ifndef VBAT_ADC
 #  error "VBAT: Add internal VBAT ADC line to adc_config[] and #define VBAT_ADC."
@@ -207,6 +262,10 @@ int32_t __attribute__((weak)) vref_mv(void) {
 
 int vbat_init(void)
 {
+#if defined(VREFINT_ADC) && defined(ADC_CCR_VREFEN)
+    /* Initialize VREFINT line for vref_mv() sampling */
+    adc_init(VREFINT_ADC);
+#endif
     return adc_init(VBAT_ADC);
 }
 
@@ -222,8 +281,9 @@ void vbat_disable(void)
 
 int32_t vbat_sample_mv(void)
 {
-    int32_t mv = adc_sample(VBAT_ADC, VBAT_ADC_RES);
-    mv = (mv * VBAT_ADC_SCALE * vref_mv()) / VBAT_ADC_MAX;
+    int32_t raw = adc_sample(VBAT_ADC, VBAT_ADC_RES);
+    int32_t vref = vref_mv();
+    int32_t mv = (raw * VBAT_ADC_SCALE * vref) / VBAT_ADC_MAX;
     return mv;
 }
 
