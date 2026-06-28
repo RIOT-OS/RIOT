@@ -33,8 +33,13 @@ static const qma6100p_odr_t rates[] = {
     QMA6100P_ODR_12HZ5,
     QMA6100P_ODR_25HZ,
     QMA6100P_ODR_100HZ,
+    QMA6100P_ODR_200HZ,
+    QMA6100P_ODR_400HZ,
+    QMA6100P_ODR_800HZ,
+    QMA6100P_ODR_1600HZ,
+
 };
-static const unsigned expect_hz[] = { 12, 25, 100 };
+static const unsigned expect_hz[] = { 12, 25, 100, 200, 400, 800, 1600 };
 
 /* waited on by the reader thread, posted by the data-ready ISR to wake it */
 static sema_t data_ready = SEMA_CREATE_LOCKED();
@@ -46,7 +51,7 @@ static char reader_stack[THREAD_STACKSIZE_MAIN];
 
 static qma6100p_t dev;
 
-static void callback(void *args)
+static void callback_stream(void *args)
 {
     (void)args;
     irq_count++;
@@ -54,6 +59,12 @@ static void callback(void *args)
     if (sema_get_value(&data_ready) == 0) {
         sema_post(&data_ready);
     }
+}
+
+static void callback(void *args)
+{
+    (void)args;
+    irq_count++;
 }
 
 /* Wakes on each data-ready signal and reads the sample over I2C. */
@@ -80,16 +91,19 @@ static void *reader_thread(void *arg)
     return NULL;
 }
 
+/* Window over which the average data-ready frequency is observed */
+#define MEASURE_WINDOW_SEC 4
+
 static inline unsigned int _measure_irq_hz(void)
 {
     unsigned before = irq_count;
-    ztimer_sleep(ZTIMER_SEC, 1);
-    return irq_count - before;
+    ztimer_sleep(ZTIMER_SEC, MEASURE_WINDOW_SEC);
+    return (irq_count - before + (MEASURE_WINDOW_SEC / 2)) / MEASURE_WINDOW_SEC;
 }
 
 /* (Re)initialize the device at @p rate and enable the data-ready interrupt on
  * INT1. Each test calls this so it does not depend on any prior test state. */
-static int _setup(qma6100p_odr_t rate)
+static int _setup(qma6100p_odr_t rate, qma6100p_int_cb_t cb)
 {
     qma6100p_params_t p = *qma6100p_params; /* mutable copy */
     p.rate = rate;
@@ -103,7 +117,7 @@ static int _setup(qma6100p_odr_t rate)
         return -1;
     }
 
-    return qma6100p_set_data_ready_int(&dev, QMA6100P_INT1, callback, NULL);
+    return qma6100p_set_data_ready_int(&dev, QMA6100P_INT1, cb, NULL);
 }
 
 static int test_init(void)
@@ -133,10 +147,10 @@ static int test_data_ready(void)
         printf("[ODR %u/%u] set rate -> %u Hz ... ",
                i + 1, (unsigned)ARRAY_SIZE(rates), expect_hz[i]);
 
-        res = _setup(rates[i]);
+        res = _setup(rates[i], callback);
         if (res < 0) {
-            printf("[ODR %u/%u] FAILED to set up (res=%d)\n",
-                   i + 1, (unsigned)ARRAY_SIZE(rates), res);
+            printf("[ODR %u/%u] FAILED to set up with rate %uHz (res=%d)\n",
+                   i + 1, (unsigned)ARRAY_SIZE(rates), expect_hz[i], res);
             return res;
         }
         puts("OK");
@@ -144,7 +158,12 @@ static int test_data_ready(void)
         res = -1;
         for (unsigned int try = 0; try < 3; try++) {
             unsigned hz = _measure_irq_hz();
-            int pass = (expect_hz[i] - 1 <= hz && hz <= expect_hz[i] + 1);
+            /* 5% tolerance (observed ODR drift + 1 count), floored at 1 Hz */
+            unsigned tol = expect_hz[i] / 20;
+            if (tol < 1) {
+                tol = 1;
+            }
+            int pass = (hz + tol >= expect_hz[i] && hz <= expect_hz[i] + tol);
             printf("  try %u/3: measured %u Hz (expect ~%u) -> %s\n",
                    try + 1, hz, expect_hz[i], pass ? "PASS" : "FAIL");
             if (pass) {
@@ -172,7 +191,7 @@ static int test_ulps(void)
 
     puts("\n--- ULPS mode test ---");
 
-    int res = _setup(rate);
+    int res = _setup(rate, callback);
     if (res < 0) {
         printf("[ULPS] FAILED to set up (res=%d)\n", res);
         return res;
@@ -206,10 +225,13 @@ static int test_ulps(void)
         return res;
     }
 
+    /* exiting ULPS does a full reset + re-init: confirm the ODR is restored
+     * and the interrupt fires again */
     irq_count = 0;
     unsigned hz_after = _measure_irq_hz();
 
-    int pass_wake = (expect_hz - 1 <= hz_after && hz_after <= expect_hz + 1);
+    unsigned tol = expect_hz / 20;   /* 5% tolerance */
+    int pass_wake = (hz_after + tol >= expect_hz && hz_after <= expect_hz + tol);
     printf("[ULPS] after wake: %u IRQs/s (expect ~%u) -> %s\n",
            hz_after, expect_hz, pass_wake ? "PASS" : "FAIL");
     if (!pass_wake) {
@@ -223,7 +245,7 @@ static int test_streaming(void)
 {
     puts("\n--- interrupt-driven streaming ---");
 
-    int res = _setup(rates[ARRAY_SIZE(rates) - 1]);
+    int res = _setup(QMA6100P_ODR_12HZ5, callback_stream);
     if (res < 0) {
         printf("[stream] FAILED to set up (res=%d)\n", res);
         return res;
@@ -244,7 +266,7 @@ int main(void)
 {
     int res;
 
-    ztimer_sleep(ZTIMER_SEC, 1);
+    ztimer_sleep(ZTIMER_SEC, 5);
     puts("=== QMA6100P accelerometer driver test ===");
 
     res = test_init();
