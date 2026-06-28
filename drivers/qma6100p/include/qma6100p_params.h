@@ -18,6 +18,7 @@
  */
 
 #include "board.h"
+#include "periph/gpio.h"
 #include "periph/i2c.h"
 #include "qma6100p.h"
 #include "saul_reg.h"
@@ -36,44 +37,26 @@ extern "C" {
  * Determined by the AD0 pin level.
  * @{
  */
-#define QMA6100P_I2C_ADDR_LOW        (0x12) /**< AD0 connected to GND */
-#define QMA6100P_I2C_ADDR_HIGH       (0x13) /**< AD0 connected to VDD */
+#define QMA6100P_I2C_ADDR_LOW  (0x12) /**< AD0 connected to GND */
+#define QMA6100P_I2C_ADDR_HIGH (0x13) /**< AD0 connected to VDD */
 /** @} */
 
-/**
-* @def QMA6100P_PARAM_INT_PIN_UNDEF
-* @brief   INT pin default: should be defined by the board or the app.
-*/
-#define QMA6100P_PARAM_INT_PIN_UNDEF (GPIO_UNDEF)
-
-/**
- * @def QMA6100P_PARAM_I2C
- * @brief Default I2C bus
- */
+/** Default I2C bus */
 #ifndef QMA6100P_PARAM_I2C
 #  define QMA6100P_PARAM_I2C (I2C_DEV(0))
 #endif
 
-/**
- * @def CONFIG_QMA6100P_I2C_ADDR
- * @brief Default I2C address (fallback when not configured via Kconfig)
- */
+/** Default I2C address (fallback when not configured via Kconfig) */
 #ifndef CONFIG_QMA6100P_I2C_ADDR
 #  define CONFIG_QMA6100P_I2C_ADDR (QMA6100P_I2C_ADDR_LOW)
 #endif
 
-/**
- * @def QMA6100P_PARAM_I2C_ADDR
- * @brief Default I2C address
- */
+/** Default I2C address */
 #ifndef QMA6100P_PARAM_I2C_ADDR
 #  define QMA6100P_PARAM_I2C_ADDR (CONFIG_QMA6100P_I2C_ADDR)
 #endif
 
-/**
- * @def QMA6100P_PARAM_RATE
- * @brief Default output data rate
- */
+/** Default output data rate */
 #if IS_ACTIVE(CONFIG_QMA6100P_ODR_100HZ)
 #  define QMA6100P_PARAM_RATE (QMA6100P_ODR_100HZ)
 #elif IS_ACTIVE(CONFIG_QMA6100P_ODR_200HZ)
@@ -95,10 +78,7 @@ extern "C" {
 #  define QMA6100P_PARAM_RATE (QMA6100P_ODR_100HZ)
 #endif
 
-/**
- * @def QMA6100P_PARAM_RANGE
- * @brief Default full-scale range
- */
+/** Default full-scale range */
 #if IS_ACTIVE(CONFIG_QMA6100P_RANGE_2G)
 #  define QMA6100P_PARAM_RANGE (QMA6100P_RANGE_2G)
 #elif IS_ACTIVE(CONFIG_QMA6100P_RANGE_4G)
@@ -114,10 +94,7 @@ extern "C" {
 #  define QMA6100P_PARAM_RANGE (QMA6100P_RANGE_2G)
 #endif
 
-/**
- * @def QMA6100P_PARAM_MCLK
- * @brief Default master clock frequency
- */
+/** Default master clock frequency */
 #if IS_ACTIVE(CONFIG_QMA6100P_PM_MCLK_51K2)
 #  define QMA6100P_PARAM_MCLK (QMA6100P_PM_MCLK_51K2)
 #elif IS_ACTIVE(CONFIG_QMA6100P_PM_MCLK_25K6)
@@ -132,26 +109,22 @@ extern "C" {
 #endif
 
 /**
- * @def QMA6100P_PARAM_INT1_PIN
- * @brief MCU GPIO connected to the QMA6100P INT1 pin. Set to GPIO_UNDEF to
- *        disable interrupt-driven operation on this line and use polling instead.
+ * MCU GPIO connected to the QMA6100P INT1 pin. Set to GPIO_UNDEF to
+ * disable interrupt-driven operation on this line and use polling instead.
  */
 #ifndef QMA6100P_PARAM_INT1_PIN
-#  define QMA6100P_PARAM_INT1_PIN (QMA6100P_PARAM_INT_PIN_UNDEF)
+#  define QMA6100P_PARAM_INT1_PIN (GPIO_UNDEF)
 #endif
 
 /**
- * @def QMA6100P_PARAM_INT2_PIN
- * @brief MCU GPIO connected to the QMA6100P INT2 pin. Set to GPIO_UNDEF to
- *        disable interrupt-driven operation on this line and use polling instead.
+ * MCU GPIO connected to the QMA6100P INT2 pin. Set to GPIO_UNDEF to
+ * disable interrupt-driven operation on this line and use polling instead.
  */
 #ifndef QMA6100P_PARAM_INT2_PIN
-#  define QMA6100P_PARAM_INT2_PIN (QMA6100P_PARAM_INT_PIN_UNDEF)
+#  define QMA6100P_PARAM_INT2_PIN (GPIO_UNDEF)
 #endif
-/**
- * @def QMA6100P_PARAM_INT_ACTIVE_LEVEL
- * @brief Default interrupt pin active level
- */
+
+/** Default interrupt pin active level */
 #if IS_ACTIVE(CONFIG_QMA6100P_INTPIN_ACTIVE_HIGH)
 #  define QMA6100P_PARAM_INT_ACTIVE_LEVEL (QMA6100P_INTPIN_ACTIVE_HIGH)
 #elif IS_ACTIVE(CONFIG_QMA6100P_INTPIN_ACTIVE_LOW)
@@ -161,10 +134,7 @@ extern "C" {
 #  define QMA6100P_PARAM_INT_ACTIVE_LEVEL (QMA6100P_INTPIN_ACTIVE_HIGH)
 #endif
 
-/**
- * @def QMA6100P_PARAM_INT_PIN_MODE
- * @brief Default interrupt pin output mode (push-pull or open-drain)
- */
+/** Default interrupt pin output mode (push-pull or open-drain) */
 #if IS_ACTIVE(CONFIG_QMA6100P_INTPIN_PUSH_PULL)
 #  define QMA6100P_PARAM_INT_PIN_MODE (QMA6100P_INTPIN_PUSH_PULL)
 #elif IS_ACTIVE(CONFIG_QMA6100P_INTPIN_OPEN_DRAIN)
@@ -174,10 +144,7 @@ extern "C" {
 #  define QMA6100P_PARAM_INT_PIN_MODE (QMA6100P_INTPIN_PUSH_PULL)
 #endif
 
-/**
- * @def QMA6100P_PARAM_INT_SHADOW
- * @brief Default shadow mode for acceleration data registers
- */
+/** Default shadow mode for acceleration data registers */
 #if IS_ACTIVE(CONFIG_QMA6100P_INT_CFG_SHADOW_DIS)
 #  define QMA6100P_PARAM_INT_SHADOW (QMA6100P_INT_CFG_SHADOW_DIS)
 #elif IS_ACTIVE(CONFIG_QMA6100P_INT_CFG_SHADOW_EN)
@@ -187,10 +154,7 @@ extern "C" {
 #  define QMA6100P_PARAM_INT_SHADOW (QMA6100P_INT_CFG_SHADOW_DIS)
 #endif
 
-/**
- * @def QMA6100P_PARAMS
- * @brief Default configuration parameters structure for QMA6100P devices
- */
+/** Default configuration parameters structure for QMA6100P devices */
 #ifndef QMA6100P_PARAMS
 #  define QMA6100P_PARAMS { .i2c = QMA6100P_PARAM_I2C,           \
                             .addr = QMA6100P_PARAM_I2C_ADDR,     \
@@ -202,10 +166,7 @@ extern "C" {
                             .interrupt_shadow = QMA6100P_PARAM_INT_SHADOW }
 #endif
 
-/**
- * @def QMA6100P_SAUL_INFO
- * @brief Additional SAUL registry information
- */
+/** Additional SAUL registry information */
 #ifndef QMA6100P_SAUL_INFO
 #  define QMA6100P_SAUL_INFO { .name = "qma6100p" }
 #endif

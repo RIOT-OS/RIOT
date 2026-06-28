@@ -71,7 +71,7 @@ typedef enum {
  * @brief   Output data rate selection
  *
  * Values map directly to bits[4:0] of the ODR register (0x10)
- * Assumes MCLK=51.2KHz (default after init sequence)
+ * Assumes MCLK=51.2kHz (default after init sequence)
  */
 typedef enum {
     QMA6100P_ODR_100HZ = 0x00,  /**< 100 Hz (default) */
@@ -89,7 +89,7 @@ typedef enum {
  *
  * Master clock is controlled by PM_REGISTER (0x11) and can be set through I2C commands.
  *
- * @note By default, QMA6100P has a 51K2 after init sequence.
+ * @note By default, QMA6100P has a 51.2kHz clock rate after init sequence.
  */
 typedef enum {
     QMA6100P_PM_MCLK_51K2 = 4, /**< 51.2 kHz Default after the power on */
@@ -123,11 +123,12 @@ typedef enum {
  * @brief   Data shadowing mode (INT_CFG, 0x21)
  */
 typedef enum {
-    QMA6100P_INT_CFG_SHADOW_EN = 0,  /**< shadowing enabled: lock the MSB content while the
-                                          LSB is read so both bytes belong to the same sample,
-                                          preserving acceleration data integrity (default) */
-    QMA6100P_INT_CFG_SHADOW_DIS = 1, /**< shadowing disabled: no lock, MSB/LSB may come from
-                                          different samples */
+    /** shadowing enabled: lock the MSB content while the LSB is read so both
+     * bytes belong to the same sample, preserving acceleration data integrity
+     * (default) */
+    QMA6100P_INT_CFG_SHADOW_EN = 0,
+    /** shadowing disabled: no lock, MSB/LSB may come from different samples */
+    QMA6100P_INT_CFG_SHADOW_DIS = 1,
 } qma6100p_int_shadow_t;
 
 /**
@@ -142,10 +143,12 @@ typedef enum {
  * @brief   Configuration parameters
  */
 typedef struct {
-    i2c_t i2c;                              /**< I2C bus the device is connected to */
-    uint8_t addr;                           /**< I2C address (@ref QMA6100P_I2C_ADDR_LOW or _HIGH) */
-    gpio_t int1_pin;                        /**< MCU GPIO connected to the QMA6100P INT1 pin (@ref GPIO_UNDEF if unused) */
-    gpio_t int2_pin;                        /**< MCU GPIO connected to the QMA6100P INT2 pin (@ref GPIO_UNDEF if unused) */
+    i2c_t i2c;    /**< I2C bus the device is connected to */
+    uint8_t addr; /**< I2C address (@ref QMA6100P_I2C_ADDR_LOW or _HIGH) */
+    /** MCU GPIO connected to the QMA6100P INT1 pin (@ref GPIO_UNDEF if unused) */
+    gpio_t int1_pin;
+    /** MCU GPIO connected to the QMA6100P INT2 pin (@ref GPIO_UNDEF if unused) */
+    gpio_t int2_pin;
     qma6100p_odr_t rate;                    /**< output data rate */
     qma6100p_range_t range;                 /**< full-scale range */
     qma6100p_mclk_t mclk;                   /**< master clock */
@@ -169,12 +172,12 @@ typedef struct {
 } qma6100p_raw_data_t;
 
 /**
- * @brief   Converted acceleration data in g
+ * @brief   Converted acceleration data in µg
  */
 typedef struct {
-    int32_t x; /**< acceleration in X direction [ug] */
-    int32_t y; /**< acceleration in Y direction [ug] */
-    int32_t z; /**< acceleration in Z direction [ug] */
+    int32_t x; /**< acceleration in X direction [µg] */
+    int32_t y; /**< acceleration in Y direction [µg] */
+    int32_t z; /**< acceleration in Z direction [µg] */
 } qma6100p_data_t;
 
 /**
@@ -188,20 +191,20 @@ typedef struct {
  * @param[out] dev          device descriptor of accelerometer to initialize
  * @param[in]  params       configuration parameters
  *
- * @return                  QMA6100P_OK on success
- * @return                  QMA6100P_NOI2C if initialization of I2C bus failed
- * @return                  QMA6100P_NODEV if accelerometer test failed
+ * @retval                  QMA6100P_OK on success
+ * @retval                  QMA6100P_NOI2C if initialization of I2C bus failed
+ * @retval                  QMA6100P_NODEV if accelerometer test failed
  */
 int qma6100p_init(qma6100p_t *dev, const qma6100p_params_t *params);
 
 /**
  * @brief   Enter Ultra-Low Power State (ULPS)
  *
- * @param[in,out]  dev        device descriptor of accelerometer
+ * @param[in,out] dev        device descriptor of accelerometer
  *
- * @return                   QMA6100P_OK on success
- * @return                   QMA6100P_NOI2C if I2C transaction failed
- * @return                   QMA6100P_NODEV if device not found on bus
+ * @retval                   QMA6100P_OK on success
+ * @retval                   QMA6100P_NOI2C if I2C transaction failed
+ * @retval                   QMA6100P_NODEV if device not found on bus
  */
 int qma6100p_set_low_power(qma6100p_t *dev);
 
@@ -210,33 +213,33 @@ int qma6100p_set_low_power(qma6100p_t *dev);
  *
  * Exits Ultra-Low Power State (ULPS) and restores the configured parameters.
  *
- * @param[in,out]  dev        device descriptor of accelerometer
+ * @param[in,out] dev        device descriptor of accelerometer
  *
- * @return                   QMA6100P_OK on success
- * @return                   QMA6100P_NOI2C if I2C transaction failed
- * @return                   QMA6100P_NODEV if device not found on bus
+ * @retval                   QMA6100P_OK on success
+ * @retval                   QMA6100P_NOI2C if I2C transaction failed
+ * @retval                   QMA6100P_NODEV if device not found on bus
  */
 int qma6100p_set_active_mode(qma6100p_t *dev);
 
 /**
  * @brief   Read raw accelerometer data (ADC counts)
  *
- * @param[in]  dev          device descriptor of accelerometer
+ * @param[in] dev           device descriptor of accelerometer
  * @param[out] data         raw ADC counts per axis
  *
- * @return                  QMA6100P_NO_NEW_DATA if nothing has changed and keep data unchanged.
+ * @retval                  QMA6100P_NO_NEW_DATA if nothing has changed and keep data unchanged.
  */
 int qma6100p_read_raw(const qma6100p_t *dev, qma6100p_raw_data_t *data);
 
 /**
  * @brief   Read accelerometer data converted to ug
  *
- * Converts raw counts using the configured range sensitivity
+ * Converts raw counts using the configured range sensitivity.
  *
- * @param[in]  dev          device descriptor of accelerometer
+ * @param[in] dev           device descriptor of accelerometer
  * @param[out] data         acceleration in ug per axis
  *
- * @return                  QMA6100P_NO_NEW_DATA if nothing has changed and keep data unchanged
+ * @retval                  QMA6100P_NO_NEW_DATA if nothing has changed and keep data unchanged
  */
 int qma6100p_read(const qma6100p_t *dev, qma6100p_data_t *data);
 
@@ -245,19 +248,19 @@ int qma6100p_read(const qma6100p_t *dev, qma6100p_data_t *data);
  *
  * Writes INTPIN_CONF, INTx_MAP1, and INT_EN1 registers to route the data-ready
  * event to the @p line INT pin, then arms the matching MCU GPIO ISR
- * (@ref qma6100p_params_t::int1_pin / int2_pin)
+ * (@ref qma6100p_params_t::int1_pin / @ref qma6100p_params_t::int2_pin).
  *
  * @param[in,out] dev        device descriptor of accelerometer
- * @param[in]     line       INT line to route the data-ready event to
+ * @param[in] line           INT line to route the data-ready event to
  *                           (@ref QMA6100P_INT1 or @ref QMA6100P_INT2)
- * @param[in]     cb         callback invoked when the data-ready event fires
- * @param[in]     arg        argument passed to @p cb
+ * @param[in] cb             callback invoked when the data-ready event fires
+ * @param[in] arg            argument passed to @p cb
  *
- * @return                   QMA6100P_OK on success
- * @return                   QMA6100P_GPIO_ERROR if the line's GPIO is unwired or initialization failed
- * @return                   QMA6100P_INVALID_ARG if line is invalid
- * @return                   QMA6100P_NOI2C if I2C transaction failed
- * @return                   QMA6100P_NODEV if device not found on bus
+ * @retval                   QMA6100P_OK on success
+ * @retval                   QMA6100P_GPIO_ERROR if the line's GPIO is unwired or initialization failed
+ * @retval                   QMA6100P_INVALID_ARG if line is invalid
+ * @retval                   QMA6100P_NOI2C if I2C transaction failed
+ * @retval                   QMA6100P_NODEV if device not found on bus
  *
  * @warning The callback is invoked from interrupt context, keep it short
  */

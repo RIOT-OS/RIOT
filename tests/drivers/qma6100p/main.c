@@ -23,6 +23,11 @@
 #include "qma6100p.h"
 #include "sema.h"
 #include "thread.h"
+#include "ztimer.h"
+
+#define QMA6100P_PARAM_RATE QMA6100P_ODR_12HZ5
+
+#include "qma6100p_params.h"
 
 static const qma6100p_odr_t rates[] = {
     QMA6100P_ODR_12HZ5,
@@ -30,13 +35,6 @@ static const qma6100p_odr_t rates[] = {
     QMA6100P_ODR_100HZ,
 };
 static const unsigned expect_hz[] = { 12, 25, 100 };
-
-#define QMA6100P_PARAM_RATE QMA6100P_ODR_12HZ5
-
-#include "qma6100p_params.h"
-#include "ztimer.h"
-
-#define SLEEP_1S (1U)
 
 /* waited on by the reader thread, posted by the data-ready ISR to wake it */
 static sema_t data_ready = SEMA_CREATE_LOCKED();
@@ -68,7 +66,8 @@ static void *reader_thread(void *arg)
         sema_wait(&data_ready);
 
         int res = qma6100p_read(&dev, &data);
-        assert(res != QMA6100P_NO_NEW_DATA); /**<interrupt-driven: a wake must always carry fresh data */
+        /* interrupt-driven: a wake must always carry fresh data */
+        assert(res != QMA6100P_NO_NEW_DATA);
 
         if (res == QMA6100P_DATA_READY) {
             printf("[data] x=%" PRId32 " y=%" PRId32 " z=%" PRId32 " ug\n",
@@ -84,7 +83,7 @@ static void *reader_thread(void *arg)
 static inline unsigned int _measure_irq_hz(void)
 {
     unsigned before = irq_count;
-    ztimer_sleep(ZTIMER_SEC, SLEEP_1S);
+    ztimer_sleep(ZTIMER_SEC, 1);
     return irq_count - before;
 }
 
@@ -245,7 +244,7 @@ int main(void)
 {
     int res;
 
-    ztimer_sleep(ZTIMER_SEC, SLEEP_1S);
+    ztimer_sleep(ZTIMER_SEC, 1);
     puts("=== QMA6100P accelerometer driver test ===");
 
     res = test_init();

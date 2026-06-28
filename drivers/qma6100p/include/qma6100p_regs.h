@@ -21,15 +21,20 @@
 extern "C" {
 #endif
 
+/** single-bit mask at position n */
 #ifndef BIT
-#  define BIT(n) (1UL << (n)) /**< single-bit mask at position n */
-#endif
-#ifndef GENMASK
-#  define GENMASK(h, l) (((1UL << ((h) - (l) + 1)) - 1) << (l)) /**< contiguous bitmask from bit l to bit h */
+#  define BIT(n) (1UL << (n))
 #endif
 
-#define FIELD_CLEAR(mask, reg) ((reg) &= ~(mask))                        /**< clear bits in reg covered by mask */
-#define FIELD_PREP(mask, val)  (((val) << __builtin_ctz(mask)) & (mask)) /**< shift val into the field defined by mask */
+/** contiguous bitmask from bit l to bit h */
+#ifndef GENMASK
+#  define GENMASK(hi, lo) (((1UL << ((hi) - (lo) + 1)) - 1) << (lo))
+#endif
+
+/** clear bits in reg covered by mask */
+#define FIELD_CLEAR(mask, reg) ((reg) &= ~(mask))
+/** shift val into the field defined by mask */
+#define FIELD_PREP(mask, val)  (((val) << __builtin_ctz(mask)) & (mask))
 
 /**
  * @brief Set a bitfield in reg to val, using mask to locate the field
@@ -81,28 +86,28 @@ extern "C" {
  * @name    Control and configuration registers
  * @{
  */
-#define QMA6100P_REG_RANGE             (0x0F) /**< Full-scale range + LPF/HPF select */
-#define QMA6100P_REG_ODR               (0x10) /**< Output data rate + NLPF */
-#define QMA6100P_REG_PM                (0x11) /**< Power management (MODE, MCLK) */
-#define QMA6100P_REG_SW_RESET          (0x36) /**< Soft reset */
+#define QMA6100P_REG_RANGE             (0x0F) /**< full-scale range + LPF/HPF select */
+#define QMA6100P_REG_ODR               (0x10) /**< output data rate + NLPF */
+#define QMA6100P_REG_PM                (0x11) /**< power management (MODE, MCLK) */
+#define QMA6100P_REG_SW_RESET          (0x36) /**< soft reset */
 #define QMA6100P_REG_NVM               (0x33) /**< Non Volatile Memory */
-#define QMA6100P_REG_CHIP_STATE        (0x45) /**< Chip state */
+#define QMA6100P_REG_CHIP_STATE        (0x45) /**< chip state */
 #define QMA6100P_REG_ULPS              (0x46) /**< ULPS control register */
-#define QMA6100P_REG_TST0_ANA          (0x4A) /**< Analog test register 0 */
-#define QMA6100P_REG_AFE_ANA           (0x56) /**< Analog front-end config */
-#define QMA6100P_REG_TST1_ANA          (0x5F) /**< Analog test register 1 */
+#define QMA6100P_REG_TST0_ANA          (0x4A) /**< analog test register 0 */
+#define QMA6100P_REG_AFE_ANA           (0x56) /**< analog front-end config */
+#define QMA6100P_REG_TST1_ANA          (0x5F) /**< analog test register 1 */
 /** @} */
 
 /**
  * @name    Interrupt registers
  * @{
  */
-#define QMA6100P_REG_INT_ST2           (0x0B) /**< Interrupt status 2 (FIFO/data) */
-#define QMA6100P_REG_INT_EN1           (0x17) /**< Interrupt enable register */
+#define QMA6100P_REG_INT_ST2           (0x0B) /**< interrupt status 2 (FIFO/data) */
+#define QMA6100P_REG_INT_EN1           (0x17) /**< interrupt enable register */
 #define QMA6100P_REG_INT1_MAP1         (0x1A) /**< INT1 map: no_mot/FIFO/data/q_tap/any_mot */
 #define QMA6100P_REG_INT2_MAP1         (0x1C) /**< INT2 map: no_mot/FIFO/data/q_tap/any_mot */
 #define QMA6100P_REG_INTPIN_CONF       (0x20) /**< INT pin config (OD/LVL) */
-#define QMA6100P_REG_INT_CFG           (0x21) /**< Interrupt latch/shadow/I2C config */
+#define QMA6100P_REG_INT_CFG           (0x21) /**< interrupt latch/shadow/I2C config */
 /** @} */
 /** @} */
 
@@ -111,8 +116,10 @@ extern "C" {
  * Bits[7:4] = 0x9 (fixed). Bits[3:0] factory-set, software must ignore
  * @{
  */
-#define QMA6100P_CHIP_ID_MASK          (0xF0) /**< mask for the fixed upper nibble */
-#define QMA6100P_CHIP_ID_VAL           (0x90) /**< expected upper nibble (0x9x), lower nibble is factory-set */
+/** mask for the fixed upper nibble */
+#define QMA6100P_CHIP_ID_MASK          (0xF0)
+/** expected upper nibble (0x9x), lower nibble is factory-set */
+#define QMA6100P_CHIP_ID_VAL           (0x90)
 /** @} */
 
 /**
@@ -133,19 +140,21 @@ extern "C" {
  * @name    RANGE (0x0F) masks — full-scale range and filter select
  * @{
  */
-#define QMA6100P_RANGE_MASK            GENMASK(3, 0) /**< full-scale range bits[3:0] mask */
-#define QMA6100P_RANGE_LPF_HPF_MASK    BIT(6)        /**< 0=LPF mode, 1=HPF mode (affects NLPF in ODR) */
+/** full-scale range bits[3:0] mask */
+#define QMA6100P_RANGE_MASK            GENMASK(3, 0)
+/** 0=LPF mode, 1=HPF mode (affects NLPF in ODR) */
+#define QMA6100P_RANGE_LPF_HPF_MASK    BIT(6)
 /** @} */
 
 /**
  * @name Resolution - Range associated resolution used to convert in g in ug/LSB
  * @{
  */
-#define QMA6100P_2G_RESOLUTION         (244)  /**< Resolution for a +- 2g range */
-#define QMA6100P_4G_RESOLUTION         (488)  /**< Resolution for a +- 4g range */
-#define QMA6100P_8G_RESOLUTION         (977)  /**< Resolution for a +- 8g range */
-#define QMA6100P_16G_RESOLUTION        (1950) /**< Resolution for a +- 16g range */
-#define QMA6100P_32G_RESOLUTION        (3810) /**< Resolution for a +- 32g range */
+#define QMA6100P_2G_RESOLUTION         (244)  /**< resolution for a +- 2g range */
+#define QMA6100P_4G_RESOLUTION         (488)  /**< resolution for a +- 4g range */
+#define QMA6100P_8G_RESOLUTION         (977)  /**< resolution for a +- 8g range */
+#define QMA6100P_16G_RESOLUTION        (1950) /**< resolution for a +- 16g range */
+#define QMA6100P_32G_RESOLUTION        (3810) /**< resolution for a +- 32g range */
 /** @} */
 
 /**
@@ -188,17 +197,22 @@ extern "C" {
  * Default 0x05 = INT1 active-high push-pull, INT2 active-high push-pull
  * @{
  */
-#define QMA6100P_INTPIN_INT1_LVL_MASK  BIT(0) /**< INT1 active level mask (@ref qma6100p_int_active_level_t) */
-#define QMA6100P_INTPIN_INT1_OD_MASK   BIT(1) /**< INT1 output mode mask (@ref qma6100p_int_pin_mode_t) */
-#define QMA6100P_INTPIN_INT2_LVL_MASK  BIT(2) /**< INT2 active level mask (@ref qma6100p_int_active_level_t) */
-#define QMA6100P_INTPIN_INT2_OD_MASK   BIT(3) /**< INT2 output mode mask (@ref qma6100p_int_pin_mode_t) */
+/** INT1 active level mask (@ref qma6100p_int_active_level_t) */
+#define QMA6100P_INTPIN_INT1_LVL_MASK  BIT(0)
+/** INT1 output mode mask (@ref qma6100p_int_pin_mode_t) */
+#define QMA6100P_INTPIN_INT1_OD_MASK   BIT(1)
+/** INT2 active level mask (@ref qma6100p_int_active_level_t) */
+#define QMA6100P_INTPIN_INT2_LVL_MASK  BIT(2)
+/** INT2 output mode mask (@ref qma6100p_int_pin_mode_t) */
+#define QMA6100P_INTPIN_INT2_OD_MASK   BIT(3)
 /** @} */
 
 /**
  * @name    INT_CFG (0x21) masks — interrupt shadow config
  * @{
  */
-#define QMA6100P_INT_CFG_SHADOW_MASK   BIT(6) /**< data shadowing mode mask (@ref qma6100p_int_shadow_t) */
+/** data shadowing mode mask (@ref qma6100p_int_shadow_t) */
+#define QMA6100P_INT_CFG_SHADOW_MASK   BIT(6)
 /** @} */
 
 /**
@@ -214,8 +228,10 @@ extern "C" {
  *
  * @{
  */
-#define QMA6100P_NVM_LOAD_DONE         BIT(0) /**< set to 1 when NVM loading is done */
-#define QMA6100P_NVM_RDY               BIT(2) /**< set to 1 when NVM is ready, and programming NVIM is done */
+/** set to 1 when NVM loading is done */
+#define QMA6100P_NVM_LOAD_DONE         BIT(0)
+/** set to 1 when NVM is ready, and programming NVIM is done */
+#define QMA6100P_NVM_RDY               BIT(2)
 /** @} */
 
 /**
@@ -229,7 +245,7 @@ extern "C" {
  * @name TST1_ANA_REGISTER (0x5F) - Take control mode setting
  * @{
  */
-#define QMA6100P_ANA_TST1_TMODE        BIT(7) /**< Bit mask of the tmode */
+#define QMA6100P_ANA_TST1_TMODE        BIT(7) /**< bit mask of the tmode */
 /** @} */
 
 #ifdef __cplusplus
