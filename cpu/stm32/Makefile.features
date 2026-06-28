@@ -28,7 +28,7 @@ ifneq (f1,$(CPU_FAM))
   FEATURES_PROVIDED += periph_gpio_ll_switch_dir
 endif
 
-ifneq (,$(filter $(CPU_FAM),c0 f0 f1 f3 g0 g4 l0 l1 l4 l5 u5 wb wl))
+ifneq (,$(filter $(CPU_FAM),c0 f0 f1 f3 g0 g4 l0 l1 l4 l5 u3 u5 wb wl))
   # The STM32G491 has "Category 4" flash which is currently not supported by
   # the flashpage peripheral driver.
   ifeq (,$(filter stm32g491%,$(CPU_MODEL)))
@@ -38,7 +38,7 @@ ifneq (,$(filter $(CPU_FAM),c0 f0 f1 f3 g0 g4 l0 l1 l4 l5 u5 wb wl))
   endif
 endif
 
-ifneq (,$(filter $(CPU_FAM),f0 f2 f3 f4 f7 l0 l1 l4 l5 u5 wb wl))
+ifneq (,$(filter $(CPU_FAM),f0 f2 f3 f4 f7 l0 l1 l4 l5 u3 u5 wb wl))
   CPU_MODELS_WITHOUT_RTC_BKPR += stm32f030% stm32f070% \
                                  stm32f302%
   ifeq (,$(filter $(CPU_MODELS_WITHOUT_RTC_BKPR),$(CPU_MODEL)))
@@ -67,6 +67,7 @@ STM32_WITH_VBAT = stm32f031% stm32f038% stm32f042% stm32f048% \
                   stm32g4% stm32gbk1cb \
                   stm32l412% stm32l433% stm32l45% stm32l47% stm32l49% stm32l4r% \
                   stm32l5% \
+                  stm32u3% \
                   stm32u5% \
                   stm32wb% \
                   stm32wl%
@@ -92,7 +93,7 @@ endif
 
 # Not all F4 and L0 parts implement a RNG.
 CPU_MODELS_WITHOUT_HWRNG = stm32f401% stm32f411% stm32f446% stm32l031% stm32l011%
-ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 h7 l0 l4 l5 u5 wb))
+ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 h7 l0 l4 l5 u3 u5 wb))
   ifeq (,$(filter $(CPU_MODELS_WITHOUT_HWRNG),$(CPU_MODEL)))
     FEATURES_PROVIDED += periph_hwrng
   endif
