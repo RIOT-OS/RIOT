@@ -78,13 +78,13 @@ int stdio_available(void)
     if (!IS_USED(MODULE_STDIN)) {
         return 0;
     }
-    return tsrb_avail(&stdin_isrpipe.tsrb);
+    return isrpipe_available(&stdin_isrpipe);
 }
 #endif
 
 void stdio_clear_stdin(void)
 {
     if (IS_USED(MODULE_STDIN)) {
-        tsrb_clear(&stdin_isrpipe.tsrb);
+        isrpipe_clear(&stdin_isrpipe);
     }
 }
