@@ -29,17 +29,13 @@ ifeq (,$(filter $(STDIO_LEGACY_MODULES),$(USEMODULE)))
   USEMODULE += stdio
 endif
 
-ifneq (,$(filter stdin,$(USEMODULE)))
-  USEMODULE += isrpipe
-endif
-
 ifneq (1, $(words $(sort $(filter $(STDIO_MODULES),$(USEMODULE)))))
   USEMODULE += stdio_dispatch
 endif
 
 ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
   USEMODULE += usbus_cdc_acm
-  USEMODULE += isrpipe
+  USEMODULE += stdin
   USEMODULE += stdio_available
 endif
 
@@ -60,7 +56,7 @@ ifneq (,$(filter stdio_nimble,$(USEMODULE)))
   USEMODULE += stdio_available
   USEPKG += nimble
   USEMODULE += tsrb
-  USEMODULE += isrpipe
+  USEMODULE += stdin
   USEMODULE += nimble_svc_gap
   USEMODULE += nimble_svc_gatt
   ifneq (,$(filter stdio_nimble_debug,$(USEMODULE)))
@@ -75,7 +71,7 @@ ifneq (,$(filter stdin,$(USEMODULE)))
 endif
 
 ifneq (,$(filter stdio_uart_rx,$(USEMODULE)))
-  USEMODULE += isrpipe
+  USEMODULE += stdin
   USEMODULE += stdio_uart
   USEMODULE += stdio_available
 endif
@@ -97,6 +93,14 @@ endif
 ifneq (,$(filter stdio_udp,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += sock_async
+endif
+
+ifneq (,$(filter stdio_notify,$(USEMODULE)))
+  USEMODULE += stdin
+endif
+
+ifneq (,$(filter stdin,$(USEMODULE)))
+  USEMODULE += isrpipe
 endif
 
 # enable stdout buffering for modules that benefit from sending out buffers in larger chunks
