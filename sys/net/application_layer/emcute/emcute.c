@@ -224,6 +224,7 @@ int emcute_con(sock_udp_ep_t *remote, bool clean, const char *will_topic,
 
     /* check for existing connections and copy given UDP endpoint */
     if (gateway.port != 0) {
+        mutex_unlock(&txlock);
         return EMCUTE_NOGW;
     }
     memcpy(&gateway, remote, sizeof(sock_udp_ep_t));
@@ -249,12 +250,14 @@ int emcute_con(sock_udp_ep_t *remote, bool clean, const char *will_topic,
         if ((topic_len > CONFIG_EMCUTE_TOPIC_MAXLEN) ||
             ((will_msg_len + 4) > CONFIG_EMCUTE_BUFSIZE)) {
             gateway.port = 0;
+            mutex_unlock(&txlock);
             return EMCUTE_OVERFLOW;
         }
 
         res = syncsend(WILLTOPICREQ, len, false);
         if (res != EMCUTE_OK) {
             gateway.port = 0;
+            mutex_unlock(&txlock);
             return res;
         }
 
@@ -268,6 +271,7 @@ int emcute_con(sock_udp_ep_t *remote, bool clean, const char *will_topic,
         res = syncsend(WILLMSGREQ, len, false);
         if (res != EMCUTE_OK) {
             gateway.port = 0;
+            mutex_unlock(&txlock);
             return res;
         }
 
