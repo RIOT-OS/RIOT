@@ -34,7 +34,7 @@ endif
 
 # Check if more than one STDIO has been selected, if so add stdio_dispatch.
 # This check will fail if 10 or more modules are selected.
-ifeq (1, $(call _is_greater,$(words $(sort $(filter $(STDIO_MODULES),$(USEMODULE)))),1) )
+ifeq (1, $(call _is_greater,$(words $(sort $(filter $(STDIO_MODULES),$(USEMODULE)))),1))
   USEMODULE += stdio_dispatch
 endif
 
