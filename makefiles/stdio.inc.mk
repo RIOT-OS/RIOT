@@ -1,4 +1,5 @@
 include $(RIOTMAKE)/stdio_backends.inc.mk
+include $(RIOTMAKE)/utils/strings.mk
 
 # select stdio_uart if no other stdio module is slected
 ifeq (,$(filter $(STDIO_MODULES),$(USEMODULE)))
@@ -13,7 +14,9 @@ ifneq (,$(filter stdin,$(USEMODULE)))
   USEMODULE += isrpipe
 endif
 
-ifneq (1, $(words $(sort $(filter $(STDIO_MODULES),$(USEMODULE)))))
+# Check if more than one STDIO has been selected, if so add stdio_dispatch.
+# This check will fail if 10 or more modules are selected.
+ifeq (1, $(call _is_greater,$(words $(sort $(filter $(STDIO_MODULES),$(USEMODULE)))),1) )
   USEMODULE += stdio_dispatch
 endif
 
