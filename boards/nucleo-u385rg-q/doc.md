@@ -41,6 +41,18 @@ A detailed description of the flashing process can be found on the
 
 The board name for the NUCLEO-U385RG-Q is `nucleo-u385rg-q`.
 
+@note   OpenOCD does not yet support the STM32U3, so the default
+        `make BOARD=nucleo-u385rg-q flash` (which uses OpenOCD) does not work
+        for this board. Until OpenOCD support is available, build with
+        `make BOARD=nucleo-u385rg-q` and flash the resulting ELF with the
+        STM32CubeProgrammer CLI, e.g.:
+@code
+STM32_Programmer_CLI -c port=SWD mode=Normal reset=HWrst freq=8000 \
+    -e all \
+    -w bin/nucleo-u385rg-q/<application>.elf \
+    -v -rst
+@endcode
+
 ## Accessing RIOT shell
 
 Default RIOT shell access uses the VCP (Virtual COM Port) over the USB interface
