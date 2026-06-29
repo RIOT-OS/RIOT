@@ -36,13 +36,13 @@
  * ### Creating an NDEF Message
  *
  * An NDEF message with one text record can created the following way
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * ```c
  * ndef_t message;
  * uint8_t buffer[1024];
  *
  * ndef_init(&message, buffer, 1024);
  * ndef_record_text_add(&message, "Hello World", 11, "en", 2, UTF8);
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * ```
  *
  * The NDEF message can then be passed to other NFC functions.
  *
@@ -51,11 +51,11 @@
  * To convert a buffer of bytes into an NDEF message @ref ndef_from_buffer has to be called.
  * In the following code example the buffer has a size of 1024 bytes and is filled with a valid byte
  * representation of an NDEF message.
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * ```c
  * ndef_t message;
  *
  * ndef_from_buffer(message, buffer, 1024);
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * ```
  *
  * @{
  *
@@ -154,14 +154,14 @@ typedef enum {
  * positions in the NDEF message.
  */
 typedef struct {
-    uint8_t *header; /**< Points to the header of the record */
-    uint8_t *type_length; /**< Points to the type length field */
-    uint8_t *type; /**< Points to the type field */
-    uint8_t *id_length; /**< Points to the ID length field */
-    uint8_t *id; /**< Points to the ID field */
+    uint8_t *header;                /**< Points to the header of the record */
+    uint8_t *type_length;           /**< Points to the type length field */
+    uint8_t *type;                  /**< Points to the type field */
+    uint8_t *id_length;             /**< Points to the ID length field */
+    uint8_t *id;                    /**< Points to the ID field */
     ndef_record_type_t record_type; /**< Record type of this record */
-    uint8_t *payload_length; /**< Points to the payload length field */
-    uint8_t *payload; /**< Points to the payload field */
+    uint8_t *payload_length;        /**< Points to the payload length field */
+    uint8_t *payload;               /**< Points to the payload field */
 } ndef_record_desc_t;
 
 /**
@@ -260,7 +260,7 @@ void ndef_init(ndef_t *ndef, uint8_t *buffer, uint32_t buffer_size);
  * @return 0 if successful, error otherwise
  */
 int ndef_record_header_add(ndef_t *ndef, const uint8_t *type, uint8_t type_length,
-    const uint8_t *id, uint8_t id_length, uint32_t payload_length, ndef_record_tnf_t tnf);
+                           const uint8_t *id, uint8_t id_length, uint32_t payload_length, ndef_record_tnf_t tnf);
 
 /**
  * @brief Removes the last record from the NDEF message
@@ -392,7 +392,7 @@ int ndef_record_uri_add(ndef_t *ndef, ndef_uri_identifier_code_t identifier_code
 
 /* MARK: MIME */
 /**
- * @brief
+ * @brief Adds an NDEF MIME record to the NDEF message
  *
  * @param ndef                  NDEF message
  * @param mime_type             MIME type
