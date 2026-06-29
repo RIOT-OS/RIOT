@@ -3,7 +3,7 @@
 -include $(APPDIR)/Makefile.$(TOOLCHAIN).dep
 
 # select default stdio provider if no other stdio backend is selected
-include $(RIOTBASE)/makefiles/stdio_backends.inc.mk
+include $(RIOTMAKE)/stdio_backends.inc.mk
 
 ifeq (,$(filter $(STDIO_MODULES),$(USEMODULE)))
   USEMODULE += stdio_default

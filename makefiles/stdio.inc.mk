@@ -1,4 +1,4 @@
-include $(RIOTBASE)/makefiles/stdio_backends.inc.mk
+include $(RIOTMAKE)/stdio_backends.inc.mk
 
 # select stdio_uart if no other stdio module is slected
 ifeq (,$(filter $(STDIO_MODULES),$(USEMODULE)))
