@@ -83,8 +83,8 @@ typedef struct {
  * @brief   TMP117 sensor structure
  */
 typedef struct {
-    tmp117_params_t params;
-    bool is_initialized;
+    tmp117_params_t params;			/**< tmp117 parameters*/
+    bool is_initialized;			/**< tmp117 initialization state*/
 } tmp117_t;
 
 /**
