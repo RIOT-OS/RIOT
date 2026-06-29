@@ -1,10 +1,28 @@
-include $(RIOTMAKE)/stdio_backends.inc.mk
 include $(RIOTMAKE)/utils/strings.mk
 
-# select stdio_uart if no other stdio module is slected
-ifeq (,$(filter $(STDIO_MODULES),$(USEMODULE)))
-  USEMODULE += stdio_uart
-endif
+# List of available stdio backend modules.
+STDIO_MODULES = \
+  stdio_usb_serial_jtag \
+  stdio_udp \
+  stdio_uart \
+  stdio_tinyusb_cdc_acm \
+  stdio_telnet \
+  stdio_slipdev \
+  stdio_semihosting \
+  stdio_rtt \
+  stdio_null \
+  stdio_nimble \
+  stdio_native \
+  stdio_fb \
+  stdio_ethos \
+  stdio_cdc_acm \
+  #
+
+# List of available legacy stdio backend modules.
+STDIO_LEGACY_MODULES = \
+  ethos_stdio \
+  stdio_ethos \
+  #
 
 ifeq (,$(filter $(STDIO_LEGACY_MODULES),$(USEMODULE)))
   USEMODULE += stdio
@@ -82,9 +100,20 @@ ifneq (,$(filter stdio_udp,$(USEMODULE)))
   USEMODULE += sock_async
 endif
 
-# enable stdout buffering for modules that benefit from sending out buffers in larger chunks
+# Enable stdout buffering for modules that benefit from sending out buffers in
+# larger chunks.
 ifneq (,$(filter picolibc,$(USEMODULE)))
   ifneq (,$(filter stdio_cdc_acm stdio_ethos stdio_slipdev stdio_semihosting stdio_tinyusb_cdc_acm,$(USEMODULE)))
     USEMODULE += picolibc_stdout_buffered
   endif
+endif
+
+# Select stdio_default if no other STDIO backend has been selected so far.
+# If no STDIO backend has been selected in the second round of dependency
+# resolution, then select stdio_uart.
+ifeq (,$(filter $(STDIO_MODULES),$(USEMODULE)))
+  ifneq (,$(filter stdio_default,$(USEMODULE)))
+    USEMODULE += stdio_uart
+  endif
+  USEMODULE += stdio_default
 endif

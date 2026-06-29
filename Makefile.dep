@@ -2,13 +2,6 @@
 -include $(APPDIR)/Makefile.board.dep
 -include $(APPDIR)/Makefile.$(TOOLCHAIN).dep
 
-# select default stdio provider if no other stdio backend is selected
-include $(RIOTMAKE)/stdio_backends.inc.mk
-
-ifeq (,$(filter $(STDIO_MODULES),$(USEMODULE)))
-  USEMODULE += stdio_default
-endif
-
 # include board dependencies
 -include $(BOARDDIR)/Makefile.dep
 
