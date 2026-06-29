@@ -51,6 +51,14 @@
 #  define UART_TYPE         NRF_UART_Type
 #endif
 
+/* Unify the HW flow control config mask name across nRF51 (UART) and nRF52 and
+ * newer (UARTE). The nRF54L only provides the UARTE_ prefixed variant. */
+#if defined(UARTE_CONFIG_HWFC_Msk)
+#  define CONFIG_HWFC_Msk UARTE_CONFIG_HWFC_Msk
+#elif defined(UART_CONFIG_HWFC_Msk)
+#  define CONFIG_HWFC_Msk UART_CONFIG_HWFC_Msk
+#endif
+
 /* The baudrate enumeration uses the UARTE_ prefix on families that have an
  * EasyDMA UARTE (nRF52 and newer) and the UART_ prefix on the nRF51, which has
  * no UARTE peripheral. */
@@ -222,7 +230,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         /* configure RTS and CTS pins to use */
         dev->PSEL_RTS = uart_config[uart].rts_pin;
         dev->PSEL_CTS = uart_config[uart].cts_pin;
-        dev->CONFIG |= UART_CONFIG_HWFC_Msk; /* enable HW flow control */
+        dev->CONFIG |= CONFIG_HWFC_Msk; /* enable HW flow control */
     }
     else
 #endif
@@ -336,12 +344,6 @@ void uart_poweroff(uart_t uart)
 }
 
 /* Unify macro names across nRF51 (UART) and nRF52 and newer (UARTE) */
-#if defined(UARTE_CONFIG_HWFC_Msk)
-#  define CONFIG_HWFC_Msk UARTE_CONFIG_HWFC_Msk
-#elif defined(UART_CONFIG_HWFC_Msk)
-#  define CONFIG_HWFC_Msk UART_CONFIG_HWFC_Msk
-#endif
-
 #if defined(UARTE_CONFIG_PARITY_Msk)
 #  define CONFIG_PARITY_Msk UARTE_CONFIG_PARITY_Msk
 #elif defined(UART_CONFIG_PARITY_Msk)
