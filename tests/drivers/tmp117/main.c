@@ -33,7 +33,7 @@ int main(void)
     puts("Initializing tmp117 sensor...");
 
     if (tmp117_init(&tmp117, tmp117_params) != TMP117_OK) {
-    	puts("  failed.\n");
+        puts("  failed.\n");
         return -1;
     }
 
