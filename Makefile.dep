@@ -2,8 +2,10 @@
 -include $(APPDIR)/Makefile.board.dep
 -include $(APPDIR)/Makefile.$(TOOLCHAIN).dep
 
-# select default stdio provider if no other is selected
-ifeq (,$(filter stdio_%,$(USEMODULE)))
+# select default stdio provider if no other stdio backend is selected
+include $(RIOTBASE)/makefiles/stdio_backends.inc.mk
+
+ifeq (,$(filter $(STDIO_MODULES),$(USEMODULE)))
   USEMODULE += stdio_default
 endif
 
