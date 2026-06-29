@@ -62,8 +62,8 @@ static const uart_conf_t uart_config[] = {
         .rx_pin     = GPIO_PIN(1, 5),
         .tx_pin     = GPIO_PIN(1, 4),
 #ifdef MODULE_PERIPH_UART_HW_FC
-        .rts_pin    = GPIO_UNDEF,
-        .cts_pin    = GPIO_UNDEF,
+        .rts_pin    = GPIO_PIN(1, 6),
+        .cts_pin    = GPIO_PIN(1, 7),
 #endif
         .irqn       = SERIAL20_IRQn,
     },
