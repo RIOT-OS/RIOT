@@ -2,20 +2,20 @@ include $(RIOTMAKE)/utils/strings.mk
 
 # List of available stdio backend modules.
 STDIO_MODULES = \
-  stdio_usb_serial_jtag \
-  stdio_udp \
-  stdio_uart \
-  stdio_tinyusb_cdc_acm \
-  stdio_telnet \
-  stdio_slipdev \
-  stdio_semihosting \
-  stdio_rtt \
-  stdio_null \
-  stdio_nimble \
-  stdio_native \
-  stdio_fb \
-  stdio_ethos \
   stdio_cdc_acm \
+  stdio_ethos \
+  stdio_fb \
+  stdio_native \
+  stdio_nimble \
+  stdio_null \
+  stdio_rtt \
+  stdio_semihosting \
+  stdio_slipdev \
+  stdio_telnet \
+  stdio_tinyusb_cdc_acm \
+  stdio_uart \
+  stdio_udp \
+  stdio_usb_serial_jtag \
   #
 
 # List of available legacy stdio backend modules.
