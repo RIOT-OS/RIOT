@@ -13,11 +13,15 @@ def testfunc(child):
 
     # sending input should wake the thread through the notify callback and
     # echo the bytes back via stdio_read
-    child.sendline("hi 123")
-    child.expect("hi 123")
+    child.sendline("hello 123")
+    child.expect("hello 123")
 
     # without any input, the periodic timer should still wake the thread
     child.expect_exact("*** Woken up! ***", timeout=10)
+
+    # sending more input to assert that thread is still capable of waking up
+    child.sendline("world 456")
+    child.expect("world 123")
 
 
 if __name__ == "__main__":
