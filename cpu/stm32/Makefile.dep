@@ -29,6 +29,12 @@ ifneq (,$(filter periph_usbdev,$(FEATURES_USED)))
   endif
 endif
 
+# always require periph_uart when using periph_lpuart because they share code
+# internally
+ifneq (,$(filter periph_lpuart,$(FEATURES_USED)))
+  FEATURES_REQUIRED += periph_uart
+endif
+
 ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
   USEMODULE += tsrb
 endif
