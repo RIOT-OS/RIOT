@@ -223,6 +223,60 @@ static void test_write_one(void)
     /* pipe now empty */
 }
 
+static void test_read_one(void)
+{
+    /* fill the pipe so isrpipe_read_one() never blocks */
+    TEST_ASSERT_EQUAL_INT(0, isrpipe_write_one(&_pipe, 1));
+    TEST_ASSERT_EQUAL_INT(0, isrpipe_write_one(&_pipe, 2));
+    TEST_ASSERT_EQUAL_INT(0, isrpipe_write_one(&_pipe, 200));
+
+    /* pipe now holds 1, 2, 200, the bytes should be returned in FIFO order */
+    TEST_ASSERT_EQUAL_INT(1, isrpipe_read_one(&_pipe));
+    TEST_ASSERT_EQUAL_INT(2, isrpipe_read_one(&_pipe));
+
+    /* a byte with the high bit set must not be confused with an error code */
+    TEST_ASSERT_EQUAL_INT(200, isrpipe_read_one(&_pipe));
+}
+
+static void test_available(void)
+{
+    const uint8_t write_buf[] = {1, 2, 3};
+    uint8_t read_buf[2];
+
+    /* freshly initialized pipe is empty */
+    TEST_ASSERT_EQUAL_INT(0, isrpipe_available(&_pipe));
+
+    TEST_ASSERT_EQUAL_INT(ARRAY_SIZE(write_buf),
+                          isrpipe_write(&_pipe, write_buf, ARRAY_SIZE(write_buf)));
+    TEST_ASSERT_EQUAL_INT(ARRAY_SIZE(write_buf), isrpipe_available(&_pipe));
+
+    /* reading reduces the number of available bytes accordingly */
+    TEST_ASSERT_EQUAL_INT(ARRAY_SIZE(read_buf),
+                          isrpipe_read(&_pipe, read_buf, ARRAY_SIZE(read_buf)));
+    TEST_ASSERT_EQUAL_INT(1, isrpipe_available(&_pipe));
+}
+
+static void test_clear(void)
+{
+    const uint8_t write_buf[] = {1, 2, 3};
+
+    TEST_ASSERT_EQUAL_INT(ARRAY_SIZE(write_buf),
+                          isrpipe_write(&_pipe, write_buf, ARRAY_SIZE(write_buf)));
+    TEST_ASSERT_EQUAL_INT(ARRAY_SIZE(write_buf), isrpipe_available(&_pipe));
+
+    /* clearing discards all buffered data */
+    isrpipe_clear(&_pipe);
+    TEST_ASSERT_EQUAL_INT(0, isrpipe_available(&_pipe));
+
+    /* clearing an empty pipe is a no-op */
+    isrpipe_clear(&_pipe);
+    TEST_ASSERT_EQUAL_INT(0, isrpipe_available(&_pipe));
+
+    /* the pipe is still usable after a clear */
+    TEST_ASSERT_EQUAL_INT(0, isrpipe_write_one(&_pipe, 42));
+    TEST_ASSERT_EQUAL_INT(1, isrpipe_available(&_pipe));
+}
+
 Test *tests_isrpipe_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -233,6 +287,9 @@ Test *tests_isrpipe_tests(void)
         new_TestFixture(test_overflow),
         new_TestFixture(test_underflow),
         new_TestFixture(test_write_one),
+        new_TestFixture(test_read_one),
+        new_TestFixture(test_available),
+        new_TestFixture(test_clear),
     };
 
     EMB_UNIT_TESTCALLER(isrpipe_tests, setup_up, NULL, fixtures);
