@@ -460,10 +460,12 @@ static void test_l2util_addr_from_str(void)
                                                    out));
     TEST_ASSERT_EQUAL_INT(0, memcmp(ieee802154_l2addr_long, out,
                                     sizeof(ieee802154_l2addr_long)));
+    out[6] = canary;
     TEST_ASSERT_EQUAL_INT(0,
                           l2util_addr_from_str_sized("3E:E6:B5:0F:19:22:FD:0A",
                                                      out,
                                                      6));
+    TEST_ASSERT_EQUAL_INT(canary, out[6]);
     TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_short),
                           l2util_addr_from_str("FD:0A", out));
     TEST_ASSERT_EQUAL_INT(0, memcmp(ieee802154_l2addr_short, out,
