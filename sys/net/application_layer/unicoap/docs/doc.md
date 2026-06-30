@@ -37,7 +37,8 @@ a @ref net_unicoap_drivers_udp and @ref net_unicoap_drivers_dtls.
 You must specify at least one driver to use networking functionality. If you just want to
 [use message APIs](@ref net_unicoap_message_example), you can use the framing implementation of
 each driver, such as the @ref net_unicoap_drivers_rfc7252_pdu submodule for the RFC 7252 PDU format.
-`unicoap` implements both a client and a server.
+`unicoap` implements both a client and a server. To create a CoAP server, visit
+@ref net_unicoap_server_example.
 
 To configure `unicoap`, go to the @ref net_unicoap_config.
 For extending `unicoap`, refer to @ref net_unicoap_internal.
