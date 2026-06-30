@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_gnrc_netif_dedup    Link-layer Broadcast deduplication
+ * @defgroup    net_gnrc_netif_dedup    gnrc_netif_dedup: Link-layer Broadcast deduplication
  * @ingroup     net_gnrc_netif
  * @brief       Deduplicates broadcast link-layer packets best-effort style
  *

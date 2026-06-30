@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_littlefs2 littlefs v2 integration
+ * @defgroup    sys_littlefs2 littlefs2: littlefs v2 integration
  * @ingroup     pkg_littlefs2
  * @brief       RIOT integration of littlefs version 2.x.y
  *

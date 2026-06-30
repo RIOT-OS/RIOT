@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_crypto Crypto
+ * @defgroup    sys_crypto crypto: collection of cryptographic functions
  * @ingroup     sys
  *
  * @brief       RIOT provides a collection of block cipher ciphers, different

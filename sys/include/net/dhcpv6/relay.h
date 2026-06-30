@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup net_dhcpv6_relay   DHCPv6 relay agent
+ * @defgroup net_dhcpv6_relay   dhcpv6_relay: DHCPv6 relay agent
  * @ingroup  net_dhcpv6
  * @brief    DHCPv6 relay agent implementation
  * @{

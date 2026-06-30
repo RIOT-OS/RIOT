@@ -9,8 +9,8 @@
 #pragma once
 
 /**
- * @defgroup    fido2_ctap_utils FIDO2 CTAP utils
- * @ingroup     fido2_ctap
+ * @defgroup    sys_fido2_ctap_utils FIDO2 CTAP utils
+ * @ingroup     sys_fido2_ctap
  * @brief       FIDO2 CTAP utility helper
  *
  * @{

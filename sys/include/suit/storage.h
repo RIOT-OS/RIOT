@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_suit_storage SUIT secure firmware OTA upgrade storage
+ * @defgroup    sys_suit_storage suit_storage: SUIT secure firmware OTA upgrade storage
  *                               infrastructure
  * @ingroup     sys_suit
  * @brief       SUIT firmware storage backends

@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup    net_gcoap  GCoAP
+ * @defgroup    net_gcoap  gcoap: GCoAP
  * @ingroup     net
  * @brief       High-level interface to CoAP messaging
  *

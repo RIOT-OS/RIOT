@@ -7,7 +7,7 @@
 #pragma once
 
 /**
- * @addtogroup  sys_stdio STDIO abstraction
+ * @addtogroup  sys_stdio stdio: STDIO abstraction
  *
  * @{
  * @file

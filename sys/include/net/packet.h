@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_packet Packet interface on device level
+ * @defgroup    net_packet packet: Packet interface on device level
  * @ingroup     net
  * @brief       Packet address family definitions
  * @{

@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_ztimer_mock ztimer mock clock backend
+ * @defgroup    sys_ztimer_mock ztimer_mock: ztimer mock clock backend
  * @ingroup     sys_ztimer
  * @brief       ztimer mock clock backend
  *

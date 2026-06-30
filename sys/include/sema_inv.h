@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_sema_inv    inverse Semaphores
+ * @defgroup    sys_sema_inv    sema_inv: inverse Semaphores
  * @ingroup     sys
  * @brief       Lightweight inverse semaphore implementation
  * @{

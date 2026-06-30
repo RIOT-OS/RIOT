@@ -9,8 +9,8 @@
 #pragma once
 
 /**
- * @defgroup    fido2_ctap_ctap FIDO2 CTAP
- * @ingroup     fido2_ctap
+ * @defgroup    sys_fido2_ctap_ctap FIDO2 CTAP
+ * @ingroup     sys_fido2_ctap
  * @brief       FIDO2 CTAP
  *
  * The Client-to-Authenticator Protocol (CTAP) is an application layer protocol

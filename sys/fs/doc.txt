@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_fs File systems
+ * @defgroup    sys_fs fs: File systems
  * @ingroup     sys
  * @brief       File system libraries
  */

@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_gnrc_rpl_srh RPL source routing header extension
+ * @defgroup    net_gnrc_rpl_srh gnrc_rpl_srh: RPL source routing header extension
  * @ingroup     net_gnrc_rpl
  * @brief       Implementation of RPL source routing extension headers
  * @see <a href="https://tools.ietf.org/html/rfc6554">

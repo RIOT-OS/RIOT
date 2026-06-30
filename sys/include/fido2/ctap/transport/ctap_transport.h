@@ -9,8 +9,8 @@
 #pragma once
 
 /**
- * @defgroup    fido2_ctap_transport FIDO2 CTAP transport
- * @ingroup     fido2_ctap
+ * @defgroup    sys_fido2_ctap_transport FIDO2 CTAP transport
+ * @ingroup     sys_fido2_ctap
  * @brief       CTAP transport layer
  *
  * @{

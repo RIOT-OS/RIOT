@@ -12,7 +12,7 @@
 #pragma once
 
 /**
- * @defgroup    net_nanocoap nanoCoAP small CoAP library
+ * @defgroup    net_nanocoap nanocoap: nanoCoAP small CoAP library
  * @ingroup     net
  * @brief       CoAP library optimized for minimal resource usage
  *

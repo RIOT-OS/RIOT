@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup  sys_frac   Fractional integer operations
+ * @defgroup  sys_frac   frac: Fractional integer operations
  * @ingroup   sys
  *
  * This header provides some functions for scaling integers by fractions, while

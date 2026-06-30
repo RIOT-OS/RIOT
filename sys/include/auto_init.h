@@ -11,7 +11,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_auto_init Auto-initialization
+ * @defgroup    sys_auto_init auto_init: Auto-initialization
  * @ingroup     sys
  * @brief       Auto initialize modules
  *
@@ -64,7 +64,7 @@
  */
 
 /**
- * @defgroup    sys_auto_init_saul SAUL drivers auto-initialization
+ * @defgroup    sys_auto_init_saul auto_init_saul: SAUL drivers auto-initialization
  * @ingroup     sys_auto_init
  * @brief       Provides auto-initialization of SAUL drivers
  *
@@ -72,7 +72,7 @@
  */
 
 /**
- * @defgroup    sys_auto_init_gnrc_netif GNRC netif drivers auto-initialization
+ * @defgroup    sys_auto_init_gnrc_netif auto_init_gnrc_netif: GNRC netif drivers auto-initialization
  * @ingroup     sys_auto_init
  * @brief       Provides auto-initialization of
  * [network device drivers](@ref drivers_netdev) via GNRC
@@ -81,7 +81,7 @@
  */
 
 /**
- * @defgroup    sys_auto_init_lwip_netif lwIP netif drivers auto-initialization
+ * @defgroup    sys_auto_init_lwip_netif auto_init_lwip_netif: lwIP netif drivers auto-initialization
  * @ingroup     sys_auto_init
  * @brief       Provides auto-initialization of network device drivers for lwIP
  *
@@ -89,7 +89,7 @@
  */
 
 /**
- * @defgroup    sys_auto_init_multimedia Multimedia driver auto-initialization
+ * @defgroup    sys_auto_init_multimedia auto_init_multimedia: Multimedia driver auto-initialization
  * @ingroup     sys_auto_init
  * @brief       Provides auto-initialization of Multimedia drivers
  *

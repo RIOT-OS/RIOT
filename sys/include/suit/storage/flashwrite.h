@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_suit_storage_flashwrite  riotboot flashwrite storage backend
+ * @defgroup    sys_suit_storage_flashwrite  suit_storage_flashwrite: riotboot flashwrite storage backend
  * @ingroup     sys_suit_storage
  * @brief       SUIT riotboot firmware storage backend
  *

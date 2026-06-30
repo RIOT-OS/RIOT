@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_fmt String formatting (fmt)
+ * @defgroup    sys_fmt fmt: String formatting (fmt)
  * @ingroup     sys
  * @brief       Provides simple string formatting functions
  *

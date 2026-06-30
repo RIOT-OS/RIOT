@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_ipv6_auto_subnets Simple-Subnet auto-configuration
+ * @defgroup    net_gnrc_ipv6_auto_subnets gnrc_ipv6_auto_subnets: Simple-Subnet auto-configuration
  * @ingroup     net_gnrc
  * @brief       Automatic configuration for cascading subnets
  *

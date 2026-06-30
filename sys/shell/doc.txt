@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_shell_commands Shell commands
+ * @defgroup    sys_shell_commands shell_commands: Shell commands
  * @ingroup     sys_shell
 
 Shell Commands

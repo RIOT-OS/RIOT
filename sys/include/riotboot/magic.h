@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_riotboot_magic     Magic values for riotboot
+ * @defgroup    sys_riotboot_magic     riotboot_magic: Magic values for riotboot
  * @ingroup     sys
  * @{
  *

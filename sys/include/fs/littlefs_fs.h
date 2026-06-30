@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_littlefs  littlefs integration
+ * @defgroup    sys_littlefs  littlefs: littlefs integration
  * @ingroup     pkg_littlefs
  * @brief       RIOT integration of littlefs
  *

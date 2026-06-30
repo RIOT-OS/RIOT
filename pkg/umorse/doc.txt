@@ -1,5 +1,5 @@
 /**
- * @defgroup pkg_umorse   Lightweight Morse encoder
+ * @defgroup pkg_umorse   pkg_umorse: Lightweight Morse encoder
  * @ingroup  pkg
  * @ingroup  sys
  * @brief    Provides slim Morse encoding functionality

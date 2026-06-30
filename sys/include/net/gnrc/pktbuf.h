@@ -10,7 +10,7 @@
 #pragma once
 
 /**
- * @defgroup    net_gnrc_pktbuf   Packet buffer
+ * @defgroup    net_gnrc_pktbuf   gnrc_pktbuf: Packet buffer
  * @ingroup     net_gnrc
  * @brief       A global network packet buffer.
  *

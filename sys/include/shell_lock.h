@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup     sys_shell_lock Shell lock
+ * @defgroup     sys_shell_lock shell_lock: Shell lock
  * @ingroup      sys
  * @brief        Simple module to provide a password protection for the shell.
  * @experimental This module is an experimental feature and only shows as a proof of concept how

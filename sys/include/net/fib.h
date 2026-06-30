@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_fib Forwarding Information Base (FIB)
+ * @defgroup    net_fib fib: Forwarding Information Base (FIB)
  * @ingroup     net
  * @brief       FIB implementation
  *

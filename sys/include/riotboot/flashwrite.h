@@ -11,7 +11,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_riotboot_flashwrite riotboot flash writer
+ * @defgroup    sys_riotboot_flashwrite riotboot_flashwrite: riotboot flash writer
  * @ingroup     sys
  * @{
  *

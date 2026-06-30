@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_ipv6_ext    IPv6 extension headers
+ * @defgroup    net_ipv6_ext    ipv6_ext: IPv6 extension headers
  * @ingroup     net_ipv6
  * @brief       Provides IPv6 extension header definitions and helper functions.
  * @{

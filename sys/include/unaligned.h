@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_unaligned unaligned memory access methods
+ * @defgroup    sys_unaligned unaligned: unaligned memory access methods
  * @ingroup     sys
  * @brief       Provides functions for safe unaligned memory accesses
  *

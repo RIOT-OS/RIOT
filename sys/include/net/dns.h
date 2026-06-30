@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_dns DNS defines
+ * @defgroup    net_dns dns: DNS defines
  * @ingroup     net
  * @brief       Generic DNS values
  * @{

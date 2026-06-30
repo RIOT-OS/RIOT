@@ -11,7 +11,7 @@
 #pragma once
 
 /**
- * @defgroup    net_nanosock nanoCoAP Sock
+ * @defgroup    net_nanosock nanosock: nanoCoAP Sock
  * @ingroup     net
  * @brief       Synchronous sock based messaging with nanocoap
  *

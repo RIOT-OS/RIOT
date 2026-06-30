@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_iana_portrange  IANA Port Ranges
+ * @defgroup    net_iana_portrange  iana_portrange: IANA Port Ranges
  * @ingroup     net
  * @brief       Service Name and Transport Protocol Port Number Registry
  * @{

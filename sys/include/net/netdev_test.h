@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_netdev_test    netdev dummy test driver
+ * @defgroup    sys_netdev_test    netdev_test: netdev dummy test driver
  * @ingroup     drivers_netdev
  * @brief       Provides a test dummy for the netdev interface.
  *

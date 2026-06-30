@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_clk System core clock
+ * @defgroup    sys_clk clk: System core clock
  * @ingroup     sys
  * @{
  *

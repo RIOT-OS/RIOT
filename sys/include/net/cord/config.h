@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    net_cord_config CoRE RD Configuration
+ * @defgroup    net_cord_conf CoRE RD Configuration
  * @ingroup     net_cord
  * @ingroup     config
  * @brief       Configuration options for CoRE RD endpoints and lookup clients

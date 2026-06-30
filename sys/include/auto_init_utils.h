@@ -9,7 +9,7 @@
 #pragma once
 
 /**
- * @defgroup    sys_auto_init_utils Utilities to influence the order of auto-initialized modules
+ * @defgroup    sys_auto_init_utils auto_init_utils: Utilities to influence the order of auto-initialized modules
  * @ingroup     sys
  *
  * @{
