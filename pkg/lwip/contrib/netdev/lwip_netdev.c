@@ -55,7 +55,6 @@
 #define WPAN_IFNAME2 'P'
 
 event_queue_t lwip_event_queue = { 0 };
-#define THREAD_FLAG_LWIP_TX_DONE    (1U << 11)
 
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 static WORD_ALIGNED char _stack[LWIP_NETDEV_STACKSIZE];

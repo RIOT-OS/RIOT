@@ -38,11 +38,12 @@
  * Usually, if it is only of interest that an event occurred, but not how many
  * of them, thread flags should be considered.
  *
- * Note that some flags (currently the two most significant bits) are used by
- * core functions and should not be set by the user. They can be waited for.
- * Unlike @ref core_msg "messages" (which are only ever sent when requested),
- * these flags can be set unprompted. (For example, @ref THREAD_FLAG_MSG_WAITING
- * is set on a thread automatically with every message sent there).
+ * Note that some flags are used by RIOT core functions and modules and should
+ * not be set by the user. They can be waited for. Unlike @ref core_msg
+ * "messages" (which are only ever sent when requested), these flags can be set
+ * unprompted. (For example, @ref THREAD_FLAG_MSG_WAITING is set on a thread
+ * automatically with every message sent there). Use @ref
+ * THREAD_FLAG_PREDEFINED_MASK to avoid collisions with predefined flags.
  *
  * This API is optional and must be enabled by adding "core_thread_flags" to USEMODULE.
  *
@@ -53,6 +54,7 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+#include "modules.h"
 #include "sched.h"  /* for thread_t typedef */
 
 #ifdef __cplusplus
@@ -99,17 +101,110 @@ extern "C" {
 #define THREAD_FLAG_TIMEOUT         (1u << 14)
 
 /**
+ * @brief   Thread flag used to notify available events in an event queue
+ */
+#ifndef THREAD_FLAG_EVENT
+#define THREAD_FLAG_EVENT           (1u << 0)
+#endif
+
+/**
+ * @brief   Thread flag used by USBUS when a USB device ISR needs handling
+ */
+#define USBUS_THREAD_FLAG_USBDEV    (1u << 1)
+
+/**
+ * @brief   Thread flag used by USBUS when endpoints need servicing
+ */
+#define USBUS_THREAD_FLAG_USBDEV_EP (1u << 2)
+
+/**
+ * @brief   Thread flag used by POSIX select
+ */
+#define POSIX_SELECT_THREAD_FLAG    (1u << 3)
+
+/**
+ * @brief   Thread flag used by the libSCHC test application
+ */
+#define THREAD_FLAG_TX_END          (1u << 4)
+
+/**
+ * @brief   Thread flag used by LVGL
+ */
+#ifndef LVGL_THREAD_FLAG
+#define LVGL_THREAD_FLAG            (1u << 7)
+#endif
+
+/**
+ * @brief   Thread flag used by Kinetis I2C
+ */
+#define THREAD_FLAG_KINETIS_I2C     (1u << 8)
+
+/**
+ * @brief   Thread flag used by KW41ZRF
+ */
+#define KW41ZRF_THREAD_FLAG_ISR     (1u << 8)
+
+/**
+ * @brief   Thread flag used by the CST816S test application
+ */
+#define CST816S_THREAD_FLAG         (1u << 8)
+
+/**
+ * @brief   Thread flag used by lwIP netdev
+ */
+#define THREAD_FLAG_LWIP_TX_DONE    (1u << 11)
+
+/**
+ * @cond INTERNAL
+ */
+#define THREAD_FLAG_EVENT_MASK              (IS_USED(MODULE_EVENT) ? \
+                                             THREAD_FLAG_EVENT : 0)
+#define USBUS_THREAD_FLAG_MASK              (IS_USED(MODULE_USBUS) ? \
+                                             (USBUS_THREAD_FLAG_USBDEV | \
+                                              USBUS_THREAD_FLAG_USBDEV_EP) : 0)
+#define POSIX_SELECT_THREAD_FLAG_MASK       (IS_USED(MODULE_POSIX_SELECT) ? \
+                                             POSIX_SELECT_THREAD_FLAG : 0)
+#define THREAD_FLAG_TX_END_MASK             (IS_USED(MODULE_LIBSCHC_COAP) ? \
+                                             THREAD_FLAG_TX_END : 0)
+#define LVGL_THREAD_FLAG_MASK               (IS_USED(MODULE_LVGL_CONTRIB) ? \
+                                             LVGL_THREAD_FLAG : 0)
+#if defined(KINETIS_FAMILY)
+#define THREAD_FLAG_KINETIS_I2C_MASK        (IS_USED(MODULE_PERIPH_I2C) ? \
+                                             THREAD_FLAG_KINETIS_I2C : 0)
+#else
+#define THREAD_FLAG_KINETIS_I2C_MASK        (0)
+#endif
+#define KW41ZRF_THREAD_FLAG_ISR_MASK        (IS_USED(MODULE_KW41ZRF) ? \
+                                             KW41ZRF_THREAD_FLAG_ISR : 0)
+#define CST816S_THREAD_FLAG_MASK            (IS_USED(MODULE_CST816S) ? \
+                                             CST816S_THREAD_FLAG : 0)
+#define THREAD_FLAG_LWIP_TX_DONE_MASK       (IS_USED(MODULE_LWIP_NETDEV) ? \
+                                             THREAD_FLAG_LWIP_TX_DONE : 0)
+/** @endcond */
+
+/**
  * @brief Comprehensive set of all predefined flags
  *
- * This bit mask is set for all thread flag bits that are predefined in RIOT.
- * Flags within this set may be set on a thread by the operating system without
- * the thread soliciting them (though not all are; for example, @ref
- * THREAD_FLAG_TIMEOUT is not).
+ * This bit mask is set for all thread flag bits that are predefined by RIOT
+ * core or by the modules selected for the current application. Flags within
+ * this set may be set on a thread by the operating system without the thread
+ * soliciting them (though not all are; for example, @ref THREAD_FLAG_TIMEOUT
+ * is not).
  *
  * When using custom flags, asserting that they are not in this set can help
  * avoid conflict with future additions to the predefined flags.
  */
-#define THREAD_FLAG_PREDEFINED_MASK (THREAD_FLAG_MSG_WAITING | THREAD_FLAG_TIMEOUT)
+#define THREAD_FLAG_PREDEFINED_MASK (THREAD_FLAG_MSG_WAITING | \
+                                     THREAD_FLAG_TIMEOUT | \
+                                     THREAD_FLAG_EVENT_MASK | \
+                                     USBUS_THREAD_FLAG_MASK | \
+                                     POSIX_SELECT_THREAD_FLAG_MASK | \
+                                     THREAD_FLAG_TX_END_MASK | \
+                                     LVGL_THREAD_FLAG_MASK | \
+                                     THREAD_FLAG_KINETIS_I2C_MASK | \
+                                     KW41ZRF_THREAD_FLAG_ISR_MASK | \
+                                     CST816S_THREAD_FLAG_MASK | \
+                                     THREAD_FLAG_LWIP_TX_DONE_MASK)
 /** @} */
 
 /**
