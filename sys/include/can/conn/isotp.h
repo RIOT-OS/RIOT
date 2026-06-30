@@ -23,6 +23,7 @@
 extern "C" {
 #endif
 
+#include "compiler_hints.h"
 #include "can/can.h"
 #include "can/isotp.h"
 #include "mbox.h"
@@ -164,6 +165,7 @@ int conn_can_isotp_close(conn_can_isotp_t *conn);
  * @return the number of bytes received
  * @return any other negative number in case of an error
  */
+ACCESS(write_only, 2, 3)
 int conn_can_isotp_recv(conn_can_isotp_t *conn, void *buf, size_t size, uint32_t timeout);
 
 /**
@@ -178,6 +180,7 @@ int conn_can_isotp_recv(conn_can_isotp_t *conn, void *buf, size_t size, uint32_t
  * @return the number of bytes sent
  * @return any other negative number in case of an error
  */
+ACCESS(read_only, 2, 3)
 int conn_can_isotp_send(conn_can_isotp_t *conn, const void *buf, size_t size, int flags);
 
 #if defined(MODULE_CONN_CAN_ISOTP_MULTI) || defined(DOXYGEN)
