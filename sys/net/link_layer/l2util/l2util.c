@@ -402,6 +402,8 @@ size_t l2util_addr_from_str_sized(const char *str, void *_addr, size_t addr_size
         return 0;
     }
 
+    assume(addr + addr_size >= addr_end);
+
     /* out is reversed */
     while (addr < --addr_end) {
         uint8_t tmp = *addr_end;
