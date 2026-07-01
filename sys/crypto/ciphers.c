@@ -14,8 +14,8 @@
  * @}
  */
 
-#include <string.h>
-#include <stdio.h>
+#include <stdint.h>
+
 #include "crypto/ciphers.h"
 
 int cipher_init(cipher_t *cipher, cipher_id_t cipher_id, const uint8_t *key,
@@ -37,7 +37,7 @@ int cipher_decrypt(const cipher_t *cipher, const uint8_t *input,
     return cipher->interface->decrypt(&cipher->context, input, output);
 }
 
-int cipher_get_block_size(const cipher_t *cipher)
+size_t cipher_get_block_size(const cipher_t *cipher)
 {
     return cipher->interface->block_size;
 }

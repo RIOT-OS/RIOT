@@ -20,6 +20,9 @@
  */
 
 #include <stddef.h>
+#include <unistd.h>
+
+#include "compiler_hints.h"
 #include "crypto/ciphers.h"
 
 #ifdef __cplusplus
@@ -27,41 +30,46 @@ extern "C" {
 #endif
 
 /**
- * @brief Encrypt data of arbitrary length in cipher block chaining mode.
+ * @brief   Encrypt data of arbitrary length in cipher block chaining mode.
  *
- * @param cipher     Already initialized cipher struct
- * @param iv         16 octet initialization vector. Must never be used more
- *                   than once for a given key.
- * @param input      pointer to input data to encrypt
- * @param input_len  length of the input data
- * @param output     pointer to allocated memory for encrypted data. It has to
- *                   be of size data_len + BLOCK_SIZE - data_len % BLOCK_SIZE.
+ * @param[in]   cipher      Already initialized cipher struct
+ * @param[in]   iv          16 octet initialization vector. Must never be used
+ *                          more than once for a given key.
+ * @param[in]   input       pointer to @p input_len bytes of data to encrypt
+ * @param[in]   input_len   length of @p input_len in bytes
+ * @param[out]  output      pointer to allocated memory for encrypted data
  *
- * @return            <0 on error
- * @return            CIPHER_ERR_INVALID_LENGTH when input_len % BLOCK_SIZE != 0
- * @return            CIPHER_ERR_ENC_FAILED on internal encryption error
- * @return            otherwise number of input bytes that aren't consumed
+ * @pre         @p input_len is a multiple of the block size of @p cipher
+ *
+ * @retval      <0                          error
+ * @retval      CIPHER_ERR_INVALID_LENGTH   input_len % BLOCK_SIZE != 0
+ * @retval      CIPHER_ERR_ENC_FAILED       internal encryption error
+ * @return      number of encrypted bytes written to @p output
  */
-int cipher_encrypt_cbc(const cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
-                       size_t input_len, uint8_t *output);
+ACCESS(read_only, 3, 4)
+ACCESS(write_only, 5, 4)
+ssize_t cipher_encrypt_cbc(const cipher_t *cipher, const uint8_t iv[16],
+                           const void *input, size_t input_len, void *output);
 
 /**
  * @brief Decrypt encrypted data in cipher block chaining mode.
  *
- * @param cipher     Already initialized cipher struct
- * @param iv         16 octet initialization vector.
- * @param input      pointer to input data to decrypt
- * @param input_len  length of the input data
- * @param output     pointer to allocated memory for plaintext data. It has to
- *                   be of size input_len.
+ * @param[in]   cipher      Already initialized cipher struct
+ * @param[in]   iv          16 octet initialization vector.
+ * @param[in]   input       pointer to input data to decrypt
+ * @param[in]   input_len   length of the input data
+ * @param[out]  output      pointer to allocated memory for decrypted data
+ * @pre         @p input_len is a multiple of the block size of @p cipher
  *
- * @return            <0 on error
- * @return            CIPHER_ERR_INVALID_LENGTH when input_len % BLOCK_SIZE != 0
- * @return            CIPHER_ERR_DEC_FAILED on internal decryption error
- * @return            otherwise number of bytes decrypted
+ * @retval      <0                          error
+ * @retval      CIPHER_ERR_INVALID_LENGTH   input_len % BLOCK_SIZE != 0
+ * @retval      CIPHER_ERR_ENC_FAILED       internal decryption error
+ * @return      number of decrypted bytes written to @p output
  */
-int cipher_decrypt_cbc(const cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
-                       size_t input_len, uint8_t *output);
+ACCESS(read_only, 3, 4)
+ACCESS(write_only, 5, 4)
+ssize_t cipher_decrypt_cbc(const cipher_t *cipher, const uint8_t iv[16],
+                           const void *input, size_t input_len, void *output);
 
 #ifdef __cplusplus
 }
