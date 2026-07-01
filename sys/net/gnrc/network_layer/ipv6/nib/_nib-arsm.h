@@ -64,8 +64,9 @@ void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
  *
  * @param[in] nbr       Neighbor to send neighbor solicitation to.
  * @param[in] reset     Reset probe counter.
+ * @param[in] src       Source address to be used or NULL if not relevant
  */
-void _snd_uc_ns(_nib_onl_entry_t *nbr, bool reset);
+void _snd_uc_ns(_nib_onl_entry_t *nbr, bool reset, const ipv6_addr_t *src);
 
 /**
  * @brief   Handles SL2AO
@@ -142,8 +143,9 @@ void _handle_state_timeout(_nib_onl_entry_t *nbr);
  *
  * @param[in] nbr   Neighbor to probe.
  * @param[in] reset Reset probe counter.
+ * @param[in] src   Source address to be used or NULL if not relevant
  */
-void _probe_nbr(_nib_onl_entry_t *nbr, bool reset);
+void _probe_nbr(_nib_onl_entry_t *nbr, bool reset, const ipv6_addr_t *src);
 
 /**
  * @brief   Handles advertised link-layer information
@@ -248,7 +250,7 @@ bool _is_reachable(_nib_onl_entry_t *entry);
 #else   /* CONFIG_GNRC_IPV6_NIB_ARSM || defined(DOXYGEN) */
 #define _handle_snd_ns(ctx)                         (void)ctx
 #define _handle_state_timeout(ctx)                  (void)ctx
-#define _probe_nbr(nbr, reset)                      (void)nbr; (void)reset
+#define _probe_nbr(nbr, reset, addr)                (void)nbr; (void)reset; (void)addr;
 #define _init_iface_arsm(netif)                     (void)netif
 #define _deinit_iface_arsm(netif)                   (void)netif
 #define _handle_adv_l2(netif, nce, icmpv6, tl2ao)   (void)netif; (void)nce; \
