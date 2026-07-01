@@ -17,6 +17,9 @@ endif
 ifneq (,$(filter telnet,$(USEMODULE)))
   DIRS += net/application_layer/telnet
 endif
+ifneq (,$(filter configuration,$(USEMODULE)))
+  DIRS += configuration
+endif
 ifneq (,$(filter constfs,$(USEMODULE)))
   DIRS += fs/constfs
 endif
