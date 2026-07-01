@@ -329,6 +329,7 @@ PSEUDOMODULES += newlib_gnu_source
 PSEUDOMODULES += newlib_nano
 PSEUDOMODULES += nrf24l01p_ng_diagnostics
 PSEUDOMODULES += opendsme
+PSEUDOMODULES += radiolib
 PSEUDOMODULES += openthread
 PSEUDOMODULES += picolibc
 PSEUDOMODULES += picolibc_stdout_buffered

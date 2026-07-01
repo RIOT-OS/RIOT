@@ -1,0 +1,34 @@
+# required features
+FEATURES_REQUIRED += cpp
+FEATURES_REQUIRED += libstdcpp
+FEATURES_REQUIRED += periph_spi
+FEATURES_REQUIRED += periph_gpio_irq
+
+# Contrib code of RadioLib
+USEMODULE += radiolib_riot_contrib
+
+# Internal RadioLib modules
+USEMODULE += radiolib_core
+USEMODULE += radiolib_utils
+USEMODULE += radiolib_physicallayer
+USEMODULE += radiolib_lr11x0
+USEMODULE += radiolib_sx127x
+
+# timing
+USEMODULE += ztimer
+USEMODULE += ztimer_msec
+USEMODULE += ztimer_usec
+
+USEMODULE += cpp11-compat
+CXXEXFLAGS += -Wno-unused-parameter
+CXXEXFLAGS += -Wno-pedantic
+CXXEXFLAGS += -Wno-missing-field-initializers
+CXXEXFLAGS += -Wno-unused-but-set-variable
+CXXEXFLAGS += -Wno-maybe-uninitialized
+CXXEXFLAGS += -Wno-unused-variable
+CXXEXFLAGS += -Wno-reorder
+CXXEXFLAGS += -Wno-address
+CXXEXFLAGS += -Wno-sign-compare
+CXXEXFLAGS += -Wno-unused-function
+CXXEXFLAGS += -Wno-missing-braces
+CXXEXFLAGS += -Wno-overloaded-virtual
