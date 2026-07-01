@@ -4,7 +4,8 @@ PKG_URL       = https://download.riot-os.org
 PKG_VERSION   = 17.1.0_ddde560
 PKG_DIR_NAME  = nRF5_SDK
 PKG_EXT       = zip
-PKG_LICENSE   = ARM Object Code and Header Files License
+# There is not a single license but multiple. License data should be inferred from files.
+PKG_LICENSE   =
 PKG_SHA512  	= cb610d724d27ef79c792511d8b889cbf2d411a3a391f5c740ea10b86139201b97eedf0c1edcf4d199c3fbd51e4cc5a4bd922c0c40d01e2f5359acd16a2b163e4
 
 PKG_SOURCE_DIR ?= $(PKGDIRBASE)/$(PKG_NAME)
