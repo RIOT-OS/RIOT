@@ -21,7 +21,7 @@ def testfunc(child):
 
     # sending more input to assert that thread is still capable of waking up
     child.sendline("world 456")
-    child.expect("world 123")
+    child.expect("world 456")
 
 
 if __name__ == "__main__":
