@@ -12,7 +12,6 @@
 # `1.13.2` or `latest` to build the latest master source.
 
 PKG_NAME=doxygen
-PKG_LEGAL_STATUS=licensed
 PKG_LICENSE=GPL-2.0
 
 RIOTTOOLS=$(CURDIR)/..
