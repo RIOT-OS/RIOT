@@ -138,7 +138,6 @@ Here is a quick overview of the examples available in the RIOT:
 | [lwip_ipv4](./networking/misc/lwip_ipv4/README.md) | This is a simple UDP client / server using lwIP for IPv4. |
 | [lwiperf](./networking/misc/lwiperf/README.md) | This is a lwIP benchmark application, providing an iPerf client and server. |
 
-
 ## Advanced Examples
 
 | Example | Description |
@@ -154,6 +153,7 @@ Here is a quick overview of the examples available in the RIOT:
 | [senml_saul](./advanced/senml_saul/README.md) | This example demonstrates the usage of the SAUL (Sensor Actuator Uber Layer) module with the SenML (Sensor Measurement Lists) format. |
 | [opendsme](./advanced/opendsme/README.md) | This example demonstrates the usage of the OpenDSME module in RIOT. |
 | [xipfs](./advanced/xipfs/README.md) | This example demonstrates the usage of XIPFS for creating and executing an executable file. |
+| [runtime_config_core](./advanced/runtime_config/runtime_config_core/README.md) | This example demonstrates the most basic usage of the `Runtime configuration` module. |
 
 ## Examples from Guides
 

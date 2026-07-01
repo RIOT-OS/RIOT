@@ -1,0 +1,2 @@
+USEMODULE += runtime_config
+USEMODULE += tests-runtime_config-namespace
