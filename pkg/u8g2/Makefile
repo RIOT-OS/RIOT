@@ -2,7 +2,6 @@ PKG_NAME=u8g2
 PKG_URL=https://github.com/olikraus/u8g2
 # approximately v2.36.18
 PKG_VERSION=3b8939cd015d6aca6a19f761df84859916f1f7d9
-PKG_LEGAL_STATUS = licensed
 PKG_LICENSE=BSD-2-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
