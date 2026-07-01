@@ -27,15 +27,9 @@ extern "C" {
  * @name Macros for controlling the on-board LED (LD3).
  * @{
  */
-#ifdef BOARD_NUCLEO_G031K8
-#  define LED0_PIN_NUM        6
-#  define LED0_PORT           GPIO_PORT_C /**< GPIO port of LED 3 */
-#  define LED0_PORT_NUM       PORT_C
-#else
-#  define LED0_PIN_NUM        3
-#  define LED0_PORT           GPIO_PORT_B /**< GPIO port of LED 0 */
-#  define LED0_PORT_NUM       PORT_B
-#endif
+#define LED0_PIN_NUM        3
+#define LED0_PORT           GPIO_PORT_B /**< GPIO port of LED 0 */
+#define LED0_PORT_NUM       PORT_B
 /** @} */
 
 #ifdef __cplusplus
