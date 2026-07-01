@@ -5,3 +5,7 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += at30tse75x
   USEMODULE += saul_gpio
 endif
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_eeprom
+endif

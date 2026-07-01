@@ -4,3 +4,7 @@ ifneq (,$(filter atmega_pcint,$(USEMODULE)))
 endif
 
 include $(RIOTCPU)/atmega_common/Makefile.dep
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE  += mtd_eeprom
+endif
