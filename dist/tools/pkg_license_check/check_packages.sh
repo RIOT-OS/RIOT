@@ -11,8 +11,8 @@ set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")"
 
 ./get_package_license_identifiers.sh | \
-    sed -e '/\tpublic-domain\t/d' | \
-    cut -f 3 | \
+    cut -f 2 | \
+    sed -e '/CopryrightWaived/d' | \
     sort | \
     uniq | \
     ./validate_spdx_license_expressions.py

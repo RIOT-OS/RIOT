@@ -33,24 +33,7 @@ fi
 
 for pkg_makefile in "${FILES[@]}"
 do
-    LEGAL_STATUS=$(grep -E '^ *PKG_LEGAL_STATUS *[:\?]?=' -- "${pkg_makefile}" | get_variable_value)
     LICENCE=$(grep -E '^ *PKG_LICENSE *[:\?]?=' -- "${pkg_makefile}" | get_variable_value)
-
-    NUM_LEGAL_STATUS=$(echo "${LEGAL_STATUS}" | wc -l)
-    if [[ "${NUM_LEGAL_STATUS}" -ne 1 ]]
-    then
-        echo "error: \"PKG_LEGAL_STATUS\" must be defined on a single line for a package. Found ${NUM_LEGAL_STATUS} declarations in \"${pkg_makefile}\"." >&2
-        exit 1
-    fi
-
-    case ${LEGAL_STATUS} in
-        public-domain | licensed)
-            ;;
-        *)
-            echo "error: unknown PKG_LEGAL_STATUS=${LEGAL_STATUS} in \"${pkg_makefile}\"." >&2
-            exit 1
-            ;;
-    esac
 
     NUM_LICENSE=$(echo "${LICENCE}" | wc -l)
     if [[ "${NUM_LICENSE}" -ne 1 ]]
@@ -59,5 +42,5 @@ do
         exit 1
     fi
 
-    echo -e "$(basename "$(dirname "${pkg_makefile}")")\t${LEGAL_STATUS}\t${LICENCE}"
+    echo -e "$(basename "$(dirname "${pkg_makefile}")")\t${LICENCE}"
 done
