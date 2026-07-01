@@ -8,7 +8,7 @@
  * @file
  * @ingroup unittests
  * @brief   Unit tests for contiguous and noncontiguous payload functionality
- * @author  Carl Seifert <carl.seifert1@mailbox.tu-dresden.de>
+ * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
 #include <stdio.h>
