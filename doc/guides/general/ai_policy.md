@@ -44,12 +44,18 @@ contributions:
 
 ## Details
 
-To ensure sufficient self review and understanding of the work, it is strongly
-recommended that contributors write PR descriptions themselves (if needed,
-using tools for translation or copy-editing). The description should explain
-the motivation, implementation approach, expected impact, and any open
-questions or uncertainties to the same extent as a contribution made without
-tool assistance.
+To ensure sufficient self review and understanding of the work, it is
+**mandatory that contributors write PR/Issue descriptions and replies themselves.**
+Authors not fluent in English may write in their native language and use
+a tool to translate it to English, if they also include the original text.
+Use of generative AI for spell checking and grammar checking is OK, if the
+text is updated by hand based on that review, rather than letting the
+generative AI directly generate a revised version.
+
+The description should explain the motivation, implementation approach, expected impact,
+and any open questions or uncertainties to the same extent as a contribution made without
+tool assistance. **LLM usage for communication with other humans will be**
+**considered extractive under the terms of this policy and is strictly forbidden**.
 
 An important implication of this policy is that it bans agents that take action
 in our digital spaces without human approval, such as the [`@claude`
