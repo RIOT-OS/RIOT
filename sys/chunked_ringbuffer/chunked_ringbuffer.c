@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2021 ML!PA Consulting GmbH
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2021 ML!PA Consulting GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -57,7 +54,7 @@ bool crb_add_bytes(chunk_ringbuf_t *rb, const void *data, size_t len)
 {
     const uint8_t *in = data;
     for (size_t i = 0; i < len; ++i) {
-        if (!crb_add_byte(rb ,in[i])) {
+        if (!crb_add_byte(rb, in[i])) {
             return false;
         }
     }
@@ -71,9 +68,9 @@ bool crb_add_chunk(chunk_ringbuf_t *rb, const void *data, size_t len)
         return false;
     }
 
-    bool keep = crb_add_bytes(rb ,data, len);
+    bool keep = crb_add_bytes(rb, data, len);
 
-    return crb_end_chunk(rb ,keep);
+    return crb_end_chunk(rb, keep);
 }
 
 static unsigned _get_cur_len(chunk_ringbuf_t *rb)
@@ -228,7 +225,7 @@ bool crb_consume_chunk(chunk_ringbuf_t *rb, void *dst, size_t len)
 
 void crb_init(chunk_ringbuf_t *rb, void *buffer, size_t len)
 {
-    memset(rb ,0, sizeof(*rb));
+    memset(rb, 0, sizeof(*rb));
     rb->buffer = buffer;
     rb->buffer_end = &rb->buffer[len - 1];
     rb->cur = rb->buffer;
