@@ -210,11 +210,9 @@ void timer_stop(tim_t dev)
     atomic_set(&DEV(dev)->PAUSE, 1u);
 }
 
-/* Interrupt Service Routines 
+/* Interrupt Service Routines
  * Each one calls the common _timer_isr function with the appropriate timer and channel,
- * then ends the ISR. These replace the default weak ISRs.
-*/
-
+ * then ends the ISR. These replace the default weak ISRs. */
 void isr_timer0_0(void)
 {
     _timer_isr(0, 0);
