@@ -33,8 +33,8 @@
 
 static timer_cb_t ctx_cb[TIMER_NUMOF];
 static void *ctx_arg[TIMER_NUMOF];
-static uint8_t flag_periodic[TIMER_NUMOF];
-static uint8_t flag_reset[TIMER_NUMOF];
+static uint8_t _flag_periodic[TIMER_NUMOF];
+static uint8_t _flag_reset[TIMER_NUMOF];
 
 static void _timer_reset(tim_t dev)
 {
@@ -46,13 +46,13 @@ static void _timer_reset(tim_t dev)
     irq_restore(state);
 }
 
-static void _isr(tim_t dev, int channel)
+static void _timer_isr(tim_t dev, int channel)
 {
     /* The latched interrupt flags are write-1-clear (see table 1243) */
     DEV(dev)->INTR = 1u << channel;
 
-    if (flag_periodic[dev] & (1u << channel)) {
-        if (flag_reset[dev] & (1u << channel)) {
+    if (_flag_periodic[dev] & (1u << channel)) {
+        if (_flag_reset[dev] & (1u << channel)) {
             _timer_reset(dev);
         }
         /* Bomb has been planted */
@@ -71,24 +71,25 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     }
     /* TICKS blocks are designed to generate 1 us ticks, so we can only support that frequency */
     assert(freq == US_PER_SEC);
-    (void)freq;
 
     ctx_cb[dev] = cb;
     ctx_arg[dev] = arg;
-    flag_periodic[dev] = 0;
-    flag_reset[dev] = 0;
+    _flag_periodic[dev] = 0;
+    _flag_reset[dev] = 0;
 
     /* Reset the timer block, so we can be sure it is in a known state */
-    uint32_t reset_bit = (DEV(dev) == TIMER0) ? RESET_TIMER0 : RESET_TIMER1;
+    uint32_t reset_bit;
+    reset_bit = (DEV(dev) == TIMER0) ? RESETS_RESET_TIMER0_BITS : RESETS_RESET_TIMER1_BITS;
     reset_component(reset_bit, reset_bit);
 
     /* Generate one tick per microsecond from clk_ref, which runs from xosc */
     if (DEV(dev) == TIMER0) {
-        TICKS->TIMER0_CYCLES = CLOCK_XOSC / MHZ(1);
+        assert(CLOCK_XOSC % freq == 0)
+        TICKS->TIMER0_CTRL = TICKS_TIMER0_CTRL_ENABLE_BITS;
         TICKS->TIMER0_CTRL = TICKS_CTRL_ENABLE_BITS;
     }
     else {
-        TICKS->TIMER1_CYCLES = CLOCK_XOSC / MHZ(1);
+        TICKS->TIMER1_CTRL = TICKS_TIMER1_CTRL_ENABLE_BITS;
         TICKS->TIMER1_CTRL = TICKS_CTRL_ENABLE_BITS;
     }
 
@@ -109,15 +110,14 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
         return -EINVAL;
     }
 
-    if (!timeout) {
-        /* catch case that a tick happens right before arming the alarm */
+    if (timeout == 0) {
         if (ctx_cb[dev]) {
             ctx_cb[dev](ctx_arg[dev], channel);
         }
     }
     else {
         unsigned state = irq_disable();
-        flag_periodic[dev] &= ~(1u << channel);
+        _flag_periodic[dev] &= ~(1u << channel);
         /* An alarm matches on the lower 32 bits */
         *ALARM(dev, channel) = DEV(dev)->TIMERAWL + timeout;
         irq_restore(state);
@@ -136,7 +136,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     }
 
     unsigned state = irq_disable();
-    flag_periodic[dev] &= ~(1u << channel);
+    _flag_periodic[dev] &= ~(1u << channel);
     *ALARM(dev, channel) = (uint32_t)value;
     irq_restore(state);
 
@@ -160,12 +160,12 @@ int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags
     }
 
     unsigned state = irq_disable();
-    flag_periodic[dev] |= (1u << channel);
+    _flag_periodic[dev] |= (1u << channel);
     if (flags & TIM_FLAG_RESET_ON_MATCH) {
-        flag_reset[dev] |= (1u << channel);
+        _flag_reset[dev] |= (1u << channel);
     }
     else {
-        flag_reset[dev] &= ~(1u << channel);
+        _flag_reset[dev] &= ~(1u << channel);
     }
     *ALARM(dev, channel) = (uint32_t)value;
     irq_restore(state);
@@ -185,7 +185,7 @@ int timer_clear(tim_t dev, int channel)
     unsigned state = irq_disable();
     /* The ARMED bits are write-1-clear (table 1236) */
     DEV(dev)->ARMED = 1u << channel;
-    flag_periodic[dev] &= ~(1u << channel);
+    _flag_periodic[dev] &= ~(1u << channel);
     irq_restore(state);
 
     return 0;
@@ -210,51 +210,56 @@ void timer_stop(tim_t dev)
     atomic_set(&DEV(dev)->PAUSE, 1u);
 }
 
+/* Interrupt Service Routines 
+ * Each one calls the common _timer_isr function with the appropriate timer and channel,
+ * then ends the ISR. These replace the default weak ISRs.
+*/
+
 void isr_timer0_0(void)
 {
-    _isr(0, 0);
+    _timer_isr(0, 0);
     rp_end_isr();
 }
 
 void isr_timer0_1(void)
 {
-    _isr(0, 1);
+    _timer_isr(0, 1);
     rp_end_isr();
 }
 
 void isr_timer0_2(void)
 {
-    _isr(0, 2);
+    _timer_isr(0, 2);
     rp_end_isr();
 }
 
 void isr_timer0_3(void)
 {
-    _isr(0, 3);
+    _timer_isr(0, 3);
     rp_end_isr();
 }
 
 void isr_timer1_0(void)
 {
-    _isr(1, 0);
+    _timer_isr(1, 0);
     rp_end_isr();
 }
 
 void isr_timer1_1(void)
 {
-    _isr(1, 1);
+    _timer_isr(1, 1);
     rp_end_isr();
 }
 
 void isr_timer1_2(void)
 {
-    _isr(1, 2);
+    _timer_isr(1, 2);
     rp_end_isr();
 }
 
 void isr_timer1_3(void)
 {
-    _isr(1, 3);
+    _timer_isr(1, 3);
     rp_end_isr();
 }
 
