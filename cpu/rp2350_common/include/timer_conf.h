@@ -25,9 +25,6 @@
 /** Reset bit for the TIMER1 peripheral */
 #define RESET_TIMER1 (1u << 24u)
 
-/** Enable bit of a tick generator control register */
-#define TICKS_CTRL_ENABLE_BITS (1u << 0u)
-
 /** Number of alarm channels per timer block */
 #define TIMER_CHANNEL_NUMOF 4u
 
