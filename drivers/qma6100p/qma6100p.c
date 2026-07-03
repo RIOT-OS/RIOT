@@ -556,7 +556,7 @@ static inline int16_t _to_signed14(uint8_t lsb, uint8_t msb)
 }
 
 /**
- * @brief Converts to ug a raw data value given the full scale range
+ * @brief Converts a raw data value to ug given the full scale range
  *
  * Multiplies the raw 14-bit signed ADC value by the resolution (ug/LSB)
  * corresponding to the configured full scale range.
