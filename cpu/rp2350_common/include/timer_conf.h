@@ -19,12 +19,6 @@
 #include "RP2350.h"
 #include "periph_cpu.h"
 
-/** Reset bit for the TIMER0 peripheral */
-#define RESET_TIMER0 (1u << 23u)
-
-/** Reset bit for the TIMER1 peripheral */
-#define RESET_TIMER1 (1u << 24u)
-
 /** Number of alarm channels per timer block */
 #define TIMER_CHANNEL_NUMOF 4u
 

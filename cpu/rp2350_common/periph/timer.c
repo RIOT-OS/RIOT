@@ -86,11 +86,11 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     if (DEV(dev) == TIMER0) {
         assert(CLOCK_XOSC % freq == 0)
         TICKS->TIMER0_CTRL = TICKS_TIMER0_CTRL_ENABLE_BITS;
-        TICKS->TIMER0_CTRL = TICKS_CTRL_ENABLE_BITS;
+        TICKS->TIMER0_CTRL = TICKS_TIMER0_CTRL_ENABLE_BITS;
     }
     else {
         TICKS->TIMER1_CTRL = TICKS_TIMER1_CTRL_ENABLE_BITS;
-        TICKS->TIMER1_CTRL = TICKS_CTRL_ENABLE_BITS;
+        TICKS->TIMER1_CTRL = TICKS_TIMER1_CTRL_ENABLE_BITS;
     }
 
     for (uint8_t i = 0; i < timer_config[dev].ch_numof; i++) {
