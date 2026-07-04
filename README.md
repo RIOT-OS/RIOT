@@ -6,32 +6,7 @@
 [![Mastodon][mastodon-badge]][mastodon-link]
 [![Matrix][matrix-badge]][matrix-link]
 
-<p align="center"><img src="doc/doxygen/src/riot-logo.svg" width="59%"><!--
-                          ZZZZZZ
-                        ZZZZZZZZZZZZ
-                      ZZZZZZZZZZZZZZZZ
-                     ZZZZZZZ     ZZZZZZ
-                    ZZZZZZ        ZZZZZ
-                    ZZZZZ          ZZZZ
-                    ZZZZ           ZZZZZ
-                    ZZZZ           ZZZZ
-                    ZZZZ          ZZZZZ
-                    ZZZZ        ZZZZZZ
-                    ZZZZ     ZZZZZZZZ       777        7777       7777777777
-              ZZ    ZZZZ   ZZZZZZZZ         777      77777777    77777777777
-          ZZZZZZZ   ZZZZ  ZZZZZZZ           777     7777  7777       777
-        ZZZZZZZZZ   ZZZZ    Z               777     777    777       777
-       ZZZZZZ       ZZZZ                    777     777    777       777
-      ZZZZZ         ZZZZ                    777     777    777       777
-     ZZZZZ          ZZZZZ    ZZZZ           777     777    777       777
-     ZZZZ           ZZZZZ    ZZZZZ          777     777    777       777
-     ZZZZ           ZZZZZ     ZZZZZ         777     777    777       777
-     ZZZZ           ZZZZ       ZZZZZ        777     777    777       777
-     ZZZZZ         ZZZZZ        ZZZZZ       777     777    777       777
-      ZZZZZZ     ZZZZZZ          ZZZZZ      777     7777777777       777
-       ZZZZZZZZZZZZZZZ            ZZZZ      777      77777777        777
-         ZZZZZZZZZZZ               Z
-            ZZZZZ                                                           --></p>
+![RIOT Logo](doc/resources/riot-logo.svg)
 
 # RIOT OS: The friendly Operating System for IoT
 
@@ -56,15 +31,15 @@ LGPL code.
 [ci-link]: https://ci.riot-os.org/details/branch/master
 [release-badge]: https://img.shields.io/github/release/RIOT-OS/RIOT.svg
 [release-link]: https://github.com/RIOT-OS/RIOT/releases/latest
-[license-badge]: https://img.shields.io/github/license/RIOT-OS/RIOT
+[license-badge]: doc/resources/badge-license.svg
 [license-link]: https://github.com/RIOT-OS/RIOT/blob/master/LICENSE
-[api-badge]: https://img.shields.io/badge/docs-API-informational.svg
+[api-badge]: doc/resources/badge-api.svg
 [api-link]: https://api.riot-os.org/
-[guide-badge]: https://img.shields.io/badge/docs-Getting_Started_Guide-informational.svg
+[guide-badge]: doc/resources/badge-guide.svg
 [guide-link]: https://guide.riot-os.org/getting-started/installing/
-[mastodon-badge]: https://img.shields.io/badge/social-Mastodon-informational.svg
+[mastodon-badge]: doc/resources/badge-mastodon.svg
 [mastodon-link]: https://floss.social/@RIOT_OS
-[matrix-badge]: https://img.shields.io/badge/chat-Matrix-brightgreen.svg
+[matrix-badge]: doc/resources/badge-matrix.svg
 [matrix-link]: https://matrix.to/#/#riot-os:matrix.org
 
 ## Getting Started
