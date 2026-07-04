@@ -118,10 +118,10 @@ extern const cipher_id_t CIPHER_AES;
  *        contains the cipher interface and the context
  */
 typedef struct {
-    const cipher_interface_t *interface; /**< BlockCipher-Interface for the
-                                                 Cipher-Algorithms */
-    cipher_context_t context;            /**< The encryption context (buffer)
-                                                 for the algorithm */
+    /** BlockCipher-Interface for the Cipher-Algorithms */
+    const cipher_interface_t *interface;
+    /** The encryption context (buffer) for the algorithm */
+    cipher_context_t context;
 } cipher_t;
 
 /**
