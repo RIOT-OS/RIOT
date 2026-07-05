@@ -194,9 +194,12 @@ ssize_t cipher_encrypt_ccm(const cipher_t *cipher,
         return CCM_ERR_INVALID_MAC_LENGTH;
     }
 
-    if (length_encoding < 2 || length_encoding > 8 ||
-        !_fits_in_nbytes(input_len, length_encoding)) {
+    if (length_encoding < 2 || length_encoding > 8) {
         return CCM_ERR_INVALID_LENGTH_ENCODING;
+    }
+
+    if (!_fits_in_nbytes(input_len, length_encoding)) {
+        return CCM_ERR_INVALID_DATA_LENGTH;
     }
 
     block_size = cipher_get_block_size(cipher);
@@ -215,6 +218,8 @@ ssize_t cipher_encrypt_ccm(const cipher_t *cipher,
     /* Create B0, encrypt it (X1) and use it as mac_iv */
     if (ccm_create_mac_iv(cipher, auth_data_len, mac_length, length_encoding,
                           nonce, nonce_len, input_len, mac_iv) < 0) {
+        /* This should never happen, we tested for !_fits_in_nbytes() before */
+        assert(0);
         return CCM_ERR_INVALID_DATA_LENGTH;
     }
 

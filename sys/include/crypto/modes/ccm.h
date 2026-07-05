@@ -33,11 +33,26 @@ extern "C" {
  * @name CCM error codes
  * @{
  */
+/**
+ * @brief   Nonce length not matching selected length encoding
+ *
+ * Section␣A.1␣"Length␣Requirements"␣from
+ *␣https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
+ * specifies `n + q == 15`, (n is the nonce length, q is the length encoding).
+ */
 #define CCM_ERR_INVALID_NONCE_LENGTH        (-2)
+/** CBC MAC invalid */
 #define CCM_ERR_INVALID_CBC_MAC             (-3)
+/**
+ * @brief   Provided more plaintext to encrypt than supported for the selected
+ *          length encoding
+ */
 #define CCM_ERR_INVALID_DATA_LENGTH         (-3)
+/** Selected length encoding parameter is not valid */
 #define CCM_ERR_INVALID_LENGTH_ENCODING     (-4)
+/** MAC length invalid */
 #define CCM_ERR_INVALID_MAC_LENGTH          (-5)
+/** block size of the used cipher is not @ref CCM_BLOCK_SIZE (as it should) */
 #define CCM_ERR_INVALID_BLOCK_SIZE          (-6)
 /** @} */
 
