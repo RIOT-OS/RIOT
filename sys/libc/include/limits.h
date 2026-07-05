@@ -24,11 +24,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* We cannot use e.g. `sizeof(ssize_t)` in preprocessor macros, but only
- * rely on other macros. We assume instead `sizeof(ssize_t) == sizeof(size_t)`
+#ifdef DOXYGEN
+/**
+ * @brief   Highest numeric value an `ssize_t` can hold
+ *
+ * @note    A POSIX compliant libc must provide this macro in `<limits.h>`. RIOT
+ *          ensures an `#include <limits.h>` does provide it, even if the used
+ *          libc is not.
  */
-#ifndef SSIZE_MAX
+#  define SSIZE_MAX implementation_defined
+#elif !defined(SSIZE_MAX)
 #  ifndef SIZE_MAX
 #    error "Neither SSIZE_MAX NOR SIZE_MAX defined"
 #  endif
