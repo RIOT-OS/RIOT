@@ -67,7 +67,7 @@ static int devopen(const char *dev, int flags)
     char devpath[1024];
 
     strcpy(devpath, "/dev/");
-    strncat(devpath, dev, sizeof(devpath) - (sizeof("/dev/") - 1));
+    strncat(devpath, dev, sizeof(devpath) - sizeof("/dev/"));
     return open(devpath, flags);
 }
 #endif
