@@ -150,6 +150,9 @@ void hmac_sha256_update(hmac_context_t *ctx, const void *data, size_t len);
 
 /**
  * @brief hmac_sha256_final HMAC SHA-256 finalization. Finish HMAC calculation and export the value
+ *
+ * Internal key material will be wiped after this function is called.
+ *
  * @param[in] ctx hmac_context_t handle to use
  * @param[out] digest the computed hmac-sha256, length MUST be SHA256_DIGEST_LENGTH
  */

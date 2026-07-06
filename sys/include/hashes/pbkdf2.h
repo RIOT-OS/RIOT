@@ -42,7 +42,7 @@ extern "C" {
  * @param[in]   password_len    length of password
  * @param[in]   salt            salt pointer
  * @param[in]   salt_len        salt length, recommended 64bit
- * @param[in]   iterations      number of rounds. Must be >1.
+ * @param[in]   iterations      number of rounds. Must be >0.
  *                              NIST’s detailed guide (Appendix A.2.2),
  *                              recommended 10000
  * @param[out]  output          array of size PBKDF2_KEY_SIZE

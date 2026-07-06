@@ -16,6 +16,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <string.h>
 
 #include "hashes/sha256.h"
@@ -46,6 +47,8 @@ void pbkdf2_sha256(const void *password, size_t password_len,
                    int iterations,
                    uint8_t *output)
 {
+    assert(iterations > 0);
+
     sha256_context_t inner;
     sha256_context_t outer;
     uint8_t tmp_digest[SHA256_DIGEST_LENGTH];
