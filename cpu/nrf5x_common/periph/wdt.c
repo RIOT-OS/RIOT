@@ -39,9 +39,12 @@
 #define NRF_WDT_HALT_MODE (WDT_CONFIG_HALT_Run)
 #endif
 
-/* Compatibility wrapper for nRF53/nRF9160 */
+/* Compatibility wrapper for nRF53/nRF9160. The nRF53 has numbered WDT
+ * instances, with matching interrupt and ISR names, the nRF9160 has one */
 #ifdef NRF_WDT0_S
 #define NRF_WDT NRF_WDT0_S
+#define WDT_IRQn WDT0_IRQn
+#define isr_wdt isr_wdt0
 #elif defined(NRF_WDT_S)
 #define NRF_WDT NRF_WDT_S
 #endif
