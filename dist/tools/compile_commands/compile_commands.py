@@ -251,7 +251,15 @@ def generate_module_compile_commands(path, state, args):
             pass
 
     if args.clangd:
+        # Inject flags for better user experience if compile commands are
+        # intended to be consumed by clangd: We do not care if those are
+        # matching 100% what the compiler uses, but rather about best linting
+        # experience.
         cdetails.cflags.append('-Wno-unknown-warning-option')
+        cdetails.cflags.append('-Wdocumentation')
+        # This flag should be removed once all deprecations use the
+        # __attribute__((deprecated)) flag.
+        cdetails.cflags.append('-Wno-documentation-deprecated-sync')
 
     c_extra_includes = []
     cxx_extra_includes = []
