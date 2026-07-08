@@ -77,8 +77,8 @@ int isrpipe_write_one(isrpipe_t *isrpipe, uint8_t c);
  * @param[in]   buf         bytes to add to isrpipe buffer
  * @param[in]   n           number of bytes to add from buf to isrpipe's buffer
  *
- * @returns     number of bytes that could be added
- * @returns     -1 if buffer was full
+ * @returns     Number of bytes that have been added. Can be less than @p n
+ *              if the buffer had insufficient space.
  */
 int isrpipe_write(isrpipe_t *isrpipe, const uint8_t *buf, size_t n);
 
