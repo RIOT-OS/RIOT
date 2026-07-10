@@ -46,7 +46,7 @@ static uint8_t _update_nce_ar_state(gnrc_netif_t *netif,
                 break;
             default:
                 assert(netif != NULL);
-                evtimer_del(&_nib_evtimer, &nce->nud_timeout.event);
+                _evtimer_del(&nce->nud_timeout);
                 _set_nud_state(netif, nce,
                                GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
                 break;
