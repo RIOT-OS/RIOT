@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2026 Xin He
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2026 Xin He
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -19,7 +16,6 @@
  */
 
 #include <string.h>
-#include <stdio.h>
 #include "nrf_sf_radio/link_radio.h"
 #include "nrf_sf_radio/radio_driver.h"
 
@@ -29,11 +25,6 @@
 
 static void _encode_packet_header(uint8_t *dst, const uint8_t *payload,
                                   uint8_t length);
-
-const uint8_t *nrf_sf_radio_payload(const uint8_t *packet)
-{
-    return &packet[NRF_SF_RADIO_HDR_LEN];
-}
 
 static void _encode_packet_header(uint8_t *dst, const uint8_t *payload,
                                   uint8_t length)
@@ -74,11 +65,12 @@ bool nrf_sf_radio_tx_start(uint8_t *payload, uint32_t txen_ticks,
     return false;
 }
 
-uint8_t nrf_sf_radio_rx_start(uint8_t *rx_buffer, uint32_t rxen_ticks,
+uint8_t nrf_sf_radio_rx_start(uint8_t **rx_buffer, uint32_t rxen_ticks,
                            uint32_t rx_window_end_ticks,
                            uint32_t rx_end_ticks)
 {
-    nrf_sf_radio_rx_arm(rx_buffer, rxen_ticks);
+    uint8_t *rx_pointer = *rx_buffer;
+    nrf_sf_radio_rx_arm(rx_pointer, rxen_ticks);
 
     nrf_sf_radio_wait_until_abs(&NRF_RADIO->EVENTS_ADDRESS,
                                 rx_window_end_ticks);
@@ -89,10 +81,13 @@ uint8_t nrf_sf_radio_rx_start(uint8_t *rx_buffer, uint32_t rxen_ticks,
                                     NRF_SF_RADIO_US_TO_TIMER_TICKS(
                                         NRF_SF_RADIO_TX_CHAIN_DELAY_US));
         if ((NRF_RADIO->EVENTS_END != 0) && (NRF_RADIO->CRCSTATUS != 0)) {
+            *rx_buffer = &rx_pointer[NRF_SF_RADIO_HDR_LEN];
             return 0;
-        }else if (NRF_RADIO->EVENTS_END == 0){
+        }
+        else if (NRF_RADIO->EVENTS_END == 0){
             return 2;
-        }else {
+        }
+        else {
             return 3;
         }
     }

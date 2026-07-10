@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2026 Xin He
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2026 Xin He
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -11,14 +8,13 @@
  * @ingroup     sys
  * @{
  *
- * @file        radio_driver.h
+ * @file
  * @brief       Physical layer radio, timer and PPI configuration interface
  *
  * @author      Xin He <xin.he@mailbox.tu-dresden.de>
  */
 
-#ifndef NRF_SF_RADIO_RADIO_DRIVER_H
-#define NRF_SF_RADIO_RADIO_DRIVER_H
+#pragma once
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -57,8 +53,8 @@ void nrf_sf_radio_start(void);
 /**
  * @brief   Busy-wait for a time interval or condition
  *
- * @param[in]       event          Required condition
- * @param[in]       timeout_ticks  Time interval to wait
+ * @param[in]  event          Required condition
+ * @param[in]  timeout_ticks  Time interval to wait
  */
 void nrf_sf_radio_wait_until(volatile uint32_t *event,
                              uint32_t timeout_ticks);
@@ -66,8 +62,8 @@ void nrf_sf_radio_wait_until(volatile uint32_t *event,
 /**
  * @brief   Busy-wait to a time point or condition
  *
- * @param[in]       event           Required condition
- * @param[in]       deadline_ticks  Time point to wait
+ * @param[in]  event           Required condition
+ * @param[in]  deadline_ticks  Time point to wait
  */
 void nrf_sf_radio_wait_until_abs(volatile uint32_t *event,
                                  uint32_t deadline_ticks);
@@ -103,30 +99,50 @@ uint32_t nrf_sf_radio_now_ticks(void);
 /**
  * @brief   Start radio transmission at the scheduled time
  *
- * @param[in]       buf             Buffer for the transmitted radio packet
- * @param[in]       deadline_ticks  Scheduled radio start time
+ * @param[in]  buf             Buffer for the transmitted radio packet
+ * @param[in]  deadline_ticks  Scheduled radio start time
  */
 void nrf_sf_radio_tx_arm(uint8_t *buf, uint32_t deadline_ticks);
 
 /**
  * @brief   Start radio reception at the scheduled time
  *
- * @param[out]      buf             Buffer for the received radio packet
- * @param[in]       deadline_ticks  Scheduled radio start time
+ * @param[out] buf             Buffer for the received radio packet
+ * @param[in]  deadline_ticks  Scheduled radio start time
  */
 void nrf_sf_radio_rx_arm(uint8_t *buf, uint32_t deadline_ticks);
 
 /**
  * @brief   Start radio reception immediately
  *
- * @param[out]      buf             Buffer for the received radio packet
+ * @param[out] buf  Buffer for the received radio packet
  */
 void nrf_sf_radio_try_rx_enable(uint8_t *buf);
+
+/**
+ * @brief   Set radio mode
+ *
+ * @param[in]  mode  RADIO MODE register value, e.g.
+ *                   `RADIO_MODE_MODE_Ble_1Mbit`
+ */
+void nrf_sf_radio_set_mode(uint32_t mode);
+
+/**
+ * @brief   Set ble channel
+ *
+ * @param[in]  channel  BLE channel index, valid range: 0..39
+ */
+void nrf_sf_radio_set_ble_channel(uint8_t channel);
+
+/**
+ * @brief   Set TX power
+ *
+ * @param[in]  power  TX power in dBm
+ */
+void nrf_sf_radio_set_power(uint16_t power);
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* NRF_SF_RADIO_RADIO_DRIVER_H */
 
 /** @} */

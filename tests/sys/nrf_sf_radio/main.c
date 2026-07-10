@@ -1,3 +1,20 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Xin He
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+/**
+ * @ingroup     tests
+ * @{
+ *
+ * @file
+ * @brief       nrf_sf_radio application
+ *
+ * @author      Xin He <xin.he@mailbox.tu-dresden.de>
+ * 
+ * @}
+ */
+
 #include <stdio.h>
 #include "nrf_sf_radio/radio_driver.h"
 

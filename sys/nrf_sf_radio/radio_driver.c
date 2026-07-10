@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2026 Xin He
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2026 Xin He
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -19,7 +16,7 @@
  */
 
 #include <stddef.h>
-
+#include "nrf_clock.h"
 #include "nrf_sf_radio/radio_driver.h"
 
 static void _timer2_init(void);
@@ -36,7 +33,7 @@ static const uint8_t ble_hw_frequency_channels[40] = {
 };
 
 #ifndef NRF_SF_RADIO_ACCESS_ADDRESS
-#  define NRF_SF_RADIO_ACCESS_ADDRESS (0x8367BED6u)
+#  define NRF_SF_RADIO_ACCESS_ADDRESS (0x8E89BED6u)
 #endif
 #ifndef NRF_SF_RADIO_FAST_RAMPUP
 #  define NRF_SF_RADIO_FAST_RAMPUP (1U)
@@ -235,11 +232,48 @@ void nrf_sf_radio_try_rx_enable(uint8_t *buf)
     NRF_TIMER2->TASKS_START = 1;
 }
 
+void nrf_sf_radio_set_mode(uint32_t mode)
+{
+    NRF_RADIO->MODE = mode;
+}
+
+void nrf_sf_radio_set_ble_channel(uint8_t channel)
+{
+    NRF_RADIO->FREQUENCY = ble_hw_frequency_channels[channel];
+    NRF_RADIO->DATAWHITEIV = channel;
+}
+
+void nrf_sf_radio_set_power(uint16_t power)
+{
+    if (power > 2) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Pos4dBm;
+    }
+    else if (power > -2) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_0dBm;
+    }
+    else if (power > -6) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg4dBm;
+    }
+    else if (power > -10) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg8dBm;
+    }
+    else if (power > -14) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg12dBm;
+    }
+    else if (power > -18) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg16dBm;
+    }
+    else if (power > -25) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg20dBm;
+    }
+    else {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg30dBm;
+    }
+}
+
 static void _init_radio(void)
 {
-    NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
-    NRF_CLOCK->TASKS_HFCLKSTART = 1;
-    while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0) {}
+    clock_hfxo_request();
 
     NRF_RADIO->POWER = 1;
     NRF_RADIO->TASKS_DISABLE = 1;
@@ -256,7 +290,7 @@ static void _init_radio(void)
 #endif
     NRF_RADIO->MODECNF0 = modecnf0;
 
-    NRF_RADIO->TXPOWER = (RADIO_TXPOWER_TXPOWER_0dBm << RADIO_TXPOWER_TXPOWER_Pos);
+    NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_0dBm;
     NRF_RADIO->FREQUENCY = ble_hw_frequency_channels[37];
     NRF_RADIO->DATAWHITEIV = 37;
 
