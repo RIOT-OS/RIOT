@@ -240,10 +240,6 @@ typedef struct {
 #define AUX_SYSIF            ((aux_sysif_regs_t *) (AUX_SYSIF_BASE))
 
 /**
- * @brief   AUX_SYSIF functions
- * @{
- */
-/**
  * @brief    Changes the AUX operational mode
  *
  * @note Only this function should be used to change the operational mode,
@@ -252,7 +248,6 @@ typedef struct {
  * @param[in] target_opmode The opmode we want to change to.
  */
 void aux_sysif_opmode_change(uint32_t target_opmode);
-/** @} */
 
 /**
  * @brief   AUX_TIMER01 registers

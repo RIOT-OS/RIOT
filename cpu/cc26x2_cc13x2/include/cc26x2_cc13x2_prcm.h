@@ -134,10 +134,6 @@ typedef struct {
 /** @} */
 
 /**
- * @brief    DDI_0_OSC functions
- * @{
- */
-/**
  * @brief   Switch the high frequency clock.
  *
  * @note This function will not return until the clock source has been switched.
@@ -145,7 +141,6 @@ typedef struct {
  * @param[in] osc The oscillator to use.
  */
 void osc_hf_source_switch(uint32_t osc);
-/** @} */
 
 /**
  * @brief    AON_PMCTL registers
