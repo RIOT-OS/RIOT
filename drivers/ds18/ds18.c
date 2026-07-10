@@ -29,15 +29,14 @@
 
 static void ds18_low(const ds18_t *dev)
 {
-    /* Set gpio as output and clear pin */
-    gpio_init(dev->params.pin, GPIO_OUT);
+    /* Clear pin */
     gpio_clear(dev->params.pin);
 }
 
 static void ds18_release(const ds18_t *dev)
 {
-    /* Init pin as input */
-    gpio_init(dev->params.pin, dev->params.in_mode);
+    /* Set pin */
+    gpio_set(dev->params.pin);
 }
 
 static void ds18_write_bit(const ds18_t *dev, uint8_t bit)
@@ -203,16 +202,13 @@ int ds18_get_temperature(const ds18_t *dev, int16_t *temperature)
 
 int ds18_init(ds18_t *dev, const ds18_params_t *params)
 {
-    int res;
-
     dev->params = *params;
 
     /* Deduct the input mode from the output mode. If pull-up resistors are
      * used for output then will be used for input as well. */
     dev->params.in_mode = (dev->params.out_mode == GPIO_OD_PU) ? GPIO_IN_PU : GPIO_IN;
 
-    /* Initialize the device and the pin */
-    res = gpio_init(dev->params.pin, dev->params.in_mode) == 0 ? DS18_OK : DS18_ERROR;
-
-    return res;
+    gpio_init(dev->params.pin, GPIO_IN_OD_PU);
+    gpio_set(dev->params.pin);
+    return DS18_OK;
 }
