@@ -152,6 +152,12 @@ export default defineConfig({
               ],
             },
             {
+              label: "Networking",
+              item: [
+                "networking/rpl"
+              ]
+            },
+            {
               label: "Advanced",
               items: [
                 "advanced_tutorials/creating_application",
