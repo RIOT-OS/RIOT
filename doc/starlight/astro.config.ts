@@ -153,7 +153,7 @@ export default defineConfig({
             },
             {
               label: "Networking",
-              item: [
+              items: [
                 "networking/rpl"
               ]
             },

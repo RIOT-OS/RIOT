@@ -1,6 +1,6 @@
 ---
-title: Configuring a multi-hop network with RPL.
-description: Guide on how to configure a multihop network with RPL routing on native, hardware, and the FIT IoT-LAB.
+title: RPL Routing
+description: Guide on how to configure a multihop network with RPL routing.
 ---
 
 import FileTree from '@components/FileTree.astro';
@@ -62,7 +62,8 @@ $ make flash term
 ```
 
 You will be greeted by RIOT's shell in all three terminals.
-In the following sections, the term node {0,1,2} will be used to refer to the RIOT instances running on the boards connected to /dev/ttyACM{0,1,2}, respectively.
+
+In the following sections, the term node\{0,1,2\} will be used to refer to the RIOT instances running on the boards connected to /dev/ttyACM\{0,1,2\}, respectively.
 
 ### Using Native
 
@@ -125,7 +126,7 @@ All up, running the shell now
 
 You will be greeted by RIOT's shell in all three terminals.
 
-In the following sections, the term node {0,1,2} will be used to refer to the nodes at tap{0,1,2}.
+In the following sections, the term node\{0,1,2\} will be used to refer to the nodes at tap\{0,1,2\}.
 
 ### Using the IoT-Lab Testbed
 
@@ -226,16 +227,16 @@ Start RPL only on one node:
 m3-10;successfully initialized RPL on interface 5
 ```
 
-In the tutorial below we use node {0,1,2} to refer to specific nodes.
-These commands should be prepended with the node ids, e.g., m3-10 / m3-11 / m3-12 for node 0, node 1, and node 2, respectively.
+In the tutorial below we use _node\{0,1,2\}_ to refer to specific nodes.
+These commands should be prepended with the node ids, e.g., `m3-10;`, `m3-11;`, and `m3-12;` for node0, node1, and node2, respectively.
 
 ## Initializing RPL
 
 In order to use RPL, we have to choose a RPL root node.
-We will choose node 0 as the RPL root.
+We will choose node0 as the RPL root.
 
 With the `ifconfig` command, we can get the configured interfaces for a particular RIOT node.
-On my system, the output is as follows for node 0.
+On my system, the output is as follows for node0.
 It may look slightly different if you are using different hardware or are running on native.
 
 ```sh
@@ -287,7 +288,7 @@ successfully initialized RPL on interface 6
 
 ## Starting RPL
 
-On the root node (node 0 in this tutorial), type:
+On the root node (node0 in this tutorial), type:
 
 ```sh
 > rpl root 1 2001:db8::1
@@ -311,7 +312,7 @@ instance [1 | Iface: 5 | mop: 2 | ocp: 0 | mhri: 256 | mri 0]
 
 The root node has a rank of `R: 256`.
 
-Now type `rpl` in the other terminals (here is an example for node 1):
+Now type `rpl` in the other terminals (here is an example for node1):
 
 ```sh
 > rpl
@@ -331,7 +332,7 @@ This parent's rank is `256`, therefore we know that this parent must be the root
 Note that all participating nodes in the RPL DODAG automatically configure a global IPv6 address matching the prefix from the DODAG ID. Verify this with `ifconfig`.
 
 RPL should now start to fill the NIB (Neighbor Information Base) table, which is consulted when forwarding packets.
-On the root node (node 0):
+On the root node (node0):
 
 ```sh
 > nib route
@@ -341,7 +342,7 @@ On the root node (node 0):
 2001:db8::d8bc:8aff:feaa:7c46/128 via fe80::d8bc:8aff:feaa:7c46 dev #6
 ```
 
-and on the participating node (node 1):
+and on the participating node (node1):
 
 ```sh
 > nib route
