@@ -153,8 +153,6 @@ static uint32_t read_first_ifr_word(uint32_t read_addr)
 /*! *********************************************************************************
  * \brief  Read command for reading additional 32bit words from IFR. Encapsulates multiple IFR read mechanisms.
  *
- * \param read_addr flash address
- *
  * \return 8 bytes of packed data containing radio trims only
  *
  * \remarks PRE-CONDITIONS:

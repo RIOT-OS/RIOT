@@ -385,8 +385,6 @@ osaStatus_t OSA_SemaphorePost(osaSemaphoreId_t semId);
  *
  * This function creates a non-recursive mutex and sets it to unlocked status.
  *
- * @param none.
- *
  * @retval handler to the new mutex if the mutex is created successfully.
  * @retval NULL   if the mutex can not be created.
  */
@@ -488,7 +486,7 @@ osaStatus_t OSA_EventClear(osaEventId_t eventId, osaEventFlags_t flagsToClear);
  *                    If the wait condition is not met, pass osaWaitForever_c will
  *                    wait indefinitely, pass 0 will return osaStatus_Timeout
  *                    immediately.
- * @param setFlags    Flags that wakeup the waiting task are obtained by this parameter.
+ * @param pSetFlags   Flags that wakeup the waiting task are obtained by this parameter.
  *
  * @retval osaStatus_Success The wait condition met and function returns successfully.
  * @retval osaStatus_Timeout Has not met wait condition within timeout.
