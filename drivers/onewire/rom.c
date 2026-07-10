@@ -69,7 +69,11 @@ bool onewire_rom_is_valid(const onewire_rom_t *rom)
        for this, allowing those part IDs to pass.
 
        see here for more info:
-       https://e2e.ti.com/support/sensors-group/sensors/f/sensors-forum/1342717/tmp1827-64-bit-uid-crc8-not-correct
+     * if their family code was 0x26 rather than the 0x27 actually used. Account
+     * for this, allowing those part IDs to pass.
+     *
+     * see here for more info:
+     * https://e2e.ti.com/support/sensors-group/sensors/f/sensors-forum/1342717/tmp1827-64-bit-uid-crc8-not-correct
     */
     if (onewire_rom_family_code(rom) == 0x27) {
         const uint_fast8_t crc =

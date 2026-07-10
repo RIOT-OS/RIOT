@@ -34,7 +34,8 @@
 
 /* bus timings as given in
  * https://www.analog.com/en/resources/technical-articles/1wire-communication-through-software.html
- * all in microseconds
+/* All bus timing values are given in microseconds, based on this article:
+ * https://www.analog.com/en/resources/technical-articles/1wire-communication-through-software.html
  */
 #define T_RESET_HOLD_US     (480U)
 #define T_RESET_SAMPLE_US   (70U)
@@ -80,7 +81,9 @@ static void _bus_power(soft_onewire_t *bus)
     /* Re-initializing a GPIO pin is supposed to leave it's set/clear state
        untouched, but not all platforms can guarantee this. So we set the pin
        before and after re-initializing it. This is to avoid momentarily pulling
-       the bus low. */
+     * untouched, but not all platforms can guarantee this. So we set the pin
+     * before and after re-initializing it. This is to avoid momentarily pulling
+     * the bus low. */
     gpio_set(pin);
     gpio_init(pin, GPIO_OUT);
     gpio_set(pin);
@@ -102,7 +105,7 @@ static void _bus_pull(soft_onewire_t *bus)
 }
 
 /* release the bus low, allow it to idle high unless another device is holding
-   it low */
+ * it low */
 static void _bus_release(soft_onewire_t *bus)
 {
 #if MODULE_SOFT_ONEWIRE_2PINS
@@ -140,7 +143,8 @@ static void _schedule(soft_onewire_t *bus, soft_onewire_timer_cb_t cb,
     if (res < 0)
     {
         /* release bus, but don't power it in-case a slave deice is trying to
-           hold it low*/
+        /* release bus, but don't power it in case a slave deice is trying to
+         * hold it low*/
         _bus_release(bus);
 
         /* stop ongoing process, and indicate error to waiting thread */

@@ -8,7 +8,8 @@
 @brief      1-Wire Bus Interface and Drivers
 
 This is RIOT's driver interface for Dallas Semiconductor Corp (now Maxim
-Integrated) specified 1-Wire Buses. 1-Wire slave device drivers should use it
+This is RIOT's driver interface for Dallas Semiconductor Corp (now Analog
+Devices Inc) specified 1-Wire Buses. 1-Wire slave device drivers should use it
 to access the buses (and slave hardware). Drivers implementing 1-Wire bus
 master functionality should expose this functionality via this interface so
 that slave drivers can operate independent of the bus master hardware and its

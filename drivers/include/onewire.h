@@ -55,7 +55,8 @@ typedef le_uint64_t onewire_rom_t;
  * @brief   1-Wire bus driver implementation
  *
  * When `onewire_multidriver` is enabled, each 1-Wire bus driver should expose
- * its functionality by providing an instance of this structure.
+ * When the `onewire_multidriver` module is enabled, each 1-Wire bus driver
+ * should expose its functionality by providing an instance of this structure.
  */
 typedef struct {
 
@@ -68,6 +69,13 @@ typedef struct {
     /** @copydoc _onewire_write_bits() */
     int (*write_bits)(onewire_t *bus, const void *buf, size_t len);
 
+typedef struct {
+    /** @copydoc _onewire_reset() */
+    int (*reset)(onewire_t *bus);
+    /** @copydoc _onewire_read_bits() */
+    int (*read_bits)(onewire_t *bus, void *buf, size_t len);
+    /** @copydoc _onewire_write_bits() */
+    int (*write_bits)(onewire_t *bus, const void *buf, size_t len);
 } onewire_driver_t;
 
 /**
@@ -93,7 +101,7 @@ struct onewire_t {
  * @brief   Initialize a 1-Wire bus base type
  *
  * @note This is a private function meant to be called by 1-Wire bus driver
- * implementations.
+ *       implementations.
  *
  * @param[in] bus       1-Wire bus descriptor
  * @param[in] params    configuration parameters
@@ -182,7 +190,8 @@ int onewire_read_rom(onewire_t *bus, onewire_rom_t *rom);
  * @brief   Select a device on the bus to communicate with
  *
  * This call resets the bus and then sends a Match ROM command followed by the
- * device's ROM pointed to by @p rom. If @p rom is NULL, then a Skip ROM command
+ * This call resets the bus and then sends a `Match ROM` command followed by the
+ * device's ROM pointed to by @p rom. If @p rom is NULL, then a `Skip ROM` command
  * is sent instead. In this case no single device is selected and all attached
  * devices will receive any further communication.
  *
