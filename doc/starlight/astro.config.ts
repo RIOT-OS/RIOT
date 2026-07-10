@@ -197,7 +197,8 @@ export default defineConfig({
                       "networking/unicoap/message",
                       "networking/unicoap/message-example",
                     ]
-                  }
+                  },
+                  "networking/rpl"
                 ],
               },
               {
