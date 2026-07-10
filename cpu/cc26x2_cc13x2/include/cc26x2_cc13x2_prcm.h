@@ -134,7 +134,7 @@ typedef struct {
 /** @} */
 
 /**
- * @brief    DDI_0_OSC functions
+ * @name     DDI_0_OSC functions
  * @{
  */
 /**
