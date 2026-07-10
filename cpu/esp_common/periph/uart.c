@@ -71,20 +71,16 @@
 #include "soc/soc_caps.h"
 #include "soc/uart_pins.h"
 
-#undef  UART_CLK_FREQ
 
 #if CPU_FAM_ESP32 || CPU_FAM_ESP32S2 || CPU_FAM_ESP32S3 || CPU_FAM_ESP32C3
-/* UART_CLK_FREQ corresponds to APB_CLK_FREQ for ESP32, ESP32-S2, ESP32-S3,
- * ESP32-C2 and ESP32-C3, which is a fixed frequency of 80 MHz. However,
- * this only applies to CPU clock frequencies of 80 MHz and above.
- * For lower CPU clock frequencies, the APB clock corresponds to the CPU clock
- * frequency. Therefore, we need to determine the actual UART clock frequency
- * from the actual APB clock frequency. */
-#  define UART_CLK_FREQ rtc_clk_apb_freq_get() /* APB_CLK is used */
+/* For ESP32, ESP32-S2, ESP32-S3, ESP32-C2 and ESP32-C3, the UART_CLOCK_FREQ
+ * is based on APB_CLK_FREQ. This is fixed at 80MHz for CPU clock frequencies
+ * >=80MHz and equal to the CPU clock frequency for CPU clock frequencies <80Mhz. */
+#  define UART_CLOCK_FREQ rtc_clk_apb_freq_get() /* APB_CLK is used */
 #elif CPU_FAM_ESP32C6
-#  define UART_CLK_FREQ (CLK_LL_PLL_80M_FREQ_MHZ * MHZ)  /* PLL_F80M_CLK is used */
+#  define UART_CLOCK_FREQ ((uint32_t)CLK_LL_PLL_80M_FREQ_MHZ * MHZ)  /* PLL_F80M_CLK is used */
 #elif CPU_FAM_ESP32H2
-#  define UART_CLK_FREQ (CLK_LL_PLL_48M_FREQ_MHZ * MHZ)  /* PLL_F48M_CLK is used */
+#  define UART_CLOCK_FREQ ((uint32_t)CLK_LL_PLL_48M_FREQ_MHZ * MHZ)  /* PLL_F48M_CLK is used */
 #else
 #  error "Platform implementation is missing"
 #endif
@@ -422,7 +418,7 @@ static int _uart_set_baudrate(uart_t uart, uint32_t baudrate)
     _uarts[uart].baudrate = baudrate;
 
     uart_ll_set_sclk(_uarts[uart].regs, (soc_module_clk_t)UART_SCLK_DEFAULT);
-    uart_ll_set_baudrate(_uarts[uart].regs, _uarts[uart].baudrate, UART_CLK_FREQ);
+    uart_ll_set_baudrate(_uarts[uart].regs, _uarts[uart].baudrate, UART_CLOCK_FREQ);
 
     critical_exit();
 

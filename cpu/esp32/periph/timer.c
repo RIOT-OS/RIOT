@@ -27,6 +27,7 @@
 #include "esp_cpu.h"
 #include "esp_private/periph_ctrl.h"
 #include "esp_rom_sys.h"
+#include "hal/clk_tree_ll.h"
 #include "hal/timer_hal.h"
 #include "hal/timer_ll.h"
 #include "rom/ets_sys.h"
@@ -59,6 +60,19 @@
 #define TIMER_1         1
 
 /* hardware timer modules used */
+
+#if CPU_FAM_ESP32 || CPU_FAM_ESP32S2 || CPU_FAM_ESP32S3 || CPU_FAM_ESP32C3
+/* For ESP32, ESP32-S2, ESP32-S3, ESP32-C2 and ESP32-C3, the TIMER_CLOCK_FREQ
+ * is based on APB_CLK_FREQ. This is fixed at 80MHz for CPU clock frequencies
+ * >=80MHz and equal to the CPU clock frequency for CPU clock frequencies <80Mhz. */
+#  define TIMER_CLOCK_FREQ rtc_clk_apb_freq_get() /* APB_CLK is used */
+#elif CPU_FAM_ESP32C6
+#  define TIMER_CLOCK_FREQ ((uint32_t)CLK_LL_PLL_80M_FREQ_MHZ * MHZ)  /* PLL_F80M_CLK is used */
+#elif CPU_FAM_ESP32H2
+#  define TIMER_CLOCK_FREQ ((uint32_t)CLK_LL_PLL_48M_FREQ_MHZ * MHZ)  /* PLL_F48M_CLK is used */
+#else
+#  error "Platform implementation is missing"
+#endif
 
 /**
  * ESP32 and ESP32-S2 have four 64 bit hardware timers while ESP32-S3 has four
@@ -196,7 +210,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     DEBUG("%s dev=%u freq=%" PRIu32 " cb=%p arg=%p\n",
           __func__, dev, freq, cb, arg);
 
-    uint32_t clk_div = rtc_clk_apb_freq_get() / freq;
+    uint32_t clk_div = TIMER_CLOCK_FREQ / freq;
 
     assert(dev <  HW_TIMER_NUMOF);
     assert(clk_div >= 2 && clk_div <= 65536);
