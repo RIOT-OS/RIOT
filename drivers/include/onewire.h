@@ -189,9 +189,9 @@ int onewire_read_rom(onewire_t *bus, onewire_rom_t *rom);
  * @brief   Select a device on the bus to communicate with
  *
  * This call resets the bus and then sends a `Match ROM` command followed by the
- * device's ROM pointed to by @p rom. If @p rom is NULL, then a `Skip ROM` command
- * is sent instead. In this case no single device is selected and all attached
- * devices will receive any further communication.
+ * device's ROM pointed to by @p rom. If @p rom is NULL, then a `Skip ROM`
+ * command is sent instead. In this case no single device is selected and all
+ * attached devices will receive any further communication.
  *
  * @param[in] bus       1-Wire bus device descriptor
  * @param[in] rom       1-Wire ROM code of target device
