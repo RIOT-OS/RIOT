@@ -54,7 +54,6 @@ typedef le_uint64_t onewire_rom_t;
 /**
  * @brief   1-Wire bus driver implementation
  *
- * When `onewire_multidriver` is enabled, each 1-Wire bus driver should expose
  * When the `onewire_multidriver` module is enabled, each 1-Wire bus driver
  * should expose its functionality by providing an instance of this structure.
  */
@@ -189,7 +188,6 @@ int onewire_read_rom(onewire_t *bus, onewire_rom_t *rom);
 /**
  * @brief   Select a device on the bus to communicate with
  *
- * This call resets the bus and then sends a Match ROM command followed by the
  * This call resets the bus and then sends a `Match ROM` command followed by the
  * device's ROM pointed to by @p rom. If @p rom is NULL, then a `Skip ROM` command
  * is sent instead. In this case no single device is selected and all attached

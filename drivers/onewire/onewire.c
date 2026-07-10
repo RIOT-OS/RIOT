@@ -196,7 +196,6 @@ int onewire_search(onewire_t *bus, onewire_rom_t *rom, int ld)
         }
 
         /* Both bits will be high if for some reason no device matches what has
-           been sent so far. This could happen if a device was removed during
          * been sent so far. This could happen if a device was removed during
          * the search process. */
         const bool no_dev = (bits & 3) == 3;

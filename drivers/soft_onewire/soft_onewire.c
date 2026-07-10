@@ -32,8 +32,6 @@
 #  define MAYBE_STATIC
 #endif
 
-/* bus timings as given in
- * https://www.analog.com/en/resources/technical-articles/1wire-communication-through-software.html
 /* All bus timing values are given in microseconds, based on this article:
  * https://www.analog.com/en/resources/technical-articles/1wire-communication-through-software.html
  */
@@ -79,8 +77,6 @@ static void _bus_power(soft_onewire_t *bus)
     gpio_t pin = _params(bus)->pin;
 
     /* Re-initializing a GPIO pin is supposed to leave it's set/clear state
-       untouched, but not all platforms can guarantee this. So we set the pin
-       before and after re-initializing it. This is to avoid momentarily pulling
      * untouched, but not all platforms can guarantee this. So we set the pin
      * before and after re-initializing it. This is to avoid momentarily pulling
      * the bus low. */
@@ -142,7 +138,6 @@ static void _schedule(soft_onewire_t *bus, soft_onewire_timer_cb_t cb,
     const int res = timer_set(timer, 0, usec);
     if (res < 0)
     {
-        /* release bus, but don't power it in-case a slave deice is trying to
         /* release bus, but don't power it in case a slave deice is trying to
          * hold it low*/
         _bus_release(bus);
