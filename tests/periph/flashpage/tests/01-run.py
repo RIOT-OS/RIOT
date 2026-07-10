@@ -20,6 +20,15 @@ def testfunc(child):
     child.expect_exact('wrote raw short buffer to last flash page')
     child.expect('>')
 
+    # check if board has pagewise write capability and if so test read and partial read
+    # capability is deduced from help contents
+    child.sendline("help")
+    index = child.expect(['test_read', '>'])
+    if index == 0:
+        child.sendline("test_read 0")
+        child.expect_exact('Successfully verified flash page content by reading it in chunks')
+        child.expect('>')
+
     # check if board has pagewise write capability and if so test that as well
     # capability is deduced from help contents
     child.sendline("help")
@@ -45,6 +54,15 @@ def testfunc(child):
     if index == 0:
         child.sendline("test_last_rwwee")
         child.expect_exact('wrote local page buffer to last RWWEE flash page')
+        child.expect('>')
+
+    # check if board has RWWEE capability and if so test chunkwise read
+    # capability is deduced from help contents
+    child.sendline("help")
+    index = child.expect(['test_read_rwwee', '>'])
+    if index == 0:
+        child.sendline("test_read_rwwee 0")
+        child.expect_exact('Successfully verified flash page content by reading it in chunks')
         child.expect('>')
 
 

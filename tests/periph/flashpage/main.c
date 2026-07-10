@@ -23,6 +23,7 @@
 
 #include "architecture.h"
 #include "od.h"
+#include "random.h"
 #include "shell.h"
 #include "periph/flashpage.h"
 #include "unaligned.h"
@@ -91,7 +92,7 @@ static int getpage(const char *str)
 #ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
 static void memdump(void *addr, size_t len)
 {
-    od_hex_dump	(addr, len, LINE_LEN);
+    od_hex_dump(addr, len, LINE_LEN);
 }
 
 static void dump_local(void)
@@ -174,9 +175,38 @@ static int cmd_read(int argc, char **argv)
         return 1;
     }
 
-    flashpage_read(page, page_mem);
+    flashpage_read(page, page_mem, 0, sizeof(page_mem));
     printf("Read flash page %i into local page buffer\n", page);
     dump_local();
+
+    return 0;
+}
+
+static int cmd_test_read(int argc, char **argv)
+{
+    int page;
+
+    if (argc < 2) {
+        printf("usage: %s <page>\n", argv[0]);
+        return 1;
+    }
+
+    page = getpage(argv[1]);
+    if (page < 0) {
+        return 1;
+    }
+
+    flashpage_read(page, page_mem, 0, sizeof(page_mem));
+    printf("Read flash page %i into local page buffer\n", page);
+    for (size_t offset = 0; offset < sizeof(page_mem); offset += sizeof(raw_buf)) {
+        random_bytes(raw_buf, sizeof(raw_buf));
+        flashpage_read(page, raw_buf, offset, sizeof(raw_buf));
+        if (memcmp(page_mem + offset, raw_buf, sizeof(raw_buf))) {
+            printf("error: partially read data does not match previously read data\n");
+            return 1;
+        }
+    }
+    printf("Successfully verified flash page content by reading it in chunks\n");
 
     return 0;
 }
@@ -377,7 +407,7 @@ static int cmd_test_reserved(int argc, char **argv)
 
     printf("Reserved page num: %u \n", page);
 
-    flashpage_read(page, page_mem);
+    flashpage_read(page, page_mem, 0, sizeof(page_mem));
 
     /* test is running for the first time so initialize flash */
     if (memcmp(sig, &page_mem[1], sizeof(sig)) != 0) {
@@ -481,6 +511,35 @@ static int cmd_read_rwwee(int argc, char **argv)
     return 0;
 }
 
+static int cmd_test_read_rwwee(int argc, char **argv)
+{
+    int page;
+
+    if (argc < 2) {
+        printf("usage: %s <page>\n", argv[0]);
+        return 1;
+    }
+
+    page = getpage_rwwee(argv[1]);
+    if (page < 0) {
+        return 1;
+    }
+
+    flashpage_rwwee_read(page, page_mem);
+    printf("Read RWWEE flash page %i into local page buffer\n", page);
+    for (size_t offset = 0; offset < sizeof(page_mem); offset += sizeof(raw_buf)) {
+        random_bytes(raw_buf, sizeof(raw_buf));
+        flashpage_rwwee_read(page, raw_buf, offset, sizeof(raw_buf));
+        if (memcmp(page_mem + offset, raw_buf, sizeof(raw_buf))) {
+            printf("error: RWWEE partially read data does not match previously read data\n");
+            return 1;
+        }
+    }
+    printf("Successfully verified flash page content by reading it in chunks\n");
+
+    return 0;
+}
+
 static int cmd_write_rwwee(int argc, char **argv)
 {
     int page;
@@ -520,7 +579,8 @@ static int cmd_test_rwwee(int argc, char **argv)
         return 1;
     }
 
-    fill += (page % ('z' - 'a')); // Make each page slightly different by changing starting char for easier comparison by eye
+    /* Make each page slightly different by changing starting char for easier comparison by eye */
+    fill += (page % ('z' - 'a'));
 
     for (unsigned i = 0; i < sizeof(page_mem); i++) {
         page_mem[i] = (uint8_t)fill++;
@@ -683,6 +743,8 @@ static const shell_command_t shell_commands[] = {
     { "dump_local", "Dump the local page buffer to STDOUT", cmd_dump_local },
     { "read", "Copy the given page to the local page buffer and dump to STDOUT", cmd_read },
     { "write", "Write the local page buffer to the given page", cmd_write },
+    { "test_read", "Read the given page in chunks "
+                   "and verify the read content matches the local page buffer", cmd_test_read },
 #endif
     { "write_raw", "Write raw bytes (max 64B) to the given address", cmd_write_raw },
     { "erase", "Erase the given page buffer", cmd_erase },
@@ -701,6 +763,8 @@ static const shell_command_t shell_commands[] = {
     { "test_rwwee", "Write and verify test pattern to RWWEE", cmd_test_rwwee },
     { "test_last_rwwee", "Write and verify test pattern on last RWWEE page available", cmd_test_last_rwwee },
     { "test_last_rwwee_raw", "Write and verify raw short write on last RWWEE page available", cmd_test_last_rwwee_raw },
+    { "test_read_rwwee", "Read the given RWWEE page in chunks "
+                         "and verify the read content matches the local page buffer", cmd_test_read_rwwee },
 #endif
 #ifdef NVMCTRL_USER
     { "dump_config_page", "Dump the content of the MCU configuration page", cmd_dump_config },
