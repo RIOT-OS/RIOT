@@ -884,8 +884,8 @@ int kw41zrf_xcvr_init(kw41zrf_t *dev)
     /* Load IFR trim values */
     IFR_SW_TRIM_TBL_ENTRY_T sw_trim_tbl[] =
     {
-        {TRIM_STATUS, 0, 0}, /*< Fetch the trim status word if available.*/
-        {TRIM_VERSION, 0, 0} /*< Fetch the trim version number if available.*/
+        {TRIM_STATUS, 0, 0}, /* Fetch the trim status word if available. */
+        {TRIM_VERSION, 0, 0} /* Fetch the trim version number if available. */
     };
     handle_ifr(&sw_trim_tbl[0], ARRAY_SIZE(sw_trim_tbl));
     DEBUG("[kw41zrf] sw_trim_tbl:\n");
