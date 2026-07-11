@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Marian Buschsieweke
+// SPDX-License-Identifier: LGPL-2.1-only
+
 use std::fs;
 use std::process::Command;
 
