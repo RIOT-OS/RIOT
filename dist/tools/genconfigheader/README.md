@@ -1,12 +1,11 @@
-genconfigheader
-===============
+# genconfigheader
 
 Usage: `env CFLAGS="..." genconfigheader path/to/header.h path/to/cflags.mk`
 
 This tool:
 
 1. Takes the `CFLAGS` from the environment and hashes it
-2. Read the given header (if existing) and checks if the hash stored in it
+2. Reads the given header (if existing) and checks if the hash stored in its
    matches. If so, it exits early without touching the header and makefile
 3. De-duplicates any `-D...` `-U...` macro flags that match perfectly
 4. Fails on any conflicting macro flags, e.g. `-DFOO=1` and `-DFOO=2`,
@@ -17,6 +16,6 @@ This tool:
 
 The goal of this script is to:
 
-1. Cause changes in CFLAGS for to (indirectly) cause rebuilds
+1. Cause changes in `CFLAGS` to (indirectly) cause rebuilds
 2. Deduplicate macro definitions
 3. Detect conflicting macro definitions early
