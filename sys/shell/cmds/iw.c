@@ -128,7 +128,7 @@ static int _iw_probe(netif_t *iface)
 {
     long ret;
     uint16_t val16;
-    if ((ret = netif_get_opt(iface, NETOPT_IS_WIRED, 0, &val16, sizeof(&val16))) < 0) {
+    if ((ret = netif_get_opt(iface, NETOPT_IS_WIRED, 0, &val16, sizeof(val16))) < 0) {
         if (ret != -ENOTSUP) {  /* -ENOTSUP means wireless */
             return -EIO;
         }
