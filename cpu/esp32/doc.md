@@ -529,6 +529,7 @@ toolchain (Debian/Ubuntu package names):
 - `curl`
 - `python3`
 - `python3-serial`
+- `python3-venv`
 - `telnet`
 
 ### Script-based installation
