@@ -299,7 +299,7 @@ class RIOTApplication:
     def board_is_supported(self):
         """Return if current board is supported."""
         env = {"BOARDS": self.board}
-        cmd = ["info-boards-supported"]
+        cmd = ["info-boards-supported", "-j"]
         ret = self.make(cmd, env=env, log_error=True).strip()
 
         supported = ret == self.board
