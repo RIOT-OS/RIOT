@@ -3,7 +3,7 @@
  * Copyright (c) 2016 - 2017 , NXP
  * All rights reserved.
  *
- * 
+ *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -288,15 +288,15 @@ void CLOCK_DisableClock(clock_ip_name_t clk);
 /*!
  * @brief Configure the clock selection muxes.
  *
- * @param connection: Clock to be configured.
+ * @param connection Clock to be configured.
  */
 void CLOCK_AttachClk(clock_attach_id_t connection);
 
 /*!
  * @brief Setup peripheral clock dividers.
  *
- * @param div_name: Clock divider name
- * @param divided_by_value: Value to be divided
+ * @param div_name          Clock divider name
+ * @param divided_by_value  Value to be divided
  */
 void CLOCK_SetClkDiv(clock_div_name_t div_name, uint32_t divided_by_value);
 
@@ -341,9 +341,10 @@ uint32_t CLOCK_GetFRGInputClock(void);
 /*!
  * @brief Set output of the Fractional baud rate generator
  *
- * @param  div_name: Clock divider name: kCLOCK_DivFrg0 and kCLOCK_DivFrg1
- * @param  freq: Desired output frequency
- * @return Error Code 0 - fail 1 - success
+ * @param  div_name Clock divider name: kCLOCK_DivFrg0 and kCLOCK_DivFrg1
+ * @param  freq     Desired output frequency
+ * @retval 0        fail
+ * @retval 1        success
  */
 uint32_t CLOCK_SetFRGClock(clock_div_name_t div_name, uint32_t freq);
 

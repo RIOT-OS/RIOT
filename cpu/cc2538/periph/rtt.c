@@ -118,7 +118,8 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     alarm_cb = cb;
     alarm_arg = arg;
 
-    DEBUG("rtt_set_alarm(%lu), alarm in %lu ticks, overflow in %lu ticks\n",
+    DEBUG("rtt_set_alarm(%" PRIu32 "), alarm in %" PRIu32 " ticks, overflow in "
+          "%" PRIu32 " ticks\n",
           alarm, rtt_alarm - _rtt_get_counter(),
           rtt_offset - _rtt_get_counter());
 
@@ -200,13 +201,13 @@ void isr_sleepmode(void)
     }
 
     if (alarm_cb && (rtt_offset >= rtt_alarm)) {
-        DEBUG("rtt: next alarm in %lu ticks (RTT)\n",
+        DEBUG("rtt: next alarm in %" PRIu32 " ticks (RTT)\n",
               rtt_alarm - _rtt_get_counter());
 
         rtt_next_alarm = RTT_ALARM;
         _set_alarm(rtt_alarm);
     } else if (overflow_cb && (rtt_alarm > rtt_offset)) {
-        DEBUG("rtt: next alarm in %lu ticks (OVERFLOW)\n",
+        DEBUG("rtt: next alarm in %" PRIu32 " ticks (OVERFLOW)\n",
                rtt_offset - _rtt_get_counter());
 
         rtt_next_alarm = RTT_OVERFLOW;
