@@ -10,7 +10,9 @@ This tool:
 3. De-duplicates any `-D...` `-U...` macro flags that match perfectly
 4. Fails on any conflicting macro flags, e.g. `-DFOO=1` and `-DFOO=2`,
    `-DFOO` and `-DFOO=1`, or `-DFOO` and `-UFOO`
-5. Writes `CFLAGS := <$CFLAGS without -D... and -U>` to the given makefile
+5. Writes `CFLAGS := <remaining CFLAGS>` to the given makefile. (E.g. if
+   `CFLAGS` originally was `-DFOO -O3 -UBAR -g`, `CFLAGS := -O3 -g` will be
+   written, as the macro (un-)definitions got written to the header.)
 6. Writes equivalent `#define ...` and `#undef ...` directives to the given
    header and adds the hash of the `CFLAGS` to it (as magic comment)
 
