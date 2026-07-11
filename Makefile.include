@@ -814,9 +814,13 @@ ifndef MAKE_RESTARTS
 endif
 
 # Remove intermediates, but keep the .elf, .hex and .map etc.
+# Special care has to be taken for ESP32 targets, the bootloader directory has
+# to be kept!
 clean-intermediates:
 	-@$(foreach dir,$(PKG_PATHS),"$(MAKE)" -C $(dir) distclean $(NEWLINE))
-	-@rm -rf $(BINDIR)/*.a $(BINDIR)/*/
+	-@rm -rf $(BINDIR)/*.a
+	-@find $(BINDIR)/ -mindepth 1 \
+	    -not -path "*/esp\_bootloader" -type d -exec rm -rf {} +;
 
 clean-pkg:
 	-@$(foreach dir,$(PKG_PATHS),"$(MAKE)" -C $(dir) distclean $(NEWLINE))
