@@ -961,7 +961,7 @@ include $(RIOTMAKE)/tools/targets.inc.mk
 include $(RIOTMAKE)/usb-codes.inc.mk
 
 # Warn if the selected board and drivers don't provide all needed features:
-ifeq (, $(filter help generate-Makefile.ci, $(MAKECMDGOALS)))
+ifeq (, $(filter clean distclean generate-Makefile.ci help, $(MAKECMDGOALS)))
   EXPECT_ERRORS :=
 
   # Test if there where dependencies against a module in DISABLE_MODULE.
@@ -986,13 +986,15 @@ ifeq (, $(filter help generate-Makefile.ci, $(MAKECMDGOALS)))
     EXPECT_ERRORS := 1
   endif
 
-BOARDS_SUPPORTED += $(BOARD_WHITELIST)
-BOARDS_UNSUPPORTED += $(BOARD_BLACKLIST)
+  BOARDS_SUPPORTED += $(BOARD_WHITELIST)
+  BOARDS_UNSUPPORTED += $(BOARD_BLACKLIST)
 
-ifneq (, $(BOARD_WHITELIST)$(BOARD_BLACKLIST))
-  $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)BOARD_WHITELIST has been renamed to BOARDS_SUPPORTED and BOARD_BLACKLIST to BOARDS_UNSUPPORTED.$(COLOR_RESET)" 1>&2)
-  $(shell $(COLOR_ECHO) "The contents of BOARD_WHITELIST have been appended to BOARDS_SUPPORTED and the contents of BOARD_BLACKLIST to BOARDS_UNSUPPORTED for compatibility." 1>&2)
-endif
+  ifneq (, $(BOARD_WHITELIST)$(BOARD_BLACKLIST))
+    $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)BOARD_WHITELIST has been renamed to"\
+      "BOARDS_SUPPORTED and BOARD_BLACKLIST to BOARDS_UNSUPPORTED.$(COLOR_RESET)" 1>&2)
+    $(shell $(COLOR_ECHO) "The contents of BOARD_WHITELIST have been appended to"\
+      "BOARDS_SUPPORTED and the contents of BOARD_BLACKLIST to BOARDS_UNSUPPORTED for compatibility." 1>&2)
+  endif
 
   # Test if any used feature conflict with another one.
   ifneq (,$(FEATURES_CONFLICTING))
