@@ -6,7 +6,7 @@ use std::process::Command;
 fn main() {
     // Run sed to strip comments
     let output = Command::new("sed")
-        .args(&["-n", "-e", "/^#.*/ p", "riotbuild-prefix.h"])
+        .args(["-n", "-e", "/^#.*/ p", "riotbuild-prefix.h"])
         .output()
         .expect("failed to execute sed");
 

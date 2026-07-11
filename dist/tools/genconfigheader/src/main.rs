@@ -187,11 +187,11 @@ mod tests_split_shell_parameters {
 /// # Returns
 /// `Result<String, io::Error>` - "un-shell-ed" parameter or error.
 fn unshell_param(s: &str) -> Result<Cow<'_, str>, io::Error> {
-    let mut chars = s.chars().peekable();
+    let chars = s.chars().peekable();
 
     // we assume mostly strings do not contain any quation or backslash chars
     // and iterate twice if they do
-    while let Some(c) = chars.next() {
+    for c in chars {
         match c {
             '\\' | '"' | '\'' => {
                 return unshell_param_slow(s).map(Cow::Owned);
@@ -237,7 +237,7 @@ fn unshell_param_slow(s: &str) -> Result<String, io::Error> {
             }
 
             c => {
-                out.push(c as char);
+                out.push(c);
             }
         }
     }
@@ -273,13 +273,13 @@ fn unshell_param_till_end_of_quote(
                 return Ok(());
             }
 
-            c => out.push(c as char),
+            c => out.push(c),
         }
     }
 
     Err(io::Error::other(format!(
         "Missing closing quote '{}'",
-        quot as char
+        quot
     )))
 }
 
@@ -568,6 +568,7 @@ fn main() -> std::io::Result<()> {
 
     let mut riotbuild_h = OpenOptions::new()
         .create(true)
+        .truncate(false)
         .read(true)
         .write(true)
         .open(riotbuild_h_path)?;
@@ -604,11 +605,11 @@ fn main() -> std::io::Result<()> {
     process_cflags(&cflags, &mut riotbuild_h, &mut cflags_mk)?;
     cflags_mk.flush()?;
     drop(cflags_mk);
-    write!(riotbuild_h, "/* CFLAGS hash: {} */\n", new_hash)?;
+    writeln!(riotbuild_h, "/* CFLAGS hash: {} */", new_hash)?;
     riotbuild_h.flush()?;
     drop(riotbuild_h);
 
-    if old_hash == "" {
+    if old_hash.is_empty() {
         println!(
             "genconfigheader: generated {} and {}",
             riotbuild_h_path, cflags_mk_path
