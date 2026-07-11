@@ -35,15 +35,12 @@ static const uint8_t ble_hw_frequency_channels[40] = {
 #ifndef NRF_SF_RADIO_ACCESS_ADDRESS
 #  define NRF_SF_RADIO_ACCESS_ADDRESS (0x8E89BED6u)
 #endif
-#ifndef NRF_SF_RADIO_FAST_RAMPUP
-#  define NRF_SF_RADIO_FAST_RAMPUP (1U)
-#endif
 #define AA_PREFIX ((uint32_t)((NRF_SF_RADIO_ACCESS_ADDRESS >> 24) & 0xFFu))
 #define AA_BASE   ((uint32_t)((NRF_SF_RADIO_ACCESS_ADDRESS << 8) & 0xFFFFFF00u))
 
 #define READY_TIME_PPI_CH   (9U)
 #define END_TIME_PPI_CH     (10U)
-#define TX_START_PPI_CH     (11U)
+#define RADIO_START_PPI_CH  (11U)
 #define TIMER2_START_PPI_CH (12U)
 #define RX_EN_PPI_CH        (13U)
 #define TX_EN_PPI_CH        (15U)
@@ -71,12 +68,12 @@ static void _timer2_init(void)
     NRF_PPI->CH[TIMER2_START_PPI_CH].TEP =
         (uint32_t)&NRF_TIMER2->TASKS_START;
 
-    NRF_PPI->CH[TX_START_PPI_CH].EEP =
+    NRF_PPI->CH[RADIO_START_PPI_CH].EEP =
         (uint32_t)&NRF_TIMER2->EVENTS_COMPARE[0];
-    NRF_PPI->CH[TX_START_PPI_CH].TEP = (uint32_t)&NRF_RADIO->TASKS_START;
+    NRF_PPI->CH[RADIO_START_PPI_CH].TEP = (uint32_t)&NRF_RADIO->TASKS_START;
 
     NRF_PPI->CHENSET = (1UL << TIMER2_START_PPI_CH) |
-                       (1UL << TX_START_PPI_CH);
+                       (1UL << RADIO_START_PPI_CH);
 }
 
 static int _timer_ppi_init(void)
@@ -243,7 +240,7 @@ void nrf_sf_radio_set_ble_channel(uint8_t channel)
     NRF_RADIO->DATAWHITEIV = channel;
 }
 
-void nrf_sf_radio_set_power(uint16_t power)
+void nrf_sf_radio_set_power(int16_t power)
 {
     if (power > 2) {
         NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Pos4dBm;

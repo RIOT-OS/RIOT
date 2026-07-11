@@ -40,12 +40,12 @@ static void _encode_packet_header(uint8_t *dst, const uint8_t *payload,
     memcpy(&dst[8], payload, length);
 }
 
-bool nrf_sf_radio_tx_start(uint8_t *payload, uint32_t txen_ticks,
-                           uint32_t event_end_ticks, uint8_t payload_length)
+bool nrf_sf_radio_tx_start(uint8_t *frame_buf, uint32_t txen_ticks,
+                           uint32_t event_end_ticks, uint8_t frame_length)
 {
-    uint8_t dst[NRF_SF_RADIO_HDR_LEN + payload_length];
+    uint8_t dst[NRF_SF_RADIO_HDR_LEN + frame_length];
 
-    _encode_packet_header(dst, payload, payload_length);
+    _encode_packet_header(dst, frame_buf, frame_length);
     nrf_sf_radio_tx_arm(dst, txen_ticks);
 
     nrf_sf_radio_wait_until_abs(&NRF_RADIO->EVENTS_ADDRESS,
@@ -98,13 +98,13 @@ uint8_t nrf_sf_radio_rx_start(uint8_t **rx_buffer, uint32_t rxen_ticks,
 
 }
 
-uint32_t nrf_sf_radio_rx_listen_until_packet(uint8_t *rx_buffer,
+uint32_t nrf_sf_radio_rx_listen_until_packet(uint8_t **rx_buffer,
                                              uint32_t rx_end_ticks,
                                              uint32_t runtimeout_us)
 {
     uint32_t rx_ticks;
-
-    nrf_sf_radio_try_rx_enable(rx_buffer);
+    uint8_t *rx_pointer = *rx_buffer;
+    nrf_sf_radio_try_rx_enable(rx_pointer);
 
     nrf_sf_radio_wait_until(&NRF_RADIO->EVENTS_ADDRESS,
                             NRF_SF_RADIO_US_TO_TIMER_TICKS(runtimeout_us));
@@ -112,6 +112,7 @@ uint32_t nrf_sf_radio_rx_listen_until_packet(uint8_t *rx_buffer,
         rx_ticks = nrf_sf_radio_get_last_address_time_ticks();
         nrf_sf_radio_wait_until(&NRF_RADIO->EVENTS_END, rx_end_ticks);
         if ((NRF_RADIO->EVENTS_END != 0) && (NRF_RADIO->CRCSTATUS == 1)) {
+            *rx_buffer = &rx_pointer[NRF_SF_RADIO_HDR_LEN];
             return rx_ticks -
                    NRF_SF_RADIO_US_TO_TIMER_TICKS(
                        NRF_SF_RADIO_TX_CHAIN_DELAY_US);

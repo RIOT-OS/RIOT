@@ -54,17 +54,17 @@ extern "C" {
 /**
  * @brief   Send one payload at a scheduled radio start time
  *
- * @param[in]  payload          Payload to be transmitted
+ * @param[in]  frame_buf        Frame to be transmitted
  * @param[in]  txen_ticks       Absolute timer tick for starting radio ramp-up
  * @param[in]  event_end_ticks  Absolute timer tick by which END is expected
- * @param[in]  payload_length   Payload length in bytes
+ * @param[in]  frame_length     Frame length in bytes
  *
  * @retval  true if the transmission completed before the end time
  * @retval  false if the transmission failed or timed out
  */
-bool nrf_sf_radio_tx_start(uint8_t *payload, uint32_t txen_ticks,
+bool nrf_sf_radio_tx_start(uint8_t *frame_buf, uint32_t txen_ticks,
                            uint32_t event_end_ticks,
-                           uint8_t payload_length);
+                           uint8_t frame_length);
 
 /**
  * @brief   Start radio reception at a scheduled radio start time
@@ -86,14 +86,14 @@ uint8_t nrf_sf_radio_rx_start(uint8_t **rx_buffer, uint32_t rxen_ticks,
 /**
  * @brief   Start radio reception immediately and wait for one packet
  *
- * @param[out] rx_buffer      Buffer for the received radio packet
- * @param[in]  rx_end_ticks   Relative timeout for END after ADDRESS
- * @param[in]  runtimeout_us  Relative timeout for ADDRESS in microseconds
+ * @param[in,out] rx_buffer      Buffer for the received radio packet
+ * @param[in]     rx_end_ticks   Relative timeout for END after ADDRESS
+ * @param[in]     runtimeout_us  Relative timeout for ADDRESS in microseconds
  *
  * @return  Corrected ADDRESS timestamp in timer ticks on success
  * @retval  0 on timeout or CRC failure
  */
-uint32_t nrf_sf_radio_rx_listen_until_packet(uint8_t *rx_buffer,
+uint32_t nrf_sf_radio_rx_listen_until_packet(uint8_t **rx_buffer,
                                              uint32_t rx_end_ticks,
                                              uint32_t runtimeout_us);
 

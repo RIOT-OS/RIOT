@@ -26,11 +26,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   16 MHz timer: 1 microsecond equals 16 ticks
- */
-#define NRF_SF_RADIO_TIMER_TICKS_PER_US    (16U)
-
-/**
  * @brief   Convert microseconds to ticks
  */
 #define NRF_SF_RADIO_US_TO_TIMER_TICKS(us) ((uint32_t)(us) << 4U)
@@ -41,9 +36,27 @@ extern "C" {
 #define NRF_SF_RADIO_TIMER_TICKS_TO_US(tk) ((uint32_t)(tk) >> 4U)
 
 /**
- * @brief   ramp-up time ticks
+ * @brief   Select the RADIO ramp-up mode
+ * 
+ * Set to 1 to use the 40 us fast ramp-up mode or 0 to use the
+ * 140 us default ramp-up mode.
  */
-#define NRF_SF_RADIO_RAMPUP_TIME_TICKS     NRF_SF_RADIO_US_TO_TIMER_TICKS(40U)
+#ifndef NRF_SF_RADIO_FAST_RAMPUP
+#  define NRF_SF_RADIO_FAST_RAMPUP (1U)
+#endif
+
+/**
+ * @brief   Selected RADIO ramp-up duration in timer ticks
+ */
+#if (NRF_SF_RADIO_FAST_RAMPUP == 1U)
+#  define NRF_SF_RADIO_RAMPUP_TIME_TICKS \
+    NRF_SF_RADIO_US_TO_TIMER_TICKS(40U)
+#elif (NRF_SF_RADIO_FAST_RAMPUP == 0U)
+#  define NRF_SF_RADIO_RAMPUP_TIME_TICKS \
+    NRF_SF_RADIO_US_TO_TIMER_TICKS(140U)
+#else
+#  error "NRF_SF_RADIO_FAST_RAMPUP must be 0 or 1"
+#endif
 
 /**
  * @brief   Initialize the radio timer and PPI
@@ -139,7 +152,7 @@ void nrf_sf_radio_set_ble_channel(uint8_t channel);
  *
  * @param[in]  power  TX power in dBm
  */
-void nrf_sf_radio_set_power(uint16_t power);
+void nrf_sf_radio_set_power(int16_t power);
 
 #ifdef __cplusplus
 }
