@@ -31,6 +31,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "compiler_hints.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -47,6 +49,7 @@ extern "C" {
  * @return          Checksum of the specified memory area based on the
  *                  given start value
  */
+ACCESS(read_only, 2, 3)
 uint16_t crc16_ccitt_kermit_update(uint16_t crc, const unsigned char *buf, size_t len);
 
 /**
