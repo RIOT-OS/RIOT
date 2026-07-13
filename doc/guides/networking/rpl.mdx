@@ -28,7 +28,7 @@ You can run the tutorial either on local hardware, native, or the FIT IoT-Lab.
 If you have three or more hardware boards with IEEE 802.15.4 radio capabilities, you can run the tutorial on actual hardware.
 This allows you to experiment with different distances between the boards and, e.g., create multi-hop topologies.
 
-In this tutorial, I am using the Adafruit Feather nRF52840 Sense boards.
+This tutorial is based on the Adafruit Feather nRF52840 Sense board.
 If you are using different hardware, simply replace the `BOARD` value in the commands below with your board name.
 
 #### Handling Multiple Boards
@@ -55,7 +55,9 @@ Set the `DEBUG_ADAPTER_ID` to the printed `serial` value.
 export BOARD=adafruit-feather-nrf52840-sense PORT=/dev/ttyACM0 DEBUG_ADAPTER_ID=AD57F0199B27E0C5
 ```
 
-In each window, compile and flash RIOT.
+In each window, compile and flash RIOT. Please note that you can not have
+multiple compilations running at the same time in a RIOT directory, so
+you have to compile and flash one at a time.
 
 ```sh
 $ make flash term
@@ -79,7 +81,7 @@ See [README.desvirt.md](https://github.com/RIOT-OS/RIOT/blob/master/dist/tools/d
 #### Creating Tap Interfaces
 
 The native RIOT instances communicate through tap interfaces.
-We provide a [script](https://github.com/RIOT-OS/RIOT/wiki/Family%3A-native/blob/master/dist/tools/tapsetup/tapsetup) that supports the setup and cleanup of such interfaces.
+We provide a [script](https://github.com/RIOT-OS/RIOT/blob/master/dist/tools/tapsetup/tapsetup) that supports the setup and cleanup of such interfaces.
 
 To set up tap interfaces and a bridge that connects each tap interface:
 
@@ -100,7 +102,7 @@ See the help for further information about additional parameters:
 $ ../../../../dist/tools/tapsetup/tapsetup -h
 ```
 
-You can verify that the tap interfaces have been created successfully by looking at the output of `ip l`.
+You can verify that the tap interfaces have been created successfully by looking at the output of the `ip l` shell command.
 This list should include the new interfaces `tapbr0`, `tap0`, `tap1`, `tap2`, and `tap3`.
 
 #### Compiling for Native
@@ -236,8 +238,8 @@ In order to use RPL, we have to choose a RPL root node.
 We will choose node0 as the RPL root.
 
 With the `ifconfig` command, we can get the configured interfaces for a particular RIOT node.
-On my system, the output is as follows for node0.
-It may look slightly different if you are using different hardware or are running on native.
+An example output for `node0` is shown below. It may look slightly different
+if you are using different hardware or are running on native.
 
 ```sh
 > ifconfig
