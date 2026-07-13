@@ -112,7 +112,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name    CHIP_ID (0x00) masks — chip ID field
+ * @name    CHIP_ID (0x00) masks - chip ID field
  * Bits[7:4] = 0x9 (fixed). Bits[3:0] factory-set, software must ignore
  * @{
  */
@@ -123,21 +123,21 @@ extern "C" {
 /** @} */
 
 /**
- * @name    Data QMA6100P_REG_D(X|Y|Z)_LSB masks — new-data flag
+ * @name    Data QMA6100P_REG_D(X|Y|Z)_LSB masks - new-data flag
  * @{
  */
 #define QMA6100P_NEWDATA_FLAG_MASK     BIT(0) /**< 1 = channel updated since last read */
 /** @} */
 
 /**
- * @name    INT_ST2 (0x0B) masks — data-ready status
+ * @name    INT_ST2 (0x0B) masks - data-ready status
  * @{
  */
 #define QMA6100P_INT_ST2_DATA_INT_MASK BIT(4) /**< data-ready interrupt active */
 /** @} */
 
 /**
- * @name    RANGE (0x0F) masks — full-scale range and filter select
+ * @name    RANGE (0x0F) masks - full-scale range and filter select
  * @{
  */
 /** full-scale range bits[3:0] mask */
@@ -150,18 +150,19 @@ extern "C" {
  * @name Resolution - Range associated resolution used to convert in g in ug/LSB
  * @{
  */
-#define QMA6100P_2G_RESOLUTION         (244)  /**< resolution for a +- 2g range */
-#define QMA6100P_4G_RESOLUTION         (488)  /**< resolution for a +- 4g range */
-#define QMA6100P_8G_RESOLUTION         (977)  /**< resolution for a +- 8g range */
-#define QMA6100P_16G_RESOLUTION        (1950) /**< resolution for a +- 16g range */
-#define QMA6100P_32G_RESOLUTION        (3810) /**< resolution for a +- 32g range */
+#define QMA6100P_2G_RESOLUTION         (244)  /**< resolution for a ±2g range */
+#define QMA6100P_4G_RESOLUTION         (488)  /**< resolution for a ±4g range */
+#define QMA6100P_8G_RESOLUTION         (977)  /**< resolution for a ±8g range */
+#define QMA6100P_16G_RESOLUTION        (1950) /**< resolution for a ±16g range */
+#define QMA6100P_32G_RESOLUTION        (3810) /**< resolution for a ±32g range */
 /** @} */
 
 /**
- * @name    ODR (0x10) masks — output data rate and filter
+ * @name    ODR (0x10) masks - output data rate and filter
  * ODR[4:0] in bits[4:0], NLPF[2:0] in bits[7:5]
  *
- * NLPF oversampling ratio depends on RANGE[LPF_HPF]:
+ * NLPF (Numerical Low-Pass Filter) oversampling ratio depends
+ * on RANGE[LPF_HPF]:
  * - LPF mode: 000=off, 100=×1, x01=×2, x10=×4, x11=×8
  * - HPF mode: 000=off, 001=ODR/10, 010=ODR/25, ...
  * @{
@@ -171,7 +172,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name    PM (0x11) masks — power management
+ * @name    PM (0x11) masks - power management
  * @{
  */
 #define QMA6100P_PM_MODE_MASK          BIT(7)        /**< active/standby mode bit mask */
@@ -179,21 +180,21 @@ extern "C" {
 /** @} */
 
 /**
- * @name    INT_EN1 (0x17) masks — data-ready interrupt enable
+ * @name    INT_EN1 (0x17) masks - data-ready interrupt enable
  * @{
  */
 #define QMA6100P_INT_EN1_DATA_MASK     BIT(4) /**< data-ready interrupt enable */
 /** @} */
 
 /**
- * @name    INT1_MAP1 (0x1A) / INT2_MAP1 (0x1C) masks — route data-ready to INT pin
+ * @name    INT1_MAP1 (0x1A) / INT2_MAP1 (0x1C) masks - route data-ready to INT pin
  * @{
  */
 #define QMA6100P_INT_MAP1_DATA_MASK    BIT(4) /**< route data-ready to INTx pin */
 /** @} */
 
 /**
- * @name    INTPIN_CONF (0x20) masks — INT pin electrical config
+ * @name    INTPIN_CONF (0x20) masks - INT pin electrical config
  * Default 0x05 = INT1 active-high push-pull, INT2 active-high push-pull
  * @{
  */
@@ -208,7 +209,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name    INT_CFG (0x21) masks — interrupt shadow config
+ * @name    INT_CFG (0x21) masks - interrupt shadow config
  * @{
  */
 /** data shadowing mode mask (@ref qma6100p_int_shadow_t) */

@@ -51,7 +51,8 @@ static int _disable_all_interrupt(const qma6100p_t *dev);
 static int _enter_ulps_mode(const qma6100p_t *dev);
 static int _set_int_params(qma6100p_t *dev);
 static int _qma6100p_set_power_mode(qma6100p_t *dev, bool low_power);
-static int _set_intpin_conf(const qma6100p_t *dev, qma6100p_int_pin_num_t pin_num, uint8_t *map_reg);
+static int _set_intpin_conf(const qma6100p_t *dev, qma6100p_int_pin_num_t pin_num,
+                            uint8_t *map_reg);
 static int _route_data_ready_int(const qma6100p_t *dev, uint8_t map_reg);
 static int _enable_data_ready_int(const qma6100p_t *dev);
 
@@ -94,7 +95,6 @@ int qma6100p_read_raw(const qma6100p_t *dev, qma6100p_raw_data_t *data)
 
     int res;
     uint8_t buf[6];
-    uint8_t new_data;
 
     i2c_acquire(BUS);
 
@@ -105,8 +105,7 @@ int qma6100p_read_raw(const qma6100p_t *dev, qma6100p_raw_data_t *data)
         goto out;
     }
 
-    new_data =
-        (buf[0] | buf[2] | buf[4]) & QMA6100P_NEWDATA_FLAG_MASK;
+    uint8_t new_data = (buf[0] | buf[2] | buf[4]) & QMA6100P_NEWDATA_FLAG_MASK;
 
     if (!new_data) {
         res = QMA6100P_NO_NEW_DATA;

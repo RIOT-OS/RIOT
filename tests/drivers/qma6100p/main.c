@@ -37,7 +37,6 @@ static const qma6100p_odr_t rates[] = {
     QMA6100P_ODR_400HZ,
     QMA6100P_ODR_800HZ,
     QMA6100P_ODR_1600HZ,
-
 };
 static const unsigned expect_hz[] = { 12, 25, 100, 200, 400, 800, 1600 };
 
@@ -230,7 +229,7 @@ static int test_ulps(void)
     irq_count = 0;
     unsigned hz_after = _measure_irq_hz();
 
-    unsigned tol = expect_hz / 20;   /* 5% tolerance */
+    unsigned tol = expect_hz / 20; /* 5% tolerance */
     int pass_wake = (hz_after + tol >= expect_hz && hz_after <= expect_hz + tol);
     printf("[ULPS] after wake: %u IRQs/s (expect ~%u) -> %s\n",
            hz_after, expect_hz, pass_wake ? "PASS" : "FAIL");

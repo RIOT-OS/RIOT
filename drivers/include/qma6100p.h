@@ -7,7 +7,7 @@
 #pragma once
 
 /**
- * @defgroup    drivers_qma6100p 3-axis QMA6100P Accelerometer
+ * @defgroup    drivers_qma6100p QMA6100P 3-axis Accelerometer
  * @ingroup     drivers_sensors
  * @ingroup     drivers_saul
  * @brief       Driver for the QMA6100P 3-Axis accelerometer.
@@ -60,11 +60,11 @@ enum {
  * Higher range = lower sensitivity
  */
 typedef enum {
-    QMA6100P_RANGE_2G = 0x01,  /**< ±2g  — sensitivity 4096 LSB/g */
-    QMA6100P_RANGE_4G = 0x02,  /**< ±4g  — sensitivity 2048 LSB/g */
-    QMA6100P_RANGE_8G = 0x04,  /**< ±8g  — sensitivity 1024 LSB/g */
-    QMA6100P_RANGE_16G = 0x08, /**< ±16g — sensitivity  512 LSB/g */
-    QMA6100P_RANGE_32G = 0x0F, /**< ±32g — sensitivity  256 LSB/g */
+    QMA6100P_RANGE_2G = 0x01,  /**< ±2g  - sensitivity 4096 LSB/g */
+    QMA6100P_RANGE_4G = 0x02,  /**< ±4g  - sensitivity 2048 LSB/g */
+    QMA6100P_RANGE_8G = 0x04,  /**< ±8g  - sensitivity 1024 LSB/g */
+    QMA6100P_RANGE_16G = 0x08, /**< ±16g - sensitivity  512 LSB/g */
+    QMA6100P_RANGE_32G = 0x0F, /**< ±32g - sensitivity  256 LSB/g */
 } qma6100p_range_t;
 
 /**
@@ -92,7 +92,7 @@ typedef enum {
  * @note By default, QMA6100P has a 51.2kHz clock rate after init sequence.
  */
 typedef enum {
-    QMA6100P_PM_MCLK_51K2 = 4, /**< 51.2 kHz Default after the power on */
+    QMA6100P_PM_MCLK_51K2 = 4, /**< 51.2 kHz (default) */
     QMA6100P_PM_MCLK_25K6 = 5, /**< 25.6 kHz */
     QMA6100P_PM_MCLK_12K8 = 6, /**< 12.8 kHz */
     QMA6100P_PM_MCLK_6K4 = 7,  /**< 6.4 kHz */
@@ -227,7 +227,8 @@ int qma6100p_set_active_mode(qma6100p_t *dev);
  * @param[in] dev           device descriptor of accelerometer
  * @param[out] data         raw ADC counts per axis
  *
- * @retval                  QMA6100P_NO_NEW_DATA if nothing has changed and keep data unchanged.
+ * @retval                  QMA6100P_NO_NEW_DATA No new measurement data is
+ *                          available, the data structure remains unchanged.
  */
 int qma6100p_read_raw(const qma6100p_t *dev, qma6100p_raw_data_t *data);
 
@@ -239,7 +240,8 @@ int qma6100p_read_raw(const qma6100p_t *dev, qma6100p_raw_data_t *data);
  * @param[in] dev           device descriptor of accelerometer
  * @param[out] data         acceleration in ug per axis
  *
- * @retval                  QMA6100P_NO_NEW_DATA if nothing has changed and keep data unchanged
+ * @retval                  QMA6100P_NO_NEW_DATA No new measurement data is
+ *                          available, the data structure remains unchanged.
  */
 int qma6100p_read(const qma6100p_t *dev, qma6100p_data_t *data);
 
@@ -257,7 +259,8 @@ int qma6100p_read(const qma6100p_t *dev, qma6100p_data_t *data);
  * @param[in] arg            argument passed to @p cb
  *
  * @retval                   QMA6100P_OK on success
- * @retval                   QMA6100P_GPIO_ERROR if the line's GPIO is unwired or initialization failed
+ * @retval                   QMA6100P_GPIO_ERROR if the line's GPIO is unwired
+ *                           or initialization failed
  * @retval                   QMA6100P_INVALID_ARG if line is invalid
  * @retval                   QMA6100P_NOI2C if I2C transaction failed
  * @retval                   QMA6100P_NODEV if device not found on bus
