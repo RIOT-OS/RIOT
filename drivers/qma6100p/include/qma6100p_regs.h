@@ -21,16 +21,6 @@
 extern "C" {
 #endif
 
-/** single-bit mask at position n */
-#ifndef BIT
-#  define BIT(n) (1UL << (n))
-#endif
-
-/** contiguous bitmask from bit l to bit h */
-#ifndef GENMASK
-#  define GENMASK(hi, lo) (((1UL << ((hi) - (lo) + 1)) - 1) << (lo))
-#endif
-
 /** clear bits in reg covered by mask */
 #define FIELD_CLEAR(mask, reg) ((reg) &= ~(mask))
 /** shift val into the field defined by mask */
@@ -126,14 +116,14 @@ extern "C" {
  * @name    Data QMA6100P_REG_D(X|Y|Z)_LSB masks - new-data flag
  * @{
  */
-#define QMA6100P_NEWDATA_FLAG_MASK     BIT(0) /**< 1 = channel updated since last read */
+#define QMA6100P_NEWDATA_FLAG_MASK     (1 << 0) /**< 1 = channel updated since last read */
 /** @} */
 
 /**
  * @name    INT_ST2 (0x0B) masks - data-ready status
  * @{
  */
-#define QMA6100P_INT_ST2_DATA_INT_MASK BIT(4) /**< data-ready interrupt active */
+#define QMA6100P_INT_ST2_DATA_INT_MASK (1 << 4) /**< data-ready interrupt active */
 /** @} */
 
 /**
@@ -141,9 +131,9 @@ extern "C" {
  * @{
  */
 /** full-scale range bits[3:0] mask */
-#define QMA6100P_RANGE_MASK            GENMASK(3, 0)
+#define QMA6100P_RANGE_MASK            (0b00001111)
 /** 0=LPF mode, 1=HPF mode (affects NLPF in ODR) */
-#define QMA6100P_RANGE_LPF_HPF_MASK    BIT(6)
+#define QMA6100P_RANGE_LPF_HPF_MASK    (1 << 6)
 /** @} */
 
 /**
@@ -167,30 +157,30 @@ extern "C" {
  * - HPF mode: 000=off, 001=ODR/10, 010=ODR/25, ...
  * @{
  */
-#define QMA6100P_ODR_MASK              GENMASK(4, 0) /**< ODR bits[4:0] mask */
-#define QMA6100P_NLPF_MASK             GENMASK(7, 5) /**< NLPF bits[7:5] mask */
+#define QMA6100P_ODR_MASK              (0b00011111) /**< ODR bits[4:0] mask */
+#define QMA6100P_NLPF_MASK             (0b11100000) /**< NLPF bits[7:5] mask */
 /** @} */
 
 /**
  * @name    PM (0x11) masks - power management
  * @{
  */
-#define QMA6100P_PM_MODE_MASK          BIT(7)        /**< active/standby mode bit mask */
-#define QMA6100P_PM_MCLK_MASK          GENMASK(3, 0) /**< MCLK[3:0] */
+#define QMA6100P_PM_MODE_MASK          (1 << 7)     /**< active/standby mode bit mask */
+#define QMA6100P_PM_MCLK_MASK          (0b00001111) /**< MCLK[3:0] */
 /** @} */
 
 /**
  * @name    INT_EN1 (0x17) masks - data-ready interrupt enable
  * @{
  */
-#define QMA6100P_INT_EN1_DATA_MASK     BIT(4) /**< data-ready interrupt enable */
+#define QMA6100P_INT_EN1_DATA_MASK     (1 << 4) /**< data-ready interrupt enable */
 /** @} */
 
 /**
  * @name    INT1_MAP1 (0x1A) / INT2_MAP1 (0x1C) masks - route data-ready to INT pin
  * @{
  */
-#define QMA6100P_INT_MAP1_DATA_MASK    BIT(4) /**< route data-ready to INTx pin */
+#define QMA6100P_INT_MAP1_DATA_MASK    (1 << 4) /**< route data-ready to INTx pin */
 /** @} */
 
 /**
@@ -199,13 +189,13 @@ extern "C" {
  * @{
  */
 /** INT1 active level mask (@ref qma6100p_int_active_level_t) */
-#define QMA6100P_INTPIN_INT1_LVL_MASK  BIT(0)
+#define QMA6100P_INTPIN_INT1_LVL_MASK  (1 << 0)
 /** INT1 output mode mask (@ref qma6100p_int_pin_mode_t) */
-#define QMA6100P_INTPIN_INT1_OD_MASK   BIT(1)
+#define QMA6100P_INTPIN_INT1_OD_MASK   (1 << 1)
 /** INT2 active level mask (@ref qma6100p_int_active_level_t) */
-#define QMA6100P_INTPIN_INT2_LVL_MASK  BIT(2)
+#define QMA6100P_INTPIN_INT2_LVL_MASK  (1 << 2)
 /** INT2 output mode mask (@ref qma6100p_int_pin_mode_t) */
-#define QMA6100P_INTPIN_INT2_OD_MASK   BIT(3)
+#define QMA6100P_INTPIN_INT2_OD_MASK   (1 << 3)
 /** @} */
 
 /**
@@ -213,7 +203,7 @@ extern "C" {
  * @{
  */
 /** data shadowing mode mask (@ref qma6100p_int_shadow_t) */
-#define QMA6100P_INT_CFG_SHADOW_MASK   BIT(6)
+#define QMA6100P_INT_CFG_SHADOW_MASK   (1 << 6)
 /** @} */
 
 /**
@@ -230,9 +220,9 @@ extern "C" {
  * @{
  */
 /** set to 1 when NVM loading is done */
-#define QMA6100P_NVM_LOAD_DONE         BIT(0)
+#define QMA6100P_NVM_LOAD_DONE         (1 << 0)
 /** set to 1 when NVM is ready, and programming NVIM is done */
-#define QMA6100P_NVM_RDY               BIT(2)
+#define QMA6100P_NVM_RDY               (1 << 2)
 /** @} */
 
 /**
@@ -246,7 +236,7 @@ extern "C" {
  * @name TST1_ANA_REGISTER (0x5F) - Take control mode setting
  * @{
  */
-#define QMA6100P_ANA_TST1_TMODE        BIT(7) /**< bit mask of the tmode */
+#define QMA6100P_ANA_TST1_TMODE        (1 << 7) /**< bit mask of the tmode */
 /** @} */
 
 #ifdef __cplusplus
