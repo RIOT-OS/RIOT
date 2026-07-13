@@ -91,7 +91,7 @@ int raw_can_abort(int ifnum, int handle);
  * @return the @p ifnum on success
  * @return < 0 on error
  */
-int raw_can_subscribe_rx(int ifnum, struct can_filter *filter, kernel_pid_t pid, void *param);
+int raw_can_subscribe_rx(int ifnum, const struct can_filter *filter, kernel_pid_t pid, void *param);
 
 /**
  * @brief Unsubscribe from reception for the given CAN @p filter on @p pid thread
@@ -174,7 +174,7 @@ int raw_can_send_mbox(int ifnum, const can_frame_t *frame, mbox_t *mbox);
  * @return the @p ifnum on success
  * @return < 0 on error
  */
-int raw_can_subscribe_rx_mbox(int ifnum, struct can_filter *filter, mbox_t *mbox, void *param);
+int raw_can_subscribe_rx_mbox(int ifnum, const struct can_filter *filter, mbox_t *mbox, void *param);
 
 /**
  * @brief Unsubscribe from reception for the given CAN @p filter and @p mbox
@@ -187,7 +187,7 @@ int raw_can_subscribe_rx_mbox(int ifnum, struct can_filter *filter, mbox_t *mbox
  * @return 0 on success
  * @return < 0 on error
  */
-int raw_can_unsubscribe_rx_mbox(int ifnum, struct can_filter *filter, mbox_t *mbox, void *param);
+int raw_can_unsubscribe_rx_mbox(int ifnum, const struct can_filter *filter, mbox_t *mbox, void *param);
 #endif
 
 /**
