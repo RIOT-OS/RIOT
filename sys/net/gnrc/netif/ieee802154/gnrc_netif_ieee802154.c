@@ -193,8 +193,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
                                                      nread,
                                                      mhr, (uint8_t *)&mhr_len,
                                                      &payload, &payload_size,
-                                                     &mic, &mic_size,
-                                                     gnrc_netif_hdr_get_src_addr(hdr)) != 0) {
+                                                     &mic, &mic_size) != 0) {
                         DEBUG("_recv_ieee802154: packet dropped by security check\n");
                         gnrc_pktbuf_release(pkt);
                         gnrc_pktbuf_release(netif_hdr);
@@ -289,21 +288,14 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         dst = gnrc_netif_hdr_get_dst_addr(netif_hdr);
         dst_len = netif_hdr->dst_l2addr_len;
     }
-    if (flags & NETDEV_IEEE802154_SECURITY_EN) {
-        /* need to include long source address because the recipient
-           will need it to decrypt the frame */
-        src_len = IEEE802154_LONG_ADDRESS_LEN;
-        src = state->long_addr;
+
+    src_len = netif_hdr->src_l2addr_len;
+    if (src_len > 0) {
+        src = gnrc_netif_hdr_get_src_addr(netif_hdr);
     }
     else {
-        src_len = netif_hdr->src_l2addr_len;
-        if (src_len > 0) {
-            src = gnrc_netif_hdr_get_src_addr(netif_hdr);
-        }
-        else {
-            src_len = netif->l2addr_len;
-            src = netif->l2addr;
-        }
+        src_len = netif->l2addr_len;
+        src = netif->l2addr;
     }
     /* fill MAC header, seq should be set by device */
     if ((res = ieee802154_set_frame_hdr(mhr, src, src_len,
