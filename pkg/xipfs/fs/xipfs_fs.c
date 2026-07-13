@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2024 Université de Lille
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2024 Université de Lille
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 /**
@@ -482,7 +479,7 @@ static int _unlink(vfs_mount_t *vfs_mp, const char *name)
     mutex_lock(mp->mutex);
     ret = xipfs_unlink(mp, name);
     mutex_unlock(mp->mutex);
-    mutex_lock(mp->execution_mutex);
+    mutex_unlock(mp->execution_mutex);
 
     return ret;
 }
