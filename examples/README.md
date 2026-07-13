@@ -154,6 +154,7 @@ Here is a quick overview of the examples available in the RIOT:
 | [senml_saul](./advanced/senml_saul/README.md) | This example demonstrates the usage of the SAUL (Sensor Actuator Uber Layer) module with the SenML (Sensor Measurement Lists) format. |
 | [opendsme](./advanced/opendsme/README.md) | This example demonstrates the usage of the OpenDSME module in RIOT. |
 | [xipfs_minimal_example](./advanced/xipfs/xipfs_minimal_example/README.md) | This example demonstrates a simple usage of XiPFS for creating and executing an executable file. |
+| [xipfs_memory_image_example](./advanced/xipfs/xipfs_memory_image_example/README.md) | This example demonstrates how to embed a pre-made off-board XiPFS mount point memory image. |
 
 ## Examples from Guides
 
