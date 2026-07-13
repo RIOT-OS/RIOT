@@ -24,7 +24,6 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#include "log.h"
 #include "isrpipe.h"
 #include "stdio_base.h"
 
@@ -36,15 +35,9 @@ static uint8_t _cdc_tx_buf_mem[CONFIG_USBUS_CDC_ACM_STDIO_BUF_SIZE];
 
 static ssize_t _write(const void* buffer, size_t len)
 {
-    const char *start = buffer;
-    while (len) {
-        size_t n = usbus_cdc_acm_submit(&cdcacm, buffer, len);
-        usbus_cdc_acm_flush(&cdcacm);
-        /* Use tsrb and flush */
-        buffer = (char *)buffer + n;
-        len -= n;
-    }
-    return (char *)buffer - start;
+    ssize_t retval = usbus_cdc_acm_submit(&cdcacm, buffer, len);
+    usbus_cdc_acm_flush(&cdcacm);
+    return retval;
 }
 
 static void _cdc_acm_rx_pipe(usbus_cdcacm_device_t *cdcacm,
