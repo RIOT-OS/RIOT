@@ -154,7 +154,7 @@ export default defineConfig({
               label: "Networking",
               items: [
                 "networking/rpl",
-                "c_tutorials/coap",
+                "networking/coap",
               ]
             },
             {
