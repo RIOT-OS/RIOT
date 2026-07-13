@@ -155,6 +155,7 @@ Here is a quick overview of the examples available in the RIOT:
 | [opendsme](./advanced/opendsme/README.md) | This example demonstrates the usage of the OpenDSME module in RIOT. |
 | [xipfs_minimal_example](./advanced/xipfs/xipfs_minimal_example/README.md) | This example demonstrates a simple usage of XiPFS for creating and executing an executable file. |
 | [xipfs_memory_image_example](./advanced/xipfs/xipfs_memory_image_example/README.md) | This example demonstrates how to embed a pre-made off-board XiPFS mount point memory image. |
+| [xipfs_complete_example](./advanced/xipfs/xipfs_complete_example/README.md) | This example demonstrates how to use various XiPFS mount points from code. |
 
 ## Examples from Guides
 
