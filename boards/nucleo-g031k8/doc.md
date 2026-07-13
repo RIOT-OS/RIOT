@@ -51,15 +51,15 @@ The board name for the Nucleo-G031K8 is `nucleo-g031k8`.
 ## Reset configuration
 
 Some boards ship with the `NRST_MODE` option byte set to `2` (the documented
-default is `3`), which turns the NRST pin into the `PF2` GPIO and disables its
-reset function, so the reset button, the NRST pin and the ST-Link reset no
-longer reset the MCU. RIOT works around this by resetting over SWD
+default is `3`), i.e. in **User button mode** below. In this case, hardware
+reset via NRST is unavailable, but RIOT works around this by resetting over SWD
 (`reset_config none`), so `make flash` always works.
 
-To restore the hardware reset, set `NRST_MODE` to `1` or `3`. The easiest way
-to do this is to use STM32CubeProgrammer, which is available for Linux,
-Mac (x86 and ARM) and Windows on the
-[ST website](https://www.st.com/en/development-tools/stm32cubeprog.html).
+- **User button mode** (`NRST_MODE = 2`): PF2 is available as button BTN0 for
+applications, but hardware reset via NRST is disabled. See warning below.
+
+- **Reset mode** (`NRST_MODE = 1 or 3`): PF2 remains a hardware reset button,
+but it cannot be used as an application user button.
 
 @warning If your program crashes after startup, it might become impossible to
          reset and flash the microcontroller if the software reset
@@ -68,6 +68,11 @@ Mac (x86 and ARM) and Windows on the
          high to enter the bootloader and then connect with e.g.
          STM32CubeProgrammer to erase the flash memory. This suggestion
          is not tested yet!
+
+To restore the hardware reset, set `NRST_MODE` to `1` or `3`. The easiest way
+to do this is to use STM32CubeProgrammer, which is available for Linux,
+Mac (x86 and ARM) and Windows on the
+[ST website](https://www.st.com/en/development-tools/stm32cubeprog.html).
 
 @note STM32CubeProgrammer v2.22 from February 2026 has a bug that prevents
 writing the Option Bytes. Use an older or newer version instead!
