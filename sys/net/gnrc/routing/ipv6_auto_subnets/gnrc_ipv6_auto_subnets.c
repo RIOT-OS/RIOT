@@ -111,6 +111,9 @@
 #include "random.h"
 #include "xtimer.h"
 
+#include "event/deferred_callback.h"
+#include "event/thread.h"
+
 /**
  * @brief Port for the custom UDP sync protocol
  */
@@ -193,13 +196,17 @@
 #define SERVER_MSG_QUEUE_SIZE                       (CONFIG_GNRC_IPV6_AUTO_SUBNETS_PEERS_MAX)
 #define SERVER_MSG_TYPE_TIMEOUT                     (0x8fae)
 
+#define CONFIG_DEFERRED_SEND (!IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE) || IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_EUI))
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
-#if !IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE)
+static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t *upstream,
+                               const ndp_opt_pi_t *pio, const ipv6_addr_t *src);
 
+#if CONFIG_DEFERRED_SEND
 /**
  * @brief Custom UDP sync protocol
  */
@@ -212,16 +219,7 @@ typedef struct __attribute__((packed)) {
 static gnrc_netif_t *_upstream;
 static ndp_opt_pi_t _pio_cache[CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF];
 static mutex_t _pio_cache_lock;
-
-static char auto_subnets_stack[SERVER_THREAD_STACKSIZE];
-static msg_t server_queue[SERVER_MSG_QUEUE_SIZE];
-
-/* store neighbor routers l2 address to ignore duplicate packets */
-static uint8_t l2addrs[CONFIG_GNRC_IPV6_AUTO_SUBNETS_PEERS_MAX]
-                      [CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
-
-/* PID of the event thread */
-static kernel_pid_t _server_pid;
+static ipv6_addr_t _pio_src;
 
 static bool _store_pio(const ndp_opt_pi_t *pio)
 {
@@ -239,6 +237,39 @@ static bool _store_pio(const ndp_opt_pi_t *pio)
     mutex_unlock(&_pio_cache_lock);
     return false;
 }
+
+static void _process_pio_cache(uint8_t subnets, uint8_t idx_start, gnrc_netif_t *upstream)
+{
+    mutex_lock(&_pio_cache_lock);
+
+    for (unsigned i = 0; i < ARRAY_SIZE(_pio_cache); ++i) {
+        if (!_pio_cache[i].len) {
+            continue;
+        }
+
+        /* use PIO for prefix configuration */
+        ipv6_addr_t *src = ipv6_addr_is_unspecified(&_pio_src)
+                         ? NULL : &_pio_src;
+        _configure_subnets(subnets, idx_start, upstream, &_pio_cache[i], src);
+
+        /* invalidate entry */
+        _pio_cache[i].len = 0;
+    }
+
+    mutex_unlock(&_pio_cache_lock);
+}
+#endif
+#if !IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE)
+static char auto_subnets_stack[SERVER_THREAD_STACKSIZE];
+static msg_t server_queue[SERVER_MSG_QUEUE_SIZE];
+
+/* store neighbor routers l2 address to ignore duplicate packets */
+static uint8_t l2addrs[CONFIG_GNRC_IPV6_AUTO_SUBNETS_PEERS_MAX]
+                      [CONFIG_GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
+
+/* PID of the event thread */
+static kernel_pid_t _server_pid;
+
 
 static int _send_udp(gnrc_netif_t *netif, const ipv6_addr_t *addr,
                      uint16_t port, const void *data, size_t len)
@@ -491,6 +522,16 @@ static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t 
     }
 }
 
+#if IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_EUI)
+static void _deferred_config(void *ctx)
+{
+    (void)ctx;
+
+    unsigned subnets = gnrc_netif_numof() - 1;
+    _process_pio_cache(subnets, 0, _upstream);
+}
+#endif
+
 void gnrc_ipv6_nib_rtr_adv_pio_cb(gnrc_netif_t *upstream, const ndp_opt_pi_t *pio,
                                   const ipv6_addr_t *src)
 {
@@ -510,23 +551,26 @@ void gnrc_ipv6_nib_rtr_adv_pio_cb(gnrc_netif_t *upstream, const ndp_opt_pi_t *pi
         return;
     }
 
-#if IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE)
     /* 'don't broadcast RA if we are a 6lo node - unicast allows l2 retransmissions */
     if (!gnrc_netif_is_6ln(upstream)) {
         src = NULL;
     }
-    /* if we are the only router on this bus, we can directly choose a prefix */
-    _configure_subnets(subnets, 0, upstream, pio, src);
-#else
-    (void)src;
-
+#if CONFIG_DEFERRED_SEND
     /* store PIO information for later use */
     if (!_store_pio(pio)) {
         DEBUG("auto_subnets: no space left in PIO cache, increase CONFIG_GNRC_IPV6_AUTO_SUBNETS_NUMOF\n");
         return;
     }
     _upstream  = upstream;
-
+    if (src) {
+        _pio_src = *src;
+    }
+#if IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_EUI)
+    static event_deferred_callback_t event;
+    event_deferred_callback_post(&event, EVENT_PRIO_MEDIUM,
+                                 ZTIMER_MSEC, 100 + (random_uint32() & 0x3FF),
+                                 _deferred_config, NULL);
+#else
     /* start advertising by sending timeout message to the server thread */
     msg_t m = {
         .type = SERVER_MSG_TYPE_TIMEOUT
@@ -534,6 +578,11 @@ void gnrc_ipv6_nib_rtr_adv_pio_cb(gnrc_netif_t *upstream, const ndp_opt_pi_t *pi
 
     msg_send(&m, _server_pid);
 #endif /* !IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE) */
+
+#else
+    /* if we are the only router on this bus, we can directly choose a prefix */
+    _configure_subnets(subnets, 0, upstream, pio, src);
+#endif /* CONFIG_DEFERRED_SEND */
 }
 
 #if !IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE)
@@ -678,25 +727,6 @@ static void _send_announce(uint8_t local_subnets, xtimer_t *timer, msg_t *msg)
                     CONFIG_GNRC_IPV6_AUTO_SUBNETS_TIMEOUT_MS * US_PER_MS);
     xtimer_set_msg(timer, timeout_us, msg, _server_pid);
     DEBUG("auto_subnets: announce sent, next timeout in %" PRIu32 " µs\n", timeout_us);
-}
-
-static void _process_pio_cache(uint8_t subnets, uint8_t idx_start, gnrc_netif_t *upstream)
-{
-    mutex_lock(&_pio_cache_lock);
-
-    for (unsigned i = 0; i < ARRAY_SIZE(_pio_cache); ++i) {
-        if (!_pio_cache[i].len) {
-            continue;
-        }
-
-        /* use PIO for prefix configuration */
-        _configure_subnets(subnets, idx_start, upstream, &_pio_cache[i], NULL);
-
-        /* invalidate entry */
-        _pio_cache[i].len = 0;
-    }
-
-    mutex_unlock(&_pio_cache_lock);
 }
 
 static void *_eventloop(void *arg)
