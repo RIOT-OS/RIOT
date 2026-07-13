@@ -5,6 +5,17 @@ description: Guide on how to configure a multihop network with RPL routing.
 
 import FileTree from '@components/FileTree.astro';
 
+The IPv6 Routing Protocol for Low-Power and Lossy Networks (RPL) is a
+routing protocol for constrained networks.
+See [RFC 6550](https://www.rfc-editor.org/info/rfc6550/) for more information
+on RPL.
+
+This tutorial shows how to use the RPL shell command to configure routing in
+a RIOT multi-hop network.
+We will configure one node as the RPL root and verify that the other nodes have
+joined the RPL Destination Oriented Directed Acyclic Graph (DODAG) and can ping
+each other using ICMPv6 echo requests.
+
 ## Prerequisites
 
 Please have a look at [The Getting Started](https://guide.riot-os.org/getting-started/installing/)
@@ -420,3 +431,12 @@ The nodes can now ping each other using the public IP addresses
 3 packets transmitted, 3 packets received, 0% packet loss
 round-trip min/avg/max = 1.010/1.269/1.728 ms
 ```
+
+:::note
+RIOT's RPL implementation currently only supports storing mode.
+To have downwards routes to all nodes the storage space within NIB must be big
+enough to store information for each node.
+If you are testing RPL with a larger number of nodes and notice that some nodes
+aren't reachable, consider increasing the NIB size.
+See the [RPL API Documentation](https://api.riot-os.org/group__net__gnrc__rpl.html).
+:::
