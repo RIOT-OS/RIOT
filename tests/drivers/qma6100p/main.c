@@ -21,13 +21,10 @@
 #include <stdio.h>
 
 #include "qma6100p.h"
+#include "qma6100p_params.h"
 #include "sema.h"
 #include "thread.h"
 #include "ztimer.h"
-
-#define QMA6100P_PARAM_RATE QMA6100P_ODR_12HZ5
-
-#include "qma6100p_params.h"
 
 static const qma6100p_odr_t rates[] = {
     QMA6100P_ODR_12HZ5,
