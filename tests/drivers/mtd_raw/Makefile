@@ -9,6 +9,9 @@ USEMODULE += mtd_write_page
 # enable true erase if MTD is an SD card
 CFLAGS += -DCONFIG_MTD_SDCARD_ERASE=1
 
+# test needs at least 2 sectors
+CFLAGS += -DMTD_EEPROM_SECTORS_NUMOF=2
+
 # Sometimes fails. See #16130.
 TEST_ON_CI_BLACKLIST += esp32-wroom-32
 

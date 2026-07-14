@@ -3,3 +3,7 @@ USEMODULE += boards_common_atmega
 ifneq (,$(filter eui_provider,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eeprom
 endif
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE  += mtd_eeprom
+endif
