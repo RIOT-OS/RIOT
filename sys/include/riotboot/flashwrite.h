@@ -105,6 +105,7 @@ extern "C" {
 typedef struct {
     int target_slot;                        /**< update targets this slot     */
     size_t offset;                          /**< update is at this position   */
+    size_t skip_len;                        /**< number of bytes to skip in first page */
     unsigned flashpage;                     /**< update is at this flashpage  */
 
     /**
@@ -121,11 +122,6 @@ typedef struct {
         firstblock_buf[RIOTBOOT_FLASHPAGE_BUFFER_SIZE];
 #endif
 } riotboot_flashwrite_t;
-
-/**
- * @brief Amount of bytes to skip at initial write of first page
- */
-#define RIOTBOOT_FLASHWRITE_SKIPLEN     sizeof(RIOTBOOT_MAGIC)
 
 /**
  * @brief   Initialize firmware update (raw version)
@@ -149,12 +145,6 @@ int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
 /**
  * @brief   Initialize firmware update (riotboot version)
  *
- * This function initializes a firmware update, skipping riotboot's magic
- * number ("RIOT") by calling @ref riotboot_flashwrite_init_raw() with an
- * offset of RIOTBOOT_FLASHWRITE_SKIPLEN (4). This ensures that riotboot will
- * ignore the slot until the magic number has been restored, e.g., through @ref
- * riotboot_flashwrite_finish().
- *
  * @param[in,out]   state       ptr to preallocated state structure
  * @param[in]       target_slot slot to write update into
  *
@@ -163,17 +153,11 @@ int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
 static inline int riotboot_flashwrite_init(riotboot_flashwrite_t *state,
                                            int target_slot)
 {
-    /* initialize state, but skip "RIOT" */
-    return riotboot_flashwrite_init_raw(state, target_slot,
-                                        RIOTBOOT_FLASHWRITE_SKIPLEN);
+    return riotboot_flashwrite_init_raw(state, target_slot, 0);
 }
 
 /**
  * @brief   Feed bytes into the firmware writer
- *
- * @note    If the update has been initialized via @ref
- *          riotboot_flashwrite_init(), make sure to skip the first
- *          RIOTBOOT_FLASHWRITE_SKIPLEN bytes.
  *
  * @param[in,out]   state   ptr to previously used update state
  * @param[in]       bytes   ptr to data
@@ -214,13 +198,21 @@ int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
  * it includes riotboot's magic number ("RIOT").
  *
  * @param[in]   state       ptr to previously used state structure
+ * @param[in]   revision    firmware revision number
  *
  * @returns     0 on success, <0 otherwise
  */
-static inline int riotboot_flashwrite_finish(riotboot_flashwrite_t *state)
+static inline int riotboot_flashwrite_finish(riotboot_flashwrite_t *state, uint32_t revision)
 {
-    return riotboot_flashwrite_finish_raw(state, (const uint8_t *)"RIOT",
-                                          RIOTBOOT_FLASHWRITE_SKIPLEN);
+    riotboot_hdr_t hdr = {
+        .magic_number = RIOTBOOT_MAGIC,
+        .version = revision,
+        .start_addr = (uint32_t)((uint8_t *)riotboot_slot_get_hdr(state->target_slot) +
+                                 RIOTBOOT_HDR_LEN)
+    };
+    hdr.chksum = riotboot_hdr_checksum(&hdr);
+    size_t fin_len = state->skip_len ? sizeof(hdr) : sizeof(hdr.magic_number);
+    return riotboot_flashwrite_finish_raw(state, (const uint8_t *)&hdr, fin_len);
 }
 
 /**
