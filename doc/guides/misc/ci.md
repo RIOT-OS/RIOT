@@ -150,6 +150,12 @@ The [labeler] workflow labels a PR with e.g. `Area:` and `Platform:` labels
 according the files changed in the PR using the [labeler action].
 The mappings can be found in the in the [labeler config] file.
 
+### pr-ai-disclosure
+The [pr-ai-disclosure] workflow checks that the AI disclosure section is present
+on new PRs. If it is not present, it will add a comment on the PR to inform
+the author, and add appropriate labels.
+
+
 ### release-test
 The [release-test] workflow runs our [release specifications] weekly and on
 every release candidate and release tag. This ensures that the latest Release
