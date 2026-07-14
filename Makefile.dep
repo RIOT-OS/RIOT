@@ -6,7 +6,7 @@
 -include $(BOARDDIR)/Makefile.dep
 
 # include cpu dependencies
--include $(RIOTCPU)/$(CPU)/Makefile.dep
+-include $(CPUDIR)/Makefile.dep
 
 # include external modules dependencies
 # processed before RIOT ones to be evaluated before the 'default' rules.
