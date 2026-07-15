@@ -35,7 +35,7 @@
 #endif
 
 #if defined(CPU_FAM_STM32U3)
-/* Give internal VBAT path time to settle before conversion. */
+/* Settling time for internal channels before conversion */
 #  define ADC_T_VBAT_STAB_US   (10U)
 #endif
 
@@ -121,9 +121,9 @@ int adc_init(adc_t line)
     }
 
 #if defined(CPU_FAM_STM32U3)
-    /* Independent analog supply for ADC analog front-end */
+    /* Enable the ADC analog supply */
     PWR->SVMCR |= PWR_SVMCR_ASV;
-    /* ADC kernel clock: clear ADCDACSEL so HCLK is selected */
+    /* Select HCLK as ADC kernel clock */
     RCC->CCIPR2 &= ~RCC_CCIPR2_ADCDACSEL;
 #endif
 
@@ -163,12 +163,10 @@ int adc_init(adc_t line)
 #endif
 
 #if defined(CPU_FAM_STM32U3)
-    /* STM32U3 ADC kernel clock is derived directly from HCLK without a CKMODE 
-     * divider. To ensure sufficient sample-and-hold time for high-impedance 
-     * internal channels (VBAT, VREFINT, TSENSE) at maximum HCLK frequencies, 
-     * a clock prescaler is applied. */
+    /* U3 has no CKMODE divider; prescale the kernel clock (HCLK/8) to keep
+     * enough sample time on high-impedance channels at high HCLK */
     ADC_INSTANCE->CCR = (ADC_INSTANCE->CCR & ~ADC_CCR_PRESC)
-                      | ADC_CCR_PRESC_2; /* divide ADC clock by 8 */
+                      | ADC_CCR_PRESC_2;
 #endif
 
 #if !defined(CPU_FAM_STM32U3)
@@ -204,7 +202,7 @@ int adc_init(adc_t line)
 #endif
         }
     }
-#endif /* !defined(CPU_FAM_STM32U3) — U3: no CKMODE in ADC_CCR; clock from RCC->CCIPR2 */
+#endif /* !CPU_FAM_STM32U3 (U3 has no CKMODE field in ADC_CCR) */
 
     /* Configure the pin */
     if (adc_config[line].pin != GPIO_UNDEF) {
@@ -218,11 +216,12 @@ int adc_init(adc_t line)
         dev(line)->CR &= ~(ADC_CR_DEEPPWD);
 #endif
 #if defined(CPU_FAM_STM32U3)
-        /* take ADC out of deep sleep */
+        /* Exit ADC deep-power-down mode */
         dev(line)->CR &= ~(ADC_CR_DEEPPWD);
 #endif
         /* Enable ADC internal voltage regulator and wait for startup period */
 #if defined(CPU_FAM_STM32U3)
+        /* Clear LDO-ready flag before enabling the regulator */
         dev(line)->ISR |= ADC_ISR_LDORDY;
 #endif
         dev(line)->CR |= ADC_CR_ADVREGEN;
@@ -254,6 +253,18 @@ int adc_init(adc_t line)
         dev(line)->CR |= ADC_CR_ADCAL;
         while (dev(line)->CR & ADC_CR_ADCAL) {}
 
+#if defined(CPU_FAM_STM32U3)
+        /* PCSEL is writable only while ADEN=0 (RM0487), so pre-select all
+         * external channels of this ADC here. Internal channels are routed
+         * via ADC_CCR and need no pre-selection. */
+        for (unsigned i = 0; i < ADC_NUMOF; i++) {
+            if ((adc_config[i].dev == adc_config[line].dev)
+                && (adc_config[i].pin != GPIO_UNDEF)) {
+                dev(line)->PCSEL |= (ADC_PCSEL_PCSEL_0 << adc_config[i].chan);
+            }
+        }
+#endif
+
         /* Clear ADRDY by writing it */
         dev(line)->ISR |= ADC_ISR_ADRDY;
 
@@ -261,7 +272,7 @@ int adc_init(adc_t line)
         dev(line)->CR |= ADC_CR_ADEN;
         while ((dev(line)->ISR & ADC_ISR_ADRDY) == 0) {}
 #if defined(CPU_FAM_STM32U3)
-        /* STM32U3 may drop ADEN once during enable; re-assert if needed */
+        /* Re-assert ADEN if it did not latch on the first write */
         if (!(dev(line)->CR & ADC_CR_ADEN)) {
             dev(line)->ISR |= ADC_ISR_ADRDY;
             dev(line)->CR |= ADC_CR_ADEN;
@@ -286,9 +297,6 @@ int adc_init(adc_t line)
 
 #if CPU_FAM_STM32H7
     /* Enable the ADC channel's analog switch */
-    dev(line)->PCSEL |= ADC_PCSEL_PCSEL_0 << adc_config[line].chan;
-#endif
-#if defined(CPU_FAM_STM32U3)
     dev(line)->PCSEL |= ADC_PCSEL_PCSEL_0 << adc_config[line].chan;
 #endif
 
@@ -354,7 +362,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
 
 #if defined(CPU_FAM_STM32U3)
     if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
-        /* Discard dummy conversion to clear residual charge after enabling path */
+        /* Dummy conversion to flush residual charge after enabling VBAT */
         dev(line)->ISR |= ADC_ISR_EOC;
         dev(line)->CR |= ADC_CR_ADSTART;
         while (!(dev(line)->ISR & ADC_ISR_EOC)) {}
