@@ -6,7 +6,7 @@
 #pragma once
 
 /**
- * @ingroup     boards_nrf9160dk
+ * @ingroup     boards_nrf9160dk-ns
  * @{
  *
  * @file
