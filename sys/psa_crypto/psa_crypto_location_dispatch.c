@@ -26,7 +26,7 @@
 #include "psa_crypto_se_driver.h"
 
 #if IS_USED(MODULE_PSA_CUSTOM_RANDOM)
-#include "psa_crypto_custom_random.h"
+#  include "psa_crypto_custom_random.h"
 #endif
 
 #if IS_USED(MODULE_PSA_KEY_MANAGEMENT)

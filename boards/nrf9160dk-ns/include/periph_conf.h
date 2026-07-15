@@ -123,7 +123,7 @@ static const uart_conf_t uart_config[] = {
  * @{
  */
 #ifndef RTT_DEV
-#define RTT_DEV             (0)                 /**< NRF_RTC0_S */
+#  define RTT_DEV             (0)                 /**< NRF_RTC0_S */
 #endif
 
 #define RTT_MAX_VALUE       (0x00ffffff)         /**< 24bit */
@@ -132,7 +132,7 @@ static const uart_conf_t uart_config[] = {
 #define RTT_CLOCK_FREQUENCY (32768U)             /**< in Hz, LFCLK*/
 
 #ifndef RTT_FREQUENCY
-#define RTT_FREQUENCY       (1024U)              /**< in Hz */
+#  define RTT_FREQUENCY       (1024U)              /**< in Hz */
 #endif
 /** @} */
 

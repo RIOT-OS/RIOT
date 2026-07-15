@@ -40,11 +40,11 @@
 
 /* Compatibility wrapper defines for nRF9160 */
 #ifdef NRF_P0_S
-#ifdef NRF_TRUSTZONE_NONSECURE
-#define NRF_P0 NRF_P0_NS
-#else
-#define NRF_P0 NRF_P0_S
-#endif
+#  ifdef NRF_TRUSTZONE_NONSECURE
+#    define NRF_P0 NRF_P0_NS
+#  else
+#    define NRF_P0 NRF_P0_S
+#  endif
 #endif
 
 #ifdef NRF_P1_S
@@ -52,11 +52,11 @@
 #endif
 
 #ifdef NRF_GPIOTE0_S
-#ifdef NRF_TRUSTZONE_NONSECURE
-#define NRF_GPIOTE NRF_GPIOTE1_NS
-#else
-#define NRF_GPIOTE NRF_GPIOTE0_S
-#endif
+#  ifdef NRF_TRUSTZONE_NONSECURE
+#    define NRF_GPIOTE NRF_GPIOTE1_NS
+#  else
+#    define NRF_GPIOTE NRF_GPIOTE0_S
+#  endif
 #define GPIOTE_IRQn GPIOTE0_IRQn
 #endif
 

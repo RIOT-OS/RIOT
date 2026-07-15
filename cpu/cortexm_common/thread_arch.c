@@ -136,9 +136,9 @@ extern uint32_t _sstack;
  *          to non-secure mode and and the non-secure exception stack.
  */
 #ifdef NRF_TRUSTZONE_NONSECURE
-#define EXCEPT_RET_TASK_MODE        (0xffffffbc)
+#  define EXCEPT_RET_TASK_MODE        (0xffffffbc)
 #else
-#define EXCEPT_RET_TASK_MODE        (0xfffffffd)
+#  define EXCEPT_RET_TASK_MODE        (0xfffffffd)
 #endif
 
 char *thread_stack_init(thread_task_func_t task_func,

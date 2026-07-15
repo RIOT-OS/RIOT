@@ -42,10 +42,10 @@ void cpu_init(void)
     clock_init_hf();
 
 #ifndef NRF_TRUSTZONE_NONSECURE
-#ifdef NVMC_ICACHECNF_CACHEEN_Msk
+#  ifdef NVMC_ICACHECNF_CACHEEN_Msk
     /* enable instruction cache */
     NRF_NVMC_S->ICACHECNF = (NVMC_ICACHECNF_CACHEEN_Msk);
-#endif
+#  endif
 #endif /* NRF_TRUSTZONE_NONSECURE */
 
     /* call cortexm default initialization */

@@ -114,7 +114,7 @@ extern "C" {
  *          fit their requirements. The default number is 5.
  */
 #ifndef CONFIG_PSA_SEALED_KEY_COUNT
-#define CONFIG_PSA_SEALED_KEY_COUNT  0
+#  define CONFIG_PSA_SEALED_KEY_COUNT  0
 #endif
 
 /**

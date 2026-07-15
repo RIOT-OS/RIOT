@@ -40,11 +40,11 @@
 #include "periph_cpu.h"
 
 #ifdef NRF_GPIOTE0_S
-#ifdef NRF_TRUSTZONE_NONSECURE
-#define NRF_GPIOTE NRF_GPIOTE0_NS
-#else
-#define NRF_GPIOTE NRF_GPIOTE0_S
-#endif
+#  ifdef NRF_TRUSTZONE_NONSECURE
+#    define NRF_GPIOTE NRF_GPIOTE0_NS
+#  else
+#    define NRF_GPIOTE NRF_GPIOTE0_S
+#  endif
 #define GPIOTE_IRQn GPIOTE0_IRQn
 #endif
 

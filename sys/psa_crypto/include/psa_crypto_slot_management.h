@@ -93,7 +93,7 @@ typedef struct {
 } psa_key_slot_t;
 
 #if PSA_SEALED_KEY_COUNT
-#include "CYS/sealed_key.h"
+#  include "CYS/sealed_key.h"
 
 /**
  * @brief   Structure for a sealed key slot.

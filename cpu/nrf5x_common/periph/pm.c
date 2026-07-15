@@ -24,11 +24,11 @@
 #include "cpu.h"
 
 #ifdef NRF_POWER_S
-#ifdef NRF_TRUSTZONE_NONSECURE
-#define NRF_POWER NRF_POWER_NS
-#else
-#define NRF_POWER NRF_POWER_S
-#endif
+#  ifdef NRF_TRUSTZONE_NONSECURE
+#    define NRF_POWER NRF_POWER_NS
+#  else
+#    define NRF_POWER NRF_POWER_S
+#  endif
 #endif
 
 /* Workaround inconsistency between nRF9160 / nRF53 headers */

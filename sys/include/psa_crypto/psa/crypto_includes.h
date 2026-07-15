@@ -38,7 +38,7 @@ extern "C" {
 #endif
 
 #if IS_USED(MODULE_PSA_CRYPTOSERVICE_HASHES_SHA256)
-#include "CYS_hashes.h"
+#  include "CYS_hashes.h"
 #endif
 
 #if IS_USED(MODULE_PERIPH_CIPHER_AES_128_CBC)
@@ -46,7 +46,7 @@ extern "C" {
 #endif
 
 #if IS_USED(MODULE_PSA_CRYPTOSERVICE_AES_128_CBC)
-#include "CYS_ciphers.h"
+#  include "CYS_ciphers.h"
 #endif
 
 #if IS_USED(MODULE_PERIPH_HASH_SHA_1) || IS_USED(MODULE_PERIPH_HASH_SHA_224) || \
