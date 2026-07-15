@@ -32,9 +32,11 @@ static void test_psa_generate_sign_verify_ecc_p256_key(void)
 
     TEST_ASSERT_PSA_SUCCESS(psa_generate_key(&privkey_attr, &privkey_id));
 
-    TEST_ASSERT_PSA_SUCCESS(psa_export_public_key(privkey_id, public_key, sizeof(public_key), &pubkey_length));
+    TEST_ASSERT_PSA_SUCCESS(psa_export_public_key(privkey_id, public_key, sizeof(public_key),
+                                                  &pubkey_length));
 
-    TEST_ASSERT_PSA_SUCCESS(psa_hash_compute(ECC_ALG_HASH, msg, sizeof(msg), hash, sizeof(hash), &hash_length));
+    TEST_ASSERT_PSA_SUCCESS(psa_hash_compute(ECC_ALG_HASH, msg, sizeof(msg), hash, sizeof(hash),
+                                             &hash_length));
 
     psa_set_key_usage_flags(&pubkey_attr, PSA_KEY_USAGE_VERIFY_MESSAGE);
     psa_set_key_algorithm(&pubkey_attr, ECC_ALG);
@@ -43,10 +45,11 @@ static void test_psa_generate_sign_verify_ecc_p256_key(void)
 
     TEST_ASSERT_PSA_SUCCESS(psa_import_key(&pubkey_attr, public_key, pubkey_length, &pubkey_id));
 
-    TEST_ASSERT_PSA_SUCCESS(psa_sign_hash(privkey_id, ECC_ALG, hash, sizeof(hash), signature, sizeof(signature), &sig_length));
-
+    TEST_ASSERT_PSA_SUCCESS(psa_sign_hash(privkey_id, ECC_ALG, hash, sizeof(hash),
+                                          signature, sizeof(signature), &sig_length));
     /* verify on original message with internal hashing operation */
-    TEST_ASSERT_PSA_SUCCESS(psa_verify_message(pubkey_id, ECC_ALG, msg, sizeof(msg), signature, sig_length));
+    TEST_ASSERT_PSA_SUCCESS(psa_verify_message(pubkey_id, ECC_ALG, msg, sizeof(msg),
+                                               signature, sig_length));
 
     psa_destroy_key(privkey_id);
     psa_destroy_key(pubkey_id);
