@@ -422,7 +422,7 @@ int sx126x_init(sx126x_t *dev)
     sx126x_errors_mask_t error = 0;
     SX126X_CHECK_API(sx126x_get_device_errors(dev, &error), /* no return */);
     if (error) {
-        SX126X_LOG_ERROR(dev, "startup: device errors 0x%04x\n", error);
+        SX126X_DEBUG(dev, "startup: device errors 0x%04x\n", error);
     }
     SX126X_CHECK_API(sx126x_clear_device_errors(dev), /* no return */);
 
