@@ -223,6 +223,7 @@ export default defineConfig({
   ],
   redirects: {
     "/misc/io_mapping_and_shields": "/board_specific/io_mapping_and_shields",
+    "/c_tutorials/coap": "networking/coap",
   },
   vite: {
     server: {
