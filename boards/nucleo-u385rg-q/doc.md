@@ -76,11 +76,11 @@ verified on hardware:
 | SPI        | working | SPI1 on PA7/PA6/PA5 (MOSI/MISO/SCK), Arduino D11/D12/D13 — verified via loopback test |
 | Flash page | working | program/erase + verify (VCORE voltage range 1)               |
 | VBAT       | working | internal VBAT channel (scaling fixed)                        |
-| ADC        | WIP     | ADC1, Arduino A0–A5 plus internal VREFINT — external channels not reading correctly, under investigation |
+| ADC        | working | ADC1, Arduino A0–A5 plus internal VREFINT (verified with a potentiometer sweep) |
 | I2C        | WIP     | I2C1 on PB8/PB9 (SCL/SDA), Arduino D15/D14 — bus scan can hang, under investigation |
 | USB device | WIP     | USB DRD FS, D+/D− on PA12/PA11 — not yet functional, under investigation |
 
-@note   ADC, I2C, and USB are configured and compile, but are not yet working
+@note   I2C and USB are configured and compile, but are not yet working
         correctly on hardware (known bugs are being worked on). The remaining
         peripherals above have been confirmed working.
 
