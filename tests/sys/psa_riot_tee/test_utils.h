@@ -3,15 +3,14 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+#pragma once
+
 /**
  * @file
  * @brief       Shared declarations for the PSA RIOT TEE tests
  *
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  */
-
-#ifndef TEST_UTILS_H
-#define TEST_UTILS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,5 +37,3 @@ Test* tests_psa_hash_sha256_gen(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* TEST_UTILS_H */

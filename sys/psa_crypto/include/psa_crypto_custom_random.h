@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+#pragma once
+
 /**
  * @ingroup     sys_psa_crypto
  * @defgroup    sys_psa_crypto_custom_random PSA Crypto Custom Random
@@ -14,9 +16,6 @@
  * @author      Lena Boeckmann <lena.boeckmann@haw-hamburg.de>
  *
  */
-
-#ifndef PSA_CUSTOM_RANDOM_H
-#define PSA_CUSTOM_RANDOM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,5 +37,4 @@ psa_status_t psa_custom_generate_random(uint8_t *output, size_t output_size);
 }
 #endif
 
-#endif /* PSA_CUSTOM_RANDOM_H */
 /** @} */

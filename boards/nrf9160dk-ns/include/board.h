@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
+#pragma once
+
 /**
  * @ingroup     boards_nrf9160dk
  * @{
@@ -12,9 +14,6 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
-
-#ifndef BOARD_H
-#define BOARD_H
 
 #include "cpu.h"
 
@@ -96,5 +95,4 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
 /** @} */
