@@ -176,21 +176,23 @@ static const uart_conf_t uart_config[] = {
  *       connector; this board’s default I2C is I2C1 on PB8/PB9.
  */
 /**
- * @brief   Internal ADC1 channel for VREFINT on STM32U3.
- *          Per CubeU3 stm32u3xx_ll_adc.h, LL_ADC_CHANNEL_VREFINT is channel 0.
+ * @brief   Internal ADC1 channel for VREFINT on STM32U3 (channel 0).
  */
 #ifndef VREFINT_ADC_CHAN
 #  define VREFINT_ADC_CHAN  0
 #endif
 
+/* ADC1 channel numbers below are verified on hardware (potentiometer sweep on
+ * each Arduino analog pin). The STM32U385 ADC1 input mux maps
+ *   PC0=IN1, PC1=IN2, PA0=IN3, PA1=IN4, PA2=IN5, PA3=IN6, PA4=IN7, PB0=IN13. */
 static const adc_conf_t adc_config[] = {
-    { .pin = GPIO_PIN(PORT_A, 0), .dev = 0, .chan = 5 },   /* A0  ADC1_IN5  */
-    { .pin = GPIO_PIN(PORT_A, 1), .dev = 0, .chan = 6 },   /* A1  ADC1_IN6  */
-    { .pin = GPIO_PIN(PORT_A, 4), .dev = 0, .chan = 9 },   /* A2  ADC1_IN9  */
-    { .pin = GPIO_PIN(PORT_B, 0), .dev = 0, .chan = 15 },  /* A3  ADC1_IN15 */
+    { .pin = GPIO_PIN(PORT_A, 0), .dev = 0, .chan = 3 },   /* A0  ADC1_IN3  */
+    { .pin = GPIO_PIN(PORT_A, 1), .dev = 0, .chan = 4 },   /* A1  ADC1_IN4  */
+    { .pin = GPIO_PIN(PORT_A, 4), .dev = 0, .chan = 7 },   /* A2  ADC1_IN7  */
+    { .pin = GPIO_PIN(PORT_B, 0), .dev = 0, .chan = 13 },  /* A3  ADC1_IN13 */
     { .pin = GPIO_PIN(PORT_C, 1), .dev = 0, .chan = 2 },   /* A4  ADC1_IN2  */
     { .pin = GPIO_PIN(PORT_C, 0), .dev = 0, .chan = 1 },   /* A5  ADC1_IN1  */
-    { .pin = GPIO_UNDEF, .dev = 0, .chan = 16 },           /* VBAT/4 internal (RM0487: VBAT is IN16, IN18 is VDDCORE) */
+    { .pin = GPIO_UNDEF, .dev = 0, .chan = 16 },           /* VBAT/4 internal (RM0487: VBAT is IN16) */
     { .pin = GPIO_UNDEF, .dev = 0, .chan = VREFINT_ADC_CHAN }, /* VREFINT (internal channel 0) */
 };
 
