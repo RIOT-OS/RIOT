@@ -74,6 +74,29 @@ static const uart_conf_t uart_config[] = {
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
+/**
+ * @name   SPI configuration
+ * @{
+ */
+static const spi_conf_t spi_config[] = {
+    {
+        .dev            = SPI1,
+        .mosi_pin       = GPIO_PIN(PORT_B, 5),  /* Arduino D11 */
+        .miso_pin       = GPIO_PIN(PORT_B, 4),  /* Arduino D12 */
+        .sclk_pin       = GPIO_PIN(PORT_B, 3),  /* Arduino D13 */
+        .cs_pin         = GPIO_UNDEF,
+        .mosi_af        = GPIO_AF0,
+        .miso_af        = GPIO_AF0,
+        .sclk_af        = GPIO_AF0,
+        .cs_af          = GPIO_AF0,
+        .rccmask        = RCC_APBENR2_SPI1EN,
+        .apbbus         = APB12,
+    },
+};
+
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
