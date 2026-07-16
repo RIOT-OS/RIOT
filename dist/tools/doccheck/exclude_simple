@@ -8361,8 +8361,9 @@ warning: Member LSM6DSL_REG_Y_OFS_USR (macro definition) of file lsm6dsxx_intern
 warning: Member LSM6DSL_REG_Z_OFS_USR (macro definition) of file lsm6dsxx_internal.h is not documented.
 warning: Member LSM6DS33_REG_ORIENT_CFG_G (macro definition) of file lsm6dsxx_internal.h is not documented.
 warning: Member AT6561_STBY_PIN (macro definition) of file board.h is not documented.
-sys/include/net/gnrc/netif/pktq.h:16: warning: Potential recursion while resolving \ref command!
-sys/include/net/gnrc/netif/pktq/type.h:15: warning: Potential recursion while resolving \ref command!
+sys/include/net/gnrc/netif/pktq.h:13: warning: Potential recursion while resolving \ref command!
+sys/include/net/gnrc/netif/pktq/type.h:9: warning: Potential recursion while resolving \ref command!
+sys/include/net/gnrc/netif/pktq/type.h:12: warning: Potential recursion while resolving \ref command!
 sys/include/net/gnrc/netif/pktq.h:0: warning: Potential recursion while resolving \ref command!
 boards/common/arduino-mkr/include/periph_conf_common.h:71: warning: Member CLOCK_DIV (macro definition) of file periph_conf_common.h is not documented.
 boards/common/native/include/board.h:136: warning: Member SPIFFS_MTD_DEV (macro definition) of file board.h is not documented.
@@ -8384,18 +8385,18 @@ drivers/include/periph/pwm.h:77: warning: Member PWM_DEV(x) (macro definition) o
 drivers/include/periph/qdec.h:93: warning: Member QDEC_DEV(x) (macro definition) of group drivers_periph_qdec is not documented.
 drivers/include/vl6180x.h:409: warning: Member VL6180X_I2C_ADDR (macro definition) of file vl6180x.h is not documented.
 sys/posix/include/semaphore.h:44: warning: Member SEM_FAILED (macro definition) of file semaphore.h is not documented.
-sys/include/net/sock/dodtls.h:135: warning: unable to resolve reference to 'sock_dtls_create()' for \ref command
-sys/include/net/sock/dtls.h:36: warning: unable to resolve reference to 'sock_dtls_create()' for \ref command
-sys/include/net/sock/dtls.h:46: warning: unable to resolve reference to 'sock_dtls_create()' for \ref command
-sys/include/net/sock/dtls.h:267: warning: unable to resolve reference to 'sock_dtls_create()' for \ref command
-sys/include/net/sock/dtls.h:434: warning: unable to resolve reference to 'sock_dtls_close()' for \ref command
-sys/include/net/sock/dtls.h:1110: warning: unable to resolve reference to 'sock_dtls_create()' for \ref command
-sys/include/net/sock/dtls.h:897: warning: Found unexpanded alias '@experimental'. Check if number of arguments passed is correct.
-sys/include/net/sock/dtls.h:853: warning: Found unexpanded alias '@experimental'. Check if number of arguments passed is correct.
+sys/include/net/sock/dodtls.h:132: warning: unable to resolve reference to 'sock_dtls_create()' for \ref command
+sys/include/net/sock/dtls.h:33: warning: unable to resolve reference to 'sock_dtls_create()' for \ref command
+sys/include/net/sock/dtls.h:43: warning: unable to resolve reference to 'sock_dtls_create()' for \ref command
+sys/include/net/sock/dtls.h:264: warning: unable to resolve reference to 'sock_dtls_create()' for \ref command
+sys/include/net/sock/dtls.h:431: warning: unable to resolve reference to 'sock_dtls_close()' for \ref command
+sys/include/net/sock/dtls.h:1107: warning: unable to resolve reference to 'sock_dtls_create()' for \ref command
+sys/include/net/sock/dtls.h:894: warning: Found unexpanded alias '@experimental'. Check if number of arguments passed is correct.
+sys/include/net/sock/dtls.h:850: warning: Found unexpanded alias '@experimental'. Check if number of arguments passed is correct.
 boards/esp32c6-devkit/doc.md:44: warning: unable to resolve reference to 'esp32c6_devkit_optional_hardware' for \ref command
 boards/esp32h2-devkit/doc.md:40: warning: unable to resolve reference to 'esp32h2_devkit_optional_hardware' for \ref command
 cpu/esp8266/doc.md:600: warning: explicit link request to 'PWM_DEV(0)' could not be resolved
-sys/include/net/gnrc.h:109: warning: unable to resolve reference to 'net_gnrc_netapi::GNRC_NETAPI_MSG_TYPE_RCV' for \ref command
+sys/include/net/gnrc.h:106: warning: unable to resolve reference to 'net_gnrc_netapi::GNRC_NETAPI_MSG_TYPE_RCV' for \ref command
 drivers/include/mcp23x17.h:190: warning: explicit link request to 'mcp23x17_interrupt_context_problem' could not be resolved
 boards/msbiot/doc.md:68: warning: unable to resolve reference to 'LED0_PIN' for \ref command
 boards/msbiot/doc.md:68: warning: unable to resolve reference to 'LED1_PIN' for \ref command
@@ -8407,15 +8408,14 @@ boards/msbiot/doc.md:72: warning: unable to resolve reference to 'LED0_TOGGLE' f
 boards/msbiot/doc.md:73: warning: unable to resolve reference to 'LED1_ON' for \ref command
 boards/msbiot/doc.md:73: warning: unable to resolve reference to 'LED1_OFF' for \ref command
 boards/msbiot/doc.md:73: warning: unable to resolve reference to 'LED1_TOGGLE' for \ref command
-sys/include/net/gnrc/netif/pktq/type.h:12: warning: Potential recursion while resolving \ref command!
 drivers/include/vl6180x.h:338: warning: explicit link request to 'VL6180X_I2C_ADDR' could not be resolved
 boards/esp32s2-wemos-mini/doc.md:38: warning: unable to resolve reference to 'esp32s2-wemos-mini_toc' for \ref command
 drivers/include/ph_oem.h:177: warning: unable to resolve reference to 'GPIO_IN_PU' for \ref command
 drivers/include/ph_oem.h:178: warning: unable to resolve reference to 'GPIO_IN_PD' for \ref command
 drivers/include/ph_oem.h:179: warning: unable to resolve reference to 'GPIO_IN_PD' for \ref command
-sys/include/net/gnrc/netif.h:218: warning: Potential recursion while resolving \ref command!
-sys/include/net/ieee802154_security.h:69: warning: unable to resolve reference to 'ieee802154_sec_context_t::ieee802154_sec_dev_t' for \ref command
-sys/include/net/ieee802154_security.h:83: warning: unable to resolve reference to 'ieee802154_sec_context_t::ieee802154_sec_dev_t' for \ref command
-sys/include/net/ieee802154_security.h:59: warning: unable to resolve reference to 'ieee802154_sec_context_t::ieee802154_sec_dev_t' for \ref command
+sys/include/net/gnrc/netif.h:215: warning: Potential recursion while resolving \ref command!
+sys/include/net/ieee802154_security.h:66: warning: unable to resolve reference to 'ieee802154_sec_context_t::ieee802154_sec_dev_t' for \ref command
+sys/include/net/ieee802154_security.h:80: warning: unable to resolve reference to 'ieee802154_sec_context_t::ieee802154_sec_dev_t' for \ref command
+sys/include/net/ieee802154_security.h:56: warning: unable to resolve reference to 'ieee802154_sec_context_t::ieee802154_sec_dev_t' for \ref command
 sys/include/net/gnrc/netif/>:1: warning: Potential recursion while resolving \ref command!
 sys/include/net/gnrc/netif/pktq/>:1: warning: Potential recursion while resolving \ref command!
