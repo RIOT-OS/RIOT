@@ -303,10 +303,10 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
          * received packet */
         /* Make sure there is no overflow even if no signal with such
            low sensitivity should be detected */
-        const int hw_rssi_min = IEEE802154_RADIO_RSSI_OFFSET
-                              + CC2538_RSSI_OFFSET;
-        if (rssi_val > hw_rssi_min) {
-            info->rssi = hw_rssi_min + rssi_val;
+        const int hw_info_rssi_offset = CC2538_RSSI_OFFSET 
+                                      - IEEE802154_RADIO_RSSI_OFFSET;
+        if (rssi_val + hw_info_rssi_offset >= 0) {
+            info->rssi = rssi_val + hw_info_rssi_offset;
         }
         else {
             info->rssi = 0;
