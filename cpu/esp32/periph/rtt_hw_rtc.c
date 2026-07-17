@@ -167,6 +167,8 @@ static void _rtc_clear_alarm(void)
 
 static void IRAM _rtc_isr(void *arg)
 {
+    irq_isr_enter();
+
     /* disable alarms first */
     LP_TIMER.target[0].hi.enable = 0;
 
@@ -192,6 +194,7 @@ static void IRAM _rtc_isr(void *arg)
         /* call the alarm handler afterwards if callback was defined */
         alarm_cb(alarm_arg);
     }
+    irq_isr_exit();
 }
 
 #else
