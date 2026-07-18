@@ -10,15 +10,15 @@
         "astro": "astro"
     },
     "dependencies": {
-        "@astrojs/rss": "4.0.18",
-        "@astrojs/starlight": "0.39.0",
-        "astro": "6.3.0",
+        "@astrojs/rss": "^4.0.19",
+        "@astrojs/starlight": "^0.41.3",
+        "astro": "^7.1.1",
         "rehype-github-emoji": "1.0.0",
-        "sharp": "0.34.5",
-        "starlight-image-zoom": "0.14.1",
+        "sharp": "0.35.3",
+        "starlight-image-zoom": "0.15.0",
         "starlight-sidebar-topics": "^0.8.0"
     },
     "devDependencies": {
-        "typescript": "6.0.3"
+        "typescript": "7.0.2"
     }
 }
