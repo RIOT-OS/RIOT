@@ -134,6 +134,7 @@ export default defineConfig({
 
           {
             label: "Using RIOT",
+            id: "using-riot",
             link: "/getting-started/installing/",
             icon: "seti:notebook",
             items: [
@@ -160,7 +161,21 @@ export default defineConfig({
               },
               {
                 label: "Networking",
-                items: ["networking/coap"],
+                items: [
+                  "networking/coap",
+                  {
+                    label: "unicoap",
+                    items: [
+                      "networking/unicoap/doc",
+                      "networking/unicoap/internals",
+                      "networking/unicoap/pdu",
+                      "networking/unicoap/resources-xfa",
+                      "networking/unicoap/server",
+                      "networking/unicoap/server-tutorial",
+                      "networking/unicoap/message-example",
+                    ]
+                  }
+                ],
               },
               {
                 label: "Advanced",
@@ -255,7 +270,7 @@ export default defineConfig({
             "/boards/**",
             "/changelog/**",
             "/test/**"
-          ]
+          ],
         }
       }),
       ],
