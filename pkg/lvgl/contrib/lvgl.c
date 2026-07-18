@@ -54,10 +54,6 @@
 #define CONFIG_LVGL_TASK_HANDLER_DELAY_MS   (5)                 /* 5ms */
 #endif
 
-#ifndef LVGL_THREAD_FLAG
-#define LVGL_THREAD_FLAG                    (1 << 7)
-#endif
-
 #if IS_USED(MODULE_LV_DRIVERS_SDL)
 
 #ifndef LCD_SCREEN_WIDTH
