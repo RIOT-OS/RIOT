@@ -204,8 +204,9 @@ static const adc_conf_t adc_config[] = {
 
 /**
  * @name    USB device (USB DRD FS) configuration
- * @note    D+/D- on ST morpho: PA12 / PA11, alternate function as per
- *          the STM32U385 and Nucleo documentation.
+ * @note    D+/D- on PA12/PA11 (user USB Type-C connector). The USB DRD FS
+ *          PHY drives the pads directly, so no alternate function is used;
+ *          the driver keeps the pins in analog mode.
  * @note    48MHz USB digital clock must be provided by the clock tree in
  *          @ref cpu_stm32 "stmclk" when using this peripheral.
  * @note    On STM32U3, USB is on APB2 and gated via @c RCC->APB2ENR
@@ -218,7 +219,7 @@ static const stm32_usbdev_fs_config_t stm32_usbdev_fs_config[] = {
         .rcc_mask   = RCC_U3_USBDEV_FS_RMASK,
         .dm         = GPIO_PIN(PORT_A, 11),
         .dp         = GPIO_PIN(PORT_A, 12),
-        .af         = GPIO_AF10,
+        .af         = GPIO_AF_UNDEF,
         .disconn    = GPIO_UNDEF,
         .irqn       = USB_FS_IRQn,
         .apb        = APB2,
