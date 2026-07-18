@@ -201,7 +201,7 @@ int _unicoap_open_request(unicoap_message_t* request,
             if (request->options->storage_capacity == 0) {
                 /* Uri-Path and Uri-Host */
                 if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
-                    if (strlen(destination->body.uri) + 4 > CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY) {
+                    if (strlen(destination->remote.uri) + 4 > CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY) {
                         unicoap_assist(API_WARNING("No options buffer supplied, allocating small default buffer")
                                            FIXIT("Increase CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY"));
                     }
@@ -212,8 +212,8 @@ int _unicoap_open_request(unicoap_message_t* request,
             }
 
             unicoap_endpoint_t endpoint = { 0 };
-            res = unicoap_uri_parse(destination->body.uri,
-                                    strlen(destination->body.uri), &endpoint,
+            res = unicoap_uri_parse(destination->remote.uri,
+                                    strlen(destination->remote.uri), &endpoint,
                                     request->options);
 
             if (res < 0) {
@@ -234,8 +234,8 @@ int _unicoap_open_request(unicoap_message_t* request,
 #if IS_USED(MODULE_DNS)
         unicoap_endpoint_t endpoint = { ._tl_ep = { .port = UNICOAP_DEFAULT_COAP_PORT } };
         // FIXME: SVCB?
-        if ((res = dns_query(destination->body.host, &endpoint._tl_ep, 0)) < 0) {
-            _CLIENT_DEBUG("DNS resolution of '%s' failed: %i\n", destination->body.host, res);
+        if ((res = dns_query(destination->remote.host, &endpoint._tl_ep, 0)) < 0) {
+            _CLIENT_DEBUG("DNS resolution of '%s' failed: %i\n", destination->remote.host, res);
             return res;
         }
         return unicoap_client_send_request_body(request, &endpoint, callback,
@@ -249,7 +249,7 @@ int _unicoap_open_request(unicoap_message_t* request,
     }
     case UNICOAP_DESTINATION_ENDPOINT:
         return unicoap_client_send_request_body(
-            request, destination->body.endoint, callback, callback_args, flags);
+            request, destination->remote.endoint, callback, callback_args, flags);
     default:
         _CLIENT_DEBUG("illegal resource identifier type %" PRIu8 "\n", destination->type);
         assert(false);

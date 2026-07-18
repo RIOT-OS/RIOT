@@ -309,7 +309,7 @@ typedef struct {
 
         /** @brief Hostname, if identified by @ref UNICOAP_DESTINATION_HOST */
         const char* host;
-    } body;
+    } remote;
 
     /** @brief The type of this identifier */
     unicoap_destination_type_t type : 3;
@@ -325,7 +325,7 @@ typedef struct {
 static inline unicoap_destination_t unicoap_destination_endpoint(unicoap_endpoint_t* endpoint)
 {
     return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_ENDPOINT,
-                                    .body.endoint = endpoint };
+                                    .remote.endoint = endpoint };
 }
 
 /**
@@ -338,7 +338,7 @@ static inline unicoap_destination_t unicoap_destination_endpoint(unicoap_endpoin
 static inline unicoap_destination_t unicoap_destination_host_string(const char* host)
 {
     return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_ENDPOINT,
-                                    .body.host = host };
+                                    .remote.host = host };
 }
 
 /**
@@ -351,7 +351,7 @@ static inline unicoap_destination_t unicoap_destination_host_string(const char* 
 static inline unicoap_destination_t unicoap_destination_uri_string(const char* uri)
 {
     return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_URI,
-                                    .body.uri = (char*)uri };
+                                    .remote.uri = (char*)uri };
 }
 /** @} */
 
