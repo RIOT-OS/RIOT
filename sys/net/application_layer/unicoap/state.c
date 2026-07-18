@@ -90,16 +90,6 @@ static unicoap_client_memo_t* _alloc_client(void) {
 }
 
 static void _free(unicoap_memo_t* memo) {
-#if UNICOAP_HAVE_MESSAGING_STATE
-    /* On the exchange layer, we're hiding the actual reason from the driver. It should
-     * not matter to the messaging layer whether we release state because of an error or because
-     * the state object is released as usual. Should the messaging layer rely on this
-     * information, the exchange-messaging abstraction has a design flaw. */
-    if (memo->messaging.state) {
-        unicoap_messaging_notify(memo->messaging.state, UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE,
-                                 NULL, memo->endpoint.proto);
-    }
-#endif
     unicoap_event_cancel(&memo->exchange.timeout);
     memset(memo, 0, sizeof(*memo));
 }
@@ -149,7 +139,23 @@ unicoap_client_memo_t* unicoap_client_memo_create(const unicoap_endpoint_t* endp
 }
 
 void unicoap_client_memo_free(unicoap_client_memo_t* memo) {
+    _lock();
+    /* Mark as unused, such that all the logic below can run without a lock.
+      * The messaging layer may need the lock too. */
+    unicoap_proto_t proto = memo->super.endpoint.proto;
+    memo->super.endpoint.proto = UNICOAP_PROTO_UNSPECIFIED;
+    _unlock();
     _deinit_client(memo);
+#if UNICOAP_HAVE_MESSAGING_STATE
+    /* On the exchange layer, we're hiding the actual reason from the driver. It should
+     * not matter to the messaging layer whether we release state because of an error or because
+     * the state object is released as usual. Should the messaging layer rely on this
+     * information, the exchange-messaging abstraction has a design flaw. */
+    if (memo->messaging.state) {
+        unicoap_messaging_notify(memo->messaging.state, UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE,
+                                 NULL, memo->endpoint.proto);
+    }
+#endif
     _free(&memo->super);
 }
 
@@ -158,14 +164,13 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
     (void)endpoint;
     (void)token;
     (void)token_length;
-    assert(endpoint);
     assert(token);
 
 #if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
     for (size_t i = 0; i < (size_t)ARRAY_SIZE(_state.client_memos); i += 1) {
         unicoap_client_memo_t* memo = &_state.client_memos[i];
 
-        if (unicoap_endpoint_is_equal(&memo->super.endpoint, endpoint) &&
+        if ((!endpoint || unicoap_endpoint_is_equal(&memo->super.endpoint, endpoint)) &&
             token_length == sizeof(memo->token) &&
             memcmp(memo->token, token, token_length) == 0) {
             return memo;
@@ -177,6 +182,7 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
 
 unicoap_client_memo_t* unicoap_client_memo_find_refno(int refno) {
     assert(refno > 0);
+    (void)memo;
 #if IS_ACTIVE(CONFIG_UNICOAP_CLIENT_CANCELLABLE)
     /* First bit is sign bit, then 3 bits for min index and then 12 bits of randomness.
      * For 16 or fewer memos, we thus don't have to search at all. */
@@ -208,6 +214,7 @@ int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo) {
 }
 
 void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, void* arg) {
+    (void)arg;
     if (!state) { return; }
     unicoap_memo_t* memo = (unicoap_memo_t*)state;
     if (memo->endpoint.proto == UNICOAP_PROTO_UNSPECIFIED) {
@@ -215,6 +222,7 @@ void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, voi
         return;
     }
     assert(memo->endpoint.proto != UNICOAP_PROTO_UNSPECIFIED);
+    _lock();
     if (type & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE) {
         _STATE_DEBUG("[NOTIF] messaging layer encountered error %i\n",
                      unicoap_layer_notification_async_failure_to_errno(type));
@@ -233,6 +241,7 @@ void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, voi
         memo->messaging.state = arg;
 #endif
     }
+    _unlock();
 
     if (IS_USED(MODULE_UNICOAP_CLIENT) && _is_client(memo)) {
         if (type & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE) {
@@ -265,7 +274,7 @@ void unicoap_messaging_notify(void* state, unicoap_layer_notification_t type, vo
     (void)arg;
     (void)type;
     switch (proto) {
-#if IS_USED(MODULE_UNICOAP_DRIVER_UDP)
+#if IS_USED(MODULE_UNICOAP_DRIVER_RFC7252_COMMON)
         case UNICOAP_PROTO_UDP:
         case UNICOAP_PROTO_DTLS: {
             extern void unicoap_messaging_notify_rfc7252(void* state, unicoap_layer_notification_t type);
@@ -294,12 +303,12 @@ void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_call
 }
 
 void unicoap_event_cancel(unicoap_scheduled_event_t* event) {
-    if (ztimer_is_set(UNICOAP_CLOCK, &event->ztimer)) {
-        /* event cancel runs in O(n), so we really only want to call
-         * event_cancel if the event has already been posted */
+    bool triggered = !ztimer_remove(UNICOAP_CLOCK, &event->ztimer);
+    if (triggered) {
+    /* event cancel runs in O(n), so we really only want to call
+     * event_cancel if the event has already been posted */
         event_cancel(&_queue, &event->super);
     }
-    ztimer_remove(UNICOAP_CLOCK, &event->ztimer);
 }
 
 /* MARK: - Lifecycle */
@@ -486,6 +495,7 @@ static void _debug_packet(const unicoap_packet_t* packet) {
 int unicoap_messaging_send(unicoap_packet_t* packet, unicoap_messaging_flags_t flags, void* exchange) {
     (void)packet;
     (void)flags;
+    (void)exchange;
 
     assert(packet);
     assert(packet->remote);
@@ -553,7 +563,12 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
     case UNICOAP_CODE_CLASS_RESPONSE_CLIENT_FAILURE:
     case UNICOAP_CODE_CLASS_RESPONSE_SERVER_FAILURE: {
         if (IS_USED(MODULE_UNICOAP_CLIENT)) {
-            unicoap_client_memo_t* memo = unicoap_client_memo_find_token(packet->remote,
+            const unicoap_endpoint_t* remote = packet->remote;
+            if (packet->local && unicoap_endpoint_is_multicast(packet->local)) {
+                _CLIENT_DEBUG("(weird) multicast response\n");
+                remote = NULL;
+            }
+            unicoap_client_memo_t* memo = unicoap_client_memo_find_token(remote,
                 packet->properties.token, packet->properties.token_length);
 
             if (!memo) {
