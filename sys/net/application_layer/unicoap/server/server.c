@@ -157,15 +157,16 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
             /* handler does not want to send response (provided No-Response is set at all) */
             /* the decision whether to honour No-Response must be made by the handler */
 
-            if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
+            if (res >= 0 && IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
+                /* Handler did not fail but did not send response. */
                 unicoap_assist(API_MISUSE("handler did not respond")
                                FIXIT("set USEMODULE += unicoap_deferred_response and"
                                      "call unicoap_defer_response")
                                FIXIT("ignore request by returning UNICOAP_IGNORING_REQUEST"));
-                unicoap_response_init_string(packet->message,
-                                             UNICOAP_STATUS_INTERNAL_SERVER_ERROR, "application");
-                goto error;
             }
+            unicoap_response_init_string(packet->message,
+                                         UNICOAP_STATUS_INTERNAL_SERVER_ERROR, "application");
+            goto error;
         }
 
         /* TODO: Advanced server features: Free exchange-layer state */
