@@ -122,7 +122,7 @@ In the case of URI queries, you can also retrieve queries by name (if they obey 
 format).
 
 ```c
-res = unicoap_options_get_first_uri_query_by_name(message->options, "color", &query);
+res = unicoap_options_get_first_uri_query_by_name_string(message->options, "color", &query);
 if (res < 0) {
     /* The getter also fails in cases where no option was found */
     if (res == -ENOENT) {

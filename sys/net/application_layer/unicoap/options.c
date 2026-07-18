@@ -862,7 +862,8 @@ ssize_t unicoap_options_get_next_by_number(unicoap_options_iterator_t* iterator,
 }
 
 ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* iterator,
-                                               unicoap_option_number_t number, const char* name,
+                                               unicoap_option_number_t number,
+                                               const char* name, size_t length,
                                                const char** value)
 {
     const uint8_t* _name = NULL;
@@ -877,7 +878,11 @@ ssize_t unicoap_options_get_next_query_by_name(unicoap_options_iterator_t* itera
             res -= 1;
         }
 
-        if (strncmp(name, (char*)_name, (uintptr_t)component - (uintptr_t)_name) != 0) {
+        if ((size_t)((uintptr_t)component - (uintptr_t)_name) != length) {
+            continue;
+        }
+
+        if (strncmp(name, (char*)_name, length) != 0) {
             continue;
         }
 

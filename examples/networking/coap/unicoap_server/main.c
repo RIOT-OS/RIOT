@@ -123,7 +123,7 @@ static int handle_greeting_request(unicoap_message_t* message, const unicoap_aux
     ssize_t res = 0;
     const char* name = NULL;
 
-    if ((res = unicoap_options_get_first_uri_query_by_name(message->options, "name", &name)) <= 0) {
+    if ((res = unicoap_options_get_first_uri_query_by_name_string(message->options, "name", &name)) <= 0) {
         printf("app: no name provided: %" PRIdSIZE " (%s)\n", res, strerror(-res));
         /* Returning a status code here will result in a response being sent automatically. */
         return UNICOAP_STATUS_BAD_REQUEST;

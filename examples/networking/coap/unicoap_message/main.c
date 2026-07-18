@@ -76,7 +76,7 @@ static void _example_handle_message(const unicoap_message_t* message)
     printf("First URI query: '%.*s'\n", (int)res, query);
 
     /* You can also get a query by name: */
-    res = unicoap_options_get_first_uri_query_by_name(message->options, "color", &query);
+    res = unicoap_options_get_first_uri_query_by_name_string(message->options, "color", &query);
     if (res < 0) {
         /* The getter also fails in cases where no option was found */
         if (res == -ENOENT) {

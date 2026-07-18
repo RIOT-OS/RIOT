@@ -183,7 +183,7 @@ UNICOAP_RESOURCE(greeting) {
 
 In `handle_greeting_request`, we need to retrieve the `name` query parameter and return a
 `Bad Request` response if our visitor did not leave their name in the request.
-To do this, we use @ref unicoap_options_t::unicoap_options_get_first_uri_query_by_name.
+To do this, we use @ref unicoap_options_t::unicoap_options_get_first_uri_query_by_name_string.
 As a simple shorthand you can return a CoAP status from the request handler as follows.
 This will send a response without any payload attached.
 
@@ -196,7 +196,7 @@ static int handle_greeting_request(unicoap_message_t* message, const unicoap_aux
     ssize_t res = 0;
     const char* name = NULL;
 
-    if ((res = unicoap_options_get_first_uri_query_by_name(message->options, "name", &name)) < 0) {
+    if ((res = unicoap_options_get_first_uri_query_by_name_string(message->options, "name", &name)) < 0) {
         printf("error: could not get 'name' query: %" PRIdSIZE " (%s)\n", res, strerror(-res));
         return UNICOAP_STATUS_BAD_REQUEST;
     }
