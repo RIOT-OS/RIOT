@@ -77,12 +77,12 @@ verified on hardware:
 | Flash page | working | program/erase + verify (VCORE voltage range 1)               |
 | VBAT       | working | internal VBAT channel (scaling fixed)                        |
 | ADC        | working | ADC1, Arduino A0–A5 plus internal VREFINT (verified with a potentiometer sweep) |
+| USB device | working | USB DRD FS, D+/D− on PA12/PA11 (user USB Type-C) — verified with a CDC-ACM shell |
 | I2C        | WIP     | I2C1 on PB8/PB9 (SCL/SDA), Arduino D15/D14 — bus scan can hang, under investigation |
-| USB device | WIP     | USB DRD FS, D+/D− on PA12/PA11 — not yet functional, under investigation |
 
-@note   I2C and USB are configured and compile, but are not yet working
-        correctly on hardware (known bugs are being worked on). The remaining
-        peripherals above have been confirmed working.
+@note   I2C is configured and compiles, but is not yet working correctly on
+        hardware (a known bug is being worked on). The remaining peripherals
+        above have been confirmed working.
 
 Arduino-style abstractions inherited from the common Nucleo-64 support are also
 provided: `arduino_pins`, `arduino_analog`, `arduino_i2c`, `arduino_spi`,
