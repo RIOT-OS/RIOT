@@ -78,11 +78,9 @@ verified on hardware:
 | VBAT       | working | internal VBAT channel (scaling fixed)                        |
 | ADC        | working | ADC1, Arduino A0–A5 plus internal VREFINT (verified with a potentiometer sweep) |
 | USB device | working | USB DRD FS, D+/D− on PA12/PA11 (user USB Type-C) — verified with a CDC-ACM shell |
-| I2C        | WIP     | I2C1 on PB8/PB9 (SCL/SDA), Arduino D15/D14 — bus scan can hang, under investigation |
+| I2C        | working | I2C1 on PB6/PB7 (SCL/SDA), Arduino D15/D14 — verified with a full bus scan (no devices attached) |
 
-@note   I2C is configured and compiles, but is not yet working correctly on
-        hardware (a known bug is being worked on). The remaining peripherals
-        above have been confirmed working.
+@note   All peripherals listed above have been verified on hardware.
 
 Arduino-style abstractions inherited from the common Nucleo-64 support are also
 provided: `arduino_pins`, `arduino_analog`, `arduino_i2c`, `arduino_spi`,
