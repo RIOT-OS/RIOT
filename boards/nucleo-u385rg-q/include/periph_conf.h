@@ -54,20 +54,18 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name I2C configuration
+ * @name    I2C configuration
  * @{
- * @note Nucleo Arduino connector D14/D15 = PB9/PB8 (SDA/SCL). I2C1 on APB1,
- *       AF4 per RM0487 / alternate-function tables (same convention as other
- *       STM32 Nucleo boards). Kernel clock: RCC CCIPR1 I2C1SEL — leave @c 0 to
- *       keep reset default (typically PCLK1); OR @ref RCC_CCIPR1_I2C1SEL if a
- *       different RM0487 setting is required.
+ * @note    I2C1 on PB6/PB7 (SCL/SDA), the Arduino connector pins D15/D14
+ *          on this board (see UM3062). The I2C1 kernel clock is left at its
+ *          reset default (PCLK1).
  */
 static const i2c_conf_t i2c_config[] = {
     {
         .dev = I2C1,
         .speed = I2C_SPEED_NORMAL,
-        .scl_pin = GPIO_PIN(PORT_B, 8),
-        .sda_pin = GPIO_PIN(PORT_B, 9),
+        .scl_pin = GPIO_PIN(PORT_B, 6),
+        .sda_pin = GPIO_PIN(PORT_B, 7),
         .scl_af = GPIO_AF4,
         .sda_af = GPIO_AF4,
         .bus = APB1,
