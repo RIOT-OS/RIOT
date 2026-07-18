@@ -41,7 +41,7 @@
 #include "debug.h"
 
 /* STM32U3 CMSIS exposes PMA base as USB_DRD_PMAADDR, not legacy USB_PMAADDR */
-#if defined(CPU_LINE_STM32U385xx)
+#if defined(CPU_FAM_STM32U3)
 #ifndef USB_PMAADDR
 #define USB_PMAADDR             USB_DRD_PMAADDR
 #endif
@@ -59,7 +59,7 @@
  *          (CHEP / CNTR) names in STM32U3 CMSIS headers.
  * @{
  */
-#if defined(CPU_LINE_STM32U385xx)
+#if defined(CPU_FAM_STM32U3)
 #ifndef USB_CNTR_FRES
 #  define USB_CNTR_FRES             USB_CNTR_USBRST
 #endif
@@ -87,7 +87,7 @@
 #  ifndef USB_EP_CTR_RX
 #    define USB_EP_CTR_RX           USB_CHEP_VTRX
 #  endif
-#endif /* U3 / U385 */
+#endif /* CPU_FAM_STM32U3 */
 /** @} */
 
 /**
@@ -120,7 +120,7 @@
 #define _PMA_ACCESS_SCHEME      (1)     /* 1 x 16-bit/word */
 #define _PMA_ACCESS_STEP_SIZE   (2)     /* Step size in 16-bit half-words when
                                          * accessing the PMA SRAM from CPU */
-#elif defined(CPU_LINE_STM32U385xx)
+#elif defined(CPU_FAM_STM32U3)
 
 #define _ENDPOINT_NUMOF         (8)
 #define _PMA_SRAM_SIZE          (2048)  /* see USB_DRD_PMA_SIZE in device header */
@@ -151,7 +151,7 @@ static uint8_t* _app_pbuf[_ENDPOINT_NUMOF];
 const usbdev_driver_t driver;
 
 /* STM32U3: USB full-speed is USB DRD (not legacy USB_TypeDef) — only this family */
-#if defined(CPU_LINE_STM32U385xx)
+#if defined(CPU_FAM_STM32U3)
 static USB_DRD_TypeDef *_global_regs(const stm32_usbdev_fs_config_t *conf)
 {
     return (USB_DRD_TypeDef *)conf->base_addr;
@@ -197,6 +197,27 @@ typedef struct {
 
 #define EP_DESC ((ep_buf_desc_t*)USB1_PMAADDR)
 #define EP_REG(x) (*((volatile uint32_t*) (((uintptr_t)(USB)) + (4*x))))
+
+#if defined(CPU_FAM_STM32U3)
+/* The USB DRD FS packet memory only supports word (32-bit) writes: a
+ * half-word write clears the other half of the addressed word. Merge
+ * half-word writes into a 32-bit read-modify-write instead. */
+static inline void _pma_write16(volatile uint16_t *addr, uint16_t val)
+{
+    volatile uint32_t *word =
+        (volatile uint32_t *)((uintptr_t)addr & ~(uintptr_t)0x3);
+
+    if ((uintptr_t)addr & 0x2) {
+        *word = (*word & 0x0000ffffUL) | ((uint32_t)val << 16);
+    }
+    else {
+        *word = (*word & 0xffff0000UL) | val;
+    }
+}
+#define _pma_set(dst, val)  _pma_write16((volatile uint16_t *)&(dst), (val))
+#else
+#define _pma_set(dst, val)  ((dst) = (val))
+#endif
 
 usbdev_t *usbdev_get_ctx(unsigned num)
 {
@@ -252,6 +273,14 @@ static void _enable_usb_clk(void)
 #if defined(PWR_CR2_USV)
     /* Validate USB Supply */
     PWR->CR2 |= PWR_CR2_USV;
+#elif defined(PWR_SVMCR_USV)
+    /* STM32U3/U5: enable the VDDUSB monitor and wait for the supply to be
+     * ready, then validate it for the FS transceiver */
+    PWR->SVMCR |= PWR_SVMCR_UVMEN;
+    busy_wait_us(100);
+    for (volatile uint32_t to = 0;
+         !(PWR->SVMSR & PWR_SVMSR_VDDUSBRDY) && to < 100000; to++) {}
+    PWR->SVMCR |= PWR_SVMCR_USV;
 #endif
 
 #if defined(RCC_APB1SMENR_USBSMEN)
@@ -268,6 +297,13 @@ static void _enable_usb_clk(void)
 
 static void _enable_gpio(const stm32_usbdev_fs_config_t *conf)
 {
+#if defined(CPU_FAM_STM32U3)
+    /* The USB DRD FS PHY drives the D+/D- pads directly; the GPIOs must be
+     * kept in analog mode instead of an alternate function */
+    gpio_init_analog(conf->dp);
+    gpio_init_analog(conf->dm);
+    return;
+#endif
     if (conf->af == GPIO_AF_UNDEF && conf->disconn == GPIO_UNDEF) {
         /* If the MCU does not have an internal D+ pullup and there is no
          * dedicated GPIO on the board to simulate a USB disconnect, the D+ GPIO
@@ -444,11 +480,15 @@ static void _usbdev_init(usbdev_t *dev)
     _global_regs(conf)->CNTR = USB_CNTR_FRES | USB_CNTR_PDWN;
     /* Clear power down */
     _global_regs(conf)->CNTR &= ~USB_CNTR_PDWN;
+#if defined(CPU_FAM_STM32U3)
+    /* USB DRD transceiver start-up time (tSTARTUP) after leaving power-down */
+    busy_wait_us(1);
+#endif
     /* Clear reset */
     _global_regs(conf)->CNTR &= ~USB_CNTR_FRES;
     /* Clear interrupt register */
     _global_regs(conf)->ISTR = 0x0000;
-#if !defined(CPU_LINE_STM32U385xx)
+#if !defined(CPU_FAM_STM32U3)
     /* Legacy USB_FS: BTABLE selects buffer-table offset inside PMA SRAM.
      * USB DRD FS on STM32U3 has no BTABLE register; table is fixed at PMA base 0 */
     /* Set BTABLE at start of USB SRAM */
@@ -467,7 +507,7 @@ static void _usbdev_init(usbdev_t *dev)
     /* Enable USB IRQ */
     NVIC_EnableIRQ(conf->irqn);
     /* fill USB SRAM with zeroes */
-#if defined(CPU_LINE_STM32U385xx)
+#if defined(CPU_FAM_STM32U3)
     /* U3 USB DRD PMA is 2 KiB; other lines keep the historical clear size */
     memset((uint8_t *)USB1_PMAADDR, 0, _PMA_SRAM_SIZE);
 #else
@@ -680,12 +720,12 @@ static void _usbdev_ep_init(usbdev_ep_t *ep)
     /* Write the configuration to the register */
     EP_REG(ep->num) = reg;
     if (ep->dir == USB_EP_DIR_IN) {
-        EP_DESC[ep->num].addr_tx = _ep_in_buf[ep->num];
-        EP_DESC[ep->num].count_tx = 64;
+        _pma_set(EP_DESC[ep->num].addr_tx, _ep_in_buf[ep->num]);
+        _pma_set(EP_DESC[ep->num].count_tx, 64);
     } else {
-        EP_DESC[ep->num].addr_rx = _ep_out_buf[ep->num];
+        _pma_set(EP_DESC[ep->num].addr_rx, _ep_out_buf[ep->num]);
         /* Set BLSIZE + NUM_BLOCK (1) */
-        EP_DESC[ep->num].count_rx = (1 << 10) | (1 << 15);
+        _pma_set(EP_DESC[ep->num].count_rx, (1 << 10) | (1 << 15));
     }
 }
 
@@ -842,10 +882,10 @@ static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t* buf, size_t len)
         }
         if (len < 63) {
             /* Should write len / 2 in count_rx if len <= 62 */
-            EP_DESC[ep->num].count_rx = (len >> 1) << 10;
+            _pma_set(EP_DESC[ep->num].count_rx, (len >> 1) << 10);
         } else {
             /* BL_SIZE = 1, NUM_BLOCK = 1 */
-            EP_DESC[ep->num].count_rx = 1 << 15 | 1 << 10;
+            _pma_set(EP_DESC[ep->num].count_rx, 1 << 15 | 1 << 10);
         }
         CLRBIT(reg, USB_EP_DTOG_TX | USB_EP_DTOG_RX);
         _app_pbuf[ep->num] = buf;
@@ -856,15 +896,15 @@ static int _usbdev_ep_xmit(usbdev_ep_t *ep, uint8_t* buf, size_t len)
         uint16_t* pma_ptr = (uint16_t *)(USB1_PMAADDR +
                                          (EP_DESC[ep->num].addr_tx * _PMA_ACCESS_STEP_SIZE));
         for (size_t i = 0; i < len; i += 2) {
-            *pma_ptr = (buf[i + 1] << 8) | buf[i];
+            _pma_set(*pma_ptr, (buf[i + 1] << 8) | buf[i]);
             pma_ptr += _PMA_ACCESS_STEP_SIZE;
         }
         /* Manage odd transfer size */
         if (len % 2 == 1) {
-            *pma_ptr =  0x00ff & buf[len - 1];
+            _pma_set(*pma_ptr, 0x00ff & buf[len - 1]);
         }
 
-        EP_DESC[ep->num].count_tx = len;
+        _pma_set(EP_DESC[ep->num].count_tx, len);
         CLRBIT(reg, USB_EP_DTOG_TX | USB_EP_DTOG_RX);
     }
 
