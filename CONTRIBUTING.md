@@ -216,22 +216,19 @@ into the source repository.
 Documentation improvements are always welcome and a good starting point for
 new contributors. This kind of contribution is merged quite quickly in general.
 
-RIOT documentation is built with [doxygen][doxygen]. Doxygen is configured to
-parse header (.h) and `doc.txt` files in the RIOT source code to generate
-the modules, cpus, boards and packages documentation.
-General documentation pages are written in Markdown and located in
-`doc/doxygen/src`.
+RIOT documentation is built with [Doxygen][doxygen] and [Starlight][starlight].
+Doxygen reads files in the RIOT source code to generate
+the modules, CPUs, boards and packages API documentation.
+Starlight is used to generate the guides and tutorials.
 
-To generate the documentation, simply run the following
-from the base directory of the RIOT source code.
-
-```shell
-make doc
-```
-
-The generated documentation is located in `doc/doxygen/html`
+Refer to the [How to Doc guide][how-to-doc] for more information on how to write guides
+and [coding conventions documentation][coding-conventions-documentation]
+for more information on how to write code documentation.
 
 [doxygen]: http://www.doxygen.nl/
+[starlight]: https://starlight.astro.build/
+[how-to-doc]: https://guide.riot-os.org/misc/how_to_doc/
+[coding-conventions-documentation]: https://guide.riot-os.org/c_tutorials/coding_conventions/#documentation
 
 ## Working with Git
 [working with git]: #working-with-git
