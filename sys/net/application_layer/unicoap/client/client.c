@@ -255,13 +255,13 @@ int _unicoap_open_request(unicoap_message_t* request,
 /* MARK: - Sync API */
 
 typedef struct {
-    mutex_t* roadblock;
+    mutex_t roadblock;
     unicoap_message_t* response;
     unicoap_aux_t* aux;
     uint8_t* buffer;
     size_t capacity;
     int res;
-} _sync_copy_args;
+} _sync_copy_args_t;
 
 static inline int _copy(unicoap_message_t* response, uint8_t* buffer, size_t capacity, int error)
 {
@@ -296,7 +296,7 @@ static inline int _copy(unicoap_message_t* response, uint8_t* buffer, size_t cap
 static int _copy_callback(const unicoap_message_t *response, const unicoap_aux_t *aux, int error,
                           void *_arg)
 {
-    _sync_copy_args *args = _arg;
+    _sync_copy_args_t *args = _arg;
     *args->response = *response;
 
     args->res = _copy(args->response, args->buffer, args->capacity, error);
@@ -328,15 +328,14 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
     assert(buffer);
     assert(buffer_capacity > 0);
     assert(response);
-
-    mutex_t roadblock;
-    mutex_init_locked(&roadblock);
-
-    _sync_copy_args args = (_sync_copy_args){ .roadblock = &roadblock,
-                                              .response = response,
-                                              .aux = aux,
-                                              .buffer = buffer,
-                                              .capacity = buffer_capacity };
+    
+    _sync_copy_args_t args = (_sync_copy_args_t) {
+        .response = response,
+        .aux = aux,
+        .buffer = buffer,
+        .capacity = buffer_capacity 
+    };
+    mutex_init_locked(&args.roadblock);
 
     int res = _unicoap_open_request(request, destination, _copy_callback, &args, flags);
     if (res < 0) {
@@ -384,12 +383,13 @@ int unicoap_send_request_sync(unicoap_message_t* request,
                            __func__);
         }
         _CLIENT_DEBUG("Attempted to open request on unicoap thread, not blocking.");
-        return _unicoap_open_request(request, destination, callback, callback_arg, flags);
+        assert(false);
+        return -1;
     }
 
     _args_t args =
         (_args_t){ .callback = callback, .caller_arg = callback_arg };
-    mutex_init_locked(&args.roadblock, 0);
+    mutex_init_locked(&args.roadblock);
 
     int res = _unicoap_open_request(request, destination, _sync_callback, &args, flags);
     if (res < 0) {
