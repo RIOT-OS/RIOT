@@ -328,6 +328,24 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
     assert(buffer);
     assert(buffer_capacity > 0);
     assert(response);
+
+    /* Prevent this function from deadlocking the unicoap thread. No one besides the unicoap
+     * thread can unlock the mutex below (via the _sync_callback). You cannot have
+     * a function that waits for the response to arrive while blocking the very same
+     * thread would process the response.
+     *
+     * This is particularly true for applications running unicoap in sync mode. */
+    if (thread_getpid() == _unicoap_pid) {
+        if (IS_ACTIVE(CONFIG_UNICOAP_ASSIT)) {
+            unicoap_assist(API_MISUSE("Attempted to call blocking '%s' on unicoap thread, "
+                                      "would block processing loop")
+                               FIXIT("Use 'unicoap_send_request_async' instead"),
+                           __func__);
+        }
+        _CLIENT_DEBUG("Attempted to open request on unicoap thread, not blocking.");
+        assert(false);
+        return -1;
+    }
     
     _sync_copy_args_t args = (_sync_copy_args_t) {
         .response = response,
