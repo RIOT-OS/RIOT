@@ -272,6 +272,18 @@ static_assert(CONFIG_UNICOAP_PATH_LENGTH_MAX > 0,
 #if !defined(CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS (7000)
 #endif
+
+/**
+ * @brief Default time to wait for a response.
+ *
+ * Setting the timeout to zero will disable it.
+ *
+ * **Unit**: milliseconds
+ * **Default**: 10000
+ */
+#if !defined(CONFIG_UNICOAP_TIMEOUT_CLIENT_MULTICAST_RESPONSE_MS) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_TIMEOUT_CLIENT_MULTICAST_RESPONSE_MS (10000)
+#endif
 /** @} */
 
 /* MARK: - Resource observation */

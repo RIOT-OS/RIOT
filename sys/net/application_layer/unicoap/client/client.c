@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <alloca.h>
 
+#include "net/ipv6/addr.h"
 #include "ztimer.h"
 #include "mutex.h"
 #include "compiler_hints.h"
@@ -73,7 +74,10 @@ int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_mem
     /* TODO: Block-wise */
     res = unicoap_client_callback_success(memo, packet, UNICOAP_BLOCK_OPTION_NONE);
 
-    unicoap_client_memo_free(memo);
+    if ((memo->flags && UNICOAP_CLIENT_FLAG_MULTICAST) == 0 ) {
+        unicoap_client_memo_free(memo);
+    }
+
     return res;
 }
 
@@ -124,6 +128,18 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
                                     .token_length = sizeof(token),
                                 } };
 
+    ipv6_addr_t ep_addr;
+    memcpy(ep_addr.u8, endpoint->_tl_ep.addr.ipv6, 16);
+    bool multicast = endpoint->_tl_ep.family == AF_INET6 && ipv6_addr_is_multicast(&ep_addr);
+
+    if (multicast) {
+        if (flags && UNICOAP_CLIENT_FLAG_RELIABLE) {
+            _CLIENT_DEBUG("error trying to send reliable datagram via multicast\n");
+            return -EINVAL;
+        }
+        flags |= UNICOAP_CLIENT_FLAG_MULTICAST;
+    }
+
     if (unicoap_callback_is_present(callback)) {
         _CLIENT_DEBUG("need a memo\n");
         if (!(memo = unicoap_client_memo_create(endpoint))) {
@@ -133,9 +149,15 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
         memo->callback_arg = callback_arg;
         memo->flags = flags;
 
-        unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
-                               CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS);
+        if (!multicast) {
+            unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
+                                   CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS);
+        } else if (CONFIG_UNICOAP_TIMEOUT_CLIENT_MULTICAST_RESPONSE_MS > 0) {
+            unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
+                                   CONFIG_UNICOAP_TIMEOUT_CLIENT_MULTICAST_RESPONSE_MS);
+        }
     }
+
     /* TODO: OSCORE */
     if ((res = unicoap_client_send_request_part(&packet, memo, flags)) < 0) {
         goto error;

@@ -153,7 +153,7 @@ void unicoap_client_memo_free(unicoap_client_memo_t* memo) {
      * the state object is released as usual. Should the messaging layer rely on this
      * information, the exchange-messaging abstraction has a design flaw. */
     if (unicoap_memo_messaging_state(&memo->super)) {
-        unicoap_messaging_notify(unicoap_memo_messaging_state(&memo->super), 
+        unicoap_messaging_notify(unicoap_memo_messaging_state(&memo->super),
             UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE, NULL, proto);
     }
 #endif
@@ -591,13 +591,17 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
                 }
             }
 
+            if ((memo->flags && UNICOAP_CLIENT_FLAG_MULTICAST) == 0) {
+                unicoap_event_cancel(&memo->super.exchange.timeout);
+            }
+
             if (truncated) {
                 _CLIENT_DEBUG("truncated, not processing\n");
                 unicoap_client_callback_failure(memo, -ENOBUFS);
                 unicoap_client_memo_free(memo);
                 return UNICOAP_PREPROCESSING_ERROR_TRUNCATED;
             }
-            unicoap_event_cancel(&memo->super.exchange.timeout);
+
             arg->client = memo;
             *flags = _messaging_flags_client(memo->flags);
             return UNICOAP_PREPROCESSING_SUCCESS_RESPONSE;

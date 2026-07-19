@@ -176,6 +176,7 @@ typedef struct {
         unicoap_scheduled_event_t timeout;
     } exchange;
 
+
     /**
      * @brief Messaging state
      *
@@ -392,8 +393,8 @@ static inline unicoap_client_memo_t* unicoap_client_memo_of_event(event_t* event
 }
 
 /**
- * @brief Returns client memo of scheduled event
- * @param[in] event Superclass event
+ * @brief Returns client memo of scheduled exchange timeout event
+ * @param[in] event Superclass timeout event
  * @returns Client memo state object
  */
 static inline unicoap_client_memo_t* unicoap_client_memo_of_timeout(unicoap_scheduled_event_t* timeout) {
@@ -444,7 +445,7 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
  *
  * @param refno Reference number associated with client memo
  * @returns Client state object or `NULL` if memo is no longer associated with reference number
- * 
+ *
  * This function may be used to find client exchange-layer state objects without keeping a pointer
  * to it. This is useful for handing public API callers a reference to, e.g., cancellable state
  * objects. With solely a pointer to the memo, `unicoap` would be at risk of accessing a memo
