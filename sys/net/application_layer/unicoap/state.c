@@ -180,14 +180,17 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
     return NULL;
 }
 
+#define UNICOAP_REFNO_MASK_MIN_INDEX (0x7000)
+#define UNICOAP_REFNO_MASK_ID (0xfff)
+
 unicoap_client_memo_t* unicoap_client_memo_find_refno(int refno) {
     assert(refno > 0);
     (void)memo;
 #if IS_ACTIVE(CONFIG_UNICOAP_CLIENT_CANCELLABLE)
     /* First bit is sign bit, then 3 bits for min index and then 12 bits of randomness.
      * For 16 or fewer memos, we thus don't have to search at all. */
-    size_t index_min = (refno & 0x7000) >> 12;
-    uint16_t reference_id = refno & 0xfff;
+    size_t index_min = (refno & UNICOAP_REFNO_MASK_MIN_INDEX) >> 12;
+    uint16_t reference_id = refno & UNICOAP_REFNO_MASK_ID;
     _STATE_DEBUG("refno=%i (min_client_ix=#%" PRIuSIZE ", refid=%u)\n", refno, index_min, reference_id);
 #  if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
     for (size_t i = index_min; i < (size_t)ARRAY_SIZE(_state.client_memos); i += 1) {
@@ -221,7 +224,6 @@ void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, voi
         _STATE_DEBUG("[NOTIF] use of released state obj\n");
         return;
     }
-    assert(memo->endpoint.proto != UNICOAP_PROTO_UNSPECIFIED);
     _lock();
     if (type & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE) {
         _STATE_DEBUG("[NOTIF] messaging layer encountered error %i\n",

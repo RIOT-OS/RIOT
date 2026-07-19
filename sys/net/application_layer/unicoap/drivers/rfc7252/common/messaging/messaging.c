@@ -442,7 +442,7 @@ static void _handle_reset(const unicoap_endpoint_t* remote, uint16_t id)
 
     if (transmission) {
         DEBUG("\n");
-        _transmission_free_notif(transmission, -ECONNRESET);
+        _transmission_free_notif(transmission, unicoap_layer_notification_async_failure_from_errno(ECONNRESET));
     }
     else {
         DEBUG(", no message with ID, ignoring\n");
@@ -823,7 +823,7 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
             MESSAGING_7252_DEBUG("created <carbon_copy size=%i>\n", res);
             transmission->pdu_size = res;
         }
-        if ((transmission->exchange = exchange)) {
+        if (transmission->exchange = exchange) {
             unicoap_exchange_notify(exchange,
                                     UNICOAP_LAYER_NOTIFICATION_STATE_ALLOC, transmission);
         }
