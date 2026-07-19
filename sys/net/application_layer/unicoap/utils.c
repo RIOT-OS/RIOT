@@ -710,6 +710,9 @@ void unicoap_print_client_flags(unicoap_client_flags_t flags)
     if (flags & UNICOAP_CLIENT_FLAG_RELIABLE) {
         printf("RELIABLE ");
     }
+    if (flags & UNICOAP_CLIENT_FLAG_OBSERVE) {
+        printf("OBSERVE ");
+    }
     printf("]");
 }
 

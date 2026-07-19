@@ -153,6 +153,20 @@
 #endif
 
 /**
+ * @brief  Buffer capacity unicoap uses to store options in a request memo to send an observation
+ * cancellation request later
+ *
+ * As per RFC 7252, the `Observe=1` cancellation request must contain the same set of options.
+ * This is the maximum size in bytes these options are allowed to occupy.
+ *
+ * **Default**: Same as @ref CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY
+ */
+#if !defined(CONFIG_UNICOAP_OPTIONS_BUFFER_CLIENT_MEMO_CAPACITY) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_OPTIONS_BUFFER_CLIENT_MEMO_CAPACITY \
+    CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY
+#endif
+
+/**
  * @brief Size of buffer unicoap allocates for a CoAP message header,
  * including token length.
  */
@@ -293,6 +307,50 @@ static_assert(CONFIG_UNIOCOAP_PATH_LENGTH_MAX > 0,
  * @name Resource observation
  * @{
  */
+/**
+ * @brief If `1`, only a single observer is allowed to register for any given resource
+ *
+ * **Default**: Disabled.
+ */
+#if !defined(CONFIG_UNICOAP_OBSERVATION_SINGLE_REGISTRATION_PER_RESOURCE) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_OBSERVATION_SINGLE_REGISTRATION_PER_RESOURCE (0)
+#endif
+
+/**
+ * @brief Maximum number of registrations
+ *
+ * **Default**: 2 registrations total
+ *
+ * If @ref CONFIG_UNICOAP_OBSERVATION_SINGLE_REGISTRATION_PER_RESOURCE is enabled,
+ * this constant's value is superseed.
+ */
+#if !defined(CONFIG_UNICOAP_OBSERVATION_REGISTRATIONS_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_OBSERVATION_REGISTRATIONS_MAX (2)
+#endif
+
+/**
+ * @brief Maximum number of Observe clients
+ *
+ * **Default**: 2 different clients total
+ *
+ * This is the total number of **different** remote endpoints that can register
+ * for resource notifications. The same client may still register for multiple resources.
+ */
+#if !defined(CONFIG_UNICOAP_OBSERVATION_CLIENTS_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_OBSERVATION_CLIENTS_MAX (2)
+#endif
+
+static_assert(CONFIG_UNICOAP_OBSERVATION_CLIENTS_MAX <= CONFIG_UNICOAP_OBSERVATION_REGISTRATIONS_MAX, "CONFIG_UNICOAP_OBSERVATION_CLIENTS_MAX must not exceed CONFIG_UNICOAP_OBSERVATION_CLIENTS_MAX");
+
+/**
+ * @brief Restrict all resources to a single observer per resource
+ *
+ * Attempts from other clients to register for resource notifications will be denied/ignored.
+ */
+#if !defined(CONFIG_UNICOAP_OBSERVATION_SINGLE_CLIENT_PER_RESOURCE) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_OBSERVATION_SINGLE_CLIENT_PER_RESOURCE 0
+#endif
+
 /**
  * @brief Width in bytes of the Observe option value for a notification
  *

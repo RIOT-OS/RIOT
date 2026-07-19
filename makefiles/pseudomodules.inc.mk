@@ -530,6 +530,11 @@ PSEUDOMODULES += unicoap_server_resource_declarations
 # URI support in unicoap client API
 PSEUDOMODULES += unicoap_client_uri
 
+# Resource observation support in client and server API,
+# automatically imports unicoap_client_observation if unicoap_client is imported
+# and unicoap_server_observation if unicoap_server is imported
+PSEUDOMODULES += unicoap_observation
+
 PSEUDOMODULES += usbus_urb
 PSEUDOMODULES += vdd_lc_filter_%
 ## @defgroup pseudomodule_vfs_auto_format vfs_auto_format

@@ -38,6 +38,13 @@ menu "CoAP Unified Suite (unicoap)"
             help
                 Default buffer capacity unicoap chooses when you invoke @ref UNICOAP_OPTIONS_ALLOC
 
+        config UNICOAP_OPTIONS_BUFFER_CLIENT_MEMO_CAPACITY
+            int "Stored option buffer capacity (bytes) to repeat request to cancel observation"
+            range 0 9999999
+            default 32
+            help
+                Client only. Buffer capacity unicoap uses to store options in a request memo to send an observation* cancellation request later
+
         config UNICOAP_EXTERNAL_TOKEN_LENGTH_MAX
             int "Maximum length of a token received from a client (bytes)"
             range 1 8
@@ -105,6 +112,29 @@ menu "CoAP Unified Suite (unicoap)"
     comment "EXTENSIONS"
 
     menu "Resource Observation"
+
+        config UNICOAP_OBSERVATION_SINGLE_REGISTRATION_PER_RESOURCE
+            bool "Restrict number of observers per resource to 1 (gcoap legacy behavior)"
+            depends on USEMODULE_UNICOAP_SERVER
+            default n
+            help
+                 Server only. If enabled, only a single observer is allowed to register for any given resource.
+
+        config UNICOAP_OBSERVATION_REGISTRATIONS_MAX
+            int "Maximum number of registrations total"
+            depends on USEMODULE_UNICOAP_SERVER
+            range 0 9999999
+            default 2
+            help
+                 Server only. If CONFIG_UNICOAP_OBSERVATION_SINGLE_REGISTRATION_PER_RESOURCE is enabled, this constant's value is superseed.
+
+        config UNICOAP_OBSERVATION_CLIENTS_MAX
+            int "Maximum number of registered clients"
+            depends on USEMODULE_UNICOAP_SERVER
+            range 0 9999999
+            default 2
+            help
+                 Server only. This is the total number of different remote endpoints that can register for resource notifications. The same client may still register for multiple resources.
 
         config UNICOAP_OBSERVE_VALUE_WIDTH
             int "Observe option value width (bytes)"

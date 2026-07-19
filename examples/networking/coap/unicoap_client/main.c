@@ -54,6 +54,10 @@ static int _print_usage(char** argv) {
     printf("Options: (default: unreliable)\n");
     printf("    -r   send reliably (send CON instead of NON over RFC7252 over UDP/DTLS)\n");
     printf("    -t   print response as UTF-8 if Content-Format is absent\n");
+    printf("    -o/--observe\n"
+           "         observe resource and print notifications\n");
+    printf("    --silence\n"
+           "         stop observing resource, do not print notifications\n");
     return 1;
 }
 
@@ -87,6 +91,8 @@ static int _on_response(
 static int _set_flags(char* opt, unicoap_client_flags_t* flags, uint8_t* shell_flags) {
     if (strcmp(opt, "-r") == 0) {
         *flags |= UNICOAP_CLIENT_FLAG_RELIABLE;
+    } else if (strcmp(opt, "--observe") == 0 || strcmp(opt, "-o") == 0) {
+        *flags |= UNICOAP_CLIENT_FLAG_OBSERVE;
     } else if (strcmp(opt, "-t") == 0) {
         *shell_flags |= _SHELL_FLAG_TEXT;
     } else {
@@ -112,12 +118,23 @@ static int _cli(int argc, char** argv) {
     }
 
     if (strcmp(argv[1], "cancel") == 0) {
-        if (argc != 3) {
+        printf("argc=%u\n", argc);
+        if (argc < 3 || argc > 4) {
             printf("error: invalid arguments\n");
             goto help;
         }
-        if ((res = unicoap_client_cancel(atoi(argv[2]))) < 0) {
-            printf("cancelling request failed (%i, %s)\n", res, strerror(-res));
+        if (argc == 4 && !(strcmp(argv[2], "--observe") == 0 || strcmp(argv[2], "-o") == 0)) {
+            printf("error: invalid arguments\n");
+            goto help;
+        }
+        if (argc == 4) {
+            if ((res = unicoap_client_cancel_observation(atoi(argv[3]))) < 0) {
+                printf("cancelling request failed (%i, %s)\n", res, strerror(-res));
+            }
+        } else {
+            if ((res = unicoap_client_cancel(atoi(argv[2]))) < 0) {
+                printf("cancelling request failed (%i, %s)\n", res, strerror(-res));
+            }
         }
         return res;
     }
@@ -175,7 +192,7 @@ static int _cli(int argc, char** argv) {
         unicoap_destination_t destination = unicoap_destination_uri_string(uri);
 
         if ((res = unicoap_send_request_async(&request, &destination, _on_response, (void*)(uintptr_t)shell_flags, flags)) < 0) {
-            printf("sending request failed (error %i, %s)\n", res, strerror(-res));
+            printf("app: sending request failed (error %i, %s)\n", res, strerror(-res));
             return res;
         }
         printf("request refno=%i\n", res);

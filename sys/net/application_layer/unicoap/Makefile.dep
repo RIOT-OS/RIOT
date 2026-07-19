@@ -28,6 +28,31 @@ ifneq (,$(filter unicoap,$(USEMODULE)))
 endif
 
 # This variable ensures the "Missing client" warning gets printed only once
+_UNICOAP_MISSING_CLIENT_OR_SERVER ?= 0
+
+# If someone imports observation, but neither server or client
+ifneq (,$(filter unicoap_observation,$(USEMODULE)))
+  ifeq (,$(filter unicoap_client unicoap_server,$(USEMODULE)))
+    ifeq (0, $(_UNICOAP_MISSING_CLIENT_OR_SERVER))
+      $(warning CoAP Observation, but neither client nor server?)
+      $(info +++ FIXIT: Makefile: Add USEMODULE += unicoap_client to import client)
+      $(info +++ FIXIT: Makefile: Add USEMODULE += unicoap_server to import server)
+      $(info +++ FIXIT: Makefile: Remove USEMODULE += unicoap_observation to remove Observation module)
+    endif
+    _UNICOAP_MISSING_CLIENT_OR_SERVER = 1
+	endif
+endif
+
+ifneq (,$(filter unicoap_observation,$(USEMODULE)))
+  ifneq (,$(filter unicoap_client,$(USEMODULE)))
+    USEMODULE += unicoap_client_observation
+  endif
+	ifneq (,$(filter unicoap_server,$(USEMODULE)))
+    USEMODULE += unicoap_server_observation
+	endif
+endif
+
+# This variable ensures the "Missing client" warning gets printed only once
 _UNICOAP_MISSING_CLIENT ?= 0
 
 # If someone imports XFA submodule, we don't silently import server submodule, we complain!
