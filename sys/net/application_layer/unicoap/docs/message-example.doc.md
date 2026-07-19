@@ -52,9 +52,9 @@ printf("CoAP over UDP/DTLS has id=%i type=%s\n",
 ### Inspecting a Message
 
 You use the
-@ref unicoap_message_is_request,
-@ref unicoap_message_is_response, and
-@ref unicoap_message_is_signal
+@ref unicoap_message_code_is_request,
+@ref unicoap_message_code_is_response, and
+@ref unicoap_message_code_is_signal
 methods to check whether a given message is a request, response, or signaling message.
 
 The corresponding typed view of the code is accessible through
@@ -122,7 +122,7 @@ In the case of URI queries, you can also retrieve queries by name (if they obey 
 format).
 
 ```c
-res = unicoap_options_get_first_uri_query_by_name(message->options, "color", &query);
+res = unicoap_options_get_first_uri_query_by_name_string(message->options, "color", &query);
 if (res < 0) {
     /* The getter also fails in cases where no option was found */
     if (res == -ENOENT) {

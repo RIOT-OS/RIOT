@@ -20,7 +20,7 @@
  * @file
  * @brief   Constants used in CoAP such as option numbers and message codes
  * @ingroup net_unicoap_message
- * @author  Carl Seifert <carl.seifert1@mailbox.tu-dresden.de>
+ * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
