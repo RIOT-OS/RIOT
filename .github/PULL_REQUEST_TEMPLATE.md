@@ -54,3 +54,7 @@ For further details, please refer to our AI policy: https://doc.riot-os.org/gene
 
 AI-Tools / LLMs that were used are:
 - none
+
+<!--
+Keep this section as is even if no AI/LLM was used, **do not** remove it if you did not use any AI/LLM.
+-->
