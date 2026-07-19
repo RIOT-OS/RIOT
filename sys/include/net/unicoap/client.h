@@ -41,7 +41,7 @@ extern "C" {
 /**
  * @brief Flags for enabling advanced features in client exchanges
  *
- * Pass these flags to one the `unicoap_send_request` functions to modify transmission,
+ * Pass these flags to one of the `unicoap_send_request` functions to modify transmission,
  * block-wise, or resource observation behavior.
  */
 typedef enum {
@@ -49,10 +49,11 @@ typedef enum {
      * @brief Sets the type of the message to confirmable (`CON`),
      * if the endpoint is an UDP or DTLS endpoint.
      *
-     * This flag is ignored with reliable transports.. For unreliable transports, a message
+     * This flag is ignored with reliable transports. For unreliable transports, a message
      * sent with this flag will require an acknowledgement to be sent from the CoAP
      * peer.
      *
+     * **Default**: disabled
      */
     UNICOAP_CLIENT_FLAG_RELIABLE = 0x0001,
 } unicoap_client_flags_t;
@@ -81,7 +82,6 @@ void unicoap_print_client_flags(unicoap_client_flags_t flags);
  * @param callback Callback -- either response or block callback, see @ref unicoap_callback_t
  * @param callback_arg Opaque argument passed to callback
  * @param flags Client flags
- * @param profile Profile, e.g., OSCORE profile
  *
  * @returns Zero on success
  * @returns Negative integer on error
@@ -91,12 +91,7 @@ int _unicoap_open_request(unicoap_message_t* request,
                           void* callback, void* callback_arg,
                           unicoap_client_flags_t flags);
 /** @} */
-/** @} */
 
-/**
- * @addtogroup net_unicoap_client
- * @{
- */
 /* MARK: - Sending a request */
 /**
  * @name Sending a request
@@ -105,9 +100,7 @@ int _unicoap_open_request(unicoap_message_t* request,
 /**
  * @brief Response or error callback
  *
- * Called either synchronously or asynchronously. If the block-wise reassembly flag was present
- * when you invoked `unicoap_request_send_*`, the given message will contain the
- * reassembled payload.
+ * Called either synchronously or asynchronously.
  *
  * @code
  * static on_response(const unicoap_message_t* response, const unicoap_aux_t* aux, int error, void* arg) {
@@ -140,24 +133,7 @@ typedef int (*unicoap_response_callback_t)(const unicoap_message_t* response,
  * using @ref unicoap_send_request_sync or @ref unicoap_send_request_sync_copy instead to
  * avoid nesting your application code in callbacks.
  *
- * Consumes @p request .
- *
- * ### Block-wise transfers
- * To automatically slice request payloads too large to be transmitted in a single message,
- * pass the @ref UNICOAP_CLIENT_FLAG_SLICE. You can avoid the copying overhead by using
- * @ref UNICOAP_CLIENT_FLAG_SLICE_NO_COPY. If you want to receive a large response in a single
- * message rather than needing to retrieve each block individually, specify
- * @ref UNICOAP_CLIENT_FLAG_REASSEMBLE. See the [Block-wise transfers module](@ref net_unicoap_blockwise)
- * for details on compile-time configuration settings.
- *
- * ### Observation of resources
- * Some CoAP resources and servers are capable of sending additional responses, i.e., notifications,
- * if the resource has changed. For example a sensor resource might send a notification if the
- * measured quantity changes. To observe the resource, pass in the  @ref UNICOAP_CLIENT_FLAG_OBSERVE flag.
- * To cancel an observation, pass the @ref UNICOAP_CLIENT_FLAG_CANCEL_OBSERVATION flag.
- * For each notification, the given callback will be called.
- *
- * @note Observing resources consumes stack resources longer than might be necessary.
+ * Consumes @p request.
  *
  * ### Transmission behavior
  * If you want to send a request to an UDP or DTLS CoAP endpoint reliably, pass in
@@ -165,13 +141,14 @@ typedef int (*unicoap_response_callback_t)(const unicoap_message_t* response,
  * sent rather than a non-confirmable message.
  *
  * @param[in,out] request Initialized request message to send
- * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or @ref unicoap_destination_endpoint
+ * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or
+ *                    @ref unicoap_destination_endpoint
  * @param callback Function executed when the entire response is available or if an error occurred
  * @param callback_arg Optional argument passed to the callback (nullable)
  * @param flags Client flags
- * @param profile Profile
  *
- * @returns Zero on success or positive refno if [cancellable requests](@ref unicoap_client_cancel) are enabled
+ * @returns Zero on success or positive refno if [cancellable requests](@ref unicoap_client_cancel) 
+ *          are enabled
  * @returns Negative integer on failure
  */
 static inline int unicoap_send_request_async(unicoap_message_t* request,
@@ -191,32 +168,17 @@ static inline int unicoap_send_request_async(unicoap_message_t* request,
  *
  * Consumes @p request .
  *
- * ### Block-wise transfers
- * To automatically slice request payloads too large to be transmitted in a single message,
- * pass the @ref UNICOAP_CLIENT_FLAG_SLICE. This method will block throughout the block-wise
- * transfer, thereby preventing copying overhead when the slice flag is present.
- * If you want to receive a large response in a single message rather than needing to retrieve each block
- * individually, specify
- * @ref UNICOAP_CLIENT_FLAG_REASSEMBLE. See the [Block-wise transfers module](@ref net_unicoap_blockwise)
- * for details on compile-time configuration settings.
- *
- * ### Observation of Resources
- * @note This client method does not support observation of resources due to the asynchronous
- * nature of notifications. To make use of observation, please refer to @ref unicoap_send_request_async.
- * If you do pass in resource observation flags, an assertion failure will be triggered when assertions
- * are enabled.
- *
  * ### Transmission behavior
  * If you want to send a request to an UDP or DTLS CoAP endpoint reliably, pass in
  * @ref UNICOAP_CLIENT_FLAG_RELIABLE. This will result in a confirmable request message being
  * sent rather than a non-confirmable message.
  *
  * @param[in,out] request Initialized request message to send
- * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or @ref unicoap_destination_endpoint
+ * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or 
+ *                    @ref unicoap_destination_endpoint
  * @param callback Function executed when the entire response is available or if an error occurred
  * @param callback_arg Optional argument passed to the callback (nullable)
  * @param flags Client flags
- * @param profile Profile
  *
  * @returns Zero on success
  * @returns Negative integer on failure
@@ -232,31 +194,14 @@ int unicoap_send_request_sync(unicoap_message_t* request,
  * This client method will not return until either an error is thrown or the response is available.
  * If blocking the current thread is unacceptable in your scenario, consider switching to
  * @ref unicoap_send_request_async. When the entire response is available, it will be copied
- * into the buffer. If the buffer capacity provided by you is too small for the response, this method will
- * fail with `-ENOBUFS`. Once method returns zero, you can start reading from @p response and @p aux.
+ * into the buffer. If the buffer capacity provided by you is too small for the response, this
+ * method will fail with `-ENOBUFS`. Once the method returns zero, you can start reading from
+ * @p response and @p aux.
  *
  * Consumes @p request .
  *
  * @remark To avoid the overhead of copying the response received by stack, use
  * @ref unicoap_send_request_sync or @ref unicoap_send_request_async.
- *
- * ### Block-wise transfers
- * To automatically slice request payloads too large to be transmitted in a single message,
- * pass the @ref UNICOAP_CLIENT_FLAG_SLICE. This method will block throughout the block-wise
- * transfer, thereby preventing copying overhead when the slice flag is present.
- * If you want to receive a large response in a single message rather than needing to retrieve each block
- * individually, specify
- * @ref UNICOAP_CLIENT_FLAG_REASSEMBLE. See the [Block-wise transfers module](@ref net_unicoap_blockwise)
- * for details on compile-time configuration settings.
- *
- * @note If you use this API with automatic block-wise transfers, make sure to provide an
- * appropriate-sized buffer as the entire reassembled payload will need to be copied.
- *
- * ### Observation of Resources
- * @note This client method does not support observation of resources due to the asynchronous
- * nature of notifications. To make use of observation, please refer to @ref unicoap_send_request_async.
- * If you do pass in resource observation flags, an assertion failure will be triggered when assertions
- * are enabled.
  *
  * ### Transmission behavior
  * If you want to send a request to an UDP or DTLS CoAP endpoint reliably, pass in
@@ -269,7 +214,6 @@ int unicoap_send_request_sync(unicoap_message_t* request,
  * @param[in,out] buffer Provide a buffer to copy
  * @param[in,out] buffer_capacity Number of free bytes available in the given @p buffer
  * @param flags Client flags
- * @param profile Profile
  * @param[in,out] aux Pre-allocated auxiliary information structure, will be initialized when a response is received successfully
  *
  * @returns Zero on success or positive refno if [cancellable requests](@ref unicoap_client_cancel) are enabled
@@ -291,8 +235,6 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
  * - @ref unicoap_send_request_async
  * - @ref unicoap_send_request_sync
  * - @ref unicoap_send_request_sync_copy
- * - @ref unicoap_send_request_blockwise_async
- * - @ref unicoap_send_request_blockwise_sync
  */
 static inline int unicoap_send_request(unicoap_message_t* request,
                                        unicoap_destination_t* destination,

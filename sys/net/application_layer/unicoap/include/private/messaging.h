@@ -278,6 +278,8 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool trun
  *
  * @param[in,out] packet Packet to send
  * @param flags Messaging flags
+ * @param[in,out] exchange Exchange-layer state object associated with this attempted 
+ *.                        messaging-layer transmission
  * @returns Zero on success or negative error value. See @ref unicoap_messaging_send_rfc7252.
  */
 int unicoap_messaging_send(unicoap_packet_t* packet, unicoap_messaging_flags_t flags, void* exchange);
@@ -310,7 +312,7 @@ _messaging_flags_resource(unicoap_resource_flags_t resource_flags)
 }
 
 /**
- * @brief Retrieves the part of a client flags bitfield releveant for the messaging driver.
+ * @brief Retrieves the part of a client flags bitfield relevant for the messaging driver.
  *
  * @param client_flags Client flags
  * @return Messaging flags extracted from the given bitfield
@@ -360,8 +362,6 @@ int unicoap_server_send_response_body(unicoap_packet_t* packet,
 /**
  * @brief Informs the unicoap client a new packet has been preprocessed and can be handled.
  *
- * This function handles block-wise transfers.
- *
  * @param[in,out] packet Packet that will be processed by the client
  * @param[in,out] memo Mandatory pointer to memo variable, memo itself can be `NULL`
  * @param[in] arg Resource
@@ -376,7 +376,6 @@ int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_mem
  *
  * @param packet Packet to send
  * @param memo Optional memo
- * @param profile Optional profile, such as OSCORE security context
  * @param client_flags Request flags
  *
  * @returns Zero on success or negative integer on error

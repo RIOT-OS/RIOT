@@ -1,4 +1,4 @@
-# Default Makefile, for simple unicoap server sample application
+# Default Makefile, for simple unicoap client sample application
 
 # name of your application
 APPLICATION = unicoap_client

@@ -8,7 +8,7 @@
  * @file
  * @ingroup net_unicoap_client
  * @brief   Client implementation
- * @author  Carl <carl.seifert@tu-dresden.de>
+ * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
 #include <string.h>
@@ -17,7 +17,6 @@
 
 #include "ztimer.h"
 #include "mutex.h"
-#include "sema.h"
 #include "compiler_hints.h"
 
 #if IS_USED(MODULE_DNS)
@@ -37,7 +36,6 @@ static void _on_response_timeout(unicoap_scheduled_event_t* timeout) {
 int unicoap_client_callback_success(unicoap_client_memo_t* memo, const unicoap_packet_t* packet,
                             unicoap_block_option_t block) {
     (void)block;
-    _UNICOAP_CHECKPOINT;
     _CLIENT_DEBUG("invoking callback with " UNICOAP_CODE_CLASS_DETAIL_FORMAT " response\n",
                  unicoap_code_class(packet->message->code),
                  unicoap_code_detail(packet->message->code));
@@ -51,10 +49,8 @@ int unicoap_client_callback_success(unicoap_client_memo_t* memo, const unicoap_p
 
     /* TODO: Block-wise callback */
     if (callback.response) {
-        _UNICOAP_CHECKPOINT;
         return callback.response(packet->message, &aux, 0, arg);
     }
-    _UNICOAP_CHECKPOINT;
     return 0;
 }
 
@@ -63,7 +59,6 @@ void unicoap_client_callback_failure(unicoap_client_memo_t* memo, int error) {
     _CLIENT_DEBUG("invoking callback with error: %i (%s)\n", error, strerror(-error));
     unicoap_callback_t callback = memo->callback;
     void* arg = memo->callback_arg;
-
     /* TODO: Block-wise callback */
     if (callback.response) {
         (void)callback.response(NULL, NULL, error, arg);
@@ -89,8 +84,8 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
     int res = 0;
 
     if (memo) {
-        // We don't want to copy the token from the buffer in packet->properties.token
-        // to the memo, so we just use the buffer in the memo instead.
+        // Instead of a temporary buffer, it's fine to reference the memo token buffer
+        // as the memo outlives or lives as long as the packet.
         packet->properties.token = memo->token;
     }
     assert(packet->properties.token);
@@ -249,7 +244,7 @@ int _unicoap_open_request(unicoap_message_t* request,
     }
     case UNICOAP_DESTINATION_ENDPOINT:
         return unicoap_client_send_request_body(
-            request, destination->remote.endoint, callback, callback_args, flags);
+            request, destination->remote.endpoint, callback, callback_args, flags);
     default:
         _CLIENT_DEBUG("illegal resource identifier type %" PRIu8 "\n", destination->type);
         assert(false);
@@ -260,10 +255,10 @@ int _unicoap_open_request(unicoap_message_t* request,
 /* MARK: - Sync API */
 
 typedef struct {
-    sema_t *sempahore;
-    unicoap_message_t *response;
-    unicoap_aux_t *aux;
-    uint8_t *buffer;
+    mutex_t* roadblock;
+    unicoap_message_t* response;
+    unicoap_aux_t* aux;
+    uint8_t* buffer;
     size_t capacity;
     int res;
 } _sync_copy_args;
@@ -320,7 +315,7 @@ static int _copy_callback(const unicoap_message_t *response, const unicoap_aux_t
         }
     }
 
-    sema_post(args->sempahore);
+    mutex_unlock(args->roadblock);
     return 0;
 }
 
@@ -334,10 +329,10 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
     assert(buffer_capacity > 0);
     assert(response);
 
-    sema_t semaphore;
-    sema_create(&semaphore, 0);
+    mutex_t roadblock;
+    mutex_init_locked(&roadblock);
 
-    _sync_copy_args args = (_sync_copy_args){ .sempahore = &semaphore,
+    _sync_copy_args args = (_sync_copy_args){ .roadblock = &roadblock,
                                               .response = response,
                                               .aux = aux,
                                               .buffer = buffer,
@@ -347,8 +342,8 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
     if (res < 0) {
         return res;
     }
-    sema_wait(&semaphore);
-    sema_destroy(&semaphore);
+    /* Block until callback calls unlock. */
+    mutex_lock(&roadblock);
     return args.res;
 }
 
@@ -356,7 +351,7 @@ typedef struct {
     unicoap_response_callback_t callback;
     void *caller_arg;
     int res;
-    sema_t semaphore;
+    mutex_t roadblock;
 } _args_t;
 
 static int _sync_callback(const unicoap_message_t *response, const unicoap_aux_t *aux, int error,
@@ -364,7 +359,7 @@ static int _sync_callback(const unicoap_message_t *response, const unicoap_aux_t
 {
     _args_t *a = (_args_t *)args;
     a->res = a->callback(response, aux, error, a->caller_arg);
-    sema_post(&a->semaphore);
+    mutex_unlock(&a->roadblock);
     return 0;
 }
 
@@ -376,7 +371,7 @@ int unicoap_send_request_sync(unicoap_message_t* request,
                               unicoap_client_flags_t flags)
 {
     /* Prevent this function from deadlocking the unicoap thread. No one besides the unicoap
-     * thread can unlock the semaphore below (via the _sync_callback). You cannot have
+     * thread can unlock the mutex below (via the _sync_callback). You cannot have
      * a function that waits for the response to arrive while blocking the very same
      * thread would process the response.
      *
@@ -394,13 +389,13 @@ int unicoap_send_request_sync(unicoap_message_t* request,
 
     _args_t args =
         (_args_t){ .callback = callback, .caller_arg = callback_arg };
-    sema_create(&args.semaphore, 0);
+    mutex_init_locked(&args.roadblock, 0);
 
     int res = _unicoap_open_request(request, destination, _sync_callback, &args, flags);
     if (res < 0) {
         return res;
     }
-    sema_wait(&args.semaphore);
-    sema_destroy(&args.semaphore);
+    /* Block until callback calls unlock. */
+    mutex_lock(&args.roadblock);
     return args.res < 0 ? args.res : 0;
 }
