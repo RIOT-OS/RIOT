@@ -30,7 +30,7 @@ endif
 # This variable ensures the "Missing client" warning gets printed only once
 _UNICOAP_MISSING_CLIENT ?= 0
 
-# If someone imports XFA submodule, we don't silently import server submodule, we complain!
+# If someone imports URI submodule, we don't silently import client submodule, we complain!  
 ifneq (,$(filter unicoap_client_uri,$(USEMODULE)))
   ifeq (,$(filter unicoap_client,$(USEMODULE)))
     ifeq (0, $(_UNICOAP_MISSING_CLIENT))

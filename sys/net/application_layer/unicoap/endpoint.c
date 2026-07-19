@@ -131,21 +131,8 @@ bool unicoap_endpoint_is_multicast(const unicoap_endpoint_t* endpoint) {
 
 int unicoap_proto_from_scheme_and_host(const char *scheme, size_t scheme_length, const char *host, size_t host_length) {
     if (strncmp(scheme, UNICOAP_SCHEME, scheme_length) == 0) {
-
-        if (host_length > _UNICOAP_BLE_DOMAIN_LENGTH) {
-            assert(host);
-            if (host[host_length - 1] == '.') {
-                /* maybe someone thinks they're genius and give us something like
-                 * .ble.arpa. with a trailing TLD dot */
-                host_length -= 1;
-            }
-
-            if (strncmp(UNICOAP_DOMAIN_BLE,
-                host + (host_length - _UNICOAP_BLE_DOMAIN_LENGTH), _UNICOAP_BLE_DOMAIN_LENGTH) == 0
-            ) {
-                return /* UNICOAP_PROTO_BLE_GATT */ -ENOTSUP;
-            }
-        }
+        /* MARK: unicoap_driver_extension_point */
+        /* CoAP over GATT/BLE domain checks would happen here. */
         return UNICOAP_PROTO_UDP;
     }
     else if (strncmp(scheme, UNICOAP_SCHEME_DTLS, scheme_length) == 0) {
@@ -167,8 +154,11 @@ const char* unicoap_scheme_from_proto(unicoap_proto_t proto) {
     }
 }
 
-int unicoap_uri_populate(uri_parser_result_t *parsed, unicoap_endpoint_t *endpoint,
-                         unicoap_options_t *options) {
+int unicoap_uri_populate(uri_parser_result_t* parsed, unicoap_endpoint_t* endpoint,
+                         unicoap_options_t* options) {
+    assert(parsed);
+    assert(endpoint);
+    assert(options);
     int res = 0;
     int proto = unicoap_proto_from_scheme_and_host(parsed->scheme, parsed->scheme_len, parsed->host, parsed->host_len);
     if (proto < 0) {
@@ -177,12 +167,10 @@ int unicoap_uri_populate(uri_parser_result_t *parsed, unicoap_endpoint_t *endpoi
         return -EPROTO;
     }
 
-    if (proto == UNICOAP_PROTO_UDP && parsed->host_len > (sizeof(UNICOAP_DOMAIN_BLE) - 1) && memcmp(parsed->host + (parsed->host_len - (sizeof(UNICOAP_DOMAIN_BLE) - 1)), UNICOAP_DOMAIN_BLE, sizeof(UNICOAP_DOMAIN_BLE) - 1) == 0) {
-        return -ENOTSUP;
-        /* proto = UNICOAP_PROTO_BLE_GATT; */
-    }
+    /* MARK: unicoap_driver_extension_point */
+    /* CoAP over GATT/BLE domain checks would happen here. */
 
-    else if (parsed->port == 0 && unicoap_transport_uses_sock_tl_ep(proto)) {
+    if (parsed->port == 0 && unicoap_transport_uses_sock_tl_ep(proto)) {
         /* use default CoAP port for coap://, coap+tcp://, coap+ws:// */
         /* use default CoAPS port for coaps://, coaps+tcp://, coaps+ws:// */
         if (parsed->scheme_len >= STRLEN(UNICOAP_SCHEME_DTLS) &&
@@ -222,10 +210,10 @@ int unicoap_uri_populate(uri_parser_result_t *parsed, unicoap_endpoint_t *endpoi
             ipv6_addr_t *v6 = ipv6_addr_from_buf((ipv6_addr_t *)tl_ep->addr.ipv6, parsed->ipv6addr,
                                                  parsed->ipv6addr_len);
             assert(v6);
+            (void)v6;
             tl_ep->family = AF_INET6;
             static_assert(sizeof(tl_ep->addr.ipv6) == sizeof(v6->u8),
                           "Programmer error: IPv6 size mismatch");
-            memcpy(tl_ep->addr.ipv6, v6->u8, sizeof(v6->u8));
 
 #  else /* if SOCK_HAS_IPV6 && IS_USED(MODULE_IPV6_ADDR) */
             _URI_DEBUG("cannot read IPv6 literal, SOCK_HAS_IPV6 ipv6_addr)\n");
@@ -235,7 +223,6 @@ int unicoap_uri_populate(uri_parser_result_t *parsed, unicoap_endpoint_t *endpoi
         }
         else {
             if (parsed->host && (parsed->host_len > 0)) {
-                assert(parsed->host_len <= 0xff);
 
 #  if SOCK_HAS_IPV4 && IS_USED(MODULE_IPV4_ADDR)
                 /* _sock_tl_ep always has v4 support */
@@ -246,7 +233,6 @@ int unicoap_uri_populate(uri_parser_result_t *parsed, unicoap_endpoint_t *endpoi
                     tl_ep->family = AF_INET;
                     static_assert(sizeof(tl_ep->addr.ipv4) == sizeof(v4->u8),
                                   "Programmer error: IPv5 size mismatch");
-                    memcpy(tl_ep->addr.ipv4, v4->u8, sizeof(v4->u8));
                 }
 
 #  else  /* SOCK_HAS_IPV4 && IS_USED(MODULE_IPV4_ADDR) */
@@ -261,7 +247,7 @@ int unicoap_uri_populate(uri_parser_result_t *parsed, unicoap_endpoint_t *endpoi
                     memcpy(domain, parsed->host, parsed->host_len);
                     domain[parsed->host_len] = '\0';
 
-                    if ((res = dns_query(domain, &tl_ep->addr, 0)) < 0) {
+                    if ((res = dns_query(domain, &tl_ep->addr, AF_UNSPEC)) < 0) {
                         _URI_DEBUG("error: DNS resolution of '%.*s' failed: %i\n",
                                   (int)parsed->host_len, parsed->host, res);
                         return res;
@@ -297,9 +283,8 @@ int unicoap_uri_populate(uri_parser_result_t *parsed, unicoap_endpoint_t *endpoi
 
     if (options) {
         if (parsed->path && (parsed->path_len > 0)) {
-            if ((res = unicoap_options_add_values_joined(options, UNICOAP_OPTION_URI_PATH,
-                                                  (uint8_t *)parsed->path, parsed->path_len, '/')) <
-                0) {
+            if ((res = 
+                unicoap_options_add_uri_path(options, (char*)parsed->path, parsed->path_len)) < 0) {
                 _URI_DEBUG("error: setting Uri-Path failed\n");
                 return res;
             }

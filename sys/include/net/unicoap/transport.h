@@ -279,7 +279,7 @@ typedef struct {
     /** @brief Representation data */
     union {
         /** @brief Endpoint itself, if identified by @ref UNICOAP_DESTINATION_ENDPOINT  */
-        unicoap_endpoint_t* endoint;
+        unicoap_endpoint_t* endpoint;
 
         /** @brief URI string, if identified by @ref UNICOAP_DESTINATION_URI  */
         const char* uri;
@@ -302,7 +302,7 @@ typedef struct {
 static inline unicoap_destination_t unicoap_destination_endpoint(unicoap_endpoint_t* endpoint)
 {
     return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_ENDPOINT,
-                                    .remote.endoint = endpoint };
+                                    .remote.endpoint = endpoint };
 }
 
 /**
@@ -314,7 +314,7 @@ static inline unicoap_destination_t unicoap_destination_endpoint(unicoap_endpoin
  */
 static inline unicoap_destination_t unicoap_destination_host_string(const char* host)
 {
-    return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_ENDPOINT,
+    return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_HOST,
                                     .remote.host = host };
 }
 
@@ -328,7 +328,7 @@ static inline unicoap_destination_t unicoap_destination_host_string(const char* 
 static inline unicoap_destination_t unicoap_destination_uri_string(const char* uri)
 {
     return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_URI,
-                                    .remote.uri = (char*)uri };
+                                    .remote.uri = uri };
 }
 /** @} */
 

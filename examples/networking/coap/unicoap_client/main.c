@@ -187,13 +187,7 @@ help:
     return _print_usage(argv);
 }
 
-#define MAIN_QUEUE_SIZE (4)
-static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
-
-static const shell_command_t commands[] = {
-    { "coap", "unicoap client", _cli },
-    { NULL, NULL, NULL }
-};
+SHELL_COMMAND(coap, "unicoap client", _cli) 
 
 int main(void) {
     /* By default, unicoap_init() is automatically called for you before main().
@@ -276,10 +270,6 @@ int main(void) {
 #   error Cannot run unicoap loop on main thread in unicoap client example as shell already runs on main there
     /* unicoap_loop_run(); */
 #endif
-
-    /* for the thread running the shell */
-    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
-
     /* start shell */
     puts("All up, running unicoap client shell, command is 'coap'");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
