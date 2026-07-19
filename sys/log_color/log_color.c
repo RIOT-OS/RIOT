@@ -28,7 +28,17 @@ typedef int dont_be_pedantic; /* this c-file is not empty */
 #include <stdarg.h>
 
 #include "kernel_defines.h"
+#include "periph/pm.h"
 #include "log.h"
+
+/**
+ * @brief   Default ANSI color escape code for WTF logs
+ *
+ * Default is bold cyan
+ */
+#ifndef LOG_WTF_ANSI_COLOR_CODE
+#define LOG_WTF_ANSI_COLOR_CODE       ("\033[1;36m")
+#endif
 
 /**
  * @brief   Default ANSI color escape code for error logs
@@ -73,6 +83,7 @@ typedef int dont_be_pedantic; /* this c-file is not empty */
 
 static const char * const _ansi_codes[] =
 {
+    [LOG_WTF] = LOG_WTF_ANSI_COLOR_CODE,
     [LOG_ERROR] = LOG_ERROR_ANSI_COLOR_CODE,
     [LOG_WARNING] = LOG_WARNING_ANSI_COLOR_CODE,
     [LOG_INFO] = LOG_INFO_ANSI_COLOR_CODE,
@@ -102,6 +113,10 @@ void log_write(unsigned level, const char *format, ...)
     /* no fflush on msp430 */
     fflush(stdout);
 #endif
+
+    if (level == LOG_WTF) {
+        pm_off();
+    }
 }
 
 #endif /*MODULE_ESP_COMMON*/
