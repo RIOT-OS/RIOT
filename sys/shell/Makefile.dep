@@ -147,6 +147,7 @@ ifneq (,$(filter shell_cmd_coap,$(USEMODULE)))
   USEMODULE += unicoap
   USEMODULE += unicoap_client
   USEMODULE += unicoap_client_uri
+  USEMODULE += unicoap_client_cancellation
   USEMODULE += unicoap_driver_udp
   USEMODULE += unicoap_driver_dtls
   USEMODULE += od

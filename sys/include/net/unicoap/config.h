@@ -242,18 +242,6 @@ static_assert(CONFIG_UNICOAP_PATH_LENGTH_MAX > 0,
 #  define CONFIG_UNICOAP_CLIENT_MEMOS_MAX (2)
 #endif
 
-/**
- * @brief Cancellable requests
- *
- * If enabled, @ref unicoap_client_send_request_async will return a positive refno
- * that can be used to cancel the request using @ref unicoap_cancel_request while still pending.
- *
- ***Default**: disabled
- */
-#if !defined(CONFIG_unicoap_cancel_requestLABLE) || defined(DOXYGEN)
-#  define CONFIG_unicoap_cancel_requestLABLE 0
-#endif
-
 /** @} */
 
 /* MARK: - Timing */
