@@ -214,7 +214,7 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
 #endif
 
 /**
- * @brief Maximum number of pending requests started using the client API
+ * @brief Maximum number of pending requests that can be started using the client API
  *
  ***Default**: 2
  *
@@ -263,7 +263,7 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
  * **Default**: 10000
  */
 #if !defined(CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS (10000)
+#  define CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS (7000)
 #endif
 /** @} */
 

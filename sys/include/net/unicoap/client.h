@@ -47,7 +47,7 @@ extern "C" {
 typedef enum {
     /**
      * @brief Sets the type of the message to confirmable (`CON`),
-     * if the endpoint is an UDP or DTLS endpoint.
+     * if the endpoint uses a non-reliable transport such as UDP or DTLS.
      *
      * This flag is ignored with reliable transports. For unreliable transports, a message
      * sent with this flag will require an acknowledgement to be sent from the CoAP
@@ -63,34 +63,6 @@ typedef enum {
  */
 void unicoap_print_client_flags(unicoap_client_flags_t flags);
 /** @} */
-/** @} */
-
-/**
- * @addtogroup net_unicoap_private
- * @{
- */
-/* MARK: - Private request API */
-/**
- * @name Private request API
- */
-/**
- * @brief Sends off client message and creates a state object for pending request
- * @private
- *
- * @param request Request message
- * @param destination Request destination
- * @param callback Callback -- either response or block callback, see @ref unicoap_callback_t
- * @param callback_arg Opaque argument passed to callback
- * @param flags Client flags
- *
- * @returns Zero on success
- * @returns Negative integer on error
- */
-int _unicoap_open_request(unicoap_message_t* request,
-                          unicoap_destination_t* destination,
-                          void* callback, void* callback_arg,
-                          unicoap_client_flags_t flags);
-/** @} */
 
 /* MARK: - Sending a request */
 /**
@@ -100,7 +72,8 @@ int _unicoap_open_request(unicoap_message_t* request,
 /**
  * @brief Response or error callback
  *
- * Called either synchronously or asynchronously.
+ * Called synchronously or asynchronously for @ref unicoap_send_request_sync or
+ * @ref unicoap_send_request_async, respectively.
  *
  * @code
  * static on_response(const unicoap_message_t* response, const unicoap_aux_t* aux, int error, void* arg) {
@@ -151,13 +124,10 @@ typedef int (*unicoap_response_callback_t)(const unicoap_message_t* response,
  *          are enabled
  * @returns Negative integer on failure
  */
-static inline int unicoap_send_request_async(unicoap_message_t* request,
-                                             unicoap_destination_t* destination,
-                                             unicoap_response_callback_t callback, void* callback_arg,
-                                             unicoap_client_flags_t flags)
-{
-    return _unicoap_open_request(request, destination, callback, callback_arg, flags);
-}
+int unicoap_send_request_async(unicoap_message_t* request,
+                               unicoap_destination_t* destination,
+                               unicoap_response_callback_t callback, void* callback_arg,
+                               unicoap_client_flags_t flags);
 
 /**
  * @brief Sends a request synchronously
@@ -200,7 +170,7 @@ int unicoap_send_request_sync(unicoap_message_t* request,
  *
  * Consumes @p request .
  *
- * @remark To avoid the overhead of copying the response received by stack, use
+ * @remark To avoid the overhead of copying the response from network-stack-internal memory, use
  * @ref unicoap_send_request_sync or @ref unicoap_send_request_async.
  *
  * ### Transmission behavior
@@ -211,8 +181,6 @@ int unicoap_send_request_sync(unicoap_message_t* request,
  * @param[in,out] request Initialized request message to send
  * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or @ref unicoap_destination_endpoint
  * @param[in,out] response Pre-allocated response message, will be initialized when a response is received successfully
- * @param[in,out] buffer Provide a buffer to copy
- * @param[in,out] buffer_capacity Number of free bytes available in the given @p buffer
  * @param flags Client flags
  * @param[in,out] aux Pre-allocated auxiliary information structure, will be initialized when a response is received successfully
  *
@@ -221,8 +189,7 @@ int unicoap_send_request_sync(unicoap_message_t* request,
  */
 int unicoap_send_request_sync_copy(unicoap_message_t* request,
                                    unicoap_destination_t* destination,
-                                   unicoap_message_t* response, uint8_t* buffer,
-                                   size_t buffer_capacity, unicoap_client_flags_t flags,
+                                   unicoap_message_t* response, unicoap_client_flags_t flags,
                                    unicoap_aux_t* aux);
 
 /**
@@ -238,11 +205,8 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
  */
 static inline int unicoap_send_request(unicoap_message_t* request,
                                        unicoap_destination_t* destination,
-                                       unicoap_message_t* response, uint8_t* buffer,
-                                       size_t buffer_capacity, unicoap_client_flags_t flags)
-{
-    return unicoap_send_request_sync_copy(request, destination, response, buffer,
-                                          buffer_capacity, flags, NULL);
+                                       unicoap_message_t* response, unicoap_client_flags_t flags) {
+    return unicoap_send_request_sync_copy(request, destination, response, flags, NULL);
 }
 
 /**
