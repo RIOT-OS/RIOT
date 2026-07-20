@@ -1,9 +1,10 @@
 #!/usr/bin/env sh
+set -eu
 
 # local is not POSIX standard, but all practical shells (even busybox) have it
 # shellcheck disable=SC3043
 
-DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
+DLCACHE_DIR=${DLCACHE_DIR:-${BUILD_DIR}/dlcache}
 
 mkdir -p "$DLCACHE_DIR"
 

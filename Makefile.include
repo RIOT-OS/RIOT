@@ -57,7 +57,7 @@ APPDIR                          ?= $(CURDIR)
 BINDIRBASE                      ?= $(APPDIR)/bin
 PKGDIRBASE                      ?= $(BUILD_DIR)/pkg
 DLCACHE                         ?= $(RIOTTOOLS)/dlcache/dlcache.sh
-DLCACHE_DIR                     ?= $(RIOTBASE)/.dlcache
+DLCACHE_DIR                     ?= $(BUILD_DIR)/dlcache
 RIOT_VERSION_DUMMY_CODE         ?= RIOT_VERSION_NUM\(2042,5,23,0\)
 
 # Resolve potential BOARD alias to canonical name before defining BINDIR
