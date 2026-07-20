@@ -5,8 +5,14 @@ CFLAGS += -DMP_RIOT_HEAPSIZE=$(MP_RIOT_HEAPSIZE)
 
 # include paths
 INCLUDES += -I$(RIOTBASE)/pkg/micropython/include
-INCLUDES += -I$(BINDIR)/pkg/micropython
-INCLUDES += -I$(BINDIR)/pkg/micropython/ports/riot
+# the RIOT port (mpconfigport.h, mphalport.h, ...) lives in contrib/
+INCLUDES += -I$(RIOTBASE)/pkg/micropython/contrib
+# the MicroPython source tree, for py/ and shared/
+INCLUDES += -I$(PKGDIRBASE)/micropython
+# generated headers (genhdr/) are placed in the per-application build dir
+INCLUDES += -I$(BINDIR)/pkg-build/micropython
+# Ensure the directory exists before any other package compiles with this INCLUDES
+$(shell mkdir -p $(BINDIR)/pkg-build/micropython)
 
 # include archive
 ARCHIVES += $(BINDIR)/micropython.a
