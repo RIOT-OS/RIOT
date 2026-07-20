@@ -65,11 +65,6 @@
 #define RCC_CSR_LSIRDY          RCC_CSR_LSI1RDY
 #endif
 
-#if defined (CPU_FAM_STM32U5)
-#define RCC_CSR_LSION           RCC_BDCR_LSION
-#define RCC_CSR_LSIRDY          RCC_BDCR_LSIRDY
-#endif
-
 #if defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U5)
 #define RCC_CFGR_SWS_HSI        RCC_CFGR_SWS_0
 #endif
@@ -105,6 +100,9 @@ void stmclk_enable_lfclk(void)
 #if defined(CPU_FAM_STM32C0)
         RCC->CSR2 |= RCC_CSR2_LSION;
         while (!(RCC->CSR2 & RCC_CSR2_LSIRDY)) {}
+#elif defined(CPU_FAM_STM32U5)
+        RCC->BDCR |= RCC_BDCR_LSION;
+        while (!(RCC->BDCR & RCC_BDCR_LSIRDY)) {}
 #else
         RCC->CSR |= RCC_CSR_LSION;
         while (!(RCC->CSR & RCC_CSR_LSIRDY)) {}
@@ -123,6 +121,8 @@ void stmclk_disable_lfclk(void)
     else {
 #if defined(CPU_FAM_STM32C0)
         RCC->CSR2 &= ~(RCC_CSR2_LSION);
+#elif defined(CPU_FAM_STM32U5)
+        RCC->BDCR &= ~(RCC_BDCR_LSION);
 #else
         RCC->CSR &= ~(RCC_CSR_LSION);
 #endif
