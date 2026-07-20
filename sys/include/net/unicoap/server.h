@@ -190,7 +190,7 @@ ssize_t unicoap_path_stringify(const unicoap_pathspec_t* path, char* buffer, siz
  *
  * @note The path can be of arbitrary length.
  */
-void unicoap_path_print(const unicoap_pathspec_t* path);
+void unicoap_print_path(const unicoap_pathspec_t* path);
 /** @} */
 
 #ifndef DOXYGEN
@@ -424,6 +424,13 @@ struct unicoap_resource {
      */
     unicoap_proto_set_t protocols;
 };
+
+/**
+ * @brief Prints CoAP resource definition properties
+ *
+ * @param resource CoAP resource
+ */
+void unicoap_print_resource(const unicoap_resource_t* resource);
 /** @} */
 
 /* MARK: - Resource discovery */

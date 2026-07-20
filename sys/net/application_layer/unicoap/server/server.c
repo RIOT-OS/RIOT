@@ -38,7 +38,7 @@ int unicoap_resource_match_request_default(const unicoap_listener_t* listener,
         if (!unicoap_match_proto((*resource)->protocols, endpoint->proto)) {
             _SERVER_DEBUG("ignoring resource <");
             if (IS_ACTIVE(ENABLE_DEBUG)) {
-                unicoap_path_print(&(*resource)->path);
+                unicoap_print_path(&(*resource)->path);
             }
             DEBUG(">, proto %s not in allowed set\n", unicoap_string_from_proto(endpoint->proto));
             continue;

@@ -41,7 +41,7 @@ size_t unicoap_path_component_count(const unicoap_pathspec_t* path) {
     return count;
 }
 
-void unicoap_path_print(const unicoap_pathspec_t* path) {
+void unicoap_print_path(const unicoap_pathspec_t* path) {
     assert(path);
     if (!path->_components) {
         printf("/");
@@ -701,6 +701,18 @@ void unicoap_print_resource_flags(unicoap_resource_flags_t flags) {
         printf("MATCH_SUBTREE ");
     }
     printf("]");
+}
+
+void unicoap_print_resource(const unicoap_resource_t* resource) {
+    printf("<");
+    unicoap_print_path(&resource->path);
+    printf(" methods=");
+    unicoap_print_methods(resource->methods);
+    printf(" protocols=");
+    unicoap_print_protocols(resource->protocols);
+    printf(" flags=");
+    unicoap_print_resource_flags(resource->flags);
+    printf(">");
 }
 
 void unicoap_assist_emit_diagnostic_missing_driver(unicoap_proto_t proto) {
