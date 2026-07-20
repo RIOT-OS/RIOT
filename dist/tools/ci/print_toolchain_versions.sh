@@ -112,7 +112,7 @@ avr_libc_version() {
 printf "\n"
 printf "%s\n" "RIOT version information"
 printf "%s\n" "----------------------------"
-if [ -d .git ]; then
+if $(git rev-parse --is-inside-work-tree); then
     RIOT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
     RIOT_COMMIT_HASH=$(git rev-parse HEAD)
     RIOT_COMMIT_DATE=$(git log -1 --format=%cd --date=short)
