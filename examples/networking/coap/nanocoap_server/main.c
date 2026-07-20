@@ -17,23 +17,50 @@
 #include <stdio.h>
 
 #include "net/nanocoap_sock.h"
+#include "shell.h"
+#include "thread.h"
 #include "ztimer.h"
 
 #ifdef MODULE_LWIP_IPV4
-#include "lwip/netif.h"
-#include <arpa/inet.h>
+#  include "lwip/netif.h"
+#  include <arpa/inet.h>
 #endif
-
-#define COAP_INBUF_SIZE (256U)
 
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
+
+#if MODULE_NANOCOAP_SERVER_DTLS
+#  include "net/credman.h"
+#  include "net/dsm.h"
+#  include "tinydtls_keys.h"
+
+static const uint8_t psk_id_0[] = PSK_DEFAULT_IDENTITY;
+static const uint8_t psk_key_0[] = PSK_DEFAULT_KEY;
+static const credman_credential_t credential = {
+    .type = CREDMAN_TYPE_PSK,
+    .tag = CONFIG_NANOCOAP_SERVER_SOCK_DTLS_TAG,
+    .params = {
+        .psk = {
+            .key = { .s = psk_key_0, .len = sizeof(psk_key_0) - 1, },
+            .id = { .s = psk_id_0, .len = sizeof(psk_id_0) - 1, },
+        }
+    },
+};
+#endif
 
 extern void setup_observe_event(void);
 
 int main(void)
 {
     puts("RIOT nanocoap example application");
+
+#if MODULE_NANOCOAP_SERVER_DTLS
+    int res = credman_add(&credential);
+    if (res < 0 && res != CREDMAN_EXIST) {
+        printf("nanocoap_server: cannot add credential to system: %d\n", res);
+        return res;
+    }
+#endif
 
     /* nanocoap_server uses gnrc sock which uses gnrc which needs a msg queue */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
@@ -65,23 +92,21 @@ int main(void)
     char buffer[16];
     inet_ntop(AF_INET, netif_ip_addr4(iface), buffer, 16);
     printf("%s\"]}\n", buffer);
-
-    /* initialize nanocoap server instance for IPv4*/
-    uint8_t buf[COAP_INBUF_SIZE];
-    sock_udp_ep_t local = { .port=COAP_PORT, .family=AF_INET };
-    nanocoap_server(&local, buf, sizeof(buf));
 #else
     /* print network addresses */
     printf("{\"IPv6 addresses\": [\"");
     netifs_print_ipv6("\", \"");
     puts("\"]}");
-
-    /* initialize nanocoap server instance for IPv6*/
-    uint8_t buf[COAP_INBUF_SIZE];
-    sock_udp_ep_t local = { .port=COAP_PORT, .family=AF_INET6 };
-    nanocoap_server(&local, buf, sizeof(buf));
 #endif
 
+#if MODULE_SHELL
+    /* start shell */
+    puts("All up, running the shell now");
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(NULL, line_buf, sizeof(line_buf));
+#else
+    thread_sleep();
+#endif
     /* should be never reached */
     return 0;
 }
