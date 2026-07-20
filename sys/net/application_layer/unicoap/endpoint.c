@@ -130,6 +130,8 @@ bool unicoap_endpoint_is_multicast(const unicoap_endpoint_t* endpoint) {
 #define _UNICOAP_BLE_DOMAIN_LENGTH (sizeof(UNICOAP_DOMAIN_BLE) - 1)
 
 int unicoap_proto_from_scheme_and_host(const char *scheme, size_t scheme_length, const char *host, size_t host_length) {
+    (void)host;
+    (void)host_length;
     if (strncmp(scheme, UNICOAP_SCHEME, scheme_length) == 0) {
         /* MARK: unicoap_driver_extension_point */
         /* CoAP over GATT/BLE domain checks would happen here. */

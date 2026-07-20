@@ -130,6 +130,9 @@ void unicoap_state_lock(void);
 
 /** @brief Unlocks internal state lock */
 void unicoap_state_unlock(void);
+
+/** @brief PID of `unicoap` thread */
+extern kernel_pid_t _unicoap_pid;
 /** @} */
 
 /* MARK: - State and initialization */

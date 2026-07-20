@@ -201,6 +201,19 @@ typedef struct {
 } unicoap_memo_t;
 
 /**
+ * @brief Returns messaging state associated with memo
+ * @param memo Client state object
+ * @return Messaging state object pointer
+ */
+static inline void* unicoap_memo_messaging_state(unicoap_memo_t* memo) {
+#if UNICOAP_HAVE_MESSAGING_STATE
+    return memo->messaging.state;
+#else
+    return NULL;
+#endif
+}
+
+/**
  * @brief Returns memo of scheduled event
  * @param[in] timeout Scheduled timeout event
  * @returns Common memo state object
