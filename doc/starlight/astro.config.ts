@@ -9,6 +9,7 @@ import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import rehypeGithubEmoji from "rehype-github-emoji";
 import starlightImageZoom from "starlight-image-zoom";
+import starlightSidebarTopics from "starlight-sidebar-topics";
 
 // https://astro.build/config
 export default defineConfig({
@@ -66,150 +67,198 @@ export default defineConfig({
           href: "https://matrix.to/#/#riot-os:matrix.org",
         },
       ],
-      sidebar: [
-        {
-          label: "External Documentation",
-          items: [
-            {
-              label: "API Documentation",
-              link: "https://api.riot-os.org",
-              badge: { text: "Doxygen", variant: "tip" },
-            },
-            {
-              label: "Rust Documentation",
-              link: "https://api.riot-os.org/rustdoc/latest/riot_doc_helpers/",
-              badge: { text: "Rustdoc", variant: "tip" },
-            },
-          ],
-        },
-        {
-          label: "Code of Conduct",
-          collapsed: true,
-          items: [
-            "general/code_of_conduct",
-            "general/code_of_conduct/faq",
-            "general/code_of_conduct/reporting",
-          ],
-        },
-        {
-          label: "RIOT in a Nutshell",
-          items: [
-            { label: "Introduction", slug: "index" },
-            "general/structure",
-            "general/contributing",
-            "general/vision",
-            "general/governance",
-            "general/security",
-            "general/ai_policy",
-          ],
-        },
-        {
-          label: "Supported Boards",
-          link: "boards",
-        },
-        {
-          label: "Supported CPUs",
-          link: "cpus",
-        },
-        {
-          label: "Tutorials",
-          items: [
-            {
-              label: "Getting Started",
-              items: [
-                "getting-started/install-wsl",
-                "getting-started/installing",
-                "getting-started/flashing",
-                "getting-started/building_example",
-                "getting-started/finding_modules",
-              ],
-            },
-            {
-              label: "C Basics",
-              items: [
-                "c_tutorials/create_project",
-                "c_tutorials/timers",
-                "c_tutorials/shell",
-                "c_tutorials/threads",
-                "c_tutorials/gpio",
-                "c_tutorials/saul",
-                "c_tutorials/coap",
-                "c_tutorials/coding_conventions",
-              ],
-            },
-            {
-              label: "C++ Basics",
-              items: [
-                "cpp_tutorials/using_cpp",
-                "cpp_tutorials/coding_conventions",
-              ],
-            },
-            {
-              label: "Rust Basics",
-              items: [
-                "rust_tutorials/rust_in_riot",
-                "rust_tutorials/create_project",
-              ],
-            },
-            {
-              label: "Advanced",
-              items: [
-                "advanced_tutorials/creating_application",
-                "advanced_tutorials/creating_modules",
-                "advanced_tutorials/unittests",
-                "advanced_tutorials/device_drivers",
-                "advanced_tutorials/porting_boards",
-                "advanced_tutorials/porting_packages",
-                "advanced_tutorials/event_queue",
-              ],
-            },
-          ],
-        },
-        {
-          label: "Build System",
-          items: [
-            "build-system/build_system",
-            "build-system/build_system_basics",
-            "build-system/kconfig",
-            "build-system/flashing",
-            "build-system/build-in-docker",
-            "build-system/advanced_build_system_tricks",
-            "build-system/debugging_aids",
-            "build-system/static_analysis",
-          ],
-        },
-        {
-          label: "Board Specific",
-          items: [
-            "board_specific/stm32",
-            "board_specific/io_mapping_and_shields",
-          ],
-        },
-        {
-          label: "Miscellaneous",
-          items: [
-            "misc/dev_best_practices",
-            "misc/ci",
-            "misc/lost_and_found",
-            "misc/release_cycle",
-            "misc/managing-a-release",
-            "misc/emulators",
-            "misc/terminal_config",
-            "misc/openocd",
-            "misc/how_to_doc",
-          ],
-        },
-        {
-          label: "Changelog",
-          link: "changelog",
-        },
-      ],
       customCss: ["./src/styles/custom.css", "./src/fonts/font-face.css"],
       logo: {
         src: "./src/assets/riot-logo.svg",
         replacesTitle: true,
       },
-      plugins: [starlightImageZoom()],
+      plugins: [
+        starlightImageZoom(),
+        starlightSidebarTopics([
+          {
+            label: "Introduction",
+            link: "/",
+            id: "introduction",
+            icon: "open-book",
+            items: [
+              {
+                label: "Code of Conduct",
+                collapsed: true,
+                items: [
+                  "general/code_of_conduct",
+                  "general/code_of_conduct/faq",
+                  "general/code_of_conduct/reporting",
+                ],
+              },
+              {
+                label: "RIOT in a Nutshell",
+                items: [
+                  { label: "Introduction", slug: "index" },
+                  "general/structure",
+                  "general/vision",
+                ],
+              },
+              {
+                label: "Getting Started",
+                link: "/getting-started/installing/",
+              },
+              {
+                label: "Supported Boards",
+                link: "boards",
+              },
+              {
+                label: "Supported CPUs",
+                link: "cpus",
+              },
+              {
+                label: "Changelog",
+                link: "changelog",
+              },
+              {
+                label: "External Documentation",
+                items: [
+                  {
+                    label: "API Documentation",
+                    link: "https://api.riot-os.org",
+                    badge: { text: "Doxygen", variant: "note" },
+                  },
+                  {
+                    label: "Rust Documentation",
+                    link: "https://api.riot-os.org/rustdoc/latest/riot_doc_helpers/",
+                    badge: { text: "Rustdoc", variant: "note" },
+                  },
+                ],
+              },
+            ],
+          },
+
+          {
+            label: "Using RIOT",
+            link: "/getting-started/installing/",
+            icon: "seti:notebook",
+            items: [
+              {
+                label: "Getting Started",
+                items: [
+                  "getting-started/install-wsl",
+                  "getting-started/installing",
+                  "getting-started/flashing",
+                  "getting-started/building_example",
+                  "getting-started/finding_modules",
+                ],
+              },
+              {
+                label: "Basics",
+                items: [
+                  "c_tutorials/create_project",
+                  "c_tutorials/timers",
+                  "c_tutorials/shell",
+                  "c_tutorials/threads",
+                  "c_tutorials/gpio",
+                  "c_tutorials/saul",
+                ],
+              },
+              {
+                label: "Networking",
+                items: ["networking/coap"],
+              },
+              {
+                label: "Advanced",
+                items: [
+                  "advanced_tutorials/creating_application",
+                  "advanced_tutorials/unittests",
+                  "advanced_tutorials/event_queue",
+                ],
+              },
+              {
+                label: "Other Languages",
+                items: [
+                  "cpp_tutorials/using_cpp",
+
+                  "rust_tutorials/rust_in_riot",
+                  "rust_tutorials/create_project",
+                ],
+              },
+              {
+                label: "Build System",
+                items: [
+                  "build-system/build_system",
+                  "build-system/build_system_basics",
+                  "build-system/kconfig",
+                  "build-system/flashing",
+                  "build-system/build-in-docker",
+                  "build-system/advanced_build_system_tricks",
+                  "build-system/debugging_aids",
+                  "build-system/static_analysis",
+                ],
+              },
+              {
+                label: "Board Specific",
+                items: [
+                  "board_specific/stm32",
+                  "board_specific/io_mapping_and_shields",
+                ],
+              },
+              {
+                label: "Miscellaneous",
+                items: [
+                  "misc/emulators",
+                  "misc/terminal_config",
+                  "misc/openocd",
+                  "misc/dev_best_practices",
+                ],
+              },
+            ],
+          },
+          {
+            label: "Developing RIOT",
+            link: "/general/contributing/",
+            icon: "seti:git",
+            items: [
+              {
+                label: "Contributing",
+                items: [
+                  "general/contributing",
+                  "c_tutorials/coding_conventions",
+                  "cpp_tutorials/coding_conventions",
+                  "general/governance",
+                  "general/security",
+                  "general/ai_policy",
+                ],
+              },
+              {
+                label: "New Features",
+                items: [
+                  "advanced_tutorials/creating_modules",
+                  "advanced_tutorials/porting_boards",
+                  "advanced_tutorials/porting_packages",
+                  "advanced_tutorials/device_drivers",
+                  "misc/how_to_doc",
+                ],
+              },
+              {
+                label: "Maintaining RIOT",
+                items: [
+                  "misc/ci",
+                  "misc/lost_and_found",
+                  "misc/release_cycle",
+                  "misc/managing-a-release",
+                ],
+              },
+            ],
+          },
+        ],
+      {
+        topics: {
+          introduction: [
+            "/cpus/**",
+            "/boards/**",
+            "/changelog/**",
+            "/test/**"
+          ]
+        }
+      }),
+      ],
       editLink: {
         baseUrl: "https://github.com/RIOT-OS/RIOT/tree/master/doc/guides",
       },
@@ -217,6 +266,7 @@ export default defineConfig({
   ],
   redirects: {
     "/misc/io_mapping_and_shields": "/board_specific/io_mapping_and_shields",
+    "/c_tutorials/coap": "/networking/coap",
   },
   vite: {
     server: {
