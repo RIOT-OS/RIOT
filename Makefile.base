@@ -2,6 +2,8 @@ ifeq (, $(__RIOTBUILD_FLAG))
   $(error You cannot build a module on its own. Use "make" in your application directory instead.)
 endif
 
+include $(RIOTBUILD_CFLAGS_MK)
+
 #
 # enable second expansion of prerequisites.
 #

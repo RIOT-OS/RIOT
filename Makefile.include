@@ -106,6 +106,9 @@ ifeq ($(INSIDE_DOCKER),0)
   ifeq ($(origin EXTERNAL_PKG_DIRS),command line)
     $(error EXTERNAL_PKG_DIRS must be passed as environment variable, and not as command line argument)
   endif
+  HOSTTOOLS_DIR := $(BUILD_DIR)/hosttools/docker
+else
+  HOSTTOOLS_DIR := $(BUILD_DIR)/hosttools/native
 endif
 
 # Deprecation of configuring 'RIOTBOARD'
@@ -265,6 +268,7 @@ include $(RIOTMAKE)/info.inc.mk
 include $(RIOTMAKE)/scan-build.inc.mk
 
 export RIOTBUILD_CONFIG_HEADER_C = $(BINDIR)/riotbuild/riotbuild.h
+export RIOTBUILD_CFLAGS_MK := $(BINDIR)/riotbuild/cflags.mk
 
 ifeq ($(OS),Darwin)
   OPEN   := open
@@ -1069,36 +1073,37 @@ endif
 # Include desvirt Makefile
 include $(RIOTTOOLS)/desvirt/Makefile.desvirt
 
-# Build a header file with all common macro definitions and undefinitions
-# Everytime the header is updated, it will trigger a new compilation.
-#
-# The file is created first through a `.in` file that will be modified if
-# any CFLAGS changed. It depends on FORCE to re-run of the script every time
-# even if the file exists but the file will only be updated on modifications.
-#
-# The header is then created by keeping only the macros. Keeping the
-# comments added absolute path in the file that screwed caching.
-#
-# The rebuild behavior could even only be done with an empty file, but currently
-# some macros definitions are passed through this file.
-$(RIOTBUILD_CONFIG_HEADER_C): $(RIOTBUILD_CONFIG_HEADER_C).in
-	$(Q)sed -n -e '1i\
-/* Generated file do not edit */' -e '/^#.*/ p' $< > $@
+GENCONFIGHEADER := $(HOSTTOOLS_DIR)/genconfigheader
 
-.SECONDARY: $(RIOTBUILD_CONFIG_HEADER_C).in
-$(RIOTBUILD_CONFIG_HEADER_C).in: FORCE | $(CLEAN)
-	@mkdir -p '$(dir $@)'
-	$(Q)'$(RIOTTOOLS)/genconfigheader/genconfigheader.sh' $(CFLAGS_WITH_MACROS) \
-		| '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
+$(GENCONFIGHEADER): $(RIOTTOOLS)/genconfigheader/src/main.rs $(RIOTTOOLS)/genconfigheader/riotbuild-prefix.h
+	cargo build \
+		--locked \
+		--release \
+		--manifest-path "$(RIOTTOOLS)/genconfigheader/Cargo.toml" \
+		--target-dir "$(HOSTTOOLS_DIR)/genconfigheader-target" \
+		#
+	cp "$(HOSTTOOLS_DIR)/genconfigheader-target/release/genconfigheader" \
+		"$@"
 
-CFLAGS_WITH_MACROS += $(CFLAGS)
-CFLAGS_WITH_MACROS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
-CFLAGS_WITH_MACROS += -DRIOT_VERSION_CODE=$(RIOT_VERSION_CODE)
+# Build a header file with all common macro definitions and undefinitions and
+# `cflags.mk` file that defines `CFALGS := ...` with all the `CFLAGS` that are
+# not macro definitions and undefinitions.
+#
+# Everytime the header is updated, it will trigger a new compilation of all
+# objects, as they depend on the generated `riotbuild.h`. The tool will
+# regenerate both files whenever the SHA256 hash of the `CFLAGS` changed
+# compared to the hash stored at the end of `riotbuild.h`.
+$(RIOTBUILD_CONFIG_HEADER_C) $(RIOTBUILD_CFLAGS_MK) &: FORCE | $(CLEAN) $(GENCONFIGHEADER)
+	@mkdir -p '$(dir $(RIOTBUILD_CONFIG_HEADER_C))'
+	$(Q)'$(GENCONFIGHEADER)' '$(RIOTBUILD_CONFIG_HEADER_C)' '$(RIOTBUILD_CFLAGS_MK)'
+
+CFLAGS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
+CFLAGS += -DRIOT_VERSION_CODE=$(RIOT_VERSION_CODE)
 ifneq (,$(RIOT_VERSION_EXTRA))
-  CFLAGS_WITH_MACROS += -DCONFIG_RIOT_VERSION_EXTRA=\""$(RIOT_VERSION_EXTRA)"\"
+  CFLAGS += -DCONFIG_RIOT_VERSION_EXTRA=\""$(RIOT_VERSION_EXTRA)"\"
 endif
 # MODULE_NAME defines. Declared in 'makefiles/modules.inc.mk'
-CFLAGS_WITH_MACROS += $(EXTDEFINES)
+CFLAGS += $(EXTDEFINES)
 
 CFLAGS += -include '$(RIOTBUILD_CONFIG_HEADER_C)'
 

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2024 Otto-von-Guericke-Universität Magdeburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2024 Otto-von-Guericke-Universität Magdeburg
+ * SPDX-FileCopyrightText: 2026 Marian Buschsieweke
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+#pragma once
 
 /**
  * @defgroup    config_riotbuild    riotbuild.h: Preprocessor Constants to Query the Build System Configuration
