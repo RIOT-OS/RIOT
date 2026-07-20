@@ -206,6 +206,7 @@ typedef struct {
  * @return Messaging state object pointer
  */
 static inline void* unicoap_memo_messaging_state(unicoap_memo_t* memo) {
+    (void)memo;
 #if UNICOAP_HAVE_MESSAGING_STATE
     return memo->messaging.state;
 #else
