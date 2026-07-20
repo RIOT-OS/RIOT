@@ -717,6 +717,11 @@ void unicoap_assist_emit_diagnostic_missing_driver(unicoap_proto_t proto) {
                            FIXIT("USEMODULE += unicoap_driver_dtls"));
             break;
 
+        case UNICOAP_PROTO_SLIPMUX:
+            unicoap_assist(API_ERROR("CoAP over Slipmux driver missing")
+                           FIXIT("USEMODULE += unicoap_driver_slipmux"));
+            break;
+
         default:
             break;
         }
