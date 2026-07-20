@@ -216,14 +216,13 @@ int unicoap_uri_populate(uri_parser_result_t* parsed, unicoap_endpoint_t* endpoi
                           "Programmer error: IPv6 size mismatch");
 
 #  else /* if SOCK_HAS_IPV6 && IS_USED(MODULE_IPV6_ADDR) */
-            _URI_DEBUG("cannot read IPv6 literal, SOCK_HAS_IPV6 ipv6_addr)\n");
+            _URI_DEBUG("cannot read IPv6 literal, SOCK_HAS_IPV6/ipv6_addr missing\n");
             return -EINVAL;
 
 #  endif /* if SOCK_HAS_IPV6 && IS_USED(MODULE_IPV6_ADDR) */
         }
         else {
             if (parsed->host && (parsed->host_len > 0)) {
-
 #  if SOCK_HAS_IPV4 && IS_USED(MODULE_IPV4_ADDR)
                 /* _sock_tl_ep always has v4 support */
                 ipv4_addr_t *v4 = NULL;
