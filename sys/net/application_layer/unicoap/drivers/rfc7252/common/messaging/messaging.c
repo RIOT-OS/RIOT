@@ -312,6 +312,7 @@ void unicoap_messaging_notify_rfc7252(void* state, unicoap_layer_notification_t 
         || (type == UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE)) {
         MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "[NOTIF] exchange layer released state\n",
                              transmission->id);
+        transmission->exchange = NULL;
         /* TODO: Advanced features: cannot _always_ release transmission if exchange layer releases. */
         /* For example, if we never see an ACK for a CON request,
          * but then get response (CON or NON), the exchange layer will handle the response and
@@ -823,7 +824,8 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
             MESSAGING_7252_DEBUG("created <carbon_copy size=%i>\n", res);
             transmission->pdu_size = res;
         }
-        if (transmission->exchange = exchange) {
+        transmission->exchange = exchange;
+        if (exchange) {
             unicoap_exchange_notify(exchange,
                                     UNICOAP_LAYER_NOTIFICATION_STATE_ALLOC, transmission);
         }
