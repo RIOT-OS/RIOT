@@ -212,6 +212,7 @@ the `tools-buildtest`.
 [deploy-guides]: https://github.com/RIOT-OS/RIOT/actions/workflows/deploy-guides.yml
 [first-contribution]: https://github.com/RIOT-OS/RIOT/actions/workflows/first-contribution.yml
 [labeler]: https://github.com/RIOT-OS/RIOT/actions/workflows/labeler.yml
+[pr-ai-disclosure]: https://github.com/RIOT-OS/RIOT/actions/workflows/pr-ai-disclosure.yml
 [release-test]: https://github.com/RIOT-OS/RIOT/actions/workflows/release-test.yml
 [static-test]: https://github.com/RIOT-OS/RIOT/actions/workflows/static-test.yml
 [sync-codeberg]: https://github.com/RIOT-OS/RIOT/actions/workflows/sync_codeberg.yml
@@ -221,6 +222,9 @@ the `tools-buildtest`.
 [tools-test]: https://github.com/RIOT-OS/RIOT/actions/workflows/tools-test.yml
 
 [commit-msg script]: https://github.com/RIOT-OS/RIOT/blob/master/dist/tools/commit-msg/check.sh
+[Doxygen]: https://github.com/RIOT-OS/RIOT/blob/master/dist/tools/doccheck/check.sh
+[Vera++]: https://github.com/RIOT-OS/RIOT/tree/master/dist/tools/vera%2B%2B
+[Coccinelle]: https://github.com/RIOT-OS/RIOT/tree/master/dist/tools/coccinelle
 [50/72 rule]: https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 [pr\_check script]: https://github.com/RIOT-OS/RIOT/blob/master/dist/tools/pr_check/check.sh
 [check-labels-action]: https://github.com/RIOT-OS/check-labels-action
