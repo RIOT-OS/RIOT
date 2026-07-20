@@ -133,7 +133,6 @@ export default defineConfig({
                 "c_tutorials/threads",
                 "c_tutorials/gpio",
                 "c_tutorials/saul",
-                "c_tutorials/coap",
                 "c_tutorials/coding_conventions",
               ],
             },
@@ -150,6 +149,13 @@ export default defineConfig({
                 "rust_tutorials/rust_in_riot",
                 "rust_tutorials/create_project",
               ],
+            },
+            {
+              label: "Networking",
+              items: [
+                "networking/rpl",
+                "networking/coap",
+              ]
             },
             {
               label: "Advanced",
@@ -217,6 +223,7 @@ export default defineConfig({
   ],
   redirects: {
     "/misc/io_mapping_and_shields": "/board_specific/io_mapping_and_shields",
+    "/c_tutorials/coap": "/networking/coap",
   },
   vite: {
     server: {
