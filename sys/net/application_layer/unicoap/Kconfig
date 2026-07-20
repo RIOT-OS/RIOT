@@ -92,12 +92,12 @@ menu "CoAP Unified Suite (unicoap)"
             help
                  Instructs the transport drivers to retrieve the local endpoint a PDU arrives at.
 
-        config UNICOAP_CLIENT_CANCELLABLE
+        config unicoap_cancel_requestLABLE
             bool "Enable cancellable requests"
             depends on USEMODULE_UNICOAP_CLIENT
             default n
             help
-                Allows cancelling pending requests using unicoap_client_cancel.
+                Allows cancelling pending requests using unicoap_cancel_request.
 
     endmenu
 
