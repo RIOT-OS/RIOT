@@ -36,6 +36,7 @@
 /* forward declarations, implementation is in net/coap */
 void slipdev_setup_net(slipdev_t *dev, uint8_t index);
 void slipdev_setup_coap(slipdev_t *dev);
+void slipdev_coap_dispatch_recv(event_t *event);
 
 /* For synchronization between stdio/config/net threads */
 mutex_t slipdev_mutex = MUTEX_INIT;
@@ -65,7 +66,7 @@ static inline void _slipdev_config_end_frame(slipdev_t *dev)
 {
 #ifdef MODULE_SLIPDEV_CONFIG
     crb_end_chunk(&dev->rb_config, true);
-    thread_flags_set(thread_get(dev->coap_server_pid), 1);
+    slipdev_coap_dispatch_recv(&dev->rxevent);
 #else
     (void)dev;
 #endif
