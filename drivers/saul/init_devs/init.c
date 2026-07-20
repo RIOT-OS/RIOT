@@ -359,6 +359,10 @@ void saul_init_devs(void)
         extern void auto_init_tmp00x(void);
         auto_init_tmp00x();
     }
+    if (IS_USED(MODULE_TMP117)) {
+        extern void auto_init_tmp117(void);
+        auto_init_tmp117();
+    }
     if (IS_USED(MODULE_TSL2561)) {
         extern void auto_init_tsl2561(void);
         auto_init_tsl2561();
