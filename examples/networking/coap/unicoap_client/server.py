@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 # SPDX-FileCopyrightText: Christian Amsüss and the aiocoap contributors
-#
 # SPDX-License-Identifier: MIT
 
 """This is a usage example of aiocoap that demonstrates how to implement a
@@ -13,6 +12,10 @@ import logging
 
 import asyncio
 
+import os
+os.environ["AIOCOAP_DTLSSERVER_ENABLED"] = "1"
+
+from argparse import ArgumentParser
 import aiocoap.resource as resource
 from aiocoap.numbers.contentformat import ContentFormat
 import aiocoap
@@ -150,6 +153,27 @@ logging.getLogger("coap-server").setLevel(logging.DEBUG)
 
 
 async def main():
+    parser = ArgumentParser()
+
+    parser.add_argument(
+        "-p", "--port",
+        help='Port number (default: 5683)',
+        required=False,
+        default=5683)
+
+    parser.add_argument(
+        "-i", "--interface",
+        help='Interface (e.g., tap0)',
+        required=False)
+
+    args = parser.parse_args()
+
+    addr = "::"
+    if args.interface != None:
+        addr = os.popen("ip addr show " + args.interface).read().split("inet6 ")[1].split("/")[0]
+        addr += "%" + args.interface
+        print("server bound to tap interface " + addr)
+
     # Resource tree creation
     root = resource.Site()
 
@@ -162,12 +186,10 @@ async def main():
     root.add_resource(["other", "separate"], SeparateLargeResource())
     root.add_resource(["whoami"], WhoAmI())
 
-    port = 5683
-    if len(sys.argv) >= 2:
-        port = int(sys.argv[1])
+    port = args.port
 
     print(f"using {port=}")
-    protocol = await aiocoap.Context.create_server_context(bind=("::", port), site=root)
+    protocol = await aiocoap.Context.create_server_context(bind=(addr, port), site=root)
     protocol.server_credentials.load_from_dict(
         {'coaps://*': {'dtls': {
             'psk': b'secretPSK',

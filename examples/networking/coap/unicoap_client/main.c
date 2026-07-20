@@ -137,8 +137,10 @@ static int _cli(int argc, char** argv) {
     }
 
     /* Prepare request message. */
+    UNICOAP_OPTIONS_ALLOC_STATIC(options, 60);
+    unicoap_options_clear(&options);
     unicoap_message_t request;
-    unicoap_request_init_string(&request, (unicoap_method_t)method, payload);
+    unicoap_request_init_string_with_options(&request, (unicoap_method_t)method, payload, &options);
 
     /* Set destination to URI passed over CLI. */
     unicoap_destination_t destination = unicoap_destination_uri_string(uri);
