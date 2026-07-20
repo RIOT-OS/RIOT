@@ -130,7 +130,7 @@ static void _test_long_with_string(bool match_subtree) {
     printf("'%.*s'\n", (int)res, test_buffer);
 
     printf("'");
-    unicoap_path_print(&r.path);
+    unicoap_print_path(&r.path);
     printf("'\n");
     */
 

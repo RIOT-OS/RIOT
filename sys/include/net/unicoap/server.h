@@ -190,7 +190,7 @@ ssize_t unicoap_path_stringify(const unicoap_pathspec_t* path, char* buffer, siz
  *
  * @note The path can be of arbitrary length.
  */
-void unicoap_path_print(const unicoap_pathspec_t* path);
+void unicoap_print_path(const unicoap_pathspec_t* path);
 /** @} */
 
 #ifndef DOXYGEN
@@ -424,6 +424,13 @@ struct unicoap_resource {
      */
     unicoap_proto_set_t protocols;
 };
+
+/**
+ * @brief Prints CoAP resource definition properties
+ *
+ * @param resource CoAP resource
+ */
+void unicoap_print_resource(const unicoap_resource_t* resource);
 /** @} */
 
 /* MARK: - Resource discovery */
@@ -638,12 +645,6 @@ static inline bool unicoap_resource_match_path_string(const unicoap_resource_t* 
  *
  * @param[in] resource Resource to check for matching path
  * @param[in] options Options to read URI path from
- *
- * @remark
- * If you want to call this function in a loop, consider reading the Uri-Path with
- * @ref unicoap_options_t::unicoap_options_copy_uri_path and then calling
- * @ref unicoap_resource_match_path_string repeatedly. This is useful when you want to match a
- * given request against a number of resources.
  *
  * This function obeys the @ref UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE flag.
  *

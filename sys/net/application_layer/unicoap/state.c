@@ -224,15 +224,10 @@ void unicoap_listener_register(unicoap_listener_t* listener) {
     for (unsigned int i = 0; i < listener->resource_count; i += 1) {
         if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
             if (!listener->resources[i].methods) {
-                char path[CONFIG_UNICOAP_PATH_LENGTH_MAX];
-                ssize_t length =
-                    unicoap_path_stringify(&listener->resources[i].path, path, sizeof(path));
-                if (length < 0) {
-                    continue;
-                }
-                unicoap_assist(API_WARNING("resource '%.*s' is inaccessible")
-                               FIXIT("Set .methods"),
-                               (int)length, path);
+                unicoap_print_resource(&listener->resources[i]);
+                printf(":\n");
+                unicoap_assist(API_WARNING("resource definition is inaccessible")
+                               FIXIT("Set .methods"));
             }
 
             /* TODO: Advanced features: emit warnings */
@@ -476,7 +471,7 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
 
                     if (IS_ACTIVE(ENABLE_DEBUG)) {
                         _SERVER_DEBUG("<");
-                        unicoap_path_print(&resource->path);
+                        unicoap_print_path(&resource->path);
                         DEBUG("%s>: found\n",
                               (*resource_ptr)->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE ? "/**" : "");
                     }
@@ -494,7 +489,7 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
             switch (ret) {
                 case UNICOAP_STATUS_METHOD_NOT_ALLOWED:
                     _SERVER_DEBUG("<");
-                    unicoap_path_print(&(*resource_ptr)->path);
+                    unicoap_print_path(&(*resource_ptr)->path);
                     DEBUG("%s>: method %s not allowed\n",
                           (*resource_ptr)->flags & UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE ? "/**" : "",
                           unicoap_string_from_method(unicoap_request_get_method(packet->message)));
@@ -540,7 +535,7 @@ void unicoap_print_listeners(void) {
                 const unicoap_resource_t* resource = &listener->resources[k];
 
                 printf("\t\t\t\t- resource #%" PRIuSIZE " ", k);
-                unicoap_path_print(&resource->path);
+                unicoap_print_path(&resource->path);
                 printf("\n");
 
                 printf("\t\t\t\t\t- flags=");

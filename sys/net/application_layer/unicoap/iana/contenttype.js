@@ -3,7 +3,7 @@
 // https://www.iana.org/assignments/core-parameters/core-parameters.xhtml#content-formats
 //
 // Copy and run this script in your web inspector, then copy into sys/include/net/unicoap/constants.h
-// into the unicoap_options_t enum.
+// into the unicoap_option_number_t enum.
 //
 // The script also adds cross-references to the documentation comment.
 [...document.querySelectorAll("#table-content-formats > tbody > tr")]

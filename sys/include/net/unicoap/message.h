@@ -323,8 +323,6 @@ typedef struct {
         /** @brief RFC 7252 message ID */
         uint16_t id;
     } rfc7252;
-
-    /** @brief CoAP message token */
 } unicoap_message_properties_t;
 
 /**
@@ -1146,7 +1144,7 @@ typedef struct {
  *
  * As `unicoap` cannot guarantee you won't add/insert/remove options later, @p cursor is not
  * qualified by `const`. That hypothetical `const` depends on your usage of the message and its
- * options. That hypothetical `const` depends on your usage of the message and its options.
+ * options.
  */
 ssize_t unicoap_pdu_parse_options_and_payload(uint8_t* cursor, const uint8_t* end,
                                               unicoap_message_t* message);

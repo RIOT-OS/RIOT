@@ -203,25 +203,6 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
 #endif
 
 /**
- * @brief Maximum length of a resource path string. Used for request matching.
- *
- * **Default**: 64 characters
- *
- * Normally, you could match a request's path against all resources' paths by comparing
- * the individual `Uri-Path` options present in the request. Re-parsing the options for each
- * resource the server hosts becomes expensive fast. Therefore, unicoap serializes the `Uri-Path`
- * and then does consecutive`strncmp` calls.
- *
- * @see @ref unicoap_resource_match_path_string and @ref unicoap_resource_match_path_options
- */
-#if !defined(CONFIG_UNICOAP_PATH_LENGTH_MAX) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_PATH_LENGTH_MAX (64)
-#endif
-
-static_assert(CONFIG_UNICOAP_PATH_LENGTH_MAX > 0,
-              "CONFIG_UNICOAP_PATH_LENGTH_MAX is zero: Path buffer too small");
-
-/**
  * @brief Maximum size of `/.well-known/core` payload.
  *
  * **Default**: 120 bytes
