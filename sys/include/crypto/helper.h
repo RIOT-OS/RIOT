@@ -16,33 +16,40 @@
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  */
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+
+#include "compiler_hints.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief Increment a counter encoded in an 16 octet block. The counter is
- *        encoded from the least significant bit in the following form:
- *        block[15-L..15])
+ * @brief   Increment a counter encoded in an 16 octet block.
  *
- * @param block     encoded block
- * @param L         length of counter
+ * The counter is encoded from the least significant bit in the following form:
+ * `block[15-L..15]`.
+ *
+ * @param[in,out]   block   encoded block
+ * @param[in]       ctr_len length of counter
  */
-void crypto_block_inc_ctr(uint8_t block[16], int L);
+void crypto_block_inc_ctr(uint8_t block[16], size_t ctr_len);
 
 /**
  * @brief   Compares two blocks of same size in deterministic time.
  *
- * @param a     block a
- * @param b     block b
- * @param len   size of both blocks
+ * @param[in]       a       block a
+ * @param[in]       b       block b
+ * @param[in]       len     size of both blocks
  *
- * @returns 0 iff the blocks are non-equal.
+ * @retval          true    blocks are equal
+ * @retval          false   blocks differ
  */
-int crypto_equals(const uint8_t *a, const uint8_t *b, size_t len);
+ACCESS(read_only, 1, 3)
+ACCESS(read_only, 2, 3)
+bool crypto_equals(const uint8_t *a, const uint8_t *b, size_t len);
 
 /**
  * @brief   Secure wipe function.
@@ -54,9 +61,10 @@ int crypto_equals(const uint8_t *a, const uint8_t *b, size_t len);
  * remanence) attacks. It is outside the scope of this function to thoroughly
  * shred the memory area.
  *
- * @param[in]   buf     buffer to wipe
- * @param[in]   len     size of the buffer in bytes
+ * @param[in]       buf     buffer to wipe
+ * @param[in]       len     size of the buffer in bytes
  */
+ACCESS(write_only, 1, 2)
 void crypto_secure_wipe(void *buf, size_t len);
 
 #ifdef __cplusplus

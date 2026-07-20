@@ -18,12 +18,13 @@
 #include "crypto/helper.h"
 #include "crypto/modes/ctr.h"
 
-int cipher_encrypt_ctr(const cipher_t *cipher, uint8_t nonce_counter[16],
-                       uint8_t nonce_len, const uint8_t *input, size_t length,
-                       uint8_t *output)
+ssize_t cipher_encrypt_ctr(const cipher_t *cipher, uint8_t nonce_counter[16],
+                           uint8_t nonce_len, const uint8_t *input, size_t length,
+                           uint8_t *output)
 {
     size_t offset = 0;
-    uint8_t stream_block[16] = { 0 }, block_size;
+    uint8_t stream_block[16] = { 0 };
+    uint8_t block_size;
 
     block_size = cipher_get_block_size(cipher);
     do {
@@ -43,12 +44,12 @@ int cipher_encrypt_ctr(const cipher_t *cipher, uint8_t nonce_counter[16],
         crypto_block_inc_ctr(nonce_counter, block_size - nonce_len);
     } while (offset < length);
 
-    return offset;
+    return (ssize_t)offset;
 }
 
-int cipher_decrypt_ctr(const cipher_t *cipher, uint8_t nonce_counter[16],
-                       uint8_t nonce_len, const uint8_t *input, size_t length,
-                       uint8_t *output)
+ssize_t cipher_decrypt_ctr(const cipher_t *cipher, uint8_t nonce_counter[16],
+                           uint8_t nonce_len, const uint8_t *input, size_t length,
+                           uint8_t *output)
 {
     return cipher_encrypt_ctr(cipher, nonce_counter, nonce_len, input,
                               length, output);

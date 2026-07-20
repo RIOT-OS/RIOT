@@ -12,16 +12,20 @@
  * @file        ocb.h
  * @brief       Offset Codebook (OCB3) AEAD mode as specified in RFC 7253
  *
- * NOTE: The OCB algorithm is covered by patents in the USA owned by Phillip Rogaway.
- * A free licence is granted for any open-source or non-military project.
- * Check http://web.cs.ucdavis.edu/~rogaway/ocb/grant.htm for details.
+ * @warning     The OCB algorithm is covered by patents in the USA
+ *              owned by Phillip Rogaway. A free licence is granted
+ *              for any open-source or non-military project. Check
+ *              http://web.cs.ucdavis.edu/~rogaway/ocb/grant.htm for details.
  *
  * @author      Mathias Tausig <mathias@tausig.at>
  */
 
-#include "crypto/ciphers.h"
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <unistd.h>
+
+#include "compiler_hints.h"
+#include "crypto/ciphers.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,77 +37,99 @@ extern "C" {
  */
 
 /**
- * Returned if a nonce of bad length (empty or more than 15 bytes) was used
+ * @brief   Returned if a nonce of bad length (empty or more than 15 bytes)
+ *          was used
  */
-#define OCB_ERR_INVALID_NONCE_LENGTH        (-2)
+#define OCB_ERR_INVALID_NONCE_LENGTH (-2)
 /**
- * OCB only works with ciphers with a block size of 128 bit
+ * @brief   OCB only works with ciphers with a block size of 128 bit
  */
-#define OCB_ERR_INVALID_BLOCK_LENGTH        (-3)
+#define OCB_ERR_INVALID_BLOCK_LENGTH (-3)
 /**
- * Returned if the amount of input data cannot be handled by this implementation
+ * @brief   Returned if the amount of input data cannot be handled by this
+ *          implementation
  */
-#define OCB_ERR_INVALID_DATA_LENGTH         (-3)
+#define OCB_ERR_INVALID_DATA_LENGTH  (-3)
 /**
- * Returned if a tag of bad length was requested (empty or more than 16 bytes)
+ * @brief   Returned if a tag of bad length was requested (empty or more than
+ *          16 bytes)
  */
-#define OCB_ERR_INVALID_TAG_LENGTH          (-4)
+#define OCB_ERR_INVALID_TAG_LENGTH   (-4)
 /**
- * Returned if the authentication failed during decryption
+ * @brief   Returned if the authentication failed during decryption
  */
-#define OCB_ERR_INVALID_TAG                 (-5)
+#define OCB_ERR_INVALID_TAG          (-5)
 
 /** @} */
 
 /**
- * @brief Encrypt and authenticate data of arbitrary length in OCB mode.
+ * @brief   Encrypt and authenticate data of arbitrary length in OCB mode.
  *
- * @param cipher           Already initialized cipher struct
- * @param auth_data        Additional data to authenticate in MAC
- * @param auth_data_len    Length of additional data
- * @param tag_len       Length of the appended tag (at least 1, at most 16 bytes)
+ * @param[in]   cipher           Already initialized cipher struct
+ * @param[in]   auth_data        Additional data to authenticate in MAC
+ * @param[in]   auth_data_len    Length of @p auth_data in bytes
+ * @param[in]   tag_len          Length of the appended tag
+ * @param[in]   nonce            Nonce for the encryption
+ * @param[in]   nonce_len        Length of @p nonce in bytes
+ * @param[in]   input            pointer to input data to encrypt
+ * @param[in]   input_len        length of @p input in bytes
+ * @param[out]  output           buffer to write the ciphertext and tag to
  *
- * @param nonce            Nonce for the encryption (must be unique)
- * @param nonce_len        Length of the nonce in bytes (at most 15)
- * @param input            pointer to input data to encrypt
- * @param input_len        length of the input data.
- *                         input_len + tag_len must be smaller than INT32_MAX (2^31-1)
- * @param output           pointer to allocated memory for encrypted data.
- *                         The tag will be appended to the ciphertext.
- *                         It has to be of size data_len + tag_len.
- * @return                 Length of the encrypted data (including the tag) or a (negative) error code
+ * @pre         @p nonce has not been used with the same key before
+ * @pre         1 <= @p tag_len <= 16
+ * @pre         (@p input_len + @p tag_len) <= `SSIZE_MAX`
+ * @pre         @p nonce_len <= 15
+ *
+ * @return      Number of bytes written to @p output or negative error code
+ * @retval      OCB_ERR_INVALID_NONCE_LENGTH    @p nonce_len invalid
+ * @retval      OCB_ERR_INVALID_BLOCK_LENGTH    @p cipher incompatible with OCB
+ * @retval      OCB_ERR_INVALID_DATA_LENGTH     @p input_len too large
+ * @retval      OCB_ERR_INVALID_TAG_LENGTH      @p tag_len invalid
  */
-int32_t cipher_encrypt_ocb(const cipher_t *cipher,
+ACCESS(read_only, 2, 3)
+ACCESS(read_only, 5, 6)
+ACCESS(read_only, 7, 8)
+ssize_t cipher_encrypt_ocb(const cipher_t *cipher,
                            const uint8_t *auth_data, size_t auth_data_len,
                            uint8_t tag_len,
                            const uint8_t *nonce, size_t nonce_len,
                            const uint8_t *input, size_t input_len,
-                           uint8_t *output);
+                           uint8_t output[input_len + tag_len]);
 
 /**
- * @brief Decrypt and verify the authentication of OCB encrypted data.
+ * @brief   Decrypt and verify the authentication of OCB encrypted data.
  *
- * @param cipher           Already initialized cipher struct
- * @param auth_data        Additional data to authenticate in MAC
- * @param auth_data_len    Length of additional data
- * @param tag_len       Length of the appended tag (at least 1, at most 16 bytes)
+ * @param[in]   cipher           Already initialized cipher struct
+ * @param[in]   auth_data        Additional data to authenticate in MAC
+ * @param[in]   auth_data_len    Length of @p auth_data in bytes
+ * @param[in]   tag_len          Length of the appended tag at the end of @p input
+ * @param[in]   nonce            Nonce for the encryption
+ * @param[in]   nonce_len        @p length of @p nonce in bytes
+ * @param[in]   input            pointer to the ciphertext with the tag appended
+ * @param[in]   input_len        length of @p input in bytes
+ * @param[out]  output           Buffer to write the plaintext to
  *
- * @param nonce            Nonce for the encryption (must be unique)
- * @param nonce_len        Length of the nonce in bytes (at most 15)
- * @param input            pointer to the ciphertext with the tag appended
- * @param input_len        length of the input data.
- *                         input_len - tag_len must be smaller than INT32_MAX (2^31-1)
- * @param output           pointer to allocated memory for the plaintext data.
- *                         It has to be of size input_len - tag_len.
- *                         Will contain only zeroes, if the authentication fails.
- * @return                 Length of the plaintext data or a (negative) error code
+ * @pre         @p nonce has not been used with the same key before
+ * @pre         1 <= @p tag_len <= 16
+ * @pre         @p input_len >= @p tag_len
+ * @pre         (@p input_len - @p tag_len) <= `SSIZE_MAX`
+ * @pre         @p nonce_len <= 15
+ *
+ * @return      Number of bytes written to @p output or negative error code
+ * @retval      OCB_ERR_INVALID_NONCE_LENGTH    @p nonce_len invalid
+ * @retval      OCB_ERR_INVALID_BLOCK_LENGTH    @p cipher incompatible with OCB
+ * @retval      OCB_ERR_INVALID_DATA_LENGTH     @p input_len too large
+ * @retval      OCB_ERR_INVALID_TAG_LENGTH      @p tag_len invalid
  */
-int32_t cipher_decrypt_ocb(const cipher_t *cipher,
+ACCESS(read_only, 2, 3)
+ACCESS(read_only, 5, 6)
+ACCESS(read_only, 7, 8)
+ssize_t cipher_decrypt_ocb(const cipher_t *cipher,
                            const uint8_t *auth_data, size_t auth_data_len,
                            uint8_t tag_len,
                            const uint8_t *nonce, size_t nonce_len,
                            const uint8_t *input, size_t input_len,
-                           uint8_t *output);
+                           uint8_t output[input_len - tag_len]);
 #ifdef __cplusplus
 }
 #endif
