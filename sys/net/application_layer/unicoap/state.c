@@ -120,7 +120,7 @@ static void _deinit_client(unicoap_client_memo_t* memo) {
     memo->callback._any = NULL;
     memo->callback_arg = NULL;
     memo->flags = 0;
-#if IS_ACTIVE(CONFIG_unicoap_cancel_requestLABLE)
+#if IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION)
     memo->reference_id = 0;
 #endif
 }
@@ -187,7 +187,7 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
 unicoap_client_memo_t* unicoap_client_memo_find_refno(int refno) {
     assert(refno > 0);
     (void)refno;
-#if IS_ACTIVE(CONFIG_unicoap_cancel_requestLABLE)
+#if IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION)
     /* First bit is sign bit, then 3 bits for min index and then 12 bits of randomness.
      * For 16 or fewer memos, we thus don't have to search at all. */
     size_t index_min = (refno & UNICOAP_REFNO_MASK_MIN_INDEX) >> 12;
@@ -207,7 +207,7 @@ unicoap_client_memo_t* unicoap_client_memo_find_refno(int refno) {
 
 int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo) {
     assert(memo);
-#if IS_ACTIVE(CONFIG_unicoap_cancel_requestLABLE)
+#if IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION)
     memo->reference_id = random_uint32_range(1, UINT16_MAX) & 0xfff;
     int refno = memo->reference_id | (MIN(_client_index(memo), 0x7) << 12);
     _STATE_DEBUG("refno=%i (min_client_ix=#%" PRIuSIZE ", refid=%u)\n", refno, MIN(_client_index(memo), 0x7), memo->reference_id);

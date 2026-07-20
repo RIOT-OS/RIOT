@@ -69,11 +69,9 @@ void unicoap_client_callback_failure(unicoap_client_memo_t* memo, int error) {
 
 int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_memo_t* memo) {
     int res = 0;
-    _UNICOAP_CHECKPOINT;
 
     /* TODO: Block-wise */
     res = unicoap_client_callback_success(memo, packet, UNICOAP_BLOCK_OPTION_NONE);
-    _UNICOAP_CHECKPOINT;
 
     unicoap_client_memo_free(memo);
     return res;
@@ -90,7 +88,7 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
     }
     assert(packet->properties.token);
     unicoap_generate_token(packet->properties.token);
-    packet->properties.token_length = sizeof(memo->token);
+    packet->properties.token_length = CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH;
     unicoap_messaging_flags_t messaging_flags = _messaging_flags_client(client_flags);
     if (memo) {
         /* State has been allocated, instruct the messaging layer to track success/failures
@@ -153,7 +151,7 @@ error:
 }
 
 int unicoap_cancel_request(int refno) {
-    if (IS_ACTIVE(CONFIG_unicoap_cancel_requestLABLE)) {
+    if (IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION)) {
         if (refno <= 0) {
             return -EINVAL;
         }
@@ -169,7 +167,7 @@ int unicoap_cancel_request(int refno) {
     } else {
         if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
             unicoap_assist(API_MISUSE("request cancellation not supported")
-                               FIXIT("enable CONFIG_unicoap_cancel_requestLABLE"));
+                               FIXIT("enable unicoap_client_cancellation"));
         }
         return -ENOTSUP;
     }

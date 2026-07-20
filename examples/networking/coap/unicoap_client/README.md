@@ -23,13 +23,13 @@ This will compile and run the application.
 In a second terminal session, you can run
 
 ```sh
-python3 server.py"
+python3 server.py
 ```
 
 Now, you can send CoAP requests from RIOT through the tap interface to the CoAP server. The Python
 script implements the following resources:
 - `/time`: Responds with current timestamp
-- `/other/separate`: Sends response in separate message instead of piggybacking (if request has been
-transmitted reliably over UDP or DTLS at all)
+- `/other/separate`: Sends response in separate message instead of piggybacking
+(if request has beentransmitted reliably over UDP or DTLS at all)
 - `/whoami`: Responds with requester information
 - `/other/block`: Responds with bigger message, supports block-wise transfer (not supported yet)

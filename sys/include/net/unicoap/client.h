@@ -94,6 +94,8 @@ void unicoap_print_client_flags(unicoap_client_flags_t flags);
  * @param[in] aux Auxiliary response information
  * @param error Error if negative, zero if successful
  * @param[in,out] arg Argument supplied to the initial `send_request` function
+ *
+ * @returns Zero on success or negative integer indicating error
  */
 typedef int (*unicoap_response_callback_t)(const unicoap_message_t* response,
                                            const unicoap_aux_t* aux, int error, void* arg);
@@ -216,7 +218,7 @@ static inline int unicoap_send_request(unicoap_message_t* request,
  * @retval -EINVAL Invalid refno
  * @retval -ENOENT No request with given refno is known
  *
- * Requires @ref CONFIG_unicoap_cancel_requestLABLE
+ * Requires @ref net_unicoap_client_cancellation
  * The client callback will be called with `-ECANCELLED`
  */
 int unicoap_cancel_request(int refno);
