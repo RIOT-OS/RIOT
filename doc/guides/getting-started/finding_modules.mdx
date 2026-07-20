@@ -89,6 +89,14 @@ If we look back at our hello world program, we can see that we included the
 USEMODULE += ztimer_sec
 ```
 
+:::tip
+Make sure that `include $(RIOTBASE)/Makefile.include` is the very last line in your `Makefile`.
+This is important because the `Makefile.include` file is responsible for setting up the
+build process and kicks off the dependency resolution. Everything included and defined
+after this line will not be considered by this process and therefore will either
+not work at all, not work as expected and/or cause confusing errors.
+:::
+
 After that we were able to simply include the `ztimer` module in our `main.c`
 file like this:
 
@@ -111,7 +119,7 @@ As previously discussed, RIOT provides some external packages that you can
 include in your application.
 
 You can include a package, for example `mcufont`, by adding this line to your
-`Makefile`:
+`Makefile` (Remember, always *before* `include $(RIOTBASE)/Makefile.include`):
 
 ```makefile
 USEPKG += mcufont
