@@ -315,7 +315,7 @@ static int _copy_callback(const unicoap_message_t *response, const unicoap_aux_t
         }
     }
 
-    mutex_unlock(args->roadblock);
+    mutex_unlock(&args->roadblock);
     return 0;
 }
 
@@ -360,7 +360,7 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
         return res;
     }
     /* Block until callback calls unlock. */
-    mutex_lock(&roadblock);
+    mutex_lock(&args.roadblock);
     return args.res;
 }
 

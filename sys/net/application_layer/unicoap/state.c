@@ -151,9 +151,9 @@ void unicoap_client_memo_free(unicoap_client_memo_t* memo) {
      * not matter to the messaging layer whether we release state because of an error or because
      * the state object is released as usual. Should the messaging layer rely on this
      * information, the exchange-messaging abstraction has a design flaw. */
-    if (memo->messaging.state) {
-        unicoap_messaging_notify(memo->messaging.state, UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE,
-                                 NULL, memo->endpoint.proto);
+    if (unicoap_memo_messaging_state(&memo->super)) {
+        unicoap_messaging_notify(unicoap_memo_messaging_state(&memo->super), 
+            UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE, NULL, proto);
     }
 #endif
     _free(&memo->super);
@@ -185,7 +185,7 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
 
 unicoap_client_memo_t* unicoap_client_memo_find_refno(int refno) {
     assert(refno > 0);
-    (void)memo;
+    (void)refno;
 #if IS_ACTIVE(CONFIG_UNICOAP_CLIENT_CANCELLABLE)
     /* First bit is sign bit, then 3 bits for min index and then 12 bits of randomness.
      * For 16 or fewer memos, we thus don't have to search at all. */

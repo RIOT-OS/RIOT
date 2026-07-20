@@ -273,6 +273,6 @@ int main(void) {
     /* start shell */
     puts("All up, running unicoap client shell, command is 'coap'");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }
