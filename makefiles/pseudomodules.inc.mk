@@ -659,6 +659,7 @@ PSEUDOMODULES += wakaama_objects_%
 PSEUDOMODULES += walltime_default
 PSEUDOMODULES += walltime_impl_ds1307
 PSEUDOMODULES += walltime_impl_ds3231
+PSEUDOMODULES += walltime_impl_max31343
 PSEUDOMODULES += walltime_impl_rtc
 PSEUDOMODULES += wifi_enterprise
 PSEUDOMODULES += wifi_scan_list
