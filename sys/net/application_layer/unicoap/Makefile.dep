@@ -43,16 +43,7 @@ ifneq (,$(filter unicoap_client_uri,$(USEMODULE)))
 endif
 
 ifneq (,$(filter unicoap_client_uri,$(USEMODULE)))
-	# We need URI parsing support with CoAP-specific tricks,
-	# e.g., understanding URI schemes and specific host formats
-	# such as .ble.arpa(.)
   USEMODULE += uri_parser
-
-  # To support UNICOAP_DESTINATION_URI (uses DNS resolution and
-  # UNICOAP_DESTINATION_HOST (uses DNS resolution and Service Binding Records)
-  USEMODULE += dns
-  USEMODULE += sock_dns
-  USEMODULE += sock_async
 endif
 
 # This variable ensures the "Missing server" warning gets printed only once

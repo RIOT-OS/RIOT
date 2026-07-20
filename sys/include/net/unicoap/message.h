@@ -414,13 +414,10 @@ static inline uint8_t unicoap_code_detail(uint8_t code)
 }
 
 /**
- * @brief Prints a `c.dd` class-detail string into the given buffer.
- * @pre @p string must have a capacity of at least 4 characters
+ * @brief Prints a `c.dd` class-detail string
  * @param code Message code
- * @param[out] string Buffer to write string into
- *
  */
-int unicoap_print_code(uint8_t code, char* string);
+int unicoap_print_code(uint8_t code);
 
 /**
  * @brief Returns label for given CoAP message code

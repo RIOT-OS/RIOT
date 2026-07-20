@@ -152,8 +152,8 @@ error:
     return res;
 }
 
-int unicoap_client_cancel(int refno) {
-    if (IS_ACTIVE(CONFIG_UNICOAP_CLIENT_CANCELLABLE)) {
+int unicoap_cancel_request(int refno) {
+    if (IS_ACTIVE(CONFIG_unicoap_cancel_requestLABLE)) {
         if (refno <= 0) {
             return -EINVAL;
         }
@@ -169,7 +169,7 @@ int unicoap_client_cancel(int refno) {
     } else {
         if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
             unicoap_assist(API_MISUSE("request cancellation not supported")
-                               FIXIT("enable CONFIG_UNICOAP_CLIENT_CANCELLABLE"));
+                               FIXIT("enable CONFIG_unicoap_cancel_requestLABLE"));
         }
         return -ENOTSUP;
     }

@@ -147,7 +147,7 @@ typedef int (*unicoap_response_callback_t)(const unicoap_message_t* response,
  * @param callback_arg Optional argument passed to the callback (nullable)
  * @param flags Client flags
  *
- * @returns Zero on success or positive refno if [cancellable requests](@ref unicoap_client_cancel) 
+ * @returns Zero on success or positive refno if [cancellable requests](@ref unicoap_cancel_request) 
  *          are enabled
  * @returns Negative integer on failure
  */
@@ -216,7 +216,7 @@ int unicoap_send_request_sync(unicoap_message_t* request,
  * @param flags Client flags
  * @param[in,out] aux Pre-allocated auxiliary information structure, will be initialized when a response is received successfully
  *
- * @returns Zero on success or positive refno if [cancellable requests](@ref unicoap_client_cancel) are enabled
+ * @returns Zero on success or positive refno if [cancellable requests](@ref unicoap_cancel_request) are enabled
  * @returns Negative integer on failure
  */
 int unicoap_send_request_sync_copy(unicoap_message_t* request,
@@ -252,10 +252,10 @@ static inline int unicoap_send_request(unicoap_message_t* request,
  * @retval -EINVAL Invalid refno
  * @retval -ENOENT No request with given refno is known
  *
- * Requires @ref CONFIG_UNICOAP_CLIENT_CANCELLABLE
+ * Requires @ref CONFIG_unicoap_cancel_requestLABLE
  * The client callback will be called with `-ECANCELLED`
  */
-int unicoap_client_cancel(int refno);
+int unicoap_cancel_request(int refno);
 /** @} */
 
 /** @} */
