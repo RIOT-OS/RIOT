@@ -143,6 +143,7 @@ void unicoap_client_memo_free(unicoap_client_memo_t* memo) {
     /* Mark as unused, such that all the logic below can run without a lock.
       * The messaging layer may need the lock too. */
     unicoap_proto_t proto = memo->super.endpoint.proto;
+    (void)proto;
     memo->super.endpoint.proto = UNICOAP_PROTO_UNSPECIFIED;
     _unlock();
     _deinit_client(memo);
