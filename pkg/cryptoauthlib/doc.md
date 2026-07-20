@@ -116,7 +116,7 @@ In your custom file you can now add a second device to `ATCA_PARAMS`:
 
 Now you just need to add the following to your Makefile:
 
-```Makefile
+```makefile
 CFLAGS += -DCUSTOM_ATCA_PARAMS
 INCLUDES += -I$(APPDIR)
 ```
