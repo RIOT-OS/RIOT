@@ -177,14 +177,13 @@ int unicoap_cancel_request(int refno) {
 
 /* MARK: - URI */
 
-int _unicoap_open_request(unicoap_message_t* request,
+static int _open_request(unicoap_message_t* request,
                           unicoap_destination_t* destination,
-                          void* _callback, void* callback_args,
+                          unicoap_callback_t callback, void* callback_arg,
                           unicoap_client_flags_t flags)
 {
     assert(request);
     assert(destination);
-    unicoap_callback_t callback = { ._any = _callback };
     int res = 0;
     switch (destination->type) {
     case UNICOAP_DESTINATION_URI:
@@ -217,7 +216,7 @@ int _unicoap_open_request(unicoap_message_t* request,
             }
 
             return unicoap_client_send_request_body(request, &endpoint, callback,
-                                                    callback_args, flags);
+                                                    callback_arg, flags);
         }
         else {
             unicoap_assist(API_ERROR("URI passed, but module is missing")
@@ -234,7 +233,7 @@ int _unicoap_open_request(unicoap_message_t* request,
             return res;
         }
         return unicoap_client_send_request_body(request, &endpoint, callback,
-                                                callback_args, flags);
+                                                callback_arg, flags);
 #else  /* IS_USED(MODULE_DNS) */
         unicoap_assist(API_ERROR("cannot resolve FQDN, dns module missing")
                        FIXIT("add USEMODULE += unicoap_client_uri"));
@@ -244,7 +243,7 @@ int _unicoap_open_request(unicoap_message_t* request,
     }
     case UNICOAP_DESTINATION_ENDPOINT:
         return unicoap_client_send_request_body(
-            request, destination->remote.endpoint, callback, callback_args, flags);
+            request, destination->remote.endpoint, callback, callback_arg, flags);
     default:
         _CLIENT_DEBUG("illegal resource identifier type %" PRIu8 "\n", destination->type);
         assert(false);
@@ -258,75 +257,81 @@ typedef struct {
     mutex_t roadblock;
     unicoap_message_t* response;
     unicoap_aux_t* aux;
-    uint8_t* buffer;
-    size_t capacity;
     int res;
 } _sync_copy_args_t;
 
-static inline int _copy(unicoap_message_t* response, uint8_t* buffer, size_t capacity, int error)
-{
-    if (error != 0) {
-        return error;
-    }
-
-    if (capacity <
-        (sizeof(unicoap_options_t) + response->payload_size + response->options->storage_size)) {
-        _CLIENT_DEBUG("no buffer space to copy options and payload, " _UNICOAP_NEED_HAVE "\n",
-                     sizeof(unicoap_options_t) + response->payload_size +
-                         response->options->storage_size,
-                     capacity);
-
-        return -ENOBUFS;
-    }
-
-    /* copy options struct itself */
-    *(unicoap_options_t *)((void *)buffer) = *response->options;
-    response->options = (unicoap_options_t *)((void *)buffer);
-    buffer += sizeof(unicoap_options_t);
-
-    /* copy options */
-    unicoap_options_swap_storage(response->options, buffer, response->options->storage_size);
-    buffer += response->options->storage_size;
-
-    /* copy payload */
-    memcpy(buffer, response->payload, response->payload_size);
-    return 0;
-}
-
-static int _copy_callback(const unicoap_message_t *response, const unicoap_aux_t *aux, int error,
-                          void *_arg)
-{
+static int _copy_callback(const unicoap_message_t* response, const unicoap_aux_t* aux, int error,
+                          void* _arg
+) {
     _sync_copy_args_t *args = _arg;
-    *args->response = *response;
-
-    args->res = _copy(args->response, args->buffer, args->capacity, error);
-    if (args->res < 0) {
-        /* something went wrong, don't hand over some half-baked response
-         * struct with potentially corrupted pointers inside */
-        *args->response = (unicoap_message_t){ 0 };
-        if (args->aux) {
-            *args->aux = (unicoap_aux_t){ 0 };
-        }
-    }
-    else {
-        /* response populated by _copy */
-        if (args->aux) {
-            *args->aux = *aux;
-        }
+    if (error) {
+        goto out;
     }
 
+    args->response->code = response->code;
+
+    unicoap_options_t* dest_options = args->response->options;
+    uint8_t* dest_payload = args->response->payload;
+    size_t dest_payload_capacity = args->response->payload_size;
+    assert(args->response->payload_representation == UNICOAP_PAYLOAD_CONTIGUOUS);
+
+    if (response->options) {
+        if (!dest_options) {
+            _CLIENT_DEBUG("no options buffer provided to copy response options\n");
+            error = -ENOBUFS;
+            goto out;
+        }
+
+        if (unicoap_options_size(response->options) > response->options->storage_capacity) {
+            _CLIENT_DEBUG("no buffer space to copy options, " _UNICOAP_NEED_HAVE "\n",
+                     unicoap_options_size(response->options), dest_options->storage_capacity);
+            error = -ENOBUFS;
+            goto out;
+        }
+
+        uint8_t* storage = dest_options->entries->data;
+        size_t capacity = dest_options->storage_capacity;
+        *dest_options = *response->options;
+        unicoap_options_swap_storage(dest_options, storage, capacity);
+    }
+
+    if (response->payload) {
+        if (!args->response->payload) {
+            _CLIENT_DEBUG("no payload buffer provided\n");
+            error = -ENOBUFS;
+            goto out;
+        }
+
+        if (args->response->payload_size < response->payload_size) {
+            _CLIENT_DEBUG("no buffer space to copy payload, " _UNICOAP_NEED_HAVE "\n",
+                     response->payload_size, dest_payload_capacity);
+        }
+        memcpy(dest_payload, response->payload, response->payload_size);
+    }
+
+    if (args->aux) {
+        if (args->aux->local && aux->local) {
+            *(unicoap_endpoint_t*)args->aux->local = *aux->local;
+        }
+        if (args->aux->remote && aux->remote) {
+            *(unicoap_endpoint_t*)args->aux->remote = *aux->remote;
+        }
+        if (args->aux->properties && aux->properties) {
+            *(unicoap_message_properties_t*)args->aux->properties = *aux->properties;
+        }
+    }
+
+out:
     mutex_unlock(&args->roadblock);
-    return 0;
+    return error;
 }
 
 int unicoap_send_request_sync_copy(unicoap_message_t* request,
                                    unicoap_destination_t* destination,
-                                   unicoap_message_t* response, uint8_t* buffer,
-                                   size_t buffer_capacity, unicoap_client_flags_t flags,
+                                   unicoap_message_t* response, unicoap_client_flags_t flags,
                                    unicoap_aux_t* aux)
 {
-    assert(buffer);
-    assert(buffer_capacity > 0);
+    assert(response);
     assert(response);
 
     /* Prevent this function from deadlocking the unicoap thread. No one besides the unicoap
@@ -350,12 +355,12 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
     _sync_copy_args_t args = (_sync_copy_args_t) {
         .response = response,
         .aux = aux,
-        .buffer = buffer,
-        .capacity = buffer_capacity 
     };
     mutex_init_locked(&args.roadblock);
 
-    int res = _unicoap_open_request(request, destination, _copy_callback, &args, flags);
+    int res = _open_request(request, destination,
+        (unicoap_callback_t) { .response = _copy_callback }, &args, flags);
+
     if (res < 0) {
         return res;
     }
@@ -409,11 +414,21 @@ int unicoap_send_request_sync(unicoap_message_t* request,
         (_args_t){ .callback = callback, .caller_arg = callback_arg };
     mutex_init_locked(&args.roadblock);
 
-    int res = _unicoap_open_request(request, destination, _sync_callback, &args, flags);
+    int res = _open_request(request, destination, 
+        (unicoap_callback_t) { .response = _sync_callback }, &args, flags);
+
     if (res < 0) {
         return res;
     }
     /* Block until callback calls unlock. */
     mutex_lock(&args.roadblock);
     return args.res < 0 ? args.res : 0;
+}
+
+int unicoap_send_request_async(unicoap_message_t* request,
+                               unicoap_destination_t* destination,
+                               unicoap_response_callback_t callback, void* callback_arg,
+                               unicoap_client_flags_t flags) {
+    return _open_request(request, destination, 
+        (unicoap_callback_t) { .response = callback }, callback_arg, flags);
 }
