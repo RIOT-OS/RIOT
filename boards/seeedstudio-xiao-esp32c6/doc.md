@@ -99,7 +99,7 @@ switch accordingly at startup.
 To use the external U.FL antenna instead, enable the
 `CONFIG_XIAO_ESP32C6_EXT_ANTENNA` option, for example by adding
 the following line to the application's Makefile:
-```Makefile
+```makefile
 CFLAGS += -DCONFIG_XIAO_ESP32C6_EXT_ANTENNA=1
 ```
 

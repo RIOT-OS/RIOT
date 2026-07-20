@@ -12,17 +12,23 @@ module.
 
 @author      Gunar Schorcht <gunar@schorcht.net>
 
-ESP32 provides an <b>Ethernet MAC layer module (EMAC)</b> according to the IEEE 802.3 standard which can be used together with an external physical layer chip (PHY) to realize a 100/10 Mbps Ethernet interface. Supported PHY chips are the Microchip LAN8710/LAN8720, the IC Plus 101G, and the Texas Instruments TLK110.
+The ESP32 provides an <b>Ethernet MAC layer module (EMAC)</b> according to the
+IEEE 802.3 standard which can be used together with an external physical layer
+chip (PHY) to realize a 100/10 Mbps Ethernet interface. Supported PHY chips are
+the Microchip LAN8710/LAN8720, the IC Plus 101G, and the Texas Instruments TLK110.
 
-The RIOT port for ESP32 realizes with module ```esp_eth``` a ```netdev``` driver for the EMAC which uses RIOT's standard Ethernet interface.
+The RIOT port for ESP32 realizes the Ethernet support with the `esp_eth` module,
+which is a `netdev` driver for the EMAC which uses RIOT's standard Ethernet interface.
 
-If the board has one of the supported PHY layer chips connected to the ESP32, the ```esp_eth``` module should be enabled by default in board's ```Makefile.dep``` when module ```netdev_default``` is used.
-```
+If the board has one of the supported PHY layer chips connected to the ESP32,
+the `esp_eth` module should be enabled by default in board's `Makefile.dep`
+when the `netdev_default` module is used.
+```makefile
 ifneq (,$(filter netdev_default,$(USEMODULE)))
     USEMODULE += esp_eth
 endif
 ```
-Otherwise, the application has to add the ```esp_eth``` module in its makefile when needed.
+Otherwise, the application has to add the `esp_eth` module in its Makefile when needed.
 
-@note
-The board has to have one of the supported PHY modules to be able to use the Ethernet MAC module.
+@note The board has to have one of the supported PHY modules to be able to
+      use the Ethernet MAC module.

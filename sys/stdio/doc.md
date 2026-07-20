@@ -23,7 +23,7 @@ consumption. This includes the following features:
 | `stdin`              | Support for input (default is output only)    |
 
 The additional features can be enabled in the application Makefile:
-```Makefile
+```makefile
 USEMODULE += printf_float
 ```
 
@@ -58,7 +58,7 @@ list below:
 As with the additional features, you can specify the STDIO backend to be used
 in your application Makefile:
 
-```Makefile
+```makefile
 USEMODULE += stdio_cdc_acm
 ```
 

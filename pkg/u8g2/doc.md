@@ -42,7 +42,7 @@ want to use it with the generic display interface.
 
 Add the following to your application's Makefile:
 
-```Makefile
+```makefile
 USEPKG += u8g2
 USEMODULE += disp_dev
 ```
@@ -50,7 +50,7 @@ U8G2 supports both I2C and SPI to communicate with displays, so it will not
 automatically pull any peripheral dependency. Therefore, you need to
 additionally add the corresponding feature to the application's Makefile:
 
-```Makefile
+```makefile
 FEATURES_REQUIRED += periph_i2c
 ```
 
@@ -62,7 +62,7 @@ the initialization function, refer to the setup documentation of the package:
 https://github.com/olikraus/u8g2/wiki/u8g2setupc#setup-function-reference. You
 can set these values in your Makefile, for example:
 
-```Makefile
+```makefile
 # I2C device 1, this will depend on which bus you connect the display on your
 # board
 CFLAGS += -DU8G2_DISPLAY_PARAM_DEV=I2C_DEV\(1\)
@@ -84,7 +84,7 @@ want to use it with the generic display interface.
 
 Add the following to your application's Makefile:
 
-```Makefile
+```makefile
 USEPKG += u8g2
 USEMODULE += disp_dev
 ```
@@ -93,7 +93,7 @@ U8G2 supports both I2C and SPI to communicate with displays, so it will not
 automatically pull any peripheral dependency. Therefore, you need to
 additionally add the corresponding feature to the application's Makefile:
 
-```Makefile
+```makefile
 FEATURES_REQUIRED += periph_spi
 ```
 
@@ -106,7 +106,7 @@ function, refer to the setup documentation of the package:
 https://github.com/olikraus/u8g2/wiki/u8g2setupc#setup-function-reference. You
 can set these values in your Makefile, for example:
 
-```Makefile
+```makefile
 # SPI device 1, this will depend on which bus you connect the display on your
 # board
 CFLAGS += -DU8G2_DISPLAY_PARAM_DEV=SPI_DEV\(1\)
@@ -122,7 +122,7 @@ CFLAGS += -DU8G2_DISPLAY_PARAM_INIT_FUNCTION=u8g2_Setup_ssd1306_128x64_noname_f
 ## Usage via Package API {#direct-usage}
 If you prefer to use the package directly, you first need to add it to your
 application's Makefile:
-```Makefile
+```makefile
 USEPKG += u8g2
 ```
 Then, add the header in your code: `#include "u8g2.h"`.
@@ -189,7 +189,7 @@ only available on native targets that have SDL installed. It uses `sdl2-config`
 to find the headers and libraries. Note that RIOT-OS builds 32-bit binaries and
 requires 32-bit SDL libraries. Using SDL requires more stack so in case you are
 using it add the following to your Makefile:
-```Makefile
+```makefile
 CFLAGS += '-DTHREAD_STACKSIZE_MAIN= 48*1024'
 ```
 48kB is enough for the test application in RIOT, other uses may need more or may
