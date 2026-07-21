@@ -200,7 +200,6 @@ static int _open_request(unicoap_message_t* request,
                 _URI_DEBUG("URI malformed: %i (%s)\n", res, strerror(-res));
                 return res;
             }
-
             if (!parsed.scheme) {
                 _URI_DEBUG("URI lacking scheme?!\n");
                 return -EINVAL;
@@ -209,13 +208,11 @@ static int _open_request(unicoap_message_t* request,
             if ((res = unicoap_uri_populate(&parsed, &endpoint, request->options)) < 0) {
                 return res;
             }
-
             return unicoap_client_send_request_body(request, &endpoint, callback,
                                                     callback_arg, flags);
-        }
-        else {
+        } else {
             unicoap_assist(API_ERROR("URI passed, but module is missing")
-                               FIXIT("add USEMODULE += unicoap_client_uri"));
+                           FIXIT("add USEMODULE += unicoap_client_uri"));
             assert(false);
             return -ENOTSUP;
         }
@@ -403,7 +400,7 @@ int unicoap_send_request_sync(unicoap_message_t* request,
         return -1;
     }
 
-    _args_t args = (_args_t){ 
+    _sync_args_t args = { 
         .callback = callback, 
         .caller_arg = callback_arg, 
         .roadblock = MUTEX_INIT_LOCKED 
