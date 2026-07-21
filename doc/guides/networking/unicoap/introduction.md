@@ -27,7 +27,7 @@ message fragmentation, and end-to-end message protection.
 
 In your application's Makefile, add:
 
-```Makefile
+```makefile
 USEMODULE += unicoap
 USEMODULE += unicoap_driver_udp
 ```

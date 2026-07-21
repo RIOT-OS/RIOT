@@ -162,11 +162,11 @@ export default defineConfig({
               {
                 label: "Networking",
                 items: [
-                  "networking/coap",
+                  "networking/gcoap",
                   {
-                    label: "unicoap",
+                    label: "CoAP via unicoap",
                     items: [
-                      "networking/unicoap/doc",
+                      "networking/unicoap/introduction",
                       "networking/unicoap/internals",
                       "networking/unicoap/pdu",
                       "networking/unicoap/resources-xfa",
@@ -281,7 +281,7 @@ export default defineConfig({
   ],
   redirects: {
     "/misc/io_mapping_and_shields": "/board_specific/io_mapping_and_shields",
-    "/c_tutorials/coap": "/networking/coap",
+    "/c_tutorials/coap": "/networking/unicoap/introduction",
   },
   vite: {
     server: {
