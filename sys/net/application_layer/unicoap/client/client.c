@@ -13,7 +13,6 @@
 
 #include <string.h>
 #include <errno.h>
-#include <alloca.h>
 
 #include "ztimer.h"
 #include "mutex.h"
@@ -187,29 +186,24 @@ static int _open_request(unicoap_message_t* request,
     case UNICOAP_DESTINATION_URI:
         if (IS_USED(MODULE_UNICOAP_CLIENT_URI)) {
             if (!request->options) {
-                request->options = (unicoap_options_t *)alloca(sizeof(unicoap_options_t));
-                memset(request->options, 0, sizeof(unicoap_options_t));
+                UNICOAP_OPTIONS_ALLOCA(options, CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY);
+                request->options = options;
             }
-            if (request->options->storage_capacity == 0) {
-                /* Uri-Path and Uri-Host */
-                if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
-                    if (strlen(destination->remote.uri) + 4 > CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY) {
-                        unicoap_assist(API_WARNING("No options buffer supplied, allocating small default buffer")
-                                           FIXIT("Increase CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY"));
-                    }
-                }
-
-                request->options->entries->data = (uint8_t *)alloca(CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY);
-                request->options->storage_capacity = CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY;
-            }
-
             unicoap_endpoint_t endpoint = { 0 };
-            res = unicoap_uri_parse(destination->remote.uri,
-                                    strlen(destination->remote.uri), &endpoint,
-                                    request->options);
+            assert(uri_parser_is_absolute(destination->remote.uri, strlen(destination->remote.uri)));
 
-            if (res < 0) {
-                _CLIENT_DEBUG("URI/DNS/options failure (%i, %s)\n", res, strerror(-res));
+            uri_parser_result_t parsed = { 0 };
+            if ((res = uri_parser_process(&parsed, destination->remote.uri, strlen(destination->remote.uri))) < 0) {
+                _URI_DEBUG("URI malformed: %i (%s)\n", res, strerror(-res));
+                return res;
+            }
+
+            if (!parsed.scheme) {
+                _URI_DEBUG("URI lacking scheme?!\n");
+                return -EINVAL;
+            }
+
+            if ((res = unicoap_uri_populate(&parsed, &endpoint, request->options)) < 0) {
                 return res;
             }
 
@@ -234,7 +228,7 @@ static int _open_request(unicoap_message_t* request,
                                                 callback_arg, flags);
 #else  /* IS_USED(MODULE_DNS) */
         unicoap_assist(API_ERROR("cannot resolve FQDN, dns module missing")
-                       FIXIT("add USEMODULE += unicoap_client_uri"));
+                       FIXIT("add USEMODULE += dns"));
         assert(false);
         return -ENOTSUP;
 #endif /* IS_USED(MODULE_DNS) */

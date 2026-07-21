@@ -302,21 +302,3 @@ int unicoap_uri_populate(uri_parser_result_t* parsed, unicoap_endpoint_t* endpoi
     }
     return 0;
 }
-
-int unicoap_uri_parse(const char *uri, size_t uri_length, unicoap_endpoint_t *endpoint,
-                      unicoap_options_t *options) {
-    assert(uri_parser_is_absolute(uri, uri_length));
-
-    uri_parser_result_t parsed = { 0 };
-    int res = 0;
-    if ((res = uri_parser_process(&parsed, uri, uri_length)) < 0) {
-        return res;
-    }
-
-    if (!parsed.scheme) {
-        _URI_DEBUG("error: missing scheme\n");
-        return -1;
-    }
-
-    return unicoap_uri_populate(&parsed, endpoint, options);
-}

@@ -609,8 +609,6 @@ typedef struct {
 /**
  * @brief Populates endpoint and CoAP options with URI parser result
  *
- * Internally called by @ref unicoap_uri_parse
- *
  * @param[in,out] parsed Parser result (port will be set based on scheme, if unspecified)
  * @param[in,out] endpoint Pre-allocated endpoint
  * @param[in,out] options Pre-initialized options (nullable). If `NULL`, no options will be extracted from URI
@@ -620,40 +618,6 @@ typedef struct {
  */
 int unicoap_uri_populate(uri_parser_result_t* parsed, unicoap_endpoint_t* endpoint,
                          unicoap_options_t* options);
-
-/**
- * @brief Parses CoAP URI, initializes given endpoint and sets options
- *
- * URI must be absolute, including CoAP scheme.
- *
- * @param[in,out] uri URI string, does **not** need to be null-terminated
- * @param[in,out] uri_length URI string length
- * @param[in,out] endpoint Pre-allocated endpoint
- * @param[in,out] options Pre-initialized options (nullable). If `NULL`, no options will be extracted from URI
- *
- * @returns `0` on success
- * @return `-1` or negative errno on error
- */
-int unicoap_uri_parse(const char* uri, size_t uri_length, unicoap_endpoint_t* endpoint,
-                      unicoap_options_t* options);
-
-/**
- * @brief Parses null-terminated CoAP URI, initializes given endpoint and sets options
- *
- * URI must be absolute, including CoAP scheme.
- *
- * @param[in,out] uri Null-terminated URI string
- * @param[in,out] endpoint Pre-allocated endpoint
- * @param[in,out] options Pre-initialized options (nullable). If `NULL`, no options will be extracted from URI
- *
- * @returns `0` on success
- * @return `-1` or negative errno on error
- */
-static inline int unicoap_uri_parse_string(const char* uri, unicoap_endpoint_t* endpoint,
-                                           unicoap_options_t* options)
-{
-    return unicoap_uri_parse(uri, strlen(uri), endpoint, options);
-}
 /** @} */
 /** @} */
 
