@@ -647,10 +647,11 @@ int
 devopen(const char *dev, int flags)
 {
     char t[1024];
-    strcpy(t, "/dev/");
-    /* cppcheck-suppress bufferAccessOutOfBounds
-     * (reason: seems to be a bug in cppcheck 1.7x) */
-    strncat(t, dev, sizeof(t) - 5);
+    int written_len = snprintf(t, sizeof(t), "/dev/%s", dev);
+    if (written_len >= sizeof(t)) {
+        /* we got truncated */
+        return -1;
+    }
     return open(t, flags);
 }
 

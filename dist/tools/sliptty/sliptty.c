@@ -64,11 +64,13 @@ static void _usage(char *cmd)
 #ifndef __linux__
 static int devopen(const char *dev, int flags)
 {
-    char devpath[1024];
-
-    strcpy(devpath, "/dev/");
-    strncat(devpath, dev, sizeof(devpath) - (sizeof("/dev/") - 1));
-    return open(devpath, flags);
+    char t[1024];
+    int written_len = snprintf(t, sizeof(t), "/dev/%s", dev);
+    if (written_len >= sizeof(t)) {
+        /* we got truncated */
+        return -1;
+    }
+    return open(t, flags);
 }
 #endif
 
