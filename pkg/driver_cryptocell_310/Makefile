@@ -4,8 +4,10 @@ PKG_URL       = https://download.riot-os.org
 PKG_VERSION   = 17.1.0_ddde560
 PKG_DIR_NAME  = nRF5_SDK
 PKG_EXT       = zip
-PKG_LICENSE   = ARM Object Code and Header Files License
-PKG_SHA512  	= cb610d724d27ef79c792511d8b889cbf2d411a3a391f5c740ea10b86139201b97eedf0c1edcf4d199c3fbd51e4cc5a4bd922c0c40d01e2f5359acd16a2b163e4
+# There is not a single license for the whole zip but different parts got different licenses this
+# uses external/nrf_cc310 witch is licensed as ARM Object Code and Header Files License.
+PKG_LICENSE   = LicenseRef-ARM-Object-Code-and-Header-Files-License-1.0
+PKG_SHA512    = cb610d724d27ef79c792511d8b889cbf2d411a3a391f5c740ea10b86139201b97eedf0c1edcf4d199c3fbd51e4cc5a4bd922c0c40d01e2f5359acd16a2b163e4
 
 PKG_SOURCE_DIR ?= $(PKGDIRBASE)/$(PKG_NAME)
 PKG_ZIP_DIR = $(PKGDIRBASE)/$(PKG_DIR_NAME)_$(PKG_VERSION)
