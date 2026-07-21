@@ -51,7 +51,8 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 {
     (void)ctx;
     coap_block_slicer_t slicer;
-    coap_block2_init(pdu, &slicer);
+    int res = coap_block2_init(pdu, &slicer);
+    if (res) { return res; }
 
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     coap_opt_add_format(pdu, COAP_FORMAT_TEXT);
@@ -59,7 +60,7 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     ssize_t plen = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
 
     /* Add actual content */
-    int res = coap_blockwise_put_bytes_pkt(pdu, &slicer, block2_intro, sizeof(block2_intro)-1);
+    res = coap_blockwise_put_bytes_pkt(pdu, &slicer, block2_intro, sizeof(block2_intro)-1);
     if (res) { return res; }
     res = coap_blockwise_put_bytes_pkt(pdu, &slicer, RIOT_VERSION, strlen(RIOT_VERSION));
     if (res) { return res; }
