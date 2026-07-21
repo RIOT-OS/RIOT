@@ -510,7 +510,9 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, uint8_
         return -1;
     }
 
-    if (option_len > 4) {
+    /* option is 0 to 3 bytes in length, see
+     * https://www.rfc-editor.org/info/rfc7959/#section-2.1 */
+    if (option_len > 3) {
         DEBUG("nanocoap: invalid option length\n");
         return -1;
     }
@@ -1579,15 +1581,20 @@ void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
     block->offset = block->blknum << (block->szx + 4);
 }
 
-void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
+int coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
                             size_t blksize)
 {
-    slicer->start = blknum * blksize;
-    slicer->end = slicer->start + blksize;
+    if (__builtin_mul_overflow(blknum, blksize, &slicer->start) ||
+        __builtin_add_overflow(slicer->start, blksize, &slicer->end)) {
+        *slicer = (coap_block_slicer_t){0};
+        return -EINVAL;
+    }
     slicer->cur = 0;
+
+    return 0;
 }
 
-void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
+int coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
 {
     uint32_t blknum = 0;
     uint8_t szx = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX - 4;
@@ -1601,7 +1608,11 @@ void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
         }
     }
 
-    coap_block_slicer_init(slicer, blknum, coap_szx2size(szx));
+    if (coap_block_slicer_init(slicer, blknum, coap_szx2size(szx))) {
+        return -EBADMSG;
+    }
+
+    return 0;
 }
 
 bool coap_block_finish(coap_block_slicer_t *slicer)
@@ -1725,8 +1736,10 @@ ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, uint8_t *buf, \
     (void)context;
     coap_block_slicer_t slicer;
     coap_builder_t state;
-    coap_block2_init(pkt, &slicer);
-    int err;
+    int err = coap_block2_init(pkt, &slicer);
+    if (err) {
+        return err;
+    }
     err = coap_builder_init_reply(&state, buf, len, pkt, COAP_CODE_CONTENT);
     if (err) {
         return err;
