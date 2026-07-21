@@ -151,8 +151,8 @@ if (res < 0) {
 
 Alternatively, you can iterate over all query options, avoiding the copy operation and allocation.
 To do this, you will need to allocate an
-[`unicoap_options_iterator_t`](https://api.riot-os.org/structunicoap__options__iterator__t.html) and initialize it using
-`unicoap_options_iterator_t::unicoap_options_iterator_init`.
+[`unicoap_options_iterator_t`](https://api.riot-os.org/structunicoap__options__iterator__t.html)
+and initialize it using `unicoap_options_iterator_t::unicoap_options_iterator_init`.
 This is the main tool to iterate over options.
 `unicoap` exposes multiple methods for getting the next instance of a repeatable option.
 

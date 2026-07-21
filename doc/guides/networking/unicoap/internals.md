@@ -8,7 +8,8 @@ CoAP was originally specified in [RFC 7252](https://datatracker.ietf.org/doc/htm
 and could only be used in combination with UDP and DTLS as transport protocols.
 [RFC 8223](https://datatracker.ietf.org/doc/html/rfc8323) modified the CoAP format
 for sending CoAP messages over TCP, TLS, and WebSockets (including WebSockets over TLS).
-There is also an Internet Draft for [CoAP over GATT (BLE)](https://datatracker.ietf.org/doc/draft-amsuess-core-coap-over-gatt).
+There is also an Internet Draft for
+[CoAP over GATT (BLE)](https://datatracker.ietf.org/doc/draft-amsuess-core-coap-over-gatt).
 
 Each of these standards leverage different messaging models, i.e., what timeouts to apply, how
 reliable transmission is implemented, and what messages are allowed to be sent
@@ -42,7 +43,8 @@ Here, `unicoap` coordinates with the operating system networking interface.
 
 ### Overview of CoAP Combinations
 To better illustrate what parts of the CoAP stack differ, have a look
-at the following graph, where each node represents a version of a certain layer. Each leaf node stands for
+at the following graph, where each node represents a version
+of a certain layer. Each leaf node stands for
 a different CoAP combination ("CoAP over ...") specification.
 ```
                                   Requests/Responses
@@ -104,19 +106,23 @@ Drivers themselves can in turn consist of a shared module for messaging and a sp
 support module. For example, the CoAP over DTLS driver encompasses a transport module for DTLS networking;
 and depends on the common RFC 7252 messaging module also employed by the CoAP over UDP driver.
 You can see this relationship in `Makefile.dep` in the `unicoap` source directory: The common
-messaging module is a shared dependency of both the [CoAP over UDP Driver](https://api.riot-os.org/group__net__unicoap__drivers__udp.html) and [CoAP over DTLS Driver](https://api.riot-os.org/group__net__unicoap__drivers__dtls.html).
+messaging module is a shared dependency of both the [CoAP over UDP Driver](https://api.riot-os.org/group__net__unicoap__drivers__udp.html) and
+[CoAP over DTLS Driver](https://api.riot-os.org/group__net__unicoap__drivers__dtls.html).
 driver module. We encourage you to follow the same approach for CoAP combinations that share a common
 messaging model, such as CoAP over TCP, TLS, and WebSockets when implementing these.
 
 On a high level, each driver interacts with the upper layers on these three occasions:
 
 - **Initialization and deinitialization**:
-  Drivers must provide an [initialization](/FIXME-upcoming-pr-unicoap_init) and [teardown](/FIXME-upcoming-pr-unicoap_deinit)
+  Drivers must provide an [initialization](/FIXME-upcoming-pr-unicoap_init) and
+  [teardown](/FIXME-upcoming-pr-unicoap_deinit)
   These may be used for setup work in the transport and messaging layer such as for creating
-  sockets or establishing connections to peripherals, alongside allocating objects required for messaging.
+  sockets or establishing connections to peripherals,
+  alongside allocating objects required for messaging.
 
 - **Sending side / Outbound**:
-  A driver must expose a standardized API for [sending from the messaging layer](/FIXME-upcoming-pr-unicoap_messaging_send).
+  A driver must expose a standardized API for
+  [sending from the messaging layer](/FIXME-upcoming-pr-unicoap_messaging_send).
   The exchange layer will call into this functionality, prompting the driver to perform any due
   work in the messaging layer like attempting to retransmit the message. Apart from the message,
   as well as the remote and local endpoint, this function accepts flags that customize transmission
@@ -128,7 +134,11 @@ On a high level, each driver interacts with the upper layers on these three occa
 - **Receiving side / Inbound**:
   Upon receipt of a new message, each driver will need to invoke an [exchange-layer processing function](/FIXME-upcoming-pr-unicoap_exchange_process).
 
-- **Ping**: Due to the variability in ping mechanisms (empty `CON` in CoAP over UDP and `7.03` message in CoAP over reliable transports), each driver can implement a ping function. unicoap bundles these APIs and provides a [single, generic ping function that multiplexes](/FIXME-upcoming-pr-unicoap_ping) between the driver implementations.
+- **Ping**: Due to the variability in ping mechanisms
+  (empty `CON` in CoAP over UDP and `7.03` message in CoAP over reliable transports),
+  each driver can implement a ping function. unicoap bundles these APIs and provides a
+  [single, generic ping function that multiplexes](/FIXME-upcoming-pr-unicoap_ping)
+  between the driver implementations.
 
 ### Communication Between Layers
 
@@ -153,5 +163,5 @@ suffixes in the function names depicted in the figure above.
 In the `unicoap` codebase you will encounter several marks (`MARK: ...`)
 that help with extending the suite.
 
-- **MARK: unicoap_driver_extension_point**: Every region of code that would need to be extended to support a new transport protocol or driver is
-  annotated with this mark.
+- **MARK: unicoap_driver_extension_point**: Every region of code that would need to be extended
+  to support a new transport protocol or driver is annotated with this mark.

@@ -30,10 +30,11 @@ if (res < 0) {
 
 ## Serializing
 To serialize a message on your own, decide whether you need vectored data or contiguous data.
-To get vectored data, you use `unicoap_pdu_buildv_*` functions, depending on the CoAP transport you intend to use.
-Vectored data is represented using an [iolist_t](https://api.riot-os.org/group__sys__iolist.html).
-If you want to build a contiguous storage body, refer to the `unicoap_pdu_build_*` methods, also depending
-on the transport.
+To get vectored data, you use `unicoap_pdu_buildv_*` functions,
+depending on the CoAP transport you intend to use. Vectored data is represented
+using an [iolist_t](https://api.riot-os.org/group__sys__iolist.html).
+If you want to build a contiguous storage body, refer to the `unicoap_pdu_build_*` methods,
+also depending on the transport.
 
 ```c
 // Build an RFC 7252 PDU

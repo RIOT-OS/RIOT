@@ -5,12 +5,15 @@ description: Declare CoAP resources at compile time.
 
 Module. Specify `USEMODULE += unicoap_server_resource_declarations` in your application's Makefile.
 
-Use [`UNICOAP_RESOURCE`](https://api.riot-os.org/group__net__unicoap__server__resource__declarations.html) to define resources across files as follows. The name you supply for
+Use
+[`UNICOAP_RESOURCE`](https://api.riot-os.org/group__net__unicoap__server__resource__declarations.html)
+to define resources across files as follows. The name you supply for
 the resource must be unique among resource definitions but has otherwise no meaning. It is
 needed purely for technical reasons involving the implementation of cross file arrays.
-The resource macro must be followed by a constant [`unicoap_resource_t`](https://api.riot-os.org/group__net__unicoap__server.html) initializer.
-In the example below, we define
-a resource reachable under `/hello-world` using the designated initializer.
+The resource macro must be followed by a constant
+[`unicoap_resource_t`](https://api.riot-os.org/group__net__unicoap__server.html) initializer.
+In the example below, we define a resource reachable under
+`/hello-world` using the designated initializer.
 
 ```c
 UNICOAP_RESOURCE(hello_world_resource) {
