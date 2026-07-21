@@ -190,10 +190,13 @@ static int _open_request(unicoap_message_t* request,
                 request->options = options;
             }
             unicoap_endpoint_t endpoint = { 0 };
-            assert(uri_parser_is_absolute(destination->remote.uri, strlen(destination->remote.uri)));
+            assert(uri_parser_is_absolute(destination->remote.uri, 
+                strlen(destination->remote.uri)));
 
             uri_parser_result_t parsed = { 0 };
-            if ((res = uri_parser_process(&parsed, destination->remote.uri, strlen(destination->remote.uri))) < 0) {
+            if ((res = uri_parser_process(
+                &parsed, destination->remote.uri, strlen(destination->remote.uri)
+            )) < 0) {
                 _URI_DEBUG("URI malformed: %i (%s)\n", res, strerror(-res));
                 return res;
             }
@@ -237,7 +240,7 @@ static int _open_request(unicoap_message_t* request,
         return unicoap_client_send_request_body(
             request, destination->remote.endpoint, callback, callback_arg, flags);
     default:
-        _CLIENT_DEBUG("illegal resource identifier type %" PRIu8 "\n", destination->type);
+        _CLIENT_DEBUG("illegal destination type %" PRIu8 "\n", destination->type);
         assert(false);
         return -EINVAL;
     }
@@ -347,8 +350,8 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
     _sync_copy_args_t args = (_sync_copy_args_t) {
         .response = response,
         .aux = aux,
+        .roadblock = MUTEX_INIT_LOCKED
     };
-    mutex_init_locked(&args.roadblock);
 
     int res = _open_request(request, destination,
         (unicoap_callback_t) { .response = _copy_callback }, &args, flags);
@@ -366,18 +369,16 @@ typedef struct {
     void *caller_arg;
     int res;
     mutex_t roadblock;
-} _args_t;
+} _sync_args_t;
 
 static int _sync_callback(const unicoap_message_t *response, const unicoap_aux_t *aux, int error,
                           void *args)
 {
-    _args_t *a = (_args_t *)args;
+    _sync_args_t* a = (_sync_args_t*)args;
     a->res = a->callback(response, aux, error, a->caller_arg);
     mutex_unlock(&a->roadblock);
     return 0;
 }
-
-extern kernel_pid_t _unicoap_pid;
 
 int unicoap_send_request_sync(unicoap_message_t* request,
                               unicoap_destination_t* destination,
@@ -402,9 +403,11 @@ int unicoap_send_request_sync(unicoap_message_t* request,
         return -1;
     }
 
-    _args_t args =
-        (_args_t){ .callback = callback, .caller_arg = callback_arg };
-    mutex_init_locked(&args.roadblock);
+    _args_t args = (_args_t){ 
+        .callback = callback, 
+        .caller_arg = callback_arg, 
+        .roadblock = MUTEX_INIT_LOCKED 
+    };
 
     int res = _open_request(request, destination, 
         (unicoap_callback_t) { .response = _sync_callback }, &args, flags);
@@ -414,7 +417,7 @@ int unicoap_send_request_sync(unicoap_message_t* request,
     }
     /* Block until callback calls unlock. */
     mutex_lock(&args.roadblock);
-    return args.res < 0 ? args.res : 0;
+    return args.res;
 }
 
 int unicoap_send_request_async(unicoap_message_t* request,
