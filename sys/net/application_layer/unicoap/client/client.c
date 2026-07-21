@@ -220,16 +220,10 @@ static int _open_request(unicoap_message_t* request,
 #if IS_USED(MODULE_DNS)
         unicoap_endpoint_t endpoint = { ._tl_ep = { .port = UNICOAP_DEFAULT_COAP_PORT } };
         // FIXME: SVCB?
-        if ((res = dns_query(destination->remote.host, &endpoint._tl_ep, 0)) < 0) {
-            _CLIENT_DEBUG("DNS resolution of '%s' failed: %i\n", destination->remote.host, res);
-            return res;
-        }
-        return unicoap_client_send_request_body(request, &endpoint, callback,
-                                                callback_arg, flags);
+        return -ENOTSUP;
 #else  /* IS_USED(MODULE_DNS) */
         unicoap_assist(API_ERROR("cannot resolve FQDN, dns module missing")
                        FIXIT("add USEMODULE += dns"));
-        assert(false);
         return -ENOTSUP;
 #endif /* IS_USED(MODULE_DNS) */
     }

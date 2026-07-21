@@ -110,8 +110,6 @@ extern "C" {
       } while (0)
 #endif
 
-#define _UNICOAP_CHECKPOINT ((void)0)
-
 /**
  * @brief Emit a diagnostic stating that a driver is missing
  */
