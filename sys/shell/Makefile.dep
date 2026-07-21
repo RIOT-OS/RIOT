@@ -114,6 +114,9 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   ifneq (,$(filter sock_udp,$(USEMODULE)))
     USEMODULE += shell_cmd_udp
   endif
+  ifneq (,$(filter unicoap,$(USEMODULE)))
+    USEMODULE += shell_cmd_coap
+  endif
   ifneq (,$(filter periph_pm,$(USEMODULE)))
     USEMODULE += shell_cmd_pm
   endif
@@ -139,6 +142,15 @@ ifneq (,$(filter shell_cmd_benchmark_udp,$(USEMODULE)))
 endif
 ifneq (,$(filter shell_cmd_ccn-lite-utils,$(USEMODULE)))
   USEMODULE += ccn-lite-utils
+endif
+ifneq (,$(filter shell_cmd_coap,$(USEMODULE)))
+  USEMODULE += unicoap
+  USEMODULE += unicoap_client
+  USEMODULE += unicoap_client_uri
+  USEMODULE += unicoap_client_cancellation
+  USEMODULE += unicoap_driver_udp
+  USEMODULE += unicoap_driver_dtls
+  USEMODULE += od
 endif
 ifneq (,$(filter shell_cmd_conn_can,$(USEMODULE)))
   USEMODULE += conn_can

@@ -233,25 +233,13 @@ static_assert(CONFIG_UNICOAP_PATH_LENGTH_MAX > 0,
 #endif
 
 /**
- * @brief Maximum number of pending requests started using the client API
+ * @brief Maximum number of pending requests that can be started using the client API
  *
  ***Default**: 2
  *
  */
 #if !defined(CONFIG_UNICOAP_CLIENT_MEMOS_MAX) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_CLIENT_MEMOS_MAX (2)
-#endif
-
-/**
- * @brief Cancellable requests
- *
- * If enabled, @ref unicoap_client_send_request_async will return a positive refno
- * that can be used to cancel the request using @ref unicoap_client_cancel while still pending.
- *
- ***Default**: disabled
- */
-#if !defined(CONFIG_UNICOAP_CLIENT_CANCELLABLE) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_CLIENT_CANCELLABLE 0
 #endif
 
 /** @} */
@@ -282,7 +270,19 @@ static_assert(CONFIG_UNICOAP_PATH_LENGTH_MAX > 0,
  * **Default**: 10000
  */
 #if !defined(CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS (10000)
+#  define CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS (7000)
+#endif
+
+/**
+ * @brief Default time to wait for a response.
+ *
+ * Setting the timeout to zero will disable it.
+ *
+ * **Unit**: milliseconds
+ * **Default**: 10000
+ */
+#if !defined(CONFIG_UNICOAP_TIMEOUT_CLIENT_MULTICAST_RESPONSE_MS) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_TIMEOUT_CLIENT_MULTICAST_RESPONSE_MS (10000)
 #endif
 /** @} */
 

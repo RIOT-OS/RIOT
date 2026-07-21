@@ -120,7 +120,7 @@ static void _deinit_client(unicoap_client_memo_t* memo) {
     memo->callback._any = NULL;
     memo->callback_arg = NULL;
     memo->flags = 0;
-#if IS_ACTIVE(CONFIG_UNICOAP_CLIENT_CANCELLABLE)
+#if IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION)
     memo->reference_id = 0;
 #endif
 }
@@ -143,6 +143,7 @@ void unicoap_client_memo_free(unicoap_client_memo_t* memo) {
     /* Mark as unused, such that all the logic below can run without a lock.
       * The messaging layer may need the lock too. */
     unicoap_proto_t proto = memo->super.endpoint.proto;
+    (void)proto;
     memo->super.endpoint.proto = UNICOAP_PROTO_UNSPECIFIED;
     _unlock();
     _deinit_client(memo);
@@ -152,7 +153,7 @@ void unicoap_client_memo_free(unicoap_client_memo_t* memo) {
      * the state object is released as usual. Should the messaging layer rely on this
      * information, the exchange-messaging abstraction has a design flaw. */
     if (unicoap_memo_messaging_state(&memo->super)) {
-        unicoap_messaging_notify(unicoap_memo_messaging_state(&memo->super), 
+        unicoap_messaging_notify(unicoap_memo_messaging_state(&memo->super),
             UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE, NULL, proto);
     }
 #endif
@@ -186,7 +187,7 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
 unicoap_client_memo_t* unicoap_client_memo_find_refno(int refno) {
     assert(refno > 0);
     (void)refno;
-#if IS_ACTIVE(CONFIG_UNICOAP_CLIENT_CANCELLABLE)
+#if IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION)
     /* First bit is sign bit, then 3 bits for min index and then 12 bits of randomness.
      * For 16 or fewer memos, we thus don't have to search at all. */
     size_t index_min = (refno & UNICOAP_REFNO_MASK_MIN_INDEX) >> 12;
@@ -206,7 +207,7 @@ unicoap_client_memo_t* unicoap_client_memo_find_refno(int refno) {
 
 int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo) {
     assert(memo);
-#if IS_ACTIVE(CONFIG_UNICOAP_CLIENT_CANCELLABLE)
+#if IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION)
     memo->reference_id = random_uint32_range(1, UINT16_MAX) & 0xfff;
     int refno = memo->reference_id | (MIN(_client_index(memo), 0x7) << 12);
     _STATE_DEBUG("refno=%i (min_client_ix=#%" PRIuSIZE ", refid=%u)\n", refno, MIN(_client_index(memo), 0x7), memo->reference_id);
@@ -590,13 +591,17 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
                 }
             }
 
+            if ((memo->flags && UNICOAP_CLIENT_FLAG_MULTICAST) == 0) {
+                unicoap_event_cancel(&memo->super.exchange.timeout);
+            }
+
             if (truncated) {
                 _CLIENT_DEBUG("truncated, not processing\n");
                 unicoap_client_callback_failure(memo, -ENOBUFS);
                 unicoap_client_memo_free(memo);
                 return UNICOAP_PREPROCESSING_ERROR_TRUNCATED;
             }
-            unicoap_event_cancel(&memo->super.exchange.timeout);
+
             arg->client = memo;
             *flags = _messaging_flags_client(memo->flags);
             return UNICOAP_PREPROCESSING_SUCCESS_RESPONSE;
