@@ -180,8 +180,8 @@ typedef struct {
      * @brief Messaging state
      *
      * @note There's no union for the underlying pointer type as drivers are allowed to keep their
-     *       data structures
-     * private. This design avoids the need to expose every driver data structure.
+     *       data structures private.  
+     *       This design avoids the need to expose every driver data structure. 
      */
     union {
 #if UNICOAP_HAVE_MESSAGING_STATE || defined(DOXYGEN)
@@ -232,6 +232,9 @@ static inline unicoap_memo_t* unicoap_memo_of_event(event_t* event) {
     return unicoap_memo_of_timeout(unicoap_scheduled_event_of_event(event));
 }
 
+/**
+ * @brief A signal sent from one layer to another indicating a change to a state object
+ */
 typedef int unicoap_layer_notification_t;
 
 /**
@@ -240,17 +243,28 @@ typedef int unicoap_layer_notification_t;
  * The recipient layer should try to release state objects as soon as possible.
  *
  * @warning **Only notify the exchange layer of errors that were produced on the messaging layer and
- * that happened asynchronously (not while in a call frame from the exchange layer).**
+ * that happened asynchronously (not while in a call frame from the exchange layer).** Synchronous
+ * errors shall be reported by returning negative integers.
  * @see @ref unicoap_exchange_notify.
  */
 #define UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE (~(~0U >> 1))
 
+/**
+ * @brief Converts notification to negative error number
+ * @param type Notification
+ * @return Negative integer indicating error
+ */
 static inline int unicoap_layer_notification_async_failure_to_errno(unicoap_layer_notification_t type) {
     assert(type & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE);
     assert(type < 0);
     return type;
 }
 
+/**
+ * @brief Converts negative error number into notification
+ * @param error Negative integer indicating error
+ * @returns Notification
+ */
 static inline unicoap_layer_notification_t unicoap_layer_notification_async_failure_from_errno(int error) {
     assert(error > 0);
     assert((-error) & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE);
@@ -444,7 +458,8 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
  *
  * @param refno Reference number associated with client memo
  * @returns Client state object or `NULL` if memo is no longer associated with reference number
- * 
+ * @note Requires @ref net_unicoap_client_cancellation 
+ *
  * This function may be used to find client exchange-layer state objects without keeping a pointer
  * to it. This is useful for handing public API callers a reference to, e.g., cancellable state
  * objects. With solely a pointer to the memo, `unicoap` would be at risk of accessing a memo
