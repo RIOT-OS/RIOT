@@ -157,8 +157,73 @@ const char* unicoap_scheme_from_proto(unicoap_proto_t proto) {
     }
 }
 
-int unicoap_uri_populate(uri_parser_result_t* parsed, unicoap_endpoint_t* endpoint,
-                         unicoap_options_t* options) {
+#define _UNICOAP_URI_RESOLVED_HOST (1)
+
+static int _populate_address(uri_parser_result_t* parsed, unicoap_endpoint_t* endpoint) {
+    int16_t netif_id = SOCK_ADDR_ANY_NETIF;
+    uint16_t* _netif_id = unicoap_endpoint_get_netif_id(endpoint);
+    if (_netif_id && parsed->zoneid && parsed->zoneid_len > 0) {
+        if (IS_USED(MODULE_NETIF)) {
+            netif_t* netif = netif_get_by_name_buffer(parsed->zoneid, parsed->zoneid_len);
+            if (!netif || (netif_id = netif_get_id(netif)) < 0) {
+                _URI_DEBUG("error: unknown zone ID\n");
+                return -ENOENT;
+            }
+            *_netif_id = netif_id;
+        } else {
+            unicoap_assist(API_ERROR("cannot resolve zone id") FIXIT("USEMODULE += netif"));
+            return -ENOTSUP;
+        }
+    }
+
+    uint16_t* port = unicoap_endpoint_get_port(endpoint);
+    if (port) {
+        *port = parsed->port;
+    }
+
+    ipv6_addr_t* v6addr = unicoap_endpoint_get_ipv6_addr(endpoint);
+    ipv4_addr_t* v4addr = unicoap_endpoint_get_ipv4_addr(endpoint);
+    if (parsed->ipv6addr && (parsed->ipv6addr_len > 0)) {
+        ipv6_addr_from_buf(v6addr, parsed->ipv6addr, parsed->ipv6addr_len);
+        *unicoap_endpoint_get_address_family(endpoint) = AF_INET6;
+        return 0;
+    } else if (ipv4_addr_from_buf(v4addr, parsed->host, parsed->host_len)) {
+        /* The host part is actually an IPv4 address literal. */
+        *unicoap_endpoint_get_address_family(endpoint) = AF_INET;
+        return 0;
+    } else {
+#if IS_USED(MODULE_DNS)
+        /* Only thing left to try is DNS resolution */
+        /* FIXME: DNS query function requires null-terminated string, 
+                    forcing us to copy the URI host */
+        if (parsed->host_len > CONFIG_UNICOAP_URI_HOST_PART_LENGTH_MAX) {
+            _URI_DEBUG("no buffer space to copy '%.*s', " _UNICOAP_NEED_HAVE "\n",
+                (int)parsed->host_len, parsed->host,
+                parsed->host_len, CONFIG_UNICOAP_URI_HOST_PART_LENGTH_MAX);
+        }
+        char* domain = alloca(CONFIG_UNICOAP_URI_HOST_PART_LENGTH_MAX + 1);
+        memcpy(domain, parsed->host, parsed->host_len);
+        domain[parsed->host_len] = '\0';
+
+        if ((res = dns_query(domain, &tl_ep->addr, AF_UNSPEC)) < 0) {
+            _URI_DEBUG("DNS resolution of '%.*s' failed: %i\n",
+                        (int)parsed->host_len, parsed->host, res);
+            return res;
+        }
+        return _UNICOAP_URI_RESOLVED_HOST;
+#else
+        unicoap_assist(API_ERROR("DNS support missing") FIXIT("USEMODULE += dns"));
+        return -ENOTSUP;
+#endif
+    }
+    /* MARK: unicoap_driver_extension_point */
+}
+
+int unicoap_uri_populate(
+    uri_parser_result_t* parsed, 
+    unicoap_endpoint_t* endpoint,
+    unicoap_options_t* options
+) {
     assert(parsed);
     assert(endpoint);
     assert(options);
@@ -171,9 +236,7 @@ int unicoap_uri_populate(uri_parser_result_t* parsed, unicoap_endpoint_t* endpoi
                   parsed->scheme);
         return -EPROTO;
     }
-
-    /* MARK: unicoap_driver_extension_point */
-    /* CoAP over GATT/BLE domain checks would happen here. */
+    endpoint->proto = proto;
 
     if (parsed->port == 0 && unicoap_transport_uses_sock_tl_ep(proto)) {
         /* use default CoAP port for coap://, coap+tcp://, coap+ws:// */
@@ -187,89 +250,39 @@ int unicoap_uri_populate(uri_parser_result_t* parsed, unicoap_endpoint_t* endpoi
             parsed->port = UNICOAP_DEFAULT_COAP_PORT;
         }
         else {
-            _URI_DEBUG("error: cannot infer default port from scheme '%.*s', "
-                      "no port provided\n",
-                      (int)parsed->scheme_len, parsed->scheme);
+            _URI_DEBUG("error: cannot infer default port from scheme '%.*s', no port provided\n",
+                       (int)parsed->scheme_len, parsed->scheme);
             assert(false);
             return -EINVAL;
         }
     }
+    /* MARK: unicoap_driver_extension_point */
+    /* CoAP over GATT/BLE domain checks would happen here. */
 
-
-    int16_t* netif_id = unicoap_endpoint_get_netif_id(endpoint);
-    if (netif_id && parsed->zoneid && parsed->zoneid_len > 0) {
-        *netif_id = SOCK_ADDR_ANY_NETIF;
-        if (IS_USED(MODULE_NETIF)) {
-            netif_t* netif = netif_get_by_name_buffer(parsed->zoneid, parsed->zoneid_len);
-            if (!netif || (*netif_id = netif_get_id(netif)) < 0) {
-                _URI_DEBUG("error: unknown zone ID\n");
-                return -ENOENT;
-            }
-        } else {
-            unicoap_assist(API_ERROR("cannot resolve zone id") FIXIT("USEMODULE += netif"));
-            return -ENOTSUP;
-        }
-    }
-
-    uint16_t* port = unicoap_endpoint_get_port(endpoint);
-    if (port) {
-        *port = parsed->port;
-    }
-
-    ipv6_addr_t* v6addr = unicoap_endpoint_get_ipv6(endpoint);
-    if (parsed->ipv6addr && (parsed->ipv6addr_len > 0)) {
-        ipv6_addr_from_buf((ipv6_addr_t*)tl_ep->addr.ipv6, parsed->ipv6addr, parsed->ipv6addr_len);
-        *unicoap_endpoint_get_address_family(endpoint) = AF_INET6;
-    } else {
-        if {
-
-        } else {
-            if (ipv4_addr_from_buf((ipv4_addr_t*)tl_ep->addr.ipv4, parsed->host, parsed->host_len)) {
-                /* The host part is actually an IPv4 address literal. */
-                *unicoap_endpoint_get_address_family(endpoint) = AF_INET4;
-            } else {
-                /* Only thing left to try is DNS resolution */
-                /* FIXME: DNS query function requires null-terminated string, 
-                          forcing us to copy the URI host */
-                char domain[parsed->host_len + 1];
-                alloca(CONFIG_UNICOAP_URI_HOST_PART_LENGTH_MAX)
-                memcpy(domain, parsed->host, parsed->host_len);
-                domain[parsed->host_len] = '\0';
-
-                if ((res = dns_query(domain, &tl_ep->addr, AF_UNSPEC)) < 0) {
-                    _URI_DEBUG("error: DNS resolution of '%.*s' failed: %i\n",
-                                (int)parsed->host_len, parsed->host, res);
-                    return res;
-                }
-
-                if ((res = unicoap_options_set_string(options, UNICOAP_OPTION_URI_HOST,
-                                                        parsed->host, parsed->host_len)) < 0) {
-                    return res;
-                }
-            }
-        }
+    if ((res = _populate_address(parsed, endpoint)) < 0) {
+        _URI_DEBUG("endpoint address resolution from URI failed: %i (%s)\n", res, strerror(-res));
+        return res;
     }
 
     /* MARK: unicoap_driver_extension_point */
-
-    endpoint->proto = proto;
+    /* Other transport may also use host names, hence, other conditions may be added below. */
+    /* E.g., CoAP over BLE/GATT uses .ble.arpa and in general .alt may represent devices etc. */
+    if (res == _UNICOAP_URI_RESOLVED_HOST) {
+        if ((res = unicoap_options_set_uri_host(options, parsed->host, parsed->host_len)) < 0) {
+            return res;
+        }
+    }
 
     if (parsed->path && (parsed->path_len > 0)) {
         if ((res = 
             unicoap_options_add_uri_path(options, (char*)parsed->path, parsed->path_len)) < 0) {
-            _URI_DEBUG("error: setting Uri-Path failed\n");
             return res;
         }
     }
-
     if (parsed->query && (parsed->query_len > 0)) {
-        if ((res = unicoap_options_add_values_joined(options, UNICOAP_OPTION_URI_QUERY,
-                                                (uint8_t *)parsed->query, parsed->query_len,
-                                                '&')) < 0) {
-            _URI_DEBUG("error: setting Uri-Query failed\n");
+        if ((res = unicoap_options_add_uri_queries(options, parsed->query, parsed->query_len)) < 0) {
             return res;
         }
     }
-    
     return 0;
 }

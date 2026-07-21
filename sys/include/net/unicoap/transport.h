@@ -204,99 +204,6 @@ typedef struct {
 } unicoap_endpoint_t;
 
 /**
- * @brief Retrieves IPv6 address from endpoint, if present and supported by endpoint type
- * @param endpoint Endpoint
- * @return IPv6 address if present and supported, `NULL` otherwise
- */
-static inline ipv6_addr_t* unicoap_endpoint_get_ipv6_addr(unicoap_endpoint_t* endoint) {
-    (void)endoint;
-    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
-    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) && 
-        (tl_ep->family == AF_INET6 || tl_ep->family == AF_UNSPEC)) {
-        return _unicoap_endpoint_get_tl(endpoint)->addr.ipv6;
-    }
-    #else
-    return NULL;
-    #endif
-    /* Other drivers may also use IPv6 addresses but not sock_tl... */
-    /* MARK: unicoap_driver_extension_point */
-}
-
-/**
- * @brief Retrieves IPv4 address from endpoint, if present and supported by endpoint type
- * @param endpoint Endpoint
- * @return IPv4 address if present and supported, `NULL` otherwise
- */
-static inline ipv4_addr_t* unicoap_endpoint_get_ipv4_addr(unicoap_endpoint_t* endoint) {
-    (void)endoint;
-    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
-    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) && 
-        (tl_ep->family == AF_INET4 || tl_ep->family == AF_UNSPEC)) {
-        return _unicoap_endpoint_get_tl(endpoint)->addr.ipv4;
-    }
-    #else
-    return NULL;
-    #endif
-    /* Other drivers may also use IPv4 addresses but not sock_tl... */
-    /* MARK: unicoap_driver_extension_point */
-}
-
-/**
- * @brief Retrieves address family from endpoint, if present and supported by endpoint type
- * @param endpoint Endpoint
- * @return Application address reference if present and supported, `NULL` otherwise
- */
-static inline unix_af_t* unicoap_endpoint_get_application_family(unicoap_endpoint_t* endoint) {
-    (void)endoint;
-    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
-    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
-        return &_unicoap_endpoint_get_tl(endpoint)->family;
-    }
-    #else
-    return NULL;
-    #endif
-    /* Other drivers may also use 16-bit ports but not sock_tl... */
-    /* MARK: unicoap_driver_extension_point */
-}
-
-/**
- * @brief Retrieves port from endpoint, if present and supported by endpoint type
- * @param endpoint Endpoint
- * @return Port reference if present and supported, `NULL` otherwise
- */
-static inline uint16_t* unicoap_endpoint_get_port(unicoap_endpoint_t* endoint) {
-    (void)endoint;
-    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
-    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
-        return &_unicoap_endpoint_get_tl(endpoint)->addr.port;
-    }
-    #else
-    return NULL;
-    #endif
-    /* Other drivers may also use 16-bit ports but not sock_tl... */
-    /* MARK: unicoap_driver_extension_point */
-}
-
-/**
- * @brief Retrieves network interface ID from endpoint, if present and supported by endpoint type
- * @param endpoint Endpoint
- * @return Network interface ID reference if present and supported, `NULL` otherwise
- */
-static inline int16_t* unicoap_endpoint_get_netif_id(unicoap_endpoint_t* endoint) {
-    (void)endoint;
-    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
-    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
-        return &_unicoap_endpoint_get_tl(endpoint)->netif;
-    }
-    #else
-    return NULL;
-    #endif
-    /* Other drivers may also use 16-bit ports but not sock_tl... */
-    /* MARK: unicoap_driver_extension_point */
-}
-
-#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
-/**
  * @brief Retrieves UDP endpoint from CoAP endpoint
  * @pre @p endpoint is a CoAP over UDP endpoint (proto == @ref UNICOAP_PROTO_UDP)
  *
@@ -308,7 +215,12 @@ static inline int16_t* unicoap_endpoint_get_netif_id(unicoap_endpoint_t* endoint
  */
 static inline sock_udp_ep_t* unicoap_endpoint_get_udp(unicoap_endpoint_t* endpoint)
 {
+    (void)endpoint;
+    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     return &endpoint->udp_ep;
+    #else
+    return NULL;
+    #endif
 }
 
 /**
@@ -323,10 +235,15 @@ static inline sock_udp_ep_t* unicoap_endpoint_get_udp(unicoap_endpoint_t* endpoi
  */
 static inline sock_udp_ep_t* unicoap_endpoint_get_dtls(unicoap_endpoint_t* endpoint)
 {
+    (void)endpoint;
+    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     return &endpoint->dtls_ep;
+    #else
+    return NULL;
+    #endif
 }
 
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 /**
  * @brief Private API. Retrieves transport layer endpoint from CoAP endpoint
  *
@@ -338,10 +255,118 @@ static inline sock_udp_ep_t* unicoap_endpoint_get_dtls(unicoap_endpoint_t* endpo
  */
 static inline struct _sock_tl_ep* _unicoap_endpoint_get_tl(unicoap_endpoint_t* endpoint)
 {
+    (void)endpoint;
+    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     return &endpoint->_tl_ep;
+    #else
+    return NULL;
+    #endif
 }
-#  endif /* !defined(DOXYGEN) */
-#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN) */
+#endif /* !defined(DOXYGEN) */
+
+/**
+ * @brief Retrieves IPv6 address from endpoint, if present and supported by endpoint type
+ * @param endpoint Endpoint
+ * @return IPv6 address if present and supported, `NULL` otherwise
+ */
+static inline ipv6_addr_t* unicoap_endpoint_get_ipv6_addr(unicoap_endpoint_t* endpoint) {
+    (void)endpoint;
+    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) && 
+        (_unicoap_endpoint_get_tl(endpoint)->family == AF_INET6 || 
+         _unicoap_endpoint_get_tl(endpoint)->family == AF_UNSPEC)) {
+        return (ipv6_addr_t*)_unicoap_endpoint_get_tl(endpoint)->addr.ipv6;
+    } else {
+        return NULL;
+    }
+    #else
+    return NULL;
+    #endif
+    /* Other drivers may also use IPv6 addresses but not sock_tl... */
+    /* MARK: unicoap_driver_extension_point */
+}
+
+/**
+ * @brief Retrieves IPv4 address from endpoint, if present and supported by endpoint type
+ * @param endpoint Endpoint
+ * @return IPv4 address if present and supported, `NULL` otherwise
+ */
+static inline ipv4_addr_t* unicoap_endpoint_get_ipv4_addr(unicoap_endpoint_t* endpoint) {
+    (void)endpoint;
+    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) && 
+        (_unicoap_endpoint_get_tl(endpoint)->family == AF_INET || 
+         _unicoap_endpoint_get_tl(endpoint)->family == AF_UNSPEC)) {
+        return (ipv4_addr_t*)_unicoap_endpoint_get_tl(endpoint)->addr.ipv4;
+    } else {
+        return NULL;
+    }
+    #else
+    return NULL;
+    #endif
+    /* Other drivers may also use IPv4 addresses but not sock_tl... */
+    /* MARK: unicoap_driver_extension_point */
+}
+
+/**
+ * @brief Retrieves address family from endpoint, if present and supported by endpoint type
+ * @param endpoint Endpoint
+ * @return Application address reference if present and supported, `NULL` otherwise
+ */
+static inline int* unicoap_endpoint_get_address_family(unicoap_endpoint_t* endpoint) {
+    (void)endpoint;
+    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
+        return &_unicoap_endpoint_get_tl(endpoint)->family;
+    } else {
+        return NULL;
+    }
+    #else
+    return NULL;
+    #endif
+    /* Other drivers may also use 16-bit ports but not sock_tl... */
+    /* MARK: unicoap_driver_extension_point */
+}
+
+/**
+ * @brief Retrieves port from endpoint, if present and supported by endpoint type
+ * @param endpoint Endpoint
+ * @return Port reference if present and supported, `NULL` otherwise
+ */
+static inline uint16_t* unicoap_endpoint_get_port(unicoap_endpoint_t* endpoint) {
+    (void)endpoint;
+    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
+        return &_unicoap_endpoint_get_tl(endpoint)->port;
+    } else {
+        return NULL;
+    }
+    #else
+    return NULL;
+    #endif
+    /* Other drivers may also use 16-bit ports but not sock_tl... */
+    /* MARK: unicoap_driver_extension_point */
+}
+
+/**
+ * @brief Retrieves network interface ID from endpoint, if present and supported by endpoint type
+ * @param endpoint Endpoint
+ * @return Network interface ID reference if present and supported, `NULL` otherwise
+ */
+static inline uint16_t* unicoap_endpoint_get_netif_id(unicoap_endpoint_t* endpoint) {
+    (void)endpoint;
+    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
+        return &_unicoap_endpoint_get_tl(endpoint)->netif;
+    } else {
+        return NULL;
+    }
+    #else
+    return NULL;
+    #endif
+    /* Other drivers may also use 16-bit ports but not sock_tl... */
+    /* MARK: unicoap_driver_extension_point */
+}
 /** @} */
 
 /* MARK: - Request destinations */

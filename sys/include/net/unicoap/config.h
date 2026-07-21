@@ -153,6 +153,16 @@
 #endif
 
 /**
+ * @brief Maximum length of host part in client URIs, used for DNS resolution
+ *
+ * **Default**: 32 bytes
+ */
+#if !defined(CONFIG_UNICOAP_URI_HOST_PART_LENGTH_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_URI_HOST_PART_LENGTH_MAX (32)
+#endif
+
+
+/**
  * @brief Size of buffer unicoap allocates for a CoAP message header,
  * including token length.
  */
