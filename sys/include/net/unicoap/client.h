@@ -170,6 +170,15 @@ int unicoap_send_request_sync(unicoap_message_t* request,
  * method will fail with `-ENOBUFS`. Once the method returns zero, you can start reading from
  * @p response and @p aux.
  *
+ * You must pass a pre-allocated @p response struct to this function. To receive response options,
+ * pre-allocate options using @ref UNICOAP_OPTIONS_ALLOC or @ref UNICOAP_OPTIONS_ALLOC_STATIC and
+ * set @ref unicoap_message_t::options accordingly. To read from the response payload, allocate a
+ * a buffer and set @ref unicoap_message_t::payload, @ref unicoap_message_t::payload_size,
+ * and @ref unicoap_message_t::payload_representation to
+ * @ref UNICOAP_PAYLOAD_REPRESENTATION_CONTIGUOUS. Non-contiguous payload buffers are not supported
+ * by this function. When this function returns, the @ref unicoap_message_t::payload_size property
+ * will have been updated to reflect the received payload length and options.
+ *
  * Consumes @p request .
  *
  * @remark To avoid the overhead of copying the response from network-stack-internal memory, use
