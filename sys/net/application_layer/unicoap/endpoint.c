@@ -17,6 +17,7 @@
 #include "net/af.h"
 #include "net/ipv4/addr.h"
 #include "net/ipv6/addr.h"
+#include "net/af.h"
 #include "uri_parser.h"
 #include "net/netif.h"
 #include "net/unicoap/transport.h"
@@ -162,7 +163,9 @@ int unicoap_uri_populate(uri_parser_result_t* parsed, unicoap_endpoint_t* endpoi
     assert(endpoint);
     assert(options);
     int res = 0;
-    int proto = unicoap_proto_from_scheme_and_host(parsed->scheme, parsed->scheme_len, parsed->host, parsed->host_len);
+    int proto = unicoap_proto_from_scheme_and_host(
+        parsed->scheme, parsed->scheme_len, parsed->host, parsed->host_len);
+
     if (proto < 0) {
         _URI_DEBUG("error: invalid protocol scheme: '%.*s'\n", (int)parsed->scheme_len,
                   parsed->scheme);
@@ -192,113 +195,81 @@ int unicoap_uri_populate(uri_parser_result_t* parsed, unicoap_endpoint_t* endpoi
         }
     }
 
-#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
-    int16_t netif_id = SOCK_ADDR_ANY_NETIF;
-    if (parsed->zoneid && parsed->zoneid_len > 0) {
-        netif_t *netif = netif_get_by_name_buffer(parsed->zoneid, parsed->zoneid_len);
-        if (!netif || (netif_id = netif_get_id(netif)) < 0) {
-            _URI_DEBUG("error: unknown zone ID\n");
-            return -EINVAL;
+
+    int16_t* netif_id = unicoap_endpoint_get_netif_id(endpoint);
+    if (netif_id && parsed->zoneid && parsed->zoneid_len > 0) {
+        *netif_id = SOCK_ADDR_ANY_NETIF;
+        if (IS_USED(MODULE_NETIF)) {
+            netif_t* netif = netif_get_by_name_buffer(parsed->zoneid, parsed->zoneid_len);
+            if (!netif || (*netif_id = netif_get_id(netif)) < 0) {
+                _URI_DEBUG("error: unknown zone ID\n");
+                return -ENOENT;
+            }
+        } else {
+            unicoap_assist(API_ERROR("cannot resolve zone id") FIXIT("USEMODULE += netif"));
+            return -ENOTSUP;
         }
     }
 
-    if (unicoap_transport_uses_sock_tl_ep(proto)) {
-        struct _sock_tl_ep *tl_ep = _unicoap_endpoint_get_tl(endpoint);
-        tl_ep->port = parsed->port;
-        tl_ep->netif = netif_id;
+    uint16_t* port = unicoap_endpoint_get_port(endpoint);
+    if (port) {
+        *port = parsed->port;
+    }
 
-        if (parsed->ipv6addr && (parsed->ipv6addr_len > 0)) {
-#  if SOCK_HAS_IPV6 && IS_USED(MODULE_IPV6_ADDR)
-            ipv6_addr_t *v6 = ipv6_addr_from_buf((ipv6_addr_t *)tl_ep->addr.ipv6, parsed->ipv6addr,
-                                                 parsed->ipv6addr_len);
-            assert(v6);
-            (void)v6;
-            tl_ep->family = AF_INET6;
-            static_assert(sizeof(tl_ep->addr.ipv6) == sizeof(v6->u8),
-                          "Programmer error: IPv6 size mismatch");
+    ipv6_addr_t* v6addr = unicoap_endpoint_get_ipv6(endpoint);
+    if (parsed->ipv6addr && (parsed->ipv6addr_len > 0)) {
+        ipv6_addr_from_buf((ipv6_addr_t*)tl_ep->addr.ipv6, parsed->ipv6addr, parsed->ipv6addr_len);
+        *unicoap_endpoint_get_address_family(endpoint) = AF_INET6;
+    } else {
+        if {
 
-#  else /* if SOCK_HAS_IPV6 && IS_USED(MODULE_IPV6_ADDR) */
-            _URI_DEBUG("cannot read IPv6 literal, SOCK_HAS_IPV6/ipv6_addr missing\n");
-            return -EINVAL;
+        } else {
+            if (ipv4_addr_from_buf((ipv4_addr_t*)tl_ep->addr.ipv4, parsed->host, parsed->host_len)) {
+                /* The host part is actually an IPv4 address literal. */
+                *unicoap_endpoint_get_address_family(endpoint) = AF_INET4;
+            } else {
+                /* Only thing left to try is DNS resolution */
+                /* FIXME: DNS query function requires null-terminated string, 
+                          forcing us to copy the URI host */
+                char domain[parsed->host_len + 1];
+                alloca(CONFIG_UNICOAP_URI_HOST_PART_LENGTH_MAX)
+                memcpy(domain, parsed->host, parsed->host_len);
+                domain[parsed->host_len] = '\0';
 
-#  endif /* if SOCK_HAS_IPV6 && IS_USED(MODULE_IPV6_ADDR) */
-        }
-        else {
-            if (parsed->host && (parsed->host_len > 0)) {
-#  if SOCK_HAS_IPV4 && IS_USED(MODULE_IPV4_ADDR)
-                /* _sock_tl_ep always has v4 support */
-                ipv4_addr_t *v4 = NULL;
-                _URI_DEBUG("trying to read IPv4 literal (ipv4_addr module used)\n");
-                if ((v4 = ipv4_addr_from_buf((ipv4_addr_t *)tl_ep->addr.ipv4, parsed->host,
-                                             parsed->host_len))) {
-                    tl_ep->family = AF_INET;
-                    static_assert(sizeof(tl_ep->addr.ipv4) == sizeof(v4->u8),
-                                  "Programmer error: IPv5 size mismatch");
+                if ((res = dns_query(domain, &tl_ep->addr, AF_UNSPEC)) < 0) {
+                    _URI_DEBUG("error: DNS resolution of '%.*s' failed: %i\n",
+                                (int)parsed->host_len, parsed->host, res);
+                    return res;
                 }
 
-#  else  /* SOCK_HAS_IPV4 && IS_USED(MODULE_IPV4_ADDR) */
-                if (false) {
+                if ((res = unicoap_options_set_string(options, UNICOAP_OPTION_URI_HOST,
+                                                        parsed->host, parsed->host_len)) < 0) {
+                    return res;
                 }
-#  endif /* SOCK_HAS_IPV4 && IS_USED(MODULE_IPV4_ADDR) */
-                else {
-#  if IS_USED(MODULE_DNS)
-                    /* FIXME: DNS query function requires null-terminated string, forcing us to copy the URI host */
-
-                    char domain[parsed->host_len + 1];
-                    memcpy(domain, parsed->host, parsed->host_len);
-                    domain[parsed->host_len] = '\0';
-
-                    if ((res = dns_query(domain, &tl_ep->addr, AF_UNSPEC)) < 0) {
-                        _URI_DEBUG("error: DNS resolution of '%.*s' failed: %i\n",
-                                  (int)parsed->host_len, parsed->host, res);
-                        return res;
-                    }
-
-                    if (options &&
-                        (res = unicoap_options_set_string(options, UNICOAP_OPTION_URI_HOST,
-                                                          parsed->host, parsed->host_len)) < 0) {
-                        return res;
-                    }
-#  else  /* IS_USED(MODULE_DNS) */
-                    _URI_DEBUG("error: cannot resolve FQDN, dns module missing\n");
-                    assert(false);
-                    return -ENOTSUP;
-#  endif /* IS_USED(MODULE_DNS) */
-                }
-            }
-            else {
-                _URI_DEBUG("error: malformed URI\n");
-                return -EINVAL;
             }
         }
     }
-    else {
-        _URI_DEBUG("error: unsupported endpoint\n");
-        return -ENOTSUP;
-    }
-#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) */
 
     /* MARK: unicoap_driver_extension_point */
 
     endpoint->proto = proto;
 
-    if (options) {
-        if (parsed->path && (parsed->path_len > 0)) {
-            if ((res = 
-                unicoap_options_add_uri_path(options, (char*)parsed->path, parsed->path_len)) < 0) {
-                _URI_DEBUG("error: setting Uri-Path failed\n");
-                return res;
-            }
-        }
-
-        if (parsed->query && (parsed->query_len > 0)) {
-            if ((res = unicoap_options_add_values_joined(options, UNICOAP_OPTION_URI_QUERY,
-                                                  (uint8_t *)parsed->query, parsed->query_len,
-                                                  '&')) < 0) {
-                _URI_DEBUG("error: setting Uri-Query failed\n");
-                return res;
-            }
+    if (parsed->path && (parsed->path_len > 0)) {
+        if ((res = 
+            unicoap_options_add_uri_path(options, (char*)parsed->path, parsed->path_len)) < 0) {
+            _URI_DEBUG("error: setting Uri-Path failed\n");
+            return res;
         }
     }
+
+    if (parsed->query && (parsed->query_len > 0)) {
+        if ((res = unicoap_options_add_values_joined(options, UNICOAP_OPTION_URI_QUERY,
+                                                (uint8_t *)parsed->query, parsed->query_len,
+                                                '&')) < 0) {
+            _URI_DEBUG("error: setting Uri-Query failed\n");
+            return res;
+        }
+    }
+    
     return 0;
 }
