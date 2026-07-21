@@ -4,7 +4,7 @@ description: Create and serialize CoAP messages.
 ---
 
 `unicoap_message_t` is the central container type for CoAP messages. To see how to access CoAP
-options, refer to the message and server pages in this folder.
+options, see [Using Message APIs](../message-example).
 
 ## Example
 

@@ -34,10 +34,7 @@ USEMODULE += unicoap_driver_udp
 
 `unicoap` enables support for CoAP over various transport protocols. Currently, it supports the
 UDP and DTLS drivers. You must specify at least one driver to use networking functionality. If you
-only want to use the message APIs, you can use the framing implementation of each driver, such as
-the RFC 7252 PDU format.
-
-`unicoap` implements both a client and a server. To create a CoAP server, see the server guide in
-this folder.
-
-For module configuration and implementation details, see the dedicated pages in this folder.
+only want to use the message APIs, see [Using Message APIs](../message-example). To create a CoAP
+server, see [Writing a Server Application](../server-tutorial). The RFC 7252 PDU format is covered
+in [Parsing and Serialization](../pdu). For implementation details, see [Behind The Scenes of
+unicoap](../internals).

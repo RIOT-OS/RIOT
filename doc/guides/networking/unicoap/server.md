@@ -11,7 +11,7 @@ A CoAP resource behaves similar to an HTTP endpoint.
 
 You can either declare a resource using static cross-file arrays (1) or manually at runtime (2).
     
-1. This technique requires the `unicoap_server_resource_declarations` module.
+1. This technique requires the [CoAP Resource Declarations](../resources-xfa) module.
    The identifier you specify with the `UNICOAP_RESOURCE` macro just needs to be unique,
    but isn't used otherwise. You will need to specify a path and a set of allowed request methods
    using `UNICOAP_METHODS`.

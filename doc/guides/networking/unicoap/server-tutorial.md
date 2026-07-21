@@ -48,7 +48,7 @@ In `main.c`, we include `unicoap`.
 
 Let's define a CoAP resource. To define a new resource statically (at compile-time), we
 use the `UNICOAP_RESOURCE` macro. To make that work, we need to import the
-`unicoap_server_resource_declarations` module in our `Makefile`.
+[CoAP Resource Declarations](../resources-xfa) module in our `Makefile`.
 
 ```makefile
 USEMODULE += unicoap_server_resource_declarations
@@ -286,7 +286,7 @@ Through `.iol_next = &suffix`, we chain the suffix behind the middle part and us
 `list.iol_next = &name_chunk` appends this chain of two chunks to the first chunk. Our vector is
 done and we can finally send the response after having set the status and message payload. unicoap
 supports multiple slightly different ways to use the API to respond to reduce boilerplate.
-Find an extended explanation in `net_unicoap_server`.
+Find an extended explanation in [CoAP Server](../server).
 
 ```c
 unicoap_message_payload_set_chunks(message, &list);
