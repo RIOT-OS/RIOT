@@ -438,7 +438,7 @@ static inline unicoap_destination_t unicoap_destination_host_string(const char* 
 /**
  * @brief Creates destination identifier from URI string
  *
- * @param uri Null-terminated Uniform Resource Rdentifier
+ * @param uri Null-terminated Uniform Resource Identifier
  *
  * @returns New resource identifier from URI
  */
