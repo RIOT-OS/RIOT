@@ -109,11 +109,8 @@ slow down the initial build of a RIOT application, depending on your
 internet connection.
 
 To avoid downloading the full archive for each fresh build, a caching script
-was used called `git-cache`. This script has been deprecated in Release 2026.04
-and will be removed in favor of
-[`git-cache-rs`](https://github.com/kaspar030/git-cache-rs), which is
-implemented in Rust, offers more feature and is still under active development
-and maintenance.
+called [`git-cache-rs`](https://github.com/kaspar030/git-cache-rs) is used,
+which is implemented in Rust and under active development.
 
 Please note that many popular Linux distributions provide very old Rust
 versions in their repositories. Therefore, it is
