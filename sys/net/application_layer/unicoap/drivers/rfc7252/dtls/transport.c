@@ -36,6 +36,13 @@ static sock_dtls_t _dtls_socket;
 
 unicoap_scheduled_event_t _dtls_session_triage_event = { 0 };
 
+/* tinydtls does not support auxiliary data
+ * see https://github.com/RIOT-OS/RIOT/issues/16054 */
+#if IS_ACTIVE(CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS)
+#  pragma message "warning: tinydtls does not support retrieving local endpoints. \
+           CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS will be ignored for the dtls transport"
+#endif
+
 /* Timeout function to free a session when too many session slots are occupied */
 static void _dtls_session_triage(unicoap_scheduled_event_t* event)
 {
@@ -130,7 +137,9 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
 
         unicoap_packet_t packet = { .remote = &remote, .dtls_session = &session };
 
-#if IS_ACTIVE(CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS)
+/* tinydtls does not support auxiliary data
+ * see https://github.com/RIOT-OS/RIOT/issues/16054 */
+#if false && IS_ACTIVE(CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS)
         assert((aux_rx.flags & SOCK_AUX_GET_LOCAL) == 0);
         unicoap_endpoint_t local = { .proto = UNICOAP_PROTO_DTLS };
         packet.local = &local;
