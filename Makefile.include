@@ -239,7 +239,7 @@ GLOBAL_GOALS += info-boards-features-blacklisted \
 PRIVATE_GLOBAL_GOALS := info-boards-collect \
                         #
 
-ifneq (, $(filter $(GLOBAL_GOALS) $(PRIVATE_GLOBAL_GOALS), $(MAKECMDGOALS)))
+ifneq (,$(filter $(GLOBAL_GOALS) $(PRIVATE_GLOBAL_GOALS),$(MAKECMDGOALS)))
   include $(RIOTMAKE)/info-global.inc.mk
 else
 
