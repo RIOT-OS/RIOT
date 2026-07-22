@@ -528,6 +528,7 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, uint8_
 bool coap_find_uri_query(coap_pkt_t *pkt, const char *key, const char **value, size_t *len)
 {
     uint8_t *opt_pos = NULL;
+    size_t len_key = strlen(key);
 
     while (1) {
         int len_query;
@@ -538,11 +539,11 @@ bool coap_find_uri_query(coap_pkt_t *pkt, const char *key, const char **value, s
         }
 
         const char *separator = memchr(key_data, '=', len_query);
-        size_t len_key = separator
-                       ? (separator - (char *)key_data)
-                       : len_query;
+        size_t len_query_key = separator
+                             ? (separator - (char *)key_data)
+                             : len_query;
 
-        if (memcmp(key, key_data, len_key)) {
+        if (len_key != len_query_key || memcmp(key, key_data, len_query_key)) {
             continue;
         }
 
@@ -553,7 +554,7 @@ bool coap_find_uri_query(coap_pkt_t *pkt, const char *key, const char **value, s
         assert(len);
         if (separator) {
             *value = separator + 1;
-            *len = len_query - len_key - 1;
+            *len = len_query - len_query_key - 1;
         } else {
             *value = NULL;
             *len   = 0;
