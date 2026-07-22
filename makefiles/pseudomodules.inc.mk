@@ -579,6 +579,7 @@ PSEUDOMODULES += stdio_default
 PSEUDOMODULES += stdio_dispatch
 PSEUDOMODULES += stdio_ethos
 PSEUDOMODULES += stdio_nimble_debug
+PSEUDOMODULES += stdio_notify
 PSEUDOMODULES += stdio_slipdev
 PSEUDOMODULES += stdio_telnet
 ## @defgroup sys_stdio_uart_onlcr   Support for DOS line endings in STDIO-UART
