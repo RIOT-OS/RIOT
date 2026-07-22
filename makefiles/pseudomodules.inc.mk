@@ -118,6 +118,8 @@ PSEUDOMODULES += dns_cache
 PSEUDOMODULES += dns_msg
 
 PSEUDOMODULES += ecc_%
+PSEUDOMODULES += efm32_eth_auto
+PSEUDOMODULES += efm32_eth_link_up
 PSEUDOMODULES += ethos_stdio
 PSEUDOMODULES += event_%
 PSEUDOMODULES += event_timeout

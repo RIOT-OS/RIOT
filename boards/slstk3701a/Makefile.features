@@ -5,6 +5,7 @@ CPU_MODEL = efm32gg11b820f2048gl192
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_dac
+FEATURES_PROVIDED += periph_eth
 FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_rtc
 FEATURES_PROVIDED += periph_rtt
@@ -12,5 +13,8 @@ FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_usbdev
+
+# Various other features (if any)
+FEATURES_PROVIDED += efm32_eth
 
 include $(RIOTBOARD)/common/silabs/Makefile.features

@@ -116,6 +116,7 @@ FEATURES_EXISTING := \
     cpu_stm32wl \
     dbgpin \
     efm32_coretemp \
+    efm32_eth \
     emulator_renode \
     esp_ble \
     esp_hw_counter \

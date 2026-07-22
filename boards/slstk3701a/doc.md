@@ -107,7 +107,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | MCU                           | EFM32GG11B  | yes       | Power modes supported                                 |
 | Low-level driver              | ADC         | yes       |                                                       |
 |                               | DAC         | yes       | VDAC, IDAC is not supported                           |
-|                               | Ethernet    | no        |                                                       |
+|                               | Ethernet    | yes       |                                                       |
 |                               | Flash       | yes       |                                                       |
 |                               | GPIO        | yes       | Interrupts are shared across pins (see ref manual)    |
 |                               | HW Crypto   | yes       |                                                       |
