@@ -453,6 +453,9 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
     assert(sock);
     assert(udp_sock);
 
+    /* tinydtls actually does not care about role */
+    (void)role;
+
     if (role != SOCK_DTLS_CLIENT && role != SOCK_DTLS_SERVER) {
         DEBUG("sock_dtls: invalid role\n");
         return -1;
@@ -494,7 +497,6 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
         sock->tags_len = 0;
     }
 
-    sock->role = role;
     sock->dtls_ctx = dtls_new_context(sock);
     if (!sock->dtls_ctx) {
         DEBUG("sock_dtls: error getting DTLS context\n");
