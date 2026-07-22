@@ -25,7 +25,7 @@
 
 static uint16_t calc_rank(gnrc_rpl_dodag_t *, uint16_t);
 static int parent_cmp(gnrc_rpl_parent_t *, gnrc_rpl_parent_t *);
-static int which_dodag(gnrc_rpl_dodag_t *, gnrc_rpl_dio_t *);
+static int which_dodag(gnrc_rpl_dodag_t *, gnrc_rpl_dio_t *, kernel_pid_t iface, ipv6_addr_t addr);
 static void reset(gnrc_rpl_dodag_t *);
 
 static gnrc_rpl_of_t gnrc_rpl_of0 = {
@@ -87,8 +87,11 @@ int parent_cmp(gnrc_rpl_parent_t *parent1, gnrc_rpl_parent_t *parent2)
     return 0;
 }
 
-int which_dodag(gnrc_rpl_dodag_t *d1, gnrc_rpl_dio_t *dio)
+int which_dodag(gnrc_rpl_dodag_t *d1, gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t addr)
 {
+    (void) iface;
+    (void) addr;
+    
     /* RFC 6552, Section 4.2 */
 
     /* parent set must not be empty */
