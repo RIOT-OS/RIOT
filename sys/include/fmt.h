@@ -42,6 +42,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "compiler_hints.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -112,6 +114,7 @@ size_t fmt_byte_hex(char *out, uint8_t byte);
  *
  * @return     2*n
  */
+ACCESS(read_only, 2, 3)
 size_t fmt_bytes_hex(char *out, const uint8_t *ptr, size_t n);
 
 /**
@@ -127,6 +130,7 @@ size_t fmt_bytes_hex(char *out, const uint8_t *ptr, size_t n);
  *
  * @return     2*n
  */
+ACCESS(read_only, 2, 3)
 size_t fmt_bytes_hex_reverse(char *out, const uint8_t *ptr, size_t n);
 
 /**
@@ -469,6 +473,8 @@ uint32_t scn_u32_hex(const char *str, size_t n);
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
+ACCESS(write_only, 1, 2)
+ACCESS(read_only, 3, 4)
 ssize_t scn_buf_hex(void *dest, size_t dest_len, const char *hex, size_t hex_len);
 
 /**
@@ -574,6 +580,7 @@ void print_byte_hex(uint8_t byte);
  * @param[in]  bytes Byte array to print
  * @param[in]  n     Number of bytes to print
  */
+ACCESS(read_only, 1, 2)
 void print_bytes_hex(const void *bytes, size_t n);
 
 /**
