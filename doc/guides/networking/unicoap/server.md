@@ -10,7 +10,7 @@ A CoAP resource behaves similar to an HTTP endpoint.
 ## Registering a Resource
 
 You can either declare a resource using static cross-file arrays (1) or manually at runtime (2).
-    
+
 1. This technique requires the [CoAP Resource Declarations](../resources-xfa) module.
    The identifier you specify with the `UNICOAP_RESOURCE` macro just needs to be unique,
    but isn't used otherwise. You will need to specify a path and a set of allowed request methods
@@ -121,18 +121,18 @@ There are multiple techniques for responding.
    ```
 
 2. **Call send**: Initialize a response message with the status code, and
-  optionally, also payload and options. You can repurpose the memory used by the `message`
-  parameter for the response, but you must not write into the payload buffer or mutate options.
-  If you do want to send options, please allocate options using `UNICOAP_OPTIONS_ALLOC`.
-  Then, pass the message and the response context you were
-  given as part of the handler parameters to `unicoap_send_response`. Finally, you may inspect
-  any errors that may have occurred while sending the response or continue processing the request.
-  You may also directly return the result of `unicoap_send_response`.
-  Please be aware any processing performed inside this handler is executed in the server's
-  processing loop and will thus block it. Given an expensive operation, we encourage you to switch
-  to the third technique. Nevertheless, this should be the preferred response technique for most
-  applications. `unicoap_send_response` can fail, and you are responsible for handling that
-  error. You may retry to send it, or to send an Internal Server Error or similar codes instead.
+   optionally, also payload and options. You can repurpose the memory used by the `message`
+   parameter for the response, but you must not write into the payload buffer or mutate options.
+   If you do want to send options, please allocate options using `UNICOAP_OPTIONS_ALLOC`.
+   Then, pass the message and the response context you were
+   given as part of the handler parameters to `unicoap_send_response`. Finally, you may inspect
+   any errors that may have occurred while sending the response or continue processing the request.
+   You may also directly return the result of `unicoap_send_response`.
+   Please be aware any processing performed inside this handler is executed in the server's
+   processing loop and will thus block it. Given an expensive operation, we encourage you to switch
+   to the third technique. Nevertheless, this should be the preferred response technique for most
+   applications. `unicoap_send_response` can fail, and you are responsible for handling that
+   error. You may retry to send it, or to send an Internal Server Error or similar codes instead.
 
    ```c
    int my_request_handler(
@@ -145,8 +145,6 @@ There are multiple techniques for responding.
    ```
 
 3. **Defer the response**: This technique is not available yet.
-
-
 
 :::note
 There is no architectural limitation in the number of sockets or ports. If

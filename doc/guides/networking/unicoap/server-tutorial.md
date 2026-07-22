@@ -417,4 +417,3 @@ and run `tcpdump -i tap0 -w coap-greeting.pcap`, then execute the client script 
 then terminate `tcpdump` with `CTRL+C`. You can now open `coap-greeting.pcap` with
 [Wireshark](https://wireshark.org) to inspect CoAP messages. You should see a `NON` request followed
 by a `CON` response which elicits another `ACK` message from the client.
-
