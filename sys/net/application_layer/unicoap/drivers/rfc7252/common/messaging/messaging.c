@@ -896,6 +896,10 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
              * Hence, only watch NON transmissions (i.e., watch for RSTs)
              * in client exchanges. The exchange layer sets the TRACK flag in this case. */
             transmission = _transmission_create(packet->remote, packet);
+            if (!transmission) {
+                res = -ENOBUFS;
+                goto error;
+            }
         }
         break;
 
@@ -903,13 +907,15 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
         /* If we send a confirmable message, we always need a transmission
          * for retransmitting the original PDU and for tracking ACK timeouts
          * (exponential back-off mechanism). */
-        if (!(transmission = _transmission_create(packet->remote, packet))) {
-            return -ENOBUFS;
+        transmission = _transmission_create(packet->remote, packet);
+        if (!transmission) {
+            res = -ENOBUFS;
             goto error;
         }
 
         /* need a carbon copy buffer for storing the PDU copy for retransmission */
-        if (!(carbon_copy = _carbon_copy_alloc())) {
+        carbon_copy = _carbon_copy_alloc();
+        if (!carbon_copy) {
             res = -ENOBUFS;
             goto error;
         }
