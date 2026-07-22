@@ -521,6 +521,30 @@ int fmt_time_tm_iso8601(char out[20], const struct tm *tm, char separator)
     return pos - out;
 }
 
+int scn_bool(const char *str, size_t n)
+{
+    if (!strncmp(str, "1", n)) {
+        return 1;
+    }
+    if (!strncmp(str, "true", n)) {
+        return 1;
+    }
+    if (!strncmp(str, "on", n)) {
+        return 1;
+    }
+    if (!strncmp(str, "0", n)) {
+        return 0;
+    }
+    if (!strncmp(str, "false", n)) {
+        return 0;
+    }
+    if (!strncmp(str, "off", n)) {
+        return 0;
+    }
+
+    return -EINVAL;
+}
+
 uint32_t scn_u32_dec(const char *str, size_t n)
 {
     uint32_t res = 0;
