@@ -87,14 +87,14 @@ void openthread_bootstrap(void)
 #endif
 #ifdef MODULE_CC2538_RF
     netdev_register(&cc2538_rf_netdev.dev.netdev, NETDEV_CC2538, 0);
-    netdev_ieee802154_submac_init(&cc2538_rf_netdev);
+    netdev_ieee802154_submac_init(&cc2538_rf_netdev, NULL);
     cc2538_rf_hal_setup(&cc2538_rf_netdev.submac.dev);
     cc2538_init();
     netdev_t *netdev = &cc2538_rf_netdev.dev.netdev;
 #endif
 #ifdef MODULE_NRF802154
     netdev_register(&nrf802154_netdev.dev.netdev, NETDEV_NRF802154, 0);
-    netdev_ieee802154_submac_init(&nrf802154_netdev);
+    netdev_ieee802154_submac_init(&nrf802154_netdev, NULL);
     nrf802154_hal_setup(&nrf802154_netdev.submac.dev);
     nrf802154_init();
     netdev_t *netdev = &nrf802154_netdev.dev.netdev;
