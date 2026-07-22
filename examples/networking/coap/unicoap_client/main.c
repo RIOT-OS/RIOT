@@ -106,7 +106,7 @@ static int _cli(int argc, char** argv) {
     } else {
         printf("error: unsupported method '%s'\n", argv[1]);
         goto help;
-    } 
+    }
 
     /* Track where URI argument is expected. */
     int uri_arg_ix = 2;
@@ -151,12 +151,12 @@ static int _cli(int argc, char** argv) {
         return res;
     }
     return 0;
-    
+
 help:
     return _print_usage(argv);
 }
 
-SHELL_COMMAND(unicoap, "unicoap sample client", _cli) 
+SHELL_COMMAND(unicoap, "unicoap sample client", _cli)
 
 int main(void) {
     /* By default, unicoap_init() is automatically called for you before main().
@@ -240,7 +240,7 @@ int main(void) {
     /* unicoap_loop_run(); */
 #endif
     /* start shell */
-    puts("All up, running unicoap client shell, command is 'coap'");
+    puts("All up, running unicoap client shell, command is 'unicoap'");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;

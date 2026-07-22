@@ -13,7 +13,6 @@ import logging
 import asyncio
 
 import os
-os.environ["AIOCOAP_DTLSSERVER_ENABLED"] = "1"
 
 from argparse import ArgumentParser
 import aiocoap.resource as resource
@@ -163,16 +162,19 @@ async def main():
 
     parser.add_argument(
         "-i", "--interface",
-        help='Interface (e.g., tap0)',
+        help='Interface to enable dtls server for (e.g., tap0)',
         required=False)
 
     args = parser.parse_args()
 
     addr = "::"
     if args.interface != None:
+        os.environ["AIOCOAP_DTLSSERVER_ENABLED"] = "1"
         addr = os.popen("ip addr show " + args.interface).read().split("inet6 ")[1].split("/")[0]
         addr += "%" + args.interface
         print("server bound to tap interface " + addr)
+    else:
+        print("interface not set, will not start dtls server")
 
     # Resource tree creation
     root = resource.Site()
