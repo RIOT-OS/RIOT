@@ -172,6 +172,7 @@ export default defineConfig({
                       "networking/unicoap/resources-xfa",
                       "networking/unicoap/server",
                       "networking/unicoap/server-tutorial",
+                      "networking/unicoap/message",
                       "networking/unicoap/message-example",
                     ]
                   }
