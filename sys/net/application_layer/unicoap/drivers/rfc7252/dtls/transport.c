@@ -61,6 +61,8 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
 
     if (type & SOCK_ASYNC_CONN_RECV) {
         _DTLS_DEBUG("establishing session\n");
+        /* finish handshake as per API contract of @ref sock_dtls_session_init.
+         * use non-buf function with less parameters */
         uint8_t buf[1];
         ssize_t res = sock_dtls_recv(sock, &session, buf, sizeof(buf),
                                      CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS * US_PER_MS);
@@ -129,6 +131,7 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
         unicoap_packet_t packet = { .remote = &remote, .dtls_session = &session };
 
 #if IS_ACTIVE(CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS)
+        assert((aux_rx.flags & SOCK_AUX_GET_LOCAL) == 0);
         unicoap_endpoint_t local = { .proto = UNICOAP_PROTO_DTLS };
         packet.local = &local;
 
@@ -171,6 +174,8 @@ error:
 }
 
 int unicoap_transport_connect_dtls(const sock_udp_ep_t* remote, sock_dtls_session_t* session) {
+    assert(remote);
+    assert(session);
     int res = 0;
     _DTLS_DEBUG("auth: connecting...\n");
     sock_dtls_session_set_udp_ep(session, remote);
@@ -263,7 +268,8 @@ int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
         break;
     default:
         /* Temporary error. Keeping the DTLS session */
-        break;
+        _DTLS_DEBUG("DTLS error: %s\n", strerror(-res));
+        return res;
     }
     return 0;
 }
@@ -279,6 +285,7 @@ static int _add_socket(event_queue_t* queue, sock_dtls_t* socket, sock_udp_t* ba
         _DTLS_DEBUG("error creating DTLS base (UDP) sock\n");
         return 0;
     }
+    /* tinydtls as a backend does not care about role, fine to reuse same socket for client */
     if (sock_dtls_create(socket, base_socket, CREDMAN_TAG_EMPTY, SOCK_DTLS_1_2,
                          SOCK_DTLS_SERVER) < 0) {
         _DTLS_DEBUG("error creating DTLS sock\n");
