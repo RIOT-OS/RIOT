@@ -11,6 +11,7 @@
  * @author  Carl <carl.seifert@tu-dresden.de>
  */
 
+#include <stddef.h>
 #include <string.h>
 
 #include "thread.h"
@@ -53,15 +54,26 @@ int unicoap_resource_match_request_default(const unicoap_listener_t* listener,
         /* potential match, check for method */
         if (!unicoap_resource_match_method((*resource)->methods,
                                            unicoap_request_get_method(request))) {
-            /* record wrong method error for next iteration, in case
-             * another resource with the same URI and correct method
-             * exists */
-            res = UNICOAP_STATUS_METHOD_NOT_ALLOWED;
+            /* The unsupported content format takes precedence */
+            if (res != UNICOAP_STATUS_UNSUPPORTED_CONTENT_FORMAT) {
+                /* set wrong method for next iteration */
+                res = UNICOAP_STATUS_METHOD_NOT_ALLOWED;
+            }
+            /* we continue searching in case
+             * another resource with the same URI and correct method exists */
             continue;
         }
-        else {
+        unicoap_content_format_code_t request_cf;
+        if(unicoap_options_get_content_format(request->options, &request_cf) < 0) {
+            /* We match since there is no content-format */
             return 0;
         }
+        if (!unicoap_format_supported(&(*resource)->formats.request, request_cf)) {
+            /* set wrong content format but keep searching. */
+            res = UNICOAP_STATUS_UNSUPPORTED_CONTENT_FORMAT;
+            continue;
+        }
+        return 0;
     }
     return res;
 }
@@ -72,24 +84,36 @@ ssize_t unicoap_resource_encode_link(const unicoap_resource_t* resource, char* b
     assert(buffer);
     /* count target separators and any link separator, path is at least one character (`/`) */
     size_t exp_size = 2 + (context->uninitialized ? 0 : 1);
-
-    unsigned int pos = 0;
+    char* start = buffer;
     if (capacity < exp_size) {
         return -ENOBUFS;
     }
 
     if (!context->uninitialized) {
-        buffer[pos++] = ',';
+        *buffer++ = ',';
     }
-    buffer[pos++] = '<';
-    ssize_t res = 0;
-    if ((res = unicoap_path_stringify(&resource->path, buffer + pos, capacity - exp_size)) < 0) {
-        return res;
+    *buffer++ = '<';
+    ssize_t written = 0;
+    if ((written = unicoap_path_stringify(&resource->path, buffer, capacity)) < 0) {
+        return written;
     }
-    pos += res;
-    buffer[pos] = '>';
-
-    return exp_size + res;
+    buffer += written;
+    if (capacity < (size_t)(buffer - start) + 1) {
+        return -ENOBUFS;
+    }
+    *buffer++ = '>';
+    size_t n_format_codes = unicoap_cfspec_len(&resource->formats.respond);
+    if (n_format_codes == 0) {
+        return (ssize_t) (buffer - start);
+    }
+    if (capacity < (size_t)(buffer - start) + 1) {
+        return -ENOBUFS;
+    }
+    *buffer++ = ';';
+    if ((written = unicoap_content_format_stringify(&resource->formats.respond, buffer, capacity)) < 0) {
+        return written;
+    }
+    return (ssize_t)(buffer - start);
 }
 
 /**

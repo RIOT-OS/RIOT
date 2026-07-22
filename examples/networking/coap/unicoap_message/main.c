@@ -47,7 +47,7 @@ static void _example_handle_message(const unicoap_message_t* message)
     unicoap_options_dump_all(message->options);
 
     /* Content-Format is an option that can occur no more than once. */
-    unicoap_content_format_t format = 0;
+    unicoap_content_format_code_t format = 0;
     if (unicoap_options_get_content_format(message->options, &format) < 0) {
         puts("Error: could not read Content-Format!");
         return;

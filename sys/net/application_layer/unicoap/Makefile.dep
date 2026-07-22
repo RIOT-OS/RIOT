@@ -126,3 +126,8 @@ ifneq (,$(filter unicoap_sock_support,$(USEMODULE)))
   USEMODULE += sock_aux_local
   USEMODULE += sock_util
 endif
+
+ifneq (,$(filter unicoap_content_format, $(USEMODULE)))
+  USEMODULE += unicoap_content_format_request
+  USEMODULE += unicoap_content_format_respond
+endif

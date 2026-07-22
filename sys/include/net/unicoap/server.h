@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "constants.h"
 #include "xfa.h"
 #include "ztimer.h"
 #include "event.h"
@@ -296,6 +297,27 @@ int unicoap_send_response(unicoap_message_t* response, unicoap_request_context_t
 unicoap_status_t unicoap_response_status_from_errno(int _errno);
 /** @} */
 
+/* MARK: - Specifying and inspecting content formats */
+typedef struct {
+    /**
+     * @brief Pointer to contiguously stored unicoap_content_format_code_t instances.
+     * The list is terminated with a unicoap_content_format_code_t::UNICOAP_FORMAT_TERMINATOR
+     */
+    const unicoap_content_format_code_t *_formats;
+} unicoap_cfspec_t;
+
+static_assert(sizeof(unicoap_cfspec_t) == sizeof(unicoap_cfspec_t*),
+              "unicoap_cfspec_t is of unexpected size. Please file a bug report.");
+
+#define UNICOAP_RESOURCE_FORMATS(...) ((unicoap_cfspec_t) { \
+        ._formats = (const unicoap_content_format_code_t[]) { \
+        __VA_ARGS__, UNICOAP_FORMAT_TERMINATOR } })
+
+size_t unicoap_cfspec_len(const unicoap_cfspec_t *cfspec);
+size_t unicoap_content_format_string_len(unicoap_content_format_code_t cf);
+ssize_t unicoap_content_format_stringify(const unicoap_cfspec_t* cfspec, char* buffer, size_t capacity);
+bool unicoap_format_supported(const unicoap_cfspec_t* cfspec, unicoap_content_format_code_t cf);
+
 /* MARK: - Registering CoAP resources */
 /**
  * @name Registering CoAP resources
@@ -328,6 +350,11 @@ typedef enum {
      */
     UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE = 0x4000,
 
+    // maybe resource for authenticated only? access control?
+    // claims? maybe independent of oscore?
+    // talk to teufelchen? slipmux
+    
+    // onio
     /* TODO: Advanced features */
 } unicoap_resource_flags_t;
 
@@ -371,6 +398,11 @@ typedef uint8_t unicoap_method_set_t;
  * @param methods Set of CoAP methods
  */
 void unicoap_print_methods(unicoap_method_set_t methods);
+
+typedef struct {
+    const unicoap_cfspec_t request;
+    const unicoap_cfspec_t respond;
+} unicoap_content_formats_t;
 
 /**
  * @brief A type representing a CoAP resource
@@ -423,6 +455,8 @@ struct unicoap_resource {
      * @see @ref unicoap_proto_set_t
      */
     unicoap_proto_set_t protocols;
+
+    const unicoap_content_formats_t formats;
 };
 
 /**
@@ -471,7 +505,7 @@ typedef struct {
     /**
      * @brief Expected content format of resource
      */
-    unicoap_content_format_t content_format;
+    unicoap_content_format_code_t content_format;
 
     /**
      * @brief Current byte offset of encoder

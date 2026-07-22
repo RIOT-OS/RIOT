@@ -188,7 +188,11 @@ UNICOAP_RESOURCE(greeting) {
     .methods = UNICOAP_METHODS(UNICOAP_METHOD_GET),
 
     .handler = handle_greeting_request,
-    .handler_arg = NULL
+    .handler_arg = NULL,
+    .formats = {
+        .request = UNICOAP_RESOURCE_FORMATS(UNICOAP_FORMAT_TEXT),
+        .respond = UNICOAP_RESOURCE_FORMATS(UNICOAP_FORMAT_JSON, UNICOAP_FORMAT_CBOR)
+    }
 };
 
 int main(void) {

@@ -88,7 +88,7 @@ static void test_pdu_rfc7252_actuators_round_trip(void)
 
     TEST_ASSERT_EQUAL_INT(parsed.options.option_count, 5);
 
-    unicoap_content_format_t format = 0;
+    unicoap_content_format_code_t format = 0;
     unicoap_options_get_content_format(&parsed.options, &format);
     TEST_ASSERT_EQUAL_INT(format, UNICOAP_FORMAT_JSON);
 

@@ -627,6 +627,10 @@ PSEUDOMODULES += unicoap_client_uri
 # Request cancellation support
 PSEUDOMODULES += unicoap_client_cancellation
 
+PSEUDOMODULES += unicoap_content_format
+PSEUDOMODULES += unicoap_content_format_request
+PSEUDOMODULES += unicoap_content_format_respond
+
 PSEUDOMODULES += usbus_urb
 
 PSEUDOMODULES += vdd_lc_filter_%

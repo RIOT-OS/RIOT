@@ -87,7 +87,7 @@ To read options like `Content-Format` which can occur no more than once, you use
 Read accessors for non-repeatable options are prefixed with `unicoap_options_get`.
 
 ```c
-unicoap_content_format_t format = 0;
+unicoap_content_format_code_t format = 0;
 
 if (unicoap_options_get_content_format(message->options, &format) < 0) {
     puts("Error: could not read Content-Format!");

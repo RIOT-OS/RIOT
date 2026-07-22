@@ -1605,14 +1605,20 @@ typedef enum {
      * @see [https://www.w3.org/TR/SVG/mimereg.html](https://www.w3.org/TR/SVG/mimereg.html)
      */
     UNICOAP_FORMAT_IMAGE_SVG_XML = 30000,
-} __attribute__((__packed__)) unicoap_content_format_t;
+
+    /**
+     * @brief Terminator value
+     * This is used to signal the end of a list of content content formats
+     */
+    UNICOAP_FORMAT_TERMINATOR = 35535,
+} __attribute__((__packed__)) unicoap_content_format_code_t;
 
 /**
  * @brief Determines whether the given `Content-Format` is based on JSON
  * @param format `Content-Format` value
  * @return A boolean value indicating whether the format is JSON-based
  */
-static inline bool unicoap_content_format_is_json(unicoap_content_format_t format) {
+static inline bool unicoap_content_format_is_json(unicoap_content_format_code_t format) {
     return
       format == UNICOAP_FORMAT_JSON ||
       format == UNICOAP_FORMAT_JSON_PATCH_JSON ||
@@ -1641,7 +1647,7 @@ static inline bool unicoap_content_format_is_json(unicoap_content_format_t forma
  * @param format `Content-Format` value
  * @return A boolean value indicating whether the format is CBOR-based
  */
-static inline bool unicoap_content_format_is_cbor(unicoap_content_format_t format) {
+static inline bool unicoap_content_format_is_cbor(unicoap_content_format_code_t format) {
     return
       format == UNICOAP_FORMAT_ACE_CBOR ||
       format == UNICOAP_FORMAT_CBOR ||
@@ -1683,7 +1689,7 @@ static inline bool unicoap_content_format_is_cbor(unicoap_content_format_t forma
  * @param format `Content-Format` value
  * @return A boolean value indicating whether the format is XML-based
  */
-static inline bool unicoap_content_format_is_xml(unicoap_content_format_t format) {
+static inline bool unicoap_content_format_is_xml(unicoap_content_format_code_t format) {
     return
       format == UNICOAP_FORMAT_XML ||
       format == UNICOAP_FORMAT_SENML_XML ||
@@ -1697,7 +1703,7 @@ static inline bool unicoap_content_format_is_xml(unicoap_content_format_t format
  * @param format `Content-Format` value
  * @return A boolean value indicating whether the format is human-readable
  */
-static inline bool unicoap_content_format_is_human_readable(unicoap_content_format_t format) {
+static inline bool unicoap_content_format_is_human_readable(unicoap_content_format_code_t format) {
     return
       format == UNICOAP_FORMAT_TEXT ||
       format == UNICOAP_FORMAT_TEXT_CSS ||

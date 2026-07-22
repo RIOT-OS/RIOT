@@ -224,6 +224,75 @@ bool unicoap_path_matches_options(const unicoap_pathspec_t* path,
     }
 }
 
+size_t unicoap_cfspec_len(const unicoap_cfspec_t *cfspec) {
+    const unicoap_content_format_code_t *cur = cfspec->_formats;
+    ssize_t s = 0;
+    for (; *cur != UNICOAP_FORMAT_TERMINATOR; cur++, s++) {}
+    return s;
+}
+
+size_t unicoap_content_format_string_len(unicoap_content_format_code_t cf) {
+    unsigned int remaining = (unsigned int)cf;
+    ssize_t s = 1;
+    while (remaining >= 10) {
+        remaining /= 10;
+        s++;
+    }
+    return s;
+}
+
+ssize_t unicoap_content_format_stringify(const unicoap_cfspec_t* cfspec, char* buffer, size_t capacity) {
+    assert(cfspec);
+    size_t n_format_codes = unicoap_cfspec_len(cfspec);
+
+    if (n_format_codes == 0) {
+        return 0;
+    }
+
+    /* 3 chars for pt=, at least 1 char for the format code, 1 char NULL */
+    if (capacity < 5) {
+        return -ENOBUFS;
+    }
+    size_t written = (size_t)sprintf(buffer, "pt=");
+
+    /* Multiple white space separated formats: wrap in quotes. */
+    if (n_format_codes > 1) {
+        buffer[written++] = '"';
+    }
+
+    const unicoap_content_format_code_t *cur = cfspec->_formats;
+    bool first = true;
+    for (; *cur != UNICOAP_FORMAT_TERMINATOR; cur++) {
+        size_t str_len = unicoap_content_format_string_len(*cur);
+        /* One additional char for the closing quotes */
+        if (capacity <= written + str_len + 1) {
+            return -ENOBUFS;
+        }
+        size_t n = (size_t)sprintf(buffer + written, "%s%d", first ? "" : " ", *cur);
+        // TODO remove sanity check
+        assert(n == str_len);
+        written += n;
+        first = false;
+    }
+
+    if (n_format_codes > 1) {
+        if (capacity < written + 1) {
+            return -ENOBUFS;
+        }
+        buffer[written++] = '"';
+    }
+    return (ssize_t)written;
+}
+
+bool unicoap_format_supported(const unicoap_cfspec_t* cfspec, unicoap_content_format_code_t cf) {
+    for (const unicoap_content_format_code_t* cur = cfspec->_formats; *cur != UNICOAP_FORMAT_TERMINATOR; cur++) {
+        if (*cur == cf) {
+            return true;
+        }
+    }
+    return false;
+}
+
 static inline void iolist_init(iolist_t* iolist, uint8_t* buffer, size_t size, iolist_t* next) {
     iolist->iol_base = buffer;
     iolist->iol_len = size;
