@@ -59,6 +59,11 @@ PERIPH_IGNORE_MODULES := \
   periph_wdt_auto_start \
   periph_xh3irq \
   #
+
+ifneq (,$(filter soft_i2c_as_periph_i2c,$(USEMODULE)))
+  USEMODULE := $(filter-out periph_i2c,$(USEMODULE))
+endif
+
 PERIPH_MODULES := $(filter-out $(PERIPH_IGNORE_MODULES),\
                                $(filter periph_%,$(USEMODULE)))
 # Use simple expansion to avoid USEMODULE referencing itself
