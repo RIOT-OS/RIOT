@@ -243,7 +243,9 @@ get_supported_boards() {
         export BOARDS="${QUICKBUILD_BOARDS}"
     fi
 
-    local boards="$(make --no-print-directory -C$appdir info-boards-supported 2>/dev/null || echo broken)"
+    # The `info-boards-supported` target supports multithreading, but
+    # using too many threads causes it to become flaky in CI.
+    local boards="$(make --no-print-directory -C$appdir -j2 info-boards-supported 2>/dev/null || echo broken)"
 
     export BOARDS="${BOARDS_}"
 

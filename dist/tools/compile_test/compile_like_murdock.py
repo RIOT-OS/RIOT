@@ -154,7 +154,7 @@ def _all_apps(cwd):
 
 
 def _supported_boards(boards, env, cwd, all_boards=False):
-    cmd = ('make', 'info-boards-supported', '--no-print-directory')
+    cmd = ('make', 'info-boards-supported', '--no-print-directory', '-j')
     supported_boards = __exec_cmd(cmd, env=env, cwd=cwd).split()
     if all_boards:
         return supported_boards
@@ -163,7 +163,7 @@ def _supported_boards(boards, env, cwd, all_boards=False):
 
 def _supported_boards_from_cpu(cpu, env, cwd):
     cmd = (f'FEATURES_REQUIRED=cpu_{cpu} make info-boards-supported '
-           '--no-print-directory')
+           '--no-print-directory -j')
     __exec_cmd(cmd, shell=True, env=env, cwd=cwd).split()
 
 

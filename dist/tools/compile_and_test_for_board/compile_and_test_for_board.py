@@ -296,10 +296,17 @@ class RIOTApplication:
         self.logger.info("Application has test: %s", has_test)
         return has_test
 
-    def board_is_supported(self):
-        """Return if current board is supported."""
+    def board_is_supported(self, jobs=False):
+        """Return if current board is supported.
+
+        :param jobs: Number of parallel jobs allowed
+        """
         env = {"BOARDS": self.board}
         cmd = ["info-boards-supported"]
+        if jobs is not None:
+            cmd += ["--jobs"]
+            if jobs:
+                cmd += [str(jobs)]
         ret = self.make(cmd, env=env, log_error=True).strip()
 
         supported = ret == self.board
@@ -393,11 +400,12 @@ class RIOTApplication:
         succeeds.
 
         :param incremental: Do not rerun successful compilation and tests
+        :param jobs: Number of parallel jobs allowed
         :raises ErrorInTest: on execution failed during one step
         """
 
         # Ignore incompatible APPS
-        if not self.board_is_supported():
+        if not self.board_is_supported(jobs):
             create_directory(self.resultdir, clean=True)
             self._skip("not_supported", "Board not supported")
             return
