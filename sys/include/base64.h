@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2014 Hochschule für Angewandte Wissenschaften Hamburg (HAW)
+ * SPDX-FileCopyrightText: 2014 HAW Hamburg
  * SPDX-FileCopyrightText: 2014 Martin Landsmann <Martin.Landsmann@HAW-Hamburg.de>
  * SPDX-License-Identifier: LGPL-2.1-only
  */
@@ -18,6 +18,8 @@
 
 #include <stddef.h> /* for size_t */
 #include <stdbool.h> /* for bool */
+
+#include "compiler_hints.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -93,6 +95,7 @@ static inline bool base64_can_estimate_encode_size(size_t data_in_size)
  * @retval  BASE64_ERROR_DATA_IN            if `data_in` equals NULL
  * @retval  BASE64_ERROR_OVERFLOW           if `data_in_size` is too large to be encoded to base64
  */
+ACCESS(read_only, 1, 2)
 int base64_encode(const void *data_in, size_t data_in_size,
                   void *base64_out, size_t *base64_out_size);
 
@@ -121,6 +124,7 @@ int base64_encode(const void *data_in, size_t data_in_size,
  * @retval  BASE64_ERROR_DATA_IN            if `data_in` equals NULL
  * @retval  BASE64_ERROR_OVERFLOW           if `data_in_size` is too large to be encoded to base64
  */
+ACCESS(read_only, 1, 2)
 int base64url_encode(const void *data_in, size_t data_in_size,
                      void *base64_out, size_t *base64_out_size);
 
@@ -144,6 +148,7 @@ int base64url_encode(const void *data_in, size_t data_in_size,
  * @retval  BASE64_ERROR_DATA_IN            if `base64_in` equals NULL
  * @retval  BASE64_ERROR_DATA_IN_SIZE       if `base64_in_size` has remainder 1 (mod 4)
  */
+ACCESS(read_only, 1, 2)
 int base64_decode(const void *base64_in, size_t base64_in_size,
                   void *data_out, size_t *data_out_size);
 

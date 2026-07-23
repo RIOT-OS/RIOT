@@ -406,7 +406,20 @@ static void test_base64_12_encode_overflow(void)
 
     size_t base64_out_size = 0;
 
+    /* To test if `base64_encode()` detects an overflow of the output size
+     * argument, we need to pass a size argument that is incredibly large. The
+     * compiler is unaware that base64_encode() won't actually read from
+     * `data_in` due to the overflow and will complain about reading
+     * `SIZE_MAX - 1` bytes beyond `data_in`. So we just disable the diagnostics
+     * here temporarily. */
+#if defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 8)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
     int ret = base64_encode(data_in, SIZE_MAX, NULL, &base64_out_size);
+#if defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 8)
+#  pragma GCC diagnostic pop
+#endif
 
     TEST_ASSERT_EQUAL_INT(BASE64_ERROR_OVERFLOW, ret);
 }
