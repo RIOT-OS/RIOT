@@ -1,0 +1,8 @@
+This driver provides RIOT support for the Sensirion SHT4X temperature and humidity sensor family.
+
+The implementation supports:
+- single-shot measurements for temperature and humidity
+- sensor initialization with soft reset
+- CRC-8 validation of temperature and humidity data
+- on-chip heater commands with configurable power and duration
+- SAUL integration for temperature and humidity sensing
