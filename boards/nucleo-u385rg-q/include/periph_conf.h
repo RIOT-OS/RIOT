@@ -10,7 +10,7 @@
  * @{
  *
  * @file
- * @brief       Minimal peripheral configuration for STM32U385 (bring-up)
+ * @brief       Peripheral configuration for the STM32 Nucleo-U385RG-Q
  *
  * @author      Adarsh Nair Mullachery <adarsh.mullachery@tuhh.de>
  */
@@ -31,7 +31,7 @@ extern "C" {
  * @name   SPI configuration
  * @{
  * @note  Arduino D11/D12/D13 (MOSI/MISO/SCK) on Nucleo-U: PA7/PA6/PA5. SPI1 on
- *        APB2; clock gate @ref RCC_APB2ENR_SPI1EN in stm32u385xx.h. Alternate
+ *        APB2; clock gate @c RCC_APB2ENR_SPI1EN in stm32u385xx.h. Alternate
  *        function AF5 for SPI1 on port A (RM0487 AF table).
  */
 static const spi_conf_t spi_config[] = {
@@ -82,7 +82,7 @@ static const i2c_conf_t i2c_config[] = {
 /**
  * @name    Timer configuration
  * @{
- * @note    TIM2 is reserved for @ref pwm_config (User LED / TIM2_CH1 on PA5).
+ * @note    TIM2 is reserved for @c pwm_config (User LED / TIM2_CH1 on PA5).
  *          TIM3 is used here as the RIOT timer backend (general-purpose timer).
  */
 static const timer_conf_t timer_config[] = {
@@ -168,10 +168,8 @@ static const uart_conf_t uart_config[] = {
 /**
  * @name    ADC configuration
  * @{
- * @note Arduino CN8 (A0–A5) pinout for NUCLEO-U385RG-Q per ST UM3062 Table 14:
- *       A0=PA0/IN5, A1=PA1/IN6, A2=PA4/IN9, A3=PB0/IN15, A4=PC1/IN2, A5=PC0/IN1.
- *       All lines use ADC1 (@c dev 0). PC0/PC1 are also Arduino I2C3 on the
- *       connector; this board’s default I2C is I2C1 on PB8/PB9.
+ * @note Arduino CN8 analog pins A0-A5 on ADC1, plus the internal VBAT and
+ *       VREFINT channels.
  */
 /**
  * @brief   Internal ADC1 channel for VREFINT on STM32U3 (channel 0).
@@ -180,8 +178,7 @@ static const uart_conf_t uart_config[] = {
 #  define VREFINT_ADC_CHAN  0
 #endif
 
-/* ADC1 channel numbers below are verified on hardware (potentiometer sweep on
- * each Arduino analog pin). The STM32U385 ADC1 input mux maps
+/* STM32U385 ADC1 input mux mapping:
  *   PC0=IN1, PC1=IN2, PA0=IN3, PA1=IN4, PA2=IN5, PA3=IN6, PA4=IN7, PB0=IN13. */
 static const adc_conf_t adc_config[] = {
     { .pin = GPIO_PIN(PORT_A, 0), .dev = 0, .chan = 3 },   /* A0  ADC1_IN3  */
@@ -202,6 +199,7 @@ static const adc_conf_t adc_config[] = {
 
 /**
  * @name    USB device (USB DRD FS) configuration
+ * @{
  * @note    D+/D- on PA12/PA11 (user USB Type-C connector). The USB DRD FS
  *          PHY drives the pads directly, so no alternate function is used;
  *          the driver keeps the pins in analog mode.
@@ -209,8 +207,8 @@ static const adc_conf_t adc_config[] = {
  *          @ref cpu_stm32 "stmclk" when using this peripheral.
  * @note    On STM32U3, USB is on APB2 and gated via @c RCC->APB2ENR
  *          (see RM0487, memory map + RCC section).
- * @{
  */
+/** @brief USB DRD FS device configuration */
 static const stm32_usbdev_fs_config_t stm32_usbdev_fs_config[] = {
     {
         .base_addr  = (uintptr_t)USB,
@@ -224,8 +222,8 @@ static const stm32_usbdev_fs_config_t stm32_usbdev_fs_config[] = {
     },
 };
 
-#define USBDEV_ISR          isr_usb_fs
-#define USBDEV_NUMOF        ARRAY_SIZE(stm32_usbdev_fs_config)
+#define USBDEV_ISR          isr_usb_fs                        /**< USB FS interrupt service routine */
+#define USBDEV_NUMOF        ARRAY_SIZE(stm32_usbdev_fs_config) /**< Number of configured USB devices */
 /** @} */
 
 #ifdef __cplusplus
