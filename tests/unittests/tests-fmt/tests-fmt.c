@@ -855,6 +855,21 @@ static void test_scn_u32_dec(void)
     TEST_ASSERT_EQUAL_INT(val2, scn_u32_dec(string1, 5));
 }
 
+static void test_scn_bool(void)
+{
+    TEST_ASSERT_EQUAL_INT(1, scn_bool_str("1"));
+    TEST_ASSERT_EQUAL_INT(1, scn_bool_str("true"));
+    TEST_ASSERT_EQUAL_INT(1, scn_bool_str("on"));
+
+    TEST_ASSERT_EQUAL_INT(0, scn_bool_str("0"));
+    TEST_ASSERT_EQUAL_INT(0, scn_bool_str("false"));
+    TEST_ASSERT_EQUAL_INT(0, scn_bool_str("off"));
+
+    TEST_ASSERT_EQUAL_INT(-EINVAL, scn_bool_str("yes"));
+    TEST_ASSERT_EQUAL_INT(-EINVAL, scn_bool_str("no"));
+    TEST_ASSERT_EQUAL_INT(-EINVAL, scn_bool_str("nobody"));
+}
+
 static void test_scn_u32_hex(void)
 {
     /* ´x´ is not a valid hexadecimal character */
@@ -1060,6 +1075,7 @@ Test *tests_fmt_tests(void)
         new_TestFixture(test_fmt_char),
         new_TestFixture(test_fmt_to_lower),
         new_TestFixture(test_scn_u32_dec),
+        new_TestFixture(test_scn_bool),
         new_TestFixture(test_scn_u32_hex),
         new_TestFixture(test_scn_buf_hex),
         new_TestFixture(test_fmt_lpad),
