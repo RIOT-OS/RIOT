@@ -161,7 +161,7 @@ extern "C" {
  */
 static inline bool sixlowpan_frag_is_snip(const gnrc_pktsnip_t *snip)
 {
-    if (snip->size < sizeof(sixlowpan_frag_t )) {
+    if (snip->size < sizeof(sixlowpan_frag_t)) {
         return false;
     }
 
