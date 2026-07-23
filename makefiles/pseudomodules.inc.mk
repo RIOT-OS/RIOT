@@ -384,6 +384,7 @@ PSEUDOMODULES += nrf24l01p_ng_diagnostics
 PSEUDOMODULES += od_string
 
 PSEUDOMODULES += opendsme
+PSEUDOMODULES += radiolib
 PSEUDOMODULES += openthread
 
 # declare periph submodules as pseudomodules, but exclude periph_common
