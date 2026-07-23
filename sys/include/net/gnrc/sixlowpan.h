@@ -152,11 +152,12 @@ extern "C" {
 /**
  * @brief   Same as @ref sixlowpan_frag_is but operates on a @ref gnrc_pktsnip_t
  *
- * @param[in]   snip    Packet snipped to check for a valid 6LoWPAN fragment
+ * @param[in]   snip    Packet snip to check for a valid 6LoWPAN fragment
  *                      header
  *
  * @retval  true    @p snip starts with a valid 6LoWPAN fragment header
- * @retval  false   @p snip does **NOT** start with a valid 6LoWPAN header
+ * @retval  false   @p snip does **NOT** start with a valid 6LoWPAN fragment
+ *                  header
  */
 static inline bool sixlowpan_frag_is_snip(const gnrc_pktsnip_t *snip)
 {
