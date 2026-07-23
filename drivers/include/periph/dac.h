@@ -49,6 +49,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
+#include <stddef.h>
 #include <stdint.h>
 #include <limits.h>
 
@@ -130,6 +131,8 @@ void dac_poweroff(dac_t line);
 
 /**
  * @brief   Get the sample rate of the DAC in Hz
+ *
+ * @return  Sampling Rate in Hz
  */
 uint32_t dac_get_freq(void);
 
