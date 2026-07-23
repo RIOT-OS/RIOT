@@ -29,9 +29,6 @@ UNICOAP_DECL_RECEIVER_STORAGE_EXTERN;
 
 static sock_udp_t _udp_socket;
 
-extern int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool truncated,
-                                             unicoap_packet_t* packet);
-
 static void _udp_on_event(sock_udp_t* sock, sock_async_flags_t type, void* arg)
 {
     (void)arg;
@@ -98,7 +95,9 @@ static void _udp_on_event(sock_udp_t* sock, sock_async_flags_t type, void* arg)
         }
 #endif
 
-        unicoap_messaging_process_rfc7252(pdu, (size_t)received, truncated, &packet);
+        unicoap_messaging_process_rfc7252(pdu, (size_t)received, 
+        UNICOAP_MESSAGING_EVENT_RFC7252_RX | (truncated ? UNICOAP_MESSAGING_EVENT_RFC7252_TRUNCATED : 0), 
+        &packet);
 
         if (IS_ACTIVE(CONFIG_UNICOAP_SOCK_ZERO_COPY_GUARANTEES)) {
             received = sock_udp_recv_buf_aux(sock, &stackbuf, &buffer_ctx, 0,
