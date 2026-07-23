@@ -326,6 +326,9 @@ void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
             break;
 
         case SIXLOWPAN_FRAG_N_DISP:
+            if (pkt->size < sizeof(sixlowpan_frag_n_t)) {
+                return;
+            }
             offset = (((sixlowpan_frag_n_t *)frag)->offset * 8);
             break;
 
