@@ -182,6 +182,12 @@ int unicoap_init_dtls(event_queue_t* queue);
 /** @brief Deinitializes the CoAP over DTLS over UDP driver on the given @p queue */
 int unicoap_deinit_dtls(event_queue_t* queue);
 
+/** @brief Initializes the CoAP over Slipmux driver on the given @p queue */
+int unicoap_init_slipmux(event_queue_t* queue);
+
+/** @brief Deinitializes the CoAP over Slipmux driver on the given @p queue */
+int unicoap_deinit_slipmux(event_queue_t* queue);
+
 /** @brief Initializes the common RFC 7252 driver on the given @p queue */
 int unicoap_init_rfc7252_common(event_queue_t* queue);
 
