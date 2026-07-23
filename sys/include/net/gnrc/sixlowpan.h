@@ -147,6 +147,29 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Same as @ref sixlowpan_frag_is but operates on a @ref gnrc_pktsnip_t
+ *
+ * @param[in]   snip    Packet snip to check for a valid 6LoWPAN fragment
+ *                      header
+ *
+ * @retval  true    @p snip starts with a valid 6LoWPAN fragment header
+ * @retval  false   @p snip does **NOT** start with a valid 6LoWPAN fragment
+ *                  header
+ */
+static inline bool sixlowpan_frag_is_snip(const gnrc_pktsnip_t *snip)
+{
+    if (snip->size < sizeof(sixlowpan_frag_t)) {
+        return false;
+    }
+
+    if (sixlowpan_frag_n_is(snip->data)) {
+        return snip->size >= sizeof(sixlowpan_frag_n_t);
+    }
+
+    return sixlowpan_frag_1_is(snip->data);
+}
+
+/**
  * @brief   Initialization of the 6LoWPAN thread.
  *
  * @details If 6LoWPAN was already initialized, it will just return the PID of
