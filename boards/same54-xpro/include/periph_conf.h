@@ -375,8 +375,8 @@ static const adc_conf_chan_t adc_channels[] = {
                             /* Must not exceed 12 MHz */
 #define DAC_CLOCK           SAM0_GCLK_TIMER
 #ifndef DAC_VREF
-                            /* Internal reference only gives 1V */
-#define DAC_VREF            DAC_CTRLB_REFSEL_INTREF
+                            /* Use analogue supply voltage as reference */
+#  define DAC_VREF          DAC_CTRLB_REFSEL_VDDANA
 #endif
 /** @} */
 
