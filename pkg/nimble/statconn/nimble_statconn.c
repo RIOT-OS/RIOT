@@ -263,7 +263,7 @@ int nimble_statconn_rm(const uint8_t *addr)
         nimble_netif_accept_stop();
     }
     s->state = UNUSED;
-    memset(s->addr, 0, sizeof(BLE_ADDR_LEN));
+    memset(s->addr, 0, sizeof(s->addr));
     mutex_unlock(&_lock);
 
     nimble_netif_close(nimble_netif_conn_get_by_addr(addr));
