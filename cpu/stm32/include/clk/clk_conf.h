@@ -32,6 +32,8 @@
 #elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
       defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
 #include "l4l5wx/cfg_clock_default.h"
+#elif defined(CPU_FAM_STM32U3)
+#include "u3/cfg_clock_default.h"
 #elif defined(CPU_FAM_STM32U5)
 #include "u5/cfg_clock_default.h"
 #elif defined(CPU_FAM_STM32MP1)
