@@ -477,6 +477,7 @@ PSEUDOMODULES += shell_cmd_app_metadata
 PSEUDOMODULES += shell_cmd_at30tse75x
 PSEUDOMODULES += shell_cmd_benchmark_udp
 PSEUDOMODULES += shell_cmd_ccn-lite-utils
+PSEUDOMODULES += shell_cmd_coap
 PSEUDOMODULES += shell_cmd_conn_can
 PSEUDOMODULES += shell_cmd_cord_ep
 PSEUDOMODULES += shell_cmd_coreclk
@@ -618,6 +619,12 @@ PSEUDOMODULES += unicoap_sock_support
 
 # XFA support for CoAP resource definitions in unicoap server
 PSEUDOMODULES += unicoap_server_resource_declarations
+
+# URI support in unicoap client API
+PSEUDOMODULES += unicoap_client_uri
+
+# Request cancellation support
+PSEUDOMODULES += unicoap_client_cancellation
 
 PSEUDOMODULES += usbus_urb
 

@@ -609,9 +609,9 @@ const char* unicoap_string_from_option_number(unicoap_option_number_t number) {
     }
 }
 
-int unicoap_print_code(uint8_t code, char* string) {
-    return sprintf(string, UNICOAP_CODE_CLASS_DETAIL_FORMAT, unicoap_code_class(code),
-                   unicoap_code_detail(code));
+int unicoap_print_code(uint8_t code) {
+    return printf(UNICOAP_CODE_CLASS_DETAIL_FORMAT, unicoap_code_class(code),
+                  unicoap_code_detail(code));
 }
 
 bool unicoap_response_is_optional(unicoap_options_t* options, unicoap_status_t status) {
@@ -713,6 +713,14 @@ void unicoap_print_resource(const unicoap_resource_t* resource) {
     printf(" flags=");
     unicoap_print_resource_flags(resource->flags);
     printf(">");
+}
+
+void unicoap_print_client_flags(unicoap_client_flags_t flags) {
+    printf("[ ");
+    if (flags & UNICOAP_CLIENT_FLAG_RELIABLE) {
+        printf("RELIABLE ");
+    }
+    printf("]");
 }
 
 void unicoap_assist_emit_diagnostic_missing_driver(unicoap_proto_t proto) {
