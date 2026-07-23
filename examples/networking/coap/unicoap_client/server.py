@@ -195,7 +195,7 @@ async def main():
     protocol.server_credentials.load_from_dict(
         {'coaps://*': {'dtls': {
             'psk': b'secretPSK',
-            'client-identity': b'Client_Identity',
+            'client-identity': b'Client_identity',
         }}})
 
     # Run forever
