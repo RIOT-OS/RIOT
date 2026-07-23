@@ -246,6 +246,13 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
  */
 int unicoap_exchange_process(unicoap_packet_t* packet, unicoap_exchange_arg_t arg);
 
+
+typedef enum {
+    UNICOAP_MESSAGING_EVENT_RFC7252_RX = 1,
+    UNICOAP_MESSAGING_EVENT_RFC7252_TRUNCATED = 1 << 1,
+    UNICOAP_MESSAGING_EVENT_RFC7252_SESSION_ESTABLISHED = 1 << 2,
+} __attribute__((packed)) unicoap_messaging_rfc7252_event_type_t;
+
 /**
  * @brief Internal RFC 7252 messaging inbound processor
  * @param[in] pdu Buffer containing PDU
@@ -262,8 +269,8 @@ int unicoap_exchange_process(unicoap_packet_t* packet, unicoap_exchange_arg_t ar
  * @remark While it is not advised to call private API, you might want to consider calling this
  * function in a very constrained environment or when using `sock` is not an option.
  */
-int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool truncated,
-                                      unicoap_packet_t* packet);
+int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, 
+    unicoap_messaging_rfc7252_event_type_t event,  unicoap_packet_t* packet);
 
 /* MARK: unicoap_driver_extension_point */
 

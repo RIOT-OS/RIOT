@@ -61,6 +61,7 @@ USEMODULE += od
 # Use shell module to accept and parse RIOT shell commands to send requests with configurable
 # CoAP request methods.
 USEMODULE += shell
+USEMODULE += shell_cmds_default
 
 # It is okay to import only either of the CoAP over UDP and CoAP over DTLS drivers.
 

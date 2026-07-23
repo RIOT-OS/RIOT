@@ -240,9 +240,10 @@ static _transmission_t* _transmission_create(const unicoap_endpoint_t* endpoint,
         return NULL;
     }
     transmission->id = _get_id(packet);
-
     /* need to store endpoint by value. transmission may outlive endpoint's lifetime. */
     transmission->endpoint = *endpoint; /* use compiler-built-in copy primitive */
+    /* Reset retransmission counter, set to actual value in unicoap_messaging_send_rfc7252. */
+    transmission->remaining_retransmissions = 0;
 
     /* transmission stores session by value for retransmissions.
      * packet stores session by reference.
@@ -338,7 +339,7 @@ static int _sendv(iolist_t* list, const unicoap_endpoint_t* remote, const unicoa
     switch (remote->proto) {
 #if IS_USED(MODULE_UNICOAP_DRIVER_UDP)
     case UNICOAP_PROTO_UDP: {
-        extern int unicoap_transport_sendv_udp(iolist_t * iolist, const sock_udp_ep_t* remote,
+        extern int unicoap_transport_sendv_udp(iolist_t* iolist, const sock_udp_ep_t* remote,
                                                const sock_udp_ep_t* local);
         return unicoap_transport_sendv_udp(
             list, unicoap_endpoint_get_udp((unicoap_endpoint_t*)remote),
@@ -348,7 +349,7 @@ static int _sendv(iolist_t* list, const unicoap_endpoint_t* remote, const unicoa
 
 #if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
     case UNICOAP_PROTO_DTLS: {
-        extern int unicoap_transport_sendv_dtls(iolist_t * iolist, const sock_udp_ep_t* remote,
+        extern int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
                                                 const sock_udp_ep_t* local,
                                                 unicoap_sock_dtls_session_t* session);
         return unicoap_transport_sendv_dtls(
@@ -365,16 +366,47 @@ static int _sendv(iolist_t* list, const unicoap_endpoint_t* remote, const unicoa
     }
 }
 
-static inline int _send(uint8_t* pdu, size_t size, const unicoap_endpoint_t* remote,
-                        const unicoap_endpoint_t* local,
-                        const unicoap_sock_dtls_session_t* dtls_session)
-{
-    iolist_t list = __IOLIST(pdu, size, NULL);
-    return _sendv(&list, remote, local, dtls_session);
+static int _connect(unicoap_packet_t* packet, _transmission_t** transmission) {
+    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS) && unicoap_packet_proto(packet) == UNICOAP_PROTO_DTLS) {
+        int res = 0;
+        /* Transport driver indicated sending now would block, so will 
+         * get RESUME event from transport driver, telling us to resume sending.
+         * We'll then send any unsent PDUs (in carbon copy buffer of each transmission associated)
+         * with endpoint attached to event. We need a carbon copy to delay sending until
+         * that happens */
+        extern int unicoap_transport_connect_dtls(const sock_udp_ep_t* remote, sock_dtls_session_t* session);
+
+        if (!*transmission && !(*transmission = _transmission_create(packet->remote, packet))) {
+            return -ENOBUFS;
+        }
+        if ((res = unicoap_transport_connect_dtls(
+            unicoap_endpoint_get_dtls((unicoap_endpoint_t*)packet->remote), 
+            _transmission_get_session(*transmission)
+        )) < 0) {
+            return res;
+        }
+        if (res != EEXIST) {
+            /* Session does not already exist, so we have to delay it. */
+            MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT 
+                                 "delaying until connected\n", _get_id(packet));
+            if (!(*transmission)->pdu) {
+                uint8_t* carbon_copy = NULL;
+                if (!(carbon_copy = _carbon_copy_alloc())) {
+                    return -ENOBUFS;
+                }
+                (*transmission)->pdu = carbon_copy;
+            }
+            return -EWOULDBLOCK;
+        }
+    }
+    return 0;
 }
 
-static ssize_t _build_and_send_pdu(unicoap_packet_t* packet, uint8_t* carbon_copy)
-{
+static ssize_t _build_and_send_pdu(
+    unicoap_packet_t* packet, 
+    uint8_t* carbon_copy, 
+    _transmission_t** transmission
+) {
     assert(packet);
     assert(packet->message);
     assert(packet->remote);
@@ -414,6 +446,15 @@ static ssize_t _build_and_send_pdu(unicoap_packet_t* packet, uint8_t* carbon_cop
         }
     }
 
+    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS) 
+        && transmission
+        && unicoap_packet_proto(packet) == UNICOAP_PROTO_DTLS ) {
+        if ((res = _connect(packet, transmission)) < 0) {
+            /* _connect may return -EWOULDBLOCK, and delay sending. */
+            return res;
+        }
+    }
+
     if ((res = _sendv(&lists[0], packet->remote, packet->local, _packet_get_dtls_session(packet))) < 0) {
         return res;
     }
@@ -450,6 +491,41 @@ static void _handle_reset(const unicoap_endpoint_t* remote, uint16_t id)
     }
 }
 
+static void _on_ack_timeout(unicoap_scheduled_event_t* _event);
+
+static int _send_carbon_copy(_transmission_t* transmission) {
+    int res = 0;
+    uint32_t duration = 0;
+    if (transmission->remaining_retransmissions > 0) {
+        /* We're supposed to retransmit in the future shouldn't we receive an ACK.
+         * remaining_retransmissions is only greater than zero for CONs. For CONs,
+         * remaining_retransmissions cannot be zero, 
+         * because that is checked before in _on_ack_timeout. Delayed PDUs due to a pending
+         * DTLS session (CONs, NONs, ACKs, RSTs) will also go through here but
+         * remaining_retransmissions will be zero in these instances. */
+        unsigned int i = CONFIG_UNICOAP_RETRANSMISSIONS_MAX - transmission->remaining_retransmissions;
+        uint32_t duration = (uint32_t)CONFIG_UNICOAP_TIMEOUT_ACK_MS << i;
+        if (CONFIG_UNICOAP_RANDOM_FACTOR_1000 > 1000) {
+            duration = random_uint32_range(duration, UNICOAP_TIMEOUT_ACK_RANGE_UPPER << i);
+        }
+        MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT
+                             "transmitting now, waiting %" PRIu32 " ms, %u attempts remaining\n",
+                             transmission->id, duration, transmission->remaining_retransmissions);
+    }
+
+    iolist_t list = __IOLIST(transmission->pdu, transmission->pdu_size, NULL);
+    if ((res = _sendv(&list,
+                     _transmission_get_endpoint(transmission), NULL,
+                     _transmission_get_session(transmission))) < 0) {
+        return res;
+    }
+
+    if (transmission->remaining_retransmissions > 0) {
+        unicoap_event_schedule(&transmission->ack_timeout, _on_ack_timeout, duration);
+    }
+    return res;
+}
+
 static void _on_ack_timeout(unicoap_scheduled_event_t* _event) {
     _transmission_t* transmission = container_of(_event, _transmission_t, ack_timeout);
     assert(transmission);
@@ -466,24 +542,24 @@ static void _on_ack_timeout(unicoap_scheduled_event_t* _event) {
 
     /* reduce retries remaining, double timeout and resend */
     transmission->remaining_retransmissions -= 1;
-    unsigned int i = CONFIG_UNICOAP_RETRANSMISSIONS_MAX - transmission->remaining_retransmissions;
-    uint32_t duration = (uint32_t)CONFIG_UNICOAP_TIMEOUT_ACK_MS << i;
-    if (CONFIG_UNICOAP_RANDOM_FACTOR_1000 > 1000) {
-        duration = random_uint32_range(duration, UNICOAP_TIMEOUT_ACK_RANGE_UPPER << i);
+
+    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS) && 
+        _transmission_get_endpoint(transmission)->proto == UNICOAP_PROTO_DTLS) {
+        unicoap_packet_t packet = {
+            .remote = _transmission_get_endpoint(transmission),
+        };
+        _packet_set_dtls_session(&packet, _transmission_get_session(transmission));
+        if ((res = _connect(&packet, &transmission)) < 0 && res != -EWOULDBLOCK) {
+            goto error;
+        }
+        if (res == -EWOULDBLOCK) {
+            return;
+        }
     }
 
-    MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT
-                         "ACK timeout, retransmitting now, waiting %" PRIu32 " ms, "
-                         "%u attempts remaining\n",
-                         transmission->id, duration, transmission->remaining_retransmissions);
-
-    if ((res = _send(transmission->pdu, transmission->pdu_size,
-                     _transmission_get_endpoint(transmission), NULL,
-                     _transmission_get_session(transmission))) < 0) {
+    if ((res = _send_carbon_copy(transmission)) < 0) {
         goto error;
     }
-
-    unicoap_event_reschedule(&transmission->ack_timeout, duration);
     return;
 
 error:
@@ -508,7 +584,7 @@ static int _send_empty_message(unicoap_packet_t* packet)
     packet->properties.token = NULL;
     packet->properties.token_length = 0;
 
-    return (int)_build_and_send_pdu(packet, NULL);
+    return (int)_build_and_send_pdu(packet, NULL, NULL);
 }
 
 static inline int _acknowledge(unicoap_packet_t* packet)
@@ -523,6 +599,22 @@ static inline int _reset(unicoap_packet_t* packet)
     MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "sending RST\n", _get_id(packet));
     _set_type(packet, UNICOAP_TYPE_RST);
     return _send_empty_message(packet);
+}
+
+static int _resume(const unicoap_endpoint_t* endpoint, unicoap_sock_dtls_session_t* session) {
+    (void)endpoint;
+#if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_MAX > 0
+    for (int i = 0; i < (int)ARRAY_SIZE(_state.transmissions); i += 1) {
+        _transmission_t* transmission = &_state.transmissions[i];
+        if (transmission->is_used &&
+            unicoap_endpoint_is_equal(&transmission->endpoint, endpoint)
+        ) {
+            _transmission_set_session(transmission, session);
+            _send_carbon_copy(transmission);
+        }
+    }
+#endif
+    return 0;
 }
 
 /* MARK: - Message Processing */
@@ -616,9 +708,16 @@ static int _process_messaging_layer(unicoap_packet_t* packet)
     return 0;
 }
 
-int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool truncated,
+int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, unicoap_messaging_rfc7252_event_type_t event,
                                       unicoap_packet_t* packet)
 {
+    if (event & UNICOAP_MESSAGING_EVENT_RFC7252_SESSION_ESTABLISHED) {
+        _resume(packet->remote, (unicoap_sock_dtls_session_t*)_packet_get_dtls_session(packet));
+    }
+
+    if (!(event & UNICOAP_MESSAGING_EVENT_RFC7252_RX)) {
+        return 0;
+    }
     unicoap_options_t options = { 0 };
     unicoap_message_t message = { .options = &options };
     packet->message = &message;
@@ -650,7 +749,8 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool trun
     unicoap_exchange_arg_t arg;
     unicoap_messaging_flags_t flags;
 
-    switch ((res = unicoap_exchange_preprocess(packet, &flags, &arg, truncated))) {
+    switch ((res = unicoap_exchange_preprocess(packet, &flags, &arg, 
+        event & UNICOAP_MESSAGING_EVENT_RFC7252_TRUNCATED))) {
     case UNICOAP_PREPROCESSING_SUCCESS_REQUEST:
         break;
 
@@ -796,12 +896,6 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
 
         transmission->remaining_retransmissions = CONFIG_UNICOAP_RETRANSMISSIONS_MAX;
         transmission->pdu = carbon_copy;
-
-        uint32_t duration = CONFIG_UNICOAP_TIMEOUT_ACK_MS;
-        if (CONFIG_UNICOAP_RANDOM_FACTOR_1000 > 1000) {
-            duration = random_uint32_range(duration, UNICOAP_TIMEOUT_ACK_RANGE_UPPER);
-        }
-        unicoap_event_schedule(&transmission->ack_timeout, _on_ack_timeout, duration);
         break;
 
     case UNICOAP_TYPE_ACK:
@@ -813,9 +907,18 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
         assert(false);
         break;
     }
-
-    if ((res = (int)_build_and_send_pdu(packet, carbon_copy)) < 0) {
+     
+    if ((res = (int)_build_and_send_pdu(packet, carbon_copy, &transmission)) < 0 
+        && res != -EWOULDBLOCK) {
         goto error;
+    }
+
+    if (res != -EWOULDBLOCK && _get_type(packet) == UNICOAP_TYPE_CON) {
+        uint32_t duration = CONFIG_UNICOAP_TIMEOUT_ACK_MS;
+        if (CONFIG_UNICOAP_RANDOM_FACTOR_1000 > 1000) {
+            duration = random_uint32_range(duration, UNICOAP_TIMEOUT_ACK_RANGE_UPPER);
+        }
+        unicoap_event_schedule(&transmission->ack_timeout, _on_ack_timeout, duration);
     }
 
     if (transmission) {
