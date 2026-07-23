@@ -1330,8 +1330,12 @@ static inline bool coap_block2_finish(coap_block_slicer_t *slicer)
  *
  * @param[in]   pkt         packet to work on
  * @param[out]  slicer      Preallocated slicer struct to fill
+ *
+ * @retval       0          Success
+ * @retval       -EBADMSG   @p pkt contains an invalid block options
  */
-void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
+WARN_UNUSED_RESULT
+int coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
 
 /**
  * @brief Initialize a block slicer struct from content information
@@ -1341,9 +1345,13 @@ void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
                             @p blksize byte blocks
  * @param[in]    blksize    size of each block; must be a power of 2 between 16
  *                          and 2 raised to #CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX
+ * @retval       0          Success
+ * @retval       -EINVAL    @p blknum and/or @p blksize are invalid, e.g.
+ *                          because they point outside the addressable RAM
  */
-void coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
-                            size_t blksize);
+WARN_UNUSED_RESULT
+int coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
+                           size_t blksize);
 
 /**
  * @brief Add a byte array to a block2 reply when building the response using

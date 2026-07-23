@@ -52,8 +52,10 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
     (void)context;
     coap_block_slicer_t slicer;
     coap_builder_t state;
-    coap_block2_init(pkt, &slicer);
-    int err;
+    int err = coap_block2_init(pkt, &slicer);
+    if (err) {
+        return err;
+    }
     err = coap_builder_init_reply(&state, buf, len, pkt, COAP_CODE_CONTENT);
     if (err) {
         return err;
