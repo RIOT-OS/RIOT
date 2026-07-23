@@ -10,11 +10,9 @@
  * @file
  * @brief       DAC (audio) test application
  *
- *              Generates Sine, Square, Triangle and Sawtooth waves
- *              using a DAC.
- *              Connect a speaker or headphones to the DAC output
- *              pins of your board, you should be able to hear the
- *              generated sounds.
+ * Generates Sine, Square, Triangle and Sawtooth waves using a DAC.
+ * Connect a speaker or headphones to the DAC output pins of your board,
+ * you should be able to hear the generated sounds.
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  *
@@ -88,7 +86,7 @@ static uint16_t _fill_sine_samples(uint16_t *dst, uint16_t len)
     for (uint16_t i = 0; i < len; ++i) {
         dst[i] = fast_sini(i * step) - SINI_MIN;
         /* scale amplitude 12 -> 16 bit
-           fast_sini() would clip since it goes from -0x1000 to 0x1000 */
+         * fast_sini() would clip since it goes from -0x1000 to 0x1000 */
         dst[i] = ((dst[i] << 3) * 64) / 65;
     }
 
@@ -107,7 +105,8 @@ static void _play_cb(void *arg)
 
     if (--ctx->iterations) {
         dac_play(CONFIG_DAC_LINE, ctx->buf, ctx->num_samples, 0);
-    } else {
+    }
+    else {
         dac_play_teardown(CONFIG_DAC_LINE);
         /* restore idle level */
         dac_set(CONFIG_DAC_LINE, 1 << 15);
@@ -137,7 +136,8 @@ static void play_function(uint32_t freq, uint32_t secs, sample_gen_t fun) {
         ctx.iterations = (secs * sample_rate) / len;
 
         dac_play_setup(CONFIG_DAC_LINE, _play_cb, &ctx);
-    } else {
+    }
+    else {
         ctx.iterations = UINT32_MAX;
         flags |= DAC_PLAY_LOOPED;
 
@@ -166,6 +166,8 @@ static int cmd_saw(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(saw, "Play Sawtooth wave /|", cmd_saw);
+
 static int cmd_triang(int argc, char **argv)
 {
     if (argc < 3) {
@@ -180,6 +182,8 @@ static int cmd_triang(int argc, char **argv)
 
     return 0;
 }
+
+SHELL_COMMAND(triang, "Play Triangle wave /\\", cmd_triang);
 
 static int cmd_sine(int argc, char **argv)
 {
@@ -196,6 +200,8 @@ static int cmd_sine(int argc, char **argv)
     return 0;
 }
 
+SHELL_COMMAND(sine, "Play Sine wave     ~", cmd_sine);
+
 static int cmd_square(int argc, char **argv)
 {
     if (argc < 3) {
@@ -211,13 +217,7 @@ static int cmd_square(int argc, char **argv)
     return 0;
 }
 
-static const shell_command_t shell_commands[] = {
-    { "saw",    "Play Sawtooth wave /|", cmd_saw },
-    { "triang", "Play Triangle wave /\\", cmd_triang },
-    { "sine",   "Play Sine wave     ~", cmd_sine },
-    { "square", "Play Square wave   _–", cmd_square },
-    { NULL, NULL, NULL }
-};
+SHELL_COMMAND(square, "Play Square wave   _–", cmd_square);
 
 int main(void)
 {
@@ -227,7 +227,7 @@ int main(void)
 
     /* start the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }
