@@ -203,9 +203,7 @@ int dac_play_setup(dac_t line, dma_cb_t cb, void *arg)
 {
     uint8_t dmac_id;
 #ifdef DAC_DMAC_ID_EMPTY_1
-    dmac_id = line
-            ? DAC_DMAC_ID_EMPTY_1
-            : DAC_DMAC_ID_EMPTY_0;
+    dmac_id = line ? DAC_DMAC_ID_EMPTY_1 : DAC_DMAC_ID_EMPTY_0;
 #else
     dmac_id = DAC_DMAC_ID_EMPTY;
 #endif
