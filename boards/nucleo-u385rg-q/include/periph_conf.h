@@ -10,7 +10,7 @@
  * @{
  *
  * @file
- * @brief       Minimal peripheral configuration for STM32U385 (bring-up)
+ * @brief       Peripheral configuration for the STM32 Nucleo-U385RG-Q
  *
  * @author      Adarsh Nair Mullachery <adarsh.mullachery@tuhh.de>
  */
@@ -168,10 +168,8 @@ static const uart_conf_t uart_config[] = {
 /**
  * @name    ADC configuration
  * @{
- * @note Arduino CN8 (A0–A5) pinout for NUCLEO-U385RG-Q per ST UM3062 Table 14:
- *       A0=PA0/IN5, A1=PA1/IN6, A2=PA4/IN9, A3=PB0/IN15, A4=PC1/IN2, A5=PC0/IN1.
- *       All lines use ADC1 (@c dev 0). PC0/PC1 are also Arduino I2C3 on the
- *       connector; this board’s default I2C is I2C1 on PB8/PB9.
+ * @note Arduino CN8 analog pins A0-A5 on ADC1, plus the internal VBAT and
+ *       VREFINT channels.
  */
 /**
  * @brief   Internal ADC1 channel for VREFINT on STM32U3 (channel 0).
@@ -180,8 +178,7 @@ static const uart_conf_t uart_config[] = {
 #  define VREFINT_ADC_CHAN  0
 #endif
 
-/* ADC1 channel numbers below are verified on hardware (potentiometer sweep on
- * each Arduino analog pin). The STM32U385 ADC1 input mux maps
+/* STM32U385 ADC1 input mux mapping:
  *   PC0=IN1, PC1=IN2, PA0=IN3, PA1=IN4, PA2=IN5, PA3=IN6, PA4=IN7, PB0=IN13. */
 static const adc_conf_t adc_config[] = {
     { .pin = GPIO_PIN(PORT_A, 0), .dev = 0, .chan = 3 },   /* A0  ADC1_IN3  */
