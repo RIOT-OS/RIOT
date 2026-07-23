@@ -165,7 +165,11 @@ static inline bool sixlowpan_frag_is_snip(const gnrc_pktsnip_t *snip)
         return false;
     }
 
-    return sixlowpan_frag_is(snip->data);
+    if (sixlowpan_frag_n_is(snip->data)) {
+        return snip->size >= sizeof(sixlowpan_frag_n_t);
+    }
+
+    return sixlowpan_frag_1_is(snip->data);
 }
 
 /**
