@@ -1194,8 +1194,8 @@ void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, dma_cb_t cb, void *ctx
 /**
  * @brief   Update the DMA Completion callback context
  *
- * @param   dma     DMA channel to release
- * @param   ctx     DMA complete callback context
+ * @param   dma[in] DMA channel to release
+ * @param   ctx[in] DMA complete callback context
  */
 void dma_set_cb_arg(dma_t dma, void *ctx);
 
@@ -1326,21 +1326,21 @@ void dma_append_dst(dma_t dma, DmacDescriptor *next, void *dst, size_t num,
 /**
  * @brief   Make the DMA transfer repeat indefinitely
  *
- * @param   dma     DMA channel reference
+ * @param   dma[in] DMA channel reference
  */
 void dma_enable_loop(dma_t dma);
 
 /**
  * @brief   Disable DMA transfer looping
  *
- * @param   dma     DMA channel reference
+ * @param   dma[in] DMA channel reference
  */
 void dma_disable_loop(dma_t dma);
 
 /**
  * @brief   Start a DMA transfer.
  *
- * @param   dma     DMA channel reference
+ * @param   dma[in] DMA channel reference
  */
 void dma_start(dma_t dma);
 
