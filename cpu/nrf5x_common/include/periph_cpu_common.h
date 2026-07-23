@@ -57,6 +57,14 @@ extern "C" {
 #define CPUID_LEN           (8U)
 
 /**
+ * @brief   Mask to check whether an address points into RAM
+ *
+ * EasyDMA can only operate on RAM, so peripheral drivers use this to detect
+ * buffers located in flash/RRAM.
+ */
+#define RAM_MASK            (0x20000000)
+
+/**
  * @name    Override macro for defining GPIO pins
  *
  * The port definition is used (and zeroed) to suppress compiler warnings
@@ -230,6 +238,17 @@ union gpio_conf_nrf5x {
 #define SPI_CONFIG_CPOL_Msk SPIM_CONFIG_CPOL_Msk
 #endif
 
+#if !defined(DOXYGEN) && defined(CPU_FAM_NRF54L)
+/**
+ * @brief Wrapper to fix differences between nRF families vendor files
+ *
+ * The nRF54L SPIM has no FREQUENCY register (it uses a prescaler instead),
+ * so only the CONFIG bits can be mapped here.
+ */
+#define SPI_CONFIG_CPHA_Msk SPIM_CONFIG_CPHA_Msk
+#define SPI_CONFIG_CPOL_Msk SPIM_CONFIG_CPOL_Msk
+#endif
+
 /**
  * @brief   No support for HW chip select...
  */
@@ -268,7 +287,14 @@ typedef enum {
     GPIO_IN       = GPIO_MODE(0, 0, 0, 0), /**< IN */
     GPIO_IN_PD    = GPIO_MODE(0, 0, 1, 0), /**< IN with pull-down */
     GPIO_IN_PU    = GPIO_MODE(0, 0, 3, 0), /**< IN with pull-up */
+#ifdef CPU_FAM_NRF54L
+    /* the nRF54L family split the 3 bit DRIVE field into the 2 bit DRIVE0
+     * (low level) and DRIVE1 (high level) fields: S0D1 ==> DRIVE1 = D1 (2) */
+    GPIO_IN_OD_PU = GPIO_MODE(0, 0, 3, (GPIO_PIN_CNF_DRIVE1_D1 << 2)),
+                                           /**< IN with pull-up and open drain output */
+#else
     GPIO_IN_OD_PU = GPIO_MODE(0, 0, 3, 6), /**< IN with pull-up and open drain output */
+#endif
     GPIO_OUT      = GPIO_MODE(1, 1, 0, 0), /**< OUT (push-pull) */
     GPIO_OD       = (0xff),                /**< not supported by HW */
     GPIO_OD_PU    = (0xfe)                 /**< not supported by HW */
@@ -339,6 +365,17 @@ typedef enum {
  * @{
  */
 #define HAVE_SPI_CLK_T
+#ifdef CPU_FAM_NRF54L
+/* the nRF54L SPIM uses a prescaler instead of fixed frequency values, the
+ * enum values hold the divisor of the 16 MHz base clock */
+typedef enum {
+    SPI_CLK_100KHZ = 126,   /**< 127KHz (best match) */
+    SPI_CLK_400KHZ = 40,    /**< 400KHz */
+    SPI_CLK_1MHZ   = 16,    /**< 1MHz */
+    SPI_CLK_5MHZ   = 4,     /**< 4MHz (best match) */
+    SPI_CLK_10MHZ  = 2      /**< 8MHz (best match) */
+} spi_clk_t;
+#else
 typedef enum {
     SPI_CLK_100KHZ = SPI_FREQUENCY_FREQUENCY_K125,  /**< 100KHz */
     SPI_CLK_400KHZ = SPI_FREQUENCY_FREQUENCY_K500,  /**< 400KHz */
@@ -346,6 +383,7 @@ typedef enum {
     SPI_CLK_5MHZ   = SPI_FREQUENCY_FREQUENCY_M4,    /**< 5MHz */
     SPI_CLK_10MHZ  = SPI_FREQUENCY_FREQUENCY_M8     /**< 10MHz */
 } spi_clk_t;
+#endif
 /** @} */
 #endif /* ndef DOXYGEN */
 
@@ -395,7 +433,13 @@ typedef struct {
     gpio_t rts_pin;         /**< RTS pin */
     gpio_t cts_pin;         /**< CTS pin */
 #endif
+#ifdef CPU_FAM_NRF54L
+    uint16_t irqn;          /**< IRQ channel (the nRF54L low-power domain
+                             *   peripherals, e.g. SERIAL30, have IRQ numbers
+                             *   above 255) */
+#else
     uint8_t irqn;           /**< IRQ channel */
+#endif
 } uart_conf_t;
 
 /**
