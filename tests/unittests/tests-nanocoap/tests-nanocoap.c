@@ -1220,108 +1220,39 @@ static void test_nanocoap__token_length_over_limit(void)
 }
 
 /*
- * Verifies that coap_parse_udp() recognizes 8 bit extended token length
+ * Verifies that coap_parse_udp() rejects 8 bit extended token length
  */
-static void test_nanocoap__token_length_ext_16(void)
+static void test_nanocoap__token_length_ext(void)
 {
     const char *token = "0123456789ABCDEF";
 
     uint8_t buf[32];
     coap_udp_hdr_t *hdr = (void *)buf;
 
-    /* build a request with an overlong token (that mandates the use of
-     * an 8 bit extended token length field) */
-    TEST_ASSERT_EQUAL_INT(21, coap_build_hdr(hdr, COAP_TYPE_CON,
-                                             (void *)token, strlen(token),
-                                             COAP_METHOD_DELETE, 23));
+    /* attempt to build a request with an overlong token (which would require
+     * an 8-bit extended token length field); this must be rejected */
+    TEST_ASSERT_EQUAL_INT(-EINVAL, coap_build_hdr(hdr, COAP_TYPE_CON,
+                                                  (void *)token, strlen(token),
+                                                  COAP_METHOD_DELETE, 23));
 
-    /* parse the packet build, and verify it parses back as expected */
+    uint8_t msg_long_token[] = {
+        /* Ver = 1, T = CON, TKL = 13 for 1 byte extended token length: */
+        (COAP_V1 << 6) | (COAP_TYPE_CON << 4) | 13,
+        /* Code DELETE: */
+        COAP_METHOD_DELETE,
+        /* Message ID = 0xABCD */
+        0xAB, 0xCD,
+        /* Extendedn Token Length */
+        strlen(token) - 13,
+        /* The Token */
+        '0', '1', '2', '3', '4', '5', '6', '7',
+        '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+    };
+    /* try to parse a packet with extended token */
     coap_pkt_t pkt;
-    ssize_t res = coap_parse_udp(&pkt, buf, 21);
+    ssize_t res = coap_parse_udp(&pkt, msg_long_token, sizeof(msg_long_token));
 
-    TEST_ASSERT_EQUAL_INT(21, res);
-    TEST_ASSERT_EQUAL_INT(21, coap_get_total_hdr_len(&pkt));
-    TEST_ASSERT_EQUAL_INT(COAP_METHOD_DELETE, coap_get_code_raw(&pkt));
-    TEST_ASSERT_EQUAL_INT(23, coap_get_id(&pkt));
-    TEST_ASSERT_EQUAL_INT(strlen(token), coap_get_token_len(&pkt));
-    TEST_ASSERT_EQUAL_INT(0, memcmp(coap_get_token(&pkt), token, strlen(token)));
-    TEST_ASSERT_EQUAL_INT(0, pkt.payload_len);
-    TEST_ASSERT_EQUAL_INT(13, hdr->ver_t_tkl & 0xf);
-
-    /* now build the corresponding reply and check that it parses back as
-     * expected */
-    uint8_t rbuf[sizeof(buf)];
-    /* build first using coap_build_reply() */
-    ssize_t len = coap_build_reply(&pkt, COAP_CODE_DELETED,
-                                   rbuf, sizeof(rbuf), 0);
-    TEST_ASSERT_EQUAL_INT(21, len);
-    /* build again using coap_build_reply_header() */
-    len = coap_build_reply_header(&pkt, COAP_CODE_DELETED, rbuf,
-                                  sizeof(rbuf), 0, NULL, NULL);
-    TEST_ASSERT_EQUAL_INT(21, len);
-    res = coap_parse_udp(&pkt, rbuf, 21);
-    TEST_ASSERT_EQUAL_INT(21, res);
-    TEST_ASSERT_EQUAL_INT(21, coap_get_total_hdr_len(&pkt));
-    TEST_ASSERT_EQUAL_INT(COAP_CODE_DELETED, coap_get_code_raw(&pkt));
-    TEST_ASSERT_EQUAL_INT(23, coap_get_id(&pkt));
-    TEST_ASSERT_EQUAL_INT(strlen(token), coap_get_token_len(&pkt));
-    TEST_ASSERT_EQUAL_INT(0, memcmp(coap_get_token(&pkt), token, strlen(token)));
-    TEST_ASSERT_EQUAL_INT(0, pkt.payload_len);
-    TEST_ASSERT_EQUAL_INT(13, hdr->ver_t_tkl & 0xf);
-}
-
-/*
- * Verifies that coap_parse_udp() recognizes 16 bit extended token length
- */
-static void test_nanocoap__token_length_ext_269(void)
-{
-    const char *token = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr,"
-                        "sed diam nonumy eirmod tempor invidunt ut labore et dolore"
-                        "magna aliquyam erat, sed diam voluptua. At vero eos et accusam"
-                        "et justo duo dolores et ea rebum. Stet clita kasd gubergren,"
-                        "no sea takimata sanctus est Lore.";
-    uint8_t buf[280];
-    coap_udp_hdr_t *hdr = (void *)buf;
-
-    /* build a request with an overlong token (that mandates the use of
-     * an 16 bit extended token length field) */
-    TEST_ASSERT_EQUAL_INT(275, coap_build_hdr(hdr, COAP_TYPE_CON,
-                                             (void *)token, strlen(token),
-                                             COAP_METHOD_DELETE, 23));
-
-    /* parse the packet build, and verify it parses back as expected */
-    coap_pkt_t pkt;
-    ssize_t res = coap_parse_udp(&pkt, buf, 275);
-
-    TEST_ASSERT_EQUAL_INT(275, res);
-    TEST_ASSERT_EQUAL_INT(275, coap_get_total_hdr_len(&pkt));
-    TEST_ASSERT_EQUAL_INT(COAP_METHOD_DELETE, coap_get_code_raw(&pkt));
-    TEST_ASSERT_EQUAL_INT(23, coap_get_id(&pkt));
-    TEST_ASSERT_EQUAL_INT(strlen(token), coap_get_token_len(&pkt));
-    TEST_ASSERT_EQUAL_INT(0, memcmp(coap_get_token(&pkt), token, strlen(token)));
-    TEST_ASSERT_EQUAL_INT(0, pkt.payload_len);
-    TEST_ASSERT_EQUAL_INT(14, hdr->ver_t_tkl & 0xf);
-
-    /* now build the corresponding reply and check that it parses back as
-     * expected */
-    uint8_t rbuf[sizeof(buf)];
-    /* build first using coap_build_reply() */
-    ssize_t len = coap_build_reply(&pkt, COAP_CODE_DELETED,
-                                   rbuf, sizeof(rbuf), 0);
-    /* build again using coap_build_reply_header() */
-    len = coap_build_reply_header(&pkt, COAP_CODE_DELETED, rbuf,
-                                  sizeof(rbuf), 0, NULL, NULL);
-
-    TEST_ASSERT_EQUAL_INT(275, len);
-    res = coap_parse_udp(&pkt, rbuf, 275);
-    TEST_ASSERT_EQUAL_INT(275, res);
-    TEST_ASSERT_EQUAL_INT(275, coap_get_total_hdr_len(&pkt));
-    TEST_ASSERT_EQUAL_INT(COAP_CODE_DELETED, coap_get_code_raw(&pkt));
-    TEST_ASSERT_EQUAL_INT(23, coap_get_id(&pkt));
-    TEST_ASSERT_EQUAL_INT(strlen(token), coap_get_token_len(&pkt));
-    TEST_ASSERT_EQUAL_INT(0, memcmp(coap_get_token(&pkt), token, strlen(token)));
-    TEST_ASSERT_EQUAL_INT(0, pkt.payload_len);
-    TEST_ASSERT_EQUAL_INT(14, hdr->ver_t_tkl & 0xf);
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, res);
 }
 
 /*
@@ -1471,8 +1402,7 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__add_path_unterminated_string),
         new_TestFixture(test_nanocoap__add_get_proxy_uri),
         new_TestFixture(test_nanocoap__token_length_over_limit),
-        new_TestFixture(test_nanocoap__token_length_ext_16),
-        new_TestFixture(test_nanocoap__token_length_ext_269),
+        new_TestFixture(test_nanocoap__token_length_ext),
         new_TestFixture(test_nanocoap___rst_message),
         new_TestFixture(test_nanocoap__out_of_bounds_option),
         new_TestFixture(test_nanocoap__coap_build_reply_header),

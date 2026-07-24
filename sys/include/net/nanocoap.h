@@ -629,12 +629,9 @@ static inline void coap_set_id(coap_pkt_t *pkt, uint16_t id)
 /**
  * @brief   Get a message's token length [in byte]
  *
- * If the `nanocoap_token_ext` module is enabled, this will include
- * the extended token length.
- *
  * @param[in]   pkt   CoAP packet
  *
- * @returns     length of token in the given message (0-8 byte)
+ * @returns     token length in bytes (0-COAP_TOKEN_LENGTH_MAX for valid packets)
  */
 static inline unsigned coap_get_token_len(const coap_pkt_t *pkt)
 {
@@ -695,52 +692,6 @@ static inline unsigned coap_get_ver(const coap_pkt_t *pkt)
 }
 
 /**
- * @brief   Get the size of the extended Token length field
- *          (RFC 8974)
- *
- * @deprecated  Use @ref coap_pkt_tkl_ext_len instead.
- *
- * @note    This requires the `nanocoap_token_ext` module to be enabled
- *
- * @param[in]   hdr   CoAP header
- *
- * @returns     number of bytes used for extended token length
- */
-static inline uint8_t coap_hdr_tkl_ext_len(const coap_udp_hdr_t *hdr)
-{
-    if (!IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        return 0;
-    }
-
-    switch (hdr->ver_t_tkl & 0x0f) {
-    case 13:
-        return 1;
-    case 14:
-        return 2;
-    case 15:
-        assert(0);
-        /* fall-through */
-    default:
-        return 0;
-    }
-}
-
-/**
- * @brief   Get the size of the extended Token length field
- *          (RFC 8974)
- *
- * @note    This requires the `nanocoap_token_ext` module to be enabled
- *
-     * @param[in]   pkt     CoAP packet
- *
- * @returns     number of bytes used for extended token length
- */
-static inline uint8_t coap_pkt_tkl_ext_len(const coap_pkt_t *pkt)
-{
-    return coap_hdr_tkl_ext_len(coap_get_udp_hdr_const(pkt));
-}
-
-/**
  * @brief   Validate that the header of @p pkt is no longer than
  *          @p len bytes.
  *
@@ -773,7 +724,7 @@ bool coap_is_hdr_in_bounds(const coap_pkt_t *pkt, size_t len);
  */
 static inline uint8_t *coap_hdr_data_ptr(const coap_udp_hdr_t *hdr)
 {
-    return ((uint8_t *)hdr) + sizeof(coap_udp_hdr_t) + coap_hdr_tkl_ext_len(hdr);
+    return ((uint8_t *)hdr) + sizeof(coap_udp_hdr_t);
 }
 
 /**
@@ -785,8 +736,7 @@ static inline uint8_t *coap_hdr_data_ptr(const coap_udp_hdr_t *hdr)
  */
 static inline unsigned coap_get_total_hdr_len(const coap_pkt_t *pkt)
 {
-    return sizeof(coap_udp_hdr_t) + coap_hdr_tkl_ext_len(pkt->hdr) +
-           coap_get_token_len(pkt);
+    return sizeof(coap_udp_hdr_t) + coap_get_token_len(pkt);
 }
 
 /**
@@ -861,27 +811,7 @@ static inline void coap_hdr_set_type(coap_udp_hdr_t *hdr, unsigned type)
  */
 static inline size_t coap_hdr_get_token_len(const coap_udp_hdr_t *hdr)
 {
-    const uint8_t *buf = (const void *)hdr;
-    /* Regarding use unnamed magic numbers 13 and 269:
-     * - If token length is < 13 it fits into TKL field (4 bit)
-     * - If token length is < 269 it fits into 8-bit extended TKL field
-     * - Otherwise token length goes into 16-bit extended TKL field.
-     *
-     * (Not using named constants here, as RFC 8974 also has no names for those
-     * magic numbers.)
-     *
-     * See: https://www.rfc-editor.org/rfc/rfc8974#name-extended-token-length-tkl-f
-     */
-    switch (coap_hdr_tkl_ext_len(hdr)) {
-    case 0:
-        return hdr->ver_t_tkl & 0x0f;
-    case 1:
-        return buf[sizeof(coap_udp_hdr_t)] + 13;
-    case 2:
-        return byteorder_bebuftohs(buf + sizeof(coap_udp_hdr_t)) + 269;
-    }
-
-    return 0;
+    return hdr->ver_t_tkl & 0x0f;
 }
 
 /**
@@ -902,7 +832,8 @@ static inline size_t coap_hdr_get_token_len(const coap_udp_hdr_t *hdr)
 static inline const void * coap_hdr_get_token(const coap_udp_hdr_t *hdr)
 {
     uint8_t *token = (void *)hdr;
-    token += sizeof(*hdr) + coap_hdr_tkl_ext_len(hdr);
+    /* token comes directly after the fixed size header for UDP */
+    token += sizeof(*hdr);
     return token;
 }
 
@@ -922,7 +853,7 @@ static inline const void * coap_hdr_get_token(const coap_udp_hdr_t *hdr)
  */
 static inline size_t coap_hdr_len(const coap_udp_hdr_t *hdr)
 {
-    return sizeof(*hdr) + coap_hdr_tkl_ext_len(hdr) + coap_hdr_get_token_len(hdr);
+    return sizeof(*hdr) + coap_hdr_get_token_len(hdr);
 }
 
 /**
@@ -2577,12 +2508,6 @@ static inline ssize_t coap_build_hdr(coap_udp_hdr_t *hdr, unsigned type, const v
                                      size_t token_len, unsigned code, uint16_t id)
 {
     size_t fingers_crossed_size = sizeof(*hdr) + token_len;
-
-    if (IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        /* With RFC 8974, we have an additional extended TKL
-         * field of 0-4 bytes in length */
-        fingers_crossed_size += 4;
-    }
 
     return coap_build_udp_hdr(hdr, fingers_crossed_size, type, token, token_len, code, id);
 }

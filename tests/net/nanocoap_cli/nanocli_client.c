@@ -82,12 +82,7 @@ static ssize_t _send(coap_pkt_t *pkt, size_t len,
     return nanocoap_request(pkt, NULL, &remote, len);
 }
 
-#if MODULE_NANOCOAP_TOKEN_EXT
-#  define CLIENT_TOKEN_LENGTH_MAX   16
-#else
-#  define CLIENT_TOKEN_LENGTH_MAX   COAP_TOKEN_LENGTH_MAX
-#endif
-static uint8_t _client_token[CLIENT_TOKEN_LENGTH_MAX] = {0xDA, 0xEC};
+static uint8_t _client_token[COAP_TOKEN_LENGTH_MAX] = { 0xDA, 0xEC };
 static uint8_t _client_token_len = 2;
 
 static int _cmd_client(int argc, char **argv)
