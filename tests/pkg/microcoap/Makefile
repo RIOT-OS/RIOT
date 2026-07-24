@@ -20,7 +20,7 @@ USEPKG += microcoap
 LOW_MEMORY_BOARDS := nucleo-f334r8
 
 ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
-  $(info Using low-memory configuration for microcoap_server.)
+  $(shell echo 'Using low-memory configuration for microcoap_server.' 1>&2)
   ## low-memory tuning values
   USEMODULE += prng_minstd
 endif
