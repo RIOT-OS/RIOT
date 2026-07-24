@@ -1,20 +1,59 @@
-# nrf_sf_radio two-board test
+# nrf_sf_radio tests
 
 ## About
 
-This test verifies basic communication through the `nrf_sf_radio` module. It
-uses two nRF52 boards and consists of two applications:
+This directory contains an automated single-board test and a manual two-board
+communication test for the `nrf_sf_radio` module.
 
-- `receiver` starts the radio, waits for a valid packet, prints its payload,
-  and exits.
-- `transmitter` repeatedly schedules the transmission of
-  `"hello, world"` and reports whether each transmission completed.
+The single-board test verifies:
 
-The test covers radio initialization, scheduled transmission, packet-header
-encoding, packet reception, CRC validation, and access to the received
-application payload.
+- time conversion macros
+- default RADIO initialization
+- PHY mode, BLE channel, and transmit-power configuration
+- the free-running timer and relative wait function
+- scheduled transmission and READY, ADDRESS, and END timestamps
+- scheduled receive timeout handling and buffer-pointer preservation
 
-## Hardware requirements
+The manual test uses two nRF52 boards and consists of two applications:
+
+- `receiver` continuously receives packets and verifies that each payload is
+  `"hello, world"`.
+- `transmitter` continuously schedules transmissions of `"hello, world"`.
+
+Both applications report their status every 1000 successfully processed
+packets so that the output remains visible when a serial terminal is attached
+after the application has started.
+
+The two-board test covers packet-header encoding, packet reception, CRC
+validation, payload access, and verification of the received bytes.
+
+## Single-board test
+
+The automated test requires one supported nRF52 board. No other node using the
+same radio configuration should transmit while this test is running, because
+one check expects a scheduled reception to time out.
+
+Build, flash, and run the test from the RIOT repository root:
+
+```shell
+make -C tests/sys/nrf_sf_radio flash test
+```
+
+The default board is `adafruit-feather-nrf52840-sense`. A different supported
+board can be selected with `BOARD=<board>`.
+
+A successful run ends with:
+
+```text
+[SUCCESS]
+```
+
+Each failed check is printed with a `[FAILED]` prefix, and the application
+returns a nonzero status.
+
+## Two-board test
+
+### Hardware requirements
 
 - Two boards based on a supported nRF52 MCU
 - One USB connection and serial terminal for each board
@@ -23,7 +62,7 @@ application payload.
 The default board is `adafruit-feather-nrf52840-sense`. A different supported
 board can be selected with `BOARD=<board>`.
 
-## Building
+### Building
 
 Run the following commands from the RIOT repository root:
 
@@ -41,61 +80,57 @@ make -C tests/sys/nrf_sf_radio/transmitter \
     BOARD=nrf52840dk clean all
 ```
 
-Both applications must use the same radio configuration.
+Both applications use BLE channel 20 and the test Access Address
+`0x8367BED6`. Any configuration changes must be applied to both applications.
 
-## Running the test
+### Running the test
 
-1. Flash the receiver application onto the first board:
+Connect both boards and identify their serial ports. The commands below use
+`/dev/ttyACM0` for the transmitter and `/dev/ttyACM1` for the receiver.
 
-   ```shell
-   make -C tests/sys/nrf_sf_radio/receiver \
-       BOARD=adafruit-feather-nrf52840-sense flash
-   ```
-
-2. Open a terminal for the receiver board. Set `PORT` if the board is not
-   selected automatically:
-
-   ```shell
-   make -C tests/sys/nrf_sf_radio/receiver \
-       BOARD=adafruit-feather-nrf52840-sense \
-       PORT=/dev/ttyACM0 term
-   ```
-
-3. Flash the transmitter application onto the second board:
-
-   ```shell
-   make -C tests/sys/nrf_sf_radio/transmitter \
-       BOARD=adafruit-feather-nrf52840-sense flash
-   ```
-
-4. Open another terminal for the transmitter board:
+1. In the first terminal, flash and start the transmitter:
 
    ```shell
    make -C tests/sys/nrf_sf_radio/transmitter \
        BOARD=adafruit-feather-nrf52840-sense \
-       PORT=/dev/ttyACM1 term
+       PORT=/dev/ttyACM0 flash term
    ```
 
-## Expected result
+2. Use a second terminal to flash and start the receiver:
 
-The transmitter repeatedly prints:
+   ```shell
+   make -C tests/sys/nrf_sf_radio/receiver \
+       BOARD=adafruit-feather-nrf52840-sense \
+       PORT=/dev/ttyACM1 flash term
+   ```
+
+Adjust `PORT` for the device names assigned by the host. Keep the transmitter
+running until the receiver reports `[SUCCESS]`. When multiple UF2 bootloader
+volumes are mounted, also set `UF2_MOUNTPOINT` to the intended board's mount
+point during `flash`.
+
+### Expected result
+
+After every 1000 successful transmissions, the transmitter prints:
 
 ```text
-TX SUCCESSFUL
+[OK] transmitter sending
 ```
 
-The receiver prints the received payload once:
+After every 1000 received and validated payloads, the receiver prints:
 
 ```text
-hello, world
+[OK] received expected payload
+[SUCCESS]
 ```
 
-The test succeeds when the receiver prints the expected payload and the
-transmitter reports a successful transmission. `TX FAILED` indicates that the
-transmission did not complete before its configured deadline.
+The test succeeds when the receiver prints `[SUCCESS]`. A line starting with
+`[FAILED]` indicates either a transmission failure or an unexpected payload.
+Both applications continue running until their boards are reset or powered
+off.
 
-## Automation
+### Automation
 
-This is a manual hardware test. It requires two independently flashed boards
-and two serial ports, so it cannot be executed by the standard single-board
-`make test` workflow.
+The two-board test is manual because it requires two independently flashed
+boards and two serial ports. Only the single-board test is executed through
+the standard `make test` workflow.

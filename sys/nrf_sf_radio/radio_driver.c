@@ -16,8 +16,10 @@
  */
 
 #include <stddef.h>
+
 #include "nrf_clock.h"
 #include "nrf_sf_radio/radio_driver.h"
+#include "radio_internal.h"
 
 static void _timer2_init(void);
 static int _timer_ppi_init(void);

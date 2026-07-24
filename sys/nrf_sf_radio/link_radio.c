@@ -16,12 +16,23 @@
  */
 
 #include <string.h>
+
 #include "nrf_sf_radio/link_radio.h"
 #include "nrf_sf_radio/radio_driver.h"
+#include "radio_internal.h"
 
 #define NRF_SF_RADIO_TX_CHAIN_DELAY_US (10U)
 #define NRF_SF_RADIO_ADV_ADDR_LO (0xABABABUL)
 #define NRF_SF_RADIO_ADV_ADDR_HI (0xABABC0UL)
+
+#define NRF_SF_RADIO_S0_LEN          (1U)
+#define NRF_SF_RADIO_LENGTH_LEN      (1U)
+#define NRF_SF_RADIO_ADV_ADDR_LEN    (6U)
+#define NRF_SF_RADIO_HDR_LEN         (NRF_SF_RADIO_S0_LEN + \
+                                      NRF_SF_RADIO_LENGTH_LEN + \
+                                      NRF_SF_RADIO_ADV_ADDR_LEN)
+
+
 
 static void _encode_packet_header(uint8_t *dst, const uint8_t *payload,
                                   uint8_t length);
@@ -66,8 +77,8 @@ bool nrf_sf_radio_tx_start(uint8_t *frame_buf, uint32_t txen_ticks,
 }
 
 uint8_t nrf_sf_radio_rx_start(uint8_t **rx_buffer, uint32_t rxen_ticks,
-                           uint32_t rx_window_end_ticks,
-                           uint32_t rx_end_ticks)
+                              uint32_t rx_window_end_ticks,
+                              uint32_t rx_end_ticks)
 {
     uint8_t *rx_pointer = *rx_buffer;
     nrf_sf_radio_rx_arm(rx_pointer, rxen_ticks);
@@ -84,7 +95,7 @@ uint8_t nrf_sf_radio_rx_start(uint8_t **rx_buffer, uint32_t rxen_ticks,
             *rx_buffer = &rx_pointer[NRF_SF_RADIO_HDR_LEN];
             return 0;
         }
-        else if (NRF_RADIO->EVENTS_END == 0){
+        else if (NRF_RADIO->EVENTS_END == 0) {
             return 2;
         }
         else {
@@ -95,7 +106,6 @@ uint8_t nrf_sf_radio_rx_start(uint8_t **rx_buffer, uint32_t rxen_ticks,
         NRF_RADIO->TASKS_DISABLE = 1;
         return 1;
     }
-
 }
 
 uint32_t nrf_sf_radio_rx_listen_until_packet(uint8_t **rx_buffer,

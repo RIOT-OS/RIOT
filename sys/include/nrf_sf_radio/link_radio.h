@@ -22,34 +22,7 @@
 extern "C" {
 #endif
 
-/**
- * @name BLE-like packet header field lengths
- * @{
- */
 
-/**
- * @brief   Length of the S0 field in bytes.
- */
-#define NRF_SF_RADIO_S0_LEN          (1U)
-
-/**
- * @brief   Length of the LENGTH field in bytes.
- */
-#define NRF_SF_RADIO_LENGTH_LEN      (1U)
-
-/**
- * @brief   Length of the advertising address field in bytes.
- */
-#define NRF_SF_RADIO_ADV_ADDR_LEN    (6U)
-
-/**
- * @brief   Total length of the link-layer packet header in bytes.
- */
-#define NRF_SF_RADIO_HDR_LEN         (NRF_SF_RADIO_S0_LEN + \
-                                      NRF_SF_RADIO_LENGTH_LEN + \
-                                      NRF_SF_RADIO_ADV_ADDR_LEN)
-
-/** @} */
 
 /**
  * @brief   Send one payload at a scheduled radio start time

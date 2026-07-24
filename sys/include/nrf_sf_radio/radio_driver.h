@@ -37,7 +37,7 @@ extern "C" {
 
 /**
  * @brief   Select the RADIO ramp-up mode
- * 
+ *
  * Set to 1 to use the 40 us fast ramp-up mode or 0 to use the
  * 140 us default ramp-up mode.
  */
@@ -66,20 +66,11 @@ void nrf_sf_radio_start(void);
 /**
  * @brief   Busy-wait for a time interval or condition
  *
- * @param[in]  event          Required condition
+ * @param[in]  event          Event flag, or `NULL` to wait only for the timeout
  * @param[in]  timeout_ticks  Time interval to wait
  */
 void nrf_sf_radio_wait_until(volatile uint32_t *event,
                              uint32_t timeout_ticks);
-
-/**
- * @brief   Busy-wait to a time point or condition
- *
- * @param[in]  event           Required condition
- * @param[in]  deadline_ticks  Time point to wait
- */
-void nrf_sf_radio_wait_until_abs(volatile uint32_t *event,
-                                 uint32_t deadline_ticks);
 
 /**
  * @brief   Get the timestamp of the last radio READY event
@@ -108,29 +99,6 @@ uint32_t nrf_sf_radio_get_last_address_time_ticks(void);
  * @return  Current timestamp
  */
 uint32_t nrf_sf_radio_now_ticks(void);
-
-/**
- * @brief   Start radio transmission at the scheduled time
- *
- * @param[in]  buf             Buffer for the transmitted radio packet
- * @param[in]  deadline_ticks  Scheduled radio start time
- */
-void nrf_sf_radio_tx_arm(uint8_t *buf, uint32_t deadline_ticks);
-
-/**
- * @brief   Start radio reception at the scheduled time
- *
- * @param[out] buf             Buffer for the received radio packet
- * @param[in]  deadline_ticks  Scheduled radio start time
- */
-void nrf_sf_radio_rx_arm(uint8_t *buf, uint32_t deadline_ticks);
-
-/**
- * @brief   Start radio reception immediately
- *
- * @param[out] buf  Buffer for the received radio packet
- */
-void nrf_sf_radio_try_rx_enable(uint8_t *buf);
 
 /**
  * @brief   Set radio mode

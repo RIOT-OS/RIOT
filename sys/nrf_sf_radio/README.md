@@ -169,7 +169,7 @@ The default runtime configuration is BLE 1 Mbit/s mode, BLE advertising
 channel 37, and 0 dBm transmit power.
 
 `nrf_sf_radio_set_ble_channel()` does not perform bounds checking. The caller
-must pass a channel in the range 0 through 39. 
+must pass a channel in the range 0 through 39.
 
 Transmit power is quantized by `nrf_sf_radio_set_power()` to one of
 +4, 0, -4, -8, -12, -16, -20, or -30 dBm.
@@ -231,5 +231,6 @@ resource conflicts.
 
 ## Test
 
-The manual two-board communication test is documented in
+The automated single-board test and manual two-board communication test are
+documented in
 `tests/sys/nrf_sf_radio/README.md`.
