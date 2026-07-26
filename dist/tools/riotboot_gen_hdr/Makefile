@@ -1,11 +1,12 @@
-RIOTBASE       := ../../..
-BUILD_DIR      ?= $(RIOTBASE)/build
-GENHDR_BINDIR  := $(BUILD_DIR)/genhdr
-RIOT_INCLUDE   := $(RIOTBASE)/sys/include
-RIOT_CORE_INC  := $(RIOTBASE)/core/include
-NATIVE_INCLUDE := $(RIOTBASE)/cpu/native/include
-COMMON_SRC     := common.c
-COMMON_HDR     := common.h
+RIOTBASE          := ../../..
+BUILD_DIR         ?= $(RIOTBASE)/build
+GENHDR_BINDIR     := $(BUILD_DIR)/genhdr
+RIOT_INCLUDE      := $(RIOTBASE)/sys/include
+RIOT_CORE_INC     := $(RIOTBASE)/core/include
+RIOT_CORE_LIB_INC := $(RIOTBASE)/core/lib/include
+NATIVE_INCLUDE    := $(RIOTBASE)/cpu/native/include
+COMMON_SRC        := common.c
+COMMON_HDR        := common.h
 
 RIOT_HDR_SRC := \
 	$(RIOTBASE)/sys/checksum/fletcher32.c \
@@ -34,7 +35,7 @@ $(GENHDR_BINDIR)/:
 	$(Q)mkdir -p "$@"
 
 $(GENHDR_BINDIR)/genhdr: $(GENHDR_HDR) $(GENHDR_SRC) Makefile | $(GENHDR_BINDIR)/
-	$(Q)$(CC) $(CFLAGS) -I$(RIOT_INCLUDE) -I$(RIOT_CORE_INC) \
+	$(Q)$(CC) $(CFLAGS) -I$(RIOT_INCLUDE) -I$(RIOT_CORE_INC) -I$(RIOT_CORE_LIB_INC) \
 		-I$(NATIVE_INCLUDE) $(GENHDR_SRC) -o $@
 
 clean:

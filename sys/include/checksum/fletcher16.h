@@ -19,6 +19,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "compiler_hints.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -45,6 +47,7 @@ typedef struct {
  *
  * @return 16 bit sized hash in the interval [1..65535]
  */
+ACCESS(read_only, 1, 2)
 uint16_t fletcher16(const uint8_t *buf, size_t bytes);
 
 /**
@@ -63,6 +66,7 @@ void fletcher16_init(fletcher16_ctx_t *ctx);
  * @param[in]       data    Data to add to the context
  * @param[in]       len     Length of the data
  */
+ACCESS(read_only, 2, 3)
 void fletcher16_update(fletcher16_ctx_t *ctx, const uint8_t *data, size_t len);
 
 /**
