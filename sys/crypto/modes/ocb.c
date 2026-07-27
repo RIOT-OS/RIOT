@@ -209,7 +209,7 @@ static void init_ocb(const cipher_t *cipher, uint8_t tag_len,
 }
 
 static ssize_t run_ocb(const cipher_t *cipher,
-                       const uint8_t *auth_data, uint32_t auth_data_len,
+                       const uint8_t *auth_data, size_t auth_data_len,
                        uint8_t tag[16], uint8_t tag_len,
                        const uint8_t *nonce, size_t nonce_len,
                        const uint8_t *input, size_t input_len,
