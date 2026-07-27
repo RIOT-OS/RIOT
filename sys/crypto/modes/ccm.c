@@ -72,7 +72,7 @@ static ssize_t ccm_compute_cbc_mac(const cipher_t *cipher, const uint8_t iv[16],
     return (ssize_t)offset;
 }
 
-static int ccm_create_mac_iv(const cipher_t *cipher, uint8_t auth_data_len, uint8_t M,
+static int ccm_create_mac_iv(const cipher_t *cipher, bool has_auth_data, uint8_t M,
                              uint8_t L, const uint8_t *nonce, uint8_t nonce_len,
                              size_t plaintext_len, uint8_t X1[16])
 {
@@ -87,7 +87,10 @@ static int ccm_create_mac_iv(const cipher_t *cipher, uint8_t auth_data_len, uint
         Reserved   Adata    M_    L_    */
     M_ = (M - 2) / 2;
     L_ = L - 1;
-    X1[0] = 64 * (auth_data_len > 0) + 8 * M_ + L_;
+    X1[0] = 8 * M_ + L_;
+    if (has_auth_data) {
+        X1[0] += 64;
+    }
 
     /* copy nonce to B[1..15-L] */
     memcpy(&X1[1], nonce, min(nonce_len, 15 - L));
@@ -216,7 +219,7 @@ ssize_t cipher_encrypt_ccm(const cipher_t *cipher,
     }
 
     /* Create B0, encrypt it (X1) and use it as mac_iv */
-    if (ccm_create_mac_iv(cipher, auth_data_len, mac_length, length_encoding,
+    if (ccm_create_mac_iv(cipher, auth_data_len > 0, mac_length, length_encoding,
                           nonce, nonce_len, input_len, mac_iv) < 0) {
         /* This should never happen, we tested for !_fits_in_nbytes() before */
         assert(0);
@@ -319,7 +322,7 @@ ssize_t cipher_decrypt_ccm(const cipher_t *cipher,
     }
 
     /* Create B0, encrypt it (X1) and use it as mac_iv */
-    if (ccm_create_mac_iv(cipher, auth_data_len, mac_length, length_encoding,
+    if (ccm_create_mac_iv(cipher, auth_data_len > 0, mac_length, length_encoding,
                           nonce, nonce_len, plain_len, mac_iv) < 0) {
         return CCM_ERR_INVALID_DATA_LENGTH;
     }
