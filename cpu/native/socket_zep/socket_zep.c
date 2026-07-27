@@ -152,7 +152,7 @@ static inline bool _dst_not_me(socket_zep_t *dev, const void *buf)
 
     dst_len = ieee802154_get_dst(buf, dst_addr, &dst_pan);
 
-    if (dst_pan.u16 != dev->pan_id) {
+    if (dst_pan.u16 != dev->pan_id && dst_pan.u16 != 0xffff) {
         DEBUG("socket_zep::dst_not_me: PAN ID %x != %x\n", dst_pan.u16, dev->pan_id);
         return true;
     }
