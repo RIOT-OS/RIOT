@@ -131,43 +131,75 @@ static int _yday(int day, int month, int year)
     return d[month] + day - 1;
 }
 
+static div_t _euclidean_div(int a, int b)
+{
+    div_t d = div(a, b);
+
+    /* Check if the remainder is negative */
+    if (d.rem < 0) {
+        d.quot--;
+        /* The remainder will be positive afterwards */
+        d.rem += b;
+    }
+
+    return d;
+}
+
 void rtc_tm_normalize(struct tm *t)
 {
     div_t d;
 
-    if (t->tm_mday == 0) {
-        t->tm_mday = 1;
-    }
-
-    d = div(t->tm_sec, 60);
+    d = _euclidean_div(t->tm_sec, 60);
     t->tm_min += d.quot;
     t->tm_sec  = d.rem;
 
-    d = div(t->tm_min, 60);
+    d = _euclidean_div(t->tm_min, 60);
     t->tm_hour += d.quot;
     t->tm_min   = d.rem;
 
-    d = div(t->tm_hour, 24);
+    d = _euclidean_div(t->tm_hour, 24);
     t->tm_mday += d.quot;
     t->tm_hour  = d.rem;
 
-    d = div(t->tm_mon, 12);
+    d = _euclidean_div(t->tm_mon, 12);
     t->tm_year += d.quot;
     t->tm_mon   = d.rem;
 
-    /* Loop to handle days overflowing the month. */
+    /* Handle days underflowing the month */
+    while (t->tm_mday <= 0) {
+
+        /* Go to the previous month */
+        t->tm_mon -= 1;
+
+        /* Check for year roll under */
+        if (t->tm_mon < 0) {
+            t->tm_mon = 11;
+            t->tm_year -= 1;
+        }
+
+        /* Add the number of days of the month we rolled under to */
+        t->tm_mday += _month_length(t->tm_mon, t->tm_year + 1900);
+    }
+
+    /* Handle days overflowing the month */
     while (1) {
         int days = _month_length(t->tm_mon, t->tm_year + 1900);
 
         if (t->tm_mday <= days) {
             break;
         }
-
-        if (++t->tm_mon > 11) {
-            t->tm_mon = 0;
-            ++t->tm_year;
+        else {
+            /* Roll over to the next month */
+            t->tm_mon += 1;
         }
 
+        /* Check for year roll over */
+        if (t->tm_mon > 11) {
+            t->tm_mon = 0;
+            t->tm_year += 1;
+        }
+
+        /* Subtract the number of days of the month we rolled over from */
         t->tm_mday -= days;
     }
 
@@ -206,6 +238,7 @@ void rtc_localtime(uint32_t time, struct tm *t)
 
     memset(t, 0, sizeof(*t));
     t->tm_sec  = time;
+    t->tm_mday = 1;
     t->tm_year = year - 1900;
 
     rtc_tm_normalize(t);
