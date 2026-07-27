@@ -49,10 +49,34 @@ void crypto_block_inc_ctr(uint8_t block[16], size_t ctr_len);
  *
  * @retval          true    blocks are equal
  * @retval          false   blocks differ
+ *
+ * The parameters @p a and @p b are marked as `volatile` to avoid that the
+ * compiler optimizes this function, even if it detects that this function is
+ * is functionally equivalent to `memcmp(a, b, len) == 0`. The memory of @p a
+ * and @p b does not need to be (and usually *should not* be) `volatile`, as
+ * only this specific operation should not be optimized to be somewhat time
+ * constant.
+ *
+ * Example usage:
+ *
+ * ```c
+ * static bool validate_input(const void *hash_expected, size_t hash_len,
+ *                            const void *data, size_t data_len)
+ * {
+ *     if (hash_len > MAX_HASH_SIZE) {
+ *         assert(0);
+ *         return false;
+ *     }
+ *     const uint8_t hash_actual[MAX_HASH_SIZE];
+ *     compute_some_crypto_hash(hash_actual, data, data_len);
+ *     return crypto_equals(hash_expected, hash_actual, hash_len);
+ * }
+ * ```
  */
 ACCESS(read_only, 1, 3)
 ACCESS(read_only, 2, 3)
-bool crypto_equals(const uint8_t *a, const uint8_t *b, size_t len);
+bool crypto_equals(volatile const uint8_t *a, volatile const uint8_t *b,
+                   size_t len);
 
 /**
  * @brief   Secure wipe function.
