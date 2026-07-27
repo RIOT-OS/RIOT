@@ -136,16 +136,3 @@
  * - Expand this readme into a proper manual.
  *
  */
-
-/* These are docs for the future (when we have the script to compile module tables) */
-/*
- * # Running Lua and C code
- *
- * see \ref sys_lua for information on how to access RIOT modules from within
- * Lua.
- *
- * While it is possible to include your application specific modules and run
- * arbitrary Lua code only just using this interpreter, the \ref sys_lua module
- * provides an automated way of handling Lua modules.
- *
- */
