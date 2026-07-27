@@ -3,7 +3,6 @@
  * @ingroup  pkg
  * @brief    Provides a Lua interpreter for RIOT
  * @see      https://github.com/lua/lua
- * @see      sys_lua
  *
  * # Lua programming language support
  *
