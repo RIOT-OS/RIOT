@@ -361,7 +361,7 @@ typedef enum {
     defined(Doxygen)
 /**
  * @brief   EBI (External Bus Interface)
- * {@
+ * @{
  */
 
 /**
