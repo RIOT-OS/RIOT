@@ -46,7 +46,7 @@ ssize_t cipher_encrypt_cbc(const cipher_t *cipher, const uint8_t iv[16],
             return CIPHER_ERR_ENC_FAILED;
         }
 
-        output_block_last = output + offset;
+        output_block_last = (uint8_t *)output + offset;
         offset += block_size;
     } while (offset < input_len);
 
