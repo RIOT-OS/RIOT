@@ -79,6 +79,12 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_opt_process(gnrc_pktsnip_t *pkt,
             /* nothing more to do */
             continue;
         }
+
+        if (offset >= hdr_len) {
+            DEBUG("gnrc_ipv6_ext_opt: option type without length byte\n");
+            goto error;
+        }
+
         opt_len = opts[offset++];
         if (opt_len > (hdr_len - offset)) {
             DEBUG("gnrc_ipv6_ext_opt: invalid option size\n");
