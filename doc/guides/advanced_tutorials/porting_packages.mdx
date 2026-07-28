@@ -305,3 +305,21 @@ directory containing the packages must match the package name, e.g. package
 
 An example can be found in
 [`tests/build_system/external_pkg_dirs`](https://github.com/RIOT-OS/RIOT/tree/master/tests/build_system/external_pkg_dirs)
+
+## Detecting RIOT Builds
+
+External code that is targeting multiple embedded systems may need to make use
+of conditional compilation to use the code compatible with the current target
+OS. For this reason, RIOT adds `-DRIOT_OS=1` to `CFLAGS`. It can be used
+like:
+
+```c
+static void say_hi(void)
+{
+#ifdef RIOT_OS
+    puts("Hi from RIOT!");
+#else
+    puts("Hi from an OS that is not RIOT!");
+#endif
+}
+```
