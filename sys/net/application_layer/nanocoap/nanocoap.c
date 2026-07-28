@@ -74,38 +74,14 @@ bool coap_is_hdr_in_bounds(const coap_pkt_t *pkt, size_t len)
         return false;
     }
 
-    if (IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        /* coap_pkt_tkl_ext_len() blows an assertion on invalid TKL value, so
-         * we have to rule that out here already. The magic number 15 is the
-         * only invalid value here, as per
-         * https://datatracker.ietf.org/doc/html/rfc8974#section-2.1.
-         * The magic number has no name in the RFC, so adding a named constant
-         * here would rather obfuscate then help when checking the code against
-         * the spec. */
-        if ((coap_get_udp_hdr_const(pkt)->ver_t_tkl & 0x0f) == 15) {
-            return false;
-        }
+    uint8_t tkl = coap_get_token_len(pkt);
 
-        min_len += coap_pkt_tkl_ext_len(pkt);
-
-        if (len < min_len) {
-            return false;
-        }
-
-        min_len += coap_get_token_len(pkt);
+    if (tkl > COAP_TOKEN_LENGTH_MAX) {
+        DEBUG("nanocoap: token length invalid\n");
+        return false;
     }
-    else {
-        uint8_t tkl = coap_get_token_len(pkt);
 
-        /* we have to either allow extendend token lengths fully
-         * (MODULE_NANOCOAP_TOKEN_EXT is used), or not at all */
-        if (tkl > COAP_TOKEN_LENGTH_MAX) {
-            DEBUG("nanocoap: token length invalid\n");
-            return false;
-        }
-
-        min_len += tkl;
-    }
+    min_len += tkl;
 
     return (len >= min_len);
 }
@@ -792,40 +768,21 @@ ssize_t coap_build_udp_hdr(void *buf, size_t buf_len, uint8_t type,
 {
     assert(!(type & ~0x3));
 
-    uint16_t tkl_ext = 0;
-    uint8_t tkl_ext_len, tkl;
-
-    if (token_len > 268 && IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        tkl_ext_len = 2;
-        tkl_ext = htons(token_len - 269); /* 269 = 255 + 14 */
-        tkl = 14;
-    }
-    else if (token_len > 12 && IS_USED(MODULE_NANOCOAP_TOKEN_EXT)) {
-        tkl_ext_len = 1;
-        tkl_ext = token_len - 13;
-        tkl = 13;
-    }
-    else {
-        tkl = token_len;
-        tkl_ext_len = 0;
+    if (token_len > COAP_TOKEN_LENGTH_MAX) {
+        return -EINVAL;
     }
 
-    size_t hdr_len = sizeof(coap_udp_hdr_t) + token_len + tkl_ext_len;
-    if (buf_len < hdr_len) {
+    size_t hdr_len = sizeof(coap_udp_hdr_t) + token_len;
+    if (hdr_len > buf_len) {
         return -EOVERFLOW;
     }
 
     memset(buf, 0, sizeof(coap_udp_hdr_t));
     coap_udp_hdr_t *hdr = buf;
-    hdr->ver_t_tkl = (COAP_V1 << 6) | (type << 4) | tkl;
+    hdr->ver_t_tkl = (COAP_V1 << 6) | (type << 4) | (uint8_t)token_len;
     hdr->code = code;
     hdr->id = htons(id);
     buf += sizeof(coap_udp_hdr_t);
-
-    if (tkl_ext_len) {
-        memcpy(buf, &tkl_ext, tkl_ext_len);
-        buf += tkl_ext_len;
-    }
 
     /* Some users build a response packet in the same buffer that contained
      * the request. In this case, the argument token already points inside
