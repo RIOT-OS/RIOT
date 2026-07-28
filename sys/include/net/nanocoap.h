@@ -1448,28 +1448,6 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, uint8_
  * @returns false if there are no critical options, or all have been accessed.
  */
 bool coap_has_unprocessed_critical_options(const coap_pkt_t *pkt);
-
-/**
- * @brief   Helper to decode SZX value to size in bytes
- *
- * @param[in]   szx     SZX value to decode
- *
- * @returns     SZX value decoded to bytes
- */
-#define coap_szx2size(szx) (1U << ((szx) + 4))
-
-/**
- * @brief   Helper to encode byte size into next equal or smaller SZX value
- *
- * @param[in]   len     Size in bytes
- *
- * @returns     closest SZX value that fits into a buffer of @p len
- */
-static inline unsigned coap_size2szx(unsigned len)
-{
-    assert(len >= 16);
-    return bitarithm_msb(len >> 4);
-}
 /**@}*/
 
 /**

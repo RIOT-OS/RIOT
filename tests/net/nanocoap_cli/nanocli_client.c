@@ -364,7 +364,7 @@ static int _cmd_get_non(int argc, char **argv)
 {
     int res;
 
-    uint8_t response[coap_szx2size(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT)];
+    uint8_t response[COAP_SZX2SIZE(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT)];
 
     if (argc < 2) {
         printf("usage: %s <url>\n", argv[0]);
