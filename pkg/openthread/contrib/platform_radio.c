@@ -327,8 +327,8 @@ void otPlatRadioSetExtendedAddress(otInstance *aInstance, const otExtAddress *aE
     
     /* OpenThread stores aExtAddress in little endian */
     char reversed_addr[IEEE802154_LONG_ADDRESS_LEN];
-    for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
-        reversed_addr[i] = (uint8_t)((uint8_t *)aExtAddress)[IEEE802154_LONG_ADDRESS_LEN - 1 - i];
+    for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; ++i) {
+        reversed_addr[i] = aExtAddress->m8[IEEE802154_LONG_ADDRESS_LEN - i - 1];
     }
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; ++i) {
@@ -640,41 +640,79 @@ otError otPlatRadioEnergyScan(otInstance *aInstance, uint8_t aScanChannel, uint1
 
 void otPlatRadioEnableSrcMatch(otInstance *aInstance, bool aEnable)
 {
-    DEBUG("openthread: otPlatRadioEnableSrcMatch is not implemented\n");
-    (void)aInstance;
-    (void)aEnable;
+    (void) aInstance;
+    if(!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
+        return;
+    }
+
+    if (ieee802154_radio_confirm_on(_ot_dev.dev) == 0) {
+        ieee802154_radio_config_src_address_match(_ot_dev.dev, IEEE802154_SRC_MATCH_EN, &aEnable);
+    }
 }
 
 otError otPlatRadioAddSrcMatchShortEntry(otInstance *aInstance, const uint16_t aShortAddress)
 {
-    DEBUG("openthread: otPlatRadioAddSrcMatchShortEntry is not implemented\n");
     (void)aInstance;
-    (void)aShortAddress;
-    return OT_ERROR_NOT_IMPLEMENTED;
+    if(!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
+        return OT_ERROR_NOT_CAPABLE;
+    }
+    if (ieee802154_radio_confirm_on(_ot_dev.dev) == 0) {
+        /* TODO is aShortAddress really little endian? */
+        if (ieee802154_radio_config_src_address_match(_ot_dev.dev, IEEE802154_SRC_MATCH_SHORT_ADD, &aShortAddress) == 0) {
+            return OT_ERROR_NONE;
+        }
+        return  OT_ERROR_NO_BUFS;
+    }
+    return OT_ERROR_BUSY;
 }
 
 otError otPlatRadioAddSrcMatchExtEntry(otInstance *aInstance, const otExtAddress *aExtAddress)
 {
-    DEBUG("openthread: otPlatRadioAddSrcMatchExtEntry is not implemented\n");
     (void)aInstance;
-    (void)aExtAddress;
-    return OT_ERROR_NOT_IMPLEMENTED;
+    if(!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
+        return OT_ERROR_NOT_CAPABLE;
+    }
+     if (ieee802154_radio_confirm_on(_ot_dev.dev) == 0) {
+        uint8_t _ext_addr[8];
+        byteorder_htobebufll((uint8_t*) &_ext_addr,byteorder_bebuftohll((uint8_t*) aExtAddress));
+        if (ieee802154_radio_config_src_address_match(_ot_dev.dev, IEEE802154_SRC_MATCH_EXT_ADD, &_ext_addr) == 0) {
+            return OT_ERROR_NONE;
+        }
+        return  OT_ERROR_NO_BUFS;
+    }
+    return OT_ERROR_BUSY;
 }
 
 otError otPlatRadioClearSrcMatchShortEntry(otInstance *aInstance, const uint16_t aShortAddress)
 {
-    DEBUG("openthread: otPlatRadioClearSrcMatchShortEntry is not implemented\n");
     (void)aInstance;
-    (void)aShortAddress;
-    return OT_ERROR_NOT_IMPLEMENTED;
+    if(!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
+        return OT_ERROR_NOT_CAPABLE;
+    }
+    if (ieee802154_radio_confirm_on(_ot_dev.dev) == 0) {
+        /* TODO is aShortAddress really little endian? */
+        //const int16_t _short_addr = byteorder_htob(aShortAddress);
+        if (ieee802154_radio_config_src_address_match(_ot_dev.dev, IEEE802154_SRC_MATCH_SHORT_CLEAR, &aShortAddress) == 0) {
+            return OT_ERROR_NONE;
+        }
+    }
+    return OT_ERROR_BUSY;
 }
 
 otError otPlatRadioClearSrcMatchExtEntry(otInstance *aInstance, const otExtAddress *aExtAddress)
 {
-    DEBUG("openthread: otPlatRadioClearSrcMatchExtEntry is not implemented\n");
     (void)aInstance;
-    (void)aExtAddress;
-    return OT_ERROR_NOT_IMPLEMENTED;
+    if(!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
+        return OT_ERROR_NOT_CAPABLE;
+    }
+    if (ieee802154_radio_confirm_on(_ot_dev.dev) == 0) {
+        uint8_t _ext_addr[8];
+        byteorder_htobebufll((uint8_t*) &_ext_addr,byteorder_bebuftohll((uint8_t*) aExtAddress));
+        if (ieee802154_radio_config_src_address_match(_ot_dev.dev, IEEE802154_SRC_MATCH_EXT_CLEAR, &_ext_addr) == 0) {
+            return OT_ERROR_NONE;
+        }
+    }
+    return OT_ERROR_BUSY;
 }
 
 void otPlatRadioClearSrcMatchShortEntries(otInstance *aInstance)
