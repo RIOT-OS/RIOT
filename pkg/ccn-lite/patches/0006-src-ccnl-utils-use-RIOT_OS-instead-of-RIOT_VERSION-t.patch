@@ -1,0 +1,40 @@
+From 317ed781983e9c4b63ed3cab009b92e5395d413b Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ml-pa.com>
+Date: Tue, 28 Jul 2026 15:37:23 +0200
+Subject: [PATCH] src/ccnl-utils: use RIOT_OS instead of RIOT_VERSION to detect
+ RIOT
+
+---
+ src/ccnl-utils/include/ccnl-common.h | 2 +-
+ src/ccnl-utils/src/ccnl-common.c     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/ccnl-utils/include/ccnl-common.h b/src/ccnl-utils/include/ccnl-common.h
+index f849f01e..7e87c6c8 100644
+--- a/src/ccnl-utils/include/ccnl-common.h
++++ b/src/ccnl-utils/include/ccnl-common.h
+@@ -86,7 +86,7 @@ int ccnl_pkt_prependComponent(int suite, char *src, int *offset, unsigned char *
+ #else // CCNL_UAPI_H_ is defined
+ 
+ #include "base64.c"
+-#ifdef RIOT_VERSION
++#ifdef RIOT_OS
+ #include "ccnl-defs.h"
+ #include "net/packet.h"
+ #include <unistd.h>
+diff --git a/src/ccnl-utils/src/ccnl-common.c b/src/ccnl-utils/src/ccnl-common.c
+index 7aec282b..221680ec 100644
+--- a/src/ccnl-utils/src/ccnl-common.c
++++ b/src/ccnl-utils/src/ccnl-common.c
+@@ -98,7 +98,7 @@ int ccnl_pkt_prependComponent(int suite, char *src, int *offset, unsigned char *
+ #else // CCNL_UAPI_H_ is defined
+ 
+ #include "base64.c"
+-#ifdef RIOT_VERSION
++#ifdef RIOT_OS
+ #include "ccnl-defs.h"
+ #include "net/packet.h"
+ #include <unistd.h>
+-- 
+2.53.0
+
