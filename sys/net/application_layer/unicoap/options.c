@@ -761,8 +761,10 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
     ssize_t index_offset = next_i - i;
 
     if (next_i == count) {
-        /* just drop last entry, no succeeding options */
-        options->storage_size -= removed_entry->size;
+        /* just drop last entries, no succeeding options */
+        for (int k = i; k < next_i; k += 1) {
+            options->storage_size -= options->entries[k].size;
+        }
         options->option_count -= index_offset;
     }
     else {
