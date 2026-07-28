@@ -288,17 +288,34 @@ void process_tx_done(otInstance *aInstance)
 /* OpenThread will call this for getting the radio caps */
 otRadioCaps otPlatRadioGetCaps(otInstance *aInstance)
 {
-    (void)aInstance;
-    DEBUG("openthread: otPlatRadioGetCaps\n");
-    /* all drivers should handle ACK, including call of NETDEV_EVENT_TX_NOACK */
+    (void) aInstance;
+    otRadioCaps caps = 0;
+    printf("Caps flags %u\n",(unsigned) _ot_dev.dev->driver->caps);
+    if (ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_IRQ_ACK_TIMEOUT)) {
+        caps |= OT_RADIO_CAPS_ACK_TIMEOUT;
+    }
+    /* OT_RADIO_CAPS_ENERGY_SCAN only possible as MAC software feature in */
+    if (ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_FRAME_RETRANS)) {
+        caps |= OT_RADIO_CAPS_TRANSMIT_RETRIES;
+    }
+    if (ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_AUTO_CSMA)) {
+        caps |= OT_RADIO_CAPS_CSMA_BACKOFF;
+    }
+    /* OT_RADIO_CAPS_SLEEP_TO_TX not possible, see precondition static int ieee802154_radio_request_transmit */
+    /* OT_RADIO_CAPS_TRANSMIT_SEC experimental with IEEE 802.15.4 security module*/
+    /* OT_RADIO_CAPS_TRANSMIT_TIMING + OT_RADIO_CAPS_RECEIVE_TIMING could be implemented */
+    /* OT_RADIO_CAPS_RX_ON_WHEN_IDLE currently as software feature in OpenThread */
+    /* OT_RADIO_CAPS_TRANSMIT_FRAME_POWER could be implemented */
+    /* OT_RADIO_CAPS_ALT_SHORT_ADDR */
 
-    return OT_RADIO_CAPS_TRANSMIT_RETRIES | OT_RADIO_CAPS_ACK_TIMEOUT;
+    DEBUG("openthread: otPlatRadioGetCaps %u\n", (uint16_t) caps);
+    return caps;
 }
 
 int8_t otPlatRadioGetReceiveSensitivity(otInstance *aInstance)
 {
-    DEBUG("openthread: otPlatRadioGetReceiveSensitivity is not implemented\n");
-    (void)aInstance;
+    (void) aInstance;
+    /* -100 is around the default range of most RIOT radios */
     return -100;
 }
 
