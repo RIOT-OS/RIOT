@@ -154,6 +154,11 @@ for p in \
 done
 printf "%25s: %s\n" "clang" "$(get_cmd_version clang)"
 printf "\n"
+printf "%s\n" "Installed container tools"
+printf "%s\n" "-------------------------"
+printf "%25s: %s\n" "docker" "$(get_cmd_version docker)"
+printf "%25s: %s\n" "podman" "$(get_cmd_version podman)"
+printf "\n"
 printf "%s\n" "Installed compiler libs"
 printf "%s\n" "-----------------------"
 # platform specific newlib version
