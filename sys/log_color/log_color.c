@@ -27,31 +27,32 @@ typedef int dont_be_pedantic; /* this c-file is not empty */
 #include <stdio.h>
 #include <stdarg.h>
 
+#include "ansi_colors.h"
 #include "kernel_defines.h"
 #include "log.h"
 
 /**
  * @brief   Default ANSI color escape code for error logs
  *
- * Default is bold red
+ * Default is red
  */
 #ifndef LOG_ERROR_ANSI_COLOR_CODE
-#define LOG_ERROR_ANSI_COLOR_CODE       ("\033[1;31m")
+#define LOG_ERROR_ANSI_COLOR_CODE       ANSI_COLOR_RED
 #endif
 
 /**
  * @brief   Default ANSI color escape code for warning logs
  *
- * Default is bold yellow
+ * Default is yellow
  */
 #ifndef LOG_WARNING_ANSI_COLOR_CODE
-#define LOG_WARNING_ANSI_COLOR_CODE     ("\033[1;33m")
+#define LOG_WARNING_ANSI_COLOR_CODE     ANSI_COLOR_YELLOW
 #endif
 
 /**
  * @brief   Default ANSI color escape code for info logs
  *
- * Default is bold white
+ * Default is white
  */
 #ifndef LOG_INFO_ANSI_COLOR_CODE
 #define LOG_INFO_ANSI_COLOR_CODE        ("\033[1m")
@@ -63,13 +64,8 @@ typedef int dont_be_pedantic; /* this c-file is not empty */
  * Default is green
  */
 #ifndef LOG_DEBUG_ANSI_COLOR_CODE
-#define LOG_DEBUG_ANSI_COLOR_CODE       ("\033[0;32m")
+#define LOG_DEBUG_ANSI_COLOR_CODE       ANSI_COLOR_GREEN
 #endif
-
-/**
- * @brief   ANSI color escape code used for resetting color
- */
-#define LOG_RESET_ANSI_COLOR_CODE       ("\033[0m")
 
 static const char * const _ansi_codes[] =
 {
@@ -96,7 +92,7 @@ void log_write(unsigned level, const char *format, ...)
 #pragma clang diagnostic pop
 #endif /* clang */
     va_end(args);
-    printf(LOG_RESET_ANSI_COLOR_CODE);
+    printf(ANSI_COLOR_RESET);
 
 #if !defined(__MSP430__)
     /* no fflush on msp430 */
