@@ -10,9 +10,7 @@ with 12KB of RAM and 32KB of ROM Flash.
 
 ## Pinout
 
-See [this application note as reference](https://www.st.com/resource/en/application_note/an5673-getting-started-with-stm32c0-mcu-hardware-development-stmicroelectronics.pdf).
-This means the responsibility is on the firmware configurer to take special
-care when configuring IO, ensuring that ports are not conflicting on each pin.
+<img src="stm32c0316-dk.svg" alt="Pinout for the STM32C0316-DK (from STM user manual UM2969, https://www.st.com/resource/en/user_manual/um2969-discovery-kit-with-stm32c031c6-mcu-stmicroelectronics.pdf, page 7)" width=25% />
 
 ## MCU
 
