@@ -619,10 +619,11 @@ typedef enum {
  * @name Blockwise transfer (RFC7959)
  * @{
  */
-#define COAP_BLOCKWISE_NUM_OFF  (4)
-#define COAP_BLOCKWISE_MORE_OFF (3)
-#define COAP_BLOCKWISE_SZX_MASK (0x07)
-#define COAP_BLOCKWISE_SZX_MAX  (7)
+#define COAP_BLOCKWISE_NUM_OFF  (4)         /**< offset of the NUM field in bits */
+#define COAP_BLOCKWISE_NUM_MAX  (0xfffffU)  /**< highest possible block number (20 bits) */
+#define COAP_BLOCKWISE_MORE_OFF (3)         /**< offset of the more field in bits */
+#define COAP_BLOCKWISE_SZX_MASK (0x07)      /**< bitmask to get the SZX field */
+#define COAP_BLOCKWISE_SZX_MAX  (7)         /**< largest valid SZX value */
 /** @} */
 
 /**
