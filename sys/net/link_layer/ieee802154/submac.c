@@ -227,7 +227,7 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
         res = ieee802154_radio_read(dev, submac->rx_buf, submac->rx_len, &submac->rx_info);
         assert(res == (int)submac->rx_len);
         /* Make sure it's not an ACK frame */
-        if (ieee802154_radio_len(dev) > (int)IEEE802154_MIN_FRAME_LEN) {
+        if (submac->rx_len > (int)IEEE802154_MIN_FRAME_LEN) {
             /* sending ACK if radio does not support auto-ACK */
             if (!_does_send_ack(dev)) {
                 ieee802154_filter_mode_t mode;
