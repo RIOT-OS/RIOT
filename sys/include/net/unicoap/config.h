@@ -131,6 +131,22 @@
  * @{
  */
 /**
+ * @brief Full support for CoAP option manipulation.
+ *
+ * Allows to change, remove and add options in any order. This comes with
+ * some implementation cost and can therefore be disabled. In that case,
+ * altering or adding an option out-of-order results in a runtime error.
+ *
+ * @remark Disabling this configuration is incompatible with Client URI,
+ *         Observe and Blockwise support.
+ *
+ * **Default**: Enabled
+ */
+#if !defined(CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT 1
+#endif
+
+ /**
  * @brief Maximum number of options that can be present in a request or response
  *
  * **Default**: 16 options

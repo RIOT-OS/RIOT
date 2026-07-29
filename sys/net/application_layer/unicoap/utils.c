@@ -345,7 +345,7 @@ int unicoap_pdu_buildv_options_and_payload(uint8_t* header, size_t header_size,
     iolist_init(iolists, header, header_size, NULL);
 
     iolist_t* element = iolists;
-    if (message->options && message->options->option_count > 0) {
+    if (message->options && unicoap_message_options_size(message) > 0) {
         element->iol_next = element + 1;
         element += 1;
         iolist_init(element, unicoap_message_options_data(message),
@@ -369,7 +369,7 @@ ssize_t unicoap_pdu_build_options_and_payload(uint8_t* pdu, size_t capacity,
     assert(pdu);
     assert(message);
 
-    if (message->options && message->options->option_count > 0) {
+    if (message->options && unicoap_message_options_size(message) > 0) {
         if (capacity < unicoap_message_options_size(message)) {
             return -ENOBUFS;
         }
