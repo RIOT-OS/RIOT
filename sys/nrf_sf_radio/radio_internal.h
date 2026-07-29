@@ -19,6 +19,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Busy-wait to a time point or condition
  *
@@ -50,3 +54,7 @@ void nrf_sf_radio_rx_arm(uint8_t *buf, uint32_t deadline_ticks);
  * @param[out] buf  Buffer for the received radio packet
  */
 void nrf_sf_radio_try_rx_enable(uint8_t *buf);
+
+#ifdef __cplusplus
+}
+#endif

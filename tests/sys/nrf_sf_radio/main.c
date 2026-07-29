@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "container.h"
 #include "nrf_sf_radio/link_radio.h"
 #include "nrf_sf_radio/radio_driver.h"
 
@@ -114,7 +115,7 @@ static void _test_channels(void)
     };
     bool passed = true;
 
-    for (size_t i = 0; i < (sizeof(tests) / sizeof(tests[0])); i++) {
+    for (size_t i = 0; i < ARRAY_SIZE(tests); i++) {
         nrf_sf_radio_set_ble_channel(tests[i].channel);
         if ((NRF_RADIO->FREQUENCY != tests[i].frequency) ||
             !_whitening_iv_matches(tests[i].channel)) {
@@ -140,7 +141,7 @@ static void _test_power(void)
     };
     bool passed = true;
 
-    for (size_t i = 0; i < (sizeof(tests) / sizeof(tests[0])); i++) {
+    for (size_t i = 0; i < ARRAY_SIZE(tests); i++) {
         nrf_sf_radio_set_power(tests[i].requested);
         if (NRF_RADIO->TXPOWER != tests[i].expected) {
             passed = false;
