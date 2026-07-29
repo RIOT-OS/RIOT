@@ -525,12 +525,12 @@ bool unicoap_options_contains(const unicoap_options_t* options, unicoap_option_n
 ssize_t unicoap_options_get(const unicoap_options_t* options, unicoap_option_number_t number,
                            const uint8_t** value)
 {
-    int i = _find_option_index(options, number);
-    if (i < 0) {
+    int option_index = _find_option_index(options, number);
+    if (option_index < 0) {
         return -ENOENT;
     }
 
-    const uint8_t* cursor = options->entries[i].data;
+    const uint8_t* cursor = options->entries[option_index].data;
     return _read_option(&cursor, value);
 }
 
@@ -719,16 +719,16 @@ int unicoap_options_set(unicoap_options_t* options, unicoap_option_number_t numb
     assert(value_size <= UNICOAP_UINT_MAX);
     assert(opts->data);
 
-    int i = _find_option_index(options, number);
-    if (i < 0) {
+    int option_index = _find_option_index(options, number);
+    if (option_index < 0) {
         return unicoap_options_add(options, number, value, value_size);
     }
     else {
-        unicoap_option_entry_t* e = &opts[i];
-        uint16_t delta = (i > 0) ? (number - opts[i - 1].number) : number;
+        unicoap_option_entry_t* e = &opts[option_index];
+        uint16_t delta = (option_index > 0) ? (number - opts[option_index - 1].number) : number;
 
         size_t option_size = _option_size(delta, value_size);
-        if (_shift_options(options, i + 1, (int)option_size - (int)e->size) < 0) {
+        if (_shift_options(options, option_index + 1, (int)option_size - (int)e->size) < 0) {
             _OPTIONS_DEBUG("storage too small for new option value\n");
             return -ENOBUFS;
         }
@@ -744,25 +744,25 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
 {
     _OPTIONS_DEBUG("attempting to remove %s (nr=%u)\n", unicoap_string_from_option_number(number),
                   number);
-    int i = _find_option_index(options, number);
-    if (unlikely(i < 0)) {
+    int option_index = _find_option_index(options, number);
+    if (unlikely(option_index < 0)) {
         return 0;
     }
 
-    unicoap_option_entry_t* removed_entry = &options->entries[i];
+    unicoap_option_entry_t* removed_entry = &options->entries[option_index];
 
     int count = (int)options->option_count;
     /* index of next option */
-    int next_i = i + 1;
-    while (next_i < count && options->entries[next_i].number == number) {
-        next_i += 1;
+    int next_option_index = option_index + 1;
+    while (next_option_index < count && options->entries[next_option_index].number == number) {
+        next_option_index += 1;
     }
 
-    ssize_t index_offset = next_i - i;
+    ssize_t index_offset = next_option_index - option_index;
 
-    if (next_i == count) {
+    if (next_option_index == count) {
         /* just drop last entries, no succeeding options */
-        for (int k = i; k < next_i; k += 1) {
+        for (int k = option_index; k < next_option_index; k += 1) {
             options->storage_size -= options->entries[k].size;
         }
         options->option_count -= index_offset;
@@ -770,7 +770,7 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
     else {
         /* the successor's option delta will change */
         unicoap_option_entry_t* next = removed_entry + index_offset;
-        unicoap_option_entry_t* prev = (i > 0) ? (&options->entries[i - 1]) : NULL;
+        unicoap_option_entry_t* prev = (option_index > 0) ? (&options->entries[option_index - 1]) : NULL;
         uint8_t length_nibble = DECODE_LENGTH_NIBBLE(*next->data);
         uint16_t new_delta = next->number - (prev ? prev->number : 0);
 
@@ -780,7 +780,7 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
         /* The extended delta field's size might change due to a new
          * delta value. */
         ssize_t total_diff = diff;
-        for (int k = i; k < next_i; k += 1) {
+        for (int k = option_index; k < next_option_index; k += 1) {
             total_diff -= options->entries[k].size;
         }
 
@@ -819,8 +819,8 @@ int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number
         _write_head_partial(&cursor, new_delta, length_nibble);
 
         /* remove entry from options lookup array */
-        _shift_option_entries(options, i + index_offset, -index_offset);
-        _update_option_entries_with_storage_diff(options, i + 1, total_diff);
+        _shift_option_entries(options, option_index + index_offset, -index_offset);
+        _update_option_entries_with_storage_diff(options, option_index + 1, total_diff);
     }
     return 0;
 }
