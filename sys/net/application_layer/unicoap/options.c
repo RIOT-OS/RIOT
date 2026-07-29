@@ -344,6 +344,7 @@ void _move_options_in_storage_buffer(unicoap_options_t* options, uint8_t* dest, 
 {
     uint8_t* start = unicoap_options_data(options);
     uint8_t* end = start + options->storage_capacity;
+    (void)end; /* unused with NDEBUG */
     assert(src >= start && src < end);
     assert(dest >= start && dest < end);
     size_t from_start = (uintptr_t)src - (uintptr_t)start;
