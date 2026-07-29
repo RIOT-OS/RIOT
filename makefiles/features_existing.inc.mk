@@ -111,6 +111,7 @@ FEATURES_EXISTING := \
     cpu_stm32l4 \
     cpu_stm32l5 \
     cpu_stm32mp1 \
+    cpu_stm32u3 \
     cpu_stm32u5 \
     cpu_stm32wb \
     cpu_stm32wl \
