@@ -1555,14 +1555,23 @@ int coap_block_slicer_init(coap_block_slicer_t *slicer, size_t blknum,
 int coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
 {
     uint32_t blknum = 0;
-    uint8_t szx = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX - 4;
+    const uint8_t szx_default = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX - 4;
+    uint8_t szx = szx_default;
 
     /* Retrieve the block2 option from the client request */
     if (coap_get_blockopt(pkt, COAP_OPT_BLOCK2, &blknum, &szx) >= 0) {
-        /* Use the client requested block size if it is smaller than our own
-         * maximum block size */
-        if (CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX - 4 < szx) {
-            szx = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX - 4;
+        /* If the client's requested block size is not acceptable (too large),
+         * we go with the maximum we are willing to do and recompute the
+         * block number to stay at the same offset. */
+        if (szx > szx_default) {
+            unsigned shift = szx - szx_default;
+            szx = szx_default;
+            uint64_t tmp = blknum;
+            tmp <<= shift;
+            if (tmp > COAP_BLOCKWISE_NUM_MAX) {
+                return -EBADMSG;
+            }
+            blknum = tmp;
         }
     }
 
