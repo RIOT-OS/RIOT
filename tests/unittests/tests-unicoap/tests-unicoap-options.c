@@ -383,6 +383,18 @@ static void test_remove_multiple(void)
     _TEST_ASSERT_EQUAL_BYTES(options_blob, unicoap_options_data(&options), sizeof(options_blob));
 }
 
+static void test_remove_multiple_trailing(void)
+{
+    UNICOAP_OPTIONS_ALLOC_STATIC(options, 20);
+    TEST_ASSERT_EQUAL_INT(unicoap_options_set(&options, 4, (uint8_t*)poem, 1), 0);
+    TEST_ASSERT_EQUAL_INT(unicoap_options_set(&options, 1, (uint8_t*)poem, 1), 0);
+    TEST_ASSERT_EQUAL_INT(unicoap_options_add(&options, 4, (uint8_t*)poem, 1), 0);
+    TEST_ASSERT_EQUAL_INT(6, unicoap_options_size(&options));
+
+    TEST_ASSERT_EQUAL_INT(unicoap_options_remove_all(&options, 4), 0);
+    TEST_ASSERT_EQUAL_INT(2, unicoap_options_size(&options));
+}
+
 static void test_option_value_uses_shortest_possible_representation(void)
 {
     static const uint8_t options_blob[] = { 0x00 };
@@ -414,6 +426,7 @@ Test* tests_unicoap_options(void)
         new_TestFixture(test_remove_leading),
         new_TestFixture(test_remove_trailing),
         new_TestFixture(test_remove_multiple),
+        new_TestFixture(test_remove_multiple_trailing),
         new_TestFixture(test_option_value_uses_shortest_possible_representation),
     };
 
