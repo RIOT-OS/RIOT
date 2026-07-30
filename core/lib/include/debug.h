@@ -159,9 +159,10 @@ static inline bool __debug_sufficient_stack(bool print)
     const thread_t *thread = thread_get_active();
     if (((thread != NULL) && (thread->stack_size < THREAD_EXTRA_STACKSIZE_PRINTF)) ||
 #  ifdef ISR_STACKSIZE
-        (irq_is_in() && (ISR_STACKSIZE < THREAD_EXTRA_STACKSIZE_PRINTF))
+        (irq_is_in() && (ISR_STACKSIZE < THREAD_EXTRA_STACKSIZE_PRINTF))) {
+#  else
+        false) {
 #  endif
-        ) {
         if (print) {
             fputs("Cannot debug, stack too small. Consider using DEBUG_PUTS().\n", stdout);
         }
