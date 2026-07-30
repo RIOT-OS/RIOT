@@ -23,6 +23,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "ansi_colors.h"
 #include "irq.h"
@@ -114,12 +115,44 @@ extern "C" {
 #  define CONFIG_DEBUG_SHOW_FUNC 0
 #endif
 
+/**
+ * @brief Separator before the function name.
+ *
+ * @internal
+ */
 #define _DEBUG_SEP_FUNC     ":"
+/**
+ * @brief Separator before the thread name.
+ *
+ * @internal
+ */
 #define _DEBUG_SEP_THREAD   "@"
+/**
+ * @brief Separator before the actual message.
+ *
+ * @internal
+ */
 #define _DEBUG_SEP_MSG      " # "
 
+/**
+ * @brief Color for the debug prefix.
+ *
+ * @internal
+ */
 #define _DEBUG_PREFIX_COLOR ANSI_COLOR_CYAN
 
+/**
+ * @brief Check whether the stack of the current thread (or ISR) is big enough in total
+ *        for printf formatting.
+ *
+ * @warning This only checks for the whole stack size, not for the currently free part of it.
+ *
+ * @internal
+ *
+ * @param    print              Whether to print a warning message
+ * @retval   true               Stack is sufficiently big
+ * @retval   false              Stack is too small
+ */
 static inline bool __debug_sufficient_stack(bool print)
 {
 #if IS_ACTIVE(DEVELHELP)
@@ -135,12 +168,28 @@ static inline bool __debug_sufficient_stack(bool print)
     return true;
 }
 
+/**
+ * @brief Get thread name of the currently running thread, or "(isr)"
+ *
+ * @internal
+ *
+ * @return   const char*    the thread name, or "(isr)"
+ */
 static inline const char *__debug_thread_name_or_isr(void)
 {
     const thread_t *thread = thread_get_active();
     return (irq_is_in() || thread == NULL) ? "(isr)" : thread_get_name(thread);
 }
 
+/**
+ * @brief Print the debug prefix for `DEBUG`
+ *
+ * @internal
+ *
+ * @param    func_name          Name of the calling function
+ * @retval   true               The prefix was printed
+ * @retval   false              No prefix was printed
+ */
 static inline bool __debug_print_prefix(const char *func_name)
 {
     if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {
@@ -160,6 +209,13 @@ static inline bool __debug_print_prefix(const char *func_name)
     return false;
 }
 
+/**
+ * @brief Print the debug prefix for `DEBUG_PUTS`
+ *
+ * @internal
+ *
+ * @param    func_name          Name of the calling function
+ */
 static inline void __debug_put_prefix(const char *func_name)
 {
     if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {
@@ -179,12 +235,11 @@ static inline void __debug_put_prefix(const char *func_name)
         fputs(__debug_thread_name_or_isr(), stdout);
         fputs(_DEBUG_SEP_MSG, stdout);
     }
-    else {
-        fputs(DEBUG_PREFIX _DEBUG_SEP_MSG, stdout); // todo: what if DEBUG_PREFIX not set, also below!
+    else if (strlen(DEBUG_PREFIX) > 0) {
+        fputs(DEBUG_PREFIX _DEBUG_SEP_MSG, stdout);
     }
 }
 
-// todo: update doc to mention `DEBUG_CONT`
 /**
  * @def DEBUG
  *
@@ -204,19 +259,22 @@ static inline void __debug_put_prefix(const char *func_name)
  *          debug output relevant for application developers using your module
  *          (e.g. to hint potentially incorrect / inefficient use of your
  *          library).
- * @details If a variable is only accessed by `DEBUG()`, the compiler will
+ * @warning If a variable is only accessed by `DEBUG()`, the compiler will
  *          warn about unused variables when `ENABLE_DEBUG` is set to `0`.
  */
-#define DEBUG(...)                                               \
-    do {                                                         \
-        if (ENABLE_DEBUG && __debug_sufficient_stack(true)) {    \
-            if (__debug_print_prefix(DEBUG_FUNC)) {              \
-                printf(__VA_ARGS__);                             \
-            }                                                    \
-            else {                                               \
-                printf(DEBUG_PREFIX _DEBUG_SEP_MSG __VA_ARGS__); \
-            }                                                    \
-        }                                                        \
+#define DEBUG(...)                                                  \
+    do {                                                            \
+        if (ENABLE_DEBUG && __debug_sufficient_stack(true)) {       \
+            if (__debug_print_prefix(DEBUG_FUNC)) {                 \
+                printf(__VA_ARGS__);                                \
+            }                                                       \
+            else if (strlen(DEBUG_PREFIX) > 0) {                    \
+                printf(DEBUG_PREFIX _DEBUG_SEP_MSG __VA_ARGS__);    \
+            }                                                       \
+            else {                                                  \
+                printf(__VA_ARGS__);                                \
+            }                                                       \
+        }                                                           \
     } while (0)
 
 /**
@@ -227,11 +285,11 @@ static inline void __debug_put_prefix(const char *func_name)
  * Use this macro the same way as `printf` if you want to continue printing to the
  * same line that has been started with @ref DEBUG previously.
  */
-#define DEBUG_CONT(...)                                        \
-    do {                                                       \
-        if (ENABLE_DEBUG && __debug_sufficient_stack(false)) { \
-            printf(__VA_ARGS__);                               \
-        }                                                      \
+#define DEBUG_CONT(...)                                             \
+    do {                                                            \
+        if (ENABLE_DEBUG && __debug_sufficient_stack(false)) {      \
+            printf(__VA_ARGS__);                                    \
+        }                                                           \
     } while (0)
 
 /**
@@ -240,12 +298,12 @@ static inline void __debug_put_prefix(const char *func_name)
  * @brief Print debug information to stdout using puts(), so no stack size
  *        restrictions do apply.
  */
-#define DEBUG_PUTS(str)                     \
-    do {                                    \
-        if (ENABLE_DEBUG) {                 \
-            __debug_put_prefix(DEBUG_FUNC); \
-            puts(str);                      \
-        }                                   \
+#define DEBUG_PUTS(str)                         \
+    do {                                        \
+        if (ENABLE_DEBUG) {                     \
+            __debug_put_prefix(DEBUG_FUNC);     \
+            puts(str);                          \
+        }                                       \
     } while (0)
 /** @} */
 
