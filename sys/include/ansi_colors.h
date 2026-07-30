@@ -5,6 +5,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   ANSI color escape code for red
  */
@@ -44,3 +48,7 @@
  * @brief   ANSI color escape code for resetting
  */
 #define ANSI_COLOR_RESET    "\x1b[0m"
+
+#ifdef __cplusplus
+}
+#endif
