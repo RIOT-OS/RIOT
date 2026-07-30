@@ -202,11 +202,13 @@ static inline bool __debug_print_prefix(const char *func_name)
         return true;
     }
     else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {
-        printf(DEBUG_PREFIX _DEBUG_SEP_FUNC "%s" _DEBUG_SEP_MSG, func_name);
+        printf(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_FUNC "%s" \
+              _DEBUG_SEP_MSG ANSI_COLOR_RESET, func_name);
         return true;
     }
     else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {
-        printf(DEBUG_PREFIX _DEBUG_SEP_THREAD "%s" _DEBUG_SEP_MSG, __debug_thread_name_or_isr());
+        printf(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_THREAD "%s" \
+            _DEBUG_SEP_MSG ANSI_COLOR_RESET, __debug_thread_name_or_isr());
         return true;
     }
     return false;
@@ -229,17 +231,17 @@ static inline void __debug_put_prefix(const char *func_name)
         fputs(_DEBUG_SEP_MSG ANSI_COLOR_RESET, stdout);
     }
     else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {
-        fputs(DEBUG_PREFIX _DEBUG_SEP_FUNC, stdout);
+        fputs(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_FUNC, stdout);
         fputs(func_name, stdout);
-        fputs(_DEBUG_SEP_MSG, stdout);
+        fputs(_DEBUG_SEP_MSG ANSI_COLOR_RESET, stdout);
     }
     else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {
-        fputs(DEBUG_PREFIX _DEBUG_SEP_THREAD, stdout);
+        fputs(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_THREAD, stdout);
         fputs(__debug_thread_name_or_isr(), stdout);
-        fputs(_DEBUG_SEP_MSG, stdout);
+        fputs(_DEBUG_SEP_MSG ANSI_COLOR_RESET, stdout);
     }
     else if (strlen(DEBUG_PREFIX) > 0) {
-        fputs(DEBUG_PREFIX _DEBUG_SEP_MSG, stdout);
+        fputs(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_MSG ANSI_COLOR_RESET, stdout);
     }
 }
 
@@ -272,7 +274,8 @@ static inline void __debug_put_prefix(const char *func_name)
                 printf(__VA_ARGS__);                                \
             }                                                       \
             else if (strlen(DEBUG_PREFIX) > 0) {                    \
-                printf(DEBUG_PREFIX _DEBUG_SEP_MSG __VA_ARGS__);    \
+                printf(_DEBUG_PREFIX_COLOR DEBUG_PREFIX             \
+                       _DEBUG_SEP_MSG ANSI_COLOR_RESET __VA_ARGS__);\
             }                                                       \
             else {                                                  \
                 printf(__VA_ARGS__);                                \
