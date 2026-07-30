@@ -169,6 +169,7 @@ static inline bool __debug_sufficient_stack(bool print)
         return false;
     }
 #endif /* IS_ACTIVE(DEVELHELP) */
+    (void)print;
     return true;
 }
 
@@ -320,6 +321,21 @@ static inline void __debug_put_prefix(const char *func_name)
  * @deprecated use @ref DEBUG instead. Will be removed after release 2027.04.
  */
 #define DEBUG_PRINT(...) DEBUG(__VA_ARGS__)
+
+/**
+ * @def DEBUG_EXTRA_STACKSIZE
+ *
+ * @brief Extra stacksize needed when ENABLE_DEBUG==1
+ *
+ * @deprecated This macro definition does not work anyway as ENABLE_DEBUG
+ *             is only set on file-level. Just remove its usages.
+ *             Will be removed after release 2027.04.
+ */
+#if ENABLE_DEBUG
+#  define DEBUG_EXTRA_STACKSIZE THREAD_EXTRA_STACKSIZE_PRINTF
+#else
+#  define DEBUG_EXTRA_STACKSIZE (0)
+#endif
 
 #ifdef __cplusplus
 }
