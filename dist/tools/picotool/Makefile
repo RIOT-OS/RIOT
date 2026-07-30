@@ -9,7 +9,7 @@ RIOTBASE ?= $(CURDIR)/../../..
 RIOTTOOLS ?= $(CURDIR)/..
 
 # Location of the picosdk package
-PICOSDK_DIR = $(RIOTBASE)/build/pkg/picosdk
+PICOSDK_DIR = $(PKGDIRBASE)/picosdk
 
 PKG_SOURCE_DIR = $(CURDIR)/source
 PKG_BUILD_DIR = $(PKG_SOURCE_DIR)/build
