@@ -301,7 +301,16 @@ DOCKER_VOLUMES_AND_ENV += -e 'TZ=$(HOST_TIMEZONE)'
 DOCKER_VOLUMES_AND_ENV += -e 'RIOTBASE=$(DOCKER_RIOTBASE)'
 DOCKER_VOLUMES_AND_ENV += -e 'CCACHE_BASEDIR=$(DOCKER_RIOTBASE)'
 
-DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,BUILD_DIR,,build)
+# For a BUILD_DIR outside of RIOTBASE, we have to create an empty $(RIOTBASE)/build folder
+# for Docker to bind the BUILD_DIR folder to. Otherwise it will create one with
+# root ownership, causing problems when doing non-Docker builds or builds
+# without an external BUILD_DIR.
+ifeq (0,$(INSIDE_DOCKER))
+  ifneq (,$(call dir_is_outside_riotbase,$(BUILD_DIR)))
+    $(shell mkdir -p $(RIOTBASE)/build)
+  endif
+endif
+DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,BUILD_DIR,$(DOCKER_RIOTBASE),build)
 
 # Prevent recursive invocation of docker by explicitly disabling docker via env variable,
 # overwriting potential default in application Makefile
