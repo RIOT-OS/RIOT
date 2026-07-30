@@ -1,4 +1,5 @@
 @defgroup pkg_u8g2 U8G2 graphic library for monochome displays
+@brief Provides drivers for multiple controllers of monochrome displays
 @ingroup pkg
 @ingroup drivers_display
 
@@ -57,8 +58,9 @@ FEATURES_REQUIRED += periph_i2c
 #### 2. Override Default Configurations
 
 You'll need to configure the I2C device (bus), to which the display is connected
-on your board, the I2C address, and the initialization function. To determine
-the initialization function, refer to the setup documentation of the package:
+on your board, the I2C address, the initialization function, and the rotation.
+To determine the initialization function, refer to the setup documentation of
+the package:
 https://github.com/olikraus/u8g2/wiki/u8g2setupc#setup-function-reference. You
 can set these values in your Makefile, for example:
 
@@ -73,9 +75,13 @@ CFLAGS += -DU8G2_DISPLAY_PARAM_I2C_ADDR=0x3C
 # Initialization function taken from documentation
 # https://github.com/olikraus/u8g2/wiki/u8g2setupc#ssd1306-128x64_noname-1
 CFLAGS += -DU8G2_DISPLAY_PARAM_INIT_FUNCTION=u8g2_Setup_ssd1306_i2c_128x64_noname_f
+
+# 180 degree clockwise rotation
+# https://github.com/olikraus/u8g2/wiki/u8g2setupc#setup-arguments
+CFLAGS += -DU8G2_DISPLAY_PARAM_ROTATION_FUNCTION=U8G2_R2
 ```
 
-### SPI Display #{disp-dev-usage-spi}
+### SPI Display {#disp-dev-usage-spi}
 
 Let's say you have an SPI monochrome display with the 1306 controller, and you
 want to use it with the generic display interface.
