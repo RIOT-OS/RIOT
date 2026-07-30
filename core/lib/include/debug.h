@@ -143,28 +143,31 @@ extern "C" {
 
 /**
  * @brief Check whether the stack of the current thread (or ISR) is big enough in total
- *        for printf formatting.
+ *        for printf formatting when `DEVELHELP` is enabled. Otherwise, it returns true.
  *
  * @warning This only checks for the whole stack size, not for the currently free part of it.
  *
  * @internal
  *
  * @param    print              Whether to print a warning message
- * @retval   true               Stack is sufficiently big
+ * @retval   true               Stack is sufficiently big, or `DEVELHELP` is disabled
  * @retval   false              Stack is too small
  */
 static inline bool __debug_sufficient_stack(bool print)
 {
 #if IS_ACTIVE(DEVELHELP)
     const thread_t *thread = thread_get_active();
-    if ((irq_is_in() && (ISR_STACKSIZE < THREAD_EXTRA_STACKSIZE_PRINTF)) ||
-        ((thread != NULL) && (thread->stack_size < THREAD_EXTRA_STACKSIZE_PRINTF))) {
+    if (((thread != NULL) && (thread->stack_size < THREAD_EXTRA_STACKSIZE_PRINTF)) ||
+#  ifdef ISR_STACKSIZE
+        (irq_is_in() && (ISR_STACKSIZE < THREAD_EXTRA_STACKSIZE_PRINTF))
+#  endif
+        ) {
         if (print) {
             fputs("Cannot debug, stack too small. Consider using DEBUG_PUTS().\n", stdout);
         }
         return false;
     }
-#endif
+#endif /* IS_ACTIVE(DEVELHELP) */
     return true;
 }
 
