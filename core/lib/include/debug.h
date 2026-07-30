@@ -62,7 +62,7 @@ extern "C" {
  * @brief   This macro can be defined as 0 or other on a file-based level.
  *          @ref DEBUG() will generate output only if ENABLE_DEBUG is non-zero.
  */
-#if !defined(ENABLE_DEBUG) || defined(DOXYGEN)
+#ifndef ENABLE_DEBUG
 #  define ENABLE_DEBUG 0
 #endif
 
@@ -70,7 +70,7 @@ extern "C" {
  * @brief   Common prefix for all debug messages, defaulting to an empty string.
  *          Expected to be set on a file-based level.
  */
-#if !defined(DEBUG_PREFIX) || defined(DOXYGEN)
+#ifndef DEBUG_PREFIX
 #  define DEBUG_PREFIX ""
 #endif
 
@@ -95,9 +95,8 @@ extern "C" {
  *          the calling thread name.
  *
  * **Default**: disabled
- *
  */
-#if !defined(CONFIG_DEBUG_SHOW_THREAD) || defined(DOXYGEN)
+#ifndef CONFIG_DEBUG_SHOW_THREAD
 #  define CONFIG_DEBUG_SHOW_THREAD 0
 #endif
 
@@ -110,7 +109,6 @@ extern "C" {
  *          the current function name.
  *
  * **Default**: disabled
- *
  */
 #if !defined(CONFIG_DEBUG_SHOW_FUNC) || defined(DOXYGEN)
 #  define CONFIG_DEBUG_SHOW_FUNC 0
@@ -146,7 +144,8 @@ static inline const char *__debug_thread_name_or_isr(void)
 static inline bool __debug_print_prefix(const char *func_name)
 {
     if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {
-        printf(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_FUNC "%s" _DEBUG_SEP_THREAD "%s" _DEBUG_SEP_MSG ANSI_COLOR_RESET,
+        printf(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_FUNC "%s" \
+               _DEBUG_SEP_THREAD "%s" _DEBUG_SEP_MSG ANSI_COLOR_RESET,
                func_name, __debug_thread_name_or_isr());
         return true;
     }
@@ -191,7 +190,7 @@ static inline void __debug_put_prefix(const char *func_name)
  *
  * @brief Print debug information to stdout
  *
- * Use this macro the same similar to `printf` when starting a new line.
+ * Use this macro similarly to `printf` when starting a new line.
  * Remember to end the line with an explicit newline character `\n`.
  * If you instead want to continue writing to the same line afterwards,
  * use @ref DEBUG_CONT for the subsequent calls (and end the line there).
@@ -225,8 +224,8 @@ static inline void __debug_put_prefix(const char *func_name)
  *
  * @brief Continue printing debug information to stdout
  *
- * Use this macro the same as `printf` if you want to continue printing to the
- * same line that was previously started with @ref DEBUG.
+ * Use this macro the same way as `printf` if you want to continue printing to the
+ * same line that has been started with @ref DEBUG previously.
  */
 #define DEBUG_CONT(...)                                        \
     do {                                                       \
@@ -253,7 +252,7 @@ static inline void __debug_put_prefix(const char *func_name)
 /**
  * @def DEBUG_PRINT
  *
- * @deprecated use @ref DEBUG instead. will be removed after release 2027.04
+ * @deprecated use @ref DEBUG instead. Will be removed after release 2027.04.
  */
 #define DEBUG_PRINT(...) DEBUG(__VA_ARGS__)
 

@@ -55,7 +55,7 @@ typedef int dont_be_pedantic; /* this c-file is not empty */
  * Default is white
  */
 #ifndef LOG_INFO_ANSI_COLOR_CODE
-#define LOG_INFO_ANSI_COLOR_CODE        ("\033[1m")
+#define LOG_INFO_ANSI_COLOR_CODE        ANSI_COLOR_WHITE
 #endif
 
 /**
