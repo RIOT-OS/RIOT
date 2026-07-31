@@ -132,8 +132,11 @@ int dw3000_hw_init_interrupt(void)
         _rx_thread_ptr = thread_get(pid);
     }
 
-    gpio_init_int(dw3000_params.irq, GPIO_IN, GPIO_RISING,
-                    _interrupt_callback, NULL);
+    /* the IRQ line is active high */
+    if (gpio_init_int(dw3000_params.irq, GPIO_IN_PD, GPIO_RISING,
+                      _interrupt_callback, NULL) != 0) {
+        return -ENOTSUP;
+    }
     _irq_active = true;
     return 0;
 }
