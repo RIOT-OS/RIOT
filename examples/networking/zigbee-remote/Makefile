@@ -20,9 +20,6 @@ USEMODULE += ws281x
 
 USEPKG += zboss
 
-# Speficy the required features that a board has to have
-FEATURES_REQUIRED += periph_flashpage_in_address_space
-
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
