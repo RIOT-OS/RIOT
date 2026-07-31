@@ -493,6 +493,11 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
         return IEEE802154_SEC_OK;
     }
 
+    if ((uint32_t)frame_size < ((uint32_t)(*header_size) + (uint32_t)aux_size +
+                                (uint32_t)mac_size)) {
+        return -IEEE802154_SEC_UNSUPORTED;
+    }
+
     *payload_size = frame_size - *header_size - aux_size - mac_size;
     *payload = header + *header_size + aux_size;
     *mic_size = mac_size;
