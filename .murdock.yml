@@ -19,3 +19,22 @@ commit:
 artifacts:
   - output.txt
   - doc-preview/
+
+# This configures Murdock queue priorities.
+#
+# The default priority is zero, higher values mean higher priorities.
+# These are *modifiers*, e.g., setting both "CI:high priority" and
+# "CI: low priority" might negate each other.
+#
+# This configuration intends to:
+# 1. allow "CI: high priority" PRs to be built next
+# 2. allow "CI: low priority" PRs to be built best-effort (e.g., on an otherwise
+#    idle CI)
+# 3. do default PR builds before bors builds
+priorities:
+  labels:
+    "CI: high priority": 10
+    "CI: low priority": -10
+  branches:
+    trying: -1
+    staging: -1
