@@ -307,6 +307,9 @@ endif
 THREAD_NAMES ?= 0
 ifeq ($(THREAD_NAMES),1)
   CFLAGS += -DCONFIG_THREAD_NAMES
+  $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)THREAD_NAMES is deprecated and will be"\
+                        "removed after the 2027.04 Release! Use CONFIG_THREAD_NAMES"\
+                        "instead.$(COLOR_RESET)" 1>&2)
 endif
 
 # Override LOG_LEVEL if variable is set and if CFLAGS doesn't already contain

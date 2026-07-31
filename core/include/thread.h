@@ -146,14 +146,15 @@ extern "C" {
 #define THREAD_MAYBE_INLINE
 #endif /* THREAD_API_INLINED */
 
-#if defined(DEVELHELP) && !defined(CONFIG_THREAD_NAMES)
 /**
  * @brief   This global macro enable storage of thread names to help developers.
  *
- *          To activate it set environment variable `THREAD_NAMES=1`, or use Kconfig.
- *          It is automatically enabled if `DEVELHELP` is.
+ * To activate it, add `CFLAGS += -DCONFIG_THREAD_NAMES` to your application's
+ * Makefile or use Kconfig.
+ * It is automatically enabled if `DEVELHELP` is actived.
  */
-#define CONFIG_THREAD_NAMES
+#if (defined(DEVELHELP) && !defined(CONFIG_THREAD_NAMES)) || defined(DOXYGEN)
+#  define CONFIG_THREAD_NAMES
 #endif
 
 /**
