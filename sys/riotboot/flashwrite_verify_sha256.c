@@ -20,6 +20,7 @@
  * @}
  */
 
+#include "riotboot/hdr.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -49,7 +50,8 @@ int riotboot_flashwrite_verify_sha256(const uint8_t *sha256_digest,
 
     /* add RIOTBOOT_MAGIC since it isn't written into flash until
      * riotboot_flashwrite_finish()" */
-    sha256_update(&sha256, "RIOT", 4);
+    uint32_t magic = RIOTBOOT_MAGIC;
+    sha256_update(&sha256, &magic, 4);
 
     /* account for injected RIOTBOOT_MAGIC by skipping RIOTBOOT_MAGIC_LEN */
     sha256_update(&sha256, img_start + 4, img_len - 4);

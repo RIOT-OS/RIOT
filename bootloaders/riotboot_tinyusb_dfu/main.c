@@ -22,8 +22,7 @@
  * @}
  */
 
-#include "cpu.h"
-#include "panic.h"
+#include "riotboot/bootloader.h"
 #include "riotboot/slot.h"
 #include "riotboot/usb_dfu.h"
 #include "ztimer.h"
@@ -56,23 +55,8 @@ static bool _bootloader_alternative_mode(void)
 
 void kernel_init(void)
 {
-    uint32_t version = 0;
-    int slot = -1;
-
-    for (unsigned i = 0; i < riotboot_slot_numof; i++) {
-        const riotboot_hdr_t *riot_hdr = riotboot_slot_get_hdr(i);
-        if (riotboot_slot_validate(i)) {
-            /* skip slot if metadata broken */
-            continue;
-        }
-        if (riot_hdr->start_addr != riotboot_slot_get_image_startaddr(i)) {
-            continue;
-        }
-        if (slot == -1 || riot_hdr->version > version) {
-            version = riot_hdr->version;
-            slot = i;
-        }
-    }
+    riotboot_hdr_t riot_hdr;
+    int slot = riotboot_bootloader_get_slot(&riot_hdr);
 
     /* Init ztimer before starting DFU mode */
     ztimer_init();
@@ -86,11 +70,4 @@ void kernel_init(void)
 
     /* Nothing to boot, stay in DFU mode to flash a slot */
     riotboot_usb_dfu_init(1);
-}
-
-NORETURN void core_panic(core_panic_t crash_code, const char *message)
-{
-    (void)crash_code;
-    (void)message;
-    while (1) {}
 }
