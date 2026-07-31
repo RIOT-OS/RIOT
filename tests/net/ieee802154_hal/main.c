@@ -16,6 +16,7 @@
  * @}
  */
 
+#include <stdint.h>
 #include <stdio.h>
 #include <strings.h>
 
@@ -33,6 +34,7 @@
 
 #include "test_utils/expect.h"
 #include "xtimer.h"
+#include "ztimer.h"
 
 #define SYMBOL_TIME (16U) /**< 16 us */
 #define ACK_TIMEOUT_TIME (40 * SYMBOL_TIME)
@@ -59,6 +61,44 @@ static network_uint16_t short_addr;
 static uint8_t seq;
 
 static ieee802154_dev_t _radio;
+
+static int _set_default_values(void) {
+    int res;
+    ieee802154_radio_set_frame_filter_mode(&_radio, IEEE802154_FILTER_ACCEPT);
+
+    uint16_t panid = CONFIG_IEEE802154_DEFAULT_PANID;
+
+    /* Set all IEEE addresses */
+    res = ieee802154_radio_config_addr_filter(&_radio,
+                                        IEEE802154_AF_SHORT_ADDR, &short_addr);
+    expect(res >= 0);
+    res = ieee802154_radio_config_addr_filter(&_radio,
+                                        IEEE802154_AF_EXT_ADDR, &ext_addr);
+    expect(res >= 0);
+    res = ieee802154_radio_config_addr_filter(&_radio,
+                                        IEEE802154_AF_PANID, &panid);
+    expect(res >= 0);
+
+    /* Set PHY configuration */
+    ieee802154_phy_conf_t conf = {  .phy_mode=CONFIG_IEEE802154_DEFAULT_PHY_MODE,
+                                    .channel=CONFIG_IEEE802154_DEFAULT_CHANNEL,
+                                    .page=CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE,
+                                    .pow=CONFIG_IEEE802154_DEFAULT_TXPOWER
+                                 };
+
+    res = ieee802154_radio_config_phy(&_radio, &conf);
+    expect(res >= 0);
+
+    /* ieee802154_radio_set_cca_mode*/
+    res = ieee802154_radio_set_cca_mode(&_radio, IEEE802154_CCA_MODE_ED_THRESHOLD);
+    expect(res >= 0);
+    res = ieee802154_radio_set_cca_threshold(&_radio, CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
+    expect(res >= 0);
+
+    /* Set the transceiver state to RX_ON in order to receive packets */
+    ieee802154_radio_set_rx(&_radio);
+    return 0;
+}
 
 static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
 {
@@ -305,40 +345,7 @@ static int _init(void)
     res = ieee802154_radio_request_on(&_radio);
     expect(res >= 0);
     while (ieee802154_radio_confirm_on(&_radio) == -EAGAIN) {}
-
-    ieee802154_radio_set_frame_filter_mode(&_radio, IEEE802154_FILTER_ACCEPT);
-
-    uint16_t panid = CONFIG_IEEE802154_DEFAULT_PANID;
-
-    /* Set all IEEE addresses */
-    res = ieee802154_radio_config_addr_filter(&_radio,
-                                        IEEE802154_AF_SHORT_ADDR, &short_addr);
-    expect(res >= 0);
-    res = ieee802154_radio_config_addr_filter(&_radio,
-                                        IEEE802154_AF_EXT_ADDR, &ext_addr);
-    expect(res >= 0);
-    res = ieee802154_radio_config_addr_filter(&_radio,
-                                        IEEE802154_AF_PANID, &panid);
-    expect(res >= 0);
-
-    /* Set PHY configuration */
-    ieee802154_phy_conf_t conf = {  .phy_mode=CONFIG_IEEE802154_DEFAULT_PHY_MODE,
-                                    .channel=CONFIG_IEEE802154_DEFAULT_CHANNEL,
-                                    .page=CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE,
-                                    .pow=CONFIG_IEEE802154_DEFAULT_TXPOWER
-                                 };
-
-    res = ieee802154_radio_config_phy(&_radio, &conf);
-    expect(res >= 0);
-
-    /* ieee802154_radio_set_cca_mode*/
-    res = ieee802154_radio_set_cca_mode(&_radio, IEEE802154_CCA_MODE_ED_THRESHOLD);
-    expect(res >= 0);
-    res = ieee802154_radio_set_cca_threshold(&_radio, CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
-    expect(res >= 0);
-
-    /* Set the transceiver state to RX_ON in order to receive packets */
-    ieee802154_radio_set_rx(&_radio);
+    _set_default_values();
     return 0;
 }
 
@@ -411,6 +418,35 @@ int _cca(int argc, char **argv)
         puts("BUSY");
     }
 
+    return 0;
+}
+
+
+static int _test_off_on(int argc, char **argv) {
+    (void) argc;
+    (void) argv;
+    int res = 0;
+
+    if((res = ieee802154_radio_off(&_radio)) != 0) {
+        puts("Radio not off");
+        expect(res == 0);
+    }
+
+    //The radio shall be off so you can call this immediately
+    if((res = ieee802154_radio_request_on(&_radio)) != 0) {
+        puts("On Request should be valid");
+        expect(res == 0);
+    }
+    puts("on");
+
+    while((res = ieee802154_radio_confirm_on(&_radio)) == -EAGAIN) {}
+
+    if(res) {
+        puts("Radio should be on");
+        expect(res == 0);
+    }
+    _set_default_values();
+    puts("Test succeeded radio is now on with default values");
     return 0;
 }
 
@@ -741,6 +777,8 @@ static const shell_command_t shell_commands[] = {
     { "print_addr", "Print IEEE802.15.4 addresses", print_addr},
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
     { "test_states", "Test state changes", _test_states },
+    { "test_off_on", "Test set the radio off then on. Radio is set to default values afterwards",
+        _test_off_on },
     { "cca", "Perform CCA", _cca },
     { "config_cca", "Config CCA parameters", _config_cca_cmd },
     { "promisc", "Set promiscuos mode", promisc },
