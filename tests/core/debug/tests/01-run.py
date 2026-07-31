@@ -33,9 +33,10 @@ def colored_prefix(prefix):
 
 def testfunc(child):
     for prefix in prefixes:
-        print("checking " + str(prefix))
         child.expect_exact(colored_prefix(prefix) + "debug puts")
         child.expect_exact(colored_prefix(prefix) + "debug printf number '42' ... continued")
+    child.expect_exact(colored_prefix('@(isr)') + "puts from isr")
+    child.expect_exact(colored_prefix('@(isr)') + "printf from isr: 42")
 
 
 if __name__ == "__main__":
