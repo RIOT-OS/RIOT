@@ -26,6 +26,7 @@
 
 #ifdef PICOLIBC_TLS
 #  include <picotls.h>
+#  include "macros/utils.h"
 #endif
 
 #define ENABLE_DEBUG 0
@@ -232,7 +233,19 @@ uintptr_t measure_stack_free_internal(const char *stack, size_t size)
     return space_free;
 }
 
-kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
+#ifdef PICOLIBC_TLS
+#  define TLS_SIZE _tls_size()
+#  if __PICOLIBC_MAJOR__ > 1 || __PICOLIBC_MINOR__ >= 8
+#    define TLS_ALIGN MAX(alignof(thread_t), _tls_align())
+#  else
+#    define TLS_ALIGN alignof(thread_t)
+#  endif
+#else
+#  define TLS_ALIGN 0
+#  define TLS_SIZE 0
+#endif
+
+kernel_pid_t thread_create(char *stack, size_t stacksize, uint8_t priority,
                            int flags, thread_task_func_t task_func, void *arg,
                            const char *name)
 {
@@ -240,14 +253,23 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
         return -EINVAL;
     }
 
+    const size_t stacksize_min = sizeof(thread_t) + alignof(void *)
+                               + alignof(thread_t) + TLS_ALIGN + TLS_SIZE;
+
+    if (stacksize < stacksize_min) {
+        DEBUG_PUTS("thread_create: stacksize is too small!");
+        return -EINVAL;
+    }
+
 #ifdef DEVELHELP
-    int total_stacksize = stacksize;
+    size_t total_stacksize = stacksize;
 #endif
 #ifndef CONFIG_THREAD_NAMES
     (void)name;
 #endif
 
-    /* align the stack on a 16/32bit boundary */
+    /* Align the stack on a 16/32bit boundary. Note: Modern compilers
+     * generate efficient code without division here. */
     uintptr_t misalignment = (uintptr_t)stack % alignof(void *);
     if (misalignment) {
         misalignment = alignof(void *) - misalignment;
@@ -261,25 +283,18 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     /* round down the stacksize to a multiple of thread_t alignments (usually 16/32bit) */
     stacksize -= stacksize % alignof(thread_t);
 
-    if (stacksize < 0) {
-        DEBUG("thread_create: stacksize is too small!\n");
-        return -EINVAL;
-    }
     /* allocate our thread control block at the top of our stackspace. Cast to
      * (uintptr_t) intermediately to silence -Wcast-align. (We manually made
      * sure alignment is correct above.) */
     thread_t *thread = (thread_t *)(uintptr_t)(stack + stacksize);
 
 #ifdef PICOLIBC_TLS
-#  if __PICOLIBC_MAJOR__ > 1 || __PICOLIBC_MINOR__ >= 8
-#    define TLS_ALIGN (alignof(thread_t) > _tls_align() ? alignof(thread_t) : _tls_align())
-#  else
-#    define TLS_ALIGN alignof(thread_t)
-#  endif
     uintptr_t tls = (uintptr_t)stack + stacksize - _tls_size();
-    /* Make sure that the TLS area is aligned as required and that the
-     * resulting stack will also be aligned as required. */
-    tls &= ~(TLS_ALIGN - 1);
+    /* Make sure the TLS area is aligned as required and that the
+     * resulting stack will also be aligned as required. Note: Modern
+     * compilers generate efficient code without division here. */
+    misalignment = tls % TLS_ALIGN;
+    tls -= misalignment;
     thread->tls = (void *)tls;
     stacksize = tls - (uintptr_t)stack;
 
