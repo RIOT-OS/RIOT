@@ -26,10 +26,41 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+static bool gnrc_netif_is_wireless(gnrc_netif_t *netif)
+{
+    int is_wired = gnrc_netapi_get(netif->pid, NETOPT_IS_WIRED, 0, NULL, 0);
+    return is_wired != 1;
+}
+
+static unsigned gnrc_netif_wireless_numof(void)
+{
+    gnrc_netif_t *netif = NULL;
+    unsigned num = 0;
+
+    while ((netif = gnrc_netif_iter(netif))) {
+        if (gnrc_netif_is_wireless(netif)) {
+            ++num;
+        }
+    }
+
+    return num;
+}
+
+static gnrc_netif_t *gnrc_netif_wireless_iter(gnrc_netif_t *netif)
+{
+    while ((netif = gnrc_netif_iter(netif))) {
+        if (gnrc_netif_is_wireless(netif)) {
+            return netif;
+        }
+    }
+
+    return NULL;
+}
+
 void auto_init_gnrc_rpl(void)
 {
-    if (gnrc_netif_highlander() || gnrc_netif_numof() == 1) {
-        gnrc_netif_t *netif = gnrc_netif_iter(NULL);
+    if (gnrc_netif_highlander() || gnrc_netif_wireless_numof() == 1) {
+        gnrc_netif_t *netif = gnrc_netif_wireless_iter(NULL);
         if (netif == NULL) {
             /* XXX this is just a work-around ideally this would happen with
              * an `up` event of the interface */
