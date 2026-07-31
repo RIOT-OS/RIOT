@@ -151,7 +151,7 @@ extern "C" {
  *
  * To activate it, add `CFLAGS += -DCONFIG_THREAD_NAMES` to your application's
  * Makefile or use Kconfig.
- * It is automatically enabled if `DEVELHELP` is actived.
+ * It is automatically enabled if `DEVELHELP` is enabled.
  */
 #if (defined(DEVELHELP) && !defined(CONFIG_THREAD_NAMES)) || defined(DOXYGEN)
 #  define CONFIG_THREAD_NAMES
