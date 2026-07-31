@@ -16,5 +16,7 @@ USEMODULE += ieee802154
 USEMODULE += ieee802154_submac
 USEMODULE += luid
 
-FEATURES_REQUIRED += periph_flashpage
-FEATURES_REQUIRED += periph_flashpage_pagewise
+FEATURES_OPTIONAL += periph_flashpage
+FEATURES_OPTIONAL += periph_flashpage_pagewise
+# Speficy the required features that a board has to have
+FEATURES_OPTIONAL += periph_flashpage_in_address_space
