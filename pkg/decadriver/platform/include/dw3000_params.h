@@ -27,8 +27,8 @@ extern "C" {
 /**
  * @name    Set default configuration parameters
  *
- * These default values correspond to the Qorvo DWM3000EVB Evaluation Shield
- * on top of an nrf52840dk
+ * The default configuration is set to `GPIO_UNDEF` to ensure a safe behavior
+ * if the application has not configured the pins.
  * @{
  */
 /** SPI device used */
@@ -38,7 +38,7 @@ extern "C" {
 
 /** Chip Select pin for SPI */
 #ifndef DW3000_PARAM_SPI_CS
-#  define DW3000_PARAM_SPI_CS           GPIO_PIN(1, 12)
+#  define DW3000_PARAM_SPI_CS           GPIO_UNDEF
 #endif
 
 /** Mode that the SPI connection uses */
@@ -48,12 +48,12 @@ extern "C" {
 
 /** IRQ pin to receive interrupts from the DW3000 */
 #ifndef DW3000_PARAM_IRQ
-#  define DW3000_PARAM_IRQ              GPIO_PIN(1, 10)
+#  define DW3000_PARAM_IRQ              GPIO_UNDEF
 #endif
 
 /** Pin to reset the DW3000 */
 #ifndef DW3000_PARAM_RESET
-#  define DW3000_PARAM_RESET            GPIO_PIN(1, 8)
+#  define DW3000_PARAM_RESET            GPIO_UNDEF
 #endif
 
 /**
@@ -62,7 +62,7 @@ extern "C" {
  * If undefined, the DW3000 will be woken using SPI CS.
  */
 #ifndef DW3000_PARAM_WAKEUP
-#  define DW3000_PARAM_WAKEUP           GPIO_PIN(1, 11)
+#  define DW3000_PARAM_WAKEUP           GPIO_UNDEF
 #endif
 
 /** The fast SPI speed. Can be activated after IDLE_RC */
