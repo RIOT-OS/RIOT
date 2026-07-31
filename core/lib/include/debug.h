@@ -192,28 +192,26 @@ static inline const char *__debug_thread_name_or_isr(void)
  * @internal
  *
  * @param    func_name          Name of the calling function
- * @retval   true               The prefix was printed
- * @retval   false              No prefix was printed
  */
-static inline bool __debug_print_prefix(const char *func_name)
+static inline void __debug_print_prefix(const char *func_name)
 {
     if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {
         printf(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_FUNC "%s" \
                _DEBUG_SEP_THREAD "%s" _DEBUG_SEP_MSG ANSI_COLOR_RESET,
                func_name, __debug_thread_name_or_isr());
-        return true;
     }
     else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {
         printf(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_FUNC "%s" \
               _DEBUG_SEP_MSG ANSI_COLOR_RESET, func_name);
-        return true;
     }
     else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {
         printf(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_THREAD "%s" \
             _DEBUG_SEP_MSG ANSI_COLOR_RESET, __debug_thread_name_or_isr());
-        return true;
     }
-    return false;
+    else if (strlen(DEBUG_PREFIX) > 0) {
+        printf(_DEBUG_PREFIX_COLOR DEBUG_PREFIX
+               _DEBUG_SEP_MSG ANSI_COLOR_RESET);
+    }
 }
 
 /**
@@ -272,16 +270,8 @@ static inline void __debug_put_prefix(const char *func_name)
 #define DEBUG(...)                                                  \
     do {                                                            \
         if (ENABLE_DEBUG && __debug_sufficient_stack(true)) {       \
-            if (__debug_print_prefix(DEBUG_FUNC)) {                 \
-                printf(__VA_ARGS__);                                \
-            }                                                       \
-            else if (strlen(DEBUG_PREFIX) > 0) {                    \
-                printf(_DEBUG_PREFIX_COLOR DEBUG_PREFIX             \
-                       _DEBUG_SEP_MSG ANSI_COLOR_RESET __VA_ARGS__);\
-            }                                                       \
-            else {                                                  \
-                printf(__VA_ARGS__);                                \
-            }                                                       \
+            __debug_print_prefix(DEBUG_FUNC);                       \
+            printf(__VA_ARGS__);                                    \
         }                                                           \
     } while (0)
 
