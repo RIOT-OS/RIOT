@@ -488,26 +488,46 @@ int _test_states(int argc, char **argv)
 int txtsnd(int argc, char **argv)
 {
     uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+    size_t addr_len;
     size_t len;
-    size_t res;
+    uint32_t count = 1;
+    uint32_t interval = 0;
     bool ack_req = false;
 
-    if (argc != 3 && !(argc == 4 && strcmp(argv[3], "ackreq") == 0)) {
-        puts("Usage: txtsnd <long_addr> <len> [ackreq]");
+    if (argc > 1 && strcmp(argv[argc - 1], "ackreq") == 0) {
+        ack_req = true;
+        argc--;
+    }
+
+    if (argc < 3 || argc > 5) {
+        puts("Usage: txtsnd <long_addr> <len> [count] [interval_ms] [ackreq]");
         return 1;
     }
 
-    res = l2util_addr_from_str(argv[ 1], addr);
-    if (res == 0) {
-        puts("Usage: txtsnd <ext_addr> <len>");
+    addr_len = l2util_addr_from_str(argv[1], addr);
+    if (addr_len == 0) {
+        puts("Usage: txtsnd <long_addr> <len> [count] [interval_ms] [ackreq]");
         return 1;
     }
+
     len = atoi(argv[2]);
 
-    if (argc == 4) {
-        ack_req = true;
+    if (argc >= 4) {
+        count = atoi(argv[3]);
     }
-    return send(addr, res, len, ack_req);
+    if (argc >= 5) {
+        interval = atoi(argv[4]);
+    }
+
+    for (uint32_t i = 0; i < count; i++) {
+        int r = send(addr, addr_len, len, ack_req);
+        if (r != 0) {
+            return r;
+        }
+        ztimer_sleep(ZTIMER_MSEC, interval);
+    }
+
+    return 0;
 }
 
 static int promisc(int argc, char **argv)
