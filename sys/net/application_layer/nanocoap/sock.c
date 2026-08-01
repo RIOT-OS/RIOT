@@ -21,23 +21,22 @@
  * @}
  */
 
-#include <errno.h>
+#include <errno.h> /* IWYU pragma: keep (exports EINVAL, ...) */
 #include <string.h>
 #include <stdio.h>
 
-#include "container.h"
-#include "event/thread.h"
 #include "net/credman.h"
 #include "net/nanocoap.h"
 #include "net/nanocoap_sock.h"
-#ifdef MODULE_SOCK_ASYNC_EVENT
-#include "net/sock/async/event.h"
-#endif
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
 #include "random.h"
 #include "sys/uio.h" /* IWYU pragma: keep (exports struct iovec) */
 #include "ztimer.h"
+
+#ifdef MODULE_SOCK_ASYNC_EVENT
+#  include "net/sock/async/event.h"
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -66,8 +65,9 @@ enum {
 typedef struct {
     coap_blockwise_cb_t callback;
     void *arg;
-    uint32_t blknum;
+    uint32_t offset;
     bool more;
+    coap_blksize_t blocksize;
 #if CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN
     uint8_t token[4];
 #endif
@@ -584,7 +584,7 @@ ssize_t nanocoap_sock_unobserve_url(const char *url, coap_observe_client_t *ctx)
 }
 #endif /* MODULE_NANOCOAP_SOCK_OBSERVE */
 
-ssize_t _sock_put_post(nanocoap_sock_t *sock, const char *path, unsigned code,
+static ssize_t _sock_put_post(nanocoap_sock_t *sock, const char *path, unsigned code,
                        uint8_t type, const void *request, size_t len,
                        void *response, size_t max_len)
 {
@@ -788,28 +788,45 @@ static int _block_cb(void *arg, coap_pkt_t *pkt)
 
     /* response was not block-wise */
     if (!coap_get_block2(pkt, &block2)) {
-        block2.offset = 0;
-        block2.more = false;
+        block2 = (coap_block1_t){ .offset = 0 };
     }
 
     DEBUG("nanocoap: got block %"PRIu32" (offset %u)\n",
           block2.blknum, (unsigned)block2.offset);
 
-    if (block2.blknum != ctx->blknum) {
+    if (block2.szx > ctx->blocksize) {
+        /* The server MUST not answer with larger blocks than requested, it MAY
+         * only reply with blocks smaller than requested. The client may have
+         * selected blocksize to fit some buffer and we don't want to overflow
+         * it */
+        return -EBADMSG;
+    }
+    ctx->blocksize = block2.szx;
+
+    if (block2.offset != ctx->offset) {
         return -EAGAIN;
     }
 
     ctx->more = block2.more;
+    ctx->offset += coap_szx2size(block2.szx);
     return ctx->callback(ctx->arg, block2.offset, pkt->payload, pkt->payload_len, block2.more);
 }
 
 static int _fetch_block(nanocoap_sock_t *sock,
-                        const char *path, coap_blksize_t blksize,
-                        _block_ctx_t *ctx)
+                        const char *path,_block_ctx_t *ctx)
 {
 
     void *token = NULL;
     size_t token_len = 0;
+
+    if ((unsigned)ctx->blocksize > COAP_BLOCKSIZE_1024) {
+        assert(0);
+        return -EINVAL;
+    }
+
+    if (!ctx->more) {
+        return -ENODATA;
+    }
 
 #if CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN
     /* HACK: Older versions of go-coap always expected a token
@@ -829,7 +846,8 @@ static int _fetch_block(nanocoap_sock_t *sock,
     }
 
     coap_opt_put_uri_pathquery(&state, path);
-    coap_opt_put_uint(&state, COAP_OPT_BLOCK2, (ctx->blknum << 4) | blksize);
+    uint32_t blocknum = ctx->offset >> ((unsigned)ctx->blocksize + 4);
+    coap_opt_put_uint(&state, COAP_OPT_BLOCK2, (blocknum << 4) | ctx->blocksize);
 
     if (coap_builder_has_overflown(&state)) {
         return -EOVERFLOW;
@@ -900,6 +918,7 @@ int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path,
         .callback = callback,
         .arg = arg,
         .more = true,
+        .blocksize = blksize,
     };
 
 #if CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN
@@ -908,9 +927,9 @@ int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path,
 
     uint8_t retries = CONFIG_COAP_MAX_RETRANSMIT;
     while (ctx.more) {
-        DEBUG("nanocoap: fetching block %"PRIu32"\n", ctx.blknum);
+        DEBUG("nanocoap: fetching block at offset %" PRIu32 "\n", ctx.offset);
 
-        int res = _fetch_block(sock, path, blksize, &ctx);
+        int res = _fetch_block(sock, path, &ctx);
         if (res == -EAGAIN) {
             if (--retries) {
                 continue;
@@ -918,11 +937,11 @@ int nanocoap_sock_get_blockwise(nanocoap_sock_t *sock, const char *path,
             res = -EBADMSG;
         }
         if (res < 0) {
-            DEBUG("nanocoap: error fetching block %"PRIu32": %d\n", ctx.blknum, res);
+            DEBUG("nanocoap: error fetching block at offset %" PRIu32 ": %d\n",
+                  ctx.offset, res);
             return res;
         }
 
-        ctx.blknum += 1;
         retries = CONFIG_COAP_MAX_RETRANSMIT;
     }
 
@@ -938,13 +957,14 @@ typedef struct {
 
 static int _2buf_slice(void *arg, size_t offset, uint8_t *buf, size_t len, int more)
 {
+    (void)more;
     _buf_slice_t *ctx = arg;
 
     if (offset + len < ctx->offset) {
         return 0;
     }
 
-    if (offset > ctx->offset + ctx->len) {
+    if (offset > ctx->offset) {
         return 0;
     }
 
@@ -965,10 +985,6 @@ static int _2buf_slice(void *arg, size_t offset, uint8_t *buf, size_t len, int m
     DEBUG("nanocoap: got %"PRIuSIZE" bytes, %"PRIuSIZE" bytes left (offset: %"PRIuSIZE")\n",
           len, ctx->len, offset);
 
-    if (!more) {
-        ctx->len = 0;
-    }
-
     return 0;
 }
 
@@ -987,9 +1003,18 @@ int nanocoap_sock_get_slice(nanocoap_sock_t *sock, const char *path,
                             coap_blksize_t blksize, size_t offset,
                             void *dst, size_t len)
 {
+    /* On 8-bit and 16-bit,adding to 16-bit size_t numbers will never be
+     * beyond UINT32_MAX. The compiler does also detect this, but it sadly barks
+     * when it does detect this. */
+#if SIZE_MAX >= UINT32_MAX
+    if ((offset >= UINT32_MAX) || (len > UINT32_MAX - offset)) {
+        return -EOVERFLOW;
+    }
+#endif
+
     /* try to find optimal blocksize */
     unsigned num_blocks = _num_blks(offset, len, blksize);
-    for (uint8_t szx = 0; szx < blksize; ++szx) {
+    for (uint8_t szx = 0; szx < (uint8_t)blksize; ++szx) {
         if (_num_blks(offset, len, szx) <= num_blocks) {
             blksize = szx;
             break;
@@ -1000,13 +1025,17 @@ int nanocoap_sock_get_slice(nanocoap_sock_t *sock, const char *path,
         .ptr = dst,
         .len = len,
         .offset = offset,
+        .res = 0,
     };
 
     _block_ctx_t ctx = {
         .callback = _2buf_slice,
         .arg = &dst_ctx,
-        .blknum = offset >> (blksize + 4),
+        /* rounding down to the start of the first block containing (parts) of
+         * the target slice */
+        .offset = offset & ~((uint32_t)coap_szx2size(blksize) - 1),
         .more = true,
+        .blocksize = blksize,
     };
 
 #if CONFIG_NANOCOAP_SOCK_BLOCK_TOKEN
@@ -1014,10 +1043,10 @@ int nanocoap_sock_get_slice(nanocoap_sock_t *sock, const char *path,
 #endif
 
     uint8_t retries = CONFIG_COAP_MAX_RETRANSMIT;
-    while (dst_ctx.len) {
-        DEBUG("nanocoap: fetching block %"PRIu32"\n", ctx.blknum);
+    while (ctx.more && (dst_ctx.len > 0)) {
+        DEBUG("nanocoap: fetching block at offset %" PRIu32 "\n", ctx.offset);
 
-        int res = _fetch_block(sock, path, blksize, &ctx);
+        int res = _fetch_block(sock, path, &ctx);
         if (res == -EAGAIN) {
             if (--retries) {
                 continue;
@@ -1025,11 +1054,11 @@ int nanocoap_sock_get_slice(nanocoap_sock_t *sock, const char *path,
             res = -EBADMSG;
         }
         if (res < 0) {
-            DEBUG("nanocoap: error fetching block %"PRIu32": %d\n", ctx.blknum, res);
+            DEBUG("nanocoap: error fetching block at offset %" PRIu32 ": %d\n",
+                  ctx.offset, res);
             return res;
         }
 
-        ctx.blknum += 1;
         retries = CONFIG_COAP_MAX_RETRANSMIT;
     }
 
