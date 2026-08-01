@@ -58,17 +58,6 @@ typedef le_uint64_t onewire_rom_t;
  * should expose its functionality by providing an instance of this structure.
  */
 typedef struct {
-
-    /** @copydoc _onewire_reset() */
-    int (*reset)(onewire_t *bus);
-
-    /** @copydoc _onewire_read_bits() */
-    int (*read_bits)(onewire_t *bus, void *buf, size_t len);
-
-    /** @copydoc _onewire_write_bits() */
-    int (*write_bits)(onewire_t *bus, const void *buf, size_t len);
-
-typedef struct {
     /** @copydoc _onewire_reset() */
     int (*reset)(onewire_t *bus);
     /** @copydoc _onewire_read_bits() */
