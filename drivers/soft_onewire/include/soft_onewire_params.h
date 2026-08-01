@@ -25,28 +25,28 @@ extern "C" {
 #endif
 
 /** default 1-wire bus pin */
-#ifndef SOFT_ONEWIRE_PARAMS_PIN
-#  define SOFT_ONEWIRE_PARAMS_PIN GPIO_UNDEF
+#ifndef SOFT_ONEWIRE_PARAM_PIN
+#  define SOFT_ONEWIRE_PARAM_PIN GPIO_UNDEF
 #endif
 
 /** default input mode for bus pin */
-#ifndef SOFT_ONEWIRE_PARAMS_PIN_IMODE
-#  define SOFT_ONEWIRE_PARAMS_PIN_IMODE GPIO_IN_PU
+#ifndef SOFT_ONEWIRE_PARAM_PIN_IMODE
+#  define SOFT_ONEWIRE_PARAM_PIN_IMODE GPIO_IN_PU
 #endif
 
 /** default 1-wire bus TX pin */
-#ifndef SOFT_ONEWIRE_PARAMS_TX_PIN
-#  define SOFT_ONEWIRE_PARAMS_TX_PIN GPIO_UNDEF
+#ifndef SOFT_ONEWIRE_PARAM_TX_PIN
+#  define SOFT_ONEWIRE_PARAM_TX_PIN GPIO_UNDEF
 #endif
 
 /** default 1-wire bus RX pin */
-#ifndef SOFT_ONEWIRE_PARAMS_RX_PIN
-#  define SOFT_ONEWIRE_PARAMS_RX_PIN GPIO_UNDEF
+#ifndef SOFT_ONEWIRE_PARAM_RX_PIN
+#  define SOFT_ONEWIRE_PARAM_RX_PIN GPIO_UNDEF
 #endif
 
 /** default timer to use for the bus */
-#ifndef SOFT_ONEWIRE_PARAMS_HWTIMER
-#  define SOFT_ONEWIRE_PARAMS_HWTIMER TIMER_UNDEF
+#ifndef SOFT_ONEWIRE_PARAM_HWTIMER
+#  define SOFT_ONEWIRE_PARAM_HWTIMER TIMER_UNDEF
 #endif
 
 /**
@@ -61,15 +61,15 @@ static soft_onewire_params_t soft_onewire_params[] = {
 #endif
 
 #if MODULE_SOFT_ONEWIRE_2PINS
-        .tx_pin = SOFT_ONEWIRE_PARAMS_TX_PIN,
-        .rx_pin = SOFT_ONEWIRE_PARAMS_RX_PIN,
+        .tx_pin = SOFT_ONEWIRE_PARAM_TX_PIN,
+        .rx_pin = SOFT_ONEWIRE_PARAM_RX_PIN,
 #else
-        .pin = SOFT_ONEWIRE_PARAMS_PIN,
-        .pin_imode = SOFT_ONEWIRE_PARAMS_PIN_IMODE,
+        .pin = SOFT_ONEWIRE_PARAM_PIN,
+        .pin_imode = SOFT_ONEWIRE_PARAM_PIN_IMODE,
 #endif
 
 #if MODULE_SOFT_ONEWIRE_HWTIMER
-        .timer = SOFT_ONEWIRE_PARAMS_HWTIMER,
+        .timer = SOFT_ONEWIRE_PARAM_HWTIMER,
 #endif
     },
 };
