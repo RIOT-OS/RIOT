@@ -27,7 +27,8 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static_assert(sizeof(onewire_rom_t) == ONEWIRE_ROM_LEN);
+static_assert(sizeof(onewire_rom_t) == ONEWIRE_ROM_LEN,
+    "size of onewire_rom_t not as expected");
 
 int onewire_rom_from_str(onewire_rom_t *rom, const char *str)
 {
