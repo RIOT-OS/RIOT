@@ -27,3 +27,18 @@
  * @warning     This is entirely unsecured, only use this for debugging in
  *              an isolated network!
  */
+
+/**
+ * @brief	The port to listen on for incoming requests
+ */
+#define CONFIG_STDIO_UDP_PORT           2323
+
+/**
+ * @brief	The interface type to listen on
+ */
+#define CONFIG_STDIO_UDP_NETIF_TYPE     NETDEV_ANY
+
+/**
+ * @brief	The index of the interface to listen on
+ */
+#define CONFIG_STDIO_UDP_NETIF_IDX      0
