@@ -68,19 +68,13 @@ void tud_dfu_download_cb(uint8_t alt, uint16_t block_num, uint8_t const *data, u
     int ret = 0;
 
     if (_tusb_dfu_dev.skip_signature) {
-        /* Avoid underflow condition */
-        if (length < RIOTBOOT_FLASHWRITE_SKIPLEN) {
-            return;
-        }
         riotboot_flashwrite_init(&_tusb_dfu_dev.writer, alt);
-        length -= RIOTBOOT_FLASHWRITE_SKIPLEN;
         DEBUG("[tinyusb_dfu] starting the download with %u bytes for slot %u "
               "with block %u\n", length, alt, block_num);
         _tusb_dfu_dev.skip_signature = false;
         _tusb_dfu_dev.slot = alt;
         ret = riotboot_flashwrite_putbytes(&_tusb_dfu_dev.writer,
-                                           &data[RIOTBOOT_FLASHWRITE_SKIPLEN],
-                                           length, true);
+                                           data, length, true);
     }
     else {
         assert(alt == _tusb_dfu_dev.slot);
@@ -115,7 +109,8 @@ void tud_dfu_manifest_cb(uint8_t alt)
 
     /* the host indicates that the download process is complete */
     riotboot_flashwrite_flush(&_tusb_dfu_dev.writer);
-    riotboot_flashwrite_finish(&_tusb_dfu_dev.writer);
+    riotboot_flashwrite_finish(&_tusb_dfu_dev.writer,
+                               riotboot_slot_get_hdr(riotboot_slot_current())->version + 1);
 
     /* indicate that flashing is finished */
     tud_dfu_finish_flashing(DFU_STATUS_OK);
