@@ -868,6 +868,9 @@ static void test_scn_bool(void)
     TEST_ASSERT_EQUAL_INT(-EINVAL, scn_bool_str("yes"));
     TEST_ASSERT_EQUAL_INT(-EINVAL, scn_bool_str("no"));
     TEST_ASSERT_EQUAL_INT(-EINVAL, scn_bool_str("nobody"));
+    TEST_ASSERT_EQUAL_INT(-EINVAL, scn_bool_str(""));
+    TEST_ASSERT_EQUAL_INT(-EINVAL, scn_bool("true", 1));
+    TEST_ASSERT_EQUAL_INT(-EINVAL, scn_bool("false", 3));
 }
 
 static void test_scn_u32_hex(void)
