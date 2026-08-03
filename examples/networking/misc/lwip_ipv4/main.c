@@ -140,7 +140,9 @@ int main(void)
     char line_buf[SHELL_DEFAULT_BUFSIZE];
 
     sys_lock_tcpip_core();
-    struct netif *iface = netif_find("ET0");
+
+    /* According to the RFC 3493 interfaces are indexed from 1 */
+    struct netif *iface = netif_get_by_index(1);
 
     if (iface == NULL) {
 #ifdef CPU_NATIVE
