@@ -427,6 +427,8 @@ static inline int ieee802154_set_tx_power(ieee802154_submac_t *submac,
 /**
  * @brief Get the received frame length
  *
+ * @pre this function MUST be called either inside @ref ieee802154_submac_cb_t::rx_done
+ *      or in SLEEP state.
  * @param[in] submac pointer to the SubMAC
  *
  * @return length of the PSDU (excluding FCS length)
@@ -442,7 +444,7 @@ static inline int ieee802154_get_frame_length(ieee802154_submac_t *submac)
  * This functions reads the received PSDU from the device (excluding FCS)
  *
  * @pre this function MUST be called either inside @ref ieee802154_submac_cb_t::rx_done
- * or in SLEEP state.
+ *      or in SLEEP state.
  *
  * @param[in] submac pointer to the SubMAC descriptor
  * @param[out] buf buffer to write into. If NULL, the packet is discarded

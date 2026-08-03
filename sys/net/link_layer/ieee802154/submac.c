@@ -72,10 +72,13 @@ static inline bool _does_handle_ack(ieee802154_dev_t *dev)
 
 static inline bool _does_send_ack(ieee802154_dev_t *dev)
 {
-    if (!IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK)) {
-        return true;
+    /* if return false we have to send ack, can only send ack if SOFTACK is used */
+    if (IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK) &&
+    !ieee802154_radio_has_capability(dev, IEEE802154_CAP_AUTO_ACK)) {
+        return false;
     }
-    return ieee802154_radio_has_capability(dev, IEEE802154_CAP_AUTO_ACK);
+    /* someone else will send the ACK for us */
+    return true;
 }
 
 static inline bool _does_handle_csma(ieee802154_dev_t *dev)
@@ -481,14 +484,10 @@ static ieee802154_fsm_state_t _fsm_state_tx_ack(ieee802154_submac_t *submac,
                                                 ieee802154_fsm_ev_t ev)
 {
     ieee802154_tx_info_t info;
-    int res;
-
-    /* This is required to prevent unused variable warnings */
-    (void) res;
 
     switch (ev) {
     case IEEE802154_FSM_EV_TX_DONE:
-        if ((res = ieee802154_radio_confirm_transmit(&submac->dev, &info)) >= 0) {
+        if (ieee802154_radio_confirm_transmit(&submac->dev, &info) >= 0) {
             return _fsm_state_tx_process_tx_done(submac, &info);
         }
         break;
