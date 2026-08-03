@@ -142,33 +142,31 @@ int main(void)
     sys_lock_tcpip_core();
     struct netif *iface = netif_find("ET0");
 
-#ifndef MODULE_LWIP_DHCP_AUTO
-    if (iface != NULL) {
-        ip4_addr_t ip = _TEST_ADDR4_LOCAL;
-        ip4_addr_t subnet = _TEST_ADDR4_MASK;
-        netif_set_addr(iface, &ip, &subnet, NULL);
-    }
-    else {
-        if ( strstr(RIOT_BOARD,"native") != NULL) {
-            printf("To use LWIP interface execute program adding as parameter tap interfece name.\n");
-            printf("For more details see README.md.\n");
-        }
-        else {
-            printf("This board does not support LWIP interface.\n");
-        }
-    }
+    if (iface == NULL) {
+#ifdef CPU_NATIVE
+        puts("To use the LWIP interface, follow the steps for setting up a tap "
+             "interface outlined in the README.md.");
 #else
-    printf("Waiting for DHCP address autoconfiguration ...\n");
+        puts("This board does not support the LWIP interface.");
+#endif
+
+        return -1;
+    }
+
+#ifndef MODULE_LWIP_DHCP_AUTO
+    ip4_addr_t ip = _TEST_ADDR4_LOCAL;
+    ip4_addr_t subnet = _TEST_ADDR4_MASK;
+    netif_set_addr(iface, &ip, &subnet, NULL);
+#else
+    puts("Waiting for DHCP address autoconfiguration ...");
     ztimer_sleep(ZTIMER_MSEC, CONFIG_DHCP_TIMEOUT_SEC * MS_PER_SEC);
 #endif
-    if (iface != NULL) {
-        /* print network addresses */
-        printf("{\"IPv4 addresses\": [\"");
-        char buffer[16];
-        inet_ntop(AF_INET, netif_ip_addr4(iface), buffer, 16);
-        sys_unlock_tcpip_core();
-        printf("%s\"]}\n", buffer);
-    }
+    /* print network addresses */
+    printf("{\"IPv4 addresses\": [\"");
+    char buffer[16];
+    inet_ntop(AF_INET, netif_ip_addr4(iface), buffer, 16);
+    sys_unlock_tcpip_core();
+    printf("%s\"]}\n", buffer);
 
     thread_create(server_stack, sizeof(server_stack), THREAD_PRIORITY_MAIN - 1, 0, server_thread, NULL, "server");
 
