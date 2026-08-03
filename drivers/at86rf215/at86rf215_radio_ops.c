@@ -231,7 +231,7 @@ static int _request_idle(at86rf215_t *dev, bool force)
 {
     if (!force && (dev->state == AT86RF215_STATE_TX          ||
                    dev->state == AT86RF215_STATE_TX_WAIT_ACK ||
-                   dev->state == AT86RF215_STATE_RX_START    ||
+                   // dev->state == AT86RF215_STATE_RX_START    ||
                    dev->state == AT86RF215_STATE_RX_SEND_ACK ||
                    dev->state == AT86RF215_STATE_CCA_RX      ||
                    dev->state == AT86RF215_STATE_CCA_IDLE)) {
@@ -263,7 +263,7 @@ static int _request_idle(at86rf215_t *dev, bool force)
     return 0;
 }
 
-static int _request_cca(at86rf215_t *dev, at86rf215_state_t next_state)
+static int _request_cca(at86rf215_t *dev, at86rf215_state_t next_cca_state)
 {
     at86rf215_state_t state = dev->state;
     if (state != AT86RF215_STATE_IDLE && state != AT86RF215_STATE_RX) {
@@ -276,10 +276,28 @@ static int _request_cca(at86rf215_t *dev, at86rf215_state_t next_state)
         at86rf215_rf_cmd(dev, CMD_RF_RX);
     }
     /* start single ED measurement */
-    dev->state = next_state;
+    dev->state = next_cca_state;
     at86rf215_reg_write(dev, dev->RF->RG_EDC, RF_EDSINGLE);
 
     return 0;
+}
+
+static int _request_tx(at86rf215_t *dev)
+{
+    if (dev->state != AT86RF215_STATE_IDLE) {
+        return -EBUSY;
+    }
+
+    if (dev->tx_ack_req) {
+        at86rf215_filter_ack_only(dev, true);
+        at86rf215_set_auto_mode(dev, AT86RF215_AM_TX2RX, true);
+    }
+
+    if (dev->cca_tx) {
+        return _request_cca(dev, AT86RF215_STATE_CCATX);
+    }
+
+    return at86rf215_tx_exec(dev);
 }
 
 static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
@@ -288,13 +306,7 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
 
     switch (op) {
     case IEEE802154_HAL_OP_TRANSMIT:
-        if (dev->tx_ack_req) {
-            at86rf215_set_auto_mode(dev, AT86RF215_AM_TX2RX, true);
-        }
-        if (dev->cca_tx) {
-            return _request_cca(dev, AT86RF215_STATE_CCATX);
-        }
-        return at86rf215_tx_exec(dev);
+        return _request_tx(dev);
         break;
     case IEEE802154_HAL_OP_SET_RX:
         return _request_rx(dev);
@@ -487,8 +499,14 @@ static int _config_src_addr_match(ieee802154_dev_t *hal, ieee802154_src_match_t 
     switch (cmd) {
     case IEEE802154_SRC_MATCH_EN:
         bool enable = *(const bool *)value;
-        at86rf215_reg_write(dev, dev->BBC->RG_AMAACKPD,
-                            enable ? 0x0F : 0x00);
+        if (enable) {
+            at86rf215_reg_write(dev, dev->BBC->RG_AMAACKPD, 0x0F);
+            at86rf215_reg_or(dev, dev->BBC->RG_IRQM, BB_IRQ_RXAM);
+        }
+        else {
+            at86rf215_reg_write(dev, dev->BBC->RG_AMAACKPD, 0);
+            at86rf215_reg_and(dev, dev->BBC->RG_IRQM, ~BB_IRQ_RXAM);
+        }
         break;
     default:
         return -ENOTSUP;
@@ -601,7 +619,7 @@ static void at86rf215_handle_common_irq(ieee802154_dev_t *hal)
 {
     at86rf215_t *dev = hal->priv;
     uint8_t fcf0 = 0;
-    uint8_t bb_irqs_enabled = BB_IRQ_RXAM | BB_IRQ_RXFE | BB_IRQ_TXFE;
+    uint8_t bb_irqs_enabled = BB_IRQ_RXFS | BB_IRQ_RXFE | BB_IRQ_TXFE | BB_IRQ_AGCR;
     uint8_t rf_irqs_enabled = RF_IRQ_EDC | RF_IRQ_TRXRDY | RF_IRQ_BATLOW;
     uint8_t bb_irq_mask = at86rf215_reg_read(dev, dev->BBC->RG_IRQS);
     uint8_t rf_irq_mask = at86rf215_reg_read(dev, dev->RF->RG_IRQS);
@@ -629,7 +647,7 @@ static void at86rf215_handle_common_irq(ieee802154_dev_t *hal)
 #endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
 
     int iter = 0;
-    while ((bb_irq_mask & (BB_IRQ_RXFE | BB_IRQ_TXFE)) || (rf_irq_mask & RF_IRQ_EDC)) {
+    while (bb_irq_mask || (rf_irq_mask & RF_IRQ_EDC)) {
 
         /* This should never happen */
         if (++iter > 3) {
@@ -651,11 +669,19 @@ static void at86rf215_handle_common_irq(ieee802154_dev_t *hal)
             case AT86RF215_STATE_RX:
             case AT86RF215_STATE_RX_START:
             case AT86RF215_STATE_IDLE:
-                if (bb_irq_mask & BB_IRQ_RXAM) {
+                if (bb_irq_mask & BB_IRQ_RXFS) {
                     DEBUG("[at86rf215] ISR IDLE/RX: → RX_START cb\n");
-                    bb_irq_mask &= ~BB_IRQ_RXAM;
+                    bb_irq_mask &= ~BB_IRQ_RXFS;
                     dev->state = AT86RF215_STATE_RX_START;
-                    hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_START);
+                    if (hal->cb) {
+                        hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_START);
+                    }
+                }
+
+                /* to avoid getting stuck in RX_START go back to rx after gain control is released */
+                if (bb_irq_mask & BB_IRQ_AGCR) {
+                    bb_irq_mask &= ~BB_IRQ_AGCR;
+                    dev->state = AT86RF215_STATE_RX;
                 }
 
                 if (!(bb_irq_mask & BB_IRQ_RXFE)) {
@@ -729,6 +755,15 @@ static void at86rf215_handle_common_irq(ieee802154_dev_t *hal)
                 break;
 
             case AT86RF215_STATE_TX_WAIT_ACK:
+
+                /* received a frame passing fcs */
+                if (bb_irq_mask & BB_IRQ_RXFS) {
+                    bb_irq_mask &= ~BB_IRQ_RXFS;
+                }
+
+                if (bb_irq_mask & BB_IRQ_AGCR) {
+                    bb_irq_mask &= ~BB_IRQ_AGCR;
+                }
 
                 if (!(bb_irq_mask & BB_IRQ_RXFE)) {
                     DEBUG("TX_WAIT_ACK: only RXFE (%x)\n", bb_irq_mask);

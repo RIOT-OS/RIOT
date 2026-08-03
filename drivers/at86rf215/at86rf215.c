@@ -75,13 +75,14 @@ if (!IS_ACTIVE(CONFIG_AT86RF215_USE_CLOCK_OUTPUT)){
     at86rf215_reg_write(dev, dev->BBC->RG_AMCS, reg);
 
     /* enable IRQS */
-    at86rf215_reg_write(dev, dev->BBC->RG_IRQM, BB_IRQ_RXAM | BB_IRQ_TXFE | BB_IRQ_RXFE);
+    at86rf215_reg_write(dev, dev->BBC->RG_IRQM, BB_IRQ_RXFS | BB_IRQ_TXFE | BB_IRQ_RXFE);
     at86rf215_reg_write(dev, dev->RF->RG_IRQM,  RF_IRQ_EDC | RF_IRQ_TRXRDY);
 }
 
 void at86rf215_tx_done(at86rf215_t *dev)
 {
     /* re-enable AACK*/
+    at86rf215_filter_ack_only(dev, false);
     at86rf215_set_auto_mode(dev, AT86RF215_AM_AUTO_ACK, true);
     /* re-enable reduced power consumption */
     at86rf215_enable_rpc(dev);
@@ -89,47 +90,8 @@ void at86rf215_tx_done(at86rf215_t *dev)
 
 int at86rf215_tx_exec(at86rf215_t *dev)
 {
-    if (dev->state != AT86RF215_STATE_IDLE) {
-        return -EBUSY;
-    }
-
     at86rf215_rf_cmd(dev, CMD_RF_TX);
 
     dev->state = AT86RF215_STATE_TX;
     return 0;
-}
-
-bool at86rf215_cca_blocking(at86rf215_t *dev)
-{
-    bool clear;
-    uint8_t old_state;
-
-    if (dev->state != AT86RF215_STATE_IDLE) {
-        return false;
-    }
-
-    if (!at86rf215_set_rx_from_idle(dev, &old_state)) {
-        return false;
-    }
-
-    /* disable ED IRQ, baseband */
-    at86rf215_reg_and(dev, dev->RF->RG_IRQM, ~(RF_IRQ_EDC | RF_IRQ_TRXRDY));
-    at86rf215_reg_and(dev, dev->BBC->RG_PC, ~PC_BBEN_MASK);
-
-    at86rf215_disable_rpc(dev);
-
-    /* start energy detect */
-    at86rf215_reg_write(dev, dev->RF->RG_EDC, RF_EDSINGLE);
-    while (!(at86rf215_reg_read(dev, dev->RF->RG_IRQS) & RF_IRQ_EDC)) {}
-
-    clear = !(at86rf215_reg_read(dev, dev->BBC->RG_AMCS) & AMCS_CCAED_MASK);
-
-    /* enable ED IRQ, baseband */
-    at86rf215_reg_or(dev, dev->RF->RG_IRQM, RF_IRQ_EDC | RF_IRQ_TRXRDY);
-    at86rf215_reg_or(dev, dev->BBC->RG_PC, PC_BBEN_MASK);
-
-    at86rf215_enable_rpc(dev);
-    at86rf215_set_idle_from_rx(dev, old_state);
-
-    return clear;
 }

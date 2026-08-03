@@ -14,8 +14,7 @@
  * @}
  */
 
-#include <string.h>
-
+#include "at86rf215.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include "ztimer.h"
@@ -201,9 +200,12 @@ const char* at86rf215_sw_state2a(at86rf215_state_t state)
     case AT86RF215_STATE_IDLE: return "IDLE";
     case AT86RF215_STATE_RX_SEND_ACK: return "RX (sending ACK)";
     case AT86RF215_STATE_RX: return "RX";
+    case AT86RF215_STATE_RX_START: return "RX_START";
     case AT86RF215_STATE_TX: return "TX";
+    case AT86RF215_STATE_TX_WAIT_ACK: return "TX_WAIT_ACK";
     case AT86RF215_STATE_CCA_RX: return "CCA_RX";
     case AT86RF215_STATE_CCA_IDLE: return "CCA_IDLE";
+    case AT86RF215_STATE_CCATX: return "CCATX";
     case AT86RF215_STATE_TRXOFF: return "TRXOFF";
     default: return "invalid";
     }
