@@ -85,14 +85,14 @@ static bool _send_ack(uint8_t seq_num)
     return true;
 }
 
-/* set 15.4 channel */
+/* set 15.4 channel (precondition idle) */
 static int _set_channel(uint16_t channel)
 {
     _ot_dev.phy_conf.channel = channel;
     return ieee802154_radio_config_phy(_ot_dev.dev, &_ot_dev.phy_conf);
 }
 
-/* set transmission power */
+/* set transmission power (precondition idle)*/
 static int _set_power(int16_t power)
 {
     _ot_dev.phy_conf.pow = power;
@@ -108,7 +108,7 @@ static int _set_panid(uint16_t panid)
 /* set extended HW address */
 static int _set_ext_addr(uint8_t *ext_addr)
 {
-    memcpy(&_ot_dev._ext_addr, ext_addr, IEEE802154_AF_EXT_ADDR);
+    memcpy(&_ot_dev._ext_addr, ext_addr, IEEE802154_LONG_ADDRESS_LEN);
     return _ot_dev.dev->driver->config_addr_filter(_ot_dev.dev, IEEE802154_AF_EXT_ADDR, ext_addr);
 }
 
@@ -116,7 +116,8 @@ static int _set_ext_addr(uint8_t *ext_addr)
 static int _set_short_addr(network_uint16_t short_addr)
 {
     memcpy(&_ot_dev._short_addr, &short_addr, IEEE802154_SHORT_ADDRESS_LEN);
-    return _ot_dev.dev->driver->config_addr_filter(_ot_dev.dev, IEEE802154_AF_SHORT_ADDR, &short_addr);
+    return _ot_dev.dev->driver->config_addr_filter(_ot_dev.dev, IEEE802154_AF_SHORT_ADDR,
+                                                   &short_addr);
 }
 
 /* set the state of promiscuous mode */
@@ -128,7 +129,9 @@ static int _set_promiscuous(bool enable)
     return ieee802154_radio_set_frame_filter_mode(_ot_dev.dev, filter_mode);
 }
 
-static int _set_cca_threshold(int8_t cca_threshhold) {
+/* set the cca threshold */
+static int _set_cca_threshold(int8_t cca_threshhold)
+{
     _ot_dev.cca_threshold = cca_threshhold;
     return ieee802154_radio_set_cca_threshold(_ot_dev.dev, cca_threshhold);
 }
@@ -151,12 +154,7 @@ int openthread_radio_init(ieee802154_dev_t *dev, uint8_t *tb, uint8_t *rb, uint8
         return res;
     }
 
-    /* get supported PHY modes */
-    // uint32_t supported_phy_modes = ieee802154_radio_get_phy_modes(_dev);
-    // assert(supported_phy_modes != 0);
-    // uint32_t default_phy_cap = ieee802154_phy_mode_to_cap(CONFIG_IEEE802154_DEFAULT_PHY_MODE);
-
-    /* set phy conf (TODO add more flexibility))*/
+    /* set phy conf */
     _ot_dev.phy_conf.phy_mode = CONFIG_IEEE802154_DEFAULT_PHY_MODE;
     _ot_dev.phy_conf.channel = CONFIG_IEEE802154_DEFAULT_CHANNEL;
     _ot_dev.phy_conf.page = 0;
@@ -173,13 +171,13 @@ int openthread_radio_init(ieee802154_dev_t *dev, uint8_t *tb, uint8_t *rb, uint8
     eui64_set_local(&_ot_dev.factory_eui);
     eui64_clear_group(&_ot_dev.factory_eui);
     eui_short_from_eui64(&_ot_dev._ext_addr, &_ot_dev._short_addr);
-    
+
     /* set address filter */
-    _set_ext_addr((uint8_t*) &_ot_dev.factory_eui);
+    _set_ext_addr((uint8_t *)&_ot_dev.factory_eui);
     _set_short_addr(_ot_dev._short_addr);
     _set_panid(CONFIG_IEEE802154_DEFAULT_PANID);
 
-    /* set cca threashold to default */
+    /* set cca threshold to default */
     _set_cca_threshold(CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
 
     assert(res >= 0);
@@ -288,9 +286,8 @@ void process_tx_done(otInstance *aInstance)
 /* OpenThread will call this for getting the radio caps */
 otRadioCaps otPlatRadioGetCaps(otInstance *aInstance)
 {
-    (void) aInstance;
+    (void)aInstance;
     otRadioCaps caps = 0;
-    printf("Caps flags %u\n",(unsigned) _ot_dev.dev->driver->caps);
     if (ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_IRQ_ACK_TIMEOUT)) {
         caps |= OT_RADIO_CAPS_ACK_TIMEOUT;
     }
@@ -308,24 +305,24 @@ otRadioCaps otPlatRadioGetCaps(otInstance *aInstance)
     /* OT_RADIO_CAPS_TRANSMIT_FRAME_POWER could be implemented */
     /* OT_RADIO_CAPS_ALT_SHORT_ADDR */
 
-    DEBUG("openthread: otPlatRadioGetCaps %u\n", (uint16_t) caps);
+    DEBUG("openthread: otPlatRadioGetCaps %u\n", (uint16_t)caps);
     return caps;
 }
 
 int8_t otPlatRadioGetReceiveSensitivity(otInstance *aInstance)
 {
-    (void) aInstance;
+    (void)aInstance;
     /* -100 is around the default range of most RIOT radios */
     return -100;
 }
 
 void otPlatRadioGetIeeeEui64(otInstance *aInstance, uint8_t *aIeee64Eui64)
 {
-    (void) aInstance;
+    (void)aInstance;
     DEBUG("openthread: otPlatRadioGetIeeeEui64 requested factory eui64, but is locally set\n");
 
     /* currently returns generated, but static eui64 based on cpuid for most devices */
-    memcpy(aIeee64Eui64, (uint8_t *) &_ot_dev.factory_eui, IEEE802154_LONG_ADDRESS_LEN);
+    memcpy(aIeee64Eui64, (uint8_t *)&_ot_dev.factory_eui, IEEE802154_LONG_ADDRESS_LEN);
 }
 
 /* OpenThread will call this for setting PAN ID */
@@ -341,7 +338,7 @@ void otPlatRadioSetExtendedAddress(otInstance *aInstance, const otExtAddress *aE
 {
     (void)aInstance;
     DEBUG("openthread: otPlatRadioSetExtendedAddress\n");
-    
+
     /* OpenThread stores aExtAddress in little endian */
     char reversed_addr[IEEE802154_LONG_ADDRESS_LEN];
     for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; ++i) {
@@ -388,6 +385,7 @@ otError otPlatRadioGetTransmitPower(otInstance *aInstance, int8_t *aPower)
 otError otPlatRadioSetTransmitPower(otInstance *aInstance, int8_t aPower)
 {
     (void)aInstance;
+    while (ieee802154_radio_set_idle(_ot_dev.dev, false) != 0) {}
     _set_power(aPower);
 
     return OT_ERROR_NONE;
@@ -395,7 +393,7 @@ otError otPlatRadioSetTransmitPower(otInstance *aInstance, int8_t aPower)
 
 otError otPlatRadioGetCcaEnergyDetectThreshold(otInstance *aInstance, int8_t *aThreshold)
 {
-    (void) aInstance;
+    (void)aInstance;
     *aThreshold = _ot_dev.cca_threshold;
 
     return OT_ERROR_NONE;
@@ -403,7 +401,7 @@ otError otPlatRadioGetCcaEnergyDetectThreshold(otInstance *aInstance, int8_t *aT
 
 otError otPlatRadioSetCcaEnergyDetectThreshold(otInstance *aInstance, int8_t aThreshold)
 {
-    (void) aInstance;
+    (void)aInstance;
     _set_cca_threshold(aThreshold);
 
     return OT_ERROR_NONE;
@@ -452,8 +450,8 @@ void otPlatRadioSetPromiscuous(otInstance *aInstance, bool aEnable)
 void otPlatRadioSetRxOnWhenIdle(otInstance *aInstance, bool aEnable)
 {
     DEBUG("openthread: otPlatRadioSetRxOnWhenIdle is not implemented\n");
-    (void) aInstance;
-    (void) aEnable;
+    (void)aInstance;
+    (void)aEnable;
 }
 
 void otPlatRadioSetMacKey(otInstance             *aInstance,
@@ -516,13 +514,6 @@ uint32_t otPlatRadioGetBusLatency(otInstance *aInstance)
     return 0;
 }
 
-otRadioState otPlatRadioGetState(otInstance *aInstance)
-{
-    DEBUG("openthread: otPlatRadioGetState is not implemented\n");
-    (void)aInstance;
-    return OT_RADIO_STATE_DISABLED;
-}
-
 /* OpenThread will call this for enabling the radio */
 otError otPlatRadioEnable(otInstance *aInstance)
 {
@@ -574,8 +565,10 @@ otError otPlatRadioReceive(otInstance *aInstance, uint8_t aChannel)
     DEBUG("openthread: otPlatRadioReceive. Channel: %i\n", aChannel);
     (void)aInstance;
 
-    ieee802154_radio_set_rx(_ot_dev.dev);
+    while (ieee802154_radio_set_idle(_ot_dev.dev, false) != 0) {}
     _set_channel(aChannel);
+
+    ieee802154_radio_set_rx(_ot_dev.dev);
     sReceiveFrame.mChannel = aChannel;
     return OT_ERROR_NONE;
 }
@@ -588,7 +581,7 @@ otError otPlatRadioReceiveAt(otInstance *aInstance, uint8_t aChannel, uint32_t a
     (void)aStart;
     (void)aDuration;
     DEBUG("otPlatRadioReceiveAt\n");
-    return OT_ERROR_FAILED; //not implemented
+    return OT_ERROR_FAILED;
 }
 
 /* OpenThread will call this function to get the transmit buffer */
@@ -657,8 +650,8 @@ otError otPlatRadioEnergyScan(otInstance *aInstance, uint8_t aScanChannel, uint1
 
 void otPlatRadioEnableSrcMatch(otInstance *aInstance, bool aEnable)
 {
-    (void) aInstance;
-    if(!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
+    (void)aInstance;
+    if (!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
         return;
     }
 
@@ -670,15 +663,15 @@ void otPlatRadioEnableSrcMatch(otInstance *aInstance, bool aEnable)
 otError otPlatRadioAddSrcMatchShortEntry(otInstance *aInstance, const uint16_t aShortAddress)
 {
     (void)aInstance;
-    if(!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
+    if (!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
         return OT_ERROR_NOT_CAPABLE;
     }
     if (ieee802154_radio_confirm_on(_ot_dev.dev) == 0) {
-        /* TODO is aShortAddress really little endian? */
-        if (ieee802154_radio_config_src_address_match(_ot_dev.dev, IEEE802154_SRC_MATCH_SHORT_ADD, &aShortAddress) == 0) {
+        if (ieee802154_radio_config_src_address_match(_ot_dev.dev, IEEE802154_SRC_MATCH_SHORT_ADD,
+                                                      &aShortAddress) == 0) {
             return OT_ERROR_NONE;
         }
-        return  OT_ERROR_NO_BUFS;
+        return OT_ERROR_NO_BUFS;
     }
     return OT_ERROR_BUSY;
 }
@@ -686,16 +679,17 @@ otError otPlatRadioAddSrcMatchShortEntry(otInstance *aInstance, const uint16_t a
 otError otPlatRadioAddSrcMatchExtEntry(otInstance *aInstance, const otExtAddress *aExtAddress)
 {
     (void)aInstance;
-    if(!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
+    if (!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
         return OT_ERROR_NOT_CAPABLE;
     }
-     if (ieee802154_radio_confirm_on(_ot_dev.dev) == 0) {
+    if (ieee802154_radio_confirm_on(_ot_dev.dev) == 0) {
         uint8_t _ext_addr[8];
-        byteorder_htobebufll((uint8_t*) &_ext_addr,byteorder_bebuftohll((uint8_t*) aExtAddress));
-        if (ieee802154_radio_config_src_address_match(_ot_dev.dev, IEEE802154_SRC_MATCH_EXT_ADD, &_ext_addr) == 0) {
+        byteorder_htobebufll((uint8_t *)&_ext_addr, byteorder_bebuftohll((uint8_t *)aExtAddress));
+        if (ieee802154_radio_config_src_address_match(_ot_dev.dev, IEEE802154_SRC_MATCH_EXT_ADD,
+                                                      &_ext_addr) == 0) {
             return OT_ERROR_NONE;
         }
-        return  OT_ERROR_NO_BUFS;
+        return OT_ERROR_NO_BUFS;
     }
     return OT_ERROR_BUSY;
 }
@@ -703,13 +697,12 @@ otError otPlatRadioAddSrcMatchExtEntry(otInstance *aInstance, const otExtAddress
 otError otPlatRadioClearSrcMatchShortEntry(otInstance *aInstance, const uint16_t aShortAddress)
 {
     (void)aInstance;
-    if(!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
+    if (!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
         return OT_ERROR_NOT_CAPABLE;
     }
     if (ieee802154_radio_confirm_on(_ot_dev.dev) == 0) {
-        /* TODO is aShortAddress really little endian? */
-        //const int16_t _short_addr = byteorder_htob(aShortAddress);
-        if (ieee802154_radio_config_src_address_match(_ot_dev.dev, IEEE802154_SRC_MATCH_SHORT_CLEAR, &aShortAddress) == 0) {
+        if (ieee802154_radio_config_src_address_match(_ot_dev.dev, IEEE802154_SRC_MATCH_SHORT_CLEAR,
+                                                      &aShortAddress) == 0) {
             return OT_ERROR_NONE;
         }
     }
@@ -719,13 +712,14 @@ otError otPlatRadioClearSrcMatchShortEntry(otInstance *aInstance, const uint16_t
 otError otPlatRadioClearSrcMatchExtEntry(otInstance *aInstance, const otExtAddress *aExtAddress)
 {
     (void)aInstance;
-    if(!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
+    if (!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
         return OT_ERROR_NOT_CAPABLE;
     }
     if (ieee802154_radio_confirm_on(_ot_dev.dev) == 0) {
         uint8_t _ext_addr[8];
-        byteorder_htobebufll((uint8_t*) &_ext_addr,byteorder_bebuftohll((uint8_t*) aExtAddress));
-        if (ieee802154_radio_config_src_address_match(_ot_dev.dev, IEEE802154_SRC_MATCH_EXT_CLEAR, &_ext_addr) == 0) {
+        byteorder_htobebufll((uint8_t *)&_ext_addr, byteorder_bebuftohll((uint8_t *)aExtAddress));
+        if (ieee802154_radio_config_src_address_match(_ot_dev.dev, IEEE802154_SRC_MATCH_EXT_CLEAR,
+                                                      &_ext_addr) == 0) {
             return OT_ERROR_NONE;
         }
     }
@@ -736,17 +730,28 @@ void otPlatRadioClearSrcMatchShortEntries(otInstance *aInstance)
 {
     DEBUG("openthread: otPlatRadioClearSrcMatchShortEntries is not implemented\n");
     (void)aInstance;
+    if (!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
+        return;
+    }
+    /* maybe add IEEE802154_SRC_MATCH_SHORT/EXT_CLEAR_ALL to radio HAL?
+     * only radio currently supporting src addr matching in RIOT OS (esp)
+     * provides esp_ieee802154_reset_pending_table(bool is_short) for that reason*/
 }
 
 void otPlatRadioClearSrcMatchExtEntries(otInstance *aInstance)
 {
     DEBUG("openthread: otPlatRadioClearSrcMatchExtEntries is not implemented\n");
     (void)aInstance;
+    if (!ieee802154_radio_has_capability(_ot_dev.dev, IEEE802154_CAP_SRC_ADDR_MATCH)) {
+        return;
+    }
 }
 
 uint32_t otPlatRadioGetSupportedChannelMask(otInstance *aInstance)
 {
     uint32_t channel_mask;
+
+    /* mask for channels 11 to 26 */
     channel_mask = 0x07fff800;
     (void)aInstance;
     return channel_mask;
@@ -754,32 +759,12 @@ uint32_t otPlatRadioGetSupportedChannelMask(otInstance *aInstance)
 
 uint32_t otPlatRadioGetPreferredChannelMask(otInstance *aInstance)
 {
-    DEBUG("openthread: otPlatRadioGetPreferredChannelMask is not implemented\n");
-    (void)aInstance;
-    return 0;
-}
+    uint32_t channel_mask;
 
-otError otPlatRadioSetCoexEnabled(otInstance *aInstance, bool aEnabled)
-{
-    DEBUG("openthread: otPlatRadioSetCoexEnabled is not implemented\n");
+    /* mask for channels 11 to 26 */
+    channel_mask = 0x07fff800;
     (void)aInstance;
-    (void)aEnabled;
-    return OT_ERROR_FAILED;
-}
-
-bool otPlatRadioIsCoexEnabled(otInstance *aInstance)
-{
-    DEBUG("openthread: otPlatRadioIsCoexEnabled is not implemented\n");
-    (void)aInstance;
-    return false;
-}
-
-otError otPlatRadioGetCoexMetrics(otInstance *aInstance, otRadioCoexMetrics *aCoexMetrics)
-{
-    DEBUG("openthread: otPlatRadioGetCoexMetrics is not implemented\n");
-    (void)aInstance;
-    (void)aCoexMetrics;
-    return OT_ERROR_INVALID_ARGS;
+    return channel_mask;
 }
 
 otError otPlatRadioEnableCsl(otInstance         *aInstance,
