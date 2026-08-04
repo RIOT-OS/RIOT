@@ -1,6 +1,8 @@
+include $(RIOTBASE)/makefiles/color.inc.mk
+
 ifeq (2, $(words $(filter ipv4 ipv6, $(USEMODULE))))
-  $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)Due to limitations in the gcoap API it is currently not \
-                         possible to use a dual stack setup$(COLOR_RESET)" 1>&2)
+  $(call echowarn,("Due to limitations in the gcoap API it is currently"\
+                   "not possible to use a dual stack setup."))
 endif
 
 CONFIG_GCOAP_PDU_BUF_SIZE := $(or $(CONFIG_GCOAP_PDU_BUF_SIZE),128)

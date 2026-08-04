@@ -1,11 +1,13 @@
+include $(RIOTBASE)/makefiles/color.inc.mk
+
 # Don't show warnings for info and generate targets
 ifeq (,$(filter info-% generate-%,$(MAKECMDGOALS)))
   ifneq (,$(filter periph_spi, $(USEMODULE)))
     ifeq (,$(filter periph_init_buttons, $(DISABLE_MODULE)))
       DISABLE_MODULE += periph_init_buttons
 
-      MSG="Warning: Using periph_spi on Seeed Studio Xiao ESP32C3 board will disable BUTTON0 due to pin conflict."
-      $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)$(MSG)$(COLOR_RESET)" 1>&2)
+      $(call echowarn,("Warning: Using periph_spi on a Seeed Studio Xiao"\
+                       "ESP32C3 board will disable BUTTON0 due to a pin conflict."))
     endif
   else ifneq (,$(filter saul_default,$(USEMODULE)))
     # The button is the only SAUL device. Enable it only when SPI is not enabled.
