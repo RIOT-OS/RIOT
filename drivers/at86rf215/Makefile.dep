@@ -31,4 +31,3 @@ USEMODULE += event_thread_highest
 ifneq (,$(filter netdev,$(USEMODULE)))
   USEMODULE += netdev_ieee802154_submac
 endif
-

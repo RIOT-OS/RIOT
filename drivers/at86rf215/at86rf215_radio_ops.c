@@ -61,7 +61,7 @@ static inline void _clear_sibling_irq(at86rf215_t *dev)
     }
 }
 
-static inline void _clear_irq(at86rf215_t * dev)
+static inline void _clear_irq(at86rf215_t *dev)
 {
     at86rf215_reg_read(dev, dev->BBC->RG_IRQS);
     at86rf215_reg_read(dev, dev->RF->RG_IRQS);
@@ -189,14 +189,15 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t size, ieee802154_rx_in
         int8_t ed = (int8_t)at86rf215_reg_read(dev, dev->RF->RG_EDV);
         if (ed == AT86RF215_INVALID_ED) {
             info->rssi = 0;
-        } else {
+        }
+        else {
             info->rssi = (uint8_t)(ed - IEEE802154_RADIO_RSSI_OFFSET);
         }
 
 #if IS_USED(MODULE_IEEE802154_RX_TIMESTAMP)
         uint32_t rx_timestamp;
         at86rf215_reg_read_bytes(dev, dev->BBC->RG_CNT0, &rx_timestamp,
-                                    sizeof(rx_timestamp));
+                                 sizeof(rx_timestamp));
 
         /* convert counter value to ns */
         uint64_t res = rx_timestamp * 1000ULL / 32;
@@ -217,7 +218,7 @@ static int _request_rx(at86rf215_t *dev)
         return 0;
     }
 
-    if(curr_state != AT86RF215_STATE_IDLE) {
+    if (curr_state != AT86RF215_STATE_IDLE) {
         return -EBUSY;
     }
 
@@ -242,22 +243,22 @@ static int _request_idle(at86rf215_t *dev, bool force)
     at86rf215_rf_cmd(dev, CMD_RF_TXPREP);
 
     /* an aborted operation produces no completion IRQ (no TXFE for an
-     * aborted TX/ACK, possibly no EDC for an aborted CCA) - clean up
-     * the software state here so we don't get stuck. If the abort
-     * happened during a CCA, re-enable what request_cca() disabled. */
+    * aborted TX/ACK, possibly no EDC for an aborted CCA) - clean up
+    * the software state here so we don't get stuck. If the abort
+    * happened during a CCA, re-enable what request_cca() disabled. */
     switch (dev->state) {
-        case AT86RF215_STATE_CCA_RX:
-        case AT86RF215_STATE_CCA_IDLE:
-            at86rf215_enable_baseband(dev);
-            at86rf215_enable_rpc(dev);
-            break;
-        case AT86RF215_STATE_TX:
-        case AT86RF215_STATE_RX_SEND_ACK:
-            at86rf215_tx_done(dev);
-            dev->tx_ack_req = false;
-            break;
-        default:
-            break;
+    case AT86RF215_STATE_CCA_RX:
+    case AT86RF215_STATE_CCA_IDLE:
+        at86rf215_enable_baseband(dev);
+        at86rf215_enable_rpc(dev);
+        break;
+    case AT86RF215_STATE_TX:
+    case AT86RF215_STATE_RX_SEND_ACK:
+        at86rf215_tx_done(dev);
+        dev->tx_ack_req = false;
+        break;
+    default:
+        break;
     }
 
     return 0;
@@ -266,6 +267,7 @@ static int _request_idle(at86rf215_t *dev, bool force)
 static int _request_cca(at86rf215_t *dev, at86rf215_state_t next_cca_state)
 {
     at86rf215_state_t state = dev->state;
+
     if (state != AT86RF215_STATE_IDLE && state != AT86RF215_STATE_RX) {
         return -EBUSY;
     }
@@ -312,12 +314,12 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
         return _request_rx(dev);
         break;
     case IEEE802154_HAL_OP_SET_IDLE:
-        bool force = *((bool *) ctx);
+        bool force = *((bool *)ctx);
         return _request_idle(dev, force);
         break;
     case IEEE802154_HAL_OP_CCA:
         at86rf215_state_t next_cca_state = (dev->state == AT86RF215_STATE_IDLE) ?
-            AT86RF215_STATE_CCA_IDLE : AT86RF215_STATE_CCA_RX;
+                                           AT86RF215_STATE_CCA_IDLE : AT86RF215_STATE_CCA_RX;
 
         return _request_cca(dev, next_cca_state);
         break;
@@ -363,6 +365,7 @@ static int _confirm_idle(at86rf215_t *dev)
 static int _confirm_cca(at86rf215_t *dev, bool *clear)
 {
     at86rf215_state_t state = dev->state;
+
     if (state == AT86RF215_STATE_CCA_RX || state == AT86RF215_STATE_CCA_IDLE) {
         return -EAGAIN;
     }
@@ -418,6 +421,7 @@ static int _set_cca_mode(ieee802154_dev_t *hal, ieee802154_cca_mode_t mode)
 static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
 {
     at86rf215_t *dev = hal->priv;
+
     switch (conf->phy_mode) {
 #ifdef MODULE_NETDEV_IEEE802154_OQPSK
     case IEEE802154_PHY_OQPSK:
@@ -455,7 +459,7 @@ static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
 }
 
 static int _set_csma_params(ieee802154_dev_t *hal, const ieee802154_csma_be_t *bd,
-                     int8_t retries)
+                            int8_t retries)
 {
     (void)bd;
     at86rf215_t *dev = hal->priv;
@@ -492,7 +496,7 @@ static int _config_addr_filter(ieee802154_dev_t *hal, ieee802154_af_cmd_t cmd, c
 }
 
 static int _config_src_addr_match(ieee802154_dev_t *hal, ieee802154_src_match_t cmd,
-                           const void *value)
+                                  const void *value)
 {
     at86rf215_t *dev = hal->priv;
 
@@ -545,7 +549,7 @@ static int _set_frame_filter_mode(ieee802154_dev_t *hal, ieee802154_filter_mode_
     }
 
     if ((dev->filter_mode == IEEE802154_FILTER_SNIFFER)
-            && (mode != IEEE802154_FILTER_SNIFFER)) {
+        && (mode != IEEE802154_FILTER_SNIFFER)) {
         /* enable fcs */
         at86rf215_reg_or(dev, dev->BBC->RG_PC, PC_FCSFE_MASK);
     }
@@ -568,6 +572,7 @@ static void _handle_edc(ieee802154_dev_t *hal)
     at86rf215_state_t current_state = dev->state;
 
     int8_t ed_value = at86rf215_get_ed_level(dev);
+
     dev->cca_busy = ed_value > at86rf215_get_cca_threshold(dev);
 
     at86rf215_enable_baseband(dev);
@@ -588,7 +593,7 @@ static void _handle_edc(ieee802154_dev_t *hal)
     }
 
     dev->state = (current_state == AT86RF215_STATE_CCA_IDLE) ?
-                            AT86RF215_STATE_IDLE : AT86RF215_STATE_RX;
+                 AT86RF215_STATE_IDLE : AT86RF215_STATE_RX;
 
     if (current_state == AT86RF215_STATE_CCA_IDLE) {
         at86rf215_rf_cmd(dev, CMD_RF_TXPREP);
@@ -661,145 +666,145 @@ static void at86rf215_handle_common_irq(ieee802154_dev_t *hal)
         }
 
         DEBUG("[at86rf215] ISR loop iter=%d bb=0x%02x rf=0x%02x SW=%s HW=%s\n",
-                iter, bb_irq_mask, rf_irq_mask,
-                at86rf215_sw_state2a(dev->state),
-                at86rf215_hw_state2a(at86rf215_get_rf_state(dev)));
+              iter, bb_irq_mask, rf_irq_mask,
+              at86rf215_sw_state2a(dev->state),
+              at86rf215_hw_state2a(at86rf215_get_rf_state(dev)));
 
         switch (dev->state) {
-            case AT86RF215_STATE_RX:
-            case AT86RF215_STATE_RX_START:
-            case AT86RF215_STATE_IDLE:
-                if (bb_irq_mask & BB_IRQ_RXFS) {
-                    DEBUG("[at86rf215] ISR IDLE/RX: → RX_START cb\n");
-                    bb_irq_mask &= ~BB_IRQ_RXFS;
-                    dev->state = AT86RF215_STATE_RX_START;
-                    if (hal->cb) {
-                        hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_START);
-                    }
-                }
-
-                /* to avoid getting stuck in RX_START go back to rx after gain control is released */
-                if (bb_irq_mask & BB_IRQ_AGCR) {
-                    bb_irq_mask &= ~BB_IRQ_AGCR;
-                    dev->state = AT86RF215_STATE_RX;
-                }
-
-                if (!(bb_irq_mask & BB_IRQ_RXFE)) {
-                    break;
-                }
-
-                bb_irq_mask &= ~BB_IRQ_RXFE;
-
-                fcf0 = at86rf215_reg_read(dev, dev->BBC->RG_FBRXS);
-
-                if (fcf0 & IEEE802154_FCF_ACK_REQ && (dev->auto_mode == AT86RF215_AM_AUTO_ACK)) {
-                    DEBUG("[at86rf215] ISR IDLE/RX: RX_ACK_REQ set → RX_SEND_ACK\n");
-                    dev->state = AT86RF215_STATE_RX_SEND_ACK;
-                    break;
-                }
-
-                DEBUG("[at86rf215] ISR IDLE/RX: no ACK_REQ → RX_DONE cb\n");
-                dev->state = AT86RF215_STATE_IDLE;
+        case AT86RF215_STATE_RX:
+        case AT86RF215_STATE_RX_START:
+        case AT86RF215_STATE_IDLE:
+            if (bb_irq_mask & BB_IRQ_RXFS) {
+                DEBUG("[at86rf215] ISR IDLE/RX: → RX_START cb\n");
+                bb_irq_mask &= ~BB_IRQ_RXFS;
+                dev->state = AT86RF215_STATE_RX_START;
                 if (hal->cb) {
-                    hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
+                    hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_START);
                 }
-                break;
+            }
 
-            case AT86RF215_STATE_RX_SEND_ACK:
-                if (!(bb_irq_mask & BB_IRQ_TXFE)) {
-                    /* don't indicate ack frames */
-                    break;
-                }
-                bb_irq_mask &= ~BB_IRQ_TXFE;
-                DEBUG("[at86rf215] ISR RX_SEND_ACK: TXFE (ACK sent) → RX_DONE cb\n");
-                dev->state = AT86RF215_STATE_IDLE;
-                if (hal->cb) {
-                    hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
-                }
-                break;
+            /* to avoid getting stuck in RX_START go back to rx after gain control is released */
+            if (bb_irq_mask & BB_IRQ_AGCR) {
+                bb_irq_mask &= ~BB_IRQ_AGCR;
+                dev->state = AT86RF215_STATE_RX;
+            }
 
-            case AT86RF215_STATE_TX:
-                /* start transmitting the frame */
-                if (rf_irq_mask & RF_IRQ_TRXRDY) {
-                    DEBUG("[at86rf215] ISR: TX_PENDING + TRXRDY → starting TX\n");
+            if (!(bb_irq_mask & BB_IRQ_RXFE)) {
+                break;
+            }
+
+            bb_irq_mask &= ~BB_IRQ_RXFE;
+
+            fcf0 = at86rf215_reg_read(dev, dev->BBC->RG_FBRXS);
+
+            if (fcf0 & IEEE802154_FCF_ACK_REQ && (dev->auto_mode == AT86RF215_AM_AUTO_ACK)) {
+                DEBUG("[at86rf215] ISR IDLE/RX: RX_ACK_REQ set → RX_SEND_ACK\n");
+                dev->state = AT86RF215_STATE_RX_SEND_ACK;
+                break;
+            }
+
+            DEBUG("[at86rf215] ISR IDLE/RX: no ACK_REQ → RX_DONE cb\n");
+            dev->state = AT86RF215_STATE_IDLE;
+            if (hal->cb) {
+                hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
+            }
+            break;
+
+        case AT86RF215_STATE_RX_SEND_ACK:
+            if (!(bb_irq_mask & BB_IRQ_TXFE)) {
+                /* don't indicate ack frames */
+                break;
+            }
+            bb_irq_mask &= ~BB_IRQ_TXFE;
+            DEBUG("[at86rf215] ISR RX_SEND_ACK: TXFE (ACK sent) → RX_DONE cb\n");
+            dev->state = AT86RF215_STATE_IDLE;
+            if (hal->cb) {
+                hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
+            }
+            break;
+
+        case AT86RF215_STATE_TX:
+            /* start transmitting the frame */
+            if (rf_irq_mask & RF_IRQ_TRXRDY) {
+                DEBUG("[at86rf215] ISR: TX_PENDING + TRXRDY → starting TX\n");
 #ifdef MODULE_NETDEV_IEEE802154_MR_FSK
-                    /* send long preamble in TX */
-                    if (dev->fsk_pl) {
-                        at86rf215_FSK_prepare_tx(dev);
-                    }
+                /* send long preamble in TX */
+                if (dev->fsk_pl) {
+                    at86rf215_FSK_prepare_tx(dev);
+                }
 #endif
-                    /* switch to state TX */
-                    at86rf215_rf_cmd(dev, CMD_RF_TX);
-                    return;
-                }
+                /* switch to state TX */
+                at86rf215_rf_cmd(dev, CMD_RF_TX);
+                return;
+            }
 
-                if (!(bb_irq_mask & BB_IRQ_TXFE)) {
-                    DEBUG("[at86rf215] ISR TX: unexpected irq 0x%02x\n", bb_irq_mask);
-                    break;
-                }
-
-                bb_irq_mask &= ~BB_IRQ_TXFE;
-                DEBUG("[at86rf215] ISR TX: TXFE\n");
-                _tx_end(hal);
+            if (!(bb_irq_mask & BB_IRQ_TXFE)) {
+                DEBUG("[at86rf215] ISR TX: unexpected irq 0x%02x\n", bb_irq_mask);
                 break;
+            }
 
-            case AT86RF215_STATE_TX_WAIT_ACK:
+            bb_irq_mask &= ~BB_IRQ_TXFE;
+            DEBUG("[at86rf215] ISR TX: TXFE\n");
+            _tx_end(hal);
+            break;
 
-                /* received a frame passing fcs */
-                if (bb_irq_mask & BB_IRQ_RXFS) {
-                    bb_irq_mask &= ~BB_IRQ_RXFS;
-                }
+        case AT86RF215_STATE_TX_WAIT_ACK:
 
-                if (bb_irq_mask & BB_IRQ_AGCR) {
-                    bb_irq_mask &= ~BB_IRQ_AGCR;
-                }
+            /* received a frame passing fcs */
+            if (bb_irq_mask & BB_IRQ_RXFS) {
+                bb_irq_mask &= ~BB_IRQ_RXFS;
+            }
 
-                if (!(bb_irq_mask & BB_IRQ_RXFE)) {
-                    DEBUG("TX_WAIT_ACK: only RXFE (%x)\n", bb_irq_mask);
-                    break;
-                }
+            if (bb_irq_mask & BB_IRQ_AGCR) {
+                bb_irq_mask &= ~BB_IRQ_AGCR;
+            }
 
-                bb_irq_mask &= ~BB_IRQ_RXFE;
-
-                fcf0 = at86rf215_reg_read(dev, dev->BBC->RG_FBRXS);
-                /* not an ack go back to receive */
-                if ((fcf0 & IEEE802154_FCF_TYPE_MASK) != IEEE802154_FCF_TYPE_ACK) {
-                    at86rf215_rf_cmd(dev, CMD_RF_RX);
-                    break;
-                }
-
-                uint8_t tx_dsn = at86rf215_reg_read(dev, dev->BBC->RG_FBTXS + 2);
-                uint8_t rx_dsn = at86rf215_reg_read(dev, dev->BBC->RG_FBRXS + 2);
-                /* ack but for the wrong frame */
-                if (tx_dsn != rx_dsn) {
-                    DEBUG("[at86rf215] ISR: stray ACK dsn=%u (expected %u)\n",
-                            rx_dsn, tx_dsn);
-                    at86rf215_rf_cmd(dev, CMD_RF_RX);
-                    break;
-                }
-
-                DEBUG("[at86rf215] TX_WAIT_ACK: ack recv → rx_done_cb\n");
-                /* ack received radio gets to TXPREP(idle) */
-                dev->state = AT86RF215_STATE_IDLE;
-                if (hal->cb) {
-                    hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
-                }
+            if (!(bb_irq_mask & BB_IRQ_RXFE)) {
+                DEBUG("TX_WAIT_ACK: only RXFE (%x)\n", bb_irq_mask);
                 break;
+            }
 
-            case AT86RF215_STATE_CCA_RX:
-            case AT86RF215_STATE_CCA_IDLE:
-            case AT86RF215_STATE_CCATX:
-                /* Start ED or handle result */
-                if (rf_irq_mask & RF_IRQ_EDC) {
-                    rf_irq_mask &= ~RF_IRQ_EDC;
-                    _handle_edc(hal);
-                }
+            bb_irq_mask &= ~BB_IRQ_RXFE;
+
+            fcf0 = at86rf215_reg_read(dev, dev->BBC->RG_FBRXS);
+            /* not an ack go back to receive */
+            if ((fcf0 & IEEE802154_FCF_TYPE_MASK) != IEEE802154_FCF_TYPE_ACK) {
+                at86rf215_rf_cmd(dev, CMD_RF_RX);
                 break;
-            case AT86RF215_STATE_OFF:
-            default:
-                DEBUG("[at86rf215] ISR: unhandled state %s bb=0x%02x\n",
-                        at86rf215_sw_state2a(dev->state), bb_irq_mask);
+            }
+
+            uint8_t tx_dsn = at86rf215_reg_read(dev, dev->BBC->RG_FBTXS + 2);
+            uint8_t rx_dsn = at86rf215_reg_read(dev, dev->BBC->RG_FBRXS + 2);
+            /* ack but for the wrong frame */
+            if (tx_dsn != rx_dsn) {
+                DEBUG("[at86rf215] ISR: stray ACK dsn=%u (expected %u)\n",
+                      rx_dsn, tx_dsn);
+                at86rf215_rf_cmd(dev, CMD_RF_RX);
                 break;
+            }
+
+            DEBUG("[at86rf215] TX_WAIT_ACK: ack recv → rx_done_cb\n");
+            /* ack received radio gets to TXPREP(idle) */
+            dev->state = AT86RF215_STATE_IDLE;
+            if (hal->cb) {
+                hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
+            }
+            break;
+
+        case AT86RF215_STATE_CCA_RX:
+        case AT86RF215_STATE_CCA_IDLE:
+        case AT86RF215_STATE_CCATX:
+            /* Start ED or handle result */
+            if (rf_irq_mask & RF_IRQ_EDC) {
+                rf_irq_mask &= ~RF_IRQ_EDC;
+                _handle_edc(hal);
+            }
+            break;
+        case AT86RF215_STATE_OFF:
+        default:
+            DEBUG("[at86rf215] ISR: unhandled state %s bb=0x%02x\n",
+                  at86rf215_sw_state2a(dev->state), bb_irq_mask);
+            break;
         }
     }
 }
@@ -837,7 +842,7 @@ static void _event_handler(event_t *event)
 }
 
 static int _init_hardware(ieee802154_dev_t *hal, at86rf215_t *dev, void (*cb)(void *),
-                        void *ctx)
+                          void *ctx)
 {
     int res = -1;
 
@@ -929,14 +934,14 @@ int at86rf215_init_event(at86rf215_bhp_ev_t *bhp, ieee802154_dev_t *hal_09,
 }
 
 #define AT86RF215_COMMON_CAPS \
-    ((IS_USED(MODULE_NETDEV_IEEE802154_OQPSK)    ? IEEE802154_CAP_PHY_OQPSK    : 0) \
-   | (IS_USED(MODULE_NETDEV_IEEE802154_MR_OQPSK) ? IEEE802154_CAP_PHY_MR_OQPSK : 0) \
-   | (IS_USED(MODULE_NETDEV_IEEE802154_MR_OFDM)  ? IEEE802154_CAP_PHY_MR_OFDM  : 0) \
-   | (IS_USED(MODULE_NETDEV_IEEE802154_MR_FSK)   ? IEEE802154_CAP_PHY_MR_FSK   : 0) \
-   | IEEE802154_CAP_AUTO_ACK \
-   | IEEE802154_CAP_IRQ_TX_DONE \
-   | IEEE802154_CAP_IRQ_RX_START \
-   | IEEE802154_CAP_IRQ_CCA_DONE)
+        ((IS_USED(MODULE_NETDEV_IEEE802154_OQPSK)    ? IEEE802154_CAP_PHY_OQPSK    : 0) \
+         | (IS_USED(MODULE_NETDEV_IEEE802154_MR_OQPSK) ? IEEE802154_CAP_PHY_MR_OQPSK : 0) \
+         | (IS_USED(MODULE_NETDEV_IEEE802154_MR_OFDM)  ? IEEE802154_CAP_PHY_MR_OFDM  : 0) \
+         | (IS_USED(MODULE_NETDEV_IEEE802154_MR_FSK)   ? IEEE802154_CAP_PHY_MR_FSK   : 0) \
+         | IEEE802154_CAP_AUTO_ACK \
+         | IEEE802154_CAP_IRQ_TX_DONE \
+         | IEEE802154_CAP_IRQ_RX_START \
+         | IEEE802154_CAP_IRQ_CCA_DONE)
 
 static const ieee802154_radio_ops_t at86rf215_sub_ghz_ops = {
     .caps = IEEE802154_CAP_SUB_GHZ | AT86RF215_COMMON_CAPS,

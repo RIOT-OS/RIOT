@@ -258,14 +258,14 @@ typedef enum {
 /** @} */
 
 /**
- * @name    Automatic Modes
+ * @brief    Automatic Modes
  * @{
  */
 typedef enum {
-    AT86RF215_AM_BASIC    = 0,                  /**< disable all auto modes */
-    AT86RF215_AM_AUTO_ACK = AMCS_AACK_MASK,     /**< auto acks for received frames */
-    AT86RF215_AM_TX2RX    = AMCS_TX2RX_MASK,    /**< auto switch to rx after frame transmission */
-    AT86RF215_AM_CCATX    = AMCS_CCATX_MASK,    /**< auto cca before frame transmission */
+    AT86RF215_AM_BASIC    = 0,                  /**< Disable all auto modes */
+    AT86RF215_AM_AUTO_ACK = AMCS_AACK_MASK,     /**< Auto acks for received frames */
+    AT86RF215_AM_TX2RX    = AMCS_TX2RX_MASK,    /**< Auto switch to rx after frame transmission */
+    AT86RF215_AM_CCATX    = AMCS_CCATX_MASK,    /**< Auto cca before frame transmission */
 } at86rf215_auto_mode_t;
 /** @} */
 
@@ -302,16 +302,16 @@ typedef struct at86rf215 {
     bool cca_busy;                          /**< Flag for cca status */
     bool cca_tx;                            /**< Flag if the radio should perform cca before tx */
     ieee802154_filter_mode_t filter_mode;   /**< Current filter mode of the device */
-    bool tx_ack_req;
-    at86rf215_auto_mode_t auto_mode;
+    bool tx_ack_req;                        /**< Flag for cca status */
+    at86rf215_auto_mode_t auto_mode;        /**< Active automatic mode of the radio */
 } at86rf215_t;
 
 /**
  *  @brief Event Bottom Half Processor descriptor for AT86RF215 transceiver.
  */
 typedef struct {
-    ieee802154_dev_t *hal_09;   /**< Pointer to the Radio HAL descriptor */
-    ieee802154_dev_t *hal_24;   /**< Pointer to the Radio HAL descriptor */
+    ieee802154_dev_t *hal_09;   /**< Pointer to the SubGHz Radio HAL descriptor */
+    ieee802154_dev_t *hal_24;   /**< Pointer to the 2.4GHz Radio HAL descriptor */
     event_queue_t *evq;         /**< Pointer to the event queue */
     event_t ev;                 /**< ISR offload event */
 } at86rf215_bhp_ev_t;
@@ -567,9 +567,10 @@ void at86rf215_set_auto_mode(at86rf215_t *dev, at86rf215_auto_mode_t mode, bool 
 /**
  * @brief Init an AT86RF215 device with an event based Bottom Half Processor.
  *
- * @param[in,out] bhp   pointer to the event BHP descriptor
- * @param[in,out] hal   pointer to the Radio HAL descriptor
- * @param[in] evq       pointer to the event queue
+ * @param[in,out] bhp   Pointer to the event BHP descriptor
+ * @param[in] hal_09    HAL descriptor for the SubGHz interface
+ * @param[in] hal_24    HAL descriptor for the 2.4GHz interface
+ * @param[in] evq       Pointer to the event queue
  *
  * @return error code
  * @retval 0 on success
@@ -577,6 +578,22 @@ void at86rf215_set_auto_mode(at86rf215_t *dev, at86rf215_auto_mode_t mode, bool 
  */
 int at86rf215_init_event(at86rf215_bhp_ev_t *bhp, ieee802154_dev_t *hal_09, ieee802154_dev_t *hal_24, event_queue_t *evq);
 
+/**
+ * @brief   Initialize the AT86RF215 transceiver.
+ *
+ * Sets up the device descriptors of both interfaces.
+ *
+ * @param[out] dev_09   Device descriptor of the SubGHz interface
+ * @param[out] dev_24   Device descriptor of the 2.4GHz interface
+ * @param[out] hal_09   HAL descriptor for the SubGHz interface
+ * @param[out] hal_24   HAL descriptor for the 2.4GHz interface
+ * @param[in]  params   Hardware configuration of the device
+ * @param[in]  ctx      Context passed to the interrupt handler
+ *
+ * @return error code
+ * @retval 0 on success
+ * @retval -ENOTSUP if the part number of the device is not supported
+ */
 int at86rf215_init(at86rf215_t *dev_09,
                    at86rf215_t *dev_24,
                    ieee802154_dev_t *hal_09,
