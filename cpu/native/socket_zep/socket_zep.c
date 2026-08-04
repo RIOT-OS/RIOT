@@ -419,7 +419,7 @@ static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *b
     return 0;
 }
 
-static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
+static int _config_phy(ieee802154_dev_t *dev, ieee802154_phy_conf_t *conf)
 {
     socket_zep_t *zepdev = dev->priv;
 
