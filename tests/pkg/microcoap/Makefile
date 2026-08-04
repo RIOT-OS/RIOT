@@ -15,13 +15,15 @@ USEMODULE += xtimer
 
 USEPKG += microcoap
 
+include $(RIOTBASE)/makefiles/color.inc.mk
+
 # Use different settings when compiling for one of the following (low-memory)
 # boards
 LOW_MEMORY_BOARDS := nucleo-f334r8
 
 ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
-  $(shell echo 'Using low-memory configuration for microcoap_server.' 1>&2)
-  ## low-memory tuning values
+  $(call echoinfo,("Using low-memory configuration for microcoap_server."))
+  # low-memory tuning values
   USEMODULE += prng_minstd
 endif
 
