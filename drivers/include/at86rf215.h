@@ -525,18 +525,6 @@ int at86rf215_tx_exec(at86rf215_t *dev);
 void at86rf215_tx_done(at86rf215_t *dev);
 
 /**
- * @brief   Perform one manual channel clear assessment (CCA)
- *
- * The CCA mode and threshold level depends on the current transceiver settings.
- *
- * @param[in]  dev          device to use
- *
- * @return                  true if channel is determined clear
- * @return                  false if channel is determined busy
- */
-bool at86rf215_cca_blocking(at86rf215_t *dev);
-
-/**
  * @brief   Generate an interrupt if supply voltage drops below the configured
  *          threshold.
  *
