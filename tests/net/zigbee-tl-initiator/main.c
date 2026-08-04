@@ -43,6 +43,8 @@
 
 #define APPLICATION_ENDPOINT 11
 
+#define APPLICATION_VERSION 1
+
 #define INPUT_CL_COUNT 1
 
 #define OUTPUT_CL_COUNT 1
@@ -56,7 +58,7 @@ static uint8_t key[] = {
 };
 
 static zb_zcl_basic_srv_attr_t basic_attrs = {
-    .app_version = 1,
+    .app_version = APPLICATION_VERSION,
     .power_source = ZB_ZCL_BASIC_POWER_SRC_MAINS,
     .phys_environment = ZB_ZCL_BASIC_PHYS_ENV_OFFICE,
     .generic_device_type = ZB_ZCL_BASIC_GEN_DEV_TYPE_LED_BULB,
@@ -75,22 +77,13 @@ static zb_zcl_basic_srv_attr_t basic_attrs = {
     .software_build_id_len = sizeof(RIOT_VERSION),
 };
 
-/* This should equal (INPUT_CL_COUNT, OUTPUT_CL_COUNT) */
+/* This will declare a simple_desc_initiator */
 //ZB_DECLARE_SIMPLE_DESC(1, 1); - already declared
-static zb_af_simple_desc_1_1_t simple_desc_initiator = {
-    APPLICATION_ENDPOINT,
-    ZB_HA_PROFILE_ID,
-    ZB_HA_ON_OFF_LIGHT_DEV_ID,
-    1,/* app version */
-    0,/* reserved */
-    INPUT_CL_COUNT,
-    OUTPUT_CL_COUNT,
-    {
-        // first input(srv), then output(cli)
-        ZB_BASIC_CLUSTER_ID,
-        ZB_ZLL_CLUSTER_ID
-    }
-};
+ZB_SET_SIMPLE_DESC(initiator, APPLICATION_ENDPOINT, ZB_HA_PROFILE_ID, \
+        ZB_HA_ON_OFF_LIGHT_DEV_ID, APPLICATION_VERSION, \
+        INPUT_CL_COUNT, OUTPUT_CL_COUNT, \
+        /* input cl: */ ZB_BASIC_CLUSTER_ID, \
+        /* output cl: */ ZB_ZLL_CLUSTER_ID);
 
 static zb_af_ep_desc_t initiator_ep = {
     APPLICATION_ENDPOINT,
