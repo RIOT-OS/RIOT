@@ -119,14 +119,15 @@ int swprintf(string_writer_t *sw, FLASH_ATTR const char *restrict format, ...);
 #endif
 
 /* explicit_bzero is provided if:
- * - glibc is used as C lib (only with board natvie)
- * - newlib is used and __BSD_VISIBLE is set
- *      - except for ESP8266, which is using an old version of newlib without it
- * - picolibc is used and __BSD_VISIBLE is set
+ * - the system is compiled for RIOT *and* any of the following:
+ *   - glibc is used as C lib (only with board native)
+ *   - newlib is used and __BSD_VISIBLE is set
+ *     - except for ESP8266, which is using an old version of newlib without it
+ *   - picolibc is used and __BSD_VISIBLE is set
  *
  * for all other cases, we provide it here
  */
-#if !defined(CPU_NATIVE) \
+#if defined(RIOT_OS) && !defined(CPU_NATIVE) \
     && !(IS_USED(MODULE_PICOLIBC) && __BSD_VISIBLE) \
     && !(IS_USED(MODULE_NEWLIB) && __BSD_VISIBLE && !defined(CPU_ESP8266))
 
