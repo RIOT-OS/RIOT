@@ -45,6 +45,8 @@
 
 #define APPLICATION_ENDPOINT 11
 
+#define APPLICATION_VERSION 1
+
 #define INPUT_CL_COUNT 4
 
 #define OUTPUT_CL_COUNT 0
@@ -100,7 +102,7 @@ static zb_zcl_on_off_srv_attr_t on_off_attrs = {
 };
 
 static zb_zcl_basic_srv_attr_t basic_attrs = {
-    .app_version = 1,
+    .app_version = APPLICATION_VERSION,
     .power_source = ZB_ZCL_BASIC_POWER_SRC_MAINS,
     .phys_environment = ZB_ZCL_BASIC_PHYS_ENV_OFFICE,
     .generic_device_type = ZB_ZCL_BASIC_GEN_DEV_TYPE_LED_BULB,
@@ -119,24 +121,14 @@ static zb_zcl_basic_srv_attr_t basic_attrs = {
     .software_build_id_len = sizeof(RIOT_VERSION),
 };
 
-/* This should equal (INPUT_CL_COUNT, OUTPUT_CL_COUNT) */
-ZB_DECLARE_SIMPLE_DESC(4, 0);
-static zb_af_simple_desc_4_0_t simple_desc_lightbulb = {
-    APPLICATION_ENDPOINT,
-    ZB_HA_PROFILE_ID,
-    ZB_HA_ON_OFF_LIGHT_DEV_ID,
-    1,/* app version */
-    0,/* reserved */
-    INPUT_CL_COUNT,
-    OUTPUT_CL_COUNT,
-    {
-        // first input(srv), then output(cli)
-        ZB_BASIC_CLUSTER_ID,
-        ZB_ZLL_CLUSTER_ID,
-        ZB_GROUPS_CLUSTER_ID,
-        ZB_ON_OFF_CLUSTER_ID
-    }
-};
+/* This will declare a simple_desc_lightbulb */
+ZB_DECLARE_SIMPLE_DESC(INPUT_CL_COUNT, OUTPUT_CL_COUNT);
+ZB_SET_SIMPLE_DESC(lightbulb, APPLICATION_ENDPOINT, ZB_HA_PROFILE_ID, \
+    ZB_HA_ON_OFF_LIGHT_DEV_ID, APPLICATION_VERSION, \
+    INPUT_CL_COUNT, OUTPUT_CL_COUNT, \
+    /* input cl: */ZB_BASIC_CLUSTER_ID, ZB_ZLL_CLUSTER_ID, \
+    ZB_GROUPS_CLUSTER_ID, ZB_ON_OFF_CLUSTER_ID \
+    /* no output cl */);
 
 static zb_af_ep_desc_t lightbulb_ep = {
     APPLICATION_ENDPOINT,
