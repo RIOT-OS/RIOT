@@ -16,7 +16,6 @@
  * @}
  */
 
-#include "openthread/platform/alarm-milli.h"
 #include "ot.h"
 #include "random.h"
 #include "thread.h"

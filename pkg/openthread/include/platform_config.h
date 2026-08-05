@@ -33,6 +33,14 @@ extern "C" {
  */
 #define OPENTHREAD_CONFIG_PLATFORM_FLASH_API_ENABLE 0
 
+
+/**
+ * @def OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE
+ *
+ * If set to 1 allows usage of usec. Currently has to be set to 1.
+ */
+#define OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE 1
+
 /**
  * @def OPENTHREAD_CONFIG_TCP_ENABLE
  *
