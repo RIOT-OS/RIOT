@@ -28,6 +28,16 @@ extern "C" {
 #endif
 
 /**
+ * @name    IPv4 Header Flags
+ * @see     [RFC 791, section 3.1](https://tools.ietf.org/html/rfc791#section-3.1)
+ * @{
+ */
+#define IPV4_HDR_FLAGS_RESERVED     (0x04)      /**< reserved */
+#define IPV4_HDR_FLAGS_DF           (0x02)      /**< do not fragment */
+#define IPV4_HDR_FLAGS_MF           (0x01)      /**< more fragments */
+/** @} */
+
+/**
  * @brief   Data type to represent an IPv4 packet header.
  *
  * The structure of the header is as follows:
