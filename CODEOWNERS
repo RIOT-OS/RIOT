@@ -112,6 +112,7 @@ Cargo.*                                     @chrysn
 /sys/fmt/                                   @kaspar030
 /sys/net/application_layer/gcoap/           @chrysn
 /sys/net/application_layer/nanocoap/        @kaspar030 @chrysn
+/sys/net/application_layer/unicoap/         @carl-tud @mguetschow
 /sys/include/net/sock*                      @maribu
 /sys/net/netif/                             @miri64 @jia200x
 /sys/net/gnrc/network_layer/                @miri64
@@ -122,6 +123,7 @@ Cargo.*                                     @chrysn
 /sys/net/gnrc/routing/rpl/                  @emmanuelsearch
 /sys/net/                                   @miri64
 /sys/pm_layered/                            @kaspar030
+/sys/psa_crypto/                            @mguetschow
 /sys/random/fortuna/                        @basilfx
 /sys/riotboot/                              @kaspar030
 /sys/suit                                   @kaspar030 @bergzand
