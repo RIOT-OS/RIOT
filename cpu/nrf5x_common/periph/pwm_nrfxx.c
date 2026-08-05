@@ -49,6 +49,31 @@ static inline NRF_PWM_Type *dev(pwm_t pwm)
     return pwm_config[pwm].dev;
 }
 
+/* On the nRF54L family, the sequence start task and the sequence buffer
+ * registers moved into DMA register groups (and the buffer length is given
+ * in bytes instead of 16-bit words) */
+static inline void _seq_start(pwm_t pwm)
+{
+#ifdef CPU_FAM_NRF54L
+    dev(pwm)->TASKS_DMA.SEQ[0].START = 1;
+#else
+    dev(pwm)->TASKS_SEQSTART[0] = 1;
+#endif
+}
+
+static inline void _seq_buf_setup(pwm_t pwm)
+{
+#ifdef CPU_FAM_NRF54L
+    dev(pwm)->DMA.SEQ[0].PTR = (uint32_t)pwm_seq[pwm];
+    dev(pwm)->DMA.SEQ[0].MAXCNT = sizeof(pwm_seq[pwm]);
+#else
+    dev(pwm)->SEQ[0].PTR = (uint32_t)pwm_seq[pwm];
+    dev(pwm)->SEQ[0].CNT = PWM_CHANNELS;
+#endif
+    dev(pwm)->SEQ[0].REFRESH = 0;
+    dev(pwm)->SEQ[0].ENDDELAY = 0;
+}
+
 /**
  * @note Center mode is not supported. Use left or right aligned PWM modes.
  */
@@ -114,18 +139,13 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     DEBUG("DECODER: 0x%08x\n", (int)dev(pwm)->DECODER);
 
     /* setup the sequence */
-    dev(pwm)->SEQ[0].PTR = (uint32_t)pwm_seq[pwm];
-    dev(pwm)->SEQ[0].CNT = PWM_CHANNELS;
-    dev(pwm)->SEQ[0].REFRESH = 0;
-    dev(pwm)->SEQ[0].ENDDELAY = 0;
+    _seq_buf_setup(pwm);
 
-    DEBUG("ptr: 0x%08x\n", (int)dev(pwm)->SEQ[0].PTR);
-    DEBUG("cnt: 0x%08x\n", (int)dev(pwm)->SEQ[0].CNT);
     DEBUG("refresh: 0x%08x\n", (int)dev(pwm)->SEQ[0].REFRESH);
     DEBUG("enddelay: 0x%08x\n", (int)dev(pwm)->SEQ[0].ENDDELAY);
 
     /* start sequence */
-    dev(pwm)->TASKS_SEQSTART[0] = 1;
+    _seq_start(pwm);
 
     DEBUG("PWM started\n");
 
@@ -159,7 +179,7 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
         pwm_seq[pwm][channel] = dev(pwm)->COUNTERTOP - value;
     }
 
-    dev(pwm)->TASKS_SEQSTART[0] = 1;
+    _seq_start(pwm);
 }
 
 void pwm_stop(pwm_t pwm)
@@ -173,7 +193,7 @@ void pwm_start(pwm_t pwm)
 {
     DEBUG("STARTING PWM %i\n", (int)pwm);
     dev(pwm)->ENABLE = 1;
-    dev(pwm)->TASKS_SEQSTART[0] = 1;
+    _seq_start(pwm);
 }
 
 void pwm_poweron(pwm_t pwm)

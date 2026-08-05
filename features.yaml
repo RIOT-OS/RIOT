@@ -266,6 +266,8 @@ groups:
           help: The MCU has an nordic nRF52 CPU
         - name: cpu_nrf53
           help: The MCU has an nordic nRF53 CPU
+        - name: cpu_nrf54l
+          help: The MCU has an nordic nRF54L CPU
         - name: cpu_nrf9160
           help: The MCU has an nordic nRF9160 CPU
 
