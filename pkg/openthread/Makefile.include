@@ -1,5 +1,6 @@
 OPENTHREAD_DIR = $(RIOTBASE)/pkg/openthread
 
+INCLUDES += -I$(PKGDIRBASE)/openthread/examples/platforms/utils
 INCLUDES += -I$(PKGDIRBASE)/openthread/include
 INCLUDES += -I$(OPENTHREAD_DIR)/include
 

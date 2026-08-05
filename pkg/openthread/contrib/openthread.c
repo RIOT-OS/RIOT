@@ -17,7 +17,6 @@
  */
 
 #include "openthread/platform/alarm-milli.h"
-#include "openthread/platform/uart.h"
 #include "ot.h"
 #include "random.h"
 #include "thread.h"
@@ -101,5 +100,6 @@ void openthread_bootstrap(void)
 #endif
 
     openthread_radio_init(netdev, tx_buf, rx_buf);
-    openthread_netdev_init(ot_thread_stack, sizeof(ot_thread_stack), THREAD_PRIORITY_MAIN - 5, "openthread", netdev);
+    openthread_netdev_init(ot_thread_stack, sizeof(ot_thread_stack), THREAD_PRIORITY_MAIN - 5,
+                           "openthread", netdev);
 }

@@ -24,7 +24,6 @@
 #include "openthread/instance.h"
 #include "openthread/ip6.h"
 #include "openthread/platform/alarm-milli.h"
-#include "openthread/platform/uart.h"
 #include "openthread/thread.h"
 #include "random.h"
 #include "ot.h"
@@ -39,7 +38,7 @@ static event_queue_t ev_queue;  /**< the event queue for OpenThread */
 
 static void _ev_isr_handler(event_t *event)
 {
-    (void) event;
+    (void)event;
     _dev->driver->isr(_dev);
 }
 
@@ -52,30 +51,31 @@ event_queue_t *openthread_get_evq(void)
     return &ev_queue;
 }
 
-otInstance* openthread_get_instance(void)
+otInstance * openthread_get_instance(void)
 {
     return sInstance;
 }
 
-static void _event_cb(netdev_t *dev, netdev_event_t event) {
+static void _event_cb(netdev_t *dev, netdev_event_t event)
+{
     switch (event) {
-        case NETDEV_EVENT_ISR:
-            event_post(&ev_queue, &ev_isr);
-            break;
-        case NETDEV_EVENT_RX_COMPLETE:
-            DEBUG("openthread_netdev: Reception of a packet\n");
-            recv_pkt(sInstance, dev);
-            break;
-        case NETDEV_EVENT_TX_COMPLETE:
+    case NETDEV_EVENT_ISR:
+        event_post(&ev_queue, &ev_isr);
+        break;
+    case NETDEV_EVENT_RX_COMPLETE:
+        DEBUG("openthread_netdev: Reception of a packet\n");
+        recv_pkt(sInstance, dev);
+        break;
+    case NETDEV_EVENT_TX_COMPLETE:
 #ifndef MODULE_NETDEV_NEW_API
-        case NETDEV_EVENT_TX_NOACK:
-        case NETDEV_EVENT_TX_MEDIUM_BUSY:
+    case NETDEV_EVENT_TX_NOACK:
+    case NETDEV_EVENT_TX_MEDIUM_BUSY:
 #endif
-            DEBUG("openthread_netdev: Transmission of a packet\n");
-            send_pkt(sInstance, dev, event);
-            break;
-        default:
-            break;
+        DEBUG("openthread_netdev: Transmission of a packet\n");
+        send_pkt(sInstance, dev, event);
+        break;
+    default:
+        break;
     }
 }
 
@@ -106,9 +106,6 @@ static void *_openthread_event_loop(void *arg)
     otIp6SetEnabled(sInstance, true);
     /* Start Thread protocol operation */
     otThreadSetEnabled(sInstance, true);
-#else
-    /* enable OpenThread UART */
-    otPlatUartEnable();
 #endif
 
 #if OPENTHREAD_ENABLE_DIAG
@@ -124,10 +121,11 @@ static void *_openthread_event_loop(void *arg)
 
 /* starts OpenThread thread */
 int openthread_netdev_init(char *stack, int stacksize, char priority,
-                           const char *name, netdev_t *netdev) {
+                           const char *name, netdev_t *netdev)
+{
     if (thread_create(stack, stacksize,
-                         priority, 0,
-                         _openthread_event_loop, netdev, name) < 0) {
+                      priority, 0,
+                      _openthread_event_loop, netdev, name) < 0) {
         return -EINVAL;
     }
 
