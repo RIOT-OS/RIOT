@@ -1,18 +1,19 @@
 APPLICATION = openthread
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= samr21-xpro
+BOARD ?= nrf52840dk
 
 # These are the boards that OpenThread stack has been tested on
+# Currently disabled boards are missing the Radio HAL port
 BOARDS_SUPPORTED := \
-                    samr21-xpro \
-                    iotlab-m3 \
-                    iotlab-a8-m3 \
-                    frdm-kw41z \
-                    openlabs-kw41z-mini-256kib \
-                    openlabs-kw41z-mini \
-                    phynode-kw41z \
-                    usb-kw41z \
+#                   samr21-xpro \
+#                   iotlab-m3 \
+#                   iotlab-a8-m3 \
+#                   frdm-kw41z \
+#                   openlabs-kw41z-mini-256kib \
+#                   openlabs-kw41z-mini \
+#                   phynode-kw41z \
+#                   usb-kw41z \
                     cc2538dk \
                     remote-reva \
                     remote-revb \
@@ -51,6 +52,7 @@ USEMODULE += openthread-$(OPENTHREAD_TYPE)
 # Comment the following line in order to disable the OpenThread CLI
 USEMODULE += openthread-cli-$(OPENTHREAD_TYPE)
 
+# Only necessary for pulling the radio driver, no netdev code is actually added
 USEMODULE += netdev_default
 
 #Define PANID, CHANNEL and NETWORK_KEY used by default
@@ -70,19 +72,6 @@ CFLAGS += -DOPENTHREAD_NETWORK_KEY=$(OPENTHREAD_NETWORK_KEY)
 # CFLAGS += -DOPENTHREAD_NETWORK_NAME=$(OPENTHREAD_NETWORK_NAME)
 # CFLAGS += -DOPENTHREAD_MESH_PREFIX=$(OPENTHREAD_MESH_PREFIX)
 # CFLAGS += -DOPENTHREAD_EXT_PANID=$(OPENTHREAD_EXT_PANID)
-
-
-ifneq (,$(filter samr21-xpro,$(BOARD)))
-  DRIVER := at86rf233
-endif
-ifneq (,$(filter iotlab-m3 fox iotlab-a8-m3,$(BOARD)))
-  DRIVER := at86rf231
-endif
-ifneq (,$(filter frdm-kw41z openlabs-kw41z-mini-256kib openlabs-kw41z-mini phynode-kw41z usb-kw41z,$(BOARD)))
-  DRIVER := kw41zrf
-endif
-
-USEMODULE += $(DRIVER)
 
 USEMODULE += random
 USEMODULE += ps

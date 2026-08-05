@@ -23,6 +23,30 @@ extern "C" {
 #endif
 
 /**
+ * @def OPENTHREAD_CONFIG_MAC_SOFTWARE_ACK_TIMEOUT_ENABLE
+ *
+ * Enables software ack time out in OpenThread MAC layer
+ * Only enable if board doesn't support hardware acks
+ */
+#define OPENTHREAD_CONFIG_MAC_SOFTWARE_ACK_TIMEOUT_ENABLE 1
+
+/**
+ * @def OPENTHREAD_CONFIG_MAC_SOFTWARE_CSMA_BACKOFF_ENABLE
+ *
+ * Enable software csma in OpenThread MAC layer
+ * Only enable if board doesn't support hardware csma
+ */
+#define OPENTHREAD_CONFIG_MAC_SOFTWARE_CSMA_BACKOFF_ENABLE 1
+
+/**
+ * @def OPENTHREAD_CONFIG_MAC_SOFTWARE_RETRANSMIT_ENABLE
+ *
+ * Enable software retransmission logic in Openthread MAC layer
+ * Only enable if board doesnt support hardware retransmissions
+ */
+#define OPENTHREAD_CONFIG_MAC_SOFTWARE_RETRANSMIT_ENABLE 1
+
+/**
  * @def OPENTHREAD_CONFIG_PLATFORM_FLASH_API_ENABLE
  *
  * If set to 1 Flash API is used else Settings API
@@ -32,7 +56,6 @@ extern "C" {
  * @see https://openthread.io/guides/porting/implement-platform-abstraction-layer-apis
  */
 #define OPENTHREAD_CONFIG_PLATFORM_FLASH_API_ENABLE 0
-
 
 /**
  * @def OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE

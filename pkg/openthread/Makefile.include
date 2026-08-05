@@ -6,7 +6,6 @@ INCLUDES += -I$(OPENTHREAD_DIR)/include
 
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
   DIRS += $(OPENTHREAD_DIR)/contrib
-  DIRS += $(OPENTHREAD_DIR)/contrib/netdev
 endif
 
 ifneq (,$(filter cortex-m0% cortex-m3%,$(CPU_CORE)))

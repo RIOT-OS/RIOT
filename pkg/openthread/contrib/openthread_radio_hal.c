@@ -10,10 +10,11 @@
  * @{
  * @ingroup     net
  * @file
- * @brief       Netdev adoption for OpenThread
+ * @brief       Radio HAL adoption for OpenThread
  *
  * @author      Jose Ignacio Alamos <jialamos@uc.cl>
  * @author      Baptiste Clenet <bapclenet@gmail.com>
+ * @author      Moritz Voigt <moritz.voigt@mailbox.tu-dresden.de>
  * @}
  */
 
@@ -35,8 +36,9 @@
 #include "debug.h"
 
 static otInstance *sInstance;   /**< global OpenThread instance */
-static netdev_t *_dev;          /**< netdev descriptor for OpenThread */
+static ieee802154_dev_t *_dev;  /**< radio hal descriptor for OpenThread */
 static event_queue_t ev_queue;  /**< the event queue for OpenThread */
+static uint8_t *_tx_is_ack;
 
 static int bytes_from_str(uint8_t *buf, int buf_len, const char *src)
 {
@@ -61,14 +63,24 @@ static int bytes_from_str(uint8_t *buf, int buf_len, const char *src)
     return 0;
 }
 
-static void _ev_isr_handler(event_t *event)
+static void _ev_recv_handler(event_t *event)
 {
     (void)event;
-    _dev->driver->isr(_dev);
+    recv_pkt(sInstance);
 }
 
-static event_t ev_isr = {
-    .handler = _ev_isr_handler
+static event_t ev_recv = {
+    .handler = _ev_recv_handler
+};
+
+static void _ev_process_tx_done_handler(event_t *event)
+{
+    (void)event;
+    process_tx_done(sInstance);
+}
+
+static event_t _ev_process_tx_done = {
+    .handler = _ev_process_tx_done_handler
 };
 
 event_queue_t *openthread_get_evq(void)
@@ -76,28 +88,29 @@ event_queue_t *openthread_get_evq(void)
     return &ev_queue;
 }
 
-otInstance * openthread_get_instance(void)
+otInstance *openthread_get_instance(void)
 {
     return sInstance;
 }
 
-static void _event_cb(netdev_t *dev, netdev_event_t event)
+static void _hal_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t status)
 {
-    switch (event) {
-    case NETDEV_EVENT_ISR:
-        event_post(&ev_queue, &ev_isr);
+    switch (status) {
+    case IEEE802154_RADIO_CONFIRM_TX_DONE:
+        if (*_tx_is_ack == 1) {
+            ieee802154_radio_confirm_transmit(dev, NULL);
+            *_tx_is_ack = 0;
+            break;
+        }
+        event_post(&ev_queue, &_ev_process_tx_done);
         break;
-    case NETDEV_EVENT_RX_COMPLETE:
-        DEBUG("openthread_netdev: Reception of a packet\n");
-        recv_pkt(sInstance, dev);
+    case IEEE802154_RADIO_INDICATION_CRC_ERROR:
+        /* Just drop the packet */
+        while (ieee802154_radio_set_idle(dev, false) < 0) {}
+        ieee802154_radio_read(dev, NULL, 0, NULL);
         break;
-    case NETDEV_EVENT_TX_COMPLETE:
-#ifndef MODULE_NETDEV_NEW_API
-    case NETDEV_EVENT_TX_NOACK:
-    case NETDEV_EVENT_TX_MEDIUM_BUSY:
-#endif
-        DEBUG("openthread_netdev: Transmission of a packet\n");
-        send_pkt(sInstance, dev, event);
+    case IEEE802154_RADIO_INDICATION_RX_DONE:
+        event_post(&ev_queue, &ev_recv);
         break;
     default:
         break;
@@ -144,17 +157,11 @@ static void *_openthread_event_loop(void *arg)
     otError error;
 
     _dev = arg;
-    netdev_t *netdev = arg;
+    _dev->cb = _hal_radio_cb;
 
     event_queue_init(&ev_queue);
 
-    netdev->event_callback = _event_cb;
-    netdev->driver->init(netdev);
-
-    netopt_enable_t enable = NETOPT_ENABLE;
-    netdev->driver->set(netdev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
-
-    /* init OpenThread */
+    /* Init OpenThread Instance */
     sInstance = otInstanceInitSingle();
 
 #if defined(MODULE_OPENTHREAD_CLI_FTD) || defined(MODULE_OPENTHREAD_CLI_MTD)
@@ -168,8 +175,7 @@ static void *_openthread_event_loop(void *arg)
     _openthread_manual_config(sInstance);
 
     /* Start Thread protocol operation */
-    otThreadSetEnabled(sInstance, true);
-
+    error = otThreadSetEnabled(sInstance, true);
     if (error != OT_ERROR_NONE) {
         printf("pkg/openthread: Error in initialization\n");
     }
@@ -186,12 +192,13 @@ static void *_openthread_event_loop(void *arg)
 }
 
 /* starts OpenThread thread */
-int openthread_netdev_init(char *stack, int stacksize, char priority,
-                           const char *name, netdev_t *netdev)
+int openthread_hal_init(char *stack, int stacksize, char priority,
+                        const char *name, ieee802154_dev_t *dev, uint8_t *tx_is_ack)
 {
+    _tx_is_ack = tx_is_ack;
     if (thread_create(stack, stacksize,
                       priority, 0,
-                      _openthread_event_loop, netdev, name) < 0) {
+                      _openthread_event_loop, dev, name) < 0) {
         return -EINVAL;
     }
 
