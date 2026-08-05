@@ -1031,7 +1031,7 @@ ifeq (, $(filter clean distclean generate-Makefile.ci help, $(MAKECMDGOALS)))
   # If there is a list of unsupported boards, then test if the board is unsupported.
   ifneq (,$(filter $(BOARDS_UNSUPPORTED),$(BOARD)))
     $(call echoerr,("The selected BOARD=$(BOARD) is listed in BOARDS_UNSUPPORTED."))
-    $(call echoinfo,("BOARDS_UNSUPPORTED = $(BOARDS_UNSUPPORTED)"))
+    $(call echoinfo,("BOARDS_UNSUPPORTED = \"$(strip $(BOARDS_UNSUPPORTED))\""))
     EXPECT_ERRORS := 1
   endif
 
