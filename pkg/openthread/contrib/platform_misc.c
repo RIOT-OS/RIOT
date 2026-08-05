@@ -26,7 +26,7 @@
 
 static void _ev_tasklets_handler(event_t *event)
 {
-    (void) event;
+    (void)event;
     otInstance *instance = openthread_get_instance();
     while (otTaskletsArePending(instance)) {
         otTaskletsProcess(instance);
@@ -38,8 +38,9 @@ static event_t ev_tasklet = {
 };
 
 /* OpenThread will call this when switching state from empty tasklet to non-empty tasklet. */
-void otTaskletsSignalPending(otInstance *aInstance) {
-    (void) aInstance;
+void otTaskletsSignalPending(otInstance *aInstance)
+{
+    (void)aInstance;
     event_post(openthread_get_evq(), &ev_tasklet);
 }
 
@@ -50,14 +51,49 @@ void otPlatReset(otInstance *aInstance)
     pm_reboot();
 }
 
+otError otPlatResetToBootloader(otInstance *aInstance)
+{
+    DEBUG("openthread: otPlatResetToBootloader is not implemented");
+    (void)aInstance;
+    return OT_ERROR_NOT_CAPABLE;
+}
+
 otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
 {
+    DEBUG("openthread: otPlatGetResetReason is not implemented");
     (void)aInstance;
-    /* TODO: Write me! */
-    return OT_PLAT_RESET_REASON_POWER_ON;
+    return OT_PLAT_RESET_REASON_UNKNOWN;
+}
+
+void otPlatAssertFail(const char *aFilename, int aLineNumber)
+{
+    DEBUG("openthread: otPlatAssertFail is not implemented");
+    (void)aFilename;
+    (void)aLineNumber;
 }
 
 void otPlatWakeHost(void)
 {
-    /* TODO: implement an operation to wake the host from sleep state. */
+    DEBUG("openthread: otPlatWakeHost is not implemented");
+}
+
+otError otPlatSetMcuPowerState(otInstance *aInstance, otPlatMcuPowerState aState)
+{
+    DEBUG("openthread: otPlatSetMcuPowerState is not implemented");
+    (void)aInstance;
+    (void)aState;
+    return OT_ERROR_FAILED;
+}
+
+otPlatMcuPowerState otPlatGetMcuPowerState(otInstance *aInstance)
+{
+    DEBUG("openthread: otPlatGetMcuPowerState is not implemented");
+    (void)aInstance;
+    return OT_PLAT_MCU_POWER_STATE_OFF;
+}
+
+otError otPlatLogCrashDump(void)
+{
+    DEBUG("openthread: otPlatLogCrashDump is not implemented");
+    return OT_ERROR_NOT_IMPLEMENTED;
 }
