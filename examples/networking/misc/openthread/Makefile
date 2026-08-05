@@ -87,6 +87,10 @@ USEMODULE += $(DRIVER)
 USEMODULE += random
 USEMODULE += ps
 
+# Stacksize should be increased in case 'ot debug' is used from the shell
+# Else Shell will prompt > > > infinitly
+CFLAGS += -DTHREAD_STACKSIZE_MAIN=2048
+
 #required for C++ compiling
 CXXEXFLAGS += -fno-rtti
 USEMODULE += cpp11-compat
