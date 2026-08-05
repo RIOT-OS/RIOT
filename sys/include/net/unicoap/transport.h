@@ -203,7 +203,6 @@ typedef struct {
     };
 } unicoap_endpoint_t;
 
-#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
 /**
  * @brief Retrieves UDP endpoint from CoAP endpoint
  * @pre @p endpoint is a CoAP over UDP endpoint (proto == @ref UNICOAP_PROTO_UDP)
@@ -216,7 +215,12 @@ typedef struct {
  */
 static inline sock_udp_ep_t* unicoap_endpoint_get_udp(unicoap_endpoint_t* endpoint)
 {
+    (void)endpoint;
+    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     return &endpoint->udp_ep;
+    #else
+    return NULL;
+    #endif
 }
 
 /**
@@ -231,10 +235,15 @@ static inline sock_udp_ep_t* unicoap_endpoint_get_udp(unicoap_endpoint_t* endpoi
  */
 static inline sock_udp_ep_t* unicoap_endpoint_get_dtls(unicoap_endpoint_t* endpoint)
 {
+    (void)endpoint;
+    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     return &endpoint->dtls_ep;
+    #else
+    return NULL;
+    #endif
 }
 
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 /**
  * @brief Private API. Retrieves transport layer endpoint from CoAP endpoint
  *
@@ -246,10 +255,198 @@ static inline sock_udp_ep_t* unicoap_endpoint_get_dtls(unicoap_endpoint_t* endpo
  */
 static inline struct _sock_tl_ep* _unicoap_endpoint_get_tl(unicoap_endpoint_t* endpoint)
 {
+    (void)endpoint;
+    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     return &endpoint->_tl_ep;
+    #else
+    return NULL;
+    #endif
 }
-#  endif /* !defined(DOXYGEN) */
-#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN) */
+#endif /* !defined(DOXYGEN) */
+
+/**
+ * @brief Retrieves IPv6 address from endpoint, if present and supported by endpoint type
+ * @param endpoint Endpoint
+ * @return IPv6 address if present and supported, `NULL` otherwise
+ */
+static inline ipv6_addr_t* unicoap_endpoint_get_ipv6_addr(unicoap_endpoint_t* endpoint) {
+    (void)endpoint;
+    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) && 
+        (_unicoap_endpoint_get_tl(endpoint)->family == AF_INET6 || 
+         _unicoap_endpoint_get_tl(endpoint)->family == AF_UNSPEC)) {
+        return (ipv6_addr_t*)_unicoap_endpoint_get_tl(endpoint)->addr.ipv6;
+    } else {
+        return NULL;
+    }
+    #else
+    return NULL;
+    #endif
+    /* Other drivers may also use IPv6 addresses but not sock_tl... */
+    /* MARK: unicoap_driver_extension_point */
+}
+
+/**
+ * @brief Retrieves IPv4 address from endpoint, if present and supported by endpoint type
+ * @param endpoint Endpoint
+ * @return IPv4 address if present and supported, `NULL` otherwise
+ */
+static inline ipv4_addr_t* unicoap_endpoint_get_ipv4_addr(unicoap_endpoint_t* endpoint) {
+    (void)endpoint;
+    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) && 
+        (_unicoap_endpoint_get_tl(endpoint)->family == AF_INET || 
+         _unicoap_endpoint_get_tl(endpoint)->family == AF_UNSPEC)) {
+        return (ipv4_addr_t*)_unicoap_endpoint_get_tl(endpoint)->addr.ipv4;
+    } else {
+        return NULL;
+    }
+    #else
+    return NULL;
+    #endif
+    /* Other drivers may also use IPv4 addresses but not sock_tl... */
+    /* MARK: unicoap_driver_extension_point */
+}
+
+/**
+ * @brief Retrieves address family from endpoint, if present and supported by endpoint type
+ * @param endpoint Endpoint
+ * @return Application address reference if present and supported, `NULL` otherwise
+ */
+static inline int* unicoap_endpoint_get_address_family(unicoap_endpoint_t* endpoint) {
+    (void)endpoint;
+    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
+        return &_unicoap_endpoint_get_tl(endpoint)->family;
+    } else {
+        return NULL;
+    }
+    #else
+    return NULL;
+    #endif
+    /* Other drivers may also use 16-bit ports but not sock_tl... */
+    /* MARK: unicoap_driver_extension_point */
+}
+
+/**
+ * @brief Retrieves port from endpoint, if present and supported by endpoint type
+ * @param endpoint Endpoint
+ * @return Port reference if present and supported, `NULL` otherwise
+ */
+static inline uint16_t* unicoap_endpoint_get_port(unicoap_endpoint_t* endpoint) {
+    (void)endpoint;
+    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
+        return &_unicoap_endpoint_get_tl(endpoint)->port;
+    } else {
+        return NULL;
+    }
+    #else
+    return NULL;
+    #endif
+    /* Other drivers may also use 16-bit ports but not sock_tl... */
+    /* MARK: unicoap_driver_extension_point */
+}
+
+/**
+ * @brief Retrieves network interface ID from endpoint, if present and supported by endpoint type
+ * @param endpoint Endpoint
+ * @return Network interface ID reference if present and supported, `NULL` otherwise
+ */
+static inline uint16_t* unicoap_endpoint_get_netif_id(unicoap_endpoint_t* endpoint) {
+    (void)endpoint;
+    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
+        return &_unicoap_endpoint_get_tl(endpoint)->netif;
+    } else {
+        return NULL;
+    }
+    #else
+    return NULL;
+    #endif
+    /* Other drivers may also use 16-bit ports but not sock_tl... */
+    /* MARK: unicoap_driver_extension_point */
+}
+/** @} */
+
+/* MARK: - Request destinations */
+/**
+ * @name Request destinations
+ * @{
+ */
+
+/**
+ * @brief Resource identifier type
+ */
+typedef enum {
+    /** @brief Endpoint */
+    UNICOAP_DESTINATION_ENDPOINT = 0,
+
+    /** @brief Hostname */
+    UNICOAP_DESTINATION_HOST = 1,
+
+    /** @brief URI (Uniform Resource Identifier) */
+    UNICOAP_DESTINATION_URI = 2,
+} __attribute__((__packed__)) unicoap_destination_type_t;
+
+/**
+ * @brief A type abstracting over CoAP resource identifiers
+ */
+typedef struct {
+    /** @brief Representation data */
+    union {
+        /** @brief Endpoint itself, if identified by @ref UNICOAP_DESTINATION_ENDPOINT  */
+        unicoap_endpoint_t* endpoint;
+
+        /** @brief URI string, if identified by @ref UNICOAP_DESTINATION_URI  */
+        const char* uri;
+
+        /** @brief Hostname, if identified by @ref UNICOAP_DESTINATION_HOST */
+        const char* host;
+    } remote;
+
+    /** @brief The type of this identifier */
+    unicoap_destination_type_t type : 3;
+} unicoap_destination_t;
+
+/**
+ * @brief Creates destination identifier from endpoint
+ *
+ * @param endpoint Endpoint to create destination from
+ *
+ * @returns New resource identifier from endpoint
+ */
+static inline unicoap_destination_t unicoap_destination_endpoint(unicoap_endpoint_t* endpoint)
+{
+    return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_ENDPOINT,
+                                    .remote.endpoint = endpoint };
+}
+
+/**
+ * @brief Creates destination identifier from hostname
+ *
+ * @param host Null-terminated host to create destination from
+ *
+ * @returns New resource identifier from endpoint
+ */
+static inline unicoap_destination_t unicoap_destination_host_string(const char* host)
+{
+    return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_HOST,
+                                    .remote.host = host };
+}
+
+/**
+ * @brief Creates destination identifier from URI string
+ *
+ * @param uri Null-terminated Uniform Resource Identifier
+ *
+ * @returns New resource identifier from URI
+ */
+static inline unicoap_destination_t unicoap_destination_uri_string(const char* uri)
+{
+    return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_URI,
+                                    .remote.uri = uri };
+}
 /** @} */
 
 /* MARK: - Conversions and Tools */
@@ -258,7 +455,41 @@ static inline struct _sock_tl_ep* _unicoap_endpoint_get_tl(unicoap_endpoint_t* e
  * @{
  */
 
-/* TODO: Client: URI */
+/**
+ * @brief Converts a given scheme string like `coap+tcp` to the corresponding protocol identifier.
+ *
+ * @param[in] scheme    Scheme string
+ * @param scheme_length Length of scheme string
+ * @param[in] host      Optional Host string
+ * @param[in] length    Scheme string length, must be zero if @p host is `NULL` or empty (i.e., points to 0x00)
+ *
+ * @return `0` for valid schemes
+ * @return `-1` if the scheme is invalid or unknown
+ */
+int unicoap_proto_from_scheme_and_host(const char* scheme, size_t scheme_length, const char* host, size_t length);
+
+/**
+ * @brief Converts a given null-terminated scheme string like `coap+tcp` to the corresponding protocol identifier.
+ *
+ * @param[in] scheme    Null-terminated scheme string
+ * @param[in] host      Null-terminated host string
+ *
+ * @return `0` for valid schemes
+ * @return `-1` if the scheme is invalid or unknown
+ */
+static inline int unicoap_transport_proto_from_scheme_and_host_string(const char* scheme, const char* host)
+{
+    return unicoap_proto_from_scheme_and_host(scheme, strlen(scheme), host, strlen(host));
+}
+
+/**
+ * @brief Returns scheme from protocol number
+ *
+ * @param proto Protocol number
+ * @returns Null-terminated transport scheme string
+ * @returns `NULL` if protocol number is unknown
+ */
+const char* unicoap_scheme_from_proto(unicoap_proto_t proto);
 
 /**
  * @brief Returns scheme from protocol number
@@ -481,6 +712,30 @@ typedef struct {
 } unicoap_aux_t;
 /** @} */
 
+/** @} */
+
+/**
+ * @addtogroup net_unicoap_client_uri
+ * @{
+ */
+/* MARK: - Manually parsing a CoAP URI */
+/**
+ * @name Manually parsing a CoAP URI
+ * @{
+ */
+/**
+ * @brief Populates endpoint and CoAP options with URI parser result
+ *
+ * @param[in,out] parsed Parser result (port will be set based on scheme, if unspecified)
+ * @param[in,out] endpoint Pre-allocated endpoint
+ * @param[in,out] options Pre-initialized options (nullable). If `NULL`, no options will be extracted from URI
+ *
+ * @returns `0` on success
+ * @return `-1` or negative errno on error
+ */
+int unicoap_uri_populate(uri_parser_result_t* parsed, unicoap_endpoint_t* endpoint,
+                         unicoap_options_t* options);
+/** @} */
 /** @} */
 
 #ifdef __cplusplus

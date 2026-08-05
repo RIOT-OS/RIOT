@@ -7,6 +7,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <alloca.h>
 
 #include "mutex.h"
 #include "bitfield.h"
@@ -66,6 +67,8 @@ extern "C" {
 #  define _STATE_DEBUG(...)                     _UNICOAP_PREFIX_DEBUG(".state", __VA_ARGS__)
 #  define _TRANSPORT_DEBUG(...)                 _UNICOAP_PREFIX_DEBUG(".transport", __VA_ARGS__)
 #  define _SERVER_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".server", __VA_ARGS__)
+#  define _CLIENT_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".client", __VA_ARGS__)
+#  define _URI_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".uri", __VA_ARGS__)
 #  define API_WARNING(message)                 "WARNING: " message "\n"
 #  define API_ERROR(message)                   "ERROR: " message "\n"
 #  define API_MISUSE(message)                  "API MISUSE: " message "\n"
@@ -126,6 +129,9 @@ void unicoap_state_lock(void);
 
 /** @brief Unlocks internal state lock */
 void unicoap_state_unlock(void);
+
+/** @brief PID of `unicoap` thread */
+extern kernel_pid_t _unicoap_pid;
 /** @} */
 
 /* MARK: - State and initialization */
@@ -145,6 +151,11 @@ typedef struct {
 #if IS_USED(MODULE_UNICOAP_SERVER) || defined(DOXYGEN)
     /** @brief Groups of resources */
     unicoap_listener_t* listeners;
+#endif
+
+#if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
+    /** @ref unicoap_memo_t */
+    unicoap_client_memo_t client_memos[CONFIG_UNICOAP_CLIENT_MEMOS_MAX];
 #endif
 
     /* TODO: Client and advanced server features: Exchange-layer state objects */
@@ -244,6 +255,37 @@ int unicoap_resource_handle_well_known_core(unicoap_message_t* message, const un
                                             unicoap_request_context_t* ctx, void* arg);
 /** @} */
 
+/* MARK: - Private message and option helpers */
+/**
+ * @name Private message and option helpers
+ * @{
+ */
+#ifndef DOXYGEN
+#  define _UNICOAP_OPTIONS_ALLOCA(_buf, _name, capacity, _static)    \
+    uint8_t* _buf = alloca(capacity);                                     \
+    unicoap_options_t* _name = alloca(sizeof(unicoap_options_t));         \
+    memset(_name, 0, sizeof(unicoap_options_t));                          \
+    (_name)->entries->data = _buf;                                        \
+    (_name)->storage_capacity = capacity;
+#endif
+
+/**
+ * @brief Dynamically allocates options with buffer capacity on stack at runtime
+ *
+ * @param name Name of the variable storing the options structure
+ * @param capacity Storage buffer capacity in bytes
+ *
+ * Allocates a new @ref unicoap_options_t container and a storage buffer with
+ * the given capacity, and initializes it. No need to call
+ * @ref unicoap_options_t::unicoap_options_init afterwards.
+ *
+ * See @ref UNICOAP_OPTIONS_ALLOC for stack allocation at compile-time
+ * See @ref UNICOAP_OPTIONS_ALLOC_STATIC for static allocation
+ */
+#define UNICOAP_OPTIONS_ALLOCA(name, capacity) \
+    _UNICOAP_OPTIONS_ALLOCA(_CONCAT3(name, _storage, __LINE__), name, capacity,)
+/** @} */
+
 /* MARK: - Other Utils */
 /**
  * @name Other Utils
@@ -301,7 +343,6 @@ static inline bool unicoap_transport_truncate_received(size_t* chunk_size, size_
     }
     return false;
 }
-/** @} */
 
 #ifndef DOXYGEN
 static inline void __debug_hex(const uint8_t* buffer, size_t size)

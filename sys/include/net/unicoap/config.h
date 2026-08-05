@@ -153,6 +153,16 @@
 #endif
 
 /**
+ * @brief Maximum length of host part in client URIs, used for DNS resolution
+ *
+ * **Default**: 32 bytes
+ */
+#if !defined(CONFIG_UNICOAP_URI_HOST_PART_LENGTH_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_URI_HOST_PART_LENGTH_MAX (32)
+#endif
+
+
+/**
  * @brief Size of buffer unicoap allocates for a CoAP message header,
  * including token length.
  */
@@ -212,6 +222,17 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
 #if !defined(CONFIG_UNICOAP_WELL_KNOWN_CORE_SIZE_MAX) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_WELL_KNOWN_CORE_SIZE_MAX (120)
 #endif
+
+/**
+ * @brief Maximum number of pending requests that can be started using the client API
+ *
+ ***Default**: 2
+ *
+ */
+#if !defined(CONFIG_UNICOAP_CLIENT_MEMOS_MAX) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_CLIENT_MEMOS_MAX (2)
+#endif
+
 /** @} */
 
 /* MARK: - Timing */
@@ -232,6 +253,16 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
  * @brief `DEFAULT_LEISURE` constant for multicast delay calculation
  */
 #define UNICOAP_DEFAULT_LEISURE (5)
+
+/**
+ * @brief Default time to wait for a response
+ *
+ * **Unit**: milliseconds
+ * **Default**: 10000
+ */
+#if !defined(CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS (7000)
+#endif
 /** @} */
 
 /* MARK: - Resource observation */

@@ -535,7 +535,7 @@ static inline ssize_t unicoap_options_${op(o)}_${suffix(o)}(
  */
 static inline ssize_t unicoap_options_${op(o)}_${suffix(o)}(
     unicoap_options_t* options,
-    ${type(o)} ${o.singular}${sizeParam(o)}
+    const ${type(o)} ${o.singular}${sizeParam(o)}
 ) {
     ${assertPre(o)}${_set(o)}
 }`
@@ -556,7 +556,7 @@ static inline ssize_t unicoap_options_${op(o)}_${suffix(o)}(
  */
 static inline ssize_t unicoap_options_${op(o)}_${suffix(o)}_string(
     unicoap_options_t* options,
-    ${type(o)} ${o.singular}
+    const ${type(o)} ${o.singular}
 ) {
     return unicoap_options_${op(o)}_${suffix(o)}(options, ${o.singular}, strlen(${o.singular}));
 }`
@@ -577,7 +577,7 @@ static inline ssize_t unicoap_options_${op(o)}_${suffix(o)}_string(
  */
 static inline ssize_t unicoap_options_add_${suffixPlural(o)}(
     unicoap_options_t* options,
-    ${type(o)} ${o.continuous}${sizeParam(o)}
+    const ${type(o)} ${o.continuous}${sizeParam(o)}
 ) {
     return unicoap_options_add_values_joined(options, ${constant(o)}, ${cast(o)}${o.continuous}, ${sizeParamName(o)}, '${o.separator}');
 }`
@@ -600,7 +600,7 @@ static inline ssize_t unicoap_options_add_${suffixPlural(o)}(
  */
 static inline ssize_t unicoap_options_add_${suffixPlural(o)}_string(
     unicoap_options_t* options,
-    ${type(o)} ${o.continuous}
+    const ${type(o)} ${o.continuous}
 ) {
     return unicoap_options_add_${suffixPlural(o)}(options, ${o.continuous}, strlen(${o.continuous}));
 }`
@@ -619,7 +619,7 @@ static inline ssize_t unicoap_options_add_${suffixPlural(o)}_string(
  */
 static inline ssize_t unicoap_options_${op(o)}_${suffix(o)}(
     unicoap_options_t* options,
-    ${type(o)} ${o.singular}${sizeParam(o)}
+    const ${type(o)} ${o.singular}${sizeParam(o)}
 ) {
     ${assertPre(o)}${_set(o)}
 }`

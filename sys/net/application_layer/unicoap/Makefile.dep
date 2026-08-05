@@ -27,6 +27,25 @@ ifneq (,$(filter unicoap,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_unicoap
 endif
 
+# This variable ensures the "Missing client" warning gets printed only once
+_UNICOAP_MISSING_CLIENT ?= 0
+
+# If someone imports URI submodule, we don't silently import client submodule, we complain!  
+ifneq (,$(filter unicoap_client_uri,$(USEMODULE)))
+  ifeq (,$(filter unicoap_client,$(USEMODULE)))
+    ifeq (0, $(_UNICOAP_MISSING_CLIENT))
+      $(warning URI support in client imported, but not client?)
+      $(info +++ FIXIT: Makefile: Add USEMODULE += unicoap_client to import client)
+      $(info +++ FIXIT: Makefile: Remove USEMODULE += unicoap_client_uri to remove URI module)
+    endif
+    _UNICOAP_MISSING_CLIENT = 1
+	endif
+endif
+
+ifneq (,$(filter unicoap_client_uri,$(USEMODULE)))
+  USEMODULE += uri_parser
+endif
+
 # This variable ensures the "Missing server" warning gets printed only once
 _UNICOAP_MISSING_SERVER ?= 0
 
