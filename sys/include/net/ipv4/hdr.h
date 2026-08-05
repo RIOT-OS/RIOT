@@ -17,6 +17,8 @@
  * @author  José Ignacio Alamos <jialamos@uc.cl>
  */
 
+#include <assert.h>
+
 #include "byteorder.h"
 #include "net/ipv4/addr.h"
 #ifdef __cplusplus
@@ -53,8 +55,13 @@ typedef struct __attribute__((packed)) {
     /**
      * @brief Version and Internet Header Length.
      *
-     * @details The version are the 4 most significant bits and the Internet Header Length
-     * the 4 next bit (see above).
+     * @details The version is encoded in the four most significant bits and
+     * the Internet Header Length in the four least significant bits (see
+     * above).
+     *
+     * @details The Internet Header Length is the length of the header in
+     * 32-bit words, so it must be multiplied by 4 to get the length in bytes.
+     * The minimum value is 5 (20 bytes) and the maximum is 15 (60 bytes).
      *
      * This module provides helper functions to set, get, and check these
      * fields accordingly:
@@ -63,7 +70,7 @@ typedef struct __attribute__((packed)) {
      * * ipv4_hdr_set_ihl()
      * * ipv4_hdr_get_ihl()
      */
-    uint8_t v_ih;
+    uint8_t v_ihl;
     uint8_t ts;             /**< type of service of packet*/
     network_uint16_t tl;    /**< total length of the datagram */
     network_uint16_t id;    /**< identification value of packet */
@@ -88,14 +95,14 @@ typedef struct __attribute__((packed)) {
 } ipv4_hdr_t;
 
 /**
- * @brief   Sets the version field of @p hdr to 6
+ * @brief   Sets the version field of @p hdr to 4
  *
  * @param[out] hdr  Pointer to an IPv4 header.
  */
 static inline void ipv4_hdr_set_version(ipv4_hdr_t *hdr)
 {
-    hdr->v_ih &= 0x0f;
-    hdr->v_ih |= 0x40;
+    hdr->v_ihl &= 0x0f;
+    hdr->v_ihl |= 0x40;
 }
 
 /**
@@ -107,7 +114,7 @@ static inline void ipv4_hdr_set_version(ipv4_hdr_t *hdr)
  */
 static inline uint8_t ipv4_hdr_get_version(ipv4_hdr_t *hdr)
 {
-    return ((hdr->v_ih) >> 4);
+    return ((hdr->v_ihl) >> 4);
 }
 
 /**
@@ -118,8 +125,11 @@ static inline uint8_t ipv4_hdr_get_version(ipv4_hdr_t *hdr)
  */
 static inline void ipv4_hdr_set_ihl(ipv4_hdr_t *hdr, uint16_t ihl)
 {
-    hdr->v_ih &= 0xf0;
-    hdr->v_ih |= 0x0f & (ihl >> 5);
+    assert(ihl >= 20 && ihl <= 60);
+    assert(ihl % 4 == 0);
+
+    hdr->v_ihl &= 0xf0;
+    hdr->v_ihl |= 0x0f & (ihl >> 2);
 }
 
 /**
@@ -131,7 +141,7 @@ static inline void ipv4_hdr_set_ihl(ipv4_hdr_t *hdr, uint16_t ihl)
  */
 static inline uint16_t ipv4_hdr_get_ihl(ipv4_hdr_t *hdr)
 {
-    return (hdr->v_ih & 0x0f) << 5;
+    return (hdr->v_ihl & 0x0f) << 2;
 }
 
 /**
