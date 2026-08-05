@@ -11,14 +11,16 @@
  * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
+#include <stddef.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <errno.h>
 #include <assert.h>
 
-#include "ztimer.h" /* needed for generating observe value */
 #include "byteorder.h"
 #include "compiler_hints.h"
+#include "modules.h"
+#include "ztimer.h" /* needed for generating observe value */
 
 #include "net/unicoap/message.h"
 #include "net/unicoap/options.h"
@@ -46,11 +48,11 @@
  * - `VALUE`: Value attached to option, succeeding `HEAD`.
  * - `delta nibble`: Either `delta` value, if lower than 13, or sentinel value 13 (`0xe`),
  *    or 14 (`0xd`). 15 (`0xf`)  is disallowed.
- * - `delta extended`: For `delta nibble` values greater or equal 13, `delta nibble - 13`.
+ * - `delta extended`: For `delta nibble` values greater or equal 13, `delta - 13`.
  *    For `delta` values greater or equal `14 + 0xff`, `delta - 14 - 0xff`
  * - `length nibble`: Either `length` value, if lower than 13, or sentinel value 13 (`0xe`),
  *    or 14 (`0xd`). 15 (`0xf`)  is disallowed.
- * - `length extended`: For `length nibble` values greater or equal 13, `length nibble - 13`.
+ * - `length extended`: For `length nibble` values greater or equal 13, `length - 13`.
  *    For `length` values greater or equal `14 + 0xff`, `length - 14 - 0xff`
  *
  * ```
@@ -340,10 +342,14 @@ static inline void _write_head_partial(uint8_t** cursor, uint16_t delta, uint8_t
 static inline
 void _move_options_in_storage_buffer(unicoap_options_t* options, uint8_t* dest, uint8_t* src)
 {
-    size_t remainder = options->storage_size - ((uintptr_t)src - (uintptr_t)options->entries->data);
-    assert(dest < options->entries->data + options->storage_capacity);
-    assert(src < (options->entries->data + options->storage_capacity));
-    assert((src + remainder) < (options->entries->data + options->storage_capacity));
+    uint8_t* start = unicoap_options_data(options);
+    uint8_t* end = start + options->storage_capacity;
+    (void)end; /* unused with NDEBUG */
+    assert(src >= start && src < end);
+    assert(dest >= start && dest < end);
+    size_t from_start = (uintptr_t)src - (uintptr_t)start;
+    size_t remainder = options->storage_size - from_start;
+    assert((src + remainder) < end);
     memmove(dest, src, remainder);
 }
 
@@ -427,7 +433,7 @@ static int _shift_options(unicoap_options_t* options, size_t i, ssize_t data_dif
     return 0;
 }
 
-static int _find_option_index(const unicoap_options_t* options, uint16_t number)
+static int _find_option_index(const unicoap_options_t* options, unicoap_option_number_t number)
 {
     size_t count = options->option_count;
     for (size_t i = 0; i < count; i += 1) {
@@ -602,8 +608,20 @@ int unicoap_options_add(unicoap_options_t* options, unicoap_option_number_t numb
     }
 
     size_t i = 0;
-    while ((i < count) && (opts[i].number <= number)) {
-        i += 1;
+    if (IS_ACTIVE(CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT)) {
+        while ((i < count) && (opts[i].number <= number)) {
+            i += 1;
+        }
+    }
+    else if (count == 0 || opts[count-1].number <= number) {
+        /* allowed in-order addition */
+        i = count;
+    }
+    else {
+        unicoap_assist(API_ERROR("Adding option out of order not supported.")
+                        FIXIT("Enable CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT")
+                        FIXIT("Reorder option additions to ascending CoAP option numbers"));
+        return -ENOTSUP;
     }
 
     unicoap_option_entry_t* e = &opts[i];
@@ -723,7 +741,7 @@ int unicoap_options_set(unicoap_options_t* options, unicoap_option_number_t numb
     if (option_index < 0) {
         return unicoap_options_add(options, number, value, value_size);
     }
-    else {
+    else if (IS_ACTIVE(CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT)) {
         unicoap_option_entry_t* e = &opts[option_index];
         uint16_t delta = (option_index > 0) ? (number - opts[option_index - 1].number) : number;
 
@@ -737,11 +755,24 @@ int unicoap_options_set(unicoap_options_t* options, unicoap_option_number_t numb
         uint8_t* dest = e->data;
         _write_option(&dest, delta, value, value_size);
     }
+    else {
+        unicoap_assist(API_ERROR("Changing existing option not supported.")
+                       FIXIT("Enable CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT")
+                       FIXIT("Only set options once."));
+        return -ENOTSUP;
+    }
     return 0;
 }
 
 int unicoap_options_remove_all(unicoap_options_t* options, unicoap_option_number_t number)
 {
+    if (!IS_ACTIVE(CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT)) {
+        unicoap_assist(API_ERROR("Removing options not supported.")
+                       FIXIT("Enable CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT")
+                       FIXIT("Do not remove options."));
+        return -ENOTSUP;
+    }
+
     _OPTIONS_DEBUG("attempting to remove %s (nr=%u)\n", unicoap_string_from_option_number(number),
                   number);
     int option_index = _find_option_index(options, number);
@@ -1000,7 +1031,7 @@ ssize_t unicoap_options_swap_storage(unicoap_options_t* options, uint8_t* destin
     if (options->storage_size == 0) {
         return 0;
     }
-    assert(options->entries->data);
+    assert(unicoap_options_data(options));
 
     if (options->storage_size > capacity) {
         _OPTIONS_DEBUG("no buffer space to copy options\n");
@@ -1008,7 +1039,7 @@ ssize_t unicoap_options_swap_storage(unicoap_options_t* options, uint8_t* destin
     }
 
     options->storage_capacity = capacity;
-    memcpy(destination, options->entries->data, options->storage_size);
+    memcpy(destination, unicoap_options_data(options), options->storage_size);
 
     size_t offset = 0;
     for (size_t i = 0; i < options->option_count; i += 1) {
