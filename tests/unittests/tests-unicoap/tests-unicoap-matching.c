@@ -34,7 +34,7 @@ static void _test_root_with_string(bool match_subtree) {
     };
 
     _TEST_ASSERT_TRUE(_MATCH_STRING(&r, "/"));
-    TEST_ASSERT_EQUAL_INT(_MATCH_STRING(&r, "/a"), match_subtree);
+    TEST_ASSERT_EQUAL_INT(match_subtree, _MATCH_STRING(&r, "/a"));
 }
 
 static void test_root_with_string(void) {
@@ -56,7 +56,7 @@ static void _test_root_with_options(bool match_subtree) {
     _TEST_ASSERT_TRUE(unicoap_resource_match_path_options(&r, &options));
 
     unicoap_options_add_uri_path_component_string(&options, "a");
-    TEST_ASSERT_EQUAL_INT(unicoap_resource_match_path_options(&r, &options), match_subtree);
+    TEST_ASSERT_EQUAL_INT(match_subtree, unicoap_resource_match_path_options(&r, &options));
 }
 
 static void test_root_with_options(void) {
@@ -78,7 +78,7 @@ static void _test_simple_with_string(bool match_subtree) {
     _TEST_ASSERT_TRUE(_MATCH_STRING(&r, "/a"));
     _TEST_ASSERT_TRUE(_MATCH_STRING(&r, "/a/"));
     _TEST_ASSERT_FALSE(_MATCH_STRING(&r, "/aa"));
-    TEST_ASSERT_EQUAL_INT(_MATCH_STRING(&r, "/a/a"), match_subtree);
+    TEST_ASSERT_EQUAL_INT(match_subtree, _MATCH_STRING(&r, "/a/a"));
 }
 
 static void test_simple_with_string(void) {
@@ -105,7 +105,7 @@ static void _test_simple_with_options(bool match_subtree) {
 
     unicoap_options_add_uri_path_component_string(&options, "a");
     unicoap_options_add_uri_path_component_string(&options, "a");
-    TEST_ASSERT_EQUAL_INT(unicoap_resource_match_path_options(&r, &options), match_subtree);
+    TEST_ASSERT_EQUAL_INT(match_subtree, unicoap_resource_match_path_options(&r, &options));
 }
 
 static void test_simple_with_options(void) {
@@ -126,7 +126,7 @@ static void _test_long_with_string(bool match_subtree) {
     char test_buffer[20] = {};
 
     ssize_t res = unicoap_path_stringify(&r.path, test_buffer, sizeof(test_buffer));
-    TEST_ASSERT_EQUAL_INT(res, static_strlen("/a123/a567"));
+    TEST_ASSERT_EQUAL_INT(static_strlen("/a123/a567"), res);
     printf("'%.*s'\n", (int)res, test_buffer);
 
     printf("'");
@@ -141,9 +141,9 @@ static void _test_long_with_string(bool match_subtree) {
     _TEST_ASSERT_FALSE(_MATCH_STRING(&r, "/a123/"));
     _TEST_ASSERT_TRUE(_MATCH_STRING(&r, "/a123/b567"));
     _TEST_ASSERT_TRUE(_MATCH_STRING(&r, "/a123/b567/"));
-    TEST_ASSERT_EQUAL_INT(_MATCH_STRING(&r, "/a123/b567/c89"), match_subtree);
-    TEST_ASSERT_EQUAL_INT(_MATCH_STRING(&r, "/a123/b567/c89/"), match_subtree);
-    TEST_ASSERT_EQUAL_INT(_MATCH_STRING(&r, "/a123/b567/c89/d00"), match_subtree);
+    TEST_ASSERT_EQUAL_INT(match_subtree, _MATCH_STRING(&r, "/a123/b567/c89"));
+    TEST_ASSERT_EQUAL_INT(match_subtree, _MATCH_STRING(&r, "/a123/b567/c89/"));
+    TEST_ASSERT_EQUAL_INT(match_subtree, _MATCH_STRING(&r, "/a123/b567/c89/d00"));
 }
 
 static void test_long_with_string(void) {
@@ -188,7 +188,7 @@ static void _test_long_with_options(bool match_subtree) {
     unicoap_options_add_uri_path_component_string(&options, "a123");
     unicoap_options_add_uri_path_component_string(&options, "b567");
     unicoap_options_add_uri_path_component_string(&options, "c89");
-    TEST_ASSERT_EQUAL_INT(unicoap_resource_match_path_options(&r, &options), match_subtree);
+    TEST_ASSERT_EQUAL_INT(match_subtree, unicoap_resource_match_path_options(&r, &options));
 
     unicoap_options_clear(&options);
 
@@ -196,7 +196,7 @@ static void _test_long_with_options(bool match_subtree) {
     unicoap_options_add_uri_path_component_string(&options, "b567");
     unicoap_options_add_uri_path_component_string(&options, "c89");
     unicoap_options_add_uri_path_component_string(&options, "d00");
-    TEST_ASSERT_EQUAL_INT(unicoap_resource_match_path_options(&r, &options), match_subtree);
+    TEST_ASSERT_EQUAL_INT(match_subtree, unicoap_resource_match_path_options(&r, &options));
 }
 
 static void test_long_with_options(void) {
@@ -218,12 +218,12 @@ static void test_path_object(void) {
 
     const unicoap_pathspec_t my_path1 = UNICOAP_PATH(str_foo);
     const char* my_path1_layout[] = { str_foo, NULL };
-    TEST_ASSERT_EQUAL_INT(memcmp(my_path1._components, my_path1_layout, sizeof(my_path1_layout)), 0);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(my_path1._components, my_path1_layout, sizeof(my_path1_layout)));
 
 
     const unicoap_pathspec_t my_path2 = UNICOAP_PATH(str_foo, str_bar, str_zoo);
     const char* my_path2_layout[] = { str_foo, str_bar, str_zoo, NULL };
-    TEST_ASSERT_EQUAL_INT(memcmp(my_path2._components, my_path2_layout, sizeof(my_path2_layout)), 0);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(my_path2._components, my_path2_layout, sizeof(my_path2_layout)));
 
     const unicoap_pathspec_t my_root = UNICOAP_PATH_ROOT;
     TEST_ASSERT_NULL(my_root._components);
@@ -242,13 +242,13 @@ static void test_path_object_is_root(void) {
 
 static void test_path_object_component_count(void) {
     const unicoap_pathspec_t my_path1 = UNICOAP_PATH("a");
-    TEST_ASSERT_EQUAL_INT(unicoap_path_component_count(&my_path1), 1);
+    TEST_ASSERT_EQUAL_INT(1, unicoap_path_component_count(&my_path1));
 
     const unicoap_pathspec_t my_root = UNICOAP_PATH_ROOT;
-    TEST_ASSERT_EQUAL_INT(unicoap_path_component_count(&my_root), 0);
+    TEST_ASSERT_EQUAL_INT(0, unicoap_path_component_count(&my_root));
 
     const unicoap_pathspec_t my_path2 = UNICOAP_PATH("foo", "bar", "zoo");
-    TEST_ASSERT_EQUAL_INT(unicoap_path_component_count(&my_path2), 3);
+    TEST_ASSERT_EQUAL_INT(3, unicoap_path_component_count(&my_path2));
 }
 
 static void test_path_object_root_is_equal(void) {

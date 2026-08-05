@@ -26,20 +26,20 @@
 #ifndef DOXYGEN
 #  define static_strlen(str) (sizeof(str) - 1)
 
-#  define _TEST_ASSERT_EQUAL_BYTES(a, b, size) \
-    TEST_ASSERT_EQUAL_INT(memcmp((uint8_t*)a, (uint8_t*)b, size), 0)
+#  define _TEST_ASSERT_EQUAL_BYTES(_exp, _act, size) \
+    TEST_ASSERT_EQUAL_INT(0, memcmp((uint8_t*)_exp, (uint8_t*)_act, size))
 
-#  define _TEST_ASSERT_EQUAL_BYTES_STRING(a, str) \
-    _TEST_ASSERT_EQUAL_BYTES(a, str, static_strlen(str))
+#  define _TEST_ASSERT_EQUAL_BYTES_STRING(_exp_str, _act) \
+    _TEST_ASSERT_EQUAL_BYTES(_act, _exp_str, static_strlen(_exp_str))
 
-#  define _TEST_ASSERT_EQUAL_POINTER(a, b) \
-    TEST_ASSERT_EQUAL_INT((uintptr_t)a, (uintptr_t)b)
+#  define _TEST_ASSERT_EQUAL_POINTER(_exp, _act) \
+    TEST_ASSERT_EQUAL_INT((uintptr_t)_exp, (uintptr_t)_act)
 
 #  define _TEST_ASSERT_TRUE(a) \
-    TEST_ASSERT_EQUAL_INT(a, true)
+    TEST_ASSERT_EQUAL_INT(true, a)
 
 #  define _TEST_ASSERT_FALSE(a) \
-    TEST_ASSERT_EQUAL_INT(a, false)
+    TEST_ASSERT_EQUAL_INT(false, a)
 
 #  define _BYTES(...) ((uint8_t[]){ __VA_ARGS__ })
 

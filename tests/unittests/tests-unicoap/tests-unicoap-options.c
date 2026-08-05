@@ -50,19 +50,19 @@ static void assert_options_data(const unicoap_options_t* options)
         0x11, 0x32, 0x37, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3d, 0x67, 0x21, 0x32
     };
 
-    TEST_ASSERT_EQUAL_INT(options->option_count, 5);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_size(options), sizeof(option_data));
+    TEST_ASSERT_EQUAL_INT(5, options->option_count);
+    TEST_ASSERT_EQUAL_INT(sizeof(option_data), unicoap_options_size(options));
     _TEST_ASSERT_EQUAL_BYTES(unicoap_options_data(options), option_data, sizeof(option_data));
 }
 
 static void test_in_order(void)
 {
     UNICOAP_OPTIONS_ALLOC_STATIC(options, 100);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_path_component_string(&options, "actuators"), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_path_component_string(&options, "leds"), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_set_content_format(&options, UNICOAP_FORMAT_JSON), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_query_string(&options, "color=g"), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON), 0);
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_add_uri_path_component_string(&options, "actuators"));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_add_uri_path_component_string(&options, "leds"));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_set_content_format(&options, UNICOAP_FORMAT_JSON));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_add_uri_query_string(&options, "color=g"));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON));
 
     assert_options_data(&options);
 }
@@ -72,19 +72,19 @@ static void test_out_of_order(void)
     UNICOAP_OPTIONS_ALLOC_STATIC(options, 100);
 
     if (!IS_ACTIVE(CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT)) {
-        TEST_ASSERT_EQUAL_INT(unicoap_options_set_content_format(&options, UNICOAP_FORMAT_JSON), 0);
-        TEST_ASSERT_EQUAL_INT(unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON), 0);
-        TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_path_component_string(&options, "actuators"), -ENOTSUP);
-        TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_query_string(&options, "color=g"), -ENOTSUP);
-        TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_path_component_string(&options, "leds"), -ENOTSUP);
+        TEST_ASSERT_EQUAL_INT(0, unicoap_options_set_content_format(&options, UNICOAP_FORMAT_JSON));
+        TEST_ASSERT_EQUAL_INT(0, unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON));
+        TEST_ASSERT_EQUAL_INT(-ENOTSUP, unicoap_options_add_uri_path_component_string(&options, "actuators"));
+        TEST_ASSERT_EQUAL_INT(-ENOTSUP, unicoap_options_add_uri_query_string(&options, "color=g"));
+        TEST_ASSERT_EQUAL_INT(-ENOTSUP, unicoap_options_add_uri_path_component_string(&options, "leds"));
         return;
     }
 
-    TEST_ASSERT_EQUAL_INT(unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_path_component_string(&options, "actuators"), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_query_string(&options, "color=g"), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_set_content_format(&options, UNICOAP_FORMAT_JSON), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_path_component_string(&options, "leds"), 0);
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_add_uri_path_component_string(&options, "actuators"));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_add_uri_query_string(&options, "color=g"));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_set_content_format(&options, UNICOAP_FORMAT_JSON));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_add_uri_path_component_string(&options, "leds"));
 
     assert_options_data(&options);
 }
@@ -94,35 +94,35 @@ static void test_idempotent(void)
     UNICOAP_OPTIONS_ALLOC_STATIC(options, 100);
 
     if (!IS_ACTIVE(CONFIG_UNICOAP_OPTIONS_FULL_SUPPORT)) {
-        TEST_ASSERT_EQUAL_INT(unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON), 0);
-        TEST_ASSERT_EQUAL_INT(unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON), -ENOTSUP);
+        TEST_ASSERT_EQUAL_INT(0, unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON));
+        TEST_ASSERT_EQUAL_INT(-ENOTSUP, unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON));
         return;
     }
 
-    TEST_ASSERT_EQUAL_INT(unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_path_component_string(&options, "actuators"), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_query_string(&options, "color=g"), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_set_content_format(&options, UNICOAP_FORMAT_JSON), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_set_content_format(&options, UNICOAP_FORMAT_TEXT), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_set_content_format(&options, UNICOAP_FORMAT_JSON), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_add_uri_path_component_string(&options, "leds"), 0);
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_set_accept(&options, UNICOAP_FORMAT_JSON));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_add_uri_path_component_string(&options, "actuators"));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_add_uri_query_string(&options, "color=g"));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_set_content_format(&options, UNICOAP_FORMAT_JSON));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_set_content_format(&options, UNICOAP_FORMAT_TEXT));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_set_content_format(&options, UNICOAP_FORMAT_JSON));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_add_uri_path_component_string(&options, "leds"));
 
     assert_options_data(&options);
 }
 
 static void _populate(unicoap_options_t* options)
 {
-    TEST_ASSERT_EQUAL_INT(unicoap_options_add(options, 50, (uint8_t*)poem, _UINT4_MAX + 1), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_add(options, 12, (uint8_t*)poem, _UINT4_MAX), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_add(options, 12, (uint8_t*)poem, _UINT4_MAX + 1), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_add(options, 13, (uint8_t*)poem, _UINT4_MAX + 1), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_set(options, 8, (uint8_t*)poem, _UINT12_MAX), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_add(options, 8, (uint8_t*)poem, _UINT12_MAX), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_set(options, 10, (uint8_t*)poem, 200), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_set(options, 2, (uint8_t*)poem, _UINT4_MAX + 1), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_set(options, 70, (uint8_t*)poem, 1), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_set(options, 1, (uint8_t*)poem, 1), 0);
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_add(options, 50, (uint8_t*)poem, _UINT4_MAX + 1));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_add(options, 12, (uint8_t*)poem, _UINT4_MAX));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_add(options, 12, (uint8_t*)poem, _UINT4_MAX + 1));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_add(options, 13, (uint8_t*)poem, _UINT4_MAX + 1));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_set(options, 8, (uint8_t*)poem, _UINT12_MAX));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_add(options, 8, (uint8_t*)poem, _UINT12_MAX));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_set(options, 10, (uint8_t*)poem, 200));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_set(options, 2, (uint8_t*)poem, _UINT4_MAX + 1));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_set(options, 70, (uint8_t*)poem, 1));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_set(options, 1, (uint8_t*)poem, 1));
 }
 
 static void test_extended_uint_shifts(void)
@@ -195,7 +195,7 @@ static void test_extended_uint_shifts(void)
     };
 
     TEST_ASSERT_EQUAL_INT(sizeof(options_blob), unicoap_options_size(&options));
-    _TEST_ASSERT_EQUAL_BYTES(options_blob, unicoap_options_data(&options), sizeof(options_blob));
+    _TEST_ASSERT_EQUAL_BYTES(unicoap_options_data(&options), options_blob, sizeof(options_blob));
 }
 
 static void test_remove_leading(void)
@@ -208,7 +208,7 @@ static void test_remove_leading(void)
     UNICOAP_OPTIONS_ALLOC_STATIC(options, 900);
     _populate(&options);
 
-    TEST_ASSERT_EQUAL_INT(unicoap_options_remove(&options, 1), 0);
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_remove(&options, 1));
 
     /* options blob, from nanoCoAP */
     static const uint8_t options_blob[] = {
@@ -270,7 +270,7 @@ static void test_remove_leading(void)
     };
 
     TEST_ASSERT_EQUAL_INT(sizeof(options_blob), unicoap_options_size(&options));
-    _TEST_ASSERT_EQUAL_BYTES(options_blob, unicoap_options_data(&options), sizeof(options_blob));
+    _TEST_ASSERT_EQUAL_BYTES(unicoap_options_data(&options), options_blob, sizeof(options_blob));
 }
 
 static void test_remove_trailing(void)
@@ -283,7 +283,7 @@ static void test_remove_trailing(void)
     UNICOAP_OPTIONS_ALLOC_STATIC(options, 900);
     _populate(&options);
 
-    TEST_ASSERT_EQUAL_INT(unicoap_options_remove(&options, 70), 0);
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_remove(&options, 70));
 
     /* options blob, from nanoCoAP */
     static const uint8_t options_blob[] = {
@@ -345,7 +345,7 @@ static void test_remove_trailing(void)
     };
 
     TEST_ASSERT_EQUAL_INT(sizeof(options_blob), unicoap_options_size(&options));
-    _TEST_ASSERT_EQUAL_BYTES(options_blob, unicoap_options_data(&options), sizeof(options_blob));
+    _TEST_ASSERT_EQUAL_BYTES(unicoap_options_data(&options), options_blob, sizeof(options_blob));
 }
 
 static void test_remove_multiple(void)
@@ -358,7 +358,7 @@ static void test_remove_multiple(void)
     UNICOAP_OPTIONS_ALLOC_STATIC(options, 900);
     _populate(&options);
 
-    TEST_ASSERT_EQUAL_INT(unicoap_options_remove(&options, 12), 0);
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_remove(&options, 12));
 
     /* options blob, from nanoCoAP */
     static const uint8_t options_blob[] = {
@@ -418,7 +418,7 @@ static void test_remove_multiple(void)
     };
 
     TEST_ASSERT_EQUAL_INT(sizeof(options_blob), unicoap_options_size(&options));
-    _TEST_ASSERT_EQUAL_BYTES(options_blob, unicoap_options_data(&options), sizeof(options_blob));
+    _TEST_ASSERT_EQUAL_BYTES(unicoap_options_data(&options), options_blob, sizeof(options_blob));
 }
 
 static void test_remove_multiple_trailing(void)
@@ -429,12 +429,12 @@ static void test_remove_multiple_trailing(void)
     }
 
     UNICOAP_OPTIONS_ALLOC_STATIC(options, 20);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_set(&options, 4, (uint8_t*)poem, 1), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_set(&options, 1, (uint8_t*)poem, 1), 0);
-    TEST_ASSERT_EQUAL_INT(unicoap_options_add(&options, 4, (uint8_t*)poem, 1), 0);
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_set(&options, 4, (uint8_t*)poem, 1));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_set(&options, 1, (uint8_t*)poem, 1));
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_add(&options, 4, (uint8_t*)poem, 1));
     TEST_ASSERT_EQUAL_INT(6, unicoap_options_size(&options));
 
-    TEST_ASSERT_EQUAL_INT(unicoap_options_remove_all(&options, 4), 0);
+    TEST_ASSERT_EQUAL_INT(0, unicoap_options_remove_all(&options, 4));
     TEST_ASSERT_EQUAL_INT(2, unicoap_options_size(&options));
 }
 
@@ -446,7 +446,7 @@ static void test_option_value_uses_shortest_possible_representation(void)
     UNICOAP_OPTIONS_ALLOC_STATIC(options, 10);
     TEST_ASSERT_EQUAL_INT(0, unicoap_options_add_uint(&options, OPTION_NUMBER, OPTION_VALUE));
     TEST_ASSERT_EQUAL_INT(sizeof(options_blob), unicoap_options_size(&options));
-    _TEST_ASSERT_EQUAL_BYTES(options_blob, unicoap_options_data(&options), sizeof(options_blob));
+    _TEST_ASSERT_EQUAL_BYTES(unicoap_options_data(&options), options_blob, sizeof(options_blob));
 
     uint8_t uint8_val = 42;
     TEST_ASSERT_EQUAL_INT(0, unicoap_options_get_uint8(&options, OPTION_NUMBER, &uint8_val));

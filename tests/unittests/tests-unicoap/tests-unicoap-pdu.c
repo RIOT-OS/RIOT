@@ -25,24 +25,24 @@
 
 #define _TEST_ASSERT_EQUAL_PARSED_RFC7252(parsed, code, payload, token, message_type, message_id) \
     _TEST_ASSERT_EQUAL_PARSED((parsed), (code), (payload), (token));                              \
-    TEST_ASSERT_EQUAL_INT((parsed)->properties.rfc7252.id, (message_id));                         \
-    TEST_ASSERT_EQUAL_INT((parsed)->properties.rfc7252.type, (message_type))
+    TEST_ASSERT_EQUAL_INT((message_id), (parsed)->properties.rfc7252.id);                         \
+    TEST_ASSERT_EQUAL_INT((message_type), (parsed)->properties.rfc7252.type)
 
 static void test_parsed_message(unicoap_parser_result_t* parsed, uint8_t code, size_t payload_size,
                                 const uint8_t* payload, uint8_t token_length, uint8_t* token)
 {
-    TEST_ASSERT_EQUAL_INT(parsed->message.code, code);
-    TEST_ASSERT_EQUAL_INT(parsed->message.payload_size, payload_size);
+    TEST_ASSERT_EQUAL_INT(code, parsed->message.code);
+    TEST_ASSERT_EQUAL_INT(payload_size, parsed->message.payload_size);
 
     if (payload_size > 0) {
         TEST_ASSERT_NOT_NULL(parsed->message.payload);
-        _TEST_ASSERT_EQUAL_BYTES(parsed->message.payload, payload, payload_size);
+        _TEST_ASSERT_EQUAL_BYTES(payload, parsed->message.payload, payload_size);
     }
 
-    TEST_ASSERT_EQUAL_INT(parsed->properties.token_length, token_length);
+    TEST_ASSERT_EQUAL_INT(token_length, parsed->properties.token_length);
     if (token_length > 0) {
         TEST_ASSERT_NOT_NULL(parsed->properties.token);
-        _TEST_ASSERT_EQUAL_BYTES(parsed->properties.token, token, token_length);
+        _TEST_ASSERT_EQUAL_BYTES(token, parsed->properties.token, token_length);
     }
 
     TEST_ASSERT_NOT_NULL(parsed->message.options);
@@ -76,7 +76,7 @@ static void test_pdu_rfc7252_actuators_round_trip(void)
     };
 
     unicoap_parser_result_t parsed = { 0 };
-    TEST_ASSERT_EQUAL_INT(unicoap_pdu_parse_rfc7252_result(pdu, sizeof(pdu), &parsed), 0);
+    TEST_ASSERT_EQUAL_INT(0, unicoap_pdu_parse_rfc7252_result(pdu, sizeof(pdu), &parsed));
 
     _TEST_ASSERT_EQUAL_PARSED_RFC7252(&parsed,
                                       UNICOAP_METHOD_POST,
@@ -86,50 +86,50 @@ static void test_pdu_rfc7252_actuators_round_trip(void)
                                       _BYTES(),
                                       UNICOAP_TYPE_CON, 65201);
 
-    TEST_ASSERT_EQUAL_INT(parsed.options.option_count, 5);
+    TEST_ASSERT_EQUAL_INT(5, parsed.options.option_count);
 
     unicoap_content_format_t format = 0;
     unicoap_options_get_content_format(&parsed.options, &format);
-    TEST_ASSERT_EQUAL_INT(format, UNICOAP_FORMAT_JSON);
+    TEST_ASSERT_EQUAL_INT(UNICOAP_FORMAT_JSON, format);
 
     format = 0;
     unicoap_options_get_accept(&parsed.options, &format);
-    TEST_ASSERT_EQUAL_INT(format, UNICOAP_FORMAT_JSON);
+    TEST_ASSERT_EQUAL_INT(UNICOAP_FORMAT_JSON, format);
 
     char path[30];
-    TEST_ASSERT_EQUAL_INT(unicoap_options_copy_uri_path(&parsed.options, path, sizeof(path)),
-                          static_strlen("/actuators/leds"));
-    _TEST_ASSERT_EQUAL_BYTES_STRING(path, "/actuators/leds");
+    TEST_ASSERT_EQUAL_INT(static_strlen("/actuators/leds"),
+                          unicoap_options_copy_uri_path(&parsed.options, path, sizeof(path)));
+    _TEST_ASSERT_EQUAL_BYTES_STRING("/actuators/leds", path);
 
     unicoap_options_iterator_t iterator = { 0 };
     const char* component = NULL;
     unicoap_options_iterator_init(&iterator, &parsed.options);
 
-    TEST_ASSERT_EQUAL_INT(unicoap_options_get_next_uri_path_component(&iterator, &component),
-                          static_strlen("actuators"));
-    _TEST_ASSERT_EQUAL_BYTES(component, "actuators", static_strlen("actuators"));
+    TEST_ASSERT_EQUAL_INT(static_strlen("actuators"),
+                          unicoap_options_get_next_uri_path_component(&iterator, &component));
+    _TEST_ASSERT_EQUAL_BYTES_STRING("actuators", component);
 
-    TEST_ASSERT_EQUAL_INT(unicoap_options_get_next_uri_path_component(&iterator, &component),
-                          static_strlen("leds"));
-    _TEST_ASSERT_EQUAL_BYTES(component, "leds", static_strlen("leds"));
+    TEST_ASSERT_EQUAL_INT(static_strlen("leds"),
+                          unicoap_options_get_next_uri_path_component(&iterator, &component));
+    _TEST_ASSERT_EQUAL_BYTES_STRING("leds", component);
 
     char queries[30];
-    TEST_ASSERT_EQUAL_INT(unicoap_options_copy_uri_queries(&parsed.options, queries,
-                                                           sizeof(queries)),
-                          static_strlen("color=g"));
-    _TEST_ASSERT_EQUAL_BYTES_STRING(queries, "color=g");
+    TEST_ASSERT_EQUAL_INT(static_strlen("color=g"),
+                          unicoap_options_copy_uri_queries(&parsed.options, queries,
+                                                           sizeof(queries)));
+    _TEST_ASSERT_EQUAL_BYTES_STRING("color=g", queries);
 
     unicoap_options_iterator_init(&iterator, &parsed.options);
 
-    TEST_ASSERT_EQUAL_INT(unicoap_options_get_next_uri_query(&iterator, &component),
-                          static_strlen("color=g"));
-    _TEST_ASSERT_EQUAL_BYTES(component, "color=g", static_strlen("color=g"));
-    TEST_ASSERT_EQUAL_INT(unicoap_options_get_next_uri_query(&iterator, &component), -1);
+    TEST_ASSERT_EQUAL_INT(static_strlen("color=g"),
+                          unicoap_options_get_next_uri_query(&iterator, &component));
+    _TEST_ASSERT_EQUAL_BYTES_STRING("color=g", component);
+    TEST_ASSERT_EQUAL_INT(-1, unicoap_options_get_next_uri_query(&iterator, &component));
 
     uint8_t pdu_copy[sizeof(pdu) + 100] = { 0 };
-    TEST_ASSERT_EQUAL_INT(unicoap_pdu_build_rfc7252(pdu_copy, sizeof(pdu_copy),
-                                                    &parsed.message, &parsed.properties),
-                          sizeof(pdu));
+    TEST_ASSERT_EQUAL_INT(sizeof(pdu),
+                          unicoap_pdu_build_rfc7252(pdu_copy, sizeof(pdu_copy),
+                                                    &parsed.message, &parsed.properties));
     _TEST_ASSERT_EQUAL_BYTES(pdu, pdu_copy, sizeof(pdu));
 
     /* Try to build a vector */
@@ -139,10 +139,10 @@ static void test_pdu_rfc7252_actuators_round_trip(void)
     iolist_t iolist[UNICOAP_PDU_IOLIST_COUNT];
     uint8_t header[UNICOAP_HEADER_SIZE_MAX];
 
-    TEST_ASSERT_EQUAL_INT(unicoap_pdu_buildv_rfc7252(header, sizeof(header), &parsed.message,
-                                                     &parsed.properties, iolist),
-                          0);
-    TEST_ASSERT_EQUAL_INT(iolist_to_buffer(iolist, pdu_copy, sizeof(pdu_copy)), sizeof(pdu));
+    TEST_ASSERT_EQUAL_INT(0,
+                          unicoap_pdu_buildv_rfc7252(header, sizeof(header), &parsed.message,
+                                                     &parsed.properties, iolist));
+    TEST_ASSERT_EQUAL_INT(sizeof(pdu), iolist_to_buffer(iolist, pdu_copy, sizeof(pdu_copy)));
     _TEST_ASSERT_EQUAL_BYTES(pdu, pdu_copy, sizeof(pdu));
 }
 
@@ -163,7 +163,7 @@ static void test_pdu_rfc7252_method_not_allowed_ack_round_trip(void)
     const uint8_t pdu[] = { 0x64, 0x85, 0x0c, 0x3c, 0xd1, 0x97, 0x96, 0xc1 };
 
     unicoap_parser_result_t parsed = { 0 };
-    TEST_ASSERT_EQUAL_INT(unicoap_pdu_parse_rfc7252_result((uint8_t*)pdu, sizeof(pdu), &parsed), 0);
+    TEST_ASSERT_EQUAL_INT(0, unicoap_pdu_parse_rfc7252_result((uint8_t*)pdu, sizeof(pdu), &parsed));
 
     _TEST_ASSERT_EQUAL_PARSED_RFC7252(&parsed,
                                       UNICOAP_STATUS_METHOD_NOT_ALLOWED,
@@ -172,14 +172,14 @@ static void test_pdu_rfc7252_method_not_allowed_ack_round_trip(void)
                                       UNICOAP_TYPE_ACK, 3132);
 
     char path[30];
-    TEST_ASSERT_EQUAL_INT(unicoap_options_copy_uri_path(&parsed.options, path, sizeof(path)),
-                          static_strlen("/"));
-    _TEST_ASSERT_EQUAL_BYTES_STRING(path, "/");
+    TEST_ASSERT_EQUAL_INT(static_strlen("/"),
+                          unicoap_options_copy_uri_path(&parsed.options, path, sizeof(path)));
+    _TEST_ASSERT_EQUAL_BYTES_STRING("/", path);
 
     uint8_t pdu_copy[sizeof(pdu) + 100] = { 0 };
-    TEST_ASSERT_EQUAL_INT(unicoap_pdu_build_rfc7252(pdu_copy, sizeof(pdu_copy),
-                                                    &parsed.message, &parsed.properties),
-                          sizeof(pdu));
+    TEST_ASSERT_EQUAL_INT(sizeof(pdu),
+                          unicoap_pdu_build_rfc7252(pdu_copy, sizeof(pdu_copy),
+                                                    &parsed.message, &parsed.properties));
     _TEST_ASSERT_EQUAL_BYTES(pdu, pdu_copy, sizeof(pdu));
 
     /* Try to build a vector */
@@ -189,10 +189,10 @@ static void test_pdu_rfc7252_method_not_allowed_ack_round_trip(void)
     iolist_t iolist[UNICOAP_PDU_IOLIST_COUNT];
     uint8_t header[UNICOAP_HEADER_SIZE_MAX];
 
-    TEST_ASSERT_EQUAL_INT(unicoap_pdu_buildv_rfc7252(header, sizeof(header), &parsed.message,
-                                                     &parsed.properties, iolist),
-                          0);
-    TEST_ASSERT_EQUAL_INT(iolist_to_buffer(iolist, pdu_copy, sizeof(pdu_copy)), sizeof(pdu));
+    TEST_ASSERT_EQUAL_INT(0,
+                          unicoap_pdu_buildv_rfc7252(header, sizeof(header), &parsed.message,
+                                                     &parsed.properties, iolist));
+    TEST_ASSERT_EQUAL_INT(sizeof(pdu), iolist_to_buffer(iolist, pdu_copy, sizeof(pdu_copy)));
     _TEST_ASSERT_EQUAL_BYTES(pdu, pdu_copy, sizeof(pdu));
 }
 
@@ -217,7 +217,7 @@ static void test_pdu_rfc7252_cbor_request_round_trip(void)
     };
 
     unicoap_parser_result_t parsed = { 0 };
-    TEST_ASSERT_EQUAL_INT(unicoap_pdu_parse_rfc7252_result((uint8_t*)pdu, sizeof(pdu), &parsed), 0);
+    TEST_ASSERT_EQUAL_INT(0, unicoap_pdu_parse_rfc7252_result((uint8_t*)pdu, sizeof(pdu), &parsed));
 
     _TEST_ASSERT_EQUAL_PARSED_RFC7252(&parsed,
                                       UNICOAP_METHOD_POST,
@@ -226,9 +226,9 @@ static void test_pdu_rfc7252_cbor_request_round_trip(void)
                                       UNICOAP_TYPE_CON, 3134);
 
     uint8_t pdu_copy[sizeof(pdu) + 100] = { 0 };
-    TEST_ASSERT_EQUAL_INT(unicoap_pdu_build_rfc7252(pdu_copy, sizeof(pdu_copy), &parsed.message,
-                                                    &parsed.properties),
-                          sizeof(pdu));
+    TEST_ASSERT_EQUAL_INT(sizeof(pdu),
+                          unicoap_pdu_build_rfc7252(pdu_copy, sizeof(pdu_copy), &parsed.message,
+                                                    &parsed.properties));
     _TEST_ASSERT_EQUAL_BYTES(pdu, pdu_copy, sizeof(pdu));
 
     /* Try to build a vector */
@@ -238,10 +238,10 @@ static void test_pdu_rfc7252_cbor_request_round_trip(void)
     iolist_t iolist[UNICOAP_PDU_IOLIST_COUNT];
     uint8_t header[UNICOAP_HEADER_SIZE_MAX];
 
-    TEST_ASSERT_EQUAL_INT(unicoap_pdu_buildv_rfc7252(header, sizeof(header),
-                                                     &parsed.message, &parsed.properties, iolist),
-                          0);
-    TEST_ASSERT_EQUAL_INT(iolist_to_buffer(iolist, pdu_copy, sizeof(pdu_copy)), sizeof(pdu));
+    TEST_ASSERT_EQUAL_INT(0,
+                          unicoap_pdu_buildv_rfc7252(header, sizeof(header),
+                                                     &parsed.message, &parsed.properties, iolist));
+    TEST_ASSERT_EQUAL_INT(sizeof(pdu), iolist_to_buffer(iolist, pdu_copy, sizeof(pdu_copy)));
     _TEST_ASSERT_EQUAL_BYTES(pdu, pdu_copy, sizeof(pdu));
 }
 
