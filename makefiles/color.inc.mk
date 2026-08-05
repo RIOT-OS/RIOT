@@ -54,7 +54,8 @@ sh_reset  = $(COLOR_ECHO) -n "$(COLOR_RESET)" 1>&2
 #
 # Note: No space after the comma and mandatory parenthesis and quotation!
 #
-# Warning: You can not use `\n` or other escape sequences in your text!
+# Warning: You can not use `\n` or other control sequences in your text!
+#  Apostrophes `'` and brackets `()` have to be escaped: `\'`, `\(`, `\)`.
 #
 # Background: The CI and other scripts interpret the output of Make printed to `stdout`.
 #  To avoid confusing these scripts, user infos and red/yellow/green warnings
@@ -81,7 +82,8 @@ sh_echowarn    = $(sh_echoyellow)
 #
 # Note: No space after the comma and mandatory parenthesis and quotation!
 #
-# Warning: You can not use `\n` or other escape sequences in your text!
+# Warning: You can not use `\n` or other control sequences in your text!
+#  Apostrophes `'` and brackets `()` have to be escaped: `\'`, `\(`, `\)`.
 #
 # Background: The CI and other scripts interpret the output of Make printed to `stdout`.
 #  To avoid confusing these scripts, user infos and red/yellow/green warnings
