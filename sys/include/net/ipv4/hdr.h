@@ -252,6 +252,13 @@ static inline uint16_t ipv4_hdr_inet_csum(uint16_t sum, ipv4_hdr_t *hdr,
                      (2 * sizeof(ipv4_addr_t)));
 }
 
+/**
+ * @brief   Outputs an IPv4 header to stdout.
+ *
+ * @param[in] hdr   An IPv4 header.
+ */
+void ipv4_hdr_print(ipv4_hdr_t *hdr);
+
 #ifdef __cplusplus
 }
 #endif
