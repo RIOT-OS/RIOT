@@ -6,29 +6,34 @@
 #pragma once
 
 /**
- * @defgroup    drivers_max31343  MAX31343 I2C RTC driver
+ * @defgroup    drivers_max313xx  MAX313xx I2C RTC driver
  * @ingroup     drivers_sensors
- * @brief       Driver for the MAX31343 I2C real-time clock with integrated MEMS oscillator
+ * @brief       Driver for the MAX313xx I2C real-time clock family
  * @{
  *
  * The driver can be used directly in an application or through the
- * @ref sys_walltime module by adding this to your application's Makefile:
+ * @ref sys_walltime module by adding one of the following lines to your
+ * application's Makefile (depending on the device you have):
  * ```makefile
+ * USEMODULE += walltime_impl_max31331
  * USEMODULE += walltime_impl_max31343
  * ```
  *
- * ## Implementation Status
+ * ## Implementation Status and Supported Devices
  * The driver does not handle interrupts from the real-time clock. The
  * application has to configure the appropriate pin with @ref gpio_init_int
  * and provide a callback.
  *
- * Furthermore there is no support for the 64 Byte built-in User Storage Memory.
+ * Furthermore there is no support for the built-in User Storage Memory.
  *
  * Only ALARM1 is supported, ALARM2 has limited capabilities compared to
  * ALARM1. The Countdown Timer is also not supported yet.
  *
+ * The driver has support for the MAX31331 and MAX31343 devices, although not
+ * all features of each device is implemented.
+ *
  * @file
- * @brief       Driver interface for the MAX31343 I2C real-time clock
+ * @brief       Driver interface for the MAX313xx I2C real-time clock
  *
  * @author      Jakob Müller <ja.mueller@tuhh.de>
  */
@@ -38,36 +43,39 @@
 #include <stdbool.h>
 
 #include "periph/i2c.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief Device descriptor for the MAX31343 RTC.
+ * @brief Device descriptor for the MAX313xx RTC.
  *
- * Holds the runtime state of a MAX31343 device instance.
+ * Holds the runtime state of a MAX313xx device instance.
  * Currently this only contains the I2C bus, but may be extended
  * in the future.
  */
 typedef struct {
     i2c_t i2c;     /**< I2C bus */
-} max31343_t;
+} max313xx_t;
 
 /**
  * @brief Square-wave output frequency selection.
  *
  * Selects the output frequency of the SQW pin.
  * The exact mapping is defined by the MAX31343 datasheet.
+ *
+ * @note Only supported on the MAX31343.
  */
 typedef enum {
-    MAX31343_SQW_1HZ = 0,
-    MAX31343_SQW_2HZ = 1,
-    MAX31343_SQW_4HZ = 2,
-    MAX31343_SQW_8HZ = 3,
-    MAX31343_SQW_16HZ = 4,
-    MAX31343_SQW_32HZ = 5,
-} max31343_sqw_freq_t;
+    MAX313xx_SQW_1HZ = 0,
+    MAX313xx_SQW_2HZ = 1,
+    MAX313xx_SQW_4HZ = 2,
+    MAX313xx_SQW_8HZ = 3,
+    MAX313xx_SQW_16HZ = 4,
+    MAX313xx_SQW_32HZ = 5,
+} max313xx_sqw_freq_t;
 
 /**
  * @brief Automatic temperature conversion interval.
@@ -76,43 +84,46 @@ typedef enum {
  * when temperature AUTOMODE is enabled.
  *
  * The values correspond to the TTSINT field (TS_Config[5:3]).
+ *
+ * @note Only supported on the MAX31343.
  */
 typedef enum {
-    MAX31343_TTSINT_1S   = 0x0, /**< update temperature every 1s   */
-    MAX31343_TTSINT_2S   = 0x1, /**< update temperature every 2s   */
-    MAX31343_TTSINT_4S   = 0x2, /**< update temperature every 4s   */
-    MAX31343_TTSINT_8S   = 0x3, /**< update temperature every 8s   */
-    MAX31343_TTSINT_16S  = 0x4, /**< update temperature every 16s  */
-    MAX31343_TTSINT_32S  = 0x5, /**< update temperature every 32s  */
-    MAX31343_TTSINT_64S  = 0x6, /**< update temperature every 64s  */
-    MAX31343_TTSINT_128S = 0x7, /**< update temperature every 128s */
-} max31343_ttsint_t;
+    MAX313xx_TTSINT_1S   = 0x0, /**< update temperature every 1s   */
+    MAX313xx_TTSINT_2S   = 0x1, /**< update temperature every 2s   */
+    MAX313xx_TTSINT_4S   = 0x2, /**< update temperature every 4s   */
+    MAX313xx_TTSINT_8S   = 0x3, /**< update temperature every 8s   */
+    MAX313xx_TTSINT_16S  = 0x4, /**< update temperature every 16s  */
+    MAX313xx_TTSINT_32S  = 0x5, /**< update temperature every 32s  */
+    MAX313xx_TTSINT_64S  = 0x6, /**< update temperature every 64s  */
+    MAX313xx_TTSINT_128S = 0x7, /**< update temperature every 128s */
+} max313xx_ttsint_t;
 
 /**
  * @brief Trickle charger resistor selection.
  *
  * Selects the series resistor in the trickle charging path.
- * Corresponds to D_TRICKLE bits [1:0].
+ * Corresponds to TRICKLE bits [1:2] for the MAX31331 and to
+ * D_TRICKLE bits [1:0] for the MAX31343.
  */
 typedef enum {
-    MAX31343_TRICKLE_RES_3K  = 0x0U,  /**< 3 kOhm  */
-    MAX31343_TRICKLE_RES_6K  = 0x2U,  /**< 6 kOhm  */
-    MAX31343_TRICKLE_RES_11K = 0x3U,  /**< 11 kOhm */
-} max31343_trickle_res_t;
+    MAX313xx_TRICKLE_RES_3K  = 0x0U,  /**< 3 kOhm  */
+    MAX313xx_TRICKLE_RES_6K  = 0x2U,  /**< 6 kOhm  */
+    MAX313xx_TRICKLE_RES_11K = 0x3U,  /**< 11 kOhm */
+} max313xx_trickle_res_t;
 
 /**
- * @brief Configuration parameters for MAX31343 initialization.
+ * @brief Configuration parameters for MAX313xx initialization.
  */
 typedef struct {
     i2c_t i2c;                              /**< I2C bus the device is connected to */
-} max31343_params_t;
+} max313xx_params_t;
 
 /**
- * @brief Initialize MAX31343 device
+ * @brief Initialize MAX313xx device
  *
  * This function initializes the device and checks the Oscillator Stop Flag (OSF).
  * If OSF is set (indicating the oscillator was stopped, e.g., after power loss),
- * the current time may be invalid and should be set using max31343_set_time().
+ * the current time may be invalid and should be set using max313xx_set_time().
  * The OSF flag is automatically cleared when the time registers are written.
  *
  * @note After power-on or if the oscillator was stopped, the caller should
@@ -125,9 +136,9 @@ typedef struct {
  * @retval -EINVAL   Invalid argument (NULL pointer)
  * @retval -EIO      I2C communication error
  * @retval -ENODATA  Oscillator was stopped; time is invalid.
- *                   Call max31343_set_time() before using max31343_get_time().
+ *                   Call max313xx_set_time() before using max313xx_get_time().
  */
-int max31343_init(max31343_t *dev, const max31343_params_t *params);
+int max313xx_init(max313xx_t *dev, const max313xx_params_t *params);
 
 /**
  * @brief Read current time from device
@@ -138,7 +149,7 @@ int max31343_init(max31343_t *dev, const max31343_params_t *params);
  * @retval  0       Success
  * @retval -EIO     I2C communication error or invalid time read from device
  */
-int max31343_get_time(const max31343_t *dev, struct tm *time);
+int max313xx_get_time(const max313xx_t *dev, struct tm *time);
 
 /**
  * @brief Set current time on device
@@ -153,7 +164,7 @@ int max31343_get_time(const max31343_t *dev, struct tm *time);
  * @retval -ERANGE  Time values are out of supported range (year must be 2000-2099)
  * @retval -EIO     I2C communication error
  */
-int max31343_set_time(const max31343_t *dev, const struct tm *time);
+int max313xx_set_time(const max313xx_t *dev, const struct tm *time);
 
 /**
  * @brief Enable RTC oscillator (power on timekeeping).
@@ -165,7 +176,7 @@ int max31343_set_time(const max31343_t *dev, const struct tm *time);
  * @retval  0       Success
  * @retval -EIO     I2C communication error
  */
-int max31343_poweron(const max31343_t *dev);
+int max313xx_poweron(const max313xx_t *dev);
 
 /**
  * @brief Disable RTC oscillator (stop timekeeping).
@@ -177,18 +188,18 @@ int max31343_poweron(const max31343_t *dev);
  * @retval  0       Success
  * @retval -EIO     I2C communication error
  */
-int max31343_poweroff(const max31343_t *dev);
+int max313xx_poweroff(const max313xx_t *dev);
 
 /**
  * @brief Set alarm time registers.
  *
  * Writes the alarm time to the device. The alarm interrupt (A1IE) is
  * disabled before writing and must be explicitly re-enabled afterwards
- * using max31343_set_alarm_int(), as required by the datasheet.
+ * using max313xx_set_alarm_int(), as required by the datasheet.
  *
  * @note Per datasheet requirement, the alarm interrupt (A1IE) must not be
  *       enabled until at least 1 second after calling this function.
- *       Use max31343_set_alarm_int() after the required delay.
+ *       Use max313xx_set_alarm_int() after the required delay.
  *
  * @param[in] dev   device descriptor
  * @param[in] time  alarm time to store
@@ -197,7 +208,7 @@ int max31343_poweroff(const max31343_t *dev);
  * @retval -ERANGE  Time values are out of supported range (year must be 2000-2099)
  * @retval -EIO     I2C communication error
  */
-int max31343_set_alarm(const max31343_t *dev, const struct tm *time);
+int max313xx_set_alarm(const max313xx_t *dev, const struct tm *time);
 
 /**
  * @brief Get the currently configured alarm time.
@@ -212,7 +223,7 @@ int max31343_set_alarm(const max31343_t *dev, const struct tm *time);
  * @retval  0       Success
  * @retval -EIO     I2C communication error
  */
-int max31343_get_alarm(const max31343_t *dev, struct tm *time);
+int max313xx_get_alarm(const max313xx_t *dev, struct tm *time);
 
 /**
  * @brief Enable or disable the alarm interrupt.
@@ -220,7 +231,7 @@ int max31343_get_alarm(const max31343_t *dev, struct tm *time);
  * Controls the alarm interrupt enable bit (A1IE) in the interrupt enable
  * register. Disabling the alarm also clears the alarm flag (A1F).
  *
- * @note When enabling the alarm after max31343_set_alarm(), wait at least
+ * @note When enabling the alarm after max313xx_set_alarm(), wait at least
  *       1 second as required by the datasheet before calling this function.
  *
  * @param[in] dev    device descriptor
@@ -229,7 +240,7 @@ int max31343_get_alarm(const max31343_t *dev, struct tm *time);
  * @retval  0       Success
  * @retval -EIO     I2C communication error
  */
-int max31343_set_alarm_int(const max31343_t *dev, bool enable);
+int max313xx_set_alarm_int(const max313xx_t *dev, bool enable);
 
 /**
  * @brief Configure the square-wave (SQW) output frequency.
@@ -237,27 +248,33 @@ int max31343_set_alarm_int(const max31343_t *dev, bool enable);
  * This function enables and configures the SQW output according
  * to the selected frequency.
  *
+ * @note Only supported on the MAX31343.
+ *
  * @param[in] dev   device descriptor
  * @param[in] freq  square-wave frequency selection
  *
  * @retval  0       Success
  * @retval -ERANGE  Invalid frequency value
  * @retval -EIO     I2C communication error
+ * @retval -ENOTSUP RTC variant does not have a square wave output
  */
-int max31343_set_sqw(const max31343_t *dev, max31343_sqw_freq_t freq);
+int max313xx_set_sqw(const max313xx_t *dev, max313xx_sqw_freq_t freq);
 
 /**
  * @brief Read temperature in centi-degrees Celsius (°C * 100)
  *
  * Example: 84.75°C -> 8475
  *
+ * @note Only supported on the MAX31343.
+ *
  * @param[in]  dev        device descriptor
  * @param[out] temp_centi temperature in centi-degC
  *
  * @retval  0       Success
  * @retval -EIO     I2C communication error
+ * @retval -ENOTSUP RTC variant does not have a temperature sensor
  */
-int max31343_get_temp(const max31343_t *dev, int16_t *temp_centi);
+int max313xx_get_temp(const max313xx_t *dev, int16_t *temp_centi);
 
 /**
  * @brief Enable the trickle charger.
@@ -274,9 +291,8 @@ int max31343_get_temp(const max31343_t *dev, int16_t *temp_centi);
  * @retval  0       Success
  * @retval -EIO     I2C communication error
  */
-int max31343_trickle_charge_enable(const max31343_t *dev,
-                                   bool diode,
-                                   max31343_trickle_res_t res);
+int max313xx_trickle_charge_enable(const max313xx_t *dev, bool diode,
+                                   max313xx_trickle_res_t res);
 
 /**
  * @brief Disable the trickle charger.
@@ -286,10 +302,12 @@ int max31343_trickle_charge_enable(const max31343_t *dev,
  * @retval  0       Success
  * @retval -EIO     I2C communication error
  */
-int max31343_trickle_charge_disable(const max31343_t *dev);
+int max313xx_trickle_charge_disable(const max313xx_t *dev);
 
 /**
  * @brief Configure automatic temperature conversion mode and interval.
+ *
+ * @note Only supported on the MAX31343.
  *
  * @param[in] dev      device descriptor
  * @param[in] enable   true to set AUTOMODE=1, false to set AUTOMODE=0
@@ -298,8 +316,9 @@ int max31343_trickle_charge_disable(const max31343_t *dev);
  * @retval  0       Success
  * @retval -ERANGE  Invalid ttsint value
  * @retval -EIO     I2C communication error
+ * @retval -ENOTSUP RTC variant does not have a temperature sensor
  */
-int max31343_temp_set_automode(const max31343_t *dev, bool enable, max31343_ttsint_t ttsint);
+int max313xx_temp_set_automode(const max313xx_t *dev, bool enable, max313xx_ttsint_t ttsint);
 
 /** @} */
 

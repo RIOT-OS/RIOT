@@ -116,6 +116,10 @@ ifneq (,$(filter m24c%,$(USEMODULE)))
   USEMODULE += at24cxxx
 endif
 
+ifneq (,$(filter max313%,$(USEMODULE)))
+  USEMODULE += max313xx
+endif
+
 ifneq (,$(filter mhz19_%,$(USEMODULE)))
   USEMODULE += mhz19
 endif
