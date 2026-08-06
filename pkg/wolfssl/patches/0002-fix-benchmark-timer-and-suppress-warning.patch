@@ -22,7 +22,7 @@ index 214d873..4898f90 100644
 +    #include "ztimer.h"
 +    double current_time(int reset)
 +    {
-+        void(reset);
++        (void)reset;
 +        return (double) ztimer_now(ZTIMER_USEC) / 1000000.0;
 +    }
  #else
