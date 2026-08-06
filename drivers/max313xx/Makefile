@@ -1,2 +1,3 @@
-MODULE = max31343
+MODULE = max313xx
+
 include $(RIOTBASE)/Makefile.base
