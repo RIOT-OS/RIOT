@@ -51,7 +51,11 @@ endif
 
 GCC_DEFAULTS_TO_NEW_RISCV_ISA ?= 0
 
-CFLAGS_CPU := -march=rv32imac -mabi=ilp32
+ifeq (rv64,$(CPU_ARCH))
+  CFLAGS_CPU := -march=rv64imac -mabi=lp64
+else
+  CFLAGS_CPU := -march=rv32imac -mabi=ilp32
+endif
 ASFLAGS := $(CFLAGS_CPU)
 
 # Since RISC-V ISA specifications 20191213 instructions previously included in
@@ -64,9 +68,13 @@ ifeq (1,$(GCC_DEFAULTS_TO_NEW_RISCV_ISA))
   CFLAGS_CPU += -misa-spec=2.2
 endif
 
-# Always use riscv32-none-elf as target triple for clang, as some
+# Always use riscv{32,64}-none-elf as target triple for clang, as some
 # autodetected gcc target triples are incompatible with clang
-TARGET_ARCH_LLVM := riscv32-none-elf
+ifeq (rv64,$(CPU_ARCH))
+  TARGET_ARCH_LLVM := riscv64-none-elf
+else
+  TARGET_ARCH_LLVM := riscv32-none-elf
+endif
 ifneq ($(TOOLCHAIN),llvm)
   CFLAGS_NO_ASM += -mcmodel=medlow -msmall-data-limit=8
   # We cannot invoke the compiler on the host system if build in docker.
@@ -93,4 +101,8 @@ ASFLAGS += $(CFLAGS_CPU)
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT) -nostartfiles -Wl,--gc-sections -static -lgcc
 
 # Platform triple as used by Rust
-RUST_TARGET = riscv32imac-unknown-none-elf
+ifeq (rv64,$(CPU_ARCH))
+  RUST_TARGET = riscv64imac-unknown-none-elf
+else
+  RUST_TARGET = riscv32imac-unknown-none-elf
+endif
