@@ -1,8 +1,8 @@
 /*
  * SPDX-FileCopyrightText: 2024-2026 Carl Seifert
  * SPDX-FileCopyrightText: 2024-2026 TU Dresden
- * SPDX-FileCopyrightText: 2024-2026 Bennet Hattesen
- * SPDX-FileCopyrightText: 2024-2026 HAW Hamburg
+ * SPDX-FileCopyrightText: 2026 Bennet Hattesen
+ * SPDX-FileCopyrightText: 2026 HAW Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
