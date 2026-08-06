@@ -92,8 +92,9 @@ __attribute((used)) static void handle_trap(uword_t mcause)
     bool is_interrupt = (mcause & MCAUSE_INT) == MCAUSE_INT;
 
 #if CONFIG_PRINT_VERBOSE_TRAP_INFO
-    printf("Trap: mcause=0x%" PRIx32 " mepc=0x%lx mtval=0x%lx\n",
-           (uint32_t)mcause, read_csr(mepc), read_csr(mtval));
+    printf("Trap: mcause=0x%" PRIxPTR " mepc=0x%" PRIxPTR " mtval=0x%" PRIxPTR "\n",
+           (uintptr_t)mcause, (uintptr_t)read_csr(mepc),
+           (uintptr_t)read_csr(mtval));
 
     if (!is_interrupt) {
         const char *error_messages[] = {
@@ -182,9 +183,9 @@ __attribute((used)) static void handle_trap(uword_t mcause)
         default:
 #ifdef DEVELHELP
             printf("Unhandled trap:\n");
-            printf("  mcause: 0x%" PRIx32 "\n", trap);
-            printf("  mepc:   0x%lx\n", read_csr(mepc));
-            printf("  mtval:  0x%lx\n", read_csr(mtval));
+            printf("  mcause: 0x%" PRIxPTR "\n", (uintptr_t)trap);
+            printf("  mepc:   0x%" PRIxPTR "\n", (uintptr_t)read_csr(mepc));
+            printf("  mtval:  0x%" PRIxPTR "\n", (uintptr_t)read_csr(mtval));
 #endif
             /* Unknown trap */
             core_panic(PANIC_GENERAL_ERROR, "Unhandled trap");
@@ -204,26 +205,26 @@ static void __attribute__((interrupt)) trap_entry(void)
         "addi sp, sp, -"XTSTR (CONTEXT_FRAME_SIZE)"          \n"
 
         /* Save caller-saved registers */
-        "sw ra, "XTSTR (ra_OFFSET)"(sp)                      \n"
-        "sw t0, "XTSTR (t0_OFFSET)"(sp)                      \n"
-        "sw t1, "XTSTR (t1_OFFSET)"(sp)                      \n"
-        "sw t2, "XTSTR (t2_OFFSET)"(sp)                      \n"
-        "sw t3, "XTSTR (t3_OFFSET)"(sp)                      \n"
-        "sw t4, "XTSTR (t4_OFFSET)"(sp)                      \n"
-        "sw t5, "XTSTR (t5_OFFSET)"(sp)                      \n"
-        "sw t6, "XTSTR (t6_OFFSET)"(sp)                      \n"
-        "sw a0, "XTSTR (a0_OFFSET)"(sp)                      \n"
-        "sw a1, "XTSTR (a1_OFFSET)"(sp)                      \n"
-        "sw a2, "XTSTR (a2_OFFSET)"(sp)                      \n"
-        "sw a3, "XTSTR (a3_OFFSET)"(sp)                      \n"
-        "sw a4, "XTSTR (a4_OFFSET)"(sp)                      \n"
-        "sw a5, "XTSTR (a5_OFFSET)"(sp)                      \n"
-        "sw a6, "XTSTR (a6_OFFSET)"(sp)                      \n"
-        "sw a7, "XTSTR (a7_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" ra, "XTSTR (ra_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" t0, "XTSTR (t0_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" t1, "XTSTR (t1_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" t2, "XTSTR (t2_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" t3, "XTSTR (t3_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" t4, "XTSTR (t4_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" t5, "XTSTR (t5_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" t6, "XTSTR (t6_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" a0, "XTSTR (a0_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" a1, "XTSTR (a1_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" a2, "XTSTR (a2_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" a3, "XTSTR (a3_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" a4, "XTSTR (a4_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" a5, "XTSTR (a5_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" a6, "XTSTR (a6_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" a7, "XTSTR (a7_OFFSET)"(sp)                      \n"
 
         /* Save s0 and s1 extra for the active thread and the stack ptr */
-        "sw s0, "XTSTR (s0_OFFSET)"(sp)                      \n"
-        "sw s1, "XTSTR (s1_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" s0, "XTSTR (s0_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" s1, "XTSTR (s1_OFFSET)"(sp)                      \n"
 
         /* Save the user stack ptr */
         "mv s0, sp                                          \n"
@@ -237,14 +238,16 @@ static void __attribute__((interrupt)) trap_entry(void)
          * the call */
         "call handle_trap                                   \n"
 
-        /* Load the sched_context_switch_request */
+        /* Load the sched_context_switch_request. This is a 32-bit int (not a
+         * register-wide value), so it must always be loaded with lw — using
+         * the XLEN-wide REG_L (ld on RV64) would read 4 bytes past the flag. */
         "lw a0, sched_context_switch_request                \n"
 
         /* And skip the context switch if not requested */
         "beqz a0, no_sched                                  \n"
 
         /*  Get the previous active thread (could be NULL) */
-        "lw s1, sched_active_thread                         \n"
+        XTSTR(REG_L)" s1, sched_active_thread                         \n"
 
         /* Run the scheduler */
         "call sched_run                                     \n"
@@ -263,72 +266,72 @@ static void __attribute__((interrupt)) trap_entry(void)
         "beqz s1, null_thread                               \n"
 
         /* Store s2-s11 */
-        "sw s2, "XTSTR (s2_OFFSET)"(sp)                      \n"
-        "sw s3, "XTSTR (s3_OFFSET)"(sp)                      \n"
-        "sw s4, "XTSTR (s4_OFFSET)"(sp)                      \n"
-        "sw s5, "XTSTR (s5_OFFSET)"(sp)                      \n"
-        "sw s6, "XTSTR (s6_OFFSET)"(sp)                      \n"
-        "sw s7, "XTSTR (s7_OFFSET)"(sp)                      \n"
-        "sw s8, "XTSTR (s8_OFFSET)"(sp)                      \n"
-        "sw s9, "XTSTR (s9_OFFSET)"(sp)                      \n"
-        "sw s10, "XTSTR (s10_OFFSET)"(sp)                    \n"
-        "sw s11, "XTSTR (s11_OFFSET)"(sp)                    \n"
+        XTSTR(REG_S)" s2, "XTSTR (s2_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" s3, "XTSTR (s3_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" s4, "XTSTR (s4_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" s5, "XTSTR (s5_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" s6, "XTSTR (s6_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" s7, "XTSTR (s7_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" s8, "XTSTR (s8_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" s9, "XTSTR (s9_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" s10, "XTSTR (s10_OFFSET)"(sp)                    \n"
+        XTSTR(REG_S)" s11, "XTSTR (s11_OFFSET)"(sp)                    \n"
 
         /* Grab mepc to save it to the stack */
         "csrr s2, mepc                                      \n"
 
         /* Save return PC in stack frame */
-        "sw s2, "XTSTR (pc_OFFSET)"(sp)                      \n"
+        XTSTR(REG_S)" s2, "XTSTR (pc_OFFSET)"(sp)                      \n"
 
         /* Save stack pointer of current thread */
-        "sw sp, "XTSTR (SP_OFFSET_IN_THREAD)"(s1)            \n"
+        XTSTR(REG_S)" sp, "XTSTR (SP_OFFSET_IN_THREAD)"(s1)            \n"
 
         /* Context saving done, from here on the new thread is scheduled */
         "null_thread:                                       \n"
 
         /*  Get the new active thread (guaranteed to be non NULL) */
-        "lw s1, sched_active_thread                         \n"
+        XTSTR(REG_L)" s1, sched_active_thread                         \n"
 
         /*  Load the thread SP of scheduled thread */
-        "lw sp, "XTSTR (SP_OFFSET_IN_THREAD)"(s1)            \n"
+        XTSTR(REG_L)" sp, "XTSTR (SP_OFFSET_IN_THREAD)"(s1)            \n"
 
         /*  Set return PC to mepc */
-        "lw a1, "XTSTR (pc_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" a1, "XTSTR (pc_OFFSET)"(sp)                      \n"
         "csrw mepc, a1                                      \n"
 
         /* restore s2-s11 */
-        "lw s2, "XTSTR (s2_OFFSET)"(sp)                      \n"
-        "lw s3, "XTSTR (s3_OFFSET)"(sp)                      \n"
-        "lw s4, "XTSTR (s4_OFFSET)"(sp)                      \n"
-        "lw s5, "XTSTR (s5_OFFSET)"(sp)                      \n"
-        "lw s6, "XTSTR (s6_OFFSET)"(sp)                      \n"
-        "lw s7, "XTSTR (s7_OFFSET)"(sp)                      \n"
-        "lw s8, "XTSTR (s8_OFFSET)"(sp)                      \n"
-        "lw s9, "XTSTR (s9_OFFSET)"(sp)                      \n"
-        "lw s10, "XTSTR (s10_OFFSET)"(sp)                    \n"
-        "lw s11, "XTSTR (s11_OFFSET)"(sp)                    \n"
+        XTSTR(REG_L)" s2, "XTSTR (s2_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" s3, "XTSTR (s3_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" s4, "XTSTR (s4_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" s5, "XTSTR (s5_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" s6, "XTSTR (s6_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" s7, "XTSTR (s7_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" s8, "XTSTR (s8_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" s9, "XTSTR (s9_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" s10, "XTSTR (s10_OFFSET)"(sp)                    \n"
+        XTSTR(REG_L)" s11, "XTSTR (s11_OFFSET)"(sp)                    \n"
 
         "no_switch:                                         \n"
 
         /* restore the caller-saved registers */
-        "lw ra, "XTSTR (ra_OFFSET)"(sp)                      \n"
-        "lw t0, "XTSTR (t0_OFFSET)"(sp)                      \n"
-        "lw t1, "XTSTR (t1_OFFSET)"(sp)                      \n"
-        "lw t2, "XTSTR (t2_OFFSET)"(sp)                      \n"
-        "lw t3, "XTSTR (t3_OFFSET)"(sp)                      \n"
-        "lw t4, "XTSTR (t4_OFFSET)"(sp)                      \n"
-        "lw t5, "XTSTR (t5_OFFSET)"(sp)                      \n"
-        "lw t6, "XTSTR (t6_OFFSET)"(sp)                      \n"
-        "lw a0, "XTSTR (a0_OFFSET)"(sp)                      \n"
-        "lw a1, "XTSTR (a1_OFFSET)"(sp)                      \n"
-        "lw a2, "XTSTR (a2_OFFSET)"(sp)                      \n"
-        "lw a3, "XTSTR (a3_OFFSET)"(sp)                      \n"
-        "lw a4, "XTSTR (a4_OFFSET)"(sp)                      \n"
-        "lw a5, "XTSTR (a5_OFFSET)"(sp)                      \n"
-        "lw a6, "XTSTR (a6_OFFSET)"(sp)                      \n"
-        "lw a7, "XTSTR (a7_OFFSET)"(sp)                      \n"
-        "lw s0, "XTSTR (s0_OFFSET)"(sp)                      \n"
-        "lw s1, "XTSTR (s1_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" ra, "XTSTR (ra_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" t0, "XTSTR (t0_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" t1, "XTSTR (t1_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" t2, "XTSTR (t2_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" t3, "XTSTR (t3_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" t4, "XTSTR (t4_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" t5, "XTSTR (t5_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" t6, "XTSTR (t6_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" a0, "XTSTR (a0_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" a1, "XTSTR (a1_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" a2, "XTSTR (a2_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" a3, "XTSTR (a3_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" a4, "XTSTR (a4_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" a5, "XTSTR (a5_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" a6, "XTSTR (a6_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" a7, "XTSTR (a7_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" s0, "XTSTR (s0_OFFSET)"(sp)                      \n"
+        XTSTR(REG_L)" s1, "XTSTR (s1_OFFSET)"(sp)                      \n"
 
         "addi sp, sp, "XTSTR (CONTEXT_FRAME_SIZE)"           \n"
         :

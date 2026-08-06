@@ -92,6 +92,11 @@ CFLAGS_DBG  ?= -g3
 CFLAGS_OPT  ?= -Os
 
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/riscv_common/ldscripts
+ifeq (rv64,$(CPU_ARCH))
+  LINKFLAGS += -Wl,--defsym=_riscv_word_bytes=8
+else
+  LINKFLAGS += -Wl,--defsym=_riscv_word_bytes=4
+endif
 LINKER_SCRIPT ?= $(CPU_MODEL).ld
 LINKFLAGS += -T$(LINKER_SCRIPT)
 

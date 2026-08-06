@@ -22,14 +22,26 @@
  * @name Configuration of default stack sizes
  * @{
  */
-#ifndef THREAD_EXTRA_STACKSIZE_PRINTF
-#define THREAD_EXTRA_STACKSIZE_PRINTF   (256)
-#endif
-#ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT        (1024)
-#endif
-#ifndef THREAD_STACKSIZE_IDLE
-#define THREAD_STACKSIZE_IDLE           (256)
+#if __riscv_xlen == 64
+#  ifndef THREAD_EXTRA_STACKSIZE_PRINTF
+#    define THREAD_EXTRA_STACKSIZE_PRINTF   (512)
+#  endif
+#  ifndef THREAD_STACKSIZE_DEFAULT
+#    define THREAD_STACKSIZE_DEFAULT        (2048)
+#  endif
+#  ifndef THREAD_STACKSIZE_IDLE
+#    define THREAD_STACKSIZE_IDLE           (512)
+#  endif
+#else
+#  ifndef THREAD_EXTRA_STACKSIZE_PRINTF
+#    define THREAD_EXTRA_STACKSIZE_PRINTF   (256)
+#  endif
+#  ifndef THREAD_STACKSIZE_DEFAULT
+#    define THREAD_STACKSIZE_DEFAULT        (1024)
+#  endif
+#  ifndef THREAD_STACKSIZE_IDLE
+#    define THREAD_STACKSIZE_IDLE           (256)
+#  endif
 #endif
 /** @} */
 
