@@ -64,20 +64,35 @@ static char *str_ev[IEEE802154_FSM_EV_NUMOF] = {
     "REQUEST_SET_IDLE",
 };
 
+/**
+ * @brief   Returns true if we do not need to do retransmissions
+ *          aka radio will watchout for ack from the receiver.
+ *
+ * @param   dev IEEE802.15.4 device descriptor
+ *
+ * @return  true if radio will take care of ack handling
+ */
 static inline bool _does_handle_ack(ieee802154_dev_t *dev)
 {
     return ieee802154_radio_has_frame_retrans(dev) ||
            ieee802154_radio_has_irq_ack_timeout(dev);
 }
 
+/**
+ * @brief   If softack module is used, we will check if submac should really send ack
+ *          aka radio does not send it.
+ *          If the module is not used, we pretend the radio will always send ack.
+ *
+ * @param   dev IEEE802.15.4 device descriptor
+ *
+ * @return  false if we should send ack
+ */
 static inline bool _does_send_ack(ieee802154_dev_t *dev)
 {
-    /* if return false we have to send ack, can only send ack if SOFTACK is used */
     if (IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK) &&
     !ieee802154_radio_has_capability(dev, IEEE802154_CAP_AUTO_ACK)) {
         return false;
     }
-    /* someone else will send the ACK for us */
     return true;
 }
 
