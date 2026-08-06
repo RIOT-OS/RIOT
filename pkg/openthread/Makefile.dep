@@ -3,7 +3,7 @@ USEMODULE += ieee802154
 USEMODULE += l2util
 USEMODULE += openthread_contrib
 
-ifneq (,$(filter openthread-cli-%,$(USEMODULE)))
+ifneq (,$(filter openthread_cli_%,$(USEMODULE)))
   USEMODULE += shell_cmds_default
 endif
 

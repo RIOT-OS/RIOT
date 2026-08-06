@@ -6,17 +6,17 @@ PKG_LICENSE=BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-ifneq (,$(filter openthread-ftd,$(USEMODULE)))
+ifneq (,$(filter openthread_ftd,$(USEMODULE)))
   TD = ftd
-else ifneq (,$(filter openthread-mtd,$(USEMODULE)))
+else ifneq (,$(filter openthread_mtd,$(USEMODULE)))
   TD = mtd
 else
-  $(error "Please use either USEMODULE=openthread-ftd or USEMODULE=openthread-mtd")
+  $(error "Please use either USEMODULE=openthread_ftd or USEMODULE=openthread_mtd")
 endif
 
 OT_MODULES = mbedcrypto mbedtls openthread-$(TD)
 
-ifneq (,$(filter openthread-cli-$(TD),$(USEMODULE)))
+ifneq (,$(filter openthread_cli_$(TD),$(USEMODULE)))
   OT_MODULES += openthread-cli-$(TD)
   OT_APP_CLI ?= ON
 endif

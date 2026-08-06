@@ -47,10 +47,10 @@ USEPKG += openthread
 # Use FTD by default
 OPENTHREAD_TYPE ?= ftd
 
-USEMODULE += openthread-$(OPENTHREAD_TYPE)
+USEMODULE += openthread_$(OPENTHREAD_TYPE)
 
 # Comment the following line in order to disable the OpenThread CLI
-USEMODULE += openthread-cli-$(OPENTHREAD_TYPE)
+USEMODULE += openthread_cli_$(OPENTHREAD_TYPE)
 
 # Only necessary for pulling the radio driver, no netdev code is actually added
 USEMODULE += netdev_default
