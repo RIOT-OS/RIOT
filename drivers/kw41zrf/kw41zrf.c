@@ -193,21 +193,37 @@ void kw41zrf_print_seq_ctrl_sts(void)
     uint32_t seq_ctrl_sts = ZLL->SEQ_CTRL_STS;
 
     printf("\n=== ZLL SEQ_CTRL_STS (0x%08lX) ===\n", seq_ctrl_sts);
-    printf("CLR_NEW_SEQ_INHIBIT:    %s\n", (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_CLR_NEW_SEQ_INHIBIT_MASK) ? "ON" : "OFF");
-    printf("EVENT_TMR_DO_NOT_LATCH: %s\n", (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_EVENT_TMR_DO_NOT_LATCH_MASK) ? "ON" : "OFF");
-    printf("LATCH_PREAMBLE:         %s\n", (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_LATCH_PREAMBLE_MASK) ? "ON" : "OFF");
-    printf("NO_RX_RECYCLE:          %s\n", (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_NO_RX_RECYCLE_MASK) ? "ON" : "OFF");
-    printf("FORCE_CRC_ERROR:        %s\n", (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_FORCE_CRC_ERROR_MASK) ? "ON" : "OFF");
-    printf("CONTINUOUS_EN:          %s\n", (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_CONTINUOUS_EN_MASK) ? "ON" : "OFF");
-    printf("XCVSEQ_ACTUAL:          0x%03lX\n", seq_ctrl_sts & ZLL_SEQ_CTRL_STS_XCVSEQ_ACTUAL_MASK);
-    printf("SEQ_IDLE:               %s\n", (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_SEQ_IDLE_MASK) ? "ON" : "OFF");
-    printf("NEW_SEQ_INHIBIT:        %s\n", (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_NEW_SEQ_INHIBIT_MASK) ? "ON" : "OFF");
-    printf("RX_TIMEOUT_PENDING:     %s\n", (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_RX_TIMEOUT_PENDING_MASK) ? "ON" : "OFF");
-    printf("RX_MODE:                %s\n", (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_RX_MODE_MASK) ? "ON" : "OFF");
-    printf("TMR2_SEQ_TRIG_ARMED:    %s\n", (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_TMR2_SEQ_TRIG_ARMED_MASK) ? "ON" : "OFF");
-    printf("SEQ_T_STATUS:           0x%05lX\n", seq_ctrl_sts & ZLL_SEQ_CTRL_STS_SEQ_T_STATUS_MASK);
-    printf("SW_ABORTED:             %s\n", (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_SW_ABORTED_MASK) ? "ON" : "OFF");
-    printf("TC3_ABORTED:            %s\n", (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_TC3_ABORTED_MASK) ? "ON" : "OFF");
-    printf("PLL_ABORTED:            %s\n", (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_PLL_ABORTED_MASK) ? "ON" : "OFF");
+    printf("CLR_NEW_SEQ_INHIBIT:    %s\n",
+            (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_CLR_NEW_SEQ_INHIBIT_MASK) ? "ON" : "OFF");
+    printf("EVENT_TMR_DO_NOT_LATCH: %s\n",
+            (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_EVENT_TMR_DO_NOT_LATCH_MASK) ? "ON" : "OFF");
+    printf("LATCH_PREAMBLE:         %s\n",
+            (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_LATCH_PREAMBLE_MASK) ? "ON" : "OFF");
+    printf("NO_RX_RECYCLE:          %s\n",
+            (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_NO_RX_RECYCLE_MASK) ? "ON" : "OFF");
+    printf("FORCE_CRC_ERROR:        %s\n",
+            (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_FORCE_CRC_ERROR_MASK) ? "ON" : "OFF");
+    printf("CONTINUOUS_EN:          %s\n",
+            (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_CONTINUOUS_EN_MASK) ? "ON" : "OFF");
+    printf("XCVSEQ_ACTUAL:          0x%03lX\n",
+            seq_ctrl_sts & ZLL_SEQ_CTRL_STS_XCVSEQ_ACTUAL_MASK);
+    printf("SEQ_IDLE:               %s\n",
+            (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_SEQ_IDLE_MASK) ? "ON" : "OFF");
+    printf("NEW_SEQ_INHIBIT:        %s\n",
+            (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_NEW_SEQ_INHIBIT_MASK) ? "ON" : "OFF");
+    printf("RX_TIMEOUT_PENDING:     %s\n",
+            (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_RX_TIMEOUT_PENDING_MASK) ? "ON" : "OFF");
+    printf("RX_MODE:                %s\n",
+            (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_RX_MODE_MASK) ? "ON" : "OFF");
+    printf("TMR2_SEQ_TRIG_ARMED:    %s\n",
+            (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_TMR2_SEQ_TRIG_ARMED_MASK) ? "ON" : "OFF");
+    printf("SEQ_T_STATUS:           0x%05lX\n",
+            seq_ctrl_sts & ZLL_SEQ_CTRL_STS_SEQ_T_STATUS_MASK);
+    printf("SW_ABORTED:             %s\n",
+            (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_SW_ABORTED_MASK) ? "ON" : "OFF");
+    printf("TC3_ABORTED:            %s\n",
+            (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_TC3_ABORTED_MASK) ? "ON" : "OFF");
+    printf("PLL_ABORTED:            %s\n",
+            (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_PLL_ABORTED_MASK) ? "ON" : "OFF");
     printf("======================================\n");
 }

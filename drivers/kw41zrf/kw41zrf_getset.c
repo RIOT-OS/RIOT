@@ -271,7 +271,8 @@ void kw41zrf_set_option(kw41zrf_t *dev, uint8_t option, uint8_t state)
                 break;
 
             case KW41ZRF_OPT_ACK_PENDING:
-                DEBUG("[kw41zrf] disable: PENDING_BIT\n"); bit_clear32(&ZLL->SAM_TABLE, ZLL_SAM_TABLE_ACK_FRM_PND_SHIFT);
+                DEBUG("[kw41zrf] disable: PENDING_BIT\n");
+                bit_clear32(&ZLL->SAM_TABLE, ZLL_SAM_TABLE_ACK_FRM_PND_SHIFT);
                 break;
             default:
                 /* do nothing */
@@ -309,5 +310,5 @@ uint8_t kw41zrf_get_partition_start(uint32_t partition_mask, uint8_t partition_s
 uint8_t kw41zrf_get_1st_free_idx_sap0(void)
 {
     return (ZLL->SAM_FREE_IDX & ZLL_SAM_FREE_IDX_SAP0_1ST_FREE_IDX_MASK)
-    >> ZLL_SAM_FREE_IDX_SAP0_1ST_FREE_IDX_SHIFT;
+            >> ZLL_SAM_FREE_IDX_SAP0_1ST_FREE_IDX_SHIFT;
 }

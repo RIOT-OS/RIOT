@@ -299,6 +299,12 @@ static inline uint32_t kw41zrf_get_timestamp(kw41zrf_t *dev)
     return ZLL->TIMESTAMP;
 }
 
+/**
+ * @brief Returns if the transmitted frame needs an ACK afterwards
+ *
+ * @retval > 0 if an ACK is needed, 0 otherwise
+ *
+ */
 static inline uint8_t kw41zrf_ack_requested(kw41zrf_t *dev)
 {
         (void) dev;

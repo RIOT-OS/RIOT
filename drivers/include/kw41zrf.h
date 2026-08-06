@@ -112,12 +112,12 @@ typedef struct {
      * @name   device specific fields
      * @{
      */
-    uint32_t rf_osc_en_idle;                /**< RF_OSC_EN bits setting when RF module is in standby */
-    int16_t tx_power;                       /**< The current tx-power setting of the device */
-    ieee802154_filter_mode_t filter_mode;   /**< Current frame filter mode */
-    uint8_t cca_busy;                       /**< CCA busy flag */
-    ieee802154_tx_status_t tx_status;       /**< Status of a transmission */
-    uint8_t pm_blocked;                     /**< true if we have blocked a low power mode in the CPU */
+    uint32_t rf_osc_en_idle;            /**< RF_OSC_EN bits setting when RF module is in standby */
+    int16_t tx_power;                   /**< The current tx-power setting of the device */
+    ieee802154_filter_mode_t filter_mode;/**< Current frame filter mode */
+    uint8_t cca_busy;                   /**< CCA busy flag */
+    ieee802154_tx_status_t tx_status;   /**< Status of a transmission */
+    uint8_t pm_blocked;                 /**< true if we have blocked a low power mode in the CPU */
     /** @} */
 } kw41zrf_t;
 
@@ -133,19 +133,18 @@ void kw41zrf_hal_setup(ieee802154_dev_t *hal);
 /**
  * @brief   Initialize the given KW41ZRF device
  *
- * @return                  0 on success
- * @return                  <0 on error
+ * @retval                  0 on success
+ * @retval                  <0 on error
  */
 int kw41zrf_init(void);
 
 /**
  * @brief   Reset radio hardware and restore default settings
  *
- * @return 0 on success
- * @return <0 on initialization failure
+ * @retval 0 on success
+ * @retval <0 on initialization failure
  */
 int kw41zrf_reset_hardware(kw41zrf_t *dev);
-
 
 /**
  * @brief Print ZLL IRQSTS register state

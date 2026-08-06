@@ -281,7 +281,6 @@ static int _confirm_op(ieee802154_dev_t *dev, ieee802154_hal_op_t op, void *ctx)
     return 0;
 }
 
-
 int _set_cca_mode(ieee802154_dev_t *dev, ieee802154_cca_mode_t mode)
 {
     (void)dev;
@@ -473,8 +472,8 @@ int _remove_from_sam_table(uint16_t checksum)
 
     for (uint8_t idx = 0; idx < end_idx; idx++) {
 
-        ZLL->SAM_TABLE = (idx << ZLL_SAM_TABLE_SAM_INDEX_SHIFT) | (1 <<
-                                                                   ZLL_SAM_TABLE_SAM_INDEX_WR_SHIFT);
+        ZLL->SAM_TABLE = (idx << ZLL_SAM_TABLE_SAM_INDEX_SHIFT) |
+                         (1 << ZLL_SAM_TABLE_SAM_INDEX_WR_SHIFT);
         uint16_t entry_checksum = ZLL->SAM_TABLE & ZLL_SAM_TABLE_SAM_CHECKSUM_MASK;
 
         if (checksum == entry_checksum) {
@@ -530,6 +529,7 @@ int _config_src_addr_match(ieee802154_dev_t *dev, ieee802154_src_match_t cmd, co
     }
     return 0;
 }
+
 /* Common CCA check handler code for sequences Transmit and Transmit/Receive */
 static uint32_t _isr_event_seq_t_ccairq(kw41zrf_t *dev, uint32_t irqsts)
 {
@@ -663,7 +663,6 @@ static uint32_t _isr_event_seq_t(kw41zrf_t *dev, uint32_t irqsts,
     return handled_irqs;
 }
 
-
 /* Handler for Transmit/Receive sequence */
 static uint32_t _isr_event_seq_tr(kw41zrf_t *dev, uint32_t irqsts,
                                   bool *indicate_hal_event,
@@ -705,7 +704,7 @@ static uint32_t _isr_event_seq_tr(kw41zrf_t *dev, uint32_t irqsts,
         bit_clear32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_TC3TMOUT_SHIFT);
         bit_clear32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_TMR3CMP_EN_SHIFT);
 
-            kw41zrf_abort_sequence(&intern_dev);
+        kw41zrf_abort_sequence(&intern_dev);
         if (irqsts & ZLL_IRQSTS_TMR3IRQ_MASK) {
             handled_irqs |= ZLL_IRQSTS_TMR3IRQ_MASK;
         }
@@ -891,12 +890,11 @@ int kw41zrf_init(void)
     return 0;
 }
 
-
 void kw41zrf_hal_setup(ieee802154_dev_t *hal)
 {
     DEBUG("[kw41zrf] hal_setup\n");
-    /* We don't set &intern_dev because the context of this device is global */
-    /* We need to store a reference to the HAL descriptor though for the ISR */
+    /* We don't set &intern_dev because the context of this device is global.
+     * We need to store a reference to the HAL descriptor though for the ISR */
     hal->driver = &kw41zrf_ops;
     _kw41zrf_hal_dev = hal;
 }

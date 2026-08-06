@@ -27,11 +27,11 @@ extern "C" {
  * @name   Internal device option flags
  * @{
  */
-#define KW41ZRF_OPT_CCA_BEFORE_TX   (0x01u) /**< cca before tx active */
-#define KW41ZRF_OPT_PROMISCUOUS     (0x02u) /**< promiscuous mode active */
-#define KW41ZRF_OPT_PRELOADING      (0x04u) /**< preloading enabled */
-#define KW41ZRF_OPT_AUTOACK         (0x80u) /**< automatic sending of ACKs */
-#define KW41ZRF_OPT_ACK_PENDING     (0x81u) /**< set pending bit on auto ACKs */
+#define KW41ZRF_OPT_CCA_BEFORE_TX   (0x01u) /**< Cca before TX */
+#define KW41ZRF_OPT_PROMISCUOUS     (0x02u) /**< Promiscuous mode */
+#define KW41ZRF_OPT_PRELOADING      (0x04u) /**< Preloading */
+#define KW41ZRF_OPT_AUTOACK         (0x80u) /**< Automatic transmission of ACKs */
+#define KW41ZRF_OPT_ACK_PENDING     (0x81u) /**< Pending bit on auto ACKs */
 /** @} */
 
 /** @brief Transceiver sequence identifiers */
@@ -165,6 +165,7 @@ void kw41zrf_set_cca_type(kw41zrf_t *dev, uint8_t type);
  * @brief   Get CCA type of a kw41zrf device
  *
  * @param[in] dev       kw41zrf device descriptor
+ *
  * @return              current CCA type
  */
 uint8_t kw41zrf_get_cca_type(kw41zrf_t *dev);
@@ -181,6 +182,7 @@ void kw41zrf_set_cca3_mode(uint8_t mode);
  * @brief   Get latest ED measurement from the device
  *
  * @param[in] dev       kw41zrf device descriptor
+ *
  * @return              most recent ED level
  */
 int8_t kw41zrf_get_ed_level(kw41zrf_t *dev);
@@ -190,8 +192,8 @@ int8_t kw41zrf_get_ed_level(kw41zrf_t *dev);
  *
  * @param[in] dev       kw41zrf device descriptor
  *
- * @return              0 if channel is idle
- * @return              1 if channel is busy
+ * @retval              0 if channel is idle
+ * @retval              1 if channel is busy
  */
 int kw41zrf_cca(kw41zrf_t *dev);
 
@@ -222,8 +224,8 @@ uint8_t kw41zrf_get_1st_free_idx_sap0(void);
 /**
  * @brief Enable or disable a partition
  *
- * @param[in] en            Enable (1) or disable (0)
- * @param[in] partition_shift Bit position for the partition
+ * @param[in] en                Enable (1) or disable (0)
+ * @param[in] partition_shift   Bit position for the partition
  */
 void kw41zrf_set_partition_enable(uint8_t en, uint8_t partition_shift);
 
@@ -248,24 +250,25 @@ uint8_t kw41zrf_get_partition_enable(uint32_t partition_mask, uint8_t partition_
 uint8_t kw41zrf_get_partition_start(uint32_t partition_mask, uint8_t partition_shift);
 
 /**
- * @brief Get link quality indicator(lqi) value
+ * @brief Get Link Quality Indicator(LQI) value
  *
  * @param[in] dev   kw41zrf device descriptor
  *
- * @return          lqi value
+ * @return          LQI value
  */
 inline uint8_t kw41zrf_get_lqi_value(kw41zrf_t *dev)
 {
     (void) dev;
-    return (ZLL->LQI_AND_RSSI & ZLL_LQI_AND_RSSI_LQI_VALUE_MASK) >> ZLL_LQI_AND_RSSI_LQI_VALUE_SHIFT;
+    return (ZLL->LQI_AND_RSSI & ZLL_LQI_AND_RSSI_LQI_VALUE_MASK)
+            >> ZLL_LQI_AND_RSSI_LQI_VALUE_SHIFT;
 }
 
 /**
- * @brief Get received signal strength indicator(rssi) value
+ * @brief Get Received Signal Strength Indicator(RSSI) value
  *
  * @param[in] dev   kw41zrf device descriptor
  *
- * @return          rssi value
+ * @return          RSSI value
  */
 inline int8_t kw41zrf_get_rssi_value(kw41zrf_t *dev)
 {
