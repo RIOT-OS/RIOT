@@ -12,7 +12,7 @@ You don't need to select this module directly.
 This is the dependency graph of this driver:
 
 ```
-unicoap_driver_udp
+unicoap_driver_slipmux
 ├── unicoap_driver_rfc7252_common
 │   ├── unicoap_driver_rfc7252_common_messaging
 │   └── unicoap_driver_rfc7252_common_pdu
