@@ -8,15 +8,16 @@ your Linux machine.
 
 ## Connecting RIOT native and the Linux host
 
-> **Note:** RIOT does not support IPv4, so you need to stick to IPv6
-> anytime. To establish a connection between RIOT and the Linux host,
-> you will need `netcat` (with IPv6 support). Ubuntu 14.04 comes with
+> **Note:** RIOT does not support IPv4 natively, so you need to stick
+> to IPv6 anytime. However, if you really need IPv4 you can use the
+> lwIP library, see [lwip_ipv4](../../misc/lwip_ipv4/README.md)
+> example for more details.
+> To establish a IPv6 connection between RIOT and the Linux host,
+> you will need `netcat` (with IPv6 support). Ubuntu comes with
 > netcat IPv6 support pre-installed.
 > On Debian it's available in the package `netcat-openbsd`. Be aware
 > that many programs require you to add an option such as -6 to tell
-> them to use IPv6, otherwise they will fail. If you're using a
-> _Raspberry Pi_, run `sudo modprobe ipv6` before trying this example,
-> because raspbian does not load the IPv6 module automatically.
+> them to use IPv6, otherwise they will fail.
 > On some systems (openSUSE for example), the _firewall_ may interfere,
 > and prevent some packets to arrive at the application (they will
 > however show up in Wireshark, which can be confusing). So be sure to
