@@ -102,7 +102,7 @@ extern "C" {
 #  define LM75_PARAM_INT GPIO_UNDEF /**< Pin used for Interrupts defined by the board */
 #endif
 
-#define LM75A_CONV_RATE    (100) /**< temperature register updated every 100ms */
+#define LM75A_CONV_RATE    (100)  /**< Temperature register updated every 100ms */
 
 #define LM75A_OS_RES       (5)    /**< resolution in 0.5ºC */
 #define LM75A_OS_MULT      (10)   /**< Must multiply by 10 to get temp in ºC */
