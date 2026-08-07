@@ -61,6 +61,7 @@
 #include <stdint.h>
 
 #include "cib.h"
+#include "event.h"
 #include "net/netdev.h"
 #include "periph/uart.h"
 #include "chunked_ringbuffer.h"
@@ -173,7 +174,7 @@ typedef struct {
 #if IS_USED(MODULE_SLIPDEV_CONFIG)
     chunk_ringbuf_t rb_config;                      /**< Ringbuffer stores received configuration frames */
     uint8_t rxmem_config[CONFIG_SLIPDEV_BUFSIZE];   /**< memory used by RX buffer */
-    kernel_pid_t coap_server_pid;                   /**< The PID of the CoAP server */
+    event_t rxevent;                                /**< The event that is send to the CoAP server */
 #endif
 
     slipdev_params_t config;                /**< configuration parameters */
@@ -193,6 +194,53 @@ typedef struct {
  *                      If initialized manually, pass a unique identifier instead.
  */
 void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index);
+
+/**
+ * @brief   Setup the event queue that will be notified when a config frame arrives
+ *
+ * @param[in] q         event queue
+ */
+void slipdev_coap_set_event_queue(event_queue_t *q);
+
+/**
+ * @brief   Teardown the event queue
+ */
+void slipdev_coap_unset_event_queue(void);
+
+/**
+ * @brief   Callback to inform unicoap that a new configuration frame is available
+ *
+ * @param[in] event     event of the received frame
+ */
+void unicoap_slipdev_recv_handler(event_t * event);
+
+
+/**
+ * @brief   Receive a CoAP packet into the given buffer
+ *
+ * This function handles the unescaping and checks the FCS for correctness.
+ *
+ * @param[in] buf       buffer into which the received frame is copied.
+ * @param[in] buf_size  length of @p buf.
+ * @param[in] dev       device descriptor to identify the slipdev instance.
+ *
+ * @retval >0   length of the stored frame in bytes
+ * @retval  0   No frame available, the buffer was not modified
+ * @retval -1   Frame length exceeds buffer size or the frame was too short to be valid
+ * @retval -2   The checksum was invalid, the buffer was modified
+ */
+int slipdev_coap_recv(uint8_t *buf, size_t buf_size, slipdev_t *dev);
+
+/**
+ * @brief   Send a CoAP message as a configuration frame
+ *
+ * This functions handles the calculation of the needed checksum, the escaping
+ * of data, the framing and finally sends the result onto the wire.
+ *
+ * @param[in] iolist    IO vector list to send.
+ * @param[in] dev       device descriptor to identify the slipdev instance.
+ */
+void slipdev_coap_send(const iolist_t *iolist,  const slipdev_t *dev);
 
 #ifdef __cplusplus
 }
