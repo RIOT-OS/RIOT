@@ -254,9 +254,9 @@ int adc_init(adc_t line)
         while (dev(line)->CR & ADC_CR_ADCAL) {}
 
 #if defined(CPU_FAM_STM32U3)
-        /* PCSEL is writable only while ADEN=0 (RM0487), so pre-select all
+        /* PCSEL is writable only while ADEN=0 (RM0487), so preselect all
          * external channels of this ADC here. Internal channels are routed
-         * via ADC_CCR and need no pre-selection. */
+         * via ADC_CCR and need no preselection. */
         for (unsigned i = 0; i < ADC_NUMOF; i++) {
             if ((adc_config[i].dev == adc_config[line].dev)
                 && (adc_config[i].pin != GPIO_UNDEF)) {
