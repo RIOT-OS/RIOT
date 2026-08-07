@@ -34,6 +34,14 @@ static const can_conf_t candev_conf[] = {
         .af = GPIO_AF9,
         .it0_irqn = FDCAN1_IT0_IRQn,
         .it1_irqn = FDCAN1_IT1_IRQn,
+#elif defined(CPU_FAM_STM32H7)
+        .can = FDCAN1,
+        .rcc_mask = RCC_APB1HENR_FDCANEN,
+        .rx_pin = GPIO_PIN(PORT_D, 0),
+        .tx_pin = GPIO_PIN(PORT_D, 1),
+        .af = GPIO_AF9,
+        .it0_irqn = FDCAN1_IT0_IRQn,
+        .it1_irqn = FDCAN1_IT1_IRQn,
 #elif defined(CPU_FAM_STM32F0)
         .can = CAN,
         .rcc_mask = RCC_APB1ENR_CANEN,
