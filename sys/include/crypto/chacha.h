@@ -79,13 +79,13 @@ void chacha_keystream_bytes(chacha_ctx *ctx, void *x);
  * @param[in]     m   The input.
  * @param[out]    c   The output.
  */
-void chacha_encrypt_bytes(chacha_ctx *ctx, const uint8_t *m, uint8_t *c);
+void chacha_encrypt_bytes(chacha_ctx *ctx, const uint8_t m[64], uint8_t c[64]);
 
 /**
  * @copydoc chacha_encrypt_bytes()
  */
-static inline void chacha_decrypt_bytes(chacha_ctx *ctx, const uint8_t *m,
-                                        uint8_t *c)
+static inline void chacha_decrypt_bytes(chacha_ctx *ctx, const uint8_t m[64],
+                                        uint8_t c[64])
 {
     chacha_encrypt_bytes(ctx, m, c);
 }
