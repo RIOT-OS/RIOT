@@ -667,6 +667,8 @@ groups:
       help: A DAC peripheral is present.
     - name: periph_dac_play
       help: The DAC peripheral implements playing multiple samples in the background.
+    - name: periph_adc_dma
+      help: The ADC peripheral can be used with DMA to transfer samples into memory.
 
   - title: Integrated Connectivity
     help: Peripheral network and communication interfaces.
