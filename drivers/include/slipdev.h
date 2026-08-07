@@ -237,11 +237,10 @@ int slipdev_coap_recv(uint8_t *buf, size_t buf_size, slipdev_t *dev);
  * This functions handles the calculation of the needed checksum, the escaping
  * of data, the framing and finally sends the result onto the wire.
  *
- * @param[in] buf       buffer into which the received frame is copied.
- * @param[in] buf_size  length of @p buf.
+ * @param[in] iolist    IO vector list to send.
  * @param[in] dev       device descriptor to identify the slipdev instance.
  */
-void slipdev_coap_send(uint8_t *buf, size_t buf_size, const slipdev_t *dev);
+void slipdev_coap_send(iolist_t *iolist,  const slipdev_t *dev);
 
 #ifdef __cplusplus
 }

@@ -75,13 +75,20 @@ int slipdev_coap_recv(uint8_t *buf, size_t buf_size, slipdev_t *dev)
     return 0;
 }
 
-void slipdev_coap_send(uint8_t *buf, size_t buf_size, const slipdev_t *dev)
+void slipdev_coap_send(iolist_t *iolist, const slipdev_t *dev)
 {
-    uint16_t fcs_sum = crc16_ccitt_fcs_finish(SPECIAL_INIT_FCS, buf, buf_size);
-
+    uint16_t fcs_sum = SPECIAL_INIT_FCS;
     _slipdev_lock();
     slipdev_write_byte(dev->config.uart, SLIPDEV_START_COAP);
-    slipdev_write_bytes(dev->config.uart, buf, buf_size);
+
+    for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
+        if (iol->iol_len) {
+            fcs_sum = crc16_ccitt_fcs_update(fcs_sum, iol->iol_base, iol->iol_len);
+            slipdev_write_bytes(dev->config.uart, iol->iol_base, iol->iol_len);
+        }
+    }
+
+    fcs_sum = crc16_ccitt_fcs_finish(fcs_sum, NULL, 0);
     slipdev_write_bytes(dev->config.uart, (uint8_t *)&fcs_sum, 2);
     slipdev_write_byte(dev->config.uart, SLIPDEV_END);
     _slipdev_unlock();

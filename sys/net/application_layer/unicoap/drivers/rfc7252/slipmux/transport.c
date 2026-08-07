@@ -65,9 +65,8 @@ int unicoap_transport_sendv_slipmux(iolist_t *iolist, const unicoap_endpoint_t *
 {
     _SLIPMUX_DEBUG("sendv: %" PRIuSIZE " bytes via UART(%d)\n", iolist_size(iolist),
                    remote->slipmux_ep->config.uart);
-    size_t len = iolist_to_buffer(iolist, unicoap_receiver_buffer,
-                                  sizeof(unicoap_receiver_buffer));
-    slipdev_coap_send(unicoap_receiver_buffer, len, remote->slipmux_ep);
+
+    slipdev_coap_send(iolist, remote->slipmux_ep);
 
     return 0;
 }
