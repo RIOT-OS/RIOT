@@ -193,7 +193,7 @@ static inline bool unicoap_transport_uses_sock_tl_ep(unicoap_proto_t proto)
      * such as CoAP over GATT, return false here. */
     /* MARK: unicoap_driver_extension_point */
     default:
-        return true;
+        return false;
     }
 }
 

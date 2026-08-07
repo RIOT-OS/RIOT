@@ -208,7 +208,7 @@ void slipdev_coap_set_event_queue(event_queue_t *q);
 void slipdev_coap_unset_event_queue(void);
 
 /**
- * @brief   Unicoap callback to handle a received config frame
+ * @brief   Callback to inform unicoap that a new configuration frame is available
  *
  * @param[in] event     event of the received frame
  */
@@ -216,7 +216,9 @@ void unicoap_slipdev_recv_handler(event_t * event);
 
 
 /**
- * @brief   Called by unicoap to receive a config frame
+ * @brief   Receive a CoAP packet into the given buffer
+ *
+ * This function handles the unescaping and checks the FCS for correctness.
  *
  * @param[in] buf       buffer into which the received frame is copied.
  * @param[in] buf_size  length of @p buf.
@@ -230,7 +232,7 @@ void unicoap_slipdev_recv_handler(event_t * event);
 int slipdev_coap_recv(uint8_t *buf, size_t buf_size, slipdev_t *dev);
 
 /**
- * @brief   Called by unicoap to send a coap message as a config frame
+ * @brief   Send a CoAP message as a configuration frame
  *
  * This functions handles the calculation of the needed checksum, the escaping
  * of data, the framing and finally sends the result onto the wire.
