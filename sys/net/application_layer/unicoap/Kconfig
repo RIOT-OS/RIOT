@@ -9,7 +9,7 @@ menu "CoAP Unified Suite (unicoap)"
         config UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS
             int "Time to wait for a response (ms)"
             range 1 9999999
-            default 10000
+            default 7000
             help
                 Client only
 
@@ -91,13 +91,6 @@ menu "CoAP Unified Suite (unicoap)"
             default y
             help
                  Instructs the transport drivers to retrieve the local endpoint a PDU arrives at.
-
-        config unicoap_cancel_requestLABLE
-            bool "Enable cancellable requests"
-            depends on USEMODULE_UNICOAP_CLIENT
-            default n
-            help
-                Allows cancelling pending requests using unicoap_cancel_request.
 
     endmenu
 

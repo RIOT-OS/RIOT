@@ -328,11 +328,6 @@ typedef enum {
      */
     UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE = 0x4000,
 
-    // maybe resource for authenticated only? access control?
-    // claims? maybe independent of oscore?
-    // talk to teufelchen? slipmux
-    
-    // onio
     /* TODO: Advanced features */
 } unicoap_resource_flags_t;
 

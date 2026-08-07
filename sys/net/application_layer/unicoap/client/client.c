@@ -259,6 +259,7 @@ static int _copy_callback(const unicoap_message_t* response, const unicoap_aux_t
     unicoap_options_t* dest_options = args->response->options;
     uint8_t* dest_payload = args->response->payload;
     size_t dest_payload_capacity = args->response->payload_size;
+    /* We want a contiguous buffer to copy the response into, not an iolist_t. */
     assert(args->response->payload_representation == UNICOAP_PAYLOAD_CONTIGUOUS);
 
     if (response->options) {
@@ -269,7 +270,7 @@ static int _copy_callback(const unicoap_message_t* response, const unicoap_aux_t
         }
 
         if (unicoap_options_size(response->options) > response->options->storage_capacity) {
-            _CLIENT_DEBUG("no buffer space to copy options, " _UNICOAP_NEED_HAVE "\n",
+            _CLIENT_DEBUG("not enough buffer space to copy options, " _UNICOAP_NEED_HAVE "\n",  
                      unicoap_options_size(response->options), dest_options->storage_capacity);
             error = -ENOBUFS;
             goto out;
@@ -282,20 +283,20 @@ static int _copy_callback(const unicoap_message_t* response, const unicoap_aux_t
     }
 
     if (response->payload) {
-        if (!args->response->payload) {
+        if (!dest_payload) {  
             _CLIENT_DEBUG("no payload buffer provided\n");
             error = -ENOBUFS;
             goto out;
         }
 
-        if (args->response->payload_size < response->payload_size) {
-            _CLIENT_DEBUG("no buffer space to copy payload, " _UNICOAP_NEED_HAVE "\n",
-                     response->payload_size, dest_payload_capacity);
+        if (dest_payload_capacity < response->payload_size) {  
+            _CLIENT_DEBUG("not enough buffer space to copy payload, " _UNICOAP_NEED_HAVE "\n",  
+                          response->payload_size, dest_payload_capacity);
         }
         memcpy(dest_payload, response->payload, response->payload_size);
     }
 
-    if (args->aux) {
+    if (args->aux && aux) {
         if (args->aux->local && aux->local) {
             *(unicoap_endpoint_t*)args->aux->local = *aux->local;
         }

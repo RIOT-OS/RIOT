@@ -61,7 +61,7 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
     (void)arg;
     sock_dtls_session_t session = { 0 };
 
-    /* This logic heavily depends on the tinydtls. At the moment, no other DTLS
+    /* This logic heavily depends on the tinydtls backend. At the moment, no other DTLS  
      * backend other than tinydtls exists. As soon as another becomes supported,
      * this logic needs to be adjusted to strictly follow the sock_dtls API.
      * For now, we need work around tinydtls quirks. */
@@ -71,8 +71,7 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
         /* finish handshake as per API contract of @ref sock_dtls_session_init.
          * use non-buf function with less parameters */
         uint8_t buf[1];
-        ssize_t res = sock_dtls_recv(sock, &session, buf, sizeof(buf),
-                                     CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS * US_PER_MS);
+        ssize_t res = sock_dtls_recv(sock, &session, buf, sizeof(buf), 0);
 
         if (res != -SOCK_DTLS_HANDSHAKE) {
             _DTLS_DEBUG("could not establish DTLS session: %" PRIiSIZE " (%s)\n", res,
@@ -81,11 +80,6 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
         }
 
         dsm_state_t prev_state = dsm_store(sock, &session, SESSION_STATE_ESTABLISHED, false);
-
-        /* If session is already stored and the state was SESSION_STATE_HANDSHAKE
-         * before, the handshake has been initiated internally by a client request
-         * and another thread is waiting for the handshake. Send message to the
-         * waiting thread to inform about established session */
         if (prev_state == SESSION_STATE_HANDSHAKE) {
             _DTLS_DEBUG("telling messaging can resume\n");
             unicoap_endpoint_t remote = { .proto = UNICOAP_PROTO_DTLS };
@@ -192,7 +186,7 @@ int unicoap_transport_connect_dtls(const sock_udp_ep_t* remote, sock_dtls_sessio
     switch (session_state) {
         case SESSION_STATE_ESTABLISHED:
             _DTLS_DEBUG("auth: session established\n");
-            return EEXIST;
+            return -EEXIST;
         case SESSION_STATE_NONE:
             _DTLS_DEBUG("auth: session not established\n");
             if ((res = sock_dtls_session_init(&_dtls_socket, remote, session)) < 0) {
@@ -203,7 +197,7 @@ int unicoap_transport_connect_dtls(const sock_udp_ep_t* remote, sock_dtls_sessio
             return 0;
         case SESSION_STATE_HANDSHAKE:
             _DTLS_DEBUG("auth: handshaking\n");
-            return EEXIST;
+            return -EEXIST;
         case NO_SPACE:
             _DTLS_DEBUG("auth: DTLS session mgmt full\n");
             return -ENOBUFS;

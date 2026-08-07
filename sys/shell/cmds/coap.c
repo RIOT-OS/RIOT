@@ -7,7 +7,7 @@
 /**
  * @file
  * @ingroup sys_shell_commands
- * @brief   `coap` client shell command
+ * @brief   `coap` client shell command using @ref unicoap  
  * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 

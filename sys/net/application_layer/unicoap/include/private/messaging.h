@@ -246,10 +246,31 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
  */
 int unicoap_exchange_process(unicoap_packet_t* packet, unicoap_exchange_arg_t arg);
 
-
+/**
+ * @brief RFC 7252 event used to notify messaging layer of a change
+ */
 typedef enum {
+    /**
+     * @brief 'Received' event
+     * 
+     * The attached packet contains a message that has been received.
+     */
     UNICOAP_MESSAGING_RFC7252_EVENT_RX = 1,
+
+    /**
+     * @brief 'Truncated' event
+     * 
+     * The attached packet contains a message that has been truncated.
+     * This event will always occur in conjunction with @ref UNICOAP_MESSAGING_RFC7252_EVENT_RX.
+     */
     UNICOAP_MESSAGING_RFC7252_EVENT_TRUNCATED = 1 << 1,
+
+    /**
+     * @brief 'Session established' event
+     * 
+     * A DTLS session with the remote endpoint has been establishment.
+     * The messaging layer may resume sending any delayed transmissions now.
+     */
     UNICOAP_MESSAGING_RFC7252_EVENT_SESSION_ESTABLISHED = 1 << 2,
 } __attribute__((packed)) unicoap_messaging_rfc7252_event_type_t;
 

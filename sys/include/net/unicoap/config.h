@@ -258,7 +258,7 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
  * @brief Default time to wait for a response
  *
  * **Unit**: milliseconds
- * **Default**: 10000
+ * **Default**: 7000
  */
 #if !defined(CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS (7000)

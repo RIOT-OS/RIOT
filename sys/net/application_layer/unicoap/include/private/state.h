@@ -261,7 +261,7 @@ static inline int unicoap_layer_notification_async_failure_to_errno(unicoap_laye
 }
 
 /**
- * @brief Converts negative error number into notification
+ * @brief Converts positive error number into notification
  * @param error Negative integer indicating error
  * @returns Notification
  */
@@ -273,7 +273,7 @@ static inline unicoap_layer_notification_t unicoap_layer_notification_async_fail
 
 /**
  * @brief Event indicating a layer is finished and is releasing its allocated
- * state objects of this exchange/transmission
+ *        state objects of this exchange/transmission  
  *
  * The recipient layer must determine whether it still needs to retain its allocated
  * state objects.
@@ -288,18 +288,21 @@ static inline unicoap_layer_notification_t unicoap_layer_notification_async_fail
 #define UNICOAP_LAYER_NOTIFICATION_STATE_ALLOC (1)
 
 /**
- * @brief Informs messaging layer of event
- * @param state Messaging-layer state reference
- * @param type Event type
- * @param[in] arg Optional opaque state object in this layer the notification relates to.
- * @param proto The protocol number for the underlying CoAP driver
+ * @brief Informs messaging layer of event  
+ *  
+ * @param state Messaging-layer state reference  
+ * @param type Event type  
+ * @param[in] arg Optional opaque state object in this layer the notification relates to.  
+ * @param proto The protocol number for the underlying CoAP driver  
  *
- * Usually called from exchange layer
+ * Usually called from exchange layer.
  */
-void unicoap_messaging_notify(void* state, unicoap_layer_notification_t type, void* arg, unicoap_proto_t proto);
+void unicoap_messaging_notify(void* state, unicoap_layer_notification_t type, 
+                              void* arg, unicoap_proto_t proto);
 
 /**
  * @brief Informs exchange layer of event
+ *
  * @param state Exchange-layer state reference
  * @param type Event type
  * @param[in] arg Optional opaque state object in this layer the notification relates to.
