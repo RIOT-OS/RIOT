@@ -8,7 +8,7 @@
  * @{
  *
  * @file
- * @brief       Test application for the MAX31343 RTC driver
+ * @brief       Test application for the MAX313xx RTC driver
  *
  * @author      Jakob Müller <ja.mueller@tuhh.de>
  *
@@ -21,15 +21,17 @@
 #include <string.h>
 #include <time.h>
 
-#include "max31343.h"
-#include "max31343_params.h"
+#include "max313xx.h"
+#include "max313xx_params.h"
+
 #include "shell.h"
 #include "ztimer.h"
+#include "kernel_defines.h"
 
 #define ISOSTR_LEN  (20U)   /* "YYYY-MM-DDTHH:mm:ss" + NUL */
 #define TEST_DELAY  (2U)    /* seconds used in the self-test */
 
-static max31343_t _dev;
+static max313xx_t _dev;
 
 static const struct tm _ref_time = {
     .tm_sec   = 0,
@@ -91,7 +93,7 @@ static int _cmd_get(int argc, char **argv)
     (void)argc; (void)argv;
 
     struct tm t;
-    int res = max31343_get_time(&_dev, &t);
+    int res = max313xx_get_time(&_dev, &t);
     if (res != 0) {
         printf("error: get_time failed (%d)\n", res);
         return 1;
@@ -115,7 +117,7 @@ static int _cmd_set(int argc, char **argv)
         return 1;
     }
 
-    int res = max31343_set_time(&_dev, &t);
+    int res = max313xx_set_time(&_dev, &t);
     if (res != 0) {
         printf("error: set_time failed (%d)\n", res);
         return 1;
@@ -130,7 +132,7 @@ static int _cmd_alarm_get(int argc, char **argv)
     (void)argc; (void)argv;
 
     struct tm t;
-    int res = max31343_get_alarm(&_dev, &t);
+    int res = max313xx_get_alarm(&_dev, &t);
     if (res == -ENOENT) {
         puts("no alarm set");
         return 0;
@@ -158,7 +160,7 @@ static int _cmd_alarm_set(int argc, char **argv)
         return 1;
     }
 
-    int res = max31343_set_alarm(&_dev, &t);
+    int res = max313xx_set_alarm(&_dev, &t);
     if (res != 0) {
         printf("error: set_alarm failed (%d)\n", res);
         return 1;
@@ -176,7 +178,7 @@ static int _cmd_set_alarm_int(int argc, char **argv)
     }
 
     bool en = (argv[1][0] == '1');
-    int res = max31343_set_alarm_int(&_dev, en);
+    int res = max313xx_set_alarm_int(&_dev, en);
     if (res != 0) {
         printf("error: set_alarm_int failed (%d)\n", res);
         return 1;
@@ -186,12 +188,13 @@ static int _cmd_set_alarm_int(int argc, char **argv)
 }
 SHELL_COMMAND(set_alarm_int, "enable/disable alarm interrupt", _cmd_set_alarm_int);
 
+#if IS_USED(MODULE_MAX31343)
 static int _cmd_temp(int argc, char **argv)
 {
     (void)argc; (void)argv;
 
     int16_t centi;
-    int res = max31343_get_temp(&_dev, &centi);
+    int res = max313xx_get_temp(&_dev, &centi);
     if (res != 0) {
         printf("error: get_temp failed (%d)\n", res);
         return 1;
@@ -203,7 +206,9 @@ static int _cmd_temp(int argc, char **argv)
     return 0;
 }
 SHELL_COMMAND(temp, "read temperature", _cmd_temp);
+#endif /* IS_USED(MAX31343) */
 
+#if IS_USED(MODULE_MAX31343)
 static int _cmd_sqw(int argc, char **argv)
 {
     if (argc != 2) {
@@ -218,7 +223,7 @@ static int _cmd_sqw(int argc, char **argv)
         return 1;
     }
 
-    int res = max31343_set_sqw(&_dev, (max31343_sqw_freq_t)freq);
+    int res = max313xx_set_sqw(&_dev, (max313xx_sqw_freq_t)freq);
     if (res != 0) {
         printf("error: set_sqw failed (%d)\n", res);
         return 1;
@@ -227,11 +232,12 @@ static int _cmd_sqw(int argc, char **argv)
     return 0;
 }
 SHELL_COMMAND(sqw, "set SQW output frequency", _cmd_sqw);
+#endif /* IS_USED(MAX31343) */
 
 static int _cmd_trickle(int argc, char **argv)
 {
     if (argc == 2 && argv[1][0] == '0') {
-        int res = max31343_trickle_charge_disable(&_dev);
+        int res = max313xx_trickle_charge_disable(&_dev);
         if (res != 0) {
             printf("error: set_trickle failed (%d)\n", res);
             return 1;
@@ -255,9 +261,8 @@ static int _cmd_trickle(int argc, char **argv)
         return 1;
     }
 
-    int res = max31343_trickle_charge_enable(&_dev,
-                                           (bool)diode,
-                                           (max31343_trickle_res_t)res_sel);
+    int res = max313xx_trickle_charge_enable(&_dev, (bool)diode,
+                                           (max313xx_trickle_res_t)res_sel);
     if (res != 0) {
         printf("error: set_trickle failed (%d)\n", res);
         return 1;
@@ -267,6 +272,7 @@ static int _cmd_trickle(int argc, char **argv)
 }
 SHELL_COMMAND(trickle, "configure trickle charger", _cmd_trickle);
 
+#if IS_USED(MODULE_MAX31343)
 static int _cmd_automode(int argc, char **argv)
 {
     if (argc != 3) {
@@ -282,7 +288,7 @@ static int _cmd_automode(int argc, char **argv)
         return 1;
     }
 
-    int res = max31343_temp_set_automode(&_dev, en, (max31343_ttsint_t)ttsint);
+    int res = max313xx_temp_set_automode(&_dev, en, (max313xx_ttsint_t)ttsint);
     if (res != 0) {
         printf("error: temp_set_automode failed (%d)\n", res);
         return 1;
@@ -291,6 +297,7 @@ static int _cmd_automode(int argc, char **argv)
     return 0;
 }
 SHELL_COMMAND(automode, "configure temp automode and interval", _cmd_automode);
+#endif
 
 static int _cmd_power(int argc, char **argv)
 {
@@ -301,11 +308,11 @@ static int _cmd_power(int argc, char **argv)
 
     int res;
     if (argv[1][0] == '1') {
-        res = max31343_poweron(&_dev);
+        res = max313xx_poweron(&_dev);
         if (res == 0) { puts("oscillator powered on"); }
     }
     else {
-        res = max31343_poweroff(&_dev);
+        res = max313xx_poweroff(&_dev);
         if (res == 0) { puts("oscillator powered off"); }
     }
 
@@ -326,21 +333,19 @@ static int _cmd_test(int argc, char **argv)
 
     puts("[test] setting reference time...");
 
-    res = max31343_set_time(&_dev, &_ref_time);
+    res = max313xx_set_time(&_dev, &_ref_time);
     if (res != 0) {
         printf("[test] FAIL: set_time returned %d\n", res);
         return 1;
     }
 
-    /*
-     * The MAX31343 only latches a written time at the next internal 1 Hz
+    /* The MAX313xx only latches a written time at the next internal 1 Hz
      * tick boundary. Waiting two full second guarantees the new value is
-     * committed before we read it back.
-     */
+     * committed before we read it back. */
     ztimer_sleep(ZTIMER_SEC, 2);
 
     puts("[test] reading back time...");
-    res = max31343_get_time(&_dev, &t);
+    res = max313xx_get_time(&_dev, &t);
     if (res != 0) {
         printf("[test] FAIL: get_time returned %d\n", res);
         return 1;
@@ -371,7 +376,7 @@ static int _cmd_test(int argc, char **argv)
     puts("[test] waiting for clock to tick...");
     ztimer_sleep(ZTIMER_SEC, TEST_DELAY);
 
-    res = max31343_get_time(&_dev, &t);
+    res = max313xx_get_time(&_dev, &t);
     if (res != 0) {
         printf("[test] FAIL: get_time returned %d\n", res);
         return 1;
@@ -384,7 +389,7 @@ static int _cmd_test(int argc, char **argv)
 
     puts("[test] testing alarm set/get...");
     struct tm alarm_time;
-    res = max31343_get_time(&_dev, &alarm_time);
+    res = max313xx_get_time(&_dev, &alarm_time);
     if (res != 0) {
         printf("[test] FAIL: get_time returned %d\n", res);
         return 1;
@@ -392,14 +397,14 @@ static int _cmd_test(int argc, char **argv)
     alarm_time.tm_sec += TEST_DELAY;
     mktime(&alarm_time);
 
-    res = max31343_set_alarm(&_dev, &alarm_time);
+    res = max313xx_set_alarm(&_dev, &alarm_time);
     if (res != 0) {
         printf("[test] FAIL: set_alarm returned %d\n", res);
         return 1;
     }
 
     struct tm alarm_readback;
-    res = max31343_get_alarm(&_dev, &alarm_readback);
+    res = max313xx_get_alarm(&_dev, &alarm_readback);
     if (res != 0) {
         printf("[test] FAIL: get_alarm returned %d\n", res);
         return 1;
@@ -418,22 +423,24 @@ static int _cmd_test(int argc, char **argv)
     puts("[test] alarm set/get OK");
 
     puts("[test] testing alarm clear...");
-    res = max31343_set_alarm_int(&_dev, false);
+    res = max313xx_set_alarm_int(&_dev, false);
     if (res != 0) {
         printf("[test] FAIL: set_alarm_int returned %d\n", res);
         return 1;
     }
     puts("[test] alarm clear OK");
 
-    puts("[test] testing temperature read...");
-    int16_t centi;
-    res = max31343_get_temp(&_dev, &centi);
-    if (res != 0) {
-        printf("[test] FAIL: get_temp_centi_c returned %d\n", res);
-        return 1;
+    if (IS_USED(MODULE_MAX31343)) {
+        puts("[test] testing temperature read...");
+        int16_t centi;
+        res = max313xx_get_temp(&_dev, &centi);
+        if (res != 0) {
+            printf("[test] FAIL: get_temp_centi_c returned %d\n", res);
+            return 1;
+        }
+        printf("[test] temperature: %d.%02d°C  OK\n",
+               centi / 100, (centi < 0 ? -(centi % 100) : centi % 100));
     }
-    printf("[test] temperature: %d.%02d°C  OK\n",
-           centi / 100, (centi < 0 ? -(centi % 100) : centi % 100));
 
     puts("[test] all tests PASSED");
     return 0;
@@ -442,9 +449,9 @@ SHELL_COMMAND(test, "run built-in self test", _cmd_test);
 
 int main(void)
 {
-    puts("MAX31343 RTC driver test\n");
+    puts("MAX313xx RTC driver test\n");
 
-    int res = max31343_init(&_dev, &max31343_params[0]);
+    int res = max313xx_init(&_dev, &max313xx_params[0]);
     if (res == -ENODATA) {
         puts("warning: oscillator was stopped; time is invalid – please set it");
     }
@@ -453,7 +460,7 @@ int main(void)
         return 1;
     }
     else {
-        puts("MAX31343 initialized OK");
+        puts("MAX313xx initialized OK");
     }
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
