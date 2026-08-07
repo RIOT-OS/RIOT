@@ -531,15 +531,6 @@ typedef enum {
     I2C_SPEED_HIGH      = 3400000U,    /**< high speed mode:   ~3.4Mbit/s */
 } i2c_speed_t;
 /** @} */
-
-/**
- * @name    I2C pin getter functions
- * @{
- */
-#  define i2c_pin_sda(dev) i2c_config[dev].sda_pin
-#  define i2c_pin_scl(dev) i2c_config[dev].scl_pin
-/** @} */
-
 #endif /* ndef DOXYGEN */
 
 /**
