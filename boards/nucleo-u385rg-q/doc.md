@@ -11,8 +11,8 @@ with TrustZone, 256KiB of RAM, and 1MiB of Flash.
 You can find general information about the Nucleo-64 boards on the
 @ref boards_common_nucleo64 page.
 
-This is the initial bring-up of the STM32U3 family and the Nucleo-U385RG-Q
-board: CPU and clock setup, GPIO, and the serial console (UART/LPUART).
+This RIOT port has moved past initial bring-up and now supports a range of the
+MCU's peripherals (see the Supported Features section below).
 
 ## Hardware
 
@@ -58,3 +58,34 @@ The default baud rate is 115200.
 
 If a physical connection to USART1 is needed, connect a UART interface to pins
 PA9 (USART1 TX) and PA10 (USART1 RX).
+
+## Supported Features
+
+The peripherals below are configured for this board (see `Makefile.features`
+and `include/periph_conf.h`). "Status" reflects whether the peripheral has been
+verified on hardware:
+
+| Peripheral | Status  | Configuration on this board                                  |
+|:-----------|:--------|:-------------------------------------------------------------|
+| GPIO       | working | including external interrupts (EXTI)                         |
+| UART       | working | USART1 on PA9/PA10 (ST-LINK VCP, STDIO)                       |
+| LPUART     | working | LPUART1 on PA2/PA3                                            |
+| Timer      | working | TIM3 (general-purpose RIOT timer backend)                    |
+| PWM        | working | TIM2 — CH1 User LED (PA5), CH2 PB3 (D3), CH3 PB10 (D6), CH4 PB11 |
+| RTC        | working | uses on-board 32.768 kHz LSE                                 |
+| SPI        | working | SPI1 on PA7/PA6/PA5 (MOSI/MISO/SCK), Arduino D11/D12/D13 — verified via loopback test |
+| Flash page | working | program/erase + verify (VCORE voltage range 1)               |
+| VBAT       | working | internal VBAT channel (scaling fixed)                        |
+| ADC        | working | ADC1, Arduino A0–A5 plus internal VREFINT (verified with a potentiometer sweep) |
+| USB device | working | USB DRD FS, D+/D− on PA12/PA11 (user USB Type-C) — verified with a CDC-ACM shell |
+| I2C        | working | I2C1 on PB6/PB7 (SCL/SDA), Arduino D15/D14 — verified with a full bus scan (no devices attached) |
+
+@note   All peripherals listed above have been verified on hardware.
+
+Arduino-style abstractions inherited from the common Nucleo-64 support are also
+provided: `arduino_pins`, `arduino_analog`, `arduino_i2c`, `arduino_spi`,
+`arduino_uart`, and `arduino_shield_uno`.
+
+@note   TIM2 is reserved for PWM (User LED on TIM2_CH1/PA5), so TIM3 is used as
+        the RIOT timer backend. PWM CH1 and SPI1 share the green User LED pin
+        (PA5); avoid using both simultaneously.
