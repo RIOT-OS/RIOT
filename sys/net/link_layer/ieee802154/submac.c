@@ -90,7 +90,7 @@ static inline bool _does_handle_ack(ieee802154_dev_t *dev)
 static inline bool _does_send_ack(ieee802154_dev_t *dev)
 {
     if (IS_USED(MODULE_IEEE802154_SUBMAC_SOFT_ACK) &&
-    !ieee802154_radio_has_capability(dev, IEEE802154_CAP_AUTO_ACK)) {
+        !ieee802154_radio_has_capability(dev, IEEE802154_CAP_AUTO_ACK)) {
         return false;
     }
     return true;
@@ -127,8 +127,7 @@ static ieee802154_fsm_state_t _tx_end(ieee802154_submac_t *submac, int status,
         DEBUG("IEEE802154 submac: ACK transmission done\n");
         submac->cb->rx_done(submac);
     }
-    else
-    {
+    else {
         submac->cb->tx_done(submac, status, info);
     }
     return IEEE802154_FSM_STATE_IDLE;
@@ -195,8 +194,7 @@ static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac, uint8_t seq_num)
     if (_does_send_ack(dev)) {
         return 0;
     }
-    uint8_t ack[]
-         = { IEEE802154_FCF_TYPE_ACK, 0x00,  seq_num };
+    uint8_t ack[] = { IEEE802154_FCF_TYPE_ACK, 0x00,  seq_num };
     iolist_t iolist = {
         .iol_base = ack,
         .iol_len = sizeof(ack),
@@ -249,16 +247,15 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
             /* sending ACK if radio does not support auto-ACK */
             if (!_does_send_ack(dev)) {
                 ieee802154_filter_mode_t mode;
-                if ((submac->rx_buf[0] & IEEE802154_FCF_TYPE_MASK) == IEEE802154_FCF_TYPE_DATA &&
-                    (submac->rx_buf[0] & IEEE802154_FCF_ACK_REQ) &&
+                if ((submac->rx_buf[0] & IEEE802154_FCF_ACK_REQ) &&
                     (ieee802154_radio_get_frame_filter_mode(dev, &mode) < 0 ||
                     mode == IEEE802154_FILTER_ACCEPT)) {
                     if ((res = _handle_fsm_ev_tx_ack(submac, ieee802154_get_seq(submac->rx_buf))) < 0) {
                         DEBUG("IEEE802154 submac: Sending ACK failed with status: %d\n", res);
                     }
                     else {
-                       /* Do not call rx_done yet. ACK must be sent first */
-                       return IEEE802154_FSM_STATE_TX_ACK;
+                        /* Do not call rx_done yet. ACK must be sent first */
+                        return IEEE802154_FSM_STATE_TX_ACK;
                     }
                 }
             }
