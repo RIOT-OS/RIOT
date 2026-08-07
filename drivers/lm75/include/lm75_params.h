@@ -28,11 +28,14 @@ extern "C" {
 #  define LM75_PARAM_I2C I2C_DEV(0) /**< I2C BUS used */
 #endif
 
-/** 7-bit I2C slave address: 1-0-0-1-A2-A1-A0, where
-   the last three bits A2, A1, A0 are defined
-   by the voltage level on the ADDR pin */
+/**
+ * @brief   Default I2C address
+ *
+ * 7-bit I2C slave address: 1-0-0-1-A2-A1-A0, where the last three bits A2, A1,
+ * A0 are defined by the voltage level on the ADDR pin
+ */
 #ifndef CONFIG_LM75_I2C_ADDR
-#  define CONFIG_LM75_I2C_ADDR (0x48) /**< Default I2C address */
+#  define CONFIG_LM75_I2C_ADDR (0x48)
 #endif
 
 /* Device operation mode configuration - normal or shutdown */
@@ -44,7 +47,6 @@ extern "C" {
 
 #ifndef CONFIG_OPERATION_MODE
 #  define CONFIG_OPERATION_MODE NORMAL_MODE /**< Normal Mode is the default */
-
 #endif
 
 /* Device Overtemperature Shutdown operation mode configuration - comparator or interrupt */
@@ -87,8 +89,15 @@ extern "C" {
 #  define CONFIG_FAULT_QUEUE FAULT_6
 #endif
 
+/**
+ * @brief   Device Overtemperatue Shutdown fault queue configuration
+ *
+ * Number of faults that must occur consecutively until OS goes active
+ *
+ * Default: One
+ */
 #ifndef CONFIG_FAULT_QUEUE
-#  define CONFIG_FAULT_QUEUE FAULT_1 /**< One Fault is the default */
+#  define CONFIG_FAULT_QUEUE FAULT_1
 #endif
 
 #ifndef LM75_PARAM_INT
@@ -127,9 +136,21 @@ extern "C" {
 #endif
 
 #ifndef CONFIG_TMP1075_CONV_RATE_REG
-#  define CONFIG_TMP1075_CONV_RATE_REG TMP1075_CONV_RATE_REG_27H /**< Default conv rate is 27.5ms */
-#  define TMP1075_CONV_RATE            (28)                      /**< Default conversion rate is 27.5 ms */
-/* this was rounded up to 28ms to retain usage of integers and to keep all times in ms */
+/**
+ * @brief   Device conversion rate register value
+ *
+ * Only available in TMP1075 devices!
+ *
+ * Default: 27.5ms
+ */
+#  define CONFIG_TMP1075_CONV_RATE_REG TMP1075_CONV_RATE_REG_27H
+/**
+ * @brief   Device conversion rate in milliseconds
+ *
+ * Default is 27.5ms or about 28 ms. This is rounded up to 28ms to retain usage
+of integers and to keep all times in ms
+ */
+#  define TMP1075_CONV_RATE            (28)
 #endif
 
 #ifndef LM75_PARAMS
