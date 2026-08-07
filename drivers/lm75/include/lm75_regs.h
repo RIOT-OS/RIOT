@@ -76,7 +76,7 @@ extern "C" {
 #define TMP1075_DEVICE_ID_REG   (0x0F) /**< Device ID register */
 
 /**
- * @name    fault queue values
+ * @name    Fault Queue Values
  * @{
  */
 #define FAULT_3                 2   /**< ALERT active after 3 faults */
