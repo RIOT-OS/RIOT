@@ -248,9 +248,9 @@ int unicoap_exchange_process(unicoap_packet_t* packet, unicoap_exchange_arg_t ar
 
 
 typedef enum {
-    UNICOAP_MESSAGING_EVENT_RFC7252_RX = 1,
-    UNICOAP_MESSAGING_EVENT_RFC7252_TRUNCATED = 1 << 1,
-    UNICOAP_MESSAGING_EVENT_RFC7252_SESSION_ESTABLISHED = 1 << 2,
+    UNICOAP_MESSAGING_RFC7252_EVENT_RX = 1,
+    UNICOAP_MESSAGING_RFC7252_EVENT_TRUNCATED = 1 << 1,
+    UNICOAP_MESSAGING_RFC7252_EVENT_SESSION_ESTABLISHED = 1 << 2,
 } __attribute__((packed)) unicoap_messaging_rfc7252_event_type_t;
 
 /**
