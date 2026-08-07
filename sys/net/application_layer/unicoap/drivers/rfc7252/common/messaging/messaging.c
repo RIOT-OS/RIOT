@@ -721,11 +721,11 @@ static int _process_messaging_layer(unicoap_packet_t* packet)
 int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, unicoap_messaging_rfc7252_event_type_t event,
                                       unicoap_packet_t* packet)
 {
-    if (event & UNICOAP_MESSAGING_EVENT_RFC7252_SESSION_ESTABLISHED) {
+    if (event & UNICOAP_MESSAGING_RFC7252_EVENT_SESSION_ESTABLISHED) {
         _resume(packet->remote, (unicoap_sock_dtls_session_t*)_packet_get_dtls_session(packet));
     }
 
-    if (!(event & UNICOAP_MESSAGING_EVENT_RFC7252_RX)) {
+    if (!(event & UNICOAP_MESSAGING_RFC7252_EVENT_RX)) {
         return 0;
     }
     unicoap_options_t options = { 0 };
@@ -760,7 +760,7 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, unicoap_m
     unicoap_messaging_flags_t flags;
 
     switch ((res = unicoap_exchange_preprocess(packet, &flags, &arg, 
-        event & UNICOAP_MESSAGING_EVENT_RFC7252_TRUNCATED))) {
+        event & UNICOAP_MESSAGING_RFC7252_EVENT_TRUNCATED))) {
     case UNICOAP_PREPROCESSING_SUCCESS_REQUEST:
         break;
 
