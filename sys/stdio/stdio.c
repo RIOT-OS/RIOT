@@ -27,6 +27,45 @@
 static uint8_t _rx_buf_mem[STDIO_RX_BUFSIZE];
 isrpipe_t stdin_isrpipe = ISRPIPE_INIT(_rx_buf_mem);
 
+#if IS_USED(MODULE_STDIO_NOTIFY)
+static stdio_notify_cb_t _notify_cb;
+static void *_notify_arg;
+
+void stdio_set_notify(stdio_notify_cb_t cb, void *arg)
+{
+    unsigned irqstate = irq_disable();
+
+    _notify_arg = arg;
+    _notify_cb = cb;
+
+    irq_restore(irqstate);
+}
+
+int stdio_rx_write_one(uint8_t c)
+{
+    int res = isrpipe_write_one(&stdin_isrpipe, c);
+
+    /* notify even if the pipe is full, isrpipe_read() would unblock anyway */
+    if (_notify_cb) {
+        _notify_cb(_notify_arg);
+    }
+
+    return res;
+}
+
+int stdio_rx_write(const uint8_t *buf, size_t len)
+{
+    int res = isrpipe_write(&stdin_isrpipe, buf, len);
+
+    /* notify even if the pipe is full, isrpipe_read() would unblock anyway */
+    if (_notify_cb) {
+        _notify_cb(_notify_arg);
+    }
+
+    return res;
+}
+#endif
+
 #ifdef MODULE_STDIO_DISPATCH
 XFA_INIT_CONST(stdio_provider_t, stdio_provider_xfa);
 

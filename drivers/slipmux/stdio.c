@@ -11,7 +11,6 @@
  */
 
 #include "board.h"
-#include "isrpipe.h"
 #include "periph/uart.h"
 
 #include "slipdev.h"
@@ -35,9 +34,10 @@ static inline void _slipdev_unlock(void)
     }
 }
 
-static void _isrpipe_write(void *arg, uint8_t data)
+static void _stdio_rx_write(void *arg, uint8_t data)
 {
-    isrpipe_write_one(arg, (char)data);
+    (void)arg;
+    stdio_rx_write_one(data);
 }
 
 static void _init(void)
@@ -45,7 +45,7 @@ static void _init(void)
     /* intentionally overwritten in netdev init so we have stdio before
      * the network device is initialized */
     uart_init(slipdev_params[0].uart, slipdev_params[0].baudrate,
-              _isrpipe_write, &stdin_isrpipe);
+              _stdio_rx_write, NULL);
 
     slipdev_write_byte(slipdev_params[0].uart, SLIPDEV_END);
 }

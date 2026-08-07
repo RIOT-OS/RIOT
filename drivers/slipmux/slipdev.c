@@ -46,7 +46,7 @@ static inline void _slipdev_stdio_add_to_frame(slipdev_t *dev, uint8_t byte)
         dev->config.uart != slipdev_params[0].uart) {
         return;
     }
-    isrpipe_write_one(&stdin_isrpipe, byte);
+    stdio_rx_write_one(byte);
 }
 
 static inline bool _slipdev_config_start_frame(slipdev_t *dev)
