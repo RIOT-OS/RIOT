@@ -111,7 +111,7 @@ extern "C" {
 #define LM75A_TEMP_MULT    (1000) /**< Must multiply by 1000 to get temp in ºC */
 #define LM75A_TEMP_SHIFT   (5)    /**< Only the 11 most significant bits are needed */
 
-#define TMP1075_OS_RES     (625)   /**< resolution in 0.0625ºC */
+#define TMP1075_OS_RES     (625)   /**< Resolution in 0.0625ºC */
 #define TMP1075_OS_MULT    (10000) /**< Must multiply by 10000 to get temp in ºC */
 #define TMP1075_OS_SHIFT   (4)     /**< Only the 12 most significant bits are needed */
 #define TMP1075_TEMP_RES   (625)   /**< resolution in 0.0625ºC */
