@@ -75,7 +75,7 @@ int slipdev_coap_recv(uint8_t *buf, size_t buf_size, slipdev_t *dev)
     return 0;
 }
 
-void slipdev_coap_send(iolist_t *iolist, const slipdev_t *dev)
+void slipdev_coap_send(const iolist_t *iolist, const slipdev_t *dev)
 {
     uint16_t fcs_sum = SPECIAL_INIT_FCS;
     _slipdev_lock();

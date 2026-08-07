@@ -240,7 +240,7 @@ int slipdev_coap_recv(uint8_t *buf, size_t buf_size, slipdev_t *dev);
  * @param[in] iolist    IO vector list to send.
  * @param[in] dev       device descriptor to identify the slipdev instance.
  */
-void slipdev_coap_send(iolist_t *iolist,  const slipdev_t *dev);
+void slipdev_coap_send(const iolist_t *iolist,  const slipdev_t *dev);
 
 #ifdef __cplusplus
 }
