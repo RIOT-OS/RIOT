@@ -104,7 +104,7 @@ extern "C" {
 
 #define LM75A_CONV_RATE    (100)  /**< Temperature register updated every 100ms */
 
-#define LM75A_OS_RES       (5)    /**< resolution in 0.5ºC */
+#define LM75A_OS_RES       (5)    /**< Resolution in 0.5ºC */
 #define LM75A_OS_MULT      (10)   /**< Must multiply by 10 to get temp in ºC */
 #define LM75A_OS_SHIFT     (7)    /**< Only the 9 most significant bits are needed */
 #define LM75A_TEMP_RES     (125)  /**< Resolution in 0.125ºC */
