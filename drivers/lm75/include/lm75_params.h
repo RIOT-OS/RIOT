@@ -118,7 +118,6 @@ extern "C" {
 #define TMP1075_TEMP_MULT  (10000) /**< Must multiply by 10000 to get temp in ºC */
 #define TMP1075_TEMP_SHIFT (4)     /**< Only the 12 most significant bits are needed */
 
-/* Device conversion rate configuration - only available in the TMP1075 sensor */
 #if IS_ACTIVE(CONFIG_TMP1075_CONV_RATE_REG_27H)
 #  define CONFIG_TMP1075_CONV_RATE_REG TMP1075_CONV_RATE_REG_27H
 #  define TMP1075_CONV_RATE            (28)
