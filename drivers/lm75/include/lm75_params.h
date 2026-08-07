@@ -73,8 +73,6 @@ extern "C" {
 
 #endif
 
-/* Device Overtemperatue Shutdown fault queue configuration -
- * number of faults that must occur consecutively until OS goes active */
 #if IS_ACTIVE(CONFIG_FAULT_1)
 #  define CONFIG_FAULT_QUEUE FAULT_1
 #elif IS_ACTIVE(CONFIG_FAULT_2)
