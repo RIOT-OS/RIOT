@@ -14,6 +14,8 @@ ifneq (,$(filter nrf802154,$(USEMODULE)))
   USEMODULE += luid
   ifneq (,$(filter netdev,$(USEMODULE)))
     USEMODULE += netdev_ieee802154_submac
+  endif
+  ifneq (,$(filter ieee802154_submac,$(USEMODULE)))
     USEMODULE += ieee802154_submac_soft_ack
   endif
 endif
