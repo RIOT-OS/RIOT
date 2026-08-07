@@ -49,6 +49,7 @@ PSEUDOMODULES += auto_init_%
 NO_PSEUDOMODULES += auto_init_can
 NO_PSEUDOMODULES += auto_init_loramac
 NO_PSEUDOMODULES += auto_init_multimedia
+NO_PSEUDOMODULES += auto_init_radiolib
 NO_PSEUDOMODULES += auto_init_security
 NO_PSEUDOMODULES += auto_init_usbus
 NO_PSEUDOMODULES += auto_init_screen
@@ -384,6 +385,7 @@ PSEUDOMODULES += nrf24l01p_ng_diagnostics
 PSEUDOMODULES += od_string
 
 PSEUDOMODULES += opendsme
+PSEUDOMODULES += radiolib
 PSEUDOMODULES += openthread
 
 # declare periph submodules as pseudomodules, but exclude periph_common
