@@ -31,6 +31,17 @@
 #endif
 
 /**
+ * Includes SoC capabilities from soc_caps.h that have been prefixed with
+ * "CONFIG_*".
+ *
+ * This file has been auto-generated during the the build process from the
+ * SoC specific ESP_IDF soc_caps.h.
+ */
+#ifndef LD_FILE_GEN
+#  include "sdkconfig_soc.h"
+#endif
+
+/**
  * @brief   SDK version number
  *
  * Determined with `git describe --tags` in `$ESP32_SDK_DIR`
@@ -104,9 +115,6 @@
 #  define CONFIG_BT_ENABLED                     1
 #  define CONFIG_BT_CONTROLLER_ENABLED          1
 #  define CONFIG_BT_CONTROLLER_ONLY             1
-#  define CONFIG_SOC_BT_SUPPORTED               SOC_BT_SUPPORTED
-#  define CONFIG_SOC_PM_SUPPORT_BT_PD           SOC_PM_SUPPORT_BT_PD
-#  define CONFIG_SOC_PM_SUPPORT_BT_WAKEUP       SOC_PM_SUPPORT_BT_WAKEUP
 #endif
 
 /**
@@ -136,7 +144,6 @@
 #  define CONFIG_SPIRAM_MEMTEST                     1
 #  define CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL       16384
 #  define CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL     32768
-#  define CONFIG_SOC_SPIRAM_SUPPORTED               SOC_SPIRAM_SUPPORTED
 #  define CONFIG_ESP_SLEEP_PSRAM_LEAKAGE_WORKAROUND 1
 #endif
 
@@ -339,28 +346,6 @@
 
 #define CONFIG_ULP_COPROC_RESERVE_MEM               0
 
-#ifdef SOC_RTC_MEM_SUPPORTED
-#  define CONFIG_SOC_RTC_MEM_SUPPORTED              1
-#endif
-#ifdef SOC_RTC_FAST_MEM_SUPPORTED
-#  define CONFIG_SOC_RTC_FAST_MEM_SUPPORTED         1
-#endif
-#ifdef SOC_RTC_SLOW_SUPPORTED
-#  define CONFIG_SOC_RTC_SLOW_MEM_SUPPORTED         1
-#endif
-
-/**
- * SDMMC Host configuration
- */
-#ifdef SOC_SDMMC_HOST_SUPPORTED
-#  define CONFIG_SOC_SDMMC_HOST_SUPPORTED           SOC_SDMMC_HOST_SUPPORTED
-#  define CONFIG_SOC_SDMMC_DELAY_PHASE_NUM          SOC_SDMMC_DELAY_PHASE_NUM
-#  define CONFIG_SOC_SDMMC_NUM_SLOTS                SOC_SDMMC_NUM_SLOTS
-#  define CONFIG_SOC_SDMMC_SUPPORT_XTAL_CLOCK       SOC_SDMMC_SUPPORT_XTAL_CLOCK
-#  define CONFIG_SOC_SDMMC_USE_GPIO_MATRIX          SOC_SDMMC_USE_GPIO_MATRIX
-#  define CONFIG_SOC_SDMMC_USE_IOMUX                SOC_SDMMC_USE_IOMUX
-#endif /* SOC_SDMMC_HOST_SUPPORTED */
-
 /**
  * USB Serial/JTAG configuration
  */
@@ -373,10 +358,6 @@
 #  endif
 #  define CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED        (CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG || \
                                                             CONFIG_ESP_CONSOLE_SECONDARY_USB_SERIAL_JTAG)
-#  define CONFIG_SOC_EFUSE_DIS_USB_JTAG                     SOC_EFUSE_DIS_USB_JTAG
-#  define CONFIG_SOC_EFUSE_HARD_DIS_JTAG                    SOC_EFUSE_HARD_DIS_JTAG
-#  define CONFIG_SOC_EFUSE_SOFT_DIS_JTAG                    SOC_EFUSE_SOFT_DIS_JTAG
-#  define CONFIG_SOC_USB_SERIAL_JTAG_SUPPORTED              1
 #  define CONFIG_USJ_ENABLE_USB_SERIAL_JTAG                 CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED
 #endif /* SOC_USB_SERIAL_JTAG_SUPPORTED */
 
