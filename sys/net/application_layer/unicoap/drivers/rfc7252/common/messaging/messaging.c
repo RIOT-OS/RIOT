@@ -385,7 +385,7 @@ static int _sendv(iolist_t* list, const unicoap_endpoint_t* remote, const unicoa
 static int _connect(unicoap_packet_t* packet, _transmission_t** transmission) {
     if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS) && unicoap_packet_proto(packet) == UNICOAP_PROTO_DTLS) {
         int res = 0;
-        /* Transport driver indicated sending now would block, so will 
+        /* Sending now might block for this transport, in which case we will
          * get RESUME event from transport driver, telling us to resume sending.
          * We'll then send any unsent PDUs (in carbon copy buffer of each transmission associated)
          * with endpoint attached to event. We need a carbon copy to delay sending until
@@ -401,7 +401,7 @@ static int _connect(unicoap_packet_t* packet, _transmission_t** transmission) {
         )) < 0) {
             return res;
         }
-        if (res != EEXIST) {
+        if (res != -EEXIST) {
             (*transmission)->delayed = true;
             /* Session does not already exist, so we have to delay it. */
             MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT 
@@ -503,7 +503,8 @@ static void _handle_reset(const unicoap_endpoint_t* remote, uint16_t id)
 
     if (transmission) {
         DEBUG("\n");
-        _transmission_free_notif(transmission, unicoap_layer_notification_async_failure_from_errno(ECONNRESET));
+        _transmission_free_notif(transmission, 
+            unicoap_layer_notification_async_failure_from_errno(ECONNRESET));
     }
     else {
         DEBUG(", no message with ID, ignoring\n");
@@ -515,13 +516,14 @@ static void _on_ack_timeout(unicoap_scheduled_event_t* _event);
 static int _send_carbon_copy(_transmission_t* transmission) {
     int res = 0;
     uint32_t duration = 0;
-    if (transmission->remaining_retransmissions > 0) {
-        /* We're supposed to retransmit in the future shouldn't we receive an ACK.
-         * remaining_retransmissions is only greater than zero for CONs. For CONs,
-         * remaining_retransmissions cannot be zero, 
-         * because that is checked before in _on_ack_timeout. Delayed PDUs due to a pending
-         * DTLS session (CONs, NONs, ACKs, RSTs) will also go through here but
-         * remaining_retransmissions will be zero in these instances. */
+        /* We're supposed to retransmit in the future shouldn't we receive an ACK.  
+     * remaining_retransmissions is only greater than zero for CONs. For CONs,  
+     * remaining_retransmissions cannot be zero, 
+     * because that is checked before in _on_ack_timeout. Delayed PDUs due to a pending  
+     * DTLS session (CONs, NONs, ACKs, RSTs) will also go through here but  
+     * remaining_retransmissions will be zero in these instances. */  
+    bool confirmable = transmission->remaining_retransmissions > 0  
+    if (confirmable) {  
         unsigned int i = CONFIG_UNICOAP_RETRANSMISSIONS_MAX - transmission->remaining_retransmissions;
         uint32_t duration = (uint32_t)CONFIG_UNICOAP_TIMEOUT_ACK_MS << i;
         if (CONFIG_UNICOAP_RANDOM_FACTOR_1000 > 1000) {

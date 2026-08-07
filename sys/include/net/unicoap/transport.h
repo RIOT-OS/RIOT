@@ -239,11 +239,11 @@ typedef struct {
 static inline sock_udp_ep_t* unicoap_endpoint_get_udp(unicoap_endpoint_t* endpoint)
 {
     (void)endpoint;
-    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     return &endpoint->udp_ep;
-    #else
+#else
     return NULL;
-    #endif
+#endif
 }
 
 /**
@@ -259,11 +259,11 @@ static inline sock_udp_ep_t* unicoap_endpoint_get_udp(unicoap_endpoint_t* endpoi
 static inline sock_udp_ep_t* unicoap_endpoint_get_dtls(unicoap_endpoint_t* endpoint)
 {
     (void)endpoint;
-    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     return &endpoint->dtls_ep;
-    #else
+#else
     return NULL;
-    #endif
+#endif
 }
 
 #ifndef DOXYGEN
@@ -279,11 +279,11 @@ static inline sock_udp_ep_t* unicoap_endpoint_get_dtls(unicoap_endpoint_t* endpo
 static inline struct _sock_tl_ep* _unicoap_endpoint_get_tl(unicoap_endpoint_t* endpoint)
 {
     (void)endpoint;
-    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+#  if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     return &endpoint->_tl_ep;
-    #else
+#  else
     return NULL;
-    #endif
+#  endif
 }
 #endif /* !defined(DOXYGEN) */
 
@@ -294,7 +294,7 @@ static inline struct _sock_tl_ep* _unicoap_endpoint_get_tl(unicoap_endpoint_t* e
  */
 static inline ipv6_addr_t* unicoap_endpoint_get_ipv6_addr(unicoap_endpoint_t* endpoint) {
     (void)endpoint;
-    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) && 
         (_unicoap_endpoint_get_tl(endpoint)->family == AF_INET6 || 
          _unicoap_endpoint_get_tl(endpoint)->family == AF_UNSPEC)) {
@@ -302,9 +302,9 @@ static inline ipv6_addr_t* unicoap_endpoint_get_ipv6_addr(unicoap_endpoint_t* en
     } else {
         return NULL;
     }
-    #else
+#else
     return NULL;
-    #endif
+#endif
     /* Other drivers may also use IPv6 addresses but not sock_tl... */
     /* MARK: unicoap_driver_extension_point */
 }
@@ -316,7 +316,7 @@ static inline ipv6_addr_t* unicoap_endpoint_get_ipv6_addr(unicoap_endpoint_t* en
  */
 static inline ipv4_addr_t* unicoap_endpoint_get_ipv4_addr(unicoap_endpoint_t* endpoint) {
     (void)endpoint;
-    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) && 
         (_unicoap_endpoint_get_tl(endpoint)->family == AF_INET || 
          _unicoap_endpoint_get_tl(endpoint)->family == AF_UNSPEC)) {
@@ -324,9 +324,9 @@ static inline ipv4_addr_t* unicoap_endpoint_get_ipv4_addr(unicoap_endpoint_t* en
     } else {
         return NULL;
     }
-    #else
+#else
     return NULL;
-    #endif
+#endif
     /* Other drivers may also use IPv4 addresses but not sock_tl... */
     /* MARK: unicoap_driver_extension_point */
 }
@@ -338,15 +338,15 @@ static inline ipv4_addr_t* unicoap_endpoint_get_ipv4_addr(unicoap_endpoint_t* en
  */
 static inline int* unicoap_endpoint_get_address_family(unicoap_endpoint_t* endpoint) {
     (void)endpoint;
-    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
         return &_unicoap_endpoint_get_tl(endpoint)->family;
     } else {
         return NULL;
     }
-    #else
+#else
     return NULL;
-    #endif
+#endif
     /* Other drivers may also use 16-bit ports but not sock_tl... */
     /* MARK: unicoap_driver_extension_point */
 }
@@ -358,15 +358,15 @@ static inline int* unicoap_endpoint_get_address_family(unicoap_endpoint_t* endpo
  */
 static inline uint16_t* unicoap_endpoint_get_port(unicoap_endpoint_t* endpoint) {
     (void)endpoint;
-    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
         return &_unicoap_endpoint_get_tl(endpoint)->port;
     } else {
         return NULL;
     }
-    #else
+#else
     return NULL;
-    #endif
+#endif
     /* Other drivers may also use 16-bit ports but not sock_tl... */
     /* MARK: unicoap_driver_extension_point */
 }
@@ -378,15 +378,15 @@ static inline uint16_t* unicoap_endpoint_get_port(unicoap_endpoint_t* endpoint) 
  */
 static inline uint16_t* unicoap_endpoint_get_netif_id(unicoap_endpoint_t* endpoint) {
     (void)endpoint;
-    #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
     if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
         return &_unicoap_endpoint_get_tl(endpoint)->netif;
     } else {
         return NULL;
     }
-    #else
+#else
     return NULL;
-    #endif
+#endif
     /* Other drivers may also use 16-bit ports but not sock_tl... */
     /* MARK: unicoap_driver_extension_point */
 }
@@ -484,12 +484,14 @@ static inline unicoap_destination_t unicoap_destination_uri_string(const char* u
  * @param[in] scheme    Scheme string
  * @param scheme_length Length of scheme string
  * @param[in] host      Optional Host string
- * @param[in] length    Scheme string length, must be zero if @p host is `NULL` or empty (i.e., points to 0x00)
+ * @param[in] length    Scheme string length, must be zero if @p host is `NULL`
+ *                      or empty (i.e., points to 0x00)
  *
- * @return `0` for valid schemes
- * @return `-1` if the scheme is invalid or unknown
+ * @retval `0` for valid schemes
+ * @retval `-1` if the scheme is invalid or unknown
  */
-int unicoap_proto_from_scheme_and_host(const char* scheme, size_t scheme_length, const char* host, size_t length);
+int unicoap_proto_from_scheme_and_host(const char* scheme, size_t scheme_length, 
+                                       const char* host, size_t length);
 
 /**
  * @brief Converts a given null-terminated scheme string like `coap+tcp` to the corresponding protocol identifier.
@@ -497,11 +499,12 @@ int unicoap_proto_from_scheme_and_host(const char* scheme, size_t scheme_length,
  * @param[in] scheme    Null-terminated scheme string
  * @param[in] host      Null-terminated host string
  *
- * @return `0` for valid schemes
- * @return `-1` if the scheme is invalid or unknown
+ * @retval `0` for valid schemes
+ * @retval `-1` if the scheme is invalid or unknown
  */
-static inline int unicoap_transport_proto_from_scheme_and_host_string(const char* scheme, const char* host)
-{
+static inline int unicoap_transport_proto_from_scheme_and_host_string(
+    const char* scheme, const char* host
+) {
     return unicoap_proto_from_scheme_and_host(scheme, strlen(scheme), host, strlen(host));
 }
 
@@ -509,8 +512,9 @@ static inline int unicoap_transport_proto_from_scheme_and_host_string(const char
  * @brief Returns scheme from protocol number
  *
  * @param proto Protocol number
- * @returns Null-terminated transport scheme string
- * @returns `NULL` if protocol number is unknown
+ *
+ * @retval Null-terminated transport scheme string
+ * @retval `NULL` if protocol number is unknown
  */
 const char* unicoap_scheme_from_proto(unicoap_proto_t proto);
 

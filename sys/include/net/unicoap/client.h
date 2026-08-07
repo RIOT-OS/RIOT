@@ -179,7 +179,7 @@ int unicoap_send_request_sync(unicoap_message_t* request,
  * by this function. When this function returns, the @ref unicoap_message_t::payload_size property
  * will have been updated to reflect the received payload length and options.
  *
- * Consumes @p request .
+ * Consumes @p request.
  *
  * @remark To avoid the overhead of copying the response from network-stack-internal memory, use
  * @ref unicoap_send_request_sync or @ref unicoap_send_request_async.
@@ -191,7 +191,7 @@ int unicoap_send_request_sync(unicoap_message_t* request,
  *
  * @param[in,out] request Initialized request message to send
  * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or @ref unicoap_destination_endpoint
- * @param[in,out] response Pre-allocated response message, will be initialized when a response is received successfully
+ * @param[in,out] response Partially initialized response message
  * @param flags Client flags
  * @param[in,out] aux Pre-allocated auxiliary information structure, will be initialized when a response is received successfully
  *
@@ -222,7 +222,9 @@ static inline int unicoap_send_request(unicoap_message_t* request,
 
 /**
  * @brief Cancels request with reference number
+ *
  * @param refno Reference number
+ *
  * @returns Zero on success, negative error number otherwise
  * @retval -EINVAL Invalid refno
  * @retval -ENOENT No request with given refno is known

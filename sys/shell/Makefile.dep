@@ -114,7 +114,7 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   ifneq (,$(filter sock_udp,$(USEMODULE)))
     USEMODULE += shell_cmd_udp
   endif
-  ifneq (,$(filter unicoap,$(USEMODULE)))
+  ifneq (,$(filter unicoap_client,$(USEMODULE)))
     USEMODULE += shell_cmd_coap
   endif
   ifneq (,$(filter periph_pm,$(USEMODULE)))

@@ -211,21 +211,13 @@ int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo) {
      * exchange. Should the memo struct in the memo array get reused for another exchange,
      * the refno can be detected to be obsolete. */
 #if IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION)
-    /* Per memo, store a unique reference ID. This guarantees that reused memos get a
-     * different ID. Additionally, we would like to store the memo index, such that we don't have
-     * to check all memos to find the one with the given reference ID. To ease this lookup,
-     * we could store the index. However, an int is not guaranteed to be the width of size_t,
-     * which is the type storing the memo array count. We must use ints for refnos as we want to
-     * return the refno in places where we would normally return a zero for success and negative
-     * integers as errors. Hence, there's not enough bit space. Additionally, an int may be as
-     * small as 16 bits, and there's a sign bit too. Effectively, we're limited to 15 bits.
-     * Hence, we made the design decision to use 12 bits for the reference ID which should provide
-     * enough uniqueness, and 3 bits to help find the correct memo. This has the drawback that we
-     * cannot store the exact memo index if there're more than 7 memo slots in the memo array.
-     * But that's fine because a size_t doesn't necessarily fit into an int anyway. 
-     * The workaround is to just store the 'minimum index', which turns the refno to memo lookup
-     * into O(1) if the number of memos is 7 or less, which is probably going to be the case 
-     * in a lot of instances. */
+    /* Memos require a unique reference ID and array index for fast lookup. Because functions return 
+     * the refno as an int where negative values represent errors, we assume a minimum 16-bit int
+     * and use the 15 positive bits.
+     * 15 available bits  =  12 bits (reference ID) + 3 bits (minimum index)
+     * Since 3 bits represent a maximum value of 7, we store the minimum index instead of the full
+     * size_t. This provides O(1) lookup for up to 7 memos and narrows the search space for larger
+     * arrays. */
     memo->reference_id = random_uint32_range(1, 0xfff); /* 12 bits for reference ID */
     int refno = memo->reference_id | (MIN(_client_index(memo), 0x7) << 12); /* 3 bits min index */
     _STATE_DEBUG("refno=%i (min_client_ix=#%" PRIuSIZE ", refid=%u)\n", 
