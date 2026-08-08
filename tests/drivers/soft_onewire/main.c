@@ -26,7 +26,7 @@ static void _enumerate_bus(onewire_t *bus)
     onewire_rom_t id;
     int res = ONEWIRE_SEARCH_FIRST;
 
-    onewire_aquire(bus);
+    onewire_acquire(bus);
 
     do {
         res = onewire_search(bus, &id, res);

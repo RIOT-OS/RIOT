@@ -120,7 +120,7 @@ static inline void onewire_acquire(onewire_t *bus)
  * @brief   Release exclusive access to 1-Wire bus
  *
  * This call ends exclusive access to a bus which was previously acquired with a
- * call to @ref onewire_aquire().
+ * call to @ref onewire_acquire().
  *
  * @param[in] bus       1-Wire bus descriptor
  */
