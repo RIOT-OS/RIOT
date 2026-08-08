@@ -49,11 +49,6 @@
 #endif
 
 /**
- * @brief   Thread flag used internally for signaling between ISR and user thread
- */
-#define THREAD_FLAG_KINETIS_I2C (1u << 8)
-
-/**
  * @brief   Array of I2C module clock dividers
  *
  * The index in this array is the I2C_F setting number
