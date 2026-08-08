@@ -25,7 +25,7 @@ static event_t event_panid = {
 
 static void _panid_handler(event_t *event)
 {
-    (void) event;
+    (void)event;
 
     /* It's safe here to call any OpenThread specific API, since this code runs
      * in the same thread as the OpenThread tasklet handler */

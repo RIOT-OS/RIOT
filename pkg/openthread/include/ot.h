@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 Fundacion Inria Chile
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Fundacion Inria Chile
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
@@ -42,7 +39,7 @@
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * @see https://openthread.io/releases/thread-reference-20180619
+ * @see https://openthread.io/reference
  *
  * @{
  *
@@ -56,13 +53,13 @@
 extern "C" {
 #endif
 
+#include "event.h"
 #include "net/netopt.h"
 #include "net/ieee802154.h"
+#include "net/ieee802154/radio.h"
 #include "net/ethernet.h"
-#include "net/netdev.h"
-#include "thread.h"
 #include "openthread/instance.h"
-#include "event.h"
+#include "thread.h"
 
 /**
  * @name    Openthread constants
@@ -73,9 +70,11 @@ extern "C" {
 /** @brief   sizeof in bytes the two first members of she serial structure */
 #define OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF               (4U)
 /** @brief   sizeof the serial buffer */
-#define OPENTHREAD_SERIAL_BUFFER_SIZE                       OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF + 100
+#define OPENTHREAD_SERIAL_BUFFER_SIZE                       OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF + \
+        100
 /** @brief   sizeof the spinel payload data */
-#define OPENTHREAD_SERIAL_BUFFER__PAYLOAD_SIZE              OPENTHREAD_SERIAL_BUFFER_SIZE - OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF
+#define OPENTHREAD_SERIAL_BUFFER__PAYLOAD_SIZE              OPENTHREAD_SERIAL_BUFFER_SIZE - \
+        OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF
 /** @brief   error when no more buffer available */
 #define OPENTHREAD_ERROR_NO_EMPTY_SERIAL_BUFFER             -1
 /** @brief   serial buffer ready to use */
@@ -103,18 +102,15 @@ typedef struct {
  * @brief Gets packet from driver and tells OpenThread about the reception.
  *
  * @param[in]  aInstance          pointer to an OpenThread instance
- * @param[in]  dev                pointer to a netdev instance
  */
-void recv_pkt(otInstance *aInstance, netdev_t *dev);
+void recv_pkt(otInstance *aInstance);
 
 /**
  * @brief   Inform OpenThread when tx is finished
  *
  * @param[in]  aInstance          pointer to an OpenThread instance
- * @param[in]  dev                pointer to a netdev interface
- * @param[in]  event              just occurred netdev event
  */
-void send_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event);
+void process_tx_done(otInstance *aInstance);
 
 /**
  * @brief Get OpenThread event queue
@@ -128,7 +124,7 @@ event_queue_t *openthread_get_evq(void);
  *
  * @return pointer to the OpenThread instance
  */
-otInstance* openthread_get_instance(void);
+otInstance *openthread_get_instance(void);
 
 /**
  * @brief   Bootstrap OpenThread
@@ -138,11 +134,15 @@ void openthread_bootstrap(void);
 /**
  * @brief   Init OpenThread radio
  *
- * @param[in]  dev                pointer to a netdev interface
+ * @param[in]  dev                pointer to a radio HAL device
  * @param[in]  tb                 pointer to the TX buffer designed for OpenThread
  * @param[in]  rb                 pointer to the RX buffer designed for Open_Thread
+ * @param[in]  tx_is_ack          pointer to variable indicating that tx done is skipped
+ *
+ * @retval 0 on success
+ * @retval negative errno on error
  */
-void openthread_radio_init(netdev_t *dev, uint8_t *tb, uint8_t *rb);
+int openthread_radio_init(ieee802154_dev_t *dev, uint8_t *tb, uint8_t *rb, uint8_t *tx_is_ack);
 
 /**
  * @brief   Starts OpenThread thread.
@@ -151,13 +151,14 @@ void openthread_radio_init(netdev_t *dev, uint8_t *tb, uint8_t *rb);
  * @param[in]  stacksize          size of the stack
  * @param[in]  priority           priority of the OpenThread stack
  * @param[in]  name               name of the OpenThread stack
- * @param[in]  netdev             pointer to the netdev interface
+ * @param[in]  dev                pointer to a radio HAL device
+ * @param[in]  tx_is_ack          pointer to variable indicating that tx done is skipped
  *
- * @return  PID of OpenThread thread
- * @return  -EINVAL if there was an error creating the thread
+ * @retval  PID of OpenThread thread
+ * @retval  -EINVAL if there was an error creating the thread
  */
-int openthread_netdev_init(char *stack, int stacksize, char priority, const char *name, netdev_t *netdev);
-
+int openthread_hal_init(char *stack, int stacksize, char priority, const char *name,
+                        ieee802154_dev_t *dev, uint8_t *tx_is_ack);
 /**
  * @brief   Init OpenThread random
  */
