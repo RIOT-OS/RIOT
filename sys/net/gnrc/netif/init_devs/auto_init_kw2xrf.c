@@ -62,7 +62,7 @@ void auto_init_kw2xrf(void)
                         bhp_event_isr_cb, &kw2xrf_bhp[i]);
 
         netdev_register(&kw2xrf_netdev[i].dev.netdev, NETDEV_KW2XRF, i);
-        netdev_ieee802154_submac_init(&kw2xrf_netdev[i]);
+        netdev_ieee802154_submac_init(&kw2xrf_netdev[i], NULL);
 
         gnrc_netif_ieee802154_create(&_netif[i], _kw2xrf_stacks[i], KW2XRF_MAC_STACKSIZE,
                                      KW2XRF_MAC_PRIO, "kw2xrf",
