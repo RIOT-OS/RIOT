@@ -128,7 +128,9 @@ advertising channels, as well as the corresponding variables in the RIOT
 command.
 
 ```c
-typedef struct __attribute__ ((aligned(4))) {
+#include <stdalign.h>
+
+typedef struct alignas(4) {
     radio_op_command_t ropCmd;
     uint8_t channel;
     struct {
