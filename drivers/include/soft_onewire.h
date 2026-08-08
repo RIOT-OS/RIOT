@@ -84,11 +84,11 @@ struct soft_onewire_t {
     /** 1-Wire API instance */
     onewire_t super;
 
-    /** mutext to sync thread with ISRs */
+    /** mutex to sync thread with ISRs */
     mutex_t sync;
 
     /** Only one of these at a time will be used, so they are in a union to
-        save RAM. */
+      * save RAM. */
     union {
         const uint8_t *tx_buf;  /**< pointer to buffer of bits to send */
         uint8_t *rx_buf;        /**< pointer to buffer for received bits */

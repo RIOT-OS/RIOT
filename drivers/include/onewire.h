@@ -43,7 +43,7 @@ extern "C" {
  */
 #define ONEWIRE_SEARCH_FIRST    (0)
 
-/** forward declaration of 1-Wire bus descriptor */
+/** Forward declaration of 1-Wire bus descriptor */
 typedef struct onewire_t onewire_t;
 
 /**
@@ -107,7 +107,7 @@ void _onewire_init(onewire_t *bus, const onewire_params_t *params);
  *
  * @param[in] bus       1-Wire bus descriptor
  */
-static inline void onewire_aquire(onewire_t *bus)
+static inline void onewire_acquire(onewire_t *bus)
 {
 #if MODULE_ONEWIRE_ONESLAVE
     (void)bus;

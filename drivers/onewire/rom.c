@@ -65,7 +65,7 @@ bool onewire_rom_is_valid(const onewire_rom_t *rom)
 {
     assert(rom);
 
-    /* Some TI tmp1827 parts have broken ROM ID's. Their CRC was calculated as
+    /* Some TI TMP1827 parts have broken ROM ID's. Their CRC was calculated as
      * if their family code was 0x26 rather than the 0x27 actually used. Account
      * for this, allowing those part IDs to pass.
      *

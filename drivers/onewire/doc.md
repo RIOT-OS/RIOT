@@ -16,7 +16,7 @@ driver.
 
 The pseudomodule `onewire_oneslave`, when enabled, permits the assumption
 that each 1-wire bus instance will only ever have a single slave device
-connected. This turns calls to acquire and release the bus into noops.
+connected. This turns calls to acquire and release the bus into no-ops.
 
 The pseudomodule `onewire_multidriver` enables support for multiple types of
 bus masters. Without this enabled, multiple buses are supported, but all
