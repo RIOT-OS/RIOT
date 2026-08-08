@@ -14,10 +14,10 @@ VALUE = 42
 STRING = 'test'
 
 STRING_FORMAT = '{}{}Logging value \'{}\' and string \'{}\''
-ERROR = '\033[1;31m'
-WARNING = '\033[1;33m'
-INFO = '\033[1m'
-DEBUG = '\033[0;32m'
+ERROR = '\033[31m'
+WARNING = '\033[33m'
+INFO = '\033[37m'
+DEBUG = '\033[32m'
 RESET = '\033[0m'
 
 LEVELS = [ERROR, WARNING, INFO, DEBUG]
