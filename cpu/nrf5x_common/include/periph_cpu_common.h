@@ -15,6 +15,7 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
+#include "buildinfo/cpuinfo.h"
 #include "cpu.h"
 
 #ifdef __cplusplus

@@ -474,11 +474,11 @@ LDGENFLAGS += -DESP_BOOTLOADER_RESERVE_RTC=0x18
 
 $(BINDIR)/memory.ld: $(RIOTCPU)/$(CPU)/vendor/ld/$(CPU_FAM)/memory.ld.in \
                      $(BINDIR)/riotbuild/riotbuild.h pkg-prepare
-	$(Q)$(CC) $(INCLUDES) -include '$(BINDIR)/riotbuild/riotbuild.h' \
+	$(Q)$(CC) $(INCLUDES) -D__ASSEMBLER__ -include '$(BINDIR)/riotbuild/riotbuild.h' \
 				$(LDGENFLAGS) -I$(RIOTCPU)/$(CPU)/vendor/ld -P -x c -E $< -o $@
 $(BINDIR)/sections.ld: $(RIOTCPU)/$(CPU)/vendor/ld/$(CPU_FAM)/sections.ld.in \
                        $(BINDIR)/riotbuild/riotbuild.h pkg-prepare
-	$(Q)$(CC) $(INCLUDES) -include '$(BINDIR)/riotbuild/riotbuild.h' \
+	$(Q)$(CC) $(INCLUDES) -D__ASSEMBLER__ -include '$(BINDIR)/riotbuild/riotbuild.h' \
 				$(LDGENFLAGS) -I$(RIOTCPU)/$(CPU)/vendor/ld -C -P -x c -E $< -o $@
 
 $(BOOTLOADER_BIN):

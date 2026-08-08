@@ -31,6 +31,7 @@
 #include <strings.h>
 #include <sys/types.h>
 
+#include "buildinfo/cpuinfo.h"
 #include "compiler_hints.h"
 #include "flash_utils.h"
 #include "modules.h"

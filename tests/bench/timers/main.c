@@ -19,6 +19,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "buildinfo/cpuinfo.h"
 #include "bitarithm.h"
 #include "fmt.h"
 #include "mutex.h"

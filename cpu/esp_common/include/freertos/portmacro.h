@@ -14,6 +14,7 @@
 #include "stdbool.h"
 #include "stdint.h"
 
+#include "buildinfo/cpuinfo.h"
 #ifndef CPU_ESP8266
 #include "esp_heap_caps.h"
 #include "esp_timer.h"

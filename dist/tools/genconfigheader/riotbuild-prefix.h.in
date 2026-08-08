@@ -19,48 +19,12 @@
 
 #ifdef DOXYGEN
 /**
- * @brief   The used RIOT version as human readable string literal, e.g., for
- *          printing to stdio or writing to a log.
- */
-#define RIOT_VERSION "<YEAR_OF_RELEASE>.<MONTH_OF_RELEASE>-<POSTFIX>"
-
-/**
- * @brief   The used RIOT version as machine readable number, e.g., for testing
- *          whether new APIs are available.
- *
- * @see     RIOT_VERSION_NUM
- */
-#define RIOT_VERSION_CODE   RIOT_VERSION_NUM(<YEAR>,<MONTH>,<PATCH>,<EXTRA>)
-
-/**
- * @brief   Name of the RIOT application as string literal
- *
- * The string is defined in the applications `Makefile` using the `APPLICATION`
- * variable.
- */
-#define RIOT_APPLICATION    "<RIOT_APP_NAME>"
-
-/**
- * @brief   Name of the board the app is compiled for as string literal
- */
-#define RIOT_BOARD          "<BOARD_NAME>"
-
-/**
- * @brief   Name of the MCU the app is compiled for as string literal
- *
- * This is the name of the MCU family in terms of RIOT's peripheral drivers,
- * or in other words, the folder name in the `cpu` folder in RIOT's repo root
- * used.
- */
-#define RIOT_CPU            "<CPU_FOLDER_NAME>"
-
-/**
  * @brief   Size of the RAM in Bytes
  *
  * @warning Not every CPU family provides this, it will be undefined if
  *          not provided
  */
-#define CPU_RAM_SIZE        /* RAM Size in Bytes */
+#  define CPU_RAM_SIZE        /* RAM Size in Bytes */
 #endif /* DOXYGEN */
 
 /**
@@ -68,7 +32,7 @@
  *          macro in the definition
  *
  * Usage:
- * ``` C
+ *
  * /// @deprecated, use @ref BAR instead of FOO
  * #define FOO          MACRO_DEPRECATED BAR
  * ```
@@ -80,4 +44,53 @@
 #else
 #  define MACRO_DEPRECATED
 #endif
+
+/**
+ * @brief   Preprocessor macro that can be used to check whether it is compiled
+ *          as part of a RIOT build
+ *
+ * @note    This is useful for external code that can also be compiled as RIOT
+ *          package, in case the upstream wants to feature guard RIOT specific
+ *          features in the external code.
+ */
+#define RIOT_OS 1
+
+#ifndef __ASSEMBLER__
+extern const char *buildinfo_app_name;    /**< Name of the application */
+extern const char *buildinfo_board_name;  /**< Name of the board */
+extern const char *buildinfo_cpu_name;    /**< Name of the CPU */
+extern const char *buildinfo_riot_version;/**< RIOT version (human readable) */
+#endif
+
+/**
+ * @brief   Alias of @ref buildinfo_app_name for backward compatibility
+ *
+ * @note    Use `RIOT_APPLICATION_LITERAL` from
+ *          `#include "buildinfo/appinfo.h"` if you need a string literal
+ */
+#define RIOT_APPLICATION buildinfo_app_name
+
+/**
+ * @brief   Alias of @ref buildinfo_board_name for backward compatibility
+ *
+ * @note    Use `RIOT_BOARD_LITERAL` from
+ *          `#include "buildinfo/boardinfo.h"` if you need a string literal
+ */
+#define RIOT_BOARD buildinfo_board_name
+
+/**
+ * @brief   Alias of @ref buildinfo_cpu_name for backward compatibility
+ *
+ * @note    Use `RIOT_CPU_LITERAL` from
+ *          `#include "buildinfo/cpuinfo.h"` if you need a string literal
+ */
+#define RIOT_CPU buildinfo_cpu_name
+
+/**
+ * @brief   Alias of @ref buildinfo_riot_version for backward compatibility
+ *
+ * @note    Use `RIOT_VERSION_LITERAL` from
+ *          `#include "buildinfo/riotver.h"` if you need a string literal
+ */
+#define RIOT_VERSION buildinfo_riot_version
 /** @} */

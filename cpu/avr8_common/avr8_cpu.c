@@ -27,6 +27,7 @@
 #include <avr/wdt.h>
 #include <avr/pgmspace.h>
 
+#include "buildinfo/cpuinfo.h"
 #include "cpu.h"
 #include "cpu_clock.h"
 #include "board.h"
