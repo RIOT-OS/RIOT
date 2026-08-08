@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: 2026 Arseny Sukhman
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config MODULE_LIS331DLH
+    bool "LIS331DLH 3-axis accelerometer"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+
+config HAVE_LIS331DLH
+    bool
+    select MODULE_LIS331DLH if MODULE_SAUL_DEFAULT
+    help
+        Indicates that a LIS331DLH accelerometer is present.
