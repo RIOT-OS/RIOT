@@ -112,6 +112,22 @@ void gnrc_sixlowpan_multiplex_by_size(gnrc_pktsnip_t *pkt,
     size_t datagram_size = gnrc_pkt_len(pkt->next);
     DEBUG("6lo: iface->sixlo.max_frag_size = %u for interface %i\n",
           netif->sixlo.max_frag_size, netif->pid);
+
+    gnrc_netif_hdr_t *hdr = pkt->data;
+
+    /* L2 header size depends on dst & src address */
+    /* we have to pass this information to the lower layer via value */
+    uint16_t value = netopt_pdu_size_ctx_pack(netif->l2addr_len,
+                                              hdr->dst_l2addr_len,
+                                              hdr->flags);
+
+    if (gnrc_netapi_get(netif->pid, NETOPT_PDU_SIZE, 0,
+                        &value, sizeof(value)) > 0) {
+        netif->sixlo.max_frag_size = value;
+    } else {
+        DEBUG("6lo: NETOPT_PDU_SIZE not implemented\n");
+    }
+
     if ((netif->sixlo.max_frag_size == 0) ||
         (datagram_size <= netif->sixlo.max_frag_size)) {
         DEBUG("6lo: Dispatch for sending\n");
