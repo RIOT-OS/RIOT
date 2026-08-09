@@ -21,6 +21,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-c031c6 \
     nucleo-f030r8 \
     nucleo-f302r8 \
+    nucleo-g031k8 \
     nucleo-l011k4 \
     nucleo-l031k6 \
     sam10-xpro \
