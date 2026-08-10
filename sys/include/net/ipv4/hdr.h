@@ -134,7 +134,7 @@ static inline void ipv4_hdr_set_ihl(ipv4_hdr_t *hdr, uint16_t ihl)
 }
 
 /**
- * brief Gets the value of the Internet Header Length field of @p hdr
+ * @brief   Gets the value of the Internet Header Length field of @p hdr
  *
  * @param[in]   hdr     Pointer to an IPv4 header.
  *
@@ -158,7 +158,7 @@ static inline void ipv4_hdr_set_flags(ipv4_hdr_t *hdr, uint8_t flags)
 }
 
 /**
- * brief Gets the value of the Version Control Flags field of @p hdr
+ * @brief   Gets the value of the Version Control Flags field of @p hdr
  *
  * @param[in]   hdr     Pointer to an IPv4 header.
  *
@@ -183,7 +183,7 @@ static inline void ipv4_hdr_set_fo(ipv4_hdr_t *hdr, uint16_t fo)
 }
 
 /**
- * brief Gets the value of the Fragment Offset field of @p hdr
+ * @brief   Gets the value of the Fragment Offset field of @p hdr
  *
  * @param[in]   hdr     Pointer to an IPv4 header.
  *
