@@ -74,7 +74,12 @@ void unicoap_print_endpoint(const unicoap_endpoint_t* endpoint) {
         return;
     }
 #endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) */
-
+#if IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX)
+    if (endpoint->proto == UNICOAP_PROTO_SLIPMUX) {
+        printf("<uart(%d)>", endpoint->slipmux_ep->config.uart);
+        return;
+    }
+#endif
     printf("<endpoint (unprintable) proto=%u>", endpoint->proto);
 }
 
@@ -84,6 +89,8 @@ const char* unicoap_string_from_proto(unicoap_proto_t proto) {
         return "UDP";
     case UNICOAP_PROTO_DTLS:
         return "DTLS";
+    case UNICOAP_PROTO_SLIPMUX:
+        return "SLIPMUX";
         /* MARK: unicoap_driver_extension_point */
     default:
         return "?";
@@ -103,6 +110,10 @@ bool unicoap_endpoint_is_equal(const unicoap_endpoint_t* lhs,
     case UNICOAP_PROTO_DTLS:
         return sock_tl_ep_equal(&lhs->_tl_ep, &rhs->_tl_ep);
 #endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) */
+#if IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX)
+    case UNICOAP_PROTO_SLIPMUX:
+        return lhs->slipmux_ep->config.uart == rhs->slipmux_ep->config.uart;
+#endif /* IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX) */
     /* MARK: unicoap_driver_extension_point */
     default:
         assert(false);
@@ -120,6 +131,8 @@ bool unicoap_endpoint_is_multicast(const unicoap_endpoint_t* endpoint) {
         UNICOAP_DEBUG("sock support is missing, cannot check if multicast addr, driver missing?\n");
         return false;
 #endif
+    case UNICOAP_PROTO_SLIPMUX:
+        return false;
     /* MARK: unicoap_driver_extension_point */
     default:
         assert(false);
