@@ -55,16 +55,16 @@ typedef struct __attribute__((packed)) {
     /**
      * @brief Version and Internet Header Length.
      *
-     * @details The version is encoded in the four most significant bits and
-     * the Internet Header Length in the four least significant bits (see
-     * above).
+     * The version is encoded in the four most significant bits and the
+     * Internet Header Length in the four least significant bits (see above).
      *
-     * @details The Internet Header Length is the length of the header in
-     * 32-bit words, so it must be multiplied by 4 to get the length in bytes.
-     * The minimum value is 5 (20 bytes) and the maximum is 15 (60 bytes).
+     * The Internet Header Length is the length of the header in 32-bit words,
+     * so it must be multiplied by 4 to get the length in bytes. The minimum
+     * value is 5 (20 bytes) and the maximum is 15 (60 bytes).
      *
      * This module provides helper functions to set, get, and check these
      * fields accordingly:
+     *
      * * ipv4_hdr_set_version()
      * * ipv4_hdr_get_version()
      * * ipv4_hdr_set_ihl()
@@ -81,6 +81,7 @@ typedef struct __attribute__((packed)) {
      *
      * This module provides helper functions to set, get, and check these
      * fields accordingly:
+     *
      * * ipv4_hdr_set_flags()
      * * ipv4_hdr_get_flags()
      * * ipv4_hdr_set_fo()
@@ -121,7 +122,7 @@ static inline uint8_t ipv4_hdr_get_version(ipv4_hdr_t *hdr)
  * @brief   Sets the Internet Header Length field of @p hdr
  *
  * @param[out] hdr  Pointer to an IPv4 header.
- * @param[in] ihl  Size in bytes of the Internet Header Length (including padding)
+ * @param[in] ihl   Size in bytes of the Internet Header Length (including padding)
  */
 static inline void ipv4_hdr_set_ihl(ipv4_hdr_t *hdr, uint16_t ihl)
 {
@@ -148,7 +149,7 @@ static inline uint16_t ipv4_hdr_get_ihl(ipv4_hdr_t *hdr)
  * @brief   Sets the Version Control Flags field of @p hdr
  *
  * @param[out] hdr  Pointer to an IPv4 header.
- * @param[in] flags  The new value of flags
+ * @param[in] flags The new value of flags
  */
 static inline void ipv4_hdr_set_flags(ipv4_hdr_t *hdr, uint8_t flags)
 {
@@ -172,7 +173,7 @@ static inline uint8_t ipv4_hdr_get_flags(ipv4_hdr_t *hdr)
  * @brief   Sets the Fragment Offset field of @p hdr
  *
  * @param[out] hdr  Pointer to an IPv4 header.
- * @param[in] fo  The new value of fragment offset
+ * @param[in] fo    The new value of fragment offset
  */
 static inline void ipv4_hdr_set_fo(ipv4_hdr_t *hdr, uint16_t fo)
 {
