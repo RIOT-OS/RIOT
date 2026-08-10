@@ -98,7 +98,7 @@ typedef struct __attribute__((packed)) {
 /**
  * @brief   Sets the version field of @p hdr to 4
  *
- * @param[out] hdr  Pointer to an IPv4 header.
+ * @param[out]  hdr     Pointer to an IPv4 header.
  */
 static inline void ipv4_hdr_set_version(ipv4_hdr_t *hdr)
 {
@@ -109,7 +109,7 @@ static inline void ipv4_hdr_set_version(ipv4_hdr_t *hdr)
 /**
  * @brief   Gets the value of the version field of @p hdr
  *
- * @param[in] hdr   Pointer to an IPv4 header.
+ * @param[in]   hdr     Pointer to an IPv4 header.
  *
  * @return  Value of the version field of @p hdr.
  */
@@ -121,8 +121,8 @@ static inline uint8_t ipv4_hdr_get_version(ipv4_hdr_t *hdr)
 /**
  * @brief   Sets the Internet Header Length field of @p hdr
  *
- * @param[out] hdr  Pointer to an IPv4 header.
- * @param[in] ihl   Size in bytes of the Internet Header Length (including padding)
+ * @param[out]  hdr     Pointer to an IPv4 header.
+ * @param[in]   ihl     Size in bytes of the Internet Header Length (including padding)
  */
 static inline void ipv4_hdr_set_ihl(ipv4_hdr_t *hdr, uint16_t ihl)
 {
@@ -136,7 +136,7 @@ static inline void ipv4_hdr_set_ihl(ipv4_hdr_t *hdr, uint16_t ihl)
 /**
  * brief Gets the value of the Internet Header Length field of @p hdr
  *
- * @param[in] hdr   Pointer to an IPv4 header.
+ * @param[in]   hdr     Pointer to an IPv4 header.
  *
  * @return Size in bytes of the Internet Header Length field of @p hdr
  */
@@ -148,8 +148,8 @@ static inline uint16_t ipv4_hdr_get_ihl(ipv4_hdr_t *hdr)
 /**
  * @brief   Sets the Version Control Flags field of @p hdr
  *
- * @param[out] hdr  Pointer to an IPv4 header.
- * @param[in] flags The new value of flags
+ * @param[out]  hdr     Pointer to an IPv4 header.
+ * @param[in]   flags   The new value of flags
  */
 static inline void ipv4_hdr_set_flags(ipv4_hdr_t *hdr, uint8_t flags)
 {
@@ -160,7 +160,7 @@ static inline void ipv4_hdr_set_flags(ipv4_hdr_t *hdr, uint8_t flags)
 /**
  * brief Gets the value of the Version Control Flags field of @p hdr
  *
- * @param[in] hdr   Pointer to an IPv4 header.
+ * @param[in]   hdr     Pointer to an IPv4 header.
  *
  * @return Value of the Version Control field of @p hdr
  */
@@ -172,8 +172,8 @@ static inline uint8_t ipv4_hdr_get_flags(ipv4_hdr_t *hdr)
 /**
  * @brief   Sets the Fragment Offset field of @p hdr
  *
- * @param[out] hdr  Pointer to an IPv4 header.
- * @param[in] fo    The new value of fragment offset
+ * @param[out]  hdr     Pointer to an IPv4 header.
+ * @param[in]   fo      The new value of fragment offset
  */
 static inline void ipv4_hdr_set_fo(ipv4_hdr_t *hdr, uint16_t fo)
 {
@@ -185,7 +185,7 @@ static inline void ipv4_hdr_set_fo(ipv4_hdr_t *hdr, uint16_t fo)
 /**
  * brief Gets the value of the Fragment Offset field of @p hdr
  *
- * @param[in] hdr   Pointer to an IPv4 header.
+ * @param[in]   hdr     Pointer to an IPv4 header.
  *
  * @return Value of the Fragment Offset field of @p hdr
  */
