@@ -85,6 +85,27 @@ uint16_t dac_util_map(int value, int min, int max);
  */
 uint16_t dac_util_mapf(float value, float min, float max);
 
+/**
+ * @brief   Generate a sine wave for the DAC
+ *
+ * This function fills the provided buffer with samples of a sine wave
+ * based on the specified center voltage, amplitude, and frequency.
+ *
+ * @param[in] center_mv     Center voltage of the sine wave in millivolts
+ * @param[in] amplitude_mv  Amplitude of the sine wave in millivolts (max - center)
+ * @param[in] freq_hz       Frequency of the sine wave in hertz
+ * @param[in] dac_ref_mv    Reference voltage of the DAC in millivolts
+ * @param[out] buf          Buffer to store the generated samples
+ * @param[in,out] buf_max   On input: maximum number of samples the buffer can hold
+ *                          On output: actual number of samples generated
+ *
+ * @retval 0                  Success
+ * @retval <0                 Negative error code on failure
+ */
+int dac_util_sine(uint16_t center_mv, uint16_t amplitude_mv, uint32_t freq_hz,
+                  uint16_t dac_ref_mv,
+                  uint16_t *buf, uint32_t *buf_max);
+
 #ifdef __cplusplus
 }
 #endif
