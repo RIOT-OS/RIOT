@@ -9,6 +9,10 @@ ifneq (,$(filter walltime_impl_ds3231,$(USEMODULE)))
   USEMODULE += ds3231
 endif
 
+ifneq (,$(filter walltime_impl_max31331,$(USEMODULE)))
+  USEMODULE += max31331
+endif
+
 ifneq (,$(filter walltime_impl_max31343,$(USEMODULE)))
   USEMODULE += max31343
 endif
