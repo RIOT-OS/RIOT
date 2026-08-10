@@ -21,6 +21,10 @@
 
 #include "xtimer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MP_HAL_PIN_FMT  "%u"
 #define mp_hal_pin_name(p) (p)
 
@@ -59,3 +63,7 @@ static inline uint64_t mp_hal_time_ns(void)
 static inline void mp_hal_set_interrupt_char(char c)
 {
 }
+
+#ifdef __cplusplus
+}
+#endif

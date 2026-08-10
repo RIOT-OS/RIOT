@@ -15,4 +15,12 @@
  * @}
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 Q(help)
+
+#ifdef __cplusplus
+}
+#endif

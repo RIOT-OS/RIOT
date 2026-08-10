@@ -19,6 +19,10 @@
 
 #include "py/obj.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Call a MicroPython callable from RIOT C code, safely
  *
@@ -30,3 +34,7 @@
  * @param[in] callback    MicroPython callable to invoke with no arguments.
  */
 void mp_riot_call_function_safe(mp_obj_t callback);
+
+#ifdef __cplusplus
+}
+#endif

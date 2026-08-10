@@ -20,6 +20,10 @@
 #include "py/obj.h"
 #include "periph/gpio.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern const mp_obj_type_t machine_pin_type;        /**< Machine pin object type */
 extern const mp_obj_type_t machine_hw_spi_type;     /**< Machine hardware SPI object type */
 extern const mp_obj_type_t machine_adc_type;        /**< Machine ADC object type */
@@ -33,3 +37,7 @@ typedef struct _machine_pin_obj_t {
     mp_obj_base_t base;
     gpio_t pin;
 } machine_pin_obj_t;
+
+#ifdef __cplusplus
+}
+#endif
