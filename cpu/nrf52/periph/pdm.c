@@ -30,9 +30,10 @@
 #include "debug.h"
 
 /* The samples buffer is a double buffer */
-int16_t _pdm_buf[PDM_BUF_SIZE * 2] = { 0 };
-static uint8_t _pdm_current_buf = 0;
+static int16_t _pdm_buf[PDM_BUF_SIZE * 2] = { 0 };
 static pdm_isr_ctx_t isr_ctx;
+static uint8_t _pdm_current_buf = 0;
+static uint8_t _pdm_next_buf = 0;
 
 int pdm_init(pdm_mode_t mode, pdm_sample_rate_t rate, int8_t gain,
               pdm_data_cb_t cb, void *arg)
@@ -112,8 +113,8 @@ int pdm_init(pdm_mode_t mode, pdm_sample_rate_t rate, int8_t gain,
                         (PDM_INTEN_STARTED_Enabled << PDM_INTEN_STARTED_Pos) |
                         (PDM_INTEN_STOPPED_Enabled << PDM_INTEN_STOPPED_Pos));
 
-    /* Configure internal RAM buffer size, divide by 2 for stereo mode */
-    NRF_PDM->SAMPLE.MAXCNT = (PDM_BUF_SIZE >> mode);
+    /* Configure Length of DMA RAM allocation in number of samples */
+    NRF_PDM->SAMPLE.MAXCNT = (PDM_BUF_SIZE);
 
     isr_ctx.cb = cb;
     isr_ctx.arg = arg;
@@ -129,6 +130,8 @@ int pdm_init(pdm_mode_t mode, pdm_sample_rate_t rate, int8_t gain,
 
 void pdm_start(void)
 {
+    _pdm_next_buf = 0;
+    _pdm_current_buf = 0;
     NRF_PDM->SAMPLE.PTR = (uint32_t)_pdm_buf;
     DEBUG("[PDM] MAXCNT: %lu\n", NRF_PDM->SAMPLE.MAXCNT);
 
@@ -142,25 +145,28 @@ void pdm_stop(void)
 
 void isr_pdm(void)
 {
+    /* new buffer started filling, prepare next buffer starting position */
     if (NRF_PDM->EVENTS_STARTED == 1) {
         NRF_PDM->EVENTS_STARTED = 0;
-        uint8_t next_buf_pos = (_pdm_current_buf + 1) & 0x1;
-        NRF_PDM->SAMPLE.PTR = (uint32_t)&_pdm_buf[next_buf_pos * (PDM_BUF_SIZE >> 1)];
+
+        _pdm_next_buf ^= 1;
+        NRF_PDM->SAMPLE.PTR = (uint32_t)&_pdm_buf[_pdm_next_buf * (PDM_BUF_SIZE)];
     }
 
+    /* PDM transfer has finished */
     if (NRF_PDM->EVENTS_STOPPED == 1) {
         NRF_PDM->EVENTS_STOPPED = 0;
-        _pdm_current_buf = 0;
     }
 
+    /* requested number of samples written to RAM */
     if (NRF_PDM->EVENTS_END == 1) {
         NRF_PDM->EVENTS_END = 0;
 
         /* Process received samples frame */
-        isr_ctx.cb(isr_ctx.arg, &_pdm_buf[_pdm_current_buf * (PDM_BUF_SIZE >> 1)]);
+        isr_ctx.cb(isr_ctx.arg, &_pdm_buf[_pdm_current_buf * (PDM_BUF_SIZE)]);
 
         /* Set next buffer */
-        _pdm_current_buf = (_pdm_current_buf + 1) & 0x1;
+        _pdm_current_buf ^= 1;
     }
 
     cortexm_isr_end();

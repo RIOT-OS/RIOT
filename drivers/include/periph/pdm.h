@@ -93,7 +93,7 @@ typedef struct {
 
 /**
  * @brief   Initialize the PDM peripheral
- *
+ * @param[in] mode      mode (Mono or Stereo)
  * @param[in] rate      sample rate
  * @param[in] gain      gain
  * @param[in] cb        data received callback function
