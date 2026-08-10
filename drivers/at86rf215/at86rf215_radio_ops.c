@@ -841,7 +841,7 @@ static void _event_handler(event_t *event)
 
 }
 
-static int _init_hardware(ieee802154_dev_t *hal, at86rf215_t *dev, void (*cb)(void *),
+static int _init_hardware(at86rf215_t *dev, void (*cb)(void *),
                           void *ctx)
 {
     int res = -1;
@@ -872,13 +872,6 @@ static int _init_hardware(ieee802154_dev_t *hal, at86rf215_t *dev, void (*cb)(vo
         return -ENOTSUP;
     }
 
-    if (is_subGHz(dev)) {
-        hal->driver = &at86rf215_sub_ghz_ops;
-    }
-    else {
-        hal->driver = &at86rf215_24_ghz_ops;
-    }
-    hal->priv = dev;
     dev->state = AT86RF215_STATE_OFF;
     at86rf215_rf_cmd(dev, CMD_RF_SLEEP);
     return 0;
@@ -887,7 +880,6 @@ static int _init_hardware(ieee802154_dev_t *hal, at86rf215_t *dev, void (*cb)(vo
 static void _irq_handler(void *ctx)
 {
     at86rf215_bhp_ev_t *bhp = ctx;
-
     event_post(bhp->evq, &bhp->ev);
 }
 
@@ -906,7 +898,9 @@ int at86rf215_init(at86rf215_t *dev_09,
         dev_09->sibling = hal_24;
         dev_09->params = *params;
         dev_09->state = AT86RF215_STATE_OFF;
-        _init_hardware(hal_09, dev_09, _irq_handler, ctx);
+        hal_09->driver = &at86rf215_sub_ghz_ops;
+        hal_09->priv = dev_09;
+        _init_hardware(dev_09, _irq_handler, ctx);
     }
 
     /* configure the 2.4 GHz interface */
@@ -916,7 +910,9 @@ int at86rf215_init(at86rf215_t *dev_09,
         dev_24->sibling = hal_09;
         dev_24->params = *params;
         dev_24->state = AT86RF215_STATE_OFF;
-        _init_hardware(hal_24, dev_24, _irq_handler, ctx);
+        hal_24->driver = &at86rf215_24_ghz_ops;
+        hal_24->priv = dev_24;
+        _init_hardware(dev_24, _irq_handler, ctx);
     }
 
     return 0;
@@ -934,7 +930,7 @@ int at86rf215_init_event(at86rf215_bhp_ev_t *bhp, ieee802154_dev_t *hal_09,
 }
 
 #define AT86RF215_COMMON_CAPS \
-        ((IS_USED(MODULE_NETDEV_IEEE802154_OQPSK)    ? IEEE802154_CAP_PHY_OQPSK    : 0) \
+          ((IS_USED(MODULE_NETDEV_IEEE802154_OQPSK)    ? IEEE802154_CAP_PHY_OQPSK    : 0) \
          | (IS_USED(MODULE_NETDEV_IEEE802154_MR_OQPSK) ? IEEE802154_CAP_PHY_MR_OQPSK : 0) \
          | (IS_USED(MODULE_NETDEV_IEEE802154_MR_OFDM)  ? IEEE802154_CAP_PHY_MR_OFDM  : 0) \
          | (IS_USED(MODULE_NETDEV_IEEE802154_MR_FSK)   ? IEEE802154_CAP_PHY_MR_FSK   : 0) \
@@ -943,42 +939,26 @@ int at86rf215_init_event(at86rf215_bhp_ev_t *bhp, ieee802154_dev_t *hal_09,
          | IEEE802154_CAP_IRQ_RX_START \
          | IEEE802154_CAP_IRQ_CCA_DONE)
 
-static const ieee802154_radio_ops_t at86rf215_sub_ghz_ops = {
-    .caps = IEEE802154_CAP_SUB_GHZ | AT86RF215_COMMON_CAPS,
-    .write = _write,
-    .read = _read,
-    .request_on = _request_on,
-    .confirm_on = _confirm_on,
-    .len = _len,
-    .off = _off,
-    .request_op = _request_op,
-    .confirm_op = _confirm_op,
-    .set_cca_threshold = _set_cca_threshold,
-    .set_cca_mode = _set_cca_mode,
-    .config_phy = _config_phy,
-    .set_csma_params = _set_csma_params,
-    .config_addr_filter = _config_addr_filter,
-    .config_src_addr_match = _config_src_addr_match,
-    .set_frame_filter_mode = _set_frame_filter_mode,
-    .get_frame_filter_mode = _get_frame_filter_mode,
-};
+#define AT86RF215_OPS(band)                              \
+{                                                        \
+        .caps = (band) | AT86RF215_COMMON_CAPS,          \
+        .write                 = _write,                 \
+        .read                  = _read,                  \
+        .request_on            = _request_on,            \
+        .confirm_on            = _confirm_on,            \
+        .len                   = _len,                   \
+        .off                   = _off,                   \
+        .request_op            = _request_op,            \
+        .confirm_op            = _confirm_op,            \
+        .set_cca_threshold     = _set_cca_threshold,     \
+        .set_cca_mode          = _set_cca_mode,          \
+        .config_phy            = _config_phy,            \
+        .set_csma_params       = _set_csma_params,       \
+        .config_addr_filter    = _config_addr_filter,    \
+        .config_src_addr_match = _config_src_addr_match, \
+        .set_frame_filter_mode = _set_frame_filter_mode, \
+        .get_frame_filter_mode = _get_frame_filter_mode, \
+}
 
-static const ieee802154_radio_ops_t at86rf215_24_ghz_ops = {
-    .caps = IEEE802154_CAP_24_GHZ | AT86RF215_COMMON_CAPS,
-    .write = _write,
-    .read = _read,
-    .request_on = _request_on,
-    .confirm_on = _confirm_on,
-    .len = _len,
-    .off = _off,
-    .request_op = _request_op,
-    .confirm_op = _confirm_op,
-    .set_cca_threshold = _set_cca_threshold,
-    .set_cca_mode = _set_cca_mode,
-    .config_phy = _config_phy,
-    .set_csma_params = _set_csma_params,
-    .config_addr_filter = _config_addr_filter,
-    .config_src_addr_match = _config_src_addr_match,
-    .set_frame_filter_mode = _set_frame_filter_mode,
-    .get_frame_filter_mode = _get_frame_filter_mode,
-};
+static const ieee802154_radio_ops_t at86rf215_sub_ghz_ops = AT86RF215_OPS(IEEE802154_CAP_SUB_GHZ);
+static const ieee802154_radio_ops_t at86rf215_24_ghz_ops = AT86RF215_OPS(IEEE802154_CAP_24_GHZ);
