@@ -78,7 +78,7 @@
 #define MICROPY_PY_TIME                             (1)
 #define MICROPY_PY_TIME_GMTIME_LOCALTIME_MKTIME     (1)
 #define MICROPY_PY_TIME_TIME_TIME_NS                (1)
-#define MICROPY_PY_TIME_INCLUDEFILE                 "modtime_riot.h"
+#define MICROPY_PY_TIME_INCLUDEFILE                 "modtime_riot.c"
 #define MICROPY_PY_SYS_MODULES                      (1)
 #define MICROPY_LONGINT_IMPL                        (MICROPY_LONGINT_IMPL_LONGLONG)
 #define MICROPY_FLOAT_IMPL                          (MICROPY_FLOAT_IMPL_FLOAT)
@@ -98,22 +98,14 @@ typedef long mp_off_t;
 #define MICROPY_BEGIN_ATOMIC_SECTION()              irq_disable()
 #define MICROPY_END_ATOMIC_SECTION(state)           irq_restore(state)
 
-void mp_riot_sched_hook(void);
-#define MICROPY_SCHED_HOOK_SCHEDULED                mp_riot_sched_hook()
+/**
+ * @name   Scheduler configuration
+ * @{
+ */
+extern void mp_riot_sched_hook(void);
 
+#define MICROPY_SCHED_HOOK_SCHEDULED                mp_riot_sched_hook()
 #define MICROPY_PORT_ROOT_POINTERS                  const char *readline_hist[8];
+/** @} */
 
 #define MP_STATE_PORT                               MP_STATE_VM
-
-/* Enable modules based on enabled RIOT OS modules */
-#define MICROPY_PY_RIOT                             (1)
-
-#if IS_USED(MODULE_PERIPH_ADC)
-#  define MICROPY_PY_MACHINE_ADC                    (1)
-#endif
-#if IS_USED(MODULE_PERIPH_SPI)
-#  define MICROPY_PY_MACHINE_SPI                    (1)
-#endif
-#if IS_USED(MODULE_XTIMER)
-#  define MICROPY_PY_XTIMER                         (1)
-#endif

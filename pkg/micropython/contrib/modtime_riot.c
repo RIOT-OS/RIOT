@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-#pragma once
-
 /**
  * @ingroup     pkg_micropython
  * @{

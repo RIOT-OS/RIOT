@@ -25,8 +25,6 @@
 #include "modmachine.h"
 #include "extmod/modmachine.h"
 
-#if MICROPY_PY_MACHINE_SPI
-
 typedef struct _machine_hw_spi_obj_t {
     mp_obj_base_t base;
     spi_t bus;
@@ -166,5 +164,3 @@ MP_DEFINE_CONST_OBJ_TYPE(
     make_new, machine_hw_spi_make_new,
     protocol, &machine_hw_spi_p,
     locals_dict, &mp_machine_spi_locals_dict);
-
-#endif /* MICROPY_PY_MACHINE_SPI */

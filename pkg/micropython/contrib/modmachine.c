@@ -26,8 +26,6 @@
 #include "py/runtime.h"
 #include "modmachine.h"
 
-#if MICROPY_PY_MACHINE
-
 static const MP_DEFINE_STR_OBJ(machine_module_doc_obj,
                                "RIOT machine module - low-level hardware access "
                                "(reset, Pin, SPI, ADC)");
@@ -85,5 +83,3 @@ const mp_obj_module_t mp_module_machine = {
 };
 
 MP_REGISTER_MODULE(MP_QSTR_machine, mp_module_machine);
-
-#endif /* MICROPY_PY_MACHINE */

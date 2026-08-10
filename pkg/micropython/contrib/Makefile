@@ -33,12 +33,34 @@ CFLAGS += -Wno-pedantic
 CFLAGS += -Wno-sign-compare
 CFLAGS += -Wno-cast-align
 
-SRC_C = $(filter-out modtime_riot.c, $(wildcard *.c)) \
-  extmod/machine_spi.c \
+SRC_C = \
   extmod/modtime.c \
+  gccollect.c \
+  help.c \
+  machine_pin.c \
+  modmachine.c \
+  modriot.c \
+  mp_riot.c \
+  mphalport.c \
   shared/readline/readline.c \
   shared/runtime/pyexec.c \
   shared/timeutils/timeutils.c
+
+ifneq (,$(filter periph_adc,$(USEMODULE)))
+  SRC_C += machine_adc.c
+  CFLAGS += -DMICROPY_PY_MACHINE_ADC=1
+endif
+
+ifneq (,$(filter periph_spi,$(USEMODULE)))
+  SRC_C += \
+    extmod/machine_spi.c \
+    machine_hw_spi.c
+  CFLAGS += -DMICROPY_PY_MACHINE_SPI=1
+endif
+
+ifneq (,$(filter xtimer,$(USEMODULE)))
+  SRC_C += modxtimer.c
+endif
 
 # list of sources for qstr extraction
 SRC_QSTR += $(SRC_C)

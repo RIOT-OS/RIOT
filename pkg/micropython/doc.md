@@ -58,7 +58,7 @@ Steps:
 make -C examples/lang_support/community/micropython flash mpy-tests
 ```
 
-The default baud rate is 115200. The test will switch the interpreter into raw 
+The default baud rate is 115200. The test will switch the interpreter into raw
 REPL mode for testing. Expect some tests to fail, depending on the enabled
 features and configured heap size.
 

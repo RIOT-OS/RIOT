@@ -20,9 +20,9 @@
 #include "py/obj.h"
 #include "periph/gpio.h"
 
-extern const mp_obj_type_t machine_pin_type;
-extern const mp_obj_type_t machine_hw_spi_type;
-extern const mp_obj_type_t machine_adc_type;
+extern const mp_obj_type_t machine_pin_type;        /**< Machine pin object type */
+extern const mp_obj_type_t machine_hw_spi_type;     /**< Machine hardware SPI object type */
+extern const mp_obj_type_t machine_adc_type;        /**< Machine ADC object type */
 
 MP_DECLARE_CONST_FUN_OBJ_0(machine_info_obj);
 

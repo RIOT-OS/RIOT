@@ -21,8 +21,6 @@
 #include "py/runtime.h"
 #include "modmachine.h"
 
-#if MICROPY_PY_MACHINE_ADC
-
 typedef struct _machine_adc_obj_t {
     mp_obj_base_t base;
     adc_t channel;
@@ -118,5 +116,3 @@ MP_DEFINE_CONST_OBJ_TYPE(
     print, machine_adc_print,
     make_new, machine_adc_make_new,
     locals_dict, &machine_adc_locals_dict);
-
-#endif /* MICROPY_PY_MACHINE_ADC */

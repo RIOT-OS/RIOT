@@ -28,8 +28,6 @@
 #include "container.h"
 #include "xtimer.h"
 
-#if MICROPY_PY_XTIMER
-
 typedef struct _mp_obj_xtimer_t {
     mp_obj_base_t base;
     xtimer_t t;
@@ -124,5 +122,3 @@ const mp_obj_module_t mp_module_xtimer = {
 };
 
 MP_REGISTER_MODULE(MP_QSTR_xtimer, mp_module_xtimer);
-
-#endif /* MICROPY_PY_XTIMER */
