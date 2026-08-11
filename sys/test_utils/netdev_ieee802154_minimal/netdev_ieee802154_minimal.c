@@ -203,7 +203,7 @@ void netdev_register_signal(struct netdev *dev, netdev_type_t type, uint8_t inde
 {
     (void) type;
 
-    if (index > NETDEV_IEEE802154_MINIMAL_NUMOF) {
+    if (index >= NETDEV_IEEE802154_MINIMAL_NUMOF) {
         return;
     }
     printf("Device %d registered (type: %d)\n", index, type);
