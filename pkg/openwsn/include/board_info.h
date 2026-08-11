@@ -57,7 +57,7 @@ extern "C" {
  */
 /* Always 32bit when using ztimer */
 #if RTT_MAX_VALUE == UINT32_MAX || !((RTT_MAX_VALUE + 1) & (RTT_MAX_VALUE)) || \
-    IS_USED(MODULE_OPENWSN_SCTIMER_ZTIMER)
+    MODULE_OPENWSN_SCTIMER_ZTIMER
 #define PORT_TIMER_WIDTH                    uint32_t
 #define PORT_RADIOTIMER_WIDTH               uint32_t
 #else

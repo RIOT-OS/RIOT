@@ -78,9 +78,9 @@ typedef struct {
     size_t response_len; /**< length of the message in @p response */
 
     uint8_t request_method; /**< the method of the initial request */
-#if IS_USED(MODULE_GCOAP) || defined(DOXYGEN)
+#if MODULE_GCOAP || defined(DOXYGEN)
     bool truncated;         /**< the cached response is truncated */
-#endif  /* IS_USED(MODULE_GCOAP) || defined(DOXYGEN) */
+#endif  /* MODULE_GCOAP || defined(DOXYGEN) */
 
     /**
      * @brief absolute system time in seconds until which this cache entry
@@ -110,7 +110,7 @@ typedef int (*nanocoap_cache_update_strategy_t)(clist_node_t *node);
 /**
  * @brief   Initializes the internal state of the nanocoap cache.
  */
-#if IS_USED(MODULE_NANOCOAP_CACHE)
+#if MODULE_NANOCOAP_CACHE
 void nanocoap_cache_init(void);
 #else
 static inline void nanocoap_cache_init(void)

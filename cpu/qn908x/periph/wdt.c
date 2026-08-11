@@ -43,7 +43,7 @@ static uint32_t wdt_load_window_value = 0xffffffff;
  * callback is provided. */
 static uint32_t wdt_load_after_isr = 0;
 
-#ifdef MODULE_PERIPH_WDT_CB
+#if MODULE_PERIPH_WDT_CB
 static wdt_cb_t wdt_cb;
 static void *wdt_arg;
 static bool wdt_kick_disabled = false;
@@ -80,7 +80,7 @@ void wdt_stop(void)
 
 void wdt_kick(void)
 {
-#ifdef MODULE_PERIPH_WDT_CB
+#if MODULE_PERIPH_WDT_CB
     if (wdt_kick_disabled) {
         return;
     }
@@ -127,14 +127,14 @@ static void wdt_setup(uint32_t min_time, uint32_t max_time, uint32_t isr_time)
 
 void wdt_setup_reboot(uint32_t min_time, uint32_t max_time)
 {
-#ifdef MODULE_PERIPH_WDT_CB
+#if MODULE_PERIPH_WDT_CB
     wdt_cb = NULL;
     wdt_arg = NULL;
 #endif /* MODULE_PERIPH_WDT_CB */
     wdt_setup(min_time, max_time, 0);
 }
 
-#ifdef MODULE_PERIPH_WDT_CB
+#if MODULE_PERIPH_WDT_CB
 void wdt_setup_reboot_with_callback(uint32_t min_time, uint32_t max_time,
                                     wdt_cb_t cb, void *arg)
 {
@@ -178,7 +178,7 @@ void isr_wdt(void)
     WDT->LOAD = wdt_load_after_isr;
     _wdt_lock();
 
-#ifdef MODULE_PERIPH_WDT_CB
+#if MODULE_PERIPH_WDT_CB
     wdt_kick_disabled = true;
     if (wdt_cb) {
         wdt_cb(wdt_arg);

@@ -36,16 +36,16 @@
 #include "suit/storage.h"
 #include "suit.h"
 
-#ifdef MODULE_SUIT_TRANSPORT_COAP
+#if MODULE_SUIT_TRANSPORT_COAP
 #include "suit/transport/coap.h"
 #include "net/nanocoap_sock.h"
 #endif
-#ifdef MODULE_SUIT_TRANSPORT_VFS
+#if MODULE_SUIT_TRANSPORT_VFS
 #include "suit/transport/vfs.h"
 #endif
 #include "suit/transport/mock.h"
 
-#if defined(MODULE_PROGRESS_BAR)
+#if MODULE_PROGRESS_BAR
 #include "progress_bar.h"
 #endif
 
@@ -336,7 +336,7 @@ static inline void _print_download_progress(suit_manifest_t *manifest,
     (void)offset;
     (void)len;
     DEBUG("_suit_flashwrite(): writing %" PRIuSIZE " bytes at pos %" PRIuSIZE "\n", len, offset);
-#if defined(MODULE_PROGRESS_BAR)
+#if MODULE_PROGRESS_BAR
     if (image_size != 0) {
         char _suffix[7] = { 0 };
         uint8_t _progress = 100 * (offset + len) / image_size;
@@ -351,7 +351,7 @@ static inline void _print_download_progress(suit_manifest_t *manifest,
 #endif
 }
 
-#if defined(MODULE_SUIT_TRANSPORT_COAP) || defined(MODULE_SUIT_TRANSPORT_VFS)
+#if MODULE_SUIT_TRANSPORT_COAP || MODULE_SUIT_TRANSPORT_VFS
 static int _storage_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
                            int more)
 {
@@ -446,20 +446,20 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
     res = -1;
 
     if (0) {}
-#ifdef MODULE_SUIT_TRANSPORT_COAP
+#if MODULE_SUIT_TRANSPORT_COAP
     else if ((strncmp(manifest->urlbuf, "coap://", 7) == 0) ||
-             (IS_USED(MODULE_NANOCOAP_DTLS) && strncmp(manifest->urlbuf, "coaps://", 8) == 0)) {
+             (MODULE_NANOCOAP_DTLS && strncmp(manifest->urlbuf, "coaps://", 8) == 0)) {
         res = nanocoap_get_blockwise_url(manifest->urlbuf, CONFIG_SUIT_COAP_BLOCKSIZE,
                                          _storage_helper,
                                          manifest);
     }
 #endif
-#ifdef MODULE_SUIT_TRANSPORT_MOCK
+#if MODULE_SUIT_TRANSPORT_MOCK
     else if (strncmp(manifest->urlbuf, "test://", 7) == 0) {
         res = suit_transport_mock_fetch(manifest);
     }
 #endif
-#ifdef MODULE_SUIT_TRANSPORT_VFS
+#if MODULE_SUIT_TRANSPORT_VFS
     else if (strncmp(manifest->urlbuf, "file://", 7) == 0) {
         res = suit_transport_vfs_fetch(manifest, _storage_helper, manifest);
     }

@@ -22,14 +22,14 @@
 
 static inline void _slipdev_lock(void)
 {
-    if (IS_USED(MODULE_SLIPDEV_CONFIG) || IS_USED(MODULE_SLIPDEV_NET)) {
+    if (MODULE_SLIPDEV_CONFIG || MODULE_SLIPDEV_NET) {
         mutex_lock(&slipdev_mutex);
     }
 }
 
 static inline void _slipdev_unlock(void)
 {
-    if (IS_USED(MODULE_SLIPDEV_CONFIG) || IS_USED(MODULE_SLIPDEV_NET)) {
+    if (MODULE_SLIPDEV_CONFIG || MODULE_SLIPDEV_NET) {
         mutex_unlock(&slipdev_mutex);
     }
 }

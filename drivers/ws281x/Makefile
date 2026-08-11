@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  od \
+  ws281x_esp32_hw \
+  #
 SRC := ws281x.c # All other sources files provide ws281x_write as submodule
 SUBMODULES := 1
 

@@ -22,7 +22,7 @@ int main(void)
 {
     puts("Start XMEGA tests");
 
-#if defined(MODULE_ATXMEGA_EBI)
+#if MODULE_ATXMEGA_EBI
     puts("Start EBI tests");
     ebi_tests();
 #endif

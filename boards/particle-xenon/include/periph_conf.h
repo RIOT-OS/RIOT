@@ -35,7 +35,7 @@ static const uart_conf_t uart_config[] = {
         .dev        = NRF_UARTE0,
         .rx_pin     = GPIO_PIN(0, 8),
         .tx_pin     = GPIO_PIN(0, 6),
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .rts_pin    = GPIO_UNDEF,
         .cts_pin    = GPIO_UNDEF,
 #endif
@@ -45,7 +45,7 @@ static const uart_conf_t uart_config[] = {
         .dev        = NRF_UARTE1,
         .rx_pin     = GPIO_PIN(1, 10),
         .tx_pin     = GPIO_PIN(1, 8),
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .rts_pin    = GPIO_PIN(1, 3),
         .cts_pin    = GPIO_PIN(1, 11),
 #endif

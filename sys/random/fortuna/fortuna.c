@@ -17,9 +17,9 @@
 #include <string.h>
 #include "fortuna.h"
 #include "kernel_defines.h"
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+#if FORTUNA_RESEED_INTERVAL_MS > 0 && MODULE_FORTUNA_RESEED
 #include "atomic_utils.h"
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
 #include "ztimer.h"
 #else
 #include "xtimer.h"
@@ -158,7 +158,7 @@ static int fortuna_pseudo_random_data(fortuna_state_t *state, uint8_t *out,
     return 0;
 }
 
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+#if FORTUNA_RESEED_INTERVAL_MS > 0 && MODULE_FORTUNA_RESEED
 void _reseed_callback(void *arg)
 {
     fortuna_state_t *state = (fortuna_state_t *) arg;
@@ -168,7 +168,7 @@ void _reseed_callback(void *arg)
 static void _reseed_timer_set(fortuna_state_t *state)
 {
     atomic_store_u8(&state->needs_reseed, 0);
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
     ztimer_set(ZTIMER_MSEC, &state->reseed_timer, FORTUNA_RESEED_INTERVAL_MS);
 #else
     xtimer_set(&state->reseed_timer, FORTUNA_RESEED_INTERVAL_MS * US_PER_MS);
@@ -195,7 +195,7 @@ int fortuna_init(fortuna_state_t *state)
         sha256_init(&state->pools[i].ctx);
     }
 
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+#if FORTUNA_RESEED_INTERVAL_MS > 0 && MODULE_FORTUNA_RESEED
     /* reseed time init if required */
     _reseed_timer_init(state);
 #endif
@@ -220,7 +220,7 @@ int fortuna_random_data(fortuna_state_t *state, uint8_t *out, size_t bytes)
 #endif
 
     /* reseed the generator if needed, before returning data */
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+#if FORTUNA_RESEED_INTERVAL_MS > 0 && MODULE_FORTUNA_RESEED
     if (state->pools[0].len >= FORTUNA_MIN_POOL_SIZE &&
         atomic_load_u8(&state->needs_reseed)) {
 #else
@@ -242,7 +242,7 @@ int fortuna_random_data(fortuna_state_t *state, uint8_t *out, size_t bytes)
 
         fortuna_reseed(state, buf, len);
 
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+#if FORTUNA_RESEED_INTERVAL_MS > 0 && MODULE_FORTUNA_RESEED
         _reseed_timer_set(state);
 #endif
 

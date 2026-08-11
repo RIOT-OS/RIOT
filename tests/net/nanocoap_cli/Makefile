@@ -1,3 +1,9 @@
+
+MODULE_DEFS_NEEDED += \
+  gnrc_ipv6 \
+  nanocoap_dtls \
+  nanocoap_sock_observe \
+  #
 include ../Makefile.net_common
 
 # use GNRC by default

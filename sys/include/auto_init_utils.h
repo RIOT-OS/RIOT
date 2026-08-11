@@ -28,7 +28,7 @@
 #include "xfa.h"
 #include "macros/xtstr.h"
 #include "modules.h"
-#if IS_USED(MODULE_PREPROCESSOR_SUCCESSOR)
+#if MODULE_PREPROCESSOR_SUCCESSOR
 #include "preprocessor_successor.h"
 #endif
 

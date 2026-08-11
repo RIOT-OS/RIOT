@@ -575,7 +575,7 @@ static void _i2c_transfer(i2c_t dev)
     i2c_ll_enable_intr_mask(_i2c_hw[dev].dev, I2C_LL_MASTER_INT);
 
     /* set a timer for the case the I2C hardware gets stuck */
-#if defined(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
     uint32_t timeout = ((I2C_TRANSFER_TIMEOUT * KHZ(1)) / _i2c_bus[dev].clk_freq) + 1;
     ztimer_t timer = { .callback = _i2c_transfer_timeout,
                        .arg = (void*)(uintptr_t)dev };
@@ -591,7 +591,7 @@ static void _i2c_transfer(i2c_t dev)
     /* wait for transfer results and remove timeout timer*/
     mutex_lock(&_i2c_bus[dev].cmd_lock);
 
-#if defined(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
     ztimer_remove(ZTIMER_MSEC, &timer);
 #endif
 

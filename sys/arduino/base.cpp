@@ -83,7 +83,7 @@ unsigned long millis()
     return ztimer_now(ZTIMER_MSEC);
 }
 
-#if IS_USED(MODULE_PERIPH_ADC) && defined(ARDUINO_ANALOG_PIN_LAST)
+#if MODULE_PERIPH_ADC && defined(ARDUINO_ANALOG_PIN_LAST)
 int analogRead(int arduino_pin)
 {
     /*

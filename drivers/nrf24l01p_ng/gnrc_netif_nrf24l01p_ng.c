@@ -122,7 +122,7 @@ static gnrc_pktsnip_t *_nrf24l01p_ng_adpt_recv(gnrc_netif_t *netif)
     }
     gnrc_netif_hdr_set_netif(netif_hdr, netif);
     LL_APPEND(frame, snip);
-#if IS_USED(MODULE_NETSTATS_L2)
+#if MODULE_NETSTATS_L2
         netif->stats.rx_count++;
         netif->stats.rx_bytes += frame->size;
 #endif
@@ -168,7 +168,7 @@ static int _nrf24l01p_ng_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         DEBUG_PUTS("[nrf24l01p_ng] _adpt_send: preparing to send broadcast");
         dst_addr = bcast_addr;
         dst_addr_len = NRF24L01P_NG_ADDR_WIDTH;
-#if IS_USED(MODULE_NETSTATS_L2)
+#if MODULE_NETSTATS_L2
         netif->stats.tx_mcast_count++;
 #endif
     }
@@ -180,7 +180,7 @@ static int _nrf24l01p_ng_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         }
         if (!memcmp(dst_addr, bcast_addr, dst_addr_len)) {
             DEBUG_PUTS("[nrf24l01p_ng] _adpt_send: preparing to send broadcast");
-#if IS_USED(MODULE_NETSTATS_L2)
+#if MODULE_NETSTATS_L2
             netif->stats.tx_mcast_count++;
 #endif
         }

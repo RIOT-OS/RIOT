@@ -129,7 +129,7 @@ void sys_unlock_tcpip_core(void);
 #define UNLOCK_TCPIP_CORE()        sys_unlock_tcpip_core()
 /** @} */
 
-#ifdef MODULE_RANDOM
+#if MODULE_RANDOM
 /**
  * @brief   Use `random_uint32()` to generate random numbers, if available
  */

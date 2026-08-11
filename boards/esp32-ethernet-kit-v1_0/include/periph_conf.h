@@ -97,7 +97,7 @@
  *
  * @{
  */
-#ifndef MODULE_ESP_JTAG
+#if !MODULE_ESP_JTAG
 #define SPI0_CTRL   HSPI    /**< HSPI is used as SPI_DEV(0) */
 #define SPI0_SCK    GPIO14  /**< HSPI SCK */
 #define SPI0_MISO   GPIO12  /**< HSPI MISO */

@@ -46,7 +46,7 @@
 #include "vfs.h"
 #endif
 
-#ifdef MODULE_XTIMER
+#if MODULE_XTIMER
 #include <sys/time.h>
 #include "div.h"
 #include "xtimer.h"
@@ -173,7 +173,7 @@ __attribute__((used)) void _exit(int n)
     else {
         LOG_WARNING("WARN: program exited\n");
     }
-#ifdef MODULE_PERIPH_PM
+#if MODULE_PERIPH_PM
     pm_off();
 #endif
     while (1) {}
@@ -626,7 +626,7 @@ int _kill(pid_t pid, int sig)
     return -1;
 }
 
-#if (IS_USED(MODULE_LIBC_GETTIMEOFDAY))
+#if (MODULE_LIBC_GETTIMEOFDAY)
 int _gettimeofday_r(struct _reent *r, struct timeval *restrict tp, void *restrict tzp)
 {
     (void)tzp;

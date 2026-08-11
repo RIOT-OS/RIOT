@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  stdio_cdc_acm \
+  usbus_dfu \
+  #
 include ../Makefile.sys_common
 
 FEATURES_REQUIRED += periph_usbdev

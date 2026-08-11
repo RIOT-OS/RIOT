@@ -27,41 +27,41 @@
 #include "usb/usbus.h"
 #include "usb/usbus/control.h"
 
-#ifdef MODULE_USBUS_CDC_ECM
+#if MODULE_USBUS_CDC_ECM
 #include "usb/usbus/cdc/ecm.h"
 usbus_cdcecm_device_t cdcecm;
 #endif
-#ifdef MODULE_USBUS_CDC_ACM
+#if MODULE_USBUS_CDC_ACM
 #include "usb/usbus/cdc/acm.h"
 #endif
-#ifdef MODULE_USBUS_DFU
+#if MODULE_USBUS_DFU
 #include "usb/usbus/dfu.h"
 static usbus_dfu_device_t dfu;
 #endif
-#ifdef MODULE_USBUS_HID
+#if MODULE_USBUS_HID
 #include "usb/usbus/hid.h"
 #endif
-#ifdef MODULE_USBUS_MSC
+#if MODULE_USBUS_MSC
 #include "usb/usbus/msc.h"
 static usbus_msc_device_t msc;
 #endif
 
-#ifndef MODULE_USBUS_CDC_ACM
+#if !MODULE_USBUS_CDC_ACM
 #define USBUS_CDC_ACM_EP_IN_REQUIRED_NUMOF  0
 #define USBUS_CDC_ACM_EP_OUT_REQUIRED_NUMOF 0
 #endif
 
-#ifndef MODULE_USBUS_CDC_ECM
+#if !MODULE_USBUS_CDC_ECM
 #define USBUS_CDC_ECM_EP_IN_REQUIRED_NUMOF  0
 #define USBUS_CDC_ECM_EP_OUT_REQUIRED_NUMOF 0
 #endif
 
-#ifndef MODULE_USBUS_HID
+#if !MODULE_USBUS_HID
 #define USBUS_HID_EP_IN_REQUIRED_NUMOF      0
 #define USBUS_HID_EP_OUT_REQUIRED_NUMOF     0
 #endif
 
-#ifndef MODULE_USBUS_MSC
+#if !MODULE_USBUS_MSC
 #define USBUS_MSC_EP_IN_REQUIRED_NUMOF      0
 #define USBUS_MSC_EP_OUT_REQUIRED_NUMOF     0
 #endif
@@ -97,20 +97,20 @@ void auto_init_usb(void)
     usbus_init(&usbus, usbdev);
 
     /* USBUS function handlers initialization */
-#ifdef MODULE_STDIO_CDC_ACM
+#if MODULE_STDIO_CDC_ACM
     void usb_cdc_acm_stdio_init(usbus_t *usbus);
     usb_cdc_acm_stdio_init(&usbus);
 #endif
 
-#ifdef MODULE_USBUS_CDC_ECM
+#if MODULE_USBUS_CDC_ECM
     usbus_cdcecm_init(&usbus, &cdcecm);
 #endif
 
-#ifdef MODULE_USBUS_DFU
+#if MODULE_USBUS_DFU
     usbus_dfu_init(&usbus, &dfu, USB_DFU_PROTOCOL_RUNTIME_MODE);
 #endif
 
-#ifdef MODULE_USBUS_MSC
+#if MODULE_USBUS_MSC
     /* Initialize Mass Storage Class */
     usbus_msc_init(&usbus, &msc);
 #endif

@@ -4,3 +4,7 @@ OPENOCD_CONFIG ?= $(BOARDDIR)/dist/openocd.cfg
 
 # configure the flash tool
 include $(RIOTBOARD)/common/cc26xx_cc13xx/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_hw_fc \
+  #

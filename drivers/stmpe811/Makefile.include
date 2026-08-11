@@ -7,3 +7,7 @@ PSEUDOMODULES += stmpe811_spi
 ifneq (,$(filter touch_dev,$(USEMODULE)))
   CFLAGS += '-DSTMPE811_FIFO_THRESHOLD_ENABLED=1'
 endif
+
+MODULE_DEFS_NEEDED += \
+  stmpe811_spi \
+  #

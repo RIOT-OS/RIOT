@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  gnrc_sixlowpan_frag_sfr \
+  netdev_ieee802154 \
+  #
 include ../Makefile.net_common
 
 TEST_6LO ?= 1

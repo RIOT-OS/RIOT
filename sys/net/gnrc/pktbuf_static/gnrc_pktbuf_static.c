@@ -61,7 +61,7 @@ static inline void _set_pktsnip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *next,
     pkt->size = size;
     pkt->type = type;
     pkt->users = 1;
-#ifdef MODULE_GNRC_NETERR
+#if MODULE_GNRC_NETERR
     pkt->err_sub = KERNEL_PID_UNDEF;
 #endif
 }
@@ -243,7 +243,7 @@ static inline void _print_chunk(void *chunk, size_t size, int num)
 {
     printf("=========== chunk %3i (%-10p size: %4" PRIuSIZE ") ===========\n", num, chunk,
            size);
-#ifdef MODULE_OD
+#if MODULE_OD
     od_hex_dump(chunk, size, OD_WIDTH_DEFAULT);
 #endif
 }
@@ -428,7 +428,7 @@ static void *_pktbuf_alloc(size_t size)
         printf("[%p] mismatch at offset %"PRIuPTR"/%" PRIuSIZE
                " (ignoring %" PRIuSIZE " initial bytes that were repurposed)\n",
                (void *)ptr, (uintptr_t)mismatch - (uintptr_t)ptr, size, sizeof(_unused_t));
-#ifdef MODULE_OD
+#if MODULE_OD
         od_hex_dump(ptr, size, 0);
 #endif
         assert(0);

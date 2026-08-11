@@ -30,10 +30,10 @@
 #include "shell.h"
 
 static const shell_command_t shell_commands[] = {
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
     { "ip", "Send IP packets and listen for packets of certain type", ip_cmd },
 #endif
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
     { "tcp", "Send TCP messages and listen for messages on TCP port", tcp_cmd },
 #endif
     { NULL, NULL, NULL }

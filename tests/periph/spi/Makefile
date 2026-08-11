@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_spi_reconfigure \
+  #
 BOARD ?= samr21-xpro
 include ../Makefile.periph_common
 

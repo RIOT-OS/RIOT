@@ -24,7 +24,7 @@
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/pkt.h"
 
-#ifdef MODULE_GNRC_NETAPI_MBOX
+#if MODULE_GNRC_NETAPI_MBOX
 #include "mbox.h"
 #endif
 
@@ -32,7 +32,7 @@
 extern "C" {
 #endif
 
-#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS) || \
+#if MODULE_GNRC_NETAPI_MBOX || MODULE_GNRC_NETAPI_CALLBACKS || \
     defined(DOXYGEN)
 /**
  *  @brief  The type of the netreg entry.
@@ -48,7 +48,7 @@ typedef enum {
      *          `gnrc_netapi_callbacks` modules.
      */
     GNRC_NETREG_TYPE_DEFAULT = 0,
-#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(DOXYGEN)
+#if MODULE_GNRC_NETAPI_MBOX || defined(DOXYGEN)
     /**
      * @brief   Use [centralized IPC](@ref core_mbox) for
      *          [netapi](@ref net_gnrc_netapi) operations.
@@ -57,7 +57,7 @@ typedef enum {
      */
     GNRC_NETREG_TYPE_MBOX,
 #endif
-#if defined(MODULE_GNRC_NETAPI_CALLBACKS) || defined(DOXYGEN)
+#if MODULE_GNRC_NETAPI_CALLBACKS || defined(DOXYGEN)
     /**
      * @brief   Use function callbacks for [netapi](@ref net_gnrc_netapi)
      *          operations.
@@ -90,7 +90,7 @@ typedef enum {
  *
  * @return  An initialized netreg entry
  */
-#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS)
+#if MODULE_GNRC_NETAPI_MBOX || MODULE_GNRC_NETAPI_CALLBACKS
 #define GNRC_NETREG_ENTRY_INIT_PID(demux_ctx, pid)  { NULL, demux_ctx, \
                                                       GNRC_NETREG_TYPE_DEFAULT, \
                                                       { pid } }
@@ -98,7 +98,7 @@ typedef enum {
 #define GNRC_NETREG_ENTRY_INIT_PID(demux_ctx, pid)  { NULL, demux_ctx, { pid } }
 #endif
 
-#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(DOXYGEN)
+#if MODULE_GNRC_NETAPI_MBOX || defined(DOXYGEN)
 /**
  * @brief   Initializes a netreg entry statically with mbox
  *
@@ -115,7 +115,7 @@ typedef enum {
                                                        { .mbox = _mbox } }
 #endif
 
-#if defined(MODULE_GNRC_NETAPI_CALLBACKS) || defined(DOXYGEN)
+#if MODULE_GNRC_NETAPI_CALLBACKS || defined(DOXYGEN)
 /**
  * @brief   Initializes a netreg entry statically with callback
  *
@@ -177,7 +177,7 @@ typedef struct gnrc_netreg_entry {
      *          ports in UDP/TCP, or similar.
      */
     uint32_t demux_ctx;
-#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS) || \
+#if MODULE_GNRC_NETAPI_MBOX || MODULE_GNRC_NETAPI_CALLBACKS || \
     defined(DOXYGEN)
     /**
      * @brief   Type of the registry entry
@@ -189,7 +189,7 @@ typedef struct gnrc_netreg_entry {
 #endif
     union {
         kernel_pid_t pid;       /**< The PID of the registering thread */
-#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(DOXYGEN)
+#if MODULE_GNRC_NETAPI_MBOX || defined(DOXYGEN)
         /**
          * @brief   Target @ref core_mbox "mailbox" for the registry entry
          *
@@ -198,7 +198,7 @@ typedef struct gnrc_netreg_entry {
         mbox_t *mbox;
 #endif
 
-#if defined(MODULE_GNRC_NETAPI_CALLBACKS) || defined(DOXYGEN)
+#if MODULE_GNRC_NETAPI_CALLBACKS || defined(DOXYGEN)
         /**
          * @brief   Target callback for the registry entry
          *
@@ -272,13 +272,13 @@ static inline void gnrc_netreg_entry_init_pid(gnrc_netreg_entry_t *entry,
 {
     entry->next = NULL;
     entry->demux_ctx = demux_ctx;
-#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS)
+#if MODULE_GNRC_NETAPI_MBOX || MODULE_GNRC_NETAPI_CALLBACKS
     entry->type = GNRC_NETREG_TYPE_DEFAULT;
 #endif
     entry->target.pid = pid;
 }
 
-#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(DOXYGEN)
+#if MODULE_GNRC_NETAPI_MBOX || defined(DOXYGEN)
 /**
  * @brief   Initializes a netreg entry dynamically with mbox
  *
@@ -300,7 +300,7 @@ static inline void gnrc_netreg_entry_init_mbox(gnrc_netreg_entry_t *entry,
 }
 #endif
 
-#if defined(MODULE_GNRC_NETAPI_CALLBACKS) || defined(DOXYGEN)
+#if MODULE_GNRC_NETAPI_CALLBACKS || defined(DOXYGEN)
 /**
  * @brief   Initializes a netreg entry dynamically with callback
  *

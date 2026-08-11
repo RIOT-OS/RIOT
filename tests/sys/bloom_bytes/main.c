@@ -106,7 +106,7 @@ int main(void)
     unsigned false_positive_rate = (1000UL * in) /  lenA;
     /* Use 'fmt/print_float' to work on all platforms (atmega)
      * Stdout should be flushed before to prevent garbled output. */
-#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
+#if MODULE_NEWLIB || MODULE_PICOLIBC
     fflush(stdout);
 #endif
 

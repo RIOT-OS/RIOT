@@ -35,7 +35,7 @@
 /* test date taken from an experimental run (uncompressed ICMPv6 echo reply with
  * 300 byte payload)*/
 #define TEST_DATAGRAM_SIZE      (348U)
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
 #define TEST_DATAGRAM_NETTYPE   (GNRC_NETTYPE_IPV6)
 #else  /* MODULE_GNRC_IPV6 */
 #define TEST_DATAGRAM_NETTYPE   (GNRC_NETTYPE_UNDEF)

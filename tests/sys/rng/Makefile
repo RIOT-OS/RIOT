@@ -1,3 +1,18 @@
+
+MODULE_DEFS_NEEDED += \
+  newlib \
+  periph_hwrng \
+  picolibc \
+  prng_fortuna \
+  prng_hwrng \
+  prng_mersenne \
+  prng_minstd \
+  prng_musl_lcg \
+  prng_sha1prng \
+  prng_sha256prng \
+  prng_tinymt32 \
+  prng_xorshift \
+  #
 include ../Makefile.sys_common
 
 # Default stack with printf + the tests buffer uint32_t[32]/uint8_t[256]

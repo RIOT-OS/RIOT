@@ -33,7 +33,7 @@ int main(void)
     bool adc_noise_single_entropy = false;
     /* NOTE, the following express needs adjustment when further entropy
        sources added by RIOT */
-#if IS_USED(MODULE_MBEDTLS_ENTROPY_SOURCE_ADC) && !IS_USED(MODULE_MBEDTLS_ENTROPY_SOURCE_HWRNG)
+#if MODULE_MBEDTLS_ENTROPY_SOURCE_ADC && !MODULE_MBEDTLS_ENTROPY_SOURCE_HWRNG
     /* If the adc noise entropy source is compiled and is the only source
        utilized with the mbedtls entropy module, indicate it */
     adc_noise_single_entropy = true;

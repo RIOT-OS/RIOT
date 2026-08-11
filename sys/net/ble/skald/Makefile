@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  nrfble \
+  #
 SRC = skald.c
 
 ifneq (,$(filter skald_ibeacon,$(USEMODULE)))

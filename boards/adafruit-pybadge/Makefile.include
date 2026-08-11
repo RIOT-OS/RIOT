@@ -5,3 +5,9 @@ TERM_DELAY ?= 4
 include $(RIOTBOARD)/common/samdx1-arduino-bootloader/Makefile.include
 # Include handling of serial and non-bossa programmers (if selected by user)
 include $(RIOTMAKE)/boards/sam0.inc.mk
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  periph_spi_on_qspi \
+  sam0_periph_uart_hw_fc \
+  #

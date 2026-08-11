@@ -14,7 +14,7 @@
  * @}
  */
 
-#ifdef MODULE_USB_BOARD_RESET
+#if MODULE_USB_BOARD_RESET
 
 #include "periph/gpio.h"
 

@@ -33,7 +33,7 @@ extern "C" {
  * @brief   @ref net_gnrc_nettype to send NDP packets to
  */
 #ifndef GNRC_NETTYPE_NDP
-# if    defined(MODULE_GNRC_IPV6) || DOXYGEN
+# if    MODULE_GNRC_IPV6 || DOXYGEN
 #  define GNRC_NETTYPE_NDP (GNRC_NETTYPE_IPV6)      /* usual configuration */
 # else
 #  define GNRC_NETTYPE_NDP (GNRC_NETTYPE_UNDEF)     /* for testing */

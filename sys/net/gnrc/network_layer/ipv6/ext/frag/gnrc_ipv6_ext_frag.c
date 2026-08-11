@@ -289,7 +289,7 @@ static gnrc_ipv6_ext_frag_send_t *_snd_buf_alloc(void)
             return snd_buf;
         }
     }
-    if (IS_USED(MODULE_GNRC_IPV6_EXT_FRAG_STATS)) {
+    if (MODULE_GNRC_IPV6_EXT_FRAG_STATS) {
         _stats.frag_full++;
     }
     return NULL;
@@ -513,7 +513,7 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_frag_reass(gnrc_pktsnip_t *pkt)
         gnrc_ipv6_ext_frag_rbuf_del(rbuf);
         ipv6->len = byteorder_htons(byteorder_ntohs(ipv6->len) -
                                     sizeof(ipv6_ext_frag_t));
-        if (IS_USED(MODULE_GNRC_IPV6_EXT_FRAG_STATS)) {
+        if (MODULE_GNRC_IPV6_EXT_FRAG_STATS) {
             _stats.fragments++;
             _stats.datagrams++;
         }
@@ -589,14 +589,14 @@ gnrc_ipv6_ext_frag_rbuf_t *gnrc_ipv6_ext_frag_rbuf_get(ipv6_hdr_t *ipv6,
         assert(oldest != NULL); /* reassembly buffer is full, so there needs
                                  * to be an oldest entry */
         DEBUG("ipv6_ext_frag: dropping oldest entry\n");
-        if (IS_USED(MODULE_GNRC_IPV6_EXT_FRAG_STATS)) {
+        if (MODULE_GNRC_IPV6_EXT_FRAG_STATS) {
             _stats.rbuf_full++;
         }
         gnrc_ipv6_ext_frag_rbuf_del(oldest);
         res = oldest;
         _init_rbuf(res, ipv6, id);
     }
-    else if (IS_USED(MODULE_GNRC_IPV6_EXT_FRAG_STATS) && (res == NULL)) {
+    else if (MODULE_GNRC_IPV6_EXT_FRAG_STATS && (res == NULL)) {
         _stats.rbuf_full++;
     }
     return res;
@@ -624,7 +624,7 @@ void gnrc_ipv6_ext_frag_rbuf_gc(void)
 
 gnrc_ipv6_ext_frag_stats_t *gnrc_ipv6_ext_frag_stats(void)
 {
-    return (IS_USED(MODULE_GNRC_IPV6_EXT_FRAG_STATS)) ? &_stats : NULL;
+    return (MODULE_GNRC_IPV6_EXT_FRAG_STATS) ? &_stats : NULL;
 }
 
 typedef struct {
@@ -736,7 +736,7 @@ static gnrc_pktsnip_t *_completed(gnrc_ipv6_ext_frag_rbuf_t *rbuf)
         /* rewrite length */
         rbuf->ipv6->len = byteorder_htons(rbuf->pkt_len);
         rbuf->pkt = NULL;
-        if (IS_USED(MODULE_GNRC_IPV6_EXT_FRAG_STATS)) {
+        if (MODULE_GNRC_IPV6_EXT_FRAG_STATS) {
             _stats.fragments += clist_count(&rbuf->limits);
             _stats.datagrams++;
         }

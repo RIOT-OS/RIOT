@@ -49,7 +49,7 @@
 #define GPIOTE_IRQn GPIOTE0_IRQn
 #endif
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 
 #if CPU_FAM_NRF51
 #define GPIOTE_CHAN_NUMOF     (4U)
@@ -158,7 +158,7 @@ void gpio_write(gpio_t pin, bool value)
     }
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 uint8_t gpio_int_get_exti(gpio_t pin)
 {
     /* Looking for already known pin in exti table */

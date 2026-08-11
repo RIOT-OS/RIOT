@@ -350,7 +350,7 @@ static inline event_t *event_wait(event_queue_t *queue)
     return event_wait_multi(queue, 1);
 }
 
-#if IS_USED(MODULE_XTIMER) || defined(DOXYGEN)
+#if MODULE_XTIMER || defined(DOXYGEN)
 /**
  * @brief   Get next event from event queue, blocking until timeout expires
  *
@@ -380,7 +380,7 @@ event_t *event_wait_timeout(event_queue_t *queue, uint32_t timeout);
 event_t *event_wait_timeout64(event_queue_t *queue, uint64_t timeout);
 #endif
 
-#if IS_USED(MODULE_ZTIMER) || defined(DOXYGEN)
+#if MODULE_ZTIMER || defined(DOXYGEN)
 /**
  * @brief   Get next event from event queue, blocking until timeout expires
  *
@@ -434,12 +434,12 @@ static inline void event_loop_multi(event_queue_t *queues, size_t n_queues)
 {
     while (1) {
         event_t *event = event_wait_multi(queues, n_queues);
-        if (IS_USED(MODULE_EVENT_LOOP_DEBUG)) {
+        if (MODULE_EVENT_LOOP_DEBUG) {
             uint32_t now;
             ztimer_acquire(ZTIMER_USEC);
 
             void _event_callback_handler(event_t *event);
-            if (!IS_USED(MODULE_EVENT_CALLBACK) ||
+            if (!MODULE_EVENT_CALLBACK ||
                 event->handler != _event_callback_handler) {
                 printf("event: executing %p->%p\n",
                        (void *)event, (void *)(uintptr_t)event->handler);

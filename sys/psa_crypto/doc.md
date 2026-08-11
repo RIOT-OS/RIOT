@@ -615,7 +615,7 @@ When defining the contexts for a software library, the headerfile should be call
 `<library>_<algorithm>.h` (e.g. `riot_hashes.h`) and must be added to `crypto_includes.h` as
 shown below:
 ```c
-#if IS_USED(MODULE_PSA_<LIBRARY>_<ALGORITHM>)
+#if IS_ACTIVE(MODULE_PSA_<LIBRARY>_<ALGORITHM>)
 #include "<library>/<library>_<algorithm>.h"
 #endif
 ```
@@ -623,7 +623,7 @@ shown below:
 When defining the context types, those must always depend on the specific algorithm module,
 for example
 ```c
-#if IS_USED(MODULE_PSA_<LIBRARY>_HASHES_SHA_256)
+#if IS_ACTIVE(MODULE_PSA_<LIBRARY>_HASHES_SHA_256)
 #include "path/to/headerfile_containing_the_driver_context_definition"
 
 typedef <library_context_type_t> psa_hashes_sha256_ctx_t;
@@ -932,10 +932,10 @@ context unions as shown in the example below:
 typedef struct {
     union driver_context {
         unsigned dummy;
-    #if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A) || defined(DOXYGEN)
+    #if MODULE_PSA_SECURE_ELEMENT_ATECCX08A || defined(DOXYGEN)
         atca_aes_cbc_ctx_t atca_aes_cbc;
     #endif
-    #if IS_USED(MODULE_PSA_SECURE_ELEMENT_SUPERSE) || defined(DOXYGEN)
+    #if MODULE_PSA_SECURE_ELEMENT_SUPERSE || defined(DOXYGEN)
         superse_cipher_ctx_t superse_aes_cbc;
     #endif
     } drv_ctx;

@@ -1,12 +1,20 @@
 _ALLMODULES = $(sort $(USEMODULE) $(USEPKG))
 
-# Define MODULE_MODULE_NAME preprocessor macros for all modules.
-# Note: Some modules may be using the 'IS_USED' macro, defined in
-# kernel_defines.h, please refer to its documentation if you change the way
-# module macros are defined.
-ED = $(addprefix MODULE_,$(_ALLMODULES))
-# EXTDEFINES will be put in CFLAGS_WITH_MACROS
-EXTDEFINES = $(addprefix -D,$(call uppercase_and_underscore,$(ED)))
+# Define `MODULE_<MODULE_NAME>` preprocessor macros for all modules listed in
+# `$(MODULE_DEFS_NEEDED)`. In case the module is used, they will be defined as
+# 1, otherwise as 0.
+#
+# Modules not listed in `$(MODULE_DEFS_NEEDED)` will not be exposed to not
+# add more entropy to `CFLAGS` as needed. This increases the chances that the
+# ccache cache can be used and CI time will be reduced as a result.
+ifneq (,$(MODULE_DEFS_NEEDED))
+  EXTDEFINES := $(addsuffix =1, $(filter $(MODULE_DEFS_NEEDED), $(USEMODULE)))
+  EXTDEFINES += $(addsuffix =0, $(filter-out $(USEMODULE), $(MODULE_DEFS_NEEDED)))
+  EXTDEFINES := $(call uppercase_and_underscore, $(EXTDEFINES))
+  EXTDEFINES := $(addprefix -DMODULE_,$(EXTDEFINES))
+  EXTDEFINES := $(sort $(EXTDEFINES))
+  MODULE_DEFS_NEEDED :=
+endif
 
 # filter "pseudomodules" from "real modules", but not "no_pseudomodules"
 REALMODULES += $(filter-out $(PSEUDOMODULES), $(_ALLMODULES))

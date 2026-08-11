@@ -37,7 +37,7 @@ static inline TIMER_Type *dev(tim_t tim)
     return timer_config[tim].dev;
 }
 
-#ifdef MODULE_PERIPH_TIMER_PERIODIC
+#if MODULE_PERIPH_TIMER_PERIODIC
 
 /**
  * @brief   Helper macro to get channel bit in timer/channel bitmap
@@ -141,7 +141,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 
     TIMER_CHANNEL(tim, channel) = (value & timer_config[tim].max);
 
-#ifdef MODULE_PERIPH_TIMER_PERIODIC
+#if MODULE_PERIPH_TIMER_PERIODIC
     if (dev(tim)->CAR == TIMER_CHANNEL(tim, channel)) {
         dev(tim)->CAR = timer_config[tim].max;
     }
@@ -154,7 +154,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     return 0;
 }
 
-#ifdef MODULE_PERIPH_TIMER_PERIODIC
+#if MODULE_PERIPH_TIMER_PERIODIC
 int timer_set_periodic(tim_t tim, int channel, unsigned int value,
                        uint8_t flags)
 {
@@ -202,7 +202,7 @@ int timer_clear(tim_t tim, int channel)
 
     dev(tim)->DMAINTEN &= ~(TIMER0_DMAINTEN_CH0IE_Msk << channel);
 
-#ifdef MODULE_PERIPH_TIMER_PERIODIC
+#if MODULE_PERIPH_TIMER_PERIODIC
     if (dev(tim)->CAR == TIMER_CHANNEL(tim, channel)) {
         dev(tim)->CAR = timer_config[tim].max;
     }

@@ -1,2 +1,6 @@
 # load the common Makefile.include for Nucleo boards
 include $(RIOTBOARD)/common/nucleo144/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  #

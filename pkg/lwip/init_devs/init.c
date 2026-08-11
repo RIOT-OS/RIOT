@@ -72,7 +72,7 @@ struct netif *lwip_add_ethernet(lwip_netif_t *netif, netdev_t *state)
     return _if;
 }
 
-#if IS_USED(MODULE_LWIP_SIXLOWPAN)
+#if MODULE_LWIP_SIXLOWPAN
 struct netif *lwip_add_6lowpan(lwip_netif_t *netif, netdev_t *state)
 {
     return setup_netif(netif, state, tcpip_6lowpan_input);

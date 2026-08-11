@@ -51,7 +51,7 @@
 #define WDT_RUNSTATUS_RUNSTATUS_Running WDT_RUNSTATUS_RUNSTATUSWDT_Running
 #endif
 
-#ifdef MODULE_PERIPH_WDT_CB
+#if MODULE_PERIPH_WDT_CB
 static wdt_cb_t wdt_cb;
 static void *wdt_arg;
 #endif
@@ -110,7 +110,7 @@ void wdt_setup_reboot(uint32_t min_time, uint32_t max_time)
     DEBUG("[wdt] watchdog setup complete\n");
 }
 
-#ifdef MODULE_PERIPH_WDT_CB
+#if MODULE_PERIPH_WDT_CB
 /* The reset can't be stopped when the callback is triggered: so the MCU will
    reset in any case after 2 cycles of 32.768kHz clock. This is very short so
    only basic and fast operations can be performed in the callback function. */

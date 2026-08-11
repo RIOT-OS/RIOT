@@ -7,3 +7,11 @@ PSEUDOMODULES += lps25hb
 
 USEMODULE_INCLUDES_lpsxxx := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_lpsxxx)
+
+MODULE_DEFS_NEEDED += \
+  lps22ch \
+  lps22hb \
+  lps22hh \
+  lps25hb \
+  lps331ap \
+  #

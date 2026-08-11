@@ -83,14 +83,14 @@
 #endif
 #endif
 
-#if IS_USED(MODULE_NIMBLE)
+#if MODULE_NIMBLE
 /*** @mynewt-nimble */
 #undef MYNEWT_VAL
 #undef MYNEWT_VAL_CHOICE
 #include "npl_sycfg.h"
 #endif
 
-#if IS_USED(MODULE_UWB_CORE)
+#if MODULE_UWB_CORE
 /*** @decawave-mynewt-core/hw/drivers/uwb */
 #include "dpl_syscfg/syscfg_uwb.h"
 
@@ -114,7 +114,7 @@
 
 #endif
 
-#if IS_USED(MODULE_UWB_DW1000)
+#if MODULE_UWB_DW1000
 /*** @decawave-uwb-dw1000/hw/drivers/uwb/uwb_dw1000 */
 #include "syscfg_uwb_dw1000.h"
 #endif

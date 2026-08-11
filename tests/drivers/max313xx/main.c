@@ -188,7 +188,7 @@ static int _cmd_set_alarm_int(int argc, char **argv)
 }
 SHELL_COMMAND(set_alarm_int, "enable/disable alarm interrupt", _cmd_set_alarm_int);
 
-#if IS_USED(MODULE_MAX31343)
+#if MODULE_MAX31343
 static int _cmd_temp(int argc, char **argv)
 {
     (void)argc; (void)argv;
@@ -206,9 +206,9 @@ static int _cmd_temp(int argc, char **argv)
     return 0;
 }
 SHELL_COMMAND(temp, "read temperature", _cmd_temp);
-#endif /* IS_USED(MAX31343) */
+#endif /* IS_ACTIVE(MAX31343) */
 
-#if IS_USED(MODULE_MAX31343)
+#if MODULE_MAX31343
 static int _cmd_sqw(int argc, char **argv)
 {
     if (argc != 2) {
@@ -232,7 +232,7 @@ static int _cmd_sqw(int argc, char **argv)
     return 0;
 }
 SHELL_COMMAND(sqw, "set SQW output frequency", _cmd_sqw);
-#endif /* IS_USED(MAX31343) */
+#endif /* IS_ACTIVE(MAX31343) */
 
 static int _cmd_trickle(int argc, char **argv)
 {
@@ -272,7 +272,7 @@ static int _cmd_trickle(int argc, char **argv)
 }
 SHELL_COMMAND(trickle, "configure trickle charger", _cmd_trickle);
 
-#if IS_USED(MODULE_MAX31343)
+#if MODULE_MAX31343
 static int _cmd_automode(int argc, char **argv)
 {
     if (argc != 3) {
@@ -430,7 +430,7 @@ static int _cmd_test(int argc, char **argv)
     }
     puts("[test] alarm clear OK");
 
-    if (IS_USED(MODULE_MAX31343)) {
+    if (MODULE_MAX31343) {
         puts("[test] testing temperature read...");
         int16_t centi;
         res = max313xx_get_temp(&_dev, &centi);

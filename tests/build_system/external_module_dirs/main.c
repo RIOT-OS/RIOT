@@ -19,11 +19,11 @@
 
 #include "external_module.h"
 
-#ifdef MODULE_PRNG_TINYMT32
+#if MODULE_PRNG_TINYMT32
 #error "Error: it included the default dependency"
 #endif
 
-#ifndef MODULE_PRNG_XORSHIFT
+#if !MODULE_PRNG_XORSHIFT
 #error "Dependency not included"
 #endif
 

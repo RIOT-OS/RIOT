@@ -17,3 +17,11 @@ PSEUDOMODULES += l3gxxxx_config
 
 USEMODULE_INCLUDES_l3gxxxx := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_l3gxxxx)
+
+MODULE_DEFS_NEEDED += \
+  l3gxxxx_fifo \
+  l3gxxxx_i2c \
+  l3gxxxx_irq_data \
+  l3gxxxx_irq_event \
+  l3gxxxx_spi \
+  #

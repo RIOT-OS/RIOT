@@ -127,7 +127,7 @@ static int _power_on(can_t *dev)
      * tl;dr: At most SAM0_PM_IDLE is allowed while not shutting down the CAN
      * controller, but even that will pause communication (including RX).
      */
-    if (IS_USED(MODULE_PM_LAYERED)) {
+    if (MODULE_PM_LAYERED) {
         pm_block(SAM0_PM_IDLE);
     }
 
@@ -153,7 +153,7 @@ static int _power_on(can_t *dev)
 
 static int _power_off(can_t *dev)
 {
-    if (IS_USED(MODULE_PM_LAYERED)) {
+    if (MODULE_PM_LAYERED) {
         pm_unblock(SAM0_PM_IDLE);
     }
 

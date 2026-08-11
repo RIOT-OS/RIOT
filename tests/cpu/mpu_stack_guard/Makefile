@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  mpu_stack_guard \
+  #
 BOARD ?= nucleo-f767zi
 
 include ../Makefile.cpu_common

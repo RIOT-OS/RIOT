@@ -72,7 +72,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     };
 
     switch (payload->type) {
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if MODULE_GNRC_SIXLOWPAN
         case GNRC_NETTYPE_SIXLOWPAN:
             esp_hdr.flags = ESP_NOW_PKT_HDR_FLAG_SIXLO;
             break;
@@ -141,7 +141,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         goto err;
     }
 
-#ifdef MODULE_L2FILTER
+#if MODULE_L2FILTER
     if (!l2filter_pass(dev->filter, mac_hdr->data, ESP_NOW_ADDR_LEN)) {
         DEBUG("gnrc_esp_now: incoming packet filtered by l2filter\n");
         pkt = mac_hdr;
@@ -151,7 +151,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 
     pkt->type = GNRC_NETTYPE_UNDEF;
 
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if MODULE_GNRC_SIXLOWPAN
     esp_now_pkt_hdr_t *hdr = (esp_now_pkt_hdr_t*)esp_hdr->data;
 
     if (hdr->flags & ESP_NOW_PKT_HDR_FLAG_SIXLO) {

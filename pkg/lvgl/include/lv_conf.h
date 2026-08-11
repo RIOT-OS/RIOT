@@ -38,7 +38,7 @@ extern "C" {
  * - 32: ARGB8888
  */
 #ifndef LV_COLOR_DEPTH
-#  if IS_USED(MODULE_U8G2_DISP_DEV)
+#  if MODULE_U8G2_DISP_DEV
 #    define LV_COLOR_DEPTH     1
 #  else
 #    define LV_COLOR_DEPTH     16
@@ -48,7 +48,7 @@ extern "C" {
 /* Swap the 2 bytes of RGB565 color.
  * Useful if the display has a 8 bit interface (e.g. SPI)*/
 #ifndef LV_COLOR_16_SWAP
-#if IS_USED(MODULE_LCD)
+#if MODULE_LCD
 #define LV_COLOR_16_SWAP   1
 #else
 #define LV_COLOR_16_SWAP   0
@@ -74,13 +74,13 @@ extern "C" {
 #ifndef LV_MEM_SIZE
 #  if (__SIZEOF_POINTER__ > 4)
 /*64-bit platforms require additional space because a lot of pointers are stored on the lvgl heap.*/
-#    if IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW)
+#    if MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW
 #    define LV_MEM_SIZE    (9U * 1024U)          /*[bytes]*/
 #    else
 #    define LV_MEM_SIZE    (8U * 1024U)          /*[bytes]*/
 #    endif
 #  else
-#    if IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW)
+#    if MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW
 #    define LV_MEM_SIZE    (6U * 1024U)          /*[bytes]*/
 #    else
 #    define LV_MEM_SIZE    (5U * 1024U)          /*[bytes]*/
@@ -421,25 +421,25 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 /*Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html*/
 
-#define LV_USE_ARC          IS_USED(MODULE_LVGL_WIDGET_ARC)
+#define LV_USE_ARC          MODULE_LVGL_WIDGET_ARC
 
-#define LV_USE_ANIMIMG	    IS_USED(MODULE_LVGL_EXTRA_WIDGET_ANIMIMG)
+#define LV_USE_ANIMIMG	    MODULE_LVGL_EXTRA_WIDGET_ANIMIMG
 
-#define LV_USE_BAR          IS_USED(MODULE_LVGL_WIDGET_BAR)
+#define LV_USE_BAR          MODULE_LVGL_WIDGET_BAR
 
-#define LV_USE_BTN          IS_USED(MODULE_LVGL_WIDGET_BTN)
+#define LV_USE_BTN          MODULE_LVGL_WIDGET_BTN
 
-#define LV_USE_BTNMATRIX    IS_USED(MODULE_LVGL_WIDGET_BTNMATRIX)
+#define LV_USE_BTNMATRIX    MODULE_LVGL_WIDGET_BTNMATRIX
 
-#define LV_USE_CANVAS       IS_USED(MODULE_LVGL_WIDGET_CANVAS)
+#define LV_USE_CANVAS       MODULE_LVGL_WIDGET_CANVAS
 
-#define LV_USE_CHECKBOX     IS_USED(MODULE_LVGL_WIDGET_CHECKBOX)
+#define LV_USE_CHECKBOX     MODULE_LVGL_WIDGET_CHECKBOX
 
-#define LV_USE_DROPDOWN     IS_USED(MODULE_LVGL_WIDGET_DROPDOWN)   /*Requires: lv_label*/
+#define LV_USE_DROPDOWN     MODULE_LVGL_WIDGET_DROPDOWN   /*Requires: lv_label*/
 
-#define LV_USE_IMG          IS_USED(MODULE_LVGL_WIDGET_IMG)   /*Requires: lv_label*/
+#define LV_USE_IMG          MODULE_LVGL_WIDGET_IMG   /*Requires: lv_label*/
 
-#define LV_USE_LABEL        IS_USED(MODULE_LVGL_WIDGET_LABEL)
+#define LV_USE_LABEL        MODULE_LVGL_WIDGET_LABEL
 #if LV_USE_LABEL
 #ifndef LV_LABEL_TEXT_SELECTION
 #define LV_LABEL_TEXT_SELECTION   1   /**< Enable selecting text of the label*/
@@ -449,23 +449,23 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif
 #endif
 
-#define LV_USE_LINE         IS_USED(MODULE_LVGL_WIDGET_LINE)
+#define LV_USE_LINE         MODULE_LVGL_WIDGET_LINE
 
-#define LV_USE_ROLLER       IS_USED(MODULE_LVGL_WIDGET_ROLLER)   /*Requires: lv_label*/
+#define LV_USE_ROLLER       MODULE_LVGL_WIDGET_ROLLER   /*Requires: lv_label*/
 #if LV_USE_ROLLER
 #  define LV_ROLLER_INF_PAGES       7   /*Number of extra "pages" when the roller is infinite*/
 #endif
 
-#define LV_USE_SLIDER       IS_USED(MODULE_LVGL_WIDGET_SLIDER)   /*Requires: lv_bar*/
+#define LV_USE_SLIDER       MODULE_LVGL_WIDGET_SLIDER   /*Requires: lv_bar*/
 
-#define LV_USE_SWITCH       IS_USED(MODULE_LVGL_WIDGET_SWITCH)
+#define LV_USE_SWITCH       MODULE_LVGL_WIDGET_SWITCH
 
-#define LV_USE_TEXTAREA     IS_USED(MODULE_LVGL_WIDGET_TEXTAREA)     /*Requires: lv_label*/
+#define LV_USE_TEXTAREA     MODULE_LVGL_WIDGET_TEXTAREA     /*Requires: lv_label*/
 #if LV_USE_TEXTAREA != 0
 #  define LV_TEXTAREA_DEF_PWD_SHOW_TIME     1500    /*ms*/
 #endif
 
-#define LV_USE_TABLE        IS_USED(MODULE_LVGL_WIDGET_TABLE)
+#define LV_USE_TABLE        MODULE_LVGL_WIDGET_TABLE
 
 /*==================
  * EXTRA COMPONENTS
@@ -475,7 +475,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  * Widgets
  *----------*/
 
-#define LV_USE_CALENDAR     IS_USED(MODULE_LVGL_EXTRA_WIDGET_CALENDAR)
+#define LV_USE_CALENDAR     MODULE_LVGL_EXTRA_WIDGET_CALENDAR
 #if LV_USE_CALENDAR
 # define LV_CALENDAR_WEEK_STARTS_MONDAY 0
 # if LV_CALENDAR_WEEK_STARTS_MONDAY
@@ -489,35 +489,35 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 # define LV_USE_CALENDAR_HEADER_DROPDOWN    1
 #endif  /*LV_USE_CALENDAR*/
 
-#define LV_USE_CHART        IS_USED(MODULE_LVGL_EXTRA_WIDGET_CHART)
+#define LV_USE_CHART        MODULE_LVGL_EXTRA_WIDGET_CHART
 
-#define LV_USE_COLORWHEEL   IS_USED(MODULE_LVGL_EXTRA_WIDGET_COLORWHEEL)
+#define LV_USE_COLORWHEEL   MODULE_LVGL_EXTRA_WIDGET_COLORWHEEL
 
-#define LV_USE_IMGBTN       IS_USED(MODULE_LVGL_EXTRA_WIDGET_IMGBTN)
+#define LV_USE_IMGBTN       MODULE_LVGL_EXTRA_WIDGET_IMGBTN
 
-#define LV_USE_KEYBOARD     IS_USED(MODULE_LVGL_EXTRA_WIDGET_KEYBOARD)
+#define LV_USE_KEYBOARD     MODULE_LVGL_EXTRA_WIDGET_KEYBOARD
 
-#define LV_USE_LED          IS_USED(MODULE_LVGL_EXTRA_WIDGET_LED)
+#define LV_USE_LED          MODULE_LVGL_EXTRA_WIDGET_LED
 
-#define LV_USE_LIST         IS_USED(MODULE_LVGL_EXTRA_WIDGET_LIST)
+#define LV_USE_LIST         MODULE_LVGL_EXTRA_WIDGET_LIST
 
-#define LV_USE_MENU         IS_USED(MODULE_LVGL_EXTRA_WIDGET_MENU)
+#define LV_USE_MENU         MODULE_LVGL_EXTRA_WIDGET_MENU
 
-#define LV_USE_METER        IS_USED(MODULE_LVGL_EXTRA_WIDGET_METER)
+#define LV_USE_METER        MODULE_LVGL_EXTRA_WIDGET_METER
 
-#define LV_USE_MSGBOX       IS_USED(MODULE_LVGL_EXTRA_WIDGET_MSGBOX)
+#define LV_USE_MSGBOX       MODULE_LVGL_EXTRA_WIDGET_MSGBOX
 
-#define LV_USE_SPINBOX      IS_USED(MODULE_LVGL_EXTRA_WIDGET_SPINBOX)
+#define LV_USE_SPINBOX      MODULE_LVGL_EXTRA_WIDGET_SPINBOX
 
-#define LV_USE_SPINNER      IS_USED(MODULE_LVGL_EXTRA_WIDGET_SPINNER)
+#define LV_USE_SPINNER      MODULE_LVGL_EXTRA_WIDGET_SPINNER
 
-#define LV_USE_TABVIEW      IS_USED(MODULE_LVGL_EXTRA_WIDGET_TABVIEW)
+#define LV_USE_TABVIEW      MODULE_LVGL_EXTRA_WIDGET_TABVIEW
 
-#define LV_USE_TILEVIEW     IS_USED(MODULE_LVGL_EXTRA_WIDGET_TILEVIEW)
+#define LV_USE_TILEVIEW     MODULE_LVGL_EXTRA_WIDGET_TILEVIEW
 
-#define LV_USE_WIN          IS_USED(MODULE_LVGL_EXTRA_WIDGET_WIN)
+#define LV_USE_WIN          MODULE_LVGL_EXTRA_WIDGET_WIN
 
-#define LV_USE_SPAN         IS_USED(MODULE_LVGL_EXTRA_WIDGET_SPAN)
+#define LV_USE_SPAN         MODULE_LVGL_EXTRA_WIDGET_SPAN
 #if LV_USE_SPAN
 /*A line text can contain maximum num of span descriptor */
 #  define LV_SPAN_SNIPPET_STACK_SIZE   64
@@ -527,32 +527,32 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  * Themes
  *----------*/
 /*A simple, impressive and very complete theme*/
-#define LV_USE_THEME_DEFAULT      IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT)
+#define LV_USE_THEME_DEFAULT      MODULE_LVGL_EXTRA_THEME_DEFAULT
 
 /*0: Light mode; 1: Dark mode*/
-#define LV_THEME_DEFAULT_DARK     IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_DARK)
+#define LV_THEME_DEFAULT_DARK     MODULE_LVGL_EXTRA_THEME_DEFAULT_DARK
 
 /*1: Enable grow on press*/
-#define LV_THEME_DEFAULT_GROW     IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW)
+#define LV_THEME_DEFAULT_GROW     MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW
 
 /*Default transition time in [ms]*/
 # define LV_THEME_DEFAULT_TRANSITON_TIME    80
 
 /*An very simple them that is a good starting point for a custom theme*/
-#define LV_USE_THEME_BASIC        IS_USED(MODULE_LVGL_EXTRA_THEME_BASIC)
+#define LV_USE_THEME_BASIC        MODULE_LVGL_EXTRA_THEME_BASIC
 
 /*A theme designed for monochrome displays*/
-#define LV_USE_THEME_MONO         IS_USED(MODULE_LVGL_EXTRA_THEME_MONO)
+#define LV_USE_THEME_MONO         MODULE_LVGL_EXTRA_THEME_MONO
 
 /*-----------
  * Layouts
  *----------*/
 
 /*A layout similar to Flexbox in CSS.*/
-#define LV_USE_FLEX               IS_USED(MODULE_LVGL_EXTRA_LAYOUT_FLEX)
+#define LV_USE_FLEX               MODULE_LVGL_EXTRA_LAYOUT_FLEX
 
 /*A layout similar to Grid in CSS.*/
-#define LV_USE_GRID               IS_USED(MODULE_LVGL_EXTRA_LAYOUT_GRID)
+#define LV_USE_GRID               MODULE_LVGL_EXTRA_LAYOUT_GRID
 
 #ifdef __cplusplus
 }

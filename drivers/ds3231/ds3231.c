@@ -139,7 +139,7 @@ static int _clrset(const ds3231_t *dev, uint8_t reg,
     return 0;
 }
 
-#if IS_USED(MODULE_DS3231_INT)
+#if MODULE_DS3231_INT
 static void _unlock(void *m)
 {
     mutex_unlock(m);
@@ -154,7 +154,7 @@ int ds3231_init(ds3231_t *dev, const ds3231_params_t *params)
     memset(dev, 0, sizeof(ds3231_t));
     dev->bus = params->bus;
 
-#if IS_USED(MODULE_DS3231_INT)
+#if MODULE_DS3231_INT
     /* write interrupt pin configuration */
     dev->int_pin = params->int_pin;
 #endif
@@ -254,7 +254,7 @@ int ds3231_set_time(const ds3231_t *dev, const struct tm *time)
     return 0;
 }
 
-#if IS_USED(MODULE_DS3231_INT)
+#if MODULE_DS3231_INT
 int ds3231_await_alarm(ds3231_t *dev)
 {
     mutex_t mutex = MUTEX_INIT_LOCKED;
@@ -439,7 +439,7 @@ int ds3231_disable_bat(const ds3231_t *dev)
     return _clrset(dev, REG_CTRL, 0, CTRL_EOSC, 1, 1);
 }
 
-#ifdef MODULE_WALLTIME_IMPL_DS3231
+#if MODULE_WALLTIME_IMPL_DS3231
 #include "ds3231_params.h"
 #include "walltime.h"
 
@@ -469,7 +469,7 @@ int walltime_impl_set(struct tm *time)
     return ds3231_set_time(&walltime_dev, time);
 }
 
-#  ifdef MODULE_DS3231_INT
+#  if MODULE_DS3231_INT
 int walltime_impl_alarm_set(struct tm *time, walltime_alarm_cb_t cb, void *arg)
 {
     if (!_init_done) {

@@ -82,9 +82,9 @@ extern "C" {
 #endif
 /** @} */
 
-#if defined(MODULE_RN2903)
+#if MODULE_RN2903
 #define RN2XX3_FREQ_BAND                (915U)
-#elif defined(MODULE_RN2483)
+#elif MODULE_RN2483
 #define RN2XX3_FREQ_BAND                (868U)
 #else
 #error "Unsupported module type, use either RN2483 or RN2903"

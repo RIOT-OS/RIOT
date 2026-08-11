@@ -94,7 +94,7 @@ static void _lcd_ll_mcu_init(lcd_t *dev)
         .dc_gpio_num = dev->params->dcx_pin,
         .wr_gpio_num = dev->params->wrx_pin,
         .clk_src = LCD_CLK_SRC_DEFAULT,
-#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+#if MODULE_LCD_PARALLEL_16BIT
         .data_gpio_nums = {
             dev->params->d0_pin,
             dev->params->d1_pin,
@@ -227,7 +227,7 @@ static uint8_t _lcd_ll_mcu_read_byte(lcd_t *dev, bool cont)
     return 0;
 }
 
-#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+#if MODULE_LCD_PARALLEL_16BIT
 
 static void _lcd_ll_mcu_write_word(lcd_t *dev, bool cont, uint16_t out)
 {
@@ -247,7 +247,7 @@ static uint16_t _lcd_ll_mcu_read_word(lcd_t *dev, bool cont)
     return 0;
 }
 
-#endif /* IS_USED(MODULE_LCD_PARALLEL_16BIT) */
+#endif /* MODULE_LCD_PARALLEL_16BIT */
 
 const lcd_ll_par_driver_t lcd_ll_par_driver = {
     .init = _lcd_ll_mcu_init,
@@ -255,7 +255,7 @@ const lcd_ll_par_driver_t lcd_ll_par_driver = {
     .cmd_start = _lcd_ll_mcu_cmd_start,
     .write_byte = _lcd_ll_mcu_write_byte,
     .read_byte = _lcd_ll_mcu_read_byte,
-#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+#if MODULE_LCD_PARALLEL_16BIT
     .write_word = _lcd_ll_mcu_write_word,
     .read_word = _lcd_ll_mcu_read_word,
 #endif

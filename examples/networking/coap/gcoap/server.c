@@ -37,7 +37,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if IS_USED(MODULE_GCOAP_DTLS)
+#if MODULE_GCOAP_DTLS
 #include "net/credman.h"
 #include "net/dsm.h"
 #include "tinydtls_keys.h"
@@ -64,7 +64,7 @@ static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
 static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
 static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len,
                                    coap_request_ctx_t *ctx);
-#if IS_USED(MODULE_PERIPH_RTC)
+#if MODULE_PERIPH_RTC
 static ssize_t _rtc_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_request_ctx_t *ctx);
 #endif
 
@@ -72,7 +72,7 @@ static ssize_t _rtc_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, coap_requ
 static const coap_resource_t _resources[] = {
     { "/cli/stats", COAP_GET | COAP_PUT, _stats_handler, NULL },
     { "/riot/board", COAP_GET, _riot_board_handler, NULL },
-#if IS_USED(MODULE_PERIPH_RTC)
+#if MODULE_PERIPH_RTC
     { "/rtc", COAP_GET, _rtc_handler, NULL },
 #endif
 };
@@ -109,7 +109,7 @@ static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
     return res;
 }
 
-#if IS_USED(MODULE_PERIPH_RTC)
+#if MODULE_PERIPH_RTC
 static void _rtc_notify_observers(void *arg)
 {
     (void)arg;
@@ -253,7 +253,7 @@ void notify_observers(void)
 
 void server_init(void)
 {
-#if IS_USED(MODULE_GCOAP_DTLS)
+#if MODULE_GCOAP_DTLS
     int res = credman_add(&credential);
     if (res < 0 && res != CREDMAN_EXIST) {
         /* ignore duplicate credentials */
@@ -268,7 +268,7 @@ void server_init(void)
 #endif
 
     gcoap_register_listener(&_listener);
-#if IS_USED(MODULE_PERIPH_RTC)
+#if MODULE_PERIPH_RTC
     static event_periodic_callback_t _ev_pcb_rtc;
     event_periodic_callback_init(&_ev_pcb_rtc, ZTIMER_MSEC, EVENT_PRIO_MEDIUM, _rtc_notify_observers, NULL);
     event_periodic_callback_start(&_ev_pcb_rtc, 10 * MS_PER_SEC);

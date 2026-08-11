@@ -1,3 +1,9 @@
+
+MODULE_DEFS_NEEDED += \
+  can_rx_mailbox \
+  mcp2515 \
+  periph_can \
+  #
 include ../Makefile.drivers_common
 
 FEATURES_OPTIONAL += periph_can

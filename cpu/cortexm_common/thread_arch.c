@@ -282,7 +282,7 @@ void *thread_isr_stack_end(void)
 
 void NORETURN cpu_switch_context_exit(void)
 {
-#ifdef MODULE_CORTEXM_FPU
+#if MODULE_CORTEXM_FPU
     /* An exiting thread won't need it's FPU state anymore, so clear it here.
      * This is important, as `sched_task_exit` clears `sched_active_thread`,
      * which in turn causes `isr_pendsv` to skip all FPU storing/restoring.
@@ -300,7 +300,7 @@ void NORETURN cpu_switch_context_exit(void)
     UNREACHABLE();
 }
 
-#ifdef MODULE_CORTEXM_STACK_LIMIT
+#if MODULE_CORTEXM_STACK_LIMIT
 static void* __attribute__((used)) _get_new_stacksize(unsigned int *args) {
     thread_t* t = (thread_t*) args;
     return thread_get_stackstart(t);
@@ -337,7 +337,7 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
 
     "mrs    r2, psp                   \n" /* get stack pointer from user mode */
 
-#ifdef MODULE_CORTEXM_FPU
+#if MODULE_CORTEXM_FPU
     "tst    lr, #0x10                 \n"
     "it     eq                        \n"
     "vstmdbeq r2!, {s16-s31}          \n" /* save FPU registers if FPU is used */
@@ -347,7 +347,7 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
 
     /* current thread context is now saved */
     "restore_context:                 \n" /* Label to skip thread state saving */
-#ifdef MODULE_CORTEXM_STACK_LIMIT
+#if MODULE_CORTEXM_STACK_LIMIT
     "mov    r4, r0                    \n" /* Save content of R0 into R4*/
     "bl _get_new_stacksize            \n" /* Get the new lower limit stack in R0 */
     "msr    psplim, r0                \n" /* Set the PSP lower limit stack */
@@ -356,7 +356,7 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     "ldr    r0, [r0]                  \n" /* load tcb->sp to register 0 */
 #endif
     "ldmia  r0!, {r4-r11,lr}          \n" /* restore other registers, including lr */
-#ifdef MODULE_CORTEXM_FPU
+#if MODULE_CORTEXM_FPU
     "tst    lr, #0x10                 \n"
     "it     eq                        \n"
     "vldmiaeq r0!, {s16-s31}          \n" /* load FPU registers if saved */
@@ -456,7 +456,7 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
 }
 #endif
 
-#ifdef MODULE_CORTEXM_SVC
+#if MODULE_CORTEXM_SVC
 void __attribute__((naked)) __attribute__((used)) isr_svc(void)
 {
     /* these two variants do exactly the same, but Cortex-M3 can use Thumb2
@@ -545,7 +545,7 @@ void __attribute__((used)) isr_svc(void)
 
 void sched_arch_idle(void)
 {
-#ifdef MODULE_PM_LAYERED
+#if MODULE_PM_LAYERED
     void pm_set_lowest(void);
     pm_set_lowest();
 #else

@@ -43,27 +43,27 @@ void _native_LED_RED_TOGGLE(void);
 #define LED1_TOGGLE         (_native_LED_GREEN_TOGGLE())
 /** @} */
 
-#if defined(MODULE_MTD) || DOXYGEN
+#if MODULE_MTD || DOXYGEN
 /**
  * @name    MTD emulation configuration
  * @{
  */
 #ifndef MTD_PAGE_SIZE
-#if defined(MODULE_FATFS) || defined(MODULE_LWEXT4)
+#if MODULE_FATFS || MODULE_LWEXT4
 #define MTD_PAGE_SIZE           (512)
 #else
 #define MTD_PAGE_SIZE           (256)
 #endif
 #endif
 #ifndef MTD_SECTOR_SIZE
-#if defined(MODULE_FATFS) || defined(MODULE_LWEXT4)
+#if MODULE_FATFS || MODULE_LWEXT4
 #define MTD_SECTOR_SIZE         (512)
 #else
 #define MTD_SECTOR_SIZE         (4096)
 #endif
 #endif
 #ifndef MTD_SECTOR_NUM
-#if defined(MODULE_FATFS) || defined(MODULE_LWEXT4)
+#if MODULE_FATFS || MODULE_LWEXT4
 #define MTD_SECTOR_NUM          (32768)
 #else
 #define MTD_SECTOR_NUM          (2048)
@@ -92,7 +92,7 @@ void _native_LED_RED_TOGGLE(void);
 #endif
 /** @} */
 
-#if defined(MODULE_SPIFFS) || DOXYGEN
+#if MODULE_SPIFFS || DOXYGEN
 /**
  * @name    SPIFFS default configuration
  * @{

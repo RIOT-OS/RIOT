@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  cortexm_stack_limit \
+  #
 BOARD ?= nrf5340dk-app
 
 include ../Makefile.cpu_common

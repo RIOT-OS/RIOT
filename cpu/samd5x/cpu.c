@@ -405,22 +405,22 @@ void cpu_init(void)
                        | MCLK_APBAMASK_GCLK
                        | MCLK_APBAMASK_SUPC
                        | MCLK_APBAMASK_PAC
-#ifdef MODULE_PERIPH_PM
+#if MODULE_PERIPH_PM
                        | MCLK_APBAMASK_PM
 #endif
-#ifdef MODULE_PERIPH_FREQM
+#if MODULE_PERIPH_FREQM
                        | MCLK_APBAMASK_FREQM
 #endif
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
                        | MCLK_APBAMASK_EIC
 #endif
                        ;
 
     MCLK->APBBMASK.reg = 0
-#ifdef MODULE_PERIPH_FLASHPAGE
+#if MODULE_PERIPH_FLASHPAGE
                        | MCLK_APBBMASK_NVMCTRL
 #endif
-#ifdef MODULE_PERIPH_GPIO
+#if MODULE_PERIPH_GPIO
                        | MCLK_APBBMASK_PORT
 #endif
                        ;
@@ -472,7 +472,7 @@ void cpu_init(void)
         sam0_set_voltage_regulator(SAM0_VREG_BUCK);
     }
 
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
     /*  initialize DMA streams */
     dma_init();
 #endif

@@ -93,7 +93,7 @@ int adc_init(adc_t line)
     assume((periph_apb_clk(APB2) / clk_div) <= ADC_CLK_MAX);
     ADC->CCR = ((clk_div / 2) - 1) << 16;
 
-    if (IS_USED(MODULE_PERIPH_VBAT)) {
+    if (MODULE_PERIPH_VBAT) {
         /* Set the sampling rate for the VBat channel to 112 cycles. It reads
         * correct with 84 cycles already, so this adds some margin. */
         ADC1->SMPR1 = (ADC1->SMPR1 & ~ADC_SMPR1_SMP18) | \
@@ -120,7 +120,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     /* lock and power on the ADC device  */
     prep(line);
     /* check if this is the VBAT line or another internal ADC channel */
-    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+    if (MODULE_PERIPH_VBAT && line == VBAT_ADC) {
         vbat_enable();
     }
     else if (dev(line) == ADC1) {
@@ -137,7 +137,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     /* finally read sample and reset the STRT bit in the status register */
     sample = (int)dev(line)->DR;
     /* check if this is the VBAT line or another internal ADC channel */
-    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+    if (MODULE_PERIPH_VBAT && line == VBAT_ADC) {
         vbat_disable();
     }
     else if (dev(line) == ADC1) {

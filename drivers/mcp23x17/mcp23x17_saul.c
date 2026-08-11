@@ -14,7 +14,7 @@
 #include "saul.h"
 #include "mcp23x17.h"
 
-#if IS_USED(MODULE_SAUL_GPIO)
+#if MODULE_SAUL_GPIO
 
 extern mcp23x17_t mcp23x17_devs[];
 

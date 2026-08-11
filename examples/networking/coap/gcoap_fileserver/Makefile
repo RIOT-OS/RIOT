@@ -1,3 +1,9 @@
+
+MODULE_DEFS_NEEDED += \
+  nanocoap_fileserver_callback \
+  nanocoap_fileserver_delete \
+  nanocoap_fileserver_put \
+  #
 # name of your application
 APPLICATION = gcoap_fileserver
 

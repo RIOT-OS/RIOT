@@ -37,7 +37,7 @@
 #include "openwsn_leds_params.h"
 #include "openwsn_uart.h"
 
-#ifdef MODULE_PM_LAYERED
+#if MODULE_PM_LAYERED
 #include "pm_layered.h"
 #endif
 
@@ -48,29 +48,29 @@ void board_init_openwsn(void)
 {
     LOG_DEBUG("[openwsn/board]: init\n");
 
-#ifdef MODULE_PM_LAYERED
+#if MODULE_PM_LAYERED
     /* sleeping is currently not supported, block all sleep modes except IDLE */
     for (uint8_t i = 0; i < PM_NUM_MODES - 1; i++) {
         pm_block(i);
     }
 #endif
 
-    if (IS_USED(MODULE_OPENWSN_LEDS)) {
+    if (MODULE_OPENWSN_LEDS) {
         LOG_DEBUG("[openwsn/board]: leds init\n");
         ledpins_riot_init(openwsn_leds_params);
     }
 
-    if (IS_USED(MODULE_OPENWSN_DEBUGPINS)) {
+    if (MODULE_OPENWSN_DEBUGPINS) {
         LOG_DEBUG("[openwsn/board]: debugpins init\n");
         openwsn_debugpins_init(openwsn_debugpins_params);
     }
 
-    if (IS_USED(MODULE_OPENWSN_SCTIMER)) {
+    if (MODULE_OPENWSN_SCTIMER) {
         LOG_DEBUG("[openwsn/board]: sctimer init\n");
         sctimer_init();
     }
 
-    if (IS_USED(MODULE_OPENWSN_SERIAL)) {
+    if (MODULE_OPENWSN_SERIAL) {
         LOG_DEBUG("[openwsn/board]: uart init\n");
         uart_init_openwsn();
     }

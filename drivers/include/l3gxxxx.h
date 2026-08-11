@@ -971,10 +971,10 @@ extern "C"
 
 #include "l3gxxxx_regs.h"
 
-#if !IS_USED(MODULE_L3GD20H) && !IS_USED(MODULE_L3GD20) \
-                             && !IS_USED(MODULE_L3G4200D_NG) \
-                             && !IS_USED(MODULE_A3G4250D) \
-                             && !IS_USED(MODULE_I3G4250D)
+#if !MODULE_L3GD20H && !MODULE_L3GD20 \
+                             && !MODULE_L3G4200D_NG \
+                             && !MODULE_A3G4250D \
+                             && !MODULE_I3G4250D
 #error Please select your sensor variant by using the respective pseudomodule.
 #endif
 
@@ -982,7 +982,7 @@ extern "C"
  * @name L3Gxxxx addresses
  * @{
  */
-#if IS_USED(MODULE_L3GD20H) || IS_USED(MODULE_L3GD20)
+#if MODULE_L3GD20H || MODULE_L3GD20
 #define L3GXXXX_I2C_ADDR_1      (0x6a)  /**< SDO pin is low */
 #define L3GXXXX_I2C_ADDR_2      (0x6b)  /**< SDO pin is high */
 #else
@@ -1076,7 +1076,7 @@ typedef enum {
     L3GXXXX_ODR_800_35  = 0x0d, /**< High ODR 400 Hz, LPF1 cutoff 211 Hz,  LPF2 cutoff 35 Hz */
     L3GXXXX_ODR_800_50  = 0x0e, /**< High ODR 400 Hz, LPF1 cutoff 211 Hz,  LPF2 cutoff 50 Hz */
     L3GXXXX_ODR_800_100 = 0x0f, /**< High ODR 400 Hz, LPF1 cutoff 211 Hz,  LPF2 cutoff 100 Hz */
-#if IS_USED(MODULE_L3GD20H) || IS_USED(MODULE_L3GXXXX_LOW_ODR) || DOXYGEN
+#if MODULE_L3GD20H || MODULE_L3GXXXX_LOW_ODR || DOXYGEN
     L3GXXXX_ODR_12      = 0x10, /**< Low ODR 12.5 Hz, LPF1 cutoff 3.9 Hz,  LPF2 not used */
     L3GXXXX_ODR_25      = 0x14, /**< Low ODR 25 Hz,   LPF1 cutoff 7.8 Hz,  LPF2 not used */
     L3GXXXX_ODR_50      = 0x18, /**< Low ODR 50 Hz,   LPF1 cutoff 16 Hz,   LPF2 cutoff 16.6 Hz */
@@ -1112,7 +1112,7 @@ typedef enum {
                                        it is full */
     L3GXXXX_STREAM           = 2, /**< FIFO is used as ring buffer and newest
                                        data samples are stored continuously */
-#if IS_USED(MODULE_L3GD20H) || IS_USED(MODULE_L3GD20) || DOXYGEN
+#if MODULE_L3GD20H || MODULE_L3GD20 || DOXYGEN
     L3GXXXX_STREAM_TO_FIFO   = 3, /**< FIFO is used in Stream mode until an
                                        interrupt, switches then to FIFO mode
                                        (L3GD20H and L3GD20 only) */
@@ -1120,7 +1120,7 @@ typedef enum {
                                        switches then to Stream mode
                                        (L3GD20H and L3GD20 only) */
 #endif
-#if IS_USED(MODULE_L3GD20H) || DOXYGEN
+#if MODULE_L3GD20H || DOXYGEN
     L3GXXXX_DYNAMIC_STREAM   = 6, /**< like Stream mode, but differs in reading
                                        the first data sample after emptying
                                        (L3GD20H only) */
@@ -1379,15 +1379,15 @@ typedef l3gxxxx_data_t l3gxxxx_data_fifo_t[32];
  * @brief   L3Gxxxx interface types
  */
 typedef enum {
-#if IS_USED(MODULE_L3GXXXX_I2C) || DOXYGEN
+#if MODULE_L3GXXXX_I2C || DOXYGEN
     L3GXXXX_I2C,                   /**< I2C interface used */
 #endif
-#if IS_USED(MODULE_L3GXXXX_SPI) || DOXYGEN
+#if MODULE_L3GXXXX_SPI || DOXYGEN
     L3GXXXX_SPI,                   /**< SPI interface used */
 #endif
 } l3gxxxx_if_t;
 
-#if IS_USED(MODULE_L3GXXXX_I2C) || DOXYGEN
+#if MODULE_L3GXXXX_I2C || DOXYGEN
 /**
  * @brief   L3Gxxxx I2C interface parameters
  */
@@ -1397,7 +1397,7 @@ typedef struct {
 } l3gxxxx_i2c_params_t;
 #endif
 
-#if IS_USED(MODULE_L3GXXXX_SPI) || DOXYGEN
+#if MODULE_L3GXXXX_SPI || DOXYGEN
 /**
  * @brief   L3Gxxxx SPI interface parameters
  */
@@ -1414,10 +1414,10 @@ typedef struct {
 typedef struct {
     l3gxxxx_if_t type;             /**< I2C/SPI interface type selector */
     union {
-#if IS_USED(MODULE_L3GXXXX_I2C) || DOXYGEN
+#if MODULE_L3GXXXX_I2C || DOXYGEN
         l3gxxxx_i2c_params_t i2c;  /**< I2C interface parameters */
 #endif
-#if IS_USED(MODULE_L3GXXXX_SPI) || DOXYGEN
+#if MODULE_L3GXXXX_SPI || DOXYGEN
         l3gxxxx_spi_params_t spi;  /**< SPI interface parameters */
 #endif
     };
@@ -1436,17 +1436,17 @@ typedef struct {
     l3gxxxx_hpf_mode_t   hpf_mode;       /**< HPF mode */
     uint8_t              hpf_cutoff;     /**< HPF cutoff frequency 0..9, see
                                               l3gxxxx_config_hpf for details */
-#if IS_USED(MODULE_L3GXXXX_FIFO) || DOXYGEN
+#if MODULE_L3GXXXX_FIFO || DOXYGEN
     l3gxxxx_fifo_mode_t  fifo_mode;      /**< FIFO operation mode */
     uint8_t              fifo_watermark; /**< FIFO watermark setting 0..31 */
 #endif
 
-#if IS_USED(MODULE_L3GXXXX_IRQ_DATA) || DOXYGEN
+#if MODULE_L3GXXXX_IRQ_DATA || DOXYGEN
     gpio_t               int2_pin;       /**< MCU GPIO pin for data interrupts
                                               on signal `INT2/DRDY` pin */
 #endif
 
-#if IS_USED(MODULE_L3GXXXX_IRQ_EVENT) || DOXYGEN
+#if MODULE_L3GXXXX_IRQ_EVENT || DOXYGEN
     l3gxxxx_int_event_cfg_t int1_cfg;    /**< event interrupt parameters */
     gpio_t                  int1_pin;    /**< MCU GPIO pin for event interrupts
                                               on signal `INT1` */
@@ -1489,7 +1489,7 @@ typedef struct {
  */
 int l3gxxxx_init(l3gxxxx_t *dev, const l3gxxxx_params_t *params);
 
-#if IS_USED(MODULE_L3GXXXX_CONFIG) || DOXYGEN
+#if MODULE_L3GXXXX_CONFIG || DOXYGEN
 /**
  * @brief   Set sensor mode
  *
@@ -1520,7 +1520,7 @@ int l3gxxxx_set_mode(l3gxxxx_t *dev,
  */
 int l3gxxxx_set_scale(l3gxxxx_t *dev, l3gxxxx_scale_t scale);
 
-#endif /* IS_USED(MODULE_L3GXXXX_CONFIG) || DOXYGEN */
+#endif /* MODULE_L3GXXXX_CONFIG || DOXYGEN */
 /** @} */
 
 /**
@@ -1554,7 +1554,7 @@ int l3gxxxx_power_down (l3gxxxx_t *dev);
  */
 int l3gxxxx_power_up (l3gxxxx_t *dev);
 
-#if IS_USED(MODULE_L3GXXXX_SLEEP) || DOXYGEN
+#if MODULE_L3GXXXX_SLEEP || DOXYGEN
 /**
  * @brief   Sleep mode
  *
@@ -1587,7 +1587,7 @@ int l3gxxxx_sleep (l3gxxxx_t *dev);
  */
 int l3gxxxx_wake_up (l3gxxxx_t *dev);
 
-#endif /* IS_USED(MODULE_L3GXXXX_SLEEP) || DOXYGEN */
+#endif /* MODULE_L3GXXXX_SLEEP || DOXYGEN */
 /** @} */
 
 /**
@@ -1658,14 +1658,14 @@ int l3gxxxx_read_raw(const l3gxxxx_t *dev, l3gxxxx_raw_data_t *raw);
 
 /** @} */
 
-#if IS_USED(MODULE_L3GXXXX_FIFO) || DOXYGEN
+#if MODULE_L3GXXXX_FIFO || DOXYGEN
 
 /**
  * @name    FIFO handling
  * @{
  */
 
-#if IS_USED(MODULE_L3GXXXX_CONFIG) || DOXYGEN
+#if MODULE_L3GXXXX_CONFIG || DOXYGEN
 /**
  * @brief   Set FIFO mode and watermark level (threshold)
  *
@@ -1694,7 +1694,7 @@ int l3gxxxx_read_raw(const l3gxxxx_t *dev, l3gxxxx_raw_data_t *raw);
 int l3gxxxx_set_fifo_mode(l3gxxxx_t *dev,
                           l3gxxxx_fifo_mode_t mode, uint8_t watermark);
 
-#endif /* IS_USED(MODULE_L3GXXXX_CONFIG) || DOXYGEN */
+#endif /* MODULE_L3GXXXX_CONFIG || DOXYGEN */
 
 /**
  * @brief   Get all samples of angular rates stored in the FIFO (unit mdps)
@@ -1735,10 +1735,10 @@ int l3gxxxx_read_fifo(const l3gxxxx_t *dev,
 int l3gxxxx_read_raw_fifo(const l3gxxxx_t *dev,
                           l3gxxxx_raw_data_fifo_t raw);
 
-#endif /* IS_USED(MODULE_L3GXXXX_FIFO) || DOXYGEN */
+#endif /* MODULE_L3GXXXX_FIFO || DOXYGEN */
 /** @} */
 
-#if IS_USED(MODULE_L3GXXXX_CONFIG) || DOXYGEN
+#if MODULE_L3GXXXX_CONFIG || DOXYGEN
 /**
  * @name    Filter configuration and handling
  * @{
@@ -1836,10 +1836,10 @@ int l3gxxxx_set_hpf_ref(const l3gxxxx_t *dev, int8_t ref);
  */
 int l3gxxxx_get_hpf_ref(const l3gxxxx_t *dev, int8_t *ref);
 
-#endif /* IS_USED(MODULE_L3GXXXX_CONFIG) || DOXYGEN */
+#endif /* MODULE_L3GXXXX_CONFIG || DOXYGEN */
 /** @} */
 
-#if IS_USED(MODULE_L3GXXXX_IRQ) || DOXYGEN
+#if MODULE_L3GXXXX_IRQ || DOXYGEN
 /**
  * @name    Interrupt configuration and handling
  * @{
@@ -1893,7 +1893,7 @@ int l3gxxxx_enable_int(const l3gxxxx_t *dev,
  */
 l3gxxxx_int_src_t l3gxxxx_wait_int(l3gxxxx_t *dev);
 
-#if IS_USED(MODULE_L3GXXXX_IRQ_EVENT) || DOXYGEN
+#if MODULE_L3GXXXX_IRQ_EVENT || DOXYGEN
 /**
  * @brief   Set new configuration for event interrupt generation
  *
@@ -1918,7 +1918,7 @@ l3gxxxx_int_src_t l3gxxxx_wait_int(l3gxxxx_t *dev);
 int l3gxxxx_set_int_event_cfg(const l3gxxxx_t *dev,
                               const l3gxxxx_int_event_cfg_t *cfg);
 
-#if IS_USED(MODULE_L3GXXXX_CONFIG) || DOXYGEN
+#if MODULE_L3GXXXX_CONFIG || DOXYGEN
 /**
  * @brief   Get current configuration of event interrupt generation
  *
@@ -1938,12 +1938,12 @@ int l3gxxxx_set_int_event_cfg(const l3gxxxx_t *dev,
 int l3gxxxx_get_int_event_cfg(const l3gxxxx_t *dev,
                               l3gxxxx_int_event_cfg_t *cfg);
 
-#endif /* IS_USED(MODULE_L3GXXXX_CONFIG) || DOXYGEN */
-#endif /* IS_USED(MODULE_L3GXXXX_IRQ_EVENT) || DOXYGEN */
+#endif /* MODULE_L3GXXXX_CONFIG || DOXYGEN */
+#endif /* MODULE_L3GXXXX_IRQ_EVENT || DOXYGEN */
 
 /** @} */
 
-#endif /* IS_USED(MODULE_L3GXXXX_IRQ) || DOXYGEN */
+#endif /* MODULE_L3GXXXX_IRQ || DOXYGEN */
 
 /**
  * @name   Low level interface functions

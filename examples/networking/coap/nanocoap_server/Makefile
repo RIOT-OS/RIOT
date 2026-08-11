@@ -1,3 +1,13 @@
+
+MODULE_DEFS_NEEDED += \
+  event_thread \
+  lwip_dhcp_auto \
+  lwip_ipv4 \
+  nanocoap_fileserver \
+  nanocoap_fileserver_delete \
+  nanocoap_fileserver_put \
+  nanocoap_server_observe \
+  #
 # name of your application
 APPLICATION = nanocoap_server
 

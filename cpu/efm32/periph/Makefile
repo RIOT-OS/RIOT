@@ -1,3 +1,10 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_gpio_irq \
+  periph_uart_modecfg \
+  periph_wdt_cb \
+  pm_layered \
+  #
 include $(RIOTCPU)/efm32/efm32-info.mk
 
 # Select the correct implementation for `periph_adc`

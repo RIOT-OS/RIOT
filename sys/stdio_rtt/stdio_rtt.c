@@ -96,7 +96,7 @@
 #define STDIO_RX_BUFSIZE    (32)
 #endif
 
-#if !defined(MODULE_STDIN) && !defined(STDIO_RTT_DISABLE_STDIN)
+#if !MODULE_STDIN && !defined(STDIO_RTT_DISABLE_STDIN)
 #define STDIO_RTT_DISABLE_STDIN 1
 #endif
 
@@ -113,7 +113,7 @@ static char down_buffer [STDIO_RX_BUFSIZE];
 /**
  * @brief flag that enables stdout blocking/polling
  */
-static char blocking_stdout = IS_USED(STDIO_RTT_ENABLE_BLOCKING_STDOUT);
+static char blocking_stdout = IS_ACTIVE(STDIO_RTT_ENABLE_BLOCKING_STDOUT);
 
 static ztimer_periodic_t stdin_timer;
 
@@ -298,7 +298,7 @@ static bool _rtt_read_cb(void *arg)
 
 static bool _init_done;
 static void _init(void) {
-    if (IS_USED(STDIO_RTT_DISABLE_STDIN)) {
+    if (IS_ACTIVE(STDIO_RTT_DISABLE_STDIN)) {
         return;
     }
     if (!thread_getpid()) {
@@ -314,7 +314,7 @@ static void _init(void) {
 
 static void _detach(void)
 {
-    if (!IS_USED(STDIO_RTT_DISABLE_STDIN)) {
+    if (!IS_ACTIVE(STDIO_RTT_DISABLE_STDIN)) {
         ztimer_periodic_stop(&stdin_timer);
     }
 }

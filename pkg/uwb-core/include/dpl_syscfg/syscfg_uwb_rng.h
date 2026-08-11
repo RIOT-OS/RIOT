@@ -28,7 +28,7 @@ extern "C" {
  * @brief uwb-core uwb_rng module is enabled
  */
 #ifndef MYNEWT_VAL_UWB_RNG_ENABLED
-#define MYNEWT_VAL_UWB_RNG_ENABLED ((IS_USED(MODULE_UWB_CORE_RNG)))
+#define MYNEWT_VAL_UWB_RNG_ENABLED ((MODULE_UWB_CORE_RNG))
 #endif
 
 /**
@@ -42,7 +42,7 @@ extern "C" {
  * @brief worst case tx holdoff delay for all TWR modes (usec)
  */
 #ifndef MYNEWT_VAL_RNG_TX_HOLDOFF
-#define MYNEWT_VAL_RNG_TX_HOLDOFF (((uint32_t)0x0320 + 0xA0 * IS_USED(MODULE_UWB_CORE_RNG_TRX_INFO)))
+#define MYNEWT_VAL_RNG_TX_HOLDOFF (((uint32_t)0x0320 + 0xA0 * MODULE_UWB_CORE_RNG_TRX_INFO))
 #endif
 
 /**

@@ -62,7 +62,7 @@ static int mtd_sdmmc_read_page(mtd_dev_t *dev, void *buff, uint32_t page,
           page, offset, size);
 
     if (offset || size % SDMMC_SDHC_BLOCK_SIZE) {
-#if IS_USED(MODULE_MTD_WRITE_PAGE)
+#if MODULE_MTD_WRITE_PAGE
         if (dev->work_area == NULL) {
             DEBUG("mtd_sdmmc_read_page: no work area\n");
             return -ENOTSUP;
@@ -100,7 +100,7 @@ static int mtd_sdmmc_write_page(mtd_dev_t *dev, const void *buff, uint32_t page,
           page, offset, size);
 
     if (offset || size % SDMMC_SDHC_BLOCK_SIZE) {
-#if IS_USED(MODULE_MTD_WRITE_PAGE)
+#if MODULE_MTD_WRITE_PAGE
         if (dev->work_area == NULL) {
             DEBUG("mtd_sdmmc_write_page: no work area\n");
             return -ENOTSUP;
@@ -174,7 +174,7 @@ const mtd_desc_t mtd_sdmmc_driver = {
     .flags = MTD_DRIVER_FLAG_DIRECT_WRITE,
 };
 
-#if IS_USED(MODULE_MTD_SDMMC_DEFAULT)
+#if MODULE_MTD_SDMMC_DEFAULT
 #include "vfs_default.h"
 
 #ifndef CONFIG_SDMMC_GENERIC_MTD_OFFSET
@@ -191,7 +191,7 @@ const mtd_desc_t mtd_sdmmc_driver = {
                                             \
     XFA_CONST(mtd_dev_t, mtd_dev_xfa, m) CONCAT(*mtd, m) = (mtd_dev_t *)&mtd_sdmmc_dev ## n
 
-#if IS_USED(MODULE_MTD_SDCARD_DEFAULT)
+#if MODULE_MTD_SDCARD_DEFAULT
 /* we use /sd1 as default mount point for coexistence with mtd_sdcard */
 #define MTD_SDMMC_DEV_FS(n, m, filesystem) \
     VFS_AUTO_MOUNT(filesystem, VFS_MTD(mtd_sdmmc_dev ##n), VFS_DEFAULT_SD(1), m)
@@ -201,10 +201,10 @@ const mtd_desc_t mtd_sdmmc_driver = {
 #endif
 
 MTD_SDMMC_DEV(0, CONFIG_SDMMC_GENERIC_MTD_OFFSET);
-#ifdef MODULE_FATFS_VFS
+#if MODULE_FATFS_VFS
 MTD_SDMMC_DEV_FS(0, CONFIG_SDMMC_GENERIC_MTD_OFFSET, fatfs);
 #endif
-#ifdef MODULE_LWEXT4
+#if MODULE_LWEXT4
 MTD_SDMMC_DEV_FS(0, CONFIG_SDMMC_GENERIC_MTD_OFFSET, lwext4);
 #endif
 

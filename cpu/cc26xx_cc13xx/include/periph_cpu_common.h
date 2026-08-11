@@ -120,7 +120,7 @@ typedef struct {
    uart_regs_t *regs;
    int tx_pin;
    int rx_pin;
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
    int rts_pin;
    int cts_pin;
 #endif

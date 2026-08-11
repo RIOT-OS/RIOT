@@ -100,7 +100,7 @@ int nimble_scanner_start(void)
         uint8_t limited = (_scan_flags & NIMBLE_SCANNER_LIMITED) ? 1 : 0;
         const struct ble_gap_ext_disc_params *uncoded =
             (_scan_flags & NIMBLE_SCANNER_PHY_1M) ? &_scan_params : NULL;
-#if IS_USED(MODULE_NIMBLE_PHY_CODED)
+#if MODULE_NIMBLE_PHY_CODED
         const struct ble_gap_ext_disc_params *coded =
             (_scan_flags & NIMBLE_SCANNER_PHY_CODED) ? &_scan_params : NULL;
 #else

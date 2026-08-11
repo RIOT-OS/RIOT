@@ -247,7 +247,7 @@
   - When HWRNG feature is used (for the 48MHz clock)
   - When PLLCLK is used as input for MCO
 */
-#if IS_ACTIVE(CONFIG_USE_CLOCK_PLL) || IS_USED(MODULE_PERIPH_HWRNG) || \
+#if IS_ACTIVE(CONFIG_USE_CLOCK_PLL) || MODULE_PERIPH_HWRNG || \
     (IS_ACTIVE(CONFIG_CLOCK_ENABLE_MCO) && IS_ACTIVE(CONFIG_CLOCK_MCO_USE_PLLCLK))
 #define CLOCK_ENABLE_PLL            1
 #else

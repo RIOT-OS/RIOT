@@ -238,7 +238,7 @@ typedef enum {
  */
 typedef struct {
     i2c_t i2c;                              /**< I2C device */
-#if IS_USED(MODULE_BQ2429X_INT)
+#if MODULE_BQ2429X_INT
     gpio_t int_pin;                         /**< Interrupt pin */
 #endif
     gpio_t ce_pin;                          /**< Charge Enable pin (optional) */
@@ -271,7 +271,7 @@ typedef struct {
  */
 int bq2429x_init(bq2429x_t *dev, const bq2429x_params_t *params);
 
-#if IS_USED(MODULE_BQ2429X_INT) || DOXYGEN
+#if MODULE_BQ2429X_INT || DOXYGEN
 /**
  * @brief   Callback function for BQ2429x interrupts.
  */
@@ -295,7 +295,7 @@ typedef void (* bq2429x_int_cb_t)(void *);
  * @return BQ2429X_ERR_GPIO on GPIO initialization failure.
  */
 int bq2429x_init_int(bq2429x_t *dev, bq2429x_int_cb_t cb, void *arg);
-#endif /* IS_USED(MODULE_BQ2429X_INT) || DOXYGEN */
+#endif /* MODULE_BQ2429X_INT || DOXYGEN */
 
 /**
  * @brief   Get device status.

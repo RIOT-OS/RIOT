@@ -78,8 +78,8 @@ int riot_hwrng_poll(void *data, unsigned char *output, size_t len,
 int riot_adc_poll(void *data, unsigned char *output, size_t len,
                   size_t *olen);
 
-#if !defined(MODULE_MBEDTLS_ENTROPY_SOURCE_HWRNG) && \
-    !defined(MODULE_ENTROPY_SOURCE_ADC_NOISE)
+#if !MODULE_MBEDTLS_ENTROPY_SOURCE_HWRNG && \
+    !MODULE_ENTROPY_SOURCE_ADC_NOISE
 #error "You must enable at least one entropy source. Currently supported are \
         HWRNG and ADC_NOISE"
 #endif

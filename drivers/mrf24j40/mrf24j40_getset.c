@@ -127,7 +127,7 @@ void mrf24j40_set_addr_short(mrf24j40_t *dev, uint16_t addr)
     network_uint16_t naddr;
     naddr.u16 = addr;
 
-#ifdef MODULE_SIXLOWPAN
+#if MODULE_SIXLOWPAN
     /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
      * 0 for unicast addresses */
     naddr.u8[0] &= 0x7F;

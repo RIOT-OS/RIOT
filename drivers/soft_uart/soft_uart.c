@@ -43,14 +43,14 @@ struct uart_ctx {
     uint16_t byte_rx;   /**< current RX byte     */
     uint8_t bits_tx;    /**< TX bit pos          */
     uint8_t state_rx;   /**< RX state            */
-#ifdef MODULE_SOFT_UART_MODECFG
+#if MODULE_SOFT_UART_MODECFG
     uint8_t data_bits;  /**< number of data bits */
     uint8_t stop_bits;  /**< number of stop bits */
     uint8_t parity;     /**< parity mode         */
 #endif
 } soft_uart_ctx[SOFT_UART_NUMOF];
 
-#ifdef MODULE_SOFT_UART_MODECFG
+#if MODULE_SOFT_UART_MODECFG
 #define BITS_DATA(ctx)      (ctx)->data_bits
 #define BITS_STOP(ctx)      (ctx)->stop_bits
 #define BITS_PARITY(ctx)    ((ctx)->parity != PARITY_NONE)
@@ -151,7 +151,7 @@ int soft_uart_init(soft_uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void
         rx_cb = NULL;
     }
 
-#ifdef MODULE_SOFT_UART_MODECFG
+#if MODULE_SOFT_UART_MODECFG
     ctx->data_bits = 8;
     ctx->stop_bits = 1;
     ctx->parity    = PARITY_NONE;
@@ -180,7 +180,7 @@ int soft_uart_init(soft_uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void
     return 0;
 }
 
-#ifdef MODULE_SOFT_UART_MODECFG
+#if MODULE_SOFT_UART_MODECFG
 int soft_uart_mode(soft_uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
                    uart_stop_bits_t stop_bits)
 {
@@ -248,7 +248,7 @@ static void soft_uart_write_byte(soft_uart_t uart, uint8_t data)
     ctx->bits_tx = 1 + BITS_DATA(ctx);
     ctx->byte_tx = data << 1;
 
-#ifdef MODULE_SOFT_UART_MODECFG
+#if MODULE_SOFT_UART_MODECFG
     if (ctx->parity != PARITY_NONE) {
         uint8_t parity = 0;
 

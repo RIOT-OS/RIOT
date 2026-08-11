@@ -890,7 +890,7 @@ static inline void gpio_ll_switch_dir_output(gpio_port_t port, uword_t outputs)
     (void)outputs;
     /* Hack: If this function is only used guarded by some
      *
-     *      if (IS_USED(MODULE_PERIPH_GPIO_LL_SWITCH_DIR)) {
+     *      if (MODULE_PERIPH_GPIO_LL_SWITCH_DIR) {
      *          ...
      *      }
      *

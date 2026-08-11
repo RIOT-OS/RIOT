@@ -122,7 +122,7 @@ static void _wait_syncbusy(void)
     }
 }
 
-#if defined(MODULE_PERIPH_RTC) || defined(MODULE_PERIPH_RTT)
+#if MODULE_PERIPH_RTC || MODULE_PERIPH_RTT
 static void _read_req(void)
 {
 #ifdef RTC_READREQ_RREQ
@@ -195,7 +195,7 @@ static inline void _rtt_reset(void)
 }
 
 #ifdef CPU_COMMON_SAMD21
-#ifdef MODULE_PERIPH_RTC
+#if MODULE_PERIPH_RTC
 static void _rtc_clock_setup(void)
 {
     /* Use 1024 Hz GCLK */
@@ -206,7 +206,7 @@ static void _rtc_clock_setup(void)
 }
 #endif /* MODULE_PERIPH_RTC */
 
-#ifdef MODULE_PERIPH_RTT
+#if MODULE_PERIPH_RTT
 static void _rtt_clock_setup(void)
 {
     /* Use 32 kHz GCLK */
@@ -219,7 +219,7 @@ static void _rtt_clock_setup(void)
 
 #else /* CPU_COMMON_SAMD21 - Clock Setup */
 
-#ifdef MODULE_PERIPH_RTC
+#if MODULE_PERIPH_RTC
 static void _rtc_clock_setup(void)
 {
     /* RTC source clock is external oscillator at 1kHz */
@@ -242,7 +242,7 @@ static void _rtc_clock_setup(void)
 }
 #endif /* MODULE_PERIPH_RTC */
 
-#if defined(MODULE_PERIPH_RTT) || RTC_NUM_OF_TAMPERS
+#if MODULE_PERIPH_RTT || RTC_NUM_OF_TAMPERS
 static void _rtt_clock_setup(void)
 {
     /* RTC source clock is external oscillator at 32kHz */
@@ -265,7 +265,7 @@ static void _rtt_clock_setup(void)
 #endif /* MODULE_PERIPH_RTT */
 #endif /* !CPU_COMMON_SAMD21 - Clock Setup */
 
-#ifdef MODULE_PERIPH_RTC_MEM
+#if MODULE_PERIPH_RTC_MEM
 /* first two GP registers are shared with COMP[0] / ALARM[0] */
 #ifdef RTC_MODE2_CTRLB_GP2EN
 #define RTC_GPR_START       (2)
@@ -324,7 +324,7 @@ void rtc_mem_write(unsigned offset, void *data, size_t len)
 }
 #endif /* MODULE_PERIPH_RTC_MEM */
 
-#ifdef MODULE_PERIPH_RTC
+#if MODULE_PERIPH_RTC
 static void _rtc_init(void)
 {
 #ifdef REG_RTC_MODE2_CTRLA
@@ -390,7 +390,7 @@ void rtc_init(void)
 }
 #endif /* MODULE_PERIPH_RTC */
 
-#ifdef MODULE_PERIPH_RTT
+#if MODULE_PERIPH_RTT
 void rtt_init(void)
 {
     /* clear previously set pm mode blockers */
@@ -400,7 +400,7 @@ void rtt_init(void)
     _rtt_clock_setup();
     _poweron();
 
-#ifdef MODULE_PERIPH_RTC_MEM
+#if MODULE_PERIPH_RTC_MEM
     uint32_t backup[RTC_GPR_NUM_AVAIL];
     _read_gp(backup);
 #endif
@@ -408,7 +408,7 @@ void rtt_init(void)
     if (!cpu_woke_from_backup()) {
         _rtt_reset();
 
-#ifdef MODULE_PERIPH_RTC_MEM
+#if MODULE_PERIPH_RTC_MEM
 #ifdef RTC_MODE2_CTRLB_GP2EN
         /* RTC driver does not use COMP[1] or ALARM[1] */
         /* Use second set of Compare registers as general purpose register */
@@ -591,7 +591,7 @@ uint8_t rtc_tamper_pin_mask(gpio_t pin)
 }
 #endif /* RTC_NUM_OF_TAMPERS */
 
-#ifdef MODULE_PERIPH_RTC
+#if MODULE_PERIPH_RTC
 int rtc_get_alarm(struct tm *time)
 {
     RTC_MODE2_ALARM_Type alarm;
@@ -723,7 +723,7 @@ void rtc_poweroff(void)
 }
 #endif /* MODULE_PERIPH_RTC */
 
-#ifdef MODULE_PERIPH_RTT
+#if MODULE_PERIPH_RTT
 void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
 {
     /* clear overflow cb to avoid race while assigning */

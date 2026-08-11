@@ -38,7 +38,7 @@ extern "C" {
 /**
  * @brief Max. allowed transmit power for the transceiver
  */
-#ifdef MODULE_AT86RF212B
+#if MODULE_AT86RF212B
 #define AT86RF2XX_TXPOWER_MAX           (36)
 #elif MODULE_AT86RF233
 #define AT86RF2XX_TXPOWER_MAX           (21)
@@ -49,7 +49,7 @@ extern "C" {
 /**
  * @brief Transmit power offset
  */
-#ifdef MODULE_AT86RF212B
+#if MODULE_AT86RF212B
 #define AT86RF2XX_TXPOWER_OFF           (25)
 #else
 #define AT86RF2XX_TXPOWER_OFF           (17)

@@ -16,7 +16,7 @@
 #include "net/af.h"
 #include "net/hosts.h"
 
-#ifdef MODULE_IPV4_ADDR
+#if MODULE_IPV4_ADDR
 /* define IPv4 hostnames cross file array */
 XFA_INIT_CONST(hostnames_v4_xfa_t, hostnames_v4_xfa);
 /* always add localhost */
@@ -46,7 +46,7 @@ static int _resolve_v4(const char *domain_name, ipv4_addr_t *dst)
 }
 #endif
 
-#ifdef MODULE_IPV6_ADDR
+#if MODULE_IPV6_ADDR
 /* define IPv6 hostnames cross file array */
 XFA_INIT_CONST(hostnames_v6_xfa_t, hostnames_v6_xfa);
 /* always add localhost */

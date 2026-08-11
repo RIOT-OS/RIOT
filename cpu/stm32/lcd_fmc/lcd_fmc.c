@@ -124,7 +124,7 @@ static uint8_t lcd_ll_mcu_read_byte(lcd_t *dev, bool cont)
     return in;
 }
 
-#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+#if MODULE_LCD_PARALLEL_16BIT
 
 static void lcd_ll_mcu_write_word(lcd_t *dev, bool cont, uint16_t out)
 {
@@ -166,7 +166,7 @@ const lcd_ll_par_driver_t lcd_ll_par_driver = {
     .cmd_start = lcd_ll_mcu_cmd_start,
     .write_byte = lcd_ll_mcu_write_byte,
     .read_byte = lcd_ll_mcu_read_byte,
-#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+#if MODULE_LCD_PARALLEL_16BIT
     .write_word = lcd_ll_mcu_write_word,
     .read_word = lcd_ll_mcu_read_word,
 #endif

@@ -66,7 +66,7 @@ int lm75_init(lm75_t *dev, const lm75_params_t *params) {
     i2c_acquire(I2C_BUS);
 
     /* read the device ID register of the TMP1075 sensor to confirm it is a TMP1075 */
-    if (IS_USED(MODULE_TMP1075) && (dev->lm75_params.res == &tmp1075_properties)) {
+    if (MODULE_TMP1075 && (dev->lm75_params.res == &tmp1075_properties)) {
         uint16_t deid = 0;
         if (i2c_read_regs(I2C_BUS, I2C_ADDR, TMP1075_DEVICE_ID_REG, &deid, 2, 0) != 0) {
             LOG_ERROR("lm75: error reading device ID\n");
@@ -85,7 +85,7 @@ int lm75_init(lm75_t *dev, const lm75_params_t *params) {
             return LM75_ERROR;
         }
     }
-    else if (IS_USED(MODULE_LM75A) && (dev->lm75_params.res == &lm75a_properties)) {
+    else if (MODULE_LM75A && (dev->lm75_params.res == &lm75a_properties)) {
         DEBUG("lm75: device is an LM75A\n");
     }
     else {
@@ -305,7 +305,7 @@ int lm75_poweron(lm75_t *dev) {
 /* Performs a single temperature conversion from shutdown mode and goes back into shutdown */
 int tmp1075_one_shot(lm75_t *dev) {
 
-    if (!IS_USED(MODULE_TMP1075) && (dev->lm75_params.res != &tmp1075_properties)) {
+    if (!MODULE_TMP1075 && (dev->lm75_params.res != &tmp1075_properties)) {
         LOG_ERROR("lm75: device incompatible with the one shot conversion function\n");
         return LM75_ERROR;
     }
@@ -334,7 +334,7 @@ int tmp1075_one_shot(lm75_t *dev) {
 
 int lm75_low_power_mode(lm75_t *dev, uint16_t interval) {
 
-    if (IS_USED(MODULE_TMP1075) && (dev->lm75_params.res == &tmp1075_properties)) {
+    if (MODULE_TMP1075 && (dev->lm75_params.res == &tmp1075_properties)) {
         if (tmp1075_one_shot(dev) != 0) {
             return LM75_ERROR;
         }

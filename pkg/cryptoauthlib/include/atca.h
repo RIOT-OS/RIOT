@@ -39,7 +39,7 @@ extern "C" {
 #define ATCA_DATA_ADDR   (0x03) /**< Word address to read and write to data area */
 /** @} */
 
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A)
+#if MODULE_PSA_SECURE_ELEMENT_ATECCX08A
 #include "psa/crypto_types.h"
 
 /**

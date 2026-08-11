@@ -183,7 +183,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     (void)cs;
     assert((unsigned)bus < SPI_NUMOF);
 
-    if (IS_USED(MODULE_PERIPH_SPI_RECONFIGURE)) {
+    if (MODULE_PERIPH_SPI_RECONFIGURE) {
         mutex_lock(&locks[bus]);
     }
 
@@ -202,7 +202,7 @@ void spi_release(spi_t bus)
     /* power off everything */
     dev(bus)->ENABLE = 0;
 
-    if (IS_USED(MODULE_PERIPH_SPI_RECONFIGURE)) {
+    if (MODULE_PERIPH_SPI_RECONFIGURE) {
         mutex_unlock(&locks[bus]);
     }
 

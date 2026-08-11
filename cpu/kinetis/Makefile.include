@@ -38,3 +38,10 @@ CFLAGS += \
   #
 
 include $(RIOTMAKE)/arch/cortexm.inc.mk
+
+MODULE_DEFS_NEEDED += \
+  periph_mcg \
+  periph_mcg_lite \
+  periph_rtt \
+  pm_layered \
+  #

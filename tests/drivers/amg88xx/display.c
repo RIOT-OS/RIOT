@@ -29,7 +29,7 @@
 #include "amg88xx.h"
 #include "amg88xx_constants.h"
 
-#if IS_USED(MODULE_DISP_DEV)
+#if MODULE_DISP_DEV
 
 /**
  * @brief   Pixel scale factor for display output

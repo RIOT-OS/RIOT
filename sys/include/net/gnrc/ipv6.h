@@ -102,7 +102,7 @@
 #include "net/gnrc/ipv6/hdr.h"
 #include "net/gnrc/ipv6/nib.h"
 
-#ifdef MODULE_FIB
+#if MODULE_FIB
 #include "net/fib.h"
 #endif
 
@@ -220,13 +220,13 @@ extern "C" {
  */
 extern kernel_pid_t gnrc_ipv6_pid;
 
-#ifdef MODULE_FIB
+#if MODULE_FIB
 
 /**
  * @brief   Maximum number of entries in the IPv6 FIB table.
  */
 #ifndef GNRC_IPV6_FIB_TABLE_SIZE
-#   ifdef MODULE_GNRC_RPL
+#   if MODULE_GNRC_RPL
 #       define GNRC_IPV6_FIB_TABLE_SIZE     (20)
 #   else
 #       define GNRC_IPV6_FIB_TABLE_SIZE     (5)

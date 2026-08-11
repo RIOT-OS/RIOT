@@ -91,6 +91,17 @@ ifeq (1,$(WRITE_SARIF))
   RCFLAGS += $(RCFLAGS_WRITE_SARIF)
 endif
 
+include $(RIOTMAKE)/utils/strings.mk
+
+ifneq (,$(MODULE_DEFS_NEEDED))
+  _MODULE_DEFS := $(addsuffix =1, $(filter $(MODULE_DEFS_NEEDED), $(USEMODULE)))
+  _MODULE_DEFS += $(addsuffix =0, $(filter-out $(USEMODULE), $(MODULE_DEFS_NEEDED)))
+  _MODULE_DEFS := $(call uppercase_and_underscore, $(_MODULE_DEFS))
+  _MODULE_DEFS := $(addprefix -DMODULE_,$(_MODULE_DEFS))
+  _MODULE_DEFS := $(sort $(_MODULE_DEFS))
+  CFLAGS += $(_MODULE_DEFS)
+endif
+
 compile-commands: | $(DIRS:%=COMPILE-COMMANDS--%)
 	$(file >$(BINDIR)/$(MODULE)/compile_cmds.txt,SRC: $(sort $(SRC) $(SRC_NO_LTO)))
 	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,SRC_NO_LTO: $(sort $(SRC_NO_LTO)))

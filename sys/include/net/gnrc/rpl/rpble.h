@@ -16,7 +16,7 @@
  */
 
 #include <string.h>
-#if IS_USED(MODULE_NIMBLE_RPBLE)
+#if MODULE_NIMBLE_RPBLE
 #include "nimble_rpble.h"
 #endif
 
@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-#if IS_USED(MODULE_NIMBLE_RPBLE)
+#if MODULE_NIMBLE_RPBLE
 static inline void gnrc_rpl_rpble_update(const gnrc_rpl_dodag_t *dodag)
 {
     nimble_rpble_ctx_t ctx;

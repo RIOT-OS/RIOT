@@ -30,7 +30,7 @@
 #include "cpu.h"
 #include "periph/gpio_ll.h"
 
-#ifdef MODULE_FMT
+#if MODULE_FMT
 #  include "fmt.h"
 #else
 #  include <stdio.h>

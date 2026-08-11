@@ -338,7 +338,7 @@ void esp_chip_info(esp_chip_info_t* out_info)
     return get_chip_info_esp8266(out_info);
 }
 
-#ifdef MODULE_ESP_IDF_HEAP
+#if MODULE_ESP_IDF_HEAP
 /**
   * @brief  Get the size of available heap.
   */

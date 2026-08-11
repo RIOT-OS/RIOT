@@ -20,7 +20,7 @@
 #include <string.h>
 
 #include "log.h"
-#ifdef MODULE_PCF857X
+#if MODULE_PCF857X
 #include "pcf857x.h"
 #include "pcf857x_params.h"
 #else
@@ -31,7 +31,7 @@
 #include "hd44780.h"
 #include "hd44780_internal.h"
 
-#ifdef MODULE_PCF857X
+#if MODULE_PCF857X
 static pcf857x_t _pcf857x_dev;
 #endif
 
@@ -109,7 +109,7 @@ static void _write_bits(const hd44780_t *dev, uint8_t bits, uint8_t value)
 
 static inline int _gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-#ifdef MODULE_PCF857X
+#if MODULE_PCF857X
     return pcf857x_gpio_init(&_pcf857x_dev, pin, mode);
 #else
     return gpio_init(pin, mode);
@@ -118,7 +118,7 @@ static inline int _gpio_init(gpio_t pin, gpio_mode_t mode)
 
 static inline void _gpio_set(gpio_t pin)
 {
-#ifdef MODULE_PCF857X
+#if MODULE_PCF857X
     pcf857x_gpio_set(&_pcf857x_dev, pin);
 #else
     gpio_set(pin);
@@ -127,7 +127,7 @@ static inline void _gpio_set(gpio_t pin)
 
 static inline void _gpio_clear(gpio_t pin)
 {
-#ifdef MODULE_PCF857X
+#if MODULE_PCF857X
     pcf857x_gpio_clear(&_pcf857x_dev, pin);
 #else
     gpio_clear(pin);
@@ -167,7 +167,7 @@ int hd44780_init(hd44780_t *dev, const hd44780_params_t *params)
     dev->roff[2] = 0x00 + dev->p.cols;
     dev->roff[3] = 0x40 + dev->p.cols;
 
-#ifdef MODULE_PCF857X
+#if MODULE_PCF857X
     /*
      * TODO: We need an approach for defining and initializing the PCF8574.
      * With this approach, only one PCF8574 could exist in the system

@@ -31,3 +31,7 @@ LINKER_SCRIPT ?= riscv.ld
 CFLAGS += -DCPU_MODEL_$(call uppercase_and_underscore,$(CPU_MODEL))
 
 include $(RIOTCPU)/riscv_common/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  #

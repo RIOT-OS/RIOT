@@ -139,7 +139,7 @@ void pio_init(pio_t pio)
 
 void pio_start_programs(void)
 {
-    if (IS_USED(MODULE_PIO_AUTOSTART_I2C)) {
+    if (MODULE_PIO_AUTOSTART_I2C) {
         pio_i2c_start_programs();
     }
 }

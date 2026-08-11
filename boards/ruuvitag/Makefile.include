@@ -7,3 +7,7 @@ endif
 
 # use shared Makefile.include
 include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_hw_fc \
+  #

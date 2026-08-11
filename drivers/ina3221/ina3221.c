@@ -141,7 +141,7 @@ int ina3221_init(ina3221_t *dev, const ina3221_params_t *params)
         (ina3221_get_config(dev, &cfg) != 0)) {
         return -EINVAL;
     }
-#if IS_USED(MODULE_INA3221_ALERTS) || defined(DOXYGEN)
+#if MODULE_INA3221_ALERTS || defined(DOXYGEN)
     memset(dev->alert_callbacks, 0, sizeof(dev->alert_callbacks));
     memset(dev->alert_callback_arguments, 0,
            sizeof(dev->alert_callback_arguments));

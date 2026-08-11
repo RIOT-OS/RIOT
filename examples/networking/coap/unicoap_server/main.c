@@ -19,9 +19,9 @@
 
 /* If you need CoAP over DTLS support, you need to include extra dependencies. What's more,
  * you'll also need to load a DTLS credential for message encryption and verification.
- * The `IS_USED(MODULE_UNICOAP_DRIVER_DTLS)` below checks if the @ref net_unicoap_drivers_dtls
+ * The `MODULE_UNICOAP_DRIVER_DTLS` below checks if the @ref net_unicoap_drivers_dtls
  * has been imported via the USEMODULE variable in the application Makefile. */
-#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if MODULE_UNICOAP_DRIVER_DTLS
 #  include "net/sock/dtls/creds.h"
 #  include "net/credman.h"
 #  include "net/dsm.h"
@@ -42,7 +42,7 @@ static const credman_credential_t credential = {
         }
     },
 };
-#endif /* IS_USED(MODULE_UNICOAP_DRIVER_DTLS) */
+#endif /* MODULE_UNICOAP_DRIVER_DTLS */
 
 static int handle_hello_request(unicoap_message_t* message, const unicoap_aux_t* aux,
                                 unicoap_request_context_t* ctx, void* arg) {
@@ -196,12 +196,12 @@ int main(void) {
      * This is because auto_init_unicoap is part of the DEFAULT_MODULE makefile variable.
      * You can opt out of this default behavior by setting DISABLE_MODULE += auto_init_unicoap.
      * However, then you need to call unicoap_init() yourself. */
-#if !IS_USED(MODULE_AUTO_INIT_UNICOAP)
+#if !MODULE_AUTO_INIT_UNICOAP
     if (unicoap_init() < 0) {
         printf("app: failed to initialize unicoap\n");
     }
 #endif
-#if IS_USED(MODULE_UNICOAP_DRIVER_UDP)
+#if MODULE_UNICOAP_DRIVER_UDP
     /* You can access the underlying transport handle. In the case of UDP,
      * this will be a UDP sock provided by the sock API. */
     sock_udp_t* udp_socket = unicoap_transport_udp_get_socket();
@@ -249,7 +249,7 @@ int main(void) {
 
     /* If DTLS is enabled, the CoAP over DTLS driver needs to be told
      * at least one DTLS credential. */
-#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if MODULE_UNICOAP_DRIVER_DTLS
     /* credman is a utility that manages DTLS credentials. */
     int res = credman_add(&credential);
     if (res < 0 && res != CREDMAN_EXIST) {

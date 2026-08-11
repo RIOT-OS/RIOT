@@ -40,7 +40,7 @@ void lwip_netif_init_devs(void);
  */
 struct netif *lwip_add_ethernet(lwip_netif_t *netif, netdev_t *state);
 
-#if IS_USED(MODULE_LWIP_SIXLOWPAN)
+#if MODULE_LWIP_SIXLOWPAN
 /**
  * @brief Adds a 6LoWPAN netif using the supplied netdev.
  *

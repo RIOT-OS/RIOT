@@ -73,7 +73,7 @@ extern "C" {
  *
  * Olimex ESP32-EVB has a CAN interface including a CAN transceiver on board.
  */
-#ifndef MODULE_OLIMEX_ESP32_GATEWAY
+#if !MODULE_OLIMEX_ESP32_GATEWAY
 #define CAN_TX      GPIO5          /**< CAN TX transceiver signal */
 #define CAN_RX      GPIO35         /**< CAN RX transceiver signal */
 #endif
@@ -95,7 +95,7 @@ extern "C" {
 #define I2C0_SPEED  I2C_SPEED_FAST  /**< I2C bus speed of I2C_DEV(0) */
 #endif
 
-#ifdef MODULE_OLIMEX_ESP32_GATEWAY
+#if MODULE_OLIMEX_ESP32_GATEWAY
 #ifndef I2C0_SCL
 #define I2C0_SCL    GPIO16          /**< SCL signal of I2C_DEV(0) [UEXT] */
 #endif

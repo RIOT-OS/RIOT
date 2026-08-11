@@ -1,5 +1,10 @@
 MODULE=esp_idf
 
+MODULE_DEFS_NEEDED += \
+  esp_eth \
+  esp_wifi_any \
+  #
+
 export ESP_IDF_PATH = $(shell pwd)
 
 # Add a list of subdirectories, that should also be built:

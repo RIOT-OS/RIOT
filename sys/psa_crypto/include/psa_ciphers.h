@@ -26,7 +26,7 @@ extern "C" {
 #include "psa/crypto.h"
 #include "psa/crypto_contexts.h"
 
-#if IS_USED(MODULE_PSA_CIPHER_AES_128_CBC) || defined(DOXYGEN)
+#if MODULE_PSA_CIPHER_AES_128_CBC || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an AES 128 CBC encryption.
  *          See @ref psa_cipher_encrypt()
@@ -56,7 +56,7 @@ psa_status_t psa_cipher_cbc_aes_128_decrypt(const psa_key_attributes_t *attribut
                                             size_t *output_length);
 #endif /* MODULE_PSA_CIPHER_AES_128_CBC */
 
-#if IS_USED(MODULE_PSA_CIPHER_AES_192_CBC) || defined(DOXYGEN)
+#if MODULE_PSA_CIPHER_AES_192_CBC || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an AES 192 CBC encryption.
  *          See @ref psa_cipher_encrypt()
@@ -72,7 +72,7 @@ psa_status_t psa_cipher_cbc_aes_192_encrypt(const psa_key_attributes_t *attribut
                                             size_t *output_length);
 #endif /* MODULE_PSA_CIPHER_AES_192_CBC */
 
-#if IS_USED(MODULE_PSA_CIPHER_AES_256_CBC) || defined(DOXYGEN)
+#if MODULE_PSA_CIPHER_AES_256_CBC || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an AES 256 CBC encryption.
  *          See @ref psa_cipher_encrypt()
@@ -88,7 +88,7 @@ psa_status_t psa_cipher_cbc_aes_256_encrypt(const psa_key_attributes_t *attribut
                                             size_t *output_length);
 #endif /* MODULE_PSA_CIPHER_AES_256_CBC */
 
-#if IS_USED(MODULE_PSA_CIPHER_CHACHA20) || defined(DOXYGEN)
+#if MODULE_PSA_CIPHER_CHACHA20 || defined(DOXYGEN)
 
 /**
  * @brief   Low level wrapper function to call a driver for ChaCha20 encryption/decryption.

@@ -55,7 +55,7 @@
 /* both 'stdio_rtt' and 'stdio_semihosting' rely on ztimer for stdio output,
    so not output is possible before 'ztimer' has been initiated, silence all
    logs */
-#if IS_USED(MODULE_STDIO_RTT) || IS_USED(MODULE_STDIO_SEMIHOSTING)
+#if MODULE_STDIO_RTT || MODULE_STDIO_SEMIHOSTING
 #undef LOG_LEVEL
 #define LOG_LEVEL   LOG_NONE
 #endif
@@ -268,7 +268,7 @@ ztimer_clock_t *const ZTIMER_SEC = ZTIMER_SEC_BASE;
 #  endif
 #endif
 
-#if IS_USED(MODULE_ZTIMER_USEC)
+#if MODULE_ZTIMER_USEC
 #ifndef CONFIG_ZTIMER_AUTO_ADJUST_BASE_ITVL
 #define CONFIG_ZTIMER_AUTO_ADJUST_BASE_ITVL     1000
 #endif
@@ -383,7 +383,7 @@ void ztimer_init(void)
 #  endif
 
     /* warm-up time if set and needed */
-    if (IS_USED(MODULE_ZTIMER_AUTO_ADJUST) &&
+    if (MODULE_ZTIMER_AUTO_ADJUST &&
         !(CONFIG_ZTIMER_USEC_ADJUST_SET != 0 && CONFIG_ZTIMER_USEC_ADJUST_SLEEP != 0)) {
         if (CONFIG_ZTIMER_AUTO_ADJUST_SETTLE) {
             ztimer_sleep(ZTIMER_USEC, CONFIG_ZTIMER_AUTO_ADJUST_SETTLE);
@@ -401,7 +401,7 @@ void ztimer_init(void)
     if (CONFIG_ZTIMER_USEC_ADJUST_SET != 0) {
         ZTIMER_USEC->adjust_set = CONFIG_ZTIMER_USEC_ADJUST_SET;
     }
-    else if (IS_USED(MODULE_ZTIMER_AUTO_ADJUST)) {
+    else if (MODULE_ZTIMER_AUTO_ADJUST) {
         _ztimer_usec_overhead(CONFIG_ZTIMER_AUTO_ADJUST_ITER, CONFIG_ZTIMER_AUTO_ADJUST_BASE_ITVL,
                               &ZTIMER_USEC->adjust_set, ztimer_overhead_set);
     }
@@ -414,7 +414,7 @@ void ztimer_init(void)
     if (CONFIG_ZTIMER_USEC_ADJUST_SLEEP != 0) {
         ZTIMER_USEC->adjust_sleep = CONFIG_ZTIMER_USEC_ADJUST_SLEEP;
     }
-    else if (IS_USED(MODULE_ZTIMER_AUTO_ADJUST)) {
+    else if (MODULE_ZTIMER_AUTO_ADJUST) {
         _ztimer_usec_overhead(CONFIG_ZTIMER_AUTO_ADJUST_ITER,
                               CONFIG_ZTIMER_AUTO_ADJUST_BASE_ITVL, &ZTIMER_USEC->adjust_sleep,
                               ztimer_overhead_sleep);

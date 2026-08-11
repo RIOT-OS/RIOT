@@ -1,3 +1,17 @@
+
+MODULE_DEFS_NEEDED += \
+  pcf857x \
+  periph_adc \
+  periph_gpio \
+  periph_gpio_irq \
+  periph_pwm \
+  periph_spi \
+  periph_timer \
+  periph_timer_query_freqs \
+  periph_uart \
+  stdio_uart \
+  ztimer_periph_timer \
+  #
 BOARD ?= arduino-due
 
 include ../Makefile.periph_common

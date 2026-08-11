@@ -85,7 +85,7 @@ int hmc5883l_init(hmc5883l_t *dev, const hmc5883l_params_t *params)
     return res;
 }
 
-#ifdef MODULE_HMC5883L_INT
+#if MODULE_HMC5883L_INT
 
 int hmc5883l_init_int(hmc5883l_t *dev, hmc5883l_drdy_int_cb_t cb, void *arg)
 {

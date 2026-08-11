@@ -60,7 +60,7 @@ static mtd_desc_t _flash_driver;
 /* the external pointer to the system MTD device */
 MTD_XFA_ADD(_flash_dev, 0);
 
-#ifdef MODULE_VFS_DEFAULT
+#if MODULE_VFS_DEFAULT
 #include "vfs_default.h"
 VFS_AUTO_MOUNT(littlefs2, { .dev = &_flash_dev }, VFS_DEFAULT_NVM(0), 0);
 #endif

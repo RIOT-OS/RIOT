@@ -64,7 +64,7 @@ static const uint32_t _crc32_tab[] = {
 
 static inline uint32_t crc32_for_byte(uint32_t result)
 {
-    if (IS_USED(MODULE_CRC32_FAST)) {
+    if (MODULE_CRC32_FAST) {
         return _crc32_tab[result & 0xFF] ^ (result >> 8);
     }
 

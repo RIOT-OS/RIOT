@@ -287,7 +287,7 @@ int max313xx_set_sqw(const max313xx_t *dev, max313xx_sqw_freq_t freq)
 {
     assert(dev);
 
-    if (!IS_USED(MODULE_MAX31343)) {
+    if (!MODULE_MAX31343) {
         return -ENOTSUP;
     }
 
@@ -314,7 +314,7 @@ int max313xx_get_temp(const max313xx_t *dev, int16_t *temp_centi)
     assert(dev);
     assert(temp_centi);
 
-    if (!IS_USED(MODULE_MAX31343)) {
+    if (!MODULE_MAX31343) {
         return -ENOTSUP;
     }
 
@@ -342,12 +342,12 @@ int max313xx_trickle_charge_enable(const max313xx_t *dev, bool diode,
 
     uint8_t reg = 0;
 
-    if (IS_USED(MODULE_MAX31331)) {
+    if (MODULE_MAX31331) {
         reg = MAX31331_TRICKLE_ENABLE;
         reg |= (diode ? MAX313XX_TRICKLE_D_DIODE : 0x00);
         reg |= ((uint8_t)res << MAX31331_TRICKLE_RES_SHIFT) & MAX313XX_TRICKLE_D_RES_MASK;
     }
-    else if (IS_USED(MODULE_MAX31343)) {
+    else if (MODULE_MAX31343) {
         uint8_t tche = (uint8_t)(MAX31343_TRICKLE_TCHE_ENABLE << MAX31343_TRICKLE_TCHE_SHIFT);
         uint8_t d_trickle = (uint8_t)(((uint8_t)diode << 2)
                                     | ((uint8_t)res & MAX313XX_TRICKLE_D_RES_MASK));
@@ -373,10 +373,10 @@ int max313xx_trickle_charge_disable(const max313xx_t *dev)
         return res;
     }
 
-    if (IS_USED(MODULE_MAX31331)) {
+    if (MODULE_MAX31331) {
         reg &= MAX31331_TRICKLE_ENABLE;
     }
-    else if (IS_USED(MODULE_MAX31343)) {
+    else if (MODULE_MAX31343) {
         reg &= MAX31343_TRICKLE_TCHE_MASK;
     }
 
@@ -389,7 +389,7 @@ int max313xx_temp_set_automode(const max313xx_t *dev, bool enable, max313xx_ttsi
 {
     assert(dev);
 
-    if (!IS_USED(MODULE_MAX31343)) {
+    if (!MODULE_MAX31343) {
         return -ENOTSUP;
     }
 
@@ -421,7 +421,7 @@ int max313xx_temp_set_automode(const max313xx_t *dev, bool enable, max313xx_ttsi
     return res;
 }
 
-#if IS_USED(MODULE_WALLTIME_IMPL_MAX31331) || IS_USED(MODULE_WALLTIME_IMPL_MAX31343)
+#if MODULE_WALLTIME_IMPL_MAX31331 || MODULE_WALLTIME_IMPL_MAX31343
 static max313xx_t _walltime_dev;
 static bool _walltime_init_done;
 

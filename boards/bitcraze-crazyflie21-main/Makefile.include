@@ -12,3 +12,6 @@ DFU_USB_ID ?= 0483:df11
 DFU_USE_DFUSE ?= 1
 
 include $(RIOTMAKE)/tools/usb_board_reset.mk
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  #

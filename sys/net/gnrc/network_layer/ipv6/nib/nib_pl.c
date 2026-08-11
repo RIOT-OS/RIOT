@@ -50,7 +50,7 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
         _nib_release();
         return -ENOMEM;
     }
-#ifdef MODULE_GNRC_NETIF
+#if MODULE_GNRC_NETIF
     gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
 
     if (netif == NULL) {
@@ -84,7 +84,7 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
     gnrc_netif_release(netif);
 #endif  /* MODULE_GNRC_NETIF */
     _nib_release();
-#if defined(MODULE_GNRC_NETIF) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
+#if MODULE_GNRC_NETIF && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     /* update prefixes down-stream */
     _handle_snd_mc_ra(netif);
 #endif

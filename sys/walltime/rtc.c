@@ -22,11 +22,11 @@
 #include "modules.h"
 #include "walltime.h"
 
-#ifdef MODULE_WALLTIME_IMPL_RTC
+#if MODULE_WALLTIME_IMPL_RTC
 
 int walltime_impl_get(struct tm *time, uint16_t *ms)
 {
-    if (IS_USED(MODULE_PERIPH_RTC_MS)) {
+    if (MODULE_PERIPH_RTC_MS) {
         rtc_get_time_ms(time, ms);
     } else {
         *ms = 0;

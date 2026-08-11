@@ -31,15 +31,15 @@
 
 #include "screen_dev.h"
 
-#if IS_USED(MODULE_LV_DRIVERS_INDEV_MOUSE)
+#if MODULE_LV_DRIVERS_INDEV_MOUSE
 #include "indev/mouse.h"
 #endif
-#if IS_USED(MODULE_LV_DRIVERS_SDL)
+#if MODULE_LV_DRIVERS_SDL
 #include "sdl/sdl.h"
 #endif
 
 #ifndef LVGL_COLOR_BUF_SIZE
-#  if IS_USED(MODULE_U8G2_DISP_DEV)
+#  if MODULE_U8G2_DISP_DEV
 #    define LVGL_COLOR_BUF_SIZE                 (LV_HOR_RES_MAX * 10 * 8)
 #  else
 #    define LVGL_COLOR_BUF_SIZE                 (LV_HOR_RES_MAX * 10)
@@ -58,7 +58,7 @@
 #define LVGL_THREAD_FLAG                    (1 << 7)
 #endif
 
-#if IS_USED(MODULE_LV_DRIVERS_SDL)
+#if MODULE_LV_DRIVERS_SDL
 
 #ifndef LCD_SCREEN_WIDTH
 #define LCD_SCREEN_WIDTH            SDL_HOR_RES
@@ -76,11 +76,11 @@ static lv_disp_draw_buf_t disp_buf;
 static lv_color_t draw_buf[LVGL_COLOR_BUF_SIZE];
 
 static lv_disp_drv_t disp_drv;
-#if IS_USED(MODULE_TOUCH_DEV)
+#if MODULE_TOUCH_DEV
 static lv_indev_drv_t indev_drv;
 #endif
 
-#if !IS_USED(MODULE_LV_DRIVERS_SDL)
+#if !MODULE_LV_DRIVERS_SDL
 static screen_dev_t *_screen_dev = NULL;
 static void _disp_map(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p)
 {
@@ -104,7 +104,7 @@ static void _disp_map(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *col
 }
 #endif
 
-#if IS_USED(MODULE_TOUCH_DEV) && !IS_USED(MODULE_LV_DRIVERS_SDL)
+#if MODULE_TOUCH_DEV && !MODULE_LV_DRIVERS_SDL
 /* adapted from https://github.com/lvgl/lvgl/tree/v6.1.2#add-littlevgl-to-your-project */
 static void _touch_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 {
@@ -160,7 +160,7 @@ void lvgl_init(screen_dev_t *screen_dev)
 {
     lv_init();
 
-#if !IS_USED(MODULE_LV_DRIVERS_SDL)
+#if !MODULE_LV_DRIVERS_SDL
     _screen_dev = screen_dev;
     assert(screen_dev->display);
 #else
@@ -171,7 +171,7 @@ void lvgl_init(screen_dev_t *screen_dev)
 
     lv_disp_drv_init(&disp_drv);
     disp_drv.draw_buf = &disp_buf;
-#if IS_USED(MODULE_LV_DRIVERS_SDL)
+#if MODULE_LV_DRIVERS_SDL
     /* Use SDL driver which creates window on PC's monitor to simulate a display */
     sdl_init();
     /* Used when `LV_VDB_SIZE != 0` in lv_conf.h (buffered drawing) */
@@ -193,8 +193,8 @@ void lvgl_init(screen_dev_t *screen_dev)
 
     lv_disp_drv_register(&disp_drv);
 
-#if IS_USED(MODULE_TOUCH_DEV)
-#if IS_USED(MODULE_LV_DRIVERS_SDL)
+#if MODULE_TOUCH_DEV
+#if MODULE_LV_DRIVERS_SDL
     /* Add the mouse as input device, use SDL driver which reads the PC's mouse */
     lv_indev_drv_init(&indev_drv);
     indev_drv.type = LV_INDEV_TYPE_POINTER;

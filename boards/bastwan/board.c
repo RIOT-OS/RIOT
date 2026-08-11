@@ -22,7 +22,7 @@
 #include "cpu.h"
 #include "periph/gpio.h"
 
-#ifdef MODULE_SX127X
+#if MODULE_SX127X
 #include "sx127x_params.h"
 #endif
 
@@ -35,7 +35,7 @@ void board_init(void)
     gpio_set(TX_SWITCH_PWR_PIN);
 #endif /* TX_SWITCH_PWR_PIN */
        /* initialize board specific pins for LoRa */
-#ifdef MODULE_SX127X
+#if MODULE_SX127X
     /* Enable the pwr for the tcxo of the radio module*/
     gpio_init(TCXO_PWR_PIN, GPIO_OUT);
     gpio_set(TCXO_PWR_PIN);

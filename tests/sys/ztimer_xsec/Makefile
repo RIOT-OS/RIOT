@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  timex \
+  #
 include ../Makefile.sys_common
 
 USEMODULE += ztimer

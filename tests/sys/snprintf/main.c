@@ -276,7 +276,7 @@ int main(void)
     test_int8();
     test_int16();
     test_int32();
-    if (IS_USED(MODULE_PRINTF_LONG_LONG)) {
+    if (MODULE_PRINTF_LONG_LONG) {
         test_int64();
     }
     else {

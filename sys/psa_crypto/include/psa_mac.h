@@ -28,7 +28,7 @@ extern "C" {
 #include "kernel_defines.h"
 #include "psa/crypto.h"
 
-#if IS_USED(MODULE_PSA_MAC_HMAC_MD5) || defined(DOXYGEN)
+#if MODULE_PSA_MAC_HMAC_MD5 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for a HMAC MD5 computation
  *          See @ref psa_mac_compute()
@@ -104,7 +104,7 @@ psa_status_t psa_mac_verify_finish_hmac_md5(psa_mac_operation_t *operation,
 psa_status_t psa_mac_abort_hmac_md5(psa_mac_operation_t *operation);
 #endif /* MODULE_PSA_MAC_HMAC_MD5 */
 
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_1) || defined(DOXYGEN)
+#if MODULE_PSA_MAC_HMAC_SHA_1 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for a HMAC SHA1 computation
  *          See @ref psa_mac_compute()
@@ -180,7 +180,7 @@ psa_status_t psa_mac_verify_finish_hmac_sha1(psa_mac_operation_t *operation,
 psa_status_t psa_mac_abort_hmac_sha1(psa_mac_operation_t *operation);
 #endif /* MODULE_PSA_MAC_HMAC_SHA_1 */
 
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_224) || defined(DOXYGEN)
+#if MODULE_PSA_MAC_HMAC_SHA_224 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for a HMAC SHA224 computation
  *          See @ref psa_mac_compute()
@@ -256,7 +256,7 @@ psa_status_t psa_mac_verify_finish_hmac_sha224(psa_mac_operation_t *operation,
 psa_status_t psa_mac_abort_hmac_sha224(psa_mac_operation_t *operation);
 #endif /* MODULE_PSA_MAC_HMAC_SHA_224 */
 
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_256) || defined(DOXYGEN)
+#if MODULE_PSA_MAC_HMAC_SHA_256 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for a HMAC SHA256 computation
  *          See @ref psa_mac_compute()
@@ -332,7 +332,7 @@ psa_status_t psa_mac_verify_finish_hmac_sha256(psa_mac_operation_t *operation,
 psa_status_t psa_mac_abort_hmac_sha256(psa_mac_operation_t *operation);
 #endif /* MODULE_PSA_MAC_HMAC_SHA_256 */
 
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_384) || defined(DOXYGEN)
+#if MODULE_PSA_MAC_HMAC_SHA_384 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for a HMAC SHA384 computation
  *          See @ref psa_mac_compute()
@@ -408,7 +408,7 @@ psa_status_t psa_mac_verify_finish_hmac_sha384(psa_mac_operation_t *operation,
 psa_status_t psa_mac_abort_hmac_sha384(psa_mac_operation_t *operation);
 #endif /* MODULE_PSA_MAC_HMAC_SHA_384 */
 
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA_512) || defined(DOXYGEN)
+#if MODULE_PSA_MAC_HMAC_SHA_512 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for a HMAC SHA512 computation
  *          See @ref psa_mac_compute()
@@ -484,7 +484,7 @@ psa_status_t psa_mac_verify_finish_hmac_sha512(psa_mac_operation_t *operation,
 psa_status_t psa_mac_abort_hmac_sha512(psa_mac_operation_t *operation);
 #endif /* MODULE_PSA_MAC_HMAC_SHA_512 */
 
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_256) || defined(DOXYGEN)
+#if MODULE_PSA_MAC_HMAC_SHA3_256 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for a HMAC SHA3-256 computation
  *          See @ref psa_mac_compute()
@@ -560,7 +560,7 @@ psa_status_t psa_mac_verify_finish_hmac_sha3_256(psa_mac_operation_t *operation,
 psa_status_t psa_mac_abort_hmac_sha3_256(psa_mac_operation_t *operation);
 #endif /* MODULE_PSA_MAC_HMAC_SHA3_256 */
 
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_384) || defined(DOXYGEN)
+#if MODULE_PSA_MAC_HMAC_SHA3_384 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for a HMAC SHA3-384 computation
  *          See @ref psa_mac_compute()
@@ -636,7 +636,7 @@ psa_status_t psa_mac_verify_finish_hmac_sha3_384(psa_mac_operation_t *operation,
 psa_status_t psa_mac_abort_hmac_sha3_384(psa_mac_operation_t *operation);
 #endif /* MODULE_PSA_MAC_HMAC_SHA3_384 */
 
-#if IS_USED(MODULE_PSA_MAC_HMAC_SHA3_512) || defined(DOXYGEN)
+#if MODULE_PSA_MAC_HMAC_SHA3_512 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for a HMAC SHA3-512 computation
  *          See @ref psa_mac_compute()

@@ -96,7 +96,7 @@ typedef struct {
     uint8_t port;                                /**< RX port */
 } semtech_loramac_rx_data_t;
 
-#if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
+#if MODULE_SEMTECH_LORAMAC_RX || DOXYGEN
 /**
  * @brief   LoRaMAC link check information
  */
@@ -113,7 +113,7 @@ typedef struct {
     netdev_t *netdev;                            /**< pointer to internal radio device */
     mutex_t lock;                                /**< loramac access lock */
     uint8_t tx_pid;                              /**< pid of sender thread */
-#if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
+#if MODULE_SEMTECH_LORAMAC_RX || DOXYGEN
     uint8_t rx_pid;                              /**< pid of receiver thread */
 #endif
     uint8_t port;                                /**< application TX port */
@@ -121,7 +121,7 @@ typedef struct {
     uint8_t deveui[LORAMAC_DEVEUI_LEN];          /**< device EUI */
     uint8_t appeui[LORAMAC_APPEUI_LEN];          /**< application EUI */
     uint8_t appkey[LORAMAC_APPKEY_LEN];          /**< application key */
-#if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
+#if MODULE_SEMTECH_LORAMAC_RX || DOXYGEN
     semtech_loramac_rx_data_t rx_data;           /**< struct handling the RX data */
     semtech_loramac_link_check_info_t link_chk;  /**< link check information */
 #endif
@@ -175,7 +175,7 @@ uint8_t semtech_loramac_join(semtech_loramac_t *mac, uint8_t type);
  */
 uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len);
 
-#if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
+#if MODULE_SEMTECH_LORAMAC_RX || DOXYGEN
 /**
  * @brief   Wait for a message sent by the LoRaWAN network
  *
@@ -211,7 +211,7 @@ uint8_t semtech_loramac_recv(semtech_loramac_t *mac);
  */
 bool semtech_loramac_is_mac_joined(semtech_loramac_t *mac);
 
-#if defined(MODULE_SEMTECH_LORAMAC_RX) || DOXYGEN
+#if MODULE_SEMTECH_LORAMAC_RX || DOXYGEN
 /**
  * @brief   Requests a LoRaWAN link check
  *
@@ -527,7 +527,7 @@ void semtech_loramac_set_channels_mask(semtech_loramac_t *mac, uint16_t *mask);
  */
 void semtech_loramac_get_channels_mask(semtech_loramac_t *mac, uint16_t *mask);
 
-#ifdef MODULE_PERIPH_EEPROM
+#if MODULE_PERIPH_EEPROM
 /**
  * @brief   The magic number used to identify the LoRaWAN configuration
  */

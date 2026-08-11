@@ -30,7 +30,7 @@
 /* allocate the device descriptor */
 static qmc5883l_t _dev;
 
-#ifdef MODULE_QMC5883L_INT
+#if MODULE_QMC5883L_INT
 static thread_t *_tmain;
 
 static void _on_drdy(void *arg)
@@ -92,7 +92,7 @@ int main(void)
         case QMC5883L_OSR_128:      puts("128");    break;
         case QMC5883L_OSR_64:       puts("64");     break;
     }
-#ifdef MODULE_QMC5883L_INT
+#if MODULE_QMC5883L_INT
     printf("Mode:             ");
     if (gpio_is_valid(qmc5883l_params[0].pin_drdy)) {
         puts("interrupt driven");
@@ -116,7 +116,7 @@ int main(void)
     }
     puts("Power cycle test: device is powered back on now");
 
-#ifdef MODULE_QMC5883L_INT
+#if MODULE_QMC5883L_INT
     /* safe a reference to the main thread TCB so we can wait for flags */
     if (gpio_is_valid(qmc5883l_params[0].pin_drdy)) {
         _tmain = thread_get_active();

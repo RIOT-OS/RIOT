@@ -220,7 +220,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         netdev_ieee802154_rx_info_t *radio_info = info;
         radio_info->rssi = (int8_t) at86rf215_reg_read(dev, dev->RF->RG_EDV);
 
-        if (IS_USED(MODULE_NETDEV_IEEE802154_RX_TIMESTAMP)) {
+        if (MODULE_NETDEV_IEEE802154_RX_TIMESTAMP) {
             uint32_t rx_timestamp;
             at86rf215_reg_read_bytes(dev, dev->BBC->RG_CNT0, &rx_timestamp,
                                     sizeof(rx_timestamp));
@@ -426,7 +426,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             *((int8_t *)val) = at86rf215_get_phy_mode(dev);
             res = max_len;
             break;
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#if MODULE_NETDEV_IEEE802154_MR_FSK
         case NETOPT_MR_FSK_MODULATION_INDEX:
             assert(max_len >= sizeof(int8_t));
             *((int8_t *)val) = at86rf215_FSK_get_mod_idx(dev);
@@ -460,7 +460,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             res = max_len;
             break;
 #endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#if MODULE_NETDEV_IEEE802154_MR_OFDM
         case NETOPT_MR_OFDM_OPTION:
             assert(max_len >= sizeof(int8_t));
             *((int8_t *)val) = at86rf215_OFDM_get_option(dev);
@@ -473,7 +473,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             res = max_len;
             break;
 #endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#if MODULE_NETDEV_IEEE802154_MR_OQPSK
         case NETOPT_MR_OQPSK_CHIPS:
             assert(max_len >= sizeof(int16_t));
             switch (at86rf215_OQPSK_get_chips(dev)) {
@@ -491,7 +491,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             res = max_len;
             break;
 #endif /* MODULE_NETDEV_IEEE802154_MR_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+#if MODULE_NETDEV_IEEE802154_OQPSK
         case NETOPT_OQPSK_RATE:
             assert(max_len >= sizeof(int8_t));
             *((int8_t *)val) = at86rf215_OQPSK_get_mode_legacy(dev);
@@ -571,7 +571,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             res = sizeof(netopt_enable_t);
             break;
 
-#ifdef MODULE_AT86RF215_BATMON
+#if MODULE_AT86RF215_BATMON
         case NETOPT_BATMON:
             assert(len <= sizeof(uint16_t));
             {
@@ -638,13 +638,13 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         case NETOPT_IEEE802154_PHY:
             assert(len <= sizeof(uint8_t));
             switch (*(uint8_t *)val) {
-#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+#if MODULE_NETDEV_IEEE802154_OQPSK
             case IEEE802154_PHY_OQPSK:
                 at86rf215_configure_legacy_OQPSK(dev, at86rf215_OQPSK_get_mode_legacy(dev));
                 res = sizeof(uint8_t);
                 break;
 #endif /* MODULE_NETDEV_IEEE802154_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#if MODULE_NETDEV_IEEE802154_MR_OQPSK
             case IEEE802154_PHY_MR_OQPSK:
                 at86rf215_configure_OQPSK(dev,
                                           at86rf215_OQPSK_get_chips(dev),
@@ -652,7 +652,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 res = sizeof(uint8_t);
                 break;
 #endif /* MODULE_NETDEV_IEEE802154_MR_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#if MODULE_NETDEV_IEEE802154_MR_OFDM
             case IEEE802154_PHY_MR_OFDM:
                 at86rf215_configure_OFDM(dev,
                                          at86rf215_OFDM_get_option(dev),
@@ -660,7 +660,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 res = sizeof(uint8_t);
                 break;
 #endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#if MODULE_NETDEV_IEEE802154_MR_FSK
             case IEEE802154_PHY_MR_FSK:
                 at86rf215_configure_FSK(dev,
                                         at86rf215_FSK_get_srate(dev),
@@ -675,7 +675,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             }
             break;
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#if MODULE_NETDEV_IEEE802154_MR_FSK
         case NETOPT_MR_FSK_MODULATION_INDEX:
             if (at86rf215_get_phy_mode(dev) != IEEE802154_PHY_MR_FSK) {
                 return -ENOTSUP;
@@ -747,7 +747,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             }
             break;
 #endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#if MODULE_NETDEV_IEEE802154_MR_OFDM
         case NETOPT_MR_OFDM_OPTION:
             if (at86rf215_get_phy_mode(dev) != IEEE802154_PHY_MR_OFDM) {
                 return -ENOTSUP;
@@ -774,7 +774,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             }
             break;
 #endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#if MODULE_NETDEV_IEEE802154_MR_OQPSK
         case NETOPT_MR_OQPSK_CHIPS:
             if (at86rf215_get_phy_mode(dev) != IEEE802154_PHY_MR_OQPSK) {
                 return -ENOTSUP;
@@ -815,7 +815,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             }
             break;
 #endif /* MODULE_NETDEV_IEEE802154_MR_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+#if MODULE_NETDEV_IEEE802154_OQPSK
         case NETOPT_OQPSK_RATE:
             if (at86rf215_get_phy_mode(dev) != IEEE802154_PHY_OQPSK) {
                 return -ENOTSUP;
@@ -1087,7 +1087,7 @@ static void _isr(netdev_t *netdev)
         rx_ack_req = 0;
     }
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#if MODULE_NETDEV_IEEE802154_MR_FSK
     /* listen for short preamble in RX */
     if (bb_irq_mask & BB_IRQ_TXFE && dev->fsk_pl) {
         at86rf215_FSK_prepare_rx(dev);
@@ -1114,7 +1114,7 @@ static void _isr(netdev_t *netdev)
         /* start transmitting the frame */
         if (rf_irq_mask & RF_IRQ_TRXRDY) {
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#if MODULE_NETDEV_IEEE802154_MR_FSK
             /* send long preamble in TX */
             if (dev->fsk_pl) {
                 at86rf215_FSK_prepare_tx(dev);

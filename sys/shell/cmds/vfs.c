@@ -68,7 +68,7 @@ static void _vfs_usage(char **argv)
     printf("%s mv <src> <dest>\n", argv[0]);
     printf("%s mkdir <path> \n", argv[0]);
     printf("%s rm"
-#if IS_USED(MODULE_VFS_UTIL)
+#if MODULE_VFS_UTIL
                " [-r]"
 #endif
            " <path>\n", argv[0]);
@@ -565,14 +565,14 @@ static int _rm_handler(int argc, char **argv)
         return 1;
     }
     bool recursive = !strcmp(argv[1], "-r");
-    if (recursive && (argc < 3 || !IS_USED(MODULE_VFS_UTIL))) {
+    if (recursive && (argc < 3 || !MODULE_VFS_UTIL)) {
         _vfs_usage(argv);
         return 1;
     }
     char *rm_name = recursive ? argv[2] : argv[1];
     printf("%s: unlink: %s\n", argv[0], rm_name);
     int res;
-    if (IS_USED(MODULE_VFS_UTIL) && recursive) {
+    if (MODULE_VFS_UTIL && recursive) {
         char pbuf[SHELL_VFS_PATH_SIZE_MAX];
         res = vfs_unlink_recursive(rm_name, pbuf, sizeof(pbuf));
     }

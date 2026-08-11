@@ -61,10 +61,10 @@ extern "C" {
  * @name    MPU-9X50 temperature calibration values
  * @{
  */
-#ifdef MODULE_MPU9150
+#if MODULE_MPU9150
 #define MPU9X50_TEMP_SENSITIVITY    340
 #define MPU9X50_TEMP_OFFSET         35
-#elif defined(MODULE_MPU9250)
+#elif MODULE_MPU9250
 #define MPU9X50_TEMP_SENSITIVITY    333.87
 #define MPU9X50_TEMP_OFFSET         21
 #else

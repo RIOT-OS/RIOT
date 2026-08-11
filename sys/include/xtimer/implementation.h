@@ -24,7 +24,7 @@
 #error "Do not include this file directly! Use xtimer.h instead"
 #endif
 
-#ifdef MODULE_XTIMER_ON_ZTIMER
+#if MODULE_XTIMER_ON_ZTIMER
 #include "ztimer.h"
 #else
 #include "periph/timer.h"
@@ -48,7 +48,7 @@ extern volatile uint64_t _xtimer_current_time;
  */
 static inline uint32_t _xtimer_lltimer_now(void)
 {
-#ifndef MODULE_XTIMER_ON_ZTIMER
+#if !MODULE_XTIMER_ON_ZTIMER
     return timer_read(XTIMER_DEV);
 #else
     return ztimer_now(ZTIMER_USEC);
@@ -78,7 +78,7 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset);
 void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period);
 void _xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid);
 void _xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid);
-#ifdef MODULE_CORE_MSG
+#if MODULE_CORE_MSG
 int _xtimer_msg_receive_timeout(msg_t *msg, uint32_t ticks);
 int _xtimer_msg_receive_timeout64(msg_t *msg, uint64_t ticks);
 void _xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid);
@@ -224,7 +224,7 @@ static inline void xtimer_set64(xtimer_t *timer, uint64_t period_us)
     _xtimer_set64(timer, ticks, ticks >> 32);
 }
 
-#ifdef MODULE_CORE_MSG
+#if MODULE_CORE_MSG
 static inline int xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout)
 {
     return _xtimer_msg_receive_timeout(msg, _xtimer_ticks_from_usec(timeout));

@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  wolfcrypt_benchmark \
+  #
 include ../Makefile.pkg_common
 
 # This is an optimized stack value based on testing, if you observe

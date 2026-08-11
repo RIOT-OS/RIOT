@@ -17,7 +17,7 @@ index 864c2e4c23..dff4a1bd83 100644
  }
  #endif
  
-+#ifdef MODULE_ESP_IDF_HEAP
++#if MODULE_ESP_IDF_HEAP
  uint32_t esp_get_free_heap_size(void)
  {
      return heap_caps_get_free_size(MALLOC_CAP_DEFAULT);

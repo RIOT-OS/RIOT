@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  at_urc \
+  #
 include ../Makefile.drivers_common
 
 HANDLE_URC ?= 1

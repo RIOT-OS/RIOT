@@ -189,7 +189,7 @@ void credman_delete(credman_tag_t tag, credman_type_t type);
  */
 int credman_get_used_count(void);
 
-#if IS_USED(MODULE_CREDMAN_LOAD) || DOXYGEN
+#if MODULE_CREDMAN_LOAD || DOXYGEN
 /**
  * @brief Load a public key from a buffer, as a `SubjectPublicKeyInfo` sequence, according to
  *        RFC5280. The key should be encoded in DER format.

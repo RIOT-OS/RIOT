@@ -22,7 +22,7 @@
 
 #include "periph/gpio.h"
 
-#if IS_USED(MODULE_MTD)
+#if MODULE_MTD
 /* GD25Q16C */
 static const mtd_spi_nor_params_t _samd51_nor_params = {
     .opcode = &mtd_spi_nor_opcode_default,
@@ -56,12 +56,12 @@ MTD_XFA_ADD(samd51_nor_dev, 0);
 
 void board_init(void)
 {
-    if (IS_USED(MODULE_DAC_DDS)) {
+    if (MODULE_DAC_DDS) {
         gpio_init(SPEAKER_ENABLE_PIN, GPIO_OUT);
         gpio_set(SPEAKER_ENABLE_PIN);
     }
 
-    if (IS_USED(MODULE_ST77XX)) {
+    if (MODULE_ST77XX) {
         gpio_init(BACKLIGHT_PIN, GPIO_OUT);
     }
 }

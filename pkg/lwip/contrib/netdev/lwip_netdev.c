@@ -61,13 +61,13 @@ static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 static WORD_ALIGNED char _stack[LWIP_NETDEV_STACKSIZE];
 static char _tmp_buf[LWIP_NETDEV_BUFLEN];
 
-#ifdef MODULE_NETDEV_ETH
+#if MODULE_NETDEV_ETH
 static err_t _eth_link_output(struct netif *netif, struct pbuf *p);
 #endif
-#ifdef MODULE_LWIP_SIXLOWPAN
+#if MODULE_LWIP_SIXLOWPAN
 static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p);
 #endif
-#ifdef MODULE_SLIPDEV
+#if MODULE_SLIPDEV
 static err_t _slip_link_output(struct netif *netif, struct pbuf *p);
 #if LWIP_IPV4
 static err_t slip_output4(struct netif *netif, struct pbuf *q, const ip4_addr_t *ipaddr);
@@ -82,12 +82,12 @@ static void _isr(event_t *ev);
 
 bool is_netdev_legacy_api(netdev_t *netdev)
 {
-    static_assert(IS_USED(MODULE_NETDEV_NEW_API) || IS_USED(MODULE_NETDEV_LEGACY_API),
+    static_assert(MODULE_NETDEV_NEW_API || MODULE_NETDEV_LEGACY_API,
                   "used netdev misses dependency to netdev_legacy_api or netdev_new_api");
-    if (!IS_USED(MODULE_NETDEV_NEW_API)) {
+    if (!MODULE_NETDEV_NEW_API) {
         return true;
     }
-    if (!IS_USED(MODULE_NETDEV_LEGACY_API)) {
+    if (!MODULE_NETDEV_LEGACY_API) {
         return false;
     }
     return (netdev->driver->confirm_send == NULL);
@@ -131,7 +131,7 @@ err_t lwip_netdev_init(struct netif *netif)
 #endif /* LWIP_NETIF_HOSTNAME */
 
     switch (dev_type) {
-#ifdef MODULE_NETDEV_ETH
+#if MODULE_NETDEV_ETH
     case NETDEV_TYPE_ETHERNET:
         netif->name[0] = ETHERNET_IFNAME1;
         netif->name[1] = ETHERNET_IFNAME2;
@@ -156,7 +156,7 @@ err_t lwip_netdev_init(struct netif *netif)
         netif->flags |= NETIF_FLAG_ETHERNET;
         break;
 #endif
-#ifdef MODULE_LWIP_SIXLOWPAN
+#if MODULE_LWIP_SIXLOWPAN
     case NETDEV_TYPE_IEEE802154:
     {
         u16_t val;
@@ -209,7 +209,7 @@ err_t lwip_netdev_init(struct netif *netif)
         break;
     }
 #endif
-#ifdef MODULE_SLIPDEV
+#if MODULE_SLIPDEV
     case NETDEV_TYPE_SLIP:
         netif->name[0] = 'S';
         netif->name[1] = 'L';
@@ -223,7 +223,7 @@ err_t lwip_netdev_init(struct netif *netif)
 #if LWIP_IPV6
         netif->output_ip6 = slip_output6;
 
-        if (IS_USED(MODULE_SLIPDEV_L2ADDR)) {
+        if (MODULE_SLIPDEV_L2ADDR) {
             netif->hwaddr_len = (u8_t)netdev->driver->get(netdev, NETOPT_ADDRESS_LONG,
                                                           netif->hwaddr,
                                                           sizeof(netif->hwaddr));
@@ -271,7 +271,7 @@ free:
     return res;
 }
 
-#if (IS_USED(MODULE_NETDEV_NEW_API))
+#if (MODULE_NETDEV_NEW_API)
 static err_t _common_link_output(struct netif *netif, netdev_t *netdev, iolist_t *iolist)
 {
     lwip_netif_dev_acquire(netif);
@@ -338,7 +338,7 @@ static err_t _common_link_output(struct netif *netif, netdev_t *netdev, iolist_t
 }
 #endif
 
-#ifdef MODULE_NETDEV_ETH
+#if MODULE_NETDEV_ETH
 static err_t _eth_link_output(struct netif *netif, struct pbuf *p)
 {
     netdev_t *netdev = netif->state;
@@ -370,7 +370,7 @@ static err_t _eth_link_output(struct netif *netif, struct pbuf *p)
 }
 #endif
 
-#ifdef MODULE_LWIP_SIXLOWPAN
+#if MODULE_LWIP_SIXLOWPAN
 static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p)
 {
     LWIP_ASSERT("p->next == NULL", p->next == NULL);
@@ -384,7 +384,7 @@ static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p)
 }
 #endif
 
-#ifdef MODULE_SLIPDEV
+#if MODULE_SLIPDEV
 #if LWIP_IPV4
 static err_t slip_output4(struct netif *netif, struct pbuf *q, const ip4_addr_t *ipaddr)
 {
@@ -447,7 +447,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         DEBUG_PUTS("[lwip_netdev] NETDEV_EVENT_ISR");
         event_post(&lwip_event_queue, &compat_netif->ev_isr);
         break;
-#if (IS_USED(MODULE_NETDEV_NEW_API))
+#if (MODULE_NETDEV_NEW_API)
     case NETDEV_EVENT_TX_COMPLETE:
         DEBUG_PUTS("[lwip_netdev] NETDEV_EVENT_TX_COMPLETE");
         {

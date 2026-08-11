@@ -77,7 +77,7 @@ typedef struct {
     uintptr_t periph;               /**< USB peripheral base address */
     dwc2_usb_otg_fshs_type_t type;  /**< FS or HS type */
     dwc2_usb_otg_fshs_phy_t phy;    /**< on-chip FS, ULPI HS or UTMI HS PHY */
-#if defined(MODULE_PERIPH_USBDEV_HS_ULPI) || DOXYGEN
+#if MODULE_PERIPH_USBDEV_HS_ULPI || DOXYGEN
     gpio_t ulpi_clk;                /**< ULPI CLK gpio */
     gpio_t ulpi_d0;                 /**< ULPI D0 gpio */
     gpio_t ulpi_d1;                 /**< ULPI D1 gpio */
@@ -99,11 +99,11 @@ typedef struct {
     gpio_t dm;                      /**< Data- gpio */
     gpio_t dp;                      /**< Data+ gpio */
     gpio_af_t af;                   /**< Alternative function */
-#if defined(MODULE_PERIPH_USBDEV_HS_UTMI) || DOXYGEN
+#if MODULE_PERIPH_USBDEV_HS_UTMI || DOXYGEN
     uint32_t phy_tune;              /**< USB HS PHY controller tuning register
                                       *  value (STM32-specific), see USBPHYC_TUNE
                                       *  register in STM32 Reference Manual */
-#endif /* defined(MODULE_PERIPH_USBDEV_HS_UTMI) */
+#endif /* MODULE_PERIPH_USBDEV_HS_UTMI */
 #endif /* defined(CPU_STM32) || DOXYGEN */
 #if defined(CPU_GD32V)
     uint32_t rcu_mask;              /**< bit in clock enable register */

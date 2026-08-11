@@ -36,22 +36,22 @@
 #include "crypto/ciphers.h"
 #include "kernel_defines.h"
 
-#if !IS_USED(MODULE_CRYPTO_AES_128) && !IS_USED(MODULE_CRYPTO_AES_192) && \
-    !IS_USED(MODULE_CRYPTO_AES_256)
+#if !MODULE_CRYPTO_AES_128 && !MODULE_CRYPTO_AES_192 && \
+    !MODULE_CRYPTO_AES_256
     #error "sys/crypto/aes: No aes module used."
 #endif
 
 /**
  * @brief AES key size used
  */
-#if IS_USED(MODULE_CRYPTO_AES_128) && !IS_USED(MODULE_CRYPTO_AES_192) && \
-    !IS_USED(MODULE_CRYPTO_AES_256)
+#if MODULE_CRYPTO_AES_128 && !MODULE_CRYPTO_AES_192 && \
+    !MODULE_CRYPTO_AES_256
 #  define AES_KEY_SIZE(ctx) AES_KEY_SIZE_128
-#elif !IS_USED(MODULE_CRYPTO_AES_128) && IS_USED(MODULE_CRYPTO_AES_192) && \
-    !IS_USED(MODULE_CRYPTO_AES_256)
+#elif !MODULE_CRYPTO_AES_128 && MODULE_CRYPTO_AES_192 && \
+    !MODULE_CRYPTO_AES_256
 #  define AES_KEY_SIZE(ctx) AES_KEY_SIZE_192
-#elif !IS_USED(MODULE_CRYPTO_AES_128) && !IS_USED(MODULE_CRYPTO_AES_192) && \
-    IS_USED(MODULE_CRYPTO_AES_256)
+#elif !MODULE_CRYPTO_AES_128 && !MODULE_CRYPTO_AES_192 && \
+    MODULE_CRYPTO_AES_256
 #  define AES_KEY_SIZE(ctx) AES_KEY_SIZE_256
 #else
 #  define AES_KEY_SIZE(ctx) ctx->key_size
@@ -146,7 +146,7 @@ static const u32 Te0[256] = {
     0x7bb0b0cbU, 0xa85454fcU, 0x6dbbbbd6U, 0x2c16163aU,
 };
 
-#ifndef MODULE_CRYPTO_AES_PRECALCULATED
+#if !MODULE_CRYPTO_AES_PRECALCULATED
     #define Te0(n)  (Te0[n])
     #define Te1(n)  ((Te0[n] >>  8) | (Te0[n] << 24))
     #define Te2(n)  ((Te0[n] >> 16) | (Te0[n] << 16))
@@ -494,7 +494,7 @@ static const u32 Td0[256] = {
     0x7bcb8461U, 0xd532b670U, 0x486c5c74U, 0xd0b85742U,
 };
 
-#ifndef MODULE_CRYPTO_AES_PRECALCULATED
+#if !MODULE_CRYPTO_AES_PRECALCULATED
     #define Td0(n)  (Td0[n])
     #define Td1(n)  ((Td0[n] >>  8) | (Td0[n] << 24))
     #define Td2(n)  ((Td0[n] >> 16) | (Td0[n] << 16))
@@ -831,9 +831,9 @@ int aes_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize)
         return CIPHER_ERR_INVALID_KEY_SIZE;
     }
 
-    if ((keySize == AES_KEY_SIZE_128 && !IS_USED(MODULE_CRYPTO_AES_128)) ||
-        (keySize == AES_KEY_SIZE_192 && !IS_USED(MODULE_CRYPTO_AES_192)) ||
-        (keySize == AES_KEY_SIZE_256 && !IS_USED(MODULE_CRYPTO_AES_256))) {
+    if ((keySize == AES_KEY_SIZE_128 && !MODULE_CRYPTO_AES_128) ||
+        (keySize == AES_KEY_SIZE_192 && !MODULE_CRYPTO_AES_192) ||
+        (keySize == AES_KEY_SIZE_256 && !MODULE_CRYPTO_AES_256)) {
         return CIPHER_ERR_INVALID_KEY_SIZE;
     }
 
@@ -1022,7 +1022,7 @@ static int aes_set_decrypt_key(const unsigned char *userKey, const int bits,
      **/
     for (i = 1; i < (key->rounds); i++) {
         rk += 4;
-#ifdef MODULE_CRYPTO_AES_UNROLL
+#if MODULE_CRYPTO_AES_UNROLL
         rk[0] =
             Td0(Te4((rk[0] >> 24)) & 0xff) ^
             Td1(Te4((rk[0] >> 16) & 0xff) & 0xff) ^
@@ -1079,7 +1079,7 @@ int aes_encrypt(const cipher_context_t *context, const uint8_t *plainBlock,
     const u32 *rk;
     u32 s0, s1, s2, s3, t0, t1, t2, t3;
 
-#ifndef MODULE_CRYPTO_AES_UNROLL
+#if !MODULE_CRYPTO_AES_UNROLL
     int r;
 #endif /* ?MODULE_CRYPTO_AES_UNROLL */
 
@@ -1093,7 +1093,7 @@ int aes_encrypt(const cipher_context_t *context, const uint8_t *plainBlock,
     s1 = GETU32(plainBlock +  4) ^ rk[1];
     s2 = GETU32(plainBlock +  8) ^ rk[2];
     s3 = GETU32(plainBlock + 12) ^ rk[3];
-#ifdef MODULE_CRYPTO_AES_UNROLL
+#if MODULE_CRYPTO_AES_UNROLL
     /* round 1: */
     t0 = Te0(s0 >> 24) ^ Te1((s1 >> 16) & 0xff) ^ Te2((s2 >>  8) & 0xff) ^
          Te3(s3 & 0xff) ^ rk[ 4];
@@ -1349,7 +1349,7 @@ int aes_decrypt(const cipher_context_t *context, const uint8_t *cipherBlock,
     const u32 *rk;
     u32 s0, s1, s2, s3, t0, t1, t2, t3;
 
-#ifndef MODULE_CRYPTO_AES_UNROLL
+#if !MODULE_CRYPTO_AES_UNROLL
     int r;
 #endif /* ?MODULE_CRYPTO_AES_UNROLL */
 
@@ -1363,7 +1363,7 @@ int aes_decrypt(const cipher_context_t *context, const uint8_t *cipherBlock,
     s1 = GETU32(cipherBlock +  4) ^ rk[1];
     s2 = GETU32(cipherBlock +  8) ^ rk[2];
     s3 = GETU32(cipherBlock + 12) ^ rk[3];
-#ifdef MODULE_CRYPTO_AES_UNROLL
+#if MODULE_CRYPTO_AES_UNROLL
     /* round 1: */
     t0 = Td0(s0 >> 24) ^ Td1((s3 >> 16) & 0xff) ^ Td2((s2 >>  8) & 0xff) ^
          Td3(s1 & 0xff) ^ rk[ 4];

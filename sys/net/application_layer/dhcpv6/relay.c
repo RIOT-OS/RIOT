@@ -55,7 +55,7 @@ static void _forward_reply(const uint8_t *in_msg, size_t in_msg_size);
 
 static int16_t _only_one_netif(void)
 {
-    if (IS_USED(MODULE_NETIF)) {
+    if (MODULE_NETIF) {
         netif_t *netif = netif_iter(NULL);
 
         return (netif_iter(netif) == NULL) ? netif_get_id(netif) : -1;
@@ -67,10 +67,10 @@ static int16_t _only_one_netif(void)
 
 void dhcpv6_relay_auto_init(void)
 {
-    if (IS_USED(MODULE_AUTO_INIT_DHCPV6_RELAY)) {
+    if (MODULE_AUTO_INIT_DHCPV6_RELAY) {
         int16_t netif = _only_one_netif();
         if (netif > 0) {
-            if (IS_USED(MODULE_EVENT_THREAD)) {
+            if (MODULE_EVENT_THREAD) {
                 dhcpv6_relay_init(EVENT_PRIO_LOWEST, netif, netif);
             }
             else {
@@ -396,7 +396,7 @@ static void _forward_reply(const uint8_t *in_msg, size_t in_msg_size)
     assert(sizeof(in_reply->peer_address) == sizeof(target.addr.ipv6));
 
     memcpy(&target.addr.ipv6, &in_reply->peer_address, sizeof(target.addr.ipv6));
-    if (IS_USED(MODULE_SOCK_UTIL) && ENABLE_DEBUG) {
+    if (MODULE_SOCK_UTIL && ENABLE_DEBUG) {
         static char addr_str[IPV6_ADDR_MAX_STR_LEN];
         uint16_t port;
 

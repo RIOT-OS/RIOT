@@ -1,3 +1,11 @@
+
+MODULE_DEFS_NEEDED += \
+  can_isotp \
+  conn_can_isotp_multi \
+  fdcan \
+  ncv7356 \
+  tja1042 \
+  #
 BOARD ?= nucleo-f767zi
 
 include ../Makefile.sys_common

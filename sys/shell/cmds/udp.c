@@ -23,7 +23,7 @@
 
 #include "fmt.h"
 #include "net/sock/udp.h"
-#if IS_USED(MODULE_SHELL_CMD_UDP_SERVER)
+#if MODULE_SHELL_CMD_UDP_SERVER
 #  include "net/sock/async/event.h"
 #endif
 #include "net/sock/util.h"
@@ -32,16 +32,16 @@
 #include "time_units.h"
 #include "ztimer.h"
 
-#if IS_USED(SOCK_HAS_IPV6)
+#if IS_ACTIVE(SOCK_HAS_IPV6)
 #  define SOCK_IP_EP_ANY  SOCK_IPV6_EP_ANY
-#elif IS_USED(SOCK_HAS_IPV4)
+#elif IS_ACTIVE(SOCK_HAS_IPV4)
 #  define SOCK_IP_EP_ANY  SOCK_IPV4_EP_ANY
 #endif
 
 #define SERVER_PRIO             (THREAD_PRIORITY_MAIN - 1)
 #define SERVER_STACKSIZE        (THREAD_STACKSIZE_DEFAULT)
 
-#if IS_USED(MODULE_SHELL_CMD_UDP_SERVER)
+#if MODULE_SHELL_CMD_UDP_SERVER
 
 static char server_stack[SERVER_STACKSIZE];
 
@@ -221,9 +221,9 @@ static void _send(const char *addr_str, const char *_data, size_t num,
         }
         printf("Success: sent %u byte over UDP to %s\n", res, addr_str);
         if (num) {
-#if IS_USED(MODULE_ZTIMER_USEC)
+#if MODULE_ZTIMER_USEC
             ztimer_sleep(ZTIMER_USEC, delay);
-#elif IS_USED(MODULE_ZTIMER_MSEC)
+#elif MODULE_ZTIMER_MSEC
             ztimer_sleep(ZTIMER_MSEC, (delay + US_PER_MS - 1) / US_PER_MS);
 #endif
         }
@@ -254,7 +254,7 @@ static int _udp_cmd(int argc, char **argv)
             argc--;
         }
         if (argc > 4) {
-            if (!IS_USED(MODULE_ZTIMER)) {
+            if (!MODULE_ZTIMER) {
                 puts("Error: retransmission requires ztimer. "
                      "Add ztimer_msec or ztimer_usec to USEMODULE.");
                 return 1;
@@ -267,7 +267,7 @@ static int _udp_cmd(int argc, char **argv)
         _send(argv[2], argv[3], num, delay, binary);
     }
     else if (strcmp(argv[1], "server") == 0) {
-        if (!IS_USED(MODULE_SHELL_CMD_UDP_SERVER)) {
+        if (!MODULE_SHELL_CMD_UDP_SERVER) {
             puts("Error: server command not supported in this build. "
                  "Add shell_cmd_udp_server to USEMODULE.");
             return 1;

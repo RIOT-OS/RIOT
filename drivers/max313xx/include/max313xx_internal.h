@@ -21,7 +21,7 @@ extern "C" {
 
 #include "kernel_defines.h"
 
-#if IS_USED(MODULE_MAX31331) && IS_USED(MODULE_MAX31343)
+#if MODULE_MAX31331 && MODULE_MAX31343
 #  error "Only one driver variant can be used at a time!"
 #endif
 
@@ -29,7 +29,7 @@ extern "C" {
  * @name MAX31331 and MAX31343 shared registers
  * @{
  */
-#if IS_USED(MODULE_MAX31331) || IS_USED(MODULE_MAX31343) || DOXYGEN
+#if MODULE_MAX31331 || MODULE_MAX31343 || DOXYGEN
 #  define MAX313XX_I2C_ADDR           (0x68U) /**< 7-bit I2C device address (slave byte = 0xD0) */
 
 /* Status/Config registers */
@@ -57,7 +57,7 @@ extern "C" {
 #  define MAX313XX_INTEN_A2IE         (1U << 1)   /**< Alarm 2 interrupt enable bit */
 #endif
 
-#if IS_USED(MODULE_MAX31331)
+#if MODULE_MAX31331
 #  define MAX313XX_REG_TIMER_CFG      (0x06U)
 #  define MAX313XX_REG_TIME0          (0x08U)
 
@@ -79,7 +79,7 @@ extern "C" {
 #  define MAX313XX_TRICKLE_D_DIODE    (1U << 4)
 #  define MAX313XX_TRICKLE_D_RES_MASK (0x06U)
 
-#elif IS_USED(MODULE_MAX31343)
+#elif MODULE_MAX31343
 #  define MAX313XX_REG_TIMER_CFG      (0x05U)
 
 #  define MAX313XX_REG_TIME0          (0x06U)
@@ -134,7 +134,7 @@ extern "C" {
 /** @} */
 
 /* The device specific registers are defined unconditionally to allow using
- * `IS_USED(MODULE_MAX313..)` in the code instead of preprocessor conditions. */
+ * `IS_ACTIVE(MODULE_MAX313..)` in the code instead of preprocessor conditions. */
 /**
  * @name MAX31331 specific registers
  * @{

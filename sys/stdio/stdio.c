@@ -27,7 +27,7 @@
 static uint8_t _rx_buf_mem[STDIO_RX_BUFSIZE];
 isrpipe_t stdin_isrpipe = ISRPIPE_INIT(_rx_buf_mem);
 
-#if IS_USED(MODULE_STDIO_NOTIFY)
+#if MODULE_STDIO_NOTIFY
 static stdio_notify_cb_t _notify_cb;
 static void *_notify_arg;
 
@@ -66,7 +66,7 @@ int stdio_rx_write(const uint8_t *buf, size_t len)
 }
 #endif
 
-#ifdef MODULE_STDIO_DISPATCH
+#if MODULE_STDIO_DISPATCH
 XFA_INIT_CONST(stdio_provider_t, stdio_provider_xfa);
 
 void stdio_init(void)
@@ -103,18 +103,18 @@ void stdio_close(void) {
 MAYBE_WEAK
 ssize_t stdio_read(void* buffer, size_t len)
 {
-    if (!IS_USED(MODULE_STDIN)) {
+    if (!MODULE_STDIN) {
         return -ENOTSUP;
     }
 
     return isrpipe_read(&stdin_isrpipe, buffer, len);
 }
 
-#if IS_USED(MODULE_STDIO_AVAILABLE)
+#if MODULE_STDIO_AVAILABLE
 MAYBE_WEAK
 int stdio_available(void)
 {
-    if (!IS_USED(MODULE_STDIN)) {
+    if (!MODULE_STDIN) {
         return 0;
     }
     return isrpipe_available(&stdin_isrpipe);
@@ -123,7 +123,7 @@ int stdio_available(void)
 
 void stdio_clear_stdin(void)
 {
-    if (IS_USED(MODULE_STDIN)) {
+    if (MODULE_STDIN) {
         isrpipe_clear(&stdin_isrpipe);
     }
 }

@@ -264,7 +264,7 @@ void kw2xrf_set_addr_short(kw2xrf_t *dev, uint16_t addr)
     uint8_t *ap = (uint8_t *)&tmp;
 
     byteorder_htolebufs(ap, addr);
-#ifdef MODULE_SIXLOWPAN
+#if MODULE_SIXLOWPAN
     /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
      * 0 for unicast addresses */
     ap[0] &= 0x7F;

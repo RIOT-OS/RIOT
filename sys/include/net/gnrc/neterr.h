@@ -44,7 +44,7 @@ extern "C" {
  * @param[in] pkt   Packet snip to report on.
  * @param[in] err   The error code for the packet.
  */
-#ifdef MODULE_GNRC_NETERR
+#if MODULE_GNRC_NETERR
 static inline void gnrc_neterr_report(gnrc_pktsnip_t *pkt, uint32_t err)
 {
     if (pkt->err_sub != KERNEL_PID_UNDEF) {
@@ -68,7 +68,7 @@ static inline void gnrc_neterr_report(gnrc_pktsnip_t *pkt, uint32_t err)
  * @return  0, on success.
  * @return  EALREADY, if there already someone registered to errors on @p pkt.
  */
-#ifdef MODULE_GNRC_NETERR
+#if MODULE_GNRC_NETERR
 static inline int gnrc_neterr_reg(gnrc_pktsnip_t *pkt)
 {
     if (pkt->err_sub != KERNEL_PID_UNDEF) {

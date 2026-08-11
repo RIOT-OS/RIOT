@@ -26,7 +26,7 @@
 #include "at30tse75x.h"
 #include "shell.h"
 
-#ifdef MODULE_AT30TSE75X
+#if MODULE_AT30TSE75X
 
 static bool initialized = false;
 static at30tse75x_t dev;

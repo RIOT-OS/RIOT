@@ -77,7 +77,7 @@ static const uart_conf_t uart_config[] = {
      .regs = UART0,
      .tx_pin = 13,
      .rx_pin = 12,
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
      .rts_pin = GPIO_UNDEF,
      .cts_pin = GPIO_UNDEF,
 #endif
@@ -87,7 +87,7 @@ static const uart_conf_t uart_config[] = {
      .regs = UART1,
      .tx_pin = 26,
      .rx_pin = 25,
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
      .rts_pin = GPIO_UNDEF,
      .cts_pin = GPIO_UNDEF,
 #endif

@@ -29,7 +29,7 @@
 #include "nrfmin.h"
 #include "net/netdev.h"
 
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if MODULE_GNRC_SIXLOWPAN
 #include "net/gnrc/nettype.h"
 #endif
 
@@ -492,7 +492,7 @@ static int nrfmin_get(netdev_t *dev, netopt_t opt, void *val, size_t max_len)
             assert(max_len >= sizeof(uint16_t));
             *((uint16_t*)val) = CONF_PSEUDO_NID;
             return sizeof(uint16_t);
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if MODULE_GNRC_SIXLOWPAN
         case NETOPT_PROTO:
             assert(max_len == sizeof(gnrc_nettype_t));
             *((gnrc_nettype_t *)val) = GNRC_NETTYPE_SIXLOWPAN;

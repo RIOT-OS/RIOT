@@ -111,7 +111,7 @@ typedef struct {
     uint32_t pages_per_sector; /**< Number of pages per sector in the MTD */
     uint32_t page_size;        /**< Size of the pages in the MTD */
     uint32_t write_size;       /**< Minimum size and alignment of writes to the device */
-#if defined(MODULE_MTD_WRITE_PAGE) || DOXYGEN
+#if MODULE_MTD_WRITE_PAGE || DOXYGEN
     void *work_area;           /**< sector-sized buffer (only present when @ref mtd_write_page is enabled) */
 #endif
 } mtd_dev_t;

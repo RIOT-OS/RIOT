@@ -25,13 +25,13 @@
 #include "psa_crypto_se_management.h"
 #include "psa_crypto_se_driver.h"
 
-#if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
+#if MODULE_PSA_KEY_MANAGEMENT
 #include "psa_crypto_slot_management.h"
 
 psa_status_t psa_location_dispatch_generate_key(const psa_key_attributes_t *attributes,
                                                 psa_key_slot_t *slot)
 {
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+#if MODULE_PSA_SECURE_ELEMENT
     psa_status_t status;
     const psa_drv_se_t *drv;
     psa_drv_se_context_t *drv_context;
@@ -71,7 +71,7 @@ psa_status_t psa_location_dispatch_import_key( const psa_key_attributes_t *attri
 {
     psa_key_location_t location = PSA_KEY_LIFETIME_GET_LOCATION(attributes->lifetime);
 
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+#if MODULE_PSA_SECURE_ELEMENT
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     const psa_drv_se_t *drv;
     psa_drv_se_context_t *drv_context;
@@ -108,13 +108,13 @@ psa_status_t psa_location_dispatch_import_key( const psa_key_attributes_t *attri
 }
 #endif /* MODULE_PSA_KEY_MANAGEMENT */
 
-#if IS_USED(MODULE_PSA_CIPHER)
+#if MODULE_PSA_CIPHER
 psa_status_t psa_location_dispatch_cipher_encrypt_setup(   psa_cipher_operation_t *operation,
                                                            const psa_key_attributes_t *attributes,
                                                            const psa_key_slot_t *slot,
                                                            psa_algorithm_t alg)
 {
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+#if MODULE_PSA_SECURE_ELEMENT
     psa_key_location_t location = PSA_KEY_LIFETIME_GET_LOCATION(attributes->lifetime);
     if (location != PSA_KEY_LOCATION_LOCAL_STORAGE) {
         const psa_drv_se_t *drv;
@@ -160,7 +160,7 @@ psa_status_t psa_location_dispatch_cipher_decrypt_setup(psa_cipher_operation_t *
     return PSA_ERROR_NOT_SUPPORTED;
 }
 
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+#if MODULE_PSA_SECURE_ELEMENT
 /**
  * @brief   Single part function for cipher encryption and decryption on a secure element
  *
@@ -256,7 +256,7 @@ psa_status_t psa_location_dispatch_cipher_encrypt(  const psa_key_attributes_t *
                                                     size_t *output_length)
 {
 
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+#if MODULE_PSA_SECURE_ELEMENT
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     const psa_drv_se_t *drv;
     psa_drv_se_context_t *drv_context;
@@ -298,7 +298,7 @@ psa_status_t psa_location_dispatch_cipher_decrypt(  const psa_key_attributes_t *
                                                     size_t *output_length)
 {
 
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+#if MODULE_PSA_SECURE_ELEMENT
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
     const psa_drv_se_t *drv;
     psa_drv_se_context_t *drv_context;
@@ -329,7 +329,7 @@ psa_status_t psa_location_dispatch_cipher_decrypt(  const psa_key_attributes_t *
 
 #endif /* MODULE_PSA_CIPHER */
 
-#if IS_USED(MODULE_PSA_AEAD)
+#if MODULE_PSA_AEAD
 psa_status_t psa_location_dispatch_aead_encrypt(const psa_key_attributes_t *attributes,
                                                 psa_algorithm_t alg,
                                                 const psa_key_slot_t *slot,
@@ -375,7 +375,7 @@ psa_status_t psa_location_dispatch_aead_decrypt(const psa_key_attributes_t *attr
 }
 #endif /* MODULE_PSA_AEAD */
 
-#if IS_USED(MODULE_PSA_ASYMMETRIC)
+#if MODULE_PSA_ASYMMETRIC
 psa_status_t psa_location_dispatch_sign_hash(  const psa_key_attributes_t *attributes,
                                                psa_algorithm_t alg,
                                                const psa_key_slot_t *slot,
@@ -385,7 +385,7 @@ psa_status_t psa_location_dispatch_sign_hash(  const psa_key_attributes_t *attri
                                                size_t signature_size,
                                                size_t *signature_length)
 {
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+#if MODULE_PSA_SECURE_ELEMENT
     const psa_drv_se_t *drv;
     psa_drv_se_context_t *drv_context;
     psa_key_slot_number_t *slot_number = psa_key_slot_get_slot_number(slot);
@@ -433,7 +433,7 @@ psa_status_t psa_location_dispatch_verify_hash(const psa_key_attributes_t *attri
                                                const uint8_t *signature,
                                                size_t signature_length)
 {
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+#if MODULE_PSA_SECURE_ELEMENT
     const psa_drv_se_t *drv;
     psa_drv_se_context_t *drv_context;
     psa_key_slot_number_t *slot_number = psa_key_slot_get_slot_number(slot);
@@ -472,7 +472,7 @@ psa_status_t psa_location_dispatch_verify_message(  const psa_key_attributes_t *
 }
 #endif /* MODULE_PSA_ASYMMETRIC */
 
-#if IS_USED(MODULE_PSA_MAC)
+#if MODULE_PSA_MAC
 psa_status_t psa_location_dispatch_mac_compute(const psa_key_attributes_t *attributes,
                                                psa_algorithm_t alg,
                                                const psa_key_slot_t *slot,
@@ -482,7 +482,7 @@ psa_status_t psa_location_dispatch_mac_compute(const psa_key_attributes_t *attri
                                                size_t mac_size,
                                                size_t *mac_length)
 {
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+#if MODULE_PSA_SECURE_ELEMENT
     const psa_drv_se_t *drv;
     psa_drv_se_context_t *drv_context;
     psa_key_slot_number_t *slot_number = psa_key_slot_get_slot_number(slot);
@@ -515,7 +515,7 @@ psa_status_t psa_location_dispatch_mac_verify(const psa_key_attributes_t *attrib
                                               const uint8_t *mac,
                                               size_t mac_length)
 {
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+#if MODULE_PSA_SECURE_ELEMENT
     psa_key_slot_number_t *slot_number = psa_key_slot_get_slot_number(slot);
     psa_drv_se_context_t *drv_context;
     uint8_t *key_data = NULL;

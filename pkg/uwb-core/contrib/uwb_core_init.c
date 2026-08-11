@@ -52,31 +52,31 @@ void uwb_core_init(void)
     uwb_txrf_config(&dev.uwb_dev, &dev.uwb_dev.config.txrf);
 
     /* init uwb pkg's */
-#if IS_USED(MODULE_UWB_CORE_RNG)
+#if MODULE_UWB_CORE_RNG
     extern void uwb_rng_pkg_init(void);
     uwb_rng_pkg_init();
 #endif
     /* uwb configuration module */
-#if IS_USED(MODULE_UWB_CORE_UWBCFG)
+#if MODULE_UWB_CORE_UWBCFG
     extern int uwbcfg_pkg_init(void);
     uwbcfg_pkg_init();
 #endif
     /* ranging algorithms */
-#if IS_USED(MODULE_UWB_CORE_TWR_SS)
+#if MODULE_UWB_CORE_TWR_SS
     twr_ss_pkg_init();
 #endif
-#if IS_USED(MODULE_UWB_CORE_TWR_SS_ACK)
+#if MODULE_UWB_CORE_TWR_SS_ACK
     twr_ss_ack_pkg_init();
     uwb_set_autoack(&dev.uwb_dev, true);
     uwb_set_autoack_delay(&dev.uwb_dev, 12);
 #endif
-#if IS_USED(MODULE_UWB_CORE_TWR_SS_EXT)
+#if MODULE_UWB_CORE_TWR_SS_EXT
     twr_ss_ext_pkg_init();
 #endif
-#if IS_USED(MODULE_UWB_CORE_TWR_DS)
+#if MODULE_UWB_CORE_TWR_DS
     twr_ds_pkg_init();
 #endif
-#if IS_USED(MODULE_UWB_CORE_TWR_DS_EXT)
+#if MODULE_UWB_CORE_TWR_DS_EXT
     twr_ds_ext_pkg_init();
 #endif
 }

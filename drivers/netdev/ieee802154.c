@@ -33,7 +33,7 @@ void netdev_ieee802154_reset(netdev_ieee802154_t *dev)
     dev->flags = 0;
 
     /* set default protocol */
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if MODULE_GNRC_SIXLOWPAN
     dev->proto = GNRC_NETTYPE_SIXLOWPAN;
 #elif MODULE_GNRC
     dev->proto = GNRC_NETTYPE_UNDEF;
@@ -43,7 +43,7 @@ void netdev_ieee802154_reset(netdev_ieee802154_t *dev)
     dev->pan = CONFIG_IEEE802154_DEFAULT_PANID;
     dev->netdev.driver->set(&dev->netdev, NETOPT_NID, &dev->pan, sizeof(dev->pan));
 
-#if IS_USED(MODULE_IEEE802154_SECURITY)
+#if MODULE_IEEE802154_SECURITY
     ieee802154_sec_init(&dev->sec_ctx);
     const netopt_enable_t e = NETOPT_ENABLE;
     netdev_ieee802154_set(dev, NETOPT_ENCRYPTION, &e, sizeof(e));
@@ -52,26 +52,26 @@ void netdev_ieee802154_reset(netdev_ieee802154_t *dev)
 
 static inline uint16_t _get_ieee802154_pdu(netdev_ieee802154_t *dev)
 {
-#if defined(MODULE_NETDEV_IEEE802154_MR_OQPSK) || \
-    defined(MODULE_NETDEV_IEEE802154_MR_OFDM)  || \
-    defined(MODULE_NETDEV_IEEE802154_MR_FSK)
+#if MODULE_NETDEV_IEEE802154_MR_OQPSK || \
+    MODULE_NETDEV_IEEE802154_MR_OFDM  || \
+    MODULE_NETDEV_IEEE802154_MR_FSK
     uint8_t type = IEEE802154_PHY_DISABLED;
     dev->netdev.driver->get(&dev->netdev, NETOPT_IEEE802154_PHY, &type, sizeof(type));
 #else
     (void) dev;
 #endif
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#if MODULE_NETDEV_IEEE802154_MR_OQPSK
     if (type == IEEE802154_PHY_MR_OQPSK) {
         return IEEE802154G_FRAME_LEN_MAX;
     }
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#if MODULE_NETDEV_IEEE802154_MR_OFDM
     if (type == IEEE802154_PHY_MR_OFDM) {
         return IEEE802154G_FRAME_LEN_MAX;
     }
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#if MODULE_NETDEV_IEEE802154_MR_FSK
     if (type == IEEE802154_PHY_MR_FSK) {
         return IEEE802154G_FRAME_LEN_MAX;
     }
@@ -118,7 +118,7 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
             *((uint16_t *)value) = (uint16_t)dev->chan;
             res = sizeof(dev->chan);
             break;
-#if IS_USED(MODULE_IEEE802154_SECURITY)
+#if MODULE_IEEE802154_SECURITY
         case NETOPT_ENCRYPTION:
             assert(max_len == sizeof(netopt_enable_t));
             if (dev->flags & NETDEV_IEEE802154_SECURITY_EN) {
@@ -129,7 +129,7 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
             }
             res = sizeof(netopt_enable_t);
             break;
-#endif /* IS_USED(MODULE_IEEE802154_SECURITY) */
+#endif /* MODULE_IEEE802154_SECURITY */
         case NETOPT_ACK_REQ:
             assert(max_len == sizeof(netopt_enable_t));
             if (dev->flags & NETDEV_IEEE802154_ACK_REQ) {
@@ -150,7 +150,7 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
             }
             res = sizeof(netopt_enable_t);
             break;
-#ifdef MODULE_GNRC
+#if MODULE_GNRC
         case NETOPT_PROTO:
             assert(max_len == sizeof(gnrc_nettype_t));
             *((gnrc_nettype_t *)value) = dev->proto;
@@ -162,7 +162,7 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
             *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
             res = sizeof(uint16_t);
             break;
-#ifdef MODULE_L2FILTER
+#if MODULE_L2FILTER
         case NETOPT_L2FILTER:
             assert(max_len >= sizeof(l2filter_t **));
             *((l2filter_t **)value) = dev->netdev.filter;
@@ -174,9 +174,9 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
 
             *((uint16_t *)value) = (_get_ieee802154_pdu(dev)
                                     - IEEE802154_MAX_HDR_LEN)
-#if IS_USED(MODULE_IEEE802154_SECURITY)
+#if MODULE_IEEE802154_SECURITY
                                     -IEEE802154_SEC_MAX_AUX_HDR_LEN
-#endif /* IS_USED(MODULE_IEEE802154_SECURITY) */
+#endif /* MODULE_IEEE802154_SECURITY */
                                     - IEEE802154_FCS_LEN;
             res = sizeof(uint16_t);
             break;
@@ -237,7 +237,7 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
             dev->pan = *((uint16_t *)value);
             res = sizeof(dev->pan);
             break;
-#if IS_USED(MODULE_IEEE802154_SECURITY)
+#if MODULE_IEEE802154_SECURITY
         case NETOPT_ENCRYPTION:
             assert(len == sizeof(netopt_enable_t));
             if ((*(bool *)value)) {
@@ -258,7 +258,7 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
                    IEEE802154_SEC_KEY_LENGTH);
             res = IEEE802154_SEC_KEY_LENGTH;
             break;
-#endif /* IS_USED(MODULE_IEEE802154_SECURITY) */
+#endif /* MODULE_IEEE802154_SECURITY */
         case NETOPT_ACK_REQ:
             if ((*(bool *)value)) {
                 dev->flags |= NETDEV_IEEE802154_ACK_REQ;
@@ -277,14 +277,14 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
             }
             res = sizeof(uint16_t);
             break;
-#ifdef MODULE_GNRC
+#if MODULE_GNRC
         case NETOPT_PROTO:
             assert(len == sizeof(gnrc_nettype_t));
             dev->proto = *((gnrc_nettype_t *)value);
             res = sizeof(gnrc_nettype_t);
             break;
 #endif
-#ifdef MODULE_L2FILTER
+#if MODULE_L2FILTER
         case NETOPT_L2FILTER:
             res = l2filter_add(dev->netdev.filter, value, len);
             break;

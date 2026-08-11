@@ -73,7 +73,7 @@ extern "C" {
 #if \
     !defined(HAVE_PTP_TIMER_SET_ABSOLUTE) && \
     !defined(HAVE_PTP_TIMER_SET_ABSOLUTE_U64) && \
-    IS_USED(MODULE_PERIPH_PTP_TIMER)
+    MODULE_PERIPH_PTP_TIMER
 #error "Neither ptp_timer_set_absolute() nor ptp_timer_set_absolute_u64() implemented"
 #endif
 

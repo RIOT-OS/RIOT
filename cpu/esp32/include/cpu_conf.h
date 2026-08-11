@@ -27,7 +27,7 @@
  * @{
  */
 /** Extra thread stack size required if newlib-nano is not used */
-#ifdef MODULE_NEWLIB_NANO
+#if MODULE_NEWLIB_NANO
 #  define THREAD_EXTRA_STACKSIZE        (0)
 #else
 #  define THREAD_EXTRA_STACKSIZE        (512)

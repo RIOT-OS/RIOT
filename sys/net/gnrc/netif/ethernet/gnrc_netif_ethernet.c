@@ -22,20 +22,20 @@
 #include "net/gnrc.h"
 #include "net/gnrc/netif/ethernet.h"
 #include "net/netdev/eth.h"
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
 #include "net/ipv6/hdr.h"
 #endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if defined(MODULE_OD) && ENABLE_DEBUG
+#if MODULE_OD && ENABLE_DEBUG
 #include "od.h"
 #endif
 
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
-#ifdef MODULE_GNRC_SIXLOENC
+#if MODULE_GNRC_SIXLOENC
 static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt);
 #else
 #define _set    gnrc_netif_set_from_netdev
@@ -67,7 +67,7 @@ static inline void _addr_set_multicast(gnrc_netif_t *netif, uint8_t *dst,
                                        gnrc_pktsnip_t *payload)
 {
     switch (payload->type) {
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
         case GNRC_NETTYPE_IPV6: {
             ipv6_hdr_t *ipv6 = payload->data;
             gnrc_netif_ipv6_group_to_l2_group(netif, &ipv6->dst, dst);
@@ -151,7 +151,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         .iol_len = sizeof(ethernet_hdr_t)
     };
 
-#ifdef MODULE_NETSTATS_L2
+#if MODULE_NETSTATS_L2
     if ((netif_hdr->flags & GNRC_NETIF_HDR_FLAGS_BROADCAST) ||
         (netif_hdr->flags & GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
         netif->stats.tx_mcast_count++;
@@ -196,7 +196,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             DEBUG("gnrc_netif_ethernet: read error.\n");
             goto safe_out;
         }
-#ifdef MODULE_NETSTATS_L2
+#if MODULE_NETSTATS_L2
         netif->stats.rx_count++;
         netif->stats.rx_bytes += nread;
 #endif
@@ -212,7 +212,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         DEBUG("gnrc_netif_ethernet: received packet from %s of length %d\n",
               gnrc_netif_addr_to_str(pkt->data, ETHERNET_ADDR_LEN, addr_str),
               nread);
-#if defined(MODULE_OD) && ENABLE_DEBUG
+#if MODULE_OD && ENABLE_DEBUG
         od_hex_dump(pkt->data, nread, OD_WIDTH_DEFAULT);
 #endif
         /* mark ethernet header */
@@ -224,7 +224,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 
         ethernet_hdr_t *hdr = (ethernet_hdr_t *)eth_hdr->data;
 
-#ifdef MODULE_L2FILTER
+#if MODULE_L2FILTER
         if (!l2filter_pass(dev->filter, hdr->src, ETHERNET_ADDR_LEN)) {
             DEBUG("gnrc_netif_ethernet: incoming packet filtered by l2filter\n");
             goto safe_out;
@@ -266,7 +266,7 @@ safe_out:
     return NULL;
 }
 
-#ifdef MODULE_GNRC_SIXLOENC
+#if MODULE_GNRC_SIXLOENC
 static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
 {
     if (opt->opt == NETOPT_6LO) {

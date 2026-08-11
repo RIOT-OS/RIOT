@@ -33,7 +33,7 @@ extern "C" {
  * @name    SPI configuration
  * @{
  */
-#if defined(MODULE_PERIPH_SPI) || defined(DOXYGEN)
+#if MODULE_PERIPH_SPI || defined(DOXYGEN)
 /**
  * GPIO15 is not available on SparkFun Thing Dev. Therefore another GPIO is
  * define as default CS signal for HSPI interface SPI_DEV(0).
@@ -42,7 +42,7 @@ extern "C" {
 #define SPI0_CS0_GPIO    GPIO16  /**< HSPI / SPI_DEV(0) CS default pin, only used when cs
                                       parameter in spi_acquire is GPIO_UNDEF */
 #endif
-#endif /* defined(MODULE_PERIPH_SPI) || defined(DOXYGEN) */
+#endif /* MODULE_PERIPH_SPI || defined(DOXYGEN) */
 /** @} */
 
 #ifdef __cplusplus

@@ -38,7 +38,7 @@
 /* Just to satisfy the linker, lwIP from SDK is not used */
 uint32_t LwipTimOutLim = 0;
 
-#ifndef MODULE_LWIP_ETHERNET
+#if !MODULE_LWIP_ETHERNET
 const uint8_t ethbroadcast[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 #endif
 

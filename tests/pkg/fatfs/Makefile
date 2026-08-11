@@ -1,3 +1,9 @@
+
+MODULE_DEFS_NEEDED += \
+  mtd_native \
+  mtd_sdcard \
+  mtd_sdmmc \
+  #
 include ../Makefile.pkg_common
 
 BOARD ?= native

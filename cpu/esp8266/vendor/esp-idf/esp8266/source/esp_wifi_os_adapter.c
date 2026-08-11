@@ -288,7 +288,7 @@ static uint32_t get_free_heap_size_wrapper(void)
 
 static void *timer_create_wrapper(const char *name, uint32_t period_ticks, bool auto_load, void *arg, void (*cb)(void *timer))
 {
-#ifdef MODULE_ESP_WIFI_ANY
+#if MODULE_ESP_WIFI_ANY
     return xTimerCreate(name, period_ticks, auto_load, arg, (tmrTIMER_CALLBACK)cb);
 #else
     return NULL;
@@ -297,7 +297,7 @@ static void *timer_create_wrapper(const char *name, uint32_t period_ticks, bool 
 
 static void *timer_get_arg_wrapper(void *timer)
 {
-#ifdef MODULE_ESP_WIFI_ANY
+#if MODULE_ESP_WIFI_ANY
     return pvTimerGetTimerID(timer);
 #else
     return false;
@@ -306,7 +306,7 @@ static void *timer_get_arg_wrapper(void *timer)
 
 static bool timer_reset_wrapper(void *timer, uint32_t ticks)
 {
-#ifdef MODULE_ESP_WIFI_ANY
+#if MODULE_ESP_WIFI_ANY
     return xTimerReset(timer, ticks);
 #else
     return false;
@@ -315,7 +315,7 @@ static bool timer_reset_wrapper(void *timer, uint32_t ticks)
 
 static bool timer_stop_wrapper(void *timer, uint32_t ticks)
 {
-#ifdef MODULE_ESP_WIFI_ANY
+#if MODULE_ESP_WIFI_ANY
     return xTimerStop(timer, ticks);
 #else
     return false;
@@ -324,7 +324,7 @@ static bool timer_stop_wrapper(void *timer, uint32_t ticks)
 
 static bool timer_delete_wrapper(void *timer, uint32_t ticks)
 {
-#ifdef MODULE_ESP_WIFI_ANY
+#if MODULE_ESP_WIFI_ANY
     return xTimerDelete(timer, ticks);
 #else
     return false;

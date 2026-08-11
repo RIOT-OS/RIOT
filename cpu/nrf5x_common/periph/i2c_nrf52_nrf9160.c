@@ -194,7 +194,7 @@ void i2c_init(i2c_t dev)
     bus(dev)->ENABLE = TWIM_ENABLE_ENABLE_Enabled;
 }
 
-#ifdef MODULE_PERIPH_I2C_RECONFIGURE
+#if MODULE_PERIPH_I2C_RECONFIGURE
 void i2c_init_pins(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
@@ -219,7 +219,7 @@ void i2c_acquire(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
 
-    if (IS_USED(MODULE_PERIPH_I2C_RECONFIGURE)) {
+    if (MODULE_PERIPH_I2C_RECONFIGURE) {
         mutex_lock(&locks[dev]);
     }
 
@@ -237,7 +237,7 @@ void i2c_release(i2c_t dev)
 
     bus(dev)->ENABLE = TWIM_ENABLE_ENABLE_Disabled;
 
-    if (IS_USED(MODULE_PERIPH_I2C_RECONFIGURE)) {
+    if (MODULE_PERIPH_I2C_RECONFIGURE) {
         mutex_unlock(&locks[dev]);
     }
 

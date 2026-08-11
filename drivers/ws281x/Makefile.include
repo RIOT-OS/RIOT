@@ -3,3 +3,11 @@ PSEUDOMODULES += ws281x_%
 
 USEMODULE_INCLUDES_ws281x := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_ws281x)
+
+MODULE_DEFS_NEEDED += \
+  ws281x_atmega \
+  ws281x_esp32 \
+  ws281x_spi \
+  ws281x_timer_gpio_ll \
+  ws281x_vt100 \
+  #

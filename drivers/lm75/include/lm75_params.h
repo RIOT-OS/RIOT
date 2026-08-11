@@ -77,13 +77,13 @@ extern "C" {
 #define CONFIG_FAULT_QUEUE     FAULT_1
 #elif IS_ACTIVE(CONFIG_FAULT_2)
 #define CONFIG_FAULT_QUEUE     FAULT_2
-#elif (IS_ACTIVE(CONFIG_FAULT_3) && IS_USED(MODULE_TMP1075))
+#elif (IS_ACTIVE(CONFIG_FAULT_3) && MODULE_TMP1075)
 #define CONFIG_FAULT_QUEUE     FAULT_3
-#elif (IS_ACTIVE(CONFIG_FAULT_4) && IS_USED(MODULE_LM75A))
+#elif (IS_ACTIVE(CONFIG_FAULT_4) && MODULE_LM75A)
 #define CONFIG_FAULT_QUEUE     FAULT_4
-#elif (IS_ACTIVE(CONFIG_FAULT_4) && IS_USED(MODULE_TMP1075))
+#elif (IS_ACTIVE(CONFIG_FAULT_4) && MODULE_TMP1075)
 #define CONFIG_FAULT_QUEUE     FAULT_4_TMP1075
-#elif (IS_ACTIVE(CONFIG_FAULT_6) && IS_USED(MODULE_LM75A))
+#elif (IS_ACTIVE(CONFIG_FAULT_6) && MODULE_LM75A)
 #define CONFIG_FAULT_QUEUE     FAULT_6
 #endif
 
@@ -134,7 +134,7 @@ extern "C" {
 #endif
 
 #ifndef LM75_PARAMS
-#if IS_USED(MODULE_LM75A)
+#if MODULE_LM75A
 #define LM75_PARAMS        {     .res             = &lm75a_properties, \
                                  .gpio_alarm      = LM75_PARAM_INT, \
                                  .conv_rate       = LM75A_CONV_RATE, \
@@ -147,7 +147,7 @@ extern "C" {
 
 #endif
 
-#if IS_USED(MODULE_TMP1075)
+#if MODULE_TMP1075
 #define LM75_PARAMS        {    .res                 = &tmp1075_properties, \
                                 .gpio_alarm          = LM75_PARAM_INT, \
                                 .conv_rate           = TMP1075_CONV_RATE, \

@@ -22,19 +22,19 @@
 #include "test_common.h"
 #include "bhp/event.h"
 
-#ifdef MODULE_CC2538_RF
+#if MODULE_CC2538_RF
 #include "cc2538_rf.h"
 #endif
 
-#ifdef MODULE_ESP_IEEE802154
+#if MODULE_ESP_IEEE802154
 #include "esp_ieee802154_hal.h"
 #endif
 
-#ifdef MODULE_NRF802154
+#if MODULE_NRF802154
 #include "nrf802154.h"
 #endif
 
-#ifdef MODULE_SOCKET_ZEP
+#if MODULE_SOCKET_ZEP
 #include "socket_zep.h"
 #include "socket_zep_params.h"
 #endif
@@ -42,7 +42,7 @@
 #include "event/thread.h"
 extern void auto_init_event_thread(void);
 
-#ifdef MODULE_KW2XRF
+#if MODULE_KW2XRF
 #include "kw2xrf.h"
 #include "kw2xrf_params.h"
 #define KW2XRF_NUM   ARRAY_SIZE(kw2xrf_params)
@@ -50,7 +50,7 @@ static kw2xrf_t kw2xrf_dev[KW2XRF_NUM];
 static bhp_event_t kw2xrf_bhp[KW2XRF_NUM];
 #endif
 
-#ifdef MODULE_MRF24J40
+#if MODULE_MRF24J40
 #include "mrf24j40.h"
 #include "mrf24j40_params.h"
 #define MRF24J40_NUM    ARRAY_SIZE(mrf24j40_params)
@@ -60,7 +60,7 @@ static bhp_event_t mrf24j40_bhp[MRF24J40_NUM];
 
 void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
 {
-    if (IS_USED(MODULE_EVENT_THREAD)) {
+    if (MODULE_EVENT_THREAD) {
         auto_init_event_thread();
     }
 
@@ -76,28 +76,28 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
         assert(false);
     }
 
-#ifdef MODULE_CC2538_RF
+#if MODULE_CC2538_RF
     if ((radio = cb(IEEE802154_DEV_TYPE_CC2538_RF, opaque)) ){
         cc2538_rf_hal_setup(radio);
         cc2538_init();
     }
 #endif
 
-#ifdef MODULE_ESP_IEEE802154
+#if MODULE_ESP_IEEE802154
     if ((radio = cb(IEEE802154_DEV_TYPE_ESP_IEEE802154, opaque)) ){
         esp_ieee802154_setup(radio);
         esp_ieee802154_init();
     }
 #endif
 
-#ifdef MODULE_NRF802154
+#if MODULE_NRF802154
     if ((radio = cb(IEEE802154_DEV_TYPE_NRF802154, opaque)) ){
         nrf802154_hal_setup(radio);
         nrf802154_init();
     }
 #endif
 
-#ifdef MODULE_KW2XRF
+#if MODULE_KW2XRF
     if ((radio = cb(IEEE802154_DEV_TYPE_KW2XRF, opaque)) ){
         for (unsigned i = 0; i < KW2XRF_NUM; i++) {
             const kw2xrf_params_t *p = &kw2xrf_params[i];
@@ -108,7 +108,7 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
     }
 #endif
 
-#ifdef MODULE_SOCKET_ZEP
+#if MODULE_SOCKET_ZEP
     static socket_zep_t _socket_zeps[SOCKET_ZEP_MAX];
     if ((radio = cb(IEEE802154_DEV_TYPE_SOCKET_ZEP, opaque)) ){
         socket_zep_hal_setup(&_socket_zeps[0], radio);
@@ -116,7 +116,7 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
     }
 #endif
 
-#ifdef MODULE_MRF24J40
+#if MODULE_MRF24J40
     if ((radio = cb(IEEE802154_DEV_TYPE_MRF24J40, opaque)) ){
         for (unsigned i = 0; i < MRF24J40_NUM; i++) {
             const mrf24j40_params_t *p = &mrf24j40_params[i];

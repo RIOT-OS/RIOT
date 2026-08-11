@@ -42,7 +42,7 @@ extern "C" {
  */
 #define GNRC_SIXLOWPAN_FRAG_SFR_CONGURE_UNIT    (1U)
 
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE) || DOXYGEN
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE || DOXYGEN
 /**
  * @brief   Retrieve CongURE state object from a pool of free objects
  *
@@ -85,7 +85,7 @@ static inline congure_snd_t *gnrc_sixlowpan_frag_sfr_congure_snd_get(void)
  */
 static inline void gnrc_sixlowpan_frag_sfr_congure_snd_free(congure_snd_t *c)
 {
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
     c->driver = NULL;
 #else
     (void)c;
@@ -103,7 +103,7 @@ static inline void gnrc_sixlowpan_frag_sfr_congure_snd_free(congure_snd_t *c)
  */
 static inline void gnrc_sixlowpan_frag_sfr_congure_snd_destroy(gnrc_sixlowpan_frag_fb_t *fb)
 {
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
     gnrc_sixlowpan_frag_sfr_congure_snd_free(fb->sfr.congure);
     fb->sfr.congure = NULL;
 #else
@@ -121,7 +121,7 @@ static inline void gnrc_sixlowpan_frag_sfr_congure_snd_destroy(gnrc_sixlowpan_fr
  */
 static inline void gnrc_sixlowpan_frag_sfr_congure_snd_init(gnrc_sixlowpan_frag_fb_t *fb)
 {
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
     fb->sfr.congure->driver->init(fb->sfr.congure, fb);
 #else
     (void)fb;
@@ -139,7 +139,7 @@ static inline void gnrc_sixlowpan_frag_sfr_congure_snd_init(gnrc_sixlowpan_frag_
  */
 static inline void gnrc_sixlowpan_frag_sfr_congure_snd_setup(gnrc_sixlowpan_frag_fb_t *fb)
 {
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
     if (fb->sfr.congure == NULL) {
         fb->sfr.congure = gnrc_sixlowpan_frag_sfr_congure_snd_get();
         assert(fb->sfr.congure);
@@ -171,7 +171,7 @@ static inline void gnrc_sixlowpan_frag_sfr_congure_snd_setup(gnrc_sixlowpan_frag
  */
 static inline bool gnrc_sixlowpan_frag_sfr_congure_snd_in_cwnd(gnrc_sixlowpan_frag_fb_t *fb)
 {
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
     return fb->sfr.frags_sent < fb->sfr.congure->cwnd;
 #else
     return fb->sfr.frags_sent < CONFIG_GNRC_SIXLOWPAN_SFR_OPT_WIN_SIZE;
@@ -196,7 +196,7 @@ static inline bool gnrc_sixlowpan_frag_sfr_congure_snd_in_cwnd(gnrc_sixlowpan_fr
  */
 static inline bool gnrc_sixlowpan_frag_sfr_congure_snd_next_in_cwnd(gnrc_sixlowpan_frag_fb_t *fb)
 {
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
     return (fb->sfr.frags_sent + GNRC_SIXLOWPAN_FRAG_SFR_CONGURE_UNIT)
         < fb->sfr.congure->cwnd;
 #else
@@ -217,7 +217,7 @@ static inline bool gnrc_sixlowpan_frag_sfr_congure_snd_next_in_cwnd(gnrc_sixlowp
 static inline bool gnrc_sixlowpan_frag_sfr_congure_snd_has_inter_frame_gap(void)
 {
     return (CONFIG_GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US > 0) ||
-           IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE);
+           MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE;
 }
 
 /**
@@ -243,7 +243,7 @@ static inline uint32_t gnrc_sixlowpan_frag_sfr_congure_snd_inter_frame_gap(
         gnrc_sixlowpan_frag_fb_t *fb
     )
 {
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
     if (fb != NULL) {
         congure_snd_t *c = fb->sfr.congure;
         int32_t res = c->driver->inter_msg_interval(
@@ -276,7 +276,7 @@ static inline void gnrc_sixlowpan_frag_sfr_congure_snd_report_frag_sent(
         gnrc_sixlowpan_frag_fb_t *fb
     )
 {
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
     congure_snd_t *c = fb->sfr.congure;
 
     c->driver->report_msg_sent(c, GNRC_SIXLOWPAN_FRAG_SFR_CONGURE_UNIT);
@@ -300,7 +300,7 @@ static inline void gnrc_sixlowpan_frag_sfr_congure_snd_report_frag_discard(
         gnrc_sixlowpan_frag_fb_t *fb
     )
 {
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
     congure_snd_t *c = fb->sfr.congure;
 
     c->driver->report_msg_discarded(c, GNRC_SIXLOWPAN_FRAG_SFR_CONGURE_UNIT);
@@ -324,7 +324,7 @@ static inline void gnrc_sixlowpan_frag_sfr_congure_snd_report_frags_timeout(
         gnrc_sixlowpan_frag_fb_t *fb
     )
 {
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
     congure_snd_t *c = fb->sfr.congure;
 
     c->driver->report_msgs_timeout(c, (congure_snd_msg_t *)(&fb->sfr.window));
@@ -350,7 +350,7 @@ static inline void gnrc_sixlowpan_frag_sfr_congure_snd_report_frags_lost(
         gnrc_sixlowpan_frag_fb_t *fb, congure_snd_msg_t *frags
     )
 {
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
     congure_snd_t *c = fb->sfr.congure;
 
     c->driver->report_msgs_lost(c, frags);
@@ -379,7 +379,7 @@ static inline void gnrc_sixlowpan_frag_sfr_congure_snd_report_frag_acked(
         congure_snd_ack_t *ack
     )
 {
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
     congure_snd_t *c = fb->sfr.congure;
 
     c->driver->report_msg_acked(c, frag, ack);
@@ -410,7 +410,7 @@ static inline void gnrc_sixlowpan_frag_sfr_congure_snd_report_ecn(
         gnrc_sixlowpan_frag_fb_t *fb, uint32_t time
     )
 {
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
     congure_snd_t *c = fb->sfr.congure;
 
     c->driver->report_ecn_ce(c, (ztimer_now_t)time);

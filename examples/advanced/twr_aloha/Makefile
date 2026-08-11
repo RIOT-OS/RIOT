@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  uwb_core_rng_trx_info \
+  #
 APPLICATION = twr-aloha
 
 # If no BOARD is found in the environment, use this default:

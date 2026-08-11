@@ -35,3 +35,12 @@ ifeq ($(USE_LIBUCONTEXT),1)
   CFLAGS += $(pkg-config libucontext --cflags) -DUSE_LIBUCONTEXT=1
   LINKFLAGS += $(shell pkg-config libucontext --libs)
 endif
+
+MODULE_DEFS_NEEDED += \
+  periph_can \
+  periph_gpio_linux \
+  periph_gpio_mock \
+  periph_i2c_mock \
+  periph_spi \
+  periph_spidev_linux \
+  #

@@ -24,7 +24,7 @@ extern void pm_reboot(void*);
 void board_init(void)
 {
     /* configure software RST button */
-#ifdef MODULE_BOARD_SOFTWARE_RESET
+#if MODULE_BOARD_SOFTWARE_RESET
     gpio_init_int(BTN0_PIN, BTN0_MODE, GPIO_FALLING,
                   pm_reboot, NULL);
 #endif

@@ -27,11 +27,11 @@
 #include "net/gnrc/ipv6/ext/frag.h"
 #include "net/gnrc/ipv6/ext/opt.h"
 #include "net/gnrc/ipv6/ext/rh.h"
-#if defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) && \
-    defined(MODULE_GNRC_IPV6_EXT_FRAG)
+#if MODULE_GNRC_SIXLOWPAN_IPHC_NHC && \
+    MODULE_GNRC_IPV6_EXT_FRAG
 #include "net/udp.h"
-#endif  /* defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) &&
-         * defined(MODULE_GNRC_IPV6_EXT_FRAG) */
+#endif  /* MODULE_GNRC_SIXLOWPAN_IPHC_NHC &&
+         * MODULE_GNRC_IPV6_EXT_FRAG */
 
 #include "net/gnrc/ipv6/ext.h"
 
@@ -108,22 +108,22 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
                                           uint8_t *protnum)
 {
     bool is_ext = true;
-#if defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) && \
-    defined(MODULE_GNRC_IPV6_EXT_FRAG)
+#if MODULE_GNRC_SIXLOWPAN_IPHC_NHC && \
+    MODULE_GNRC_IPV6_EXT_FRAG
     bool is_frag = false;
-#endif  /* defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) &&
-         * defined(MODULE_GNRC_IPV6_EXT_FRAG) */
+#endif  /* MODULE_GNRC_SIXLOWPAN_IPHC_NHC &&
+         * MODULE_GNRC_IPV6_EXT_FRAG */
 
     while (is_ext) {
-#if defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) && \
-    defined(MODULE_GNRC_IPV6_EXT_FRAG)
+#if MODULE_GNRC_SIXLOWPAN_IPHC_NHC && \
+    MODULE_GNRC_IPV6_EXT_FRAG
         if (*protnum == PROTNUM_IPV6_EXT_FRAG) {
             /* just assigning the if expression might override it if
              * fragment header is not the last extension header ;-) */
             is_frag = true;
         }
-#endif  /* defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) &&
-         * defined(MODULE_GNRC_IPV6_EXT_FRAG) */
+#endif  /* MODULE_GNRC_SIXLOWPAN_IPHC_NHC &&
+         * MODULE_GNRC_IPV6_EXT_FRAG */
         switch (*protnum) {
             case PROTNUM_IPV6_EXT_DST:
             case PROTNUM_IPV6_EXT_RH:
@@ -149,8 +149,8 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
                 }
                 break;
             }
-#if defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) && \
-    defined(MODULE_GNRC_IPV6_EXT_FRAG)
+#if MODULE_GNRC_SIXLOWPAN_IPHC_NHC && \
+    MODULE_GNRC_IPV6_EXT_FRAG
             case PROTNUM_UDP:
                 if (is_frag) {
                     DEBUG("gnrc_ipv6_ext: adapting compressed header length\n");
@@ -175,8 +175,8 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
                 }
                 is_ext = false;
                 break;
-#endif  /* defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC) &&
-         * defined(MODULE_GNRC_IPV6_EXT_FRAG) */
+#endif  /* MODULE_GNRC_SIXLOWPAN_IPHC_NHC &&
+         * MODULE_GNRC_IPV6_EXT_FRAG */
             default:
                 is_ext = false;
                 break;
@@ -189,7 +189,7 @@ static bool _duplicate_hopopt(gnrc_pktsnip_t *pkt, unsigned protnum)
 {
     if (protnum == PROTNUM_IPV6_EXT_HOPOPT) {
         DEBUG("ipv6: duplicate Hop-by-Hop header\n");
-#ifdef MODULE_GNRC_ICMPV6_ERROR
+#if MODULE_GNRC_ICMPV6_ERROR
         gnrc_icmpv6_error_param_prob_send(
                 ICMPV6_ERROR_PARAM_PROB_NH,
                 &((ipv6_ext_t *)pkt->next->data)->nh, pkt
@@ -281,7 +281,7 @@ static gnrc_pktsnip_t *_demux(gnrc_pktsnip_t *pkt, unsigned protnum)
     }
     switch (protnum) {
         case PROTNUM_IPV6_EXT_RH:
-#ifdef MODULE_GNRC_IPV6_EXT_RH
+#if MODULE_GNRC_IPV6_EXT_RH
             switch (gnrc_ipv6_ext_rh_process(pkt)) {
                 case GNRC_IPV6_EXT_RH_AT_DST:
                     /* We are the final destination of the route laid out in
@@ -308,12 +308,12 @@ static gnrc_pktsnip_t *_demux(gnrc_pktsnip_t *pkt, unsigned protnum)
             break;
 #endif  /* MODULE_GNRC_IPV6_EXT_RH */
         case PROTNUM_IPV6_EXT_FRAG:
-#ifdef MODULE_GNRC_IPV6_EXT_FRAG
+#if MODULE_GNRC_IPV6_EXT_FRAG
             return gnrc_ipv6_ext_frag_reass(pkt);
 #endif  /* MODULE_GNRC_IPV6_EXT_FRAG */
         case PROTNUM_IPV6_EXT_HOPOPT:
         case PROTNUM_IPV6_EXT_DST:
-            if (IS_USED(MODULE_GNRC_IPV6_EXT_OPT)) {
+            if (MODULE_GNRC_IPV6_EXT_OPT) {
                 return gnrc_ipv6_ext_opt_process(pkt, protnum);
             }
             /* Intentionally falls through */

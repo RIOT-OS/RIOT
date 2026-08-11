@@ -29,7 +29,7 @@
 #include "include/gnrc_tcp_option.h"
 #include "include/gnrc_tcp_pkt.h"
 
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
 #endif
 
@@ -59,7 +59,7 @@ int _gnrc_tcp_pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt,
     gnrc_pktsnip_t *tcp_snp = gnrc_pktsnip_search_type(in_pkt,
                                                        GNRC_NETTYPE_TCP);
     tcp_hdr_t *tcp_hdr_in = (tcp_hdr_t *)tcp_snp->data;
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     gnrc_pktsnip_t *ip6_snp = gnrc_pktsnip_search_type(in_pkt,
                                                        GNRC_NETTYPE_IPV6);
     ipv6_hdr_t *ip6_hdr = (ipv6_hdr_t *)ip6_snp->data;
@@ -105,7 +105,7 @@ int _gnrc_tcp_pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt,
     *out_pkt = tcp_snp;
 
     /* Build new network layer header */
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     ip6_snp = gnrc_ipv6_hdr_build(tcp_snp, &(ip6_hdr->dst), &(ip6_hdr->src));
     if (ip6_snp == NULL) {
         gnrc_pktbuf_release(tcp_snp);
@@ -225,7 +225,7 @@ int _gnrc_tcp_pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt,
     }
 
     /* Build network layer header */
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     ipv6_addr_t *src_addr = (ipv6_addr_t *) tcb->local_addr;
     ipv6_addr_t *dst_addr = (ipv6_addr_t *) tcb->peer_addr;
 
@@ -540,7 +540,7 @@ uint16_t _gnrc_tcp_pkt_calc_csum(const gnrc_pktsnip_t *hdr,
 
     /* Process network layer header */
     switch (pseudo_hdr->type) {
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
         case GNRC_NETTYPE_IPV6:
             csum = ipv6_hdr_inet_csum(csum, pseudo_hdr->data, PROTNUM_TCP, len);
             break;

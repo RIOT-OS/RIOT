@@ -31,7 +31,7 @@ static int _get_slot(void)
     uint32_t version = 0;
     int slot = -1;
 
-    if (!IS_USED(MODULE_RIOTBOOT_SLOT)) {
+    if (!MODULE_RIOTBOOT_SLOT) {
         return -1;
     }
 
@@ -55,7 +55,7 @@ static int _get_slot(void)
 
 static void _boot_default(int slot)
 {
-    if (!IS_USED(MODULE_RIOTBOOT_SLOT)) {
+    if (!MODULE_RIOTBOOT_SLOT) {
         /* boot 'raw' firmware image */
         cpu_jump_to_image(SLOT0_OFFSET);
         return;
@@ -74,7 +74,7 @@ void kernel_init(void)
 {
     int slot = -1;
 
-    if (IS_USED(MODULE_RIOTBOOT_SERIAL)) {
+    if (MODULE_RIOTBOOT_SERIAL) {
         slot = riotboot_serial_loader();
     }
 

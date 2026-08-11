@@ -73,13 +73,13 @@ typedef struct {
     sdmmc_pin_t dat1;           /**< Data Line Bit 1 pin */
     sdmmc_pin_t dat2;           /**< Data Line Bit 2 pin */
     sdmmc_pin_t dat3;           /**< Data Line Bit 3 pin */
-#if IS_USED(MODULE_PERIPH_SDMMC_8BIT)
+#if MODULE_PERIPH_SDMMC_8BIT
     sdmmc_pin_t dat4;           /**< Data Line Bit 4 pin */
     sdmmc_pin_t dat5;           /**< Data Line Bit 5 pin */
     sdmmc_pin_t dat6;           /**< Data Line Bit 6 pin */
     sdmmc_pin_t dat7;           /**< Data Line Bit 7 pin */
 #endif
-#if IS_USED(MODULE_PERIPH_DMA)
+#if MODULE_PERIPH_DMA
     dma_t dma;                  /**< Logical DMA stream used for SDIO/SDMMC */
     uint8_t dma_chan;           /**< DMA channel used for SDIO/SDMMC */
 #endif

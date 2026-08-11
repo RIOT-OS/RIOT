@@ -1,5 +1,11 @@
 MODULE = boards_common_silabs
 
+MODULE_DEFS_NEEDED += \
+  silabs_aem \
+  silabs_bc \
+  silabs_pic \
+  #
+
 ifneq (,$(filter silabs_aem,$(USEMODULE)))
   DIRS += drivers/aem
 endif

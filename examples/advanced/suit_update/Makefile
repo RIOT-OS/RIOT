@@ -1,3 +1,12 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_gpio \
+  periph_gpio_irq \
+  riotboot_slot \
+  suit_storage_flashwrite \
+  suit_storage_ram \
+  suit_storage_vfs \
+  #
 # name of your application
 APPLICATION = suit_update
 

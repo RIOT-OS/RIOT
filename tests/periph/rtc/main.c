@@ -58,7 +58,7 @@ static void cb(void *arg)
     mutex_unlock(arg);
 }
 
-#ifdef MODULE_PERIPH_RTC_MEM
+#if MODULE_PERIPH_RTC_MEM
 static const uint8_t riot_msg_offset = 1;
 static const char riot_msg[] = "RIOT";
 static void _set_rtc_mem(void)
@@ -126,7 +126,7 @@ int main(void)
     _get_rtc_mem();
 
     /* read RTC to retrieve initial */
-    if (IS_USED(MODULE_PERIPH_RTC_MS)) {
+    if (MODULE_PERIPH_RTC_MS) {
         rtc_get_time_ms(&time, &ms);
         print_time_ms("Clock value is now ", &time, ms);
     } else {
@@ -151,7 +151,7 @@ int main(void)
     ms = 0;
 
     /* read RTC to confirm value */
-    if (IS_USED(MODULE_PERIPH_RTC_MS)) {
+    if (MODULE_PERIPH_RTC_MS) {
         rtc_get_time_ms(&time, &ms);
         print_time_ms("Clock value is now ", &time, ms);
     } else {
@@ -176,7 +176,7 @@ int main(void)
 
     /* clear alarm */
     rtc_clear_alarm();
-    if (IS_USED(MODULE_PERIPH_RTC_MS)) {
+    if (MODULE_PERIPH_RTC_MS) {
         rtc_get_time_ms(&time, &ms);
         print_time_ms("  Alarm cleared at ", &time, ms);
     } else {
@@ -197,7 +197,7 @@ int main(void)
     time = (struct tm){0};
     ms = 0;
 
-    if (IS_USED(MODULE_PERIPH_RTC_MS)) {
+    if (MODULE_PERIPH_RTC_MS) {
         rtc_get_time_ms(&time, &ms);
         print_time_ms(message, &time, ms);
     } else {

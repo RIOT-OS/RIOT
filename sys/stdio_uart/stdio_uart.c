@@ -49,7 +49,7 @@ static void _init(void)
 {
     uart_rx_cb_t cb = NULL;
 
-    if (IS_USED(MODULE_STDIO_UART_RX)) {
+    if (MODULE_STDIO_UART_RX) {
         cb = _stdio_rx_write_one_wrapper;
     }
 
@@ -59,7 +59,7 @@ static void _init(void)
 static ssize_t _write(const void *buffer, size_t len)
 {
     ssize_t result = len;
-    if (IS_USED(MODULE_STDIO_UART_ONLCR)) {
+    if (MODULE_STDIO_UART_ONLCR) {
         static const uint8_t crlf[2] = { (uint8_t)'\r', (uint8_t)'\n' };
         const uint8_t *buf = buffer;
         while (len) {

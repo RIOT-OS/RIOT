@@ -2,3 +2,7 @@ override RAM_LEN = 65536
 override EXP_RAM = 1
 
 include $(RIOTBOARD)/common/atxmega/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_hw_fc \
+  #

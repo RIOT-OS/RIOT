@@ -138,7 +138,7 @@ static inline void gpio_ll_write(gpio_port_t port, uword_t value)
     p->ODR = value;
 }
 
-#ifdef MODULE_PERIPH_GPIO_LL_SWITCH_DIR
+#if MODULE_PERIPH_GPIO_LL_SWITCH_DIR
 static inline uword_t gpio_ll_prepare_switch_dir(uword_t mask)
 {
     /* implementation too large to always inline */

@@ -1115,7 +1115,7 @@ static inline ssize_t sock_dtls_sendv(sock_dtls_t *sock,
  */
 void sock_dtls_close(sock_dtls_t *sock);
 
-#ifdef MODULE_SOCK_DTLS
+#if MODULE_SOCK_DTLS
 #include "sock_dtls_types.h"
 #endif
 

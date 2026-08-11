@@ -27,7 +27,7 @@
 #include "cose/crypto.h"
 #include "cose/crypto/riot.h"
 
-#if IS_USED(MODULE_AUTO_INIT)
+#if MODULE_AUTO_INIT
 #include "auto_init_utils.h"
 #endif
 
@@ -43,7 +43,7 @@ void libcose_crypt_init(void)
     cose_crypt_set_rng(_riot_random_bytes, NULL);
 }
 
-#if IS_USED(MODULE_AUTO_INIT_LIBCOSE_CRYPT)
+#if MODULE_AUTO_INIT_LIBCOSE_CRYPT
 /* initialize just after random module */
 AUTO_INIT(libcose_crypt_init, AUTO_INIT_PRIO_MOD_LIBCOSE);
 #endif

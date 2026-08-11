@@ -65,7 +65,7 @@ static inline void pm_set_lowest_normal(void)
     /* reset system watchdog timer */
     system_wdt_feed();
 
-#ifndef MODULE_ESP_QEMU
+#if !MODULE_ESP_QEMU
     /* passive wait for interrupt to leave lowest power mode */
 #if __xtensa__
     __asm__ volatile ("waiti 0");
@@ -101,7 +101,7 @@ void pm_reboot(void)
 {
     DEBUG ("%s\n", __func__);
 
-    if (IS_USED(MODULE_ESP_WIFI_ANY)) {
+    if (MODULE_ESP_WIFI_ANY) {
         /* stop WiFi if necessary */
         esp_wifi_stop();
     }
@@ -117,7 +117,7 @@ void pm_reboot(void)
     software_reset();
 }
 
-#if !IS_USED(MODULE_PM_LAYERED)
+#if !MODULE_PM_LAYERED
 
 void pm_set_lowest(void)
 {
@@ -198,7 +198,7 @@ void pm_set(unsigned mode)
         UNREACHABLE();
     }
     else if (mode == ESP_PM_LIGHT_SLEEP) {
-        if (IS_USED(MODULE_ESP_WIFI_ANY)) {
+        if (MODULE_ESP_WIFI_ANY) {
             /* stop WiFi if necessary */
             esp_wifi_stop();
         }
@@ -213,7 +213,7 @@ void pm_set(unsigned mode)
                __func__, mode, system_get_time(), wakeup_reason);
 
         /* restart WiFi if necessary */
-        if (IS_USED(MODULE_ESP_WIFI_ANY) && (esp_wifi_start() != ESP_OK)) {
+        if (MODULE_ESP_WIFI_ANY && (esp_wifi_start() != ESP_OK)) {
             LOG_ERROR("esp_wifi_start failed\n");
         }
     }

@@ -4,3 +4,10 @@ PROG_TTY_BOARD_FILTER := --vendor 'Adafruit Industries' --model 'Grand Central M
 include $(RIOTBOARD)/common/samdx1-arduino-bootloader/Makefile.include
 # Include handling of serial and non-bossa programmers (if selected by user)
 include $(RIOTMAKE)/boards/sam0.inc.mk
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  periph_spi_on_qspi \
+  periph_uart_hw_fc \
+  sdcard_spi \
+  #

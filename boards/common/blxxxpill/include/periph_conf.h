@@ -69,7 +69,7 @@ static const adc_conf_t adc_config[] = {
      * 2 PWM outputs). */
 #if !defined(BOARD_BLACKPILL_STM32F103C8) \
     && !defined(BOARD_BLACKPILL_STM32F103CB) \
-    && !defined(MODULE_PERIPH_PWM)
+    && !MODULE_PERIPH_PWM
     { .pin = GPIO_PIN(PORT_B, 0), .dev = 0, .chan = 8 },
     { .pin = GPIO_PIN(PORT_B, 1), .dev = 0, .chan = 9 },
 #endif
@@ -150,7 +150,7 @@ static const qdec_conf_t qdec_config[] = {
         .irqn       = TIM4_IRQn,
     },
     /* this conflicts with PWM */
-#ifndef MODULE_PERIPH_PWM
+#if !MODULE_PERIPH_PWM
     {
         .dev        = TIM3,
         .max        = 0x0000ffff,
@@ -164,7 +164,7 @@ static const qdec_conf_t qdec_config[] = {
     },
 #endif
     /* this conflicts with UART_DEV(0) */
-#ifndef MODULE_PERIPH_UART
+#if !MODULE_PERIPH_UART
     {
         .dev      = TIM1,
         .max      = 0x0000ffff,
@@ -192,7 +192,7 @@ static const uart_conf_t uart_config[] = {
         .tx_pin     = GPIO_PIN(PORT_A, 9),
         .bus        = APB2,
         .irqn       = USART1_IRQn,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma        = 2,
         .dma_chan   = DMA_CHAN_CONFIG_UNSUPPORTED
 #endif
@@ -204,7 +204,7 @@ static const uart_conf_t uart_config[] = {
         .tx_pin     = GPIO_PIN(PORT_A, 2),
         .bus        = APB1,
         .irqn       = USART2_IRQn,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma        = 4,
         .dma_chan   = DMA_CHAN_CONFIG_UNSUPPORTED
 #endif
@@ -216,7 +216,7 @@ static const uart_conf_t uart_config[] = {
         .tx_pin     = GPIO_PIN(PORT_B, 10),
         .bus        = APB1,
         .irqn       = USART3_IRQn,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma        = 0,
         .dma_chan   = DMA_CHAN_CONFIG_UNSUPPORTED
 #endif
@@ -307,14 +307,14 @@ static const spi_conf_t spi_config[] = {
         .cs_pin   = GPIO_PIN(PORT_B, 12),
         .rccmask  = RCC_APB1ENR_SPI2EN,
         .apbbus   = APB1,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_dma   = 3,
         .tx_dma_chan = DMA_CHAN_CONFIG_UNSUPPORTED,
         .rx_dma   = 2,
         .rx_dma_chan = DMA_CHAN_CONFIG_UNSUPPORTED
 #endif
     },
-#ifndef MODULE_PERIPH_ADC
+#if !MODULE_PERIPH_ADC
     {
         .dev      = SPI1,
         .mosi_pin = GPIO_PIN(PORT_A, 7),
@@ -323,7 +323,7 @@ static const spi_conf_t spi_config[] = {
         .cs_pin   = GPIO_PIN(PORT_A, 4),
         .rccmask  = RCC_APB2ENR_SPI1EN,
         .apbbus   = APB2,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_dma   = 1,
         .tx_dma_chan = DMA_CHAN_CONFIG_UNSUPPORTED,
         .rx_dma   = 0,

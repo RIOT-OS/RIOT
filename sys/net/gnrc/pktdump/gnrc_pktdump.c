@@ -53,7 +53,7 @@ static void _dump_snip(gnrc_pktsnip_t *pkt)
     switch (pkt->type) {
     case GNRC_NETTYPE_NETIF:
         printf("NETTYPE_NETIF (%i)\n", pkt->type);
-        if (IS_USED(MODULE_GNRC_NETIF_HDR)) {
+        if (MODULE_GNRC_NETIF_HDR) {
             gnrc_netif_hdr_print(pkt->data);
             hdr_len = pkt->size;
         }
@@ -61,68 +61,68 @@ static void _dump_snip(gnrc_pktsnip_t *pkt)
     case GNRC_NETTYPE_UNDEF:
         printf("NETTYPE_UNDEF (%i)\n", pkt->type);
         break;
-#if IS_USED(MODULE_GNRC_NETTYPE_SIXLOWPAN)
+#if MODULE_GNRC_NETTYPE_SIXLOWPAN
     case GNRC_NETTYPE_SIXLOWPAN:
         printf("NETTYPE_SIXLOWPAN (%i)\n", pkt->type);
-        if (IS_USED(MODULE_SIXLOWPAN)) {
+        if (MODULE_SIXLOWPAN) {
             sixlowpan_print(pkt->data, pkt->size);
             hdr_len = pkt->size;
         }
         break;
-#endif  /* IS_USED(MODULE_GNRC_NETTYPE_SIXLOWPAN) */
-#if IS_USED(MODULE_GNRC_NETTYPE_IPV6)
+#endif  /* MODULE_GNRC_NETTYPE_SIXLOWPAN */
+#if MODULE_GNRC_NETTYPE_IPV6
     case GNRC_NETTYPE_IPV6:
         printf("NETTYPE_IPV6 (%i)\n", pkt->type);
-        if (IS_USED(MODULE_IPV6_HDR)) {
+        if (MODULE_IPV6_HDR) {
             ipv6_hdr_print(pkt->data);
             hdr_len = sizeof(ipv6_hdr_t);
         }
         break;
-#endif  /* IS_USED(MODULE_GNRC_NETTYPE_IPV6) */
-#if IS_USED(MODULE_GNRC_NETTYPE_IPV6_EXT)
+#endif  /* MODULE_GNRC_NETTYPE_IPV6 */
+#if MODULE_GNRC_NETTYPE_IPV6_EXT
     case GNRC_NETTYPE_IPV6_EXT:
         printf("NETTYPE_IPV6_EXT (%i)\n", pkt->type);
         break;
-#endif  /* IS_USED(MODULE_GNRC_NETTYPE_IPV6_EXT) */
-#if IS_USED(MODULE_GNRC_NETTYPE_ICMPV6)
+#endif  /* MODULE_GNRC_NETTYPE_IPV6_EXT */
+#if MODULE_GNRC_NETTYPE_ICMPV6
     case GNRC_NETTYPE_ICMPV6:
         printf("NETTYPE_ICMPV6 (%i)\n", pkt->type);
-        if (IS_USED(MODULE_ICMPV6)) {
+        if (MODULE_ICMPV6) {
             icmpv6_hdr_print(pkt->data);
             hdr_len = sizeof(icmpv6_hdr_t);
         }
         break;
-#endif  /* IS_USED(MODULE_GNRC_NETTYPE_ICMPV6) */
-#if IS_USED(MODULE_GNRC_NETTYPE_CCN)
+#endif  /* MODULE_GNRC_NETTYPE_ICMPV6 */
+#if MODULE_GNRC_NETTYPE_CCN
     case GNRC_NETTYPE_CCN_CHUNK:
         printf("GNRC_NETTYPE_CCN_CHUNK (%i)\n", pkt->type);
         printf("Content is: %.*s\n", (int)pkt->size, (char*)pkt->data);
         hdr_len = pkt->size;
         break;
-#endif  /* IS_USED(MODULE_GNRC_NETTYPE_CCN) */
-#if IS_USED(MODULE_GNRC_NETTYPE_NDN)
+#endif  /* MODULE_GNRC_NETTYPE_CCN */
+#if MODULE_GNRC_NETTYPE_NDN
     case GNRC_NETTYPE_NDN:
             printf("NETTYPE_NDN (%i)\n", pkt->type);
         break;
-#endif  /* IS_USED(MODULE_GNRC_NETTYPE_NDN) */
-#if IS_USED(MODULE_GNRC_NETTYPE_TCP)
+#endif  /* MODULE_GNRC_NETTYPE_NDN */
+#if MODULE_GNRC_NETTYPE_TCP
     case GNRC_NETTYPE_TCP:
         printf("NETTYPE_TCP (%i)\n", pkt->type);
-        if (IS_USED(MODULE_TCP)) {
+        if (MODULE_TCP) {
             tcp_hdr_print(pkt->data);
             hdr_len = sizeof(tcp_hdr_t);
         }
         break;
-#endif  /* IS_USED(MODULE_GNRC_NETTYPE_TCP) */
-#if IS_USED(MODULE_GNRC_NETTYPE_UDP)
+#endif  /* MODULE_GNRC_NETTYPE_TCP */
+#if MODULE_GNRC_NETTYPE_UDP
     case GNRC_NETTYPE_UDP:
         printf("NETTYPE_UDP (%i)\n", pkt->type);
-        if (IS_USED(MODULE_UDP)) {
+        if (MODULE_UDP) {
             udp_hdr_print(pkt->data);
             hdr_len = sizeof(udp_hdr_t);
         }
         break;
-#endif  /* IS_USED(MODULE_GNRC_NETTYPE_UDP) */
+#endif  /* MODULE_GNRC_NETTYPE_UDP */
 #ifdef TEST_SUITES
     case GNRC_NETTYPE_TEST:
         printf("NETTYPE_TEST (%i)\n", pkt->type);

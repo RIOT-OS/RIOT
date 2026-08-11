@@ -28,7 +28,7 @@
 #include "include/gnrc_tcp_fsm.h"
 #include "include/gnrc_tcp_eventloop.h"
 
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
 #endif
 
@@ -81,7 +81,7 @@ static int _send(gnrc_pktsnip_t *pkt)
     }
 
     /* Search for network layer */
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     /* Get IPv6 header, discard packet if doesn't contain an ipv6 header */
     nw = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
     if (nw == NULL) {
@@ -139,7 +139,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
     }
     pkt = tcp;
 
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     /* Get IPv6 header, discard packet if doesn't contain an ip header */
     ip = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
     if (ip == NULL) {
@@ -199,7 +199,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
 
     /* Validate checksum */
     if (byteorder_ntohs(hdr->checksum) != _gnrc_tcp_pkt_calc_csum(tcp, ip, pkt)) {
-#ifndef MODULE_FUZZING
+#if !MODULE_FUZZING
         gnrc_pktbuf_release(pkt);
         TCP_DEBUG_ERROR("-EINVAL: Invalid checksum.");
         TCP_DEBUG_LEAVE;
@@ -212,7 +212,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
     mutex_lock(&list->lock);
     tcb = list->head;
     while (tcb) {
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
         /* Check if current TCB is fitting for the incoming packet */
         if (ip->type == GNRC_NETTYPE_IPV6 && tcb->address_family == AF_INET6) {
             /* If SYN is set, a connection is listening on that port ... */

@@ -3,3 +3,8 @@ INCLUDES += -isystem$(PKGDIRBASE)/driver_bme680
 INCLUDES += -isystem$(RIOTPKG)/driver_bme680/include
 
 DIRS += $(RIOTPKG)/driver_bme680/contrib
+
+MODULE_DEFS_NEEDED += \
+  periph_i2c \
+  periph_spi \
+  #

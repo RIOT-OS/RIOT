@@ -27,14 +27,14 @@
 #include "periph/pm.h"
 #include "shell.h"
 
-#ifdef MODULE_PM_LAYERED
+#if MODULE_PM_LAYERED
 #include "pm_layered.h"
 
 #endif /* MODULE_PM_LAYERED */
 
 static void _print_usage(void) {
     puts("Usage:");
-#ifdef MODULE_PM_LAYERED
+#if MODULE_PM_LAYERED
     puts("\tpm show: display current blockers for each power mode");
     puts("\tpm set <mode>: manually set power mode (lasts until WFI returns)");
     puts("\tpm block <mode>: manually block power mode");
@@ -43,7 +43,7 @@ static void _print_usage(void) {
     puts("\tpm off: call pm_off()");
 }
 
-#ifdef MODULE_PM_LAYERED
+#if MODULE_PM_LAYERED
 static int check_mode(int argc, char **argv)
 {
     if (argc != 3) {
@@ -156,7 +156,7 @@ static int _pm_handler(int argc, char **argv)
         return 1;
     }
 
-#ifdef MODULE_PM_LAYERED
+#if MODULE_PM_LAYERED
     if (!strcmp(argv[1], "show")) {
         if (argc != 2) {
             puts("usage: pm show: display current blockers for each power mode");

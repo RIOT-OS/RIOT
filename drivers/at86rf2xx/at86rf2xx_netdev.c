@@ -39,10 +39,10 @@
 #include "at86rf2xx_netdev.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
-#if IS_USED(IEEE802154_SECURITY)
+#if IS_ACTIVE(IEEE802154_SECURITY)
 #include "net/ieee802154_security.h"
 #endif
-#if IS_USED(MODULE_AT86RF2XX_AES_SPI)
+#if MODULE_AT86RF2XX_AES_SPI
 #include "at86rf2xx_aes.h"
 #endif
 
@@ -68,8 +68,8 @@ const netdev_driver_t at86rf2xx_driver = {
 /* Default AT86RF2XX channel */
 static const uint16_t at86rf2xx_chan_default = AT86RF2XX_DEFAULT_CHANNEL;
 
-#if IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
-    IS_USED(MODULE_IEEE802154_SECURITY)
+#if MODULE_AT86RF2XX_AES_SPI && \
+    MODULE_IEEE802154_SECURITY
 /**
  * @brief   Pass the 802.15.4 encryption key to the transceiver hardware
  *
@@ -137,8 +137,8 @@ static const ieee802154_radio_cipher_ops_t _at86rf2xx_cipher_ops = {
     .ecb = _at86rf2xx_ecb,
     .cbc = _at86rf2xx_cbc
 };
-#endif /* IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
-          IS_USED(MODULE_IEEE802154_SECURITY) */
+#endif /* MODULE_AT86RF2XX_AES_SPI && \
+          MODULE_IEEE802154_SECURITY */
 
 /* SOC has radio interrupts, store reference to netdev */
 static netdev_t *at86rfmega_dev;
@@ -184,8 +184,8 @@ static int _init(netdev_t *netdev)
         netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
                               &ack_req, sizeof(ack_req));
     }
-#if IS_USED(MODULE_IEEE802154_SECURITY) && \
-    IS_USED(MODULE_AT86RF2XX_AES_SPI)
+#if MODULE_IEEE802154_SECURITY && \
+    MODULE_AT86RF2XX_AES_SPI
     dev->netdev.sec_ctx.dev.cipher_ops = &_at86rf2xx_cipher_ops;
     dev->netdev.sec_ctx.dev.ctx = dev;
 #endif
@@ -321,7 +321,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         radio_info->rssi = RSSI_BASE_VAL + ed;
         DEBUG("[at86rf2xx] LQI:%d high is good, RSSI:%d high is either good or "
               "too much interference.\n", radio_info->lqi, radio_info->rssi);
-#if AT86RF2XX_IS_PERIPH && IS_USED(MODULE_NETDEV_IEEE802154_RX_TIMESTAMP)
+#if AT86RF2XX_IS_PERIPH && MODULE_NETDEV_IEEE802154_RX_TIMESTAMP
         /* AT86RF2XX_IS_PERIPH means the MCU is ATmegaRFR2 that has symbol counter */
         {
             uint32_t rx_sc;
@@ -567,7 +567,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             }
             break;
 
-#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+#if MODULE_NETDEV_IEEE802154_OQPSK
 
         case NETOPT_IEEE802154_PHY:
             assert(max_len >= sizeof(int8_t));
@@ -621,7 +621,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         case NETOPT_ADDRESS:
             assert(len == sizeof(network_uint16_t));
             memcpy(dev->netdev.short_addr, val, len);
-#ifdef MODULE_SIXLOWPAN
+#if MODULE_SIXLOWPAN
             /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
              * 0 for unicast addresses */
             dev->netdev.short_addr[0] &= 0x7F;
@@ -767,7 +767,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             res = sizeof(int8_t);
             break;
 
-#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+#if MODULE_NETDEV_IEEE802154_OQPSK
 
         case NETOPT_OQPSK_RATE:
             assert(len <= sizeof(int8_t));
@@ -815,7 +815,7 @@ static void _isr_send_complete(at86rf2xx_t *dev, uint8_t trac_status)
 
     if (netdev->event_callback) {
         switch (trac_status) {
-#ifdef MODULE_OPENTHREAD
+#if MODULE_OPENTHREAD
             case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
                 netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
                 DEBUG("[at86rf2xx] TX SUCCESS\n");

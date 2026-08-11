@@ -11,3 +11,7 @@ OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 
 # openocd programmer is supported
 PROGRAMMERS_SUPPORTED += openocd
+
+MODULE_DEFS_NEEDED += \
+  saul_pwm \
+  #

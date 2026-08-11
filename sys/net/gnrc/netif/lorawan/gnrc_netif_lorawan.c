@@ -224,7 +224,7 @@ static void _driver_cb(netdev_t *dev, netdev_event_t event)
             gnrc_lorawan_radio_tx_done_cb(mac);
             break;
         case NETDEV_EVENT_LINK_UP: {
-            if (IS_USED(MODULE_GNRC_IPV6)) {
+            if (MODULE_GNRC_IPV6) {
                 msg_t msg = { .type = GNRC_IPV6_NIB_IFACE_UP, .content = { .ptr = netif } };
 
                 msg_send(&msg, gnrc_ipv6_pid);
@@ -232,7 +232,7 @@ static void _driver_cb(netdev_t *dev, netdev_event_t event)
             break;
         }
         case NETDEV_EVENT_LINK_DOWN: {
-            if (IS_USED(MODULE_GNRC_IPV6)) {
+            if (MODULE_GNRC_IPV6) {
                 msg_t msg = { .type = GNRC_IPV6_NIB_IFACE_DOWN, .content = { .ptr = netif } };
 
                 msg_send(&msg, gnrc_ipv6_pid);
@@ -282,7 +282,7 @@ static int _init(gnrc_netif_t *netif)
 
     /* Convert default keys, address and EUIs to hex */
     fmt_hex_bytes(_appskey, CONFIG_LORAMAC_APP_SKEY_DEFAULT);
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
+    if (MODULE_GNRC_LORAWAN_1_1) {
         fmt_hex_bytes(_joineui, CONFIG_LORAMAC_JOIN_EUI_DEFAULT);
         fmt_hex_bytes(_appkey, CONFIG_LORAMAC_APP_KEY_DEFAULT);
         fmt_hex_bytes(_nwkkey, CONFIG_LORAMAC_NWK_KEY_DEFAULT);
@@ -306,7 +306,7 @@ static int _init(gnrc_netif_t *netif)
     memcpy(netif->lorawan.nwkkey, _nwkkey, sizeof(_nwkkey));
     memcpy(netif->lorawan.fnwksintkey, _fnwksintkey, sizeof(_fnwksintkey));
 
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
+    if (MODULE_GNRC_LORAWAN_1_1) {
         gnrc_netif_lorawan_set_appkey(&netif->lorawan, _appkey, sizeof(_appkey));
         gnrc_netif_lorawan_set_snwksintkey(&netif->lorawan, _snwksintkey, sizeof(_snwksintkey));
         gnrc_netif_lorawan_set_nwksenckey(&netif->lorawan, _nwksenckey, sizeof(_nwksenckey));
@@ -317,7 +317,7 @@ static int _init(gnrc_netif_t *netif)
     const gnrc_lorawan_key_ctx_t ctx = {
         .appskey = netif->lorawan.appskey,
         .fnwksintkey = netif->lorawan.fnwksintkey,
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
         .snwksintkey = netif->lorawan.snwksintkey,
         .nwksenckey = netif->lorawan.nwksenckey,
         .jsintkey = netif->lorawan.jsintkey,
@@ -505,7 +505,7 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
         memcpy_reversed(netif->lorawan.joineui, opt->data,
                         LORAMAC_JOINEUI_LEN);
         break;
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     case NETOPT_LORAWAN_NWKKEY:
         assert(opt->data_len == LORAMAC_NWKKEY_LEN);
         memcpy(netif->lorawan.nwkkey, opt->data, LORAMAC_NWKKEY_LEN);
@@ -561,7 +561,7 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
                 mlme_request.join.joineui = netif->lorawan.joineui;
                 mlme_request.join.nwkkey = netif->lorawan.nwkkey;
 
-                if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
+                if (MODULE_GNRC_LORAWAN_1_1) {
                     gnrc_lorawan_mlme_join_set_appkey(&mlme_request.join, gnrc_netif_lorawan_get_appkey(
                                                           &netif->lorawan));
                 }

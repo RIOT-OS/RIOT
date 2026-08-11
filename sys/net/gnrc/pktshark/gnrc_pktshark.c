@@ -258,7 +258,7 @@ static void _dump_icmpv6(const icmpv6_hdr_t *hdr, size_t payload_len)
 {
     print_str("\n\tICMPv6 ");
 
-    if (!IS_USED(MODULE_GNRC_PKTSHARK_ICMPV6)) {
+    if (!MODULE_GNRC_PKTSHARK_ICMPV6) {
         goto _default;
     }
 
@@ -355,7 +355,7 @@ static void _print_coap_format(unsigned format)
 
 static bool _dump_coap(const void *buf, size_t len)
 {
-    if (!IS_USED(MODULE_GNRC_PKTSHARK_COAP)) {
+    if (!MODULE_GNRC_PKTSHARK_COAP) {
         return false;
     }
 
@@ -610,7 +610,7 @@ static void _dump_ipv6(const ipv6_hdr_t *hdr, size_t payload_len, bool rx)
             _dump_tcp(payload, payload_len - sizeof(tcp_hdr_t));
             break;
         case PROTNUM_IPV4:
-            if (IS_USED(MODULE_GNRC_PKTSHARK_4IN6)) {
+            if (MODULE_GNRC_PKTSHARK_4IN6) {
                 /* 4in6 */
                 print_str("\n\t");
                 _dump_ipv4(payload, payload_len - sizeof(ipv4_hdr_t), rx);
@@ -635,17 +635,17 @@ static void _dump_snip(gnrc_pktsnip_t *pkt, bool rx)
     case GNRC_NETTYPE_IPV6:
         _dump_ipv6(pkt->data, pkt->size - sizeof(ipv6_hdr_t), rx);
         break;
-#ifdef MODULE_GNRC_NETTYPE_ICMPV6
+#if MODULE_GNRC_NETTYPE_ICMPV6
     case GNRC_NETTYPE_ICMPV6:
         _dump_icmpv6(pkt->data, pkt->size);
         break;
 #endif
-#ifdef MODULE_GNRC_NETTYPE_UDP
+#if MODULE_GNRC_NETTYPE_UDP
     case GNRC_NETTYPE_UDP:
         _dump_udp(pkt->data, pkt->size - sizeof(udp_hdr_t), pkt->next);
         break;
 #endif
-#ifdef MODULE_GNRC_NETTYPE_TCP
+#if MODULE_GNRC_NETTYPE_TCP
     case GNRC_NETTYPE_TCP:
         _dump_tcp(pkt->data, pkt->size - sizeof(tcp_hdr_t));
         break;
@@ -736,13 +736,13 @@ static void gnrc_pktshark_init(void)
 {
     gnrc_pktshark_pid = thread_create(_stack, sizeof(_stack), GNRC_PKTSHARK_PRIO, 0,
                                       _eventloop, NULL, "pktshark");
-    if (IS_USED(MODULE_AUTO_INIT_GNRC_PKTSHARK)) {
+    if (MODULE_AUTO_INIT_GNRC_PKTSHARK) {
         _set_capture(true);
     }
 }
 AUTO_INIT(gnrc_pktshark_init, AUTO_INIT_PRIO_MOD_GNRC_PKTSHARK);
 
-#ifdef MODULE_SHELL_CMD_GNRC_PKTSHARK
+#if MODULE_SHELL_CMD_GNRC_PKTSHARK
 static int cmd_pktshark(int argc, char **argv)
 {
     if (argc < 2) {

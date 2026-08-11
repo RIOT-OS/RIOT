@@ -32,9 +32,9 @@
 #include "shell.h"
 #include "ztimer.h"
 
-#define FULL_CONTROL            !IS_USED(MODULE_NIMBLE_AUTOCONN) && \
-                                !IS_USED(MODULE_NIMBLE_STATCONN) && \
-                                !IS_USED(MODULE_NIMBLE_RPBLE)
+#define FULL_CONTROL            !MODULE_NIMBLE_AUTOCONN && \
+                                !MODULE_NIMBLE_STATCONN && \
+                                !MODULE_NIMBLE_RPBLE
 
 #if FULL_CONTROL
 #include "nimble_scanlist.h"
@@ -157,12 +157,12 @@ static int _conn_dump(nimble_netif_conn_t *conn, int handle, void *arg)
 
     printf("[%2i] ", handle);
     bluetil_addr_print(conn->addr);
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     printf(" ");
     bluetil_addr_ipv6_l2ll_print(conn->addr);
 #endif
 
-#if IS_USED(MODULE_NIMBLE_NETIF_EXT)
+#if MODULE_NIMBLE_NETIF_EXT
     uint8_t phy_rx, phy_tx;
     (void)phy_tx;
     res = ble_gap_read_le_phy(conn->gaphandle, &phy_tx, &phy_rx);
@@ -230,17 +230,17 @@ static void _cmd_info(void)
     printf("Own Address: ");
     bluetil_addr_print(own_addr);
     printf(" (%s)", nimble_riot_own_addr_type ? "static random" : "public");
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     printf(" -> ");
     bluetil_addr_ipv6_l2ll_print(own_addr);
 #endif
     puts("");
 
     printf("Supported PHY modes: 1M");
-#if IS_USED(MODULE_NIMBLE_PHY_2MBIT)
+#if MODULE_NIMBLE_PHY_2MBIT
     printf(" 2M");
 #endif
-#if IS_USED(MODULE_NIMBLE_PHY_CODED)
+#if MODULE_NIMBLE_PHY_CODED
     printf(" CODED");
 #endif
     puts("");
@@ -379,7 +379,7 @@ static void _do_scan(nimble_scanner_cb cb, unsigned duration)
     nimble_scanner_cfg_t p = {
         .itvl_ms = DEFAULT_SCAN_ITVL_MS,
         .win_ms = DEFAULT_SCAN_ITVL_MS,
-#if IS_USED(MODULE_NIMBLE_PHY_CODED)
+#if MODULE_NIMBLE_PHY_CODED
         .flags = (NIMBLE_SCANNER_PASSIVE | NIMBLE_SCANNER_PHY_1M |
                   NIMBLE_SCANNER_PHY_CODED),
 #else

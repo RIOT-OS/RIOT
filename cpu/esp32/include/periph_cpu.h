@@ -681,7 +681,7 @@ typedef struct {
  *       different from those used for the Flash.
  */
 typedef enum {
-#if IS_USED(SOC_SDMMC_USE_GPIO_MATRIX) || DOXYGEN
+#if IS_ACTIVE(SOC_SDMMC_USE_GPIO_MATRIX) || DOXYGEN
     SDMMC_SLOT_0 = 0,   /**< SD/MMC host controller slot 0 (not usable on ESP32 variant) */
 #endif
     SDMMC_SLOT_1 = 1,   /**< SD/MMC host controller slot 1 */
@@ -702,20 +702,20 @@ typedef struct {
     sdmmc_slot_t slot;  /**< SDMMC slot used [ SDMMC_SLOT_0 | SDMMC_SLOT_1] */
     gpio_t cd;          /**< Card Detect pin (must be GPIO_UNDEF if not connected) */
     gpio_t wp;          /**< Write Protect pin (must be GPIO_UNDEF if not connected) */
-#if IS_USED(SOC_SDMMC_USE_GPIO_MATRIX) || DOXYGEN
+#if IS_ACTIVE(SOC_SDMMC_USE_GPIO_MATRIX) || DOXYGEN
     gpio_t clk;         /**< CLK pin (must be defined) */
     gpio_t cmd;         /**< CMD pin (must be defined) */
     gpio_t dat0;        /**< DAT[0] pin (must be defined) */
     gpio_t dat1;        /**< DAT[1] pin (GPIO_UNDEF if not connected) */
     gpio_t dat2;        /**< DAT[2] pin (GPIO_UNDEF if not connected) */
     gpio_t dat3;        /**< DAT[3] pin (GPIO_UNDEF if not connected) */
-#if IS_USED(MODULE_PERIPH_SMMC_8BIT) || DOXYGEN
+#if MODULE_PERIPH_SMMC_8BIT || DOXYGEN
     gpio_t dat4;        /**< DAT[4] pin (GPIO_UNDEF if not connected) */
     gpio_t dat5;        /**< DAT[5] pin (GPIO_UNDEF if not connected) */
     gpio_t dat6;        /**< DAT[6] pin (GPIO_UNDEF if not connected) */
     gpio_t dat7;        /**< DAT[7] pin (GPIO_UNDEF if not connected) */
-#endif /* IS_USED(MODULE_PERIPH_SMMC_8BIT) */
-#else /* IS_USED(SOC_SDMMC_USE_IOMUX) */
+#endif /* MODULE_PERIPH_SMMC_8BIT */
+#else /* IS_ACTIVE(SOC_SDMMC_USE_IOMUX) */
     uint8_t bus_width;  /**< Bus width */
 #endif
 } sdmmc_conf_t;
@@ -900,7 +900,7 @@ typedef struct {
  * @{
  */
 
-#ifndef MODULE_ESP_HW_COUNTER
+#if !MODULE_ESP_HW_COUNTER
 /**
  * @brief Hardware timer modules are used for timer implementation (default)
  *
@@ -1053,7 +1053,7 @@ typedef enum {
 #  error "ESP32x family implementation missing"
 #endif
 
-#ifdef MODULE_PERIPH_CAN
+#if MODULE_PERIPH_CAN
 #  include "can_esp.h"
 #endif
 /** @} */

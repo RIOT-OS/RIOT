@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  gnrc_icmpv6_echo \
+  lwip \
+  #
 APPLICATION = paho-mqtt-example
 
 # If no BOARD is found in the environment, use this default:

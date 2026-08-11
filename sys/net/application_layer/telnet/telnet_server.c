@@ -107,7 +107,7 @@ static void _connected(void)
     telnet_cb_pre_connected(client);
 
     connected = true;
-    if (!IS_USED(MODULE_STDIO_TELNET)) {
+    if (!MODULE_STDIO_TELNET) {
         mutex_unlock(&connected_mutex);
     }
 
@@ -116,7 +116,7 @@ static void _connected(void)
 
 static void _disconnect(void)
 {
-    if (!IS_USED(MODULE_STDIO_TELNET)) {
+    if (!MODULE_STDIO_TELNET) {
         mutex_trylock(&connected_mutex);
     }
     connected = false;
@@ -197,7 +197,7 @@ static void _process_cmd(uint8_t cmd, uint8_t option)
 
 static void _send_opts(void)
 {
-    if (IS_USED(MODULE_STDIO_TELNET)) {
+    if (MODULE_STDIO_TELNET) {
         /* RIOT will echo stdio, disable local echo */
         const uint8_t opt_echo[] = {
             TELNET_CMD_IAC, TELNET_CMD_WILL, TELNET_OPT_ECHO
@@ -274,7 +274,7 @@ static void *telnet_thread(void *arg)
                     continue;
                 }
 write:
-                if (IS_USED(MODULE_STDIO_TELNET)) {
+                if (MODULE_STDIO_TELNET) {
                     stdio_rx_write_one(c);
                 }
                 else {
@@ -302,7 +302,7 @@ ssize_t telnet_server_write(const void* buffer, size_t len)
     return -ENOTCONN;
 }
 
-#ifndef MODULE_STDIO_TELNET
+#if !MODULE_STDIO_TELNET
 int telnet_server_read(void* buffer, size_t count)
 {
     /* block until a connection is established */
@@ -332,7 +332,7 @@ int telnet_server_start(void)
         return res;
     }
 
-    if (!IS_USED(MODULE_STDIO_TELNET)) {
+    if (!MODULE_STDIO_TELNET) {
         /* init RX ringbuffer */
         ringbuffer_init(&_stdin_ringbuffer, _stdin_pipe_buf, sizeof(_stdin_pipe_buf));
         pipe_init(&_stdin_pipe, &_stdin_ringbuffer, NULL);

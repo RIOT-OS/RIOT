@@ -1,5 +1,15 @@
 MODULE = nrf5x_common_periph
 
+MODULE_DEFS_NEEDED += \
+  fmt \
+  periph_gpio_irq \
+  periph_i2c_reconfigure \
+  periph_spi_reconfigure \
+  periph_uart_hw_fc \
+  periph_uart_nonblocking \
+  periph_wdt_cb \
+  #
+
 # Select the specific implementation for `periph_i2c`
 ifneq (,$(filter periph_i2c,$(USEMODULE)))
   ifneq (,$(filter $(CPU_FAM),nrf52 nrf53 nrf9160))

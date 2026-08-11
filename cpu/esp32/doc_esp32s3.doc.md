@@ -235,7 +235,7 @@ static const sdmmc_conf_t sdmmc_config[] = {
         .dat1 = GPIO4,
         .dat2 = GPIO12,
         .dat3 = GPIO13,
-#if IS_USED(MODULE_PERIPH_SMMC_8BIT)
+#if MODULE_PERIPH_SMMC_8BIT
         .dat4 = GPIO33,
         .dat5 = GPIO33,
         .dat6 = GPIO33,

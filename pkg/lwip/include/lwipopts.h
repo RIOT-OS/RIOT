@@ -32,123 +32,123 @@ extern "C" {
  * @see     lwIP documentation
  * @{
  */
-#if defined(MODULE_LWIP_ARP) && defined(MODULE_LWIP_ETHERNET)
+#if MODULE_LWIP_ARP && MODULE_LWIP_ETHERNET
 #define LWIP_ARP                1
 #else  /* MODULE_LWIP_ARP */
 #define LWIP_ARP                0
 #endif /* MODULE_LWIP_ARP */
 
-#ifdef MODULE_LWIP_AUTOIP
+#if MODULE_LWIP_AUTOIP
 #define LWIP_AUTOIP             1
 #else  /* MODULE_LWIP_AUTOIP */
 #define LWIP_AUTOIP             0
 #endif /* MODULE_LWIP_AUTOIP */
 
-#ifdef MODULE_LWIP_DHCP
+#if MODULE_LWIP_DHCP
 #define LWIP_DHCP               1
 #else  /* MODULE_LWIP_DHCP */
 #define LWIP_DHCP               0
 #endif /* MODULE_LWIP_DHCP */
 
-#ifdef MODULE_LWIP_ETHERNET
+#if MODULE_LWIP_ETHERNET
 #define LWIP_ETHERNET           1
 #else  /* MODULE_LWIP_ETHERNET */
 #define LWIP_ETHERNET           0
 #endif /* MODULE_LWIP_ETHERNET */
 
-#ifdef MODULE_LWIP_NETIF
+#if MODULE_LWIP_NETIF
 #define LWIP_NETIF_API          1
 #else  /* MODULE_LWIP_NETIF */
 #define LWIP_NETIF_API          0
 #endif /* MODULE_LWIP_NETIF */
 
-#ifdef MODULE_LWIP_IGMP
+#if MODULE_LWIP_IGMP
 #define LWIP_IGMP               1
 #else  /* MODULE_LWIP_IGMP */
 #define LWIP_IGMP               0
 #endif /* MODULE_LWIP_IGMP */
 
-#ifdef MODULE_LWIP_IPV4
+#if MODULE_LWIP_IPV4
 #define LWIP_IPV4               1
 #else  /* MODULE_LWIP_IPV4 */
 #define LWIP_IPV4               0
 #endif /* MODULE_LWIP_IPV4 */
 
-#ifdef MODULE_LWIP_IPV6_AUTOCONFIG
+#if MODULE_LWIP_IPV6_AUTOCONFIG
 #define LWIP_IPV6_AUTOCONFIG    1
 #else  /* MODULE_LWIP_IPV6_AUTOCONFIG */
 #define LWIP_IPV6_AUTOCONFIG    0
 #endif /* MODULE_LWIP_IPV6_AUTOCONFIG */
 
-#ifdef MODULE_LWIP_IPV6_MLD
+#if MODULE_LWIP_IPV6_MLD
 #define LWIP_IPV6_MLD           1
 #else  /* MODULE_LWIP_IPV6 */
 #define LWIP_IPV6_MLD           0
 #endif /* MODULE_LWIP_IPV6 */
 
-#ifdef MODULE_LWIP_IPV6
+#if MODULE_LWIP_IPV6
 #define LWIP_IPV6               1
 #else  /* MODULE_LWIP_IPV6 */
 #define LWIP_IPV6               0
 #endif /* MODULE_LWIP_IPV6 */
 
-#ifdef MODULE_LWIP_NETIF_PPP
+#if MODULE_LWIP_NETIF_PPP
 #define PPP_SUPPORT             1
 #else  /* MODULE_LWIP_NETIF_PPP */
 #define PPP_SUPPORT             0
 #endif /* MODULE_LWIP_NETIF_PPP */
 
-#ifdef MODULE_LWIP_RAW
+#if MODULE_LWIP_RAW
 #define LWIP_RAW                1
 #else  /* MODULE_LWIP_RAW */
 #define LWIP_RAW                0
 #endif /* MODULE_LWIP_RAW */
 
-#ifdef MODULE_LWIP_SIXLOWPAN
+#if MODULE_LWIP_SIXLOWPAN
 #define LWIP_6LOWPAN            1
 #else  /* MODULE_LWIP_STATS */
 #define LWIP_6LOWPAN            0
 #endif /* MODULE_LWIP_STATS */
 
-#ifdef MODULE_LWIP_STATS
+#if MODULE_LWIP_STATS
 #define LWIP_STATS              1
 #else  /* MODULE_LWIP_STATS */
 #define LWIP_STATS              0
 #endif /* MODULE_LWIP_STATS */
 
-#ifdef MODULE_LWIP_TCP
+#if MODULE_LWIP_TCP
 #define LWIP_TCP                1
 #else  /* MODULE_LWIP_TCP */
 #define LWIP_TCP                0
 #endif /* MODULE_LWIP_TCP */
 
-#ifdef MODULE_LWIP_UDP
+#if MODULE_LWIP_UDP
 #define LWIP_UDP                1
 #else  /* MODULE_LWIP_UDP */
 #define LWIP_UDP                0
 #endif /* MODULE_LWIP_UDP */
 
-#ifdef MODULE_LWIP_UDPLITE
+#if MODULE_LWIP_UDPLITE
 #define LWIP_UDPLITE            1
 #else  /* MODULE_LWIP_UDPLITE */
 #define LWIP_UDPLITE            0
 #endif /* MODULE_LWIP_UDPLITE */
 
-#if IS_USED(MODULE_LWIP_SOCK)
+#if MODULE_LWIP_SOCK
 #define LWIP_NETCONN            1
-#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+#if MODULE_SOCK_AUX_LOCAL
 #define LWIP_NETBUF_RECVINFO    1
 #endif /* MODULE_SOCK_AUX_LOCAL */
 #else
 #define LWIP_NETCONN            0
 #endif /* MODULE_LWIP_SOCK */
 
-#ifdef MODULE_SHELL_CMD_LWIP_NETIF
+#if MODULE_SHELL_CMD_LWIP_NETIF
 #define LWIP_DEBUG              1
 #endif
 
 #ifndef TCP_LISTEN_BACKLOG
-# if defined(MODULE_LWIP_SOCK_TCP)
+# if MODULE_LWIP_SOCK_TCP
 # define TCP_LISTEN_BACKLOG     1
 # else
 # define TCP_LISTEN_BACKLOG     0

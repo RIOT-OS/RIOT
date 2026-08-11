@@ -53,7 +53,7 @@ static char mode_strings[TOTAL_OPTIONS][MODE_STR_LEN];
 
 static void _delay(void)
 {
-    if (IS_USED(MODULE_XTIMER)) {
+    if (MODULE_XTIMER) {
         xtimer_usleep(DELAY_US);
     }
     else {

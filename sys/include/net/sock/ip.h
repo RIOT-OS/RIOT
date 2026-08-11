@@ -302,7 +302,7 @@ typedef struct sock_ip sock_ip_t;
  * @brief   Auxiliary data provided when receiving using an IP sock object
  */
 typedef struct {
-#if defined(MODULE_SOCK_AUX_LOCAL) || defined(DOXYGEN)
+#if MODULE_SOCK_AUX_LOCAL || defined(DOXYGEN)
     /**
      * @brief   The local address the packet was received on
      *
@@ -310,15 +310,15 @@ typedef struct {
      */
     sock_ip_ep_t local;
 #endif /* MODULE_SOCK_AUX_ENDPOINT */
-#if defined(MODULE_SOCK_AUX_TIMESTAMP) || defined(DOXYGEN)
+#if MODULE_SOCK_AUX_TIMESTAMP || defined(DOXYGEN)
     /**
      * @brief   System time the packet was received
      *
      * @see SOCK_AUX_GET_TIMESTAMP
      */
     uint64_t timestamp;
-#endif /* MODULE_SOCK_AUX_TIMESTAP */
-#if defined(MODULE_SOCK_AUX_RSSI) || defined(DOXYGEN)
+#endif /* MODULE_SOCK_AUX_TIMESTAMP */
+#if MODULE_SOCK_AUX_RSSI || defined(DOXYGEN)
     /**
      * @brief   RSSI value of the received frame
      *
@@ -333,7 +333,7 @@ typedef struct {
  * @brief   Auxiliary data provided when sending using an IP sock object
  */
 typedef struct {
-#if defined(MODULE_SOCK_AUX_LOCAL) || defined(DOXYGEN)
+#if MODULE_SOCK_AUX_LOCAL || defined(DOXYGEN)
     /**
      * @brief   The local endpoint from which the datagram will be sent
      *
@@ -341,7 +341,7 @@ typedef struct {
      */
     sock_ip_ep_t local;
 #endif /* MODULE_SOCK_AUX_ENDPOINT */
-#if defined(MODULE_SOCK_AUX_TIMESTAMP) || defined(DOXYGEN)
+#if MODULE_SOCK_AUX_TIMESTAMP || defined(DOXYGEN)
     /**
      * @brief   System time the packet was send
      *
@@ -355,7 +355,7 @@ typedef struct {
      * implementation.
      */
     uint64_t timestamp;
-#endif /* MODULE_SOCK_AUX_TIMESTAP*/
+#endif /* MODULE_SOCK_AUX_TIMESTAMP*/
     sock_aux_flags_t flags; /**< Flags used request information */
 } sock_ip_aux_tx_t;
 

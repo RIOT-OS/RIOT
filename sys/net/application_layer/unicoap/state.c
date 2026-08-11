@@ -26,7 +26,7 @@
 
 UNICOAP_DECL_RECEIVER_STORAGE;
 
-#if IS_USED(MODULE_UNICOAP_SERVER)
+#if MODULE_UNICOAP_SERVER
 /* Internal variables */
 const unicoap_resource_t _unicoap_default_resources[] = {
 #  if CONFIG_UNICOAP_WELL_KNOWN_CORE
@@ -43,14 +43,14 @@ static unicoap_listener_t _default_listener = {
     .link_encoder = unicoap_resource_encode_link,
     .next = NULL,
 };
-#endif /* IS_USED(MODULE_UNICOAP_SERVER) */
+#endif /* MODULE_UNICOAP_SERVER */
 
-#if IS_USED(MODULE_UNICOAP_SERVER_RESOURCE_DECLARATIONS)
+#if MODULE_UNICOAP_SERVER_RESOURCE_DECLARATIONS
 XFA_INIT_CONST(unicoap_resource_t, unicoap_resources_xfa);
 #endif
 
 static unicoap_state_t _state = {
-#if IS_USED(MODULE_UNICOAP_SERVER)
+#if MODULE_UNICOAP_SERVER
     .listeners = &_default_listener
 #endif
 };
@@ -103,22 +103,22 @@ void unicoap_event_cancel(unicoap_scheduled_event_t* event) {
 
 static inline int _init_drivers(event_queue_t* queue) {
     (void)queue;
-#if IS_USED(MODULE_UNICOAP_DRIVER_RFC7252_COMMON)
+#if MODULE_UNICOAP_DRIVER_RFC7252_COMMON
     if (unicoap_init_rfc7252_common(queue) < 0) {
         return -1;
     }
 #endif
-#if IS_USED(MODULE_UNICOAP_DRIVER_UDP)
+#if MODULE_UNICOAP_DRIVER_UDP
     if (unicoap_init_udp(queue) < 0) {
         return -1;
     }
 #endif
-#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if MODULE_UNICOAP_DRIVER_DTLS
     if (unicoap_init_dtls(queue) < 0) {
         return -1;
     }
 #endif
-#if IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX)
+#if MODULE_UNICOAP_DRIVER_SLIPMUX
     if (unicoap_init_slipmux(queue) < 0) {
         return -1;
     }
@@ -130,16 +130,16 @@ static inline int _init_drivers(event_queue_t* queue) {
 static inline int _deinit_drivers(event_queue_t* queue) {
     (void)queue;
     int res = 0;
-#if IS_USED(MODULE_UNICOAP_DRIVER_RFC7252_COMMON)
+#if MODULE_UNICOAP_DRIVER_RFC7252_COMMON
     res += unicoap_deinit_rfc7252_common(queue);
 #endif
-#if IS_USED(MODULE_UNICOAP_DRIVER_UDP)
+#if MODULE_UNICOAP_DRIVER_UDP
     res += unicoap_deinit_udp(queue);
 #endif
-#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if MODULE_UNICOAP_DRIVER_DTLS
     res += unicoap_deinit_dtls(queue);
 #endif
-#if IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX)
+#if MODULE_UNICOAP_DRIVER_SLIPMUX
     res += unicoap_deinit_slipmux(queue);
 #endif
     /* MARK: unicoap_driver_extension_point */
@@ -168,7 +168,7 @@ kernel_pid_t unicoap_init(void) {
 
     mutex_init(&_state.lock);
 
-#if IS_USED(MODULE_UNICOAP_SERVER_RESOURCE_DECLARATIONS)
+#if MODULE_UNICOAP_SERVER_RESOURCE_DECLARATIONS
     /* add CoAP resources from XFA */
     XFA_USE_CONST(unicoap_resource_t, unicoap_resources_xfa);
     static unicoap_listener_t _xfa_listener = {
@@ -300,7 +300,7 @@ int unicoap_messaging_send(unicoap_packet_t* packet, unicoap_messaging_flags_t f
     _debug_packet(packet);
 
     switch (unicoap_packet_proto(packet)) {
-#if IS_USED(MODULE_UNICOAP_DRIVER_RFC7252_COMMON)
+#if MODULE_UNICOAP_DRIVER_RFC7252_COMMON
     case UNICOAP_PROTO_UDP:
     case UNICOAP_PROTO_DTLS:
     case UNICOAP_PROTO_SLIPMUX:
@@ -452,7 +452,7 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
     assert(packet);
     int ret = UNICOAP_STATUS_PATH_NOT_FOUND;
 
-    if (IS_USED(MODULE_UNICOAP_SERVER)) {
+    if (MODULE_UNICOAP_SERVER) {
         for (unicoap_listener_t* listener = unicoap_get_listeners(&_state); listener; listener = listener->next) {
             const unicoap_resource_t* resource;
             int res;
@@ -518,7 +518,7 @@ int unicoap_resource_find(const unicoap_packet_t* packet, const unicoap_resource
 }
 
 void unicoap_print_listeners(void) {
-    if (IS_USED(MODULE_UNICOAP_SERVER)) {
+    if (MODULE_UNICOAP_SERVER) {
         printf("\n\t- listeners:\n");
         size_t i = 0;
         for (const unicoap_listener_t* listener = unicoap_get_listeners(&_state); listener;

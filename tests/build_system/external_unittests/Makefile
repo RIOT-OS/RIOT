@@ -1,3 +1,14 @@
+
+MODULE_DEFS_NEEDED += \
+  xtimer \
+  ztimer64_msec \
+  ztimer64_sec \
+  ztimer64_usec \
+  ztimer_msec \
+  ztimer_sec \
+  ztimer_usec \
+  ztimer_xtimer_compat \
+  #
 # Run this only on native64 / native32, as this rather tests the build system
 # than the code actually run.
 

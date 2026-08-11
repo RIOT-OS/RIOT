@@ -26,7 +26,7 @@ extern "C" {
 
 #include "shell.h"
 
-#ifdef MODULE_SHELL_LOCK
+#if MODULE_SHELL_LOCK
     #ifndef CONFIG_SHELL_LOCK_PASSWORD
         #error Using MODULE_SHELL_LOCK requires defining CONFIG_SHELL_LOCK_PASSWORD
     #endif /* CONFIG_SHELL_LOCK_PASSWORD */
@@ -69,7 +69,7 @@ bool shell_lock_is_locked(void);
  */
 void shell_lock_do_lock(void);
 
-#ifdef MODULE_SHELL_LOCK_AUTO_LOCKING
+#if MODULE_SHELL_LOCK_AUTO_LOCKING
 /**
  * @brief   Restart the timeout interval before the shell is locked
  *          automatically.

@@ -188,7 +188,7 @@ static void _calc_szx2(coap_pkt_t *pdu, size_t reserve, coap_block1_t *block2)
 
 static inline void _event_file(nanocoap_fileserver_event_t event, struct requestdata *request)
 {
-    if (!IS_USED(MODULE_NANOCOAP_FILESERVER_CALLBACK)) {
+    if (!MODULE_NANOCOAP_FILESERVER_CALLBACK) {
         return;
     }
 
@@ -304,7 +304,7 @@ late_err:
     return coap_get_total_hdr_len(pdu);
 }
 
-#if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)
+#if MODULE_NANOCOAP_FILESERVER_PUT
 static ssize_t _put_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                          struct requestdata *request)
 {
@@ -420,7 +420,7 @@ unlink_on_error:
 }
 #endif
 
-#if IS_USED(MODULE_NANOCOAP_FILESERVER_DELETE)
+#if MODULE_NANOCOAP_FILESERVER_DELETE
 static ssize_t _delete_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                             struct requestdata *request)
 {
@@ -453,11 +453,11 @@ static ssize_t nanocoap_fileserver_file_handler(coap_pkt_t *pdu, uint8_t *buf, s
     switch (coap_get_method(pdu)) {
         case COAP_METHOD_GET:
             return _get_file(pdu, buf, len, request);
-#if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)
+#if MODULE_NANOCOAP_FILESERVER_PUT
         case COAP_METHOD_PUT:
             return _put_file(pdu, buf, len, request);
 #endif
-#if IS_USED(MODULE_NANOCOAP_FILESERVER_DELETE)
+#if MODULE_NANOCOAP_FILESERVER_DELETE
         case COAP_METHOD_DELETE:
             return _delete_file(pdu, buf, len, request);
 #endif
@@ -534,7 +534,7 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     return (uintptr_t)pdu->payload - (uintptr_t)pdu->buf;
 }
 
-#if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)
+#if MODULE_NANOCOAP_FILESERVER_PUT
 static ssize_t _put_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                               struct requestdata *request)
 {
@@ -560,7 +560,7 @@ static ssize_t _put_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 }
 #endif
 
-#if IS_USED(MODULE_NANOCOAP_FILESERVER_DELETE)
+#if MODULE_NANOCOAP_FILESERVER_DELETE
 static ssize_t _delete_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                  struct requestdata *request)
 {
@@ -573,7 +573,7 @@ static ssize_t _delete_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
             return _error_handler(pdu, buf, len, err);
         }
     }
-    else if (IS_USED(MODULE_VFS_UTIL)) {
+    else if (MODULE_VFS_UTIL) {
         if ((err = vfs_unlink_recursive(request->namebuf,
                                         request->namebuf,
                                         sizeof(request->namebuf))) < 0) {
@@ -592,11 +592,11 @@ static ssize_t nanocoap_fileserver_directory_handler(coap_pkt_t *pdu, uint8_t *b
     switch (coap_get_method(pdu)) {
         case COAP_METHOD_GET:
             return _get_directory(pdu, buf, len, request, root, resource_dir);
-#if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)
+#if MODULE_NANOCOAP_FILESERVER_PUT
         case COAP_METHOD_PUT:
             return _put_directory(pdu, buf, len, request);
 #endif
-#if IS_USED(MODULE_NANOCOAP_FILESERVER_DELETE)
+#if MODULE_NANOCOAP_FILESERVER_DELETE
         case COAP_METHOD_DELETE:
             return _delete_directory(pdu, buf, len, request);
 #endif
@@ -748,7 +748,7 @@ error:
     return 0;
 }
 
-#ifdef MODULE_NANOCOAP_FILESERVER_CALLBACK
+#if MODULE_NANOCOAP_FILESERVER_CALLBACK
 void nanocoap_fileserver_set_event_cb(nanocoap_fileserver_event_handler_t cb, void *ctx)
 {
     mutex_lock(&_event_mtx);

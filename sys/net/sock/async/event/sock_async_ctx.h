@@ -32,17 +32,17 @@ typedef union {
      * @brief   anything goes
      */
     void (*generic)(void *, sock_async_flags_t, void *);
-#ifdef MODULE_SOCK_DTLS
+#if MODULE_SOCK_DTLS
     sock_dtls_cb_t dtls;                            /**< DTLS callback */
 #endif
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
     sock_ip_cb_t ip;                                /**< IP callback */
 #endif
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
     sock_tcp_cb_t tcp;                              /**< TCP callback */
     sock_tcp_queue_cb_t tcp_queue;                  /**< TCP queue callback */
 #endif
-#ifdef MODULE_SOCK_UDP
+#if MODULE_SOCK_UDP
     sock_udp_cb_t udp;                              /**< UDP callback */
 #endif
 } sock_event_cb_t;

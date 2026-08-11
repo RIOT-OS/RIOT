@@ -34,7 +34,7 @@ static int _random_init(int argc, char **argv)
     int initval;
 
     if (argc == 1) {
-        if (IS_USED(MODULE_ZTIMER_USEC)) {
+        if (MODULE_ZTIMER_USEC) {
             initval = ztimer_now(ZTIMER_USEC);
             printf("PRNG initialized to current time: %d\n", initval);
         }

@@ -27,7 +27,7 @@
 #include "byteorder.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/netif/hdr.h"
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_HINT
+#if MODULE_GNRC_SIXLOWPAN_FRAG_HINT
 #include "net/gnrc/sixlowpan/frag/hint.h"
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_HINT */
 #include "net/gnrc/sixlowpan/frag/fb.h"

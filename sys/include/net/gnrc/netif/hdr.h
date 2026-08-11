@@ -133,7 +133,7 @@ typedef struct {
      * @brief   RSSI of received packet or @ref GNRC_NETIF_HDR_NO_RSSI
      */
     int16_t rssi;
-#if IS_USED(MODULE_GNRC_NETIF_TIMESTAMP) || defined(DOXYGEN)
+#if MODULE_GNRC_NETIF_TIMESTAMP || defined(DOXYGEN)
     /**
      * @brief   Timestamp of reception in nanoseconds since epoch
      *
@@ -262,7 +262,7 @@ static inline void gnrc_netif_hdr_set_timestamp(gnrc_netif_hdr_t *hdr,
 {
     (void)hdr;
     (void)timestamp;
-#if IS_USED(MODULE_GNRC_NETIF_TIMESTAMP)
+#if MODULE_GNRC_NETIF_TIMESTAMP
     hdr->timestamp = timestamp;
     hdr->flags |= GNRC_NETIF_HDR_FLAGS_TIMESTAMP;
 #endif
@@ -283,7 +283,7 @@ static inline int gnrc_netif_hdr_get_timestamp(const gnrc_netif_hdr_t *hdr,
 {
     (void)hdr;
     (void)dest;
-#if IS_USED(MODULE_GNRC_NETIF_TIMESTAMP)
+#if MODULE_GNRC_NETIF_TIMESTAMP
     if (hdr->flags & GNRC_NETIF_HDR_FLAGS_TIMESTAMP) {
         *dest = hdr->timestamp;
         return 0;
@@ -292,7 +292,7 @@ static inline int gnrc_netif_hdr_get_timestamp(const gnrc_netif_hdr_t *hdr,
     return -1;
 }
 
-#if defined(MODULE_GNRC_IPV6) || defined(DOXYGEN)
+#if MODULE_GNRC_IPV6 || defined(DOXYGEN)
 /**
  * @brief   Converts the source address of a given @ref net_gnrc_netif_hdr to
  *          an IPv6 IID
@@ -346,10 +346,10 @@ static inline int gnrc_netif_hdr_ipv6_iid_from_dst(const gnrc_netif_t *netif,
                                          hdr->dst_l2addr_len,
                                          iid);
 }
-#else   /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
+#else   /* MODULE_GNRC_IPV6 || defined(DOXYGEN) */
 #define gnrc_netif_hdr_ipv6_iid_from_src(netif, hdr, iid)   (-ENOTSUP);
 #define gnrc_netif_hdr_ipv6_iid_from_dst(netif, hdr, iid)   (-ENOTSUP);
-#endif  /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
+#endif  /* MODULE_GNRC_IPV6 || defined(DOXYGEN) */
 
 /**
  * @brief   Builds a generic network interface header for sending and

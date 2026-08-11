@@ -128,9 +128,9 @@ static bool _check_mask(uint32_t val, uint32_t mask)
 
 static void _delay(unsigned us)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer_sleep(ZTIMER_USEC, us);
-    } else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    } else if (MODULE_ZTIMER_MSEC) {
         ztimer_sleep(ZTIMER_MSEC, 1);
     } else {
         busy_wait_us(us);
@@ -177,7 +177,7 @@ static bool _wait_for_event(sdhc_state_t *state,
         if (SDHC_DEV->EISTR.reg & error_mask) {
             state->error = SDHC_DEV->EISTR.reg;
             SDHC_DEV->EISTR.reg = SDHC_EISTR_MASK;
-            if (IS_USED(ENABLE_DEBUG)) {
+            if (IS_ACTIVE(ENABLE_DEBUG)) {
                 DEBUG("sdhc error: %x, ", state->error);
                 switch (reset) {
                 case SDHC_SRR_SWRSTCMD:
@@ -374,7 +374,7 @@ int sdhc_init(sdhc_state_t *state)
     _set_hc(state);
 
     /* if it is high speed capable, (well it is) */
-    if (IS_USED(SDHC_ENABLE_HS) && (SDHC_DEV->CA0R.reg & SDHC_CA0R_HSSUP)) {
+    if (IS_ACTIVE(SDHC_ENABLE_HS) && (SDHC_DEV->CA0R.reg & SDHC_CA0R_HSSUP)) {
         if (!_test_high_speed(state)) {
             res = -EIO;
             goto out;

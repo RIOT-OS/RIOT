@@ -112,7 +112,7 @@
  * **Default**: Set if `gnrc_sock_udp` module is used (automatically used when UDP driver imported)
  */
 #if !defined(CONFIG_UNICOAP_SOCK_ZERO_COPY_GUARANTEES) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_SOCK_ZERO_COPY_GUARANTEES IS_USED(MODULE_GNRC_SOCK_UDP)
+#  define CONFIG_UNICOAP_SOCK_ZERO_COPY_GUARANTEES MODULE_GNRC_SOCK_UDP
 #endif
 
 /**
@@ -444,7 +444,7 @@ static_assert(CONFIG_UNICOAP_RETRANSMISSIONS_MAX < 32,
 /**
  * @brief Extra stack memory to be used when CoAP over DTLS driver is used
  */
-#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#  if MODULE_UNICOAP_DRIVER_DTLS
 #    define UNICOAP_DTLS_EXTRA_STACKSIZE (THREAD_STACKSIZE_DEFAULT)
 #  else
 #    define UNICOAP_DTLS_EXTRA_STACKSIZE (0)

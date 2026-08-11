@@ -67,7 +67,7 @@ void gnrc_lorawan_trigger_join(gnrc_lorawan_t *mac)
 static int gnrc_lorawan_send_join_request(gnrc_lorawan_t *mac, uint8_t *deveui,
                                           uint8_t *eui, uint8_t *key, uint8_t dr)
 {
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
+    if (MODULE_GNRC_LORAWAN_1_1) {
         /**
          * DevNonce starting at 0 when device is powered up and incremented with
          * every Join-request.
@@ -137,7 +137,7 @@ void gnrc_lorawan_mlme_process_join(gnrc_lorawan_t *mac, uint8_t *data,
 
     lorawan_join_accept_t *ja_hdr = (lorawan_join_accept_t *)data;
 
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
+    if (MODULE_GNRC_LORAWAN_1_1) {
         gnrc_lorawan_set_optneg(mac, lorawan_ja_hdr_get_optneg(ja_hdr));
     }
 
@@ -149,7 +149,7 @@ void gnrc_lorawan_mlme_process_join(gnrc_lorawan_t *mac, uint8_t *data,
         goto out;
     }
 
-    void *joineui = IS_USED(MODULE_GNRC_LORAWAN_1_1) ? mac->joineui : NULL;
+    void *joineui = MODULE_GNRC_LORAWAN_1_1 ? mac->joineui : NULL;
 
     gnrc_lorawan_generate_session_keys(ja_hdr->join_nonce,
                                        mac->mlme.dev_nonce, joineui, mac);
@@ -176,7 +176,7 @@ void gnrc_lorawan_mlme_process_join(gnrc_lorawan_t *mac, uint8_t *data,
     status = GNRC_LORAWAN_REQ_STATUS_SUCCESS;
 
     /* schedule rekey indication command */
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && gnrc_lorawan_optneg_is_set(mac)) {
+    if (MODULE_GNRC_LORAWAN_1_1 && gnrc_lorawan_optneg_is_set(mac)) {
         mac->mlme.pending_mlme_opts |= GNRC_LORAWAN_MLME_OPTS_REKEY_IND_REQ;
     }
 
@@ -280,7 +280,7 @@ void gnrc_lorawan_mlme_request(gnrc_lorawan_t *mac,
             break;
         }
 
-        if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
+        if (MODULE_GNRC_LORAWAN_1_1) {
             memcpy(mac->ctx.appskey, gnrc_lorawan_mlme_join_get_appkey(
                        &mlme_request->join), LORAMAC_APPKEY_LEN);
         }

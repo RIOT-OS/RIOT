@@ -1608,7 +1608,7 @@ static size_t _wait_for_packet(size_t exp_size)
     xtimer_mutex_lock_timeout(&_target_buf_filled,
                               SEND_PACKET_TIMEOUT);
     while ((mhr_len = ieee802154_get_frame_hdr_len(_target_buf))) {
-        if (IS_USED(MODULE_OD) && _target_buf_len > 0) {
+        if (MODULE_OD && _target_buf_len > 0) {
             puts("Sent packet: ");
             od_hex_dump(_target_buf, _target_buf_len, OD_WIDTH_DEFAULT);
         }

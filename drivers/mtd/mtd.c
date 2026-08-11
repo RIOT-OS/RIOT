@@ -71,7 +71,7 @@ int mtd_init(mtd_dev_t *mtd)
      * writes. */
     assert(mtd->write_size != 0);
 
-#ifdef MODULE_MTD_WRITE_PAGE
+#if MODULE_MTD_WRITE_PAGE
     if ((mtd->driver->flags & MTD_DRIVER_FLAG_DIRECT_WRITE) == 0) {
         if (!mtd->work_area) {
             mtd->work_area = malloc(mtd->pages_per_sector * mtd->page_size);
@@ -175,7 +175,7 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count)
     return mtd_write_page_raw(mtd, src, addr >> page_shift, addr & page_mask, count);
 }
 
-#ifdef MODULE_MTD_WRITE_PAGE
+#if MODULE_MTD_WRITE_PAGE
 /**
  * @brief   Write to a sector on a Memory Technology Device (MTD) by performing a
  *          read-modify-write cycle.

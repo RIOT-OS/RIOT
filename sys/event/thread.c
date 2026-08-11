@@ -96,7 +96,7 @@ event_queue_t event_thread_queues[EVENT_QUEUE_PRIO_NUMOF];
 
 void auto_init_event_thread(void)
 {
-    if (IS_USED(MODULE_EVENT_THREAD_HIGHEST)) {
+    if (MODULE_EVENT_THREAD_HIGHEST) {
         /* In order to allow highest priority events to preempt all others,
          * high priority events must be run in their own thread. This thread
          * can preempt than preempt the other event thread(s). */
@@ -104,7 +104,7 @@ void auto_init_event_thread(void)
                           _evq_highest_stack, sizeof(_evq_highest_stack),
                           EVENT_THREAD_HIGHEST_PRIO);
     }
-    if (IS_USED(MODULE_EVENT_THREAD_MEDIUM)) {
+    if (MODULE_EVENT_THREAD_MEDIUM) {
         /* In order to allow medium priority events to preempt low priority
          * events, we need to move the low priority events into their own
          * thread. The always existing medium priority event thread can then
@@ -116,11 +116,11 @@ void auto_init_event_thread(void)
 
     event_queue_t *qs = EVENT_PRIO_MEDIUM;
     size_t qs_numof = 1;
-    if (!IS_USED(MODULE_EVENT_THREAD_HIGHEST)) {
+    if (!MODULE_EVENT_THREAD_HIGHEST) {
         qs = EVENT_PRIO_HIGHEST;
         qs_numof = 2;
     }
-    if (!IS_USED(MODULE_EVENT_THREAD_MEDIUM)) {
+    if (!MODULE_EVENT_THREAD_MEDIUM) {
         qs_numof++;
     }
     event_thread_init_multi(qs, qs_numof,

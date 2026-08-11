@@ -239,7 +239,7 @@ typedef struct {
  * Those fields are used by the RTC.
  * @{
  */
-#if defined(MODULE_PERIPH_RTC) && !defined(RTC_NORMALIZE_COMPAT)
+#if MODULE_PERIPH_RTC && !defined(RTC_NORMALIZE_COMPAT)
 #define RTC_NORMALIZE_COMPAT    (1)
 #endif
 /** @} */

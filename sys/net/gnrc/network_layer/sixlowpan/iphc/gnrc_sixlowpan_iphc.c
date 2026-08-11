@@ -27,10 +27,10 @@
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "net/gnrc/sixlowpan/frag/rb.h"
 #include "net/gnrc/sixlowpan/frag/minfwd.h"
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR
 #include "net/gnrc/sixlowpan/frag/sfr.h"
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_SFR */
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
+#if MODULE_GNRC_SIXLOWPAN_FRAG_VRB
 #include "net/gnrc/sixlowpan/frag/vrb.h"
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_VRB */
 #include "net/gnrc/sixlowpan/internal.h"
@@ -117,13 +117,13 @@
 
 /* currently only used with forwarding output, remove guard if more debug info
  * is added */
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
+#if MODULE_GNRC_SIXLOWPAN_FRAG_VRB
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_VRB */
 
 static inline bool _is_rfrag(gnrc_pktsnip_t *sixlo)
 {
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR
     assert((sixlo->next != NULL) &&
            (sixlo->next->type == GNRC_NETTYPE_SIXLOWPAN));
     return sixlowpan_sfr_rfrag_is(sixlo->next->data);
@@ -158,7 +158,7 @@ static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
                                     const gnrc_netif_hdr_t *netif_hdr,
                                     gnrc_netif_t *netif);
 
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
+#if MODULE_GNRC_SIXLOWPAN_FRAG_VRB
 static gnrc_pktsnip_t *_encode_frag_for_forwarding(gnrc_pktsnip_t *decoded_pkt,
                                                    gnrc_sixlowpan_frag_vrb_t *vrbe);
 static int _forward_frag(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *frag_hdr,
@@ -451,7 +451,7 @@ static size_t _iphc_ipv6_decode(const uint8_t *iphc_hdr,
     return payload_offset;
 }
 
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
+#if MODULE_GNRC_SIXLOWPAN_IPHC_NHC
 static size_t _iphc_nhc_ipv6_ext_decode(gnrc_pktsnip_t *sixlo, size_t offset,
                                         size_t *prev_nh_offset,
                                         gnrc_pktsnip_t *ipv6,
@@ -737,7 +737,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
     size_t payload_offset;
     size_t uncomp_hdr_len = sizeof(ipv6_hdr_t);
     gnrc_sixlowpan_frag_rb_t *rbuf = rbuf_ptr;
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
+#if MODULE_GNRC_SIXLOWPAN_FRAG_VRB
     gnrc_sixlowpan_frag_vrb_t *vrbe = NULL;
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_VRB */
 
@@ -781,7 +781,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
         _recv_error_release(sixlo, ipv6, rbuf);
         return;
     }
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
+#if MODULE_GNRC_SIXLOWPAN_IPHC_NHC
     if (iphc_hdr[IPHC1_IDX] & SIXLOWPAN_IPHC1_NH) {
         bool nhc_header = true;
         ipv6_hdr = ipv6->data;
@@ -847,7 +847,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
                           (uncomp_hdr_len - sizeof(ipv6_hdr_t));
             DEBUG("   => %u\n", payload_len);
             /* adapt datagram size for uncompressed datagram */
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR
             /* guard required because SFR-specific field of vrbe is accessed */
             rbuf->offset_diff += (uncomp_hdr_len - payload_offset);
             rbuf->super.datagram_size += rbuf->offset_diff;
@@ -857,7 +857,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
             /* for a fragmented datagram we know the overall length already */
             payload_len = (uint16_t)(rbuf->super.datagram_size - sizeof(ipv6_hdr_t));
         }
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
+#if MODULE_GNRC_SIXLOWPAN_FRAG_VRB
         /* re-assign IPv6 header in case realloc changed the address */
         ipv6_hdr = ipv6->data;
         DEBUG("6lo iphc: VRB present, trying to create entry for dst %s\n",
@@ -925,14 +925,14 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
     }
     if (rbuf != NULL) {
         rbuf->super.current_size += (uncomp_hdr_len - payload_offset);
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
+#if MODULE_GNRC_SIXLOWPAN_FRAG_VRB
         if (vrbe != NULL) {
             int res = -1;
             DEBUG("6lo iphc: found route, trying to forward\n");
             ipv6_hdr->hl--;
             vrbe->super.current_size = rbuf->super.current_size;
             if ((ipv6 = _encode_frag_for_forwarding(ipv6, vrbe))) {
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR
                 /* guard required because SFR-specific field of vrbe is
                  * accessed */
                 if (_is_rfrag(sixlo)) {
@@ -975,7 +975,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
     return;
 }
 
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
+#if MODULE_GNRC_SIXLOWPAN_FRAG_VRB
 static gnrc_pktsnip_t *_encode_frag_for_forwarding(gnrc_pktsnip_t *decoded_pkt,
                                                    gnrc_sixlowpan_frag_vrb_t *vrbe)
 {
@@ -1020,14 +1020,14 @@ static int _forward_frag(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *frag_hdr,
     /* remove rewritten netif header (forwarding implementation must do this
      * anyway) */
     pkt = gnrc_pktbuf_remove_snip(pkt, pkt);
-    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_MINFWD) &&
+    if (MODULE_GNRC_SIXLOWPAN_FRAG_MINFWD &&
         sixlowpan_frag_is(frag_hdr->data)) {
         return gnrc_sixlowpan_frag_minfwd_forward(pkt, frag_hdr->data, vrbe,
                                                   page);
     }
     /* the following is just debug output for testing without any forwarding
      * scheme */
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR
     if (sixlowpan_sfr_rfrag_is(frag_hdr->data)) {
         return gnrc_sixlowpan_frag_sfr_forward(pkt, frag_hdr->data, vrbe, page);
     }
@@ -1038,7 +1038,7 @@ static int _forward_frag(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *frag_hdr,
     DEBUG("to (%s, %u)\n",
           gnrc_netif_addr_to_str(vrbe->super.dst, vrbe->super.dst_len,
                                  addr_str), vrbe->out_tag);
-    if (IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_OD)) {
+    if (IS_ACTIVE(ENABLE_DEBUG) && MODULE_OD) {
         DEBUG("Original fragmentation header:\n");
         od_hex_dump(frag_hdr->data, frag_hdr->size, OD_WIDTH_DEFAULT);
         DEBUG("IPHC headers + payload:\n");
@@ -1058,7 +1058,7 @@ static int _forward_frag(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *frag_hdr,
 static inline bool _compressible_nh(uint8_t nh)
 {
     switch (nh) {
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
+#if MODULE_GNRC_SIXLOWPAN_IPHC_NHC
         case PROTNUM_IPV6_EXT_HOPOPT:
         case PROTNUM_UDP:
         case PROTNUM_IPV6:
@@ -1372,7 +1372,7 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
     return inline_pos;
 }
 
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
+#if MODULE_GNRC_SIXLOWPAN_IPHC_NHC
 static ssize_t _iphc_nhc_ipv6_ext_encode(uint8_t *nhc_data,
                                         const gnrc_pktsnip_t *ext,
                                         uint16_t ext_len,
@@ -1600,13 +1600,13 @@ static inline bool _compressible(gnrc_pktsnip_t *hdr)
     switch (hdr->type) {
         case GNRC_NETTYPE_UNDEF:    /* when forwarded */
         case GNRC_NETTYPE_IPV6:
-#if defined(MODULE_GNRC_SIXLOWPAN_IPHC_NHC)
-# if defined(MODULE_GNRC_IPV6_EXT)
+#if MODULE_GNRC_SIXLOWPAN_IPHC_NHC
+# if MODULE_GNRC_IPV6_EXT
         case GNRC_NETTYPE_IPV6_EXT:
-# endif /* defined(MODULE_GNRC_IPV6_EXT) */
-# if defined(MODULE_GNRC_UDP)
+# endif /* MODULE_GNRC_IPV6_EXT */
+# if MODULE_GNRC_UDP
         case GNRC_NETTYPE_UDP:
-# endif /* defined(MODULE_GNRC_UDP) */
+# endif /* MODULE_GNRC_UDP */
 #endif
             return true;
         default:
@@ -1669,7 +1669,7 @@ static gnrc_pktsnip_t *_iphc_encode(gnrc_pktsnip_t *pkt,
     }
 
     nh = ((ipv6_hdr_t *)pkt->next->data)->nh;
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
+#if MODULE_GNRC_SIXLOWPAN_IPHC_NHC
     while (_compressible_nh(nh)) {
         ssize_t local_pos = 0;
         if (pkt->next->next == NULL) {
@@ -1739,12 +1739,12 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     ipv6_hdr_t *ipv6_hdr = pkt->next->data;
     ipv6_addr_t dst;
 
-    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_MINFWD)) {
+    if (MODULE_GNRC_SIXLOWPAN_FRAG_MINFWD) {
         dst = ipv6_hdr->dst;    /* copying original destination address */
     }
 
     if ((tmp = _iphc_encode(pkt, pkt->data, netif))) {
-        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_MINFWD) && (ctx != NULL) &&
+        if (MODULE_GNRC_SIXLOWPAN_FRAG_MINFWD && (ctx != NULL) &&
             (gnrc_sixlowpan_frag_minfwd_frag_iphc(tmp, orig_datagram_size, &dst,
                                                   ctx) == 0)) {
             DEBUG("6lo iphc minfwd: putting slack in first fragment\n");
@@ -1753,7 +1753,7 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
         gnrc_sixlowpan_multiplex_by_size(tmp, orig_datagram_size, netif, page);
     }
     else {
-        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_MINFWD)) {
+        if (MODULE_GNRC_SIXLOWPAN_FRAG_MINFWD) {
             gnrc_sixlowpan_frag_fb_t *fb = ctx;
 
             if (fb->pkt == pkt) {

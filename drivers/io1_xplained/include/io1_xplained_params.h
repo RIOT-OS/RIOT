@@ -61,7 +61,7 @@ saul_reg_info_t io1_xplained_saul_info[][4] =
     IO1_XPLAINED_SAUL_INFO
 };
 
-#ifdef MODULE_SAUL_GPIO
+#if MODULE_SAUL_GPIO
 /**
  * @brief   Allocate and configure the extension LED gpios
  */

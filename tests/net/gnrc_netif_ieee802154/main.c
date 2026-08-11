@@ -14,7 +14,7 @@
 #include "net/gnrc/netif.h"
 #include "net/gnrc/pktdump.h"
 
-#if IS_USED(MODULE_SHELL)
+#if MODULE_SHELL
 #include <stdio.h>
 #include <string.h>
 
@@ -24,7 +24,7 @@
 
 int main(void)
 {
-#if IS_USED(MODULE_SOCKET_ZEP)
+#if MODULE_SOCKET_ZEP
     /* This is a test for native with socket_zep */
     char addr_str[GNRC_NETIF_L2ADDR_MAXLEN * 3];
     gnrc_netif_t *netif = gnrc_netif_iter(NULL);
@@ -39,7 +39,7 @@ int main(void)
         );
     gnrc_netreg_register(GNRC_NETTYPE_UNDEF, &dump);
 
-#if IS_USED(MODULE_SHELL)
+#if MODULE_SHELL
     /* this is manual test for real MCU using shell module */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);

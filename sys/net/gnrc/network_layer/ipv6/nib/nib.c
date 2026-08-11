@@ -136,7 +136,7 @@ static bool _add_static_lladdr(gnrc_netif_t *netif)
 {
 #ifdef CONFIG_GNRC_IPV6_STATIC_LLADDR
 #if (CONFIG_GNRC_IPV6_STATIC_LLADDR_NETDEV_MASK) > 0
-#ifndef MODULE_NETDEV_REGISTER
+#if !MODULE_NETDEV_REGISTER
 #error "Use of CONFIG_GNRC_IPV6_STATIC_LLADDR_NETDEV_MASK requires MODULE_NETDEV_REGISTER"
 #endif
     if (! (((CONFIG_GNRC_IPV6_STATIC_LLADDR_NETDEV_MASK) & (1ULL << netif->dev->type)) ||
@@ -184,7 +184,7 @@ static bool _add_static_lladdr(gnrc_netif_t *netif)
 
 static bool _add_dynamic_lladdr(gnrc_netif_t *netif)
 {
-    if (!IS_USED(MODULE_GNRC_IPV6_NIB_DYN_LLADDR)) {
+    if (!MODULE_GNRC_IPV6_NIB_DYN_LLADDR) {
         return false;
     }
 
@@ -887,7 +887,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                 next_timeout = _min(next_timeout, min_pfx_timeout);
 
                 /* notify optional PIO consumer */
-                if (IS_USED(MODULE_GNRC_IPV6_NIB_RTR_ADV_PIO_CB)) {
+                if (MODULE_GNRC_IPV6_NIB_RTR_ADV_PIO_CB) {
                     extern void gnrc_ipv6_nib_rtr_adv_pio_cb(gnrc_netif_t *netif,
                                                              const ndp_opt_pi_t *pio,
                                                              const ipv6_addr_t *src);
@@ -929,7 +929,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 #if IS_ACTIVE(MODULE_DHCPV6_CLIENT)
     uint8_t current_conf_mode = dhcpv6_client_get_conf_mode();
     if (rtr_adv->flags & NDP_RTR_ADV_FLAGS_M) {
-        if (IS_USED(MODULE_DHCPV6_CLIENT_IA_NA)) {
+        if (MODULE_DHCPV6_CLIENT_IA_NA) {
             netif->ipv6.aac_mode |= GNRC_NETIF_AAC_DHCP;
             dhcpv6_client_req_ia_na(netif->pid);
         } else {
@@ -1539,7 +1539,7 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
 
 static void _handle_snd_na(gnrc_pktsnip_t *pkt)
 {
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     DEBUG("nib: Send delayed neighbor advertisement\n");
     if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL,
                                    pkt)) {
@@ -1824,7 +1824,7 @@ static const char *_prio_string(uint8_t prio)
 static uint32_t _handle_rio(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                             const ndp_opt_ri_t *rio)
 {
-    if (!IS_USED(MODULE_GNRC_IPV6_NIB_RIO)) {
+    if (!MODULE_GNRC_IPV6_NIB_RIO) {
         return 0;
     }
 

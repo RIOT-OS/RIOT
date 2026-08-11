@@ -18,14 +18,14 @@
 
 #ifdef SOCK_HAS_ASYNC
 #  include "net/sock/async.h"
-#  ifdef MODULE_SOCK_ASYNC_EVENT
+#  if MODULE_SOCK_ASYNC_EVENT
 #    include "net/sock/async/event.h"
 #  endif
 #endif
 #include "net/ipv6/addr.h"
 #include "net/iana/portrange.h"
 #include "net/sock/udp.h"
-#ifdef MODULE_ZTIMER_USEC
+#if MODULE_ZTIMER_USEC
 #  include "ztimer.h"
 #endif
 #include "mutex.h"
@@ -42,7 +42,7 @@
 #include "04-TRAN/udp.h"
 
 #define _MSG_TYPE_RECV_PKT (0x1601)
-#ifdef MODULE_ZTIMER_USEC
+#if MODULE_ZTIMER_USEC
 #  define _TIMEOUT_MAGIC     (0xF38A0B63U)
 #  define _TIMEOUT_MSG_TYPE  (0x8474)
 #endif /* MODULE_ZTIMER_USEC */
@@ -52,7 +52,7 @@ static sock_udp_t *_udp_socket_list;
 /* linked list lock */
 static mutex_t _sock_list_lock;
 
-#ifdef MODULE_ZTIMER_USEC
+#if MODULE_ZTIMER_USEC
 static void _timeout_cb(void *arg)
 {
     msg_t timeout_msg = { .sender_pid = KERNEL_PID_UNDEF,
@@ -435,7 +435,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
         return -EADDRNOTAVAIL;
     }
 
-#ifdef MODULE_ZTIMER_USEC
+#if MODULE_ZTIMER_USEC
     ztimer_t timer;
 
     if ((timeout != SOCK_NO_TIMEOUT) && (timeout != 0)) {
@@ -452,7 +452,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
             return -EAGAIN;
         }
     }
-#ifdef MODULE_ZTIMER_USEC
+#if MODULE_ZTIMER_USEC
     if ((timeout != SOCK_NO_TIMEOUT) && (timeout != 0)) {
         ztimer_remove(ZTIMER_USEC, &timer);
     }
@@ -461,7 +461,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
     case _MSG_TYPE_RECV_PKT:
         pkt = msg.content.ptr;
         break;
-#ifdef MODULE_ZTIMER_USEC
+#if MODULE_ZTIMER_USEC
     case _TIMEOUT_MSG_TYPE:
         if (msg.content.value == _TIMEOUT_MAGIC) {
             return -ETIMEDOUT;

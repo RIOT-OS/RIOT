@@ -9,3 +9,8 @@ STLINK_VERSION ?= 2-1
 
 # openocd programmer is supported
 PROGRAMMERS_SUPPORTED += openocd
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  periph_uart_hw_fc \
+  #

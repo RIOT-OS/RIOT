@@ -251,7 +251,7 @@ void sx127x_set_rx(sx127x_t *dev)
                            SX127X_IQ_INVERTED_FLAG) ? SX127X_RF_LORA_INVERTIQ2_ON :
                           SX127X_RF_LORA_INVERTIQ2_OFF));
 
-#if defined(MODULE_SX1276)
+#if MODULE_SX1276
         /* ERRATA 2.3 - Receiver Spurious Reception of a LoRa Signal */
         if (dev->settings.lora.bandwidth < 9) {
             sx127x_reg_write(dev, SX127X_REG_LR_DETECTOPTIMIZE,
@@ -487,7 +487,7 @@ static void _low_datarate_optimize(sx127x_t *dev)
         dev->settings.lora.flags &= ~SX127X_LOW_DATARATE_OPTIMIZE_FLAG;
     }
 
-#if defined(MODULE_SX1272)
+#if MODULE_SX1272
     sx127x_reg_write(dev, SX127X_REG_LR_MODEMCONFIG1,
                      (sx127x_reg_read(dev, SX127X_REG_LR_MODEMCONFIG1) &
                       SX127X_RF_LORA_MODEMCONFIG1_LOWDATARATEOPTIMIZE_MASK) |
@@ -504,7 +504,7 @@ static void _update_bandwidth(const sx127x_t *dev)
 {
     uint8_t config1_reg = sx127x_reg_read(dev, SX127X_REG_LR_MODEMCONFIG1);
 
-#if defined(MODULE_SX1272)
+#if MODULE_SX1272
     config1_reg &= SX1272_RF_LORA_MODEMCONFIG1_BW_MASK;
     switch (dev->settings.lora.bandwidth) {
     case LORA_BW_125_KHZ:
@@ -625,7 +625,7 @@ void sx127x_set_coding_rate(sx127x_t *dev, uint8_t coderate)
     dev->settings.lora.coderate = coderate;
     uint8_t config1_reg = sx127x_reg_read(dev, SX127X_REG_LR_MODEMCONFIG1);
 
-#if defined(MODULE_SX1272)
+#if MODULE_SX1272
     config1_reg &= SX1272_RF_LORA_MODEMCONFIG1_CODINGRATE_MASK;
     config1_reg |= coderate << 3;
 #else /* MODULE_SX1276 */
@@ -659,7 +659,7 @@ void sx127x_set_rx_single(sx127x_t *dev, bool single)
 
 bool sx127x_get_crc(const sx127x_t *dev)
 {
-#if defined(MODULE_SX1272)
+#if MODULE_SX1272
     return (sx127x_reg_read(dev, SX127X_REG_LR_MODEMCONFIG1) &
             SX1272_RF_LORA_MODEMCONFIG1_RXPAYLOADCRC_MASK);
 #else /* MODULE_SX1276 */
@@ -673,7 +673,7 @@ void sx127x_set_crc(sx127x_t *dev, bool crc)
     DEBUG("[sx127x] Set CRC: %d\n", crc);
     _set_flag(dev, SX127X_ENABLE_CRC_FLAG, crc);
 
-#if defined(MODULE_SX1272)
+#if MODULE_SX1272
     uint8_t config2_reg = sx127x_reg_read(dev, SX127X_REG_LR_MODEMCONFIG1);
     config2_reg &= SX1272_RF_LORA_MODEMCONFIG1_RXPAYLOADCRC_MASK;
     config2_reg |= crc << 1;
@@ -719,7 +719,7 @@ void sx127x_set_fixed_header_len_mode(sx127x_t *dev, bool fixed_len)
 
     uint8_t config1_reg = sx127x_reg_read(dev, SX127X_REG_LR_MODEMCONFIG1);
 
-#if defined(MODULE_SX1272)
+#if MODULE_SX1272
     config1_reg &= SX1272_RF_LORA_MODEMCONFIG1_IMPLICITHEADER_MASK;
     config1_reg |= fixed_len << 2;
 #else /* MODULE_SX1276 */
@@ -763,7 +763,7 @@ void sx127x_set_tx_power(sx127x_t *dev, int8_t power)
 
     uint8_t pa_config = sx127x_reg_read(dev, SX127X_REG_PACONFIG);
 
-#if defined(MODULE_SX1272)
+#if MODULE_SX1272
     uint8_t pa_dac = sx127x_reg_read(dev, SX1272_REG_PADAC);
 #else /* MODULE_SX1276 */
     uint8_t pa_dac = sx127x_reg_read(dev, SX1276_REG_PADAC);
@@ -772,7 +772,7 @@ void sx127x_set_tx_power(sx127x_t *dev, int8_t power)
     pa_config = ((pa_config & SX127X_RF_PACONFIG_PASELECT_MASK) |
                  sx127x_get_pa_select(dev));
 
-#if defined(MODULE_SX1276)
+#if MODULE_SX1276
     /* max power is 14dBm */
     pa_config = (pa_config & SX127X_RF_PACONFIG_MAX_POWER_MASK) | 0x70;
 #endif
@@ -825,7 +825,7 @@ void sx127x_set_tx_power(sx127x_t *dev, int8_t power)
     }
 
     sx127x_reg_write(dev, SX127X_REG_PACONFIG, pa_config);
-#if defined(MODULE_SX1272)
+#if MODULE_SX1272
     sx127x_reg_write(dev, SX1272_REG_PADAC, pa_dac);
 #else /* MODULE_SX1276 */
     sx127x_reg_write(dev, SX1276_REG_PADAC, pa_dac);

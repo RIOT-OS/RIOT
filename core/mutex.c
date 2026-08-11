@@ -52,7 +52,7 @@ void _block(mutex_t *mutex,
 {
     /* pc is only used when MODULE_CORE_MUTEX_DEBUG */
     (void)pc;
-#if IS_USED(MODULE_CORE_MUTEX_DEBUG)
+#if MODULE_CORE_MUTEX_DEBUG
     printf("[mutex] waiting for thread %" PRIkernel_pid " (pc = 0x%" PRIxTXTPTR
            ")\n",
            mutex->owner, mutex->owner_calling_pc);
@@ -73,7 +73,7 @@ void _block(mutex_t *mutex,
         thread_add_to_list(&mutex->queue, me);
     }
 
-#ifdef MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
+#if MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
     thread_t *owner = thread_get(mutex->owner);
     if ((owner) && (owner->priority > me->priority)) {
         DEBUG("PID[%" PRIkernel_pid "] prio of %" PRIkernel_pid
@@ -87,7 +87,7 @@ void _block(mutex_t *mutex,
     irq_restore(irq_state);
     thread_yield_higher();
     /* We were woken up by scheduler. Waker removed us from queue. */
-#if IS_USED(MODULE_CORE_MUTEX_DEBUG)
+#if MODULE_CORE_MUTEX_DEBUG
     mutex->owner_calling_pc = pc;
 #endif
 }
@@ -95,7 +95,7 @@ void _block(mutex_t *mutex,
 bool mutex_lock_internal(mutex_t *mutex, bool block)
 {
     uinttxtptr_t pc = 0;
-#if IS_USED(MODULE_CORE_MUTEX_DEBUG)
+#if MODULE_CORE_MUTEX_DEBUG
     pc = cpu_get_caller_pc();
 #endif
     unsigned irq_state = irq_disable();
@@ -106,15 +106,15 @@ bool mutex_lock_internal(mutex_t *mutex, bool block)
     if (mutex->queue.next == NULL) {
         /* mutex is unlocked. */
         mutex->queue.next = MUTEX_LOCKED;
-#if IS_USED(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE) \
-        || IS_USED(MODULE_CORE_MUTEX_DEBUG)
+#if MODULE_CORE_MUTEX_PRIORITY_INHERITANCE \
+        || MODULE_CORE_MUTEX_DEBUG
         thread_t *me = thread_get_active();
         mutex->owner = me ? me->pid : KERNEL_PID_UNDEF;
 #endif
-#if IS_USED(MODULE_CORE_MUTEX_DEBUG)
+#if MODULE_CORE_MUTEX_DEBUG
         mutex->owner_calling_pc = pc;
 #endif
-#if IS_USED(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE)
+#if MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
         mutex->owner_original_priority = me->priority;
 #endif
         DEBUG("PID[%" PRIkernel_pid "] mutex_lock(): early out.\n",
@@ -135,7 +135,7 @@ bool mutex_lock_internal(mutex_t *mutex, bool block)
 int mutex_lock_cancelable(mutex_cancel_t *mc)
 {
     uinttxtptr_t pc = 0;
-#if IS_USED(MODULE_CORE_MUTEX_DEBUG)
+#if MODULE_CORE_MUTEX_DEBUG
     pc = cpu_get_caller_pc();
 #endif
     unsigned irq_state = irq_disable();
@@ -155,15 +155,15 @@ int mutex_lock_cancelable(mutex_cancel_t *mc)
     if (mutex->queue.next == NULL) {
         /* mutex is unlocked. */
         mutex->queue.next = MUTEX_LOCKED;
-#if IS_USED(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE) \
-        || IS_USED(MODULE_CORE_MUTEX_DEBUG)
+#if MODULE_CORE_MUTEX_PRIORITY_INHERITANCE \
+        || MODULE_CORE_MUTEX_DEBUG
         thread_t *me = thread_get_active();
         mutex->owner = me->pid;
 #endif
-#if IS_USED(MODULE_CORE_MUTEX_DEBUG)
+#if MODULE_CORE_MUTEX_DEBUG
         mutex->owner_calling_pc = pc;
 #endif
-#if IS_USED(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE)
+#if MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
         mutex->owner_original_priority = me->priority;
 #endif
         DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable() early out.\n",
@@ -213,7 +213,7 @@ void mutex_unlock(mutex_t *mutex)
         mutex->queue.next = MUTEX_LOCKED;
     }
 
-#if IS_USED(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE)
+#if MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
     thread_t *owner = thread_get(mutex->owner);
     if ((owner) && (owner->priority != mutex->owner_original_priority)) {
         DEBUG("PID[%" PRIkernel_pid "] prio %u --> %u\n",
@@ -222,7 +222,7 @@ void mutex_unlock(mutex_t *mutex)
         sched_change_priority(owner, mutex->owner_original_priority);
     }
 #endif
-#if IS_USED(MODULE_CORE_MUTEX_DEBUG)
+#if MODULE_CORE_MUTEX_DEBUG
     mutex->owner_calling_pc = 0;
 #endif
 

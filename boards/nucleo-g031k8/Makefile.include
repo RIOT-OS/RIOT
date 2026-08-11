@@ -6,3 +6,7 @@ include $(RIOTBOARD)/common/nucleo32/Makefile.include
 # See doc.md.
 OPENOCD_RESET_USE_CONNECT_ASSERT_SRST = 0
 OPENOCD_EXTRA_INIT += -c 'reset_config none'
+
+MODULE_DEFS_NEEDED += \
+  periph_init_led0 \
+  #

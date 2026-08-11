@@ -67,7 +67,7 @@ extern "C" {
  * @name    XTimer configuration
  * @{
  */
-#if defined(MODULE_ESP_SW_TIMER)
+#if MODULE_ESP_SW_TIMER
 #define XTIMER_BACKOFF              (100U)
 #define XTIMER_ISR_BACKOFF          (100U)
 #endif /* MODULE_ESP_SW_TIMER */
@@ -75,7 +75,7 @@ extern "C" {
 /** @} */
 #endif /* DOXYGEN */
 
-#if defined(MODULE_MTD) || defined(DOXYGEN)
+#if MODULE_MTD || defined(DOXYGEN)
 /**
  * @name    MTD device configuration
  *
@@ -97,9 +97,9 @@ extern "C" {
 #endif
 
 /** @} */
-#endif /* defined(MODULE_MTD) || defined(DOXYGEN) */
+#endif /* MODULE_MTD || defined(DOXYGEN) */
 
-#if defined(MODULE_SPIFFS) || defined(DOXYGEN)
+#if MODULE_SPIFFS || defined(DOXYGEN)
 /**
  * @name    SPIFFS configuration
  *
@@ -112,7 +112,7 @@ extern "C" {
 #define SPIFFS_HAL_CALLBACK_EXTRA 1
 #define SPIFFS_CACHE 1
 /** @} */
-#endif /* defined(MODULE_SPIFFS) || defined(DOXYGEN) */
+#endif /* MODULE_SPIFFS || defined(DOXYGEN) */
 
 /**
   * @brief Print the board configuration in a human readable format

@@ -25,7 +25,7 @@
 #include "fmt.h"
 
 #include "periph/pm.h"
-#if IS_USED(MODULE_PERIPH_RTC)
+#if MODULE_PERIPH_RTC
 #include "periph/rtc.h"
 #else
 #include "timex.h"
@@ -49,7 +49,7 @@ static kernel_pid_t sender_pid;
 static char sender_stack[THREAD_STACKSIZE_MAIN / 2];
 
 extern semtech_loramac_t loramac;
-#if !IS_USED(MODULE_PERIPH_RTC)
+#if !MODULE_PERIPH_RTC
 static ztimer_t timer;
 #endif
 
@@ -76,7 +76,7 @@ static void _alarm_cb(void *arg)
 
 static void _prepare_next_alarm(void)
 {
-#if IS_USED(MODULE_PERIPH_RTC)
+#if MODULE_PERIPH_RTC
     struct tm time;
     rtc_get_time(&time);
     /* set initial alarm */
@@ -152,7 +152,7 @@ int main(void)
             return 1;
         }
 
-#ifdef MODULE_PERIPH_EEPROM
+#if MODULE_PERIPH_EEPROM
         /* Save current MAC state to EEPROM */
         semtech_loramac_save_config(&loramac);
 #endif
@@ -172,7 +172,7 @@ int main(void)
     semtech_loramac_set_rx2_freq(&loramac, CONFIG_LORAMAC_DEFAULT_RX2_FREQ);
     semtech_loramac_set_rx2_dr(&loramac, CONFIG_LORAMAC_DEFAULT_RX2_DR);
 
-#ifdef MODULE_PERIPH_EEPROM
+#if MODULE_PERIPH_EEPROM
     /* Store ABP parameters to EEPROM */
     semtech_loramac_save_config(&loramac);
 #endif

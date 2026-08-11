@@ -37,7 +37,7 @@ int main(void)
         return 1;
     }
 
-#if IS_USED(MODULE_HM3302)
+#if MODULE_HM3302
     print_str(
         "+------------------------+------------------------+----------------------------------------------+\n"
         "| Standard concentration | Atmospheric Environment|   # Particles in 0.1l air of diameter >=     |\n"
@@ -71,7 +71,7 @@ int main(void)
             print_col_u32_dec(data.amc_pm_2p5, 7);
             print("|", 1);
             print_col_u32_dec(data.amc_pm_10, 8);
-#if IS_USED(MODULE_HM3302)
+#if MODULE_HM3302
             print("|", 1);
             print_col_u32_dec(data.nc_pm_0p3, 7);
             print("|", 1);

@@ -131,7 +131,7 @@ __attribute((used)) static void handle_trap(uword_t mcause)
     if (is_interrupt) {
         /* Cause is an interrupt - determine type */
         switch (mcause & MCAUSE_CAUSE) {
-#ifdef MODULE_PERIPH_CORETIMER
+#if MODULE_PERIPH_CORETIMER
         case IRQ_M_TIMER:
             /* Handle timer interrupt */
             timer_isr();
@@ -171,7 +171,7 @@ __attribute((used)) static void handle_trap(uword_t mcause)
             write_csr(mepc, return_pc + 4);
             break;
         }
-#ifdef MODULE_PERIPH_PMP
+#if MODULE_PERIPH_PMP
         case CAUSE_FAULT_FETCH:
             core_panic(PANIC_MEM_MANAGE, "MEM MANAGE HANDLER (fetch)");
         case CAUSE_FAULT_LOAD:

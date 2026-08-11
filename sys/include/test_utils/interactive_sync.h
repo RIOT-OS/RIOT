@@ -27,7 +27,7 @@ extern "C" {
  * @details Wait for a 's' character to return
  *
  */
-#ifdef MODULE_TEST_UTILS_INTERACTIVE_SYNC
+#if MODULE_TEST_UTILS_INTERACTIVE_SYNC
 void test_utils_interactive_sync(void);
 #else
 static inline void test_utils_interactive_sync(void) {}

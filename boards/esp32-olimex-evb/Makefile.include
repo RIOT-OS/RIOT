@@ -3,3 +3,10 @@ PSEUDOMODULES += olimex_esp32_gateway
 # Only consider TTYs matching the following filter when auto-selecting the TTY
 # with `MOST_RECENT_PORT=1`.
 TTY_BOARD_FILTER := --driver 'ch341' --vendor '1a86' --model 'USB2.0-Serial'
+
+MODULE_DEFS_NEEDED += \
+  esp_eth \
+  olimex_esp32_gateway \
+  periph_sdmmc \
+  sdcard_spi \
+  #

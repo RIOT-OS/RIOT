@@ -23,7 +23,7 @@
 
 #include_next "stdio.h"
 
-#ifdef MODULE_STDIO_NULL
+#if MODULE_STDIO_NULL
 
 #include <stdarg.h>
 

@@ -42,7 +42,7 @@
 /* i2c_buf is global to reduce stack memory consumption */
 static uint8_t i2c_buf[BUFSIZE];
 
-#if IS_USED(MODULE_PERIPH_I2C_MOCK)
+#if MODULE_PERIPH_I2C_MOCK
 /* The write function of periph_i2c_mock is usually a complete no-op. This
  * function illustrates how the mock functions are customized. */
 int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
@@ -171,7 +171,7 @@ int cmd_i2c_release(int argc, char **argv)
     return 0;
 }
 
-#ifdef MODULE_PERIPH_I2C_RECONFIGURE
+#if MODULE_PERIPH_I2C_RECONFIGURE
 int cmd_i2c_gpio(int argc, char **argv)
 {
     int dev;
@@ -496,7 +496,7 @@ int cmd_i2c_get_id(int argc, char **argv)
 static const shell_command_t shell_commands[] = {
     { "i2c_acquire", "Get access to the I2C bus", cmd_i2c_acquire },
     { "i2c_release", "Release to the I2C bus", cmd_i2c_release },
-#ifdef MODULE_PERIPH_I2C_RECONFIGURE
+#if MODULE_PERIPH_I2C_RECONFIGURE
     { "i2c_gpio", "Re-configures I2C pins to GPIO mode and back.", cmd_i2c_gpio },
 #endif
     { "i2c_read_reg", "Read byte from register", cmd_i2c_read_reg },

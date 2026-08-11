@@ -21,7 +21,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A)
+#if MODULE_PSA_SECURE_ELEMENT_ATECCX08A
 #include "psa/crypto.h"
 #include "psa_crypto_se_management.h"
 
@@ -34,7 +34,7 @@ ATCADevice atca_devs_ptr[ATCA_NUMOF];
 
 static struct atca_device atca_devs[ATCA_NUMOF];
 
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A)
+#if MODULE_PSA_SECURE_ELEMENT_ATECCX08A
 void auto_init_atca(void)
 {
     DEBUG("[auto_init_atca] Number of secure elements: %zu\n", ATCA_NUMOF);

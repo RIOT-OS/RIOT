@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_modecfg \
+  soft_uart_modecfg \
+  #
 include ../Makefile.drivers_common
 
 USEMODULE += soft_uart

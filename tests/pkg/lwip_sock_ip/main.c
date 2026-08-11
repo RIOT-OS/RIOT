@@ -40,7 +40,7 @@ static void tear_down(void)
     memset(&_sock, 0, sizeof(_sock));
 }
 
-#ifdef MODULE_LWIP_IPV4
+#if MODULE_LWIP_IPV4
 static void test_sock_ip_create4__EAFNOSUPPORT(void)
 {
     static const sock_ip_ep_t local = { .family = AF_UNSPEC };
@@ -317,7 +317,7 @@ static void test_sock_ip_recv4__aux(void)
     expect(AF_INET == result.family);
     expect(_TEST_ADDR4_REMOTE == result.addr.ipv4_u32);
     expect(_TEST_NETIF == result.netif);
-#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+#if MODULE_SOCK_AUX_LOCAL
     expect(!(aux.flags & SOCK_AUX_GET_LOCAL));
     expect(aux.local.family == AF_INET );
     expect(aux.local.addr.ipv4_u32 == _TEST_ADDR4_LOCAL );
@@ -587,7 +587,7 @@ static void test_sock_ip_send4__no_sock(void)
 }
 #endif  /* MODULE_LWIP_IPV4 */
 
-#ifdef MODULE_LWIP_IPV6
+#if MODULE_LWIP_IPV6
 static void test_sock_ip_create6__EAFNOSUPPORT(void)
 {
     static const sock_ip_ep_t local = { .family = AF_UNSPEC };
@@ -886,7 +886,7 @@ static void test_sock_ip_recv6__aux(void)
     expect(AF_INET6 == result.family);
     expect(memcmp(&result.addr, &src_addr, sizeof(result.addr)) == 0);
     expect(_TEST_NETIF == result.netif);
-#if defined(MODULE_SOCK_AUX_LOCAL)
+#if MODULE_SOCK_AUX_LOCAL
     expect(!(aux.flags & SOCK_AUX_GET_LOCAL));
     expect(aux.local.family == AF_INET6 );
     expect(memcmp(&aux.local.addr, &dst_addr, sizeof(dst_addr)) == 0);
@@ -1181,16 +1181,16 @@ int main(void)
 #ifdef SO_REUSE
     code |= 1;
 #endif
-#ifdef MODULE_LWIP_IPV4
+#if MODULE_LWIP_IPV4
     code |= (1 << 4);
 #endif
-#ifdef MODULE_LWIP_IPV6
+#if MODULE_LWIP_IPV6
     code |= (1 << 6);
 #endif
     printf("code 0x%02x\n", code);
     _net_init();
     tear_down();
-#ifdef MODULE_LWIP_IPV4
+#if MODULE_LWIP_IPV4
     /* EADDRINUSE does not apply for lwIP */
     CALL(test_sock_ip_create4__EAFNOSUPPORT());
     CALL(test_sock_ip_create4__EINVAL_addr());
@@ -1236,7 +1236,7 @@ int main(void)
     CALL(test_sock_ip_send4__no_sock_no_netif());
     CALL(test_sock_ip_send4__no_sock());
 #endif  /* MODULE_LWIP_IPV4 */
-#ifdef MODULE_LWIP_IPV6
+#if MODULE_LWIP_IPV6
     /* EADDRINUSE does not apply for lwIP */
     CALL(test_sock_ip_create6__EAFNOSUPPORT());
     CALL(test_sock_ip_create6__EINVAL_addr());

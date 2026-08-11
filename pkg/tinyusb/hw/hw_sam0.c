@@ -60,12 +60,12 @@ int tinyusb_hw_init(void)
 void isr_usb(void)
 {
     /* call device interrupt handler with the first device */
-    if (IS_USED(MODULE_TINYUSB_DEVICE)) {
+    if (MODULE_TINYUSB_DEVICE) {
         tud_int_handler(TINYUSB_TUD_RHPORT);
     }
 
     /* call host interrupt handler with the first device */
-    if (IS_USED(MODULE_TINYUSB_HOST)) {
+    if (MODULE_TINYUSB_HOST) {
         tuh_int_handler(TINYUSB_TUH_RHPORT);
     }
 

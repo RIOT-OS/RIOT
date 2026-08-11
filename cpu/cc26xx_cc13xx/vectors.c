@@ -113,7 +113,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[] = {
 #endif // CPU_VARIANT_X2
 };
 
-#if IS_USED(CONFIG_CC26XX_CC13XX_UPDATE_CCFG)
+#if IS_ACTIVE(CONFIG_CC26XX_CC13XX_UPDATE_CCFG)
 /**
  * @brief   Set the bits of a CCFG bit field.
  *
@@ -283,6 +283,6 @@ ccfg_regs_t cc26xx_cc13xx_ccfg = {
     .CCFG_PROT_95_64    = 0xFFFFFFFF,
     .CCFG_PROT_127_96   = 0xFFFFFFFF,
 };
-#endif /* IS_USED(CONFIG_CC26XX_CC13XX_UPDATE_CCFG) */
+#endif /* IS_ACTIVE(CONFIG_CC26XX_CC13XX_UPDATE_CCFG) */
 
 /** @} */

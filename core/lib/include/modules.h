@@ -60,11 +60,16 @@ extern "C" {
  * @brief       Checks whether a module is being used or not. Can be used in C
  *              conditionals.
  *
+ * @deprecated  Instead of `IS_USED(MODULE_<NAME>)` use `MODULE_<NAME>`. In
+ *              either case, you need to list modules to export via `CFLAGS` in
+ *              `MODULE_DEFS_NEEDED` as variable in the `Makefile.include` of
+ *              the module/app needing to expect it.
+ *
  * @param[in]   module   Module to check
  * @returns     1 if the module is being used
  * @returns     0 if the module is not being used
  */
-#define IS_USED(module) IS_ACTIVE(module)
+#define IS_USED(module) module
 
 /**
  * @cond INTERNAL

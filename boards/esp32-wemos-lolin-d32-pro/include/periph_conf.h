@@ -60,7 +60,7 @@
  * purposes.
  */
 #ifndef ADC_GPIOS
-#ifndef MODULE_ESP_LOLIN_TFT
+#if !MODULE_ESP_LOLIN_TFT
 #define ADC_GPIOS   { GPIO36, GPIO39, GPIO34, GPIO35, GPIO32, GPIO33 }
 #else
 #define ADC_GPIOS   { GPIO36, GPIO39, GPIO34, GPIO35 }
@@ -144,11 +144,11 @@
 #define SPI0_CS0    GPIO5   /**< VSPI CS0 */
 #endif
 
-#ifdef MODULE_SDCARD_SPI
+#if MODULE_SDCARD_SPI
 #define SPI0_CS1    GPIO4   /**< VSPI CS1 / SD card [TF_CS] */
 #endif
 
-#ifdef MODULE_ESP_LOLIN_TFT
+#if MODULE_ESP_LOLIN_TFT
 #define SPI0_CS2    GPI14   /**< VSPI CS2 / TFT [TFT_CS]    */
 #define SPI0_CS3    GPI12   /**< VSPI CS3 / TFT [TS_CS]     */
 #endif

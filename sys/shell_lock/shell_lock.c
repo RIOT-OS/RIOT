@@ -33,14 +33,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#ifdef MODULE_STDIO_TELNET
+#if MODULE_STDIO_TELNET
 #include "net/telnet.h"
 #endif
 #include "ztimer.h"
 
 #include "shell_lock.h"
 
-#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
+#if MODULE_NEWLIB || MODULE_PICOLIBC
     #define flush_if_needed() fflush(stdout)
 #else
     #define flush_if_needed()
@@ -48,7 +48,7 @@
 
 static bool _shell_is_locked = true;
 
-#ifdef MODULE_SHELL_LOCK_AUTO_LOCKING
+#if MODULE_SHELL_LOCK_AUTO_LOCKING
 static ztimer_t _shell_auto_lock_ztimer;
 #endif
 
@@ -130,14 +130,14 @@ static void _login_barrier(char *line_buf, size_t buf_size)
             puts("Wrong password");
             ztimer_sleep(ZTIMER_MSEC, 1000);
         }
-#ifdef MODULE_STDIO_TELNET
+#if MODULE_STDIO_TELNET
         telnet_server_disconnect();
 #endif
         ztimer_sleep(ZTIMER_MSEC, 7000);
     }
 }
 
-#ifdef MODULE_STDIO_TELNET
+#if MODULE_STDIO_TELNET
 void telnet_cb_disconneced(void)
 {
     shell_lock_do_lock();
@@ -149,12 +149,12 @@ void shell_lock_do_lock(void)
     _shell_is_locked = true;
 }
 
-#ifdef MODULE_SHELL_LOCK_AUTO_LOCKING
+#if MODULE_SHELL_LOCK_AUTO_LOCKING
 static void _shell_auto_lock_ztimer_callback(void *arg)
 {
     (void) arg;
 
-#ifdef MODULE_STDIO_TELNET
+#if MODULE_STDIO_TELNET
     telnet_server_disconnect();
 #endif
     _shell_is_locked = true;
@@ -180,7 +180,7 @@ void shell_lock_checkpoint(char *line_buf, int buf_size)
 
         _login_barrier(line_buf, buf_size);
 
-        if (IS_USED(MODULE_SHELL_LOCK_AUTO_LOCKING)) {
+        if (MODULE_SHELL_LOCK_AUTO_LOCKING) {
             printf("Shell was unlocked.\n\n");
         }
         else {
@@ -192,7 +192,7 @@ void shell_lock_checkpoint(char *line_buf, int buf_size)
         _shell_is_locked = false;
     }
 
-#ifdef MODULE_SHELL_LOCK_AUTO_LOCKING
+#if MODULE_SHELL_LOCK_AUTO_LOCKING
     _shell_auto_lock_ztimer.callback = &_shell_auto_lock_ztimer_callback;
     shell_lock_auto_lock_refresh();
 #endif

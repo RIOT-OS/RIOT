@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  lwip_ipv4 \
+  lwip_ipv6 \
+  #
 include ../Makefile.pkg_common
 
 LWIP_IPV4 ?= 0

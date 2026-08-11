@@ -32,7 +32,7 @@
 
 #include "net/ethernet.h"
 
-#ifdef MODULE_TINYUSB_DFU
+#if MODULE_TINYUSB_DFU
 #include "riotboot/usb_dfu.h"
 #endif
 

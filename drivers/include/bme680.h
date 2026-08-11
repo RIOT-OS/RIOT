@@ -107,7 +107,7 @@
 #include "periph/i2c.h"
 #include "periph/spi.h"
 
-#ifdef MODULE_BME680_FP
+#if MODULE_BME680_FP
 #define BME680_FLOAT_POINT_COMPENSATION
 #endif
 
@@ -156,7 +156,7 @@ typedef struct bme680_field_data {
                              to check for the status. */
     uint8_t gas_index;  /**< Index of used heater profile */
     uint8_t meas_index; /**< Measurement index */
-#ifndef MODULE_BME680_FP
+#if !MODULE_BME680_FP
     int16_t temperature;        /**< Temperature in degree Celsius x 100 */
     uint32_t pressure;          /**< Pressure in Pascal */
     uint32_t humidity;          /**< Relative humidity in percent x 1000 */

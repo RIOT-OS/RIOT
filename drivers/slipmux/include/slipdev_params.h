@@ -28,7 +28,7 @@ extern "C" {
  * @{
  */
 #ifndef SLIPDEV_PARAM_UART
-# ifdef MODULE_STDIO_UART
+# if MODULE_STDIO_UART
 #  define SLIPDEV_PARAM_UART        UART_DEV(1)
 # else
 #  define SLIPDEV_PARAM_UART        STDIO_UART_DEV

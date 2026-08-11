@@ -103,7 +103,7 @@ void gnrc_pktbuf_release_error(gnrc_pktsnip_t *pkt, uint32_t err)
 
         if (pkt->users == 1) {
             pkt->users = 0; /* not necessary but to be on the safe side */
-            if (!IS_USED(MODULE_GNRC_TX_SYNC)
+            if (!MODULE_GNRC_TX_SYNC
                 || (pkt->type != GNRC_NETTYPE_TX_SYNC)) {
                 gnrc_pktbuf_free_internal(pkt->data, pkt->size);
             }

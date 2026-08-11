@@ -29,7 +29,7 @@ extern "C" {
  * @{
  */
 
-#ifdef MODULE_ABP2_SPI              /* default configuration for SPI version */
+#if MODULE_ABP2_SPI              /* default configuration for SPI version */
 
 #ifndef ABP2_PARAM_SPI
 #define ABP2_PARAM_SPI              (SPI_DEV(0))
@@ -46,7 +46,7 @@ extern "C" {
                                     .clk = ABP2_PARAM_CLK
 #endif
 
-#elif defined(MODULE_ABP2_I2C)      /* default configuration for I2C version */
+#elif MODULE_ABP2_I2C      /* default configuration for I2C version */
 
 #ifndef ABP2_PARAM_I2C
 #define ABP2_PARAM_I2C              I2C_DEV(0)

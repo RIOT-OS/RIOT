@@ -45,7 +45,7 @@ static const  saul_gpio_params_t saul_gpio_params[] =
         .mode = BTN1_MODE,
         .flags = SAUL_GPIO_INVERTED,
     },
-#ifndef MODULE_BOARD_SOFTWARE_RESET
+#if !MODULE_BOARD_SOFTWARE_RESET
     {
         .name = "BTN (RST)",
         .pin  = BTN0_PIN,

@@ -19,7 +19,7 @@
 #include "unittests-constants.h"
 #include "tests-gcoap.h"
 
-#if IS_USED(MODULE_NANOCOAP_CACHE)
+#if MODULE_NANOCOAP_CACHE
 #define ETAG_SLACK 9    /* account for ETag slack implicitly added by gcoap_req_init() */
 #else
 #define ETAG_SLACK 0

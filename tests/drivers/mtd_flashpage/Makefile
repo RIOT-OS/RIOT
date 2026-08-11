@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  mtd_write_page \
+  periph_flashpage_aux \
+  #
 include ../Makefile.drivers_common
 
 USEMODULE += mtd_flashpage

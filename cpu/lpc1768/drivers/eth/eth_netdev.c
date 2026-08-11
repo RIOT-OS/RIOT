@@ -79,8 +79,8 @@ static int _init(netdev_t *netdev)
         return res;
     }
 
-    if (IS_USED(MODULE_LPC1768_ETH_LINK_UP)) {
-        if (IS_USED(MODULE_LPC1768_ETH_AUTO)) {
+    if (MODULE_LPC1768_ETH_LINK_UP) {
+        if (MODULE_LPC1768_ETH_AUTO) {
             /* start auto-negotiation of the link speed */
             lpc1768_eth_start_auto_negotiation();
         }
@@ -144,7 +144,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 static void _isr(netdev_t *netdev)
 {
     /* poll the link state in thread context when the timer requested it */
-    if (IS_USED(MODULE_LPC1768_ETH_LINK_UP) && _link_check) {
+    if (MODULE_LPC1768_ETH_LINK_UP && _link_check) {
         _link_check = false;
 
         bool up = lpc1768_eth_link_up();
@@ -154,7 +154,7 @@ static void _isr(netdev_t *netdev)
 
             if (up) {
                 DEBUG_PUTS("[eth-netdev] _isr: link up");
-                if (IS_USED(MODULE_LPC1768_ETH_AUTO)) {
+                if (MODULE_LPC1768_ETH_AUTO) {
                     /* complete auto-negotiation of the link */
                     lpc1768_eth_complete_auto_negotiation();
                 }

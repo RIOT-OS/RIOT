@@ -119,7 +119,7 @@ gnrc_sixlowpan_ctx_t *gnrc_sixlowpan_ctx_update(uint8_t id, const ipv6_addr_t *p
  */
 static inline void gnrc_sixlowpan_ctx_remove(uint8_t id)
 {
-    if (IS_USED(MODULE_GNRC_SIXLOWPAN_CTX)) {
+    if (MODULE_GNRC_SIXLOWPAN_CTX) {
         gnrc_sixlowpan_ctx_lookup_id(id)->prefix_len = 0;
     }
 }
@@ -155,7 +155,7 @@ static inline bool gnrc_sixlowpan_ctx_match(const gnrc_sixlowpan_ctx_t *ctx,
 static inline bool gnrc_sixlowpan_ctx_update_6ctx(const ipv6_addr_t *prefix, uint8_t prefix_len,
                                                   uint32_t valid)
 {
-    if (!IS_USED(MODULE_GNRC_SIXLOWPAN_CTX)) {
+    if (!MODULE_GNRC_SIXLOWPAN_CTX) {
         return false;
     }
 

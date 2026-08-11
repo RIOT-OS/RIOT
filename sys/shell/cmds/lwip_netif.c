@@ -34,7 +34,7 @@
 
 #include "net/netif.h"
 
-#ifdef MODULE_LWIP_IPV6
+#if MODULE_LWIP_IPV6
 static void _netif_list_ipv6(struct netif *netif, int addr_index, uint8_t state)
 {
     printf("        inet6 addr: ");
@@ -91,7 +91,7 @@ static void _netif_list(struct netif *netif)
     printf("        Link type: %s\n",
            (dev->driver->get(dev, NETOPT_IS_WIRED, &i, sizeof(i)) > 0) ?
            "wired" : "wireless");
-#ifdef MODULE_LWIP_IPV4
+#if MODULE_LWIP_IPV4
     printf("        inet addr: ");
     ip_addr_debug_print(LWIP_DBG_ON, netif_ip_addr4(netif));
     printf(" mask: ");
@@ -101,7 +101,7 @@ static void _netif_list(struct netif *netif)
     printf("\n");
 #endif
 
-#ifdef MODULE_LWIP_IPV6
+#if MODULE_LWIP_IPV6
     for (i = 0; i < LWIP_IPV6_NUM_ADDRESSES; i++) {
         uint8_t state = netif_ip6_addr_state(netif, i);
         /* Note: !ip_addr_isinvalid() also matches tentative addresses,
@@ -117,7 +117,7 @@ static void _netif_list(struct netif *netif)
 #endif
 }
 
-#ifdef MODULE_LWIP_IPV4
+#if MODULE_LWIP_IPV4
 static void _usage_add4(char *cmd)
 {
     printf("usage: %s add <interface> <IPv4>/<prefix>\n", cmd);
@@ -216,7 +216,7 @@ static int _lwip_netif_add4(int argc, char **argv)
 }
 #endif
 
-#ifdef MODULE_LWIP_IPV6
+#if MODULE_LWIP_IPV6
 static void _usage_add6(char *cmd)
 {
     printf("usage: %s add for LWIP IPv6 currently not implemented\n", cmd);
@@ -236,10 +236,10 @@ static void _lwip_netif_help(char *cmd)
 {
     printf("usage: %s\n", cmd);
     printf("usage: %s help\n", cmd);
-#ifdef MODULE_LWIP_IPV4
+#if MODULE_LWIP_IPV4
     _usage_add4(cmd);
 #endif
-#ifdef MODULE_LWIP_IPV6
+#if MODULE_LWIP_IPV6
     _usage_add6(cmd);
 #endif
 }
@@ -267,14 +267,14 @@ static int _lwip_netif_config(int argc, char **argv)
         if (strcmp("help", argv[1]) == 0) {
             _lwip_netif_help(argv[0]);
         }
-#if defined(MODULE_LWIP_IPV4) || defined(MODULE_LWIP_IPV6)
+#if MODULE_LWIP_IPV4 || MODULE_LWIP_IPV6
         else if (strcmp("add", argv[1]) == 0) {
             if (argc != 4 && argc != 6) {
                 printf("error: invalid number of parameters\n");
-#ifdef MODULE_LWIP_IPV4
+#if MODULE_LWIP_IPV4
                 _usage_add4(argv[0]);
 #endif
-#ifdef MODULE_LWIP_IPV6
+#if MODULE_LWIP_IPV6
                 _usage_add6(argv[0]);
 #endif
                 return 0;
@@ -289,7 +289,7 @@ static int _lwip_netif_config(int argc, char **argv)
 
             *prefix_ptr = 0;
 
-#ifdef MODULE_LWIP_IPV4
+#if MODULE_LWIP_IPV4
             ipv4_addr_t ip4;
 
             if (ipv4_addr_from_buf(&ip4, argv[3], strlen(argv[3])) != NULL) {
@@ -298,7 +298,7 @@ static int _lwip_netif_config(int argc, char **argv)
                 return 1;
             }
 #endif
-#ifdef MODULE_LWIP_IPV6
+#if MODULE_LWIP_IPV6
             ipv6_addr_t ip6;
             if (ipv6_addr_from_buf(&ip6, argv[3], strlen(argv[3])) != NULL) {
                 *prefix_ptr = '/';

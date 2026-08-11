@@ -1,3 +1,13 @@
+
+MODULE_DEFS_NEEDED += \
+  fatfs_vfs_format \
+  mtd_mci \
+  mtd_native \
+  mtd_sdcard \
+  mtd_sdmmc \
+  newlib \
+  picolibc \
+  #
 include ../Makefile.pkg_common
 
 USEMODULE += fatfs_vfs

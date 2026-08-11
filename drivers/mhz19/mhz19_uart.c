@@ -27,7 +27,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifdef MODULE_MHZ19_UART
+#if MODULE_MHZ19_UART
 #include "mhz19_internals.h"
 
 /* Precalculated command sequences */

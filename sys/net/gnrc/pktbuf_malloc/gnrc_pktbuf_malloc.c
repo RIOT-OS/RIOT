@@ -38,11 +38,11 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifdef MODULE_FUZZING
+#if MODULE_FUZZING
 extern gnrc_pktsnip_t *gnrc_pktbuf_fuzzptr;
 #endif
 
-#if defined(TEST_SUITES) || defined(MODULE_FUZZING)
+#if defined(TEST_SUITES) || MODULE_FUZZING
 static unsigned mallocs;
 
 static inline void *_malloc(size_t size)
@@ -58,7 +58,7 @@ static inline void _free(void *ptr)
          * application from the fuzzing/ subdirectory. If _free is
          * called on the crafted fuzzing packet, the setup assumes that
          * input processing has completed and the application terminates. */
-#if defined(MODULE_FUZZING) && !defined(MODULE_GNRC_SOCK)
+#if MODULE_FUZZING && !MODULE_GNRC_SOCK
         if (ptr == gnrc_pktbuf_fuzzptr) {
            exit(EXIT_SUCCESS);
         }
@@ -84,7 +84,7 @@ static inline void _set_pktsnip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *next,
     pkt->size = size;
     pkt->type = type;
     pkt->users = 1;
-#ifdef MODULE_GNRC_NETERR
+#if MODULE_GNRC_NETERR
     pkt->err_sub = KERNEL_PID_UNDEF;
 #endif
 }

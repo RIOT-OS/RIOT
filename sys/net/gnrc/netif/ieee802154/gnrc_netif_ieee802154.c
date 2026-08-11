@@ -17,7 +17,7 @@
 #include "net/gnrc/netif/ieee802154.h"
 #include "net/netdev/ieee802154.h"
 
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
 #include "net/ipv6/hdr.h"
 #endif
 
@@ -112,7 +112,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             gnrc_pktbuf_release(pkt);
             return NULL;
         }
-#ifdef MODULE_NETSTATS_L2
+#if MODULE_NETSTATS_L2
         netif->stats.rx_count++;
         netif->stats.rx_bytes += nread;
 #endif
@@ -129,7 +129,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             gnrc_netif_hdr_t *hdr = netif_snip->data;
             hdr->lqi = rx_info.lqi;
             hdr->rssi = rx_info.rssi;
-#if IS_USED(MODULE_GNRC_NETIF_TIMESTAMP)
+#if MODULE_GNRC_NETIF_TIMESTAMP
             if (rx_info.flags & NETDEV_RX_IEEE802154_INFO_FLAG_TIMESTAMP) {
                 gnrc_netif_hdr_set_timestamp(hdr, rx_info.timestamp);
             }
@@ -158,7 +158,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             }
             hdr = netif_hdr->data;
 
-#ifdef MODULE_L2FILTER
+#if MODULE_L2FILTER
             if (!l2filter_pass(dev->filter, gnrc_netif_hdr_get_src_addr(hdr),
                                hdr->src_l2addr_len)) {
                 gnrc_pktbuf_release(pkt);
@@ -167,7 +167,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
                 return NULL;
             }
 #endif
-#ifdef MODULE_GNRC_NETIF_DEDUP
+#if MODULE_GNRC_NETIF_DEDUP
             if (_already_received(netif, hdr, mhr)) {
                 gnrc_pktbuf_release(pkt);
                 gnrc_pktbuf_release(netif_hdr);
@@ -179,7 +179,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             netif->last_pkt.src_len = hdr->src_l2addr_len;
             netif->last_pkt.seq = ieee802154_get_seq(mhr);
 #endif /* MODULE_GNRC_NETIF_DEDUP */
-#if IS_USED(MODULE_IEEE802154_SECURITY)
+#if MODULE_IEEE802154_SECURITY
             {
                 uint8_t *payload = NULL;
                 uint16_t payload_size = 0;
@@ -206,7 +206,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 #endif
             hdr->lqi = rx_info.lqi;
             hdr->rssi = rx_info.rssi;
-#if IS_USED(MODULE_GNRC_NETIF_TIMESTAMP)
+#if MODULE_GNRC_NETIF_TIMESTAMP
             if (rx_info.flags & NETDEV_RX_IEEE802154_INFO_FLAG_TIMESTAMP) {
                 gnrc_netif_hdr_set_timestamp(hdr, rx_info.timestamp);
             }
@@ -221,7 +221,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
                                             hdr->src_l2addr_len,
                                             src_str),
                     nread);
-                if (IS_USED(MODULE_OD)) {
+                if (MODULE_OD) {
                     od_hex_dump(pkt->data, nread, OD_WIDTH_DEFAULT);
                 }
             }
@@ -257,7 +257,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     int res = 0;
     size_t src_len, dst_len;
     uint8_t mhr_len;
-#if IS_USED(MODULE_IEEE802154_SECURITY)
+#if MODULE_IEEE802154_SECURITY
     uint8_t mhr[IEEE802154_MAX_HDR_LEN + IEEE802154_SEC_MAX_AUX_HDR_LEN];
 #else
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
@@ -322,7 +322,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         .iol_len = mhr_len
     };
 
-#if IS_USED(MODULE_IEEE802154_SECURITY)
+#if MODULE_IEEE802154_SECURITY
     {
         /* write protect `pkt` to set `pkt->next` */
         gnrc_pktsnip_t *tmp = gnrc_pktbuf_start_write(pkt);
@@ -378,7 +378,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         iolist_header.iol_len = mhr_len;
     }
 #endif
-#ifdef MODULE_NETSTATS_L2
+#if MODULE_NETSTATS_L2
     if (netif_hdr->flags &
             (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
         netif->stats.tx_mcast_count++;

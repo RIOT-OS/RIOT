@@ -18,7 +18,7 @@
 #include "gpio_arch.h"
 #include "soc/io_mux_reg.h"
 
-#if !IS_USED(MODULE_ESP_IDF_GPIO_HAL)
+#if !MODULE_ESP_IDF_GPIO_HAL
 
 /* GPIO to IOMUX register mapping (see Technical Reference, Section 5.13.2 Register Summary)
    https://www.espressif.com/sites/default/files/documentation/esp32-c3_technical_reference_manual_en.pdf */
@@ -49,7 +49,7 @@ const uint32_t _gpio_to_iomux_reg[GPIO_PIN_NUMOF] =
     PERIPHS_IO_MUX_U0TXD_U,         /* GPIO21 */
 };
 
-#endif /* !IS_USED(MODULE_ESP_IDF_GPIO_HAL) */
+#endif /* !MODULE_ESP_IDF_GPIO_HAL */
 
 /* Table of the usage type of each GPIO pin */
 gpio_pin_usage_t _gpio_pin_usage[GPIO_PIN_NUMOF] = {

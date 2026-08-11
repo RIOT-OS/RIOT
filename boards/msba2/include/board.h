@@ -45,7 +45,7 @@ extern "C" {
  * @name MTD configuration
  * @{
  */
-#ifdef MODULE_MTD_MCI
+#if MODULE_MTD_MCI
 #define MTD_0 mtd_dev_get(0)
 #endif
 /** @} */

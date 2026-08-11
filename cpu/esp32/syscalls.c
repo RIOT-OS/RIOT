@@ -52,14 +52,14 @@
 #include "xtensa/xtensa_api.h"
 #endif
 
-#ifdef MODULE_ESP_IDF_HEAP
+#if MODULE_ESP_IDF_HEAP
 #include "esp_heap_caps.h"
 #endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if IS_USED(MODULE_CPP)
+#if MODULE_CPP
 /* weak function that have to be overridden, otherwise DEFAULT_ARENA_SIZE would
  * be allocated that would consume the whole heap memory */
 size_t __cxx_eh_arena_size_get(void)
@@ -68,7 +68,7 @@ size_t __cxx_eh_arena_size_get(void)
 }
 #endif
 
-#if IS_USED(MODULE_ESP_IDF_HEAP)
+#if MODULE_ESP_IDF_HEAP
 
 /* if module esp_idf_heap is used, this function has to be defined for ESP32 */
 unsigned int get_free_heap_size(void)
@@ -93,7 +93,7 @@ void heap_stats(void)
                _alloc + _free, _alloc, _free);
 }
 
-#else /* IS_USED(MODULE_ESP_IDF_HEAP) */
+#else /* MODULE_ESP_IDF_HEAP */
 
 void *heap_caps_malloc_prefer(size_t size, size_t num, ...)
 {
@@ -115,7 +115,7 @@ void *heap_caps_aligned_calloc(size_t alignment, size_t n, size_t size, uint32_t
     return calloc(n, size);
 }
 
-#endif /* IS_USED(MODULE_ESP_IDF_HEAP) */
+#endif /* MODULE_ESP_IDF_HEAP */
 
 /**
  * @name Other system functions
@@ -133,7 +133,7 @@ void _exit_r(struct _reent *r, int status)
     _exit(status);
 }
 
-#if !IS_USED(MODULE_VFS)
+#if !MODULE_VFS
 int _fcntl_r(struct _reent *r, int fd, int cmd, int arg)
                               __attribute__((weak, alias("_no_sys_func")));
 #endif
@@ -182,7 +182,7 @@ int clock_gettime(clockid_t clock_id, struct timespec *tp)
     return clock_gettime_r(_GLOBAL_REENT, clock_id, tp);
 }
 
-#if !IS_USED(MODULE_LIBC_GETTIMEOFDAY)
+#if !MODULE_LIBC_GETTIMEOFDAY
 int IRAM _gettimeofday_r(struct _reent *r, struct timeval *tv, void *tz)
 {
     (void) tz;
@@ -560,7 +560,7 @@ void system_wdt_start(void)
     esp_cpu_intr_enable(BIT(CPU_INUM_WDT));
 }
 
-#ifndef MODULE_POSIX_SLEEP
+#if !MODULE_POSIX_SLEEP
 
 int usleep(useconds_t us)
 {

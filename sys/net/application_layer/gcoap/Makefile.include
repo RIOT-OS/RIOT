@@ -10,3 +10,7 @@ DTLS_MAX_BUF ?= $(shell echo $$(((${CONFIG_GCOAP_PDU_BUF_SIZE} + 36) > 200 ? (${
 ifneq (,$(filter gcoap_forward_proxy,$(USEMODULE)))
   INCLUDES += -I$(RIOTBASE)/sys/net/application_layer/gcoap/include
 endif
+
+MODULE_DEFS_NEEDED += \
+  nanocoap_cache \
+  #

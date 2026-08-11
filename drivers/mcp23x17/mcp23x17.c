@@ -19,7 +19,7 @@
 #include "mcp23x17.h"
 #include "mcp23x17_regs.h"
 
-#if IS_USED(MODULE_MCP23X17_IRQ)
+#if MODULE_MCP23X17_IRQ
 #include "event/thread.h"
 #endif
 
@@ -42,21 +42,21 @@
 
 #define _ADDR       (MCP23X17_BASE_ADDR + dev->params.addr)
 
-#if IS_USED(MODULE_MCP23X17_SPI)
+#if MODULE_MCP23X17_SPI
 #define _SPI_DEV    (dev->params.if_params.spi.dev)
 #define _SPI_CS     (dev->params.if_params.spi.cs)
 #define _SPI_CLK    (dev->params.if_params.spi.clk)
 #endif
 
-#if IS_USED(MODULE_MCP23X17_I2C)
+#if MODULE_MCP23X17_I2C
 #define _I2C_DEV    (dev->params.if_params.i2c.dev)
 #endif
 
-#if IS_USED(MODULE_MCP23X17_IRQ)
+#if MODULE_MCP23X17_IRQ
 
-#if IS_USED(MODULE_MCP23X17_IRQ_MEDIUM)
+#if MODULE_MCP23X17_IRQ_MEDIUM
 #define  MCP23X17_EVENT_PRIO    EVENT_PRIO_MEDIUM
-#elif IS_USED(MODULE_MCP23X17_IRQ_HIGHEST)
+#elif MODULE_MCP23X17_IRQ_HIGHEST
 #define  MCP23X17_EVENT_PRIO    EVENT_PRIO_HIGHEST
 #endif
 
@@ -95,7 +95,7 @@ int mcp23x17_init(mcp23x17_t *dev, const mcp23x17_params_t* params)
 
     int res = MCP23X17_OK;
 
-#if IS_USED(MODULE_MCP23X17_SPI)
+#if MODULE_MCP23X17_SPI
     if (params->if_params.type == MCP23X17_SPI) {
         /* CS pin has to be defined and has to be initialized */
         assert(gpio_is_valid(_SPI_CS));
@@ -106,7 +106,7 @@ int mcp23x17_init(mcp23x17_t *dev, const mcp23x17_params_t* params)
     }
 #endif
 
-#if IS_USED(MODULE_MCP23X17_RESET)
+#if MODULE_MCP23X17_RESET
     /* GPIO pin for the RESET signal has to be define and initialized */
     assert(gpio_is_valid(params->reset_pin));
 
@@ -121,7 +121,7 @@ int mcp23x17_init(mcp23x17_t *dev, const mcp23x17_params_t* params)
     gpio_set(params->reset_pin);
 #endif
 
-#if IS_USED(MODULE_MCP23X17_IRQ)
+#if MODULE_MCP23X17_IRQ
     /* GPIO pin for combined interrupt signal INTA/INTB has to be defined */
     assert(gpio_is_valid(params->int_pin));
 
@@ -178,7 +178,7 @@ int mcp23x17_init(mcp23x17_t *dev, const mcp23x17_params_t* params)
      */
     res |= _write(dev, MCP23X17_REG_IODIR, _reset_conf, ARRAY_SIZE(_reset_conf));
 
-#if IS_USED(MODULE_MCP23X17_IRQ)
+#if MODULE_MCP23X17_IRQ
     /* INT is configured as push/pull and is active low */
     iocon &= ~MCP23X17_IOCON_ODR;
     iocon &= ~MCP23X17_IOCON_INTPOL;
@@ -351,7 +351,7 @@ void mcp23x17_gpio_toggle(mcp23x17_t *dev, gpio_t pin)
     mcp23x17_gpio_write(dev, pin, mcp23x17_gpio_read(dev, pin) ? 0 : 1);
 }
 
-#if IS_USED(MODULE_MCP23X17_IRQ)
+#if MODULE_MCP23X17_IRQ
 
 int mcp23x17_gpio_init_int(mcp23x17_t *dev, gpio_t pin,
                                             gpio_mode_t mode,
@@ -486,12 +486,12 @@ static void _irq_handler(event_t* event)
 
 static void _acquire(const mcp23x17_t *dev)
 {
-#if IS_USED(MODULE_MCP23X17_SPI)
+#if MODULE_MCP23X17_SPI
     if (dev->params.if_params.type == MCP23X17_SPI) {
         spi_acquire(_SPI_DEV, _SPI_CS, SPI_MODE_0, _SPI_CLK);
     }
 #endif
-#if IS_USED(MODULE_MCP23X17_I2C)
+#if MODULE_MCP23X17_I2C
     if (dev->params.if_params.type == MCP23X17_I2C) {
         i2c_acquire(_I2C_DEV);
     }
@@ -500,12 +500,12 @@ static void _acquire(const mcp23x17_t *dev)
 
 static void _release(const mcp23x17_t *dev)
 {
-#if IS_USED(MODULE_MCP23X17_SPI)
+#if MODULE_MCP23X17_SPI
     if (dev->params.if_params.type == MCP23X17_SPI) {
         spi_release(_SPI_DEV);
     }
 #endif
-#if IS_USED(MODULE_MCP23X17_I2C)
+#if MODULE_MCP23X17_I2C
     if (dev->params.if_params.type == MCP23X17_I2C) {
         i2c_release(_I2C_DEV);
     }
@@ -518,7 +518,7 @@ static int _read(const mcp23x17_t *dev, uint8_t reg, uint8_t *data, size_t len)
 
     int res = MCP23X17_OK;
 
-#if IS_USED(MODULE_MCP23X17_SPI)
+#if MODULE_MCP23X17_SPI
     if (dev->params.if_params.type == MCP23X17_SPI) {
         spi_transfer_byte(_SPI_DEV, _SPI_CS, true, (_ADDR << 1) | 1);
         spi_transfer_byte(_SPI_DEV, _SPI_CS, true, reg);
@@ -526,7 +526,7 @@ static int _read(const mcp23x17_t *dev, uint8_t reg, uint8_t *data, size_t len)
     }
 #endif
 
-#if IS_USED(MODULE_MCP23X17_I2C)
+#if MODULE_MCP23X17_I2C
     if (dev->params.if_params.type == MCP23X17_I2C) {
         int res = i2c_read_regs(_I2C_DEV, _ADDR, reg, data, len, 0);
         if (res) {
@@ -565,7 +565,7 @@ static int _write(const mcp23x17_t *dev, uint8_t reg,
         printf("\n");
     }
 
-#if IS_USED(MODULE_MCP23X17_SPI)
+#if MODULE_MCP23X17_SPI
     if (dev->params.if_params.type == MCP23X17_SPI) {
         spi_transfer_byte(_SPI_DEV, _SPI_CS, true, (_ADDR << 1));
         spi_transfer_byte(_SPI_DEV, _SPI_CS, true, reg);
@@ -574,7 +574,7 @@ static int _write(const mcp23x17_t *dev, uint8_t reg,
     }
 #endif
 
-#if IS_USED(MODULE_MCP23X17_I2C)
+#if MODULE_MCP23X17_I2C
     if (dev->params.if_params.type == MCP23X17_I2C) {
         int res = i2c_write_regs(_I2C_DEV, _ADDR, reg, data, len, 0);
         if (res) {

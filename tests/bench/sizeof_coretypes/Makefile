@@ -1,3 +1,10 @@
+
+MODULE_DEFS_NEEDED += \
+  core_mbox \
+  core_msg \
+  core_thread_flags \
+  mpu_stack_guard \
+  #
 include ../Makefile.bench_common
 
 # Modules that will have an impact on the size of the TCB (thread_t):

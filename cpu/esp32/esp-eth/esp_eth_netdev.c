@@ -13,7 +13,7 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifdef MODULE_ESP_ETH
+#if MODULE_ESP_ETH
 
 #include "log.h"
 #include "tools.h"
@@ -257,7 +257,7 @@ static int _esp_eth_send(netdev_t *netdev, const iolist_t *iolist)
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         printf ("%s: send %d byte\n", __func__, dev->tx_len);
-        if (IS_ACTIVE(ENABLE_DEBUG_HEXDUMP) && IS_USED(MODULE_OD)) {
+        if (IS_ACTIVE(ENABLE_DEBUG_HEXDUMP) && MODULE_OD) {
             od_hex_dump(dev->tx_buf, dev->tx_len, OD_WIDTH_DEFAULT);
         }
     }
@@ -309,7 +309,7 @@ static int _esp_eth_recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         printf ("%s: received %d byte\n", __func__, dev->rx_len);
-        if (IS_ACTIVE(ENABLE_DEBUG_HEXDUMP) && IS_USED(MODULE_OD)) {
+        if (IS_ACTIVE(ENABLE_DEBUG_HEXDUMP) && MODULE_OD) {
             od_hex_dump(dev->rx_buf, dev->rx_len, OD_WIDTH_DEFAULT);
         }
     }

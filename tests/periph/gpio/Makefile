@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_gpio_irq \
+  periph_gpio_tamper_wake \
+  #
 BOARD ?= samr34-xpro
 
 include ../Makefile.periph_common

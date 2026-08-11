@@ -26,7 +26,7 @@
 #include "net/gnrc/pkt.h"
 #include "config.h"
 
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
 #endif
 
@@ -39,7 +39,7 @@ extern "C" {
  */
 typedef struct sock_tcp {
     uint8_t address_family;                   /**< Address Family of local_addr / peer_addr */
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     uint8_t local_addr[sizeof(ipv6_addr_t)];  /**< Local IP address */
     uint8_t peer_addr[sizeof(ipv6_addr_t)];   /**< Peer IP address */
     int8_t  ll_iface;                         /**< Link layer interface id to use. */

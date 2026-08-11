@@ -16,10 +16,10 @@
 #include <string.h>
 #include <errno.h>
 
-#ifdef MODULE_IPV6_ADDR
+#if MODULE_IPV6_ADDR
 #include "net/ipv6/addr.h"
 #endif
-#ifdef MODULE_IPV4_ADDR
+#if MODULE_IPV4_ADDR
 #include "net/ipv4/addr.h"
 #endif
 #include "net/dns.h"
@@ -56,7 +56,7 @@ static int mqtt_read(struct Network *n, unsigned char *buf, int len,
     void *_buf;
     int rc = -1;
 
-    if (IS_USED(MODULE_LWIP)) {
+    if (MODULE_LWIP) {
         /* As LWIP doesn't support packet reading byte per byte and
          * PAHO MQTT reads like that to decode it on the fly,
          * we read TSRB_MAX_SIZE at once and keep them in a ring buffer.
@@ -78,7 +78,7 @@ static int mqtt_read(struct Network *n, unsigned char *buf, int len,
             rc = 0;
         }
 
-        if (IS_USED(MODULE_LWIP)) {
+        if (MODULE_LWIP) {
             if (rc > 0) {
                 tsrb_add(&tsrb_lwip_tcp, _temp_buf, rc);
             }
@@ -87,7 +87,7 @@ static int mqtt_read(struct Network *n, unsigned char *buf, int len,
         }
     } while (rc < len && ztimer_now(ZTIMER_MSEC) < send_time && rc >= 0);
 
-    if (IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_LWIP) && rc > 0) {
+    if (IS_ACTIVE(ENABLE_DEBUG) && MODULE_LWIP && rc > 0) {
         DEBUG("MQTT buf asked for %d, available to read %d\n",
                 rc, tsrb_avail(&tsrb_lwip_tcp));
         for (int i = 0; i < rc; i++) {
@@ -110,7 +110,7 @@ static int mqtt_write(struct Network *n, unsigned char *buf, int len,
 
 void NetworkInit(Network *n)
 {
-    if (IS_USED(MODULE_LWIP)) {
+    if (MODULE_LWIP) {
         tsrb_init(&tsrb_lwip_tcp, buffer, TSRB_MAX_SIZE);
     }
     n->mqttread = mqtt_read;
@@ -128,12 +128,12 @@ int NetworkConnect(Network *n, char *addr_ip, int port)
         remote.family = ret == 4 ? AF_INET : AF_INET6;
     }
 
-    if (IS_USED(MODULE_IPV4_ADDR) && (remote.port == 0) &&
+    if (MODULE_IPV4_ADDR && (remote.port == 0) &&
         ipv4_addr_from_str((ipv4_addr_t *)&remote.addr, addr_ip)) {
             remote.port = port;
     }
 
-    if (IS_USED(MODULE_IPV6_ADDR) && (remote.port == 0) &&
+    if (MODULE_IPV6_ADDR && (remote.port == 0) &&
         ipv6_addr_from_str((ipv6_addr_t *)&remote.addr, addr_ip)) {
             remote.port = port;
             remote.family = AF_INET6;

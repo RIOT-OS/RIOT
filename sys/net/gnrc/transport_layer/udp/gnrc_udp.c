@@ -74,7 +74,7 @@ static uint16_t _calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr,
     csum = inet_csum(csum, (uint8_t *)hdr->data, sizeof(udp_hdr_t));
 
     switch (pseudo_hdr->type) {
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
         case GNRC_NETTYPE_IPV6:
             csum = ipv6_hdr_inet_csum(csum, pseudo_hdr->data, PROTNUM_UDP, len);
             break;

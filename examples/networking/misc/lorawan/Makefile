@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_eeprom \
+  periph_rtc \
+  #
 # name of your application
 APPLICATION = lorawan
 

@@ -19,7 +19,7 @@
  * published under GPLv3
  */
 
-#ifdef MODULE_GNRC_ICMPV6
+#if MODULE_GNRC_ICMPV6
 #include <limits.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -40,10 +40,10 @@
 #include "utlist.h"
 #include "ztimer.h"
 
-#ifdef MODULE_LUID
+#if MODULE_LUID
 #include "luid.h"
 #endif
-#ifdef MODULE_GNRC_IPV6_NIB
+#if MODULE_GNRC_IPV6_NIB
 #include "net/gnrc/ipv6/nib/nc.h"
 #endif
 
@@ -243,7 +243,7 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
         _usage(cmdname);
     }
     data->id ^= (ztimer_now(ZTIMER_USEC) & UINT16_MAX);
-#ifdef MODULE_LUID
+#if MODULE_LUID
     luid_custom(&data->id, sizeof(data->id), data->id);
 #endif
     return res;

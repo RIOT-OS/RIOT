@@ -33,7 +33,7 @@
 #  include "net/sock/async/event.h"
 #endif
 
-#ifdef MODULE_GNRC_SOCK_CHECK_REUSE
+#if MODULE_GNRC_SOCK_CHECK_REUSE
 #  include "utlist.h"
 #endif
 
@@ -41,7 +41,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifdef MODULE_GNRC_SOCK_CHECK_REUSE
+#if MODULE_GNRC_SOCK_CHECK_REUSE
 static sock_udp_t *_udp_socks = NULL;
 #endif
 
@@ -50,7 +50,7 @@ static sock_udp_t *_udp_socks = NULL;
  */
 static bool _dyn_port_used(uint16_t port)
 {
-#ifdef MODULE_GNRC_SOCK_CHECK_REUSE
+#if MODULE_GNRC_SOCK_CHECK_REUSE
     for (sock_udp_t *ptr = _udp_socks; ptr != NULL;
          ptr = (sock_udp_t *)ptr->reg.next) {
         bool spec_addr = false;
@@ -118,7 +118,7 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
                 return -EADDRINUSE;
             }
         }
-#ifdef MODULE_GNRC_SOCK_CHECK_REUSE
+#if MODULE_GNRC_SOCK_CHECK_REUSE
         else if (!(flags & SOCK_FLAGS_REUSE_EP)) {
             for (sock_udp_t *ptr = _udp_socks; ptr != NULL;
                  ptr = (sock_udp_t *)ptr->reg.next) {
@@ -165,7 +165,7 @@ void sock_udp_close(sock_udp_t *sock)
 #ifdef SOCK_HAS_ASYNC_CTX
     sock_event_close(sock_udp_get_async_ctx(sock));
 #endif
-#ifdef MODULE_GNRC_SOCK_CHECK_REUSE
+#if MODULE_GNRC_SOCK_CHECK_REUSE
     if (_udp_socks != NULL) {
         gnrc_sock_reg_t *head = (gnrc_sock_reg_t *)_udp_socks;
         LL_DELETE(head, (gnrc_sock_reg_t *)sock);
@@ -271,17 +271,17 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
         return -EADDRNOTAVAIL;
     }
     tmp.family = sock->local.family;
-#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+#if MODULE_SOCK_AUX_LOCAL
     if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_LOCAL)) {
         _aux.local = (sock_ip_ep_t *)&aux->local;
     }
 #endif
-#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+#if MODULE_SOCK_AUX_TIMESTAMP
     if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_TIMESTAMP)) {
         _aux.timestamp = &aux->timestamp;
     }
 #endif
-#if IS_USED(MODULE_SOCK_AUX_RSSI)
+#if MODULE_SOCK_AUX_RSSI
     if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_RSSI)) {
         _aux.rssi = &aux->rssi;
     }
@@ -302,23 +302,23 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
         gnrc_pktbuf_release(pkt);
         return -EPROTO;
     }
-#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+#if MODULE_SOCK_AUX_LOCAL
     if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_LOCAL)) {
         aux->flags &= ~SOCK_AUX_GET_LOCAL;
         aux->local.port = sock->local.port;
     }
 #endif
-#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+#if MODULE_SOCK_AUX_TIMESTAMP
     if ((aux != NULL) && (_aux.flags & GNRC_SOCK_RECV_AUX_FLAG_TIMESTAMP)) {
         aux->flags &= ~SOCK_AUX_GET_TIMESTAMP;
     }
 #endif
-#if IS_USED(MODULE_SOCK_AUX_RSSI)
+#if MODULE_SOCK_AUX_RSSI
     if ((aux != NULL) && (_aux.flags & GNRC_SOCK_RECV_AUX_FLAG_RSSI)) {
         aux->flags &= ~SOCK_AUX_GET_RSSI;
     }
 #endif
-#if IS_USED(MODULE_SOCK_AUX_TTL)
+#if MODULE_SOCK_AUX_TTL
     if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_TTL)) {
         gnrc_pktsnip_t *ip = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
         if (ip) {
@@ -390,7 +390,7 @@ ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
                 sock->local.family = remote->family;
             }
             gnrc_sock_create(&sock->reg, GNRC_NETTYPE_UDP, src_port);
-#ifdef MODULE_GNRC_SOCK_CHECK_REUSE
+#if MODULE_GNRC_SOCK_CHECK_REUSE
             /* prepend to current socks */
             sock->reg.next = (gnrc_sock_reg_t *)_udp_socks;
             _udp_socks = sock;
@@ -401,7 +401,7 @@ ssize_t sock_udp_sendv_aux(sock_udp_t *sock,
         src_port = sock->local.port;
         memcpy(&local, &sock->local, sizeof(local));
     }
-#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+#if MODULE_SOCK_AUX_LOCAL
     /* user supplied local endpoint takes precedent */
     if ((aux != NULL) && (aux->flags & SOCK_AUX_SET_LOCAL)) {
         local.family = aux->local.family;

@@ -16,7 +16,7 @@
  * @}
  */
 
-#ifdef MODULE_MTD
+#if MODULE_MTD
 
 #include "board.h"
 #include "mtd.h"
@@ -51,7 +51,7 @@ static mtd_spi_nor_t nrf52840dk_nor_dev = {
 
 MTD_XFA_ADD(nrf52840dk_nor_dev, 0);
 
-#ifdef MODULE_VFS_DEFAULT
+#if MODULE_VFS_DEFAULT
 #include "vfs_default.h"
 VFS_AUTO_MOUNT(littlefs2, VFS_MTD(nrf52840dk_nor_dev), VFS_DEFAULT_NVM(0), 0);
 #endif

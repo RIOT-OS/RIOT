@@ -30,7 +30,7 @@
 #include "debug.h"
 
 /* the following block contains the SPI mode specific adaption */
-#ifdef MODULE_LIS2DH12_SPI
+#if MODULE_LIS2DH12_SPI
 
 /* SPI bus speed and mode */
 #define BUS_CLK             SPI_CLK_5MHZ
@@ -404,7 +404,7 @@ void lis2dh12_cfg_disable_event(const lis2dh12_t *dev, uint8_t event, uint8_t li
     _release(dev);
 }
 
-#ifdef MODULE_LIS2DH12_INT
+#if MODULE_LIS2DH12_INT
 static void _cb(void *lock)
 {
     mutex_unlock(lock);
@@ -591,7 +591,7 @@ int lis2dh12_read_temperature(const lis2dh12_t *dev, int16_t *temp)
     /* enable temperature sensor */
     if (!_read(dev, REG_TEMP_CFG_REG)) {
         _write(dev, REG_TEMP_CFG_REG, LIS2DH12_TEMP_CFG_REG_ENABLE);
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
         uint8_t odr = _read(dev, REG_CTRL_REG1) >> 4;
         ztimer_sleep(ZTIMER_MSEC, MS_PER_SEC / hz_per_dr[odr]);
 #endif

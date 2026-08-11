@@ -36,10 +36,10 @@ void auto_init_can_mcp2515(void) {
         candev_mcp2515_init(&candev_mcp2515[i], &candev_mcp2515_conf[i]);
         candev_dev_mcp2515[i].dev = (candev_t *)&candev_mcp2515[i];
         candev_dev_mcp2515[i].name = candev_mcp2515_params[i].name;
-#ifdef MODULE_CAN_TRX
+#if MODULE_CAN_TRX
         candev_dev_mcp2515[i].trx = candev_mcp2515_params[i].trx;
 #endif
-#ifdef MODULE_CAN_PM
+#if MODULE_CAN_PM
         candev_dev_mcp2515[i].rx_inactivity_timeout = candev_mcp2515_params[i].rx_inactivity_timeout;
         candev_dev_mcp2515[i].tx_wakeup_timeout = candev_mcp2515_params[i].tx_wakeup_timeout;
 #endif

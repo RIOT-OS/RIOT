@@ -37,7 +37,7 @@
  */
 sht1x_dev_t sht1x_devs[SHT1X_NUM];
 
-#ifdef MODULE_AUTO_INIT_SAUL
+#if MODULE_AUTO_INIT_SAUL
 
 /**
  * @brief   Memory for the SAUL registry entries
@@ -83,7 +83,7 @@ void auto_init_sht1x(void)
                 continue;
         }
 
-#ifdef MODULE_AUTO_INIT_SAUL
+#if MODULE_AUTO_INIT_SAUL
         saul_entries[(i * 2)    ].dev = &(sht1x_devs[i]);
         saul_entries[(i * 2) + 1].dev = &(sht1x_devs[i]);
         saul_entries[(i * 2)    ].name = sht1x_saul_info[(i * 2)    ].name;

@@ -22,10 +22,10 @@
 
 #include "msg.h"
 #include "net/gnrc/pkt.h"
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_HINT
+#if MODULE_GNRC_SIXLOWPAN_FRAG_HINT
 #include "net/gnrc/sixlowpan/frag/hint.h"
 #endif /* MODULE_GNRC_SIXLOWPAN_FRAG_HINT */
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR
 #include "net/gnrc/sixlowpan/frag/sfr_types.h"
 #endif
 
@@ -53,13 +53,13 @@ typedef struct {
     uint16_t tag;           /**< Tag used for the fragment */
     uint16_t offset;        /**< Offset of the Nth fragment from the beginning of the
                              *   payload datagram */
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR
     /**
      * @brief   Extension for selective fragment recovery.
      */
     gnrc_sixlowpan_frag_sfr_fb_t sfr;
-#endif  /* IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_HINT
+#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_SFR */
+#if MODULE_GNRC_SIXLOWPAN_FRAG_HINT
     /**
      * @brief   Hint for the size (smaller than link-layer PDU) for the next
      *          fragment to sent

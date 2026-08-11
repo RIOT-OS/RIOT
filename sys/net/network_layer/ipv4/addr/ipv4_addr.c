@@ -29,7 +29,7 @@ void ipv4_addr_print(const ipv4_addr_t *addr)
     char addr_str[IPV4_ADDR_MAX_STR_LEN];
     ipv4_addr_to_str(addr_str, addr, sizeof(addr_str));
 
-    if (IS_USED(MODULE_FMT)) {
+    if (MODULE_FMT) {
         print_str(addr_str);
     } else {
         printf("%s", addr_str);

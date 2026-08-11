@@ -20,3 +20,8 @@ endif
 ifeq ($(OS),Darwin)
   CFLAGS += -Wno-empty-body
 endif
+
+MODULE_DEFS_NEEDED += \
+  fatfs_vfs \
+  fatfs_vfs_format \
+  #

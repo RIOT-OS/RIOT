@@ -96,7 +96,7 @@ static gnrc_pktsnip_t *cc1xxx_adpt_recv(gnrc_netif_t *netif)
     /* and append the netif header */
     payload = gnrc_pkt_append(payload, hdr);
 
-#ifdef MODULE_NETSTATS_L2
+#if MODULE_NETSTATS_L2
     netif->stats.rx_count++;
     netif->stats.rx_bytes += pktlen;
 #endif
@@ -124,7 +124,7 @@ static int cc1xxx_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     if (netif_hdr->flags & BCAST) {
         l2hdr.dest_addr = CC1XXX_BCAST_ADDR;
         DEBUG("[cc1xxx-gnrc] send: preparing to send broadcast\n");
-#ifdef MODULE_NETSTATS_L2
+#if MODULE_NETSTATS_L2
         netif->stats.tx_mcast_count++;
 #endif
     }
@@ -135,7 +135,7 @@ static int cc1xxx_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         l2hdr.dest_addr = addr[0];
         DEBUG("[cc1xxx-gnrc] send: preparing to send unicast %02x --> %02x\n",
               (int)l2hdr.src_addr, (int)l2hdr.dest_addr);
-#ifdef MODULE_NETSTATS_L2
+#if MODULE_NETSTATS_L2
         netif->stats.tx_unicast_count++;
 #endif
     }

@@ -27,19 +27,19 @@
 #include "net/gnrc.h"
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ipv6.h"
-#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+#if MODULE_GNRC_NETIF_PKTQ
 #include "net/gnrc/netif/pktq.h"
-#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
+#endif /* MODULE_GNRC_NETIF_PKTQ */
 #include "net/gnrc/sixlowpan/ctx.h"
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR
 #include "net/gnrc/sixlowpan/frag/sfr.h"
-#endif /* IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
+#endif /* MODULE_GNRC_SIXLOWPAN_FRAG_SFR */
 #include "net/netstats.h"
 #include "net/netstats/neighbor.h"
 #include "fmt.h"
 #include "log.h"
 #include "sched.h"
-#if IS_USED(MODULE_ZTIMER)
+#if MODULE_ZTIMER
 #include "ztimer.h"
 #endif
 
@@ -73,7 +73,7 @@ int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
                     "more than one interface is being registered.\n");
         assert(netif_iter(NULL) == NULL);
     }
-#ifdef MODULE_GNRC_NETIF_BUS
+#if MODULE_GNRC_NETIF_BUS
     for (int i = 0; i < GNRC_NETIF_BUS_NUMOF; ++i) {
         msg_bus_init(&netif->bus[i]);
     }
@@ -83,7 +83,7 @@ int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
     assert(netif->dev == NULL);
     netif->dev = netdev;
 
-#ifdef MODULE_NETSTATS_NEIGHBOR
+#if MODULE_NETSTATS_NEIGHBOR
     netstats_nb_init(&netif->netif);
 #endif
 
@@ -106,7 +106,7 @@ int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
 bool gnrc_netif_dev_is_6lo(const gnrc_netif_t *netif)
 {
     switch (netif->device_type) {
-#ifdef MODULE_GNRC_SIXLOENC
+#if MODULE_GNRC_SIXLOENC
         case NETDEV_TYPE_ETHERNET:
             return (netif->flags & GNRC_NETIF_FLAGS_6LO);
 #endif
@@ -146,7 +146,7 @@ gnrc_netif_t *gnrc_netif_get_by_type(netdev_type_t type, uint8_t index)
     gnrc_netif_t *netif = NULL;
     while ((netif = gnrc_netif_iter(netif))) {
 
-#ifdef MODULE_NETDEV_REGISTER
+#if MODULE_NETDEV_REGISTER
         if (netif->dev->type != type && type != NETDEV_ANY) {
             continue;
         }
@@ -185,7 +185,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             break;
         case NETOPT_STATS:
             switch ((int16_t)opt->context) {
-#if IS_USED(MODULE_NETSTATS_IPV6) && IS_USED(MODULE_GNRC_NETIF_IPV6)
+#if MODULE_NETSTATS_IPV6 && MODULE_GNRC_NETIF_IPV6
             case NETSTATS_IPV6:
                 {
                     assert(opt->data_len == sizeof(netstats_t));
@@ -200,7 +200,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
                 }
                 break;
 #endif
-#ifdef MODULE_NETSTATS_L2
+#if MODULE_NETSTATS_L2
             case NETSTATS_LAYER2:
                 assert(opt->data_len == sizeof(netstats_t));
                 /* this is only accesses from the netif thread (us), so no need
@@ -215,7 +215,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
                 break;
             }
             break;
-#if IS_USED(MODULE_GNRC_NETIF_IPV6)
+#if MODULE_GNRC_NETIF_IPV6
         case NETOPT_IPV6_ADDR: {
                 assert(opt->data_len >= sizeof(ipv6_addr_t));
                 ipv6_addr_t *tgt = opt->data;
@@ -294,8 +294,8 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             res = sizeof(netopt_enable_t);
             break;
 #endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
-#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
+#endif  /* MODULE_GNRC_NETIF_IPV6 */
+#if MODULE_GNRC_SIXLOWPAN_IPHC
         case NETOPT_6LO_IPHC:
             assert(opt->data_len == sizeof(netopt_enable_t));
             *((netopt_enable_t *)opt->data) = (netif->flags &
@@ -336,7 +336,7 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
             netif->cur_hl = *((uint8_t *)opt->data);
             res = sizeof(uint8_t);
             break;
-#if IS_USED(MODULE_GNRC_NETIF_IPV6)
+#if MODULE_GNRC_NETIF_IPV6
         case NETOPT_IPV6_ADDR: {
                 assert(opt->data_len == sizeof(ipv6_addr_t));
                 /* always assume manually added */
@@ -405,8 +405,8 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
             res = sizeof(netopt_enable_t);
             break;
 #endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
-#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
+#endif  /* MODULE_GNRC_NETIF_IPV6 */
+#if MODULE_GNRC_SIXLOWPAN_IPHC
         case NETOPT_6LO_IPHC:
             assert(opt->data_len == sizeof(netopt_enable_t));
             if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
@@ -453,7 +453,7 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
             break;
         case NETOPT_STATS:
             switch ((int16_t)opt->context) {
-#if IS_USED(MODULE_NETSTATS_IPV6) && IS_USED(MODULE_GNRC_NETIF_IPV6)
+#if MODULE_NETSTATS_IPV6 && MODULE_GNRC_NETIF_IPV6
             case NETSTATS_IPV6:
                 {
                     /* IPv6 thread is updating this, to prevent data
@@ -466,7 +466,7 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
                 }
                 break;
 #endif
-#ifdef MODULE_NETSTATS_L2
+#if MODULE_NETSTATS_L2
             case NETSTATS_LAYER2:
                 /* this is only accesses from the netif thread (us), so no need
                  * to lock this */
@@ -530,7 +530,7 @@ void gnrc_netif_release(gnrc_netif_t *netif)
     }
 }
 
-#if IS_USED(MODULE_GNRC_NETIF_IPV6)
+#if MODULE_GNRC_NETIF_IPV6
 static int _addr_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr);
 static int _group_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr);
 
@@ -679,7 +679,7 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
 #endif /* CONFIG_GNRC_IPV6_NIB_ARSM */
     netif->ipv6.addrs_flags[idx] = flags;
     memcpy(&netif->ipv6.addrs[idx], addr, sizeof(netif->ipv6.addrs[idx]));
-#ifdef MODULE_GNRC_IPV6_NIB
+#if MODULE_GNRC_IPV6_NIB
     if (_get_state(netif, idx) == GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID) {
         void *state = NULL;
         gnrc_ipv6_nib_pl_t ple;
@@ -697,7 +697,7 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
 
         gnrc_netif_ipv6_bus_post(netif, GNRC_IPV6_EVENT_ADDR_VALID, &netif->ipv6.addrs[idx]);
     }
-    else if (IS_USED(MODULE_GNRC_IPV6) &&
+    else if (MODULE_GNRC_IPV6 &&
              IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) &&
              !gnrc_netif_is_6ln(netif)) {
         /* cast to remove const qualifier (will still be used NIB internally as
@@ -1163,7 +1163,7 @@ static unsigned _cap_match(const gnrc_netif_t *netif, const ipv6_addr_t *src,
     if (ipv6_addr_is_link_local(src)) {
         best_prefix = 64U;  /* Link-local prefix is always of length 64 */
     }
-#ifdef MODULE_GNRC_IPV6_NIB
+#if MODULE_GNRC_IPV6_NIB
     else {
         void *state = NULL;
         gnrc_ipv6_nib_pl_t ple;
@@ -1349,7 +1349,7 @@ int gnrc_netif_ipv6_add_prefix(gnrc_netif_t *netif,
     gnrc_ipv6_nib_pl_set(netif->pid, pfx, pfx_len, valid, pref);
 
     /* configure 6LoWPAN specific options */
-    if (IS_USED(MODULE_GNRC_IPV6_NIB) &&
+    if (MODULE_GNRC_IPV6_NIB &&
         IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) &&
         IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C) &&
         gnrc_netif_is_6ln(netif)) {
@@ -1369,7 +1369,7 @@ out:
     return res;
 }
 
-#if IS_USED(MODULE_GNRC_NETIF_BUS)
+#if MODULE_GNRC_NETIF_BUS
 static bool _has_global_addr(gnrc_netif_t *netif)
 {
     bool has_global = false;
@@ -1504,8 +1504,8 @@ bool gnrc_netif_ipv6_wait_for_global_address(gnrc_netif_t *netif,
 
     return has_global;
 }
-#endif  /* IS_USED(MODULE_GNRC_NETIF_BUS) */
-#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
+#endif  /* MODULE_GNRC_NETIF_BUS */
+#endif  /* MODULE_GNRC_NETIF_IPV6 */
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif)
 {
@@ -1546,7 +1546,7 @@ static void _check_netdev_capabilities(netdev_t *dev, bool legacy)
 {
     /* Check whether RX- and TX-complete interrupts are supported by the driver */
     if (IS_ACTIVE(DEVELHELP)) {
-        if (IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ)) {
+        if (MODULE_NETSTATS_L2 || MODULE_GNRC_NETIF_PKTQ) {
             if (!legacy) {
                 /* new API implies TX end event */
                 return;
@@ -1591,7 +1591,7 @@ static void _test_options(gnrc_netif_t *netif)
         case NETDEV_TYPE_ESP_NOW:
             assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
             assert(ETHERNET_ADDR_LEN == netif->l2addr_len);
-#if IS_USED(MODULE_GNRC_NETIF_IPV6)
+#if MODULE_GNRC_NETIF_IPV6
             switch (netif->device_type) {
                 case NETDEV_TYPE_BLE:
 #if IS_ACTIVE(CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU)
@@ -1606,7 +1606,7 @@ static void _test_options(gnrc_netif_t *netif)
                 case NETDEV_TYPE_ESP_NOW:
                     assert(netif->ipv6.mtu <= ETHERNET_DATA_LEN);
             }
-#endif  /* IS_USED(MODULE GNRC_NETIF_IPV6) */
+#endif  /* IS_ACTIVE(MODULE GNRC_NETIF_IPV6) */
             break;
         case NETDEV_TYPE_IEEE802154:
         case NETDEV_TYPE_NRFMIN: {
@@ -1617,8 +1617,8 @@ static void _test_options(gnrc_netif_t *netif)
             assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
             assert((IEEE802154_SHORT_ADDRESS_LEN == netif->l2addr_len) ||
                    (IEEE802154_LONG_ADDRESS_LEN == netif->l2addr_len));
-#if IS_USED(MODULE_GNRC_NETIF_IPV6)
-#if IS_USED(MODULE_GNRC_NETIF_6LO)
+#if MODULE_GNRC_NETIF_IPV6
+#if MODULE_GNRC_NETIF_6LO
 #if IS_ACTIVE(CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU)
             assert(netif->ipv6.mtu >= IPV6_MIN_MTU);
 #else /* IS_ACTIVE(CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU) */
@@ -1626,11 +1626,11 @@ static void _test_options(gnrc_netif_t *netif)
 #endif /* IS_ACTIVE(CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU) */
             assert(-ENOTSUP != netif->dev->driver->get(netif->dev, NETOPT_PROTO,
                                                        &tmp, sizeof(tmp)));
-#else   /* IS_USED(MODULE_GNRC_NETIF_6LO) */
+#else   /* MODULE_GNRC_NETIF_6LO */
             assert(netif->ipv6.mtu < UINT16_MAX);
-#endif  /* IS_USED(MODULE_GNRC_NETIF_6LO) */
-#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
-#ifdef MODULE_GNRC_SIXLOWPAN_ND
+#endif  /* MODULE_GNRC_NETIF_6LO */
+#endif  /* MODULE_GNRC_NETIF_IPV6 */
+#if MODULE_GNRC_SIXLOWPAN_ND
             assert((netif->device_type != NETDEV_TYPE_IEEE802154) ||
                    (-ENOTSUP != netif->dev->driver->get(netif->dev,
                                                         NETOPT_ADDRESS_LONG,
@@ -1642,20 +1642,20 @@ static void _test_options(gnrc_netif_t *netif)
         case NETDEV_TYPE_CC110X:
             assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
             assert(1U == netif->l2addr_len);
-#if IS_USED(MODULE_GNRC_NETIF_IPV6)
+#if MODULE_GNRC_NETIF_IPV6
             assert(netif->ipv6.mtu < UINT16_MAX);
-#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
+#endif  /* MODULE_GNRC_NETIF_IPV6 */
             break;
         case NETDEV_TYPE_NRF24L01P_NG:
             assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
             assert(netif->l2addr_len >= 3U && netif->l2addr_len <= 5U);
             break;
         case NETDEV_TYPE_SLIP:
-#if IS_USED(MODULE_SLIPDEV_L2ADDR)
+#if MODULE_SLIPDEV_L2ADDR
             assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
             assert(8U == netif->l2addr_len);
             break;
-#endif /* IS_USED(MODULE_SLIPDEV_L2ADDR) */
+#endif /* MODULE_SLIPDEV_L2ADDR */
         case NETDEV_TYPE_LORA: /* LoRa doesn't provide L2 ADDR */
             assert(!(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR));
             assert(0U == netif->l2addr_len);
@@ -1669,11 +1669,11 @@ static void _test_options(gnrc_netif_t *netif)
     }
     /* These functions only apply to network devices having link-layers */
     if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
-#if IS_USED(MODULE_GNRC_NETIF_IPV6)
+#if MODULE_GNRC_NETIF_IPV6
         assert(-ENOTSUP != gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&tmp64));
         assert(-ENOTSUP != gnrc_netif_ndp_addr_len_from_l2ao(netif,
                                                              &dummy_opt));
-#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
+#endif  /* MODULE_GNRC_NETIF_IPV6 */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
         assert(-ENOTSUP != gnrc_netif_ipv6_iid_to_addr(netif, (eui64_t *)&tmp64,
                                                        dummy_addr));
@@ -1700,11 +1700,11 @@ int gnrc_netif_default_init(gnrc_netif_t *netif)
 #ifdef DEVELHELP
     _test_options(netif);
 #endif
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR
     gnrc_sixlowpan_frag_sfr_init_iface(netif);
 #endif
     netif->cur_hl = CONFIG_GNRC_NETIF_DEFAULT_HL;
-#ifdef MODULE_GNRC_IPV6_NIB
+#if MODULE_GNRC_IPV6_NIB
     gnrc_ipv6_nib_init_iface(netif);
 #endif
 #if DEVELHELP
@@ -1728,7 +1728,7 @@ static void _event_handler_isr(event_t *evp)
 
 static void _process_receive_stats(gnrc_netif_t *netdev, gnrc_pktsnip_t *pkt)
 {
-    if (!IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
+    if (!MODULE_NETSTATS_NEIGHBOR) {
         return;
     }
 
@@ -1796,14 +1796,14 @@ static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
 static void _send_queued_pkt(gnrc_netif_t *netif)
 {
     (void)netif;
-#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+#if MODULE_GNRC_NETIF_PKTQ
     gnrc_pktsnip_t *pkt;
 
     if ((pkt = gnrc_netif_pktq_get(netif)) != NULL) {
         _send(netif, pkt, true);
         gnrc_netif_pktq_sched_get(netif);
     }
-#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
+#endif /* MODULE_GNRC_NETIF_PKTQ */
 }
 
 static netstats_nb_result_t _res_to_nb_result(int res)
@@ -1820,7 +1820,7 @@ static netstats_nb_result_t _res_to_nb_result(int res)
 static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
                      gnrc_pktsnip_t *tx_sync, int res, bool push_back)
 {
-    (void)push_back; /* only used with IS_USED(MODULE_GNRC_NETIF_PKTQ) */
+    (void)push_back; /* only used with MODULE_GNRC_NETIF_PKTQ */
 
     uint32_t err = (res < 0) ? -res : GNRC_NETERR_SUCCESS;
 
@@ -1828,7 +1828,7 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
         gnrc_pktbuf_release_error(tx_sync, err);
     }
 
-    if (IS_USED(MODULE_NETSTATS_NEIGHBOR) && gnrc_netif_netdev_new_api(netif)) {
+    if (MODULE_NETSTATS_NEIGHBOR && gnrc_netif_netdev_new_api(netif)) {
         int8_t retries = -1;
         netstats_nb_result_t result = _res_to_nb_result(res);
         if (result != NETSTATS_NB_BUSY) {
@@ -1844,16 +1844,16 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
         DEBUG("gnrc_netif: error sending packet %p (code: %i)\n",
               (void *)pkt, res);
 
-        if (IS_USED(MODULE_NETSTATS_NEIGHBOR) && gnrc_netif_netdev_legacy_api(netif)) {
+        if (MODULE_NETSTATS_NEIGHBOR && gnrc_netif_netdev_legacy_api(netif)) {
             netstats_nb_update_tx(&netif->netif, NETSTATS_NB_BUSY, 0);
         }
     }
-#ifdef MODULE_NETSTATS_L2
+#if MODULE_NETSTATS_L2
     else {
         netif->stats.tx_bytes += res;
     }
 #endif
-#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+#if MODULE_GNRC_NETIF_PKTQ
     if (res == -EBUSY) {
         int put_res;
 
@@ -1888,7 +1888,7 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
         gnrc_pktbuf_release(pkt);
         return;
     }
-#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
+#endif /* MODULE_GNRC_NETIF_PKTQ */
 
     if (gnrc_netif_netdev_new_api(netif)) {
         /* with new netdev (with confirm_send), the netif remains owner of the
@@ -1897,7 +1897,7 @@ static void _tx_done(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
     }
 }
 
-#if IS_USED(MODULE_NETDEV_NEW_API)
+#if MODULE_NETDEV_NEW_API
 /**
  * @brief   Call the confirm_send handler from an event
  *
@@ -1919,7 +1919,7 @@ static void _event_handler_tx_done(event_t *evp)
 
 static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
 {
-#if IS_USED(MODULE_NETDEV_NEW_API)
+#if MODULE_NETDEV_NEW_API
     if (netif->tx_pkt != NULL) {
         /* Upper layer is handing out frames faster than hardware can transmit.
          * Note that not only doesn't it make sense to bother the driver if it
@@ -1934,7 +1934,7 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
     }
 #endif
 
-#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+#if MODULE_GNRC_NETIF_PKTQ
     /* send queued packets first to keep order */
     if (!push_back && !gnrc_netif_pktq_empty(netif)) {
         int put_res;
@@ -1953,10 +1953,10 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
             /* try to send anyway */
         }
     }
-#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
+#endif /* MODULE_GNRC_NETIF_PKTQ */
 
     /* Record send in neighbor statistics if destination is unicast */
-    if (IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
+    if (MODULE_NETSTATS_NEIGHBOR) {
         gnrc_netif_hdr_t *netif_hdr = pkt->data;
         if (netif_hdr->flags &
             (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
@@ -1971,15 +1971,15 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
     }
 
     /* Split off the TX sync snip */
-    gnrc_pktsnip_t *tx_sync = IS_USED(MODULE_GNRC_TX_SYNC)
+    gnrc_pktsnip_t *tx_sync = MODULE_GNRC_TX_SYNC
                             ? gnrc_tx_sync_split(pkt) : NULL;
-#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+#if MODULE_GNRC_NETIF_PKTQ
     /* hold in case device was busy to not having to rewrite *all* the link
      * layer implementations in case `gnrc_netif_pktq` is included */
     if (gnrc_netif_netdev_legacy_api(netif)) {
         gnrc_pktbuf_hold(pkt, 1);
     }
-#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
+#endif /* MODULE_GNRC_NETIF_PKTQ */
     int res = netif->ops->send(netif, pkt);
 
     /* For legacy netdevs (no confirm_send) TX is blocking, thus it is always
@@ -1990,14 +1990,14 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
     if (gnrc_netif_netdev_legacy_api(netif) || (res != 0)) {
         _tx_done(netif, pkt, tx_sync, res, push_back);
     }
-#if IS_USED(MODULE_NETDEV_NEW_API)
+#if MODULE_NETDEV_NEW_API
     else {
         /* new API *and* send() was a success --> block netif and memorize
          * frame to free memory later */
         netif->tx_pkt = pkt;
 
         gnrc_pkt_append(pkt, tx_sync);
-        if (IS_USED(MODULE_GNRC_NETIF_PKTQ) && push_back) {
+        if (MODULE_GNRC_NETIF_PKTQ && push_back) {
             netif->flags |= GNRC_NETIF_FLAGS_TX_FROM_PKTQUEUE;
         }
     }
@@ -2018,7 +2018,7 @@ static void *_gnrc_netif_thread(void *args)
     netif->pid = thread_getpid();
 
     netif->event_isr.handler = _event_handler_isr;
-#if IS_USED(MODULE_NETDEV_NEW_API)
+#if MODULE_NETDEV_NEW_API
     netif->event_tx_done.handler = _event_handler_tx_done;
 #endif
     /* set up the event queue */
@@ -2034,7 +2034,7 @@ static void *_gnrc_netif_thread(void *args)
         LOG_ERROR("gnrc_netif: init %u failed: %d\n", thread_getpid(), ctx->result);
         return NULL;
     }
-#ifdef MODULE_NETSTATS_L2
+#if MODULE_NETSTATS_L2
     memset(&netif->stats, 0, sizeof(netstats_t));
 #endif
     /* now let rest of GNRC use the interface */
@@ -2052,12 +2052,12 @@ static void *_gnrc_netif_thread(void *args)
         /* dispatch netdev, MAC and gnrc_netapi messages */
         DEBUG("gnrc_netif: message %u\n", (unsigned)msg.type);
         switch (msg.type) {
-#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+#if MODULE_GNRC_NETIF_PKTQ
             case GNRC_NETIF_PKTQ_DEQUEUE_MSG:
                 DEBUG("gnrc_netif: send from packet send queue\n");
                 _send_queued_pkt(netif);
                 break;
-#endif  /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
+#endif  /* MODULE_GNRC_NETIF_PKTQ */
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
                 _send(netif, msg.content.ptr, false);
@@ -2074,7 +2074,7 @@ static void *_gnrc_netif_thread(void *args)
                 break;
             case GNRC_NETAPI_MSG_TYPE_SET:
                 opt = msg.content.ptr;
-#ifdef MODULE_NETOPT
+#if MODULE_NETOPT
                 DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_SET received. opt=%s\n",
                       netopt2str(opt->opt));
 #else
@@ -2089,7 +2089,7 @@ static void *_gnrc_netif_thread(void *args)
                 break;
             case GNRC_NETAPI_MSG_TYPE_GET:
                 opt = msg.content.ptr;
-#ifdef MODULE_NETOPT
+#if MODULE_NETOPT
                 DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_GET received. opt=%s\n",
                       netopt2str(opt->opt));
 #else
@@ -2137,7 +2137,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
     if (event == NETDEV_EVENT_ISR) {
         event_post(&netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW], &netif->event_isr);
     }
-#if IS_USED(MODULE_NETDEV_NEW_API)
+#if MODULE_NETDEV_NEW_API
     else if (gnrc_netif_netdev_new_api(netif)
              && (event == NETDEV_EVENT_TX_COMPLETE)) {
         event_post(&netif->evq[GNRC_NETIF_EVQ_INDEX_PRIO_LOW],
@@ -2149,14 +2149,14 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         gnrc_pktsnip_t *pkt = NULL;
         switch (event) {
             case NETDEV_EVENT_LINK_UP:
-                if (IS_USED(MODULE_GNRC_IPV6)) {
+                if (MODULE_GNRC_IPV6) {
                     msg_t msg = { .type = GNRC_IPV6_NIB_IFACE_UP, .content = { .ptr = netif } };
 
                     msg_send(&msg, gnrc_ipv6_pid);
                 }
                 break;
             case NETDEV_EVENT_LINK_DOWN:
-                if (IS_USED(MODULE_GNRC_IPV6)) {
+                if (MODULE_GNRC_IPV6) {
                     msg_t msg = { .type = GNRC_IPV6_NIB_IFACE_DOWN, .content = { .ptr = netif } };
 
                     msg_send(&msg, gnrc_ipv6_pid);
@@ -2173,8 +2173,8 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                     _pass_on_packet(pkt);
                 }
                 break;
-#if IS_USED(MODULE_NETDEV_LEGACY_API)
-#  if IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ)
+#if MODULE_NETDEV_LEGACY_API
+#  if MODULE_NETSTATS_L2 || MODULE_GNRC_NETIF_PKTQ
             case NETDEV_EVENT_TX_COMPLETE:
             case NETDEV_EVENT_TX_COMPLETE_DATA_PENDING:
                 /* send packet previously queued within netif due to the lower
@@ -2182,24 +2182,24 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                  * Further packets will be sent on later TX_COMPLETE or
                  * TX_MEDIUM_BUSY */
                 _send_queued_pkt(netif);
-#    if IS_USED(MODULE_NETSTATS_L2)
+#    if MODULE_NETSTATS_L2
                 /* we are the only ones supposed to touch this variable,
                  * so no acquire necessary */
                 netif->stats.tx_success++;
-#    endif  /* IS_USED(MODULE_NETSTATS_L2) */
-                if (IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
+#    endif  /* MODULE_NETSTATS_L2 */
+                if (MODULE_NETSTATS_NEIGHBOR) {
                     int8_t retries = -1;
                     dev->driver->get(dev, NETOPT_TX_RETRIES_NEEDED, &retries, sizeof(retries));
                     netstats_nb_update_tx(&netif->netif, NETSTATS_NB_SUCCESS, retries + 1);
                 }
                 break;
-#  endif  /* IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ) */
-#  if IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ) || \
-      IS_USED(MODULE_NETSTATS_NEIGHBOR)
+#  endif  /* MODULE_NETSTATS_L2 || MODULE_GNRC_NETIF_PKTQ */
+#  if MODULE_NETSTATS_L2 || MODULE_GNRC_NETIF_PKTQ || \
+      MODULE_NETSTATS_NEIGHBOR
             case NETDEV_EVENT_TX_MEDIUM_BUSY:
             case NETDEV_EVENT_TX_NOACK:
                 /* update neighbor statistics */
-                if (IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
+                if (MODULE_NETSTATS_NEIGHBOR) {
                     int8_t retries = -1;
                     netstats_nb_result_t result;
                     if (event == NETDEV_EVENT_TX_NOACK) {
@@ -2215,14 +2215,14 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                  * Further packets will be sent on later TX_COMPLETE or
                  * TX_MEDIUM_BUSY */
                 _send_queued_pkt(netif);
-#    if IS_USED(MODULE_NETSTATS_L2)
+#    if MODULE_NETSTATS_L2
                 /* we are the only ones supposed to touch this variable,
                  * so no acquire necessary */
                 netif->stats.tx_failed++;
-#    endif  /* IS_USED(MODULE_NETSTATS_L2) */
+#    endif  /* MODULE_NETSTATS_L2 */
                 break;
-#  endif  /* IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ) */
-#endif /* IS_USED(MODULE_NETDEV_LEGACY_API) */
+#  endif  /* MODULE_NETSTATS_L2 || MODULE_GNRC_NETIF_PKTQ */
+#endif /* MODULE_NETDEV_LEGACY_API */
             default:
                 DEBUG("gnrc_netif: warning: unhandled event %u.\n", event);
         }

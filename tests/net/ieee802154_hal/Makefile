@@ -1,3 +1,13 @@
+
+MODULE_DEFS_NEEDED += \
+  cc2538_rf \
+  esp_ieee802154 \
+  event_thread \
+  kw2xrf \
+  mrf24j40 \
+  nrf802154 \
+  socket_zep \
+  #
 include ../Makefile.net_common
 
 ifneq (,$(filter native native32 native64,$(BOARD)))

@@ -28,7 +28,7 @@
 #include "fido2/ctap/ctap_cbor.h"
 #include "fido2/ctap/ctap_mem.h"
 
-#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
+#if MODULE_FIDO2_CTAP_TRANSPORT_HID
 #include "fido2/ctap/transport/hid/ctap_hid.h"
 #endif
 
@@ -552,7 +552,7 @@ static int _make_credential(ctap_req_t *req_raw)
     }
 
     /* last moment where transaction can be cancelled */
-#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
+#if MODULE_FIDO2_CTAP_TRANSPORT_HID
     if (fido2_ctap_transport_hid_should_cancel()) {
         ret = CTAP2_ERR_KEEPALIVE_CANCEL;
         goto done;
@@ -714,7 +714,7 @@ static int _get_assertion(ctap_req_t *req_raw)
     rk = &_assert_state.rks[_assert_state.cred_counter++];
 
     /* last moment where transaction can be cancelled */
-#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
+#if MODULE_FIDO2_CTAP_TRANSPORT_HID
     if (fido2_ctap_transport_hid_should_cancel()) {
         ret = CTAP2_ERR_KEEPALIVE_CANCEL;
         goto done;
@@ -1012,7 +1012,7 @@ static int _set_pin(ctap_client_pin_req_t *req)
     }
 
     /* last moment where transaction can be cancelled */
-#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
+#if MODULE_FIDO2_CTAP_TRANSPORT_HID
     if (fido2_ctap_transport_hid_should_cancel()) {
         ret = CTAP2_ERR_KEEPALIVE_CANCEL;
         goto done;
@@ -1123,7 +1123,7 @@ static int _change_pin(ctap_client_pin_req_t *req)
     }
 
     /* last moment where transaction can be cancelled */
-#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
+#if MODULE_FIDO2_CTAP_TRANSPORT_HID
     if (fido2_ctap_transport_hid_should_cancel()) {
         ret = CTAP2_ERR_KEEPALIVE_CANCEL;
         goto done;
@@ -1220,7 +1220,7 @@ static int _get_pin_token(ctap_client_pin_req_t *req)
     }
 
     /* last moment where transaction can be cancelled */
-#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
+#if MODULE_FIDO2_CTAP_TRANSPORT_HID
     if (fido2_ctap_transport_hid_should_cancel()) {
         ret = CTAP2_ERR_KEEPALIVE_CANCEL;
         goto done;

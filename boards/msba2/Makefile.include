@@ -5,3 +5,7 @@
 TTY_BOARD_FILTER := --model MSB430A
 
 include $(RIOTBOARD)/common/msba2/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  mtd_mci \
+  #

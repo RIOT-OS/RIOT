@@ -21,7 +21,7 @@ index 2133eb2..f43a500 100644
 -// default: activated
 -#ifndef PRINTF_DISABLE_SUPPORT_FLOAT
 +// default: deactivated
-+#ifdef MODULE_PRINTF_FLOAT
++#if MODULE_PRINTF_FLOAT
  #define PRINTF_SUPPORT_FLOAT
  #endif
  
@@ -32,7 +32,7 @@ index 2133eb2..f43a500 100644
 -// default: activated
 -#ifndef PRINTF_DISABLE_SUPPORT_LONG_LONG
 +// default: deactivated
-+#ifdef MODULE_PRINTF_LONG_LONG
++#if MODULE_PRINTF_LONG_LONG
  #define PRINTF_SUPPORT_LONG_LONG
  #endif
  

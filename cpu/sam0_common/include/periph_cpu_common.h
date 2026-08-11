@@ -36,7 +36,7 @@ extern "C" {
  */
 #define PERIPH_SPI_NEEDS_INIT_CS
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTE
-#ifndef MODULE_PERIPH_DMA
+#if !MODULE_PERIPH_DMA
 #  define PERIPH_SPI_NEEDS_TRANSFER_REG
 #  define PERIPH_SPI_NEEDS_TRANSFER_REGS
 #endif
@@ -74,7 +74,7 @@ typedef uint32_t gpio_t;
  * @brief   Macro for accessing GPIO pins
  * @{
  */
-#ifdef MODULE_PERIPH_GPIO_FAST_READ
+#if MODULE_PERIPH_GPIO_FAST_READ
 #  ifdef PORT_IOBUS_SEC
 #    define GPIO_PIN(x, y)  (((gpio_t)(&PORT_IOBUS_SEC->Group[x])) | y)
 #  else /* Use IOBUS access when available */
@@ -336,7 +336,7 @@ typedef struct {
     SercomUsart *dev;       /**< pointer to the used UART device */
     gpio_t rx_pin;          /**< pin used for RX */
     gpio_t tx_pin;          /**< pin used for TX */
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
     gpio_t rts_pin;          /**< pin used for RTS */
     gpio_t cts_pin;          /**< pin used for CTS */
 #endif
@@ -502,7 +502,7 @@ typedef struct {
     spi_misopad_t miso_pad; /**< pad to use for MISO line */
     spi_mosipad_t mosi_pad; /**< pad to use for MOSI and CLK line */
     uint8_t gclk_src;       /**< GCLK source which supplys SERCOM */
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
     uint8_t tx_trigger;     /**< DMA trigger */
     uint8_t rx_trigger;     /**< DMA trigger */
 #endif
@@ -644,7 +644,7 @@ void cpu_pm_cb_leave(int deep);
  */
 static inline void sam0_cortexm_sleep(int deep)
 {
-#ifdef MODULE_PERIPH_GPIO
+#if MODULE_PERIPH_GPIO
     gpio_pm_cb_enter(deep);
 #endif
 
@@ -654,7 +654,7 @@ static inline void sam0_cortexm_sleep(int deep)
 
     cpu_pm_cb_leave(deep);
 
-#ifdef MODULE_PERIPH_GPIO
+#if MODULE_PERIPH_GPIO
     gpio_pm_cb_leave(deep);
 #endif
 }

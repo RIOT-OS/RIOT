@@ -31,7 +31,7 @@ extern "C" {
  * @name    Set default configuration parameters
  * @{
  */
-#ifdef MODULE_GP8503
+#if MODULE_GP8503
 #  ifndef GP8503_PARAM_I2C_DEV
 #    define GP8503_PARAM_I2C_DEV    I2C_DEV(0)
 #  endif
@@ -55,7 +55,7 @@ extern "C" {
 #  endif
 #endif /* MODULE_GP8503 */
 
-#ifdef MODULE_GP8512
+#if MODULE_GP8512
 #  ifndef GP8512_PARAM_I2C_DEV
 #    define GP8512_PARAM_I2C_DEV    I2C_DEV(0)
 #  endif
@@ -78,7 +78,7 @@ extern "C" {
 #  endif
 #endif /* MODULE_GP8512 */
 
-#ifdef MODULE_GP8403
+#if MODULE_GP8403
 #  ifndef GP8403_PARAM_I2C_DEV
 #    define GP8403_PARAM_I2C_DEV    I2C_DEV(0)
 #  endif
@@ -102,7 +102,7 @@ extern "C" {
 #  endif
 #endif /* MODULE_GP8403 */
 
-#ifdef MODULE_GP8413
+#if MODULE_GP8413
 #  ifndef GP8413_PARAM_I2C_DEV
 #    define GP8413_PARAM_I2C_DEV    I2C_DEV(0)
 #  endif
@@ -126,7 +126,7 @@ extern "C" {
 #  endif
 #endif /* MODULE_GP8413 */
 
-#ifdef MODULE_GP8211S
+#if MODULE_GP8211S
 #  ifndef GP8211S_PARAM_I2C_DEV
 #    define GP8211S_PARAM_I2C_DEV   I2C_DEV(0)
 #  endif
@@ -149,7 +149,7 @@ extern "C" {
 #  endif
 #endif /* MODULE_GP8211S */
 
-#ifdef MODULE_GP8302
+#if MODULE_GP8302
 #  ifndef GP8302_PARAM_I2C_DEV
 #    define GP8302_PARAM_I2C_DEV    I2C_DEV(0)
 #  endif

@@ -26,7 +26,7 @@
 
 #include "em_gpio.h"
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 /**
  * @brief   Number of external interrupt lines.
  */
@@ -100,7 +100,7 @@ void gpio_write(gpio_t pin, bool value)
     }
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 static inline uint32_t _pin_mask(gpio_t pin)
 {
     return (1 << _pin_num(pin));

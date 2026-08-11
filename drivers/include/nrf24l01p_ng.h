@@ -433,7 +433,7 @@ nrf24l01p_ng_state_t nrf24l01p_ng_get_state(const nrf24l01p_ng_t *dev);
  */
 void nrf24l01p_ng_eui_get(const netdev_t *dev, uint8_t *eui);
 
-#if IS_USED(MODULE_NRF24L01P_NG_DIAGNOSTICS)
+#if MODULE_NRF24L01P_NG_DIAGNOSTICS
 /**
  * @brief Get state variable as a string
  *

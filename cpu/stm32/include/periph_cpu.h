@@ -80,8 +80,8 @@
 #include "periph/cpu_vbat.h"
 #include "periph/cpu_wdt.h"
 
-#ifdef MODULE_PERIPH_CAN
-#ifdef MODULE_FDCAN
+#if MODULE_PERIPH_CAN
+#if MODULE_FDCAN
 #include "fdcandev_stm32.h"
 #else
 #include "candev_stm32.h"
@@ -169,7 +169,7 @@ typedef struct {
  *       number of allocated EPs does not exceed the number of available EPs if
  *       a device has less EPs.
  */
-#if defined(MODULE_PERIPH_USBDEV_HS) && defined(STM32_USB_OTG_HS_NUM_EP)
+#if MODULE_PERIPH_USBDEV_HS && defined(STM32_USB_OTG_HS_NUM_EP)
 #define USBDEV_NUM_ENDPOINTS            STM32_USB_OTG_HS_NUM_EP
 #elif defined(STM32_USB_OTG_FS_NUM_EP)
 #define USBDEV_NUM_ENDPOINTS            STM32_USB_OTG_FS_NUM_EP

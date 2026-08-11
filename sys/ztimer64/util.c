@@ -69,7 +69,7 @@ void ztimer64_periodic_wakeup(ztimer64_clock_t *clock, uint64_t *last_wakeup,
     }
 }
 
-#ifdef MODULE_CORE_MSG
+#if MODULE_CORE_MSG
 static void _callback_msg(void *arg)
 {
     msg_t *msg = (msg_t *)arg;
@@ -120,7 +120,7 @@ int ztimer64_msg_receive_until(ztimer64_clock_t *clock, msg_t *msg,
 
 #endif /* MODULE_CORE_MSG */
 
-#ifdef MODULE_CORE_THREAD_FLAGS
+#if MODULE_CORE_THREAD_FLAGS
 static void _set_timeout_flag_callback(void *arg)
 {
     thread_flags_set(arg, THREAD_FLAG_TIMEOUT);

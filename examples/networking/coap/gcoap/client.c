@@ -36,7 +36,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if IS_USED(MODULE_GCOAP_DTLS)
+#if MODULE_GCOAP_DTLS
 #include "net/dsm.h"
 #endif
 
@@ -245,12 +245,12 @@ static int _cli_cmd(int argc, char **argv)
     if (strcmp(argv[1], "info") == 0) {
         uint8_t open_reqs = gcoap_op_state();
 
-        if (IS_USED(MODULE_GCOAP_DTLS)) {
+        if (MODULE_GCOAP_DTLS) {
             printf("CoAP server is listening on port %u\n", CONFIG_GCOAPS_PORT);
         } else {
             printf("CoAP server is listening on port %u\n", CONFIG_GCOAP_PORT);
         }
-#if IS_USED(MODULE_GCOAP_DTLS)
+#if MODULE_GCOAP_DTLS
         printf("Connection secured with DTLS\n");
         printf("Free DTLS session slots: %d/%d\n", dsm_get_num_available_slots(),
                 dsm_get_num_maximum_slots());

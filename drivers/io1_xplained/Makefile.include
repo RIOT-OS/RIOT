@@ -1,2 +1,6 @@
 USEMODULE_INCLUDES_io1_xplained := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_io1_xplained)
+
+MODULE_DEFS_NEEDED += \
+  saul_gpio \
+  #

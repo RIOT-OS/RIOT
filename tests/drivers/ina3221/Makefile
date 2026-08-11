@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  ina3221_alerts \
+  #
 include ../Makefile.drivers_common
 
 DEBUG ?= 0

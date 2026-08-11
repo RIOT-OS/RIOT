@@ -121,9 +121,9 @@ static int _cmd_server(int argc, char **argv)
 
     printf("TCP server listening on port %d\n", LWIPERF_TCP_PORT_DEFAULT);
 
-#if IS_USED(MODULE_LWIP_IPV4) && !IS_USED(MODULE_LWIP_IPV6)
+#if MODULE_LWIP_IPV4 && !MODULE_LWIP_IPV6
     puts("Run on host: iperf -c <board_ip>");
-#elif !IS_USED(MODULE_LWIP_IPV4) && IS_USED(MODULE_LWIP_IPV6)
+#elif !MODULE_LWIP_IPV4 && MODULE_LWIP_IPV6
     puts("Run on host: iperf -V -c <board_ip>");
 #else
     puts("Run on host: iperf -c <board_ip>    (for IPv4)");
@@ -200,11 +200,11 @@ SHELL_COMMAND(server, "start iPerf server", _cmd_server);
 
 int main(void)
 {
-#if IS_USED(MODULE_LWIP_IPV4) && IS_USED(MODULE_LWIP_DHCP_AUTO)
+#if MODULE_LWIP_IPV4 && MODULE_LWIP_DHCP_AUTO
     /* auto-configure using DHCP */
     puts("Waiting for DHCP address autoconfiguration ...");
     ztimer_sleep(ZTIMER_MSEC, TEST_DHCP_TIMEOUT_SEC * MS_PER_SEC);
-#elif IS_USED(MODULE_LWIP_IPV4)
+#elif MODULE_LWIP_IPV4
     /* configure static IP address */
     ip4_addr_t ip = TEST_ADDR4_LOCAL;
     ip4_addr_t subnet = TEST_ADDR4_MASK;

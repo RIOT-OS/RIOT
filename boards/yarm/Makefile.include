@@ -14,3 +14,8 @@ $(call target-export-variables,test,TESTRUNNER_CONNECT_DELAY)
 
 term-delay: $(TERMDELAYDEPS)
 	sleep $(TERM_DELAY)
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  periph_uart_hw_fc \
+  #

@@ -142,7 +142,7 @@ typedef struct {
      */
     mutex_t lock;
 
-#if IS_USED(MODULE_UNICOAP_SERVER) || defined(DOXYGEN)
+#if MODULE_UNICOAP_SERVER || defined(DOXYGEN)
     /** @brief Groups of resources */
     unicoap_listener_t* listeners;
 #endif
@@ -152,7 +152,7 @@ typedef struct {
 
 /** @brief Sets listener array on @p state object to @p listeners */
 static inline void unicoap_set_listeners(unicoap_state_t* state, unicoap_listener_t* listeners) {
-#if IS_USED(MODULE_UNICOAP_SERVER)
+#if MODULE_UNICOAP_SERVER
     state->listeners = listeners;
 #else
     (void)state;
@@ -162,7 +162,7 @@ static inline void unicoap_set_listeners(unicoap_state_t* state, unicoap_listene
 
 /** @brief Gets listener array from @p state object */
 static inline unicoap_listener_t* unicoap_get_listeners(unicoap_state_t* state) {
-#if IS_USED(MODULE_UNICOAP_SERVER)
+#if MODULE_UNICOAP_SERVER
     return state->listeners;
 #else
     (void)state;

@@ -196,7 +196,7 @@ int adc_init(adc_t line)
 
     /* determine the right sampling time */
     uint32_t smp_time = ADC_SMP_MIN_VAL;
-    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+    if (MODULE_PERIPH_VBAT && line == VBAT_ADC) {
         smp_time = ADC_SMP_VBAT_VAL;
     }
 
@@ -229,7 +229,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     prep(line);
 
     /* check if this is the VBAT line */
-    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+    if (MODULE_PERIPH_VBAT && line == VBAT_ADC) {
         vbat_enable();
     }
 #ifdef VREFINT_ADC
@@ -256,7 +256,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     sample = (int)dev(line)->DR;
 
     /* check if this is the VBAT line */
-    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+    if (MODULE_PERIPH_VBAT && line == VBAT_ADC) {
         vbat_disable();
     }
 #ifdef VREFINT_ADC

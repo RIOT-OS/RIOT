@@ -190,7 +190,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     return 0;
 }
 
-#ifdef MODULE_PERIPH_UART_MODECFG
+#if MODULE_PERIPH_UART_MODECFG
 int uart_mode(uart_t dev, uart_data_bits_t data_bits, uart_parity_t parity,
               uart_stop_bits_t stop_bits)
 {

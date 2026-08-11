@@ -13,7 +13,7 @@
 #include "random.h"
 #include "xtimer.h"
 
-#ifdef MODULE_PERIPH_HWRNG
+#if MODULE_PERIPH_HWRNG
 #include "periph/hwrng.h"
 #endif
 
@@ -38,7 +38,7 @@ static void test_init(char *name)
     if (source == RNG_PRNG) {
         random_init(seed);
     }
-#ifdef MODULE_PERIPH_HWRNG
+#if MODULE_PERIPH_HWRNG
     else if (source == RNG_HWRNG) {
         hwrng_init();
     }
@@ -70,7 +70,7 @@ static void test_init(char *name)
         puts("unknown PRNG.\n");
 #endif
     }
-#ifdef MODULE_PERIPH_HWRNG
+#if MODULE_PERIPH_HWRNG
     else if (source == RNG_HWRNG) {
         puts("HW RNG.\n");
     }
@@ -88,7 +88,7 @@ static inline uint32_t test_get_uint32(void)
     if (source == RNG_PRNG) {
         return random_uint32();
     }
-#ifdef MODULE_PERIPH_HWRNG
+#if MODULE_PERIPH_HWRNG
     else if (source == RNG_HWRNG) {
         uint32_t result;
         hwrng_read(&result, 4);
@@ -112,7 +112,7 @@ static inline uint32_t test_get_uint32_range(uint32_t a, uint32_t b)
     if (source == RNG_PRNG) {
         return random_uint32_range(a, b);
     }
-#ifdef MODULE_PERIPH_HWRNG
+#if MODULE_PERIPH_HWRNG
     else if (source == RNG_HWRNG) {
         puts("Range feature not supported by HWRNG");
     }
@@ -386,7 +386,7 @@ void test_entropy(uint32_t samples)
     /* Use 'fmt/print_float' to work on all platforms (atmega)
      * Stdout should be flushed before to prevent garbled output. */
     printf("Calculated ");
-#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
+#if MODULE_NEWLIB || MODULE_PICOLIBC
     /* no fflush on msp430 */
     fflush(stdout);
 #endif

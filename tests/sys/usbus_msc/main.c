@@ -22,7 +22,7 @@
 #include "board.h"
 #include "test_utils/expect.h"
 
-#if defined(MODULE_MTD_EMULATED)
+#if MODULE_MTD_EMULATED
 
 #include "mtd_emulated.h"
 

@@ -26,7 +26,7 @@
 #include "mutex.h"
 #include "ztimer.h"
 
-#if IS_USED(MODULE_SEMA_DEPRECATED)
+#if MODULE_SEMA_DEPRECATED
 #include "ztimer64.h"
 #endif
 
@@ -131,7 +131,7 @@ static inline unsigned sema_get_value(const sema_t *sema)
 int _sema_wait_ztimer(sema_t *sema, int block,
                       ztimer_clock_t *clock, uint32_t timeout);
 
-#if IS_USED(MODULE_SEMA_DEPRECATED)
+#if MODULE_SEMA_DEPRECATED
 /**
  * @brief   Wait for a semaphore, blocking or non-blocking.
  *
@@ -187,7 +187,7 @@ static inline int sema_try_wait(sema_t *sema)
     return _sema_wait_ztimer(sema, 0, NULL, 0);
 }
 
-#if IS_USED(MODULE_SEMA_DEPRECATED) || defined(DOXYGEN)
+#if MODULE_SEMA_DEPRECATED || defined(DOXYGEN)
 /**
  * @brief   Wait for a semaphore being posted with a 64bit timeout
  *

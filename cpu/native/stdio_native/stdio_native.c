@@ -32,7 +32,7 @@ static void _async_read_wrapper(int fd, void *arg)
 static void _init(void)
 {
     native_async_read_setup();
-    if (IS_USED(MODULE_STDIN)) {
+    if (MODULE_STDIN) {
         native_async_read_add_int_handler(STDIN_FILENO, NULL,
                                           _async_read_wrapper);
     }

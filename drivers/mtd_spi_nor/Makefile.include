@@ -1,0 +1,66 @@
+MODULE_DEFS_NEEDED += \
+  xtimer \
+  ztimer \
+  ztimer_msec \
+  ztimer_usec \
+  #
+
+MODULE_DEFS_NEEDED += \
+  xtimer \
+  ztimer \
+  ztimer_msec \
+  ztimer_usec \
+  #
+
+MODULE_DEFS_NEEDED += \
+  xtimer \
+  ztimer \
+  ztimer_msec \
+  ztimer_usec \
+  #
+
+MODULE_DEFS_NEEDED += \
+  xtimer \
+  ztimer \
+  ztimer_msec \
+  ztimer_usec \
+  #
+
+MODULE_DEFS_NEEDED += \
+  xtimer \
+  ztimer \
+  ztimer_msec \
+  ztimer_usec \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  xtimer \
+  ztimer \
+  ztimer_msec \
+  ztimer_usec \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  xtimer \
+  ztimer \
+  ztimer_msec \
+  ztimer_usec \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  xtimer \
+  ztimer \
+  ztimer_msec \
+  ztimer_usec \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  xtimer \
+  ztimer \
+  ztimer_msec \
+  ztimer_usec \
+  #

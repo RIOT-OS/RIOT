@@ -31,7 +31,7 @@
 
 #define GPIO_PIN_NUMOF  30U
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 static gpio_cb_t _cbs[GPIO_PIN_NUMOF];
 static void *_args[GPIO_PIN_NUMOF];
 #endif /* MODULE_PERIPH_GPIO_IRQ */
@@ -138,7 +138,7 @@ void gpio_write(gpio_t pin, bool value)
     }
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 static void _irq_enable(gpio_t pin, unsigned flank)
 {
     volatile uint32_t *irq_enable_regs = &IO_BANK0->PROC0_INTE0;

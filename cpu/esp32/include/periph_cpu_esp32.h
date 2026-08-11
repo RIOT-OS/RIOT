@@ -210,7 +210,7 @@ extern "C" {
  * @{
  */
 
-#ifdef MODULE_ESP_HW_COUNTER
+#if MODULE_ESP_HW_COUNTER
 /** Hardware ccount/ccompare registers are used for timer implementation */
 #define TIMER_NUMOF         (2)
 #define TIMER_CHANNEL_NUMOF (1)

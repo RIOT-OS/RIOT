@@ -1,5 +1,10 @@
 MODULE = u8g2_disp_dev
 
+MODULE_DEFS_NEEDED += \
+  periph_i2c \
+  periph_spi \
+  #
+
 # Check that either I2C or SPI are there (only supported peripherals)
 SUPPORTED_PERIPHERALS := periph_i2c periph_spi
 ifeq (,$(filter $(SUPPORTED_PERIPHERALS),$(USEMODULE)))

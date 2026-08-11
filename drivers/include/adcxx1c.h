@@ -48,11 +48,11 @@ enum {
 /**
  * @brief   ADC default resolution for device variants
  */
-#if   defined(MODULE_ADC081C)
+#if   MODULE_ADC081C
 #define ADCXX1C_RES_DEFAULT     ADCXX1C_RES_8BITS
-#elif defined(MODULE_ADC101C)
+#elif MODULE_ADC101C
 #define ADCXX1C_RES_DEFAULT     ADCXX1C_RES_10BITS
-#elif defined(MODULE_ADC121C)
+#elif MODULE_ADC121C
 #define ADCXX1C_RES_DEFAULT     ADCXX1C_RES_12BITS
 #else
 #define ADCXX1C_RES_DEFAULT     (-1)

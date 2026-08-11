@@ -47,7 +47,7 @@ static uart_ctx_t ctx[SOFT_UART_NUMOF];
 static kernel_pid_t printer_pid;
 static char printer_stack[THREAD_STACKSIZE_MAIN];
 
-#ifdef MODULE_SOFT_UART_MODECFG
+#if MODULE_SOFT_UART_MODECFG
 static uart_data_bits_t data_bits_lut[] = { UART_DATA_BITS_5, UART_DATA_BITS_6,
                                             UART_DATA_BITS_7, UART_DATA_BITS_8 };
 static int data_bits_lut_len = ARRAY_SIZE(data_bits_lut);
@@ -154,7 +154,7 @@ static int cmd_init(int argc, char **argv)
     return 0;
 }
 
-#ifdef MODULE_SOFT_UART_MODECFG
+#if MODULE_SOFT_UART_MODECFG
 static int cmd_mode(int argc, char **argv)
 {
     int dev, data_bits_arg, stop_bits_arg;
@@ -245,7 +245,7 @@ static int cmd_send(int argc, char **argv)
 
 static const shell_command_t shell_commands[] = {
     { "init", "Initialize a UART device with a given baudrate", cmd_init },
-#ifdef MODULE_SOFT_UART_MODECFG
+#if MODULE_SOFT_UART_MODECFG
     { "mode", "Setup data bits, stop bits and parity for a given UART device", cmd_mode },
 #endif
     { "send", "Send a string through given UART device", cmd_send },

@@ -26,7 +26,7 @@
 #include "shell.h"
 #include "trickle.h"
 #include "utlist.h"
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
 #include "net/gnrc/rpl/p2p.h"
 #include "net/gnrc/rpl/p2p_dodag.h"
 #include "net/gnrc/rpl/p2p_structs.h"
@@ -67,7 +67,7 @@ int _gnrc_rpl_dodag_root(char *arg1, char *arg2)
     return 0;
 }
 
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
 int _gnrc_rpl_find(char *arg1, char *arg2)
 {
     uint8_t instance_id = atoi(arg1);
@@ -200,7 +200,7 @@ int _gnrc_rpl_send_dis(void)
     return 0;
 }
 
-#ifdef MODULE_NETSTATS_RPL
+#if MODULE_NETSTATS_RPL
 static void _print_stats_block(netstats_rpl_block_t *block, const char *name)
 {
     /* In the following we need to sync with the RPL thread via disabling IRQs
@@ -281,7 +281,7 @@ int _gnrc_rpl_dodag_show(void)
 
     putchar('\n');
 
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
     printf("p2p-rpl table:\t");
     for (int8_t i = 0; i < GNRC_RPL_P2P_EXTS_NUMOF; ++i) {
         if (gnrc_rpl_p2p_exts[i].state == 0) {
@@ -319,7 +319,7 @@ int _gnrc_rpl_dodag_show(void)
                (1 << dodag->dio_min), dodag->dio_interval_doubl, dodag->trickle.k,
                dodag->trickle.c);
 
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
         if (dodag->instance->mop == GNRC_RPL_P2P_MOP) {
             gnrc_rpl_p2p_ext_t *p2p_ext = gnrc_rpl_p2p_ext_get(dodag);
             printf("\tP2P-Ext [%s | HBH: %s | R: %s | L: %us]\n",
@@ -433,20 +433,20 @@ static int _gnrc_rpl(int argc, char **argv)
             }
         }
     }
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
     else if (strcmp(argv[1], "find") == 0) {
         if (argc == 4) {
             return _gnrc_rpl_find(argv[2], argv[3]);
         }
     }
 #endif
-#ifdef MODULE_NETSTATS_RPL
+#if MODULE_NETSTATS_RPL
     else if (strcmp(argv[1], "stats") == 0) {
         return _stats();
     }
 #endif
 
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
     printf("* find <dodag_id> <target>\t\t\t- initiate a P2P-RPL route discovery\n");
 #endif
     printf("* help\t\t\t\t\t- show usage\n");

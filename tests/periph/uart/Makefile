@@ -1,3 +1,11 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_collision \
+  periph_uart_modecfg \
+  periph_uart_rxstart_irq \
+  stdio_uart \
+  ztimer \
+  #
 include ../Makefile.periph_common
 
 FEATURES_REQUIRED += periph_uart

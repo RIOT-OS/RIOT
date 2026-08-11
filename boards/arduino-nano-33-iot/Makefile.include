@@ -6,3 +6,7 @@ include $(RIOTBOARD)/common/samdx1-arduino-bootloader/Makefile.include
 
 # Include handling of serial and non-bossa programmers (if selected by user)
 include $(RIOTMAKE)/boards/sam0.inc.mk
+
+MODULE_DEFS_NEEDED += \
+  sam0_periph_uart_hw_fc \
+  #

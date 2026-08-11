@@ -10,3 +10,11 @@ TTY_BOARD_FILTER := --driver 'ftdi_sio' --vendor FTDI --model 'Dual RS232-HS' --
 ifneq (,$(filter esp_jtag,$(USEMODULE)))
   OPENOCD_CONFIG ?= board/esp32-wrover-kit-3.3v.cfg
 endif
+
+MODULE_DEFS_NEEDED += \
+  esp32_wrover_kit_camera \
+  ili9341 \
+  periph_sdmmc \
+  periph_spi \
+  sdcard_spi \
+  #

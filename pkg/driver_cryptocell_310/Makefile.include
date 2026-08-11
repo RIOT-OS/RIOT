@@ -27,3 +27,11 @@ PSEUDOMODULES += psa_cryptocell_310_hashes_sha224
 PSEUDOMODULES += psa_cryptocell_310_hashes_sha256
 PSEUDOMODULES += psa_cryptocell_310_hashes_sha512
 PSEUDOMODULES += psa_cryptocell_310_hmac
+
+MODULE_DEFS_NEEDED += \
+  periph_cipher_aes_128_cbc \
+  periph_hash_sha_1 \
+  periph_hash_sha_224 \
+  periph_hash_sha_256 \
+  periph_hash_sha_512 \
+  #

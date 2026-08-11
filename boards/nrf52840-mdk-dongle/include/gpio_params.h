@@ -27,7 +27,7 @@ extern "C" {
  */
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
-#ifndef MODULE_SAUL_PWM
+#if !MODULE_SAUL_PWM
     {
         .name  = "LED Red",
         .pin   = LED0_PIN,

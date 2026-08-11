@@ -41,7 +41,7 @@
 #include "atomic_utils.h"
 #include "mutex.h"
 
-#ifdef MODULE_XTIMER
+#if MODULE_XTIMER
 #include "xtimer.h"
 #endif
 
@@ -122,7 +122,7 @@ static inline int sema_inv_try_wait(sema_inv_t *s)
     return mutex_trylock(&s->lock);
 }
 
-#if defined(MODULE_XTIMER) || DOXYGEN
+#if MODULE_XTIMER || DOXYGEN
 /**
  * @brief   Wait for the inverse semaphore value to reach zero or
  *          a timeout being reached.

@@ -49,7 +49,7 @@ extern "C" {
  *          fit their requirements. The default number is 5.
  */
 #ifndef CONFIG_PSA_PROTECTED_KEY_COUNT
-#if (IS_USED(MODULE_PSA_SECURE_ELEMENT))
+#if (MODULE_PSA_SECURE_ELEMENT)
 #define CONFIG_PSA_PROTECTED_KEY_COUNT 5
 #else
 #define CONFIG_PSA_PROTECTED_KEY_COUNT  0

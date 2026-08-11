@@ -5,3 +5,12 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 # Set RTS and DTR to 0 to release reset when RTS is connected to the reset pin
 # and DTR to GPIO0.
 PYTERMFLAGS += --set-rts 0 --set-dtr 0
+
+MODULE_DEFS_NEEDED += \
+  enc28j60 \
+  esp_sw_timer \
+  mrf24j40 \
+  mtd \
+  sdcard_spi \
+  spiffs \
+  #

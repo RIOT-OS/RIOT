@@ -81,7 +81,7 @@ int main(void)
     puts("after ~150 iterations. If the test succeeds, the MEM MANAGE HANDLER");
     puts("will trigger a RIOT kernel panic before the canary value changes.\n");
 
-#ifdef MODULE_MPU_STACK_GUARD
+#if MODULE_MPU_STACK_GUARD
     puts("The mpu_stack_guard module is present. Expect the test to succeed.\n");
 #else
     puts("The mpu_stack_guard module is missing! Expect the test to fail.\n");

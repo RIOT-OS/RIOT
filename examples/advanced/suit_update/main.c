@@ -24,7 +24,7 @@
 #include "shell.h"
 
 #include "suit/transport/coap.h"
-#ifdef MODULE_SUIT_STORAGE_FLASHWRITE
+#if MODULE_SUIT_STORAGE_FLASHWRITE
 #include "riotboot/slot.h"
 #endif
 
@@ -36,7 +36,7 @@
 #include "vfs_default.h"
 #endif
 
-#ifdef MODULE_PERIPH_GPIO
+#if MODULE_PERIPH_GPIO
 #include "board.h"
 #include "periph/gpio.h"
 #endif
@@ -45,7 +45,7 @@
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 /* add handled storages */
-#if IS_USED(MODULE_SUIT_STORAGE_VFS)
+#if MODULE_SUIT_STORAGE_VFS
 XFA_USE(char*, suit_storage_files_reg);
 #ifdef CPU_NATIVE
 XFA(char*, suit_storage_files_reg, 0) _slot0 = VFS_DEFAULT_DATA "/SLOT0.txt";
@@ -54,7 +54,7 @@ XFA(char*, suit_storage_files_reg, 1) _slot1 = VFS_DEFAULT_DATA "/SLOT1.txt";
 #endif
 
 /* assuming that first button is always BTN0 */
-#if defined(MODULE_PERIPH_GPIO_IRQ) && defined(BTN0_PIN)
+#if MODULE_PERIPH_GPIO_IRQ && defined(BTN0_PIN)
 static void cb(void *arg)
 {
     (void) arg;
@@ -63,7 +63,7 @@ static void cb(void *arg)
 }
 #endif
 
-#ifdef MODULE_SUIT_STORAGE_FLASHWRITE
+#if MODULE_SUIT_STORAGE_FLASHWRITE
 static int cmd_print_riotboot_hdr(int argc, char **argv)
 {
     (void)argc;
@@ -159,7 +159,7 @@ static int cmd_lsstorage(int argc, char **argv)
     if (IS_ACTIVE(MODULE_SUIT_STORAGE_FLASHWRITE)) {
         puts("Flashwrite slot 0: \"\"\n");
     }
-#if IS_USED(MODULE_SUIT_STORAGE_VFS)
+#if MODULE_SUIT_STORAGE_VFS
     for (unsigned i = 0; i < XFA_LEN(char **, suit_storage_files_reg); i++) {
         const char *filepath = (const char *)suit_storage_files_reg[i];
         printf("VFS %u: \"%s\"\n", i, filepath);
@@ -175,12 +175,12 @@ int main(void)
 {
     puts("RIOT SUIT update example application");
 
-#if defined(MODULE_PERIPH_GPIO_IRQ) && defined(BTN0_PIN)
+#if MODULE_PERIPH_GPIO_IRQ && defined(BTN0_PIN)
     /* initialize a button to manually trigger an update */
     gpio_init_int(BTN0_PIN, BTN0_MODE, GPIO_FALLING, cb, NULL);
 #endif
 
-#ifdef MODULE_SUIT_STORAGE_FLASHWRITE
+#if MODULE_SUIT_STORAGE_FLASHWRITE
     cmd_print_current_slot(0, NULL);
     cmd_print_riotboot_hdr(0, NULL);
 #endif

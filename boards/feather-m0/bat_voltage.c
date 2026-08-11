@@ -15,7 +15,7 @@
  * @}
  */
 
-#ifdef MODULE_SAUL_BAT_VOLTAGE
+#if MODULE_SAUL_BAT_VOLTAGE
 #include "saul/bat_voltage.h"
 
 int16_t saul_bat_voltage_convert(int32_t adc_sample)

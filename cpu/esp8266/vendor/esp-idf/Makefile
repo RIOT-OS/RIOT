@@ -1,5 +1,9 @@
 MODULE=esp_idf
 
+MODULE_DEFS_NEEDED += \
+  lwip_ethernet \
+  #
+
 DIRS += esp8266/source
 DIRS += nvs_flash/src
 DIRS += spi_flash

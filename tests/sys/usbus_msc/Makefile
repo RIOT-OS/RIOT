@@ -1,4 +1,8 @@
 
+MODULE_DEFS_NEEDED += \
+  mtd_emulated \
+  #
+
 BOARD ?= same54-xpro
 include ../Makefile.sys_common
 

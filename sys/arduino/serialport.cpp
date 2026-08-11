@@ -27,7 +27,7 @@ extern "C" {
 #include "irq.h"
 #include "kernel_defines.h"
 
-#if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+#if MODULE_ARDUINO_SERIAL_STDIO
 #include "stdio_base.h"
 #endif
 }
@@ -42,7 +42,7 @@ void rx_cb(void *arg, uint8_t c)
 
 SerialPort::SerialPort(uart_t dev)
 {
-#if !IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+#if !MODULE_ARDUINO_SERIAL_STDIO
     assert(dev != UART_UNDEF);
 #endif
     this->dev = dev;
@@ -50,15 +50,15 @@ SerialPort::SerialPort(uart_t dev)
 
 int SerialPort::available(void)
 {
-#if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+#if MODULE_ARDUINO_SERIAL_STDIO
     if (this->dev == UART_UNDEF) {
-#if IS_USED(MODULE_STDIO_AVAILABLE)
+#if MODULE_STDIO_AVAILABLE
         return stdio_available();
-#else /* IS_USED(MODULE_STDIO_AVAILABLE) */
+#else /* MODULE_STDIO_AVAILABLE */
         return 0;
-#endif /* IS_USED(MODULE_STDIO_AVAILABLE) */
+#endif /* MODULE_STDIO_AVAILABLE */
     }
-#endif /* IS_USED(MODULE_ARDUINO_SERIAL_STDIO) */
+#endif /* MODULE_ARDUINO_SERIAL_STDIO */
     return (int)rx_buf.avail;
 }
 
@@ -66,7 +66,7 @@ void SerialPort::begin(long baudrate)
 {
     /* this clears the contents of the ringbuffer... */
     ringbuffer_init(&rx_buf, rx_mem, SERIAL_RX_BUFSIZE);
-#if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+#if MODULE_ARDUINO_SERIAL_STDIO
     if (this->dev == UART_UNDEF) {
         return;
     }
@@ -76,7 +76,7 @@ void SerialPort::begin(long baudrate)
 
 void SerialPort::end(void)
 {
-#if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+#if MODULE_ARDUINO_SERIAL_STDIO
     if (this->dev == UART_UNDEF) {
         return;
     }
@@ -280,7 +280,7 @@ int SerialPort::read(void)
     int res = -1;
 
     irq_disable();
-#if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+#if MODULE_ARDUINO_SERIAL_STDIO
     if (this->dev == UART_UNDEF) {
         char chr;
         if (this->available()) {
@@ -300,7 +300,7 @@ int SerialPort::read(void)
 
 int SerialPort::write(int val)
 {
-#if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+#if MODULE_ARDUINO_SERIAL_STDIO
     if (this->dev == UART_UNDEF) {
         stdio_write((const void *)&val, 1);
         return 1;
@@ -312,7 +312,7 @@ int SerialPort::write(int val)
 
 int SerialPort::write(const char *str)
 {
-#if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+#if MODULE_ARDUINO_SERIAL_STDIO
     if (this->dev == UART_UNDEF) {
         stdio_write((const void *)str, strlen(str));
         return strlen(str);
@@ -324,7 +324,7 @@ int SerialPort::write(const char *str)
 
 int SerialPort::write(char *buf, int len)
 {
-#if IS_USED(MODULE_ARDUINO_SERIAL_STDIO)
+#if MODULE_ARDUINO_SERIAL_STDIO
     if (this->dev == UART_UNDEF) {
         stdio_write((const void *)buf, len);
         return len;

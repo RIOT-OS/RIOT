@@ -26,7 +26,7 @@
 #include "periph/spi.h"
 #include "timex.h"
 
-#ifdef MODULE_MTD
+#if MODULE_MTD
 static const mtd_spi_nor_params_t _pinetime_nor_params = {
     .opcode = &mtd_spi_nor_opcode_default,
     .wait_chip_erase = 9LU * US_PER_SEC,

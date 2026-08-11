@@ -3,3 +3,8 @@ PORT_LINUX ?= /dev/ttyACM0
 OPENOCD_CONFIG ?= board/esp32s3-builtin.cfg
 
 include $(RIOTBOARD)/common/esp32s3/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  cst816s \
+  gc9a01 \
+  #

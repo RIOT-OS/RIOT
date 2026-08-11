@@ -23,15 +23,15 @@ extern "C" {
 
 static const pn532_params_t pn532_conf[] = {
     {
-#if IS_USED(MODULE_PN532_I2C)
+#if MODULE_PN532_I2C
         .i2c = TEST_PN532_I2C,
 #endif
-#if IS_USED(MODULE_PN532_SPI)
+#if MODULE_PN532_SPI
         .spi = TEST_PN532_SPI,
 #endif
         .reset = TEST_PN532_RESET,
         .irq = TEST_PN532_IRQ,
-#if IS_USED(MODULE_PN532_SPI)
+#if MODULE_PN532_SPI
         .nss   = TEST_PN532_NSS
 #endif
     },

@@ -86,7 +86,7 @@ static int read_mc_pm_10(const void *_dev, phydat_t *data)
     return 1;
 }
 
-#if IS_USED(MODULE_HM3302)
+#if MODULE_HM3302
 static int read_nc_pm_1(const void *_dev, phydat_t *data)
 {
     hm330x_t *dev = (hm330x_t *)_dev;
@@ -151,7 +151,7 @@ const saul_driver_t hm330x_saul_driver_mc_pm_10 = {
     .type = SAUL_SENSE_PM
 };
 
-#if IS_USED(MODULE_HM3302)
+#if MODULE_HM3302
 const saul_driver_t hm330x_saul_driver_nc_pm_1 = {
     .read = read_nc_pm_1,
     .write = saul_write_notsup,

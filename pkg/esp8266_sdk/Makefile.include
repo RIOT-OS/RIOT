@@ -31,3 +31,8 @@ ifneq (,$(filter esp_bootloader,$(USEMODULE)))
 endif
 
 $(BOOTLOADER_BIN):
+
+MODULE_DEFS_NEEDED += \
+  esp_log_colored \
+  esp_log_startup \
+  #

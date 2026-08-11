@@ -1,2 +1,6 @@
 # include this module into the build
 INCLUDES += -I$(RIOTBOARD)/nrf9160dk/include
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_hw_fc \
+  #

@@ -27,7 +27,7 @@
 #define MAIN_QUEUE_SIZE (4)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
-#if IS_USED(MODULE_NANOCOAP_DTLS)
+#if MODULE_NANOCOAP_DTLS
 #include "net/credman.h"
 #include "tinydtls_keys.h"
 
@@ -46,7 +46,7 @@ static const credman_credential_t credential = {
 #endif
 
 /* _list_all_inet6() and _print_addr() derived from sc_gnrc_netif.c */
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
 static void _print_addr(ipv6_addr_t *addr, uint8_t flags)
 {
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
@@ -124,7 +124,7 @@ int main(void)
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
     puts("nanocoap test app");
 
-#if IS_USED(MODULE_NANOCOAP_DTLS)
+#if MODULE_NANOCOAP_DTLS
     int res = credman_add(&credential);
     if (res < 0 && res != CREDMAN_EXIST) {
         printf("nanocoap: cannot add credential to system: %d\n", res);

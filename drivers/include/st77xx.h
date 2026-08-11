@@ -51,7 +51,7 @@
 
 #include "lcd.h"
 
-#ifdef MODULE_DISP_DEV
+#if MODULE_DISP_DEV
 #include "disp_dev.h"
 #endif
 

@@ -20,10 +20,10 @@
 #include "async_read.h"
 #include "tty_uart.h"
 
-#ifdef MODULE_PERIPH_SPIDEV_LINUX
+#if MODULE_PERIPH_SPIDEV_LINUX
 #include "spidev_linux.h"
 #endif
-#ifdef MODULE_PERIPH_GPIO_LINUX
+#if MODULE_PERIPH_GPIO_LINUX
 #include "gpiodev_linux.h"
 #endif
 
@@ -44,7 +44,7 @@ static void _native_sleep(void)
     }
 }
 
-#if !defined(MODULE_PM_LAYERED)
+#if !MODULE_PM_LAYERED
 void pm_set_lowest(void)
 {
     _native_sleep();
@@ -61,13 +61,13 @@ void pm_set(unsigned mode)
 void pm_off(void)
 {
     puts("\nnative: exiting");
-#ifdef MODULE_PERIPH_SPIDEV_LINUX
+#if MODULE_PERIPH_SPIDEV_LINUX
     spidev_linux_teardown();
 #endif
-#ifdef MODULE_PERIPH_GPIO_LINUX
+#if MODULE_PERIPH_GPIO_LINUX
     gpio_linux_teardown();
 #endif
-#ifdef MODULE_VFS_DEFAULT
+#if MODULE_VFS_DEFAULT
     extern void auto_unmount_vfs(void);
     auto_unmount_vfs();
 #endif
@@ -79,13 +79,13 @@ void pm_reboot(void)
     printf("\n\n\t\t!! REBOOT !!\n\n");
 
     native_async_read_cleanup();
-#ifdef MODULE_PERIPH_SPIDEV_LINUX
+#if MODULE_PERIPH_SPIDEV_LINUX
     spidev_linux_teardown();
 #endif
-#ifdef MODULE_PERIPH_GPIO_LINUX
+#if MODULE_PERIPH_GPIO_LINUX
     gpio_linux_teardown();
 #endif
-#ifdef MODULE_VFS_DEFAULT
+#if MODULE_VFS_DEFAULT
     extern void auto_unmount_vfs(void);
     auto_unmount_vfs();
 #endif

@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  ds3231_int \
+  #
 include ../Makefile.drivers_common
 
 USEMODULE += ds3231

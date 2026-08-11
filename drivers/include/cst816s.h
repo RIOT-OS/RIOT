@@ -42,7 +42,7 @@
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 
-#ifdef MODULE_TOUCH_DEV
+#if MODULE_TOUCH_DEV
 #include "touch_dev.h"
 #endif
 
@@ -109,7 +109,7 @@ typedef struct {
  * @brief cst816s device descriptor
  */
 typedef struct {
-#ifdef MODULE_TOUCH_DEV
+#if MODULE_TOUCH_DEV
     touch_dev_t *dev;                   /**< Pointer to the generic touch device */
 #endif
     const cst816s_params_t *params;     /**< Device parameters */

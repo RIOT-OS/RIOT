@@ -1,3 +1,11 @@
+
+MODULE_DEFS_NEEDED += \
+  psa_asymmetric_ecc_ed25519 \
+  psa_asymmetric_ecc_p256r1 \
+  psa_cipher \
+  psa_mac \
+  psa_secure_element_ateccx08a_ecc_p256 \
+  #
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../..
 

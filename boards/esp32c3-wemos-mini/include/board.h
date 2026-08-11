@@ -62,7 +62,7 @@
  * - v2.1.0 has one 24-bit RGB-LED WS2812B connected to GPIO7.
  * @{
  */
-#ifdef MODULE_ESP32C3_WEMOS_MINI_V1_0_0
+#if MODULE_ESP32C3_WEMOS_MINI_V1_0_0
 
 #define LED0_PIN    GPIO7   /**< GPIO7 is used as LED Pin */
 #define LED0_ACTIVE (1)     /**< LED is HIGH active */

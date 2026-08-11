@@ -25,7 +25,7 @@
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+#if MODULE_PSA_PERSISTENT_STORAGE
 #include "psa_crypto_persistent_storage.h"
 #include "psa_crypto_cbor_encoder.h"
 
@@ -36,7 +36,7 @@
  */
 #if PSA_ASYMMETRIC_KEYPAIR_COUNT
 #define CBOR_BUF_MAX_SIZE       (CBOR_BUF_SIZE_KEY_PAIR)
-#elif PSA_PROTECTED_KEY_COUNT && IS_USED(MODULE_PSA_ASYMMETRIC)
+#elif PSA_PROTECTED_KEY_COUNT && MODULE_PSA_ASYMMETRIC
 #define CBOR_BUF_MAX_SIZE       (CBOR_BUF_SIZE_PROT_KEY)
 #elif PSA_SINGLE_KEY_COUNT
 #define CBOR_BUF_MAX_SIZE       (CBOR_BUF_SIZE_SINGLE_KEY)
@@ -256,7 +256,7 @@ static int node_id_equals_key_id(clist_node_t *n, void *arg)
     return 0;
 }
 
-#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+#if MODULE_PSA_PERSISTENT_STORAGE
 static int node_lifetime_is_persistent(clist_node_t *n, void *arg)
 {
     psa_key_slot_t *slot = container_of(n, psa_key_slot_t, node);
@@ -297,7 +297,7 @@ static psa_status_t psa_get_and_lock_key_slot_in_memory(psa_key_id_t id, psa_key
     return status;
 }
 
-#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+#if MODULE_PSA_PERSISTENT_STORAGE
 /**
  * @brief   Reads a persistently stored key from storage
  *
@@ -381,7 +381,7 @@ psa_status_t psa_get_and_lock_key_slot(psa_key_id_t id, psa_key_slot_t **p_slot)
     /* Try to find key in volatile key slot list */
     status = psa_get_and_lock_key_slot_in_memory(id, p_slot);
 
-#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+#if MODULE_PSA_PERSISTENT_STORAGE
     if (status == PSA_ERROR_DOES_NOT_EXIST && !psa_key_id_is_volatile(id)) {
         return psa_get_persisted_key_slot_from_storage(id, p_slot);
     }
@@ -411,7 +411,7 @@ static psa_status_t psa_allocate_key_slot_in_list(psa_key_slot_t **p_slot,
 
     /* Check if any empty elements of this key slot type are left */
     if (clist_is_empty(empty_list)) {
-#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+#if MODULE_PSA_PERSISTENT_STORAGE
         /* If no slots left: Look for slot in list with persistent key
            (key will be stored in persistent memory and slot can be reused) */
         psa_status_t status = psa_find_and_wipe_persistent_key_from_local_storage();
@@ -467,7 +467,7 @@ psa_status_t psa_allocate_empty_key_slot(psa_key_id_t *id,
         if (PSA_KEY_LIFETIME_IS_VOLATILE(attr->lifetime)) {
             *id = key_id_count++;
         }
-#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+#if MODULE_PSA_PERSISTENT_STORAGE
         else if (!psa_key_id_is_volatile(attr->id)) {
             *id = attr->id;
         }
@@ -515,7 +515,7 @@ psa_status_t psa_unlock_key_slot(psa_key_slot_t *slot)
 psa_status_t psa_validate_key_location(psa_key_lifetime_t lifetime, psa_se_drv_data_t **p_drv)
 {
     if (psa_key_lifetime_is_external(lifetime)) {
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+#if MODULE_PSA_SECURE_ELEMENT
         psa_se_drv_data_t *driver = psa_get_se_driver_data(lifetime);
         if (driver != NULL) {
             if (p_drv != NULL) {
@@ -540,7 +540,7 @@ psa_status_t psa_validate_key_persistence(psa_key_lifetime_t lifetime)
         return PSA_SUCCESS;
     }
 
-#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+#if MODULE_PSA_PERSISTENT_STORAGE
     if (PSA_KEY_LIFETIME_GET_PERSISTENCE(lifetime) == PSA_KEY_LIFETIME_PERSISTENT) {
         return PSA_SUCCESS;
     }

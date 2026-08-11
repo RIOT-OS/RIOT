@@ -167,7 +167,7 @@ typedef struct {
  */
 int gpio_init(gpio_t pin, gpio_mode_t mode);
 
-#if defined(MODULE_PERIPH_GPIO_IRQ) || defined(DOXYGEN)
+#if MODULE_PERIPH_GPIO_IRQ || defined(DOXYGEN)
 /**
  * @brief   Initialize a GPIO pin for external interrupt usage
  *
@@ -216,7 +216,7 @@ void gpio_irq_enable(gpio_t pin);
  */
 void gpio_irq_disable(gpio_t pin);
 
-#endif /* defined(MODULE_PERIPH_GPIO_IRQ) || defined(DOXYGEN) */
+#endif /* MODULE_PERIPH_GPIO_IRQ || defined(DOXYGEN) */
 
 /**
  * @brief   Get the current value of the given pin

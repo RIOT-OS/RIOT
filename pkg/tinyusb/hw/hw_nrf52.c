@@ -35,7 +35,7 @@
 
 int tinyusb_hw_init(void)
 {
-    if (IS_USED(MODULE_TINYUSB_DEVICE)) {
+    if (MODULE_TINYUSB_DEVICE) {
         NVIC_SetPriority(USBD_IRQn, 2);
     }
 
@@ -58,12 +58,12 @@ int tinyusb_hw_init(void)
 void isr_usbd(void)
 {
     /* call device interrupt handler with the first device */
-    if (IS_USED(MODULE_TINYUSB_DEVICE)) {
+    if (MODULE_TINYUSB_DEVICE) {
         tud_int_handler(0);
     }
 
     /* call host interrupt handler with the first device */
-    if (IS_USED(MODULE_TINYUSB_HOST)) {
+    if (MODULE_TINYUSB_HOST) {
         tuh_int_handler(0);
     }
 

@@ -76,7 +76,7 @@
 #define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE)
 #endif
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
 
 #include "tsrb.h"
 /**
@@ -108,12 +108,12 @@ static inline void uart_init_usart(uart_t uart, uint32_t baudrate);
     defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
     defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32U5)
-#ifdef MODULE_PERIPH_LPUART
+#if MODULE_PERIPH_LPUART
 static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate);
 #endif
 #endif
 
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
 static inline void uart_init_rts_pin(uart_t uart)
 {
     if (uart_config[uart].rts_pin != GPIO_UNDEF) {
@@ -152,7 +152,7 @@ static inline void uart_init_pins(uart_t uart, uart_rx_cb_t rx_cb)
         gpio_init_af(uart_config[uart].rx_pin, uart_config[uart].rx_af);
 #endif
     }
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
     uart_init_cts_pin(uart);
     uart_init_rts_pin(uart);
 #endif
@@ -187,7 +187,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     isr_ctx[uart].arg       = arg;
     isr_ctx[uart].data_mask = 0xFF;
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
     tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
 #endif
@@ -207,7 +207,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         case STM32_USART:
             uart_init_usart(uart, baudrate);
             break;
-#ifdef MODULE_PERIPH_LPUART
+#if MODULE_PERIPH_LPUART
         case STM32_LPUART:
             uart_init_lpuart(uart, baudrate);
             break;
@@ -225,7 +225,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
      * sent. */
     uart_init_pins(uart, rx_cb);
 
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
     if (uart_config[uart].cts_pin != GPIO_UNDEF) {
         dev(uart)->CR3 |= USART_CR3_CTSE;
     }
@@ -243,14 +243,14 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         dev(uart)->CR1 = (USART_CR1_UE | USART_CR1_TE);
     }
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
     NVIC_EnableIRQ(uart_config[uart].irqn);
 #endif
 
     return UART_OK;
 }
 
-#ifdef MODULE_PERIPH_UART_MODECFG
+#if MODULE_PERIPH_UART_MODECFG
 int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
               uart_stop_bits_t stop_bits)
 {
@@ -347,7 +347,7 @@ static inline void uart_init_usart(uart_t uart, uint32_t baudrate)
 #define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR3_LPUART1SEL_1
 #define CCIPR                   CCIPR3
 #endif
-#ifdef MODULE_PERIPH_LPUART
+#if MODULE_PERIPH_LPUART
 static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
 {
     uint32_t clk;
@@ -387,7 +387,7 @@ static inline void send_byte(uart_t uart, uint8_t byte)
     dev(uart)->TDR_REG = byte;
 }
 
-#ifndef MODULE_PERIPH_UART_NONBLOCKING
+#if !MODULE_PERIPH_UART_NONBLOCKING
 static inline void wait_for_tx_complete(uart_t uart)
 {
     while (!(dev(uart)->ISR_REG & ISR_TC)) {}
@@ -403,7 +403,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         return;
     }
 #endif
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
     if (len > CONFIG_UART_DMA_THRESHOLD_BYTES &&
         uart_config[uart].dma != DMA_STREAM_UNDEF) {
         if (irq_is_in()) {
@@ -439,7 +439,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         return;
     }
 #endif
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
     for (size_t i = 0; i < len; i++) {
         dev(uart)->CR1 |= (USART_CR1_TCIE);
         if (irq_is_in() || __get_PRIMASK()) {
@@ -471,7 +471,7 @@ void uart_poweron(uart_t uart)
 
     dev(uart)->CR1 |= (USART_CR1_UE);
 
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
     /* STM32F4 errata 2.10.9: nRTS is active while RE or UE = 0
      * we should only configure nRTS pin after setting UE */
     uart_init_rts_pin(uart);
@@ -482,7 +482,7 @@ void uart_poweroff(uart_t uart)
 {
     assert(uart < UART_NUMOF);
 
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
     /* the uart peripheral does not put RTS high from hardware when
      * UE flag is cleared, so we need to do this manually */
     if (uart_config[uart].rts_pin != GPIO_UNDEF) {
@@ -496,7 +496,7 @@ void uart_poweroff(uart_t uart)
     uart_disable_clock(uart);
 }
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
 static inline void irq_handler_tx(uart_t uart)
 {
     int byte = tsrb_get_one(&uart_tx_rb[uart]);
@@ -515,7 +515,7 @@ static inline void irq_handler(uart_t uart)
 {
     uint32_t status = dev(uart)->ISR_REG;
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
     if (status & ISR_TC) {
         irq_handler_tx(uart);
     }

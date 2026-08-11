@@ -51,7 +51,7 @@ int gnrc_ipv6_nib_abr_add(const ipv6_addr_t *addr)
             _nib_abr_add_pfx(abr, offl);
         }
     }
-#ifdef MODULE_GNRC_SIXLOWPAN_CTX    /* included optionally for NIB testing */
+#if MODULE_GNRC_SIXLOWPAN_CTX    /* included optionally for NIB testing */
     for (uint8_t id = 0; id < GNRC_SIXLOWPAN_CTX_SIZE; id++) {
         if (gnrc_sixlowpan_ctx_lookup_id(id) != NULL) {
             bf_set(abr->ctxs, id);

@@ -18,7 +18,7 @@
 #include <inttypes.h>
 
 #include "ztimer.h"
-#if IS_USED(MODULE_STMPE811_SPI)
+#if MODULE_STMPE811_SPI
 #include "periph/spi.h"
 #else
 #include "periph/i2c.h"
@@ -32,7 +32,7 @@
 #define ENABLE_DEBUG        0
 #include "debug.h"
 
-#if IS_USED(MODULE_STMPE811_SPI)
+#if MODULE_STMPE811_SPI
 #define BUS                 (dev->params.spi)
 #define CS                  (dev->params.cs)
 #define CLK                 (dev->params.clk)
@@ -61,7 +61,7 @@
 #define STMPE811_FIFO_THRESHOLD     (STMPE811_FIFO_THRESHOLD_ENABLED ? 2 : 1)
 #endif
 
-#if IS_USED(MODULE_STMPE811_SPI) /* using SPI mode */
+#if MODULE_STMPE811_SPI /* using SPI mode */
 static inline void _acquire(const stmpe811_t *dev)
 {
     spi_acquire(BUS, CS, MODE, CLK);
@@ -160,7 +160,7 @@ static void _clear_interrupt_status(const stmpe811_t *dev)
     _write_reg(dev, STMPE811_INT_STA, 0xff);
 }
 
-#if IS_USED(MODULE_STMPE811_SPI)
+#if MODULE_STMPE811_SPI
 static int _stmpe811_check_mode(stmpe811_t *dev)
 {
     /* can iterate directly through the enum since they might not be
@@ -200,7 +200,7 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t *params, stmpe811_eve
     int ret = 0;
     uint8_t reg;
 
-#if IS_USED(MODULE_STMPE811_SPI)
+#if MODULE_STMPE811_SPI
     /* configure the chip-select pin */
     if (spi_init_cs(BUS, CS) != SPI_OK) {
         DEBUG("[stmpe811] error: unable to configure chip the select pin\n");
@@ -341,7 +341,7 @@ int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *pos
     uint8_t xyz[4];
     uint32_t xyz_ul;
 
-#if IS_USED(MODULE_STMPE811_SPI)
+#if MODULE_STMPE811_SPI
     for (uint8_t i = 0; i < sizeof(xyz); i++) {
         if (_read_reg(dev, STMPE811_TSC_DATA_NON_INC, &xyz[i]) < 0) {
             DEBUG("[stmpe811] position: cannot read position\n");

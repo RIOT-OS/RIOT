@@ -34,7 +34,7 @@
 #  include "net/sock/tcp.h"
 #  define SOCK_HAS_TCP  1   /**< TCP support is enabled */
 #endif
-#ifdef MODULE_SOCK_DTLS
+#if MODULE_SOCK_DTLS
 #  include "net/credman.h"
 #  include "net/sock/dtls.h"
 #endif
@@ -295,7 +295,7 @@ static inline bool sock_udp_ep_equal(const sock_udp_ep_t *a,
 #endif
 #endif
 
-#if defined(MODULE_SOCK_DTLS) || DOXYGEN
+#if MODULE_SOCK_DTLS || DOXYGEN
 /**
  * @brief   Helper function to establish a DTLS connection
  *

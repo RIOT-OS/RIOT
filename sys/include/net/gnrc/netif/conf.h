@@ -81,7 +81,7 @@ extern "C" {
  *
  * @note    Used for calculation of @ref GNRC_NETIF_IPV6_GROUPS_NUMOF
  */
-#ifdef MODULE_GNRC_RPL
+#if MODULE_GNRC_RPL
 #define GNRC_NETIF_RPL_ADDR        (1)
 #else
 #define GNRC_NETIF_RPL_ADDR        (0)
@@ -143,7 +143,7 @@ extern "C" {
  *       address types are included
  */
 #ifndef GNRC_NETIF_L2ADDR_MAXLEN
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) || defined(MODULE_SLIPDEV_L2ADDR)
+#if MODULE_NETDEV_IEEE802154 || MODULE_XBEE || MODULE_SLIPDEV_L2ADDR
 #define GNRC_NETIF_L2ADDR_MAXLEN   (IEEE802154_LONG_ADDRESS_LEN)
 #elif   MODULE_NETDEV_ETH
 #define GNRC_NETIF_L2ADDR_MAXLEN   (ETHERNET_ADDR_LEN)

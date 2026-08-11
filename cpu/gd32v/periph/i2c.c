@@ -23,7 +23,7 @@
 #include "cpu.h"
 #include "irq.h"
 #include "mutex.h"
-#ifdef MODULE_PM_LAYERED
+#if MODULE_PM_LAYERED
 #include "pm_layered.h"
 #endif
 #include "panic.h"
@@ -621,12 +621,12 @@ void _i2c_transfer_timeout(void *arg)
 
 static void _wait_for_irq(i2c_t dev)
 {
-#if defined(MODULE_ZTIMER_USEC)
+#if MODULE_ZTIMER_USEC
     ztimer_t timer = { .callback = _i2c_transfer_timeout,
                        .arg = (void *)dev };
     uint32_t timeout = ((I2C_TIMEOUT_CYCLES * MHZ(1)) / i2c_config[dev].speed) + 1;
     ztimer_set(ZTIMER_USEC, &timer, timeout);
-#elif defined(MODULE_ZTIMER_MSEC)
+#elif MODULE_ZTIMER_MSEC
     ztimer_t timer = { .callback = _i2c_transfer_timeout,
                        .arg = (void *)dev };
     uint32_t timeout = ((I2C_TIMEOUT_CYCLES * KHZ(1)) / i2c_config[dev].speed) + 1;
@@ -641,9 +641,9 @@ static void _wait_for_irq(i2c_t dev)
     /* wait for buffer, event or error interrupt */
     mutex_lock(&_i2c_dev[dev].irq_lock);
 
-#if defined(MODULE_ZTIMER_USEC)
+#if MODULE_ZTIMER_USEC
     ztimer_remove(ZTIMER_USEC, &timer);
-#elif defined(MODULE_ZTIMER_MSEC)
+#elif MODULE_ZTIMER_MSEC
     ztimer_remove(ZTIMER_MSEC, &timer);
 #endif
 

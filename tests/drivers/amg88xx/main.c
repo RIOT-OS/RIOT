@@ -52,7 +52,7 @@ static bool _grid_enabled = true;
  */
 static bool _grid_raw = true;
 
-#if IS_USED(MODULE_PERIPH_GPIO_IRQ)
+#if MODULE_PERIPH_GPIO_IRQ
 static kernel_pid_t _main_pid;
 
 static void _int_cb(void *arg)
@@ -115,7 +115,7 @@ static int _cmd_read(int argc, char **argv)
         return 1;
     }
 
-    if (IS_USED(MODULE_DISP_DEV)) {
+    if (MODULE_DISP_DEV) {
         extern void display_update(const int16_t *pixels);
         display_update(pixels);
     }
@@ -167,7 +167,7 @@ static int _cmd_poll(int argc, char **argv)
             return 1;
         }
 
-        if (IS_USED(MODULE_DISP_DEV)) {
+        if (MODULE_DISP_DEV) {
             extern void display_update(const int16_t *pixels);
             display_update(pixels);
         }
@@ -214,7 +214,7 @@ static int _cmd_fps(int argc, char **argv)
     return 0;
 }
 
-#if IS_USED(MODULE_PERIPH_GPIO_IRQ)
+#if MODULE_PERIPH_GPIO_IRQ
 static int _cmd_interrupt(int argc, char **argv)
 {
     if (argc < 4) {
@@ -282,7 +282,7 @@ static int _cmd_interrupt(int argc, char **argv)
             return 1;
         }
 
-        if (IS_USED(MODULE_DISP_DEV)) {
+        if (MODULE_DISP_DEV) {
             extern void display_update(const int16_t *pixels);
             display_update(pixels);
         }
@@ -494,7 +494,7 @@ SHELL_COMMAND(poll, "continuously poll frames (interval)", _cmd_poll);
 SHELL_COMMAND(read, "read a single frame", _cmd_read);
 SHELL_COMMAND(temp, "read the thermistor temperature", _cmd_temp);
 
-#if IS_USED(MODULE_PERIPH_GPIO_IRQ)
+#if MODULE_PERIPH_GPIO_IRQ
 SHELL_COMMAND(interrupt, "wait for threshold interrupts", _cmd_interrupt);
 #endif
 

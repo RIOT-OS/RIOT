@@ -30,7 +30,7 @@
 #include "net/cord/ep.h"
 #include "net/cord/common.h"
 
-#ifdef MODULE_CORD_EP_STANDALONE
+#if MODULE_CORD_EP_STANDALONE
 #include "net/cord/ep_standalone.h"
 #endif
 
@@ -306,7 +306,7 @@ end:
     if (retval != CORD_EP_OK) {
         _rd_loc[0] = '\0';
     }
-#ifdef MODULE_CORD_EP_STANDALONE
+#if MODULE_CORD_EP_STANDALONE
     else {
         cord_ep_standalone_signal(true);
     }
@@ -322,7 +322,7 @@ int cord_ep_update(void)
     int res = _update_remove(COAP_METHOD_POST, _on_update);
     if (res != CORD_EP_OK) {
         /* in case we are not able to reach the RD, we drop the association */
-#ifdef MODULE_CORD_EP_STANDALONE
+#if MODULE_CORD_EP_STANDALONE
         cord_ep_standalone_signal(false);
 #endif
         _rd_loc[0] = '\0';
@@ -338,7 +338,7 @@ int cord_ep_remove(void)
         mutex_unlock(&_mutex);
         return CORD_EP_NORD;
     }
-#ifdef MODULE_CORD_EP_STANDALONE
+#if MODULE_CORD_EP_STANDALONE
     cord_ep_standalone_signal(false);
 #endif
     _update_remove(COAP_METHOD_DELETE, _on_remove);

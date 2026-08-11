@@ -28,7 +28,7 @@
 #include "thread.h"
 #include "ztimer.h"
 
-#ifdef MODULE_STDIO_UART
+#if MODULE_STDIO_UART
 #  include "stdio_uart.h"
 #endif
 
@@ -45,7 +45,7 @@
 #define POWEROFF_DELAY_MS   (250U)
 
 /* if stdio is not done via UART, allow to use the stdio UART for the test */
-#ifndef MODULE_STDIO_UART
+#if !MODULE_STDIO_UART
 #  undef STDIO_UART_DEV
 #endif
 
@@ -66,7 +66,7 @@ static void _write_newline(uart_t dev)
 
 static void _delay_ms(uint32_t msec)
 {
-    if (IS_USED(MODULE_ZTIMER)) {
+    if (MODULE_ZTIMER) {
         ztimer_sleep(ZTIMER_MSEC, msec);
     }
     else {
@@ -99,7 +99,7 @@ static char printer_stack[THREAD_STACKSIZE_MAIN];
 
 static bool test_mode;
 
-#ifdef MODULE_PERIPH_UART_MODECFG
+#if MODULE_PERIPH_UART_MODECFG
 static uart_data_bits_t data_bits_lut[] = { UART_DATA_BITS_5, UART_DATA_BITS_6,
                                             UART_DATA_BITS_7, UART_DATA_BITS_8 };
 static int data_bits_lut_len = ARRAY_SIZE(data_bits_lut);
@@ -124,7 +124,7 @@ static int parse_dev(char *arg)
     return dev;
 }
 
-#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+#if MODULE_PERIPH_UART_RXSTART_IRQ
 static void rxs_cb(void *arg)
 {
     ringbuffer_add_one(arg, STX);
@@ -173,7 +173,7 @@ static int _self_test(uart_t dev, unsigned baud)
         }
     }
 
-#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+#if MODULE_PERIPH_UART_RXSTART_IRQ
     /* test RX Start detection if available */
     uart_rxstart_irq_configure(dev, rxs_cb, &ctx[dev].rx_buf);
     uart_rxstart_irq_enable(dev);
@@ -195,7 +195,7 @@ static int _self_test(uart_t dev, unsigned baud)
     }
     uart_rxstart_irq_disable(dev);
 #endif
-#ifdef MODULE_PERIPH_UART_COLLISION
+#if MODULE_PERIPH_UART_COLLISION
     uart_collision_detect_enable(dev);
     uart_write(dev, (uint8_t*)test_string, sizeof(test_string));
     if (uart_collision_detected(dev)) {
@@ -322,7 +322,7 @@ static int cmd_off(int argc, char **argv)
 
 SHELL_COMMAND(off, "Power off the given UART device", cmd_off);
 
-#ifdef MODULE_PERIPH_UART_MODECFG
+#if MODULE_PERIPH_UART_MODECFG
 static int cmd_mode(int argc, char **argv)
 {
     int dev, data_bits_arg, stop_bits_arg;

@@ -73,7 +73,7 @@ static const uint32_t _port_base[] = {
     GPIO_PORTF_BASE,
 };
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 static const uint32_t _int_assign[] = {
     INT_GPIOA,
     INT_GPIOB,
@@ -164,7 +164,7 @@ void gpio_write(gpio_t pin, bool value)
     }
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 static void _isr_gpio(uint32_t port_num){
     const uint32_t port_addr = _port_base[port_num];
     uint32_t isr = ROM_GPIOPinIntStatus(port_addr, true);

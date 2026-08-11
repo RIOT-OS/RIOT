@@ -20,14 +20,14 @@
 #include "sdk/sdk.h"
 #include "timex.h"
 
-#ifdef MODULE_ESP_IDF_HEAP
+#if MODULE_ESP_IDF_HEAP
 #include "esp_heap_caps.h"
 #endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifdef MODULE_ESP_IDF_HEAP
+#if MODULE_ESP_IDF_HEAP
 
 /* this function is platform specific if module esp_idf_heap is used */
 void heap_stats(void)

@@ -19,7 +19,7 @@
 #include <assert.h>
 #include <string.h>
 #include "kernel_defines.h"
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
 #include "ztimer.h"
 #else
 #include "xtimer.h"
@@ -37,14 +37,14 @@
 #include "gnrc_rpl_internal/globals.h"
 #include "of0.h"
 
-#ifdef MODULE_NETSTATS_RPL
+#if MODULE_NETSTATS_RPL
 #include "gnrc_rpl_internal/netstats.h"
 #endif
 
 #include "net/gnrc/rpl.h"
 #include "gnrc_rpl_internal/validation.h"
 
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
 #include "net/gnrc/rpl/p2p_structs.h"
 #include "net/gnrc/rpl/p2p_dodag.h"
 #include "net/gnrc/rpl/p2p.h"
@@ -325,7 +325,7 @@ static gnrc_pktsnip_t *_dio_prefix_info_build(gnrc_pktsnip_t *pkt, gnrc_rpl_doda
     prefix_info->prefix_len = 64;
     if (_get_pl_entry(dodag->iface, &dodag->dodag_id, prefix_info->prefix_len,
                       &ple)) {
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
         uint32_t now = (uint32_t)ztimer_now(ZTIMER_MSEC);
 #else
         uint32_t now = (xtimer_now_usec64() / US_PER_MS) & UINT32_MAX;
@@ -362,7 +362,7 @@ void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination)
     gnrc_pktsnip_t *pkt = NULL, *tmp;
     gnrc_rpl_dio_t *dio;
 
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
     gnrc_rpl_p2p_ext_t *p2p_ext = gnrc_rpl_p2p_ext_get(dodag);
     if (dodag->instance->mop == GNRC_RPL_P2P_MOP) {
         if (!p2p_ext->for_me) {
@@ -415,7 +415,7 @@ void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination)
     }
     pkt = tmp;
 
-#ifdef MODULE_NETSTATS_RPL
+#if MODULE_NETSTATS_RPL
     gnrc_rpl_netstats_tx_DIO(&gnrc_rpl_netstats, gnrc_pkt_len(pkt),
                              (destination && !ipv6_addr_is_multicast(destination)));
 #endif
@@ -482,7 +482,7 @@ void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination,
         return;
     }
     pkt = tmp;
-#ifdef MODULE_NETSTATS_RPL
+#if MODULE_NETSTATS_RPL
     gnrc_rpl_netstats_tx_DIS(&gnrc_rpl_netstats, gnrc_pkt_len(pkt),
                              (destination && !ipv6_addr_is_multicast(destination)));
 #endif
@@ -675,7 +675,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
             first_target = NULL;
             break;
 
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
         case (GNRC_RPL_P2P_OPT_RDO):
             gnrc_rpl_p2p_rdo_parse((gnrc_rpl_p2p_opt_rdo_t *)opt, gnrc_rpl_p2p_ext_get(dodag));
             break;
@@ -692,7 +692,7 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src
 {
     (void)iface;
 
-#ifdef MODULE_NETSTATS_RPL
+#if MODULE_NETSTATS_RPL
     gnrc_rpl_netstats_rx_DIS(&gnrc_rpl_netstats, len, (dst && !ipv6_addr_is_multicast(dst)));
 #endif
 
@@ -707,7 +707,7 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src
             if ((gnrc_rpl_instances[i].state != 0)
                 /* a leaf node should only react to unicast DIS */
                 && (gnrc_rpl_instances[i].dodag.node_status != GNRC_RPL_LEAF_NODE)) {
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
                 if (gnrc_rpl_instances[i].mop == GNRC_RPL_P2P_MOP) {
                     DEBUG("RPL: Not responding to DIS for P2P-RPL DODAG\n");
                     continue;
@@ -953,7 +953,7 @@ static void _recv_DIO_for_existing_dodag(gnrc_rpl_instance_t *inst, gnrc_rpl_dio
         return;
     }
 
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
     gnrc_rpl_p2p_ext_t *p2p_ext = gnrc_rpl_p2p_ext_get(dodag);
     if ((dodag->instance->mop == GNRC_RPL_P2P_MOP) && (p2p_ext->lifetime_sec <= 0)) {
         return;
@@ -988,7 +988,7 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
     (void)dst;
     gnrc_rpl_instance_t *inst = NULL;
 
-#ifdef MODULE_NETSTATS_RPL
+#if MODULE_NETSTATS_RPL
     gnrc_rpl_netstats_rx_DIO(&gnrc_rpl_netstats, len, (dst && !ipv6_addr_is_multicast(dst)));
 #endif
 
@@ -1072,7 +1072,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
         return;
     }
 
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
     if (dodag->instance->mop == GNRC_RPL_P2P_MOP) {
         return;
     }
@@ -1177,7 +1177,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
     }
     pkt = tmp;
 
-#ifdef MODULE_NETSTATS_RPL
+#if MODULE_NETSTATS_RPL
     gnrc_rpl_netstats_tx_DAO(&gnrc_rpl_netstats, gnrc_pkt_len(pkt),
                              (destination && !ipv6_addr_is_multicast(destination)));
 #endif
@@ -1229,7 +1229,7 @@ void gnrc_rpl_send_DAO_ACK(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, 
     dao_ack->dao_sequence = seq;
     dao_ack->status = 0;
 
-#ifdef MODULE_NETSTATS_RPL
+#if MODULE_NETSTATS_RPL
     gnrc_rpl_netstats_tx_DAO_ACK(&gnrc_rpl_netstats, gnrc_pkt_len(pkt),
                                  (destination && !ipv6_addr_is_multicast(destination)));
 #endif
@@ -1243,7 +1243,7 @@ void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, kernel_pid_t iface, ipv6_addr_t *src
     (void)iface;
     (void)dst;
 
-#ifdef MODULE_NETSTATS_RPL
+#if MODULE_NETSTATS_RPL
     gnrc_rpl_netstats_rx_DAO(&gnrc_rpl_netstats, len, (dst && !ipv6_addr_is_multicast(dst)));
 #endif
 
@@ -1282,7 +1282,7 @@ void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, kernel_pid_t iface, ipv6_addr_t *src
         return;
     }
 
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
     if (dodag->instance->mop == GNRC_RPL_P2P_MOP) {
         return;
     }
@@ -1313,7 +1313,7 @@ void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, ipv6
     gnrc_rpl_instance_t *inst = NULL;
     gnrc_rpl_dodag_t *dodag = NULL;
 
-#ifdef MODULE_NETSTATS_RPL
+#if MODULE_NETSTATS_RPL
     gnrc_rpl_netstats_rx_DAO_ACK(&gnrc_rpl_netstats, len, (dst && !ipv6_addr_is_multicast(dst)));
 #endif
 

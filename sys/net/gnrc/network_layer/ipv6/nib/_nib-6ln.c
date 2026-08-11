@@ -300,7 +300,7 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
 {
     uint16_t ltime;
 
-#ifdef MODULE_GNRC_SIXLOWPAN_CTX
+#if MODULE_GNRC_SIXLOWPAN_CTX
     uint8_t cid;
 #endif  /* MODULE_GNRC_SIXLOWPAN_CTX */
     (void)icmpv6;
@@ -313,7 +313,7 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
         return UINT32_MAX;
     }
     ltime = byteorder_ntohs(sixco->ltime);
-#ifdef MODULE_GNRC_SIXLOWPAN_CTX
+#if MODULE_GNRC_SIXLOWPAN_CTX
     cid = sixlowpan_nd_opt_6ctx_get_cid(sixco);
     gnrc_sixlowpan_ctx_update(cid, (ipv6_addr_t *)(sixco + 1), sixco->ctx_len,
                               ltime, sixlowpan_nd_opt_6ctx_is_comp(sixco));

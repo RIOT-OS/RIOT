@@ -53,7 +53,7 @@ extern "C" {
  * @brief   maximum number of credentials that can be added with @ref gcoap_dns_cred_add()
  */
 #ifndef CONFIG_GCOAP_DNS_CREDS_MAX
-#if IS_USED(MODULE_GCOAP_DTLS) || defined(DOXYGEN)
+#if MODULE_GCOAP_DTLS || defined(DOXYGEN)
 #define CONFIG_GCOAP_DNS_CREDS_MAX          1U
 #else
 #define CONFIG_GCOAP_DNS_CREDS_MAX          0U

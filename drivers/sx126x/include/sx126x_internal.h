@@ -36,7 +36,7 @@ static inline bool sx126x_is_sx1261(sx126x_t *dev)
 {
     assert(dev);
     if (SX126X_SINGLE) {
-        return IS_USED(MODULE_SX1261);
+        return MODULE_SX1261;
     }
     else {
         return dev->params->type == SX126X_TYPE_SX1261;
@@ -55,7 +55,7 @@ static inline bool sx126x_is_sx1262(sx126x_t *dev)
 {
     assert(dev);
     if (SX126X_SINGLE) {
-        return IS_USED(MODULE_SX1262);
+        return MODULE_SX1262;
     }
     else {
         return dev->params->type == SX126X_TYPE_SX1262;
@@ -74,7 +74,7 @@ static inline bool sx126x_is_llcc68(sx126x_t *dev)
 {
     assert(dev);
     if (SX126X_SINGLE) {
-        return IS_USED(MODULE_LLCC68);
+        return MODULE_LLCC68;
     }
     else {
         return dev->params->type == SX126X_TYPE_LLCC68;
@@ -93,7 +93,7 @@ static inline bool sx126x_is_sx1268(sx126x_t *dev)
 {
     assert(dev);
     if (SX126X_SINGLE) {
-        return IS_USED(MODULE_SX1268);
+        return MODULE_SX1268;
     }
     else {
         return dev->params->type == SX126X_TYPE_SX1268;
@@ -112,7 +112,7 @@ static inline bool sx126x_is_stm32wl(sx126x_t *dev)
 {
     assert(dev);
     if (SX126X_SINGLE) {
-        return IS_USED(MODULE_SX126X_STM32WL);
+        return MODULE_SX126X_STM32WL;
     }
     else {
         return dev->params->type == SX126X_TYPE_STM32WL;

@@ -35,7 +35,7 @@ extern "C" {
 /**
  * @brief   Maximum payload length that can be send
  */
-#ifdef MODULE_XBEE_ENCRYPTION
+#if MODULE_XBEE_ENCRYPTION
 #define XBEE_MAX_PAYLOAD_LENGTH     (95U)
 #else
 #define XBEE_MAX_PAYLOAD_LENGTH     (100U)
@@ -59,7 +59,7 @@ extern "C" {
 /**
  * @brief   Default protocol for data that is coming in
  */
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if MODULE_GNRC_SIXLOWPAN
 #define XBEE_DEFAULT_PROTOCOL       (GNRC_NETTYPE_SIXLOWPAN)
 #else
 #define XBEE_DEFAULT_PROTOCOL       (GNRC_NETTYPE_UNDEF)

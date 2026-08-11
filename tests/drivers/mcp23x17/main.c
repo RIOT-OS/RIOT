@@ -141,7 +141,7 @@
 /* MCP23x17 devices allocation */
 mcp23x17_t mcp23x17_dev[MCP23X17_NUM];
 
-#if IS_USED(MODULE_MCP23X17_IRQ)
+#if MODULE_MCP23X17_IRQ
 static void gpio_cb(void *arg)
 {
     printf("INT: external interrupt from GPIO pin %i\n", (int)arg);
@@ -199,7 +199,7 @@ static int _init_od_pu(int argc, char **argv)
     return _init_pin(argc, argv, GPIO_OD_PU);
 }
 
-#if IS_USED(MODULE_MCP23X17_IRQ)
+#if MODULE_MCP23X17_IRQ
 static int _init_int(int argc, char **argv)
 {
     gpio_mode_t mode = GPIO_IN;
@@ -473,7 +473,7 @@ static const shell_command_t shell_commands[] = {
     { "init_out", "init as output (push-pull mode)", _init_out },
     { "init_od", "init as output (open-drain w/o pull-up)", _init_od },
     { "init_od_pu", "init as output (open-drain with pull-up)", _init_od_pu },
-#if IS_USED(MODULE_MCP23X17_IRQ)
+#if MODULE_MCP23X17_IRQ
     { "init_int", "init as external INT w/o pull-up", _init_int },
     { "init_int_pu", "init as external INT with pull-up", _init_int_pu },
     { "enable_int", "enable gpio interrupt", _enable_int },

@@ -48,7 +48,7 @@ void telnet_cb_pre_connected(sock_tcp_t *sock)
 }
 
 /* shell lock module makes use of disconnect callback */
-#ifndef MODULE_SHELL_LOCK
+#if !MODULE_SHELL_LOCK
 void telnet_cb_disconneced(void)
 {
     puts("disconnected");

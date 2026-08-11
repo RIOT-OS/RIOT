@@ -152,13 +152,13 @@ static const uart_conf_t uart_config[] = {
         .dev      = &SERCOM0->USART,
         .rx_pin   = GPIO_PIN(PA, 5),
         .tx_pin   = GPIO_PIN(PA, 4),
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .rts_pin  = GPIO_PIN(PA, 6),
         .cts_pin  = GPIO_PIN(PA, 7),
 #endif
         .mux      = GPIO_MUX_D,
         .rx_pad   = UART_PAD_RX_1,
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .tx_pad   = UART_PAD_TX_0_RTS_2_CTS_3,
 #else
         .tx_pad   = UART_PAD_TX_0,
@@ -249,7 +249,7 @@ static const spi_conf_t spi_config[] = {
         .miso_pad = SPI_PAD_MISO_3,
         .mosi_pad = SPI_PAD_MOSI_0_SCK_1,
         .gclk_src = SAM0_GCLK_PERIPH,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_trigger = SERCOM4_DMAC_ID_TX,
         .rx_trigger = SERCOM4_DMAC_ID_RX,
 #endif
@@ -266,12 +266,12 @@ static const spi_conf_t spi_config[] = {
         .miso_pad = SPI_PAD_MISO_3,
         .mosi_pad = SPI_PAD_MOSI_0_SCK_1,
         .gclk_src = SAM0_GCLK_48MHZ,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_trigger = SERCOM6_DMAC_ID_TX,
         .rx_trigger = SERCOM6_DMAC_ID_RX,
 #endif
     },
-#ifdef MODULE_PERIPH_SPI_ON_QSPI
+#if MODULE_PERIPH_SPI_ON_QSPI
     {    /* QSPI in SPI mode */
         .dev      = QSPI,
         .miso_pin = SAM0_QSPI_PIN_DATA_1,
@@ -283,7 +283,7 @@ static const spi_conf_t spi_config[] = {
         .miso_pad = SPI_PAD_MISO_0,         /* unused */
         .mosi_pad = SPI_PAD_MOSI_0_SCK_1,   /* unused */
         .gclk_src = SAM0_GCLK_MAIN,         /* unused */
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_trigger = QSPI_DMAC_ID_TX,
         .rx_trigger = QSPI_DMAC_ID_RX,
 #endif

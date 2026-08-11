@@ -1,2 +1,6 @@
 USEMODULE_INCLUDES_slipdev := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_slipdev)
+
+MODULE_DEFS_NEEDED += \
+  stdio_uart \
+  #

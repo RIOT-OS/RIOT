@@ -226,7 +226,7 @@ int main(void)
     };
     int failed = 0;
 
-    if (IS_USED(MODULE_PERIPH_PTP_SPEED_ADJUSTMENT)) {
+    if (MODULE_PERIPH_PTP_SPEED_ADJUSTMENT) {
         for (size_t i = 0; i < ARRAY_SIZE(speeds); i++) {
             failed |= test_speed_adjustment(speeds[i]);
         }

@@ -9,3 +9,12 @@ PSEUDOMODULES += at86rf2xx_aes_spi
 
 USEMODULE_INCLUDES_at86rf2xx := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_at86rf2xx)
+
+MODULE_DEFS_NEEDED += \
+  at86rf212b \
+  at86rf231 \
+  at86rf232 \
+  at86rf233 \
+  at86rfa1 \
+  at86rfr2 \
+  #

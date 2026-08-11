@@ -50,3 +50,36 @@ endif
 ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib/sock/udp
 endif
+
+MODULE_DEFS_NEEDED += \
+  bhp_event \
+  log \
+  lwip_arp \
+  lwip_autoip \
+  lwip_dhcp \
+  lwip_ethernet \
+  lwip_igmp \
+  lwip_ipv4 \
+  lwip_ipv6 \
+  lwip_ipv6_autoconfig \
+  lwip_ipv6_mld \
+  lwip_netif \
+  lwip_netif_ppp \
+  lwip_raw \
+  lwip_sixlowpan \
+  lwip_sock \
+  lwip_sock_ip \
+  lwip_sock_tcp \
+  lwip_sock_udp \
+  lwip_stats \
+  lwip_tcp \
+  lwip_udp \
+  lwip_udplite \
+  netdev_new_api \
+  random \
+  shell_cmd_lwip_netif \
+  sock_aux_local \
+  sock_ip \
+  sock_tcp \
+  sock_udp \
+  #

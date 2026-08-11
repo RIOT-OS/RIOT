@@ -59,7 +59,7 @@ typedef struct {
  *
  * @param[in]   mode      power mode to block
  */
-#ifdef MODULE_PM_LAYERED
+#if MODULE_PM_LAYERED
 void pm_block(unsigned mode);
 #else
 static inline void pm_block(unsigned mode) { (void)mode; }
@@ -70,7 +70,7 @@ static inline void pm_block(unsigned mode) { (void)mode; }
  *
  * @param[in]   mode      power mode to unblock
  */
-#ifdef MODULE_PM_LAYERED
+#if MODULE_PM_LAYERED
 void pm_unblock(unsigned mode);
 #else
 static inline void pm_unblock(unsigned mode) { (void)mode; }

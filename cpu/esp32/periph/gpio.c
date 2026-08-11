@@ -20,7 +20,7 @@
 
 #include "log.h"
 #include "periph/gpio.h"    /* RIOT gpio.h */
-#if IS_USED(MODULE_GPIO_LL)
+#if MODULE_GPIO_LL
 #include "periph/gpio_ll_arch.h"
 #endif
 
@@ -103,7 +103,7 @@ extern gpio_pin_usage_t _gpio_pin_usage[GPIO_PIN_NUMOF];
 _Static_assert(ARRAY_SIZE(_gpio_pin_usage) == SOC_GPIO_PIN_COUNT,
                "size of _gpio_pin_usage does not match SOC_GPIO_PIN_COUNT");
 
-#if !IS_USED(MODULE_ESP_IDF_GPIO_HAL)
+#if !MODULE_ESP_IDF_GPIO_HAL
 extern const uint32_t _gpio_to_iomux_reg[GPIO_PIN_NUMOF];
 
 _Static_assert(ARRAY_SIZE(_gpio_to_iomux_reg) == SOC_GPIO_PIN_COUNT,
@@ -356,7 +356,7 @@ void gpio_irq_disable(gpio_t pin)
 
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
-#if IS_USED(MODULE_ESP_IDF_GPIO_HAL)
+#if MODULE_ESP_IDF_GPIO_HAL
 
 static gpio_hal_context_t _gpio_hal_ctx = {
     .dev = GPIO_HAL_GET_HW(0)
@@ -423,7 +423,7 @@ void gpio_toggle(gpio_t pin)
     gpio_hal_set_level(&_gpio_hal_ctx, pin, bf_isset(_output, pin) ? 1 : 0);
 }
 
-#else /* IS_USED(MODULE_ESP_IDF_GPIO_HAL) */
+#else /* MODULE_ESP_IDF_GPIO_HAL */
 
 bool gpio_read(gpio_t pin)
 {
@@ -477,7 +477,7 @@ void gpio_toggle(gpio_t pin)
     _gpio_reg_out_xor(pin);
 }
 
-#endif /* IS_USED(MODULE_ESP_IDF_GPIO_HAL) */
+#endif /* MODULE_ESP_IDF_GPIO_HAL */
 
 int gpio_set_pin_usage(gpio_t pin, gpio_pin_usage_t usage)
 {

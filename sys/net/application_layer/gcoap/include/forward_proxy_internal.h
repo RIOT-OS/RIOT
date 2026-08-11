@@ -42,7 +42,7 @@ typedef struct {
     sock_udp_ep_t proxy_ep;                 /**< proxy endpoint */
     uint16_t mid;                           /**< message ID */
     uint8_t flags;                          /**< client flags */
-#if IS_USED(MODULE_NANOCOAP_CACHE)
+#if MODULE_NANOCOAP_CACHE
     uint8_t req_etag[COAP_ETAG_LENGTH_MAX]; /**< request ETag */
 #endif
     ztimer_t empty_ack_timer;               /**< empty ACK timer */

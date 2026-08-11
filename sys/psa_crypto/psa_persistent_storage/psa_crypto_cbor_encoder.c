@@ -134,7 +134,7 @@ static psa_status_t psa_encode_protected_key_slot(nanocbor_encoder_t *enc, psa_k
     int key_array_size = 1;
     psa_key_slot_number_t *slot_no = psa_key_slot_get_slot_number(slot);
 
-#if IS_USED(MODULE_PSA_ASYMMETRIC)
+#if MODULE_PSA_ASYMMETRIC
     if (PSA_KEY_TYPE_IS_KEY_PAIR(slot->attr.type)) {
         key_array_size = 2;
     }
@@ -150,7 +150,7 @@ static psa_status_t psa_encode_protected_key_slot(nanocbor_encoder_t *enc, psa_k
         goto error;
     }
 
-#if IS_USED(MODULE_PSA_ASYMMETRIC)
+#if MODULE_PSA_ASYMMETRIC
     if (PSA_KEY_TYPE_IS_KEY_PAIR(slot->attr.type)) {
         uint8_t *pubkey_data;
         size_t *pubkey_data_len;
@@ -437,7 +437,7 @@ static psa_status_t psa_decode_protected_key_slot(nanocbor_value_t *key, psa_key
         goto error;
     }
 
-#if IS_USED(MODULE_PSA_ASYMMETRIC)
+#if MODULE_PSA_ASYMMETRIC
     if (PSA_KEY_TYPE_IS_KEY_PAIR(slot->attr.type)) {
         size_t *pubkey_data_len;
         uint8_t *pubkey_data;

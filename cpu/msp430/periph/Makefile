@@ -1,5 +1,10 @@
 MODULE = periph
 
+MODULE_DEFS_NEEDED += \
+  gpio_ll_irq \
+  periph_gpio_irq \
+  #
+
 # All supported MSP430 families use special serial IP block that implements
 # various serial bus interfaces using the same hardware block. For the
 # MSP430 x1xx family, the block is called USART. For the MSP430 F2xx/G2xx

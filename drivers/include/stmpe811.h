@@ -19,13 +19,13 @@
 
 #include "saul.h"
 #include "periph/gpio.h"
-#if IS_USED(MODULE_STMPE811_SPI)
+#if MODULE_STMPE811_SPI
 #include "periph/spi.h"
 #else
 #include "periph/i2c.h"
 #endif
 
-#ifdef MODULE_TOUCH_DEV
+#if MODULE_TOUCH_DEV
 #include "touch_dev.h"
 #endif
 
@@ -84,7 +84,7 @@ typedef void (*stmpe811_event_cb_t)(void *arg);
  *       conversion defined by stmpe811_params_t::xmax.
  */
 typedef struct {
-#if IS_USED(MODULE_STMPE811_SPI)
+#if MODULE_STMPE811_SPI
     /* SPI configuration */
     spi_t spi;                          /**< SPI bus */
     spi_mode_t mode;                    /**< SPI mode */
@@ -106,7 +106,7 @@ typedef struct {
  * @brief   Device descriptor for the STMPE811 sensor
  */
 typedef struct {
-#ifdef MODULE_TOUCH_DEV
+#if MODULE_TOUCH_DEV
     touch_dev_t *dev;                   /**< Pointer to the generic touch device */
 #endif
     stmpe811_params_t params;           /**< Device parameters */

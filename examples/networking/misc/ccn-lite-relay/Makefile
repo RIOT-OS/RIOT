@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  netif \
+  #
 APPLICATION = ccn-lite-relay
 
 # If no BOARD is found in the environment, use this default:

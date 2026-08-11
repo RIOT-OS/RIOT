@@ -42,3 +42,10 @@ endif
 
 PSEUDOMODULES += periph_rtc
 PSEUDOMODULES += periph_rtt
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  periph_gpio \
+  periph_gpio_fast_read \
+  periph_uart_hw_fc \
+  #

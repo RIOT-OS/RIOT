@@ -16,7 +16,7 @@
  * @}
  */
 
-#ifdef MODULE_USB_BOARD_RESET
+#if MODULE_USB_BOARD_RESET
 
 #define USB_H_USER_IS_RIOT_INTERNAL
 

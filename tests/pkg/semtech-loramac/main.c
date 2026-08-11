@@ -16,7 +16,7 @@
 
 #include <stdio.h>
 
-#ifdef MODULE_SEMTECH_LORAMAC_RX
+#if MODULE_SEMTECH_LORAMAC_RX
 #include "thread.h"
 #include "msg.h"
 #endif
@@ -26,7 +26,7 @@
 
 extern semtech_loramac_t loramac;
 
-#ifdef MODULE_SEMTECH_LORAMAC_RX
+#if MODULE_SEMTECH_LORAMAC_RX
 #define LORAMAC_RECV_MSG_QUEUE                   (4U)
 static msg_t _loramac_recv_queue[LORAMAC_RECV_MSG_QUEUE];
 static char _recv_stack[THREAD_STACKSIZE_DEFAULT];
@@ -74,7 +74,7 @@ static void *_wait_recv(void *arg)
 
 int main(void)
 {
-#ifdef MODULE_SEMTECH_LORAMAC_RX
+#if MODULE_SEMTECH_LORAMAC_RX
     thread_create(_recv_stack, sizeof(_recv_stack),
                   THREAD_PRIORITY_MAIN - 1, 0, _wait_recv, NULL, "recv thread");
 #endif

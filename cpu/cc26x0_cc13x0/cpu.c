@@ -19,7 +19,7 @@
 #include "periph_conf.h"
 #include "periph/init.h"
 #include "stdio_base.h"
-#if IS_USED(MODULE_CC26X0_DRIVERLIB)
+#if MODULE_CC26X0_DRIVERLIB
 #include "vendor/driverlib/setup.h"
 #endif
 
@@ -38,7 +38,7 @@ void cpu_init(void)
     /* initialize the Cortex-M core */
     cortexm_init();
 
-#if IS_USED(MODULE_CC26X0_DRIVERLIB)
+#if MODULE_CC26X0_DRIVERLIB
     /* Final trim of device */
     SetupTrimDevice();
 #endif

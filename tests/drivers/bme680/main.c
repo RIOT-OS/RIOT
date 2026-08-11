@@ -79,7 +79,7 @@ int main(void)
             int res = bme680_get_data(&dev[i], &data);
 
             if (res == 0 && dev[i].sensor.new_fields) {
-#ifndef MODULE_BME680_FP
+#if !MODULE_BME680_FP
                 printf("[bme680]: dev=%u, "
                        "T = %02d.%02d degC, "
                        "P = %" PRIu32 " Pa, H = %02" PRIu32 ".%03" PRIu32 " %%",

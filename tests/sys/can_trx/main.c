@@ -22,14 +22,14 @@
 #include "can/can_trx.h"
 #include "shell.h"
 
-#ifdef MODULE_TJA1042
+#if MODULE_TJA1042
 #include "tja1042.h"
 tja1042_trx_t tja1042 = { .trx.driver = &tja1042_driver,
                           .stb_pin = TJA1042_STB_PIN
 };
 #endif
 
-#ifdef MODULE_NCV7356
+#if MODULE_NCV7356
 #include "ncv7356.h"
 ncv7356_trx_t ncv7356 ={ .trx.driver = &ncv7356_driver,
                          .mode0_pin = NCV7356_MODE0_PIN,
@@ -38,10 +38,10 @@ ncv7356_trx_t ncv7356 ={ .trx.driver = &ncv7356_driver,
 #endif
 
 static can_trx_t *devs[] = {
-#ifdef MODULE_TJA1042
+#if MODULE_TJA1042
     (can_trx_t *)&tja1042,
 #endif
-#ifdef MODULE_NCV7356
+#if MODULE_NCV7356
     (can_trx_t *)&ncv7356,
 #endif
     NULL,

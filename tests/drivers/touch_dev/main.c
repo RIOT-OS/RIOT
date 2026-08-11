@@ -25,7 +25,7 @@
 
 #include "touch_dev.h"
 
-#if IS_USED(MODULE_STMPE811)
+#if MODULE_STMPE811
 #include "stmpe811.h"
 #include "test_utils/expect.h"
 #endif
@@ -56,7 +56,7 @@ int main(void)
     touch_dev_set_touch_event_callback(touch_dev->dev, _touch_event_cb, &lock);
 #endif
 
-#if IS_USED(MODULE_STMPE811)
+#if MODULE_STMPE811
     uint16_t xmax = touch_dev_width(touch_dev->dev);
     uint16_t ymax = touch_dev_height(touch_dev->dev);
 

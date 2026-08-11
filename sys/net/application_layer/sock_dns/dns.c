@@ -37,7 +37,7 @@
 /* global DNS server UDP endpoint */
 sock_udp_ep_t sock_dns_server;
 
-#ifdef MODULE_AUTO_INIT_SOCK_DNS
+#if MODULE_AUTO_INIT_SOCK_DNS
 void auto_init_sock_dns(void)
 {
     assert(   CONFIG_AUTO_INIT_SOCK_DNS_IP_VERSION == 4

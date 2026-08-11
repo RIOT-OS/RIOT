@@ -18,7 +18,7 @@
 
 #include "board_internal.h"
 
-#ifdef MODULE_MTD
+#if MODULE_MTD
 #include "mtd_native.h"
 
 mtd_native_dev_t mtd0_dev = {
@@ -35,7 +35,7 @@ mtd_native_dev_t mtd0_dev = {
 MTD_XFA_ADD(mtd0_dev.base, 0);
 #endif
 
-#ifdef MODULE_VFS_DEFAULT
+#if MODULE_VFS_DEFAULT
 #include "vfs_default.h"
 
 /*
@@ -47,27 +47,27 @@ MTD_XFA_ADD(mtd0_dev.base, 0);
  */
 
 /* littlefs support */
-#if defined(MODULE_LITTLEFS)
+#if MODULE_LITTLEFS
 VFS_AUTO_MOUNT(littlefs, VFS_MTD(mtd0_dev), VFS_DEFAULT_NVM(0), 0);
 
 /* littlefs2 support */
-#elif defined(MODULE_LITTLEFS2)
+#elif MODULE_LITTLEFS2
 VFS_AUTO_MOUNT(littlefs2, VFS_MTD(mtd0_dev), VFS_DEFAULT_NVM(0), 0);
 
 /* spiffs support */
-#elif defined(MODULE_SPIFFS)
+#elif MODULE_SPIFFS
 VFS_AUTO_MOUNT(spiffs, VFS_MTD(mtd0_dev), VFS_DEFAULT_NVM(0), 0);
 
 /* FAT support */
-#elif defined(MODULE_FATFS_VFS)
+#elif MODULE_FATFS_VFS
 VFS_AUTO_MOUNT(fatfs, VFS_MTD(mtd0_dev), VFS_DEFAULT_NVM(0), 0);
 
 /* ext2/3/4 support */
-#elif defined(MODULE_LWEXT4)
+#elif MODULE_LWEXT4
 VFS_AUTO_MOUNT(lwext4, VFS_MTD(mtd0_dev), VFS_DEFAULT_NVM(0), 0);
 
 /* host fs pass-through */
-#elif defined(MODULE_FS_NATIVE)
+#elif MODULE_FS_NATIVE
 VFS_AUTO_MOUNT(native, { .hostpath = FS_NATIVE_DIR }, VFS_DEFAULT_NVM(0), 0);
 
 #endif

@@ -1,0 +1,39 @@
+MODULE_DEFS_NEEDED += \
+  vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  vfs \
+  #

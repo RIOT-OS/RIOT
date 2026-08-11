@@ -29,7 +29,7 @@ uint16_t inet_csum_slice(uint16_t sum, const uint8_t *buf, uint16_t len, size_t 
     DEBUG("inet_sum: sum = 0x%04" PRIx16 ", len = %" PRIu16, sum, len);
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
-        if (IS_USED(MODULE_OD)) {
+        if (MODULE_OD) {
             DEBUG(", buf:\n");
             od_hex_dump(buf, len, OD_WIDTH_DEFAULT);
         } else {

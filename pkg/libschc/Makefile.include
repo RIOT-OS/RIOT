@@ -10,3 +10,9 @@ INCLUDES += -I$(PKGDIRBASE)/libschc
 
 PSEUDOMODULES += libschc_coap
 PSEUDOMODULES += libschc_udpv6
+
+MODULE_DEFS_NEEDED += \
+  libschc_coap \
+  libschc_udpv6 \
+  lora \
+  #

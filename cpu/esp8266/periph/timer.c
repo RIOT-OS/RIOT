@@ -32,7 +32,7 @@
 #include "sdk/sdk.h"
 #include "xtensa/hal.h"
 
-#if !defined(MODULE_ESP_SW_TIMER)
+#if !MODULE_ESP_SW_TIMER
 
 /* hardware timer used */
 

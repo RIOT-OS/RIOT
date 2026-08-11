@@ -26,7 +26,7 @@
 #include "shell.h"
 #include "timex.h"
 
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
 #include "ztimer.h"
 static ztimer_t del_timer[GNRC_SIXLOWPAN_CTX_SIZE];
 #else
@@ -77,7 +77,7 @@ static int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *
         _usage(cmd_str);
         return 1;
     }
-    if (!IS_USED(MODULE_GNRC_IPV6_NIB_6LBR)) {
+    if (!MODULE_GNRC_IPV6_NIB_6LBR) {
         printf("WARNING: context dissemination by non-6LBR not supported\n");
     }
     addr_str = strtok_r(prefix_str, "/", &save_ptr);
@@ -117,7 +117,7 @@ static int _gnrc_6ctx_del(char *cmd_str, char *ctx_str)
         _usage(cmd_str);
         return 1;
     }
-    if (!IS_USED(MODULE_GNRC_IPV6_NIB_6LBR)) {
+    if (!MODULE_GNRC_IPV6_NIB_6LBR) {
         printf("WARNING: context dissemination by non-6LBR not supported\n");
     }
     if (del_timer[cid].callback == NULL) {
@@ -127,7 +127,7 @@ static int _gnrc_6ctx_del(char *cmd_str, char *ctx_str)
             ctx->ltime = 0;
             del_timer[cid].callback = _del_cb;
             del_timer[cid].arg = ctx;
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
             ztimer_set(ZTIMER_MSEC, &del_timer[cid],
                        SIXLOWPAN_ND_MIN_CTX_CHANGE_SEC_DELAY * MS_PER_SEC);
 #else

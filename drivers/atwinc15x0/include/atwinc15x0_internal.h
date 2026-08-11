@@ -270,7 +270,7 @@ static inline bool _atwinc15x0_is_sleeping(const atwinc15x0_t *dev) {
  */
 static inline void _atwinc15x0_sta_set_current_ssid(atwinc15x0_t *dev, const char *ssid) {
     (void)dev; (void)ssid;
-#if IS_USED(MODULE_ATWINC15X0_DYNAMIC_CONNECT)
+#if MODULE_ATWINC15X0_DYNAMIC_CONNECT
     strscpy(atwinc15x0->ssid, ssid, ARRAY_SIZE(atwinc15x0->ssid));
 #endif
 }
@@ -286,7 +286,7 @@ static inline void _atwinc15x0_sta_set_current_ssid(atwinc15x0_t *dev, const cha
  */
 static inline const char *_atwinc15x0_sta_get_current_ssid(const atwinc15x0_t *dev) {
     (void)dev;
-#if IS_USED(MODULE_ATWINC15X0_DYNAMIC_CONNECT)
+#if MODULE_ATWINC15X0_DYNAMIC_CONNECT
     return dev->ssid;
 #endif
     return NULL;

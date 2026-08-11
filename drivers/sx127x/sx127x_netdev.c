@@ -147,7 +147,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             int16_t rssi = sx127x_reg_read(dev, SX127X_REG_LR_PKTRSSIVALUE);
 
             if (packet_info->snr < 0) {
-#if defined(MODULE_SX1272)
+#if MODULE_SX1272
                 packet_info->rssi = SX127X_RSSI_OFFSET + rssi + (rssi >> 4) + packet_info->snr;
 #else /* MODULE_SX1276 */
                 if (dev->settings.channel > SX127X_RF_MID_BAND_THRESH) {
@@ -161,7 +161,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 #endif
             }
             else {
-#if defined(MODULE_SX1272)
+#if MODULE_SX1272
                 packet_info->rssi = SX127X_RSSI_OFFSET + rssi + (rssi >> 4);
 #else /* MODULE_SX1276 */
                 if (dev->settings.channel > SX127X_RF_MID_BAND_THRESH) {

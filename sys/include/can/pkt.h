@@ -25,7 +25,7 @@ extern "C" {
 #include "can/common.h"
 #include "can/can.h"
 #include "msg.h"
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
 #include "mbox.h"
 #endif
 
@@ -72,7 +72,7 @@ can_pkt_t *can_pkt_alloc_tx(int ifnum, const can_frame_t *frame, kernel_pid_t tx
  */
 can_pkt_t *can_pkt_alloc_rx(int ifnum, const can_frame_t *frame);
 
-#if defined(MODULE_CAN_MBOX) || defined(DOXYGEN)
+#if MODULE_CAN_MBOX || defined(DOXYGEN)
 /**
  * @brief Allocate a CAN packet for a mbox to transmit
  *

@@ -29,7 +29,7 @@ extern "C" {
 typedef struct tinyusb_dfu_device {
     bool skip_signature;                    /**< Skip RIOTBOOT signature status */
     uint8_t slot;                           /**< Download slot */
-#ifdef MODULE_RIOTBOOT_TINYUSB_DFU
+#if MODULE_RIOTBOOT_TINYUSB_DFU
     riotboot_flashwrite_t writer;           /**< DFU firmware update state structure */
 #endif
 } tinyusb_dfu_device_t;

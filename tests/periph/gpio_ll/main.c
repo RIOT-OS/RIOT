@@ -161,7 +161,7 @@ static void test_gpio_ll_init_input_configs(void)
     printf_optional("Support for input with pull up: %s\n",
                     noyes[is_supported]);
     /* check if this matches compile time checks */
-    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_INPUT_PULL_UP));
+    expect(is_supported == MODULE_PERIPH_GPIO_LL_INPUT_PULL_UP);
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_in, PIN_IN_0);
         print_conf(conf);
@@ -172,7 +172,7 @@ static void test_gpio_ll_init_input_configs(void)
     printf_optional("Support for input with pull down: %s\n",
                     noyes[is_supported]);
     /* check if this matches compile time checks */
-    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_INPUT_PULL_DOWN));
+    expect(is_supported == MODULE_PERIPH_GPIO_LL_INPUT_PULL_DOWN);
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_in, PIN_IN_0);
         print_conf(conf);
@@ -183,7 +183,7 @@ static void test_gpio_ll_init_input_configs(void)
     printf_optional("Support for input with pull to bus level: %s\n",
                     noyes[is_supported]);
     /* check if this matches compile time checks */
-    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_INPUT_PULL_KEEP));
+    expect(is_supported == MODULE_PERIPH_GPIO_LL_INPUT_PULL_KEEP);
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_in, PIN_IN_0);
         print_conf(conf);
@@ -273,7 +273,7 @@ static void test_gpio_ll_init_output_configs(void)
                     "value of LOW: %s\n",
                     noyes[is_supported]);
     /* check if this matches compile time checks */
-    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_OPEN_DRAIN_PULL_UP));
+    expect(is_supported == MODULE_PERIPH_GPIO_LL_OPEN_DRAIN_PULL_UP);
 
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
@@ -298,7 +298,7 @@ static void test_gpio_ll_init_output_configs(void)
                     "value of HIGH: %s\n",
                     noyes[is_supported]);
     /* check if this matches compile time checks */
-    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_OPEN_DRAIN_PULL_UP));
+    expect(is_supported == MODULE_PERIPH_GPIO_LL_OPEN_DRAIN_PULL_UP);
 
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
@@ -323,7 +323,7 @@ static void test_gpio_ll_init_output_configs(void)
                     "LOW: %s\n",
                     noyes[is_supported]);
     /* check if this matches compile time checks */
-    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_OPEN_DRAIN));
+    expect(is_supported == MODULE_PERIPH_GPIO_LL_OPEN_DRAIN);
 
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
@@ -348,7 +348,7 @@ static void test_gpio_ll_init_output_configs(void)
                     "HIGH: %s\n",
                     noyes[is_supported]);
     /* check if this matches compile time checks */
-    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_OPEN_DRAIN));
+    expect(is_supported == MODULE_PERIPH_GPIO_LL_OPEN_DRAIN);
 
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
@@ -397,7 +397,7 @@ static void test_gpio_ll_init_output_configs(void)
                     "LOW: %s\n",
                     noyes[is_supported]);
     /* check if this matches compile time checks */
-    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_OPEN_SOURCE));
+    expect(is_supported == MODULE_PERIPH_GPIO_LL_OPEN_SOURCE);
 
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
@@ -448,7 +448,7 @@ static void test_gpio_ll_init_output_configs(void)
                     "HIGH: %s\n",
                     noyes[is_supported]);
     /* check if this matches compile time checks */
-    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_OPEN_SOURCE));
+    expect(is_supported == MODULE_PERIPH_GPIO_LL_OPEN_SOURCE);
 
     if (is_supported) {
         gpio_conf_t conf = gpio_ll_query_conf(port_out, PIN_OUT_0);
@@ -473,7 +473,7 @@ static void test_gpio_ll_init_output_configs(void)
                     "value of HIGH: %s\n",
                     noyes[is_supported]);
     /* check if this matches compile time checks */
-    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_OPEN_SOURCE_PULL_DOWN));
+    expect(is_supported == MODULE_PERIPH_GPIO_LL_OPEN_SOURCE_PULL_DOWN);
 
     if (is_supported) {
         ztimer_sleep(ZTIMER_USEC, US_PER_MS);
@@ -494,7 +494,7 @@ static void test_gpio_ll_init_output_configs(void)
                     "value of LOW: %s\n",
                     noyes[is_supported]);
     /* check if this matches compile time checks */
-    expect(is_supported == IS_USED(MODULE_PERIPH_GPIO_LL_OPEN_SOURCE_PULL_DOWN));
+    expect(is_supported == MODULE_PERIPH_GPIO_LL_OPEN_SOURCE_PULL_DOWN);
 
     if (is_supported) {
         ztimer_sleep(ZTIMER_USEC, US_PER_MS);
@@ -715,7 +715,7 @@ static void test_irq_edge(void)
     puts_optional("... OK");
 
     puts_optional("Testing both edges on PIN_IN_0");
-    if (IS_USED(MODULE_PERIPH_GPIO_LL_IRQ_EDGE_TRIGGERED_BOTH)) {
+    if (MODULE_PERIPH_GPIO_LL_IRQ_EDGE_TRIGGERED_BOTH) {
         expect(0 == gpio_ll_irq(port_in, PIN_IN_0, GPIO_TRIGGER_EDGE_BOTH,
                                 irq_edge_cb, &irq_mut));
         /* test for spurious IRQ */
@@ -808,7 +808,7 @@ static void test_irq_level(void)
 {
     struct irq_level_cb_arg arg = { .mutex = MUTEX_INIT_LOCKED, .counter = 10 };
 
-    if (IS_USED(MODULE_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_HIGH)) {
+    if (MODULE_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_HIGH) {
         arg.trigger_level = HIGH;
         puts_optional("Testing level-triggered on HIGH on PIN_IN_0 (when input "
                       "is LOW when setting up IRQ)");
@@ -843,7 +843,7 @@ static void test_irq_level(void)
         puts_optional("... OK");
     }
 
-    if (IS_USED(MODULE_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_LOW)) {
+    if (MODULE_PERIPH_GPIO_LL_IRQ_LEVEL_TRIGGERED_LOW) {
         arg.trigger_level = LOW;
         puts_optional("Testing level-triggered on LOW on PIN_IN_0 (when input "
                       "is HIGH when setting up IRQ)");
@@ -980,11 +980,11 @@ int main(void)
     test_gpio_port_pack();
     test_gpio_ll_init();
     test_input_output();
-    if (IS_USED(MODULE_PERIPH_GPIO_LL_IRQ)) {
+    if (MODULE_PERIPH_GPIO_LL_IRQ) {
         test_irq();
     }
 
-    if (IS_USED(MODULE_PERIPH_GPIO_LL_SWITCH_DIR)) {
+    if (MODULE_PERIPH_GPIO_LL_SWITCH_DIR) {
         test_switch_dir();
     }
 

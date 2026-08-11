@@ -7,3 +7,10 @@ PSEUDOMODULES += vl6180x_config
 
 USEMODULE_INCLUDES_vl6180x:= $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_vl6180x)
+
+MODULE_DEFS_NEEDED += \
+  vl6180x_als \
+  vl6180x_irq \
+  vl6180x_rng \
+  vl6180x_shutdown \
+  #

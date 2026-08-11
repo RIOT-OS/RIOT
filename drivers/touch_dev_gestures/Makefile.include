@@ -1,0 +1,23 @@
+MODULE_DEFS_NEEDED += \
+  touch_dev_gestures \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  touch_dev_gestures \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  touch_dev_gestures \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  touch_dev_gestures \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  touch_dev_gestures \
+  #

@@ -708,7 +708,7 @@ static void _reset_periph(dwc2_usb_otg_fshs_t *usbdev)
 static void _enable_gpio(const dwc2_usb_otg_fshs_config_t *conf)
 {
     (void)conf;
-#ifndef MODULE_PERIPH_USBDEV_HS_ULPI
+#if !MODULE_PERIPH_USBDEV_HS_ULPI
     /* Enables clock on the GPIO bus */
     gpio_init(conf->dp, GPIO_IN);
     gpio_init(conf->dm, GPIO_IN);
@@ -867,7 +867,7 @@ static void _usbdev_init(usbdev_t *dev)
             _global_regs(usbdev->config)->GUSBCFG |= USB_OTG_GUSBCFG_PHYSEL;
         }
 
-#ifdef MODULE_PERIPH_USBDEV_HS_ULPI
+#if MODULE_PERIPH_USBDEV_HS_ULPI
         else if (conf->phy == DWC2_USB_OTG_PHY_ULPI) {
             /* initialize ULPI interface */
             gpio_init(conf->ulpi_clk, GPIO_IN);
@@ -921,7 +921,7 @@ static void _usbdev_init(usbdev_t *dev)
             _global_regs(usbdev->config)->GUSBCFG &= ~USB_OTG_GUSBCFG_ULPIFSLS;
         }
 
-#elif defined(MODULE_PERIPH_USBDEV_HS_UTMI)
+#elif MODULE_PERIPH_USBDEV_HS_UTMI
         else if (conf->phy == DWC2_USB_OTG_PHY_UTMI) {
             /* enable ULPI clock */
             periph_clk_en(conf->ahb, RCC_AHB1ENR_OTGHSULPIEN);
@@ -1021,11 +1021,11 @@ static void _usbdev_init(usbdev_t *dev)
         /* set `Power Down Disable` to activate the on-chip FS transceiver */
         _global_regs(usbdev->config)->GCCFG |= USB_OTG_GCCFG_PWRDWN;
     }
-    else if (IS_USED(MODULE_PERIPH_USBDEV_HS_ULPI) && (conf->phy == DWC2_USB_OTG_PHY_ULPI)) {
+    else if (MODULE_PERIPH_USBDEV_HS_ULPI && (conf->phy == DWC2_USB_OTG_PHY_ULPI)) {
         /* clear `Power Down Disable` to deactivate the on-chip FS transceiver */
         _global_regs(usbdev->config)->GCCFG &= ~USB_OTG_GCCFG_PWRDWN;
     }
-    else if (IS_USED(MODULE_PERIPH_USBDEV_HS_UTMI) && (conf->phy == DWC2_USB_OTG_PHY_UTMI)) {
+    else if (MODULE_PERIPH_USBDEV_HS_UTMI && (conf->phy == DWC2_USB_OTG_PHY_UTMI)) {
         /* clear `Power Down Disable` to deactivate the on-chip FS transceiver */
         _global_regs(usbdev->config)->GCCFG &= ~USB_OTG_GCCFG_PWRDWN;
     }
@@ -1136,7 +1136,7 @@ static usb_speed_t _get_max_speed(const usbdev_t *dev)
 {
     dwc2_usb_otg_fshs_t *usbdev = (dwc2_usb_otg_fshs_t *)dev;
     const dwc2_usb_otg_fshs_config_t *conf = usbdev->config;
-    if (IS_USED(DWC2_USB_OTG_HS_ENABLED) && (conf->type == DWC2_USB_OTG_HS)) {
+    if (IS_ACTIVE(DWC2_USB_OTG_HS_ENABLED) && (conf->type == DWC2_USB_OTG_HS)) {
         return USB_SPEED_HIGH;
     }
     return USB_SPEED_FULL;
@@ -1634,7 +1634,7 @@ void _isr_common(dwc2_usb_otg_fshs_t *usbdev)
         }
     }
 
-#ifdef MODULE_CORTEXM_COMMON
+#if MODULE_CORTEXM_COMMON
     cortexm_isr_end();
 #endif
 }

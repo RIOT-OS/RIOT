@@ -38,7 +38,7 @@ extern "C" {
 #endif
 
 #ifndef DOSE_PARAMS
-#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+#if MODULE_PERIPH_UART_RXSTART_IRQ
 #define DOSE_PARAMS             {                                        \
                                   .uart = DOSE_PARAM_UART,               \
                                   .baudrate = DOSE_PARAM_BAUDRATE,       \

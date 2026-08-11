@@ -48,7 +48,7 @@
 
 static kernel_pid_t p_main;
 
-#ifdef MODULE_ITG320X_INT
+#if MODULE_ITG320X_INT
 static void itg320x_isr_data_ready (void *arg)
 {
     (void)arg;
@@ -76,13 +76,13 @@ int main(void)
         return 1;
     }
 
-#ifdef MODULE_ITG320X_INT
+#if MODULE_ITG320X_INT
     /* init interrupt */
     itg320x_init_int(&dev, itg320x_isr_data_ready, 0);
 #endif
 
     while (1) {
-#ifdef MODULE_ITG320X_INT
+#if MODULE_ITG320X_INT
         /* wait for data ready interrupt */
         msg_t msg;
         msg_receive(&msg);

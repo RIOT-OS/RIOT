@@ -8,3 +8,8 @@ endif
 # Only consider TTYs matching the following filter when auto-selecting the TTY
 # with `MOST_RECENT_PORT=1`.
 TTY_BOARD_FILTER := --driver 'ftdi_sio' --vendor FTDI --model 'Dual RS232-HS' --iface-num 1
+
+MODULE_DEFS_NEEDED += \
+  esp_eth \
+  esp_jtag \
+  #

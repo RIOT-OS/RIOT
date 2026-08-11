@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  gnrc_ipv6 \
+  #
 include ../Makefile.net_common
 
 USEMODULE += gnrc_sixlowpan_frag

@@ -410,7 +410,7 @@ typedef struct {
     spi_cs_t cs_pin;        /**< HWCS pin, set to SPI_CS_UNDEF if not mapped */
     uint32_t rcumask;       /**< bit in the RCC peripheral enable register */
     uint8_t apbbus;         /**< APBx bus the device is connected to */
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
     dma_t tx_dma;           /**< Logical DMA stream used for TX */
     uint8_t tx_dma_chan;    /**< DMA channel used for TX */
     dma_t rx_dma;           /**< Logical DMA stream used for RX */

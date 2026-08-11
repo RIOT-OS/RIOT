@@ -52,7 +52,7 @@ static const uart_conf_t uart_config[] = {
         .dma_stream = 4,
         .dma_chan   = 4,
 #endif
-#if IS_USED(MODULE_STM32MP1_ENG_MODE)
+#if MODULE_STM32MP1_ENG_MODE
         .clk_src    = RCC_UART35CKSELR_UART35SRC_4, /* HSE clock source */
 #else
         .clk_src    = RCC_UART35CKSELR_UART35SRC_2, /* HSI clock source */

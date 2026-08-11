@@ -23,7 +23,7 @@
 #include "periph/spi.h"
 #include "timex.h"
 
-#ifdef MODULE_MTD
+#if MODULE_MTD
 /* GD25Q32C */
 static const mtd_spi_nor_params_t _serpente_nor_params = {
     .opcode = &mtd_spi_nor_opcode_default,

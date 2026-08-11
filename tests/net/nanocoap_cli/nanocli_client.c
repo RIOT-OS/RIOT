@@ -33,7 +33,7 @@
 #include "shell.h"
 #include "tiny_strerror.h"
 
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
 static ssize_t _send(coap_pkt_t *pkt, size_t len,
                           char *addr_str, const char *port_str)
 {
@@ -389,7 +389,7 @@ static int _cmd_get_non(int argc, char **argv)
 
 SHELL_COMMAND(get_non, "non-confirmable get", _cmd_get_non);
 
-#ifdef MODULE_NANOCOAP_SOCK_OBSERVE
+#if MODULE_NANOCOAP_SOCK_OBSERVE
 static int _observe_cb(void *arg, coap_pkt_t *pkt)
 {
     (void)arg;

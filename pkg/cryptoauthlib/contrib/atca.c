@@ -109,7 +109,7 @@ ATCA_STATUS hal_i2c_wake(ATCAIface iface)
     ATCAIfaceCfg *cfg = atgetifacecfg(iface);
     uint8_t data[4] = { 0 };
 
-#if IS_USED(MODULE_PERIPH_I2C_RECONFIGURE)
+#if MODULE_PERIPH_I2C_RECONFIGURE
     /* switch I2C peripheral to GPIO function */
     i2c_deinit_pins(cfg->atcai2c.bus);
     gpio_init(i2c_pin_sda(cfg->atcai2c.bus), GPIO_OUT);

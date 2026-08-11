@@ -28,7 +28,7 @@
 #include "thread.h"
 #include "stdio_base.h"
 
-#if IS_USED(MODULE_VFS)
+#if MODULE_VFS
 #include "vfs.h"
 #endif
 
@@ -53,24 +53,24 @@ static void *main_trampoline(void *arg)
     vfs_bind_stdio();
 #endif
 
-    if (IS_USED(MODULE_AUTO_INIT)) {
+    if (MODULE_AUTO_INIT) {
         auto_init();
     }
 
-    if (!IS_ACTIVE(CONFIG_SKIP_BOOT_MSG) && !IS_USED(MODULE_STDIO_NULL)) {
+    if (!IS_ACTIVE(CONFIG_SKIP_BOOT_MSG) && !MODULE_STDIO_NULL) {
         LOG_INFO(CONFIG_BOOT_MSG_STRING "\n");
     }
 
     int res = main();
 
-    if (IS_USED(MODULE_TEST_UTILS_MAIN_EXIT_CB)) {
+    if (MODULE_TEST_UTILS_MAIN_EXIT_CB) {
         void test_utils_main_exit_cb(int res);
         test_utils_main_exit_cb(res);
     }
 
-#ifdef MODULE_TEST_UTILS_PRINT_STACK_USAGE
+#if MODULE_TEST_UTILS_PRINT_STACK_USAGE
     void print_stack_usage_metric(const char *name, void *stack, unsigned max_size);
-    if (IS_USED(MODULE_CORE_IDLE_THREAD)) {
+    if (MODULE_CORE_IDLE_THREAD) {
         print_stack_usage_metric("idle", idle_stack, THREAD_STACKSIZE_IDLE);
     }
 #endif
@@ -82,7 +82,7 @@ static void *main_trampoline(void *arg)
     }
 #endif
 
-    if (IS_ACTIVE(CONFIG_CORE_EXIT_WITH_MAIN) && IS_USED(MODULE_PERIPH_PM)) {
+    if (IS_ACTIVE(CONFIG_CORE_EXIT_WITH_MAIN) && MODULE_PERIPH_PM) {
         pm_off();
     }
 
@@ -94,7 +94,7 @@ static void *idle_thread(void *arg)
     (void)arg;
 
     while (1) {
-        if (IS_USED(MODULE_PERIPH_PM)) {
+        if (MODULE_PERIPH_PM) {
             pm_set_lowest();
         }
     }
@@ -104,7 +104,7 @@ static void *idle_thread(void *arg)
 
 void kernel_init(void)
 {
-    if (!IS_USED(MODULE_CORE_THREAD)) {
+    if (!MODULE_CORE_THREAD) {
         /* RIOT without threads */
         main_trampoline(NULL);
         while (1) {}
@@ -113,7 +113,7 @@ void kernel_init(void)
 
     irq_disable();
 
-    if (IS_USED(MODULE_CORE_IDLE_THREAD)) {
+    if (MODULE_CORE_IDLE_THREAD) {
         thread_create(idle_stack, sizeof(idle_stack),
                       THREAD_PRIORITY_IDLE,
                       THREAD_CREATE_WOUT_YIELD,
@@ -131,7 +131,7 @@ void kernel_init(void)
 void early_init(void)
 {
     /* initialize leds */
-    if (IS_USED(MODULE_PERIPH_INIT_LEDS)) {
+    if (MODULE_PERIPH_INIT_LEDS) {
         extern void led_init(void);
         led_init();
     }

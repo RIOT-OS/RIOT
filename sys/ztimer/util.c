@@ -81,7 +81,7 @@ void ztimer_periodic_wakeup(ztimer_clock_t *clock, uint32_t *last_wakeup,
     }
 }
 
-#ifdef MODULE_CORE_MSG
+#if MODULE_CORE_MSG
 static void _callback_msg(void *arg)
 {
     msg_t *msg = (msg_t *)arg;
@@ -131,7 +131,7 @@ int ztimer_msg_receive_timeout(ztimer_clock_t *clock, msg_t *msg,
 
 #endif /* MODULE_CORE_MSG */
 
-#ifdef MODULE_CORE_MBOX
+#if MODULE_CORE_MBOX
 struct ztimer_mbox_thread_status {
     ztimer_t timer;
     mbox_t *mbox;
@@ -174,7 +174,7 @@ int ztimer_mbox_get_timeout(ztimer_clock_t *clock, mbox_t *mbox, msg_t *msg, uin
 }
 #endif
 
-#ifdef MODULE_CORE_THREAD_FLAGS
+#if MODULE_CORE_THREAD_FLAGS
 static void _set_timeout_flag_callback(void *arg)
 {
     thread_flags_set(arg, THREAD_FLAG_TIMEOUT);

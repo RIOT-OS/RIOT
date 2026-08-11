@@ -62,7 +62,7 @@ extern "C" {
  */
 #define CONFIG_RTC_CLK_CAL_CYCLES               576
 
-#ifdef MODULE_ESP_RTC_TIMER_32K
+#if MODULE_ESP_RTC_TIMER_32K
 #  define CONFIG_RTC_XTAL_CAL_RETRY             3
 #endif
 
@@ -108,14 +108,14 @@ extern "C" {
 /**
  * ESP32-S2 specific USB configuration
  */
-#ifdef MODULE_ESP_IDF_USB
+#if MODULE_ESP_IDF_USB
 #  define CONFIG_USB_OTG_SUPPORTED              1
 #endif
 /**
  * ESP32-S2 specific SPI RAM configuration
  */
-#ifdef  MODULE_ESP_SPI_RAM
-#  ifdef MODULE_ESP_SPI_OCT
+#if MODULE_ESP_SPI_RAM
+#  if MODULE_ESP_SPI_OCT
 #    define CONFIG_SPIRAM_MODE_OCT              1
 #  else
 #    define CONFIG_SPIRAM_MODE_QUAD             1

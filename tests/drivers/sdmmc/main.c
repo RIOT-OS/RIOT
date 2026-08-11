@@ -105,7 +105,7 @@ static int _cid(int argc, char **argv)
     sdmmc_cid_t *cid = &dev->cid;
 
     puts("----------------------------------------");
-    if (IS_USED(MODULE_SDMMC_MMC) && (dev->type == SDMMC_CARD_TYPE_MMC)) {
+    if (MODULE_SDMMC_MMC && (dev->type == SDMMC_CARD_TYPE_MMC)) {
         printf("MID: %d\n", cid->mmc.MID);
         printf("OID: 0x%04x\n", byteorder_ntohs(cid->mmc.OID));
         printf("PNM: %c%c%c%c%c%c\n",
@@ -189,7 +189,7 @@ static int _csd(int argc, char **argv)
 
     sdmmc_csd_t *csd = &dev->csd;
 
-    if (IS_USED(MODULE_SDMMC_MMC) && (dev->type == SDMMC_CARD_TYPE_MMC)) {
+    if (MODULE_SDMMC_MMC && (dev->type == SDMMC_CARD_TYPE_MMC)) {
         puts("CSD MMC\n---------------------------------------");
         printf("CSD_STRUCTURE: 0x%x\n", csd->mmc.CSD_STRUCTURE);
         printf("SPEC_VERS: 0x%x\n", csd->mmc.SPEC_VERS);
@@ -224,7 +224,7 @@ static int _csd(int argc, char **argv)
         printf("ECC: 0x%x\n", csd->mmc.ECC);
         printf("CRC: 0x%x\n", csd->mmc.CSD_CRC);
 
-#if IS_USED(MODULE_SDMMC_MMC)
+#if MODULE_SDMMC_MMC
         sdmmc_ext_csd_t *ext_csd = &dev->ext_csd;
 
         puts("\nEXT_CSD MMC\n---------------------------------------");
@@ -403,7 +403,7 @@ static int _read(int argc, char **argv)
             return -1;
         }
 
-        if (IS_USED(OUTPUT)) {
+        if (IS_ACTIVE(OUTPUT)) {
             for (int i = 0; i < chunk_blocks * SDMMC_SDHC_BLOCK_SIZE; i++) {
 
                 if ((i % SDMMC_SDHC_BLOCK_SIZE) == 0) {
@@ -597,7 +597,7 @@ static int _copy(int argc, char **argv)
             return -1;
         }
 
-        if (IS_USED(OUTPUT) && (num_block > 1)) {
+        if (IS_ACTIVE(OUTPUT) && (num_block > 1)) {
             extern ssize_t stdio_write(const void *buffer, size_t len);
             stdio_write(".", 1); //printf(".");
             if ((num_block % 79) == 79) {
@@ -606,7 +606,7 @@ static int _copy(int argc, char **argv)
         }
     }
 
-    if (IS_USED(OUTPUT)) {
+    if (IS_ACTIVE(OUTPUT)) {
         printf("\n");
     }
 

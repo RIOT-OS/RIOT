@@ -45,7 +45,7 @@ void sema_destroy(sema_t *sema)
     mutex_unlock(&sema->mutex);
 }
 
-#if IS_USED(MODULE_SEMA_DEPRECATED)
+#if MODULE_SEMA_DEPRECATED
 int _sema_wait_ztimer64(sema_t *sema, int block, ztimer64_clock_t *clock, uint64_t us)
 {
     assert(sema != NULL);

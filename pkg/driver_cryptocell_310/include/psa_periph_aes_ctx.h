@@ -26,7 +26,7 @@ extern "C" {
 #include "ssi_aes.h"
 #include "kernel_defines.h"
 
-#if IS_USED(MODULE_PERIPH_CIPHER_AES_128_CBC) || DOXYGEN
+#if MODULE_PERIPH_CIPHER_AES_128_CBC || DOXYGEN
 /**
  * @brief   Map driver specific AES context to PSA context
  */

@@ -1,5 +1,9 @@
 MODULE = nrfmin
 
+MODULE_DEFS_NEEDED += \
+  gnrc_sixlowpan \
+  #
+
 SRC = nrfmin.c
 
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))

@@ -1,3 +1,10 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_gpio \
+  periph_gpio_irq \
+  periph_rtc \
+  pm_layered \
+  #
 BOARD ?= slstk3401a
 include ../Makefile.periph_common
 

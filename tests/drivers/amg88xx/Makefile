@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  disp_dev \
+  periph_gpio_irq \
+  #
 include ../Makefile.drivers_common
 
 USEMODULE += bitfield

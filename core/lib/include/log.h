@@ -125,15 +125,15 @@ enum {
 #define LOG_DEBUG(...) LOG(LOG_DEBUG, __VA_ARGS__)
 /** @} */
 
-#ifdef MODULE_LOG
-#include "log_module.h"
+#if MODULE_LOG
+#  include "log_module.h"
 #else
-#include <stdio.h>
+#  include <stdio.h>
 
 /**
  * @brief Default log_write function, just maps to printf
  */
-#define log_write(level, ...) printf(__VA_ARGS__)
+#  define log_write(level, ...) printf(__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

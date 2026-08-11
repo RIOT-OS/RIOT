@@ -36,7 +36,7 @@ typedef struct {
 
 static _pin_mask_t _low_byte_masks[256] = {};
 
-#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+#if MODULE_LCD_PARALLEL_16BIT
 static _pin_mask_t _high_byte_masks[256] = {};
 #endif
 
@@ -68,7 +68,7 @@ static void _lcd_ll_mcu_set_data_dir(lcd_t *dev, bool output)
 
     /* sanity check to ensure that data pins can be handled as array */
     assert((&dev->params->d7_pin - &dev->params->d0_pin) == 7);
-#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+#if MODULE_LCD_PARALLEL_16BIT
     assert((&dev->params->d15_pin - &dev->params->d8_pin) == 7);
 #endif
 
@@ -99,7 +99,7 @@ static void _lcd_ll_mcu_set_data_dir(lcd_t *dev, bool output)
                 }
             }
         }
-#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+#if MODULE_LCD_PARALLEL_16BIT
         pins = &dev->params->d8_pin;
 
         for (unsigned data = 0; data < 256; data++) {
@@ -135,7 +135,7 @@ static void _lcd_ll_mcu_set_data_dir(lcd_t *dev, bool output)
     gpio_init(dev->params->d5_pin, output ? GPIO_OUT : GPIO_IN);
     gpio_init(dev->params->d6_pin, output ? GPIO_OUT : GPIO_IN);
     gpio_init(dev->params->d7_pin, output ? GPIO_OUT : GPIO_IN);
-#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+#if MODULE_LCD_PARALLEL_16BIT
     gpio_init(dev->params->d8_pin, output ? GPIO_OUT : GPIO_IN);
     gpio_init(dev->params->d9_pin, output ? GPIO_OUT : GPIO_IN);
     gpio_init(dev->params->d10_pin, output ? GPIO_OUT : GPIO_IN);
@@ -144,7 +144,7 @@ static void _lcd_ll_mcu_set_data_dir(lcd_t *dev, bool output)
     gpio_init(dev->params->d13_pin, output ? GPIO_OUT : GPIO_IN);
     gpio_init(dev->params->d14_pin, output ? GPIO_OUT : GPIO_IN);
     gpio_init(dev->params->d15_pin, output ? GPIO_OUT : GPIO_IN);
-#endif /* IS_USED(MODULE_LCD_PARALLEL_16BIT) */
+#endif /* MODULE_LCD_PARALLEL_16BIT */
 }
 
 static void _lcd_ll_mcu_write_data(lcd_t *dev, bool cont,
@@ -163,7 +163,7 @@ static void _lcd_ll_mcu_write_data(lcd_t *dev, bool cont,
     uint32_t set_mask_1 = _low_byte_masks[_byte].set_mask_1;
     uint32_t clr_mask_1 = _low_byte_masks[_byte].clr_mask_1;
 
-#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+#if MODULE_LCD_PARALLEL_16BIT
     _byte = data >> 8;
 
     set_mask_0 |= _high_byte_masks[_byte].set_mask_0;
@@ -229,7 +229,7 @@ static uint8_t _lcd_ll_mcu_read_byte(lcd_t *dev, bool cont)
     return _lcd_ll_mcu_read_data(dev, cont, 8);
 }
 
-#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+#if MODULE_LCD_PARALLEL_16BIT
 
 static void _lcd_ll_mcu_write_word(lcd_t *dev, bool cont, uint16_t out)
 {
@@ -243,7 +243,7 @@ static uint16_t _lcd_ll_mcu_read_word(lcd_t *dev, bool cont)
     return _lcd_ll_mcu_read_data(dev, cont, 16);
 }
 
-#endif /* IS_USED(MODULE_LCD_PARALLEL_16BIT) */
+#endif /* MODULE_LCD_PARALLEL_16BIT */
 
 const lcd_ll_par_driver_t lcd_ll_par_driver = {
     .init = lcd_ll_par_gpio_init,               /* GPIO-driven `init` is used */
@@ -251,7 +251,7 @@ const lcd_ll_par_driver_t lcd_ll_par_driver = {
     .cmd_start = lcd_ll_par_gpio_cmd_start,     /* GPIO-driven `cmd_start` is used */
     .write_byte = _lcd_ll_mcu_write_byte,
     .read_byte = _lcd_ll_mcu_read_byte,
-#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+#if MODULE_LCD_PARALLEL_16BIT
     .write_word = _lcd_ll_mcu_write_word,
     .read_word = _lcd_ll_mcu_read_word,
 #endif

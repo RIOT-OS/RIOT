@@ -102,7 +102,7 @@ static int _openwsn_ifconfig(int argc, char **argv)
     open_addr_t *addr;
     /* Use shared buffer for IEEE802154_LONG_ADDRES and IPV6_ADDR str
        conversion */
-#if IS_USED(MODULE_OPENWSN_IPV6)
+#if MODULE_OPENWSN_IPV6
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #else
     char addr_str[IEEE802154_LONG_ADDRESS_LEN_STR_MAX];
@@ -125,7 +125,7 @@ static int _openwsn_ifconfig(int argc, char **argv)
            l2util_addr_to_str(addr->addr_64b, sizeof(addr->addr_64b),
                              addr_str));
 
-    if (IS_USED(MODULE_OPENWSN_IPV6)) {
+    if (MODULE_OPENWSN_IPV6) {
         /* Can't recover ADDR_128B directly, recover ADDR_64B
            and ADDR_PREFIX to construct ADDR_128B */
         open_addr_t addr_ipv6;
@@ -141,12 +141,12 @@ static int _openwsn_ifconfig(int argc, char **argv)
     }
 
     printf("\t\tIEEE802154E sync: %i\n", ieee154e_isSynch());
-    if (IS_USED(MODULE_OPENWSN_CJOIN)) {
+    if (MODULE_OPENWSN_CJOIN) {
         printf("\t\t6TiSCH joined: %i\n", cjoin_getIsJoined());
     }
     puts("");
 
-    if (IS_USED(MODULE_OPENWSN_IPV6)) {
+    if (MODULE_OPENWSN_IPV6) {
         uint8_t index;
 
         if (icmpv6rpl_getPreferredParentIndex(
@@ -372,7 +372,7 @@ static int _6top_manage_cmd(int argc, char **argv)
         }
     }
     else {
-        if (IS_USED(MODULE_OPENWSN_IPV6)) {
+        if (MODULE_OPENWSN_IPV6) {
             if (!icmpv6rpl_getPreferredParentEui64(&neigh)) {
                 puts("Error: no preferred parent");
                 return -1;
@@ -459,7 +459,7 @@ static int _6top_cmd(int argc, char **argv)
             }
         }
         else {
-            if (IS_USED(MODULE_OPENWSN_IPV6)) {
+            if (MODULE_OPENWSN_IPV6) {
                 if (!icmpv6rpl_getPreferredParentEui64(&neighbor)) {
                     puts("Error: no preferred parent");
                     return -1;

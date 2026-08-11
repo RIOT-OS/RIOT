@@ -101,7 +101,7 @@ extern "C" {
  * Both conditions are typically true when saul_default is on, but strictly, it
  * is those two that in combination make LEDs effectively unavailable to users.
  * */
-#if !(IS_USED(MODULE_AUTO_INIT_SAUL) && IS_USED(MODULE_SAUL_PWM))
+#if !(MODULE_AUTO_INIT_SAUL && MODULE_SAUL_PWM)
 
 #define LED0_ON             (LED_PORT->OUTCLR = LED0_MASK)
 #define LED0_OFF            (LED_PORT->OUTSET = LED0_MASK)
@@ -115,7 +115,7 @@ extern "C" {
 #define LED2_OFF            (LED_PORT->OUTSET = LED2_MASK)
 #define LED2_TOGGLE         (LED_PORT->OUT   ^= LED2_MASK)
 
-#endif /* !(IS_USED(MODULE_AUTO_INIT_SAUL) && IS_USED(MODULE_SAUL_PWM)) */
+#endif /* !(MODULE_AUTO_INIT_SAUL && MODULE_SAUL_PWM) */
 
 /** @} */
 

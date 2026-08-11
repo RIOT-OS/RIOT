@@ -60,7 +60,7 @@ typedef struct {
      */
     unicoap_endpoint_t endpoint;
 
-#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if MODULE_UNICOAP_DRIVER_DTLS
     unicoap_sock_dtls_session_t dtls_session;
 #endif
 
@@ -106,7 +106,7 @@ typedef struct {
 
 static inline void* _transmission_get_session(_transmission_t* transmission)
 {
-#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if MODULE_UNICOAP_DRIVER_DTLS
     return transmission->endpoint.proto == UNICOAP_PROTO_DTLS ? &transmission->dtls_session : NULL;
 #else
     (void)transmission;
@@ -117,7 +117,7 @@ static inline void* _transmission_get_session(_transmission_t* transmission)
 static inline void _transmission_set_session(_transmission_t* transmission,
                                              const unicoap_sock_dtls_session_t* dtls_session)
 {
-#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if MODULE_UNICOAP_DRIVER_DTLS
     transmission->dtls_session = *dtls_session;
 #else
     (void)transmission;
@@ -302,7 +302,7 @@ static int _sendv(iolist_t* list, const unicoap_endpoint_t* remote, const unicoa
     assert(remote);
 
     switch (remote->proto) {
-#if IS_USED(MODULE_UNICOAP_DRIVER_UDP)
+#if MODULE_UNICOAP_DRIVER_UDP
     case UNICOAP_PROTO_UDP: {
         extern int unicoap_transport_sendv_udp(iolist_t * iolist, const sock_udp_ep_t* remote,
                                                const sock_udp_ep_t* local);
@@ -312,7 +312,7 @@ static int _sendv(iolist_t* list, const unicoap_endpoint_t* remote, const unicoa
     }
 #endif
 
-#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if MODULE_UNICOAP_DRIVER_DTLS
     case UNICOAP_PROTO_DTLS: {
         extern int unicoap_transport_sendv_dtls(iolist_t * iolist, const sock_udp_ep_t* remote,
                                                 const sock_udp_ep_t* local,
@@ -324,7 +324,7 @@ static int _sendv(iolist_t* list, const unicoap_endpoint_t* remote, const unicoa
     }
 #endif
 
-#if IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX)
+#if MODULE_UNICOAP_DRIVER_SLIPMUX
     case UNICOAP_PROTO_SLIPMUX: {
         extern int unicoap_transport_sendv_slipmux(iolist_t * iolist,
                                                    const unicoap_endpoint_t* remote);

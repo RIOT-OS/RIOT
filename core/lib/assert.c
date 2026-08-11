@@ -15,16 +15,17 @@
 #include "assert.h"
 #include "architecture.h"
 #include "cpu.h"
-#include "debug.h"
 #include "irq.h"
 #include "panic.h"
-#if IS_USED(MODULE_BACKTRACE)
-#include "backtrace.h"
+
+#if MODULE_BACKTRACE
+#  include "backtrace.h"
+#  include "debug.h"
 #endif
 
 __NORETURN static inline void _assert_common(void)
 {
-#if IS_USED(MODULE_BACKTRACE)
+#if MODULE_BACKTRACE
     printf("FAILED ASSERTION. Backtrace:\n");
     backtrace_print();
 #endif

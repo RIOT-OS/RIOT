@@ -36,8 +36,8 @@
  */
 
 #include "mutex.h"
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if FORTUNA_RESEED_INTERVAL_MS > 0 && MODULE_FORTUNA_RESEED
+#if MODULE_ZTIMER_MSEC
 #include "ztimer.h"
 #else
 #include "xtimer.h"
@@ -77,7 +77,7 @@ extern "C" {
 #define FORTUNA_SEED_SIZE           (64U)
 #endif
 
-#if IS_USED(MODULE_FORTUNA_RESEED) || DOXYGEN
+#if MODULE_FORTUNA_RESEED || DOXYGEN
 /**
  * @brief Reseed interval in us. After this interval, the PRNG must be
  *        reseeded. Per section 9.5.5, the recommended value is 100ms. Set to
@@ -159,8 +159,8 @@ typedef struct {
 #if FORTUNA_LOCK
     mutex_t lock;
 #endif
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if FORTUNA_RESEED_INTERVAL_MS > 0 && MODULE_FORTUNA_RESEED
+#if MODULE_ZTIMER_MSEC
     ztimer_t reseed_timer;
 #else
     xtimer_t reseed_timer;

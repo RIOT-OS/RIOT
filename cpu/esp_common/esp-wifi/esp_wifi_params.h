@@ -16,7 +16,7 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#if defined(MODULE_ESP_WIFI) || defined(DOXYGEN)
+#if MODULE_ESP_WIFI || defined(DOXYGEN)
 
 /**
  * @name    Set default configuration parameters for the ESP WiFi netdev driver
@@ -59,7 +59,7 @@
 #define WIFI_PASS           ESP_WIFI_PASS
 #endif
 
-#if defined(MODULE_ESP_WIFI_AP) || defined(DOXYGEN)
+#if MODULE_ESP_WIFI_AP || defined(DOXYGEN)
 
 /**
  * @brief   Use dynamic SSID for the SoftAP

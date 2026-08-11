@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  ps \
+  #
 include ../Makefile.core_common
 
 # For better testing use ps

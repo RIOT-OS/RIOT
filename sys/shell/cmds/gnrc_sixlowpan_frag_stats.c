@@ -17,7 +17,7 @@
 
 #include "net/gnrc/sixlowpan/frag/stats.h"
 #include "shell.h"
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS
 #include "net/gnrc/sixlowpan/frag/sfr.h"
 #endif
 
@@ -29,10 +29,10 @@ static int _gnrc_6lo_frag_stats(int argc, char **argv)
     (void)argv;
     printf("rbuf full: %u\n", stats->rbuf_full);
     printf("frag full: %u\n", stats->frag_full);
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
+#if MODULE_GNRC_SIXLOWPAN_FRAG_VRB
     printf("VRB full: %u\n", stats->vrb_full);
 #endif
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS
     gnrc_sixlowpan_frag_sfr_stats_t sfr;
 
     gnrc_sixlowpan_frag_sfr_stats_get(&sfr);

@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  printf_long_long \
+  #
 include ../Makefile.sys_common
 
 # avrlibc's snprintf doesn't support uint64_t / int64_t and even fails

@@ -26,7 +26,7 @@
 #include "net/sock/udp.h"
 #include "random.h"
 #include "timex.h"
-#if IS_USED(MODULE_ZTIMER)
+#if MODULE_ZTIMER
 #include "ztimer.h"
 #else
 #include "xtimer.h"
@@ -126,7 +126,7 @@ static event_t request = { .handler = _request };
 static event_t renew = { .handler = _renew };
 static event_t rebind = { .handler = _rebind };
 
-#ifdef MODULE_AUTO_INIT_DHCPV6_CLIENT
+#if MODULE_AUTO_INIT_DHCPV6_CLIENT
 static char _thread_stack[DHCPV6_CLIENT_STACK_SIZE];
 static void *_thread(void *args);
 static kernel_pid_t _thread_pid;
@@ -188,7 +188,7 @@ void _print_ia_na_debug_info(uint16_t netif, int result_code)
 
 void _initialize_ia_na(uint16_t netif)
 {
-    if (!IS_USED(MODULE_DHCPV6_CLIENT_IA_NA)) {
+    if (!MODULE_DHCPV6_CLIENT_IA_NA) {
         return;
     }
 
@@ -218,7 +218,7 @@ void _initialize_ia_na(uint16_t netif)
 void dhcpv6_client_init(event_queue_t *eq, uint16_t netif)
 {
     assert(eq->waiter != NULL);
-    if (IS_USED(MODULE_DHCPV6_CLIENT_MUD_URL)) {
+    if (MODULE_DHCPV6_CLIENT_MUD_URL) {
         assert(strlen(mud_url) <= MAX_MUD_URL_LENGTH);
         assert(strncmp(mud_url, "https://", 8) == 0);
     }
@@ -284,10 +284,10 @@ int dhcpv6_client_req_ia_pd(unsigned netif, unsigned pfx_len)
 {
     pfx_lease_t *lease = NULL;
 
-    assert(IS_USED(MODULE_DHCPV6_CLIENT_IA_PD));
+    assert(MODULE_DHCPV6_CLIENT_IA_PD);
     assert(pfx_len <= 128);
 
-    if (!IS_USED(MODULE_DHCPV6_CLIENT_IA_PD)) {
+    if (!MODULE_DHCPV6_CLIENT_IA_PD) {
         LOG_WARNING("DHCPv6 client: Unable to request IA_PD as module "
                     "`dhcpv6_client_ia_pd` is not used\n");
         return -ENOTSUP;
@@ -308,8 +308,8 @@ int dhcpv6_client_req_ia_pd(unsigned netif, unsigned pfx_len)
 
 int dhcpv6_client_req_ia_na(unsigned netif)
 {
-    assert(IS_USED(MODULE_DHCPV6_CLIENT_IA_NA));
-    if (!IS_USED(MODULE_DHCPV6_CLIENT_IA_NA)) {
+    assert(MODULE_DHCPV6_CLIENT_IA_NA);
+    if (!MODULE_DHCPV6_CLIENT_IA_NA) {
         LOG_WARNING("DHCPv6 client: Unable to request IA_NA as module "
                     "`dhcpv6_client_ia_na` is not used\n");
         return -ENOTSUP;
@@ -359,7 +359,7 @@ static inline bool _is_tid(dhcpv6_msg_t *msg)
 
 static inline uint32_t _now_cs(void)
 {
-#if IS_USED(MODULE_ZTIMER)
+#if MODULE_ZTIMER
     return (uint32_t)(ztimer_now(ZTIMER_MSEC) / MS_PER_CS);
 #else
     return (uint32_t)(xtimer_now_usec64() / US_PER_CS);
@@ -368,7 +368,7 @@ static inline uint32_t _now_cs(void)
 
 static inline uint32_t _now_sec(void)
 {
-#if IS_USED(MODULE_ZTIMER)
+#if MODULE_ZTIMER
     return (uint32_t)ztimer_now(ZTIMER_SEC);
 #else
     return (uint32_t)(xtimer_now_usec64() / US_PER_SEC);
@@ -420,7 +420,7 @@ static inline size_t _compose_elapsed_time_opt(dhcpv6_opt_elapsed_time_t *time)
 static inline size_t _compose_mud_url_opt(dhcpv6_opt_mud_url_t *mud_url_opt,
                                           size_t len_max)
 {
-    if (!IS_USED(MODULE_DHCPV6_CLIENT_MUD_URL)) {
+    if (!MODULE_DHCPV6_CLIENT_MUD_URL) {
         return 0;
     }
     uint16_t len = strlen(mud_url);
@@ -482,7 +482,7 @@ static inline size_t _compose_ia_pd_opt(dhcpv6_opt_ia_pd_t *ia_pd,
 static inline size_t _compose_ia_na_opt(dhcpv6_opt_ia_na_t *ia_na,
                                         uint32_t ia_id, uint16_t opts_len)
 {
-    if (!IS_USED(MODULE_DHCPV6_CLIENT_IA_NA)) {
+    if (!MODULE_DHCPV6_CLIENT_IA_NA) {
         return 0;
     }
 
@@ -498,7 +498,7 @@ static inline size_t _compose_ia_na_opt(dhcpv6_opt_ia_na_t *ia_na,
 
 static inline size_t _add_ia_na(uint8_t *buf, size_t len_max)
 {
-    if (!IS_USED(MODULE_DHCPV6_CLIENT_IA_NA)) {
+    if (!MODULE_DHCPV6_CLIENT_IA_NA) {
         return 0;
     }
 
@@ -523,7 +523,7 @@ static inline size_t _add_ia_na(uint8_t *buf, size_t len_max)
 
 static inline size_t _add_ia_pd_from_config(uint8_t *buf, size_t len_max)
 {
-    if (!IS_USED(MODULE_DHCPV6_CLIENT_IA_PD)) {
+    if (!MODULE_DHCPV6_CLIENT_IA_PD) {
         return 0;
     }
 
@@ -830,7 +830,7 @@ static void _parse_advertise(uint8_t *adv, size_t len)
                     return;
                 }
                 for (unsigned i = 0;
-                     IS_USED(MODULE_DHCPV6_CLIENT_IA_PD) &&
+                     MODULE_DHCPV6_CLIENT_IA_PD &&
                      (i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX);
                      i++) {
                     dhcpv6_opt_ia_pd_t *ia_pd = (dhcpv6_opt_ia_pd_t *)opt;
@@ -875,7 +875,7 @@ static void _parse_advertise(uint8_t *adv, size_t len)
                     return;
                 }
                 for (unsigned i = 0;
-                    IS_USED(MODULE_DHCPV6_CLIENT_IA_NA) &&
+                    MODULE_DHCPV6_CLIENT_IA_NA &&
                     i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX;
                     i++) {
                     dhcpv6_opt_ia_na_t *ia_na = (dhcpv6_opt_ia_na_t *)opt;
@@ -934,7 +934,7 @@ static void _parse_advertise(uint8_t *adv, size_t len)
 
 static bool _parse_ia_pd_option(dhcpv6_opt_ia_pd_t *ia_pd)
 {
-    if (!IS_USED(MODULE_DHCPV6_CLIENT_IA_PD)) {
+    if (!MODULE_DHCPV6_CLIENT_IA_PD) {
         return true;
     }
 
@@ -994,7 +994,7 @@ static bool _parse_ia_pd_option(dhcpv6_opt_ia_pd_t *ia_pd)
 
 static bool _parse_ia_na_option(dhcpv6_opt_ia_na_t *ia_na)
 {
-    if (!IS_USED(MODULE_DHCPV6_CLIENT_IA_NA)) {
+    if (!MODULE_DHCPV6_CLIENT_IA_NA) {
         return true;
     }
 
@@ -1126,12 +1126,12 @@ static bool _parse_reply(uint8_t *rep, size_t len, uint8_t request_type)
     for (dhcpv6_opt_t *opt = (dhcpv6_opt_t *)(&rep[sizeof(dhcpv6_msg_t)]);
          len > 0; len -= _opt_len(opt), opt = _opt_next(opt)) {
         switch (byteorder_ntohs(opt->type)) {
-#if IS_USED(MODULE_DHCPV6_CLIENT_DNS)
+#if MODULE_DHCPV6_CLIENT_DNS
             case DHCPV6_OPT_DNS_RNS:
                 dhcpv6_client_dns_rns_conf((dhcpv6_opt_dns_rns_t *)opt,
                                            remote.netif);
                 break;
-#endif  /* IS_USED(MODULE_DHCPV6_CLIENT_DNS) */
+#endif  /* MODULE_DHCPV6_CLIENT_DNS */
             case DHCPV6_OPT_IA_PD:
                 if (_opt_len(opt) < sizeof(dhcpv6_opt_ia_pd_t)) {
                     DEBUG("DHCPv6 client: IA_PD option underflow minimum size\n");
@@ -1264,7 +1264,7 @@ static uint32_t _calculate_mrd_from_leases(void)
     uint32_t mrd = 0;
     /* calculate MRD from prefix leases */
     for (unsigned i = 0;
-            IS_USED(MODULE_DHCPV6_CLIENT_IA_PD) &&
+            MODULE_DHCPV6_CLIENT_IA_PD &&
             (i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX);
             i++) {
         const pfx_lease_t *lease = &pfx_leases[i];
@@ -1278,7 +1278,7 @@ static uint32_t _calculate_mrd_from_leases(void)
     }
     /* calculate MRD from addr_leases */
     for (unsigned i = 0;
-            IS_USED(MODULE_DHCPV6_CLIENT_IA_NA) &&
+            MODULE_DHCPV6_CLIENT_IA_NA &&
             (i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX);
             i++) {
         const addr_lease_t *lease = &addr_leases[i];
@@ -1408,7 +1408,7 @@ static void _refresh_information(event_t *event)
 static void _set_event_timeout_ms(event_timeout_t *timeout, event_t *event,
                                   uint32_t delay_ms)
 {
-#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
+#if MODULE_EVENT_TIMEOUT_ZTIMER
     event_timeout_ztimer_init(timeout, ZTIMER_MSEC, event_queue, event);
     event_timeout_set(timeout, delay_ms);
 #else
@@ -1420,7 +1420,7 @@ static void _set_event_timeout_ms(event_timeout_t *timeout, event_t *event,
 static void _set_event_timeout_sec(event_timeout_t *timeout, event_t *event,
                                    uint32_t delay_sec)
 {
-#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
+#if MODULE_EVENT_TIMEOUT_ZTIMER
     event_timeout_ztimer_init(timeout, ZTIMER_SEC, event_queue, event);
     event_timeout_set(timeout, delay_sec);
 #else

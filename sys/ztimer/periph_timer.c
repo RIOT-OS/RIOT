@@ -113,7 +113,7 @@ uint32_t ztimer_periph_timer_init(ztimer_periph_timer_t *clock, tim_t dev,
     clock->super.ops = &_ztimer_periph_timer_ops;
     clock->super.max_value = max_val;
 
-    if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+    if (MODULE_PERIPH_TIMER_QUERY_FREQS) {
         freq = timer_get_closest_freq(dev, freq);
     }
     int ret = timer_init(dev, freq, _ztimer_periph_timer_callback, clock);

@@ -16,7 +16,7 @@ static void _event_timeout_callback(void *arg)
     event_post(event_timeout->queue, event_timeout->event);
 }
 
-#if IS_USED(MODULE_EVENT_TIMEOUT)
+#if MODULE_EVENT_TIMEOUT
 void event_timeout_init(event_timeout_t *event_timeout, event_queue_t *queue, event_t *event)
 {
     event_timeout_ztimer_init(event_timeout, ZTIMER_USEC, queue, event);

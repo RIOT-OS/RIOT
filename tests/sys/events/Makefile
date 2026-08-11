@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  ztimer_usec \
+  #
 include ../Makefile.sys_common
 
 FORCE_ASSERTS = 1

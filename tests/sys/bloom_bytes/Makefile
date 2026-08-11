@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  newlib \
+  picolibc \
+  #
 include ../Makefile.sys_common
 
 USEMODULE += hashes

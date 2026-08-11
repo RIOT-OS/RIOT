@@ -49,7 +49,7 @@ static int gnrc_lorawan_mic_is_valid(uint8_t *buf, size_t len, uint8_t *key,
     /* for LoRaWAN 1.0 conf_fcnt is hardcoded to be 0 */
     uint16_t conf_fnct = 0x00;
 
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && optneg) {
+    if (MODULE_GNRC_LORAWAN_1_1 && optneg) {
         /**
          * If the device is connected to a LoRaWAN 1.1 Network Server and the
          * ACK bit of the downlink frame is set, meaning this frame is acknowledging
@@ -146,7 +146,7 @@ int gnrc_lorawan_parse_dl(gnrc_lorawan_t *mac, uint8_t *buf, size_t len,
 
     uint32_t fcnt_down = mac->mcps.fcnt_down;
 
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && pkt->port) {
+    if (MODULE_GNRC_LORAWAN_1_1 && pkt->port) {
         fcnt_down = gnrc_lorawan_get_afcnt_down(mac);
     }
 
@@ -209,14 +209,14 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
                                      key);
     }
 
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && _pkt.port) {
+    if (MODULE_GNRC_LORAWAN_1_1 && _pkt.port) {
         gnrc_lorawan_set_afcnt_down(mac, _pkt.fcnt_down);
     }
     else {
         mac->mcps.fcnt_down = _pkt.fcnt_down;
     }
 
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
+    if (MODULE_GNRC_LORAWAN_1_1) {
         gnrc_lorawan_set_last_fcnt_down(mac, _pkt.fcnt_down);
     }
 
@@ -232,7 +232,7 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
 
     /* if there are fopts, it's either an empty packet or application payload */
     if (fopts) {
-        if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && gnrc_lorawan_optneg_is_set(mac)) {
+        if (MODULE_GNRC_LORAWAN_1_1 && gnrc_lorawan_optneg_is_set(mac)) {
             if (_pkt.port) {
                 gnrc_lorawan_encrypt_fopts(fopts->iol_base, fopts->iol_len,
                                            &mac->dev_addr,
@@ -336,7 +336,7 @@ size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
     gnrc_lorawan_encrypt_payload(payload, &mac->dev_addr, mac->mcps.fcnt,
                                  GNRC_LORAWAN_DIR_UPLINK, key);
 
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && gnrc_lorawan_optneg_is_set(mac)) {
+    if (MODULE_GNRC_LORAWAN_1_1 && gnrc_lorawan_optneg_is_set(mac)) {
         key = mac->ctx.nwksenckey;
 
         gnrc_lorawan_encrypt_fopts(&buf.data[sizeof(lorawan_hdr_t)], fopts_length,
@@ -393,7 +393,7 @@ static void _transmit_pkt(gnrc_lorawan_t *mac)
 
     uint16_t conf_fcnt = 0;
 
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
+    if (MODULE_GNRC_LORAWAN_1_1) {
         /**
          * If the ACK bit of the uplink frame is set, meaning this frame is
          * acknowledging a downlink “confirmed” frame, then ConfFCnt is the frame

@@ -348,8 +348,8 @@
 #endif
 
 /* periph_hwrng, periph_usbdev and periph_sdmmc require a 48MHz clock source */
-#if IS_USED(MODULE_PERIPH_HWRNG) || IS_USED(MODULE_PERIPH_USBDEV_CLK) || \
-    IS_USED(MODULE_PERIPH_SDMMC_CLK)
+#if MODULE_PERIPH_HWRNG || MODULE_PERIPH_USBDEV_CLK || \
+    MODULE_PERIPH_SDMMC_CLK
 #if !IS_ACTIVE(CLOCK48MHZ_USE_PLLQ) && !IS_ACTIVE(CLOCK48MHZ_USE_MSI) && \
     !IS_ACTIVE(CLOCK48MHZ_USE_HSI48)
 #error "No 48MHz clock source available, HWRNG cannot work"
@@ -499,7 +499,7 @@ void stmclk_init_sysclk(void)
              (instead of MSIRANGE in the RCC_CR) */
     RCC->CR = (RCC_CR_HSION);
     /* Use VDDTCXO regulator, required by the radio and HSE */
-    if (IS_ACTIVE(CLOCK_ENABLE_HSE) || IS_USED(MODULE_SX126X_STM32WL)) {
+    if (IS_ACTIVE(CLOCK_ENABLE_HSE) || MODULE_SX126X_STM32WL) {
 #ifdef RCC_CR_HSEBYPPWR
         RCC->CR |= (RCC_CR_HSEBYPPWR);
 #endif
@@ -606,7 +606,7 @@ void stmclk_init_sysclk(void)
         stmclk_disable_hsi();
     }
 
-    if (IS_USED(MODULE_PERIPH_RTT)) {
+    if (MODULE_PERIPH_RTT) {
         /* Ensure LPTIM1 clock source (LSI or LSE) is correctly reset when initializing
            the clock, this is particularly useful after waking up from deep sleep */
         if (IS_ACTIVE(CONFIG_BOARD_HAS_LSE)) {
@@ -661,7 +661,7 @@ void stmclk_init_sysclk(void)
         gpio_init_af(GPIO_PIN(PORT_A, 8), GPIO_AF0);
     }
 
-#if IS_USED(MODULE_PERIPH_USBDEV_CLK) && defined(RCC_APB1RSTR1_USBRST)
+#if MODULE_PERIPH_USBDEV_CLK && defined(RCC_APB1RSTR1_USBRST)
     RCC->APB1RSTR1 |= RCC_APB1RSTR1_USBRST;
     RCC->APB1RSTR1 &= ~RCC_APB1RSTR1_USBRST;
 #endif

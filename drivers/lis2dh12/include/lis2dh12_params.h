@@ -27,7 +27,7 @@ extern "C" {
  * @name    Set default configuration parameters for LIS2DH12 devices
  * @{
  */
-#ifdef MODULE_LIS2DH12_SPI          /* default configuration for SPI mode */
+#if MODULE_LIS2DH12_SPI          /* default configuration for SPI mode */
 #ifndef LIS2DH12_PARAM_SPI
 #define LIS2DH12_PARAM_SPI          SPI_DEV(0)
 #endif
@@ -68,7 +68,7 @@ extern "C" {
 #endif
 
 #ifndef LIS2DH12_PARAMS
-#ifdef MODULE_LIS2DH12_INT
+#if MODULE_LIS2DH12_INT
 #define LIS2DH12_PARAMS         {  \
                                     LIS2DH12_PARAMS_BUSCFG,  \
                                     .int1_pin = LIS2DH12_PARAM_INT_PIN1,  \

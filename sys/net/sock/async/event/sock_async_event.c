@@ -16,7 +16,7 @@
 #include "irq.h"
 #include "net/sock/async/event.h"
 
-#ifdef MODULE_FUZZING
+#if MODULE_FUZZING
 extern gnrc_pktsnip_t *gnrc_pktbuf_fuzzptr;
 extern gnrc_pktsnip_t *gnrc_sock_prevpkt;
 #endif
@@ -47,7 +47,7 @@ static inline void _cb(void *sock, sock_async_flags_t type, void *arg,
      * assumes that gnrc_sock_recv is called by the event callback. If
      * the value returned by gnrc_sock_recv was the fuzzing packet, the
      * fuzzing application is terminated as input processing finished. */
-#ifdef MODULE_FUZZING
+#if MODULE_FUZZING
     if (gnrc_sock_prevpkt && gnrc_sock_prevpkt == gnrc_pktbuf_fuzzptr) {
         exit(EXIT_SUCCESS);
     }
@@ -84,16 +84,16 @@ void sock_event_close(sock_async_ctx_t *async_ctx)
 }
 
 typedef enum {
-#if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
+#if MODULE_SOCK_UDP || defined(DOXYGEN)
     SOCK_ASYNC_UDP,
 #endif
-#if defined(MODULE_SOCK_TCP) || defined(DOXYGEN)
+#if MODULE_SOCK_TCP || defined(DOXYGEN)
     SOCK_ASYNC_TCP,
 #endif
-#if defined(MODULE_SOCK_IP) || defined(DOXYGEN)
+#if MODULE_SOCK_IP || defined(DOXYGEN)
     SOCK_ASYNC_IP,
 #endif
-#if defined(MODULE_SOCK_DTLS) || defined(DOXYGEN)
+#if MODULE_SOCK_DTLS || defined(DOXYGEN)
     SOCK_ASYNC_DTLS,
 #endif
 } sock_async_t;
@@ -109,22 +109,22 @@ static void _sock_event_close_cb(event_t *ev)
     _sock_close_ev *close_ev = container_of(ev, _sock_close_ev, super);
 
     switch (close_ev->type) {
-#if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
+#if MODULE_SOCK_UDP || defined(DOXYGEN)
         case SOCK_ASYNC_UDP:
         sock_udp_close(close_ev->sock);
         break;
 #endif
-#if defined(MODULE_SOCK_TCP) || defined(DOXYGEN)
+#if MODULE_SOCK_TCP || defined(DOXYGEN)
         case SOCK_ASYNC_TCP:
         sock_tcp_disconnect(close_ev->sock);
         break;
 #endif
-#if defined(MODULE_SOCK_IP) || defined(DOXYGEN)
+#if MODULE_SOCK_IP || defined(DOXYGEN)
         case SOCK_ASYNC_IP:
         sock_ip_close(close_ev->sock);
         break;
 #endif
-#if defined(MODULE_SOCK_DTLS) || defined(DOXYGEN)
+#if MODULE_SOCK_DTLS || defined(DOXYGEN)
         case SOCK_ASYNC_DTLS:
         sock_dtls_close(close_ev->sock);
         break;
@@ -156,7 +156,7 @@ static void _sock_event_close_common(void *sock, sock_async_ctx_t *async_ctx,
     event_post(async_ctx->queue, &ev.super);
     event_sync(async_ctx->queue);
 }
-#ifdef MODULE_SOCK_DTLS
+#if MODULE_SOCK_DTLS
 static void _dtls_cb(sock_dtls_t *sock, sock_async_flags_t type, void *arg)
 {
     _cb(sock, type, arg, sock_dtls_get_async_ctx(sock));
@@ -178,7 +178,7 @@ void sock_dtls_event_close(sock_dtls_t *sock)
 }
 #endif /* MODULE_SOCK_DTLS */
 
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
 static void _ip_cb(sock_ip_t *sock, sock_async_flags_t type, void *arg)
 {
     _cb(sock, type, arg, sock_ip_get_async_ctx(sock));
@@ -200,7 +200,7 @@ void sock_ip_event_close(sock_ip_t *sock)
 }
 #endif  /* MODULE_SOCK_IP */
 
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
 static void _tcp_cb(sock_tcp_t *sock, sock_async_flags_t type, void *arg)
 {
     _cb(sock, type, arg, sock_tcp_get_async_ctx(sock));
@@ -238,7 +238,7 @@ void sock_tcp_event_close(sock_tcp_t *sock)
 }
 #endif /* MODULE_SOCK_TCP */
 
-#ifdef MODULE_SOCK_UDP
+#if MODULE_SOCK_UDP
 static void _udp_cb(sock_udp_t *sock, sock_async_flags_t type, void *arg)
 {
     _cb(sock, type, arg, sock_udp_get_async_ctx(sock));

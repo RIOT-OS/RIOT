@@ -24,7 +24,7 @@
 #include "net/l2util.h"
 #include "net/netopt.h"
 
-#ifdef MODULE_GNRC_IPV6_NIB
+#if MODULE_GNRC_IPV6_NIB
 #include "net/gnrc/ipv6/nib/conf.h"
 #endif
 
@@ -55,7 +55,7 @@ void gnrc_netif_acquire(gnrc_netif_t *netif);
  */
 void gnrc_netif_release(gnrc_netif_t *netif);
 
-#if IS_USED(MODULE_GNRC_NETIF_IPV6) || DOXYGEN
+#if MODULE_GNRC_NETIF_IPV6 || DOXYGEN
 /**
  * @brief   Adds an IPv6 address to the interface
  *
@@ -291,7 +291,7 @@ int gnrc_netif_ipv6_group_idx(gnrc_netif_t *netif,
 static inline void gnrc_netif_ipv6_bus_post(gnrc_netif_t *netif, int type,
                                             const void *ctx)
 {
-#ifdef MODULE_GNRC_NETIF_BUS
+#if MODULE_GNRC_NETIF_BUS
     msg_bus_post(&netif->bus[GNRC_NETIF_BUS_IPV6], type, ctx);
 #else
     (void) netif;
@@ -299,7 +299,7 @@ static inline void gnrc_netif_ipv6_bus_post(gnrc_netif_t *netif, int type,
     (void) ctx;
 #endif
 }
-#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN) */
+#endif  /* MODULE_GNRC_NETIF_IPV6 || defined(DOXYGEN) */
 
 /**
  * @brief   Checks if the interface represents a router according to RFC 4861
@@ -317,7 +317,7 @@ static inline void gnrc_netif_ipv6_bus_post(gnrc_netif_t *netif, int type,
  */
 static inline bool gnrc_netif_is_rtr(const gnrc_netif_t *netif)
 {
-    if (IS_USED(MODULE_GNRC_IPV6_ROUTER)) {
+    if (MODULE_GNRC_IPV6_ROUTER) {
         return (netif->flags & GNRC_NETIF_FLAGS_IPV6_FORWARDING);
     }
     else {
@@ -340,7 +340,7 @@ static inline bool gnrc_netif_is_rtr(const gnrc_netif_t *netif)
  */
 static inline bool gnrc_netif_is_rtr_adv(const gnrc_netif_t *netif)
 {
-    if (IS_USED(MODULE_GNRC_IPV6_ROUTER)) {
+    if (MODULE_GNRC_IPV6_ROUTER) {
         return (netif->flags & GNRC_NETIF_FLAGS_IPV6_RTR_ADV);
     }
     else {
@@ -379,11 +379,11 @@ bool gnrc_netif_dev_is_6lo(const gnrc_netif_t *netif);
 static inline bool gnrc_netif_is_6lo(const gnrc_netif_t *netif)
 {
     if ((!gnrc_netif_highlander() &&
-       IS_USED(MODULE_GNRC_SIXLOWPAN)) || \
-       IS_USED(MODULE_GNRC_SIXLOENC)) {
+       MODULE_GNRC_SIXLOWPAN) || \
+       MODULE_GNRC_SIXLOENC) {
         return gnrc_netif_dev_is_6lo(netif);
     }
-    else if (gnrc_netif_highlander() && IS_USED(MODULE_GNRC_SIXLOWPAN)) {
+    else if (gnrc_netif_highlander() && MODULE_GNRC_SIXLOWPAN) {
         return true;
     }
     else {
@@ -433,9 +433,9 @@ static inline bool gnrc_netif_is_6lr(const gnrc_netif_t *netif)
 {
      /* if flag checkers even evaluate, otherwise just assume their result */
     if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR) &&
-            (IS_USED(MODULE_GNRC_IPV6_ROUTER) ||
+            (MODULE_GNRC_IPV6_ROUTER ||
             (!gnrc_netif_highlander()) ||
-            !IS_USED(MODULE_GNRC_SIXLOWPAN))) {
+            !MODULE_GNRC_SIXLOWPAN)) {
         return gnrc_netif_is_rtr(netif) && gnrc_netif_is_6ln(netif);
     }
     else {
@@ -552,7 +552,7 @@ static inline int gnrc_netif_get_eui64(gnrc_netif_t *netif, eui64_t *eui64)
  */
 void gnrc_netif_init_6ln(gnrc_netif_t *netif);
 
-#if IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN)
+#if MODULE_GNRC_NETIF_IPV6 || defined(DOXYGEN)
 /**
  * @brief   Initialize IPv6 MTU and other packet length related members of
  *          @ref gnrc_netif_t based on gnrc_netif_t::device_type
@@ -732,14 +732,14 @@ static inline int gnrc_netif_ipv6_group_to_l2_group(gnrc_netif_t *netif,
 int gnrc_netif_ipv6_add_prefix(gnrc_netif_t *netif,
                                const ipv6_addr_t *pfx, uint8_t pfx_len,
                                uint32_t valid, uint32_t pref);
-#else   /* IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN) */
+#else   /* MODULE_GNRC_NETIF_IPV6 || defined(DOXYGEN) */
 #define gnrc_netif_ipv6_init_mtu(netif)                             (void)netif
 #define gnrc_netif_ipv6_iid_from_addr(netif, addr, addr_len, iid)   (-ENOTSUP)
 #define gnrc_netif_ipv6_iid_to_addr(netif, iid, addr)               (-ENOTSUP)
 #define gnrc_netif_ndp_addr_len_from_l2ao(netif, opt)               (-ENOTSUP)
 #define gnrc_netif_ipv6_get_iid(netif, iid)                         (-ENOTSUP)
 #define gnrc_netif_ipv6_group_to_l2_group(netif, ipv6_group, l2_group)  (-ENOTSUP)
-#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN) */
+#endif  /* MODULE_GNRC_NETIF_IPV6 || defined(DOXYGEN) */
 /** @} */
 
 #ifdef __cplusplus

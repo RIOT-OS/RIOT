@@ -25,7 +25,7 @@ extern "C" {
 #define ARDUINO_UART_D0D1       UART_DEV(0) /**< Arduino UART interface */
 #define ARDUINO_SPI_D11D12D13   SPI_DEV(0)  /**< Arduino SPI bus */
 
-#ifdef MODULE_ESP32C3_WEMOS_MINI_V1_0_0
+#if MODULE_ESP32C3_WEMOS_MINI_V1_0_0
 #  define ARDUINO_LED           (5)         /**< LED is connected to Arduino pin 5 */
 #endif
 
@@ -38,7 +38,7 @@ extern "C" {
 #define ARDUINO_PIN_2       GPIO9       /**< Arduino pin 2 (BTN0) */
 #define ARDUINO_PIN_3       GPIO6       /**< Arduino pin 3 (PWM) */
 
-#ifdef MODULE_ESP32C3_WEMOS_MINI_V1_0_0
+#if MODULE_ESP32C3_WEMOS_MINI_V1_0_0
 
 #  define ARDUINO_PIN_4     GPIO0       /**< Arduino pin 4 */
 #  define ARDUINO_PIN_5     GPIO1       /**< Arduino pin 5 (PWM/LED) */

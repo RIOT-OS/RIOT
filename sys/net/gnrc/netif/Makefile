@@ -1,5 +1,36 @@
 MODULE := gnrc_netif
 
+MODULE_DEFS_NEEDED += \
+  cc110x \
+  esp_now \
+  gnrc_ipv6 \
+  gnrc_ipv6_nib \
+  gnrc_netif_6lo \
+  gnrc_netif_bus \
+  gnrc_netif_ipv6 \
+  gnrc_netif_pktq \
+  gnrc_sixloenc \
+  gnrc_sixlowpan_frag_sfr \
+  gnrc_sixlowpan_iphc \
+  gnrc_sixlowpan_nd \
+  gnrc_tx_sync \
+  netdev_eth \
+  netdev_ieee802154 \
+  netdev_legacy_api \
+  netdev_new_api \
+  netdev_register \
+  netopt \
+  netstats_ipv6 \
+  netstats_l2 \
+  netstats_neighbor \
+  nimble_netif \
+  nrf24l01p_ng \
+  nrfmin \
+  slipdev_l2addr \
+  xbee \
+  ztimer \
+  #
+
 ifneq (,$(filter gnrc_netif_ethernet,$(USEMODULE)))
   DIRS += ethernet
 endif

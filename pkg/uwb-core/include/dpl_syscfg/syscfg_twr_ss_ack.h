@@ -28,7 +28,7 @@ extern "C" {
  * @brief Enable toplevel ranging services
  */
 #ifndef MYNEWT_VAL_TWR_SS_ACK_ENABLED
-#define MYNEWT_VAL_TWR_SS_ACK_ENABLED (IS_USED(MODULE_UWB_CORE_TWR_SS_ACK))
+#define MYNEWT_VAL_TWR_SS_ACK_ENABLED (MODULE_UWB_CORE_TWR_SS_ACK)
 #endif
 
 /**
@@ -42,7 +42,7 @@ extern "C" {
  * @brief TOA timeout delay for SS TWR (usec)
  */
 #ifndef MYNEWT_VAL_TWR_SS_ACK_TX_HOLDOFF
-#define MYNEWT_VAL_TWR_SS_ACK_TX_HOLDOFF (((uint32_t)0x800 + 0xA0 * IS_USED(MODULE_UWB_CORE_RNG_TRX_INFO)))
+#define MYNEWT_VAL_TWR_SS_ACK_TX_HOLDOFF (((uint32_t)0x800 + 0xA0 * MODULE_UWB_CORE_RNG_TRX_INFO))
 #endif
 
 #ifdef __cplusplus

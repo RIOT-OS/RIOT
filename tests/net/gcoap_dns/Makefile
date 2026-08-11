@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  dns_cache \
+  gcoap_dtls \
+  #
 include ../Makefile.net_common
 
 USEMODULE += embunit

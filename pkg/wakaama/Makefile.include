@@ -29,3 +29,7 @@ endif
 
 PSEUDOMODULES += wakaama
 PSEUDOMODULES += wakaama_client_dtls
+
+MODULE_DEFS_NEEDED += \
+  wakaama_client_dtls \
+  #

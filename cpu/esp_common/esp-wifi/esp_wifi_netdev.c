@@ -13,7 +13,7 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifdef MODULE_ESP_WIFI
+#if MODULE_ESP_WIFI
 
 #include <string.h>
 #include <assert.h>
@@ -31,7 +31,7 @@
 #include "esp_event.h"
 #include "esp_event_legacy.h"
 #endif
-#ifndef MODULE_ESP_WIFI_AP
+#if !MODULE_ESP_WIFI_AP
 #include "esp_now.h"
 #endif
 #include "esp_system.h"
@@ -44,7 +44,7 @@
 
 #include "nvs_flash.h"
 
-#ifdef MODULE_ESP_WIFI_ENTERPRISE
+#if MODULE_ESP_WIFI_ENTERPRISE
 #include "esp_eap_client.h"
 #endif
 
@@ -380,7 +380,7 @@ esp_err_t _esp_wifi_rx_cb(void *buffer, uint16_t len, void *eb)
     return ESP_OK;
 }
 
-#ifndef MODULE_ESP_WIFI_AP
+#if !MODULE_ESP_WIFI_AP
 static const char *_esp_wifi_disc_reasons[] = {
     "INVALID",                                  /* 0 */
     "UNSPECIFIED",                              /* 1 */
@@ -489,14 +489,14 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
 {
     assert(event != NULL);
 
-#ifndef MODULE_ESP_WIFI_AP
+#if !MODULE_ESP_WIFI_AP
     esp_err_t result;
 
     uint8_t reason;
 #endif /* MODULE_ESP_WIFI_AP */
 
     switch (event->event_id) {
-#ifdef MODULE_ESP_WIFI_AP
+#if MODULE_ESP_WIFI_AP
         case SYSTEM_EVENT_AP_START:
             _esp_wifi_started = 1;
             esp_wifi_internal_reg_rxcb(WIFI_IF_AP, _esp_wifi_rx_cb);
@@ -553,7 +553,7 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
                               event->event_info.connected.ssid,
                               event->event_info.connected.channel);
             _esp_wifi_channel = event->event_info.connected.channel;
-#ifdef MODULE_ESP_NOW
+#if MODULE_ESP_NOW
             extern void esp_now_set_channel(uint8_t channel);
             esp_now_set_channel(_esp_wifi_channel);
 #endif
@@ -619,7 +619,7 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
 
     esp_wifi_netdev_t* dev = container_of(netdev, esp_wifi_netdev_t, netdev);
 
-#ifdef MODULE_ESP_WIFI_AP
+#if MODULE_ESP_WIFI_AP
     if (_esp_wifi_dev.sta_connected == 0) {
         ESP_WIFI_DEBUG("No STAs are connected to SoftAP, cannot send");
         _esp_wifi_send_is_in = false;
@@ -651,14 +651,14 @@ static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         ESP_WIFI_DEBUG("send %d byte", dev->tx_len);
-        if (IS_ACTIVE(ENABLE_DEBUG_HEXDUMP) && IS_USED(MODULE_OD)) {
+        if (IS_ACTIVE(ENABLE_DEBUG_HEXDUMP) && MODULE_OD) {
             od_hex_dump(dev->tx_buf, dev->tx_len, OD_WIDTH_DEFAULT);
         }
     }
 
     critical_exit();
 
-#ifdef MODULE_ESP_WIFI_AP
+#if MODULE_ESP_WIFI_AP
     if (esp_wifi_internal_tx(WIFI_IF_AP, dev->tx_buf, dev->tx_len) == ESP_OK) {
 #else /* MODULE_ESP_WIFI_AP */
     /* send the packet to the peer(s) mac address */
@@ -726,7 +726,7 @@ static int _esp_wifi_recv(netdev_t *netdev, void *buf, size_t len, void *info)
         ESP_WIFI_DEBUG("received %u byte from addr " MAC_STR,
                     size, MAC_STR_ARG(hdr->src));
 
-        if (IS_ACTIVE(ENABLE_DEBUG_HEXDUMP) && IS_USED(MODULE_OD)) {
+        if (IS_ACTIVE(ENABLE_DEBUG_HEXDUMP) && MODULE_OD) {
             od_hex_dump(buf, size, OD_WIDTH_DEFAULT);
         }
     }
@@ -741,7 +741,7 @@ static int _esp_wifi_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_l
 
     assert(netdev != NULL);
 
-#ifndef MODULE_ESP_WIFI_AP
+#if !MODULE_ESP_WIFI_AP
     esp_wifi_netdev_t* dev = container_of(netdev, esp_wifi_netdev_t, netdev);
 #endif /* MODULE_ESP_WIFI_AP */
 
@@ -754,7 +754,7 @@ static int _esp_wifi_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_l
             return sizeof(uint16_t);
         case NETOPT_ADDRESS:
             assert(max_len >= ETHERNET_ADDR_LEN);
-#ifdef MODULE_ESP_WIFI_AP
+#if MODULE_ESP_WIFI_AP
             esp_wifi_get_mac(WIFI_IF_AP, (uint8_t *)val);
 #else /* MODULE_ESP_WIFI_AP */
             esp_wifi_get_mac(WIFI_IF_STA, (uint8_t *)val);
@@ -762,7 +762,7 @@ static int _esp_wifi_get(netdev_t *netdev, netopt_t opt, void *val, size_t max_l
             return ETHERNET_ADDR_LEN;
         case NETOPT_LINK:
             assert(max_len == sizeof(netopt_enable_t));
-#ifdef MODULE_ESP_WIFI_AP
+#if MODULE_ESP_WIFI_AP
             *((netopt_enable_t *)val) = (_esp_wifi_started) ? NETOPT_ENABLE
                                                             : NETOPT_DISABLE;
 #else /* MOUDLE_ESP_WIFI_AP */
@@ -785,7 +785,7 @@ static int _esp_wifi_set(netdev_t *netdev, netopt_t opt, const void *val, size_t
     switch (opt) {
         case NETOPT_ADDRESS:
             assert(max_len == ETHERNET_ADDR_LEN);
-#ifdef MODULE_ESP_WIFI_AP
+#if MODULE_ESP_WIFI_AP
             esp_wifi_set_mac(WIFI_IF_AP, (uint8_t *)val);
 #else /* MODULE_ESP_WIFI_AP */
             esp_wifi_set_mac(WIFI_IF_STA, (uint8_t *)val);
@@ -808,7 +808,7 @@ static void _esp_wifi_isr(netdev_t *netdev)
         dev->event_recv--;
         dev->netdev.event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
     }
-#ifndef MODULE_ESP_WIFI_AP
+#if !MODULE_ESP_WIFI_AP
     if (dev->event_conn) {
         dev->event_conn--;
         dev->netdev.event_callback(netdev, NETDEV_EVENT_LINK_UP);
@@ -839,14 +839,14 @@ static const netdev_driver_t _esp_wifi_driver =
     .set = _esp_wifi_set,
 };
 
-#ifndef MODULE_ESP_WIFI_AP
+#if !MODULE_ESP_WIFI_AP
 /*
  * Static configuration for the Station interface
  */
 static wifi_config_t wifi_config_sta = {
     .sta = {
         .ssid = WIFI_SSID,
-#if !defined(MODULE_ESP_WIFI_ENTERPRISE) && defined(WIFI_PASS)
+#if !MODULE_ESP_WIFI_ENTERPRISE && defined(WIFI_PASS)
         .password = WIFI_PASS,
 #endif
         .channel = 0,
@@ -858,7 +858,7 @@ static wifi_config_t wifi_config_sta = {
 };
 #endif /* MODULE_ESP_WIFI_AP */
 
-#if (defined(CPU_ESP8266) && !defined(MODULE_ESP_NOW)) || defined(MODULE_ESP_WIFI_AP)
+#if (defined(CPU_ESP8266) && !MODULE_ESP_NOW) || MODULE_ESP_WIFI_AP
 /**
  * Static configuration for the SoftAP interface if ESP-NOW is not enabled.
  *
@@ -888,7 +888,7 @@ static wifi_config_t wifi_config_ap = {
 #else
         .authmode = WIFI_AUTH_OPEN,
 #endif
-#ifdef MODULE_ESP_WIFI_AP
+#if MODULE_ESP_WIFI_AP
         .ssid_hidden = ESP_WIFI_SSID_HIDDEN, /* don't make the AP visible */
         .max_connection = ESP_WIFI_MAX_CONN, /* maximum number of connections */
         .beacon_interval = ESP_WIFI_BEACON_INTERVAL,
@@ -899,7 +899,7 @@ static wifi_config_t wifi_config_ap = {
 #endif
     }
 };
-#endif /* (defined(CPU_ESP8266) && !defined(MODULE_ESP_NOW)) || defined(MODULE_ESP_WIFI_AP) */
+#endif /* (defined(CPU_ESP8266) && !MODULE_ESP_NOW) || MODULE_ESP_WIFI_AP */
 
 void esp_wifi_setup (esp_wifi_netdev_t* dev)
 {
@@ -918,7 +918,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
      */
     esp_err_t result;
 
-#ifndef MODULE_ESP_NOW
+#if !MODULE_ESP_NOW
     /* if module esp_now is used, the following part is already done */
 #ifndef CPU_ESP8266
     extern portMUX_TYPE g_intr_lock_mux;
@@ -944,7 +944,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     /* TODO */
 #endif
 
-#ifdef MODULE_ESP_WIFI_AP
+#if MODULE_ESP_WIFI_AP
     /* Activate the SoftAP interface */
     result = esp_wifi_set_mode(WIFI_MODE_AP);
 #elif defined(CPU_ESP8266)
@@ -966,7 +966,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
         return;
     }
 
-#if defined(CPU_ESP8266) || defined(MODULE_ESP_WIFI_AP)
+#if defined(CPU_ESP8266) || MODULE_ESP_WIFI_AP
 #if IS_ACTIVE(ESP_WIFI_SSID_DYNAMIC)
     uint8_t mac[ETHERNET_ADDR_LEN];
     esp_wifi_get_mac(WIFI_IF_AP, mac);
@@ -980,11 +980,11 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
         ESP_WIFI_LOG_ERROR("esp_wifi_set_config softap failed with return value %d", result);
         return;
     }
-#endif /* defined(CPU_ESP8266) || defined(MODULE_ESP_WIFI_AP) */
+#endif /* defined(CPU_ESP8266) || MODULE_ESP_WIFI_AP */
 
 #endif /* MODULE_ESP_NOW */
 
-#ifndef MODULE_ESP_WIFI_AP
+#if !MODULE_ESP_WIFI_AP
     /* set the Station configuration */
     result = esp_wifi_set_config(WIFI_IF_STA, &wifi_config_sta);
     if (result != ESP_OK) {
@@ -993,7 +993,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
     }
 #endif /* MODULE_ESP_WIFI_AP */
 
-#if defined(MODULE_ESP_WIFI_ENTERPRISE) && !defined(MODULE_ESP_WIFI_AP)
+#if MODULE_ESP_WIFI_ENTERPRISE && !MODULE_ESP_WIFI_AP
 
 #if !defined(WIFI_EAP_ID) && defined(ESP_WIFI_EAP_ID)
 #define WIFI_EAP_ID     ESP_WIFI_EAP_ID
@@ -1022,7 +1022,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 #error "WIFI_EAP_USER and WIFI_EAP_PASS have to be defined for EAP phase 2 authentication"
 #endif /* defined(WIFI_EAP_USER) && defined(WIFI_EAP_PASS) */
     esp_wifi_sta_enterprise_enable();
-#endif /* defined(MODULE_ESP_WIFI_ENTERPRISE) && !defined(MODULE_ESP_WIFI_AP) */
+#endif /* MODULE_ESP_WIFI_ENTERPRISE && !MODULE_ESP_WIFI_AP */
 
     /* start the WiFi driver */
     result = esp_wifi_start();
@@ -1036,7 +1036,7 @@ void esp_wifi_setup (esp_wifi_netdev_t* dev)
 
     /* initialize netdev data structure */
     dev->event_recv = 0;
-#ifdef MODULE_ESP_WIFI_AP
+#if MODULE_ESP_WIFI_AP
     dev->sta_connected = 0;
 #else /* MODULE_ESP_WIFI_AP */
     dev->event_conn = 0;

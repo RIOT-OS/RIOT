@@ -107,7 +107,7 @@ extern "C" {
 /**
  * ESP32-C3 BLE driver configuration (DO NOT CHANGE)
  */
-#ifdef MODULE_ESP_BLE
+#if MODULE_ESP_BLE
 #  define CONFIG_BT_ALARM_MAX_NUM                           50
 #  define CONFIG_BT_BLE_CCA_MODE                            0
 #  define CONFIG_BT_BLE_CCA_MODE_NONE                       1

@@ -49,7 +49,7 @@ extern "C" {
  * @brief   Priority used for NimBLE's host thread
  */
 #ifndef NIMBLE_HOST_PRIO
-#if IS_USED(MODULE_NIMBLE_NETIF)
+#if MODULE_NIMBLE_NETIF
 /* when using IP, the host should have a higher prio than the netif thread, but
  * MUST always have a lower priority then the controller thread. Setting it to
  * controller prio plus will guarantee the latter while also matching the first
@@ -73,10 +73,10 @@ extern "C" {
 typedef enum {
     NIMBLE_PHY_INVALID,         /**< PHY mode invalid */
     NIMBLE_PHY_1M,              /**< legacy 1Mbit PHY mode (always supported) */
-#if IS_USED(MODULE_NIMBLE_PHY_2MBIT)
+#if MODULE_NIMBLE_PHY_2MBIT
     NIMBLE_PHY_2M,              /**< 2Mbit PHY mode */
 #endif
-#if IS_USED(MODULE_NIMBLE_PHY_CODED)
+#if MODULE_NIMBLE_PHY_CODED
     NIMBLE_PHY_CODED,           /**< Coded (long range) PHY mode */
 #endif
 } nimble_phy_t;

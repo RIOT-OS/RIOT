@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  bme680_fp \
+  #
 include ../Makefile.drivers_common
 
 DRIVER ?= bme680_i2c

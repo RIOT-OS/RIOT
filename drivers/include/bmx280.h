@@ -72,7 +72,7 @@
 #include <stdint.h>
 #include "saul.h"
 
-#if defined(MODULE_BME280_SPI) || defined(MODULE_BMP280_SPI)
+#if MODULE_BME280_SPI || MODULE_BMP280_SPI
 #define BMX280_USE_SPI
 #include "periph/spi.h"
 #else
@@ -86,7 +86,7 @@ extern "C" {
 /**
  * @brief   Select the number or raw data bytes depending on the device type
  */
-#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+#if MODULE_BME280_SPI || MODULE_BME280_I2C
 #define BMX280_RAW_LEN      (8U)
 #else
 #define BMX280_RAW_LEN      (6U)
@@ -230,7 +230,7 @@ extern const saul_driver_t bmx280_temperature_saul_driver;
  */
 extern const saul_driver_t bmx280_pressure_saul_driver;
 
-#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+#if MODULE_BME280_SPI || MODULE_BME280_I2C
 /**
  * @brief   Export of SAUL interface for humidity sensor
  */
@@ -279,7 +279,7 @@ int16_t bmx280_read_temperature(bmx280_t* dev);
  */
 uint32_t bmx280_read_pressure(bmx280_t *dev);
 
-#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C) || defined(DOXYGEN)
+#if MODULE_BME280_SPI || MODULE_BME280_I2C || defined(DOXYGEN)
 /**
  * @brief   Read humidity value from the given BME280 device
  *

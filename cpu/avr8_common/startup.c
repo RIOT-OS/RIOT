@@ -26,10 +26,10 @@
 
 /* For Catchall-Loop */
 #include "board.h"
-#ifdef MODULE_PUF_SRAM
+#if MODULE_PUF_SRAM
 #include "puf_sram.h"
 #endif
-#ifdef MODULE_DBGPIN
+#if MODULE_DBGPIN
 #include "dbgpin.h"
 #endif
 
@@ -81,11 +81,11 @@ __attribute__((used, naked)) void init8_ovr(void)
  */
 __attribute__((used)) void reset_handler(void)
 {
-#ifdef MODULE_PUF_SRAM
+#if MODULE_PUF_SRAM
     puf_sram_init((uint8_t *)RAMEND-SEED_RAM_LEN, SEED_RAM_LEN);
 #endif
 
-#ifdef MODULE_DBGPIN
+#if MODULE_DBGPIN
     dbgpin_init();
 #endif
 

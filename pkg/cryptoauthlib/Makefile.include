@@ -32,3 +32,7 @@ PSEUDOMODULES += psa_secure_element_ateccx08a
 PSEUDOMODULES += psa_secure_element_ateccx08a_cipher_aes_128
 PSEUDOMODULES += psa_secure_element_ateccx08a_ecc_p256
 PSEUDOMODULES += psa_secure_element_ateccx08a_hmac_sha256
+
+MODULE_DEFS_NEEDED += \
+  psa_secure_element_ateccx08a \
+  #

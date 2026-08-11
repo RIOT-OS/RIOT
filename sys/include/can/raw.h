@@ -29,11 +29,11 @@ extern "C" {
 #include "can/common.h"
 #include "can/device.h"
 
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
 #include "mbox.h"
 #endif
 
-#ifdef MODULE_TRX
+#if MODULE_TRX
 #include "can/can_trx.h"
 #endif
 
@@ -139,7 +139,7 @@ int raw_can_get_can_opt(int ifnum, can_opt_t *opt);
  */
 int raw_can_set_can_opt(int ifnum, can_opt_t *opt);
 
-#if  defined(MODULE_CAN_MBOX) || defined(DOXYGEN)
+#if  MODULE_CAN_MBOX || defined(DOXYGEN)
 /**
  * @brief Send a CAN frame
  *
@@ -260,7 +260,7 @@ candev_dev_t *raw_can_get_dev_by_ifnum(int ifnum);
  */
 int raw_can_set_bitrate(int ifnum, uint32_t bitrate, uint32_t sample_point);
 
-#if defined(MODULE_CAN_TRX) || defined(DOXYGEN)
+#if MODULE_CAN_TRX || defined(DOXYGEN)
 /**
  * @brief Set a transceiver for a given interface
  *

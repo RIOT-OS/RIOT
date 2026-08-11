@@ -308,7 +308,7 @@ typedef struct usbus_endpoint {
     usbus_descr_gen_t *descr_gen;   /**< Linked list of optional additional
                                          descriptor generators */
     usbdev_ep_t *ep;                /**< ptr to the matching usbdev endpoint */
-#ifdef MODULE_USBUS_URB
+#if MODULE_USBUS_URB
     clist_node_t urb_list;          /**< clist of urbs */
 #endif
     uint16_t maxpacketsize;         /**< Max packet size of this endpoint */

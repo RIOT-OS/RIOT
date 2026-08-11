@@ -15,7 +15,7 @@
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
-#ifdef MODULE_ESP_COMMON
+#if MODULE_ESP_COMMON
 /* ESP_COMMON provides its own log_module implementation see
  * - cpu/esp_common/include/log_module.h
  * - cpu/esp_common/include/esp_common_log.h */

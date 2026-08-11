@@ -114,7 +114,7 @@ void IRAM NORETURN exception_handler (XtExcFrame *frame)
 
 #if defined(DEVELHELP)
 
-#if defined(MODULE_PS)
+#if MODULE_PS
     ets_printf("processes:\n");
     ps();
     ets_printf("\n");

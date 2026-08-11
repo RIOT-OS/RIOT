@@ -58,7 +58,7 @@ typedef struct lwm2m_obj_security_inst {
      */
     uint8_t security_mode;
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
     /**
      * @brief Tag of the credential to use with the server.
      */
@@ -203,7 +203,7 @@ static int _get_value(lwm2m_data_t *data, lwm2m_obj_security_inst_t *instance);
 static int _initialize_new_instance(lwm2m_obj_security_inst_t *instance, uint16_t instance_id,
                                     const lwm2m_obj_security_args_t *args);
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
 /**
  * @brief Update a credential in the credman registry with the current instance information.
  *
@@ -220,7 +220,7 @@ struct lwm2m_security_object {
     mutex_t lock;                               /**< mutex for the instances access */
     lwm2m_obj_security_inst_t *free_instances;  /**< list of free instances */
     lwm2m_obj_security_inst_t instances[CONFIG_LWM2M_OBJ_SECURITY_INSTANCES_MAX]; /**< instances */
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
     credman_tag_t tag_count;                    /**< counter for the credential tags */
 #endif
 };
@@ -230,7 +230,7 @@ struct lwm2m_security_object {
  */
 static struct lwm2m_security_object _security_object = {
     .lock = MUTEX_INIT,
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
     .tag_count= CONFIG_LWM2M_CREDMAN_TAG_BASE,
 #endif
     .wakaama_object = {
@@ -247,7 +247,7 @@ static struct lwm2m_security_object _security_object = {
     }
 };
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
 static int _update_credential(lwm2m_obj_security_inst_t *instance)
 {
     assert(instance);
@@ -362,7 +362,7 @@ static int _get_value(lwm2m_data_t *data, lwm2m_obj_security_inst_t *instance)
             break;
 
         case LWM2M_SECURITY_PUBLIC_KEY_ID:
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
             lwm2m_data_encode_opaque(instance->pub_key_or_id, instance->pub_key_or_id_len, data);
 #else
             return COAP_404_NOT_FOUND;
@@ -370,7 +370,7 @@ static int _get_value(lwm2m_data_t *data, lwm2m_obj_security_inst_t *instance)
             break;
 
         case LWM2M_SECURITY_SECRET_KEY_ID:
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
             lwm2m_data_encode_opaque(instance->secret_key, instance->secret_key_len, data);
 #else
             return COAP_404_NOT_FOUND;
@@ -378,7 +378,7 @@ static int _get_value(lwm2m_data_t *data, lwm2m_obj_security_inst_t *instance)
             break;
 
         case LWM2M_SECURITY_SERVER_PUBLIC_KEY_ID:
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
             lwm2m_data_encode_opaque(instance->server_pub_key, instance->server_pub_key_len, data);
 #else
             return COAP_404_NOT_FOUND;
@@ -422,7 +422,7 @@ static uint8_t _read_cb(lwm2m_context_t * context, uint16_t instance_id, int * n
             LWM2M_SECURITY_URI_ID,
             LWM2M_SECURITY_BOOTSTRAP_ID,
             LWM2M_SECURITY_SECURITY_ID,
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
             LWM2M_SECURITY_PUBLIC_KEY_ID,
             LWM2M_SECURITY_SERVER_PUBLIC_KEY_ID,
             LWM2M_SECURITY_SECRET_KEY_ID,
@@ -569,7 +569,7 @@ static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int nu
                 break;
 
             case LWM2M_SECURITY_PUBLIC_KEY_ID:
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
                 DEBUG("[lwm2m:security:write]: writing pub. key or ID\n");
                 if (data->value.asBuffer.length >
                     CONFIG_LWM2M_OBJ_SECURITY_PUB_KEY_ID_BUFSIZE) {
@@ -590,7 +590,7 @@ static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int nu
                 break;
 
             case LWM2M_SECURITY_SECRET_KEY_ID:
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
                 DEBUG("[lwm2m:security:write]: writing sec. key\n");
                 if (data->value.asBuffer.length >
                     CONFIG_LWM2M_OBJ_SECURITY_SEC_KEY_BUFSIZE) {
@@ -611,7 +611,7 @@ static uint8_t _write_cb(lwm2m_context_t * context, uint16_t instance_id, int nu
                 break;
 
             case LWM2M_SECURITY_SERVER_PUBLIC_KEY_ID:
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
                 DEBUG("[lwm2m:security:write]: writing server pub. key\n");
                 if (data->value.asBuffer.length >
                     CONFIG_LWM2M_OBJ_SECURITY_SERVER_PUB_KEY_BUFSIZE) {
@@ -671,7 +671,7 @@ static uint8_t _delete_cb(lwm2m_context_t * context, uint16_t instance_id,
         goto free_out;
     }
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
     /* if there is an associated credential, de-register */
     if (instance->cred_tag != CREDMAN_TAG_EMPTY) {
         credman_type_t type = instance->security_mode == LWM2M_SECURITY_MODE_PRE_SHARED_KEY ?
@@ -724,7 +724,7 @@ static uint8_t _create_cb(lwm2m_context_t * context, uint16_t instance_id, int n
 
     memset(instance, 0, sizeof(lwm2m_obj_security_inst_t));
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
     instance->cred_tag = CREDMAN_TAG_EMPTY;
 #endif
 
@@ -775,7 +775,7 @@ static int _initialize_new_instance(lwm2m_obj_security_inst_t *instance, uint16_
     instance->client_hold_off_time = args->client_hold_off_time;
     instance->bs_account_timeout = args->bootstrap_account_timeout;
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
     instance->cred_tag = CREDMAN_TAG_EMPTY;
 #endif
 
@@ -789,7 +789,7 @@ static int _initialize_new_instance(lwm2m_obj_security_inst_t *instance, uint16_
     strncpy(instance->uri, args->server_uri, uri_len);
     instance->uri[uri_len] = '\0';
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
     if (LWM2M_SECURITY_MODE_NONE != args->security_mode) {
         if (LWM2M_SECURITY_MODE_CERTIFICATE == args->security_mode) {
             DEBUG("[lwm2m:security]: certificate mode not supported\n");
@@ -909,7 +909,7 @@ free_out:
 
 credman_tag_t lwm2m_object_security_get_credential(uint16_t instance_id)
 {
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
     lwm2m_obj_security_inst_t *instance;
 
     /* try to get the requested instance from the object list */

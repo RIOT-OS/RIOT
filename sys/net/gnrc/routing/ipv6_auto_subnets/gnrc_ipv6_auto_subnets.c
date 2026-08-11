@@ -198,7 +198,7 @@
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
-#if !IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE)
+#if !MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE
 
 /**
  * @brief Custom UDP sync protocol
@@ -291,7 +291,7 @@ static int _send_udp(gnrc_netif_t *netif, const ipv6_addr_t *addr,
 
     return 0;
 }
-#endif /* !IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE) */
+#endif /* !MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE */
 
 static void _init_sub_prefix(ipv6_addr_t *out,
                              const ipv6_addr_t *prefix, uint8_t bits,
@@ -437,7 +437,7 @@ static void _configure_subnets(uint8_t subnets, uint8_t start_idx, gnrc_netif_t 
         }
 
         /* create subnet from upstream prefix */
-        if (IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_EUI)) {
+        if (MODULE_GNRC_IPV6_AUTO_SUBNETS_EUI) {
             uint8_t hwaddr[GNRC_NETIF_L2ADDR_MAXLEN];
             int hwaddr_len = netif_get_opt(&downstream->netif, NETOPT_ADDRESS, 0,
                                            hwaddr, sizeof(hwaddr));
@@ -510,7 +510,7 @@ void gnrc_ipv6_nib_rtr_adv_pio_cb(gnrc_netif_t *upstream, const ndp_opt_pi_t *pi
         return;
     }
 
-#if IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE)
+#if MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE
     /* 'don't broadcast RA if we are a 6lo node - unicast allows l2 retransmissions */
     if (!gnrc_netif_is_6ln(upstream)) {
         src = NULL;
@@ -533,10 +533,10 @@ void gnrc_ipv6_nib_rtr_adv_pio_cb(gnrc_netif_t *upstream, const ndp_opt_pi_t *pi
     };
 
     msg_send(&m, _server_pid);
-#endif /* !IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE) */
+#endif /* !MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE */
 }
 
-#if !IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE)
+#if !MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE
 /**
  * @brief Check if memory region is set to 0
  *
@@ -779,6 +779,6 @@ void gnrc_ipv6_auto_subnets_init(void)
                                 THREAD_PRIORITY_MAIN - 1, 0,
                                 _eventloop, NULL, "auto_subnets");
 }
-#endif /* !IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE) */
+#endif /* !MODULE_GNRC_IPV6_AUTO_SUBNETS_SIMPLE */
 #endif /* !DOXYGEN */
 /** @} */

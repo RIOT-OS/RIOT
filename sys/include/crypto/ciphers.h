@@ -33,9 +33,9 @@ extern "C" {
  * Here we optimize the CIPHERS_MAX_KEY_SIZE to always have the smallest possible
  * value based on which AES key sizes are used.
  */
-#if IS_USED(MODULE_CRYPTO_AES_256)
+#if MODULE_CRYPTO_AES_256
     #define CIPHERS_MAX_KEY_SIZE 32
-#elif IS_USED(MODULE_CRYPTO_AES_192)
+#elif MODULE_CRYPTO_AES_192
     #define CIPHERS_MAX_KEY_SIZE 24
 #else
     #define CIPHERS_MAX_KEY_SIZE 16
@@ -48,8 +48,8 @@ extern "C" {
  *
  * aes          needs CIPHERS_MAX_KEY_SIZE bytes          <br>
  */
-#if IS_USED(MODULE_CRYPTO_AES_256) || IS_USED(MODULE_CRYPTO_AES_192) || \
-    IS_USED(MODULE_CRYPTO_AES_128)
+#if MODULE_CRYPTO_AES_256 || MODULE_CRYPTO_AES_192 || \
+    MODULE_CRYPTO_AES_128
     #define CIPHER_MAX_CONTEXT_SIZE CIPHERS_MAX_KEY_SIZE
 #else
 /* 0 is not a possibility because 0-sized arrays are not allowed in ISO C */

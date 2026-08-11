@@ -30,7 +30,7 @@
 #include "custom_atca_params.h"
 #endif
 
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A)
+#if MODULE_PSA_SECURE_ELEMENT_ATECCX08A
 #include "psa/crypto_types.h"
 #endif
 
@@ -83,7 +83,7 @@ extern "C" {
 
 /**@}*/
 
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A)
+#if MODULE_PSA_SECURE_ELEMENT_ATECCX08A
 /**
  * @brief   Structure to store ATCA device configuration
  */

@@ -30,7 +30,7 @@ typedef struct usbus_dfu_device {
     usbus_interface_t iface;                /**< Control interface */
     usbus_descr_gen_t dfu_descr;            /**< DFU descriptor generator */
     usbus_string_t slot0_str;               /**< Descriptor string for Slot 0 */
-#ifdef MODULE_RIOTBOOT_USB_DFU
+#if MODULE_RIOTBOOT_USB_DFU
     usbus_interface_alt_t iface_alt_slot1;  /**< Alt interface for secondary slot */
     usbus_string_t slot1_str;               /**< Descriptor string for Slot 1 */
     riotboot_flashwrite_t writer;           /**< DFU firmware update state structure */

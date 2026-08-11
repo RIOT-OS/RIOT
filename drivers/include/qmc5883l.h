@@ -237,7 +237,7 @@ int qmc5883l_poweron(const qmc5883l_t *dev);
  */
 int qmc5883l_poweroff(const qmc5883l_t *dev);
 
-#if defined(MODULE_QMC5883L_INT) || defined(DOXYGEN)
+#if MODULE_QMC5883L_INT || defined(DOXYGEN)
 /**
  * @brief   Initialize data ready (DRDY) interrupt notifications
  *
@@ -293,7 +293,7 @@ int qmc5883l_irq_enable(const qmc5883l_t *dev);
  * @return  QMC5883L_BUSERR on any I2C bus error
  */
 int qmc5883l_irq_disable(const qmc5883l_t *dev);
-#endif /* defined(MODULE_QMC5883L_INT) || defined(DOXYGEN) */
+#endif /* MODULE_QMC5883L_INT || defined(DOXYGEN) */
 
 #ifdef __cplusplus
 }

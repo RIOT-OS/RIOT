@@ -28,7 +28,7 @@ extern "C" {
 #include "periph/gpio.h"
 #include <stdint.h>
 
-#if !IS_USED(MODULE_PN532_I2C) && !IS_USED(MODULE_PN532_SPI)
+#if !MODULE_PN532_I2C && !MODULE_PN532_SPI
 #error Please use either pn532_i2c and/or pn532_spi module to enable \
     the functionality on this device
 #endif
@@ -38,16 +38,16 @@ extern "C" {
  */
 typedef struct {
     union {
-#if IS_USED(MODULE_PN532_I2C) || DOXYGEN
+#if MODULE_PN532_I2C || DOXYGEN
         i2c_t i2c;              /**< I2C device */
 #endif
-#if IS_USED(MODULE_PN532_SPI) || DOXYGEN
+#if MODULE_PN532_SPI || DOXYGEN
         spi_t spi;              /**< SPI device */
 #endif
     };
     gpio_t reset;               /**< Reset pin */
     gpio_t irq;                 /**< Interrupt pin */
-#if IS_USED(MODULE_PN532_SPI) || DOXYGEN
+#if MODULE_PN532_SPI || DOXYGEN
     gpio_t nss;                 /**< Chip Select pin (only SPI) */
 #endif
 } pn532_params_t;
@@ -181,7 +181,7 @@ void pn532_reset(const pn532_t *dev);
  */
 int pn532_init(pn532_t *dev, const pn532_params_t *params, pn532_mode_t mode);
 
-#if IS_USED(MODULE_PN532_I2C) || DOXYGEN
+#if MODULE_PN532_I2C || DOXYGEN
 /**
  * @brief   Initialization of PN532 using i2c
  *
@@ -194,7 +194,7 @@ static inline int pn532_init_i2c(pn532_t *dev, const pn532_params_t *params)
 }
 #endif
 
-#if IS_USED(MODULE_PN532_SPI) || DOXYGEN
+#if MODULE_PN532_SPI || DOXYGEN
 /**
  * @brief   Initialization of PN532 using spi
  *

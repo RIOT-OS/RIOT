@@ -133,7 +133,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     /* lock and power on the ADC device  */
     prep(line);
     /* check if this channel is an internal ADC channel */
-    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+    if (MODULE_PERIPH_VBAT && line == VBAT_ADC) {
         vbat_enable();
     }
     /* set resolution and conversion channel */
@@ -145,7 +145,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     /* finally read sample and reset the STRT bit in the status register */
     sample = (int)dev(line)->DR;
     /* check if this channel was an internal ADC channel */
-    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+    if (MODULE_PERIPH_VBAT && line == VBAT_ADC) {
         vbat_disable();
     }
     /* power off and unlock device again */

@@ -169,7 +169,7 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
     return SPI_OK;
 }
 
-#ifdef MODULE_PERIPH_SPI_RECONFIGURE
+#if MODULE_PERIPH_SPI_RECONFIGURE
 void spi_deinit_pins(spi_t bus)
 {
     assert(bus < SPI_NUMOF);

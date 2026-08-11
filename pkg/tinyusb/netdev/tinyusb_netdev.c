@@ -82,7 +82,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         printf("[tinyusb_netdev] %s: send %d byte from %p\n",
                __func__, dev->tx_len, dev->tx_buf);
-        if (IS_ACTIVE(ENABLE_DEBUG_HEXDUMP) && IS_USED(MODULE_OD)) {
+        if (IS_ACTIVE(ENABLE_DEBUG_HEXDUMP) && MODULE_OD) {
             od_hex_dump(dev->tx_buf, dev->tx_len, OD_WIDTH_DEFAULT);
         }
     }
@@ -132,7 +132,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         printf ("[tinyusb_netdev] %s: received %d byte\n", __func__, dev->rx_len);
-        if (IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_OD)) {
+        if (IS_ACTIVE(ENABLE_DEBUG) && MODULE_OD) {
             od_hex_dump(dev->rx_buf, dev->rx_len, OD_WIDTH_DEFAULT);
         }
     }

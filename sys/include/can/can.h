@@ -107,7 +107,7 @@ struct can_frame {
     uint8_t data[CAN_MAX_DLEN] __attribute__((aligned(8)));
 };
 
-#ifdef MODULE_FDCAN
+#if MODULE_FDCAN
 struct canfd_frame {
     canid_t can_id;  /**< 32 bit CAN_ID + EFF/RTR/ERR flags */
     uint8_t len; /**< frame payload length in byte (0 .. CAN_MAX_DLEN) */
@@ -169,7 +169,7 @@ struct can_bittiming_const {
 /**
  * @brief CAN frame
  */
-#ifdef MODULE_FDCAN
+#if MODULE_FDCAN
 typedef struct canfd_frame can_frame_t;
 #else
 typedef struct can_frame can_frame_t;

@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  shell_hooks \
+  #
 DEVELHELP = 0
 BOARD ?= nrf52dk
 include ../Makefile.sys_common

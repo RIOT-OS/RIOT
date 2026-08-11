@@ -1,3 +1,14 @@
+
+MODULE_DEFS_NEEDED += \
+  xtimer \
+  ztimer64_msec \
+  ztimer64_sec \
+  ztimer64_usec \
+  ztimer_msec \
+  ztimer_sec \
+  ztimer_usec \
+  ztimer_xtimer_compat \
+  #
 DEVELHELP ?= 0
 
 # Allow including this Makefile from other apps, as done by

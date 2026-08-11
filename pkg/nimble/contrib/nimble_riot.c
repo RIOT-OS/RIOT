@@ -27,31 +27,31 @@
 #include "host/ble_hs.h"
 #include "host/util/util.h"
 
-#ifdef MODULE_NIMBLE_SVC_GAP
+#if MODULE_NIMBLE_SVC_GAP
 #include "services/gap/ble_svc_gap.h"
 #endif
-#ifdef MODULE_NIMBLE_SVC_GATT
+#if MODULE_NIMBLE_SVC_GATT
 #include "services/gatt/ble_svc_gatt.h"
 #endif
-#ifdef MODULE_NIMBLE_SVC_IPSS
+#if MODULE_NIMBLE_SVC_IPSS
 #include "services/ipss/ble_svc_ipss.h"
 #endif
 
-#ifdef MODULE_NIMBLE_STATCONN
+#if MODULE_NIMBLE_STATCONN
 #include "nimble_statconn.h"
 #endif
 
-#ifdef MODULE_NIMBLE_AUTOADV
+#if MODULE_NIMBLE_AUTOADV
 #include "nimble_autoadv_params.h"
 #include "nimble_autoadv.h"
 #endif
 
-#if defined(MODULE_NIMBLE_AUTOCONN) && !defined(MODULE_NIMBLE_AUTOCONN_NOAUTOINIT)
+#if MODULE_NIMBLE_AUTOCONN && !MODULE_NIMBLE_AUTOCONN_NOAUTOINIT
 #include "nimble_autoconn.h"
 #include "nimble_autoconn_params.h"
 #endif
 
-#ifdef MODULE_NIMBLE_CONTROLLER
+#if MODULE_NIMBLE_CONTROLLER
 #if defined(CPU_FAM_NRF52) || defined(CPU_FAM_NRF51)
 #include "nrf_clock.h"
 #endif
@@ -60,12 +60,12 @@
 static char _stack_controller[NIMBLE_CONTROLLER_STACKSIZE];
 #endif
 
-#ifdef MODULE_NIMBLE_RPBLE
+#if MODULE_NIMBLE_RPBLE
 #include "nimble_rpble.h"
 #include "nimble_rpble_params.h"
 #endif
 
-#ifdef MODULE_NIMBLE_HOST
+#if MODULE_NIMBLE_HOST
 static char _stack_host[NIMBLE_HOST_STACKSIZE];
 
 uint8_t nimble_riot_own_addr_type;
@@ -79,7 +79,7 @@ static void *_host_thread(void *arg)
     nimble_port_init();
     nimble_port_initialized = true;
 
-#ifdef MODULE_NIMBLE_CONTROLLER
+#if MODULE_NIMBLE_CONTROLLER
     /* XXX: NimBLE needs the nRF5x's LF clock to run */
 #if defined(CPU_FAM_NRF52) || defined(CPU_FAM_NRF51)
     clock_start_lf();
@@ -118,7 +118,7 @@ void nimble_riot_init(void)
     int res;
     (void)res;
 
-#if !IS_USED(MODULE_MYNEWT_CORE) && IS_ACTIVE(NIMBLE_CFG_CONTROLLER)
+#if !MODULE_MYNEWT_CORE && IS_ACTIVE(NIMBLE_CFG_CONTROLLER)
     /* in mynewt-nimble and uwb-core OS_CPUTIMER_TIMER_NUM == 5 is NRF_RTC0,
        for nimble this must be used for the BLE stack and must go through
        mynewt timer initialization for it to work properly. The RTC frequency
@@ -151,31 +151,31 @@ void nimble_riot_init(void)
     res = ble_hs_id_infer_auto(0, &nimble_riot_own_addr_type);
     assert(res == 0);
 
-#ifdef MODULE_NIMBLE_NETIF
+#if MODULE_NIMBLE_NETIF
     extern void nimble_netif_init(void);
     nimble_netif_init();
-#ifdef MODULE_SHELL_CMD_NIMBLE_NETIF
+#if MODULE_SHELL_CMD_NIMBLE_NETIF
     extern void sc_nimble_netif_init(void);
     sc_nimble_netif_init();
 #endif
 #endif
 
     /* initialize the configured, built-in services */
-#ifdef MODULE_NIMBLE_SVC_GAP
+#if MODULE_NIMBLE_SVC_GAP
     ble_svc_gap_init();
 #endif
-#ifdef MODULE_NIMBLE_SVC_GATT
+#if MODULE_NIMBLE_SVC_GATT
     ble_svc_gatt_init();
 #endif
-#ifdef MODULE_NIMBLE_SVC_IPSS
+#if MODULE_NIMBLE_SVC_IPSS
     ble_svc_ipss_init();
 #endif
 
-#ifdef MODULE_NIMBLE_STATCONN
+#if MODULE_NIMBLE_STATCONN
     nimble_statconn_init();
 #endif
 
-#if defined(MODULE_NIMBLE_AUTOCONN) && !defined(MODULE_NIMBLE_AUTOCONN_NOAUTOINIT)
+#if MODULE_NIMBLE_AUTOCONN && !MODULE_NIMBLE_AUTOCONN_NOAUTOINIT
     ble_gatts_start();
     /* CAUTION: this must be called after nimble_netif_init() and also only
      *          after the GATT server has been initialized */
@@ -184,18 +184,18 @@ void nimble_riot_init(void)
     nimble_autoconn_enable();
 #endif
 
-#ifdef MODULE_STDIO_NIMBLE
+#if MODULE_STDIO_NIMBLE
     extern void stdio_nimble_init(void);
     /* stdio_nimble_init() needs to be called after nimble stack initialization
      * and before nimble_autoadv_init() */
     stdio_nimble_init();
 #endif
 
-#ifdef MODULE_NIMBLE_AUTOADV
+#if MODULE_NIMBLE_AUTOADV
     nimble_autoadv_init(&nimble_autoadv_cfg);
 #endif
 
-#ifdef MODULE_NIMBLE_RPBLE
+#if MODULE_NIMBLE_RPBLE
     res = nimble_rpble_init(&nimble_rpble_params);
     assert(res == 0);
 #endif
@@ -207,11 +207,11 @@ int nimble_riot_get_phy_hci(uint8_t mode)
     switch (mode) {
     case NIMBLE_PHY_1M:
         return BLE_HCI_LE_PHY_1M;
-#if IS_USED(MODULE_NIMBLE_PHY_2MBIT)
+#if MODULE_NIMBLE_PHY_2MBIT
     case NIMBLE_PHY_2M:
         return BLE_HCI_LE_PHY_2M;
 #endif
-#if IS_USED(MODULE_NIMBLE_PHY_CODED)
+#if MODULE_NIMBLE_PHY_CODED
     case NIMBLE_PHY_CODED:
         return BLE_HCI_LE_PHY_CODED;
 #endif

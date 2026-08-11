@@ -318,7 +318,7 @@ void wdt_setup_reboot(uint32_t min_time, uint32_t max_time);
  */
 void wdt_init(void);
 
-#if defined(MODULE_PERIPH_WDT_CB) || defined(DOXYGEN)
+#if MODULE_PERIPH_WDT_CB || defined(DOXYGEN)
 /**
  * @defgroup    drivers_periph_wdt_conf  WDT compile configurations
  * @ingroup     drivers_periph_wdt

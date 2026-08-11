@@ -56,7 +56,7 @@ extern "C" {
 #define BQ2429X_PARAM_VREG      BQ2429X_VREG_4208
 #endif
 
-#if !IS_USED(MODULE_BQ2429X_INT)
+#if !MODULE_BQ2429X_INT
 
 #ifndef BQ2429X_PARAMS
 #define BQ2429X_PARAMS  { \
@@ -70,7 +70,7 @@ extern "C" {
                         }
 #endif
 
-#else /* !IS_USED(MODULE_BQ2429X_INT) */
+#else /* !MODULE_BQ2429X_INT */
 
 #ifndef BQ2429X_PARAMS
 #define BQ2429X_PARAMS  { \
@@ -85,7 +85,7 @@ extern "C" {
                         }
 #endif
 
-#endif /* !IS_USED(MODULE_BQ2429X_INT) */
+#endif /* !MODULE_BQ2429X_INT */
 
 static bq2429x_params_t bq2429x_params[] = {
     BQ2429X_PARAMS,

@@ -25,7 +25,7 @@
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
-#if IS_USED(MODULE_DISP_DEV)
+#if MODULE_DISP_DEV
 #include "disp_dev.h"
 #endif
 
@@ -208,7 +208,7 @@ void ltdc_fill(uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2, const uint16_
     LTDC->SRCR = LTDC_SRCR_IMR;
 }
 
-#if IS_USED(MODULE_DISP_DEV)
+#if MODULE_DISP_DEV
 static void _ltdc_map(const disp_dev_t *disp_dev, const disp_dev_area_t *area, const uint16_t *color)
 {
     (void)disp_dev;

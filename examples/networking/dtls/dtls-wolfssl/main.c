@@ -31,7 +31,7 @@ static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 extern int dtls_client(int argc, char **argv);
 extern int dtls_server(int argc, char **argv);
 
-#ifdef MODULE_WOLFCRYPT_TEST
+#if MODULE_WOLFCRYPT_TEST
 extern int wolfcrypt_test(void* args);
 static int wolftest(int argc, char **argv)
 {

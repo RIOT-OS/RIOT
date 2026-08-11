@@ -175,3 +175,14 @@ endif
 
 $(BINDIR)/partitions.bin: $(PARTITION_TABLE_CSV)
 	$(Q)python3 $(RIOTTOOLS)/esptools/gen_esp32part.py --verify $< $@
+
+MODULE_DEFS_NEEDED += \
+  esp_idf_heap \
+  esp_log_colored \
+  esp_log_tagged \
+  esp_now \
+  esp_wifi \
+  esp_wifi_ap \
+  gnrc \
+  log_printfnoformat \
+  #

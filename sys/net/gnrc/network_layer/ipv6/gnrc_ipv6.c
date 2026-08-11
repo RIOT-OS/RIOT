@@ -34,11 +34,11 @@
 #include "net/gnrc/ipv6/whitelist.h"
 #include "net/gnrc/ipv6/blacklist.h"
 
-#ifdef MODULE_GNRC_IPV6_EXT_FRAG
+#if MODULE_GNRC_IPV6_EXT_FRAG
 #include "net/gnrc/ipv6/ext/frag.h"
 #endif
 
-#ifdef MODULE_FIB
+#if MODULE_FIB
 #include "net/fib.h"
 #include "net/fib/table.h"
 #endif
@@ -53,7 +53,7 @@
 static char _stack[GNRC_IPV6_STACK_SIZE + DEBUG_EXTRA_STACKSIZE];
 static msg_t _msg_q[GNRC_IPV6_MSG_QUEUE_SIZE];
 
-#ifdef MODULE_FIB
+#if MODULE_FIB
 /**
  * @brief buffer to store the entries in the IPv6 forwarding table
  */
@@ -76,7 +76,7 @@ static void _receive(gnrc_pktsnip_t *pkt);
  * assume it is already prepared */
 static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr);
 
-#ifdef MODULE_GNRC_IPV6_EXT_FRAG
+#if MODULE_GNRC_IPV6_EXT_FRAG
 static void _send_by_netif_hdr(gnrc_pktsnip_t *pkt);
 #endif  /* MODULE_GNRC_IPV6_EXT_FRAG */
 /* Main event loop for IPv6 */
@@ -90,7 +90,7 @@ kernel_pid_t gnrc_ipv6_init(void)
                                       _event_loop, NULL, "ipv6");
     }
 
-#ifdef MODULE_FIB
+#if MODULE_FIB
     gnrc_ipv6_fib_table.data.entries = _fib_entries;
     gnrc_ipv6_fib_table.table_type = FIB_TABLE_TYPE_SH;
     gnrc_ipv6_fib_table.size = GNRC_IPV6_FIB_TABLE_SIZE;
@@ -104,7 +104,7 @@ static void _dispatch_next_header(gnrc_pktsnip_t *pkt, unsigned nh,
                                   bool interested);
 
 static inline bool _gnrc_ipv6_is_interested(unsigned nh) {
-#ifdef MODULE_GNRC_ICMPV6
+#if MODULE_GNRC_ICMPV6
     return (nh == PROTNUM_ICMPV6);
 #else  /* MODULE_GNRC_ICMPV6 */
     return false;
@@ -116,7 +116,7 @@ static void _demux(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, unsigned nh)
     pkt->type = gnrc_nettype_from_protnum(nh);
     _dispatch_next_header(pkt, nh, _gnrc_ipv6_is_interested(nh));
     switch (nh) {
-#ifdef MODULE_GNRC_ICMPV6
+#if MODULE_GNRC_ICMPV6
         case PROTNUM_ICMPV6:
             DEBUG("ipv6: handle ICMPv6 packet (nh = %u)\n", nh);
             gnrc_icmpv6_demux(netif, pkt);
@@ -254,7 +254,7 @@ static inline void _on_l2_disconnected(kernel_pid_t if_pid, uint8_t *l2addr, uin
  */
 static inline void _netapi_notify_event(gnrc_netapi_notify_t *notify)
 {
-    if (!IS_USED(MODULE_GNRC_NETAPI_NOTIFY)) {
+    if (!MODULE_GNRC_NETAPI_NOTIFY) {
         return;
     }
 
@@ -286,7 +286,7 @@ static void *_event_loop(void *args)
     /* Register entry for messages in IPv6 context. */
     gnrc_netreg_entry_t me_ipv6_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
                                                                  thread_getpid());
-#ifdef MODULE_GNRC_NETAPI_NOTIFY
+#if MODULE_GNRC_NETAPI_NOTIFY
     /* Register entry for messages in L2 discovery context. */
     gnrc_netreg_entry_t me_discovery_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
                                                                       thread_getpid());
@@ -296,14 +296,14 @@ static void *_event_loop(void *args)
     msg_init_queue(_msg_q, GNRC_IPV6_MSG_QUEUE_SIZE);
 
     /* initialize fragmentation data-structures */
-#ifdef MODULE_GNRC_IPV6_EXT_FRAG
+#if MODULE_GNRC_IPV6_EXT_FRAG
     gnrc_ipv6_ext_frag_init();
 #endif  /* MODULE_GNRC_IPV6_EXT_FRAG */
 
     /* Register interest in all IPv6 packets. */
     gnrc_netreg_register(GNRC_NETTYPE_IPV6, &me_ipv6_reg);
 
-#ifdef MODULE_GNRC_NETAPI_NOTIFY
+#if MODULE_GNRC_NETAPI_NOTIFY
     /* Register interest in L2 neighbor discovery info. */
     gnrc_netreg_register(GNRC_NETTYPE_L2_DISCOVERY, &me_discovery_reg);
 #endif /* MODULE_GNRC_NETAPI_NOTIFY */
@@ -337,7 +337,7 @@ static void *_event_loop(void *args)
                 DEBUG("ipv6: GNRC_NETAPI_MSG_TYPE_NOTIFY received\n");
                 _netapi_notify_event(msg.content.ptr);
                 break;
-#ifdef MODULE_GNRC_IPV6_EXT_FRAG
+#if MODULE_GNRC_IPV6_EXT_FRAG
             case GNRC_IPV6_EXT_FRAG_RBUF_GC:
                 gnrc_ipv6_ext_frag_rbuf_gc();
                 break;
@@ -401,7 +401,7 @@ static void _send_to_iface(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     DEBUG("dst = %s, next header = %u, length = %u)\n",
           ipv6_addr_to_str(addr_str, &hdr->dst, sizeof(addr_str)), hdr->nh,
           byteorder_ntohs(hdr->len));
-#ifdef MODULE_NETSTATS_IPV6
+#if MODULE_NETSTATS_IPV6
     /* This is read from the netif thread. To prevent data corruptions, we
      * have to guarantee mutually exclusive access */
     unsigned irq_state = irq_disable();
@@ -410,7 +410,7 @@ static void _send_to_iface(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     irq_restore(irq_state);
 #endif
 
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if MODULE_GNRC_SIXLOWPAN
     if (gnrc_netif_is_6lo(netif)) {
         DEBUG("ipv6: send to 6LoWPAN instead\n");
         if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_SIXLOWPAN, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
@@ -450,7 +450,7 @@ static gnrc_pktsnip_t *_create_netif_hdr(uint8_t *dst_l2addr,
 
 static bool _is_ipv6_hdr(gnrc_pktsnip_t *hdr)
 {
-#ifdef MODULE_GNRC_IPV6_EXT
+#if MODULE_GNRC_IPV6_EXT
     return (hdr->type == GNRC_NETTYPE_IPV6) ||
            (hdr->type == GNRC_NETTYPE_IPV6_EXT);
 #else
@@ -586,7 +586,7 @@ static bool _fragment_pkt_if_needed(gnrc_pktsnip_t *pkt,
                                     gnrc_netif_t *netif,
                                     bool from_me)
 {
-#ifdef MODULE_GNRC_IPV6_EXT_FRAG
+#if MODULE_GNRC_IPV6_EXT_FRAG
     /* TODO: get path MTU when PMTU discovery is implemented */
     unsigned path_mtu = netif->ipv6.mtu;
 
@@ -604,7 +604,7 @@ static bool _fragment_pkt_if_needed(gnrc_pktsnip_t *pkt,
     return false;
 }
 
-#ifdef MODULE_GNRC_IPV6_EXT_FRAG
+#if MODULE_GNRC_IPV6_EXT_FRAG
 static void _send_by_netif_hdr(gnrc_pktsnip_t *pkt)
 {
     assert(pkt->type == GNRC_NETTYPE_NETIF);
@@ -644,7 +644,7 @@ static void _send_unicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
         DEBUG("ipv6: send unicast over interface %" PRIkernel_pid "\n",
               netif->pid);
         /* and send to interface */
-#ifdef MODULE_NETSTATS_IPV6
+#if MODULE_NETSTATS_IPV6
         /* This is read from the netif thread. To prevent data corruptions, we
          * have to guarantee mutually exclusive access */
         unsigned irq_state = irq_disable();
@@ -671,7 +671,7 @@ static inline void _send_multicast_over_iface(gnrc_pktsnip_t *pkt,
         return;
     }
     DEBUG("ipv6: send multicast over interface %" PRIkernel_pid "\n", netif->pid);
-#ifdef MODULE_NETSTATS_IPV6
+#if MODULE_NETSTATS_IPV6
     /* This is read from the netif thread. To prevent data corruptions, we
      * have to guarantee mutually exclusive access */
     unsigned irq_state = irq_disable();
@@ -887,7 +887,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 
     if (netif_hdr != NULL) {
         netif = gnrc_netif_hdr_get_netif(netif_hdr->data);
-#ifdef MODULE_NETSTATS_IPV6
+#if MODULE_NETSTATS_IPV6
         assert(netif != NULL);
         /* This is read from the netif thread. To prevent data corruptions, we
          * have to guarantee mutually exclusive access */
@@ -905,7 +905,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
         gnrc_pktbuf_release(pkt);
         return;
     }
-#ifdef MODULE_GNRC_IPV6_WHITELIST
+#if MODULE_GNRC_IPV6_WHITELIST
     else if (!gnrc_ipv6_whitelisted(&((ipv6_hdr_t *)(pkt->data))->src)) {
         DEBUG("ipv6: Source address not whitelisted, dropping packet\n");
         gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_PROHIB, pkt);
@@ -913,7 +913,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
         return;
     }
 #endif
-#ifdef MODULE_GNRC_IPV6_BLACKLIST
+#if MODULE_GNRC_IPV6_BLACKLIST
     else if (gnrc_ipv6_blacklisted(&((ipv6_hdr_t *)(pkt->data))->src)) {
         DEBUG("ipv6: Source address blacklisted, dropping packet\n");
         gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_PROHIB, pkt);
@@ -992,7 +992,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
     if (_pkt_not_for_me(&netif, hdr)) { /* if packet is not for me */
         DEBUG("ipv6: packet destination not this host\n");
 
-#ifdef MODULE_GNRC_IPV6_ROUTER    /* only routers redirect */
+#if MODULE_GNRC_IPV6_ROUTER    /* only routers redirect */
         /* redirect to next hop */
         DEBUG("ipv6: decrement hop limit to %u\n", (uint8_t) (hdr->hl - 1));
 
@@ -1003,7 +1003,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
         if ((ipv6_addr_is_link_local(&(hdr->src))) || (ipv6_addr_is_link_local(&(hdr->dst)))) {
             DEBUG("ipv6: do not forward packets with link-local source or"
                   " destination address\n");
-#ifdef MODULE_GNRC_ICMPV6_ERROR
+#if MODULE_GNRC_ICMPV6_ERROR
             if (ipv6_addr_is_link_local(&(hdr->src)) &&
                 !ipv6_addr_is_link_local(&(hdr->dst))) {
                 gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_SCOPE, pkt);

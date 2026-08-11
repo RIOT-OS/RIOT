@@ -13,3 +13,8 @@ ifneq (1,$(words $(filter-out prng_shaxprng,$(USED_PRNG_IMPLEMENTATIONS))))
   $(info Currently the following prng modules are used: $(USED_PRNG_IMPLEMENTATIONS))
   $(error Only one implementation of PRNG should be used.)
 endif
+
+MODULE_DEFS_NEEDED += \
+  fortuna_reseed \
+  ztimer_msec \
+  #

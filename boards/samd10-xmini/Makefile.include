@@ -2,3 +2,7 @@
 BAUD ?= 57600
 
 include $(RIOTMAKE)/boards/sam0.inc.mk
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_hw_fc \
+  #

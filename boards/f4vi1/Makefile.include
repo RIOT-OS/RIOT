@@ -14,3 +14,7 @@ DEBUGSERVER = st-util
 FLASHFILE ?= $(BINFILE)
 FFLAGS = write $(FLASHFILE) 0x8000000
 DEBUGGER_FLAGS = $(RIOTBOARD)/f4vi1/dist/gdb.conf $(DEBUG_ELFFILE)
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  #

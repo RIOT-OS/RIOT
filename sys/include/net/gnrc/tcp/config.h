@@ -66,25 +66,27 @@ extern "C" {
  * @brief Maximum Segment Size (MSS).
  */
 #ifndef CONFIG_GNRC_TCP_MSS
-#ifdef  MODULE_GNRC_IPV6
-#define CONFIG_GNRC_TCP_MSS (1220U) /**< If IPv6 is used. Get MSS = 1280 - IPv6 Hdr - TCP Hdr = 1220 */
-#else
-#define CONFIG_GNRC_TCP_MSS (576U) /**< Default MSS */
-#endif
+#  if MODULE_GNRC_IPV6
+/** If IPv6 is used. Get MSS = 1280 - IPv6 Hdr - TCP Hdr = 1220 */
+#    define CONFIG_GNRC_TCP_MSS (1220U)
+#  else
+#    define CONFIG_GNRC_TCP_MSS (576U) /**< Default MSS */
+#  endif
 #endif
 
 /**
  * @brief MSS Multiplicator = Number of MSS sized packets stored in receive buffer
  */
 #ifndef CONFIG_GNRC_TCP_MSS_MULTIPLICATOR
-#define CONFIG_GNRC_TCP_MSS_MULTIPLICATOR (1U)
+#  define CONFIG_GNRC_TCP_MSS_MULTIPLICATOR (1U)
 #endif
 
 /**
  * @brief Default receive window size
  */
 #ifndef CONFIG_GNRC_TCP_DEFAULT_WINDOW
-#define CONFIG_GNRC_TCP_DEFAULT_WINDOW (CONFIG_GNRC_TCP_MSS * CONFIG_GNRC_TCP_MSS_MULTIPLICATOR)
+#  define CONFIG_GNRC_TCP_DEFAULT_WINDOW \
+    (CONFIG_GNRC_TCP_MSS * CONFIG_GNRC_TCP_MSS_MULTIPLICATOR)
 #endif
 
 /**
@@ -94,74 +96,74 @@ extern "C" {
  * same time.
  */
 #ifndef CONFIG_GNRC_TCP_RCV_BUFFERS
-#define CONFIG_GNRC_TCP_RCV_BUFFERS (1U)
+#  define CONFIG_GNRC_TCP_RCV_BUFFERS (1U)
 #endif
 
 /**
  * @brief Default receive buffer size
  */
 #ifndef GNRC_TCP_RCV_BUF_SIZE
-#define GNRC_TCP_RCV_BUF_SIZE (CONFIG_GNRC_TCP_DEFAULT_WINDOW)
+#  define GNRC_TCP_RCV_BUF_SIZE (CONFIG_GNRC_TCP_DEFAULT_WINDOW)
 #endif
 
 /**
  * @brief Lower bound for RTO in milliseconds. Default is 1 sec (see RFC 6298)
  *
- * @note Retransmission Timeout (RTO) determines how long TCP waits for
- * acknowledgment (ACK) of transmitted segment. If the acknowledgment
- * isn't received within this time it is considered lost.
+ * @note    Retransmission Timeout (RTO) determines how long TCP waits for
+ *          acknowledgment (ACK) of transmitted segment. If the acknowledgment
+ *          isn't received within this time it is considered lost.
  */
 #ifndef CONFIG_GNRC_TCP_RTO_LOWER_BOUND_MS
-#define CONFIG_GNRC_TCP_RTO_LOWER_BOUND_MS (1U * MS_PER_SEC)
+#  define CONFIG_GNRC_TCP_RTO_LOWER_BOUND_MS (1U * MS_PER_SEC)
 #endif
 
 /**
  * @brief Upper bound for RTO in milliseconds. Default is 60 sec (see RFC 6298)
  */
 #ifndef CONFIG_GNRC_TCP_RTO_UPPER_BOUND_MS
-#define CONFIG_GNRC_TCP_RTO_UPPER_BOUND_MS (60U * MS_PER_SEC)
+#  define CONFIG_GNRC_TCP_RTO_UPPER_BOUND_MS (60U * MS_PER_SEC)
 #endif
 
 /**
  * @brief Clock granularity for TCP in milliseconds. Default is 10 milliseconds (see RFC 6298)
  */
 #ifndef CONFIG_GNRC_TCP_RTO_GRANULARITY_MS
-#define CONFIG_GNRC_TCP_RTO_GRANULARITY_MS (10U)
+#  define CONFIG_GNRC_TCP_RTO_GRANULARITY_MS (10U)
 #endif
 
 /**
  * @brief Alpha value for RTO calculation, default is 1/8
  */
 #ifndef CONFIG_GNRC_TCP_RTO_A_DIV
-#define CONFIG_GNRC_TCP_RTO_A_DIV (8U)
+#  define CONFIG_GNRC_TCP_RTO_A_DIV (8U)
 #endif
 
 /**
  * @brief Beta value for RTO calculation, default is 1/4
  */
 #ifndef CONFIG_GNRC_TCP_RTO_B_DIV
-#define CONFIG_GNRC_TCP_RTO_B_DIV (4U)
+#  define CONFIG_GNRC_TCP_RTO_B_DIV (4U)
 #endif
 
 /**
  * @brief K value for RTO calculation, default is 4
  */
 #ifndef CONFIG_GNRC_TCP_RTO_K
-#define CONFIG_GNRC_TCP_RTO_K (4U)
+#  define CONFIG_GNRC_TCP_RTO_K (4U)
 #endif
 
 /**
  * @brief Lower bound for the duration between probes in milliseconds. Default is 1 seconds
  */
 #ifndef CONFIG_GNRC_TCP_PROBE_LOWER_BOUND_MS
-#define CONFIG_GNRC_TCP_PROBE_LOWER_BOUND_MS (1U * MS_PER_SEC)
+#  define CONFIG_GNRC_TCP_PROBE_LOWER_BOUND_MS (1U * MS_PER_SEC)
 #endif
 
 /**
  * @brief Upper bound for the duration between probes in milliseconds. Default is 60 seconds
  */
 #ifndef CONFIG_GNRC_TCP_PROBE_UPPER_BOUND_MS
-#define CONFIG_GNRC_TCP_PROBE_UPPER_BOUND_MS (60U * MS_PER_SEC)
+#  define CONFIG_GNRC_TCP_PROBE_UPPER_BOUND_MS (60U * MS_PER_SEC)
 #endif
 
 /**
@@ -170,7 +172,7 @@ extern "C" {
  *       This value defines the exponent of 2^n.
  */
 #ifndef CONFIG_GNRC_TCP_MSG_QUEUE_SIZE_EXP
-#define CONFIG_GNRC_TCP_MSG_QUEUE_SIZE_EXP (2U)
+#  define CONFIG_GNRC_TCP_MSG_QUEUE_SIZE_EXP (2U)
 #endif
 
 /**
@@ -179,7 +181,7 @@ extern "C" {
  *       This value defines the exponent of 2^n.
  */
 #ifndef CONFIG_GNRC_TCP_EVENTLOOP_MSG_QUEUE_SIZE_EXP
-#define CONFIG_GNRC_TCP_EVENTLOOP_MSG_QUEUE_SIZE_EXP (3U)
+#  define CONFIG_GNRC_TCP_EVENTLOOP_MSG_QUEUE_SIZE_EXP (3U)
 #endif
 
 /**
@@ -191,7 +193,7 @@ extern "C" {
  *       faster return times on gnrc_tcp_close.
  */
 #ifndef CONFIG_GNRC_TCP_EXPERIMENTAL_DYN_MSL_EN
-#define CONFIG_GNRC_TCP_EXPERIMENTAL_DYN_MSL_EN 0
+#  define CONFIG_GNRC_TCP_EXPERIMENTAL_DYN_MSL_EN 0
 #endif
 
 /**

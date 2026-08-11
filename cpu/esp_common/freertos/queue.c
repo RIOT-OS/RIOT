@@ -19,7 +19,7 @@
 #include "rmutex.h"
 #include "syscalls.h"
 #include "thread.h"
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
 #include "ztimer.h"
 #endif
 
@@ -218,7 +218,7 @@ BaseType_t IRAM_ATTR xQueueReset( QueueHandle_t xQueue )
     return pdPASS;
 }
 
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
 
 /* descriptor for timeout handling for a thread that is waiting in a queue */
 typedef struct {
@@ -347,7 +347,7 @@ BaseType_t IRAM_ATTR _queue_generic_send(QueueHandle_t xQueue,
             DEBUG("%s pid=%d queue=%p suspended calling thread\n", __func__,
                   thread_getpid(), xQueue);
 
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
             _queue_waiting_thread_t wdt = { .queue = &queue->sending,
                                             .thread = me,
                                             .timeout = false };
@@ -362,7 +362,7 @@ BaseType_t IRAM_ATTR _queue_generic_send(QueueHandle_t xQueue,
             vTaskExitCritical(0);
             thread_yield_higher();
 
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
             vTaskEnterCritical(0);
             if (xTicksToWait < portMAX_DELAY) {
                 ztimer_remove(ZTIMER_MSEC, &tm);
@@ -475,7 +475,7 @@ BaseType_t IRAM_ATTR _queue_generic_recv (QueueHandle_t xQueue,
             DEBUG("%s pid=%d queue=%p suspended calling thread\n", __func__,
                   thread_getpid(), xQueue);
 
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
             _queue_waiting_thread_t wdt = { .queue = &queue->receiving,
                                             .thread = me,
                                             .timeout = false };
@@ -490,7 +490,7 @@ BaseType_t IRAM_ATTR _queue_generic_recv (QueueHandle_t xQueue,
             vTaskExitCritical(0);
             thread_yield_higher();
 
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
             vTaskEnterCritical(0);
             if (xTicksToWait < portMAX_DELAY) {
                 ztimer_remove(ZTIMER_MSEC, &tm);

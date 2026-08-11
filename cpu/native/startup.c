@@ -55,57 +55,57 @@ pid_t _native_id;
 unsigned _native_rng_seed = 0;
 int _native_rng_mode = 0;
 
-#ifdef MODULE_NETDEV_TAP
+#if MODULE_NETDEV_TAP
 #include "netdev_tap_params.h"
 
 netdev_tap_params_t netdev_tap_params[NETDEV_TAP_MAX];
 #endif
-#ifdef MODULE_MTD_NATIVE
+#if MODULE_MTD_NATIVE
 #include "board.h"
 #include "mtd_native.h"
 #endif
-#ifdef MODULE_PERIPH_CAN
+#if MODULE_PERIPH_CAN
 #include "candev_linux.h"
 #endif
-#ifdef MODULE_PERIPH_SPIDEV_LINUX
+#if MODULE_PERIPH_SPIDEV_LINUX
 #include "spidev_linux.h"
 #endif
-#ifdef MODULE_PERIPH_GPIO_LINUX
+#if MODULE_PERIPH_GPIO_LINUX
 #include "gpiodev_linux.h"
 #endif
-#ifdef MODULE_NATIVE_CLI_EUI_PROVIDER
+#if MODULE_NATIVE_CLI_EUI_PROVIDER
 #include "native_cli_eui_provider.h"
 #endif
-#ifdef MODULE_SOCKET_ZEP
+#if MODULE_SOCKET_ZEP
 #include "socket_zep_params.h"
 
 socket_zep_params_t socket_zep_params[SOCKET_ZEP_MAX];
 #endif
-#ifdef MODULE_PERIPH_EEPROM
+#if MODULE_PERIPH_EEPROM
 #include "eeprom_native.h"
 extern char eeprom_file[EEPROM_FILEPATH_MAX_LEN];
 #endif
 
 static const char short_opts[] = ":hi:s:deEoc:"
-#ifdef MODULE_PERIPH_GPIO_LINUX
+#if MODULE_PERIPH_GPIO_LINUX
     "g:"
 #endif
-#ifdef MODULE_MTD_NATIVE
+#if MODULE_MTD_NATIVE
     "m:"
 #endif
-#ifdef MODULE_PERIPH_CAN
+#if MODULE_PERIPH_CAN
     "n:"
 #endif
-#ifdef MODULE_SOCKET_ZEP
+#if MODULE_SOCKET_ZEP
     "z:"
 #endif
-#ifdef MODULE_NATIVE_CLI_EUI_PROVIDER
+#if MODULE_NATIVE_CLI_EUI_PROVIDER
     "U:"
 #endif
-#ifdef MODULE_PERIPH_SPIDEV_LINUX
+#if MODULE_PERIPH_SPIDEV_LINUX
     "p:"
 #endif
-#ifdef MODULE_NETDEV_TAP
+#if MODULE_NETDEV_TAP
     "w:"
 #endif
     "";
@@ -127,25 +127,25 @@ static const struct option long_opts[] = {
     { "stderr-noredirect", no_argument, NULL, 'E' },
     { "stdout-pipe", no_argument, NULL, 'o' },
     { "uart-tty", required_argument, NULL, 'c' },
-#ifdef MODULE_PERIPH_GPIO_LINUX
+#if MODULE_PERIPH_GPIO_LINUX
     { "gpio", required_argument, NULL, 'g' },
 #endif
-#ifdef MODULE_MTD_NATIVE
+#if MODULE_MTD_NATIVE
     { "mtd", required_argument, NULL, 'm' },
 #endif
-#ifdef MODULE_PERIPH_CAN
+#if MODULE_PERIPH_CAN
     { "can", required_argument, NULL, 'n' },
 #endif
-#ifdef MODULE_SOCKET_ZEP
+#if MODULE_SOCKET_ZEP
     { "zep", required_argument, NULL, 'z' },
 #endif
-#ifdef MODULE_NATIVE_CLI_EUI_PROVIDER
+#if MODULE_NATIVE_CLI_EUI_PROVIDER
     { "eui64", required_argument, NULL, 'U' },
 #endif
-#ifdef MODULE_PERIPH_SPIDEV_LINUX
+#if MODULE_PERIPH_SPIDEV_LINUX
     { "spi", required_argument, NULL, 'p' },
 #endif
-#ifdef MODULE_PERIPH_EEPROM
+#if MODULE_PERIPH_EEPROM
     { "eeprom", required_argument, NULL, 'M' },
 #endif
     { NULL, 0, NULL, '\0' },
@@ -273,17 +273,17 @@ void usage_exit(int status)
 {
     real_printf("usage: %s", _progname);
 
-#if defined(MODULE_NETDEV_TAP)
+#if MODULE_NETDEV_TAP
     for (int i = 0; i < NETDEV_TAP_MAX; i++) {
         real_printf(" <tap interface %d>", i + 1);
     }
 #endif
     real_printf(" [-i <id>] [-d] [-e|-E] [-o] [-c <tty>]");
-#ifdef MODULE_PERIPH_GPIO_LINUX
+#if MODULE_PERIPH_GPIO_LINUX
     real_printf(" [-g <gpiochip>]");
 #endif
     real_printf(" [-i <id>] [-d] [-e|-E] [-o] [-c <tty>]");
-#if defined(MODULE_SOCKET_ZEP) && (SOCKET_ZEP_MAX > 0)
+#if MODULE_SOCKET_ZEP && (SOCKET_ZEP_MAX > 0)
     real_printf(" -z [[<laddr>:<lport>,]<raddr>:<rport>]");
     for (int i = 0; i < SOCKET_ZEP_MAX - 1; i++) {
         /* for further interfaces the local address must be different so we omit
@@ -291,10 +291,10 @@ void usage_exit(int status)
         real_printf(" -z <laddr>:<lport>,<raddr>:<rport>");
     }
 #endif
-#ifdef MODULE_NATIVE_CLI_EUI_PROVIDER
+#if MODULE_NATIVE_CLI_EUI_PROVIDER
     real_printf(" [--eui64 <eui64> …]");
 #endif
-#ifdef MODULE_PERIPH_SPIDEV_LINUX
+#if MODULE_PERIPH_SPIDEV_LINUX
     real_printf(" [-p <b>:<d>:<spidev>]");
 #endif
 
@@ -323,13 +323,13 @@ void usage_exit(int status)
 "    -c <tty>, --uart-tty=<tty>\n"
 "        specify TTY device for UART. This argument can be used multiple\n"
 "        times (up to UART_NUMOF)\n"
-#ifdef MODULE_PERIPH_GPIO_LINUX
+#if MODULE_PERIPH_GPIO_LINUX
 "    -g <gpio>, --gpio=<gpio>\n"
 "        specify gpiochip device for GPIO access.\n"
 "        This argument can be used multiple times.\n"
 "        Example: --gpio=/dev/gpiochip0 uses gpiochip0 for port 0\n"
 #endif
-#if defined(MODULE_SOCKET_ZEP) && (SOCKET_ZEP_MAX > 0)
+#if MODULE_SOCKET_ZEP && (SOCKET_ZEP_MAX > 0)
 "    -z [<laddr>:<lport>,]<raddr>:<rport> --zep=[<laddr>:<lport>,]<raddr>:<rport>\n"
 "        provide a ZEP interface with an (optional) local address and port\n"
 "        (<laddr>:<lport>) and a remote address and port (<raddr>:<rport>).\n"
@@ -337,24 +337,24 @@ void usage_exit(int status)
 "        on a local address.\n"
 "        Required to be provided SOCKET_ZEP_MAX times\n"
 #endif
-#ifdef MODULE_NATIVE_CLI_EUI_PROVIDER
+#if MODULE_NATIVE_CLI_EUI_PROVIDER
 "    -U <eui64>, --eui64=<eui64>\n"
 "        provide a ZEP interface with EUI-64 (MAC address)\n"
 "        This argument can be provided multiple times\n"
 #endif
     );
-#ifdef MODULE_MTD_NATIVE
+#if MODULE_MTD_NATIVE
     real_printf(
 "    -m <mtd>, --mtd=<mtd>\n"
 "       specify the file name of mtd emulated device\n");
 #endif
-#if defined(MODULE_PERIPH_CAN)
+#if MODULE_PERIPH_CAN
     real_printf(
 "    -n <ifnum>:<ifname>, --can <ifnum>:<ifname>\n"
 "        specify CAN interface <ifname> to use for CAN device #<ifnum>\n"
 "        max number of CAN device: %d\n", CAN_DLL_NUMOF);
 #endif
-#ifdef MODULE_PERIPH_SPIDEV_LINUX
+#if MODULE_PERIPH_SPIDEV_LINUX
     real_printf(
 "    -p <b>:<d>:<spidev>, --spi=<b>:<d>:<spidev>\n"
 "        specify Linux SPI device to use for CS line d on bus b (in RIOT)\n"
@@ -363,13 +363,13 @@ void usage_exit(int status)
 "        Supports up to %d buses with %d CS lines each.\n", SPI_NUMOF, SPI_MAXCS
     );
 #endif
-#ifdef MODULE_PERIPH_EEPROM
+#if MODULE_PERIPH_EEPROM
     real_printf(
 "    -M <eeprom> , --eeprom=<eeprom>\n"
 "        Specify the file path where the EEPROM content is stored\n"
 "        Example: --eeprom=/tmp/riot_native.eeprom\n");
 #endif
-#ifdef MODULE_NETDEV_TAP
+#if MODULE_NETDEV_TAP
     real_printf(
 "    -w <tap>\n"
 "        Add a tap interface as a wireless interface\n");
@@ -377,7 +377,7 @@ void usage_exit(int status)
     real_exit(status);
 }
 
-#ifdef MODULE_SOCKET_ZEP
+#if MODULE_SOCKET_ZEP
 static void _parse_ep_str(char *ep_str, char **addr, char **port)
 {
     /* read endpoint string in reverse, the last chars are the port and decimal
@@ -520,11 +520,11 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
     _native_id = _native_pid;
 
     int c, opt_idx = 0, uart = 0;
-#ifdef MODULE_NETDEV_TAP
+#if MODULE_NETDEV_TAP
     unsigned taps = 0;
     memset(netdev_tap_params, 0, sizeof(netdev_tap_params));
 #endif
-#ifdef MODULE_SOCKET_ZEP
+#if MODULE_SOCKET_ZEP
     unsigned zeps = 0;
 #endif
     bool dmn = false, force_stderr = false;
@@ -563,7 +563,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
                 }
                 force_stderr = true;
                 break;
-#ifdef MODULE_PERIPH_GPIO_LINUX
+#if MODULE_PERIPH_GPIO_LINUX
             case 'g':
                 if (gpio_linux_setup(optarg) < 0) {
                     usage_exit(EXIT_FAILURE);
@@ -576,12 +576,12 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
             case 'c':
                 tty_uart_setup(uart++, optarg);
                 break;
-#ifdef MODULE_MTD_NATIVE
+#if MODULE_MTD_NATIVE
             case 'm':
                 ((mtd_native_dev_t *)mtd_dev_get(0))->fname = strndup(optarg, PATH_MAX - 1);
                 break;
 #endif
-#if defined(MODULE_PERIPH_CAN)
+#if MODULE_PERIPH_CAN
             case 'n':{
                 int i;
                 i = atol(optarg);
@@ -600,17 +600,17 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
                 }
                 break;
 #endif
-#ifdef MODULE_SOCKET_ZEP
+#if MODULE_SOCKET_ZEP
             case 'z':
                 _zep_params_setup(optarg, zeps++);
                 break;
 #endif
-#ifdef MODULE_NATIVE_CLI_EUI_PROVIDER
+#if MODULE_NATIVE_CLI_EUI_PROVIDER
             case 'U':
                 native_cli_add_eui64(optarg);
                 break;
 #endif
-#ifdef MODULE_PERIPH_SPIDEV_LINUX
+#if MODULE_PERIPH_SPIDEV_LINUX
             case 'p': {
                     long bus = strtol(optarg, &optarg, 10);
                     if (*optarg != ':') {
@@ -626,13 +626,13 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
                 }
                 break;
 #endif
-#ifdef MODULE_PERIPH_EEPROM
+#if MODULE_PERIPH_EEPROM
             case 'M': {
                 strncpy(eeprom_file, optarg, EEPROM_FILEPATH_MAX_LEN);
                 break;
             }
 #endif
-#ifdef MODULE_NETDEV_TAP
+#if MODULE_NETDEV_TAP
             case 'w':
                 netdev_tap_params[taps].tap_name = &argv[optind - 1];
                 netdev_tap_params[taps].wired = false;
@@ -644,7 +644,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
                 break;
         }
     }
-#ifdef MODULE_SOCKET_ZEP
+#if MODULE_SOCKET_ZEP
     if (zeps != SOCKET_ZEP_MAX) {
         /* not enough ZEPs given */
         usage_exit(EXIT_FAILURE);
@@ -707,7 +707,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
 
     native_cpu_init();
     native_interrupt_init();
-#ifdef MODULE_NETDEV_TAP
+#if MODULE_NETDEV_TAP
     for (unsigned i = 0; taps < NETDEV_TAP_MAX; ++taps, ++i) {
         if (argv[optind + i] == NULL) {
             break;
@@ -717,7 +717,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
     }
 #endif
 
-#ifdef MODULE_PERIPH_EEPROM
+#if MODULE_PERIPH_EEPROM
     eeprom_native_read();
 #endif
 

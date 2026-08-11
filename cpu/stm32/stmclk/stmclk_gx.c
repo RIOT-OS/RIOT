@@ -469,7 +469,7 @@ void stmclk_init_sysclk(void)
         gpio_init_af(GPIO_PIN(PORT_A, 8), GPIO_AF0);
     }
 
-#if IS_USED(MODULE_PERIPH_HWRNG)
+#if MODULE_PERIPH_HWRNG
     /* HWRNG is clocked by HSI48 so enable this clock when the peripheral is used */
     RCC->CRRCR |= RCC_CRRCR_HSI48ON;
     while (!(RCC->CRRCR & RCC_CRRCR_HSI48RDY)) {}

@@ -6,3 +6,8 @@ endif
 
 # Include all definitions for flashing with bossa over USB
 include $(RIOTBOARD)/common/samdx1-arduino-bootloader/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  periph_uart_hw_fc \
+  #

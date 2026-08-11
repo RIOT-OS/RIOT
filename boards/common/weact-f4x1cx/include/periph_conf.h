@@ -56,7 +56,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma        = DMA_STREAM_UNDEF,
         .dma_chan   = UINT8_MAX,
 #endif
@@ -70,7 +70,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB2,
         .irqn       = USART1_IRQn,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma        = DMA_STREAM_UNDEF,
         .dma_chan   = UINT8_MAX,
 #endif

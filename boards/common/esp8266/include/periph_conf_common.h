@@ -183,7 +183,7 @@ static const spi_conf_t spi_config[] = {
  * @name    Timer configuration
  * @{
  */
-#if defined(MODULE_ESP_SW_TIMER)
+#if MODULE_ESP_SW_TIMER
 
 /* software timer */
 #define TIMER_NUMOF         (1U)    /**< number of timer devices */

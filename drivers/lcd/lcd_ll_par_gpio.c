@@ -24,7 +24,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if IS_USED(MODULE_LCD_PARALLEL)
+#if MODULE_LCD_PARALLEL
 
 void lcd_ll_par_gpio_init(lcd_t *dev)
 {
@@ -56,7 +56,7 @@ void lcd_ll_par_gpio_init(lcd_t *dev)
     assert(gpio_is_valid(dev->params->d5_pin));
     assert(gpio_is_valid(dev->params->d6_pin));
     assert(gpio_is_valid(dev->params->d7_pin));
-#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+#if MODULE_LCD_PARALLEL_16BIT
     if (dev->params->mode == LCD_IF_PARALLEL_16BIT) {
         assert(gpio_is_valid(dev->params->d8_pin));
         assert(gpio_is_valid(dev->params->d9_pin));
@@ -68,7 +68,7 @@ void lcd_ll_par_gpio_init(lcd_t *dev)
         assert(gpio_is_valid(dev->params->d15_pin));
     }
     dev->word_access = false;
-#endif /* IS_USED(MODULE_LCD_PARALLEL_16BIT) */
+#endif /* MODULE_LCD_PARALLEL_16BIT */
 
     /* initialize all data GPIOs as outputs */
     lcd_ll_par_gpio_set_data_dir(dev, true);
@@ -86,7 +86,7 @@ void lcd_ll_par_gpio_set_data_dir(lcd_t *dev, bool output)
     gpio_init(dev->params->d5_pin, output ? GPIO_OUT : GPIO_IN);
     gpio_init(dev->params->d6_pin, output ? GPIO_OUT : GPIO_IN);
     gpio_init(dev->params->d7_pin, output ? GPIO_OUT : GPIO_IN);
-#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+#if MODULE_LCD_PARALLEL_16BIT
     if (dev->params->mode == LCD_IF_PARALLEL_16BIT) {
         gpio_init(dev->params->d8_pin, output ? GPIO_OUT : GPIO_IN);
         gpio_init(dev->params->d9_pin, output ? GPIO_OUT : GPIO_IN);
@@ -97,7 +97,7 @@ void lcd_ll_par_gpio_set_data_dir(lcd_t *dev, bool output)
         gpio_init(dev->params->d14_pin, output ? GPIO_OUT : GPIO_IN);
         gpio_init(dev->params->d15_pin, output ? GPIO_OUT : GPIO_IN);
     }
-#endif /* IS_USED(MODULE_LCD_PARALLEL_16BIT) */
+#endif /* MODULE_LCD_PARALLEL_16BIT */
 }
 
 void lcd_ll_par_gpio_cmd_start(lcd_t *dev, uint8_t cmd, bool cont)
@@ -165,7 +165,7 @@ uint8_t lcd_ll_par_gpio_read_byte(lcd_t *dev, bool cont)
     return in;
 }
 
-#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+#if MODULE_LCD_PARALLEL_16BIT
 
 void lcd_ll_par_gpio_write_word(lcd_t *dev, bool cont, uint16_t out)
 {
@@ -238,9 +238,9 @@ uint16_t lcd_ll_par_gpio_read_word(lcd_t *dev, bool cont)
 
     return in;
 }
-#endif /* IS_USED(MODULE_LCD_PARALLEL_16BIT) */
+#endif /* MODULE_LCD_PARALLEL_16BIT */
 
-#if !IS_USED(MODULE_LCD_PARALLEL_LL_MCU)
+#if !MODULE_LCD_PARALLEL_LL_MCU
 /* If MCU-driven low-level implementation is not used, the GPIO-driven
  * implementation is used as driver. */
 const lcd_ll_par_driver_t lcd_ll_par_driver = {
@@ -249,11 +249,11 @@ const lcd_ll_par_driver_t lcd_ll_par_driver = {
     .cmd_start = lcd_ll_par_gpio_cmd_start,
     .write_byte = lcd_ll_par_gpio_write_byte,
     .read_byte = lcd_ll_par_gpio_read_byte,
-#if IS_USED(MODULE_LCD_PARALLEL_16BIT)
+#if MODULE_LCD_PARALLEL_16BIT
     .write_word = lcd_ll_par_gpio_write_word,
     .read_word = lcd_ll_par_gpio_read_word,
 #endif
 };
 #endif
 
-#endif /* IS_USED(MODULE_LCD_PARALLEL) */
+#endif /* MODULE_LCD_PARALLEL */

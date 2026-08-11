@@ -3,3 +3,9 @@ PROGRAMMER ?= dfu-util
 OPENOCD_CONFIG ?= $(RIOTBOARD)/common/gd32v/dist/openocd.cfg
 
 include $(RIOTBOARD)/common/gd32v/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  periph_can \
+  periph_dac \
+  st77xx \
+  #

@@ -10,3 +10,7 @@ PROGRAMMER ?= dfu-util
 PROGRAMMERS_SUPPORTED += dfu-util
 DFU_USB_ID ?= 1d50:607f
 DFU_USE_DFUSE ?= 1
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  #

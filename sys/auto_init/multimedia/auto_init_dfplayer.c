@@ -15,7 +15,7 @@
  * @}
  */
 
-#ifdef MODULE_DFPLAYER
+#if MODULE_DFPLAYER
 
 #include "log.h"
 #include "dfplayer.h"

@@ -143,7 +143,7 @@ int openwsn_radio_init(void *radio_dev)
     /* MAC layer retransmissions are disabled by _set_csma_params() */
     ieee802154_radio_set_csma_params(dev, NULL, -1);
 
-    if (IS_USED(MODULE_CC2538_RF)) {
+    if (MODULE_CC2538_RF) {
         /* If frame filtering is enabled cc2538 will not accept beacons
         where the destination-address mode is 0 (no destination address).
         per rfc8180 4.5.1 the destination address must be set, which means

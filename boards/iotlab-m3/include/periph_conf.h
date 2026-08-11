@@ -36,14 +36,14 @@ static const spi_conf_t spi_config[] = {
         .cs_pin   = SPI_CS_UNDEF,
         .rccmask  = RCC_APB2ENR_SPI1EN,
         .apbbus   = APB2,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_dma   = DMA_STREAM_UNDEF,
         .tx_dma_chan = 1,
         .rx_dma   = DMA_STREAM_UNDEF,
         .rx_dma_chan = 1,
 #endif
     },
-#ifdef MODULE_MTD
+#if MODULE_MTD
     {
         .dev      = SPI2,
         .mosi_pin = GPIO_PIN(PORT_B, 15),
@@ -52,7 +52,7 @@ static const spi_conf_t spi_config[] = {
         .cs_pin   = SPI_CS_UNDEF,
         .rccmask  = RCC_APB1ENR_SPI2EN,
         .apbbus   = APB1,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_dma   = DMA_STREAM_UNDEF,
         .tx_dma_chan = 1,
         .rx_dma   = DMA_STREAM_UNDEF,

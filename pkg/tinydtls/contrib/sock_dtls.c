@@ -406,7 +406,7 @@ static int _verify_ecdsa_key(struct dtls_context_t *ctx,
                              const unsigned char *other_pub_x,
                              const unsigned char *other_pub_y, size_t key_size)
 {
-    if (IS_USED(MODULE_SOCK_DTLS_VERIFY_PUBLIC_KEY)) {
+    if (MODULE_SOCK_DTLS_VERIFY_PUBLIC_KEY) {
         int ret;
         credman_credential_t credential;
         sock_dtls_t *sock = (sock_dtls_t *)dtls_get_app_data(ctx);

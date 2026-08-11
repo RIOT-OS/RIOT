@@ -13,7 +13,7 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#if defined(MODULE_ESP_WIFI) && defined(MODULE_GNRC_NETIF_ETHERNET)
+#if MODULE_ESP_WIFI && MODULE_GNRC_NETIF_ETHERNET
 
 #include "net/ethernet.h"
 #include "net/gnrc/netif/ethernet.h"
@@ -36,7 +36,7 @@ void auto_init_esp_wifi (void)
 {
     esp_wifi_setup(&_esp_wifi_dev);
     gnrc_netif_ethernet_create(&_netif, _esp_wifi_stack, ESP_WIFI_STACKSIZE,
-#ifdef MODULE_ESP_NOW
+#if MODULE_ESP_NOW
                                ESP_WIFI_PRIO - 1,
 #else
                                ESP_WIFI_PRIO,
@@ -45,9 +45,9 @@ void auto_init_esp_wifi (void)
                                &_esp_wifi_dev.netdev);
 }
 
-#else /* defined(MODULE_ESP_WIFI) && defined(MODULE_GNRC_NETIF_ETHERNET) */
+#else /* MODULE_ESP_WIFI && MODULE_GNRC_NETIF_ETHERNET */
 
 typedef int dont_be_pedantic;
 
-#endif /* defined(MODULE_ESP_WIFI) && defined(MODULE_GNRC_NETIF_ETHERNET) */
+#endif /* MODULE_ESP_WIFI && MODULE_GNRC_NETIF_ETHERNET */
 /**@}*/

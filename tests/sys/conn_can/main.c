@@ -33,14 +33,14 @@
 
 #define SHELL_BUFSIZE   512 /* Needed for CAN FD frame */
 
-#ifdef MODULE_TJA1042
+#if MODULE_TJA1042
 #include "tja1042.h"
 tja1042_trx_t tja1042 = { .trx.driver = &tja1042_driver,
                           .stb_pin = TJA1042_STB_PIN
 };
 #endif
 
-#ifdef MODULE_NCV7356
+#if MODULE_NCV7356
 #include "ncv7356.h"
 ncv7356_trx_t ncv7356 = { .trx.driver = &ncv7356_driver,
                           .mode0_pin = NCV7356_MODE0_PIN,
@@ -49,10 +49,10 @@ ncv7356_trx_t ncv7356 = { .trx.driver = &ncv7356_driver,
 #endif
 
 static can_trx_t *devs[] = {
-#ifdef MODULE_TJA1042
+#if MODULE_TJA1042
     (can_trx_t *)&tja1042,
 #endif
-#ifdef MODULE_NCV7356
+#if MODULE_NCV7356
     (can_trx_t *)&ncv7356,
 #endif
     NULL,
@@ -80,7 +80,7 @@ static kernel_pid_t receive_pid[RCV_THREAD_NUMOF];
 static conn_can_raw_t conn[RCV_THREAD_NUMOF];
 static struct can_filter filters[RCV_THREAD_NUMOF][MAX_FILTER];
 
-#ifdef MODULE_CAN_ISOTP
+#if MODULE_CAN_ISOTP
 #define ISOTP_BUF_SIZE 1024
 static uint8_t isotp_buf[RCV_THREAD_NUMOF][ISOTP_BUF_SIZE];
 
@@ -94,14 +94,14 @@ static void print_usage(void)
     puts("test_can list");
     puts("test_can send ifnum can_id [B1 [B2 [B3 [B4 [B5 [B6 [B7 [B8]]]]]]]]");
     puts("test_can sendrtr ifnum can_id length(0..8)");
-#ifdef MODULE_FDCAN
+#if MODULE_FDCAN
     puts("test_can fdsend ifnum can_id [B1 [B2 [B3 [B4 [B5 [B6 [B7 ... [B64]]]]]]]]");
     puts("test_can fdsendrtr ifnum can_id length(0..64)");
 #endif
     printf("test_can recv ifnum user_id timeout can_id1 [can_id2..can_id%d]\n",
         MAX_FILTER);
     puts("test_can close user_id");
-#ifdef MODULE_CAN_ISOTP
+#if MODULE_CAN_ISOTP
     puts("test_can bind_isotp ifnum user_id source_id dest_id");
     puts("test_can send_isotp user_id [B1 [.. [ Bn ]]]");
     puts("test_can recv_isotp user_id timeout");
@@ -154,7 +154,7 @@ static int _send(int argc, char **argv, bool rtr, bool is_fd)
         frame.len = argc - 4;
     }
 
-#ifdef MODULE_FDCAN
+#if MODULE_FDCAN
     if (is_fd) {
         frame.flags |= CANFD_FDF;
         if (frame.len > DEFAULT_CAN_MAX_DLEN) {
@@ -266,7 +266,7 @@ static int _close(int argc, char **argv)
     return 0;
 }
 
-#ifdef MODULE_CAN_ISOTP
+#if MODULE_CAN_ISOTP
 static int _bind_isotp(int argc, char **argv)
 {
     if (argc < 4) {
@@ -294,7 +294,7 @@ static int _bind_isotp(int argc, char **argv)
     isotp_opt.tx_id = strtoul(argv[4], NULL, 16);
     isotp_opt.rx_id = strtoul(argv[5], NULL, 16);
 
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#if MODULE_CONN_CAN_ISOTP_MULTI
     conn_can_isotp_init_slave(&conn_isotp[thread_nb], (conn_can_isotp_slave_t *)
         &conn_isotp[thread_nb]);
 #endif
@@ -576,7 +576,7 @@ static int _can_handler(int argc, char **argv)
     else if (strncmp(argv[1], "sendrtr", 8) == 0) {
         return _send(argc, argv, true, false);
     }
-#ifdef MODULE_FDCAN
+#if MODULE_FDCAN
     else if (strncmp(argv[1], "fdsend", 5) == 0) {
         return _send(argc, argv, false, true);
     }
@@ -590,7 +590,7 @@ static int _can_handler(int argc, char **argv)
     else if (strncmp(argv[1], "close", 6) == 0) {
         return _close(argc, argv);
     }
-#ifdef MODULE_CAN_ISOTP
+#if MODULE_CAN_ISOTP
     else if (strncmp(argv[1], "bind_isotp", 11) == 0) {
         return _bind_isotp(argc, argv);
     }
@@ -663,7 +663,7 @@ static void *_receive_thread(void *args)
             thread_busy[thread_nb] = 0;
             break;
         }
-#ifdef MODULE_CAN_ISOTP
+#if MODULE_CAN_ISOTP
         case CAN_MSG_RECV_ISOTP:
         {
             int ret;

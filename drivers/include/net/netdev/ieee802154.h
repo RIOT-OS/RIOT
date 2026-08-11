@@ -19,7 +19,7 @@
 
 #include "net/eui_provider.h"
 #include "net/ieee802154.h"
-#if IS_USED(MODULE_IEEE802154_SECURITY)
+#if MODULE_IEEE802154_SECURITY
 #include "net/ieee802154_security.h"
 #endif
 #include "net/gnrc/nettype.h"
@@ -100,7 +100,7 @@ typedef struct {
      * @brief IEEE 802.15.4 specific fields
      * @{
      */
-#ifdef MODULE_GNRC
+#if MODULE_GNRC
     gnrc_nettype_t proto;                   /**< Protocol for upper layer */
 #endif
 
@@ -123,7 +123,7 @@ typedef struct {
     uint8_t page;                           /**< channel page */
     uint16_t flags;                         /**< flags as defined above */
     int16_t txpower;                        /**< tx power in dBm */
-#if IS_USED(MODULE_IEEE802154_SECURITY) || defined(DOXYGEN)
+#if MODULE_IEEE802154_SECURITY || defined(DOXYGEN)
     ieee802154_sec_context_t sec_ctx;       /**< security context */
 #endif
     /** @} */
@@ -136,7 +136,7 @@ typedef struct netdev_ieee802154_rx_info {
     int16_t rssi;           /**< RSSI of a received frame in dBm */
     uint8_t lqi;            /**< LQI of a received frame */
     uint8_t flags;          /**< Flags e.g. used to mark other fields as valid */
-#if IS_USED(MODULE_NETDEV_IEEE802154_RX_TIMESTAMP)
+#if MODULE_NETDEV_IEEE802154_RX_TIMESTAMP
     uint64_t timestamp;     /**< Timestamp value of a received frame in ns */
 #endif
 } netdev_ieee802154_rx_info_t;
@@ -154,7 +154,7 @@ static inline void netdev_ieee802154_rx_info_set_timestamp(
 {
     (void)dest;
     (void)timestamp;
-#if IS_USED(MODULE_NETDEV_IEEE802154_RX_TIMESTAMP)
+#if MODULE_NETDEV_IEEE802154_RX_TIMESTAMP
     dest->timestamp = timestamp;
     dest->flags |= NETDEV_RX_IEEE802154_INFO_FLAG_TIMESTAMP;
 #endif
@@ -177,7 +177,7 @@ static inline int netdev_ieee802154_rx_info_get_timestamp(
 {
     (void)info;
     (void)dest;
-#if IS_USED(MODULE_NETDEV_IEEE802154_RX_TIMESTAMP)
+#if MODULE_NETDEV_IEEE802154_RX_TIMESTAMP
     if (info->flags & NETDEV_RX_IEEE802154_INFO_FLAG_TIMESTAMP) {
         *dest = info->timestamp;
         return 0;

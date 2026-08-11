@@ -43,7 +43,7 @@ enum {
     NIMBLE_SCANNER_LIMITED      = 0x02,     /**< do limited discovery */
     NIMBLE_SCANNER_FILTER_DUPS  = 0x04,     /**< filter duplicates */
     NIMBLE_SCANNER_PHY_1M       = 0x10,     /**< scan on 1Mbit PHY */
-#if IS_USED(MODULE_NIMBLE_PHY_CODED)
+#if MODULE_NIMBLE_PHY_CODED
     NIMBLE_SCANNER_PHY_CODED    = 0x20,     /**< scan on CODED PHY */
 #endif
 };

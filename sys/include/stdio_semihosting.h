@@ -66,7 +66,7 @@ extern "C" {
  *
  * Automatically enabled when including the `stdin` module
  */
-#define STDIO_SEMIHOSTING_RX            (IS_USED(MODULE_STDIN))
+#define STDIO_SEMIHOSTING_RX            (MODULE_STDIN)
 
 #ifdef __cplusplus
 }

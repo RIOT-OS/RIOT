@@ -3,3 +3,7 @@ include $(RIOTBOARD)/common/nucleo/Makefile.include
 
 # add the common header files to the include path
 INCLUDES += -I$(RIOTBOARD)/common/nucleo32/include
+
+MODULE_DEFS_NEEDED += \
+  periph_init_led0 \
+  #

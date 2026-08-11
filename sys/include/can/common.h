@@ -31,14 +31,14 @@ extern "C" {
 
 #include "timex.h"
 #include "thread.h"
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
 #include "mbox.h"
 #endif
 
 /**
  * @brief Default CAN maximum data length
  */
-#ifdef MODULE_FDCAN
+#if MODULE_FDCAN
 #define DEFAULT_CAN_MAX_DLEN CANFD_MAX_DLEN
 #else
 #define DEFAULT_CAN_MAX_DLEN CAN_MAX_DLEN
@@ -56,7 +56,7 @@ typedef enum {
     CANOPT_CLOCK,           /**< controller main clock */
     CANOPT_BITTIMING_CONST, /**< controller bittiming parameters */
     CANOPT_STATE,           /**< set controller state @ref canopt_state_t */
-#ifdef MODULE_FDCAN
+#if MODULE_FDCAN
     CANOPT_FD_BITTIMING,    /**< bit timing parameter for FDCAN data payload */
     CANOPT_FD_BITTIMING_CONST, /**< controller bit timing parameter for FDCAN data payload */
 #endif
@@ -99,7 +99,7 @@ enum can_msg {
     CAN_MSG_REMOVE_FILTER,    /**< remove a filter */
     CAN_MSG_POWER_UP,         /**< power up */
     CAN_MSG_POWER_DOWN,       /**< power down */
-#if defined(MODULE_CAN_TRX) || defined(DOXYGEN)
+#if MODULE_CAN_TRX || defined(DOXYGEN)
     CAN_MSG_SET_TRX,          /**< set a transceiver */
 #endif
     /* candev internal messages */
@@ -112,11 +112,11 @@ enum can_msg {
     CAN_MSG_BUS_OFF,          /**< bus-off detected */
     CAN_MSG_ERROR_PASSIVE,    /**< driver switched in error passive */
     CAN_MSG_ERROR_WARNING,    /**< driver reached error warning */
-#if defined(MODULE_CAN_PM) || defined(DOXYGEN)
+#if MODULE_CAN_PM || defined(DOXYGEN)
     CAN_MSG_PM,               /**< power management event */
 #endif
     /* isotp messages */
-#if defined(MODULE_CAN_ISOTP) || defined(DOXYGEN)
+#if MODULE_CAN_ISOTP || defined(DOXYGEN)
     CAN_MSG_ISOTP_RX_TIMEOUT = 0x400,  /**< isotp rx timeout */
     CAN_MSG_ISOTP_TX_TIMEOUT,          /**< isotp tx timeout */
 #endif
@@ -138,7 +138,7 @@ typedef struct can_rx_data {
  */
 typedef enum {
     CAN_TYPE_DEFAULT = 0, /**< default entry (use msg) */
-#if defined(MODULE_CAN_MBOX) || defined(DOXYGEN)
+#if MODULE_CAN_MBOX || defined(DOXYGEN)
     CAN_TYPE_MBOX,        /**< mbox entry */
 #endif
 } can_reg_type_t;
@@ -154,11 +154,11 @@ typedef struct can_reg_entry {
     int ifnum;                  /**< interface number for the entry */
     union {
         kernel_pid_t pid;       /**< pid of the thread when using msg */
-#if defined(MODULE_CAN_MBOX) || defined(DOXYGEN)
+#if MODULE_CAN_MBOX || defined(DOXYGEN)
         mbox_t *mbox;           /**< mbox pointer */
 #endif
     } target;                   /**< entry target */
-#if defined(MODULE_CAN_MBOX) || defined(DOXYGEN)
+#if MODULE_CAN_MBOX || defined(DOXYGEN)
     can_reg_type_t type;        /**< entry type */
 #endif
 } can_reg_entry_t;

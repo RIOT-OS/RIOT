@@ -81,7 +81,7 @@
  */
 #define PINS_PER_PORT       (32)
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 /**
  * @brief   Calculate the needed memory (in byte) needed to save 4 bits per MCU
  *          pin
@@ -141,7 +141,7 @@ static inline int pin_num(gpio_t pin)
     return (int)(pin & 0x3f);
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 
 /**
  * @brief   Get context for a specific pin
@@ -223,7 +223,7 @@ void gpio_init_port(gpio_t pin, uint32_t pcr)
     clk_en(pin);
 
 #ifdef KINETIS_HAVE_PCR
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
     /* if the given interrupt was previously configured as interrupt source, we
      * need to free its interrupt context. We to this only after we
      * re-configured the pin in case an event is happening just in between... */
@@ -233,7 +233,7 @@ void gpio_init_port(gpio_t pin, uint32_t pcr)
     /* set new PCR value */
     port(pin)->PCR[pin_num(pin)] = pcr;
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
     /* and clear the interrupt context if needed */
     if (isr_state & PORT_PCR_IRQC_MASK) {
         ctx_clear(port_num(pin), pin_num(pin));
@@ -279,7 +279,7 @@ void gpio_write(gpio_t pin, bool value)
     }
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {

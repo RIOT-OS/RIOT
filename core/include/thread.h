@@ -124,7 +124,7 @@
 #include "sched.h"
 #include "thread_config.h"
 
-#ifdef MODULE_CORE_THREAD_FLAGS
+#if MODULE_CORE_THREAD_FLAGS
 #include "thread_flags.h"
 #endif
 
@@ -171,18 +171,18 @@ struct _thread {
 
     kernel_pid_t pid;               /**< thread's process id            */
 
-#if defined(MODULE_CORE_THREAD_FLAGS) || defined(DOXYGEN)
+#if MODULE_CORE_THREAD_FLAGS || defined(DOXYGEN)
     thread_flags_t flags;           /**< currently set flags            */
 #endif
 
     clist_node_t rq_entry;          /**< run queue entry                */
 
-#if defined(MODULE_CORE_MSG) || defined(MODULE_CORE_THREAD_FLAGS) \
-    || defined(MODULE_CORE_MBOX) || defined(DOXYGEN)
+#if MODULE_CORE_MSG || MODULE_CORE_THREAD_FLAGS \
+    || MODULE_CORE_MBOX || defined(DOXYGEN)
     void *wait_data;                /**< used by msg, mbox and thread
                                          flags                          */
 #endif
-#if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
+#if MODULE_CORE_MSG || defined(DOXYGEN)
     list_node_t msg_waiters;        /**< threads waiting for their message
                                          to be delivered to this thread
                                          (i.e. all blocked sends)       */
@@ -192,7 +192,7 @@ struct _thread {
                                          to this thread's message queue */
 #endif
 #if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) \
-    || defined(MODULE_MPU_STACK_GUARD) || defined(DOXYGEN)
+    || MODULE_MPU_STACK_GUARD || defined(DOXYGEN)
     char *stack_start;              /**< thread's stack start address   */
 #endif
 #if defined(CONFIG_THREAD_NAMES) || defined(DOXYGEN)
@@ -374,7 +374,7 @@ void thread_sleep(void);
  *
  * @see     thread_yield_higher()
  */
-#if defined(MODULE_CORE_THREAD) || DOXYGEN
+#if MODULE_CORE_THREAD || DOXYGEN
 void thread_yield(void);
 #else
 static inline void thread_yield(void)
@@ -493,7 +493,7 @@ void thread_add_to_list(list_node_t *list, thread_t *thread);
  * @return          the threads name
  * @return          `NULL` if pid is unknown
  */
-#if defined(MODULE_CORE_THREAD) || DOXYGEN
+#if MODULE_CORE_THREAD || DOXYGEN
 const char *thread_getname(kernel_pid_t pid);
 #else
 static inline const char *thread_getname(kernel_pid_t pid)
@@ -562,7 +562,7 @@ void thread_print_stack(void);
 static inline bool thread_has_msg_queue(const thread_t *thread)
 {
     assume(thread != NULL);
-#if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
+#if MODULE_CORE_MSG || defined(DOXYGEN)
     return (thread->msg_array != NULL);
 #else
     (void)thread;
@@ -620,7 +620,7 @@ const char *thread_state_to_string(thread_status_t state);
 static inline void *thread_get_stackstart(const thread_t *thread)
 {
 #if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) \
-    || defined(MODULE_MPU_STACK_GUARD)
+    || MODULE_MPU_STACK_GUARD
     return thread->stack_start;
 #else
     (void)thread;

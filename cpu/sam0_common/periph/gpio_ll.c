@@ -41,7 +41,7 @@
 #include "irq.h"
 #include "periph/gpio_ll.h"
 
-#ifdef MODULE_FMT
+#if MODULE_FMT
 #  include "fmt.h"
 #else
 #  include <stdio.h>
@@ -124,7 +124,7 @@ int gpio_ll_init(gpio_port_t port, uint8_t pin, gpio_conf_t conf)
         pin_cfg |= PORT_PINCFG_DRVSTR;
     }
 
-    if (IS_USED(MODULE_PERIPH_GPIO_FAST_READ)) {
+    if (MODULE_PERIPH_GPIO_FAST_READ) {
         /* This read-modify-write needs to be made atomic to avoid
          * corrupting the control register. */
         unsigned state = irq_disable();

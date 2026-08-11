@@ -11,3 +11,7 @@ DEBUGGER_FLAGS ?= debugr $(DEBUG_ELFFILE)
 
 # Setup of programmer and serial is shared between STM32 based boards
 include $(RIOTMAKE)/boards/stm32.inc.mk
+
+MODULE_DEFS_NEEDED += \
+  stm32mp1_eng_mode \
+  #

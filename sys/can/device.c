@@ -25,14 +25,14 @@
 #include "can/pkt.h"
 #include "can/dll.h"
 
-#ifdef MODULE_CAN_TRX
+#if MODULE_CAN_TRX
 #include "can/can_trx.h"
 #endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifdef MODULE_FDCAN
+#if MODULE_FDCAN
 /**
  * The loop delay in CAN, especially in CAN FD with bitrate switching, affects synchronization due to increased data rates.
  * The unit is nanoseconds.
@@ -46,7 +46,7 @@
 #define CAN_DEVICE_MSG_QUEUE_SIZE 64
 #endif
 
-#ifdef MODULE_CAN_PM
+#if MODULE_CAN_PM
 #define CAN_DEVICE_PM_DEFAULT_RX_TIMEOUT (10 * US_PER_SEC)
 #define CAN_DEVICE_PM_DEFAULT_TX_TIMEOUT (2 * US_PER_SEC)
 static void pm_cb(void *arg);
@@ -78,7 +78,7 @@ static void _can_event(candev_t *dev, candev_event_t event, void *arg)
     case CANDEV_EVENT_WAKE_UP:
         DEBUG("_can_event: CANDEV_EVENT_WAKE_UP\n");
         power_up(candev_dev);
-#ifdef MODULE_CAN_PM
+#if MODULE_CAN_PM
         pm_reset(candev_dev, candev_dev->rx_inactivity_timeout);
 #endif
         break;
@@ -96,7 +96,7 @@ static void _can_event(candev_t *dev, candev_event_t event, void *arg)
         break;
     case CANDEV_EVENT_RX_INDICATION:
         DEBUG("_can_event: CANDEV_EVENT_RX_INDICATION\n");
-#ifdef MODULE_CAN_PM
+#if MODULE_CAN_PM
         pm_reset(candev_dev, candev_dev->rx_inactivity_timeout);
 #endif
         /* received frame in arg */
@@ -127,7 +127,7 @@ static int power_up(candev_dev_t *candev_dev)
 
     DEBUG("candev: power up\n");
 
-#ifdef MODULE_CAN_TRX
+#if MODULE_CAN_TRX
     can_trx_set_mode(candev_dev->trx, TRX_NORMAL_MODE);
 #endif
     canopt_state_t state = CANOPT_STATE_ON;
@@ -143,7 +143,7 @@ static int power_down(candev_dev_t *candev_dev)
 
     DEBUG("candev: power down\n");
 
-#ifdef MODULE_CAN_TRX
+#if MODULE_CAN_TRX
     can_trx_set_mode(candev_dev->trx, TRX_SLEEP_MODE);
 #endif
     canopt_state_t state = CANOPT_STATE_SLEEP;
@@ -153,7 +153,7 @@ static int power_down(candev_dev_t *candev_dev)
         dev->state = CAN_STATE_SLEEPING;
     }
 
-#ifdef MODULE_CAN_PM
+#if MODULE_CAN_PM
     ztimer_remove(ZTIMER_USEC, &candev_dev->pm_timer);
     candev_dev->last_pm_update = 0;
 #endif
@@ -161,7 +161,7 @@ static int power_down(candev_dev_t *candev_dev)
     return res;
 }
 
-#ifdef MODULE_CAN_PM
+#if MODULE_CAN_PM
 static void pm_cb(void *arg)
 {
     candev_dev_t *candev_dev = (candev_dev_t *)arg;
@@ -199,7 +199,7 @@ static void wake_up(candev_dev_t *candev_dev)
         DEBUG("can device: waking up driver\n");
         power_up(candev_dev);
     }
-#ifdef MODULE_CAN_PM
+#if MODULE_CAN_PM
     pm_reset(candev_dev, candev_dev->tx_wakeup_timeout);
 #endif
 }
@@ -215,10 +215,10 @@ static void *_can_device_thread(void *args)
 
     candev_dev->pid = thread_getpid();
 
-#ifdef MODULE_CAN_TRX
+#if MODULE_CAN_TRX
     can_trx_init(candev_dev->trx);
 #endif
-#ifdef MODULE_CAN_PM
+#if MODULE_CAN_PM
     if (candev_dev->rx_inactivity_timeout == 0) {
         candev_dev->rx_inactivity_timeout = CAN_DEVICE_PM_DEFAULT_RX_TIMEOUT;
     }
@@ -243,7 +243,7 @@ static void *_can_device_thread(void *args)
 
     candev_dev->ifnum = can_dll_register_candev(candev_dev);
 
-#if defined(MODULE_FDCAN)
+#if MODULE_FDCAN
     if (candev_dev->loop_delay == 0) {
         candev_dev->loop_delay = CONFIG_FDCAN_DEVICE_TRANSCEIVER_LOOP_DELAY;
     }
@@ -320,7 +320,7 @@ static void *_can_device_thread(void *args)
         case CAN_MSG_POWER_UP:
             DEBUG("can device: CAN_MSG_POWER_UP received\n");
             res = power_up(candev_dev);
-#ifdef MODULE_CAN_PM
+#if MODULE_CAN_PM
             pm_reset(candev_dev, candev_dev->tx_wakeup_timeout);
 #endif
             /* send reply to calling thread */
@@ -331,7 +331,7 @@ static void *_can_device_thread(void *args)
         case CAN_MSG_POWER_DOWN:
             DEBUG("can device: CAN_MSG_POWER_DOWN received\n");
             res = power_down(candev_dev);
-#ifdef MODULE_CAN_PM
+#if MODULE_CAN_PM
             pm_reset(candev_dev, 0);
 #endif
             /* send reply to calling thread */
@@ -339,7 +339,7 @@ static void *_can_device_thread(void *args)
             reply.content.value = (uint32_t)res;
             msg_reply(&msg, &reply);
             break;
-#ifdef MODULE_CAN_TRX
+#if MODULE_CAN_TRX
         case CAN_MSG_SET_TRX:
             DEBUG("can device: CAN_MSG_SET_TRX received\n");
             reply.type = CAN_MSG_ACK;
@@ -353,7 +353,7 @@ static void *_can_device_thread(void *args)
             msg_reply(&msg, &reply);
             break;
 #endif
-#ifdef MODULE_CAN_PM
+#if MODULE_CAN_PM
         case CAN_MSG_PM:
             DEBUG("can device: pm power down\n");
             power_down(candev_dev);

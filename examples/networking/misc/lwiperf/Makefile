@@ -1,3 +1,9 @@
+
+MODULE_DEFS_NEEDED += \
+  lwip_dhcp_auto \
+  lwip_ipv4 \
+  lwip_ipv6 \
+  #
 # Set the name of your application:
 APPLICATION = lwiperf
 

@@ -149,7 +149,7 @@ if (!IS_ACTIVE(CONFIG_AT86RF215_USE_CLOCK_OUTPUT)){
         reg |= AMCS_AACK_MASK;
     }
 
-    if (IS_USED(MODULE_AT86RF215_TIMESTAMP)) {
+    if (MODULE_AT86RF215_TIMESTAMP) {
         at86rf215_reg_write(dev, dev->BBC->RG_CNTC,
                                  CNTC_EN_MASK | CNTC_CAPRXS_MASK);
     }

@@ -216,10 +216,10 @@ static void _enable_gpio(const stm32_usbdev_fs_config_t *conf)
         gpio_init(conf->dp, GPIO_OUT);
         gpio_clear(conf->dp);
         /* wait a 1 ms */
-        if (IS_USED(MODULE_ZTIMER_MSEC)) {
+        if (MODULE_ZTIMER_MSEC) {
             ztimer_sleep(ZTIMER_MSEC, 1);
         }
-        else if(IS_USED(MODULE_ZTIMER_USEC)) {
+        else if(MODULE_ZTIMER_USEC) {
             ztimer_sleep(ZTIMER_USEC, 1 * US_PER_MS);
         }
         else {

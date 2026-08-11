@@ -45,9 +45,9 @@
 #define ENABLE_DEBUG            0
 #include "debug.h"
 
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if MODULE_GNRC_SIXLOWPAN
 #define NETTYPE                 GNRC_NETTYPE_SIXLOWPAN
-#elif defined(MODULE_GNRC_IPV6)
+#elif MODULE_GNRC_IPV6
 #define NETTYPE                 GNRC_NETTYPE_IPV6
 #else
 #define NETTYPE                 GNRC_NETTYPE_UNDEF
@@ -97,11 +97,11 @@ static int _netif_init(gnrc_netif_t *netif)
     /* save the threads context pointer, so we can set its flags */
     _netif_thread = thread_get_active();
 
-#if IS_USED(MODULE_GNRC_NETIF_6LO)
+#if MODULE_GNRC_NETIF_6LO
     /* we disable fragmentation for this device, as the L2CAP layer takes care
      * of this */
     _netif.sixlo.max_frag_size = 0;
-#endif  /* IS_USED(MODULE_GNRC_NETIF_6LO) */
+#endif  /* MODULE_GNRC_NETIF_6LO */
     res = 0;
 
     return res;
@@ -351,7 +351,7 @@ end:
  */
 static inline void _dispatch_connection_event(netapi_notify_t notify, const void *addr)
 {
-    if (!IS_USED(MODULE_GNRC_NETAPI_NOTIFY)) {
+    if (!MODULE_GNRC_NETAPI_NOTIFY) {
         return;
     }
 
@@ -677,12 +677,12 @@ int nimble_netif_connect(const ble_addr_t *addr,
     if (params->phy_mode == NIMBLE_PHY_1M) {
         phy_mask = BLE_GAP_LE_PHY_1M_MASK;
     }
-#if IS_USED(MODULE_NIMBLE_PHY_2MBIT)
+#if MODULE_NIMBLE_PHY_2MBIT
     else if (params->phy_mode == NIMBLE_PHY_2M) {
         phy_mask = (BLE_GAP_LE_PHY_1M_MASK | BLE_GAP_LE_PHY_2M_MASK);
     }
 #endif
-#if IS_USED(MODULE_NIMBLE_PHY_CODED)
+#if MODULE_NIMBLE_PHY_CODED
     else if (params->phy_mode == NIMBLE_PHY_CODED) {
         phy_mask = BLE_GAP_LE_PHY_CODED_MASK;
     }

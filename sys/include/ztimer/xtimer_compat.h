@@ -26,7 +26,7 @@
 #include "board.h"
 #include "busy_wait.h"
 #include "timex.h"
-#ifdef MODULE_CORE_MSG
+#if MODULE_CORE_MSG
 #include "msg.h"
 #endif /* MODULE_CORE_MSG */
 #include "mutex.h"
@@ -120,10 +120,10 @@ static inline xtimer_ticks64_t xtimer_ticks_from_usec64(uint64_t usec)
 
 static inline xtimer_ticks32_t xtimer_now(void)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         return ztimer_now(ZTIMER_USEC);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         return ztimer_now(ZTIMER_MSEC) * US_PER_MS;
     }
     else {
@@ -139,10 +139,10 @@ static inline uint32_t xtimer_now_usec(void)
 
 static inline uint32_t xtimer_now_msec(void)
 {
-    if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    if (MODULE_ZTIMER_MSEC) {
         return ztimer_now(ZTIMER_MSEC);
     }
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         return ztimer_now(ZTIMER_USEC) / US_PER_MS;
     }
     else {
@@ -167,7 +167,7 @@ static inline void _ztimer_sleep_scale(ztimer_clock_t *clock, uint32_t time,
 static inline void xtimer_sleep(uint32_t seconds)
 {
     /* TODO: use ZTIMER_SEC */
-    if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    if (MODULE_ZTIMER_MSEC) {
         _ztimer_sleep_scale(ZTIMER_MSEC, seconds, MS_PER_SEC);
     }
     else {
@@ -177,10 +177,10 @@ static inline void xtimer_sleep(uint32_t seconds)
 
 static inline void xtimer_msleep(uint32_t milliseconds)
 {
-    if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    if (MODULE_ZTIMER_MSEC) {
         ztimer_sleep(ZTIMER_MSEC, milliseconds);
     }
-    else if (IS_USED(MODULE_ZTIMER_USEC)) {
+    else if (MODULE_ZTIMER_USEC) {
         _ztimer_sleep_scale(ZTIMER_USEC, milliseconds, US_PER_MS);
     }
     else {
@@ -190,10 +190,10 @@ static inline void xtimer_msleep(uint32_t milliseconds)
 
 static inline void xtimer_usleep(uint32_t microseconds)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer_sleep(ZTIMER_USEC, microseconds);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer_sleep(ZTIMER_MSEC, _div_round_up_u32(microseconds, US_PER_MS));
     }
     else {
@@ -203,10 +203,10 @@ static inline void xtimer_usleep(uint32_t microseconds)
 
 static inline void xtimer_set(xtimer_t *timer, uint32_t offset)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer_set(ZTIMER_USEC, timer, offset);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer_set(ZTIMER_MSEC, timer, _div_round_up_u32(offset, US_PER_MS));
     }
     else {
@@ -216,10 +216,10 @@ static inline void xtimer_set(xtimer_t *timer, uint32_t offset)
 
 static inline void xtimer_remove(xtimer_t *timer)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer_remove(ZTIMER_USEC, timer);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer_remove(ZTIMER_MSEC, timer);
     }
     else {
@@ -229,10 +229,10 @@ static inline void xtimer_remove(xtimer_t *timer)
 
 static inline bool xtimer_is_set(const xtimer_t *timer)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         return ztimer_is_set(ZTIMER_USEC, timer);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         return ztimer_is_set(ZTIMER_MSEC, timer);
     }
     else {
@@ -244,10 +244,10 @@ static inline bool xtimer_is_set(const xtimer_t *timer)
 static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg,
                                   kernel_pid_t target_pid)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer_set_msg(ZTIMER_USEC, timer, offset, msg, target_pid);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer_set_msg(ZTIMER_MSEC, timer, _div_round_up_u32(offset, US_PER_MS),
                        msg, target_pid);
     }
@@ -259,10 +259,10 @@ static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg,
 static inline void xtimer_periodic_wakeup(xtimer_ticks32_t *last_wakeup,
                                           uint32_t period)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer_periodic_wakeup(ZTIMER_USEC, last_wakeup, period);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer_periodic_wakeup(ZTIMER_MSEC, last_wakeup, _div_round_up_u32(period, US_PER_MS));
     }
     else {
@@ -272,10 +272,10 @@ static inline void xtimer_periodic_wakeup(xtimer_ticks32_t *last_wakeup,
 
 static inline int xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         return ztimer_msg_receive_timeout(ZTIMER_USEC, msg, timeout);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         return ztimer_msg_receive_timeout(ZTIMER_MSEC, msg, _div_round_up_u32(timeout, US_PER_MS));
     }
     else {
@@ -287,10 +287,10 @@ static inline int xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout)
 static inline void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset,
                                      kernel_pid_t pid)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer_set_wakeup(ZTIMER_USEC, timer, offset, pid);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer_set_wakeup(ZTIMER_MSEC, timer, _div_round_up_u32(offset, US_PER_MS), pid);
     }
     else {
@@ -302,11 +302,11 @@ static inline int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us)
 {
     int res;
 
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         assert(us <= UINT32_MAX);
         res = ztimer_mutex_lock_timeout(ZTIMER_USEC, mutex, (uint32_t)us);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         us = _div_round_up_u64(us, US_PER_MS);
         assert(us <= UINT32_MAX);
         res = ztimer_mutex_lock_timeout(ZTIMER_MSEC, mutex, (uint32_t)us);
@@ -324,11 +324,11 @@ static inline int xtimer_rmutex_lock_timeout(rmutex_t *rmutex, uint64_t us)
 {
     int res;
 
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         assert(us <= UINT32_MAX);
         res = ztimer_rmutex_lock_timeout(ZTIMER_USEC, rmutex, (uint32_t)us);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         us = _div_round_up_u64(us, US_PER_MS);
         assert(us <= UINT32_MAX);
         res = ztimer_rmutex_lock_timeout(ZTIMER_MSEC, rmutex, (uint32_t)us);
@@ -344,10 +344,10 @@ static inline int xtimer_rmutex_lock_timeout(rmutex_t *rmutex, uint64_t us)
 
 static inline void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer_set_timeout_flag(ZTIMER_USEC, t, timeout);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer_set_timeout_flag(ZTIMER_MSEC, t, _div_round_up_u32(timeout, US_PER_MS));
     }
     else {
@@ -363,10 +363,10 @@ static inline void xtimer_set_timeout_flag64(xtimer_t *t, uint64_t timeout)
 
 static inline void xtimer_spin(xtimer_ticks32_t ticks)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer_spin(ZTIMER_USEC, xtimer_usec_from_ticks(ticks));
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer_spin(ZTIMER_MSEC, xtimer_msec_from_ticks(ticks));
     }
     else {

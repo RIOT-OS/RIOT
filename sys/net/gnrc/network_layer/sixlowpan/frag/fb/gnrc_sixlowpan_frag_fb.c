@@ -18,7 +18,7 @@
 
 #include "net/gnrc/sixlowpan/config.h"
 #include "net/gnrc/sixlowpan/frag/fb.h"
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
+#if MODULE_GNRC_SIXLOWPAN_FRAG_STATS
 #include "net/gnrc/sixlowpan/frag/stats.h"
 #endif
 
@@ -40,7 +40,7 @@ gnrc_sixlowpan_frag_fb_t *gnrc_sixlowpan_frag_fb_get(void)
             return &_fbs[i];
         }
     }
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
+#if MODULE_GNRC_SIXLOWPAN_FRAG_STATS
     gnrc_sixlowpan_frag_stats_get()->frag_full++;
 #endif
     return NULL;

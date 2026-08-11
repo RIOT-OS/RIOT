@@ -40,7 +40,7 @@ typedef enum {
     SOCK_ASYNC_PATH_PROP = 0x0040,  /**< Path property changed event */
 } sock_async_flags_t;
 
-#if defined(MODULE_SOCK_DTLS) || defined(DOXYGEN)
+#if MODULE_SOCK_DTLS || defined(DOXYGEN)
 typedef struct sock_dtls sock_dtls_t;       /**< forward declare for async */
 
 /**
@@ -64,9 +64,9 @@ typedef struct sock_dtls sock_dtls_t;       /**< forward declare for async */
  */
 typedef void (*sock_dtls_cb_t)(sock_dtls_t *sock, sock_async_flags_t flags,
                                void *arg);
-#endif  /* defined(MODULE_SOCK_DTLS) || defined(DOXYGEN) */
+#endif  /* MODULE_SOCK_DTLS || defined(DOXYGEN) */
 
-#if defined(MODULE_SOCK_IP) || defined(DOXYGEN)
+#if MODULE_SOCK_IP || defined(DOXYGEN)
 typedef struct sock_ip sock_ip_t;       /**< forward declare for async */
 
 /**
@@ -87,9 +87,9 @@ typedef struct sock_ip sock_ip_t;       /**< forward declare for async */
  */
 typedef void (*sock_ip_cb_t)(sock_ip_t *sock, sock_async_flags_t flags,
                              void *arg);
-#endif  /* defined(MODULE_SOCK_IP) || defined(DOXYGEN) */
+#endif  /* MODULE_SOCK_IP || defined(DOXYGEN) */
 
-#if defined(MODULE_SOCK_TCP) || defined(DOXYGEN)
+#if MODULE_SOCK_TCP || defined(DOXYGEN)
 typedef struct sock_tcp sock_tcp_t;            /**< forward declare for async */
 typedef struct sock_tcp_queue sock_tcp_queue_t;/**< forward declare for async */
 
@@ -130,9 +130,9 @@ typedef void (*sock_tcp_cb_t)(sock_tcp_t *sock, sock_async_flags_t flags,
 typedef void (*sock_tcp_queue_cb_t)(sock_tcp_queue_t *queue,
                                     sock_async_flags_t flags,
                                     void *arg);
-#endif  /* defined(MODULE_SOCK_TCP) || defined(DOXYGEN) */
+#endif  /* MODULE_SOCK_TCP || defined(DOXYGEN) */
 
-#if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
+#if MODULE_SOCK_UDP || defined(DOXYGEN)
 typedef struct sock_udp sock_udp_t;     /**< forward declare for async */
 
 /**
@@ -153,14 +153,14 @@ typedef struct sock_udp sock_udp_t;     /**< forward declare for async */
  */
 typedef void (*sock_udp_cb_t)(sock_udp_t *sock, sock_async_flags_t flags,
                               void *arg);
-#endif  /* defined(MODULE_SOCK_UDP) || defined(DOXYGEN) */
+#endif  /* MODULE_SOCK_UDP || defined(DOXYGEN) */
 
 #ifdef SOCK_HAS_ASYNC_CTX
 #include "sock_async_ctx.h"
 #endif
 
 #include "sock_types.h"
-#ifdef MODULE_SOCK_DTLS
+#if MODULE_SOCK_DTLS
 #include "sock_dtls_types.h"
 #endif  /* MODULE_SOCK_DTLS */
 #endif  /* defined(SOCK_HAS_ASYNC) || defined(DOXYGEN) */

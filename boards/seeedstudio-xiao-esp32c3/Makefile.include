@@ -1,1 +1,5 @@
 PORT_LINUX ?= /dev/ttyACM0
+
+MODULE_DEFS_NEEDED += \
+  periph_init_buttons \
+  #

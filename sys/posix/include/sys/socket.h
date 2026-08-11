@@ -55,7 +55,7 @@ extern "C" {
  * @brief Maximum number of sockets available on for creation with @ref socket()
  */
 #ifndef SOCKET_POOL_SIZE
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
 #define SOCKET_POOL_SIZE        (6)    /* define enough for accepted sockets */
 #else
 #define SOCKET_POOL_SIZE        (4)
@@ -67,7 +67,7 @@ extern "C" {
  *        handle
  */
 #ifndef SOCKET_TCP_QUEUE_SIZE
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
 #define SOCKET_TCP_QUEUE_SIZE   (2)
 #else
 #define SOCKET_TCP_QUEUE_SIZE   (0)

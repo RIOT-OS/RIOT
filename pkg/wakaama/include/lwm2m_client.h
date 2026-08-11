@@ -35,7 +35,7 @@ extern "C" {
 #include "periph/pm.h"
 #include "net/sock/udp.h"
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
 #include "net/sock/dtls.h"
 #endif
 
@@ -56,7 +56,7 @@ typedef enum {
 typedef struct lwm2m_client_connection {
     struct lwm2m_client_connection *next; /**< pointer to the next connection */
     sock_udp_ep_t remote;                 /**< remote endpoint */
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS) || DOXYGEN
+#if MODULE_WAKAAMA_CLIENT_DTLS || DOXYGEN
     sock_dtls_session_t session;          /**< DTLS session (needs wakaama_client_dtls module) */
 #endif
     lwm2m_client_connection_type_t type;  /**< type of connection */
@@ -69,7 +69,7 @@ typedef struct lwm2m_client_connection {
 typedef struct {
     kernel_pid_t pid;              /**< PID of the client thread */
     sock_udp_t sock;               /**< UDP server sock */
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
     sock_udp_t dtls_udp_sock;      /**< UDP sock for DTLS */
     sock_dtls_t dtls_sock;         /**< DTLS client sock */
     sock_udp_ep_t dtls_local_ep;   /**< DTLS local endpoint */
@@ -134,7 +134,7 @@ static inline lwm2m_context_t *lwm2m_client_get_ctx(
     return client_data->lwm2m_ctx;
 }
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS) || defined(DOXYGEN)
+#if MODULE_WAKAAMA_CLIENT_DTLS || defined(DOXYGEN)
 /**
  * @brief Refreshes the client available credentials using the currently registered security objects
  * @note Only available when using the module `wakaama_client_dtls`.

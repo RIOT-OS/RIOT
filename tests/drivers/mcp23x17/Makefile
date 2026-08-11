@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  mcp23x17_irq \
+  #
 include ../Makefile.drivers_common
 
 # default expander is MCP23017

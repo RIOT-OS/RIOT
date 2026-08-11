@@ -57,16 +57,16 @@
 #define CONFIG_SDMMC_CLK_MAX        MHZ(4)
 #elif CONFIG_SDMMC_CLK_MAX_10MHZ
 #define CONFIG_SDMMC_CLK_MAX        MHZ(10)
-#elif CONFIG_SDMMC_CLK_MAX_20MHZ || !IS_USED(MODULE_PERIPH_SDMMC_HS)
+#elif CONFIG_SDMMC_CLK_MAX_20MHZ || !MODULE_PERIPH_SDMMC_HS
 #define CONFIG_SDMMC_CLK_MAX        MHZ(20)
 #else
 #define CONFIG_SDMMC_CLK_MAX        MHZ(40)
 #endif
 
 /* millisecond timer definitions dependent on active ztimer backend */
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
 #define _ZTIMER_SLEEP_MS(n)     ztimer_sleep(ZTIMER_MSEC, n)
-#elif IS_USED(MODULE_ZTIMER_USEC)
+#elif MODULE_ZTIMER_USEC
 #define _ZTIMER_SLEEP_MS(n)     ztimer_sleep(ZTIMER_USEC, n * US_PER_MS)
 #else
 #error "Either ztimer_msec or ztimer_usec is needed"
@@ -132,7 +132,7 @@ static void _init(sdmmc_dev_t *sdmmc_dev)
 
     sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
 
-#if IS_USED(CPU_FAM_ESP32)
+#if IS_ACTIVE(CPU_FAM_ESP32)
 
     /* On ESP32 only Slot 1 can be used */
     assert(conf->slot == SDMMC_SLOT_1);
@@ -141,7 +141,7 @@ static void _init(sdmmc_dev_t *sdmmc_dev)
 
     sdmmc_dev->bus_width = conf->bus_width;
 
-#elif IS_USED(CPU_FAM_ESP32S3)
+#elif IS_ACTIVE(CPU_FAM_ESP32S3)
 
     assert(gpio_is_valid(conf->clk) && !gpio_is_equal(conf->clk, GPIO0));
     assert(gpio_is_valid(conf->cmd) && !gpio_is_equal(conf->cmd, GPIO0));
@@ -170,7 +170,7 @@ static void _init(sdmmc_dev_t *sdmmc_dev)
         slot_config.d3 = conf->dat3;
         sdmmc_dev->bus_width = SDMMC_BUS_WIDTH_4BIT;
 
-#if IS_USED(MODULE_PERIPH_SDMMC_8BIT)
+#if MODULE_PERIPH_SDMMC_8BIT
         if (gpio_is_valid(conf->dat4) && !gpio_is_equal(conf->dat4, GPIO0) &&
             gpio_is_valid(conf->dat5) && !gpio_is_equal(conf->dat5, GPIO0) &&
             gpio_is_valid(conf->dat6) && !gpio_is_equal(conf->dat6, GPIO0) &&
@@ -188,7 +188,7 @@ static void _init(sdmmc_dev_t *sdmmc_dev)
 #error "ESP32x variant not supported"
 #endif
 
-#if IS_USED(CONFIG_SDMMC_INTERNAL_PULLUP)
+#if IS_ACTIVE(CONFIG_SDMMC_INTERNAL_PULLUP)
     slot_config.flags |= SDMMC_SLOT_FLAG_INTERNAL_PULLUP;
 #endif
 

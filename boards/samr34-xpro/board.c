@@ -22,11 +22,11 @@
 #include "cpu.h"
 #include "periph/gpio.h"
 
-#ifdef MODULE_SX127X
+#if MODULE_SX127X
 #include "sx127x_params.h"
 #endif
 
-#ifdef MODULE_MTD_SPI_NOR
+#if MODULE_MTD_SPI_NOR
 #include "timex.h"
 #include "mtd_spi_nor.h"
 /* AT25DF041B */
@@ -56,7 +56,7 @@ static mtd_spi_nor_t _nor_dev = {
 };
 MTD_XFA_ADD(_nor_dev, 0);
 
-#ifdef MODULE_VFS_DEFAULT
+#if MODULE_VFS_DEFAULT
 #include "vfs_default.h"
 VFS_AUTO_MOUNT(littlefs2, VFS_MTD(_nor_dev), VFS_DEFAULT_NVM(0), 0);
 #endif
@@ -65,7 +65,7 @@ VFS_AUTO_MOUNT(littlefs2, VFS_MTD(_nor_dev), VFS_DEFAULT_NVM(0), 0);
 void board_init(void)
 {
     /* initialize board specific pins for LoRa */
-#ifdef MODULE_SX127X
+#if MODULE_SX127X
     gpio_init(TCXO_PWR_PIN, GPIO_OUT);
     gpio_set(TCXO_PWR_PIN);
     gpio_init(TX_OUTPUT_SEL_PIN, GPIO_OUT);

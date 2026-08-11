@@ -29,7 +29,7 @@
 /* Num of GPIOs supported */
 #define GPIO_NUMOF (32)
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 static gpio_flank_t isr_flank[GPIO_NUMOF];
 static gpio_isr_ctx_t isr_ctx[GPIO_NUMOF];
 #endif /* MODULE_PERIPH_GPIO_IRQ */
@@ -118,7 +118,7 @@ void gpio_write(gpio_t pin, bool value)
     }
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 void gpio_isr(int num)
 {
     uint32_t pin = num - INT_GPIO_BASE;

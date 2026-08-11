@@ -18,16 +18,16 @@
 
 #include "irq.h"
 
-#ifdef MODULE_VFS
+#if MODULE_VFS
 #include <fcntl.h>
 #include "vfs.h"
-#elif defined(MODULE_STDIO_UART)
+#elif MODULE_STDIO_UART
 #include "stdio_uart.h"
 #endif
 
 int open(const char *name, int flags, ...)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     unsigned mode = 0;
 
     if ((flags & O_CREAT)) {
@@ -54,7 +54,7 @@ int open(const char *name, int flags, ...)
 
 int close(int fd)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     int res = vfs_close(fd);
     if (res < 0) {
         errno = -res;
@@ -70,7 +70,7 @@ int close(int fd)
 
 off_t lseek(int fd, off_t off, int whence)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     off_t res = vfs_lseek(fd, off, whence);
     if (res < 0) {
         errno = -res;
@@ -88,7 +88,7 @@ off_t lseek(int fd, off_t off, int whence)
 
 int fcntl(int fd, int cmd, ...)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     unsigned long arg;
     va_list ap;
     va_start(ap, cmd);
@@ -111,7 +111,7 @@ int fcntl(int fd, int cmd, ...)
 
 int fstat(int fd, struct stat *buf)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     int res = vfs_fstat(fd, buf);
     if (res < 0) {
         errno = -res;
@@ -128,14 +128,14 @@ int fstat(int fd, struct stat *buf)
 
 ssize_t read(int fd, void *dest, size_t count)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     ssize_t res = vfs_read(fd, dest, count);
     if (res < 0) {
         errno = -res;
         return -1;
     }
     return res;
-#elif defined(MODULE_STDIO_UART)
+#elif MODULE_STDIO_UART
     if (fd == 0) {
         return stdio_read(dest, count);
     }
@@ -152,14 +152,14 @@ ssize_t read(int fd, void *dest, size_t count)
 
 ssize_t write(int fd, const void *src, size_t count)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     ssize_t res = vfs_write(fd, src, count);
     if (res < 0) {
         errno = -res;
         return -1;
     }
     return res;
-#elif defined(MODULE_STDIO_UART)
+#elif MODULE_STDIO_UART
     if (fd == 0) {
         return stdio_write(src, count);
     }
@@ -174,7 +174,7 @@ ssize_t write(int fd, const void *src, size_t count)
 #endif
 }
 
-#ifndef MODULE_STDIO_NULL
+#if !MODULE_STDIO_NULL
 void perror(const char *s)
 {
     printf("%s: %s\n", s, strerror(errno));

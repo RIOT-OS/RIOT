@@ -575,6 +575,10 @@ BASELIBS += $(APPDEPS)
 # add extra include paths for packages in $(USEMODULE)
 USEMODULE_INCLUDES =
 
+# include global Makefile.include for core
+include $(RIOTBASE)/core/Makefile.include
+include $(RIOTBASE)/core/lib/Makefile.include
+
 # include global Makefile.include for `sys` modules
 include $(RIOTBASE)/sys/Makefile.include
 

@@ -1,6 +1,14 @@
 # Define the module that is built:
 MODULE = cpu
 
+MODULE_DEFS_NEEDED += \
+  esp_gdbstub \
+  esp_idf_heap \
+  esp_log_startup \
+  esp_wifi_any \
+  mtd \
+  #
+
 # Add a list of subdirectories, that should also be built:
 DIRS += $(RIOTCPU)/esp_common
 DIRS += freertos

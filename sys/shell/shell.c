@@ -40,7 +40,7 @@
 #include "shell.h"
 #include "shell_lock.h"
 
-#ifdef MODULE_VFS
+#if MODULE_VFS
 #include <fcntl.h>
 #include "vfs.h"
 #endif
@@ -53,7 +53,7 @@ XFA_INIT_CONST(shell_command_xfa_t, shell_commands_xfa_v2);
 #define BS  '\x08'  /** ASCII "Backspace" */
 #define DEL '\x7f'  /** ASCII "Delete" */
 
-#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
+#if MODULE_NEWLIB || MODULE_PICOLIBC
     #define flush_if_needed() fflush(stdout)
 #else
     #define flush_if_needed()
@@ -250,7 +250,7 @@ int shell_handle_input_line(const shell_command_t *command_list, char *line)
     char *writepos = readpos;
 
     uint8_t pstate = PARSE_BLANK;
-    if (IS_USED(MODULE_SHELL_HOOKS)) {
+    if (MODULE_SHELL_HOOKS) {
         shell_post_readline_hook();
     }
     for (; *readpos != '\0'; readpos++) {
@@ -359,7 +359,7 @@ int shell_handle_input_line(const shell_command_t *command_list, char *line)
     /* then we call the appropriate handler */
     shell_command_handler_t handler = find_handler(command_list, argv[0]);
     if (handler != NULL) {
-        if (IS_USED(MODULE_SHELL_HOOKS)) {
+        if (MODULE_SHELL_HOOKS) {
             shell_pre_command_hook(argc, argv);
             int res = handler(argc, argv);
             shell_post_command_hook(res, argc, argv);
@@ -374,7 +374,7 @@ int shell_handle_input_line(const shell_command_t *command_list, char *line)
             print_help(command_list);
             return 0;
         }
-        else if (IS_USED(MODULE_SHELL_BUILTIN_CMD_HELP_JSON)
+        else if (MODULE_SHELL_BUILTIN_CMD_HELP_JSON
                  && !strcmp("help_json", argv[0])) {
             print_commands_json(command_list);
         }
@@ -506,7 +506,7 @@ int shell_readline(char *buf, size_t size)
 void shell_run_once(const shell_command_t *shell_commands,
                     char *line_buf, int len)
 {
-    if (IS_USED(MODULE_SHELL_LOCK)) {
+    if (MODULE_SHELL_LOCK) {
         shell_lock_checkpoint(line_buf, len);
     }
 
@@ -515,13 +515,13 @@ void shell_run_once(const shell_command_t *shell_commands,
     while (1) {
         int res = shell_readline(line_buf, len);
 
-        if (IS_USED(MODULE_SHELL_LOCK)) {
+        if (MODULE_SHELL_LOCK) {
             if (shell_lock_is_locked()) {
                 break;
             }
         }
 
-        if (IS_USED(MODULE_SHELL_LOCK_AUTO_LOCKING)) {
+        if (MODULE_SHELL_LOCK_AUTO_LOCKING) {
             /* reset lock countdown in case of new input */
             shell_lock_auto_lock_refresh();
         }
@@ -529,7 +529,7 @@ void shell_run_once(const shell_command_t *shell_commands,
         switch (res) {
 
             case EOF:
-                if (IS_USED(MODULE_SHELL_LOCK)) {
+                if (MODULE_SHELL_LOCK) {
                     shell_lock_do_lock();
                 }
                 return;
@@ -547,7 +547,7 @@ void shell_run_once(const shell_command_t *shell_commands,
     }
 }
 
-#ifdef MODULE_VFS
+#if MODULE_VFS
 int shell_parse_file(const shell_command_t *shell_commands,
                      const char *filename, unsigned *line_nr)
 {

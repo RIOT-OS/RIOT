@@ -47,7 +47,7 @@
 
 FATFS fat_fs; /* FatFs work area needed for each volume */
 
-#ifdef MODULE_MTD_NATIVE
+#if MODULE_MTD_NATIVE
 
 /* mtd device for native is provided in boards/native/board_init.c */
 mtd_dev_t *fatfs_mtd_devs[1];

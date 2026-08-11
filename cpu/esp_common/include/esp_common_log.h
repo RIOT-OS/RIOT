@@ -97,7 +97,7 @@ extern int ets_printf(const char *fmt, ...);
  * Override LOG_* definitions with a tagged version. By default the function
  * name is used as tag.
  */
-#ifndef MODULE_LOG_PRINTFNOFORMAT
+#if !MODULE_LOG_PRINTFNOFORMAT
 #undef LOG_ERROR
 #undef LOG_INFO
 #undef LOG_WARNING

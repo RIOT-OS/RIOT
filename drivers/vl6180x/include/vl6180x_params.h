@@ -148,14 +148,14 @@ extern "C" {
 #define CONFIG_VL6180X_ALS_THRESH_HIGH  (2000)
 #endif
 
-#if IS_USED(MODULE_VL6180X_RNG) || DOXYGEN
+#if MODULE_VL6180X_RNG || DOXYGEN
 /** Range measurement configuration parameters */
 #define VL6180X_PARAM_RANGE         .rng_max_time = CONFIG_VL6180X_RNG_MAX_TIME,
 #else
 #define VL6180X_PARAM_RANGE
 #endif
 
-#if IS_USED(MODULE_VL6180X_ALS) || DOXYGEN
+#if MODULE_VL6180X_ALS || DOXYGEN
 /** ALS measurement configuration parameters */
 #define VL6180X_PARAM_ALS           .als_int_time = CONFIG_VL6180X_ALS_INT_TIME, \
                                     .als_gain = CONFIG_VL6180X_ALS_GAIN, \
@@ -164,40 +164,40 @@ extern "C" {
 #define VL6180X_PARAM_ALS
 #endif
 
-#if IS_USED(MODULE_VL6180X_SHUTDOWN) || DOXYGEN
+#if MODULE_VL6180X_SHUTDOWN || DOXYGEN
 /** Shutdown hardware configuration */
 #define VL6180X_PARAM_SHUTDOWN      .shutdown_pin = VL6180X_PARAM_SHUTDOWN_PIN,
 #else
 #define VL6180X_PARAM_SHUTDOWN
 #endif
 
-#if IS_USED(MODULE_VL6180X_IRQ) || DOXYGEN
+#if MODULE_VL6180X_IRQ || DOXYGEN
 /** Interrupt pin configuration */
 #define VL6180X_PARAM_INT           .int_pin = VL6180X_PARAM_INT_PIN,
 
-#if IS_USED(MODULE_VL6180X_RNG) || DOXYGEN
+#if MODULE_VL6180X_RNG || DOXYGEN
 /** Interrupt configuration for ranging */
 #define VL6180X_PARAM_INT_RNG_CFG   .int_cfg.rng_int = CONFIG_VL6180X_RNG_INT, \
                                     .int_thresh.rng_low = CONFIG_VL6180X_RNG_THRESH_LOW, \
                                     .int_thresh.rng_high = CONFIG_VL6180X_RNG_THRESH_HIGH,
-#else /* IS_USED(MODULE_VL6180X_RNG) || DOXYGEN */
+#else /* MODULE_VL6180X_RNG || DOXYGEN */
 #define VL6180X_PARAM_INT_RNG_CFG
-#endif /* IS_USED(MODULE_VL6180X_RNG) || DOXYGEN */
+#endif /* MODULE_VL6180X_RNG || DOXYGEN */
 
-#if IS_USED(MODULE_VL6180X_ALS) || DOXYGEN
+#if MODULE_VL6180X_ALS || DOXYGEN
 /** Interrupt configuration for ALS */
 #define VL6180X_PARAM_INT_ALS_CFG   .int_cfg.als_int = CONFIG_VL6180X_ALS_INT, \
                                     .int_thresh.als_low = CONFIG_VL6180X_ALS_THRESH_LOW, \
                                     .int_thresh.als_high = CONFIG_VL6180X_ALS_THRESH_HIGH,
-#else /* IS_USED(MODULE_VL6180X_ALS) || DOXYGEN */
+#else /* MODULE_VL6180X_ALS || DOXYGEN */
 #define VL6180X_PARAM_INT_ALS_CFG
-#endif /* IS_USED(MODULE_VL6180X_ALS) || DOXYGEN */
+#endif /* MODULE_VL6180X_ALS || DOXYGEN */
 
-#else /* IS_USED(MODULE_VL6180X_IRQ) || DOXYGEN */
+#else /* MODULE_VL6180X_IRQ || DOXYGEN */
 #define VL6180X_PARAM_INT
 #define VL6180X_PARAM_INT_RNG_CFG
 #define VL6180X_PARAM_INT_ALS_CFG
-#endif /* IS_USED(MODULE_VL6180X_IRQ) || DOXYGEN */
+#endif /* MODULE_VL6180X_IRQ || DOXYGEN */
 
 #if !VL6180X_PARAMS || DOXYGEN
 /** Default configuration parameter set */

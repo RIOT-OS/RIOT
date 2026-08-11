@@ -274,7 +274,7 @@ int at86rf215_configure_OFDM(at86rf215_t *dev, uint8_t option, uint8_t scheme)
     _set_ack_timeout(dev, option, scheme);
 
     /* disable FSK preamble switching */
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#if MODULE_NETDEV_IEEE802154_MR_FSK
     dev->fsk_pl = 0;
 #endif
 

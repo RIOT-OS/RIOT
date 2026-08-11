@@ -18,7 +18,7 @@
 #include "kernel_init.h"
 #include "periph/init.h"
 #include "stdio_base.h"
-#ifdef MODULE_PERIPH_MCG
+#if MODULE_PERIPH_MCG
 #include "mcg.h"
 #endif
 
@@ -36,7 +36,7 @@ void cpu_init(void)
      * enable all power modes that we wish to use. */
     SMC->PMPROT |= SMC_PMPROT_ALLS_MASK | SMC_PMPROT_AVLP_MASK;
 #endif
-#ifdef MODULE_PERIPH_MCG
+#if MODULE_PERIPH_MCG
     /* initialize the CPU clocking provided by the MCG module */
     kinetis_mcg_init();
 #endif

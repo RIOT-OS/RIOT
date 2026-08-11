@@ -11,7 +11,7 @@
 #include "fal_cfg.h"
 #include "board.h"
 #include "mutex.h"
-#ifdef MODULE_VFS
+#if MODULE_VFS
 #include "vfs_default.h"
 #else
 #include "mtd.h"
@@ -26,7 +26,7 @@
 
 #define FDB_LOG_TAG "[main]"
 
-#if IS_USED(MODULE_FLASHDB_MTD)
+#if MODULE_FLASHDB_MTD
 #define FDB_DIR     ""
 #else
 #define FDB_DIR     VFS_DEFAULT_DATA
@@ -76,7 +76,7 @@ int main(void)
     fdb_err_t result;
     uint32_t sec_size = 4096, db_size = sec_size * 4;
 
-    if (IS_USED(MODULE_FLASHDB_MTD)) {
+    if (MODULE_FLASHDB_MTD) {
 #if defined(FDB_MTD)
     fdb_mtd_init(FDB_MTD);
     sec_size = FDB_MTD->pages_per_sector * FDB_MTD->page_size;
@@ -90,7 +90,7 @@ int main(void)
     { /* KVDB Sample */
         struct fdb_default_kv default_kv;
 
-#if IS_USED(MODULE_FLASHDB_VFS)
+#if MODULE_FLASHDB_VFS
         /* enable file mode */
         bool file_mode = true;
         fdb_kvdb_control(&kvdb, FDB_KVDB_CTRL_SET_FILE_MODE, &file_mode);
@@ -139,7 +139,7 @@ int main(void)
         /* set the sector and database max size */
         fdb_tsdb_control(&tsdb, FDB_TSDB_CTRL_SET_SEC_SIZE, &sec_size);
         fdb_tsdb_control(&tsdb, FDB_TSDB_CTRL_SET_MAX_SIZE, &db_size);
-#if IS_USED(MODULE_FLASHDB_VFS)
+#if MODULE_FLASHDB_VFS
         /* enable file mode */
         bool file_mode = true;
         fdb_tsdb_control(&tsdb, FDB_TSDB_CTRL_SET_FILE_MODE, &file_mode);

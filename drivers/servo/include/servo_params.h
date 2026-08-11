@@ -218,7 +218,7 @@ static const servo_timer_params_t servo_timer_params[] =
 /**
  * @brief   Parameters for controlling a servo
  */
-#ifdef MODULE_SERVO_PWM
+#if MODULE_SERVO_PWM
 #define SERVO_PARAMS    {\
         .pwm        = SERVO_PARAM_PWM_PARAMS, \
         .min_us     = SERVO_PARAM_MIN_US, \
@@ -226,7 +226,7 @@ static const servo_timer_params_t servo_timer_params[] =
         .pwm_chan   = SERVO_PARAM_PWM_CHAN, \
     }
 #endif
-#ifdef MODULE_SERVO_TIMER
+#if MODULE_SERVO_TIMER
 #define SERVO_PARAMS    {\
         .timer      = SERVO_PARAM_TIMER_PARAMS, \
         .servo_pin  = SERVO_PARAM_PIN, \

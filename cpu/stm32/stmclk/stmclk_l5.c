@@ -163,7 +163,7 @@
 #endif
 
 /* Only periph_hwrng requires 48MHz for the moment */
-#if IS_USED(MODULE_PERIPH_HWRNG)
+#if MODULE_PERIPH_HWRNG
 #if !IS_ACTIVE(CLOCK48MHZ_USE_PLLQ) && !IS_ACTIVE(CLOCK48MHZ_USE_MSI)
 #error "No 48MHz clock source available, HWRNG cannot work"
 #endif

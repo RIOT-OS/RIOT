@@ -100,7 +100,7 @@ extern "C" {
  *        at maximum PWM_CHANNEL_NUM_DEV_MAX.
  */
 #ifndef PWM0_GPIOS
-#  ifdef MODULE_ESP32C3_WEMOS_MINI_V1_0_0
+#  if MODULE_ESP32C3_WEMOS_MINI_V1_0_0
 #    define PWM0_GPIOS  { GPIO1, GPIO6, GPIO7 }
 #  else /* MODULE_ESP32C3_WEMOS_MINI_V2_1_0 */
 #    define PWM0_GPIOS  { GPIO2, GPIO6, GPIO3 }
@@ -126,7 +126,7 @@ extern "C" {
  *
  * @{
  */
-#ifdef MODULE_ESP32C3_WEMOS_MINI_V1_0_0
+#if MODULE_ESP32C3_WEMOS_MINI_V1_0_0
 #ifndef SPI0_CTRL
 #define SPI0_CTRL   FSPI    /**< FSPI is used as SPI_DEV(0) */
 #endif

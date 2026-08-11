@@ -35,7 +35,7 @@ static const uart_conf_t uart_config[] = {
         .dev      = UART0_BASEADDR,
         .rx_pin   = GPIO_PIN(PORT_A, 0),
         .tx_pin   = GPIO_PIN(PORT_A, 1),
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .cts_pin  = GPIO_UNDEF,
         .rts_pin  = GPIO_UNDEF
 #endif

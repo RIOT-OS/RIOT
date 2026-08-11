@@ -34,7 +34,7 @@ static tsrb_t serial_tx_rb;
 static uint8_t serial_tx_rb_buf[USB_SERIAL_JTAG_PACKET_SZ_BYTES];
 
 #define IRQ_MASK (USB_SERIAL_JTAG_INTR_SERIAL_IN_EMPTY | \
-                 (IS_USED(MODULE_STDIO_USB_SERIAL_JTAG_RX) * USB_SERIAL_JTAG_INTR_SERIAL_OUT_RECV_PKT))
+                 (MODULE_STDIO_USB_SERIAL_JTAG_RX * USB_SERIAL_JTAG_INTR_SERIAL_OUT_RECV_PKT))
 
 static ssize_t _write(const void *buffer, size_t len)
 {
@@ -54,7 +54,7 @@ static void _serial_intr_handler(void *arg)
     uint32_t mask = usb_serial_jtag_ll_get_intsts_mask();
 
     /* read data if available */
-    while (IS_USED(MODULE_STDIO_USB_SERIAL_JTAG_RX) &&
+    while (MODULE_STDIO_USB_SERIAL_JTAG_RX &&
            usb_serial_jtag_ll_rxfifo_data_available()) {
         stdio_rx_write_one(USB_SERIAL_JTAG.ep1.rdwr_byte);
     }
@@ -85,7 +85,7 @@ static void _init(void)
     tsrb_init(&serial_tx_rb, serial_tx_rb_buf, sizeof(serial_tx_rb_buf));
 
     /* enable RX interrupt */
-    if (IS_USED(MODULE_STDIO_USB_SERIAL_JTAG_RX)) {
+    if (MODULE_STDIO_USB_SERIAL_JTAG_RX) {
         USB_SERIAL_JTAG.int_ena.val = USB_SERIAL_JTAG_INTR_SERIAL_OUT_RECV_PKT;
     }
 

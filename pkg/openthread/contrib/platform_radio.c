@@ -172,7 +172,7 @@ void recv_pkt(otInstance *aInstance, netdev_t *dev)
 }
 
 /* Called upon TX event */
-#ifdef MODULE_NETDEV_NEW_API
+#if MODULE_NETDEV_NEW_API
 void send_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event)
 {
     (void)event;

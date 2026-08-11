@@ -1,6 +1,23 @@
 # Define the module that is built:
 MODULE = cpu
 
+MODULE_DEFS_NEEDED += \
+  cpp \
+  esp_idf_heap \
+  esp_idf_spi_flash \
+  esp_log_startup \
+  esp_spi_ram \
+  libc_gettimeofday \
+  mpaland_printf \
+  mtd \
+  periph_flashpage \
+  periph_rtc \
+  posix_sleep \
+  puf_sram \
+  stdio_uart \
+  vfs \
+  #
+
 SRC = irq_arch.c startup.c stdatomic.c syscalls.c
 
 # Add a list of subdirectories, that should also be built:

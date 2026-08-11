@@ -43,14 +43,14 @@ void hwrng_init(void)
  */
 void hwrng_read(void *buf, unsigned int num)
 {
-    if (!IS_USED(MODULE_ESP_WIFI_ANY) && !IS_USED(MODULE_ESP_BLE)) {
+    if (!MODULE_ESP_WIFI_ANY && !MODULE_ESP_BLE) {
         /* enable the Bootloader RNG if WiFi and BT are not used */
         bootloader_random_enable();
     }
 
     esp_fill_random(buf, num);
 
-    if (!IS_USED(MODULE_ESP_WIFI_ANY) && !IS_USED(MODULE_ESP_BLE)) {
+    if (!MODULE_ESP_WIFI_ANY && !MODULE_ESP_BLE) {
         /* disable the Bootloader RNG to ensure that ADC SAR calibration works */
         bootloader_random_disable();
     }

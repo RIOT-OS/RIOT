@@ -19,9 +19,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#ifdef MODULE_FIB
+#if MODULE_FIB
 #include "net/fib.h"
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
 #endif
 #endif
@@ -37,7 +37,7 @@
 /* determine the maximum number of entries */
 #ifndef UNIVERSAL_ADDRESS_MAX_ENTRIES
 /* all potential users of universal addresses have to add their requirements here */
-#   if defined(MODULE_FIB) && defined(MODULE_GNRC_IPV6)
+#   if MODULE_FIB && MODULE_GNRC_IPV6
 #       define UA_ADD0 (2 * GNRC_IPV6_FIB_TABLE_SIZE)
 #   else
 #       define UA_ADD0  (0)

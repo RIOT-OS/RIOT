@@ -18,32 +18,32 @@
 
 #include "board.h"
 #include "modules.h"
-#if IS_USED(MODULE_VFS) || DOXYGEN
+#if MODULE_VFS || DOXYGEN
 #include "vfs.h"
 #else
 /* don't try to create auto-mounts if there is no VFS module */
 #define VFS_AUTO_MOUNT(type, mtd, path, idx)
 #endif
 
-#if IS_USED(MODULE_FATFS_VFS)
+#if MODULE_FATFS_VFS
 #include "fs/fatfs.h"
 #endif
-#if IS_USED(MODULE_LITTLEFS)
+#if MODULE_LITTLEFS
 #include "fs/littlefs_fs.h"
 #endif
-#if IS_USED(MODULE_LITTLEFS2)
+#if MODULE_LITTLEFS2
 #include "fs/littlefs2_fs.h"
 #endif
-#if IS_USED(MODULE_SPIFFS)
+#if MODULE_SPIFFS
 #include "fs/spiffs_fs.h"
 #endif
-#if IS_USED(MODULE_LWEXT4)
+#if MODULE_LWEXT4
 #include "fs/lwext4_fs.h"
 #endif
-#if IS_USED(MODULE_XIPFS)
+#if MODULE_XIPFS
 #include "fs/xipfs_fs.h"
 #endif
-#if IS_USED(MODULE_FS_NATIVE)
+#if MODULE_FS_NATIVE
 #include "fs/native_fs.h"
 #endif
 
@@ -70,8 +70,8 @@ extern "C" {
  *          This can be written to by applications
  */
 #ifndef VFS_DEFAULT_DATA
-#if IS_USED(MODULE_MTD_MCI) || IS_USED(MODULE_MTD_SDCARD) || \
-    IS_USED(MODULE_SAM0_SDHC) || IS_USED(MODULE_MTD_SDMMC)
+#if MODULE_MTD_MCI || MODULE_MTD_SDCARD || \
+    MODULE_SAM0_SDHC || MODULE_MTD_SDMMC
 #define VFS_DEFAULT_DATA    VFS_DEFAULT_SD(0)
 #else
 #define VFS_DEFAULT_DATA    VFS_DEFAULT_NVM(0)

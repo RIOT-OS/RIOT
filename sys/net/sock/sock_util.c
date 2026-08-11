@@ -151,7 +151,7 @@ int sock_tl_ep_fmt(const struct _sock_tl_ep *endpoint,
     }
 
     if (IS_ACTIVE(SOCK_HAS_IPV6) && (endpoint->family == AF_INET6) && endpoint->netif) {
-#ifdef MODULE_FMT
+#if MODULE_FMT
         char *tmp = addr_str + strlen(addr_str);
         *tmp++ = '%';
         tmp += fmt_u16_dec(tmp, endpoint->netif);
@@ -356,7 +356,7 @@ bool sock_tl_ep_equal(const struct _sock_tl_ep *a,
 }
 #endif
 
-#if defined(MODULE_SOCK_DTLS)
+#if MODULE_SOCK_DTLS
 int sock_dtls_establish_session(sock_udp_t *sock_udp, sock_dtls_t *sock_dtls,
                                 sock_dtls_session_t *session, credman_tag_t tag,
                                 sock_udp_ep_t *local, const sock_udp_ep_t *remote,

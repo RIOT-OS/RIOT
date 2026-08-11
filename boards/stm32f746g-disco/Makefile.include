@@ -17,3 +17,10 @@ OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 # heap configuration
 FMC_RAM_ADDR=0xc0000000
 FMC_RAM_LEN=8192K
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  periph_fmc_16bit \
+  periph_fmc_sdram \
+  periph_usbdev_hs_ulpi \
+  #

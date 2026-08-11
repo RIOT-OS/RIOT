@@ -47,7 +47,7 @@ extern "C" {
 #define HMC5883L_PARAM_INT_PIN      (GPIO_UNDEF)
 #endif
 
-#ifdef MODULE_HMC5883L_INT
+#if MODULE_HMC5883L_INT
 #ifndef HMC5883L_PARAMS
 #define HMC5883L_PARAMS             { \
                                      .dev  = HMC5883L_PARAM_DEV,  \

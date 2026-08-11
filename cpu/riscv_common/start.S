@@ -26,7 +26,7 @@ _start_real:
 .option pop
     la sp, _sp
 
-#ifdef MODULE_PUF_SRAM
+#if MODULE_PUF_SRAM
     /* PUF */
     call riscv_puf_sram_init
 #endif

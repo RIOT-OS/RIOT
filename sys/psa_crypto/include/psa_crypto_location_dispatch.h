@@ -27,7 +27,7 @@ extern "C" {
 #include "kernel_defines.h"
 #include "psa/crypto.h"
 
-#if IS_USED(MODULE_PSA_ASYMMETRIC)
+#if MODULE_PSA_ASYMMETRIC
 /**
  * @brief   Dispatch call of a hash signature function to a location specific backend.
  *          See psa_sign_hash()
@@ -79,7 +79,7 @@ psa_status_t psa_location_dispatch_verify_message(const psa_key_attributes_t *at
                                                  size_t signature_length);
 #endif /* MODULE_PSA_ASYMMETRIC */
 
-#if IS_USED(MODULE_PSA_MAC)
+#if MODULE_PSA_MAC
 /**
  * @brief   Dispatch call of a mac computation function to a location-specific backend.
  *          See @ref psa_mac_compute()
@@ -155,7 +155,7 @@ psa_status_t psa_location_dispatch_mac_verify_finish(psa_mac_operation_t *operat
 psa_status_t psa_location_dispatch_mac_abort(psa_mac_operation_t *operation);
 #endif /* MODULE_PSA_MAC */
 
-#if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
+#if MODULE_PSA_KEY_MANAGEMENT
 /**
  * @brief   Dispatch call of the key generation function to a location specific backend.
  *          See psa_generate_key()
@@ -172,7 +172,7 @@ psa_status_t psa_location_dispatch_import_key( const psa_key_attributes_t *attri
                                                psa_key_slot_t *slot, size_t *bits);
 #endif /* MODULE_PSA_KEY_MANAGEMENT */
 
-#if IS_USED(MODULE_PSA_CIPHER)
+#if MODULE_PSA_CIPHER
 /**
  * @brief   Dispatch call of a cipher encrypt setup function to a location specific backend.
  *          See psa_cipher_setup()
@@ -226,7 +226,7 @@ psa_status_t psa_location_dispatch_cipher_decrypt(  const psa_key_attributes_t *
                                                     size_t *output_length);
 #endif /* MODULE_PSA_CIPHER */
 
-#if IS_USED(MODULE_PSA_AEAD)
+#if MODULE_PSA_AEAD
 /**
  * @brief   Dispatch a aead encrypt function to a specific backend.
  *          See @ref psa_aead_encrypt()

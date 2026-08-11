@@ -54,7 +54,7 @@
  * - an I/O mapping for the UART at D0/D1 needs to be provided
  * - this UART dev is not busy with stdio (either not using `stdio_uart` or a different UART is used for stdio)
  */
-#if defined(ARDUINO_UART_D0D1) && defined(MODULE_PERIPH_UART)
+#if defined(ARDUINO_UART_D0D1) && MODULE_PERIPH_UART
 #  if MODULE_STDIO_UART
 #    define ENABLE_UART_TEST (STDIO_UART_DEV != ARDUINO_UART_D0D1)
 #  else
@@ -72,7 +72,7 @@
  *     - Arduino I/O mapping for PWM on D5 *AND* analog pin A2 is provided
  *     - Arduino I/O mapping for PWM on D6 *AND* analog pin A1 is provided
  */
-#if defined(MODULE_PERIPH_PWM) && defined(MODULE_PERIPH_ADC)
+#if MODULE_PERIPH_PWM && MODULE_PERIPH_ADC
 #  if defined(ARDUINO_PIN_5_PWM_DEV) && defined(ARDUINO_A2)
 #    define ENABLE_PWM_TEST_D5  1
 #  else
@@ -96,7 +96,7 @@
  * - The PCF857x driver (so that we can control the R-2R resistor ladder
  *   connected to the GPIO expander).
  */
-#if defined(MODULE_PERIPH_ADC) && defined(ARDUINO_A0) && defined(MODULE_PCF857X)
+#if MODULE_PERIPH_ADC && defined(ARDUINO_A0) && MODULE_PCF857X
 #  define ENABLE_ADC_TEST       1
 #else
 #  define ENABLE_ADC_TEST       0
@@ -128,14 +128,14 @@
 #  define UART_TEST_DEV UART_DEV(0)
 #endif
 #ifndef TIMER
-#  if IS_USED(MODULE_ZTIMER_PERIPH_TIMER) && CONFIG_ZTIMER_USEC_DEV == TIMER_DEV(0)
+#  if MODULE_ZTIMER_PERIPH_TIMER && CONFIG_ZTIMER_USEC_DEV == TIMER_DEV(0)
 #    define TIMER         TIMER_DEV(1)
 #  else
 #    define TIMER         TIMER_DEV(0)
 #  endif
 #endif
 
-#if IS_USED(MODULE_ZTIMER_PERIPH_TIMER)
+#if MODULE_ZTIMER_PERIPH_TIMER
 #  if CONFIG_ZTIMER_USEC_DEV == TIMER
 #    error "Same timer used for ztimer and test"
 #  endif
@@ -197,7 +197,7 @@ static struct {
  * mapping are present. If this module is not used, this test is optimized
  * out as dead branch. We still want the compile test, though. */
 static const pcf857x_params_t params = {
-#ifdef MODULE_PCF857X
+#if MODULE_PCF857X
     .dev = ARDUINO_I2C_UNO,
     .exp = PCF857X_EXP_PCF8574,
 #endif
@@ -749,17 +749,17 @@ static bool periph_uart_rxtx_test(uint32_t symbolrate, uint32_t timer_freq)
 
     ASSERT_NO_ERROR(uart_init(UART_TEST_DEV, symbolrate, uart_rx_cb, NULL));
 
-    if (IS_USED(MODULE_PERIPH_TIMER)) {
+    if (MODULE_PERIPH_TIMER) {
         bit_ticks = timer_freq / symbolrate;
         duration_ticks = 9ULL * sizeof(testdata) * bit_ticks;
     }
 
     /* test that data send matches data received */
-    if (IS_USED(MODULE_PERIPH_TIMER)) {
+    if (MODULE_PERIPH_TIMER) {
         start = timer_read(TIMER);
     }
     uart_write(UART_TEST_DEV, (void *)testdata, sizeof(testdata));
-    if (IS_USED(MODULE_PERIPH_TIMER)) {
+    if (MODULE_PERIPH_TIMER) {
         uint16_t stop = timer_read(TIMER);
         /* expecting actual duration within 75% to 200% of the expected. */
         failed |= TEST(stop - start > duration_ticks - (duration_ticks >> 2));
@@ -824,7 +824,7 @@ static bool periph_uart_test(void)
 
     /* Select a frequency >= TIMER_FREQ_UART_TEST that is closest to it. If no
      * such exists, select the highest supported frequency instead. */
-    if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+    if (MODULE_PERIPH_TIMER_QUERY_FREQS) {
         timer_freq = timer_query_freqs(TIMER, 0);
         for (uword_t i = 0; i < timer_query_freqs_numof(TIMER); i++) {
             uint32_t tmp = timer_query_freqs(TIMER, i);
@@ -835,7 +835,7 @@ static bool periph_uart_test(void)
         }
     }
 
-    if (IS_USED(MODULE_PERIPH_TIMER)) {
+    if (MODULE_PERIPH_TIMER) {
         ASSERT_NO_ERROR(timer_init(TIMER, timer_freq, NULL, NULL));
         timer_start(TIMER);
     }
@@ -857,7 +857,7 @@ static bool periph_spi_rxtx_test(spi_t bus, spi_mode_t mode, spi_clk_t clk,
     uint16_t byte_transfer_ticks = 0;
     memset(&serial_buf, 0, sizeof(serial_buf));
 
-    if (IS_USED(MODULE_PERIPH_TIMER)) {
+    if (MODULE_PERIPH_TIMER) {
         byte_transfer_ticks = 8ULL * timer_freq / clk_hz;
     }
 
@@ -869,7 +869,7 @@ static bool periph_spi_rxtx_test(spi_t bus, spi_mode_t mode, spi_clk_t clk,
 
     spi_acquire(bus, cs, mode, clk);
 
-    if (IS_USED(MODULE_PCF857X)) {
+    if (MODULE_PCF857X) {
         failed |= TEST(idle_level == (bool)pcf857x_gpio_read(&egpios, clk_check));
     }
 
@@ -879,16 +879,16 @@ static bool periph_spi_rxtx_test(spi_t bus, spi_mode_t mode, spi_clk_t clk,
     uint16_t byte_time;
     for (uint8_t i = 0; i < UINT8_MAX; i++) {
         uint16_t start = 0;
-        if (IS_USED(MODULE_PERIPH_TIMER)) {
+        if (MODULE_PERIPH_TIMER) {
             start = timer_read(TIMER);
         }
         uint8_t received = spi_transfer_byte(bus, cs, true, i);
         uint16_t stop = 0;
-        if (IS_USED(MODULE_PERIPH_TIMER)) {
+        if (MODULE_PERIPH_TIMER) {
             stop = timer_read(TIMER);
         }
         failed |= TEST(received == i);
-        if (IS_USED(MODULE_PERIPH_TIMER)) {
+        if (MODULE_PERIPH_TIMER) {
             byte_time = (uint16_t)(stop - start);
             /* We allow the actual SPI clock to be slower than requested, but
              * not faster. So the transfer needs to take *at least* the
@@ -932,7 +932,7 @@ static bool periph_spi_rxtx_test(spi_t bus, spi_mode_t mode, spi_clk_t clk,
         }
     }
 
-    if (IS_USED(MODULE_PCF857X)) {
+    if (MODULE_PCF857X) {
         failed |= TEST(idle_level == (bool)pcf857x_gpio_read(&egpios, clk_check));
     }
 
@@ -949,7 +949,7 @@ static bool periph_spi_test(void)
 
     /* Select a frequency >= TIMER_FREQ_SPI_TEST that is closest to it. If no
      * such exists, select the highest supported frequency instead. */
-    if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+    if (MODULE_PERIPH_TIMER_QUERY_FREQS) {
         timer_freq = timer_query_freqs(TIMER, 0);
         for (uword_t i = 0; i < timer_query_freqs_numof(TIMER); i++) {
             uint32_t tmp = timer_query_freqs(TIMER, i);
@@ -960,7 +960,7 @@ static bool periph_spi_test(void)
         }
     }
 
-    if (IS_USED(MODULE_PERIPH_TIMER)) {
+    if (MODULE_PERIPH_TIMER) {
         ASSERT_NO_ERROR(timer_init(TIMER, timer_freq, NULL, NULL));
         timer_start(TIMER);
     }
@@ -969,7 +969,7 @@ static bool periph_spi_test(void)
     static const spi_clk_t clocks[] = { SPI_CLK_400KHZ, SPI_CLK_1MHZ, SPI_CLK_10MHZ };
     static const uint32_t clk_hzs[] = { KHZ(400), MHZ(1), MHZ(10) };
 
-    if (IS_USED(MODULE_PCF857X)) {
+    if (MODULE_PCF857X) {
         for (int i = 0; i < (int)ARRAY_SIZE(spi_clk_check_pins); i++) {
             ASSERT_NO_ERROR(pcf857x_gpio_init(&egpios, spi_clk_check_pins[i], GPIO_IN));
         }
@@ -1103,19 +1103,19 @@ int main(void)
 
     /* the GPIO extender is used by the I2C test and the ADC test, so only
      * initialize it once here */
-    if (IS_USED(MODULE_PCF857X)) {
+    if (MODULE_PCF857X) {
         ASSERT_NO_ERROR(pcf857x_init(&egpios, &params));
     }
 
-    if (IS_USED(MODULE_PERIPH_GPIO)) {
+    if (MODULE_PERIPH_GPIO) {
         failed |= periph_gpio_test();
     }
 
-    if (IS_USED(MODULE_PERIPH_GPIO_IRQ)) {
+    if (MODULE_PERIPH_GPIO_IRQ) {
         failed |= periph_gpio_irq_test();
     }
 
-    if (IS_USED(MODULE_PCF857X) && IS_USED(MODULE_PERIPH_GPIO)) {
+    if (MODULE_PCF857X && MODULE_PERIPH_GPIO) {
         failed |= periph_i2c_test();
     }
 
@@ -1123,7 +1123,7 @@ int main(void)
         failed |= periph_uart_test();
     }
 
-    if (IS_USED(MODULE_PERIPH_SPI)) {
+    if (MODULE_PERIPH_SPI) {
         failed |= periph_spi_test();
     }
 

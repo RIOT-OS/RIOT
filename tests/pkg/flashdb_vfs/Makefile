@@ -1,3 +1,9 @@
+
+MODULE_DEFS_NEEDED += \
+  flashdb_mtd \
+  flashdb_vfs \
+  vfs \
+  #
 include ../Makefile.pkg_common
 
 # select the VFS backend

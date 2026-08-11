@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_rtc_mem \
+  periph_rtc_ms \
+  #
 include ../Makefile.periph_common
 
 FEATURES_REQUIRED += periph_rtc

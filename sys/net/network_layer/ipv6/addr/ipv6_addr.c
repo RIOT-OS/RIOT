@@ -136,7 +136,7 @@ void ipv6_addr_print(const ipv6_addr_t *addr)
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
     ipv6_addr_to_str(addr_str, addr, sizeof(addr_str));
 
-    if (IS_USED(MODULE_FMT)) {
+    if (MODULE_FMT) {
         print_str(addr_str);
     }
     else {
@@ -155,7 +155,7 @@ void ipv6_addrs_print(const ipv6_addr_t *addrs, size_t num,
     char buf[IPV6_ADDR_MAX_STR_LEN];
     for (size_t idx = 0; idx < (size_t)num; idx++) {
         ipv6_addr_to_str(buf, &addrs[idx], sizeof(buf));
-        if (IS_USED(MODULE_FMT)) {
+        if (MODULE_FMT) {
             print_str(buf);
             print_str(separator);
         }
@@ -165,7 +165,7 @@ void ipv6_addrs_print(const ipv6_addr_t *addrs, size_t num,
     }
 
     ipv6_addr_to_str(buf, &addrs[num], sizeof(buf));
-    if (IS_USED(MODULE_FMT)) {
+    if (MODULE_FMT) {
         print_str(buf);
     }
     else {
@@ -178,7 +178,7 @@ void ipv6_prefix_print(const ipv6_addr_t *pfx, uint8_t bits)
     ipv6_addr_t tmp = {};
     ipv6_addr_init_prefix(&tmp, pfx, bits);
     ipv6_addr_print(&tmp);
-    if (IS_USED(MODULE_FMT)) {
+    if (MODULE_FMT) {
         print_str("/");
         print_u32_dec(bits);
     } else {

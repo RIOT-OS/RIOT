@@ -119,7 +119,7 @@ int pn532_init(pn532_t *dev, const pn532_params_t *params, pn532_mode_t mode)
     gpio_set(dev->conf->reset);
     dev->mode = mode;
     if (mode == PN532_SPI) {
-#if IS_USED(MODULE_PN532_SPI)
+#if MODULE_PN532_SPI
         /* we handle the CS line manually... */
         gpio_init(dev->conf->nss, GPIO_OUT);
         gpio_set(dev->conf->nss);
@@ -144,7 +144,7 @@ static uint8_t chksum(uint8_t *b, unsigned len)
     return c;
 }
 
-#if IS_USED(MODULE_PN532_SPI)
+#if MODULE_PN532_SPI
 static void reverse(uint8_t *buff, unsigned len)
 {
     while (len--) {
@@ -163,7 +163,7 @@ static int _write(const pn532_t *dev, uint8_t *buff, unsigned len)
     (void)len;
 
     switch (dev->mode) {
-#if IS_USED(MODULE_PN532_I2C)
+#if MODULE_PN532_I2C
     case PN532_I2C:
         i2c_acquire(dev->conf->i2c);
         ret = i2c_write_bytes(dev->conf->i2c, PN532_I2C_ADDRESS, buff, len, 0);
@@ -173,7 +173,7 @@ static int _write(const pn532_t *dev, uint8_t *buff, unsigned len)
         i2c_release(dev->conf->i2c);
         break;
 #endif
-#if IS_USED(MODULE_PN532_SPI)
+#if MODULE_PN532_SPI
     case PN532_SPI:
         spi_acquire(dev->conf->spi, SPI_CS_UNDEF, SPI_MODE, SPI_CLK);
         gpio_clear(dev->conf->nss);
@@ -202,7 +202,7 @@ static int _read(const pn532_t *dev, uint8_t *buff, unsigned len)
     (void)len;
 
     switch (dev->mode) {
-#if IS_USED(MODULE_PN532_I2C)
+#if MODULE_PN532_I2C
     case PN532_I2C:
         i2c_acquire(dev->conf->i2c);
         /* len+1 for RDY after read is accepted */
@@ -213,7 +213,7 @@ static int _read(const pn532_t *dev, uint8_t *buff, unsigned len)
         i2c_release(dev->conf->i2c);
         break;
 #endif
-#if IS_USED(MODULE_PN532_SPI)
+#if MODULE_PN532_SPI
     case PN532_SPI:
         spi_acquire(dev->conf->spi, SPI_CS_UNDEF, SPI_MODE, SPI_CLK);
         gpio_clear(dev->conf->nss);

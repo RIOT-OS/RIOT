@@ -212,7 +212,7 @@ static const spi_conf_t spi_config[] = {
         .miso_pad = SPI_PAD_MISO_3,
         .mosi_pad = SPI_PAD_MOSI_0_SCK_1,
         .gclk_src = SAM0_GCLK_PERIPH,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_trigger = SERCOM7_DMAC_ID_TX,
         .rx_trigger = SERCOM7_DMAC_ID_RX,
 #endif
@@ -228,12 +228,12 @@ static const spi_conf_t spi_config[] = {
         .miso_pad = SPI_PAD_MISO_3,
         .mosi_pad = SPI_PAD_MOSI_0_SCK_1,
         .gclk_src = SAM0_GCLK_PERIPH,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_trigger = SERCOM2_DMAC_ID_TX,
         .rx_trigger = SERCOM2_DMAC_ID_RX,
 #endif
     },
-#ifdef MODULE_PERIPH_SPI_ON_QSPI
+#if MODULE_PERIPH_SPI_ON_QSPI
     {    /* QSPI in SPI mode */
         .dev      = QSPI,
         .miso_pin = SAM0_QSPI_PIN_DATA_1,
@@ -245,7 +245,7 @@ static const spi_conf_t spi_config[] = {
         .miso_pad = SPI_PAD_MISO_0,         /* unused */
         .mosi_pad = SPI_PAD_MOSI_0_SCK_1,   /* unused */
         .gclk_src = SAM0_GCLK_MAIN,         /* unused */
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_trigger = QSPI_DMAC_ID_TX,
         .rx_trigger = QSPI_DMAC_ID_RX,
 #endif
@@ -280,7 +280,7 @@ static const uart_conf_t uart_config[] = {
         .dev      = &SERCOM0->USART,
         .rx_pin   = GPIO_PIN(PB, 25),   /* D0 (UART0_RX) */
         .tx_pin   = GPIO_PIN(PB, 24),   /* D1 (UART0_TX) */
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .rts_pin  = GPIO_UNDEF,
         .cts_pin  = GPIO_UNDEF,
 #endif
@@ -294,7 +294,7 @@ static const uart_conf_t uart_config[] = {
         .dev      = &SERCOM4->USART,
         .rx_pin   = GPIO_PIN(PB, 13),   /* D19 (UART2_RX) */
         .tx_pin   = GPIO_PIN(PB, 12),   /* D18 (UART2_TX) */
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .rts_pin  = GPIO_UNDEF,
         .cts_pin  = GPIO_UNDEF,
 #endif
@@ -308,7 +308,7 @@ static const uart_conf_t uart_config[] = {
         .dev      = &SERCOM1->USART,
         .rx_pin   = GPIO_PIN(PC, 23),   /* D17 (UART2_RX) */
         .tx_pin   = GPIO_PIN(PC, 22),   /* D16 (UART2_TX) */
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .rts_pin  = GPIO_UNDEF,
         .cts_pin  = GPIO_UNDEF,
 #endif

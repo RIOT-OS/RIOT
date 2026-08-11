@@ -125,7 +125,7 @@
 #endif
 
 /* Only periph_hwrng and periph_usbdev require HSI RC with 48MHz for the moment */
-#if IS_USED(MODULE_PERIPH_HWRNG) || IS_USED(MODULE_PERIPH_USBDEV_CLK)
+#if MODULE_PERIPH_HWRNG || MODULE_PERIPH_USBDEV_CLK
 #define CLOCK_ENABLE_HSI48          1
 #else
 #define CLOCK_ENABLE_HSI48          0

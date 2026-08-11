@@ -37,10 +37,10 @@ typedef struct {
     struct netif lwip_netif;            /**< lwIP interface data */
     rmutex_t lock;                      /**< lock for the interface */
     event_t ev_isr;                     /**< ISR event */
-#ifdef MODULE_BHP_EVENT
+#if MODULE_BHP_EVENT
     bhp_event_t bhp;                    /**< IPC Bottom Half Processor */
 #endif
-#if (IS_USED(MODULE_NETDEV_NEW_API))
+#if (MODULE_NETDEV_NEW_API)
     thread_t *thread_doing_tx;          /**< The thread currently doing TX */
 #endif
 } lwip_netif_t;

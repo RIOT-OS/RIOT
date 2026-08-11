@@ -27,7 +27,7 @@
 
 #include "ft5x06_constants.h"
 
-#ifdef MODULE_TOUCH_DEV
+#if MODULE_TOUCH_DEV
 #include "touch_dev.h"
 #endif
 
@@ -122,7 +122,7 @@ typedef struct {
  * @brief   Device descriptor for the driver
  */
 typedef struct {
-#ifdef MODULE_TOUCH_DEV
+#if MODULE_TOUCH_DEV
     touch_dev_t *dev;               /**< Pointer to the generic touch device */
 #endif
     const ft5x06_params_t *params;  /**< Initialization parameters */

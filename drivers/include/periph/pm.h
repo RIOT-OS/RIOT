@@ -22,7 +22,7 @@
 
 #include "periph_cpu.h"
 
-#ifdef MODULE_PM_LAYERED
+#if MODULE_PM_LAYERED
 #include "pm_layered.h"
 #endif
 

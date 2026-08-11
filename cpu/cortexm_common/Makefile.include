@@ -78,3 +78,8 @@ endif
 
 # JLink is able to flash any ARM CPUs
 PROGRAMMERS_SUPPORTED += jlink
+
+MODULE_DEFS_NEEDED += \
+  cortexm_fpu \
+  debug_irq_disable \
+  #

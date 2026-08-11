@@ -155,7 +155,7 @@ int main(void)
         return -1;
     }
 
-#ifndef MODULE_LWIP_DHCP_AUTO
+#if !MODULE_LWIP_DHCP_AUTO
     ip4_addr_t ip = _TEST_ADDR4_LOCAL;
     ip4_addr_t subnet = _TEST_ADDR4_MASK;
     netif_set_addr(iface, &ip, &subnet, NULL);

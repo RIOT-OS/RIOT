@@ -11,3 +11,15 @@ PSEUDOMODULES += si7055
 
 USEMODULE_INCLUDES_si70xx := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_si70xx)
+
+MODULE_DEFS_NEEDED += \
+  si7006 \
+  si7013 \
+  si7020 \
+  si7021 \
+  si7050 \
+  si7051 \
+  si7053 \
+  si7054 \
+  si7055 \
+  #

@@ -70,7 +70,7 @@ extern "C" {
  * @internal
  */
 typedef struct {
-#if IS_USED(MODULE_SOCK_AUX_LOCAL) || DOXYGEN
+#if MODULE_SOCK_AUX_LOCAL || DOXYGEN
     /**
      * @brief   local IP address PDU was received on
      *
@@ -78,10 +78,10 @@ typedef struct {
      */
     sock_ip_ep_t *local;
 #endif
-#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP) || DOXYGEN
+#if MODULE_SOCK_AUX_TIMESTAMP || DOXYGEN
     uint64_t *timestamp;    /**< timestamp PDU was received at in nanoseconds */
 #endif
-#if IS_USED(MODULE_SOCK_AUX_RSSI) || DOXYGEN
+#if MODULE_SOCK_AUX_RSSI || DOXYGEN
     int16_t *rssi;          /**< RSSI value of received PDU */
 #endif
     /**

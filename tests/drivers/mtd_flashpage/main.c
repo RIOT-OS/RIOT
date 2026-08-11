@@ -154,7 +154,7 @@ static void test_mtd_write_read(void)
 
 static void test_mtd_write_read_page(void)
 {
-#ifdef MODULE_MTD_WRITE_PAGE
+#if MODULE_MTD_WRITE_PAGE
         const char buf[] __attribute__ ((aligned (FLASHPAGE_WRITE_BLOCK_ALIGNMENT)))
             = "abcdefghijklmno";
 
@@ -215,7 +215,7 @@ static void test_mtd_write_read_page(void)
 #endif
 }
 
-#ifdef MODULE_PERIPH_FLASHPAGE_AUX
+#if MODULE_PERIPH_FLASHPAGE_AUX
 static bool mem_is_all_set(const uint8_t *buf, uint8_t c, size_t n)
 {
     for (const uint8_t *end = buf + n; buf != end; ++buf) {
@@ -297,7 +297,7 @@ Test *tests_mtd_flashpage_tests(void)
         new_TestFixture(test_mtd_write_erase),
         new_TestFixture(test_mtd_write_read),
         new_TestFixture(test_mtd_write_read_page),
-#ifdef MODULE_PERIPH_FLASHPAGE_AUX
+#if MODULE_PERIPH_FLASHPAGE_AUX
         new_TestFixture(test_mtd_aux_slot),
 #endif
     };

@@ -64,7 +64,7 @@ extern "C" {
 /**
  * @brief Default protocol for data that is coming in
  */
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if MODULE_GNRC_SIXLOWPAN
 #define CC1XXX_DEFAULT_PROTOCOL         (GNRC_NETTYPE_SIXLOWPAN)
 #else
 #define CC1XXX_DEFAULT_PROTOCOL         (GNRC_NETTYPE_UNDEF)

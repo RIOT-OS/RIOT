@@ -154,7 +154,7 @@ int sx127x_init(sx127x_t *dev)
 
     sx127x_reset(dev);
 
-#if defined(MODULE_SX1276)
+#if MODULE_SX1276
     sx1276_rx_chain_calibration(dev);
 #endif
     sx127x_set_op_mode(dev, SX127X_RF_OPMODE_SLEEP);
@@ -341,7 +341,7 @@ static int _init_spi(sx127x_t *dev)
     /* Setup SPI for SX127X */
     res = spi_init_cs(dev->params.spi, dev->params.nss_pin);
 
-#ifdef MODULE_PERIPH_SPI_GPIO_MODE
+#if MODULE_PERIPH_SPI_GPIO_MODE
     spi_gpio_mode_t gpio_modes = {
         .mosi = (GPIO_OUT | SX127X_DIO_PULL_MODE),
         .miso = (SX127X_DIO_PULL_MODE),

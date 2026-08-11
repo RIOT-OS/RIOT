@@ -31,7 +31,7 @@
 #include "periph/spi.h"
 #include "periph/gpio.h"
 
-#ifdef MODULE_DISP_DEV
+#if MODULE_DISP_DEV
 #include "disp_dev.h"
 #endif
 
@@ -100,7 +100,7 @@ typedef struct {
  * @brief   Device initialisation parameters.
  */
 typedef struct {
-    #ifdef MODULE_DISP_DEV
+    #if MODULE_DISP_DEV
     disp_dev_t *dev;                    /**< pointer to the generic display device */
     #endif
     epd_bw_spi_params_t params;         /**< SPI display parameters */

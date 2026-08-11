@@ -272,7 +272,7 @@ void cpu_init(void)
     cortexm_init();
     /* Initialise clock sources and generic clocks */
     clk_init();
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
     /*  initialize DMA streams */
     dma_init();
 #endif

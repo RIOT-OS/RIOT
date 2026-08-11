@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  ncv7356 \
+  tja1042 \
+  #
 export APPLICATION = can_trx
 include ../Makefile.sys_common
 

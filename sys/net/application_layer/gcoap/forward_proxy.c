@@ -283,7 +283,7 @@ static void _forward_resp_handler(const gcoap_request_memo_t *memo,
 
         if (req_etag_len > 0) {
             /* req_tag in cep is pre-processor guarded so we need to as well */
-#if IS_USED(MODULE_NANOCOAP_CACHE)
+#if MODULE_NANOCOAP_CACHE
             uint8_t *resp_etag;
 
             /* check if we can just send 2.03 Valid instead */
@@ -366,7 +366,7 @@ static int _gcoap_forward_proxy_copy_options(coap_pkt_t *pkt,
         /* wrt to ETag option slack: we always have at least the Proxy-URI option in the client_pkt,
          * so we should hit at least once (and it's opt_num is also >= COAP_OPT_ETAG) */
         if (optlen >= 0) {
-            if (IS_USED(MODULE_NANOCOAP_CACHE) && !etag_added && (opt.opt_num >= COAP_OPT_ETAG)) {
+            if (MODULE_NANOCOAP_CACHE && !etag_added && (opt.opt_num >= COAP_OPT_ETAG)) {
                 static const uint8_t tmp[COAP_ETAG_LENGTH_MAX] = { 0 };
                 /* add slack to maybe add an ETag on stale cache hit later, as is done in
                  * gcoap_req_send() (which we circumvented in _gcoap_forward_proxy_via_coap()) */
@@ -374,7 +374,7 @@ static int _gcoap_forward_proxy_copy_options(coap_pkt_t *pkt,
                     etag_added = true;
                 }
             }
-            if (IS_USED(MODULE_NANOCOAP_CACHE) && opt.opt_num == COAP_OPT_ETAG) {
+            if (MODULE_NANOCOAP_CACHE && opt.opt_num == COAP_OPT_ETAG) {
                 if (_cep_get_req_etag_len(cep) == 0) {
                     /* TODO: what to do on multiple ETags? */
                     _cep_set_req_etag(cep, value, optlen);
@@ -467,7 +467,7 @@ static int _gcoap_forward_proxy_via_coap(coap_pkt_t *client_pkt,
         _free_client_ep(client_ep);
         return -EINVAL;
     }
-    if (IS_USED(MODULE_GCOAP_FORWARD_PROXY_THREAD)) {
+    if (MODULE_GCOAP_FORWARD_PROXY_THREAD) {
         /* WORKAROUND: DTLS communication is blocking the gcoap thread,
          * therefore the communication should be handled in the proxy thread */
 
@@ -558,7 +558,7 @@ static void _cep_set_response_type(client_ep_t *cep, uint8_t resp_type)
 
 static uint8_t _cep_get_req_etag_len(client_ep_t *cep)
 {
-    if (IS_USED(MODULE_NANOCOAP_CACHE)) {
+    if (MODULE_NANOCOAP_CACHE) {
         return (cep->flags & CLIENT_EP_FLAGS_ETAG_LEN_MASK) >> CLIENT_EP_FLAGS_ETAG_LEN_POS;
     }
     return 0;

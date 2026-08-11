@@ -10,3 +10,9 @@ PSEUDOMODULES += mcp23x17_reset
 
 USEMODULE_INCLUDES_mcp23x17 := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_mcp23x17)
+
+MODULE_DEFS_NEEDED += \
+  mcp23x17_i2c \
+  mcp23x17_spi \
+  saul_gpio \
+  #

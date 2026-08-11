@@ -61,7 +61,7 @@ static void _cc2538_observable_signals(void)
     /* Select on which pin PC0:7 should the selected observable signals
        be wired through, the signal is selected in CONFIG_CC2538_RF_OBS_%
        and the pin in CONFIG_CC2538_RF_OBS_SIG_%_PCX */
-    if (IS_USED(MODULE_CC2538_RF_OBS_SIG)) {
+    if (MODULE_CC2538_RF_OBS_SIG) {
         if (CONFIG_CC2538_RF_OBS_0 != disabled) {
             RFCORE_XREG_RFC_OBS_CTRL0 = CONFIG_CC2538_RF_OBS_0;
             *(&CCTEST_OBSSEL0 + CONFIG_CC2538_RF_OBS_SIG_0_PCX) = \

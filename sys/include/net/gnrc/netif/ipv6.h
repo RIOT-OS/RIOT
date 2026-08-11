@@ -19,12 +19,12 @@
 
 #include "evtimer_msg.h"
 #include "net/ipv6/addr.h"
-#ifdef MODULE_GNRC_IPV6_NIB
+#if MODULE_GNRC_IPV6_NIB
 #include "net/gnrc/ipv6/nib/conf.h"
 #endif
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif/conf.h"
-#ifdef MODULE_NETSTATS_IPV6
+#if MODULE_NETSTATS_IPV6
 #include "net/netstats.h"
 #endif
 
@@ -95,7 +95,7 @@ typedef struct {
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6".
      */
     ipv6_addr_t groups[GNRC_NETIF_IPV6_GROUPS_NUMOF];
-#ifdef MODULE_NETSTATS_IPV6
+#if MODULE_NETSTATS_IPV6
     /**
      * @brief IPv6 packet statistics
      *
@@ -103,7 +103,7 @@ typedef struct {
      */
     netstats_t stats;
 #endif
-#if defined(MODULE_GNRC_IPV6_NIB) || DOXYGEN
+#if MODULE_GNRC_IPV6_NIB || DOXYGEN
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER) || DOXYGEN
     /**
      * @brief   Route info callback

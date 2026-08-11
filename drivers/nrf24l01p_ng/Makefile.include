@@ -1,2 +1,6 @@
 USEMODULE_INCLUDES_nrf24l01p_ng := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_nrf24l01p_ng)
+
+MODULE_DEFS_NEEDED += \
+  gnrc_sixlowpan \
+  #

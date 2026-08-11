@@ -85,7 +85,7 @@ void cortexm_init(void);
 static inline void cortexm_init_fpu(void)
 {
     /* initialize the FPU on Cortex-M4F CPUs */
-#if (defined(CPU_CORE_CORTEX_M33) || defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7)) && defined(MODULE_CORTEXM_FPU)
+#if (defined(CPU_CORE_CORTEX_M33) || defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7)) && MODULE_CORTEXM_FPU
     /* give full access to the FPU */
     SCB->CPACR |= (uint32_t)CORTEXM_SCB_CPACR_FPU_ACCESS_FULL;
 #endif

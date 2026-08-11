@@ -82,7 +82,7 @@ static void tear_down(void)
     memset(&_server_addr, 0, sizeof(_server_addr));
 }
 
-#ifdef MODULE_LWIP_IPV4
+#if MODULE_LWIP_IPV4
 #ifdef SO_REUSE
 static void test_tcp_connect4__EADDRINUSE(void)
 {
@@ -517,7 +517,7 @@ static void test_tcp_write4__success(void)
 }
 #endif /* MODULE_LWIP_IPV4 */
 
-#ifdef MODULE_LWIP_IPV6
+#if MODULE_LWIP_IPV6
 #ifdef SO_REUSE
 static void test_tcp_connect6__EADDRINUSE(void)
 {
@@ -956,10 +956,10 @@ int main(void)
 #ifdef SO_REUSE
     code |= 1;
 #endif
-#ifdef MODULE_LWIP_IPV4
+#if MODULE_LWIP_IPV4
     code |= (1 << 4);
 #endif
-#ifdef MODULE_LWIP_IPV6
+#if MODULE_LWIP_IPV6
     code |= (1 << 6);
 #endif
     printf("code 0x%02x\n", code);
@@ -971,7 +971,7 @@ int main(void)
                              THREAD_PRIORITY_MAIN - 2, 0,
                              _server_func, NULL, "tcp_server"));
     tear_down();
-#ifdef MODULE_LWIP_IPV4
+#if MODULE_LWIP_IPV4
 #ifdef SO_REUSE
     CALL(test_tcp_connect4__EADDRINUSE());
 #endif
@@ -1014,7 +1014,7 @@ int main(void)
     CALL(test_tcp_write4__ENOTCONN());
     CALL(test_tcp_write4__success());
 #endif /* MODULE_LWIP_IPV4 */
-#ifdef MODULE_LWIP_IPV6
+#if MODULE_LWIP_IPV6
 #ifdef SO_REUSE
     CALL(test_tcp_connect6__EADDRINUSE());
 #endif

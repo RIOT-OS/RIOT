@@ -18,11 +18,11 @@
 #include "periph/gpio.h"
 #include "mtd_spi_nor.h"
 #include "timex.h"
-#ifdef MODULE_VFS_DEFAULT
+#if MODULE_VFS_DEFAULT
 #include "vfs_default.h"
 #endif
 
-#ifdef MODULE_MTD
+#if MODULE_MTD
 /* GD25x16 */
 static const mtd_spi_nor_params_t _samd51_nor_params = {
     .opcode = &mtd_spi_nor_opcode_default,
@@ -53,7 +53,7 @@ static mtd_spi_nor_t samd51_nor_dev = {
 
 MTD_XFA_ADD(samd51_nor_dev, 0);
 
-#ifdef MODULE_VFS_DEFAULT
+#if MODULE_VFS_DEFAULT
 VFS_AUTO_MOUNT(littlefs2, VFS_MTD(samd51_nor_dev), VFS_DEFAULT_NVM(0), 0);
 #endif
 #endif /* MODULE_MTD */
@@ -71,7 +71,7 @@ static inline void _toggle(unsigned n)
 void board_init(void)
 {
     /* if the real driver is used, it will deal with the LED */
-    if (IS_USED(MODULE_APA102)) {
+    if (MODULE_APA102) {
         return;
     }
 

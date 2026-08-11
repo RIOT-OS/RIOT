@@ -34,7 +34,7 @@ extern "C" {
 #endif
 
 #ifndef DS3231_PARAMS
-#if IS_USED(MODULE_DS3231_INT)
+#if MODULE_DS3231_INT
 #define DS3231_PARAMS           { .bus = DS3231_PARAM_I2C, \
                                   .opt = DS3231_PARAM_OPT, \
                                   .int_pin = DS3231_PARAM_INT_PIN}

@@ -277,7 +277,7 @@ void spi_init_pins(spi_t bus);
  */
 int spi_init_cs(spi_t bus, spi_cs_t cs);
 
-#if defined(MODULE_PERIPH_SPI_RECONFIGURE) || DOXYGEN
+#if MODULE_PERIPH_SPI_RECONFIGURE || DOXYGEN
 
 /**
  * @brief   Change the pins of the given SPI bus back to plain GPIO functionality
@@ -342,7 +342,7 @@ gpio_t spi_pin_clk(spi_t dev);
 #endif /* DOXYGEN */
 #endif /* MODULE_PERIPH_SPI_RECONFIGURE */
 
-#if defined(MODULE_PERIPH_SPI_GPIO_MODE) || DOXYGEN
+#if MODULE_PERIPH_SPI_GPIO_MODE || DOXYGEN
 
 /**
  * @brief   SPI gpio mode

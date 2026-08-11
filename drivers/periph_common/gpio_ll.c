@@ -13,7 +13,7 @@
  * Otherwise, fall back to fputs(), which is still way more stack friendly than
  * printf().
  */
-#ifdef MODULE_FMT
+#if MODULE_FMT
 #  include "fmt.h"
 #else
 #  include <stdio.h>

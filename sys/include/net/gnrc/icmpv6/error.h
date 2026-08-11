@@ -30,7 +30,7 @@
 extern "C" {
 #endif
 
-#if defined(MODULE_GNRC_ICMPV6_ERROR) || defined(DOXYGEN)
+#if MODULE_GNRC_ICMPV6_ERROR || defined(DOXYGEN)
 /**
  * @brief   Sends an ICMPv6 destination unreachable message for sending.
  *
@@ -87,7 +87,7 @@ void gnrc_icmpv6_error_time_exc_send(uint8_t code,
  */
 void gnrc_icmpv6_error_param_prob_send(uint8_t code, void *ptr,
                                        const gnrc_pktsnip_t *orig_pkt);
-#else   /* defined(MODULE_GNRC_ICMPV6_ERROR) || defined(DOXYGEN) */
+#else   /* MODULE_GNRC_ICMPV6_ERROR || defined(DOXYGEN) */
 /* NOPs to make the usage code more readable */
 #define gnrc_icmpv6_error_dst_unr_send(code, orig_pkt) \
         (void)code; (void)orig_pkt
@@ -97,7 +97,7 @@ void gnrc_icmpv6_error_param_prob_send(uint8_t code, void *ptr,
         (void)code; (void)orig_pkt
 #define gnrc_icmpv6_error_param_prob_send(code, ptr, orig_pkt) \
         (void)code; (void)ptr, (void)orig_pkt
-#endif  /* defined(MODULE_GNRC_ICMPV6_ERROR) || defined(DOXYGEN) */
+#endif  /* MODULE_GNRC_ICMPV6_ERROR || defined(DOXYGEN) */
 
 #ifdef __cplusplus
 }

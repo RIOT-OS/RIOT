@@ -62,7 +62,7 @@ static int ds18_read_bit(const ds18_t *dev, uint8_t *bit)
     ds18_low(dev);
     ds18_release(dev);
 
-#if defined(MODULE_DS18_OPTIMIZED)
+#if MODULE_DS18_OPTIMIZED
     ztimer_sleep(ZTIMER_USEC, DS18_SAMPLE_TIME);
     *bit = gpio_read(dev->params.pin);
     ztimer_sleep(ZTIMER_USEC, DS18_DELAY_R_RECOVER);

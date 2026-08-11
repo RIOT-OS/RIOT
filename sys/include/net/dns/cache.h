@@ -48,17 +48,17 @@ extern "C" {
  * @brief   Handle to cache A records
  */
 #ifndef CONFIG_DNS_CACHE_A
-#define CONFIG_DNS_CACHE_A      IS_USED(MODULE_IPV4)
+#define CONFIG_DNS_CACHE_A      MODULE_IPV4
 #endif
 
 /**
  * @brief   Handle to cache AAAA records
  */
 #ifndef CONFIG_DNS_CACHE_AAAA
-#define CONFIG_DNS_CACHE_AAAA   IS_USED(MODULE_IPV6)
+#define CONFIG_DNS_CACHE_AAAA   MODULE_IPV6
 #endif
 
-#if IS_USED(MODULE_DNS_CACHE) || DOXYGEN
+#if MODULE_DNS_CACHE || DOXYGEN
 /**
  * @brief Get IP address for a DNS name from the DNS cache
  *

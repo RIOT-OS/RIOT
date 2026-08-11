@@ -50,7 +50,7 @@ const char *tests[] = {
     "f7",                  /* undefined               */
     "f8ff",                /* simple(255)             */
 
-#ifdef MODULE_TINYCBOR_FLOAT
+#if MODULE_TINYCBOR_FLOAT
     "f93c00",              /* 1.0                     */
     "f9bc00",              /* -1.0                    */
     "f903ff",              /* 6.097555160522461e-05   */

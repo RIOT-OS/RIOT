@@ -56,7 +56,7 @@ static int mtd_sdcard_read_page(mtd_dev_t *dev, void *buff, uint32_t page,
           page, offset, size);
 
     if (offset || size % SD_HC_BLOCK_SIZE) {
-#if IS_USED(MODULE_MTD_WRITE_PAGE)
+#if MODULE_MTD_WRITE_PAGE
         if (dev->work_area == NULL) {
             DEBUG("mtd_sdcard_read_page: no work area\n");
             return -ENOTSUP;
@@ -98,7 +98,7 @@ static int mtd_sdcard_write_page(mtd_dev_t *dev, const void *buff, uint32_t page
           page, offset, size);
 
     if (offset || size % SD_HC_BLOCK_SIZE) {
-#if IS_USED(MODULE_MTD_WRITE_PAGE)
+#if MODULE_MTD_WRITE_PAGE
         if (dev->work_area == NULL) {
             DEBUG("mtd_sdcard_write_page: no work area\n");
             return -ENOTSUP;
@@ -136,7 +136,7 @@ static int mtd_sdcard_write_page(mtd_dev_t *dev, const void *buff, uint32_t page
 
 static int mtd_sdcard_erase_sector(mtd_dev_t *dev, uint32_t sector, uint32_t count)
 {
-#if IS_ACTIVE(CONFIG_MTD_SDCARD_ERASE) && IS_USED(MODULE_MTD_WRITE_PAGE)
+#if IS_ACTIVE(CONFIG_MTD_SDCARD_ERASE) && MODULE_MTD_WRITE_PAGE
     mtd_sdcard_t *mtd_sd = (mtd_sdcard_t*)dev;
 
     DEBUG("mtd_sdcard_erase_sector: sector: %" PRIu32 " count: %" PRIu32 "\n",
@@ -203,7 +203,7 @@ const mtd_desc_t mtd_sdcard_driver = {
     .power = mtd_sdcard_power,
 };
 
-#if IS_USED(MODULE_MTD_SDCARD_DEFAULT)
+#if MODULE_MTD_SDCARD_DEFAULT
 #include "sdcard_spi_params.h"
 #include "vfs_default.h"
 
@@ -231,7 +231,7 @@ const mtd_desc_t mtd_sdcard_driver = {
 extern sdcard_spi_t sdcard_spi_devs[SDCARD_NUMOF];
 
 MTD_SDCARD_DEV(0, CONFIG_SDCARD_GENERIC_MTD_OFFSET);
-#ifdef MODULE_FATFS_VFS
+#if MODULE_FATFS_VFS
 MTD_SDCARD_DEV_FS(0, CONFIG_SDCARD_GENERIC_MTD_OFFSET, fatfs);
 #endif
 

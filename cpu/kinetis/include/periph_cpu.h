@@ -516,7 +516,7 @@ enum {
 #ifndef RTT_FREQUENCY
 #define RTT_FREQUENCY       RTT_MAX_FREQUENCY
 #endif
-#if IS_USED(MODULE_PERIPH_RTT)
+#if MODULE_PERIPH_RTT
 /* On kinetis periph_rtt is built on top on an LPTIMER so if used it
    will conflict with xtimer, if a LPTIMER backend and RTT are needed
    consider using ztimer */
@@ -559,7 +559,7 @@ typedef struct {
     uart_type_t type;             /**< Hardware module type (KINETIS_UART or KINETIS_LPUART)*/
 } uart_conf_t;
 
-#if !defined(KINETIS_HAVE_PLL) && defined(MODULE_PERIPH_MCG) \
+#if !defined(KINETIS_HAVE_PLL) && MODULE_PERIPH_MCG \
   && defined(MCG_C6_PLLS_MASK) || DOXYGEN
 /**
  * @brief Defined to 1 if the MCG in this Kinetis CPU has a PLL
@@ -569,7 +569,7 @@ typedef struct {
 #define KINETIS_HAVE_PLL 0
 #endif
 
-#ifdef MODULE_PERIPH_MCG_LITE
+#if MODULE_PERIPH_MCG_LITE
 /**
  * @brief Kinetis possible MCG modes
  */
@@ -582,7 +582,7 @@ typedef enum kinetis_mcg_mode {
 } kinetis_mcg_mode_t;
 #endif /* MODULE_PERIPH_MCG_LITE */
 
-#ifdef MODULE_PERIPH_MCG
+#if MODULE_PERIPH_MCG
 /**
  * @brief Kinetis possible MCG modes
  */
@@ -623,7 +623,7 @@ typedef enum {
 } kinetis_mcg_fll_t;
 
 #endif /* MODULE_PERIPH_MCG */
-#if defined(MODULE_PERIPH_MCG) || defined(MODULE_PERIPH_MCG_LITE)
+#if MODULE_PERIPH_MCG || MODULE_PERIPH_MCG_LITE
 
 /**
  * @brief Kinetis FLL external reference clock range settings
@@ -778,7 +778,7 @@ typedef struct {
      * @see CPU reference manual, OSC_CR[SCxP]
      */
     uint8_t osc_clc;
-#ifdef MODULE_PERIPH_MCG
+#if MODULE_PERIPH_MCG
     /**
      * @brief   MCG external reference oscillator selection
      *
@@ -802,7 +802,7 @@ typedef struct {
      * @see CPU reference manual, MCG_SC[FCRDIV]
      */
     uint8_t fcrdiv;
-#ifdef MODULE_PERIPH_MCG_LITE
+#if MODULE_PERIPH_MCG_LITE
     /**
      * @brief   LIRC second clock divider
      *

@@ -109,7 +109,7 @@ typedef enum {
 #define DMA_DATA_WIDTH_WORD      (0x02) /**< Word width (4 bytes)*/
 /** @} */
 
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
 /**
  * @brief   DMA stream not defined
  */

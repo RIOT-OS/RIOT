@@ -22,7 +22,7 @@
 #define AT_PRINT_INCOMING (0)
 #endif
 
-#if defined(MODULE_AT_URC)
+#if MODULE_AT_URC
 static int _check_urc(clist_node_t *node, void *arg);
 #endif
 
@@ -178,7 +178,7 @@ static int wait_echo(at_dev_t *dev, char const *command, uint32_t timeout)
     ssize_t res;
     while ((res = read_line_or_echo(dev, command, dev->rp_buf, dev->rp_buf_size, timeout)) > 0) {
         /* keep reading until echo or some error happens. */
-#ifdef MODULE_AT_URC
+#if MODULE_AT_URC
         clist_foreach(&dev->urc_list, _check_urc, dev->rp_buf);
 #endif
     }
@@ -348,7 +348,7 @@ ssize_t at_get_resp_with_prefix(at_dev_t *dev, const char *resp_prefix,
         if (res < 0) {
             return res;
         }
-#if IS_USED(MODULE_AT_URC)
+#if MODULE_AT_URC
         else {
             clist_foreach(&dev->urc_list, _check_urc, resp_buf);
         }
@@ -373,7 +373,7 @@ ssize_t at_send_cmd_get_resp_wait_ok(at_dev_t *dev, const char *command, const c
     return at_wait_ok(dev, timeout);
 }
 
-#if IS_USED(MODULE_AT_URC)
+#if MODULE_AT_URC
 static char *next_line(char *p)
 {
     while (*p && *p != '\r' && *p != '\n') {
@@ -413,7 +413,7 @@ static ssize_t get_lines(at_dev_t *dev, char *resp_buf, size_t len, uint32_t tim
             }
             continue;
         default: /* <0 */
-#if IS_USED(MODULE_AT_URC)
+#if MODULE_AT_URC
             /* DCE responded with an error. If we got some lines before that,
              * they must be URCs. */
             handle_urc_lines(dev, resp_buf);
@@ -447,7 +447,7 @@ int at_wait_prompt(at_dev_t *dev, uint32_t timeout)
             return 0;
         }
         res = at_parse_resp(dev, dev->rp_buf);
-#ifdef MODULE_AT_URC
+#if MODULE_AT_URC
         if (res == 1) {
             clist_foreach(&dev->urc_list, _check_urc, dev->rp_buf);
         }
@@ -588,12 +588,12 @@ int at_wait_ok(at_dev_t *dev, uint32_t timeout)
         if (res < 1) {
             return (int)res;
         }
-#ifdef MODULE_AT_URC
+#if MODULE_AT_URC
         clist_foreach(&dev->urc_list, _check_urc, dev->rp_buf);
 #endif
     }
 }
-#ifdef MODULE_AT_URC
+#if MODULE_AT_URC
 void at_add_urc(at_dev_t *dev, at_urc_t *urc)
 {
     assert(urc);
@@ -655,7 +655,7 @@ void at_dev_poweroff(at_dev_t *dev)
     uart_poweroff(dev->uart);
 }
 
-#ifdef MODULE_EMBUNIT
+#if MODULE_EMBUNIT
 /* Exports for unit tests */
 __attribute__((alias("read_line_or_echo")))
 ssize_t _emb_read_line_or_echo(at_dev_t *dev, char const *cmd, char *resp_buf,

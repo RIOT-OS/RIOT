@@ -22,13 +22,13 @@
 #include "mtd.h"
 #include "periph/init.h"
 
-#ifdef MODULE_MTD_MCI
+#if MODULE_MTD_MCI
 extern const mtd_desc_t mtd_mci_driver;
 static mtd_dev_t _mtd_mci = { .driver = &mtd_mci_driver };
 MTD_XFA_ADD(_mtd_mci, 0);
 #endif
 
-#ifdef MODULE_VFS_DEFAULT
+#if MODULE_VFS_DEFAULT
 #include "vfs_default.h"
 VFS_AUTO_MOUNT(fatfs, { .dev = &_mtd_mci }, VFS_DEFAULT_SD(0), 0);
 #endif

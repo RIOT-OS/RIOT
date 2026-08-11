@@ -15,7 +15,7 @@
  * @}
  */
 
-#ifdef MODULE_SI1133
+#if MODULE_SI1133
 
 #include "assert.h"
 #include "log.h"

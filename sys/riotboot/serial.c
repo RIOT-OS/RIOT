@@ -282,7 +282,7 @@ int riotboot_serial_loader(void)
             case '\n':
                 uart_write_byte(RIOTBOOT_UART_DEV, RIOTBOOT_STAT_OK);
                 return -1;
-#ifdef MODULE_RIOTBOOT_SLOT
+#if MODULE_RIOTBOOT_SLOT
             case '0':
                 uart_write_byte(RIOTBOOT_UART_DEV, RIOTBOOT_STAT_OK);
                 return 0;

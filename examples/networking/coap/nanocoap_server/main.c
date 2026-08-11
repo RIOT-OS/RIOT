@@ -19,7 +19,7 @@
 #include "net/nanocoap_sock.h"
 #include "ztimer.h"
 
-#ifdef MODULE_LWIP_IPV4
+#if MODULE_LWIP_IPV4
 #include "lwip/netif.h"
 #include <arpa/inet.h>
 #endif
@@ -41,18 +41,18 @@ int main(void)
     puts("Waiting for address autoconfiguration...");
     ztimer_sleep(ZTIMER_MSEC, 3 * MS_PER_SEC);
 
-    if (IS_USED(MODULE_NANOCOAP_SERVER_OBSERVE)) {
+    if (MODULE_NANOCOAP_SERVER_OBSERVE) {
         setup_observe_event();
     }
 
-#ifdef MODULE_LWIP_IPV4
+#if MODULE_LWIP_IPV4
 #define _TEST_ADDR4_LOCAL  (0x9664a8c0U)   /* 192.168.100.150 */
 #define _TEST_ADDR4_MASK   (0x00ffffffU)   /* 255.255.255.0 */
 
     sys_lock_tcpip_core();
     struct netif *iface = netif_find("ET0");
 
-#ifndef MODULE_LWIP_DHCP_AUTO
+#if !MODULE_LWIP_DHCP_AUTO
     ip4_addr_t ip, subnet;
     ip.addr = _TEST_ADDR4_LOCAL;
     subnet.addr = _TEST_ADDR4_MASK;

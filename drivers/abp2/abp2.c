@@ -50,7 +50,7 @@ int abp2_init(abp2_t *dev, const abp2_params_t *params)
     assert(dev && params);
     dev->params = params;
 
-#if defined(MODULE_ABP2_SPI)
+#if MODULE_ABP2_SPI
     res = spi_init_cs(params->spi, params->cs);
 #else
 #pragma message("implement I2C code here")
@@ -61,7 +61,7 @@ int abp2_init(abp2_t *dev, const abp2_params_t *params)
 
     /* test status byte: the busy flag should clear in about 5ms */
     while ((status & ABP2_STATUS_BUSY) && count) {
-#if defined(MODULE_ABP2_SPI)
+#if MODULE_ABP2_SPI
         spi_acquire(params->spi, params->cs, SPI_MODE_0, params->clk);
         status = spi_transfer_byte(params->spi, params->cs, false, ABP2_CMD_NOP);
         spi_release(params->spi);
@@ -85,7 +85,7 @@ int abp2_measure(const abp2_t *dev)
     int res = 0;
     uint8_t data_rx[ABP2_RX_BUF_LEN];
 
-#if defined(MODULE_ABP2_SPI)
+#if MODULE_ABP2_SPI
     spi_acquire(dev->params->spi, dev->params->cs, SPI_MODE_0, dev->params->clk);
     spi_transfer_bytes(dev->params->spi, dev->params->cs, false, data_tx_meas_start, data_rx,
                        sizeof(data_tx_meas_start));
@@ -157,7 +157,7 @@ uint8_t abp2_getstatus(const abp2_t *dev)
 {
     uint8_t status = 0xFF;      /* sensor status byte */
 
-#if defined(MODULE_ABP2_SPI)
+#if MODULE_ABP2_SPI
     spi_acquire(dev->params->spi, dev->params->cs, SPI_MODE_0, dev->params->clk);
     status = spi_transfer_byte(dev->params->spi, dev->params->cs, false, ABP2_CMD_NOP);
     spi_release(dev->params->spi);
@@ -173,7 +173,7 @@ int abp2_read_raw(const abp2_t *dev, abp2_raw_t *raw_values)
     uint8_t status = 0xFF;      /* sensor status byte */
     uint8_t data_rx[ABP2_RX_BUF_LEN];
 
-#if defined(MODULE_ABP2_SPI)
+#if MODULE_ABP2_SPI
     spi_acquire(dev->params->spi, dev->params->cs, SPI_MODE_0, dev->params->clk);
     spi_transfer_bytes(dev->params->spi, dev->params->cs, false, data_tx_nop_read, data_rx,
                        sizeof(data_tx_nop_read));
@@ -197,7 +197,7 @@ int abp2_measure_read(const abp2_t *dev, abp2_raw_t *raw_values)
     int res = 0;
     uint8_t data_rx[ABP2_RX_BUF_LEN];
 
-#if defined(MODULE_ABP2_SPI)
+#if MODULE_ABP2_SPI
     spi_acquire(dev->params->spi, dev->params->cs, SPI_MODE_0, dev->params->clk);
     spi_transfer_bytes(dev->params->spi, dev->params->cs, false, data_tx_meas_read, data_rx,
                        sizeof(data_tx_meas_read));

@@ -28,7 +28,7 @@ extern "C" {
  * @{
  */
 
-#if IS_USED(MODULE_MCP23X17_SPI) || DOXYGEN
+#if MODULE_MCP23X17_SPI || DOXYGEN
 
 #ifndef MCP23X17_PARAM_SPI_ADDR
 /**
@@ -61,7 +61,7 @@ extern "C" {
 
 #endif /* MODULE_MCP23X17_SPI || DOXYGEN */
 
-#if IS_USED(MODULE_MCP23X17_I2C) || DOXYGEN
+#if MODULE_MCP23X17_I2C || DOXYGEN
 
 #ifndef MCP23X17_PARAM_I2C_ADDR
 /** Default hardware address, if the I2C interface is used */
@@ -85,7 +85,7 @@ extern "C" {
 #define MCP23X17_PARAM_RESET_PIN    (GPIO_UNDEF)
 #endif
 
-#if IS_USED(MODULE_MCP23X17_SPI) || DOXYGEN
+#if MODULE_MCP23X17_SPI || DOXYGEN
 #ifndef MCP23X17_SPI_PARAMS
 /** Default device parameters, if SPI interface is used */
 #define MCP23X17_SPI_PARAMS { \
@@ -100,7 +100,7 @@ extern "C" {
 #endif /* MCP23X17_SPI_PARAMS */
 #endif /* MODULE_MCP23X17_SPI || DOXYGEN */
 
-#if IS_USED(MODULE_MCP23X17_I2C) || DOXYGEN
+#if MODULE_MCP23X17_I2C || DOXYGEN
 #ifndef MCP23X17_I2C_PARAMS
 /** Default device parameters, if I2C interface is used */
 #define MCP23X17_I2C_PARAMS { \
@@ -113,7 +113,7 @@ extern "C" {
 #endif /* MCP23X17_I2C_PARAMS */
 #endif /* MODULE_MCP23X17_I2C || DOXYGEN */
 
-#if IS_USED(MODULE_SAUL_GPIO) || DOXYGEN
+#if MODULE_SAUL_GPIO || DOXYGEN
 
 #ifndef MCP23X17_SAUL_GPIO_PARAMS
 /** Example for mapping expander pins to SAUL */
@@ -144,15 +144,15 @@ extern "C" {
  */
 static const mcp23x17_params_t mcp23x17_params[] =
 {
-#if IS_USED(MODULE_MCP23X17_SPI) || DOXYGEN
+#if MODULE_MCP23X17_SPI || DOXYGEN
     MCP23X17_SPI_PARAMS,
 #endif
-#if IS_USED(MODULE_MCP23X17_I2C) || DOXYGEN
+#if MODULE_MCP23X17_I2C || DOXYGEN
     MCP23X17_I2C_PARAMS,
 #endif
 };
 
-#if IS_USED(MODULE_SAUL_GPIO) || DOXYGEN
+#if MODULE_SAUL_GPIO || DOXYGEN
 /**
  * @brief   Additional meta information to keep in the SAUL registry
  */

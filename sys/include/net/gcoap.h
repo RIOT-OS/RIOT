@@ -400,10 +400,10 @@
 #include "net/sock/udp.h"
 #include "net/nanocoap.h"
 
-#if IS_USED(MODULE_GCOAP_DTLS)
+#if MODULE_GCOAP_DTLS
 #  include "net/sock/dtls.h"
 #endif
-#if IS_USED(MODULE_NANOCOAP_CACHE)
+#if MODULE_NANOCOAP_CACHE
 #  include "net/nanocoap/cache.h"
 #endif
 
@@ -641,7 +641,7 @@ extern "C" {
  * @{
  */
 #ifndef GCOAP_DTLS_EXTRA_STACKSIZE
-#if IS_USED(MODULE_GCOAP_DTLS)
+#if MODULE_GCOAP_DTLS
 #define GCOAP_DTLS_EXTRA_STACKSIZE  (THREAD_STACKSIZE_DEFAULT)
 #else
 #define GCOAP_DTLS_EXTRA_STACKSIZE  (0)
@@ -651,7 +651,7 @@ extern "C" {
 /**
  * @brief Extra stack for VFS operations
  */
-#if IS_USED(MODULE_GCOAP_FILESERVER)
+#if MODULE_GCOAP_FILESERVER
 #include "vfs.h"
 #define GCOAP_VFS_EXTRA_STACKSIZE   (VFS_DIR_BUFFER_SIZE + VFS_FILE_BUFFER_SIZE)
 #else
@@ -757,11 +757,11 @@ typedef struct {
     gcoap_socket_type_t type;                /**< Type of stored socket */
     union {
         sock_udp_t *udp;
-#if IS_USED(MODULE_GCOAP_DTLS) || defined(DOXYGEN)
+#if MODULE_GCOAP_DTLS || defined(DOXYGEN)
         sock_dtls_t *dtls;
 #endif
     } socket;                               /**< Stored socket */
-#if IS_USED(MODULE_GCOAP_DTLS) || defined(DOXYGEN)
+#if MODULE_GCOAP_DTLS || defined(DOXYGEN)
     sock_dtls_session_t ctx_dtls_session;   /**< Session object for the stored socket.
                                                  Used for exchanging a session between
                                                  functions. */
@@ -842,7 +842,7 @@ struct gcoap_request_memo {
     event_timeout_t resp_evt_tmout;     /**< Limits wait for response */
     event_callback_t resp_tmout_cb;     /**< Callback for response timeout */
     gcoap_socket_t socket;              /**< Transport type to remote endpoint */
-#if IS_USED(MODULE_NANOCOAP_CACHE) || DOXYGEN
+#if MODULE_NANOCOAP_CACHE || DOXYGEN
     /**
      * @brief   Cache key for the request
      *
@@ -986,7 +986,7 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                     unsigned code, char *path)
 {
     if (gcoap_req_init(pdu, buf, len, code, path) == 0) {
-        if (IS_USED(MODULE_NANOCOAP_CACHE)) {
+        if (MODULE_NANOCOAP_CACHE) {
             /* remove ETag option slack added for cache validation */
             coap_opt_remove(pdu, COAP_OPT_ETAG);
         }
@@ -1174,7 +1174,7 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf,
 ssize_t gcoap_encode_link(const coap_resource_t *resource, char *buf,
                           size_t maxlen, coap_link_encoder_ctx_t *context);
 
-#if IS_USED(MODULE_GCOAP_DTLS) || defined(DOXYGEN)
+#if MODULE_GCOAP_DTLS || defined(DOXYGEN)
 /**
  * @brief   Get the underlying DTLS socket of gcoap.
  *

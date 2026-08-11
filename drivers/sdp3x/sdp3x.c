@@ -33,7 +33,7 @@
 #define DATA_READY_SLEEP_US (50 * US_PER_MS)
 
 static bool _check_product_number(uint8_t *readData);
-#ifdef MODULE_SDP3X_IRQ
+#if MODULE_SDP3X_IRQ
 static void _sdp3x_irq_callback(void *arg);
 #endif
 static int8_t _checkCRC(uint16_t value, uint8_t test);
@@ -85,7 +85,7 @@ int sdp3x_init(sdp3x_t *dev, const sdp3x_params_t *params)
         return ret;
     }
 
-#ifdef MODULE_SDP3X_IRQ
+#if MODULE_SDP3X_IRQ
     /* check if current device has irq pin connected */
     if (params->irq_pin != GPIO_UNDEF) {
         mutex_init(&dev->mutex);
@@ -104,7 +104,7 @@ int sdp3x_init(sdp3x_t *dev, const sdp3x_params_t *params)
 int32_t sdp3x_read_single_temperature(sdp3x_t *dev, uint8_t flags)
 {
     _SDP3x_start_triggered(dev, flags);
-    if (!IS_USED(MODULE_SDP3X_IRQ) || dev->params.irq_pin == GPIO_UNDEF) {
+    if (!MODULE_SDP3X_IRQ || dev->params.irq_pin == GPIO_UNDEF) {
         /* Wait for measurement to be ready if irq pin not used */
         xtimer_usleep(DATA_READY_SLEEP_US);
     }
@@ -119,7 +119,7 @@ int32_t sdp3x_read_single_differential_pressure(sdp3x_t *dev,
                                                uint8_t flags)
 {
     _SDP3x_start_triggered(dev, flags);
-    if (!IS_USED(MODULE_SDP3X_IRQ) || dev->params.irq_pin == GPIO_UNDEF) {
+    if (!MODULE_SDP3X_IRQ || dev->params.irq_pin == GPIO_UNDEF) {
         /* Wait for measurement to be ready if irq pin not used */
         xtimer_usleep(DATA_READY_SLEEP_US);
     }
@@ -134,7 +134,7 @@ int8_t sdp3x_read_single_measurement(sdp3x_t *dev, uint8_t flags,
                                      sdp3x_measurement_t *result)
 {
     _SDP3x_start_triggered(dev, flags);
-    if (!IS_USED(MODULE_SDP3X_IRQ) || dev->params.irq_pin == GPIO_UNDEF) {
+    if (!MODULE_SDP3X_IRQ || dev->params.irq_pin == GPIO_UNDEF) {
         /* Wait for measurement to be ready if irq pin not used */
         xtimer_usleep(DATA_READY_SLEEP_US);
     }
@@ -425,7 +425,7 @@ static int8_t _checkCRC(uint16_t value, uint8_t test)
  *      @param  arguments passed when interrupt is raised
  *              (in this case sdp3x dev)
  */
-#ifdef MODULE_SDP3X_IRQ
+#if MODULE_SDP3X_IRQ
 static void _sdp3x_irq_callback(void *arg)
 {
     sdp3x_t *dev = (sdp3x_t *)arg;

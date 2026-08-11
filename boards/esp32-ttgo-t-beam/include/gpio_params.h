@@ -25,7 +25,7 @@ extern "C" {
  */
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
-#ifndef MODULE_ESP32_TTGO_T_BEAM_V1_0
+#if !MODULE_ESP32_TTGO_T_BEAM_V1_0
     {
         .name = "LED",
         .pin = LED0_PIN,

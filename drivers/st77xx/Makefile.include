@@ -4,3 +4,9 @@ PSEUDOMODULES += st7796
 
 USEMODULE_INCLUDES_st77xx := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_st77xx)
+
+MODULE_DEFS_NEEDED += \
+  lcd_parallel \
+  lcd_parallel_16bit \
+  lcd_spi \
+  #

@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  prng_tinymt32 \
+  prng_xorshift \
+  #
 include ../Makefile.build_system_common
 USEMODULE += random
 

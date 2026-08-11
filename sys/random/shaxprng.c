@@ -25,11 +25,11 @@
 #include "hashes/sha256.h"
 #include "kernel_defines.h"
 
-#if IS_USED(MODULE_PRNG_SHA1PRNG)
+#if MODULE_PRNG_SHA1PRNG
 /* state size is digset length of SHA-1 */
 #define STATE_SIZE                      (SHA1_DIGEST_LENGTH)
 typedef sha1_context shax_context_t;
-#elif IS_USED(MODULE_PRNG_SHA256PRNG)
+#elif MODULE_PRNG_SHA256PRNG
 /* state size is digest length of SHA-256 */
 #define STATE_SIZE                      (SHA256_DIGEST_LENGTH)
 typedef sha256_context_t shax_context_t;
@@ -37,30 +37,30 @@ typedef sha256_context_t shax_context_t;
 
 static inline void _shax_init(shax_context_t *ctx)
 {
-    if (IS_USED(MODULE_PRNG_SHA1PRNG)) {
+    if (MODULE_PRNG_SHA1PRNG) {
         sha1_init((sha1_context *)ctx);
     }
-    else if (IS_USED(MODULE_PRNG_SHA256PRNG)) {
+    else if (MODULE_PRNG_SHA256PRNG) {
         sha256_init((sha256_context_t *)ctx);
     }
 }
 
 static inline void _shax_update(shax_context_t *ctx, const void *data, size_t len)
 {
-    if (IS_USED(MODULE_PRNG_SHA1PRNG)) {
+    if (MODULE_PRNG_SHA1PRNG) {
         sha1_update((sha1_context *)ctx, data, len);
     }
-    else if (IS_USED(MODULE_PRNG_SHA256PRNG)) {
+    else if (MODULE_PRNG_SHA256PRNG) {
         sha256_update((sha256_context_t *)ctx, data, len);
     }
 }
 
 static inline void _shax_final(shax_context_t *ctx, void *digest)
 {
-    if (IS_USED(MODULE_PRNG_SHA1PRNG)) {
+    if (MODULE_PRNG_SHA1PRNG) {
         sha1_final((sha1_context *)ctx, digest);
     }
-    else if (IS_USED(MODULE_PRNG_SHA256PRNG)) {
+    else if (MODULE_PRNG_SHA256PRNG) {
         sha256_final((sha256_context_t *)ctx, digest);
     }
 }

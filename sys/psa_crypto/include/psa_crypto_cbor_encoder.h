@@ -64,7 +64,7 @@ extern "C" {
                                     )
 #endif /* PSA_ASYMMETRIC_KEYPAIR_COUNT */
 
-#if PSA_PROTECTED_KEY_COUNT && IS_USED(MODULE_PSA_ASYMMETRIC)
+#if PSA_PROTECTED_KEY_COUNT && MODULE_PSA_ASYMMETRIC
 /**
  * @brief   Required CBOR buffer size to encode a basic PSA key slot containing
  *          a key in protected memory.

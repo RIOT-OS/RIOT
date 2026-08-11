@@ -17,7 +17,7 @@
  * @author  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
-#ifdef MODULE_AUTO_INIT_GNRC_RPL
+#if MODULE_AUTO_INIT_GNRC_RPL
 
 #include "log.h"
 #include "net/gnrc.h"

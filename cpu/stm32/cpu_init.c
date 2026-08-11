@@ -371,11 +371,11 @@ void cpu_init(void)
     _gpio_init_ain();
     _rdp_check();
 #endif
-#if !defined(CPU_FAM_STM32MP1) || IS_USED(MODULE_STM32MP1_ENG_MODE)
+#if !defined(CPU_FAM_STM32MP1) || MODULE_STM32MP1_ENG_MODE
     /* initialize the system clock as configured in the periph_conf.h */
     stmclk_init_sysclk();
 #endif
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
     /*  initialize DMA streams */
     dma_init();
 #endif
@@ -418,7 +418,7 @@ void backup_ram_init(void)
 
 __attribute__((unused))
 static inline bool _backup_battery_connected(void) {
-#if IS_USED(MODULE_PERIPH_VBAT)
+#if MODULE_PERIPH_VBAT
     vbat_init(); /* early use of VBAT requires init() */
     return !vbat_is_empty();
 #endif

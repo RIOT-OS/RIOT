@@ -22,7 +22,7 @@
 
 #include <wolfssl/wolfcrypt/settings.h>
 #include <wolfcrypt/test/test.h>
-#ifdef MODULE_WOLFCRYPT_BENCHMARK
+#if MODULE_WOLFCRYPT_BENCHMARK
 #include <wolfcrypt/benchmark/benchmark.h>
 #endif
 
@@ -34,7 +34,7 @@ int main(void)
      */
     xtimer_sleep(1);
     wolfcrypt_test(NULL);
-#ifdef MODULE_WOLFCRYPT_BENCHMARK
+#if MODULE_WOLFCRYPT_BENCHMARK
     LOG_INFO("wolfSSL Benchmark!\n");
     benchmark_test(NULL);
 #else

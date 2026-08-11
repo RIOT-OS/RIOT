@@ -250,11 +250,11 @@ extern "C"
 #include "periph/gpio.h"
 #include "periph/i2c.h"
 
-#if IS_USED(MODULE_SAUL_GPIO) || DOXYGEN
+#if MODULE_SAUL_GPIO || DOXYGEN
 #include "saul/periph.h"
 #endif /* MODULE_SAUL_GPIO */
 
-#if IS_USED(MODULE_PCF857X_IRQ) || DOXYGEN
+#if MODULE_PCF857X_IRQ || DOXYGEN
 #include "event.h"
 #endif /* MODULE_PCF857X_IRQ */
 
@@ -299,7 +299,7 @@ extern "C"
  * @name   Module dependent definitions and declarations
  * @{
  */
-#if IS_USED(MODULE_PCF8575) || DOXYGEN
+#if MODULE_PCF8575 || DOXYGEN
 
 /**
  * @brief   Maximum number of GPIO pins
@@ -334,13 +334,13 @@ typedef uint8_t pcf857x_data_t;     /**< type that can mask all expander pins */
  * `pcf8574`, `pcf8574a` and `pcf8575`.
  */
 typedef enum {
-#if IS_USED(MODULE_PCF8574) || DOXYGEN
+#if MODULE_PCF8574 || DOXYGEN
     PCF857X_EXP_PCF8574,    /**< PCF8574 8 bit I/O expander used */
 #endif
-#if IS_USED(MODULE_PCF8574A) || DOXYGEN
+#if MODULE_PCF8574A || DOXYGEN
     PCF857X_EXP_PCF8574A,   /**< PCF8574A 8 bit I/O expander */
 #endif
-#if IS_USED(MODULE_PCF8575) || DOXYGEN
+#if MODULE_PCF8575 || DOXYGEN
     PCF857X_EXP_PCF8575,    /**< PCF8575 16 bit I/O expander */
 #endif
     PCF857X_EXP_MAX,
@@ -357,7 +357,7 @@ typedef struct {
     pcf857x_exp_t exp;  /**< PCF857X expander variant used by the device
                              (default depends on used pseudomodules */
 
-#if IS_USED(MODULE_PCF857X_IRQ) || DOXYGEN
+#if MODULE_PCF857X_IRQ || DOXYGEN
     gpio_t   int_pin;   /**< MCU GPIO pin or #GPIO_UNDEF if not used (default).
                              Using interrupt pin has the advantage that inputs
                              have to be read from expander only if any input
@@ -367,7 +367,7 @@ typedef struct {
 #endif /* MODULE_PCF857X_IRQ */
 } pcf857x_params_t;
 
-#if IS_USED(MODULE_PCF857X_IRQ) || DOXYGEN
+#if MODULE_PCF857X_IRQ || DOXYGEN
 /**
  * @brief   IRQ event type
  *
@@ -402,7 +402,7 @@ typedef struct {
     pcf857x_data_t in;        /**< expander input pin values */
     pcf857x_data_t out;       /**< expander output pin values */
 
-#if IS_USED(MODULE_PCF857X_IRQ) || DOXYGEN
+#if MODULE_PCF857X_IRQ || DOXYGEN
     gpio_isr_ctx_t isr[PCF857X_GPIO_PIN_NUM];  /**< ISR with arg for each expander pin */
     gpio_flank_t flank[PCF857X_GPIO_PIN_NUM];  /**< interrupt flank for each expander pin */
     bool enabled[PCF857X_GPIO_PIN_NUM];        /**< enabled flag for each expander pin */
@@ -411,7 +411,7 @@ typedef struct {
 
 } pcf857x_t;
 
-#if IS_USED(MODULE_SAUL_GPIO) || DOXYGEN
+#if MODULE_SAUL_GPIO || DOXYGEN
 /**
  * @brief   PCF857X configuration structure for mapping expander pins to SAUL
  *
@@ -468,7 +468,7 @@ int pcf857x_init(pcf857x_t *dev, const pcf857x_params_t *params);
  */
 int pcf857x_gpio_init(pcf857x_t *dev, uint8_t pin, gpio_mode_t mode);
 
-#if IS_USED(MODULE_PCF857X_IRQ) || DOXYGEN
+#if MODULE_PCF857X_IRQ || DOXYGEN
 /**
  * @brief   Initialize a PCF857X pin for external interrupt usage
  *
@@ -555,7 +555,7 @@ void pcf857x_gpio_set(pcf857x_t *dev, uint8_t pin);
  */
 void pcf857x_gpio_toggle(pcf857x_t *dev, uint8_t pin);
 
-#if IS_USED(MODULE_PCF857X_IRQ) || DOXYGEN
+#if MODULE_PCF857X_IRQ || DOXYGEN
 /**
  * @brief   Enable pin interrupt
  *
