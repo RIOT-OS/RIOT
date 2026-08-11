@@ -29,7 +29,7 @@ You can either declare a resource using static cross-file arrays (1) or manually
    built-in listener.
 
    ```c
-   // First, declare your resources in an array
+   /* First, declare your resources in an array */
    static unicoap_resource_t my_resources[] = {
       {
         .path = UNICOAP_PATH("led", "state"),
@@ -38,17 +38,17 @@ You can either declare a resource using static cross-file arrays (1) or manually
       }
    };
 
-   // Then, create a listener encompassing your resources
+   /* Then, create a listener encompassing your resources */
    static unicoap_listener_t my_listener = {
      .resources = my_resources,
      .resource_count = ARRAY_SIZE(my_resources),
      .request_matcher = unicoap_resource_match_request_default,
    };
 
-   // Finally, register your listener with unicoap
+   /* Finally, register your listener with unicoap */
    unicoap_listener_register(&my_listener);
 
-   // Optionally, deregister your listener later
+   /* Optionally, deregister your listener later */
    unicoap_listener_deregister(&my_listener);
    ```
 
@@ -112,10 +112,8 @@ There are multiple techniques for responding.
    other techniques.
 
    ```c
-   int my_request_handler(
-       unicoap_message_t* message, const unicoap_aux_t* aux,
-       unicoap_request_context_t* ctx, void* arg
-   ) {
+   int my_request_handler(unicoap_message_t* message, const unicoap_aux_t* aux,
+                          unicoap_request_context_t* ctx, void* arg) {
        return UNICOAP_STATUS_NOT_IMPLEMENTED;
    }
    ```
@@ -135,10 +133,8 @@ There are multiple techniques for responding.
    error. You may retry to send it, or to send an Internal Server Error or similar codes instead.
 
    ```c
-   int my_request_handler(
-       unicoap_message_t* message, const unicoap_aux_t* aux,
-       unicoap_request_context_t* ctx, void* arg
-   ) {
+   int my_request_handler(unicoap_message_t* message, const unicoap_aux_t* aux,
+                          unicoap_request_context_t* ctx, void* arg) {
        unicoap_response_init_string(message, UNICOAP_STATUS_CONTENT, "Hello, World!");
        return unicoap_send_response(message, ctx);
    }

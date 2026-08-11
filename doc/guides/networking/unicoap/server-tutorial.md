@@ -56,7 +56,7 @@ USEMODULE += unicoap_server_resource_declarations
 
 ```c
 UNICOAP_RESOURCE(hello) {
-    // ...
+    /* ... */
 };
 ```
 
@@ -94,9 +94,9 @@ unencrypted UDP.
 
 ```c
 UNICOAP_RESOURCE(hello) {
-    // ...
+    /* ... */
     .protocols = UNICOAP_PROTOCOLS(UNICOAP_PROTO_DTLS, UNICOAP_PROTO_UDP),
-    // ...
+    /* ... */
 };
 ```
 
@@ -133,7 +133,7 @@ address, a context and an optional argument (`unicoap_resource_t.handler_arg`).
 static int handle_hello_request(unicoap_message_t* message, const unicoap_aux_t* aux,
                                 unicoap_request_context_t* ctx, void* arg) {
 
-    // ...
+    /* ... */
 }
 ```
 
@@ -154,10 +154,11 @@ printf(
 This version of the resource is going to be very simple. The root resource will simply respond
 with a `Hello, World!` string. For static null-terminated strings, `unicoap` provides
 convenience initializers. Note that we can reuse the memory of the `message` parameter.
-Finally, we respond. You do not necessarily need to return the result of `unicoap_send_response`.
+Finally, we respond. You do not necessarily need to return the result of
+[`unicoap_send_response`](https://api.riot-os.org/group__net__unicoap__server.html).
 However, the return value is always supposed to indicate a success (zero) or an error (negative
-integer). Invoking send_response before and returning a status code, as well as not calling
-send_response before and not returning a status code are treated as fatal errors.
+integer). Invoking `unicoap_send_response` before and returning a status code, as well as not
+calling `unicoap_send_response` before and not returning a status code are treated as fatal errors.
 
 ```c
 unicoap_response_init_string(message, UNICOAP_STATUS_CONTENT, "Hello, World!");
@@ -202,7 +203,7 @@ static int handle_greeting_request(unicoap_message_t* message, const unicoap_aux
         return UNICOAP_STATUS_BAD_REQUEST;
     }
 
-    // ...
+    /* ... */
 }
 ```
 
@@ -211,8 +212,9 @@ client the query value was invalid by leveraging the `unicoap_send_response` fun
 dedicated error message.
 
 ```c
-// Validate any input. Here, we apply a 30 UTF-8 character limit. You should perform UTF-8
-// validation (is_valid_name). This also includes checking if there's a premature null terminator.
+/* Validate any input. Here, we apply a 30 UTF-8 character limit. You should perform UTF-8
+ * validation (is_valid_name). This also includes checking if there's a premature null
+ * terminator. */
 if (res > 30 || !is_valid_name(name, res)) {
     unicoap_response_init_string(message, UNICOAP_STATUS_BAD_REQUEST, "invalid 'name' query");
     return unicoap_send_response(message, ctx);
@@ -228,15 +230,15 @@ We allocate options on the stack through `UNICOAP_OPTIONS_ALLOC` and set the for
 :::note
 Note that the buffer capacity we specify when allocating
 should be an upper estimate. If you do know how CoAP options are represented in memory, you can
-set the capacity to exactly the size in bytes (Which, in this case, would prevent us from adding
-another option. But since we only need the `Content-Format` option, we set the capacity to exactly
-2 bytes.).
+set the capacity to exactly the size in bytes (which, in this case, would prevent us from adding
+another option; but since we only need the `Content-Format` option, we set the capacity to exactly
+2 bytes).
 :::
 
 ```c
 UNICOAP_OPTIONS_ALLOC(options, 2);
 
-// Set Content-Format option to text/plain
+/* Set Content-Format option to text/plain */
 if (unicoap_options_set_content_format(&options, UNICOAP_FORMAT_TEXT) < 0) {
     return UNICOAP_STATUS_INTERNAL_SERVER_ERROR;
 }
@@ -284,7 +286,7 @@ list.iol_next = &name_chunk;
 
 Through `.iol_next = &suffix`, we chain the suffix behind the middle part and using
 `list.iol_next = &name_chunk` appends this chain of two chunks to the first chunk. Our vector is
-done and we can finally send the response after having set the status and message payload. unicoap
+done and we can finally send the response after having set the status and message payload. `unicoap`
 supports multiple slightly different ways to use the API to respond to reduce boilerplate.
 Find an extended explanation in [CoAP Server](../server).
 
@@ -303,12 +305,12 @@ However, we need to include additional headers to add a DTLS credential to `unic
 
 ```c
 #if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
-# include "net/sock/dtls/creds.h"
-# include "net/credman.h"
-# include "net/dsm.h"
-# include "unicoap_example_dtls.h"
+#  include "net/sock/dtls/creds.h"
+#  include "net/credman.h"
+#  include "net/dsm.h"
+#  include "unicoap_example_dtls.h"
 
-# define EXAMPLE_DTLS_CREDENTIAL_TAG 42
+#  define EXAMPLE_DTLS_CREDENTIAL_TAG 42
 
 static const uint8_t psk_id_0[] = PSK_DEFAULT_IDENTITY;
 static const uint8_t psk_key_0[] = PSK_DEFAULT_KEY;
@@ -330,7 +332,7 @@ using `unicoap_transport_dtls_get_socket`.
 
 ```c
 int main(void) {
-#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
     int res = credman_add(&credential);
     if (res < 0 && res != CREDMAN_EXIST) {
         /* ignore duplicate credentials */
@@ -344,7 +346,7 @@ int main(void) {
         printf("app: cannot add credential to DTLS sock: %d\n", res);
         return 1;
     }
-#  endif
+#endif
 }
 ```
 

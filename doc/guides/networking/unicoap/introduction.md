@@ -4,7 +4,7 @@ description: Send requests and create server resources using the Constrained App
 ---
 
 `unicoap` is RIOT's unified and modular framework for communication via the Constrained Application
-Protocol. It supports different transports and several CoAP features through a layered and
+Protocol (CoAP). It supports different transports and several CoAP features through a layered and
 modular design. Support for each CoAP transport, such as UDP, is available through driver modules.
 
 `unicoap` aims to eventually replace `net_gcoap`, `net_nanocoap`, and `net_nanosock`, in favor of a

@@ -71,7 +71,7 @@ without checking the message class first, use `unicoap_string_from_code`.
 const char* method_name = unicoap_string_from_method(message->method);
 ```
 
-The payload and payload size in bytes can be retrieved the
+The payload and payload size in bytes can be retrieved by the
 [`unicoap_message_t.payload`](https://api.riot-os.org/structunicoap__message__t.html)
 and
 [`unicoap_message_t.payload_size`](https://api.riot-os.org/structunicoap__message__t.html)
@@ -110,12 +110,12 @@ if (res < 0) {
     if (res == -ENOENT) {
         puts("Message has no Uri-Query option");
     }
-    printf("Error: could read first Uri-Query option");
+    puts("Error: could not read first Uri-Query option");
 }
 ```
 
 The `first` getter provides a view into the PDU buffer. The returned string
-is thus not null-terminated.
+is thus not null-terminated, so you have to explicitly specify the size when using it.
 
 ```c
 printf("First URI query: '%.*s'\n", (int)res, query);
@@ -131,7 +131,7 @@ if (res < 0) {
     if (res == -ENOENT) {
         puts("Message has no 'color' query");
     }
-    printf("Error: could read first 'color' query");
+    puts("Error: could not read first 'color' query");
 }
 ```
 
@@ -185,9 +185,12 @@ while ((res = unicoap_options_get_next(&iterator, &number, &value)) >= 0) {
 Since we want to add options to the CoAP message, we need to allocate an options buffer first.
 To avoid the boilerplate necessary for allocating a helper structure and buffer and the initialization
 work, you just need to call
-`UNICOAP_OPTIONS_ALLOC` and provide the desired buffer capacity.
+`UNICOAP_OPTIONS_ALLOC` and provide the desired buffer capacity. The macro declares a
+[`unicoap_options_t`](https://api.riot-os.org/structunicoap__options__t.html) with the name you
+pass, along with a storage buffer of the given capacity, and initializes both for you.
 
 ```c
+/* Declares unicoap_options_t options, backed by a 100 byte buffer */
 UNICOAP_OPTIONS_ALLOC(options, 100);
 ```
 

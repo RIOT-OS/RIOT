@@ -3,7 +3,11 @@ title: Behind The Scenes of unicoap
 description: Learn how unicoap is structured internally.
 ---
 
-## CoAP 101
+## CoAP Internals 101
+This page picks up where [unicoap: Unified CoAP Suite](../introduction) leaves off, so head there
+first if you are looking for an introduction to `unicoap` or CoAP itself. What follows explains how
+the different CoAP specifications relate to each other and how `unicoap` reflects that internally.
+
 CoAP was originally specified in [RFC 7252](https://datatracker.ietf.org/doc/html/rfc7252)
 and could only be used in combination with UDP and DTLS as transport protocols.
 [RFC 8223](https://datatracker.ietf.org/doc/html/rfc8323) modified the CoAP format
@@ -65,8 +69,6 @@ Specification:          RFC 7252                       RFC 8323
 |                     /         \             /      \           /         \
 +-- Transport       UDP        DTLS          TCP     TLS    WebSockets  WebSockets
     Protocol:                                                           over TLS
-
-Figure 2: Differences between CoAP combinations
 ```
 
 #### CoAP over UDP and CoAP over DTLS (RFC 7252)
@@ -100,12 +102,12 @@ To integrate new CoAP combinations, functionality for messaging and transport la
 The `unicoap` design refers to these integrations collectively as a _driver_ that represents
 a CoAP combination, such as CoAP over DTLS. Each driver is a RIOT module you can import. For instance,
 to use the CoAP over UDP driver, you import the `unicoap_driver_udp` by adding it to the `USEMODULE`
-Makefile variable: `USEMODULE += unicoap_driver_udp`.
+variable in your application's Makefile: `USEMODULE += unicoap_driver_udp`.
 
 Drivers themselves can in turn consist of a shared module for messaging and a specific transport
 support module. For example, the CoAP over DTLS driver encompasses a transport module for DTLS networking;
 and depends on the common RFC 7252 messaging module also employed by the CoAP over UDP driver.
-You can see this relationship in `Makefile.dep` in the `unicoap` source directory: The common
+You can see this relationship in `sys/net/application_layer/unicoap/Makefile.dep`: The common
 messaging module is a shared dependency of both the [CoAP over UDP Driver](https://api.riot-os.org/group__net__unicoap__drivers__udp.html) and
 [CoAP over DTLS Driver](https://api.riot-os.org/group__net__unicoap__drivers__dtls.html).
 driver module. We encourage you to follow the same approach for CoAP combinations that share a common
@@ -114,8 +116,8 @@ messaging model, such as CoAP over TCP, TLS, and WebSockets when implementing th
 On a high level, each driver interacts with the upper layers on these three occasions:
 
 - **Initialization and deinitialization**:
-  Drivers must provide an [initialization](/FIXME-upcoming-pr-unicoap_init) and
-  [teardown](/FIXME-upcoming-pr-unicoap_deinit)
+  Drivers must provide an [initialization](https://api.riot-os.org/group__net__unicoap.html) and
+  [teardown](https://api.riot-os.org/group__net__unicoap.html) function.
   These may be used for setup work in the transport and messaging layer such as for creating
   sockets or establishing connections to peripherals,
   alongside allocating objects required for messaging.
@@ -136,7 +138,7 @@ On a high level, each driver interacts with the upper layers on these three occa
 
 - **Ping**: Due to the variability in ping mechanisms
   (empty `CON` in CoAP over UDP and `7.03` message in CoAP over reliable transports),
-  each driver can implement a ping function. unicoap bundles these APIs and provides a
+  each driver can implement a ping function. `unicoap` bundles these APIs and provides a
   [single, generic ping function that multiplexes](/FIXME-upcoming-pr-unicoap_ping)
   between the driver implementations.
 
