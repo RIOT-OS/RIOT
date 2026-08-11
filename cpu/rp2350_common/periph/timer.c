@@ -71,6 +71,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     }
     /* TICKS blocks are designed to generate 1 us ticks, so we can only support that frequency */
     assert(freq == US_PER_SEC);
+    assert((CLOCK_XOSC % freq) == 0);
 
     ctx_cb[dev] = cb;
     ctx_arg[dev] = arg;
@@ -82,13 +83,16 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     reset_bit = (DEV(dev) == TIMER0) ? RESETS_RESET_TIMER0_BITS : RESETS_RESET_TIMER1_BITS;
     reset_component(reset_bit, reset_bit);
 
-    /* Generate one tick per microsecond from clk_ref, which runs from xosc */
+    /* Generate one tick per microsecond from clk_ref, which runs from xosc.
+     * The tick generator has to be stopped while its cycle count is changed
+     * (see section 8.5.1) */
     if (DEV(dev) == TIMER0) {
-        assert((CLOCK_XOSC % freq) == 0);
-        TICKS->TIMER1_CYCLES = CLOCK_XOSC / MHZ(1);
+        TICKS->TIMER0_CTRL = 0;
+        TICKS->TIMER0_CYCLES = CLOCK_XOSC / MHZ(1);
         TICKS->TIMER0_CTRL = TICKS_TIMER0_CTRL_ENABLE_BITS;
     }
     else {
+        TICKS->TIMER1_CTRL = 0;
         TICKS->TIMER1_CYCLES = CLOCK_XOSC / MHZ(1);
         TICKS->TIMER1_CTRL = TICKS_TIMER1_CTRL_ENABLE_BITS;
     }
