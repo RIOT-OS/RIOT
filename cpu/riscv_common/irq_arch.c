@@ -91,7 +91,7 @@ __attribute((used)) static void handle_trap(uword_t mcause)
     /* Check if this is an interrupt or a trap, indicated by the left most bit */
     bool is_interrupt = (mcause & MCAUSE_INT) == MCAUSE_INT;
 
-#ifdef CONFIG_PRINT_VERBOSE_TRAP_INFO
+#if CONFIG_PRINT_VERBOSE_TRAP_INFO
     printf("Trap: mcause=0x%" PRIx32 " mepc=0x%lx mtval=0x%lx\n",
            (uint32_t)mcause, read_csr(mepc), read_csr(mtval));
 
