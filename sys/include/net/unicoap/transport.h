@@ -446,12 +446,11 @@ int unicoap_transport_dtls_add_socket(sock_dtls_t* socket, sock_udp_t* base_sock
                                       sock_udp_ep_t* local);
 #  else
 static inline
-int unicoap_transport_dtls_add_socket(sock_dtls_t* socket, sock_udp_t* base_socket,
-                                      sock_udp_ep_t* local)
+int unicoap_transport_dtls_add_socket(void* socket, void* base_socket, void* local)
 {
-    (void)socket;
-    (void)base_socket;
-    (void)local;
+    (void) socket;
+    (void) base_socket;
+    (void) local;
     return 0;
 }
 #  endif
@@ -469,9 +468,9 @@ int unicoap_transport_dtls_add_socket(sock_dtls_t* socket, sock_udp_t* base_sock
 int unicoap_transport_dtls_remove_socket(sock_dtls_t* socket);
 #  else
 static inline
-int unicoap_transport_dtls_remove_socket(sock_dtls_t* socket)
+int unicoap_transport_dtls_remove_socket(void* socket)
 {
-    (void)socket;
+    (void) socket;
     return 0;
 }
 #  endif
