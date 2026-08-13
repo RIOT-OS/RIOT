@@ -114,9 +114,10 @@ typedef void (*unicoap_event_callback_t)(unicoap_scheduled_event_t* event);
  * @param[in,out] event The event to schedule. Provide a pointer to a pre-allocated event
  * @param[in] callback Function pointer to be called on the internal queue after @p duration ms have elapses
  * @param duration Number of milliseconds to wait
+ * @param[in] debug_id A null-terminated string identifier to distinguish the event in debug logs
  */
 void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_callback_t callback,
-                            uint32_t duration);
+                            uint32_t duration, const char* debug_id);
 
 /**
  * @brief Discards the currently set timeout, and reschedules the event to be posted in @p duration ms
@@ -126,21 +127,23 @@ void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_call
  *
  * @param[in] event Scheduled event you want to reschedule
  * @param[in] duration Number of milliseconds the event should be posted on the queue
+ * @param[in] debug_id A null-terminated string identifier to distinguish the event in debug logs
  */
-static inline void unicoap_event_reschedule(unicoap_scheduled_event_t* event, uint32_t duration)
-{
-    ztimer_set(UNICOAP_CLOCK, &event->ztimer, duration);
-}
+void unicoap_event_reschedule(unicoap_scheduled_event_t* event, uint32_t duration, 
+                              const char* debug_id);
 
 /**
  * @brief Cancels the event
+ *
+ * @param[in] event Scheduled event you want to cancel
+ * @param[in] debug_id A null-terminated string identifier to distinguish the event in debug logs
  *
  * Internally, the timer is removed from the clock.
  *
  * @note If the event has already been posted on the queue, this method will try to remove
  * the cancel the event that has already been posted to the queue.
  */
-void unicoap_event_cancel(unicoap_scheduled_event_t* event);
+void unicoap_event_cancel(unicoap_scheduled_event_t* event, const char* debug_id);
 /** @} */
 
 /* MARK: - Common state */

@@ -27,7 +27,7 @@
 #include "private.h"
 
 static void _on_response_timeout(unicoap_scheduled_event_t* timeout) {
-    _CLIENT_DEBUG("response timeout\n");
+    _STATE_EVENT_DEBUG("client.resp-timeout fired\n");
     unicoap_client_callback_failure(unicoap_client_memo_of_timeout(timeout), -ETIMEDOUT);
     unicoap_client_memo_free(unicoap_client_memo_of_timeout(timeout));
 }
@@ -133,7 +133,7 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
         memo->flags = flags;
 
         unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
-                               CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS);
+                               CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS, "client.resp-timeout");
     }
     /* TODO: OSCORE */
     if ((res = unicoap_client_send_request_part(&packet, memo, flags)) < 0) {

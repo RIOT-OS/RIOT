@@ -65,6 +65,8 @@ extern "C" {
 #  define _OPTIONS_DEBUG(...)                   _UNICOAP_PREFIX_DEBUG(".options", __VA_ARGS__)
 #  define _MESSAGING_DEBUG(...)                 _UNICOAP_PREFIX_DEBUG(".messaging", __VA_ARGS__)
 #  define _STATE_DEBUG(...)                     _UNICOAP_PREFIX_DEBUG(".state", __VA_ARGS__)
+#  define _STATE_EVENT_DEBUG(...)               _UNICOAP_PREFIX_DEBUG(".state.sched", __VA_ARGS__)
+#  define _STATE_NOTIF_DEBUG(...)               _UNICOAP_PREFIX_DEBUG(".state.notif", __VA_ARGS__)
 #  define _TRANSPORT_DEBUG(...)                 _UNICOAP_PREFIX_DEBUG(".transport", __VA_ARGS__)
 #  define _SERVER_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".server", __VA_ARGS__)
 #  define _CLIENT_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".client", __VA_ARGS__)

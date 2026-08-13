@@ -89,11 +89,6 @@ static unicoap_client_memo_t* _alloc_client(void) {
     return NULL;
 }
 
-static void _free(unicoap_memo_t* memo) {
-    unicoap_event_cancel(&memo->exchange.timeout);
-    memset(memo, 0, sizeof(*memo));
-}
-
 static inline bool _is_client(const unicoap_memo_t* memo) {
     (void)memo;
 #if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
@@ -136,6 +131,19 @@ unicoap_client_memo_t* unicoap_client_memo_create(const unicoap_endpoint_t* endp
     }
     _unlock();
     return memo;
+}
+
+static const char* _memo_timeout_debug_id(const unicoap_memo_t* memo) {
+    if (_is_client(memo)) {
+        return "client.resp-timeout";
+    } else {
+        return "(exchange ANY?)";
+    }
+}
+
+static void _free(unicoap_memo_t* memo) {
+    unicoap_event_cancel(&memo->exchange.timeout, _memo_timeout_debug_id(memo));
+    memset(memo, 0, sizeof(*memo));
 }
 
 void unicoap_client_memo_free(unicoap_client_memo_t* memo) {
@@ -233,23 +241,23 @@ void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, voi
     if (!state) { return; }
     unicoap_memo_t* memo = (unicoap_memo_t*)state;
     if (memo->endpoint.proto == UNICOAP_PROTO_UNSPECIFIED) {
-        _STATE_DEBUG("[NOTIF] use of released state obj\n");
+        _STATE_NOTIF_DEBUG("use of released state obj\n");
         return;
     }
     _lock();
     if (type & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE) {
-        _STATE_DEBUG("[NOTIF] messaging layer encountered error %i\n",
+        _STATE_NOTIF_DEBUG("messaging layer encountered error %i\n",
                      unicoap_layer_notification_async_failure_to_errno(type));
 #if UNICOAP_HAVE_MESSAGING_STATE
         memo->messaging.state = NULL;
 #endif
     } else if (type == UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE) {
-        _STATE_DEBUG("[NOTIF] messaging layer released state\n");
+        _STATE_NOTIF_DEBUG("messaging layer released state\n");
 #if UNICOAP_HAVE_MESSAGING_STATE
         memo->messaging.state = NULL;
 #endif
     } else if (type == UNICOAP_LAYER_NOTIFICATION_STATE_ALLOC) {
-        _STATE_DEBUG("[NOTIF] messaging layer allocated state\n");
+        _STATE_NOTIF_DEBUG("messaging layer allocated state\n");
         assert(arg);
 #if UNICOAP_HAVE_MESSAGING_STATE
         memo->messaging.state = arg;
@@ -306,8 +314,15 @@ static void _scheduled_event_callback(void* scheduled_event) {
     event_post(&_queue, (event_t*)scheduled_event);
 }
 
+void unicoap_event_reschedule(unicoap_scheduled_event_t* event, uint32_t duration, 
+                              const char* debug_id) {
+    _STATE_EVENT_DEBUG("%s in %"PRIu32"ms (resched)\n", debug_id, duration);
+    ztimer_set(UNICOAP_CLOCK, &event->ztimer, duration);
+}
+
 void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_callback_t callback,
-                            uint32_t duration) {
+                            uint32_t duration, const char* debug_id) {
+    _STATE_EVENT_DEBUG("%s in %"PRIu32"ms\n", debug_id, duration);
     event->ztimer.callback = _scheduled_event_callback;
     event->ztimer.arg = (void*)event;
     /* This cast is fine because (a) the return types are identical and the function argument is
@@ -316,7 +331,8 @@ void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_call
     ztimer_set(UNICOAP_CLOCK, &event->ztimer, duration);
 }
 
-void unicoap_event_cancel(unicoap_scheduled_event_t* event) {
+void unicoap_event_cancel(unicoap_scheduled_event_t* event, const char* debug_id) {
+    _STATE_EVENT_DEBUG("%s cancelled\n", debug_id);
     bool triggered = !ztimer_remove(UNICOAP_CLOCK, &event->ztimer);
     if (triggered) {
     /* event cancel runs in O(n), so we really only want to call
@@ -612,7 +628,7 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
                 unicoap_client_memo_free(memo);
                 return UNICOAP_PREPROCESSING_ERROR_TRUNCATED;
             }
-            unicoap_event_cancel(&memo->super.exchange.timeout);
+            unicoap_event_cancel(&memo->super.exchange.timeout, "client.resp.timeout");
             arg->client = memo;
             *flags = _messaging_flags_client(memo->flags);
             return UNICOAP_PREPROCESSING_SUCCESS_RESPONSE;
