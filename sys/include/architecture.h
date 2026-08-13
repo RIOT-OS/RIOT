@@ -92,35 +92,55 @@ typedef int<NUM>_t  sword_t;
 
 /* end of ifdef DOXYGEN */
 #elif (ARCHITECTURE_WORD_BITS == 8)
-#define ARCHITECTURE_WORD_BYTES     (1U)
+#  define ARCHITECTURE_WORD_BYTES   (1U)
 typedef uint8_t     uword_t;
 typedef int8_t      sword_t;
-#define SWORD_MAX   (INT8_MAX)
-#define SWORD_MIN   (INT8_MIN)
-#define UWORD_MAX   (UINT8_MAX)
+#  define SWORD_MAX (INT8_MAX)
+#  define SWORD_MIN (INT8_MIN)
+#  define UWORD_MAX (UINT8_MAX)
+#  define PRIdWORD  PRId8
+#  define PRIuWORD  PRIu8
+#  define PRIiWORD  PRIu8
+#  define PRIxWORD  PRIx8
+#  define PRIoWORD  PRIo8
 #elif (ARCHITECTURE_WORD_BITS == 16)
-#define ARCHITECTURE_WORD_BYTES     (2U)
+#  define ARCHITECTURE_WORD_BYTES   (2U)
 typedef uint16_t    uword_t;
 typedef int16_t     sword_t;
-#define SWORD_MAX   (INT16_MAX)
-#define SWORD_MIN   (INT16_MIN)
-#define UWORD_MAX   (UINT16_MAX)
+#  define SWORD_MAX (INT16_MAX)
+#  define SWORD_MIN (INT16_MIN)
+#  define UWORD_MAX (UINT16_MAX)
+#  define PRIdWORD  PRId16
+#  define PRIuWORD  PRIu16
+#  define PRIiWORD  PRIu16
+#  define PRIxWORD  PRIx16
+#  define PRIoWORD  PRIo16
 #elif (ARCHITECTURE_WORD_BITS == 32)
-#define ARCHITECTURE_WORD_BYTES     (4U)
+#  define ARCHITECTURE_WORD_BYTES   (4U)
 typedef uint32_t    uword_t;
 typedef int32_t     sword_t;
-#define SWORD_MAX   (INT32_MAX)
-#define SWORD_MIN   (INT32_MIN)
-#define UWORD_MAX   (UINT32_MAX)
+#  define SWORD_MAX (INT32_MAX)
+#  define SWORD_MIN (INT32_MIN)
+#  define UWORD_MAX (UINT32_MAX)
+#  define PRIdWORD  PRId32
+#  define PRIuWORD  PRIu32
+#  define PRIiWORD  PRIu32
+#  define PRIxWORD  PRIx32
+#  define PRIoWORD  PRIo32
 #elif (ARCHITECTURE_WORD_BITS == 64)
-#define ARCHITECTURE_WORD_BYTES     (8U)
+#  define ARCHITECTURE_WORD_BYTES   (8U)
 typedef uint64_t    uword_t;
 typedef int64_t     sword_t;
-#define SWORD_MAX   (INT64_MAX)
-#define SWORD_MIN   (INT64_MIN)
-#define UWORD_MAX   (UINT64_MAX)
+#  define SWORD_MAX (INT64_MAX)
+#  define SWORD_MIN (INT64_MIN)
+#  define UWORD_MAX (UINT64_MAX)
+#  define PRIdWORD  PRId64
+#  define PRIuWORD  PRIu64
+#  define PRIiWORD  PRIu64
+#  define PRIxWORD  PRIx64
+#  define PRIoWORD  PRIo64
 #else
-#error  "Unsupported word size (check ARCHITECTURE_WORD_BITS in architecture_arch.h)"
+#  error "Unsupported word size (check ARCHITECTURE_WORD_BITS in architecture_arch.h)"
 #endif
 
 /**

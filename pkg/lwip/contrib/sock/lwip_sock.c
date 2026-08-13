@@ -681,6 +681,7 @@ ssize_t lwip_sock_sendv(struct netconn *conn, const iolist_t *snips,
                 DEBUG("[lwip_sock_sendv] lwip_sock_bind_addr_to_netif() "
                       "returned %u, but expected %u\n",
                       (unsigned)netif, (unsigned)remote->netif);
+                netbuf_delete(buf);
                 return -EINVAL;
             }
         }

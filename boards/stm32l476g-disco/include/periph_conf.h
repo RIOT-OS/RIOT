@@ -106,11 +106,11 @@ static const uart_conf_t uart_config[] = {
  * @{
  */
 static const adc_conf_t adc_config[] = {
-    {GPIO_PIN(PORT_A, 0), 0, 5},  /*< ADC12_IN5  */
-    {GPIO_PIN(PORT_A, 5), 0, 10}, /*< ADC12_IN10 */
-    {GPIO_PIN(PORT_A, 1), 0, 6},  /*< ADC12_IN6  */
-    {GPIO_PIN(PORT_A, 2), 0, 7},  /*< ADC12_IN7  */
-    {GPIO_PIN(PORT_A, 3), 0, 8},  /*< ADC12_IN8  */
+    {GPIO_PIN(PORT_A, 0), 0, 5},  /* ADC12_IN5  */
+    {GPIO_PIN(PORT_A, 5), 0, 10}, /* ADC12_IN10 */
+    {GPIO_PIN(PORT_A, 1), 0, 6},  /* ADC12_IN6  */
+    {GPIO_PIN(PORT_A, 2), 0, 7},  /* ADC12_IN7  */
+    {GPIO_PIN(PORT_A, 3), 0, 8},  /* ADC12_IN8  */
     {GPIO_UNDEF, 0, 18}, /* VBAT */
 };
 

@@ -16,7 +16,7 @@ index 70c1b71..8a4105f 100644
  #include <stdlib.h>
  #endif
 +
-+#if !defined(RIOT_VERSION)
++#if !defined(RIOT_OS)
  struct uwb_dev*
  uwb_dev_idx_lookup(int idx)
  {

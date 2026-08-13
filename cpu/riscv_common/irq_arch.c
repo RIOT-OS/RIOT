@@ -15,23 +15,21 @@
  * @}
  */
 
-#include <stdio.h>
 #include <inttypes.h>
+#include <stdio.h>
 
-#include "macros/xtstr.h"
-#include "cpu.h"
+#include "architecture.h"
+#include "clic.h"
 #include "context_frame.h"
+#include "cpu.h"
 #include "irq.h"
 #include "irq_arch.h"
+#include "macros/xtstr.h"
 #include "panic.h"
-#include "sched.h"
 #include "plic.h"
-#include "clic.h"
-#include "architecture.h"
-
-#include "xh3irq.h"
-
+#include "sched.h"
 #include "vendor/riscv_csr.h"
+#include "xh3irq.h"
 
 /* Default state of mstatus register */
 #define MSTATUS_DEFAULT (MSTATUS_MPP | MSTATUS_MPIE)
@@ -122,10 +120,10 @@ __attribute((used)) static void handle_trap(uword_t mcause)
         };
 
         if (trap < ARRAY_SIZE(error_messages)) {
-            printf("Machine Cause Error 0x%lx: %s\n", trap, error_messages[trap]);
+            printf("Machine Cause Error 0x%" PRIxWORD ": %s\n", trap, error_messages[trap]);
         }
         else {
-            printf("Machine Cause Error 0x%lx: Reserved / Custom\n", trap);
+            printf("Machine Cause Error 0x%" PRIxWORD ": Reserved / Custom\n", trap);
         }
     }
 #endif

@@ -229,7 +229,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 #endif
     }
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
-    else if (sixlowpan_frag_is((sixlowpan_frag_t *)dispatch)) {
+    else if (sixlowpan_frag_is_snip(payload)) {
         DEBUG("6lo: received 6LoWPAN fragment\n");
         gnrc_sixlowpan_frag_recv(pkt, NULL, 0);
         return;
