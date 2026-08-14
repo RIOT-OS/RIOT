@@ -1,7 +1,9 @@
 PKG_NAME=wolfssl
 PKG_URL=https://github.com/wolfssl/wolfssl.git
-# v5.9.2
-PKG_VERSION=ac01707f552c611fbd135cc723b2682b3e7f80f2
+# Past v5.9.2
+# https://github.com/wolfSSL/wolfssl/commit/addf0d4b743635a9e4c6d10d0c05458f724e56e3
+# This commit hash was used because it enables off the line pinning for raw public keys
+PKG_VERSION=addf0d4b743635a9e4c6d10d0c05458f724e56e3
 PKG_LICENSE=GPL-3.0
 
 include $(RIOTBASE)/pkg/pkg.mk
