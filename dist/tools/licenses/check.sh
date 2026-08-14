@@ -44,7 +44,7 @@ for FILE in ${FILES}; do
     FAIL=1
     head -100 "${ROOT}/${FILE}" | sed -e 's/[\/\*'"${TAB_CHAR}"']/ /g' -e 's/$/ /' | tr -d '\r\n' | sed -e 's/  */ /g' > "${TMP}"
     for LICENSE in ${LICENSES}; do
-        if pcregrep -q -f "${LICENSEDIR}/${LICENSE}" "${TMP}"; then
+        if grep -qP -f "${LICENSEDIR}/${LICENSE}" "${TMP}"; then
             echo "${FILE}" >> "${OUTPUT}/${LICENSE}"
             FAIL=0
             break
