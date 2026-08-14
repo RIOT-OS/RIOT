@@ -1,4 +1,4 @@
-/*
+g/*
  * SPDX-FileCopyrightText: 2024-2026 Carl Seifert
  * SPDX-FileCopyrightText: 2024-2026 TU Dresden
  * SPDX-License-Identifier: LGPL-2.1-only
@@ -79,7 +79,29 @@ typedef struct {
      * event on the internal unicoap queue.
      */
     ztimer_t ztimer;
+
+#if DEVELHELP || defined (DOXYGEN)
+    /**
+     * @brief Null-terminated event identifier used in debug logs
+     *
+     * Requires `DEVELHELP`
+     */
+    const char* name;
+#endif
 } unicoap_scheduled_event_t;
+
+/**
+ * @brief Name of scheduled event
+ * @returns Null-terminated string when `DEVELHELP` is turned on, `NULL` otherwise
+ * @param event Scheduled event
+ */
+static inline const char* unicoap_scheduled_event_name(unicoap_scheduled_event_t* event) {
+#if DEVELHELP
+    return event->name;
+#else
+    return NULL;
+#endif
+}
 
 /**
  * @brief Returns scheduled event subclass of event
@@ -114,10 +136,12 @@ typedef void (*unicoap_event_callback_t)(unicoap_scheduled_event_t* event);
  * @param[in,out] event The event to schedule. Provide a pointer to a pre-allocated event
  * @param[in] callback Function pointer to be called on the internal queue after @p duration ms have elapses
  * @param duration Number of milliseconds to wait
- * @param[in] debug_id A null-terminated string identifier to distinguish the event in debug logs
+ * @param[in] name A null-terminated string identifier to distinguish the event in debug logs
+ *
+ * @p name has no effect when `DEVELHELP` is disabled.
  */
 void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_callback_t callback,
-                            uint32_t duration, const char* debug_id);
+                            uint32_t duration, const char* name);
 
 /**
  * @brief Discards the currently set timeout, and reschedules the event to be posted in @p duration ms
@@ -127,23 +151,19 @@ void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_call
  *
  * @param[in] event Scheduled event you want to reschedule
  * @param[in] duration Number of milliseconds the event should be posted on the queue
- * @param[in] debug_id A null-terminated string identifier to distinguish the event in debug logs
  */
-void unicoap_event_reschedule(unicoap_scheduled_event_t* event, uint32_t duration, 
-                              const char* debug_id);
-
+void unicoap_event_reschedule(unicoap_scheduled_event_t* event, uint32_t duration);
 /**
  * @brief Cancels the event
  *
  * @param[in] event Scheduled event you want to cancel
- * @param[in] debug_id A null-terminated string identifier to distinguish the event in debug logs
  *
  * Internally, the timer is removed from the clock.
  *
  * @note If the event has already been posted on the queue, this method will try to remove
  * the cancel the event that has already been posted to the queue.
  */
-void unicoap_event_cancel(unicoap_scheduled_event_t* event, const char* debug_id);
+void unicoap_event_cancel(unicoap_scheduled_event_t* event);
 /** @} */
 
 /* MARK: - Common state */

@@ -304,7 +304,7 @@ static inline void _transmission_free(_transmission_t* transmission)
     if (transmission->pdu) {
         _carbon_copy_free(transmission->pdu);
     }
-    unicoap_event_cancel(&transmission->ack_timeout, "messaging.7252.ack-timeout");
+    unicoap_event_cancel(&transmission->ack_timeout);
     memset(transmission, 0, sizeof(_transmission_t));
     /* DTLS session gets purged automatically after a period of time. This avoids successive
      * session establishments. */
@@ -567,7 +567,6 @@ static int _send_carbon_copy(_transmission_t* transmission) {
 }
 
 static void _on_ack_timeout(unicoap_scheduled_event_t* _event) {
-    _STATE_EVENT_DEBUG("messaging.7252.ack-timeout fired\n");
     _transmission_t* transmission = container_of(_event, _transmission_t, ack_timeout);
     assert(transmission);
     assert(transmission->pdu);

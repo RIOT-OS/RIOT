@@ -27,7 +27,6 @@
 #include "private.h"
 
 static void _on_response_timeout(unicoap_scheduled_event_t* timeout) {
-    _STATE_EVENT_DEBUG("client.resp-timeout fired\n");
     unicoap_client_callback_failure(unicoap_client_memo_of_timeout(timeout), -ETIMEDOUT);
     unicoap_client_memo_free(unicoap_client_memo_of_timeout(timeout));
 }

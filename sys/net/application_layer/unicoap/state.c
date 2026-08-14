@@ -133,16 +133,8 @@ unicoap_client_memo_t* unicoap_client_memo_create(const unicoap_endpoint_t* endp
     return memo;
 }
 
-static const char* _memo_timeout_debug_id(const unicoap_memo_t* memo) {
-    if (_is_client(memo)) {
-        return "client.resp-timeout";
-    } else {
-        return "(exchange ANY?)";
-    }
-}
-
 static void _free(unicoap_memo_t* memo) {
-    unicoap_event_cancel(&memo->exchange.timeout, _memo_timeout_debug_id(memo));
+    unicoap_event_cancel(&memo->exchange.timeout);
     memset(memo, 0, sizeof(*memo));
 }
 
@@ -311,18 +303,22 @@ void unicoap_messaging_notify(void* state, unicoap_layer_notification_t type, vo
 /* MARK: - Event Scheduling on Internal Queue */
 
 static void _scheduled_event_callback(void* scheduled_event) {
+    if (IS_ACTIVE(DEVELHELP)) {
+        _STATE_EVENT_DEBUG("%s fired, exec queued\n", unicoap_scheduled_event_name(
+                           unicoap_scheduled_event_of_event((event_t*)scheduled_event)));
+    }
     event_post(&_queue, (event_t*)scheduled_event);
 }
 
-void unicoap_event_reschedule(unicoap_scheduled_event_t* event, uint32_t duration, 
-                              const char* debug_id) {
-    _STATE_EVENT_DEBUG("%s in %"PRIu32"ms (resched)\n", debug_id, duration);
-    ztimer_set(UNICOAP_CLOCK, &event->ztimer, duration);
-}
-
 void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_callback_t callback,
-                            uint32_t duration, const char* debug_id) {
-    _STATE_EVENT_DEBUG("%s in %"PRIu32"ms\n", debug_id, duration);
+                            uint32_t duration, const char* name) {
+#if DEVELHELP
+    assert(name);
+    event->name = name;
+#endif
+    if (IS_ACTIVE(DEVELHELP)) {
+        _STATE_EVENT_DEBUG("%s in %"PRIu32"ms\n", unicoap_scheduled_event_name(event), duration);
+    }
     event->ztimer.callback = _scheduled_event_callback;
     event->ztimer.arg = (void*)event;
     /* This cast is fine because (a) the return types are identical and the function argument is
@@ -331,14 +327,27 @@ void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_call
     ztimer_set(UNICOAP_CLOCK, &event->ztimer, duration);
 }
 
-void unicoap_event_cancel(unicoap_scheduled_event_t* event, const char* debug_id) {
-    _STATE_EVENT_DEBUG("%s cancelled\n", debug_id);
+void unicoap_event_reschedule(unicoap_scheduled_event_t* event, uint32_t duration) {
+    if (IS_ACTIVE(DEVELHELP)) {
+        _STATE_EVENT_DEBUG("%s in %"PRIu32"ms (rescheduled)\n", 
+                           unicoap_scheduled_event_name(event), duration);
+    }
+    ztimer_set(UNICOAP_CLOCK, &event->ztimer, duration);
+}
+
+void unicoap_event_cancel(unicoap_scheduled_event_t* event) {
+    if (IS_ACTIVE(DEVELHELP) && unicoap_scheduled_event_name(event)) {
+        _STATE_EVENT_DEBUG("%s cancelled\n", unicoap_scheduled_event_name(event));
+    }
     bool triggered = !ztimer_remove(UNICOAP_CLOCK, &event->ztimer);
     if (triggered) {
     /* event cancel runs in O(n), so we really only want to call
      * event_cancel if the event has already been posted */
         event_cancel(&_queue, &event->super);
     }
+#if DEVELHELP
+    event->name = NULL;
+#endif
 }
 
 /* MARK: - Lifecycle */
@@ -628,7 +637,7 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
                 unicoap_client_memo_free(memo);
                 return UNICOAP_PREPROCESSING_ERROR_TRUNCATED;
             }
-            unicoap_event_cancel(&memo->super.exchange.timeout, "client.resp.timeout");
+            unicoap_event_cancel(&memo->super.exchange.timeout);
             arg->client = memo;
             *flags = _messaging_flags_client(memo->flags);
             return UNICOAP_PREPROCESSING_SUCCESS_RESPONSE;

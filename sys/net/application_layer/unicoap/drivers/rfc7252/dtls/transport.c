@@ -47,7 +47,6 @@ unicoap_scheduled_event_t _dtls_session_triage_event = { 0 };
 /* Timeout function to free a session when too many session slots are occupied */
 static void _dtls_session_triage(unicoap_scheduled_event_t* event)
 {
-    _STATE_EVENT_DEBUG("messaging.dtls.triage fired\n");
     (void)event;
     sock_dtls_session_t session;
     if (dsm_get_num_available_slots() < CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS) {
