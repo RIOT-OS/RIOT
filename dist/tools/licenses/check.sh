@@ -37,6 +37,13 @@ for LICENSE in ${LICENSES}; do
     echo -n '' > "${OUTPUT}/${LICENSE}"
 done
 
+# prepare license patterns
+declare -A PATTERNS
+for LICENSE in ${LICENSES}; do
+    echo -n '' > "${OUTPUT}/${LICENSE}"
+    PATTERNS[${LICENSE}]="$(grep -v '^$' "${LICENSEDIR}/${LICENSE}" | paste -sd'|')"
+done
+
 FILES=$(FILEREGEX='\.([sSch]|cpp)$' changed_files)
 
 # categorize files
@@ -44,7 +51,7 @@ for FILE in ${FILES}; do
     FAIL=1
     head -100 "${ROOT}/${FILE}" | sed -e 's/[\/\*'"${TAB_CHAR}"']/ /g' -e 's/$/ /' | tr -d '\r\n' | sed -e 's/  */ /g' > "${TMP}"
     for LICENSE in ${LICENSES}; do
-        if grep -qP -f "${LICENSEDIR}/${LICENSE}" "${TMP}"; then
+        if grep -qP "${PATTERNS[${LICENSE}]}" "${TMP}"; then
             echo "${FILE}" >> "${OUTPUT}/${LICENSE}"
             FAIL=0
             break
