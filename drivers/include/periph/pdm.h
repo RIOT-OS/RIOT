@@ -38,21 +38,6 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   Default PDM sampling rate values
- * @{
- */
-#ifndef HAVE_PDM_SAMPLE_RATE_T
-typedef enum {
-    PDM_SAMPLE_RATE_16KHZ = 0,      /**< 16kHz */
-    PDM_SAMPLE_RATE_20KHZ,          /**< 20kHz */
-    PDM_SAMPLE_RATE_41KHZ,          /**< 41.6kHz */
-    PDM_SAMPLE_RATE_50KHZ,          /**< 50kHz */
-    PDM_SAMPLE_RATE_60KHZ,          /**< 60kHz */
-} pdm_sample_rate_t;
-#endif
-/** @} */
-
-/**
  * @brief   Default PDM min gain values (in dB)
  */
 #ifndef PDM_GAIN_MIN
@@ -70,7 +55,7 @@ typedef enum {
  * @brief   Default PDM samples frame buffer size
  */
 #ifndef PDM_BUF_SIZE
-#define PDM_BUF_SIZE        (128U)
+#define PDM_BUF_SIZE        (64U)
 #endif
 
 /**
@@ -79,7 +64,7 @@ typedef enum {
  * @param[in] arg           context to the callback (optional)
  * @param[in] buf           the buffer containing the current samples frame
  */
-typedef void(*pdm_data_cb_t)(void *arg, int16_t *buf);
+typedef void (*pdm_data_cb_t)(void *arg, int16_t *buf);
 
 /**
  * @brief   Interrupt context for a PDM device
@@ -94,7 +79,7 @@ typedef struct {
 /**
  * @brief   Initialize the PDM peripheral
  * @param[in] mode      mode (Mono or Stereo)
- * @param[in] rate      sample rate
+ * @param[in] rate      sample rate in Hz
  * @param[in] gain      gain
  * @param[in] cb        data received callback function
  * @param[in] arg       context passed to the callback function
@@ -102,7 +87,7 @@ typedef struct {
  * @return  0 on successful initialization
  * @return <0 on error
  */
-int pdm_init(pdm_mode_t mode, pdm_sample_rate_t rate, int8_t gain,
+int pdm_init(pdm_mode_t mode, uint32_t rate, int8_t gain,
              pdm_data_cb_t cb, void *arg);
 
 /**
