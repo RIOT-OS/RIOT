@@ -55,7 +55,7 @@ static int _on_response(
     return 0;
 }
 
-static int _set_flags(char* opt, unicoap_client_flags_t* flags, uint8_t* shell_flags) {
+static int _set_flags(char* opt, unicoap_request_flags_t* flags, uint8_t* shell_flags) {
     if (strcmp(opt, "-r") == 0) {
         *flags |= UNICOAP_CLIENT_FLAG_RELIABLE;
     } else if (strcmp(opt, "-t") == 0) {
@@ -72,7 +72,7 @@ static int _cli(int argc, char** argv) {
         "get", "post", "put", "delete", "fetch", "patch", "ipatch"
     };
 
-    unicoap_client_flags_t flags = 0;
+    unicoap_request_flags_t flags = 0;
     uint8_t shell_flags = 0;
     int res = 0;
 

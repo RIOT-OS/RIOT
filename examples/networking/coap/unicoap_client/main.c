@@ -89,7 +89,7 @@ static int _on_response(
 }
 
 static int _cli(int argc, char** argv) {
-    unicoap_client_flags_t flags = 0;
+    unicoap_request_flags_t flags = 0;
     int res = 0;
     if (argc == 1) {
         printf("error: missing request method\n");

@@ -74,7 +74,7 @@ extern "C" {
  *
  * ### Relationship with Exchange-Layer Flags
  * Messaging flags are provided as part of client and resource flags. The
- * (TODO: ref) unicoap_client_flags_t and @ref unicoap_resource_flags_t are separated into
+ * (TODO: ref) unicoap_request_flags_t and @ref unicoap_resource_flags_t are separated into
  * - exchange flags needed for features building on top the request/response level and
  * - messaging flags.
  *
@@ -345,7 +345,7 @@ _messaging_flags_resource(unicoap_resource_flags_t resource_flags)
  * @param client_flags Client flags
  * @return Messaging flags extracted from the given bitfield
  */
-static inline unicoap_messaging_flags_t _messaging_flags_client(unicoap_client_flags_t client_flags) {
+static inline unicoap_messaging_flags_t _messaging_flags_client(unicoap_request_flags_t client_flags) {
     /* We documented other flags are RFU, hence downcasting to the messaging
      flags bitfield width is fine here */
     return (unicoap_messaging_flags_t)client_flags;
@@ -409,7 +409,7 @@ int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_mem
  * @returns Zero on success or negative integer on error
  */
 int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_memo_t* memo,
-                                     unicoap_client_flags_t client_flags);
+                                     unicoap_request_flags_t client_flags);
 
 /**
  * @brief Sends entire request body, may be split into parts and then sent
@@ -417,7 +417,7 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
  * @param request Request body to send
  * @param endpoint Remote endpoint (server)
  * @param callback Optional application callback
- * @param callback_arg Optional argument passed to @p callback
+ * @param parameters Optional parameters (nullable)
  * @param flags Request flags
  * @param profile Optional profile, such as OSCORE security context
  *
@@ -425,8 +425,9 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
  */
 int unicoap_client_send_request_body(unicoap_message_t* request,
                                      unicoap_endpoint_t* endpoint,
-                                     unicoap_callback_t callback, void* callback_arg,
-                                     unicoap_client_flags_t flags);
+                                     unicoap_callback_t callback, 
+                                     unicoap_request_parameters_t* parameters,
+                                     unicoap_request_flags_t flags);
 /** @} */
 
 #ifdef __cplusplus

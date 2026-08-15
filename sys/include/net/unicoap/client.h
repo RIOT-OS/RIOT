@@ -56,12 +56,23 @@ typedef enum {
      * **Default**: disabled
      */
     UNICOAP_CLIENT_FLAG_RELIABLE = 0x0001,
-} unicoap_client_flags_t;
+} unicoap_request_flags_t;
 
 /**
  * @brief Prints client flags
  */
-void unicoap_print_client_flags(unicoap_client_flags_t flags);
+void unicoap_print_client_flags(unicoap_request_flags_t flags);
+
+
+/** 
+ * @brief Additional parameters to customize request behavior
+ */
+typedef struct {
+    /**
+     * @brief Opaque argument passed to callback both in success and failure cases 
+     */
+    void* callback_arg;
+} unicoap_request_parameters_t;
 /** @} */
 
 /* MARK: - Sending a request */
@@ -119,7 +130,7 @@ typedef int (*unicoap_response_callback_t)(const unicoap_message_t* response,
  * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or
  *                    @ref unicoap_destination_endpoint
  * @param callback Function executed when the entire response is available or if an error occurred
- * @param callback_arg Optional argument passed to the callback (nullable)
+ * @param parameters Optional parameters (nullable)
  * @param flags Client flags
  *
  * @returns Zero on success or positive refno if [cancellable requests](@ref unicoap_cancel_request) 
@@ -128,8 +139,9 @@ typedef int (*unicoap_response_callback_t)(const unicoap_message_t* response,
  */
 int unicoap_send_request_async(unicoap_message_t* request,
                                unicoap_destination_t* destination,
-                               unicoap_response_callback_t callback, void* callback_arg,
-                               unicoap_client_flags_t flags);
+                               unicoap_response_callback_t callback, 
+                               unicoap_request_parameters_t* parameters,
+                               unicoap_request_flags_t flags);
 
 /**
  * @brief Sends a request synchronously
@@ -149,7 +161,7 @@ int unicoap_send_request_async(unicoap_message_t* request,
  * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or 
  *                    @ref unicoap_destination_endpoint
  * @param callback Function executed when the entire response is available or if an error occurred
- * @param callback_arg Optional argument passed to the callback (nullable)
+ * @param parameters Optional parameters (nullable)
  * @param flags Client flags
  *
  * @returns Zero on success
@@ -157,8 +169,9 @@ int unicoap_send_request_async(unicoap_message_t* request,
  */
 int unicoap_send_request_sync(unicoap_message_t* request,
                               unicoap_destination_t* destination,
-                              unicoap_response_callback_t callback, void* callback_arg,
-                              unicoap_client_flags_t flags);
+                              unicoap_response_callback_t callback, 
+                              unicoap_request_parameters_t* parameters,
+                              unicoap_request_flags_t flags);
 
 /**
  * @brief Sends a request synchronously and copies the request to the given buffer
@@ -192,6 +205,7 @@ int unicoap_send_request_sync(unicoap_message_t* request,
  * @param[in,out] request Initialized request message to send
  * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or @ref unicoap_destination_endpoint
  * @param[in,out] response Partially initialized response message
+ * @param parameters Optional parameters (nullable)
  * @param flags Client flags
  * @param[in,out] aux Pre-allocated auxiliary information structure, will be initialized when a response is received successfully
  *
@@ -200,25 +214,10 @@ int unicoap_send_request_sync(unicoap_message_t* request,
  */
 int unicoap_send_request_sync_copy(unicoap_message_t* request,
                                    unicoap_destination_t* destination,
-                                   unicoap_message_t* response, unicoap_client_flags_t flags,
+                                   unicoap_message_t* response, 
+                                   unicoap_request_parameters_t* parameters,
+                                   unicoap_request_flags_t flags,
                                    unicoap_aux_t* aux);
-
-/**
- * @brief Shorthand for @ref unicoap_send_request_sync_copy
- *
- * If you want to try out something quickly with the CoAP stack, use this method.
- * In other cases, the explicit sync or async methods are a better fit.
- *
- * @warning Do not use this method in production environments in favor of one these methods:
- * - @ref unicoap_send_request_async
- * - @ref unicoap_send_request_sync
- * - @ref unicoap_send_request_sync_copy
- */
-static inline int unicoap_send_request(unicoap_message_t* request,
-                                       unicoap_destination_t* destination,
-                                       unicoap_message_t* response, unicoap_client_flags_t flags) {
-    return unicoap_send_request_sync_copy(request, destination, response, flags, NULL);
-}
 
 /**
  * @brief Cancels request with reference number

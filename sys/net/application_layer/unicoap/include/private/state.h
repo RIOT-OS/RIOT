@@ -1,4 +1,4 @@
-g/*
+/*
  * SPDX-FileCopyrightText: 2024-2026 Carl Seifert
  * SPDX-FileCopyrightText: 2024-2026 TU Dresden
  * SPDX-License-Identifier: LGPL-2.1-only
@@ -410,7 +410,7 @@ typedef struct {
     /**
      * @brief Request flags from application, from the original call to `unicoap_send_request_*
      */
-    unicoap_client_flags_t flags;
+    unicoap_request_flags_t flags;
 } unicoap_client_memo_t;
 
 /**

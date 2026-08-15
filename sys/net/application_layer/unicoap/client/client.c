@@ -76,7 +76,7 @@ int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_mem
 }
 
 int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_memo_t* memo,
-                                     unicoap_client_flags_t client_flags) {
+                                     unicoap_request_flags_t client_flags) {
     int res = 0;
 
     if (memo) {
@@ -104,8 +104,9 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
 
 int unicoap_client_send_request_body(unicoap_message_t* request,
                                      unicoap_endpoint_t* endpoint,
-                                     unicoap_callback_t callback, void* callback_arg,
-                                     unicoap_client_flags_t flags)
+                                     unicoap_callback_t callback, 
+                                     unicoap_request_parameters_t* parameters,
+                                     unicoap_request_flags_t flags)
 {
     assert(request);
     assert(endpoint);
@@ -128,7 +129,7 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
             return -ENOBUFS;
         }
         memo->callback = callback;
-        memo->callback_arg = callback_arg;
+        memo->callback_arg = parameters ? parameters->callback_arg : NULL;
         memo->flags = flags;
 
         unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
@@ -174,9 +175,10 @@ int unicoap_cancel_request(int refno) {
 /* MARK: - URI */
 
 static int _open_request(unicoap_message_t* request,
-                          unicoap_destination_t* destination,
-                          unicoap_callback_t callback, void* callback_arg,
-                          unicoap_client_flags_t flags)
+                         unicoap_destination_t* destination,
+                         unicoap_callback_t callback, 
+                         unicoap_request_parameters_t* parameters,
+                         unicoap_request_flags_t flags)
 {
     assert(request);
     assert(destination);
@@ -208,7 +210,7 @@ static int _open_request(unicoap_message_t* request,
                 return res;
             }
             return unicoap_client_send_request_body(request, &endpoint, callback,
-                                                    callback_arg, flags);
+                                                    parameters, flags);
         } else {
             unicoap_assist(API_ERROR("URI passed, but module is missing")
                            FIXIT("add USEMODULE += unicoap_client_uri"));
@@ -228,7 +230,7 @@ static int _open_request(unicoap_message_t* request,
     }
     case UNICOAP_DESTINATION_ENDPOINT:
         return unicoap_client_send_request_body(
-            request, destination->remote.endpoint, callback, callback_arg, flags);
+            request, destination->remote.endpoint, callback, parameters, flags);
     default:
         _CLIENT_DEBUG("illegal destination type %" PRIu8 "\n", destination->type);
         assert(false);
@@ -314,7 +316,9 @@ out:
 
 int unicoap_send_request_sync_copy(unicoap_message_t* request,
                                    unicoap_destination_t* destination,
-                                   unicoap_message_t* response, unicoap_client_flags_t flags,
+                                   unicoap_message_t* response, 
+                                   unicoap_request_parameters_t* parameters,
+                                   unicoap_request_flags_t flags,
                                    unicoap_aux_t* aux)
 {
     assert(response);
@@ -344,8 +348,14 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
         .roadblock = MUTEX_INIT_LOCKED
     };
 
+    unicoap_request_parameters_t sync_copy_parameters = {};
+    if (parameters) {
+        sync_copy_parameters = *parameters;
+    }
+    sync_copy_parameters.callback_arg = &args;
+
     int res = _open_request(request, destination,
-        (unicoap_callback_t) { .response = _copy_callback }, &args, flags);
+        (unicoap_callback_t) { .response = _copy_callback }, &sync_copy_parameters, flags);
 
     if (res < 0) {
         return res;
@@ -373,8 +383,9 @@ static int _sync_callback(const unicoap_message_t *response, const unicoap_aux_t
 
 int unicoap_send_request_sync(unicoap_message_t* request,
                               unicoap_destination_t* destination,
-                              unicoap_response_callback_t callback, void* callback_arg,
-                              unicoap_client_flags_t flags)
+                              unicoap_response_callback_t callback, 
+                              unicoap_request_parameters_t* parameters,
+                              unicoap_request_flags_t flags)
 {
     /* Prevent this function from deadlocking the unicoap thread. No one besides the unicoap
      * thread can unlock the mutex below (via the _sync_callback). You cannot have
@@ -396,12 +407,18 @@ int unicoap_send_request_sync(unicoap_message_t* request,
 
     _sync_args_t args = { 
         .callback = callback, 
-        .caller_arg = callback_arg, 
         .roadblock = MUTEX_INIT_LOCKED 
     };
 
+    unicoap_request_parameters_t sync_parameters = {};
+    if (parameters) {
+        args.caller_arg = parameters->callback_arg;
+        sync_parameters = *parameters;
+    }
+    sync_parameters.callback_arg = &args;
+
     int res = _open_request(request, destination, 
-        (unicoap_callback_t) { .response = _sync_callback }, &args, flags);
+        (unicoap_callback_t) { .response = _sync_callback }, &sync_parameters, flags);
 
     if (res < 0) {
         return res;
@@ -413,8 +430,9 @@ int unicoap_send_request_sync(unicoap_message_t* request,
 
 int unicoap_send_request_async(unicoap_message_t* request,
                                unicoap_destination_t* destination,
-                               unicoap_response_callback_t callback, void* callback_arg,
-                               unicoap_client_flags_t flags) {
+                               unicoap_response_callback_t callback, 
+                               unicoap_request_parameters_t* parameters,
+                               unicoap_request_flags_t flags) {
     return _open_request(request, destination, 
-        (unicoap_callback_t) { .response = callback }, callback_arg, flags);
+        (unicoap_callback_t) { .response = callback }, parameters, flags);
 }
