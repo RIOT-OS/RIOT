@@ -14,11 +14,12 @@
 #include "uri_parser.h"
 #include "modules.h"
 
+#include "net/sock.h"
+#include "net/sock/udp.h"
+
 #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
-#  include "net/sock.h"
 #  include "net/sock/async/event.h"
 #  include "net/sock/util.h"
-#  include "net/sock/udp.h"
 #  include "net/sock/tcp.h"
 #endif
 
@@ -704,7 +705,7 @@ int unicoap_transport_dtls_add_socket(sock_dtls_t* socket, sock_udp_t* base_sock
 int unicoap_transport_dtls_remove_socket(sock_dtls_t* socket);
 #  else
 static inline
-int unicoap_transport_dtls_remove_socket(sock_dtls_t* socket)
+int unicoap_transport_dtls_remove_socket(void* socket)
 {
     (void)socket;
     return 0;
