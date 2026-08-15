@@ -206,6 +206,7 @@ unicoap_client_memo_t* unicoap_client_memo_find_refno(int refno) {
 }
 
 int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo) {
+    (void)memo;
     assert(memo);
     /* Here, we build a refno, a stable reference to a memo while it is being used for a specific
      * exchange. Should the memo struct in the memo array get reused for another exchange,
@@ -312,6 +313,7 @@ static void _scheduled_event_callback(void* scheduled_event) {
 
 void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_callback_t callback,
                             uint32_t duration, const char* name) {
+    (void)name;
 #if DEVELHELP
     assert(name);
     event->name = name;

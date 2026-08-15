@@ -96,6 +96,7 @@ typedef struct {
  * @param event Scheduled event
  */
 static inline const char* unicoap_scheduled_event_name(unicoap_scheduled_event_t* event) {
+    (void)event;
 #if DEVELHELP
     return event->name;
 #else
