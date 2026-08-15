@@ -14,6 +14,7 @@
 #include "net/unicoap/server.h"
 
 #include "private/packet.h"
+#include "private/features/blockwise.h"
 
 /**
  * @defgroup net_unicoap_private_state State Management
@@ -185,6 +186,14 @@ void unicoap_event_cancel(unicoap_scheduled_event_t* event);
 #define UNICOAP_HAVE_CLIENT_STATE \
     IS_USED(MODULE_UNICOAP_CLIENT) && CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY > 0
 
+/** 
+  * @brief A feature check macro that determines whether automatic block-wise transfers are
+  *        supported. 
+  */
+#define UNICOAP_HAVE_BLOCKWISE_STATE \
+    (IS_USED(MODULE_UNICOAP_CLIENT_BLOCKWISE) || IS_USED(MODULE_UNICOAP_SERVER_BLOCKWISE)) \
+    && CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX > 0
+
 /**
  * @brief A type used to retain state spanning across a single or multiple message exchanges
  *
@@ -204,6 +213,13 @@ typedef struct {
          * @brief Timeout
          */
         unicoap_scheduled_event_t timeout;
+
+#if UNICOAP_HAVE_BLOCKWISE_STATE || defined(DOXYGEN)
+        /**
+         * @brief Block-wise transfer, comprising multiple requests and responses
+         */
+        unicoap_blockwise_transfer_t* blockwise_transfer;
+#endif
     } exchange;
 
     /**
@@ -241,6 +257,36 @@ static inline void* unicoap_memo_messaging_state(unicoap_memo_t* memo) {
     return memo->messaging.state;
 #else
     return NULL;
+#endif
+}
+
+/**
+ * @brief Returns block-wise transfer object
+ * @param memo Client state object
+ * @return Block-wise transfer object pointer
+ */
+static inline unicoap_blockwise_transfer_t*
+unicoap_memo_blockwise_transfer_get(unicoap_memo_t* memo) {
+    (void)memo;
+#if UNICOAP_HAVE_BLOCKWISE_STATE
+    return memo->exchange.blockwise_transfer;
+#else
+    return NULL;
+#endif
+}
+
+/**
+ * @brief Sets block-wise transfer object
+ * @param memo Client state object
+ * @param transfer Block-wise transfer
+ * @return Block-wise transfer object pointer
+ */
+static inline void
+unicoap_memo_blockwise_transfer_set(unicoap_memo_t* memo, unicoap_blockwise_transfer_t* transfer) {
+    (void)memo;
+    (void)transfer;
+#if UNICOAP_HAVE_BLOCKWISE_STATE
+    memo->exchange.blockwise_transfer = transfer;
 #endif
 }
 
@@ -513,6 +559,41 @@ int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo);
  */
 void unicoap_client_memo_free(unicoap_client_memo_t* memo);
 /** @} */
+
+/* MARK: - Allocating and releasing block-wise state */
+/**
+ * @name Allocating and releasing block-wise state
+ * @{
+ */
+
+/**
+ * @brief Allocates block-wise transfer and attaches it to the given memo
+ *
+ * @note This function is thread-safe.
+ *
+ * @param[in,out] memo Memo to attach block-wise transfer to
+ * @param flags Block-wise indicating whether to slice or reassemble, used to allocate buffer if needed
+ *
+ * @returns `NULL` if no buffer space is available
+ * @returns Block-wise transfer on success
+ */
+unicoap_blockwise_transfer_t* unicoap_blockwise_transfer_create(unicoap_memo_t* memo,
+                                                                unicoap_blockwise_flags_t flags);
+
+/**
+ * @brief Removes block-wise transfer from memo, if present
+
+ * @param[in] memo Memo with block-wise transfer
+ */
+void unicoap_blockwise_transfer_free(unicoap_memo_t* memo);
+
+/**
+ * @brief Removes block-wise buffer from transfer, if present
+
+ * @param[in] transfer Transfer with block-wise body buffer
+ */
+void unicoap_blockwise_buffer_free(unicoap_blockwise_transfer_t* transfer);
+/** @}*/
 
 /* TODO: Client and advanced server features: Elaborate state management */
 

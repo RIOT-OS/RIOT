@@ -71,6 +71,7 @@ extern "C" {
 #  define _TRANSPORT_DEBUG(...)                 _UNICOAP_PREFIX_DEBUG(".transport", __VA_ARGS__)
 #  define _SERVER_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".server", __VA_ARGS__)
 #  define _CLIENT_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".client", __VA_ARGS__)
+#  define _CLIENT_BLOCKWISE_DEBUG(...)          _UNICOAP_PREFIX_DEBUG(".client.blockwise", __VA_ARGS__)
 #  define _URI_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".uri", __VA_ARGS__)
 #  define _BLOCKWISE_DEBUG(...)                 _UNICOAP_PREFIX_DEBUG(".blockwise", __VA_ARGS__)
 #  define API_WARNING(message)                 "WARNING: " message "\n"
@@ -160,6 +161,20 @@ typedef struct {
 #if UNICOAP_HAVE_CLIENT_STATE
     /** @ref unicoap_memo_t */
     unicoap_client_memo_t client_memos[CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY];
+#endif
+
+#if UNICOAP_HAVE_BLOCKWISE_STATE
+    /** @brief Block-wise transfer state objects */
+    unicoap_blockwise_transfer_t blockwise_transfers[CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX];
+
+#  if CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX > 0
+    /** @brief Buffers for slicing and reassembling */
+    uint8_t blockwise_buffers[CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX]
+                             [CONFIG_UNICOAP_BLOCKWISE_BODY_SIZE_MAX];
+
+    /** @brief Bitfield used to mark buffers currently in use */
+    BITFIELD(blockwise_buffers_used, CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX);
+#  endif
 #endif
 
     /* TODO: Client and advanced server features: Exchange-layer state objects */
@@ -252,6 +267,41 @@ typedef enum {
 
 } unicoap_client_flags_internal_t;
 /** @} */
+
+/* MARK: - Block-wise client integration */
+/**
+ * @name Block-wise client integration
+ * @{
+ */
+/**
+ * @brief Processes response and applies automatic block-wise transfer handling
+ *
+ * @param[in,out] packet Packet
+ * @param[in,out] memo Memo
+ *
+ * Do not invoke client callback until this function has returned 1 or
+ * a negative error number.
+ *
+ * @returns Negative integer on error, otherwise zero or one
+ * @retval 0 Zero in case block-wise transfer is done
+ * @retval 1 One if block-wise transfer is not done yet
+ */
+int unicoap_client_process_response_blockwise(unicoap_packet_t* packet, 
+                                              unicoap_client_memo_t* memo);
+
+/**
+ * @brief Prepare request in block-wise transfer
+ *
+ * @param[in,out] packet Packet
+ * @param[in,out] transfer Block-wise transfer state object
+ * @param client_flags Client flags
+ *
+ * @return Zero on success or negative error number instead.
+ */
+int unicoap_client_prepare_request_blockwise(const unicoap_packet_t* packet,
+                                             unicoap_blockwise_transfer_t* transfer,
+                                             unicoap_request_flags_t client_flags);
+/** @}*/
 
 /* MARK: - Private Server Utils */
 /**

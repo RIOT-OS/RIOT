@@ -139,8 +139,117 @@ unicoap_client_memo_t* unicoap_client_memo_create(const unicoap_endpoint_t* endp
     return memo;
 }
 
+static inline size_t _blockwise_transfer_index(unicoap_blockwise_transfer_t* transfer) {
+    /* debugging-only */
+#if UNICOAP_HAVE_BLOCKWISE_STATE
+    return ((uintptr_t)transfer - (uintptr_t)_state.blockwise_transfers) /
+           sizeof(*_state.blockwise_transfers);
+#else
+    (void)transfer;
+    assert(false);
+    return 0;
+#endif
+}
+
+static inline size_t _blockwise_buffer_index(uint8_t* buffer) {
+#if UNICOAP_HAVE_BLOCKWISE_STATE && CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX > 0
+    size_t i = ((uintptr_t)buffer - (uintptr_t)_state.blockwise_buffers) /
+               sizeof(*_state.blockwise_buffers);
+    assert(i < CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX);
+    return i;
+#else
+    (void)buffer;
+    assert(false);
+    return 0;
+#endif
+}
+
+static unicoap_blockwise_transfer_t* _get_blockwise_transfer(void) {
+#if IS_USED(MODULE_UNICOAP_BLOCKWISE) && CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX > 0
+    for (int i = 0; i < (int)ARRAY_SIZE(_state.blockwise_transfers); i += 1) {
+        if (!_state.blockwise_transfers[i].is_active) {
+            return &_state.blockwise_transfers[i];
+        }
+    }
+#endif
+    _STATE_DEBUG("[block-wise transfer] no space to alloc\n");
+    return NULL;
+}
+
+static uint8_t *_blockwise_buffer_alloc_unsafe(void) {
+#if UNICOAP_HAVE_BLOCKWISE_STATE && CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX > 0
+    int i =
+        bf_find_first_unset(_state.blockwise_buffers_used, CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX);
+    if (i >= 0) {
+        _STATE_DEBUG("[block-wise buffer #%i] alloc\n", i);
+        bf_set(_state.blockwise_buffers_used, i);
+        return _state.blockwise_buffers[i];
+    }
+#endif
+    _STATE_DEBUG("[block-wise buffer] no space to alloc\n");
+    return NULL;
+}
+
+static inline unicoap_blockwise_transfer_t*
+_blockwise_transfer_alloc_unsafe(unicoap_blockwise_flags_t flags) {
+    /* just 'get' the transfer, do not allocate right away,
+     * something we do below might fail */
+    unicoap_blockwise_transfer_t* transfer = _get_blockwise_transfer();
+    if (!transfer) {
+        return NULL;
+    }
+
+    if (flags & UNICOAP_BLOCKWISE_FLAG_REASSEMBLE ||
+        (flags & UNICOAP_BLOCKWISE_FLAG_SLICE && !(flags & UNICOAP_BLOCKWISE_FLAG_DURABLE_MESSAGE))) {
+        /* need buffer */
+        if (!(transfer->buffer = _blockwise_buffer_alloc_unsafe())) {
+            /* okay to return NULL, transfer hasn't been allocated yet */
+            return NULL;
+        }
+    }
+
+    /* alloc transfer only after everything above succeeded */
+    transfer->is_active = true;
+    _STATE_DEBUG("[block-wise transfer #%" PRIuSIZE "] alloc\n",
+                _blockwise_transfer_index(transfer));
+    return transfer;
+}
+
+unicoap_blockwise_transfer_t* unicoap_blockwise_transfer_create(unicoap_memo_t* memo,
+                                                                unicoap_blockwise_flags_t flags) {
+    _lock();
+    unicoap_blockwise_transfer_t* transfer = _blockwise_transfer_alloc_unsafe(flags);
+    unicoap_memo_blockwise_transfer_set(memo, transfer);
+    _unlock();
+    return transfer;
+}
+
+void unicoap_blockwise_buffer_free(unicoap_blockwise_transfer_t* transfer) {
+    (void)transfer;
+#if UNICOAP_HAVE_BLOCKWISE_STATE && CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX > 0
+    if (transfer->buffer) {
+        size_t i = _blockwise_buffer_index(transfer->buffer);
+        _STATE_DEBUG("[block-wise buffer #%" PRIuSIZE "] free\n", i);
+        bf_unset(_state.blockwise_buffers_used, i);
+    }
+#endif
+}
+
+void unicoap_blockwise_transfer_free(unicoap_memo_t* memo) {
+    unicoap_blockwise_transfer_t* transfer = unicoap_memo_blockwise_transfer_get(memo);
+    if (transfer) {
+        _STATE_DEBUG("[block-wise transfer #%" PRIuSIZE "] free\n",
+                     _blockwise_transfer_index(transfer));
+        transfer->iterator.block_option = UNICOAP_BLOCK_OPTION_NONE;
+        unicoap_blockwise_buffer_free(transfer);
+        unicoap_memo_blockwise_transfer_set(memo, NULL);
+        transfer->is_active = false;
+    }
+}
+
 static void _free(unicoap_memo_t* memo) {
     unicoap_event_cancel(&memo->exchange.timeout);
+    unicoap_blockwise_transfer_free(memo);
     memset(memo, 0, sizeof(*memo));
 }
 

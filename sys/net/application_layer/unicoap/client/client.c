@@ -26,6 +26,10 @@
 #include "debug.h"
 #include "private.h"
 
+#define ANY_BLOCKWISE_FLAGS                                       \
+    (UNICOAP_CLIENT_FLAG_REASSEMBLE | UNICOAP_CLIENT_FLAG_SLICE | \
+     UNICOAP_CLIENT_FLAG_BLOCK_CALLBACK)
+
 static void _on_response_timeout(unicoap_scheduled_event_t* timeout) {
     unicoap_client_callback_failure(unicoap_client_memo_of_timeout(timeout), -ETIMEDOUT);
     unicoap_client_memo_free(unicoap_client_memo_of_timeout(timeout));
@@ -45,8 +49,18 @@ int unicoap_client_callback_success(unicoap_client_memo_t* memo, const unicoap_p
                           .local = packet->local,
                           .properties = &packet->properties };
 
-    /* TODO: Block-wise callback */
-    if (callback.response) {
+    if (IS_USED(MODULE_UNICOAP_CLIENT_BLOCKWISE) &&
+        memo->flags & UNICOAP_CLIENT_FLAG_BLOCK_CALLBACK && callback.block) {
+        unicoap_block_info_t info = { };
+        if (block == UNICOAP_BLOCK_OPTION_NONE) {
+            info.size = packet->message->payload_size;
+        }
+        else {
+            unicoap_block_get_info(block, &info);
+        }
+        return callback.block(packet->message, &aux, 0, &info, arg);
+    }
+    else if (callback.response) {
         return callback.response(packet->message, &aux, 0, arg);
     }
     return 0;
@@ -57,20 +71,44 @@ void unicoap_client_callback_failure(unicoap_client_memo_t* memo, int error) {
     _CLIENT_DEBUG("invoking callback with error: %i (%s)\n", error, strerror(-error));
     unicoap_callback_t callback = memo->callback;
     void* arg = memo->callback_arg;
-    /* TODO: Block-wise callback */
-    if (callback.response) {
+
+    if (IS_USED(MODULE_UNICOAP_CLIENT_BLOCKWISE) &&
+        memo->flags & UNICOAP_CLIENT_FLAG_BLOCK_CALLBACK && callback.block) {
+        (void)callback.block(NULL, NULL, error, NULL, arg);
+    }
+    else if (callback.response) {
         (void)callback.response(NULL, NULL, error, arg);
     }
 }
 
-/* TODO: Block-wise processing */
-
 int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_memo_t* memo) {
     int res = 0;
 
-    /* TODO: Block-wise */
-    res = unicoap_client_callback_success(memo, packet, UNICOAP_BLOCK_OPTION_NONE);
+    unicoap_blockwise_transfer_t* transfer = unicoap_memo_blockwise_transfer_get(&memo->super);
+    if (IS_USED(MODULE_UNICOAP_CLIENT_BLOCKWISE) && transfer) {
+        res = unicoap_client_process_response_blockwise(packet, memo);
 
+        if (res < 0) {
+            /* block-wise transfer failed */
+            _CLIENT_DEBUG("block-wise transfer failed\n");
+            goto error;
+        }
+        else if (res == 0) {
+            /* block-wise transfer is done */
+            goto out;
+        }
+        else {
+            /* block-wise transfer still in progress */
+            return 0;
+        }
+    }
+
+    res = unicoap_client_callback_success(memo, packet, UNICOAP_BLOCK_OPTION_NONE);
+    goto out;
+
+error:
+    unicoap_client_callback_failure(memo, res);
+out:
     unicoap_client_memo_free(memo);
     return res;
 }
@@ -114,7 +152,30 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
     unicoap_client_memo_t* memo = NULL;
 
     /* TODO: Block-wise */
-    /* TODO: Observe */
+    
+    if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
+        if (flags & ANY_BLOCKWISE_FLAGS && !IS_USED(MODULE_UNICOAP_CLIENT_BLOCKWISE)) {
+            unicoap_assist(API_WARNING("automatic block-wise feature used, module missing")
+                           FIXIT("add USEMODULE += unicoap_blockwise"));
+        }
+
+        if (flags & UNICOAP_CLIENT_FLAG_REASSEMBLE &&
+            flags & UNICOAP_CLIENT_FLAG_BLOCK_CALLBACK) {
+            unicoap_assist(API_MISUSE("cannot reassemble when using per-block client callback")
+                           FIXIT("remove UNICOAP_CLIENT_FLAG_REASSEMBLE")
+                           FIXIT("use unicoap_send_request_(sync|async) instead"));
+        }
+    }
+    assert(!(flags & ANY_BLOCKWISE_FLAGS) || IS_USED(MODULE_UNICOAP_BLOCKWISE));
+    assert(
+        !(flags & UNICOAP_CLIENT_FLAG_REASSEMBLE && flags & UNICOAP_CLIENT_FLAG_BLOCK_CALLBACK));
+
+    if (IS_USED(MODULE_UNICOAP_BLOCKWISE)) {
+        if (request->payload_size <= CONFIG_UNICOAP_BLOCK_SIZE) {
+            flags &= ~UNICOAP_CLIENT_FLAG_SLICE;
+        }
+    }
+
     uint8_t token[CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH];
     unicoap_packet_t packet = { .remote = endpoint,
                                 .message = request,
@@ -138,6 +199,33 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
                                "client.resp-timeout");
     }
     /* TODO: OSCORE */
+
+    if (IS_USED(MODULE_UNICOAP_CLIENT_BLOCKWISE) && flags & ANY_BLOCKWISE_FLAGS) {
+        unicoap_blockwise_transfer_t* transfer =
+            unicoap_blockwise_transfer_create(&memo->super, unicoap_blockwise_client_flags(flags));
+        
+            if (!transfer) {
+                return -ENOBUFS;
+            }
+
+        /* first, determine the stage we're supposed to start in */
+        if (flags & UNICOAP_CLIENT_FLAG_SLICE) {
+            transfer->stage = UNICOAP_BLOCKWISE_STAGE_SLICE;
+        }
+        else if (flags &
+                    (UNICOAP_CLIENT_FLAG_BLOCK_CALLBACK | UNICOAP_CLIENT_FLAG_REASSEMBLE)) {
+            transfer->stage = UNICOAP_BLOCKWISE_STAGE_COLLECT;
+        }
+        else {
+            UNREACHABLE();
+            return -1;
+        }
+
+        if ((res = unicoap_client_prepare_request_blockwise(&packet, transfer, flags)) < 0) {
+            goto error;
+        }
+    }
+
     if ((res = unicoap_client_send_request_part(&packet, memo, flags)) < 0) {
         goto error;
     }
