@@ -144,7 +144,10 @@ static int _cli(int argc, char** argv) {
         unicoap_request_init_string_with_options(&request, (unicoap_method_t)method, payload, &options);
         unicoap_destination_t destination = unicoap_destination_uri_string(uri);
 
-        if ((res = unicoap_send_request_async(&request, &destination, _on_response, (void*)(uintptr_t)shell_flags, flags)) < 0) {
+        unicoap_request_parameters_t parameters = {
+            .callback_arg = (void*)(uintptr_t)shell_flags
+        };
+        if ((res = unicoap_send_request_async(&request, &destination, _on_response, &parameters, flags)) < 0) {
             printf("sending request failed (error %i, %s)\n", res, strerror(-res));
             return res;
         }
