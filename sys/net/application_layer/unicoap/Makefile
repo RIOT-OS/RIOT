@@ -24,4 +24,8 @@ ifneq (,$(filter unicoap_client,$(USEMODULE)))
   DIRS += client
 endif
 
+ifneq (,$(filter unicoap_blockwise_kit,$(USEMODULE)))
+  DIRS += blockwise
+endif
+
 include $(RIOTBASE)/Makefile.base

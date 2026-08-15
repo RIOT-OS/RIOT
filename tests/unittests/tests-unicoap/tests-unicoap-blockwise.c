@@ -20,8 +20,6 @@
 #include "net/unicoap/blockwise.h"
 
 #define _TEST_ASSERT_EQUAL_BLOCK(block, number, size, m) \
-    UNICOAP_DUMP_BLOCK(printf, block); \
-    printf("\n"); \
     TEST_ASSERT_EQUAL_INT(unicoap_block_get_number(block), number); \
     TEST_ASSERT_EQUAL_INT(unicoap_block_get_size(block), size); \
     TEST_ASSERT_EQUAL_INT(unicoap_block_get_more(block), m)

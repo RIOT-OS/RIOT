@@ -134,7 +134,7 @@ static inline int _collect(unicoap_blockwise_iterator_t* collector, uint8_t* chu
         }
         else if (chunk) {
             if (total_size > collector->body_size) {
-                _BLOCKWISE_DEBUG("no space to reassemble " _NEED_HAVE "\n",
+                _BLOCKWISE_DEBUG("no space to reassemble " _UNICOAP_NEED_HAVE "\n",
                                 total_size, collector->body_size);
                 return -EMSGSIZE;
             }
@@ -557,8 +557,8 @@ int unicoap_blockwise_transfer_setup(unicoap_message_t* outbound_message,
             }
             else {
                 _BLOCKWISE_DEBUG("copying payload into block-wise buffer\n");
-                if (outbound_message->payload_size > CONFIG_UNICOAP_BLOCKWISE_REPRESENTATION_SIZE_MAX) {
-                    _BLOCKWISE_DEBUG("no buffer space to copy body, " _NEED_HAVE "\n", outbound_message->payload_size, (size_t)CONFIG_UNICOAP_BLOCKWISE_REPRESENTATION_SIZE_MAX);
+                if (outbound_message->payload_size > CONFIG_UNICOAP_BLOCKWISE_BODY_SIZE_MAX) {
+                    _BLOCKWISE_DEBUG("no buffer space to copy body, " _UNICOAP_NEED_HAVE "\n", outbound_message->payload_size, (size_t)CONFIG_UNICOAP_BLOCKWISE_BODY_SIZE_MAX);
                     return -ENOBUFS;
                 }
                 memcpy(transfer->buffer, outbound_message->payload, outbound_message->payload_size);
@@ -574,7 +574,7 @@ int unicoap_blockwise_transfer_setup(unicoap_message_t* outbound_message,
 
         if (blockwise_flags & UNICOAP_BLOCKWISE_FLAG_REASSEMBLE) {
             buffer = transfer->buffer;
-            size = CONFIG_UNICOAP_BLOCKWISE_REPRESENTATION_SIZE_MAX;
+            size = CONFIG_UNICOAP_BLOCKWISE_BODY_SIZE_MAX;
         }
         break;
 
@@ -601,7 +601,7 @@ int unicoap_blockwise_transfer_setup(unicoap_message_t* outbound_message,
 
 int unicoap_blockwise_transfer_collector_validate(unicoap_message_t* message,
                                                   unicoap_blockwise_transfer_t* transfer) {
-    uint8_t* etag = NULL;
+    const uint8_t* etag = NULL;
     int res = unicoap_options_get_first_etag(message->options, &etag);
     if (res > 8) {
         _CLIENT_DEBUG("error: invalid ETag length\n");

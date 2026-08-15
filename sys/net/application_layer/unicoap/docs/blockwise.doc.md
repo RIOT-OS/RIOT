@@ -102,7 +102,7 @@ Hence, if you don't rely on auto-reassembly and can guarantee your payload buffe
 valid for the duration of the transfer, you can set the Block-wise buffer count to zero.
 
 To configure the maximum size of payload body that can be reassembled or sliced,
-set @ref CONFIG_UNICOAP_BLOCKWISE_REPRESENTATION_SIZE_MAX.
+set @ref CONFIG_UNICOAP_BLOCKWISE_BODY_SIZE_MAX.
 
 ## See Also
 

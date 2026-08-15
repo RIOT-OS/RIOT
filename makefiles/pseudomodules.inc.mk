@@ -621,11 +621,22 @@ PSEUDOMODULES += unicoap_sock_support
 # XFA support for CoAP resource definitions in unicoap server
 PSEUDOMODULES += unicoap_server_resource_declarations
 
+# Automatic block-wise transfers in server API
+PSEUDOMODULES += unicoap_server_blockwise
+
 # URI support in unicoap client API
 PSEUDOMODULES += unicoap_client_uri
 
 # Request cancellation support
 PSEUDOMODULES += unicoap_client_cancellation
+
+# Automatic block-wise transfers in client API
+PSEUDOMODULES += unicoap_client_blockwise
+
+# Automatic block-wise transfer support in client and server API,
+# automatically imports unicoap_client_blockwise if unicoap_client is imported
+# and unicoap_server_blockwise if unicoap_server is imported
+PSEUDOMODULES += unicoap_blockwise
 
 PSEUDOMODULES += usbus_urb
 

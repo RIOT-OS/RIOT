@@ -19,6 +19,7 @@
 #include "private/state.h"
 #include "private/packet.h"
 #include "private/messaging.h"
+#include "private/features/blockwise.h"
 
 /**
  * @defgroup net_unicoap_private Private API
