@@ -212,6 +212,47 @@ int unicoap_deinit_rfc7252_common(event_queue_t* queue);
 /* MARK: unicoap_driver_extension_point */
 /** @} */
 
+/* MARK: - Private client utils */
+/**
+ * @name  Private client utils
+ * @{
+ */
+/**
+ * @brief Sends off client message and creates a state object for pending request
+ * @private
+ *
+ * @param request Request message
+ * @param destination Request destination
+ * @param callback Callback -- either response or block callback, see @ref unicoap_callback_t
+ * @param parameters Optional parameters (nullable)
+ * @param flags Client flags
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+int unicoap_open_request(unicoap_message_t* request,
+                         unicoap_destination_t* destination,
+                         unicoap_callback_t callback, 
+                         unicoap_request_parameters_t* parameters,
+                         unicoap_request_flags_t flags);
+
+/**
+ * @brief Bitfield values determining exchange layer (request/response) stack behavior
+ * @private
+ */
+typedef enum {
+    /**
+     * @brief Block-wise collect and invoke callback for each block
+     * @private
+     *
+     * This flag is private. Access to block-wise callback functionality is gated behing
+     * public `unicoap_send_request_blockwise_*` APIs.
+     */
+    UNICOAP_CLIENT_FLAG_BLOCK_CALLBACK = 0x0080,
+
+} unicoap_client_flags_internal_t;
+/** @} */
+
 /* MARK: - Private Server Utils */
 /**
  * @name Resource-request matching

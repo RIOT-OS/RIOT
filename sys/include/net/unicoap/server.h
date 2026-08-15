@@ -1,4 +1,4 @@
-/*
+ /*
  * SPDX-FileCopyrightText: 2024-2026 Carl Seifert
  * SPDX-FileCopyrightText: 2024-2026 TU Dresden
  * SPDX-License-Identifier: LGPL-2.1-only
@@ -327,6 +327,40 @@ typedef enum {
      * would match a resource with this flag and path `/laniakea/milky-way`.
      */
     UNICOAP_RESOURCE_FLAG_MATCH_SUBTREE = 0x4000,
+
+    /**
+     * @brief If set, response payload and options are expected to stay alive until the exchange has
+     *        been completed
+     *
+     * @note This option has no effect on blocking client APIs, only on async block-wise APIs.
+     *
+     * With async APIs, as payload and options pointers cannot be assumed to stay valid
+     * after these functions return, their buffers may need to be copied into temporary storage.
+     * Set this flag to indicate payload and options stay valid and don't require copying.
+     *
+     * Has effect only in conjunction with @ref UNICOAP_RESOURCE_FLAG_SLICE
+     *
+     * **Default**: disabled.
+     */
+    UNICOAP_RESOURCE_FLAG_DURABLE_MESSAGE = 0x0010,
+
+    /**
+     * @brief Instructs the stack to send a given message with block-wise fragmented
+     * payload.
+     *
+     * @warning The body you want to slice must not exceed `UINT32_MAX` bytes.
+     *
+     * **Default**: Disabled
+     */
+    UNICOAP_RESOURCE_FLAG_SLICE = 0x0020,
+
+    /**
+     * @brief Instructs the stack to return a message with its payload reassembled by
+     * the stack.
+     *
+     * **Default**: disabled.
+     */
+    UNICOAP_RESOURCE_FLAG_REASSEMBLE = 0x0040,
 
     /* TODO: Advanced features */
 } unicoap_resource_flags_t;

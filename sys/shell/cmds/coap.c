@@ -22,8 +22,10 @@ static int _print_usage(char** argv) {
     printf("usage: %s <get|post|put|delete|fetch|path|ipatch> [-r] <URI> [<UTF-8 payload>]\n", argv[0]);
     printf("          cancel <refno>\n");
     printf("Options: (default: unreliable)\n");
-    printf("    -r   send reliably (send CON instead of NON over RFC7252 over UDP/DTLS)\n");
-    printf("    -t   print response as UTF-8 if Content-Format is absent\n");
+    printf("    -r       send reliably (send CON instead of NON over RFC7252 over UDP/DTLS)\n");
+    printf("    -t       print response as UTF-8 if Content-Format is absent\n");
+    printf("    --slice  slice request payload into blocks\n");
+    printf("    --glue   glue together response blocks\n");
     return 1;
 }
 
@@ -60,6 +62,10 @@ static int _set_flags(char* opt, unicoap_request_flags_t* flags, uint8_t* shell_
         *flags |= UNICOAP_CLIENT_FLAG_RELIABLE;
     } else if (strcmp(opt, "-t") == 0) {
         *shell_flags |= _SHELL_FLAG_TEXT;
+    } else if (strcmp(opt, "--slice") == 0) {
+        *flags |= UNICOAP_CLIENT_FLAG_SLICE;
+    } else if (strcmp(opt, "--glue") == 0) {
+        *flags |= UNICOAP_CLIENT_FLAG_REASSEMBLE;
     } else {
         printf("error: invalid option '%s'\n", opt);
         return -1;

@@ -17,6 +17,7 @@
 #include "net/unicoap/message.h"
 #include "net/unicoap/transport.h"
 #include "net/unicoap/util_macros.h"
+#include "net/unicoap/blockwise.h"
 
 /**
  * @file
@@ -56,6 +57,40 @@ typedef enum {
      * **Default**: disabled
      */
     UNICOAP_CLIENT_FLAG_RELIABLE = 0x0001,
+
+    /**
+     * @brief If set, request payload and options are expected to stay alive until the exchange has
+     *        been completed
+     *
+     * @note This option has no effect on blocking client APIs, only on async block-wise APIs.
+     *
+     * With async APIs, as payload and options pointers cannot be assumed to stay valid
+     * after these functions return, their buffers may need to be copied into temporary storage.
+     * Set this flag to indicate payload and options stay valid and don't require copying.
+     *
+     * Has effect only in conjunction with @ref UNICOAP_CLIENT_FLAG_SLICE
+     *
+     * **Default**: disabled.
+     */
+    UNICOAP_CLIENT_FLAG_DURABLE_MESSAGE = 0x0010,
+
+    /**
+     * @brief Instructs the stack to send a given message with block-wise fragmented
+     * payload.
+     *
+     * @warning The body you want to slice must not exceed `UINT32_MAX` bytes.
+     *
+     * **Default**: Disabled
+     */
+    UNICOAP_CLIENT_FLAG_SLICE = 0x0020,
+
+    /**
+     * @brief Instructs the stack to return a message with its payload reassembled by
+     * the stack.
+     *
+     * **Default**: disabled.
+     */
+    UNICOAP_CLIENT_FLAG_REASSEMBLE = 0x0040,
 } unicoap_request_flags_t;
 
 /**
@@ -133,6 +168,16 @@ typedef int (*unicoap_response_callback_t)(const unicoap_message_t* response,
  * @ref UNICOAP_CLIENT_FLAG_RELIABLE. This will result in a confirmable request message being
  * sent rather than a non-confirmable message.
  *
+ * ### Block-wise transfers
+ * To automatically slice request payloads too large to be transmitted in a single message,
+ * pass the @ref UNICOAP_CLIENT_FLAG_SLICE. You can avoid the copying overhead by using
+ * @ref UNICOAP_CLIENT_FLAG_DURABLE_MESSAGE, guaranteeing that the message will stay alive
+ * throughout the block-wise transfer. If you want to receive a large response in a single
+ * message rather than needing to retrieve each block individually, specify
+ * @ref UNICOAP_CLIENT_FLAG_REASSEMBLE. See 
+ * [Block-wise transfers module](@ref net_unicoap_blockwise) for details on compile-time
+ * configuration options.
+ *
  * @param[in,out] request Initialized request message to send
  * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or
  *                    @ref unicoap_destination_endpoint
@@ -163,6 +208,16 @@ int unicoap_send_request_async(unicoap_message_t* request,
  * If you want to send a request to an UDP or DTLS CoAP endpoint reliably, pass in
  * @ref UNICOAP_CLIENT_FLAG_RELIABLE. This will result in a confirmable request message being
  * sent rather than a non-confirmable message.
+ *
+ * ### Block-wise transfers
+ * To automatically slice request payloads too large to be transmitted in a single message,
+ * pass the @ref UNICOAP_CLIENT_FLAG_SLICE. You can avoid the copying overhead by using
+ * @ref UNICOAP_CLIENT_FLAG_DURABLE_MESSAGE, guaranteeing that the message will stay alive
+ * throughout the block-wise transfer. If you want to receive a large response in a single
+ * message rather than needing to retrieve each block individually, specify
+ * @ref UNICOAP_CLIENT_FLAG_REASSEMBLE. See 
+ * [Block-wise transfers module](@ref net_unicoap_blockwise) for details on compile-time
+ * configuration options.
  *
  * @param[in,out] request Initialized request message to send
  * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or 
@@ -209,6 +264,14 @@ int unicoap_send_request_sync(unicoap_message_t* request,
  * @ref UNICOAP_CLIENT_FLAG_RELIABLE. This will result in a confirmable request message being
  * sent rather than a non-confirmable message.
  *
+ * ### Block-wise transfers
+ * To automatically slice request payloads too large to be transmitted in a single message,
+ * pass the @ref UNICOAP_CLIENT_FLAG_SLICE. If you want to receive a large response in a single
+ * message rather than needing to retrieve each block individually, specify
+ * @ref UNICOAP_CLIENT_FLAG_REASSEMBLE. See 
+ * [Block-wise transfers module](@ref net_unicoap_blockwise) for details on compile-time
+ * configuration options.
+ *
  * @param[in,out] request Initialized request message to send
  * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or @ref unicoap_destination_endpoint
  * @param[in,out] response Partially initialized response message
@@ -239,6 +302,78 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
  * The client callback will be called with `-ECANCELLED`
  */
 int unicoap_cancel_request(int refno);
+/** @} */
+
+/* MARK: - Receiving block-wise chunks individually */
+/**
+ * @name Receiving block-wise chunks individually
+ * Receive Block2 response individually in an automatic block-wise transfer
+ * @{
+ */
+/**
+ * @brief Per-block callback
+ *
+ * This callback will be called per Block2 message arriving at the client.
+ * If the response isn't transmitted block-wise, the callback is invoked only once.
+ * If a response times out, the @p error parameter will be set to `-ETIMEDOUT`.
+ * Other failures are also communicated via the error parameter.
+ *
+ * Return a negative integer to abort the block-wise transfer.
+ *
+ * @param[in] response Response message
+ * @param[in] aux Auxiliary response information
+ * @param error Error if negative, zero if successful
+ * @param[in] block Block structure containing information on the current block
+ * @param[in,out] arg Argument supplied to the initial `send_request` function
+ *
+ * @returns Zero on success
+ * @returns Negative integer on failure
+ */
+typedef int (*unicoap_blockwise_callback_t)(const unicoap_message_t* response,
+                                            const unicoap_aux_t* aux, int error,
+                                            const unicoap_block_info_t* block, void* arg);
+
+/**
+ * @brief Sends a request and calls @p callback for each block received
+ *
+ * The callback is called once the response is received
+ *
+ * @param request Request
+ * @param destination URI or endpoint
+ * @param callback Function called each time a Block2 response is received
+ * @param parameters Optional parameters (nullable)
+ * @param flags Request flags
+ * @param profile Profile
+ *
+ * @returns Zero on success.
+ * @returns Negative integer on error
+ */
+int unicoap_send_request_blockwise_async(unicoap_message_t* request,
+                                                       unicoap_destination_t* destination,
+                                                       unicoap_blockwise_callback_t callback, 
+                                                       unicoap_request_parameters_t* parameters,
+                                                       unicoap_request_flags_t flags);
+
+/**
+ * @brief Sends a request and calls @p callback for each block received.
+ *
+ * Blocks until last block is has been processed by @p callback .
+ *
+ * @param request Request
+ * @param destination URI or endpoint
+ * @param callback Function called each time a Block2 response is received
+ * @param parameters Optional parameters (nullable)
+ * @param flags Request flags
+ * @param profile Profile
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+int unicoap_send_request_blockwise_sync(unicoap_message_t* request,
+                                        unicoap_destination_t* destination,
+                                        unicoap_blockwise_callback_t callback, 
+                                        unicoap_request_parameters_t* parameters,
+                                        unicoap_request_flags_t flags);
 /** @} */
 
 /** @} */

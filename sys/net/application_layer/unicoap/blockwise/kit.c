@@ -547,11 +547,13 @@ int unicoap_blockwise_transfer_setup(unicoap_message_t* outbound_message,
     switch (transfer->stage) {
     case UNICOAP_BLOCKWISE_STAGE_SLICE:
         _BLOCKWISE_DEBUG("preparing transfer for SLICE stage: no_copy=%u\n",
-                        blockwise_flags & UNICOAP_BLOCKWISE_FLAG_SLICE_NO_COPY);
+                        blockwise_flags & 
+                        (UNICOAP_BLOCKWISE_FLAG_DURABLE_MESSAGE | UNICOAP_BLOCKWISE_FLAG_SLICE));
 
         /* FIXME: what if there's no outbound message (see server.c L395) */
         if (outbound_message) {
-            if (blockwise_flags & UNICOAP_BLOCKWISE_FLAG_SLICE_NO_COPY) {
+            if (blockwise_flags & 
+                (UNICOAP_BLOCKWISE_FLAG_DURABLE_MESSAGE | UNICOAP_BLOCKWISE_FLAG_SLICE)) {
                 buffer = outbound_message->payload;
                 unicoap_blockwise_buffer_free(transfer);
             }

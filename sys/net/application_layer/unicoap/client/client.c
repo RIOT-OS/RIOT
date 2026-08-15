@@ -176,11 +176,11 @@ int unicoap_cancel_request(int refno) {
 
 /* MARK: - URI */
 
-static int _open_request(unicoap_message_t* request,
-                         unicoap_destination_t* destination,
-                         unicoap_callback_t callback, 
-                         unicoap_request_parameters_t* parameters,
-                         unicoap_request_flags_t flags)
+int unicoap_open_request(unicoap_message_t* request,
+                  unicoap_destination_t* destination,
+                  unicoap_callback_t callback, 
+                  unicoap_request_parameters_t* parameters,
+                  unicoap_request_flags_t flags)
 {
     assert(request);
     assert(destination);
@@ -356,8 +356,9 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
     }
     sync_copy_parameters.callback_arg = &args;
 
-    int res = _open_request(request, destination,
-        (unicoap_callback_t) { .response = _copy_callback }, &sync_copy_parameters, flags);
+    int res = unicoap_open_request(request, destination,
+        (unicoap_callback_t) { .response = _copy_callback }, &sync_copy_parameters, 
+        flags | UNICOAP_CLIENT_FLAG_DURABLE_MESSAGE);
 
     if (res < 0) {
         return res;
@@ -419,8 +420,9 @@ int unicoap_send_request_sync(unicoap_message_t* request,
     }
     sync_parameters.callback_arg = &args;
 
-    int res = _open_request(request, destination, 
-        (unicoap_callback_t) { .response = _sync_callback }, &sync_parameters, flags);
+    int res = unicoap_open_request(request, destination, 
+        (unicoap_callback_t) { .response = _sync_callback }, &sync_parameters, 
+            flags | UNICOAP_CLIENT_FLAG_DURABLE_MESSAGE);
 
     if (res < 0) {
         return res;
@@ -435,6 +437,6 @@ int unicoap_send_request_async(unicoap_message_t* request,
                                unicoap_response_callback_t callback, 
                                unicoap_request_parameters_t* parameters,
                                unicoap_request_flags_t flags) {
-    return _open_request(request, destination, 
+    return unicoap_open_request(request, destination, 
         (unicoap_callback_t) { .response = callback }, parameters, flags);
 }

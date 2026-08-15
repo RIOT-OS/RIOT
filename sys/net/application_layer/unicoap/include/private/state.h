@@ -380,6 +380,8 @@ void unicoap_exchange_notify_all(const unicoap_endpoint_t* endpoint, unicoap_lay
 typedef union {
     /** @brief Called once the response is received. Used by the client. */
     unicoap_response_callback_t response;
+    /** @brief Called once per received block. Used by the block-wise client. */
+    unicoap_blockwise_callback_t block;
     void* _any;
 } unicoap_callback_t;
 
