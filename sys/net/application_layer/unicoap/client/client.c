@@ -133,7 +133,9 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
         memo->flags = flags;
 
         unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
-                               CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS, "client.resp-timeout");
+                               (parameters && parameters->timeout_ms > 0) ? 
+                               parameters->timeout_ms : CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS, 
+                               "client.resp-timeout");
     }
     /* TODO: OSCORE */
     if ((res = unicoap_client_send_request_part(&packet, memo, flags)) < 0) {

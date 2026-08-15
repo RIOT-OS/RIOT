@@ -72,6 +72,13 @@ typedef struct {
      * @brief Opaque argument passed to callback both in success and failure cases 
      */
     void* callback_arg;
+
+    /**
+     * @brief Response timeout in milliseconds
+     * 
+     * Leave set to zero to fall back to @ref CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS
+     */
+    uint32_t timeout_ms;
 } unicoap_request_parameters_t;
 /** @} */
 
