@@ -1,5 +1,9 @@
 # Check if all required FEATURES are provided
 
+ifneq (,$(filter soft_i2c,$(USEMODULE)))
+  FEATURES_PROVIDED += periph_i2c
+endif
+
 # Features that are used without taking "one out of" dependencies into account
 FEATURES_USED_SO_FAR := $(sort $(FEATURES_REQUIRED) $(FEATURES_OPTIONAL_USED))
 

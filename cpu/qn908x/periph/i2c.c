@@ -372,6 +372,16 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
     return ret;
 }
 
+gpio_t i2c_pin_sda(i2c_t dev)
+{
+    return i2c_config[dev].pin_sda;
+}
+
+gpio_t i2c_pin_scl(i2c_t dev)
+{
+    return i2c_config[dev].pin_scl;
+}
+
 void isr_flexcomm_i2c(USART_Type *dev, uint32_t flexcomm_num)
 {
     // TODO: Set up async mode with interrupts.
