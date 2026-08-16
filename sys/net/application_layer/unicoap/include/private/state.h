@@ -179,6 +179,9 @@ void unicoap_event_cancel(unicoap_scheduled_event_t* event);
     IS_USED(MODULE_UNICOAP_DRIVER_RFC7252_COMMON)
 /* MARK: unicoap_driver_extension_point */
 
+/** 
+  * @brief A feature check macro that determines whether client state objects are supported 
+  */
 #define UNICOAP_HAVE_CLIENT_STATE \
     IS_USED(MODULE_UNICOAP_CLIENT) && CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY > 0
 
