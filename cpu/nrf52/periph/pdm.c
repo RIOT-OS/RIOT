@@ -139,7 +139,7 @@ static uint8_t _get_clk_bitfield(uint32_t rate, uint8_t ratio)
     return DIV_TO_BITFIELD_LUT[divisor - MIN_PDM_CLK_DIV];
 }
 
-static void _set_best_pdm_rate(uint32_t rate)
+static uint32_t _set_best_pdm_rate(uint32_t rate)
 {
     if (rate < PDM_SAMPLE_RATE_MIN) {
         rate = PDM_SAMPLE_RATE_MIN;
@@ -163,21 +163,23 @@ static void _set_best_pdm_rate(uint32_t rate)
         DEBUG("[PDM] sample rate = %" PRIu32 " Hz, ratio 80\n", real_rate_80);
         NRF_PDM->RATIO = ((PDM_RATIO_RATIO_Ratio80 << PDM_RATIO_RATIO_Pos) & PDM_RATIO_RATIO_Msk);
         NRF_PDM->PDMCLKCTRL = ((uint32_t)bitfield_80 << PDM_CLK_POS);
+        return real_rate_80;
     }
     else {
         DEBUG("[PDM] sample rate = %" PRIu32 " Hz, ratio 64\n", real_rate_64);
         NRF_PDM->RATIO = ((PDM_RATIO_RATIO_Ratio64 << PDM_RATIO_RATIO_Pos) & PDM_RATIO_RATIO_Msk);
         NRF_PDM->PDMCLKCTRL = ((uint32_t)bitfield_64 << PDM_CLK_POS);
+        return real_rate_64;
     }
 }
 
-int pdm_init(pdm_mode_t mode, uint32_t rate, int8_t gain,
-             pdm_data_cb_t cb, void *arg)
+int32_t pdm_init(pdm_mode_t mode, uint32_t rate, int8_t gain,
+                 pdm_data_cb_t cb, void *arg)
 {
     clock_hfxo_request();
 
     /* Configure sampling rate */
-    _set_best_pdm_rate(rate);
+    uint32_t real_rate = _set_best_pdm_rate(rate);
 
     /* Configure mode (Mono or Stereo) */
     switch (mode) {
@@ -234,7 +236,7 @@ int pdm_init(pdm_mode_t mode, uint32_t rate, int8_t gain,
     /* Enable PDM */
     NRF_PDM->ENABLE = (PDM_ENABLE_ENABLE_Enabled << PDM_ENABLE_ENABLE_Pos);
 
-    return 0;
+    return (int32_t)real_rate;
 }
 
 void pdm_start(void)

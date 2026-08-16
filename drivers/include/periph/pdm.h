@@ -78,17 +78,22 @@ typedef struct {
 
 /**
  * @brief   Initialize the PDM peripheral
+ *
+ * The requested rate is approximated to the closest rate the hardware can
+ * produce. The actually configured rate is returned so the caller can use it
+ * for further processing.
+ *
  * @param[in] mode      mode (Mono or Stereo)
  * @param[in] rate      sample rate in Hz
- * @param[in] gain      gain
+ * @param[in] gain      gain in dB [PDM_GAIN_MIN...PDM_GAIN_MAX]
  * @param[in] cb        data received callback function
  * @param[in] arg       context passed to the callback function
  *
- * @return  0 on successful initialization
- * @return <0 on error
+ * @retval  >0   actual configured PDM sample rate in Hz on success
+ * @retval  <0   on error
  */
-int pdm_init(pdm_mode_t mode, uint32_t rate, int8_t gain,
-             pdm_data_cb_t cb, void *arg);
+int32_t pdm_init(pdm_mode_t mode, uint32_t rate, int8_t gain,
+                 pdm_data_cb_t cb, void *arg);
 
 /**
  * @brief   Start the PDM peripheral
