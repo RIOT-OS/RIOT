@@ -245,8 +245,8 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
  ***Default**: 2
  *
  */
-#if !defined(CONFIG_UNICOAP_CLIENT_MEMOS_MAX) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_CLIENT_MEMOS_MAX (2)
+#if !defined(CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY (2)
 #endif
 
 /** @} */

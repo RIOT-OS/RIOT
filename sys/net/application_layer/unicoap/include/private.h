@@ -155,9 +155,9 @@ typedef struct {
     unicoap_listener_t* listeners;
 #endif
 
-#if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
+#if UNICOAP_HAVE_CLIENT_STATE
     /** @ref unicoap_memo_t */
-    unicoap_client_memo_t client_memos[CONFIG_UNICOAP_CLIENT_MEMOS_MAX];
+    unicoap_client_memo_t client_memos[CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY];
 #endif
 
     /* TODO: Client and advanced server features: Exchange-layer state objects */

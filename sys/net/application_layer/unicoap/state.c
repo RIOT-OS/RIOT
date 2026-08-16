@@ -77,7 +77,7 @@ void unicoap_state_unlock(void) {
 }
 
 static unicoap_client_memo_t* _alloc_client(void) {
-#if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
+#if UNICOAP_HAVE_CLIENT_STATE
     /* Find empty slot in list of transactions */
     for (int i = 0; i < (int)ARRAY_SIZE(_state.client_memos); i += 1) {
         if (_state.client_memos[i].super.endpoint.proto == UNICOAP_PROTO_UNSPECIFIED) {
@@ -91,7 +91,7 @@ static unicoap_client_memo_t* _alloc_client(void) {
 
 static inline bool _is_client(const unicoap_memo_t* memo) {
     (void)memo;
-#if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
+#if UNICOAP_HAVE_CLIENT_STATE
     return (uintptr_t)memo >= (uintptr_t)&_state.client_memos[0] &&
         (uintptr_t)memo <= (uintptr_t)&_state.client_memos[ARRAY_SIZE(_state.client_memos) - 1];
 #else
@@ -101,7 +101,7 @@ static inline bool _is_client(const unicoap_memo_t* memo) {
 
 static inline size_t _client_index(unicoap_client_memo_t* memo) {
     /* debugging-only */
-#if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
+#if UNICOAP_HAVE_CLIENT_STATE
     return ((uintptr_t)memo - (uintptr_t)_state.client_memos) / sizeof(*_state.client_memos);
 #else
     (void)memo;
@@ -111,6 +111,9 @@ static inline size_t _client_index(unicoap_client_memo_t* memo) {
 }
 
 static void _deinit_client(unicoap_client_memo_t* memo) {
+    if (!UNICOAP_HAVE_CLIENT_STATE) {
+        return;
+    }
     _STATE_DEBUG("[client #%" PRIuSIZE "] release\n", _client_index(memo));
     memo->callback._any = NULL;
     memo->callback_arg = NULL;
@@ -121,6 +124,9 @@ static void _deinit_client(unicoap_client_memo_t* memo) {
 }
 
 unicoap_client_memo_t* unicoap_client_memo_create(const unicoap_endpoint_t* endpoint) {
+    if (!UNICOAP_HAVE_CLIENT_STATE) {
+        return NULL;
+    }
     assert(endpoint);
     assert(endpoint->proto != UNICOAP_PROTO_UNSPECIFIED);
     _lock();
@@ -139,6 +145,9 @@ static void _free(unicoap_memo_t* memo) {
 }
 
 void unicoap_client_memo_free(unicoap_client_memo_t* memo) {
+    if (!UNICOAP_HAVE_CLIENT_STATE) {
+        return;
+    }
     _lock();
     /* Mark as unused, such that all the logic below can run without a lock.
       * The messaging layer may need the lock too. */
@@ -167,7 +176,7 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
     (void)token_length;
     assert(token);
 
-#if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
+#if UNICOAP_HAVE_CLIENT_STATE
     for (size_t i = 0; i < (size_t)ARRAY_SIZE(_state.client_memos); i += 1) {
         unicoap_client_memo_t* memo = &_state.client_memos[i];
 
@@ -193,7 +202,7 @@ unicoap_client_memo_t* unicoap_client_memo_find_refno(int refno) {
     size_t index_min = (refno & UNICOAP_REFNO_MASK_MIN_INDEX) >> 12;
     uint16_t reference_id = refno & UNICOAP_REFNO_MASK_ID;
     _STATE_DEBUG("refno=%i (min_client_ix=#%" PRIuSIZE ", refid=%u)\n", refno, index_min, reference_id);
-#  if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
+#  if UNICOAP_HAVE_CLIENT_STATE
     for (size_t i = index_min; i < (size_t)ARRAY_SIZE(_state.client_memos); i += 1) {
         unicoap_client_memo_t* memo = &_state.client_memos[i];
         if (memo->reference_id == reference_id) {
@@ -273,8 +282,8 @@ void unicoap_exchange_notify_all(const unicoap_endpoint_t* endpoint, unicoap_lay
     (void)endpoint;
     (void)type;
     (void)arg;
-#if CONFIG_UNICOAP_CLIENT_MEMOS_MAX > 0
-    for (int i = 0; i < CONFIG_UNICOAP_CLIENT_MEMOS_MAX; i += 1) {
+#if UNICOAP_HAVE_CLIENT_STATE
+    for (int i = 0; i < CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY; i += 1) {
         memo = &_state.client_memos[i].super;
         if (unicoap_endpoint_is_equal(endpoint, &memo->endpoint)) {
             unicoap_exchange_notify(memo, type, arg);
