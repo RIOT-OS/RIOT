@@ -46,6 +46,9 @@
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/tx_sync.h"
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+#include "../network_layer/ipv6/nib/_nib-slaac.h"
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -532,6 +535,9 @@ void gnrc_netif_release(gnrc_netif_t *netif)
 
 #if IS_USED(MODULE_GNRC_NETIF_IPV6)
 static int _addr_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr);
+static int _addr_pfx_idx(const gnrc_netif_t *netif,
+                                const ipv6_addr_t *pfx,
+                                uint8_t pfx_len);
 static int _group_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr);
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
@@ -719,6 +725,9 @@ void gnrc_netif_ipv6_addr_remove_internal(gnrc_netif_t *netif,
 {
     bool remove_sol_nodes = true;
     ipv6_addr_t sol_nodes;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+    ipv6_addr_t addr_backup = *addr;
+#endif
 
     assert((netif != NULL) && (addr != NULL));
     ipv6_addr_set_solicited_nodes(&sol_nodes, addr);
@@ -743,6 +752,15 @@ void gnrc_netif_ipv6_addr_remove_internal(gnrc_netif_t *netif,
         gnrc_netif_ipv6_group_leave_internal(netif, &sol_nodes);
     }
     gnrc_netif_release(netif);
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+    // for temporary addresses (deleted on DAD failure or manually),
+    // also their prefix needs to be removed
+    gnrc_ipv6_nib_pl_del(netif->pid, &addr_backup, IPV6_ADDR_BIT_LEN);
+    // only expected to find a prefix if it's a temporary address.
+    // on prefix deletion, it won't find an address to delete
+    // this is fine, to avoid infinite loop
+#endif
 }
 
 int gnrc_netif_ipv6_addr_idx(gnrc_netif_t *netif,
@@ -756,6 +774,23 @@ int gnrc_netif_ipv6_addr_idx(gnrc_netif_t *netif,
           netif->pid);
     gnrc_netif_acquire(netif);
     idx = _addr_idx(netif, addr);
+    gnrc_netif_release(netif);
+    return idx;
+}
+
+int gnrc_netif_ipv6_addr_pfx_idx(gnrc_netif_t *netif,
+                                 const ipv6_addr_t *pfx, uint8_t pfx_len)
+{
+    int idx;
+
+    assert((netif != NULL) && (pfx != NULL));
+    DEBUG("gnrc_netif: get index of first address matching %s/%u"
+          " from interface %" PRIkernel_pid "\n",
+          ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)),
+          pfx_len,
+          netif->pid);
+    gnrc_netif_acquire(netif);
+    idx = _addr_pfx_idx(netif, pfx, pfx_len);
     gnrc_netif_release(netif);
     return idx;
 }
@@ -977,9 +1012,33 @@ static int _idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr, bool mcast)
     return -1;
 }
 
+static int _pfx_idx(const gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint8_t pfx_len, bool mcast)
+{
+    //same as function @ref _idx above, but with generalized condition
+    if (!ipv6_addr_is_unspecified(pfx)) {
+        const ipv6_addr_t *iplist = (mcast) ? netif->ipv6.groups :
+                                    netif->ipv6.addrs;
+        unsigned ipmax = (mcast) ? GNRC_NETIF_IPV6_GROUPS_NUMOF :
+                         CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF;
+        for (unsigned i = 0; i < ipmax; i++) {
+            if (ipv6_addr_match_prefix(&iplist[i], pfx) >= pfx_len) {
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+
 static inline int _addr_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr)
 {
     return _idx(netif, addr, false);
+}
+
+static inline int _addr_pfx_idx(const gnrc_netif_t *netif,
+                                const ipv6_addr_t *pfx,
+                                uint8_t pfx_len)
+{
+    return _pfx_idx(netif, pfx, pfx_len, false);
 }
 
 static inline int _group_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr)
@@ -1142,6 +1201,8 @@ static int _create_candidate_set(const gnrc_netif_t *netif,
 /* number of "points" assigned to an source address candidate in preferred
  * state */
 #define RULE_3_PTS          (1)
+/* number of "points" assigned to a temporary source address candidate */
+#define RULE_7_PTS          (1)
 
 /**
  * @brief   Caps the match at a source addresses prefix length
@@ -1266,10 +1327,13 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
          * TODO: update as soon as gnrc supports flow labels
          */
 
-        /* Rule 7: Prefer temporary addresses.
-         * Temporary addresses are currently not supported by gnrc.
-         * TODO: update as soon as gnrc supports temporary addresses
-         */
+        /* Rule 7: Prefer temporary addresses. */
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+        if (is_temporary_addr(netif, ptr)) {
+            DEBUG("winner for rule 7 found\n");
+            winner_set[i] += RULE_7_PTS;
+        }
+#endif
 
         if (winner_set[i] > max_pts) {
             idx = i;
