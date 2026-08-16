@@ -117,8 +117,8 @@ int unicoap_client_prepare_request_blockwise(const unicoap_packet_t* packet,
             return res;
         }
         request->payload_size = res;
-        if ((res = 
-            unicoap_options_set_block1(request->options, transfer->iterator.block_option)) < 0) {
+        if ((res = unicoap_options_set_block1(request->options, 
+            unicoap_blockwise_iterator_current_option(&transfer->iterator))) < 0) {
             return res;
         }
 
@@ -134,8 +134,9 @@ int unicoap_client_prepare_request_blockwise(const unicoap_packet_t* packet,
             return res;
         }
 
-        if ((res = 
-            unicoap_options_set_block2(request->options, transfer->iterator.block_option)) < 0) {
+        if ((res = unicoap_options_set_block2(request->options, 
+            unicoap_blockwise_iterator_current_option(&transfer->iterator)
+        )) < 0) {
             return res;
         }
         break;
@@ -188,11 +189,12 @@ int unicoap_client_process_response_blockwise(unicoap_packet_t* packet, unicoap_
                                               &transfer->options);
 
             if ((res = unicoap_options_set_block1(message->options,
-                                                  transfer->iterator.block_option)) < 0) {
+                unicoap_blockwise_iterator_current_option(&transfer->iterator))) < 0) {
                 return res;
             }
 
-            if (!unicoap_block_get_more(transfer->iterator.block_option)) {
+            if (!unicoap_block_get_more(
+                unicoap_blockwise_iterator_current_option(&transfer->iterator))) {
                 /* final Block1 request is first Block2 request */
                 if (client_flags &
                     (UNICOAP_CLIENT_FLAG_REASSEMBLE | UNICOAP_CLIENT_FLAG_BLOCK_CALLBACK)) {
@@ -251,7 +253,7 @@ int unicoap_client_process_response_blockwise(unicoap_packet_t* packet, unicoap_
             unicoap_request_init_with_options(message, transfer->code, NULL, 0, &transfer->options);
 
             if ((res = unicoap_options_set_block2(message->options,
-                                                  transfer->iterator.block_option)) < 0) {
+                unicoap_blockwise_iterator_current_option(&transfer->iterator))) < 0) {
                 return res;
             }
 

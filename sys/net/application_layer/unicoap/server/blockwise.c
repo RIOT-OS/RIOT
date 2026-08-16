@@ -34,7 +34,10 @@ int unicoap_server_prepare_response_blockwise(unicoap_packet_t* packet,
     unicoap_blockwise_transfer_t* transfer = unicoap_memo_blockwise_transfer_get(&memo->super);
     int res = 0;
 
+    unicoap_block_option_t block1 = UNICOAP_BLOCK_OPTION_NONE;
     if (transfer) {
+        /* Exists, so check for Block1 option from ended Block1 transfer / collect stage. */
+        unicoap_options_get_block1(&transfer->options, &block1);
         if ((res = unicoap_blockwise_transfer_setup(packet->message, transfer, blockwise_flags,
                                                     packet->remote->proto, false)) < 0) {
             return res;
@@ -51,16 +54,20 @@ int unicoap_server_prepare_response_blockwise(unicoap_packet_t* packet,
         }
     }
 
-    /* iterator.block_option will be set to the Block1 control option
-     * set by the client, may be UNICOAP_BLOCK_OPTION_NONE */
     if ((res = unicoap_blockwise_slice_block2_produce(&transfer->iterator,
                                                       &packet->message->payload)) < 0) {
         return res;
     }
 
     packet->message->payload_size = res;
+
+    if (block1 != UNICOAP_BLOCK_OPTION_NONE) {
+        if ((res = unicoap_options_set_block1(packet->message->options, block1)) < 0) {
+            return res;
+        }
+    }
     if ((res = unicoap_options_set_block2(packet->message->options,
-                                          transfer->iterator.block_option)) < 0) {
+        unicoap_blockwise_iterator_current_option(&transfer->iterator))) < 0) {
         return res;
     }
 
@@ -77,7 +84,7 @@ int unicoap_server_process_request_blockwise(unicoap_packet_t* packet, unicoap_s
     ssize_t res = 0;
     unicoap_block_option_t block = UNICOAP_BLOCK_OPTION_NONE;
 
-    switch (unicoap_memo_blockwise_transfer_get(&memo->super)->stage) {
+    switch (transfer->stage) {
     case UNICOAP_BLOCKWISE_STAGE_COLLECT: {
         _SERVER_BLOCKWISE_DEBUG("received request in COLLECT stage\n");
 
@@ -101,7 +108,7 @@ int unicoap_server_process_request_blockwise(unicoap_packet_t* packet, unicoap_s
                                                &transfer->options);
 
             if ((res = unicoap_options_set_block1(message->options,
-                                                  transfer->iterator.block_option)) < 0) {
+                unicoap_blockwise_iterator_current_option(&transfer->iterator))) < 0) {
                 return res;
             }
 
@@ -122,6 +129,12 @@ int unicoap_server_process_request_blockwise(unicoap_packet_t* packet, unicoap_s
             transfer->stage = UNICOAP_BLOCKWISE_STAGE_SLICE;
             unicoap_blockwise_iterator_init(&transfer->iterator, CONFIG_UNICOAP_BLOCK_SZX, NULL, 0);
 
+            if (block) {
+                /* Remember Block1 option to set in last Block1 response = first Block2 response */
+                unicoap_options_set_block1(&transfer->options, block);
+            }
+
+            block = UNICOAP_BLOCK_OPTION_NONE;
             res = unicoap_options_get_block2(message->options, &block);
             if (res < 0 && res != -ENOENT) {
                 return res;
@@ -130,9 +143,6 @@ int unicoap_server_process_request_blockwise(unicoap_packet_t* packet, unicoap_s
             if ((res = unicoap_blockwise_slice_block2_process(&transfer->iterator, block)) < 0) {
                 return res;
             }
-
-            /* remove Block1 option for potential Block2 transfer */
-            unicoap_options_remove_block1(&transfer->options);
         }
         else {
             /* We could keep the block-wise transfer until the exchange ends,
@@ -146,9 +156,10 @@ int unicoap_server_process_request_blockwise(unicoap_packet_t* packet, unicoap_s
     }
 
     case UNICOAP_BLOCKWISE_STAGE_SLICE: {
-        /* FIXME: What if transfer begins with SLICE stage? -> unicoap_blockwise_slice_block2_process! */
-        uint8_t *chunk = NULL;
+        _SERVER_BLOCKWISE_DEBUG("received request in SLICE stage\n");
 
+        uint8_t* chunk = NULL;
+        block = UNICOAP_BLOCK_OPTION_NONE;
         res = unicoap_options_get_block2(message->options, &block);
         if (res < 0 && res != -ENOENT) {
             return res;
@@ -167,7 +178,7 @@ int unicoap_server_process_request_blockwise(unicoap_packet_t* packet, unicoap_s
             message->payload_size = res;
 
             if ((res = unicoap_options_set_block2(message->options,
-                                                  transfer->iterator.block_option)) < 0) {
+                unicoap_blockwise_iterator_current_option(&transfer->iterator))) < 0) {
                 return res;
             }
 

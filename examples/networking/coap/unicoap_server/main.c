@@ -44,6 +44,16 @@ static const credman_credential_t credential = {
 };
 #endif /* IS_USED(MODULE_UNICOAP_DRIVER_DTLS) */
 
+#if IS_USED(MODULE_UNICOAP_BLOCKWISE)
+#  define HELLO_RESPONSE  "Hello, World!" \
+    " This is a demo of block-wise transfers in unicoap." \
+    " This very long response payload will be split into several chunks aka. blocks," \
+    " each sent in a separate Block2 response. The client needs to support block-wise transfer," \
+    " and sent subsequent Block2 requests to retrieve the remaining response blocks."
+#else 
+#  define HELLO_RESPONSE "Hello, World!"
+#endif
+
 static int handle_hello_request(unicoap_message_t* message, const unicoap_aux_t* aux,
                                 unicoap_request_context_t* ctx, void* arg) {
     (void)aux;
@@ -55,7 +65,7 @@ static int handle_hello_request(unicoap_message_t* message, const unicoap_aux_t*
 
     /* String literals in C are null-terminated. For null-terminated string, we can use the
      * _string message initializers. */
-    unicoap_response_init_string(message, UNICOAP_STATUS_CONTENT, "Hello, World!");
+    unicoap_response_init_string(message, UNICOAP_STATUS_CONTENT, HELLO_RESPONSE);
 
     /* Respond. Note that you do not need to return the result of @ref unicoap_send_response. */
     return unicoap_send_response(message, ctx);
@@ -80,7 +90,14 @@ UNICOAP_RESOURCE(hello) {
      * In this case, we don't want to loose our precious greeting along the way.
      * To send confirmable messages (CON) over UDP or DTLS, we pass the
      * @ref UNICOAP_RESOURCE_FLAG_RELIABLE flag. */
-    .flags = UNICOAP_RESOURCE_FLAG_RELIABLE,
+#if IS_USED(MODULE_UNICOAP_BLOCKWISE)
+    .flags = UNICOAP_RESOURCE_FLAG_RELIABLE 
+           | UNICOAP_RESOURCE_FLAG_REASSEMBLE 
+           | UNICOAP_RESOURCE_FLAG_DURABLE_MESSAGE
+           | UNICOAP_RESOURCE_FLAG_SLICE,
+#else
+     .flags = UNICOAP_RESOURCE_FLAG_RELIABLE,
+#endif
 
     /* You must declare what CoAP methods you want to allow for each resource. */
     .methods = UNICOAP_METHODS(UNICOAP_METHOD_GET, UNICOAP_METHOD_PUT, UNICOAP_METHOD_POST),

@@ -296,10 +296,10 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
  * @brief Maximum duration to wait for the next Block1 or Block1 request in a Block-wise transfer (server)
  *
  * **Unit**: milliseconds
- * **Default**: 200000 ms = 3 min and 20 s
+ * **Default**: 60000 ms = 60s
  */
 #if !defined(CONFIG_UNICOAP_TIMEOUT_SERVER_BLOCKWISE_MS) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_TIMEOUT_SERVER_BLOCKWISE_MS (200000)
+#  define CONFIG_UNICOAP_TIMEOUT_SERVER_BLOCKWISE_MS (60 * MS_PER_SEC)
 #endif
 /** @} */
 

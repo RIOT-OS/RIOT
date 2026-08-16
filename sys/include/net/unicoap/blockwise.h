@@ -87,11 +87,15 @@ typedef enum {
 } __attribute__((__packed__)) unicoap_block_szx_t;
 
 #ifndef DOXYGEN
-#  define UNICOAP_BERT_BLOCK_SIZE      (1024)
-#  define UNICOAP_BERT_BLOCK_SZX       (6)
-#  define _UNICOAP_BLOCK_SZX_MASK      (0x7)
-#  define _UNICOAP_BLOCK_NUMBER_OFFSET (4)
-#  define _UNICOAP_BLOCK_MORE_FLAG     (0x8)
+#  define UNICOAP_BERT_BLOCK_SIZE        (1024)
+#  define UNICOAP_BERT_BLOCK_SZX         (6)
+#  define _UNICOAP_BLOCK_SZX_MASK        (0x7)
+#  define _UNICOAP_BLOCK_NUMBER_MAX     (0xfffff)
+#  define _UNICOAP_BLOCK_NUMBER_OFFSET   (4)
+#  define _UNICOAP_BLOCK_NUMBER_MASK     (0xfffff << _UNICOAP_BLOCK_NUMBER_OFFSET)
+#  define _UNICOAP_BLOCK_MORE_FLAG       (0x8)
+#  define _UNICOAP_BLOCK_FIXED_BIT_WIDTH (24)
+#  define _UNICOAP_BLOCK_NONE_FLAG       (UNICOAP_BLOCK_OPTION_NONE)
 #endif
 
 /**
@@ -139,7 +143,7 @@ static inline void unicoap_block_set_more(unicoap_block_option_t* option, bool m
  * @returns Block number
  */
 static inline uint32_t unicoap_block_get_number(unicoap_block_option_t option) {
-    return option >> _UNICOAP_BLOCK_NUMBER_OFFSET;
+    return (option & _UNICOAP_BLOCK_NUMBER_MASK) >> _UNICOAP_BLOCK_NUMBER_OFFSET;
 }
 
 /**
@@ -148,7 +152,8 @@ static inline uint32_t unicoap_block_get_number(unicoap_block_option_t option) {
  * @param number Block number
  */
 static inline void unicoap_block_set_number(unicoap_block_option_t* option, uint32_t number) {
-    *option = (*option & (_UNICOAP_BLOCK_MORE_FLAG | _UNICOAP_BLOCK_SZX_MASK)) |
+    assert(number <= _UNICOAP_BLOCK_NUMBER_MAX);
+    *option = (*option & ~(_UNICOAP_BLOCK_NUMBER_MASK | _UNICOAP_BLOCK_NONE_FLAG)) |
               (number << _UNICOAP_BLOCK_NUMBER_OFFSET);
 }
 
@@ -167,7 +172,7 @@ static inline unicoap_block_szx_t unicoap_block_get_szx(unicoap_block_option_t o
  * @param szx `szx` value to set
  */
 static inline void unicoap_block_set_szx(unicoap_block_option_t* option, unicoap_block_szx_t szx) {
-    *option = (*option & ~_UNICOAP_BLOCK_SZX_MASK) | szx;
+    *option = (*option & ~(_UNICOAP_BLOCK_SZX_MASK | _UNICOAP_BLOCK_NONE_FLAG)) | szx;
 }
 
 /**
@@ -295,17 +300,29 @@ static inline unicoap_block_option_t unicoap_block_from_info(const unicoap_block
  * @see @ref unicoap_blockwise_iterator_init
  */
 typedef struct {
-    /** @brief Buffer for entire payload */
+    /**
+     * @brief Buffer for entire payload
+     * @private
+     */
     uint8_t* body;
 
-    /** @brief @p body size or capacity */
+    /** 
+     * @brief @p body size or capacity
+     * @private
+     */
     size_t body_size;
 
-    /** @brief Current offset in @p body */
+    /** 
+     * @brief Current offset in @p body 
+     * @private
+     */
     size_t offset;
 
-    /** @brief Block option */
-    unicoap_block_option_t block_option;
+    /** 
+     * @brief Block option
+     * @private
+     */
+    unicoap_block_option_t _block_option;
 } unicoap_blockwise_iterator_t;
 
 /**
@@ -360,6 +377,13 @@ void unicoap_blockwise_iterator_init(unicoap_blockwise_iterator_t* iterator,
  * @brief Prints Block-wise iterator info
  */
 void unicoap_print_blockwise_iterator(const unicoap_blockwise_iterator_t* iterator);
+
+static inline unicoap_block_option_t unicoap_blockwise_iterator_current_option(
+    const unicoap_blockwise_iterator_t* iterator
+) {
+    return iterator->_block_option & 0x1ffffff; 
+    /* 1 more bit for UNICOAP_BLOCK_OPTION_NONE sentinel value. */
+}
 
 /**
  * @brief Collects a Block2 chunk received from the server.

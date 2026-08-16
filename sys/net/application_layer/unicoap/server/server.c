@@ -114,7 +114,7 @@ int unicoap_resource_handle_well_known_core(unicoap_message_t* message, const un
 }
 
 static void _on_blockwise_transfer_timeout(unicoap_scheduled_event_t* timeout) {
-    _SERVER_BLOCKWISE_DEBUG("block-wise transfer period expired\n");
+    _SERVER_BLOCKWISE_DEBUG("block-wise memory period expired, forgetting\n");
     unicoap_server_memo_free(unicoap_server_memo_of_timeout(timeout));
 }
 
@@ -134,16 +134,26 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
              * The Block2 Option provides no way for a single endpoint to perform
              * multiple concurrently proceeding block-wise response payload transfer
              * (e.g., GET) operations to the same resource */
-            if ((memo = unicoap_server_memo_find_blockwise(packet->remote, resource))) {
+            bool block1 = unicoap_options_contains(packet->message->options, UNICOAP_OPTION_BLOCK1);
+            memo = unicoap_server_memo_find_blockwise(packet->remote, resource);
+            if (block1 && memo && unicoap_memo_blockwise_transfer_get(&memo->super)->stage == 
+                UNICOAP_BLOCKWISE_STAGE_SLICE
+            ) {
+                /* We see a new Block1 option in the request, meaning the client wants to transfer
+                 * another request body. The previous transfer in the Block2 / slice stage is 
+                 * thus obsolete. In fact, the Block2/response body may change due to a new
+                 * request (with a new Block1/request body). */
+                _SERVER_BLOCKWISE_DEBUG("client starting over, forgetting transfer\n");
+                unicoap_server_memo_free(memo);
+                memo = NULL;
+            }
+
+            if (memo) {
                 transfer = unicoap_memo_blockwise_transfer_get(&memo->super);
                 unicoap_event_cancel(&memo->super.exchange.timeout);
             }
             else {
-                bool block1 = false;
-                if ((resource->flags & UNICOAP_RESOURCE_FLAG_REASSEMBLE &&
-                     (block1 = unicoap_options_contains(packet->message->options,
-                                                        UNICOAP_OPTION_BLOCK1))) ||
-
+                if ((resource->flags & UNICOAP_RESOURCE_FLAG_REASSEMBLE && block1) ||
                     /* this check is only for the first request to a resource when the client
                      * suggests a block SZX */
                     (resource->flags & UNICOAP_RESOURCE_FLAG_SLICE &&
@@ -193,7 +203,7 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
                     unicoap_event_schedule(&memo->super.exchange.timeout, 
                                            _on_blockwise_transfer_timeout,
                                            CONFIG_UNICOAP_TIMEOUT_SERVER_BLOCKWISE_MS,
-                                           "server.blockwise.memory");
+                                           "server.blockwise.amnesia");
                     return 0;
                 }
             }

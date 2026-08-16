@@ -42,6 +42,8 @@
                     unicoap_block_size_from_szx(suggested_szx),                         \
                     suggested_szx == UNICOAP_BLOCK_SZX_1024_BERT ? " (BERT)" : "");
 
+#define _UNICOAP_BLOCK_SZX_FIXED_FLAG (2 << _UNICOAP_BLOCK_FIXED_BIT_WIDTH)
+
 unicoap_block_szx_t unicoap_block_szx_from_size(size_t size) {
     assert(size >= 16);
     assert((size & (size - 1)) == 0 /* power of two */);
@@ -72,7 +74,7 @@ void unicoap_blockwise_iterator_init(unicoap_blockwise_iterator_t* iterator,
     iterator->body = body;
     iterator->body_size = body_size;
     iterator->offset = 0;
-    iterator->block_option = unicoap_block_from_szx(
+    iterator->_block_option = unicoap_block_from_szx(
         max_szx, 0, body_size >= unicoap_block_size_from_szx(max_szx));
 }
 
@@ -81,15 +83,15 @@ void unicoap_print_blockwise_iterator(const unicoap_blockwise_iterator_t* iterat
            "block_size=%" PRIuSIZE " "
            "block_number=%" PRIu32 " offset=%" PRIuSIZE " "
            "body=<buffer at %p size=%" PRIuSIZE ">>",
-           unicoap_block_get_size(iterator->block_option),
-           unicoap_block_get_number(iterator->block_option), iterator->offset,
+           unicoap_block_get_size(iterator->_block_option),
+           unicoap_block_get_number(iterator->_block_option), iterator->offset,
            iterator->body, iterator->body_size);
 }
 
 static inline int _check_same_szx(unicoap_blockwise_iterator_t* iterator, unicoap_block_szx_t szx) {
-    if (unicoap_block_get_szx(iterator->block_option) != szx) {
+    if (unicoap_block_get_szx(iterator->_block_option) != szx) {
         _BLOCKWISE_DEBUG("illegal attempt to change block szx from %x to %x\n",
-                        unicoap_block_get_szx(iterator->block_option), szx);
+                        unicoap_block_get_szx(iterator->_block_option), szx);
         return -EBADMSG;
     }
 
@@ -159,9 +161,9 @@ static size_t _slice(unicoap_blockwise_iterator_t* slicer, uint8_t** chunk) {
     *chunk = slicer->body + slicer->offset;
     size_t remaining = slicer->body_size - slicer->offset;
 
-    size_t max_chunk_size = unicoap_block_get_size(slicer->block_option);
+    size_t max_chunk_size = unicoap_block_get_size(slicer->_block_option);
 
-    if (unicoap_block_get_szx(slicer->block_option) == UNICOAP_BLOCK_SZX_1024_BERT) {
+    if (unicoap_block_get_szx(slicer->_block_option) == UNICOAP_BLOCK_SZX_1024_BERT) {
         _BLOCKWISE_DEBUG("BERT: slicing off %u blocks\n",
                         CONFIG_UNICOAP_BLOCKWISE_BERT_BLOCKS_PER_MESSAGE_MAX);
         max_chunk_size *= CONFIG_UNICOAP_BLOCKWISE_BERT_BLOCKS_PER_MESSAGE_MAX;
@@ -169,10 +171,10 @@ static size_t _slice(unicoap_blockwise_iterator_t* slicer, uint8_t** chunk) {
 
     /* last block may be smaller than a fully filled block */
     size_t chunk_size = MIN(remaining, max_chunk_size);
-    unicoap_block_set_more(&slicer->block_option, remaining > max_chunk_size);
+    unicoap_block_set_more(&slicer->_block_option, remaining > max_chunk_size);
 
     _BLOCKWISE_DEBUG("slicing off block <#%" PRIu32 ", total=%" PRIuSIZE "B, %s>\n",
-                    unicoap_block_get_number(slicer->block_option), chunk_size,
+                    unicoap_block_get_number(slicer->_block_option), chunk_size,
                     remaining > max_chunk_size ? "M" : "last");
 
     slicer->offset += chunk_size;
@@ -192,7 +194,7 @@ int unicoap_blockwise_collect_block2(unicoap_blockwise_iterator_t* collector,
                  * not transmitted blockw-wise */
                 _BLOCKWISE_DEBUG("single response (not transmitted block-wise)\n");
                 _collect(collector, chunk, chunk_size, false);
-                unicoap_block_set_more(&collector->block_option, false);
+                unicoap_block_set_more(&collector->_block_option, false);
                 /* We're done, do not request more. */
                 return 0;
             }
@@ -208,20 +210,20 @@ int unicoap_blockwise_collect_block2(unicoap_blockwise_iterator_t* collector,
             /* As expected, the first time we get called, there's no Block2
              * option and no response payload */
             assert(collector->offset == 0);
-            unicoap_block_set_more(&collector->block_option, false);
+            unicoap_block_set_more(&collector->_block_option, false);
             /* return 1 to indicate a Block2 request shall be sent */
             return 1;
         }
     }
     else {
         /* got a Block2 response */
-        if (_check_valid_chunk_size(collector->block_option, chunk_size) < 0) {
+        if (_check_valid_chunk_size(collector->_block_option, chunk_size) < 0) {
             return -EBADMSG;
         }
 
-        if (unicoap_block_get_number(collector->block_option) != unicoap_block_get_number(block)) {
+        if (unicoap_block_get_number(collector->_block_option) != unicoap_block_get_number(block)) {
             _BLOCKWISE_DEBUG("expected block #%" PRIu32 ", got #%" PRIu32 "\n",
-                            unicoap_block_get_number(collector->block_option),
+                            unicoap_block_get_number(collector->_block_option),
                             unicoap_block_get_number(block));
             return -ENOMSG;
         }
@@ -229,14 +231,14 @@ int unicoap_blockwise_collect_block2(unicoap_blockwise_iterator_t* collector,
         unicoap_block_szx_t szx = unicoap_block_get_szx(block);
         if (collector->offset == 0) {
             /* first Block2 response */
-            if (szx > unicoap_block_get_szx(collector->block_option)) {
+            if (szx > unicoap_block_get_szx(collector->_block_option)) {
                 /* From RFC 7959 (Block-wise), section 2.4:
                  * A server MUST use the block size indicated or a smaller size. */
-                _BLOCKWISE_DEBUG_SIZE_EXCEEDS(szx, unicoap_block_get_szx(collector->block_option));
+                _BLOCKWISE_DEBUG_SIZE_EXCEEDS(szx, unicoap_block_get_szx(collector->_block_option));
                 return -EBADMSG;
             }
-            _BLOCKWISE_DEBUG_SIZE(szx, unicoap_block_get_szx(collector->block_option), szx);
-            unicoap_block_set_szx(&collector->block_option, szx); /* (SZX) */
+            _BLOCKWISE_DEBUG_SIZE(szx, unicoap_block_get_szx(collector->_block_option), szx);
+            unicoap_block_set_szx(&collector->_block_option, szx); /* (SZX) */
         }
         else {
             /* block size must not change after initial request */
@@ -259,11 +261,11 @@ int unicoap_blockwise_collect_block2(unicoap_blockwise_iterator_t* collector,
         }
 
         /* (NUM) */
-        unicoap_block_set_number_from_offset(&collector->block_option, collector->offset);
+        unicoap_block_set_number_from_offset(&collector->_block_option, collector->offset);
 
         /* RFC 7959 (Block-wise), section 2.3:
          * In this case, the M bit has no function and MUST be set to zero. */
-        unicoap_block_set_more(&collector->block_option, false); /* (M) */
+        unicoap_block_set_more(&collector->_block_option, false); /* (M) */
         return more;
 
         /* if more == true, send Block2 request:
@@ -296,12 +298,25 @@ int unicoap_blockwise_slice_block2_process(unicoap_blockwise_iterator_t* slicer,
         }
 
         unicoap_block_szx_t szx = unicoap_block_get_szx(block);
-        if (unicoap_block_get_number(block) == 0) {
-            /* first Block2 request */
-            unicoap_block_szx_t old_szx = unicoap_block_get_szx(slicer->block_option);
+        if ((slicer->_block_option & _UNICOAP_BLOCK_SZX_FIXED_FLAG) == 0) {
+            /* first Block2 request with desired block size */
+            /* RFC 7959 (Block-wise), section 2.4: 
+             * Any further block-wise requests for blocks beyond the first one
+             * MUST indicate the same block size that was used by the server in
+             * the response for the first request that gave a desired size using
+             * a Block2 Option. [...] The server behavior MUST ensure that this
+             * client behavior results in the same block size for all responses
+             * in a sequence (except for the last one with the M bit not set,
+             * and possibly the first one if the initial request did not contain
+             * a Block2 Option). */
+            /* This means we have to track whether we've seen such a first
+             * request with a Block2 option, and we do so using a hidden flag
+             * in the block option. Note that this is fine as we documented*/
+            unicoap_block_szx_t old_szx = unicoap_block_get_szx(slicer->_block_option);
             unicoap_block_szx_t new_szx = MIN(old_szx, szx);
             _BLOCKWISE_DEBUG_SIZE(new_szx, old_szx, szx);
             unicoap_block_set_szx(&block, new_szx); /* (SZX) */
+            block |= _UNICOAP_BLOCK_SZX_FIXED_FLAG; /* prevent further changes */
         }
         else {
             /* intermediary block */
@@ -311,7 +326,7 @@ int unicoap_blockwise_slice_block2_process(unicoap_blockwise_iterator_t* slicer,
             }
         }
 
-        slicer->block_option = block; /* (NUM) */
+        slicer->_block_option = block; /* (NUM) */
         slicer->offset = unicoap_block_get_offset(block);
     }
     return 0;
@@ -370,26 +385,26 @@ ssize_t unicoap_blockwise_slice_block1(unicoap_blockwise_iterator_t* slicer,
         assert(slicer->offset > 0);
         _BLOCKWISE_DEBUG("got control block\n");
 
-        if (unicoap_block_get_number(slicer->block_option) != unicoap_block_get_number(block)) {
+        if (unicoap_block_get_number(slicer->_block_option) != unicoap_block_get_number(block)) {
             _BLOCKWISE_DEBUG("expected block #%" PRIu32 ", got #%" PRIu32 "\n",
-                            unicoap_block_get_number(slicer->block_option),
+                            unicoap_block_get_number(slicer->_block_option),
                             unicoap_block_get_number(block));
             return -EBADMSG;
         }
 
-        if (unicoap_block_get_more(slicer->block_option) == false &&
+        if (unicoap_block_get_more(slicer->_block_option) == false &&
             unicoap_block_get_more(block)) {
             _BLOCKWISE_DEBUG("error: M flag set for last control block\n");
             return -EBADMSG;
         }
 
         unicoap_block_szx_t szx = unicoap_block_get_szx(block);
-        if (unicoap_block_get_number(slicer->block_option) == 0) {
+        if (unicoap_block_get_number(slicer->_block_option) == 0) {
             /* first Block1 response */
-            unicoap_block_szx_t old_szx = unicoap_block_get_szx(slicer->block_option);
+            unicoap_block_szx_t old_szx = unicoap_block_get_szx(slicer->_block_option);
             unicoap_block_szx_t new_szx = MIN(old_szx, szx);
             _BLOCKWISE_DEBUG_SIZE(new_szx, old_szx, szx);
-            unicoap_block_set_szx(&slicer->block_option, new_szx); /* (SZX) */
+            unicoap_block_set_szx(&slicer->_block_option, new_szx); /* (SZX) */
         }
         else {
             /* block size must not change after initial request */
@@ -400,7 +415,7 @@ ssize_t unicoap_blockwise_slice_block1(unicoap_blockwise_iterator_t* slicer,
     }
 
     /* (NUM) */
-    unicoap_block_set_number_from_offset(&slicer->block_option, slicer->offset);
+    unicoap_block_set_number_from_offset(&slicer->_block_option, slicer->offset);
 
     return (int)_slice(slicer, chunk); /* (M) */
 
@@ -421,7 +436,7 @@ int unicoap_blockwise_collect_block1(unicoap_blockwise_iterator_t* collector,
             /* body is not transmitted block-wise */
             _BLOCKWISE_DEBUG("not transmitted block-wise\n");
             _collect(collector, chunk, chunk_size, false);
-            collector->block_option = 0;
+            collector->_block_option = UNICOAP_BLOCK_OPTION_NONE;
             return 0;
         }
         else {
@@ -445,7 +460,7 @@ int unicoap_blockwise_collect_block1(unicoap_blockwise_iterator_t* collector,
 
         if (collector->offset != unicoap_block_get_offset(block)) {
             _BLOCKWISE_DEBUG("expected block #%" PRIu32 ", got #%" PRIu32 "\n",
-                            unicoap_block_get_number(collector->block_option),
+                            unicoap_block_get_number(collector->_block_option),
                             unicoap_block_get_number(block));
             return -ENOMSG;
         }
@@ -453,9 +468,9 @@ int unicoap_blockwise_collect_block1(unicoap_blockwise_iterator_t* collector,
         unicoap_block_szx_t szx = unicoap_block_get_szx(block);
         if (collector->offset == 0) {
         }
-        else if (unicoap_block_get_number(collector->block_option) == 0) {
+        else if (unicoap_block_get_number(collector->_block_option) == 0) {
             /* second Block1 request */
-            if (szx > unicoap_block_get_szx(collector->block_option)) {
+            if (szx > unicoap_block_get_szx(collector->_block_option)) {
                 /* RFC 7959 (Block-wise), section 2.5:
                  * Still, the client SHOULD heed the preference indicated and, for all further
                  * blocks, use the block size preferred by the server or a smaller one.
@@ -463,11 +478,11 @@ int unicoap_blockwise_collect_block1(unicoap_blockwise_iterator_t* collector,
                  * request starts with a block number larger than one, as the first
                  * request already transferred multiple blocks as counted in the smaller
                  * size. */
-                _BLOCKWISE_DEBUG_SIZE_EXCEEDS(szx, unicoap_block_get_szx(collector->block_option));
+                _BLOCKWISE_DEBUG_SIZE_EXCEEDS(szx, unicoap_block_get_szx(collector->_block_option));
                 return -EBADMSG;
             }
-            _BLOCKWISE_DEBUG_SIZE(szx, unicoap_block_get_szx(collector->block_option), szx);
-            unicoap_block_set_szx(&collector->block_option, szx); /* (SZX) */
+            _BLOCKWISE_DEBUG_SIZE(szx, unicoap_block_get_szx(collector->_block_option), szx);
+            unicoap_block_set_szx(&collector->_block_option, szx); /* (SZX) */
         }
         else {
             /* block size must not change after initial request */
@@ -493,8 +508,8 @@ int unicoap_blockwise_collect_block1(unicoap_blockwise_iterator_t* collector,
         }
     }
 
-    unicoap_block_set_szx(&block, unicoap_block_get_szx(collector->block_option)); /* (SZX) */
-    collector->block_option = block;                                               /* (NUM), (M) */
+    unicoap_block_set_szx(&block, unicoap_block_get_szx(collector->_block_option)); /* (SZX) */
+    collector->_block_option = block;                                               /* (NUM), (M) */
     return more;
 
     /* if more == true, send Block2 request:
@@ -547,8 +562,7 @@ int unicoap_blockwise_transfer_setup(unicoap_message_t* outbound_message,
     switch (transfer->stage) {
     case UNICOAP_BLOCKWISE_STAGE_SLICE:
         _BLOCKWISE_DEBUG("preparing transfer for SLICE stage: no_copy=%u\n",
-                        blockwise_flags & 
-                        (UNICOAP_BLOCKWISE_FLAG_DURABLE_MESSAGE | UNICOAP_BLOCKWISE_FLAG_SLICE));
+                        (blockwise_flags & UNICOAP_BLOCKWISE_FLAG_DURABLE_MESSAGE) != 0);
 
         /* FIXME: what if there's no outbound message (see server.c L395) */
         if (outbound_message) {

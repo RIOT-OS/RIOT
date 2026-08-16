@@ -306,7 +306,7 @@ void unicoap_blockwise_transfer_free(unicoap_memo_t* memo) {
     if (transfer) {
         _STATE_DEBUG("[block-wise transfer #%" PRIuSIZE "] free\n",
                      _blockwise_transfer_index(transfer));
-        transfer->iterator.block_option = UNICOAP_BLOCK_OPTION_NONE;
+        transfer->iterator._block_option = UNICOAP_BLOCK_OPTION_NONE;
         unicoap_blockwise_buffer_free(transfer);
         unicoap_memo_blockwise_transfer_set(memo, NULL);
         transfer->is_active = false;

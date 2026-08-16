@@ -10,6 +10,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 from aiocoap import Reliable, Unreliable, GET, PUT, POST, DELETE, PATCH, iPATCH, FETCH, Context, Message
 import aiocoap.resource as resource
+from aiocoap.numbers import constants
 
 LOG_PREFIX = Path(__file__).name
 
@@ -89,6 +90,12 @@ async def main():
         default=None)
 
     parser.add_argument(
+        "--slice",
+        action="store_true",
+        help='Slice payload',
+        default=None)
+
+    parser.add_argument(
         "-to", "--timeout",
         type=float,
         help='Request timeout',
@@ -126,8 +133,11 @@ async def main():
         code=method(args.method),
         uri=args.uri,
         payload=bytes(args.payload, 'utf-8') if args.payload else "",
-        observe=observeValue
+        observe=observeValue,
     )
+
+    if args.slice:
+        request.remote.maximum_block_size_exp = 0
 
     try:
         pr = protocol.request(request)
