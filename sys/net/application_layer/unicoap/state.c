@@ -178,12 +178,18 @@ static inline size_t _server_index(unicoap_server_memo_t* memo) {
 }
 
 static void _deinit_server(unicoap_server_memo_t* memo) {
+    if (!UNICOAP_HAVE_SERVER_STATE) {
+        return;
+    }
     _STATE_DEBUG("[server #%" PRIuSIZE "] release\n", _server_index(memo));
     memo->resource = NULL;
 }
 
 unicoap_server_memo_t* unicoap_server_memo_create(const unicoap_endpoint_t* endpoint, 
                                                   const unicoap_resource_t* resource) {
+    if (!UNICOAP_HAVE_SERVER_STATE) {
+        return NULL;
+    }
     assert(endpoint);
     assert(endpoint->proto != UNICOAP_PROTO_UNSPECIFIED);
     _lock();
@@ -348,6 +354,9 @@ void unicoap_client_memo_free(unicoap_client_memo_t* memo) {
 }
 
 void unicoap_server_memo_free(unicoap_server_memo_t* memo) {
+    if (!UNICOAP_HAVE_SERVER_STATE) {
+        return;
+    }
     unicoap_proto_t proto = _free_prologue(&memo->super);
     _deinit_server(memo);
     _free_epilogue(&memo->super, proto);
