@@ -76,6 +76,8 @@ void unicoap_state_unlock(void) {
     _unlock();
 }
 
+/* MARK: - Client memos */
+
 static unicoap_client_memo_t* _alloc_client(void) {
 #if UNICOAP_HAVE_CLIENT_STATE
     /* Find empty slot in list of transactions */
@@ -139,6 +141,64 @@ unicoap_client_memo_t* unicoap_client_memo_create(const unicoap_endpoint_t* endp
     return memo;
 }
 
+/* MARK: - Server memos */
+
+static unicoap_server_memo_t* _alloc_server(void) {
+#if UNICOAP_HAVE_SERVER_STATE
+    /* Find empty slot in list of transactions */
+    for (int i = 0; i < (int)ARRAY_SIZE(_state.server_memos); i += 1) {
+        if (_state.server_memos[i].super.endpoint.proto == UNICOAP_PROTO_UNSPECIFIED) {
+            return &_state.server_memos[i];
+        }
+    }
+#endif
+    _STATE_DEBUG("[server] no space to alloc\n");
+    return NULL;
+}
+
+static inline bool _is_server(const unicoap_memo_t* memo) {
+    (void)memo;
+#if UNICOAP_HAVE_SERVER_STATE
+    return (uintptr_t)memo >= (uintptr_t)&_state.server_memos[0] &&
+        (uintptr_t)memo <= (uintptr_t)&_state.server_memos[ARRAY_SIZE(_state.server_memos) - 1];
+#else
+    return false;
+#endif
+}
+
+static inline size_t _server_index(unicoap_server_memo_t* memo) {
+    /* debugging-only */
+#if UNICOAP_HAVE_SERVER_STATE
+    return ((uintptr_t)memo - (uintptr_t)_state.server_memos) / sizeof(*_state.server_memos);
+#else
+    (void)memo;
+    assert(false);
+    return 0;
+#endif
+}
+
+static void _deinit_server(unicoap_server_memo_t* memo) {
+    _STATE_DEBUG("[server #%" PRIuSIZE "] release\n", _server_index(memo));
+    memo->resource = NULL;
+}
+
+unicoap_server_memo_t* unicoap_server_memo_create(const unicoap_endpoint_t* endpoint, 
+                                                  const unicoap_resource_t* resource) {
+    assert(endpoint);
+    assert(endpoint->proto != UNICOAP_PROTO_UNSPECIFIED);
+    _lock();
+    unicoap_server_memo_t* memo = _alloc_server();
+    if (memo) {
+        _STATE_DEBUG("[server #%" PRIuSIZE "] alloc\n", _server_index(memo));
+        memo->super.endpoint = *endpoint;
+        memo->resource = resource;
+    }
+    _unlock();
+    return memo;
+}
+
+/* MARK: - Block-wise transfers */
+
 static inline size_t _blockwise_transfer_index(unicoap_blockwise_transfer_t* transfer) {
     /* debugging-only */
 #if UNICOAP_HAVE_BLOCKWISE_STATE
@@ -152,10 +212,10 @@ static inline size_t _blockwise_transfer_index(unicoap_blockwise_transfer_t* tra
 }
 
 static inline size_t _blockwise_buffer_index(uint8_t* buffer) {
-#if UNICOAP_HAVE_BLOCKWISE_STATE && CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX > 0
+#if UNICOAP_HAVE_BLOCKWISE_STATE && CONFIG_UNICOAP_BLOCKWISE_BUFFERS_POOL_CAPACITY > 0
     size_t i = ((uintptr_t)buffer - (uintptr_t)_state.blockwise_buffers) /
                sizeof(*_state.blockwise_buffers);
-    assert(i < CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX);
+    assert(i < CONFIG_UNICOAP_BLOCKWISE_BUFFERS_POOL_CAPACITY);
     return i;
 #else
     (void)buffer;
@@ -165,7 +225,7 @@ static inline size_t _blockwise_buffer_index(uint8_t* buffer) {
 }
 
 static unicoap_blockwise_transfer_t* _get_blockwise_transfer(void) {
-#if IS_USED(MODULE_UNICOAP_BLOCKWISE) && CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX > 0
+#if IS_USED(MODULE_UNICOAP_BLOCKWISE) && CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_CAPACITY > 0
     for (int i = 0; i < (int)ARRAY_SIZE(_state.blockwise_transfers); i += 1) {
         if (!_state.blockwise_transfers[i].is_active) {
             return &_state.blockwise_transfers[i];
@@ -177,9 +237,9 @@ static unicoap_blockwise_transfer_t* _get_blockwise_transfer(void) {
 }
 
 static uint8_t *_blockwise_buffer_alloc_unsafe(void) {
-#if UNICOAP_HAVE_BLOCKWISE_STATE && CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX > 0
+#if UNICOAP_HAVE_BLOCKWISE_STATE && CONFIG_UNICOAP_BLOCKWISE_BUFFERS_POOL_CAPACITY > 0
     int i =
-        bf_find_first_unset(_state.blockwise_buffers_used, CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX);
+        bf_find_first_unset(_state.blockwise_buffers_used, CONFIG_UNICOAP_BLOCKWISE_BUFFERS_POOL_CAPACITY);
     if (i >= 0) {
         _STATE_DEBUG("[block-wise buffer #%i] alloc\n", i);
         bf_set(_state.blockwise_buffers_used, i);
@@ -226,7 +286,7 @@ unicoap_blockwise_transfer_t* unicoap_blockwise_transfer_create(unicoap_memo_t* 
 
 void unicoap_blockwise_buffer_free(unicoap_blockwise_transfer_t* transfer) {
     (void)transfer;
-#if UNICOAP_HAVE_BLOCKWISE_STATE && CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX > 0
+#if UNICOAP_HAVE_BLOCKWISE_STATE && CONFIG_UNICOAP_BLOCKWISE_BUFFERS_POOL_CAPACITY > 0
     if (transfer->buffer) {
         size_t i = _blockwise_buffer_index(transfer->buffer);
         _STATE_DEBUG("[block-wise buffer #%" PRIuSIZE "] free\n", i);
@@ -253,29 +313,44 @@ static void _free(unicoap_memo_t* memo) {
     memset(memo, 0, sizeof(*memo));
 }
 
-void unicoap_client_memo_free(unicoap_client_memo_t* memo) {
-    if (!UNICOAP_HAVE_CLIENT_STATE) {
-        return;
-    }
+unicoap_proto_t _free_prologue(unicoap_memo_t* memo) {
     _lock();
     /* Mark as unused, such that all the logic below can run without a lock.
       * The messaging layer may need the lock too. */
-    unicoap_proto_t proto = memo->super.endpoint.proto;
+    unicoap_proto_t proto = memo->endpoint.proto;
     (void)proto;
-    memo->super.endpoint.proto = UNICOAP_PROTO_UNSPECIFIED;
+    memo->endpoint.proto = UNICOAP_PROTO_UNSPECIFIED;
     _unlock();
-    _deinit_client(memo);
+    return proto;
+}
+
+void _free_epilogue(unicoap_memo_t* memo, unicoap_proto_t proto) {
 #if UNICOAP_HAVE_MESSAGING_STATE
     /* On the exchange layer, we're hiding the actual reason from the driver. It should
      * not matter to the messaging layer whether we release state because of an error or because
      * the state object is released as usual. Should the messaging layer rely on this
      * information, the exchange-messaging abstraction has a design flaw. */
-    if (unicoap_memo_messaging_state(&memo->super)) {
-        unicoap_messaging_notify(unicoap_memo_messaging_state(&memo->super), 
+    if (unicoap_memo_messaging_state(memo)) {
+        unicoap_messaging_notify(unicoap_memo_messaging_state(memo), 
             UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE, NULL, proto);
     }
 #endif
-    _free(&memo->super);
+    _free(memo);
+}
+
+void unicoap_client_memo_free(unicoap_client_memo_t* memo) {
+    if (!UNICOAP_HAVE_CLIENT_STATE) {
+        return;
+    }
+    unicoap_proto_t proto = _free_prologue(&memo->super);
+    _deinit_client(memo);
+    _free_epilogue(&memo->super, proto);
+}
+
+void unicoap_server_memo_free(unicoap_server_memo_t* memo) {
+    unicoap_proto_t proto = _free_prologue(&memo->super);
+    _deinit_server(memo);
+    _free_epilogue(&memo->super, proto);
 }
 
 unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* endpoint,
@@ -345,6 +420,30 @@ int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo) {
 #else
     return 0;
 #endif
+}
+
+unicoap_server_memo_t* unicoap_server_memo_find_blockwise(
+    const unicoap_endpoint_t* endpoint,
+    const unicoap_resource_t* resource
+) {
+    (void)endpoint;
+    (void)resource;
+    assert(endpoint);
+    assert(resource);
+
+#if UNICOAP_HAVE_SERVER_STATE && UNICOAP_HAVE_BLOCKWISE_STATE && \
+    IS_USED(MODULE_UNICOAP_SERVER_BLOCKWISE)
+    unicoap_server_memo_t* memo = NULL;
+    for (int i = 0; i < (int)ARRAY_SIZE(_state.server_memos); i += 1) {
+        memo = &_state.server_memos[i];
+        if (unicoap_memo_blockwise_transfer_get(&memo->super) &&
+            memo->resource == resource &&
+            unicoap_endpoint_is_equal(endpoint, &memo->super.endpoint)) {
+            return memo;
+        }
+    }
+#endif
+    return NULL;
 }
 
 void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, void* arg) {

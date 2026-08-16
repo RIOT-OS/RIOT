@@ -202,7 +202,7 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
 
     if (IS_USED(MODULE_UNICOAP_CLIENT_BLOCKWISE) && flags & ANY_BLOCKWISE_FLAGS) {
         unicoap_blockwise_transfer_t* transfer =
-            unicoap_blockwise_transfer_create(&memo->super, unicoap_blockwise_client_flags(flags));
+            unicoap_blockwise_transfer_create(&memo->super, _blockwise_flags_client(flags));
         
             if (!transfer) {
                 return -ENOBUFS;

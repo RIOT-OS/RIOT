@@ -92,8 +92,8 @@ number of blocks that can be present in a single BERT message.
 determines whether BERT can be enabled for a given protocol.
 
 The stack restricts the number of automatic Block-wise transfers that can be active at a time to
-@ref CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX (client and server).
-@ref CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX dictates the number of large payload
+@ref CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_CAPACITY (client and server).
+@ref CONFIG_UNICOAP_BLOCKWISE_BUFFERS_POOL_CAPACITY dictates the number of large payload
 body buffers reserved for the application by the stack. A buffer is used
 - if either of the auto-reassemble flags is used, or
 - if either of the auto-slice flags is used without specifying the no-copy slice flag.
@@ -102,7 +102,7 @@ Hence, if you don't rely on auto-reassembly and can guarantee your payload buffe
 valid for the duration of the transfer, you can set the Block-wise buffer count to zero.
 
 To configure the maximum size of payload body that can be reassembled or sliced,
-set @ref CONFIG_UNICOAP_BLOCKWISE_BODY_SIZE_MAX.
+set @ref CONFIG_UNICOAP_BLOCKWISE_BODY_CAPACITY.
 
 ## See Also
 

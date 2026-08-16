@@ -187,12 +187,18 @@ void unicoap_event_cancel(unicoap_scheduled_event_t* event);
     IS_USED(MODULE_UNICOAP_CLIENT) && CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY > 0
 
 /** 
+  * @brief A feature check macro that determines whether server state objects are supported
+  */
+#define UNICOAP_HAVE_SERVER_STATE \
+    IS_USED(MODULE_UNICOAP_SERVER) && CONFIG_UNICOAP_SERVER_MEMOS_CAPACITY > 0
+
+/** 
   * @brief A feature check macro that determines whether automatic block-wise transfers are
   *        supported. 
   */
 #define UNICOAP_HAVE_BLOCKWISE_STATE \
     (IS_USED(MODULE_UNICOAP_CLIENT_BLOCKWISE) || IS_USED(MODULE_UNICOAP_SERVER_BLOCKWISE)) \
-    && CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX > 0
+    && CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_CAPACITY > 0
 
 /**
  * @brief A type used to retain state spanning across a single or multiple message exchanges
@@ -560,10 +566,87 @@ int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo);
 void unicoap_client_memo_free(unicoap_client_memo_t* memo);
 /** @} */
 
+/* MARK: - Server state */
+/**
+ * @name Server state
+ * @{
+ */
+
+/**
+ * @brief Client exchange
+ */
+typedef struct {
+    unicoap_memo_t super;
+
+    /** @brief Resource */
+    const unicoap_resource_t* resource;
+} unicoap_server_memo_t;
+
+/**
+ * @brief Returns server memo of common memo state object
+ * @param[in] memo Superclass memo
+ * @returns Server memo state object
+ */
+static inline unicoap_server_memo_t* unicoap_server_memo_of_super(unicoap_memo_t* memo) {
+    return container_of(memo, unicoap_server_memo_t, super);
+}
+
+/**
+ * @brief Returns server memo of event
+ * @param[in] event Superclass event
+ * @returns Server memo state object
+ */
+static inline unicoap_server_memo_t* unicoap_server_memo_of_event(event_t* event) {
+    return unicoap_server_memo_of_super(unicoap_memo_of_event(event));
+}
+
+/**
+ * @brief Returns server memo of scheduled event
+ * @param[in] event Superclass event
+ * @returns Server memo state object
+ */
+static inline unicoap_server_memo_t* unicoap_server_memo_of_timeout(unicoap_scheduled_event_t* timeout) {
+    return unicoap_server_memo_of_super(unicoap_memo_of_timeout(timeout));
+}
+
+/**
+ * @brief Allocates and sets up a new memo
+ *
+ * @note This function is thread-safe.
+ *
+ * @param[in] endpoint Remote endpoint
+ * @param[in] resource Resource
+ *
+ * @returns New memo
+ */
+unicoap_server_memo_t* unicoap_server_memo_create(const unicoap_endpoint_t* endpoint,
+                                                  const unicoap_resource_t* resource);
+
+/**
+ * @brief Tries to find a server exchange memo by endpoint and with active block-wise transfer
+ *
+ * @param[in] endpoint Remote endpoint of exchange
+ * @param[in] resource Resource engaged in block-wise transfer with @p endpoint
+ *
+ * @returns Memo, if found
+ */
+unicoap_server_memo_t* unicoap_server_memo_find_blockwise(
+    const unicoap_endpoint_t* endpoint,
+    const unicoap_resource_t* resource
+);
+
+/**
+ * @brief Frees memo and associated buffers
+ *
+ * @param[in,out] memo Memo state bucket to discard and free
+ */
+void unicoap_server_memo_free(unicoap_server_memo_t* memo);
+/** @} */
+
 /* MARK: - Allocating and releasing block-wise state */
 /**
  * @name Allocating and releasing block-wise state
- * @{
+ * @{a
  */
 
 /**

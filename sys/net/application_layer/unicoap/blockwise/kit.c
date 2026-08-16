@@ -559,8 +559,8 @@ int unicoap_blockwise_transfer_setup(unicoap_message_t* outbound_message,
             }
             else {
                 _BLOCKWISE_DEBUG("copying payload into block-wise buffer\n");
-                if (outbound_message->payload_size > CONFIG_UNICOAP_BLOCKWISE_BODY_SIZE_MAX) {
-                    _BLOCKWISE_DEBUG("no buffer space to copy body, " _UNICOAP_NEED_HAVE "\n", outbound_message->payload_size, (size_t)CONFIG_UNICOAP_BLOCKWISE_BODY_SIZE_MAX);
+                if (outbound_message->payload_size > CONFIG_UNICOAP_BLOCKWISE_BODY_CAPACITY) {
+                    _BLOCKWISE_DEBUG("no buffer space to copy body, " _UNICOAP_NEED_HAVE "\n", outbound_message->payload_size, (size_t)CONFIG_UNICOAP_BLOCKWISE_BODY_CAPACITY);
                     return -ENOBUFS;
                 }
                 memcpy(transfer->buffer, outbound_message->payload, outbound_message->payload_size);
@@ -576,7 +576,7 @@ int unicoap_blockwise_transfer_setup(unicoap_message_t* outbound_message,
 
         if (blockwise_flags & UNICOAP_BLOCKWISE_FLAG_REASSEMBLE) {
             buffer = transfer->buffer;
-            size = CONFIG_UNICOAP_BLOCKWISE_BODY_SIZE_MAX;
+            size = CONFIG_UNICOAP_BLOCKWISE_BODY_CAPACITY;
         }
         break;
 

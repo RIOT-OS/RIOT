@@ -105,7 +105,7 @@ int unicoap_client_prepare_request_blockwise(const unicoap_packet_t* packet,
     unicoap_message_t* request = packet->message;
 
     if ((res = unicoap_blockwise_transfer_setup(request, transfer, 
-                                                unicoap_blockwise_client_flags(client_flags),
+                                                _blockwise_flags_client(client_flags),
                                                 packet->remote->proto, true)) < 0) {
         return res;
     }

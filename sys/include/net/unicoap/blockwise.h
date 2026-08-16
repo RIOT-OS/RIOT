@@ -623,29 +623,29 @@ int unicoap_blockwise_collect_block1(unicoap_blockwise_iterator_t* collector,
  *
  * TODO: description
  */
-#if !defined(CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX) || defined(DOXYGEN)
+#if !defined(CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_CAPACITY) || defined(DOXYGEN)
 #  if IS_USED(MODULE_UNICOAP_BLOCKWISE)
-#    define CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX (2)
+#    define CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_CAPACITY (2)
 #  else
-#    define CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX (0)
+#    define CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_CAPACITY (0)
 #  endif
 #endif
 
-static_assert(CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX <= 
-    (CONFIG_UNICOAP_CLIENT_MEMOS_MAX + CONFIG_UNICOAP_SERVER_MEMOS_MAX),
-              "CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX must not exceed "
-              "(CONFIG_UNICOAP_CLIENT_MEMOS_MAX + CONFIG_UNICOAP_SERVER_MEMOS_MAX)");
+static_assert(CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_CAPACITY <= 
+    (CONFIG_UNICOAP_CLIENT_MEMOS_MAX + CONFIG_UNICOAP_SERVER_MEMOS_CAPACITY),
+              "CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_CAPACITY must not exceed "
+              "(CONFIG_UNICOAP_CLIENT_MEMOS_MAX + CONFIG_UNICOAP_SERVER_MEMOS_CAPACITY)");
 
 #if IS_USED(MODULE_UNICOAP_BLOCKWISE)
-#  if CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX == 0
-#    error "CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX is zero. Auto-reassembly, auto-slicing, and unicoap_send_request_blockwise_* functions are impossible to use."
+#  if CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_CAPACITY == 0
+#    error "CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_CAPACITY is zero. Auto-reassembly, auto-slicing, and unicoap_send_request_blockwise_* functions are impossible to use."
 #  endif
 #endif
 
 /**
  * @brief Maximum number of Block-wise buffers for slicing and reassembling.
  *
- * **Default**: @ref CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX (a buffer for each transfer)
+ * **Default**: @ref CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_CAPACITY (a buffer for each transfer)
  *
  * Set this constant to zero if you always use the [no-copy slice flag](@ref UNICOAP_CLIENT_FLAG_SLICE_NO_COPY)
  * and never let unicoap [reassemble](@ref UNICOAP_CLIENT_FLAG_REASSEMBLE) requests/responses (client)
@@ -653,13 +653,13 @@ static_assert(CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX <=
  * and never let unicoap [reassemble](@ref UNICOAP_RESOURCE_FLAG_REASSEMBLE) requests/responses (client)
  *
  */
-#if !defined(CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX
+#if !defined(CONFIG_UNICOAP_BLOCKWISE_BUFFERS_POOL_CAPACITY) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_BLOCKWISE_BUFFERS_POOL_CAPACITY CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_CAPACITY
 #endif
 
-static_assert(CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX <= CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX,
-              "CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX must not exceed "
-              "CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_MAX");
+static_assert(CONFIG_UNICOAP_BLOCKWISE_BUFFERS_POOL_CAPACITY <= CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_CAPACITY,
+              "CONFIG_UNICOAP_BLOCKWISE_BUFFERS_POOL_CAPACITY must not exceed "
+              "CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_CAPACITY");
 
 /**
  * @brief Block-wise buffer capacity.
@@ -672,12 +672,12 @@ static_assert(CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX <= CONFIG_UNICOAP_BLOCKWISE_T
  * - a request body that can be auto-sliced by the client ([except you use no-copy mode](@ref UNICOAP_CLIENT_FLAG_SLICE_NO_COPY)), or
  * - a request body that can be auto-reassembled by the server.
  */
-#if !defined(CONFIG_UNICOAP_BLOCKWISE_BODY_SIZE_MAX) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_BLOCKWISE_BODY_SIZE_MAX (1024)
+#if !defined(CONFIG_UNICOAP_BLOCKWISE_BODY_CAPACITY) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_BLOCKWISE_BODY_CAPACITY (1024)
 #endif
 
-#if IS_USED(MODULE_UNICOAP_BLOCKWISE) && CONFIG_UNICOAP_BLOCKWISE_BODY_SIZE_MAX == 0
-#  warning "CONFIG_UNICOAP_BLOCKWISE_BODY_SIZE_MAX is zero. Auto-reassembly is impossible, auto-slicing is limited to UNICOAP_FLAG_SLICE_NO_COPY, otherwise impossible to use"
+#if IS_USED(MODULE_UNICOAP_BLOCKWISE) && CONFIG_UNICOAP_BLOCKWISE_BODY_CAPACITY == 0
+#  warning "CONFIG_UNICOAP_BLOCKWISE_BODY_CAPACITY is zero. Auto-reassembly is impossible, auto-slicing is limited to UNICOAP_FLAG_SLICE_NO_COPY, otherwise impossible to use"
 #endif
 
 /**
@@ -738,9 +738,9 @@ static_assert(CONFIG_UNICOAP_BLOCKWISE_BUFFERS_MAX <= CONFIG_UNICOAP_BLOCKWISE_T
 #endif
 
 static_assert(
-    CONFIG_UNICOAP_BLOCKWISE_BODY_SIZE_MAX == 0 ||
-        CONFIG_UNICOAP_BLOCK_SIZE < CONFIG_UNICOAP_BLOCKWISE_BODY_SIZE_MAX,
-    "CONFIG_UNICOAP_BLOCK_SIZE must be smaller than CONFIG_UNICOAP_BLOCKWISE_BODY_SIZE_MAX");
+    CONFIG_UNICOAP_BLOCKWISE_BODY_CAPACITY == 0 ||
+        CONFIG_UNICOAP_BLOCK_SIZE < CONFIG_UNICOAP_BLOCKWISE_BODY_CAPACITY,
+    "CONFIG_UNICOAP_BLOCK_SIZE must be smaller than CONFIG_UNICOAP_BLOCKWISE_BODY_CAPACITY");
 
 #if CONFIG_UNICOAP_BLOCK_SIZE > CONFIG_UNICOAP_PDU_SIZE_MAX
 #  warning "CONFIG_UNICOAP_BLOCK_SIZE exceeds CONFIG_UNICOAP_PDU_SIZE_MAX, inbound messages might get truncated"
