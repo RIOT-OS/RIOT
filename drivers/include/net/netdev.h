@@ -334,6 +334,7 @@ typedef enum {
     NETDEV_W5500,
     NETDEV_ESP_IEEE802154,
     NETDEV_LPC1768_ETH,
+    NETDEV_EFM32_ETH,
     /* add more if needed */
 } netdev_type_t;
 /** @} */

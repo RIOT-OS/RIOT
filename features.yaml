@@ -127,6 +127,10 @@ groups:
       features:
       - name: efm32_coretemp
         help: Y R U not using `periph_temperature` for this?
+      - name: efm32_eth
+        help: Certain EFM32 MCUs have an Ethernet MAC peripheral. Note that this
+              does not necessarily mean that the board has an Ethernet PHY connected
+              to it.
       - name: gecko_sdk_librail_nonfpu
         help: The CPU offers librail support if the FPU is disabled.
               Librail is shipped as pre-compiled blobs. Thus, we have to adapt to
