@@ -825,6 +825,7 @@ static const ieee802154_radio_ops_t at86rf2xx_ops = {
             | IEEE802154_CAP_IRQ_TX_DONE
 #if ! IS_ACTIVE(AT86RF2XX_BASIC_MODE)
             | IEEE802154_CAP_FRAME_RETRANS
+            | IEEE802154_CAP_AUTO_CSMA
 #  if AT86RF2XX_HAVE_RETRIES
             | IEEE802154_CAP_FRAME_RETRANS_INFO
 #  endif

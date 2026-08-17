@@ -821,6 +821,10 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
                 CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS);
     }
 
+    if (ieee802154_radio_has_auto_csma(&submac->dev)) {
+        ieee802154_radio_set_csma_params(&submac->dev, &submac->be, submac->csma_retries);
+    }
+
     assert(res >= 0);
 
     while (ieee802154_radio_set_rx(dev) < 0) {}

@@ -4,7 +4,7 @@ include ../Makefile.net_common
 # working Kconfig dependency resolution.
 # Other boards should still work when running with CONTINUE_ON_EXPECTED_ERRORS=1
 
-BOARD_WHITELIST += adafruit-clue \
+BOARDS_SUPPORTED += adafruit-clue \
                    adafruit-itsybitsy-nrf52 \
                    arduino-nano-33-ble \
                    atmega256rfr2-xpro \
