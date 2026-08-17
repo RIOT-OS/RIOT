@@ -53,6 +53,8 @@ else ifeq ($(CPU_ARCH),xtensa)
   WAMR_BUILD_TARGET = XTENSA
 else ifeq ($(CPU_ARCH),rv32)
   WAMR_BUILD_TARGET = RISCV32
+else ifeq ($(CPU_ARCH),rv64)
+  WAMR_BUILD_TARGET = RISCV64
 else
   $(error "WASM is not supported for architecture $(CPU_ARCH)")
 endif

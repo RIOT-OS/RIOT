@@ -49,7 +49,8 @@ static int init(int argc, char **argv)
     uint32_t baudrate = atoi(argv[2]);
 
     if (uart >= UART_NUMOF) {
-        printf("Wrong UART device number - should be in range 0-%d.\n", UART_NUMOF - 1);
+        printf("Wrong UART device number - should be in range 0-%u.\n",
+               (unsigned)(UART_NUMOF - 1));
         return 1;
     }
     at_dev_init_t at_init_params = {

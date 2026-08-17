@@ -82,6 +82,11 @@ void gnrc_netif_init_devs(void)
         auto_init_esp_ieee802154();
     }
 
+    if (IS_USED(MODULE_GRETH)) {
+        extern void auto_init_greth(void);
+        auto_init_greth();
+    }
+
     /* don't change the order of auto_init_esp_now and auto_init_esp_wifi */
     if (IS_USED(MODULE_ESP_NOW)) {
         extern void auto_init_esp_now(void);
