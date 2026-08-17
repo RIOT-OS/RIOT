@@ -72,6 +72,10 @@ int main(void)
             }
         }
 
+        /* release the interpreter's state before the next mp_riot_init() call
+         * resets the heap out from under it */
+        mp_riot_deinit();
+
         /* the MicroPython test suite expects \r\n */
         printf("soft reboot\r\n");
     }
