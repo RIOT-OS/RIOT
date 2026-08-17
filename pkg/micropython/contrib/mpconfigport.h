@@ -106,14 +106,15 @@ typedef long mp_off_t;
 #define MICROPY_BEGIN_ATOMIC_SECTION()              irq_disable()
 #define MICROPY_END_ATOMIC_SECTION(state)           irq_restore(state)
 
-extern void mp_riot_sched_hook(void);
+void mp_riot_sched_hook(void);
 #define MICROPY_SCHED_HOOK_SCHEDULED                mp_riot_sched_hook()
 
 #define MICROPY_PORT_ROOT_POINTERS                  const char *readline_hist[8];
 
 #define MP_STATE_PORT                               MP_STATE_VM
-/** @} */
 
 #ifdef __cplusplus
 }
 #endif
+
+/** @} */

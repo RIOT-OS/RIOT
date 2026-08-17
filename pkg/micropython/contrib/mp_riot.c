@@ -35,6 +35,15 @@ void mp_riot_init(char *heap, size_t heap_size)
     mp_init();
 }
 
+void mp_riot_deinit(void)
+{
+#if MICROPY_ENABLE_GC
+    gc_sweep_all();
+#endif
+
+    mp_deinit();
+}
+
 mp_lexer_t *mp_lexer_new_from_file(qstr filename)
 {
     return NULL;

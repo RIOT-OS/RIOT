@@ -28,14 +28,14 @@ extern const mp_obj_type_t machine_pin_type;        /**< Machine pin object type
 extern const mp_obj_type_t machine_hw_spi_type;     /**< Machine hardware SPI object type */
 extern const mp_obj_type_t machine_adc_type;        /**< Machine ADC object type */
 
-MP_DECLARE_CONST_FUN_OBJ_0(machine_info_obj);
+MP_DECLARE_CONST_FUN_OBJ_0(machine_info_obj);       /**< Machine info function object */
 
 /**
  * @brief   Machine pin object
  */
 typedef struct _machine_pin_obj_t {
-    mp_obj_base_t base;
-    gpio_t pin;
+    mp_obj_base_t base;                             /**< Base object */
+    gpio_t pin;                                     /**< GPIO pin */
 } machine_pin_obj_t;
 
 #ifdef __cplusplus

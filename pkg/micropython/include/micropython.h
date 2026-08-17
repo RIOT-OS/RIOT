@@ -49,4 +49,17 @@ extern "C" {
  */
 void mp_riot_init(char* heap, size_t heap_size);
 
+/**
+ * @brief   Tear down RIOT MicroPython port
+ *
+ * Releases the interpreter's state, so that a following mp_riot_init() call
+ * starts from a clean state instead of leaving stale references into the
+ * heap it is about to reset.
+ */
+void mp_riot_deinit(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 /** @} */
