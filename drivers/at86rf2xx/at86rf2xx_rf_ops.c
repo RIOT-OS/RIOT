@@ -519,23 +519,11 @@ static int _set_csma_params(ieee802154_dev_t *hal, const ieee802154_csma_be_t *b
 {
     DEBUG("at86rf2xx_rf_ops: set_csma_params.");
     at86rf2xx_t *dev = hal->priv;
-    retries = MIN(retries, 5);              /* valid values: 0-5 */
-    retries = (retries < 0) ? 7 : retries;  /* max < 0 => disable CSMA (set to 7) */
-    DEBUG("Retries: %i ", retries);
     mutex_lock(&dev->lock);
-    uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_0);
-    tmp &= ~(AT86RF2XX_XAH_CTRL_0__MAX_CSMA_RETRIES);
-    tmp |= (retries << 1);
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__XAH_CTRL_0, tmp);
+    at86rf2xx_set_csma_max_retries(dev, retries);
 
     if (bd) {
-        uint8_t max = bd->max;
-        uint8_t min = bd->min;
-        DEBUG("max: %i ", max);
-        DEBUG("min: %i ", min);
-        max = MIN(8, max);
-        min = MIN(min, max);
-        at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_BE, (max << 4) | (min));
+        at86rf2xx_set_csma_backoff_exp(dev, bd->min, bd->max);
     }
     DEBUG("\n");
 
@@ -630,6 +618,12 @@ static int _set_frame_filter_mode(ieee802154_dev_t *hal, ieee802154_filter_mode_
     mutex_lock(&dev->lock);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_PROMISCUOUS, promisc);
     mutex_unlock(&dev->lock);
+    return 0;
+}
+
+static int _set_frame_retrans(ieee802154_dev_t *hal, uint8_t retrans)
+{
+    at86rf2xx_set_max_retries(hal->priv, retrans);
     return 0;
 }
 
@@ -856,6 +850,7 @@ static const ieee802154_radio_ops_t at86rf2xx_ops = {
     .config_addr_filter = _config_addr_filter,
     .config_src_addr_match = _config_src_addr_match,
     .set_frame_filter_mode = _set_frame_filter_mode,
+    .set_frame_retrans = _set_frame_retrans,
 #if IS_USED(MODULE_AT86RF2XX_AES_SPI) && IS_USED(MODULE_IEEE802154_SECURITY)
     .cipher_ops = &_at86rf2xx_cipher_ops,
 #endif
