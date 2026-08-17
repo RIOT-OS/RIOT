@@ -75,7 +75,8 @@ static inline bool _does_handle_csma(ieee802154_dev_t *dev)
 
 static bool _has_retrans_left(ieee802154_submac_t *submac)
 {
-    return submac->retrans < CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS;
+    return !ieee802154_radio_has_frame_retrans(&submac->dev) &&
+        submac->retrans < CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS;
 }
 
 static ieee802154_fsm_state_t _tx_end(ieee802154_submac_t *submac, int status,
@@ -814,6 +815,12 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     ieee802154_submac_config_phy(submac, &conf.super);
     ieee802154_radio_set_cca_threshold(dev,
                                        CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
+
+    if (ieee802154_radio_has_frame_retrans(&submac->dev)) {
+        ieee802154_radio_set_frame_retrans(&submac->dev,
+                CONFIG_IEEE802154_DEFAULT_MAX_FRAME_RETRANS);
+    }
+
     assert(res >= 0);
 
     while (ieee802154_radio_set_rx(dev) < 0) {}
