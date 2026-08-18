@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <stdlib.h>
 #include "ztimer.h"
 #include "random.h"
 #include "event.h"
@@ -292,13 +293,11 @@ static inline int unicoap_layer_notification_async_failure_to_errno(unicoap_laye
 
 /**
  * @brief Converts positive error number into notification
- * @param error Negative integer indicating error
+ * @param error Positive or negative integer indicating error, e.g., `-ETIMEDOUT` or `ETIMEDOUT`
  * @returns Notification
  */
 static inline unicoap_layer_notification_t unicoap_layer_notification_async_failure_from_errno(int error) {
-    assert(error > 0);
-    assert((-error) & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE);
-    return -error;
+    return -abs(error);
 }
 
 /**

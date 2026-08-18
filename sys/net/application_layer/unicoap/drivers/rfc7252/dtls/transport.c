@@ -237,7 +237,7 @@ int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
                                   CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS * US_PER_MS, NULL);
     }
 
-    if (res < 0) {
+    if (res <= 0) {
         switch (res) {
         case -EHOSTUNREACH:
         case -ENOTCONN:

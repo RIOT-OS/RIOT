@@ -193,12 +193,11 @@ static int _open_request(unicoap_message_t* request,
                 request->options = options;
             }
             unicoap_endpoint_t endpoint = { 0 };
-            assert(uri_parser_is_absolute(destination->remote.uri, 
-                strlen(destination->remote.uri)));
+            assert(uri_parser_is_absolute(destination->remote.uri, destination->_string_length));
 
             uri_parser_result_t parsed = { 0 };
             if ((res = uri_parser_process(
-                &parsed, destination->remote.uri, strlen(destination->remote.uri)
+                &parsed, destination->remote.uri, destination->_string_length
             )) < 0) {
                 _URI_DEBUG("URI malformed: %i (%s)\n", res, strerror(-res));
                 return res;
