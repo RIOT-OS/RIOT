@@ -340,15 +340,15 @@ _messaging_flags_resource(unicoap_resource_flags_t resource_flags)
 }
 
 /**
- * @brief Retrieves the part of a client flags bitfield relevant for the messaging driver.
+ * @brief Retrieves the part of a request flags bitfield relevant for the messaging driver.
  *
- * @param client_flags Client flags
+ * @param request_flags Request flags
  * @return Messaging flags extracted from the given bitfield
  */
-static inline unicoap_messaging_flags_t _messaging_flags_client(unicoap_request_flags_t client_flags) {
+static inline unicoap_messaging_flags_t _messaging_flags_client(unicoap_request_flags_t request_flags) {
     /* We documented other flags are RFU, hence downcasting to the messaging
      flags bitfield width is fine here */
-    return (unicoap_messaging_flags_t)client_flags;
+    return (unicoap_messaging_flags_t)request_flags;
 }
 /** @}  */
 
@@ -404,12 +404,12 @@ int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_mem
  *
  * @param packet Packet to send
  * @param memo Optional memo
- * @param client_flags Request flags
+ * @param request_flags Request flags
  *
  * @returns Zero on success or negative integer on error
  */
 int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_memo_t* memo,
-                                     unicoap_request_flags_t client_flags);
+                                     unicoap_request_flags_t request_flags);
 
 /**
  * @brief Sends entire request body, may be split into parts and then sent

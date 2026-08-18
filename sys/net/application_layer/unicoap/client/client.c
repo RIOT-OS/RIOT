@@ -76,7 +76,7 @@ int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_mem
 }
 
 int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_memo_t* memo,
-                                     unicoap_request_flags_t client_flags) {
+                                     unicoap_request_flags_t request_flags) {
     int res = 0;
 
     if (memo) {
@@ -87,7 +87,7 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
     assert(packet->properties.token);
     unicoap_generate_token(packet->properties.token);
     packet->properties.token_length = CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH;
-    unicoap_messaging_flags_t messaging_flags = _messaging_flags_client(client_flags);
+    unicoap_messaging_flags_t messaging_flags = _messaging_flags_client(request_flags);
     if (memo) {
         /* State has been allocated, instruct the messaging layer to track success/failures
          * with this transmission. If a NON is sent, this flag tells the RFC 7252 driver

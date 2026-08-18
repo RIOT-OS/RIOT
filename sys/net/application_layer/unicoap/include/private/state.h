@@ -292,7 +292,7 @@ static inline int unicoap_layer_notification_async_failure_to_errno(unicoap_laye
 }
 
 /**
- * @brief Converts positive error number into notification
+ * @brief Converts error number into notification
  * @param error Positive or negative integer indicating error, e.g., `-ETIMEDOUT` or `ETIMEDOUT`
  * @returns Notification
  */

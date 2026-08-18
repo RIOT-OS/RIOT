@@ -115,7 +115,7 @@ static int _cli(int argc, char** argv) {
     if (argc > 2 && strncmp(argv[2], "-", 1) == 0) {
         if (strcmp(argv[2], "-r") == 0) {
             /* For reliable transmission, use RELIABLE client request flag. */
-            flags |= UNICOAP_CLIENT_FLAG_RELIABLE;
+            flags |= UNICOAP_REQUEST_FLAG_RELIABLE;
         } else {
             printf("error: unsupported flag '%s'\n", argv[2]);
             goto help;

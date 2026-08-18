@@ -715,9 +715,9 @@ void unicoap_print_resource(const unicoap_resource_t* resource) {
     printf(">");
 }
 
-void unicoap_print_client_flags(unicoap_request_flags_t flags) {
+void unicoap_print_request_flags(unicoap_request_flags_t flags) {
     printf("[ ");
-    if (flags & UNICOAP_CLIENT_FLAG_RELIABLE) {
+    if (flags & UNICOAP_REQUEST_FLAG_RELIABLE) {
         printf("RELIABLE ");
     }
     printf("]");

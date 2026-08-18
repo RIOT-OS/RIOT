@@ -57,7 +57,7 @@ static int _on_response(
 
 static int _set_flags(char* opt, unicoap_request_flags_t* flags, uint8_t* shell_flags) {
     if (strcmp(opt, "-r") == 0) {
-        *flags |= UNICOAP_CLIENT_FLAG_RELIABLE;
+        *flags |= UNICOAP_REQUEST_FLAG_RELIABLE;
     } else if (strcmp(opt, "-t") == 0) {
         *shell_flags |= _SHELL_FLAG_TEXT;
     } else {
