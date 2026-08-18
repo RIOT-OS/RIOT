@@ -22,6 +22,7 @@
 #include "log.h"
 #include "event.h"
 #include "iolist.h"
+#include "sys/bus.h"
 #include "byteorder.h"
 
 #include "net/eui64.h"
