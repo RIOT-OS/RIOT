@@ -113,7 +113,7 @@ typedef struct {
  * @{
  */
 #ifdef CPU_FAM_STM32H7
-#  define FDCAN_STM32_TX_MAILBOXES 64
+#  define FDCAN_STM32_TX_BUFFERS 64
     /**< Number of frames the driver can transmit simultaneously */
 #else
 #  define FDCAN_STM32_TX_MAILBOXES 12
@@ -121,7 +121,7 @@ typedef struct {
 #endif
 
 #ifdef CPU_FAM_STM32H7
-#  define FDCAN_STM32_RX_MAILBOXES (128)
+#  define FDCAN_STM32_RX_BUFFERS 128
     /**< Maximum number of frames the driver can receive simultaneously.
          There are 64 buffers per RxFIFO */
 #else
@@ -574,8 +574,13 @@ static const uint8_t fdcan_bytes_lut[8] = {8, 12, 16, 20, 24, 32, 48, 64};
 
 /** This structure holds anything related to the receive part */
 typedef struct candev_stm32_rx_mailbox {
+#ifdef CPU_FAM_STM32H7
+        can_frame_t frame[FDCAN_STM32_RX_BUFFERS];
+        /**< Receive FIFO */
+#else
     can_frame_t frame[FDCAN_STM32_RX_MAILBOXES];
         /**< Receive FIFO */
+#endif
     int write_idx;
         /**< Write index in the receive FIFO */
     int read_idx;
@@ -614,8 +619,13 @@ struct can {
     gpio_t rx_pin;                      /**< RX pin */
     gpio_t tx_pin;                      /**< TX pin */
     gpio_af_t af;                       /**< Alternate pin function to use */
+#ifdef CPU_FAM_STM32H7
+    const can_frame_t
+        *tx_mailbox[FDCAN_STM32_TX_BUFFERS];  /**< Tx mailboxes*/
+#else
     const can_frame_t
         *tx_mailbox[FDCAN_STM32_TX_MAILBOXES];  /**< Tx mailboxes*/
+#endif
     candev_stm32_rx_mailbox_t rx_mailbox;       /**< Rx mailboxes */
     candev_stm32_isr_t isr_flags;               /**< ISR flags */
     fdcan_msg_ram_t *msg_ram;                   /**< Message RAM block addresses */

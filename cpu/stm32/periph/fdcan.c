@@ -480,43 +480,42 @@ static int filter_is_set(can_t *dev, uint8_t filter_id)
 #if CPU_FAM_STM32H7
         if (filter_id < CONFIG_FDCAN_STD_FILTERS_NUM) {
             DEBUG("%s: Filter %u is lesser than standard filter list size (%lx)\n",
-                    __func__,
-                    filter_id,
-                    (can->SIDFC & FDCAN_SIDFC_LSS) >> FDCAN_SIDFC_LSS_Pos);
+                  __func__,
+                  filter_id,
+                  (can->SIDFC & FDCAN_SIDFC_LSS) >> FDCAN_SIDFC_LSS_Pos);
             uint32_t *fls_ram_address = get_message_ram(dev)
                                         + FDCAN_SRAM_FLS_FILTER_SIZE * filter_id;
 #else
         if (filter_id < (can->RXGFC & FDCAN_RXGFC_LSS) >> FDCAN_RXGFC_LSS_Pos) {
             DEBUG("%s: Filter %u is lesser than standard filter list size (%lx)\n",
-                __func__,
-                filter_id,
-                (can->RXGFC & FDCAN_RXGFC_LSS) >> FDCAN_RXGFC_LSS_Pos);
+                  __func__,
+                  filter_id,
+                  (can->RXGFC & FDCAN_RXGFC_LSS) >> FDCAN_RXGFC_LSS_Pos);
             /* Filter List Standard start at
              * RAM address + FLSSA (0x00) + standard filter offset (4 Bytes * filter_id) */
             uint32_t *fls_ram_address = get_message_ram(can)
                                         + FDCAN_SRAM_FLS_FILTER_SIZE * filter_id;
 #endif
             DEBUG("%s: FDCAN%u ftandard filter message RAM address is %p\n",
-                __func__, get_channel_id(can),
-                fls_ram_address
-                );
+                  __func__, get_channel_id(can),
+                  fls_ram_address);
 
             if (((*fls_ram_address & FDCAN_SRAM_FLS_SFT) != FDCAN_SRAM_FLS_SFT_DISABLED)
                 || ((*fls_ram_address & FDCAN_SRAM_FLS_SFEC) != FDCAN_SRAM_FLS_SFEC_DISABLED)) {
                 DEBUG("%s: FDCAN%u filter %u is enabled by SFT(%lx) and SFEC(%lx)\n",
-                __func__, get_channel_id(can),
-                filter_id,
-                (*fls_ram_address & FDCAN_SRAM_FLS_SFT),
-                (*fls_ram_address & FDCAN_SRAM_FLS_SFEC));
+                      __func__, get_channel_id(can),
+                      filter_id,
+                      (*fls_ram_address & FDCAN_SRAM_FLS_SFT),
+                      (*fls_ram_address & FDCAN_SRAM_FLS_SFEC));
 
                 ret = true;
             }
             else {
                 DEBUG("%s: FDCAN%u filter %u is disabled by SFT(%lx) and/or SFEC(%lx)\n",
-                __func__, get_channel_id(can),
-                filter_id,
-                (*fls_ram_address & FDCAN_SRAM_FLS_SFT),
-                (*fls_ram_address & FDCAN_SRAM_FLS_SFEC));
+                      __func__, get_channel_id(can),
+                      filter_id,
+                      (*fls_ram_address & FDCAN_SRAM_FLS_SFT),
+                      (*fls_ram_address & FDCAN_SRAM_FLS_SFEC));
             }
         }
     }
@@ -558,16 +557,16 @@ static int filter_is_set(can_t *dev, uint8_t filter_id)
             if ((*fle_ram_address_f0 & FDCAN_SRAM_FLE_F0_EFEC) != FDCAN_SRAM_FLE_F0_EFEC_DISABLED) {
 
                 DEBUG("%s: FDCAN%u filter %u is enabled by EFEC(%lx)\n",
-                  __func__, get_channel_id(can),
-                  filter_id,
-                  (*fle_ram_address_f0 & FDCAN_SRAM_FLE_F0_EFEC));
+                      __func__, get_channel_id(can),
+                      filter_id,
+                      (*fle_ram_address_f0 & FDCAN_SRAM_FLE_F0_EFEC));
                 ret = true;
             }
             else {
                 DEBUG("%s: FDCAN%u filter %u is disabled by EFEC(%lx)\n",
-                  __func__, get_channel_id(can),
-                  filter_id,
-                  (*fle_ram_address_f0 & FDCAN_SRAM_FLE_F0_EFEC));
+                      __func__, get_channel_id(can),
+                      filter_id,
+                      (*fle_ram_address_f0 & FDCAN_SRAM_FLE_F0_EFEC));
             }
         }
     }
@@ -1275,6 +1274,16 @@ static int _abort(candev_t *candev, const can_frame_t *frame)
     FDCAN_GlobalTypeDef *can = dev->conf->can;
     int mailbox = 0;
 
+#if CPU_FAM_STM32H7
+    for (mailbox = 0; mailbox < FDCAN_STM32_TX_BUFFERS; mailbox++) {
+            if (dev->tx_mailbox[mailbox] == frame) {
+                break;
+            }
+        }
+    if (mailbox == FDCAN_STM32_TX_BUFFERS) {
+        return -EOVERFLOW;
+    }
+#else
     for (mailbox = 0; mailbox < FDCAN_STM32_TX_MAILBOXES; mailbox++) {
         if (dev->tx_mailbox[mailbox] == frame) {
             break;
@@ -1283,6 +1292,7 @@ static int _abort(candev_t *candev, const can_frame_t *frame)
     if (mailbox == FDCAN_STM32_TX_MAILBOXES) {
         return -EOVERFLOW;
     }
+#endif
 
     can->TXBCR = 1 << (uint32_t)mailbox;
     dev->tx_mailbox[mailbox] = NULL;
@@ -1773,8 +1783,13 @@ static int _set_filter(candev_t *candev, const struct can_filter *filter)
                     &&  !(filter->can_mask & ~CAN_SFF_MASK)))) { /* or the filter is standard */
             can_mode_t mode = get_mode(can);
             set_mode(can, MODE_INIT);
+#if CPU_FAM_STM32H7
+            res = set_filter(dev, filter->can_id, filter->can_mask,\
+                             i, i % FDCAN_STM32_RX_BUFFERS);
+#else
             res = set_filter(dev, filter->can_id, filter->can_mask,\
                              i, i % FDCAN_STM32_RX_MAILBOXES);
+#endif
             set_mode(can, mode);
             if (res) {
                 return -EINVAL;
@@ -1905,9 +1920,15 @@ static void rx_new_message_irq_handler(can_t *dev, uint8_t message_ram_rx_fifo)
         read_frame(dev, &(dev->rx_mailbox.frame[i]), message_ram_rx_fifo);
 
         dev->rx_mailbox.write_idx++;
+#if CPU_FAM_STM32H7
+        if (dev->rx_mailbox.write_idx == FDCAN_STM32_RX_BUFFERS) {
+            dev->rx_mailbox.write_idx = 0;
+        }
+#else
         if (dev->rx_mailbox.write_idx == FDCAN_STM32_RX_MAILBOXES) {
             dev->rx_mailbox.write_idx = 0;
         }
+#endif
         if (dev->rx_mailbox.write_idx == dev->rx_mailbox.read_idx) {
             dev->rx_mailbox.is_full = 1;
         }
@@ -1939,9 +1960,15 @@ static void rx_isr(can_t *dev)
         }
 
         dev->rx_mailbox.read_idx++;
+#if CPU_FAM_STM32H7
+        if (dev->rx_mailbox.write_idx == FDCAN_STM32_RX_BUFFERS) {
+            dev->rx_mailbox.write_idx = 0;
+        }
+#else
         if (dev->rx_mailbox.read_idx == FDCAN_STM32_RX_MAILBOXES) {
             dev->rx_mailbox.read_idx = 0;
         }
+#endif
 
         dev->rx_mailbox.is_full = 0;
     }
