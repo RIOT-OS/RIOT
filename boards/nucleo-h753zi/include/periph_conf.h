@@ -196,6 +196,7 @@ static const pwm_conf_t pwm_config[] = {
  * @name    FDCAN configuration
  * @{
  */
+/**< Available CAN interfaces */
 static const can_conf_t candev_conf[] = {
     {
         .can = FDCAN1,
