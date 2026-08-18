@@ -35,10 +35,6 @@
 extern "C" {
 #endif
 
-/**
- * @name   MicroPython configuration
- * @{
- */
 #define MICROPY_COMP_CONST_FOLDING                  (1)
 #define MICROPY_COMP_CONST                          (1)
 #define MICROPY_COMP_DOUBLE_TUPLE_ASSIGN            (1)
@@ -99,8 +95,8 @@ extern "C" {
 
 #define MICROPY_MODULE_FROZEN_STR                   (0)
 
-typedef intptr_t mp_int_t;   /* must be pointer size */
-typedef uintptr_t mp_uint_t; /* must be pointer size */
+typedef intptr_t mp_int_t;
+typedef uintptr_t mp_uint_t;
 typedef long mp_off_t;
 
 #define MICROPY_BEGIN_ATOMIC_SECTION()              irq_disable()
@@ -116,5 +112,3 @@ void mp_riot_sched_hook(void);
 #ifdef __cplusplus
 }
 #endif
-
-/** @} */
