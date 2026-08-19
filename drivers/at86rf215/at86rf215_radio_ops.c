@@ -315,15 +315,19 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
         return _request_rx(dev);
         break;
     case IEEE802154_HAL_OP_SET_IDLE:
-        bool force = *((bool *)ctx);
-        return _request_idle(dev, force);
-        break;
+        {
+            bool force = *((bool *)ctx);
+            return _request_idle(dev, force);
+            break;
+        }
     case IEEE802154_HAL_OP_CCA:
-        at86rf215_state_t next_cca_state = (dev->state == AT86RF215_STATE_IDLE) ?
-                                           AT86RF215_STATE_CCA_IDLE : AT86RF215_STATE_CCA_RX;
+        {
+            at86rf215_state_t next_cca_state = (dev->state == AT86RF215_STATE_IDLE) ?
+                AT86RF215_STATE_CCA_IDLE : AT86RF215_STATE_CCA_RX;
 
-        return _request_cca(dev, next_cca_state);
-        break;
+            return _request_cca(dev, next_cca_state);
+            break;
+        }
     default:
         return -ENOTSUP;
     }
@@ -503,16 +507,18 @@ static int _config_src_addr_match(ieee802154_dev_t *hal, ieee802154_src_match_t 
 
     switch (cmd) {
     case IEEE802154_SRC_MATCH_EN:
-        bool enable = *(const bool *)value;
-        if (enable) {
-            at86rf215_reg_write(dev, dev->BBC->RG_AMAACKPD, 0x0F);
-            at86rf215_reg_or(dev, dev->BBC->RG_IRQM, BB_IRQ_RXAM);
+        {
+            bool enable = *(const bool *)value;
+            if (enable) {
+                at86rf215_reg_write(dev, dev->BBC->RG_AMAACKPD, 0x0F);
+                at86rf215_reg_or(dev, dev->BBC->RG_IRQM, BB_IRQ_RXAM);
+            }
+            else {
+                at86rf215_reg_write(dev, dev->BBC->RG_AMAACKPD, 0);
+                at86rf215_reg_and(dev, dev->BBC->RG_IRQM, ~BB_IRQ_RXAM);
+            }
+            break;
         }
-        else {
-            at86rf215_reg_write(dev, dev->BBC->RG_AMAACKPD, 0);
-            at86rf215_reg_and(dev, dev->BBC->RG_IRQM, ~BB_IRQ_RXAM);
-        }
-        break;
     default:
         return -ENOTSUP;
     }
