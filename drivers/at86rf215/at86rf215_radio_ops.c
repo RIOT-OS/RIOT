@@ -816,17 +816,16 @@ static void at86rf215_irq_handler(ieee802154_dev_t *hal)
     ieee802154_dev_t *sibling_hal = dev->sibling;
     at86rf215_t *sibling_dev = sibling_hal ? sibling_hal->priv : NULL;
 
-    at86rf215_handle_common_irq(hal);
+    do {
+        at86rf215_handle_common_irq(hal);
 
-    /* If the interrupt pin is still high, there was an IRQ on the other radio */
-    if (gpio_read(dev->params.int_pin)) {
         if (sibling_dev && sibling_dev->state != AT86RF215_STATE_OFF) {
             at86rf215_handle_common_irq(sibling_hal);
         }
         else {
             _clear_sibling_irq(dev);
         }
-    }
+    } while (gpio_read(dev->params.int_pin));
 }
 
 static void _event_handler(event_t *event)
