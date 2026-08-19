@@ -13,6 +13,7 @@
 #include "net/unicoap/transport.h" /* IWYU pragma: export */
 #include "net/unicoap/server.h" /* IWYU pragma: export */
 #include "net/unicoap/client.h" /* IWYU pragma: export */
+#include "net/unicoap/blockwise.h" /* IWYU pragma: export */
 
 #ifdef __cplusplus
 extern "C" {

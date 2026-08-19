@@ -27,6 +27,16 @@ ifneq (,$(filter unicoap,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_unicoap
 endif
 
+ifneq (,$(filter unicoap_blockwise,$(USEMODULE)))
+  USEMODULE += unicoap_blockwise_kit
+  ifneq (,$(filter unicoap_client,$(USEMODULE)))
+    USEMODULE += unicoap_client_blockwise
+  endif
+	ifneq (,$(filter unicoap_server,$(USEMODULE)))
+    USEMODULE += unicoap_server_blockwise
+	endif
+endif
+
 # This variable ensures the "Missing client" warning gets printed only once
 _UNICOAP_MISSING_CLIENT ?= 0
 

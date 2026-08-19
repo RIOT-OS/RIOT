@@ -19,6 +19,7 @@
 #include "private/state.h"
 #include "private/packet.h"
 #include "private/messaging.h"
+#include "private/features/blockwise.h"
 
 /**
  * @defgroup net_unicoap_private Private API
@@ -69,8 +70,11 @@ extern "C" {
 #  define _STATE_NOTIF_DEBUG(...)               _UNICOAP_PREFIX_DEBUG(".state.notif", __VA_ARGS__)
 #  define _TRANSPORT_DEBUG(...)                 _UNICOAP_PREFIX_DEBUG(".transport", __VA_ARGS__)
 #  define _SERVER_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".server", __VA_ARGS__)
+#  define _SERVER_BLOCKWISE_DEBUG(...)          _UNICOAP_PREFIX_DEBUG(".server.blockwise", __VA_ARGS__)
 #  define _CLIENT_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".client", __VA_ARGS__)
+#  define _CLIENT_BLOCKWISE_DEBUG(...)          _UNICOAP_PREFIX_DEBUG(".client.blockwise", __VA_ARGS__)
 #  define _URI_DEBUG(...)                    _UNICOAP_PREFIX_DEBUG(".uri", __VA_ARGS__)
+#  define _BLOCKWISE_DEBUG(...)                 _UNICOAP_PREFIX_DEBUG(".blockwise", __VA_ARGS__)
 #  define API_WARNING(message)                 "WARNING: " message "\n"
 #  define API_ERROR(message)                   "ERROR: " message "\n"
 #  define API_MISUSE(message)                  "API MISUSE: " message "\n"
@@ -160,6 +164,25 @@ typedef struct {
     unicoap_client_memo_t client_memos[CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY];
 #endif
 
+#if UNICOAP_HAVE_SERVER_STATE
+    /** @ref unicoap_memo_t */
+    unicoap_server_memo_t server_memos[CONFIG_UNICOAP_SERVER_MEMOS_CAPACITY];
+#endif
+
+#if UNICOAP_HAVE_BLOCKWISE_STATE
+    /** @brief Block-wise transfer state objects */
+    unicoap_blockwise_transfer_t blockwise_transfers[CONFIG_UNICOAP_BLOCKWISE_TRANSFERS_CAPACITY];
+
+#  if CONFIG_UNICOAP_BLOCKWISE_BUFFERS_POOL_CAPACITY > 0
+    /** @brief Buffers for slicing and reassembling */
+    uint8_t blockwise_buffers[CONFIG_UNICOAP_BLOCKWISE_BUFFERS_POOL_CAPACITY]
+                             [CONFIG_UNICOAP_BLOCKWISE_BODY_CAPACITY];
+
+    /** @brief Bitfield used to mark buffers currently in use */
+    BITFIELD(blockwise_buffers_used, CONFIG_UNICOAP_BLOCKWISE_BUFFERS_POOL_CAPACITY);
+#  endif
+#endif
+
     /* TODO: Client and advanced server features: Exchange-layer state objects */
 } unicoap_state_t;
 
@@ -208,6 +231,47 @@ int unicoap_init_rfc7252_common(event_queue_t* queue);
 int unicoap_deinit_rfc7252_common(event_queue_t* queue);
 
 /* MARK: unicoap_driver_extension_point */
+/** @} */
+
+/* MARK: - Private client utils */
+/**
+ * @name  Private client utils
+ * @{
+ */
+/**
+ * @brief Sends off client message and creates a state object for pending request
+ * @private
+ *
+ * @param request Request message
+ * @param destination Request destination
+ * @param callback Callback -- either response or block callback, see @ref unicoap_callback_t
+ * @param parameters Optional parameters (nullable)
+ * @param flags Client flags
+ *
+ * @returns Zero on success
+ * @returns Negative integer on error
+ */
+int unicoap_open_request(unicoap_message_t* request,
+                         unicoap_destination_t* destination,
+                         unicoap_callback_t callback, 
+                         unicoap_request_parameters_t* parameters,
+                         unicoap_request_flags_t flags);
+
+/**
+ * @brief Bitfield values determining exchange layer (request/response) stack behavior
+ * @private
+ */
+typedef enum {
+    /**
+     * @brief Block-wise collect and invoke callback for each block
+     * @private
+     *
+     * This flag is private. Access to block-wise callback functionality is gated behing
+     * public `unicoap_send_request_blockwise_*` APIs.
+     */
+    UNICOAP_CLIENT_FLAG_BLOCK_CALLBACK = 0x0080,
+
+} unicoap_client_flags_internal_t;
 /** @} */
 
 /* MARK: - Private Server Utils */

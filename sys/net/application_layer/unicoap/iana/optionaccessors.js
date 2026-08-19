@@ -732,7 +732,7 @@ static inline int unicoap_options_remove_${suffixPlural(o)}(unicoap_options_t* o
  * @note This constant occupies 4 bytes and does thus not represent a valid \`Block1\` or \`Block2\`
  *   value.
  */
-#define UNICOAP_BLOCK_OPTION_NONE (0x0f000000)
+#define UNICOAP_BLOCK_OPTION_NONE (0x01000000)
 
 /**
  * @brief \`Block1\` and \`Block2\` option value

@@ -113,11 +113,102 @@ int unicoap_resource_handle_well_known_core(unicoap_message_t* message, const un
     return unicoap_send_response(message, ctx);
 }
 
+static void _on_blockwise_transfer_timeout(unicoap_scheduled_event_t* timeout) {
+    _SERVER_BLOCKWISE_DEBUG("block-wise memory period expired, forgetting\n");
+    unicoap_server_memo_free(unicoap_server_memo_of_timeout(timeout));
+}
+
 int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resource_t* resource)
 {
     assert(packet);
     assert(packet->remote);
     int res = 0;
+    unicoap_server_memo_t* memo = NULL;
+
+    if (IS_USED(MODULE_UNICOAP_SERVER_BLOCKWISE)) {
+        /* Try to find an active block-wise transfer. */
+        unicoap_blockwise_transfer_t* transfer = NULL;
+
+        if (resource->flags & (UNICOAP_RESOURCE_FLAG_REASSEMBLE | UNICOAP_RESOURCE_FLAG_SLICE)) {
+            /* From RFC 7959, Section 2.4
+             * The Block2 Option provides no way for a single endpoint to perform
+             * multiple concurrently proceeding block-wise response payload transfer
+             * (e.g., GET) operations to the same resource */
+            bool block1 = unicoap_options_contains(packet->message->options, UNICOAP_OPTION_BLOCK1);
+            memo = unicoap_server_memo_find_blockwise(packet->remote, resource);
+            if (block1 && memo && unicoap_memo_blockwise_transfer_get(&memo->super)->stage == 
+                UNICOAP_BLOCKWISE_STAGE_SLICE
+            ) {
+                /* We see a new Block1 option in the request, meaning the client wants to transfer
+                 * another request body. The previous transfer in the Block2 / slice stage is 
+                 * thus obsolete. In fact, the Block2/response body may change due to a new
+                 * request (with a new Block1/request body). */
+                _SERVER_BLOCKWISE_DEBUG("client starting over, forgetting transfer\n");
+                unicoap_server_memo_free(memo);
+                memo = NULL;
+            }
+
+            if (memo) {
+                transfer = unicoap_memo_blockwise_transfer_get(&memo->super);
+                unicoap_event_cancel(&memo->super.exchange.timeout);
+            }
+            else {
+                if ((resource->flags & UNICOAP_RESOURCE_FLAG_REASSEMBLE && block1) ||
+                    /* this check is only for the first request to a resource when the client
+                     * suggests a block SZX */
+                    (resource->flags & UNICOAP_RESOURCE_FLAG_SLICE &&
+                     unicoap_options_contains(packet->message->options, UNICOAP_OPTION_BLOCK2))) {
+
+                    if (!(memo = unicoap_server_memo_create(packet->remote, resource)) ||
+                        !(transfer = unicoap_blockwise_transfer_create(
+                              &memo->super, _blockwise_flags_resource(resource->flags)))) {
+                        res = UNICOAP_STATUS_INTERNAL_SERVER_ERROR;
+                        unicoap_response_init_empty(packet->message,
+                                                    UNICOAP_STATUS_INTERNAL_SERVER_ERROR);
+                        goto error;
+                    }
+
+                    transfer->stage = block1 ? UNICOAP_BLOCKWISE_STAGE_COLLECT :
+                                               UNICOAP_BLOCKWISE_STAGE_SLICE;
+                    if ((res = unicoap_blockwise_transfer_setup(
+                        NULL, transfer, _blockwise_flags_resource(resource->flags),
+                        packet->remote->proto, true
+                    )) < 0) {
+                        res = UNICOAP_STATUS_INTERNAL_SERVER_ERROR;
+                        unicoap_response_init_empty(packet->message,
+                                                    UNICOAP_STATUS_INTERNAL_SERVER_ERROR);
+                        goto error;
+                    }
+                }
+            }
+
+            if (transfer) {
+                /* Only do block-wise processing if we have a block-wise transfer.
+                 * For example, if the request doesn't carry a Block1/2 option,
+                 * there isn't a block-wise transfer yet. */
+
+                if ((res = unicoap_server_process_request_blockwise(
+                    packet, memo, resource
+                )) < 0) {
+                    unicoap_response_init_empty(packet->message,
+                                                unicoap_response_status_from_errno(res));
+                    goto error;
+                }
+                if (res > 0) {
+                    /* If the Block1 exchange with the client is still ongoing,
+                     * do not call the resource handler. Similarly, if the handler
+                     * was already called and a Block2 exchange is therefore in
+                     * progress, don't call the handler again. */
+
+                    unicoap_event_schedule(&memo->super.exchange.timeout, 
+                                           _on_blockwise_transfer_timeout,
+                                           CONFIG_UNICOAP_TIMEOUT_SERVER_BLOCKWISE_MS,
+                                           "server.blockwise.amnesia");
+                    return 0;
+                }
+            }
+        }
+    }
 
     unicoap_request_context_t context = {
         .resource = resource, ._packet = packet
@@ -148,7 +239,7 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
         }
 
         unicoap_response_init_empty(packet->message, (unicoap_status_t)res);
-        return unicoap_server_send_response_body(packet, resource);
+        return unicoap_server_send_response_body(packet, NULL, resource);
     }
     else if (context._packet) {
         /* application didn't send a response or deferred response,
@@ -175,29 +266,79 @@ int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resou
     return 0;
 
 error:
-    if ((res = unicoap_server_send_response_body(packet, resource)) < 0) {
+    if ((res = unicoap_server_send_response_body(packet, NULL, resource)) < 0) {
         return res;
     }
 
-    /* TODO: Advanced server features: Free exchange-layer state */
+    if (memo) {
+        unicoap_server_memo_free(memo);
+    }
     return 0;
+}
+
+int unicoap_server_send_response_part(unicoap_packet_t* packet, unicoap_server_memo_t* memo,
+                                      unicoap_resource_flags_t resource_flags) {
+    int res = 0;
+    /* TODO: OSCORE */
+    if ((res = unicoap_messaging_send(
+        packet, _messaging_flags_resource(resource_flags), &memo->super
+    )) < 0) {
+        _SERVER_DEBUG("error: could not send message\n");
+    }
+    return res;
 }
 
 /**
  * @brief Common function for @ref unicoap_send_response and @ref unicoap_send_response_deferred
  */
 int unicoap_server_send_response_body(unicoap_packet_t* packet,
+                                      unicoap_server_memo_t* memo,
                                       const unicoap_resource_t* resource)
 {
     int res = 0;
-    if ((res = unicoap_messaging_send(packet, _messaging_flags_resource(resource->flags), NULL)) < 0) {
-        _SERVER_DEBUG("error: could not send response\n");
+    /* TODO: OSCORE */
+    if (IS_USED(MODULE_UNICOAP_SERVER_BLOCKWISE)) {
+        if (resource->flags & UNICOAP_RESOURCE_FLAG_SLICE &&
+            unicoap_message_payload_get_size(packet->message) > CONFIG_UNICOAP_BLOCK_SIZE) {
+            if (!memo &&
+                !(memo = unicoap_server_memo_find_blockwise(packet->remote, resource))) {
+                if (!(memo = unicoap_server_memo_create(packet->remote, resource))) {
+                    res = -ENOBUFS;
+                    goto internal_server_error;
+                }
+            }
+
+            if ((res = unicoap_server_prepare_response_blockwise(
+                packet, memo, _blockwise_flags_resource(resource->flags)
+            )) < 0) {
+                goto internal_server_error;
+            }
+        }
+    }
+
+    unicoap_resource_flags_t flags = resource->flags;
+    if ((res = unicoap_server_send_response_part(packet, memo, flags)) < 0) {
         goto error;
+    }
+
+    if (memo && !unicoap_memo_blockwise_transfer_get(&memo->super)) {
+        _SERVER_DEBUG("finished sending response body\n");
+        unicoap_server_memo_free(memo);
     }
     return 0;
 
+internal_server_error:
+    _SERVER_DEBUG("internal server error, sending CoAP response\n");
+    unicoap_response_init_empty(packet->message, UNICOAP_STATUS_INTERNAL_SERVER_ERROR);
+    unicoap_messaging_send(
+        packet, 
+        _messaging_flags_resource(resource->flags) & ~UNICOAP_MESSAGING_FLAG_RELIABLE,
+        NULL
+    );
+
 error:
-    /* TODO: Client and advanced server features: free allocated state */
+    _SERVER_DEBUG("failed to send response (%i, %s)\n", res, strerror(-res));
+    unicoap_server_memo_free(memo);
     return res;
 }
 
@@ -220,7 +361,7 @@ int unicoap_send_response(unicoap_message_t* response, unicoap_request_context_t
     /* reuse the packet, stack-allocated, we're still inside resource handler */
     ((unicoap_packet_t*)context->_packet)->message = response;
     int res = unicoap_server_send_response_body((unicoap_packet_t*)context->_packet,
-                                                context->resource);
+                                                NULL, context->resource);
 
     /* prevent context from being used for sending a response again.
      * If sending response on lower layer fails, then res < 0,

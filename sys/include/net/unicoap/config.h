@@ -249,6 +249,18 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
 #  define CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY (2)
 #endif
 
+/**
+ * @brief Maximum number of managed server request-response exchanges
+ *
+ * Automatic server block-wise transfers require a server memo per exchange
+ *
+ ***Default**: 2
+ *
+ */
+#if !defined(CONFIG_UNICOAP_SERVER_MEMOS_CAPACITY) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_SERVER_MEMOS_CAPACITY (2)
+#endif
+
 /** @} */
 
 /* MARK: - Timing */
@@ -278,6 +290,16 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
  */
 #if !defined(CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS (7000)
+#endif
+
+/**
+ * @brief Maximum duration to wait for the next Block1 or Block1 request in a Block-wise transfer (server)
+ *
+ * **Unit**: milliseconds
+ * **Default**: 60000 ms = 60s
+ */
+#if !defined(CONFIG_UNICOAP_TIMEOUT_SERVER_BLOCKWISE_MS) || defined(DOXYGEN)
+#  define CONFIG_UNICOAP_TIMEOUT_SERVER_BLOCKWISE_MS (60 * MS_PER_SEC)
 #endif
 /** @} */
 
@@ -490,42 +512,6 @@ static_assert(CONFIG_UNICOAP_RETRANSMISSIONS_MAX < 32,
        CONFIG_UNICOAP_OPTIONS_BUFFER_DEFAULT_CAPACITY + UNICOAP_DTLS_EXTRA_STACKSIZE)
 #endif
 /** @} */
-
-/* TODO: Put the following into the Automatic Block-wise Transfers Group once available */
-
-/**
- * @brief Block size unicoap will suggest for Block1 and Block2 transfers
- *
- * **Default**: 32 bytes
- */
-#if !defined(CONFIG_UNICOAP_BLOCK_SIZE) || defined(DOXYGEN)
-#  define CONFIG_UNICOAP_BLOCK_SIZE (32)
-#endif
-
-#ifndef DOXYGEN
-#  ifdef CONFIG_UNICOAP_BLOCK_SZX
-#    error CONFIG_UNICOAP_BLOCK_SZX must not be configured manually.
-#  endif
-#  if CONFIG_UNICOAP_BLOCK_SIZE == 1024
-#    define CONFIG_UNICOAP_BLOCK_SZX (6)
-#  elif CONFIG_UNICOAP_BLOCK_SIZE == 512
-#    define CONFIG_UNICOAP_BLOCK_SZX (5)
-#  elif CONFIG_UNICOAP_BLOCK_SIZE == 256
-#    define CONFIG_UNICOAP_BLOCK_SZX (4)
-#  elif CONFIG_UNICOAP_BLOCK_SIZE == 128
-#    define CONFIG_UNICOAP_BLOCK_SZX (3)
-#  elif CONFIG_UNICOAP_BLOCK_SIZE == 64
-#    define CONFIG_UNICOAP_BLOCK_SZX (2)
-#  elif CONFIG_UNICOAP_BLOCK_SIZE == 32
-#    define CONFIG_UNICOAP_BLOCK_SZX (1)
-#  elif CONFIG_UNICOAP_BLOCK_SIZE == 16
-#    define CONFIG_UNICOAP_BLOCK_SZX (0)
-#  else
-#    error CONFIG_UNICOAP_BLOCK_SIZE must be 1024, 512, 256, 128, 64, 32, or 16
-#  endif
-#endif
-
-/* TODO: Add static_asserts once other Block-wise parameters are available */
 
 #ifdef __cplusplus
 extern "C" {

@@ -407,6 +407,27 @@ bool unicoap_message_code_is_response(uint8_t code) {
     }
 }
 
+unicoap_status_t unicoap_response_status_from_errno(int error) {
+    switch (error < 0 ? -error : error) {
+    case ENOTSUP:
+        return UNICOAP_STATUS_NOT_IMPLEMENTED;
+    case EBADMSG:
+    case EINVAL:
+        return UNICOAP_STATUS_BAD_REQUEST;
+    case ENOMSG:
+        return UNICOAP_STATUS_REQUEST_ENTITY_INCOMPLETE;
+    case EACCES:
+        return UNICOAP_STATUS_FORBIDDEN;
+    case ENOENT:
+        return UNICOAP_STATUS_PATH_NOT_FOUND;
+    case EMSGSIZE:
+        return UNICOAP_STATUS_REQUEST_ENTITY_TOO_LARGE;
+    case ENOBUFS:
+    default:
+        return UNICOAP_STATUS_INTERNAL_SERVER_ERROR;
+    }
+}
+
 const char* unicoap_string_from_code_class(uint8_t code) {
     if (code == UNICOAP_CODE_EMPTY) {
         return "EMPTY";

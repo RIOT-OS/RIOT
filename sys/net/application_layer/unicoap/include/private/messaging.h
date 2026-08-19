@@ -371,15 +371,61 @@ static inline unicoap_messaging_flags_t _messaging_flags_client(unicoap_request_
 int unicoap_server_process_request(unicoap_packet_t* packet, const unicoap_resource_t* resource);
 
 /**
+ * @brief Sends part of response body, such as single response in a block-wise transfer
+ *
+ * @param packet Packet to send
+ * @param memo Optional memo
+ * @param client_flags Request flags
+ *
+ * @returns Zero on success or negative integer on error
+ */
+int unicoap_server_send_response_part(unicoap_packet_t* packet, unicoap_server_memo_t* memo,
+                                      unicoap_resource_flags_t resource_flags);
+
+/**
  * @brief Sends entire response body, may be split into parts and then sent
  *
  * @param[in,out] packet Response packet to send
+ * @param memo Optional memo
  * @param[in] resource mandatory resource which is sending this response
  *
  * @returns Zero on success, negative integer otherwise
  */
 int unicoap_server_send_response_body(unicoap_packet_t* packet,
+                                      unicoap_server_memo_t* memo,
                                       const unicoap_resource_t* resource);
+
+
+/**
+ * @brief Prepare response in block-wise transfer
+ *
+ * @param[in,out] packet Packet
+ * @param[in,out] transfer Block-wise transfer state object
+ * @param blockwise_flags Block-wise transfer flags
+ *
+ * @return Zero on success or negative error number instead.
+ */
+int unicoap_server_prepare_response_blockwise(unicoap_packet_t* packet, 
+                                              unicoap_server_memo_t* memo,
+                                              unicoap_blockwise_flags_t blockwise_flags);
+
+/**
+ * @brief Processes request and applies automatic block-wise transfer handling
+ *
+ * @param[in,out] packet Packet
+ * @param[in,out] memo Memo
+ * @param[in,out] resource Resource that received the request
+ *
+ * Do not invoke resource handler until this function has returned 1 or
+ * a negative error number.
+ *
+ * @returns Negative integer on error, otherwise zero or one
+ * @retval 0 Zero in case block-wise transfer is done
+ * @retval 1 One if block-wise transfer is not done yet
+ */
+int unicoap_server_process_request_blockwise(unicoap_packet_t* packet, 
+                                             unicoap_server_memo_t* memo,
+                                             const unicoap_resource_t* resource);
 /** @} */
 
 /* MARK: - Private exchange-layer client API */
@@ -429,6 +475,41 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
                                      unicoap_request_parameters_t* parameters,
                                      unicoap_request_flags_t flags);
 /** @} */
+
+/* MARK: - Block-wise client integration */
+/**
+ * @name Block-wise client integration
+ * @{
+ */
+/**
+ * @brief Processes response and applies automatic block-wise transfer handling
+ *
+ * @param[in,out] packet Packet
+ * @param[in,out] memo Memo
+ *
+ * Do not invoke client callback until this function has returned 1 or
+ * a negative error number.
+ *
+ * @returns Negative integer on error, otherwise zero or one
+ * @retval 0 Zero in case block-wise transfer is done
+ * @retval 1 One if block-wise transfer is not done yet
+ */
+int unicoap_client_process_response_blockwise(unicoap_packet_t* packet, 
+                                              unicoap_client_memo_t* memo);
+
+/**
+ * @brief Prepare request in block-wise transfer
+ *
+ * @param[in,out] packet Packet
+ * @param[in,out] transfer Block-wise transfer state object
+ * @param client_flags Client flags
+ *
+ * @return Zero on success or negative error number instead.
+ */
+int unicoap_client_prepare_request_blockwise(const unicoap_packet_t* packet,
+                                             unicoap_blockwise_transfer_t* transfer,
+                                             unicoap_request_flags_t client_flags);
+/** @}*/
 
 #ifdef __cplusplus
 }

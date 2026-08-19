@@ -1,2 +1,3 @@
 USEMODULE += unicoap
 USEMODULE += unicoap_driver_rfc7252_pdu
+USEMODULE += unicoap_blockwise_kit
