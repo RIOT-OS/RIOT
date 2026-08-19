@@ -181,6 +181,13 @@ typedef enum {
      * e.g. for software handling of the ACK reply.
      */
     IEEE802154_CAP_FRAME_RETENTION      = BIT21,
+    /**
+     * @brief the device supports auto RX after a Transmission
+     *
+     * The device automatically goes to state RX after a Transmission
+     * with ACK Req bit set.
+     */
+    IEEE802154_CAP_AUTO_TX2RX           = BIT22,
 } ieee802154_rf_caps_t;
 
 /**
