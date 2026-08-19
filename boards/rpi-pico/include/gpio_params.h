@@ -18,6 +18,7 @@
  * @author      Nick Weiler <nick.weiler@st.ovgu.de>
  */
 
+#include "buildinfo/boardinfo.h"
 #include "board.h"
 #include "saul/periph.h"
 

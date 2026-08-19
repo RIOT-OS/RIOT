@@ -25,6 +25,7 @@
  */
 #include <assert.h>
 
+#include "buildinfo/cpuinfo.h"
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/spi.h"

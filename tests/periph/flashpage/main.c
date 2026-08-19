@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#include "buildinfo/cpuinfo.h"
 #include "architecture.h"
 #include "od.h"
 #include "shell.h"

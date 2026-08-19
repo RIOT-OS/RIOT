@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <string.h>
 
+#include "buildinfo/cpuinfo.h"
 #include "esp_common.h"
 #include "esp_attr.h"
 #include "log.h"

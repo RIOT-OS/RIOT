@@ -19,6 +19,8 @@
 
 #include <stdint.h>
 
+#include "buildinfo/cpuinfo.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

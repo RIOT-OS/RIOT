@@ -14,6 +14,11 @@
 
 #include <stdio.h>
 
+#include "buildinfo/appinfo.h"
+#include "buildinfo/boardinfo.h"
+#include "buildinfo/cpuinfo.h"
+#include "buildinfo/riotver.h"
+
 void app_metadata_print_json(void)
 {
     puts("{\"cmd\": \"app_metadata_print_json()\"}");

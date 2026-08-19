@@ -15,6 +15,8 @@
  * @{
  */
 
+#include "buildinfo/cpuinfo.h"
+
 /* If building on native we need to use the system libraries instead */
 #ifdef CPU_NATIVE
 #pragma GCC system_header

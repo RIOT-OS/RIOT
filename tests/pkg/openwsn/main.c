@@ -18,6 +18,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "buildinfo/boardinfo.h"
+#include "buildinfo/cpuinfo.h"
 #include "shell.h"
 
 extern int udp_cmd(int argc, char **argv);

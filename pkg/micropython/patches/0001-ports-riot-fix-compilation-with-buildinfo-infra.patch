@@ -1,0 +1,38 @@
+From 09a2c346f3f1d5fb30ad01cb2f0cb3949e1a1261 Mon Sep 17 00:00:00 2001
+From: Marian Buschsieweke <marian.buschsieweke@ml-pa.com>
+Date: Wed, 12 Aug 2026 08:33:35 +0200
+Subject: [PATCH] ports/riot: fix compilation with buildinfo infra
+
+microptyhon relias on preprocessor concatenation of string literals,
+so we need to include the buildinfo headers and use the string literals.
+---
+ ports/riot/mpconfigport.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/ports/riot/mpconfigport.h b/ports/riot/mpconfigport.h
+index b36dd7234..1ac6ed480 100644
+--- a/ports/riot/mpconfigport.h
++++ b/ports/riot/mpconfigport.h
+@@ -27,6 +27,8 @@
+ #include <stdint.h>
+ 
+ #include "irq.h"
++#include "buildinfo/boardinfo.h"
++#include "buildinfo/cpuinfo.h"
+ 
+ // Usually passed from Makefile
+ #ifndef MICROPY_HEAP_SIZE
+@@ -92,8 +94,8 @@
+ 
+ #define MICROPY_PY_SYS_PLATFORM         "RIOT"
+ 
+-#define MICROPY_HW_BOARD_NAME           "riot-" RIOT_BOARD
+-#define MICROPY_HW_MCU_NAME             RIOT_CPU
++#define MICROPY_HW_BOARD_NAME           "riot-" RIOT_BOARD_LITERAL
++#define MICROPY_HW_MCU_NAME             RIOT_CPU_LITERAL
+ 
+ #define MICROPY_MODULE_FROZEN_STR       (1)
+ 
+-- 
+2.53.0
+
