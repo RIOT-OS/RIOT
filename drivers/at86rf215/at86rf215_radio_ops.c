@@ -937,6 +937,7 @@ int at86rf215_init_event(at86rf215_bhp_ev_t *bhp, ieee802154_dev_t *hal_09,
          | IEEE802154_CAP_AUTO_ACK \
          | IEEE802154_CAP_IRQ_TX_DONE \
          | IEEE802154_CAP_IRQ_RX_START \
+         | IEEE802154_CAP_AUTO_TX2RX \
          | IEEE802154_CAP_IRQ_CCA_DONE)
 
 #define AT86RF215_OPS(band)                              \
