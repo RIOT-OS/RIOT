@@ -11,13 +11,14 @@
  * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
-#include "tests-unicoap.h"
 #include <stdio.h>
 
-Test* tests_unicoap_options(void);
-Test* tests_unicoap_pdu(void);
-Test* tests_unicoap_message(void);
-Test* tests_unicoap_matching(void);
+#include "tests-unicoap.h"
+
+Test *tests_unicoap_options(void);
+Test *tests_unicoap_pdu(void);
+Test *tests_unicoap_message(void);
+Test *tests_unicoap_matching(void);
 
 void tests_unicoap(void)
 {

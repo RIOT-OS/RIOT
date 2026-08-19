@@ -17,29 +17,30 @@
  * @author Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
+#include <stddef.h>
+#include <stdint.h>
+#include <sys/types.h>
+
 #include "embUnit.h"
 #include "embUnit/embUnit.h"
-#include <stdint.h>
-#include <stddef.h>
-#include <sys/types.h>
 
 #ifndef DOXYGEN
 #  define static_strlen(str) (sizeof(str) - 1)
 
 #  define _TEST_ASSERT_EQUAL_BYTES(_exp, _act, size) \
-    TEST_ASSERT_EQUAL_INT(0, memcmp((uint8_t*)_exp, (uint8_t*)_act, size))
+      TEST_ASSERT_EQUAL_INT(0, memcmp((uint8_t *)_exp, (uint8_t *)_act, size))
 
 #  define _TEST_ASSERT_EQUAL_BYTES_STRING(_exp_str, _act) \
-    _TEST_ASSERT_EQUAL_BYTES(_act, _exp_str, static_strlen(_exp_str))
+      _TEST_ASSERT_EQUAL_BYTES(_act, _exp_str, static_strlen(_exp_str))
 
 #  define _TEST_ASSERT_EQUAL_POINTER(_exp, _act) \
-    TEST_ASSERT_EQUAL_INT((uintptr_t)_exp, (uintptr_t)_act)
+      TEST_ASSERT_EQUAL_INT((uintptr_t)_exp, (uintptr_t)_act)
 
 #  define _TEST_ASSERT_TRUE(a) \
-    TEST_ASSERT_EQUAL_INT(true, a)
+      TEST_ASSERT_EQUAL_INT(true, a)
 
 #  define _TEST_ASSERT_FALSE(a) \
-    TEST_ASSERT_EQUAL_INT(false, a)
+      TEST_ASSERT_EQUAL_INT(false, a)
 
 #  define _BYTES(...) ((uint8_t[]){ __VA_ARGS__ })
 
