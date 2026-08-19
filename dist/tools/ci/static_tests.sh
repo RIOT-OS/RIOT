@@ -1,15 +1,12 @@
 #!/usr/bin/env bash
-#
-# Copyright (C) 2020 Kaspar Schleiser <kaspar@schleiser.de>
-#               2020 Inria
-#               2020 Freie Universität Berlin
-#               2015 Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
-#
 
+# SPDX-FileCopyrightText: 2020 Kaspar Schleiser <kaspar@schleiser.de>
+# SPDX-FileCopyrightText: 2020 Inria
+# SPDX-FileCopyrightText: 2020 Freie Universität Berlin
+# SPDX-FileCopyrightText: 2015 Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
+# SPDX-License-Identifier: LGPL-2.1-only
+
+# shellcheck source=dist/tools/ci/github_annotate.sh
 . "$(dirname "${0}")"/github_annotate.sh
 
 declare -A DEPS
@@ -61,7 +58,7 @@ set_result() {
 
 function run {
     for dep in ${DEPS["$1"]}; do
-        if ! command -v ${dep} &>/dev/null; then
+        if ! command -v "${dep}" &>/dev/null; then
             echo -n "Required command '${dep}' for '$*' not found in PATH "
             print_warning
             set_result 1
@@ -140,4 +137,4 @@ else
 fi
 ERROR_EXIT_CODE=0 run ./dist/tools/shellcheck/check.sh
 
-exit $RESULT
+exit "$RESULT"
