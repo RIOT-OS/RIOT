@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
-# Copyright 2017 Kaspar Schleiser <kaspar@schleiser.de>
-# Copyright 2014 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2017 Kaspar Schleiser <kaspar@schleiser.de>
+# SPDX-FileCopyrightText: 2014 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+# SPDX-FileCopyrightText: 2026 Karl Fessel
+# SPDX-License-Identifier: LGPL-2.1-only
 
 SCRIPTREALDIR=$(realpath "$(dirname "${0}")")
 
@@ -28,7 +26,10 @@ TAB_CHAR="$(printf '\t')"
 
 # prepare
 ROOT=$(git rev-parse --show-toplevel)
-LICENSES=$(ls "${LICENSEDIR}")
+# put the SPDX patterns first to speed up the loop below
+LICENSES=$(find "${LICENSEDIR}" -type f -iname 'spdx*' -printf '%f ')
+LICENSES=${LICENSES}$(find "${LICENSEDIR}" -type f ! -iname 'spdx*' -printf '%f ')
+
 EXIT_CODE=0
 
 : "${ERROR_EXIT_CODE:=1}"
@@ -41,7 +42,8 @@ mkdir -p "${OUTPUT}"
 declare -A PATTERNS
 for LICENSE in ${LICENSES}; do
     echo -n '' > "${OUTPUT}/${LICENSE}"
-    PATTERNS[${LICENSE}]="$(grep -v '^$' "${LICENSEDIR}/${LICENSE}" | paste -sd' ' | sed -e 's/[[:space:]][[:space:]]*/ /g')"
+    PATTERNS[${LICENSE}]="$(grep -v '^$' "${LICENSEDIR}/${LICENSE}" | \
+        paste -sd' ' | sed -e 's/[[:space:]][[:space:]]*/ /g')"
 done
 
 FILES=$(FILEREGEX='\.([sSch]|cpp)$' changed_files)
@@ -49,7 +51,8 @@ FILES=$(FILEREGEX='\.([sSch]|cpp)$' changed_files)
 # categorize files
 for FILE in ${FILES}; do
     FAIL=1
-    head -100 "${ROOT}/${FILE}" | sed -e 's/[\/\*'"${TAB_CHAR}"']/ /g' | paste -sd' ' | sed -e 's/[[:space:]][[:space:]]*/ /g' > "${TMP}"
+    head -100 "${ROOT}/${FILE}" | sed -e 's/[\/\*'"${TAB_CHAR}"']/ /g' | \
+        paste -sd' ' | sed -e 's/[[:space:]][[:space:]]*/ /g' > "${TMP}"
     for LICENSE in ${LICENSES}; do
         if grep -qE "${PATTERNS[${LICENSE}]}" "${TMP}"; then
             echo "${FILE}" >> "${OUTPUT}/${LICENSE}"
@@ -64,4 +67,4 @@ for FILE in ${FILES}; do
     fi
 done
 
-exit ${EXIT_CODE}
+exit "${EXIT_CODE}"
