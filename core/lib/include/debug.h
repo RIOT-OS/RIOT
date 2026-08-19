@@ -73,6 +73,9 @@ extern "C" {
  */
 #ifndef DEBUG_PREFIX
 #  define DEBUG_PREFIX ""
+#  define _DEBUG_PREFIX ""
+#else
+#  define _DEBUG_PREFIX DEBUG_PREFIX " "
 #endif
 
 /**
@@ -116,30 +119,11 @@ extern "C" {
 #endif
 
 /**
- * @brief Separator before the function name.
- *
- * @internal
- */
-#define _DEBUG_SEP_FUNC     ":"
-/**
- * @brief Separator before the thread name.
- *
- * @internal
- */
-#define _DEBUG_SEP_THREAD   "@"
-/**
- * @brief Separator before the actual message.
- *
- * @internal
- */
-#define _DEBUG_SEP_MSG      " # "
-
-/**
  * @brief Color for the debug prefix.
  *
  * @internal
  */
-#define _DEBUG_PREFIX_COLOR ANSI_COLOR_CYAN
+#define _DEBUG_PREFIX_COLOR ANSI_COLOR_CYAN_BOLD
 
 /**
  * @brief Check whether the stack of the current thread (or ISR) is big enough in total
@@ -196,21 +180,19 @@ static inline const char *__debug_thread_name_or_isr(void)
 static inline void __debug_print_prefix(const char *func_name)
 {
     if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {
-        printf(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_FUNC "%s" \
-               _DEBUG_SEP_THREAD "%s" _DEBUG_SEP_MSG ANSI_COLOR_RESET,
+        printf(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "(%s@%s) # " ANSI_COLOR_RESET,
                func_name, __debug_thread_name_or_isr());
     }
     else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {
-        printf(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_FUNC "%s" \
-              _DEBUG_SEP_MSG ANSI_COLOR_RESET, func_name);
+        printf(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "(%s) # " ANSI_COLOR_RESET,
+               func_name);
     }
     else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {
-        printf(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_THREAD "%s" \
-            _DEBUG_SEP_MSG ANSI_COLOR_RESET, __debug_thread_name_or_isr());
+        printf(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "(@%s) # " ANSI_COLOR_RESET,
+               __debug_thread_name_or_isr());
     }
-    else if (strlen(DEBUG_PREFIX) > 0) {
-        printf(_DEBUG_PREFIX_COLOR DEBUG_PREFIX
-               _DEBUG_SEP_MSG ANSI_COLOR_RESET);
+    else {
+        printf(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "# " ANSI_COLOR_RESET);
     }
 }
 
@@ -224,24 +206,24 @@ static inline void __debug_print_prefix(const char *func_name)
 static inline void __debug_put_prefix(const char *func_name)
 {
     if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {
-        fputs(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_FUNC, stdout);
+        fputs(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "(", stdout);
         fputs(func_name, stdout);
-        fputs(_DEBUG_SEP_THREAD, stdout);
+        fputs("@", stdout);
         fputs(__debug_thread_name_or_isr(), stdout);
-        fputs(_DEBUG_SEP_MSG ANSI_COLOR_RESET, stdout);
+        fputs(") # " ANSI_COLOR_RESET, stdout);
     }
     else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {
-        fputs(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_FUNC, stdout);
+        fputs(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "(", stdout);
         fputs(func_name, stdout);
-        fputs(_DEBUG_SEP_MSG ANSI_COLOR_RESET, stdout);
+        fputs(") # " ANSI_COLOR_RESET, stdout);
     }
     else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {
-        fputs(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_THREAD, stdout);
+        fputs(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "(@", stdout);
         fputs(__debug_thread_name_or_isr(), stdout);
-        fputs(_DEBUG_SEP_MSG ANSI_COLOR_RESET, stdout);
+        fputs(") # " ANSI_COLOR_RESET, stdout);
     }
-    else if (strlen(DEBUG_PREFIX) > 0) {
-        fputs(_DEBUG_PREFIX_COLOR DEBUG_PREFIX _DEBUG_SEP_MSG ANSI_COLOR_RESET, stdout);
+    else {
+        fputs(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "# " ANSI_COLOR_RESET, stdout);
     }
 }
 
