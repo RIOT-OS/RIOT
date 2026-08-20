@@ -2,7 +2,11 @@
 USEPKG += gecko_sdk
 
 ifneq (,$(filter efm32_coretemp,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_adc
+  # Series 0 and 1 have the internal temperature sensor wired to an ADC line,
+  # whereas Series 2 has a dedicated register to read the temperature.
+  ifneq (,$(filter 0 1,$(EFM32_SERIES)))
+    FEATURES_REQUIRED += periph_adc
+  endif
 endif
 
 # CMSIS-DSP is needed for arm_math.h on Cortex-M0+ architectures
