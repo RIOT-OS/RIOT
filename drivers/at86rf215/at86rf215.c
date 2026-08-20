@@ -67,6 +67,7 @@ if (!IS_ACTIVE(CONFIG_AT86RF215_USE_CLOCK_OUTPUT)){
 
     /* enable auto-ACK with Frame Checksum & Data Rate derived from RX frame */
     uint8_t reg = AMCS_AACKFA_MASK | AMCS_AACKDR_MASK | AMCS_AACK_MASK;
+    dev->auto_mode = AT86RF215_AM_AUTO_ACK;
     /* send acks respective to 802.15.4-2006 */
     reg &= ~AMCS_AACKS_MASK;
     /* disable cca before tx and tx2rx to avoid conflicts */

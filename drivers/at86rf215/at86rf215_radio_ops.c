@@ -242,26 +242,6 @@ static int _request_idle(at86rf215_t *dev, bool force)
 
     /* writing TXPREP aborts any ongoing operation (TX, auto-ACK, ED) */
     at86rf215_rf_cmd(dev, CMD_RF_TXPREP);
-
-    /* an aborted operation produces no completion IRQ (no TXFE for an
-    * aborted TX/ACK, possibly no EDC for an aborted CCA) - clean up
-    * the software state here so we don't get stuck. If the abort
-    * happened during a CCA, re-enable what request_cca() disabled. */
-    switch (dev->state) {
-    case AT86RF215_STATE_CCA_RX:
-    case AT86RF215_STATE_CCA_IDLE:
-        at86rf215_enable_baseband(dev);
-        at86rf215_enable_rpc(dev);
-        break;
-    case AT86RF215_STATE_TX:
-    case AT86RF215_STATE_RX_SEND_ACK:
-        at86rf215_tx_done(dev);
-        dev->tx_ack_req = false;
-        break;
-    default:
-        break;
-    }
-
     return 0;
 }
 
@@ -363,6 +343,26 @@ static int _confirm_idle(at86rf215_t *dev)
     if (current_state != RF_STATE_TXPREP) {
         return -EAGAIN;
     }
+
+    /* an aborted operation produces no completion IRQ (no TXFE for an
+    * aborted TX/ACK, possibly no EDC for an aborted CCA) - clean up
+    * the software state here so we don't get stuck. If the abort
+    * happened during a CCA, re-enable what request_cca() disabled. */
+    switch (dev->state) {
+    case AT86RF215_STATE_CCA_RX:
+    case AT86RF215_STATE_CCA_IDLE:
+        at86rf215_enable_baseband(dev);
+        at86rf215_enable_rpc(dev);
+        break;
+    case AT86RF215_STATE_TX:
+    case AT86RF215_STATE_RX_SEND_ACK:
+        at86rf215_tx_done(dev);
+        dev->tx_ack_req = false;
+        break;
+    default:
+        break;
+    }
+
     dev->state = AT86RF215_STATE_IDLE;
     return 0;
 }
@@ -573,6 +573,17 @@ static int _get_frame_filter_mode(ieee802154_dev_t *hal, ieee802154_filter_mode_
     return 0;
 }
 
+static void _handle_txrx_done(ieee802154_dev_t *hal, ieee802154_trx_ev_t event)
+{
+    at86rf215_t *dev = hal->priv;
+    /* After RXFE or TXFE the devices switches automatically to TXPREP make sure to be sync
+     * with HW State */
+    dev->state = AT86RF215_STATE_IDLE;
+    if (hal->cb) {
+        hal->cb(hal, event);
+    }
+}
+
 static void _handle_edc(ieee802154_dev_t *hal)
 {
     at86rf215_t *dev = hal->priv;
@@ -587,10 +598,9 @@ static void _handle_edc(ieee802154_dev_t *hal)
 
     if (current_state == AT86RF215_STATE_CCATX) {
         if (dev->cca_busy) {
-            dev->state = AT86RF215_STATE_IDLE;
             at86rf215_tx_done(dev);
             at86rf215_rf_cmd(dev, CMD_RF_TXPREP);
-            hal->cb(hal, IEEE802154_RADIO_CONFIRM_TX_DONE);
+            _handle_txrx_done(hal, IEEE802154_RADIO_CONFIRM_TX_DONE);
             return;
         }
         /* channel clear -> TX */
@@ -604,7 +614,11 @@ static void _handle_edc(ieee802154_dev_t *hal)
 
     if (current_state == AT86RF215_STATE_CCA_IDLE) {
         at86rf215_rf_cmd(dev, CMD_RF_TXPREP);
+        _handle_txrx_done(hal, IEEE802154_RADIO_CONFIRM_CCA);
+        return;
     }
+
+    dev->state = AT86RF215_STATE_RX;
     if (hal->cb) {
         hal->cb(hal, IEEE802154_RADIO_CONFIRM_CCA);
     }
@@ -619,8 +633,8 @@ static void _tx_end(ieee802154_dev_t *hal)
           at86rf215_hw_state2a(at86rf215_get_rf_state(dev)));
 
     at86rf215_tx_done(dev);
-    dev->state = dev->tx_ack_req ? AT86RF215_STATE_TX_WAIT_ACK : AT86RF215_STATE_IDLE;
 
+    dev->state = dev->tx_ack_req ? AT86RF215_STATE_TX_WAIT_ACK : AT86RF215_STATE_IDLE;
     if (hal->cb) {
         DEBUG("[at86rf215] _tx_end: cb CONFIRM_TX_DONE\n");
         hal->cb(hal, IEEE802154_RADIO_CONFIRM_TX_DONE);
@@ -681,6 +695,10 @@ static void at86rf215_handle_common_irq(ieee802154_dev_t *hal)
         case AT86RF215_STATE_RX:
         case AT86RF215_STATE_RX_START:
         case AT86RF215_STATE_IDLE:
+
+            /* assume this comes from sending auto ack; don't indicate rx_done here*/
+            bb_irq_mask &= ~BB_IRQ_TXFE;
+
             if (bb_irq_mask & BB_IRQ_RXFS) {
                 DEBUG("[at86rf215] ISR IDLE/RX: → RX_START cb\n");
                 bb_irq_mask &= ~BB_IRQ_RXFS;
@@ -711,23 +729,20 @@ static void at86rf215_handle_common_irq(ieee802154_dev_t *hal)
             }
 
             DEBUG("[at86rf215] ISR IDLE/RX: no ACK_REQ → RX_DONE cb\n");
-            dev->state = AT86RF215_STATE_IDLE;
-            if (hal->cb) {
-                hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
-            }
+            _handle_txrx_done(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
             break;
 
         case AT86RF215_STATE_RX_SEND_ACK:
+            /* this can happen when receiving an RXFE IRQ but the AGCR is not indicated yet */
+            bb_irq_mask &= ~BB_IRQ_AGCR;
+
             if (!(bb_irq_mask & BB_IRQ_TXFE)) {
-                /* don't indicate ack frames */
                 break;
             }
+
             bb_irq_mask &= ~BB_IRQ_TXFE;
             DEBUG("[at86rf215] ISR RX_SEND_ACK: TXFE (ACK sent) → RX_DONE cb\n");
-            dev->state = AT86RF215_STATE_IDLE;
-            if (hal->cb) {
-                hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
-            }
+            _handle_txrx_done(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
             break;
 
         case AT86RF215_STATE_TX:
@@ -773,29 +788,8 @@ static void at86rf215_handle_common_irq(ieee802154_dev_t *hal)
 
             bb_irq_mask &= ~BB_IRQ_RXFE;
 
-            fcf0 = at86rf215_reg_read(dev, dev->BBC->RG_FBRXS);
-            /* not an ack go back to receive */
-            if ((fcf0 & IEEE802154_FCF_TYPE_MASK) != IEEE802154_FCF_TYPE_ACK) {
-                at86rf215_rf_cmd(dev, CMD_RF_RX);
-                break;
-            }
-
-            uint8_t tx_dsn = at86rf215_reg_read(dev, dev->BBC->RG_FBTXS + 2);
-            uint8_t rx_dsn = at86rf215_reg_read(dev, dev->BBC->RG_FBRXS + 2);
-            /* ack but for the wrong frame */
-            if (tx_dsn != rx_dsn) {
-                DEBUG("[at86rf215] ISR: stray ACK dsn=%u (expected %u)\n",
-                      rx_dsn, tx_dsn);
-                at86rf215_rf_cmd(dev, CMD_RF_RX);
-                break;
-            }
-
             DEBUG("[at86rf215] TX_WAIT_ACK: ack recv → rx_done_cb\n");
-            /* ack received radio gets to TXPREP(idle) */
-            dev->state = AT86RF215_STATE_IDLE;
-            if (hal->cb) {
-                hal->cb(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
-            }
+            _handle_txrx_done(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
             break;
 
         case AT86RF215_STATE_CCA_RX:

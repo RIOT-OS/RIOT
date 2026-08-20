@@ -51,7 +51,7 @@ static at86rf215_t at86rf215_devs[AT86RF215_NUM * USED_BANDS];
 static netdev_ieee802154_submac_t at86rf215_netdev[AT86RF215_NUM * USED_BANDS];
 static gnrc_netif_t _netif[AT86RF215_NUM * USED_BANDS];
 static char _at86rf215_stacks[AT86RF215_NUM * USED_BANDS][AT86RF215_MAC_STACKSIZE];
-static at86rf215_bhp_ev_t at86rf215_bhp[AT86RF215_NUM * USED_BANDS];
+static at86rf215_bhp_ev_t at86rf215_bhp[AT86RF215_NUM];
 
 static inline void _setup_netif(gnrc_netif_t *netif, void* netdev, void* stack,
                                 int prio, const char *name)
