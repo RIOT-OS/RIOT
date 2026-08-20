@@ -31,6 +31,15 @@ void cpu_clock_init(void) {
     /* Enable the XOSC */
     xosc_start();
 
+    /* Out of reset clk_ref runs from the ROSC, which is only specified to be
+     * somewhere between 4.6 MHz and 19.6 MHz. Move it over to the XOSC, since
+     * the tick generators feeding the system timers divide clk_ref and rely on
+     * it being an accurate 12 MHz (see chapter 8.5). */
+    CLOCKS->CLK_REF_DIV = CLK_REF_DIV_INT_VALUE << CLK_REF_DIV_INT_LSB;
+    CLOCKS->CLK_REF_CTRL = CLK_REF_CTRL_SRC_XOSC_VALUE;
+    while (CLOCKS->CLK_REF_SELECTED != CLK_REF_SELECTED_XOSC_FIELD_VALUE) {
+    }
+
     /* Setup the PLL using the XOSC as the reference clock. */
     PLL_SYS->FBDIV_INT =
     PLL_FEEDBACK_DIVIDER_VALUE; /* Set the feedback divider */
