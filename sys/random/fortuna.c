@@ -1,9 +1,6 @@
-/**
- * Copyright (C) 2016-2018 Bas Stottelaar <basstottelaar@gmail.com>
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+/*
+ * SPDX-FileCopyrightText: 2016-2018 Bas Stottelaar <basstottelaar@gmail.com>
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -76,7 +73,7 @@ static void _read(uint8_t *out, size_t bytes)
         /* advance bytes and buffer */
         bytes -= chunk;
         out += chunk;
-    } while (bytes > FORTUNA_RESEED_LIMIT);
+    } while (bytes > 0);
 }
 
 void random_init_by_array(uint32_t init_key[], int key_length)
