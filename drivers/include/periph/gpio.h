@@ -180,6 +180,10 @@ int gpio_init(gpio_t pin, gpio_mode_t mode);
  *          enable this function
  *
  * @pre     @p cb must not be NULL
+ * @pre     The pin interrupt must not be active when calling
+ *          `gpio_init_int()`. The pin must either not have been configured as
+ *          an interrupt source before, or the interrupt must be disabled with
+ *          @ref gpio_irq_disable before calling `gpio_init_int()` again.
  *
  * @param[in] pin       pin to initialize
  * @param[in] mode      mode of the pin, see @c gpio_mode_t
