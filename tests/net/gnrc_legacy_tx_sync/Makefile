@@ -9,4 +9,4 @@ USEMODULE += ztimer_sec
 
 include $(RIOTBASE)/Makefile.include
 
-CFLAGS += -DDEBUG_ASSERT_VERBOSE=1
+CFLAGS += -DCONFIG_ASSERT_VERBOSE=1
