@@ -186,6 +186,7 @@ static const gpio_t sam0_adc_pins[2][16] = {
  * @name    Real time counter configuration
  * @{
  */
+#define RTT_MIN_OFFSET      (8U)
 #define RTT_MAX_VALUE       (0xffffffff)
 #define RTT_CLOCK_FREQUENCY (32768U)                      /* in Hz */
 #define RTT_MIN_FREQUENCY   (RTT_CLOCK_FREQUENCY / 1024U) /* in Hz */
