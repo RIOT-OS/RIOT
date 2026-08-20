@@ -412,7 +412,7 @@ typedef struct usbus_handler_driver {
      * @param usbus     USBUS context
      * @param handler   handler context
      * @param state     control request state
-     * @param setup     setup packet
+     * @param request   setup packet
      *
      * @return          Size of the returned data when the request is handled
      * @return          negative to have the stack return an USB stall to the
