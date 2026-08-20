@@ -23,13 +23,17 @@
 #define ENABLE_DEBUG 1
 #include "debug.h"
 
+#define MY_DEBUG(...) DEBUG_("custom", __VA_ARGS__)
+#define MY_DEBUG_PUTS(str) DEBUG_PUTS_("custom", str)
+
 static mutex_t _barrier = MUTEX_INIT_LOCKED;
 
 static void _timer_isr(void *arg)
 {
     uint8_t *value = arg;
-    DEBUG_PUTS("puts from isr");
-    DEBUG("printf from isr: %d\n", *value);
+    DEBUG_PUTS("debug puts");
+    DEBUG("debug printf number '%d'", *value);
+    DEBUG_CONT(" ... continued\n");
     mutex_unlock(&_barrier);
 }
 
@@ -53,4 +57,8 @@ int main(void)
     prefix_thread_func();
 
     mutex_lock(&_barrier);
+
+    MY_DEBUG_PUTS("debug puts");
+    MY_DEBUG("debug printf number '%d'", _value);
+    DEBUG_CONT(" ... continued\n");
 }

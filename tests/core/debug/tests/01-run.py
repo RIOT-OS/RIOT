@@ -17,13 +17,15 @@ THREAD = '@main'
 
 prefixes = [
     '',
-    '(noprefix_func)',
-    '(' + THREAD + ')',
-    '(noprefix_thread_func' + THREAD + ')',
+    ' (noprefix_func)',
+    ' (' + THREAD + ')',
+    ' (noprefix_thread_func' + THREAD + ')',
     PREFIX,
     PREFIX + ' (prefix_func)',
     PREFIX + ' (' + THREAD + ')',
     PREFIX + ' (prefix_thread_func' + THREAD + ')',
+    ' (@<isr>)',
+    'custom (' + THREAD + ')',
 ]
 
 def colored_prefix(prefix):
@@ -35,8 +37,6 @@ def testfunc(child):
     for prefix in prefixes:
         child.expect_exact(colored_prefix(prefix) + "debug puts")
         child.expect_exact(colored_prefix(prefix) + "debug printf number '42' ... continued")
-    child.expect_exact(colored_prefix('(@(isr))') + "puts from isr")
-    child.expect_exact(colored_prefix('(@(isr))') + "printf from isr: 42")
 
 
 if __name__ == "__main__":

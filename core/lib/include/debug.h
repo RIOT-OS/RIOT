@@ -72,10 +72,7 @@ extern "C" {
  *          Expected to be set on a file-based level.
  */
 #ifndef DEBUG_PREFIX
-#  define DEBUG_PREFIX ""
-#  define _DEBUG_PREFIX ""
-#else
-#  define _DEBUG_PREFIX DEBUG_PREFIX " "
+#  define DEBUG_PREFIX  ""
 #endif
 
 /**
@@ -158,7 +155,7 @@ static inline bool __debug_sufficient_stack(bool print)
 }
 
 /**
- * @brief Get thread name of the currently running thread, or "(isr)"
+ * @brief Get thread name of the currently running thread, or "<isr>"
  *
  * @internal
  *
@@ -167,65 +164,46 @@ static inline bool __debug_sufficient_stack(bool print)
 static inline const char *__debug_thread_name_or_isr(void)
 {
     const thread_t *thread = thread_get_active();
-    return (irq_is_in() || thread == NULL) ? "(isr)" : thread_get_name(thread);
+    return (irq_is_in() || thread == NULL) ? "<isr>" : thread_get_name(thread);
 }
 
 /**
- * @brief Print the debug prefix for `DEBUG`
+ * @def DEBUG_
+ *
+ * @brief Print debug information to stdout with a custom prefix
  *
  * @internal
  *
- * @param    func_name          Name of the calling function
- */
-static inline void __debug_print_prefix(const char *func_name)
-{
-    if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {
-        printf(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "(%s@%s) # " ANSI_COLOR_RESET,
-               func_name, __debug_thread_name_or_isr());
-    }
-    else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {
-        printf(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "(%s) # " ANSI_COLOR_RESET,
-               func_name);
-    }
-    else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {
-        printf(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "(@%s) # " ANSI_COLOR_RESET,
-               __debug_thread_name_or_isr());
-    }
-    else if (strlen(DEBUG_PREFIX) > 0) {
-        printf(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "# " ANSI_COLOR_RESET);
-    }
-}
-
-/**
- * @brief Print the debug prefix for `DEBUG_PUTS`
+ * Use this internal macro if you want to have something more fine-grained than
+ * the file-wide @ref DEBUG_PREFIX, to define your own debug function like
  *
- * @internal
+ * @code {.c}
+ * #define CUSTOM_DEBUG(...) DEBUG_("custom-prefix", __VA_ARGS__)
+ * @endcode
  *
- * @param    func_name          Name of the calling function
+ * Otherwise, just use @ref DEBUG
  */
-static inline void __debug_put_prefix(const char *func_name)
-{
-    if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {
-        fputs(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "(", stdout);
-        fputs(func_name, stdout);
-        fputs("@", stdout);
-        fputs(__debug_thread_name_or_isr(), stdout);
-        fputs(") # " ANSI_COLOR_RESET, stdout);
-    }
-    else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {
-        fputs(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "(", stdout);
-        fputs(func_name, stdout);
-        fputs(") # " ANSI_COLOR_RESET, stdout);
-    }
-    else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {
-        fputs(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "(@", stdout);
-        fputs(__debug_thread_name_or_isr(), stdout);
-        fputs(") # " ANSI_COLOR_RESET, stdout);
-    }
-    else if (strlen(DEBUG_PREFIX) > 0) {
-        fputs(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "# " ANSI_COLOR_RESET, stdout);
-    }
-}
+#define DEBUG_(prefix, ...)                                                                 \
+    do {                                                                                    \
+        if (ENABLE_DEBUG && __debug_sufficient_stack(true)) {                               \
+            if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) { \
+                printf(_DEBUG_PREFIX_COLOR prefix " (%s@%s) # " ANSI_COLOR_RESET,           \
+                       DEBUG_FUNC, __debug_thread_name_or_isr());                           \
+            }                                                                               \
+            else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {                                   \
+                printf(_DEBUG_PREFIX_COLOR prefix " (%s) # " ANSI_COLOR_RESET,              \
+                       DEBUG_FUNC);                                                         \
+            }                                                                               \
+            else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {                                 \
+                printf(_DEBUG_PREFIX_COLOR prefix " (@%s) # " ANSI_COLOR_RESET,             \
+                       __debug_thread_name_or_isr());                                       \
+            }                                                                               \
+            else if (strlen(DEBUG_PREFIX) > 0) {                                            \
+                printf(_DEBUG_PREFIX_COLOR prefix " # " ANSI_COLOR_RESET);                  \
+            }                                                                               \
+            printf(__VA_ARGS__);                                                            \
+        }                                                                                   \
+    } while (0)
 
 /**
  * @def DEBUG
@@ -248,28 +226,67 @@ static inline void __debug_put_prefix(const char *func_name)
  *          library).
  * @warning If a variable is only accessed by `DEBUG()`, the compiler will
  *          warn about unused variables when `ENABLE_DEBUG` is set to `0`.
+ *
+ * Make use of @ref DEBUG_ if you need to use a custom prefix.
  */
-#define DEBUG(...)                                                  \
-    do {                                                            \
-        if (ENABLE_DEBUG && __debug_sufficient_stack(true)) {       \
-            __debug_print_prefix(DEBUG_FUNC);                       \
-            printf(__VA_ARGS__);                                    \
-        }                                                           \
-    } while (0)
+#define DEBUG(...) DEBUG_(DEBUG_PREFIX, __VA_ARGS__)
 
 /**
  * @def DEBUG_CONT
  *
- * @brief Continue printing debug information to stdout
+ * @brief Continue printing debug information to stdout, without repeating the prefix
  *
  * Use this macro the same way as `printf` if you want to continue printing to the
  * same line that has been started with @ref DEBUG previously.
  */
-#define DEBUG_CONT(...)                                             \
-    do {                                                            \
-        if (ENABLE_DEBUG && __debug_sufficient_stack(false)) {      \
-            printf(__VA_ARGS__);                                    \
-        }                                                           \
+#define DEBUG_CONT(...)                                        \
+    do {                                                       \
+        if (ENABLE_DEBUG && __debug_sufficient_stack(false)) { \
+            printf(__VA_ARGS__);                               \
+        }                                                      \
+    } while (0)
+
+/**
+ * @def DEBUG_PUTS
+ *
+ * @brief Print debug information to stdout using puts() witha custom prefix.
+ *
+ * @internal
+ *
+ * Use this internal macro if you want to have something more fine-grained than
+ * the file-wide @ref DEBUG_PREFIX, to define your own debug function like
+ *
+ * @code {.c}
+ * #define CUSTOM_DEBUG_PUTS(str) DEBUG_PUTS_("custom-prefix", str)
+ * @endcode
+ *
+ * Otherwise, just use @ref DEBUG_PUTS
+ */
+#define DEBUG_PUTS_(prefix, str)                                                            \
+    do {                                                                                    \
+        if (ENABLE_DEBUG) {                                                                 \
+            if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) { \
+                fputs(_DEBUG_PREFIX_COLOR prefix " (", stdout);                             \
+                fputs(DEBUG_FUNC, stdout);                                                  \
+                fputs("@", stdout);                                                         \
+                fputs(__debug_thread_name_or_isr(), stdout);                                \
+                fputs(") # " ANSI_COLOR_RESET, stdout);                                     \
+            }                                                                               \
+            else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {                                   \
+                fputs(_DEBUG_PREFIX_COLOR prefix " (", stdout);                             \
+                fputs(DEBUG_FUNC, stdout);                                                  \
+                fputs(") # " ANSI_COLOR_RESET, stdout);                                     \
+            }                                                                               \
+            else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {                                 \
+                fputs(_DEBUG_PREFIX_COLOR prefix " (@", stdout);                            \
+                fputs(__debug_thread_name_or_isr(), stdout);                                \
+                fputs(") # " ANSI_COLOR_RESET, stdout);                                     \
+            }                                                                               \
+            else if (strlen(DEBUG_PREFIX) > 0) {                                            \
+                fputs(_DEBUG_PREFIX_COLOR prefix " # " ANSI_COLOR_RESET, stdout);           \
+            }                                                                               \
+            puts(str);                                                                      \
+        }                                                                                   \
     } while (0)
 
 /**
@@ -277,14 +294,10 @@ static inline void __debug_put_prefix(const char *func_name)
  *
  * @brief Print debug information to stdout using puts(), so no stack size
  *        restrictions do apply.
+ *
+ * Make use of @ref DEBUG_PUTS_ if you need to use a custom prefix.
  */
-#define DEBUG_PUTS(str)                         \
-    do {                                        \
-        if (ENABLE_DEBUG) {                     \
-            __debug_put_prefix(DEBUG_FUNC);     \
-            puts(str);                          \
-        }                                       \
-    } while (0)
+#define DEBUG_PUTS(str)  DEBUG_PUTS_(DEBUG_PREFIX, str)
 /** @} */
 
 /**
