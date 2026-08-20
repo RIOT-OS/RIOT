@@ -1,22 +1,22 @@
 #!/bin/sh
 
-# Copyright 2017 Kaspar Schleiser <kaspar@schleiser.de>
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2017 Kaspar Schleiser <kaspar@schleiser.de>
+# SPDX-License-Identifier: LGPL-2.1-only
 
-: "${RIOTBASE:=$(cd $(dirname $0)/../../../; pwd)}"
-cd $RIOTBASE
+: "${RIOTBASE:=$(cd "$(dirname "$0")/../../../" || exit 1; pwd)}"
+cd "$RIOTBASE" || exit 1
 
 : "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
+
+# shellcheck source=dist/tools/ci/changed_files.sh
 . "${RIOTTOOLS}"/ci/changed_files.sh
+# shellcheck source=dist/tools/ci/github_annotate.sh
 . "${RIOTTOOLS}"/ci/github_annotate.sh
 
 EXIT_CODE=0
 
 filter() {
-    if [ $QUIET -eq 0 ]; then
+    if [ "$QUIET" -eq 0 ]; then
         cat
     else
         grep '^---' | cut -f 2 -d ' '
@@ -24,13 +24,13 @@ filter() {
 }
 
 _annotate_diff() {
-    if [ -n "$1" -a -n "$2" -a -n "$3" ]; then
+    if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ]; then
         IFS="${OLD_IFS}" github_annotate_error "$1" "$2" "Wrong header guard format:\n\n$3"
     fi
 }
 
 _headercheck() {
-    OUT=$(${RIOTTOOLS}/headerguards/headerguards.py ${FILES} 2>&1 | filter)
+    OUT=$("${RIOTTOOLS}"/headerguards/headerguards.py "${FILES}" 2>&1 | filter)
     if [ -n "$OUT" ]; then
         EXIT_CODE=1
         if github_annotate_is_on; then
@@ -94,7 +94,7 @@ _headercheck() {
     fi
 }
 
-: ${FILES:=$(FILEREGEX='\.h$' changed_files)}
+: "${FILES:=$(FILEREGEX='\.h$' changed_files)}"
 
 if [ -z "${FILES}" ]; then
     exit
@@ -102,7 +102,7 @@ fi
 
 github_annotate_setup
 
-: ${QUIET:=0}
+: "${QUIET:=0}"
 
 if [ -z "$*" ]; then
     _headercheck
@@ -110,4 +110,4 @@ fi
 
 github_annotate_teardown
 
-exit $EXIT_CODE
+exit "$EXIT_CODE"
