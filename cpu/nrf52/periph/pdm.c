@@ -63,6 +63,8 @@
 /* The samples buffer is a double buffer */
 static int16_t _pdm_buf[PDM_BUF_SIZE * 2] = { 0 };
 static pdm_isr_ctx_t _isr_ctx;
+static uint32_t _backoff_buffers;
+static volatile uint32_t _backoff_buffers_left;
 static uint8_t _pdm_current_buf = 0;
 static uint8_t _pdm_next_buf = 0;
 
@@ -125,6 +127,9 @@ int32_t pdm_init(pdm_mode_t mode, uint32_t rate, int8_t gain,
 
     /* Configure sampling rate */
     uint32_t real_rate = _set_best_pdm_rate(rate);
+    uint8_t channels = (mode == PDM_MODE_STEREO) ? 2 : 1;
+    uint32_t backoff_samples = (real_rate * PDM_BACKOFF_MS * channels + 999) / 1000;
+    _backoff_buffers = (backoff_samples + PDM_BUF_SIZE - 1) / PDM_BUF_SIZE;
 
     /* Configure mode (Mono or Stereo) */
     switch (mode) {
@@ -189,6 +194,7 @@ void pdm_start(void)
 {
     _pdm_next_buf = 0;
     _pdm_current_buf = 0;
+    _backoff_buffers_left = _backoff_buffers;
     NRF_PDM->SAMPLE.PTR = (uint32_t)_pdm_buf;
     DEBUG("[PDM] MAXCNT: %" PRIu32 "\n", NRF_PDM->SAMPLE.MAXCNT);
 
@@ -219,8 +225,14 @@ void isr_pdm(void)
     if (NRF_PDM->EVENTS_END == 1) {
         NRF_PDM->EVENTS_END = 0;
 
-        /* Process received samples frame */
-        _isr_ctx.cb(_isr_ctx.arg, &_pdm_buf[_pdm_current_buf * (PDM_BUF_SIZE)]);
+        if (_backoff_buffers_left > 0) {
+            /* still inside the startup backoff window, so discard buffer */
+            _backoff_buffers_left--;
+        }
+        else {
+            /* backoff has elapsed, hand the buffer to the callback */
+            _isr_ctx.cb(_isr_ctx.arg, &_pdm_buf[_pdm_current_buf * (PDM_BUF_SIZE)]);
+        }
 
         /* Set next buffer */
         _pdm_current_buf ^= 1;

@@ -1,12 +1,13 @@
 /*
  * SPDX-FileCopyrightText: 2020 Inria
+ * SPDX-FileCopyrightText: 2024-2026 HAW Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 #pragma once
 
 /**
- * @defgroup    drivers_periph_pdm Pulse Density Modulation (PDM) driver
+ * @defgroup    drivers_periph_pdm Pulse Density Modulation (PDM)
  * @ingroup     drivers_periph
  * @brief       Low-level Pulse Density Modulation (PDM) driver
  *
@@ -14,6 +15,7 @@
  * @file
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Ben Wehrberger <ben.wehrberger@haw-hamburg.de>
  *
  */
 
@@ -26,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Default PDM mode values
+ * @brief   PDM operation modes
  * @{
  */
 #ifndef HAVE_PDM_MODE_T
@@ -38,31 +40,44 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   Default PDM min gain values (in dB)
+ * @brief   Minimum PDM gain (in dB)
  */
 #ifndef PDM_GAIN_MIN
-#define PDM_GAIN_MIN        (-20)
+#  define PDM_GAIN_MIN        (-20)
 #endif
 
 /**
- * @brief   Default PDM max gain values (in dB)
+ * @brief   Maximum PDM gain (in dB)
  */
 #ifndef PDM_GAIN_MAX
-#define PDM_GAIN_MAX        (20)
+#  define PDM_GAIN_MAX        (20)
 #endif
 
 /**
- * @brief   Default PDM samples frame buffer size
+ * @brief   Default PDM sample buffer size
  */
 #ifndef PDM_BUF_SIZE
-#define PDM_BUF_SIZE        (64U)
+#  define PDM_BUF_SIZE        (64U)
+#endif
+
+/**
+ * @brief   Startup backoff in ms during which samples are discarded while the
+ *          peripheral settles
+ *
+ * @note    Depending on the hardware a microphone settling/startup artifact
+ *          may appear that is way longer (up to several 100 ms). Its duration
+ *          and shape depends on the config. Increase PDM_BACKOFF_MS accordingly
+ *          if the application needs clean samples from the start.
+ */
+#ifndef PDM_BACKOFF_MS
+#  define PDM_BACKOFF_MS      (5U)
 #endif
 
 /**
  * @brief   Signature for data received interrupt callback
  *
- * @param[in] arg           context to the callback (optional)
- * @param[in] buf           the buffer containing the current samples frame
+ * @param[in] arg       context passed to the callback (optional)
+ * @param[in] buf       the buffer containing the current sample frame
  */
 typedef void (*pdm_data_cb_t)(void *arg, int16_t *buf);
 
@@ -72,7 +87,7 @@ typedef void (*pdm_data_cb_t)(void *arg, int16_t *buf);
 #ifndef HAVE_PDM_ISR_CTX_T
 typedef struct {
     pdm_data_cb_t cb;       /**< data received interrupt callback */
-    void *arg;              /**< argument to both callback routines */
+    void *arg;              /**< context passed to the callback */
 } pdm_isr_ctx_t;
 #endif
 
