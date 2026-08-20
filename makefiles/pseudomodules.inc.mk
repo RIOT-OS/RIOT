@@ -301,6 +301,7 @@ PSEUDOMODULES += gnrc_txtsnd
 
 PSEUDOMODULES += ieee802154_security
 PSEUDOMODULES += ieee802154_submac
+PSEUDOMODULES += ieee802154_submac_soft_ack
 PSEUDOMODULES += ipv4
 PSEUDOMODULES += ipv6
 
