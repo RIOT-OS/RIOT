@@ -19,7 +19,6 @@
  * @author      Hermann Lelong <hermann@otakeys.com>
  * @author      Toon Stegen <toon.stegen@altran.com>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
- *
  * @}
  */
 
@@ -31,54 +30,54 @@
 #include "periph/gpio.h"
 #include "pm_layered.h"
 
-#if defined(CPU_LINE_STM32L4R5xx) || defined(CPU_FAM_STM32G0) || \
+#if defined(CPU_FAM_STM32C0) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0) || \
-    defined(CPU_FAM_STM32U5)
-#define ISR_REG     ISR
-#define ISR_TXE     USART_ISR_TXE_TXFNF
-#define ISR_RXNE    USART_ISR_RXNE_RXFNE
-#define ISR_TC      USART_ISR_TC
-#define TDR_REG     TDR
-#define RDR_REG     RDR
-#elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
-      defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) || \
-      defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32F7) || \
-      defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32MP1)
-#define ISR_REG     ISR
-#define ISR_TXE     USART_ISR_TXE
-#define ISR_RXNE    USART_ISR_RXNE
-#define ISR_TC      USART_ISR_TC
-#define TDR_REG     TDR
-#define RDR_REG     RDR
+    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WL) || \
+    defined(CPU_LINE_STM32L4R5xx)
+#  define ISR_REG   ISR
+#  define ISR_TXE   USART_ISR_TXE_TXFNF
+#  define ISR_RXNE  USART_ISR_RXNE_RXFNE
+#  define ISR_TC    USART_ISR_TC
+#  define TDR_REG   TDR
+#  define RDR_REG   RDR
+#elif defined(CPU_FAM_STM32F0)  || defined(CPU_FAM_STM32F3) || \
+      defined(CPU_FAM_STM32F7)  || defined(CPU_FAM_STM32G4) || \
+      defined(CPU_FAM_STM32L0)  || defined(CPU_FAM_STM32L4) || \
+      defined(CPU_FAM_STM32MP1) || defined(CPU_FAM_STM32WB)
+#  define ISR_REG   ISR
+#  define ISR_TXE   USART_ISR_TXE
+#  define ISR_RXNE  USART_ISR_RXNE
+#  define ISR_TC    USART_ISR_TC
+#  define TDR_REG   TDR
+#  define RDR_REG   RDR
 #elif defined(CPU_FAM_STM32H7)
-#  define ISR_REG     ISR
-#  define ISR_TXE     USART_ISR_TXE_TXFNF
-#  define ISR_RXNE    USART_ISR_RXNE_RXFNE
-#  define ISR_TC      USART_ISR_TC
-#  define TDR_REG     TDR
-#  define RDR_REG     RDR
+#  define ISR_REG   ISR
+#  define ISR_TXE   USART_ISR_TXE_TXFNF
+#  define ISR_RXNE  USART_ISR_RXNE_RXFNE
+#  define ISR_TC    USART_ISR_TC
+#  define TDR_REG   TDR
+#  define RDR_REG   RDR
 #else
-#define ISR_REG     SR
-#define ISR_TXE     USART_SR_TXE
-#define ISR_RXNE    USART_SR_RXNE
-#define ISR_TC      USART_SR_TC
-#define TDR_REG     DR
-#define RDR_REG     DR
+#  define ISR_REG   SR
+#  define ISR_TXE   USART_SR_TXE
+#  define ISR_RXNE  USART_SR_RXNE
+#  define ISR_TC    USART_SR_TC
+#  define TDR_REG   DR
+#  define RDR_REG   DR
 #endif
 
-#if defined(CPU_LINE_STM32L4R5xx) || defined(CPU_FAM_STM32G0) || \
+#if defined(CPU_FAM_STM32C0) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32C0) || \
-    defined(CPU_FAM_STM32U5)
-#define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE_RXFNEIE)
+    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WL) || \
+    defined(CPU_LINE_STM32L4R5xx)
+#  define RXENABLE          (USART_CR1_RE | USART_CR1_RXNEIE_RXFNEIE)
 #else
-#define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE)
+#  define RXENABLE          (USART_CR1_RE | USART_CR1_RXNEIE)
 #endif
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
 
-#include "tsrb.h"
+#  include "tsrb.h"
 /**
  * @brief   Allocate for tx ring buffers
  */
@@ -104,13 +103,13 @@ static inline USART_TypeDef *dev(uart_t uart)
 }
 
 static inline void uart_init_usart(uart_t uart, uint32_t baudrate);
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4) || \
-    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32U5)
-#ifdef MODULE_PERIPH_LPUART
+#if defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
+    defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32U5) || \
+    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
+#  ifdef MODULE_PERIPH_LPUART
 static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate);
-#endif
+#  endif
 #endif
 
 #ifdef MODULE_PERIPH_UART_HW_FC
@@ -118,11 +117,11 @@ static inline void uart_init_rts_pin(uart_t uart)
 {
     if (uart_config[uart].rts_pin != GPIO_UNDEF) {
         gpio_init(uart_config[uart].rts_pin, GPIO_OUT);
-#ifdef CPU_FAM_STM32F1
+#  ifdef CPU_FAM_STM32F1
         gpio_init_af(uart_config[uart].rts_pin, GPIO_AF_OUT_PP);
-#else
+#  else
         gpio_init_af(uart_config[uart].rts_pin, uart_config[uart].rts_af);
-#endif
+#  endif
     }
 }
 
@@ -130,9 +129,9 @@ static inline void uart_init_cts_pin(uart_t uart)
 {
     if (uart_config[uart].cts_pin != GPIO_UNDEF) {
         gpio_init(uart_config[uart].cts_pin, GPIO_IN);
-#ifndef CPU_FAM_STM32F1
+#  ifndef CPU_FAM_STM32F1
         gpio_init_af(uart_config[uart].cts_pin, uart_config[uart].cts_af);
-#endif
+#  endif
     }
 }
 #endif
@@ -199,21 +198,21 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     dev(uart)->CR2 = 0;
     dev(uart)->CR3 = 0;
 
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4) || \
-    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32U5)
+#if defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
+    defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32U5) || \
+    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
     switch (uart_config[uart].type) {
-        case STM32_USART:
-            uart_init_usart(uart, baudrate);
-            break;
-#ifdef MODULE_PERIPH_LPUART
-        case STM32_LPUART:
-            uart_init_lpuart(uart, baudrate);
-            break;
-#endif
-        default:
-            return UART_NODEV;
+    case STM32_USART:
+        uart_init_usart(uart, baudrate);
+        break;
+#  ifdef MODULE_PERIPH_LPUART
+    case STM32_LPUART:
+        uart_init_lpuart(uart, baudrate);
+        break;
+#  endif
+    default:
+        return UART_NODEV;
     }
 #else
     uart_init_usart(uart, baudrate);
@@ -260,35 +259,35 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 
     if (parity) {
         switch (data_bits) {
-            case UART_DATA_BITS_6:
-                data_bits = UART_DATA_BITS_7;
-                isr_ctx[uart].data_mask = 0x3F;
-                break;
-            case UART_DATA_BITS_7:
-                data_bits = UART_DATA_BITS_8;
-                isr_ctx[uart].data_mask = 0x7F;
-                break;
-            case UART_DATA_BITS_8:
-#ifdef USART_CR1_M0
-                data_bits = USART_CR1_M0;
-#else
-                data_bits = USART_CR1_M;
-#endif
-                break;
-            default:
-                return UART_NOMODE;
+        case UART_DATA_BITS_6:
+            data_bits = UART_DATA_BITS_7;
+            isr_ctx[uart].data_mask = 0x3F;
+            break;
+        case UART_DATA_BITS_7:
+            data_bits = UART_DATA_BITS_8;
+            isr_ctx[uart].data_mask = 0x7F;
+            break;
+        case UART_DATA_BITS_8:
+#  ifdef USART_CR1_M0
+            data_bits = USART_CR1_M0;
+#  else
+            data_bits = USART_CR1_M;
+#  endif
+            break;
+        default:
+            return UART_NOMODE;
         }
     }
     if ((data_bits & UART_INVALID_MODE) || (parity & UART_INVALID_MODE)) {
         return UART_NOMODE;
     }
 
-#ifdef USART_CR1_M1
+#  ifdef USART_CR1_M1
     if (!(dev(uart)->ISR & USART_ISR_TC)) {
         return UART_INTERR;
     }
     dev(uart)->CR1 &= ~(USART_CR1_UE | USART_CR1_TE);
-#endif
+#  endif
 
     dev(uart)->CR2 &= ~USART_CR2_STOP;
     dev(uart)->CR1 &= ~(USART_CR1_PS | USART_CR1_PCE | USART_CR1_M);
@@ -330,40 +329,40 @@ static inline void uart_init_usart(uart_t uart, uint32_t baudrate)
     dev(uart)->BRR = ((mantissa & 0x0fff) << 4) | (fraction & 0x0f);
 }
 
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4) || \
-    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
-    defined(CPU_FAM_STM32WL) || defined(CPU_FAM_STM32U5)
-#ifdef CPU_FAM_STM32L5
-#define RCC_CCIPR_LPUART1SEL_0  RCC_CCIPR1_LPUART1SEL_0
-#define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR1_LPUART1SEL_1
-#define CCIPR                   CCIPR1
-#elif CPU_FAM_STM32U3
-#define RCC_CCIPR_LPUART1SEL_0  RCC_CCIPR3_LPUART1SEL_0
-#define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR3_LPUART1SEL_1
-#define CCIPR                   CCIPR3
-#elif CPU_FAM_STM32U5
-#define RCC_CCIPR_LPUART1SEL_0  RCC_CCIPR3_LPUART1SEL_0
-#define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR3_LPUART1SEL_1
-#define CCIPR                   CCIPR3
-#endif
-#ifdef MODULE_PERIPH_LPUART
+#if defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
+    defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32U5) || \
+    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
+#  ifdef CPU_FAM_STM32L5
+#    define RCC_CCIPR_LPUART1SEL_0  RCC_CCIPR1_LPUART1SEL_0
+#    define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR1_LPUART1SEL_1
+#    define CCIPR                   CCIPR1
+#  elif CPU_FAM_STM32U3
+#    define RCC_CCIPR_LPUART1SEL_0  RCC_CCIPR3_LPUART1SEL_0
+#    define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR3_LPUART1SEL_1
+#    define CCIPR                   CCIPR3
+# elif CPU_FAM_STM32U5
+#    define RCC_CCIPR_LPUART1SEL_0  RCC_CCIPR3_LPUART1SEL_0
+#    define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR3_LPUART1SEL_1
+#    define CCIPR                   CCIPR3
+#  endif
+#  ifdef MODULE_PERIPH_LPUART
 static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
 {
     uint32_t clk;
 
     switch (uart_config[uart].clk_src) {
-        case 0:
-            clk = periph_apb_clk(uart_config[uart].bus);
-            break;
-        case RCC_CCIPR_LPUART1SEL_0:
-            clk = CLOCK_CORECLOCK;
-            break;
-        case (RCC_CCIPR_LPUART1SEL_0 | RCC_CCIPR_LPUART1SEL_1):
-            clk = 32768;
-            break;
-        default: /* HSI is not supported */
-            return;
+    case 0:
+        clk = periph_apb_clk(uart_config[uart].bus);
+        break;
+    case RCC_CCIPR_LPUART1SEL_0:
+        clk = CLOCK_CORECLOCK;
+        break;
+    case (RCC_CCIPR_LPUART1SEL_0 | RCC_CCIPR_LPUART1SEL_1):
+        clk = 32768;
+        break;
+    default: /* HSI is not supported */
+        return;
     }
 
     RCC->CCIPR |= uart_config[uart].clk_src;
@@ -378,8 +377,8 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
 
     dev(uart)->BRR = brr;
 }
-#endif /* MODULE_PERIPH_LPUART */
-#endif /* STM32L0 || STM32L4 || STM32WB */
+#  endif /* MODULE_PERIPH_LPUART */
+#endif
 
 static inline void send_byte(uart_t uart, uint8_t byte)
 {
