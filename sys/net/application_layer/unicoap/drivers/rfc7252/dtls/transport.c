@@ -27,18 +27,22 @@
 #include "private.h"
 
 #define _DTLS_DEBUG(...) _UNICOAP_PREFIX_DEBUG(".transport.dtls", __VA_ARGS__)
+#define _DTLS_AUTH_DEBUG(...) _UNICOAP_PREFIX_DEBUG(".transport.dtls.auth", __VA_ARGS__)
 
 UNICOAP_DECL_RECEIVER_STORAGE_EXTERN;
 
 #define SOCK_DTLS_CLIENT_TAG (2)
 static sock_udp_t _dtls_base_socket;
 static sock_dtls_t _dtls_socket;
-static kernel_pid_t _dtls_auth_waiting_thread;
 
 unicoap_scheduled_event_t _dtls_session_triage_event = { 0 };
 
-extern int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, bool truncated,
-                                             unicoap_packet_t* packet);
+/* tinydtls does not support auxiliary data
+ * see https://github.com/RIOT-OS/RIOT/issues/16054 */
+#if IS_ACTIVE(CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS)
+#  pragma message "warning: tinydtls does not support retrieving local endpoints. \
+           CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS will be ignored for the dtls transport"
+#endif
 
 /* Timeout function to free a session when too many session slots are occupied */
 static void _dtls_session_triage(unicoap_scheduled_event_t* event)
@@ -54,32 +58,35 @@ static void _dtls_session_triage(unicoap_scheduled_event_t* event)
     }
 }
 
-static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg)
-{
+static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg) {
     (void)arg;
     sock_dtls_session_t session = { 0 };
 
+    /* This logic heavily depends on the tinydtls backend. At the moment, no other DTLS  
+     * backend other than tinydtls exists. As soon as another becomes supported,
+     * this logic needs to be adjusted to strictly follow the sock_dtls API.
+     * For now, we need work around tinydtls quirks. */
+
     if (type & SOCK_ASYNC_CONN_RECV) {
         _DTLS_DEBUG("establishing session\n");
+        /* finish handshake as per API contract of @ref sock_dtls_session_init.
+         * use non-buf function with less parameters */
         uint8_t buf[1];
-        ssize_t res = sock_dtls_recv(sock, &session, buf, sizeof(buf),
-                                     CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS * US_PER_MS);
+        ssize_t res = sock_dtls_recv(sock, &session, buf, sizeof(buf), 0);
 
         if (res != -SOCK_DTLS_HANDSHAKE) {
             _DTLS_DEBUG("could not establish DTLS session: %" PRIiSIZE " (%s)\n", res,
-                       strerror(-(int)res));
+                        strerror(-(int)res));
             goto error;
         }
 
         dsm_state_t prev_state = dsm_store(sock, &session, SESSION_STATE_ESTABLISHED, false);
-
-        /* If session is already stored and the state was SESSION_STATE_HANDSHAKE
-         * before, the handshake has been initiated internally by a client request
-         * and another thread is waiting for the handshake. Send message to the
-         * waiting thread to inform about established session */
         if (prev_state == SESSION_STATE_HANDSHAKE) {
-            msg_t msg = { .type = DTLS_EVENT_CONNECTED };
-            msg_send(&msg, _dtls_auth_waiting_thread);
+            _DTLS_DEBUG("established, telling messaging can resume\n");
+            unicoap_endpoint_t remote = { .proto = UNICOAP_PROTO_DTLS };
+            sock_dtls_session_get_udp_ep(&session, unicoap_endpoint_get_dtls(&remote));
+            unicoap_packet_t packet = { .remote = &remote, .dtls_session = &session };
+            unicoap_messaging_process_rfc7252(NULL, 0, UNICOAP_MESSAGING_RFC7252_EVENT_SESSION_ESTABLISHED, &packet);
         }
         else if (prev_state == NO_SPACE) {
             /* No space in session management. Should not happen. If it occurs,
@@ -90,12 +97,13 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
 
         /* If not enough session slots left: set timeout to free session. */
         if (dsm_get_num_available_slots() < CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS) {
-            _DTLS_DEBUG("session triage: fewer than %u session slots available in session mgmt,"
+            _DTLS_DEBUG("session triage: fewer than %u session slots available,"
                        " limiting session lifespan to %" PRIu32 " ms\n",
                        (unsigned int)CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS,
                        (uint32_t)CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS);
             unicoap_event_schedule(&_dtls_session_triage_event, _dtls_session_triage,
-                                   CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS);
+                                   CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS,
+                                   "messaging.dtls.triage");
         }
     }
 
@@ -125,7 +133,10 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
 
         unicoap_packet_t packet = { .remote = &remote, .dtls_session = &session };
 
-#if IS_ACTIVE(CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS)
+/* tinydtls does not support auxiliary data
+ * see https://github.com/RIOT-OS/RIOT/issues/16054 */
+#if false && IS_ACTIVE(CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS)
+        assert((aux_rx.flags & SOCK_AUX_GET_LOCAL) == 0);
         unicoap_endpoint_t local = { .proto = UNICOAP_PROTO_DTLS };
         packet.local = &local;
 
@@ -135,7 +146,7 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
 #endif
 
         /* Truncated DTLS messages would already have gotten lost at verification */
-        unicoap_messaging_process_rfc7252((uint8_t*)pdu, received, false, &packet);
+        unicoap_messaging_process_rfc7252((uint8_t*)pdu, received, UNICOAP_MESSAGING_RFC7252_EVENT_RX, &packet);
 
         received = sock_dtls_recv_buf_aux(sock, &session, &pdu, &buffer_ctx, 0, &aux_rx);
         /* If the networking backends holds its zero-copy guarantee, then trying to read
@@ -158,7 +169,7 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
 
         unicoap_endpoint_t endpoint = { .proto = UNICOAP_PROTO_DTLS };
         sock_dtls_session_get_udp_ep(&session, unicoap_endpoint_get_dtls(&endpoint));
-        unicoap_exchange_release_endpoint_state(&endpoint);
+        unicoap_exchange_notify_all(&endpoint, unicoap_layer_notification_async_failure_from_errno(ECONNABORTED), NULL);
     }
 
     return;
@@ -167,55 +178,37 @@ error:
     sock_dtls_session_destroy(sock, &session);
 }
 
-static ssize_t _dtls_authenticate(const sock_udp_ep_t* remote, sock_dtls_session_t* session,
-                                  uint32_t timeout)
-{
+int unicoap_transport_connect_dtls(const sock_udp_ep_t* remote, sock_dtls_session_t* session) {
+    assert(remote);
     assert(session);
-    int res;
-
-    /* prepare session */
+    int res = 0;
+    _DTLS_AUTH_DEBUG("connecting...\n");
     sock_dtls_session_set_udp_ep(session, remote);
     dsm_state_t session_state = dsm_store(&_dtls_socket, session, SESSION_STATE_HANDSHAKE, true);
-    if (session_state == SESSION_STATE_ESTABLISHED) {
-        _DTLS_DEBUG("auth: session already established\n");
-        return 0;
+    switch (session_state) {
+        case SESSION_STATE_ESTABLISHED:
+            _DTLS_AUTH_DEBUG("session established\n");
+            return -EEXIST;
+        case SESSION_STATE_NONE:
+            _DTLS_AUTH_DEBUG("session not established\n");
+            if ((res = sock_dtls_session_init(&_dtls_socket, remote, session)) < 0) {
+                _DTLS_AUTH_DEBUG("init DTLS session failed: %i (%s)\n", (int)res, strerror(-(int)res));
+                return res;
+            }
+            /* Need to wait until session is established. */
+            return 0;
+        case SESSION_STATE_HANDSHAKE:
+            _DTLS_AUTH_DEBUG("handshaking\n");
+            /* Need to wait until handshake is done. */
+            return 0;
+        case NO_SPACE:
+            _DTLS_AUTH_DEBUG("DTLS session mgmt full\n");
+            return -ENOBUFS;
+        default:
+            UNREACHABLE();
+            assert(false);
+            return -1;
     }
-    if (session_state == NO_SPACE) {
-        _DTLS_DEBUG("auth: no space in DTLS session mgmt\n");
-        return -ENOBUFS;
-    }
-
-    /* start handshake */
-    _dtls_auth_waiting_thread = thread_getpid();
-    res = sock_dtls_session_init(&_dtls_socket, remote, session);
-    if (res == 0) {
-        /* session already exists */
-        _dtls_auth_waiting_thread = -1;
-        return res;
-    }
-
-    msg_t msg;
-    bool is_timed_out = false;
-    do {
-        uint32_t start = ztimer_now(ZTIMER_MSEC);
-        res = ztimer_msg_receive_timeout(ZTIMER_MSEC, &msg, timeout);
-
-        /* ensure whole timeout time for the case we receive other messages than
-         * DTLS_EVENT_CONNECTED */
-        if (timeout != SOCK_NO_TIMEOUT) {
-            uint32_t diff = (ztimer_now(ZTIMER_MSEC) - start);
-            timeout = (diff > timeout) ? 0 : timeout - diff;
-            is_timed_out = (res < 0) || (timeout == 0);
-        }
-    } while (!is_timed_out && (msg.type != DTLS_EVENT_CONNECTED));
-
-    if (is_timed_out && (msg.type != DTLS_EVENT_CONNECTED)) {
-        _DTLS_DEBUG("auth: timeout\n");
-        dsm_remove(&_dtls_socket, session);
-        sock_dtls_session_destroy(&_dtls_socket, session);
-        return -ENOTCONN;
-    }
-    return 0;
 }
 
 int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
@@ -224,14 +217,15 @@ int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
     assert(remote);
     ssize_t res = 0;
 
-    if (!session) {
-        if ((res = _dtls_authenticate(remote, session, CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS))
-            < 0) {
-            return res;
-        }
+    _DTLS_DEBUG("sendv\n");
+    sock_dtls_session_set_udp_ep(session, remote);
+    /* Get session state to assert session has been established before using connect(). */
+    dsm_state_t session_state = dsm_store(&_dtls_socket, session, SESSION_STATE_HANDSHAKE, true);
+    (void)session_state;
+    if (IS_ACTIVE(DEVELHELP) && session_state != SESSION_STATE_ESTABLISHED) {
+        _DTLS_DEBUG("FATAL ERROR: session not established, call connect() before\n");
     }
-
-    _DTLS_DEBUG("started sending\n");
+    assert(session_state == SESSION_STATE_ESTABLISHED);
 
     if (unlikely(local)) {
         sock_dtls_aux_tx_t aux_tx = { .flags = SOCK_AUX_SET_LOCAL, .local = *local };
@@ -242,20 +236,21 @@ int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
         res = sock_dtls_sendv_aux(&_dtls_socket, session, iolist,
                                   CONFIG_UNICOAP_DTLS_HANDSHAKE_TIMEOUT_MS * US_PER_MS, NULL);
     }
-    _DTLS_DEBUG("done sending\n");
 
-    switch (res) {
-    case -EHOSTUNREACH:
-    case -ENOTCONN:
-    case 0:
-        _DTLS_DEBUG("DTLS sock not connected or remote unreachable. "
-                   "Destroying session.\n");
-        dsm_remove(&_dtls_socket, session);
-        sock_dtls_session_destroy(&_dtls_socket, session);
-        break;
-    default:
-        /* Temporary error. Keeping the DTLS session */
-        break;
+    if (res <= 0) {
+        switch (res) {
+        case -EHOSTUNREACH:
+        case -ENOTCONN:
+        case 0:
+            _DTLS_DEBUG("sock not connected or remote unreachable, tearing down session\n");
+            dsm_remove(&_dtls_socket, session);
+            sock_dtls_session_destroy(&_dtls_socket, session);
+            break;
+        default:
+            /* Temporary error, keep DTLS session. */
+            _DTLS_DEBUG("error: %s\n", strerror(-res));
+            return res;
+        }
     }
     return 0;
 }
@@ -271,6 +266,7 @@ static int _add_socket(event_queue_t* queue, sock_dtls_t* socket, sock_udp_t* ba
         _DTLS_DEBUG("error creating DTLS base (UDP) sock\n");
         return 0;
     }
+    /* tinydtls as a backend does not care about role, fine to reuse same socket for client */
     if (sock_dtls_create(socket, base_socket, CREDMAN_TAG_EMPTY, SOCK_DTLS_1_2,
                          SOCK_DTLS_SERVER) < 0) {
         _DTLS_DEBUG("error creating DTLS sock\n");
