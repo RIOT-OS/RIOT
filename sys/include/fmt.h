@@ -25,9 +25,9 @@
  *       This can be used to ensure the `out` buffer is large enough.
  *
  * @note The print functions in this library do not buffer any output.
- * Mixing calls to standard @c printf from stdio.h with the @c print_xxx
- * functions in fmt, especially on the same output line, may cause garbled
- * output.
+ *       Mixing calls to standard @c printf from `stdio.h` with the @c print_xxx
+ *       functions in fmt, especially on the same output line, may cause garbled
+ *       output.
  *
  * @{
  *
@@ -44,12 +44,14 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "compiler_hints.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #ifndef FMT_USE_MEMMOVE
-#define FMT_USE_MEMMOVE (1) /**< use memmove() or internal implementation */
+#  define FMT_USE_MEMMOVE (1) /**< use memmove() or internal implementation */
 #endif
 
 /**
@@ -57,7 +59,8 @@ extern "C" {
  *
  * @param[in] c     Character to test
  *
- * @return  true if @p c is a digit, false otherwise
+ * @retval  true if @p c is a digit
+ * @retval false otherwise
  */
 static inline int fmt_is_digit(char c)
 {
@@ -69,7 +72,8 @@ static inline int fmt_is_digit(char c)
  *
  * @param[in] c     Character to test
  *
- * @return  true if @p c is an uppercase letter, false otherwise
+ * @retval  true if @p c is an uppercase letter
+ * @retval  false otherwise
  */
 static inline int fmt_is_upper(char c)
 {
@@ -81,7 +85,8 @@ static inline int fmt_is_upper(char c)
  *
  * @param[in] str   String to test, **must be `\0` terminated**
  *
- * @return  true if @p str solely contains decimal digits, false otherwise
+ * @retval  true if @p str solely contains decimal digits
+ * @retval  false otherwise
  */
 int fmt_is_number(const char *str);
 
@@ -97,7 +102,7 @@ int fmt_is_number(const char *str);
  * @param[out] out  Pointer to output buffer, or NULL
  * @param[in]  byte Byte value to convert
  *
- * @return     2
+ * @retval     2 in any case
  */
 size_t fmt_byte_hex(char *out, uint8_t byte);
 
@@ -112,8 +117,9 @@ size_t fmt_byte_hex(char *out, uint8_t byte);
  * @param[in]  ptr  Pointer to bytes to convert
  * @param[in]  n    Number of bytes to convert
  *
- * @return     2*n
+ * @retval     2*n in any case
  */
+ACCESS(read_only, 2, 3)
 size_t fmt_bytes_hex(char *out, const uint8_t *ptr, size_t n);
 
 /**
@@ -127,8 +133,9 @@ size_t fmt_bytes_hex(char *out, const uint8_t *ptr, size_t n);
  * @param[in]  ptr  Pointer to bytes to convert
  * @param[in]  n    Number of bytes to convert
  *
- * @return     2*n
+ * @retval     2*n in any case
  */
+ACCESS(read_only, 2, 3)
 size_t fmt_bytes_hex_reverse(char *out, const uint8_t *ptr, size_t n);
 
 /**
@@ -158,7 +165,8 @@ uint8_t fmt_hex_byte(const char *hex);
  * @param[out] out  Pointer to converted bytes, or NULL
  * @param[in]  hex  Pointer to input buffer
  * @returns    strlen(hex) / 2 when length of @p hex was even
- * @returns    0 otherwise
+ * @retval     strlen(hex)/2 when length of @p hex was even
+ * @retval     0 otherwise
  */
 size_t fmt_hex_bytes(uint8_t *out, const char *hex);
 
@@ -172,7 +180,7 @@ size_t fmt_hex_bytes(uint8_t *out, const char *hex);
  * @param[out]  out  Pointer to output buffer, or NULL
  * @param[in]   val  Value to convert
  *
- * @return      4
+ * @retval      4 in any case
  */
 size_t fmt_u16_hex(char *out, uint16_t val);
 
@@ -186,7 +194,7 @@ size_t fmt_u16_hex(char *out, uint16_t val);
  * @param[out]  out  Pointer to output buffer, or NULL
  * @param[in]   val  Value to convert
  *
- * @return      8
+ * @retval      8 in any case
  */
 size_t fmt_u32_hex(char *out, uint32_t val);
 
@@ -200,7 +208,7 @@ size_t fmt_u32_hex(char *out, uint32_t val);
  * @param[out]  out  Pointer to output buffer, or NULL
  * @param[in]   val  Value to convert
  *
- * @return      16
+ * @retval      16 in any case
  */
 size_t fmt_u64_hex(char *out, uint64_t val);
 
@@ -213,7 +221,7 @@ size_t fmt_u64_hex(char *out, uint64_t val);
  * @param[out]  out  Pointer to output buffer, or NULL
  * @param[in]   val  Value to convert
  *
- * @return      nr of characters written to (or needed in) @p out
+ * @return      Number of characters written to (or needed in) @p out
  */
 size_t fmt_u16_dec(char *out, uint16_t val);
 
@@ -226,7 +234,7 @@ size_t fmt_u16_dec(char *out, uint16_t val);
  * @param[out]  out  Pointer to output buffer, or NULL
  * @param[in]   val  Value to convert
  *
- * @return      nr of characters written to (or needed in) @p out
+ * @return      Number of characters written to (or needed in) @p out
  */
 size_t fmt_u32_dec(char *out, uint32_t val);
 
@@ -241,12 +249,12 @@ size_t fmt_u32_dec(char *out, uint32_t val);
  * @param[out]  out  Pointer to output buffer, or NULL
  * @param[in]   val  Value to convert
  *
- * @return      nr of characters written to (or needed in) @p out
+ * @return      Number of characters written to (or needed in) @p out
  */
 size_t fmt_u64_dec(char *out, uint64_t val);
 
 /**
- * @brief Convert a int64 value to decimal string.
+ * @brief Convert an int64 value to decimal string.
  *
  * Will add a leading "-" if @p val is negative.
  *
@@ -256,12 +264,12 @@ size_t fmt_u64_dec(char *out, uint64_t val);
  * @param[out]  out  Pointer to output buffer, or NULL
  * @param[in]   val  Value to convert
  *
- * @return      nr of characters written to (or needed in) @p out
+ * @return      Number of characters written to (or needed in) @p out
  */
 size_t fmt_s64_dec(char *out, int64_t val);
 
 /**
- * @brief Convert a int32 value to decimal string.
+ * @brief Convert an int32 value to decimal string.
  *
  * Will add a leading "-" if @p val is negative.
  *
@@ -271,12 +279,12 @@ size_t fmt_s64_dec(char *out, int64_t val);
  * @param[out]  out  Pointer to output buffer, or NULL
  * @param[in]   val  Value to convert
  *
- * @return      nr of characters written to (or needed in) @p out
+ * @return      Number of characters written to (or needed in) @p out
  */
 size_t fmt_s32_dec(char *out, int32_t val);
 
 /**
- * @brief Convert a int16 value to decimal string.
+ * @brief Convert an int16 value to decimal string.
  *
  * Will add a leading "-" if @p val is negative.
  *
@@ -286,7 +294,7 @@ size_t fmt_s32_dec(char *out, int32_t val);
  * @param[out]  out  Pointer to output buffer, or NULL
  * @param[in]   val  Value to convert
  *
- * @return      nr of characters written to (or needed in) @p out
+ * @return      Number of characters written to (or needed in) @p out
  */
 size_t fmt_s16_dec(char *out, int16_t val);
 
@@ -340,7 +348,7 @@ size_t fmt_s32_dfp(char *out, int32_t val, int scale);
  * @param[in]   f           float value to convert
  * @param[in]   precision   number of digits after decimal point
  *
- * @returns     nr of characters the function did or would write to out
+ * @return      Number of characters the function did or would write to out
  */
 size_t fmt_float(char *out, float f, unsigned precision);
 
@@ -353,7 +361,7 @@ size_t fmt_float(char *out, float f, unsigned precision);
  * @param[out]  out     string to write to (or NULL)
  * @param[in]   c       char value to append
  *
- * @return      nr of characters the function did or would write to out
+ * @return      Number of characters the function did or would write to out
  */
 size_t fmt_char(char *out, char c);
 
@@ -362,7 +370,7 @@ size_t fmt_char(char *out, char c);
  *
  * @param[in]   str  Pointer to string
  *
- * @return      nr of characters in string @p str points to
+ * @return      Number of characters in string @p str points to
  */
 size_t fmt_strlen(const char *str);
 
@@ -372,7 +380,7 @@ size_t fmt_strlen(const char *str);
  * @param[in]   str     Pointer to string
  * @param[in]   maxlen  Maximum number of chars to count
  *
- * @return      nr of characters in string @p str points to, or @p maxlen if no
+ * @return      Number of characters in string @p str points to, or @p maxlen if no
  *              null terminator is found within @p maxlen chars
  */
 size_t fmt_strnlen(const char *str, size_t maxlen);
@@ -386,7 +394,7 @@ size_t fmt_strnlen(const char *str, size_t maxlen);
  * @param[out]  out  Pointer to output buffer, or NULL
  * @param[in]   str  Pointer to null-terminated source string
  *
- * @return      nr of characters written to (or needed in) @p out
+ * @return      Number of characters written to (or needed in) @p out
  */
 size_t fmt_str(char *out, const char *str);
 
@@ -399,7 +407,7 @@ size_t fmt_str(char *out, const char *str);
  * @param[out]  out     Pointer to output buffer, or NULL
  * @param[in]   str     Pointer to null-terminated source string
  *
- * @return      nr of characters written to (or needed in) @p out
+ * @return      Number of characters written to (or needed in) @p out
  */
 size_t fmt_to_lower(char *out, const char *str);
 
@@ -463,7 +471,7 @@ static inline int scn_bool_str(const char *str)
  * Will convert up to @p n digits. Stops at any non-digit or '\0' character.
  *
  * @param[in]   str  Pointer to string to read from
- * @param[in]   n    Maximum nr of characters to consider
+ * @param[in]   n    Maximum number of characters to consider
  *
  * @return      converted uint32_t value
  */
@@ -484,6 +492,19 @@ uint32_t scn_u32_hex(const char *str, size_t n);
 /**
  * @brief   Convert a hex to binary
  *
+ * @pre     If @p dest_len is > 0, @p dest is not a null pointer
+ * @pre     If @p hex_len is > 0, @p hex is not a null pointer
+ *
+ * Example usage:
+ * ```c
+ * const char *hex = "deadbeef";
+ * uint8_t binary[sizeof(hex) / 2];
+ * ssize_t len = scn_buf_hex(binary, sizeof(binary), hex, strlen(hex));
+ * if (len >= 0) {
+ *     make_use_of(binary, len);
+ * }
+ * ```
+ *
  * @param[out]  dest        Destination buffer to write to
  * @param[in]   dest_len    Size of @p dest in bytes
  * @param[in]   hex         Hex string to convert
@@ -492,26 +513,15 @@ uint32_t scn_u32_hex(const char *str, size_t n);
  * @return  Number of bytes written
  * @retval  -EINVAL     @p hex_len is odd or @p hex contains non-hex chars
  * @retval  -EOVERFLOW  Destination to small
- *
- * @pre     If @p dest_len is > 0, @p dest is not a null pointer
- * @pre     If @p hex_len is > 0, @p hex is not a null pointer
- *
- * Examples
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
- * const char *hex = "deadbeef";
- * uint8_t binary[sizeof(hex) / 2];
- * ssize_t len = scn_buf_hex(binary, sizeof(binary), hex, strlen(hex));
- * if (len >= 0) {
- *     make_use_of(binary, len);
- * }
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
+ACCESS(write_only, 1, 2)
+ACCESS(read_only, 3, 4)
 ssize_t scn_buf_hex(void *dest, size_t dest_len, const char *hex, size_t hex_len);
 
 /**
  * @brief   Convert an ISO 8601 time string to time structure
  *
- * This function parses a string in the format YYYY-MM-DD.
+ * This function parses a string in the format `YYYY-MM-DD`.
  *
  * A terminating '\0' is not required.
  *
@@ -554,7 +564,7 @@ int scn_time_tm_iso8601_time(struct tm *tm, const char *str);
  * @brief   Convert an ISO 8601 string to time structure
  *
  * This function parses a string in the format
- * YYYY-MM-DD\<separator\>HH:MM:SS or YYYY-MM-DD.
+ * `YYYY-MM-DD\<separator\>HH:MM:SS` or `YYYY-MM-DD`.
  *
  * A terminating '\0' is not required.
  *
@@ -611,6 +621,7 @@ void print_byte_hex(uint8_t byte);
  * @param[in]  bytes Byte array to print
  * @param[in]  n     Number of bytes to print
  */
+ACCESS(read_only, 1, 2)
 void print_bytes_hex(const void *bytes, size_t n);
 
 /**
@@ -670,11 +681,10 @@ void print_str(const char* str);
  *
  * This function left-pads a given string @p str with @p pad_char.
  *
- * For example, calling
- *
- *     fmt_lpad("abcd", 4, 7, ' ');
- *
- * would result in "   abcd".
+  * For example, calling the following function would result in "   abcd".
+   * ```c
+   * fmt_lpad("abcd", 4, 7, ' ');
+  * ```
  *
  * The function only writes to @p str if str is non-NULL and @p pad_len is < @p
  * in_len.
