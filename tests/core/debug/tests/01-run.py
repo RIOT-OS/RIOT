@@ -28,7 +28,7 @@ prefixes = [
 
 def colored_prefix(prefix):
     if len(prefix) == 0:
-        return ANSI_CYAN + "# " + ANSI_RESET
+        return ""
     return ANSI_CYAN + prefix + " # " + ANSI_RESET
 
 def testfunc(child):

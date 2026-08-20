@@ -191,7 +191,7 @@ static inline void __debug_print_prefix(const char *func_name)
         printf(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "(@%s) # " ANSI_COLOR_RESET,
                __debug_thread_name_or_isr());
     }
-    else {
+    else if (strlen(DEBUG_PREFIX) > 0) {
         printf(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "# " ANSI_COLOR_RESET);
     }
 }
@@ -222,7 +222,7 @@ static inline void __debug_put_prefix(const char *func_name)
         fputs(__debug_thread_name_or_isr(), stdout);
         fputs(") # " ANSI_COLOR_RESET, stdout);
     }
-    else {
+    else if (strlen(DEBUG_PREFIX) > 0) {
         fputs(_DEBUG_PREFIX_COLOR _DEBUG_PREFIX "# " ANSI_COLOR_RESET, stdout);
     }
 }
