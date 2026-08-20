@@ -19,7 +19,7 @@
 #include "usb/usbus.h"
 #include "usb/usbus/cdc/acm.h"
 
-#ifdef MODULE_USBUS_DFU
+#if MODULE_USBUS_DFU
 #include "usb/usbus/dfu.h"
 static usbus_dfu_device_t _dfu;
 #endif
@@ -33,7 +33,7 @@ static void _init(void)
 {
     usbus_init(&_usbus, usbdev_get_ctx(0));
 
-#ifdef MODULE_STDIO_CDC_ACM
+#if MODULE_STDIO_CDC_ACM
     /* if stdio_cdc_acm is used, initialize it */
     void usb_cdc_acm_stdio_init(usbus_t *_usbus);
     usb_cdc_acm_stdio_init(&_usbus);
@@ -45,7 +45,7 @@ static void _init(void)
     usbus_cdc_acm_init(&_usbus, &_cdcacm, NULL, NULL, &_cdcacm_buf, 1);
 #endif
 
-#ifdef MODULE_USBUS_DFU
+#if MODULE_USBUS_DFU
     usbus_dfu_init(&_usbus, &_dfu, USB_DFU_PROTOCOL_RUNTIME_MODE);
 #endif
 

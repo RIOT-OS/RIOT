@@ -15,3 +15,9 @@ ifneq (,$(filter nrf51 nrf52,$(CPU)))
 else
   CFLAGS += -DMYNEWT_VAL_OS_CPUTIME_FREQ=CONFIG_ZTIMER_MSEC_BASE_FREQ
 endif
+
+MODULE_DEFS_NEEDED += \
+  nimble \
+  uwb_core \
+  uwb_dw1000 \
+  #

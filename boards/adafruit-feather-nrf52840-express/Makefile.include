@@ -1,1 +1,5 @@
 UF2_SOFTDEV ?= SD611
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_hw_fc \
+  #

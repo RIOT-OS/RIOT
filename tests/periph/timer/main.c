@@ -34,7 +34,7 @@
 #endif
 
 /* backward compatibility with legacy drivers */
-#if !defined(TIMER_CHANNEL_NUMOF) && !IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)
+#if !defined(TIMER_CHANNEL_NUMOF) && !MODULE_PERIPH_TIMER_QUERY_FREQS
 #define TIMER_CHANNEL_NUMOF 10U
 #endif
 
@@ -70,7 +70,7 @@ static void cb_not_to_be_executed(void *arg, int chan)
 
 static uword_t query_channel_numof(tim_t dev)
 {
-    if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+    if (MODULE_PERIPH_TIMER_QUERY_FREQS) {
         return timer_query_channel_numof(dev);
     }
 
@@ -123,7 +123,7 @@ static int test_timer(unsigned num, uint32_t timer_freq)
             /* If the timer supports the periph_timer_query_freqs feature, we
              * expect it to correctly report the number of supported channels
              */
-            if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+            if (MODULE_PERIPH_TIMER_QUERY_FREQS) {
                 return 0;
             }
             break;
@@ -206,7 +206,7 @@ static int test_timer(unsigned num, uint32_t timer_freq)
 
 static uword_t query_freq_numof(tim_t dev)
 {
-    if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+    if (MODULE_PERIPH_TIMER_QUERY_FREQS) {
         return timer_query_freqs_numof(dev);
     }
 
@@ -215,7 +215,7 @@ static uword_t query_freq_numof(tim_t dev)
 
 static uint32_t query_freq(tim_t dev, uword_t index)
 {
-    if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+    if (MODULE_PERIPH_TIMER_QUERY_FREQS) {
         return timer_query_freqs(dev, index);
     }
 
@@ -230,7 +230,7 @@ static uint32_t query_freq(tim_t dev, uword_t index)
 
 static void print_supported_frequencies(tim_t dev)
 {
-    if (!IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+    if (!MODULE_PERIPH_TIMER_QUERY_FREQS) {
         printf("  - feature periph_timer_query_freqs unsupported\n");
         return;
     }
@@ -303,7 +303,7 @@ int main(void)
         print_supported_frequencies(TIMER_DEV(i));
 
         /* test querying of frequencies, but only if supported by the driver */
-        if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+        if (MODULE_PERIPH_TIMER_QUERY_FREQS) {
             test_querying(TIMER_DEV(i));
         }
 

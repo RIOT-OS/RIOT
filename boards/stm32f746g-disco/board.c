@@ -22,7 +22,7 @@
 void board_init(void)
 {
     gpio_init(BACKLIGHT_PIN, GPIO_OUT);
-    if (IS_USED(MODULE_PERIPH_LTDC)) {
+    if (MODULE_PERIPH_LTDC) {
         gpio_init(LCD_DISP_PIN, GPIO_OUT);
         gpio_set(LCD_DISP_PIN);
         gpio_set(BACKLIGHT_PIN);

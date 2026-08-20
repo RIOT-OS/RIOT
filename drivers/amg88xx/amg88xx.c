@@ -255,7 +255,7 @@ int amg88xx_get_frame(const amg88xx_t *dev, int16_t pixels[AMG88XX_PIXELS_COUNT]
     return 0;
 }
 
-#if IS_USED(MODULE_PERIPH_GPIO_IRQ)
+#if MODULE_PERIPH_GPIO_IRQ
 int amg88xx_init_int(amg88xx_t *dev, amg88xx_int_cb_t cb, void *arg)
 {
     if (!gpio_is_valid(dev->params.int_pin)) {

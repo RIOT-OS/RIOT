@@ -8,3 +8,7 @@ STLINK_VERSION ?= 2
 
 # import nrf51 boards common configuration
 include $(RIOTBOARD)/common/nrf51/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_hw_fc \
+  #

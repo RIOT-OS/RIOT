@@ -42,7 +42,7 @@ extern "C" {
  * @name    Assign the part number for the device we are building the driver for
  * @{
  */
-#ifdef MODULE_AT86RF212B
+#if MODULE_AT86RF212B
 #define AT86RF2XX_PARTNUM           AT86RF212B_PARTNUM
 #elif MODULE_AT86RF232
 #define AT86RF2XX_PARTNUM           AT86RF232_PARTNUM
@@ -60,7 +60,7 @@ extern "C" {
 /*
  * memory-mapped transceiver
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if MODULE_AT86RFA1 || MODULE_AT86RFR2
 
 #include <avr/io.h>
 
@@ -219,9 +219,9 @@ extern "C" {
 #define AT86RF2XX_REG__XOSC_CTRL                                (0x12)
 #define AT86RF2XX_REG__CC_CTRL_1                                (0x14)
 #define AT86RF2XX_REG__RX_SYN                                   (0x15)
-#ifdef MODULE_AT86RF212B
+#if MODULE_AT86RF212B
 #define AT86RF2XX_REG__RF_CTRL_0                                (0x16)
-#elif defined(MODULE_AT86RF233)
+#elif MODULE_AT86RF233
 #define AT86RF2XX_REG__TRX_RPC                                  (0x16)
 #endif
 #define AT86RF2XX_REG__XAH_CTRL_1                               (0x17)
@@ -392,7 +392,7 @@ extern "C" {
  * @name    Bitfield definitions for the PHY_TX_PWR register
  * @{
  */
-#ifdef MODULE_AT86RF212B
+#if MODULE_AT86RF212B
 #define AT86RF2XX_PHY_TX_PWR_MASK__PA_BOOST                     (0x80)
 #define AT86RF2XX_PHY_TX_PWR_MASK__GC_PA                        (0x60)
 #define AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR                       (0x1F)
@@ -497,7 +497,7 @@ extern "C" {
  * @name   Bitfield definitions for the  TRXPR  Transceiver Pin Register
  * @{
  */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if MODULE_AT86RFA1 || MODULE_AT86RFR2
 #define AT86RF2XX_TRXPR_ATBE                                    (0x08)
 #define AT86RF2XX_TRXPR_TRXTST                                  (0x04)
 #define AT86RF2XX_TRXPR_SLPTR                                   (0x02)
@@ -509,7 +509,7 @@ extern "C" {
  * @name    Bitfield definitions for the RF_CTRL_0 register
  * @{
  */
-#ifdef MODULE_AT86RF212B
+#if MODULE_AT86RF212B
 #define AT86RF2XX_RF_CTRL_0_MASK__PA_LT                         (0xC0)
 #define AT86RF2XX_RF_CTRL_0_MASK__GC_TX_OFFS                    (0x03)
 

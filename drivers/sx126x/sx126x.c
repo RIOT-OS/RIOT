@@ -48,7 +48,7 @@
 #define CONFIG_SX126X_RAMP_TIME_DEFAULT         (SX126X_RAMP_10_US)
 #endif
 
-#if IS_USED(MODULE_SX1268)
+#if MODULE_SX1268
 /* sx1268 */
 const sx126x_pa_cfg_params_t sx1268_pa_cfg[] = {
     /* 10 dBm */
@@ -89,7 +89,7 @@ const sx126x_pa_cfg_params_t sx1268_pa_cfg[] = {
 };
 #endif
 
-#if IS_USED(MODULE_SX1261) || IS_USED(MODULE_SX126X_STM32WL)
+#if MODULE_SX1261 || MODULE_SX126X_STM32WL
 /* sx1261 */
 const sx126x_pa_cfg_params_t lpa_cfg[] = {
     /* 10 dBm */
@@ -116,7 +116,7 @@ const sx126x_pa_cfg_params_t lpa_cfg[] = {
 };
 #endif
 
-#if IS_USED(MODULE_SX1262) || IS_USED(MODULE_LLCC68) || IS_USED(MODULE_SX126X_STM32WL)
+#if MODULE_SX1262 || MODULE_LLCC68 || MODULE_SX126X_STM32WL
 /* sx1262, llcc68 */
 const sx126x_pa_cfg_params_t hpa_cfg[] = {
     /* 14 dBm */
@@ -158,14 +158,14 @@ const sx126x_pa_cfg_params_t hpa_cfg[] = {
 static int8_t _select_pa_cfg(sx126x_t *dev, int8_t tx_power_dbm,
                              const sx126x_pa_cfg_params_t **pa_cfg)
 {
-#if IS_USED(MODULE_SX126X_STM32WL)
+#if MODULE_SX126X_STM32WL
     if (sx126x_is_stm32wl(dev)) {
         if (tx_power_dbm <= 10) {
             *pa_cfg = &lpa_cfg[0];
             return 10;
         }
         else if (tx_power_dbm <= 14) {
-#if IS_USED(MODULE_SX126X_RF_SWITCH)
+#if MODULE_SX126X_RF_SWITCH
             /* Only lora-e5 and nucleo-wl55jc are using this module
             I think the parameter was introduced because 14dbm can be
             achieved with both LPA and HPA settings. */
@@ -194,7 +194,7 @@ static int8_t _select_pa_cfg(sx126x_t *dev, int8_t tx_power_dbm,
         }
     }
 #endif
-#if IS_USED(MODULE_SX1261)
+#if MODULE_SX1261
     if (sx126x_is_sx1261(dev)) {
         if (tx_power_dbm <= 10) {
             *pa_cfg = &lpa_cfg[0];
@@ -210,7 +210,7 @@ static int8_t _select_pa_cfg(sx126x_t *dev, int8_t tx_power_dbm,
         }
     }
 #endif
-#if IS_USED(MODULE_SX1262) || IS_USED(MODULE_LLCC68)
+#if MODULE_SX1262 || MODULE_LLCC68
     if (sx126x_is_sx1262(dev) || sx126x_is_llcc68(dev)) {
         if (tx_power_dbm <= 14) {
             *pa_cfg = &hpa_cfg[0];
@@ -230,7 +230,7 @@ static int8_t _select_pa_cfg(sx126x_t *dev, int8_t tx_power_dbm,
         }
     }
 #endif
-#if IS_USED(MODULE_SX1268)
+#if MODULE_SX1268
     if (sx126x_is_sx1268(dev)) {
         if (tx_power_dbm <= 10) {
             *pa_cfg = &sx1268_pa_cfg[0];
@@ -399,12 +399,12 @@ int sx126x_init(sx126x_t *dev)
     /* Initialize radio with the default parameters */
     sx126x_init_default_config(dev);
 
-#if IS_USED(MODULE_SX126X_DIO2)
+#if MODULE_SX126X_DIO2
     if (dev->params->dio2_mode == SX126X_DIO2_RF_SWITCH) {
         sx126x_set_dio2_as_rf_sw_ctrl(dev, true);
     }
 #endif
-#if IS_USED(MODULE_SX126X_DIO3)
+#if MODULE_SX126X_DIO3
      if (dev->params->dio3_mode == SX126X_DIO3_TCXO) {
         sx126x_set_dio3_as_tcxo_ctrl(dev, dev->params->dio3_arg.tcxo_volt,
                                      dev->params->dio3_arg.tcxo_timeout);

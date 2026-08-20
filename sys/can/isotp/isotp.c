@@ -91,7 +91,7 @@ static int _isotp_tx_send(struct isotp *isotp, can_frame_t *frame);
 
 static int _send_msg(msg_t *msg, can_reg_entry_t *entry)
 {
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
     switch (entry->type) {
     case CAN_TYPE_DEFAULT:
         return msg_try_send(msg, entry->target.pid);
@@ -758,7 +758,7 @@ kernel_pid_t isotp_init(char *stack, int stacksize, char priority, const char *n
 int isotp_send(struct isotp *isotp, const void *buf, int len, int flags)
 {
     assert(isotp != NULL);
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
     assert((isotp->entry.type == CAN_TYPE_DEFAULT && pid_is_valid(isotp->entry.target.pid)) ||
            (isotp->entry.type == CAN_TYPE_MBOX && isotp->entry.target.mbox != NULL));
 #else
@@ -801,7 +801,7 @@ int isotp_bind(struct isotp *isotp, can_reg_entry_t *entry, void *arg,
     int ret;
 
     assert(isotp != NULL);
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
     assert((entry->type == CAN_TYPE_DEFAULT && pid_is_valid(entry->target.pid)) ||
            (entry->type == CAN_TYPE_MBOX && entry->target.mbox != NULL));
 #else
@@ -829,7 +829,7 @@ int isotp_bind(struct isotp *isotp, can_reg_entry_t *entry, void *arg,
     isotp->txfc.wftmax = fc_options ? fc_options->wftmax : CAN_ISOTP_WFTMAX;
 
     isotp->entry.ifnum = entry->ifnum;
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
     isotp->entry.type = entry->type;
     isotp->entry.target.mbox = entry->target.mbox;
 #else
@@ -868,7 +868,7 @@ void isotp_free_rx(can_rx_data_t *rx)
 int isotp_release(struct isotp *isotp)
 {
     assert(isotp != NULL);
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
     assert((isotp->entry.type == CAN_TYPE_DEFAULT && pid_is_valid(isotp->entry.target.pid)) ||
            (isotp->entry.type == CAN_TYPE_MBOX && isotp->entry.target.mbox != NULL));
 #else

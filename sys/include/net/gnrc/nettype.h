@@ -62,12 +62,12 @@ typedef enum {
      * @{
      * @name Link layer
      */
-#if IS_USED(MODULE_GNRC_NETTYPE_CUSTOM) || defined(DOXYGEN)
+#if MODULE_GNRC_NETTYPE_CUSTOM || defined(DOXYGEN)
     GNRC_NETTYPE_CUSTOM,         /**< Custom ethertype */
 #endif
     /** @} */
 
-#if IS_USED(MODULE_GNRC_NETTYPE_SIXLOWPAN) || defined(DOXYGEN)
+#if MODULE_GNRC_NETTYPE_SIXLOWPAN || defined(DOXYGEN)
     GNRC_NETTYPE_SIXLOWPAN,     /**< Protocol is 6LoWPAN */
 #endif
 
@@ -75,23 +75,23 @@ typedef enum {
      * @{
      * @name Network layer
      */
-#if IS_USED(MODULE_GNRC_NETTYPE_IPV6) || defined(DOXYGEN)
+#if MODULE_GNRC_NETTYPE_IPV6 || defined(DOXYGEN)
     GNRC_NETTYPE_IPV6,          /**< Protocol is IPv6 */
 #endif
-#if IS_USED(MODULE_GNRC_NETTYPE_IPV6_EXT) || defined(DOXYGEN)
+#if MODULE_GNRC_NETTYPE_IPV6_EXT || defined(DOXYGEN)
     GNRC_NETTYPE_IPV6_EXT,      /**< Protocol is IPv6 extension header */
 #endif
-#if IS_USED(MODULE_GNRC_NETTYPE_ICMPV6) || defined(DOXYGEN)
+#if MODULE_GNRC_NETTYPE_ICMPV6 || defined(DOXYGEN)
     GNRC_NETTYPE_ICMPV6,        /**< Protocol is ICMPv6 */
 #endif
 
-#if IS_USED(MODULE_GNRC_NETTYPE_CCN) || defined(DOXYGEN)
+#if MODULE_GNRC_NETTYPE_CCN || defined(DOXYGEN)
     GNRC_NETTYPE_CCN,           /**< Protocol is CCN */
     GNRC_NETTYPE_CCN_CHUNK,     /**< Protocol is CCN, packet contains a content
                                      chunk */
 #endif
 
-#if IS_USED(MODULE_GNRC_NETTYPE_NDN) || defined(DOXYGEN)
+#if MODULE_GNRC_NETTYPE_NDN || defined(DOXYGEN)
     GNRC_NETTYPE_NDN,           /**< Protocol is NDN */
 #endif
     /** @} */
@@ -100,10 +100,10 @@ typedef enum {
      * @{
      * @name Transport layer
      */
-#if IS_USED(MODULE_GNRC_NETTYPE_TCP) || defined(DOXYGEN)
+#if MODULE_GNRC_NETTYPE_TCP || defined(DOXYGEN)
     GNRC_NETTYPE_TCP,           /**< Protocol is TCP */
 #endif
-#if IS_USED(MODULE_GNRC_NETTYPE_UDP) || defined(DOXYGEN)
+#if MODULE_GNRC_NETTYPE_UDP || defined(DOXYGEN)
     GNRC_NETTYPE_UDP,           /**< Protocol is UDP */
 #endif
     /** @} */
@@ -162,23 +162,23 @@ typedef enum {
 static inline gnrc_nettype_t gnrc_nettype_from_ethertype(uint16_t type)
 {
     switch (type) {
-#if IS_USED(MODULE_GNRC_NETTYPE_IPV6)
+#if MODULE_GNRC_NETTYPE_IPV6
         case ETHERTYPE_IPV6:
             return GNRC_NETTYPE_IPV6;
 #endif
-#if IS_USED(MODULE_GNRC_NETTYPE_CCN) || IS_USED(MODULE_GNRC_NETTYPE_NDN)
+#if MODULE_GNRC_NETTYPE_CCN || MODULE_GNRC_NETTYPE_NDN
         case ETHERTYPE_NDN:
-#if IS_USED(MODULE_GNRC_NETTYPE_CCN)
+#if MODULE_GNRC_NETTYPE_CCN
             return GNRC_NETTYPE_CCN;
-#elif IS_USED(MODULE_GNRC_NETTYPE_NDN)
+#elif MODULE_GNRC_NETTYPE_NDN
             return GNRC_NETTYPE_NDN;
 #endif
 #endif
-#if IS_USED(MODULE_GNRC_SIXLOENC) && IS_USED(MODULE_GNRC_NETTYPE_SIXLOWPAN)
+#if MODULE_GNRC_SIXLOENC && MODULE_GNRC_NETTYPE_SIXLOWPAN
         case ETHERTYPE_6LOENC:
             return GNRC_NETTYPE_SIXLOWPAN;
 #endif
-#if IS_USED(MODULE_GNRC_NETTYPE_CUSTOM)
+#if MODULE_GNRC_NETTYPE_CUSTOM
         case ETHERTYPE_CUSTOM:
             return GNRC_NETTYPE_CUSTOM;
 #endif
@@ -199,23 +199,23 @@ static inline gnrc_nettype_t gnrc_nettype_from_ethertype(uint16_t type)
 static inline uint16_t gnrc_nettype_to_ethertype(gnrc_nettype_t type)
 {
     switch (type) {
-#if IS_USED(MODULE_GNRC_NETTYPE_CUSTOM)
+#if MODULE_GNRC_NETTYPE_CUSTOM
         case GNRC_NETTYPE_CUSTOM:
             return ETHERTYPE_CUSTOM;
 #endif
-#if IS_USED(MODULE_GNRC_SIXLOENC) && IS_USED(MODULE_GNRC_NETTYPE_SIXLOWPAN)
+#if MODULE_GNRC_SIXLOENC && MODULE_GNRC_NETTYPE_SIXLOWPAN
         case GNRC_NETTYPE_SIXLOWPAN:
             return ETHERTYPE_6LOENC;
 #endif
-#if IS_USED(MODULE_GNRC_NETTYPE_IPV6)
+#if MODULE_GNRC_NETTYPE_IPV6
         case GNRC_NETTYPE_IPV6:
             return ETHERTYPE_IPV6;
 #endif
-#if IS_USED(MODULE_GNRC_NETTYPE_CCN)
+#if MODULE_GNRC_NETTYPE_CCN
         case GNRC_NETTYPE_CCN:
             return ETHERTYPE_NDN;
 #endif
-#if IS_USED(MODULE_GNRC_NETTYPE_NDN)
+#if MODULE_GNRC_NETTYPE_NDN
         case GNRC_NETTYPE_NDN:
             return ETHERTYPE_NDN;
 #endif
@@ -238,23 +238,23 @@ static inline uint16_t gnrc_nettype_to_ethertype(gnrc_nettype_t type)
 static inline gnrc_nettype_t gnrc_nettype_from_protnum(uint8_t num)
 {
     switch (num) {
-#if IS_USED(MODULE_GNRC_NETTYPE_ICMPV6)
+#if MODULE_GNRC_NETTYPE_ICMPV6
         case PROTNUM_ICMPV6:
             return GNRC_NETTYPE_ICMPV6;
 #endif
-#if IS_USED(MODULE_GNRC_NETTYPE_IPV6)
+#if MODULE_GNRC_NETTYPE_IPV6
         case PROTNUM_IPV6:
             return GNRC_NETTYPE_IPV6;
 #endif
-#if IS_USED(MODULE_GNRC_NETTYPE_TCP)
+#if MODULE_GNRC_NETTYPE_TCP
         case PROTNUM_TCP:
             return GNRC_NETTYPE_TCP;
 #endif
-#if IS_USED(MODULE_GNRC_NETTYPE_UDP)
+#if MODULE_GNRC_NETTYPE_UDP
         case PROTNUM_UDP:
             return GNRC_NETTYPE_UDP;
 #endif
-#if IS_USED(MODULE_GNRC_NETTYPE_IPV6_EXT)
+#if MODULE_GNRC_NETTYPE_IPV6_EXT
         case PROTNUM_IPV6_EXT_HOPOPT:
         case PROTNUM_IPV6_EXT_DST:
         case PROTNUM_IPV6_EXT_RH:
@@ -283,19 +283,19 @@ static inline gnrc_nettype_t gnrc_nettype_from_protnum(uint8_t num)
 static inline uint8_t gnrc_nettype_to_protnum(gnrc_nettype_t type)
 {
     switch (type) {
-#if IS_USED(MODULE_GNRC_NETTYPE_IPV6)
+#if MODULE_GNRC_NETTYPE_IPV6
         case GNRC_NETTYPE_IPV6:
             return PROTNUM_IPV6;
 #endif
-#if IS_USED(MODULE_GNRC_NETTYPE_ICMPV6)
+#if MODULE_GNRC_NETTYPE_ICMPV6
         case GNRC_NETTYPE_ICMPV6:
             return PROTNUM_ICMPV6;
 #endif
-#if IS_USED(MODULE_GNRC_NETTYPE_TCP)
+#if MODULE_GNRC_NETTYPE_TCP
         case GNRC_NETTYPE_TCP:
             return PROTNUM_TCP;
 #endif
-#if IS_USED(MODULE_GNRC_NETTYPE_UDP)
+#if MODULE_GNRC_NETTYPE_UDP
         case GNRC_NETTYPE_UDP:
             return PROTNUM_UDP;
 #endif

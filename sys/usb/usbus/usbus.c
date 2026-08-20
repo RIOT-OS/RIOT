@@ -266,7 +266,7 @@ static void _usbus_init_handlers(usbus_t *usbus)
     }
 }
 
-#ifdef MODULE_USBUS_URB
+#if MODULE_USBUS_URB
 static void _usbus_transfer_urb_submit(usbus_endpoint_t *usbus_ep,
                                        usbus_urb_t *urb)
 {

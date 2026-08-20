@@ -40,7 +40,7 @@ static void tear_down(void)
     memset(&_sock, 0, sizeof(_sock));
 }
 
-#ifdef MODULE_GNRC_SOCK_CHECK_REUSE
+#if MODULE_GNRC_SOCK_CHECK_REUSE
 static void test_sock_udp_create__EADDRINUSE(void)
 {
     static const sock_udp_ep_t local = { .family = AF_INET6,
@@ -462,26 +462,26 @@ static void test_sock_udp_recv__aux(void)
     expect(memcmp(&result.addr, &src_addr, sizeof(result.addr)) == 0);
     expect(_TEST_PORT_REMOTE == result.port);
     expect(_TEST_NETIF == result.netif);
-#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+#if MODULE_SOCK_AUX_LOCAL
     expect(!(aux.flags & SOCK_AUX_GET_LOCAL));
     expect(memcmp(&aux.local.addr, &dst_addr, sizeof(dst_addr)) == 0);
     expect(_TEST_PORT_LOCAL == aux.local.port);
 #else
     expect(aux.flags & SOCK_AUX_GET_LOCAL);
 #endif
-#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+#if MODULE_SOCK_AUX_TIMESTAMP
     expect(!(aux.flags & SOCK_AUX_GET_TIMESTAMP));
     expect(inject_aux.timestamp == aux.timestamp);
 #else
     expect(aux.flags & SOCK_AUX_GET_TIMESTAMP);
 #endif
-#if IS_USED(MODULE_SOCK_AUX_RSSI)
+#if MODULE_SOCK_AUX_RSSI
     expect(!(aux.flags & SOCK_AUX_GET_RSSI));
     expect(inject_aux.rssi == aux.rssi);
 #else
     expect(aux.flags & SOCK_AUX_GET_RSSI);
 #endif
-#if IS_USED(MODULE_SOCK_AUX_TTL)
+#if MODULE_SOCK_AUX_TTL
     expect(!(aux.flags & SOCK_AUX_GET_TTL));
     expect(64 == aux.ttl);
 #else
@@ -822,7 +822,7 @@ int main(void)
 {
     _net_init();
     tear_down();
-#ifdef MODULE_GNRC_SOCK_CHECK_REUSE
+#if MODULE_GNRC_SOCK_CHECK_REUSE
     CALL(test_sock_udp_create__EADDRINUSE());
 #endif
     CALL(test_sock_udp_create__EAFNOSUPPORT());

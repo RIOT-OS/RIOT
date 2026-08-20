@@ -21,7 +21,7 @@
 #include "mtd_spi_nor.h"
 #include "timex.h"
 
-#ifdef MODULE_MTD
+#if MODULE_MTD
 static const mtd_spi_nor_params_t _ikea_tradfri_nor_params = {
     .opcode = &mtd_spi_nor_opcode_default,
     .wait_chip_erase = 2LU * US_PER_SEC,
@@ -52,7 +52,7 @@ MTD_XFA_ADD(ikea_tradfri_nor_dev, 0);
 
 void board_init(void)
 {
-#ifdef MODULE_MTD
+#if MODULE_MTD
     /* enable NOR flash (only on the ICC-1-A) */
     if (gpio_is_valid(IKEA_TRADFRI_NOR_EN)) {
         gpio_init(IKEA_TRADFRI_NOR_EN, GPIO_OUT);

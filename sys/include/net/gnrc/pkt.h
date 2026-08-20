@@ -108,7 +108,7 @@ typedef struct gnrc_pktsnip {
     void *data;                     /**< pointer to the data of the snip */
     size_t size;                    /**< the length of the snip in byte */
     /* end of iolist_t */
-#ifdef MODULE_GNRC_NETERR
+#if MODULE_GNRC_NETERR
     kernel_pid_t err_sub;           /**< subscriber to errors related to this
                                      *   packet snip */
 #endif

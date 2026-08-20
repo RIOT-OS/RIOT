@@ -149,7 +149,7 @@ int adc_init(adc_t line)
          * and Sampling Time Register 2 to 39.5 ADC Cycles for VBat. Set the
          * VBat channel to use Sampling Time Register 2. */
         ADC->SMPR = ADC_SMPR_SMP1_0;
-        if (IS_USED(MODULE_PERIPH_VBAT)) {
+        if (MODULE_PERIPH_VBAT) {
             ADC->SMPR |= ADC_SMPR_SMP2_2 | ADC_SMPR_SMP2_0 |
                          (1 << (adc_config[VBAT_ADC].chan+ ADC_SMPR_SMPSEL_Pos));
         }
@@ -173,7 +173,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     prep();
 
     /* check if this is the VBAT line */
-    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+    if (MODULE_PERIPH_VBAT && line == VBAT_ADC) {
         vbat_enable();
     }
 
@@ -200,7 +200,7 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     sample = (int)ADC->DR;
 
     /* check if this is the VBAT line */
-    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+    if (MODULE_PERIPH_VBAT && line == VBAT_ADC) {
         vbat_disable();
     }
 

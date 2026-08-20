@@ -23,7 +23,7 @@
 #include "isrpipe.h"
 #include "modules.h"
 
-#if defined(MODULE_STDIO_DISPATCH)
+#if MODULE_STDIO_DISPATCH
 #  include "xfa.h"
 #endif
 
@@ -102,7 +102,7 @@ extern isrpipe_t stdin_isrpipe;
  * @retval      0       on success
  * @retval      -1      if the stdin buffer was full
  */
-#if IS_USED(MODULE_STDIO_NOTIFY) || DOXYGEN
+#if MODULE_STDIO_NOTIFY || DOXYGEN
 int stdio_rx_write_one(uint8_t c);
 #else
 static inline int stdio_rx_write_one(uint8_t c)
@@ -126,7 +126,7 @@ static inline int stdio_rx_write_one(uint8_t c)
  * @return  number of bytes pushed into stdin, which may be less than @p len if
  *          the stdin buffer was full
  */
-#if IS_USED(MODULE_STDIO_NOTIFY) || DOXYGEN
+#if MODULE_STDIO_NOTIFY || DOXYGEN
 int stdio_rx_write(const uint8_t *buf, size_t len);
 #else
 static inline int stdio_rx_write(const uint8_t *buf, size_t len)
@@ -135,7 +135,7 @@ static inline int stdio_rx_write(const uint8_t *buf, size_t len)
 }
 #endif
 
-#if IS_USED(MODULE_STDIO_NOTIFY) || DOXYGEN
+#if MODULE_STDIO_NOTIFY || DOXYGEN
 /**
  * @brief   Definition of a stdio notify callback
  *
@@ -170,7 +170,7 @@ void stdio_set_notify(stdio_notify_cb_t cb, void *arg);
  */
 void stdio_init(void);
 
-#if IS_USED(MODULE_STDIO_AVAILABLE) || DOXYGEN
+#if MODULE_STDIO_AVAILABLE || DOXYGEN
 /**
  * @brief   Get the number of bytes available for reading from stdio.
  *
@@ -226,7 +226,7 @@ ssize_t stdio_write(const void *buffer, size_t len);
  */
 void stdio_close(void);
 
-#if defined(MODULE_STDIO_DISPATCH) || DOXYGEN
+#if MODULE_STDIO_DISPATCH || DOXYGEN
 /**
  * @brief stdio implementation methods
  *

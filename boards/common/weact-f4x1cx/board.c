@@ -22,7 +22,7 @@
 #include "periph/gpio.h"
 #include "timex.h"
 
-#ifdef MODULE_MTD
+#if MODULE_MTD
 /* AT25SF041 */
 static const mtd_spi_nor_params_t _weact_nor_params = {
     .opcode = &mtd_spi_nor_opcode_default,
@@ -50,7 +50,7 @@ static mtd_spi_nor_t weact_nor_dev = {
 
 MTD_XFA_ADD(weact_nor_dev, 0);
 
-#ifdef MODULE_VFS_DEFAULT
+#if MODULE_VFS_DEFAULT
 #include "vfs_default.h"
 VFS_AUTO_MOUNT(littlefs2, VFS_MTD(weact_nor_dev), VFS_DEFAULT_NVM(0), 0);
 #endif

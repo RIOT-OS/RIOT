@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  hm3302 \
+  #
 BOARD ?= nrf52840-mdk
 
 include ../Makefile.drivers_common

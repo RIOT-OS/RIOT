@@ -27,11 +27,11 @@ extern "C" {
 #include "kernel_defines.h"
 #include "psa/crypto.h"
 
-#if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
+#if MODULE_PSA_KEY_MANAGEMENT
 #include "psa_crypto_slot_management.h"
 #endif
 
-#if IS_USED(MODULE_PSA_HASH)
+#if MODULE_PSA_HASH
 /**
  * @brief   Dispatch a hash setup function to a specific backend.
  *          See @ref psa_hash_setup()
@@ -57,7 +57,7 @@ psa_status_t psa_algorithm_dispatch_hash_finish(psa_hash_operation_t *operation,
                                                 size_t *hash_length);
 #endif /* MODULE_PSA_HASH */
 
-#if IS_USED(MODULE_PSA_ASYMMETRIC)
+#if MODULE_PSA_ASYMMETRIC
 /**
  * @brief   Dispatch a hash signature function to a specific backend.
  *          See @ref psa_sign_hash()
@@ -109,7 +109,7 @@ psa_status_t psa_algorithm_dispatch_verify_message( const psa_key_attributes_t *
                                                     size_t signature_length);
 #endif /* MODULE_PSA_ASYMMETRIC */
 
-#if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
+#if MODULE_PSA_KEY_MANAGEMENT
 /**
  * @brief   Dispatch the key generation function to a specific backend.
  *          See @ref psa_generate_key()
@@ -126,7 +126,7 @@ psa_status_t psa_algorithm_dispatch_import_key(const psa_key_attributes_t *attri
                                                psa_key_slot_t *slot, size_t *bits);
 #endif
 
-#if IS_USED(MODULE_PSA_CIPHER)
+#if MODULE_PSA_CIPHER
 /**
  * @brief   Dispatch a cipher encrypt function to a specific backend.
  *          See @ref psa_cipher_encrypt()
@@ -154,7 +154,7 @@ psa_status_t psa_algorithm_dispatch_cipher_decrypt( const psa_key_attributes_t *
                                                     size_t *output_length);
 #endif /* MODULE_PSA_CIPHER */
 
-#if IS_USED(MODULE_PSA_AEAD)
+#if MODULE_PSA_AEAD
 /**
  * @brief   Dispatch a aead encrypt function to a specific backend.
  *          See @ref psa_aead_encrypt()
@@ -190,7 +190,7 @@ psa_status_t psa_algorithm_dispatch_aead_decrypt(   const psa_key_attributes_t *
                                                     size_t *plaintext_length);
 #endif /* MODULE_PSA_AEAD */
 
-#if IS_USED(MODULE_PSA_MAC)
+#if MODULE_PSA_MAC
 /**
  * @brief   Dispatch a mac computation function to a specific backend.
  *          See @ref psa_mac_compute()

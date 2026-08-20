@@ -1,4 +1,11 @@
 
+MODULE_DEFS_NEEDED += \
+  can_mbox \
+  can_pm \
+  can_trx \
+  fdcan \
+  #
+
 ifneq (,$(filter can_isotp,$(USEMODULE)))
   DIRS += isotp
 endif

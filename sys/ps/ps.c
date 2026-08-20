@@ -25,12 +25,12 @@
 #include "thread.h"
 #include "sched.h"
 
-#ifdef MODULE_SCHEDSTATISTICS
+#if MODULE_SCHEDSTATISTICS
 #include "schedstatistics.h"
 #include "ztimer.h"
 #endif
 
-#ifdef MODULE_TLSF_MALLOC
+#if MODULE_TLSF_MALLOC
 #include "tlsf.h"
 #include "tlsf-malloc.h"
 #endif
@@ -52,7 +52,7 @@ void ps(void)
 #ifdef DEVELHELP
            "| stack  ( used) ( free) | base addr  | current     "
 #endif
-#ifdef MODULE_SCHEDSTATISTICS
+#if MODULE_SCHEDSTATISTICS
            "| runtime  | switches  | runtime_usec "
 #endif
            "\n",
@@ -75,7 +75,7 @@ void ps(void)
     }
 #endif
 
-#ifdef MODULE_SCHEDSTATISTICS
+#if MODULE_SCHEDSTATISTICS
     uint64_t rt_sum = 0;
     if (!IS_ACTIVE(MODULE_CORE_IDLE_THREAD)) {
         rt_sum = sched_pidlist[KERNEL_PID_UNDEF].runtime_us;
@@ -102,7 +102,7 @@ void ps(void)
             stacksz -= stack_free;
             overall_used += stacksz;
 #endif
-#ifdef MODULE_SCHEDSTATISTICS
+#if MODULE_SCHEDSTATISTICS
             /* multiply with 100 for percentage and to avoid floats/doubles */
             uint64_t runtime_us = sched_pidlist[i].runtime_us * 100;
             uint32_t ztimer_us = {sched_pidlist[i].runtime_us};
@@ -118,7 +118,7 @@ void ps(void)
 #ifdef DEVELHELP
                    " | %6" PRIuSIZE " (%5i) (%5i) | %10p | %10p "
 #endif
-#ifdef MODULE_SCHEDSTATISTICS
+#if MODULE_SCHEDSTATISTICS
                    " | %2d.%03d%% |  %8u  | %10"PRIu32" "
 #endif
                    "\n",
@@ -131,7 +131,7 @@ void ps(void)
                    , thread_get_stacksize(p), stacksz, stack_free,
                    thread_get_stackstart(p), thread_get_sp(p)
 #endif
-#ifdef MODULE_SCHEDSTATISTICS
+#if MODULE_SCHEDSTATISTICS
                    , runtime_major, runtime_minor, switches, ztimer_us
 #endif
                   );
@@ -141,7 +141,7 @@ void ps(void)
 #ifdef DEVELHELP
     printf("\t%5s %-21s|%13s%6s %6i (%5i) (%5i)\n", "|", "SUM", "|", "|",
            overall_stacksz, overall_used, overall_stacksz - overall_used);
-#   ifdef MODULE_TLSF_MALLOC
+#   if MODULE_TLSF_MALLOC
     puts("\nHeap usage:");
     tlsf_size_container_t sizes = { .free = 0, .used = 0 };
     tlsf_walk_pool(tlsf_get_pool(_tlsf_get_global_control()), tlsf_size_walker, &sizes);

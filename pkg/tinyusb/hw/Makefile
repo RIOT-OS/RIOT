@@ -1,5 +1,12 @@
 MODULE = tinyusb_hw
 
+MODULE_DEFS_NEEDED += \
+  periph_usbdev_hs_ulpi \
+  periph_usbdev_hs_utmi \
+  tinyusb_device \
+  tinyusb_host \
+  #
+
 ifneq (,$(filter saml21 samd5x samd21,$(CPU)))
   SRC = hw_sam0.c
 else ifeq (stm32,$(CPU))

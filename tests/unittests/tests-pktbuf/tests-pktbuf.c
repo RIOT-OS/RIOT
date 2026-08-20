@@ -189,7 +189,7 @@ static void test_pktbuf_add__pkt_NOT_NULL__data_NOT_NULL__size_not_0(void)
     TEST_ASSERT(!gnrc_pktbuf_is_empty());
 }
 
-#ifndef MODULE_GNRC_PKTBUF_MALLOC   /* to long for standard malloc on native ;-) */
+#if !MODULE_GNRC_PKTBUF_MALLOC   /* to long for standard malloc on native ;-) */
 static void test_pktbuf_add__memfull(void)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL, 1, GNRC_NETTYPE_TEST);
@@ -246,7 +246,7 @@ static void test_pktbuf_add__packed_struct(void)
     TEST_ASSERT_EQUAL_INT(data.s64, data_cpy->s64);
 }
 
-#ifndef MODULE_GNRC_PKTBUF_MALLOC   /* alignment-handling left to malloc, so no certainty here */
+#if !MODULE_GNRC_PKTBUF_MALLOC   /* alignment-handling left to malloc, so no certainty here */
 static void test_pktbuf_add__unaligned_in_aligned_hole(void)
 {
     gnrc_pktsnip_t *pkt1 = gnrc_pktbuf_add(NULL, NULL, ALIGNMENT_SIZE, GNRC_NETTYPE_TEST);
@@ -513,7 +513,7 @@ static void test_pktbuf_realloc_data__size_0(void)
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
 
-#ifndef MODULE_GNRC_PKTBUF_MALLOC   /* CONFIG_GNRC_PKTBUF_SIZE does not*/
+#if !MODULE_GNRC_PKTBUF_MALLOC   /* CONFIG_GNRC_PKTBUF_SIZE does not*/
                                     /* apply for gnrc_pktbuf_malloc */
 static void test_pktbuf_realloc_data__memfull(void)
 {
@@ -543,7 +543,7 @@ static void test_pktbuf_realloc_data__shrink(void)
      *
      * If gnrc_pktbuf_static is used, though, we can rely on the data being
      * kept in place on shrinking. */
-    if (IS_USED(MODULE_GNRC_PKTBUF_STATIC)) {
+    if (MODULE_GNRC_PKTBUF_STATIC) {
         TEST_ASSERT(exp_data == pkt->data);
     }
     TEST_ASSERT_NULL(pkt->next);
@@ -666,7 +666,7 @@ static void test_pktbuf_realloc_data__success3(void)
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
 
-#ifndef MODULE_GNRC_PKTBUF_MALLOC
+#if !MODULE_GNRC_PKTBUF_MALLOC
 static void test_pktbuf_merge_data__memfull(void)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL, (CONFIG_GNRC_PKTBUF_SIZE / 4),
@@ -826,7 +826,7 @@ static void test_pktbuf_start_write__pkt_users_2(void)
     TEST_ASSERT(gnrc_pktbuf_is_empty());
 }
 
-#ifndef MODULE_GNRC_PKTBUF_MALLOC
+#if !MODULE_GNRC_PKTBUF_MALLOC
 static void test_pktbuf_reverse_snips__too_full(void)
 {
     gnrc_pktsnip_t *pkt, *pkt_next, *pkt_huge;
@@ -876,12 +876,12 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_add__pkt_NULL__data_NULL__size_not_0),
         new_TestFixture(test_pktbuf_add__pkt_NOT_NULL__data_NULL__size_not_0),
         new_TestFixture(test_pktbuf_add__pkt_NOT_NULL__data_NOT_NULL__size_not_0),
-#ifndef MODULE_GNRC_PKTBUF_MALLOC
+#if !MODULE_GNRC_PKTBUF_MALLOC
         new_TestFixture(test_pktbuf_add__memfull),
 #endif
         new_TestFixture(test_pktbuf_add__success),
         new_TestFixture(test_pktbuf_add__packed_struct),
-#ifndef MODULE_GNRC_PKTBUF_MALLOC
+#if !MODULE_GNRC_PKTBUF_MALLOC
         new_TestFixture(test_pktbuf_add__unaligned_in_aligned_hole),
 #endif
         new_TestFixture(test_pktbuf_add__0_sized_release),
@@ -895,7 +895,7 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_mark__success_small),
         new_TestFixture(test_pktbuf_mark__success_equally_sized),
         new_TestFixture(test_pktbuf_realloc_data__size_0),
-#ifndef MODULE_GNRC_PKTBUF_MALLOC
+#if !MODULE_GNRC_PKTBUF_MALLOC
         new_TestFixture(test_pktbuf_realloc_data__memfull),
 #endif
         new_TestFixture(test_pktbuf_realloc_data__nomemenough),
@@ -905,7 +905,7 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_realloc_data__success),
         new_TestFixture(test_pktbuf_realloc_data__success2),
         new_TestFixture(test_pktbuf_realloc_data__success3),
-#ifndef MODULE_GNRC_PKTBUF_MALLOC
+#if !MODULE_GNRC_PKTBUF_MALLOC
         new_TestFixture(test_pktbuf_merge_data__memfull),
 #endif /* MODULE_GNRC_PKTBUF_MALLOC */
         new_TestFixture(test_pktbuf_merge_data__success1),
@@ -919,7 +919,7 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_start_write__NULL),
         new_TestFixture(test_pktbuf_start_write__pkt_users_1),
         new_TestFixture(test_pktbuf_start_write__pkt_users_2),
-#ifndef MODULE_GNRC_PKTBUF_MALLOC
+#if !MODULE_GNRC_PKTBUF_MALLOC
         new_TestFixture(test_pktbuf_reverse_snips__too_full),
 #endif /* MODULE_GNRC_PKTBUF_MALLOC */
         new_TestFixture(test_pktbuf_reverse_snips__success),

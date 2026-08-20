@@ -138,7 +138,7 @@ typedef struct {
     void *deveui;   /**< pointer to the Device EUI */
     void *joineui;  /**< pointer to the Join EUI */
     void *nwkkey;   /**< pointer to the Network Key. Mapped to App key if LoRaWAN 1.0x */
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     void *appkey;   /**< pointer to the App key */
 #endif
     uint8_t dr;     /**< datarate for the Join Request */
@@ -177,7 +177,7 @@ typedef struct {
 typedef struct {
     uint32_t fcnt;                      /**< uplink framecounter */
     uint32_t fcnt_down;                 /**< downlink frame counter. Mapped to network downlink frame counter if using LoRaWAN 1.1 */
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     uint32_t afcnt_down;                /**< application downlink frame counter */
     uint32_t last_fcnt_down;            /**< last downlink frame counter used to decrypt frame. Needed to compute ConfFCnt */
 #endif
@@ -209,7 +209,7 @@ typedef struct {
     uint8_t *fnwksintkey;                           /**< pointer to Forwarding Network session integrity key */
     uint8_t *snwksintkey;                           /**< pointer to Serving Network session integrity key */
     uint8_t *nwksenckey;                            /**< pointer to Network session encryption key */
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     uint8_t *jsintkey;                              /**< pointer to join session integrity key */
     uint8_t *jsenckey;                              /**< pointer to join session encryption key */
 #endif
@@ -224,7 +224,7 @@ typedef struct {
     void *mcps_buf;                                 /**< pointer to MCPS buffer */
     uint8_t *joineui;                               /**< pointer to Join EUI */
     gnrc_lorawan_key_ctx_t ctx;                     /**< GNRC LoRaWAN key context struct */
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     bool optneg;                                    /**< optneg bit */
 #endif
     uint32_t channel[GNRC_LORAWAN_MAX_CHANNELS];    /**< channel array */
@@ -621,7 +621,7 @@ void gnrc_lorawan_store_dev_nonce(uint8_t *dev_nonce);
  *  When using LoRaWAN 1.1x the OptNeg bit indicates whether the Network Server
  *  implements the LoRaWAN1.0 protocol version (unset) or 1.1 and later (set).
  *
- *  This getter function exists to allow if (IS_USED(...)) constructs in the
+ *  This getter function exists to allow if (IS_ACTIVE(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
  * @param[in] mac pointer to the MAC descriptor
@@ -631,7 +631,7 @@ void gnrc_lorawan_store_dev_nonce(uint8_t *dev_nonce);
 static inline bool gnrc_lorawan_optneg_is_set(const gnrc_lorawan_t *mac)
 {
     (void)mac;
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     return mac->optneg;
 #else
     return 1; /* NO-OP */
@@ -644,7 +644,7 @@ static inline bool gnrc_lorawan_optneg_is_set(const gnrc_lorawan_t *mac)
  *  When using LoRaWAN 1.1x the OptNeg bit indicates whether the Network Server
  *  implements the LoRaWAN1.0 protocol version (unset) or 1.1 and later (set).
  *
- *  This setter function exists to allow if (IS_USED(...)) constructs in the
+ *  This setter function exists to allow if (IS_ACTIVE(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
  * @param[in] mac       pointer to the MAC descriptor
@@ -655,7 +655,7 @@ static inline void gnrc_lorawan_set_optneg(gnrc_lorawan_t *mac, uint8_t optneg)
     (void)mac;
     (void)optneg;
 
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     mac->optneg = optneg;
 #endif
 }
@@ -663,7 +663,7 @@ static inline void gnrc_lorawan_set_optneg(gnrc_lorawan_t *mac, uint8_t optneg)
 /**
  * @brief Get the join session integrity key from the MAC descriptor
  *
- *  This getter function exists to allow if (IS_USED(...)) constructs in the
+ *  This getter function exists to allow if (IS_ACTIVE(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
  * @param[in] mac       pointer to the MAC descriptor
@@ -672,7 +672,7 @@ static inline void gnrc_lorawan_set_optneg(gnrc_lorawan_t *mac, uint8_t optneg)
 static inline uint8_t *gnrc_lorawan_get_jsintkey(const gnrc_lorawan_t *mac)
 {
     (void)mac;
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     return mac->ctx.jsintkey;
 #else
     return NULL; /* NO-OP */
@@ -682,7 +682,7 @@ static inline uint8_t *gnrc_lorawan_get_jsintkey(const gnrc_lorawan_t *mac)
 /**
  * @brief Get the join session encryption key from the MAC descriptor
  *
- *  This getter function exists to allow if (IS_USED(...)) constructs in the
+ *  This getter function exists to allow if (IS_ACTIVE(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
  * @param[in] mac       pointer to the MAC descriptor
@@ -691,7 +691,7 @@ static inline uint8_t *gnrc_lorawan_get_jsintkey(const gnrc_lorawan_t *mac)
 static inline uint8_t *gnrc_lorawan_get_jsenckey(const gnrc_lorawan_t *mac)
 {
     (void)mac;
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     return mac->ctx.jsenckey;
 #else
     return NULL; /* NO-OP */
@@ -701,7 +701,7 @@ static inline uint8_t *gnrc_lorawan_get_jsenckey(const gnrc_lorawan_t *mac)
 /**
  * @brief Get the application downlink frame counter from the MAC descriptor
  *
- *  This getter function exists to allow if (IS_USED(...)) constructs in the
+ *  This getter function exists to allow if (IS_ACTIVE(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
  * @param[in] mac       pointer to the MAC descriptor
@@ -710,7 +710,7 @@ static inline uint8_t *gnrc_lorawan_get_jsenckey(const gnrc_lorawan_t *mac)
 static inline uint32_t gnrc_lorawan_get_afcnt_down(const gnrc_lorawan_t *mac)
 {
     (void)mac;
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     return mac->mcps.afcnt_down;
 #else
     return 0; /* NO-OP */
@@ -720,7 +720,7 @@ static inline uint32_t gnrc_lorawan_get_afcnt_down(const gnrc_lorawan_t *mac)
 /**
  * @brief Set the application downlink frame counter in the MAC descriptor
  *
- *  This getter function exists to allow if (IS_USED(...)) constructs in the
+ *  This getter function exists to allow if (IS_ACTIVE(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
  * @param[in] mac       pointer to the MAC descriptor
@@ -731,7 +731,7 @@ static inline void gnrc_lorawan_set_afcnt_down(gnrc_lorawan_t *mac, uint32_t afc
     (void)mac;
     (void)afcnt_down;
 
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     mac->mcps.afcnt_down = afcnt_down;
 #endif
 }
@@ -739,7 +739,7 @@ static inline void gnrc_lorawan_set_afcnt_down(gnrc_lorawan_t *mac, uint32_t afc
 /**
  * @brief Get the last downlink frame counter from the MAC descriptor
  *
- *  This getter function exists to allow if (IS_USED(...)) constructs in the
+ *  This getter function exists to allow if (IS_ACTIVE(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
  * @param[in] mac       pointer to the MAC descriptor
@@ -747,7 +747,7 @@ static inline void gnrc_lorawan_set_afcnt_down(gnrc_lorawan_t *mac, uint32_t afc
 static inline uint32_t gnrc_lorawan_get_last_fcnt_down(const gnrc_lorawan_t *mac)
 {
     (void)mac;
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     return mac->mcps.last_fcnt_down;
 #else
     return 0; /* NO-OP */
@@ -757,7 +757,7 @@ static inline uint32_t gnrc_lorawan_get_last_fcnt_down(const gnrc_lorawan_t *mac
 /**
  * @brief Set the last downlink frame counter in the MAC descriptor
  *
- *  This getter function exists to allow if (IS_USED(...)) constructs in the
+ *  This getter function exists to allow if (IS_ACTIVE(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
  * @param[in] mac       pointer to the MAC descriptor
@@ -767,7 +767,7 @@ static inline void gnrc_lorawan_set_last_fcnt_down(gnrc_lorawan_t *mac, uint32_t
 {
     (void)mac;
     (void)last_fcnt_down;
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     mac->mcps.last_fcnt_down = last_fcnt_down;
 #endif
 }
@@ -775,7 +775,7 @@ static inline void gnrc_lorawan_set_last_fcnt_down(gnrc_lorawan_t *mac, uint32_t
 /**
  * @brief Get the app key from the MLME join request data
  *
- *  This getter function exists to allow if (IS_USED(...)) constructs in the
+ *  This getter function exists to allow if (IS_ACTIVE(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
  * @param[in] mlme_join      pointer to the MLME join request data
@@ -785,7 +785,7 @@ static inline uint8_t * gnrc_lorawan_mlme_join_get_appkey(const mlme_lorawan_joi
 {
     (void)mlme_join;
 
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     return mlme_join->appkey;
 #else
     return NULL; /* NO-OP */
@@ -795,7 +795,7 @@ static inline uint8_t * gnrc_lorawan_mlme_join_get_appkey(const mlme_lorawan_joi
 /**
  * @brief Se the app key in the MLME join request data
  *
- *  This getter function exists to allow if (IS_USED(...)) constructs in the
+ *  This getter function exists to allow if (IS_ACTIVE(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
  * @param[in] mlme_join       pointer to the MLME join request data
@@ -806,7 +806,7 @@ static inline void gnrc_lorawan_mlme_join_set_appkey(mlme_lorawan_join_t *mlme_j
     (void)mlme_join;
     (void)key;
 
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     mlme_join->appkey = key;
 #endif
 }

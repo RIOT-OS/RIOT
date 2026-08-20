@@ -42,7 +42,7 @@ extern "C" {
 #define PROVIDES_PM_LAYERED_OFF
 
 /* GPIO configuration only if the module is available (=Linux) */
-#if defined(MODULE_PERIPH_GPIO_LINUX) || defined(DOXYGEN)
+#if MODULE_PERIPH_GPIO_LINUX || defined(DOXYGEN)
 #  include <linux/gpio.h>
 
 /* MARK: - GPIO Configuration */
@@ -117,7 +117,7 @@ typedef enum {
 } gpio_flank_t;
 /** @} */
 
-#elif defined(MODULE_PERIPH_GPIO_MOCK)
+#elif MODULE_PERIPH_GPIO_MOCK
 
 /**
  * @brief   Mocked GPIO
@@ -190,7 +190,7 @@ typedef gpio_mock_t* gpio_t;
 #define PERIPH_I2C_NEED_WRITE_REG
 #define PERIPH_I2C_NEED_WRITE_REGS
 
-#if defined(MODULE_PERIPH_I2C_MOCK) || defined(DOXYGEN)
+#if MODULE_PERIPH_I2C_MOCK || defined(DOXYGEN)
 /**
  * @brief   I2C configuration structure type
  */
@@ -204,7 +204,7 @@ typedef struct {
  * Needs to go here, otherwise the SPI_NEEDS_ are defined after inclusion of
  * spi.h.
  */
-#if defined(MODULE_PERIPH_SPIDEV_LINUX) || defined(DOXYGEN)
+#if MODULE_PERIPH_SPIDEV_LINUX || defined(DOXYGEN)
 /* MARK: - SPI Configuration */
 /**
  * @name SPI Configuration
@@ -252,7 +252,7 @@ typedef enum {
 #  define EEPROM_SIZE             (1024U)  /* 1kB */
 #endif
 
-#ifdef MODULE_PERIPH_CAN
+#if MODULE_PERIPH_CAN
 #  include "candev_linux.h"
 #endif
 

@@ -33,11 +33,11 @@
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
 
-#if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
+#if MODULE_STDIO_NIMBLE_DEBUG
 #include <stdarg.h>
 #include "stdio_uart.h"
 #include "periph/uart.h"
-#endif /* IS_USED(MODULE_STDIO_NIMBLE_DEBUG) */
+#endif /* MODULE_STDIO_NIMBLE_DEBUG */
 
 #include "stdio_base.h"
 #include "stdio_nimble.h"
@@ -72,15 +72,15 @@ static volatile uint8_t _status = STDIO_NIMBLE_DISCONNECTED;
 static struct ble_npl_callout _send_stdout_callout;
 static struct ble_gap_event_listener _gap_event_listener;
 
-#if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
+#if MODULE_STDIO_NIMBLE_DEBUG
 #define DEBUG_PRINTF_BUFSIZE  512
 #define PREFIX_STDIN    "\nSTDIN: "
 #define PREFIX_STDOUT   "STDOUT: "
 
 static char _debug_printf_buf[DEBUG_PRINTF_BUFSIZE];
-#endif /* IS_USED(MODULE_STDIO_NIMBLE_DEBUG) */
+#endif /* MODULE_STDIO_NIMBLE_DEBUG */
 
-#if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
+#if MODULE_STDIO_NIMBLE_DEBUG
 #define _debug_printf(...) \
     do { \
         unsigned state = irq_disable(); \
@@ -173,7 +173,7 @@ static void _purge_buffer(void)
 {
     stdio_clear_stdin();
 
-#if IS_USED(MODULE_SHELL)
+#if MODULE_SHELL
     /* send Ctrl-C to the shell to reset the input */
     stdio_rx_write_one('\x03');
 #endif
@@ -297,7 +297,7 @@ static int gatt_svr_chr_access_stdin(
 
 static void _init(void)
 {
-#if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
+#if MODULE_STDIO_NIMBLE_DEBUG
     uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, NULL, NULL);
 #endif
 
@@ -309,7 +309,7 @@ static ssize_t _write(const void *buffer, size_t len)
 {
     unsigned state = irq_disable();
 
-#if IS_USED(MODULE_STDIO_NIMBLE_DEBUG)
+#if MODULE_STDIO_NIMBLE_DEBUG
     uart_write(STDIO_UART_DEV, (const uint8_t *)PREFIX_STDOUT, strlen(PREFIX_STDOUT));
     uart_write(STDIO_UART_DEV, (const uint8_t *)buffer, len);
     uart_write(STDIO_UART_DEV, (const uint8_t *)"\n", 1);

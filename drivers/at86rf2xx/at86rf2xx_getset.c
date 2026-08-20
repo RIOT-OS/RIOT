@@ -31,7 +31,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifdef MODULE_AT86RF212B
+#if MODULE_AT86RF212B
 /* See: Table 9-15. Recommended Mapping of TX Power, Frequency Band, and
  * PHY_TX_PWR (register 0x05), AT86RF212B data sheet. */
 static const uint8_t dbm_to_tx_pow_868[] = { 0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x18,

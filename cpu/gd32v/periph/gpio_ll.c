@@ -24,7 +24,7 @@
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-#ifdef MODULE_FMT
+#if MODULE_FMT
 #  include "fmt.h"
 #else
 #  include <stdio.h>

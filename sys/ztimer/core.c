@@ -43,7 +43,7 @@ static void _ztimer_update(ztimer_clock_t *clock);
 static void _ztimer_print(const ztimer_clock_t *clock);
 static uint32_t _ztimer_update_head_offset(ztimer_clock_t *clock);
 
-#ifdef MODULE_ZTIMER_EXTEND
+#if MODULE_ZTIMER_EXTEND
 static inline uint32_t _min_u32(uint32_t a, uint32_t b)
 {
     return a < b ? a : b;
@@ -260,7 +260,7 @@ static uint32_t _add_modulo(uint32_t a, uint32_t b, uint32_t mod)
     return a - b;
 }
 
-#ifdef MODULE_ZTIMER_EXTEND
+#if MODULE_ZTIMER_EXTEND
 ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock)
 {
     assert(clock->max_value);
@@ -397,7 +397,7 @@ static ztimer_t *_now_next(ztimer_clock_t *clock)
 
 static void _ztimer_update(ztimer_clock_t *clock)
 {
-#ifdef MODULE_ZTIMER_EXTEND
+#if MODULE_ZTIMER_EXTEND
     if (clock->max_value < UINT32_MAX) {
         if (clock->list.next) {
             clock->ops->set(clock,

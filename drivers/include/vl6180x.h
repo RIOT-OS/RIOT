@@ -507,10 +507,10 @@ typedef enum {
  * @note Interrupts are only supported when module `vl6180x_irq` is used.
  */
 typedef struct {
-#if IS_USED(MODULE_VL6180X_RNG) || DOXYGEN
+#if MODULE_VL6180X_RNG || DOXYGEN
     vl6180x_int_mode_t rng_int; /**< Interrupt mode for range measurements */
 #endif
-#if IS_USED(MODULE_VL6180X_ALS) || DOXYGEN
+#if MODULE_VL6180X_ALS || DOXYGEN
     vl6180x_int_mode_t als_int; /**< Interrupt mode for ALS measurements */
 #endif
 } vl6180x_int_config_t;
@@ -530,11 +530,11 @@ typedef struct {
  * @note Interrupts are only supported when module `vl6180x_irq` is used.
  */
 typedef struct {
-#if IS_USED(MODULE_VL6180X_RNG) || DOXYGEN
+#if MODULE_VL6180X_RNG || DOXYGEN
     uint8_t rng_high;   /**< upper threshold for range values */
     uint8_t rng_low;    /**< lower threshold for range values */
 #endif
-#if IS_USED(MODULE_VL6180X_ALS) || DOXYGEN
+#if MODULE_VL6180X_ALS || DOXYGEN
     uint16_t als_high;  /**< upper threshold for ALS values */
     uint16_t als_low;   /**< lower threshold for ALS values */
 #endif
@@ -551,15 +551,15 @@ typedef struct {
     unsigned i2c_dev;        /**< I2C device, default I2C_DEV(0) */
     uint8_t  i2c_addr;       /**< I2C slave address */
 
-#if IS_USED(MODULE_VL6180X_SHUTDOWN) || DOXYGEN
+#if MODULE_VL6180X_SHUTDOWN || DOXYGEN
     gpio_t   shutdown_pin;  /**< Shutdown pin, LOW active */
-#endif /* IS_USED(MODULE_VL6180X_SHUTDOWN) || DOXYGEN */
+#endif /* MODULE_VL6180X_SHUTDOWN || DOXYGEN */
 
-#if IS_USED(MODULE_VL6180X_IRQ) || DOXYGEN
+#if MODULE_VL6180X_IRQ || DOXYGEN
     gpio_t               int_pin;     /**< Interrupt pin, LOW active */
     vl6180x_int_config_t int_cfg;     /**< Interrupt mode configuration */
     vl6180x_int_thresh_t int_thresh;  /**< Interrupt threshold configuration */
-#endif /* IS_USED(MODULE_VL6180X_IRQ) || DOXYGEN */
+#endif /* MODULE_VL6180X_IRQ || DOXYGEN */
 
     /** @} */
 
@@ -584,7 +584,7 @@ typedef struct {
      */
     uint8_t period;
 
-#if IS_USED(MODULE_VL6180X_RNG) || DOXYGEN
+#if MODULE_VL6180X_RNG || DOXYGEN
     /**
      * @name Range measurement configuration
      * @{
@@ -593,9 +593,9 @@ typedef struct {
                                 to the sensor to perform a range measurement
                                 (default 50 = 50 ms) */
     /** @} */
-#endif /* IS_USED(MODULE_VL6180X_RNG) || DOXYGEN */
+#endif /* MODULE_VL6180X_RNG || DOXYGEN */
 
-#if IS_USED(MODULE_VL6180X_ALS) || DOXYGEN
+#if MODULE_VL6180X_ALS || DOXYGEN
     /**
      * @name ALS measurement configuration
      * @{
@@ -608,7 +608,7 @@ typedef struct {
     vl6180x_als_gain_t als_gain; /**< ALS analogue gain for light channel
                                       (default VL6180X_ALS_GAIN_1_0) */
     /** @} */
-#endif /* IS_USED(MODULE_VL6180X_ALS) || DOXYGEN */
+#endif /* MODULE_VL6180X_ALS || DOXYGEN */
 
 } vl6180x_params_t;
 
@@ -619,12 +619,12 @@ typedef struct {
 
     vl6180x_params_t params;  /**< Device initialization parameters */
     bool cont_meas;           /**< Continuous mode running */
-#if IS_USED(MODULE_VL6180X_RNG) || DOXYGEN
+#if MODULE_VL6180X_RNG || DOXYGEN
     vl6180x_rng_status_t rng_status; /**< Status of last range measurement */
-#endif /* IS_USED(MODULE_VL6180X_RNG) || DOXYGEN */
-#if IS_USED(MODULE_VL6180X_ALS) || DOXYGEN
+#endif /* MODULE_VL6180X_RNG || DOXYGEN */
+#if MODULE_VL6180X_ALS || DOXYGEN
     vl6180x_als_status_t als_status; /**< Status of last ALS measurement */
-#endif /* IS_USED(MODULE_VL6180X_ALS) || DOXYGEN */
+#endif /* MODULE_VL6180X_ALS || DOXYGEN */
 } vl6180x_t;
 
 /**
@@ -691,7 +691,7 @@ int vl6180x_start_cont(vl6180x_t *dev);
  */
 int vl6180x_stop_cont(vl6180x_t *dev);
 
-#if IS_USED(MODULE_VL6180X_RNG) || DOXYGEN
+#if MODULE_VL6180X_RNG || DOXYGEN
 /**
  * @brief   Range data ready status function
  *
@@ -756,7 +756,7 @@ vl6180x_rng_status_t vl6180x_rng_status(const vl6180x_t *dev);
  */
 int vl6180x_rng_start_single(const vl6180x_t *dev);
 
-#if IS_USED(MODULE_VL6180X_CONFIG) || DOXYGEN
+#if MODULE_VL6180X_CONFIG || DOXYGEN
 /**
  * @brief   Reconfigure range measurements at runtime
  *
@@ -789,10 +789,10 @@ int vl6180x_rng_start_single(const vl6180x_t *dev);
  */
 int vl6180x_rng_config(vl6180x_t *dev, uint8_t period, uint8_t max_time);
 
-#endif /* IS_USED(MODULE_VL6180X_CONFIG) || DOXYGEN */
-#endif /* IS_USED(MODULE_VL6180X_RNG) || DOXYGEN */
+#endif /* MODULE_VL6180X_CONFIG || DOXYGEN */
+#endif /* MODULE_VL6180X_RNG || DOXYGEN */
 
-#if IS_USED(MODULE_VL6180X_ALS) || DOXYGEN
+#if MODULE_VL6180X_ALS || DOXYGEN
 /**
  * @brief   ALS data ready status function
  *
@@ -866,7 +866,7 @@ vl6180x_als_status_t vl6180x_als_status(const vl6180x_t *dev);
  */
 int vl6180x_als_start_single(const vl6180x_t *dev);
 
-#if IS_USED(MODULE_VL6180X_CONFIG) || DOXYGEN
+#if MODULE_VL6180X_CONFIG || DOXYGEN
 /**
  * @brief   Reconfigure ambient light sensing (ALS) during runtime
  *
@@ -901,10 +901,10 @@ int vl6180x_als_start_single(const vl6180x_t *dev);
 int vl6180x_als_config(vl6180x_t *dev, uint8_t period, uint8_t int_time,
                                        vl6180x_als_gain_t gain);
 
-#endif /* IS_USED(MODULE_VL6180X_CONFIG) || DOXYGEN */
-#endif /* IS_USED(MODULE_VL6180X_ALS) || DOXYGEN */
+#endif /* MODULE_VL6180X_CONFIG || DOXYGEN */
+#endif /* MODULE_VL6180X_ALS || DOXYGEN */
 
-#if IS_USED(MODULE_VL6180X_SHUTDOWN) || DOXYGEN
+#if MODULE_VL6180X_SHUTDOWN || DOXYGEN
 /**
  * @brief   Power down the sensor
  *
@@ -939,9 +939,9 @@ int vl6180x_power_down(const vl6180x_t *dev);
  */
 int vl6180x_power_up(vl6180x_t *dev);
 
-#endif /* IS_USED(MODULE_VL6180X_SHUTDOWN) || DOXYGEN  */
+#endif /* MODULE_VL6180X_SHUTDOWN || DOXYGEN  */
 
-#if IS_USED(MODULE_VL6180X_IRQ) || DOXYGEN
+#if MODULE_VL6180X_IRQ || DOXYGEN
 
 /**
  * @brief   Wait for configured interrupts and return the interrupt sources
@@ -1000,7 +1000,7 @@ int vl6180x_int_wait(const vl6180x_t *dev, vl6180x_int_config_t *src);
  */
 int vl6180x_int_enable(vl6180x_t *dev, vl6180x_int_config_t mode);
 
-#if IS_USED(MODULE_VL6180X_CONFIG) || DOXYGEN
+#if MODULE_VL6180X_CONFIG || DOXYGEN
 /**
  * @brief   Configure thresholds for event interrupts at runtime
  *
@@ -1017,8 +1017,8 @@ int vl6180x_int_enable(vl6180x_t *dev, vl6180x_int_config_t mode);
  */
 int vl6180x_int_config(vl6180x_t *dev, vl6180x_int_thresh_t thresh);
 
-#endif /* IS_USED(MODULE_VL6180X_CONFIG) || DOXYGEN  */
-#endif /* IS_USED(MODULE_VL6180X_IRQ) || DOXYGEN */
+#endif /* MODULE_VL6180X_CONFIG || DOXYGEN  */
+#endif /* MODULE_VL6180X_IRQ || DOXYGEN */
 
 /**
  * @name   Low level interface functions

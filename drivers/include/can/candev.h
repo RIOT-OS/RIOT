@@ -76,7 +76,7 @@ struct candev {
     void *isr_arg;                         /**< argument to pass on isr event */
     struct can_bittiming bittiming;        /**< device bittimings */
     enum can_state state;                  /**< device state */
-#ifdef MODULE_FDCAN
+#if MODULE_FDCAN
     struct can_bittiming fd_data_bittiming;/**< device bittimings for FD CAN only */
     uint16_t loop_delay;                   /**< CAN FD transceiver loop delay */
 #endif

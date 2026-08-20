@@ -31,7 +31,7 @@
 
 /* Circular average for moving average calculation, this is always
    called in irq context */
-#ifdef MODULE_SM_PWM_01C_MA
+#if MODULE_SM_PWM_01C_MA
 static void _circ_buf_push(circ_buf_t *buf, uint16_t data)
 {
     buf->buf[buf->head] = data;
@@ -94,7 +94,7 @@ static void _sample_timer_cb(void *arg)
     DEBUG("[sm_pwm_01c] new sample tlp conc: %" PRIu16 " ug/m3\n", tlp);
 
     /* update concentration values*/
-#ifdef MODULE_SM_PWM_01C_MA
+#if MODULE_SM_PWM_01C_MA
     _circ_buf_push(&dev->_values.tsp_circ_buf, tsp);
     _circ_buf_push(&dev->_values.tlp_circ_buf, tlp);
 #else
@@ -157,7 +157,7 @@ int sm_pwm_01c_init(sm_pwm_01c_t *dev, const sm_pwm_01c_params_t *params)
     dev->_sampler.callback = _sample_timer_cb;
     dev->_sampler.arg = dev;
 
-#ifdef MODULE_SM_PWM_01C_MA
+#if MODULE_SM_PWM_01C_MA
     memset(&dev->_values.tsp_circ_buf, 0, sizeof(circ_buf_t));
     memset(&dev->_values.tlp_circ_buf, 0, sizeof(circ_buf_t));
 #endif
@@ -191,7 +191,7 @@ void sm_pwm_01c_read_data(sm_pwm_01c_t *dev, sm_pwm_01c_data_t *data)
 {
     assert(dev);
     unsigned int state = irq_disable();
-#ifdef MODULE_SM_PWM_01C_MA
+#if MODULE_SM_PWM_01C_MA
     data->mc_pm_10 = _circ_buf_avg(&dev->_values.tlp_circ_buf);
     data->mc_pm_2p5 = _circ_buf_avg(&dev->_values.tsp_circ_buf);
 #else

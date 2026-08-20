@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  shell_hooks \
+  #
 include ../Makefile.tests_common
 
 USEMODULE += shell

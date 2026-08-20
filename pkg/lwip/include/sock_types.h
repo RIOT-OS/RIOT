@@ -61,17 +61,17 @@ struct lwip_sock_base {
      */
     union {
         lwip_sock_cb_t gen;         /**< generic version */
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
         sock_ip_cb_t ip;            /**< IP version */
 #endif
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
         sock_tcp_cb_t tcp;          /**< TCP version */
         /**
          * @brief   TCP queue version
          */
         sock_tcp_queue_cb_t tcp_queue;
 #endif
-#ifdef MODULE_SOCK_UDP
+#if MODULE_SOCK_UDP
         sock_udp_cb_t udp;          /**< UDP version */
 #endif
     } async_cb;

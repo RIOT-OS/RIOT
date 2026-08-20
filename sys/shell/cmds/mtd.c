@@ -227,7 +227,7 @@ static int _print_write_page_usage(const char *progname)
 
 static int cmd_write_page(mtd_dev_t *dev, int argc, char **argv)
 {
-#if IS_USED(MODULE_MTD_WRITE_PAGE)
+#if MODULE_MTD_WRITE_PAGE
     uint32_t page, offset, len;
     void *data;
 

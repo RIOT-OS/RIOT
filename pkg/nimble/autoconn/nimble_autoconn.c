@@ -34,9 +34,9 @@
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-#if defined(MODULE_NIMBLE_AUTOCONN_IPSP)
+#if MODULE_NIMBLE_AUTOCONN_IPSP
 #define SVC_FILTER      BLE_GATT_SVC_IPSS
-#elif defined(MODULE_NIMBLE_AUTOCONN_NDNSP)
+#elif MODULE_NIMBLE_AUTOCONN_NDNSP
 #define SVC_FILTER      BLE_GATT_SVC_NDNSS
 #else
 #error "NimBLE autoconn: please select a fitting submodule"
@@ -136,7 +136,7 @@ static void _on_scan_evt(uint8_t type, const ble_addr_t *addr,
 {
     (void)info;
 
-#if IS_USED(MODULE_NIMBLE_AUTOCONN_EXT)
+#if MODULE_NIMBLE_AUTOCONN_EXT
     if ((type != (NIMBLE_SCANNER_EXT_ADV | BLE_HCI_ADV_CONN_MASK)) ||
         (info->status != BLE_GAP_EXT_ADV_DATA_STATUS_COMPLETE)) {
         return;
@@ -290,7 +290,7 @@ int nimble_autoconn_update(const nimble_autoconn_params_t *params,
     _conn_params.conn_supervision_timeout_ms = params->conn_super_to_ms;
     _conn_params.conn_slave_latency = params->conn_latency;
     _conn_params.timeout_ms = params->conn_timeout_ms;
-#if IS_USED(MODULE_NIMBLE_AUTOCONN_EXT)
+#if MODULE_NIMBLE_AUTOCONN_EXT
     _conn_params.phy_mode = params->phy_mode;
 #else
     _conn_params.phy_mode = NIMBLE_PHY_1M;
@@ -312,7 +312,7 @@ int nimble_autoconn_update(const nimble_autoconn_params_t *params,
     scan_params.itvl_ms = params->scan_itvl_ms;
     scan_params.win_ms = params->scan_win_ms;
     scan_params.flags = (NIMBLE_SCANNER_PASSIVE | NIMBLE_SCANNER_FILTER_DUPS);
-#if IS_USED(MODULE_NIMBLE_AUTOCONN_EXT) && IS_USED(MODULE_NIMBLE_PHY_CODED)
+#if MODULE_NIMBLE_AUTOCONN_EXT && MODULE_NIMBLE_PHY_CODED
     if (params->phy_mode == NIMBLE_PHY_CODED) {
         scan_params.flags |= NIMBLE_SCANNER_PHY_CODED;
     }
@@ -325,7 +325,7 @@ int nimble_autoconn_update(const nimble_autoconn_params_t *params,
 
     /* set the advertising parameters used */
     memset(&_accept_params, 0, sizeof(_accept_params));
-#if IS_USED(MODULE_NIMBLE_AUTOCONN_EXT)
+#if MODULE_NIMBLE_AUTOCONN_EXT
     _accept_params.flags = 0;
     _accept_params.primary_phy = params->phy_mode;
     _accept_params.secondary_phy = params->phy_mode;

@@ -191,10 +191,10 @@ typedef struct {
                                             /* to prevent any simultaneous writes),         */
                                             /* consumed exclusively in the network stack's  */
                                             /* loop at _isr.                                */
-#if defined(MODULE_DOSE_WATCHDOG) || DOXYGEN
+#if MODULE_DOSE_WATCHDOG || DOXYGEN
     void *recv_buf_ptr_last;                /**< Last value of recv_buf_ptr when the watchdog visited */
 #endif
-#if !defined(MODULE_PERIPH_UART_RXSTART_IRQ) || DOXYGEN
+#if !MODULE_PERIPH_UART_RXSTART_IRQ || DOXYGEN
     gpio_t sense_pin;                       /**< GPIO to sense for start bits on the UART's rx line */
 #endif
     gpio_t standby_pin;                     /**< GPIO to put the CAN transceiver in standby mode */
@@ -210,7 +210,7 @@ typedef struct {
  */
 typedef struct {
     uart_t uart;                            /**< UART device to use */
-#if !defined(MODULE_PERIPH_UART_RXSTART_IRQ) || DOXYGEN
+#if !MODULE_PERIPH_UART_RXSTART_IRQ || DOXYGEN
     gpio_t sense_pin;                       /**< GPIO to sense for start bits on the UART's rx line */
 #endif
     gpio_t standby_pin;                     /**< GPIO to put the CAN transceiver in standby mode */

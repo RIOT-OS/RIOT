@@ -17,7 +17,7 @@
 #include "fido2/ctap/transport/ctap_transport.h"
 #include "fido2/ctap/ctap.h"
 
-#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
+#if MODULE_FIDO2_CTAP_TRANSPORT_HID
 #include "usb/usbus.h"
 #include "usb/usbus/hid_io.h"
 #include "fido2/ctap/transport/hid/ctap_hid.h"
@@ -26,7 +26,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
+#if MODULE_FIDO2_CTAP_TRANSPORT_HID
 /**
  * @brief CTAPHID timeout handler
  */
@@ -65,7 +65,7 @@ static void *_event_loop(void *arg)
 
     event_queue_init(&_queue);
 
-#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
+#if MODULE_FIDO2_CTAP_TRANSPORT_HID
     event_timeout_ztimer_init(&_ctap_hid_event_timeout, ZTIMER_MSEC, &_queue,
                               &_ctap_hid_timeout_event);
     event_timeout_set(&_ctap_hid_event_timeout, CTAP_HID_TRANSACTION_TIMEOUT_MS);
@@ -76,7 +76,7 @@ static void *_event_loop(void *arg)
     return NULL;
 }
 
-#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
+#if MODULE_FIDO2_CTAP_TRANSPORT_HID
 static void _ctap_hid_timeout_cb(event_t *arg)
 {
     (void)arg;
@@ -87,7 +87,7 @@ static void _ctap_hid_timeout_cb(event_t *arg)
 
 void fido2_ctap_transport_init(void)
 {
-#if IS_USED(MODULE_FIDO2_CTAP_TRANSPORT_HID)
+#if MODULE_FIDO2_CTAP_TRANSPORT_HID
     fido2_ctap_transport_hid_init(&_queue);
 #endif
 

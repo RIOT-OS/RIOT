@@ -40,7 +40,7 @@ static lis2dh12_t dev;
 
 void lis2dh12_test_init(void) {
 
-    if (IS_USED(MODULE_LIS2DH12_SPI)) {
+    if (MODULE_LIS2DH12_SPI) {
         puts("using SPI mode, for I2C mode select the lis2dh12_i2c module");
     } else {
         puts("using I2C mode, for SPI mode select the lis2dh12_spi module");
@@ -67,7 +67,7 @@ void lis2dh12_test_init(void) {
     lis2dh12_set_fifo(&dev, &fifo_cfg);
 }
 
-#ifdef MODULE_LIS2DH12_INT
+#if MODULE_LIS2DH12_INT
 void* lis2dh12_test_process(void* arg) {
     (void) arg;
 
@@ -360,7 +360,7 @@ int main(void)
     /* init lis */
     lis2dh12_test_init();
 
-#ifdef MODULE_LIS2DH12_INT
+#if MODULE_LIS2DH12_INT
     static char lis2dh12_process_stack[THREAD_STACKSIZE_MAIN];
 
     /* processing lis2dh12 acceleration data */

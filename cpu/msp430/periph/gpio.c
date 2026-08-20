@@ -22,7 +22,7 @@
 #include "periph/gpio.h"
 #include "periph/gpio_ll.h"
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 #include "modules.h"
 #include "periph/gpio_ll_irq.h"
 #endif
@@ -145,7 +145,7 @@ void gpio_write(gpio_t pin, bool value)
     }
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 /**
  * @brief   Interrupt context for each interrupt line
  */
@@ -174,7 +174,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         return -1;
     }
 
-    if (IS_USED(MODULE_GPIO_LL_IRQ)) {
+    if (MODULE_GPIO_LL_IRQ) {
         gpio_irq_trig_t trig = (flank == GPIO_RISING) ? GPIO_TRIGGER_EDGE_RISING
                                                       : GPIO_TRIGGER_EDGE_FALLING;
         return gpio_ll_irq((gpio_port_t)&port->base, _pin_num(pin), trig, cb, arg);
@@ -209,7 +209,7 @@ void gpio_irq_disable(gpio_t pin)
     }
 }
 
-#  ifndef MODULE_GPIO_LL_IRQ
+#  if !MODULE_GPIO_LL_IRQ
 static inline void isr_handler(msp430_port_p1_p2_t *port, int ctx)
 {
     for (unsigned i = 0; i < PINS_PER_PORT; i++) {

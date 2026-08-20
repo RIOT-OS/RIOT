@@ -23,11 +23,11 @@
 
 #include "log.h"
 
-#ifdef MODULE_BME680_I2C
+#if MODULE_BME680_I2C
 #include "periph/i2c.h"
 #endif
 
-#ifdef MODULE_BME680_SPI
+#if MODULE_BME680_SPI
 #include "periph/spi.h"
 #endif
 
@@ -53,7 +53,7 @@ int bme680_init(bme680_t *dev, const bme680_params_t *params)
 
     /* Select device interface and apply needed params */
     if (params->ifsel == BME680_I2C_INTF) {
-#ifdef MODULE_BME680_I2C
+#if MODULE_BME680_I2C
         BME680_SENSOR(dev).intf = BME680_I2C_INTF;
         BME680_SENSOR(dev).read = bme680_i2c_read_hal;
         BME680_SENSOR(dev).write = bme680_i2c_write_hal;
@@ -63,7 +63,7 @@ int bme680_init(bme680_t *dev, const bme680_params_t *params)
 #endif
     }
     else {
-#ifdef MODULE_BME680_SPI
+#if MODULE_BME680_SPI
         BME680_SENSOR(dev).intf = BME680_SPI_INTF;
         BME680_SENSOR(dev).read = bme680_spi_read_hal;
         BME680_SENSOR(dev).write = bme680_spi_write_hal;

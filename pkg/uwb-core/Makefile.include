@@ -25,3 +25,14 @@ ifneq (,$(filter uwb-core_rng_trx_info,$(USEMODULE)))
  # Enable RX diagnostics
  CFLAGS += -DCONFIG_DW1000_RX_DIAGNOSTIC=1
 endif
+
+MODULE_DEFS_NEEDED += \
+  uwb_core_event_thread \
+  uwb_core_rng \
+  uwb_core_rng_trx_info \
+  uwb_core_twr_ds \
+  uwb_core_twr_ds_ext \
+  uwb_core_twr_ss \
+  uwb_core_twr_ss_ack \
+  uwb_core_twr_ss_ext \
+  #

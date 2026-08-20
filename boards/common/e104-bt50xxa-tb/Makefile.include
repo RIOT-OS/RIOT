@@ -4,3 +4,8 @@ OPENOCD_DEBUG_ADAPTER ?= jlink
 INCLUDES += -I$(RIOTBOARD)/common/e104-bt50xxa-tb/include
 
 include $(RIOTBOARD)/common/nrf52/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  board_software_reset \
+  periph_uart_hw_fc \
+  #

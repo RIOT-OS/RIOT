@@ -29,7 +29,7 @@ extern "C" {
  * @name   Constant values used to compute RSSI
  * @{
  */
-#if defined(MODULE_SX1272)
+#if MODULE_SX1272
 #define SX127X_RSSI_OFFSET                                 (-139)
 #else /* MODULE_SX1276 */
 #define SX127X_RSSI_OFFSET_LF                              (-164)
@@ -41,7 +41,7 @@ extern "C" {
  * @name   Device specific logic level to indicate POR-cycle is active
  * @{
  */
-#if defined(MODULE_SX1272)
+#if MODULE_SX1272
 #define SX127X_POR_ACTIVE_LOGIC_LEVEL                      (1)
 #else /* MODULE_SX1276 */
 #define SX127X_POR_ACTIVE_LOGIC_LEVEL                      (0)
@@ -126,7 +126,7 @@ void sx127x_read_fifo(const sx127x_t *dev, uint8_t *buffer, uint8_t size);
  */
 int16_t sx127x_read_rssi(const sx127x_t *dev);
 
-#if defined(MODULE_SX1276)
+#if MODULE_SX1276
 /**
  * @brief   Performs the Rx chain calibration for LF and HF bands
  *

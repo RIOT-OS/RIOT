@@ -274,7 +274,7 @@ static int power_off(int argc, char **argv)
     return 0;
 }
 
-#ifdef MODULE_AT_URC
+#if MODULE_AT_URC
 #ifndef MAX_URC_NB
 #define MAX_URC_NB  5
 #endif
@@ -366,7 +366,7 @@ static int emulate_dce(int argc, char **argv)
     int res = 0;
     char resp_buf[128];
 
-#ifdef MODULE_AT_URC
+#if MODULE_AT_URC
     at_urc_t urc = {.cb = _urc_cb, .code = "+CSCON"};
     at_add_urc(&at_dev, &urc);
 #endif
@@ -457,7 +457,7 @@ static int emulate_dce(int argc, char **argv)
 
     res = 0;
 exit:
-#ifdef MODULE_AT_URC
+#if MODULE_AT_URC
     at_remove_urc(&at_dev, &urc);
 #endif
     printf("%s finished with %d\n", __func__, res);
@@ -476,7 +476,7 @@ static const shell_command_t shell_commands[] = {
     { "power_on", "Power on AT device", power_on },
     { "power_off", "Power off AT device", power_off },
     { "emulate_dce", "Test against the DCE emulation script.", emulate_dce},
-#ifdef MODULE_AT_URC
+#if MODULE_AT_URC
     { "add_urc", "Register an URC", add_urc },
     { "remove_urc", "De-register an URC", remove_urc },
     { "process_urc", "Process the URCs", process_urc },

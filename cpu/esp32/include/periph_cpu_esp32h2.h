@@ -143,7 +143,7 @@ extern "C" {
  * ESP32-H2 has two timer groups with one channel each.
  */
 
-#ifdef MODULE_ESP_HW_COUNTER
+#if MODULE_ESP_HW_COUNTER
 #  error "Counter based timers are not supported by ESP32-H2"
 #endif
 

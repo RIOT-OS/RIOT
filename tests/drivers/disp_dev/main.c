@@ -24,7 +24,7 @@
 
 #include "test_utils/expect.h"
 
-#if IS_USED(MODULE_ILI9341)
+#if MODULE_ILI9341
 #include "ili9341.h"
 #endif
 
@@ -50,7 +50,7 @@ int main(void)
     uint16_t max_width = disp_dev_width(disp_dev->dev);
     uint16_t max_height = disp_dev_height(disp_dev->dev);
 
-#if IS_USED(MODULE_ILI9341)
+#if MODULE_ILI9341
     ili9341_t *ili9341 = (ili9341_t *)disp_dev->dev;
     expect(ili9341);
     expect(max_width == ili9341->dev.params->lines);

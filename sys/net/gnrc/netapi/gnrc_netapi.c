@@ -70,7 +70,7 @@ int _gnrc_netapi_send_recv(kernel_pid_t pid, gnrc_pktsnip_t *pkt, uint16_t type)
     return ret;
 }
 
-#ifdef MODULE_GNRC_NETAPI_MBOX
+#if MODULE_GNRC_NETAPI_MBOX
 static inline int _snd_rcv_mbox(mbox_t *mbox, uint16_t type, gnrc_pktsnip_t *pkt)
 {
     /* set the outgoing message's fields */
@@ -91,7 +91,7 @@ static int _dispatch_single(gnrc_netreg_entry_t *sendto, uint16_t cmd, void *dat
 {
     int status = 0;
 
-#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS)
+#if MODULE_GNRC_NETAPI_MBOX || MODULE_GNRC_NETAPI_CALLBACKS
     switch (sendto->type) {
     case GNRC_NETREG_TYPE_DEFAULT:
         if (_gnrc_netapi_send_recv(sendto->target.pid, data, cmd) < 1) {
@@ -99,7 +99,7 @@ static int _dispatch_single(gnrc_netreg_entry_t *sendto, uint16_t cmd, void *dat
             status = -EIO;
         }
         break;
-#  ifdef MODULE_GNRC_NETAPI_MBOX
+#  if MODULE_GNRC_NETAPI_MBOX
     case GNRC_NETREG_TYPE_MBOX:
         if (_snd_rcv_mbox(sendto->target.mbox, cmd, data) < 1) {
             /* unable to dispatch packet */
@@ -107,7 +107,7 @@ static int _dispatch_single(gnrc_netreg_entry_t *sendto, uint16_t cmd, void *dat
         }
         break;
 #  endif
-#  ifdef MODULE_GNRC_NETAPI_CALLBACKS
+#  if MODULE_GNRC_NETAPI_CALLBACKS
     case GNRC_NETREG_TYPE_CB:
         sendto->target.cbd->cb(cmd, data, sendto->target.cbd->ctx);
         break;

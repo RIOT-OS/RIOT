@@ -18,7 +18,7 @@
  * @}
  */
 
-#ifdef MODULE_PERIPH_SPI
+#if MODULE_PERIPH_SPI
 
 extern "C" {
 #include "assert.h"

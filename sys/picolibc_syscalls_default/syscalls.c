@@ -122,7 +122,7 @@ _exit(int n)
     else {
         LOG_WARNING("WARN: program exited\n");
     }
-#ifdef MODULE_PERIPH_PM
+#if MODULE_PERIPH_PM
     pm_off();
 #endif /* MODULE_PERIPH_PM */
     for (;;) {
@@ -178,7 +178,7 @@ int kill(pid_t pid, int sig)
 #define PICOLIBC_STDOUT_BUFSIZE 64
 #endif
 
-#ifdef MODULE_PICOLIBC_STDOUT_BUFFERED
+#if MODULE_PICOLIBC_STDOUT_BUFFERED
 static mutex_t picolibc_put_mutex = MUTEX_INIT;
 static char picolibc_stdout[PICOLIBC_STDOUT_BUFSIZE];
 static int picolibc_stdout_queued;
@@ -297,7 +297,7 @@ pid_t getpid(void)
  */
 int open(const char *name, int flags, int mode)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     int fd = vfs_open(name, flags, mode);
     if (fd < 0) {
         /* vfs returns negative error codes */
@@ -335,7 +335,7 @@ int open(const char *name, int flags, int mode)
  */
 _READ_WRITE_RETURN_TYPE read(int fd, void *dest, size_t count)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     int res = vfs_read(fd, dest, count);
     if (res < 0) {
         /* vfs returns negative error codes */
@@ -367,7 +367,7 @@ _READ_WRITE_RETURN_TYPE read(int fd, void *dest, size_t count)
  */
 _READ_WRITE_RETURN_TYPE write(int fd, const void *src, size_t count)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     int res = vfs_write(fd, src, count);
     if (res < 0) {
         /* vfs returns negative error codes */
@@ -400,7 +400,7 @@ _READ_WRITE_RETURN_TYPE write(int fd, const void *src, size_t count)
  */
 int close(int fd)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     int res = vfs_close(fd);
     if (res < 0) {
         /* vfs returns negative error codes */
@@ -444,7 +444,7 @@ clock_t times(struct tms *ptms)
  */
 int fcntl(int fd, int cmd, int arg)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     int res = vfs_fcntl(fd, cmd, arg);
     if (res < 0) {
         /* vfs returns negative error codes */
@@ -482,7 +482,7 @@ int fcntl(int fd, int cmd, int arg)
  */
 off_t lseek(int fd, _off_t off, int whence)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     int res = vfs_lseek(fd, off, whence);
     if (res < 0) {
         /* vfs returns negative error codes */
@@ -522,7 +522,7 @@ void rewind(FILE *stream)
  */
 int fstat(int fd, struct stat *buf)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     int res = vfs_fstat(fd, buf);
     if (res < 0) {
         /* vfs returns negative error codes */
@@ -551,7 +551,7 @@ int fstat(int fd, struct stat *buf)
  */
 int stat(const char *name, struct stat *st)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     int res = vfs_stat(name, st);
     if (res < 0) {
         /* vfs returns negative error codes */
@@ -577,7 +577,7 @@ int stat(const char *name, struct stat *st)
  */
 int unlink(const char *path)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     int res = vfs_unlink(path);
     if (res < 0) {
         /* vfs returns negative error codes */
@@ -602,7 +602,7 @@ int unlink(const char *path)
  */
 int rmdir(const char *path)
 {
-#ifdef MODULE_VFS
+#if MODULE_VFS
     int res = vfs_rmdir(path);
     if (res < 0) {
         /* vfs returns negative error codes */

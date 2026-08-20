@@ -85,7 +85,7 @@ typedef enum {
  */
 typedef struct {
     i2c_t bus;          /**< I2C bus the device is connected to */
-#if IS_USED(MODULE_DS3231_INT)
+#if MODULE_DS3231_INT
     gpio_t int_pin;     /**< alarm interrupt pin */
 #endif /* MODULE_DS3231_INT */
 } ds3231_t;
@@ -96,12 +96,12 @@ typedef struct {
 typedef struct {
     i2c_t bus;          /**< I2C bus the device is connected to */
     uint8_t opt;        /**< additional options */
-#if IS_USED(MODULE_DS3231_INT)
+#if MODULE_DS3231_INT
     gpio_t int_pin;     /**< alarm interrupt pin */
 #endif /* MODULE_DS3231_INT */
 } ds3231_params_t;
 
-#if IS_USED(MODULE_DS3231_INT)
+#if MODULE_DS3231_INT
 typedef void (*ds3231_alarm_cb_t)(void *);
 
 #endif /* MODULE_DS3231_INT */
@@ -117,7 +117,7 @@ typedef void (*ds3231_alarm_cb_t)(void *);
  */
 int ds3231_init(ds3231_t *dev, const ds3231_params_t *params);
 
-#if IS_USED(MODULE_DS3231_INT)
+#if MODULE_DS3231_INT
 /**
  * @brief   Initialize the GPIO alarm interrupt
  *

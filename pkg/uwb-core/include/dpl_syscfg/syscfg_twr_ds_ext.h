@@ -28,7 +28,7 @@ extern "C" {
  * @brief Enable double sided extended two way ranging
  */
 #ifndef MYNEWT_VAL_TWR_DS_EXT_ENABLED
-#define MYNEWT_VAL_TWR_DS_EXT_ENABLED IS_USED(MODULE_UWB_CORE_TWR_DS_EXT)
+#define MYNEWT_VAL_TWR_DS_EXT_ENABLED MODULE_UWB_CORE_TWR_DS_EXT
 #endif
 
 /**
@@ -42,7 +42,7 @@ extern "C" {
  * @brief tx holdoff delay for DS TWR extended frame (usec)
  */
 #ifndef MYNEWT_VAL_TWR_DS_EXT_TX_HOLDOFF
-#define MYNEWT_VAL_TWR_DS_EXT_TX_HOLDOFF (((uint32_t)0x0400 + 0xA0 * IS_USED(MODULE_UWB_CORE_RNG_TRX_INFO)))
+#define MYNEWT_VAL_TWR_DS_EXT_TX_HOLDOFF (((uint32_t)0x0400 + 0xA0 * MODULE_UWB_CORE_RNG_TRX_INFO))
 #endif
 
 #ifdef __cplusplus

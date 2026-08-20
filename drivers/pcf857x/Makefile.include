@@ -9,3 +9,11 @@ PSEUDOMODULES += pcf857x_irq_highest
 
 USEMODULE_INCLUDES_pcf857x := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_pcf857x)
+
+MODULE_DEFS_NEEDED += \
+  pcf8574 \
+  pcf8574a \
+  pcf8575 \
+  pcf857x_irq \
+  saul_gpio \
+  #

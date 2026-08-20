@@ -34,14 +34,14 @@ extern "C" {
 #ifndef AMG88XX_PARAM_ADDR
 #  define AMG88XX_PARAM_ADDR        AMG88XX_I2C_ADDRESS     /**< I2C address */
 #endif
-#if IS_USED(MODULE_PERIPH_GPIO_IRQ)
+#if MODULE_PERIPH_GPIO_IRQ
 #ifndef AMG88XX_PARAM_INT_PIN
 #  define AMG88XX_PARAM_INT_PIN     GPIO_UNDEF              /**< Interrupt pin */
 #endif
 #endif
 
 #ifndef AMG88XX_PARAMS
-#  if IS_USED(MODULE_PERIPH_GPIO_IRQ) || defined(DOXYGEN)
+#  if MODULE_PERIPH_GPIO_IRQ || defined(DOXYGEN)
 #    define AMG88XX_PARAMS          { .i2c_dev = AMG88XX_PARAM_I2C_DEV, \
                                       .address = AMG88XX_PARAM_ADDR, \
                                       .int_pin = AMG88XX_PARAM_INT_PIN }    /**< Default params */

@@ -23,19 +23,19 @@
 extern "C" {
 #endif
 
-#if defined(MODULE_MTD_SDCARD_DEFAULT)
+#if MODULE_MTD_SDCARD_DEFAULT
 #include "mtd_sdcard.h"
 #endif
 
-#if defined(MODULE_MTD_EMULATED)
+#if MODULE_MTD_EMULATED
 #include "mtd_emulated.h"
 #endif
 
-#if defined(MODULE_MTD_SDCARD_DEFAULT)
+#if MODULE_MTD_SDCARD_DEFAULT
 extern mtd_sdcard_t mtd_sdcard_dev0;
 #endif
 
-#if defined(MODULE_MTD_EMULATED)
+#if MODULE_MTD_EMULATED
 extern mtd_emulated_t mtd_emulated_dev0;
 #endif
 

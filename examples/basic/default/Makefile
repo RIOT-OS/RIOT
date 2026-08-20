@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  gnrc_pktdump \
+  #
 # name of your application
 APPLICATION = default
 

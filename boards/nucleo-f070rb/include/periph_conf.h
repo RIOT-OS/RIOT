@@ -183,7 +183,7 @@ static const spi_conf_t spi_config[] = {
         .cs_af    = GPIO_AF0,
         .rccmask  = RCC_APB2ENR_SPI1EN,
         .apbbus   = APB2,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_dma   = 1,
         .tx_dma_chan = 0,
         .rx_dma   = 0,

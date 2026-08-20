@@ -44,7 +44,7 @@
 typedef struct {
     uint8_t addr[BLE_ADDR_LEN];     /**< peer addr, network byte order */
     uint8_t state;                  /**< internal state */
-#if IS_USED(MODULE_NIMBLE_STATCONN_EXT)
+#if MODULE_NIMBLE_STATCONN_EXT
     nimble_phy_t phy_mode;          /**< PHY mode used by this slot */
 #endif
 } slot_t;
@@ -90,13 +90,13 @@ static void _activate(uint8_t role)
                                                      : BLE_ADDR_PUBLIC;
         bluetil_addr_swapped_cp(slot->addr, peer.val);
         /* try to (re)open the connection */
-#if IS_USED(MODULE_NIMBLE_STATCONN_EXT)
+#if MODULE_NIMBLE_STATCONN_EXT
         _conn_params.phy_mode = slot->phy_mode;
 #endif
         nimble_netif_connect(&peer, &_conn_params);
     }
     else if (slot && (role == ROLE_S)) {
-#if IS_USED(MODULE_NIMBLE_STATCONN_EXT)
+#if MODULE_NIMBLE_STATCONN_EXT
         _accept_params.primary_phy = slot->phy_mode;
         _accept_params.secondary_phy = slot->phy_mode;
 #endif
@@ -182,7 +182,7 @@ static int _be(uint8_t role, const uint8_t *addr,
     memcpy(s->addr, addr, BLE_ADDR_LEN);
     mutex_unlock(&_lock);
 
-#if IS_USED(MODULE_NIMBLE_STATCONN_EXT)
+#if MODULE_NIMBLE_STATCONN_EXT
     if (cfg != NULL) {
         s->phy_mode = cfg->phy_mode;
     }
@@ -203,7 +203,7 @@ void nimble_statconn_init(void)
 
     /* set the advertising parameters used */
     memset(&_accept_params, 0, sizeof(_accept_params));
-#if IS_USED(MODULE_NIMBLE_STATCONN_EXT)
+#if MODULE_NIMBLE_STATCONN_EXT
     _accept_params.flags = 0;
 #else
     _accept_params.flags = NIMBLE_NETIF_FLAG_LEGACY;
@@ -216,7 +216,7 @@ void nimble_statconn_init(void)
 
     /* set connection parameters */
     memset(&_conn_params, 0, sizeof(_conn_params));
-#if !IS_USED(MODULE_NIMBLE_AUTOCONN_EXT)
+#if !MODULE_NIMBLE_AUTOCONN_EXT
     _conn_params.phy_mode = NIMBLE_PHY_1M;
 #endif
     _conn_params.scan_itvl_ms = NIMBLE_STATCONN_CONN_WIN_MS;

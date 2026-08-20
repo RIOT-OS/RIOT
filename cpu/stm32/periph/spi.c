@@ -71,7 +71,7 @@ static inline SPI_TypeDef *dev(spi_t bus)
     return spi_config[bus].dev;
 }
 
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
 static inline bool _use_dma(const spi_conf_t *conf)
 {
     return conf->tx_dma != DMA_STREAM_UNDEF && conf->rx_dma != DMA_STREAM_UNDEF;
@@ -221,7 +221,7 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
     return SPI_OK;
 }
 
-#ifdef MODULE_PERIPH_SPI_GPIO_MODE
+#if MODULE_PERIPH_SPI_GPIO_MODE
 int spi_init_with_gpio_mode(spi_t bus, const spi_gpio_mode_t* mode)
 {
     assume(bus < SPI_NUMOF);
@@ -309,7 +309,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     dev(bus)->CFG1 = cfg1;
     dev(bus)->CFG2 = cfg2;
 
-#  ifdef MODULE_PERIPH_DMA
+#  if MODULE_PERIPH_DMA
     if (_use_dma(&spi_config[bus])) {
         dev(bus)->CFG1 |= SPI_CFG1_RXDMAEN | SPI_CFG1_TXDMAEN;
         dma_acquire(spi_config[bus].tx_dma);
@@ -327,7 +327,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
         cr2 = (SPI_CR2_SSOE);
     }
 
-#  ifdef MODULE_PERIPH_DMA
+#  if MODULE_PERIPH_DMA
     if (_use_dma(&spi_config[bus])) {
         cr2 |= SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN;
 
@@ -355,7 +355,7 @@ void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
 void spi_release(spi_t bus)
 {
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
     if (_use_dma(&spi_config[bus])) {
         dma_release(spi_config[bus].tx_dma);
         dma_release(spi_config[bus].rx_dma);
@@ -397,7 +397,7 @@ static inline void _wait_for_end(spi_t bus)
 #endif
 }
 
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
 static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
 {
     uint8_t tmp = 0;
@@ -580,14 +580,14 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
 #endif
     }
 
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
     if (_use_dma(&spi_config[bus]) && len > CONFIG_SPI_DMA_THRESHOLD_BYTES) {
         _transfer_dma(bus, out, in, len);
     }
     else {
 #endif
         _transfer_no_dma(bus, out, in, len);
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
     }
 #endif
 

@@ -15,7 +15,7 @@
  * @}
  */
 
-#if defined(MODULE_ATXMEGA_EBI)
+#if MODULE_ATXMEGA_EBI
 
 #include "board.h"
 #include "cpu_ebi.h"

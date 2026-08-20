@@ -446,7 +446,7 @@ static void _setup_phy(void)
     while (MII_BMCR_RESET & _mii_reg_read(MII_BMCR)) {}
 
     /* check if auto-negotiation is enabled and supported */
-    if (IS_USED(MODULE_STM32_ETH_AUTO) && _phy_can_negotiate()) {
+    if (MODULE_STM32_ETH_AUTO && _phy_can_negotiate()) {
         _mii_reg_write(MII_BMCR, MII_BMCR_AN_ENABLE);
         DEBUG("[stm32_eth] Enabled auto-negotiation\n");
         /* We'll continue link setup once auto-negotiation is done */
@@ -476,7 +476,7 @@ static void _setup_phy(void)
 static int stm32_eth_init(netdev_t *netdev)
 {
     (void)netdev;
-    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+    if (MODULE_STM32_ETH_TRACING) {
         gpio_ll_init(STM32_ETH_TRACING_TX_PORT,
                      STM32_ETH_TRACING_TX_PIN_NUM,
                      gpio_ll_out);
@@ -484,7 +484,7 @@ static int stm32_eth_init(netdev_t *netdev)
                      STM32_ETH_TRACING_RX_PIN_NUM,
                      gpio_ll_out);
     }
-    if (IS_USED(MODULE_STM32_ETH_LINK_UP)) {
+    if (MODULE_STM32_ETH_LINK_UP) {
         _link_status_timer.callback = _timer_cb;
         _link_status_timer.arg = netdev;
         ztimer_set(ZTIMER_MSEC, &_link_status_timer, STM32_ETH_LINK_UP_TIMEOUT_MS);
@@ -492,7 +492,7 @@ static int stm32_eth_init(netdev_t *netdev)
 
     /* The PTP clock is initialized prior to the netdevs and will have already
      * initialized the common stuff, if used.*/
-    if (!IS_USED(MODULE_PERIPH_INIT_PTP)) {
+    if (!MODULE_PERIPH_INIT_PTP) {
         stm32_eth_common_init();
     }
 
@@ -537,7 +537,7 @@ static int stm32_eth_init(netdev_t *netdev)
     _setup_phy();
 
     /* signal link UP if no proper link detection is enabled */
-    if (!IS_USED(MODULE_STM32_ETH_LINK_UP)) {
+    if (!MODULE_STM32_ETH_LINK_UP) {
         netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
     }
 
@@ -574,7 +574,7 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
         dma_iter = dma_iter->desc_next;
     }
 
-    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+    if (MODULE_STM32_ETH_TRACING) {
         gpio_ll_set(STM32_ETH_TRACING_TX_PORT,
                     (1U << STM32_ETH_TRACING_TX_PIN_NUM));
     }
@@ -591,7 +591,7 @@ static int stm32_eth_confirm_send(netdev_t *netdev, void *info)
 {
     (void)info;
     (void)netdev;
-    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+    if (MODULE_STM32_ETH_TRACING) {
         gpio_ll_clear(STM32_ETH_TRACING_TX_PORT,
                       (1U << STM32_ETH_TRACING_TX_PIN_NUM));
     }
@@ -751,7 +751,7 @@ static int stm32_eth_recv(netdev_t *netdev, void *_buf, size_t max_len,
         }
         if (rx_curr->status & RX_DESC_STAT_LS) {
             /* LS bit set --> reached last DMA descriptor of this frame */
-            if (IS_USED(MODULE_PERIPH_PTP)) {
+            if (MODULE_PERIPH_PTP) {
                 info->timestamp = rx_curr->ts_low;
                 info->timestamp += (uint64_t)rx_curr->ts_high * NS_PER_SEC;
                 info->flags |= NETDEV_ETH_RX_INFO_FLAG_TIMESTAMP;
@@ -764,7 +764,7 @@ static int stm32_eth_recv(netdev_t *netdev, void *_buf, size_t max_len,
         rx_curr = rx_curr->desc_next;
     }
 
-    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+    if (MODULE_STM32_ETH_TRACING) {
         gpio_ll_clear(STM32_ETH_TRACING_RX_PORT,
                       (1U << STM32_ETH_TRACING_RX_PIN_NUM));
     }
@@ -781,11 +781,11 @@ void stm32_eth_isr_eth_wkup(void)
 
 static void stm32_eth_isr(netdev_t *netdev)
 {
-    if (IS_USED(MODULE_STM32_ETH_LINK_UP)) {
+    if (MODULE_STM32_ETH_LINK_UP) {
         switch (_link_state) {
         case LINK_STATE_UP:
             DEBUG("[stm32_eth] Link UP\n");
-            if (IS_USED(MODULE_STM32_ETH_AUTO)) {
+            if (MODULE_STM32_ETH_AUTO) {
                 /* Complete auto-negotiation of the link */
                 _complete_auto_negotiation();
             }
@@ -802,7 +802,7 @@ static void stm32_eth_isr(netdev_t *netdev)
         }
     }
 
-    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+    if (MODULE_STM32_ETH_TRACING) {
         gpio_ll_set(STM32_ETH_TRACING_RX_PORT,
                     (1U << STM32_ETH_TRACING_RX_PIN_NUM));
     }

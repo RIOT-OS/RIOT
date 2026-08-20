@@ -42,7 +42,7 @@ typedef union {
  *          fragment recovery
  */
 typedef struct gnrc_sixlowpan_frag_sfr_fb {
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE) || DOXYGEN
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE || DOXYGEN
     congure_snd_t *congure;     /**< state object for [CongURE](@ref sys_congure) */
 #endif
     /**

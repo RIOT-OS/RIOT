@@ -15,7 +15,7 @@
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
-#ifndef MODULE_PERIPH_SPI
+#if !MODULE_PERIPH_SPI
 #error "No SPI support on your board"
 #endif
 

@@ -20,7 +20,7 @@
 
 #include "kernel_defines.h"
 #include "board.h"
-#if IS_USED(MODULE_LV_DRIVERS_SDL)
+#if MODULE_LV_DRIVERS_SDL
 #include "lv_drv_conf.h"
 #endif
 

@@ -25,11 +25,11 @@
 #include "entropy_sources_mbedtls_riot.h"
 
 #include "kernel_defines.h"
-#if IS_USED(MODULE_MBEDTLS_ENTROPY_SOURCE_HWRNG)
+#if MODULE_MBEDTLS_ENTROPY_SOURCE_HWRNG
 #include "periph/hwrng.h"
 #endif
 
-#if IS_USED(MODULE_MBEDTLS_ENTROPY_SOURCE_ADC)
+#if MODULE_MBEDTLS_ENTROPY_SOURCE_ADC
 #include "entropy_source/adc_noise.h"
 #endif
 
@@ -49,10 +49,10 @@
  * @{
  */
 const entropy_source_mbedtls_riot_t entropy_funcs[] = {
-#if IS_USED(MODULE_MBEDTLS_ENTROPY_SOURCE_HWRNG)
+#if MODULE_MBEDTLS_ENTROPY_SOURCE_HWRNG
 { .func = riot_hwrng_poll, .strong = MBEDTLS_ENTROPY_SOURCE_STRONG },
 #endif
-#if IS_USED(MODULE_MBEDTLS_ENTROPY_SOURCE_ADC)
+#if MODULE_MBEDTLS_ENTROPY_SOURCE_ADC
 { .func = riot_adc_poll, .strong = MBEDTLS_ENTROPY_SOURCE_WEAK },
 #endif
     /* Additional sources need to be added here */
@@ -78,7 +78,7 @@ int riot_add_entropy_src_avail(mbedtls_entropy_context *ctx)
     assert(ctx);
     int ret = 0;
 
-#if IS_USED(MODULE_MBEDTLS_ENTROPY_SOURCE_ADC)
+#if MODULE_MBEDTLS_ENTROPY_SOURCE_ADC
     entropy_source_adc_init();
 #endif
 
@@ -93,7 +93,7 @@ int riot_add_entropy_src_avail(mbedtls_entropy_context *ctx)
     return ret;
 }
 
-#if IS_USED(MODULE_MBEDTLS_ENTROPY_SOURCE_HWRNG)
+#if MODULE_MBEDTLS_ENTROPY_SOURCE_HWRNG
 int riot_hwrng_poll(void *data, unsigned char *output, size_t len,
                         size_t *olen)
 {
@@ -109,7 +109,7 @@ int riot_hwrng_poll(void *data, unsigned char *output, size_t len,
 }
 #endif
 
-#if IS_USED(MODULE_MBEDTLS_ENTROPY_SOURCE_ADC)
+#if MODULE_MBEDTLS_ENTROPY_SOURCE_ADC
 int riot_adc_poll(void *data, unsigned char *output, size_t len,
                     size_t *olen)
 {

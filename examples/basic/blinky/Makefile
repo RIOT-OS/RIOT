@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  ztimer \
+  #
 # name of your application
 APPLICATION = blinky
 

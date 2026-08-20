@@ -92,7 +92,7 @@ extern "C" {
  * @brief The maximum number of threads to be scheduled
  */
 #ifndef MAXTHREADS
-#if defined(MODULE_CORE_THREAD)
+#if MODULE_CORE_THREAD
 #define MAXTHREADS 32
 #else
 #define MAXTHREADS 0
@@ -280,7 +280,7 @@ void sched_change_priority(thread_t *thread, uint8_t priority);
  */
 void sched_arch_idle(void);
 
-#if IS_USED(MODULE_SCHED_CB) || defined(DOXYGEN)
+#if MODULE_SCHED_CB || defined(DOXYGEN)
 /**
  * @brief   Scheduler run callback
  *
@@ -320,7 +320,7 @@ static inline void sched_runq_advance(uint8_t prio)
     clist_lpoprpush(&sched_runqueues[prio]);
 }
 
-#if (IS_USED(MODULE_SCHED_RUNQ_CALLBACK)) || defined(DOXYGEN)
+#if (MODULE_SCHED_RUNQ_CALLBACK) || defined(DOXYGEN)
 /**
  * @brief   Scheduler runqueue (change) callback
  *

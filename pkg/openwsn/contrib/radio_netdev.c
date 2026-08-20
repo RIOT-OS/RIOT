@@ -35,12 +35,12 @@
 #include "openwsn.h"
 #include "openwsn_radio.h"
 
-#ifdef MODULE_AT86RF2XX
+#if MODULE_AT86RF2XX
 #include "at86rf2xx.h"
 #include "at86rf2xx_params.h"
 #endif
 
-#ifdef MODULE_CC2538_RF
+#if MODULE_CC2538_RF
 #include "cc2538_rf.h"
 #endif
 

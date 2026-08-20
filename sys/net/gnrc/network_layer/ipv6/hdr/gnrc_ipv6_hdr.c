@@ -21,12 +21,12 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if defined(MODULE_IPV6_ADDR)
+#if MODULE_IPV6_ADDR
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
 /* For independent testing */
-#ifdef MODULE_GNRC_NETTYPE_IPV6
+#if MODULE_GNRC_NETTYPE_IPV6
 #define HDR_NETTYPE (GNRC_NETTYPE_IPV6)
 #else
 #define HDR_NETTYPE (GNRC_NETTYPE_UNDEF)
@@ -48,7 +48,7 @@ gnrc_pktsnip_t *gnrc_ipv6_hdr_build(gnrc_pktsnip_t *payload, const ipv6_addr_t *
     hdr = (ipv6_hdr_t *)ipv6->data;
 
     if (src != NULL) {
-#ifdef MODULE_IPV6_ADDR
+#if MODULE_IPV6_ADDR
         DEBUG("ipv6_hdr: set packet source to %s\n",
               ipv6_addr_to_str(addr_str, (ipv6_addr_t *)src,
                                sizeof(addr_str)));
@@ -61,7 +61,7 @@ gnrc_pktsnip_t *gnrc_ipv6_hdr_build(gnrc_pktsnip_t *payload, const ipv6_addr_t *
     }
 
     if (dst != NULL) {
-#ifdef MODULE_IPV6_ADDR
+#if MODULE_IPV6_ADDR
         DEBUG("ipv6_hdr: set packet destination to %s\n",
               ipv6_addr_to_str(addr_str, (ipv6_addr_t *)dst,
                                sizeof(addr_str)));

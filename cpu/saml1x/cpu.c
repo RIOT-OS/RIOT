@@ -128,13 +128,13 @@ void cpu_init(void)
                          | MCLK_APBAMASK_OSC32KCTRL
                          | MCLK_APBAMASK_GCLK
                          | MCLK_APBAMASK_PM
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
                          | MCLK_APBAMASK_EIC
 #endif
-#ifdef MODULE_PERIPH_GPIO
+#if MODULE_PERIPH_GPIO
                          | MCLK_APBAMASK_PORT
 #endif
-#ifdef MODULE_PERIPH_RTC_RTT
+#if MODULE_PERIPH_RTC_RTT
                          | MCLK_APBAMASK_RTC
 #endif
                          ;
@@ -174,7 +174,7 @@ void cpu_init(void)
     _gclk_setup(SAM0_GCLK_32KHZ, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSCULP32K);
 #endif
 
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
     /*  initialize DMA streams */
     dma_init();
 #endif

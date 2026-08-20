@@ -69,21 +69,21 @@
  * Determine if PLL is required, even if not used as SYSCLK
  * This is the case when USB/SDMMC is used in application and PLL1_Q/PLL3_Q is
  * configured to output 48MHz. */
-#if (IS_USED(MODULE_PERIPH_USBDEV_CLK) || IS_USED(MODULE_PERIPH_SDMMC_CLK)) && \
+#if (MODULE_PERIPH_USBDEV_CLK || MODULE_PERIPH_SDMMC_CLK) && \
     (CLOCK_PLL1_Q_OUT == 48)
 #  define CLOCK_REQUIRE_PLL1_Q          1
 #else
 #  define CLOCK_REQUIRE_PLL1_Q          0
 #endif
 
-#if (defined(CPU_LINE_STM32H753XX)) && (IS_USED(MODULE_PERIPH_USBDEV_CLK)) && \
+#if (defined(CPU_LINE_STM32H753XX)) && (MODULE_PERIPH_USBDEV_CLK) && \
     (!IS_ACTIVE(CLOCK_REQUIRE_PLL1_Q) && (CLOCK_PLL3_Q_OUT == 48))
 #  define CLOCK_REQUIRE_PLL3_Q          1
 #else
 #  define CLOCK_REQUIRE_PLL3_Q          0
 #endif
 
-#if (defined(CPU_LINE_STM32H753XX)) && (IS_USED(MODULE_PERIPH_SDMMC_CLK)) && \
+#if (defined(CPU_LINE_STM32H753XX)) && (MODULE_PERIPH_SDMMC_CLK) && \
     (!IS_ACTIVE(CLOCK_REQUIRE_PLL1_Q))
 #  define CLOCK_REQUIRE_PLL2_R          1
 #else
@@ -93,21 +93,21 @@
 /* PLL1_Q & PLL3_Q for USB_CLK MUX can only be used for STM32H753ZI.
  * HSI48 is only enabled if no suitbale 48MHz clock source can be generated
  * with PLL1_Q / PLL3_Q for USBDEV OR RNG. */
-#if (defined(CPU_LINE_STM32H753XX)) && (IS_USED(MODULE_PERIPH_USBDEV_CLK)) && \
+#if (defined(CPU_LINE_STM32H753XX)) && (MODULE_PERIPH_USBDEV_CLK) && \
     (!IS_ACTIVE(CLOCK_REQUIRE_PLL1_Q)) && (!IS_ACTIVE(CLOCK_REQUIRE_PLL3_Q))
 #  define CLOCK_REQUIRE_HSI48           1
 /* Disable HSI48 if USBDEV or RNG PERIPH is not used. */
-#elif (!IS_USED(MODULE_PERIPH_USBDEV_CLK))
+#elif (!MODULE_PERIPH_USBDEV_CLK)
 #  define CLOCK_REQUIRE_HSI48           0
 #endif
 
-#if (IS_USED(MODULE_PERIPH_USBDEV_CLK)) && !(IS_ACTIVE(CLOCK_REQUIRE_PLL1_Q) || \
+#if (MODULE_PERIPH_USBDEV_CLK) && !(IS_ACTIVE(CLOCK_REQUIRE_PLL1_Q) || \
      IS_ACTIVE(CLOCK_REQUIRE_PLL3_Q) || IS_ACTIVE(CLOCK_REQUIRE_HSI48))
 #  error No suitable 48MHz found, USB will not work
 #endif
 
 /* If no suitable clock for SDMMC is found */
-#if (IS_USED(MODULE_SDMMC_CLK)) && !(IS_ACTIVE(CLOCK_REQUIRE_PLL1_Q) || \
+#if (MODULE_SDMMC_CLK) && !(IS_ACTIVE(CLOCK_REQUIRE_PLL1_Q) || \
      IS_ACTIVE(CLOCK_REQUIRE_PLL2_R))
 #  error No suitable 48MHz found, SDMMC will not work
 #endif

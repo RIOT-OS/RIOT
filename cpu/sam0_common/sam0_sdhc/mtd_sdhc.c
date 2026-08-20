@@ -40,7 +40,7 @@ static int _init(mtd_dev_t *dev)
     dev->sector_count = ctx->state.sectors;
     dev->write_size = SD_MMC_BLOCK_SIZE;
 
-#if IS_USED(MODULE_MTD_WRITE_PAGE)
+#if MODULE_MTD_WRITE_PAGE
     /* TODO: move to MTD layer */
     if (!dev->work_area) {
         dev->work_area = malloc(SD_MMC_BLOCK_SIZE);
@@ -68,7 +68,7 @@ static int _read_page(mtd_dev_t *dev, void *buff, uint32_t page,
 
     /* emulate unaligned / sub-page read */
     if (pages == 0 || offset || ((uintptr_t)buff & 0x3)) {
-#if IS_USED(MODULE_MTD_WRITE_PAGE)
+#if MODULE_MTD_WRITE_PAGE
         if (dev->work_area == NULL) {
             DEBUG("mtd_sdhc: no work area\n");
             return -ENOTSUP;
@@ -104,7 +104,7 @@ static int _write_page(mtd_dev_t *dev, const void *buff, uint32_t page,
 
     /* emulate unaligned / sub-page write */
     if (pages == 0 || offset || ((uintptr_t)buff & 0x3)) {
-#if IS_USED(MODULE_MTD_WRITE_PAGE)
+#if MODULE_MTD_WRITE_PAGE
         if (dev->work_area == NULL) {
             DEBUG("mtd_sdhc: no work area\n");
             return -ENOTSUP;

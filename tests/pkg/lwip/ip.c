@@ -29,7 +29,7 @@
 #include "utilities.h"
 #include "ztimer.h"
 
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
 static char sock_inbuf[SOCK_INBUF_SIZE];
 static bool server_running;
 static sock_ip_t server_sock;
@@ -56,7 +56,7 @@ static void _ip_recv(sock_ip_t *sock, sock_async_flags_t flags, void *arg)
             printf("Received IP data from ");
             switch (src.family) {
                 case AF_INET:
-#if IS_USED(MODULE_LWIP_IPV4)
+#if MODULE_LWIP_IPV4
                     printf("[%s]:\n",
                            ipv4_addr_to_str(addrstr,
                                             (ipv4_addr_t *)&src.addr.ipv4,
@@ -67,7 +67,7 @@ static void _ip_recv(sock_ip_t *sock, sock_async_flags_t flags, void *arg)
                     break;
 #endif
                 case AF_INET6:
-#if IS_USED(MODULE_LWIP_IPV6)
+#if MODULE_LWIP_IPV6
                     printf("[%s]:\n",
                            ipv6_addr_to_str(addrstr,
                                             (ipv6_addr_t *)&src.addr.ipv6,
@@ -115,7 +115,7 @@ static int ip_send(char *addr_str, char *port_str, char *data, unsigned int num,
     size_t data_len;
 
     /* parse destination address */
-#if IS_USED(MODULE_LWIP_IPV6)
+#if MODULE_LWIP_IPV6
     if (strchr(addr_str, ':')) {
         if (ipv6_addr_from_str((ipv6_addr_t *)&dst.addr.ipv6,
                                addr_str) == NULL) {
@@ -126,11 +126,11 @@ static int ip_send(char *addr_str, char *port_str, char *data, unsigned int num,
             dst.family = AF_INET6;
         }
     }
-#if IS_USED(MODULE_LWIP_IPV4)
+#if MODULE_LWIP_IPV4
     else
 #endif
 #endif
-#if IS_USED(MODULE_LWIP_IPV4)
+#if MODULE_LWIP_IPV4
     if (ipv4_addr_from_str((ipv4_addr_t *)&dst.addr.ipv4,
                            addr_str) == NULL) {
         puts("Error: unable to parse destination address");

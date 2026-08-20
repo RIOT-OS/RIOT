@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  max31343 \
+  #
 include ../Makefile.drivers_common
 
 # The test supports both MAX31331 and MAX31343. Comment out the variant you have.

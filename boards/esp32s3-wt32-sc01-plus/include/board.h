@@ -68,7 +68,7 @@
 #define LCD_SCREEN_WIDTH    480     /**< LCD width */
 #define LCD_SCREEN_HEIGHT   320     /**< LCD height */
 
-#ifdef MODULE_ST77XX
+#if MODULE_ST77XX
 #define LCD_DB0         GPIO9
 #define LCD_DB1         GPIO46
 #define LCD_DB2         GPIO3

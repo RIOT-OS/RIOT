@@ -1,0 +1,24 @@
+MODULE_DEFS_NEEDED += \
+	auto_init \
+	backtrace \
+	core_idle_thread \
+	core_init \
+	core_thread \
+	cortexm_common \
+	defs_needed \
+	log \
+	periph_init_leds \
+	periph_pm \
+	ps \
+	stdio_null \
+	test_utils_main_exit_cb \
+	test_utils_print_stack_usage \
+	usb_board_reset \
+	vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  core_init \
+  cortexm_common \
+  log \
+  #

@@ -24,7 +24,7 @@
 
 #include "periph/gpio.h"
 
-#ifdef MODULE_MTD
+#if MODULE_MTD
 /* MX25R2035F */
 static const mtd_spi_nor_params_t _mtd_nor_params = {
     .opcode = &mtd_spi_nor_opcode_default,

@@ -1,2 +1,7 @@
 USEMODULE_INCLUDES_servo := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_servo)
+
+MODULE_DEFS_NEEDED += \
+  servo_pwm \
+  servo_timer \
+  #

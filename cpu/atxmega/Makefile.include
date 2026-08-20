@@ -54,3 +54,10 @@ endif
 include $(RIOTCPU)/avr8_common/Makefile.include
 
 PSEUDOMODULE += atxmega_ebi
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_hw_fc \
+  xtimer \
+  ztimer \
+  ztimer64 \
+  #

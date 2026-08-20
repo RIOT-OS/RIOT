@@ -38,10 +38,10 @@
 #include "net/sock/udp.h"
 #include "net/sock/tcp.h"
 
-#if IS_USED(MODULE_SOCK_ASYNC)
+#if MODULE_SOCK_ASYNC
 #include "net/sock/async.h"
 #endif
-#if IS_USED(MODULE_POSIX_SELECT)
+#if MODULE_POSIX_SELECT
 #include <sys/select.h>
 
 #include "thread.h"
@@ -62,16 +62,16 @@ typedef union {
     /* cppcheck-suppress unusedStructMember
      * (reason: is not supposed to be used) */
     int undef;
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
     sock_ip_t raw;              /**< raw IP sock */
 #endif /* MODULE_SOCK_IP */
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
     union {
         sock_tcp_t sock;        /**< TCP sock */
         sock_tcp_queue_t queue; /**< TCP queue */
     } tcp;                      /**< both TCP types */
 #endif /* MODULE_SOCK_TCP */
-#ifdef MODULE_SOCK_UDP
+#if MODULE_SOCK_UDP
     sock_udp_t udp;             /**< UDP sock */
 #endif /* MODULE_SOCK_UDP */
 } socket_sock_t;
@@ -86,14 +86,14 @@ typedef struct {
     uint32_t recv_timeout;
 #endif
     socket_sock_t *sock;
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
     sock_tcp_t *queue_array;
     unsigned queue_array_len;
 #endif
-#if IS_USED(MODULE_SOCK_ASYNC)
+#if MODULE_SOCK_ASYNC
     atomic_uint available;
 #endif
-#if IS_USED(MODULE_POSIX_SELECT)
+#if MODULE_POSIX_SELECT
     thread_t *selecting_thread;
 #endif
     sock_tcp_ep_t local;        /* to store bind before connect/listen */
@@ -101,7 +101,7 @@ typedef struct {
 
 static socket_t _socket_pool[_ACTUAL_SOCKET_POOL_SIZE];
 static socket_sock_t _sock_pool[SOCKET_POOL_SIZE];
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
 static sock_tcp_t _tcp_sock_pool[SOCKET_POOL_SIZE][SOCKET_TCP_QUEUE_SIZE];
 #endif
 BITFIELD(_sock_pool_used, SOCKET_POOL_SIZE);
@@ -122,10 +122,10 @@ static socket_t *_get_free_socket(void)
 {
     for (int i = 0; i < _ACTUAL_SOCKET_POOL_SIZE; i++) {
         if (_socket_pool[i].domain == AF_UNSPEC) {
-#if IS_USED(MODULE_SOCK_ASYNC)
+#if MODULE_SOCK_ASYNC
             atomic_init(&_socket_pool[i].available, 0U);
 #endif
-#if IS_USED(MODULE_POSIX_SELECT)
+#if MODULE_POSIX_SELECT
             _socket_pool[i].selecting_thread = NULL;
 #endif
             return &_socket_pool[i];
@@ -171,7 +171,7 @@ static int _get_sock_idx(socket_sock_t *sock)
 static inline int _choose_ipproto(int type, int protocol)
 {
     switch (type) {
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
     case SOCK_STREAM:
         if ((protocol == 0) || (protocol == IPPROTO_TCP)) {
             return protocol;
@@ -181,7 +181,7 @@ static inline int _choose_ipproto(int type, int protocol)
         }
         break;
 #endif
-#ifdef MODULE_SOCK_UDP
+#if MODULE_SOCK_UDP
     case SOCK_DGRAM:
         if ((protocol == 0) || (protocol == IPPROTO_UDP)) {
             return protocol;
@@ -191,7 +191,7 @@ static inline int _choose_ipproto(int type, int protocol)
         }
         break;
 #endif
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
     case SOCK_RAW:
         return protocol;
 #endif
@@ -293,17 +293,17 @@ static int socket_close(vfs_file_t *filp)
     if (s->sock != NULL) {
         int idx = _get_sock_idx(s->sock);
         switch (s->type) {
-#ifdef MODULE_SOCK_UDP
+#if MODULE_SOCK_UDP
         case SOCK_DGRAM:
             sock_udp_close(&s->sock->udp);
             break;
 #endif
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
         case SOCK_RAW:
             sock_ip_close(&s->sock->raw);
             break;
 #endif
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
         case SOCK_STREAM:
             if (s->queue_array == NULL) {
                 sock_tcp_disconnect(&s->sock->tcp.sock);
@@ -363,7 +363,7 @@ static const vfs_file_ops_t socket_ops = {
     .write = socket_write,
 };
 
-#if IS_USED(MODULE_SOCK_ASYNC)
+#if MODULE_SOCK_ASYNC
 static void _async_cb(void *sock, sock_async_flags_t type,
                       void *arg)
 {
@@ -372,7 +372,7 @@ static void _async_cb(void *sock, sock_async_flags_t type,
     (void)sock;
     if (type & SOCK_ASYNC_MSG_RECV) {
         atomic_fetch_add(&socket->available, 1);
-#if IS_USED(MODULE_POSIX_SELECT)
+#if MODULE_POSIX_SELECT
         if (socket->selecting_thread) {
             thread_flags_set(socket->selecting_thread,
                              POSIX_SELECT_THREAD_FLAG);
@@ -385,25 +385,25 @@ static void _sock_set_cb(socket_t *socket)
 {
     union {
         void (*sock_pool)(void *, sock_async_flags_t, void *);
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
         sock_ip_cb_t ip;
 #endif
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
         sock_tcp_cb_t tcp;
         sock_tcp_queue_cb_t tcp_queue;
 #endif
-#ifdef MODULE_SOCK_UDP
+#if MODULE_SOCK_UDP
         sock_udp_cb_t udp;
 #endif
     } callback = { .sock_pool = _async_cb };
 
     switch (socket->type) {
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
     case SOCK_RAW:
         sock_ip_set_cb(&socket->sock->raw, callback.ip, socket);
         break;
 #endif
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
     case SOCK_STREAM:
         /* is a TCP client socket */
         if (socket->queue_array == NULL) {
@@ -416,7 +416,7 @@ static void _sock_set_cb(socket_t *socket)
         }
         break;
 #endif
-#ifdef MODULE_SOCK_UDP
+#if MODULE_SOCK_UDP
     case SOCK_DGRAM:
         sock_udp_set_cb(&socket->sock->udp, callback.udp, socket);
         break;
@@ -466,7 +466,7 @@ int socket(int domain, int type, int protocol)
 #ifdef POSIX_SETSOCKOPT
         s->recv_timeout = SOCK_NO_TIMEOUT;
 #endif
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
         if (type == SOCK_STREAM)  {
             s->queue_array = NULL;
             s->queue_array_len = 0;
@@ -488,7 +488,7 @@ int socket(int domain, int type, int protocol)
 int accept(int socket, struct sockaddr *restrict address,
            socklen_t *restrict address_len)
 {
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
     sock_tcp_t *sock = NULL;
     socket_t *s, *new_s = NULL;
     int res = 0;
@@ -560,7 +560,7 @@ int accept(int socket, struct sockaddr *restrict address,
             new_s->queue_array = NULL;
             new_s->queue_array_len = 0;
             new_s->sock = (socket_sock_t *)sock;
-#if IS_USED(MODULE_SOCK_ASYNC)
+#if MODULE_SOCK_ASYNC
             _sock_set_cb(new_s);
 #endif
             memset(&s->local, 0, sizeof(sock_tcp_ep_t));
@@ -607,15 +607,15 @@ int bind(int socket, const struct sockaddr *address, socklen_t address_len)
         return -1;
     }
     switch (s->type) {
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
     case SOCK_RAW:
         break;
 #endif
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
     case SOCK_STREAM:
         break;
 #endif
-#ifdef MODULE_SOCK_UDP
+#if MODULE_SOCK_UDP
     case SOCK_DGRAM:
         break;
 #endif
@@ -660,14 +660,14 @@ static int _bind_connect(socket_t *s, const struct sockaddr *address,
         return -1;
     }
     switch (s->type) {
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
     case SOCK_RAW:
         /* TODO apply flags if possible */
         res = sock_ip_create(&sock->raw, (sock_ip_ep_t *)local,
                              (sock_ip_ep_t *)remote, s->protocol, 0);
         break;
 #endif
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
     case SOCK_STREAM:
         /* TODO apply flags if possible */
         assert(remote != NULL);
@@ -675,7 +675,7 @@ static int _bind_connect(socket_t *s, const struct sockaddr *address,
                                (local == NULL) ? 0 : local->port, 0);
         break;
 #endif
-#ifdef MODULE_SOCK_UDP
+#if MODULE_SOCK_UDP
     case SOCK_DGRAM:
         /* TODO apply flags if possible */
         res = sock_udp_create(&sock->udp, local, remote, 0);
@@ -696,7 +696,7 @@ static int _bind_connect(socket_t *s, const struct sockaddr *address,
         return -1;
     }
     s->sock = sock;
-#if IS_USED(MODULE_SOCK_ASYNC)
+#if MODULE_SOCK_ASYNC
     _sock_set_cb(s);
 #endif
 
@@ -715,7 +715,7 @@ int connect(int socket, const struct sockaddr *address, socklen_t address_len)
         return -1;
     }
     if (s->sock != NULL) {
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
         if (s->queue_array != NULL) {
             errno = EOPNOTSUPP;
         }
@@ -739,12 +739,12 @@ static int _getpeername(socket_t *s, struct sockaddr *__restrict address,
         return -ENOTCONN;
     }
     switch (s->type) {
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
     case SOCK_RAW:
         res = sock_ip_get_remote(&s->sock->raw, (sock_ip_ep_t *)&ep);
         break;
 #endif
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
     case SOCK_STREAM:
         if (s->queue_array == NULL) {
             res = sock_tcp_get_remote(&s->sock->tcp.sock, &ep);
@@ -754,7 +754,7 @@ static int _getpeername(socket_t *s, struct sockaddr *__restrict address,
         }
         break;
 #endif
-#ifdef MODULE_SOCK_UDP
+#if MODULE_SOCK_UDP
     case SOCK_DGRAM:
         res = sock_udp_get_remote(&s->sock->udp, &ep);
         break;
@@ -813,12 +813,12 @@ int getsockname(int socket, struct sockaddr *__restrict address,
     else {
         struct _sock_tl_ep ep;
         switch (s->type) {
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
         case SOCK_RAW:
             res = sock_ip_get_local(&s->sock->raw, (sock_ip_ep_t *)&ep);
             break;
 #endif
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
         case SOCK_STREAM:
             if (s->queue_array == NULL) {
                 res = sock_tcp_get_local(&s->sock->tcp.sock, &ep);
@@ -828,7 +828,7 @@ int getsockname(int socket, struct sockaddr *__restrict address,
             }
             break;
 #endif
-#ifdef MODULE_SOCK_UDP
+#if MODULE_SOCK_UDP
         case SOCK_DGRAM:
             res = sock_udp_get_local(&s->sock->udp, &ep);
             break;
@@ -852,7 +852,7 @@ int getsockname(int socket, struct sockaddr *__restrict address,
 
 int listen(int socket, int backlog)
 {
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
     socket_t *s;
     socket_sock_t *sock;
     int res = 0;
@@ -899,7 +899,7 @@ int listen(int socket, int backlog)
     }
     if (res == 0) {
         s->sock = sock;
-#if IS_USED(MODULE_SOCK_ASYNC)
+#if MODULE_SOCK_ASYNC
         _sock_set_cb(s);
 #endif
     }
@@ -932,7 +932,7 @@ static ssize_t socket_recvfrom(socket_t *s, void *restrict buffer,
         return -ENOTSOCK;
     }
     if (s->sock == NULL) {  /* socket is not connected */
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
         if (s->type == SOCK_STREAM) {
             return -ENOTCONN;
         }
@@ -950,37 +950,37 @@ static ssize_t socket_recvfrom(socket_t *s, void *restrict buffer,
 #endif
 
     switch (s->type) {
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
     case SOCK_RAW:
         res = sock_ip_recv(&s->sock->raw, buffer, length, recv_timeout,
                            (sock_ip_ep_t *)&ep);
         break;
 #endif
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
     case SOCK_STREAM:
         res = sock_tcp_read(&s->sock->tcp.sock, buffer, length,
                             recv_timeout);
         break;
 #endif
-#ifdef MODULE_SOCK_UDP
+#if MODULE_SOCK_UDP
     case SOCK_DGRAM:
         res = sock_udp_recv(&s->sock->udp, buffer, length, recv_timeout,
                             &ep);
         break;
 #endif
     default:
-#if !defined(MODULE_SOCK_IP) && !defined(MODULE_SOCK_TCP) && !defined(MODULE_SOCK_UDP)
+#if !MODULE_SOCK_IP && !MODULE_SOCK_TCP && !MODULE_SOCK_UDP
         (void) recv_timeout;
 #endif
         res = -EOPNOTSUPP;
         break;
     }
     if ((res >= 0) && (address != NULL) && (address_len != NULL)) {
-#ifdef MODULE_SOCK_ASYNC
+#if MODULE_SOCK_ASYNC
         atomic_fetch_sub(&s->available, 1);
 #endif
         switch (s->type) {
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
         case SOCK_STREAM:
             res = _getpeername(s, address, address_len);
             break;
@@ -1023,7 +1023,7 @@ static ssize_t socket_sendto(socket_t *s, const void *buffer, size_t length,
                              socklen_t address_len)
 {
     int res = 0;
-#if defined(MODULE_SOCK_IP) || defined(MODULE_SOCK_UDP)
+#if MODULE_SOCK_IP || MODULE_SOCK_UDP
     struct _sock_tl_ep ep = { .port = 0 };
 #endif
 
@@ -1033,7 +1033,7 @@ static ssize_t socket_sendto(socket_t *s, const void *buffer, size_t length,
         return -1;
     }
     if (s->sock == NULL) {  /* socket is not connected */
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
         if (s->type == SOCK_STREAM) {
             errno = ENOTCONN;
             return -1;
@@ -1043,12 +1043,12 @@ static ssize_t socket_sendto(socket_t *s, const void *buffer, size_t length,
             return res;
         }
     }
-#if defined(MODULE_SOCK_IP)
+#if MODULE_SOCK_IP
     if ((res = _sockaddr_to_ep(address, address_len, &ep)) < 0)
         return res;
 #endif
     switch (s->type) {
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
     case SOCK_RAW:
         if ((res = sock_ip_send(&s->sock->raw, buffer, length,
                            s->protocol, (sock_ip_ep_t *)&ep)) < 0) {
@@ -1057,7 +1057,7 @@ static ssize_t socket_sendto(socket_t *s, const void *buffer, size_t length,
         }
         break;
 #endif
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
     case SOCK_STREAM:
         if (address == NULL) {
             (void)address_len;
@@ -1072,7 +1072,7 @@ static ssize_t socket_sendto(socket_t *s, const void *buffer, size_t length,
         }
         break;
 #endif
-#ifdef MODULE_SOCK_UDP
+#if MODULE_SOCK_UDP
     case SOCK_DGRAM:
         if (address == NULL) {
             res = sock_udp_get_remote(&s->sock->udp, &ep);
@@ -1177,12 +1177,12 @@ int setsockopt(int socket, int level, int option_name, const void *option_value,
 
 bool posix_socket_is(int fd)
 {
-    return IS_USED(MODULE_SOCK_ASYNC) && (_get_socket(fd) != NULL);
+    return MODULE_SOCK_ASYNC && (_get_socket(fd) != NULL);
 }
 
 unsigned posix_socket_avail(int fd)
 {
-#if IS_USED(MODULE_SOCK_ASYNC)
+#if MODULE_SOCK_ASYNC
     socket_t *socket = _get_socket(fd);
 
     return (socket != NULL) ? atomic_load(&socket->available) : 0U;
@@ -1194,7 +1194,7 @@ unsigned posix_socket_avail(int fd)
 
 int posix_socket_select(int fd)
 {
-#if IS_USED(MODULE_POSIX_SELECT)
+#if MODULE_POSIX_SELECT
     socket_t *socket = _get_socket(fd);
 
     if (socket != NULL) {

@@ -7,3 +7,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 
 # Setup of programmer and serial is shared between STM32 based boards
 include $(RIOTMAKE)/boards/stm32.inc.mk
+
+MODULE_DEFS_NEEDED += \
+  sx126x_stm32wl \
+  #

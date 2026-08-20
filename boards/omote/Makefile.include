@@ -3,3 +3,7 @@ PORT_LINUX  ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
 include $(RIOTBOARD)/common/cc2538/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_hw_fc \
+  #

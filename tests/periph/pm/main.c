@@ -20,12 +20,12 @@
 #include <stdlib.h>
 
 #include "periph/pm.h"
-#ifdef MODULE_PERIPH_GPIO
+#if MODULE_PERIPH_GPIO
 #include "board.h"
 #include "periph/gpio.h"
 #endif
-#ifdef MODULE_PM_LAYERED
-#ifdef MODULE_PERIPH_RTC
+#if MODULE_PM_LAYERED
+#if MODULE_PERIPH_RTC
 #include "periph/rtc.h"
 #endif
 #include "pm_layered.h"
@@ -37,9 +37,9 @@
 #define BTN0_INT_FLANK  GPIO_RISING
 #endif
 
-#ifdef MODULE_PM_LAYERED
+#if MODULE_PM_LAYERED
 
-#ifdef MODULE_PERIPH_RTC
+#if MODULE_PERIPH_RTC
 static int check_mode_duration(int argc, char **argv)
 {
     if (argc != 3) {
@@ -149,7 +149,7 @@ static int cmd_set_rtc(int argc, char **argv)
 #endif /* MODULE_PERIPH_RTC */
 #endif /* MODULE_PM_LAYERED */
 
-#if defined(MODULE_PERIPH_GPIO_IRQ) && defined(BTN0_PIN)
+#if MODULE_PERIPH_GPIO_IRQ && defined(BTN0_PIN)
 static void btn_cb(void *ctx)
 {
     (void) ctx;
@@ -168,7 +168,7 @@ static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
 };
 
-#if IS_USED(MODULE_PM_LAYERED)
+#if MODULE_PM_LAYERED
 static void _show_blockers(void)
 {
     uint8_t lowest_allowed_mode = 0;
@@ -193,7 +193,7 @@ int main(void)
     char line_buf[SHELL_DEFAULT_BUFSIZE];
 
     /* print test application information */
-#ifdef MODULE_PM_LAYERED
+#if MODULE_PM_LAYERED
     printf("This application allows you to test the CPU power management.\n"
            "The available power modes are 0 - %d. Lower-numbered power modes\n"
            "save more power, but may require an event/interrupt to wake up\n"
@@ -211,7 +211,7 @@ int main(void)
          "needed.");
 #endif
 
-#if defined(MODULE_PERIPH_GPIO_IRQ) && defined(BTN0_PIN)
+#if MODULE_PERIPH_GPIO_IRQ && defined(BTN0_PIN)
     puts("using BTN0 as wake-up source");
     gpio_init_int(BTN0_PIN, BTN0_MODE, BTN0_INT_FLANK, btn_cb, NULL);
 #endif

@@ -16,7 +16,7 @@
  * @}
  */
 
-#ifdef MODULE_MTD
+#if MODULE_MTD
 
 #include "board.h"
 #include "mtd.h"
@@ -52,7 +52,7 @@ static mtd_spi_nor_t xiao_nrf52840_nor_dev = {
 
 MTD_XFA_ADD(xiao_nrf52840_nor_dev, 0);
 
-#ifdef MODULE_VFS_DEFAULT
+#if MODULE_VFS_DEFAULT
 #include "vfs_default.h"
 VFS_AUTO_MOUNT(littlefs2, VFS_MTD(xiao_nrf52840_nor_dev), VFS_DEFAULT_NVM(0), 0);
 #endif

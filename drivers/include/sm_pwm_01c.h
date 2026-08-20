@@ -69,7 +69,7 @@ extern "C" {
 #define CONFIG_SM_PWM_01C_WINDOW_TIME           (10 * US_PER_SEC)
 #endif
 
-#if defined(MODULE_SM_PWM_01C_MA) || defined(DOXYGEN)
+#if MODULE_SM_PWM_01C_MA || defined(DOXYGEN)
 /**
  * @def     SM_PWM_01C_BUFFER_LEN
  *
@@ -95,7 +95,7 @@ extern "C" {
 
 /** @} */
 
-#if defined(MODULE_SM_PWM_01C_MA) || defined(DOXYGEN)
+#if MODULE_SM_PWM_01C_MA || defined(DOXYGEN)
 /**
  * @brief   Circular buffer holding moving average values
  * @internal
@@ -140,7 +140,7 @@ typedef struct {
     uint32_t tlp_lpo;           /**< Large Particle low Pulse active time us */
     uint32_t tlp_start_time;    /**< Last time tlp pin went low */
     uint32_t tsp_start_time;    /**< Last time tsp pin went low */
-#ifdef MODULE_SM_PWM_01C_MA
+#if MODULE_SM_PWM_01C_MA
     circ_buf_t tsp_circ_buf;    /**< Small particle moving average values */
     circ_buf_t tlp_circ_buf;    /**< Large particle moving average values */
 #else

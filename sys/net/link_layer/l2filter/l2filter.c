@@ -85,7 +85,7 @@ bool l2filter_pass(const l2filter_t *list, const void *addr, size_t addr_len)
 {
     assert(list && addr && (addr_len <= CONFIG_L2FILTER_ADDR_MAXLEN));
 
-#ifdef MODULE_L2FILTER_WHITELIST
+#if MODULE_L2FILTER_WHITELIST
     bool res = false;
     for (unsigned i = 0; i < CONFIG_L2FILTER_LISTSIZE; i++) {
         if (match(&list[i], addr, addr_len)) {

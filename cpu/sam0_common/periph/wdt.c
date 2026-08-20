@@ -178,7 +178,7 @@ void wdt_kick(void)
     WDT->CLEAR.reg = WDT_CLEAR_CLEAR_KEY_Val;
 }
 
-#ifdef MODULE_PERIPH_WDT_CB
+#if MODULE_PERIPH_WDT_CB
 static wdt_cb_t cb;
 static void* cb_arg;
 

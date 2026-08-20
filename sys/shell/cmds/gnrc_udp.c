@@ -32,10 +32,10 @@
 #include "shell.h"
 #include "timex.h"
 #include "utlist.h"
-#if IS_USED(MODULE_ZTIMER_USEC) || IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_USEC || MODULE_ZTIMER_MSEC
 #include "ztimer.h"
 #endif
-#if IS_USED(MODULE_XTIMER)
+#if MODULE_XTIMER
 #include "xtimer.h"
 #endif
 
@@ -112,11 +112,11 @@ static void _send(const char *addr_str, const char *port_str,
         printf("Success: sent %u byte(s) to [%s]:%u\n", payload_size, addr_str,
                port);
         if (num) {
-#if IS_USED(MODULE_ZTIMER_USEC)
+#if MODULE_ZTIMER_USEC
             ztimer_sleep(ZTIMER_USEC, delay);
-#elif IS_USED(MODULE_XTIMER)
+#elif MODULE_XTIMER
             xtimer_usleep(delay);
-#elif IS_USED(MODULE_ZTIMER_MSEC)
+#elif MODULE_ZTIMER_MSEC
             ztimer_sleep(ZTIMER_MSEC, (delay + US_PER_MS - 1) / US_PER_MS);
 #endif
         }

@@ -13,25 +13,27 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
-#include "net/ieee802154.h"
-#ifdef MODULE_GNRC_IPV6_NIB
-#include "net/ipv6/addr.h"
-#include "net/gnrc/ipv6/nib.h"
-#endif  /* MODULE_GNRC_IPV6_NIB */
 #include "net/gnrc/netif.h"
+#include "net/gnrc/sixlowpan/frag/fb.h"
+#include "net/gnrc/sixlowpan/frag/vrb.h"
+#include "net/ieee802154.h"
 #include "xtimer.h"
 
-#include "net/gnrc/sixlowpan/frag/fb.h"
-#ifdef  MODULE_GNRC_SIXLOWPAN_FRAG_STATS
-#include "net/gnrc/sixlowpan/frag/stats.h"
+#if MODULE_GNRC_IPV6_NIB
+#  include "net/ipv6/addr.h"
+#  include "net/gnrc/ipv6/nib.h"
+#endif  /* MODULE_GNRC_IPV6_NIB */
+
+#if MODULE_GNRC_SIXLOWPAN_FRAG_STATS
+#  include "net/gnrc/sixlowpan/frag/stats.h"
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_STATS */
-#include "net/gnrc/sixlowpan/frag/vrb.h"
+
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
 static gnrc_sixlowpan_frag_vrb_t _vrb[CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE];
-#ifdef MODULE_GNRC_IPV6_NIB
+#if MODULE_GNRC_IPV6_NIB
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #else   /* MODULE_GNRC_IPV6_NIB */
 static char addr_str[3 * IEEE802154_LONG_ADDRESS_LEN];
@@ -112,7 +114,7 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
             break;
         }
     }
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
+#if MODULE_GNRC_SIXLOWPAN_FRAG_STATS
     if (vrbe == NULL) {
         gnrc_sixlowpan_frag_stats_get()->vrb_full++;
     }
@@ -129,7 +131,7 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_from_route(
     assert(base != NULL);
     assert((hdr != NULL) && (hdr->data != NULL) && (hdr->size > 0));
     switch (hdr->type) {
-#ifdef MODULE_GNRC_IPV6_NIB
+#if MODULE_GNRC_IPV6_NIB
         case GNRC_NETTYPE_IPV6: {
             assert(hdr->size >= sizeof(ipv6_hdr_t));
             const ipv6_addr_t *addr = &((const ipv6_hdr_t *)hdr->data)->dst;

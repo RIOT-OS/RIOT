@@ -95,7 +95,7 @@
 
 #define TESTS_DRIVER_L3GXXXX_SLEEP (200)    /* 200 ms */
 
-#if IS_USED(MODULE_L3GXXXX_IRQ)
+#if MODULE_L3GXXXX_IRQ
 int handle_event(const l3gxxxx_t *dev, l3gxxxx_int_event_src_t source)
 {
     (void)dev;
@@ -126,11 +126,11 @@ int handle_event(const l3gxxxx_t *dev, l3gxxxx_int_event_src_t source)
 
     return 0;
 }
-#endif /* IS_USED(MODULE_L3GXXXX_IRQ) */
+#endif /* MODULE_L3GXXXX_IRQ */
 
 int read_data(const l3gxxxx_t *dev)
 {
-#if IS_USED(MODULE_L3GXXXX_FIFO)
+#if MODULE_L3GXXXX_FIFO
 
     l3gxxxx_data_fifo_t data;
 
@@ -144,7 +144,7 @@ int read_data(const l3gxxxx_t *dev)
 
     return num;
 
-#else /* IS_USED(MODULE_L3GXXXX_FIFO) */
+#else /* MODULE_L3GXXXX_FIFO */
 
     l3gxxxx_data_t data;
     l3gxxxx_read(dev, &data);
@@ -154,7 +154,7 @@ int read_data(const l3gxxxx_t *dev)
 
     return 1;
 
-#endif /* IS_USED(MODULE_L3GXXXX_FIFO) */
+#endif /* MODULE_L3GXXXX_FIFO */
 }
 
 int main(void)
@@ -173,21 +173,21 @@ int main(void)
         return 1;
     }
 
-#if IS_USED(MODULE_L3GXXXX_CONFIG)
+#if MODULE_L3GXXXX_CONFIG
     /* select LPF2 and HPF, configure HPF and reset REFERENCE by dummy read */
     int8_t ref;
     l3gxxxx_select_output_filter(&dev, L3GXXXX_HPF_ONLY);
     l3gxxxx_config_hpf(&dev, L3GXXXX_HPF_NORMAL, 0);
     l3gxxxx_get_hpf_ref(&dev, &ref);
-#endif /* IS_USED(MODULE_L3GXXXX_CONFIG) */
+#endif /* MODULE_L3GXXXX_CONFIG */
 
-#if IS_USED(MODULE_L3GXXXX_FIFO)  && IS_USED(MODULE_L3GXXXX_CONFIG)
+#if MODULE_L3GXXXX_FIFO  && MODULE_L3GXXXX_CONFIG
     /* clear FIFO and activate FIFO Stream mode */
     l3gxxxx_set_fifo_mode(&dev, L3GXXXX_BYPASS, 0);
     l3gxxxx_set_fifo_mode(&dev, L3GXXXX_STREAM, 10);
 #endif
 
-#if IS_USED(MODULE_L3GXXXX_IRQ_EVENT) && IS_USED(MODULE_L3GXXXX_CONFIG)
+#if MODULE_L3GXXXX_IRQ_EVENT && MODULE_L3GXXXX_CONFIG
     /* enable event interrupts (axis movement and wake-up) */
     l3gxxxx_int_event_cfg_t int_cfg;
 
@@ -209,11 +209,11 @@ int main(void)
     int_cfg.latch = true;
 
     l3gxxxx_set_int_event_cfg(&dev, &int_cfg);
-#endif /* IS_USED(MODULE_L3GXXXX_CONFIG) && IS_USED(MODULE_L3GXXXX_IRQ_EVENT) */
+#endif /* MODULE_L3GXXXX_CONFIG && MODULE_L3GXXXX_IRQ_EVENT */
 
     while (1) {
 
-#if IS_USED(MODULE_L3GXXXX_IRQ)
+#if MODULE_L3GXXXX_IRQ
         /* wait for next interrupt */
         l3gxxxx_int_src_t int_src = l3gxxxx_wait_int(&dev);
         (void)int_src;
@@ -228,7 +228,7 @@ int main(void)
         /* read and print data */
         read_data(&dev);
         ztimer_sleep(ZTIMER_MSEC, TESTS_DRIVER_L3GXXXX_SLEEP);
-#endif /* IS_USED(MODULE_L3GXXXX_IRQ) */
+#endif /* MODULE_L3GXXXX_IRQ */
     }
 
     return 0;

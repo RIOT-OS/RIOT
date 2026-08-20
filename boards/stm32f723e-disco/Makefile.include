@@ -18,3 +18,11 @@ OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 # 1 MByte PSRAM can be used.
 FMC_RAM_ADDR=0x60000000
 FMC_RAM_LEN=512K
+
+MODULE_DEFS_NEEDED += \
+  periph_fmc_16bit \
+  periph_fmc_nor_sram \
+  periph_init_led0 \
+  periph_uart_hw_fc \
+  periph_usbdev_hs_utmi \
+  #

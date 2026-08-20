@@ -22,7 +22,7 @@ static int _gnrc_ipv6_frag_stats(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-    if (IS_USED(MODULE_GNRC_IPV6_EXT_FRAG_STATS)) {
+    if (MODULE_GNRC_IPV6_EXT_FRAG_STATS) {
         gnrc_ipv6_ext_frag_stats_t *stats = gnrc_ipv6_ext_frag_stats();
 
         printf("rbuf full: %u\n", stats->rbuf_full);

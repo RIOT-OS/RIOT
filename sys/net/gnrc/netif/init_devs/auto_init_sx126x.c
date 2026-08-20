@@ -54,7 +54,7 @@ void auto_init_sx126x(void)
     for (unsigned i = 0; i < SX126X_NUMOF; ++i) {
         LOG_DEBUG("[auto_init_netif] initializing sx126x #%u\n", i);
         sx126x_setup(&sx126x_devs[i], &sx126x_params[i], i);
-        if (IS_USED(MODULE_GNRC_NETIF_LORAWAN)) {
+        if (MODULE_GNRC_NETIF_LORAWAN) {
             /* Currently only one lora device is supported */
             assert(SX126X_NUMOF == 1);
 

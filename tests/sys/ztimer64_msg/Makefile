@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  ztimer64_msec \
+  ztimer64_sec \
+  #
 include ../Makefile.sys_common
 
 USEMODULE += ztimer64_usec

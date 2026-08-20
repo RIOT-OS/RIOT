@@ -66,7 +66,7 @@
 #define CONFIG_SAM0_GCLK_GPIO       (SAM0_GCLK_MAIN)
 #endif
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 
 /**
  * @brief   Number of external interrupt lines
@@ -109,7 +109,7 @@ static inline PortGroup *_port_iobus(gpio_t pin)
 
 static inline PortGroup *_port(gpio_t pin)
 {
-#ifdef MODULE_PERIPH_GPIO_FAST_READ
+#if MODULE_PERIPH_GPIO_FAST_READ
     /* Shift the PortGroup address back from the IOBUS region to the peripheral
      * region
      */
@@ -239,7 +239,7 @@ void gpio_write(gpio_t pin, bool value)
     }
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 
 #ifdef CPU_COMMON_SAMD21
 #define EIC_SYNC() while (_EIC->STATUS.reg & EIC_STATUS_SYNCBUSY)

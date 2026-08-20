@@ -67,7 +67,7 @@ extern "C" {
  */
 #define CONFIG_RTC_CLK_CAL_CYCLES               1024
 
-#ifdef MODULE_ESP_RTC_TIMER_32K
+#if MODULE_ESP_RTC_TIMER_32K
 #endif
 
 /**
@@ -119,7 +119,7 @@ extern "C" {
 /**
  * ESP32-C6 BLE driver configuration (DO NOT CHANGE)
  */
-#ifdef MODULE_ESP_BLE
+#if MODULE_ESP_BLE
 #  define CONFIG_BT_ALARM_MAX_NUM                           50
 #  define CONFIG_BT_CTRL_BLE_ADV_REPORT_DISCARD_THRSHOLD    20
 #  define CONFIG_BT_CTRL_BLE_ADV_REPORT_FLOW_CTRL_NUM       100

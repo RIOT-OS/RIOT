@@ -27,7 +27,7 @@
 #include "mutex.h"
 #include "thread.h"
 
-#if IS_USED(MODULE_XTIMER)
+#if MODULE_XTIMER
 #include "xtimer.h"
 #endif
 
@@ -109,7 +109,7 @@ event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
     }
 }
 
-#if IS_USED(MODULE_XTIMER) || IS_USED(MODULE_ZTIMER)
+#if MODULE_XTIMER || MODULE_ZTIMER
 static event_t *_wait_timeout(event_queue_t *queue)
 {
     assert(queue);
@@ -129,7 +129,7 @@ static event_t *_wait_timeout(event_queue_t *queue)
 }
 #endif
 
-#if IS_USED(MODULE_XTIMER)
+#if MODULE_XTIMER
 static event_t *_wait_timeout_xtimer(event_queue_t *queue, xtimer_t *timer)
 {
     event_t *result = _wait_timeout(queue);
@@ -159,7 +159,7 @@ event_t *event_wait_timeout64(event_queue_t *queue, uint64_t timeout)
 }
 #endif
 
-#if IS_USED(MODULE_ZTIMER)
+#if MODULE_ZTIMER
 event_t *event_wait_timeout_ztimer(event_queue_t *queue,
                                    ztimer_clock_t *clock, uint32_t timeout)
 {

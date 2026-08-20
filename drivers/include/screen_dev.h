@@ -36,7 +36,7 @@ extern "C" {
 
 #include "disp_dev.h"
 
-#ifdef MODULE_TOUCH_DEV
+#if MODULE_TOUCH_DEV
 #include "touch_dev.h"
 #endif
 

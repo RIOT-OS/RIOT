@@ -40,7 +40,7 @@ void uhcp_handle_udp(uint8_t *buf, size_t len, uint8_t *src, uint16_t port, uhcp
     }
 
     switch(type) {
-#ifdef MODULE_UHCPD
+#if MODULE_UHCPD
         case UHCP_REQ:
             if (len < sizeof(uhcp_req_t)) {
                 LOG_ERROR("error: request too small\n");
@@ -50,7 +50,7 @@ void uhcp_handle_udp(uint8_t *buf, size_t len, uint8_t *src, uint16_t port, uhcp
             }
             break;
 #endif
-#ifdef MODULE_UHCPC
+#if MODULE_UHCPC
         case UHCP_PUSH:
             {
                 uhcp_push_t *push = (uhcp_push_t*)hdr;
@@ -70,7 +70,7 @@ void uhcp_handle_udp(uint8_t *buf, size_t len, uint8_t *src, uint16_t port, uhcp
     }
 }
 
-#ifdef MODULE_UHCPD
+#if MODULE_UHCPD
 extern char _prefix[16];
 extern unsigned _prefix_len;
 void uhcp_handle_req(uhcp_req_t *req, uint8_t *src, uint16_t port, uhcp_iface_t iface)
@@ -91,7 +91,7 @@ void uhcp_handle_req(uhcp_req_t *req, uint8_t *src, uint16_t port, uhcp_iface_t 
 }
 #endif /* MODULE_UHCPD */
 
-#ifdef MODULE_UHCPC
+#if MODULE_UHCPC
 void uhcp_handle_push(uhcp_push_t *req, uint8_t *src, uint16_t port, uhcp_iface_t iface)
 {
     char addr_str[INET6_ADDRSTRLEN];

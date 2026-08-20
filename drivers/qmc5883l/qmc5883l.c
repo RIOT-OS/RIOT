@@ -165,7 +165,7 @@ int qmc5883l_poweroff(const qmc5883l_t *dev)
     return _reg_write(dev, QMC5883L_CTRL1, 0, 1, 1);
 }
 
-#ifdef MODULE_QMC5883L_INT
+#if MODULE_QMC5883L_INT
 int qmc5883l_init_int(const qmc5883l_t *dev, gpio_cb_t cb, void *arg)
 {
     assert(dev);

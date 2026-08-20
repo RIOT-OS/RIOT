@@ -107,7 +107,7 @@ static const sdmmc_conf_t sdmmc_config[] = {
 #define SPI0_CS0    GPIO5       /**< LCD CS */
 #endif
 
-#if IS_USED(MODULE_SDCARD_SPI)
+#if MODULE_SDCARD_SPI
 #ifndef SPI1_CTRL
 #define SPI1_CTRL   SPI3_HOST   /**< FSPI is configured as SPI_DEV(0) */
 #endif

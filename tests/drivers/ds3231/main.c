@@ -279,7 +279,7 @@ static int _cmd_test(int argc, char **argv)
         return 1;
     }
 
-#ifdef MODULE_DS3231_INT
+#if MODULE_DS3231_INT
 
     /* wait for an alarm with GPIO interrupt */
     res = ds3231_await_alarm(&_dev);

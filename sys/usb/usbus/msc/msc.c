@@ -243,7 +243,7 @@ int usbus_msc_add_lun(usbus_t *usbus, mtd_dev_t *dev)
                 /* If new registered MTD device need more memory than the
                    previous, realloc a new buffer */
                 if (block_size > msc->buffer_size) {
-                    if (IS_USED(MODULE_ESP32_SDK)) {
+                    if (MODULE_ESP32_SDK) {
                         /* ESP32x does not support posix_memalign */
                         msc->buffer = realloc(msc->buffer, block_size);
                     }
@@ -254,7 +254,7 @@ int usbus_msc_add_lun(usbus_t *usbus, mtd_dev_t *dev)
                 }
             } else {
                 /* No buffer allocated yet, so allocate one */
-                if (IS_USED(MODULE_ESP32_SDK)) {
+                if (MODULE_ESP32_SDK) {
                     /* ESP32x does not support posix_memalign */
                     msc->buffer = malloc(block_size);
                 }

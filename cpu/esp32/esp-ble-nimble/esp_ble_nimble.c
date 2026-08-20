@@ -161,7 +161,7 @@ int ble_transport_to_ll_cmd_impl(void *buf)
     memcpy(packet + 1, cmd, len - 1);
 
     DEBUG("%s: CMD host to ctrl\n", __func__);
-    if (ENABLE_DEBUG && IS_USED(MODULE_OD)) {
+    if (ENABLE_DEBUG && MODULE_OD) {
         od_hex_dump(packet + 1, len - 1, OD_WIDTH_DEFAULT);
     }
 
@@ -195,7 +195,7 @@ int ble_transport_to_ll_acl_impl(struct os_mbuf *om)
     len++;
 
     DEBUG("%s: ACL host to ctrl\n", __func__);
-    if (ENABLE_DEBUG && IS_USED(MODULE_OD)) {
+    if (ENABLE_DEBUG && MODULE_OD) {
         od_hex_dump(packet + 1,
                     (om->om_len < 32) ? om->om_len : 32, OD_WIDTH_DEFAULT);
     }
@@ -221,14 +221,14 @@ static int _esp_hci_h4_frame_cb(uint8_t pkt_type, void *data)
     switch (pkt_type) {
     case HCI_H4_ACL:
         DEBUG("%s: ACL ctrl to host\n", __func__);
-        if (ENABLE_DEBUG && IS_USED(MODULE_OD)) {
+        if (ENABLE_DEBUG && MODULE_OD) {
             od_hex_dump((uint8_t *)data, 4, OD_WIDTH_DEFAULT);
         }
         rc = ble_transport_to_hs_acl(data);
         break;
     case HCI_H4_EVT:
         DEBUG("%s: EVT ctrl to host\n", __func__);
-        if (ENABLE_DEBUG && IS_USED(MODULE_OD)) {
+        if (ENABLE_DEBUG && MODULE_OD) {
             od_hex_dump((uint8_t *)data, ((uint8_t *)data)[1] + 2, OD_WIDTH_DEFAULT);
         }
         rc = ble_transport_to_hs_evt(data);
@@ -246,7 +246,7 @@ void esp_ble_nimble_init(void)
     esp_err_t ret;
     esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
 
-    if (IS_ACTIVE(CONFIG_ESP_WIFI_NVS_ENABLED) && !IS_USED(MODULE_ESP_WIFI_ANY)) {
+    if (IS_ACTIVE(CONFIG_ESP_WIFI_NVS_ENABLED) && !MODULE_ESP_WIFI_ANY) {
         if (nvs_flash_init() != ESP_OK) {
             LOG_ERROR("nfs_flash_init failed\n");
         }

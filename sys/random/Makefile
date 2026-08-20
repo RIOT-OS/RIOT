@@ -1,3 +1,12 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_cpuid \
+  periph_hwrng \
+  periph_init_hwrng \
+  prng_sha1prng \
+  prng_sha256prng \
+  puf_sram \
+  #
 SRC := random.c
 
 BASE_MODULE := prng

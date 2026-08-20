@@ -13,7 +13,7 @@
  * @}
  */
 
-#ifdef MODULE_CAN_ISOTP
+#if MODULE_CAN_ISOTP
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
@@ -22,7 +22,7 @@
 #include "can/isotp.h"
 #include "can/device.h"
 
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#if MODULE_CONN_CAN_ISOTP_MULTI
 #include "utlist.h"
 #endif
 
@@ -42,7 +42,7 @@
 
 static inline int try_put_msg(conn_can_isotp_t *conn, msg_t *msg)
 {
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#if MODULE_CONN_CAN_ISOTP_MULTI
     return mbox_try_put(&conn->master->mbox, msg);
 #else
     return mbox_try_put(&conn->mbox, msg);
@@ -51,7 +51,7 @@ static inline int try_put_msg(conn_can_isotp_t *conn, msg_t *msg)
 
 static inline void put_msg(conn_can_isotp_t *conn, msg_t *msg)
 {
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#if MODULE_CONN_CAN_ISOTP_MULTI
     mbox_put(&conn->master->mbox, msg);
 #else
     mbox_put(&conn->mbox, msg);
@@ -60,7 +60,7 @@ static inline void put_msg(conn_can_isotp_t *conn, msg_t *msg)
 
 static inline void get_msg(conn_can_isotp_t *conn, msg_t *msg)
 {
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#if MODULE_CONN_CAN_ISOTP_MULTI
     mbox_get(&conn->master->mbox, msg);
 #else
     mbox_get(&conn->mbox, msg);
@@ -73,7 +73,7 @@ int conn_can_isotp_create(conn_can_isotp_t *conn, struct isotp_options *options,
     assert(options != NULL);
     assert(ifnum < CAN_DLL_NUMOF);
 
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#if MODULE_CONN_CAN_ISOTP_MULTI
     DEBUG("conn_can_isotp_create: conn=%p, conn->master=%p, ifnum=%d\n",
           (void *)conn, (void *)conn->master, ifnum);
 
@@ -114,7 +114,7 @@ int conn_can_isotp_bind(conn_can_isotp_t *conn, struct isotp_fc_options *fc_opti
     can_reg_entry_t entry;
     entry.ifnum = conn->ifnum;
     entry.type = CAN_TYPE_MBOX;
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#if MODULE_CONN_CAN_ISOTP_MULTI
     assert(conn->master != NULL);
 
     entry.target.mbox = &(conn->master->mbox);
@@ -183,7 +183,7 @@ int conn_can_isotp_send(conn_can_isotp_t *conn, const void *buf, size_t size, in
                 }
                 /* Fall through */
             case CAN_MSG_TX_CONFIRMATION:
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#if MODULE_CONN_CAN_ISOTP_MULTI
                 if (msg.content.ptr != conn) {
                     mbox_put(&conn->master->mbox, &msg);
                     break;
@@ -227,7 +227,7 @@ int conn_can_isotp_recv(conn_can_isotp_t *conn, void *buf, size_t size, uint32_t
         return -ENOTCONN;
     }
 
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#if MODULE_CONN_CAN_ISOTP_MULTI
     if (conn->rx) {
         snip = conn->rx->data.iov_base;
         if (snip->size <= size) {
@@ -260,7 +260,7 @@ int conn_can_isotp_recv(conn_can_isotp_t *conn, void *buf, size_t size, uint32_t
             DEBUG("conn_can_isotp_recv: CAN_MSG_RX_INDICATION\n");
             rx = msg.content.ptr;
             snip = rx->data.iov_base;
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#if MODULE_CONN_CAN_ISOTP_MULTI
             if (rx->arg != conn) {
                 mbox_put(&conn->master->mbox, &msg);
                 break;
@@ -289,14 +289,14 @@ int conn_can_isotp_recv(conn_can_isotp_t *conn, void *buf, size_t size, uint32_t
             return ret;
         case _CLOSE_CONN_MSG_TYPE:
             DEBUG("conn_can_isotp_recv: _CLOSE_CONN_MSG_TYPE\n");
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#if MODULE_CONN_CAN_ISOTP_MULTI
             if ((msg.content.ptr == conn) || (msg.content.ptr == conn->master)) {
 #endif
                 if (timeout != 0) {
                     ztimer_remove(ZTIMER_USEC, &timer);
                 }
                 return -ECONNABORTED;
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#if MODULE_CONN_CAN_ISOTP_MULTI
             }
 #endif
             break;
@@ -325,7 +325,7 @@ int conn_can_isotp_close(conn_can_isotp_t *conn)
         return -EALREADY;
     }
 
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#if MODULE_CONN_CAN_ISOTP_MULTI
     assert(conn->master != NULL);
 
     if (conn->master != conn) {
@@ -342,7 +342,7 @@ int conn_can_isotp_close(conn_can_isotp_t *conn)
 
     isotp_release(&conn->isotp);
 
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#if MODULE_CONN_CAN_ISOTP_MULTI
     if (conn->rx) {
         isotp_free_rx(conn->rx);
     }
@@ -372,7 +372,7 @@ int conn_can_isotp_close(conn_can_isotp_t *conn)
     return 0;
 }
 
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
+#if MODULE_CONN_CAN_ISOTP_MULTI
 int conn_can_isotp_select(conn_can_isotp_slave_t **conn, conn_can_isotp_t *master, uint32_t timeout)
 {
     assert(master != NULL);

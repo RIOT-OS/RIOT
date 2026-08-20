@@ -176,7 +176,7 @@ static void play_function(uint16_t period, uint32_t samples, sample_gen_t fun)
     }
 }
 
-#if IS_USED(ENABLE_GREETING)
+#if IS_ACTIVE(ENABLE_GREETING)
 static int cmd_greeting(int argc, char **argv)
 {
     (void) argc;
@@ -278,7 +278,7 @@ static int cmd_square(int argc, char **argv)
 }
 
 static const shell_command_t shell_commands[] = {
-#if IS_USED(ENABLE_GREETING)
+#if IS_ACTIVE(ENABLE_GREETING)
     { "hello", "Play Greeting", cmd_greeting },
 #endif
     { "init",   "Initialize DAC", cmd_init },

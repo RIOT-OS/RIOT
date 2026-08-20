@@ -26,7 +26,7 @@ index dcadc001..0cd4d389 100644
  
  #include "bplib_as.h"
 +
-+#ifdef MODULE_BPLIB_INCLUDE_AS
++#if MODULE_BPLIB_INCLUDE_AS
 +
  #include "bplib_as_internal.h"
  #include "bplib_fwp.h"
@@ -128,7 +128,7 @@ index 21f1df0d..daa88e20 100644
  #include "bplib_as.h"
  #include "bplib_version.h"
  
-+#ifdef MODULE_BPLIB_INCLUDE_AS
++#if MODULE_BPLIB_INCLUDE_AS
 +
  /* ================= */
  /* Telemetry Packets */
@@ -185,7 +185,7 @@ index dc15a330..416c6819 100644
  /* Externs */
  /* ======= */
  
-+#ifdef MODULE_BPLIB_INCLUDE_NC_TELEMETRY
++#if MODULE_BPLIB_INCLUDE_NC_TELEMETRY
  extern BPLib_SourceMibConfigHkTlm_Payload_t    BPLib_NC_SourceMibConfigPayload;
  extern BPLib_NodeMibConfigHkTlm_Payload_t      BPLib_NC_NodeMibConfigPayload;
 +#endif
@@ -201,7 +201,7 @@ index 21f5a6e4..e333e051 100644
  {
      BPLib_Status_t Status;
  
-+#ifdef MODULE_BPLIB_INCLUDE_NC_TELEMETRY
++#if MODULE_BPLIB_INCLUDE_NC_TELEMETRY
      memset((void*) &BPLib_NC_SourceMibConfigPayload,     0, sizeof(BPLib_NC_SourceMibConfigPayload));
      memset((void*) &BPLib_NC_NodeMibConfigPayload,       0, sizeof(BPLib_NC_NodeMibConfigPayload));
 +#endif
@@ -242,7 +242,7 @@ index 21f5a6e4..e333e051 100644
          BPLib_EID_CopyEids(&BPLIB_EID_INSTANCE, BPLib_NC_ConfigPtrs.MibPnConfigPtr->InstanceEID);
  
          /* Set telemetry values */
-+#ifdef MODULE_BPLIB_INCLUDE_NC_TELEMETRY
++#if MODULE_BPLIB_INCLUDE_NC_TELEMETRY
          memcpy(&(BPLib_NC_NodeMibConfigPayload.Values), BPLib_NC_ConfigPtrs.MibPnConfigPtr, 
                                                              sizeof(BPLib_NC_MibPerNodeConfig_t));
 +#endif
@@ -253,7 +253,7 @@ index 21f5a6e4..e333e051 100644
                  ** Table update was successful, update the corresponding telemetry value
                  ** as well
                  */
-+#ifdef MODULE_BPLIB_INCLUDE_NC_TELEMETRY
++#if MODULE_BPLIB_INCLUDE_NC_TELEMETRY
                  BPLib_NC_NodeMibConfigPayload.Values.Configs[MibItem] = Value;
 +#endif
              }
@@ -263,7 +263,7 @@ index 21f5a6e4..e333e051 100644
          BPLib_EID_CopyEids(&BPLIB_EID_INSTANCE, BPLib_NC_ConfigPtrs.MibPnConfigPtr->InstanceEID);
  
          /* Update telemetry values */
-+#ifdef MODULE_BPLIB_INCLUDE_NC_TELEMETRY
++#if MODULE_BPLIB_INCLUDE_NC_TELEMETRY
          memcpy(&(BPLib_NC_NodeMibConfigPayload.Values), BPLib_NC_ConfigPtrs.MibPnConfigPtr, 
                                                              sizeof(BPLib_NC_MibPerNodeConfig_t));
 +#endif
@@ -278,7 +278,7 @@ index 45a002e1..3adc6808 100644
  {
      BPLib_Status_t Status;
  
-+#ifdef MODULE_BPLIB_INCLUDE_NC_TELEMETRY
++#if MODULE_BPLIB_INCLUDE_NC_TELEMETRY
      Status = BPLib_FWP_ProxyCallbacks.BPA_TLMP_SendNodeMibConfigPkt(&BPLib_NC_NodeMibConfigPayload);
 +#else
 +    Status = BPLib_FWP_ProxyCallbacks.BPA_TLMP_SendNodeMibConfigPkt(NULL);
@@ -290,7 +290,7 @@ index 45a002e1..3adc6808 100644
  {
      BPLib_Status_t Status;
  
-+#ifdef MODULE_BPLIB_INCLUDE_NC_TELEMETRY
++#if MODULE_BPLIB_INCLUDE_NC_TELEMETRY
      Status = BPLib_FWP_ProxyCallbacks.BPA_TLMP_SendPerSourceMibConfigPkt(&BPLib_NC_SourceMibConfigPayload);
 +#else
 +    Status = BPLib_FWP_ProxyCallbacks.BPA_TLMP_SendPerSourceMibConfigPkt(NULL);
@@ -306,7 +306,7 @@ index 98475903..e6354280 100644
  ** Global Data
  */
  
-+#ifdef MODULE_BPLIB_INCLUDE_NC_TELEMETRY
++#if MODULE_BPLIB_INCLUDE_NC_TELEMETRY
  BPLib_SourceMibConfigHkTlm_Payload_t    BPLib_NC_SourceMibConfigPayload;
  BPLib_NodeMibConfigHkTlm_Payload_t      BPLib_NC_NodeMibConfigPayload;
 +#endif
@@ -322,7 +322,7 @@ index 68d5e404..72ac533f 100644
  ** Global Data
  */
  
-+#ifdef MODULE_BPLIB_INCLUDE_NC_TELEMETRY
++#if MODULE_BPLIB_INCLUDE_NC_TELEMETRY
  extern BPLib_SourceMibConfigHkTlm_Payload_t    BPLib_NC_SourceMibConfigPayload;
  extern BPLib_NodeMibConfigHkTlm_Payload_t      BPLib_NC_NodeMibConfigPayload;
 +#endif

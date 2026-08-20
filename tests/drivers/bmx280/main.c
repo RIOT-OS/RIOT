@@ -64,7 +64,7 @@ int main(void)
     printf("dig_P8: %i\n", dev.calibration.dig_P8);
     printf("dig_P9: %i\n", dev.calibration.dig_P9);
 
-#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+#if MODULE_BME280_SPI || MODULE_BME280_I2C
     printf("dig_H1: %u\n", dev.calibration.dig_H1);
     printf("dig_H2: %i\n", dev.calibration.dig_H2);
     printf("dig_H3: %i\n", dev.calibration.dig_H3);
@@ -78,7 +78,7 @@ int main(void)
         /* read temperature, pressure [and humidity] values */
         int16_t temperature = bmx280_read_temperature(&dev);
         uint32_t pressure = bmx280_read_pressure(&dev);
-#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+#if MODULE_BME280_SPI || MODULE_BME280_I2C
         uint16_t humidity = bme280_read_humidity(&dev);
 #endif
 
@@ -86,7 +86,7 @@ int main(void)
         char str_temp[8];
         size_t len = fmt_s16_dfp(str_temp, temperature, -2);
         str_temp[len] = '\0';
-#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+#if MODULE_BME280_SPI || MODULE_BME280_I2C
         char str_hum[8];
         len = fmt_s16_dfp(str_hum, humidity, -2);
         str_hum[len] = '\0';
@@ -95,7 +95,7 @@ int main(void)
         /* print values to STDIO */
         printf("Temperature [°C]: %s\n", str_temp);
         printf("   Pressure [Pa]: %" PRIu32 "\n", pressure);
-#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+#if MODULE_BME280_SPI || MODULE_BME280_I2C
         printf("  Humidity [%%rH]: %s\n", str_hum);
 #endif
         puts("\n+-------------------------------------+\n");

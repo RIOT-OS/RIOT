@@ -86,7 +86,7 @@ void gnrc_icmpv6_demux(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
     switch (hdr->type) {
         /* TODO: handle ICMPv6 errors */
-#ifdef MODULE_GNRC_ICMPV6_ECHO
+#if MODULE_GNRC_ICMPV6_ECHO
         case ICMPV6_ECHO_REQ:
             DEBUG("icmpv6: handle echo request.\n");
             gnrc_icmpv6_echo_req_handle(netif, (ipv6_hdr_t *)ipv6->data,

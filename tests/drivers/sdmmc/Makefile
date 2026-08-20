@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  sdmmc_mmc \
+  #
 BOARD ?= same54-xpro
 
 include ../Makefile.drivers_common

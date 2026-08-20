@@ -1132,7 +1132,7 @@ typedef struct {
      */
     int (*set_clock_rate)(sdmmc_dev_t *dev, sdmmc_clock_rate_t rate);
 
-#if !IS_USED(MODULE_PERIPH_SDMMC_AUTO_CLK) || DOXYGEN
+#if !MODULE_PERIPH_SDMMC_AUTO_CLK || DOXYGEN
     /**
      * @brief   Enable or disable the SD CLK signal
      *
@@ -1306,7 +1306,7 @@ typedef struct sdmmc_dev {
      */
     sdmmc_csd_t csd;
 
-#if IS_USED(MODULE_SDMMC_MMC)
+#if MODULE_SDMMC_MMC
     /**
      * EXT_CSD register of the MMC Card, read during the initialization and
      * identification procedure int the @ref sdmmc_card_init function.

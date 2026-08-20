@@ -43,7 +43,7 @@ extern "C" {
  * @brief The maximum number DTLS peers (i.e. sessions)
  */
 #ifndef CONFIG_DTLS_PEER_MAX
-#if IS_USED(MODULE_GCOAP_DTLS)
+#if MODULE_GCOAP_DTLS
 #define CONFIG_DTLS_PEER_MAX       (2)
 #else
 #define CONFIG_DTLS_PEER_MAX       (1)

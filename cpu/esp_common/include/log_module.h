@@ -22,7 +22,7 @@ extern "C" {
 #include <stdio.h>
 #include "esp_common_log.h"
 
-#ifdef MODULE_LOG_PRINTFNOFORMAT
+#if MODULE_LOG_PRINTFNOFORMAT
 
 static inline void log_write(unsigned level, const char *format, ...) {
     (void)level;

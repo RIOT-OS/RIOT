@@ -43,7 +43,7 @@ extern "C" {
  * You may increase this value if you experience a stack overflow
  * with IEEE 802.15.4 security enabled.
  */
-#if IS_USED(MODULE_IEEE802154_SECURITY) || DOXYGEN
+#if MODULE_IEEE802154_SECURITY || DOXYGEN
 #define IEEE802154_SECURITY_EXTRA_STACKSIZE (128)
 #else
 #define IEEE802154_SECURITY_EXTRA_STACKSIZE (0)
@@ -52,7 +52,7 @@ extern "C" {
 /**
  * @brief   extra stack size if openDSME is enabled
  */
-#if IS_USED(MODULE_OPENDSME)
+#if MODULE_OPENDSME
 #define IEEE802154_OPENDSME_EXTRA_STACKSIZE (THREAD_STACKSIZE_DEFAULT)
 #else
 #define IEEE802154_OPENDSME_EXTRA_STACKSIZE (0)

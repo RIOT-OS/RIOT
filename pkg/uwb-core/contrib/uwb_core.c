@@ -21,7 +21,7 @@
 #include "event.h"
 #include "uwb_core.h"
 
-#if !IS_USED(MODULE_UWB_CORE_EVENT_THREAD)
+#if !MODULE_UWB_CORE_EVENT_THREAD
 static event_queue_t _queue;
 static char _stack_uwb_core[UWB_CORE_STACKSIZE];
 static void *_uwb_core_thread(void *arg)
@@ -36,7 +36,7 @@ static void *_uwb_core_thread(void *arg)
 
 event_queue_t *uwb_core_get_eventq(void)
 {
-#if !IS_USED(MODULE_UWB_CORE_EVENT_THREAD)
+#if !MODULE_UWB_CORE_EVENT_THREAD
     return &_queue;
 #else
     return UWB_CORE_EVENT_THREAD_QUEUE;
@@ -45,7 +45,7 @@ event_queue_t *uwb_core_get_eventq(void)
 
 void uwb_core_riot_init(void)
 {
-#if !IS_USED(MODULE_UWB_CORE_EVENT_THREAD)
+#if !MODULE_UWB_CORE_EVENT_THREAD
     thread_create(_stack_uwb_core, sizeof(_stack_uwb_core),
                   UWB_CORE_PRIO,
                   0,

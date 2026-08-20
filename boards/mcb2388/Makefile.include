@@ -4,3 +4,7 @@ JLINK_DEVICE := LPC2388
 OPENOCD_TRANSPORT := jtag
 
 include $(RIOTBOARD)/common/msba2/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  mtd_mci \
+  #

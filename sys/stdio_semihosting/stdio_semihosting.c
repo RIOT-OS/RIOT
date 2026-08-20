@@ -57,7 +57,7 @@
 
 static ztimer_periodic_t stdin_timer;
 
-#if defined(MODULE_RISCV_COMMON)
+#if MODULE_RISCV_COMMON
 
 static uintptr_t _semihosting_raw(int cmd, uintptr_t *args)
 {
@@ -87,7 +87,7 @@ static uintptr_t _semihosting_raw(int cmd, uintptr_t *args)
     return result;
 }
 
-#elif defined(MODULE_CORTEXM_COMMON)
+#elif MODULE_CORTEXM_COMMON
 
 static uintptr_t _semihosting_raw(int cmd, uintptr_t *args)
 {
@@ -162,7 +162,7 @@ static bool _read_cb(void *arg)
 
 static bool _init_done;
 static void _init(void) {
-    if (!STDIO_SEMIHOSTING_RX || !IS_USED(MODULE_STDIO_DISPATCH)) {
+    if (!STDIO_SEMIHOSTING_RX || !MODULE_STDIO_DISPATCH) {
         return;
     }
 
@@ -189,7 +189,7 @@ static ssize_t _write(const void* buffer, size_t len)
     if (!_semihosting_connected()) {
         return len;
     }
-    if (STDIO_SEMIHOSTING_RX && IS_USED(MODULE_STDIO_DISPATCH)
+    if (STDIO_SEMIHOSTING_RX && MODULE_STDIO_DISPATCH
         && !_init_done) {
         _init();
     }
@@ -198,7 +198,7 @@ static ssize_t _write(const void* buffer, size_t len)
     return len - remaining;
 }
 
-#ifndef MODULE_STDIO_DISPATCH
+#if !MODULE_STDIO_DISPATCH
 ssize_t stdio_read(void* buffer, size_t count)
 {
     if (!STDIO_SEMIHOSTING_RX) {

@@ -54,7 +54,7 @@
  */
 static uint8_t raw_buf[RAW_BUF_SIZE] ALIGNMENT_ATTR;
 
-#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
+#if MODULE_PERIPH_FLASHPAGE_PAGEWISE
 /**
  * @brief   Allocate space for 1 flash page in RAM
  *
@@ -65,7 +65,7 @@ static uint8_t raw_buf[RAW_BUF_SIZE] ALIGNMENT_ATTR;
  */
 static uint8_t page_mem[FLASHPAGE_SIZE] ALIGNMENT_ATTR;
 
-#ifdef MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
+#if MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
 /**
  * @brief Reserve 1 page of flash memory
  */
@@ -88,7 +88,7 @@ static int getpage(const char *str)
     return page;
 }
 
-#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
+#if MODULE_PERIPH_FLASHPAGE_PAGEWISE
 static void memdump(void *addr, size_t len)
 {
     od_hex_dump	(addr, len, LINE_LEN);
@@ -127,7 +127,7 @@ static int cmd_info(int argc, char **argv)
     return 0;
 }
 
-#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
+#if MODULE_PERIPH_FLASHPAGE_PAGEWISE
 static int cmd_dump(int argc, char **argv)
 {
     int page;
@@ -182,7 +182,7 @@ static int cmd_read(int argc, char **argv)
 }
 #endif
 
-#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
+#if MODULE_PERIPH_FLASHPAGE_PAGEWISE
 static int cmd_write(int argc, char **argv)
 {
     int page;
@@ -266,7 +266,7 @@ static int cmd_erase(int argc, char **argv)
     return 0;
 }
 
-#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
+#if MODULE_PERIPH_FLASHPAGE_PAGEWISE
 static int cmd_edit(int argc, char **argv)
 {
     int offset;
@@ -356,7 +356,7 @@ static int cmd_test_last(int argc, char **argv)
     return 0;
 }
 
-#ifdef MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
+#if MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
 /**
  * @brief   Does a write and verify test on reserved page
  */
@@ -678,7 +678,7 @@ static int cmd_test_config(int argc, char **argv)
 
 static const shell_command_t shell_commands[] = {
     { "info", "Show information about pages", cmd_info },
-#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
+#if MODULE_PERIPH_FLASHPAGE_PAGEWISE
     { "dump", "Dump the selected page to STDOUT", cmd_dump },
     { "dump_local", "Dump the local page buffer to STDOUT", cmd_dump_local },
     { "read", "Copy the given page to the local page buffer and dump to STDOUT", cmd_read },
@@ -686,12 +686,12 @@ static const shell_command_t shell_commands[] = {
 #endif
     { "write_raw", "Write raw bytes (max 64B) to the given address", cmd_write_raw },
     { "erase", "Erase the given page buffer", cmd_erase },
-#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
+#if MODULE_PERIPH_FLASHPAGE_PAGEWISE
     { "edit", "Write bytes to the local page buffer", cmd_edit },
     { "test", "Write and verify test pattern", cmd_test },
     { "test_last_pagewise", "Write and verify test pattern on last page available", cmd_test_last },
 #endif
-#ifdef MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
+#if MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
     { "test_reserved_pagewise", "Write and verify short write on reserved page", cmd_test_reserved},
 #endif
     { "test_last_raw", "Write and verify raw short write on last page available", cmd_test_last_raw },

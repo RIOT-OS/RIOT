@@ -50,7 +50,7 @@ extern "C" {
  *
  */
 #ifndef OPENWSN_UART_DEV
-#ifdef MODULE_STDIO_NULL
+#if MODULE_STDIO_NULL
 #define OPENWSN_UART_DEV            (STDIO_UART_DEV)
 #else
 #define OPENWSN_UART_DEV            ((STDIO_UART_DEV + 1) % UART_NUMOF)

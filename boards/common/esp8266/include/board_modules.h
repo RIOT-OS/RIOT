@@ -31,7 +31,7 @@
 extern "C" {
 #endif
 
-#if defined(MODULE_ENC28J60) || defined(DOXYGEN)
+#if MODULE_ENC28J60 || defined(DOXYGEN)
 /**
  * @name    ENC28J60 configuration
  *
@@ -58,9 +58,9 @@ extern "C" {
 #define ENC28J60_PARAM_RESET    GPIO10      /**< ENC28J60 RESET signal (can be overridden) */
 #endif
 /** @} */
-#endif /* defined(MODULE_ENC28J60) || defined(DOXYGEN) */
+#endif /* MODULE_ENC28J60 || defined(DOXYGEN) */
 
-#if defined(MODULE_MRF24J40) || defined(DOXYGEN)
+#if MODULE_MRF24J40 || defined(DOXYGEN)
 /**
  * @name    MRF24J40 configuration
  *
@@ -89,9 +89,9 @@ extern "C" {
 #define MRF24J40_PARAM_RESET    GPIO2           /**< MRF24J40 RESET signal (can be overridden) */
 #endif
 /** @} */
-#endif /* defined(MODULE_MRF24J40) || defined(DOXYGEN) */
+#endif /* MODULE_MRF24J40 || defined(DOXYGEN) */
 
-#if defined(MODULE_SDCARD_SPI) || defined(DOXYGEN)
+#if MODULE_SDCARD_SPI || defined(DOXYGEN)
 /**
  * @name    SD-Card configuration
  *
@@ -115,7 +115,7 @@ extern "C" {
 #define SDCARD_SPI_PARAM_CS     SPI0_CS0    /**< SD-Card CS signal (can be overridden) */
 #endif
 /** @} */
-#endif /* defined(MODULE_SDCARD_SPI) || defined(DOXYGEN) */
+#endif /* MODULE_SDCARD_SPI || defined(DOXYGEN) */
 
 #ifdef __cplusplus
 } /* end extern "C" */

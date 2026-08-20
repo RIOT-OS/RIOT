@@ -38,11 +38,11 @@ extern "C" {
 
 #ifndef PCF857X_PARAM_EXP
 /** PCF857X expander variant used depends on enabled pseudomodules*/
-#if IS_USED(MODULE_PCF8575) || DOXYGEN
+#if MODULE_PCF8575 || DOXYGEN
 #define PCF857X_PARAM_EXP       (PCF857X_EXP_PCF8575)
-#elif IS_USED(MODULE_PCF8574)
+#elif MODULE_PCF8574
 #define PCF857X_PARAM_EXP       (PCF857X_EXP_PCF8574)
-#elif IS_USED(MODULE_PCF8574A)
+#elif MODULE_PCF8574A
 #define PCF857X_PARAM_EXP       (PCF857X_EXP_PCF8574A)
 #endif
 #endif /* PCF857X_PARAM_EXP */
@@ -53,7 +53,7 @@ extern "C" {
 #endif
 
 #ifndef PCF857X_PARAMS
-#if IS_USED(MODULE_PCF857X_IRQ) || DOXYGEN
+#if MODULE_PCF857X_IRQ || DOXYGEN
 /** Default configuration parameter set */
 #define PCF857X_PARAMS { \
                             .dev = PCF857X_PARAM_DEV, \
@@ -101,7 +101,7 @@ static const pcf857x_params_t pcf857x_params[] =
     PCF857X_PARAMS
 };
 
-#if IS_USED(MODULE_SAUL_GPIO) || DOXYGEN
+#if MODULE_SAUL_GPIO || DOXYGEN
 /**
  * @brief   Additional meta information to keep in the SAUL registry
  */

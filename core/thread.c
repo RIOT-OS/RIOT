@@ -289,7 +289,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
 #endif
 
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK) \
-    || defined(MODULE_TEST_UTILS_PRINT_STACK_USAGE)
+    || MODULE_TEST_UTILS_PRINT_STACK_USAGE
     if (flags & THREAD_CREATE_NO_STACKTEST) {
         /* create stack guard. Alignment has been handled above, so silence
          * -Wcast-align */
@@ -331,7 +331,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     thread->sp = thread_stack_init(function, arg, stack, stacksize);
 
 #if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) || \
-    defined(MODULE_MPU_STACK_GUARD) || defined(MODULE_CORTEXM_STACK_LIMIT)
+    MODULE_MPU_STACK_GUARD || MODULE_CORTEXM_STACK_LIMIT
     thread->stack_start = stack;
 #endif
 
@@ -347,7 +347,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
 
     thread->rq_entry.next = NULL;
 
-#ifdef MODULE_CORE_MSG
+#if MODULE_CORE_MSG
     thread->wait_data = NULL;
     thread->msg_waiters.next = NULL;
     cib_init(&(thread->msg_queue), 0);

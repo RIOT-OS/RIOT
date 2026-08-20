@@ -25,7 +25,7 @@
 #include "net/gnrc/icmpv6.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/udp.h"
-#ifdef MODULE_GNRC_TCP
+#if MODULE_GNRC_TCP
 #include "net/gnrc/tcp.h"
 #endif
 
@@ -132,7 +132,7 @@ static void _gnrc_netreg_release_exclusive(void) {
 int gnrc_netreg_register(gnrc_nettype_t type, gnrc_netreg_entry_t *entry)
 {
 #if DEVELHELP
-# if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS)
+# if MODULE_GNRC_NETAPI_MBOX || MODULE_GNRC_NETAPI_CALLBACKS
     bool has_msg_q = (entry->type != GNRC_NETREG_TYPE_DEFAULT) ||
                      thread_has_msg_queue(thread_get(entry->target.pid));
 # else
@@ -179,7 +179,7 @@ void gnrc_netreg_unregister(gnrc_nettype_t type, gnrc_netreg_entry_t *entry)
      * lock becomes available again. */
     _gnrc_netreg_release_exclusive();
 
-#if defined(MODULE_GNRC_NETAPI_MBOX)
+#if MODULE_GNRC_NETAPI_MBOX
     /* drain packets still in the mbox */
     if (entry->type == GNRC_NETREG_TYPE_MBOX) {
         msg_t msg;
@@ -257,15 +257,15 @@ int gnrc_netreg_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr)
     }
 
     switch (hdr->type) {
-#ifdef MODULE_GNRC_ICMPV6
+#if MODULE_GNRC_ICMPV6
         case GNRC_NETTYPE_ICMPV6:
             return gnrc_icmpv6_calc_csum(hdr, pseudo_hdr);
 #endif
-#ifdef MODULE_GNRC_TCP
+#if MODULE_GNRC_TCP
         case GNRC_NETTYPE_TCP:
             return gnrc_tcp_calc_csum(hdr, pseudo_hdr);
 #endif
-#ifdef MODULE_GNRC_UDP
+#if MODULE_GNRC_UDP
         case GNRC_NETTYPE_UDP:
             return gnrc_udp_calc_csum(hdr, pseudo_hdr);
 #endif

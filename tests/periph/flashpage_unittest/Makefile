@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_flashpage \
+  #
 include ../Makefile.periph_common
 
 FEATURES_REQUIRED += periph_flashpage

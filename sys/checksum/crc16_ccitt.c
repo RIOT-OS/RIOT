@@ -96,7 +96,7 @@ uint16_t crc16_ccitt_kermit_update(uint16_t crc, const unsigned char *buf, size_
 {
     while (len--) {
         uint8_t e = crc ^= *buf++;
-        if (IS_USED(MODULE_CRC16_FAST)) {
+        if (MODULE_CRC16_FAST) {
             crc = (crc >> 8) ^ _crc_ccitt_lookuptable[e];
         } else {
             uint8_t f = e ^ (e << 4);
@@ -139,7 +139,7 @@ uint16_t crc16_ccitt_false_update(uint16_t crc, const unsigned char *buf, size_t
 {
     while (len--) {
         crc = byteorder_swaps(crc) ^ *buf++;
-        if (IS_USED(MODULE_CRC16_FAST)) {
+        if (MODULE_CRC16_FAST) {
             crc = (crc & 0xFF00) ^ _crc16_ccitt_false_lookuptable[crc & 0xFF];
         } else {
             crc ^= (uint8_t)(crc & 0xff) >> 4;

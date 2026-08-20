@@ -35,10 +35,10 @@
 #include "net/netif.h"
 #include "shell.h"
 
-#ifdef MODULE_NETSTATS
+#if MODULE_NETSTATS
 #include "net/netstats.h"
 #endif
-#ifdef MODULE_L2FILTER
+#if MODULE_L2FILTER
 #include "net/l2filter.h"
 #endif
 
@@ -140,7 +140,7 @@ static void frac_extend(uint8_t *a, uint8_t *b, uint8_t base)
     *b = base;
 }
 
-#ifdef MODULE_NETSTATS
+#if MODULE_NETSTATS
 static const char *_netstats_module_to_str(uint8_t module)
 {
     switch (module) {
@@ -218,15 +218,15 @@ static void _set_usage(char *cmd_name)
          "       * \"pan\" - alias for \"nid\"\n"
          "       * \"pan_id\" - alias for \"nid\"\n"
          "       * \"phy_busy\" - set busy mode on-off\n"
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORA)
+#if MODULE_SHELL_CMD_GNRC_NETIF_LORA
          "       * \"bw\" - alias for channel bandwidth\n"
          "       * \"sf\" - alias for spreading factor\n"
          "       * \"cr\" - alias for coding rate\n"
 #endif  /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
+#if MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN
          "       * \"appkey\" - sets Application key\n"
          "       * \"appskey\" - sets Application session key\n"
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
          "       * \"joineui\" - sets Join EUI\n"
          "       * \"nwkkey\"  - sets Network key\n"
          "       * \"nwksenckey\" - sets Network session encryption key\n"
@@ -240,18 +240,18 @@ static void _set_usage(char *cmd_name)
          "       * \"dr\" - sets datarate\n"
          "       * \"rx2_dr\" - sets datarate of RX2 (lorawan)\n"
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
+#if MODULE_NETDEV_IEEE802154_MULTIMODE
          "       * \"phy_mode\" - select PHY mode\n"
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#if MODULE_NETDEV_IEEE802154_MR_OQPSK
          "       * \"chip_rate\" - BPSK/QPSK chip rate in kChip/s\n"
          "       * \"rate_mode\" - BPSK/QPSK rate mode\n"
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#if MODULE_NETDEV_IEEE802154_MR_OFDM
          "       * \"option\" - OFDM option\n"
          "       * \"scheme\" - OFDM modulation & coding scheme\n"
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#if MODULE_NETDEV_IEEE802154_MR_FSK
          "       * \"modulation_index\" - FSK modulation index\n"
          "       * \"modulation_order\" - FSK modulation order\n"
          "       * \"symbol_rate\" - FSK symbol rate\n"
@@ -288,7 +288,7 @@ static void _del_usage(char *cmd_name)
            cmd_name);
 }
 
-#ifdef MODULE_NETSTATS
+#if MODULE_NETSTATS
 static void _stats_usage(char *cmd_name)
 {
     printf("usage: %s <if_id> stats [l2|ipv6] [reset]\n", cmd_name);
@@ -315,7 +315,7 @@ static void _print_netopt(netopt_t opt)
         printf("AppSKey");
         break;
 
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     case NETOPT_LORAWAN_JOINEUI:
         printf("JoinEUI");
         break;
@@ -342,7 +342,7 @@ static void _print_netopt(netopt_t opt)
     case NETOPT_LORAWAN_NWKSKEY:
         printf("NwkSKey");
         break;
-#endif /* IS_USED(MODULE_GNRC_LORAWAN_1_1) */
+#endif /* MODULE_GNRC_LORAWAN_1_1 */
 
     case NETOPT_SRC_LEN:
         printf("source address length");
@@ -396,7 +396,7 @@ static void _print_netopt(netopt_t opt)
         printf("encryption key");
         break;
 
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORA)
+#if MODULE_SHELL_CMD_GNRC_NETIF_LORA
     case NETOPT_BANDWIDTH:
         printf("bandwidth");
         break;
@@ -409,21 +409,21 @@ static void _print_netopt(netopt_t opt)
         printf("coding rate");
         break;
 #endif /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
-#ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
+#if MODULE_NETDEV_IEEE802154_MULTIMODE
 
     case NETOPT_IEEE802154_PHY:
         printf("PHY mode");
         break;
 
 #endif /* MODULE_NETDEV_IEEE802154_MULTIMODE */
-#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+#if MODULE_NETDEV_IEEE802154_OQPSK
 
     case NETOPT_OQPSK_RATE:
         printf("high rate");
         break;
 
 #endif /* MODULE_NETDEV_IEEE802154_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#if MODULE_NETDEV_IEEE802154_MR_OQPSK
 
     case NETOPT_MR_OQPSK_CHIPS:
         printf("chip rate");
@@ -434,7 +434,7 @@ static void _print_netopt(netopt_t opt)
         break;
 
 #endif /* MODULE_NETDEV_IEEE802154_MR_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#if MODULE_NETDEV_IEEE802154_MR_OFDM
 
     case NETOPT_MR_OFDM_OPTION:
         printf("OFDM option");
@@ -445,7 +445,7 @@ static void _print_netopt(netopt_t opt)
         break;
 
 #endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#if MODULE_NETDEV_IEEE802154_MR_FSK
 
     case NETOPT_MR_FSK_MODULATION_INDEX:
         printf("FSK modulation index");
@@ -509,7 +509,7 @@ static const char *_netopt_state_str[] = {
     [NETOPT_STATE_STANDBY] = "STANDBY"
 };
 
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORA)
+#if MODULE_SHELL_CMD_GNRC_NETIF_LORA
 static const char *_netopt_bandwidth_str[] = {
     [LORA_BW_125_KHZ] = "125",
     [LORA_BW_250_KHZ] = "250",
@@ -524,7 +524,7 @@ static const char *_netopt_coding_rate_str[] = {
 };
 #endif  /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
 
-#ifdef MODULE_NETDEV_IEEE802154
+#if MODULE_NETDEV_IEEE802154
 static const char *_netopt_ieee802154_phy_str[] = {
     [IEEE802154_PHY_DISABLED] = "DISABLED",
     [IEEE802154_PHY_BPSK] = "BPSK",
@@ -536,7 +536,7 @@ static const char *_netopt_ieee802154_phy_str[] = {
 };
 #endif
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#if MODULE_NETDEV_IEEE802154_MR_OFDM
 static const char *_netopt_ofdm_mcs_str[] = {
     [0] = "BPSK, rate 1/2, 4x frequency repetition",
     [1] = "BPSK, rate 1/2, 2x frequency repetition",
@@ -548,7 +548,7 @@ static const char *_netopt_ofdm_mcs_str[] = {
 };
 #endif
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#if MODULE_NETDEV_IEEE802154_MR_FSK
 static const char *_netopt_fec_str[] = {
     [IEEE802154_FEC_NONE] = "none",
     [IEEE802154_FEC_NRNSC] = "NRNSC",
@@ -581,7 +581,7 @@ static unsigned _netif_list_flag(netif_t *iface, netopt_t opt, char *str,
     return line_thresh;
 }
 
-#ifdef MODULE_IPV6
+#if MODULE_IPV6
 static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
 {
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
@@ -641,7 +641,7 @@ static void _netif_list_groups(ipv6_addr_t *addr)
 
 static void _netif_list(netif_t *iface)
 {
-#ifdef MODULE_IPV6
+#if MODULE_IPV6
     ipv6_addr_t ipv6_addrs[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
     ipv6_addr_t ipv6_groups[GNRC_NETIF_IPV6_GROUPS_NUMOF];
 #endif
@@ -685,7 +685,7 @@ static void _netif_list(netif_t *iface)
     if (res >= 0) {
         printf(" RSSI: %d ", i16);
     }
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORA)
+#if MODULE_SHELL_CMD_GNRC_NETIF_LORA
     res = netif_get_opt(iface, NETOPT_BANDWIDTH, 0, &u8, sizeof(u8));
     if (res >= 0) {
         printf(" BW: %skHz ", _netopt_bandwidth_str[u8]);
@@ -699,13 +699,13 @@ static void _netif_list(netif_t *iface)
         printf(" CR: %s ", _netopt_coding_rate_str[u8]);
     }
 #endif /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
-#ifdef MODULE_NETDEV_IEEE802154
+#if MODULE_NETDEV_IEEE802154
     res = netif_get_opt(iface, NETOPT_IEEE802154_PHY, 0, &u8, sizeof(u8));
     if (res >= 0) {
         printf(" PHY: %s ", _netopt_ieee802154_phy_str[u8]);
         switch (u8) {
 
-#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+#if MODULE_NETDEV_IEEE802154_OQPSK
         case IEEE802154_PHY_OQPSK:
             printf("\n          ");
             res = netif_get_opt(iface, NETOPT_OQPSK_RATE, 0, &u8, sizeof(u8));
@@ -716,7 +716,7 @@ static void _netif_list(netif_t *iface)
             break;
 
 #endif /* MODULE_NETDEV_IEEE802154_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#if MODULE_NETDEV_IEEE802154_MR_OQPSK
         case IEEE802154_PHY_MR_OQPSK:
             printf("\n          ");
             res = netif_get_opt(iface, NETOPT_MR_OQPSK_CHIPS, 0, &u16, sizeof(u16));
@@ -731,7 +731,7 @@ static void _netif_list(netif_t *iface)
             break;
 
 #endif /* MODULE_NETDEV_IEEE802154_MR_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#if MODULE_NETDEV_IEEE802154_MR_OFDM
         case IEEE802154_PHY_MR_OFDM:
             printf("\n          ");
             res = netif_get_opt(iface, NETOPT_MR_OFDM_OPTION, 0, &u8, sizeof(u8));
@@ -745,7 +745,7 @@ static void _netif_list(netif_t *iface)
 
             break;
 #endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#if MODULE_NETDEV_IEEE802154_MR_FSK
         case IEEE802154_PHY_MR_FSK:
             printf("\n          ");
             res = netif_get_opt(iface, NETOPT_MR_FSK_MODULATION_INDEX, 0, &u8, sizeof(u8));
@@ -786,7 +786,7 @@ static void _netif_list(netif_t *iface)
     if (res >= 0) {
         printf(" Link: %s ", (enabled == NETOPT_ENABLE) ? "up" : "down" );
     }
-#if IS_USED(MODULE_LWIP_NETIF) /* only supported on lwIP for now */
+#if MODULE_LWIP_NETIF /* only supported on lwIP for now */
     res = netif_get_opt(iface, NETOPT_ACTIVE, 0, &enabled, sizeof(enabled));
     if (res >= 0) {
         printf(" State: %s ", (enabled == NETOPT_ENABLE) ? "up" : "down" );
@@ -824,7 +824,7 @@ static void _netif_list(netif_t *iface)
         }
         line_thresh++;
     }
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
+#if MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN
     res = netif_get_opt(iface, NETOPT_DEMOD_MARGIN, 0, &u8, sizeof(u8));
     if (res >= 0) {
         printf(" Demod margin.: %u ", (unsigned)u8);
@@ -869,7 +869,7 @@ static void _netif_list(netif_t *iface)
         printf("L2-PDU:%" PRIu16 "  ", u16);
         line_thresh++;
     }
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     res = netif_get_opt(iface, NETOPT_MAX_PDU_SIZE, GNRC_NETTYPE_IPV6, &u16, sizeof(u16));
     if (res > 0) {
         printf("MTU:%" PRIu16 "  ", u16);
@@ -882,18 +882,18 @@ static void _netif_list(netif_t *iface)
     }
     line_thresh = _netif_list_flag(iface, NETOPT_IPV6_FORWARDING, "RTR  ",
                                    line_thresh);
-#ifndef MODULE_GNRC_SIXLOWPAN_IPHC
+#if !MODULE_GNRC_SIXLOWPAN_IPHC
     line_thresh += _LINE_THRESHOLD + 1; /* enforce linebreak after this option */
 #endif
     line_thresh = _netif_list_flag(iface, NETOPT_IPV6_SND_RTR_ADV, "RTR_ADV  ",
                                    line_thresh);
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if MODULE_GNRC_SIXLOWPAN
     line_thresh = _netif_list_flag(iface, NETOPT_6LO, "6LO  ", line_thresh);
 #endif
 #if CONFIG_GNRC_IPV6_NIB_6LBR
     line_thresh = _netif_list_flag(iface, NETOPT_6LO_ABR, "ABR  ", line_thresh);
 #endif
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
+#if MODULE_GNRC_SIXLOWPAN_IPHC
     line_thresh += _LINE_THRESHOLD + 1; /* enforce linebreak after this option */
     line_thresh = _netif_list_flag(iface, NETOPT_6LO_IPHC, "IPHC  ",
                                    line_thresh);
@@ -910,7 +910,7 @@ static void _netif_list(netif_t *iface)
            (netif_get_opt(iface, NETOPT_IS_WIRED, 0, &u16, sizeof(u16)) > 0) ?
            "wired" : "wireless");
     _newline(0U, ++line_thresh);
-#ifdef MODULE_IPV6
+#if MODULE_IPV6
     res = netif_get_opt(iface, NETOPT_IPV6_ADDR, 0, ipv6_addrs,
                         sizeof(ipv6_addrs));
     if (res >= 0) {
@@ -934,11 +934,11 @@ static void _netif_list(netif_t *iface)
     }
 #endif
 
-#ifdef MODULE_L2FILTER
+#if MODULE_L2FILTER
     l2filter_t *filter = NULL;
     res = netif_get_opt(iface, NETOPT_L2FILTER, 0, &filter, sizeof(filter));
     if (res > 0) {
-#ifdef MODULE_L2FILTER_WHITELIST
+#if MODULE_L2FILTER_WHITELIST
         printf("\n           White-listed link layer addresses:\n");
 #else
         printf("\n           Black-listed link layer addresses:\n");
@@ -958,11 +958,11 @@ static void _netif_list(netif_t *iface)
     }
 #endif
 
-#ifdef MODULE_NETSTATS_L2
+#if MODULE_NETSTATS_L2
     puts("");
     _netif_stats(iface, NETSTATS_LAYER2, false);
 #endif
-#ifdef MODULE_NETSTATS_IPV6
+#if MODULE_NETSTATS_IPV6
     _netif_stats(iface, NETSTATS_IPV6, false);
 #endif
     puts("");
@@ -1017,7 +1017,7 @@ static int _netif_set_u32(netif_t *iface, netopt_t opt, uint32_t context,
     return 0;
 }
 
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORA)
+#if MODULE_SHELL_CMD_GNRC_NETIF_LORA
 static int _netif_set_bandwidth(netif_t *iface, char *value)
 {
     uint8_t bw;
@@ -1080,7 +1080,7 @@ static int _netif_set_coding_rate(netif_t *iface, char *value)
 }
 #endif  /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#if MODULE_NETDEV_IEEE802154_MR_FSK
 static int _netif_set_fsk_fec(netif_t *iface, char *value)
 {
     /* ignore case */
@@ -1135,7 +1135,7 @@ static int _netif_set_fsk_modulation_index(netif_t *iface, char *value)
 }
 #endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
 
-#ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
+#if MODULE_NETDEV_IEEE802154_MULTIMODE
 static int _netif_set_ieee802154_phy_mode(netif_t *iface, char *value)
 {
     /* ignore case */
@@ -1270,7 +1270,7 @@ static int _netif_set_flag(netif_t *iface, netopt_t opt, netopt_enable_t set)
     return 0;
 }
 
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
+#if MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN
 static int _netif_set_lw_key(netif_t *iface, netopt_t opt, char *key_str)
 {
     /* This is the longest key */
@@ -1457,7 +1457,7 @@ static int _netif_set_encrypt_key(netif_t *iface, netopt_t opt, char *key_str)
     return 0;
 }
 
-#ifdef MODULE_L2FILTER
+#if MODULE_L2FILTER
 static int _netif_addrm_l2filter(netif_t *iface, char *val, bool add)
 {
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
@@ -1500,10 +1500,10 @@ static void _usage(char *cmd)
     _flag_usage(cmd);
     _add_usage(cmd);
     _del_usage(cmd);
-#ifdef MODULE_L2FILTER
+#if MODULE_L2FILTER
     _l2filter_usage(cmd);
 #endif
-#ifdef MODULE_NETSTATS
+#if MODULE_NETSTATS
     _stats_usage(cmd);
 #endif
 }
@@ -1522,7 +1522,7 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
     else if ((strcmp("frequency", key) == 0) || (strcmp("freq", key) == 0)) {
         return _netif_set_u32(iface, NETOPT_CHANNEL_FREQUENCY, 0, value);
     }
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORA)
+#if MODULE_SHELL_CMD_GNRC_NETIF_LORA
     else if ((strcmp("bandwidth", key) == 0) || (strcmp("bw", key) == 0)) {
         return _netif_set_bandwidth(iface, value);
     }
@@ -1533,8 +1533,8 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
         return _netif_set_coding_rate(iface, value);
     }
 #endif  /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
-#if IS_USED(MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN)
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN
+#if MODULE_GNRC_LORAWAN_1_1
     else if (strcmp("joineui", key) == 0) {
         return _netif_set_lw_key(iface, NETOPT_LORAWAN_JOINEUI, value);
     }
@@ -1557,7 +1557,7 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
     else if (strcmp("nwkskey", key) == 0) {
         return _netif_set_addr(iface, NETOPT_LORAWAN_NWKSKEY, value);
     }
-#endif /* IS_USED(MODULE_GNRC_LORAWAN_1_1) */
+#endif /* MODULE_GNRC_LORAWAN_1_1 */
     else if (strcmp("appskey", key) == 0) {
         return _netif_set_addr(iface, NETOPT_LORAWAN_APPSKEY, value);
     }
@@ -1575,17 +1575,17 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
         return _netif_set_u8(iface, NETOPT_LORAWAN_RX2_DR, 0, value);
     }
 #endif /* MODULE_SHELL_CMD_GNRC_NETIF_LORAWAN */
-#ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
+#if MODULE_NETDEV_IEEE802154_MULTIMODE
     else if ((strcmp("phy_mode", key) == 0) || (strcmp("phy", key) == 0)) {
         return _netif_set_ieee802154_phy_mode(iface, value);
     }
 #endif /* MODULE_NETDEV_IEEE802154_MULTIMODE */
-#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+#if MODULE_NETDEV_IEEE802154_OQPSK
     else if (strcmp("high_rate", key) == 0) {
         return _netif_set_u8(iface, NETOPT_OQPSK_RATE, 0, value);
     }
 #endif /* MODULE_NETDEV_IEEE802154_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#if MODULE_NETDEV_IEEE802154_MR_OQPSK
     else if ((strcmp("chip_rate", key) == 0) || (strcmp("chips", key) == 0)) {
         return _netif_set_u16(iface, NETOPT_MR_OQPSK_CHIPS, 0, value);
     }
@@ -1593,7 +1593,7 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
         return _netif_set_u8(iface, NETOPT_MR_OQPSK_RATE, 0, value);
     }
 #endif /* MODULE_NETDEV_IEEE802154_MR_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#if MODULE_NETDEV_IEEE802154_MR_OFDM
     else if ((strcmp("option", key) == 0) || (strcmp("opt", key) == 0)) {
         return _netif_set_u8(iface, NETOPT_MR_OFDM_OPTION, 0, value);
     }
@@ -1601,7 +1601,7 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
         return _netif_set_u8(iface, NETOPT_MR_OFDM_MCS, 0, value);
     }
 #endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#if MODULE_NETDEV_IEEE802154_MR_FSK
     else if ((strcmp("modulation_index", key) == 0) || (strcmp("midx", key) == 0)) {
         return _netif_set_fsk_modulation_index(iface, value);
     }
@@ -1630,7 +1630,7 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
     else if (strcmp("key", key) == 0) {
         return _netif_set_encrypt_key(iface, NETOPT_ENCRYPTION_KEY, value);
     }
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     else if (strcmp("mtu", key) == 0) {
         return _netif_set_u16(iface, NETOPT_MAX_PDU_SIZE, GNRC_NETTYPE_IPV6,
                               value);
@@ -1677,7 +1677,7 @@ static int _netif_flag(char *cmd, netif_t *iface, char *flag)
     return 1;
 }
 
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
 static uint8_t _get_prefix_len(char *addr)
 {
     int prefix_len = ipv6_addr_split_int(addr, '/', _IPV6_DEFAULT_PREFIX_LEN);
@@ -1692,7 +1692,7 @@ static uint8_t _get_prefix_len(char *addr)
 
 static int _netif_link(netif_t *iface, netopt_enable_t en)
 {
-#if IS_USED(MODULE_LWIP_NETIF) /* lwIP sets netif state, not link state */
+#if MODULE_LWIP_NETIF /* lwIP sets netif state, not link state */
     if (netif_set_opt(iface, NETOPT_ACTIVE, 0, &en, sizeof(en)) < 0) {
         printf("error: unable to set state %s\n", en == NETOPT_ENABLE ? "up" : "down");
         return 1;
@@ -1708,7 +1708,7 @@ static int _netif_link(netif_t *iface, netopt_enable_t en)
 
 static int _netif_add(char *cmd_name, netif_t *iface, int argc, char **argv)
 {
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     enum {
         _UNICAST = 0,
         _ANYCAST
@@ -1777,7 +1777,7 @@ static int _netif_add(char *cmd_name, netif_t *iface, int argc, char **argv)
 
 static int _netif_del(netif_t *iface, char *addr_str)
 {
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     ipv6_addr_t addr;
 
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
@@ -1886,7 +1886,7 @@ int _gnrc_netif_config(int argc, char **argv)
 
             return _netif_del(iface, argv[3]);
         }
-#ifdef MODULE_L2FILTER
+#if MODULE_L2FILTER
         else if (strcmp(argv[2], "l2filter") == 0) {
             if (argc < 5) {
                 _l2filter_usage(argv[2]);
@@ -1903,7 +1903,7 @@ int _gnrc_netif_config(int argc, char **argv)
             return 1;
         }
 #endif
-#ifdef MODULE_NETSTATS
+#if MODULE_NETSTATS
         else if (strcmp(argv[2], "stats") == 0) {
             uint8_t module;
             bool reset = false;

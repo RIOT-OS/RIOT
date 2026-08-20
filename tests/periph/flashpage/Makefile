@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_flashpage_in_address_space \
+  periph_flashpage_pagewise \
+  #
 BOARD ?= iotlab-m3
 include ../Makefile.periph_common
 

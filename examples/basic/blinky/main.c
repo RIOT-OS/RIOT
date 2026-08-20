@@ -25,7 +25,7 @@
 
 static void delay(void)
 {
-    if (IS_USED(MODULE_ZTIMER)) {
+    if (MODULE_ZTIMER) {
         ztimer_sleep(ZTIMER_USEC, 1 * US_PER_SEC);
     }
     else {

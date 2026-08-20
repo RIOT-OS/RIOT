@@ -2,3 +2,7 @@ USEMODULE_INCLUDES_dose := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_dose)
 
 PSEUDOMODULES += dose_watchdog
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_rxstart_irq \
+  #

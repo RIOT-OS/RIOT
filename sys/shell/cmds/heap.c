@@ -21,7 +21,7 @@
 #include "cpu_conf.h"
 #include "shell.h"
 
-#if defined(MODULE_NEWLIB_SYSCALLS_DEFAULT) || defined (HAVE_HEAP_STATS)
+#if MODULE_NEWLIB_SYSCALLS_DEFAULT || defined (HAVE_HEAP_STATS)
 extern void heap_stats(void);
 #else
 #include <stdio.h>
@@ -32,7 +32,7 @@ static int _heap_handler(int argc, char **argv)
     (void) argc;
     (void) argv;
 
-#if defined(MODULE_NEWLIB_SYSCALLS_DEFAULT) || defined (HAVE_HEAP_STATS)
+#if MODULE_NEWLIB_SYSCALLS_DEFAULT || defined (HAVE_HEAP_STATS)
     heap_stats();
     return 0;
 #else

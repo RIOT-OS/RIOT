@@ -1,3 +1,16 @@
+
+MODULE_DEFS_NEEDED += \
+  dns \
+  ipv4_addr \
+  ipv6_addr \
+  unicoap_driver_dtls \
+  unicoap_driver_rfc7252_common \
+  unicoap_driver_slipmux \
+  unicoap_driver_udp \
+  unicoap_server \
+  unicoap_server_resource_declarations \
+  unicoap_sock_support \
+  #
 ifneq (,$(filter unicoap_driver_rfc7252_common_pdu,$(USEMODULE)))
   DIRS += drivers/rfc7252/common/pdu
 endif

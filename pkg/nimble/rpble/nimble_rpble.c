@@ -117,7 +117,7 @@ static void _on_scan_evt(uint8_t type, const ble_addr_t *addr,
     int res;
     (void)info;
 
-#if IS_USED(MODULE_NIMBLE_RPBLE_EXT)
+#if MODULE_NIMBLE_RPBLE_EXT
     if ((type != (NIMBLE_SCANNER_EXT_ADV | BLE_HCI_ADV_CONN_MASK)) ||
         (info->status != BLE_GAP_EXT_ADV_DATA_STATUS_COMPLETE)) {
         return;
@@ -288,7 +288,7 @@ int nimble_rpble_param_update(const nimble_rpble_cfg_t *cfg)
 
     /* accept parameter extraction */
     memset(&_accept_params, 0, sizeof(_accept_params));
-#if IS_USED(MODULE_NIMBLE_RPBLE_EXT)
+#if MODULE_NIMBLE_RPBLE_EXT
     _accept_params.flags = 0;
     _accept_params.primary_phy = cfg->phy_mode;
     _accept_params.secondary_phy = cfg->phy_mode;
@@ -310,7 +310,7 @@ int nimble_rpble_param_update(const nimble_rpble_cfg_t *cfg)
     _conn_params.conn_supervision_timeout_ms = cfg->conn_super_to_ms;
     _conn_params.conn_slave_latency = cfg->conn_latency;
     _conn_params.timeout_ms = cfg->conn_scan_to_ms;
-#if IS_USED(MODULE_NIMBLE_RPBLE_EXT)
+#if MODULE_NIMBLE_RPBLE_EXT
     _conn_params.phy_mode = cfg->phy_mode;
 #else
     _conn_params.phy_mode = NIMBLE_PHY_1M;
@@ -326,7 +326,7 @@ int nimble_rpble_param_update(const nimble_rpble_cfg_t *cfg)
     scan_params.win_ms = cfg->scan_win_ms;
     scan_params.flags = (NIMBLE_SCANNER_PASSIVE | NIMBLE_SCANNER_FILTER_DUPS);
 
-#if IS_USED(MODULE_NIMBLE_RPBLE_EXT) && IS_USED(MODULE_NIMBLE_PHY_CODED)
+#if MODULE_NIMBLE_RPBLE_EXT && MODULE_NIMBLE_PHY_CODED
     if (cfg->phy_mode == NIMBLE_PHY_CODED) {
         scan_params.flags |= NIMBLE_SCANNER_PHY_CODED;
     }

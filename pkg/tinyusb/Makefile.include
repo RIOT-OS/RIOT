@@ -47,3 +47,25 @@ endif
 ifneq (,$(filter tinyusb_netdev,$(USEMODULE)))
   INCLUDES += -I$(RIOTBASE)/pkg/tinyusb/netdev/include
 endif
+
+MODULE_DEFS_NEEDED += \
+  riotboot_tinyusb_dfu \
+  tinyusb_class_audio \
+  tinyusb_class_bth \
+  tinyusb_class_cdc \
+  tinyusb_class_dfu \
+  tinyusb_class_dfu_runtime \
+  tinyusb_class_hid \
+  tinyusb_class_hub \
+  tinyusb_class_midi \
+  tinyusb_class_msc \
+  tinyusb_class_net \
+  tinyusb_class_net_cdc_ecm \
+  tinyusb_class_net_cdc_ncm \
+  tinyusb_class_net_rndis \
+  tinyusb_class_usbtmc \
+  tinyusb_class_vendor \
+  tinyusb_class_video \
+  tinyusb_device \
+  tinyusb_host \
+  #

@@ -27,7 +27,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifdef MODULE_DISP_DEV
+#if MODULE_DISP_DEV
 #ifdef LCD_SCREEN_WIDTH
 #define DISPLAY_BUFFER_MAX_SIZE (LCD_SCREEN_WIDTH)
 #else
@@ -52,7 +52,7 @@ static uint8_t fig_buf[PIXBUF_NUM_ROWS][PIXBUF_NUM_COLS] = { 0 };
 static disp_dev_reg_t *init_display(void)
 {
     disp_dev_reg_t *disp_dev = NULL;
-#ifdef MODULE_DISP_DEV
+#if MODULE_DISP_DEV
     /* Use the first screen */
     disp_dev = disp_dev_reg_find_screen(0);
     if (!disp_dev) {

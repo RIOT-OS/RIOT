@@ -16428,7 +16428,7 @@ API Changes
 +     assert(options_tested);
 # endif
 -     netif->cur_hl = GNRC_NETIF_DEFAULT_HL;
-- #ifdef MODULE_GNRC_IPV6_NIB
+- #if MODULE_GNRC_IPV6_NIB
 -     gnrc_ipv6_nib_init_iface(netif);
 - #endif
 -     if (netif->ops->init) {

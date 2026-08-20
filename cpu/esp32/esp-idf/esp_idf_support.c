@@ -30,7 +30,7 @@
 #define ENABLE_DEBUG  0
 #include "debug.h"
 
-#if IS_USED(MODULE_ESP_WIFI_ANY) || IS_USED(MODULE_ESP_ETH)
+#if MODULE_ESP_WIFI_ANY || MODULE_ESP_ETH
 #include "esp_event_base.h"
 
 ESP_EVENT_DEFINE_BASE(IP_EVENT);

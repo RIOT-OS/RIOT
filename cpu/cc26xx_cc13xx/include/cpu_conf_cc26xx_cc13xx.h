@@ -130,7 +130,7 @@ extern "C" {
 #define SET_BL_CONFIG_BL_PIN_NUMBER                 CONFIG_CC26XX_CC13XX_BL_PIN
 #endif
 
-#endif /* IS_USED(CONFIG_CC26XX_CC13XX_ROM_BOOTLOADER) */
+#endif /* IS_ACTIVE(CONFIG_CC26XX_CC13XX_ROM_BOOTLOADER) */
 
 /* when GPRAM is not disabled, use it as a backup RAM */
 #if IS_ACTIVE(CONFIG_CC26XX_CC13XX_DIS_GPRAM)

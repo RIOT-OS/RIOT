@@ -22,7 +22,7 @@
 
 #include "can/dll.h"
 
-#ifdef MODULE_CAN_ISOTP
+#if MODULE_CAN_ISOTP
 #include "can/isotp.h"
 
 #ifndef ISOTP_STACK_SIZE
@@ -41,17 +41,17 @@ void auto_init_candev(void)
     DEBUG("auto_init_can: init dll\n");
     can_dll_init();
 
-#ifdef MODULE_CAN_ISOTP
+#if MODULE_CAN_ISOTP
     DEBUG("auto_init_can: init isotp\n");
     isotp_init(isotp_stack, ISOTP_STACK_SIZE, ISOTP_PRIORITY, "isotp");
 #endif
 
-#ifdef MODULE_PERIPH_CAN
+#if MODULE_PERIPH_CAN
     extern void auto_init_periph_can(void);
     auto_init_periph_can();
 #endif
 
-#ifdef MODULE_MCP2515
+#if MODULE_MCP2515
     extern void auto_init_can_mcp2515(void);
     auto_init_can_mcp2515();
 #endif

@@ -28,7 +28,7 @@ extern "C" {
 /**
  * @brief USBUS MSC bulk data endpoint size.
  */
-#if defined(MODULE_PERIPH_USBDEV_HS_UTMI) || defined(MODULE_PERIPH_USBDEV_HS_ULPI)
+#if MODULE_PERIPH_USBDEV_HS_UTMI || MODULE_PERIPH_USBDEV_HS_ULPI
 #define USBUS_MSC_EP_DATA_SIZE  512
 #else
 #define USBUS_MSC_EP_DATA_SIZE  64

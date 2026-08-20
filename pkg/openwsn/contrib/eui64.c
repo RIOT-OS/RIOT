@@ -29,7 +29,7 @@
 
 extern openwsn_radio_t openwsn_radio;
 
-#ifdef MODULE_OPENWSN_RADIO_HAL
+#if MODULE_OPENWSN_RADIO_HAL
 /* HACK: temporary hack while eui_provider still depends on netdev */
 static eui64_t _eui64;
 static bool _eui64_is_set = false;
@@ -37,7 +37,7 @@ static bool _eui64_is_set = false;
 
 void eui64_get(uint8_t *addressToWrite)
 {
-#ifdef MODULE_OPENWSN_RADIO_HAL
+#if MODULE_OPENWSN_RADIO_HAL
     if (!_eui64_is_set) {
         luid_get_eui64(&_eui64);
         _eui64_is_set = true;

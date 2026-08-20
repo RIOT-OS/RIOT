@@ -1,3 +1,10 @@
+
+MODULE_DEFS_NEEDED += \
+  ztimer_msec \
+  ztimer_periph_timer \
+  ztimer_sec \
+  ztimer_usec \
+  #
 include ../Makefile.sys_common
 
 # required modules

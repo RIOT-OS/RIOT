@@ -51,7 +51,7 @@
 #define RTC_PLL_480M    480 /* PLL with 480 MHz at maximum */
 #define RTC_PLL_320M    320 /* PLL with 320 MHz at maximum */
 
-#ifndef MODULE_ESP_HW_COUNTER
+#if !MODULE_ESP_HW_COUNTER
 
 /* for compatibility with older versions of ESP-IDF */
 #define TIMER_GROUP_0   0

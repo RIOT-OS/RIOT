@@ -53,7 +53,7 @@
 /* Determine if PLL is required, even if not used as SYSCLK
    This is the case when USB/SDIO/SDMMC is used in application and PLLQ is
    configured to output 48MHz */
-#if (IS_USED(MODULE_PERIPH_USBDEV_CLK) || IS_USED(MODULE_PERIPH_SDMMC_CLK)) && \
+#if (MODULE_PERIPH_USBDEV_CLK || MODULE_PERIPH_SDMMC_CLK) && \
     (CLOCK_PLLQ == MHZ(48))
 #define CLOCK_REQUIRE_PLLQ          1
 #else
@@ -65,7 +65,7 @@
 #if (defined(CPU_LINE_STM32F412Cx) || defined(CPU_LINE_STM32F412Rx) || \
      defined(CPU_LINE_STM32F412Vx) || defined(CPU_LINE_STM32F412Zx) || \
      defined(CPU_LINE_STM32F413xx) || defined(CPU_LINE_STM32F423xx)) && \
-    (IS_USED(MODULE_PERIPH_USBDEV_CLK) || IS_USED(MODULE_PERIPH_SDMMC_CLK)) && \
+    (MODULE_PERIPH_USBDEV_CLK || MODULE_PERIPH_SDMMC_CLK) && \
     !IS_ACTIVE(CLOCK_REQUIRE_PLLQ)
 #define CLOCK_REQUIRE_PLLI2SR       1
 #else
@@ -78,7 +78,7 @@
    PLLSAI is only enabled if no suitable 48MHz clock source can be generated with PLLQ */
 #if (defined(CPU_LINE_STM32F446xx) || defined(CPU_LINE_STM32F469xx) || \
      defined(CPU_LINE_STM32F479xx) || defined(CPU_FAM_STM32F7)) && \
-    (IS_USED(MODULE_PERIPH_USBDEV_CLK) || IS_USED(MODULE_PERIPH_SDMMC_CLK)) && \
+    (MODULE_PERIPH_USBDEV_CLK || MODULE_PERIPH_SDMMC_CLK) && \
     !IS_ACTIVE(CLOCK_REQUIRE_PLLQ)
 #define CLOCK_REQUIRE_PLLSAIP       1
 #else
@@ -87,7 +87,7 @@
 #define CLOCK_REQUIRE_PLLSAIP       0
 #endif
 
-#if (IS_USED(MODULE_PERIPH_USBDEV_CLK) || IS_USED(MODULE_PERIPH_SDMMC_CLK)) && \
+#if (MODULE_PERIPH_USBDEV_CLK || MODULE_PERIPH_SDMMC_CLK) && \
     !(IS_ACTIVE(CLOCK_REQUIRE_PLLQ) || \
       IS_ACTIVE(CLOCK_REQUIRE_PLLI2SR) || \
       IS_ACTIVE(CLOCK_REQUIRE_PLLSAIP))
@@ -95,7 +95,7 @@
 #endif
 
 /* PLLSAI is enabled when LTDC is used */
-#if IS_USED(MODULE_PERIPH_LTDC)
+#if MODULE_PERIPH_LTDC
 #define CLOCK_REQUIRE_PLLSAIR       1
 #else
 #define CLOCK_REQUIRE_PLLSAIR       0
@@ -566,14 +566,14 @@ void stmclk_init_sysclk(void)
 #endif
 
 #if defined(RCC_DCKCFGR1_PLLSAIDIVR)
-    if (IS_USED(MODULE_PERIPH_LTDC)) {
+    if (MODULE_PERIPH_LTDC) {
         RCC->DCKCFGR1 &= ~RCC_DCKCFGR1_PLLSAIDIVR;
         RCC->DCKCFGR1 |= RCC_DCKCFGR1_PLLSAIDIVR_0; /* Divide by 4 */
     }
 #endif
 
 #if defined(RCC_DCKCFGR_PLLSAIDIVR)
-    if (IS_USED(MODULE_PERIPH_LTDC)) {
+    if (MODULE_PERIPH_LTDC) {
         RCC->DCKCFGR &= ~RCC_DCKCFGR_PLLSAIDIVR;
         RCC->DCKCFGR |= RCC_DCKCFGR_PLLSAIDIVR_0; /* Divide by 4 */
     }

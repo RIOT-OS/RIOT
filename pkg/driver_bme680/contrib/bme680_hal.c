@@ -27,10 +27,10 @@
 #include "bme680_hal.h"
 #include "irq.h"
 
-#ifdef MODULE_PERIPH_I2C
+#if MODULE_PERIPH_I2C
 #include "periph/i2c.h"
 #endif
-#ifdef MODULE_PERIPH_SPI
+#if MODULE_PERIPH_SPI
 #include "periph/spi.h"
 #endif
 
@@ -49,7 +49,7 @@ void bme680_ms_sleep(uint32_t msleep)
     ztimer_sleep(ZTIMER_MSEC, msleep);
 }
 
-#ifdef MODULE_PERIPH_I2C
+#if MODULE_PERIPH_I2C
 int8_t bme680_i2c_read_hal(uint8_t dev_id, uint8_t reg_addr,
                            uint8_t *data, uint16_t len)
 {
@@ -79,7 +79,7 @@ int8_t bme680_i2c_write_hal(uint8_t dev_id, uint8_t reg_addr,
 }
 #endif /* MODULE_PERIPH_I2C */
 
-#ifdef MODULE_PERIPH_SPI
+#if MODULE_PERIPH_SPI
 int8_t bme680_spi_read_hal(uint8_t dev_id, uint8_t reg_addr,
                            uint8_t *data, uint16_t len)
 {

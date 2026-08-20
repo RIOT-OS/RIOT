@@ -17,7 +17,7 @@
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-#define USED_BANDS (IS_USED(MODULE_AT86RF215_SUBGHZ) + IS_USED(MODULE_AT86RF215_24GHZ))
+#define USED_BANDS (MODULE_AT86RF215_SUBGHZ + MODULE_AT86RF215_24GHZ)
 
 #include "log.h"
 #include "board.h"
@@ -67,14 +67,14 @@ void auto_init_at86rf215(void)
         gnrc_netif_t *netif_09 = NULL;
         gnrc_netif_t *netif_24 = NULL;
 
-        if (IS_USED(MODULE_AT86RF215_SUBGHZ)) {
+        if (MODULE_AT86RF215_SUBGHZ) {
             dev_09   = &at86rf215_devs[i];
             stack_09 = &_at86rf215_stacks[i];
             netif_09 = &_netif[i];
             ++i;
         }
 
-        if (IS_USED(MODULE_AT86RF215_24GHZ)) {
+        if (MODULE_AT86RF215_24GHZ) {
             dev_24   = &at86rf215_devs[i];
             stack_24 = &_at86rf215_stacks[i];
             netif_24 = &_netif[i];

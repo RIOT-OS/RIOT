@@ -29,7 +29,7 @@ extern "C" {
  * @name    Set default configuration parameters for the MH-Z19
  * @{
  */
-#ifdef MODULE_MHZ19_UART
+#if MODULE_MHZ19_UART
 #ifndef MHZ19_PARAM_UART_DEV
 #define MHZ19_PARAM_UART_DEV        UART_DEV(1)
 #endif
@@ -39,7 +39,7 @@ extern "C" {
 #endif
 #endif /* MODULE_MHZ19_UART */
 
-#ifdef MODULE_MHZ19_PWM
+#if MODULE_MHZ19_PWM
 #ifndef MHZ19_PARAM_PIN
 #define MHZ19_PARAM_PIN (GPIO_PIN(0, 0))
 #endif

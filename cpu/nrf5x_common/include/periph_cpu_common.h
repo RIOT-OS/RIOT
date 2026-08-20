@@ -391,7 +391,7 @@ typedef struct {
 #endif
     gpio_t rx_pin;          /**< RX pin */
     gpio_t tx_pin;          /**< TX pin */
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
     gpio_t rts_pin;         /**< RTS pin */
     gpio_t cts_pin;         /**< CTS pin */
 #endif

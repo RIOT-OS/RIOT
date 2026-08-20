@@ -50,20 +50,20 @@
 
 #include "modules.h"
 #include "timex.h"
-#ifdef MODULE_CORE_MSG
+#if MODULE_CORE_MSG
 #include "msg.h"
 #endif /* MODULE_CORE_MSG */
 #include "mutex.h"
 #include "sched.h"
 #include "rmutex.h"
 
-#if IS_USED(MODULE_ZTIMER64_XTIMER_COMPAT)
+#if MODULE_ZTIMER64_XTIMER_COMPAT
 #include "ztimer64/xtimer_compat.h" /* IWYU pragma: export */
-#elif IS_USED(MODULE_ZTIMER_XTIMER_COMPAT)
+#elif MODULE_ZTIMER_XTIMER_COMPAT
 #include "ztimer/xtimer_compat.h" /* IWYU pragma: export */
 #else
 #include "board.h"
-#if !IS_USED(MODULE_XTIMER_ON_ZTIMER)
+#if !MODULE_XTIMER_ON_ZTIMER
 #include "periph_conf.h"
 #endif
 
@@ -445,7 +445,7 @@ int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us);
  */
 int xtimer_rmutex_lock_timeout(rmutex_t *rmutex, uint64_t us);
 
-#if defined(MODULE_CORE_THREAD_FLAGS) || defined(DOXYGEN)
+#if MODULE_CORE_THREAD_FLAGS || defined(DOXYGEN)
 
 /**
  * @brief    Set timeout thread flag after @p timeout
@@ -479,7 +479,7 @@ void xtimer_set_timeout_flag64(xtimer_t *t, uint64_t timeout);
  */
 uint64_t xtimer_left_usec(const xtimer_t *timer);
 
-#if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
+#if MODULE_CORE_MSG || defined(DOXYGEN)
 /**
  * @brief Set a timer that sends a message
  *
@@ -610,14 +610,14 @@ static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout);
  */
 #define XTIMER_HZ_BASE (1000000ul)
 
-#if !defined(XTIMER_HZ) && !defined(MODULE_XTIMER_ON_ZTIMER)
+#if !defined(XTIMER_HZ) && !MODULE_XTIMER_ON_ZTIMER
 /**
  * @brief  Frequency of the underlying hardware timer
  */
 #define XTIMER_HZ XTIMER_HZ_BASE
 #endif
 
-#if !defined(XTIMER_SHIFT) && !defined(MODULE_XTIMER_ON_ZTIMER)
+#if !defined(XTIMER_SHIFT) && !MODULE_XTIMER_ON_ZTIMER
 #if (XTIMER_HZ == 32768ul)
 /* No shift necessary, the conversion is not a power of two and is handled by
  * functions in tick_conversion.h */
@@ -654,7 +654,7 @@ static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout);
 #else
 #error "XTIMER_SHIFT cannot be derived for given XTIMER_HZ, verify settings!"
 #endif
-#elif !defined(MODULE_XTIMER_ON_ZTIMER)
+#elif !MODULE_XTIMER_ON_ZTIMER
 #error "XTIMER_SHIFT is set relative to XTIMER_HZ, no manual define required!"
 #endif
 

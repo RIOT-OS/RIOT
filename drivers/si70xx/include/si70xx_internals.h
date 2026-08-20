@@ -50,23 +50,23 @@ extern "C" {
  * @name Si70xx register values.
  * @{
  */
-#if defined(MODULE_SI7006)
+#if MODULE_SI7006
 #define SI70XX_ID                   (6)
-#elif defined(MODULE_SI7013)
+#elif MODULE_SI7013
 #define SI70XX_ID                   (13)
-#elif defined(MODULE_SI7020)
+#elif MODULE_SI7020
 #define SI70XX_ID                   (20)
-#elif defined(MODULE_SI7021)
+#elif MODULE_SI7021
 #define SI70XX_ID                   (21)
-#elif defined(MODULE_SI7050)
+#elif MODULE_SI7050
 #define SI70XX_ID                   (50)
-#elif defined(MODULE_SI7051)
+#elif MODULE_SI7051
 #define SI70XX_ID                   (51)
-#elif defined(MODULE_SI7053)
+#elif MODULE_SI7053
 #define SI70XX_ID                   (53)
-#elif defined(MODULE_SI7054)
+#elif MODULE_SI7054
 #define SI70XX_ID                   (54)
-#elif defined(MODULE_SI7055)
+#elif MODULE_SI7055
 #define SI70XX_ID                   (55)
 #else
 #error "Please provide a valid Si70xx variant (Si7006/13/20/21/5X)"

@@ -19,3 +19,7 @@ ifneq (,$(filter lv_drivers_sdl,$(USEMODULE)))
     sdl2-config --cflags | tr ' ' '\n' | grep '^-I' | cut -c3- | head -n1))
   CFLAGS += -DSDL_INCLUDE_PATH="<$(SDL_INCLUDE_PATH)/SDL.h>"
 endif
+
+MODULE_DEFS_NEEDED += \
+  lv_drivers_sdl \
+  #

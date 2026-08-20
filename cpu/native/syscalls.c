@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-#ifdef MODULE_LIBC_GETTIMEOFDAY
+#if MODULE_LIBC_GETTIMEOFDAY
 # include <sys/time.h>
 #endif
 #include <ifaddrs.h>
@@ -32,7 +32,7 @@
 
 #include "cpu.h"
 #include "irq.h"
-#ifdef MODULE_LIBC_GETTIMEOFDAY
+#if MODULE_LIBC_GETTIMEOFDAY
 # include "time_units.h"
 # include "ztimer64.h"
 #endif
@@ -115,7 +115,7 @@ void *malloc(size_t size)
     _native_syscall_enter();
     r = real_malloc(size);
     _native_syscall_leave();
-    if (IS_USED(MODULE_MALLOC_MONITOR)) {
+    if (MODULE_MALLOC_MONITOR) {
         malloc_monitor_add(r, size, cpu_get_caller_pc(), "m");
     }
     return r;
@@ -126,7 +126,7 @@ void free(void *ptr)
     _native_syscall_enter();
     real_free(ptr);
     _native_syscall_leave();
-    if (IS_USED(MODULE_MALLOC_MONITOR)) {
+    if (MODULE_MALLOC_MONITOR) {
         malloc_monitor_rm(ptr, cpu_get_caller_pc());
     }
 }
@@ -153,7 +153,7 @@ void *calloc(size_t nmemb, size_t size)
     _native_syscall_enter();
     r = real_calloc(nmemb, size);
     _native_syscall_leave();
-    if (IS_USED(MODULE_MALLOC_MONITOR)) {
+    if (MODULE_MALLOC_MONITOR) {
         malloc_monitor_add(r, nmemb*size, cpu_get_caller_pc(), "c");
     }
     return r;
@@ -165,7 +165,7 @@ void *realloc(void *ptr, size_t size)
     _native_syscall_enter();
     r = real_realloc(ptr, size);
     _native_syscall_leave();
-    if (IS_USED(MODULE_MALLOC_MONITOR)) {
+    if (MODULE_MALLOC_MONITOR) {
         malloc_monitor_mv(ptr, r, size, cpu_get_caller_pc());
     }
     return r;
@@ -176,7 +176,7 @@ ssize_t _native_read(int fd, void *buf, size_t count)
 {
     ssize_t r;
 
-    if (fd == STDIN_FILENO && IS_USED(MODULE_STDIN)) {
+    if (fd == STDIN_FILENO && MODULE_STDIN) {
         return stdio_read(buf, count);
     }
 
@@ -236,7 +236,7 @@ ssize_t _native_writev(int fd, const struct iovec *iov, int iovcnt)
 #if defined(__FreeBSD__)
 #undef putchar
 #endif
-#ifndef MODULE_STDIO_NULL
+#if !MODULE_STDIO_NULL
 int putchar(int c)
 {
     char tmp = c;
@@ -340,7 +340,7 @@ char *make_message(const char *format, va_list argp)
     }
 }
 
-#ifndef MODULE_STDIO_NULL
+#if !MODULE_STDIO_NULL
 int printf(const char *format, ...)
 {
     int r;
@@ -468,7 +468,7 @@ int getpid(void)
     return real_getpid();
 }
 
-#if (IS_USED(MODULE_LIBC_GETTIMEOFDAY))
+#if (MODULE_LIBC_GETTIMEOFDAY)
 int _gettimeofday(struct timeval *tp, void *restrict tzp)
 {
     (void)tzp;

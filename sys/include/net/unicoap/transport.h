@@ -14,7 +14,7 @@
 #include "uri_parser.h"
 #include "modules.h"
 
-#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
+#if MODULE_UNICOAP_SOCK_SUPPORT || defined(DOXYGEN)
 #  include "net/sock.h"
 #  include "net/sock/async/event.h"
 #  include "net/sock/util.h"
@@ -22,11 +22,11 @@
 #  include "net/sock/tcp.h"
 #endif
 
-#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS) || defined(DOXYGEN)
+#if MODULE_UNICOAP_DRIVER_DTLS || defined(DOXYGEN)
 #  include "net/sock/dtls.h"
 #endif
 
-#if IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX) || defined(DOXYGEN)
+#if MODULE_UNICOAP_DRIVER_SLIPMUX || defined(DOXYGEN)
 #  include "slipdev.h"
 #endif
 
@@ -207,7 +207,7 @@ typedef struct {
     union {
         /* union members are guaranteed to start at offset zero */
 
-#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
+#if MODULE_UNICOAP_SOCK_SUPPORT || defined(DOXYGEN)
         /** @brief Transport layer endpoint */
         struct _sock_tl_ep _tl_ep;
 
@@ -218,15 +218,15 @@ typedef struct {
 
         /** @brief RIOT sock DTLS endpoint */
         sock_udp_ep_t dtls_ep;
-#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN) */
-#if IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX) || defined(DOXYGEN)
+#endif /* MODULE_UNICOAP_SOCK_SUPPORT || defined(DOXYGEN) */
+#if MODULE_UNICOAP_DRIVER_SLIPMUX || defined(DOXYGEN)
         slipdev_t *slipmux_ep;
-#endif /* IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX) || defined(DOXYGEN) */
+#endif /* MODULE_UNICOAP_DRIVER_SLIPMUX || defined(DOXYGEN) */
         /* MARK: unicoap_driver_extension_point */
     };
 } unicoap_endpoint_t;
 
-#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
+#if MODULE_UNICOAP_SOCK_SUPPORT || defined(DOXYGEN)
 /**
  * @brief Retrieves UDP endpoint from CoAP endpoint
  * @pre @p endpoint is a CoAP over UDP endpoint (proto == @ref UNICOAP_PROTO_UDP)
@@ -272,7 +272,7 @@ static inline struct _sock_tl_ep* _unicoap_endpoint_get_tl(unicoap_endpoint_t* e
     return &endpoint->_tl_ep;
 }
 #  endif /* !defined(DOXYGEN) */
-#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN) */
+#endif /* MODULE_UNICOAP_SOCK_SUPPORT || defined(DOXYGEN) */
 /** @} */
 
 /* MARK: - Conversions and Tools */
@@ -315,7 +315,7 @@ bool unicoap_endpoint_is_multicast(const unicoap_endpoint_t* endpoint);
  *
  * @param[in] ep Transport layer endpoint
  */
-#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
+#if MODULE_UNICOAP_SOCK_SUPPORT || defined(DOXYGEN)
 void unicoap_print_sock_tl_ep(const struct _sock_tl_ep* ep);
 #else
 static inline void unicoap_print_sock_tl_ep(const void* ep)
@@ -343,7 +343,7 @@ void unicoap_print_endpoint(const unicoap_endpoint_t* endpoint);
  * @{
  */
 /** @brief Returns the internal UDP socket */
-#if IS_USED(MODULE_UNICOAP_DRIVER_UDP) || defined(DOXYGEN)
+#if MODULE_UNICOAP_DRIVER_UDP || defined(DOXYGEN)
 sock_udp_t* unicoap_transport_udp_get_socket(void);
 #else
 static inline
@@ -353,7 +353,7 @@ void* unicoap_transport_udp_get_socket(void)
 }
 #endif
 
-#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
+#if MODULE_UNICOAP_SOCK_SUPPORT || defined(DOXYGEN)
 /* sock_udp_t requires an implementation which is not present if someone uses unicoap
  * without a driver, i.e., just message APIs. In this case, unicoap_sock_support is not imported. */
 
@@ -369,7 +369,7 @@ void* unicoap_transport_udp_get_socket(void)
  *
  * @returns `0` on success or negative error value otherwise.
  */
-#  if IS_USED(MODULE_UNICOAP_DRIVER_UDP) || defined(DOXYGEN)
+#  if MODULE_UNICOAP_DRIVER_UDP || defined(DOXYGEN)
 int unicoap_transport_udp_add_socket(sock_udp_t* socket, sock_udp_ep_t* local);
 #  else
 static inline
@@ -389,7 +389,7 @@ int unicoap_transport_udp_add_socket(sock_udp_t* socket, sock_udp_ep_t* local)
  *
  * @returns `0`, indicating a success. Future versions of this API may return a negative error.
  */
-#  if IS_USED(MODULE_UNICOAP_DRIVER_UDP) || defined(DOXYGEN)
+#  if MODULE_UNICOAP_DRIVER_UDP || defined(DOXYGEN)
 int unicoap_transport_udp_remove_socket(sock_udp_t* socket);
 #  else
 static inline
@@ -399,7 +399,7 @@ int unicoap_transport_udp_remove_socket(sock_udp_t* socket)
     return 0;
 }
 #  endif
-#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN) */
+#endif /* MODULE_UNICOAP_SOCK_SUPPORT || defined(DOXYGEN) */
 /** @} */
 /** @} */
 
@@ -413,7 +413,7 @@ int unicoap_transport_udp_remove_socket(sock_udp_t* socket)
  * @{
  */
 /** @brief Returns the internal DTLS socket */
-#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS) || defined(DOXYGEN)
+#if MODULE_UNICOAP_DRIVER_DTLS || defined(DOXYGEN)
 sock_dtls_t* unicoap_transport_dtls_get_socket(void);
 #else
 static inline
@@ -423,7 +423,7 @@ void* unicoap_transport_dtls_get_socket(void)
 }
 #endif
 
-#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN)
+#if MODULE_UNICOAP_SOCK_SUPPORT || defined(DOXYGEN)
 /* sock_udp_t requires an implementation which is not present if someone uses unicoap
  * without a driver, i.e., just message APIs. In this case, unicoap_sock_support is not imported. */
 
@@ -441,7 +441,7 @@ void* unicoap_transport_dtls_get_socket(void)
  * @returns `0` on success or negative error value otherwise. The error value depends on the
  * DTLS implementation.
  */
-#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS) || defined(DOXYGEN)
+#  if MODULE_UNICOAP_DRIVER_DTLS || defined(DOXYGEN)
 int unicoap_transport_dtls_add_socket(sock_dtls_t* socket, sock_udp_t* base_socket,
                                       sock_udp_ep_t* local);
 #  else
@@ -464,7 +464,7 @@ int unicoap_transport_dtls_add_socket(void* socket, void* base_socket, void* loc
  * @returns `0`, indicating a success. Future versions of this API may return a negative error.
  *
  */
-#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS) || defined(DOXYGEN)
+#  if MODULE_UNICOAP_DRIVER_DTLS || defined(DOXYGEN)
 int unicoap_transport_dtls_remove_socket(sock_dtls_t* socket);
 #  else
 static inline
@@ -474,7 +474,7 @@ int unicoap_transport_dtls_remove_socket(void* socket)
     return 0;
 }
 #  endif
-#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN) */
+#endif /* MODULE_UNICOAP_SOCK_SUPPORT || defined(DOXYGEN) */
 /** @} */
 
 /* MARK: - Utils */

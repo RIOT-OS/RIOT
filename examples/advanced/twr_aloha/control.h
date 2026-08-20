@@ -48,7 +48,7 @@ extern "C" {
  * @brief   uwb rng data structure
  */
 typedef struct uwb_core_rng_data_t {
-#if IS_USED(MODULE_UWB_CORE_RNG_TRX_INFO)
+#if MODULE_UWB_CORE_RNG_TRX_INFO
     float tof;              /**< range request time of flight */
     float los;              /**< range request line of sight estimation [0..1] */
     float fppl;             /**< range request first path phase loss */
@@ -57,7 +57,7 @@ typedef struct uwb_core_rng_data_t {
     int32_t d_cm;           /**< range request range estimation (cm) */
     uint16_t src;           /**< source short address */
     uint16_t dest;          /**< destination short address */
-#if IS_USED(MODULE_UWB_CORE_RNG_TRX_INFO)
+#if MODULE_UWB_CORE_RNG_TRX_INFO
     int16_t rssi;           /**< range request rssi */
 #endif
 } uwb_core_rng_data_t;

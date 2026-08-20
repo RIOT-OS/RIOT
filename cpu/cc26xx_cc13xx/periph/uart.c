@@ -36,7 +36,7 @@
 /**
  * @brief   Get the enable mask depending on enabled HW flow control
  */
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
 #define ENABLE_MASK         (UART_CTSEN | UART_CTL_RTSEN | \
                              UART_CTL_RXE | UART_CTL_TXE | UART_CTL_UARTEN)
 #else
@@ -56,7 +56,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     int tx_pin = uart_config[uart].tx_pin;
     int rx_pin = uart_config[uart].rx_pin;
     int intn = uart_config[uart].intn;
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
     int rts_pin = uart_config[uart].rts_pin;
     int cts_pin = uart_config[uart].cts_pin;
 #endif
@@ -89,7 +89,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     if (uart == 0) {
         IOC->CFG[tx_pin] =  IOCFG_PORTID_UART0_TX;
         IOC->CFG[rx_pin] = (IOCFG_PORTID_UART0_RX | IOCFG_INPUT_ENABLE);
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         if (rts_pin != GPIO_UNDEF && cts_pin != GPIO_UNDEF) {
             IOC->CFG[rts_pin] =  IOCFG_PORTID_UART0_RTS;
             IOC->CFG[cts_pin] = (IOCFG_PORTID_UART0_CTS | IOCFG_INPUT_ENABLE);
@@ -100,7 +100,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     else if (uart == 1) {
         IOC->CFG[tx_pin] =  IOCFG_PORTID_UART1_TX;
         IOC->CFG[rx_pin] = (IOCFG_PORTID_UART1_RX | IOCFG_INPUT_ENABLE);
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         if (rts_pin != GPIO_UNDEF && cts_pin != GPIO_UNDEF) {
             IOC->CFG[rts_pin] =  IOCFG_PORTID_UART1_RTS;
             IOC->CFG[cts_pin] = (IOCFG_PORTID_UART1_CTS | IOCFG_INPUT_ENABLE);
@@ -129,7 +129,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     return UART_OK;
 }
 
-#ifdef MODULE_PERIPH_UART_MODECFG
+#if MODULE_PERIPH_UART_MODECFG
 int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
               uart_stop_bits_t stop_bits)
 {

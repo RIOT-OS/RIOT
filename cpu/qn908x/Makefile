@@ -1,6 +1,10 @@
 # define the module that is build
 MODULE = cpu
 
+MODULE_DEFS_NEEDED += \
+  periph_wdt \
+  #
+
 # add a list of subdirectories that should also be built
 DIRS = periph $(RIOTCPU)/cortexm_common vendor
 

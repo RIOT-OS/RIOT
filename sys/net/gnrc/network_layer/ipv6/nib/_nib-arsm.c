@@ -21,7 +21,7 @@
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/netreg.h"
-#ifdef MODULE_GNRC_SIXLOWPAN_ND
+#if MODULE_GNRC_SIXLOWPAN_ND
 #include "net/gnrc/sixlowpan/nd.h"
 #endif  /* MODULE_GNRC_SIXLOWPAN_ND */
 
@@ -39,7 +39,7 @@ void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
 {
     gnrc_pktsnip_t *ext_opt = NULL;
 
-#ifdef MODULE_GNRC_SIXLOWPAN_ND
+#if MODULE_GNRC_SIXLOWPAN_ND
     assert(netif != NULL);
     _nib_dr_entry_t *dr = _nib_drl_get(NULL, netif->pid);
 

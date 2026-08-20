@@ -11,7 +11,7 @@
  * @author  Frank Hessel <frank@fhessel.de>
  */
 
-#ifdef MODULE_PERIPH_SPIDEV_LINUX
+#if MODULE_PERIPH_SPIDEV_LINUX
 
 #include <assert.h>
 #include <fcntl.h>
@@ -28,7 +28,7 @@
 
 #include "native_internal.h"
 #include "spidev_linux.h"
-#ifdef MODULE_PERIPH_GPIO
+#if MODULE_PERIPH_GPIO
 #include "periph/gpio.h"
 #endif
 
@@ -43,7 +43,7 @@
 /**
  * @brief true, if x is a gpio-based chip select line
  */
-#ifdef MODULE_PERIPH_GPIO
+#if MODULE_PERIPH_GPIO
 #define IS_GPIO_CS(x) (x < UINT_MAX - SPI_MAXCS)
 #else
 #define IS_GPIO_CS(x) (0)
@@ -228,7 +228,7 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
         return SPI_NOCS;
     }
     else if (IS_GPIO_CS(cs)) {
-#ifdef MODULE_PERIPH_GPIO
+#if MODULE_PERIPH_GPIO
         if (gpio_init(cs, GPIO_OUT) < 0) {
             return SPI_NOCS;
         }
@@ -302,7 +302,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         .speed_hz = 0,
     };
 
-#ifdef MODULE_PERIPH_GPIO
+#if MODULE_PERIPH_GPIO
     if (IS_GPIO_CS(cs)) {
         DEBUG("spi_transfer_bytes: using GPIO-based CS\n");
         gpio_clear(cs);
@@ -316,7 +316,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         DEBUG("spi_transfer_bytes: transferred %zu bytes\n", len);
     }
 
-#ifdef MODULE_PERIPH_GPIO
+#if MODULE_PERIPH_GPIO
     if (IS_GPIO_CS(cs) && !cont) {
         gpio_set(cs);
     }

@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  auto_init \
+  #
 BOARD ?= samr21-xpro
 include ../Makefile.pkg_common
 

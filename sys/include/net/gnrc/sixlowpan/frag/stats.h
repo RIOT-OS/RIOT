@@ -33,7 +33,7 @@ typedef struct {
                              *   no @ref gnrc_sixlowpan_frag_fb_t available */
     unsigned datagrams;     /**< reassembled datagrams */
     unsigned fragments;     /**< total fragments of reassembled fragments */
-#if defined(MODULE_GNRC_SIXLOWPAN_FRAG_VRB) || DOXYGEN
+#if MODULE_GNRC_SIXLOWPAN_FRAG_VRB || DOXYGEN
     unsigned vrb_full;      /**< counts the number of events where the virtual
                              *   reassembly buffer is full */
 #endif

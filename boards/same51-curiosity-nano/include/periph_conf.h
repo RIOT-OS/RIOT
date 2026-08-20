@@ -130,13 +130,13 @@ static const uart_conf_t uart_config[] = {
         .dev      = &SERCOM4->USART,
         .rx_pin   = GPIO_PIN(PB, 13),
         .tx_pin   = GPIO_PIN(PB, 12),
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .rts_pin  = GPIO_PIN(PB, 14),
         .cts_pin  = GPIO_PIN(PB, 15),
 #endif
         .mux      = GPIO_MUX_C,
         .rx_pad   = UART_PAD_RX_1,
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .tx_pad   = UART_PAD_TX_0_RTS_2_CTS_3,
 #else
         .tx_pad   = UART_PAD_TX_0,
@@ -148,13 +148,13 @@ static const uart_conf_t uart_config[] = {
         .dev      = &SERCOM0->USART,
         .rx_pin   = GPIO_PIN(PA, 9),
         .tx_pin   = GPIO_PIN(PA, 8),
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .rts_pin  = GPIO_PIN(PA, 10),
         .cts_pin  = GPIO_PIN(PA, 10),
 #endif
         .mux      = GPIO_MUX_C,
         .rx_pad   = UART_PAD_RX_1,
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .tx_pad   = UART_PAD_TX_0_RTS_2_CTS_3,
 #else
         .tx_pad   = UART_PAD_TX_0,
@@ -235,7 +235,7 @@ static const spi_conf_t spi_config[] = {
         .miso_pad = SPI_PAD_MISO_3,
         .mosi_pad = SPI_PAD_MOSI_0_SCK_1,
         .gclk_src = SAM0_GCLK_PERIPH,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_trigger = SERCOM1_DMAC_ID_TX,
         .rx_trigger = SERCOM1_DMAC_ID_RX,
 #endif

@@ -11,3 +11,8 @@ PROGRAMMERS_SUPPORTED += openocd
 # The board can become un-flashable after some execution,
 # use connect_assert_srst to always be able to flash or reset the board.
 OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  periph_init_led0 \
+  #

@@ -82,24 +82,24 @@ int vl6180x_init(vl6180x_t *dev, const vl6180x_params_t *params)
 
     DEBUG_DEV("params=%p", dev, params);
 
-#if IS_USED(MODULE_VL6180X_RNG)
+#if MODULE_VL6180X_RNG
     ASSERT_PARAM(params->rng_max_time > 0 && params->rng_max_time < 64);
 #endif
-#if IS_USED(MODULE_VL6180X_ALS)
+#if MODULE_VL6180X_ALS
     ASSERT_PARAM(params->als_int_time > 0 && params->als_int_time < 512);
 #endif
 
     /* init sensor data structure */
     dev->params = *params;
 
-#if IS_USED(MODULE_VL6180X_SHUTDOWN)
+#if MODULE_VL6180X_SHUTDOWN
     /* if shutdown is used, the pin nust not be undefined */
     ASSERT_PARAM(gpio_is_valid(params->shutdown_pin));
 
     /* shutdown pin is initialized and set to HIGH */
     gpio_init(params->shutdown_pin, GPIO_OUT);
     gpio_write(params->shutdown_pin, 1);
-#endif /* IS_USED(MODULE_VL6180X_SHUTDOWN) */
+#endif /* MODULE_VL6180X_SHUTDOWN */
 
     /* init the sensor and start measurement if periodic measurements used */
     return _init(dev);
@@ -118,7 +118,7 @@ int vl6180x_start_cont(vl6180x_t *dev)
 
     _acquire(dev);
 
-#if IS_USED(MODULE_VL6180X_ALS)
+#if MODULE_VL6180X_ALS
     res |= _read(dev, VL6180X_REG_ALS_STATUS, &status, 1);
     if ((status & VL6180X_ALS_DEVICE_RDY) == 0) {
         res |= _write_byte(dev, VL6180X_REG_ALS_START, VL6180X_ALS_START_STOP);
@@ -136,10 +136,10 @@ int vl6180x_start_cont(vl6180x_t *dev)
      * period is then used for both measurements.
      */
     res |= _write_byte(dev, VL6180X_REG_INTERLEAVED_MODE,
-                            IS_USED(MODULE_VL6180X_RNG));
+                            MODULE_VL6180X_RNG);
     res |= _write_byte(dev, VL6180X_REG_ALS_START,
                             VL6180X_ALS_START_STOP | VL6180X_ALS_MODE_CONT);
-#elif IS_USED(MODULE_VL6180X_RNG)
+#elif MODULE_VL6180X_RNG
     res |= _read(dev, VL6180X_REG_RNG_STATUS, &status, 1);
     if ((status & VL6180X_RNG_DEVICE_RDY) == 0) {
         res |= _write_byte(dev, VL6180X_REG_RNG_START, VL6180X_RNG_START_STOP);
@@ -157,7 +157,7 @@ int vl6180x_start_cont(vl6180x_t *dev)
     res |= _write_byte(dev, VL6180X_REG_INTERLEAVED_MODE, 0);
     res |= _write_byte(dev, VL6180X_REG_RNG_START,
                             VL6180X_RNG_START_STOP | VL6180X_RNG_MODE_CONT);
-#endif /* IS_USED(MODULE_VL6180X_ALS) */
+#endif /* MODULE_VL6180X_ALS */
 
     _release(dev);
 
@@ -179,7 +179,7 @@ int vl6180x_stop_cont(vl6180x_t *dev)
 
     _acquire(dev);
 
-#if IS_USED(MODULE_VL6180X_ALS)
+#if MODULE_VL6180X_ALS
     res |= _read(dev, VL6180X_REG_ALS_STATUS, &status, 1);
     if ((status & VL6180X_ALS_DEVICE_RDY) == 0) {
         /* stop only when device is not ready, otherwise it is already stopped */
@@ -190,7 +190,7 @@ int vl6180x_stop_cont(vl6180x_t *dev)
         res |= _read(dev, VL6180X_REG_ALS_STATUS, &status, 1);
     } while ((res != VL6180X_OK) || ((status & VL6180X_ALS_DEVICE_RDY) == 0));
 
-#elif IS_USED(MODULE_VL6180X_RNG)
+#elif MODULE_VL6180X_RNG
     res |= _read(dev, VL6180X_REG_RNG_STATUS, &status, 1);
     if ((status & VL6180X_RNG_DEVICE_RDY) == 0) {
         /* stop only when device is not ready, otherwise it is already stopped */
@@ -210,7 +210,7 @@ int vl6180x_stop_cont(vl6180x_t *dev)
     return res;
 }
 
-#if IS_USED(MODULE_VL6180X_RNG)
+#if MODULE_VL6180X_RNG
 
 int vl6180x_rng_data_ready (const vl6180x_t *dev)
 {
@@ -283,7 +283,7 @@ int vl6180x_rng_start_single(const vl6180x_t *dev)
     return res;
 }
 
-#if IS_USED(MODULE_VL6180X_CONFIG)
+#if MODULE_VL6180X_CONFIG
 
 int vl6180x_rng_config(vl6180x_t *dev, uint8_t period, uint8_t max_time)
 {
@@ -316,10 +316,10 @@ int vl6180x_rng_config(vl6180x_t *dev, uint8_t period, uint8_t max_time)
     return res;
 }
 
-#endif /* IS_USED(MODULE_VL6180X_CONFIG) */
-#endif /* IS_USED(MODULE_VL6180X_RNG) */
+#endif /* MODULE_VL6180X_CONFIG */
+#endif /* MODULE_VL6180X_RNG */
 
-#if IS_USED(MODULE_VL6180X_ALS)
+#if MODULE_VL6180X_ALS
 
 int vl6180x_als_data_ready(const vl6180x_t *dev)
 {
@@ -415,7 +415,7 @@ int vl6180x_als_start_single(const vl6180x_t *dev)
     return res;
 }
 
-#if IS_USED(MODULE_VL6180X_CONFIG)
+#if MODULE_VL6180X_CONFIG
 
 int vl6180x_als_config(vl6180x_t *dev, uint8_t period, uint8_t int_time,
                        vl6180x_als_gain_t gain)
@@ -448,10 +448,10 @@ int vl6180x_als_config(vl6180x_t *dev, uint8_t period, uint8_t int_time,
 
     return res;
 }
-#endif /* IS_USED(MODULE_VL6180X_CONFIG) */
-#endif /* IS_USED(MODULE_VL6180X_ALS) */
+#endif /* MODULE_VL6180X_CONFIG */
+#endif /* MODULE_VL6180X_ALS */
 
-#if IS_USED(MODULE_VL6180X_SHUTDOWN)
+#if MODULE_VL6180X_SHUTDOWN
 int vl6180x_power_down(const vl6180x_t *dev)
 {
     ASSERT_PARAM(dev != NULL);
@@ -475,9 +475,9 @@ int vl6180x_power_up(vl6180x_t *dev)
 
     return VL6180X_OK;
 }
-#endif /* IS_USED(MODULE_VL6180X_SHUTDOWN) */
+#endif /* MODULE_VL6180X_SHUTDOWN */
 
-#if IS_USED(MODULE_VL6180X_IRQ)
+#if MODULE_VL6180X_IRQ
 
 static void _isr(void *lock)
 {
@@ -507,10 +507,10 @@ int vl6180x_int_wait(const vl6180x_t *dev, vl6180x_int_config_t *src)
 
     _acquire(dev);
     res = _read(dev, VL6180X_REG_INT_STATUS, &byte, 1);
-#if IS_USED(MODULE_VL6180X_RNG)
+#if MODULE_VL6180X_RNG
     src->rng_int = (byte & VL6180X_INT_RNG) >> VL6180X_INT_RNG_S;
 #endif
-#if IS_USED(MODULE_VL6180X_ALS)
+#if MODULE_VL6180X_ALS
     src->als_int = (byte & VL6180X_INT_ALS) >> VL6180X_INT_ALS_S;
 #endif
 
@@ -521,7 +521,7 @@ int vl6180x_int_wait(const vl6180x_t *dev, vl6180x_int_config_t *src)
     return res;
 }
 
-#if IS_USED(MODULE_VL6180X_CONFIG)
+#if MODULE_VL6180X_CONFIG
 int vl6180x_int_enable(vl6180x_t *dev, vl6180x_int_config_t mode)
 {
     ASSERT_PARAM(dev != NULL);
@@ -530,10 +530,10 @@ int vl6180x_int_enable(vl6180x_t *dev, vl6180x_int_config_t mode)
     dev->params.int_cfg = mode;
 
     uint8_t byte = 0;
-#if IS_USED(MODULE_VL6180X_RNG)
+#if MODULE_VL6180X_RNG
     byte |= (mode.rng_int << VL6180X_INT_RNG_S) & VL6180X_INT_RNG;
 #endif
-#if IS_USED(MODULE_VL6180X_ALS)
+#if MODULE_VL6180X_ALS
     byte |= (mode.als_int << VL6180X_INT_ALS_S) & VL6180X_INT_ALS;
 #endif
 
@@ -558,12 +558,12 @@ int vl6180x_int_config(vl6180x_t *dev, vl6180x_int_thresh_t thresh)
     int res = VL6180X_OK;
 
     _acquire(dev);
-#if IS_USED(MODULE_VL6180X_RNG)
+#if MODULE_VL6180X_RNG
     res |= _write_byte(dev, VL6180X_REG_RNG_THRESH_HI, thresh.rng_high);
     res |= _write_byte(dev, VL6180X_REG_RNG_THRESH_LO, thresh.rng_low);
 #endif
 
-#if IS_USED(MODULE_VL6180X_ALS)
+#if MODULE_VL6180X_ALS
     res |= _write_word(dev, VL6180X_REG_ALS_THRESH_HI, thresh.als_high);
     res |= _write_word(dev, VL6180X_REG_ALS_THRESH_LO, thresh.als_low);
 #endif
@@ -571,9 +571,9 @@ int vl6180x_int_config(vl6180x_t *dev, vl6180x_int_thresh_t thresh)
 
     return res;
 }
-#endif /* IS_USED(MODULE_VL6180X_CONFIG) */
+#endif /* MODULE_VL6180X_CONFIG */
 
-#endif /* IS_USED(MODULE_VL6180X_IRQ) */
+#endif /* MODULE_VL6180X_IRQ */
 
 int vl6180x_reg_read(const vl6180x_t *dev,
                      uint16_t reg, uint8_t *pdata, uint8_t len)
@@ -635,12 +635,12 @@ static int _is_available(const vl6180x_t *dev)
 
 static int _init(vl6180x_t *dev)
 {
-#if IS_USED(MODULE_VL6180X_RNG)
+#if MODULE_VL6180X_RNG
     dev->rng_status = VL6180X_RNG_OK;
-#endif /* IS_USED(MODULE_VL6180X_RNG) */
-#if IS_USED(MODULE_VL6180X_ALS)
+#endif /* MODULE_VL6180X_RNG */
+#if MODULE_VL6180X_ALS
     dev->als_status = VL6180X_ALS_OK;
-#endif /* IS_USED(MODULE_VL6180X_ALS) */
+#endif /* MODULE_VL6180X_ALS */
 
     dev->cont_meas = false;
 
@@ -667,35 +667,35 @@ static int _init(vl6180x_t *dev)
     /* set range measurement configuration */
     uint8_t rng_int = 0;
 
-#if IS_USED(MODULE_VL6180X_RNG)
-#if IS_USED(MODULE_VL6180X_IRQ)
+#if MODULE_VL6180X_RNG
+#if MODULE_VL6180X_IRQ
     res |= _write_byte(dev, VL6180X_REG_RNG_THRESH_HI, dev->params.int_thresh.rng_high);
     res |= _write_byte(dev, VL6180X_REG_RNG_THRESH_LO, dev->params.int_thresh.rng_low);
     rng_int = (dev->params.int_cfg.rng_int << VL6180X_INT_RNG_S) & VL6180X_INT_RNG;
 #else
     rng_int = VL6180X_INT_RNG_DRDY;
-#endif /* IS_USED(MODULE_VL6180X_IRQ) */
+#endif /* MODULE_VL6180X_IRQ */
     res |= _write_byte(dev, VL6180X_REG_RNG_PERIOD, dev->params.period - 1);
     res |= _write_byte(dev, VL6180X_REG_RNG_MAX_TIME, dev->params.rng_max_time);
-#endif /* IS_USED(MODULE_VL6180X_RNG) */
+#endif /* MODULE_VL6180X_RNG */
 
     /* set ALS measurement configuration */
     uint8_t als_int = 0;
 
-#if IS_USED(MODULE_VL6180X_ALS)
-#if IS_USED(MODULE_VL6180X_IRQ)
+#if MODULE_VL6180X_ALS
+#if MODULE_VL6180X_IRQ
     res |= _write_byte(dev, VL6180X_REG_ALS_THRESH_HI, dev->params.int_thresh.als_high);
     res |= _write_byte(dev, VL6180X_REG_ALS_THRESH_LO, dev->params.int_thresh.als_low);
     als_int = (dev->params.int_cfg.als_int << VL6180X_INT_ALS_S) & VL6180X_INT_ALS;
-#else  /* IS_USED(MODULE_VL6180X_IRQ) */
+#else  /* MODULE_VL6180X_IRQ */
     als_int = VL6180X_INT_ALS_DRDY;
-#endif /* IS_USED(MODULE_VL6180X_IRQ) */
+#endif /* MODULE_VL6180X_IRQ */
     res |= _write_byte(dev, VL6180X_REG_ALS_PERIOD, dev->params.period - 1);
     res |= _write_byte(dev, VL6180X_REG_ALS_INT_TIME, dev->params.als_int_time - 1);
     res |= _write_byte(dev, VL6180X_REG_ALS_GAIN, 0x40 + dev->params.als_gain);
-#endif /* IS_USED(MODULE_VL6180X_ALS) */
+#endif /* MODULE_VL6180X_ALS */
 
-#if IS_USED(MODULE_VL6180X_IRQ)
+#if MODULE_VL6180X_IRQ
     res |= _write_byte(dev, VL6180X_REG_GPIO1_MODE,
                             VL6180X_GPIO1_POL_LOW | VL6180X_GPIO1_FUNC_ON);
 #endif

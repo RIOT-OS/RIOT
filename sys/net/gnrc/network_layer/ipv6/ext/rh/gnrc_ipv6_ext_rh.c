@@ -22,7 +22,7 @@
 
 #include "net/gnrc/icmpv6/error.h"
 
-#ifdef MODULE_GNRC_RPL_SRH
+#if MODULE_GNRC_RPL_SRH
 #include "net/gnrc/rpl/srh.h"
 #endif
 
@@ -81,7 +81,7 @@ int gnrc_ipv6_ext_rh_process(gnrc_pktsnip_t *pkt)
     assert(ipv6 != NULL);
     hdr = ipv6->data;
     switch (ext->type) {
-#ifdef MODULE_GNRC_RPL_SRH
+#if MODULE_GNRC_RPL_SRH
         case IPV6_EXT_RH_TYPE_RPL_SRH:
             res = gnrc_rpl_srh_process(hdr, (gnrc_rpl_srh_t *)ext, &err_ptr);
             break;
@@ -98,7 +98,7 @@ int gnrc_ipv6_ext_rh_process(gnrc_pktsnip_t *pkt)
         case GNRC_IPV6_EXT_RH_AT_DST:
             break;
         default:
-#ifdef MODULE_GNRC_ICMPV6_ERROR
+#if MODULE_GNRC_ICMPV6_ERROR
             if (err_ptr) {
                 gnrc_icmpv6_error_param_prob_send(
                         ICMPV6_ERROR_PARAM_PROB_HDR_FIELD,

@@ -62,11 +62,11 @@ extern "C" {
  * @{
  */
 #ifndef SHT1X_SAULINFO
-#ifdef MODULE_SHT15
+#if MODULE_SHT15
 #define SHT1X_SAULINFO                { .name = "SHT15 temperature" }, \
                                       { .name = "SHT15 humidity" }
 #else
-#ifdef MODULE_SHT10
+#if MODULE_SHT10
 #define SHT1X_SAULINFO                { .name = "SHT10 temperature" }, \
                                       { .name = "SHT10 humidity" }
 #else

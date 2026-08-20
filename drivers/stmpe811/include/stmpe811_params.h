@@ -30,7 +30,7 @@ extern "C" {
  *
  * These default values are adapted for the @ref boards_stm32f429i-disc1 board
  */
-#if IS_USED(MODULE_STMPE811_SPI)
+#if MODULE_STMPE811_SPI
 /* SPI configuration */
 #ifndef STMPE811_PARAM_SPI_DEV
 #define STMPE811_PARAM_SPI_DEV        SPI_DEV(0)
@@ -65,7 +65,7 @@ extern "C" {
 #endif
 
 #ifndef STMPE811_PARAMS
-#if IS_USED(MODULE_STMPE811_SPI)
+#if MODULE_STMPE811_SPI
 #define STMPE811_PARAMS                { .spi = STMPE811_PARAM_SPI_DEV,     \
                                          .clk = STMPE811_PARAM_CLK,         \
                                          .cs = STMPE811_PARAM_CS,           \

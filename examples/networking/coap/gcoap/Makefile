@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  gcoap_dtls \
+  periph_rtc \
+  #
 # Default Makefile, for host native GNRC-based networking
 
 # name of your application

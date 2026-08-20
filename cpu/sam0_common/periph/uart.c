@@ -55,7 +55,7 @@
 /**
  * @brief   Allocate memory to store the callback functions & buffers
  */
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
 #include "tsrb.h"
 static tsrb_t uart_tx_rb[UART_NUMOF];
 static uint8_t uart_tx_rb_buf[UART_NUMOF][UART_TXBUF_SIZE];
@@ -158,7 +158,7 @@ static void _configure_pins(uart_t uart)
         gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
     }
 
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
     /* If RTS/CTS needed, enable them */
     if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
         /* Ensure RTS is defined */
@@ -199,7 +199,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* must disable here first to ensure idempotency */
     dev(uart)->CTRLA.reg = 0;
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
     tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
 #endif
@@ -276,7 +276,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
             dev(uart)->CTRLB.reg |= SERCOM_USART_CTRLB_SFDE;
         }
     }
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
 #ifndef UART_HAS_TX_ISR
     else {
         /* enable UART ISR */
@@ -317,7 +317,7 @@ void uart_deinit_pins(uart_t uart)
         gpio_disable_mux(uart_config[uart].tx_pin);
     }
 
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
     /* If RTS/CTS needed, enable them */
     if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
         /* Ensure RTS is defined */
@@ -334,7 +334,7 @@ void uart_deinit_pins(uart_t uart)
 
 gpio_t uart_pin_cts(uart_t uart)
 {
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
     if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
         return uart_config[uart].cts_pin;
     }
@@ -345,7 +345,7 @@ gpio_t uart_pin_cts(uart_t uart)
 
 gpio_t uart_pin_rts(uart_t uart)
 {
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
     if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
         return uart_config[uart].rts_pin;
     }
@@ -364,7 +364,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         return;
     }
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
     for (const void* end = data + len; data != end; ++data) {
         if (irq_is_in() || __get_PRIMASK()) {
             /* if ring buffer is full free up a spot */
@@ -449,7 +449,7 @@ void uart_poweroff(uart_t uart)
     sercom_clk_dis(dev(uart));
 }
 
-#ifdef MODULE_PERIPH_UART_COLLISION
+#if MODULE_PERIPH_UART_COLLISION
 bool uart_collision_detected(uart_t uart)
 {
     /* In case of collision, the CTRLB register
@@ -525,7 +525,7 @@ void uart_collision_detect_disable(uart_t uart)
 }
 #endif
 
-#ifdef MODULE_PERIPH_UART_MODECFG
+#if MODULE_PERIPH_UART_MODECFG
 int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
               uart_stop_bits_t stop_bits)
 {
@@ -579,7 +579,7 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 }
 #endif /* MODULE_PERIPH_UART_MODECFG */
 
-#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+#if MODULE_PERIPH_UART_RXSTART_IRQ
 void uart_rxstart_irq_configure(uart_t uart, uart_rxstart_cb_t cb, void *arg)
 {
     /* CTRLB is enable-proteced */
@@ -610,7 +610,7 @@ void uart_rxstart_irq_disable(uart_t uart)
 }
 #endif /* MODULE_PERIPH_UART_RXSTART_IRQ */
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
 static inline void irq_handler_tx(unsigned uartnum)
 {
     /* workaround for saml1x */
@@ -637,14 +637,14 @@ static inline void irq_handler(unsigned uartnum)
     /* TXC is used by uart_write() */
     dev(uartnum)->INTFLAG.reg = status & ~SERCOM_USART_INTFLAG_TXC;
 
-#if !defined(UART_HAS_TX_ISR) && defined(MODULE_PERIPH_UART_NONBLOCKING)
+#if !defined(UART_HAS_TX_ISR) && MODULE_PERIPH_UART_NONBLOCKING
     if ((status & SERCOM_USART_INTFLAG_DRE) &&
         (dev(uartnum)->INTENSET.reg & SERCOM_USART_INTENSET_DRE)) {
         irq_handler_tx(uartnum);
     }
 #endif
 
-#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+#if MODULE_PERIPH_UART_RXSTART_IRQ
     if ((status & SERCOM_USART_INTFLAG_RXS) &&
         (dev(uartnum)->INTENSET.reg & SERCOM_USART_INTENSET_RXS)) {
         uart_ctx[uartnum].rxs_cb(uart_ctx[uartnum].rxs_arg);
@@ -702,7 +702,7 @@ void UART_5_ISR(void)
 }
 #endif
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
 
 #ifdef UART_0_ISR_TX
 void UART_0_ISR_TX(void)

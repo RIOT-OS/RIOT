@@ -769,7 +769,7 @@ static inline bool unicoap_match_proto(unicoap_proto_set_t protocols, unicoap_pr
  * You must supply a constant initializer following the macro invocation.
  * The name you supply is needed for technical reasons but has otherwise no meaning.
  */
-#if IS_USED(MODULE_UNICOAP_SERVER_RESOURCE_DECLARATIONS) || defined(DOXYGEN)
+#if MODULE_UNICOAP_SERVER_RESOURCE_DECLARATIONS || defined(DOXYGEN)
 #  define UNICOAP_RESOURCE(name) \
       XFA_CONST(unicoap_resource_t, unicoap_resources_xfa, 0) CONCAT(unicoap_resource_, name) =
 #else

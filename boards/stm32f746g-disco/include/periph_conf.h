@@ -36,7 +36,7 @@
 #include "clk_conf.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
-#if defined(MODULE_PERIPH_USBDEV_HS_ULPI)
+#if MODULE_PERIPH_USBDEV_HS_ULPI
 #include "usbdev_synopsys_dwc2.h"
 #else
 #include "cfg_usb_otg_fs.h"
@@ -90,7 +90,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB2,
         .irqn       = USART1_IRQn,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma = 0,
         .dma_chan   = 4
 #endif
@@ -104,7 +104,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB2,
         .irqn       = USART6_IRQn,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma = 1,
         .dma_chan   = 5
 #endif
@@ -136,7 +136,7 @@ static const spi_conf_t spi_config[] = {
         .cs_af    = GPIO_AF5,
         .rccmask  = RCC_APB1ENR_SPI2EN,
         .apbbus   = APB1,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_dma   = 4,
         .tx_dma_chan = 0,
         .rx_dma   = 3,
@@ -268,7 +268,7 @@ static const ltdc_conf_t ltdc_config = {
 };
 /** @} */
 
-#if defined(MODULE_PERIPH_USBDEV_HS_ULPI) || DOXYGEN
+#if MODULE_PERIPH_USBDEV_HS_ULPI || DOXYGEN
 /**
  * @name USB OTG FS configuration using ULPI HS PHY
  *
@@ -316,7 +316,7 @@ static const dwc2_usb_otg_fshs_config_t dwc2_usb_otg_fshs_config[] = {
 #define USBDEV_NUMOF           ARRAY_SIZE(dwc2_usb_otg_fshs_config)
 
 /** @} */
-#endif /* defined(MODULE_PERIPH_USBDEV_HS_ULPI) || DOXYGEN */
+#endif /* MODULE_PERIPH_USBDEV_HS_ULPI || DOXYGEN */
 
 /**
  * @name    FMC configuration
@@ -449,7 +449,7 @@ static const sdmmc_conf_t sdmmc_config[] = {
         .dat1 = { GPIO_PIN(PORT_C,  9), GPIO_AF12 },
         .dat2 = { GPIO_PIN(PORT_C, 10), GPIO_AF12 },
         .dat3 = { GPIO_PIN(PORT_C, 11), GPIO_AF12 },
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma = 5,
         .dma_chan = 4,
 #endif

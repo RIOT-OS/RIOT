@@ -93,7 +93,7 @@ int tinyusb_hw_init(void)
 void USBDEV_ISR(void)
 {
     /* call device interrupt handler with the last device */
-    if (IS_USED(MODULE_TINYUSB_DEVICE)) {
+    if (MODULE_TINYUSB_DEVICE) {
         tud_int_handler(TINYUSB_TUD_RHPORT);
     }
 

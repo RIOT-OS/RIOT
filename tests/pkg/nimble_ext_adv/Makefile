@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  nimble_phy_coded \
+  #
 BOARD ?= nrf52840dk
 include ../Makefile.pkg_common
 

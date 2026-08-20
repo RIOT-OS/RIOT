@@ -99,7 +99,7 @@ static void _print_rng_data_cb(void *arg)
     turo_string(&ctx, addr_str);
     turo_dict_key(&ctx, "d_cm");
     turo_s32(&ctx, rng_data->d_cm);
-#if IS_USED(MODULE_UWB_CORE_RNG_TRX_INFO)
+#if MODULE_UWB_CORE_RNG_TRX_INFO
     turo_dict_key(&ctx, "tof");
     turo_float(&ctx, rng_data->tof);
     turo_dict_key(&ctx, "los");
@@ -172,7 +172,7 @@ static bool _complete_cb(struct uwb_dev *inst, struct uwb_mac_interface *cbs)
 
     /* convert from float meters to cm */
     data.d_cm = ((int32_t)(range_f * 100));
-#if IS_USED(MODULE_UWB_CORE_RNG_TRX_INFO)
+#if MODULE_UWB_CORE_RNG_TRX_INFO
     data.rssi = (int16_t)uwb_calc_rssi(inst, inst->rxdiag);
     data.fppl = uwb_calc_fppl(inst, inst->rxdiag);
     data.tof = uwb_rng_twr_to_tof(rng, rng->idx_current);

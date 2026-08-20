@@ -37,7 +37,7 @@
 #define MODE_BIT_ODE        (0x4)
 /** @} */
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 /**
  * @brief We store 4 bit for each external interrupt line (each pin) that can
  *        mapped to an entry in the exti_ctx table
@@ -171,7 +171,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
     /* disable interrupt and clear context (to be safe) */
     port->PIO_IDR = (1 << pin_num);
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
     _ctx_clear(port_num, pin_num);
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
@@ -276,7 +276,7 @@ bool gpio_read(gpio_t pin)
     }
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {

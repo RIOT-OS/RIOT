@@ -15,7 +15,7 @@
 #include "saul.h"
 #include "vl6180x.h"
 
-#if IS_USED(MODULE_VL6180X_ALS)
+#if MODULE_VL6180X_ALS
 
 static int read_als(const void *dev, phydat_t *res)
 {
@@ -35,9 +35,9 @@ const saul_driver_t vl6180x_saul_als_driver = {
     .type = SAUL_SENSE_LIGHT,
 };
 
-#endif /* IS_USED(MODULE_VL6180X_ALS) */
+#endif /* MODULE_VL6180X_ALS */
 
-#if IS_USED(MODULE_VL6180X_RNG)
+#if MODULE_VL6180X_RNG
 
 static int read_rng(const void *dev, phydat_t *res)
 {
@@ -58,4 +58,4 @@ const saul_driver_t vl6180x_saul_rng_driver = {
     .type = SAUL_SENSE_DISTANCE,
 };
 
-#endif /* IS_USED(MODULE_VL6180X_RNG) */
+#endif /* MODULE_VL6180X_RNG */

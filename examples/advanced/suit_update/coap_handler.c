@@ -11,7 +11,7 @@
 #include "suit/transport/coap.h"
 #include "kernel_defines.h"
 
-#ifdef MODULE_RIOTBOOT_SLOT
+#if MODULE_RIOTBOOT_SLOT
 #include "riotboot/slot.h"
 #endif
 
@@ -55,7 +55,7 @@ static ssize_t _trigger_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
                              COAP_FORMAT_NONE, NULL, 0);
 }
 
-#ifdef MODULE_RIOTBOOT_SLOT
+#if MODULE_RIOTBOOT_SLOT
 static ssize_t _slot_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
                              coap_request_ctx_t *context)
 {
@@ -74,7 +74,7 @@ static ssize_t _slot_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
 }
 #endif
 
-#ifdef MODULE_RIOTBOOT_SLOT
+#if MODULE_RIOTBOOT_SLOT
 NANOCOAP_RESOURCE(slot_active) {
     .path = "/suit/slot/active", .methods = COAP_METHOD_GET, .handler = _slot_handler,
 };

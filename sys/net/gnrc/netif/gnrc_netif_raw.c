@@ -80,7 +80,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         }
         gnrc_netif_hdr_set_netif(hdr->data, netif);
         LL_APPEND(pkt, hdr);
-#ifdef MODULE_NETSTATS_L2
+#if MODULE_NETSTATS_L2
         netif->stats.rx_count++;
         netif->stats.rx_bytes += nread;
 #endif
@@ -92,7 +92,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             gnrc_pktbuf_realloc_data(pkt, nread);
         }
         switch (_get_version(pkt->data)) {
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
             case IP_VERSION6:
                 pkt->type = GNRC_NETTYPE_IPV6;
                 break;
@@ -127,7 +127,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
     netdev_t *dev = netif->dev;
 
-#ifdef MODULE_NETSTATS_L2
+#if MODULE_NETSTATS_L2
     netif->stats.tx_unicast_count++;
 #endif
 

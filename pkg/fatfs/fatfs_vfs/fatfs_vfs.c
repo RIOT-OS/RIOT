@@ -71,7 +71,7 @@ static int _init(vfs_mount_t *mountp)
     return -1;
 }
 
-#ifdef MODULE_FATFS_VFS_FORMAT
+#if MODULE_FATFS_VFS_FORMAT
 static int _format(vfs_mount_t *mountp)
 {
     fatfs_desc_t *fs_desc = mountp->private_data;
@@ -559,7 +559,7 @@ static int fatfs_err_to_errno(int32_t err)
 }
 
 static const vfs_file_system_ops_t fatfs_fs_ops = {
-#ifdef MODULE_FATFS_VFS_FORMAT
+#if MODULE_FATFS_VFS_FORMAT
     .format = _format,
 #endif
     .mount = _mount,

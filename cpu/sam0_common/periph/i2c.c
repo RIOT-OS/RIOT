@@ -274,7 +274,7 @@ void i2c_release(i2c_t dev)
     mutex_unlock(&locks[dev]);
 }
 
-#ifdef MODULE_PERIPH_I2C_RECONFIGURE
+#if MODULE_PERIPH_I2C_RECONFIGURE
 void i2c_init_pins(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);

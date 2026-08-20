@@ -105,7 +105,7 @@ static inline PortGroup *sam0_gpio_iobus2ap(PortGroup *iobus)
 static inline uword_t gpio_ll_read(gpio_port_t port)
 {
     PortGroup *p = (PortGroup *)port;
-    if (!IS_USED(MODULE_PERIPH_GPIO_FAST_READ)) {
+    if (!MODULE_PERIPH_GPIO_FAST_READ) {
         p = sam0_gpio_iobus2ap(p);
     }
     return p->IN.reg;

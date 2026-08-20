@@ -20,7 +20,7 @@
 #include "cpu.h"
 #include "periph/gpio.h"
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 /**
  * @brief   Number of external interrupt lines.
  */
@@ -129,7 +129,7 @@ void gpio_write(gpio_t pin, bool value)
     }
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 static inline void _configure_flank(gpio_t pin, gpio_flank_t flank)
 {
     switch (flank) {

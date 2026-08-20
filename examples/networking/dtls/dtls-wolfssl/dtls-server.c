@@ -40,7 +40,7 @@ static sock_tls_t *sk = &skv;
 
 static const char Test_dtls_string[] = "DTLS OK!";
 
-#ifdef MODULE_WOLFSSL_PSK
+#if MODULE_WOLFSSL_PSK
 /* identity is OpenSSL testing default for openssl s_client, keep same */
 static const char* kIdentityStr = "Client_identity";
 
@@ -98,7 +98,7 @@ static int _server_cmd(int argc, char **argv)
         return -1;
     }
 
-#ifndef MODULE_WOLFSSL_PSK
+#if !MODULE_WOLFSSL_PSK
     /* Load certificate file for the DTLS server */
     if (wolfSSL_CTX_use_certificate_buffer(sk->ctx, server_cert,
                 server_cert_len, SSL_FILETYPE_ASN1 ) != SSL_SUCCESS)

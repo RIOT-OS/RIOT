@@ -52,14 +52,14 @@ static gnrc_netif_t _netif[SX127X_NUMOF];
 void auto_init_sx127x(void)
 {
     for (unsigned i = 0; i < SX127X_NUMOF; ++i) {
-#if defined(MODULE_SX1272)
+#if MODULE_SX1272
         LOG_DEBUG("[auto_init_netif] initializing sx1272 #%u\n", i);
 #else /* MODULE_SX1276 */
         LOG_DEBUG("[auto_init_netif] initializing sx1276 #%u\n", i);
 #endif
 
         sx127x_setup(&sx127x_devs[i], &sx127x_params[i], i);
-        if (IS_USED(MODULE_GNRC_NETIF_LORAWAN)) {
+        if (MODULE_GNRC_NETIF_LORAWAN) {
             /* Currently only one lora device is supported */
             assert(SX127X_NUMOF == 1);
 

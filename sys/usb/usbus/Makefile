@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  usbus_urb \
+  #
 SRCS := usbus.c
 SRCS += usbus_hdrs.c
 

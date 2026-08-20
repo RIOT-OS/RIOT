@@ -35,12 +35,12 @@
 #include "debug.h"
 
 /* millisecond timer definitions dependent on active ztimer backend */
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
 #define _ZTIMER_ACQUIRE()       ztimer_acquire(ZTIMER_MSEC)
 #define _ZTIMER_RELEASE()       ztimer_release(ZTIMER_MSEC)
 #define _ZTIMER_NOW()           ztimer_now(ZTIMER_MSEC)
 #define _ZTIMER_SLEEP_MS(n)     ztimer_sleep(ZTIMER_MSEC, n)
-#elif IS_USED(MODULE_ZTIMER_USEC)
+#elif MODULE_ZTIMER_USEC
 #define _ZTIMER_ACQUIRE()       ztimer_acquire(ZTIMER_USEC)
 #define _ZTIMER_RELEASE()       ztimer_release(ZTIMER_USEC)
 #define _ZTIMER_NOW()           ztimer_now(ZTIMER_USEC) / US_PER_MS
@@ -276,7 +276,7 @@ static int _read_scr(sdmmc_dev_t *dev);
 static inline int _enable_clock(sdmmc_dev_t *dev);
 static inline int _disable_clock(sdmmc_dev_t *dev);
 
-#if IS_USED(MODULE_SDMMC_MMC)
+#if MODULE_SDMMC_MMC
 static int _read_ext_csd(sdmmc_dev_t *dev);
 static int _write_ext_csd(sdmmc_dev_t *dev, uint8_t index, uint8_t value);
 #endif
@@ -427,7 +427,7 @@ int sdmmc_card_init(sdmmc_dev_t *dev)
     if (_send_cmd(dev, SDMMC_CMD5, SDMMC_CMD_NO_ARG, SDMMC_R4, response) == 0) {
         dev->type = SDMMC_CARD_TYPE_SDIO;
         /* If CMD8 previously failed (flag_f8 = 0), it is a SDIO only card */
-        if (!IS_USED(MODULE_SDMMC_SDIO) && (res == 0) && !flag_f8) {
+        if (!MODULE_SDMMC_SDIO && (res == 0) && !flag_f8) {
             /* TODO: SDIO support */
             LOG_ERROR("[sdmmc] card is a SDIO card, not supported yet\n");
             res = -ENOTSUP;
@@ -512,7 +512,7 @@ int sdmmc_card_init(sdmmc_dev_t *dev)
         /* card is a MultimediaCard */
         dev->type = SDMMC_CARD_TYPE_MMC;
         /* TODO: MMC support */
-        if (!IS_USED(MODULE_SDMMC_MMC)) {
+        if (!MODULE_SDMMC_MMC) {
             LOG_ERROR("[sdmmc] MultimediaCard detected, not supported\n");
             res = -ENOTSUP;
             goto out;
@@ -533,7 +533,7 @@ int sdmmc_card_init(sdmmc_dev_t *dev)
 
     /* SD Card or MMC card is now in `ident` state */
 
-    if (IS_USED(MODULE_SDMMC_MMC) && (dev->type == SDMMC_CARD_TYPE_MMC)) {
+    if (MODULE_SDMMC_MMC && (dev->type == SDMMC_CARD_TYPE_MMC)) {
         DEBUG("[sdmmc] send CMD3 to set RCA\n");
         /* for MMCs, RCA is selected and assigned by host using the device address */
         dev->rca = ((uint32_t)dev & 0x0000ffff);
@@ -612,7 +612,7 @@ int sdmmc_card_init(sdmmc_dev_t *dev)
         dev->driver->set_clock_rate(dev, SDMMC_CLK_25M);
 
         /* if the peripheral supports High Speed mode, try to switch into */
-        if (IS_USED(MODULE_PERIPH_SDMMC_HS) && dev->scr.SD_SPEC) {
+        if (MODULE_PERIPH_SDMMC_HS && dev->scr.SD_SPEC) {
             static_assert(sizeof(sdmmc_sw_status_t) == SDMMC_CMD6_SW_STATUS_SIZE,
                           "sizeof(sdmmc_sw_status_t) != SDMMC_CMD6_SW_STATUS_SIZE");
             /* try to switch to high speed for SD Memory Cards v1.10 or higher */
@@ -647,7 +647,7 @@ int sdmmc_card_init(sdmmc_dev_t *dev)
     }
     else {
         /* handle MMCs only if MMC support is enabled */
-#if IS_USED(MODULE_SDMMC_MMC)
+#if MODULE_SDMMC_MMC
         /* read Extended CSD */
         res = _read_ext_csd(dev);
         if (res) {
@@ -671,7 +671,7 @@ int sdmmc_card_init(sdmmc_dev_t *dev)
         }
 
         /* change HS_TIMING if the card supports high speed interface */
-        if (IS_USED(MODULE_PERIPH_SDMMC_HS) &&
+        if (MODULE_PERIPH_SDMMC_HS &&
             (dev->csd.mmc.SPEC_VERS >= 4) &&
             (dev->ext_csd.CARD_TYPE & SDMMC_EXT_CSD_CARD_TYPE_HS52)) {
             DEBUG("[sdmmc] set high speed interface timing\n");
@@ -684,7 +684,7 @@ int sdmmc_card_init(sdmmc_dev_t *dev)
         else {
             dev->driver->set_clock_rate(dev, SDMMC_CLK_26M);
         }
-#endif /* IS_USED(MODULE_SDMMC_MMC) */
+#endif /* MODULE_SDMMC_MMC */
     }
 
     dev->init_done = true;
@@ -754,7 +754,7 @@ int sdmmc_erase_blocks(sdmmc_dev_t *dev,
         return res;
     }
 
-    if (IS_USED(MODULE_SDMMC_MMC) && (dev->type == SDMMC_CARD_TYPE_MMC)) {
+    if (MODULE_SDMMC_MMC && (dev->type == SDMMC_CARD_TYPE_MMC)) {
         /* MMCs don't support the erase of a single block but only the erase of
          * a group of blocks. Blocks are erased implicitly on write. */
         DEBUG("[sdmmc] MMCs don't support the erase of single blocks\n");
@@ -825,7 +825,7 @@ uint64_t sdmmc_get_capacity(sdmmc_dev_t *dev)
     uint32_t block_nr = 0;
 
     if (dev->type == SDMMC_CARD_TYPE_MMC) {
-#if IS_USED(MODULE_SDMMC_MMC)
+#if MODULE_SDMMC_MMC
         if (dev->csd.mmc.C_SIZE == 0xfff) {
             /* memory capacity = SEC_COUNT * 512 Byte */
             block_nr = dev->ext_csd.SEC_COUNT;
@@ -876,7 +876,7 @@ int sdmmc_read_sds(sdmmc_dev_t *dev, sdmmc_sd_status_t *sds)
 
     sdmmc_buf_t raw_data[SDMMC_SD_STATUS_SIZE];
 
-    if (IS_USED(MODULE_SDMMC_MMC) && (dev->type == SDMMC_CARD_TYPE_MMC)) {
+    if (MODULE_SDMMC_MMC && (dev->type == SDMMC_CARD_TYPE_MMC)) {
         LOG_ERROR("[sdmmc] MMC cards don't have a SD Status register\n");
         return -ENOTSUP;
     }
@@ -922,7 +922,7 @@ static int _send_cmd(sdmmc_dev_t *dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
     DEBUG("[sdmmc] %s dev=%p cmd_idx=%u arg=0x%"PRIx32" resp_type=0x%x resp=%p\n",
           __func__, dev, cmd_idx, arg, resp_type, resp);
 
-#if !IS_USED(MODULE_PERIPH_SDMMC_AUTO_CLK)
+#if !MODULE_PERIPH_SDMMC_AUTO_CLK
     /* enable the SD CLK signal if the SDIO/SD/MMC peripheral driver does
      * not support the Auto-CLK feature (periph_sdmmc_auto_clk) */
     if (dev->driver->enable_clock && dev->driver->enable_clock(dev, true)) {
@@ -1098,10 +1098,10 @@ static int _xfer(sdmmc_dev_t *dev, sdmmc_cmd_t cmd_idx, uint32_t arg,
      * in case of multiple block transfers if supported by card, requires
      * that SCR.CMD_SUPPORT[1] (SCR bit 33) is set */
     if (block_num > 1) {
-        if (IS_USED(MODULE_PERIPH_SDMMC_AUTO_CMD12)) {
+        if (MODULE_PERIPH_SDMMC_AUTO_CMD12) {
             DEBUG("[sdmmc] Auto CMD12 used\n");
         }
-        else if (IS_USED(MODULE_SDMMC_MMC) && (dev->type == SDMMC_CARD_TYPE_MMC)) {
+        else if (MODULE_SDMMC_MMC && (dev->type == SDMMC_CARD_TYPE_MMC)) {
             /* MMC cards use R1 in case of read and R1B in case of write */
             _send_cmd(dev, SDMMC_CMD12, SDMMC_CMD_NO_ARG,
                       xfer.write ? SDMMC_R1B : SDMMC_R1, &response);
@@ -1483,7 +1483,7 @@ static inline int _enable_clock(sdmmc_dev_t *dev)
 {
     DEBUG("[sdmmc] %s dev=%p\n", __func__, dev);
 
-#if !IS_USED(MODULE_PERIPH_SDMMC_AUTO_CLK)
+#if !MODULE_PERIPH_SDMMC_AUTO_CLK
     return (dev->driver->enable_clock) ? dev->driver->enable_clock(dev, true)
                                        : 0;
 #else
@@ -1496,7 +1496,7 @@ static inline int _disable_clock(sdmmc_dev_t *dev)
 {
     DEBUG("[sdmmc] %s dev=%p\n", __func__, dev);
 
-#if !IS_USED(MODULE_PERIPH_SDMMC_AUTO_CLK)
+#if !MODULE_PERIPH_SDMMC_AUTO_CLK
     return (dev->driver->enable_clock) ? dev->driver->enable_clock(dev, false)
                                        : 0;
 #else
@@ -1505,7 +1505,7 @@ static inline int _disable_clock(sdmmc_dev_t *dev)
 #endif
 }
 
-#if IS_USED(MODULE_SDMMC_MMC)
+#if MODULE_SDMMC_MMC
 
 /* To avoid a 512 byte buffer on the stack, a static variable is used here.
  * The exclusive access to this buffer must be guaranteed. */
@@ -1596,7 +1596,7 @@ static int _write_ext_csd(sdmmc_dev_t *dev, uint8_t index, uint8_t value)
 
     return 0;
 }
-#endif /* IS_USED(MODULE_SDMMC_MMC) */
+#endif /* MODULE_SDMMC_MMC */
 
 #if ENABLE_DEBUG
 static uint8_t _crc_7(const uint8_t *data, unsigned n)

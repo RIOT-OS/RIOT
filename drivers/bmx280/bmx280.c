@@ -154,7 +154,7 @@ static int _read_calibration_data(bmx280_t *dev)
     dev->calibration.dig_P8 = _to_i16_le(buf, OFFSET_T_P(BMX280_DIG_P8_LSB_REG));
     dev->calibration.dig_P9 = _to_i16_le(buf, OFFSET_T_P(BMX280_DIG_P9_LSB_REG));
 
-#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+#if MODULE_BME280_SPI || MODULE_BME280_I2C
     /* read dig_H1 in a single read, as this value is not in the block with the
      * rest of the humidity calibration values */
     if (_read_reg(dev, BME280_DIG_H1_REG, &dev->calibration.dig_H1) != BMX280_OK) {
@@ -278,7 +278,7 @@ int bmx280_init(bmx280_t *dev, const bmx280_params_t *params)
         goto err;
     }
 
-#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+#if MODULE_BME280_SPI || MODULE_BME280_I2C
     /* ctrl_hum must be written before ctrl_meas for changes to become
      * effective */
     reg = dev->params.humid_oversample;
@@ -381,7 +381,7 @@ uint32_t bmx280_read_pressure(bmx280_t *dev)
     return p_acc >> 8;
 }
 
-#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+#if MODULE_BME280_SPI || MODULE_BME280_I2C
 uint16_t bme280_read_humidity(bmx280_t *dev)
 {
     assert(dev);

@@ -187,7 +187,7 @@ extern "C" {
 #endif
 /** @} */
 
-#if defined(MODULE_AT_URC) || DOXYGEN
+#if MODULE_AT_URC || DOXYGEN
 /**
  * @brief   Unsolicited result code callback
  *
@@ -222,9 +222,9 @@ typedef struct {
     uart_t uart;            /**< UART device where the AT device is attached */
     char *rp_buf;           /**< response parsing buffer */
     size_t rp_buf_size;     /**< response parsing buffer size */
-#ifdef MODULE_AT_URC
+#if MODULE_AT_URC
     clist_node_t urc_list;  /**< list to keep track of all registered urc's */
-#ifdef MODULE_AT_URC_ISR
+#if MODULE_AT_URC_ISR
     bool awaiting_response; /**< indicates if the driver waits for a response */
     event_t event;          /**< event posted from ISR to process urc's */
 #endif
@@ -607,7 +607,7 @@ void at_dev_poweron(at_dev_t *dev);
  */
 void at_dev_poweroff(at_dev_t *dev);
 
-#if defined(MODULE_AT_URC) || DOXYGEN
+#if MODULE_AT_URC || DOXYGEN
 /**
  * @brief   Add a callback for an unsolicited response code
  *

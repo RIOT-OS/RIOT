@@ -19,3 +19,8 @@ endif
 
 # include the Arduino headers
 INCLUDES += -I$(RIOTBASE)/sys/arduino/include
+
+MODULE_DEFS_NEEDED += \
+  periph_i2c \
+  periph_spi \
+  #

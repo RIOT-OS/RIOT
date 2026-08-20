@@ -31,7 +31,7 @@
 #include "net/eui64.h"
 #include "kernel_defines.h"
 #include "net/ipv6/addr.h"
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
 #endif
 #include "net/gnrc/ipv6/nib/ft.h"
@@ -293,7 +293,7 @@ static inline void _evtimer_del(evtimer_msg_event_t *event)
 static inline void _evtimer_add(void *ctx, int16_t type,
                                 evtimer_msg_event_t *event, uint32_t offset)
 {
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     kernel_pid_t target_pid = gnrc_ipv6_pid;
 #else
     kernel_pid_t target_pid = KERNEL_PID_LAST;  /* just for testing */

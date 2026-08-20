@@ -185,7 +185,7 @@ extern "C" {
  * in RIOT if the module `esp_hw_counter` is enabled.
  */
 
-#ifdef MODULE_ESP_HW_COUNTER
+#if MODULE_ESP_HW_COUNTER
 /** Hardware ccount/ccompare registers are used for timer implementation */
 #define TIMER_NUMOF         (2)
 #define TIMER_CHANNEL_NUMOF (1)

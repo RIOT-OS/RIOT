@@ -35,7 +35,7 @@
 #include "hal/cpu_hal.h"
 #include "soc/rtc.h"
 
-#ifdef MODULE_WS281X_ESP32_HW
+#if MODULE_WS281X_ESP32_HW
 #include "esp_intr_alloc.h"
 #include "driver/rmt_encoder.h"
 #include "driver/rmt_tx.h"
@@ -47,7 +47,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifdef MODULE_WS281X_ESP32_HW
+#if MODULE_WS281X_ESP32_HW
 
 static uint8_t channel;
 
@@ -70,7 +70,7 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
 {
     assert(dev);
 
-#ifdef MODULE_WS281X_ESP32_HW
+#if MODULE_WS281X_ESP32_HW
 
     rmt_transmit_config_t tx_config = {
         .loop_count = 0,
@@ -132,7 +132,7 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
 #endif
 }
 
-#ifdef MODULE_WS281X_ESP32_HW
+#if MODULE_WS281X_ESP32_HW
 
 #define WS281x_RMT_FREQ     (40 * MHZ)
 #define WS281x_RMT_CYCLES   (WS281x_RMT_FREQ / (NS_PER_SEC / WS281X_T_DATA_NS))
@@ -206,7 +206,7 @@ int ws281x_init(ws281x_t *dev, const ws281x_params_t *params)
     memset(dev, 0, sizeof(ws281x_t));
     dev->params = *params;
 
-#ifdef MODULE_WS281X_ESP32_HW
+#if MODULE_WS281X_ESP32_HW
     const rmt_tx_channel_config_t ws821x_rmt_chn_config = {
         .clk_src = RMT_CLK_SRC_DEFAULT,
         .resolution_hz = WS281x_RMT_FREQ,

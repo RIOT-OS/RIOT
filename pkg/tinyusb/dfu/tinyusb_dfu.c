@@ -20,7 +20,7 @@
 #include "riotboot/magic.h"
 #include "riotboot/slot.h"
 
-#ifdef MODULE_RIOTBOOT_TINYUSB_DFU
+#if MODULE_RIOTBOOT_TINYUSB_DFU
 #include "ztimer.h"
 #endif
 
@@ -32,7 +32,7 @@
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-#ifdef MODULE_RIOTBOOT_TINYUSB_DFU
+#if MODULE_RIOTBOOT_TINYUSB_DFU
 static void _reboot(void *arg);
 static ztimer_t scheduled_reboot = { .callback=_reboot };
 #endif
@@ -46,7 +46,7 @@ void tinyusb_dfu_init(void)
     _tusb_dfu_dev.slot = 0;
 }
 
-#ifdef MODULE_RIOTBOOT_TINYUSB_DFU
+#if MODULE_RIOTBOOT_TINYUSB_DFU
 
 uint32_t tud_dfu_get_timeout_cb(uint8_t alt, uint8_t state)
 {

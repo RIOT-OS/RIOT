@@ -1,6 +1,10 @@
 # define the module that is build (not strictly necessary)
 MODULE = atmega_common
 
+MODULE_DEFS_NEEDED += \
+  sys_bus_power \
+  #
+
 # add a list of subdirectories, that should also be build
 DIRS = periph $(RIOTCPU)/avr8_common/
 

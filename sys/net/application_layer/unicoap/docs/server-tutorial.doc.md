@@ -298,7 +298,7 @@ To enable Datagram Transport Layer Security, we already imported the
 However, we need to include additional headers to add a DTLS credential to `unicoap`.
 
 ```c
-#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if MODULE_UNICOAP_DRIVER_DTLS
 # include "net/sock/dtls/creds.h"
 # include "net/credman.h"
 # include "net/dsm.h"
@@ -326,7 +326,7 @@ using @ref unicoap_transport_dtls_get_socket.
 
 ```c
 int main(void) {
-#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#  if MODULE_UNICOAP_DRIVER_DTLS
     int res = credman_add(&credential);
     if (res < 0 && res != CREDMAN_EXIST) {
         /* ignore duplicate credentials */

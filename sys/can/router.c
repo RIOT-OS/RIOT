@@ -150,7 +150,7 @@ static void _insert_to_list(can_reg_entry_t **list, filter_el_t *el)
     }
 }
 
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
 #define ENTRY_MATCHES(e1, e2) (((e1)->type == (e2)->type) && \
     (((e1)->type == CAN_TYPE_DEFAULT && (e1)->target.pid == (e2)->target.pid) ||\
     ((e1)->type == CAN_TYPE_MBOX && (e1)->target.mbox == (e2)->target.mbox)))
@@ -204,7 +204,7 @@ int can_router_register(can_reg_entry_t *entry, canid_t can_id, canid_t mask, vo
     filter_el_t *filter;
     int ret;
 
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         if (entry->type == CAN_TYPE_DEFAULT) {
             DEBUG("can_router_register: ifnum=%d, pid=%" PRIkernel_pid ", can_id=0x%" PRIx32
@@ -225,7 +225,7 @@ int can_router_register(can_reg_entry_t *entry, canid_t can_id, canid_t mask, vo
         return -ENOMEM;
     }
 
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
     filter->entry.type = entry->type;
     switch (entry->type) {
     case CAN_TYPE_DEFAULT:
@@ -255,7 +255,7 @@ int can_router_unregister(can_reg_entry_t *entry, canid_t can_id,
     filter_el_t *el;
     int ret;
 
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         if (entry->type == CAN_TYPE_DEFAULT) {
             DEBUG("can_router_unregister: ifnum=%d, pid=%" PRIkernel_pid ", can_id=0x%" PRIx32
@@ -285,7 +285,7 @@ int can_router_unregister(can_reg_entry_t *entry, canid_t can_id,
 
 static int _send_msg(msg_t *msg, can_reg_entry_t *entry)
 {
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
     switch (entry->type) {
     case CAN_TYPE_DEFAULT:
         return msg_try_send(msg, entry->target.pid);

@@ -20,7 +20,7 @@
 #include <string.h>
 
 #include "net/utils.h"
-#if defined(MODULE_DNS)
+#if MODULE_DNS
 #include "net/af.h"
 #endif
 #include "net/dns.h"

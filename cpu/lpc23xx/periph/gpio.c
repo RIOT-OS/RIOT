@@ -28,7 +28,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 #define GPIO_NUM_ISR    (16)
 
 static BITFIELD(_gpio_config_bitfield, GPIO_NUM_ISR);
@@ -60,7 +60,7 @@ static int _isr_map_entry(gpio_t pin) {
 
 void gpio_init_ports(void) {
     SCS |= 0x1; /* set GPIO ports 0 and 1 to FIO mode (3.7.2) */
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
     memset(&_gpio_isr_map[0], 0xff, 64);
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 }
@@ -140,7 +140,7 @@ void gpio_write(gpio_t pin, bool value)
     }
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 static void _gpio_configure(gpio_t pin, unsigned rising, unsigned falling)
 {
     unsigned _pin = pin & 31;

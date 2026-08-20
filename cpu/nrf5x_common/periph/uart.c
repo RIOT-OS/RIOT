@@ -68,7 +68,7 @@ static uart_isr_ctx_t isr_ctx[UART_NUMOF];
 static uint8_t rx_buf[UART_NUMOF];
 #endif
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
 
 #include "tsrb.h"
 /**
@@ -149,7 +149,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     dev->PSEL_TXD = uart_config[uart].tx_pin;
 
     /* enable HW-flow control if defined */
- #ifdef MODULE_PERIPH_UART_HW_FC
+ #if MODULE_PERIPH_UART_HW_FC
     /* set pin mode for RTS and CTS pins */
     if (uart_config[uart].rts_pin != GPIO_UNDEF && uart_config[uart].cts_pin != GPIO_UNDEF) {
         gpio_init(uart_config[uart].rts_pin, GPIO_OUT);
@@ -223,7 +223,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* enable the UART device */
     set_power(uart, true);
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
     tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
 #endif
@@ -241,7 +241,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 #endif
     }
 
-    if (rx_cb || IS_USED(MODULE_PERIPH_UART_NONBLOCKING)) {
+    if (rx_cb || MODULE_PERIPH_UART_NONBLOCKING) {
 #if  defined(CPU_NRF53) || defined(CPU_NRF9160)
         shared_irq_register_uart(dev, uart_isr_handler, (void *)(uintptr_t)uart);
 #else
@@ -334,7 +334,7 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 static void _write_buf(uart_t uart, const uint8_t *data, size_t len)
 {
     uart_config[uart].dev->EVENTS_ENDTX = 0;
-    if (IS_USED(MODULE_PERIPH_UART_NONBLOCKING)) {
+    if (MODULE_PERIPH_UART_NONBLOCKING) {
         uart_config[uart].dev->INTENSET = UARTE_INTENSET_ENDTX_Msk;
     }
     /* set data to transfer to DMA TX pointer */
@@ -343,7 +343,7 @@ static void _write_buf(uart_t uart, const uint8_t *data, size_t len)
     /* start transmission */
     uart_config[uart].dev->TASKS_STARTTX = 1;
     /* wait for the end of transmission */
-    if (!IS_USED(MODULE_PERIPH_UART_NONBLOCKING)) {
+    if (!MODULE_PERIPH_UART_NONBLOCKING) {
         while (uart_config[uart].dev->EVENTS_ENDTX == 0) {}
         uart_config[uart].dev->TASKS_STOPTX = 1;
     }
@@ -356,7 +356,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         /* Device is powered down. Writing anyway would deadlock */
         return;
     }
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
     for (size_t i = 0; i < len; i++) {
         /* in IRQ or interrupts disabled */
         if (irq_is_in() || __get_PRIMASK()) {
@@ -424,7 +424,7 @@ static void irq_handler(uart_t uart)
         }
     }
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
     if (uart_config[uart].dev->EVENTS_ENDTX) {
         /* reset flags and idsable ISR on EVENTS_ENDTX */
         uart_config[uart].dev->EVENTS_ENDTX = 0;

@@ -1,3 +1,9 @@
+
+MODULE_DEFS_NEEDED += \
+  st7735 \
+  st7789 \
+  st7796 \
+  #
 SRC = st77xx.c
 
 ifneq (,$(filter st7735,$(USEMODULE)))

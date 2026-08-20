@@ -310,12 +310,12 @@ int main(void)
     puts("candev test application\n");
 
     isrpipe_init(&rxbuf, (uint8_t *)rx_ringbuf, sizeof(rx_ringbuf));
-    if (IS_USED(MODULE_PERIPH_CAN)) {
+    if (MODULE_PERIPH_CAN) {
         puts("Initializing CAN periph device");
         can_init(&periph_dev, periph_can_conf);
         candev = _can_t2candev_t(&periph_dev);
     }
-    else if (IS_USED(MODULE_MCP2515)) {
+    else if (MODULE_MCP2515) {
         puts("Initializing MCP2515");
         candev_mcp2515_init(&mcp2515_dev, mcp2515_conf);
         candev = &mcp2515_dev.candev;
@@ -352,7 +352,7 @@ as the first reception mailbox supports up to two filters
 the last filter won't be applied as the CAN controller supports up to 3 standard filters
 - For SAMD5x/E5x CAN controller, if you increase the maximum capacity of the standard
 filters (check Makefile.board.dep), the last filter can be applied correctly. */
-#if defined(MODULE_MCP2515)
+#if MODULE_MCP2515
     if (IS_ACTIVE(MCP2515_RECV_FILTER_EN)) {
 #endif
         /* CAN filters examples */
@@ -381,7 +381,7 @@ filters (check Makefile.board.dep), the last filter can be applied correctly. */
             candev->driver->set_filter(candev, &filter[i]);
         }
         /* All other messages won't be received */
-#if defined(MODULE_MCP2515)
+#if MODULE_MCP2515
     }
 #endif
 

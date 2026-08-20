@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_timer_query_freqs \
+  #
 include ../Makefile.periph_common
 
 FEATURES_REQUIRED = periph_timer

@@ -293,10 +293,10 @@ static unsigned char readbuf[BUF_SIZE];
 
 int main(void)
 {
-    if (IS_USED(MODULE_GNRC_ICMPV6_ECHO)) {
+    if (MODULE_GNRC_ICMPV6_ECHO) {
         msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
     }
-#ifdef MODULE_LWIP
+#if MODULE_LWIP
     /* let LWIP initialize */
     ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
 #endif

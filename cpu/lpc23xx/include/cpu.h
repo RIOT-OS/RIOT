@@ -47,7 +47,7 @@ void cpu_init_clks(void);
  */
 bool install_irq(int IntNumber, void (*HandlerAddr)(void), int Priority);
 
-#ifdef MODULE_PERIPH
+#if MODULE_PERIPH
 void gpio_init_ports(void);
 #endif
 

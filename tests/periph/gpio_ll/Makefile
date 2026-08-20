@@ -1,3 +1,19 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_gpio_ll_input_pull_down \
+  periph_gpio_ll_input_pull_keep \
+  periph_gpio_ll_input_pull_up \
+  periph_gpio_ll_irq \
+  periph_gpio_ll_irq_edge_triggered_both \
+  periph_gpio_ll_irq_level_triggered_high \
+  periph_gpio_ll_irq_level_triggered_low \
+  periph_gpio_ll_irq_unmask \
+  periph_gpio_ll_open_drain \
+  periph_gpio_ll_open_drain_pull_up \
+  periph_gpio_ll_open_source \
+  periph_gpio_ll_open_source_pull_down \
+  periph_gpio_ll_switch_dir \
+  #
 BOARD ?= nucleo-f767zi
 
 # Custom per-board pin configuration (e.g. for setting PORT_IN, PIN_IN_0, ...)

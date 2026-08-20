@@ -25,12 +25,12 @@
 
 #include "ztimer.h"
 
-#ifdef MODULE_PERIPH_SPI
+#if MODULE_PERIPH_SPI
 #include "periph/spi.h"
 #endif
 #include "periph/gpio.h"
 
-#ifdef MODULE_PERIPH_SPI
+#if MODULE_PERIPH_SPI
 static spi_clk_t ucg_serial_clk_speed_to_spi_speed(uint32_t serial_clk_speed)
 {
     if (serial_clk_speed < 100) {
@@ -73,7 +73,7 @@ static void _enable_pins(const ucg_riotos_t *ucg_riot_ptr)
     }
 }
 
-#ifdef MODULE_PERIPH_SPI
+#if MODULE_PERIPH_SPI
 int16_t ucg_com_hw_spi_riotos(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 {
     const ucg_riotos_t *ucg_riot_ptr = ucg_GetUserPtr(ucg);

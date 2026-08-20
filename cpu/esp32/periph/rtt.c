@@ -68,7 +68,7 @@ static const rtt_hw_driver_t *_rtt_hw = &_rtt_hw_sys_driver;
 
 void rtt_init(void)
 {
-    if (IS_USED(MODULE_ESP_RTC_TIMER_32K)) {
+    if (MODULE_ESP_RTC_TIMER_32K) {
         /* check whether the 32.678 kHz crystal is working */
         if (rtc_clk_slow_freq_get_hz() == 32768) {
             _rtt_hw = &_rtt_hw_rtc_driver;

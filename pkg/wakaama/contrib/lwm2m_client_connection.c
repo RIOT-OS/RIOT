@@ -47,7 +47,7 @@
 #include "liblwm2m.h"
 #include "net/sock/udp.h"
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
 #include "net/sock/dtls.h"
 #endif
 
@@ -226,7 +226,7 @@ static int _connection_send(lwm2m_client_connection_t *conn, uint8_t *buffer,
             return -1;
         }
     }
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
     else {
         ssize_t sent_bytes = sock_dtls_send(&client_data->dtls_sock, &conn->session, buffer,
                                             buffer_size, SOCK_NO_TIMEOUT);
@@ -366,7 +366,7 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
         }
     }
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
     uint8_t buf[DTLS_HANDSHAKE_BUFSIZE];
     int64_t val;
     resource_uri.resourceId = LWM2M_SECURITY_SECURITY_ID;

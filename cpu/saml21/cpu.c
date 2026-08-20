@@ -33,7 +33,7 @@
 #define USE_VREG_BUCK   (0)
 #endif
 
-#if (CLOCK_CORECLOCK == 48000000U) || defined (MODULE_PERIPH_USBDEV)
+#if (CLOCK_CORECLOCK == 48000000U) || MODULE_PERIPH_USBDEV
 #define USE_DFLL        (1)
 #define GCLK_GENCTRL_SRC_MAIN GCLK_GENCTRL_SRC_DFLL48M
 #else
@@ -300,7 +300,7 @@ void cpu_init(void)
     _gclk_setup(SAM0_GCLK_TIMER, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_MAIN
                 | GCLK_GENCTRL_DIV(CLOCK_CORECLOCK/sam0_gclk_freq(SAM0_GCLK_TIMER)));
 
-#ifdef MODULE_PERIPH_PM
+#if MODULE_PERIPH_PM
     PM->CTRLA.reg = PM_CTRLA_MASK & (~PM_CTRLA_IORET);
 
     /* disable brownout detection
@@ -309,7 +309,7 @@ void cpu_init(void)
     SUPC->BOD33.reg &= ~SUPC_BOD33_ENABLE;
 #endif
 
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
     /*  initialize DMA streams */
     dma_init();
 #endif

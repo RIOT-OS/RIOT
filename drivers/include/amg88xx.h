@@ -107,7 +107,7 @@ typedef enum {
     AMG88XX_INT_ABSOLUTE    = 0x01,     /**< Absolute value interrupt mode */
 } amg88xx_interrupt_mode_t;
 
-#if IS_USED(MODULE_PERIPH_GPIO_IRQ) || defined(DOXYGEN)
+#if MODULE_PERIPH_GPIO_IRQ || defined(DOXYGEN)
 /**
  * @brief   Interrupt callback type
  */
@@ -120,7 +120,7 @@ typedef void (*amg88xx_int_cb_t)(void *);
 typedef struct {
     i2c_t i2c_dev;              /**< I2C bus the sensor is connected to */
     uint8_t address;            /**< sensor address */
-#if IS_USED(MODULE_PERIPH_GPIO_IRQ) || defined(DOXYGEN)
+#if MODULE_PERIPH_GPIO_IRQ || defined(DOXYGEN)
     gpio_t int_pin;             /**< interrupt pin (GPIO_UNDEF if not used) */
 #endif
 } amg88xx_params_t;
@@ -245,7 +245,7 @@ int amg88xx_get_temperature(const amg88xx_t *dev, int16_t *temperature);
  */
 int amg88xx_get_frame(const amg88xx_t *dev, int16_t pixels[AMG88XX_PIXELS_COUNT]);
 
-#if IS_USED(MODULE_PERIPH_GPIO_IRQ) || defined(DOXYGEN)
+#if MODULE_PERIPH_GPIO_IRQ || defined(DOXYGEN)
 /**
  * @brief   Initialize the interrupt pin
  *

@@ -1,1 +1,6 @@
 include $(RIOTCPU)/arm7_common/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  periph \
+  periph_rtc \
+  #

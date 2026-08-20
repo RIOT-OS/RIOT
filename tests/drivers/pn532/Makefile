@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  pn532_i2c \
+  #
 include ../Makefile.drivers_common
 
 USEMODULE += ztimer

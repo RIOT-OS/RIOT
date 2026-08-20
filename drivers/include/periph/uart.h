@@ -145,7 +145,7 @@ typedef void(*uart_rxstart_cb_t)(void *arg);
 typedef struct {
     uart_rx_cb_t rx_cb;     /**< data received interrupt callback */
     void *arg;              /**< argument to data received callback */
-#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+#if MODULE_PERIPH_UART_RXSTART_IRQ
     uart_rxstart_cb_t rxs_cb;   /**< start condition received interrupt callback */
     void *rxs_arg;          /**< argument to start condition received callback */
 #endif
@@ -234,7 +234,7 @@ typedef enum {
  */
 int uart_init(uart_t uart, uint32_t baud, uart_rx_cb_t rx_cb, void *arg);
 
-#if defined(MODULE_PERIPH_UART_RECONFIGURE) || DOXYGEN
+#if MODULE_PERIPH_UART_RECONFIGURE || DOXYGEN
 /**
  * @brief   Change the pins of the given UART back to plain GPIO functionality
  *
@@ -322,7 +322,7 @@ gpio_t uart_pin_rts(uart_t uart);
 
 #endif /* MODULE_PERIPH_UART_RECONFIGURE */
 
-#if defined(MODULE_PERIPH_UART_RXSTART_IRQ) || DOXYGEN
+#if MODULE_PERIPH_UART_RXSTART_IRQ || DOXYGEN
 
 /**
  * @brief   Configure the function that will be called when a start condition
@@ -361,7 +361,7 @@ void uart_rxstart_irq_enable(uart_t uart);
 void uart_rxstart_irq_disable(uart_t uart);
 #endif /* MODULE_PERIPH_UART_RXSTART_IRQ */
 
-#if defined(MODULE_PERIPH_UART_COLLISION) || DOXYGEN
+#if MODULE_PERIPH_UART_COLLISION || DOXYGEN
 /**
  * @brief   Enables collision detection check of the UART.
  *          This assumes the UART is connected to a bus where RX and TX are

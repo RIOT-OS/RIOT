@@ -45,7 +45,7 @@ extern "C" {
 #endif
 
 /* if using ethos + stdio, use STDIO_UART values unless overridden */
-#if IS_USED(MODULE_ETHOS_STDIO) || defined(DOXYGEN)
+#if MODULE_ETHOS_STDIO || defined(DOXYGEN)
 #include "stdio_uart.h"
 /**
  * @defgroup drivers_ethos_config     Ethernet-over-serial driver driver compile configuration
@@ -68,7 +68,7 @@ extern "C" {
 /** @} */
 #else
 #ifndef ETHOS_UART
-#if IS_USED(MODULE_USBUS_CDC_ACM)
+#if MODULE_USBUS_CDC_ACM
 #define ETHOS_UART     UART_DEV(0)
 #else
 #define ETHOS_UART     UART_DEV(1)

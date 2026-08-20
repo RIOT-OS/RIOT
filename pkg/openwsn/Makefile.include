@@ -76,3 +76,11 @@ endif
 ifndef CONFIG_KCONFIG_USEMODULE_IEEE802154
   CFLAGS += -DCONFIG_IEEE802154_AUTO_ACK_DISABLE
 endif
+
+MODULE_DEFS_NEEDED += \
+  boards_common_nucleo \
+  openwsn_radio_netdev \
+  openwsn_sctimer_ztimer \
+  sock_async_event \
+  stdio_null \
+  #

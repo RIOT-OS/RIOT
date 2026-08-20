@@ -38,14 +38,14 @@ void auto_init_periph_can(void) {
         can_init(&candev[i], &candev_conf[i]);
         candev_dev[i].dev = (candev_t *)&candev[i];
         candev_dev[i].name = candev_params[i].name;
-#ifdef MODULE_CAN_TRX
+#if MODULE_CAN_TRX
         candev_dev[i].trx = candev_params[i].trx;
 #endif
-#ifdef MODULE_CAN_PM
+#if MODULE_CAN_PM
         candev_dev[i].rx_inactivity_timeout = candev_params[i].rx_inactivity_timeout;
         candev_dev[i].tx_wakeup_timeout = candev_params[i].tx_wakeup_timeout;
 #endif
-#ifdef MODULE_FDCAN
+#if MODULE_FDCAN
         candev_dev[i].loop_delay = candev_params[i].loop_delay;
 #endif
 

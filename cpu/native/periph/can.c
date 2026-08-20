@@ -162,7 +162,7 @@ static int _init(candev_t *candev)
                               CAN_ERR_BUSOFF |
                               CAN_ERR_CRTL;
     ret = real_setsockopt(dev->sock, SOL_CAN_RAW,
-#ifdef MODULE_FDCAN
+#if MODULE_FDCAN
                           CAN_RAW_FD_FRAMES |
 #endif
                           CAN_RAW_ERR_FILTER,

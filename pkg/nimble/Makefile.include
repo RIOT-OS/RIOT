@@ -181,3 +181,9 @@ endif
 ifneq (,$(filter nimble_statconn,$(USEMODULE)))
   INCLUDES += -isystem$(RIOTPKG)/nimble/statconn/include
 endif
+
+MODULE_DEFS_NEEDED += \
+  nimble_netif \
+  nimble_phy_2mbit \
+  nimble_phy_coded \
+  #

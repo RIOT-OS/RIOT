@@ -68,7 +68,7 @@
  *
  * @{
  */
-#ifndef MODULE_ESP32_TTGO_T_BEAM_V1_0
+#if !MODULE_ESP32_TTGO_T_BEAM_V1_0
 #define LED0_PIN        GPIO14
 #define LED0_ACTIVE     (1)     /**< LED is high active */
 #endif

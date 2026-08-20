@@ -35,7 +35,7 @@
 const uint8_t llcc68_max_sf = LORA_SF11;
 const uint8_t sx126x_max_sf = LORA_SF12;
 
-#if IS_USED(MODULE_SX126X_STM32WL)
+#if MODULE_SX126X_STM32WL
 static netdev_t *_dev;
 
 void isr_subghz_radio(void)
@@ -126,7 +126,7 @@ static int _init(netdev_t *netdev)
     sx126x_t *dev = container_of(netdev, sx126x_t, netdev);
 
     if (sx126x_is_stm32wl(dev)) {
-#if IS_USED(MODULE_SX126X_STM32WL)
+#if MODULE_SX126X_STM32WL
         _dev = netdev;
 #endif
     }
@@ -155,7 +155,7 @@ static void _isr(netdev_t *netdev)
     sx126x_get_and_clear_irq_status(dev, &irq_mask);
 
     if (sx126x_is_stm32wl(dev)) {
-#if IS_USED(MODULE_SX126X_STM32WL)
+#if MODULE_SX126X_STM32WL
         NVIC_EnableIRQ(SUBGHZ_Radio_IRQn);
 #endif
     }
@@ -308,7 +308,7 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
     case NETOPT_STATE_IDLE:
     case NETOPT_STATE_RX:
         DEBUG("[sx126x] netdev: set NETOPT_STATE_RX state\n");
-#if IS_USED(MODULE_SX126X_RF_SWITCH)
+#if MODULE_SX126X_RF_SWITCH
         /* Refer Section 4.2 RF Switch in Application Note (AN5406) */
         if (dev->params->set_rf_mode) {
             dev->params->set_rf_mode(dev, SX126X_RF_MODE_RX);
@@ -319,7 +319,7 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
 
     case NETOPT_STATE_TX:
         DEBUG("[sx126x] netdev: set NETOPT_STATE_TX state\n");
-#if IS_USED(MODULE_SX126X_RF_SWITCH)
+#if MODULE_SX126X_RF_SWITCH
         if (dev->params->set_rf_mode) {
             dev->params->set_rf_mode(dev, dev->params->tx_pa_mode);
         }

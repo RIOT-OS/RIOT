@@ -41,7 +41,7 @@ static void usage(const char *cmd_name)
     LOG(LOG_ERROR, "Usage: %s <server-address>\n", cmd_name);
 }
 
-#ifdef MODULE_WOLFSSL_PSK
+#if MODULE_WOLFSSL_PSK
 /* identity is OpenSSL testing default for openssl s_client, keep same */
 static const char* kIdentityStr = "Client_identity";
 
@@ -128,7 +128,7 @@ static int _client_cmd(int argc, char **argv)
         return -1;
     }
 
-#ifndef MODULE_WOLFSSL_PSK
+#if !MODULE_WOLFSSL_PSK
     /* Disable certificate validation from the client side */
     wolfSSL_CTX_set_verify(sk->ctx, SSL_VERIFY_NONE, 0);
 

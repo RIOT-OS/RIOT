@@ -39,26 +39,26 @@ void print_board_config(void)
 {
     ets_printf("\nBoard configuration:\n");
 
-#if IS_USED(MODULE_PERIPH_ADC)
+#if MODULE_PERIPH_ADC
     adc_print_config();
 #endif
-#if IS_USED(MODULE_PERIPH_DAC)
+#if MODULE_PERIPH_DAC
     dac_print_config();
 #endif
-#if IS_USED(MODULE_PERIPH_PWM)
+#if MODULE_PERIPH_PWM
     pwm_print_config();
 #endif
-#if IS_USED(MODULE_PERIPH_I2C)
+#if MODULE_PERIPH_I2C
     i2c_print_config();
 #endif
-#if IS_USED(MODULE_PERIPH_SPI)
+#if MODULE_PERIPH_SPI
     spi_print_config();
 #endif
-#if IS_USED(MODULE_PERIPH_UART)
+#if MODULE_PERIPH_UART
     uart_print_config();
 #endif
 
-#if IS_USED(MODULE_PERIPH_CAN)
+#if MODULE_PERIPH_CAN
     can_print_config();
 #endif
 

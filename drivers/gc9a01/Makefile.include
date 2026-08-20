@@ -1,2 +1,8 @@
 USEMODULE_INCLUDES_gc9a01 := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_gc9a01)
+
+MODULE_DEFS_NEEDED += \
+  lcd_parallel \
+  lcd_parallel_16bit \
+  lcd_spi \
+  #

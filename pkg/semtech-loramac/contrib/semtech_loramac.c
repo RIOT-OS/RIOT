@@ -40,11 +40,11 @@
 #include "LoRaMacTest.h"
 #include "region/Region.h"
 
-#if IS_USED(MODULE_SX127X)
+#if MODULE_SX127X
 #include "sx127x.h"
 #endif
 
-#ifdef MODULE_PERIPH_EEPROM
+#if MODULE_PERIPH_EEPROM
 #include "periph/eeprom.h"
 #endif
 
@@ -186,7 +186,7 @@ static void mlme_indication(MlmeIndication_t *indication)
     msg_send(&msg, semtech_loramac_pid);
 }
 
-#ifdef MODULE_PERIPH_EEPROM
+#if MODULE_PERIPH_EEPROM
 static size_t _read_uint32(size_t pos, uint32_t *value)
 {
     uint8_t array[4] = { 0 };
@@ -385,7 +385,7 @@ void _init_loramac(semtech_loramac_t *mac,
     semtech_loramac_set_system_max_rx_error(mac,
                                             CONFIG_LORAMAC_DEFAULT_SYSTEM_MAX_RX_ERROR);
     semtech_loramac_set_min_rx_symbols(mac, CONFIG_LORAMAC_DEFAULT_MIN_RX_SYMBOLS);
-#ifdef MODULE_PERIPH_EEPROM
+#if MODULE_PERIPH_EEPROM
     _read_loramac_config(mac);
 #endif
 }
@@ -565,7 +565,7 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
             semtech_loramac_radio_events.RxError();
             break;
 
-#if IS_USED(MODULE_SX127X)
+#if MODULE_SX127X
         case NETDEV_EVENT_FHSS_CHANGE_CHANNEL:
             DEBUG("[semtech-loramac] FHSS channel change\n");
             if(semtech_loramac_radio_events.FhssChangeChannel) {
@@ -671,7 +671,7 @@ void *_semtech_loramac_event_loop(void *arg)
                             msg_send(&msg_ret, mac->tx_pid);
                             break;
                         }
-#ifdef MODULE_SEMTECH_LORAMAC_RX
+#if MODULE_SEMTECH_LORAMAC_RX
                         case MLME_LINK_CHECK:
                             if (confirm->Status == LORAMAC_EVENT_INFO_STATUS_OK) {
                                 mac->link_chk.demod_margin = confirm->DemodMargin;
@@ -698,7 +698,7 @@ void *_semtech_loramac_event_loop(void *arg)
                     MlmeIndication_t *indication = (MlmeIndication_t *)msg.content.ptr;
                     if (indication->MlmeIndication == MLME_SCHEDULE_UPLINK) {
                         DEBUG("[semtech-loramac] MLME indication: schedule an uplink\n");
-#ifdef MODULE_SEMTECH_LORAMAC_RX
+#if MODULE_SEMTECH_LORAMAC_RX
                         msg_t msg_ret;
                         msg_ret.content.value = SEMTECH_LORAMAC_TX_SCHEDULE;
                         msg_send(&msg_ret, mac->rx_pid);
@@ -716,7 +716,7 @@ void *_semtech_loramac_event_loop(void *arg)
                     if (confirm->Status == LORAMAC_EVENT_INFO_STATUS_OK) {
                         DEBUG("[semtech-loramac] MCPS confirm event OK\n");
                         status = SEMTECH_LORAMAC_TX_DONE;
-#ifdef MODULE_PERIPH_EEPROM
+#if MODULE_PERIPH_EEPROM
                         /* save the uplink counter */
                         _save_uplink_counter(mac);
 #endif
@@ -790,7 +790,7 @@ void *_semtech_loramac_event_loop(void *arg)
                        Check Port
                        Check Datarate */
 
-#ifdef MODULE_SEMTECH_LORAMAC_RX
+#if MODULE_SEMTECH_LORAMAC_RX
                     if (indication->RxData) {
                         DEBUG("[semtech-loramac] MCPS indication: data received\n");
                         memcpy(mac->rx_data.payload,
@@ -880,7 +880,7 @@ uint8_t semtech_loramac_join(semtech_loramac_t *mac, uint8_t type)
     return (uint8_t)msg.content.value;
 }
 
-#ifdef MODULE_SEMTECH_LORAMAC_RX
+#if MODULE_SEMTECH_LORAMAC_RX
 void semtech_loramac_request_link_check(semtech_loramac_t *mac)
 {
     mutex_lock(&mac->lock);
@@ -913,7 +913,7 @@ uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len)
     return (uint8_t)msg.content.value;
 }
 
-#ifdef MODULE_SEMTECH_LORAMAC_RX
+#if MODULE_SEMTECH_LORAMAC_RX
 uint8_t semtech_loramac_recv(semtech_loramac_t *mac)
 {
     /* Correctly set the receiver thread pid */

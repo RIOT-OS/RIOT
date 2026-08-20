@@ -92,7 +92,7 @@ extern "C" {
 #define ARDUINO_PIN_5_PWM_DEV   PWM_DEV(0)  /**< PWM device for Arduino pin 5 */
 #define ARDUINO_PIN_5_PWM_CHAN  1           /**< PWM channel for Arduino pin 5 */
 
-#ifndef MODULE_PERIPH_SPI
+#if !MODULE_PERIPH_SPI
 #define ARDUINO_PIN_10_PWM_DEV  PWM_DEV(1)  /**< PWM device for Arduino pin 10 */
 #define ARDUINO_PIN_10_PWM_CHAN 0           /**< PWM channel for Arduino pin 10 */
 

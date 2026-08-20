@@ -43,7 +43,7 @@ mutex_t slipdev_mutex = MUTEX_INIT;
 
 static inline void _slipdev_stdio_add_to_frame(slipdev_t *dev, uint8_t byte)
 {
-    if (!IS_USED(MODULE_STDIO_SLIPDEV) ||
+    if (!MODULE_STDIO_SLIPDEV ||
         dev->config.uart != slipdev_params[0].uart) {
         return;
     }
@@ -52,7 +52,7 @@ static inline void _slipdev_stdio_add_to_frame(slipdev_t *dev, uint8_t byte)
 
 static inline bool _slipdev_config_start_frame(slipdev_t *dev)
 {
-#ifdef MODULE_SLIPDEV_CONFIG
+#if MODULE_SLIPDEV_CONFIG
     /* try to create new configuration / CoAP frame */
     return crb_start_chunk(&dev->rb_config);
 #else
@@ -64,7 +64,7 @@ static inline bool _slipdev_config_start_frame(slipdev_t *dev)
 
 static inline void _slipdev_config_end_frame(slipdev_t *dev)
 {
-#ifdef MODULE_SLIPDEV_CONFIG
+#if MODULE_SLIPDEV_CONFIG
     crb_end_chunk(&dev->rb_config, true);
     slipdev_coap_dispatch_recv(&dev->rxevent);
 #else
@@ -74,7 +74,7 @@ static inline void _slipdev_config_end_frame(slipdev_t *dev)
 
 static inline bool _slipdev_config_add_to_frame(slipdev_t *dev, uint8_t byte)
 {
-#ifdef MODULE_SLIPDEV_CONFIG
+#if MODULE_SLIPDEV_CONFIG
     /* discard frame if byte can't be added */
     if (!crb_add_byte(&dev->rb_config, byte)) {
         DEBUG("slipmux: coap rx buffer full, drop frame\n");
@@ -90,7 +90,7 @@ static inline bool _slipdev_config_add_to_frame(slipdev_t *dev, uint8_t byte)
 
 static inline bool _slipdev_net_start_frame(slipdev_t *dev, uint8_t byte)
 {
-#ifdef MODULE_SLIPDEV_NET
+#if MODULE_SLIPDEV_NET
     /* try to create new ip frame */
     if (!crb_start_chunk(&dev->rb)) {
         DEBUG("slipmux: can't start new net frame, drop frame\n");
@@ -110,7 +110,7 @@ static inline bool _slipdev_net_start_frame(slipdev_t *dev, uint8_t byte)
 
 static inline void _slipdev_net_end_frame(slipdev_t *dev)
 {
-#ifdef MODULE_SLIPDEV_NET
+#if MODULE_SLIPDEV_NET
     crb_end_chunk(&dev->rb, true);
     netdev_trigger_event_isr(&dev->netdev);
 #else
@@ -120,7 +120,7 @@ static inline void _slipdev_net_end_frame(slipdev_t *dev)
 
 static inline bool _slipdev_net_add_to_frame(slipdev_t *dev, uint8_t byte)
 {
-#ifdef MODULE_SLIPDEV_NET
+#if MODULE_SLIPDEV_NET
     /* discard frame if byte can't be added */
     if (!crb_add_byte(&dev->rb, byte)) {
         DEBUG("slipmux: net rx buffer full, drop frame\n");
@@ -305,11 +305,11 @@ void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index
     dev->state = SLIPDEV_STATE_UNKNOWN;
 
     /* we only support one coap server at the moment */
-    if ((index == 0) && IS_USED(MODULE_SLIPDEV_CONFIG)) {
+    if ((index == 0) && MODULE_SLIPDEV_CONFIG) {
         slipdev_setup_coap(dev);
     }
 
-    if (IS_USED(MODULE_SLIPDEV_NET)) {
+    if (MODULE_SLIPDEV_NET) {
         slipdev_setup_net(dev, index);
     }
     else {

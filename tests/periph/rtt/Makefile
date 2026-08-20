@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_rtc_mem \
+  periph_rtt_set_counter \
+  #
 BOARD ?= samr21-xpro
 include ../Makefile.periph_common
 

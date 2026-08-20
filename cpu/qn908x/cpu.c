@@ -31,7 +31,7 @@ void cpu_init(void)
 {
     /* initialize the Cortex-M core */
     cortexm_init();
-#ifndef MODULE_PERIPH_WDT
+#if !MODULE_PERIPH_WDT
     /* If the `periph_wdt` is *not* being used (because the user does not care
      * about that feature) we need to disable the Watchdog and continue running
      * without it. Otherwise the CPU will reboot after about 10 seconds.

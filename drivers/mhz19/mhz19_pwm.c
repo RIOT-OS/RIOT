@@ -25,7 +25,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifdef MODULE_MHZ19_PWM
+#if MODULE_MHZ19_PWM
 int mhz19_init(mhz19_t *dev, const mhz19_params_t *params)
 {
     int16_t res;

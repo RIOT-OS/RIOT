@@ -51,7 +51,7 @@ extern "C" {
 #endif
 
 #ifndef ITG320X_PARAMS
-#ifdef MODULE_ITG320X_INT
+#if MODULE_ITG320X_INT
 #define ITG320X_PARAMS             { \
                                      .dev  = ITG320X_PARAM_DEV,  \
                                      .addr = ITG320X_PARAM_ADDR, \

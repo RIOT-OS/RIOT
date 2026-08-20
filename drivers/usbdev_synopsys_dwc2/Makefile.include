@@ -1,0 +1,57 @@
+MODULE_DEFS_NEEDED += \
+  cortexm_common \
+  periph_usbdev_hs_ulpi \
+  periph_usbdev_hs_utmi \
+  #
+
+MODULE_DEFS_NEEDED += \
+  cortexm_common \
+  periph_usbdev_hs_ulpi \
+  periph_usbdev_hs_utmi \
+  #
+
+MODULE_DEFS_NEEDED += \
+  cortexm_common \
+  periph_usbdev_hs_ulpi \
+  periph_usbdev_hs_utmi \
+  #
+
+MODULE_DEFS_NEEDED += \
+  cortexm_common \
+  periph_usbdev_hs_ulpi \
+  periph_usbdev_hs_utmi \
+  #
+
+MODULE_DEFS_NEEDED += \
+  cortexm_common \
+  periph_usbdev_hs_ulpi \
+  periph_usbdev_hs_utmi \
+  #
+
+MODULE_DEFS_NEEDED += \
+  cortexm_common \
+  defs_needed \
+  periph_usbdev_hs_ulpi \
+  periph_usbdev_hs_utmi \
+  #
+
+MODULE_DEFS_NEEDED += \
+  cortexm_common \
+  defs_needed \
+  periph_usbdev_hs_ulpi \
+  periph_usbdev_hs_utmi \
+  #
+
+MODULE_DEFS_NEEDED += \
+  cortexm_common \
+  defs_needed \
+  periph_usbdev_hs_ulpi \
+  periph_usbdev_hs_utmi \
+  #
+
+MODULE_DEFS_NEEDED += \
+  cortexm_common \
+  defs_needed \
+  periph_usbdev_hs_ulpi \
+  periph_usbdev_hs_utmi \
+  #

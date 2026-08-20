@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  riotboot_serial \
+  riotboot_slot \
+  #
 # Default RIOT bootloader
 APPLICATION = riotboot_serial
 

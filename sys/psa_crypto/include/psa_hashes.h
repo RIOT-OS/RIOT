@@ -27,7 +27,7 @@ extern "C" {
 #include "psa/crypto.h"
 #include "psa/crypto_contexts.h"
 
-#if IS_USED(MODULE_PSA_HASH_MD5) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_MD5 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an MD5 hash setup
  *          See @ref psa_hash_setup()
@@ -55,7 +55,7 @@ psa_status_t psa_hashes_md5_finish(psa_hashes_md5_ctx_t *ctx,
                                    size_t *hash_length);
 #endif /* MODULE_PSA_HASH_MD5 */
 
-#if IS_USED(MODULE_PSA_HASH_SHA_1) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA_1 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an SHA1 hash setup
  *          See @ref psa_hash_setup()
@@ -80,7 +80,7 @@ psa_status_t psa_hashes_sha1_finish(psa_hashes_sha1_ctx_t *ctx,
                                     size_t *hash_length);
 #endif /* MODULE_PSA_HASH_SHA_1 */
 
-#if IS_USED(MODULE_PSA_HASH_SHA_224) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA_224 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an SHA224 hash setup
  *          See @ref psa_hash_setup()
@@ -105,7 +105,7 @@ psa_status_t psa_hashes_sha224_finish(psa_hashes_sha224_ctx_t *ctx,
                                       size_t *hash_length);
 #endif /* MODULE_PSA_HASH_SHA_224 */
 
-#if IS_USED(MODULE_PSA_HASH_SHA_256) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA_256 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an SHA256 hash setup
  *          See @ref psa_hash_setup()
@@ -130,7 +130,7 @@ psa_status_t psa_hashes_sha256_finish(psa_hashes_sha256_ctx_t *ctx,
                                       size_t *hash_length);
 #endif /* MODULE_PSA_HASH_SHA_256 */
 
-#if IS_USED(MODULE_PSA_HASH_SHA_384) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA_384 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an SHA384 hash setup
  *          See @ref psa_hash_setup()
@@ -155,7 +155,7 @@ psa_status_t psa_hashes_sha384_finish(psa_hashes_sha384_ctx_t *ctx,
                                       size_t *hash_length);
 #endif /* MODULE_PSA_HASH_SHA_384 */
 
-#if IS_USED(MODULE_PSA_HASH_SHA_512) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA_512 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an SHA512 hash setup
  *          See @ref psa_hash_setup()
@@ -180,7 +180,7 @@ psa_status_t psa_hashes_sha512_finish(psa_hashes_sha512_ctx_t *ctx,
                                       size_t *hash_length);
 #endif /* MODULE_PSA_HASH_SHA_512 */
 
-#if IS_USED(MODULE_PSA_HASH_SHA_512_224) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA_512_224 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an SHA512/224 hash setup
  *          See @ref psa_hash_setup()
@@ -205,7 +205,7 @@ psa_status_t psa_hashes_sha512_224_finish(psa_hashes_sha512_224_ctx_t *ctx,
                                       size_t *hash_length);
 #endif /* MODULE_PSA_HASH_SHA_512_224 */
 
-#if IS_USED(MODULE_PSA_HASH_SHA_512_256) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA_512_256 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an SHA512/256 hash setup
  *          See @ref psa_hash_setup()
@@ -230,7 +230,7 @@ psa_status_t psa_hashes_sha512_256_finish(psa_hashes_sha512_256_ctx_t *ctx,
                                       size_t *hash_length);
 #endif /* MODULE_PSA_HASH_SHA_512_256 */
 
-#if IS_USED(MODULE_PSA_HASH_SHA3_256) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA3_256 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for a general SHA3 hash update
  *          See @ref psa_hash_update()
@@ -253,7 +253,7 @@ psa_status_t psa_hashes_sha3_256_finish(psa_hashes_sha3_ctx_t *ctx,
                                       uint8_t *hash);
 #endif /* MODULE_PSA_HASH_SHA3_256 */
 
-#if IS_USED(MODULE_PSA_HASH_SHA3_384) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA3_384 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for a general SHA3 hash update
  *          See @ref psa_hash_update()
@@ -276,7 +276,7 @@ psa_status_t psa_hashes_sha3_384_finish(psa_hashes_sha3_ctx_t *ctx,
                                       uint8_t *hash);
 #endif /* MODULE_PSA_HASH_SHA3_384 */
 
-#if IS_USED(MODULE_PSA_HASH_SHA3_512) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA3_512 || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for a general SHA3 hash update
  *          See @ref psa_hash_update()

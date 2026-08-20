@@ -1,5 +1,35 @@
 MODULE = periph
 
+MODULE_DEFS_NEEDED += \
+  cortexm_common \
+  disp_dev \
+  fmt \
+  periph_dma \
+  periph_eth \
+  periph_fmc_nor_sram \
+  periph_fmc_sdram \
+  periph_gpio_irq \
+  periph_init_ptp \
+  periph_lpuart \
+  periph_ptp \
+  periph_ptp_timer \
+  periph_sdmmc_8bit \
+  periph_spi_gpio_mode \
+  periph_timer_periodic \
+  periph_uart_hw_fc \
+  periph_uart_modecfg \
+  periph_uart_nonblocking \
+  periph_vbat \
+  ptp_timer \
+  stm32_eth \
+  stm32_eth_auto \
+  stm32_eth_link_up \
+  stm32_eth_tracing \
+  stm32mp1_eng_mode \
+  ztimer_msec \
+  ztimer_usec \
+  #
+
 # Select the specific implementation for `periph_i2c`
 ifneq (,$(filter periph_i2c,$(USEMODULE)))
   ifneq (,$(filter $(CPU_FAM),f0 f3 f7 g0 g4 h7 l0 l4 l5 u5 wb wl c0))

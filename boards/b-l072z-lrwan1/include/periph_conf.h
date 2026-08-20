@@ -70,7 +70,7 @@ static const uart_conf_t uart_config[] = {
         .irqn       = USART2_IRQn,
         .type       = STM32_USART,
         .clk_src    = 0, /* Use APB clock */
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma        = 2,
         .dma_chan   = 4,
 #endif
@@ -86,7 +86,7 @@ static const uart_conf_t uart_config[] = {
         .irqn       = USART1_IRQn,
         .type       = STM32_USART,
         .clk_src    = 0, /* Use APB clock */
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma        = 0,
         .dma_chan   = 3,
 #endif
@@ -116,7 +116,7 @@ static const spi_conf_t spi_config[] = {
         .cs_af    = GPIO_AF0,
         .rccmask  = RCC_APB1ENR_SPI2EN,
         .apbbus   = APB1,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_dma   = 3,
         .tx_dma_chan = 2,
         .rx_dma   = 2,
@@ -135,7 +135,7 @@ static const spi_conf_t spi_config[] = {
         .cs_af    = GPIO_AF0,
         .rccmask  = RCC_APB2ENR_SPI1EN,
         .apbbus   = APB2,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_dma   = 1,
         .tx_dma_chan = 1,
         .rx_dma   = 0,

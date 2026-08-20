@@ -12,3 +12,7 @@ endif
 
 # Setup of programmer and serial is shared between STM32 based boards
 include $(RIOTMAKE)/boards/stm32.inc.mk
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  #

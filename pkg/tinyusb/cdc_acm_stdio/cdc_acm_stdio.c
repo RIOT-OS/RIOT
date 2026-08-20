@@ -44,7 +44,7 @@ static ssize_t _write(const void* buffer, size_t len)
     return (char *)buffer - start;
 }
 
-#ifdef MODULE_STDIN
+#if MODULE_STDIN
 void tud_cdc_rx_cb(uint8_t itf)
 {
     (void)itf;

@@ -189,7 +189,7 @@ extern "C" {
  */
 #define DFPLAYER_WAIT_MS    (100U)
 
-#ifdef MODULE_AUTO_INIT_MULTIMEDIA
+#if MODULE_AUTO_INIT_MULTIMEDIA
 
 extern dfplayer_t dfplayer_devs[DFPLAYER_NUMOF];
 

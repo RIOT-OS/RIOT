@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 #if defined(SOCK_HAS_ASYNC) || defined(DOXYGEN)
-#if defined(MODULE_SOCK_DTLS) || defined(DOXYGEN)
+#if MODULE_SOCK_DTLS || defined(DOXYGEN)
 
 /**
  * @brief Gets the asynchronous event session from sock object
@@ -62,9 +62,9 @@ bool sock_dtls_get_event_session(sock_dtls_t *sock,
  * @param[in] cb_arg    Argument to provide to @p cb. May be NULL.
  */
 void sock_dtls_set_cb(sock_dtls_t *sock, sock_dtls_cb_t cb, void *cb_arg);
-#endif  /* defined(MODULE_SOCK_DTLS) || defined(DOXYGEN) */
+#endif  /* MODULE_SOCK_DTLS || defined(DOXYGEN) */
 
-#if defined(MODULE_SOCK_IP) || defined(DOXYGEN)
+#if MODULE_SOCK_IP || defined(DOXYGEN)
 /**
  * @brief   Sets event callback for @ref sock_ip_t
  *
@@ -80,9 +80,9 @@ void sock_dtls_set_cb(sock_dtls_t *sock, sock_dtls_cb_t cb, void *cb_arg);
  * @param[in] cb_arg    Argument to provide to @p cb. May be NULL.
  */
 void sock_ip_set_cb(sock_ip_t *sock, sock_ip_cb_t cb, void *cb_arg);
-#endif  /* defined(MODULE_SOCK_IP) || defined(DOXYGEN) */
+#endif  /* MODULE_SOCK_IP || defined(DOXYGEN) */
 
-#if defined(MODULE_SOCK_TCP) || defined(DOXYGEN)
+#if MODULE_SOCK_TCP || defined(DOXYGEN)
 /**
  * @brief   Sets event callback for @ref sock_tcp_t
  *
@@ -115,9 +115,9 @@ void sock_tcp_set_cb(sock_tcp_t *sock, sock_tcp_cb_t cb, void *cb_arg);
  */
 void sock_tcp_queue_set_cb(sock_tcp_queue_t *queue, sock_tcp_queue_cb_t cb,
                            void *cb_arg);
-#endif  /* defined(MODULE_SOCK_TCP) || defined(DOXYGEN) */
+#endif  /* MODULE_SOCK_TCP || defined(DOXYGEN) */
 
-#if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
+#if MODULE_SOCK_UDP || defined(DOXYGEN)
 /**
  * @brief   Gets the asynchronous event context from sock object
  *
@@ -133,12 +133,12 @@ void sock_tcp_queue_set_cb(sock_tcp_queue_t *queue, sock_tcp_queue_cb_t cb,
  * @param[in] cb_arg    Argument to provide to @p cb
  */
 void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb, void *cb_arg);
-#endif  /* defined(MODULE_SOCK_UDP) || defined(DOXYGEN) */
+#endif  /* MODULE_SOCK_UDP || defined(DOXYGEN) */
 
 #if defined(SOCK_HAS_ASYNC_CTX) || defined(DOXYGEN)
 #include "sock_async_ctx.h"     /* defines sock_async_ctx_t */
 
-#if defined(MODULE_SOCK_DTLS) || defined(DOXYGEN)
+#if MODULE_SOCK_DTLS || defined(DOXYGEN)
 /**
  * @brief   Gets the asynchronous event context from sock object
  *
@@ -154,9 +154,9 @@ void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb, void *cb_arg);
  * @return  The asynchronous event context
  */
 sock_async_ctx_t *sock_dtls_get_async_ctx(sock_dtls_t *sock);
-#endif  /* defined(MODULE_SOCK_DTLS) || defined(DOXYGEN) */
+#endif  /* MODULE_SOCK_DTLS || defined(DOXYGEN) */
 
-#if defined(MODULE_SOCK_IP) || defined(DOXYGEN)
+#if MODULE_SOCK_IP || defined(DOXYGEN)
 /**
  * @brief   Gets the asynchronous event context from sock object
  *
@@ -172,9 +172,9 @@ sock_async_ctx_t *sock_dtls_get_async_ctx(sock_dtls_t *sock);
  * @return  The asynchronous event context
  */
 sock_async_ctx_t *sock_ip_get_async_ctx(sock_ip_t *sock);
-#endif  /* defined(MODULE_SOCK_IP) || defined(DOXYGEN) */
+#endif  /* MODULE_SOCK_IP || defined(DOXYGEN) */
 
-#if defined(MODULE_SOCK_TCP) || defined(DOXYGEN)
+#if MODULE_SOCK_TCP || defined(DOXYGEN)
 /**
  * @brief   Gets the asynchronous event context from sock object
  *
@@ -206,9 +206,9 @@ sock_async_ctx_t *sock_tcp_get_async_ctx(sock_tcp_t *sock);
  * @return  The asynchronous event context
  */
 sock_async_ctx_t *sock_tcp_queue_get_async_ctx(sock_tcp_queue_t *queue);
-#endif  /* defined(MODULE_SOCK_TCP) || defined(DOXYGEN) */
+#endif  /* MODULE_SOCK_TCP || defined(DOXYGEN) */
 
-#if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
+#if MODULE_SOCK_UDP || defined(DOXYGEN)
 /**
  * @brief   Gets the asynchronous event context from sock object
  *
@@ -224,7 +224,7 @@ sock_async_ctx_t *sock_tcp_queue_get_async_ctx(sock_tcp_queue_t *queue);
  * @return  The asynchronous event context
  */
 sock_async_ctx_t *sock_udp_get_async_ctx(sock_udp_t *sock);
-#endif  /* defined(MODULE_SOCK_UDP) || defined(DOXYGEN) */
+#endif  /* MODULE_SOCK_UDP || defined(DOXYGEN) */
 #endif  /* defined(SOCK_HAS_ASYNC_CTX) || defined(DOXYGEN) */
 #endif  /* defined(SOCK_HAS_ASYNC) || defined(DOXYGEN) */
 

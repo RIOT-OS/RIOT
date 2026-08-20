@@ -71,7 +71,7 @@ int main(void)
     nimble_scanner_cfg_t params = {
         .itvl_ms = DEFAULT_SCAN_INTERVAL_MS,
         .win_ms = DEFAULT_SCAN_INTERVAL_MS,
-#if IS_USED(MODULE_NIMBLE_PHY_CODED)
+#if MODULE_NIMBLE_PHY_CODED
         .flags = NIMBLE_SCANNER_PHY_1M | NIMBLE_SCANNER_PHY_CODED,
 #else
         .flags = NIMBLE_SCANNER_PHY_1M,

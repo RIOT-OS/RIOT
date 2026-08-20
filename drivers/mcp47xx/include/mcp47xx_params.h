@@ -87,7 +87,7 @@ static const mcp47xx_params_t mcp47xx_params[] =
     MCP47XX_PARAMS
 };
 
-#if IS_USED(MODULE_SAUL) || DOXYGEN
+#if MODULE_SAUL || DOXYGEN
 /**
  * @brief   Additional meta information to keep in the SAUL registry
  */
@@ -95,7 +95,7 @@ static const  mcp47xx_saul_dac_params_t mcp47xx_saul_dac_params[] =
 {
     MCP47XX_SAUL_DAC_PARAMS
 };
-#endif /* IS_USED(MODULE_SAUL) || DOXYGEN */
+#endif /* MODULE_SAUL || DOXYGEN */
 
 #ifdef __cplusplus
 }

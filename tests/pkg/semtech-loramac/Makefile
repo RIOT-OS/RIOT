@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  semtech_loramac_rx \
+  #
 BOARD ?= b-l072z-lrwan1
 
 include ../Makefile.pkg_common

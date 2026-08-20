@@ -13,3 +13,7 @@ TERM_DELAY ?= 1
 # Setup of programmer and serial is shared between STM32 based boards
 include $(RIOTMAKE)/boards/stm32.inc.mk
 include $(RIOTMAKE)/tools/usb_board_reset.mk
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  #

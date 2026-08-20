@@ -21,7 +21,7 @@
 extern "C" {
 #endif
 
-#ifdef MODULE_ATMEGA_COMMON
+#if MODULE_ATMEGA_COMMON
 #define ARDUINO
 #endif
 

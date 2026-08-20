@@ -15,3 +15,50 @@ PSEUDOMODULES += wolfcrypt_%
 
 # wolfssl implements different options using pseudomodules (ocsp, dtls, crl, etc.)
 PSEUDOMODULES += wolfssl_%
+
+MODULE_DEFS_NEEDED += \
+  sock_tcp \
+  wolfcrypt_aes \
+  wolfcrypt_asn \
+  wolfcrypt_blake2b \
+  wolfcrypt_camellia \
+  wolfcrypt_chacha \
+  wolfcrypt_cmac \
+  wolfcrypt_coding \
+  wolfcrypt_compress \
+  wolfcrypt_curve25519 \
+  wolfcrypt_des3 \
+  wolfcrypt_dh \
+  wolfcrypt_dsa \
+  wolfcrypt_ecc \
+  wolfcrypt_ed25519 \
+  wolfcrypt_ffdhe_2048 \
+  wolfcrypt_hc128 \
+  wolfcrypt_hmac \
+  wolfcrypt_idea \
+  wolfcrypt_md4 \
+  wolfcrypt_md5 \
+  wolfcrypt_pkcs12 \
+  wolfcrypt_pkcs7 \
+  wolfcrypt_poly1305 \
+  wolfcrypt_pwdbased \
+  wolfcrypt_rabbit \
+  wolfcrypt_random \
+  wolfcrypt_ripemd \
+  wolfcrypt_rsa \
+  wolfcrypt_sha \
+  wolfcrypt_sha3 \
+  wolfcrypt_sha512 \
+  wolfcrypt_signature \
+  wolfcrypt_srp \
+  wolfssl_crl \
+  wolfssl_debug \
+  wolfssl_dtls \
+  wolfssl_dtls13 \
+  wolfssl_md2 \
+  wolfssl_ocsp \
+  wolfssl_psk \
+  wolfssl_socket \
+  wolfssl_tls \
+  wolfssl_tls13 \
+  #

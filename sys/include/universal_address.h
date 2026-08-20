@@ -33,7 +33,7 @@ extern "C" {
 #endif
 
 /* IPv6 address has 128 bit -> 16 bytes */
-#if defined(MODULE_IPV6_ADDR) && ((IPV6_ADDR_BIT_LEN >> 3) > UNIVERSAL_ADDRESS_SIZE)
+#if MODULE_IPV6_ADDR && ((IPV6_ADDR_BIT_LEN >> 3) > UNIVERSAL_ADDRESS_SIZE)
 #undef UNIVERSAL_ADDRESS_SIZE
 #define UNIVERSAL_ADDRESS_SIZE (IPV6_ADDR_BIT_LEN >> 3)
 #endif

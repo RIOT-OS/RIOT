@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#ifndef MODULE_XTIMER_ON_ZTIMER
+#if !MODULE_XTIMER_ON_ZTIMER
 #include "board.h"
 #include "periph/timer.h"
 #include "periph_conf.h"
@@ -56,7 +56,7 @@ static inline void _schedule_earliest_lltimer(uint32_t now);
 
 static void _timer_callback(void);
 
-#ifndef MODULE_XTIMER_ON_ZTIMER
+#if !MODULE_XTIMER_ON_ZTIMER
 static void _periph_timer_callback(void *arg, int chan);
 #else
 static void _ztimer_callback(void *arg);
@@ -65,7 +65,7 @@ static ztimer_t _ztimer = { .callback=_ztimer_callback };
 
 void xtimer_init(void)
 {
-#ifndef MODULE_XTIMER_ON_ZTIMER
+#if !MODULE_XTIMER_ON_ZTIMER
     /* initialize low-level timer */
     int ret = timer_init(XTIMER_DEV, XTIMER_HZ, _periph_timer_callback, NULL);
     (void)ret;
@@ -122,7 +122,7 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
     irq_restore(state);
 }
 
-#ifndef MODULE_XTIMER_ON_ZTIMER
+#if !MODULE_XTIMER_ON_ZTIMER
 static void _periph_timer_callback(void *arg, int chan)
 {
     (void)arg;
@@ -164,7 +164,7 @@ static inline void _schedule_earliest_lltimer(uint32_t now)
     }
 
     DEBUG("_schedule_earliest_lltimer(): setting %" PRIu32 "\n", _xtimer_lltimer_mask(target));
-#ifndef MODULE_XTIMER_ON_ZTIMER
+#if !MODULE_XTIMER_ON_ZTIMER
     timer_set_absolute(XTIMER_DEV, XTIMER_CHAN, _xtimer_lltimer_mask(target));
 #else
     ztimer_set(ZTIMER_USEC, &_ztimer, target - ztimer_now(ZTIMER_USEC));

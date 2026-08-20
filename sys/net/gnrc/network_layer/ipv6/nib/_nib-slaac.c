@@ -165,7 +165,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
         /* Cannot use target address as personal address and can
          * not change hardware address to retry SLAAC => use purely
          * DHCPv6 instead */
-        if (IS_USED(MODULE_DHCPV6_CLIENT_IA_NA)) {
+        if (MODULE_DHCPV6_CLIENT_IA_NA) {
             netif->ipv6.aac_mode &= ~GNRC_NETIF_AAC_AUTO;
             netif->ipv6.aac_mode |= GNRC_NETIF_AAC_DHCP;
             dhcpv6_client_req_ia_na(netif->pid);

@@ -28,7 +28,7 @@
 #include "net/skald.h"
 
 /* include fitting radio driver */
-#if defined(MODULE_NRFBLE)
+#if MODULE_NRFBLE
 #include "nrfble.h"
 /* add other BLE radio drivers once implemented - and potentially move to
  * auto-init at some point */
@@ -106,7 +106,7 @@ void skald_init(void)
 {
     /* setup and a fitting radio driver - potentially move to auto-init at some
      * point */
-#if defined(MODULE_NRFBLE)
+#if MODULE_NRFBLE
     _radio = nrfble_setup();
 #endif
 

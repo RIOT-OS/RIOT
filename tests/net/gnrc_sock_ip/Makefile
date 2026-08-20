@@ -1,3 +1,9 @@
+
+MODULE_DEFS_NEEDED += \
+  sock_aux_local \
+  sock_aux_rssi \
+  sock_aux_timestamp \
+  #
 include ../Makefile.net_common
 
 AUX_LOCAL ?= 1

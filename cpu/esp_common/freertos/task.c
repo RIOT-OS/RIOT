@@ -16,7 +16,7 @@
 #include "log.h"
 #include "syscalls.h"
 #include "thread.h"
-#if defined(MODULE_ZTIMER_MSEC) || defined(MODULE_ZTIMER_USEC)
+#if MODULE_ZTIMER_MSEC || MODULE_ZTIMER_USEC
 #include "ztimer.h"
 #endif
 #include "timex.h"
@@ -212,10 +212,10 @@ void vTaskDelay(const TickType_t xTicksToDelay)
     irq_enable();
 #endif
 
-#if defined(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
     uint64_t ms = xTicksToDelay * portTICK_PERIOD_MS;
     ztimer_sleep(ZTIMER_MSEC, ms);
-#elif defined(MODULE_ZTIMER_USEC)
+#elif MODULE_ZTIMER_USEC
     uint64_t us = xTicksToDelay * portTICK_PERIOD_MS * US_PER_MS;
     ztimer_sleep(ZTIMER_USEC, us);
 #endif
@@ -443,7 +443,7 @@ BaseType_t xTaskNotifyWait(uint32_t ulBitsToClearOnEntry,
 
         DEBUG("%s pid=%d suspend calling thread\n", __func__, pid);
 
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
         ztimer_t tm = { };
         uint32_t to = xTicksToWait * portTICK_PERIOD_MS;
         /* set the timeout if given */
@@ -457,7 +457,7 @@ BaseType_t xTaskNotifyWait(uint32_t ulBitsToClearOnEntry,
         vTaskExitCritical(0);
         thread_yield_higher();
 
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
         vTaskEnterCritical(0);
         if (xTicksToWait < portMAX_DELAY) {
             ztimer_remove(ZTIMER_MSEC, &tm);

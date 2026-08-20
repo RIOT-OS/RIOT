@@ -331,7 +331,7 @@ void sock_dtls_session_destroy(sock_tls_t *sk);
  */
 void sock_dtls_close(sock_tls_t *sk);
 
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
 #   error Only support for UDP/IP provided via GNRC stack.
 #endif
 

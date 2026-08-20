@@ -1,3 +1,10 @@
+
+MODULE_DEFS_NEEDED += \
+  esp_eth \
+  esp_idf_heap \
+  esp_wifi_any \
+  pthread \
+  #
 # add a list of subdirectories, that should also be build
 DIRS += periph
 

@@ -43,7 +43,7 @@
 #define SX126X_SPI_WAKEUP_TIME      500U
 #endif
 
-#if IS_USED(MODULE_SX126X_STM32WL)
+#if MODULE_SX126X_STM32WL
 static uint8_t sx126x_radio_wait_until_ready(sx126x_t *dev)
 {
     if (dev->radio_sleep == true) {
@@ -66,7 +66,7 @@ sx126x_hal_status_t sx126x_hal_write(const void *context,
     sx126x_t *dev = (sx126x_t *)context;
 
     if (sx126x_is_stm32wl(dev)) {
-#if IS_USED(MODULE_SX126X_STM32WL)
+#if MODULE_SX126X_STM32WL
         sx126x_radio_wait_until_ready(dev);
         spi_acquire(dev->params->spi, SPI_CS_UNDEF, SX126X_SPI_MODE, SX126X_SPI_SPEED);
 
@@ -115,7 +115,7 @@ sx126x_hal_status_t sx126x_hal_read(const void *context,
     sx126x_t *dev = (sx126x_t *)context;
 
     if (sx126x_is_stm32wl(dev)) {
-#if IS_USED(MODULE_SX126X_STM32WL)
+#if MODULE_SX126X_STM32WL
         sx126x_radio_wait_until_ready(dev);
 
         spi_acquire(dev->params->spi, SPI_CS_UNDEF, SX126X_SPI_MODE, SX126X_SPI_SPEED);
@@ -149,7 +149,7 @@ sx126x_hal_status_t sx126x_hal_reset(const void *context)
     sx126x_t *dev = (sx126x_t *)context;
 
     if (sx126x_is_stm32wl(dev)) {
-#if IS_USED(MODULE_SX126X_STM32WL)
+#if MODULE_SX126X_STM32WL
         /* Reset Radio */
         RCC->CSR |= RCC_CSR_RFRST;
         /* Clear radio reset */
@@ -194,7 +194,7 @@ sx126x_hal_status_t sx126x_hal_wakeup(const void *context)
     sx126x_t *dev = (sx126x_t *)context;
 
     if (sx126x_is_stm32wl(dev)) {
-#if IS_USED(MODULE_SX126X_STM32WL)
+#if MODULE_SX126X_STM32WL
         /* Pull NSS low */
         PWR->SUBGHZSPICR &= ~PWR_SUBGHZSPICR_NSS;
         ztimer_sleep(ZTIMER_USEC, 1000);

@@ -1,6 +1,10 @@
 # Define the module that is built:
 MODULE = cpu
 
+MODULE_DEFS_NEEDED += \
+  cc26x0_driverlib \
+  #
+
 # Add a list of subdirectories, that should also be built:
 DIRS = periph $(RIOTCPU)/cortexm_common $(RIOTCPU)/cc26xx_cc13xx
 ifneq (,$(filter cc26x0_driverlib,$(USEMODULE)))

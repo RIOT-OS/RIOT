@@ -44,7 +44,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_UNDEF,
         .rts_pin    = GPIO_UNDEF,
         .cts_af     = GPIO_AF7,
@@ -62,7 +62,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB12,
         .irqn       = LPUART1_IRQn,
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_UNDEF,
         .rts_pin    = GPIO_UNDEF,
         .cts_af     = GPIO_AF7,
@@ -80,7 +80,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB2,
         .irqn       = USART1_IRQn,
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_PIN(PORT_G, 11),
         .rts_pin    = GPIO_PIN(PORT_G, 12),
         .cts_af     = GPIO_AF7,

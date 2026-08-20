@@ -33,7 +33,7 @@ int main(void)
     ztimer64_init();
 #endif
 
-#if IS_USED(MODULE_XTIMER) && !IS_USED(MODULE_ZTIMER_XTIMER_COMPAT)
+#if MODULE_XTIMER && !MODULE_ZTIMER_XTIMER_COMPAT
     /* auto_init is disabled, but some modules depends on this module being initialized */
     xtimer_init();
 #endif

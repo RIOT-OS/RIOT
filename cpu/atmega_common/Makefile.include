@@ -6,3 +6,9 @@ PSEUDOMODULES += atmega_pcint%
 
 # CPU depends on the avr8 common module, so include it
 include $(RIOTCPU)/avr8_common/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  xtimer \
+  ztimer \
+  ztimer64 \
+  #

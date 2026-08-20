@@ -28,7 +28,7 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 }
 #endif
 
-#ifdef MODULE_PERIPH_TIMER_QUERY_FREQS
+#if MODULE_PERIPH_TIMER_QUERY_FREQS
 __attribute__((weak))
 uword_t timer_query_channel_numof(tim_t dev)
 {

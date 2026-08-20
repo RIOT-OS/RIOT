@@ -71,10 +71,10 @@
 
 #include "saul.h"
 
-#if defined(MODULE_ABP2_SPI)
+#if MODULE_ABP2_SPI
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#elif defined(MODULE_ABP2_I2C)
+#elif MODULE_ABP2_I2C
 #include "periph/i2c.h"
 #else
 #error "ABP2 driver >> Please add a valid module: either abp2_spi or abp2_i2c"
@@ -84,7 +84,7 @@
 extern "C" {
 #endif
 
-#if defined(MODULE_ABP2_I2C)
+#if MODULE_ABP2_I2C
 /**
  * @brief   Default I2C slave address for ABP2 devices
  *
@@ -127,7 +127,7 @@ extern "C" {
  * properties in µbar.
  */
 typedef struct abp2_params {
-#if defined(MODULE_ABP2_SPI)
+#if MODULE_ABP2_SPI
     spi_t spi;              /**< SPI bus the sensor is connected to. */
     spi_cs_t cs;            /**< CS pin GPIO handle. */
     spi_clk_t clk;          /**< SPI bus clock speed. */

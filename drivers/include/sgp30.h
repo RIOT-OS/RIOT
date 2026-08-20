@@ -57,7 +57,7 @@ typedef struct {
                              Volatile Organic Compounds in ppb. */
     uint16_t eco2;      /**< The last measurement of the IAQ-calculated
                              equivalent CO2 in ppm */
-#ifdef MODULE_SGP30_STRICT
+#if MODULE_SGP30_STRICT
     uint32_t timestamp; /**< Timestamp of last measured value */
 #endif
 } sgp30_data_t;
@@ -82,7 +82,7 @@ typedef struct {
  */
 typedef struct {
     sgp30_params_t params;      /**< parameters of the sensor device */
-#ifdef MODULE_SGP30_STRICT
+#if MODULE_SGP30_STRICT
     bool ready;                 /**< if initialization phase is over*/
     ztimer_t _timer;            /**< timer */
     sgp30_data_t _data;         /**< internal current data */
@@ -137,7 +137,7 @@ int sgp30_read_future_set(sgp30_t *dev, uint16_t *version);
  */
 int sgp30_reset(sgp30_t *dev);
 
-#if defined(MODULE_SGP30_STRICT) || defined(DOXYGEN)
+#if MODULE_SGP30_STRICT || defined(DOXYGEN)
 /**
  * @brief   If device is ready to start reading measurements
  *

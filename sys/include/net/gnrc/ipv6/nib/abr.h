@@ -22,7 +22,7 @@
 
 /* prevent cascading include error to xtimer if it is not compiled in or not
  * supported by board */
-#if IS_USED(MODULE_EVTIMER)
+#if MODULE_EVTIMER
 #include "timex.h"
 #include "evtimer.h"
 #endif
@@ -102,7 +102,7 @@ void gnrc_ipv6_nib_abr_del(const ipv6_addr_t *addr);
  */
 bool gnrc_ipv6_nib_abr_iter(void **state, gnrc_ipv6_nib_abr_t *abr);
 
-#if IS_USED(MODULE_EVTIMER) || defined(DOXYGEN)
+#if MODULE_EVTIMER || defined(DOXYGEN)
 /**
  * @brief   Provides the time in minutes for which the authoritative border
  *          router entry is valid

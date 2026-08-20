@@ -28,7 +28,7 @@
 #include "mutex.h"
 #include "evtimer.h"
 #include "random.h"
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
 #include "ztimer.h"
 #include "timex.h"
 #else
@@ -38,7 +38,7 @@
 
 #include "net/gnrc/rpl.h"
 #include "net/gnrc/rpl/rpble.h"
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
 #include "net/gnrc/rpl/p2p.h"
 #include "net/gnrc/rpl/p2p_dodag.h"
 #endif
@@ -49,8 +49,8 @@
 static char _stack[GNRC_RPL_STACK_SIZE];
 kernel_pid_t gnrc_rpl_pid = KERNEL_PID_UNDEF;
 const ipv6_addr_t ipv6_addr_all_rpl_nodes = GNRC_RPL_ALL_NODES_ADDR;
-#ifdef MODULE_GNRC_RPL_P2P
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_GNRC_RPL_P2P
+#if MODULE_ZTIMER_MSEC
 static uint32_t _lt_time = GNRC_RPL_LIFETIME_UPDATE_STEP * MS_PER_SEC;
 static ztimer_t _lt_timer;
 #else
@@ -62,7 +62,7 @@ static msg_t _lt_msg = { .type = GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE };
 static msg_t _msg_q[GNRC_RPL_MSG_QUEUE_SIZE];
 
 static gnrc_netreg_entry_t _me_icmpv6_reg;
-#ifdef MODULE_GNRC_NETAPI_NOTIFY
+#if MODULE_GNRC_NETAPI_NOTIFY
 static gnrc_netreg_entry_t _me_routing_reg;
 #endif /* MODULE_GNRC_NETAPI_NOTIFY*/
 
@@ -72,11 +72,11 @@ static uint8_t _instance_id;
 gnrc_rpl_instance_t gnrc_rpl_instances[GNRC_RPL_INSTANCES_NUMOF];
 gnrc_rpl_parent_t gnrc_rpl_parents[GNRC_RPL_PARENTS_NUMOF];
 
-#ifdef MODULE_NETSTATS_RPL
+#if MODULE_NETSTATS_RPL
 netstats_rpl_t gnrc_rpl_netstats;
 #endif
 
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
 static void _update_lifetime(void);
 #endif
 static void _dao_handle_send(gnrc_rpl_dodag_t *dodag);
@@ -112,7 +112,7 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
         _me_icmpv6_reg.target.pid = gnrc_rpl_pid;
         gnrc_netreg_register(GNRC_NETTYPE_ICMPV6, &_me_icmpv6_reg);
 
-#ifdef MODULE_GNRC_NETAPI_NOTIFY
+#if MODULE_GNRC_NETAPI_NOTIFY
         /* Register interest in L3 routing info. */
         _me_routing_reg.demux_ctx = GNRC_NETREG_DEMUX_CTX_ALL;
         _me_routing_reg.target.pid = gnrc_rpl_pid;
@@ -121,8 +121,8 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
 
         gnrc_rpl_of_manager_init();
         evtimer_init_msg(&gnrc_rpl_evtimer);
-#ifdef MODULE_GNRC_RPL_P2P
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_GNRC_RPL_P2P
+#if MODULE_ZTIMER_MSEC
         ztimer_set_msg(ZTIMER_MSEC, &_lt_timer, _lt_time,
                        &_lt_msg, gnrc_rpl_pid);
 #else
@@ -130,7 +130,7 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
 #endif
 #endif
 
-#ifdef MODULE_NETSTATS_RPL
+#if MODULE_NETSTATS_RPL
         memset(&gnrc_rpl_netstats, 0, sizeof(gnrc_rpl_netstats));
 #endif
     }
@@ -209,7 +209,7 @@ static void _receive(gnrc_pktsnip_t *icmpv6)
             gnrc_rpl_recv_DAO_ACK((gnrc_rpl_dao_ack_t *)(icmpv6_hdr + 1), iface, &ipv6_hdr->src,
                                   &ipv6_hdr->dst, byteorder_ntohs(ipv6_hdr->len));
             break;
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
         case GNRC_RPL_P2P_ICMPV6_CODE_DRO:
             DEBUG("RPL: P2P DRO received\n");
             gnrc_pktsnip_t *icmpv6_snip = gnrc_pktbuf_add(NULL, NULL, icmpv6->size,
@@ -300,7 +300,7 @@ static inline void _handle_unreachable_neighbor(ipv6_addr_t *addr)
  */
 static inline void _netapi_notify_event(gnrc_netapi_notify_t *notify)
 {
-    if (!IS_USED(MODULE_GNRC_NETAPI_NOTIFY)) {
+    if (!MODULE_GNRC_NETAPI_NOTIFY) {
         return;
     }
 
@@ -366,7 +366,7 @@ static void *_event_loop(void *args)
         msg_receive(&msg);
 
         switch (msg.type) {
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
             case GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE:
                 DEBUG("RPL: GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE received\n");
                 _update_lifetime();
@@ -425,12 +425,12 @@ static void *_event_loop(void *args)
     return NULL;
 }
 
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
 void _update_lifetime(void)
 {
     gnrc_rpl_p2p_update();
 
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
     ztimer_set_msg(ZTIMER_MSEC, &_lt_timer, _lt_time, &_lt_msg, gnrc_rpl_pid);
 #else
     xtimer_set_msg(&_lt_timer, _lt_time, &_lt_msg, gnrc_rpl_pid);
@@ -467,7 +467,7 @@ void _dao_handle_send(gnrc_rpl_dodag_t *dodag)
     if (dodag->node_status == GNRC_RPL_ROOT_NODE) {
         return;
     }
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
     if (dodag->instance->mop == GNRC_RPL_P2P_MOP) {
         return;
     }

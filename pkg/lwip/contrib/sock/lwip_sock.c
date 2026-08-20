@@ -164,7 +164,7 @@ static bool _addr_on_netif(int family, int netif_num, const ip_addr_t *addr)
     return false;
 }
 
-#ifdef MODULE_LWIP_SOCK_IP
+#if MODULE_LWIP_SOCK_IP
 #define _set_port(p, ep, type)   \
     if (!((type) & NETCONN_RAW)) { \
         p = (ep)->port; \
@@ -506,7 +506,7 @@ int lwip_sock_get_addr(struct netconn *conn, struct _sock_tl_ep *ep, u8_t local)
 {
     ip_addr_t addr;
     int res;
-#ifdef MODULE_LWIP_SOCK_IP
+#if MODULE_LWIP_SOCK_IP
     u16_t port = UINT16_MAX;
     u16_t *port_ptr = &port;
     /* addr needs to be NULL because netconn_getaddr returns error on connected
@@ -521,13 +521,13 @@ int lwip_sock_get_addr(struct netconn *conn, struct _sock_tl_ep *ep, u8_t local)
         return 1;
     }
 
-#ifdef MODULE_LWIP_SOCK_IP
+#if MODULE_LWIP_SOCK_IP
     if (!(conn->type & NETCONN_RAW)) {
         port_ptr = &ep->port;
     }
 #endif
     if ((res = netconn_getaddr(conn, &addr, port_ptr, local)) != ERR_OK
-#ifdef MODULE_LWIP_SOCK_IP
+#if MODULE_LWIP_SOCK_IP
         /* XXX lwIP's API is very inconsistent here so we need to check if addr
          * was changed */
             && !local && ip_addr_isany_val(addr)
@@ -558,7 +558,7 @@ int lwip_sock_get_addr(struct netconn *conn, struct _sock_tl_ep *ep, u8_t local)
     return 0;
 }
 
-#if defined(MODULE_LWIP_SOCK_UDP) || defined(MODULE_LWIP_SOCK_IP)
+#if MODULE_LWIP_SOCK_UDP || MODULE_LWIP_SOCK_IP
 int lwip_sock_recv(struct netconn *conn, uint32_t timeout, struct netbuf **buf)
 {
     int res;
@@ -607,7 +607,7 @@ int lwip_sock_recv(struct netconn *conn, uint32_t timeout, struct netbuf **buf)
 #endif
     return res;
 }
-#endif /* defined(MODULE_LWIP_SOCK_UDP) || defined(MODULE_LWIP_SOCK_IP) */
+#endif /* MODULE_LWIP_SOCK_UDP || MODULE_LWIP_SOCK_IP */
 
 ssize_t lwip_sock_sendv(struct netconn *conn, const iolist_t *snips,
                         int proto, const struct _sock_tl_ep *remote, int type)

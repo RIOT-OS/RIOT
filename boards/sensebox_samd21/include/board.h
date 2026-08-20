@@ -158,7 +158,7 @@ extern "C" {
  */
 #define BMX280_PARAM_I2C_ADDR        (0x76)
 
-#if defined(MODULE_MTD_SDCARD) || defined(DOXYGEN)
+#if MODULE_MTD_SDCARD || defined(DOXYGEN)
 /**
  * @brief MTD device 0 (SD Card) definition. mtd_dev_get(0) is defined in board.c
  * @{

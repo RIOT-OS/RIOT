@@ -42,3 +42,8 @@ MONOFIRMWARETOOL = ${RIOTBOARD}/common/particle-mesh/monofirmware-tool.py
 	${MONOFIRMWARETOOL} $*.elf $< $@
 
 include $(RIOTBOARD)/common/nrf52/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  auto_init_saul \
+  saul_pwm \
+  #

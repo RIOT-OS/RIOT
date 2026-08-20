@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  xtimer \
+  #
 BOARD ?= samr34-xpro
 
 include ../Makefile.periph_common

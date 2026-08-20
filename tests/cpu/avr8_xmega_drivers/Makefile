@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  atxmega_ebi \
+  #
 BOARD ?= atxmega-a1u-xpro
 
 include ../Makefile.cpu_common

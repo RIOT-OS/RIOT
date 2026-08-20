@@ -34,7 +34,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifdef MODULE_PERIPH_WDT_CB
+#if MODULE_PERIPH_WDT_CB
 static wdt_cb_t wdt_cb;
 static void *wdt_arg;
 #endif
@@ -84,7 +84,7 @@ static void _init(uint32_t min_time, uint32_t max_time, bool warn)
     /* avoid compilation errors when NDEBUG is defined */
     (void)min_time;
     (void)max_time;
-#ifndef MODULE_PERIPH_WDT_CB
+#if !MODULE_PERIPH_WDT_CB
     (void)warn;
 #endif
 
@@ -127,7 +127,7 @@ static void _init(uint32_t min_time, uint32_t max_time, bool warn)
     DEBUG("[wdt_series1] _init: prescaler=%d, winsel=%d, calculated=%" PRIu32 "\n",
           (int) init.perSel, (int) init.winSel, calculated_time);
 
-#ifdef MODULE_PERIPH_WDT_CB
+#if MODULE_PERIPH_WDT_CB
     if (warn) {
         init.warnSel = wdogWarnTime50pct;
     }
@@ -138,7 +138,7 @@ static void _init(uint32_t min_time, uint32_t max_time, bool warn)
     /* Configure interrupts */
     WDOGn_IntEnable(WDOG0, WDOG_IEN_WIN);
 
-#ifdef MODULE_PERIPH_WDT_CB
+#if MODULE_PERIPH_WDT_CB
     if (warn) {
         WDOGn_IntEnable(WDOG0, WDOG_IEN_WARN);
     }
@@ -167,7 +167,7 @@ void wdt_setup_reboot(uint32_t min_time, uint32_t max_time)
     _init(min_time, max_time, false);
 }
 
-#if defined(MODULE_PERIPH_WDT_CB)
+#if MODULE_PERIPH_WDT_CB
 void wdt_setup_reboot_with_callback(uint32_t min_time, uint32_t max_time,
                                     wdt_cb_t cb, void *arg)
 {
@@ -188,7 +188,7 @@ void isr_wdog0(void)
         pm_reboot();
     }
 
-#if defined(MODULE_PERIPH_WDT_CB)
+#if MODULE_PERIPH_WDT_CB
     if (flags & WDOG_IEN_WARN) {
         WDOGn_IntClear(WDOG0, WDOG_IEN_WARN);
 

@@ -58,7 +58,7 @@ static void _handle_packet_from_remote(const sock_udp_ep_t *remote,
                                        lwm2m_client_connection_type_t type, uint8_t *buffer,
                                        size_t len);
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
 /**
  * @brief   Callback to handle DTLS sock events.
  */
@@ -80,7 +80,7 @@ static event_t _lwm2m_step_event = { .handler = _lwm2m_step_cb };
 static event_timeout_t _lwm2m_step_event_timeout;
 static lwm2m_client_data_t *_client_data = NULL;
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
 /**
  * @brief Callback registered to the client DTLS sock to select a PSK credential to use.
  */
@@ -204,7 +204,7 @@ lwm2m_context_t *lwm2m_client_run(lwm2m_client_data_t *client_data,
         return NULL;
     }
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
     /* create sock for DTLS server */
     _client_data->dtls_local_ep.family = AF_INET6;
     _client_data->dtls_local_ep.netif = SOCK_ADDR_ANY_NETIF;
@@ -243,13 +243,13 @@ lwm2m_context_t *lwm2m_client_run(lwm2m_client_data_t *client_data,
         return NULL;
     }
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
     lwm2m_client_refresh_dtls_credentials();
 #endif
 
     sock_udp_event_init(&_client_data->sock, EVENT_PRIO_MEDIUM, _udp_event_handler, NULL);
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
     sock_dtls_event_init(&_client_data->dtls_sock, EVENT_PRIO_MEDIUM, _dtls_event_handler, NULL);
 #endif
 
@@ -299,7 +299,7 @@ static void _udp_event_handler(sock_udp_t *sock, sock_async_flags_t type, void *
     }
 }
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
 static void _dtls_event_handler(sock_dtls_t *sock, sock_async_flags_t type, void *arg)
 {
     (void) arg;
@@ -367,7 +367,7 @@ static void _lwm2m_step_cb(event_t *arg)
     event_timeout_set(&_lwm2m_step_event_timeout, next_step * US_PER_SEC);
 }
 
-#if IS_USED(MODULE_WAKAAMA_CLIENT_DTLS)
+#if MODULE_WAKAAMA_CLIENT_DTLS
 void lwm2m_client_add_credential(credman_tag_t tag)
 {
     if (!_client_data) {

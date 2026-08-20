@@ -65,7 +65,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART3_IRQn,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma        = 0,
         .dma_chan   = 46 /* DMAMUX_REQ_USART3_TX */
 #endif
@@ -79,7 +79,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB2,
         .irqn       = USART6_IRQn,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma        = 1,
         .dma_chan   = 72 /* DMAMUX_REQ_USART6_TX */
 #endif
@@ -93,7 +93,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma        = 2,
         .dma_chan   = 44 /* DMAMUX_REQ_USART2_TX */
 #endif

@@ -818,7 +818,7 @@ int ztimer_rmutex_lock_timeout(ztimer_clock_t *clock, rmutex_t *rmutex,
  */
 void ztimer_init(void);
 
-#if defined(MODULE_ZTIMER_EXTEND) || defined(DOXYGEN)
+#if MODULE_ZTIMER_EXTEND || defined(DOXYGEN)
 /**
  * @brief   Initialize possible ztimer extension intermediate timer
  *

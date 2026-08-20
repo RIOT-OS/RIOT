@@ -24,7 +24,7 @@
 #include "architecture.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/pkt.h"
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR
 #include "net/sixlowpan/sfr.h"
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_SFR */
 
@@ -98,7 +98,7 @@ typedef struct {
      * @brief   The reassembled packet in the packet buffer
      */
     gnrc_pktsnip_t *pkt;
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) || defined(DOXYGEN)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR || defined(DOXYGEN)
     /**
      * @brief   Bitmap for received fragments
      *
@@ -109,7 +109,7 @@ typedef struct {
     BITFIELD(received, SIXLOWPAN_SFR_ACK_BITMAP_SIZE);
     int8_t offset_diff;                         /**< offset change due to
                                                  *   recompression */
-#endif /* IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
+#endif /* MODULE_GNRC_SIXLOWPAN_FRAG_SFR */
 } gnrc_sixlowpan_frag_rb_t;
 
 /**
@@ -259,7 +259,7 @@ void gnrc_sixlowpan_frag_rb_gc(void);
 int gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf,
                                                   gnrc_netif_hdr_t *netif);
 
-#if defined(MODULE_GNRC_SIXLOWPAN_FRAG_RB) || defined(DOXYGEN)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_RB || defined(DOXYGEN)
 /**
  * @brief   Unsets a reassembly buffer entry (but does not free
  *          rbuf_t::super::pkt)

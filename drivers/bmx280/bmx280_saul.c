@@ -41,7 +41,7 @@ static int read_pressure(const void *dev, phydat_t *res)
     return 1;
 }
 
-#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+#if MODULE_BME280_SPI || MODULE_BME280_I2C
 static int read_relative_humidity(const void *dev, phydat_t *res)
 {
     res->val[0] = bme280_read_humidity((bmx280_t *)dev);
@@ -64,7 +64,7 @@ const saul_driver_t bmx280_pressure_saul_driver = {
     .type = SAUL_SENSE_PRESS,
 };
 
-#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+#if MODULE_BME280_SPI || MODULE_BME280_I2C
 const saul_driver_t bme280_relative_humidity_saul_driver = {
     .read = read_relative_humidity,
     .write = saul_write_notsup,

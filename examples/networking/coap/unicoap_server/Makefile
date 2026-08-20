@@ -1,3 +1,9 @@
+
+MODULE_DEFS_NEEDED += \
+  auto_init_unicoap \
+  unicoap_driver_dtls \
+  unicoap_driver_udp \
+  #
 # Default Makefile, for simple unicoap server sample application
 
 # name of your application

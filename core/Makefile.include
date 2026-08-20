@@ -1,0 +1,29 @@
+MODULE_DEFS_NEEDED += \
+  core_idle_thread \
+  core_mbox \
+  core_msg \
+  core_mutex_debug \
+  core_mutex_priority_inheritance \
+  core_thread \
+  core_thread_flags \
+  cortexm_stack_limit \
+  mpu_stack_guard \
+  sched_cb \
+  sched_cb \
+  sched_runq_callback \
+  stdio_null \
+  test_utils_print_stack_usage \
+  #
+
+MODULE_DEFS_NEEDED += \
+  core_mbox \
+  core_msg \
+  core_mutex_debug \
+  core_mutex_priority_inheritance \
+  core_thread \
+  core_thread_flags \
+  mpu_stack_guard \
+  sched_cb \
+  sched_runq_callback \
+  stdio_null \
+  #

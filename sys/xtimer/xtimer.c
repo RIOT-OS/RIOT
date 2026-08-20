@@ -34,7 +34,7 @@
 
 #include "timex.h"
 
-#ifdef MODULE_CORE_THREAD_FLAGS
+#if MODULE_CORE_THREAD_FLAGS
 #include "thread_flags.h"
 #endif
 
@@ -93,7 +93,7 @@ void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
     *last_wakeup = now + offset;
 }
 
-#ifdef MODULE_CORE_MSG
+#if MODULE_CORE_MSG
 static void _callback_msg(void* arg)
 {
     msg_t *msg = (msg_t*)arg;
@@ -232,7 +232,7 @@ int xtimer_rmutex_lock_timeout(rmutex_t *rmutex, uint64_t timeout)
     return -1;
 }
 
-#ifdef MODULE_CORE_THREAD_FLAGS
+#if MODULE_CORE_THREAD_FLAGS
 static void _set_timeout_flag_callback(void* arg)
 {
     thread_flags_set(arg, THREAD_FLAG_TIMEOUT);

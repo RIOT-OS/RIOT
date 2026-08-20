@@ -19,3 +19,13 @@ endif
 
 FMC_RAM_ADDR=0x64000000
 FMC_RAM_LEN=1024K
+
+MODULE_DEFS_NEEDED += \
+  periph_dac \
+  periph_dma \
+  periph_fmc_16bit \
+  periph_fmc_nor_sram \
+  periph_spi \
+  periph_spi_stmod \
+  periph_uart_hw_fc \
+  #

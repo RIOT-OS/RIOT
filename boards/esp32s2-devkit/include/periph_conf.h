@@ -123,7 +123,7 @@ extern "C" {
  * These PWM channels cannot be used if an external 32 kHz crystal is
  * connected to the board at GPIO15 and GPIO16.
  */
-#ifndef MODULE_ESP_RTC_TIMER_32K
+#if !MODULE_ESP_RTC_TIMER_32K
 #ifndef PWM1_GPIOS
 #define PWM1_GPIOS  { GPIO15, GPIO16 }
 #endif

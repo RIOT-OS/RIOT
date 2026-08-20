@@ -29,7 +29,7 @@ void pm_set_lowest(void)
     /* reset system watchdog timer */
     system_wdt_feed();
 
-    #ifndef MODULE_ESP_QEMU
+    #if !MODULE_ESP_QEMU
     /* passive wait for interrupt to leave lowest power mode */
     __asm__ volatile ("waiti 0");
     #endif
@@ -50,12 +50,12 @@ void pm_reboot(void)
 {
     DEBUG("%s\n", __func__);
 
-    if (IS_USED(MODULE_ESP_WIFI_ANY)) {
+    if (MODULE_ESP_WIFI_ANY) {
         /* stop WiFi if necessary */
         esp_wifi_stop();
     }
 
-#ifdef MODULE_PERIPH_RTT
+#if MODULE_PERIPH_RTT
     /* save counters */
     extern void rtt_save_counter(void);
     rtt_save_counter();

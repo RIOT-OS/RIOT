@@ -33,9 +33,9 @@
 #include "debug.h"
 
 /* millisecond timer definitions dependent on active ztimer backend */
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
 #define _ZTIMER_SLEEP_MS(n)     ztimer_sleep(ZTIMER_MSEC, n)
-#elif IS_USED(MODULE_ZTIMER_USEC)
+#elif MODULE_ZTIMER_USEC
 #define _ZTIMER_SLEEP_MS(n)     ztimer_sleep(ZTIMER_USEC, n * US_PER_MS)
 #else
 #error "Either ztimer_msec or ztimer_usec is needed"
@@ -243,7 +243,7 @@ XFA_CONST(sdmmc_dev_t * const, sdmmc_devs, 0) _sdmmc_2 = (sdmmc_dev_t * const)&_
 
 static inline bool _use_dma(const sdmmc_conf_t *conf)
 {
-#if IS_USED(MODULE_PERIPH_DMA)
+#if MODULE_PERIPH_DMA
     /* TODO SDMMC_IDMA_IDMAEN */
 #   ifdef SDMMC_IDMA_IDMAEN
         /* The SDMMC of the L4+ and some L5 MCUs have an internal DMA controller
@@ -253,10 +253,10 @@ static inline bool _use_dma(const sdmmc_conf_t *conf)
 #   else
         return (conf->dma != DMA_STREAM_UNDEF);
 #   endif
-#else /* IS_USED(MODULE_PERIPH_DMA) */
+#else /* MODULE_PERIPH_DMA */
     (void)conf;
     return false;
-#endif /* IS_USED(MODULE_PERIPH_DMA) */
+#endif /* MODULE_PERIPH_DMA */
 }
 
 static void _isr(SDMMC_TypeDef *dev);
@@ -327,7 +327,7 @@ static void _init_pins(sdmmc_dev_t *sdmmc_dev)
     }
 #endif
 
-#if IS_USED(MODULE_PERIPH_SDMMC_8BIT)
+#if MODULE_PERIPH_SDMMC_8BIT
     if (gpio_is_valid(conf->dat4.pin) && gpio_is_valid(conf->dat5.pin) &&
         gpio_is_valid(conf->dat6.pin) && gpio_is_valid(conf->dat7.pin)) {
         sdmmc_dev->bus_width = SDMMC_BUS_WIDTH_8BIT;
@@ -342,7 +342,7 @@ static void _init_pins(sdmmc_dev_t *sdmmc_dev)
         gpio_init_af(conf->dat7.pin, conf->dat3.af);
 #endif /* !defined(CPU_FAM_STM32F1) */
     }
-#endif /* IS_USED(MODULE_PERIPH_SDMMC_8BIT) */
+#endif /* MODULE_PERIPH_SDMMC_8BIT */
 
     if (gpio_is_valid(conf->cd)) {
         gpio_init_int(conf->cd, conf->cd_mode, GPIO_BOTH, _isr_cd_pin, sdmmc_dev);
@@ -574,7 +574,7 @@ static int _xfer_prepare(sdmmc_dev_t *sdmmc_dev, sdmmc_xfer_desc_t *xfer)
     sdmmc->DTIMER = xfer->write ? SDMMC_DATA_W_TIMEOUT : SDMMC_DATA_R_TIMEOUT;
     sdmmc->DLEN = xfer->block_size * xfer->block_num;
 
-#if IS_USED(MODULE_PERIPH_DMA)
+#if MODULE_PERIPH_DMA
     const sdmmc_conf_t *conf = dev->config;
 
     if (_use_dma(conf)) {
@@ -641,7 +641,7 @@ static int _xfer_execute(sdmmc_dev_t *sdmmc_dev, sdmmc_xfer_desc_t *xfer,
 
     /* read data blocks from or write data blocks to the card */
     if (_use_dma(conf)) {
-#if IS_USED(MODULE_PERIPH_DMA)
+#if MODULE_PERIPH_DMA
         dma_prepare(conf->dma,
                     (xfer->write) ? (void *)data_to_write : data_to_read,
                     fifo_words, 1);
@@ -797,7 +797,7 @@ static void _isr(SDMMC_TypeDef *dev)
         mutex_unlock(&sdmmc_dev->irq_wait);
     }
 
-#ifdef MODULE_CORTEXM_COMMON
+#if MODULE_CORTEXM_COMMON
     cortexm_isr_end();
 #endif
 }

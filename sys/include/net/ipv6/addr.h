@@ -35,7 +35,7 @@ extern "C" {
  */
 #define IPV6_ADDR_BIT_LEN           (128)
 
-#ifdef MODULE_IPV4_ADDR
+#if MODULE_IPV4_ADDR
 /**
  * @brief   Maximum length of an IPv6 address as string.
  */

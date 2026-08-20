@@ -26,7 +26,7 @@ void board_init(void)
     gpio_set(VCOM_EN_PIN);
 
 #ifndef RIOTBOOT
-#ifdef MODULE_SI7021
+#if MODULE_SI7021
     /* Enable Si7021 sensor */
     gpio_init(SI7021_EN_PIN, GPIO_OUT);
     gpio_set(SI7021_EN_PIN);

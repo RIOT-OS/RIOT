@@ -32,7 +32,7 @@
 #include "gpio_ll_arch.h"
 #include "soc/gpio_struct.h"
 
-#ifdef MODULE_FMT
+#if MODULE_FMT
 #  include "fmt.h"
 #else
 #  include <stdio.h>

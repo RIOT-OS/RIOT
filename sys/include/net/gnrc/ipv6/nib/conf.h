@@ -28,7 +28,7 @@ extern "C" {
 #if !IS_ACTIVE(CONFIG_KCONFIG_MODULE_GNRC_IPV6_NIB) || defined(DOXYGEN)
 
 /* some pseudo-module based configuration, doc: see below */
-#ifdef MODULE_GNRC_IPV6_NIB_6LBR
+#if MODULE_GNRC_IPV6_NIB_6LBR
 #  ifndef CONFIG_GNRC_IPV6_NIB_6LBR
 #    define CONFIG_GNRC_IPV6_NIB_6LBR                 1
 #  endif
@@ -37,17 +37,17 @@ extern "C" {
 #  endif
 #endif
 
-#ifdef MODULE_GNRC_IPV6_NIB_6LR
+#if MODULE_GNRC_IPV6_NIB_6LR
 #  ifndef CONFIG_GNRC_IPV6_NIB_6LR
 #    define CONFIG_GNRC_IPV6_NIB_6LR                  1
 #  endif
 #endif
 
-#ifdef MODULE_GNRC_IPV6_NIB_6LN
+#if MODULE_GNRC_IPV6_NIB_6LN
 #  ifndef CONFIG_GNRC_IPV6_NIB_6LN
 #    define CONFIG_GNRC_IPV6_NIB_6LN                  1
 #  endif
-#  ifndef MODULE_GNRC_IPV6_CLASSIC
+#  if !MODULE_GNRC_IPV6_CLASSIC
      /* We are only a 6lo node with no 'classic' IPv6 interface */
 #    ifndef CONFIG_GNRC_IPV6_NIB_QUEUE_PKT
 #      define CONFIG_GNRC_IPV6_NIB_QUEUE_PKT          0
@@ -67,11 +67,11 @@ extern "C" {
 #  endif
 #endif
 
-#ifdef MODULE_GNRC_IPV6_NIB_ROUTER
+#if MODULE_GNRC_IPV6_NIB_ROUTER
 #  define CONFIG_GNRC_IPV6_NIB_ROUTER                 1
 #endif
 
-#ifdef MODULE_GNRC_IPV6_NIB_DNS
+#if MODULE_GNRC_IPV6_NIB_DNS
 #  define CONFIG_GNRC_IPV6_NIB_DNS                    1
 #endif
 
@@ -165,7 +165,7 @@ extern "C" {
  *          Requires the `gnrc_ipv6_nib_rio` module.
  */
 #ifndef CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_LAST_RA
-#  if IS_USED(MODULE_GNRC_IPV6_AUTO_SUBNETS)
+#  if MODULE_GNRC_IPV6_AUTO_SUBNETS
 #    define CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_LAST_RA   1
 #  else
 #    define CONFIG_GNRC_IPV6_NIB_ADD_RIO_IN_LAST_RA   0

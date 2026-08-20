@@ -169,7 +169,7 @@
 
 #include "event.h"
 /* guard required since `sock_dtls_types.h` might not be provided */
-#ifdef MODULE_SOCK_DTLS
+#if MODULE_SOCK_DTLS
 #include "net/sock/dtls.h"
 #endif  /* MODULE_SOCK_DTLS */
 #include "net/sock/ip.h"
@@ -182,7 +182,7 @@ extern "C" {
 #endif
 
 /* guard required since `sock_dtls_types.h` might not be provided */
-#if defined(MODULE_SOCK_DTLS) || defined(DOXYGEN)
+#if MODULE_SOCK_DTLS || defined(DOXYGEN)
 /**
  * @brief   Makes a DTLS sock able to handle asynchronous events using
  *          @ref sys_event.
@@ -206,9 +206,9 @@ void sock_dtls_event_init(sock_dtls_t *sock, event_queue_t *ev_queue,
  * @param sock socket
  */
 void sock_dtls_event_close(sock_dtls_t *sock);
-#endif  /* defined(MODULE_SOCK_DTLS) || defined(DOXYGEN) */
+#endif  /* MODULE_SOCK_DTLS || defined(DOXYGEN) */
 
-#if defined(MODULE_SOCK_IP) || defined(DOXYGEN)
+#if MODULE_SOCK_IP || defined(DOXYGEN)
 /**
  * @brief   Makes a raw IPv4/IPv6 sock able to handle asynchronous events using
  *          @ref sys_event.
@@ -232,9 +232,9 @@ void sock_ip_event_init(sock_ip_t *sock, event_queue_t *ev_queue,
  * @param sock socket
  */
 void sock_ip_event_close(sock_ip_t *sock);
-#endif  /* defined(MODULE_SOCK_IP) || defined(DOXYGEN) */
+#endif  /* MODULE_SOCK_IP || defined(DOXYGEN) */
 
-#if defined(MODULE_SOCK_TCP) || defined(DOXYGEN)
+#if MODULE_SOCK_TCP || defined(DOXYGEN)
 /**
  * @brief   Makes a TCP sock able to handle asynchronous events using
  *          @ref sys_event.
@@ -273,9 +273,9 @@ void sock_tcp_event_close(sock_tcp_t *sock);
  */
 void sock_tcp_queue_event_init(sock_tcp_queue_t *queue, event_queue_t *ev_queue,
                                sock_tcp_queue_cb_t handler, void *handler_arg);
-#endif  /* defined(MODULE_SOCK_TCP) || defined(DOXYGEN) */
+#endif  /* MODULE_SOCK_TCP || defined(DOXYGEN) */
 
-#if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
+#if MODULE_SOCK_UDP || defined(DOXYGEN)
 /**
  * @brief   Makes a UDP sock able to handle asynchronous events using
  *          @ref sys_event.
@@ -300,7 +300,7 @@ void sock_udp_event_init(sock_udp_t *sock, event_queue_t *ev_queue,
  */
 void sock_udp_event_close(sock_udp_t *sock);
 
-#endif  /* defined(MODULE_SOCK_UDP) || defined(DOXYGEN) */
+#endif  /* MODULE_SOCK_UDP || defined(DOXYGEN) */
 
 /**
  * @brief clear any pending socket async events

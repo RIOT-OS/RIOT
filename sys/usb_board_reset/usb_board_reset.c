@@ -62,7 +62,7 @@ int usb_board_reset_coding_cb(usbus_cdcacm_device_t *cdcacm,
     return 0;
 }
 
-#ifndef MODULE_RIOTBOOT_RESET
+#if !MODULE_RIOTBOOT_RESET
 /*
  * Definition of a function as weak symbol for reset in bootloader which
  * prints an error message if no real implementation is compiled in and

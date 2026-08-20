@@ -24,7 +24,7 @@
 #include "include/init_devs.h"
 #include "net/netdev/ieee802154_submac.h"
 
-#if IS_USED(MODULE_OPENDSME)
+#if MODULE_OPENDSME
 #include "opendsme/opendsme.h"
 #endif
 
@@ -53,7 +53,7 @@ void auto_init_nrf802154(void)
     netdev_register(&nrf802154_netdev.dev.netdev, NETDEV_NRF802154, 0);
 
     nrf802154_init();
-#if IS_USED(MODULE_OPENDSME)
+#if MODULE_OPENDSME
         nrf802154_hal_setup(&nrf802154_netdev.submac.dev);
         /* NOTE: This casts a Radio HAL descriptor to a netdev and should be
          * addressed as soon as the GNRC<->netdev dependency is removed.

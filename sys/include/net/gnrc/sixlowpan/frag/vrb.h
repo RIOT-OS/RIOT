@@ -28,7 +28,7 @@
 #include "net/gnrc/sixlowpan/config.h"
 #include "net/gnrc/sixlowpan/frag/rb.h"
 
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG
+#if MODULE_GNRC_SIXLOWPAN_FRAG
 #  include "net/gnrc/sixlowpan/frag.h"
 #endif /* MODULE_GNRC_SIXLOWPAN_FRAG */
 
@@ -52,13 +52,13 @@ typedef struct {
      * @brief   Outgoing tag to gnrc_sixlowpan_frag_rb_base_t::dst
      */
     uint16_t out_tag;
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR
     int16_t offset_diff;    /**< offset change due to recompression */
     /**
      * @brief   Incoming interface to gnrc_sixlowpan_frag_rb_base_t::src
      */
     gnrc_netif_t *in_netif;
-#endif  /* IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
+#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_SFR */
 } gnrc_sixlowpan_frag_vrb_t;
 
 /**
@@ -149,7 +149,7 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_reverse(
  */
 static inline void gnrc_sixlowpan_frag_vrb_rm(gnrc_sixlowpan_frag_vrb_t *vrb)
 {
-    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_RB)) {
+    if (MODULE_GNRC_SIXLOWPAN_FRAG_RB) {
         gnrc_sixlowpan_frag_rb_base_rm(&vrb->super);
     }
     vrb->super.src_len = 0;

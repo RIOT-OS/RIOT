@@ -47,7 +47,7 @@ static const timer_conf_t timer_config[] = {
         .bus      = APB1,
         .irqn     = TIMER1_IRQn
     },
-#if !defined(MODULE_PERIPH_PM)
+#if !MODULE_PERIPH_PM
     {
         .dev      = TIMER2,
         .max      = 0x0000ffff,
@@ -74,13 +74,13 @@ static const timer_conf_t timer_config[] = {
         .irqn     = TIMER4_IRQn
     }
 #endif
-#endif /* !defined(MODULE_PERIPH_PWM) */
+#endif /* !MODULE_PERIPH_PWM */
 };
 
 #define TIMER_0_IRQN        TIMER0_Channel_IRQn
 #define TIMER_1_IRQN        TIMER1_IRQn
 
-#if !defined(MODULE_PERIPH_PWM)
+#if !MODULE_PERIPH_PWM
 #define TIMER_2_IRQN        TIMER2_IRQn
 #if defined(CPU_MODEL_GD32VF103C8T6) || defined(CPU_MODEL_GD32VF103CBT6) || \
     defined(CPU_MODEL_GD32VF103R8T6) || defined(CPU_MODEL_GD32VF103RBT6) || \
@@ -89,7 +89,7 @@ static const timer_conf_t timer_config[] = {
 #define TIMER_3_IRQN        TIMER3_IRQn
 #define TIMER_4_IRQN        TIMER4_IRQn
 #endif
-#endif /* !defined(MODULE_PERIPH_PWM) */
+#endif /* !MODULE_PERIPH_PWM */
 
 #define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */

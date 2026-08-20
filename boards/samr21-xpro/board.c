@@ -36,7 +36,7 @@ void board_init(void)
 {
 
     /* initialize the on-board antenna switch */
-    if (IS_USED(MODULE_AT86RF233)) {
+    if (MODULE_AT86RF233) {
         gpio_init(RFCTL1_PIN, GPIO_OUT);
         gpio_init(RFCTL2_PIN, GPIO_OUT);
 

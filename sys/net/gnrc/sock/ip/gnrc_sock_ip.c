@@ -137,17 +137,17 @@ ssize_t sock_ip_recv_buf_aux(sock_ip_t *sock, void **data, void **buf_ctx,
         return -EADDRNOTAVAIL;
     }
     tmp.family = sock->local.family;
-#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+#if MODULE_SOCK_AUX_LOCAL
     if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_LOCAL)) {
         _aux.local = &aux->local;
     }
 #endif
-#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+#if MODULE_SOCK_AUX_TIMESTAMP
     if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_TIMESTAMP)) {
         _aux.timestamp = &aux->timestamp;
     }
 #endif
-#if IS_USED(MODULE_SOCK_AUX_RSSI)
+#if MODULE_SOCK_AUX_RSSI
     if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_RSSI)) {
         _aux.rssi = &aux->rssi;
     }
@@ -169,17 +169,17 @@ ssize_t sock_ip_recv_buf_aux(sock_ip_t *sock, void **data, void **buf_ctx,
         gnrc_pktbuf_release(pkt);
         return -EPROTO;
     }
-#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+#if MODULE_SOCK_AUX_LOCAL
     if (aux != NULL) {
         aux->flags &= ~(SOCK_AUX_GET_LOCAL);
     }
 #endif
-#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+#if MODULE_SOCK_AUX_TIMESTAMP
     if ((aux != NULL) && (_aux.flags & GNRC_SOCK_RECV_AUX_FLAG_TIMESTAMP)) {
         aux->flags &= ~(SOCK_AUX_GET_TIMESTAMP);
     }
 #endif
-#if IS_USED(MODULE_SOCK_AUX_RSSI)
+#if MODULE_SOCK_AUX_RSSI
     if ((aux != NULL) && (_aux.flags & GNRC_SOCK_RECV_AUX_FLAG_RSSI)) {
         aux->flags &= ~(SOCK_AUX_GET_RSSI);
     }
@@ -230,7 +230,7 @@ ssize_t sock_ip_send_aux(sock_ip_t *sock, const void *data, size_t len,
         }
         memcpy(&local, &sock->local, sizeof(local));
     }
-#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+#if MODULE_SOCK_AUX_LOCAL
     /* user supplied local endpoint takes precedent */
     if ((aux != NULL) && (aux->flags & SOCK_AUX_SET_LOCAL)) {
         local = aux->local;

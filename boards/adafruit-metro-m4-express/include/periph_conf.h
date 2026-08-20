@@ -237,7 +237,7 @@ static const uart_conf_t uart_config[] = {
         .dev      = &SERCOM3->USART,
         .rx_pin   = GPIO_PIN(PA, 23),   /* C: SERCOM3.1, D: SERCOM5.0 */
         .tx_pin   = GPIO_PIN(PA, 22),   /* C: SERCOM3.0, D: SERCOM5.1 */
-  #ifdef MODULE_PERIPH_UART_HW_FC
+  #if MODULE_PERIPH_UART_HW_FC
         .rts_pin  = GPIO_UNDEF,
         .cts_pin  = GPIO_UNDEF,
   #endif

@@ -34,7 +34,7 @@
 #include "kw41zrf_getset.h"
 #include "vendor/MKW41Z4.h"
 
-#ifdef MODULE_OD
+#if MODULE_OD
 #include "od.h"
 #endif
 
@@ -256,7 +256,7 @@ static int kw41zrf_netdev_send(netdev_t *netdev, const iolist_t *iolist)
      * MKW41Z ref. man. 44.6.2.6.3.1.3 Sequence T (Transmit), p. 2147
      */
     *((volatile uint8_t *)&ZLL->PKT_BUFFER_TX[0]) = len + IEEE802154_FCS_LEN;
-#if defined(MODULE_OD) && ENABLE_DEBUG
+#if MODULE_OD && ENABLE_DEBUG
     DEBUG("[kw41zrf] send:\n");
     od_hex_dump((const uint8_t *)ZLL->PKT_BUFFER_TX, len, OD_WIDTH_DEFAULT);
 #endif
@@ -314,7 +314,7 @@ static int kw41zrf_netdev_recv(netdev_t *netdev, void *buf, size_t len, void *in
         return pkt_len;
     }
 
-#if defined(MODULE_OD) && ENABLE_DEBUG
+#if MODULE_OD && ENABLE_DEBUG
     DEBUG("[kw41zrf] recv:\n");
     od_hex_dump((const uint8_t *)ZLL->PKT_BUFFER_RX, pkt_len, OD_WIDTH_DEFAULT);
 #endif
@@ -535,7 +535,7 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
             case NETOPT_CCA_MODE:
             case NETOPT_LAST_ED_LEVEL:
                 kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
-#ifdef MODULE_NETOPT
+#if MODULE_NETOPT
                 DEBUG("[kw41zrf] Wake to get opt %s\n", netopt2str(opt));
 #else
                 DEBUG("[kw41zrf] Wake to get opt %d\n", (int)opt);
@@ -711,7 +711,7 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
             case NETOPT_CCA_THRESHOLD:
             case NETOPT_CCA_MODE:
                 kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
-#ifdef MODULE_NETOPT
+#if MODULE_NETOPT
                 DEBUG("[kw41zrf] Wake to set opt %s\n", netopt2str(opt));
 #else
                 DEBUG("[kw41zrf] Wake to set opt %d\n", (int)opt);

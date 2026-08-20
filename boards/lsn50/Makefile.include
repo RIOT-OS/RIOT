@@ -11,3 +11,7 @@ OPENOCD_DEBUG_ADAPTER ?= stlink
 
 # openocd programmer is supported
 PROGRAMMERS_SUPPORTED += openocd
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  #

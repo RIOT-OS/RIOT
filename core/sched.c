@@ -29,7 +29,7 @@
 #include "thread.h"
 #include "panic.h"
 
-#ifdef MODULE_MPU_STACK_GUARD
+#if MODULE_MPU_STACK_GUARD
 #include "mpu.h"
 #endif
 
@@ -76,7 +76,7 @@ volatile unsigned int sched_context_switch_request;
 clist_node_t sched_runqueues[SCHED_PRIO_LEVELS];
 static uint32_t runqueue_bitcache = 0;
 
-#ifdef MODULE_SCHED_CB
+#if MODULE_SCHED_CB
 static void (*sched_cb)(kernel_pid_t active_thread,
                         kernel_pid_t next_thread) = NULL;
 #endif
@@ -134,7 +134,7 @@ static void _unschedule(thread_t *active_thread)
         core_panic(PANIC_STACK_OVERFLOW, "STACK OVERFLOW");
     }
 #endif
-#ifdef MODULE_SCHED_CB
+#if MODULE_SCHED_CB
     if (sched_cb) {
         sched_cb(active_thread->pid, KERNEL_PID_UNDEF);
     }
@@ -146,7 +146,7 @@ thread_t *__attribute__((used)) sched_run(void)
     thread_t *active_thread = thread_get_active();
     thread_t *previous_thread = active_thread;
 
-    if (!IS_USED(MODULE_CORE_IDLE_THREAD) && !runqueue_bitcache) {
+    if (!MODULE_CORE_IDLE_THREAD && !runqueue_bitcache) {
         if (active_thread) {
             _unschedule(active_thread);
             active_thread = NULL;
@@ -163,7 +163,7 @@ thread_t *__attribute__((used)) sched_run(void)
     thread_t *next_thread = container_of(sched_runqueues[nextrq].next->next,
                                          thread_t, rq_entry);
 
-#if (IS_USED(MODULE_SCHED_RUNQ_CALLBACK))
+#if (MODULE_SCHED_RUNQ_CALLBACK)
     sched_runq_callback(nextrq);
 #endif
 
@@ -177,7 +177,7 @@ thread_t *__attribute__((used)) sched_run(void)
     next_thread->status = STATUS_RUNNING;
 
     if (previous_thread == next_thread) {
-#ifdef MODULE_SCHED_CB
+#if MODULE_SCHED_CB
         /* Call the sched callback again only if the active thread is NULL. When
          * active_thread is NULL, there was a sleep in between descheduling the
          * previous thread and scheduling the new thread. Call the callback here
@@ -198,7 +198,7 @@ thread_t *__attribute__((used)) sched_run(void)
         sched_active_pid = next_thread->pid;
         sched_active_thread = next_thread;
 
-#ifdef MODULE_SCHED_CB
+#if MODULE_SCHED_CB
         if (sched_cb) {
             sched_cb(KERNEL_PID_UNDEF, next_thread->pid);
         }
@@ -208,7 +208,7 @@ thread_t *__attribute__((used)) sched_run(void)
         _set_tls(next_thread->tls);
 #endif
 
-#ifdef MODULE_MPU_STACK_GUARD
+#if MODULE_MPU_STACK_GUARD
         mpu_configure(
             2,                                              /* MPU region 2 */
             (uintptr_t)next_thread->stack_start + 31,       /* Base Address (rounded up) */
@@ -234,7 +234,7 @@ static inline __attribute__((always_inline)) void _runqueue_push(thread_t *threa
     /* some thread entered a runqueue
      * if it is the active runqueue
      * inform the runqueue_change callback */
-#if (IS_USED(MODULE_SCHED_RUNQ_CALLBACK))
+#if (MODULE_SCHED_RUNQ_CALLBACK)
     thread_t *active_thread = thread_get_active();
     if (active_thread && active_thread->priority == priority) {
         sched_runq_callback(priority);
@@ -253,7 +253,7 @@ static inline __attribute__((always_inline)) void _runqueue_pop(thread_t *thread
 
     if (!sched_runqueues[thread->priority].next) {
         _clear_runqueue_bit(thread->priority);
-#if (IS_USED(MODULE_SCHED_RUNQ_CALLBACK))
+#if (MODULE_SCHED_RUNQ_CALLBACK)
         sched_runq_callback(thread->priority);
 #endif
     }
@@ -306,7 +306,7 @@ NORETURN void sched_task_exit(void)
     DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n",
           thread_getpid());
 
-#if defined(MODULE_TEST_UTILS_PRINT_STACK_USAGE) && defined(DEVELHELP)
+#if MODULE_TEST_UTILS_PRINT_STACK_USAGE && defined(DEVELHELP)
     void print_stack_usage_metric(const char *name, void *stack, unsigned max_size);
     thread_t *me = thread_get_active();
     print_stack_usage_metric(me->name, me->stack_start, me->stack_size);
@@ -322,7 +322,7 @@ NORETURN void sched_task_exit(void)
     cpu_switch_context_exit();
 }
 
-#ifdef MODULE_SCHED_CB
+#if MODULE_SCHED_CB
 void sched_register_cb(void (*callback)(kernel_pid_t, kernel_pid_t))
 {
     sched_cb = callback;

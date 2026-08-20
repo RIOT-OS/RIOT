@@ -31,9 +31,9 @@
 #include "time_units.h"
 #include "thread.h"
 
-#if IS_USED(MODULE_ZTIMER)
+#if MODULE_ZTIMER
 #include "ztimer.h"
-#elif IS_USED(MODULE_XTIMER)
+#elif MODULE_XTIMER
 #include "xtimer.h"
 #endif
 
@@ -340,9 +340,9 @@ static uint32_t mtd_spi_nor_get_size(const mtd_jedec_id_t *id)
 
 static void delay_us(unsigned us)
 {
-#if defined(MODULE_ZTIMER_USEC)
+#if MODULE_ZTIMER_USEC
     ztimer_sleep(ZTIMER_USEC, us);
-#elif defined(MODULE_ZTIMER_MSEC)
+#elif MODULE_ZTIMER_MSEC
     ztimer_sleep(ZTIMER_MSEC, DIV_ROUND_UP(us, US_PER_MS));
 #else
     busy_wait_us(us);
@@ -356,9 +356,9 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
 #if IS_ACTIVE(ENABLE_DEBUG)
     uint32_t diff = 0;
 #endif
-#if IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_ZTIMER_USEC)
+#if IS_ACTIVE(ENABLE_DEBUG) && MODULE_ZTIMER_USEC
     diff = ztimer_now(ZTIMER_USEC);
-#elif IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_XTIMER)
+#elif IS_ACTIVE(ENABLE_DEBUG) && MODULE_XTIMER
     diff = xtimer_now_usec();
 #endif
     do {
@@ -388,9 +388,9 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
     } while (1);
     DEBUG("wait loop %u times, yield %u times", i, j);
 #if IS_ACTIVE(ENABLE_DEBUG)
-#if IS_USED(MODULE_ZTIMER_USEC)
+#if MODULE_ZTIMER_USEC
     diff = ztimer_now(ZTIMER_USEC) - diff;
-#elif IS_USED(MODULE_XTIMER)
+#elif MODULE_XTIMER
     diff = xtimer_now_usec() - diff;
 #endif
     DEBUG(", total wait %"PRIu32"us", diff);
@@ -435,7 +435,7 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
 
             /* fall back to polling if no timer is used */
             unsigned retries = MTD_POWER_UP_WAIT_FOR_ID;
-            if (!IS_USED(MODULE_ZTIMER) && !IS_USED(MODULE_XTIMER)) {
+            if (!MODULE_ZTIMER && !MODULE_XTIMER) {
                 retries *= dev->params->wait_chip_wake_up * 1000;
             }
 

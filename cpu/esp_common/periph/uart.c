@@ -46,7 +46,7 @@
 #include "esp/iomux_regs.h"
 #include "uart_ll.h"
 
-#ifdef MODULE_ESP_QEMU
+#if MODULE_ESP_QEMU
 #include "esp/uart_regs.h"
 #endif /* MODULE_ESP_QEMU */
 
@@ -318,7 +318,7 @@ static void IRAM _uart_intr_handler(void *arg)
 /* receive one data byte with wait */
 static uint8_t IRAM _uart_rx_one_char(uart_t uart)
 {
-#if defined(CPU_ESP8266) && defined(MODULE_ESP_QEMU)
+#if defined(CPU_ESP8266) && MODULE_ESP_QEMU
     /* wait until at least von byte is in RX FIFO */
     while (!FIELD2VAL(UART_STATUS_RXFIFO_COUNT, UART(uart).STATUS)) {}
 
@@ -342,7 +342,7 @@ static void _uart_tx_one_char(uart_t uart, uint8_t data)
     while (!uart_ll_get_txfifo_len(_uarts[uart].regs)) {}
 
     /* send the byte by placing it in the TX FIFO using MPU */
-#if defined(CPU_ESP8266) && defined(MODULE_ESP_QEMU)
+#if defined(CPU_ESP8266) && MODULE_ESP_QEMU
     UART(uart).FIFO = data;
 #else
     uart_ll_write_txfifo(_uarts[uart].regs, &data, 1);

@@ -537,7 +537,7 @@ int cmd_bench(int argc, char **argv)
 SHELL_COMMAND(bench, "Runs some benchmarks", cmd_bench);
 #endif
 
-#ifdef MODULE_PERIPH_SPI_RECONFIGURE
+#if MODULE_PERIPH_SPI_RECONFIGURE
 int cmd_spi_gpio(int argc, char **argv)
 {
     int dev = -1;

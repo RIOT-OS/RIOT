@@ -61,11 +61,11 @@ static vfs_mount_t _test_vfs_mount = {
     .private_data = (void *)&fatfs,
 };
 
-#if defined(MODULE_MTD_NATIVE) || defined(MODULE_MTD_MCI)
+#if MODULE_MTD_NATIVE || MODULE_MTD_MCI
 /* mtd devices are provided in the board's board_init.c*/
-#elif defined(MODULE_MTD_SDMMC)
+#elif MODULE_MTD_SDMMC
 extern mtd_sdmmc_t mtd_sdmmc_dev0;
-#elif defined(MODULE_MTD_SDCARD)
+#elif MODULE_MTD_SDCARD
 #define SDCARD_SPI_NUM ARRAY_SIZE(sdcard_spi_params)
 extern sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
 mtd_sdcard_t mtd_sdcard_devs[SDCARD_SPI_NUM];
@@ -80,7 +80,7 @@ static void print_test_result(const char *test_name, int ok)
 
 static void test_format(void)
 {
-#ifdef MODULE_FATFS_VFS_FORMAT
+#if MODULE_FATFS_VFS_FORMAT
     print_test_result("test_format__format", vfs_format(&_test_vfs_mount) == 0);
 #endif
 }
@@ -329,7 +329,7 @@ static void test_fstat(void)
     print_test_result("test_stat__umount", vfs_umount(&_test_vfs_mount, false) == 0);
 }
 
-#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
+#if MODULE_NEWLIB || MODULE_PICOLIBC
 static void test_libc(void)
 {
     FILE* fl;
@@ -397,11 +397,11 @@ static void test_libc(void)
 
 int main(void)
 {
-#if defined(MODULE_MTD_NATIVE) || defined(MODULE_MTD_MCI)
+#if MODULE_MTD_NATIVE || MODULE_MTD_MCI
     fatfs.dev = mtd_dev_get(0);
-#elif defined(MODULE_MTD_SDMMC)
+#elif MODULE_MTD_SDMMC
     fatfs.dev = &mtd_sdmmc_dev0.base;
-#elif defined(MODULE_MTD_SDCARD)
+#elif MODULE_MTD_SDCARD
     for(unsigned int i = 0; i < SDCARD_SPI_NUM; i++){
         mtd_sdcard_devs[i].base.driver = &mtd_sdcard_driver;
         mtd_sdcard_devs[i].sd_card = &sdcard_spi_devs[i];
@@ -425,7 +425,7 @@ int main(void)
     test_mkrmdir();
     test_create();
     test_fstat();
-#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
+#if MODULE_NEWLIB || MODULE_PICOLIBC
     test_libc();
 #endif
 

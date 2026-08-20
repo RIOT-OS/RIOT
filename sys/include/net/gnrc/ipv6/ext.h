@@ -26,7 +26,7 @@
 #include "net/ipv6/ext.h"
 #include "timex.h"
 
-#ifdef MODULE_GNRC_IPV6_EXT_RH
+#if MODULE_GNRC_IPV6_EXT_RH
 #include "net/gnrc/ipv6/ext/rh.h"
 #endif
 
@@ -113,7 +113,7 @@ extern "C" {
 gnrc_pktsnip_t *gnrc_ipv6_ext_build(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *next,
                                     uint8_t nh, size_t size);
 
-#if     defined(MODULE_GNRC_IPV6_EXT) || defined(DOXYGEN)
+#if     MODULE_GNRC_IPV6_EXT || defined(DOXYGEN)
 /**
  * @brief   Processes a packet's payload as hop-by-hop option if @p protnum is
  *          pointing to a value equal to @ref PROTNUM_IPV6_EXT_HOPOPT.
@@ -178,11 +178,11 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_process_hopopt(gnrc_pktsnip_t *pkt,
  */
 gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
                                           uint8_t *protnum);
-#else   /* defined(MODULE_GNRC_IPV6_EXT) || defined(DOXYGEN) */
+#else   /* MODULE_GNRC_IPV6_EXT || defined(DOXYGEN) */
 /* NOPs to make the usage code more readable */
 #define gnrc_ipv6_ext_process_hopopt(pkt, protnum)  (pkt)
 #define gnrc_ipv6_ext_process_all(pkt, protnum)     (pkt)
-#endif  /* defined(MODULE_GNRC_IPV6_EXT) || defined(DOXYGEN) */
+#endif  /* MODULE_GNRC_IPV6_EXT || defined(DOXYGEN) */
 
 #ifdef __cplusplus
 }

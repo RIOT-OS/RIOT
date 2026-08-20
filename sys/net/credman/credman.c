@@ -30,7 +30,7 @@
 
 static mutex_t _mutex = MUTEX_INIT;
 
-#if IS_USED(MODULE_CREDMAN_LOAD)
+#if MODULE_CREDMAN_LOAD
 #include "tiny-asn1.h"
 
 /* Context-specific tag in DER encoding
@@ -107,7 +107,7 @@ end:
     return ret;
 }
 
-#if IS_USED(MODULE_CREDMAN_LOAD)
+#if MODULE_CREDMAN_LOAD
 int credman_load_public_key(const void *buf, size_t buf_len, ecdsa_public_key_t *out)
 {
     asn1_tree objects[CONFIG_CREDMAN_MAX_ASN1_OBJ];

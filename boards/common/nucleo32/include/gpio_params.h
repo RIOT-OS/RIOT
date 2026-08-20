@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-#ifndef MODULE_PERIPH_INIT_LED0
+#if !MODULE_PERIPH_INIT_LED0
 #define SAUL_GPIO_NUMOF (0U)
 #else
 /**

@@ -5,3 +5,10 @@ PSEUDOMODULES += bme680_fp
 
 USEMODULE_INCLUDES_bme680 := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_bme680)
+
+MODULE_DEFS_NEEDED += \
+  bme680_i2c \
+  bme680_spi \
+  periph_i2c \
+  periph_spi \
+  #

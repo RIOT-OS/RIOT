@@ -53,13 +53,13 @@ extern "C" {
 #define SCHC_CONF_RX_CONNS              CONFIG_LIBSCHC_MAX_RX_CONNS
 #define SCHC_CONF_MBUF_POOL_LEN         CONFIG_LIBSCHC_MBUF_POOL_SIZE
 
-#if IS_USED(MODULE_LIBSCHC_COAP)
+#if MODULE_LIBSCHC_COAP
 #define USE_COAP                        1
 #else
 #define USE_COAP                        0
 #endif
 
-#if IS_USED(MODULE_LIBSCHC_UDPV6)
+#if MODULE_LIBSCHC_UDPV6
 #define USE_IP6_UDP                     1
 #else
 #define USE_IP6_UDP                     0
@@ -98,7 +98,7 @@ extern "C" {
 #define MAX_ACK_REQUESTS                3
 
 /* the number of FCN bits */
-#if IS_USED(MODULE_LORA)
+#if MODULE_LORA
 #define FCN_SIZE_BITS                   6
 #else
 #define FCN_SIZE_BITS                   3
@@ -111,7 +111,7 @@ extern "C" {
 #define MIC_SIZE_BYTES                  4
 
 /* the length of the bitmap */
-#if IS_USED(MODULE_LORA)
+#if MODULE_LORA
 #define BITMAP_SIZE_BYTES               8  /* pow(2, FCN_SIZE_BITS) / 8 */
 #else
 #define BITMAP_SIZE_BYTES               2  /* pow(2, FCN_SIZE_BITS) / 8 */

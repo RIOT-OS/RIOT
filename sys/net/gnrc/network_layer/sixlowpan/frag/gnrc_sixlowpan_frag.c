@@ -46,7 +46,7 @@ static inline size_t _min(size_t a, size_t b)
 static inline uint8_t _max_frag_size(gnrc_netif_t *iface,
                                      gnrc_sixlowpan_frag_fb_t *fbuf)
 {
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_HINT
+#if MODULE_GNRC_SIXLOWPAN_FRAG_HINT
     if (fbuf->hint.fragsz > 0) {
         /* account for rounding down to 8*/
         return (fbuf->hint.fragsz & 0x7)
@@ -61,7 +61,7 @@ static inline uint8_t _max_frag_size(gnrc_netif_t *iface,
 static inline int _payload_diff(gnrc_sixlowpan_frag_fb_t *fbuf,
                                 size_t payload_len)
 {
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_HINT
+#if MODULE_GNRC_SIXLOWPAN_FRAG_HINT
     if (fbuf->hint.fragsz > 0) {
         return fbuf->hint.fragsz_uncomp - fbuf->hint.fragsz;
     }
@@ -76,7 +76,7 @@ static gnrc_pktsnip_t *_build_frag_pkt(gnrc_pktsnip_t *pkt,
     sixlowpan_frag_t *frag_hdr;
     gnrc_netif_hdr_t *netif_hdr = pkt->data, *new_netif_hdr;
     gnrc_pktsnip_t *netif, *frag;
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_HINT
+#if MODULE_GNRC_SIXLOWPAN_FRAG_HINT
     size_t fragment_size = ((fbuf->hint.fragsz > 0) &&
                             (fbuf->offset == 0))
                          ? size     /* we want the calculated fragment size
@@ -228,7 +228,7 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *iface,
     if ((offset + local_offset) < payload_len) {
         gnrc_netif_hdr_t *netif_hdr = frag->data;
         netif_hdr->flags |= GNRC_NETIF_HDR_FLAGS_MORE_DATA;
-    } else if (IS_USED(MODULE_GNRC_TX_SYNC) && (*tx_sync != NULL)) {
+    } else if (MODULE_GNRC_TX_SYNC && (*tx_sync != NULL)) {
         gnrc_pkt_append(frag, *tx_sync);
         *tx_sync = NULL;
     }
@@ -267,7 +267,7 @@ void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     }
 #endif
 
-    if (IS_USED(MODULE_GNRC_TX_SYNC)) {
+    if (MODULE_GNRC_TX_SYNC) {
         tx_sync = gnrc_tx_sync_split((pkt) ? pkt : fbuf->pkt);
     }
 
@@ -297,7 +297,7 @@ void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
               "sending\n");
         goto error;
     }
-    if (IS_USED(MODULE_GNRC_TX_SYNC) && tx_sync) {
+    if (MODULE_GNRC_TX_SYNC && tx_sync) {
         /* re-attach tx_sync to allow releasing it at end
          * of transmission, or transmission failure */
         gnrc_pkt_append((pkt) ? pkt : fbuf->pkt, tx_sync);
@@ -307,7 +307,7 @@ void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
 error:
     gnrc_pktbuf_release(fbuf->pkt);
     fbuf->pkt = NULL;
-    if (IS_USED(MODULE_GNRC_TX_SYNC) && tx_sync) {
+    if (MODULE_GNRC_TX_SYNC && tx_sync) {
         gnrc_pktbuf_release(tx_sync);
     }
 }

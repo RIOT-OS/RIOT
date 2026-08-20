@@ -110,7 +110,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART3_IRQn,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma        = 0,
         .dma_chan   = 7
 #endif
@@ -124,7 +124,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB2,
         .irqn       = USART6_IRQn,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma        = 1,
         .dma_chan   = 5
 #endif
@@ -138,7 +138,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma        = 2,
         .dma_chan   = 4
 #endif
@@ -164,7 +164,7 @@ static const spi_conf_t spi_config[] = {
          * Ethernet PHY. We work around this by remapping the MOSI to PB5 when
          * the on-board Ethernet PHY is used.
          */
-#ifdef MODULE_PERIPH_ETH
+#if MODULE_PERIPH_ETH
         .mosi_pin = GPIO_PIN(PORT_B, 5),
 #else
         .mosi_pin = GPIO_PIN(PORT_A, 7),
@@ -178,7 +178,7 @@ static const spi_conf_t spi_config[] = {
         .cs_af    = GPIO_AF5,
         .rccmask  = RCC_APB2ENR_SPI1EN,
         .apbbus   = APB2,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_dma   = 4,
         .tx_dma_chan = 3,
         .rx_dma   = 3,
@@ -197,7 +197,7 @@ static const spi_conf_t spi_config[] = {
         .cs_af    = GPIO_AF5,
         .rccmask  = RCC_APB2ENR_SPI4EN,
         .apbbus   = APB2,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .tx_dma   = 6,
         .tx_dma_chan = 5,
         .rx_dma   = 5,

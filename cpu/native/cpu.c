@@ -29,7 +29,7 @@
 #include "sched.h"
 #include "test_utils/expect.h"
 
-#ifdef MODULE_NETDEV_TAP
+#if MODULE_NETDEV_TAP
 #include "netdev_tap.h"
 extern netdev_tap_t netdev_tap;
 #endif
@@ -102,7 +102,7 @@ void _isr_context_switch_exit(void)
     DEBUG_CPU("_isr_schedule_and_switch\n");
     /* Schedule thread job if no active thread */
     if (((sched_context_switch_request == 1) || (thread_get_active() == NULL))
-        && IS_USED(MODULE_CORE_THREAD)) {
+        && MODULE_CORE_THREAD) {
         /* Schedule active thread */
         sched_run();
     }
@@ -156,7 +156,7 @@ void _isr_thread_yield(void)
         _native_call_sig_handlers_and_switch();
     }
 
-    if (!IS_USED(MODULE_CORE_THREAD)) {
+    if (!MODULE_CORE_THREAD) {
         return;
     }
 

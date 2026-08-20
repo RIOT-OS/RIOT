@@ -117,7 +117,7 @@ static void netstats_nb_create(netstats_nb_t *entry, const uint8_t *l2_addr, uin
     memcpy(entry->l2_addr, l2_addr, l2_len);
     entry->l2_addr_len = l2_len;
 
-#ifdef MODULE_NETSTATS_NEIGHBOR_ETX
+#if MODULE_NETSTATS_NEIGHBOR_ETX
     entry->etx = NETSTATS_NB_ETX_INIT * NETSTATS_NB_ETX_DIVISOR;
 #endif
 }
@@ -264,7 +264,7 @@ static void netstats_nb_update_etx(netstats_nb_t *stats, netstats_nb_result_t re
         transmissions = NETSTATS_NB_ETX_NOACK_PENALTY;
     }
 
-#ifdef MODULE_NETSTATS_NEIGHBOR_ETX
+#if MODULE_NETSTATS_NEIGHBOR_ETX
     stats->etx = _ewma(fresh, stats->etx, transmissions * NETSTATS_NB_ETX_DIVISOR);
 #else
     (void)stats;
@@ -294,7 +294,7 @@ static void netstats_nb_update_time(netstats_nb_t *stats, netstats_nb_result_t r
 
 static void netstats_nb_update_rssi(netstats_nb_t *stats, uint8_t rssi, bool fresh)
 {
-#ifdef MODULE_NETSTATS_NEIGHBOR_RSSI
+#if MODULE_NETSTATS_NEIGHBOR_RSSI
     stats->rssi = _ewma(fresh, stats->rssi, rssi);
 #else
     (void)stats;
@@ -305,7 +305,7 @@ static void netstats_nb_update_rssi(netstats_nb_t *stats, uint8_t rssi, bool fre
 
 static void netstats_nb_update_lqi(netstats_nb_t *stats, uint8_t lqi, bool fresh)
 {
-#ifdef MODULE_NETSTATS_NEIGHBOR_LQI
+#if MODULE_NETSTATS_NEIGHBOR_LQI
     stats->lqi = _ewma(fresh, stats->lqi, lqi);
 #else
     (void)stats;
@@ -316,7 +316,7 @@ static void netstats_nb_update_lqi(netstats_nb_t *stats, uint8_t lqi, bool fresh
 
 static void netstats_nb_incr_count_tx(netstats_nb_t *stats, netstats_nb_result_t result)
 {
-#ifdef MODULE_NETSTATS_NEIGHBOR_COUNT
+#if MODULE_NETSTATS_NEIGHBOR_COUNT
     stats->tx_count++;
 
     /* gracefully handle overflow */
@@ -337,7 +337,7 @@ static void netstats_nb_incr_count_tx(netstats_nb_t *stats, netstats_nb_result_t
 
 static void netstats_nb_incr_count_rx(netstats_nb_t *stats)
 {
-#ifdef MODULE_NETSTATS_NEIGHBOR_COUNT
+#if MODULE_NETSTATS_NEIGHBOR_COUNT
     stats->rx_count++;
 #else
     (void)stats;

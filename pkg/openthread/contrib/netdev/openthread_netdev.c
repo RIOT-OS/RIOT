@@ -67,7 +67,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event) {
             recv_pkt(sInstance, dev);
             break;
         case NETDEV_EVENT_TX_COMPLETE:
-#ifndef MODULE_NETDEV_NEW_API
+#if !MODULE_NETDEV_NEW_API
         case NETDEV_EVENT_TX_NOACK:
         case NETDEV_EVENT_TX_MEDIUM_BUSY:
 #endif
@@ -95,7 +95,7 @@ static void *_openthread_event_loop(void *arg)
     /* init OpenThread */
     sInstance = otInstanceInitSingle();
 
-#if defined(MODULE_OPENTHREAD_CLI_FTD) || defined(MODULE_OPENTHREAD_CLI_MTD)
+#if MODULE_OPENTHREAD_CLI_FTD || MODULE_OPENTHREAD_CLI_MTD
     ot_shell_init(sInstance);
     /* Init default parameters */
     otPanId panid = OPENTHREAD_PANID;

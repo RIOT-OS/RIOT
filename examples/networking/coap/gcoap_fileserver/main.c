@@ -28,10 +28,10 @@ static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 static const coap_resource_t _resources[] = {
     { "/vfs",
       COAP_GET |
-#if IS_USED(MODULE_NANOCOAP_FILESERVER_PUT)
+#if MODULE_NANOCOAP_FILESERVER_PUT
       COAP_PUT |
 #endif
-#if IS_USED(MODULE_NANOCOAP_FILESERVER_DELETE)
+#if MODULE_NANOCOAP_FILESERVER_DELETE
       COAP_DELETE |
 #endif
       COAP_MATCH_SUBTREE,
@@ -69,7 +69,7 @@ int main(void)
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
     gcoap_register_listener(&_listener);
 
-    if (IS_USED(MODULE_NANOCOAP_FILESERVER_CALLBACK)) {
+    if (MODULE_NANOCOAP_FILESERVER_CALLBACK) {
         nanocoap_fileserver_set_event_cb(_event_cb, NULL);
     }
 

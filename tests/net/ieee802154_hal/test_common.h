@@ -16,18 +16,18 @@
  */
 
 #include "net/ieee802154/radio.h"
-#if IS_USED(MODULE_SOCKET_ZEP)
+#if MODULE_SOCKET_ZEP
 #include "socket_zep_params.h"
 #else
 #define SOCKET_ZEP_MAX  0
 #endif
 
-#define RADIOS_NUMOF IS_USED(MODULE_CC2538_RF) + \
-                     IS_USED(MODULE_NRF802154) + \
+#define RADIOS_NUMOF MODULE_CC2538_RF + \
+                     MODULE_NRF802154 + \
                      SOCKET_ZEP_MAX + \
-                     IS_USED(MODULE_MRF24J40) + \
-                     IS_USED(MODULE_KW2XRF) + \
-                     IS_USED(MODULE_ESP_IEEE802154)
+                     MODULE_MRF24J40 + \
+                     MODULE_KW2XRF + \
+                     MODULE_ESP_IEEE802154
 
 #ifdef __cplusplus
 extern "C" {

@@ -15,7 +15,7 @@
  * @}
  */
 
-#if defined(MODULE_XIPFS_FS) || defined(MODULE_XIPFS)
+#if MODULE_XIPFS_FS || MODULE_XIPFS
 #include <stdlib.h>
 #include <stdint.h>
 #include <limits.h>

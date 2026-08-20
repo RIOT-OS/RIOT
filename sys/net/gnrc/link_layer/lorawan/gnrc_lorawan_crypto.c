@@ -85,7 +85,7 @@ void gnrc_lorawan_calculate_join_acpt_mic(const uint8_t *buf, size_t len,
 {
     uint8_t *key;
 
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && gnrc_lorawan_optneg_is_set(mac)) {
+    if (MODULE_GNRC_LORAWAN_1_1 && gnrc_lorawan_optneg_is_set(mac)) {
         key = gnrc_lorawan_get_jsintkey(mac);
     }
     else {
@@ -94,7 +94,7 @@ void gnrc_lorawan_calculate_join_acpt_mic(const uint8_t *buf, size_t len,
 
     aes128_cmac_init(&CmacContext, key, LORAMAC_JSINTKEY_LEN);
 
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && gnrc_lorawan_optneg_is_set(mac)) {
+    if (MODULE_GNRC_LORAWAN_1_1 && gnrc_lorawan_optneg_is_set(mac)) {
         /**
          *  TODO: JoinReqType hardcoded for now. Will probably move into
          *  gnrc_lorawan_t struct once ReJoin requests are implemented.
@@ -133,7 +133,7 @@ void gnrc_lorawan_calculate_mic_uplink(iolist_t *frame, uint16_t conf_fcnt,
     }
     aes128_cmac_final(&CmacContext, digest);
 
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && gnrc_lorawan_optneg_is_set(mac)) {
+    if (MODULE_GNRC_LORAWAN_1_1 && gnrc_lorawan_optneg_is_set(mac)) {
         /* cmacF[0..1] (MIC = cmacS[0..1] | cmacF[0..1]) */
         memcpy((uint8_t *)out + 0x2, digest, 0x2);
     }
@@ -142,7 +142,7 @@ void gnrc_lorawan_calculate_mic_uplink(iolist_t *frame, uint16_t conf_fcnt,
         memcpy(out, digest, sizeof(le_uint32_t));
     }
 
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && gnrc_lorawan_optneg_is_set(mac)) {
+    if (MODULE_GNRC_LORAWAN_1_1 && gnrc_lorawan_optneg_is_set(mac)) {
         lorawan_block1_t block1 = { 0 };
 
         block1.fb = MIC_B1_START;
@@ -196,7 +196,7 @@ void gnrc_lorawan_calculate_mic_downlink(const le_uint32_t *dev_addr,
     memcpy(out, digest, sizeof(le_uint32_t));
 }
 
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
 void gnrc_lorawan_encrypt_fopts(uint8_t *fopts, size_t len,
                                 const le_uint32_t *dev_addr, uint32_t fcnt,
                                 bool afcnt, uint8_t dir, const uint8_t *key)
@@ -229,7 +229,7 @@ void gnrc_lorawan_encrypt_fopts(uint8_t *fopts, size_t len,
         fopts[i] ^= s_block[i];
     }
 }
-#endif /* IS_USED(MODULE_GNRC_LORAWAN_1_1) */
+#endif /* MODULE_GNRC_LORAWAN_1_1 */
 
 void gnrc_lorawan_encrypt_payload(iolist_t *iolist, const le_uint32_t *dev_addr,
                                   uint32_t fcnt, uint8_t dir,
@@ -284,7 +284,7 @@ void gnrc_lorawan_decrypt_join_accept(const uint8_t *key, uint8_t *pkt,
     }
 }
 
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
 void gnrc_lorawan_generate_lifetime_session_keys(const uint8_t *deveui,
                                                  const uint8_t *nwkkey,
                                                  uint8_t *jsintkey,
@@ -302,7 +302,7 @@ void gnrc_lorawan_generate_lifetime_session_keys(const uint8_t *deveui,
     buf[0] = JSINT_KEY_B0_START;
     cipher_encrypt(&AesContext, buf, jsintkey);
 }
-#endif /* IS_USED(MODULE_GNRC_LORAWAN_1_1) */
+#endif /* MODULE_GNRC_LORAWAN_1_1 */
 
 void gnrc_lorawan_generate_session_keys(const uint8_t *join_nonce,
                                         const uint8_t *dev_nonce,
@@ -313,7 +313,7 @@ void gnrc_lorawan_generate_session_keys(const uint8_t *join_nonce,
     uint8_t *nwkkey = mac->ctx.nwksenckey;
     uint8_t *appkey = mac->ctx.appskey;
 
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && gnrc_lorawan_optneg_is_set(mac)) {
+    if (MODULE_GNRC_LORAWAN_1_1 && gnrc_lorawan_optneg_is_set(mac)) {
         /* JoinNonce | JoinEUI | DevNonce */
         memcpy(buf + 1, join_nonce, GNRC_LORAWAN_JOIN_NONCE_SIZE);
         memcpy(buf + 1 + GNRC_LORAWAN_JOIN_NONCE_SIZE, joineui,
@@ -330,7 +330,7 @@ void gnrc_lorawan_generate_session_keys(const uint8_t *join_nonce,
                dev_nonce, GNRC_LORAWAN_DEV_NONCE_SIZE);
     }
 
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && gnrc_lorawan_optneg_is_set(mac)) {
+    if (MODULE_GNRC_LORAWAN_1_1 && gnrc_lorawan_optneg_is_set(mac)) {
         cipher_init(&AesContext, CIPHER_AES, appkey, LORAMAC_APPKEY_LEN);
 
         /* derive application session key */
@@ -344,7 +344,7 @@ void gnrc_lorawan_generate_session_keys(const uint8_t *join_nonce,
     buf[0] = FNWKSINT_KEY_B0_START;
     cipher_encrypt(&AesContext, buf, mac->ctx.fnwksintkey);
 
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1) && gnrc_lorawan_optneg_is_set(mac)) {
+    if (MODULE_GNRC_LORAWAN_1_1 && gnrc_lorawan_optneg_is_set(mac)) {
         /* derive serving network session integrity key */
         buf[0] = SNWKSINT_KEY_B0_START;
         cipher_encrypt(&AesContext, buf, mac->ctx.snwksintkey);

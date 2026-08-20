@@ -73,7 +73,7 @@ static void _init_standby(dose_t *ctx, const dose_params_t *params)
 
 static void _init_sense(dose_t *ctx, const dose_params_t *params)
 {
-#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+#if MODULE_PERIPH_UART_RXSTART_IRQ
     (void)params;
     uart_rxstart_irq_configure(ctx->uart, _isr_gpio, ctx);
 #else
@@ -87,7 +87,7 @@ static void _init_sense(dose_t *ctx, const dose_params_t *params)
 
 static inline void _enable_sense(dose_t *ctx)
 {
-#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+#if MODULE_PERIPH_UART_RXSTART_IRQ
     uart_rxstart_irq_enable(ctx->uart);
 #else
     if (gpio_is_valid(ctx->sense_pin)) {
@@ -98,7 +98,7 @@ static inline void _enable_sense(dose_t *ctx)
 
 static inline void _disable_sense(dose_t *ctx)
 {
-#ifdef MODULE_PERIPH_UART_RXSTART_IRQ
+#if MODULE_PERIPH_UART_RXSTART_IRQ
     uart_rxstart_irq_disable(ctx->uart);
 #else
     if (gpio_is_valid(ctx->sense_pin)) {
@@ -107,7 +107,7 @@ static inline void _disable_sense(dose_t *ctx)
 #endif
 }
 
-#ifdef MODULE_DOSE_WATCHDOG
+#if MODULE_DOSE_WATCHDOG
 static unsigned _watchdog_users;
 static dose_t *_dose_base;
 static uint8_t _dose_numof;
@@ -267,7 +267,7 @@ static dose_signal_t state_transit_send(dose_t *ctx, dose_signal_t signal)
     /* Don't trace any END octets ... the timeout or the END signal
      * will bring us back to the BLOCKED state after _send has emitted
      * its last octet. */
-#ifndef MODULE_PERIPH_UART_COLLISION
+#if !MODULE_PERIPH_UART_COLLISION
     ztimer_set(ZTIMER_USEC, &ctx->timeout, ctx->timeout_base);
 #endif
 
@@ -347,7 +347,7 @@ static void _isr_ztimer(void *arg)
     dose_t *dev = arg;
 
     switch (dev->state) {
-#ifndef MODULE_DOSE_WATCHDOG
+#if !MODULE_DOSE_WATCHDOG
     case DOSE_STATE_RECV:
 #endif
     case DOSE_STATE_BLOCKED:
@@ -363,7 +363,7 @@ static void clear_recv_buf(dose_t *ctx)
 {
     unsigned irq_state = irq_disable();
 
-#ifdef MODULE_DOSE_WATCHDOG
+#if MODULE_DOSE_WATCHDOG
     ctx->recv_buf_ptr_last = NULL;
 #endif
     CLRBIT(ctx->flags, DOSE_FLAG_RECV_BUF_DIRTY);
@@ -461,7 +461,7 @@ static int send_octet(dose_t *ctx, uint8_t c)
 {
     uart_write(ctx->uart, (uint8_t *) &c, sizeof(c));
 
-#ifdef MODULE_PERIPH_UART_COLLISION
+#if MODULE_PERIPH_UART_COLLISION
     return uart_collision_detected(ctx->uart);
 #endif
 
@@ -501,10 +501,10 @@ static int send_data_octet(dose_t *ctx, uint8_t c)
 
 static inline void _send_start(dose_t *ctx)
 {
-#ifdef MODULE_PERIPH_UART_TX_ONDEMAND
+#if MODULE_PERIPH_UART_TX_ONDEMAND
     uart_enable_tx(ctx->uart);
 #endif
-#ifdef MODULE_PERIPH_UART_COLLISION
+#if MODULE_PERIPH_UART_COLLISION
     uart_collision_detect_enable(ctx->uart);
 #else
     (void)ctx;
@@ -513,10 +513,10 @@ static inline void _send_start(dose_t *ctx)
 
 static inline void _send_done(dose_t *ctx, bool collision)
 {
-#ifdef MODULE_PERIPH_UART_TX_ONDEMAND
+#if MODULE_PERIPH_UART_TX_ONDEMAND
     uart_disable_tx(ctx->uart);
 #endif
-#ifdef MODULE_PERIPH_UART_COLLISION
+#if MODULE_PERIPH_UART_COLLISION
     uart_collision_detect_disable(ctx->uart);
     if (collision) {
         state(ctx, DOSE_SIGNAL_ZTIMER);
@@ -802,7 +802,7 @@ void dose_setup(dose_t *ctx, const dose_params_t *params, uint8_t index)
     ctx->timeout.callback = _isr_ztimer;
     ctx->timeout.arg = ctx;
 
-#ifdef MODULE_DOSE_WATCHDOG
+#if MODULE_DOSE_WATCHDOG
     if (index >= _dose_numof) {
         _dose_numof = index + 1;
     }

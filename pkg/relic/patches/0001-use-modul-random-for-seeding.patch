@@ -15,7 +15,7 @@ index c21c5a9..09cd948 100644
  		}
  	}
  
-+#elif SEED == RIOTRND && defined(MODULE_RANDOM)
++#elif SEED == RIOTRND && MODULE_RANDOM
 +
 +    void random_bytes(uint8_t *buf, size_t size);
 +	random_bytes(buf, RLC_RAND_SEED);

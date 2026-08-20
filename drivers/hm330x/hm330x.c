@@ -25,9 +25,9 @@
 #include "clk.h"
 #include "timex.h"
 
-#if IS_USED(MODULE_ZTIMER_USEC)
+#if MODULE_ZTIMER_USEC
 #include "ztimer.h"
-#elif IS_USED(MODULE_XTIMER)
+#elif MODULE_XTIMER
 #include "xtimer.h"
 #endif
 
@@ -110,7 +110,7 @@ int hm330x_read(hm330x_t *dev, hm330x_data_t *data)
         .amc_pm_1 = (buf[10] << 8) | buf[11],
         .amc_pm_2p5 = (buf[12] << 8) | buf[13],
         .amc_pm_10 = (buf[14] << 8) | buf[15],
-#if IS_USED(MODULE_HM3302)
+#if MODULE_HM3302
         .nc_pm_0p3 = (buf[16] << 8) | buf[17],
         .nc_pm_0p5 = (buf[18] << 8) | buf[19],
         .nc_pm_1 = (buf[20] << 8) | buf[21],
@@ -129,9 +129,9 @@ void hm330x_reset(hm330x_t *dev)
 {
     if (gpio_is_valid(dev->params.reset_pin)) {
         gpio_clear(dev->params.reset_pin);
-#if IS_USED(MODULE_ZTIMER_USEC)
+#if MODULE_ZTIMER_USEC
         ztimer_sleep(ZTIMER_USEC, HM330X_RESET_TIME_US);
-#elif IS_USED(MODULE_XTIMER)
+#elif MODULE_XTIMER
         xtimer_sleep(HM330X_RESET_TIME_US);
 #else
         /* each loop iteration is at least 3 instructions, so this tries

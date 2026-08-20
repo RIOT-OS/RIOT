@@ -1,1 +1,6 @@
 include $(RIOTBOARD)/common/iotlab/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  mtd \
+  periph_dma \
+  #

@@ -26,7 +26,7 @@
 #include "nrf24l01p_ng_communication.h"
 #include "nrf24l01p_ng_registers.h"
 #include "nrf24l01p_ng_states.h"
-#if IS_USED(MODULE_NRF24L01P_NG_DIAGNOSTICS)
+#if MODULE_NRF24L01P_NG_DIAGNOSTICS
 #include "nrf24l01p_ng_diagnostics.h"
 #endif
 
@@ -386,7 +386,7 @@ nrf24l01p_ng_state_t nrf24l01p_ng_get_state(const nrf24l01p_ng_t *dev)
     return dev->state;
 }
 
-#if IS_USED(MODULE_NRF24L01P_NG_DIAGNOSTICS)
+#if MODULE_NRF24L01P_NG_DIAGNOSTICS
 void nrf24l01p_ng_print_all_regs(nrf24l01p_ng_t *dev)
 {
     nrf24l01p_ng_acquire(dev);

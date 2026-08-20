@@ -48,7 +48,7 @@ extern "C" {
 #endif
 
 #ifndef CCS811_PARAMS
-#ifdef MODULE_CCS811_FULL
+#if MODULE_CCS811_FULL
 #define CCS811_PARAMS    { .i2c_dev   = CCS811_PARAM_I2C_DEV,  \
                            .i2c_addr  = CCS811_PARAM_I2C_ADDR, \
                            .mode      = CCS811_PARAM_MODE,     \

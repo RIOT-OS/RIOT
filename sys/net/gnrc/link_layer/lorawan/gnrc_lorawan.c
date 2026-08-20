@@ -29,7 +29,7 @@
 #include "net/gnrc/lorawan/region.h"
 #include "timex.h"
 
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
 #include "periph/flashpage.h"
 #endif
 
@@ -84,7 +84,7 @@ static void _sleep_radio(gnrc_lorawan_t *mac)
 static void _load_persistent_state(gnrc_lorawan_t *mac)
 {
     (void) mac;
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     void *addr = flashpage_addr(GNRC_LORAWAN_STATE_FLASHPAGE_NUM);
     gnrc_lorawan_persistent_state_t state = { 0 };
 
@@ -115,7 +115,7 @@ void gnrc_lorawan_init(gnrc_lorawan_t *mac, uint8_t *joineui, const gnrc_lorawan
     gnrc_lorawan_mlme_backoff_init(mac);
     gnrc_lorawan_reset(mac);
 
-    if (IS_USED(MODULE_GNRC_LORAWAN_1_1)) {
+    if (MODULE_GNRC_LORAWAN_1_1) {
         _load_persistent_state(mac);
     }
 }
@@ -148,7 +148,7 @@ void gnrc_lorawan_reset(gnrc_lorawan_t *mac)
 void gnrc_lorawan_store_dev_nonce(uint8_t *dev_nonce)
 {
     (void) dev_nonce;
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     void *addr = flashpage_addr(GNRC_LORAWAN_STATE_FLASHPAGE_NUM);
     gnrc_lorawan_persistent_state_t state = { 0 };
     memcpy(&state, addr, sizeof(state));

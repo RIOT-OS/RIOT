@@ -114,7 +114,7 @@ typedef struct {
  * @brief   Configuration parameters for a servo
  */
 typedef struct {
-#if defined(MODULE_SERVO_PWM) || defined(DOXYGEN)
+#if MODULE_SERVO_PWM || defined(DOXYGEN)
     /**
      * @brief   Specification of the PWM device the servo is connected to
      *
@@ -122,7 +122,7 @@ typedef struct {
      */
     const servo_pwm_params_t *pwm;
 #endif
-#if defined(MODULE_SERVO_TIMER) || defined(DOXYGEN)
+#if MODULE_SERVO_TIMER || defined(DOXYGEN)
     /**
      * @brief   Specification of the timer to use
      *
@@ -138,7 +138,7 @@ typedef struct {
 #endif
     uint16_t min_us;    /**< Duration of high phase (in µs) for min extension */
     uint16_t max_us;    /**< Duration of high phase (in µs) for max extension */
-#ifdef MODULE_SERVO_PWM
+#if MODULE_SERVO_PWM
     /**
      * @brief   PWM channel to use
      *
@@ -146,7 +146,7 @@ typedef struct {
      */
     uint8_t pwm_chan;
 #endif
-#ifdef MODULE_SERVO_TIMER
+#if MODULE_SERVO_TIMER
     /**
      * @brief   Timer channel to use
      *
@@ -185,12 +185,12 @@ struct servo {
      * clock source and clock dividers available.
      */
     uint16_t max;
-#ifdef MODULE_SERVO_TIMER
+#if MODULE_SERVO_TIMER
     uint16_t current; /**< Current timer target */
 #endif
 };
 
-#if defined(MODULE_SERVO_TIMER) || DOXYGEN
+#if MODULE_SERVO_TIMER || DOXYGEN
 /**
  * @brief   Default timer context
  */

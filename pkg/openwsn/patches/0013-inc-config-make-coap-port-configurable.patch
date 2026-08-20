@@ -13,7 +13,7 @@ index fd215d28..11a7ccef 100644
 --- a/inc/config.h
 +++ b/inc/config.h
 @@ -216,6 +216,15 @@
- #define OPENWSN_COAP_C IS_USED(MODULE_OPENWSN_COAP)
+ #define OPENWSN_COAP_C MODULE_OPENWSN_COAP
  #endif
  
 +/**

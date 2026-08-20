@@ -40,8 +40,8 @@ typedef struct {
      * @internal
      */
     list_node_t queue;
-#if defined(DOXYGEN) || defined(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE) \
-    || defined(MODULE_CORE_MUTEX_DEBUG)
+#if defined(DOXYGEN) || MODULE_CORE_MUTEX_PRIORITY_INHERITANCE \
+    || MODULE_CORE_MUTEX_DEBUG
     /**
      * @brief   The current owner of the mutex or `NULL`
      * @note    Only available if module core_mutex_priority_inheritance
@@ -53,7 +53,7 @@ typedef struct {
      */
     kernel_pid_t owner;
 #endif
-#if defined(DOXYGEN) || defined(MODULE_CORE_MUTEX_DEBUG)
+#if defined(DOXYGEN) || MODULE_CORE_MUTEX_DEBUG
     /**
      * @brief   Program counter of the call to @ref mutex_lock that most
      *          recently acquired this mutex
@@ -63,7 +63,7 @@ typedef struct {
      */
     uinttxtptr_t owner_calling_pc;
 #endif
-#if defined(DOXYGEN) || defined(MODULE_CORE_MUTEX_PRIORITY_INHERITANCE)
+#if defined(DOXYGEN) || MODULE_CORE_MUTEX_PRIORITY_INHERITANCE
     /**
      * @brief   Original priority of the owner
      * @note    Only available if module core_mutex_priority_inheritance

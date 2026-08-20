@@ -23,7 +23,7 @@
 
 void board_init(void)
 {
-    if (IS_USED(MODULE_SX126X_STM32WL)) {
+    if (MODULE_SX126X_STM32WL) {
         /* Initialize the GPIO control for RF 3-port switch (SP3T) */
         gpio_init(FE_CTRL1, GPIO_OUT);
         gpio_init(FE_CTRL2, GPIO_OUT);
@@ -37,7 +37,7 @@ void board_init(void)
  * This function sets the GPIO's wired to the SP3T RF Switch. Nucleo-WL55JC
  * supports three modes of operation.
  */
-#if IS_USED(MODULE_SX126X_STM32WL)
+#if MODULE_SX126X_STM32WL
 void nucleo_wl55jc_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mode)
 {
     (void)dev;

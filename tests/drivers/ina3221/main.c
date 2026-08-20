@@ -41,7 +41,7 @@
 #define HLINE (    \
         "--------------+--------------+--------------+--------------+--------------")
 
-#ifdef MODULE_INA3221_ALERTS
+#if MODULE_INA3221_ALERTS
 static void warning_alert(void *arg)
 {
     ina3221_t *dev = (ina3221_t *)arg;
@@ -126,7 +126,7 @@ int main(void)
         puts("[SUCCESS] ina3221_init");
     }
 
-#ifdef MODULE_INA3221_ALERTS
+#if MODULE_INA3221_ALERTS
     status = ina3221_enable_warning_alert(&dev, warning_alert, &dev);
     if (status == -ENOTSUP) {
         puts("[WARNING] INA3221_ALERT_WRN not supported");

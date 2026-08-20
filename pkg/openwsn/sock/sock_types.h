@@ -80,7 +80,7 @@ struct sock_udp {
     openwsn_gen_sock_t gen_sock;                /**< Generic socket */
     mbox_t mbox;                                /**< @ref core_mbox target for the sock */
     msg_t mbox_queue[OPENWSN_SOCK_MBOX_SIZE];   /**< queue for gnrc_sock_reg_t::mbox */
-#ifdef MODULE_SOCK_ASYNC_EVENT
+#if MODULE_SOCK_ASYNC_EVENT
     sock_async_ctx_t async_ctx;                 /**< asynchronous event context */
 #endif
 #ifdef SOCK_HAS_ASYNC

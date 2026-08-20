@@ -236,7 +236,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
                                            GNRC_IPV6_NIB_RDNSS_TIMEOUT);
 
     /* with auto_init_sock_dns we always have a valid (static) DNS server */
-    if (((rdnss_ltime < UINT32_MAX) || IS_USED(MODULE_AUTO_INIT_SOCK_DNS)) &&
+    if (((rdnss_ltime < UINT32_MAX) || MODULE_AUTO_INIT_SOCK_DNS) &&
         (!ipv6_addr_is_link_local((ipv6_addr_t *)sock_dns_server.addr.ipv6))) {
         gnrc_pktsnip_t *rdnsso = gnrc_ndp_opt_rdnss_build(
                 rdnss_ltime * MS_PER_SEC,
@@ -258,7 +258,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
         uint16_t ltime_min;
         gnrc_pktsnip_t *abro;
 
-#ifdef MODULE_GNRC_SIXLOWPAN_CTX
+#if MODULE_GNRC_SIXLOWPAN_CTX
         for (int i = 0; i < GNRC_SIXLOWPAN_CTX_SIZE; i++) {
             gnrc_sixlowpan_ctx_t *ctx;
             if (bf_isset(abr->ctxs, i) &&

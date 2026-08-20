@@ -51,12 +51,12 @@ extern "C" {
   * @ingroup  config
   * @{
   */
- #ifdef MODULE_TMP006
+ #if MODULE_TMP006
  #define TMP00X_REGS_DEVICE_ID    0xFF /**< Device ID Register */
  #define TMP00X_REGS_READ_STATUS  TMP00X_REGS_CONFIG
  #define TMP00X_DRDY              (1 << 7)  /**< DRDY: Data ready bit */
  #define TMP00X_DID_VALUE         (0x0067)  /**< Device ID */
- #elif defined(MODULE_TMP007)
+ #elif MODULE_TMP007
  #define TMP00X_REGS_DEVICE_ID    0x1F /**< Device ID Register */
  #define TMP00X_REGS_READ_STATUS  TMP007_REGS_STATUS
  #define TMP00X_DRDY              (1 << 14) /**< DRDY: Data ready bit */

@@ -98,7 +98,7 @@ int raw_can_send(int ifnum, const can_frame_t *frame, kernel_pid_t pid)
     return ret;
 }
 
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
 int raw_can_send_mbox(int ifnum, const can_frame_t *frame, mbox_t *mbox)
 {
     can_pkt_t *pkt;
@@ -233,14 +233,14 @@ int raw_can_subscribe_rx(int ifnum, const struct can_filter *filter,
     can_reg_entry_t entry;
     entry.ifnum = ifnum;
     entry.target.pid = pid;
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
     entry.type = CAN_TYPE_DEFAULT;
 #endif
 
     return register_filter_entry(&entry, filter, param);
 }
 
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
 int raw_can_subscribe_rx_mbox(int ifnum, const struct can_filter *filter,
                               mbox_t *mbox, void *param)
 {
@@ -264,14 +264,14 @@ int raw_can_unsubscribe_rx(int ifnum, const struct can_filter *filter, kernel_pi
     can_reg_entry_t entry;
     entry.ifnum = ifnum;
     entry.target.pid = pid;
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
     entry.type = CAN_TYPE_DEFAULT;
 #endif
 
     return unregister_filter_entry(&entry, filter, param);
 }
 
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
 int raw_can_unsubscribe_rx_mbox(int ifnum, const struct can_filter *filter,
                                 mbox_t *mbox, void *param)
 {
@@ -529,7 +529,7 @@ int raw_can_set_bitrate(int ifnum, uint32_t bitrate, uint32_t sample_point)
     return res;
 }
 
-#ifdef MODULE_CAN_TRX
+#if MODULE_CAN_TRX
 int raw_can_set_trx(int ifnum, can_trx_t *trx)
 {
     msg_t msg, reply;

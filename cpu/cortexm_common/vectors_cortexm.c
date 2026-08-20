@@ -32,10 +32,10 @@
 #include "panic.h"
 #include "sched.h"
 #include "vectors_cortexm.h"
-#ifdef MODULE_PUF_SRAM
+#if MODULE_PUF_SRAM
 #include "puf_sram.h"
 #endif
-#ifdef MODULE_DBGPIN
+#if MODULE_DBGPIN
 #include "dbgpin.h"
 #endif
 
@@ -104,7 +104,7 @@ void reset_handler_default(void)
 
     cortexm_init_fpu();
 
-#ifdef MODULE_PUF_SRAM
+#if MODULE_PUF_SRAM
     puf_sram_init((uint8_t *)&_srelocate, SEED_RAM_LEN);
 #endif
 
@@ -163,7 +163,7 @@ void reset_handler_default(void)
     }
 #endif /* CPU_HAS_BACKUP_RAM */
 
-#ifdef MODULE_MPU_NOEXEC_RAM
+#if MODULE_MPU_NOEXEC_RAM
     /* This marks the memory region from 0x20000000 to 0x3FFFFFFF as non
      * executable. This is the Cortex-M SRAM region used for on-chip RAM.
      */
@@ -174,7 +174,7 @@ void reset_handler_default(void)
     );
 #endif
 
-#ifdef MODULE_MPU_STACK_GUARD
+#if MODULE_MPU_STACK_GUARD
     if (((uintptr_t)&_sstack) != SRAM_BASE) {
         mpu_configure(
             1,                                              /* MPU region 1 */
@@ -185,13 +185,13 @@ void reset_handler_default(void)
     }
 #endif
 
-#if defined(MODULE_MPU_STACK_GUARD) || defined(MODULE_MPU_NOEXEC_RAM)
+#if MODULE_MPU_STACK_GUARD || MODULE_MPU_NOEXEC_RAM
     mpu_enable();
 #endif
 
     post_startup();
 
-#ifdef MODULE_DBGPIN
+#if MODULE_DBGPIN
     dbgpin_init();
 #endif
 
@@ -274,7 +274,7 @@ __attribute__((naked)) void hard_fault_default(void)
         "mrs r0, psp                        \n" /*   r0 = psp                 */
         " out:                              \n" /* }                          */
 #if (defined(CPU_CORE_CORTEX_M0) || defined(CPU_CORE_CORTEX_M0PLUS)) \
-    && defined(MODULE_CPU_CHECK_ADDRESS)
+    && MODULE_CPU_CHECK_ADDRESS
         /* catch intended HardFaults on Cortex-M0 to probe memory addresses */
         "ldr     r1, [r0, #0x04]            \n" /* read R1 from the stack        */
         "ldr     r2, =0xDEADF00D            \n" /* magic number to be found      */

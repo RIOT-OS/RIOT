@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  tinycbor_float \
+  #
 include ../Makefile.pkg_common
 
 USEMODULE += embunit

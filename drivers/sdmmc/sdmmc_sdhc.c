@@ -75,11 +75,11 @@
 #endif
 
 /* millisecond timer definitions dependent on active ztimer backend */
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
 #  define _ZTIMER_CLOCK           ZTIMER_MSEC
 #  define _ZTIMER_TICKS_PER_MS    1
 
-#elif IS_USED(MODULE_ZTIMER_USEC)
+#elif MODULE_ZTIMER_USEC
 #  define _ZTIMER_CLOCK           ZTIMER_USEC
 #  define _ZTIMER_TICKS_PER_MS    US_PER_MS
 #else
@@ -255,7 +255,7 @@ static int _send_cmd(sdmmc_dev_t *dev, uint8_t cmd_idx, uint32_t arg,
     }
 
     /* enable the clock to the card if needed */
-    if (IS_USED(MODULE_PERIPH_SDMMC_AUTO_CLK) && _enable_sd_clk(sdhc_dev)) {
+    if (MODULE_PERIPH_SDMMC_AUTO_CLK && _enable_sd_clk(sdhc_dev)) {
         return -EIO;
     }
 
@@ -406,7 +406,7 @@ static int _set_clock_rate(sdmmc_dev_t *dev, sdmmc_clock_rate_t rate)
 
     uint32_t fsdhc = (rate > CONFIG_SDMMC_CLK_MAX) ? CONFIG_SDMMC_CLK_MAX
                                                    : rate;
-    if (IS_USED(MODULE_SDMMC_MMC) &&
+    if (MODULE_SDMMC_MMC &&
         (dev->type == SDMMC_CARD_TYPE_MMC) && (fsdhc > MHZ(25))) {
         /* maximum frequency supported for MMCs */
         fsdhc = MHZ(25);
@@ -450,7 +450,7 @@ static int _set_clock_rate(sdmmc_dev_t *dev, sdmmc_clock_rate_t rate)
 #if 0
     /* for testing purposes if it is necessary to enable the SD clock when
      * the clock rate is changed */
-    if (!IS_USED(MODULE_PERIPH_SDMMC_AUTO_CLK)) {
+    if (!MODULE_PERIPH_SDMMC_AUTO_CLK) {
         /* if periph_sdmmc_auto_clk is not used, enable the clock to the card here */
         if (_enable_sd_clk(sdhc_dev)) {
             return -EIO;
@@ -461,7 +461,7 @@ static int _set_clock_rate(sdmmc_dev_t *dev, sdmmc_clock_rate_t rate)
     return 0;
 }
 
-#if !IS_USED(MODULE_PERIPH_SDMMC_AUTO_CLK)
+#if !MODULE_PERIPH_SDMMC_AUTO_CLK
 int _enable_clock(sdmmc_dev_t *dev, bool enable)
 {
     DEBUG("[sdmmc] %s clock\n", enable ? "enable" : "disable");
@@ -495,7 +495,7 @@ static int _xfer_prepare(sdmmc_dev_t *dev, sdmmc_xfer_desc_t *xfer)
 
     if (xfer->block_num > 1) {
         tmr |= SDHC_TMR_MSBSEL_MULTIPLE | SDHC_TMR_BCEN;
-        tmr |= IS_USED(MODULE_PERIPH_SDMMC_AUTO_CMD12) ? SDHC_TMR_ACMDEN_CMD12 : 0;
+        tmr |= MODULE_PERIPH_SDMMC_AUTO_CMD12 ? SDHC_TMR_ACMDEN_CMD12 : 0;
     }
     else {
         tmr |= SDHC_TMR_MSBSEL_SINGLE;
@@ -599,7 +599,7 @@ static int _xfer_finish(sdmmc_dev_t *dev, sdmmc_xfer_desc_t *xfer)
     sdhc_t *sdhc = sdhc_dev->conf->sdhc;
     sdhc->NISTR.reg = (SDHC_NISTR_BWRRDY | SDHC_NISTR_BRDRDY);
 
-    if (IS_USED(MODULE_PERIPH_SDMMC_AUTO_CLK)) {
+    if (MODULE_PERIPH_SDMMC_AUTO_CLK) {
         /* disable the clock to the card */
         return _disable_sd_clk(sdhc_dev);
     }
@@ -754,7 +754,7 @@ static bool _wait_for_event(sdhc_dev_t *sdhc_dev,
     sdhc->EISIER.reg &= ~error_mask;
 
     if (timeout || (sdhc_dev->error & error_mask)) {
-        if (IS_USED(ENABLE_DEBUG)) {
+        if (IS_ACTIVE(ENABLE_DEBUG)) {
             if (timeout) {
                 DEBUG("[sdmmc] IRQ wait timeout\n");
             }
@@ -872,7 +872,7 @@ static void _isr(sdhc_dev_t *sdhc_dev)
         mutex_unlock(&sdhc_dev->irq_wait);
     }
 
-#ifdef MODULE_CORTEXM_COMMON
+#if MODULE_CORTEXM_COMMON
     cortexm_isr_end();
 #endif
 }
@@ -895,7 +895,7 @@ static const sdmmc_driver_t _driver = {
     .send_cmd = _send_cmd,
     .set_bus_width = _set_bus_width,
     .set_clock_rate = _set_clock_rate,
-#if !IS_USED(MODULE_PERIPH_SDMMC_AUTO_CLK)
+#if !MODULE_PERIPH_SDMMC_AUTO_CLK
     .enable_clock = _enable_clock,
 #endif
     .xfer_prepare = _xfer_prepare,

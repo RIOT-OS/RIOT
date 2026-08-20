@@ -38,7 +38,7 @@
 #include "net/netopt.h"
 #include "net/ipv6.h"
 
-#ifdef MODULE_NETSTATS_NEIGHBOR
+#if MODULE_NETSTATS_NEIGHBOR
 #include "cib.h"
 #include "net/netstats.h"
 #endif
@@ -67,7 +67,7 @@ extern "C" {
  */
 typedef struct {
     list_node_t node;               /**< Pointer to the next interface */
-#ifdef MODULE_NETSTATS_NEIGHBOR
+#if MODULE_NETSTATS_NEIGHBOR
     netstats_nb_table_t neighbors;  /**< Structure containing all L2 neighbors */
 #endif
 } netif_t;

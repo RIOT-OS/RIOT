@@ -65,18 +65,18 @@ typedef enum {
  * not.
  */
 #define SX126X_SINGLE ((            \
-                          IS_USED(MODULE_SX1261) \
-                        + IS_USED(MODULE_SX1262) \
-                        + IS_USED(MODULE_SX1268) \
-                        + IS_USED(MODULE_LLCC68) \
-                        + IS_USED(MODULE_SX126X_STM32WL) \
+                          MODULE_SX1261 \
+                        + MODULE_SX1262 \
+                        + MODULE_SX1268 \
+                        + MODULE_LLCC68 \
+                        + MODULE_SX126X_STM32WL \
                         ) == 1)
 
 /**
  * @brief   Used to identify if its a generic SPI module
  */
-#if (IS_USED(MODULE_SX1261) || IS_USED(MODULE_SX1262) || \
-     IS_USED(MODULE_SX1268) || IS_USED(MODULE_LLCC68))
+#if (MODULE_SX1261 || MODULE_SX1262 || \
+     MODULE_SX1268 || MODULE_LLCC68)
 #define SX126X_SPI    1
 #endif
 
@@ -127,10 +127,10 @@ typedef struct {
     gpio_t reset_pin;                   /**< Reset pin */
     gpio_t busy_pin;                    /**< Busy pin */
     gpio_t dio1_pin;                    /**< Dio1 pin */
-#if IS_USED(MODULE_SX126X_DIO2)
+#if MODULE_SX126X_DIO2
     sx126x_dio2_mode_t dio2_mode;       /**< Dio2 mode */
 #endif
-#if IS_USED(MODULE_SX126X_DIO3)
+#if MODULE_SX126X_DIO3
     sx126x_dio3_mode_t dio3_mode;       /**< Dio3 mode */
     struct {
         unsigned tcxo_volt    :8;   /**< TCXO voltage (see sx126x_tcxo_ctrl_voltages_t)*/
@@ -140,7 +140,7 @@ typedef struct {
 #endif
     sx126x_reg_mod_t regulator;         /**< Power regulator mode */
     sx126x_type_t type;                 /**< Variant of sx126x */
-#if IS_USED(MODULE_SX126X_RF_SWITCH)
+#if MODULE_SX126X_RF_SWITCH
     /**
      * @ brief  Interface to set RF switch parameters
      */

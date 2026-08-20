@@ -27,7 +27,7 @@
 #include "embUnit.h"
 #include "shell.h"
 
-#if IS_USED(MODULE_GCOAP_DTLS)
+#if MODULE_GCOAP_DTLS
 #include "net/sock/dtls.h"
 #endif
 #include "net/gcoap/dns.h"
@@ -55,12 +55,12 @@ static uint8_t _mock_response[CONFIG_DNS_MSG_LEN];
 static size_t _mock_response_len = 0U;
 static uint8_t _resp_code = COAP_CODE_EMPTY;
 
-#if IS_USED(MODULE_GCOAP_DTLS)
+#if MODULE_GCOAP_DTLS
 static_assert(CONFIG_GCOAP_DNS_CREDS_MAX == CONFIG_DTLS_CREDENTIALS_MAX,
               "CONFIG_GCOAP_DNS_CREDS_MAX and CONFIG_DTLS_CREDENTIALS_MAX "
               "must be equal for this test");
 #endif
-static_assert(!IS_USED(MODULE_GCOAP_DTLS) ||
+static_assert(!MODULE_GCOAP_DTLS ||
              (CONFIG_GCOAP_DNS_CREDS_MAX == CONFIG_CREDMAN_MAX_CREDENTIALS),
               "CONFIG_GCOAP_DNS_CREDS_MAX and CONFIG_CREDMAN_MAX_CREDENTIALS "
               "must be equal for this test");
@@ -99,7 +99,7 @@ static void test_server_uri_set__success_2(void)
 {
     static const char uri[] = "coaps://example.org/";
 
-    if (IS_USED(MODULE_GCOAP_DTLS)) {
+    if (MODULE_GCOAP_DTLS) {
         char res[sizeof(uri)];
         TEST_ASSERT_EQUAL_INT(strlen(uri), gcoap_dns_server_uri_set(uri));
         TEST_ASSERT_EQUAL_INT(strlen(uri), gcoap_dns_server_uri_get(res, sizeof(res)));
@@ -148,7 +148,7 @@ static void test_server_uri_get__buf_too_short(void)
 static void test_cred_add__success(void)
 {
     INIT_TEST_PSK(TEST_TAG);
-    if (IS_USED(MODULE_GCOAP_DTLS)) {
+    if (MODULE_GCOAP_DTLS) {
         TEST_ASSERT_EQUAL_INT(0, gcoap_dns_cred_add(&_credential));
     }
     else {
@@ -158,7 +158,7 @@ static void test_cred_add__success(void)
 
 static void test_cred_add__no_mem(void)
 {
-#if IS_USED(MODULE_GCOAP_DTLS)
+#if MODULE_GCOAP_DTLS
     for (unsigned i = 0; i < CONFIG_GCOAP_DNS_CREDS_MAX; i++) {
         INIT_TEST_PSK(TEST_TAG + i);
         TEST_ASSERT_EQUAL_INT(0, gcoap_dns_cred_add(&_credential));
@@ -172,7 +172,7 @@ static void test_cred_add__no_mem(void)
 
 static void test_cred_add__credman_error(void)
 {
-    if (IS_USED(MODULE_GCOAP_DTLS)) {
+    if (MODULE_GCOAP_DTLS) {
         INIT_TEST_PSK(TEST_TAG);
         _credential.type = CREDMAN_TYPE_EMPTY;
         TEST_ASSERT_EQUAL_INT(-EBADF, gcoap_dns_cred_add(&_credential));
@@ -185,7 +185,7 @@ static void test_cred_add__credman_error(void)
 static void test_cred_remove__success(void)
 {
     INIT_TEST_PSK(TEST_TAG);
-    if (IS_USED(MODULE_GCOAP_DTLS)) {
+    if (MODULE_GCOAP_DTLS) {
         TEST_ASSERT_EQUAL_INT(CREDMAN_NOT_FOUND, credman_get(&_credential,
                                                              _credential.tag, _credential.type));
         TEST_ASSERT_EQUAL_INT(0, gcoap_dns_cred_add(&_credential));
@@ -523,7 +523,7 @@ static int _has_dns_cache(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-    if (IS_USED(MODULE_DNS_CACHE)) {
+    if (MODULE_DNS_CACHE) {
         puts("DNS cache exists");
     }
     else {

@@ -29,7 +29,7 @@
 #include "utilities.h"
 #include "ztimer.h"
 
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
 static char sock_inbuf[SOCK_INBUF_SIZE];
 static bool server_running = false, client_running = false;
 static sock_tcp_t server_sock, client_sock;

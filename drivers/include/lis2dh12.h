@@ -39,7 +39,7 @@
 #include "lis2dh12_registers.h"
 
 #include "periph/gpio.h"
-#ifdef MODULE_LIS2DH12_SPI
+#if MODULE_LIS2DH12_SPI
 #include "periph/spi.h"
 #else
 #include "periph/i2c.h"
@@ -49,7 +49,7 @@
 extern "C" {
 #endif
 
-#if defined(MODULE_LIS2DH12) || defined(DOXYGEN)
+#if MODULE_LIS2DH12 || defined(DOXYGEN)
 /**
  * @brief   Default I2C slave address for LIS2DH12 devices
  */

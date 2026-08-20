@@ -1,3 +1,12 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_rtt \
+  prng_mersenne \
+  prng_minstd \
+  prng_musl_lcg \
+  prng_tinymt32 \
+  prng_xorshift \
+  #
 include ../Makefile.bench_common
 
 # These boards only have a single timer in their periph_conf.h, needs special

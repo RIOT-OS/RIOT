@@ -40,7 +40,7 @@
  */
 static mutex_t locks[SPI_NUMOF];
 
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
 struct dma_state {
     dma_t tx_dma;
     dma_t rx_dma;
@@ -62,7 +62,7 @@ static inline SercomSpi *dev(spi_t bus)
 
 static inline bool _is_qspi(spi_t bus)
 {
-#ifdef MODULE_PERIPH_SPI_ON_QSPI
+#if MODULE_PERIPH_SPI_ON_QSPI
     return (void*)spi_config[bus].dev == (void*)QSPI;
 #else
     (void)bus;
@@ -140,7 +140,7 @@ static inline void _enable(SercomSpi *dev)
 
 static inline bool _use_dma(spi_t bus)
 {
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
     return (spi_config[bus].tx_trigger != DMA_TRIGGER_DISABLED) &&
            (spi_config[bus].rx_trigger != DMA_TRIGGER_DISABLED);
 #else
@@ -155,7 +155,7 @@ static inline void _init_dma(spi_t bus, const volatile void *reg_rx, volatile vo
         return;
     }
 
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
     _dma_state[bus].rx_dma = dma_acquire_channel();
     _dma_state[bus].tx_dma = dma_acquire_channel();
 
@@ -461,7 +461,7 @@ static void _blocking_transfer(spi_t bus, const void *out, void *in, size_t len)
     }
 }
 
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
 
 static void _dma_execute(spi_t bus)
 {
@@ -546,7 +546,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     }
 
     if (_use_dma(bus) && len > CONFIG_SPI_DMA_THRESHOLD_BYTES) {
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         /* The DMA promises not to modify the const out data */
         _dma_transfer(bus, out, in, len);
 #endif

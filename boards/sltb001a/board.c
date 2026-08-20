@@ -20,7 +20,7 @@
 #include "board_common.h"
 #include "periph/gpio.h"
 
-#ifdef MODULE_SILABS_PIC
+#if MODULE_SILABS_PIC
 #include "pic.h"
 #endif
 
@@ -30,8 +30,8 @@ void board_init(void)
     /* perform common board initialization */
     board_common_init();
 
-#ifdef MODULE_SILABS_PIC
-#ifdef MODULE_CCS811
+#if MODULE_SILABS_PIC
+#if MODULE_CCS811
     /* enable the CCS811 air quality/gas sensor */
     pic_write(CCS811_PIC_ADDR, (1 << CCS811_PIC_EN_BIT) | (1 << CCS811_PIC_WAKE_BIT));
 #endif
@@ -41,7 +41,7 @@ void board_init(void)
     pic_write(ICM20648_PIC_ADDR, 1 << ICM20648_PIC_EN_BIT);
 #endif
 
-#if defined(MODULE_BMP280) || defined(MODULE_SI7021) || SI1133_ENABLED || SI7210_ENABLED
+#if MODULE_BMP280 || MODULE_SI7021 || SI1133_ENABLED || SI7210_ENABLED
     /* enable the environmental sensors */
     pic_write(ENV_SENSE_PIC_ADDR, 1 << ENV_SENSE_PIC_BIT);
 #endif

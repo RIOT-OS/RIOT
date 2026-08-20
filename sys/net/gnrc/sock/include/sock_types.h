@@ -28,7 +28,7 @@
 #include "mbox.h"
 #include "net/af.h"
 #include "net/gnrc.h"
-#if IS_USED(MODULE_GNRC_TCP)
+#if MODULE_GNRC_TCP
 #include "net/gnrc/tcp.h"
 #endif
 #include "net/gnrc/netreg.h"
@@ -88,7 +88,7 @@ typedef void (*gnrc_sock_reg_cb_t)(gnrc_sock_reg_t *sock,
  * @internal
  */
 struct gnrc_sock_reg {
-#ifdef MODULE_GNRC_SOCK_CHECK_REUSE
+#if MODULE_GNRC_SOCK_CHECK_REUSE
     struct gnrc_sock_reg *next;            /**< list-like for internal storage */
 #endif
     gnrc_netreg_entry_t entry;             /**< @ref net_gnrc_netreg entry for mbox */
@@ -104,10 +104,10 @@ struct gnrc_sock_reg {
      */
     union {
         gnrc_sock_reg_cb_t generic;        /**< generic version */
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
         sock_ip_cb_t ip;                   /**< IP version */
 #endif
-#ifdef MODULE_SOCK_UDP
+#if MODULE_SOCK_UDP
         sock_udp_cb_t udp;                 /**< UDP version */
 #endif
     } async_cb;

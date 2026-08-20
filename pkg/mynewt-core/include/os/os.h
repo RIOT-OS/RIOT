@@ -134,7 +134,7 @@ static inline bool os_hw_is_in_critical(void)
 #include "os/os_trace_api.h"
 #include "os/queue.h"
 
-#if IS_USED(MODULE_NIMBLE)
+#if MODULE_NIMBLE
 #include "nimble/nimble_npl.h"
 #endif
 

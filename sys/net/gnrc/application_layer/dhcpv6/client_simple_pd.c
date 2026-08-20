@@ -103,7 +103,7 @@ static void _configure_dhcpv6_client(void)
     }
 
     while ((netif = gnrc_netif_iter(netif))) {
-        if (IS_USED(MODULE_GNRC_DHCPV6_CLIENT_6LBR)
+        if (MODULE_GNRC_DHCPV6_CLIENT_6LBR
             && !gnrc_netif_is_6lo(netif)) {
             continue;
         }

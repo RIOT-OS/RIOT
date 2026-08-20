@@ -20,7 +20,7 @@
 #include <stdint.h>
 #include "modules.h"
 
-#if IS_USED(MODULE_EVTIMER)
+#if MODULE_EVTIMER
 #include "evtimer.h"
 #endif
 #include "net/ipv6/addr.h"
@@ -123,7 +123,7 @@ void gnrc_ipv6_nib_pl_del(unsigned iface,
 bool gnrc_ipv6_nib_pl_iter(unsigned iface, void **state,
                            gnrc_ipv6_nib_pl_t *ple);
 
-#if IS_USED(MODULE_EVTIMER) || defined(DOXYGEN)
+#if MODULE_EVTIMER || defined(DOXYGEN)
 /**
  * @brief   Provides the time in milliseconds for which the prefix list
  *          entry is valid

@@ -25,7 +25,7 @@ extern "C" {
  * @name    Default hardware configuration
  * @{
  */
-#if IS_USED(MODULE_L3GXXXX_I2C) || DOXYGEN
+#if MODULE_L3GXXXX_I2C || DOXYGEN
 
 #ifndef L3GXXXX_I2C_DEV
 /** Default I2C device, if the I2C interface is used */
@@ -46,7 +46,7 @@ extern "C" {
 
 #endif /* MODULE_L3GXXXX_I2C || DOXYGEN */
 
-#if IS_USED(MODULE_L3GXXXX_SPI) || DOXYGEN
+#if MODULE_L3GXXXX_SPI || DOXYGEN
 
 #ifndef L3GXXXX_SPI_DEV
 /** Default SPI device, if the SPI interface is used */
@@ -277,7 +277,7 @@ extern "C" {
 #define CONFIG_L3GXXXX_INT1_LATCH       (true)
 #endif
 
-#if IS_USED(MODULE_L3GXXXX_IRQ_EVENT) || DOXYGEN
+#if MODULE_L3GXXXX_IRQ_EVENT || DOXYGEN
 /** Default INT1 parameter set */
 #define L3GXXXX_INT1_PARAMS     .int1_pin =  L3GXXXX_INT1_PIN, \
                                 .int1_cfg.x_high_enabled = CONFIG_L3GXXXX_INT1_X_GT_THRESH, \
@@ -296,14 +296,14 @@ extern "C" {
 #define L3GXXXX_INT1_PARAMS
 #endif
 
-#if IS_USED(MODULE_L3GXXXX_IRQ_DATA) || DOXYGEN
+#if MODULE_L3GXXXX_IRQ_DATA || DOXYGEN
 /** Default INT2 parameter set */
 #define L3GXXXX_INT2_PARAMS     .int2_pin =  L3GXXXX_INT2_PIN,
 #else
 #define L3GXXXX_INT2_PARAMS
 #endif
 
-#if IS_USED(MODULE_L3GXXXX_FIFO) || DOXYGEN
+#if MODULE_L3GXXXX_FIFO || DOXYGEN
 /** Default FIFO parameter set */
 #define L3GXXXX_FIFO_PARAMS     .fifo_mode =  CONFIG_L3GXXXX_FIFO_MODE, \
                                 .fifo_watermark  =  CONFIG_L3GXXXX_FIFO_WATERMARK,
@@ -311,7 +311,7 @@ extern "C" {
 #define L3GXXXX_FIFO_PARAMS
 #endif
 
-#if IS_USED(MODULE_L3GXXXX_I2C) || DOXYGEN
+#if MODULE_L3GXXXX_I2C || DOXYGEN
 
 #ifndef L3GXXXX_I2C_PARAMS
 /** Default I2C device parameter set */
@@ -329,7 +329,7 @@ extern "C" {
 #endif
 #endif /* MODULE_L3GXXXX_I2C || DOXYGEN */
 
-#if IS_USED(MODULE_L3GXXXX_SPI) || DOXYGEN
+#if MODULE_L3GXXXX_SPI || DOXYGEN
 #ifndef L3GXXXX_SPI_PARAMS
 /** Default SPI device parameter set */
 #define L3GXXXX_SPI_PARAMS  { \
@@ -357,10 +357,10 @@ extern "C" {
  */
 static const l3gxxxx_params_t l3gxxxx_params[] =
 {
-#if IS_USED(MODULE_L3GXXXX_I2C) || DOXYGEN
+#if MODULE_L3GXXXX_I2C || DOXYGEN
     L3GXXXX_I2C_PARAMS,
 #endif
-#if IS_USED(MODULE_L3GXXXX_SPI) || DOXYGEN
+#if MODULE_L3GXXXX_SPI || DOXYGEN
     L3GXXXX_SPI_PARAMS,
 #endif
 };

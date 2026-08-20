@@ -94,7 +94,7 @@ can_pkt_t *can_pkt_alloc_tx(int ifnum, const can_frame_t *frame, kernel_pid_t tx
 
     _init_tx_pkt(pkt);
     pkt->entry.target.pid = tx_pid;
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
     pkt->entry.type = CAN_TYPE_DEFAULT;
 #endif
 
@@ -114,7 +114,7 @@ can_pkt_t *can_pkt_alloc_rx(int ifnum, const can_frame_t *frame)
     return pkt;
 }
 
-#ifdef MODULE_CAN_MBOX
+#if MODULE_CAN_MBOX
 can_pkt_t *can_pkt_alloc_mbox_tx(int ifnum, const can_frame_t *frame, mbox_t *tx_mbox)
 {
     can_pkt_t *pkt = _pkt_alloc(ifnum, frame);

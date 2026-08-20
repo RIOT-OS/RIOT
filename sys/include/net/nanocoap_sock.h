@@ -142,7 +142,7 @@
 #include "net/sock/util.h"
 #include "random.h"
 
-#if IS_USED(MODULE_NANOCOAP_DTLS)
+#if MODULE_NANOCOAP_DTLS
 #  include "net/credman.h"
 #  include "net/sock/dtls.h"
 #endif
@@ -207,7 +207,7 @@ typedef enum {
  */
 typedef struct {
     sock_udp_t udp;                         /**< UDP socket     */
-#if IS_USED(MODULE_NANOCOAP_DTLS) || defined(DOXYGEN)
+#if MODULE_NANOCOAP_DTLS || defined(DOXYGEN)
     sock_dtls_t dtls;                       /**< DTLS socket    */
     sock_dtls_session_t dtls_session;       /**< Session object for the stored socket.
                                                  Used for exchanging a session between
@@ -512,7 +512,7 @@ static inline int nanocoap_sock_connect(nanocoap_sock_t *sock,
                                         const sock_udp_ep_t *local,
                                         const sock_udp_ep_t *remote)
 {
-#if IS_USED(MODULE_NANOCOAP_DTLS)
+#if MODULE_NANOCOAP_DTLS
     sock->type = COAP_SOCKET_TYPE_UDP;
 #endif
     sock->msg_id = random_uint32();
@@ -520,7 +520,7 @@ static inline int nanocoap_sock_connect(nanocoap_sock_t *sock,
     return sock_udp_create(&sock->udp, local, remote, 0);
 }
 
-#if IS_USED(MODULE_NANOCOAP_DTLS) || DOXYGEN
+#if MODULE_NANOCOAP_DTLS || DOXYGEN
 /**
  * @brief   Create a DTLS secured CoAP client socket
  *
@@ -555,7 +555,7 @@ int nanocoap_sock_url_connect(const char *url, nanocoap_sock_t *sock);
  */
 static inline void nanocoap_sock_close(nanocoap_sock_t *sock)
 {
-#if IS_USED(MODULE_NANOCOAP_DTLS)
+#if MODULE_NANOCOAP_DTLS
     if (sock->type == COAP_SOCKET_TYPE_DTLS) {
         sock_dtls_session_destroy(&sock->dtls, &sock->dtls_session);
         sock_dtls_close(&sock->dtls);

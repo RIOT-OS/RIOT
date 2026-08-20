@@ -42,7 +42,7 @@ int sx127x_check_version(const sx127x_t *dev)
     /* Read version number and compare with sx127x assigned revision */
     uint8_t version = sx127x_reg_read(dev, SX127X_REG_VERSION);
 
-#if defined(MODULE_SX1272)
+#if MODULE_SX1272
     if (version != VERSION_SX1272) {
         DEBUG("[sx127x] sx1272 test failed, invalid version number: %d\n",
               version);
@@ -109,7 +109,7 @@ void sx127x_read_fifo(const sx127x_t *dev, uint8_t *buffer, uint8_t size)
     sx127x_reg_read_burst(dev, 0, buffer, size);
 }
 
-#if defined(MODULE_SX1276)
+#if MODULE_SX1276
 void sx1276_rx_chain_calibration(sx127x_t *dev)
 {
     uint8_t reg_pa_config_init_val;
@@ -160,7 +160,7 @@ int16_t sx127x_read_rssi(const sx127x_t *dev)
         rssi = -(sx127x_reg_read(dev, SX127X_REG_RSSIVALUE) >> 1);
         break;
     case SX127X_MODEM_LORA:
-#if defined(MODULE_SX1272)
+#if MODULE_SX1272
         rssi = SX127X_RSSI_OFFSET + sx127x_reg_read(dev, SX127X_REG_LR_RSSIVALUE);
 #else /* MODULE_SX1276 */
         if (dev->settings.channel > SX127X_RF_MID_BAND_THRESH) {

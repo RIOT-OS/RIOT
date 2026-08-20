@@ -31,7 +31,7 @@
 #include "include/gnrc_tcp_rcvbuf.h"
 #include "include/gnrc_tcp_fsm.h"
 
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
 #endif
 
@@ -178,7 +178,7 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, _gnrc_tcp_fsm_state_t state)
             tcb->status &= ~(STATUS_ACCEPTED);
 
             /* Clear address info */
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
             if (tcb->address_family == AF_INET6) {
                 if (tcb->status & STATUS_ALLOW_ANY_ADDR) {
                     ipv6_addr_set_unspecified((ipv6_addr_t *) tcb->local_addr);
@@ -482,7 +482,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
     seg_wnd = byteorder_ntohs(tcp_hdr->window);
 
     /* Extract network layer header */
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     snp = gnrc_pktsnip_search_type(in_pkt, GNRC_NETTYPE_IPV6);
     if (snp == NULL) {
         TCP_DEBUG_ERROR("Packet contains no IPv6 header.");
@@ -518,7 +518,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
             while (lst) {
                 /* Compare port numbers and network layer addresses */
                 if (lst->local_port == dst && lst->peer_port == src) {
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
                     if (snp->type == GNRC_NETTYPE_IPV6 && lst->address_family == AF_INET6) {
                         ipv6_addr_t *dst_addr = &((ipv6_hdr_t *)ip)->dst;
                         ipv6_addr_t *src_addr = &((ipv6_hdr_t *)ip)->src;
@@ -543,7 +543,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
             }
 
             /* SYN request is valid, fill TCB with connection information */
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
             if (snp->type == GNRC_NETTYPE_IPV6 && tcb->address_family == AF_INET6) {
                 memcpy(tcb->local_addr, &((ipv6_hdr_t *)ip)->dst, sizeof(ipv6_addr_t));
                 memcpy(tcb->peer_addr, &((ipv6_hdr_t *)ip)->src, sizeof(ipv6_addr_t));
@@ -618,7 +618,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
                 _gnrc_tcp_pkt_acknowledge(tcb, seg_ack);
             }
             /* Set local network layer address accordingly */
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
             if (snp->type == GNRC_NETTYPE_IPV6 && tcb->address_family == AF_INET6) {
                 memcpy(tcb->local_addr, &((ipv6_hdr_t *)ip)->dst, sizeof(ipv6_addr_t));
             }

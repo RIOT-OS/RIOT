@@ -121,7 +121,7 @@ void spidev_linux_teardown(void);
 
 #else
 /* Create the error in the header file as spi.c will be compiled to late to show it */
-#ifdef MODULE_PERIPH_SPIDEV_LINUX
+#if MODULE_PERIPH_SPIDEV_LINUX
 #error "MODULE periph_spidev_linux is only available on Linux"
 #endif
 #endif /* defined(__linux__) || defined(DOXYGEN) */

@@ -17,7 +17,7 @@
 #include "tinyusb.h"
 #include "tinyusb_hw.h"
 
-#if IS_USED(MODULE_AUTO_INIT)
+#if MODULE_AUTO_INIT
 #include "auto_init_utils.h"
 #include "auto_init_priorities.h"
 #endif
@@ -35,7 +35,7 @@ static void *_tinyusb_thread_impl(void *arg)
     }
     DEBUG("tinyUSB peripherals initialized\n");
 
-    if (IS_USED(MODULE_TINYUSB_DEVICE)) {
+    if (MODULE_TINYUSB_DEVICE) {
         if (!tud_init(TINYUSB_TUD_RHPORT)) {
             LOG_ERROR("tinyUSB device stack couldn't be initialized\n");
             assert(0);
@@ -43,7 +43,7 @@ static void *_tinyusb_thread_impl(void *arg)
         DEBUG("tinyUSB device stack initialized\n");
     }
 
-    if (IS_USED(MODULE_TINYUSB_HOST)) {
+    if (MODULE_TINYUSB_HOST) {
         if (!tuh_init(TINYUSB_TUH_RHPORT)) {
             LOG_ERROR("tinyUSB host stack couldn't be initialized\n");
             assert(0);
@@ -52,12 +52,12 @@ static void *_tinyusb_thread_impl(void *arg)
     }
 
     while (1) {
-        if (IS_USED(MODULE_TINYUSB_DEVICE)) {
+        if (MODULE_TINYUSB_DEVICE) {
             /* call tinyUSB device task blocking */
             tud_task();
             DEBUG("tinyUSB device task executed\n");
         }
-        if (IS_USED(MODULE_TINYUSB_HOST)) {
+        if (MODULE_TINYUSB_HOST) {
             /* call tinyUSB device task blocking */
             tuh_task();
             DEBUG("tinyUSB host task executed\n");
@@ -95,6 +95,6 @@ void tinyusb_auto_init(void)
     tinyusb_setup();
 }
 
-#if IS_USED(MODULE_AUTO_INIT_TINYUSB)
+#if MODULE_AUTO_INIT_TINYUSB
 AUTO_INIT(tinyusb_auto_init, AUTO_INIT_PRIO_MOD_TINYUSB);
 #endif

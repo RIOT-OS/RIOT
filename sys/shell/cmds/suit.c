@@ -26,7 +26,7 @@
 #include "suit/storage.h"
 #include "suit/transport/coap.h"
 
-#ifdef MODULE_SUIT_STORAGE_FLASHWRITE
+#if MODULE_SUIT_STORAGE_FLASHWRITE
 #include "riotboot/flashwrite.h"
 #include "periph/pm.h"
 #endif
@@ -35,7 +35,7 @@ static void _print_usage(char **argv)
 {
     printf("Usage: %s fetch <manifest url>\n", argv[0]);
     printf("       %s seq_no\n", argv[0]);
-    if (IS_USED(MODULE_SUIT_STORAGE_FLASHWRITE)) {
+    if (MODULE_SUIT_STORAGE_FLASHWRITE) {
         printf("       %s revert\n", argv[0]);
     }
 }
@@ -55,7 +55,7 @@ static int _suit_handler(int argc, char **argv)
         suit_storage_get_highest_seq_no(&seq_no);
         printf("seq_no: 0x%08" PRIx32 "\n", seq_no);
     }
-#ifdef MODULE_SUIT_STORAGE_FLASHWRITE
+#if MODULE_SUIT_STORAGE_FLASHWRITE
     else if (strcmp(argv[1], "revert") == 0) {
         int res = riotboot_flashwrite_invalidate_latest();
         if (res) {

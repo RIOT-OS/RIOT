@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  pcf857x_irq \
+  #
 INCLUDES += -I$(APPDIR)
 
 include ../Makefile.drivers_common

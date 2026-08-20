@@ -19,11 +19,11 @@
 #include "board.h"
 #include "periph/gpio.h"
 #include "timex.h"
-#ifdef MODULE_VFS_DEFAULT
+#if MODULE_VFS_DEFAULT
 #include "vfs_default.h"
 #endif
 
-#ifdef MODULE_MTD_SPI_NOR
+#if MODULE_MTD_SPI_NOR
 
 #include "mtd_spi_nor.h"
 
@@ -58,7 +58,7 @@ static mtd_spi_nor_t samd51_nor_dev = {
 
 MTD_XFA_ADD(samd51_nor_dev, 0);
 
-#ifdef MODULE_VFS_DEFAULT
+#if MODULE_VFS_DEFAULT
 VFS_AUTO_MOUNT(littlefs2, VFS_MTD(samd51_nor_dev), VFS_DEFAULT_NVM(0), 0);
 #endif
 

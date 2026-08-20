@@ -891,7 +891,7 @@ static void test_ipv6_addr_to_str__success5(void)
     };
     char result[IPV6_ADDR_MAX_STR_LEN];
 
-#ifdef MODULE_IPV4_ADDR
+#if MODULE_IPV4_ADDR
     TEST_ASSERT_EQUAL_STRING("::ffff:192.168.0.1", ipv6_addr_to_str(result, &a, sizeof(result)));
 #else
     TEST_ASSERT_EQUAL_STRING("::ffff:c0a8:1", ipv6_addr_to_str(result, &a, sizeof(result)));
@@ -1027,7 +1027,7 @@ static void test_ipv6_addr_from_str__success6(void)
     };
     ipv6_addr_t result;
 
-#ifdef MODULE_IPV4_ADDR
+#if MODULE_IPV4_ADDR
     TEST_ASSERT_NOT_NULL(ipv6_addr_from_str(&result, "ffff:ffff:ffff:ffff:ffff:ffff"
                                                      ":255.255.255.255"));
 #else
@@ -1075,7 +1075,7 @@ static void test_ipv6_addr_from_buf__success(void)
     };
     ipv6_addr_t result;
 
-#ifdef MODULE_IPV4_ADDR
+#if MODULE_IPV4_ADDR
     TEST_ASSERT_NOT_NULL(ipv6_addr_from_buf(&result, "ffff:ffff:ffff:ffff:ffff:ffff"
                                                      ":255.255.255.255%tap0", 45));
 #else

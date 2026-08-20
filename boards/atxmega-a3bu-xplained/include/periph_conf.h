@@ -70,7 +70,7 @@ static const uart_conf_t uart_config[] = {
         .pwr            = PWR_RED_REG(PWR_PORT_C, PR_USART0_bm),
         .rx_pin         = GPIO_PIN(PORT_C, 2),
         .tx_pin         = GPIO_PIN(PORT_C, 3),
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .rts_pin        = GPIO_UNDEF,
         .cts_pin        = GPIO_UNDEF,
 #endif
@@ -83,7 +83,7 @@ static const uart_conf_t uart_config[] = {
         .pwr            = PWR_RED_REG(PWR_PORT_E, PR_USART0_bm),
         .rx_pin         = GPIO_PIN(PORT_E, 2),
         .tx_pin         = GPIO_PIN(PORT_E, 3),
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .rts_pin        = GPIO_UNDEF,
         .cts_pin        = GPIO_UNDEF,
 #endif

@@ -91,9 +91,9 @@ void gnrc_sixlowpan_frag_sfr_init(void);
  */
 static inline void gnrc_sixlowpan_frag_sfr_init_iface(gnrc_netif_t *netif)
 {
-    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) &&
+    if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR &&
         gnrc_netif_is_6lo(netif)) {
-#if IS_USED(MODULE_GNRC_NETIF_6LO)
+#if MODULE_GNRC_NETIF_6LO
         netif->sixlo.local_flags |= GNRC_NETIF_6LO_LOCAL_FLAGS_SFR;
         netif->sixlo.max_frag_size =
               (netif->sixlo.max_frag_size > CONFIG_GNRC_SIXLOWPAN_SFR_OPT_FRAG_SIZE)
@@ -117,8 +117,8 @@ static inline void gnrc_sixlowpan_frag_sfr_init_iface(gnrc_netif_t *netif)
  */
 static inline bool gnrc_sixlowpan_frag_sfr_netif(gnrc_netif_t *netif)
 {
-#if IS_USED(MODULE_GNRC_NETIF_6LO)
-    return IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) &&
+#if MODULE_GNRC_NETIF_6LO
+    return MODULE_GNRC_SIXLOWPAN_FRAG_SFR &&
         gnrc_netif_is_6lo(netif) &&
         (netif->sixlo.local_flags & GNRC_NETIF_6LO_LOCAL_FLAGS_SFR);
 #else
@@ -187,14 +187,14 @@ void gnrc_sixlowpan_frag_sfr_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf);
  */
 void gnrc_sixlowpan_frag_sfr_inter_frame_gap(gnrc_sixlowpan_frag_fb_t *fbuf);
 
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS
 /**
  * @brief   Fetch current stats for selective fragment recovery
  *
  * @param[out] stats    The current stats. Must not be NULL.
  */
 void gnrc_sixlowpan_frag_sfr_stats_get(gnrc_sixlowpan_frag_sfr_stats_t *stats);
-#endif /* IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS) */
+#endif /* MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS */
 
 #ifdef __cplusplus
 }

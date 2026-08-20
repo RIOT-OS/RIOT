@@ -93,7 +93,7 @@ static const pwm_conf_t pwm_config[] = {
         .af       = GPIO_AF_OUT_PP,
         .bus      = APB1,
     },
-#if !defined(MODULE_PERIPH_CAN)
+#if !MODULE_PERIPH_CAN
     {
         .dev      = TIMER3,
         .rcu_mask = RCU_APB1EN_TIMER3EN_Msk,

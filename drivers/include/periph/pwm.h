@@ -99,7 +99,7 @@ typedef enum {
 } pwm_mode_t;
 #endif
 
-#ifdef MODULE_ARDUINO
+#if MODULE_ARDUINO
 /**
  * @brief   Mapping of an Arduino digital pin to the corresponding PWM dev and
  *          channel pair

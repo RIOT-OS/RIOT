@@ -110,10 +110,10 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_opt_process(gnrc_pktsnip_t *pkt,
                     case IPV6_EXT_OPT_ACTION_DISC:
                         break;
                     case IPV6_EXT_OPT_ACTION_DISC_ERR_MCAST:
-                        send_error = IS_USED(MODULE_GNRC_ICMPV6_ERROR);
+                        send_error = MODULE_GNRC_ICMPV6_ERROR;
                         break;
                     case IPV6_EXT_OPT_ACTION_DISC_ERR:
-                        send_error = IS_USED(MODULE_GNRC_ICMPV6_ERROR) &&
+                        send_error = MODULE_GNRC_ICMPV6_ERROR &&
                                      !_multicast_dst(pkt);
                         break;
                 }

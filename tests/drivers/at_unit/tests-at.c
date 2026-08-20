@@ -18,7 +18,7 @@
 at_dev_t at_dev;
 static char buf[256];
 static char rp_buf[256];
-#ifdef MODULE_AT_URC
+#if MODULE_AT_URC
 static unsigned urc_count = 0;
 
 void unit_test_urc_long_handler(void *arg, char const *code)
@@ -77,7 +77,7 @@ static void set_up(void)
     at_dev_poweroff(&at_dev);
     at_drain(&at_dev);
 
-#ifdef MODULE_AT_URC
+#if MODULE_AT_URC
     at_add_urc(&at_dev, &urc_long);
     at_add_urc(&at_dev, &urc_short);
 #endif
@@ -85,7 +85,7 @@ static void set_up(void)
 
 static void tear_down(void)
 {
-#ifdef MODULE_AT_URC
+#if MODULE_AT_URC
     at_remove_urc(&at_dev, &urc_long);
     at_remove_urc(&at_dev, &urc_short);
 #endif
@@ -93,7 +93,7 @@ static void tear_down(void)
 
 static void assert_urc_count(unsigned expected)
 {
-#ifdef MODULE_AT_URC
+#if MODULE_AT_URC
     TEST_ASSERT_EQUAL_INT(expected, urc_count);
     urc_count = 0;
 #endif
@@ -648,7 +648,7 @@ void test_wait_ok(void)
     assert_urc_count(urc_cnt);
 }
 
-#ifdef MODULE_AT_URC
+#if MODULE_AT_URC
 void test_process_urc(void)
 {
     at_dev_t *dev = &at_dev;
@@ -681,7 +681,7 @@ static Test *tests_at(void)
         new_TestFixture(test_read_lines),
         new_TestFixture(test_wait_prompt),
         new_TestFixture(test_wait_ok),
-        #ifdef MODULE_AT_URC
+        #if MODULE_AT_URC
         new_TestFixture(test_process_urc),
         #endif
     };

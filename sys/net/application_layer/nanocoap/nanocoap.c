@@ -43,7 +43,7 @@
 #define COAP_RST                (3)
 /** @} */
 
-#ifdef MODULE_NANOCOAP_RESOURCES
+#if MODULE_NANOCOAP_RESOURCES
 /**
  * @brief   CoAP resources XFA
  */
@@ -184,7 +184,7 @@ ssize_t coap_parse_udp(coap_pkt_t *pkt, uint8_t *buf, size_t len)
         pkt->payload = pkt_pos;
     }
 
-#ifdef MODULE_GCOAP
+#if MODULE_GCOAP
     if (coap_opt_get_uint(pkt, COAP_OPT_OBSERVE, &pkt->observe_value) != 0) {
         pkt->observe_value = UINT32_MAX;
     }
@@ -559,7 +559,7 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
 {
     assert(ctx);
 
-    if (IS_USED(MODULE_NANOCOAP_SERVER_OBSERVE) && (coap_get_type(pkt) == COAP_TYPE_RST)) {
+    if (MODULE_NANOCOAP_SERVER_OBSERVE && (coap_get_type(pkt) == COAP_TYPE_RST)) {
         nanocoap_unregister_observer_due_to_reset(coap_request_ctx_get_remote_udp(ctx),
                                                   coap_get_id(pkt));
     }
@@ -1757,7 +1757,7 @@ void *coap_request_ctx_get_context(const coap_request_ctx_t *ctx)
 
 uint32_t coap_request_ctx_get_tl_type(const coap_request_ctx_t *ctx)
 {
-#ifdef MODULE_GCOAP
+#if MODULE_GCOAP
     return ctx->tl_type;
 #else
     (void)ctx;
@@ -1772,7 +1772,7 @@ const sock_udp_ep_t *coap_request_ctx_get_remote_udp(const coap_request_ctx_t *c
 
 const sock_udp_ep_t *coap_request_ctx_get_local_udp(const coap_request_ctx_t *ctx)
 {
-#if defined(MODULE_SOCK_AUX_LOCAL)
+#if MODULE_SOCK_AUX_LOCAL
     return ctx->local_udp;
 #else
     (void)ctx;

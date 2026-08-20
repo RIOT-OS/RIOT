@@ -71,15 +71,15 @@ int flexcomm_instance_from_addr(const FLEXCOMM_Type *dev)
     return -1;
 }
 
-#ifdef MODULE_PERIPH_UART
+#if MODULE_PERIPH_UART
 extern void isr_flexcomm_uart(USART_Type *dev, uint32_t flexcomm_num);
 #endif /* MODULE_PERIPH_UART */
 
-#ifdef MODULE_PERIPH_SPI
+#if MODULE_PERIPH_SPI
 extern void isr_flexcomm_spi(SPI_Type *dev, uint32_t flexcomm_num);
 #endif /* MODULE_PERIPH_SPI */
 
-#ifdef MODULE_PERIPH_I2C
+#if MODULE_PERIPH_I2C
 extern void isr_flexcomm_i2c(I2C_Type *dev, uint32_t flexcomm_num);
 #endif /* MODULE_PERIPH_I2C */
 
@@ -92,17 +92,17 @@ extern void isr_flexcomm_i2c(I2C_Type *dev, uint32_t flexcomm_num);
 static void isr_flexcomm(void *flexcomm, uint32_t flexcomm_num)
 {
     switch (((FLEXCOMM_Type *)flexcomm)->PSELID & FLEXCOMM_PSELID_PERSEL_MASK) {
-#ifdef MODULE_PERIPH_UART
+#if MODULE_PERIPH_UART
     case FLEXCOMM_ID_UART:
         isr_flexcomm_uart((USART_Type *)(flexcomm), flexcomm_num);
         return;
 #endif  /* MODULE_PERIPH_UART */
-#ifdef MODULE_PERIPH_SPI
+#if MODULE_PERIPH_SPI
     case FLEXCOMM_ID_SPI:
         isr_flexcomm_spi((SPI_Type *)(flexcomm), flexcomm_num);
         return;
 #endif  /* MODULE_PERIPH_SPI */
-#ifdef MODULE_PERIPH_I2C
+#if MODULE_PERIPH_I2C
     case FLEXCOMM_ID_I2C:
         isr_flexcomm_i2c((I2C_Type *)(flexcomm), flexcomm_num);
         return;

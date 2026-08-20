@@ -25,7 +25,7 @@
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-#define USED_BANDS (IS_USED(MODULE_AT86RF215_SUBGHZ) + IS_USED(MODULE_AT86RF215_24GHZ))
+#define USED_BANDS (MODULE_AT86RF215_SUBGHZ + MODULE_AT86RF215_24GHZ)
 #define NETIF_AT86RF215_NUMOF   ARRAY_SIZE(at86rf215_params)
 
 static lwip_netif_t netif[NETIF_AT86RF215_NUMOF * USED_BANDS];
@@ -41,13 +41,13 @@ static void auto_init_at86rf215(void)
         lwip_netif_t *netif_09 = NULL;
         lwip_netif_t *netif_24 = NULL;
 
-        if (IS_USED(MODULE_AT86RF215_SUBGHZ)) {
+        if (MODULE_AT86RF215_SUBGHZ) {
             dev_09   = &at86rf215_devs[i];
             netif_09 = &netif[i];
             ++i;
         }
 
-        if (IS_USED(MODULE_AT86RF215_24GHZ)) {
+        if (MODULE_AT86RF215_24GHZ) {
             dev_24   = &at86rf215_devs[i];
             netif_24 = &netif[i];
             ++i;

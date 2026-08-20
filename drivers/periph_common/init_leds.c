@@ -28,7 +28,7 @@
 __attribute__ ((weak))
 void led_init(void)
 {
-    if (!IS_USED(MODULE_PERIPH_GPIO)) {
+    if (!MODULE_PERIPH_GPIO) {
         return;
     }
 

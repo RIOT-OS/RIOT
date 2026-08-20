@@ -164,7 +164,7 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
     return SPI_OK;
 }
 
-#ifdef MODULE_PERIPH_SPI_GPIO_MODE
+#if MODULE_PERIPH_SPI_GPIO_MODE
 int spi_init_with_gpio_mode(spi_t bus, const spi_gpio_mode_t* mode)
 {
     assert(bus < SPI_NUMOF);

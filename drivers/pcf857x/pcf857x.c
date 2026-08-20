@@ -17,7 +17,7 @@
 
 #include "pcf857x.h"
 
-#if IS_USED(MODULE_PCF857X_IRQ)
+#if MODULE_PCF857X_IRQ
 #include "event/thread.h"
 #endif
 
@@ -36,15 +36,15 @@
 
 #endif /* ENABLE_DEBUG */
 
-#if !IS_USED(MODULE_PCF8574) && !IS_USED(MODULE_PCF8574A) && !IS_USED(MODULE_PCF8575)
+#if !MODULE_PCF8574 && !MODULE_PCF8574A && !MODULE_PCF8575
 #error "Please provide a list of pcf857x variants used by the application (pcf8574, pcf8574a or pcf8575)"
 #endif
 
-#if IS_USED(MODULE_PCF857X_IRQ_LOW)
+#if MODULE_PCF857X_IRQ_LOW
 #define PCF857X_EVENT_PRIO EVENT_PRIO_LOWEST
-#elif IS_USED(MODULE_PCF857X_IRQ_MEDIUM)
+#elif MODULE_PCF857X_IRQ_MEDIUM
 #define PCF857X_EVENT_PRIO EVENT_PRIO_MEDIUM
-#elif IS_USED(MODULE_PCF857X_IRQ_HIGHEST)
+#elif MODULE_PCF857X_IRQ_HIGHEST
 #define PCF857X_EVENT_PRIO EVENT_PRIO_HIGHEST
 #endif
 
@@ -55,7 +55,7 @@ static inline void _release(const pcf857x_t *dev);
 static int _read(const pcf857x_t *dev, pcf857x_data_t *data);
 static int _write(const pcf857x_t *dev, pcf857x_data_t data);
 
-#if IS_USED(MODULE_PCF857X_IRQ)
+#if MODULE_PCF857X_IRQ
 
 /* interrupt service routine for IRQs */
 static void _irq_isr(void *arg);
@@ -74,7 +74,7 @@ int pcf857x_init(pcf857x_t *dev, const pcf857x_params_t *params)
     assert(dev != NULL);
     assert(params != NULL);
     assert(params->exp < PCF857X_EXP_MAX);
-#if IS_USED(MODULE_PCF857X_IRQ)
+#if MODULE_PCF857X_IRQ
     assert(gpio_is_valid(params->int_pin));
 #endif
 
@@ -84,19 +84,19 @@ int pcf857x_init(pcf857x_t *dev, const pcf857x_params_t *params)
     dev->params = *params;
 
     switch (params->exp) {
-#if IS_USED(MODULE_PCF8574)
+#if MODULE_PCF8574
         /**< PCF8574 8 bit I/O expander used */
         case PCF857X_EXP_PCF8574: dev->pin_num = PCF8574_GPIO_PIN_NUM;
                                   dev->params.addr += PCF8574_BASE_ADDR;
                                   break;
 #endif
-#if IS_USED(MODULE_PCF8574A)
+#if MODULE_PCF8574A
         /**< PCF8574A 8 bit I/O expander */
         case PCF857X_EXP_PCF8574A: dev->pin_num = PCF8574A_GPIO_PIN_NUM;
                                    dev->params.addr += PCF8574A_BASE_ADDR;
                                    break;
 #endif
-#if IS_USED(MODULE_PCF8575)
+#if MODULE_PCF8575
         /**< PCF8575 16 bit I/O expander */
         case PCF857X_EXP_PCF8575: dev->pin_num = PCF8575_GPIO_PIN_NUM;
                                   dev->params.addr += PCF8575_BASE_ADDR;
@@ -105,7 +105,7 @@ int pcf857x_init(pcf857x_t *dev, const pcf857x_params_t *params)
         default: return -ENOTSUP;
     }
 
-#if IS_USED(MODULE_PCF857X_IRQ)
+#if MODULE_PCF857X_IRQ
     /* initialize the IRQ event object used for delaying interrupts */
     dev->irq_event.event.handler = _irq_handler;
     dev->irq_event.dev = dev;
@@ -180,7 +180,7 @@ int pcf857x_gpio_init(pcf857x_t *dev, uint8_t pin, gpio_mode_t mode)
         return res;
     }
 
-#if IS_USED(MODULE_PCF857X_IRQ)
+#if MODULE_PCF857X_IRQ
     /* reset the callback in case the port used external interrupts before */
     dev->isr[pin].cb = NULL;
     dev->isr[pin].arg = NULL;
@@ -205,7 +205,7 @@ int pcf857x_gpio_init(pcf857x_t *dev, uint8_t pin, gpio_mode_t mode)
     return res;
 }
 
-#if IS_USED(MODULE_PCF857X_IRQ)
+#if MODULE_PCF857X_IRQ
 int pcf857x_gpio_init_int(pcf857x_t *dev, uint8_t pin,
                                           gpio_mode_t mode,
                                           gpio_flank_t flank,
@@ -268,7 +268,7 @@ int pcf857x_gpio_read(pcf857x_t *dev, uint8_t pin)
      * stored in the device data structure and which can be used directly.
      * Otherwise we have to read the pins first.
      */
-#if !IS_USED(MODULE_PCF857X_IRQ)
+#if !MODULE_PCF857X_IRQ
     _acquire(dev);
     _read(dev, &dev->in);
     _release(dev);
@@ -296,7 +296,7 @@ void pcf857x_gpio_write(pcf857x_t *dev, uint8_t pin, int value)
     pcf857x_data_t data = dev->modes | dev->out;
     _acquire(dev);
     _write(dev, data);
-#if IS_USED(MODULE_PCF857X_IRQ)
+#if MODULE_PCF857X_IRQ
     /*
      * If an output of the expander is connected to an input of the same
      * expander, there is no interrupt triggered by the input when the
@@ -333,7 +333,7 @@ void pcf857x_gpio_toggle(pcf857x_t *dev, uint8_t pin)
 
 /** Functions for internal use only */
 
-#if IS_USED(MODULE_PCF857X_IRQ)
+#if MODULE_PCF857X_IRQ
 
 /* interrupt service routine for IRQs */
 static void _irq_isr(void *arg)

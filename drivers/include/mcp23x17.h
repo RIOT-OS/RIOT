@@ -348,16 +348,16 @@ extern "C" {
 #include "periph/i2c.h"
 #include "periph/spi.h"
 
-#if IS_USED(MODULE_SAUL_GPIO) || DOXYGEN
+#if MODULE_SAUL_GPIO || DOXYGEN
 #include "saul/periph.h"
 #endif /* MODULE_SAUL_GPIO */
 
-#if !IS_USED(MODULE_MCP23X17_I2C) && !IS_USED(MODULE_MCP23X17_SPI)
+#if !MODULE_MCP23X17_I2C && !MODULE_MCP23X17_SPI
 #error "Please provide the MCP23x17 variants used by the application."
 #error "At least one variant has to be specified (mcp23017 and/or mcp23s17)."
 #endif
 
-#if IS_USED(MODULE_MCP23X17_IRQ) || DOXYGEN
+#if MODULE_MCP23X17_IRQ || DOXYGEN
 
 #include "event.h"
 
@@ -413,10 +413,10 @@ typedef enum {
  * @brief   MCP23x17 interface types
  */
 typedef enum {
-#if IS_USED(MODULE_MCP23X17_I2C) || DOXYGEN
+#if MODULE_MCP23X17_I2C || DOXYGEN
     MCP23X17_I2C,                   /**< I2C interface used */
 #endif
-#if IS_USED(MODULE_MCP23X17_SPI) || DOXYGEN
+#if MODULE_MCP23X17_SPI || DOXYGEN
     MCP23X17_SPI,                   /**< SPI interface used */
 #endif
 } mcp23x17_if_t;
@@ -424,7 +424,7 @@ typedef enum {
 /**
  * @brief   MCP23017 I2C parameters
  */
-#if IS_USED(MODULE_MCP23X17_I2C) || DOXYGEN
+#if MODULE_MCP23X17_I2C || DOXYGEN
 typedef struct {
     i2c_t dev;                      /**< I2C device used */
 } mcp23x17_i2c_params_t;
@@ -433,7 +433,7 @@ typedef struct {
 /**
  * @brief   MCP23S17 SPI parameters
  */
-#if IS_USED(MODULE_MCP23X17_SPI) || DOXYGEN
+#if MODULE_MCP23X17_SPI || DOXYGEN
 typedef struct {
     spi_t     dev;                  /**< SPI device used */
     spi_clk_t clk;                  /**< SPI clock speed */
@@ -447,10 +447,10 @@ typedef struct {
 typedef struct {
     mcp23x17_if_t type;             /**< I2C/SPI interface type selector */
     union {
-#if IS_USED(MODULE_MCP23X17_I2C) || DOXYGEN
+#if MODULE_MCP23X17_I2C || DOXYGEN
         mcp23x17_i2c_params_t i2c;  /**< I2C specific interface parameters */
 #endif
-#if IS_USED(MODULE_MCP23X17_SPI) || DOXYGEN
+#if MODULE_MCP23X17_SPI || DOXYGEN
         mcp23x17_spi_params_t spi;  /**< SPI specific interface parameters */
 #endif
     };
@@ -482,7 +482,7 @@ typedef struct {
     mcp23x17_if_params_t if_params; /**< specific I2C/SPI interface parameters */
 } mcp23x17_params_t;
 
-#if IS_USED(MODULE_MCP23X17_IRQ) || DOXYGEN
+#if MODULE_MCP23X17_IRQ || DOXYGEN
 /**
  * @brief   IRQ event type
  *
@@ -514,7 +514,7 @@ typedef struct {
 
     uint16_t od_pins;           /**< Pins defined as GPIO_OD or GPIO_OD_PU */
 
-#if IS_USED(MODULE_MCP23X17_IRQ) || DOXYGEN
+#if MODULE_MCP23X17_IRQ || DOXYGEN
     gpio_isr_ctx_t isr[MCP23X17_GPIO_PIN_NUM];  /**< ISR with arg for each expander pin */
     gpio_flank_t flank[MCP23X17_GPIO_PIN_NUM];  /**< interrupt flank for each expander pin */
 
@@ -523,7 +523,7 @@ typedef struct {
 
 } mcp23x17_t;
 
-#if IS_USED(MODULE_SAUL_GPIO) || DOXYGEN
+#if MODULE_SAUL_GPIO || DOXYGEN
 /**
  * @brief   MCP23x17 configuration structure for mapping expander pins to SAUL
  *
@@ -567,7 +567,7 @@ int mcp23x17_init(mcp23x17_t *dev, const mcp23x17_params_t *params);
  */
 int mcp23x17_gpio_init(mcp23x17_t *dev, gpio_t pin, gpio_mode_t mode);
 
-#if IS_USED(MODULE_MCP23X17_IRQ) || DOXYGEN
+#if MODULE_MCP23X17_IRQ || DOXYGEN
 /**
  * @brief   Initialize a MCP23x17 pin for external interrupt usage
  *
@@ -647,7 +647,7 @@ void mcp23x17_gpio_set(mcp23x17_t *dev, gpio_t pin);
  */
 void mcp23x17_gpio_toggle(mcp23x17_t *dev, gpio_t pin);
 
-#if IS_USED(MODULE_MCP23X17_IRQ) || DOXYGEN
+#if MODULE_MCP23X17_IRQ || DOXYGEN
 /**
  * @brief   Enable pin interrupt
  *

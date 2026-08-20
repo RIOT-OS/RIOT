@@ -30,7 +30,7 @@
 
 #include "net/gnrc/rpl.h"
 #include "net/gnrc/rpl/rpble.h"
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
 #include "net/gnrc/rpl/p2p.h"
 #include "net/gnrc/rpl/p2p_dodag.h"
 #endif
@@ -53,7 +53,7 @@ static void _rpl_trickle_send_dio(void *args)
         return;
     }
 
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
     if (dodag->instance->mop == GNRC_RPL_P2P_MOP) {
         gnrc_rpl_p2p_ext_t *p2p_ext = gnrc_rpl_p2p_ext_get(dodag);
         if (p2p_ext && (p2p_ext->for_me || ((p2p_ext->lifetime_sec <= 0) || p2p_ext->stop))) {
@@ -137,7 +137,7 @@ bool gnrc_rpl_instance_remove_by_id(uint8_t instance_id)
 
 void gnrc_rpl_dodag_remove(gnrc_rpl_dodag_t *dodag)
 {
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
     gnrc_rpl_p2p_ext_remove(dodag);
 #endif
     gnrc_rpl_dodag_remove_all_parents(dodag);
@@ -221,7 +221,7 @@ bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, const ipv6_addr_t *dodag
     if ((netif != NULL) && !(netif->flags & GNRC_NETIF_FLAGS_IPV6_FORWARDING)) {
         gnrc_rpl_leaf_operation(dodag);
     }
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
     if ((instance->mop == GNRC_RPL_P2P_MOP) && (gnrc_rpl_p2p_ext_new(dodag) == NULL)) {
         DEBUG("RPL: could not allocate new P2P-RPL DODAG extension. Remove DODAG\n");
         gnrc_rpl_instance_remove(instance);
@@ -393,7 +393,7 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
         ((evtimer_event_t *)&(parent->timeout_event))->offset = (dodag->default_lifetime - 1) * dodag->lifetime_unit * MS_PER_SEC;
         parent->timeout_event.msg.type = GNRC_RPL_MSG_TYPE_PARENT_TIMEOUT;
         evtimer_add_msg(&gnrc_rpl_evtimer, &parent->timeout_event, gnrc_rpl_pid);
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
         if (dodag->instance->mop != GNRC_RPL_P2P_MOP) {
 #endif
         if (parent == dodag->parents) {
@@ -401,7 +401,7 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
             gnrc_ipv6_nib_ft_add(NULL, 0, &parent->addr, dodag->iface,
                                  _dflt_route_lifetime_sec(dodag));
         }
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
         }
 #endif
     }
@@ -446,13 +446,13 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
             gnrc_rpl_delay_dao(dodag);
         }
 
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
     if (dodag->instance->mop != GNRC_RPL_P2P_MOP) {
 #endif
         gnrc_ipv6_nib_ft_del(NULL, 0);
         gnrc_ipv6_nib_ft_add(NULL, 0, &dodag->parents->addr, dodag->iface,
                              dodag->default_lifetime * dodag->lifetime_unit);
-#ifdef MODULE_GNRC_RPL_P2P
+#if MODULE_GNRC_RPL_P2P
     }
 #endif
 

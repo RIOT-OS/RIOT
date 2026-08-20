@@ -15,7 +15,7 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#if defined(MODULE_ESP_ETH) || defined(DOXYGEN)
+#if MODULE_ESP_ETH || defined(DOXYGEN)
 
 /**
  * @name    Set default configuration parameters for the ESP-ETH netdev driver

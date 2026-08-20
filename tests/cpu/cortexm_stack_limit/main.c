@@ -80,7 +80,7 @@ int main(void)
 
     puts("If the test fails, all onboard LEDs will be on");
 
-#ifdef MODULE_CORTEXM_STACK_LIMIT
+#if MODULE_CORTEXM_STACK_LIMIT
     puts("The cortexm_stack_limit module is present. Expect the board to crash"\
          " without onboard LEDs on.\n");
 #else

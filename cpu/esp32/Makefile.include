@@ -482,3 +482,27 @@ $(BINDIR)/sections.ld: $(RIOTCPU)/$(CPU)/vendor/ld/$(CPU_FAM)/sections.ld.in \
 				$(LDGENFLAGS) -I$(RIOTCPU)/$(CPU)/vendor/ld -C -P -x c -E $< -o $@
 
 $(BOOTLOADER_BIN):
+
+MODULE_DEFS_NEEDED += \
+  esp_ble \
+  esp_eth \
+  esp_hw_counter \
+  esp_idf_lcd \
+  esp_idf_nvs_flash \
+  esp_idf_usb \
+  esp_ieee802154 \
+  esp_log_colored \
+  esp_log_startup \
+  esp_log_tagged \
+  esp_now \
+  esp_rtc_timer_32k \
+  esp_spi_oct \
+  esp_spi_ram \
+  esp_wifi_any \
+  esp_wifi_ap \
+  esp_wifi_enterprise \
+  newlib_nano \
+  periph_can \
+  periph_flashpage \
+  periph_smmc_8bit \
+  #

@@ -38,7 +38,7 @@ static debugpins_config_t _configuration = {
 
 static void _set_checked(gpio_t pin)
 {
-    if (IS_USED(MODULE_OPENWSN_DEBUGPINS)) {
+    if (MODULE_OPENWSN_DEBUGPINS) {
         if (gpio_is_valid(pin)){
             gpio_set(pin);
         }
@@ -47,7 +47,7 @@ static void _set_checked(gpio_t pin)
 
 static void _clear_checked(gpio_t pin)
 {
-    if (IS_USED(MODULE_OPENWSN_DEBUGPINS)) {
+    if (MODULE_OPENWSN_DEBUGPINS) {
         if (gpio_is_valid(pin)){
             gpio_clear(pin);
         }
@@ -56,7 +56,7 @@ static void _clear_checked(gpio_t pin)
 
 static void _toggle_checked(gpio_t pin)
 {
-    if (IS_USED(MODULE_OPENWSN_DEBUGPINS)) {
+    if (MODULE_OPENWSN_DEBUGPINS) {
         if (gpio_is_valid(pin)){
             gpio_toggle(pin);
         }
@@ -65,7 +65,7 @@ static void _toggle_checked(gpio_t pin)
 
 static void _init_checked(gpio_t pin)
 {
-    if (IS_USED(MODULE_OPENWSN_DEBUGPINS)) {
+    if (MODULE_OPENWSN_DEBUGPINS) {
         if (gpio_is_valid(pin)){
             gpio_init(pin, GPIO_OUT);
         }
@@ -74,7 +74,7 @@ static void _init_checked(gpio_t pin)
 
 void openwsn_debugpins_init(const debugpins_config_t *user_config)
 {
-    if (IS_USED(MODULE_OPENWSN_DEBUGPINS)) {
+    if (MODULE_OPENWSN_DEBUGPINS) {
         memset(&_configuration, GPIO_UNDEF, sizeof(debugpins_config_t));
 
         if (user_config != NULL) {

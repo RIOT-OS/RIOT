@@ -61,7 +61,7 @@ typedef struct {
 void event_timeout_ztimer_init(event_timeout_t *event_timeout, ztimer_clock_t *clock,
                                event_queue_t *queue, event_t *event);
 
-#if IS_USED(MODULE_EVENT_TIMEOUT) || DOXYGEN
+#if MODULE_EVENT_TIMEOUT || DOXYGEN
 /**
  * @brief   Initialize timeout event object
  *

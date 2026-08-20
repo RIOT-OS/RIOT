@@ -316,7 +316,7 @@ typedef struct {
  */
 typedef struct {
     ina3221_params_t params;                        /**< Device parameters */
-#if IS_USED(MODULE_INA3221_ALERTS) || defined(DOXYGEN)
+#if MODULE_INA3221_ALERTS || defined(DOXYGEN)
     union {
         struct {
             ina3221_alert_cb_t warn_cb;             /**< Warning alert callback: executed when WRN is pulled low */
@@ -372,7 +372,7 @@ int ina3221_reset(ina3221_t *dev);
  */
 int ina3221_init(ina3221_t *dev, const ina3221_params_t *params);
 
-#if IS_USED(MODULE_INA3221_ALERTS) || defined(DOXYGEN)
+#if MODULE_INA3221_ALERTS || defined(DOXYGEN)
 /**
  * @brief Enable alert and set callback and argument for alert @p alert
  *

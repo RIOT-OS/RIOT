@@ -24,7 +24,7 @@
 #include "bplib.h"
 
 /* Signal the vfs based storage when a contact / channel terminates to flush the caches */
-#if defined(MODULE_BPLIB_STOR_VFS_ORDERED) || defined(MODULE_BPLIB_STOR_VFS_UNORDERED)
+#if MODULE_BPLIB_STOR_VFS_ORDERED || MODULE_BPLIB_STOR_VFS_UNORDERED
 #  include "bplib_stor_vfs.h"
 #endif
 
@@ -71,7 +71,7 @@ static void BPA_TIMEP_GetHostEpoch(BPLib_TIME_Epoch_t *Epoch)
 static BPLib_TIME_ClockState_t BPA_TIMEP_GetHostClockState(void)
 {
     /* Assume valid if walltime is there */
-    if (IS_USED(MODULE_BPLIB_WALLTIME_AVAILABLE)) {
+    if (MODULE_BPLIB_WALLTIME_AVAILABLE) {
         return BPLIB_TIME_CLOCK_VALID;
     }
     else {
@@ -167,7 +167,7 @@ static BPLib_Status_t BPA_ADUP_AddApplication(uint32_t ChanId)
 
 static BPLib_Status_t BPA_ADUP_StartApplication(uint32_t ChanId)
 {
-#if defined(MODULE_BPLIB_STOR_VFS_ORDERED) || defined(MODULE_BPLIB_STOR_VFS_UNORDERED)
+#if MODULE_BPLIB_STOR_VFS_ORDERED || MODULE_BPLIB_STOR_VFS_UNORDERED
         bplib_stor_vfs_channel_changed(ChanId);
 #endif
     (void) ChanId;
@@ -195,7 +195,7 @@ static BPLib_Status_t BPA_CLAP_ContactSetup(uint32_t ContactId, BPLib_CLA_Contac
 
 static BPLib_Status_t BPA_CLAP_ContactStart(uint32_t ContactId)
 {
-#if defined(MODULE_BPLIB_STOR_VFS_ORDERED) || defined(MODULE_BPLIB_STOR_VFS_UNORDERED)
+#if MODULE_BPLIB_STOR_VFS_ORDERED || MODULE_BPLIB_STOR_VFS_UNORDERED
         bplib_stor_vfs_contact_changed(ContactId);
 #endif
     (void) ContactId;

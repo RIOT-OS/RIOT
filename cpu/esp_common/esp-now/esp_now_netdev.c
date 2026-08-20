@@ -412,7 +412,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
         return NULL;
     }
 
-#ifndef MODULE_ESP_WIFI
+#if !MODULE_ESP_WIFI
     /* start WiFi if esp_wifi is not used, otherwise it is done by esp_wifi */
     result = esp_wifi_start();
     if (result != ESP_OK) {
@@ -470,7 +470,7 @@ int esp_now_set_channel(uint8_t channel)
 #ifdef ESP_NOW_UNICAST
     scan_cfg.channel = channel;
 #endif
-#ifdef MODULE_ESP_WIFI
+#if MODULE_ESP_WIFI
     /* channel is controlled by `esp_wifi`, only update SoftAP info */
     wifi_config_ap.ap.channel = channel;
     return ESP_ERR_NOT_SUPPORTED;
@@ -550,7 +550,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     }
 
     DEBUG("%s: send %u byte\n", __func__, (unsigned)data_len);
-#if defined(MODULE_OD) && ENABLE_DEBUG
+#if MODULE_OD && ENABLE_DEBUG
     od_hex_dump(dev->tx_mem, data_len, OD_WIDTH_DEFAULT);
 #endif
 
@@ -569,7 +569,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         while (_esp_now_sending > 0) {
             thread_yield_higher();
         }
-#ifdef MODULE_NETSTATS_L2
+#if MODULE_NETSTATS_L2
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
 #endif
 
@@ -620,7 +620,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     DEBUG("%s: received %d byte from %02x:%02x:%02x:%02x:%02x:%02x\n",
           __func__, size - ESP_NOW_ADDR_LEN,
           mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-#if defined(MODULE_OD) && ENABLE_DEBUG
+#if MODULE_OD && ENABLE_DEBUG
     od_hex_dump(buf + ESP_NOW_ADDR_LEN, size - ESP_NOW_ADDR_LEN, OD_WIDTH_DEFAULT);
 #endif
 
@@ -650,7 +650,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             res = sizeof(uint16_t);
             break;
 
-#ifdef MODULE_GNRC
+#if MODULE_GNRC
         case NETOPT_PROTO:
             CHECK_PARAM_RET(max_len == sizeof(gnrc_nettype_t), -EOVERFLOW);
             *((gnrc_nettype_t *)val) = dev->proto;
@@ -702,7 +702,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t max_len)
 
     switch (opt) {
 
-#ifdef MODULE_GNRC
+#if MODULE_GNRC
         case NETOPT_PROTO:
             CHECK_PARAM_RET(max_len == sizeof(gnrc_nettype_t), -EOVERFLOW);
             dev->proto = *((gnrc_nettype_t *)val);

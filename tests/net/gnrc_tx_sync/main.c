@@ -99,7 +99,7 @@ static int netdev_get_device_type(netdev_t *dev, void *value, size_t max_len)
     const uint16_t type_ipv6 = NETDEV_TYPE_ETHERNET;
     const uint16_t type_6lo = NETDEV_TYPE_IEEE802154;
     expect(max_len == sizeof(uint16_t));
-    if (IS_USED(MODULE_NETDEV_IEEE802154)) {
+    if (MODULE_NETDEV_IEEE802154) {
         memcpy(value, &type_6lo, sizeof(type_6lo));
     }
     else {
@@ -114,7 +114,7 @@ static int netdev_get_max_pdu_size(netdev_t *dev, void *value, size_t max_len)
     const uint16_t pdu_size_ethernet = 1500;
     const uint16_t pdu_size_6lo = 96;
     expect(max_len == sizeof(uint16_t));
-    if (IS_USED(MODULE_NETDEV_IEEE802154)) {
+    if (MODULE_NETDEV_IEEE802154) {
         memcpy(value, &pdu_size_6lo, sizeof(pdu_size_6lo));
     }
     else {
@@ -127,7 +127,7 @@ static int netdev_get_proto(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
     const gnrc_nettype_t proto =
-#if IS_USED(MODULE_NETDEV_IEEE802154)
+#if MODULE_NETDEV_IEEE802154
         GNRC_NETTYPE_SIXLOWPAN;
 #else
         GNRC_NETTYPE_IPV6;
@@ -141,7 +141,7 @@ static int netdev_get_address(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
     const uint8_t addr[] = {
-#if IS_USED(MODULE_NETDEV_IEEE802154)
+#if MODULE_NETDEV_IEEE802154
         0x13, 0x37
 #else
         0x13, 0x37, 0xac, 0xdc, 0xbe, 0xef
@@ -156,7 +156,7 @@ static int netdev_get_address_long(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
     const uint8_t addr[] = {0x13, 0x37, 0x13, 0x37, 0x13, 0x37, 0x13, 0x37};
-    if (!IS_USED(MODULE_NETDEV_IEEE802154)) {
+    if (!MODULE_NETDEV_IEEE802154) {
         return -ENOTSUP;
     }
     expect(max_len >= sizeof(addr));
@@ -168,7 +168,7 @@ static int netdev_get_src_len(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
     const uint16_t src_len = 2;
-    if (!IS_USED(MODULE_NETDEV_IEEE802154)) {
+    if (!MODULE_NETDEV_IEEE802154) {
         return -ENOTSUP;
     }
     expect(max_len == sizeof(src_len));
@@ -191,10 +191,10 @@ int main(void)
         "fragments are out. In the Ethernet case, only a single frame is send.\n"
     );
 
-    if (IS_USED(MODULE_NETDEV_IEEE802154)) {
+    if (MODULE_NETDEV_IEEE802154) {
         printf("IEEE 802.15.4 mode (TEST_6LO=1, TEST_FRAG_SFR=%u), "
                "sending 2 6LoWPAN fragments",
-               (unsigned)IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR));
+               (unsigned)MODULE_GNRC_SIXLOWPAN_FRAG_SFR);
     }
     else {
         puts("Ethernet mode (TEST_6LO=0), sending 1 IPv6 packet");
@@ -224,7 +224,7 @@ int main(void)
      * payload. If this value has not reached the value of 1 (or 2 for 6LoWPAN fragmentation),
      * the test has failed. */
     int sends = atomic_load(&sends_completed);
-    int sends_expected = (IS_USED(MODULE_NETDEV_IEEE802154)) ? 2 : 1;
+    int sends_expected = (MODULE_NETDEV_IEEE802154) ? 2 : 1;
     printf("transmissions expected = %d, transmissions completed = %d\n",
            sends_expected, sends);
     printf("sent %u out of %" PRIuSIZE " bytes\n", pld_pos, sizeof(test_msg));

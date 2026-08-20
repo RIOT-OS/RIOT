@@ -17,10 +17,10 @@
 
 #include "irq.h"
 #include "kernel_defines.h"
-#ifdef MODULE_GNRC_IPV6_NIB
+#if MODULE_GNRC_IPV6_NIB
 #include "net/ipv6/addr.h"
 #endif
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
 #include "net/ipv6/hdr.h"
 #endif
 #include "net/gnrc/neterr.h"
@@ -78,7 +78,7 @@ typedef struct {
     } entry;
 } _generic_rb_entry_t;
 
-#ifdef MODULE_GNRC_IPV6_NIB
+#if MODULE_GNRC_IPV6_NIB
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #else   /* MODULE_GNRC_IPV6_NIB */
 static char addr_str[GNRC_NETIF_HDR_L2ADDR_PRINT_LEN];
@@ -340,7 +340,7 @@ void gnrc_sixlowpan_frag_sfr_send(gnrc_pktsnip_t *pkt, void *ctx,
     netif = gnrc_netif_hdr_get_netif(pkt->data);
     assert(netif != NULL);
 
-    if (IS_USED(MODULE_GNRC_TX_SYNC)) {
+    if (MODULE_GNRC_TX_SYNC) {
         tx_sync = gnrc_tx_sync_split(pkt);
     }
 
@@ -362,7 +362,7 @@ void gnrc_sixlowpan_frag_sfr_send(gnrc_pktsnip_t *pkt, void *ctx,
     }
     else if (fbuf->offset < fbuf->datagram_size) {
         DEBUG("6lo sfr: sending subsequent fragment\n");
-#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)
+#if MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE
         assert(fbuf->sfr.congure);
         assert(fbuf->sfr.congure->driver);
 #endif
@@ -405,7 +405,7 @@ void gnrc_sixlowpan_frag_sfr_send(gnrc_pktsnip_t *pkt, void *ctx,
         _sched_arq_timeout(fbuf, fbuf->sfr.arq_timeout);
     }
 
-    if (IS_USED(MODULE_GNRC_TX_SYNC) && tx_sync) {
+    if (MODULE_GNRC_TX_SYNC && tx_sync) {
         /* re-attach tx_sync to allow releasing it at end
          * of transmission, or transmission failure */
         gnrc_pkt_append(pkt, tx_sync);
@@ -423,7 +423,7 @@ error:
     else {
         _clean_up_fbuf(fbuf, error_no);
     }
-    if (IS_USED(MODULE_GNRC_TX_SYNC) && tx_sync) {
+    if (MODULE_GNRC_TX_SYNC && tx_sync) {
         gnrc_pktbuf_release(tx_sync);
     }
 }
@@ -524,7 +524,7 @@ void gnrc_sixlowpan_frag_sfr_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf)
         /* mock-up to emulate time having passed beyond (1us) the ARQ timeout */
         now -= (fbuf->sfr.arq_timeout * US_PER_MS) + 1;
     }
-    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE) && frag_desc) {
+    if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE && frag_desc) {
         /* report timeout to CongURE state */
         gnrc_sixlowpan_frag_sfr_congure_snd_report_frags_timeout(fbuf);
         _shrink_window(fbuf);   /* potentially shrink window */
@@ -575,12 +575,12 @@ void gnrc_sixlowpan_frag_sfr_arq_timeout(gnrc_sixlowpan_frag_fb_t *fbuf)
                         goto error;
                     }
                     else {
-                        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)) {
+                        if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE) {
                             /* fragment was resent successfully, report this to CongURE state
                              * object */
                             gnrc_sixlowpan_frag_sfr_congure_snd_report_frag_sent(fbuf);
                         }
-                        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+                        if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS) {
                             /* fragment was resent successfully, note this done
                              * in the statistics */
                             _stats.fragment_resends.by_timeout++;
@@ -656,7 +656,7 @@ void gnrc_sixlowpan_frag_sfr_inter_frame_gap(gnrc_sixlowpan_frag_fb_t *fbuf)
 
 void gnrc_sixlowpan_frag_sfr_stats_get(gnrc_sixlowpan_frag_sfr_stats_t *stats)
 {
-    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+    if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS) {
         *stats = _stats;
     }
 }
@@ -829,12 +829,12 @@ static uint16_t _find_offset_and_copy_rest(uint8_t *data, gnrc_pktsnip_t **pkt,
 
 static void _check_for_ecn(gnrc_pktsnip_t *frame)
 {
-    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN) &&
+    if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN &&
         (sixlowpan_sfr_rfrag_is(frame->next->data))) {
         int queue_state = 0;
         int queue_size = 0;
 
-        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_IF_IN)) {
+        if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_IF_IN) {
             gnrc_netif_t *netif = gnrc_netif_hdr_get_netif(frame->data);
 
             assert(frame->type == GNRC_NETTYPE_NETIF);
@@ -849,7 +849,7 @@ static void _check_for_ecn(gnrc_pktsnip_t *frame)
             }
         }
 
-        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_IF_OUT)) {
+        if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_IF_OUT) {
             queue_state = gnrc_netif_pktq_usage();
             queue_size = CONFIG_GNRC_NETIF_PKTQ_POOL_SIZE;
 
@@ -859,7 +859,7 @@ static void _check_for_ecn(gnrc_pktsnip_t *frame)
             }
         }
 
-        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_FQUEUE)) {
+        if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_FQUEUE) {
             queue_state = clist_count(&_frame_queue);
             queue_size = FRAME_QUEUE_POOL_SIZE;
 
@@ -920,7 +920,7 @@ static bool _send_fragment(gnrc_pktsnip_t *frag, gnrc_sixlowpan_frag_fb_t *fbuf,
     frag_desc->super.resends = 0;
     clist_rpush(&fbuf->sfr.window, &frag_desc->super.super);
     if ((res = _send_frame(frag, fbuf, NULL, page))) {
-        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+        if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS) {
             _stats.fragments_sent.usual++;
         }
         frag_desc->super.send_time = _last_frame_sent / US_PER_MS;
@@ -1019,7 +1019,7 @@ static void _try_reassembly(gnrc_netif_hdr_t *netif_hdr,
               "fragment\n");
         /* send abort */
         bitmap = &_null_bitmap;
-        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+        if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS) {
             _stats.acks.aborts++;
         }
     }
@@ -1042,7 +1042,7 @@ static void _try_reassembly(gnrc_netif_hdr_t *netif_hdr,
             _clean_up_rb_entry(entry);
             /* send abort */
             bitmap = &_null_bitmap;
-            if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+            if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS) {
                 _stats.acks.aborts++;
             }
         }
@@ -1050,7 +1050,7 @@ static void _try_reassembly(gnrc_netif_hdr_t *netif_hdr,
             if (res) {
                 DEBUG("6lo sfr: dispatched datagram to upper layer\n");
                 bitmap = &_full_bitmap;
-                if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+                if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS) {
                     _stats.acks.full++;
                 }
             }
@@ -1064,7 +1064,7 @@ static void _try_reassembly(gnrc_netif_hdr_t *netif_hdr,
                       entry->entry.base->current_size,
                       entry->entry.base->datagram_size);
                 bitmap = _get_bitmap(entry->entry.rb);
-                if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+                if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS) {
                     _stats.acks.partly++;
                 }
             }
@@ -1104,7 +1104,7 @@ static void _forward_uncomp(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     };
 
     switch (page) {
-#if defined(MODULE_GNRC_IPV6)
+#if MODULE_GNRC_IPV6
         case 0: {
             ipv6_hdr_t *ipv6_hdr = tmp.data;
 
@@ -1136,7 +1136,7 @@ static void _forward_uncomp(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     }
     /* only decrement hop-limit after check in case we reassemble */
     switch (page) {
-#if defined(MODULE_GNRC_IPV6)
+#if MODULE_GNRC_IPV6
         case 0: {
             ipv6_hdr_t *ipv6_hdr = tmp.data;
 
@@ -1210,7 +1210,7 @@ static void _handle_1st_rfrag(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         _forward_uncomp(netif_hdr, pkt, page, entry, payload + 1);
     }
     else {
-        if (IS_USED(MODULE_GNRC_SIXLOWPAN_IPHC) &&
+        if (MODULE_GNRC_SIXLOWPAN_IPHC &&
             sixlowpan_iphc_is(payload)) {
             _try_reassembly(netif_hdr, pkt, 0, entry, page);
             return;
@@ -1257,7 +1257,7 @@ static int _resend_failed_frag(clist_node_t *node, void *fbuf_ptr)
     int res = _resend_frag(node, fbuf_ptr);
 
     if (res == 0) {
-        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+        if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS) {
             _stats.fragment_resends.by_nack++;
         }
         gnrc_sixlowpan_frag_sfr_congure_snd_report_frag_sent(fbuf_ptr);
@@ -1281,7 +1281,7 @@ static void _check_failed_frags(sixlowpan_sfr_ack_t *ack,
         uint8_t seq;
 
         seq = _frag_seq(frag_desc);
-        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE) &&
+        if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE &&
             (earliest_send > frag_desc->super.send_time)) {
             earliest_send = frag_desc->super.send_time;
         }
@@ -1291,7 +1291,7 @@ static void _check_failed_frags(sixlowpan_sfr_ack_t *ack,
                   frag_desc->offset, _frag_size(frag_desc), fbuf->tag);
             fbuf->sfr.frags_sent--;
             clist_rpush(&_frag_descs_free, &frag_desc->super.super);
-            if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)) {
+            if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE) {
                 congure_snd_ack_t ack = {
                     .recv_time = ack_recv_time,
                     .id = seq,
@@ -1316,7 +1316,7 @@ static void _check_failed_frags(sixlowpan_sfr_ack_t *ack,
             }
             else {
                 DEBUG("6lo sfr: no more retries for fragment %u\n", seq);
-                if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE) &&
+                if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE &&
                     IS_ACTIVE(CONFIG_GNRC_SIXLOWPAN_SFR_USE_ECN) &&
                     sixlowpan_sfr_ecn(&ack->base)) {
                     gnrc_sixlowpan_frag_sfr_congure_snd_report_ecn(
@@ -1330,7 +1330,7 @@ static void _check_failed_frags(sixlowpan_sfr_ack_t *ack,
             }
         }
     }
-    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE) &&
+    if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE &&
         sixlowpan_sfr_ecn(&ack->base)) {
         gnrc_sixlowpan_frag_sfr_congure_snd_report_ecn(fbuf, earliest_send);
     }
@@ -1459,7 +1459,7 @@ static uint16_t _send_1st_fragment(gnrc_netif_t *netif,
     sixlowpan_sfr_rfrag_set_offset(hdr, fbuf->datagram_size);
     /* don't copy netif header of pkt => pkt->next */
     frag_size = _copy_pkt_to_frag(data, pkt->next, frag_size, 0);
-    if (IS_USED(MODULE_GNRC_TX_SYNC) && *tx_sync && (frag_size >= fbuf->datagram_size)) {
+    if (MODULE_GNRC_TX_SYNC && *tx_sync && (frag_size >= fbuf->datagram_size)) {
         gnrc_pkt_append(frag, *tx_sync);
         *tx_sync = NULL;
     }
@@ -1509,7 +1509,7 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *netif,
                                               fbuf->offset);
     /* copy remaining packet snips */
     local_offset = _copy_pkt_to_frag(data, pkt, frag_size, local_offset);
-    if (IS_USED(MODULE_GNRC_TX_SYNC) && *tx_sync && (local_offset >= fbuf->datagram_size)) {
+    if (MODULE_GNRC_TX_SYNC && *tx_sync && (local_offset >= fbuf->datagram_size)) {
         gnrc_pkt_append(frag, *tx_sync);
         *tx_sync = NULL;
     }
@@ -1535,7 +1535,7 @@ static bool _send_abort_frag(gnrc_pktsnip_t *pkt,
     if (frag != NULL) {
         sixlowpan_sfr_rfrag_set_offset(frag->next->data, 0);
         _send_frame(frag, fbuf, NULL, page);
-        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+        if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS) {
             _stats.fragments_sent.aborts++;
         }
         return true;
@@ -1545,7 +1545,7 @@ static bool _send_abort_frag(gnrc_pktsnip_t *pkt,
 
 static void _shrink_window(gnrc_sixlowpan_frag_fb_t *fbuf)
 {
-    if (!IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)) {
+    if (!MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE) {
         /* window does not shrink without congure */
         return;
     }
@@ -1637,7 +1637,7 @@ static void _retry_datagram(gnrc_sixlowpan_frag_fb_t *fbuf)
     }
     else {
         DEBUG("6lo sfr: Retrying to send datagram %u completely\n", fbuf->tag);
-        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+        if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS) {
             _stats.datagram_resends++;
         }
         fbuf->sfr.retrans--;
@@ -1658,7 +1658,7 @@ static void _abort_rb(gnrc_pktsnip_t *pkt, _generic_rb_entry_t *entry,
                                  netif_hdr->src_l2addr_len, addr_str),
           hdr->base.tag);
     if (send_ack) {
-        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+        if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS) {
             _stats.acks.aborts++;
         }
         _send_ack(gnrc_netif_hdr_get_netif(netif_hdr),
@@ -1801,7 +1801,7 @@ static void _handle_ack(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                                      addr_str), vrbe->super.tag);
         _send_ack(vrbe->in_netif, vrbe->super.src, vrbe->super.src_len,
                   &mock_base, hdr->bitmap);
-        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+        if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS) {
             _stats.acks.forwarded++;
         }
         if ((unaligned_get_u32(hdr->bitmap) == _full_bitmap.u32) ||
@@ -1888,7 +1888,7 @@ static int _forward_rfrag(gnrc_pktsnip_t *pkt, _generic_rb_entry_t *entry,
     gnrc_netif_hdr_set_netif(new->data, entry->entry.vrb->out_netif);
     new->next = pkt;
     _send_frame(new, NULL, NULL, page);
-    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS)) {
+    if (MODULE_GNRC_SIXLOWPAN_FRAG_SFR_STATS) {
         _stats.fragments_sent.forwarded++;
     }
     return 0;

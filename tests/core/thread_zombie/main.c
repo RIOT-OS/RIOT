@@ -17,7 +17,7 @@
 
 #include <stdio.h>
 #include "thread.h"
-#ifdef MODULE_PS
+#if MODULE_PS
 #include "ps.h"
 #endif /* MODULE_PS */
 
@@ -55,7 +55,7 @@ int main(void)
         THREAD_CREATE_SLEEPING,
         second_thread, (void *)1, "nr1");
 
-    #ifdef MODULE_PS
+    #if MODULE_PS
     ps();
     puts("");
     #endif /* MODULE_PS */
@@ -66,7 +66,7 @@ int main(void)
         THREAD_PRIORITY_MAIN - 1,
         THREAD_CREATE_SLEEPING,
         second_thread, (void *)2, "nr2");
-    #ifdef MODULE_PS
+    #if MODULE_PS
     ps();
     puts("");
     #endif /* MODULE_PS */
@@ -77,7 +77,7 @@ int main(void)
         THREAD_PRIORITY_MAIN - 1,
         THREAD_CREATE_SLEEPING,
         second_thread, (void *)3, "nr3");
-    #ifdef MODULE_PS
+    #if MODULE_PS
     ps();
     puts("");
     #endif /* MODULE_PS */
@@ -97,7 +97,7 @@ int main(void)
     puts("Waking up first thread");
     thread_wakeup(first_pid);
 
-    #ifdef MODULE_PS
+    #if MODULE_PS
     ps();
     puts("");
     #endif /* MODULE_PS */
@@ -120,7 +120,7 @@ int main(void)
     puts("Waking up second thread");
     thread_wakeup(second_pid);
 
-    #ifdef MODULE_PS
+    #if MODULE_PS
     ps();
     puts("");
     #endif /* MODULE_PS */
@@ -153,7 +153,7 @@ int main(void)
         puts("Error thread_kill_zombie returned an error");
     }
 
-    #ifdef MODULE_PS
+    #if MODULE_PS
     ps();
     puts("");
     #endif /* MODULE_PS */
@@ -182,7 +182,7 @@ int main(void)
     puts("Waking up third thread");
     thread_wakeup(third_pid);
 
-    #ifdef MODULE_PS
+    #if MODULE_PS
     ps();
     puts("");
     #endif /* MODULE_PS */
@@ -217,7 +217,7 @@ int main(void)
         THREAD_CREATE_SLEEPING,
         second_thread, (void *)4, "nr4");
 
-    #ifdef MODULE_PS
+    #if MODULE_PS
     ps();
     puts("");
     #endif /* MODULE_PS */
@@ -249,7 +249,7 @@ int main(void)
         }
     }
 
-    #ifdef MODULE_PS
+    #if MODULE_PS
     ps();
     puts("");
     #endif /* MODULE_PS */

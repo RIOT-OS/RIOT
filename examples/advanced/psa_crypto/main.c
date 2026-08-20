@@ -18,17 +18,17 @@
 #include "psa/crypto.h"
 #include "ztimer.h"
 
-#if IS_USED(MODULE_PSA_CIPHER)
+#if MODULE_PSA_CIPHER
 extern psa_status_t example_cipher_aes_128(void);
 #endif
-#if IS_USED(MODULE_PSA_MAC)
+#if MODULE_PSA_MAC
 extern psa_status_t example_hmac_sha256(void);
 #endif
-#if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || \
-    IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256)
+#if MODULE_PSA_ASYMMETRIC_ECC_P256R1 || \
+    MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256
 extern psa_status_t example_ecdsa_p256(void);
 #endif
-#if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
+#if MODULE_PSA_ASYMMETRIC_ECC_ED25519
 #ifndef SECURE_ELEMENT
 extern psa_status_t example_eddsa(void);
 #endif
@@ -37,13 +37,13 @@ extern psa_status_t example_eddsa(void);
 extern psa_status_t example_hash(void);
 
 #ifdef MULTIPLE_SE
-#if IS_USED(MODULE_PSA_CIPHER)
+#if MODULE_PSA_CIPHER
 extern psa_status_t example_cipher_aes_128_sec_se(void);
 #endif /* MODULE_PSA_CIPHER */
-#if IS_USED(MODULE_PSA_MAC)
+#if MODULE_PSA_MAC
 extern psa_status_t example_hmac_sha256_sec_se(void);
 #endif /* MODULE_PSA_MAC */
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256)
+#if MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256
 extern psa_status_t example_ecdsa_p256_sec_se(void);
 #endif /* MODULE_PSA_ASYMMETRIC_ECC_P256R1 */
 #endif /* MULTIPLE_SE */
@@ -67,7 +67,7 @@ int main(void)
         printf("Hash failed: %s\n", psa_status_to_humanly_readable(status));
     }
 
-#if IS_USED(MODULE_PSA_MAC)
+#if MODULE_PSA_MAC
     status = example_hmac_sha256();
     printf("HMAC SHA256 took %d us\n", (int)(ztimer_now(ZTIMER_USEC) - start));
     if (status != PSA_SUCCESS) {
@@ -76,7 +76,7 @@ int main(void)
     }
 #endif
 
-#if IS_USED(MODULE_PSA_CIPHER)
+#if MODULE_PSA_CIPHER
     start = ztimer_now(ZTIMER_USEC);
     status = example_cipher_aes_128();
     printf("Cipher AES 128 took %d us\n", (int)(ztimer_now(ZTIMER_USEC) - start));
@@ -86,8 +86,8 @@ int main(void)
     }
 #endif
 
-#if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_P256R1) || \
-    IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256)
+#if MODULE_PSA_ASYMMETRIC_ECC_P256R1 || \
+    MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256
     start = ztimer_now(ZTIMER_USEC);
     status = example_ecdsa_p256();
     printf("ECDSA took %d us\n", (int)(ztimer_now(ZTIMER_USEC) - start));
@@ -97,7 +97,7 @@ int main(void)
     }
 #endif
 
-#if IS_USED(MODULE_PSA_ASYMMETRIC_ECC_ED25519)
+#if MODULE_PSA_ASYMMETRIC_ECC_ED25519
     start = ztimer_now(ZTIMER_USEC);
     status = example_eddsa();
     printf("EdDSA took %d us\n", (int)(ztimer_now(ZTIMER_USEC) - start));
@@ -108,7 +108,7 @@ int main(void)
 #endif
 
 #ifdef MULTIPLE_SE
-#if IS_USED(MODULE_PSA_MAC)
+#if MODULE_PSA_MAC
     puts("Running Examples with secondary SE:");
     status = example_hmac_sha256_sec_se();
     printf("HMAC SHA256 took %d us\n", (int)(ztimer_now(ZTIMER_USEC) - start));
@@ -118,7 +118,7 @@ int main(void)
     }
 #endif /* MODULE_PSA_MAC */
 
-#if IS_USED(MODULE_PSA_CIPHER)
+#if MODULE_PSA_CIPHER
     start = ztimer_now(ZTIMER_USEC);
     status = example_cipher_aes_128_sec_se();
     printf("Cipher AES 128 took %d us\n", (int)(ztimer_now(ZTIMER_USEC) - start));
@@ -128,7 +128,7 @@ int main(void)
     }
 #endif /* MODULE_PSA_CIPHER */
 
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256)
+#if MODULE_PSA_SECURE_ELEMENT_ATECCX08A_ECC_P256
     start = ztimer_now(ZTIMER_USEC);
     status = example_ecdsa_p256_sec_se();
     printf("ECDSA took %d us\n", (int)(ztimer_now(ZTIMER_USEC) - start));

@@ -100,7 +100,7 @@ extern "C" {
 /**
  * @brief   The frequency of ZTIMER_MSEC_BASE (base ztimer for ZTIMER_MSEC)
  */
-#ifdef MODULE_ZTIMER_PERIPH_RTT
+#if MODULE_ZTIMER_PERIPH_RTT
 #  define CONFIG_ZTIMER_MSEC_BASE_FREQ   (RTT_FREQUENCY)
 # else
 #  define CONFIG_ZTIMER_MSEC_BASE_FREQ   (CONFIG_ZTIMER_USEC_BASE_FREQ)

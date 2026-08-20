@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  lwip_dhcp_auto \
+  #
 # Set the name of your application:
 APPLICATION = lwip_ipv4
 

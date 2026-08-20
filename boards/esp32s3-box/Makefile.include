@@ -1,3 +1,7 @@
 PORT_LINUX ?= /dev/ttyACM0
 
 OPENOCD_CONFIG ?= board/esp32s3-builtin.cfg
+
+MODULE_DEFS_NEEDED += \
+  ili9341 \
+  #

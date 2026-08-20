@@ -60,3 +60,11 @@ ifneq (,$(filter periph_can,$(FEATURES_USED)))
   PERIPH_CAN_FLAGS ?= --can $(VCAN_IFACE)
   TERMFLAGS += $(PERIPH_CAN_FLAGS)
 endif
+
+MODULE_DEFS_NEEDED += \
+  fatfs \
+  lwext4 \
+  mtd \
+  periph_gpio_mock \
+  spiffs \
+  #

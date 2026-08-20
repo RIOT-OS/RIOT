@@ -28,7 +28,7 @@
 
 #include "test_utils/expect.h"
 
-#ifdef MODULE_ZTIMER64_SEC
+#if MODULE_ZTIMER64_SEC
 #define ZTIMER64 ZTIMER64_SEC
 #define TICKS_PER_SEC 1
 #elif MODULE_ZTIMER64_MSEC

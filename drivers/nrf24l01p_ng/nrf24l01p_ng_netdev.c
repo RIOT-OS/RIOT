@@ -33,7 +33,7 @@
 #include "nrf24l01p_ng_communication.h"
 #include "nrf24l01p_ng_states.h"
 #include "nrf24l01p_ng_netdev.h"
-#if IS_USED(MODULE_NRF24L01P_NG_DIAGNOSTICS)
+#if MODULE_NRF24L01P_NG_DIAGNOSTICS
 #include "nrf24l01p_ng_diagnostics.h"
 #endif
 
@@ -235,7 +235,7 @@ static int _init(netdev_t *netdev)
     nrf24l01p_ng_reg8_write(dev, NRF24L01P_NG_REG_STATUS, NRF24L01P_NG_FLG_IRQ);
     /* go to standby */
     nrf24l01p_ng_transition_to_standby_1(dev);
-#if IS_USED(MODULE_NRF24L01P_NG_DIAGNOSTICS) && ENABLE_DEBUG
+#if MODULE_NRF24L01P_NG_DIAGNOSTICS && ENABLE_DEBUG
     nrf24l01p_ng_diagnostics_print_all_regs(dev);
     nrf24l01p_ng_diagnostics_print_dev_info(dev);
 #endif
@@ -344,7 +344,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     memcpy(frame, dst_addr, sizeof(dst_addr));
     frame += sizeof(dst_addr);
     nrf24l01p_ng_read_rx_payload(dev, frame, pl_width);
-#if IS_USED(MODULE_NRF24L01P_NG_DIAGNOSTICS) && ENABLE_DEBUG
+#if MODULE_NRF24L01P_NG_DIAGNOSTICS && ENABLE_DEBUG
     nrf24l01p_ng_diagnostics_print_frame(dev, (uint8_t *)buf, frame_len);
 #endif
     DEBUG("[nrf24l01p_ng] Received frame length: %u\n", frame_len);

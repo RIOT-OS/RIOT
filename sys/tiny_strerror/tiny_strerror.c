@@ -227,7 +227,7 @@ static FLASH_ATTR const char * FLASH_ATTR const lookup[] = {
 
 const char *tiny_strerror(int errnum)
 {
-    if (IS_USED(MODULE_TINY_STRERROR_MINIMAL)) {
+    if (MODULE_TINY_STRERROR_MINIMAL) {
         static char buf[4];
         snprintf(buf, sizeof(buf), "%d", errnum);
         return buf;
@@ -258,7 +258,7 @@ const char *tiny_strerror(int errnum)
 #endif
 }
 
-#if IS_USED(MODULE_TINY_STRERROR_AS_STRERROR)
+#if MODULE_TINY_STRERROR_AS_STRERROR
 __attribute__((alias("tiny_strerror"))) const char *__wrap_strerror(int errnum);
 #endif
 

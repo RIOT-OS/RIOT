@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  od \
+  #
 include ../Makefile.net_common
 
 USEMODULE += gnrc_ipv6_router_default

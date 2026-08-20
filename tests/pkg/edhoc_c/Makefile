@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  tinycrypt \
+  wolfssl \
+  #
 include ../Makefile.pkg_common
 
 FEATURES_REQUIRED += netif

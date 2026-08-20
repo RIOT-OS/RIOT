@@ -44,3 +44,8 @@ ifneq (,$(filter riotboot,$(FEATURES_USED)))
 endif
 
 include $(RIOTMAKE)/arch/cortexm.inc.mk
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_hw_fc \
+  riotboot \
+  #

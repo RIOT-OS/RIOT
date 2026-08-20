@@ -151,7 +151,7 @@
 #include "time_units.h"
 #include "trickle.h"
 
-#ifdef MODULE_NETSTATS_RPL
+#if MODULE_NETSTATS_RPL
 #include "net/rpl/rpl_netstats.h"
 #endif
 
@@ -601,7 +601,7 @@ extern kernel_pid_t gnrc_rpl_pid;
  */
 extern const ipv6_addr_t ipv6_addr_all_rpl_nodes;
 
-#ifdef MODULE_NETSTATS_RPL
+#if MODULE_NETSTATS_RPL
 /**
  * @brief   Statistics for RPL control messages
  * @warning Access to this structure need to be synchronized with the RPL
@@ -821,7 +821,7 @@ static inline void gnrc_rpl_config_pio(gnrc_rpl_dodag_t *dodag, bool status)
     }
 }
 
-#if IS_USED(MODULE_GNRC_RPL) || DOXYGEN
+#if MODULE_GNRC_RPL || DOXYGEN
 /**
  * @brief Convenience function to start a RPL root using the default configuration.
  *

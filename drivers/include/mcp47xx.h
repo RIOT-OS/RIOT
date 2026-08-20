@@ -228,7 +228,7 @@ typedef struct {
                                                powered off */
 } mcp47xx_t;
 
-#if IS_USED(MODULE_SAUL) || DOXYGEN
+#if MODULE_SAUL || DOXYGEN
 /**
  * @brief   MCP47xx configuration structure for mapping DAC channels to SAUL
  */

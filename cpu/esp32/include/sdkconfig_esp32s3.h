@@ -108,22 +108,22 @@ extern "C" {
 /**
  * ESP32-S3 specific USB configuration
  */
-#define CONFIG_ESP_PHY_ENABLE_USB               1
-#ifdef MODULE_ESP_IDF_USB
-#  define CONFIG_USB_OTG_SUPPORTED              1
+#define CONFIG_ESP_PHY_ENABLE_USB                   1
+#if MODULE_ESP_IDF_USB
+#  define CONFIG_USB_OTG_SUPPORTED                  1
 #endif
 
 /**
  * ESP32-S3 specific SPI RAM configuration
  */
-#ifdef  MODULE_ESP_SPI_RAM
-#ifdef MODULE_ESP_SPI_OCT
-#  define CONFIG_SPIRAM_MODE_OCT                1
-#else
-#  define CONFIG_SPIRAM_MODE_QUAD               1
-#endif
-#  define CONFIG_SPIRAM_CLK_IO                  30
-#  define CONFIG_SPIRAM_CS_IO                   26
+#if MODULE_ESP_SPI_RAM
+#  if MODULE_ESP_SPI_OCT
+#    define CONFIG_SPIRAM_MODE_OCT                  1
+#  else
+#    define CONFIG_SPIRAM_MODE_QUAD                 1
+#  endif
+#  define CONFIG_SPIRAM_CLK_IO                      30
+#  define CONFIG_SPIRAM_CS_IO                       26
 #endif
 
 /**
@@ -145,7 +145,7 @@ extern "C" {
 /**
  * ESP32-S3 BLE driver configuration (DO NOT CHANGE)
  */
-#ifdef MODULE_ESP_BLE
+#if MODULE_ESP_BLE
 #  define CONFIG_BT_ALARM_MAX_NUM                           50
 #  define CONFIG_BT_BLE_CCA_MODE                            0
 #  define CONFIG_BT_BLE_CCA_MODE_NONE                       1

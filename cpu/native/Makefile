@@ -1,5 +1,22 @@
 MODULE = cpu
 
+MODULE_DEFS_NEEDED += \
+  core_thread \
+  libc_gettimeofday \
+  malloc_monitor \
+  mtd_native \
+  native_cli_eui_provider \
+  netdev_tap \
+  periph_can \
+  periph_eeprom \
+  periph_gpio_linux \
+  periph_spidev_linux \
+  socket_zep \
+  stdin \
+  stdio_null \
+  tlsf \
+  #
+
 DIRS += periph
 
 ifneq (,$(filter native_vfs,$(USEMODULE)))

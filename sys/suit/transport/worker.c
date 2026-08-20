@@ -37,26 +37,26 @@
 
 #include "suit/transport/worker.h"
 
-#ifdef MODULE_SUIT_TRANSPORT_COAP
+#if MODULE_SUIT_TRANSPORT_COAP
 #include "net/nanocoap_sock.h"
 #include "suit/transport/coap.h"
 #include "net/sock/util.h"
 #endif
-#ifdef MODULE_SUIT_TRANSPORT_VFS
+#if MODULE_SUIT_TRANSPORT_VFS
 #include "vfs_util.h"
 #endif
 
-#ifdef MODULE_RIOTBOOT_SLOT
+#if MODULE_RIOTBOOT_SLOT
 #include "riotboot/slot.h"
 #endif
 
-#ifdef MODULE_SUIT
+#if MODULE_SUIT
 #include "suit.h"
 #include "suit/handlers.h"
 #include "suit/storage.h"
 #endif
 
-#if defined(MODULE_PROGRESS_BAR)
+#if MODULE_PROGRESS_BAR
 #include "progress_bar.h"
 #endif
 
@@ -92,16 +92,16 @@ int suit_handle_url(const char *url)
     LOG_INFO("suit_worker: downloading \"%s\"\n", url);
 
     if (0) {}
-#ifdef MODULE_SUIT_TRANSPORT_COAP
+#if MODULE_SUIT_TRANSPORT_COAP
     else if ((strncmp(url, "coap://", 7) == 0) ||
-             (IS_USED(MODULE_NANOCOAP_DTLS) && strncmp(url, "coaps://", 8) == 0)) {
+             (MODULE_NANOCOAP_DTLS && strncmp(url, "coaps://", 8) == 0)) {
         size = nanocoap_get_blockwise_url_to_buf(url,
                                                  CONFIG_SUIT_COAP_BLOCKSIZE,
                                                  _manifest_buf,
                                                  sizeof(_manifest_buf));
     }
 #endif
-#ifdef MODULE_SUIT_TRANSPORT_VFS
+#if MODULE_SUIT_TRANSPORT_VFS
     else if (strncmp(url, "file://", 7) == 0) {
         size = vfs_file_to_buffer(&url[7], _manifest_buf, sizeof(_manifest_buf));
     }
@@ -135,7 +135,7 @@ int suit_handle_manifest_buf(const uint8_t *buffer, size_t size)
         return res;
     }
 
-#ifdef MODULE_SUIT_STORAGE_FLASHWRITE
+#if MODULE_SUIT_STORAGE_FLASHWRITE
     const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(riotboot_slot_other());
     riotboot_hdr_print(hdr);
     ztimer_sleep(ZTIMER_MSEC, 1 * MS_PER_SEC);
@@ -151,7 +151,7 @@ void suit_worker_done_cb(int res)
 {
     if (res == 0) {
         LOG_INFO("suit_worker: update successful\n");
-        if (IS_USED(MODULE_SUIT_STORAGE_FLASHWRITE)) {
+        if (MODULE_SUIT_STORAGE_FLASHWRITE) {
             LOG_INFO("suit_worker: rebooting...\n");
             pm_reboot();
         }

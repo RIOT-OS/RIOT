@@ -82,7 +82,7 @@ int itg320x_init(itg320x_t *dev, const itg320x_params_t *params)
     return ITG320X_OK;
 }
 
-#ifdef MODULE_ITG320X_INT
+#if MODULE_ITG320X_INT
 
 int itg320x_init_int(const itg320x_t *dev, itg320x_drdy_int_cb_t cb, void *arg)
 {
@@ -172,7 +172,7 @@ int itg320x_read_raw(const itg320x_t *dev, itg320x_raw_data_t *raw)
     raw->y = (data[2] << 8) | data[3];
     raw->z = (data[4] << 8) | data[5];
 
-#ifdef MODULE_ITG320X_INT
+#if MODULE_ITG320X_INT
     /* read status register to clear the interrupt */
     EXEC_RET(_reg_read(dev, ITG320X_REG_INT_STATUS, data, 1));
 #endif

@@ -38,13 +38,13 @@
 
 #include "saul.h"
 
-#ifdef MODULE_MHZ19_UART
+#if MODULE_MHZ19_UART
 #include "periph/uart.h"
 #include "mhz19_internals.h"
 #include "mutex.h"
 #endif /* MODULE_MHZ19_UART */
 
-#ifdef MODULE_MHZ19_PWM
+#if MODULE_MHZ19_PWM
 #include "periph/gpio.h"
 #endif /* MODULE_MHZ19_PWM */
 
@@ -62,7 +62,7 @@ enum {
     MHZ19_ERR_CHECKSUM  = -3,       /**< checksum failure on received data */
 };
 
-#ifdef MODULE_MHZ19_UART
+#if MODULE_MHZ19_UART
 /**
  * @brief   Device initialization parameters
  */
@@ -83,7 +83,7 @@ typedef struct {
 } mhz19_t;
 #endif /* MODULE_MHZ19_UART */
 
-#ifdef MODULE_MHZ19_PWM
+#if MODULE_MHZ19_PWM
 /**
  * @brief  Device initialization parameters
  */
@@ -128,7 +128,7 @@ int mhz19_init(mhz19_t *dev, const mhz19_params_t *params);
  */
 int mhz19_get_ppm(mhz19_t *dev, int16_t *ppm);
 
-#ifdef MODULE_MHZ19_UART
+#if MODULE_MHZ19_UART
 /**
  * @brief   Enable or disable auto base calibration
  *

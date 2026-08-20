@@ -12,3 +12,16 @@ PSEUDOMODULES += sx126x_dio3
 
 USEMODULE_INCLUDES_sx126x := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_sx126x)
+
+MODULE_DEFS_NEEDED += \
+  llcc68 \
+  shield_llcc68 \
+  shield_sx1262 \
+  sx1261 \
+  sx1262 \
+  sx1268 \
+  sx126x_dio2 \
+  sx126x_dio3 \
+  sx126x_rf_switch \
+  sx126x_stm32wl \
+  #

@@ -58,7 +58,7 @@ void board_print_config (void)
     #if MODULE_PERIPH_TIMER
     timer_print_config();
     #endif
-    #ifdef MODULE_ESP_CAN
+    #if MODULE_ESP_CAN
     can_print_config();
     #endif
 

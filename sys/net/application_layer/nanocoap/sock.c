@@ -34,7 +34,7 @@
 #include "sys/uio.h" /* IWYU pragma: keep (exports struct iovec) */
 #include "ztimer.h"
 
-#ifdef MODULE_SOCK_ASYNC_EVENT
+#if MODULE_SOCK_ASYNC_EVENT
 #  include "net/sock/async/event.h"
 #endif
 
@@ -105,7 +105,7 @@ static mutex_t _observer_pool_lock;
 int nanocoap_sock_dtls_connect(nanocoap_sock_t *sock, sock_udp_ep_t *local,
                                const sock_udp_ep_t *remote, credman_tag_t tag)
 {
-#if IS_USED(MODULE_NANOCOAP_DTLS)
+#if MODULE_NANOCOAP_DTLS
     uint8_t buf[CONFIG_NANOCOAP_DTLS_HANDSHAKE_BUF_SIZE];
 
     sock->type = COAP_SOCKET_TYPE_DTLS;
@@ -134,7 +134,7 @@ static int _get_error(const coap_pkt_t *pkt)
 
 static inline nanocoap_socket_type_t _get_type(nanocoap_sock_t *sock)
 {
-#if IS_USED(MODULE_NANOCOAP_DTLS)
+#if MODULE_NANOCOAP_DTLS
     return sock->type;
 #else
     (void)sock;
@@ -147,7 +147,7 @@ static int _sock_sendv(nanocoap_sock_t *sock, const iolist_t *snips)
     switch (_get_type(sock)) {
     case COAP_SOCKET_TYPE_UDP:
         return sock_udp_sendv(&sock->udp, snips, NULL);
-#if IS_USED(MODULE_NANOCOAP_DTLS)
+#if MODULE_NANOCOAP_DTLS
     case COAP_SOCKET_TYPE_DTLS:
         return sock_dtls_sendv(&sock->dtls, &sock->dtls_session, snips,
                                CONFIG_SOCK_DTLS_TIMEOUT_MS);
@@ -163,7 +163,7 @@ static int _sock_recv_buf(nanocoap_sock_t *sock, void **data, void **ctx, uint32
     switch (_get_type(sock)) {
     case COAP_SOCKET_TYPE_UDP:
         return sock_udp_recv_buf(&sock->udp, data, ctx, timeout, NULL);
-#if IS_USED(MODULE_NANOCOAP_DTLS)
+#if MODULE_NANOCOAP_DTLS
     case COAP_SOCKET_TYPE_DTLS:
         return sock_dtls_recv_buf(&sock->dtls, &sock->dtls_session, data, ctx, timeout);
 #endif
@@ -470,7 +470,7 @@ ssize_t nanocoap_sock_get(nanocoap_sock_t *sock, const char *path,
     return _sock_get(sock, path, COAP_TYPE_CON, response, len_max);
 }
 
-#ifdef MODULE_NANOCOAP_SOCK_OBSERVE
+#if MODULE_NANOCOAP_SOCK_OBSERVE
 static void _async_udp_handler(sock_udp_t *sock, sock_async_flags_t type, void *arg)
 {
     if (!(type & SOCK_ASYNC_MSG_RECV)) {
@@ -1072,7 +1072,7 @@ int nanocoap_sock_url_connect(const char *url, nanocoap_sock_t *sock)
 
     bool is_coaps = false;
 
-    if (IS_USED(MODULE_NANOCOAP_DTLS) && !strncmp(url, "coaps://", 8)) {
+    if (MODULE_NANOCOAP_DTLS && !strncmp(url, "coaps://", 8)) {
         DEBUG("nanocoap: CoAPS URL detected\n");
         is_coaps = true;
     }
@@ -1225,7 +1225,7 @@ int nanocoap_server(sock_udp_ep_t *local, void *rsp_buf, size_t rsp_buf_len)
         }
 
         sock_udp_aux_rx_t *aux_in_ptr = NULL;
-#ifdef MODULE_SOCK_AUX_LOCAL
+#if MODULE_SOCK_AUX_LOCAL
         sock_udp_aux_rx_t aux_in = {
             .flags = SOCK_AUX_GET_LOCAL,
         };
@@ -1245,7 +1245,7 @@ int nanocoap_server(sock_udp_ep_t *local, void *rsp_buf, size_t rsp_buf_len)
         }
 
         sock_udp_aux_tx_t *aux_out_ptr = NULL;
-#ifdef MODULE_SOCK_AUX_LOCAL
+#if MODULE_SOCK_AUX_LOCAL
         /* make sure we reply with the same address that the request was
          * destined for -- except in the multicast case */
         sock_udp_aux_tx_t aux_out = {

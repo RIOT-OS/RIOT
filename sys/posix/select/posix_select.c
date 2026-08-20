@@ -21,7 +21,7 @@
 #include "ztimer64.h"
 #include "timex.h"
 
-#if IS_USED(MODULE_POSIX_SOCKETS)
+#if MODULE_POSIX_SOCKETS
 extern bool posix_socket_is(int fd);
 extern unsigned posix_socket_avail(int fd);
 extern void posix_socket_select(int fd);
@@ -43,7 +43,7 @@ static inline void posix_socket_select(int fd)
     (void)fd;
     return 0;
 }
-#endif  /* IS_USED(MODULE_POSIX_SOCKETS) */
+#endif  /* MODULE_POSIX_SOCKETS */
 
 static int _set_timeout(ztimer64_t *timeout_timer, struct timeval *timeout,
                         uint32_t offset, bool *wait)

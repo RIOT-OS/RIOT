@@ -18,11 +18,11 @@
 #include "cpu_conf_common.h"
 #include "periph_cpu_common.h"
 
-#ifdef MODULE_PMP_NOEXEC_RAM
+#if MODULE_PMP_NOEXEC_RAM
 #include "pmp.h"
 #endif
 
-#ifdef MODULE_PUF_SRAM
+#if MODULE_PUF_SRAM
 #include "puf_sram.h"
 
 extern unsigned _sheap;
@@ -46,7 +46,7 @@ void riscv_init(void)
 {
     riscv_fpu_init();
     riscv_irq_init();
-#ifdef MODULE_PMP_NOEXEC_RAM
+#if MODULE_PMP_NOEXEC_RAM
     /* This marks the (main) RAM region as non
      * executable. Using PMP entry 0.
      */

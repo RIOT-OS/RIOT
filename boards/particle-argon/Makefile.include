@@ -1,2 +1,6 @@
 CFLAGS += "-DPARTICLE_PLATFORM_ID=12"
 include $(RIOTBOARD)/common/particle-mesh/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_hw_fc \
+  #

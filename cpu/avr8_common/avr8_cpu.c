@@ -104,7 +104,7 @@ void cpu_init(void)
     avr8_clk_init();
 
     /* Initialize stdio before periph_init() to allow use of DEBUG() there */
-#ifdef MODULE_AVR_LIBC_EXTRA
+#if MODULE_AVR_LIBC_EXTRA
     avr8_stdio_init();
 #endif
     /* Initialize peripherals for which modules are included in the makefile.*/

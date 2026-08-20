@@ -1,3 +1,10 @@
+
+MODULE_DEFS_NEEDED += \
+  l3gxxxx_config \
+  l3gxxxx_fifo \
+  l3gxxxx_irq \
+  l3gxxxx_irq_event \
+  #
 include ../Makefile.drivers_common
 
 # define the driver to be used for selected boards

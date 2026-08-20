@@ -89,7 +89,7 @@
 #include "net/coap.h"
 #include "net/sock/udp.h"
 
-#if defined(MODULE_NANOCOAP_RESOURCES)
+#if MODULE_NANOCOAP_RESOURCES
 #include "xfa.h"
 #endif
 
@@ -250,7 +250,7 @@ typedef struct {
     uint16_t options_len;                             /**< length of options array */
     coap_optpos_t options[CONFIG_NANOCOAP_NOPTS_MAX]; /**< option offset array     */
     BITFIELD(opt_crit, CONFIG_NANOCOAP_NOPTS_MAX);    /**< unhandled critical option */
-#ifdef MODULE_GCOAP
+#if MODULE_GCOAP
     uint32_t observe_value;                           /**< observe value           */
 #endif
 } coap_pkt_t;
@@ -354,13 +354,13 @@ struct _coap_request_ctx {
         sock_udp_ep_t *remote_udp;      /**< remote UDP endpoint of the request */
         sock_udp_ep_t *remote;          /**< deprecated alias for request_udp */
     };
-#if defined(MODULE_SOCK_AUX_LOCAL) || DOXYGEN
+#if MODULE_SOCK_AUX_LOCAL || DOXYGEN
     union {
         sock_udp_ep_t *local_udp;       /**< local UDP endpoint of the request */
         sock_udp_ep_t *local;           /**< deprecated alias for local_udp */
     };
 #endif
-#if defined(MODULE_GCOAP) || DOXYGEN
+#if MODULE_GCOAP || DOXYGEN
     /**
      * @brief   transport the packet was received over
      * @see     @ref gcoap_socket_type_t for values.
@@ -476,7 +476,7 @@ typedef struct {
     uint8_t *opt_value;             /**< Pointer to the value of the placed option */
 } coap_block_slicer_t;
 
-#if defined(MODULE_NANOCOAP_RESOURCES) || DOXYGEN
+#if MODULE_NANOCOAP_RESOURCES || DOXYGEN
 /**
  * @brief   CoAP XFA resource entry
  *
@@ -2816,7 +2816,7 @@ extern ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, \
  * @brief   Respond to `/.well-known/core` to list all resources on the server
  */
 #ifndef CONFIG_NANOCOAP_SERVER_WELL_KNOWN_CORE
-#define CONFIG_NANOCOAP_SERVER_WELL_KNOWN_CORE !IS_USED(MODULE_GCOAP)
+#define CONFIG_NANOCOAP_SERVER_WELL_KNOWN_CORE !MODULE_GCOAP
 #endif
 
 /**
@@ -2836,7 +2836,7 @@ extern ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, \
  */
 int coap_match_path(const coap_resource_t *resource, const char *uri);
 
-#if defined(MODULE_GCOAP) || defined(DOXYGEN)
+#if MODULE_GCOAP || defined(DOXYGEN)
 /**
  * @name    Functions -- gcoap specific
  */

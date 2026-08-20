@@ -64,7 +64,7 @@
  * purposes.
  */
 #ifndef ADC_GPIOS
-#ifndef MODULE_ESP32_WROVER_KIT_CAMERA
+#if !MODULE_ESP32_WROVER_KIT_CAMERA
 #define ADC_GPIOS   { GPIO34, GPIO35, GPIO36, GPIO39 }
 #else
 #define ADC_GPIOS   { }

@@ -8,3 +8,8 @@ endif
 include $(RIOTBOARD)/common/samdx1-arduino-bootloader/Makefile.include
 
 INCLUDES += -I$(RIOTBOARD)/common/arduino-mkr/include
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  periph_uart_hw_fc \
+  #

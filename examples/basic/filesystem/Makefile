@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  newlib \
+  picolibc \
+  #
 # name of your application
 APPLICATION = filesystem
 

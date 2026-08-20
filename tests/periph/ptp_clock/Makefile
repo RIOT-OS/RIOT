@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_ptp_speed_adjustment \
+  #
 BOARD ?= nucleo-f767zi
 include ../Makefile.periph_common
 

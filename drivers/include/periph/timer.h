@@ -348,13 +348,13 @@ uint32_t timer_get_closest_freq(tim_t dev, uint32_t target);
 /* As this function is polled, it needs to be inlined, so it is typically
  * provided through `timer_arch.h`. If a platform ever does not need to go
  * through static inline here, this declaration's condition can be extended to
- * be `(defined(MODULE_PERIPH_TIMER_POLL) &&
+ * be `(MODULE_PERIPH_TIMER_POLL &&
  * !defined(PERIPH_TIMER_PROVIDES_INLINE_POLL_CHANNEL) || defined(DOXYGEN)` or
  * similar. */
 bool timer_poll_channel(tim_t dev, int channel);
 #endif
 
-#if defined(MODULE_PERIPH_TIMER_POLL)
+#if MODULE_PERIPH_TIMER_POLL
 #  include "timer_arch.h" /* IWYU pragma: export */
 #endif
 

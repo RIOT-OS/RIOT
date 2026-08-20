@@ -73,7 +73,7 @@ extern "C" {
  * @note    Used for calculation of @ref CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF.
  *          Set to 0 if `dhcpv6_client_ia_na` is not included.
  */
-#if defined(MODULE_DHCPV6_CLIENT_IA_NA) || defined(DOXYGEN)
+#if MODULE_DHCPV6_CLIENT_IA_NA || defined(DOXYGEN)
 #define DHCPV6_CLIENT_ADDRS_NUMOF ((int)(CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX))
 #else
 #define DHCPV6_CLIENT_ADDRS_NUMOF (0)
@@ -103,7 +103,7 @@ typedef struct __attribute__((packed)) {
     /* link-layer address follows this header */
 } dhcpv6_duid_l2_t;
 
-#if defined(MODULE_AUTO_INIT_DHCPV6_CLIENT) || defined(DOXYGEN)
+#if MODULE_AUTO_INIT_DHCPV6_CLIENT || defined(DOXYGEN)
 /**
  * @brief   Configure a hook function to be executed during dhcpv6 client's
  *          auto init.
@@ -284,7 +284,7 @@ static inline uint32_t dhcpv6_client_addr_valid_until(unsigned netif,
  *
  * @note    Only (re)defined by the `dhcpv6_client_mud_url` pseudo-module.
  */
-#if defined(MODULE_DHCPV6_CLIENT_MUD_URL) || defined(DOXYGEN)
+#if MODULE_DHCPV6_CLIENT_MUD_URL || defined(DOXYGEN)
 #define DHCPV6_CLIENT_SEND_BUFLEN        (DHCPV6_CLIENT_BUFLEN + 256)
 #else
 #define DHCPV6_CLIENT_SEND_BUFLEN        (DHCPV6_CLIENT_BUFLEN)

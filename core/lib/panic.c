@@ -25,14 +25,14 @@
 #include "panic.h"
 #include "periph/pm.h"
 
-#if defined(DEVELHELP) && defined(MODULE_PS)
+#if defined(DEVELHELP) && MODULE_PS
 #include "ps.h"
 #endif
 
 /* If a device is flashed over USB bootloader, try to launch
  * the bootloader again on crash so the user can re-flash it.
  */
-#if defined(DEVELHELP) && defined(MODULE_USB_BOARD_RESET)
+#if defined(DEVELHELP) && MODULE_USB_BOARD_RESET
 #include "usb_board_reset.h"
 #endif
 
@@ -63,7 +63,7 @@ NORETURN void core_panic(core_panic_t crash_code, const char *message)
         panic_app(crash_code, message);
         printf("*** RIOT kernel panic:\n%s\n\n", message);
 #ifdef DEVELHELP
-#ifdef MODULE_PS
+#if MODULE_PS
         ps();
         printf("\n");
 #endif
@@ -76,15 +76,15 @@ NORETURN void core_panic(core_panic_t crash_code, const char *message)
     /* disable watchdog and all possible sources of interrupts */
     irq_disable();
     panic_arch();
-#if CONFIG_CORE_REBOOT_ON_PANIC && defined(MODULE_PERIPH_PM)
+#if CONFIG_CORE_REBOOT_ON_PANIC && MODULE_PERIPH_PM
     /* DEVELHELP not set => reboot system */
     pm_reboot();
 #else
     /* DEVELHELP set => power off system */
     /*               or start bootloader */
-#if defined(MODULE_USB_BOARD_RESET)
+#if MODULE_USB_BOARD_RESET
     usb_board_reset_in_bootloader();
-#elif defined(MODULE_PERIPH_PM)
+#elif MODULE_PERIPH_PM
     pm_off();
 #else
     while (1) {}

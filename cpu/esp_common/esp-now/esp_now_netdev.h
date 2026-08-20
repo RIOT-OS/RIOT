@@ -19,7 +19,7 @@
 #include "net/netdev.h"
 #include "mutex.h"
 #include "net/ethernet/hdr.h"
-#ifdef MODULE_GNRC
+#if MODULE_GNRC
 #include "net/gnrc/nettype.h"
 #endif
 
@@ -89,7 +89,7 @@ typedef struct
 
     uint8_t tx_mem[ESP_NOW_MAX_SIZE_RAW]; /**< memory holding outgoing package */
 
-#ifdef MODULE_GNRC
+#if MODULE_GNRC
     gnrc_nettype_t proto;            /**< protocol for upper layer */
 #endif
 

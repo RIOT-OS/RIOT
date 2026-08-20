@@ -35,7 +35,7 @@ extern "C" {
  * @{
  */
 #ifndef OPENWSN_LEDPIN_ERROR
-#if defined (LED0_PIN) && !defined(MODULE_BOARDS_COMMON_NUCLEO)
+#if defined (LED0_PIN) && !MODULE_BOARDS_COMMON_NUCLEO
 #define OPENWSN_LEDPIN_ERROR            LED0_PIN
 #else
 #define OPENWSN_LEDPIN_ERROR            GPIO_UNDEF

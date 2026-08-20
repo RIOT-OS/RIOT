@@ -16,7 +16,7 @@ const char *inet_ntop(int af, const void *restrict src, char *restrict dst,
                       socklen_t size)
 {
     switch (af) {
-#ifdef MODULE_IPV4_ADDR
+#if MODULE_IPV4_ADDR
         case AF_INET:
             if (ipv4_addr_to_str(dst, src, (size_t)size) == NULL) {
                 errno = ENOSPC;
@@ -24,7 +24,7 @@ const char *inet_ntop(int af, const void *restrict src, char *restrict dst,
             }
             break;
 #endif
-#ifdef MODULE_IPV6_ADDR
+#if MODULE_IPV6_ADDR
         case AF_INET6:
             if (ipv6_addr_to_str(dst, src, (size_t)size) == NULL) {
                 errno = ENOSPC;
@@ -45,14 +45,14 @@ const char *inet_ntop(int af, const void *restrict src, char *restrict dst,
 int inet_pton(int af, const char *src, void *dst)
 {
     switch (af) {
-#ifdef MODULE_IPV4_ADDR
+#if MODULE_IPV4_ADDR
         case AF_INET:
             if (ipv4_addr_from_str(dst, src) == NULL) {
                 return 0;
             }
             break;
 #endif
-#ifdef MODULE_IPV6_ADDR
+#if MODULE_IPV6_ADDR
         case AF_INET6:
             if (ipv6_addr_from_str(dst, src) == NULL) {
                 return 0;

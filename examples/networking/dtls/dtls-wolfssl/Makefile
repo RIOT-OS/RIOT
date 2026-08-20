@@ -1,3 +1,10 @@
+
+MODULE_DEFS_NEEDED += \
+  wolfcrypt_ecc \
+  wolfcrypt_rsa \
+  wolfcrypt_test \
+  wolfssl_psk \
+  #
 # name of your application
 APPLICATION = dtls_wolfssl
 

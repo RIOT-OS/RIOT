@@ -16,7 +16,7 @@
  */
 
 #include "board.h"
-#ifdef MODULE_PCF857X
+#if MODULE_PCF857X
 #include "pcf857x.h"
 #else
 #include "periph/gpio.h"
@@ -36,7 +36,7 @@ extern "C"
 #define HD44780_PARAM_ROWS              (2U)
 #endif
 
-#ifndef MODULE_PCF857X
+#if !MODULE_PCF857X
 
 #ifndef HD44780_PARAM_PIN_RS
 #define HD44780_PARAM_PIN_RS            GPIO_PIN(0, 14)         /* Arduino D2 */

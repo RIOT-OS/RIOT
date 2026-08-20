@@ -25,7 +25,7 @@ extern "C" {
  * @name    Device specific chip ID
  * @{
  */
-#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+#if MODULE_BME280_SPI || MODULE_BME280_I2C
 #define BMX280_CHIP_ID_VAL              (0x60)
 #else
 #define BMX280_CHIP_ID_VAL              (0x58)
@@ -111,7 +111,7 @@ extern "C" {
 #define CALIB_T_P_BASE                  (BMX280_DIG_T1_LSB_REG)
 #define CALIB_T_P_LEN                   (24U)
 #define OFFSET_T_P(x)                   (x - CALIB_T_P_BASE)
-#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+#if MODULE_BME280_SPI || MODULE_BME280_I2C
 #define CALIB_H_BASE                    (BME280_DIG_H2_LSB_REG)
 #define CALIB_H_LEN                     (7U)
 #define OFFSET_H(x)                     (x - CALIB_H_BASE)

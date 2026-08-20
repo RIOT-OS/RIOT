@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  nimble_phy_coded \
+  #
 include ../Makefile.pkg_common
 
 # If no BOARD is found in the environment, use this default:

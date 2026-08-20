@@ -20,7 +20,7 @@ index e2bcc0be..244507f7 100644
 +#  define CONFIG_BPLIB_TIME_FILE_NAME "/nvm0/time.dat"
 +#endif
 +
-+#ifndef MODULE_BPLIB_NO_VFS
++#if !MODULE_BPLIB_NO_VFS
 +#  include "vfs_util.h"
 +#else
 +

@@ -32,7 +32,7 @@
 #define MODE_MASK                       (0x0f)
 #define ODR_POS                         (4U)
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 /**
  * @brief   Number of available external interrupt lines
  */
@@ -203,7 +203,7 @@ void gpio_write(gpio_t pin, bool value)
     }
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 
 /* Forward declaration of ISR */
 static void _gpio_isr(unsigned irqn);

@@ -226,7 +226,7 @@ conditionals:
 
 ```c
 /* GOOD */
-if (IS_USED(MODULE_GNRC_IPV6_EXT_FRAG_STATS)) {
+if (MODULE_GNRC_IPV6_EXT_FRAG_STATS) {
     _stats.fragments++;
     _stats.datagrams++;
 }
@@ -235,19 +235,19 @@ if (IS_USED(MODULE_GNRC_IPV6_EXT_FRAG_STATS)) {
 That way tooling such as language servers and static code analysers will still
 see the code and perform their checks on it.
 
-If preprocessor conditionals are needed, use `#ifdef MODULE_FOO` or
-`#if MODULE_FOO` instead of `#if IS_USED(MODULE_FOO)`
+If preprocessor conditionals are needed, use `#if MODULE_FOO` or
+`#if MODULE_FOO` instead of `#if MODULE_FOO`
 
 The general rule is to reduce preprocessor statements as much as possible.
 Instead of guarding individual code sections, add a stub or use early returns:
 
 ```c
 /* BAD */
-#ifdef MODULE_FOO
+#if MODULE_FOO
 #  include "foo.h"
 #endif /* MODULE_FOO */
 
-#ifdef MODULE_FOO
+#if MODULE_FOO
 static void _do_foo(void) {
     // do foo
     ...
@@ -256,7 +256,7 @@ static void _do_foo(void) {
 
 void bar(my_type t) {
     switch(t)
-#ifdef MODULE_FOO
+#if MODULE_FOO
     case MY_TYPE_FOO:
         _do_foo();
 #endif /* MODULE_FOO */
@@ -268,7 +268,7 @@ void bar(my_type t) {
 /* GOOD: Stubs */
 #include "foo.h"
 
-#ifdef MODULE_FOO
+#if MODULE_FOO
 static void _do_foo(void) {
     // do foo
     ...
@@ -293,7 +293,7 @@ void bar(my_type t) {
 #include "foo.h"
 
 static void _do_foo(void) {
-    if (!IS_USED(MODULE_FOO)) {
+    if (!MODULE_FOO) {
         return;
     }
     // do foo
@@ -400,10 +400,10 @@ of code.
   includes (in quotes).
 * Headers should only be guarded if they are not always available, i.e.,
   if they explicitly depend on a module. If that is the case, the import
-  should be guarded with `#ifdef MODULE_...` statements:
+  should be guarded with `#if MODULE_...` statements:
 
 ```c
-#ifdef MODULE_ABC
+#if MODULE_ABC
 #  include "abc.h"
 #endif
 ```

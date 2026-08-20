@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_adc \
+  #
 DEVELHELP ?= 0
 include ../Makefile.sys_common
 

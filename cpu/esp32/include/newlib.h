@@ -23,7 +23,7 @@
 
 #ifndef DOXYGEN
 
-#if IS_USED(MODULE_NEWLIB_NANO)
+#if MODULE_NEWLIB_NANO
 /* newlib nano formatted io is used */
 #define _NANO_FORMATTED_IO  1
 #endif

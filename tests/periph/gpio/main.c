@@ -30,7 +30,7 @@
 #define BENCH_RUNS_DEFAULT      (1000UL * 100)
 #define IRQ_TIMEOUT_US          (1000UL)
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 static void cb(void *arg)
 {
     printf("INT: external interrupt from pin %" PRIiPTR "\n", (intptr_t)arg);
@@ -87,7 +87,7 @@ static int init_od_pu(int argc, char **argv)
     return init_pin(argc, argv, GPIO_OD_PU);
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 static int init_int(int argc, char **argv)
 {
     int po, pi;
@@ -248,7 +248,7 @@ static int cmd_toggle(int argc, char **argv)
     return 0;
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 static void _test_cb(void *ctx)
 {
     mutex_unlock(ctx);
@@ -293,7 +293,7 @@ static int cmd_auto_test(int argc, char **argv)
         return -1;
     }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
     mutex_t lock = MUTEX_INIT_LOCKED;
 
     /* test rising interrupt */
@@ -408,7 +408,7 @@ static const shell_command_t shell_commands[] = {
     { "init_in_pd", "init as input with pull-down", init_in_pd },
     { "init_od", "init as output (open-drain without pull resistor)", init_od },
     { "init_od_pu", "init as output (open-drain with pull-up)", init_od_pu },
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
     { "init_int", "init as external INT w/o pull resistor", init_int },
     { "enable_int", "enable or disable gpio interrupt", enable_int },
 #endif

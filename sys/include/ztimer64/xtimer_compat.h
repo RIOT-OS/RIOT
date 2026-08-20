@@ -26,7 +26,7 @@
 #include "board.h"
 #include "div.h"
 #include "timex.h"
-#ifdef MODULE_CORE_MSG
+#if MODULE_CORE_MSG
 #include "msg.h"
 #endif /* MODULE_CORE_MSG */
 #include "mutex.h"
@@ -122,10 +122,10 @@ static inline xtimer_ticks64_t xtimer_ticks_from_usec64(uint64_t usec)
 
 static inline xtimer_ticks32_t xtimer_now(void)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         return ztimer_now(ZTIMER_USEC);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         return ztimer_now(ZTIMER_MSEC) * US_PER_MS;
     }
     else {
@@ -141,10 +141,10 @@ static inline uint32_t xtimer_now_usec(void)
 
 static inline uint32_t xtimer_now_msec(void)
 {
-    if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    if (MODULE_ZTIMER_MSEC) {
         return ztimer_now(ZTIMER_MSEC);
     }
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         return ztimer64_now(ZTIMER64_USEC) / US_PER_MS;
     }
     else {
@@ -155,10 +155,10 @@ static inline uint32_t xtimer_now_msec(void)
 
 static inline uint64_t xtimer_now_usec64(void)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         return ztimer64_now(ZTIMER64_USEC);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         return ztimer64_now(ZTIMER64_MSEC) * US_PER_MS;
     }
     else {
@@ -206,7 +206,7 @@ static inline void xtimer_msleep(uint32_t milliseconds)
     if (IS_ACTIVE(MODULE_ZTIMER_MSEC)) {
         ztimer_sleep(ZTIMER_MSEC, milliseconds);
     }
-    else if (IS_USED(MODULE_ZTIMER_USEC)) {
+    else if (MODULE_ZTIMER_USEC) {
         ztimer64_sleep(ZTIMER64_USEC, ((uint64_t)milliseconds) * 1000LLU);
     }
     else {
@@ -216,10 +216,10 @@ static inline void xtimer_msleep(uint32_t milliseconds)
 
 static inline void xtimer_usleep(uint32_t microseconds)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer_sleep(ZTIMER_USEC, microseconds);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer_sleep(ZTIMER_MSEC, _div_round_up_u32(microseconds, US_PER_MS));
     }
     else {
@@ -229,10 +229,10 @@ static inline void xtimer_usleep(uint32_t microseconds)
 
 static inline void xtimer_set(xtimer_t *timer, uint32_t offset)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer64_set(ZTIMER64_USEC, timer, offset);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer64_set(ZTIMER64_MSEC, timer, _div_round_up_u32(offset, US_PER_MS));
     }
     else {
@@ -242,10 +242,10 @@ static inline void xtimer_set(xtimer_t *timer, uint32_t offset)
 
 static inline void xtimer_remove(xtimer_t *timer)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer64_remove(ZTIMER64_USEC, timer);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer64_remove(ZTIMER64_MSEC, timer);
     }
     else {
@@ -261,10 +261,10 @@ static inline bool xtimer_is_set(const xtimer_t *timer)
 static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg,
                                   kernel_pid_t target_pid)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer64_set_msg(ZTIMER64_USEC, timer, offset, msg, target_pid);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer64_set_msg(ZTIMER64_MSEC, timer, _div_round_up_u32(offset, US_PER_MS),
                          msg, target_pid);
     }
@@ -276,10 +276,10 @@ static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg,
 static inline void xtimer_periodic_wakeup(xtimer_ticks32_t *last_wakeup,
                                           uint32_t period)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer_periodic_wakeup(ZTIMER_USEC, last_wakeup, period);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer_periodic_wakeup(ZTIMER_MSEC, last_wakeup, _div_round_up_u32(period, US_PER_MS));
     }
     else {
@@ -289,10 +289,10 @@ static inline void xtimer_periodic_wakeup(xtimer_ticks32_t *last_wakeup,
 
 static inline int xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         return ztimer_msg_receive_timeout(ZTIMER_USEC, msg, timeout);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         return ztimer_msg_receive_timeout(ZTIMER_MSEC, msg, _div_round_up_u32(timeout, US_PER_MS));
     }
     else {
@@ -304,10 +304,10 @@ static inline int xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout)
 static inline void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset,
                                      kernel_pid_t pid)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer64_set_wakeup(ZTIMER64_USEC, timer, offset, pid);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer64_set_wakeup(ZTIMER64_MSEC, timer, _div_round_up_u32(offset, US_PER_MS), pid);
     }
     else {
@@ -319,10 +319,10 @@ static inline int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us)
 {
     int res;
 
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         res = ztimer64_mutex_lock_timeout(ZTIMER64_USEC, mutex, us);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         us = _div_round_up_u64(us, US_PER_MS);
         res = ztimer64_mutex_lock_timeout(ZTIMER64_MSEC, mutex, us);
     }
@@ -339,10 +339,10 @@ static inline int xtimer_rmutex_lock_timeout(rmutex_t *rmutex, uint64_t us)
 {
     int res;
 
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         res = ztimer64_rmutex_lock_timeout(ZTIMER64_USEC, rmutex, us);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         us = _div_round_up_u64(us, US_PER_MS);
         res = ztimer64_rmutex_lock_timeout(ZTIMER64_MSEC, rmutex, us);
     }
@@ -357,10 +357,10 @@ static inline int xtimer_rmutex_lock_timeout(rmutex_t *rmutex, uint64_t us)
 
 static inline void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer64_set_timeout_flag(ZTIMER64_USEC, t, timeout);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer64_set_timeout_flag(ZTIMER64_MSEC, t, _div_round_up_u32(timeout, US_PER_MS));
     }
     else {
@@ -370,10 +370,10 @@ static inline void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout)
 
 static inline void xtimer_set_timeout_flag64(xtimer_t *t, uint64_t timeout)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer64_set_timeout_flag(ZTIMER64_USEC, t, timeout);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer64_set_timeout_flag(ZTIMER64_MSEC, t, _div_round_up_u64(timeout, US_PER_MS));
     }
     else {
@@ -383,10 +383,10 @@ static inline void xtimer_set_timeout_flag64(xtimer_t *t, uint64_t timeout)
 
 static inline void xtimer_spin(xtimer_ticks32_t ticks)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer_spin(ZTIMER_USEC, xtimer_usec_from_ticks(ticks));
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer_spin(ZTIMER_MSEC, xtimer_msec_from_ticks(ticks));
     }
     else {
@@ -448,14 +448,14 @@ static inline void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset,
     ztimer64_set_wakeup(ZTIMER64_USEC, timer, offset, pid);
 }
 
-#if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
+#if MODULE_CORE_MSG || defined(DOXYGEN)
 static inline void xtimer_set_msg64(xtimer_t *timer, uint64_t offset,
                                     msg_t *msg, kernel_pid_t target_pid)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         ztimer64_set_msg(ZTIMER64_USEC, timer, offset, msg, target_pid);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         ztimer64_set_msg(ZTIMER64_MSEC, timer,
                          _div_round_up_u64(offset, US_PER_MS), msg, target_pid);
     }
@@ -466,10 +466,10 @@ static inline void xtimer_set_msg64(xtimer_t *timer, uint64_t offset,
 
 static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout)
 {
-    if (IS_USED(MODULE_ZTIMER_USEC)) {
+    if (MODULE_ZTIMER_USEC) {
         return ztimer64_msg_receive_timeout(ZTIMER64_USEC, msg, timeout);
     }
-    else if (IS_USED(MODULE_ZTIMER_MSEC)) {
+    else if (MODULE_ZTIMER_MSEC) {
         return ztimer64_msg_receive_timeout(ZTIMER64_MSEC, msg,
                                             _div_round_up_u64(timeout, US_PER_MS));
     }

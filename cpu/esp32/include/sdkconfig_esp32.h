@@ -62,7 +62,7 @@ extern "C" {
  */
 #define CONFIG_RTC_CLK_CAL_CYCLES                 1024
 
-#ifdef MODULE_ESP_RTC_TIMER_32K
+#if MODULE_ESP_RTC_TIMER_32K
 #  define CONFIG_RTC_EXT_CRYST_ADDIT_CURRENT_NONE 1
 #  define CONFIG_RTC_XTAL_CAL_RETRY               1
 #  define CONFIG_ESP_SYSTEM_RTC_EXT_XTAL_BOOTSTRAP_CYCLES 5
@@ -130,7 +130,7 @@ extern "C" {
 /**
  * ESP32 specific SPI RAM configuration
  */
-#ifdef  MODULE_ESP_SPI_RAM
+#if MODULE_ESP_SPI_RAM
 #  define CONFIG_D0WD_PSRAM_CLK_IO                      17
 #  define CONFIG_D0WD_PSRAM_CS_IO                       16
 #  define CONFIG_D2WD_PSRAM_CLK_IO                      9
@@ -147,7 +147,7 @@ extern "C" {
 /**
  * ESP32 specific ETH configuration
  */
-#ifdef MODULE_ESP_ETH
+#if MODULE_ESP_ETH
 #  define CONFIG_ETH_USE_ESP32_EMAC                     1
 #  define CONFIG_ETH_PHY_INTERFACE_RMII                 1
 #  define CONFIG_ETH_RMII_CLK_INPUT                     1
@@ -160,7 +160,7 @@ extern "C" {
 /**
  * ESP32 specific BLE driver configuration (DO NOT CHANGE)
  */
-#ifdef MODULE_ESP_BLE
+#if MODULE_ESP_BLE
 #  define CONFIG_BT_ALARM_MAX_NUM                        50
 #  define CONFIG_BTDM_BLE_ADV_REPORT_DISCARD_THRSHOLD    20
 #  define CONFIG_BTDM_BLE_ADV_REPORT_FLOW_CTRL_NUM       100

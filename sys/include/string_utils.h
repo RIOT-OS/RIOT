@@ -128,8 +128,8 @@ int swprintf(string_writer_t *sw, FLASH_ATTR const char *restrict format, ...);
  * for all other cases, we provide it here
  */
 #if defined(RIOT_OS) && !defined(CPU_NATIVE) \
-    && !(IS_USED(MODULE_PICOLIBC) && __BSD_VISIBLE) \
-    && !(IS_USED(MODULE_NEWLIB) && __BSD_VISIBLE && !defined(CPU_ESP8266))
+    && !(MODULE_PICOLIBC && __BSD_VISIBLE) \
+    && !(MODULE_NEWLIB && __BSD_VISIBLE && !defined(CPU_ESP8266))
 
 /**
  * @brief   Like `memset(dest, 0, n_bytes)`, but secure

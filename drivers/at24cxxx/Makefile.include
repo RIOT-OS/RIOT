@@ -7,3 +7,21 @@ NO_PSEUDOMODULES += at24cxxx
 
 USEMODULE_INCLUDES_at24cxxx := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_at24cxxx)
+
+MODULE_DEFS_NEEDED += \
+  at24c01a \
+  at24c02 \
+  at24c04 \
+  at24c08a \
+  at24c1024 \
+  at24c128 \
+  at24c16a \
+  at24c256 \
+  at24c32 \
+  at24c512 \
+  at24c64 \
+  at24cs04 \
+  at24cs08 \
+  at24mac \
+  m24c01 \
+  #

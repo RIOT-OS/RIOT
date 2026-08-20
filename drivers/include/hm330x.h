@@ -60,7 +60,7 @@ typedef struct {
     uint16_t amc_pm_1;      /**< PM1.0 ug/m3 (atmospheric environment) <= 1µm [µg/m^3] */
     uint16_t amc_pm_2p5;    /**< PM2.5 ug/m3 (atmospheric environment) <= 2.5µm [µg/m^3] */
     uint16_t amc_pm_10;     /**< PM10 ug/m3  (atmospheric environment) <= 10µm [µg/m^3] */
-#if IS_USED(MODULE_HM3302)
+#if MODULE_HM3302
     uint16_t nc_pm_0p3;     /**< Number concentration of all particles <= 0.3µm [#/cm^3] */
     uint16_t nc_pm_0p5;     /**< Number concentration of all particles <= 0.5µm [#/cm^3] */
     uint16_t nc_pm_1;       /**< Number concentration of all particles <= 1µm [#/cm^3] */

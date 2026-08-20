@@ -38,7 +38,7 @@ extern "C" {
  * @brief   Internal flag to enable LVGL SDL2 based drivers for display, mouse,
  *          mousewheel and keyboard
  */
-#define USE_SDL IS_USED(MODULE_LV_DRIVERS_SDL)
+#define USE_SDL MODULE_LV_DRIVERS_SDL
 /**
  * @brief   LVGL SDL2 display horizontal resolution
  */

@@ -30,7 +30,7 @@
 #include "priority_queue.h"
 #include "ringbuffer.h"
 #include "rmutex.h"
-#ifdef MODULE_CORE_THREAD_FLAGS
+#if MODULE_CORE_THREAD_FLAGS
 #include "thread_flags.h"
 #endif
 #include "thread.h"
@@ -57,7 +57,7 @@ int main(void)
            sizeof(list_node_t));
     printf("sizeof(mbox_t):                 %3" PRIuSIZE "\n",
            sizeof(mbox_t));
-#ifdef MODULE_CORE_MSG
+#if MODULE_CORE_MSG
     printf("sizeof(msg_t):                  %3" PRIuSIZE "\n",
            sizeof(msg_t));
 #else
@@ -73,7 +73,7 @@ int main(void)
            sizeof(ringbuffer_t));
     printf("sizeof(rmutex_t):               %3" PRIuSIZE "\n",
            sizeof(rmutex_t));
-#ifdef MODULE_CORE_THREAD_FLAGS
+#if MODULE_CORE_THREAD_FLAGS
     printf("sizeof(thread_flags_t):         %3" PRIuSIZE "\n",
            sizeof(thread_flags_t));
 #else
@@ -86,19 +86,19 @@ int main(void)
     P(status);
     P(priority);
     P(pid);
-#ifdef MODULE_CORE_THREAD_FLAGS
+#if MODULE_CORE_THREAD_FLAGS
     P(flags);
 #endif
     P(rq_entry);
-#if defined(MODULE_CORE_MSG) || defined(MODULE_CORE_THREAD_FLAGS) || defined(MODULE_CORE_MBOX)
+#if MODULE_CORE_MSG || MODULE_CORE_THREAD_FLAGS || MODULE_CORE_MBOX
     P(wait_data);
 #endif
-#ifdef MODULE_CORE_MSG
+#if MODULE_CORE_MSG
     P(msg_waiters);
     P(msg_queue);
     P(msg_array);
 #endif
-#if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) || defined(MODULE_MPU_STACK_GUARD)
+#if defined(DEVELHELP) || IS_ACTIVE(SCHED_TEST_STACK) || MODULE_MPU_STACK_GUARD
     P(stack_start);
 #endif
 #ifdef DEVELHELP

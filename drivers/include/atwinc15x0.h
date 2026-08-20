@@ -82,7 +82,7 @@ typedef struct atwinc15x0 {
     atwinc15x0_params_t params; /**< Device initialization parameters */
     atwinc15x0_state_t state;   /**< Device state */
     char ap[ETHERNET_ADDR_LEN]; /**< BSSID of current AP */
-#if IS_USED(MODULE_ATWINC15X0_DYNAMIC_CONNECT) || defined(DOXYGEN)
+#if MODULE_ATWINC15X0_DYNAMIC_CONNECT || defined(DOXYGEN)
     char ssid[WIFI_SSID_LEN_MAX + 1]; /**< SSID of current AP */
 #endif
     uint8_t channel;            /**< Channel used for current AP */

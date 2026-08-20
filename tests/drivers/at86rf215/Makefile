@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  at86rf215_24ghz \
+  at86rf215_subghz \
+  #
 INCLUDES += -I$(APPDIR)
 BOARD ?= openmote-b
 

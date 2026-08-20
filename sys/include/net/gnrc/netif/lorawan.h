@@ -35,7 +35,7 @@ typedef struct {
     uint8_t appskey[LORAMAC_APPSKEY_LEN];           /**< App SKey buffer */
     uint8_t fnwksintkey[LORAMAC_FNWKSINTKEY_LEN];   /**< Forwarding Network session integrity key buffer */
     uint8_t nwkkey[LORAMAC_NWKKEY_LEN];             /**< Network key buffer. Mapped to AppKey if LoRaWAN 1.0x */
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     uint8_t appkey[LORAMAC_APPKEY_LEN];             /**< App Key buffer. The AppKey used in LoRaWAN 1.0x has been mapped to the nwkkey in LoRaWAN 1.1x */
     uint8_t snwksintkey[LORAMAC_SNWKSINTKEY_LEN];   /**< Serving Network session integrity key buffer */
     uint8_t nwksenckey[LORAMAC_NWKSENCKEY_LEN];     /**< Network session encryption key buffer */
@@ -59,7 +59,7 @@ typedef struct {
 /**
  * @brief Set the app key in the interface descriptor
  *
- *  This getter function exists to allow if (IS_USED(...)) constructs in the
+ *  This getter function exists to allow if (IS_ACTIVE(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
  * @param[in,out]   lw_netif  pointer to the interface descriptor
@@ -77,7 +77,7 @@ static inline int gnrc_netif_lorawan_set_appkey(gnrc_netif_lorawan_t *lw_netif,
     (void)key;
     (void)len;
 
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     if (sizeof(lw_netif->appkey) < len) {
         return -1;
     }
@@ -89,7 +89,7 @@ static inline int gnrc_netif_lorawan_set_appkey(gnrc_netif_lorawan_t *lw_netif,
 /**
  * @brief Get the app key from the interface descriptor
  *
- *  This getter function exists to allow if (IS_USED(...)) constructs in the
+ *  This getter function exists to allow if (IS_ACTIVE(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
  * @param[in] lw_netif       pointer to the interface descriptor
@@ -99,7 +99,7 @@ static inline uint8_t * gnrc_netif_lorawan_get_appkey(gnrc_netif_lorawan_t *lw_n
 {
     (void)lw_netif;
 
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     return lw_netif->appkey;
 #endif
     return NULL; /* NO-OP */
@@ -108,7 +108,7 @@ static inline uint8_t * gnrc_netif_lorawan_get_appkey(gnrc_netif_lorawan_t *lw_n
 /**
  * @brief Set the serving network session integrity key in the interface descriptor
  *
- *  This getter function exists to allow if (IS_USED(...)) constructs in the
+ *  This getter function exists to allow if (IS_ACTIVE(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
  * @param[in,out]   lw_netif  pointer to the interface descriptor
@@ -125,7 +125,7 @@ static inline int gnrc_netif_lorawan_set_snwksintkey(gnrc_netif_lorawan_t *lw_ne
     (void)key;
     (void)len;
 
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     if (sizeof(lw_netif->snwksintkey) < len) {
         return -1;
     }
@@ -137,7 +137,7 @@ static inline int gnrc_netif_lorawan_set_snwksintkey(gnrc_netif_lorawan_t *lw_ne
 /**
  * @brief Set the network session encryption key in the interface descriptor
  *
- *  This getter function exists to allow if (IS_USED(...)) constructs in the
+ *  This getter function exists to allow if (IS_ACTIVE(...)) constructs in the
  *  LoRaWAN code in order to increase code coverage.
  *
  * @param[in,out]   lw_netif  pointer to the interface descriptor
@@ -154,7 +154,7 @@ static inline int gnrc_netif_lorawan_set_nwksenckey(gnrc_netif_lorawan_t *lw_net
     (void)key;
     (void)len;
 
-#if IS_USED(MODULE_GNRC_LORAWAN_1_1)
+#if MODULE_GNRC_LORAWAN_1_1
     if (sizeof(lw_netif->nwksenckey) < len) {
         return -1;
     }

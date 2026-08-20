@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "thread.h"
-#ifdef MODULE_PUF_SRAM
+#if MODULE_PUF_SRAM
 #include "puf_sram.h"
 #endif
 
@@ -130,7 +130,7 @@ void bootloader(void)
     /* initialize bss and data */
     _init_data();
 
-#ifdef MODULE_PUF_SRAM
+#if MODULE_PUF_SRAM
     /* use uninitialized heap */
     extern unsigned _sheap;
     puf_sram_init((uint8_t *) &_sheap, SEED_RAM_LEN);
@@ -139,7 +139,7 @@ void bootloader(void)
     /* cpu specific setup of clocks, peripherals */
     cpu_init();
 
-#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
+#if MODULE_NEWLIB || MODULE_PICOLIBC
     extern void __libc_init_array(void);
     __libc_init_array();
 #endif

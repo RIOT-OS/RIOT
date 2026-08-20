@@ -27,7 +27,7 @@
 #ifdef SOCK_HAS_IPV6
 #  include "net/sock.h"
 #else
-#  ifdef MODULE_GNRC_IPV6
+#  if MODULE_GNRC_IPV6
 #    include "net/gnrc/ipv6.h"
 #  endif
 #endif
@@ -58,7 +58,7 @@ typedef struct _sock_tl_ep gnrc_tcp_ep_t;
 typedef struct {
     int family;                            /**< IP address family. */
     union {
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
         uint8_t ipv6[sizeof(ipv6_addr_t)]; /**< IPv6 address storage */
 #endif
         uint8_t dummy;                     /**< Enable build without network module */

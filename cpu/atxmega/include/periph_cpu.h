@@ -216,7 +216,7 @@ typedef struct {
     pwr_reduction_t pwr;            /**< Power Management */
     gpio_t rx_pin;                  /**< pin used for RX */
     gpio_t tx_pin;                  /**< pin used for TX */
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
     gpio_t rts_pin;                 /**< RTS pin */
     gpio_t cts_pin;                 /**< CTS pin */
 #endif

@@ -1,1 +1,6 @@
 INCLUDES += -I$(RIOTBASE)/sys/net/application_layer/unicoap/include
+
+MODULE_DEFS_NEEDED += \
+  unicoap_driver_dtls \
+  unicoap_server \
+  #

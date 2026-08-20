@@ -29,7 +29,7 @@ extern "C" {
  * that either maps to the system-provided DTLS session struct or to nothing. */
 
 #ifndef DOXYGEN
-#  if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#  if MODULE_UNICOAP_DRIVER_DTLS
 typedef sock_dtls_session_t unicoap_sock_dtls_session_t;
 #  else
 typedef void unicoap_sock_dtls_session_t;
@@ -54,7 +54,7 @@ typedef struct {
     const unicoap_endpoint_t* local;
 
     union {
-#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS) || defined(DOXYGEN)
+#if MODULE_UNICOAP_DRIVER_DTLS || defined(DOXYGEN)
         /**
          * @brief DTLS session
          *
@@ -98,7 +98,7 @@ static inline unicoap_proto_t unicoap_packet_proto(const unicoap_packet_t* packe
  */
 static inline const void* _packet_get_dtls_session(unicoap_packet_t* packet)
 {
-#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if MODULE_UNICOAP_DRIVER_DTLS
     return unicoap_packet_proto(packet) == UNICOAP_PROTO_DTLS ? packet->dtls_session : NULL;
 #else
     (void)packet;
@@ -115,7 +115,7 @@ static inline const void* _packet_get_dtls_session(unicoap_packet_t* packet)
 static inline void _packet_set_dtls_session(unicoap_packet_t* packet,
                                             const unicoap_sock_dtls_session_t* dtls_session)
 {
-#if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+#if MODULE_UNICOAP_DRIVER_DTLS
     packet->dtls_session = dtls_session;
 #else
     (void)packet;

@@ -204,7 +204,7 @@ static int _nvram_write(struct nvram *nvram, const uint8_t *src, uint32_t dst,
     return (res == 0) ? (int)size : -1;
 }
 
-#ifdef MODULE_WALLTIME_IMPL_DS1307
+#if MODULE_WALLTIME_IMPL_DS1307
 #include "ds1307_params.h"
 
 static ds1307_t walltime_dev;

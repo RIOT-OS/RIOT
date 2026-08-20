@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  shell_lock \
+  #
 # name of your application
 APPLICATION = telnet_server
 

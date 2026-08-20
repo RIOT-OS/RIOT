@@ -62,7 +62,7 @@
 #include "iolist.h"
 #include "macros/utils.h"
 #include "mtd.h"
-#ifdef MODULE_NANOCOAP_FS
+#if MODULE_NANOCOAP_FS
 #  include "net/sock/config.h"
 #endif
 #include "xfa.h"
@@ -88,7 +88,7 @@ extern "C" {
  * @brief   VFS parameters for FAT
  * @{
  */
-#ifdef MODULE_FATFS_VFS
+#if MODULE_FATFS_VFS
 #  include "ffconf.h"
 
 #  if FF_FS_TINY
@@ -144,7 +144,7 @@ extern "C" {
  * @brief   VFS parameters for littlefs
  * @{
  */
-#ifdef MODULE_LITTLEFS
+#if MODULE_LITTLEFS
 #  if (__SIZEOF_POINTER__ == 8)
 #    define LITTLEFS_VFS_DIR_BUFFER_SIZE   (48)
 #    define LITTLEFS_VFS_FILE_BUFFER_SIZE  (72)
@@ -162,7 +162,7 @@ extern "C" {
  * @brief   VFS parameters for littlefs2
  * @{
  */
-#ifdef MODULE_LITTLEFS2
+#if MODULE_LITTLEFS2
 #  if (__SIZEOF_POINTER__ == 8)
 #    define LITTLEFS2_VFS_DIR_BUFFER_SIZE  (56)
 #    define LITTLEFS2_VFS_FILE_BUFFER_SIZE (104)
@@ -180,7 +180,7 @@ extern "C" {
  * @brief   VFS parameters for spiffs
  * @{
  */
-#ifdef MODULE_SPIFFS
+#if MODULE_SPIFFS
 #  define SPIFFS_VFS_DIR_BUFFER_SIZE       (12)
 #  define SPIFFS_VFS_FILE_BUFFER_SIZE      (1)
 #else
@@ -193,7 +193,7 @@ extern "C" {
  * @brief   VFS parameters for lwext4
  * @{
  */
-#if defined(MODULE_LWEXT4) || DOXYGEN
+#if MODULE_LWEXT4 || DOXYGEN
 #  define LWEXT4_VFS_DIR_BUFFER_SIZE       (308)   /**< sizeof(ext4_dir)  */
 #  define LWEXT4_VFS_FILE_BUFFER_SIZE      (32)    /**< sizeof(ext4_file) */
 #else
@@ -206,7 +206,7 @@ extern "C" {
  * @brief   VFS parameters for nanoCoAP FS
  * @{
  */
-#if defined(MODULE_NANOCOAP_FS) || DOXYGEN
+#if MODULE_NANOCOAP_FS || DOXYGEN
 #  define NANOCOAP_FS_VFS_DIR_BUFFER_SIZE  \
           (4 + CONFIG_SOCK_URLPATH_MAXLEN) /**< sizeof(nanocoap_fs_dir_t) */
 #  define NANOCOAP_FS_VFS_FILE_BUFFER_SIZE \
@@ -221,7 +221,7 @@ extern "C" {
  * @brief   VFS parameters for xipfs
  * @{
  */
-#if defined(MODULE_XIPFS) || DOXYGEN
+#if MODULE_XIPFS || DOXYGEN
 #  define XIPFS_VFS_DIR_BUFFER_SIZE     (68) /**< sizeof(xipfs_dir_desc_t) */
 #  define XIPFS_VFS_FILE_BUFFER_SIZE    (12) /**< sizeof(xipfs_file_desc_t) */
 #else

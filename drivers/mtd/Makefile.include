@@ -1,0 +1,48 @@
+MODULE_DEFS_NEEDED += \
+  mtd_write_page \
+  vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  mtd_write_page \
+  vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  mtd_write_page \
+  vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  mtd_write_page \
+  vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  mtd_write_page \
+  vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  mtd_write_page \
+  vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  mtd_write_page \
+  vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  mtd_write_page \
+  vfs \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  mtd_write_page \
+  vfs \
+  #

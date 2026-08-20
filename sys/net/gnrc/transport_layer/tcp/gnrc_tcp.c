@@ -136,7 +136,7 @@ int gnrc_tcp_ep_init(gnrc_tcp_ep_t *ep, int family, const uint8_t *addr, size_t 
                      uint16_t port, uint16_t netif)
 {
     TCP_DEBUG_ENTER;
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     if (family != AF_INET6) {
         TCP_DEBUG_ERROR("-EAFNOSUPPORT: Parameter family is not AF_INET6.");
         TCP_DEBUG_LEAVE;
@@ -248,7 +248,7 @@ int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
         addr_end = if_begin - 1;
     }
 
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     /* 5) Try to parse IP Address. Construct Endpoint on after success. */
     char tmp[IPV6_ADDR_MAX_STR_LEN];
 
@@ -310,7 +310,7 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb)
     assert(tcb != NULL);
 
     memset(tcb, 0, sizeof(gnrc_tcp_tcb_t));
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     tcb->address_family = AF_INET6;
 #else
     TCP_DEBUG_ERROR("Missing network layer. Add module to makefile.");
@@ -343,7 +343,7 @@ int gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote, uint16_t loc
     assert(remote->port != PORT_UNSPEC);
 
     /* Verify remote ep */
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     if (remote->family != AF_INET6) {
         TCP_DEBUG_ERROR("-EAFNOSUPPORT: remote AF-Family not supported.");
         TCP_DEBUG_LEAVE;
@@ -382,7 +382,7 @@ int gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote, uint16_t loc
     _gnrc_tcp_fsm_set_mbox(tcb, &mbox);
 
     /* Parse target address and port number into TCB */
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     if (tcb->address_family == AF_INET6) {
 
         /* Store Address information in TCB */
@@ -476,7 +476,7 @@ int gnrc_tcp_listen(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_tcb_t *tcbs, size_t tc
     assert(local->port != PORT_UNSPEC);
 
     /* Verify given endpoint */
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     if (local->family != AF_INET6) {
         TCP_DEBUG_ERROR("-EAFNOSUPPORT: AF-Family not supported.");
         TCP_DEBUG_LEAVE;
@@ -513,7 +513,7 @@ int gnrc_tcp_listen(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_tcb_t *tcbs, size_t tc
         /* Setup TCB for incoming connections attempts */
         if (!ret)
         {
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
             if (tcb->address_family == AF_INET6) {
                 memcpy(tcb->local_addr, local->addr.ipv6, sizeof(tcb->local_addr));
 
@@ -999,7 +999,7 @@ int gnrc_tcp_get_local(gnrc_tcp_tcb_t *tcb, gnrc_tcp_ep_t *ep)
         ep->family = tcb->address_family;
         ep->port = tcb->local_port;
         ep->netif = tcb->ll_iface;
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
         if (ep->family == AF_INET6) {
             memcpy(ep->addr.ipv6, tcb->local_addr, sizeof(ep->addr.ipv6));
         }
@@ -1032,7 +1032,7 @@ int gnrc_tcp_get_remote(gnrc_tcp_tcb_t *tcb, gnrc_tcp_ep_t *ep)
         ep->family = tcb->address_family;
         ep->port = tcb->peer_port;
         ep->netif = 0;
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
         if (ep->family == AF_INET6) {
             memcpy(ep->addr.ipv6, tcb->peer_addr, sizeof(ep->addr.ipv6));
         }
@@ -1068,7 +1068,7 @@ int gnrc_tcp_queue_get_local(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_ep_t *ep)
         ep->family = tcb->address_family;
         ep->port = tcb->local_port;
         ep->netif = 0;
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
         if (ep->family == AF_INET6) {
             if (tcb->status & STATUS_ALLOW_ANY_ADDR) {
                 ipv6_addr_set_unspecified((ipv6_addr_t *) ep->addr.ipv6);

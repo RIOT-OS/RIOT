@@ -43,7 +43,7 @@ gnrc_pktsnip_t *gnrc_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
 
     if (data != NULL) {
         memcpy(echo + 1, data, data_len);
-#if defined(MODULE_OD) && ENABLE_DEBUG
+#if MODULE_OD && ENABLE_DEBUG
         DEBUG(", payload:\n");
         od_hex_dump(data, data_len, OD_WIDTH_DEFAULT);
 #endif
@@ -217,7 +217,7 @@ int gnrc_icmpv6_echo_rsp_handle(gnrc_pktsnip_t *pkt, size_t len,
         return -EINVAL;
     }
     ipv6_hdr = ipv6->data;
-#ifdef MODULE_GNRC_IPV6_NIB
+#if MODULE_GNRC_IPV6_NIB
     /* successful ping to neighbor (NIB handles case if ipv6->src is not a
      * neighbor) can be taken as upper-layer hint for reachability:
      * https://tools.ietf.org/html/rfc4861#section-7.3.1 */

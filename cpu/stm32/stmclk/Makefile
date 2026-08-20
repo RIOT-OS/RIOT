@@ -1,5 +1,15 @@
 MODULE = stm32_clk
 
+MODULE_DEFS_NEEDED += \
+  periph_hwrng \
+  periph_ltdc \
+  periph_rtt \
+  periph_sdmmc_clk \
+  periph_usbdev_clk \
+  sdmmc_clk \
+  sx126x_stm32wl \
+  #
+
 ifneq (mp1,$(CPU_FAM))
   SRC = stmclk_common.c
 endif

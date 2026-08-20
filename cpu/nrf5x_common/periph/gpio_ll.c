@@ -33,7 +33,7 @@
 #include "periph_cpu.h"
 #include "periph_conf.h"
 
-#ifdef MODULE_FMT
+#if MODULE_FMT
 #  include "fmt.h"
 #else
 #  include <stdio.h>

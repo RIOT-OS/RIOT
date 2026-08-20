@@ -108,7 +108,7 @@ extern "C" {
  *
  * PWM_DEV(1) is only used if SPI peripheral is not enabled.
  */
-#if !defined(PWM1_GPIOS) && !defined(MODULE_PERIPH_SPI)
+#if !defined(PWM1_GPIOS) && !MODULE_PERIPH_SPI
 #  define PWM1_GPIOS  { GPIO10, GPIO7 }
 #endif
 

@@ -21,7 +21,7 @@
 
 static inline unsigned _get_idx(netdev_t *netdev)
 {
-#ifdef MODULE_NETDEV_REGISTER
+#if MODULE_NETDEV_REGISTER
     return netdev->index;
 #else
     (void)netdev;
@@ -33,7 +33,7 @@ void netdev_eui48_get(netdev_t *netdev, eui48_t *addr)
 {
     unsigned i = EUI48_PROVIDER_NUMOF;
     while (i--) {
-#ifdef MODULE_NETDEV_REGISTER
+#if MODULE_NETDEV_REGISTER
         /* using NETDEV_ANY causes conflicts if there is another interface
          * of a different type. Require EUI  providers to be locked to an
          * interface type for uniqueness.
@@ -61,7 +61,7 @@ void netdev_eui64_get(netdev_t *netdev, eui64_t *addr)
 {
     unsigned i = EUI64_PROVIDER_NUMOF;
     while (i--) {
-#ifdef MODULE_NETDEV_REGISTER
+#if MODULE_NETDEV_REGISTER
         /* using NETDEV_ANY causes conflicts if there is another interface
          * of a different type. Require EUI  providers to be locked to an
          * interface type for uniqueness.

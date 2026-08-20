@@ -319,7 +319,7 @@ int at24cxxx_disable_write_protect(const at24cxxx_t *dev)
     return AT24CXXX_OK;
 }
 
-#ifdef MODULE_MTD_AT24CXXX
+#if MODULE_MTD_AT24CXXX
 #include "mtd_at24cxxx.h"
 
 #define DEV(mtd_ptr)        (((mtd_at24cxxx_t *)(mtd_ptr))->at24cxxx_eeprom)

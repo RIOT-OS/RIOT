@@ -145,7 +145,7 @@ int _read_measurements(sgp30_t *dev, sgp30_data_t *data)
     return 0;
 }
 
-#ifdef MODULE_SGP30_STRICT
+#if MODULE_SGP30_STRICT
 static void _read_cb(void *arg)
 {
     sgp30_t *dev = (sgp30_t *)arg;
@@ -164,7 +164,7 @@ int sgp30_start_air_quality(sgp30_t *dev)
     int ret = _rx_tx_data(dev, SGP30_CMD_INIT_AIR_QUALITY, NULL, 0,
                           SGP30_DELAY_INIT_AIR_QUALITY, false);
 
-#ifdef MODULE_SGP30_STRICT
+#if MODULE_SGP30_STRICT
     if (ret == 0) {
         ztimer_set(ZTIMER_USEC, &dev->_timer, SGP30_AIR_QUALITY_INIT_DELAY_US);
     }
@@ -176,7 +176,7 @@ int sgp30_init(sgp30_t *dev, const sgp30_params_t *params)
 {
     assert(dev && params);
     dev->params = *params;
-#ifdef MODULE_SGP30_STRICT
+#if MODULE_SGP30_STRICT
     dev->ready = false;
     dev->_timer.callback = _read_cb;
     dev->_timer.arg = dev;
@@ -221,7 +221,7 @@ int sgp30_reset(sgp30_t *dev)
 {
     assert(dev);
     int ret = _rx_tx_data(dev, SGP30_CMD_SOFT_RESET, NULL, 0, SGP30_DELAY_SOFT_RESET, false);
-#ifdef MODULE_SGP30_STRICT
+#if MODULE_SGP30_STRICT
     if (ret == 0) {
         ztimer_remove(ZTIMER_USEC, &dev->_timer);
         dev->ready = false;
@@ -314,7 +314,7 @@ int sgp30_get_baseline(sgp30_t *dev, sgp30_data_t *data)
 
 int sgp30_read_measurements(sgp30_t *dev, sgp30_data_t *data)
 {
-#ifdef MODULE_SGP30_STRICT
+#if MODULE_SGP30_STRICT
     if (dev->ready) {
         unsigned state = irq_disable();
         memcpy(data, &dev->_data, sizeof(sgp30_data_t));
@@ -346,7 +346,7 @@ int sgp30_read_raw_measurements(sgp30_t *dev, sgp30_raw_data_t *data)
     return 0;
 }
 
-#ifdef MODULE_SGP30_STRICT
+#if MODULE_SGP30_STRICT
 bool sgp30_ready(sgp30_t *dev)
 {
     return dev->ready;

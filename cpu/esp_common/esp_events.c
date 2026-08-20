@@ -17,7 +17,7 @@
 
 #include "kernel_defines.h"
 
-#if IS_USED(MODULE_ESP_WIFI_ANY) || IS_USED(MODULE_ESP_ETH)
+#if MODULE_ESP_WIFI_ANY || MODULE_ESP_ETH
 
 #include <string.h>
 
@@ -109,7 +109,7 @@ static void esp_system_event_handler(void* arg,
 {
     system_event_t sys_event = { .event_id = SYSTEM_EVENT_MAX };
 
-#if IS_USED(MODULE_ESP_WIFI_ANY)
+#if MODULE_ESP_WIFI_ANY
     if (event_base == WIFI_EVENT) {
         switch (event_id) {
         case WIFI_EVENT_WIFI_READY:
@@ -204,7 +204,7 @@ static void esp_system_event_handler(void* arg,
     }
 #endif
 
-#if IS_USED(MODULE_ESP_ETH)
+#if MODULE_ESP_ETH
     if (event_base == ETH_EVENT) {
         switch (event_id) {
         case ETHERNET_EVENT_START:
@@ -234,23 +234,23 @@ static void esp_system_event_handler(void* arg,
     }
 }
 #endif /* CPU_ESP8266 */
-#endif /* IS_USED(MODULE_ESP_WIFI_ANY) || IS_USED(MODULE_ESP_ETH) */
+#endif /* MODULE_ESP_WIFI_ANY || MODULE_ESP_ETH */
 
 void esp_event_handler_init(void)
 {
-#if IS_USED(MODULE_ESP_WIFI_ANY) || IS_USED(MODULE_ESP_ETH)
+#if MODULE_ESP_WIFI_ANY || MODULE_ESP_ETH
 #ifdef CPU_ESP8266
     esp_event_loop_init(esp_system_event_handler, NULL);
 #else
     /* newer ESP-IDF versions use another event loop API that have to be used */
     esp_event_loop_create_default();
-    if (IS_USED(MODULE_ESP_WIFI_ANY)) {
+    if (MODULE_ESP_WIFI_ANY) {
         esp_event_handler_instance_register(WIFI_EVENT,
                                             ESP_EVENT_ANY_ID,
                                             esp_system_event_handler,
                                             NULL, NULL);
     }
-    if (IS_USED(MODULE_ESP_ETH)) {
+    if (MODULE_ESP_ETH) {
         esp_event_handler_instance_register(ETH_EVENT,
                                             ESP_EVENT_ANY_ID,
                                             esp_system_event_handler,

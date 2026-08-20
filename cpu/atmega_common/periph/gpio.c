@@ -41,31 +41,31 @@
 #define ENABLE_DEBUG            0
 #include "debug.h"
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 
 static gpio_isr_ctx_t config[GPIO_EXT_INT_NUMOF];
 
 /* Detects amount of possible PCINTs */
-#if defined(MODULE_ATMEGA_PCINT0) || defined(MODULE_ATMEGA_PCINT1) || \
-    defined(MODULE_ATMEGA_PCINT2) || defined(MODULE_ATMEGA_PCINT3)
+#if MODULE_ATMEGA_PCINT0 || MODULE_ATMEGA_PCINT1 || \
+    MODULE_ATMEGA_PCINT2 || MODULE_ATMEGA_PCINT3
 #include "atmega_pcint.h"
 
 #define ENABLE_PCINT
 
 /* Check which pcints should be enabled */
-#if defined(MODULE_ATMEGA_PCINT0) && !defined(ATMEGA_PCINT_MAP_PCINT0)
+#if MODULE_ATMEGA_PCINT0 && !defined(ATMEGA_PCINT_MAP_PCINT0)
 #  error "Either mapping for pin change interrupt bank 0 is missing or not supported by the MCU"
 #endif
 
-#if defined(MODULE_ATMEGA_PCINT1) && !defined(ATMEGA_PCINT_MAP_PCINT1)
+#if MODULE_ATMEGA_PCINT1 && !defined(ATMEGA_PCINT_MAP_PCINT1)
 #  error "Either mapping for pin change interrupt bank 1 is missing or not supported by the MCU"
 #endif
 
-#if defined(MODULE_ATMEGA_PCINT2) && !defined(ATMEGA_PCINT_MAP_PCINT2)
+#if MODULE_ATMEGA_PCINT2 && !defined(ATMEGA_PCINT_MAP_PCINT2)
 #  error "Either mapping for pin change interrupt bank 2 is missing or not supported by the MCU"
 #endif
 
-#if defined(MODULE_ATMEGA_PCINT3) && !defined(ATMEGA_PCINT_MAP_PCINT3)
+#if MODULE_ATMEGA_PCINT3 && !defined(ATMEGA_PCINT_MAP_PCINT3)
 #  error "Either mapping for pin change interrupt bank 3 is missing or not supported by the MCU"
 #endif
 
@@ -73,16 +73,16 @@ static gpio_isr_ctx_t config[GPIO_EXT_INT_NUMOF];
  * @brief   Use anonymous enum as for addressing the @ref pcint_state
  */
 enum {
-#ifdef MODULE_ATMEGA_PCINT0
+#if MODULE_ATMEGA_PCINT0
     PCINT0_IDX,     /**< Index of PCINT0, if used */
 #endif /* MODULE_ATMEGA_PCINT0 */
-#ifdef MODULE_ATMEGA_PCINT1
+#if MODULE_ATMEGA_PCINT1
     PCINT1_IDX,     /**< Index of PCINT1, if used */
 #endif /* MODULE_ATMEGA_PCINT1 */
-#ifdef MODULE_ATMEGA_PCINT2
+#if MODULE_ATMEGA_PCINT2
     PCINT2_IDX,     /**< Index of PCINT2, if used */
 #endif /* MODULE_ATMEGA_PCINT2 */
-#ifdef MODULE_ATMEGA_PCINT3
+#if MODULE_ATMEGA_PCINT3
     PCINT3_IDX,     /**< Index of PCINT3, if used */
 #endif /* MODULE_ATMEGA_PCINT3 */
     PCINT_NUM_BANKS     /**< Number of PCINT banks used */
@@ -106,16 +106,16 @@ typedef struct {
  * @brief
  */
 static const gpio_t pcint_mapping[] = {
-#ifdef MODULE_ATMEGA_PCINT0
+#if MODULE_ATMEGA_PCINT0
     ATMEGA_PCINT_MAP_PCINT0,
 #endif /* PCINT0_IDX */
-#ifdef MODULE_ATMEGA_PCINT1
+#if MODULE_ATMEGA_PCINT1
     ATMEGA_PCINT_MAP_PCINT1,
 #endif /* PCINT1_IDX */
-#ifdef MODULE_ATMEGA_PCINT2
+#if MODULE_ATMEGA_PCINT2
     ATMEGA_PCINT_MAP_PCINT2,
 #endif /* PCINT2_IDX */
-#ifdef MODULE_ATMEGA_PCINT3
+#if MODULE_ATMEGA_PCINT3
     ATMEGA_PCINT_MAP_PCINT3,
 #endif /* PCINT3_IDX */
 };
@@ -185,7 +185,7 @@ void gpio_write(gpio_t pin, bool value)
     }
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 static inline int8_t _int_num(gpio_t pin)
 {
     uint8_t num;
@@ -236,25 +236,25 @@ static inline int pcint_init_int(gpio_t pin, gpio_mode_t mode,
     /* configure pcint */
     cli();
     switch (bank) {
-#ifdef MODULE_ATMEGA_PCINT0
+#if MODULE_ATMEGA_PCINT0
         case PCINT0_IDX:
             PCMSK0 |= (1 << bank_idx);
             PCICR |= (1 << PCIE0);
             break;
 #endif /* MODULE_ATMEGA_PCINT0 */
-#ifdef MODULE_ATMEGA_PCINT1
+#if MODULE_ATMEGA_PCINT1
         case PCINT1_IDX:
             PCMSK1 |= (1 << bank_idx);
             PCICR |= (1 << PCIE1);
             break;
 #endif /* MODULE_ATMEGA_PCINT1 */
-#ifdef MODULE_ATMEGA_PCINT2
+#if MODULE_ATMEGA_PCINT2
         case PCINT2_IDX:
             PCMSK2 |= (1 << bank_idx);
             PCICR |= (1 << PCIE2);
             break;
 #endif /* MODULE_ATMEGA_PCINT2 */
-#ifdef MODULE_ATMEGA_PCINT3
+#if MODULE_ATMEGA_PCINT3
         case PCINT3_IDX:
             PCMSK3 |= (1 << bank_idx);
             PCICR |= (1 << PCIE3);
@@ -404,19 +404,19 @@ static inline void pcint_handler(uint8_t bank, uint8_t enabled_pcints)
         idx++;
     }
 }
-#ifdef MODULE_ATMEGA_PCINT0
+#if MODULE_ATMEGA_PCINT0
 AVR8_ISR(PCINT0_vect, pcint_handler, PCINT0_IDX, PCMSK0);
 #endif /* MODULE_ATMEGA_PCINT0 */
 
-#ifdef MODULE_ATMEGA_PCINT1
+#if MODULE_ATMEGA_PCINT1
 AVR8_ISR(PCINT1_vect, pcint_handler, PCINT1_IDX, PCMSK1);
 #endif  /* MODULE_ATMEGA_PCINT1 */
 
-#ifdef MODULE_ATMEGA_PCINT2
+#if MODULE_ATMEGA_PCINT2
 AVR8_ISR(PCINT2_vect, pcint_handler, PCINT2_IDX, PCMSK2);
 #endif  /* MODULE_ATMEGA_PCINT2 */
 
-#ifdef MODULE_ATMEGA_PCINT3
+#if MODULE_ATMEGA_PCINT3
 AVR8_ISR(PCINT3_vect, pcint_handler, PCINT3_IDX, PCMSK3);
 #endif  /* MODULE_ATMEGA_PCINT3 */
 

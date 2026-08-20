@@ -25,7 +25,7 @@ extern "C" {
 #include "can/isotp.h"
 #include "mbox.h"
 
-#if defined(MODULE_CONN_CAN_ISOTP_MULTI) || defined(DOXYGEN)
+#if MODULE_CONN_CAN_ISOTP_MULTI || defined(DOXYGEN)
 #include "mutex.h"
 
 #ifndef CONN_CAN_ISOTP_MBOX_SIZE
@@ -181,7 +181,7 @@ int conn_can_isotp_recv(conn_can_isotp_t *conn, void *buf, size_t size, uint32_t
 ACCESS(read_only, 2, 3)
 int conn_can_isotp_send(conn_can_isotp_t *conn, const void *buf, size_t size, int flags);
 
-#if defined(MODULE_CONN_CAN_ISOTP_MULTI) || defined(DOXYGEN)
+#if MODULE_CONN_CAN_ISOTP_MULTI || defined(DOXYGEN)
 /**
  * @brief Wait for reception from multiple connections
  *

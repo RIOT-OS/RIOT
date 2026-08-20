@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 #include "event.h"
-#if IS_USED(MODULE_UWB_CORE_EVENT_THREAD)
+#if MODULE_UWB_CORE_EVENT_THREAD
 #include "event/thread.h"
 #endif
 

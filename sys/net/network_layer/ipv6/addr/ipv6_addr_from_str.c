@@ -44,7 +44,7 @@ ipv6_addr_t *ipv6_addr_from_buf(ipv6_addr_t *result, const char *addr,
 {
     uint8_t *colonp = 0;
     const char *start = addr;
-#ifdef MODULE_IPV4_ADDR
+#if MODULE_IPV4_ADDR
     const char *curtok = addr;
 #endif
     uint32_t val = 0;
@@ -87,7 +87,7 @@ ipv6_addr_t *ipv6_addr_from_buf(ipv6_addr_t *result, const char *addr,
         }
 
         if (ch == ':') {
-#ifdef MODULE_IPV4_ADDR
+#if MODULE_IPV4_ADDR
             curtok = addr;
 #endif
 
@@ -111,7 +111,7 @@ ipv6_addr_t *ipv6_addr_from_buf(ipv6_addr_t *result, const char *addr,
             continue;
         }
 
-#ifdef MODULE_IPV4_ADDR
+#if MODULE_IPV4_ADDR
         if (ch == '.' && ((i + sizeof(ipv4_addr_t)) <= sizeof(ipv6_addr_t)) &&
             ipv4_addr_from_buf((ipv4_addr_t *)(&(result->u8[i])),
                                curtok, addr_len - (curtok - start)) != NULL) {

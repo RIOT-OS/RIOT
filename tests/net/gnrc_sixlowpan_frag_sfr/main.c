@@ -33,7 +33,7 @@
 #include "net/gnrc/sixlowpan/frag/sfr.h"
 #include "net/gnrc/sixlowpan/iphc.h"
 #include "net/netdev_test.h"
-#ifdef MODULE_OD
+#if MODULE_OD
 /* for debugging _target_buf */
 #include "od.h"
 #endif
@@ -2853,7 +2853,7 @@ static size_t _wait_for_packet(size_t exp_size)
     while ((mhr_len = ieee802154_get_frame_hdr_len(_target_buf))) {
         now = xtimer_now_usec();
         size_t size = _target_buf_len - mhr_len;
-#ifdef MODULE_OD
+#if MODULE_OD
         if (_target_buf_len > 0) {
             puts("Sent packet: ");
             od_hex_dump(_target_buf, _target_buf_len, OD_WIDTH_DEFAULT);

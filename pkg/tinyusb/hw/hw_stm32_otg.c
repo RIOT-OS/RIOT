@@ -45,7 +45,7 @@ static int tinyusb_hw_init_dev(const dwc2_usb_otg_fshs_config_t *conf)
     /* Enable the clock to the peripheral */
     periph_clk_en(conf->ahb, conf->rcc_mask);
 
-#ifndef MODULE_PERIPH_USBDEV_HS_ULPI
+#if !MODULE_PERIPH_USBDEV_HS_ULPI
     /* Enables clock on the GPIO bus */
     gpio_init(conf->dp, GPIO_IN);
     gpio_init(conf->dm, GPIO_IN);
@@ -76,7 +76,7 @@ static int tinyusb_hw_init_dev(const dwc2_usb_otg_fshs_config_t *conf)
             /* select on-chip builtin PHY */
             global_regs->GUSBCFG |= USB_OTG_GUSBCFG_PHYSEL;
         }
-#ifdef MODULE_PERIPH_USBDEV_HS_ULPI
+#if MODULE_PERIPH_USBDEV_HS_ULPI
         else if (conf->phy == DWC2_USB_OTG_PHY_ULPI) {
             /* initialize ULPI interface */
             gpio_init(conf->ulpi_clk, GPIO_IN);
@@ -130,7 +130,7 @@ static int tinyusb_hw_init_dev(const dwc2_usb_otg_fshs_config_t *conf)
             global_regs->GUSBCFG &= ~USB_OTG_GUSBCFG_ULPIFSLS;
         }
 
-#elif defined(MODULE_PERIPH_USBDEV_HS_UTMI)
+#elif MODULE_PERIPH_USBDEV_HS_UTMI
         else if (conf->phy == DWC2_USB_OTG_PHY_UTMI) {
             /* enable ULPI clock */
             periph_clk_en(conf->ahb, RCC_AHB1ENR_OTGHSULPIEN);
@@ -231,12 +231,12 @@ int tinyusb_hw_init(void)
 void isr_otg_fs(void)
 {
     /* call device interrupt handler with the first device */
-    if (IS_USED(MODULE_TINYUSB_DEVICE)) {
+    if (MODULE_TINYUSB_DEVICE) {
         tud_int_handler(TINYUSB_TUD_RHPORT);
     }
 
     /* call host interrupt handler with the first device */
-    if (IS_USED(MODULE_TINYUSB_HOST)) {
+    if (MODULE_TINYUSB_HOST) {
         tuh_int_handler(TINYUSB_TUH_RHPORT);
     }
 
@@ -248,12 +248,12 @@ void isr_otg_fs(void)
 void isr_otg_hs(void)
 {
     /* call device interrupt handler with the last device */
-    if (IS_USED(MODULE_TINYUSB_DEVICE)) {
+    if (MODULE_TINYUSB_DEVICE) {
         tud_int_handler(TINYUSB_TUD_RHPORT);
     }
 
     /* call host interrupt handler with the last device */
-    if (IS_USED(MODULE_TINYUSB_HOST)) {
+    if (MODULE_TINYUSB_HOST) {
         tuh_int_handler(TINYUSB_TUH_RHPORT);
     }
 

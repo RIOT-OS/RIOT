@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  lcd_parallel \
+  #
 BOARD ?= stm32f429i-disc1
 
 include ../Makefile.drivers_common

@@ -66,7 +66,7 @@
  * The eXecute In Place File System only makes sense if the
  * non-volatile memory of the target MCU is addressable
  */
-#ifndef MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
+#if !MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE
 #error "sys/fs/xipfs: the target MCU has no addressable NVM"
 #endif /* !MODULE_PERIPH_FLASHPAGE_IN_ADDRESS_SPACE */
 

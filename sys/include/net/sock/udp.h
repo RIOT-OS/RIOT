@@ -307,7 +307,7 @@ typedef struct sock_udp sock_udp_t;
  * @brief   Auxiliary data provided when receiving using an UDP sock object
  */
 typedef struct {
-#if defined(MODULE_SOCK_AUX_LOCAL) || defined(DOXYGEN)
+#if MODULE_SOCK_AUX_LOCAL || defined(DOXYGEN)
     /**
      * @brief   The local endpoint the datagram was received on
      *
@@ -315,15 +315,15 @@ typedef struct {
      */
     sock_udp_ep_t local;
 #endif /* MODULE_SOCK_AUX_ENDPOINT */
-#if defined(MODULE_SOCK_AUX_TIMESTAMP) || defined(DOXYGEN)
+#if MODULE_SOCK_AUX_TIMESTAMP || defined(DOXYGEN)
     /**
      * @brief   System time the datagram was received
      *
      * @see SOCK_AUX_GET_TIMESTAMP
      */
     uint64_t timestamp;
-#endif /* MODULE_SOCK_AUX_TIMESTAP */
-#if defined(MODULE_SOCK_AUX_RSSI) || defined(DOXYGEN)
+#endif /* MODULE_SOCK_AUX_TIMESTAMP */
+#if MODULE_SOCK_AUX_RSSI || defined(DOXYGEN)
     /**
      * @brief   RSSI value of the received frame
      *
@@ -331,7 +331,7 @@ typedef struct {
      */
     int16_t rssi;
 #endif /* MODULE_SOCK_AUX_RSSI */
-#if defined(MODULE_SOCK_AUX_TTL) || defined(DOXYGEN)
+#if MODULE_SOCK_AUX_TTL || defined(DOXYGEN)
     /**
      * @brief   TTL value of the received frame
      *
@@ -346,7 +346,7 @@ typedef struct {
  * @brief   Auxiliary data provided when sending using an UDP sock object
  */
 typedef struct {
-#if defined(MODULE_SOCK_AUX_LOCAL) || defined(DOXYGEN)
+#if MODULE_SOCK_AUX_LOCAL || defined(DOXYGEN)
     /**
      * @brief   The local endpoint from which the datagram will be sent
      *
@@ -354,7 +354,7 @@ typedef struct {
      */
     sock_udp_ep_t local;
 #endif /* MODULE_SOCK_AUX_ENDPOINT */
-#if defined(MODULE_SOCK_AUX_TIMESTAMP) || defined(DOXYGEN)
+#if MODULE_SOCK_AUX_TIMESTAMP || defined(DOXYGEN)
     /**
      * @brief   System time the datagram was send
      *
@@ -368,7 +368,7 @@ typedef struct {
      * underlying implementation.
      */
     uint64_t timestamp;
-#endif /* MODULE_SOCK_AUX_TIMESTAP*/
+#endif /* MODULE_SOCK_AUX_TIMESTAMP*/
     sock_aux_flags_t flags; /**< Flags used request information */
 } sock_udp_aux_tx_t;
 
@@ -841,7 +841,7 @@ static inline bool sock_udp_ep_is_v6(const sock_udp_ep_t *ep)
 #endif
 }
 
-#if defined(MODULE_SOCK) || defined(MODULE_SOCK_UDP)
+#if MODULE_SOCK || MODULE_SOCK_UDP
 #include "sock_types.h"
 #endif
 

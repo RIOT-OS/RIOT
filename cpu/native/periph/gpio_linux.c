@@ -32,7 +32,7 @@ typedef struct {
     int fd;
     unsigned num_pins;
     int *pins;
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
     native_gpio_cb_t **cbs;
 #endif
 } native_port_t;
@@ -73,7 +73,7 @@ int gpio_linux_setup(const char* gpiochip)
     ports[port_numof].fd = fd;
     ports[port_numof].num_pins = info.lines;
     ports[port_numof].pins = calloc(info.lines, sizeof(*ports[0].pins));
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
     ports[port_numof].cbs = calloc(info.lines, sizeof(*ports[0].cbs));
 #endif
     ++port_numof;
@@ -89,7 +89,7 @@ void gpio_linux_teardown(void)
             if (ports[i].pins[j] > 0) {
                 real_close(ports[i].pins[j]);
             }
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
             if (ports[i].cbs[j]) {
                 real_free(ports[i].cbs[j]);
             }
@@ -103,7 +103,7 @@ void gpio_linux_teardown(void)
         if (ports[i].fd) {
             real_close(ports[i].fd);
         }
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
         if (ports[i].cbs) {
             real_free(ports[i].cbs);
         }
@@ -207,7 +207,7 @@ void gpio_write(gpio_t pin, bool value)
     _set(pin, value);
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 #include "async_read.h"
 
 static void _async_read_wrapper(int fd, void *arg) {

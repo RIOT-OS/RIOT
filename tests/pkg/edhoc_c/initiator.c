@@ -22,9 +22,9 @@
 #include "edhoc/edhoc.h"
 #include "edhoc_keys.h"
 
-#if IS_USED(MODULE_WOLFSSL)
+#if MODULE_WOLFSSL
 #include "wolfssl/wolfcrypt/sha256.h"
-#elif IS_USED(MODULE_TINYCRYPT)
+#elif MODULE_TINYCRYPT
 #include "tinycrypt/sha256.h"
 #endif
 
@@ -44,9 +44,9 @@ static edhoc_conf_t _conf;
 static rpk_t _rpk;
 static cred_id_t _cred_id;
 static cose_key_t _auth_key;
-#if IS_USED(MODULE_WOLFSSL)
+#if MODULE_WOLFSSL
 static wc_Sha256 _sha_i;
-#elif IS_USED(MODULE_TINYCRYPT)
+#elif MODULE_TINYCRYPT
 struct tc_sha256_state_struct _sha_i;
 #endif
 static uint8_t _method;

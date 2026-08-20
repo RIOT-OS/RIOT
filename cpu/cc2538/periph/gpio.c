@@ -30,7 +30,7 @@
 
 #define MODE_NOTSUP         (0xf0)
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 static gpio_isr_ctx_t isr_ctx[4][8];
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
@@ -149,7 +149,7 @@ void gpio_write(gpio_t pin, bool value)
     }
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {

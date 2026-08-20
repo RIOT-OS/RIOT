@@ -93,7 +93,7 @@ static void _handle_phy_irq(uint16_t irq)
     if (irq & MII_IRQ_LINK_DOWN) {
         DEBUG_PUTS("[sam0_eth]: link down");
 
-        if (IS_USED(MODULE_ZTIMER_MSEC)) {
+        if (MODULE_ZTIMER_MSEC) {
             ztimer_remove(ZTIMER_MSEC, &_phy_tim);
         }
         /* only listen for link partner ACK events now */
@@ -108,7 +108,7 @@ static void _handle_phy_irq(uint16_t irq)
         uint16_t adv = sam0_read_phy(0, MII_ADVERTISE);
         uint16_t lpa = sam0_read_phy(0, MII_LPA);
 
-        if (IS_USED(MODULE_ZTIMER_MSEC)) {
+        if (MODULE_ZTIMER_MSEC) {
             ztimer_remove(ZTIMER_MSEC, &_phy_tim);
         }
 
@@ -132,7 +132,7 @@ static void _handle_phy_irq(uint16_t irq)
         DEBUG_PUTS("[sam0_eth]: link partner present");
 
         /* if we don't succeed, restart auto-negotiation in 5s */
-        if (IS_USED(MODULE_ZTIMER_MSEC)) {
+        if (MODULE_ZTIMER_MSEC) {
             ztimer_set(ZTIMER_MSEC, &_phy_tim, CONFIG_SAM0_ETH_LINK_TIMEOUT_MS);
         }
 
@@ -257,7 +257,7 @@ static int _set_state(netopt_state_t state)
 {
     switch (state) {
         case NETOPT_STATE_SLEEP:
-            if (IS_USED(MODULE_ZTIMER_MSEC)) {
+            if (MODULE_ZTIMER_MSEC) {
                 ztimer_remove(ZTIMER_MSEC, &_phy_tim);
             }
             sam0_eth_poweroff();

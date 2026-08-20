@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include "psa/crypto.h"
 
-#if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
+#if MODULE_PSA_KEY_MANAGEMENT
 #include "psa_crypto_slot_management.h"
 #endif
 
@@ -30,7 +30,7 @@
 #include "psa_crypto_location_dispatch.h"
 #include "psa_crypto_algorithm_dispatch.h"
 
-#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+#if MODULE_PSA_PERSISTENT_STORAGE
 #include "psa_crypto_persistent_storage.h"
 #endif /* MODULE_PSA_PERSISTENT_STORAGE */
 
@@ -46,7 +46,7 @@
  */
 static uint8_t lib_initialized = 0;
 
-#if IS_USED(MODULE_PSA_HASH)
+#if MODULE_PSA_HASH
 /**
  * @brief   Compares the content of two same-sized buffers while maintaining
  *          constant processing time
@@ -71,7 +71,7 @@ static inline int constant_time_memcmp(const uint8_t *a, const uint8_t *b, size_
 }
 #endif /* MODULE_PSA_HASH */
 
-#if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
+#if MODULE_PSA_KEY_MANAGEMENT
 static psa_status_t psa_get_and_lock_key_slot_with_policy(psa_key_id_t id,
                                                           psa_key_slot_t **p_slot,
                                                           psa_key_usage_t usage,
@@ -138,14 +138,14 @@ psa_status_t psa_crypto_init(void)
 
     lib_initialized = 1;
 
-#if (IS_USED(MODULE_PSA_KEY_SLOT_MGMT))
+#if (MODULE_PSA_KEY_SLOT_MGMT)
     psa_init_key_slots();
 #endif
 
     return PSA_SUCCESS;
 }
 
-#if IS_USED(MODULE_PSA_AEAD)
+#if MODULE_PSA_AEAD
 psa_status_t psa_aead_abort(psa_aead_operation_t *operation)
 {
     (void)operation;
@@ -393,7 +393,7 @@ psa_status_t psa_aead_verify(   psa_aead_operation_t *operation,
 }
 #endif /* MODULE_PSA_AEAD */
 
-#if IS_USED(MODULE_PSA_ASYMMETRIC)
+#if MODULE_PSA_ASYMMETRIC
 psa_status_t psa_asymmetric_decrypt(psa_key_id_t key,
                                     psa_algorithm_t alg,
                                     const uint8_t *input,
@@ -439,7 +439,7 @@ psa_status_t psa_asymmetric_encrypt(psa_key_id_t key,
 }
 #endif /* MODULE_PSA_ASYMMETRIC */
 
-#if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
+#if MODULE_PSA_KEY_MANAGEMENT
 /**
  * @brief   Checks whether a key's policy permits the usage of a given algorithm
  *
@@ -520,7 +520,7 @@ static psa_status_t psa_get_and_lock_key_slot_with_policy(psa_key_id_t id,
 }
 #endif /* MODULE_PSA_KEY_MANAGEMENT */
 
-#if IS_USED(MODULE_PSA_CIPHER)
+#if MODULE_PSA_CIPHER
 psa_status_t psa_cipher_abort(psa_cipher_operation_t *operation)
 {
     if (!lib_initialized) {
@@ -782,7 +782,7 @@ psa_status_t psa_cipher_update(psa_cipher_operation_t *operation,
 
 #endif /* MODULE_PSA_CIPHER */
 
-#if IS_USED(MODULE_PSA_HASH)
+#if MODULE_PSA_HASH
 psa_status_t psa_hash_setup(psa_hash_operation_t *operation,
                             psa_algorithm_t alg)
 {
@@ -1039,7 +1039,7 @@ psa_status_t psa_generate_random(uint8_t *output,
 }
 
 /* Key Management */
-#if IS_USED(MODULE_PSA_KEY_MANAGEMENT)
+#if MODULE_PSA_KEY_MANAGEMENT
 /**
  * @brief   Check whether the key policy is valid
  *
@@ -1116,7 +1116,7 @@ static psa_status_t psa_validate_key_for_key_generation(psa_key_type_t type, siz
     if (PSA_KEY_TYPE_IS_UNSTRUCTURED(type)) {
         return psa_validate_unstructured_key_size(type, bits);
     }
-#if IS_USED(MODULE_PSA_ASYMMETRIC)
+#if MODULE_PSA_ASYMMETRIC
     else if (PSA_KEY_TYPE_IS_ECC_KEY_PAIR(type)) {
         return PSA_ECC_KEY_SIZE_IS_VALID(type, bits) ? PSA_SUCCESS : PSA_ERROR_INVALID_ARGUMENT;
     }
@@ -1158,7 +1158,7 @@ static psa_status_t psa_validate_key_attributes(const psa_key_attributes_t *attr
             return PSA_ERROR_INVALID_ARGUMENT;
         }
     }
-#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+#if MODULE_PSA_PERSISTENT_STORAGE
     else {
         if (!psa_is_valid_key_id(key, 1)) {
             return PSA_ERROR_INVALID_ARGUMENT;
@@ -1220,7 +1220,7 @@ static psa_status_t psa_start_key_creation(psa_key_creation_method_t method,
         slot->attr.id = key_id;
     }
 
-#if IS_USED(MODULE_PSA_SECURE_ELEMENT)
+#if MODULE_PSA_SECURE_ELEMENT
     /* Find a free slot on a secure element and store SE slot number in key_data */
     if (*p_drv != NULL) {
         psa_key_slot_number_t *slot_number = psa_key_slot_get_slot_number(slot);
@@ -1253,7 +1253,7 @@ static psa_status_t psa_finish_key_creation(psa_key_slot_t *slot, psa_se_drv_dat
     if (PSA_KEY_LIFETIME_IS_VOLATILE(slot->attr.lifetime)) {
         *key_id = slot->attr.id;
     }
-#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+#if MODULE_PSA_PERSISTENT_STORAGE
     else {
         status = psa_persist_key_slot_in_storage(slot);
     }
@@ -1304,7 +1304,7 @@ psa_status_t psa_destroy_key(psa_key_id_t key)
         return PSA_ERROR_CORRUPTION_DETECTED;
     }
 
-#if IS_USED(MODULE_PSA_PERSISTENT_STORAGE)
+#if MODULE_PSA_PERSISTENT_STORAGE
     if (!PSA_KEY_LIFETIME_IS_VOLATILE(slot->attr.lifetime)) {
         status = psa_destroy_persistent_key(key);
         if (status != PSA_SUCCESS) {
@@ -1699,7 +1699,7 @@ psa_status_t psa_import_key(const psa_key_attributes_t *attributes,
 }
 #endif /* MODULE_PSA_KEY_MANAGEMENT */
 
-#if IS_USED(MODULE_PSA_KEY_DERIVATION)
+#if MODULE_PSA_KEY_DERIVATION
 psa_status_t psa_key_derivation_abort(psa_key_derivation_operation_t *operation)
 {
     (void)operation;
@@ -1787,7 +1787,7 @@ psa_status_t psa_key_derivation_setup(psa_key_derivation_operation_t *operation,
 }
 #endif /* MODULE_PSA_KEY_DERIVATION */
 
-#if IS_USED(MODULE_PSA_MAC)
+#if MODULE_PSA_MAC
 /**
  * @brief   Validate algorithm and key for a MAC operation
  *
@@ -2064,7 +2064,7 @@ psa_status_t psa_purge_key(psa_key_id_t key)
 }
 #endif /* MODULE_PSA_MAC */
 
-#if IS_USED(MODULE_PSA_KEY_AGREEMENT)
+#if MODULE_PSA_KEY_AGREEMENT
 psa_status_t psa_raw_key_agreement(psa_algorithm_t alg,
                                    psa_key_id_t private_key,
                                    const uint8_t *peer_key,
@@ -2084,7 +2084,7 @@ psa_status_t psa_raw_key_agreement(psa_algorithm_t alg,
 }
 #endif /* MODULE_PSA_KEY_AGREEMENT */
 
-#if IS_USED(MODULE_PSA_ASYMMETRIC)
+#if MODULE_PSA_ASYMMETRIC
 psa_status_t psa_sign_hash(psa_key_id_t key,
                            psa_algorithm_t alg,
                            const uint8_t *hash,

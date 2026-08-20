@@ -97,7 +97,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 
 typedef struct {
     gpio_cb_t cb;
@@ -177,7 +177,7 @@ void gpio_irq_disable(gpio_t pin)
     GPIO_T_ADDR(pin)->INTENCLR = 1u << GPIO_T_PIN(pin);
 }
 
-#endif /* defined(MODULE_PERIPH_GPIO_IRQ) */
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 bool gpio_read(gpio_t pin)
 {
@@ -239,7 +239,7 @@ void gpio_write(gpio_t pin, bool value)
     }
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if MODULE_PERIPH_GPIO_IRQ
 
 static inline void irq_handler(GPIO_Type *base, uint32_t port_num)
 {

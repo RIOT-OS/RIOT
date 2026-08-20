@@ -96,7 +96,7 @@ void ptp_init(void)
         .nanoseconds = 0
     };
     ptp_clock_set(&initial_time);
-    if (IS_USED(MODULE_PERIPH_ETH)) {
+    if (MODULE_PERIPH_ETH) {
         /* enable timestamping of all received frames */
         ETH->PTPTSCR |= ETH_PTPTSCR_TSSARFE;
     }
@@ -178,7 +178,7 @@ void ptp_clock_read(ptp_timestamp_t *timestamp)
     irq_restore(irq_state);
 }
 
-#if IS_USED(MODULE_PERIPH_PTP_TIMER)
+#if MODULE_PERIPH_PTP_TIMER
 void ptp_timer_clear(void)
 {
     const atomic_bit_u32_t tsite = atomic_bit_u32(&ETH->PTPTSCR, ETH_PTPTSCR_TSITE_Pos);
@@ -207,4 +207,4 @@ void ptp_timer_set_absolute(const ptp_timestamp_t *target)
               (unsigned)ETH->PTPTSCR, (unsigned)ETH->MACIMR, (unsigned)ETH->MACSR);
     }
 }
-#endif /* IS_USED(MODULE_PTP_TIMER) */
+#endif /* MODULE_PTP_TIMER */

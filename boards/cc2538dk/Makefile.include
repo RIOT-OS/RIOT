@@ -7,3 +7,7 @@ PORT_LINUX ?= $(word 2,$(shell $(RIOTTOOLS)/usb-serial/find-tty.sh '^$(PROGRAMME
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 
 include $(RIOTBOARD)/common/cc2538/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_hw_fc \
+  #

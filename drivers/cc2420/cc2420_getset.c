@@ -69,7 +69,7 @@ void cc2420_set_addr_short(cc2420_t *dev, const uint8_t *addr)
 
     memcpy(dev->netdev.short_addr, addr, 2);
 
-#ifdef MODULE_SIXLOWPAN
+#if MODULE_SIXLOWPAN
     /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
      * 0 for unicast addresses */
     dev->netdev.short_addr[0] &= 0x7F;

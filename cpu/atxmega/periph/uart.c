@@ -233,7 +233,7 @@ static inline void _configure_pins(uart_t uart)
         gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
     }
 
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
     /* TODO */
 #endif
 }

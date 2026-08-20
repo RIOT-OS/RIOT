@@ -47,7 +47,7 @@ static unsigned channel_numof(tim_t tim)
     return TIMER_CHANNEL_NUMOF;
 }
 
-#ifdef MODULE_PERIPH_TIMER_PERIODIC
+#if MODULE_PERIPH_TIMER_PERIODIC
 
 /**
  * @brief   Helper macro to get channel bit in timer/channel bitmap
@@ -139,7 +139,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     unsigned irqstate = irq_disable();
     set_oneshot(tim, channel);
 
-#ifdef MODULE_PERIPH_TIMER_PERIODIC
+#if MODULE_PERIPH_TIMER_PERIODIC
     if (dev(tim)->ARR == TIM_CHAN(tim, channel)) {
         dev(tim)->ARR = timer_config[tim].max;
     }
@@ -185,7 +185,7 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
     unsigned irqstate = irq_disable();
     set_oneshot(tim, channel);
 
-#ifdef MODULE_PERIPH_TIMER_PERIODIC
+#if MODULE_PERIPH_TIMER_PERIODIC
     if (dev(tim)->ARR == TIM_CHAN(tim, channel)) {
         dev(tim)->ARR = timer_config[tim].max;
     }
@@ -215,7 +215,7 @@ int timer_set(tim_t tim, int channel, unsigned int timeout)
     return 0;
 }
 
-#ifdef MODULE_PERIPH_TIMER_PERIODIC
+#if MODULE_PERIPH_TIMER_PERIODIC
 int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags)
 {
     if ((unsigned)channel >= channel_numof(tim)) {
@@ -271,7 +271,7 @@ int timer_clear(tim_t tim, int channel)
 
     irq_restore(irqstate);
 
-#ifdef MODULE_PERIPH_TIMER_PERIODIC
+#if MODULE_PERIPH_TIMER_PERIODIC
     if (dev(tim)->ARR == TIM_CHAN(tim, channel)) {
         dev(tim)->ARR = timer_config[tim].max;
     }

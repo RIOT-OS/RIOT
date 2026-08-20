@@ -31,11 +31,11 @@
 #include "sock_types.h"
 #include "gnrc_sock_internal.h"
 
-#if IS_USED(MODULE_ZTIMER_USEC) || IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_USEC || MODULE_ZTIMER_MSEC
 #  include "ztimer.h"
 #endif
 
-#ifdef MODULE_FUZZING
+#if MODULE_FUZZING
 extern gnrc_pktsnip_t *gnrc_pktbuf_fuzzptr;
 gnrc_pktsnip_t *gnrc_sock_prevpkt = NULL;
 #endif
@@ -92,7 +92,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
      * crafted fuzzing packet, the fuzzing application terminates.
      *
      * sock_async_event has its on fuzzing termination condition. */
-#if defined(MODULE_FUZZING) && !defined(MODULE_SOCK_ASYNC_EVENT)
+#if MODULE_FUZZING && !MODULE_SOCK_ASYNC_EVENT
     if (gnrc_sock_prevpkt && gnrc_sock_prevpkt == gnrc_pktbuf_fuzzptr) {
         exit(EXIT_SUCCESS);
     }
@@ -124,14 +124,14 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
          * possible. This is typically the better trade-off, as even on fast
          * networks round-trip-times are typically measured in ms rather than
          * in us */
-        if (IS_USED(MODULE_ZTIMER_MSEC)) {
+        if (MODULE_ZTIMER_MSEC) {
             /* rounding up seems more sensible here */
             uint32_t timeout_ms = (timeout + US_PER_MS - 1) / US_PER_MS;
             if (ztimer_mbox_get_timeout(ZTIMER_MSEC, &reg->mbox, &msg, timeout_ms)) {
                 return -ETIMEDOUT;
             }
         }
-        else if (IS_USED(MODULE_ZTIMER_USEC)) {
+        else if (MODULE_ZTIMER_USEC) {
             if (ztimer_mbox_get_timeout(ZTIMER_USEC, &reg->mbox, &msg, timeout)) {
                 return -ETIMEDOUT;
             }
@@ -155,7 +155,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     assert(ipv6_hdr != NULL);
     memcpy(&remote->addr, &ipv6_hdr->src, sizeof(ipv6_addr_t));
     remote->family = AF_INET6;
-#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+#if MODULE_SOCK_AUX_LOCAL
     if (aux->local != NULL) {
         memcpy(&aux->local->addr, &ipv6_hdr->dst, sizeof(ipv6_addr_t));
         aux->local->family = AF_INET6;
@@ -169,14 +169,14 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
         gnrc_netif_hdr_t *netif_hdr = netif->data;
         /* TODO: use API in #5511 */
         remote->netif = (uint16_t)netif_hdr->if_pid;
-#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+#if MODULE_SOCK_AUX_TIMESTAMP
         if (aux->timestamp != NULL) {
             if (gnrc_netif_hdr_get_timestamp(netif_hdr, aux->timestamp) == 0) {
                 aux->flags |= GNRC_SOCK_RECV_AUX_FLAG_TIMESTAMP;
             }
         }
 #endif /* MODULE_SOCK_AUX_TIMESTAMP */
-#if IS_USED(MODULE_SOCK_AUX_RSSI)
+#if MODULE_SOCK_AUX_RSSI
         if ((aux->rssi) && (netif_hdr->rssi != GNRC_NETIF_HDR_NO_RSSI)) {
             aux->flags |= GNRC_SOCK_RECV_AUX_FLAG_RSSI;
             *aux->rssi = netif_hdr->rssi;
@@ -190,7 +190,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
         reg->async_cb.generic(reg, SOCK_ASYNC_MSG_RECV, reg->async_cb_arg);
     }
 #endif
-#ifdef MODULE_FUZZING
+#if MODULE_FUZZING
     gnrc_sock_prevpkt = pkt;
 #endif
 
@@ -204,10 +204,10 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
     kernel_pid_t iface = KERNEL_PID_UNDEF;
     gnrc_nettype_t type;
     size_t payload_len = gnrc_pkt_len(payload);
-#ifdef MODULE_GNRC_NETERR
+#if MODULE_GNRC_NETERR
     unsigned status_subs = 0;
 #endif
-#if IS_USED(MODULE_GNRC_TX_SYNC)
+#if MODULE_GNRC_TX_SYNC
     gnrc_tx_sync_t tx_sync;
 #endif
 
@@ -216,7 +216,7 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
         return -EAFNOSUPPORT;
     }
 
-#if IS_USED(MODULE_GNRC_TX_SYNC)
+#if MODULE_GNRC_TX_SYNC
     if (gnrc_tx_sync_append(payload, &tx_sync)) {
         gnrc_pktbuf_release(payload);
         return -ENOMEM;
@@ -269,7 +269,7 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
         netif_hdr->if_pid = iface;
         pkt = gnrc_pkt_prepend(pkt, netif);
     }
-#ifdef MODULE_GNRC_NETERR
+#if MODULE_GNRC_NETERR
     /* cppcheck-suppress uninitvar
      * (reason: pkt is initialized in AF_INET6 case above, otherwise function
      * will return early) */
@@ -285,11 +285,11 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
         return -EBADMSG;
     }
 
-#if IS_USED(MODULE_GNRC_TX_SYNC)
+#if MODULE_GNRC_TX_SYNC
     gnrc_tx_sync(&tx_sync);
 #endif
 
-#ifdef MODULE_GNRC_NETERR
+#if MODULE_GNRC_NETERR
     uint32_t last_status = GNRC_NETERR_SUCCESS;
 
     while (status_subs--) {

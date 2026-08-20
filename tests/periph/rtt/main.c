@@ -45,7 +45,7 @@ void cb(void *arg)
     puts("Hello");
 }
 
-#ifdef MODULE_PERIPH_RTC_MEM
+#if MODULE_PERIPH_RTC_MEM
 static const uint8_t riot_msg_offset = 1;
 static const char riot_msg[] = "RIOT";
 static void _set_rtc_mem(void)
@@ -128,7 +128,7 @@ int main(void)
     uint32_t now = rtt_get_counter();
     printf("RTT now: %" PRIu32 "\n", now);
 
-    if (IS_USED(MODULE_PERIPH_RTT_SET_COUNTER)) {
+    if (MODULE_PERIPH_RTT_SET_COUNTER) {
         puts("Setting RTT timer to 1337");
         rtt_set_counter(1337);
         now = rtt_get_counter();

@@ -24,3 +24,8 @@ ifneq (,$(filter entropy_source_adc_noise,$(USEMODULE)))
     CFLAGS += -DCONFIG_ENTROPY_SOURCE_ADC_HEALTH_TEST=1
   endif
 endif
+
+MODULE_DEFS_NEEDED += \
+  entropy_source_adc_noise \
+  mbedtls_entropy_source_hwrng \
+  #

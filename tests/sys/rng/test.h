@@ -24,7 +24,7 @@ extern "C" {
 typedef enum {
     RNG_PRNG,
     RNG_CONSTANT,
-#ifdef MODULE_PERIPH_HWRNG
+#if MODULE_PERIPH_HWRNG
     RNG_HWRNG,
 #endif
     RNG_NUMOF
@@ -36,7 +36,7 @@ typedef enum {
 static const char sources[][12] = {
     [RNG_PRNG] = "PRNG",
     [RNG_CONSTANT] = "Constant",
-#ifdef MODULE_PERIPH_HWRNG
+#if MODULE_PERIPH_HWRNG
     [RNG_HWRNG] = "HWRNG",
 #endif
 };

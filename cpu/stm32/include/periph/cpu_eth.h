@@ -148,7 +148,7 @@ typedef struct eth_dma_desc {
 #define TX_DESC_STAT_OWN        (BIT31) /**< If set, descriptor is owned by DMA, otherwise by CPU */
 /** @} */
 
-#ifdef MODULE_PERIPH_ETH_COMMON
+#if MODULE_PERIPH_ETH_COMMON
 /**
  * @brief   Perform ETH initialization common to periph_stm32_eth and
  *          periph_ptp_clock

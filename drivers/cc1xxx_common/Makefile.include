@@ -1,0 +1,39 @@
+MODULE_DEFS_NEEDED += \
+  netstats_l2 \
+  #
+
+MODULE_DEFS_NEEDED += \
+  netstats_l2 \
+  #
+
+MODULE_DEFS_NEEDED += \
+  netstats_l2 \
+  #
+
+MODULE_DEFS_NEEDED += \
+  netstats_l2 \
+  #
+
+MODULE_DEFS_NEEDED += \
+  netstats_l2 \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  netstats_l2 \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  netstats_l2 \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  netstats_l2 \
+  #
+
+MODULE_DEFS_NEEDED += \
+  defs_needed \
+  netstats_l2 \
+  #

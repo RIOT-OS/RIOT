@@ -71,14 +71,14 @@ static void _cpu_reset(void)
                                    CLOCKS_CLK_SYS_CTRL_AUXSRC_clksrc_pll_sys);
     /* configure the peripheral clock to run from the system clock */
     clock_periph_configure(CLOCK_PERIPH_SOURCE);
-    if (IS_USED(ENABLE_DEBUG)) {
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
         /* check clk_ref with logic analyzer */
         clock_gpout0_configure(CLOCK_XOSC, CLOCK_XOSC,
                                CLOCKS_CLK_GPOUT0_CTRL_AUXSRC_clk_ref);
     }
 
     /* Configure USB PLL to deliver 48MHz needed by ADC */
-    if (IS_USED(MODULE_PERIPH_ADC)) {
+    if (MODULE_PERIPH_ADC) {
         pll_start_usb(PLL_USB_REF_DIV, PLL_USB_VCO_FEEDBACK_SCALE,
                       PLL_USB_POSTDIV1, PLL_USB_POSTDIV2);
         clock_adc_configure(CLOCKS_CLK_ADC_CTRL_AUXSRC_clksrc_pll_usb);

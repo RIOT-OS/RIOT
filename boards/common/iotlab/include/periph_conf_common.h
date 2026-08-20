@@ -104,7 +104,7 @@ static const uart_conf_t uart_config[] = {
         .tx_pin   = GPIO_PIN(PORT_A, 9),
         .bus      = APB2,
         .irqn     = USART1_IRQn,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma        = 0,
         .dma_chan   = 2
 #endif
@@ -116,7 +116,7 @@ static const uart_conf_t uart_config[] = {
         .tx_pin   = GPIO_PIN(PORT_A, 2),
         .bus      = APB1,
         .irqn     = USART2_IRQn,
-#ifdef MODULE_PERIPH_DMA
+#if MODULE_PERIPH_DMA
         .dma        = 1,
         .dma_chan   = 2
 #endif

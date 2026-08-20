@@ -46,31 +46,31 @@
 #include "rmutex.h"
 #include "sched.h"
 
-#ifdef MODULE_GNRC_NETIF_BUS
+#if MODULE_GNRC_NETIF_BUS
 #  include "msg_bus.h"
 #endif
 
-#if IS_USED(MODULE_GNRC_NETIF_LORAWAN)
+#if MODULE_GNRC_NETIF_LORAWAN
 #  include "net/gnrc/netif/lorawan.h"
 #endif
 
-#if IS_USED(MODULE_GNRC_NETIF_6LO)
+#if MODULE_GNRC_NETIF_6LO
 #  include "net/gnrc/netif/6lo.h"
 #endif
 
-#if defined(MODULE_GNRC_NETIF_DEDUP) && (GNRC_NETIF_L2ADDR_MAXLEN > 0)
+#if MODULE_GNRC_NETIF_DEDUP && (GNRC_NETIF_L2ADDR_MAXLEN > 0)
 #  include "net/gnrc/netif/dedup.h"
 #endif
 
-#if IS_USED(MODULE_GNRC_NETIF_IPV6)
+#if MODULE_GNRC_NETIF_IPV6
 #  include "net/gnrc/netif/ipv6.h"
 #endif
 
-#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+#if MODULE_GNRC_NETIF_PKTQ
 #  include "net/gnrc/netif/pktq/type.h"
 #endif
 
-#ifdef MODULE_NETSTATS_L2
+#if MODULE_NETSTATS_L2
 #  include "net/netstats.h"
 #endif
 
@@ -86,7 +86,7 @@ extern "C" {
 /**
  * @brief Index of the low priority queue
  */
-#if IS_USED(MODULE_BHP_EVENT)
+#if MODULE_BHP_EVENT
 #define GNRC_NETIF_EVQ_INDEX_PRIO_LOW   (GNRC_NETIF_EVQ_INDEX_PRIO_HIGH + 1)
 #else
 #define GNRC_NETIF_EVQ_INDEX_PRIO_LOW   GNRC_NETIF_EVQ_INDEX_PRIO_HIGH
@@ -101,7 +101,7 @@ extern "C" {
  * @brief   Per-Interface Event Message Buses
  */
 typedef enum {
-#ifdef MODULE_GNRC_IPV6
+#if MODULE_GNRC_IPV6
     GNRC_NETIF_BUS_IPV6,                    /**< provides @ref gnrc_ipv6_event_t
                                                  messages to subscribers */
 #endif
@@ -139,16 +139,16 @@ typedef struct {
     const gnrc_netif_ops_t *ops;            /**< Operations of the network interface */
     netdev_t *dev;                          /**< Network device of the network interface */
     rmutex_t mutex;                         /**< Mutex of the interface */
-#if IS_USED(MODULE_NETSTATS_L2) || defined(DOXYGEN)
+#if MODULE_NETSTATS_L2 || defined(DOXYGEN)
     netstats_t stats;                       /**< transceiver's statistics */
 #endif
-#if IS_USED(MODULE_GNRC_NETIF_LORAWAN) || defined(DOXYGEN)
+#if MODULE_GNRC_NETIF_LORAWAN || defined(DOXYGEN)
     gnrc_netif_lorawan_t lorawan;           /**< LoRaWAN component */
 #endif
-#if IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN)
+#if MODULE_GNRC_NETIF_IPV6 || defined(DOXYGEN)
     gnrc_netif_ipv6_t ipv6;                 /**< IPv6 component */
 #endif
-#if IS_USED(MODULE_GNRC_NETIF_BUS) || DOXYGEN
+#if MODULE_GNRC_NETIF_BUS || DOXYGEN
     msg_bus_t bus[GNRC_NETIF_BUS_NUMOF];    /**< Event Message Bus */
 #endif
     /**
@@ -165,7 +165,7 @@ typedef struct {
      * @brief   ISR event for the network device
      */
     event_t event_isr;
-#if IS_USED(MODULE_NETDEV_NEW_API) || defined(DOXYGEN)
+#if MODULE_NETDEV_NEW_API || defined(DOXYGEN)
     /**
      * @brief   TX done event for the network device
      *
@@ -196,7 +196,7 @@ typedef struct {
      * @note    Only available if @ref GNRC_NETIF_L2ADDR_MAXLEN > 0
      */
     uint8_t l2addr_len;
-#if defined(MODULE_GNRC_NETIF_DEDUP) || DOXYGEN
+#if MODULE_GNRC_NETIF_DEDUP || DOXYGEN
     /**
      * @brief   Last received packet information
      *
@@ -205,10 +205,10 @@ typedef struct {
     gnrc_netif_dedup_t last_pkt;
 #endif
 #endif
-#if IS_USED(MODULE_GNRC_NETIF_6LO) || defined(DOXYGEN)
+#if MODULE_GNRC_NETIF_6LO || defined(DOXYGEN)
     gnrc_netif_6lo_t sixlo;                 /**< 6Lo component */
 #endif
-#if IS_USED(MODULE_GNRC_NETIF_PKTQ) || defined(DOXYGEN)
+#if MODULE_GNRC_NETIF_PKTQ || defined(DOXYGEN)
     /**
      * @brief   Packet queue for sending
      *
@@ -242,18 +242,18 @@ typedef struct {
  */
 static inline bool gnrc_netif_netdev_legacy_api(gnrc_netif_t *netif)
 {
-    if (!IS_USED(MODULE_NETDEV_NEW_API) && !IS_USED(MODULE_NETDEV_LEGACY_API)) {
+    if (!MODULE_NETDEV_NEW_API && !MODULE_NETDEV_LEGACY_API) {
         /* this should only happen for external netdevs or when no netdev is
          * used (e.g. examples/networking/coap/gcoap can be used without any netdev, as still
          * CoAP requests to ::1 can be send */
         return true;
     }
 
-    if (!IS_USED(MODULE_NETDEV_NEW_API)) {
+    if (!MODULE_NETDEV_NEW_API) {
         return true;
     }
 
-    if (!IS_USED(MODULE_NETDEV_LEGACY_API)) {
+    if (!MODULE_NETDEV_LEGACY_API) {
         return false;
     }
 
@@ -439,7 +439,7 @@ unsigned gnrc_netif_numof(void);
  */
 static inline bool gnrc_netif_highlander(void)
 {
-    return IS_USED(MODULE_GNRC_NETIF_SINGLE);
+    return MODULE_GNRC_NETIF_SINGLE;
 }
 
 /**
@@ -736,7 +736,7 @@ static inline int gnrc_netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     return gnrc_netapi_send(netif->pid, pkt);
 }
 
-#if defined(MODULE_GNRC_NETIF_BUS) || DOXYGEN
+#if MODULE_GNRC_NETIF_BUS || DOXYGEN
 /**
  * @brief   Get a message bus of a given @ref gnrc_netif_t interface.
  *

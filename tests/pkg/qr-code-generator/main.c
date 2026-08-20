@@ -24,7 +24,7 @@
 
 #include "qrcodegen.h"
 
-#ifdef MODULE_DISP_DEV
+#if MODULE_DISP_DEV
 #include "disp_dev.h"
 #endif
 
@@ -38,7 +38,7 @@
 static uint8_t qr0[qrcodegen_BUFFER_LEN_FOR_VERSION(ENCODER_VERSION)];
 static uint8_t buffer[qrcodegen_BUFFER_LEN_FOR_VERSION(ENCODER_VERSION)];
 
-#ifdef MODULE_DISP_DEV
+#if MODULE_DISP_DEV
 #ifdef LCD_SCREEN_WIDTH
 #define DISPLAY_BUFFER_MAX_SIZE (LCD_SCREEN_WIDTH)
 #else
@@ -61,7 +61,7 @@ int main(void)
 
     int size = qrcodegen_getSize(qr0);
 
-#ifdef MODULE_DISP_DEV
+#if MODULE_DISP_DEV
     /* Use the first screen */
     disp_dev_reg_t *disp_dev = disp_dev_reg_find_screen(0);
     if (!disp_dev) {
@@ -94,7 +94,7 @@ int main(void)
 
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
-#ifdef MODULE_DISP_DEV
+#if MODULE_DISP_DEV
             if (qrcodegen_getModule(qr0, x, y)) {
                 area.x1 = w_offset + (x * scale);
                 area.x2 = w_offset + ((x + 1)* scale) - 1;

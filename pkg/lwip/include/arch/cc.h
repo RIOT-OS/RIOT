@@ -28,7 +28,7 @@
 #include "byteorder.h"
 #include "mutex.h"
 
-#ifdef MODULE_LOG
+#if MODULE_LOG
 #define LOG_LEVEL LOG_INFO
 #include "log.h"
 #endif
@@ -76,7 +76,7 @@ extern "C" {
  * @name    Platform specific diagnostic output
  * @{
  */
-#ifdef MODULE_LOG
+#if MODULE_LOG
 #  define LWIP_PLATFORM_DIAG(x)   LOG_INFO x
 #  ifdef NDEBUG
 #    define LWIP_PLATFORM_ASSERT(x)

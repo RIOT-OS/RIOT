@@ -24,10 +24,10 @@
 extern "C" {
 #endif
 
-#if IS_USED(MODULE_LWIP_IPV6)
+#if MODULE_LWIP_IPV6
 #include "net/ipv6.h"
 #define SOCK_IP_EP_ANY  SOCK_IPV6_EP_ANY
-#elif IS_USED(MODULE_LWIP_IPV4)
+#elif MODULE_LWIP_IPV4
 #include "net/ipv4.h"
 #define SOCK_IP_EP_ANY  SOCK_IPV4_EP_ANY
 #endif
@@ -43,7 +43,7 @@ extern "C" {
  * @}
  */
 
-#ifdef MODULE_SOCK_IP
+#if MODULE_SOCK_IP
 /**
  * @brief   Raw IP shell command
  *
@@ -56,7 +56,7 @@ extern "C" {
 int ip_cmd(int argc, char **argv);
 #endif
 
-#ifdef MODULE_SOCK_TCP
+#if MODULE_SOCK_TCP
 /**
  * @brief   TCP IP shell command
  *
@@ -69,7 +69,7 @@ int ip_cmd(int argc, char **argv);
 int tcp_cmd(int argc, char **argv);
 #endif
 
-#ifdef MODULE_SOCK_UDP
+#if MODULE_SOCK_UDP
 /**
  * @brief   UDP IP shell command
  *

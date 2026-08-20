@@ -66,7 +66,7 @@ enum {
  */
 static uart_isr_ctx_t uart_ctx[UART_NUMOF];
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
 
 #include "tsrb.h"
 /**
@@ -88,7 +88,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
      */
     unsigned int uart_num = ((uintptr_t)u - (uintptr_t)UART0_BASEADDR) / 0x1000;
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
     tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
 #endif
@@ -113,7 +113,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     u->CC = 0;
 
     /* On the CC2538, hardware flow control is supported only on UART1 */
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
     if (uart_config[uart].rts_pin != GPIO_UNDEF) {
         assert(u != UART0_BASEADDR);
         gpio_init_af(uart_config[uart].rts_pin, UART1_RTS, GPIO_OUT);
@@ -164,7 +164,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         uart_ctx[uart].arg = arg;
     }
 
-    if (IS_USED(MODULE_PERIPH_UART_NONBLOCKING) || rx_cb) {
+    if (MODULE_PERIPH_UART_NONBLOCKING || rx_cb) {
         NVIC_EnableIRQ(UART_IRQ(uart_num));
     }
 
@@ -174,7 +174,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     return UART_OK;
 }
 
-#ifdef MODULE_PERIPH_UART_MODECFG
+#if MODULE_PERIPH_UART_MODECFG
 int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
               uart_stop_bits_t stop_bits)
 {
@@ -213,7 +213,7 @@ static inline void send_byte(uart_t uart, uint8_t byte)
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     assert(uart < UART_NUMOF);
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
     for (size_t i = 0; i < len; i++) {
         uart_config[uart].dev->cc2538_uart_im.IM |= TXMIS;
         if (irq_is_in() || __get_PRIMASK()) {
@@ -303,7 +303,7 @@ void uart_poweroff(uart_t uart)
     SYS_CTRL->cc2538_sys_ctrl_unnamed1.RCGCUART &= ~(1 << uart);
 }
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
 static inline void irq_handler_tx(uart_t uart)
 {
     /* fill up FIFO again */
@@ -335,7 +335,7 @@ static inline void irq_handler(uart_t uart)
         uart_ctx[uart].rx_cb(uart_ctx[uart].arg, uart_config[uart].dev->DR);
     }
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
+#if MODULE_PERIPH_UART_NONBLOCKING
     if (mis & TXMIS) {
         irq_handler_tx(uart);
     }

@@ -29,7 +29,7 @@
 #include "esp_attr.h"
 #include "syscalls.h"
 
-#ifdef MODULE_ESP_IDF_HEAP
+#if MODULE_ESP_IDF_HEAP
 #  include "esp_heap_caps.h"
 
 #  ifndef CPU_ESP8266                       /* for all ESP32x SoCs */
@@ -45,7 +45,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#ifndef MODULE_PTHREAD
+#if !MODULE_PTHREAD
 
 #define PTHREAD_CANCEL_DISABLE 1
 /*
@@ -330,7 +330,7 @@ void IRAM_ATTR _lock_release_recursive(_lock_t *lock)
  * @name Memory allocation functions
  */
 
-#ifdef MODULE_ESP_IDF_HEAP
+#if MODULE_ESP_IDF_HEAP
 
 /* For ESP8266, the `heap_caps_*_default` functions are simply mapped to the
  * corresponding `heap_caps_*` functions because SPI RAM is not supported.

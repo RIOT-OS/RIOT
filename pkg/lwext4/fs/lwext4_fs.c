@@ -262,7 +262,7 @@ out:
     return -res;
 }
 
-#ifdef MODULE_LWEXT4_VFS_FORMAT
+#if MODULE_LWEXT4_VFS_FORMAT
 static int _format(vfs_mount_t *mountp)
 {
     lwext4_desc_t *fs = mountp->private_data;
@@ -475,7 +475,7 @@ static int _closedir(vfs_DIR *dirp)
 }
 
 static const vfs_file_system_ops_t lwext4_fs_ops = {
-#ifdef MODULE_LWEXT4_VFS_FORMAT
+#if MODULE_LWEXT4_VFS_FORMAT
     .format = _format,
 #endif
     .mount = _mount,

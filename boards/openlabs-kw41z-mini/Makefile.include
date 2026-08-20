@@ -15,3 +15,7 @@ SWDIO_PIN ?= 21
 
 # Include default FRDM board config for openocd configuration
 include $(RIOTBOARD)/common/frdm/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  periph_llwu \
+  #

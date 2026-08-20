@@ -1,3 +1,8 @@
+
+MODULE_DEFS_NEEDED += \
+  periph_i2c_mock \
+  periph_i2c_reconfigure \
+  #
 BOARD ?= samr21-xpro
 include ../Makefile.periph_common
 

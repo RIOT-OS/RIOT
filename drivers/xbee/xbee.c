@@ -27,7 +27,7 @@
 #include "timex.h"
 #include "xbee.h"
 #include "ztimer.h"
-#ifdef MODULE_GNRC
+#if MODULE_GNRC
 #include "net/gnrc.h"
 #endif
 
@@ -297,7 +297,7 @@ static int _set_addr(xbee_t *dev, const uint8_t *val, size_t len)
     addr[0] = val[0];
     addr[1] = val[1];
 
-#ifdef MODULE_SIXLOWPAN
+#if MODULE_SIXLOWPAN
     /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit
      * to 0 for unicast addresses */
     addr[1] &= 0x7F;
@@ -419,7 +419,7 @@ static int _set_panid(xbee_t *dev, const uint8_t *val, size_t len)
     return -EINVAL;
 }
 
-#ifdef MODULE_XBEE_ENCRYPTION
+#if MODULE_XBEE_ENCRYPTION
 static int _set_encryption(xbee_t *dev, const uint8_t *val)
 {
     uint8_t cmd[3];
@@ -599,7 +599,7 @@ int xbee_init(netdev_t *dev)
     /* put XBee module in "API mode without escaped characters" */
     _at_cmd(xbee, "ATAP1\r");
     /* disable xbee CTS and RTS, unless hardware flow control is used */
-    if (!IS_USED(MODULE_PERIPH_UART_HW_FC)) {
+    if (!MODULE_PERIPH_UART_HW_FC) {
         DEBUG("[xbee] init: WARNING if using an arduino BOARD + arduino xbee " \
               "shield with ICSP connector, hardware flow control can't be " \
               "used since CTS pin is connected to ICSP RESET pin\n");
@@ -777,7 +777,7 @@ static int xbee_get(netdev_t *ndev, netopt_t opt, void *value, size_t max_len)
         return sizeof(uint16_t);
     case NETOPT_NID:
         return _get_panid(dev, (uint8_t *)value, max_len);
-#ifdef MODULE_GNRC
+#if MODULE_GNRC
     case NETOPT_PROTO:
         if (max_len != sizeof(gnrc_nettype_t)) {
             return -EOVERFLOW;
@@ -806,7 +806,7 @@ static int xbee_set(netdev_t *ndev, netopt_t opt, const void *value, size_t len)
         return _set_channel(dev, value, len);
     case NETOPT_NID:
         return _set_panid(dev, value, len);
-#ifdef MODULE_XBEE_ENCRYPTION
+#if MODULE_XBEE_ENCRYPTION
     case NETOPT_ENCRYPTION:
         return _set_encryption(dev, value);
     case NETOPT_ENCRYPTION_KEY:

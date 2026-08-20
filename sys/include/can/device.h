@@ -23,10 +23,10 @@ extern "C" {
 #include "can/candev.h"
 #include "sched.h"
 
-#ifdef MODULE_CAN_PM
+#if MODULE_CAN_PM
 #include "ztimer.h"
 #endif
-#ifdef MODULE_CAN_TRX
+#if MODULE_CAN_TRX
 #include "can/can_trx.h"
 #endif
 
@@ -50,13 +50,13 @@ extern "C" {
  */
 typedef struct candev_params {
     const char *name;                /**< candev name to set */
-#if defined(MODULE_CAN_TRX) || defined(DOXYGEN)
+#if MODULE_CAN_TRX || defined(DOXYGEN)
     can_trx_t *trx;                  /**< transceiver to set */
 #endif
-#if defined(MODULE_FDCAN)
+#if MODULE_FDCAN
     uint16_t loop_delay;             /**< CAN FD transceiver loop delay */
 #endif
-#if defined(MODULE_CAN_PM) || defined(DOXYGEN)
+#if MODULE_CAN_PM || defined(DOXYGEN)
     uint32_t rx_inactivity_timeout;  /**< power management rx timeout value */
     uint32_t tx_wakeup_timeout;      /**< power management tx wake up value */
 #endif
@@ -70,13 +70,13 @@ typedef struct candev_dev {
     int ifnum;        /**< interface number */
     kernel_pid_t pid; /**< pid */
     const char *name; /**< device name */
-#if defined(MODULE_CAN_TRX) || defined(DOXYGEN)
+#if MODULE_CAN_TRX || defined(DOXYGEN)
     can_trx_t *trx;   /**< transceiver attached to the device */
 #endif
-#if defined(MODULE_FDCAN)
+#if MODULE_FDCAN
     uint16_t loop_delay;    /**< CAN FD transceiver loop delay */
 #endif
-#if defined(MODULE_CAN_PM) || defined(DOXYGEN)
+#if MODULE_CAN_PM || defined(DOXYGEN)
     uint32_t rx_inactivity_timeout; /**< Min timeout loaded when a frame is received */
     uint32_t tx_wakeup_timeout;     /**< Min timeout loaded when a frame is sent */
     uint32_t last_pm_update;   /**< time when the pm was updated */

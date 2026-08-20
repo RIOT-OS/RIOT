@@ -26,14 +26,14 @@
 
 #include "ztimer.h"
 
-#ifdef MODULE_PERIPH_SPI
+#if MODULE_PERIPH_SPI
 #include "periph/spi.h"
 #endif
-#ifdef MODULE_PERIPH_I2C
+#if MODULE_PERIPH_I2C
 #include "periph/i2c.h"
 #endif
 
-#ifdef MODULE_PERIPH_SPI
+#if MODULE_PERIPH_SPI
 static spi_clk_t u8x8_pulse_width_to_spi_speed(uint32_t pulse_width)
 {
     const uint32_t cycle_time = 2 * pulse_width;
@@ -128,7 +128,7 @@ uint8_t u8x8_gpio_and_delay_riotos(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, v
     return 1;
 }
 
-#ifdef MODULE_PERIPH_SPI
+#if MODULE_PERIPH_SPI
 uint8_t u8x8_byte_hw_spi_riotos(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {
     const u8x8_riotos_t *u8x8_riot_ptr = u8x8_GetUserPtr(u8g2);
@@ -170,7 +170,7 @@ uint8_t u8x8_byte_hw_spi_riotos(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void
 }
 #endif /* MODULE_PERIPH_SPI */
 
-#ifdef MODULE_PERIPH_I2C
+#if MODULE_PERIPH_I2C
 uint8_t u8x8_byte_hw_i2c_riotos(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {
     static uint8_t buffer[32]; /* u8x8 will never send more than 32 bytes

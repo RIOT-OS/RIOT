@@ -17,7 +17,7 @@
 
 #include "mutex.h"
 #include "net/gnrc/sixlowpan/ctx.h"
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
 #include "ztimer.h"
 #include "timex.h"
 #else
@@ -136,7 +136,7 @@ gnrc_sixlowpan_ctx_t *gnrc_sixlowpan_ctx_update(uint8_t id, const ipv6_addr_t *p
 
 static uint32_t _current_minute(void)
 {
-#if IS_USED(MODULE_ZTIMER_MSEC)
+#if MODULE_ZTIMER_MSEC
     return ztimer_now(ZTIMER_MSEC) / (MS_PER_SEC * SEC_PER_MIN);
 #else
     return xtimer_now_usec() / (US_PER_SEC * SEC_PER_MIN);

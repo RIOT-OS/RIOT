@@ -83,7 +83,7 @@
  * OLED display uses SPI_DEV(0) on this board.
  * @{
  */
-#if defined(MODULE_ST77XX)
+#if MODULE_ST77XX
 #define ST77XX_PARAM_CNTRL          ST77XX_CNTRL_ST7789
 #define ST77XX_PARAM_SPI            SPI_DEV(0)      /**< SPI device */
 #define ST77XX_PARAM_SPI_CLK        SPI_CLK_10MHZ   /**< SPI clock frequency */

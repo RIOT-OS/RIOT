@@ -68,7 +68,7 @@ int main(void)
                   THREAD_CREATE_WOUT_YIELD,
                   led_thread_impl, NULL, "led");
 
-    if (!IS_USED(MODULE_AUTO_INIT)) {
+    if (!MODULE_AUTO_INIT) {
         /* If auto-initialization is not used (module `auto_init`),
          * initialize the tinyUSB stack including used peripherals and
          * start the tinyUSB thread. Auto-initialization is used by default. */

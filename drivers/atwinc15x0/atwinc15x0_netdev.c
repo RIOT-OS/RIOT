@@ -119,7 +119,7 @@ static struct {
 
 static inline void _wifi_scan_list_empty(void)
 {
-#if IS_USED(MODULE_WIFI_SCAN_LIST)
+#if MODULE_WIFI_SCAN_LIST
     wifi_scan_list_empty(&_atwinc15x0_scan_list.head,
                          _atwinc15x0_scan_list.array,
                          ARRAY_SIZE(_atwinc15x0_scan_list.array));
@@ -129,7 +129,7 @@ static inline void _wifi_scan_list_empty(void)
 static inline void _wifi_scan_list_insert(const wifi_scan_result_t *result)
 {
     (void)result;
-#if IS_USED(MODULE_WIFI_SCAN_LIST)
+#if MODULE_WIFI_SCAN_LIST
     wifi_scan_list_insert(&_atwinc15x0_scan_list.head,
                           _atwinc15x0_scan_list.array,
                           ARRAY_SIZE(_atwinc15x0_scan_list.array),
@@ -221,7 +221,7 @@ static inline void _atwinc15x0_set_reconnect_timer(void)
 
 static int _atwinc15x0_static_connect(void)
 {
-    if (!IS_USED(MODULE_ATWINC15X0_STATIC_CONNECT)) {
+    if (!MODULE_ATWINC15X0_STATIC_CONNECT) {
         return 0;
     }
     tuniM2MWifiAuth auth_info;
@@ -235,12 +235,12 @@ static int _atwinc15x0_static_connect(void)
     if (_atwinc15x0_is_sleeping(atwinc15x0)) {
         return -ECANCELED;
     }
-#if !defined(MODULE_WIFI_ENTERPRISE) && defined(WIFI_PASS)
+#if !MODULE_WIFI_ENTERPRISE && defined(WIFI_PASS)
 
     strncpy((char *)auth_info.au8PSK, WIFI_PASS, M2M_MAX_PSK_LEN);
     auth_type = M2M_WIFI_SEC_WPA_PSK;
 
-#elif defined(MODULE_WIFI_ENTERPRISE)
+#elif MODULE_WIFI_ENTERPRISE
 
 #if defined(WIFI_USER) && defined(WIFI_PASS)
     strncpy((char *)&auth_info.strCred1x.au8UserName, WIFI_USER, M2M_1X_USR_NAME_MAX);
@@ -251,7 +251,7 @@ static int _atwinc15x0_static_connect(void)
        and the password for EAP phase 2 authentication in wifi_enterprise
 #endif /* defined(WIFI_USER) && defined(WIFI_PASS) */
 
-#endif /* defined(MODULE_WIFI_ENTERPRISE) */
+#endif /* MODULE_WIFI_ENTERPRISE */
     /* connect */
     int8_t res;
     if ((res = m2m_wifi_connect(WIFI_SSID, sizeof(WIFI_SSID),
@@ -291,7 +291,7 @@ static void _atwinc15x0_eth_cb(uint8_t type, void *msg, void *ctrl_buf)
     DEBUG("%s type=%u msg=%p len=%d remaining=%d\n", __func__,
           type, msg, ctrl->u16DataSize, ctrl->u16RemainigDataSize);
 
-    if (IS_ACTIVE(ENABLE_DEBUG_DUMP) && IS_USED(MODULE_OD)) {
+    if (IS_ACTIVE(ENABLE_DEBUG_DUMP) && MODULE_OD) {
         od_hex_dump(msg, ctrl->u16DataSize, 16);
     }
 
@@ -330,7 +330,7 @@ static void _atwinc15x0_handle_resp_scan_done(const tstrM2mScanDone* scan_done)
     else {
         /* no results */
         _atwinc15x0_set_idle(atwinc15x0);
-        if (IS_USED(MODULE_ATWINC15X0_DYNAMIC_SCAN)) {
+        if (MODULE_ATWINC15X0_DYNAMIC_SCAN) {
             _wifi_scan_result_callback(&_atwinc15x0_scan_list.head);
         }
     }
@@ -351,7 +351,7 @@ static void _atwinc15x0_handle_resp_scan_result(const tstrM2mWifiscanResult* sca
             atwinc15x0->channel = scan_result->u8ch;
         }
     }
-    if (IS_USED(MODULE_ATWINC15X0_DYNAMIC_SCAN)) {
+    if (MODULE_ATWINC15X0_DYNAMIC_SCAN) {
         int sec;
         if ((sec = _atwinc15x0_get_sec_mode(scan_result->u8AuthType)) != -1) {
             wifi_scan_result_t result = WIFI_SCAN_RESULT_INITIALIZER(scan_result->u8ch,
@@ -367,7 +367,7 @@ static void _atwinc15x0_handle_resp_scan_result(const tstrM2mWifiscanResult* sca
     }
     else {
         _atwinc15x0_set_idle(atwinc15x0);
-        if (IS_USED(MODULE_ATWINC15X0_DYNAMIC_SCAN)) {
+        if (MODULE_ATWINC15X0_DYNAMIC_SCAN) {
             _wifi_scan_result_callback(&_atwinc15x0_scan_list.head);
         }
     }
@@ -402,7 +402,7 @@ static void _atwinc15x0_handle_resp_con_state_changed(const tstrM2mWifiStateChan
                 DEBUG("atwinc15x0: notify upper layer about disconnect\n");
                 atwinc15x0->netdev.event_callback(&atwinc15x0->netdev, NETDEV_EVENT_LINK_DOWN);
             }
-            if (IS_USED(MODULE_ATWINC15X0_DYNAMIC_CONNECT)) {
+            if (MODULE_ATWINC15X0_DYNAMIC_CONNECT) {
                 if (!was_connected && !is_disconnecting && !is_sleeping) {
                     /* connection failed */
                     DEBUG("atwinc15x0: notify about connection failure\n");
@@ -422,7 +422,7 @@ static void _atwinc15x0_handle_resp_con_state_changed(const tstrM2mWifiStateChan
                     _wifi_disconnect_result_callback(&disconn);
                 }
             }
-            if (IS_USED(MODULE_ATWINC15X0_STATIC_CONNECT)) {
+            if (MODULE_ATWINC15X0_STATIC_CONNECT) {
                 /* do not reconnect on sleep */
                 if (!_atwinc15x0_is_sleeping(atwinc15x0)) {
                     /* schedule reconnect timer:
@@ -438,7 +438,7 @@ static void _atwinc15x0_handle_resp_con_state_changed(const tstrM2mWifiStateChan
             atwinc15x0->netdev.event_callback(&atwinc15x0->netdev, NETDEV_EVENT_LINK_UP);
             /* get information about the current AP */
             m2m_wifi_get_connection_info();
-            if (IS_USED(MODULE_ATWINC15X0_DYNAMIC_CONNECT)) {
+            if (MODULE_ATWINC15X0_DYNAMIC_CONNECT) {
                 _atwinc15x0_sta_set_current_ssid(atwinc15x0,
                                                  _atwinc15x0_connect_req.conn_req.ssid);
                 atwinc15x0->channel = _atwinc15x0_connect_req.conn_req.base.channel;
@@ -462,7 +462,7 @@ static void _atwinc15x0_handle_resp_con_state_changed(const tstrM2mWifiStateChan
                 }
                 _wifi_connect_result_callback(&conn);
             }
-            if (IS_USED(MODULE_ATWINC15X0_STATIC_CONNECT)) {
+            if (MODULE_ATWINC15X0_STATIC_CONNECT) {
                 /* start a scan for additional info, e.g. used channel */
                 m2m_wifi_request_scan(M2M_WIFI_CH_ALL);
             }
@@ -482,7 +482,7 @@ static void _atwinc15x0_handle_resp_conn_info(const tstrM2MConnInfo *conn_info)
     /* set the RSSI and BSSID of the current AP */
     atwinc15x0->rssi = conn_info->s8RSSI;
     memcpy(atwinc15x0->ap, conn_info->au8MACAddress, ETHERNET_ADDR_LEN);
-    if (IS_USED(MODULE_ATWINC15X0_DYNAMIC_CONNECT)) {
+    if (MODULE_ATWINC15X0_DYNAMIC_CONNECT) {
         _atwinc15x0_sta_set_current_ssid(atwinc15x0, conn_info->acSSID);
     }
 }
@@ -560,7 +560,7 @@ static int _atwinc15x0_send(netdev_t *netdev, const iolist_t *iolist)
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         DEBUG("%s send %d byte", __func__, tx_len);
-        if (IS_ACTIVE(ENABLE_DEBUG_DUMP) && IS_USED(MODULE_OD)) {
+        if (IS_ACTIVE(ENABLE_DEBUG_DUMP) && MODULE_OD) {
             od_hex_dump(atwinc15x0_eth_buf, tx_len, OD_WIDTH_DEFAULT);
         }
     }
@@ -627,7 +627,7 @@ static int _atwinc15x0_recv(netdev_t *netdev, void *buf, size_t len, void *info)
         DEBUG("%s received %u byte from addr " ATWINC15X0_MAC_STR "\n",
             __func__, rx_size, ATWINC15X0_MAC_STR_ARG(hdr->src));
 
-        if (IS_ACTIVE(ENABLE_DEBUG_DUMP) && IS_USED(MODULE_OD)) {
+        if (IS_ACTIVE(ENABLE_DEBUG_DUMP) && MODULE_OD) {
             od_hex_dump(buf, rx_size, OD_WIDTH_DEFAULT);
         }
     }
@@ -723,7 +723,7 @@ static int _set_state(atwinc15x0_t *dev, netopt_state_t state)
             }
             m2m_wifi_set_sleep_mode(M2M_PS_DEEP_AUTOMATIC, CONFIG_ATWINC15X0_RECV_BCAST);
             _atwinc15x0_set_disconnected(dev);
-            if (IS_USED(MODULE_ATWINC15X0_STATIC_CONNECT)) {
+            if (MODULE_ATWINC15X0_STATIC_CONNECT) {
                 _atwinc15x0_set_reconnect_timer();
             }
         }
@@ -792,7 +792,7 @@ static int _atwinc15x0_set(netdev_t *netdev, netopt_t opt, const void *val,
                 return max_len;
             }
         case NETOPT_SCAN:
-            if (!IS_USED(MODULE_ATWINC15X0_DYNAMIC_SCAN)) {
+            if (!MODULE_ATWINC15X0_DYNAMIC_SCAN) {
                 break;
             }
             if (max_len < sizeof(wifi_scan_request_t)) {
@@ -803,7 +803,7 @@ static int _atwinc15x0_set(netdev_t *netdev, netopt_t opt, const void *val,
             }
             return sizeof(wifi_scan_request_t);
         case NETOPT_CONNECT:
-            if (!IS_USED(MODULE_ATWINC15X0_DYNAMIC_CONNECT)) {
+            if (!MODULE_ATWINC15X0_DYNAMIC_CONNECT) {
                 break;
             }
             if (max_len < sizeof(wifi_connect_request_t)) {
@@ -814,7 +814,7 @@ static int _atwinc15x0_set(netdev_t *netdev, netopt_t opt, const void *val,
             }
             return sizeof(wifi_connect_request_t);
         case NETOPT_DISCONNECT:
-            if (!IS_USED(MODULE_ATWINC15X0_DYNAMIC_CONNECT)) {
+            if (!MODULE_ATWINC15X0_DYNAMIC_CONNECT) {
                 break;
             }
             if (max_len < sizeof(wifi_disconnect_request_t)) {
@@ -905,7 +905,7 @@ static int _atwinc15x0_init(netdev_t *netdev)
     m2m_wifi_set_sleep_mode(M2M_PS_DEEP_AUTOMATIC, CONFIG_ATWINC15X0_RECV_BCAST);
 
     res = 0;
-    if (IS_USED(MODULE_ATWINC15X0_STATIC_CONNECT)) {
+    if (MODULE_ATWINC15X0_STATIC_CONNECT) {
         /* try to connect and return */
         res = _atwinc15x0_static_connect();
     }
@@ -916,7 +916,7 @@ static int _atwinc15x0_scan(const wifi_scan_request_t *req)
 {
     assert(req);
     (void)req;
-    if (!IS_USED(MODULE_ATWINC15X0_DYNAMIC_SCAN)) {
+    if (!MODULE_ATWINC15X0_DYNAMIC_SCAN) {
         return 0;
     }
     if (_atwinc15x0_is_busy(atwinc15x0)) {
@@ -986,7 +986,7 @@ static int _atwinc15x0_disconnect(const wifi_disconnect_request_t *req)
 static int _atwinc15x0_connect(const wifi_connect_request_t *req)
 {
     assert(req);
-    if (!IS_USED(MODULE_ATWINC15X0_DYNAMIC_CONNECT)) {
+    if (!MODULE_ATWINC15X0_DYNAMIC_CONNECT) {
         return 0;
     }
     tuniM2MWifiAuth auth_info;
@@ -1061,7 +1061,7 @@ static void _atwinc15x0_isr(netdev_t *netdev)
         _atwinc15x0_init(netdev);
     }
     int err;
-    if (IS_USED(MODULE_ATWINC15X0_STATIC_CONNECT)) {
+    if (MODULE_ATWINC15X0_STATIC_CONNECT) {
         if (_atwinc15x0_timer.timeout == ATWINC15X0_WIFI_STA_TIMEOUT_RECONNECT) {
             if (!_atwinc15x0_is_connected(atwinc15x0)) {
                 /* try again if device is busy or the Atmel firmware throws an error */

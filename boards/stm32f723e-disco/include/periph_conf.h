@@ -33,7 +33,7 @@
 #include "periph_cpu.h"
 #include "clk_conf.h"
 #include "cfg_rtt_default.h"
-#if defined(MODULE_PERIPH_USBDEV_HS_UTMI)
+#if MODULE_PERIPH_USBDEV_HS_UTMI
 #include "cfg_usb_otg_hs_phy_utmi.h"
 #else
 #include "cfg_usb_otg_fs.h"
@@ -77,7 +77,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB2,
         .irqn       = USART6_IRQn,
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_UNDEF,
         .rts_pin    = GPIO_UNDEF,
         .cts_af     = GPIO_AF8,
@@ -93,7 +93,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_UNDEF,
         .rts_pin    = GPIO_UNDEF,
         .cts_af     = GPIO_AF8,
@@ -109,7 +109,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB1,
         .irqn       = UART7_IRQn,
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_PIN(PORT_F, 9),
         .rts_pin    = GPIO_PIN(PORT_F, 8),
         .cts_af     = GPIO_AF8,
@@ -125,7 +125,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB1,
         .irqn       = UART5_IRQn,
-#ifdef MODULE_PERIPH_UART_HW_FC
+#if MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_UNDEF,
         .rts_pin    = GPIO_UNDEF,
         .cts_af     = GPIO_AF8,

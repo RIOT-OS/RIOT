@@ -98,7 +98,7 @@ typedef struct {
     psa_key_attributes_t attr;
     struct prot_key_data {
         psa_key_slot_number_t slot_number;
-#if IS_USED(MODULE_PSA_ASYMMETRIC)
+#if MODULE_PSA_ASYMMETRIC
         uint8_t pubkey_data[PSA_EXPORT_PUBLIC_KEY_MAX_SIZE];
         size_t pubkey_data_len;
 #endif

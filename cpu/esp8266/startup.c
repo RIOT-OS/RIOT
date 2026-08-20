@@ -74,7 +74,7 @@ void esp_riot_init(void)
     }
 
     ets_printf("\n");
-#ifdef MODULE_ESP_LOG_STARTUP
+#if MODULE_ESP_LOG_STARTUP
     ets_printf("Starting ESP8266 CPU with ID: %08x\n", system_get_chip_id());
     ets_printf("ESP8266-RTOS-SDK Version %s\n\n", system_get_sdk_version());
     ets_printf("CPU clock frequency: %d MHz\n", system_get_cpu_freq());
@@ -112,7 +112,7 @@ void esp_riot_init(void)
     /* trigger board initialization */
     board_init();
 
-#ifdef MODULE_ESP_LOG_STARTUP
+#if MODULE_ESP_LOG_STARTUP
     /* print the board config */
     board_print_config();
 #else
@@ -129,7 +129,7 @@ void esp_riot_init(void)
     ets_isr_attach(ETS_SOFT_INUM, thread_yield_isr, NULL);
     ets_isr_unmask(BIT(ETS_SOFT_INUM));
 
-#ifdef MODULE_ESP_GDBSTUB
+#if MODULE_ESP_GDBSTUB
     gdbstub_init();
 #endif
 }
@@ -142,7 +142,7 @@ void esp_riot_start(void)
 
 void __wrap_pp_attach(void)
 {
-#ifdef MODULE_ESP_WIFI_ANY
+#if MODULE_ESP_WIFI_ANY
     extern void __real_pp_attach(void);
     __real_pp_attach();
 #endif
@@ -150,7 +150,7 @@ void __wrap_pp_attach(void)
 
 void __wrap_pm_attach(void)
 {
-#ifdef MODULE_ESP_WIFI_ANY
+#if MODULE_ESP_WIFI_ANY
     extern void __real_pm_attach(void);
     __real_pm_attach();
 #endif

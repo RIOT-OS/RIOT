@@ -19,7 +19,7 @@
 #include "board_nucleo.h"
 
 /* Required for `nucleo_wl55jc_sx126x_set_rf_mode` */
-#if IS_USED(MODULE_SX126X_STM32WL)
+#if MODULE_SX126X_STM32WL
 #include "sx126x.h"
 #endif
 
@@ -33,7 +33,7 @@ extern "C" {
  */
 #define SX126X_PARAM_SPI                    (SPI_DEV(0))
 
-#if IS_USED(MODULE_SX126X_STM32WL)
+#if MODULE_SX126X_STM32WL
 extern void nucleo_wl55jc_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_mode);
 #define SX126X_PARAM_SET_RF_MODE_CB         nucleo_wl55jc_sx126x_set_rf_mode
 #define SX126X_PARAM_TYPE                   SX126X_TYPE_STM32WL

@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  nimble_phy_coded \
+  #
 # name of your application
 APPLICATION = nimble_scanner
 

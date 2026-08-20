@@ -27,7 +27,7 @@ extern "C" {
 #include "psa/crypto.h"
 #include "psa/crypto_contexts.h"
 
-#if IS_USED(MODULE_PSA_AEAD_AES_128_CCM) || defined(DOXYGEN)
+#if MODULE_PSA_AEAD_AES_128_CCM || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an AES 128 CCM encryption.
  *          See @ref psa_aead_encrypt()
@@ -53,7 +53,7 @@ psa_status_t psa_aead_aes_128_ccm_decrypt(const psa_key_attributes_t *attributes
                                           size_t plaintext_size, size_t *plaintext_length);
 #endif /* MODULE_PSA_AEAD_AES_128_CCM */
 
-#if IS_USED(MODULE_PSA_AEAD_AES_192_CCM) || defined(DOXYGEN)
+#if MODULE_PSA_AEAD_AES_192_CCM || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an AES 192 CCM encryption.
  *          See @ref psa_aead_encrypt()
@@ -79,7 +79,7 @@ psa_status_t psa_aead_aes_192_ccm_decrypt(const psa_key_attributes_t *attributes
                                           size_t plaintext_size, size_t *plaintext_length);
 #endif /* MODULE_PSA_AEAD_AES_192_CCM */
 
-#if IS_USED(MODULE_PSA_AEAD_AES_256_CCM) || defined(DOXYGEN)
+#if MODULE_PSA_AEAD_AES_256_CCM || defined(DOXYGEN)
 /**
  * @brief   Low level wrapper function to call a driver for an AES 256 CCM encryption.
  *          See @ref psa_aead_encrypt()

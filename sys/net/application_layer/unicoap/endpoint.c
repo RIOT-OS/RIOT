@@ -23,7 +23,7 @@
 #include "net/unicoap/message.h"
 #include "net/unicoap/server.h"
 
-#if IS_USED(MODULE_DNS)
+#if MODULE_DNS
 #  include "net/dns.h"
 #endif
 
@@ -33,28 +33,28 @@
 
 #define STRLEN(str) (sizeof(str) - 1)
 
-#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+#if MODULE_UNICOAP_SOCK_SUPPORT
 void unicoap_print_sock_tl_ep(const struct _sock_tl_ep* ep) {
     (void)ep;
     printf("<sock_tl_ep port=%" PRIu16 " netif=%" PRIu16 " ", ep->port, ep->netif);
     switch (ep->family) {
     case AF_INET6:
         printf("ipv6=");
-#  if SOCK_HAS_IPV6 && IS_USED(MODULE_IPV6_ADDR)
+#  if SOCK_HAS_IPV6 && MODULE_IPV6_ADDR
         ipv6_addr_print((ipv6_addr_t*)ep->addr.ipv6);
 #  else
         UNICOAP_DEBUG("SOCK_HAS_IPV6: v6 support missing, cannot print\n");
         printf("?");
-#  endif /* SOCK_HAS_IPV6 && IS_USED(MODULE_IPV6_ADDR) */
+#  endif /* SOCK_HAS_IPV6 && MODULE_IPV6_ADDR */
         break;
     case AF_INET:
         printf("ipv4=");
-#  if SOCK_HAS_IPV4 && IS_USED(MODULE_IPV4_ADDR)
+#  if SOCK_HAS_IPV4 && MODULE_IPV4_ADDR
         ipv4_addr_print((ipv4_addr_t*)ep->addr.ipv4);
 #  else
         UNICOAP_DEBUG("SOCK_HAS_IPV4: v4 support missing, cannot print\n");
         printf("?");
-#  endif /* SOCK_HAS_IPV6 && IS_USED(MODULE_IPV4_ADDR) */
+#  endif /* SOCK_HAS_IPV6 && MODULE_IPV4_ADDR */
         break;
 
     default:
@@ -63,18 +63,18 @@ void unicoap_print_sock_tl_ep(const struct _sock_tl_ep* ep) {
     }
     printf(">");
 }
-#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) */
+#endif /* MODULE_UNICOAP_SOCK_SUPPORT */
 
 void unicoap_print_endpoint(const unicoap_endpoint_t* endpoint) {
     printf("%s ", unicoap_string_from_proto(endpoint->proto));
 
-#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+#if MODULE_UNICOAP_SOCK_SUPPORT
     if (unicoap_transport_uses_sock_tl_ep(endpoint->proto)) {
         unicoap_print_sock_tl_ep(&endpoint->_tl_ep);
         return;
     }
-#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) */
-#if IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX)
+#endif /* MODULE_UNICOAP_SOCK_SUPPORT */
+#if MODULE_UNICOAP_DRIVER_SLIPMUX
     if (endpoint->proto == UNICOAP_PROTO_SLIPMUX) {
         printf("<uart(%d)>", endpoint->slipmux_ep->config.uart);
         return;
@@ -105,15 +105,15 @@ bool unicoap_endpoint_is_equal(const unicoap_endpoint_t* lhs,
         return false;
     }
     switch (lhs->proto) {
-#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+#if MODULE_UNICOAP_SOCK_SUPPORT
     case UNICOAP_PROTO_UDP:
     case UNICOAP_PROTO_DTLS:
         return sock_tl_ep_equal(&lhs->_tl_ep, &rhs->_tl_ep);
-#endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) */
-#if IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX)
+#endif /* MODULE_UNICOAP_SOCK_SUPPORT */
+#if MODULE_UNICOAP_DRIVER_SLIPMUX
     case UNICOAP_PROTO_SLIPMUX:
         return lhs->slipmux_ep->config.uart == rhs->slipmux_ep->config.uart;
-#endif /* IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX) */
+#endif /* MODULE_UNICOAP_DRIVER_SLIPMUX */
     /* MARK: unicoap_driver_extension_point */
     default:
         assert(false);
@@ -125,7 +125,7 @@ bool unicoap_endpoint_is_multicast(const unicoap_endpoint_t* endpoint) {
     switch (endpoint->proto) {
     case UNICOAP_PROTO_UDP:
     case UNICOAP_PROTO_DTLS:
-#if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
+#if MODULE_UNICOAP_SOCK_SUPPORT
         return sock_udp_ep_is_multicast(&endpoint->udp_ep);
 #else
         UNICOAP_DEBUG("sock support is missing, cannot check if multicast addr, driver missing?\n");

@@ -15,7 +15,7 @@
  * @}
  */
 
-#ifdef MODULE_HSC
+#if MODULE_HSC
 
 #include "assert.h"
 #include "log.h"

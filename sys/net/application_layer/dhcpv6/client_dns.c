@@ -14,7 +14,7 @@
  */
 
 #include "net/dhcpv6/client.h"
-#if IS_USED(MODULE_SOCK_DNS)
+#if MODULE_SOCK_DNS
 #include "net/sock/dns.h"
 #endif
 
@@ -31,7 +31,7 @@ void dhcpv6_client_dns_rns_conf(const dhcpv6_opt_dns_rns_t *opt, uint16_t netif)
         DEBUG("dhcpv6_client_dns: no DNS recursive name server provided.\n");
         return;
     }
-#if IS_USED(MODULE_SOCK_DNS) && IS_ACTIVE(SOCK_HAS_IPV6)
+#if MODULE_SOCK_DNS && IS_ACTIVE(SOCK_HAS_IPV6)
     DEBUG("Overriding sock_dns_server with %s\n",
           ipv6_addr_to_str(addr_str, opt->dns_rns, sizeof(addr_str)));
     sock_dns_server.port = SOCK_DNS_PORT;

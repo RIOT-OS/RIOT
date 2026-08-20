@@ -33,7 +33,7 @@ void lwip_bootstrap(void)
     lwip_netif_init_devs();
     /* also allow for external interface definition */
     tcpip_init(NULL, NULL);
-#if IS_USED(MODULE_LWIP_DHCP_AUTO)
+#if MODULE_LWIP_DHCP_AUTO
     {
         /* Start DHCP on all supported netifs. Interfaces that support
          * link status events will reset DHCP retries when link comes up. */

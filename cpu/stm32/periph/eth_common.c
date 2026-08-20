@@ -89,27 +89,27 @@ void stm32_eth_common_init(void)
     ETH->DMABMR |= ETH_DMABMR_SR;
     while (ETH->DMABMR & ETH_DMABMR_SR) {}
 
-    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+    if (MODULE_STM32_ETH_TRACING) {
         gpio_ll_init(STM32_ETH_TRACING_IRQ_PORT,
                      STM32_ETH_TRACING_IRQ_PIN_NUM,
                      gpio_ll_out);
     }
 
-    if (IS_USED(MODULE_PERIPH_ETH) || IS_USED(MODULE_PERIPH_PTP_TIMER)) {
+    if (MODULE_PERIPH_ETH || MODULE_PERIPH_PTP_TIMER) {
         NVIC_EnableIRQ(ETH_IRQn);
     }
 }
 
-#if IS_USED(MODULE_STM32_ETH) || IS_USED(MODULE_PERIPH_PTP_TIMER)
+#if MODULE_STM32_ETH || MODULE_PERIPH_PTP_TIMER
 void isr_eth(void)
 {
     DEBUG("[periph_eth_common] isr_eth()\n");
-    if (IS_USED(MODULE_STM32_ETH_TRACING)) {
+    if (MODULE_STM32_ETH_TRACING) {
         gpio_ll_toggle(STM32_ETH_TRACING_IRQ_PORT,
                        (1U << STM32_ETH_TRACING_IRQ_PIN_NUM));
     }
 
-    if (IS_USED(MODULE_PERIPH_PTP_TIMER)) {
+    if (MODULE_PERIPH_PTP_TIMER) {
         if (ETH->MACSR & ETH_MACSR_TSTS) {
             /* clear interrupt by reading PTPTSSR */
             (void)ETH->PTPTSSR;
@@ -117,7 +117,7 @@ void isr_eth(void)
         }
     }
 
-    if (IS_USED(MODULE_STM32_ETH)) {
+    if (MODULE_STM32_ETH) {
         extern netdev_t *stm32_eth_netdev;
         unsigned tmp = ETH->DMASR;
         ETH->DMASR = ETH_DMASR_NIS | ETH_DMASR_TS | ETH_DMASR_RS;

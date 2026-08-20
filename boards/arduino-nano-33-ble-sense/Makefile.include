@@ -19,3 +19,7 @@ TESTRUNNER_CONNECT_DELAY ?= 2
 $(call target-export-variables,test,TESTRUNNER_CONNECT_DELAY)
 
 include $(RIOTBOARD)/common/nrf52/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_hw_fc \
+  #

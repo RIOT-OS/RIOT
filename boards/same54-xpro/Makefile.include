@@ -11,3 +11,9 @@ CFLAGS += -DSAM0_GCLK_PERIPH=9
 CFLAGS += -DSAM0_GCLK_100MHZ=10
 
 include $(RIOTMAKE)/boards/sam0.inc.mk
+
+MODULE_DEFS_NEEDED += \
+  periph_dma \
+  periph_spi_on_qspi \
+  periph_uart_hw_fc \
+  #

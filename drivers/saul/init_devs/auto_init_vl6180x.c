@@ -11,7 +11,7 @@
  * @file
  */
 
-#ifdef MODULE_VL6180X
+#if MODULE_VL6180X
 
 #include "assert.h"
 #include "log.h"

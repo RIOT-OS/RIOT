@@ -35,7 +35,7 @@
 #include "net/gnrc/nettype.h"
 
 /* we need no peripherals for memory mapped radios */
-#if !defined(MODULE_AT86RFA1) && !defined(MODULE_AT86RFR2)
+#if !MODULE_AT86RFA1 && !MODULE_AT86RFR2
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #endif
@@ -53,7 +53,7 @@ extern "C" {
  * @name    Channel configuration
  * @{
  */
-#ifdef MODULE_AT86RF212B
+#if MODULE_AT86RF212B
 /* the AT86RF212B has a sub-1GHz radio */
 #define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN_SUBGHZ)
 #define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX_SUBGHZ)
@@ -107,7 +107,7 @@ extern "C" {
 /**
  * @brief   Whether there is a periph version of the radio
  */
-#if IS_USED(MODULE_AT86RFA1) || IS_USED(MODULE_AT86RFR2)
+#if MODULE_AT86RFA1 || MODULE_AT86RFR2
 #define AT86RF2XX_IS_PERIPH (1)
 #else
 #define AT86RF2XX_IS_PERIPH (0)
@@ -116,7 +116,7 @@ extern "C" {
 /**
  * @brief   ED Register
  */
-#if defined(MODULE_AT86RF231) || IS_ACTIVE(AT86RF2XX_PERIPH)
+#if MODULE_AT86RF231 || IS_ACTIVE(AT86RF2XX_PERIPH)
 #define AT86RF2XX_HAVE_ED_REGISTER (1)
 #else
 #define AT86RF2XX_HAVE_ED_REGISTER (0)
@@ -125,13 +125,13 @@ extern "C" {
 /**
  * @brief   Support for SubGHz bands
  */
-#ifdef MODULE_AT86RF212B
+#if MODULE_AT86RF212B
 #define AT86RF2XX_HAVE_SUBGHZ (1)
 #else
 #define AT86RF2XX_HAVE_SUBGHZ (0)
 #endif
 
-#if defined(DOXYGEN) || defined(MODULE_AT86RF232) || defined(MODULE_AT86RF233) || defined(MODULE_AT86RFR2)
+#if defined(DOXYGEN) || MODULE_AT86RF232 || MODULE_AT86RF233 || MODULE_AT86RFR2
 /**
  * @brief   Frame retry counter reporting
  *
@@ -171,7 +171,7 @@ extern "C" {
  * register as a source of randomness.
  * See Section 11.2 of the at86rf233 reference manual. (RND_VALUE)
  */
-#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RF231) || defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if MODULE_AT86RF233 || MODULE_AT86RF231 || MODULE_AT86RFA1 || MODULE_AT86RFR2
 #ifndef AT86RF2XX_RANDOM_NUMBER_GENERATOR
 #define AT86RF2XX_RANDOM_NUMBER_GENERATOR  (1)
 #endif
@@ -189,7 +189,7 @@ extern "C" {
  * manual recommends to disable this feature for RSSI measurements or random number
  * generation (Section 8.4 and Section 11.2).
  */
-#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RFR2)
+#if MODULE_AT86RF233 || MODULE_AT86RFR2
 #ifndef AT86RF2XX_SMART_IDLE_LISTENING
 #define AT86RF2XX_SMART_IDLE_LISTENING     (1)
 #endif
@@ -294,7 +294,7 @@ typedef struct {
     uint16_t flags;                         /**< Device specific flags */
     uint8_t state;                          /**< current state of the radio */
     uint8_t tx_frame_len;                   /**< length of the current TX frame */
-#ifdef MODULE_AT86RF212B
+#if MODULE_AT86RF212B
     /* Only AT86RF212B supports multiple pages (PHY modes) */
     uint8_t page;                       /**< currently used channel page */
 #endif

@@ -32,7 +32,7 @@
 extern "C" {
 #endif
 
-#ifdef MODULE_AUTO_INIT_SOCK_DNS
+#if MODULE_AUTO_INIT_SOCK_DNS
 /**
  * @brief IP version of the address provided with CONFIG_AUTO_INIT_SOCK_DNS_SERVER_ADDR
  */

@@ -26,19 +26,19 @@ extern "C" {
 #include "kernel_defines.h"
 #include "psa/algorithm.h"
 
-#if IS_USED(MODULE_PSA_RIOT_HASHES_HMAC_SHA256) || IS_USED(MODULE_PSA_RIOT_HASHES_MD5) || \
-    IS_USED(MODULE_PSA_RIOT_HASHES_SHA_1) || IS_USED(MODULE_PSA_RIOT_HASHES_SHA_224) || \
-    IS_USED(MODULE_PSA_RIOT_HASHES_SHA_256) || IS_USED(MODULE_PSA_RIOT_HASHES_SHA_384) || \
-    IS_USED(MODULE_PSA_RIOT_HASHES_SHA_512) || IS_USED(MODULE_PSA_RIOT_HASHES_SHA_512_224) || \
-    IS_USED(MODULE_PSA_RIOT_HASHES_SHA_512_256) || IS_USED(MODULE_PSA_RIOT_HASHES_SHA3_256) || \
-    IS_USED(MODULE_PSA_RIOT_HASHES_SHA3_384) || IS_USED(MODULE_PSA_RIOT_HASHES_SHA3_512)
+#if MODULE_PSA_RIOT_HASHES_HMAC_SHA256 || MODULE_PSA_RIOT_HASHES_MD5 || \
+    MODULE_PSA_RIOT_HASHES_SHA_1 || MODULE_PSA_RIOT_HASHES_SHA_224 || \
+    MODULE_PSA_RIOT_HASHES_SHA_256 || MODULE_PSA_RIOT_HASHES_SHA_384 || \
+    MODULE_PSA_RIOT_HASHES_SHA_512 || MODULE_PSA_RIOT_HASHES_SHA_512_224 || \
+    MODULE_PSA_RIOT_HASHES_SHA_512_256 || MODULE_PSA_RIOT_HASHES_SHA3_256 || \
+    MODULE_PSA_RIOT_HASHES_SHA3_384 || MODULE_PSA_RIOT_HASHES_SHA3_512
 #include "hashes/psa/riot_hashes.h"
 #endif
 
-#if IS_USED(MODULE_PERIPH_HASH_SHA_1) || IS_USED(MODULE_PERIPH_HASH_SHA_224) || \
-    IS_USED(MODULE_PERIPH_HASH_SHA_256) || IS_USED(MODULE_PERIPH_HASH_SHA_384) || \
-    IS_USED(MODULE_PERIPH_HASH_SHA_512) || IS_USED(MODULE_PERIPH_HASH_SHA_512_224) || \
-    IS_USED(MODULE_PERIPH_HASH_SHA_512_256)
+#if MODULE_PERIPH_HASH_SHA_1 || MODULE_PERIPH_HASH_SHA_224 || \
+    MODULE_PERIPH_HASH_SHA_256 || MODULE_PERIPH_HASH_SHA_384 || \
+    MODULE_PERIPH_HASH_SHA_512 || MODULE_PERIPH_HASH_SHA_512_224 || \
+    MODULE_PERIPH_HASH_SHA_512_256
 #include "psa_periph_hashes_ctx.h"
 #endif
 
@@ -46,32 +46,32 @@ extern "C" {
  * @brief   Structure containing the hash contexts needed by the application.
  */
 typedef union {
-#if IS_USED(MODULE_PSA_HASH_MD5) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_MD5 || defined(DOXYGEN)
     psa_hashes_md5_ctx_t md5;   /**< MD5 context */
 #endif
-#if IS_USED(MODULE_PSA_HASH_SHA_1) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA_1 || defined(DOXYGEN)
     psa_hashes_sha1_ctx_t sha1; /**< SHA-1 context */
 #endif
-#if IS_USED(MODULE_PSA_HASH_SHA_224) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA_224 || defined(DOXYGEN)
     psa_hashes_sha224_ctx_t sha224; /**< SHA-224 context */
 #endif
-#if IS_USED(MODULE_PSA_HASH_SHA_256) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA_256 || defined(DOXYGEN)
     psa_hashes_sha256_ctx_t sha256; /**< SHA-256 context */
 #endif
-#if IS_USED(MODULE_PSA_HASH_SHA_384) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA_384 || defined(DOXYGEN)
     psa_hashes_sha384_ctx_t sha384; /**< SHA-384 context */
 #endif
-#if IS_USED(MODULE_PSA_HASH_SHA_512) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA_512 || defined(DOXYGEN)
     psa_hashes_sha512_ctx_t sha512; /**< SHA-512 context */
 #endif
-#if IS_USED(MODULE_PSA_HASH_SHA3_256) || IS_USED(MODULE_PSA_HASH_SHA3_384) \
-|| IS_USED(MODULE_PSA_HASH_SHA3_512) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA3_256 || MODULE_PSA_HASH_SHA3_384 \
+|| MODULE_PSA_HASH_SHA3_512 || defined(DOXYGEN)
     psa_hashes_sha3_ctx_t sha3; /**< SHA-3 context */
 #endif
-#if IS_USED(MODULE_PSA_HASH_SHA_512_224) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA_512_224 || defined(DOXYGEN)
     psa_hashes_sha512_224_ctx_t sha512_224; /**< SHA-512/224 context */
 #endif
-#if IS_USED(MODULE_PSA_HASH_SHA_512_256) || defined(DOXYGEN)
+#if MODULE_PSA_HASH_SHA_512_256 || defined(DOXYGEN)
     psa_hashes_sha512_256_ctx_t sha512_256; /**< SHA-512/256 context */
 #endif
 } psa_hash_context_t;
@@ -81,7 +81,7 @@ typedef union {
  */
 struct psa_hash_operation_s {
     psa_algorithm_t alg;        /**< Operation algorithm */
-#if IS_USED(MODULE_PSA_HASH) || defined(DOXYGEN)
+#if MODULE_PSA_HASH || defined(DOXYGEN)
     psa_hash_context_t ctx;     /**< Operation hash context */
 #endif
 };

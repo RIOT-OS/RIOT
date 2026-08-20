@@ -206,7 +206,7 @@ int32_t adc_sample(adc_t line,  adc_res_t res)
     prep();
 
     /* check if this is the VBAT line */
-    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+    if (MODULE_PERIPH_VBAT && line == VBAT_ADC) {
         vbat_enable();
     }
 
@@ -228,7 +228,7 @@ int32_t adc_sample(adc_t line,  adc_res_t res)
     sample = (int)ADC1->DR;
 
     /* check if this is the VBAT line */
-    if (IS_USED(MODULE_PERIPH_VBAT) && line == VBAT_ADC) {
+    if (MODULE_PERIPH_VBAT && line == VBAT_ADC) {
         vbat_disable();
     }
 

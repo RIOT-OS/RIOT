@@ -72,9 +72,9 @@
 #include "vl6180x.h"
 #include "vl6180x_params.h"
 
-#if IS_USED(MODULE_VL6180X_IRQ)
+#if MODULE_VL6180X_IRQ
 
-#if IS_USED(MODULE_VL6180X_RNG)
+#if MODULE_VL6180X_RNG
 static const char *rng_errors[] = {
     "No error",                         /**< VL6180X_RNG_OK */
     "VCSEL continuity Test",            /**< VL6180X_RNG_VCSEL_CONT_TEST */
@@ -95,7 +95,7 @@ static const char *rng_errors[] = {
 };
 #endif
 
-#if IS_USED(MODULE_VL6180X_ALS)
+#if MODULE_VL6180X_ALS
 static const char *als_errors[] = {
     "No error",                         /**< VL6180X_ALS_OK */
     "ALS measurement overflow",         /**< VL6180X_ALS_OVERFLOW */
@@ -103,18 +103,18 @@ static const char *als_errors[] = {
 };
 #endif
 
-#endif /* IS_USED(MODULE_VL6180X_IRQ) */
+#endif /* MODULE_VL6180X_IRQ */
 
 int main(void)
 {
     /* Initialize the sensor */
     vl6180x_t dev;
 
-#if IS_USED(MODULE_VL6180X_RNG)
+#if MODULE_VL6180X_RNG
     uint8_t  rng;
 #endif
 
-#if IS_USED(MODULE_VL6180X_ALS)
+#if MODULE_VL6180X_ALS
     uint16_t als;
     uint16_t lux;
 #endif
@@ -131,38 +131,38 @@ int main(void)
         return 1;
     }
 
-#if IS_USED(MODULE_VL6180X_SHUTDOWN)
+#if MODULE_VL6180X_SHUTDOWN
     unsigned count = 0;
 #endif
 
-#if IS_USED(MODULE_VL6180X_IRQ) && IS_USED(MODULE_VL6180X_CONFIG)
+#if MODULE_VL6180X_IRQ && MODULE_VL6180X_CONFIG
     vl6180x_int_config_t mode;
     vl6180x_int_thresh_t thresh;
 
-#if IS_USED(MODULE_VL6180X_RNG)
+#if MODULE_VL6180X_RNG
     /* interrupt when distance is less than 30 mm or greater than 100 mm */
     mode.rng_int = VL6180X_INT_OUT;
     thresh.rng_low = 30;
     thresh.rng_high = 100;
-#endif /* IS_USED(MODULE_VL6180X_RNG) */
+#endif /* MODULE_VL6180X_RNG */
 
-#if IS_USED(MODULE_VL6180X_ALS)
+#if MODULE_VL6180X_ALS
     /* interrupts when ALS data are ready */
     mode.als_int = VL6180X_INT_DRDY;
-#endif /* IS_USED(MODULE_VL6180X_RNG) */
+#endif /* MODULE_VL6180X_RNG */
 
     vl6180x_int_config(&dev, thresh);
     vl6180x_int_enable(&dev, mode);
 
-#endif /* IS_USED(MODULE_VL6180X_CONFIG) && IS_USED(MODULE_VL6180X_IRQ) */
+#endif /* MODULE_VL6180X_CONFIG && MODULE_VL6180X_IRQ */
 
     while (1) {
 
-#if IS_USED(MODULE_VL6180X_IRQ)
+#if MODULE_VL6180X_IRQ
         vl6180x_int_config_t src;
 
         vl6180x_int_wait(&dev, &src);
-#if IS_USED(MODULE_VL6180X_RNG)
+#if MODULE_VL6180X_RNG
         if (src.rng_int == VL6180X_INT_DRDY) {
             int status = vl6180x_rng_read(&dev, &rng);
             switch (status) {
@@ -187,9 +187,9 @@ int main(void)
         else if (src.rng_int == VL6180X_INT_RNG_HIGH) {
             puts("RNG: high level");
         }
-#endif /* IS_USED(MODULE_VL6180X_RNG) */
+#endif /* MODULE_VL6180X_RNG */
 
-#if IS_USED(MODULE_VL6180X_ALS)
+#if MODULE_VL6180X_ALS
         if (src.als_int == VL6180X_INT_DRDY) {
             int status = vl6180x_als_read(&dev, &als, &lux);
             switch (status) {
@@ -213,21 +213,21 @@ int main(void)
         else if (src.als_int == VL6180X_INT_HIGH) {
             puts("ALS: high level");
         }
-#endif /* IS_USED(MODULE_VL6180X_ALS) */
+#endif /* MODULE_VL6180X_ALS */
 
-#else /* IS_USED(MODULE_VL6180X_IRQ) */
+#else /* MODULE_VL6180X_IRQ */
 
         /* just wait 250 ms if module vl6180x_basic is used */
         ztimer_sleep(ZTIMER_MSEC, 250);
 
-#if IS_USED(MODULE_VL6180X_ALS)
+#if MODULE_VL6180X_ALS
         if (vl6180x_als_data_ready(&dev) == VL6180X_OK &&
             vl6180x_als_read(&dev, &als, &lux) == VL6180X_OK) {
             printf("ALS: %u [cnts], %u [lux]\n", als, lux);
         }
-#endif /* IS_USED(MODULE_VL6180X_ALS) */
+#endif /* MODULE_VL6180X_ALS */
 
-#if IS_USED(MODULE_VL6180X_RNG)
+#if MODULE_VL6180X_RNG
          if (vl6180x_rng_data_ready(&dev) == VL6180X_OK) {
             if (vl6180x_rng_read(&dev, &rng) == VL6180X_OK) {
                 printf("RNG: %u [mm]\n", rng);
@@ -237,11 +237,11 @@ int main(void)
             }
             puts("+-----------------------------------------+");
         }
-#endif /* IS_USED(MODULE_VL6180X_RNG) */
+#endif /* MODULE_VL6180X_RNG */
 
-#endif /* IS_USED(MODULE_VL6180X_IRQ) */
+#endif /* MODULE_VL6180X_IRQ */
 
-#if IS_USED(MODULE_VL6180X_SHUTDOWN)
+#if MODULE_VL6180X_SHUTDOWN
         /*
          * if shutdown pin is defined, the sensor is powered down and up
          * again after 5 seconds every 50 cycles
@@ -254,7 +254,7 @@ int main(void)
             vl6180x_power_up(&dev);
             puts("Sensor powered up");
         }
-#endif /* IS_USED(MODULE_VL6180X_SHUTDOWN) */
+#endif /* MODULE_VL6180X_SHUTDOWN */
     }
 
     return 0;

@@ -53,7 +53,7 @@ unsigned int irq_disable(void)
 {
     uint32_t mask = __get_PRIMASK();
 
-    if ((mask == 0) && IS_USED(MODULE_DEBUG_IRQ_DISABLE)) {
+    if ((mask == 0) && MODULE_DEBUG_IRQ_DISABLE) {
         _irq_debug_start_count();
     }
 
@@ -77,7 +77,7 @@ unsigned int irq_enable(void)
  * @brief Restore the state of the IRQ flags
  */
 static inline __attribute__((always_inline))
-#if !IS_USED(MODULE_DEBUG_IRQ_DISABLE)
+#if !MODULE_DEBUG_IRQ_DISABLE
 void irq_restore(unsigned int state)
 {
     __set_PRIMASK(state);

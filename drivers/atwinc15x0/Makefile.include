@@ -7,3 +7,8 @@ PSEUDOMODULES += atwinc15x0_static_connect
 PSEUDOMODULES += atwinc15x0_dynamic_connect
 # Accept scan requests (NETOPT_SCAN)
 PSEUDOMODULES += atwinc15x0_dynamic_scan
+
+MODULE_DEFS_NEEDED += \
+  atmega_common \
+  atwinc15x0_dynamic_connect \
+  #

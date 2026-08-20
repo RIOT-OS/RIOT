@@ -21,14 +21,14 @@
 #include "screen_dev.h"
 #include "disp_dev.h"
 
-#if IS_USED(MODULE_TOUCH_DEV)
+#if MODULE_TOUCH_DEV
 #include "touch_dev.h"
 #endif
 
 static screen_dev_t s_screen;
 extern disp_dev_reg_t *disp_dev_reg;
 
-#if IS_USED(MODULE_TOUCH_DEV)
+#if MODULE_TOUCH_DEV
 static void _touch_event_callback(void *arg)
 {
     (void)arg;
@@ -45,7 +45,7 @@ void auto_init_lvgl(void)
     LOG_DEBUG("[auto_init_screen] initializing lvgl\n");
 
     /* Only a single screen is supported by lvgl */
-#if !IS_USED(MODULE_LV_DRIVERS_SDL)
+#if !MODULE_LV_DRIVERS_SDL
     disp_dev_reg_t *disp_dev = disp_dev_reg_find_screen(CONFIG_LVGL_SCREEN_DEFAULT);
     if (disp_dev == NULL) {
         puts("[auto_init_screen] error: no display device found\n");
@@ -54,7 +54,7 @@ void auto_init_lvgl(void)
     s_screen.display = disp_dev->dev;
 #endif
 
-#if IS_USED(MODULE_TOUCH_DEV)
+#if MODULE_TOUCH_DEV
     touch_dev_reg_t *touch_dev = touch_dev_reg_find_screen(CONFIG_LVGL_SCREEN_DEFAULT);
     if (touch_dev) {
         s_screen.touch = touch_dev->dev;

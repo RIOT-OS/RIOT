@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-#if IS_USED(MODULE_PERIPH_GPIO_MOCK)
+#if MODULE_PERIPH_GPIO_MOCK
 /**
  * @brief    GPIO pin configuration
  *

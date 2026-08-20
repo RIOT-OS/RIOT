@@ -68,20 +68,20 @@
 #include "xtensa/xtensa_api.h"
 #endif
 
-#if IS_USED(MODULE_ESP_IDF_SPI_FLASH)
+#if MODULE_ESP_IDF_SPI_FLASH
 #include "esp_private/spi_flash_os.h"
 #include "esp_flash_internal.h"
 #endif
 
-#if IS_USED(MODULE_ESP_SPI_RAM)
+#if MODULE_ESP_SPI_RAM
 #include "esp_private/esp_psram_extram.h"
 #endif
 
-#if IS_USED(MODULE_PUF_SRAM)
+#if MODULE_PUF_SRAM
 #include "puf_sram.h"
 #endif
 
-#if IS_USED(MODULE_STDIO_UART)
+#if MODULE_STDIO_UART
 #include "stdio_uart.h"
 #endif
 
@@ -91,7 +91,7 @@
 #define STRINGIFY(s) STRINGIFY2(s)
 #define STRINGIFY2(s) #s
 
-#if IS_USED(MODULE_ESP_LOG_STARTUP)
+#if MODULE_ESP_LOG_STARTUP
 #define LOG_STARTUP(format, ...) LOG_TAG_EARLY(LOG_INFO, D, __func__, format, ##__VA_ARGS__)
 #else
 #define LOG_STARTUP(format, ...)
@@ -144,11 +144,11 @@ static NORETURN void IRAM system_startup_cpu0(void)
     register uint32_t *sp __asm__ ("x2"); (void)sp;
 #endif
 
-#ifdef MODULE_PUF_SRAM
+#if MODULE_PUF_SRAM
     puf_sram_init((uint8_t *)&_sheap, SEED_RAM_LEN);
 #endif
 
-#if IS_USED(MODULE_ESP_IDF_HEAP)
+#if MODULE_ESP_IDF_HEAP
     /* init heap */
     heap_caps_init();
     heap_caps_enable_nonos_stack_heaps();
@@ -179,7 +179,7 @@ static NORETURN void IRAM system_startup_cpu0(void)
     uint8_t cpu_id[CPUID_LEN];
     cpuid_get ((void*)cpu_id);
 
-#if IS_USED(MODULE_ESP_LOG_STARTUP)
+#if MODULE_ESP_LOG_STARTUP
     LOG_STARTUP("\nStarting ESP32x with ID: ");
     for (unsigned i = 0; i < CPUID_LEN; i++) {
         ets_printf("%02x", cpu_id[i]);
@@ -280,7 +280,7 @@ static NORETURN void IRAM system_init (void)
     periph_init();
 
     /* print system time */
-#if IS_USED(MODULE_PERIPH_RTC)
+#if MODULE_PERIPH_RTC
     struct tm _sys_time;
     rtc_get_time(&_sys_time);
     LOG_STARTUP("System time: %04d-%02d-%02d %02d:%02d:%02d\n",
@@ -289,16 +289,16 @@ static NORETURN void IRAM system_init (void)
 #endif
 
     /* print the board config */
-#if IS_USED(MODULE_ESP_LOG_STARTUP)
+#if MODULE_ESP_LOG_STARTUP
     print_board_config();
 #endif
 
-#if IS_USED(MODULE_PERIPH_FLASHPAGE)
+#if MODULE_PERIPH_FLASHPAGE
     extern void esp_flashpage_init(void);
     esp_flashpage_init();
 #endif
 
-#if IS_USED(MODULE_MTD)
+#if MODULE_MTD
     /* init flash drive */
     extern void spi_flash_drive_init (void);
     spi_flash_drive_init();
@@ -324,7 +324,7 @@ static NORETURN void IRAM system_init (void)
     /* initialize ESP-IDF timer task */
     esp_timer_init();
 
-#if IS_USED(MODULE_ESP_IDF_SPI_FLASH)
+#if MODULE_ESP_IDF_SPI_FLASH
 #if CONFIG_SPI_FLASH_ROM_IMPL
     spi_flash_rom_impl_init();
 #endif
@@ -340,7 +340,7 @@ static NORETURN void IRAM system_init (void)
 #endif /* MODULE_ESP_IDF_SPI_FLASH */
 
     /* starting RIOT */
-#if IS_USED(MODULE_ESP_LOG_STARTUP)
+#if MODULE_ESP_LOG_STARTUP
     LOG_STARTUP("Starting RIOT kernel on PRO cpu\n");
     esp_rom_output_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
 #else

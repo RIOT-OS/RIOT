@@ -1,3 +1,7 @@
+
+MODULE_DEFS_NEEDED += \
+  ili9341 \
+  #
 BOARD ?= stm32f429i-disc1
 include ../Makefile.drivers_common
 

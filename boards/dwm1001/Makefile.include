@@ -5,3 +5,7 @@ OPENOCD_PRE_VERIFY_CMDS = -c 'flash fillw 0x10001200 0x00000015 2'
 
 # include common configuration for nrf52 based boards
 include $(RIOTBOARD)/common/nrf52/Makefile.include
+
+MODULE_DEFS_NEEDED += \
+  periph_uart_hw_fc \
+  #

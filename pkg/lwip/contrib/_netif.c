@@ -54,7 +54,7 @@ int netif_get_opt(const netif_t *iface, netopt_t opt, uint16_t context,
             res = 0;
         }
         break;
-#ifdef MODULE_LWIP_IPV6
+#if MODULE_LWIP_IPV6
     case NETOPT_IPV6_ADDR: {
             assert(max_len >= sizeof(ipv6_addr_t));
             ipv6_addr_t *tgt = value;
