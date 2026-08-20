@@ -580,3 +580,31 @@ void UART_5_ISR(void)
     irq_handler(UART_DEV(5));
 }
 #endif
+
+#ifdef UART_6_ISR
+void UART_6_ISR(void)
+{
+    irq_handler(UART_DEV(6));
+}
+#endif
+
+#ifdef UART_7_ISR
+void UART_7_ISR(void)
+{
+    irq_handler(UART_DEV(7));
+}
+#endif
+
+#ifdef UART_8_ISR
+void UART_8_ISR(void)
+{
+    irq_handler(UART_DEV(8));
+}
+#endif
+
+#ifdef UART_9_ISR
+void UART_9_ISR(void)
+{
+    irq_handler(UART_DEV(9));
+}
+#endif
