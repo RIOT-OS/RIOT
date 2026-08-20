@@ -35,7 +35,7 @@ static mtd_dev_t *_get_dev(int argc, char **argv)
 
     unsigned idx = atoi(argv[1]);
 
-    if (idx > MTD_NUMOF) {
+    if (idx >= MTD_NUMOF) {
         printf("%s: invalid device: %s\n", argv[0], argv[1]);
         return NULL;
     }
