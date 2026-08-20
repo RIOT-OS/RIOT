@@ -6,7 +6,8 @@
 # shellcheck source=dist/tools/ci/github_annotate.sh
 . "$(dirname "$0")/../ci/github_annotate.sh"
 
-IGNORE=$(awk '{ printf ":!%s ", $0 }' "$(dirname "$0")/ignore_list.txt")
+# read the ignore list into an array and generate a pattern that `git diff` understands
+mapfile -t IGNORE < <(awk '{ printf ":!%s\n", $0 }' "$(dirname "$0")/ignore_list.txt")
 
 # If no branch but an option is given, unset BRANCH.
 # Otherwise, consume this parameter.
@@ -33,15 +34,15 @@ if [ -z "${BRANCH}" ]; then
     BRANCH=$(git rev-list HEAD | tail -n 1)
 fi
 
-git -c core.whitespace="tab-in-indent,tabwidth=4" \
-    diff --check "$(git merge-base "${BRANCH}" HEAD)" -- *.[ch] "${IGNORE}" \
+git -c core.whitespace="tab-in-indent,tabwidth=4" -c diff.renameLimit=20000  \
+    diff --check "$(git merge-base "${BRANCH}" HEAD)" -- *.[ch] "${IGNORE[@]}" \
             | ${LOG}
 RESULT=${PIPESTATUS[0]}
 
 # Git regards any trailing white space except `\n` as an error so `\r` is
 # checked here, too
-git -c core.whitespace="trailing-space" \
-    diff --check "$(git merge-base "${BRANCH}" HEAD)" -- . "${IGNORE}" \
+git -c core.whitespace="trailing-space" -c diff.renameLimit=20000 \
+    diff --check "$(git merge-base "${BRANCH}" HEAD)" -- . "${IGNORE[@]}" \
             | ${LOG}
 
 TRAILING_RESULT=${PIPESTATUS[0]}

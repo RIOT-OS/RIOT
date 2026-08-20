@@ -6,8 +6,8 @@
 # SPDX-License-Identifier: LGPL-2.1-only
 
 changed_files() {
-    : "${FILEREGEX:='\.([CcHh]|[ch]pp)$'}"
-    : "${EXCLUDE:='^(.+/vendor/|dist/tools/coccinelle/include|dist/tools/fixdep/fixdep.c|dist/tools/lpc2k_pgm/src)'}"
+    : "${FILEREGEX:=\.([CcHh]|[ch]pp)$}"
+    : "${EXCLUDE:=^(.+/vendor/|dist/tools/coccinelle/include|dist/tools/fixdep/fixdep.c|dist/tools/lpc2k_pgm/src)}"
     : "${DIFFFILTER:=ACMR}"
 
     DIFFFILTER="--diff-filter=${DIFFFILTER}"
