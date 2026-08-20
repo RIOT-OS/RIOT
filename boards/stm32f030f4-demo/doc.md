@@ -6,6 +6,9 @@
 
 The STM32F030F4 Demo Board is a very cheap breakout board for the STM32F030F4 MCU.
 
+\warning This board is deprecated and the support for it will be removed
+         after the 2026.07 Release!
+
 ## Hardware
 
 ![STM32F030F4 Demo Board](https://user-images.githubusercontent.com/20950920/48240567-e985c080-e3db-11e8-8775-68a216485b59.jpg)
