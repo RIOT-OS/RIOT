@@ -20,12 +20,10 @@
 #include "shell.h"
 #include "openthread/cli.h"
 
-static int ot_console_cb(const char *abuf, uint16_t bufsize, void *context)
+static int ot_console_cb(void *context, const char *format, va_list args)
 {
-    (void) context;
-    if (bufsize > 0) {
-        printf("%.*s", bufsize, abuf);
-    }
+    (void)context;
+    vprintf(format, args);
     return 0;
 }
 
@@ -39,10 +37,10 @@ static int ot_cmd(int argc, char **argv)
     }
 
     if (strlen(argv[1]) != 0) {
-        otCliConsoleInputLine(argv[1], strlen(argv[1]));
+        otCliInputLine(argv[1]);
     }
     else {
-        otCliConsoleInputLine("help", strlen("help"));
+        otCliInputLine("help");
     }
     return 0;
 }
@@ -51,5 +49,5 @@ SHELL_COMMAND(ot, "Use commands from OpenThread CLI", ot_cmd);
 
 void ot_shell_init(otInstance *aInstance)
 {
-    otCliConsoleInit(aInstance, ot_console_cb, NULL);
+    otCliInit(aInstance, ot_console_cb, NULL);
 }

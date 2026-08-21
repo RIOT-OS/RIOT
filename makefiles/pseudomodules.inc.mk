@@ -385,6 +385,9 @@ PSEUDOMODULES += od_string
 
 PSEUDOMODULES += opendsme
 PSEUDOMODULES += openthread
+PSEUDOMODULES += openthread_ftd
+PSEUDOMODULES += openthread_mtd
+PSEUDOMODULES += openthread_cli_%
 
 # declare periph submodules as pseudomodules, but exclude periph_common
 PSEUDOMODULES += periph_%
