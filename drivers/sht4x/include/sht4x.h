@@ -21,8 +21,9 @@
 extern "C" {
 #endif
 
-/** possible I2C slave addresses */
+/** default I2C slave addresses */
 #define SHT4X_I2C_ADDR_1    (0x44)
+/** alternative I2C slave addresses */
 #define SHT4X_I2C_ADDR_2    (0x45)
 
 /** @brief Driver error codes (returned as negative values) */

@@ -20,18 +20,22 @@
 extern "C" {
 #endif
 
+/** I2C bus the device is connected to */
 #ifndef SHT4X_PARAM_I2C_DEV
 #define SHT4X_PARAM_I2C_DEV     (I2C_DEV(0))
 #endif
 
+/** I2C slave address */
 #ifndef SHT4X_PARAM_I2C_ADDR
 #define SHT4X_PARAM_I2C_ADDR    (SHT4X_I2C_ADDR_1)
 #endif
 
+/** Oversampling */
 #ifndef SHT4X_PARAM_REPEAT
 #define SHT4X_PARAM_REPEAT      (SHT4X_HIGH)
 #endif
 
+/** Parameters for a single sensor device */
 #ifndef SHT4X_PARAMS
 #define SHT4X_PARAMS    { .i2c_dev  = SHT4X_PARAM_I2C_DEV,  \
                           .i2c_addr = SHT4X_PARAM_I2C_ADDR, \
@@ -40,7 +44,7 @@ extern "C" {
 #endif
 
 #ifndef SHT4X_SAUL_INFO
-#define SHT4X_SAUL_INFO { .name = "sht4x1" }
+#define SHT4X_SAUL_INFO { .name = "sht4x" }
 #endif
 
 #ifndef SHT4X_INFO_NUM
