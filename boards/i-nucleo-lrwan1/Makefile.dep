@@ -1,5 +1,9 @@
-ifneq (,$(filter stdio_uart,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_lpuart
+# The ST-Link is connected to the LPUART, so we require periph_lpuart too
+# when using the UART
+ifneq (,$(filter periph_uart,$(USEMODULE)))
+  ifeq (,$(filter periph_lpuart,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_lpuart
+  endif
 endif
 ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += sx1272
