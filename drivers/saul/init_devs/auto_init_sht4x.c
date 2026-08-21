@@ -4,15 +4,15 @@
  */
 
 #include <assert.h>
-#include <stdio.h>
 
+#include "log.h"
 #include "saul.h"
 #include "saul_reg.h"
 #include "sht4x.h"
 #include "sht4x_params.h"
 
 #define SHT4X_NUM      ARRAY_SIZE(sht4x_params)
-extern sht4x_dev_t sht4x_devs[SHT4X_NUM];
+sht4x_dev_t sht4x_devs[SHT4X_NUM];
 
 static saul_reg_t saul_entries[SHT4X_NUM * 2];
 
@@ -29,14 +29,18 @@ void auto_init_sht4x(void)
             continue;
         }
 
+        /* temperature */
         saul_entries[(i * 2)].dev = &sht4x_devs[i];
         saul_entries[(i * 2)].name = sht4x_saul_info[i].name;
         saul_entries[(i * 2)].driver = &sht4x_saul_driver_temperature;
 
+        /* relative humidity */
         saul_entries[(i * 2) + 1].dev = &sht4x_devs[i];
         saul_entries[(i * 2) + 1].name = sht4x_saul_info[i].name;
         saul_entries[(i * 2) + 1].driver = &sht4x_saul_driver_humidity;
-    }
 
-    saul_register(saul_entries, ARRAY_SIZE(saul_entries));
+        /* register to saul */
+        saul_reg_add(&(saul_entries[(i * 2)]));
+        saul_reg_add(&(saul_entries[(i * 2) + 1]));
+    }
 }
