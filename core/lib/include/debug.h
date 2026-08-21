@@ -72,7 +72,7 @@ extern "C" {
  *          Expected to be set on a file-based level.
  */
 #ifndef DEBUG_PREFIX
-#  define DEBUG_PREFIX  ""
+#  define DEBUG_PREFIX ""
 #endif
 
 /**
@@ -183,26 +183,28 @@ static inline const char *__debug_thread_name_or_isr(void)
  *
  * Otherwise, just use @ref DEBUG
  */
-#define DEBUG_(prefix, ...)                                                                 \
-    do {                                                                                    \
-        if (ENABLE_DEBUG && __debug_sufficient_stack(true)) {                               \
-            if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) { \
-                printf(_DEBUG_PREFIX_COLOR prefix " (%s@%s) # " ANSI_COLOR_RESET,           \
-                       DEBUG_FUNC, __debug_thread_name_or_isr());                           \
-            }                                                                               \
-            else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {                                   \
-                printf(_DEBUG_PREFIX_COLOR prefix " (%s) # " ANSI_COLOR_RESET,              \
-                       DEBUG_FUNC);                                                         \
-            }                                                                               \
-            else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {                                 \
-                printf(_DEBUG_PREFIX_COLOR prefix " (@%s) # " ANSI_COLOR_RESET,             \
-                       __debug_thread_name_or_isr());                                       \
-            }                                                                               \
-            else if (strlen(DEBUG_PREFIX) > 0) {                                            \
-                printf(_DEBUG_PREFIX_COLOR prefix " # " ANSI_COLOR_RESET);                  \
-            }                                                                               \
-            printf(__VA_ARGS__);                                                            \
-        }                                                                                   \
+#define DEBUG_(prefix, ...)                                                                     \
+    do {                                                                                        \
+        if (ENABLE_DEBUG && __debug_sufficient_stack(true)) {                                   \
+            if (strlen(prefix) > 0) {                                                           \
+                if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) { \
+                    printf(_DEBUG_PREFIX_COLOR prefix " (%s@%s) # " ANSI_COLOR_RESET,           \
+                           DEBUG_FUNC, __debug_thread_name_or_isr());                           \
+                }                                                                               \
+                else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {                                   \
+                    printf(_DEBUG_PREFIX_COLOR prefix " (%s) # " ANSI_COLOR_RESET,              \
+                           DEBUG_FUNC);                                                         \
+                }                                                                               \
+                else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {                                 \
+                    printf(_DEBUG_PREFIX_COLOR prefix " (@%s) # " ANSI_COLOR_RESET,             \
+                           __debug_thread_name_or_isr());                                       \
+                }                                                                               \
+                else {                                                                          \
+                    printf(_DEBUG_PREFIX_COLOR prefix " # " ANSI_COLOR_RESET);                  \
+                }                                                                               \
+            }                                                                                   \
+            printf(__VA_ARGS__);                                                                \
+        }                                                                                       \
     } while (0)
 
 /**
@@ -262,31 +264,33 @@ static inline const char *__debug_thread_name_or_isr(void)
  *
  * Otherwise, just use @ref DEBUG_PUTS
  */
-#define DEBUG_PUTS_(prefix, str)                                                            \
-    do {                                                                                    \
-        if (ENABLE_DEBUG) {                                                                 \
-            if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) { \
-                fputs(_DEBUG_PREFIX_COLOR prefix " (", stdout);                             \
-                fputs(DEBUG_FUNC, stdout);                                                  \
-                fputs("@", stdout);                                                         \
-                fputs(__debug_thread_name_or_isr(), stdout);                                \
-                fputs(") # " ANSI_COLOR_RESET, stdout);                                     \
-            }                                                                               \
-            else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {                                   \
-                fputs(_DEBUG_PREFIX_COLOR prefix " (", stdout);                             \
-                fputs(DEBUG_FUNC, stdout);                                                  \
-                fputs(") # " ANSI_COLOR_RESET, stdout);                                     \
-            }                                                                               \
-            else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {                                 \
-                fputs(_DEBUG_PREFIX_COLOR prefix " (@", stdout);                            \
-                fputs(__debug_thread_name_or_isr(), stdout);                                \
-                fputs(") # " ANSI_COLOR_RESET, stdout);                                     \
-            }                                                                               \
-            else if (strlen(DEBUG_PREFIX) > 0) {                                            \
-                fputs(_DEBUG_PREFIX_COLOR prefix " # " ANSI_COLOR_RESET, stdout);           \
-            }                                                                               \
-            puts(str);                                                                      \
-        }                                                                                   \
+#define DEBUG_PUTS_(prefix, str)                                                                \
+    do {                                                                                        \
+        if (ENABLE_DEBUG) {                                                                     \
+            if (strlen(prefix) > 0) {                                                           \
+                if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) { \
+                    fputs(_DEBUG_PREFIX_COLOR prefix " (", stdout);                             \
+                    fputs(DEBUG_FUNC, stdout);                                                  \
+                    fputs("@", stdout);                                                         \
+                    fputs(__debug_thread_name_or_isr(), stdout);                                \
+                    fputs(") # " ANSI_COLOR_RESET, stdout);                                     \
+                }                                                                               \
+                else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {                                   \
+                    fputs(_DEBUG_PREFIX_COLOR prefix " (", stdout);                             \
+                    fputs(DEBUG_FUNC, stdout);                                                  \
+                    fputs(") # " ANSI_COLOR_RESET, stdout);                                     \
+                }                                                                               \
+                else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {                                 \
+                    fputs(_DEBUG_PREFIX_COLOR prefix " (@", stdout);                            \
+                    fputs(__debug_thread_name_or_isr(), stdout);                                \
+                    fputs(") # " ANSI_COLOR_RESET, stdout);                                     \
+                }                                                                               \
+                else if (strlen(DEBUG_PREFIX) > 0) {                                            \
+                    fputs(_DEBUG_PREFIX_COLOR prefix " # " ANSI_COLOR_RESET, stdout);           \
+                }                                                                               \
+            }                                                                                   \
+            puts(str);                                                                          \
+        }                                                                                       \
     } while (0)
 
 /**
