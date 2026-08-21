@@ -155,7 +155,11 @@ typedef void (*dma_cb_t)(void *arg);
  *
  * @param[in]   line        DAC line to configure
  * @param[in]   cb          Callback to be executed when the current sample buffer
- *                          is done. Will be executed in interrupt context.
+ *                          is done.
+ *                          If `DAC_PLAY_LOOPED` is set in `dac_play()`, the callback
+ *                          will not be executed, the current sample buffer will be
+ *                          played again.
+ *                          Will be executed in interrupt context.
  *                          May be NULL.
  * @param[in]   arg         Callback argument
  *
