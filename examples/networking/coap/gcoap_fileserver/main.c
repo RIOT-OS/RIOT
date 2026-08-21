@@ -18,7 +18,6 @@
 #include "kernel_defines.h"
 #include "net/gcoap.h"
 #include "net/nanocoap/fileserver.h"
-#include "shell.h"
 #include "vfs_default.h"
 
 #define MAIN_QUEUE_SIZE (4)
@@ -72,9 +71,6 @@ int main(void)
     if (IS_USED(MODULE_NANOCOAP_FILESERVER_CALLBACK)) {
         nanocoap_fileserver_set_event_cb(_event_cb, NULL);
     }
-
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }
