@@ -48,11 +48,11 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define _DEBUG_PREFIX "[native] syscalls: "
-#define DEBUG_SYSCALLS(...) DEBUG(_DEBUG_PREFIX __VA_ARGS__)
+#define __DEBUG_PREFIX "[native] syscalls: "
+#define DEBUG_SYSCALLS(...) DEBUG(__DEBUG_PREFIX __VA_ARGS__)
 
-#define _SYSCALL_ENTER_MESSAGE _DEBUG_PREFIX "> _native_pending_syscalls\n"
-#define _SYSCALL_LEAVE_MESSAGE _DEBUG_PREFIX "< _native_pending_syscalls\n"
+#define _SYSCALL_ENTER_MESSAGE __DEBUG_PREFIX "> _native_pending_syscalls\n"
+#define _SYSCALL_LEAVE_MESSAGE __DEBUG_PREFIX "< _native_pending_syscalls\n"
 
 void _native_syscall_enter(void)
 {
