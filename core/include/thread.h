@@ -487,12 +487,12 @@ void thread_add_to_list(list_node_t *list, thread_t *thread);
 /**
  * @brief Returns the name of a thread with PID @p pid
  *
- * @note when compiling without @ref CONFIG_THREAD_NAMES, this *always* returns NULL!
+ * @note when compiling without @ref CONFIG_THREAD_NAMES, this *always* returns "?"!
  *
  * @param[in] pid   the PID of the thread to get the name from
  *
  * @retval          the thread's name
- * @retval          `NULL` if pid is unknown
+ * @retval          `"?"` if pid is unknown
  */
 #if defined(MODULE_CORE_THREAD) || defined(DOXYGEN)
 const char *thread_getname(kernel_pid_t pid);
@@ -500,7 +500,7 @@ const char *thread_getname(kernel_pid_t pid);
 static inline const char *thread_getname(kernel_pid_t pid)
 {
     (void)pid;
-    return NULL;
+    return "?";
 }
 #endif
 
@@ -675,7 +675,7 @@ static inline kernel_pid_t thread_getpid_of(const thread_t *thread)
  * Get name of thread.
  *
  * @param   thread thread to work on
- * @returns thread name or NULL if not available
+ * @returns thread name or "?" if not available
  */
 static inline const char *thread_get_name(const thread_t *thread)
 {
@@ -683,7 +683,7 @@ static inline const char *thread_get_name(const thread_t *thread)
     return thread->name;
 #else
     (void)thread;
-    return NULL;
+    return "?";
 #endif
 }
 
