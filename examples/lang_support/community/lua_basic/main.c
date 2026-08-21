@@ -15,6 +15,7 @@
  * @}
  */
 
+#include <stdalign.h>
 #include <stdio.h>
 #include <errno.h>
 
@@ -29,7 +30,7 @@
 #else
 #define LUA_MEM_SIZE (11000)
 #endif
-static char lua_mem[LUA_MEM_SIZE] __attribute__ ((aligned(__BIGGEST_ALIGNMENT__)));
+static alignas(__BIGGEST_ALIGNMENT__) char lua_mem[LUA_MEM_SIZE];
 
 int lua_run_script(const uint8_t *buffer, size_t buffer_len)
 {
