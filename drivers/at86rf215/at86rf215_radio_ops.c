@@ -711,7 +711,10 @@ static void at86rf215_handle_common_irq(ieee802154_dev_t *hal)
             /* to avoid getting stuck in RX_START go back to rx after gain control is released */
             if (bb_irq_mask & BB_IRQ_AGCR) {
                 bb_irq_mask &= ~BB_IRQ_AGCR;
-                dev->state = AT86RF215_STATE_RX;
+
+                if (dev->state == AT86RF215_STATE_RX_START) {
+                    dev->state = AT86RF215_STATE_RX;
+                }
             }
 
             if (!(bb_irq_mask & BB_IRQ_RXFE)) {
