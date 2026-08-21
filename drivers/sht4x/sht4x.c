@@ -1,10 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2026 RIOT Contributors
+ * SPDX-FileCopyrightText: 2026 ML!PA Consulting GmbH
  * SPDX-License-Identifier: LGPL-2.1-only
  */
-
-#include "debug.h"
-#include "log.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -17,19 +14,8 @@
 #include "sht4x.h"
 #include "ztimer.h"
 
-#define ASSERT_PARAM(cond) \
-    do { \
-        if (!(cond)) { \
-            DEBUG("[sht4x] %s: %s\n", __func__, "parameter condition (" #cond ") not fulfilled"); \
-            assert(cond); \
-        } \
-    } while (0)
-
-#define DEBUG_DEV(f, d, ...) \
-    DEBUG("[sht4x] %s dev=%d addr=%02x: " f "\n", __func__, d->i2c_dev, d->i2c_addr, ## __VA_ARGS__)
-
-#define ERROR_DEV(f, d, ...) \
-    LOG_ERROR("[sht4x] dev=%d addr=%02x: " f "\n", d->i2c_dev, d->i2c_addr, ## __VA_ARGS__)
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 #define SHT4X_CMD_RESET       0x94
 #define SHT4X_CMD_READ_SERIAL 0x89
@@ -73,16 +59,16 @@ static int _send_command(sht4x_dev_t *dev, uint8_t cmd)
 {
     int res;
 
-    ASSERT_PARAM(dev != NULL);
+    assert(dev != NULL);
 
-    DEBUG_DEV("send command 0x%02x", dev, cmd);
+    DEBUG("[sht4x] send command 0x%02x\n", cmd);
 
     i2c_acquire(dev->i2c_dev);
     res = i2c_write_byte(dev->i2c_dev, dev->i2c_addr, cmd, 0);
     i2c_release(dev->i2c_dev);
 
     if (res != 0) {
-        DEBUG_DEV("could not send command 0x%02x, reason=%d", dev, cmd, res);
+        DEBUG("[sht4x] could not send command 0x%02x, reason=%d\n", cmd, res);
         return -SHT4X_ERROR_I2C;
     }
 
@@ -93,15 +79,15 @@ static int _read_sample(sht4x_dev_t *dev, void *buf, size_t len)
 {
     int res;
 
-    ASSERT_PARAM(dev != NULL);
-    ASSERT_PARAM(buf != NULL);
+    assert(dev != NULL);
+    assert(buf != NULL);
 
     i2c_acquire(dev->i2c_dev);
     res = i2c_read_bytes(dev->i2c_dev, dev->i2c_addr, buf, len, 0);
     i2c_release(dev->i2c_dev);
 
     if (res != 0) {
-        DEBUG_DEV("could not read %zu bytes, reason=%d", dev, len, res);
+        DEBUG("[sht4x] could not read %zu bytes, reason=%d\n", len, res);
         return -SHT4X_ERROR_I2C;
     }
 
@@ -130,12 +116,12 @@ static int _measure(sht4x_dev_t *dev, uint8_t cmd, uint32_t wait_us,
     }
 
     if (_crc8(&data.temp_raw, sizeof(data.temp_raw)) != data.temp_crc) {
-        DEBUG_DEV("temperature CRC failed", dev);
+        DEBUG("[sht4x] temperature CRC failed\n");
         return -SHT4X_ERROR_CRC;
     }
 
     if (_crc8(&data.rh_raw, sizeof(data.rh_raw)) != data.rh_crc) {
-        DEBUG_DEV("humidity CRC failed", dev);
+        DEBUG("[sht4x] humidity CRC failed\n");
         return -SHT4X_ERROR_CRC;
     }
 
@@ -155,8 +141,8 @@ static int _measure(sht4x_dev_t *dev, uint8_t cmd, uint32_t wait_us,
 
 int sht4x_init(sht4x_dev_t *dev, const sht4x_params_t *params)
 {
-    ASSERT_PARAM(dev != NULL);
-    ASSERT_PARAM(params != NULL);
+    assert(dev != NULL);
+    assert(params != NULL);
 
     dev->i2c_dev = params->i2c_dev;
     dev->i2c_addr = params->i2c_addr;
@@ -165,20 +151,20 @@ int sht4x_init(sht4x_dev_t *dev, const sht4x_params_t *params)
     dev->heater_duration = SHT4X_HEATER_DURATION_LONG;
 
     if (_send_command(dev, SHT4X_CMD_RESET) != SHT4X_OK) {
-        DEBUG_DEV("reset failed", dev);
+        DEBUG("[sht4x] reset failed\n");
         return -SHT4X_ERROR_I2C;
     }
 
     ztimer_sleep(ZTIMER_USEC, 1000);
-    DEBUG_DEV("sensor initialized", dev);
+    DEBUG("[sht4x] sensor initialized\n");
 
     return SHT4X_OK;
 }
 
 int sht4x_read(sht4x_dev_t *dev, int16_t *temp, int16_t *hum)
 {
-    ASSERT_PARAM(dev != NULL);
-    ASSERT_PARAM(temp != NULL || hum != NULL);
+    assert(dev != NULL);
+    assert(temp != NULL || hum != NULL);
 
     return _measure(dev, SHT4X_MEASURE_CMD[dev->repeat],
                      SHT4X_MEASURE_WAIT_US[dev->repeat], temp, hum);
@@ -186,8 +172,8 @@ int sht4x_read(sht4x_dev_t *dev, int16_t *temp, int16_t *hum)
 
 int sht4x_read_with_heater(sht4x_dev_t *dev, int16_t *temp, int16_t *hum)
 {
-    ASSERT_PARAM(dev != NULL);
-    ASSERT_PARAM(temp != NULL || hum != NULL);
+    assert(dev != NULL);
+    assert(temp != NULL || hum != NULL);
 
     return _measure(dev, SHT4X_HEATER_CMD[dev->heater_power][dev->heater_duration],
                      SHT4X_HEATER_WAIT_US[dev->heater_duration], temp, hum);
@@ -195,8 +181,8 @@ int sht4x_read_with_heater(sht4x_dev_t *dev, int16_t *temp, int16_t *hum)
 
 int sht4x_set_heater_power(sht4x_dev_t *dev, sht4x_heater_power_t power)
 {
-    ASSERT_PARAM(dev != NULL);
-    ASSERT_PARAM(power <= SHT4X_HEATER_POWER_LOW);
+    assert(dev != NULL);
+    assert(power <= SHT4X_HEATER_POWER_LOW);
 
     dev->heater_power = power;
 
@@ -205,8 +191,8 @@ int sht4x_set_heater_power(sht4x_dev_t *dev, sht4x_heater_power_t power)
 
 int sht4x_set_heater_duration(sht4x_dev_t *dev, sht4x_heater_duration_t duration)
 {
-    ASSERT_PARAM(dev != NULL);
-    ASSERT_PARAM(duration <= SHT4X_HEATER_DURATION_SHORT);
+    assert(dev != NULL);
+    assert(duration <= SHT4X_HEATER_DURATION_SHORT);
 
     dev->heater_duration = duration;
 
