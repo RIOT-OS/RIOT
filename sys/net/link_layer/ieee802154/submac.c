@@ -328,12 +328,15 @@ static ieee802154_fsm_state_t _fsm_state_tx_process_tx_done(ieee802154_submac_t 
         if (_does_handle_ack(&submac->dev) || !submac->wait_for_ack) {
             return _tx_end(submac, info->status, info);
         }
-        /* If the radio doesn't handle ACK, set the transceiver state to RX_ON
-         * and enable the ACK filter */
+        /* If the radio doesn't handle ACK */
         else {
-            ieee802154_radio_set_frame_filter_mode(dev, IEEE802154_FILTER_ACK_ONLY);
-            res = ieee802154_radio_set_rx(dev);
-            assert (res >= 0);
+            /* If the radio doesn't go automatically to RX after Transmission,
+             * set the transceiver state to RX_ON and enable the ACK filter */
+            if (!ieee802154_radio_has_capability(&submac->dev, IEEE802154_CAP_AUTO_TX2RX)) {
+                ieee802154_radio_set_frame_filter_mode(dev, IEEE802154_FILTER_ACK_ONLY);
+                res = ieee802154_radio_set_rx(dev);
+                assert (res >= 0);
+            }
 
             /* Handle ACK reception */
             ieee802154_submac_ack_timer_set(submac);

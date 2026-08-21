@@ -161,6 +161,13 @@ typedef enum {
      * set if the source address matches one from the table.
      */
     IEEE802154_CAP_SRC_ADDR_MATCH       = BIT19,
+    /**
+     * @brief the device supports auto RX after a Transmission
+     *
+     * The device automatically goes to state RX after a Transmission
+     * with ACK Req bit set.
+     */
+    IEEE802154_CAP_AUTO_TX2RX           = BIT20,
 } ieee802154_rf_caps_t;
 
 /**
