@@ -151,6 +151,11 @@ typedef enum {
 } gpio_mode_t;
 /** @} */
 
+/**
+ * @brief Compile-time flag: platform supports combined input + open-drain mode
+ */
+#define HAVE_GPIO_IN_OD_PU
+
 /* BEGIN: GPIO LL overwrites */
 
 #if SOC_GPIO_PIN_COUNT > 32
