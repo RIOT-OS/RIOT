@@ -31,8 +31,8 @@
 #include "deca_device_api.h"
 
 /* PAN ID/short address */
-#define PAN_ID              0xDECA
-#define SHORT_ADDR_DEFAULT  0x0001
+#define PAN_ID              0xDECAU
+#define SHORT_ADDR_DEFAULT  0x0001U
 
 static dwt_config_t _config = {
     .chan = 9,
@@ -152,6 +152,7 @@ static int _dw_send(int argc, char **argv)
 
 static int _dw_addr(int argc, char **argv)
 {
+    printf("[deca] Current address: '%"PRIx16"'\n", _self_address);
     if (argc < 2) {
         puts("Usage: dw_addr <addr (hex without 0x)>");
         return 0;
@@ -203,16 +204,37 @@ SHELL_COMMAND(dw_wakeup, "Wake up the DW3000 again", _dw_wakeup);
 
 int main(void)
 {
-    dw3000_hw_init();
-    dw3000_hw_init_interrupt();
+    if (dw3000_hw_init() != 0) {
+        puts("[deca init] Error: Hardware initialization failed!");
+        return 1;
+    }
+
     dw3000_hw_reset();
 
-    dwt_probe((struct dwt_probe_s *)&dw3000_probe_interf);
+    if (dwt_probe((struct dwt_probe_s *)&dw3000_probe_interf) != DWT_SUCCESS) {
+        puts("[deca init] Device Probing failed!");
+        return 1;
+    }
+
     uint32_t dev_id = dwt_readdevid();
-    printf("[deca init] detected device id: %"PRIx32"\n", dev_id);
+    printf("[deca init] detected device id: '0x%"PRIx32"'\n", dev_id);
+    if (dev_id == 0 || dev_id == 0xFFFFFFFF) {
+        /* depending on the hardware, the level of a floating MISO pin can be
+         * low or high, so we check for both variants. `dwt_probe` should've
+         * failed before reaching this check. */
+        puts("[deca init] Error: No device present!");
+        return 1;
+    }
+
+    /* dwt_probe() initializes data structures used by the `deca tx` thread,
+     * so it has to be called first */
+    if (dw3000_hw_init_interrupt() != 0) {
+        puts("[deca init] Error: Interrupt initialization failed!");
+        return 1;
+    }
 
     /* The API guide says it is recommended to check for idle rc before
-     * dwt_initialse(), while libdeca does the other order. */
+     * dwt_initialise(), while libdeca does the other order. */
     while (!dwt_checkidlerc()) {};
     puts("[deca init] DW3xxx reached IDLE_RC");
 
@@ -230,6 +252,8 @@ int main(void)
     }
     dwt_setrxtimeout(0);
 
+    printf("[deca init] Setting PAN ID '0x%"PRIx16"' and Short Address '0x%"PRIx16"'\n",
+           (uint16_t)PAN_ID, (uint16_t)_self_address);
     dwt_setpanid(PAN_ID);
     dwt_setaddress16(_self_address);
 

@@ -128,7 +128,7 @@ extern "C" {
  */
 /** @brief   Maximum number of Options in a message */
 #ifndef CONFIG_NANOCOAP_NOPTS_MAX
-#define CONFIG_NANOCOAP_NOPTS_MAX          (16)
+#  define CONFIG_NANOCOAP_NOPTS_MAX             (16)
 #endif
 
 /**
@@ -136,26 +136,26 @@ extern "C" {
  *           a message
  */
 #ifndef CONFIG_NANOCOAP_URI_MAX
-#define CONFIG_NANOCOAP_URI_MAX            (64)
+#  define CONFIG_NANOCOAP_URI_MAX               (64)
 #endif
 
 /**
  * @brief    Maximum size for a blockwise transfer as a power of 2
  */
-#ifndef CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX
-#define CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX  (6)
+#ifndef CONFIG_NANOCOAP_BLOCK_SIZE_MAX
+#  define CONFIG_NANOCOAP_BLOCK_SIZE_MAX        COAP_BLOCKSIZE_64
 #endif
 
 /**
  * @brief CoAP block-wise-transfer size that should be used by default
  */
 #ifndef CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT
-#define CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT  COAP_BLOCKSIZE_64
+#  define CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT     COAP_BLOCKSIZE_64
 #endif
 
 /** @brief   Maximum length of a query string written to a message */
 #ifndef CONFIG_NANOCOAP_QS_MAX
-#define CONFIG_NANOCOAP_QS_MAX             (64)
+#  define CONFIG_NANOCOAP_QS_MAX                (64)
 #endif
 /** @} */
 
@@ -165,7 +165,7 @@ extern "C" {
  *           Value obtained experimentally when using SUIT
  */
 #ifndef CONFIG_NANOCOAP_BLOCK_HEADER_MAX
-#define CONFIG_NANOCOAP_BLOCK_HEADER_MAX   (80)
+#  define CONFIG_NANOCOAP_BLOCK_HEADER_MAX      (80)
 #endif
 
 /**
@@ -1193,7 +1193,7 @@ static inline ssize_t coap_get_proxy_uri(coap_pkt_t *pkt, char **target)
  * @param[in]    blknum     offset from the beginning of content, in terms of
                             @p blksize byte blocks
  * @param[in]    blksize    size of each block; must be a power of 2 between 16
- *                          and 2 raised to #CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX
+ *                          and `coap_szx2size(CONFIG_NANOCOAP_BLOCK_SIZE_MAX)`
  * @param[in]    more       more blocks? use 1 if yes; 0 if no or unknown
  */
 void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
@@ -1275,7 +1275,7 @@ int coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
  * @param[in]    blknum     offset from the beginning of content, in terms of
                             @p blksize byte blocks
  * @param[in]    blksize    size of each block; must be a power of 2 between 16
- *                          and 2 raised to #CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX
+ *                          `coap_szx2size(CONFIG_NANOCOAP_BLOCK_SIZE_MAX)`
  * @retval       0          Success
  * @retval       -EINVAL    @p blknum and/or @p blksize are invalid, e.g.
  *                          because they point outside the addressable RAM
@@ -1448,28 +1448,6 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, uint8_
  * @returns false if there are no critical options, or all have been accessed.
  */
 bool coap_has_unprocessed_critical_options(const coap_pkt_t *pkt);
-
-/**
- * @brief   Helper to decode SZX value to size in bytes
- *
- * @param[in]   szx     SZX value to decode
- *
- * @returns     SZX value decoded to bytes
- */
-#define coap_szx2size(szx) (1U << ((szx) + 4))
-
-/**
- * @brief   Helper to encode byte size into next equal or smaller SZX value
- *
- * @param[in]   len     Size in bytes
- *
- * @returns     closest SZX value that fits into a buffer of @p len
- */
-static inline unsigned coap_size2szx(unsigned len)
-{
-    assert(len >= 16);
-    return bitarithm_msb(len >> 4);
-}
 /**@}*/
 
 /**

@@ -79,8 +79,91 @@ typedef struct {
 
 /**
  * @brief   isrpipe for writing stdin input to
+ *
+ * @deprecated  Use @ref stdio_rx_write or @ref stdio_rx_write_one. This
+ *              isrpipe will become private and should not be used directly.
+ *              Using this isrpipe directly will not work with the
+ *              `stdio_notify` module. Will be removed after the 2027.01
+ *              release.
  */
 extern isrpipe_t stdin_isrpipe;
+
+/**
+ * @brief   Push a single received byte into stdin
+ *
+ * This is the entry point stdio backends use to hand received data to stdin.
+ * It buffers the byte for @ref stdio_read and, when the `stdio_notify` module
+ * is used, invokes the registered notify callback (see @ref stdio_set_notify).
+ *
+ * @note    Safe to call from ISR context.
+ *
+ * @param[in]   c       received byte to push into stdin
+ *
+ * @retval      0       on success
+ * @retval      -1      if the stdin buffer was full
+ */
+#if IS_USED(MODULE_STDIO_NOTIFY) || DOXYGEN
+int stdio_rx_write_one(uint8_t c);
+#else
+static inline int stdio_rx_write_one(uint8_t c)
+{
+    return isrpipe_write_one(&stdin_isrpipe, c);
+}
+#endif
+
+/**
+ * @brief   Push received bytes into stdin
+ *
+ * This is the entry point stdio backends use to hand received data to stdin.
+ * It buffers the data for @ref stdio_read and, when the `stdio_notify` module
+ * is used, invokes the registered notify callback (see @ref stdio_set_notify).
+ *
+ * @note    Safe to call from ISR context.
+ *
+ * @param[in]   buf     received bytes to push into stdin
+ * @param[in]   len     number of bytes in @p buf
+ *
+ * @return  number of bytes pushed into stdin, which may be less than @p len if
+ *          the stdin buffer was full
+ */
+#if IS_USED(MODULE_STDIO_NOTIFY) || DOXYGEN
+int stdio_rx_write(const uint8_t *buf, size_t len);
+#else
+static inline int stdio_rx_write(const uint8_t *buf, size_t len)
+{
+    return isrpipe_write(&stdin_isrpipe, buf, len);
+}
+#endif
+
+#if IS_USED(MODULE_STDIO_NOTIFY) || DOXYGEN
+/**
+ * @brief   Definition of a stdio notify callback
+ *
+ * Invoked once data becomes available on stdin (see @ref stdio_set_notify), in
+ * the (ISR) context of the stdio backend feeding stdin. It must therefore be
+ * ISR-safe and non-blocking.
+ *
+ * @param[in]   arg     argument registered with the callback
+ */
+typedef void (*stdio_notify_cb_t)(void *arg);
+
+/**
+ * @brief   Register a callback fired when data is available on stdin
+ *
+ * The callback is invoked by the stdio backend once new data has been pushed
+ * to stdin, in (ISR) context. It must therefore be ISR-safe and non-blocking.
+ * This allows a consumer to be woken by means other than a blocking
+ * @ref stdio_read (e.g. thread flags), so it can also react to other events.
+ *
+ * There can only be one notify callback registered at a time.
+ *
+ * @note    Only available with the `stdio_notify` module.
+ *
+ * @param[in]   cb      callback to invoke, or `NULL` to disable
+ * @param[in]   arg     argument passed to @p cb
+ */
+void stdio_set_notify(stdio_notify_cb_t cb, void *arg);
+#endif
 
 /**
  * @brief initialize the module

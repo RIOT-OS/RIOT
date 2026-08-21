@@ -59,9 +59,9 @@ static ztimer_periodic_t stdin_timer;
 
 #if defined(MODULE_RISCV_COMMON)
 
-static uint32_t _semihosting_raw(int cmd, uint32_t *args)
+static uintptr_t _semihosting_raw(int cmd, uintptr_t *args)
 {
-    uint32_t result = 0;
+    uintptr_t result = 0;
     /* Moves cmd and args to r0 and r1. Then triggers a breakpoint.
      * Finally moves the results stored in r0 to result
      */
@@ -89,9 +89,9 @@ static uint32_t _semihosting_raw(int cmd, uint32_t *args)
 
 #elif defined(MODULE_CORTEXM_COMMON)
 
-static uint32_t _semihosting_raw(int cmd, uint32_t *args)
+static uintptr_t _semihosting_raw(int cmd, uintptr_t *args)
 {
-    uint32_t result = 0;
+    uintptr_t result = 0;
     /* Moves cmd and args to r0 and r1. Then triggers a breakpoint.
      * Finally moves the results stored in r0 to result
      */
@@ -123,20 +123,20 @@ static bool _semihosting_connected(void) {
 
 static size_t _semihosting_write(const uint8_t *buffer, size_t len)
 {
-    uint32_t args[3] = {
+    uintptr_t args[3] = {
         STDIO_SEMIHOSTING_F_STDOUT,
-        (uint32_t)buffer,
-        (uint32_t)len,
+        (uintptr_t)buffer,
+        (uintptr_t)len,
     };
     return _semihosting_raw(STDIO_SEMIHOSTING_SYS_WRITE, args);
 }
 
 static ssize_t _semihosting_read(uint8_t *buffer, size_t len)
 {
-    uint32_t args[3] = {
+    uintptr_t args[3] = {
         STDIO_SEMIHOSTING_F_STDIN,
-        (uint32_t)buffer,
-        (uint32_t)len,
+        (uintptr_t)buffer,
+        (uintptr_t)len,
     };
     size_t remaining = _semihosting_raw(STDIO_SEMIHOSTING_SYS_READ, args);
     return len - remaining;
@@ -144,6 +144,8 @@ static ssize_t _semihosting_read(uint8_t *buffer, size_t len)
 
 static bool _read_cb(void *arg)
 {
+    (void)arg;
+
     uint8_t buffer[STDIO_RX_BUFSIZE];
 
     if (!_semihosting_connected()) {
@@ -152,7 +154,7 @@ static bool _read_cb(void *arg)
 
     int bytes = _semihosting_read(buffer, sizeof(buffer));
     if (bytes > 0) {
-        isrpipe_write(arg, buffer, bytes);
+        stdio_rx_write(buffer, bytes);
     }
 
     return true;
@@ -169,7 +171,7 @@ static void _init(void) {
         return;
     }
 
-    ztimer_periodic_init(ZTIMER_MSEC, &stdin_timer, _read_cb, &stdin_isrpipe,
+    ztimer_periodic_init(ZTIMER_MSEC, &stdin_timer, _read_cb, NULL,
                          STDIO_SEMIHOSTING_POLL_RATE_MS);
     ztimer_periodic_start(&stdin_timer);
     _init_done = true;

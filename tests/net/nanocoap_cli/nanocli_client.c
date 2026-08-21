@@ -31,6 +31,7 @@
 #include "net/sock/util.h"
 #include "od.h"
 #include "shell.h"
+#include "tiny_strerror.h"
 
 #ifdef MODULE_GNRC_IPV6
 static ssize_t _send(coap_pkt_t *pkt, size_t len,
@@ -84,12 +85,12 @@ static ssize_t _send(coap_pkt_t *pkt, size_t len,
 
 static uint8_t _client_token[COAP_TOKEN_LENGTH_MAX] = { 0xDA, 0xEC };
 static uint8_t _client_token_len = 2;
+static uint8_t _client_buf[512];
 
 static int _cmd_client(int argc, char **argv)
 {
     /* Ordered like the RFC method code numbers, but off by 1. GET is code 0. */
     const char *method_codes[] = {"get", "post", "put"};
-    uint8_t buf[128];
     coap_pkt_t pkt;
     size_t len;
 
@@ -108,14 +109,14 @@ static int _cmd_client(int argc, char **argv)
         goto end;
     }
 
-    pkt.buf = buf;
+    pkt.buf = _client_buf;
 
     /* parse options */
     if (argc == 5 || argc == 6) {
-        ssize_t hdrlen = coap_build_udp_hdr(buf, sizeof(buf), COAP_TYPE_CON,
+        ssize_t hdrlen = coap_build_udp_hdr(_client_buf, sizeof(_client_buf), COAP_TYPE_CON,
                                             _client_token, _client_token_len,
                                             code_pos + 1, 1);
-        coap_pkt_init(&pkt, &buf[0], sizeof(buf), hdrlen);
+        coap_pkt_init(&pkt, &_client_buf[0], sizeof(_client_buf), hdrlen);
         coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, argv[4], '/');
         if (argc == 6) {
             coap_opt_add_uint(&pkt, COAP_OPT_CONTENT_FORMAT, COAP_FORMAT_TEXT);
@@ -132,7 +133,7 @@ static int _cmd_client(int argc, char **argv)
         printf("nanocli: sending msg ID %u, %" PRIuSIZE " bytes\n", coap_get_id(&pkt),
                len);
 
-        ssize_t res = _send(&pkt, sizeof(buf), argv[2], argv[3]);
+        ssize_t res = _send(&pkt, sizeof(_client_buf), argv[2], argv[3]);
         if (res < 0) {
             printf("nanocli: msg send failed: %" PRIdSIZE "\n", res);
         }
@@ -364,7 +365,7 @@ static int _cmd_get_non(int argc, char **argv)
 {
     int res;
 
-    uint8_t response[coap_szx2size(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT)];
+    uint8_t response[COAP_SZX2SIZE(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT)];
 
     if (argc < 2) {
         printf("usage: %s <url>\n", argv[0]);
@@ -435,3 +436,69 @@ static int _cmd_observe(int argc, char **argv)
 }
 SHELL_COMMAND(observe, "observe URL", _cmd_observe);
 #endif /* MODULE_NANOCOAP_SOCK_OBSERVE */
+
+static int _cmd_get_slice(int argc, char **argv)
+{
+    if ((argc < 3) || (argc > 5)) {
+        printf("Usage: %s <URI> <LEN_BYTE> [OFFSET_BYTE] [BLOCK_SIZE_BYTE]\n",
+               argv[0]);
+        return 1;
+    }
+
+    size_t len = atoi(argv[2]);
+    if (len > sizeof(_client_buf)) {
+        printf("LEN_BYTE must be <= %u\n", (unsigned)sizeof(_client_buf));
+        return 1;
+    }
+    size_t offset = 0;
+    size_t blocksize = 64;
+    coap_blksize_t szx = COAP_BLOCKSIZE_64;
+    if (argc >= 4) {
+        offset = atoi(argv[3]);
+    }
+
+    if (argc >= 5) {
+        blocksize = atoi(argv[4]);
+        szx = coap_size2szx(blocksize);
+        if (blocksize != coap_szx2size(szx)) {
+            printf("Blocksize \"%s\" invalid. Use a power of two with "
+                "16 <= blocksize <= 1024.\n",
+                argv[4]);
+            return 1;
+        }
+    }
+
+
+    nanocoap_sock_t sock;
+    int res = nanocoap_sock_url_connect(argv[1], &sock);
+    if (res) {
+        printf("nanocoap_sock_url_connect(\"%s\", &sock): %s\n",
+               argv[1], tiny_strerror(res));
+        return 1;
+    }
+
+    const char *path = sock_urlpath(argv[1]);
+
+    res = nanocoap_sock_get_slice(&sock, path, szx, offset, _client_buf,
+                                  len);
+    nanocoap_sock_close(&sock);
+
+    if (res < 0) {
+        printf("nanocoap_sock_get_slice(&sock, \"%s\", %u, %u, buf, %u): %s\n",
+               path, (unsigned)blocksize, (unsigned)offset, (unsigned)len,
+               tiny_strerror(res));
+        return 1;
+    }
+
+    assert((size_t)res <= len);
+    if (res == 0) {
+        puts("No data received (requested slice behind payload)");
+        return 0;
+    }
+
+    od_hex_dump(_client_buf, res, 0);
+
+    return 0;
+}
+
+SHELL_COMMAND(get_slice, "GET-Request with given range", _cmd_get_slice);

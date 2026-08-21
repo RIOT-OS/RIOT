@@ -161,7 +161,7 @@ static int _nanocoap_put_handler(int argc, char **argv)
 {
     int res;
     char *file, *url;
-    static char work_buf[coap_szx2size(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT) + 1];
+    static char work_buf[COAP_SZX2SIZE(CONFIG_NANOCOAP_BLOCKSIZE_DEFAULT) + 1];
 
     if (argc < 3) {
         printf("Usage: %s <file> <url>\n", argv[0]);

@@ -275,7 +275,7 @@ static void *telnet_thread(void *arg)
                 }
 write:
                 if (IS_USED(MODULE_STDIO_TELNET)) {
-                    isrpipe_write_one(&stdin_isrpipe, c);
+                    stdio_rx_write_one(c);
                 }
                 else {
                     pipe_write(&_stdin_pipe, &c, 1);

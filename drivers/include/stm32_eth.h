@@ -1,4 +1,9 @@
 /*
+ * SPDX-FileCopyrightText: 2018 Robin Lösch
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+/**
  *
  * @file
  * @brief       Interface definition for the stm32 ethernet driver
@@ -8,8 +13,7 @@
  * @{
  */
 
-#ifndef STM32_ETH_H
-#define STM32_ETH_H
+#pragma once
 
 #include "net/netdev.h"
 
@@ -27,5 +31,4 @@ void stm32_eth_netdev_setup(netdev_t *netdev);
 }
 #endif
 
-#endif /* STM32_ETH_H */
-/* @} */
+/** @} */

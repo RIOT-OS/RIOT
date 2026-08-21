@@ -37,12 +37,13 @@ get_kernel_info() {
 }
 
 get_os_info() {
-    local os="$(uname -s)"
+    local os
+    os=$(uname -s)
     local osname="unknown"
     local osvers="unknown"
     if [ "$os" = "Linux" ]; then
-        osname="$(cat /etc/os-release | grep ^NAME= | awk -F'=' '{print $2}')"
-        osvers="$(cat /etc/os-release | grep ^VERSION= | awk -F'=' '{print $2}')"
+        osname="$(grep ^NAME= /etc/os-release | awk -F'=' '{print $2}')"
+        osvers="$(grep ^VERSION= /etc/os-release | awk -F'=' '{print $2}')"
     elif [ "$os" = "Darwin" ]; then
         osname="$(sw_vers -productName)"
         osvers="$(sw_vers -productVersion)"
@@ -153,6 +154,11 @@ for p in \
     printf "%25s: %s\n" "$p-gcc" "$(get_cmd_version ${p}-gcc)"
 done
 printf "%25s: %s\n" "clang" "$(get_cmd_version clang)"
+printf "\n"
+printf "%s\n" "Installed container tools"
+printf "%s\n" "-------------------------"
+printf "%25s: %s\n" "docker" "$(get_cmd_version docker)"
+printf "%25s: %s\n" "podman" "$(get_cmd_version podman)"
 printf "\n"
 printf "%s\n" "Installed compiler libs"
 printf "%s\n" "-----------------------"

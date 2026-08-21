@@ -131,6 +131,10 @@ typedef struct {
  * The timer will be started automatically after initialization with interrupts
  * enabled.
  *
+ * @pre     The timer must not be active when calling `timer_init()`. It must
+ *          either not have been initialized before or it must be stopped with
+ *          @ref timer_stop before calling `timer_init()` again.
+ *
  * @param[in] dev   the timer to initialize
  * @param[in] freq  requested number of ticks per second
  * @param[in] cb    this callback is called in interrupt context, the

@@ -17,10 +17,17 @@
 #define ATOMIC_INT_SAME_SIZED_TYPE                      uint32_t
 #define ATOMIC_UINT_SIZE                                (4U)
 #define ATOMIC_UINT_SAME_SIZED_TYPE                     uint32_t
-#define ATOMIC_LONG_SIZE                                (4U)
-#define ATOMIC_LONG_SAME_SIZED_TYPE                     uint32_t
-#define ATOMIC_ULONG_SIZE                               (4U)
-#define ATOMIC_ULONG_SAME_SIZED_TYPE                    uint32_t
+#if __riscv_xlen == 64
+#  define ATOMIC_LONG_SIZE                                (8U)
+#  define ATOMIC_LONG_SAME_SIZED_TYPE                     uint64_t
+#  define ATOMIC_ULONG_SIZE                               (8U)
+#  define ATOMIC_ULONG_SAME_SIZED_TYPE                    uint64_t
+#else
+#  define ATOMIC_LONG_SIZE                                (4U)
+#  define ATOMIC_LONG_SAME_SIZED_TYPE                     uint32_t
+#  define ATOMIC_ULONG_SIZE                               (4U)
+#  define ATOMIC_ULONG_SAME_SIZED_TYPE                    uint32_t
+#endif
 #define ATOMIC_LLONG_SIZE                               (8U)
 #define ATOMIC_LLONG_SAME_SIZED_TYPE                    uint64_t
 #define ATOMIC_ULLONG_SIZE                              (8U)
@@ -57,12 +64,21 @@
 #define ATOMIC_INT_FAST64_T_SAME_SIZED_TYPE             uint64_t
 #define ATOMIC_UINT_FAST64_T_SIZE                       (8U)
 #define ATOMIC_UINT_FAST64_T_SAME_SIZED_TYPE            uint64_t
-#define ATOMIC_INTPTR_T_SIZE                            (4U)
-#define ATOMIC_INTPTR_T_SAME_SIZED_TYPE                 uint32_t
-#define ATOMIC_UINTPTR_T_SIZE                           (4U)
-#define ATOMIC_UINTPTR_T_SAME_SIZED_TYPE                uint32_t
-#define ATOMIC_SIZE_T_SIZE                              (4U)
-#define ATOMIC_SIZE_T_SAME_SIZED_TYPE                   uint32_t
+#if __riscv_xlen == 64
+#  define ATOMIC_INTPTR_T_SIZE                            (8U)
+#  define ATOMIC_INTPTR_T_SAME_SIZED_TYPE                 uint64_t
+#  define ATOMIC_UINTPTR_T_SIZE                           (8U)
+#  define ATOMIC_UINTPTR_T_SAME_SIZED_TYPE                uint64_t
+#  define ATOMIC_SIZE_T_SIZE                              (8U)
+#  define ATOMIC_SIZE_T_SAME_SIZED_TYPE                   uint64_t
+#else
+#  define ATOMIC_INTPTR_T_SIZE                            (4U)
+#  define ATOMIC_INTPTR_T_SAME_SIZED_TYPE                 uint32_t
+#  define ATOMIC_UINTPTR_T_SIZE                           (4U)
+#  define ATOMIC_UINTPTR_T_SAME_SIZED_TYPE                uint32_t
+#  define ATOMIC_SIZE_T_SIZE                              (4U)
+#  define ATOMIC_SIZE_T_SAME_SIZED_TYPE                   uint32_t
+#endif
 #define ATOMIC_PTRDIFF_T_SIZE                           (4U)
 #define ATOMIC_PTRDIFF_T_SAME_SIZED_TYPE                uint32_t
 #define ATOMIC_INTMAX_T_SIZE                            (8U)

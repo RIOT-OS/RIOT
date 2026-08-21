@@ -1,0 +1,10 @@
+MODULE := libcoap_oscore
+
+SRC := \
+  oscore.c \
+  oscore_cbor.c \
+  oscore_context.c \
+  oscore_cose.c \
+  oscore_crypto.c
+
+include $(RIOTBASE)/Makefile.base

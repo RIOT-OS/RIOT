@@ -212,7 +212,7 @@ static ssize_t _get_file(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     int err;
     uint32_t etag, size_total;
 
-    coap_block1_t block2 = { .szx = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX };
+    coap_block1_t block2 = { .szx = CONFIG_NANOCOAP_BLOCK_SIZE_MAX };
     {
         struct stat stat;
         if ((err = vfs_stat(request->namebuf, &stat)) < 0) {
@@ -473,7 +473,7 @@ static ssize_t _get_directory(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     int err;
     vfs_DIR dir;
     coap_block_slicer_t slicer;
-    coap_block1_t block2 = { .szx = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX };
+    coap_block1_t block2 = { .szx = CONFIG_NANOCOAP_BLOCK_SIZE_MAX };
     if (request->options.exists.block2 && !coap_get_block2(pdu, &block2)) {
         return _error_handler(pdu, buf, len, COAP_OPT_FINISH_NONE);
     }

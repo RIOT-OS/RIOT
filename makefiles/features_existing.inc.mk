@@ -81,6 +81,7 @@ FEATURES_EXISTING := \
     cpu_msp430_f2xx_g2xx \
     cpu_msp430_x1xx \
     cpu_native \
+    cpu_noelv \
     cpu_nrf51 \
     cpu_nrf52 \
     cpu_nrf53 \

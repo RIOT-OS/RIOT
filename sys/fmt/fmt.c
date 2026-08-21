@@ -16,7 +16,6 @@
  */
 
 #include <assert.h>
-#include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -519,6 +518,40 @@ int fmt_time_tm_iso8601(char out[20], const struct tm *tm, char separator)
     *pos = '\0';
 
     return pos - out;
+}
+
+static int _check_array(const char *str, size_t str_len, const char **vals, size_t num_vals, bool ret)
+{
+    for (unsigned i = 0; i < num_vals; ++i) {
+        const char *val = vals[i];
+        size_t val_len = strlen(val);
+        if (str_len >= val_len && !memcmp(str, val, val_len)) {
+            /* check that there are no trailing characters, e.g. "yesterday" should not parse as 'true' */
+            unsigned char next_char = str[val_len];
+            return (str_len > val_len && next_char != '\0') ? -EINVAL : ret;
+        }
+    }
+
+    return -EINVAL;
+}
+
+int scn_bool(const char *str, size_t n)
+{
+    if (n < 1 || !str) {
+        return -EINVAL;
+    }
+
+    const char *trueish[] = {
+        "1", "on", "yes", "true"
+    };
+    const char *falsy[] = {
+        "0", "off", "no", "false"
+    };
+
+    int res = _check_array(str, n, trueish, ARRAY_SIZE(trueish), true);
+    return res == -EINVAL
+                ? _check_array(str, n, falsy, ARRAY_SIZE(falsy), false)
+                : res;
 }
 
 uint32_t scn_u32_dec(const char *str, size_t n)

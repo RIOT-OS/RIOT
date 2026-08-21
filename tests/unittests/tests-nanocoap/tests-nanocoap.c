@@ -1365,7 +1365,36 @@ static void test_nanocoap__coap_build_reply_header(void)
     TEST_ASSERT(0 == memcmp(response, response_expected, response_expected_hdr_len));
 }
 
-Test *tests_nanocoap_tests(void)
+/* Test if coap_szx2size() and coap_size2szx() */
+static void test_nanocoap__coap_szx2size(void)
+{
+    struct {
+        coap_blksize_t szx;
+        unsigned bytes;
+    } expected[] = {
+        { COAP_BLOCKSIZE_16, 16 },
+        { COAP_BLOCKSIZE_32, 32 },
+        { COAP_BLOCKSIZE_64, 64 },
+        { COAP_BLOCKSIZE_128, 128 },
+        { COAP_BLOCKSIZE_256, 256 },
+        { COAP_BLOCKSIZE_512, 512 },
+        { COAP_BLOCKSIZE_1024, 1024 },
+    };
+
+    for (size_t i = 0; i < ARRAY_SIZE(expected); i++) {
+        TEST_ASSERT_EQUAL_INT(expected[i].bytes, coap_szx2size(expected[i].szx));
+        TEST_ASSERT_EQUAL_INT(expected[i].szx, coap_size2szx(expected[i].bytes));
+    }
+
+    /* smaller than 16 --> COAP_BLOCKSIZE_16 */
+    TEST_ASSERT_EQUAL_INT(COAP_BLOCKSIZE_16, coap_size2szx(3));
+    /* larger than 1024 --> COAP_BLOCKSIZE_1024 */
+    TEST_ASSERT_EQUAL_INT(COAP_BLOCKSIZE_1024, coap_size2szx(4096));
+    /* no power of two is rounded down */
+    TEST_ASSERT_EQUAL_INT(COAP_BLOCKSIZE_32, coap_size2szx(63));
+}
+
+static Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_nanocoap__hdr),
@@ -1406,6 +1435,7 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap___rst_message),
         new_TestFixture(test_nanocoap__out_of_bounds_option),
         new_TestFixture(test_nanocoap__coap_build_reply_header),
+        new_TestFixture(test_nanocoap__coap_szx2size),
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);

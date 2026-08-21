@@ -1,22 +1,22 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# Copyright 2017 Kaspar Schleiser <kaspar@schleiser.de>
-#
-# This file is subject to the terms and conditions of the GNU Lesser
-# General Public License v2.1. See the file LICENSE in the top level
-# directory for more details.
+# SPDX-FileCopyrightText: 2017 Kaspar Schleiser <kaspar@schleiser.de>
+# SPDX-License-Identifier: LGPL-2.1-only
 
-: "${RIOTBASE:=$(cd $(dirname $0)/../../../; pwd)}"
-cd $RIOTBASE
+: "${RIOTBASE:=$(cd "$(dirname "$0")/../../../" || exit 1; pwd)}"
+cd "$RIOTBASE" || exit 1
 
 : "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
+
+# shellcheck source=dist/tools/ci/changed_files.sh
 . "${RIOTTOOLS}"/ci/changed_files.sh
+# shellcheck source=dist/tools/ci/github_annotate.sh
 . "${RIOTTOOLS}"/ci/github_annotate.sh
 
 EXIT_CODE=0
 
 filter() {
-    if [ $QUIET -eq 0 ]; then
+    if [ "$QUIET" -eq 0 ]; then
         cat
     else
         grep '^---' | cut -f 2 -d ' '
@@ -24,13 +24,17 @@ filter() {
 }
 
 _annotate_diff() {
-    if [ -n "$1" -a -n "$2" -a -n "$3" ]; then
+    if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ]; then
         IFS="${OLD_IFS}" github_annotate_error "$1" "$2" "Wrong header guard format:\n\n$3"
     fi
 }
 
 _headercheck() {
-    OUT=$(${RIOTTOOLS}/headerguards/headerguards.py ${FILES} 2>&1 | filter)
+    if [ "${#FILES_ARR[@]}" -eq 0 ] || [ -z "${FILES_ARR[0]}" ]; then
+        return 0
+    fi
+
+    OUT=$("${RIOTTOOLS}"/headerguards/headerguards.py "${FILES_ARR[@]}" 2>&1 | filter)
     if [ -n "$OUT" ]; then
         EXIT_CODE=1
         if github_annotate_is_on; then
@@ -44,7 +48,7 @@ _headercheck() {
                 IFS=''  # keep leading and trailing spaces
                 while read -r line; do
                     # file has no or broken header guard
-                    if echo "$line" | grep -q '^.*: no / broken header guard$'; then
+                    if [[ "$line" == *": no / broken header guard" ]]; then
                         # this output comes outside of a diff, so reset diff parser
                         _annotate_diff "$DIFFFILE" "$DIFFLINE" "$DIFF"
                         DIFF=""
@@ -55,10 +59,10 @@ _headercheck() {
                         MESSAGE=$(echo "$line" | cut -d: -f2 | xargs echo)
                         github_annotate_error "$FILE" 0 "$MESSAGE"
                     # parse beginning of new diff
-                    elif echo "$line" | grep -q '^--- .\+$'; then
+                    elif [[ "$line" == "--- "* ]]; then
                         _annotate_diff "$DIFFFILE" "$DIFFLINE" "$DIFF"
                         DIFF="$line"
-                        DIFFFILE=$(echo "$line" | sed 's/^--- \(.\+\)$/\1/g')
+                        DIFFFILE="${line#--- }"
                         DIFFLINE=""
                     # we are in a diff currently
                     elif [ -n "$DIFF" ]; then
@@ -71,9 +75,11 @@ _headercheck() {
                                _annotate_diff "$DIFFFILE" "$DIFFLINE" "$DIFF"
                                DIFF="--- $DIFFFILE\n+++ $DIFFFILE"
                            fi
-                           DIFFLINE="$(echo "$line" | sed 's/@@ -\([0-9]\+\).*$/\1/')"
+                           DIFFLINE="${line#@@ -}"
+                           DIFFLINE="${DIFFLINE%%[!0-9]*}"
                            # Parse
                            # @@ -<DIFFLINE>,<DIFFOFFSET> ...
+                           # shellcheck disable=SC2001 # cond. expr. can't easily be done without sed
                            DIFFOFFSET="$(echo "$line" |
                                sed 's/@@ -[0-9]\+\(,\([0-9]\)\+\)\?.*$/\2/')"
                            if [ -n "$DIFFOFFSET" ]; then
@@ -83,7 +89,8 @@ _headercheck() {
                                DIFFLINE=$(( DIFFLINE + DIFFOFFSET - 1 ))
                            fi
                         fi
-                        DIFF="$DIFF\n$(echo "${line}"| sed 's/\\/\\\\/g' )"
+                        # replace all \ by \\
+                        DIFF="$DIFF\n${line//\\/\\\\}"
                     fi
                 done
                 _annotate_diff "$DIFFFILE" "$DIFFLINE" "$DIFF"
@@ -94,7 +101,9 @@ _headercheck() {
     fi
 }
 
-: ${FILES:=$(FILEREGEX='\.h$' changed_files)}
+# create an array from the changed files list
+: "${FILES:=$(FILEREGEX='\.h$' changed_files)}"
+mapfile -t FILES_ARR <<< "${FILES}"
 
 if [ -z "${FILES}" ]; then
     exit
@@ -102,7 +111,7 @@ fi
 
 github_annotate_setup
 
-: ${QUIET:=0}
+: "${QUIET:=0}"
 
 if [ -z "$*" ]; then
     _headercheck
@@ -110,4 +119,4 @@ fi
 
 github_annotate_teardown
 
-exit $EXIT_CODE
+exit "$EXIT_CODE"

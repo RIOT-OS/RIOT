@@ -49,7 +49,7 @@ static void _sock_cb(sock_udp_t *sock, sock_async_flags_t flags, void *arg)
 
     int res;
     while ((res = sock_udp_recv_buf(sock, &data, &ctx, 0, &remote)) > 0) {
-        isrpipe_write(&stdin_isrpipe, data, res);
+        stdio_rx_write(data, res);
 
         /* detach remote */
         if (res == 1 && *(int8_t *)data == EOT) {
