@@ -44,7 +44,7 @@ static void auto_init_kw2xrf(void)
                     bhp_event_isr_cb, &netif[i].bhp);
 
         netdev_register(&kw2xrf_netdev[i].dev.netdev, NETDEV_KW2XRF, i);
-        netdev_ieee802154_submac_init(&kw2xrf_netdev[i]);
+        netdev_ieee802154_submac_init(&kw2xrf_netdev[i], NULL);
 
         if (lwip_add_6lowpan(&netif[i], &kw2xrf_netdev[i].dev.netdev) == NULL) {
             DEBUG("Could not add kw2xrf device\n");
