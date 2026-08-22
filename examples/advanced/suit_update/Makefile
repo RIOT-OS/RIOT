@@ -65,6 +65,10 @@ endif
 
 # Change this to 0 to not use ethos
 USE_ETHOS ?= 1
+# see SUIT_CLIENT and SUIT_COAP_SERVER
+SUIT_COAP_SERVER_PREFIX ?= 2001:db8::/64
+# you may need to run dist/tools/tapsetup/tapsetup to create tap0
+SUIT_COAP_SERVER_IFACE ?= tap0
 
 ifeq (1,$(USE_ETHOS))
   USEMODULE += stdio_ethos
@@ -76,15 +80,8 @@ ifeq (1,$(USE_ETHOS))
 
   # make sure ethos and uhcpd are built
   TERMDEPS += host-tools
-
-  # For local testing, run
-  #
-  #     $ cd dist/tools/ethos; sudo ./setup_network.sh riot0 2001:db8::0/64
-  #
-  #... in another shell and keep it running.
-  IFACE ?= riot0
-  TERMPROG = $(RIOTTOOLS)/ethos/ethos
-  TERMFLAGS = $(IFACE) $(PORT)
+  TERMPROG = $(RIOTTOOLS)/ethos/start_network.sh
+  TERMFLAGS = $(PORT) $(SUIT_COAP_SERVER_IFACE) $(SUIT_COAP_SERVER_PREFIX)
 else
   USEMODULE += netdev_default
 endif
@@ -107,11 +104,11 @@ TESTRUNNER_RESET_AFTER_TERM ?= 1
 # with ed25519 support.
 TEST_ON_CI_BLACKLIST = all
 
+# Add custom SUIT targets and constants before including the global Makefile.include
+include $(CURDIR)/Makefile.suit.custom
+
 # Include global Makefile.include first to apply board aliasses
 include $(RIOTBASE)/Makefile.include
-
-# Add custom SUIT targets
-include $(CURDIR)/Makefile.suit.custom
 
 # export IFACE for test
 $(call target-export-variables,test-with-config test-with-config/check-config,IFACE)
@@ -130,9 +127,16 @@ ifndef CONFIG_GNRC_PKTBUF_SIZE
 endif
 endif
 
-.PHONY: host-tools
+.PHONY: host-tools suit_coap_server
 
 host-tools:
 	$(Q)env -u CC -u CFLAGS $(MAKE) -C $(RIOTTOOLS)
 
+suit_coap_server:
+	aiocoap-fileserver --bind [::] $(SUIT_COAP_FSROOT)
+
 include $(RIOTMAKE)/default-radio-settings.inc.mk
+
+ifneq (1,$(USE_ETHOS))
+  TERMPROG := $(CURDIR)/start_network.sh -r $(SUIT_COAP_SERVER_PREFIX) -i $(SUIT_COAP_SERVER_IFACE) $(TERMPROG)
+endif
