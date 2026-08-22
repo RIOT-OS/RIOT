@@ -26,7 +26,7 @@
 
 int16_t coretemp_read(void)
 {
-    /* initialize factory calibration values */
+    /* read factory calibration values */
     int32_t cal_temp = ((DEVINFO->CAL & _DEVINFO_CAL_TEMP_MASK) >>
                          _DEVINFO_CAL_TEMP_SHIFT);
 #if defined(_SILICON_LABS_32B_SERIES_0)
