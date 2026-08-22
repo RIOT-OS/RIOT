@@ -15,6 +15,7 @@
  * @}
  */
 
+#include <stddef.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -77,9 +78,12 @@ static const uint8_t payload[] =
 
 static int print_addr(int argc, char **argv);
 static int txtsnd(int argc, char **argv);
+static int txtsnd_multiple_times(int argc, char **argv);
+
 static const shell_command_t shell_commands[] = {
     { "print_addr", "Print IEEE802.15.4 addresses", print_addr },
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
+    { "txtsnd_n", "Send multiple IEEE 802.15.4 packets", txtsnd_multiple_times },
     { NULL, NULL, NULL }
 };
 
@@ -187,6 +191,9 @@ static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
         break;
     case IEEE802154_DEV_TYPE_KW2XRF:
         printf("kw2xrf");
+        break;
+    case IEEE802154_DEV_TYPE_KW41ZRF:
+        printf("kw41zrf");
         break;
     case IEEE802154_DEV_TYPE_MRF24J40:
         printf("mrf24j40");
@@ -428,6 +435,21 @@ static int txtsnd(int argc, char **argv)
     return send(addr, res, len);
 }
 
+static int txtsnd_multiple_times(int argc, char **argv)
+{
+    if (argc != 5) {
+        puts("Usage: txtsnd_n <long_addr> <len> <times> <interval>\n");
+        return 1;
+    }
+    size_t times = atoi(argv[3]);
+    size_t interval = atoi(argv[4]);
+    for (size_t i = 0; i < times; i++) {
+        txtsnd(3, argv);
+        ztimer_sleep(ZTIMER_MSEC, interval);
+    }
+    return 0;
+}
+
 static int _init(void)
 {
     mutex_init(&lock);
@@ -447,7 +469,6 @@ static int _init(void)
 
     struct _reg_container reg = { 0 };
     ieee802154_hal_test_init_devs(_reg_callback, &reg);
-
     int res = ieee802154_submac_init(&submac, &short_addr, &long_addr);
 
     if (res < 0) {
