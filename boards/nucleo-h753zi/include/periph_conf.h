@@ -192,6 +192,31 @@ static const pwm_conf_t pwm_config[] = {
 #define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
+/**
+ * @name    FDCAN configuration
+ * @{
+ */
+/**< Available CAN interfaces */
+static const can_conf_t candev_conf[] = {
+    {
+        .can = FDCAN1,
+        .rcc_mask = RCC_APB1HENR_FDCANEN,
+        .rx_pin = GPIO_PIN(PORT_D, 0),
+        .tx_pin = GPIO_PIN(PORT_D, 1),
+        .af = GPIO_AF9,
+        .it0_irqn = FDCAN1_IT0_IRQn,
+        .it1_irqn = FDCAN1_IT1_IRQn,
+        .en_deep_sleep_wake_up = true,
+        .ttcm = 0,
+        .abom = 1,
+        .awum = 1,
+        .nart = 0,
+        .rflm = 0,
+        .txfp = 0,
+    },
+};
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
