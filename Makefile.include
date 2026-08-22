@@ -740,6 +740,8 @@ endif # RIOTNOLINK
 
 $(ELFFILE): $(BASELIBS) $(ARCHIVES) $(LD_SCRIPTS)
 	$(Q)$(_LINK) -o $@
+	$(Q)mkdir -p "$(BINDIR)"
+	$(Q)printf '%s\n' "$(BUILD_DIR)" > "$(BINDIR)/.build_dir"
 
 .PHONY: $(APPLICATION_MODULE).module
 
@@ -774,6 +776,23 @@ print-size: $(ELFFILE)
 
 endif # BUILD_IN_DOCKER
 
+# Keep track of the BUILD_DIR used for the dependency files. This is done only
+# after all link prerequisites completed successfully. Invalidate the stamp
+# before a build only when it does not match the current BUILD_DIR, so an
+# unchanged BUILD_DIR can reuse valid dependency files incrementally.
+.PHONY: ..build-dir-prepare
+..build-dir-prepare:
+	$(Q)if ! test -f "$(BINDIR)/.build_dir" || \
+	    ! grep -Fqx "$(BUILD_DIR)" "$(BINDIR)/.build_dir"; then \
+	    rm -f "$(BINDIR)/.build_dir"; \
+	fi
+
+ifneq (1,$(BUILD_IN_DOCKER))
+link:
+	$(Q)mkdir -p "$(BINDIR)"
+	$(Q)printf '%s\n' "$(BUILD_DIR)" > "$(BINDIR)/.build_dir"
+endif # BUILD_IN_DOCKER
+
 # Check given command is available in the path
 #   check_cmd 'command' 'description'
 define check_cmd
@@ -802,8 +821,15 @@ endif
 	@$(call sh_echogreen,("Building application \"$(APPLICATION)\" for \"$(BOARD)\" with CPU \"$(CPU)\"."))
 	@$(call sh_echoinfo)
 
-# The `clean` needs to be serialized before everything else.
-all $(BASELIBS) $(ARCHIVES) $(BUILDDEPS) $(GENSRC) ..in-docker-container: | $(CLEAN)
+# The `clean` and build directory stamp preparation need to be serialized
+# before everything else.
+all link $(BUILD_FILES) $(BASELIBS) $(ARCHIVES) $(BUILDDEPS) $(GENSRC) \
+    ..in-docker-container pkg-build: | $(CLEAN)
+
+ifneq (1,$(BUILD_IN_DOCKER))
+all link $(BUILD_FILES) $(BASELIBS) $(ARCHIVES) $(BUILDDEPS) $(GENSRC) \
+    ..in-docker-container pkg-build: | ..build-dir-prepare
+endif # BUILD_IN_DOCKER
 
 .PHONY: pkg-prepare pkg-build
 pkg-prepare:

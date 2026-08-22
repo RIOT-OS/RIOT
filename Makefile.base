@@ -117,6 +117,21 @@ ASSMOBJ     := $(ASSMSRC:%.S=$(BINDIR)/$(MODULE)/%.o)
 OBJ := $(OBJC) $(OBJCXX) $(ASMOBJ) $(ASSMOBJ) $(GENOBJC)
 DEP := $(OBJC:.o=.d) $(OBJCXX:.o=.d) $(ASSMOBJ:.o=.d)
 
+# Dependency files contain absolute paths. If BUILD_DIR changed since the
+# last successful link, the existing dependency files may refer to files in
+# the old build directory. Ignore them until they are regenerated.
+_BUILD_DIR_STAMP := $(BINDIR)/.build_dir
+_BUILD_DIR_STAMP_MATCH := $(shell \
+    test -f "$(_BUILD_DIR_STAMP)" && \
+    grep -Fqx "$(BUILD_DIR)" "$(_BUILD_DIR_STAMP)" && \
+    echo 1)
+ifneq (1,$(_BUILD_DIR_STAMP_MATCH))
+  DEP :=
+  .PHONY: _BUILD_DIR_CHANGED
+  _BUILD_DIR_CHANGED:
+  $(OBJ): _BUILD_DIR_CHANGED
+endif
+
 SRC_ALL := $(SRC) $(SRCXX) $(ASMSRC) $(ASSMSRC)
 SUBDIRS_IN_DIRS := $(filter $(DIRS), $(abspath $(sort $(dir $(SRC_ALL)))))
 ifneq (,$(SUBDIRS_IN_DIRS))
