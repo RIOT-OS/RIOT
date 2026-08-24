@@ -45,67 +45,85 @@ extern "C" {
 /**
  * @brief  SPI interface lock status
  *
- * 0: Interface is unlocked (default)
- * 1: Interface is locked
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|Interface is unlocked (default)|
+ * |1|Interface is locked|
  */
 #define ADS131M02_STATUS_LOCK_MASK      BIT15
 /**
  * @brief  ADC resynchronization indicator
  *
- * 0: No resynchronization (default)
- * 1: Resynchronization occurred
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|No resynchronization (default)|
+ * |1|Resynchronization occurred|
  */
 #define ADS131M02_STATUS_F_RESYNC_MASK  BIT14
 
 /**
  * @brief  Register map CRC fault indicator
  *
- * 0: No change in the register map CRC (default)
- * 1: Register map CRC changed
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|No change in the register map CRC (default)|
+ * |1|Register map CRC changed|
  */
 #define ADS131M02_STATUS_REG_MAP_MASK   BIT13
 /**
  * @brief  SPI input CRC error indicator
  *
- * 0: No CRC error (default)
- * 1: Input CRC error occurred
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|No CRC error (default)|
+ * |1|Input CRC error occurred|
  */
 #define ADS131M02_STATUS_CRC_ERR_MASK   BIT12
 /**
  * @brief  CRC type
  *
- * 0: 16 bit CCITT (default)
- * 1: 16 bit ANSI
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|16 bit CCITT (default)|
+ * |1|16 bit ANSI|
  */
 #define ADS131M02_STATUS_CRC_TYPE_MASK  BIT11
 /**
  * @brief  Reset status
  *
- * 0: Not reset
- * 1: Reset occurred (default)
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|Not reset|
+ * |1|Reset occurred (default)|
  */
 #define ADS131M02_STATUS_RESET_MASK     BIT10
 /**
  * @brief  Data word length
  *
- * 00: 16-bit
- * 01: 24-bit (default)
- * 10: 32-bit zero-padded
- * 11: 32-bit sign-extended
+ * |Value|Description|
+ * |:---:|-----------|
+ * |00|16-bit|
+ * |01|24-bit (default)|
+ * |10|32-bit zero-padded|
+ * |11|32-bit sign-extended|
  */
 #define ADS131M02_STATUS_WLENGTH_MASK   (BIT9 | BIT8)
 /**
  * @brief  Channel 1 ADC data ready indicator
  *
- * 0: Channel 1 data is not new
- * 1: Channel 1 data is new
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|Channel 1 data is not new|
+ * |1|Channel 1 data is new|
  */
 #define ADS131M02_STATUS_DRDY1_MASK     BIT1
 /**
  * @brief  Channel 0 ADC data ready indicator
  *
- * 0: Channel 0 data is not new
- * 1: Channel 0 data is new
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|Channel 0 data is not new|
+ * |1|Channel 0 data is new|
  */
 #define ADS131M02_STATUS_DRDY0_MASK     BIT0
 
@@ -117,39 +135,49 @@ extern "C" {
 /**
  * @brief  Register map CRC enable (Bit 13)
  *
- * 0: Register CRC disabled (default)
- * 1: Register CRC enabled
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|Register CRC disabled (default)|
+ * |1|Register CRC enabled|
  */
 #define ADS131M02_MODE_REG_CRC_EN_MASK  BIT13
 /**
  * @brief   SPI input CRC enable
  *
- * 0: Disabled (default)
- * 1: Enabled
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|Disabled (default)|
+ * |1|Enabled|
  */
 #define ADS131M02_MODE_RX_CRC_EN_MASK   BIT12
 /**
  * @brief  SPI input and output, register map CRC type
  *
- * 0: 16-bit CCITT (default)
- * 1: 16-bit ANSI
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|16-bit CCITT (default)|
+ * |1|16-bit ANSI|
  */
 #define ADS131M02_MODE_CRC_TYPE_MASK    BIT11
 /**
  * @brief  Reset - Write 0b to clear this bit in the STATUS register
  *
- * 0: No reset
- * 1: Reset occurred (default by definition)
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|No reset|
+ * |1|Reset occurred (default by definition)|
  */
 #define ADS131M02_MODE_RESET_MASK       BIT10
 /**
  * @name  Data word length selection
  * @{
  *
- * 00: 16-bit
- * 01: 24-bit (default)
- * 10: 32-bit zero-padded
- * 11: 32-bit sign-extended
+ * |Value|Description|
+ * |:---:|-----------|
+ * |00|16-bit|
+ * |01|24-bit (default)|
+ * |10|32-bit zero-padded|
+ * |11|32-bit sign-extended|
  */
 #define ADS131M02_MODE_WLENGTH_MASK     (BIT9 | BIT8)
 #define ADS131M02_MODE_WLENGTH_16BIT    (0x0U << 8)
@@ -168,18 +196,22 @@ typedef enum {
 /**
  * @brief  SPI timeout enable
  *
- * 0: Disabled (default)
- * 1: Enabled
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|Disabled (default)|
+ * |1|Enabled|
  */
 #define ADS131M02_MODE_TIMEOUT_MASK     BIT4
 /**
  * @name  DRDY pin signal source selection
  * @{
  *
- * 00: Most lagging enabled channel (default)
- * 01: Logic OR of all the enabled channels
- * 10: Most leading enabled channel
- * 11: Most leading enabled channel
+ * |Value|Description|
+ * |:---:|-----------|
+ * |00|Most lagging enabled channel (default)|
+ * |01|Logic OR of all the enabled channels|
+ * |10|Most leading enabled channel|
+ * |11|Most leading enabled channel|
  */
 #define ADS131M02_MODE_DRDY_SEL_MASK    (BIT3 | BIT2)
 #define ADS131M02_MODE_DRDY_SEL_ALL     (0x0U << 2)
@@ -194,15 +226,19 @@ typedef enum {
 /**
  * @brief  DRDY pin state when conversion data are not available
  *
- * 0: Logic high (default)
- * 1: High impedance
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|Logic high (default)|
+ * |1|High impedance|
  */
 #define ADS131M02_MODE_DRDY_HiZ_MASK    BIT1
 /**
  * @brief  DRDY signal format when conversion data are available
  *
- * 0: Logic low (default)
- * 1: Low pulse with a fixed duration
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|Logic low (default)|
+ * |1|Low pulse with a fixed duration|
  */
 #define ADS131M02_MODE_DRDY_FMT_MASK    BIT0
 
@@ -214,22 +250,28 @@ typedef enum {
 /**
  * @brief  Channel 1 ADC enable
  *
- * 0: Disabled
- * 1: Enabled (default)
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|Disabled|
+ * |1|Enabled (default)| 
  */
 #define ADS131M02_CLOCK_CH1_EN_MASK     BIT9
 /**
  * @brief  Channel 0 ADC enable
  *
- * 0: Disabled
- * 1: Enabled (default)
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|Disabled|
+ * |1|Enabled (default)|
  */
 #define ADS131M02_CLOCK_CH0_EN_MASK     BIT8
 /**
  * @brief   Modulator oversampling ratio 64 selection (TurboMode)
  *
- * 0: OSR set by Bit 4:2 , i.e. OSR[2:0]
- * 1: OSR of 64 is selected
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|OSR set by Bit 4:2 , i.e. OSR[2:0]|
+ * |1|OSR of 64 is selected|
  */
 #define ADS131M02_CLOCK_TBM_MASK        BIT5
 /**
@@ -239,17 +281,21 @@ typedef enum {
  * The OSR determines the amount of averaging of the modulator output in the digital filter and therefore also
  * the filter bandwidth.
  *
- * OSR = fMOD / fDATA
- *     = fCLK / 2 / fDATA
+ * \f[
+ * \mathrm{OSR} = \frac{f_{\mathrm{MOD}}}{f_{\mathrm{DATA}}}
+ *              = \frac{f_{\mathrm{CLK}}}{2 f_{\mathrm{DATA}}}
+ * \f]
  *
- * 000: 128
- * 001: 256
- * 010: 512
- * 011: 1024 (default)
- * 100: 2048
- * 101: 4096
- * 110: 8192
- * 111: 16384
+ * |Value|Description|
+ * |:---:|-----------|
+ * |000|128|
+ * |001|256|
+ * |010|512|
+ * |011|1024 (default)|
+ * |100|2048|
+ * |101|4096|
+ * |110|8192|
+ * |111|16384|
  */
 #define ADS131M02_CLOCK_OSR_MASK        (BIT4 | BIT3 | BIT2)
 #define ADS131M02_CLOCK_OSR_128         (0x0U << 2)
@@ -277,10 +323,12 @@ typedef enum {
  * @name  Power mode selection
  * @{
  *
- * 00: Very low power
- * 01: Low power
- * 10: High resolution (default)
- * 11: High resolution
+ * |Value|Description|
+ * |:---:|-----------|
+ * |00|Very low power|
+ * |01|Low power|
+ * |10|High resolution (default)|
+ * |11|High resolution|
  */
 #define ADS131M02_CLOCK_PWR_MASK        (BIT1 | BIT0)
 #define ADS131M02_CLOCK_PWR_VERY_LOW    (0x0U)
@@ -303,16 +351,20 @@ typedef enum {
  * @name  Channel 1 PGA gain selection
  * @{
  *
- * FSR = ±1.2 V / Gain
+ * \f[
+ * F_{\mathrm{SR}} = \frac{\pm 1.2\,\mathrm{V}}{\mathrm{Gain}}
+ * \f]
  *
- * 000: 1 (default)
- * 001: 2
- * 010: 4
- * 011: 8
- * 100: 16
- * 101: 32
- * 110: 64
- * 111: 128
+ * |Value|Description|
+ * |:---:|-----------|
+ * |000|1 (default)|
+ * |001|2|
+ * |010|4|
+ * |011|8|
+ * |100|16|
+ * |101|32|
+ * |110|64|
+ * |111|128|
  */
 #define ADS131M02_GAIN_PGAGAIN1_MASK    (BIT6 | BIT5 | BIT4)
 #define ADS131M02_GAIN_SHIFT(ch)        ((ch) * 4)
@@ -330,14 +382,16 @@ typedef enum {
  * @name  Channel 0 PGA gain selection
  * @{
  *
- * 000: 1 (default)
- * 001: 2
- * 010: 4
- * 011: 8
- * 100: 16
- * 101: 32
- * 110: 64
- * 111: 128
+ * |Value|Description|
+ * |:---:|-----------|
+ * |000|1 (default)|
+ * |001|2|
+ * |010|4|
+ * |011|8|
+ * |100|16|
+ * |101|32|
+ * |110|64|
+ * |111|128|
  */
 #define ADS131M02_GAIN_PGAGAIN0_MASK    (BIT2 | BIT1 | BIT0)
 #define ADS131M02_GAIN_SHIFT(ch)        ((ch) * 4)
@@ -373,37 +427,43 @@ typedef enum {
  * @brief  Global chop delay selection
  * Delay in modulator clock periods before measurement begins
  *
- * 0000: 2
- * 0001: 4
- * 0010: 8
- * 0011: 16 (default)
- * 0100: 32
- * 0101: 64
- * 0110: 128
- * 0111: 256
- * 1000: 512
- * 1001: 1024
- * 1010: 2048
- * 1011: 4096
- * 1100: 8192
- * 1101: 16384
- * 1110: 32768
- * 1111: 65536
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0000|2|
+ * |0001|4|
+ * |0010|8|
+ * |0011|16 (default)|
+ * |0100|32|
+ * |0101|64|
+ * |0110|128|
+ * |0111|256|
+ * |1000|512|
+ * |1001|1024|
+ * |1010|2048|
+ * |1011|4096|
+ * |1100|8192|
+ * |1101|16384|
+ * |1110|32768|
+ * |1111|65536|
  */
 #define ADS131M02_CFG_GC_DLY_MASK       (BIT12 | BIT11 | BIT10 | BIT9)
 /**
  * @brief  Global chop enable
  *
- * 0: Disabled (default)
- * 1: Enabled
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|Disabled (default)|
+ * |1|Enabled|
  */
 #define ADS131M02_CFG_GC_EN_MASK        BIT8
 /**
  * @brief   Current-detect channel selection
  * Channels required to trigger current-detect
  *
- * 0: Any channel (default)
- * 1: All channels
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|Any channel (default)|
+ * |1|All channels|
  */
 #define ADS131M02_CFG_CD_ALL_MASK       BIT7
 /**
@@ -412,14 +472,16 @@ typedef enum {
  *
  * Number of current-detect exceeded thresholds to trigger a detection
  *
- * 000: 1 (default)
- * 001: 2
- * 010: 4
- * 011: 8
- * 100: 16
- * 101: 32
- * 110: 64
- * 111: 128
+ * |Value|Description|
+ * |:---:|-----------|
+ * |000|1 (default)|
+ * |001|2|
+ * |010|4|
+ * |011|8|
+ * |100|16|
+ * |101|32|
+ * |110|64|
+ * |111|128|
  */
 #define ADS131M02_CFG_CD_NUM_MASK       (BIT6 | BIT5 | BIT4)
 #define ADS131M02_CFG_CD_NUM_1          (0x0U << 4)
@@ -436,14 +498,16 @@ typedef enum {
  * @name  Current-detect measurement length selection
  * @{
  *
- * 000: 128 conversion periods (default)
- * 001: 256
- * 010: 512
- * 011: 768
- * 100: 1280
- * 101: 1792
- * 110: 2560
- * 111: 3584
+ * |Value|Description|
+ * |:---:|-----------|
+ * |000|128 conversion periods (default)|
+ * |001|256|
+ * |010|512|
+ * |011|768|
+ * |100|1280|
+ * |101|1792|
+ * |110|2560|
+ * |111|3584|
  */
 #define ADS131M02_CFG_CD_LEN_MASK       (BIT3 | BIT2 | BIT1)
 #define ADS131M02_CFG_CD_LEN_128        (0x0U << 1)
@@ -459,8 +523,10 @@ typedef enum {
 /**
  * @brief  Current-detect mode enable
  *
- * 0: Disabled (default)
- * 1: Enabled
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|Disabled (default)|
+ * |1|Enabled|
  */
 #define ADS131M02_CFG_CD_EN_MASK        BIT0
 
@@ -489,22 +555,24 @@ typedef enum {
  *
  * Value of coefficient a
  *
- * 0000: DC block filter disabled
- * 0001: 1/4
- * 0010: 1/8
- * 0011: 1/16
- * 0100: 1/32
- * 0101: 1/64
- * 0110: 1/128
- * 0111: 1/256
- * 1000: 1/512
- * 1001: 1/1024
- * 1010: 1/2048
- * 1011: 1/4096
- * 1100: 1/8192
- * 1101: 1/16384
- * 1110: 1/32768
- * 1111: 1/65536
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0000|DC block filter disabled|
+ * |0001|1/4|
+ * |0010|1/8|
+ * |0011|1/16|
+ * |0100|1/32|
+ * |0101|1/64|
+ * |0110|1/128|
+ * |0111|1/256|
+ * |1000|1/512|
+ * |1001|1/1024|
+ * |1010|1/2048|
+ * |1011|1/4096|
+ * |1100|1/8192|
+ * |1101|1/16384|
+ * |1110|1/32768|
+ * |1111|1/65536|
  */
 #define ADS131M02_THRREG_LSB_DCBLOCK_MASK       (BIT3 | BIT2 | BIT1 | BIT0)
 #define ADS131M02_THRREG_LSB_DCBLOCK_DISABLED   (0x0U)
@@ -538,8 +606,10 @@ typedef enum {
 /**
  * @brief  Channel 0 DC block filter disable
  *
- * 0: Controlled by DCBLOCK[3:0] (default)
- * 1: Disabled for this channel
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|Controlled by DCBLOCK[3:0] (default)|
+ * |1|Disabled for this channel|
  */
 #define ADS131M02_CH0_CFG_DCBLK0_DIS0_MASK      BIT2
 /**
@@ -552,10 +622,12 @@ typedef enum {
  * Positive DC test signal
  * Negative DC test signal
  *
- * 00: AIN0P and AIN0N connected directly to ADC (default)
- * 01: ADC inputs shorted to (AIN0P + AIN0N) / 2
- * 10: Positive DC test signal
- * 11: Negative DC test signal
+ * |Value|Description|
+ * |:---:|-----------|
+ * |00|AIN0P and AIN0N connected directly to ADC (default)|
+ * |01|ADC inputs shorted to (AIN0P + AIN0N) / 2|
+ * |10|Positive DC test signal|
+ * |11|Negative DC test signal|
  */
 #define ADS131M02_CH0_CFG_MUX_MASK              (BIT1 | BIT0)
 #define ADS131M02_CH0_CFG_MUX_AIN0P_AIN0N       (0x0U)
@@ -617,18 +689,22 @@ typedef enum {
 /**
  * @brief  Channel 1 DC block filter disable
  *
- * 0: Controlled by DCBLOCK[3:0] (default
- * 1: Disabled for this channel
+ * |Value|Description|
+ * |:---:|-----------|
+ * |0|Controlled by DCBLOCK[3:0] (default)|
+ * |1|Disabled for this channel|
  */
 #define ADS131M02_CH1_CFG_DCBLK1_DIS0_MASK      BIT2
 /**
  * @name  Channel 1 input multiplexer selection
  * @{
  *
- * 00: AIN1P and AIN1N connected directly to ADC (default)
- * 01: ADC inputs shorted to (AIN1P + AIN1N) / 2
- * 10: Positive DC test signal
- * 11: Negative DC test signal
+ * |Value|Description|
+ * |:---:|-----------|
+ * |00|AIN1P and AIN1N connected directly to ADC (default)|
+ * |01|ADC inputs shorted to (AIN1P + AIN1N) / 2|
+ * |10|Positive DC test signal|
+ * |11|Negative DC test signal|
  */
 #define ADS131M02_CH1_CFG_MUX_MASK              (BIT1 | BIT0)
 #define ADS131M02_CH1_CFG_MUX_AIN1P_AIN1N       (0x0U)
