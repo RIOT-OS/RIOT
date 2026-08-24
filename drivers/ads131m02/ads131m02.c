@@ -69,11 +69,26 @@ static void _read_regs(ads131m02_t *dev, uint8_t addr, uint16_t *dest, size_t nu
         uint16_t ack = 0;
         while(numof) {
             spi_transfer_bytes(SPI_PARAM(dev), numof > 4, NULL, rx_buf, sizeof(rx_buf));
-            if (!ack) { ack = byteorder_bebuftohs(&rx_buf[0 * ADS131M02_WORD_LEN]); numof--; }
-            else { *dest++ = byteorder_bebuftohs(&rx_buf[0 * ADS131M02_WORD_LEN]); numof--; }
-            if (numof) { *dest++ = byteorder_bebuftohs(&rx_buf[1 * ADS131M02_WORD_LEN]); numof--; }
-            if (numof) { *dest++ = byteorder_bebuftohs(&rx_buf[2 * ADS131M02_WORD_LEN]); numof--; }
-            if (numof) { *dest++ = byteorder_bebuftohs(&rx_buf[3 * ADS131M02_WORD_LEN]); numof--; }
+            if (!ack) {
+                ack = byteorder_bebuftohs(&rx_buf[0 * ADS131M02_WORD_LEN]);
+                numof--;
+            }
+            else {
+                *dest++ = byteorder_bebuftohs(&rx_buf[0 * ADS131M02_WORD_LEN]);
+                numof--;
+            }
+            if (numof) {
+                *dest++ = byteorder_bebuftohs(&rx_buf[1 * ADS131M02_WORD_LEN]);
+                numof--;
+            }
+            if (numof) {
+                *dest++ = byteorder_bebuftohs(&rx_buf[2 * ADS131M02_WORD_LEN]);
+                numof--;
+            }
+            if (numof) {
+                *dest++ = byteorder_bebuftohs(&rx_buf[3 * ADS131M02_WORD_LEN]);
+                numof--;
+            }
         }
     }
 }
@@ -98,11 +113,26 @@ static void _write_regs(ads131m02_t *dev, uint8_t addr, uint16_t *src, size_t nu
     else {
         uint16_t ack = 0;
         while (numof) {
-            if (!ack) { byteorder_htobebufs(&tx_buf[0], ADS131M02_CMD_WREG(addr, numof)); ack = 1; }
-            else { byteorder_htobebufs(&tx_buf[0 * ADS131M02_WORD_LEN], *src++); numof--; }
-            if (numof) { byteorder_htobebufs(&tx_buf[1 * ADS131M02_WORD_LEN], *src++); numof--; }
-            if (numof) { byteorder_htobebufs(&tx_buf[2 * ADS131M02_WORD_LEN], *src++); numof--; }
-            if (numof) { byteorder_htobebufs(&tx_buf[3 * ADS131M02_WORD_LEN], *src++); numof--; }
+            if (!ack) {
+                byteorder_htobebufs(&tx_buf[0], ADS131M02_CMD_WREG(addr, numof));
+                ack = 1;
+            }
+            else {
+                byteorder_htobebufs(&tx_buf[0 * ADS131M02_WORD_LEN], *src++);
+                numof--;
+            }
+            if (numof) {
+                byteorder_htobebufs(&tx_buf[1 * ADS131M02_WORD_LEN], *src++);
+                numof--;
+            }
+            if (numof) {
+                byteorder_htobebufs(&tx_buf[2 * ADS131M02_WORD_LEN], *src++);
+                numof--;
+            }
+            if (numof) {
+                byteorder_htobebufs(&tx_buf[3 * ADS131M02_WORD_LEN], *src++);
+                numof--;
+            }
             /* same as above: the write confirmation is only returned in the
             * following SPI frame, and each frame is always a full 12 bytes. */
             spi_transfer_bytes(SPI_PARAM(dev), numof, tx_buf, NULL, sizeof(tx_buf));
