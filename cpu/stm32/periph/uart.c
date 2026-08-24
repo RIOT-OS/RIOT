@@ -103,10 +103,11 @@ static inline USART_TypeDef *dev(uart_t uart)
 }
 
 static inline void uart_init_usart(uart_t uart, uint32_t baudrate);
-#if defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L0) || \
-    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
+#if defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32H7) || \
+    defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4) || \
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
+    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WB) || \
+    defined(CPU_FAM_STM32WL)
 #  ifdef MODULE_PERIPH_LPUART
 static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate);
 #  endif
@@ -198,10 +199,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     dev(uart)->CR2 = 0;
     dev(uart)->CR3 = 0;
 
-#if defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L0) || \
-    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
+#if defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32H7) || \
+    defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4) || \
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
+    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WB) || \
+    defined(CPU_FAM_STM32WL)
     switch (uart_config[uart].type) {
     case STM32_USART:
         uart_init_usart(uart, baudrate);
@@ -329,19 +331,20 @@ static inline void uart_init_usart(uart_t uart, uint32_t baudrate)
     dev(uart)->BRR = ((mantissa & 0x0fff) << 4) | (fraction & 0x0f);
 }
 
-#if defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L0) || \
-    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
-    defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
-#  ifdef CPU_FAM_STM32L5
+#if defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32H7) || \
+    defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4) || \
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
+    defined(CPU_FAM_STM32U5) || defined(CPU_FAM_STM32WB) || \
+    defined(CPU_FAM_STM32WL)
+#  if defined(CPU_FAM_STM32H7)
+#    define RCC_CCIPR_LPUART1SEL_0  RCC_D3CCIPR_LPUART1SEL_0
+#    define RCC_CCIPR_LPUART1SEL_1  RCC_D3CCIPR_LPUART1SEL_1
+#    define CCIPR                   D3CCIPR
+#  elif defined(CPU_FAM_STM32L5)
 #    define RCC_CCIPR_LPUART1SEL_0  RCC_CCIPR1_LPUART1SEL_0
 #    define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR1_LPUART1SEL_1
 #    define CCIPR                   CCIPR1
-#  elif CPU_FAM_STM32U3
-#    define RCC_CCIPR_LPUART1SEL_0  RCC_CCIPR3_LPUART1SEL_0
-#    define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR3_LPUART1SEL_1
-#    define CCIPR                   CCIPR3
-# elif CPU_FAM_STM32U5
+#  elif defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32U5)
 #    define RCC_CCIPR_LPUART1SEL_0  RCC_CCIPR3_LPUART1SEL_0
 #    define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR3_LPUART1SEL_1
 #    define CCIPR                   CCIPR3
