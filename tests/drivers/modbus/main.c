@@ -1594,12 +1594,12 @@ static void test_modbus_decode_request__read_coils__invalid_count(void)
     uint8_t buf_zero[] = { 0x01, 0x00, 0x1D, 0x00, 0x00 };
     modbus_message_t msg = { 0 };
 
-    TEST_ASSERT_EQUAL_INT(-EBADMSG,
+    TEST_ASSERT_EQUAL_INT(-ERANGE,
                           modbus_decode_request(buf_zero, sizeof(buf_zero), &msg));
 
     /* count 2001 (maximum is 2000) */
     uint8_t buf_over[] = { 0x01, 0x00, 0x1D, 0x07, 0xD1 };
-    TEST_ASSERT_EQUAL_INT(-EBADMSG,
+    TEST_ASSERT_EQUAL_INT(-ERANGE,
                           modbus_decode_request(buf_over, sizeof(buf_over), &msg));
 }
 
@@ -1609,12 +1609,12 @@ static void test_modbus_decode_request__read_holding_registers__invalid_count(vo
     uint8_t buf_zero[] = { 0x03, 0x00, 0x1D, 0x00, 0x00 };
     modbus_message_t msg = { 0 };
 
-    TEST_ASSERT_EQUAL_INT(-EBADMSG,
+    TEST_ASSERT_EQUAL_INT(-ERANGE,
                           modbus_decode_request(buf_zero, sizeof(buf_zero), &msg));
 
     /* count 126 (maximum is 125) */
     uint8_t buf_over[] = { 0x03, 0x00, 0x1D, 0x00, 0x7E };
-    TEST_ASSERT_EQUAL_INT(-EBADMSG,
+    TEST_ASSERT_EQUAL_INT(-ERANGE,
                           modbus_decode_request(buf_over, sizeof(buf_over), &msg));
 }
 
@@ -1624,12 +1624,12 @@ static void test_modbus_decode_request__write_multiple_coils__invalid_count(void
     uint8_t buf_zero[] = { 0x0F, 0x00, 0x1B, 0x00, 0x00, 0x00 };
     modbus_message_t msg = { 0 };
 
-    TEST_ASSERT_EQUAL_INT(-EBADMSG,
+    TEST_ASSERT_EQUAL_INT(-ERANGE,
                           modbus_decode_request(buf_zero, sizeof(buf_zero), &msg));
 
     /* count 1969 (maximum is 1968) */
     uint8_t buf_over[] = { 0x0F, 0x00, 0x1B, 0x07, 0xB1, 0x02, 0x4D, 0x01 };
-    TEST_ASSERT_EQUAL_INT(-EBADMSG,
+    TEST_ASSERT_EQUAL_INT(-ERANGE,
                           modbus_decode_request(buf_over, sizeof(buf_over), &msg));
 }
 
@@ -1639,12 +1639,12 @@ static void test_modbus_decode_request__write_multiple_regs__invalid_count(void)
     uint8_t buf_zero[] = { 0x10, 0x00, 0x12, 0x00, 0x00, 0x00 };
     modbus_message_t msg = { 0 };
 
-    TEST_ASSERT_EQUAL_INT(-EBADMSG,
+    TEST_ASSERT_EQUAL_INT(-ERANGE,
                           modbus_decode_request(buf_zero, sizeof(buf_zero), &msg));
 
     /* count 124 (maximum is 123) */
     uint8_t buf_over[] = { 0x10, 0x00, 0x12, 0x00, 0x7C, 0x04, 0x0B, 0x0A, 0xC1, 0x02 };
-    TEST_ASSERT_EQUAL_INT(-EBADMSG,
+    TEST_ASSERT_EQUAL_INT(-ERANGE,
                           modbus_decode_request(buf_over, sizeof(buf_over), &msg));
 }
 
@@ -2887,12 +2887,12 @@ static void test_modbus_decode_request__read_discrete_inputs__invalid_count(void
     uint8_t buf_zero[] = { 0x02, 0x00, 0x7A, 0x00, 0x00 };
     modbus_message_t msg = { 0 };
 
-    TEST_ASSERT_EQUAL_INT(-EBADMSG,
+    TEST_ASSERT_EQUAL_INT(-ERANGE,
                           modbus_decode_request(buf_zero, sizeof(buf_zero), &msg));
 
     /* count 2001 (maximum is 2000) */
     uint8_t buf_over[] = { 0x02, 0x00, 0x7A, 0x07, 0xD1 };
-    TEST_ASSERT_EQUAL_INT(-EBADMSG,
+    TEST_ASSERT_EQUAL_INT(-ERANGE,
                           modbus_decode_request(buf_over, sizeof(buf_over), &msg));
 }
 
@@ -2902,12 +2902,12 @@ static void test_modbus_decode_request__read_input_registers__invalid_count(void
     uint8_t buf_zero[] = { 0x04, 0x00, 0x0A, 0x00, 0x00 };
     modbus_message_t msg = { 0 };
 
-    TEST_ASSERT_EQUAL_INT(-EBADMSG,
+    TEST_ASSERT_EQUAL_INT(-ERANGE,
                           modbus_decode_request(buf_zero, sizeof(buf_zero), &msg));
 
     /* count 126 (maximum is 125) */
     uint8_t buf_over[] = { 0x04, 0x00, 0x0A, 0x00, 0x7E };
-    TEST_ASSERT_EQUAL_INT(-EBADMSG,
+    TEST_ASSERT_EQUAL_INT(-ERANGE,
                           modbus_decode_request(buf_over, sizeof(buf_over), &msg));
 }
 
