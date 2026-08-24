@@ -502,36 +502,36 @@ size_t modbus_reg_count_to_size(uint16_t count);
  * @brief   Copy @p count of bits from @p src to @p dst
  *
  * When @p pad_zeroes is @c true, all bits in the byte range addressed by
- * @p start_bit_dst and @p start_bit_dst + @p count will be set to zero. This
+ * @p pos_bit_dst and @p pos_bit_dst + @p count will be set to zero. This
  * can be useful when writing response messages to buffers that are not zeroed
  * out.
  *
  * @param[out] dst          Pointer to destination (must not be NULL)
- * @param[in] start_bit_dst Bit offset in @p dst
+ * @param[in] pos_bit_dst   Bit offset in @p dst
  * @param[in] src           Pointer to source (must not be NULL)
- * @param[in] start_bit_src Bit offset in @p src
+ * @param[in] pos_bit_src   Bit offset in @p src
  * @param[in] count         Number of bits to copy
  * @param[in] pad_zeroes    Whether to pad @p dst with zeroes
  */
-void modbus_copy_bits(uint8_t *dst, uint16_t start_bit_dst,
-                      const uint8_t *src, uint16_t start_bit_src,
+void modbus_copy_bits(uint8_t *dst, uint16_t pos_bit_dst,
+                      const uint8_t *src, uint16_t pos_bit_src,
                       uint16_t count, bool pad_zeroes);
 
 /**
  * @brief   Copy a single bit from @p src to @p dst
  *
  * When @p pad_zeroes is @c true, all bits in the byte addressed by
- * @p start_bit_dst will be set to zero. This can be useful when writing
+ * @p pos_bit_dst will be set to zero. This can be useful when writing
  * response messages to buffers that are not zeroed out.
  *
  * @param[out] dst          Pointer to destination (must not be NULL)
- * @param[in] start_bit_dst Bit offset in @p dst
+ * @param[in] pos_bit_dst   Bit offset in @p dst
  * @param[in] src           Pointer to source (must not be NULL)
- * @param[in] start_bit_src Bit offset in @p src
+ * @param[in] pos_bit_src   Bit offset in @p src
  * @param[in] pad_zeroes    Whether to pad @p dst with zeroes
  */
-void modbus_copy_bit(uint8_t *dst, uint16_t start_bit_dst,
-                     const uint8_t *src, uint16_t start_bit_src,
+void modbus_copy_bit(uint8_t *dst, uint16_t pos_bit_dst,
+                     const uint8_t *src, uint16_t pos_bit_src,
                      bool pad_zeroes);
 
 /**
