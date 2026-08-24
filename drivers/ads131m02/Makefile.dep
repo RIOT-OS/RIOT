@@ -1,0 +1,18 @@
+FEATURES_REQUIRED += periph_spi
+USEMODULE += xtimer
+
+ifneq (,$(filter ads131m02_irq,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+  FEATURES_REQUIRED += periph_spi_dma
+endif
+
+ifneq (,$(filter ads131m02_event,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_event
+  FEATURES_REQUIRED += periph_spi_dma
+endif
+
+ifneq (,$(filter ads131m02_poll,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_ll
+  FEATURES_REQUIRED += periph_timer
+  FEATURES_REQUIRED += periph_timer_poll
+endif
