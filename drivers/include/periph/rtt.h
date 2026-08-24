@@ -88,8 +88,8 @@ extern "C" {
 #define RTT_FREQUENCY MOCK_RTT_FREQUENCY
 #else
 #ifndef RTT_FREQUENCY
-#warning "RTT_FREQUENCY undefined. Set RTT_FREQUENCY to the number of ticks " \
-         "per second for the current architecture."
+#error "RTT_FREQUENCY undefined. Set RTT_FREQUENCY to the number of ticks " \
+       "per second for the current architecture."
 #endif
 #endif
 
@@ -99,8 +99,8 @@ extern "C" {
 #define RTT_MAX_VALUE MOCK_RTT_MAX_VALUE
 #else
 #ifndef RTT_MAX_VALUE
-#warning "RTT_MAX_VALUE is undefined. Set RTT_MAX_VALUE to the maximum value " \
-         "for the RTT counter, ensure it is (2^n - 1)."
+#error "RTT_MAX_VALUE is undefined. Set RTT_MAX_VALUE to the maximum value " \
+       "for the RTT counter, ensure it is (2^n - 1)."
 #endif
 #endif
 
