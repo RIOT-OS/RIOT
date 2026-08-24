@@ -36,8 +36,8 @@ size_t modbus_reg_count_to_size(uint16_t count)
     return count * MODBUS_REGISTER_SIZE;
 }
 
-void modbus_copy_bits(uint8_t *dst, uint16_t start_bit_dst,
-                      const uint8_t *src, uint16_t start_bit_src,
+void modbus_copy_bits(uint8_t *dst, uint16_t pos_bit_dst,
+                      const uint8_t *src, uint16_t pos_bit_src,
                       uint16_t count, bool pad_zeroes)
 {
     if (count == 0) {
@@ -45,16 +45,16 @@ void modbus_copy_bits(uint8_t *dst, uint16_t start_bit_dst,
     }
 
     if (pad_zeroes) {
-        size_t first = start_bit_dst / 8;
-        size_t last = (start_bit_dst + count - 1) / 8;
+        size_t first = pos_bit_dst / 8;
+        size_t last = (pos_bit_dst + count - 1) / 8;
 
         memset(&(dst[first]), 0, last - first + 1);
     }
 
-    size_t src_idx = start_bit_src / 8;
-    uint8_t src_mask = 1 << (start_bit_src % 8);
-    size_t dst_idx = start_bit_dst / 8;
-    uint8_t dst_mask = 1 << (start_bit_dst % 8);
+    size_t src_idx = pos_bit_src / 8;
+    uint8_t src_mask = 1 << (pos_bit_src % 8);
+    size_t dst_idx = pos_bit_dst / 8;
+    uint8_t dst_mask = 1 << (pos_bit_dst % 8);
 
     while (count-- > 0) {
         if (src[src_idx] & src_mask) {
@@ -82,11 +82,11 @@ void modbus_copy_bits(uint8_t *dst, uint16_t start_bit_dst,
     }
 }
 
-void modbus_copy_bit(uint8_t *dst, uint16_t start_bit_dst,
-                     const uint8_t *src, uint16_t start_bit_src,
+void modbus_copy_bit(uint8_t *dst, uint16_t pos_bit_dst,
+                     const uint8_t *src, uint16_t pos_bit_src,
                      bool pad_zeroes)
 {
-    modbus_copy_bits(dst, start_bit_dst, src, start_bit_src, 1, pad_zeroes);
+    modbus_copy_bits(dst, pos_bit_dst, src, pos_bit_src, 1, pad_zeroes);
 }
 
 void modbus_copy_regs(void *dst, const void *src, uint16_t count)
