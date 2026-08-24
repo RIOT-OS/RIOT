@@ -29,9 +29,6 @@
  * @author     Fabian Hüßler <fabian.hussler@ml-pa.com>
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -40,6 +37,10 @@ extern "C" {
 #include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief   Nominal voltage reference in nanovolts
