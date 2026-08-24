@@ -76,6 +76,9 @@ extern "C" {
  *
  */
 #ifndef RTT_MIN_OFFSET
+#warning "RTT_MIN_OFFSET is undefined. Using default value of 2. " \
+         "Please test your CPU using RIOT/tests/periph/rtt_min and " \
+         "define RTT_MIN_OFFSET in periph_cpu.h accordingly."
 #define RTT_MIN_OFFSET (2U)
 #endif
 
