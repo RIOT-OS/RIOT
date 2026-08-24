@@ -27,31 +27,31 @@ extern "C" {
  * @{
  */
 #ifndef ADS131M02_PARAM_SPI
-#define ADS131M02_PARAM_SPI             (SPI_DEV(0))
+#  define ADS131M02_PARAM_SPI           (SPI_DEV(0))
 #endif
 #ifndef ADS131M02_PARAM_SPI_CLK
-#define ADS131M02_PARAM_SPI_CLK         (SPI_CLK_1MHZ)
+#  define ADS131M02_PARAM_SPI_CLK       (SPI_CLK_1MHZ)
 #endif
 #ifndef ADS131M02_PARAM_CS
-#define ADS131M02_PARAM_CS              (GPIO_UNDEF)
+#  define ADS131M02_PARAM_CS            (GPIO_UNDEF)
 #endif
 #ifndef ADS131M02_PARAM_READY
-#define ADS131M02_PARAM_READY           (GPIO_UNDEF)
+#  define ADS131M02_PARAM_READY        (GPIO_UNDEF)
 #endif
 #ifndef ADS131M02_PARAM_SYNC
-#define ADS131M02_PARAM_SYNC            (GPIO_UNDEF)
+#  define ADS131M02_PARAM_SYNC         (GPIO_UNDEF)
 #endif
 #ifndef ADS131M02_PARAM_READY_PULLUP
-#define ADS131M02_PARAM_READY_PULLUP    0
+#  define ADS131M02_PARAM_READY_PULLUP 0
 #endif
 
 #ifndef ADS131M02_PARAMS
-#define ADS131M02_PARAMS            { .spi       = ADS131M02_PARAM_SPI,     \
-                                       .spi_clk   = ADS131M02_PARAM_SPI_CLK, \
-                                       .cs_pin    = ADS131M02_PARAM_CS,      \
-                                       .ready_pin = ADS131M02_PARAM_READY,   \
-                                       .sync_pin  = ADS131M02_PARAM_SYNC, \
-                                       .ready_pin_pullup = ADS131M02_PARAM_READY_PULLUP }
+#  define ADS131M02_PARAMS             { .spi       = ADS131M02_PARAM_SPI,     \
+                                         .spi_clk   = ADS131M02_PARAM_SPI_CLK, \
+                                         .cs_pin    = ADS131M02_PARAM_CS,      \
+                                         .ready_pin = ADS131M02_PARAM_READY,   \
+                                         .sync_pin  = ADS131M02_PARAM_SYNC, \
+                                         .ready_pin_pullup = ADS131M02_PARAM_READY_PULLUP }
 #endif
 /** @} */
 
