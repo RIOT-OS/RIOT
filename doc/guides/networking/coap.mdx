@@ -247,7 +247,7 @@ static int _send_coap_request(void)
     remote.netif = SOCK_ADDR_ANY_NETIF;
     remote.port = CONFIG_GCOAP_PORT;
 
-    if (ipv6_addr_from_str((ipv6_addr_t *)&remote.addr.ipv6, SERVER_ADDRESS) ==
+    if (ipv6_addr_from_str(&remote.ip.addr.v6, SERVER_ADDRESS) ==
         NULL) {
         puts("Error: unable to parse destination address");
         return -1;

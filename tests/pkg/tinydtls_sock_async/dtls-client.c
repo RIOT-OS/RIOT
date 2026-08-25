@@ -204,7 +204,7 @@ static int client_send(char *addr_str, char *data)
         remote.netif = SOCK_ADDR_ANY_NETIF;
     }
 
-    if (!ipv6_addr_from_str((ipv6_addr_t *)remote.addr.ipv6, addr_str)) {
+    if (!ipv6_addr_from_str(remote.ip.addr.v6, addr_str)) {
         puts("Error parsing destination address");
         return -1;
     }

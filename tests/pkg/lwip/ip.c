@@ -59,7 +59,7 @@ static void _ip_recv(sock_ip_t *sock, sock_async_flags_t flags, void *arg)
 #if IS_USED(MODULE_LWIP_IPV4)
                     printf("[%s]:\n",
                            ipv4_addr_to_str(addrstr,
-                                            (ipv4_addr_t *)&src.addr.ipv4,
+                                            &src.ip.addr.v4,
                                             sizeof(addrstr)));
                     break;
 #else
@@ -70,7 +70,7 @@ static void _ip_recv(sock_ip_t *sock, sock_async_flags_t flags, void *arg)
 #if IS_USED(MODULE_LWIP_IPV6)
                     printf("[%s]:\n",
                            ipv6_addr_to_str(addrstr,
-                                            (ipv6_addr_t *)&src.addr.ipv6,
+                                            &src.ip.addr.v6,
                                             sizeof(addrstr)));
                     break;
 #else
@@ -117,7 +117,7 @@ static int ip_send(char *addr_str, char *port_str, char *data, unsigned int num,
     /* parse destination address */
 #if IS_USED(MODULE_LWIP_IPV6)
     if (strchr(addr_str, ':')) {
-        if (ipv6_addr_from_str((ipv6_addr_t *)&dst.addr.ipv6,
+        if (ipv6_addr_from_str(&dst.ip.addr.v6,
                                addr_str) == NULL) {
             puts("Error: unable to parse destination address");
             return 1;
@@ -131,7 +131,7 @@ static int ip_send(char *addr_str, char *port_str, char *data, unsigned int num,
 #endif
 #endif
 #if IS_USED(MODULE_LWIP_IPV4)
-    if (ipv4_addr_from_str((ipv4_addr_t *)&dst.addr.ipv4,
+    if (ipv4_addr_from_str(&dst.ip.addr.v4,
                            addr_str) == NULL) {
         puts("Error: unable to parse destination address");
         return 1;

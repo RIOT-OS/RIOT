@@ -958,7 +958,7 @@ static void _ep_to_session(const sock_udp_ep_t *ep, session_t *session)
 #endif
 #ifdef SOCK_HAS_IPV6
     case AF_INET6:
-        if (ipv6_addr_is_link_local((ipv6_addr_t *)ep->addr.ipv6)) {
+        if (ipv6_addr_is_link_local(ep->ip.addr.v6)) {
             /* set ifindex for link-local addresses */
             session->ifindex = ep->netif;
         }

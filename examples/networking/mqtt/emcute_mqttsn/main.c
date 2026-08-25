@@ -83,7 +83,7 @@ static int cmd_con(int argc, char **argv)
     }
 
     /* parse address */
-    if (ipv6_addr_from_str((ipv6_addr_t *)&gw.addr.ipv6, argv[1]) == NULL) {
+    if (ipv6_addr_from_str(&gw.ip.addr.v6, argv[1]) == NULL) {
         printf("error parsing IPv6 address\n");
         return 1;
     }

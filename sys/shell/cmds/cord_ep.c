@@ -85,7 +85,7 @@ static int _cord_ep_handler(int argc, char **argv)
             return 1;
         }
 
-        if (!ipv6_addr_from_buf((ipv6_addr_t *)&remote.addr.ipv6, uri_result.ipv6addr,
+        if (!ipv6_addr_from_buf(&remote.ip.addr.v6, uri_result.ipv6addr,
                                 uri_result.ipv6addr_len)) {
             puts("error: IPv6 address malformed");
             return 1;

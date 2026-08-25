@@ -154,8 +154,8 @@ bool lwm2m_session_is_equal(void *session1, void *session2, void *user_data)
     lwm2m_client_connection_t *conn_2 = (lwm2m_client_connection_t *)session2;
 
     return ((conn_1->remote.port == conn_2->remote.port) &&
-            ipv6_addr_equal((ipv6_addr_t *)&(conn_1->remote.addr.ipv6),
-                            (ipv6_addr_t *)&(conn_2->remote.addr.ipv6)));
+            ipv6_addr_equal(&conn_1->remote.ip.addr.v6,
+                            &conn_2->remote.ip.addr.v6));
 }
 
 uint8_t lwm2m_buffer_send(void *sessionH, uint8_t *buffer, size_t length,
@@ -186,7 +186,7 @@ lwm2m_client_connection_t *lwm2m_client_connection_find(lwm2m_client_connection_
     char ip[128];
     uint8_t ip_len = 128;
 
-    ipv6_addr_to_str(ip, (ipv6_addr_t *)&remote->addr.ipv6, ip_len);
+    ipv6_addr_to_str(ip, &remote->ip.addr.v6, ip_len);
     DEBUG("Looking for connection from [%s]:%" PRIu16 "\n", ip, remote->port);
 
     if (conn_list == NULL) {
@@ -194,11 +194,11 @@ lwm2m_client_connection_t *lwm2m_client_connection_find(lwm2m_client_connection_
     }
 
     while (conn != NULL) {
-        ipv6_addr_to_str(ip, (ipv6_addr_t *)&conn->remote.addr.ipv6, ip_len);
+        ipv6_addr_to_str(ip, &conn->remote.ip.addr.v6, ip_len);
         DEBUG("Comparing to [%s]:%" PRIu16 "\n", ip, conn->remote.port);
         if ((conn->remote.port == remote->port) && conn->type == type &&
-            ipv6_addr_equal((ipv6_addr_t *)&(conn->remote.addr.ipv6),
-                            (ipv6_addr_t *)&(remote->addr.ipv6))) {
+            ipv6_addr_equal(&conn->remote.ip.addr.v6,
+                            &remote->ip.addr.v6)) {
             break;
         }
         conn = conn->next;
@@ -336,13 +336,13 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
     conn->remote.netif = SOCK_ADDR_ANY_NETIF;
     conn->remote.port = port;
 
-    if (!ipv6_addr_from_buf((ipv6_addr_t *)&conn->remote.addr.ipv6, parsed_uri.ipv6addr,
+    if (!ipv6_addr_from_buf(&conn->remote.ip.addr.v6, parsed_uri.ipv6addr,
                             parsed_uri.ipv6addr_len)) {
         DEBUG("[_connection_create] IPv6 address malformed\n");
         goto free_out;
     }
 
-    if (ipv6_addr_is_unspecified((const ipv6_addr_t *)&conn->remote.addr.ipv6)) {
+    if (ipv6_addr_is_unspecified(&conn->remote.ip.addr.v6)) {
         DEBUG("[_connection_create] Invalid server address ([::])\n");
         goto free_out;
     }
@@ -350,7 +350,7 @@ static lwm2m_client_connection_t *_connection_create(uint16_t sec_obj_inst_id,
     /* If the address is a link-local one first check if interface is specified,
      * if not, check the number of interfaces and default to the first if there
      * is only one defined. */
-    if (ipv6_addr_is_link_local((ipv6_addr_t *)&conn->remote.addr.ipv6)) {
+    if (ipv6_addr_is_link_local(&conn->remote.ip.addr.v6)) {
         netif_t *netif = _get_interface(parsed_uri.zoneid, parsed_uri.zoneid_len);
 
         if (netif == NULL) {

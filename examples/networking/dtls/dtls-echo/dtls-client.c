@@ -353,7 +353,7 @@ dtls_context_t *_init_dtls(sock_udp_t *sock, sock_udp_ep_t *local,
         remote->netif = (uint16_t)netif->pid;
     }
 
-    if (ipv6_addr_from_str((ipv6_addr_t *)remote->addr.ipv6, addr_str) == NULL) {
+    if (ipv6_addr_from_str(remote->ip.addr.v6, addr_str) == NULL) {
         puts("ERROR: unable to parse destination address");
         return new_context;
     }

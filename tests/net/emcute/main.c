@@ -332,7 +332,7 @@ static int _info(int argc, char **argv)
     (void)argv;
     if (_gw.port > 0) {
         printf("Broker: '[%s]:%u'\n",
-               ipv6_addr_to_str(_addr_str, (ipv6_addr_t *)_gw.addr.ipv6,
+               ipv6_addr_to_str(_addr_str, _gw.ip.addr.v6,
                                 sizeof(_addr_str)), _gw.port);
         puts("- Topics:");
         for (unsigned i = 0; i < NUMOFTOPS; i++) {

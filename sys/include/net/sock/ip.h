@@ -162,7 +162,7 @@
  *         sock_ip_ep_t remote = { .family = AF_INET6 };
  *         ssize_t res;
  *
- *         ipv6_addr_set_all_nodes_multicast((ipv6_addr_t *)&remote.addr.ipv6,
+ *         ipv6_addr_set_all_nodes_multicast(&remote.addr.v6,
  *                                           IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
  *
  *         if (sock_ip_send(&sock, "Hello!", sizeof("Hello!"), 0, &remote) < 0) {
@@ -219,7 +219,7 @@
  *         sock_ip_ep_t remote = { .family = AF_INET6 };
  *         ssize_t res;
  *
- *         ipv6_addr_set_all_nodes_multicast((ipv6_addr_t *)&remote.addr.ipv6,
+ *         ipv6_addr_set_all_nodes_multicast(&remote.addr.v6,
  *                                           IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
  *
  *         if (sock_ip_send(&sock, "Hello!", sizeof("Hello!"), 0, &remote) < 0) {

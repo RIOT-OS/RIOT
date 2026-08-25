@@ -61,7 +61,7 @@ static void *server_thread(void *arg)
             print_str("Received a message via: [");
             if (!(rx_aux.flags & SOCK_AUX_GET_LOCAL)) {
                 char tmp[IPV6_ADDR_MAX_STR_LEN + 1];
-                ipv6_addr_to_str(tmp, (ipv6_addr_t *)rx_aux.local.addr.ipv6,
+                ipv6_addr_to_str(tmp, rx_aux.local.ip.addr.v6,
                                  sizeof(tmp));
                 print_str(tmp);
                 print_str("]:");

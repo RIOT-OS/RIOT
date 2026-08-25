@@ -215,7 +215,7 @@ int main(void)
     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
     sock_udp_ep_t remote = { .family = AF_INET6 };
     remote.port = 12345;
-    ipv6_addr_set_all_nodes_multicast((ipv6_addr_t *)&remote.addr.ipv6,
+    ipv6_addr_set_all_nodes_multicast(&remote.ip.addr.v6,
                                       IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
     expect(sock_udp_create(&sock, &local, NULL, 0) == 0);
     /* with gnrc_tx_sync, we expect sock_udp_send() to block until transmission is done */

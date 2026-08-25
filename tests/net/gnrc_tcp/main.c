@@ -100,7 +100,7 @@ int gnrc_tcp_ep_from_str_cmd(int argc, char **argv)
         switch (ep.family) {
             case AF_INET6:
                 printf("Family: AF_INET6\n");
-                ipv6_addr_to_str(addr_as_str, (ipv6_addr_t *) ep.addr.ipv6,
+                ipv6_addr_to_str(addr_as_str, ep.ip.addr.v6,
                                  sizeof(addr_as_str));
                 printf("Addr: %s\n", addr_as_str);
                 break;
@@ -356,7 +356,7 @@ int gnrc_tcp_get_local_cmd(int argc, char **argv)
         case 0:
             printf("%s: returns 0\n", argv[0]);
             printf("Endpoint: addr.ipv6=");
-            ipv6_addr_print((ipv6_addr_t *) ep.addr.ipv6);
+            ipv6_addr_print(ep.ip.addr.v6);
             printf(" netif=%u port=%u\n", ep.netif, ep.port);
             break;
 
@@ -380,7 +380,7 @@ int gnrc_tcp_get_remote_cmd(int argc, char **argv)
         case 0:
             printf("%s: returns 0\n", argv[0]);
             printf("Endpoint: addr.ipv6=");
-            ipv6_addr_print((ipv6_addr_t *) ep.addr.ipv6);
+            ipv6_addr_print(ep.ip.addr.v6);
             printf(" netif=%u port=%u\n", ep.netif, ep.port);
             break;
 
@@ -404,7 +404,7 @@ int gnrc_tcp_queue_get_local_cmd(int argc, char **argv)
         case 0:
             printf("%s: returns 0\n", argv[0]);
             printf("Endpoint: addr.ipv6=");
-            ipv6_addr_print((ipv6_addr_t *) ep.addr.ipv6);
+            ipv6_addr_print(ep.ip.addr.v6);
             printf(" netif=%u port=%u\n", ep.netif, ep.port);
             break;
 
