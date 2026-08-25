@@ -316,7 +316,7 @@ ifdef LOG_LEVEL
   endif
 endif
 
-# Fail on warnings. Can be overridden by `make WERROR=0`.
+# Fail on compiler and linker warnings do not fail on preprocessor `#warning` . Can be overridden by `make WERROR=0`.
 WERROR ?= 1
 ifeq ($(WERROR),1)
   CFLAGS += -Werror -Wno-error=cpp
