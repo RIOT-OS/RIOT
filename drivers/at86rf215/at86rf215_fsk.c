@@ -494,7 +494,7 @@ uint8_t at86rf215_FSK_get_srate(at86rf215_t *dev)
 int at86rf215_FSK_set_srate(at86rf215_t *dev, uint8_t srate)
 {
     if (srate > FSK_SRATE_400K) {
-        return -1;
+        return -ERANGE;
     }
 
     at86rf215_await_state_end(dev, RF_STATE_TX);

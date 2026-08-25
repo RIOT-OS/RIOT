@@ -554,6 +554,24 @@ static const char *_netopt_fec_str[] = {
     [IEEE802154_FEC_NRNSC] = "NRNSC",
     [IEEE802154_FEC_RSC] = "RSC"
 };
+
+static const char *_netopt_srate_str[] = {
+    [IEEE802154_MR_FSK_SRATE_50K]  = "50",
+    [IEEE802154_MR_FSK_SRATE_100K] = "100",
+    [IEEE802154_MR_FSK_SRATE_150K] = "150",
+    [IEEE802154_MR_FSK_SRATE_200K] = "200",
+    [IEEE802154_MR_FSK_SRATE_300K] = "300",
+    [IEEE802154_MR_FSK_SRATE_400K] = "400",
+};
+#endif
+
+#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+static const char *_netopt_chips_str[] = {
+    [IEEE802154_MR_OQPSK_CHIPS_100]  = "100",
+    [IEEE802154_MR_OQPSK_CHIPS_200]  = "200",
+    [IEEE802154_MR_OQPSK_CHIPS_1000] = "1000",
+    [IEEE802154_MR_OQPSK_CHIPS_2000] = "2000",
+};
 #endif
 
 /* for some lines threshold might just be 0, so we can't use _LINE_THRESHOLD
@@ -719,9 +737,9 @@ static void _netif_list(netif_t *iface)
 #ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
         case IEEE802154_PHY_MR_OQPSK:
             printf("\n          ");
-            res = netif_get_opt(iface, NETOPT_MR_OQPSK_CHIPS, 0, &u16, sizeof(u16));
+            res = netif_get_opt(iface, NETOPT_MR_OQPSK_CHIPS, 0, &u8, sizeof(u16));
             if (res >= 0) {
-                printf(" chip rate: %u ", u16);
+                printf(" chip rate: %s ", _netopt_chips_str[u8]);
             }
             res = netif_get_opt(iface, NETOPT_MR_OQPSK_RATE, 0, &u8, sizeof(u8));
             if (res >= 0) {
@@ -763,9 +781,9 @@ static void _netif_list(netif_t *iface)
             if (res >= 0) {
                 printf(" %u-FSK ", u8);
             }
-            res = netif_get_opt(iface, NETOPT_MR_FSK_SRATE, 0, &u16, sizeof(u16));
+            res = netif_get_opt(iface, NETOPT_MR_FSK_SRATE, 0, &u8, sizeof(u16));
             if (res >= 0) {
-                printf(" symbol rate: %u kHz ", u16);
+                printf(" symbol rate: %s kHz ", _netopt_srate_str[u8]);
             }
             res = netif_get_opt(iface, NETOPT_MR_FSK_FEC, 0, &u8, sizeof(u8));
             if (res >= 0) {
@@ -1105,6 +1123,28 @@ static int _netif_set_fsk_fec(netif_t *iface, char *value)
     return 1;
 }
 
+static int _netif_set_fsk_srate(netif_t *iface, char *value)
+{
+    for (size_t i = 0; i < ARRAY_SIZE(_netopt_srate_str); ++i) {
+
+        if (strcmp(value, _netopt_srate_str[i])) {
+            continue;
+        }
+
+        uint8_t srate = i;
+        if (netif_set_opt(iface, NETOPT_MR_FSK_SRATE, 0, &srate, sizeof(srate)) < 0) {
+            printf("error: unable to set symbol rate to %s kHz\n", value);
+            return 1;
+        }
+
+        printf("success: set symbol rate to %s kHz\n", value);
+        return 0;
+    }
+
+    printf("usage: ifconfig <if_id> set srate [50|100|150|200|300|400]\n");
+    return 1;
+}
+
 static int _netif_set_fsk_modulation_index(netif_t *iface, char *value)
 {
     uint8_t a, b;
@@ -1134,6 +1174,31 @@ static int _netif_set_fsk_modulation_index(netif_t *iface, char *value)
     return 0;
 }
 #endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
+
+#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+static int _netif_set_oqpsk_chips(netif_t *iface, char *value)
+{
+    for (size_t i = 0; i < ARRAY_SIZE(_netopt_chips_str); ++i) {
+
+        if (strcmp(value, _netopt_chips_str[i])) {
+            continue;
+        }
+
+        uint16_t chips = i;
+        if (netif_set_opt(iface, NETOPT_MR_OQPSK_CHIPS, 0,
+                          &chips, sizeof(chips)) < 0) {
+            printf("error: unable to set chip rate to %s kchip/s\n", value);
+            return 1;
+        }
+
+        printf("success: set chip rate to %s kchip/s\n", value);
+        return 0;
+    }
+
+    printf("usage: ifconfig <if_id> set chips [100|200|1000|2000]\n");
+    return 1;
+}
+#endif
 
 #ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
 static int _netif_set_ieee802154_phy_mode(netif_t *iface, char *value)
@@ -1587,7 +1652,7 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
 #endif /* MODULE_NETDEV_IEEE802154_OQPSK */
 #ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
     else if ((strcmp("chip_rate", key) == 0) || (strcmp("chips", key) == 0)) {
-        return _netif_set_u16(iface, NETOPT_MR_OQPSK_CHIPS, 0, value);
+        return _netif_set_oqpsk_chips(iface, value);
     }
     else if (strcmp("rate_mode", key) == 0) {
         return _netif_set_u8(iface, NETOPT_MR_OQPSK_RATE, 0, value);
@@ -1609,7 +1674,7 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
         return _netif_set_u8(iface, NETOPT_MR_FSK_MODULATION_ORDER, 0, value);
     }
     else if ((strcmp("symbol_rate", key) == 0) || (strcmp("srate", key) == 0)) {
-        return _netif_set_u16(iface, NETOPT_MR_FSK_SRATE, 0, value);
+        return _netif_set_fsk_srate(iface, value);
     }
     else if ((strcmp("forward_error_correction", key) == 0) || (strcmp("fec", key) == 0)) {
         return _netif_set_fsk_fec(iface, value);

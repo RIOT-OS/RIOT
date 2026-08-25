@@ -207,7 +207,8 @@ typedef enum {
 typedef enum {
     IEEE802154_FEC_NONE,            /**< no forward error correction */
     IEEE802154_FEC_NRNSC,           /**< non-recursive and non-systematic code */
-    IEEE802154_FEC_RSC              /**< recursive and systematic code */
+    IEEE802154_FEC_RSC,             /**< recursive and systematic code */
+    IEEE802154_FEC_INVALID,         /**< invalid forward error correction scheme */
 } ieee802154_mr_fsk_fec_t;
 
 /**
@@ -220,16 +221,18 @@ typedef enum {
     IEEE802154_MR_FSK_SRATE_200K,   /**< 200k Symbols/s */
     IEEE802154_MR_FSK_SRATE_300K,   /**< 300k Symbols/s */
     IEEE802154_MR_FSK_SRATE_400K,   /**< 400k Symbols/s */
+    IEEE802154_MR_FSK_SRATE_INVALID,/**< Invalid Symbol rate */
 } ieee802154_mr_fsk_srate_t;
 
 /**
  * @brief   802.15.4 MR-OQPSK chip rates
  */
 typedef enum {
-    IEEE802154_MR_OQPSK_CHIPS_100,  /**< 100 kChip/s  */
-    IEEE802154_MR_OQPSK_CHIPS_200,  /**< 200 kChip/s  */
-    IEEE802154_MR_OQPSK_CHIPS_1000, /**< 1000 kChip/s */
-    IEEE802154_MR_OQPSK_CHIPS_2000, /**< 2000 kChip/s */
+    IEEE802154_MR_OQPSK_CHIPS_100,      /**< 100 kChip/s  */
+    IEEE802154_MR_OQPSK_CHIPS_200,      /**< 200 kChip/s  */
+    IEEE802154_MR_OQPSK_CHIPS_1000,     /**< 1000 kChip/s */
+    IEEE802154_MR_OQPSK_CHIPS_2000,     /**< 2000 kChip/s */
+    IEEE802154_MR_OQPSK_CHIPS_INVALID,  /**< Invalid Chip Rate */
 } ieee802154_mr_oqpsk_chips_t;
 
 /**
@@ -253,9 +256,9 @@ static inline uint8_t ieee802154_mr_fsk_plen(ieee802154_mr_fsk_srate_t srate)
         return 8;
     case IEEE802154_MR_FSK_SRATE_400K:
         return 10;
+    default:
+        return 0;
     }
-
-    return 0;
 }
 
 /**
