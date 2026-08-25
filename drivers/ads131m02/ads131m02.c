@@ -35,7 +35,8 @@
 #include "debug.h"
 
 #define SPI_PARAM(dev)      dev->params->spi, dev->params->cs_pin
-#define SPI_ACQUIRE(dev)    spi_acquire(dev->params->spi, dev->params->cs_pin, SPI_MODE_1, dev->params->spi_clk);
+#define SPI_ACQUIRE(dev)    spi_acquire(dev->params->spi, dev->params->cs_pin, \
+                                        SPI_MODE_1, dev->params->spi_clk);
 #define SPI_RELEASE(dev)    spi_release(dev->params->spi)
 
 #define ADS131M02_DEVICE_ID             0x22
@@ -228,7 +229,8 @@ static void _ads131m02_sync(ads131m02_t *dev)
 
     gpio_clear(dev->params->sync_pin);
     /* Hold low for 1024 (< 2048) clock cycles assuming fastest clock.
-       For slower clocks, same duration results into less clock cycles, but still less than 2048. */
+       For slower clocks, same duration results into less clock cycles,
+       but still less than 2048. */
     xtimer_usleep(1024 * 1000 / 8192);
     gpio_set(dev->params->sync_pin);
 }
@@ -240,7 +242,9 @@ static int32_t _ads131m02_word_to_int32(const uint8_t *p_word, ads131m02_wlength
         return ((int32_t)raw16) << 8;
     }
     else if (wlen == ads131m02_wlength_24bit || wlen == ads131m02_wlength_32bit_zp) {
-        int32_t val24 = ((int32_t)p_word[0] << 16) | ((int32_t)p_word[1] << 8)  | (int32_t)p_word[2];
+        int32_t val24 = ((int32_t)p_word[0] << 16) |
+                        ((int32_t)p_word[1] << 8)  |
+                         (int32_t)p_word[2];
         /* Sign-extend from bit 23 to bit 31 if negative */
         if (val24 & 0x00800000) {
             val24 |= 0xFF000000;
@@ -287,11 +291,13 @@ static uint16_t _read_sample(ads131m02_t *dev, int32_t *chan0, int32_t *chan1)
      * 24-bit response word, i.e. in its upper two bytes */
     uint16_t status = byteorder_bebuftohs(&rx_buf[0 * ADS131M02_WORD_LEN]);
     if (chan0 && (status & ADS131M02_STATUS_DRDY0_MASK)) {
-        *chan0 = _ads131m02_word_to_int32(&rx_buf[1 * ADS131M02_WORD_LEN], ads131m02_wlength_24bit);
+        *chan0 = _ads131m02_word_to_int32(&rx_buf[1 * ADS131M02_WORD_LEN],
+                                          ads131m02_wlength_24bit);
         *chan0 = _ads131m02_int32_scale_nv(*chan0, dev->gain[0]);
     }
     if (chan1 && (status & ADS131M02_STATUS_DRDY1_MASK)) {
-        *chan1 = _ads131m02_word_to_int32(&rx_buf[2 * ADS131M02_WORD_LEN], ads131m02_wlength_24bit);
+        *chan1 = _ads131m02_word_to_int32(&rx_buf[2 * ADS131M02_WORD_LEN],
+                                          ads131m02_wlength_24bit);
         *chan1 = _ads131m02_int32_scale_nv(*chan1, dev->gain[1]);
     }
 
@@ -481,7 +487,8 @@ int ads131m02_start(ads131m02_t *dev, const ads131m02_start_t *start, uint32_t f
         }
         uint8_t div = 1;
         while (div) { /* (uint8_t)256 == 0 */
-            if (ADS131M02_VREF_NV / (div << 1) < ((uint32_t)start->ch[ch].abs_mv) * 1000u * 1000u) {
+            if (ADS131M02_VREF_NV / (div << 1)
+                < ((uint32_t)start->ch[ch].abs_mv) * 1000u * 1000u) {
                 break;
             }
             div <<= 1;
@@ -500,8 +507,10 @@ int ads131m02_start(ads131m02_t *dev, const ads131m02_start_t *start, uint32_t f
         SPI_RELEASE(dev);
         return -ECANCELED;
     }
-    _write_reg(dev, ADS131M02_REG_GAIN, (_read_reg(dev, ADS131M02_REG_GAIN) & ~gain_mask) | gain);
-    _write_reg(dev, ADS131M02_REG_CLOCK, (_read_reg(dev, ADS131M02_REG_CLOCK) & ~clock_mask) | clock);
+    _write_reg(dev, ADS131M02_REG_GAIN,
+               (_read_reg(dev, ADS131M02_REG_GAIN) & ~gain_mask) | gain);
+    _write_reg(dev, ADS131M02_REG_CLOCK,
+               (_read_reg(dev, ADS131M02_REG_CLOCK) & ~clock_mask) | clock);
     SPI_RELEASE(dev);
     _ads131m02_sync(dev);
     return 0;
@@ -550,16 +559,19 @@ int ads131m02_sample(ads131m02_t *dev,
                      int32_t chan0[ADS131M02_FIFO_LEN + 1], int32_t chan1[ADS131M02_FIFO_LEN + 1],
                      unsigned *chan0_numof, unsigned *chan1_numof)
 {
-    /* The internal mechanism that outputs data contains a first-in-first-out (FIFO) buffer that can store two
-       samples of data per channel at a time. The DRDY flag for each channel in the STATUS register remains set
-       until both samples for each channel are read from the device. This condition is not obvious under normal
-       circumstances when the host is reading each consecutive sample from the device. In that case, the samples
-       are cleared from the device each time new data are generated so the DRDY flag for each channel in the STATUS
-       register is cleared with each read. However, both slots of the FIFO are full if a sample is missed or if data are
-       not read for a period of time. Either strobe the SYNC/RESET pin to re-synchronize conversions and clear the
-       FIFOs, or quickly read two data packets when data are read for the first time or after a gap in reading data.
-       This process ensures predictable DRDY pin behavior. See the Synchronization section for information about the
-       synchronization feature. */
+    /* The internal mechanism that outputs data contains a first-in-first-out (FIFO)
+       buffer that can store two samples of data per channel at a time. The DRDY flag
+       for each channel in the STATUS register remains set until both samples for each
+       channel are read from the device. This condition is not obvious under normal
+       circumstances when the host is reading each consecutive sample from the device.
+       In that case, the samples are cleared from the device each time new data are
+       generated so the DRDY flag for each channel in the STATUS register is cleared
+       with each read. However, both slots of the FIFO are full if a sample is missed
+       or if data are not read for a period of time. Either strobe the SYNC/RESET pin
+       to re-synchronize conversions and clear the FIFOs, or quickly read two data
+       packets when data are read for the first time or after a gap in reading data.
+       This process ensures predictable DRDY pin behavior. See the Synchronization
+       section for information about the synchronization feature. */
     if ((!!chan0 ^ !!chan0_numof) || (!!chan1 ^ !!chan1_numof)) {
         return -EINVAL;
     }

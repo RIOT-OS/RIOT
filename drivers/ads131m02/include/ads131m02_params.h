@@ -27,25 +27,46 @@ extern "C" {
  * @{
  */
 #ifndef ADS131M02_PARAM_SPI
+/**
+ * @brief   Default SPI port
+ */
 #  define ADS131M02_PARAM_SPI           (SPI_DEV(0))
 #endif
 #ifndef ADS131M02_PARAM_SPI_CLK
+/**
+ * @brief   Default SPI clock speed
+ */
 #  define ADS131M02_PARAM_SPI_CLK       (SPI_CLK_1MHZ)
 #endif
 #ifndef ADS131M02_PARAM_CS
+/**
+ * @brief   SPI CS pin must be defined
+ */
 #  define ADS131M02_PARAM_CS            (GPIO_UNDEF)
 #endif
 #ifndef ADS131M02_PARAM_READY
+/**
+ * @brief   DRDY pin must be defined
+ */
 #  define ADS131M02_PARAM_READY        (GPIO_UNDEF)
 #endif
 #ifndef ADS131M02_PARAM_SYNC
+/**
+ * @brief   SYNC pin must be defined
+ */
 #  define ADS131M02_PARAM_SYNC         (GPIO_UNDEF)
 #endif
 #ifndef ADS131M02_PARAM_READY_PULLUP
+/**
+ * @brief   Must be set to true if GRDY pin is pulled up with an external 100-kOhm resistor
+ */
 #  define ADS131M02_PARAM_READY_PULLUP 0
 #endif
 
 #ifndef ADS131M02_PARAMS
+/**
+ * @brief   Default ADS131M02 parameters
+ */
 #  define ADS131M02_PARAMS             { .spi       = ADS131M02_PARAM_SPI,     \
                                          .spi_clk   = ADS131M02_PARAM_SPI_CLK, \
                                          .cs_pin    = ADS131M02_PARAM_CS,      \

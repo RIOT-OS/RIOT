@@ -179,16 +179,46 @@ extern "C" {
  * |10|32-bit zero-padded|
  * |11|32-bit sign-extended|
  */
+/**
+ * @brief   Data word length mask
+ */
 #define ADS131M02_MODE_WLENGTH_MASK     (BIT9 | BIT8)
+/**
+ * @brief   16 bit
+ */
 #define ADS131M02_MODE_WLENGTH_16BIT    (0x0U << 8)
+/**
+ * @brief   24 bit
+ */
 #define ADS131M02_MODE_WLENGTH_24BIT    (0x1U << 8)
+/**
+ * @brief   32 bit zero-padded
+ */
 #define ADS131M02_MODE_WLENGTH_32BIT_ZP (0x2U << 8)
+/**
+ * @brief   32 bit sign-extended
+ */
 #define ADS131M02_MODE_WLENGTH_32BIT_SE (0x3U << 8)
 
+/**
+ * @brief   Data word length selection enum for clear parameterization
+ */
 typedef enum {
+    /**
+     * @brief   16 bit
+     */
     ads131m02_wlength_16bit = ADS131M02_MODE_WLENGTH_16BIT,
+    /**
+     * @brief   24 bit
+     */
     ads131m02_wlength_24bit = ADS131M02_MODE_WLENGTH_24BIT,
+    /**
+     * @brief   32 bit zero-padded
+     */
     ads131m02_wlength_32bit_zp = ADS131M02_MODE_WLENGTH_32BIT_ZP,
+    /**
+     * @brief   32 bit sign-extended
+     */
     ads131m02_wlength_32bit_se = ADS131M02_MODE_WLENGTH_32BIT_SE,
 } ads131m02_wlength_t;
 /** @} */
@@ -213,10 +243,22 @@ typedef enum {
  * |10|Most leading enabled channel|
  * |11|Most leading enabled channel|
  */
+/**
+ * @brief   DRDY pin signal source selection mask
+ */
 #define ADS131M02_MODE_DRDY_SEL_MASK    (BIT3 | BIT2)
+/**
+ * @brief   All enabled channels must be ready to assert DRDY (default)
+ */
 #define ADS131M02_MODE_DRDY_SEL_ALL     (0x0U << 2)
+/**
+ * @brief   Any enabled channel asserts DRDY
+ */
 #define ADS131M02_MODE_DRDY_SEL_ANY     (0x1U << 2)
 
+/**
+ * @brief   DRDY pin configuration enum for clear parameterization
+ */
 typedef enum {
     ads131m02_drdy_sel_all = ADS131M02_MODE_DRDY_SEL_ALL,
     ads131m02_drdy_sel_any = ADS131M02_MODE_DRDY_SEL_ANY,
@@ -278,8 +320,8 @@ typedef enum {
  * @name  Modulator oversampling ratio selection
  * @{
  *
- * The OSR determines the amount of averaging of the modulator output in the digital filter and therefore also
- * the filter bandwidth.
+ * The OSR determines the amount of averaging of the modulator output
+ * in the digital filter and therefore also the filter bandwidth.
  *
  * \f[
  * \mathrm{OSR} = \frac{f_{\mathrm{MOD}}}{f_{\mathrm{DATA}}}
@@ -297,24 +339,78 @@ typedef enum {
  * |110|8192|
  * |111|16384|
  */
+/**
+ * @brief   Oversampling ratio selection mask
+ */
 #define ADS131M02_CLOCK_OSR_MASK        (BIT4 | BIT3 | BIT2)
+/**
+ * @brief   128 OSR
+ */
 #define ADS131M02_CLOCK_OSR_128         (0x0U << 2)
+/**
+ * @brief   256 OSR
+ */
 #define ADS131M02_CLOCK_OSR_256         (0x1U << 2)
+/**
+ * @brief   512 OSR
+ */
 #define ADS131M02_CLOCK_OSR_512         (0x2U << 2)
+/**
+ * @brief   1024 OSR
+ */
 #define ADS131M02_CLOCK_OSR_1024        (0x3U << 2)
+/**
+ * @brief   2048 OSR
+ */
 #define ADS131M02_CLOCK_OSR_2048        (0x4U << 2)
+/**
+ * @brief   4096 OSR
+ */
 #define ADS131M02_CLOCK_OSR_4096        (0x5U << 2)
+/**
+ * @brief   8192 OSR
+ */
 #define ADS131M02_CLOCK_OSR_8192        (0x6U << 2)
+/**
+ * @brief   16384 OSR
+ */
 #define ADS131M02_CLOCK_OSR_16384       (0x7U << 2)
 
+/**
+ * @brief   OSR as enum for clear parameterization
+ */
 typedef enum {
+    /**
+     * @brief   128 OSR
+     */
     ads131m02_osr_128 = ADS131M02_CLOCK_OSR_128,
+    /**
+     * @brief   256 OSR
+     */
     ads131m02_osr_256 = ADS131M02_CLOCK_OSR_256,
+    /**
+     * @brief   512 OSR
+     */
     ads131m02_osr_512 = ADS131M02_CLOCK_OSR_512,
+    /**
+     * @brief   1024 OSR
+     */
     ads131m02_osr_1024 = ADS131M02_CLOCK_OSR_1024,
+    /**
+     * @brief   2048 OSR
+     */
     ads131m02_osr_2048 = ADS131M02_CLOCK_OSR_2048,
+    /**
+     * @brief   4096 OSR
+     */
     ads131m02_osr_4096 = ADS131M02_CLOCK_OSR_4096,
+    /**
+     * @brief   8192 OSR
+     */
     ads131m02_osr_8192 = ADS131M02_CLOCK_OSR_8192,
+    /**
+     * @brief   16384 OSR
+     */
     ads131m02_osr_16384 = ADS131M02_CLOCK_OSR_16384,
 } ads131m02_osr_t;
 /** @}  */
@@ -330,14 +426,38 @@ typedef enum {
  * |10|High resolution (default)|
  * |11|High resolution|
  */
+/**
+ * @brief   Power mode selection mask
+ */
 #define ADS131M02_CLOCK_PWR_MASK        (BIT1 | BIT0)
+/**
+ * @brief   Very low power
+ */
 #define ADS131M02_CLOCK_PWR_VERY_LOW    (0x0U)
+/**
+ * @brief   Low power
+ */
 #define ADS131M02_CLOCK_PWR_LOW         (0x1U)
+/**
+ * @brief   High resolution
+ */
 #define ADS131M02_CLOCK_PWR_HIGH_RES    (0x2U)
 
+/**
+ * @brief   Power mode selection enum for clear parameterization
+ */
 typedef enum {
+    /**
+     * @brief   Very low power
+     */
     ads131m02_pwr_very_low = ADS131M02_CLOCK_PWR_VERY_LOW,
+    /**
+     * @brief   Low power
+     */
     ads131m02_pwr_low = ADS131M02_CLOCK_PWR_LOW,
+    /**
+     * @brief   High resolution
+     */
     ads131m02_pwr_high_res = ADS131M02_CLOCK_PWR_HIGH_RES,
 } ads131m02_pwr_t;
 /** @}  */
@@ -366,15 +486,47 @@ typedef enum {
  * |110|64|
  * |111|128|
  */
+/**
+ * @brief   Channel 1 gain selection mask
+ */
 #define ADS131M02_GAIN_PGAGAIN1_MASK    (BIT6 | BIT5 | BIT4)
+/**
+ * @brief   Gain selection shift by channel
+ *
+ * @param ch Channel
+ */
 #define ADS131M02_GAIN_SHIFT(ch)        ((ch) * 4)
+/**
+ * @brief   Channel 1 samples are divided by 1
+ */
 #define ADS131M02_GAIN_PGAGAIN1_1       (0x0U << ADS131M02_GAIN_SHIFT(1))
+/**
+ * @brief   Channel 1 samples are divided by 2
+ */
 #define ADS131M02_GAIN_PGAGAIN1_2       (0x1U << ADS131M02_GAIN_SHIFT(1))
+/**
+ * @brief   Channel 1 samples are divided by 4
+ */
 #define ADS131M02_GAIN_PGAGAIN1_4       (0x2U << ADS131M02_GAIN_SHIFT(1))
+/**
+ * @brief   Channel 1 samples are divided by 8
+ */
 #define ADS131M02_GAIN_PGAGAIN1_8       (0x3U << ADS131M02_GAIN_SHIFT(1))
+/**
+ * @brief   Channel 1 samples are divided by 16
+ */
 #define ADS131M02_GAIN_PGAGAIN1_16      (0x4U << ADS131M02_GAIN_SHIFT(1))
+/**
+ * @brief   Channel 1 samples are divided by 32
+ */
 #define ADS131M02_GAIN_PGAGAIN1_32      (0x5U << ADS131M02_GAIN_SHIFT(1))
+/**
+ * @brief   Channel 1 samples are divided by 64
+ */
 #define ADS131M02_GAIN_PGAGAIN1_64      (0x6U << ADS131M02_GAIN_SHIFT(1))
+/**
+ * @brief   Channel 1 samples are divided by 128
+ */
 #define ADS131M02_GAIN_PGAGAIN1_128     (0x7U << ADS131M02_GAIN_SHIFT(1))
 /** @} */
 
@@ -393,27 +545,83 @@ typedef enum {
  * |110|64|
  * |111|128|
  */
+/**
+ * @brief   Channel 0 gain selection mask
+ */
 #define ADS131M02_GAIN_PGAGAIN0_MASK    (BIT2 | BIT1 | BIT0)
-#define ADS131M02_GAIN_SHIFT(ch)        ((ch) * 4)
+/**
+ * @brief   Channel 0 samples are divided by 1
+ */
 #define ADS131M02_GAIN_PGAGAIN0_1       (0x0U << ADS131M02_GAIN_SHIFT(0))
+/**
+ * @brief   Channel 0 samples are divided by 2
+ */
 #define ADS131M02_GAIN_PGAGAIN0_2       (0x1U << ADS131M02_GAIN_SHIFT(0))
+/**
+ * @brief   Channel 0 samples are divided by 4
+ */
 #define ADS131M02_GAIN_PGAGAIN0_4       (0x2U << ADS131M02_GAIN_SHIFT(0))
+/**
+ * @brief   Channel 0 samples are divided by 8
+ */
 #define ADS131M02_GAIN_PGAGAIN0_8       (0x3U << ADS131M02_GAIN_SHIFT(0))
+/**
+ * @brief   Channel 0 samples are divided by 16
+ */
 #define ADS131M02_GAIN_PGAGAIN0_16      (0x4U << ADS131M02_GAIN_SHIFT(0))
+/**
+ * @brief   Channel 0 samples are divided by 32
+ */
 #define ADS131M02_GAIN_PGAGAIN0_32      (0x5U << ADS131M02_GAIN_SHIFT(0))
+/**
+ * @brief   Channel 0 samples are divided by 64
+ */
 #define ADS131M02_GAIN_PGAGAIN0_64      (0x6U << ADS131M02_GAIN_SHIFT(0))
+/**
+ * @brief   Channel 0 samples are divided by 128
+ */
 #define ADS131M02_GAIN_PGAGAIN0_128     (0x7U << ADS131M02_GAIN_SHIFT(0))
 
+/**
+ * @brief   Convert gain divisor to enum value
+ */
 #define ADS131M02_GAIN(div)             ((div) ? __builtin_ctz(div) : 0)
 
+/**
+ * @brief   Gain selection enum for clear parameterization
+ */
 typedef enum {
+    /**
+     * @brief   Samples divided by 1
+     */
     ads131m02_gain_1 = ADS131M02_GAIN_PGAGAIN0_1,
+    /**
+     * @brief   Samples divided by 2
+     */
     ads131m02_gain_2 = ADS131M02_GAIN_PGAGAIN0_2,
+    /**
+     * @brief   Samples divided by 4
+     */
     ads131m02_gain_4 = ADS131M02_GAIN_PGAGAIN0_4,
+    /**
+     * @brief   Samples divided by 8
+     */
     ads131m02_gain_8 = ADS131M02_GAIN_PGAGAIN0_8,
+    /**
+     * @brief   Samples divided by 16
+     */
     ads131m02_gain_16 = ADS131M02_GAIN_PGAGAIN0_16,
+    /**
+     * @brief   Samples divided by 32
+     */
     ads131m02_gain_32 = ADS131M02_GAIN_PGAGAIN0_32,
+    /**
+     * @brief   Samples divided by 64
+     */
     ads131m02_gain_64 = ADS131M02_GAIN_PGAGAIN0_64,
+    /**
+     * @brief   Samples divided by 128
+     */
     ads131m02_gain_128 = ADS131M02_GAIN_PGAGAIN0_128,
 } ads131m02_gain_t;
 /** @} */
@@ -483,14 +691,41 @@ typedef enum {
  * |110|64|
  * |111|128|
  */
+/**
+ * @brief   Number of current-detect exceeded thresholds mask
+ */
 #define ADS131M02_CFG_CD_NUM_MASK       (BIT6 | BIT5 | BIT4)
+/**
+ * @brief   1 time threshold exceeded triggers current-detect (default)
+ */
 #define ADS131M02_CFG_CD_NUM_1          (0x0U << 4)
+/**
+ * @brief   2 times threshold exceeded triggers current-detect
+ */
 #define ADS131M02_CFG_CD_NUM_2          (0x1U << 4)
+/**
+ * @brief   4 times threshold exceeded triggers current-detect
+ */
 #define ADS131M02_CFG_CD_NUM_4          (0x2U << 4)
+/**
+ * @brief   8 times threshold exceeded triggers current-detect
+ */
 #define ADS131M02_CFG_CD_NUM_8          (0x3U << 4)
+/**
+ * @brief   16 times threshold exceeded triggers current-detect
+ */
 #define ADS131M02_CFG_CD_NUM_16         (0x4U << 4)
+/**
+ * @brief   32 times threshold exceeded triggers current-detect
+ */
 #define ADS131M02_CFG_CD_NUM_32         (0x5U << 4)
+/**
+ * @brief   64 times threshold exceeded triggers current-detect
+ */
 #define ADS131M02_CFG_CD_NUM_64         (0x6U << 4)
+/**
+ * @brief   128 times threshold exceeded triggers current-detect
+ */
 #define ADS131M02_CFG_CD_NUM_128        (0x7U << 4)
 /** @} */
 
@@ -509,14 +744,41 @@ typedef enum {
  * |110|2560|
  * |111|3584|
  */
+/**
+ * @brief   Current-detect measurement length selection mask
+ */
 #define ADS131M02_CFG_CD_LEN_MASK       (BIT3 | BIT2 | BIT1)
+/**
+ * @brief   128 conversion periods (default)
+ */
 #define ADS131M02_CFG_CD_LEN_128        (0x0U << 1)
+/**
+ * @brief   256 conversion periods
+ */
 #define ADS131M02_CFG_CD_LEN_256        (0x1U << 1)
+/**
+ * @brief   512 conversion periods
+ */
 #define ADS131M02_CFG_CD_LEN_512        (0x2U << 1)
+/**
+ * @brief   768 conversion periods
+ */
 #define ADS131M02_CFG_CD_LEN_768        (0x3U << 1)
+/**
+ * @brief   1280 conversion periods
+ */
 #define ADS131M02_CFG_CD_LEN_1280       (0x4U << 1)
+/**
+ * @brief   1792 conversion periods
+ */
 #define ADS131M02_CFG_CD_LEN_1792       (0x5U << 1)
+/**
+ * @brief   2560 conversion periods
+ */
 #define ADS131M02_CFG_CD_LEN_2560       (0x6U << 1)
+/**
+ * @brief   3584 conversion periods
+ */
 #define ADS131M02_CFG_CD_LEN_3584       (0x7U << 1)
 /** @} */
 
@@ -548,9 +810,10 @@ typedef enum {
 /**
  * @brief  Current-detect threshold LSB bits [7:0]
  */
-#define ADS131M02_THRREG_LSB_CD_TH_MASK (BIT15 | BIT14 | BIT13 | BIT12 | BIT11 | BIT10 | BIT9 | BIT8)
+#define ADS131M02_THRREG_LSB_CD_TH_MASK (BIT15 | BIT14 | BIT13 | BIT12 | BIT11 | \
+                                         BIT10 | BIT9 | BIT8)
 /**
- * @name  DC block filter setting, see Table 8-4for details
+ * @name  DC block filter setting
  * @{
  *
  * Value of coefficient a
@@ -574,22 +837,73 @@ typedef enum {
  * |1110|1/32768|
  * |1111|1/65536|
  */
+/**
+ * @brief   DC block filter setting mask
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_MASK       (BIT3 | BIT2 | BIT1 | BIT0)
+/**
+ * @brief   DC block filter disabled
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_DISABLED   (0x0U)
+/**
+ * @brief   DC block filter enabled with 1/4 a-coefficient
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_1_4        (0x1U)
+/**
+ * @brief   DC block filter enabled with 1/8 a-coefficient
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_1_8        (0x2U)
+/**
+ * @brief   DC block filter enabled with 1/16 a-coefficient
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_1_16       (0x3U)
+/**
+ * @brief   DC block filter enabled with 1/32 a-coefficient
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_1_32       (0x4U)
+/**
+ * @brief   DC block filter enabled with 1/64 a-coefficient
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_1_64       (0x5U)
+/**
+ * @brief   DC block filter enabled with 1/128 a-coefficient
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_1_128      (0x6U)
+/**
+ * @brief   DC block filter enabled with 1/256 a-coefficient
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_1_256      (0x7U)
+/**
+ * @brief   DC block filter enabled with 1/512 a-coefficient
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_1_512      (0x8U)
+/**
+ * @brief   DC block filter enabled with 1/1024 a-coefficient
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_1_1024     (0x9U)
+/**
+ * @brief   DC block filter enabled with 1/2048 a-coefficient
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_1_2048     (0xAU)
+/**
+ * @brief   DC block filter enabled with 1/4096 a-coefficient
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_1_4096     (0xBU)
+/**
+ * @brief   DC block filter enabled with 1/8192 a-coefficient
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_1_8192     (0xCU)
+/**
+ * @brief   DC block filter enabled with 1/16384 a-coefficient
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_1_16384    (0xDU)
+/**
+ * @brief   DC block filter enabled with 1/32768 a-coefficient
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_1_32768    (0xEU)
+/**
+ * @brief   DC block filter enabled with 1/65536 a-coefficient
+ */
 #define ADS131M02_THRREG_LSB_DCBLOCK_1_65536    (0xFU)
 /** @} */
 
@@ -602,7 +916,8 @@ typedef enum {
  * @brief  Channel 0 phase compensation delay
  * 10-bit two's complement value.
  */
-#define ADS131M02_CH0_CFG_PHASE0_MASK   (BIT15 | BIT14 | BIT13 | BIT12 | BIT11 | BIT10 | BIT9 | BIT8 | BIT7 | BIT6)
+#define ADS131M02_CH0_CFG_PHASE0_MASK   (BIT15 | BIT14 | BIT13 | BIT12 | BIT11 | \
+                                         BIT10 | BIT9 | BIT8 | BIT7 | BIT6)
 /**
  * @brief  Channel 0 DC block filter disable
  *
@@ -625,14 +940,29 @@ typedef enum {
  * |Value|Description|
  * |:---:|-----------|
  * |00|AIN0P and AIN0N connected directly to ADC (default)|
- * |01|ADC inputs shorted to (AIN0P + AIN0N) / 2|
+ * |01|ADC inputs shorted|
  * |10|Positive DC test signal|
  * |11|Negative DC test signal|
  */
+/**
+ * @brief   Channel 0 input multiplexer selection mask
+ */
 #define ADS131M02_CH0_CFG_MUX_MASK              (BIT1 | BIT0)
+/**
+ * @brief   Channel 0 input is AIN0P and AIN0N connected directly to ADC (default)
+ */
 #define ADS131M02_CH0_CFG_MUX_AIN0P_AIN0N       (0x0U)
+/**
+ * @brief   Channel 0 input is ADC inputs shorted
+ */
 #define ADS131M02_CH0_CFG_MUX_SHORTED           (0x1U)
+/**
+ * @brief   Channel 0 input is positive DC test signal
+ */
 #define ADS131M02_CH0_CFG_MUX_POS_DC            (0x2U)
+/**
+ * @brief   Channel 0 input is negative DC test signal
+ */
 #define ADS131M02_CH0_CFG_MUX_NEG_DC            (0x3U)
 /** @} */
 
@@ -685,7 +1015,8 @@ typedef enum {
  * @brief  Channel 1 phase compensation delay
  * 10-bit two's complement value.
  */
-#define ADS131M02_CH1_CFG_PHASE1_MASK           (BIT15 | BIT14 | BIT13 | BIT12 | BIT11 | BIT10 | BIT9 | BIT8 | BIT7 | BIT6)
+#define ADS131M02_CH1_CFG_PHASE1_MASK           (BIT15 | BIT14 | BIT13 | BIT12 | BIT11 | \
+                                                 BIT10 | BIT9 | BIT8 | BIT7 | BIT6)
 /**
  * @brief  Channel 1 DC block filter disable
  *
@@ -702,20 +1033,50 @@ typedef enum {
  * |Value|Description|
  * |:---:|-----------|
  * |00|AIN1P and AIN1N connected directly to ADC (default)|
- * |01|ADC inputs shorted to (AIN1P + AIN1N) / 2|
+ * |01|ADC inputs shorted
  * |10|Positive DC test signal|
  * |11|Negative DC test signal|
  */
+/**
+ * @brief   Channel 1 input multiplexer selection mask
+ */
 #define ADS131M02_CH1_CFG_MUX_MASK              (BIT1 | BIT0)
+/**
+ * @brief   Channel 1 input is AIN1P and AIN1N connected directly to ADC (default)
+ */
 #define ADS131M02_CH1_CFG_MUX_AIN1P_AIN1N       (0x0U)
+/**
+ * @brief   Channel 1 input is ADC inputs shorted
+ */
 #define ADS131M02_CH1_CFG_MUX_SHORTED           (0x1U)
+/**
+ * @brief   Channel 1 input is positive DC test signal
+ */
 #define ADS131M02_CH1_CFG_MUX_POS_DC            (0x2U)
+/**
+ * @brief   Channel 1 input is negative DC test signal
+ */
 #define ADS131M02_CH1_CFG_MUX_NEG_DC            (0x3U)
 
+/**
+ * @brief   Multiplexer selection enum for clear parameterization
+ */
 typedef enum {
+    /**
+     * @brief   ADC channel input is AINxP and AINxN
+     */
     ads131m02_mux_ain0p_ain0n = ADS131M02_CH0_CFG_MUX_AIN0P_AIN0N,
+    /**
+     * @brief   ADC input shorted
+     */
     ads131m02_mux_shorted = ADS131M02_CH0_CFG_MUX_SHORTED,
+    /**
+     * @brief   ADC channel input is positive DC test signal
+     */
     ads131m02_mux_pos_dc = ADS131M02_CH0_CFG_MUX_POS_DC,
+    /**
+     * @brief   ADC channel input is negative DC test signal
+     */
     ads131m02_mux_neg_dc = ADS131M02_CH0_CFG_MUX_NEG_DC,
 } ads131m02_mux_t;
 /** @} */

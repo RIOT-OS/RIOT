@@ -70,7 +70,8 @@ static void _drdy_event_handler(event_t *ev)
     unsigned chan0_numof = 0, chan1_numof = 0;
     int res;
     do {
-        res = ads131m02_sample(&ads_ev->dev, ads_ev->chan0, ads_ev->chan1, &chan0_numof, &chan1_numof);
+        res = ads131m02_sample(&ads_ev->dev, ads_ev->chan0, ads_ev->chan1,
+                               &chan0_numof, &chan1_numof);
         for (unsigned i = 0; i < chan0_numof; ++i) {
             DEBUG("chan0[%u] = %" PRId32 " nV\n", i, ads_ev->chan0[i]);
         }
@@ -200,7 +201,8 @@ int main(void)
     uint32_t ch0_rmse = 0;
     uint32_t ch1_rmse = 0;
     for (unsigned i = 0; i < ADS131M02_TEST_SAMPLES_NUMOF; ++i) {
-        if (!(ev = event_wait_timeout(&_ads_ev_queue, (MS_PER_SEC * US_PER_MS) / ADS131M02_TEST_SPS))) {
+        if (!(ev = event_wait_timeout(&_ads_ev_queue,
+                                      (MS_PER_SEC * US_PER_MS) / ADS131M02_TEST_SPS))) {
             printf("ads131m02: sample timeout\n");
             goto failure;
         }
@@ -212,12 +214,14 @@ int main(void)
         ch0_rmse += (ch0_nv - test_signal_nv) * (ch0_nv - test_signal_nv);
         ch1_rmse += (ch1_nv - test_signal_nv) * (ch1_nv - test_signal_nv);
         if (ch0_nv < test_signal_nv - tolerance_nv || ch0_nv > test_signal_nv + tolerance_nv) {
-            printf("ads131m02: channel 0 not in expected range: %" PRId32 " nV [%" PRId32 " nV, %" PRId32 " nV]\n",
+            printf("ads131m02: channel 0 not in expected range: "
+                   "%" PRId32 " nV [%" PRId32 " nV, %" PRId32 " nV]\n",
                    ch0_nv, test_signal_nv - tolerance_nv, test_signal_nv + tolerance_nv);
             ch0_out_of_range++;
         }
         if (ch1_nv < test_signal_nv - tolerance_nv || ch1_nv > test_signal_nv + tolerance_nv) {
-            printf("ads131m02: channel 1 not in expected range: %" PRId32 " nV [%" PRId32 " nV, %" PRId32 " nV]\n",
+            printf("ads131m02: channel 1 not in expected range: "
+                   "%" PRId32 " nV [%" PRId32 " nV, %" PRId32 " nV]\n",
                    ch1_nv, test_signal_nv - tolerance_nv, test_signal_nv + tolerance_nv);
             ch1_out_of_range++;
         }
@@ -240,8 +244,10 @@ int main(void)
         goto failure;
     }
     /* stale event in queue */
-    if ((ev = event_wait_timeout(&_ads_ev_queue, (MS_PER_SEC * US_PER_MS) / ADS131M02_TEST_SPS)) &&
-        (ev = event_wait_timeout(&_ads_ev_queue, (MS_PER_SEC * US_PER_MS) / ADS131M02_TEST_SPS))) {
+    if ((ev = event_wait_timeout(&_ads_ev_queue,
+                                 (MS_PER_SEC * US_PER_MS) / ADS131M02_TEST_SPS)) &&
+        (ev = event_wait_timeout(&_ads_ev_queue,
+                                 (MS_PER_SEC * US_PER_MS) / ADS131M02_TEST_SPS))) {
         printf("ads131m02: device not in standby\n");
         goto failure;
     }
@@ -250,7 +256,8 @@ int main(void)
         printf("ads131m02: wakeup: %d\n", res);
         goto failure;
     }
-    if (!(ev = event_wait_timeout(&_ads_ev_queue, (MS_PER_SEC * US_PER_MS) / ADS131M02_TEST_SPS))) {
+    if (!(ev = event_wait_timeout(&_ads_ev_queue,
+                                  (MS_PER_SEC * US_PER_MS) / ADS131M02_TEST_SPS))) {
         printf("ads131m02: device not awake\n");
         goto failure;
     }
@@ -262,7 +269,8 @@ int main(void)
         printf("ads131m02: stop: %d\n", res);
         goto failure;
     }
-    if ((ev = event_wait_timeout(&_ads_ev_queue, (MS_PER_SEC * US_PER_MS) / ADS131M02_TEST_SPS))) {
+    if ((ev = event_wait_timeout(&_ads_ev_queue,
+                                 (MS_PER_SEC * US_PER_MS) / ADS131M02_TEST_SPS))) {
         printf("ads131m02: ADC conversion not stopped\n");
         goto failure;
     }
@@ -274,7 +282,8 @@ int main(void)
         printf("ads131m02: resume: %d\n", res);
         goto failure;
     }
-    if (!(ev = event_wait_timeout(&_ads_ev_queue, (MS_PER_SEC * US_PER_MS) / ADS131M02_TEST_SPS))) {
+    if (!(ev = event_wait_timeout(&_ads_ev_queue,
+                                  (MS_PER_SEC * US_PER_MS) / ADS131M02_TEST_SPS))) {
         printf("ads131m02: ADC conversion not resumed\n");
         goto failure;
     }
