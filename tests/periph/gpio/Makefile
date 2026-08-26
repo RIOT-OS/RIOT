@@ -5,6 +5,7 @@ include ../Makefile.periph_common
 FEATURES_REQUIRED += periph_gpio
 FEATURES_OPTIONAL += periph_gpio_irq
 FEATURES_OPTIONAL += periph_gpio_fast_read
+FEATURES_OPTIONAL += periph_gpio_read_output
 FEATURES_OPTIONAL += periph_gpio_tamper_wake
 
 USEMODULE += shell_cmds_default
