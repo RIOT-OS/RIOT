@@ -55,6 +55,27 @@ static const uart_conf_t uart_config[] = {
 
 #define UART_NUMOF      ARRAY_SIZE(uart_config)
 
+/**
+ * @brief   Timer configuration
+ *
+ * The entries have to be ordered by hardware instance, see
+ * @ref timer_conf_t for details.
+ */
+static const timer_conf_t timer_config[] = {
+    {
+        .dev = TIMER0,
+        .irqn_base = TIMER0_IRQ_0_IRQn,
+        .ch_numof = TIMER_CHANNEL_NUMOF,
+    },
+    {
+        .dev = TIMER1,
+        .irqn_base = TIMER1_IRQ_0_IRQn,
+        .ch_numof = TIMER_CHANNEL_NUMOF
+    }
+};
+
+#define TIMER_NUMOF      2
+
 #ifdef __cplusplus
 }
 #endif
