@@ -201,8 +201,7 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t size, ieee802154_rx_in
                                  sizeof(rx_timestamp));
 
         /* convert counter value to ns */
-        uint64_t res = rx_timestamp * 1000ULL / 32;
-        netdev_ieee802154_rx_info_set_timestamp(info, res);
+        info->rx_timestamp = rx_timestamp * 1000ULL / 32;
 #endif
     }
 
@@ -941,6 +940,7 @@ int at86rf215_init_event(at86rf215_bhp_ev_t *bhp, ieee802154_dev_t *hal_09,
          | IEEE802154_CAP_IRQ_TX_DONE \
          | IEEE802154_CAP_IRQ_RX_START \
          | IEEE802154_CAP_AUTO_TX2RX \
+         | IEEE802154_CAP_RX_TIMESTAMP \
          | IEEE802154_CAP_IRQ_CCA_DONE)
 
 #define AT86RF215_OPS(band)                              \
