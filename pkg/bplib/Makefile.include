@@ -29,6 +29,9 @@ INCLUDES += -isystem$(PKGDIRBASE)/bplib/inc
 
 INCLUDES += -isystem$(PKGDIRBASE)/bplib/version/inc
 
+# Used for config file with modified defaults
+INCLUDES += -I$(RIOTPKG)/bplib/include
+
 # -------------------- Abstraction Layer Modules -------------------------------
 INCLUDES += -I$(RIOTPKG)/bplib/fwp/include
 INCLUDES += -I$(RIOTPKG)/bplib/nc/include
