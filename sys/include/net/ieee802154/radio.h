@@ -403,8 +403,10 @@ typedef struct {
      * The minimum and maximum values are 0 (-174 dBm) and 254 (80 dBm).
      */
     uint8_t rssi;
-    uint8_t lqi;            /**< LQI of the received frame */
-    uint64_t timestamp;     /**< Timestamp value of a received frame in ns */
+    uint8_t lqi;        /**< LQI of the received frame */
+#ifdef MODULE_IEEEE802154_RX_TIMESTAMP
+    uint64_t timestamp; /**< Timestamp value of a received frame in ns */
+#endif
 } ieee802154_rx_info_t;
 
 /**
