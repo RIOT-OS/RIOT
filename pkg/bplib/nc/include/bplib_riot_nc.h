@@ -71,6 +71,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief Whether this node should support taking custody [bool].
+ */
+#ifndef CONFIG_BPLIB_SUPPORT_CUSTODY
+#  define CONFIG_BPLIB_SUPPORT_CUSTODY 1
+#endif
+
+/**
  * @brief block type indicator for bplib_channel_set_block_*() functions
  */
 typedef enum {
@@ -84,12 +91,11 @@ typedef enum {
  * @brief Initializes bplib's NC.
  *
  * NC means "Node Config" and contains pointers to the configuration tables.
- * This function sets the config pointers, calls BPLib_NC_Init and returns.
+ * This function sets the config pointers.
  *
  * @param[out] ConfigPtrs pointers in this will be set to the config
- * @return BPLIB_SUCCESS on success, forwarded from BPLib_NC_Init call.
  */
-BPLib_Status_t bplib_riot_nc_init(BPLib_NC_ConfigPtrs_t* ConfigPtrs);
+void bplib_riot_nc_init(BPLib_NC_ConfigPtrs_t* ConfigPtrs);
 
 /**
  * @brief Set the hop limit of the channel.

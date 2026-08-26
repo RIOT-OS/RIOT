@@ -104,9 +104,9 @@ static void _config_nc(void)
 
 int main(void)
 {
-    int rv = bplib_init();
+    BPLib_Status_t rv = bplib_init();
     if (rv != 0) {
-        printf("Error Initializing bplib: %i\n", rv);
+        printf("Error Initializing bplib: %"PRIi32"\n", rv);
         return 1;
     }
 
@@ -115,7 +115,7 @@ int main(void)
     /* Start the implementation of the CLA */
     rv = bplib_cla_udp_start(&cla_udp1, 0);
     if (rv != 0) {
-        printf("Failed to start UDP CL, error: %i\n", rv);
+        printf("Failed to start UDP CL, error: %"PRIi32"\n", rv);
     }
 
     /* Add and start the application level I/O */
