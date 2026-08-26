@@ -1350,7 +1350,7 @@ void dma_start(dma_t dma);
  * It is not harmful to call this on an inactive channel, but it will waste some
  * processing time
  *
- * @param   dma     DMA channel reference
+ * @param[in]   dma     DMA channel reference
  */
 void dma_cancel(dma_t dma);
 /** @} */
