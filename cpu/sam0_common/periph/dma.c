@@ -285,6 +285,9 @@ void dma_disable_loop(dma_t dma)
             return;
         }
     }
+    /* Clear the Block Action to avoid further interrupts */
+    first->BTCTRL.reg = (first->BTCTRL.reg & ~DMAC_BTCTRL_BLOCKACT_Msk) |
+                        DMAC_BTCTRL_BLOCKACT_NOACT;
     _set_next_descriptor(last, NULL);
 }
 
