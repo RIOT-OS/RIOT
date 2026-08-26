@@ -23,6 +23,7 @@
 #include "architecture.h"
 #include "kernel_defines.h"
 #include "log.h"
+#include "macros/utils.h"
 #include "xfa.h"
 
 #include "suit.h"
@@ -67,16 +68,23 @@ static int _flashwrite_write(suit_storage_t *storage,
     suit_storage_flashwrite_t *fw = _get_fw(storage);
 
     if (offset == 0) {
-        if (len < RIOTBOOT_FLASHWRITE_SKIPLEN) {
+        uint32_t magic;
+        if (len < sizeof(magic)) {
             LOG_WARNING("_suit_flashwrite(): offset==0, len<4. aborting\n");
             return -1;
         }
-        offset = RIOTBOOT_FLASHWRITE_SKIPLEN;
-        buf += RIOTBOOT_FLASHWRITE_SKIPLEN;
-        len -= RIOTBOOT_FLASHWRITE_SKIPLEN;
+        memcpy(&magic, buf, sizeof(magic));
+        if (magic == RIOTBOOT_MAGIC) {
+            fw->writer.offset = 0;
+            fw->writer.skip_len = 0;
+        }
+        else {
+            fw->writer.offset = RIOTBOOT_HDR_LEN;
+            fw->writer.skip_len = RIOTBOOT_HDR_LEN;
+        }
+        memset(fw->writer.flashpage_buf, FLASHPAGE_ERASE_STATE, sizeof(fw->writer.flashpage_buf));
     }
-
-    if (offset != fw->writer.offset) {
+    else if (offset != fw->writer.offset - fw->writer.skip_len) {
         LOG_ERROR("Unexpected offset: %u - expected: %u\n", (unsigned)offset,
                   (unsigned)fw->writer.offset);
         return SUIT_ERR_STORAGE;
@@ -98,53 +106,34 @@ static int _flashwrite_finish(suit_storage_t *storage,
 static int _flashwrite_install(suit_storage_t *storage,
                                const suit_manifest_t *manifest)
 {
-    (void)manifest;
     suit_storage_flashwrite_t *fw = _get_fw(storage);
 
-    return riotboot_flashwrite_finish(&fw->writer);
+    return riotboot_flashwrite_finish(&fw->writer, manifest->seq_number);
 }
 
 static int _flashwrite_read(suit_storage_t *storage, uint8_t *buf,
                             size_t offset, size_t len)
 {
     suit_storage_flashwrite_t *fw = _get_fw(storage);
-
-    static const char _prefix[] = "RIOT";
-    static const size_t _prefix_len = sizeof(_prefix) - 1;
     int target_slot = riotboot_slot_other();
     size_t slot_size = riotboot_slot_size(target_slot);
 
-    /* Insert the "RIOT" magic number */
-    if (offset < (_prefix_len)) {
-        size_t prefix_to_copy = _prefix_len - offset;
-        memcpy(buf, _prefix + offset, prefix_to_copy);
-        len -= prefix_to_copy;
-        offset = _prefix_len;
-        buf += prefix_to_copy;
-
-    }
-
+    if (!fw->writer.skip_len) {
 #if CONFIG_RIOTBOOT_FLASHWRITE_RAW
-    /* Insert the first chunk from the separate buffer here, there are cases
-     * where the chunk size is 4 bytes and we can skip this because it only
-     * contains the magic number already copied above. */
-    if (offset < RIOTBOOT_FLASHPAGE_BUFFER_SIZE) {
-        const size_t chunk_remaining =
-            RIOTBOOT_FLASHPAGE_BUFFER_SIZE - _prefix_len;
-        /* How much of the first page must be copied */
-        size_t firstpage_to_copy = len > chunk_remaining ?
-            (chunk_remaining) : len;
-        /* Copy the first buffer */
-        memcpy(buf, fw->writer.firstblock_buf + offset, firstpage_to_copy);
+        /* Insert the first chunk from the separate buffer here */
+        if (offset < RIOTBOOT_FLASHPAGE_BUFFER_SIZE) {
+            /* How much of the first page must be copied */
+            size_t firstpage_to_copy = MIN(len, RIOTBOOT_FLASHPAGE_BUFFER_SIZE);
+            /* Copy the first buffer */
+            memcpy(buf, fw->writer.firstblock_buf + offset, firstpage_to_copy);
 
-        offset += firstpage_to_copy;
-        buf += firstpage_to_copy;
-        len -= firstpage_to_copy;
-    }
-#else
-    (void)fw;
+            offset += firstpage_to_copy;
+            buf += firstpage_to_copy;
+            len -= firstpage_to_copy;
+        }
 #endif /* CONFIG_RIOTBOOT_FLASHWRITE_RAW */
-
+    }
+    offset += fw->writer.skip_len;
     if (offset + len > slot_size) {
         return -1;
     }
