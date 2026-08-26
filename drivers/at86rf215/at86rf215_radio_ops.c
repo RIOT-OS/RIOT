@@ -232,7 +232,6 @@ static int _request_idle(at86rf215_t *dev, bool force)
 {
     if (!force && (dev->state == AT86RF215_STATE_TX          ||
                    dev->state == AT86RF215_STATE_TX_WAIT_ACK ||
-                   // dev->state == AT86RF215_STATE_RX_START    ||
                    dev->state == AT86RF215_STATE_RX_SEND_ACK ||
                    dev->state == AT86RF215_STATE_CCA_RX      ||
                    dev->state == AT86RF215_STATE_CCA_IDLE)) {
