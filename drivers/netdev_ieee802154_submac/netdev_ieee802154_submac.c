@@ -85,7 +85,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             *((int16_t *)value) = netdev_submac->dev.txpower;
             return sizeof(int16_t);
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
         case NETOPT_MR_FSK_MODULATION_INDEX:
             *((int8_t *)value) = netdev_submac->phy_conf.mr_fsk.mod_idx;
             return max_len;
@@ -105,8 +105,8 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
         case NETOPT_CHANNEL_SPACING:
             return -ENOTSUP;
 
-#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#endif /* MODULE_IEEE802154_PHY_MR_FSK */
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
         case NETOPT_MR_OFDM_OPTION:
             *((int8_t *)value) = netdev_submac->phy_conf.mr_ofdm.option;
             return max_len;
@@ -115,8 +115,8 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             *((int8_t *)value) = netdev_submac->phy_conf.mr_ofdm.scheme;
             return max_len;
 
-#endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#endif /* MODULE_IEEE802154_PHY_MR_OFDM */
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
         case NETOPT_MR_OQPSK_CHIPS:
             *(int8_t *)value = netdev_submac->phy_conf.mr_oqpsk.chips;
             return max_len;
@@ -125,11 +125,11 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             *((int8_t *)value) = netdev_submac->phy_conf.mr_oqpsk.rate_mode;
             return max_len;
 
-#endif /* MODULE_NETDEV_IEEE802154_MR_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+#endif /* MODULE_IEEE802154_PHY_MR_OQPSK */
+#ifdef MODULE_IEEE802154_PHY_OQPSK
         case NETOPT_OQPSK_RATE:
             return -ENOTSUP;
-#endif /* MODULE_NETDEV_IEEE802154_OQPSK */
+#endif /* MODULE_IEEE802154_PHY_OQPSK */
         default:
             break;
     }
@@ -198,19 +198,19 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value,
                 return -ENOTSUP;
             }
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
             if (mode == IEEE802154_PHY_MR_OQPSK) {
                 netdev_submac->phy_conf.mr_oqpsk.chips = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_CHIPS;
                 netdev_submac->phy_conf.mr_oqpsk.rate_mode = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_RATE;
             }
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
             if (mode == IEEE802154_PHY_MR_OFDM) {
                 netdev_submac->phy_conf.mr_ofdm.option = CONFIG_IEEE802154_MR_OFDM_DEFAULT_OPTION;
                 netdev_submac->phy_conf.mr_ofdm.scheme = CONFIG_IEEE802154_MR_OFDM_DEFAULT_SCHEME;
             }
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
             if (mode == IEEE802154_PHY_MR_FSK) {
                 netdev_submac->phy_conf.mr_fsk.srate = CONFIG_IEEE802154_MR_FSK_DEFAULT_SRATE;
                 netdev_submac->phy_conf.mr_fsk.mod_ord = CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_ORD;
@@ -231,7 +231,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value,
 
             return res;
         }
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
     case NETOPT_MR_FSK_MODULATION_INDEX:
     if (ieee802154_get_phy_mode(submac) != IEEE802154_PHY_MR_FSK) {
         return -ENOTSUP;
@@ -280,8 +280,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value,
         netdev_submac->phy_conf.mr_fsk.fec = fec;
         return ieee802154_set_phy_conf(submac, &netdev_submac->phy_conf.super);
     }
-#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#endif /* MODULE_IEEE802154_PHY_MR_FSK */
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
     case NETOPT_MR_OFDM_OPTION:
     if (ieee802154_get_phy_mode(submac) != IEEE802154_PHY_MR_OFDM) {
         return -ENOTSUP;
@@ -306,8 +306,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value,
     netdev_submac->phy_conf.mr_ofdm.scheme = *(uint8_t *)value;
     return ieee802154_set_phy_conf(submac, &netdev_submac->phy_conf.super);
 
-#endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#endif /* MODULE_IEEE802154_PHY_MR_OFDM */
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
     case NETOPT_MR_OQPSK_CHIPS:
     {
         if (ieee802154_get_phy_mode(submac) != IEEE802154_PHY_MR_OQPSK) {
@@ -334,14 +334,14 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value,
     netdev_submac->phy_conf.mr_oqpsk.rate_mode = *(uint8_t *)value;
     return ieee802154_set_phy_conf(submac, &netdev_submac->phy_conf.super);
 
-#endif /* MODULE_NETDEV_IEEE802154_MR_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+#endif /* MODULE_IEEE802154_PHY_MR_OQPSK */
+#ifdef MODULE_IEEE802154_PHY_OQPSK
     case NETOPT_OQPSK_RATE:
     if (ieee802154_get_phy_mode(submac) != IEEE802154_PHY_OQPSK) {
         return -ENOTSUP;
     }
     return -ENOTSUP;
-#endif /* MODULE_NETDEV_IEEE802154_OQPSK */
+#endif /* MODULE_IEEE802154_PHY_OQPSK */
     default:
     break;
 }

@@ -677,19 +677,19 @@ static int ieee802154_submac_config_phy(ieee802154_submac_t *submac,
         submac->ack_timeout_us = ACK_TIMEOUT_US;
         submac->csma_backoff_us = CSMA_SENDER_BACKOFF_PERIOD_UNIT_US;
         break;
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
     case IEEE802154_PHY_MR_OQPSK:
         submac->ack_timeout_us = _mr_oqpsk_ack_timeout_us((void *)conf);
         submac->csma_backoff_us = _mr_oqpsk_csma_backoff_period_us((void *)conf);
         break;
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
     case IEEE802154_PHY_MR_OFDM:
         submac->ack_timeout_us = _mr_ofdm_ack_timeout_us((void *)conf);
         submac->csma_backoff_us = _mr_ofdm_csma_backoff_period_us((void *)conf);
         break;
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
     case IEEE802154_PHY_MR_FSK:
         submac->ack_timeout_us = _mr_fsk_ack_timeout_us((void *)conf);
         submac->csma_backoff_us = _mr_fsk_csma_backoff_period_us((void *)conf);
@@ -768,19 +768,19 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     ieee802154_radio_config_addr_filter(dev, IEEE802154_AF_EXT_ADDR, &submac->ext_addr);
     ieee802154_radio_config_addr_filter(dev, IEEE802154_AF_PANID, &submac->panid);
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
     if (submac->phy_conf.super.phy_mode == IEEE802154_PHY_MR_OQPSK) {
         submac->phy_conf.mr_oqpsk.chips = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_CHIPS;
         submac->phy_conf.mr_oqpsk.rate_mode = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_RATE;
     }
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
     if (submac->phy_conf.super.phy_mode == IEEE802154_PHY_MR_OFDM) {
         submac->phy_conf.mr_ofdm.option = CONFIG_IEEE802154_MR_OFDM_DEFAULT_OPTION;
         submac->phy_conf.mr_ofdm.scheme = CONFIG_IEEE802154_MR_OFDM_DEFAULT_SCHEME;
     }
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
     if (submac->phy_conf.super.phy_mode == IEEE802154_PHY_MR_FSK) {
         submac->phy_conf.mr_fsk.srate = CONFIG_IEEE802154_MR_FSK_DEFAULT_SRATE;
         submac->phy_conf.mr_fsk.mod_ord = CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_ORD;
@@ -837,17 +837,17 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, const ieee802154_phy_co
         size_t conf_size = sizeof(ieee802154_phy_conf_t);
 
         switch (conf->phy_mode) {
-#if IS_USED(MODULE_NETDEV_IEEE802154_MR_OQPSK)
+#if IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK)
         case IEEE802154_PHY_MR_OQPSK:
             conf_size = sizeof(ieee802154_mr_oqpsk_conf_t);
             break;
 #endif
-#if IS_USED(MODULE_NETDEV_IEEE802154_MR_OFDM)
+#if IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)
         case IEEE802154_PHY_MR_OFDM:
             conf_size = sizeof(ieee802154_mr_ofdm_conf_t);
             break;
 #endif
-#if IS_USED(MODULE_NETDEV_IEEE802154_MR_FSK)
+#if IS_USED(MODULE_IEEE802154_PHY_MR_FSK)
         case IEEE802154_PHY_MR_FSK:
             conf_size = sizeof(ieee802154_mr_fsk_conf_t);
             break;

@@ -426,26 +426,26 @@ static int _config_phy(ieee802154_dev_t *hal, const ieee802154_phy_conf_t *conf)
     at86rf215_t *dev = hal->priv;
 
     switch (conf->phy_mode) {
-#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+#ifdef MODULE_IEEE802154_PHY_OQPSK
     case IEEE802154_PHY_OQPSK:
         at86rf215_configure_legacy_OQPSK(dev, at86rf215_OQPSK_get_mode_legacy(dev));
         break;
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
     case IEEE802154_PHY_MR_OQPSK: {
         const ieee802154_mr_oqpsk_conf_t *oqpsk = (const ieee802154_mr_oqpsk_conf_t *)conf;
         at86rf215_configure_OQPSK(dev, oqpsk->chips, oqpsk->rate_mode);
         break;
     }
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
     case IEEE802154_PHY_MR_OFDM: {
         const ieee802154_mr_ofdm_conf_t *ofdm = (const ieee802154_mr_ofdm_conf_t *)conf;
         at86rf215_configure_OFDM(dev, ofdm->option, ofdm->scheme);
         break;
     }
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
     case IEEE802154_PHY_MR_FSK: {
         const ieee802154_mr_fsk_conf_t *fsk = (const ieee802154_mr_fsk_conf_t *)conf;
         at86rf215_configure_FSK(dev, fsk->srate, fsk->mod_idx, (fsk->mod_ord == 4), fsk->fec);
@@ -663,12 +663,12 @@ static void at86rf215_handle_common_irq(ieee802154_dev_t *hal)
     }
 #endif
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
     /* listen for short preamble in RX */
     if (bb_irq_mask & BB_IRQ_TXFE && dev->fsk_pl) {
         at86rf215_FSK_prepare_rx(dev);
     }
-#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
+#endif /* MODULE_IEEE802154_PHY_MR_FSK */
 
     int iter = 0;
     while (bb_irq_mask || (rf_irq_mask & RF_IRQ_EDC)) {
@@ -750,7 +750,7 @@ static void at86rf215_handle_common_irq(ieee802154_dev_t *hal)
             /* start transmitting the frame */
             if (rf_irq_mask & RF_IRQ_TRXRDY) {
                 DEBUG("[at86rf215] ISR: TX_PENDING + TRXRDY → starting TX\n");
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
                 /* send long preamble in TX */
                 if (dev->fsk_pl) {
                     at86rf215_FSK_prepare_tx(dev);
@@ -931,10 +931,10 @@ int at86rf215_init_event(at86rf215_bhp_ev_t *bhp, ieee802154_dev_t *hal_09,
 }
 
 #define AT86RF215_COMMON_CAPS \
-          ((IS_USED(MODULE_NETDEV_IEEE802154_OQPSK)    ? IEEE802154_CAP_PHY_OQPSK    : 0) \
-         | (IS_USED(MODULE_NETDEV_IEEE802154_MR_OQPSK) ? IEEE802154_CAP_PHY_MR_OQPSK : 0) \
-         | (IS_USED(MODULE_NETDEV_IEEE802154_MR_OFDM)  ? IEEE802154_CAP_PHY_MR_OFDM  : 0) \
-         | (IS_USED(MODULE_NETDEV_IEEE802154_MR_FSK)   ? IEEE802154_CAP_PHY_MR_FSK   : 0) \
+          ((IS_USED(MODULE_IEEE802154_PHY_OQPSK)    ? IEEE802154_CAP_PHY_OQPSK    : 0) \
+         | (IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK) ? IEEE802154_CAP_PHY_MR_OQPSK : 0) \
+         | (IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)  ? IEEE802154_CAP_PHY_MR_OFDM  : 0) \
+         | (IS_USED(MODULE_IEEE802154_PHY_MR_FSK)   ? IEEE802154_CAP_PHY_MR_FSK   : 0) \
          | IEEE802154_CAP_AUTO_ACK \
          | IEEE802154_CAP_IRQ_TX_DONE \
          | IEEE802154_CAP_IRQ_RX_START \
