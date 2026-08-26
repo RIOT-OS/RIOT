@@ -12,7 +12,8 @@ IGNORE  += bplib_no_vfs
 
 SUBMODS := $(filter-out $(IGNORE),$(filter bplib_%,$(USEMODULE)))
 
-all: $(BINDIR)/libbplib.a $(SUBMODS)
+all: $(SUBMODS)
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(CURDIR)/Makefile.$(PKG_NAME)
 
 # ------------------------- General helper submodules --------------------------
 bplib_fwp:
@@ -40,10 +41,3 @@ bplib_cla_ble:
 
 bplib_cla_udp:
 	+"$(MAKE)" -C $(RIOTPKG)/bplib/cla/udp
-
-# ------------------------------- bplib library --------------------------------
-$(BINDIR)/libbplib.a: $(PKG_BUILD_DIR)/libbplib.a
-	@cp $< $@
-
-$(PKG_BUILD_DIR)/libbplib.a:
-	+"$(MAKE)" -C $(PKG_SOURCE_DIR) -f riot.mk BUILDDIR=$(PKG_BUILD_DIR)
