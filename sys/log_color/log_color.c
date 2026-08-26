@@ -34,28 +34,28 @@ typedef int dont_be_pedantic; /* this c-file is not empty */
 /**
  * @brief   Default ANSI color escape code for error logs
  *
- * Default is red
+ * Default is bold red
  */
 #ifndef LOG_ERROR_ANSI_COLOR_CODE
-#define LOG_ERROR_ANSI_COLOR_CODE       ANSI_STYLE(FG(RED))
+#define LOG_ERROR_ANSI_COLOR_CODE       ANSI_STYLE(BOLD, FOREGROUND(RED))
 #endif
 
 /**
  * @brief   Default ANSI color escape code for warning logs
  *
- * Default is yellow
+ * Default is bold yellow
  */
 #ifndef LOG_WARNING_ANSI_COLOR_CODE
-#define LOG_WARNING_ANSI_COLOR_CODE     ANSI_STYLE(FG(YELLOW))
+#define LOG_WARNING_ANSI_COLOR_CODE     ANSI_STYLE(BOLD, FOREGROUND(YELLOW))
 #endif
 
 /**
  * @brief   Default ANSI color escape code for info logs
  *
- * Default is white
+ * Default is bold
  */
 #ifndef LOG_INFO_ANSI_COLOR_CODE
-#define LOG_INFO_ANSI_COLOR_CODE        ANSI_STYLE(FG(WHITE))
+#define LOG_INFO_ANSI_COLOR_CODE        ANSI_STYLE(BOLD)
 #endif
 
 /**
@@ -64,7 +64,7 @@ typedef int dont_be_pedantic; /* this c-file is not empty */
  * Default is green
  */
 #ifndef LOG_DEBUG_ANSI_COLOR_CODE
-#define LOG_DEBUG_ANSI_COLOR_CODE       ANSI_STYLE(FG(GREEN))
+#define LOG_DEBUG_ANSI_COLOR_CODE       ANSI_STYLE(FOREGROUND(GREEN))
 #endif
 
 static const char * const _ansi_codes[] =
