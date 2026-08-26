@@ -35,8 +35,6 @@ extern "C" {
 #endif
 
 /**
- * @def DEBUG_BREAKPOINT
- *
  * @brief Set a debug breakpoint
  *
  * When `DEVELHELP` is enabled, this traps the CPU and allows to debug the
@@ -76,8 +74,6 @@ extern "C" {
 #endif
 
 /**
- * @def DEBUG_FUNC
- *
  * @brief   Contains the function name if given compiler supports it.
  *          Otherwise it is an empty string.
  */
@@ -92,8 +88,8 @@ extern "C" {
 #endif
 
 /**
- * @brief   Specify whether calls to @ref DEBUG and @ref DEBUG_PUTS automatically include
- *          the calling thread name.
+ * @brief   Specify whether calls to @ref DEBUG and @ref DEBUG_PUTS automatically
+ *          include the calling thread name.
  *
  * @warning Only applies to files where @ref DEBUG_PREFIX is non-empty.
  *
@@ -108,8 +104,8 @@ extern "C" {
 #endif
 
 /**
- * @brief   Whether calls to @ref DEBUG and @ref DEBUG_PUTS automatically include
- *          the current function name.
+ * @brief   Specify whether calls to @ref DEBUG and @ref DEBUG_PUTS automatically
+ *          include the current function name.
  *
  * @warning Only applies to files where @ref DEBUG_PREFIX is non-empty.
  *
@@ -303,8 +299,6 @@ static inline const char *__debug_thread_name_or_isr(void)
     } while (0)
 
 /**
- * @def DEBUG_PUTS
- *
  * @brief Print debug information to stdout using puts(), so no stack size
  *        restrictions do apply.
  *
@@ -314,15 +308,11 @@ static inline const char *__debug_thread_name_or_isr(void)
 /** @} */
 
 /**
- * @def DEBUG_PRINT
- *
  * @deprecated use @ref DEBUG instead. Will be removed after release 2027.04.
  */
 #define DEBUG_PRINT(...) DEBUG(__VA_ARGS__)
 
 /**
- * @def DEBUG_EXTRA_STACKSIZE
- *
  * @brief Extra stacksize needed when ENABLE_DEBUG==1
  *
  * @deprecated This macro definition does not work anyway as ENABLE_DEBUG
