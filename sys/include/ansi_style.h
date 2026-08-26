@@ -361,7 +361,7 @@ extern "C" {
  *
  * This is equivalent to `ANSI_STYLE()`
  */
-#define ANSI_STYLE_RESET ANSI_STYLE()
+#define ANSI_STYLE_RESET ANSI_STYLE(NONE)
 
 /**
  * @brief Applies ANSI styling but only modifies given text
