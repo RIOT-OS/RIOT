@@ -92,7 +92,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Whether calls to @ref DEBUG and @ref DEBUG_PUTS automatically include
+ * @brief   Specify whether calls to @ref DEBUG and @ref DEBUG_PUTS automatically include
  *          the calling thread name.
  *
  * @warning Only applies to files where @ref DEBUG_PREFIX is non-empty.
@@ -104,7 +104,7 @@ extern "C" {
 #endif
 
 #if IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD) && !defined(CONFIG_THREAD_NAMES)
-#  error "CONFIG_DEBUG_SHOW_THREAD can only be set if CONFIG_THREAD_NAMES is set"
+#  error "CONFIG_DEBUG_SHOW_THREAD requires CONFIG_THREAD_NAMES to be set"
 #endif
 
 /**
@@ -124,12 +124,12 @@ extern "C" {
  *
  * @internal
  */
-#define _DEBUG_DISPLAY_FOR_PREFIX      ANSI_STYLE(FG_BRIGHT(CYAN), BOLD)
-#define _DEBUG_DISPLAY_FOR_THREAD_FUNC ANSI_STYLE(FG(WHITE), DIM)
+#define _DEBUG_STYLE_FOR_PREFIX      ANSI_STYLE(FOREGROUND_BRIGHT(CYAN), BOLD)
+#define _DEBUG_STYLE_FOR_THREAD_FUNC ANSI_STYLE(FOREGROUND(WHITE), DIM)
 
 /**
  * @brief Check whether the stack of the current thread (or ISR) is big enough in total
- *        for printf formatting when `DEVELHELP` is enabled. Otherwise, it returns true.
+ *        for printf formatting when `DEVELHELP` is enabled.
  *
  * @warning This only checks for the whole stack size, not for the currently free part of it.
  *
@@ -150,7 +150,9 @@ static inline bool __debug_sufficient_stack(bool print)
         false) {
 #  endif
         if (print) {
-            fputs("Cannot debug, stack too small. Consider using DEBUG_PUTS().\n", stdout);
+            fputs("Cannot debug, stack too small."
+                  "Consider using DEBUG_PUTS() or increasing the stack size.\n",
+                  stdout);
         }
         return false;
     }
@@ -164,7 +166,7 @@ static inline bool __debug_sufficient_stack(bool print)
  *
  * @internal
  *
- * @return   const char*    the thread name, or "(isr)"
+ * @return   the thread name, or "<isr>"
  */
 static inline const char *__debug_thread_name_or_isr(void)
 {
@@ -173,8 +175,6 @@ static inline const char *__debug_thread_name_or_isr(void)
 }
 
 /**
- * @def DEBUG_
- *
  * @brief Print debug information to stdout with a custom prefix
  *
  * @internal
@@ -182,9 +182,9 @@ static inline const char *__debug_thread_name_or_isr(void)
  * Use this internal macro if you want to have something more fine-grained than
  * the file-wide @ref DEBUG_PREFIX, to define your own debug function like
  *
- * @code {.c}
+ * ```c
  * #define CUSTOM_DEBUG(...) DEBUG_("custom-prefix", __VA_ARGS__)
- * @endcode
+ * ```
  *
  * Otherwise, just use @ref DEBUG
  */
@@ -193,22 +193,22 @@ static inline const char *__debug_thread_name_or_isr(void)
         if (ENABLE_DEBUG && __debug_sufficient_stack(true)) {                                   \
             if (strlen(prefix) > 0) {                                                           \
                 if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) { \
-                    printf(_DEBUG_DISPLAY_FOR_PREFIX prefix _DEBUG_DISPLAY_FOR_THREAD_FUNC      \
+                    printf(_DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC          \
                            " (%s@%s): " ANSI_STYLE_RESET,                                       \
                            DEBUG_FUNC, __debug_thread_name_or_isr());                           \
                 }                                                                               \
                 else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {                                   \
-                    printf(_DEBUG_DISPLAY_FOR_PREFIX prefix _DEBUG_DISPLAY_FOR_THREAD_FUNC      \
+                    printf(_DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC          \
                            " (%s): " ANSI_STYLE_RESET,                                          \
                            DEBUG_FUNC);                                                         \
                 }                                                                               \
                 else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {                                 \
-                    printf(_DEBUG_DISPLAY_FOR_PREFIX prefix _DEBUG_DISPLAY_FOR_THREAD_FUNC      \
+                    printf(_DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC          \
                            " (@%s): " ANSI_STYLE_RESET,                                         \
                            __debug_thread_name_or_isr());                                       \
                 }                                                                               \
                 else {                                                                          \
-                    printf(_DEBUG_DISPLAY_FOR_PREFIX prefix _DEBUG_DISPLAY_FOR_THREAD_FUNC      \
+                    printf(_DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC          \
                            ": " ANSI_STYLE_RESET);                                              \
                 }                                                                               \
             }                                                                                   \
@@ -217,14 +217,13 @@ static inline const char *__debug_thread_name_or_isr(void)
     } while (0)
 
 /**
- * @def DEBUG
- *
  * @brief Print debug information to stdout
  *
  * Use this macro similarly to `printf` when starting a new line.
  * Remember to end the line with an explicit newline character `\n`.
- * If you instead want to continue writing to the same line afterwards,
- * use @ref DEBUG_CONT for the subsequent calls (and end the line there).
+ * This will prefix the print with @ref DEBUG_PREFIX. Therefore,
+ * if you want to continue writing to the same line afterwards,
+ * use @ref DEBUG_CONT for subsequent calls (and end the line there).
  *
  * DEBUG macros will perform a crude check whether the current stack may be
  * big enough for a call to `printf` when `DEVELHELP` is defined.
@@ -243,8 +242,6 @@ static inline const char *__debug_thread_name_or_isr(void)
 #define DEBUG(...) DEBUG_(DEBUG_PREFIX, __VA_ARGS__)
 
 /**
- * @def DEBUG_CONT
- *
  * @brief Continue printing debug information to stdout, without repeating the prefix
  *
  * Use this macro the same way as `printf` if you want to continue printing to the
@@ -258,8 +255,6 @@ static inline const char *__debug_thread_name_or_isr(void)
     } while (0)
 
 /**
- * @def DEBUG_PUTS
- *
  * @brief Print debug information to stdout using puts() witha custom prefix.
  *
  * @internal
@@ -267,9 +262,9 @@ static inline const char *__debug_thread_name_or_isr(void)
  * Use this internal macro if you want to have something more fine-grained than
  * the file-wide @ref DEBUG_PREFIX, to define your own debug function like
  *
- * @code {.c}
+ * ```c
  * #define CUSTOM_DEBUG_PUTS(str) DEBUG_PUTS_("custom-prefix", str)
- * @endcode
+ * ```
  *
  * Otherwise, just use @ref DEBUG_PUTS
  */
@@ -278,27 +273,27 @@ static inline const char *__debug_thread_name_or_isr(void)
         if (ENABLE_DEBUG) {                                                                     \
             if (strlen(prefix) > 0) {                                                           \
                 if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) { \
-                    fputs(_DEBUG_DISPLAY_FOR_PREFIX prefix, stdout);                            \
-                    fputs(_DEBUG_DISPLAY_FOR_THREAD_FUNC " (", stdout);                         \
+                    fputs(_DEBUG_STYLE_FOR_PREFIX prefix, stdout);                              \
+                    fputs(_DEBUG_STYLE_FOR_THREAD_FUNC " (", stdout);                           \
                     fputs(DEBUG_FUNC, stdout);                                                  \
                     fputs("@", stdout);                                                         \
                     fputs(__debug_thread_name_or_isr(), stdout);                                \
                     fputs("): " ANSI_STYLE_RESET, stdout);                                      \
                 }                                                                               \
                 else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {                                   \
-                    fputs(_DEBUG_DISPLAY_FOR_PREFIX prefix, stdout);                            \
-                    fputs(_DEBUG_DISPLAY_FOR_THREAD_FUNC " (", stdout);                         \
+                    fputs(_DEBUG_STYLE_FOR_PREFIX prefix, stdout);                              \
+                    fputs(_DEBUG_STYLE_FOR_THREAD_FUNC " (", stdout);                           \
                     fputs(DEBUG_FUNC, stdout);                                                  \
                     fputs("): " ANSI_STYLE_RESET, stdout);                                      \
                 }                                                                               \
                 else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {                                 \
-                    fputs(_DEBUG_DISPLAY_FOR_PREFIX prefix, stdout);                            \
-                    fputs(_DEBUG_DISPLAY_FOR_THREAD_FUNC " (@", stdout);                        \
+                    fputs(_DEBUG_STYLE_FOR_PREFIX prefix, stdout);                              \
+                    fputs(_DEBUG_STYLE_FOR_THREAD_FUNC " (@", stdout);                          \
                     fputs(__debug_thread_name_or_isr(), stdout);                                \
                     fputs("): " ANSI_STYLE_RESET, stdout);                                      \
                 }                                                                               \
                 else if (strlen(DEBUG_PREFIX) > 0) {                                            \
-                    fputs(_DEBUG_DISPLAY_FOR_PREFIX prefix _DEBUG_DISPLAY_FOR_THREAD_FUNC       \
+                    fputs(_DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC           \
                           ": " ANSI_STYLE_RESET,                                                \
                           stdout);                                                              \
                 }                                                                               \
