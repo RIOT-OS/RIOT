@@ -39,6 +39,9 @@ export RIOTBOARD             # This folder is the base of the riot boards.
 export BOARDSDIR             # This is the folder containing the board dir
 export EXTERNAL_BOARD_DIRS   # List of folders containing external board dirs
 export BOARDDIR              # This folder contains the board
+export CPUSDIR               # This is the folder containing the CPU dir
+export EXTERNAL_CPU_DIRS     # list of folders containing external CPU dirs
+export CPUDIR                # This folder contains the CPU
 export RIOTPKG               # For overriding RIOT's pkg directory
 export RIOTTOOLS             # Location of host machine tools
 export RIOTPROJECT           # Top level git root of the project being built, or PWD if not a git repository

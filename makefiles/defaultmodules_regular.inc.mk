@@ -12,4 +12,4 @@ DEFAULT_MODULE += board board_common_init \
 -include $(BOARDDIR)/Makefile.default
 
 # Include potentially added default modules by the CPU
--include $(RIOTCPU)/$(CPU)/Makefile.default
+-include $(CPUDIR)/Makefile.default
