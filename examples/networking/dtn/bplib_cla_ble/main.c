@@ -107,9 +107,9 @@ static void _config_nc(void)
 
 int main(void)
 {
-    int rv = bplib_init();
+    BPLib_Status_t rv = bplib_init();
     if (rv != 0) {
-        printf("Error Initializing bplib %i\n", rv);
+        printf("Error Initializing bplib %"PRIi32"\n", rv);
         return 1;
     }
 
@@ -117,7 +117,7 @@ int main(void)
 
     rv = bplib_cla_ble_start(0, BPLIB_EXAMPLE_ROLE_CLIENT);
     if (rv != 0) {
-        printf("BLE CLA failed to initialize, error %i\n", rv);
+        printf("BLE CLA failed to initialize, error %"PRIi32"\n", rv);
         if (rv == -EINVAL) {
             printf("Is your MAC address formatted correctly?\n");
         }

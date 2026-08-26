@@ -29,20 +29,19 @@ static BPLib_NC_MibPerNodeConfig_t  MibPnTbl = {
     },
 
     .Configs = {
-        BPLIB_MAX_BUNDLE_LEN,       /* PARAM_BUNDLE_SIZE_NO_FRAGMENT      */
-        CONFIG_BPLIB_MAX_SEQ_NUM,   /* PARAM_SET_MAX_SEQUENCE NUM         */
-        BPLIB_MAX_PAYLOAD_SIZE,     /* PARAM_SET_MAX_PAYLOAD_LENGTH       */
-        BPLIB_MAX_BUNDLE_LEN,       /* PARAM_SET_MAX_BUNDLE_LENGTH        */
-        0,                          /* PARAM_SET_NODE_DTN_TIME            */
-        10,                         /* PARAM_SET_BEHAVIOR_EVENT_REPORTING */
-        BPLIB_MAX_LIFETIME_ALLOWED  /* PARAM_SET_MAX_LIFETIME             */
+        BPLIB_MAX_BUNDLE_LEN,           /* PARAM_BUNDLE_SIZE_NO_FRAGMENT */
+        CONFIG_BPLIB_MAX_SEQ_NUM,       /* PARAM_SET_MAX_SEQUENCE NUM */
+        BPLIB_MAX_PAYLOAD_SIZE,         /* PARAM_SET_MAX_PAYLOAD_LENGTH */
+        BPLIB_MAX_BUNDLE_LEN,           /* PARAM_SET_MAX_BUNDLE_LENGTH */
+        CONFIG_BPLIB_SUPPORT_CUSTODY,   /* PARAM_SUPPORT_CUSTODY */
+        BPLIB_MAX_LIFETIME_ALLOWED      /* PARAM_SET_MAX_LIFETIME */
     }
 };
 
-BPLib_Status_t bplib_riot_nc_init(BPLib_NC_ConfigPtrs_t* ConfigPtrs)
+void bplib_riot_nc_init(BPLib_NC_ConfigPtrs_t* ConfigPtrs)
 {
     if (ConfigPtrs == NULL) {
-        return BPLIB_NULL_PTR_ERROR;
+        return;
     }
 
     ConfigPtrs->ChanConfigPtr      = &ChanTbl;
@@ -56,8 +55,6 @@ BPLib_Status_t bplib_riot_nc_init(BPLib_NC_ConfigPtrs_t* ConfigPtrs)
     ConfigPtrs->AuthConfigPtr      = NULL;
     ConfigPtrs->LatConfigPtr       = NULL;
     ConfigPtrs->StorConfigPtr      = NULL;
-
-    return BPLib_NC_Init(ConfigPtrs);
 }
 
 static BPLib_Status_t _channel_ok_and_stopped(uint32_t channel)
