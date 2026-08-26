@@ -13,12 +13,12 @@ ifneq (,$(filter at86rf215_batmon,$(USEMODULE)))
   USEMODULE += sys_bus_power
 endif
 
-DEFAULT_MODULE += netdev_ieee802154_multimode
+DEFAULT_MODULE += ieee802154_multimode
 
-DEFAULT_MODULE += netdev_ieee802154_oqpsk
-DEFAULT_MODULE += netdev_ieee802154_mr_oqpsk
-DEFAULT_MODULE += netdev_ieee802154_mr_ofdm
-DEFAULT_MODULE += netdev_ieee802154_mr_fsk
+DEFAULT_MODULE += ieee802154_phy_oqpsk
+DEFAULT_MODULE += ieee802154_phy_mr_oqpsk
+DEFAULT_MODULE += ieee802154_phy_mr_ofdm
+DEFAULT_MODULE += ieee802154_phy_mr_fsk
 
 FEATURES_REQUIRED += periph_gpio
 FEATURES_REQUIRED += periph_gpio_irq

@@ -243,15 +243,15 @@ static void _set_usage(char *cmd_name)
 #ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
          "       * \"phy_mode\" - select PHY mode\n"
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
          "       * \"chip_rate\" - BPSK/QPSK chip rate in kChip/s\n"
          "       * \"rate_mode\" - BPSK/QPSK rate mode\n"
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
          "       * \"option\" - OFDM option\n"
          "       * \"scheme\" - OFDM modulation & coding scheme\n"
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
          "       * \"modulation_index\" - FSK modulation index\n"
          "       * \"modulation_order\" - FSK modulation order\n"
          "       * \"symbol_rate\" - FSK symbol rate\n"
@@ -416,14 +416,14 @@ static void _print_netopt(netopt_t opt)
         break;
 
 #endif /* MODULE_NETDEV_IEEE802154_MULTIMODE */
-#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+#ifdef MODULE_IEEE802154_PHY_OQPSK
 
     case NETOPT_OQPSK_RATE:
         printf("high rate");
         break;
 
-#endif /* MODULE_NETDEV_IEEE802154_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#endif /* MODULE_IEEE802154_PHY_OQPSK */
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
 
     case NETOPT_MR_OQPSK_CHIPS:
         printf("chip rate");
@@ -433,8 +433,8 @@ static void _print_netopt(netopt_t opt)
         printf("rate mode");
         break;
 
-#endif /* MODULE_NETDEV_IEEE802154_MR_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#endif /* MODULE_IEEE802154_PHY_MR_OQPSK */
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
 
     case NETOPT_MR_OFDM_OPTION:
         printf("OFDM option");
@@ -444,8 +444,8 @@ static void _print_netopt(netopt_t opt)
         printf("modulation/coding scheme");
         break;
 
-#endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#endif /* MODULE_IEEE802154_PHY_MR_OFDM */
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
 
     case NETOPT_MR_FSK_MODULATION_INDEX:
         printf("FSK modulation index");
@@ -467,7 +467,7 @@ static void _print_netopt(netopt_t opt)
         printf("Channel Spacing");
         break;
 
-#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
+#endif /* MODULE_IEEE802154_PHY_MR_FSK */
 
     case NETOPT_CHECKSUM:
         printf("checksum");
@@ -536,7 +536,7 @@ static const char *_netopt_ieee802154_phy_str[] = {
 };
 #endif
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
 static const char *_netopt_ofdm_mcs_str[] = {
     [0] = "BPSK, rate 1/2, 4x frequency repetition",
     [1] = "BPSK, rate 1/2, 2x frequency repetition",
@@ -548,7 +548,7 @@ static const char *_netopt_ofdm_mcs_str[] = {
 };
 #endif
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
 static const char *_netopt_fec_str[] = {
     [IEEE802154_FEC_NONE] = "none",
     [IEEE802154_FEC_NRNSC] = "NRNSC",
@@ -565,7 +565,7 @@ static const char *_netopt_srate_str[] = {
 };
 #endif
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
 static const char *_netopt_chips_str[] = {
     [IEEE802154_MR_OQPSK_CHIPS_100]  = "100",
     [IEEE802154_MR_OQPSK_CHIPS_200]  = "200",
@@ -723,7 +723,7 @@ static void _netif_list(netif_t *iface)
         printf(" PHY: %s ", _netopt_ieee802154_phy_str[u8]);
         switch (u8) {
 
-#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+#ifdef MODULE_IEEE802154_PHY_OQPSK
         case IEEE802154_PHY_OQPSK:
             printf("\n          ");
             res = netif_get_opt(iface, NETOPT_OQPSK_RATE, 0, &u8, sizeof(u8));
@@ -733,8 +733,8 @@ static void _netif_list(netif_t *iface)
 
             break;
 
-#endif /* MODULE_NETDEV_IEEE802154_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#endif /* MODULE_IEEE802154_PHY_OQPSK */
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
         case IEEE802154_PHY_MR_OQPSK:
             printf("\n          ");
             res = netif_get_opt(iface, NETOPT_MR_OQPSK_CHIPS, 0, &u8, sizeof(u16));
@@ -748,8 +748,8 @@ static void _netif_list(netif_t *iface)
 
             break;
 
-#endif /* MODULE_NETDEV_IEEE802154_MR_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#endif /* MODULE_IEEE802154_PHY_MR_OQPSK */
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
         case IEEE802154_PHY_MR_OFDM:
             printf("\n          ");
             res = netif_get_opt(iface, NETOPT_MR_OFDM_OPTION, 0, &u8, sizeof(u8));
@@ -762,8 +762,8 @@ static void _netif_list(netif_t *iface)
             }
 
             break;
-#endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#endif /* MODULE_IEEE802154_PHY_MR_OFDM */
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
         case IEEE802154_PHY_MR_FSK:
             printf("\n          ");
             res = netif_get_opt(iface, NETOPT_MR_FSK_MODULATION_INDEX, 0, &u8, sizeof(u8));
@@ -795,7 +795,7 @@ static void _netif_list(netif_t *iface)
             }
 
             break;
-#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
+#endif /* MODULE_IEEE802154_PHY_MR_FSK */
         }
     }
 #endif /* MODULE_NETDEV_IEEE802154 */
@@ -1098,7 +1098,7 @@ static int _netif_set_coding_rate(netif_t *iface, char *value)
 }
 #endif  /* MODULE_SHELL_CMD_GNRC_NETIF_LORA */
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
 static int _netif_set_fsk_fec(netif_t *iface, char *value)
 {
     /* ignore case */
@@ -1173,9 +1173,9 @@ static int _netif_set_fsk_modulation_index(netif_t *iface, char *value)
 
     return 0;
 }
-#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
+#endif /* MODULE_IEEE802154_PHY_MR_FSK */
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
 static int _netif_set_oqpsk_chips(netif_t *iface, char *value)
 {
     for (size_t i = 0; i < ARRAY_SIZE(_netopt_chips_str); ++i) {
@@ -1645,28 +1645,28 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
         return _netif_set_ieee802154_phy_mode(iface, value);
     }
 #endif /* MODULE_NETDEV_IEEE802154_MULTIMODE */
-#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+#ifdef MODULE_IEEE802154_PHY_OQPSK
     else if (strcmp("high_rate", key) == 0) {
         return _netif_set_u8(iface, NETOPT_OQPSK_RATE, 0, value);
     }
-#endif /* MODULE_NETDEV_IEEE802154_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#endif /* MODULE_IEEE802154_PHY_OQPSK */
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
     else if ((strcmp("chip_rate", key) == 0) || (strcmp("chips", key) == 0)) {
         return _netif_set_oqpsk_chips(iface, value);
     }
     else if (strcmp("rate_mode", key) == 0) {
         return _netif_set_u8(iface, NETOPT_MR_OQPSK_RATE, 0, value);
     }
-#endif /* MODULE_NETDEV_IEEE802154_MR_OQPSK */
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#endif /* MODULE_IEEE802154_PHY_MR_OQPSK */
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
     else if ((strcmp("option", key) == 0) || (strcmp("opt", key) == 0)) {
         return _netif_set_u8(iface, NETOPT_MR_OFDM_OPTION, 0, value);
     }
     else if ((strcmp("scheme", key) == 0) || (strcmp("mcs", key) == 0)) {
         return _netif_set_u8(iface, NETOPT_MR_OFDM_MCS, 0, value);
     }
-#endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#endif /* MODULE_IEEE802154_PHY_MR_OFDM */
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
     else if ((strcmp("modulation_index", key) == 0) || (strcmp("midx", key) == 0)) {
         return _netif_set_fsk_modulation_index(iface, value);
     }
@@ -1682,7 +1682,7 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
     else if ((strcmp("channel_spacing", key) == 0) || (strcmp("bw", key) == 0)) {
         return _netif_set_u16(iface, NETOPT_CHANNEL_SPACING, 0, value);
     }
-#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
+#endif /* MODULE_IEEE802154_PHY_MR_FSK */
     else if ((strcmp("channel", key) == 0) || (strcmp("chan", key) == 0)) {
         return _netif_set_u16(iface, NETOPT_CHANNEL, 0, value);
     }
