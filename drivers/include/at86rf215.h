@@ -295,7 +295,7 @@ typedef struct at86rf215 {
     bool rpc_enable;                        /**< Flag for reduced power consumption option */
     uint16_t channel;                       /**< Current channel of the device */
     at86rf215_state_t state;                /**< Current state of the radio */
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
     uint8_t fsk_pl;                         /**< FSK Preamble Length */
 #endif
     int8_t cca_thresh;                      /**< CSMA energy detect threshold */

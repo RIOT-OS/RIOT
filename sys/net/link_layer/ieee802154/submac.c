@@ -679,19 +679,19 @@ static int ieee802154_submac_config_phy(ieee802154_submac_t *submac,
         submac->ack_timeout_us = ACK_TIMEOUT_US;
         submac->csma_backoff_us = CSMA_SENDER_BACKOFF_PERIOD_UNIT_US;
         break;
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
     case IEEE802154_PHY_MR_OQPSK:
         submac->ack_timeout_us = _mr_oqpsk_ack_timeout_us((void *)conf);
         submac->csma_backoff_us = _mr_oqpsk_csma_backoff_period_us((void *)conf);
         break;
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
     case IEEE802154_PHY_MR_OFDM:
         submac->ack_timeout_us = _mr_ofdm_ack_timeout_us((void *)conf);
         submac->csma_backoff_us = _mr_ofdm_csma_backoff_period_us((void *)conf);
         break;
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
     case IEEE802154_PHY_MR_FSK:
         submac->ack_timeout_us = _mr_fsk_ack_timeout_us((void *)conf);
         submac->csma_backoff_us = _mr_fsk_csma_backoff_period_us((void *)conf);
@@ -777,30 +777,30 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     /* Configure PHY settings (mode, channel, TX power) */
     union {
         ieee802154_phy_conf_t super;
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
         ieee802154_mr_oqpsk_conf_t mr_oqpsk;
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
         ieee802154_mr_ofdm_conf_t mr_ofdm;
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
         ieee802154_mr_fsk_conf_t mr_fsk;
 #endif
     } conf;
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
     if (submac->phy_mode == IEEE802154_PHY_MR_OQPSK) {
         conf.mr_oqpsk.chips = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_CHIPS;
         conf.mr_oqpsk.rate_mode = CONFIG_IEEE802154_MR_OQPSK_DEFAULT_RATE;
     }
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
     if (submac->phy_mode == IEEE802154_PHY_MR_OFDM) {
         conf.mr_ofdm.option = CONFIG_IEEE802154_MR_OFDM_DEFAULT_OPTION;
         conf.mr_ofdm.scheme = CONFIG_IEEE802154_MR_OFDM_DEFAULT_SCHEME;
     }
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
     if (submac->phy_mode == IEEE802154_PHY_MR_FSK) {
         conf.mr_fsk.srate = CONFIG_IEEE802154_MR_FSK_DEFAULT_SRATE;
         conf.mr_fsk.mod_ord = CONFIG_IEEE802154_MR_FSK_DEFAULT_MOD_ORD;

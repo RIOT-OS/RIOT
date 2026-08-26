@@ -53,13 +53,13 @@ typedef struct {
     netdev_event_t ev;                  /**< event to be dispatched */
     union {
         ieee802154_phy_conf_t super;
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
         ieee802154_mr_oqpsk_conf_t mr_oqpsk;
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
         ieee802154_mr_ofdm_conf_t mr_ofdm;
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
         ieee802154_mr_fsk_conf_t mr_fsk;
 #endif
     } phy_conf;                         /**< PHY configuration */

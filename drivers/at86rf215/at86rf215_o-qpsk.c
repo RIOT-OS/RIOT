@@ -247,7 +247,7 @@ void _end_configure_OQPSK(at86rf215_t *dev)
     at86rf215_reg_write16(dev, dev->RF->RG_CNL, dev->channel);
 
     /* disable FSK preamble switching */
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
     dev->fsk_pl = 0;
 #endif
 
