@@ -1326,21 +1326,22 @@ void dma_append_dst(dma_t dma, DmacDescriptor *next, void *dst, size_t num,
 /**
  * @brief   Make the DMA transfer repeat indefinitely
  *
- * @param   dma[in] DMA channel reference
+ * @param[in]   dma     DMA channel reference
+ * @param[in]   irq     Whether to enable interrupts on each loop iteration
  */
-void dma_enable_loop(dma_t dma);
+void dma_enable_loop(dma_t dma, bool irq);
 
 /**
  * @brief   Disable DMA transfer looping
  *
- * @param   dma[in] DMA channel reference
+ * @param[in]   dma     DMA channel reference
  */
 void dma_disable_loop(dma_t dma);
 
 /**
  * @brief   Start a DMA transfer.
  *
- * @param   dma[in] DMA channel reference
+ * @param[in]   dma     DMA channel reference
  */
 void dma_start(dma_t dma);
 
@@ -1350,7 +1351,7 @@ void dma_start(dma_t dma);
  * It is not harmful to call this on an inactive channel, but it will waste some
  * processing time
  *
- * @param   dma     DMA channel reference
+ * @param[in]   dma     DMA channel reference
  */
 void dma_cancel(dma_t dma);
 /** @} */

@@ -248,7 +248,7 @@ void dac_play(dac_t line, const uint16_t *buf, size_t len, uint8_t flags)
                 buf + len, dst, len, DMA_INCR_SRC);
 
     if (flags & DAC_PLAY_LOOPED) {
-        dma_enable_loop(tx_dma[line]);
+        dma_enable_loop(tx_dma[line], false);
     }
 
     dma_start(tx_dma[line]);

@@ -255,7 +255,7 @@ void dma_append_dst(dma_t dma, DmacDescriptor *next, void *dst, size_t num,
     _fmt_append(descr, next, (void *)descr->SRCADDR.reg, dst, num);
 }
 
-void dma_enable_loop(dma_t dma)
+void dma_enable_loop(dma_t dma, bool irq)
 {
     DmacDescriptor *first = &descriptors[dma];
     DmacDescriptor *last = first;
@@ -267,6 +267,11 @@ void dma_enable_loop(dma_t dma)
         }
     }
     _set_next_descriptor(last, first);
+    if (irq) {
+        /* Set Block Action to INT so an interrupt fires on every loop iteration */
+        first->BTCTRL.reg = (first->BTCTRL.reg & ~DMAC_BTCTRL_BLOCKACT_Msk) |
+                            DMAC_BTCTRL_BLOCKACT_INT;
+    }
 }
 
 void dma_disable_loop(dma_t dma)

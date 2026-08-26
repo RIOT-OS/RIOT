@@ -572,7 +572,7 @@ int adc_dma_start(adc_t line, uint16_t *dst, size_t num)
 #endif
     _wait_syncbusy(dev);
 
-    dma_enable_loop(tx_dma[line]);
+    dma_enable_loop(tx_dma[line], true);
     /* Start DMA channel first */
     dma_start(tx_dma[line]);
 
