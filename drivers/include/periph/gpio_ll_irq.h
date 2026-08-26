@@ -95,6 +95,9 @@ typedef void (*gpio_ll_cb_t)(void *arg);
  * @pre     The given GPIO pin has been initialized using
  *          @ref gpio_ll_init prior to this call
  * @pre     The trigger in @p trig is supported by the MCU
+ * @pre     IRQs on the given pin must not be active when calling
+ *          `gpio_ll_irq()`. The pin must either not have been configured yet,
+ *          or IRQs must be disabled with @ref gpio_ll_irq_off first.
  *
  * @retval  0           Success
  * @retval  -ENOTSUP    No external IRQs supported for @p port and @p pin

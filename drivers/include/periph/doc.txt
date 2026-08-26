@@ -52,15 +52,15 @@
  * | `periph_dac`       | user / driver     | Partial (no concurrent use of the same DAC line allowed)                      |
  * | `periph_eeprom`    | not needed        | None (no concurrency whatsoever)                                              |
  * | `periph_flashpage` | not needed        | None (no concurrency whatsoever)                                              |
- * | `periph_gpio`      | not needed        | Limited (reads are fine, concurrent writes to pins on distinct ports work)    |
- * | `periph_gpio_ll`   | not needed        | Yes, except for concurrent initialization of the GPIO pin                     |
+ * | `periph_gpio`      | not needed        | Limited (reads are fine, concurrent writes to pins on distinct ports work; no reconfiguration of an active interrupt pin) |
+ * | `periph_gpio_ll`   | not needed        | Yes, except for concurrent initialization of the GPIO pin or an active IRQ    |
  * | `periph_hwrng`     | `periph_init`     | None (no concurrency whatsoever)                                              |
  * | `periph_i2c`       | `periph_init`     | Full Thread Safety (except for initialization)                                |
  * | `periph_pio`       | `periph_init`     | Full Thread Safety (except for initialization)                                |
  * | `periph_pm`        | not needed        | Full Thread Safety                                                            |
  * | `periph_ptp`       | `periph_init`     | Full Thread Safety (except for initialization)                                |
  * | `periph_pwm`       | user / driver     | Partial (no concurrent use of the same PWM device)                            |
- * | `periph_qdec`      | user / driver     | Partial (no concurrent use of the same QDEC device)                           |
+ * | `periph_qdec`      | user / driver     | Partial (no concurrent use of the same QDEC; no re-init of an active QDEC)    |
  * | `periph_rtc`       | `periph_init`     | None (no concurrency whatsoever)                                              |
  * | `periph_rtt`       | `periph_init`     | None (no concurrency whatsoever)                                              |
  * | `periph_spi`       | `periph_init`     | Full Thread Safety (except for initialization)                                |
