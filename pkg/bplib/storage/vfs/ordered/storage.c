@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
+#include "mutex.h"
 #include "vfs.h"
 
 #include "bplib.h"

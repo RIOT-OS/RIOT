@@ -83,6 +83,7 @@ CONFIG_BPLIB_MEMPOOL_LEN | Mempool size available for bplib bundles in send / de
 CONFIG_BPLIB_GEN_WORKER_TIMEOUT | Timeout [ms] after which the generic worker times out after bplib termination | `bplib_init`
 CONFIG_BPLIB_GENERIC_STACK_SIZE | Stack size of the generic worker. | `bplib_init`
 CONFIG_BPLIB_MAX_SEQ_NUM | Maximum sequence number, after which it will wrap back to 0 | `bplib_nc`
+CONFIG_BPLIB_SUPPORT_CUSTODY | Whether this node shall allow custody bundles or not [bool] | `bplib_nc`
 CONFIG_BPLIB_STOR_BASE | File path prefix of the folder where the bundles will be stored. | `bplib_stor_vfs_*`
 CONFIG_BPLIB_EGRESS_CACHE_LEN | Number of bundle references stored in the caches / queues per channel and contact. Larger means the storage is searched less, at the price of more used memory. | `bplib_stor_vfs_*`
 CONFIG_BPLIB_STOR_MAX_DUPLICATE_CHECKS | Used to upper bound the linear search for a filename which is not yet used. This applies only for the ordered storage, so when DTN time is known there should not be many bundles with the same expiration timestamp. Max 255. | `bplib_stor_vfs_ordered`

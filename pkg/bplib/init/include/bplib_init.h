@@ -36,6 +36,8 @@
 
 #include "bplib.h"
 
+#include "thread_config.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -99,12 +101,14 @@ extern bplib_instance_data_t bplib_instance_data;
  * @brief Initializes bplib, with all of its modules.
  *
  * Before calling this init function, if walltime is available, it should
- * be set correctly.
+ * be set correctly. If bplib initialization fails, no worker thread will be
+ * started.
  *
- * @return 0 on success, values 1-7 for failure in init of the modules
- *         [FWP, EM, TIME, NC, MEM, QM, thread creation] respectively
+ * @retval BPLIB_SUCCESS on success
+ * @retval other error values from BPLib_NC_Init
+ * @retval BPLIB_ERROR if the thread creation failed
  */
-int bplib_init(void);
+BPLib_Status_t bplib_init(void);
 
 /**
  * @brief Terminates bplib.

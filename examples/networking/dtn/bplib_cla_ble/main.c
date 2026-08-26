@@ -107,7 +107,7 @@ static void _config_nc(void)
 
 int main(void)
 {
-    int rv = bplib_init();
+    BPLib_Status_t rv = bplib_init();
     if (rv != 0) {
         printf("Error Initializing bplib %i\n", rv);
         return 1;
