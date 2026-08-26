@@ -49,6 +49,18 @@ extern "C" {
 #endif
 
 /**
+ * @brief Whether prints may include ANSI SGR escape codes.
+ *
+ * If disabled, calls to @ref ANSI_STYLE and @ref ANSI_STYLED are no-ops.
+ *
+ * **Default**: enabled
+ *
+ */
+#ifndef CONFIG_STDIO_ANSI_STYLING
+#  define CONFIG_STDIO_ANSI_STYLING (1)
+#endif
+
+/**
  * @name SGR escape sequence
  * @{
  */
@@ -333,10 +345,14 @@ extern "C" {
  *
  * @returns Format string literal
  */
-#define ANSI_STYLE(...) \
-    _ANSI_SGR_PREFIX \
-    __ANSI_APPLY_STYLES(__VA_ARGS__) \
-    _ANSI_SGR_SUFFIX
+#if CONFIG_STDIO_ANSI_STYLING
+#  define ANSI_STYLE(...) \
+        _ANSI_SGR_PREFIX \
+        __ANSI_APPLY_STYLES(__VA_ARGS__) \
+        _ANSI_SGR_SUFFIX
+#else
+#  define ANSI_STYLE(...) /* no-op */
+#endif
 
 /**
  * @brief Resets text color and style applied previously back to defaults
@@ -345,7 +361,7 @@ extern "C" {
  *
  * This is equivalent to `ANSI_STYLE()`
  */
-#define ANSI_STYLE_RESET _ANSI_SGR_PREFIX ANSI_STYLE_NONE _ANSI_SGR_SUFFIX
+#define ANSI_STYLE_RESET ANSI_STYLE()
 
 /**
  * @brief Applies ANSI styling but only modifies given text
