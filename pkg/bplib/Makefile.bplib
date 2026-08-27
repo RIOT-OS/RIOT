@@ -7,15 +7,19 @@ BPLIB_FOLDERS := aa/arp aa/as aa/fwp aa/nc \
 
 BPLIB_PRIVATE_INCLUDE_DIRS := $(foreach dir,$(BPLIB_FOLDERS),$(dir)/inc) inc
 
-# Note 1: We don't compile bpa/stor
-# Note 2: We use the ben_allocator and exlude the std_allocator (which would use
-#  malloc instead of a static allocation pool for the blocks). This could be
-#  swapped or a custom allocator could even be used here.
+# Note: We don't compile bpa/stor and ci/mem (mem is added back later)
 BPLIB_SOURCES_INIT := $(foreach dir,$(BPLIB_FOLDERS),$(wildcard $(dir)/src/*.c))
-BPLIB_IGNORED_SOURCES := bpa/stor/src/% ci/mem/src/bplib_std_allocator.c
+BPLIB_IGNORED_SOURCES := bpa/stor/src/% ci/mem/src/%
 
 INCLUDES += $(foreach dir,$(BPLIB_PRIVATE_INCLUDE_DIRS),-I$(dir))
 SRC += $(filter-out $(BPLIB_IGNORED_SOURCES),$(BPLIB_SOURCES_INIT))
+SRC += ci/mem/src/bplib_mem.c # Add back since filtered out. This is always needed
+
+# Note: We use the ben_allocator and exlude the std_allocator (which would use
+#  malloc instead of a static allocation pool for the blocks). This could be
+#  changed here.
+#  !!! Remember to also change the define in the Makefile.include
+SRC += ci/mem/src/bplib_ben_allocator.c
 
 CFLAGS += -Wno-format
 CFLAGS += -Wno-int-to-pointer-cast
@@ -23,6 +27,7 @@ CFLAGS += -Wno-old-style-definition
 CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-cast-function-type
 CFLAGS += -Wno-sign-compare
+CFLAGS += -Wno-type-limits
 # LLVM specifics that GCC does not complain about
 ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-strict-prototypes
