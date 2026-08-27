@@ -1100,7 +1100,7 @@ int nanocoap_sock_url_connect(const char *url, nanocoap_sock_t *sock)
 #if SOCK_HAS_IPV6
         /* tinydtls wants the interface to match */
         if (!remote.netif && sock_udp_ep_is_v6(&remote) &&
-            ipv6_addr_is_link_local(remote.ip.addr.v6)) {
+            ipv6_addr_is_link_local(&remote.ip.addr.v6)) {
             netif_t *iface = netif_iter(NULL);
             if (iface == NULL) {
                 return -ENODEV;

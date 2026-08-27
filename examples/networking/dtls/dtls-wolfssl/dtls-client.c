@@ -117,7 +117,7 @@ static int _client_cmd(int argc, char **argv)
         }
         remote.netif = (uint16_t)netif->pid;
     }
-    if (ipv6_addr_from_str(remote.addr.v6, addr_str) == NULL) {
+    if (ipv6_addr_from_str(&remote.ip.addr.v6, addr_str) == NULL) {
         LOG(LOG_ERROR, "ERROR: unable to parse destination address\n");
         usage(argv[0]);
         return -1;

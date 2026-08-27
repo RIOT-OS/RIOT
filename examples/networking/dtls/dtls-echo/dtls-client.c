@@ -120,14 +120,14 @@ static int dtls_handle_read(dtls_context_t *ctx)
     dtls_session_init(&session);
     session.addr.port = remote.port;
     session.addr.family = AF_INET6;
-    if (remote.netif == SOCK_ADDR_ANY_NETIF) {
+    if (remote.ip.netif == SOCK_ADDR_ANY_NETIF) {
         session.ifindex = SOCK_ADDR_ANY_NETIF;
     }
     else {
-        session.ifindex = remote.netif;
+        session.ifindex = remote.ip.netif;
     }
 
-    memcpy(&session.addr.ipv6, &remote.addr.ipv6, sizeof(session.addr.ipv6));
+    session.addr.ipv6 = remote.ip.addr.v6;
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         DEBUG("DBG-Client: Msg received from \n\t Addr Src: [");
@@ -353,7 +353,7 @@ dtls_context_t *_init_dtls(sock_udp_t *sock, sock_udp_ep_t *local,
         remote->netif = (uint16_t)netif->pid;
     }
 
-    if (ipv6_addr_from_str(remote->ip.addr.v6, addr_str) == NULL) {
+    if (ipv6_addr_from_str(&remote->ip.addr.v6, addr_str) == NULL) {
         puts("ERROR: unable to parse destination address");
         return new_context;
     }

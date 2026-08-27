@@ -336,7 +336,7 @@ bool sock_tl_ep_equal(const struct _sock_tl_ep *a,
     assert(a && b);
 
     /* compare family and port */
-    if ((a->family != b->family) || (a->port != b->port)) {
+    if ((a->ip.family != b->ip.family) || (a->port != b->port)) {
         return false;
     }
 
@@ -344,11 +344,11 @@ bool sock_tl_ep_equal(const struct _sock_tl_ep *a,
     switch (a->family) {
 #  ifdef SOCK_HAS_IPV4
     case AF_INET:
-        return memcmp(a->addr.ipv4, b->addr.ipv4, 4) == 0;
+        return ipv4_addr_equal(&a->ip.addr.v4, &b->ip.addr.v4);
 #  endif
 #  ifdef SOCK_HAS_IPV6
     case AF_INET6:
-        return memcmp(a->addr.ipv6, b->addr.ipv6, 16) == 0;
+        return ipv6_addr_equal(&a->ip.addr.v6, &b->ip.addr.v6);
 #  endif
     default:
         return false;

@@ -946,7 +946,7 @@ void sock_dtls_init(void)
 static void _ep_to_session(const sock_udp_ep_t *ep, session_t *session)
 {
     dtls_session_init(session);
-    session->addr.family = ep->family;
+    session->addr.family = ep->ip.family;
     session->addr.port = ep->port;
 
     switch (ep->family) {
@@ -958,7 +958,7 @@ static void _ep_to_session(const sock_udp_ep_t *ep, session_t *session)
 #endif
 #ifdef SOCK_HAS_IPV6
     case AF_INET6:
-        if (ipv6_addr_is_link_local(ep->ip.addr.v6)) {
+        if (ipv6_addr_is_link_local(&ep->ip.addr.v6)) {
             /* set ifindex for link-local addresses */
             session->ifindex = ep->netif;
         }
@@ -977,8 +977,8 @@ static void _ep_to_session(const sock_udp_ep_t *ep, session_t *session)
 static void _session_to_ep(const session_t *session, sock_udp_ep_t *ep)
 {
     ep->port = session->addr.port;
-    ep->netif = session->ifindex;
-    ep->family = session->addr.family;
+    ep->ip.netif = session->ifindex;
+    ep->ip.family = session->addr.family;
 
     switch (session->addr.family) {
 #ifdef SOCK_HAS_IPV4

@@ -109,8 +109,7 @@ static void test_sock_udp_create__only_local(void)
     expect(0 == sock_udp_create(&_sock, &local, NULL, SOCK_FLAGS_REUSE_EP));
     expect(0 == sock_udp_get_local(&_sock, &ep));
     expect(AF_INET6 == ep.family);
-    expect(memcmp(&ipv6_addr_unspecified, &ep.addr.ipv6,
-                  sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&ipv6_addr_unspecified, &ep.ip.addr.v6));
     expect(SOCK_ADDR_ANY_NETIF == ep.netif);
     expect(_TEST_PORT_LOCAL == ep.port);
     expect(-ENOTCONN == sock_udp_get_remote(&_sock, &ep));
@@ -125,8 +124,7 @@ static void test_sock_udp_create__only_local_port0(void)
     expect(0 == sock_udp_create(&_sock, &local, NULL, SOCK_FLAGS_REUSE_EP));
     expect(0 == sock_udp_get_local(&_sock, &ep));
     expect(AF_INET6 == ep.family);
-    expect(memcmp(&ipv6_addr_unspecified, &ep.addr.ipv6,
-                  sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&ipv6_addr_unspecified, &ep.ip.addr.v6));
     expect(SOCK_ADDR_ANY_NETIF == ep.netif);
     expect(0U != ep.port);
     expect(-ENOTCONN == sock_udp_get_remote(&_sock, &ep));
@@ -143,14 +141,12 @@ static void test_sock_udp_create__only_local_reuse_ep(void)
     expect(0 == sock_udp_get_local(&_sock, &ep));
     expect(0 == sock_udp_get_local(&_sock2, &ep2));
     expect(AF_INET6 == ep.family);
-    expect(memcmp(&ipv6_addr_unspecified, &ep.addr.ipv6,
-                  sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&ipv6_addr_unspecified, &ep.ip.addr.v6));
     expect(SOCK_ADDR_ANY_NETIF == ep.netif);
     expect(_TEST_PORT_LOCAL == ep.port);
     expect(-ENOTCONN == sock_udp_get_remote(&_sock, &ep));
     expect(AF_INET6 == ep2.family);
-    expect(memcmp(&ipv6_addr_unspecified, &ep2.addr.ipv6,
-                  sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&ipv6_addr_unspecified, &ep2.ip.addr.v6));
     expect(SOCK_ADDR_ANY_NETIF == ep2.netif);
     expect(_TEST_PORT_LOCAL == ep2.port);
     expect(-ENOTCONN == sock_udp_get_remote(&_sock, &ep2));
@@ -169,7 +165,7 @@ static void test_sock_udp_create__only_remote(void)
     expect(-EADDRNOTAVAIL == sock_udp_get_local(&_sock, &ep));
     expect(0 == sock_udp_get_remote(&_sock, &ep));
     expect(AF_INET6 == ep.family);
-    expect(memcmp(&remote_addr, &ep.addr.ipv6, sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&remote_addr, &ep.ip.addr.v6));
     expect(SOCK_ADDR_ANY_NETIF == ep.netif);
     expect(_TEST_PORT_REMOTE == ep.port);
 }
@@ -187,13 +183,12 @@ static void test_sock_udp_create__full(void)
     expect(0 == sock_udp_create(&_sock, &local, &remote, SOCK_FLAGS_REUSE_EP));
     expect(0 == sock_udp_get_local(&_sock, &ep));
     expect(AF_INET6 == ep.family);
-    expect(memcmp(&ipv6_addr_unspecified, &ep.addr.ipv6,
-                  sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&ipv6_addr_unspecified, &ep.ip.addr.v6));
     expect(_TEST_NETIF == ep.netif);
     expect(_TEST_PORT_LOCAL == ep.port);
     expect(0 == sock_udp_get_remote(&_sock, &ep));
     expect(AF_INET6 == ep.family);
-    expect(memcmp(&remote_addr, &ep.addr.ipv6, sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&remote_addr, &ep.ip.addr.v6));
     expect(SOCK_ADDR_ANY_NETIF == ep.netif);
     expect(_TEST_PORT_REMOTE == ep.port);
 }

@@ -42,7 +42,7 @@ void telnet_cb_pre_connected(sock_tcp_t *sock)
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
     sock_tcp_get_local(sock, &ep);
-    ipv6_addr_to_str(addr_str, ep.ip.addr.v6, sizeof(addr_str));
+    ipv6_addr_to_str(addr_str, &ep.ip.addr.v6, sizeof(addr_str));
 
     printf("%s connected\n", addr_str);
 }

@@ -1668,9 +1668,7 @@ static uint32_t _handle_rdnsso(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
     if (addr == NULL) {
         unsigned addrs_num = (rdnsso->len - 1) / 2;
         for (unsigned i = 0; i < addrs_num; i++) {
-            if (memcmp(sock_dns_server.addr.ipv6,
-                       &rdnsso->addrs[i],
-                       sizeof(rdnsso->addrs[i])) == 0) {
+            if (ipv6_addr_equal(&sock_dns_server.ip.addr.v6, &rdnsso->addrs[i])) {
                 addr = &rdnsso->addrs[i];
                 break;
             }
@@ -1683,8 +1681,7 @@ static uint32_t _handle_rdnsso(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
             sock_dns_server.port = SOCK_DNS_PORT;
             sock_dns_server.family = AF_INET6;
             sock_dns_server.netif = netif->pid;
-            memcpy(sock_dns_server.addr.ipv6, rdnsso->addrs,
-                   sizeof(sock_dns_server.addr.ipv6));
+            sock_dns_server.ip.addr.v6 = rdnsso->addrs[0];
 
             if (ltime < UINT32_MAX) {
                 /* the valid lifetime is given in seconds, but our timers work

@@ -41,7 +41,7 @@ void unicoap_print_sock_tl_ep(const struct _sock_tl_ep* ep) {
     case AF_INET6:
         printf("ipv6=");
 #  if SOCK_HAS_IPV6 && IS_USED(MODULE_IPV6_ADDR)
-        ipv6_addr_print(ep->ip.addr.v6);
+        ipv6_addr_print(&ep->ip.addr.v6);
 #  else
         UNICOAP_DEBUG("SOCK_HAS_IPV6: v6 support missing, cannot print\n");
         printf("?");

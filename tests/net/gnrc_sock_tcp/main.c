@@ -153,7 +153,7 @@ int sock_tcp_get_local_cmd(int argc, char **argv)
     print_result(argv[0], err);
     if (err == 0) {
         printf("Endpoint: addr.ipv6=");
-        ipv6_addr_print(ep.ip.addr.v6);
+        ipv6_addr_print(&ep.ip.addr.v6);
         printf(" netif=%u port=%u\n", ep.netif, ep.port);
     }
     return 0;
@@ -168,7 +168,7 @@ int sock_tcp_queue_get_local_cmd(int argc, char **argv)
     print_result(argv[0], err);
     if (err == 0) {
         printf("Endpoint: addr.ipv6=");
-        ipv6_addr_print(ep.ip.addr.v6);
+        ipv6_addr_print(&ep.ip.addr.v6);
         printf(" netif=%u port=%u\n", ep.netif, ep.port);
     }
     return 0;
@@ -183,7 +183,7 @@ int sock_tcp_get_remote_cmd(int argc, char **argv)
     print_result(argv[0], err);
     if (err == 0) {
         printf("Endpoint: addr.ipv6=");
-        ipv6_addr_print(ep.ip.addr.v6);
+        ipv6_addr_print(&ep.ip.addr.v6);
         printf(" netif=%u port=%u\n", ep.netif, ep.port);
     }
     return 0;

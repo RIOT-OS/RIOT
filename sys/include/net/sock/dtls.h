@@ -335,7 +335,7 @@
  *     sock_dtls_t dtls_sock;
  *     sock_dtls_session_t session;
  *
- *     if (!ipv6_addr_from_str(remote.ip.addr.v6, SERVER_ADDR)) {
+ *     if (!ipv6_addr_from_str(&remote.ip.addr.v6, SERVER_ADDR)) {
  *         puts("Error parsing destination address");
  *         return -1;
  *     }
@@ -407,7 +407,7 @@
  * remote.port = DTLS_DEFAULT_PORT;
  * remote.netif = gnrc_netif_iter(NULL)->pid;   // only if gnrc_netif_highlander() returns true
  *
- * if (!ipv6_addr_from_str(remote.ip.addr.v6, SERVER_ADDR)) {
+ * if (!ipv6_addr_from_str(&remote.ip.addr.v6, SERVER_ADDR)) {
  *     puts("Error parsing destination address");
  *     return -1;
  * }

@@ -592,7 +592,7 @@ static void test_tcp_connect6__success_without_port(void)
     expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
     expect(0 == sock_tcp_get_remote(&_sock, &ep));
     expect(AF_INET6 == ep.family);
-    expect(memcmp(&remote_addr, &ep.addr.ipv6, sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&remote_addr, &ep.ip.addr.v6));
     expect(SOCK_ADDR_ANY_NETIF == ep.netif);
     expect(_TEST_PORT_REMOTE == ep.port);
 }
@@ -619,7 +619,7 @@ static void test_tcp_connect6__success_local_port(void)
     expect(_TEST_PORT_LOCAL == ep.port);
     expect(0 == sock_tcp_get_remote(&_sock, &ep));
     expect(AF_INET6 == ep.family);
-    expect(memcmp(&remote_addr, &ep.addr.ipv6, sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&remote_addr, &ep.ip.addr.v6));
     expect(SOCK_ADDR_ANY_NETIF == ep.netif);
     expect(_TEST_PORT_REMOTE == ep.port);
 }
@@ -673,7 +673,7 @@ static void test_tcp_listen6__success_any_netif(void)
                                 _QUEUE_SIZE, 0));
     expect(0 == sock_tcp_queue_get_local(&_queue, &ep));
     expect(AF_INET6 == ep.family);
-    expect(memcmp(&local_addr, &ep.addr.ipv6, sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&local_addr, &ep.ip.addr.v6));
     expect(SOCK_ADDR_ANY_NETIF == ep.netif);
     expect(_TEST_PORT_LOCAL == ep.port);
 }
@@ -751,7 +751,7 @@ static void test_tcp_accept6__success(void)
     expect(_TEST_PORT_LOCAL == ep.port);
     expect(0 == sock_tcp_get_remote(sock, &ep));
     expect(AF_INET6 == ep.family);
-    expect(memcmp(&remote_addr, &ep.addr.ipv6, sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&remote_addr, &ep.ip.addr.v6));
     expect(SOCK_ADDR_ANY_NETIF == ep.netif);
     expect(_TEST_PORT_REMOTE == ep.port);
 }
