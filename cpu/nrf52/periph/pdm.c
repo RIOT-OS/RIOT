@@ -62,11 +62,16 @@
 
 /* The samples buffer is a double buffer */
 static int16_t _pdm_buf[PDM_BUF_SIZE * 2] = { 0 };
-static pdm_isr_ctx_t _isr_ctx;
-static uint32_t _backoff_buffers;
-static volatile uint32_t _backoff_buffers_left;
 static uint8_t _pdm_current_buf = 0;
 static uint8_t _pdm_next_buf = 0;
+
+static pdm_isr_ctx_t _isr_ctx;
+
+/* Buffers discarded at start, to let filter/mic settle */
+static uint32_t _backoff_buffers;
+static volatile uint32_t _backoff_buffers_left;
+
+static bool _pdm_running = false;
 
 static uint8_t _rate_to_divisor(uint32_t rate, uint8_t ratio)
 {
@@ -170,10 +175,9 @@ int32_t pdm_init(pdm_mode_t mode, uint32_t rate, int8_t gain,
     NRF_PDM->EVENTS_STOPPED = 0;
     NRF_PDM->EVENTS_END = 0;
 
-    /* Enable end/started/stopped events */
+    /* Enable end/started events */
     NRF_PDM->INTENSET = ((PDM_INTEN_END_Enabled << PDM_INTEN_END_Pos) |
-                         (PDM_INTEN_STARTED_Enabled << PDM_INTEN_STARTED_Pos) |
-                         (PDM_INTEN_STOPPED_Enabled << PDM_INTEN_STOPPED_Pos));
+                         (PDM_INTEN_STARTED_Enabled << PDM_INTEN_STARTED_Pos));
 
     /* Configure Length of DMA RAM allocation in number of samples */
     NRF_PDM->SAMPLE.MAXCNT = (PDM_BUF_SIZE);
@@ -192,18 +196,34 @@ int32_t pdm_init(pdm_mode_t mode, uint32_t rate, int8_t gain,
 
 void pdm_start(void)
 {
+    if (_pdm_running) {
+        return;
+    }
+
     _pdm_next_buf = 0;
     _pdm_current_buf = 0;
     _backoff_buffers_left = _backoff_buffers;
+
     NRF_PDM->SAMPLE.PTR = (uint32_t)_pdm_buf;
     DEBUG("[PDM] MAXCNT: %" PRIu32 "\n", NRF_PDM->SAMPLE.MAXCNT);
 
     NRF_PDM->TASKS_START = 1;
+    _pdm_running = true;
 }
 
 void pdm_stop(void)
 {
+    if (!_pdm_running) {
+        return;
+    }
+
     NRF_PDM->TASKS_STOP = 1;
+
+    /* restarting before STOPPED is received is unpredictable behaviour */
+    while (NRF_PDM->EVENTS_STOPPED == 0) {}
+    NRF_PDM->EVENTS_STOPPED = 0;
+
+    _pdm_running = false;
 }
 
 void isr_pdm(void)
@@ -214,11 +234,6 @@ void isr_pdm(void)
 
         _pdm_next_buf ^= 1;
         NRF_PDM->SAMPLE.PTR = (uint32_t)&_pdm_buf[_pdm_next_buf * (PDM_BUF_SIZE)];
-    }
-
-    /* PDM transfer has finished */
-    if (NRF_PDM->EVENTS_STOPPED == 1) {
-        NRF_PDM->EVENTS_STOPPED = 0;
     }
 
     /* requested number of samples written to RAM */
