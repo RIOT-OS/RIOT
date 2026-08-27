@@ -353,7 +353,6 @@ compile() {
 
     # set build directory. CI ensures only one build at a time in $(pwd).
     export BINDIR="$(pwd)/build"
-    export PKGDIRBASE="${BINDIR}/pkg"
 
     # Pre-build cleanup
     rm -rf ${BINDIR}
