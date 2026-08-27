@@ -77,7 +77,7 @@ ifneq (,$(filter stdio_uart_rx,$(USEMODULE)))
   USEMODULE += stdio_available
 endif
 
-ifneq (,$(filter stdio_uart,$(USEMODULE)))
+ifneq (,$(filter stdio_uart stdio_slipdev,$(USEMODULE)))
   FEATURES_REQUIRED_ANY += periph_uart|periph_lpuart
 endif
 
