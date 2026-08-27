@@ -1,82 +1,45 @@
-From 8a8d2c571207f561b20070a62b19431ad0d7cce6 Mon Sep 17 00:00:00 2001
+From 54109b6ae8a117feb21f548394bea90c8b9d8cd9 Mon Sep 17 00:00:00 2001
 From: Simon Grund <simon.grund@tuhh.de>
 Date: Wed, 4 Feb 2026 13:56:09 +0100
-Subject: [PATCH 1/8] Initial port of bplib
+Subject: [PATCH 1/9] Initial port of bplib
 
 Changed all Threading synchronization to RIOT analogs. Changed the time
 module to use vfs. The storage is now only the header, the actual
 implementation is not fixed inside of bplib but must be supplied by the
 user (this could also be a pseudomodule or similar in the package).
+Changed other limitations for RIOT (like only one worker).
 ---
- CMakeLists.txt                    | 14 +++--
- aa/as/src/bplib_as_internal.c     | 46 ++-------------
- aa/as/src/bplib_as_internal.h     |  6 +-
- aa/nc/inc/bplib_nc_rwlock.h       |  9 +--
- aa/nc/src/bplib_nc_rwlock.c       | 56 ++++++------------
- bpa/stor/CMakeLists.txt           |  9 ++-
- bpa/stor/inc/bplib_stor.h         | 12 ++--
- bpa/stor/src/bplib_stor_cmake.c   |  3 +
- ci/mem/inc/bplib_mem.h            |  4 +-
- ci/mem/src/bplib_mem.c            | 11 ++--
- ci/qm/inc/bplib_qm.h              |  4 +-
- ci/qm/inc/bplib_qm_waitqueue.h    |  9 +--
- ci/qm/src/bplib_qm.c              | 15 ++---
- ci/qm/src/bplib_qm_waitqueue.c    | 94 +++++++++++--------------------
- ci/time/inc/bplib_time.h          |  2 +
- ci/time/src/bplib_time_internal.c | 62 ++++++--------------
- ci/time/src/bplib_time_internal.h |  3 +-
- version/src/bplib_version.c       |  9 +--
- 18 files changed, 132 insertions(+), 236 deletions(-)
+ aa/as/src/bplib_as_internal.c     |  46 ++-----------
+ aa/as/src/bplib_as_internal.h     |   6 +-
+ aa/nc/inc/bplib_nc_rwlock.h       |   9 +--
+ aa/nc/src/bplib_nc.c              |  15 ++---
+ aa/nc/src/bplib_nc_rwlock.c       |  56 +++++-----------
+ bpa/ct/inc/bplib_ct.h             |   4 +-
+ bpa/ct/src/bplib_ct.c             |  36 +++++-----
+ bpa/ct/src/bplib_ct_ccs.c         |  16 ++---
+ bpa/pi/src/bplib_pi.c             |   2 +-
+ bpa/stor/inc/bplib_stor.h         |  12 ++--
+ bpa/stor/src/bplib_stor_cmake.c   |   3 +
+ ci/mem/inc/bplib_mem.h            |   6 +-
+ ci/mem/src/bplib_mem.c            |  13 ++--
+ ci/qm/inc/bplib_qm.h              |   2 +-
+ ci/qm/inc/bplib_qm_waitqueue.h    |   9 +--
+ ci/qm/src/bplib_qm.c              |  10 +--
+ ci/qm/src/bplib_qm_waitqueue.c    | 105 ++++++++++--------------------
+ ci/time/inc/bplib_time.h          |   2 +
+ ci/time/src/bplib_time_internal.c |  62 +++++-------------
+ ci/time/src/bplib_time_internal.h |   3 +-
+ cla/src/bplib_cla.c               |   2 +-
+ inc/bplib_inst.h                  |   3 +-
+ version/src/bplib_version.c       |   9 +--
+ 23 files changed, 155 insertions(+), 276 deletions(-)
  create mode 100644 bpa/stor/src/bplib_stor_cmake.c
 
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index ac07f511..ad0faf66 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -102,6 +102,8 @@ list(APPEND BPLIB_COMPONENTS
-   bplib_crc bplib_version bplib_qm bplib_eid bplib_rbt
- )
- 
-+separate_arguments(RIOT_INCLUDES)
-+
- foreach(COMPONENT ${BPLIB_COMPONENTS})
-   list(APPEND BPLIB_SRC 
-     $<TARGET_OBJECTS:${COMPONENT}>
-@@ -111,6 +113,10 @@ foreach(COMPONENT ${BPLIB_COMPONENTS})
-     $<TARGET_PROPERTY:${COMPONENT},INTERFACE_INCLUDE_DIRECTORIES>
-   )
- 
-+  # RIOT includes
-+  target_include_directories(${COMPONENT} SYSTEM PRIVATE
-+      ${RIOT_INCLUDES}
-+  )
- endforeach()
- 
- # If building as part of CFE/CFS, then the "IS_CFS_ARCH_BUILD" should be set
-@@ -176,8 +182,8 @@ else()
- 
-   endif()
- 
--  # Build bpcat always
--  add_subdirectory(app)
-+  # Build bpcat always, just not for RIOT :D
-+  # add_subdirectory(app)
- 
- endif()
- 
-@@ -230,5 +236,5 @@ if (BPLIB_ENABLE_UNIT_TESTS)
- endif (BPLIB_ENABLE_UNIT_TESTS)
- 
- # Prepare the BPLib Doxygen build.
--set(BPLIB_API_INCLUDE_DIRECTORIES ${BPLIB_COMPONENT_INCLUDE_DIRS})
--add_subdirectory(docs/doc-src)
-+# set(BPLIB_API_INCLUDE_DIRECTORIES ${BPLIB_COMPONENT_INCLUDE_DIRS})
-+# add_subdirectory(docs/doc-src)
 diff --git a/aa/as/src/bplib_as_internal.c b/aa/as/src/bplib_as_internal.c
-index c2347dfc..21f1df0d 100644
+index ffc5f4d2..ca30744b 100644
 --- a/aa/as/src/bplib_as_internal.c
 +++ b/aa/as/src/bplib_as_internal.c
-@@ -37,7 +37,7 @@ BPLib_NodeMibReportsHkTlm_Payload_t    BPLib_AS_NodeReportsPayload;    /** \brie
+@@ -38,7 +38,7 @@ BPLib_NodeMibReportsHkTlm_Payload_t    BPLib_AS_NodeReportsPayload;    /** \brie
  /* =============== */
  /* Mutex Variables */
  /* =============== */
@@ -85,7 +48,7 @@ index c2347dfc..21f1df0d 100644
  BPLib_TIME_MonotonicTime_t InitTime;    /** \brief Time the node was initialized */
  
  /* ==================== */
-@@ -98,55 +98,21 @@ BPLib_Status_t BPLib_AS_SetCounter(BPLib_EID_t EID, BPLib_AS_Counter_t Counter,
+@@ -99,55 +99,21 @@ BPLib_Status_t BPLib_AS_SetCounter(BPLib_EID_t EID, BPLib_AS_Counter_t Counter,
  
  BPLib_Status_t BPLib_AS_InitMutex(void)
  {
@@ -147,7 +110,7 @@ index c2347dfc..21f1df0d 100644
  
  /* Initialize the static MIB reports telemetry values */
 diff --git a/aa/as/src/bplib_as_internal.h b/aa/as/src/bplib_as_internal.h
-index 18c46134..c016f8a3 100644
+index cb030e5c..683f9f52 100644
 --- a/aa/as/src/bplib_as_internal.h
 +++ b/aa/as/src/bplib_as_internal.h
 @@ -28,7 +28,7 @@
@@ -197,6 +160,32 @@ index 2fe65fff..3e5c7a19 100644
      int ReaderCnt;                 /**< Number of active readers */
      int WriterCnt;               /**< Number of active writers */
  } BPLib_NC_RWLock_t;
+diff --git a/aa/nc/src/bplib_nc.c b/aa/nc/src/bplib_nc.c
+index 8eea6f34..ba533f6b 100644
+--- a/aa/nc/src/bplib_nc.c
++++ b/aa/nc/src/bplib_nc.c
+@@ -147,14 +147,13 @@ BPLib_Status_t BPLib_NC_Init(BPLib_NC_ConfigPtrs_t* ConfigPtrs, void* Callbacks,
+     /* Without modifying the TIME module, this was unable to work in BPCat. The
+     ** TIME and AS module's use of OSAL needs to be abstracted because no data is
+     ** being put into BPLib by BPCat */
+-    #ifdef CFS_BUILD
+-        /* Initialize time */
+-        Status = BPLib_TIME_Init();
+-        if (Status != BPLIB_SUCCESS)
+-        { /* Failed initialization of TIME */
+-            return BPLIB_NC_TIME_INIT_ERR;
+-        }
+-    #endif
++    /* This should work on RIOT */
++    /* Initialize time */
++    Status = BPLib_TIME_Init();
++    if (Status != BPLIB_SUCCESS)
++    { /* Failed initialization of TIME */
++        return BPLIB_NC_TIME_INIT_ERR;
++    }
+ 
+     /* Initialize NC */
+     Status = BPLib_NC_InitImpl(Instance, ConfigPtrs);
 diff --git a/aa/nc/src/bplib_nc_rwlock.c b/aa/nc/src/bplib_nc_rwlock.c
 index fa8b3533..309defde 100644
 --- a/aa/nc/src/bplib_nc_rwlock.c
@@ -322,59 +311,291 @@ index fa8b3533..309defde 100644
 -    pthread_mutex_unlock(&RWLock->Lock);
 +    mutex_unlock(&RWLock->Lock);
  }
-diff --git a/bpa/stor/CMakeLists.txt b/bpa/stor/CMakeLists.txt
-index 3a5e7ecc..6732e106 100644
---- a/bpa/stor/CMakeLists.txt
-+++ b/bpa/stor/CMakeLists.txt
-@@ -6,12 +6,11 @@
- #
- ##################################################################
+diff --git a/bpa/ct/inc/bplib_ct.h b/bpa/ct/inc/bplib_ct.h
+index c8302eee..e3d1c199 100644
+--- a/bpa/ct/inc/bplib_ct.h
++++ b/bpa/ct/inc/bplib_ct.h
+@@ -28,7 +28,7 @@
+ #include "bplib_api_types.h"
+ #include "bplib_rbt.h"
+ #include "bplib_bblocks.h"
+-#include <pthread.h>
++#include "mutex.h"
+ #include "bplib_cfg.h"
  
-+# We dont want to compile the storage in bplib, that has to be provided by the using application.
-+# However the general buildsystem breaks if the library is not an OBJECT, so I add some c file that
-+# provides a throwaway function which does nothing and should not get linked.
- add_library(bplib_stor OBJECT
--    src/bplib_stor.c
--    src/bplib_stor_sql.c
--    src/bplib_stor_sql_store.c
--    src/bplib_stor_sql_load.c
--    src/bplib_stor_loadbatch.c
-+    src/bplib_stor_cmake.c
- )
+ /*
+@@ -215,7 +215,7 @@ typedef struct
+     BPLib_RBT_Root_t SeqTreeRoot;                               /** \brief An RBT that allows for CTDB queries based on sequence ID/number */
+     BPLib_RBT_Root_t IdTreeRoot;                                /** \brief An RBT that allows for CTDB queries based on bundle ID */
  
- target_include_directories(bplib_stor PUBLIC
+-    pthread_mutex_t Lock;                                     /** \brief Read/write lock on CTDB and open CCSs */
++    mutex_t Lock;                                               /** \brief Read/write lock on CTDB and open CCSs */
+ } BPLib_CT_Context_t;
+ 
+ /*
+diff --git a/bpa/ct/src/bplib_ct.c b/bpa/ct/src/bplib_ct.c
+index dad95607..ecad2366 100644
+--- a/bpa/ct/src/bplib_ct.c
++++ b/bpa/ct/src/bplib_ct.c
+@@ -127,7 +127,7 @@ BPLib_Status_t BPLib_CT_Init(BPLib_Instance_t *Inst)
+ 
+     memset(&(Inst->Ct), 0, sizeof(BPLib_CT_Context_t));
+ 
+-    pthread_mutex_init(&Inst->Ct.Lock, NULL);
++    mutex_init(&Inst->Ct.Lock);
+ 
+     BPLib_RBT_InitRoot(&(Inst->Ct.SeqTreeRoot));
+     BPLib_RBT_InitRoot(&(Inst->Ct.IdTreeRoot));
+@@ -197,7 +197,7 @@ BPLib_Status_t BPLib_CT_ProcessNewBundle(BPLib_Instance_t* Inst, BPLib_Bundle_t
+     /* Default to refused custody */
+     DispCode = BPLib_CT_CustodyRefused;
+ 
+-    pthread_mutex_lock(&Inst->Ct.Lock);
++    mutex_lock(&Inst->Ct.Lock);
+ 
+     /* Reject custody due to lack of storage */
+     /* Check if there's storage left (TotalBytes includes the deserialized bundle) */
+@@ -257,7 +257,7 @@ BPLib_Status_t BPLib_CT_ProcessNewBundle(BPLib_Instance_t* Inst, BPLib_Bundle_t
+         (void) BPLib_CT_SignalCustodyImpl(Inst, Bundle, DispCode, StoreBundle, ExtBlockIdx);
+     }    
+     
+-    pthread_mutex_unlock(&Inst->Ct.Lock);
++    mutex_unlock(&Inst->Ct.Lock);
+ 
+     return Status;
+ }
+@@ -280,10 +280,10 @@ BPLib_Status_t BPLib_CT_SignalCustody(BPLib_Instance_t *Inst, BPLib_Bundle_t *Bu
+         return BPLIB_SUCCESS;
+     }
+ 
+-    pthread_mutex_lock(&Inst->Ct.Lock);
++    mutex_lock(&Inst->Ct.Lock);
+     Status = BPLib_CT_SignalCustodyImpl(Inst, Bundle, DispCode, StoreBundle, ExtBlockIdx);
+ 
+-    pthread_mutex_unlock(&Inst->Ct.Lock);
++    mutex_unlock(&Inst->Ct.Lock);
+ 
+     return Status;
+ }
+@@ -317,7 +317,7 @@ BPLib_Status_t BPLib_CT_UpdateBundle(BPLib_Instance_t* Inst, BPLib_Bundle_t *Bun
+ 
+     CtebPtr = &(Bundle->blocks.ExtBlocks[ExtBlockIdx].BlockData.CustodyBlockData);
+ 
+-    pthread_mutex_lock(&Inst->Ct.Lock);
++    mutex_lock(&Inst->Ct.Lock);
+     
+     Status = BPLib_CT_GetEntryFromCtdbWithId(&(Inst->Ct),
+                         Bundle->blocks.PrimaryBlock.BundleId, &DbEntry);
+@@ -382,7 +382,7 @@ BPLib_Status_t BPLib_CT_UpdateBundle(BPLib_Instance_t* Inst, BPLib_Bundle_t *Bun
+         Bundle->blocks.ExtBlocks[ExtBlockIdx].Header.RequiresEncode = true;
+     }
+ 
+-    pthread_mutex_unlock(&Inst->Ct.Lock);
++    mutex_unlock(&Inst->Ct.Lock);
+ 
+     return Status;
+ }
+@@ -422,7 +422,7 @@ BPLib_Status_t BPLib_CT_ProcessCcs(BPLib_Instance_t *Inst, BPLib_CT_Deserialized
+         }
+     }
+ 
+-    pthread_mutex_unlock(&Inst->Ct.Lock);
++    mutex_unlock(&Inst->Ct.Lock);
+ 
+     return Status;
+ }
+@@ -463,7 +463,7 @@ void BPLib_CT_DeleteBundleFromCtdb(BPLib_Instance_t *Inst, uint32_t BundleId)
+         return;
+     }
+ 
+-    pthread_mutex_lock(&Inst->Ct.Lock);
++    mutex_lock(&Inst->Ct.Lock);
+ 
+     Status = BPLib_CT_GetEntryFromCtdbWithId(&(Inst->Ct), BundleId, &DbEntry);
+     if (Status == BPLIB_SUCCESS)
+@@ -478,14 +478,14 @@ void BPLib_CT_DeleteBundleFromCtdb(BPLib_Instance_t *Inst, uint32_t BundleId)
+                     BundleId, Status);
+     }
+ 
+-    pthread_mutex_unlock(&Inst->Ct.Lock);
++    mutex_unlock(&Inst->Ct.Lock);
+ }
+ 
+ void BPLib_CT_BuildAndSendOpenCcs(BPLib_Instance_t* Instance, BPLib_CT_OpenCcs_t* OpenCcs)
+ {
+-    pthread_mutex_lock(&Instance->Ct.Lock);
++    mutex_lock(&Instance->Ct.Lock);
+     BPLib_CT_BuildAndSendOpenCcs_Impl(Instance, OpenCcs);
+-    pthread_mutex_unlock(&Instance->Ct.Lock);
++    mutex_unlock(&Instance->Ct.Lock);
+ }
+ 
+ void BPLib_CT_CheckCcsTimeout(BPLib_Instance_t* Instance)
+@@ -495,7 +495,7 @@ void BPLib_CT_CheckCcsTimeout(BPLib_Instance_t* Instance)
+     int64_t             TimeOpen;
+     BPLib_CT_OpenCcs_t* OpenCcs;
+ 
+-    pthread_mutex_lock(&Instance->Ct.Lock);
++    mutex_lock(&Instance->Ct.Lock);
+ 
+     Context = &(Instance->Ct);
+     for (OpenCcsIdx = 0; OpenCcsIdx < BPLIB_CT_MAX_OPEN_CCS; OpenCcsIdx++)
+@@ -515,7 +515,7 @@ void BPLib_CT_CheckCcsTimeout(BPLib_Instance_t* Instance)
+         }
+     }
+ 
+-    pthread_mutex_unlock(&Instance->Ct.Lock);
++    mutex_unlock(&Instance->Ct.Lock);
+ }
+ 
+ BPLib_Status_t BPLib_CT_CompleteDelivery(BPLib_Instance_t *Inst, BPLib_Bundle_t *Bundle)
+@@ -536,7 +536,7 @@ BPLib_Status_t BPLib_CT_CompleteDelivery(BPLib_Instance_t *Inst, BPLib_Bundle_t
+         return BPLIB_SUCCESS;
+     }
+ 
+-    pthread_mutex_lock(&Inst->Ct.Lock);
++    mutex_lock(&Inst->Ct.Lock);
+ 
+     /* Mark bundle as transferred */
+     Status = BPLib_CT_GetEntryFromCtdbWithId(&(Inst->Ct), 
+@@ -561,7 +561,7 @@ BPLib_Status_t BPLib_CT_CompleteDelivery(BPLib_Instance_t *Inst, BPLib_Bundle_t
+         Status = BPLIB_SUCCESS;
+     }
+ 
+-    pthread_mutex_unlock(&Inst->Ct.Lock);
++    mutex_unlock(&Inst->Ct.Lock);
+ 
+     return Status;
+ }
+@@ -573,7 +573,7 @@ bool BPLib_CT_TriggerCustodialGarbageCollection(BPLib_Instance_t *Inst)
+     
+     if (Inst != NULL)
+     {
+-        pthread_mutex_lock(&Inst->Ct.Lock);
++        mutex_lock(&Inst->Ct.Lock);
+ 
+         if (Inst->Ct.CurrDbSize == 0)
+         {
+@@ -586,7 +586,7 @@ bool BPLib_CT_TriggerCustodialGarbageCollection(BPLib_Instance_t *Inst)
+             TriggerGC = (BPLIB_CT_DB_MAX_PERCENT_NONCUSTODIAL_ENTRIES <= (uint32_t)(DecimalVal * 100));
+         }
+ 
+-        pthread_mutex_unlock(&Inst->Ct.Lock);
++        mutex_unlock(&Inst->Ct.Lock);
+     }
+ 
+     return TriggerGC;
+diff --git a/bpa/ct/src/bplib_ct_ccs.c b/bpa/ct/src/bplib_ct_ccs.c
+index a7505d2c..d19ed1a3 100644
+--- a/bpa/ct/src/bplib_ct_ccs.c
++++ b/bpa/ct/src/bplib_ct_ccs.c
+@@ -389,7 +389,7 @@ BPLib_Status_t BPLib_CT_ProcessBundleSeqCollection(BPLib_Instance_t *Inst,
+     ** locks at the same time introduces the potential for deadlocks. Each thread should
+     ** only ever have one of each lock at a time.
+     */
+-    pthread_mutex_lock(&Inst->Ct.Lock);
++    mutex_lock(&Inst->Ct.Lock);
+ 
+     for (SeqRangeIdx = 0; SeqRangeIdx < SeqCollection->SeqRangeLen; SeqRangeIdx++)
+     {
+@@ -431,9 +431,9 @@ BPLib_Status_t BPLib_CT_ProcessBundleSeqCollection(BPLib_Instance_t *Inst,
+                     DbEntry->State = BPLib_CT_Transferred;
+ 
+                     /* Request bundle deletion from storage */
+-                    pthread_mutex_unlock(&Inst->Ct.Lock);
++                    mutex_unlock(&Inst->Ct.Lock);
+                     BPLib_STOR_AddToCustodialUpdateBatch(Inst, BundleId, BPLIB_CT_MARK_DELETE);
+-                    pthread_mutex_lock(&Inst->Ct.Lock);
++                    mutex_lock(&Inst->Ct.Lock);
+ 
+                     BPLib_AS_Increment(BPLIB_EID_INSTANCE, BUNDLE_COUNT_CUSTODY_TRANSFERRED, 1);
+                 }
+@@ -441,9 +441,9 @@ BPLib_Status_t BPLib_CT_ProcessBundleSeqCollection(BPLib_Instance_t *Inst,
+                 else
+                 {
+                     /* Request storage turn retransmit timer off */
+-                    pthread_mutex_unlock(&Inst->Ct.Lock);
++                    mutex_unlock(&Inst->Ct.Lock);
+                     BPLib_STOR_AddToCustodialUpdateBatch(Inst, BundleId, BPLIB_CT_STOP_RETRANSMIT);
+-                    pthread_mutex_lock(&Inst->Ct.Lock);
++                    mutex_lock(&Inst->Ct.Lock);
+ 
+                     BPLib_AS_Increment(BPLIB_EID_INSTANCE, BUNDLE_COUNT_CUSTODY_REJECTED, 1);
+                 }
+@@ -454,9 +454,9 @@ BPLib_Status_t BPLib_CT_ProcessBundleSeqCollection(BPLib_Instance_t *Inst,
+                 BundleId = DbEntry->BundleId;
+ 
+                 /* Request bundle retransmission from storage */
+-                pthread_mutex_unlock(&Inst->Ct.Lock);
++                mutex_unlock(&Inst->Ct.Lock);
+                 BPLib_STOR_AddToCustodialUpdateBatch(Inst, BundleId, BPLIB_CT_START_RETRANSMIT);
+-                pthread_mutex_lock(&Inst->Ct.Lock);
++                mutex_lock(&Inst->Ct.Lock);
+             }
+         }
+ 
+@@ -488,7 +488,7 @@ BPLib_Status_t BPLib_CT_ProcessBundleSeqCollection(BPLib_Instance_t *Inst,
+         CurrSeqNum += SeqCollection->SeqRange[SeqRangeIdx];
+     }
+ 
+-    pthread_mutex_unlock(&Inst->Ct.Lock);
++    mutex_unlock(&Inst->Ct.Lock);
+ 
+     /* Do remaining batch of storage operations */
+     BPLib_STOR_UpdateCustodialBundles(Inst);
+diff --git a/bpa/pi/src/bplib_pi.c b/bpa/pi/src/bplib_pi.c
+index b994e655..544415d7 100644
+--- a/bpa/pi/src/bplib_pi.c
++++ b/bpa/pi/src/bplib_pi.c
+@@ -299,7 +299,7 @@ BPLib_Status_t BPLib_PI_RemoveApplication(BPLib_Instance_t *Inst, uint32_t ChanI
+     }
+ 
+     /* Clear relevant load batch. Ignore return code since we've already done a null check */
+-    (void) BPLib_STOR_LoadBatch_Reset(&Inst->BundleStorage.ChannelLoadBatches[ChanId]);
++    //(void) BPLib_STOR_LoadBatch_Reset(&Inst->BundleStorage.ChannelLoadBatches[ChanId]);
+ 
+     /* Reset sequence number */
+     Inst->ChanCtxt[ChanId].SequenceNum = 0;
 diff --git a/bpa/stor/inc/bplib_stor.h b/bpa/stor/inc/bplib_stor.h
-index 0c7e8b25..1db8fd03 100644
+index 52f30e5d..93a39c3c 100644
 --- a/bpa/stor/inc/bplib_stor.h
 +++ b/bpa/stor/inc/bplib_stor.h
-@@ -29,9 +29,6 @@
+@@ -29,8 +29,6 @@
  #include "bplib_cfg.h"
  #include "bplib_eid.h"
  #include "bplib_mem.h"
 -#include "bplib_stor_loadbatch.h"
--
--#include <sqlite3.h>
+-#include "bplib_stor_sql.h"
+ #include "bplib_ct.h"
  
- #ifndef BPLIB_STOR_INSERTBATCHSIZE
- #define BPLIB_STOR_INSERTBATCHSIZE 100
-@@ -43,12 +40,13 @@
+ /* ====== */
+@@ -42,7 +40,7 @@
+ #endif
+ 
+ #ifndef BPLIB_STOR_DISCARDBATCHSIZE
+-#define BPLIB_STOR_DISCARDBATCHSIZE 25000
++#define BPLIB_STOR_DISCARDBATCHSIZE 64
+ #endif
+ 
+ /* We conditionally allow this to be defined by a compile time variable
+@@ -76,13 +74,13 @@ typedef struct
  
  struct BPLib_BundleCache
  {
--    pthread_mutex_t lock;
--    sqlite3* db;
+-    pthread_mutex_t        lock;
+-    sqlite3*               db;
 +    mutex_t lock;
-     BPLib_Bundle_t* InsertBatch[BPLIB_STOR_INSERTBATCHSIZE];
-     size_t InsertBatchSize;
+     int64_t                BundleRowsToDelete[BPLIB_STOR_DISCARDBATCHSIZE];
+     BPLib_Bundle_t*        InsertBatch[BPLIB_STOR_INSERTBATCHSIZE];
+     size_t                 InsertBatchSize;
 -    BPLib_STOR_LoadBatch_t ChannelLoadBatches[BPLIB_MAX_NUM_CHANNELS];
 -    BPLib_STOR_LoadBatch_t ContactLoadBatches[BPLIB_MAX_NUM_CONTACTS];
-+    /* The load batches are removed for RIOT because they are very implementation dependent
++    /* The load batches are removed for RIOT because they are very implementation dependent.
 +     * Loading the numbers (which iirc were the row numbers in the blob table) does not really
-+     * help if the actual storage implementation uses some other indexing / storage medium.
-+    **/
- 
-     /* Storage-related MIB reports */
-     uint32_t BundleCountStored;
++     * help if the actual storage implementation uses some other indexing / storage medium. */
+     BPLib_STOR_CtUpdateBatch_t CustodyUpdateBatch;
+     int64_t                LastActiveTime;
+     size_t                 BundleCountNotEgressed;  /* Number of bundles in storage that have not been marked as egressed */
 diff --git a/bpa/stor/src/bplib_stor_cmake.c b/bpa/stor/src/bplib_stor_cmake.c
 new file mode 100644
 index 00000000..e4d36e61
@@ -386,41 +607,43 @@ index 00000000..e4d36e61
 +}
 \ No newline at end of file
 diff --git a/ci/mem/inc/bplib_mem.h b/ci/mem/inc/bplib_mem.h
-index 192bcdab..a6ab489e 100644
+index 78c4594f..bd40125c 100644
 --- a/ci/mem/inc/bplib_mem.h
 +++ b/ci/mem/inc/bplib_mem.h
-@@ -24,7 +24,7 @@
- #include "bplib_ben_allocator.h"
- #include "bplib_bblocks.h"
+@@ -27,7 +27,7 @@
+ #include "bplib_ct.h"
+ #include "bplib_arp.h"
  
 -#include <pthread.h>
 +#include "mutex.h"
  
- /**
-  ** \brief Defines the size of a memory block user data if used as a bytearray
-@@ -78,7 +78,7 @@ struct BPLib_MEM_Block
+ 
+ /*
+@@ -125,8 +125,8 @@ struct BPLib_MEM_Block
  typedef struct BPLib_MEM_Pool
  {
      BPLib_MEM_PoolImpl_t impl; /**< The pool implementation (details hidden) */
 -    pthread_mutex_t lock; /**< Mutex for synchronizing access to the pool */
+-    size_t         HighWaterMark;   /** \brief Highwater memory mark */
 +    mutex_t lock; /**< Mutex for synchronizing access to the pool */
++    size_t HighWaterMark;   /** \brief Highwater memory mark */
  } BPLib_MEM_Pool_t;
  
- /**
+ 
 diff --git a/ci/mem/src/bplib_mem.c b/ci/mem/src/bplib_mem.c
-index c94f75f2..43179aa2 100644
+index 80a00c4a..1ae1f826 100644
 --- a/ci/mem/src/bplib_mem.c
 +++ b/ci/mem/src/bplib_mem.c
-@@ -39,7 +39,7 @@ BPLib_Status_t BPLib_MEM_PoolInit(BPLib_MEM_Pool_t* pool, void* init_mem, size_t
-     }
- 
+@@ -56,7 +56,7 @@ BPLib_Status_t BPLib_MEM_PoolInit(BPLib_MEM_Pool_t* pool, void* init_mem, size_t
      memset(pool, 0, sizeof(BPLib_MEM_Pool_t));
+     memset(init_mem, 0, sizeof(init_size));
+ 
 -    pthread_mutex_init(&pool->lock, NULL);
 +    mutex_init(&pool->lock);
+     
      return BPLib_MEM_PoolImplInit(&pool->impl, init_mem, init_size,
          sizeof(BPLib_MEM_Block_t));
- }
-@@ -51,7 +51,6 @@ void BPLib_MEM_PoolDestroy(BPLib_MEM_Pool_t* pool)
+@@ -69,7 +69,6 @@ void BPLib_MEM_PoolDestroy(BPLib_MEM_Pool_t* pool)
          return;
      }
  
@@ -428,19 +651,28 @@ index c94f75f2..43179aa2 100644
      BPLib_MEM_PoolImplDestroy(&pool->impl);
      memset(pool, 0, sizeof(BPLib_MEM_Pool_t));
  }
-@@ -65,9 +64,9 @@ BPLib_MEM_Block_t* BPLib_MEM_BlockAlloc(BPLib_MEM_Pool_t* pool)
+@@ -83,10 +82,8 @@ BPLib_MEM_Block_t* BPLib_MEM_BlockAlloc(BPLib_MEM_Pool_t* pool, size_t Size)
          return NULL;
      }
  
 -    pthread_mutex_lock(&pool->lock);
+-    
 +    mutex_lock(&pool->lock);
-     block = (BPLib_MEM_Block_t*)(BPLib_MEM_PoolImplAlloc(&pool->impl));
--    pthread_mutex_unlock(&pool->lock);
-+    mutex_unlock(&pool->lock);
+     block = (BPLib_MEM_Block_t*)(BPLib_MEM_PoolImplAlloc(&pool->impl, Size));
+-
      if (block != NULL)
      {
          block->used_len = 0;
-@@ -83,9 +82,9 @@ void BPLib_MEM_BlockFree(BPLib_MEM_Pool_t* pool, BPLib_MEM_Block_t* block)
+@@ -98,7 +95,7 @@ BPLib_MEM_Block_t* BPLib_MEM_BlockAlloc(BPLib_MEM_Pool_t* pool, size_t Size)
+         }
+     }
+ 
+-    pthread_mutex_unlock(&pool->lock);
++    mutex_unlock(&pool->lock);
+ 
+     return block;
+ }
+@@ -110,9 +107,9 @@ void BPLib_MEM_BlockFree(BPLib_MEM_Pool_t* pool, BPLib_MEM_Block_t* block)
          return;
      }
  
@@ -451,31 +683,22 @@ index c94f75f2..43179aa2 100644
 +    mutex_unlock(&pool->lock);
  }
  
- BPLib_MEM_Block_t* BPLib_MEM_BlockListAlloc(BPLib_MEM_Pool_t* pool, size_t byte_len)
+ BPLib_MEM_Block_t* BPLib_MEM_BlockListAlloc(BPLib_MEM_Pool_t* pool, size_t byte_len, size_t BlockSize)
 diff --git a/ci/qm/inc/bplib_qm.h b/ci/qm/inc/bplib_qm.h
-index e198a4c5..69a277df 100644
+index 2803a190..562c2f2d 100644
 --- a/ci/qm/inc/bplib_qm.h
 +++ b/ci/qm/inc/bplib_qm.h
-@@ -28,6 +28,8 @@
- #include "bplib_cfg.h"
- #include "bplib_stor.h"
+@@ -28,7 +28,7 @@
+ #define QM_STANDARD_WAIT    100L /**< Standard wait of 100msec */
+ #define QM_NO_WAIT          0L   /**< Constant representing no wait */
+ #define QM_WAIT_FOREVER    -1L   /**< Constant representing an indefinite wait */
+-#define QM_MAX_GEN_WORKERS  8L   /**< Constant representing maximum allowed generic workers */
++#define QM_MAX_GEN_WORKERS  1L   /**< Constant representing maximum allowed generic workers */
  
-+#include "mutex.h"
-+
- #define QM_NO_WAIT          0L  /**< Constant representing no wait */
- #define QM_WAIT_FOREVER    -1L /**< Constant representing an indefinite wait */
- #define QM_MAX_GEN_WORKERS  8L /**< Constant representing maximum allowed generic workers */
-@@ -53,7 +55,7 @@ struct BPLib_Instance
-     BPLib_MEM_Pool_t pool; /**< Memory pool for this BPLib Instance */
- 
-     /* Worker Management */
--    pthread_mutex_t RegisteredWorkersLock; // Move to bplib_os
-+    mutex_t RegisteredWorkersLock; // Move to bplib_os
-     BPLib_QM_WorkerState_t RegisteredWorkers[QM_MAX_GEN_WORKERS];
-     size_t NumWorkers;
- 
+ typedef struct BPLib_QM_WorkerState
+ {
 diff --git a/ci/qm/inc/bplib_qm_waitqueue.h b/ci/qm/inc/bplib_qm_waitqueue.h
-index 70027ff3..203ef63b 100644
+index 0934f083..62d65ba1 100644
 --- a/ci/qm/inc/bplib_qm_waitqueue.h
 +++ b/ci/qm/inc/bplib_qm_waitqueue.h
 @@ -29,7 +29,8 @@
@@ -502,10 +725,10 @@ index 70027ff3..203ef63b 100644
  
  /**
 diff --git a/ci/qm/src/bplib_qm.c b/ci/qm/src/bplib_qm.c
-index effec911..6e90fcc5 100644
+index 9f2252ea..8cc9f531 100644
 --- a/ci/qm/src/bplib_qm.c
 +++ b/ci/qm/src/bplib_qm.c
-@@ -41,10 +41,7 @@ BPLib_Status_t BPLib_QM_QueueTableInit(BPLib_Instance_t* inst, size_t MaxJobs)
+@@ -42,10 +42,7 @@ BPLib_Status_t BPLib_QM_QueueTableInit(BPLib_Instance_t* inst, size_t MaxJobs)
      }
  
      /* Initialize worker registration state */
@@ -517,7 +740,7 @@ index effec911..6e90fcc5 100644
  
      /* Init Cache */
      Status = BPLib_STOR_Init(inst);
-@@ -109,7 +106,6 @@ void BPLib_QM_QueueTableDestroy(BPLib_Instance_t* inst)
+@@ -112,7 +109,6 @@ void BPLib_QM_QueueTableDestroy(BPLib_Instance_t* inst)
      }
  
      /* Worker State Cleanup */
@@ -525,7 +748,7 @@ index effec911..6e90fcc5 100644
      inst->NumWorkers = 0;
  
      /* Queue Cleanup */
-@@ -136,7 +132,7 @@ BPLib_Status_t BPLib_QM_RegisterWorker(BPLib_Instance_t* inst, int32_t* WorkerID
+@@ -143,7 +139,7 @@ BPLib_Status_t BPLib_QM_RegisterWorker(BPLib_Instance_t* inst, int32_t* WorkerID
          return BPLIB_NULL_PTR_ERROR;
      }
  
@@ -534,7 +757,7 @@ index effec911..6e90fcc5 100644
      if (inst->NumWorkers == QM_MAX_GEN_WORKERS)
      {
          *WorkerID = -1;
-@@ -149,7 +145,7 @@ BPLib_Status_t BPLib_QM_RegisterWorker(BPLib_Instance_t* inst, int32_t* WorkerID
+@@ -156,7 +152,7 @@ BPLib_Status_t BPLib_QM_RegisterWorker(BPLib_Instance_t* inst, int32_t* WorkerID
          *WorkerID = NewWorkerID;
          Status = BPLIB_SUCCESS;
      }
@@ -543,36 +766,32 @@ index effec911..6e90fcc5 100644
  
      return Status;
  }
-@@ -313,8 +309,9 @@ BPLib_Status_t BPLib_QM_DuctPull(BPLib_Instance_t* Inst, uint32_t EgressID, bool
-             */
-             Status = BPLIB_TIMEOUT;
-         }
--
--        return Status;
-+        /* Dont do what the comment above says. Since we dont use the loadbatches (at least
-+         * not by default, because that uses quite a bit of RAM and traffic is probably rather
-+         * low). Instead just continue with the egress after this point */
-     }
- 
-     /* Pull the bundle from the queue and push it to the 'edge' of BPA 
 diff --git a/ci/qm/src/bplib_qm_waitqueue.c b/ci/qm/src/bplib_qm_waitqueue.c
-index a699d696..06a8f09f 100644
+index bb5061ef..5fb883b7 100644
 --- a/ci/qm/src/bplib_qm_waitqueue.c
 +++ b/ci/qm/src/bplib_qm_waitqueue.c
-@@ -27,19 +27,7 @@
+@@ -26,27 +26,8 @@
+ 
  #include <errno.h>
  #include <stdio.h>
+-#include "osapi.h"
  
 -static void ms_to_abstimeout(uint32_t ms, struct timespec *ts)
 -{
+-    int64_t AbsTimeoutInMsec;
+-    OS_time_t time;
+-
 -    if (ts == NULL)
 -    {
 -        return;
 -    }
 -
--    clock_gettime(CLOCK_REALTIME, ts);
--    ts->tv_sec += ms / 1000;
--    ts->tv_nsec += (ms % 1000 * 1000000);
+-    /* This is super cleugy but it gets rid of our clock_gettime dependency for now */
+-    OS_GetLocalTime(&time);
+-    AbsTimeoutInMsec = (time.ticks / OS_TIME_TICKS_PER_MSEC) + ms;
+-
+-    ts->tv_sec = AbsTimeoutInMsec / 1000;
+-    ts->tv_nsec = (AbsTimeoutInMsec % 1000 * 1000000);
 -    ts->tv_sec += ts->tv_nsec / 1000000000;
 -    ts->tv_nsec %= 1000000000;
 -}
@@ -580,7 +799,7 @@ index a699d696..06a8f09f 100644
  
  /*******************************************************************************
  * Exported Functions
-@@ -65,9 +53,9 @@ bool BPLib_QM_WaitQueueInit(BPLib_QM_WaitQueue_t* q, size_t el_size, size_t capa
+@@ -72,9 +53,9 @@ bool BPLib_QM_WaitQueueInit(BPLib_QM_WaitQueue_t* q, size_t el_size, size_t capa
      }
  
      // TODO: move to bplib_OS module
@@ -593,7 +812,7 @@ index a699d696..06a8f09f 100644
      return true;
  }
  
-@@ -87,14 +75,13 @@ void BPLib_QM_WaitQueueDestroy(BPLib_QM_WaitQueue_t* q)
+@@ -94,14 +75,13 @@ void BPLib_QM_WaitQueueDestroy(BPLib_QM_WaitQueue_t* q)
      q->size = 0;
  
      // TODO: move to bplib_OS module
@@ -611,7 +830,7 @@ index a699d696..06a8f09f 100644
      int rc;
  
      if ((q == NULL) || (item == NULL))
-@@ -102,78 +89,63 @@ bool BPLib_QM_WaitQueueTryPush(BPLib_QM_WaitQueue_t* q, const void* item, int ti
+@@ -109,78 +89,63 @@ bool BPLib_QM_WaitQueueTryPush(BPLib_QM_WaitQueue_t* q, const void* item, int ti
          return false;
      }
  
@@ -633,7 +852,7 @@ index a699d696..06a8f09f 100644
 -            return false;
 +    rc = sema_wait_timed_ztimer(&q->s_slots, ZTIMER_MSEC, timeout_ms);
 +    if (rc != 0) {
-+        if (rc != -ETIMEDOUT) {
++        if (rc != -ETIMEDOUT && rc != -EAGAIN) {
 +            printf(" BPLib_QM_WaitQueueTryPush NON-TIMEOUT ERROR: %s\n", strerror(rc));
          }
 +        return false;
@@ -688,7 +907,7 @@ index a699d696..06a8f09f 100644
 -            return false;
 +    rc = sema_wait_timed_ztimer(&q->s_items, ZTIMER_MSEC, timeout_ms);
 +    if (rc != 0) {
-+        if (rc != -ETIMEDOUT) {
++        if (rc != -ETIMEDOUT && rc != -EAGAIN) {
 +            printf(" BPLib_QM_WaitQueueTryPull NON-TIMEOUT ERROR: %s\n", strerror(rc));
          }
 +        return false;
@@ -714,7 +933,7 @@ index a699d696..06a8f09f 100644
  
      return true;
  }
-@@ -187,9 +159,9 @@ bool BPLib_QM_WaitQueueIsEmpty(BPLib_QM_WaitQueue_t* q)
+@@ -194,9 +159,9 @@ bool BPLib_QM_WaitQueueIsEmpty(BPLib_QM_WaitQueue_t* q)
          return false;
      }
  
@@ -725,6 +944,18 @@ index a699d696..06a8f09f 100644
 +    mutex_unlock(&q->lock);
  
      return IsEmpty;
+ }
+@@ -210,9 +175,9 @@ bool BPLib_QM_WaitQueueIsFull(BPLib_QM_WaitQueue_t* q)
+         return false;
+     }
+ 
+-    pthread_mutex_lock(&q->lock);
++    mutex_lock(&q->lock);
+     IsFull = (q->size == q->capacity);
+-    pthread_mutex_unlock(&q->lock);
++    mutex_unlock(&q->lock);
+ 
+     return IsFull;
  }
 diff --git a/ci/time/inc/bplib_time.h b/ci/time/inc/bplib_time.h
 index 5e274ec8..b576ea03 100644
@@ -865,6 +1096,40 @@ index e07bf184..481caf4f 100644
      BPLib_TIME_InitState_t InitState;   /**< \brief Initialization state of TIME */
      BPLib_TIME_FileData_t TimeData;     /**< \brief Local copy of time file data */
  } BPLib_TIME_GlobalData_t;
+diff --git a/cla/src/bplib_cla.c b/cla/src/bplib_cla.c
+index f78c2782..277f4119 100644
+--- a/cla/src/bplib_cla.c
++++ b/cla/src/bplib_cla.c
+@@ -443,7 +443,7 @@ BPLib_Status_t BPLib_CLA_ContactTeardown(BPLib_Instance_t *Inst, uint32_t Contac
+     }
+ 
+     /* Clear relevant load batch. Ignore return code since we've already done a null check */
+-    (void) BPLib_STOR_LoadBatch_Reset(&Inst->BundleStorage.ContactLoadBatches[ContactId]);
++    //(void) BPLib_STOR_LoadBatch_Reset(&Inst->BundleStorage.ContactLoadBatches[ContactId]);
+ 
+     /* Do any framework-specific operations */
+     BPLib_FWP_ProxyCallbacks.BPA_CLAP_ContactTeardown(ContactId);
+diff --git a/inc/bplib_inst.h b/inc/bplib_inst.h
+index 065d0d9f..ca220120 100644
+--- a/inc/bplib_inst.h
++++ b/inc/bplib_inst.h
+@@ -30,6 +30,7 @@
+ #include "bplib_stor.h"
+ #include "bplib_pi.h"
+ 
++#include "mutex.h"
+ 
+ /*
+ ** Types
+@@ -48,7 +49,7 @@ struct BPLib_Instance
+     BPLib_MEM_Pool_t pool; /**< Memory pool for this BPLib Instance */
+ 
+     /* Worker Management */
+-    pthread_mutex_t RegisteredWorkersLock; // Move to bplib_os
++    mutex_t RegisteredWorkersLock; // Move to bplib_os
+     BPLib_QM_WorkerState_t RegisteredWorkers[QM_MAX_GEN_WORKERS];
+     size_t NumWorkers;
+ 
 diff --git a/version/src/bplib_version.c b/version/src/bplib_version.c
 index a038c10a..0597efc2 100644
 --- a/version/src/bplib_version.c
