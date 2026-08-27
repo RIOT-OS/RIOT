@@ -40,17 +40,7 @@ extern "C" {
  */
 #ifdef DEVELHELP
 #include "cpu_conf.h"
-#define DEBUG_PRINT(...) \
-    do { \
-        if ((thread_get_active() == NULL) || \
-            (thread_get_active()->stack_size >= \
-             THREAD_EXTRA_STACKSIZE_PRINTF)) { \
-            printf(__VA_ARGS__); \
-        } \
-        else { \
-            puts("Cannot debug, stack too small. Consider using DEBUG_PUTS()."); \
-        } \
-    } while (0)
+#define DEBUG_PRINT(...) do { printf(__VA_ARGS__); } while (0)
 #else
 #define DEBUG_PRINT(...) printf(__VA_ARGS__)
 #endif
