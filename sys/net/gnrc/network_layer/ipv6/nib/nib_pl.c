@@ -25,6 +25,9 @@
 
 #include "_nib-internal.h"
 #include "_nib-router.h"
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+#include "_nib-slaac.h"
+#endif
 
 int gnrc_ipv6_nib_pl_set(unsigned iface,
                          const ipv6_addr_t *pfx, unsigned pfx_len,
@@ -119,6 +122,23 @@ void gnrc_ipv6_nib_pl_del(unsigned iface,
     }
     _nib_release();
 }
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+bool gnrc_ipv6_nib_pl_has_prefix(const unsigned int iface, const ipv6_addr_t *pfx,
+                                 const uint8_t pfx_len)
+{
+    void *state = NULL;
+    gnrc_ipv6_nib_pl_t ple;
+
+    while (gnrc_ipv6_nib_pl_iter(iface, &state, &ple)) {
+        if (ple.pfx_len == pfx_len
+            && ipv6_addr_match_prefix(&ple.pfx, pfx) >= pfx_len) {
+            return true;
+        }
+    }
+    return false;
+}
+#endif
 
 bool gnrc_ipv6_nib_pl_iter(unsigned iface, void **state,
                            gnrc_ipv6_nib_pl_t *entry)
