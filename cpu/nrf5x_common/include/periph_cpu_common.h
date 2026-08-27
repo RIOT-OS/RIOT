@@ -604,14 +604,6 @@ typedef struct {
 #define PERIPH_I2C_NEED_READ_REG
 #define PERIPH_I2C_NEED_WRITE_REG
 /** @} */
-
-/**
- * @name    Define macros for sda and scl pin to be able to reinitialize them
- * @{
- */
-#define i2c_pin_sda(dev) i2c_config[dev].sda    /**< Macro for getting SDA pin */
-#define i2c_pin_scl(dev) i2c_config[dev].scl    /**< Macro for getting SCL pin */
-/** @} */
 #endif /* ndef CPU_NRF51 */
 
 #ifdef __cplusplus
