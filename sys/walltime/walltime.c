@@ -30,7 +30,7 @@
 #include "debug.h"
 
 #ifndef AUTO_INIT_PRIO_MOD_WALLTIME
-#define AUTO_INIT_PRIO_MOD_WALLTIME    AUTO_INIT_PRIO_WDT_EVENT
+#  define AUTO_INIT_PRIO_MOD_WALLTIME  AUTO_INIT_PRIO_WDT_EVENT
 #endif
 
 static uint32_t _boottime;
