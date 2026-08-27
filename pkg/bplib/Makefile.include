@@ -32,6 +32,9 @@ INCLUDES += -isystem$(PKGDIRBASE)/bplib/version/inc
 # Used for config file with modified defaults
 INCLUDES += -I$(RIOTPKG)/bplib/include
 
+# Used to select the used storage backend
+CFLAGS += -DBPLIB_MEM_BEN_IMPL=1
+
 # -------------------- Abstraction Layer Modules -------------------------------
 INCLUDES += -I$(RIOTPKG)/bplib/fwp/include
 INCLUDES += -I$(RIOTPKG)/bplib/nc/include

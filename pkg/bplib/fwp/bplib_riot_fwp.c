@@ -91,6 +91,11 @@ static void BPA_PERFLOGP_Exit(uint32_t PerfLogID)
     return;
 }
 
+BPLib_Status_t BPA_TABLEP_TableInit(void)
+{
+    return BPLIB_SUCCESS;
+}
+
 static BPLib_Status_t BPA_TABLEP_TableUpdate(uint8_t TableType, void** TblPtr)
 {
     (void) TableType;
@@ -225,6 +230,7 @@ BPLib_FWP_ProxyCallbacks_t bplib_fwp_callbacks = {
     .BPA_PERFLOGP_Exit = BPA_PERFLOGP_Exit,
 
     /* Table Proxy */
+    .BPA_TABLEP_TableInit = BPA_TABLEP_TableInit,
     .BPA_TABLEP_TableUpdate = BPA_TABLEP_TableUpdate,
 
     /* Event Proxy */
