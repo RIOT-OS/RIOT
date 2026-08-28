@@ -686,7 +686,7 @@ static void at86rf215_handle_common_irq(ieee802154_dev_t *hal)
             bb_irq_mask &= ~BB_IRQ_TXFE;
 
             if (bb_irq_mask & BB_IRQ_RXFS) {
-                DEBUG("[at86rf215] ISR IDLE/RX: → RX_START cb\n");
+                DEBUG("[at86rf215] ISR IDLE/RX: -> RX_START cb\n");
                 bb_irq_mask &= ~BB_IRQ_RXFS;
                 dev->state = AT86RF215_STATE_RX_START;
                 if (hal->cb) {
@@ -712,12 +712,12 @@ static void at86rf215_handle_common_irq(ieee802154_dev_t *hal)
             fcf0 = at86rf215_reg_read(dev, dev->BBC->RG_FBRXS);
 
             if (fcf0 & IEEE802154_FCF_ACK_REQ && (dev->auto_mode == AT86RF215_AM_AUTO_ACK)) {
-                DEBUG("[at86rf215] ISR IDLE/RX: RX_ACK_REQ set → RX_SEND_ACK\n");
+                DEBUG("[at86rf215] ISR IDLE/RX: RX_ACK_REQ set -> RX_SEND_ACK\n");
                 dev->state = AT86RF215_STATE_RX_SEND_ACK;
                 break;
             }
 
-            DEBUG("[at86rf215] ISR IDLE/RX: no ACK_REQ → RX_DONE cb\n");
+            DEBUG("[at86rf215] ISR IDLE/RX: no ACK_REQ -> RX_DONE cb\n");
             _handle_txrx_done(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
             break;
 
@@ -730,14 +730,14 @@ static void at86rf215_handle_common_irq(ieee802154_dev_t *hal)
             }
 
             bb_irq_mask &= ~BB_IRQ_TXFE;
-            DEBUG("[at86rf215] ISR RX_SEND_ACK: TXFE (ACK sent) → RX_DONE cb\n");
+            DEBUG("[at86rf215] ISR RX_SEND_ACK: TXFE (ACK sent) -> RX_DONE cb\n");
             _handle_txrx_done(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
             break;
 
         case AT86RF215_STATE_TX:
             /* start transmitting the frame */
             if (rf_irq_mask & RF_IRQ_TRXRDY) {
-                DEBUG("[at86rf215] ISR: TX_PENDING + TRXRDY → starting TX\n");
+                DEBUG("[at86rf215] ISR: TX_PENDING + TRXRDY -> starting TX\n");
 #ifdef MODULE_IEEE802154_PHY_MR_FSK
                 /* send long preamble in TX */
                 if (dev->fsk_pl) {
@@ -777,7 +777,7 @@ static void at86rf215_handle_common_irq(ieee802154_dev_t *hal)
 
             bb_irq_mask &= ~BB_IRQ_RXFE;
 
-            DEBUG("[at86rf215] TX_WAIT_ACK: ack recv → rx_done_cb\n");
+            DEBUG("[at86rf215] TX_WAIT_ACK: ack recv -> rx_done_cb\n");
             _handle_txrx_done(hal, IEEE802154_RADIO_INDICATION_RX_DONE);
             break;
 

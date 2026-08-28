@@ -82,7 +82,7 @@ if (!IS_ACTIVE(CONFIG_AT86RF215_USE_CLOCK_OUTPUT)){
 
 void at86rf215_tx_done(at86rf215_t *dev)
 {
-    /* re-enable AACK*/
+    /* re-enable AACK */
     at86rf215_filter_ack_only(dev, false);
     at86rf215_set_auto_mode(dev, AT86RF215_AM_AUTO_ACK, true);
     /* re-enable reduced power consumption */
