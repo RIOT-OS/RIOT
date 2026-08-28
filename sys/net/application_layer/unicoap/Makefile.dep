@@ -20,10 +20,6 @@ ifneq (,$(filter unicoap,$(USEMODULE)))
   # Synchronous methods
   USEMODULE += sema
 
-  USEMODULE += netif
-  USEMODULE += ipv6_addr
-  USEMODULE += ipv4_addr
-
   DEFAULT_MODULE += auto_init_unicoap
 endif
 
@@ -76,6 +72,11 @@ ifneq (,$(filter unicoap_driver_udp,$(USEMODULE)))
   # We're using the sock API
   USEMODULE += unicoap_sock_support
   USEMODULE += sock_udp
+
+  # We're going over IP
+  USEMODULE += netif
+  USEMODULE += ipv6_addr
+  USEMODULE += ipv4_addr
 endif
 
 ifneq (,$(filter unicoap_driver_dtls,$(USEMODULE)))
@@ -85,6 +86,11 @@ ifneq (,$(filter unicoap_driver_dtls,$(USEMODULE)))
   # We're using the sock API
   USEMODULE += unicoap_sock_support
   USEMODULE += sock_dtls
+
+  # We're going over IP
+  USEMODULE += netif
+  USEMODULE += ipv6_addr
+  USEMODULE += ipv4_addr
 
   # DTLS stuff
   USEMODULE += tinydtls_sock_dtls
