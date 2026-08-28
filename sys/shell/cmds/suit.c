@@ -48,7 +48,17 @@ static int _suit_handler(int argc, char **argv)
     }
 
     if (strcmp(argv[1], "fetch") == 0) {
-        suit_worker_trigger(argv[2], strlen(argv[2]));
+        if (argc > 2) {
+            suit_worker_trigger(argv[2], strlen(argv[2]));
+        }
+        else {
+#ifdef SUIT_MANIFEST_RESOURCE
+            suit_worker_trigger(SUIT_MANIFEST_RESOURCE, strlen(SUIT_MANIFEST_RESOURCE));
+#else
+            printf("No manifest URL provided, and SUIT_MANIFEST_RESOURCE not defined.\n");
+            return -1;
+#endif
+        }
     }
     else if (strcmp(argv[1], "seq_no") == 0) {
         uint32_t seq_no = 0;
