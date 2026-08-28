@@ -307,7 +307,7 @@ typedef struct at86rf215 {
 } at86rf215_t;
 
 /**
- *  @brief Event Bottom Half Processor descriptor for AT86RF215 transceiver.
+ * @brief Event Bottom Half Processor descriptor for AT86RF215 transceiver.
  */
 typedef struct {
     ieee802154_dev_t *hal_09;   /**< Pointer to the SubGHz Radio HAL descriptor */
