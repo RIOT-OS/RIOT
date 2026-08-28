@@ -169,7 +169,7 @@ typedef enum {
      */
     IEEE802154_CAP_AUTO_TX2RX           = BIT20,
     /**
-     * @brief The devices records timestamps of received frames
+     * @brief The device records timestamps of received frames
      */
     IEEE802154_CAP_RX_TIMESTAMP         = BIT21,
 } ieee802154_rf_caps_t;
