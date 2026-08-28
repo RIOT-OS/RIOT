@@ -147,6 +147,13 @@ uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
  */
 void _handle_rereg_address(const ipv6_addr_t *addr);
 
+/**
+ * @brief   Handler to re-register all addresses of a network interface
+ *
+ * @param[in] netif An interface.
+ */
+void _handle_rereg_addresses_netif(gnrc_netif_t *netif);
+
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C) || defined(DOXYGEN)
 _nib_abr_entry_t *_handle_abro(const sixlowpan_nd_opt_abr_t *abro);
 uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
@@ -163,7 +170,8 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
  * => throw error in case it is compiled in => don't define it here as NOP macro
  */
 #define _get_next_rs_interval(netif)                (NDP_RS_MS_INTERVAL)
-#define _handle_rereg_address(netif)                (void)netif
+#define _handle_rereg_address(addr)                (void)addr
+#define _handle_rereg_addresses_netif(netif)       (void)netif
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C) || defined(DOXYGEN)
 #define _handle_abro(abro)                          (NULL)
 #define _handle_6co(icmpv6, sixco, abr)             (UINT32_MAX)
