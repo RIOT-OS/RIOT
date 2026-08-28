@@ -442,7 +442,8 @@ static char *str_states[IEEE802154_FSM_STATE_NUMOF] = {
     "WAIT_FOR_ACK",
 };
 
-static int print_submac_state(int argc, char **argv) {
+static int print_submac_state(int argc, char **argv)
+{
     (void) argc;
     (void) argv;
     printf("%s\n", str_states[submac.fsm_state]);
