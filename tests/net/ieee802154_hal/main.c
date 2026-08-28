@@ -62,7 +62,8 @@ static uint8_t seq;
 
 static ieee802154_dev_t _radio;
 
-static int _set_default_values(void) {
+static int _set_default_values(void)
+{
     int res;
     ieee802154_radio_set_frame_filter_mode(&_radio, IEEE802154_FILTER_ACCEPT);
 
@@ -422,7 +423,8 @@ int _cca(int argc, char **argv)
 }
 
 
-static int _test_off_on(int argc, char **argv) {
+static int _test_off_on(int argc, char **argv)
+{
     (void) argc;
     (void) argv;
     int res = 0;
