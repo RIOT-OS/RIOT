@@ -201,7 +201,7 @@ static int _read(ieee802154_dev_t *hal, void *buf, size_t size, ieee802154_rx_in
                                  sizeof(rx_timestamp));
 
         /* convert counter value to ns */
-        info->rx_timestamp = rx_timestamp * 1000ULL / 32;
+        info->timestamp = rx_timestamp * 1000ULL / 32;
 #endif
     }
 
@@ -562,7 +562,7 @@ static int _get_frame_filter_mode(ieee802154_dev_t *hal, ieee802154_filter_mode_
 static void _handle_txrx_done(ieee802154_dev_t *hal, ieee802154_trx_ev_t event)
 {
     at86rf215_t *dev = hal->priv;
-    /* After RXFE or TXFE the devices switches automatically to TXPREP make sure to be sync
+    /* After RXFE or TXFE the device switches automatically to TXPREP make sure to be sync
      * with HW State */
     dev->state = AT86RF215_STATE_IDLE;
     if (hal->cb) {
@@ -921,11 +921,11 @@ int at86rf215_init_event(at86rf215_bhp_ev_t *bhp, ieee802154_dev_t *hal_09,
          | (IS_USED(MODULE_IEEE802154_PHY_MR_OQPSK) ? IEEE802154_CAP_PHY_MR_OQPSK : 0) \
          | (IS_USED(MODULE_IEEE802154_PHY_MR_OFDM)  ? IEEE802154_CAP_PHY_MR_OFDM  : 0) \
          | (IS_USED(MODULE_IEEE802154_PHY_MR_FSK)   ? IEEE802154_CAP_PHY_MR_FSK   : 0) \
+         | (IS_USED(MODULE_IEEE802154_RX_TIMESTAMP) ? IEEE802154_CAP_RX_TIMESTAMP : 0) \
          | IEEE802154_CAP_AUTO_ACK \
          | IEEE802154_CAP_IRQ_TX_DONE \
          | IEEE802154_CAP_IRQ_RX_START \
          | IEEE802154_CAP_AUTO_TX2RX \
-         | IEEE802154_CAP_RX_TIMESTAMP \
          | IEEE802154_CAP_IRQ_CCA_DONE)
 
 #define AT86RF215_OPS(band)                              \
