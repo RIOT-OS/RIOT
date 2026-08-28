@@ -78,7 +78,7 @@ enum {
  *          Otherwise it is turned off to save energy.
  */
 #ifdef DOXYGEN
-#define CONFIG_AT86RF215_USE_CLOCK_OUTPUT
+#  define CONFIG_AT86RF215_USE_CLOCK_OUTPUT
 #endif
 
 #if defined(DOXYGEN) && !defined(CONFIG_AT86RF215_TRIM_VAL)
@@ -94,7 +94,7 @@ enum {
  *          meter connected to the clock output pin of the AT86RF215.
  *          Tweak the value until the measured clock output matches 26 MHz the best.
  */
-#define CONFIG_AT86RF215_TRIM_VAL              (0)
+#  define CONFIG_AT86RF215_TRIM_VAL              (0)
 #endif
 
 /**
@@ -102,7 +102,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_RPC_EN
-#define CONFIG_AT86RF215_RPC_EN                 (0)
+#  define CONFIG_AT86RF215_RPC_EN                 (0)
 #endif
 /** @} */
 
@@ -112,7 +112,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_BATMON_THRESHOLD
-#define CONFIG_AT86RF215_BATMON_THRESHOLD       (1800)
+#  define CONFIG_AT86RF215_BATMON_THRESHOLD       (1800)
 #endif
 /** @} */
 
@@ -122,7 +122,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_OQPSK_RATE
-#define CONFIG_AT86RF215_DEFAULT_OQPSK_RATE     (0)
+#  define CONFIG_AT86RF215_DEFAULT_OQPSK_RATE     (0)
 #endif
 /** @} */
 
@@ -131,17 +131,17 @@ enum {
  * @{
  */
 #if IS_ACTIVE(CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS_100)
-#define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_100)
+#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_100)
 #elif IS_ACTIVE(CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS_200)
-#define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_200)
+#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_200)
 #elif IS_ACTIVE(CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS_1000)
-#define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_1000)
+#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_1000)
 #elif IS_ACTIVE(CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS_2000)
-#define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_2000)
+#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_2000)
 #endif
 
 #ifndef CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS
-#define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_1000)
+#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_1000)
 #endif
 /** @} */
 
@@ -150,7 +150,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_MR_OQPSK_RATE
-#define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_RATE  (2)
+#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_RATE  (2)
 #endif
 /** @} */
 
@@ -159,7 +159,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_MR_OFDM_OPT
-#define CONFIG_AT86RF215_DEFAULT_MR_OFDM_OPT    (2)
+#  define CONFIG_AT86RF215_DEFAULT_MR_OFDM_OPT    (2)
 #endif
 /** @} */
 
@@ -168,7 +168,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_MR_OFDM_MCS
-#define CONFIG_AT86RF215_DEFAULT_MR_OFDM_MCS    (2)
+#  define CONFIG_AT86RF215_DEFAULT_MR_OFDM_MCS    (2)
 #endif
 /** @} */
 
@@ -177,7 +177,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_MR_FSK_SRATE
-#define CONFIG_AT86RF215_DEFAULT_MR_FSK_SRATE   FSK_SRATE_200K
+#  define CONFIG_AT86RF215_DEFAULT_MR_FSK_SRATE   FSK_SRATE_200K
 #endif
 /** @} */
 
@@ -186,7 +186,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_MR_FSK_MOD_IDX
-#define CONFIG_AT86RF215_DEFAULT_MR_FSK_MOD_IDX (64)
+#  define CONFIG_AT86RF215_DEFAULT_MR_FSK_MOD_IDX (64)
 #endif
 /** @} */
 
@@ -195,7 +195,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_MR_FSK_MORD
-#define CONFIG_AT86RF215_DEFAULT_MR_FSK_MORD    FSK_MORD_4SFK
+#  define CONFIG_AT86RF215_DEFAULT_MR_FSK_MORD    FSK_MORD_4SFK
 #endif
 /** @} */
 
@@ -204,7 +204,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_MR_FSK_FEC
-#define CONFIG_AT86RF215_DEFAULT_MR_FSK_FEC     IEEE802154_FEC_NONE
+#  define CONFIG_AT86RF215_DEFAULT_MR_FSK_FEC     IEEE802154_FEC_NONE
 #endif
 /** @} */
 
@@ -223,9 +223,9 @@ typedef enum {
     AT86RF215_STATE_RX,          /**< listening for frame */
     AT86RF215_STATE_RX_START,    /**< receiving frame */
     AT86RF215_STATE_RX_SEND_ACK, /**< receiving frame, sending ACK */
-    AT86RF215_STATE_CCA_RX,      /**< device proceeding CCA from RX */
-    AT86RF215_STATE_CCA_IDLE,    /**< device proceeding CCA from IDLE */
-    AT86RF215_STATE_CCATX,       /**< device proceeding CCA before TX */
+    AT86RF215_STATE_CCA_RX,      /**< performing CCA from RX */
+    AT86RF215_STATE_CCA_IDLE,    /**< performing CCA from IDLE */
+    AT86RF215_STATE_CCATX,       /**< performing CCA before TX */
 } at86rf215_state_t;
 /** @} */
 
@@ -298,11 +298,11 @@ typedef struct at86rf215 {
 #ifdef MODULE_IEEE802154_PHY_MR_FSK
     uint8_t fsk_pl;                         /**< FSK Preamble Length */
 #endif
-    int8_t cca_thresh;                      /**< CSMA energy detect threshold */
+    int8_t cca_thresh;                      /**< CCA energy detection threshold */
     bool cca_busy;                          /**< Flag for cca status */
     bool cca_tx;                            /**< Flag if the radio should perform cca before tx */
     ieee802154_filter_mode_t filter_mode;   /**< Current filter mode of the device */
-    bool tx_ack_req;                        /**< Flag for cca status */
+    bool tx_ack_req;                        /**< Flag if an ACK was requested for the frame */
     at86rf215_auto_mode_t auto_mode;        /**< Active automatic mode of the radio */
 } at86rf215_t;
 
@@ -557,7 +557,7 @@ void at86rf215_set_promisc(at86rf215_t *dev, bool enable);
  *
  * Automatic modes are mutually exclusive. Enabling a mode automatically
  * disables any previously enabled automatic mode. Disabling a mode
- * leaves the transceiver basic mode.
+ * return the transceiver to basic mode.
  *
  * @param[in,out] dev       Device descriptor
  * @param[in]     mode      Automatic mode to use

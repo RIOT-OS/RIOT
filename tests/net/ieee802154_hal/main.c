@@ -446,7 +446,7 @@ static int _test_off_on(int argc, char **argv) {
         expect(res == 0);
     }
     _set_default_values();
-    puts("Test succeeded radio is now on with default values");
+    puts("Test succeeded: radio is now on with default values");
     return 0;
 }
 

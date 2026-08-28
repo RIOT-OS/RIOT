@@ -28,7 +28,7 @@ extern "C" {
  * @brief Minimum reset pulse width (tRST) in µs
  */
 #ifndef CONFIG_AT86RF215_RESET_PULSE_WIDTH_US
-#define CONFIG_AT86RF215_RESET_PULSE_WIDTH_US  (16U)
+#  define CONFIG_AT86RF215_RESET_PULSE_WIDTH_US  (16U)
 #endif
 
 /**
