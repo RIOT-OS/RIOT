@@ -309,8 +309,7 @@ void at86rf215_set_auto_mode(at86rf215_t *dev, at86rf215_auto_mode_t mode, bool 
 {
     uint8_t amcs = at86rf215_reg_read(dev, dev->BBC->RG_AMCS);
     /* The datasheet recommends to use only one automatic mode at a time.
-     * Therefore disabling an automatic mode returns the transceiver to basic mode
-     **/
+     * Therefore disabling an automatic mode returns the transceiver to basic mode */
     if (!enable) {
         mode = AT86RF215_AM_BASIC;
     }

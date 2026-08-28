@@ -330,7 +330,7 @@ static ieee802154_fsm_state_t _fsm_state_tx_process_tx_done(ieee802154_submac_t 
         }
         /* If the radio doesn't handle ACK */
         else {
-            /* If the radio doesn't go automatically to RX after Transmission,
+            /* If the radio doesn't go automatically to RX after a transmission,
              * set the transceiver state to RX_ON and enable the ACK filter */
             if (!ieee802154_radio_has_capability(&submac->dev, IEEE802154_CAP_AUTO_TX2RX)) {
                 ieee802154_radio_set_frame_filter_mode(dev, IEEE802154_FILTER_ACK_ONLY);

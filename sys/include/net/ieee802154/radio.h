@@ -162,14 +162,14 @@ typedef enum {
      */
     IEEE802154_CAP_SRC_ADDR_MATCH       = BIT19,
     /**
-     * @brief the device supports auto RX after a Transmission
+     * @brief the device supports auto RX after a transmission
      *
-     * The device automatically goes to state RX after a Transmission
+     * The device automatically goes to state RX after a transmission
      * with ACK Req bit set.
      */
     IEEE802154_CAP_AUTO_TX2RX           = BIT20,
     /**
-     * @brief the devices records timestamps of received frames
+     * @brief The devices records timestamps of received frames
      */
     IEEE802154_CAP_RX_TIMESTAMP         = BIT21,
 } ieee802154_rf_caps_t;

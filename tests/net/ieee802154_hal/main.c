@@ -427,21 +427,21 @@ static int _test_off_on(int argc, char **argv) {
     (void) argv;
     int res = 0;
 
-    if((res = ieee802154_radio_off(&_radio)) != 0) {
+    if ((res = ieee802154_radio_off(&_radio)) != 0) {
         puts("Radio not off");
         expect(res == 0);
     }
 
-    //The radio shall be off so you can call this immediately
-    if((res = ieee802154_radio_request_on(&_radio)) != 0) {
+    /* The radio shall be off so you can call this immediately */
+    if ((res = ieee802154_radio_request_on(&_radio)) != 0) {
         puts("On Request should be valid");
         expect(res == 0);
     }
     puts("on");
 
-    while((res = ieee802154_radio_confirm_on(&_radio)) == -EAGAIN) {}
+    while ((res = ieee802154_radio_confirm_on(&_radio)) == -EAGAIN) {}
 
-    if(res) {
+    if (res) {
         puts("Radio should be on");
         expect(res == 0);
     }

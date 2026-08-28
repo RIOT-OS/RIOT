@@ -512,7 +512,8 @@ void at86rf215_set_clock_output(at86rf215_t *dev,
  *
  * @param[in] dev           device to trigger
  *
- * @return                  0 on success, error otherwise
+ * @retval                  0 on success
+ * @retval                  Negative error otherwise
  */
 int at86rf215_tx_exec(at86rf215_t *dev);
 
@@ -531,7 +532,8 @@ void at86rf215_tx_done(at86rf215_t *dev);
  * @param[in] dev           device to configure
  * @param[in] voltage       Threshold voltage in mV
  *
- * @return                  0 on success, error otherwise
+ * @retval                  0 on success
+ * @retval                  Negative error otherwise
  */
 int at86rf215_enable_batmon(at86rf215_t *dev, unsigned voltage);
 
@@ -572,11 +574,11 @@ void at86rf215_set_auto_mode(at86rf215_t *dev, at86rf215_auto_mode_t mode, bool 
  * @param[in] hal_24    HAL descriptor for the 2.4GHz interface
  * @param[in] evq       Pointer to the event queue
  *
- * @return error code
  * @retval 0 on success
  * @retval negative errno on failure
  */
-int at86rf215_init_event(at86rf215_bhp_ev_t *bhp, ieee802154_dev_t *hal_09, ieee802154_dev_t *hal_24, event_queue_t *evq);
+int at86rf215_init_event(at86rf215_bhp_ev_t *bhp, ieee802154_dev_t *hal_09,
+                         ieee802154_dev_t *hal_24, event_queue_t *evq);
 
 /**
  * @brief   Initialize the AT86RF215 transceiver.
@@ -590,7 +592,6 @@ int at86rf215_init_event(at86rf215_bhp_ev_t *bhp, ieee802154_dev_t *hal_09, ieee
  * @param[in]  params   Hardware configuration of the device
  * @param[in]  ctx      Context passed to the interrupt handler
  *
- * @return error code
  * @retval 0 on success
  * @retval -ENOTSUP if the part number of the device is not supported
  */

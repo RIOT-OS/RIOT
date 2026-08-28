@@ -31,7 +31,7 @@
 #include "net/gnrc/netif/ieee802154.h"
 #include "net/netdev/ieee802154_submac.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**
@@ -44,6 +44,11 @@
 #endif
 #ifndef AT86RF215_MAC_PRIO_SUBGHZ
 #define AT86RF215_MAC_PRIO_SUBGHZ   (AT86RF215_MAC_PRIO)
+#ifndef AT86RF215_MAC_PRIO
+#  define AT86RF215_MAC_PRIO        (GNRC_NETIF_PRIO)
+#endif
+#ifndef AT86RF215_MAC_PRIO_SUBGHZ
+#  define AT86RF215_MAC_PRIO_SUBGHZ (AT86RF215_MAC_PRIO)
 #endif
 /** @} */
 

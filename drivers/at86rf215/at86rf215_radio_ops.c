@@ -10,7 +10,7 @@
  * @file
  * @brief       Implementation of 802.15.4 Radio HAL interface for AT86RF215 driver.
  *
- * @author     Stepan Konoplev <stepan.konoplev@haw-hamburg.de>
+ * @author      Stepan Konoplev <stepan.konoplev@haw-hamburg.de>
  * @}
  */
 
@@ -33,7 +33,7 @@
 #include "at86rf215_internal.h"
 #include "at86rf215_registers.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define AT86RF215_INVALID_ED 127
@@ -113,8 +113,8 @@ static int _confirm_on(ieee802154_dev_t *hal)
     _clear_irq(dev);
     _clear_sibling_irq(dev);
 
-    /* if both transceivers were sleeping, the chip entered DEEP_SLEEP.
-       Waking one device in that mode wakes the other one too. */
+    /* If both transceivers were sleeping, the chip entered DEEP_SLEEP.
+     * Waking one device in that mode wakes the other one too. */
     if (sibling_dev && (sibling_dev->state == AT86RF215_STATE_OFF)) {
         _put_sibling_to_sleep(dev);
     }
@@ -138,7 +138,7 @@ static int _write(ieee802154_dev_t *hal, const iolist_t *psdu)
         /* current packet data + FCS too long */
         if ((len + iol->iol_len + IEEE802154_FCS_LEN) > AT86RF215_MAX_PKT_LENGTH) {
             DEBUG("[at86rf215] error: packet too large (%" PRIuSIZE
-                  " byte) to be send\n", len + IEEE802154_FCS_LEN);
+                  " byte) to be sent\n", len + IEEE802154_FCS_LEN);
             return -EOVERFLOW;
         }
 
@@ -288,10 +288,8 @@ static int _request_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
     switch (op) {
     case IEEE802154_HAL_OP_TRANSMIT:
         return _request_tx(dev);
-        break;
     case IEEE802154_HAL_OP_SET_RX:
         return _request_rx(dev);
-        break;
     case IEEE802154_HAL_OP_SET_IDLE:
         {
             bool force = *((bool *)ctx);
@@ -325,9 +323,7 @@ static int _confirm_tx(at86rf215_t *dev, ieee802154_tx_info_t *info)
 
 static int _confirm_rx(at86rf215_t *dev)
 {
-    uint8_t current_state = at86rf215_get_rf_state(dev);
-
-    if (current_state != RF_STATE_RX) {
+    if (at86rf215_get_rf_state(dev) != RF_STATE_RX) {
         return -EAGAIN;
     }
     dev->state = AT86RF215_STATE_RX;
@@ -336,16 +332,14 @@ static int _confirm_rx(at86rf215_t *dev)
 
 static int _confirm_idle(at86rf215_t *dev)
 {
-    uint8_t current_state = at86rf215_get_rf_state(dev);
-
-    if (current_state != RF_STATE_TXPREP) {
+    if (at86rf215_get_rf_state(dev) != RF_STATE_TXPREP) {
         return -EAGAIN;
     }
 
-    /* an aborted operation produces no completion IRQ (no TXFE for an
-    * aborted TX/ACK, possibly no EDC for an aborted CCA) - clean up
-    * the software state here so we don't get stuck. If the abort
-    * happened during a CCA, re-enable what request_cca() disabled. */
+    /* An aborted operation produces no completion IRQ (no TXFE for an
+     * aborted TX/ACK, possibly no EDC for an aborted CCA) - clean up
+     * the software state here so we don't get stuck. If the abort
+     * happened during a CCA, re-enable what request_cca() disabled. */
     switch (dev->state) {
     case AT86RF215_STATE_CCA_RX:
     case AT86RF215_STATE_CCA_IDLE:
@@ -386,16 +380,12 @@ static int _confirm_op(ieee802154_dev_t *hal, ieee802154_hal_op_t op, void *ctx)
     switch (op) {
     case IEEE802154_HAL_OP_TRANSMIT:
         return _confirm_tx(dev, ctx);
-        break;
     case IEEE802154_HAL_OP_SET_RX:
         return _confirm_rx(dev);
-        break;
     case IEEE802154_HAL_OP_SET_IDLE:
         return _confirm_idle(dev);
-        break;
     case IEEE802154_HAL_OP_CCA:
         return _confirm_cca(dev, ctx);
-        break;
     default:
         return -ENOTSUP;
     }
@@ -527,8 +517,6 @@ static int _config_src_addr_match(ieee802154_dev_t *hal, ieee802154_src_match_t 
 static int _set_frame_filter_mode(ieee802154_dev_t *hal, ieee802154_filter_mode_t mode)
 {
     at86rf215_t *dev = hal->priv;
-
-
     switch (mode) {
     case IEEE802154_FILTER_ACCEPT:
         at86rf215_set_promisc(dev, false);
@@ -839,11 +827,9 @@ static void _event_handler(event_t *event)
     else {
         at86rf215_irq_handler(bhp->hal_24);
     }
-
 }
 
-static int _init_hardware(at86rf215_t *dev, void (*cb)(void *),
-                          void *ctx)
+static int _init_hardware(at86rf215_t *dev, void (*cb)(void *), void *ctx)
 {
     int res = -1;
 

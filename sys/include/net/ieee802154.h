@@ -221,7 +221,7 @@ typedef enum {
     IEEE802154_MR_FSK_SRATE_200K,   /**< 200k Symbols/s */
     IEEE802154_MR_FSK_SRATE_300K,   /**< 300k Symbols/s */
     IEEE802154_MR_FSK_SRATE_400K,   /**< 400k Symbols/s */
-    IEEE802154_MR_FSK_SRATE_INVALID,/**< Invalid Symbol rate */
+    IEEE802154_MR_FSK_SRATE_INVALID, /**< Invalid Symbol rate */
 } ieee802154_mr_fsk_srate_t;
 
 /**
