@@ -293,7 +293,13 @@ int at86rf215_tx_exec(at86rf215_t *dev)
         dev->flags |= AT86RF215_OPT_CCA_PENDING;
     }
 
-    if (dev->state == AT86RF215_STATE_IDLE) {
+    /* AGCH marks a reception in progress. A high IRQ pin marks an unserviced
+     * radio event - e.g. a finished RX whose auto-ACK is still transmitting
+     * (AGCR already cleared AGCH). Prevent kicking TXPREP during ongoing frame
+     * reception, so defer: the pending _isr resumes the TX via _set_idle(). */
+    if ((dev->state == AT86RF215_STATE_IDLE) &&
+        !(dev->flags & AT86RF215_OPT_AGCH) &&
+        !gpio_read(dev->params.int_pin)) {
         at86rf215_rf_cmd(dev, CMD_RF_TXPREP);
     } else {
         DEBUG("[at86rf215] will TX after %s\n", at86rf215_sw_state2a(dev->state));
@@ -318,7 +324,9 @@ bool at86rf215_cca(at86rf215_t *dev)
     bool clear;
     uint8_t old_state;
 
-    if (dev->state != AT86RF215_STATE_IDLE) {
+    /* Check both software state AND hardware reception state (AGCH)
+     * to prevent CCA during ongoing frame reception */
+    if (dev->state != AT86RF215_STATE_IDLE || (dev->flags & AT86RF215_OPT_AGCH)) {
         return false;
     }
 
