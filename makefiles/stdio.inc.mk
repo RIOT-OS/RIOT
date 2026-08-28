@@ -18,15 +18,7 @@ STDIO_MODULES = \
   stdio_usb_serial_jtag \
   #
 
-# List of available legacy stdio backend modules.
-STDIO_LEGACY_MODULES = \
-  ethos_stdio \
-  stdio_ethos \
-  #
-
-ifeq (,$(filter $(STDIO_LEGACY_MODULES),$(USEMODULE)))
-  USEMODULE += stdio
-endif
+USEMODULE += stdio
 
 # Check if more than one STDIO has been selected, if so add stdio_dispatch.
 # This check will fail if 10 or more modules are selected.
