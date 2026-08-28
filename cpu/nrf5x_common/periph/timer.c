@@ -277,7 +277,13 @@ void timer_stop(tim_t tim)
      *
      * cf. https://infocenter.nordicsemi.com/pdf/nRF52833_Engineering_A_Errata_v1.4.pdf
      */
+#ifdef CPU_FAM_NRF54L
+    /* the nRF54L timers have no SHUTDOWN task (and are not affected by the
+     * erratum above) */
+    dev(tim)->TASKS_STOP = 1;
+#else
     dev(tim)->TASKS_SHUTDOWN = 1;
+#endif
 }
 
 static inline void irq_handler(int num)

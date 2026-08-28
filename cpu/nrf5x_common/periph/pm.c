@@ -29,6 +29,13 @@
 #define REGULATORS_SYSTEMOFF_SYSTEMOFF_Enter REGULATORS_SYSTEMOFF_SYSTEMOFF_Enable
 #endif
 
+/* The nRF54L headers provide no enumerator value for the SYSTEMOFF field,
+ * only the (single bit) mask */
+#if !defined(REGULATORS_SYSTEMOFF_SYSTEMOFF_Enter) && \
+    defined(REGULATORS_SYSTEMOFF_SYSTEMOFF_Msk)
+#  define REGULATORS_SYSTEMOFF_SYSTEMOFF_Enter REGULATORS_SYSTEMOFF_SYSTEMOFF_Msk
+#endif
+
 void pm_off(void)
 {
 #if defined(REGULATORS_SYSTEMOFF_SYSTEMOFF_Enter)
