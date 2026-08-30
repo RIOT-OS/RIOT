@@ -12,20 +12,20 @@ More information about the module can be found on this
 
 ## Hardware
 
-##
+### MCU
 
 | MCU             | EFR32MG1P132F256GM32                                                                    |
 |-----------------|-----------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M4F                                                                          |
 | Vendor          | Silicon Labs                                                                            |
 | Vendor Family   | EFR32 Mighty Gecko 1P                                                                   |
-| RAM             | 32.0 KiB (1.0 KiB reserved)                                                             |
+| RAM             | 32.0 KiB (1.0 KiB reserved for the radio blob)                                          |
 | Flash           | 256.0 KiB                                                                               |
 | EEPROM          | no                                                                                      |
 | Frequency       | up to 38.4 MHz                                                                          |
 | FPU             | yes                                                                                     |
 | MPU             | yes                                                                                     |
-| DMA             | 12 channels                                                                             |
+| DMA             | 8 channels                                                                              |
 | Timers          | 2x 16-bit + 1x 16-bit (low power)                                                       |
 | ADCs            | 12-bit ADC                                                                              |
 | UARTs           | 2x USART, 1x LEUART                                                                     |

@@ -1,6 +1,6 @@
-@defgroup    boards_stk3600 Silicon Labs STK3600 starter kit
-@ingroup     boards
-@brief       Support for Silicon Labs STK3600 starter kit
+@defgroup   boards_stk3600 Silicon Labs STK3600 starter kit
+@ingroup    boards
+@brief      Support for Silicon Labs STK3600 starter kit
 
 ## Overview
 
@@ -19,7 +19,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 |-----------------|--------------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M3                                                                              |
 | Vendor          | Silicon Labs                                                                               |
-| Vendor Family   | EFM32 Leoppard Gecko                                                                       |
+| Vendor Family   | EFM32 Leopard Gecko                                                                       |
 | RAM             | 32.0 KiB                                                                                   |
 | Flash           | 256.0 KiB                                                                                  |
 | EEPROM          | no                                                                                         |
@@ -41,7 +41,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 ### Pinout
 
 This is the pinout of the expansion header on the right side of the board.
-PIN 1 is the bottom-left contact when the header faces  you horizontally.
+PIN 1 is the bottom-left contact when the header faces you horizontally.
 
 |      | PIN | PIN |      |
 |------|-----|-----|------|

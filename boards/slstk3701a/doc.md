@@ -44,7 +44,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 ### Pinout
 
 This is the pinout of the expansion header on the right side of the board.
-PIN 1 is the bottom-left contact when the header faces  you horizontally.
+PIN 1 is the bottom-left contact when the header faces you horizontally.
 
 | RIOT Peripheral | Name | PIN | PIN | Name   | RIOT Peripheral |
 |-----------------|------|-----|-----|--------|-----------------|
@@ -73,7 +73,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | I2C         | 0       | I2C0       | SDA:PC0, SCL:PC1 | Normal speed                        |
 | I2C         | 1       | I2C1       | SDA:PC4, SCL:PC5 | Normal speed                        |
 | I2C         | 2       | I2C2       | SDA:PI4, SCL:PI5 | Normal speed, Sensor I2C bus        |
-| HWRNG       | -       | TNRG0      |                  | True Random Number Generator (TRNG) |
+| HWRNG       | -       | TRNG0      |                  | True Random Number Generator (TRNG) |
 | RTT         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
 | RTC         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
 | SPI         | 0       | USART0     | MOSI:PE10, MISO:PE11, CLK:PE12 |                       |
@@ -109,12 +109,12 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |                               | Ethernet    | no        |                                                       |
 |                               | Flash       | yes       |                                                       |
 |                               | GPIO        | yes       | Interrupts are shared across pins (see ref manual)    |
+|                               | HWRNG       | yes       | True Random Number Generator                          |
 |                               | I2C         | yes       |                                                       |
 |                               | PWM         | yes       |                                                       |
 |                               | RTCC        | yes       | As RTT or RTC                                         |
 |                               | SPI         | yes       | Only master mode                                      |
 |                               | Timer       | yes       |                                                       |
-|                               | TRNG        | yes       | True Random Number Generator                          |
 |                               | UART        | yes       | USART is shared with SPI. LEUART baud rate limited    |
 |                               | USB         | yes       | Device mode                                           |
 | LCD driver                    | LS013B7DH06 | no        | Sharp Low Power Memory color LCD (Rev. A0 - A5 board) |

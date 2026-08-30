@@ -41,7 +41,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 ### Pinout
 
 This is the pinout of the expansion header on the right side of the board.
-PIN 1 is the bottom-left contact when the header faces  you horizontally.
+PIN 1 is the bottom-left contact when the header faces you horizontally.
 
 |      | PIN | PIN |      |
 |------|-----|-----|------|
@@ -66,7 +66,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |------------|--------|-------------------|--------------------------------|----------------------------------------------------------|
 | ADC        | 0      | ADC0              | CHAN0: internal temperature    | Ports are fixed, 14/16-bit resolution not supported      |
 | I2C        | 0      | I2C0              | SDA: PC10, CLK: PC11           | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
-| HWRNG      | -      | TNRG0             |                                | Hardware-based true random number generator              |
+| HWRNG      | -      | TRNG0             |                                | Hardware-based true random number generator              |
 | RTT        | -      | RTCC              |                                | 1 Hz interval. Either RTT or RTC (see below)             |
 | RTC        | -      | RTCC              |                                | 1 Hz interval. Either RTC or RTT (see below)             |
 | SPI        | 0      | USART2            | MOSI: PA6, MISO: PA7, CLK: PA8 |                                                          |
@@ -94,7 +94,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | Low-level driver              | ADC         | yes       |                                                                |
 |                               | Flash       | yes       |                                                                |
 |                               | GPIO        | yes       | Interrupts are shared across pins (see reference manual)       |
-|                               | HW RNG      | yes       |                                                                |
+|                               | HWRNG       | yes       |                                                                |
 |                               | I2C         | yes       |                                                                |
 |                               | PWM         | yes       |                                                                |
 |                               | RTCC        | yes       | As RTT or RTC                                                  |

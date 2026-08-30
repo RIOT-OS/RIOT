@@ -1,6 +1,6 @@
-@defgroup    boards_common_slwstk6000b Silicon Labs SLWSTK6000B starter kit
-@ingroup     boards
-@brief       Support for the Silicon Labs SLWSTK6000B starter kit
+@defgroup   boards_common_slwstk6000b Silicon Labs SLWSTK6000B starter kit
+@ingroup    boards
+@brief      Support for the Silicon Labs SLWSTK6000B starter kit
 
 ## Overview
 
@@ -47,6 +47,7 @@ The MCU depends on the module used.
 | Low-level driver | ADC                   | yes       |                                                                |
 |                  | Flash                 | yes       |                                                                |
 |                  | GPIO                  | yes       | Interrupts are shared across pins (see reference manual)       |
+|                  | HWRNG                 | yes       | Only on the EFR32MG12P, the EFR32MG1P has no TRNG              |
 |                  | I2C                   | yes       |                                                                |
 |                  | PWM                   | yes       |                                                                |
 |                  | RTCC                  | yes       | As RTT or RTC                                                  |
@@ -60,7 +61,7 @@ The MCU depends on the module used.
 ### Board controller
 
 The starter kit is equipped with a Board Controller. This controller provides a
-virtual serial port. The boardcontroller is enabled via a GPIO pin.
+virtual serial port. The board controller is enabled via a GPIO pin.
 
 By default, this pin is enabled. You can disable the board controller module by
 passing `DISABLE_MODULE=silabs_bc` to the `make` command.

@@ -72,7 +72,7 @@ PIN 1 is the top-left contact.
 | ADC         | 0       | ADC0:CH0   |                  | Internal temperature                |
 | ADC         | 1       | ADC0:CH1   |                  | AVDD                                |
 | I2C         | 0       | I2C0       | SDA:PE4, SCL:PE5 | Normal speed                        |
-| HWRNG       | -       | TNRG0      |                  | True Random Number Generator (TRNG) |
+| HWRNG       | -       | TRNG0      |                  | True Random Number Generator (TRNG) |
 | RTT         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
 | RTC         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
 | SPI         | 0       | USART3     | MOSI:PA0, MISO:PA1, CLK:PA2 |                          |
@@ -106,6 +106,7 @@ PIN 1 is the top-left contact.
 |                  | DAC        | yes       | VDAC, IDAC is not supported                        |
 |                  | Flash      | yes       |                                                    |
 |                  | GPIO       | yes       | Interrupts are shared across pins (see ref manual) |
+|                  | HWRNG      | yes       |                                                    |
 |                  | I2C        | yes       |                                                    |
 |                  | PWM        | yes       |                                                    |
 |                  | RTCC       | yes       | As RTT or RTC                                      |

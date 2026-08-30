@@ -26,7 +26,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 | Frequency       | up to 24 MHz                                                                               |
 | FPU             | no                                                                                         |
 | MPU             | no                                                                                         |
-| DMA             | 12 channels                                                                                |
+| DMA             | 4 channels                                                                                 |
 | Timers          | 2x 16-bit                                                                                  |
 | ADCs            | 12-bit ADC                                                                                 |
 | UARTs           | 2x USART, 1x LEUART                                                                        |
@@ -41,7 +41,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 ### Pinout
 
 This is the pinout of the expansion header on the right side of the board.
-PIN 1 is the bottom-left contact when the header faces  you horizontally.
+PIN 1 is the bottom-left contact when the header faces you horizontally.
 
 |      | PIN | PIN |      |
 |------|-----|-----|------|

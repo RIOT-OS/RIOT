@@ -1,6 +1,6 @@
-@defgroup    boards_slstk3301a Silicon Labs SLSTK3301A starter kit
-@ingroup     boards
-@brief       Support for Silicon Labs SLSTK3301A starter kit
+@defgroup   boards_slstk3301a Silicon Labs SLSTK3301A starter kit
+@ingroup    boards
+@brief      Support for Silicon Labs SLSTK3301A starter kit
 
 ## Overview
 
@@ -66,6 +66,7 @@ PIN 1 is the bottom-left contact when the header faces you horizontally.
 |------------|--------|-----------------|-----------------------------------|----------------------------------------------------------|
 | ADC        | 0      | ADC0            | CHAN0: internal temperature       | Ports are fixed, 14/16-bit resolution not supported      |
 | I2C        | 0      | I2C0            | SDA: PD6, CLK: PD7                | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
+| HWRNG      | -      | TRNG0           |                                   | Hardware-based true random number generator              |
 | RTT        | -      | RTCC            |                                   | 1 Hz interval. Either RTT or RTC (see below)             |
 | RTC        | -      | RTCC            |                                   | 1 Hz interval. Either RTC or RTT (see below)             |
 | SPI        | 0      | USART1          | MOSI: PC11, MISO: PC10, CLK: PA12 |                                                          |
@@ -91,6 +92,7 @@ PIN 1 is the bottom-left contact when the header faces you horizontally.
 | Low-level driver              | ADC        | yes       |                                                                |
 |                               | Flash      | yes       |                                                                |
 |                               | GPIO       | yes       | Interrupts are shared across pins (see reference manual)       |
+|                               | HWRNG      | yes       |                                                                |
 |                               | I2C        | yes       |                                                                |
 |                               | PWM        | yes       |                                                                |
 |                               | RTCC       | yes       | As RTT or RTC                                                  |

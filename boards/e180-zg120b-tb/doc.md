@@ -19,7 +19,7 @@ peripherals, different energy modes and short wake-up times.
 | Family        | ARM Cortex-M4F                                                                          |
 | Vendor        | Silicon Labs                                                                            |
 | Vendor Family | EFM32 Mighty Gecko 1B                                                                   |
-| RAM           | 32.0 KiB (1.0 KiB reserved by radio blob)                                               |
+| RAM           | 32.0 KiB (1.0 KiB reserved for the radio blob)                                          |
 | Flash         | 256.0 KiB                                                                               |
 | EEPROM        | no                                                                                      |
 | Frequency     | up to 38.4 MHz                                                                          |
