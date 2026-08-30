@@ -2,7 +2,7 @@ INCLUDES += -I$(RIOTBOARD)/common/msp430/include
 
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 
 # setup flash tool
 PROGRAMMER ?= mspdebug
