@@ -103,7 +103,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 ### Clock selection
 
 There are several clock sources that are available for the different
-peripherals. You are advised to read [AN0004.0](https://www.silabs.com/documents/public/application-notes/an0004.0-efm32-cmu.pdf)
+peripherals. You are advised to read [AN0004.2](https://www.silabs.com/documents/public/application-notes/an0004.2-efr32-series2-cmu.pdf)
 to get familiar with the different clocks.
 
 | Source | Internal | Speed      | Comments                           |

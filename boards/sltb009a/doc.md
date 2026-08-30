@@ -129,7 +129,7 @@ expects data from the MCU with the same settings.
 
 There are several clock sources that are available for the different
 peripherals. You are advised to read
-[AN0004.0](https://www.silabs.com/documents/public/application-notes/an0004.0-efm32-cmu.pdf)
+[AN0004.1](https://www.silabs.com/documents/public/application-notes/an0004.1-efm32-cmu.pdf)
 to get familiar with the different clocks.
 
 | Source | Internal | Speed      | Comments                           |
