@@ -93,7 +93,6 @@ peripherals, different energy modes and short wake-up times.
 | Peripheral | Number  | Hardware        | Pins                        | Comments                                            |
 |------------|---------|-----------------|-----------------------------|-----------------------------------------------------|
 | ADC        | 0       | ADC0            | CHAN0: internal temperature | Ports are fixed, 14/16-bit resolution not supported |
-| HWCRYPTO   | &mdash; | &mdash;         |                             | AES128/AES256, SHA1, SHA256                         |
 | RTT        | &mdash; | RTCC            |                             | 1 Hz interval. Either RTT or RTC (see below)        |
 | RTC        | &mdash; | RTCC            |                             | 1 Hz interval. Either RTC or RTT (see below)        |
 | Timer      | 0       | TIMER0 + TIMER1 |                             | TIMER0 is used as prescaler (must be adjacent)      |
@@ -120,7 +119,6 @@ The fourth button with the Chinese description is the reset button.
 | Low-level driver | ADC       | yes       |                                                                |
 |                  | Flash     | yes       |                                                                |
 |                  | GPIO      | yes       | Interrupts are shared across pins (see reference manual)       |
-|                  | HW Crypto | yes       |                                                                |
 |                  | I2C       | yes       |                                                                |
 |                  | PWM       | yes       |                                                                |
 |                  | RTCC      | yes       | As RTT or RTC                                                  |
@@ -188,14 +186,6 @@ Calendar*, which can be configured in ticker mode **or** calendar mode.
 Therefore, only one of both peripherals can be enabled at the same time.
 
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
-
-### Hardware crypto
-
-This MCU is equipped with a hardware-accelerated crypto peripheral that can
-speed up AES128, AES256, SHA1, SHA256 and several other cryptographic
-computations.
-
-A peripheral driver interface is proposed, but not yet implemented.
 
 ### Usage of EMLIB
 

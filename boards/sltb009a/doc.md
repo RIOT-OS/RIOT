@@ -72,7 +72,6 @@ PIN 1 is the top-left contact.
 | ADC         | 0       | ADC0:CH0   |                  | Internal temperature                |
 | ADC         | 1       | ADC0:CH1   |                  | AVDD                                |
 | I2C         | 0       | I2C0       | SDA:PE4, SCL:PE5 | Normal speed                        |
-| HWCRYPTO    | -       | -          |                  | AES128/AES256, SHA1, SHA224/SHA256  |
 | HWRNG       | -       | TNRG0      |                  | True Random Number Generator (TRNG) |
 | RTT         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
 | RTC         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
@@ -107,7 +106,6 @@ PIN 1 is the top-left contact.
 |                  | DAC        | yes       | VDAC, IDAC is not supported                        |
 |                  | Flash      | yes       |                                                    |
 |                  | GPIO       | yes       | Interrupts are shared across pins (see ref manual) |
-|                  | HW Crypto  | yes       |                                                    |
 |                  | I2C        | yes       |                                                    |
 |                  | PWM        | yes       |                                                    |
 |                  | RTCC       | yes       | As RTT or RTC                                      |
@@ -185,14 +183,6 @@ Calendar*, which can be configured in ticker mode **or** calendar mode.
 Therefore, only one of both peripherals can be enabled at the same time.
 
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
-
-### Hardware crypto
-
-This MCU is equipped with a hardware-accelerated crypto peripheral that can
-speed up AES128, AES256, SHA1, SHA256 and several other cryptographic
-computations.
-
-A peripheral driver interface is proposed, but not yet implemented.
 
 ### Usage of EMLIB
 

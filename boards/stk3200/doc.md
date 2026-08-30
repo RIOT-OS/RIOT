@@ -66,7 +66,6 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |------------|---------|-----------------|---------------------------------|----------------------------------------------------------|
 | ADC        | 0       | ADC0            | CHAN0: internal temperature     | Ports are fixed, 14/16-bit resolution not supported      |
 | I2C        | 0       | I2C0            | SDA: PE12, SCL: PE13            | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
-| HWCRYPTO   | &mdash; | &mdash;         |                                 | AES128/AES256 only                                       |
 | RTT        | &mdash; | RTC             |                                 | Either RTT or RTC (see below)                            |
 | RTC        | &mdash; | RTC             |                                 | Either RTC or RTT (see below)                            |
 | SPI        | 0       | USART1          | MOSI: PD7, MISO: PD6, CLK: PC15 |                                                          |
@@ -90,7 +89,6 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | Low-level driver | ADC         | yes       |                                                                |
 |                  | Flash       | yes       |                                                                |
 |                  | GPIO        | yes       | Interrupts are shared across pins (see reference manual)       |
-|                  | HW Crypto   | yes       |                                                                |
 |                  | I2C         | yes       |                                                                |
 |                  | PWM         | yes       |                                                                |
 |                  | RTC         | yes       | As RTT or RTC                                                  |
@@ -180,12 +178,6 @@ structures and visa versa.
 
 Configured at 1 Hz interval, the RTC will overflow each 194 days. When using
 the ticker-to-calendar mode, this interval is extended artificially.
-
-### Hardware crypto
-
-This MCUs has support for hardware-accelerated AES128.
-
-A peripheral driver interface is proposed, but not yet implemented.
 
 ### Usage of EMLIB
 

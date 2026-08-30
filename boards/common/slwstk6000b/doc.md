@@ -47,7 +47,6 @@ The MCU depends on the module used.
 | Low-level driver | ADC                   | yes       |                                                                |
 |                  | Flash                 | yes       |                                                                |
 |                  | GPIO                  | yes       | Interrupts are shared across pins (see reference manual)       |
-|                  | HW Crypto             | yes       |                                                                |
 |                  | I2C                   | yes       |                                                                |
 |                  | PWM                   | yes       |                                                                |
 |                  | RTCC                  | yes       | As RTT or RTC                                                  |
@@ -150,14 +149,6 @@ Calendar*, which can be configured in ticker mode **or** calendar mode.
 Therefore, only one of both peripherals can be enabled at the same time.
 
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
-
-### Hardware crypto
-
-This MCU is equipped with a hardware accelerated crypto peripheral that can
-speed up AES128, AES256, SHA1, SHA256 and several other cryptographic
-computations.
-
-A peripheral driver interface for RIOT-OS is proposed, but not yet implemented.
 
 ### Usage of EMLIB
 

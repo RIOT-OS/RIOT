@@ -88,7 +88,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | Low-level driver              | ADC         | no        |                                                                |
 |                               | Flash       | yes       |                                                                |
 |                               | GPIO        | yes       | Interrupts are shared across pins (see reference manual)       |
-|                               | HW Crypto   | partially | Only hwrng                                                     |
+|                               | HW Crypto   | partially | Only HW RNG                                                    |
 |                               | I2C         | yes       |                                                                |
 |                               | PWM         | no        |                                                                |
 |                               | RTC         | no        | As RTT or RTC                                                  |

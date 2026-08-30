@@ -66,7 +66,6 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |------------|---------|-------------------|--------------------------------|----------------------------------------------------------|
 | ADC        | 0       | ADC0              | CHAN0: internal temperature    | Ports are fixed, 14/16-bit resolution not supported      |
 | I2C        | 0       | I2C0              | SDA: PC10, CLK: PC11           | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
-| HWCRYPTO   | &mdash; | &mdash;           |                                | AES128/AES256, SHA1, SHA256                              |
 | HWRNG      | &mdash; | TNRG0             |                                | Hardware-based true random number generator              |
 | RTT        | &mdash; | RTCC              |                                | 1 Hz interval. Either RTT or RTC (see below)             |
 | RTC        | &mdash; | RTCC              |                                | 1 Hz interval. Either RTC or RTT (see below)             |
@@ -95,7 +94,6 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | Low-level driver              | ADC         | yes       |                                                                |
 |                               | Flash       | yes       |                                                                |
 |                               | GPIO        | yes       | Interrupts are shared across pins (see reference manual)       |
-|                               | HW Crypto   | yes       |                                                                |
 |                               | HW RNG      | yes       |                                                                |
 |                               | I2C         | yes       |                                                                |
 |                               | PWM         | yes       |                                                                |
@@ -205,14 +203,6 @@ Calendar*, which can be configured in ticker mode **or** calendar mode.
 Therefore, only one of both peripherals can be enabled at the same time.
 
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
-
-### Hardware crypto
-
-This MCU is equipped with a hardware-accelerated crypto peripheral that can
-speed up AES128, AES256, SHA1, SHA256 and several other cryptographic
-computations.
-
-A peripheral driver interface is proposed, but not yet implemented.
 
 ### Usage of EMLIB
 
