@@ -42,7 +42,7 @@ On Windows, devices will appear as a virtual `COM` port.
 
 On Linux, devices will appear under `/dev/`.
 
-On macOS, `/dev/tty.SLAB_USBtoUARTx`.
+On macOS, `/dev/tty.usbserial*`.
 
 On Linux:
 

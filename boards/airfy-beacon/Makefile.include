@@ -1,6 +1,6 @@
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 
 # this board uses an ST-Link v2 debug adapter
 OPENOCD_DEBUG_ADAPTER ?= stlink
