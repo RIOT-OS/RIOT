@@ -74,12 +74,12 @@ is the top-left contact, marked on the silkscreen.
 
 ### User interface
 
-| Peripheral | Mapped to | Pin  | Comments  |
-|------------|-----------|------|-----------|
-| Button     | PB0       | PD14 |           |
-|            | PB1       | PD15 |           |
-| LED        | LED0      | PD11 | Red LED   |
-|            | LED1      | PD12 | Green LED |
+| Peripheral | Number | Mapped to | Pin  | Comments  |
+|------------|--------|-----------|------|-----------|
+| Button     | 0      | PB0_PIN   | PD14 |           |
+|            | 1      | PB1_PIN   | PD15 |           |
+| LED        | 0      | LED0_PIN  | PD12 | Green LED |
+|            | 1      | LED1_PIN  | PD11 | Red LED   |
 
 ## Implementation Status
 

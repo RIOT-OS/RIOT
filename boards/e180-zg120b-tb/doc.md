@@ -101,13 +101,13 @@ peripherals, different energy modes and short wake-up times.
 
 ### User interface
 
-| Peripheral | Mapped to | Pin  | Comments        |
-|------------|-----------|------|-----------------|
-| Button     | PB0_PIN   | PD15 | Mode Change     |
-|            | PB1_PIN   | PD13 | Touch Link      |
-|            | PB2_PIN   | PB11 | Baud Rate Reset |
-| LED        | LED0_PIN  | PF2  | GPIO2 LED       |
-|            | LED1_PIN  | PF3  | Link LED        |
+| Peripheral | Number | Mapped to | Pin  | Comments        |
+|------------|--------|-----------|------|-----------------|
+| Button     | 0      | PB0_PIN   | PD15 | Mode Change     |
+|            | 1      | PB1_PIN   | PD13 | Touch Link      |
+|            | 2      | PB2_PIN   | PB11 | Baud Rate Reset |
+| LED        | 0      | LED0_PIN  | PF2  | GPIO2 LED       |
+|            | 1      | LED1_PIN  | PF3  | Link LED        |
 
 The fourth button with the Chinese description is the reset button.
 

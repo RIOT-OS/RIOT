@@ -80,12 +80,12 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 
 ### User interface
 
-| Peripheral | Mapped to | Pin  | Comments   |
-|------------|-----------|------|------------|
-| Button     | PB0       | PB9  |            |
-|            | PB1       | PB10 |            |
-| LED        | LED0      | PE2  | Yellow LED |
-|            | LED1      | PE3  | Yellow LED |
+| Peripheral | Number | Mapped to | Pin  | Comments   |
+|------------|--------|-----------|------|------------|
+| Button     | 0      | PB0_PIN   | PB9  |            |
+|            | 1      | PB1_PIN   | PB10 |            |
+| LED        | 0      | LED0_PIN  | PE2  | Yellow LED |
+|            | 1      | LED1_PIN  | PE3  | Yellow LED |
 
 ## Implementation Status
 

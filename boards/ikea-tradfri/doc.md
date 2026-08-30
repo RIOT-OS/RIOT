@@ -75,10 +75,10 @@ Pin 1 is on the top-left side with only 6 contacts.
 
 ### User interface
 
-| Peripheral | Mapped to | Pin  | Comments |
-|------------|-----------|------|----------|
-| LED        | LED0      | PB13 |          |
-|            | LED1      | PA1  |          |
+| Peripheral | Number | Mapped to | Pin  | Comments |
+|------------|--------|-----------|------|----------|
+| LED        | 0      | LED0_PIN  | PA1  |          |
+|            | 1      | LED1_PIN  | PB13 |          |
 
 ## Implementation Status
 

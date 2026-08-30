@@ -84,18 +84,18 @@ PIN 1 is the top-left contact.
 
 ### User interface
 
-| Peripheral | Mapped to | Pin       | Comments   |
-|------------|-----------|-----------|------------|
-| Button     | PB0_PIN   | PD5       |            |
-|            | PB1_PIN   | PD8       |            |
-| LED        | LED0R_PIN | PA12      |            |
-|            | LED0G_PIN | PA13      |            |
-|            | LED0B_PIN | PA14      |            |
-|            | LED1R_PIN | PD6       |            |
-|            | LED1G_PIN | PF12      |            |
-|            | LED1B_PIN | PE12      |            |
-|            | LED0_PIN  | LED0R_PIN |            |
-|            | LED1_PIN  | LED1R_PIN |            |
+| Peripheral | Number | Mapped to | Pin       | Comments |
+|------------|--------|-----------|-----------|----------|
+| Button     | 0      | PB0_PIN   | PD5       |          |
+|            | 1      | PB1_PIN   | PD8       |          |
+| LED        | 0      | LED0R_PIN | PA12      |          |
+|            |        | LED0G_PIN | PA13      |          |
+|            |        | LED0B_PIN | PA14      |          |
+|            |        | LED0_PIN  | LED0R_PIN |          |
+|            | 1      | LED1R_PIN | PD6       |          |
+|            |        | LED1G_PIN | PF12      |          |
+|            |        | LED1B_PIN | PE12      |          |
+|            |        | LED1_PIN  | LED1R_PIN |          |
 
 ## Implementation Status
 

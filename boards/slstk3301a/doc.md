@@ -76,12 +76,12 @@ PIN 1 is the bottom-left contact when the header faces you horizontally.
 
 ### User interface
 
-| Peripheral | Mapped to | Pin  | Comments   |
-|------------|-----------|------|------------|
-| Button     | PB0_PIN   | PD5  |            |
-|            | PB1_PIN   | PC9  |            |
-| LED        | LED0_PIN  | PD2  |            |
-|            | LED1_PIN  | PC2  |            |
+| Peripheral | Number | Mapped to | Pin | Comments |
+|------------|--------|-----------|-----|----------|
+| Button     | 0      | PB0_PIN   | PD5 |          |
+|            | 1      | PB1_PIN   | PC9 |          |
+| LED        | 0      | LED0_PIN  | PD2 |          |
+|            | 1      | LED1_PIN  | PC2 |          |
 
 ## Implementation Status
 
