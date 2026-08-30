@@ -101,6 +101,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 ## Board configuration
 
 ### Clock selection
+
 There are several clock sources that are available for the different
 peripherals. You are advised to read [AN0004.0](https://www.silabs.com/documents/public/application-notes/an0004.0-efm32-cmu.pdf)
 to get familiar with the different clocks.
@@ -114,6 +115,22 @@ It is important that the clock speeds are known to the code, for proper
 calculations of speeds and baud rates. If the HFXO or LFXO are different from
 the speeds above, ensure to pass `HFXO_FREQ=freq_in_hz` and
 `LFXO_FREQ=freq_in_hz` to your compiler defines.
+
+### Usage of EMLIB
+
+This port makes use of EMLIB by Silicon Labs to abstract peripheral registers.
+While some overhead is to be expected, it ensures proper setup of devices,
+provides chip errata and simplifies development. The exact overhead depends on
+the application and peripheral usage, but the largest overhead is expected
+during peripheral setup. A lot of read/write/get/set methods are implemented as
+inline methods or macros (which have no overhead).
+
+Another advantage of EMLIB are the included assertions. These assertions ensure
+that peripherals are used properly. To enable this, pass `DEBUG_EFM` to your
+compiler defines.
+
+EMLIB is licensed by Silicon Labs under the zlib-style license, which permits
+distribution of source.
 
 ## Flashing the device
 
@@ -137,7 +154,3 @@ Or, to connect with your own debugger:
 ```shell
 BOARD=xg23-pk6068a make debug-server
 ```
-
-## License information
-
-Silicon Labs' EMLIB: zlib-style license (permits distribution of source).

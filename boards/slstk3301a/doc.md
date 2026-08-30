@@ -190,7 +190,7 @@ inline methods or macros (which have no overhead).
 
 Another advantage of EMLIB are the included assertions. These assertions ensure
 that peripherals are used properly. To enable this, pass `DEBUG_EFM` to your
-compiler.
+compiler defines.
 
 EMLIB is licensed by Silicon Labs under the zlib-style license, which permits
 distribution of source.
