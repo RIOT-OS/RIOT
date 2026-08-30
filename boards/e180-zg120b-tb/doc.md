@@ -17,7 +17,7 @@ peripherals, different energy modes and short wake-up times.
 | MCU           | EFR32MG1B232F256GM32                                                                    |
 |---------------|-----------------------------------------------------------------------------------------|
 | Family        | ARM Cortex-M4F                                                                          |
-| Vendor        | Ebyte                                                                                   |
+| Vendor        | Silicon Labs                                                                            |
 | Vendor Family | EFM32 Mighty Gecko 1B                                                                   |
 | RAM           | 32.0 KiB (1.0 KiB reserved by radio blob)                                               |
 | Flash         | 256.0 KiB                                                                               |
@@ -199,7 +199,7 @@ A peripheral driver interface is proposed, but not yet implemented.
 
 ### Usage of EMLIB
 
-This port makes uses of EMLIB by Ebyte to abstract peripheral registers.
+This port makes uses of EMLIB by Silicon Labs to abstract peripheral registers.
 While some overhead is to be expected, it ensures proper setup of devices,
 provides chip errata and simplifies development. The exact overhead depends on
 the application and peripheral usage, but the largest overhead is expected
@@ -267,4 +267,4 @@ BOARD=e180-zg120b-tb make emulate
 
 ## License information
 
-Ebyte' EMLIB: zlib-style license (permits distribution of source).
+Silicon Labs' EMLIB: zlib-style license (permits distribution of source).
