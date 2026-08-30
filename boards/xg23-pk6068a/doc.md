@@ -92,7 +92,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |                               | I2C         | yes       |                                                                |
 |                               | PWM         | no        |                                                                |
 |                               | RTC         | no        | As RTT or RTC                                                  |
-|                               | SPI         | partially | Only master mode                                               |
+|                               | SPI         | yes       | Only master mode                                               |
 |                               | Timer       | yes       |                                                                |
 |                               | UART        | yes       |                                                                |
 | LCD driver                    | LS013B7DH03 | yes       | Sharp Low Power Memory LCD via the U8g2 package                |

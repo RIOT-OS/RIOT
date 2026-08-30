@@ -122,7 +122,7 @@ The fourth button with the Chinese description is the reset button.
 |                  | I2C       | yes       |                                                                |
 |                  | PWM       | yes       |                                                                |
 |                  | RTCC      | yes       | As RTT or RTC                                                  |
-|                  | SPI       | partially | Only master mode                                               |
+|                  | SPI       | yes       | Only master mode                                               |
 |                  | Timer     | yes       |                                                                |
 |                  | UART      | yes       | USART is shared with SPI. LEUART baud rate limited (see below) |
 |                  | USB       | no        |                                                                |

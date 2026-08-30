@@ -91,7 +91,7 @@ Pin 1 is on the top-left side with only 6 contacts.
 |                  | I2C        | yes       |                                                                |
 |                  | PWM        | yes       |                                                                |
 |                  | RTCC       | yes       | As RTT or RTC                                                  |
-|                  | SPI        | partially | Only master mode                                               |
+|                  | SPI        | yes       | Only master mode                                               |
 |                  | Timer      | yes       |                                                                |
 |                  | UART       | yes       | USART is shared with SPI. LEUART baud rate limited (see below) |
 | SPI NOR Flash    | IS25LQ020B | yes       | 2MBit flash. Can be used with the MTD API.                     |

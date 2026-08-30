@@ -92,7 +92,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |                  | I2C         | yes       |                                                                |
 |                  | PWM         | yes       |                                                                |
 |                  | RTC         | yes       | As RTT or RTC                                                  |
-|                  | SPI         | partially | Only master mode                                               |
+|                  | SPI         | yes       | Only master mode                                               |
 |                  | Timer       | yes       |                                                                |
 |                  | UART        | yes       | USART is shared with SPI. LEUART baud rate limited (see below) |
 |                  | USB         | no        |                                                                |
