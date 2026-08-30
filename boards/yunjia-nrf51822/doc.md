@@ -130,10 +130,10 @@ The default values are PIN 1: `UART_RX` and Pin 2: `UART_TX` _(also compare
 schematic above)_.
 
 The BLE400 development board contains a CP2102 accessible through
-/dev/tty.SLAB_USBtoUART. You have to edit periph_conf.h to use it with UART_RX
-pin 11 and UART_TX pin 9.
+`/dev/tty.usbserial`. You have to edit `periph_conf.h` to use it with `UART_RX`
+pin 11 and `UART_TX` pin 9.
 
-The default Baud rate is `115200`.
+The default baud rate is `115200`.
 
 ### Troubleshooting
 
