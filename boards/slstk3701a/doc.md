@@ -18,6 +18,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 | MCU             | EFM32GG11B820F2048GL192                              |
 |-----------------|------------------------------------------------------|
 | Family          | ARM Cortex-M4F                                       |
+| Series          | Series 1                                             |
 | Vendor          | Silicon Labs                                         |
 | Vendor Family   | EFM32 Giant Gecko 11B                                |
 | RAM             | 512.0 KiB                                            |

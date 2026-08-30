@@ -18,6 +18,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 | MCU             | EFM32HG322F64                                                                                    |
 |-----------------|--------------------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M0PLUS                                                                                |
+| Series          | Series 0                                                                                         |
 | Vendor          | Silicon Labs                                                                                     |
 | Vendor Family   | EFM32 Happy Gecko                                                                                |
 | RAM             | 8.0 KiB                                                                                          |

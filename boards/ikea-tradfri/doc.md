@@ -17,6 +17,7 @@ More information about the module can be found on this
 | MCU             | EFR32MG1P132F256GM32                                                                    |
 |-----------------|-----------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M4F                                                                          |
+| Series          | Series 1                                                                                |
 | Vendor          | Silicon Labs                                                                            |
 | Vendor Family   | EFR32 Mighty Gecko 1P                                                                   |
 | RAM             | 32.0 KiB (1.0 KiB reserved for the radio blob)                                          |

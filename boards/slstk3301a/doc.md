@@ -18,6 +18,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 | MCU             | EFM32TG11B520F128GM80                                                                              |
 |-----------------|----------------------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M0PLUS                                                                                  |
+| Series          | Series 1                                                                                           |
 | Vendor          | Silicon Labs                                                                                       |
 | Vendor Family   | EFM32 Tiny Gecko 11B                                                                               |
 | RAM             | 32.0 KiB                                                                                           |

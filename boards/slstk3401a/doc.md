@@ -18,6 +18,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 | MCU             | EFM32PG1B200F256GM48                                                                             |
 |-----------------|--------------------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M4F                                                                                   |
+| Series          | Series 1                                                                                         |
 | Vendor          | Silicon Labs                                                                                     |
 | Vendor Family   | EFM32 Pearl Gecko 1B                                                                             |
 | RAM             | 32.0 KiB                                                                                         |

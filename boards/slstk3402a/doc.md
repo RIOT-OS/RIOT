@@ -18,6 +18,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 | MCU             | EFM32PG12B500F1024GL125                                                                          |
 |-----------------|--------------------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M4F                                                                                   |
+| Series          | Series 1                                                                                         |
 | Vendor          | Silicon Labs                                                                                     |
 | Vendor Family   | EFM32 Pearl Gecko 12B                                                                            |
 | RAM             | 256.0 KiB                                                                                        |

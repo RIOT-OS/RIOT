@@ -15,7 +15,8 @@ actively measure the power consumption of your hardware and code, in real-time.
 
 ### MCU
 
-The MCU depends on the module used.
+The MCU depends on the module used. All modules are based on an EFR32
+Series 1 MCU.
 
 | Module     | MCU                     |
 |------------|-------------------------|

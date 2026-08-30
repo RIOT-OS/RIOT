@@ -18,6 +18,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 | MCU             | EFM32LG990F256                                                                             |
 |-----------------|--------------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M3                                                                              |
+| Series          | Series 0                                                                                   |
 | Vendor          | Silicon Labs                                                                               |
 | Vendor Family   | EFM32 Leopard Gecko                                                                       |
 | RAM             | 32.0 KiB                                                                                   |

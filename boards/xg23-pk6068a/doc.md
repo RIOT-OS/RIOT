@@ -21,6 +21,7 @@ expansion header.
 | MCU             | EFR32ZG23                                                                                        |
 |-----------------|--------------------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M33                                                                                   |
+| Series          | Series 2                                                                                         |
 | Vendor          | Silicon Labs                                                                                     |
 | Vendor Family   | EFM32 Wireless Gecko                                                                             |
 | RAM             | 64.0 KiB                                                                                         |

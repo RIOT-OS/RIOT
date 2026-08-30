@@ -18,6 +18,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 | MCU             | EFM32ZG222F32                                                                              |
 |-----------------|--------------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M0PLUS                                                                          |
+| Series          | Series 0                                                                                   |
 | Vendor          | Silicon Labs                                                                               |
 | Vendor Family   | EFM32 Zero Gecko                                                                           |
 | RAM             | 4.0 KiB                                                                                    |

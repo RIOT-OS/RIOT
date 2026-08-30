@@ -18,6 +18,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 | MCU             | EZR32WG330F256R60                                                                                 |
 |-----------------|---------------------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M4F                                                                                    |
+| Series          | Series 0                                                                                          |
 | Vendor          | Silicon Labs                                                                                      |
 | Vendor Family   | EZR32 Wonder Gecko                                                                                |
 | RAM             | 32.0 KiB                                                                                          |
