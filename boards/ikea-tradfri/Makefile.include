@@ -1,4 +1,12 @@
 # setup JLink for flashing
-PROGRAMMER ?= jlink
 JLINK_DEVICE = EFR32MG1PxxxF256
 JLINK_PRE_FLASH += r
+
+# setup OpenOCD for flashing
+OPENOCD_CONFIG ?= board/efm32.cfg
+
+# configure JLink as default programmer
+PROGRAMMER ?= jlink
+
+# board can also use BMP or OpenOCD as programmer
+PROGRAMMERS_SUPPORTED += bmp openocd
