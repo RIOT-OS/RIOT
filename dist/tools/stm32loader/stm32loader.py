@@ -64,7 +64,7 @@ class CmdException(Exception):
     pass
 
 class CommandInterface(object):
-    def open(self, aport='/dev/tty.usbserial-FTD3TMCH', abaudrate=115200) :
+    def open(self, aport='/dev/cu.usbserial-FTD3TMCH', abaudrate=115200) :
         self.sp = serial.Serial(
             port=aport,
             baudrate=abaudrate,     # baudrate
@@ -582,7 +582,7 @@ if __name__ == "__main__":
         ports = []
 
         # Get a list of all USB-like names in /dev
-        for name in ['tty.usbserial', 'ttyUSB']:
+        for name in ['cu.usbserial', 'ttyUSB']:
             ports.extend(glob.glob('/dev/%s*' % name))
 
         ports = sorted(ports)
