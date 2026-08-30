@@ -8,5 +8,4 @@ OPENOCD_DEBUG_ADAPTER ?= stlink
 include $(RIOTMAKE)/tools/openocd.inc.mk
 
 # setup serial terminal
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/cu.usbserial*)))

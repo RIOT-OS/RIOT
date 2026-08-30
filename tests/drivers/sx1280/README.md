@@ -155,7 +155,7 @@ help
 ```
 
 ```
-2022-04-28 16:26:43,538 # Connect to serial port /dev/tty.usbserial-14620
+2022-04-28 16:26:43,538 # Connect to serial port /dev/cu.usbserial-14620
 Welcome to pyterm!
 Type '/exit' to exit.
 sx1280
