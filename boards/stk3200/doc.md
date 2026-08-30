@@ -62,15 +62,15 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 
 ### Peripheral mapping
 
-| Peripheral | Number  | Hardware        | Pins                            | Comments                                                 |
-|------------|---------|-----------------|---------------------------------|----------------------------------------------------------|
-| ADC        | 0       | ADC0            | CHAN0: internal temperature     | Ports are fixed, 14/16-bit resolution not supported      |
-| I2C        | 0       | I2C0            | SDA: PE12, SCL: PE13            | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
-| RTT        | &mdash; | RTC             |                                 | Either RTT or RTC (see below)                            |
-| RTC        | &mdash; | RTC             |                                 | Either RTC or RTT (see below)                            |
-| SPI        | 0       | USART1          | MOSI: PD7, MISO: PD6, CLK: PC15 |                                                          |
-| Timer      | 0       | TIMER0 + TIMER1 |                                 | TIMER0 is used as prescaler (must be adjacent)           |
-| UART       | 0       | LEUART0         | RX: PD5, TX: PD4                | STDIO Output, Baud rate limited (see below)              |
+| Peripheral | Number | Hardware        | Pins                            | Comments                                                 |
+|------------|--------|-----------------|---------------------------------|----------------------------------------------------------|
+| ADC        | 0      | ADC0            | CHAN0: internal temperature     | Ports are fixed, 14/16-bit resolution not supported      |
+| I2C        | 0      | I2C0            | SDA: PE12, SCL: PE13            | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
+| RTT        | -      | RTC             |                                 | Either RTT or RTC (see below)                            |
+| RTC        | -      | RTC             |                                 | Either RTC or RTT (see below)                            |
+| SPI        | 0      | USART1          | MOSI: PD7, MISO: PD6, CLK: PC15 |                                                          |
+| Timer      | 0      | TIMER0 + TIMER1 |                                 | TIMER0 is used as prescaler (must be adjacent)           |
+| UART       | 0      | LEUART0         | RX: PD5, TX: PD4                | STDIO Output, Baud rate limited (see below)              |
 
 ### User interface
 

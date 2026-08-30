@@ -62,16 +62,16 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 
 ### Peripheral mapping
 
-| Peripheral | Number  | Hardware        | Pins                              | Comments                                                 |
-|------------|---------|-----------------|-----------------------------------|----------------------------------------------------------|
-| ADC        | 0       | ADC0            | CHAN0: internal temperature       | Ports are fixed, 14/16-bit resolution not supported      |
-| I2C        | 0       | I2C0            | SDA: PD6,  CLK: PD7               | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
-| RTT        | &mdash; | RTCC            |                                   | 1 Hz interval. Either RTT or RTC (see below)             |
-| RTC        | &mdash; | RTCC            |                                   | 1 Hz interval. Either RTC or RTT (see below)             |
-| SPI        | 0       | USART0          | MOSI: PE10, MISO: PE11, CLK: PE12 |                                                          |
-| Timer      | 0       | TIMER0 + TIMER1 |                                   | TIMER0 is used as prescaler (must be adjacent)           |
-| UART       | 0       | USART1          | RX: PA0, TX: PF2                  | Default STDIO output                                     |
-|            | 1       | LEUART0         | RX: PD5, TX: PD4                  | Baud rate limited (see below)                            |
+| Peripheral | Number | Hardware        | Pins                              | Comments                                                 |
+|------------|--------|-----------------|-----------------------------------|----------------------------------------------------------|
+| ADC        | 0      | ADC0            | CHAN0: internal temperature       | Ports are fixed, 14/16-bit resolution not supported      |
+| I2C        | 0      | I2C0            | SDA: PD6,  CLK: PD7               | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
+| RTT        | -      | RTCC            |                                   | 1 Hz interval. Either RTT or RTC (see below)             |
+| RTC        | -      | RTCC            |                                   | 1 Hz interval. Either RTC or RTT (see below)             |
+| SPI        | 0      | USART0          | MOSI: PE10, MISO: PE11, CLK: PE12 |                                                          |
+| Timer      | 0      | TIMER0 + TIMER1 |                                   | TIMER0 is used as prescaler (must be adjacent)           |
+| UART       | 0      | USART1          | RX: PA0, TX: PF2                  | Default STDIO output                                     |
+|            | 1      | LEUART0         | RX: PD5, TX: PD4                  | Baud rate limited (see below)                            |
 
 ### User interface
 

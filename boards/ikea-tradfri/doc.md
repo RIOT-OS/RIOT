@@ -62,16 +62,16 @@ Pin 1 is on the top-left side with only 6 contacts.
 
 ### Peripheral mapping
 
-| Peripheral | Number  | Hardware        | Pins                              | Comments                                            |
-|------------|---------|-----------------|-----------------------------------|-----------------------------------------------------|
-| ADC        | 0       | ADC0            | CHAN0: internal temperature       | Ports are fixed, 14/16-bit resolution not supported |
-| RTT        | &mdash; | RTCC            |                                   | 1 Hz interval. Either RTT or RTC (see below)        |
-| RTC        | &mdash; | RTCC            |                                   | 1 Hz interval. Either RTC or RTT (see below)        |
-| SPI        | 0       | USART1          | MOSI: PD15, MISO: PD14, CLK: PD13 |                                                     |
-| Timer      | 0       | TIMER0 + TIMER1 |                                   | TIMER0 is used as prescaler (must be adjacent)      |
-|            | 1       | LETIMER0        |                                   |                                                     |
-| UART       | 0       | USART0          | RX: PB15, TX: PB14                | Default STDIO output                                |
-|            | 1       | LEUART0         | RX: PB15, TX: PB14                | Baud rate limited (see below)                       |
+| Peripheral | Number | Hardware        | Pins                              | Comments                                            |
+|------------|--------|-----------------|-----------------------------------|-----------------------------------------------------|
+| ADC        | 0      | ADC0            | CHAN0: internal temperature       | Ports are fixed, 14/16-bit resolution not supported |
+| RTT        | -      | RTCC            |                                   | 1 Hz interval. Either RTT or RTC (see below)        |
+| RTC        | -      | RTCC            |                                   | 1 Hz interval. Either RTC or RTT (see below)        |
+| SPI        | 0      | USART1          | MOSI: PD15, MISO: PD14, CLK: PD13 |                                                     |
+| Timer      | 0      | TIMER0 + TIMER1 |                                   | TIMER0 is used as prescaler (must be adjacent)      |
+|            | 1      | LETIMER0        |                                   |                                                     |
+| UART       | 0      | USART0          | RX: PB15, TX: PB14                | Default STDIO output                                |
+|            | 1      | LEUART0         | RX: PB15, TX: PB14                | Baud rate limited (see below)                       |
 
 ### User interface
 

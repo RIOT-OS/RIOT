@@ -62,19 +62,19 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 
 ### Peripheral mapping
 
-| Peripheral | Number  | Hardware        | Pins                           | Comments                                                 |
-|------------|---------|-----------------|--------------------------------|----------------------------------------------------------|
-| ADC        | 0       | ADC0            | CHAN0: internal temperature    | Ports are fixed, 14/16-bit resolution not supported      |
-| DAC        | 0       | DAC0            | CHAN0: PB11                    | Ports are fixed, shared with I2C                         |
-| I2C        | 0       | I2C0            | SDA: PE0, SCL: PE1             | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
-| PWM        | 0       | TIMER0          | CHAN0: PF6, CHAN1: PF7         | Mapped to LED0 and LED1                                  |
-| RTT        | &mdash; | RTC             |                                | Either RTT or RTC (see below)                            |
-| RTC        | &mdash; | RTC             |                                | Either RTC or RTT (see below)                            |
-| SPI        | 0       | USART1          | MOSI: PD0, MISO: PD1, CLK: PD2 |                                                          |
-| Timer      | 0       | TIMER1 + TIMER2 |                                | TIMER1 is used as prescaler (must be adjacent)           |
-|            | 1       | LETIMER0        |                                |                                                          |
-| UART       | 0       | UART0           | RX: PE1, TX: PE0               | STDIO output                                             |
-|            | 1       | LEUART0         | RX: PD5, TX: PD4               | Baud rate limited (see below)                            |
+| Peripheral | Number | Hardware        | Pins                           | Comments                                                 |
+|------------|--------|-----------------|--------------------------------|----------------------------------------------------------|
+| ADC        | 0      | ADC0            | CHAN0: internal temperature    | Ports are fixed, 14/16-bit resolution not supported      |
+| DAC        | 0      | DAC0            | CHAN0: PB11                    | Ports are fixed, shared with I2C                         |
+| I2C        | 0      | I2C0            | SDA: PE0, SCL: PE1             | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
+| PWM        | 0      | TIMER0          | CHAN0: PF6, CHAN1: PF7         | Mapped to LED0 and LED1                                  |
+| RTT        | -      | RTC             |                                | Either RTT or RTC (see below)                            |
+| RTC        | -      | RTC             |                                | Either RTC or RTT (see below)                            |
+| SPI        | 0      | USART1          | MOSI: PD0, MISO: PD1, CLK: PD2 |                                                          |
+| Timer      | 0      | TIMER1 + TIMER2 |                                | TIMER1 is used as prescaler (must be adjacent)           |
+|            | 1      | LETIMER0        |                                |                                                          |
+| UART       | 0      | UART0           | RX: PE1, TX: PE0               | STDIO output                                             |
+|            | 1      | LEUART0         | RX: PD5, TX: PD4               | Baud rate limited (see below)                            |
 
 ### User interface
 

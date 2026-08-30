@@ -62,21 +62,21 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 
 ### Peripheral mapping
 
-| Peripheral | Number  | Hardware        | Pins                           | Comments                                                 |
-|------------|---------|-----------------|--------------------------------|----------------------------------------------------------|
-| ADC        | 0       | ADC0            | CHAN0: internal temperature    | Ports are fixed, 14/16-bit resolution not supported      |
-| DAC        | 0       | DAC0            | CHAN0: PB11                    | Ports are fixed, shared with I2C                         |
-| I2C        | 0       | I2C0            | SDA: PD6, SCL: PD7             | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
-|            | 1       | I2C1            | SDA: PC4, SCL: PC5             | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
-| PWM        | 0       | TIMER3          | CHAN0: PE2                     | Mapped to LED0                                           |
-| RTT        | &mdash; | RTC             |                                | Either RTT or RTC (see below)                            |
-| RTC        | &mdash; | RTC             |                                | Either RTC or RTT (see below)                            |
-| SPI        | 0       | USART1          | MOSI: PD0, MISO: PD1, CLK: PD2 |                                                          |
-|            | 1       | USART2          | MOSI: NC, MISO: PC3, CLK: PC4  |                                                          |
-| Timer      | 0       | TIMER0 + TIMER1 |                                | TIMER0 is used as prescaler (must be adjacent)           |
-|            | 1       | LETIMER0        |                                |                                                          |
-| UART       | 0       | UART0           | RX: PE1, TX: PE0               | STDIO output                                             |
-|            | 1       | LEUART0         | RX: PD5, TX: PD4               | Baud rate limited (see below)                            |
+| Peripheral | Number | Hardware        | Pins                           | Comments                                                 |
+|------------|--------|-----------------|--------------------------------|----------------------------------------------------------|
+| ADC        | 0      | ADC0            | CHAN0: internal temperature    | Ports are fixed, 14/16-bit resolution not supported      |
+| DAC        | 0      | DAC0            | CHAN0: PB11                    | Ports are fixed, shared with I2C                         |
+| I2C        | 0      | I2C0            | SDA: PD6, SCL: PD7             | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
+|            | 1      | I2C1            | SDA: PC4, SCL: PC5             | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
+| PWM        | 0      | TIMER3          | CHAN0: PE2                     | Mapped to LED0                                           |
+| RTT        | -      | RTC             |                                | Either RTT or RTC (see below)                            |
+| RTC        | -      | RTC             |                                | Either RTC or RTT (see below)                            |
+| SPI        | 0      | USART1          | MOSI: PD0, MISO: PD1, CLK: PD2 |                                                          |
+|            | 1      | USART2          | MOSI: NC, MISO: PC3, CLK: PC4  |                                                          |
+| Timer      | 0      | TIMER0 + TIMER1 |                                | TIMER0 is used as prescaler (must be adjacent)           |
+|            | 1      | LETIMER0        |                                |                                                          |
+| UART       | 0      | UART0           | RX: PE1, TX: PE0               | STDIO output                                             |
+|            | 1      | LEUART0         | RX: PD5, TX: PD4               | Baud rate limited (see below)                            |
 
 ### User interface
 
