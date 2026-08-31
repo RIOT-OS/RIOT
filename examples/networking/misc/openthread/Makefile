@@ -61,9 +61,6 @@ endif
 ifneq (,$(filter iotlab-m3 fox iotlab-a8-m3,$(BOARD)))
   DRIVER := at86rf231
 endif
-ifneq (,$(filter frdm-kw41z openlabs-kw41z-mini-256kib openlabs-kw41z-mini phynode-kw41z usb-kw41z,$(BOARD)))
-  DRIVER := kw41zrf
-endif
 
 USEMODULE += $(DRIVER)
 
