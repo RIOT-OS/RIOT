@@ -460,7 +460,7 @@ static ssize_t _build_and_send_pdu(
         }
     }
 
-    uint8_t* carbon_copy = transmission ? (*transmission)->pdu : NULL;
+    uint8_t* carbon_copy = transmission && *transmission ? (*transmission)->pdu : NULL;
     if (carbon_copy) {
         if ((size = unicoap_pdu_build_rfc7252(carbon_copy, sizeof(_state.carbon_copies[0]),
                                               packet->message, &packet->properties)) < 0) {
