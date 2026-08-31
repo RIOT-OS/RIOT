@@ -1,10 +1,13 @@
 INCLUDES += -I$(RIOTBOARD)/common/silabs/include
 INCLUDES += -I$(RIOTBOARD)/common/silabs/drivers/include
 
+# setup JLink for flashing
 PROGRAMMER ?= jlink
 
-# Silabs boards can use openocd programmer
-PROGRAMMERS_SUPPORTED += openocd
+# Series 2 is not supported by the BMP or OpenOCD programmer.
+ifneq (2,$(EFM32_SERIES))
+  PROGRAMMERS_SUPPORTED += bmp openocd
+endif
 
 JLINK_DEVICE ?= ${CPU_MODEL}
 OPENOCD_CONFIG ?= board/efm32.cfg
