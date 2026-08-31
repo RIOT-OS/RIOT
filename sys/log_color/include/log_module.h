@@ -28,7 +28,7 @@ extern "C" {
  * @param[in] level  Logging level
  * @param[in] format String format to print
  */
-void log_write(unsigned level, const char *format, ...);
+void log_write(unsigned level, const char* unit, const char *format, ...);
 
 #ifdef __cplusplus
 }

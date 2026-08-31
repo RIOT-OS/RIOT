@@ -91,9 +91,15 @@ extern "C" {
 /**
  * @brief   Common prefix for all debug messages, defaulting to an empty string.
  *          Expected to be set on a file-based level.
+ * 
+ * Defaults to `""` unless @ref 
  */
 #ifndef DEBUG_UNIT
-#  define DEBUG_UNIT ""
+#  ifdef LOG_UNIT
+#    define DEBUG_UNIT LOG_UNIT
+#  else
+#    define DEBUG_UNIT ""
+#  endif
 #endif
 
 /**
@@ -137,11 +143,26 @@ extern "C" {
 #if !defined(CONFIG_DEBUG_SHOW_FUNC) || defined(DOXYGEN)
 #  define CONFIG_DEBUG_SHOW_FUNC 0
 #endif
+
+/**
+ * @brief   Determines whether debug messages are printed like @ref LOG_DEBUG messages for visual
+ *          consistency
+ *
+ * **Default**: enabled if @ref CONFIG_STDIO_ANSI_STYLING is
+ */
+#if !defined(CONFIG_DEBUG_LOG_COLOR_COMPAT) || defined(DOXYGEN)
+#  define CONFIG_DEBUG_LOG_COLOR_COMPAT CONFIG_STDIO_ANSI_STYLING
+#endif
 /** @} */ /* end of section */
 
 #if !defined(DOXYGEN)
-#  define _DEBUG_STYLE_FOR_PREFIX      ANSI_STYLE(FOREGROUND_BRIGHT(CYAN), BOLD)
-#  define _DEBUG_STYLE_FOR_THREAD_FUNC ANSI_STYLE(FOREGROUND(WHITE), DIM)
+#  define _DEBUG_STYLE_FOR_PREFIX                ANSI_STYLE(FOREGROUND_BRIGHT(CYAN), BOLD)
+#  define _DEBUG_STYLE_FOR_THREAD_FUNC           ANSI_STYLE(FOREGROUND(WHITE), DIM)
+#  if CONFIG_DEBUG_LOG_COLOR_COMPAT
+#    define _DEBUG_PREFIX                        ANSI_STYLE(BOLD) "DEBUG " ANSI_STYLE_RESET "# "
+#  else
+#    define _DEBUG_PREFIX                        ""
+#  endif
 #endif
 
 /**
@@ -235,22 +256,22 @@ static inline const char *__debug_thread_name_or_isr(void)
         if (ENABLE_DEBUG && __debug_sufficient_stack(true)) {                                   \
             if (strlen(prefix) > 0) {                                                           \
                 if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) { \
-                    func(_DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC            \
+                    func(_DEBUG_PREFIX _DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC            \
                            " (%s@%s): " ANSI_STYLE_RESET,                                       \
                            DEBUG_FUNC, __debug_thread_name_or_isr());                           \
                 }                                                                               \
                 else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {                                   \
-                    func(_DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC            \
+                    func(_DEBUG_PREFIX _DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC            \
                            " (%s): " ANSI_STYLE_RESET,                                          \
                            DEBUG_FUNC);                                                         \
                 }                                                                               \
                 else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {                                 \
-                    func(_DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC            \
+                    func(_DEBUG_PREFIX _DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC            \
                            " (@%s): " ANSI_STYLE_RESET,                                         \
                            __debug_thread_name_or_isr());                                       \
                 }                                                                               \
                 else {                                                                          \
-                    func(_DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC            \
+                    func(_DEBUG_PREFIX _DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC            \
                            ": " ANSI_STYLE_RESET);                                              \
                 }                                                                               \
             }                                                                                   \
@@ -314,7 +335,7 @@ static inline const char *__debug_thread_name_or_isr(void)
     do {                                                                                        \
         if (ENABLE_DEBUG) {                                                                     \
             if (strlen(prefix) > 0) {                                                           \
-                func(_DEBUG_STYLE_FOR_PREFIX prefix, ##__VA_ARGS__);                            \
+                func(_DEBUG_PREFIX _DEBUG_STYLE_FOR_PREFIX prefix, ##__VA_ARGS__);                            \
                 if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) || IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) { \
                     func(_DEBUG_STYLE_FOR_THREAD_FUNC " (", ##__VA_ARGS__);                     \
                 }                                                                               \

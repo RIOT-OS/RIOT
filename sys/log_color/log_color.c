@@ -23,6 +23,7 @@ typedef int dont_be_pedantic; /* this c-file is not empty */
 #include <assert.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 
 #include "ansi_style.h"
 #include "kernel_defines.h"
@@ -52,7 +53,7 @@ typedef int dont_be_pedantic; /* this c-file is not empty */
  * Default is bold
  */
 #ifndef LOG_INFO_ANSI_COLOR_CODE
-#define LOG_INFO_ANSI_COLOR_CODE        ANSI_STYLE(BOLD)
+#define LOG_INFO_ANSI_COLOR_CODE        ANSI_STYLE(BOLD, FOREGROUND(GREEN))
 #endif
 
 /**
@@ -61,22 +62,29 @@ typedef int dont_be_pedantic; /* this c-file is not empty */
  * Default is green
  */
 #ifndef LOG_DEBUG_ANSI_COLOR_CODE
-#define LOG_DEBUG_ANSI_COLOR_CODE       ANSI_STYLE(FOREGROUND(GREEN))
+#define LOG_DEBUG_ANSI_COLOR_CODE       ANSI_STYLE(BOLD, FOREGROUND(WHITE))
 #endif
 
-static const char * const _ansi_codes[] =
+#define LOG_UNIT_ANSI_COLOR_CODE        ANSI_STYLE(BOLD, FOREGROUND_BRIGHT(CYAN))
+#define LOG_SEPARATORS_ANSI_COLOR_CODE  ANSI_STYLE(DIM, FOREGROUND(WHITE))
+
+static const char * const level_strings[] =
 {
-    [LOG_ERROR] = LOG_ERROR_ANSI_COLOR_CODE,
-    [LOG_WARNING] = LOG_WARNING_ANSI_COLOR_CODE,
-    [LOG_INFO] = LOG_INFO_ANSI_COLOR_CODE,
-    [LOG_DEBUG] = LOG_DEBUG_ANSI_COLOR_CODE,
+    [LOG_ERROR] = LOG_ERROR_ANSI_COLOR_CODE "ERROR",
+    [LOG_WARNING] = LOG_WARNING_ANSI_COLOR_CODE "WARN ",
+    [LOG_INFO] = LOG_INFO_ANSI_COLOR_CODE "INFO ",
+    [LOG_DEBUG] = LOG_DEBUG_ANSI_COLOR_CODE "DEBUG",
 };
 
-void log_write(unsigned level, const char *format, ...)
+void log_write(unsigned level, const char* unit, const char *format, ...)
 {
-    assert((level > 0) && (level < ARRAY_SIZE(_ansi_codes)));
+    assert((level > 0) && (level < ARRAY_SIZE(level_strings)));
 
-    printf("%s", _ansi_codes[level]);
+    printf("%s " ANSI_STYLE_RESET "# ", level_strings[level]);
+    if (unit && strlen(unit) > 0) {
+        printf(LOG_UNIT_ANSI_COLOR_CODE "%s" LOG_SEPARATORS_ANSI_COLOR_CODE ": ", unit);
+    }
+    printf(ANSI_STYLE_RESET);
     va_list args;
     va_start(args, format);
     /* Temporarily disable clang format-nonliteral warning */

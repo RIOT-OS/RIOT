@@ -6,12 +6,9 @@
 #pragma once
 
 /**
- * @ingroup     core_util
+ * @defgroup     core_util_log Logging
+ * @brief Logging
  * @{
- *
- * @file
- * @brief       System logging header
- * @anchor      core_util_log
  *
  * This header offers a bunch of "LOG_*" functions that, with the default
  * implementation, just use printf, but honour a verbosity level.
@@ -26,15 +23,20 @@
  * 1. provide "log_module.h"
  * 2. have a name starting with "log_" *or* depend on the pseudo-module LOG,
  * 3. implement log_write()
- *
- * See "sys/log/log_printfnoformat" for an example.
- *
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @file
+ * @brief       System logging header
+ *
+ * See "sys/log/log_printfnoformat" for an example.
+ *
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ */
 
 /**
  * @brief defined log levels
@@ -67,7 +69,11 @@ enum {
 /**
  * @brief Default log level define
  */
-#define LOG_LEVEL LOG_INFO
+#  define LOG_LEVEL LOG_INFO
+#endif
+
+#if !defined(LOG_UNIT) && defined(DEBUG_UNIT)
+#  define LOG_UNIT DEBUG_UNIT
 #endif
 
 /**
@@ -75,10 +81,11 @@ enum {
  *
  * @note Internal use only, use @ref LOG() instead.
  */
+
 #ifdef LOG_UNIT
-#  define LOG_WRITE(level, fmt, ...) log_write((level), "%s: "fmt, LOG_UNIT, ##__VA_ARGS__)
+#  define LOG_WRITE(level, ...) log_write((level), LOG_UNIT, __VA_ARGS__)
 #else
-#  define LOG_WRITE(level, ...) log_write((level), __VA_ARGS__)
+#  define LOG_WRITE(level, ...) log_write((level), "", __VA_ARGS__)
 #endif
 
 /**
@@ -126,14 +133,21 @@ enum {
 /** @} */
 
 #ifdef MODULE_LOG
-#include "log_module.h"
+#  include "log_module.h"
 #else
-#include <stdio.h>
+#  include <stdio.h>
 
 /**
  * @brief Default log_write function, just maps to printf
  */
-#define log_write(level, ...) printf(__VA_ARGS__)
+#  define log_write(level, unit, ...) \
+    do { \
+        if (unit && unit[0]) { \
+            printf("%s: ", (unit)); \
+        } \
+        printf(__VA_ARGS__); \
+    } while (0)
+
 #endif
 
 #ifdef __cplusplus
