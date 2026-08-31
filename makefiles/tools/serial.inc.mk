@@ -68,7 +68,16 @@ ifeq ($(RIOT_TERMINAL),pyterm)
 else ifeq ($(RIOT_TERMINAL),socat)
   SOCAT_OUTPUT ?= -
   TERMPROG ?= $(RIOT_TERMINAL)
-  TERMFLAGS ?= $(SOCAT_OUTPUT) open:$(PORT),b$(BAUD),echo=0,raw,cs8,parenb=0,cstopb=0
+  ifeq ($(OS),Linux)
+    # RIOT's build image is based on Ubuntu 22.04, which ships a broken version
+    # of socat that does not support the "ispeed" and "ospeed" options. Once
+    # Ubuntu 22.04 is end-of-life (April 2027), the Linux-specific case can be
+    # removed. See https://bugs.launchpad.net/ubuntu/+source/socat/+bug/2165102
+    # for more information on the issue.
+    TERMFLAGS ?= $(SOCAT_OUTPUT) open:$(PORT),b$(BAUD),nonblock,clocal=1,cread=1,echo=0,raw,cs8,parenb=0,cstopb=0
+  else ifeq ($(OS),Darwin)
+    TERMFLAGS ?= $(SOCAT_OUTPUT) open:$(PORT),ispeed=$(BAUD),ospeed=$(BAUD),nonblock,clocal=1,cread=1,echo=0,raw,cs8,parenb=0,cstopb=0
+  endif
 else ifeq ($(RIOT_TERMINAL),picocom)
   TERMPROG  ?= picocom
   TERMFLAGS ?= --nolock --imap lfcrlf --baud "$(BAUD)" "$(PORT)"
