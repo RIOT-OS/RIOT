@@ -58,14 +58,40 @@ static void _dtls_session_triage(unicoap_scheduled_event_t* event)
     }
 }
 
+static void _dtls_pander_and_spoonfeed_session_mgmt(void) {
+    if (IS_ACTIVE(CONFIG_UNICOAP_DTLS_UNSAFE_PREVENT_TRIAGE)) {
+        return;
+    }
+    if (dsm_get_num_available_slots() < CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS) {
+        /* If not enough session slots left: set timeout to free session. */
+        _DTLS_DEBUG("session triage: fewer than %u session slots available,"
+                    " limiting session lifespan to %" PRIu32 " ms\n",
+                    (unsigned int)CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS,
+                    (uint32_t)CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS);
+        unicoap_event_schedule(&_dtls_session_triage_event, _dtls_session_triage,
+                                CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS_TIMEOUT_MS,
+                                "messaging.dtls.triage");
+    } else {
+         /* If enough session slots left: cancel timeout to free session. */
+        if (dsm_get_num_available_slots() >= CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS) {
+            _DTLS_DEBUG("session triage: enough slots, cancelling triage\n");
+            unicoap_event_cancel(&_dtls_session_triage_event);
+        }
+    }
+}
+
 static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg) {
     (void)arg;
     sock_dtls_session_t session = { 0 };
 
-    /* This logic heavily depends on the tinydtls backend. At the moment, no other DTLS  
+    /* This logic heavily depends on the tinydtls backend. At the moment, no other DTLS
      * backend other than tinydtls exists. As soon as another becomes supported,
      * this logic needs to be adjusted to strictly follow the sock_dtls API.
      * For now, we need work around tinydtls quirks. */
+
+    if ((type & SOCK_ASYNC_MSG_SENT) || (type & SOCK_ASYNC_CONN_RECV)) {
+        _dtls_pander_and_spoonfeed_session_mgmt();
+    }
 
     if (type & SOCK_ASYNC_CONN_RECV) {
         _DTLS_DEBUG("establishing session\n");
