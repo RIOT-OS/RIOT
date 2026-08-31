@@ -41,7 +41,7 @@ extern "C" {
 
 #define LOG_DEBUG(x)                /**< not used */
 #define LOG_DEBUG_PURE(x)           /**< not used */
-#define LOG_DEBUG_PREFIX            /**< not used */
+#define LOG_DEBUG_UNIT            /**< not used */
 
 #ifdef __cplusplus
 }

@@ -18,7 +18,7 @@
 /* this would typically be set application-wide via Kconfig or make */
 #define CONFIG_DEBUG_SHOW_THREAD 1
 #define CONFIG_DEBUG_SHOW_FUNC 1
-/* as DEBUG_PREFIX is not set, this configuration has no effect */
+/* as DEBUG_UNIT is not set, this configuration has no effect */
 
 #define ENABLE_DEBUG 1
 #include "debug.h"

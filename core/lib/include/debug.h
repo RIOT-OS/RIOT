@@ -92,8 +92,8 @@ extern "C" {
  * @brief   Common prefix for all debug messages, defaulting to an empty string.
  *          Expected to be set on a file-based level.
  */
-#ifndef DEBUG_PREFIX
-#  define DEBUG_PREFIX ""
+#ifndef DEBUG_UNIT
+#  define DEBUG_UNIT ""
 #endif
 
 /**
@@ -114,7 +114,7 @@ extern "C" {
  * @brief   Specify whether calls to @ref DEBUG and @ref DEBUG_PUTS automatically
  *          include the calling thread name.
  *
- * @warning Only applies to files where @ref DEBUG_PREFIX is non-empty.
+ * @warning Only applies to files where @ref DEBUG_UNIT is non-empty.
  *
  * **Default**: disabled
  */
@@ -130,7 +130,7 @@ extern "C" {
  * @brief   Specify whether calls to @ref DEBUG and @ref DEBUG_PUTS automatically
  *          include the current function name.
  *
- * @warning Only applies to files where @ref DEBUG_PREFIX is non-empty.
+ * @warning Only applies to files where @ref DEBUG_UNIT is non-empty.
  *
  * **Default**: disabled
  */
@@ -349,7 +349,7 @@ static inline const char *__debug_thread_name_or_isr(void)
  * @param ... Variadic arguments compatible with `printf`
  *
  * Use this internal macro if you want to have something more fine-grained than
- * the file-wide @ref DEBUG_PREFIX, to define your own debug function like
+ * the file-wide @ref DEBUG_UNIT, to define your own debug function like
  *
  * ```c
  * #define CUSTOM_DEBUG(...) DEBUG_("custom-prefix", __VA_ARGS__)
@@ -370,7 +370,7 @@ static inline const char *__debug_thread_name_or_isr(void)
  *
  * Use this macro similarly to `printf` when starting a new line.
  * Remember to end the line with an explicit newline character `\n`.
- * This will prefix the print with @ref DEBUG_PREFIX. Therefore,
+ * This will prefix the print with @ref DEBUG_UNIT. Therefore,
  * if you want to continue writing to the same line afterwards,
  * use @ref DEBUG_CONT for subsequent calls (and end the line there).
  *
@@ -388,7 +388,7 @@ static inline const char *__debug_thread_name_or_isr(void)
  *
  * Make use of @ref DEBUG_ if you need to use a custom prefix.
  */
-#define DEBUG(...) DEBUG_(DEBUG_PREFIX, __VA_ARGS__)
+#define DEBUG(...) DEBUG_(DEBUG_UNIT, __VA_ARGS__)
 
 /**
  * @brief Continue printing debug information to stdout, without repeating the prefix
@@ -411,7 +411,7 @@ static inline const char *__debug_thread_name_or_isr(void)
  * @param str A message string, does not need to be constant
  *
  * Use this internal macro if you want to have something more fine-grained than
- * the file-wide @ref DEBUG_PREFIX, to define your own debug function like
+ * the file-wide @ref DEBUG_UNIT, to define your own debug function like
  *
  * ```c
  * #define CUSTOM_DEBUG_PUTS(str) DEBUG_PUTS_("custom-prefix", str)
@@ -434,7 +434,7 @@ static inline const char *__debug_thread_name_or_isr(void)
  *
  * Make use of @ref DEBUG_PUTS_ if you need to use a custom prefix.
  */
-#define DEBUG_PUTS(str) DEBUG_PUTS_(DEBUG_PREFIX, str)
+#define DEBUG_PUTS(str) DEBUG_PUTS_(DEBUG_UNIT, str)
 
 /**
  * @deprecated use @ref DEBUG instead. Will be removed after release 2027.04.

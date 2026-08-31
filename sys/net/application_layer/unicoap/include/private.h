@@ -45,7 +45,7 @@ extern "C" {
  * @{
  */
 /** @brief Debug log prefix */
-#define UNICOAP_DEBUG_PREFIX "coap"
+#define UNICOAP_DEBUG_UNIT "coap"
 
 #ifndef DOXYGEN
 #  define _UNICOAP_NEED_HAVE "(need %" PRIuSIZE ", have %" PRIuSIZE ")"
@@ -59,7 +59,7 @@ extern "C" {
  *
  * @param category Category string
  */
-#  define _UNICOAP_PREFIX_DEBUG(category, ...) DEBUG(UNICOAP_DEBUG_PREFIX category ": " __VA_ARGS__)
+#  define _UNICOAP_PREFIX_DEBUG(category, ...) DEBUG(UNICOAP_DEBUG_UNIT category ": " __VA_ARGS__)
 #  define UNICOAP_DEBUG(...)                   _UNICOAP_PREFIX_DEBUG("", __VA_ARGS__)
 #  define _OPTIONS_DEBUG(...)                   _UNICOAP_PREFIX_DEBUG(".options", __VA_ARGS__)
 #  define _MESSAGING_DEBUG(...)                 _UNICOAP_PREFIX_DEBUG(".messaging", __VA_ARGS__)

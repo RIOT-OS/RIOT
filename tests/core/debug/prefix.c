@@ -16,7 +16,7 @@
 #include "tests.h"
 
 #define ENABLE_DEBUG 1
-#define DEBUG_PREFIX "prefix"
+#define DEBUG_UNIT "prefix"
 #include "debug.h"
 
 void prefix(void)

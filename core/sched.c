@@ -34,7 +34,7 @@
 #endif
 
 #define ENABLE_DEBUG 0
-#define DEBUG_PREFIX "sched"
+#define DEBUG_UNIT "sched"
 #include "debug.h"
 
 #ifdef PICOLIBC_TLS
