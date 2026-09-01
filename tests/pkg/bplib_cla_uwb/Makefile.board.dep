@@ -1,0 +1,30 @@
+# include color echo macros
+include $(RIOTMAKE)/utils/ansi.mk
+include $(RIOTMAKE)/color.inc.mk
+
+# The pin configuration depends on the specific board used. Wrong
+# pin configurations can cause weird issues or even hardware damage,
+# so the default pin settings are GPIO_UNDEF in the
+# `pkg/decadriver/platform/include/dw3000_params.h` header.
+
+ifeq (nrf52840dk,$(BOARD))
+  CFLAGS += '-DDW3000_PARAM_SPI_CS=GPIO_PIN(1,12)'
+  CFLAGS += '-DDW3000_PARAM_IRQ=GPIO_PIN(1,10)'
+  CFLAGS += '-DDW3000_PARAM_RESET=GPIO_PIN(1,8)'
+  CFLAGS += '-DDW3000_PARAM_WAKEUP=GPIO_PIN(1,11)'
+
+else ifeq (nucleo-l452re,$(BOARD))
+  CFLAGS += '-DDW3000_PARAM_SPI_CS=GPIO_PIN(PORT_B,6)'
+  CFLAGS += '-DDW3000_PARAM_IRQ=GPIO_PIN(PORT_A,9)'
+  CFLAGS += '-DDW3000_PARAM_RESET=GPIO_PIN(PORT_A,8)'
+  CFLAGS += '-DDW3000_PARAM_WAKEUP=GPIO_PIN(PORT_C,7)'
+
+else ifeq (,$(filter list-% info-% generate-%,$(MAKECMDGOALS)))
+  ifeq (,$(DECA_WARNING_PRINTED))
+    MSG="Warning: No default decadriver configuration for \"$(BOARD)\"."\
+        "Make sure to set all CFLAGS manually!"
+    $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)$(MSG)$(COLOR_RESET)" 1>&2)
+
+    DECA_WARNING_PRINTED := 1 # print the warning only once
+  endif
+endif
