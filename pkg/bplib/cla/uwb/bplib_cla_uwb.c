@@ -122,7 +122,7 @@ static inline bool _rx_enable(void)
  * @brief Send a bundle with DW3000.
  *
  * This function handles fragmentation and blocks until all fragments have been
- * transfered (or the single frame) and have been ACKd.
+ * transferred (or the single frame) and have been ACKd.
  *
  * It also handles retransmissions, up to NUM_RETRANS_ATTEMPTS with some
  * back-off. After all transmissions the radio will be in RX again.
@@ -314,8 +314,8 @@ static void _irq_rx_ok_cb(const dwt_cb_data_t* dat)
             thread_flags_set(_cla.rx_thread, THREAD_FLAG_RX_OK);
         }
 
-        /* RX will be renabled when the auto ACK has been sent, OR, when a
-         * bundle has arrived completely, it will be renabled after the ingress.
+        /* RX will be re-enabled when the auto ACK has been sent, OR, when a
+         * bundle has arrived completely, it will be re-enabled after the ingress.
          * This prevents buffer overwrites. */
     }
 }
@@ -407,7 +407,7 @@ int bplib_cla_uwb_start(uint32_t contact_id)
     /* Parse the out-address. Here an address string is to be understood as
      * SHORT_ADDR, in hexadecimal, without leading 0x, resulting in a
      * total length of 4. Long addresses are currently not supported and the
-     * adresses and PAN should not be changed outside of the CLA */
+     * addresses and PAN should not be changed outside of the CLA */
     addr_str = bplib_instance_data.ConfigPtrs.ContactsConfigPtr->ContactSet[contact_id].ClaOutAddr;
     if (strlen(addr_str) != 4) {
         return -EINVAL;
