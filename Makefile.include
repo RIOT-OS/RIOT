@@ -1073,6 +1073,9 @@ CFLAGS_WITH_MACROS += -DRIOT_OS=1
 ifneq (,$(RIOT_VERSION_EXTRA))
   CFLAGS_WITH_MACROS += -DCONFIG_RIOT_VERSION_EXTRA=\""$(RIOT_VERSION_EXTRA)"\"
 endif
+ifneq ($(strip $(LOGUNIT)),)
+CFLAGS_WITH_MACROS += -DLOG_UNITS=\"$(shell echo '$(sort $(LOGUNIT))' | sed 's/ /\\",\\"/g')\"
+endif
 # MODULE_NAME defines. Declared in 'makefiles/modules.inc.mk'
 CFLAGS_WITH_MACROS += $(EXTDEFINES)
 

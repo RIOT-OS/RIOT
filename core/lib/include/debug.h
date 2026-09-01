@@ -102,6 +102,23 @@ extern "C" {
 #  endif
 #endif
 
+#ifndef DOXYGEN
+#  ifdef LOG_UNITS
+#    define FORCE_DEBUG(unit) (                                                                      \
+        (strlen(unit) > 0) && ({                                                                   \
+            bool forced = false;                                                                   \
+            for (unsigned int i = 0; i < ARRAY_SIZE((const char *[]){ LOG_UNITS }); i += 1) {      \
+                forced |= strncmp(((const char*[]){ LOG_UNITS })[i], unit,                         \
+                           strlen(((const char*[]){ LOG_UNITS })[i])) == 0;                        \
+            }                                                                                      \
+            forced;                                                                                \
+        }))
+#  else
+#    define FORCE_DEBUG(unit) (false)
+#  endif
+#endif
+
+
 /**
  * @brief   Contains the function name if given compiler supports it.
  *          Otherwise it is an empty string.
@@ -158,7 +175,7 @@ extern "C" {
 #if !defined(DOXYGEN)
 #  define _DEBUG_STYLE_FOR_PREFIX                ANSI_STYLE(FOREGROUND_BRIGHT(CYAN), BOLD)
 #  define _DEBUG_STYLE_FOR_THREAD_FUNC           ANSI_STYLE(FOREGROUND(WHITE), DIM)
-#  if CONFIG_DEBUG_LOG_COLOR_COMPAT
+#  if MODULE_LOG_COLOR
 #    define _DEBUG_PREFIX                        ANSI_STYLE(BOLD) "DEBUG " ANSI_STYLE_RESET "# "
 #  else
 #    define _DEBUG_PREFIX                        ""
@@ -253,7 +270,7 @@ static inline const char *__debug_thread_name_or_isr(void)
  */
 #define __DEBUG_IMPL_FORMATTED(func, prefix, ...)                                                                     \
     do {                                                                                        \
-        if (ENABLE_DEBUG && __debug_sufficient_stack(true)) {                                   \
+        if ((ENABLE_DEBUG || FORCE_DEBUG(prefix)) && __debug_sufficient_stack(true)) {                                   \
             if (strlen(prefix) > 0) {                                                           \
                 if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) { \
                     func(_DEBUG_PREFIX _DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC            \
@@ -333,7 +350,7 @@ static inline const char *__debug_thread_name_or_isr(void)
  */
 #define __DEBUG_IMPL_PIECEWISE(func, prefix, str, ...)                                          \
     do {                                                                                        \
-        if (ENABLE_DEBUG) {                                                                     \
+        if (ENABLE_DEBUG || FORCE_DEBUG(prefix)) {                                                                     \
             if (strlen(prefix) > 0) {                                                           \
                 func(_DEBUG_PREFIX _DEBUG_STYLE_FOR_PREFIX prefix, ##__VA_ARGS__);                            \
                 if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) || IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) { \
