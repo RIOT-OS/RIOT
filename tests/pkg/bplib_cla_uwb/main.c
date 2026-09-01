@@ -125,7 +125,7 @@ static int _bp(int argc, char **argv) {
             } else {
                 printf("Contact start failed with: %"PRIx32"\n", status);
             }
-            
+
         } else if (strcmp(argv[3], "stop") == 0) {
             status = BPLib_CLA_ContactStop(c);
             if (status == 0) {
