@@ -265,7 +265,7 @@ static void _irq_rx_ok_cb(const dwt_cb_data_t* dat)
             /* Retransmission of already received frame (lost ACK?) */
             return;
         }
-        
+
         if (flags & CLA_HEADER_BIT_FRG && seq != _cla.rx_seq_no_trans) {
             /* New fragmented transmission */
             _cla.rx_seq_no_trans = seq;
@@ -305,7 +305,7 @@ static void _irq_rx_ok_cb(const dwt_cb_data_t* dat)
                        hdr_len + CLA_HEADER_LEN);
         _cla.rx_offset += frame_len;
         _cla.rx_seq_no_frame = seq_frame;
-        
+
         if (rx_done) {
             /* The RX is re-enabled after ingress, preventing the buffer from
              * being overwritten */
@@ -315,7 +315,7 @@ static void _irq_rx_ok_cb(const dwt_cb_data_t* dat)
         }
 
         /* RX will be renabled when the auto ACK has been sent, OR, when a
-         * bundle has arrived completely, it will be renabled after the ingress. 
+         * bundle has arrived completely, it will be renabled after the ingress.
          * This prevents buffer overwrites. */
     }
 }
