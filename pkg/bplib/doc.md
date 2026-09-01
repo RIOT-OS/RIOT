@@ -62,6 +62,7 @@ Module name   | Description   | Requirements
 ------------- | ------------- | -----------
 `bplib_cla_udp`  | Basic UDPCL implementation, that sends bundles without any other wrapping as UDP payload. | `gnrc_sock_udp`
 `bplib_cla_ble`  | Basic BLE L2CAP CLA. | `nimble`
+`bplib_cla_uwb`  | Experimental CLA for decadriver sending bundles over 802.15.4 frames. | `decadriver`
 
 ### List of optimization modules
 Module name   | Description   | Benefit
@@ -74,11 +75,6 @@ Module name   | Description   | Benefit
 Macro Name   | Description   | Requirements
 ------------- | ------------- | -----------
 CONFIG_BPLIB_TIME_FILE_NAME | File path of the time information file. Make sure that this is *not* in a subfolder which is iterated by the storage implementation, or it might think this file is a bundle. | -
-CONFIG_BPLIB_CLA_BLE_TIMEOUT | Timeout [ms] after which the BLE CLA will terminate after `bplib_cla_ble_stop()` is called. | `bplib_cla_ble`
-CONFIG_BPLIB_CLA_BLE_MTU | MTU of the L2CAP channel. This has to be larger than the bundle payload you intend to send (50-150 B depending on block configuration), due to the other bundle blocks. Make sure the nimble MSYS pool is sufficiently large. | `bplib_cla_ble`
-CONFIG_BPLIB_CLA_BLE_CID | CID of the L2CAP channel | `bplib_cla_ble`
-CONFIG_BPLIB_CLA_UDP_BUFLEN | MTU over UDP. Should probably be around 1400 max. | `bplib_cla_udp`
-CONFIG_BPLIB_CLA_UDP_TIMEOUT | Timeout [ms] after which the UDP CLA will terminate after `bplib_cla_udp_stop()` is called | `bplib_cla_udp`
 CONFIG_BPLIB_MEMPOOL_LEN | Mempool size available for bplib bundles in send / delivery queues. Increasing this means more bundles can be queued, since bundles ingressed when to mempool is full, are dropped. Note: Each bundle is at least `sizeof BPLib_BBlocks_t` (around 700) + the blocks allocated for the actual payload. | `bplib_init`
 CONFIG_BPLIB_GEN_WORKER_TIMEOUT | Timeout [ms] after which the generic worker times out after bplib termination | `bplib_init`
 CONFIG_BPLIB_GENERIC_STACK_SIZE | Stack size of the generic worker. | `bplib_init`
@@ -87,7 +83,11 @@ CONFIG_BPLIB_STOR_BASE | File path prefix of the folder where the bundles will b
 CONFIG_BPLIB_EGRESS_CACHE_LEN | Number of bundle references stored in the caches / queues per channel and contact. Larger means the storage is searched less, at the price of more used memory. | `bplib_stor_vfs_*`
 CONFIG_BPLIB_STOR_MAX_DUPLICATE_CHECKS | Used to upper bound the linear search for a filename which is not yet used. This applies only for the ordered storage, so when DTN time is known there should not be many bundles with the same expiration timestamp. Max 255. | `bplib_stor_vfs_ordered`
 
-Also the generic bplib config options from [bplib]/inc/bplib_cfg.h. These are currently not prefixed by CONFIG_.
+@note The configuration options of each CLA are not listed here can be found in
+their respective subdirectory.
+
+Also the generic bplib config options from [bplib]/inc/bplib_cfg.h. These are
+currently not prefixed by CONFIG_.
 
 The defaults, i.e. not using `bplib_include_nc_telemetry` and
 `bplib_include_as` save more than 20KB of application size.
