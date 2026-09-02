@@ -34,3 +34,15 @@ of the client as of now, it will accept any incoming connection.
 
 This CLA is meant for testing and as a base point for a "good" CLA implementation, which also
 allows discovery of devices and their reachable EIDs and so on.
+
+### UWB CLA
+
+@see pkg_bplib_cla_uwb
+
+This CLA sends bundles over UWB using decadriver.
+
+It uses a two byte control header but otherwise sends bundles directly after in
+802.15.4 frames. It also supports basic fragmentation of bundles larger than a
+single frame.
+
+@note This is an experimental implementation
