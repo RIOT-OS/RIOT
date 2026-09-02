@@ -176,7 +176,7 @@ void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, dma_cb_t cb, void *ctx
 }
 
 void dma_prepare(dma_t dma, uint8_t width, const void *src, void *dst,
-                 size_t num, dma_incr_t incr)
+                 size_t num, dma_incr_t incr, dma_blockact_t blockact)
 {
     DEBUG("[DMA]: Prepare %u, num: %u\n", dma, (unsigned)num);
     DmacDescriptor *descr = &descriptors[dma];
@@ -186,6 +186,7 @@ void dma_prepare(dma_t dma, uint8_t width, const void *src, void *dst,
     descr->DESCADDR.reg = (uint32_t)NULL;
     descr->BTCTRL.reg = width << DMAC_BTCTRL_BEATSIZE_Pos |
                         incr << DMAC_BTCTRL_SRCINC_Pos |
+                        blockact << DMAC_BTCTRL_BLOCKACT_Pos |
                         DMAC_BTCTRL_VALID;
 }
 

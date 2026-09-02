@@ -615,7 +615,9 @@ int adc_dma_start(adc_t line, uint16_t *dst, size_t num)
 
     /* Set DMA transfer descriptors */
     const volatile void *src = &dev->RESULT.reg;
-    dma_prepare(tx_dma[line], DMAC_BTCTRL_BEATSIZE_HWORD_Val, (const void *)src, dst + num, num, DMA_INCR_DEST);
+    /* enable block interrupt and suspend DMA on block completion */
+    dma_prepare(tx_dma[line], DMAC_BTCTRL_BEATSIZE_HWORD_Val, (const void *)src, dst + num, num,
+                DMA_INCR_DEST, DMA_BLOCKACT_BOTH);
 
     if (dst_numof > 1) {
         for (unsigned i = 0; i < dst_numof - 1; ++i) {
