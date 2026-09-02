@@ -96,8 +96,9 @@ uint16_t dac_util_mapf(float value, float min, float max);
  * @param[in] freq_hz       Frequency of the sine wave in hertz
  * @param[in] dac_ref_mv    Reference voltage of the DAC in millivolts
  * @param[out] buf          Buffer to store the generated samples
- * @param[in,out] buf_max   On input: maximum number of samples the buffer can hold
- *                          On output: actual number of samples generated
+ * @param[in,out] buf_max   Pointer to maximum buffer capacity on entry.
+ *                          - On input: Maximum number of samples the buffer can hold.
+ *                          - On output: Actual number of samples generated.
  *
  * @retval 0                  Success
  * @retval <0                 Negative error code on failure
