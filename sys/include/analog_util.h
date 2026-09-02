@@ -100,8 +100,9 @@ uint16_t dac_util_mapf(float value, float min, float max);
  *                          - On input: Maximum number of samples the buffer can hold.
  *                          - On output: Actual number of samples generated.
  *
- * @retval 0                  Success
- * @retval <0                 Negative error code on failure
+ * @retval 0                Success
+ * @retval -EINVAL          Invalid parameters, e.g. @p center_mv < @p amplitude_mv
+ * @retval -ENOMEM          Insufficient buffer size for one period of the requested frequency
  */
 int dac_util_sine(uint16_t center_mv, uint16_t amplitude_mv, uint32_t freq_hz,
                   uint16_t dac_ref_mv, uint16_t *buf, uint32_t *buf_max);
