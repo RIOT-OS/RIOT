@@ -1150,6 +1150,28 @@ typedef enum {
 } dma_incr_t;
 
 /**
+ * @brief   Available DMA block action modes after block completion
+ */
+typedef enum {
+    /**
+     * @brief   No action on block completion
+     */
+    DMA_BLOCKACT_NONE    = DMAC_BTCTRL_BLOCKACT_NOACT_Val, /**<  */
+    /**
+     * @brief   Interrupt on block completion
+     */
+    DMA_BLOCKACT_INT     = DMAC_BTCTRL_BLOCKACT_INT_Val,
+    /**
+     * @brief   Suspend the DMA on block completion
+     */
+    DMA_BLOCKACT_SUSPEND = DMAC_BTCTRL_BLOCKACT_SUSPEND_Val,
+    /**
+     * @brief   Interrupt and suspend the DMA on block completion
+     */
+    DMA_BLOCKACT_BOTH    = DMAC_BTCTRL_BLOCKACT_BOTH_Val,
+} dma_blockact_t;
+
+/**
  * @brief   Signature of event callback functions triggered from interrupts
  *
  * @param[in] arg       optional context for the callback
@@ -1211,9 +1233,11 @@ void dma_set_cb_arg(dma_t dma, void *ctx);
  * @param   dst     Destination address for the transfer
  * @param   num     Number of beats to transfer
  * @param   incr    Which of the addresses to increment after a beat
+ * @param   blockact Action to take when the block transfer is complete
+ *                   (e.g., suspend, interrupt, etc.)
  */
 void dma_prepare(dma_t dma, uint8_t width, const void *src, void *dst,
-                 size_t num, dma_incr_t incr);
+                 size_t num, dma_incr_t incr, dma_blockact_t blockact);
 
 /**
  * @brief   Prepare a transfer without modifying the destination address

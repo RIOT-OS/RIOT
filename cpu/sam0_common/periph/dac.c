@@ -245,7 +245,7 @@ void dac_play(dac_t line, const uint16_t *buf, size_t len, uint8_t flags)
 
     /* source buffer will be set by dac_play() */
     dma_prepare(tx_dma[line], DMAC_BTCTRL_BEATSIZE_HWORD_Val,
-                buf + len, dst, len, DMA_INCR_SRC);
+                buf + len, dst, len, DMA_INCR_SRC, DMA_BLOCKACT_NONE);
 
     if (flags & DAC_PLAY_LOOPED) {
         dma_enable_loop(tx_dma[line]);
