@@ -109,7 +109,6 @@ static void _adc_dma_cb(void *arg)
 
 int main(void)
 {
-    adc_continuous_begin(ADC_RES_12BIT);
     adc_process_event_t adc_arg = {
         .ev= {
             .handler = _adc_process,
@@ -124,7 +123,7 @@ int main(void)
            adc_get_sample_rate(adc_arg.adc, 12),
            adc_get_freq());
 
-    adc_dma_setup(adc_arg.adc, _adc_dma_cb, &adc_arg);
+    adc_dma_setup(adc_arg.adc, _adc_dma_cb, &adc_arg, ADC_RES_12BIT);
     uint16_t *dst[] = {_buf[0], _buf[1]};
     adc_dma_start(adc_arg.adc, dst, adc_arg.avg_samples_numof, 2);
 
