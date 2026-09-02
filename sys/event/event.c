@@ -73,12 +73,12 @@ bool event_is_queued(const event_queue_t *queue, const event_t *event)
 event_t *event_get(event_queue_t *queue)
 {
     unsigned state = irq_disable();
-    event_t *result = (event_t *) clist_lpop(&queue->event_list);
-    irq_restore(state);
-
+    event_t *result = container_of(clist_lpop(&queue->event_list), event_t, list_node);
     if (result) {
         result->list_node.next = NULL;
     }
+    irq_restore(state);
+
     return result;
 }
 
