@@ -1,3 +1,5 @@
+@addtogroup pkg_bplib_cla_uwb
+
 ## UWB CLA
 
 This implements a CLA to transport bundles of arbitrary size, in principle only

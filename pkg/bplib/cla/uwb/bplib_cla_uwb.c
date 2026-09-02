@@ -2,6 +2,19 @@
  * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
  * SPDX-License-Identifier: LGPL-2.1-only
  */
+
+/**
+ * @ingroup     pkg_bplib_cla_uwb
+ * @{
+ *
+ * @file
+ * @brief       UWB CLA implementation
+ *
+ * @author      Simon Grund <mail@simongrund.de>
+ *
+ * @}
+ */
+
 #include "bplib_cla_uwb.h"
 #include "bplib_init.h"
 
@@ -127,8 +140,8 @@ static inline bool _rx_enable(void)
  * It also handles retransmissions, up to NUM_RETRANS_ATTEMPTS with some
  * back-off. After all transmissions the radio will be in RX again.
  *
- * @param buf CBOR encoded bundle
- * @param len Length of the bundle
+ * @param[in] buf CBOR encoded bundle
+ * @param[in] len Length of the bundle
  *
  * @return The status of the transmission
  */
@@ -247,16 +260,16 @@ static void _irq_rx_ok_cb(const dwt_cb_data_t* dat)
 
     dwt_readrxdata(mhr, IEEE802154_MAX_HDR_LEN, 0);
 
-    if (mhr[0] & IEEE802154_FCF_TYPE_ACK && _cla.radio_state == STATE_TX_AWAITING_ACK) {
+    if ((mhr[0] & IEEE802154_FCF_TYPE_ACK) && (_cla.radio_state == STATE_TX_AWAITING_ACK)) {
         thread_flags_set(_cla.tx_thread, THREAD_FLAG_ACK_RX);
     }
-    else if (_cla.radio_state == STATE_RX && mhr[0] & IEEE802154_FCF_TYPE_DATA) {
+    else if ((_cla.radio_state == STATE_RX) && (mhr[0] & IEEE802154_FCF_TYPE_DATA)) {
         hdr_len = ieee802154_get_frame_hdr_len(mhr);
         seq_frame = ieee802154_get_seq(mhr);
         flags = mhr[hdr_len];
         seq = mhr[hdr_len + 1];
 
-        if (flags & CLA_HEADER_NALP_MASK || flags & CLA_HEADER_BIT_VRS) {
+        if ((flags & CLA_HEADER_NALP_MASK) || (flags & CLA_HEADER_BIT_VRS)) {
             /* Not using version 0 */
             return;
         }
@@ -266,17 +279,17 @@ static void _irq_rx_ok_cb(const dwt_cb_data_t* dat)
             return;
         }
 
-        if (flags & CLA_HEADER_BIT_FRG && seq != _cla.rx_seq_no_trans) {
+        if ((flags & CLA_HEADER_BIT_FRG) && (seq != _cla.rx_seq_no_trans)) {
             /* New fragmented transmission */
             _cla.rx_seq_no_trans = seq;
             _cla.rx_offset = 0;
             DEBUG_PUTS(DEBUG_PREFIX" RX Begin (fragmented)");
         }
-        else if (flags & CLA_HEADER_BIT_FRG && flags & CLA_HEADER_BIT_FED) {
+        else if ((flags & CLA_HEADER_BIT_FRG) && (flags & CLA_HEADER_BIT_FED)) {
             /* End of fragmented transmission */
             rx_done = true;
         }
-        else if (flags & CLA_HEADER_BIT_FRG && !(flags & CLA_HEADER_BIT_FED)) {
+        else if ((flags & CLA_HEADER_BIT_FRG) && !(flags & CLA_HEADER_BIT_FED)) {
             /* Middle of some fragmented transmission */
             DEBUG_PUTS(DEBUG_PREFIX"  +1 fragment");
         }
@@ -334,7 +347,7 @@ static void _irq_rx_err_cb(const dwt_cb_data_t* dat)
 static void _irq_rx_to_cb(const dwt_cb_data_t *dat)
 {
     (void)dat;
-    /* Normal RX does not time out, so it has to be waiting for an ACK */
+    /* Normal RX does not time out, so it is currently waiting for an ACK */
     thread_flags_set(_cla.tx_thread, THREAD_FLAG_ACK_TO);
 }
 
@@ -349,7 +362,6 @@ static void* _cla_uwb_out(void* arg)
 {
     (void) arg;
     BPLib_Status_t egress_status;
-    //int rc;
     size_t out_size;
 
     while (_cla.running && bplib_instance_data.running) {
@@ -372,7 +384,7 @@ static void* _cla_uwb_in(void* arg)
     thread_flags_t wait_flags;
 
     while (_cla.running && bplib_instance_data.running) {
-        /* Wait for receive here*/
+        /* Wait for receive here */
         wait_flags = thread_flags_wait_any(THREAD_FLAGS_RECEIVE);
         if (wait_flags & THREAD_FLAG_TERM) {
             return NULL;
