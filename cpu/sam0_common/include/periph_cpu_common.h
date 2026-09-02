@@ -1377,6 +1377,16 @@ void dma_start(dma_t dma);
  * @param[in]   dma     DMA channel reference
  */
 void dma_cancel(dma_t dma);
+
+/**
+ * @brief   Resume a suspended DMA transfer
+ *
+ * This is intended to be called from an DMA ISR, when DMA was prepared with
+ * @ref DMA_BLOCKACT_SUSPEND or @ref DMA_BLOCKACT_BOTH.
+ *
+ * @param[in]   dma     DMA channel reference
+ */
+void dma_resume(dma_t dma);
 /** @} */
 #endif /* REV_DMAC || DOXYGEN */
 
