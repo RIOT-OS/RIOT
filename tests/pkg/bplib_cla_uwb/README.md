@@ -37,5 +37,5 @@ delivered immediately will be dropped.
 This can be changed in the Makefile by selecting a different storage
 module (`bplib_stor_vfs_ordered` or `bplib_stor_vfs_unordered`) and selecting a
 vfs implementation.
-Refer to the UDPCL example Makefile for more details, of how to set the path
-under which bundles are saved.
+Refer to the UDPCL example Makefile in `examples/networking/dtn/bplib_cla_udp/`
+for more details on how to set the path under which bundles are saved.
