@@ -16,6 +16,7 @@
  */
 
 #include "board.h"
+#include "container.h"
 #include "ads131m02.h"
 
 #ifdef __cplusplus
@@ -75,6 +76,11 @@ extern "C" {
                                          .ready_pin_pullup = ADS131M02_PARAM_READY_PULLUP }
 #endif
 /** @} */
+
+/**
+ * @brief   Number of ADS131M02 instances
+ */
+#define ADS131M02_NUMOF                 (ARRAY_SIZE(ads131m02_params))
 
 /**
  * @brief   ADS131M02 configuration

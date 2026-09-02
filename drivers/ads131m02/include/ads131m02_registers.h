@@ -295,7 +295,7 @@ typedef enum {
  * |Value|Description|
  * |:---:|-----------|
  * |0|Disabled|
- * |1|Enabled (default)| 
+ * |1|Enabled (default)|
  */
 #define ADS131M02_CLOCK_CH1_EN_MASK     BIT9
 /**

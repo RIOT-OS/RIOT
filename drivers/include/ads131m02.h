@@ -139,24 +139,9 @@ typedef struct {
 } ads131m02_init_t;
 
 /**
- * @brief   Calculate the register value for the given samples per second
+ * @brief   Calculate the voltage range in millivolts for the given gain
  */
-#define ADS131M02_SPS(sps)          (((32000 - 1) / (sps)))
-
-/**
- * @brief   ADS131M02 samples per second
- */
-typedef enum {
-    ads131m02_sps_32000 = ADS131M02_SPS(32000),     /**< 32000 samples per second */
-    ads131m02_sps_16000 = ADS131M02_SPS(16000),     /**< 16000 samples per second */
-    ads131m02_sps_8000 = ADS131M02_SPS(8000),       /**< 8000 samples per second */
-    ads131m02_sps_4000 = ADS131M02_SPS(4000),       /**< 4000 samples per second */
-    ads131m02_sps_2000 = ADS131M02_SPS(2000),       /**< 2000 samples per second */
-    ads131m02_sps_1000 = ADS131M02_SPS(1000),       /**< 1000 samples per second */
-    ads131m02_sps_500 = ADS131M02_SPS(500),         /**< 500 samples per second */
-    ads131m02_sps_250 = ADS131M02_SPS(250),         /**< 250 samples per second */
-    ads131m02_sps_125 = ADS131M02_SPS(125),         /**< 125 samples per second */
-} ads131m02_sps_t;
+#define ADS131M02_ABS_MV(gain)      (ADS131M02_VREF_NV / 1000  / 1000 / (gain))
 
 /**
  * @brief   ADS131M02 channel configuration
@@ -175,7 +160,7 @@ typedef struct {
     /**
      * @brief   Samples per second required
      */
-    ads131m02_sps_t sps;
+    unsigned sps;
     /**
      * @brief   Bitmask of channels to enable @ref ads131m02_channel_mask_t
      */
@@ -235,16 +220,18 @@ int ads131m02_init(ads131m02_t *dev, const ads131m02_params_t *params,
 /**
  * @brief   Start sampling on the ADS131M02 ADC device
  *
- * @param[in] dev           Device descriptor
- * @param[in] config        Device sampling configuration
- * @param[in] f_clkin_hz    Externally provided clock frequency in Hz
+ * @param[in]     dev           Device descriptor
+ * @param[in,out] config        Device sampling configuration, adjusted with actual settings
+ * @param[in]     f_clkin_hz    Externally provided clock frequency in Hz
+ * @param[in]     apply         True to apply the configuration immediately or
+ *                              false to only adjust the settings
  *
  * @retval    0         Successful initialization
  * @retval    <0        Error code
  * @retval   -EINVAL    Invalid configuration
  * @retval   -ECANCELED  Device is in standby mode
  */
-int ads131m02_start(ads131m02_t *dev, const ads131m02_start_t *config, uint32_t f_clkin_hz);
+int ads131m02_start(ads131m02_t *dev, ads131m02_start_t *config, uint32_t f_clkin_hz, bool apply);
 
 /**
  * @brief   Stop sampling on the ADS131M02 ADC device
@@ -275,10 +262,9 @@ int ads131m02_resume(ads131m02_t *dev, const ads131m02_resume_t *resume);
  * Use events to offload the sampling to a thread context.
  *
  * @param[in] dev           Device descriptor
- * @param[out] chan0        Buffer to store channel 0 samples or NULL if not enabled
- * @param[out] chan1        Buffer to store channel 1 samples or NULL if not enabled
- * @param[out] chan0_numof  Number of samples read for channel 0
- * @param[out] chan1_numof  Number of samples read for channel 1
+ * @param[out] chan         Buffers to store channel samples for every channel
+ * @param[out] chan_numof   Number of samples read for each channel
+ * @param[in]  nanovolt      True to scale the samples to nanovolts, false to keep raw values
  *
  * @retval      0           Success
  * @retval      <0          Error code
@@ -286,9 +272,7 @@ int ads131m02_resume(ads131m02_t *dev, const ads131m02_resume_t *resume);
  * @retval      -EINVAL     Invalid parameters
  * @retval      -ECANCELED  Device is in standby mode
  */
-int ads131m02_sample(ads131m02_t *dev,
-                     int32_t chan0[ADS131M02_FIFO_LEN + 1], int32_t chan1[ADS131M02_FIFO_LEN + 1],
-                     unsigned *chan0_numof, unsigned *chan1_numof);
+int ads131m02_sample(ads131m02_t *dev, int32_t *chan[], unsigned chan_numof[], bool nanovolt);
 
 /**
  * @brief   Put device into low power standby mode, disabling ADC conversions and main clock

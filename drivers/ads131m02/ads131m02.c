@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "ads131m02.h"
@@ -42,6 +43,10 @@
 #define ADS131M02_DEVICE_ID             0x22
 #define ADS131M02_RESET_DELAY           100
 #define ADS131M02_POR_DELAY_US          300
+
+#define ADS131M02_SPS(sps)            ((sps) >= 32000 ? 0 : \
+                                       (sps) <= 125   ? 8 : \
+                                       (31 - __builtin_clz(32000 / (sps))))
 
 static void _read_regs(ads131m02_t *dev, uint8_t addr, uint16_t *dest, size_t numof)
 {
@@ -279,31 +284,6 @@ static void _isr_drdy(void *ctx)
     }
 }
 
-static uint16_t _read_sample(ads131m02_t *dev, int32_t *chan0, int32_t *chan1)
-{
-    uint8_t rx_buf[ADS131M02_FRAME_WORDS * ADS131M02_WORD_LEN];
-
-    /* clock out a NULL command while reading back the previous
-     * conversion's status + channel data in the same full-duplex frame */
-    spi_transfer_bytes(SPI_PARAM(dev), false, NULL, rx_buf, sizeof(rx_buf));
-
-    /* the STATUS register (16 bit) is returned left-justified in the
-     * 24-bit response word, i.e. in its upper two bytes */
-    uint16_t status = byteorder_bebuftohs(&rx_buf[0 * ADS131M02_WORD_LEN]);
-    if (chan0 && (status & ADS131M02_STATUS_DRDY0_MASK)) {
-        *chan0 = _ads131m02_word_to_int32(&rx_buf[1 * ADS131M02_WORD_LEN],
-                                          ads131m02_wlength_24bit);
-        *chan0 = _ads131m02_int32_scale_nv(*chan0, dev->gain[0]);
-    }
-    if (chan1 && (status & ADS131M02_STATUS_DRDY1_MASK)) {
-        *chan1 = _ads131m02_word_to_int32(&rx_buf[2 * ADS131M02_WORD_LEN],
-                                          ads131m02_wlength_24bit);
-        *chan1 = _ads131m02_int32_scale_nv(*chan1, dev->gain[1]);
-    }
-
-    return status;
-}
-
 static void _ads131m02_mux(ads131m02_t *dev, ads131m02_channel_t ch, ads131m02_mux_t mux)
 {
     uint16_t addr = ADS131M02_REG_CH0_CFG +
@@ -381,96 +361,113 @@ out:
     return res;
 }
 
-int ads131m02_start(ads131m02_t *dev, const ads131m02_start_t *start, uint32_t f_clkin_hz)
+int ads131m02_start(ads131m02_t *dev, ads131m02_start_t *start, uint32_t f_clkin_hz, bool apply)
 {
     uint16_t clock = 0;
     uint16_t clock_mask = ADS131M02_CLOCK_PWR_MASK | ADS131M02_CLOCK_OSR_MASK;
     /* Table 8-2. OSR Settings and Data Rates for Nominal Master Clock Frequencies */
     if (f_clkin_hz == 8192000) {
         clock |= ADS131M02_CLOCK_PWR_HIGH_RES;
-        if (start->sps == ads131m02_sps_32000) {
+        if (start->sps >= 32000) {
+            start->sps = 32000;
             clock |= ADS131M02_CLOCK_OSR_128;
         }
-        else if (start->sps == ads131m02_sps_16000) {
+        else if (start->sps >= 16000) {
+            start->sps = 16000;
             clock |= ADS131M02_CLOCK_OSR_256;
         }
-        else if (start->sps == ads131m02_sps_8000) {
+        else if (start->sps >= 8000) {
+            start->sps = 8000;
             clock |= ADS131M02_CLOCK_OSR_512;
         }
-        else if (start->sps == ads131m02_sps_4000) {
+        else if (start->sps >= 4000) {
+            start->sps = 4000;
             clock |= ADS131M02_CLOCK_OSR_1024;
         }
-        else if (start->sps == ads131m02_sps_2000) {
+        else if (start->sps >= 2000) {
+            start->sps = 2000;
             clock |= ADS131M02_CLOCK_OSR_2048;
         }
-        else if (start->sps == ads131m02_sps_1000) {
+        else if (start->sps >= 1000) {
+            start->sps = 1000;
             clock |= ADS131M02_CLOCK_OSR_4096;
         }
-        else if (start->sps == ads131m02_sps_500) {
+        else if (start->sps >= 500) {
+            start->sps = 500;
             clock |= ADS131M02_CLOCK_OSR_8192;
         }
-        else if (start->sps == ads131m02_sps_250) {
-            clock |= ADS131M02_CLOCK_OSR_16384;
-        }
         else {
-            return -EINVAL;
+            /* lowest possible data rate */
+            start->sps = 250;
+            clock |= ADS131M02_CLOCK_OSR_16384;
         }
     }
     else if (f_clkin_hz == 4096000) {
         clock |= ADS131M02_CLOCK_PWR_LOW;
-        if (start->sps == ads131m02_sps_16000) {
+        if (start->sps >= 16000) {
+            start->sps = 16000;
             clock |= ADS131M02_CLOCK_OSR_128;
         }
-        else if (start->sps == ads131m02_sps_8000) {
+        else if (start->sps >= 8000) {
+            start->sps = 8000;
             clock |= ADS131M02_CLOCK_OSR_256;
         }
-        else if (start->sps == ads131m02_sps_4000) {
+        else if (start->sps >= 4000) {
+            start->sps = 4000;
             clock |= ADS131M02_CLOCK_OSR_512;
         }
-        else if (start->sps == ads131m02_sps_2000) {
+        else if (start->sps >= 2000) {
+            start->sps = 2000;
             clock |= ADS131M02_CLOCK_OSR_1024;
         }
-        else if (start->sps == ads131m02_sps_1000) {
+        else if (start->sps >= 1000) {
+            start->sps = 1000;
             clock |= ADS131M02_CLOCK_OSR_2048;
         }
-        else if (start->sps == ads131m02_sps_500) {
+        else if (start->sps >= 500) {
+            start->sps = 500;
             clock |= ADS131M02_CLOCK_OSR_4096;
         }
-        else if (start->sps == ads131m02_sps_250) {
+        else if (start->sps >= 250) {
+            start->sps = 250;
             clock |= ADS131M02_CLOCK_OSR_8192;
         }
-        else if (start->sps == ads131m02_sps_125) {
-            clock |= ADS131M02_CLOCK_OSR_16384;
-        }
         else {
-            return -EINVAL;
+            /* lowest possible data rate */
+            start->sps = 125;
+            clock |= ADS131M02_CLOCK_OSR_16384;
         }
     }
     else if (f_clkin_hz == 2048000) {
         clock |= ADS131M02_CLOCK_PWR_VERY_LOW;
-        if (start->sps == ads131m02_sps_8000) {
+        if (start->sps >= 8000) {
+            start->sps = 8000;
             clock |= ADS131M02_CLOCK_OSR_128;
         }
-        else if (start->sps == ads131m02_sps_4000) {
+        else if (start->sps >= 4000) {
+            start->sps = 4000;
             clock |= ADS131M02_CLOCK_OSR_256;
         }
-        else if (start->sps == ads131m02_sps_2000) {
+        else if (start->sps >= 2000) {
+            start->sps = 2000;
             clock |= ADS131M02_CLOCK_OSR_512;
         }
-        else if (start->sps == ads131m02_sps_1000) {
+        else if (start->sps >= 1000) {
+            start->sps = 1000;
             clock |= ADS131M02_CLOCK_OSR_1024;
         }
-        else if (start->sps == ads131m02_sps_500) {
+        else if (start->sps >= 500) {
+            start->sps = 500;
             clock |= ADS131M02_CLOCK_OSR_2048;
         }
-        else if (start->sps == ads131m02_sps_250) {
+        else if (start->sps >= 250) {
+            start->sps = 250;
             clock |= ADS131M02_CLOCK_OSR_4096;
         }
-        else if (start->sps == ads131m02_sps_125) {
-            clock |= ADS131M02_CLOCK_OSR_8192;
-        }
         else {
-            return -EINVAL;
+            /* lowest possible data rate */
+            start->sps = 125;
+            clock |= ADS131M02_CLOCK_OSR_8192;
         }
     }
     else {
@@ -496,23 +493,27 @@ int ads131m02_start(ads131m02_t *dev, const ads131m02_start_t *start, uint32_t f
         if (div == 0) {
             return -EINVAL;
         }
-        dev->gain[ch] = div;
+        if (apply) {
+            dev->gain[ch] = div;
+        }
         gain |= (ADS131M02_GAIN(dev->gain[ch]) << ADS131M02_GAIN_SHIFT(ch));
         gain_mask |= (ADS131M02_GAIN_PGAGAIN0_MASK << ADS131M02_GAIN_SHIFT(ch));
         clock |= (ADS131M02_CLOCK_CH0_EN_MASK << ch);
         clock_mask |= (ADS131M02_CLOCK_CH0_EN_MASK << ch);
     }
-    SPI_ACQUIRE(dev);
-    if (dev->standby) {
+    if (apply) {
+        SPI_ACQUIRE(dev);
+        if (dev->standby) {
+            SPI_RELEASE(dev);
+            return -ECANCELED;
+        }
+        _write_reg(dev, ADS131M02_REG_GAIN,
+                (_read_reg(dev, ADS131M02_REG_GAIN) & ~gain_mask) | gain);
+        _write_reg(dev, ADS131M02_REG_CLOCK,
+                (_read_reg(dev, ADS131M02_REG_CLOCK) & ~clock_mask) | clock);
         SPI_RELEASE(dev);
-        return -ECANCELED;
+        _ads131m02_sync(dev);
     }
-    _write_reg(dev, ADS131M02_REG_GAIN,
-               (_read_reg(dev, ADS131M02_REG_GAIN) & ~gain_mask) | gain);
-    _write_reg(dev, ADS131M02_REG_CLOCK,
-               (_read_reg(dev, ADS131M02_REG_CLOCK) & ~clock_mask) | clock);
-    SPI_RELEASE(dev);
-    _ads131m02_sync(dev);
     return 0;
 }
 
@@ -555,9 +556,31 @@ int ads131m02_resume(ads131m02_t *dev, const ads131m02_resume_t *resume)
     return 0;
 }
 
-int ads131m02_sample(ads131m02_t *dev,
-                     int32_t chan0[ADS131M02_FIFO_LEN + 1], int32_t chan1[ADS131M02_FIFO_LEN + 1],
-                     unsigned *chan0_numof, unsigned *chan1_numof)
+static uint16_t _read_sample(ads131m02_t *dev, int32_t *chan[], unsigned chan_numof, bool nanovolt)
+{
+    uint8_t rx_buf[ADS131M02_FRAME_WORDS * ADS131M02_WORD_LEN];
+
+    /* clock out a NULL command while reading back the previous
+     * conversion's status + channel data in the same full-duplex frame */
+    spi_transfer_bytes(SPI_PARAM(dev), false, NULL, rx_buf, sizeof(rx_buf));
+
+    /* the STATUS register (16 bit) is returned left-justified in the
+     * 24-bit response word, i.e. in its upper two bytes */
+    uint16_t status = byteorder_bebuftohs(&rx_buf[0 * ADS131M02_WORD_LEN]);
+    for (unsigned i = 0; i < chan_numof; i++) {
+        if (chan[i] && (status & (ADS131M02_STATUS_DRDY0_MASK << i))) {
+            *(chan[i]) = _ads131m02_word_to_int32(&rx_buf[(i + 1) * ADS131M02_WORD_LEN],
+                                                  ads131m02_wlength_24bit);
+            if (nanovolt) {
+                *(chan[i]) = _ads131m02_int32_scale_nv(*(chan[i]), dev->gain[i]);
+            }
+        }
+    }
+
+    return status;
+}
+
+int ads131m02_sample(ads131m02_t *dev, int32_t *chan[], unsigned chan_numof[], bool nanovolt)
 {
     /* The internal mechanism that outputs data contains a first-in-first-out (FIFO)
        buffer that can store two samples of data per channel at a time. The DRDY flag
@@ -572,14 +595,10 @@ int ads131m02_sample(ads131m02_t *dev,
        packets when data are read for the first time or after a gap in reading data.
        This process ensures predictable DRDY pin behavior. See the Synchronization
        section for information about the synchronization feature. */
-    if ((!!chan0 ^ !!chan0_numof) || (!!chan1 ^ !!chan1_numof)) {
-        return -EINVAL;
-    }
-    if (chan0_numof) {
-        *chan0_numof = 0;
-    }
-    if (chan1_numof) {
-        *chan1_numof = 0;
+
+    /* using ADS131M02_CHANNELS_NUMOF is a simplification because only m02 is supported so far */
+    for (unsigned i = 0; i < ADS131M02_CHANNELS_NUMOF; ++i) {
+        chan_numof[i] = 0;
     }
     uint16_t status;
     SPI_ACQUIRE(dev);
@@ -588,24 +607,22 @@ int ads131m02_sample(ads131m02_t *dev,
         return -ECANCELED;
     }
     do {
-        if ((chan0 && *chan0_numof > ADS131M02_FIFO_LEN) ||
-            (chan1 && *chan1_numof > ADS131M02_FIFO_LEN)) {
-            SPI_RELEASE(dev);
-            return -EAGAIN; /* new samples produced while reading fifo */
+        for (unsigned i = 0; i < ADS131M02_CHANNELS_NUMOF; ++i) {
+            if (chan_numof[i] > ADS131M02_FIFO_LEN) {
+                SPI_RELEASE(dev);
+                return -EAGAIN; /* new samples produced while reading fifo */
+            }
         }
-
         /* last read must confirm that there are no new samples */
-        status = _read_sample(dev, chan0, chan1);
-        if (chan0 && (status & ADS131M02_STATUS_DRDY0_MASK)) {
-            chan0++;
-            (*chan0_numof)++;
+        status = _read_sample(dev, chan, ADS131M02_CHANNELS_NUMOF, nanovolt);
+        for (unsigned i = 0; i < ADS131M02_CHANNELS_NUMOF; ++i) {
+            if ((status & (ADS131M02_STATUS_DRDY0_MASK << i))) {
+                chan[i]++;
+                chan_numof[i]++;
+            }
         }
-        if (chan1 && (status & ADS131M02_STATUS_DRDY1_MASK)) {
-            chan1++;
-            (*chan1_numof)++;
-        }
-    } while ((chan0 && (status & ADS131M02_STATUS_DRDY0_MASK)) ||
-             (chan1 && (status & ADS131M02_STATUS_DRDY1_MASK)));
+    } while ((status & ADS131M02_STATUS_DRDY0_MASK) ||
+             (status & ADS131M02_STATUS_DRDY1_MASK));
     SPI_RELEASE(dev);
 
     return 0;
