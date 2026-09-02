@@ -213,6 +213,18 @@ int adc_dma_start(adc_t line, uint16_t *dst, size_t num);
 int adc_dma_stop(adc_t line);
 
 /**
+ * @brief   Continue a suspended DMA transfer for ADC sampling
+ *
+ * This requires the `periph_adc_dma` feature.
+ *
+ * @param[in] line          ADC line to continue DMA transfer for
+ *
+ * @return    0             success
+ * @return   -EINVAL        DMA channel not set up
+ */
+int adc_dma_continue(adc_t line);
+
+/**
  * @brief   Release DMA channel for ADC sampling
  *
  * This requires the `periph_adc_dma` feature.

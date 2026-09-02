@@ -87,6 +87,7 @@ static void _adc_process_cb(void *arg)
     }
     memcpy(_buf_process, _buf, adc_arg->avg_samples_numof * sizeof(uint16_t));
     event_post(_adc_process_ev_queue, &adc_arg->ev);
+    adc_dma_continue(adc_arg->adc);
 }
 
 static void _adc_dma_cb(void *arg)

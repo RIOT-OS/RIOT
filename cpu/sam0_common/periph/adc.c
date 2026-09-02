@@ -603,6 +603,16 @@ int adc_dma_stop(adc_t line)
     return 0;
 }
 
+int adc_dma_continue(adc_t line)
+{
+    if (tx_dma[line] == UINT8_MAX) {
+        return -EINVAL;
+    }
+    dma_resume(tx_dma[line]);
+
+    return 0;
+}
+
 int adc_dma_release(adc_t line)
 {
     if (tx_dma[line] == UINT8_MAX) {
