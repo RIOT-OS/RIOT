@@ -1,6 +1,5 @@
 ifneq (,$(filter periph_adc_dma,$(USEMODULE)))
   FEATURES_REQUIRED += periph_adc
-  FEATURES_REQUIRED += periph_adc_continuous
   USEMODULE += periph_dma
 endif
 

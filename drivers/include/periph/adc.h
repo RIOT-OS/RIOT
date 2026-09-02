@@ -179,12 +179,13 @@ void adc_continuous_stop(void);
  * @param[in] line          ADC line to setup DMA for
  * @param[in] cb            DMA callback function
  * @param[in] arg           Argument to pass to the callback function
+ * @param[in] res           Bit resolution to use for conversion
  *
  * @retval    0             success
  * @retval   -EEXIST        DMA channel already in use
  * @retval   -ENOMEM        No DMA channel available
  */
-int adc_dma_setup(adc_t line, dma_cb_t cb, void *arg);
+int adc_dma_setup(adc_t line, dma_cb_t cb, void *arg, adc_res_t res);
 
 /**
  * @brief   Start DMA transfer for ADC sampling
