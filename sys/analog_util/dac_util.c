@@ -35,6 +35,7 @@
 #include "imath.h"
 #include "analog_util.h"
 #include "macros/math.h"
+#include "modules.h"
 #include "periph/dac.h"
 
 uint16_t dac_util_map(int value, int min, int max)
@@ -48,8 +49,7 @@ uint16_t dac_util_mapf(float value, float min, float max)
 }
 
 int dac_util_sine(uint16_t center_mv, uint16_t amplitude_mv, uint32_t freq_hz,
-                  uint16_t dac_ref_mv,
-                  uint16_t *buf, uint32_t *buf_max)
+                  uint16_t dac_ref_mv, uint16_t *buf, uint32_t *buf_max)
 {
     if (freq_hz == 0) {
         return -EINVAL;
@@ -72,7 +72,7 @@ int dac_util_sine(uint16_t center_mv, uint16_t amplitude_mv, uint32_t freq_hz,
     uint16_t dac_max_val = dac_util_map(center_mv + amplitude_mv, 0, dac_ref_mv);
     uint16_t dac_amplitude = dac_max_val - dac_center;
 
-#if __FPU_PRESENT
+#if IS_USED(MODULE_CORTEXM_FPU)
     float radix_step = (2.0f * (float)PI) / (float)samples_per_period;
     for (uint32_t i = 0; i < samples_per_period; ++i) {
         float val = (float)dac_center + ((float)dac_amplitude * sinf((float)i * radix_step));
