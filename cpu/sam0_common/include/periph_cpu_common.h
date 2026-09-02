@@ -1369,6 +1369,16 @@ void dma_disable_loop(dma_t dma);
 void dma_start(dma_t dma);
 
 /**
+ * @brief   Resume a suspended DMA transfer
+ *
+ * This is intended to be called from an DMA ISR, when DMA was prepared with
+ * @ref DMA_BLOCKACT_SUSPEND or @ref DMA_BLOCKACT_BOTH.
+ *
+ * @param[in]   dma     DMA channel reference
+ */
+void dma_resume(dma_t dma);
+
+/**
  * @brief   Cancel an active DMA transfer
  *
  * It is not harmful to call this on an inactive channel, but it will waste some
