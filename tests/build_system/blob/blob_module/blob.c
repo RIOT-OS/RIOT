@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2019 Kaspar Schleiser <kaspar@schleiser.de>
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 #include "fmt.h"
 
 #include "blob/blobtest.bin.h"

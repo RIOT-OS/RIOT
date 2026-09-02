@@ -16,7 +16,8 @@
 #include "tests-core-xfa.h"
 
 XFA(xfatest_t, xfatest, 0) _xfatest1 = { .val = 12345, .text = "xfatest1" };
-XFA_CONST(xfatest_t, xfatest_const, 0) _xfatest_const1 = { .val = 0xcafe, .text = "xfatest_const1" };
+XFA_CONST(xfatest_t, xfatest_const, 0) _xfatest_const1 = { .val = 0xcafe,
+                                                           .text = "xfatest_const1" };
 
 XFA_INIT(xfatest_t, xfatest_use);
 XFA_INIT_CONST(xfatest_t, xfatest_use_const);

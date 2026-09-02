@@ -33,7 +33,7 @@ int main(void)
 
     printf("+------------Initializing------------+\n");
 
-    switch(tsl2561_init(&dev, &tsl2561_params[0])) {
+    switch (tsl2561_init(&dev, &tsl2561_params[0])) {
         case TSL2561_NOI2C:
         puts("[Error] I2C not working: cannot initialize the sensor.\n");
         break;

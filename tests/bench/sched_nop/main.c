@@ -45,7 +45,7 @@ int main(void)
     uint32_t n = 0;
 
     xtimer_set(&timer, TEST_DURATION);
-    while(!_flag) {
+    while (!_flag) {
         thread_yield();
         n++;
     }

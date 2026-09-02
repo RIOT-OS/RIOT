@@ -40,7 +40,7 @@ static void *_second_thread(void *arg)
 {
     (void)arg;
 
-    while(1) {
+    while (1) {
         thread_yield();
     }
 
@@ -65,7 +65,7 @@ int main(void)
     uint32_t n = 0;
 
     xtimer_set(&timer, TEST_DURATION);
-    while(!_flag) {
+    while (!_flag) {
         thread_yield();
         n++;
     }

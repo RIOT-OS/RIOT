@@ -29,7 +29,7 @@ typedef struct {
     uint32_t variance_high;
 } stat_limits_t;
 
-typedef struct  {
+typedef struct {
     const char *label;
     const char **sub_labels;
     unsigned num_sub_labels;
@@ -50,7 +50,8 @@ typedef struct {
  * @param[in]   ref_states  State vector from reference measurements
  * @param[in]   int_states  State vector from introspective measurements
  */
-void print_results(const result_presentation_t *pres, const matstat_state_t *ref_states, const matstat_state_t *int_states);
+void print_results(const result_presentation_t *pres, const matstat_state_t *ref_states,
+                   const matstat_state_t *int_states);
 
 #ifdef __cplusplus
 }
