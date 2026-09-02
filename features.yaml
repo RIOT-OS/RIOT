@@ -41,8 +41,6 @@ groups:
       help: CPU architecture is classic ARM (ARM7)
     - name: arch_avr8
       help: CPU architecture is AVR-8
-    - name: arch_efm32
-      help: FIXME. This is not an architecture. Use cpu_efm32 for this
     - name: arch_esp
       help: "CPU architecture is an ESP. (Fixme: This is not an architecture)"
     - name: arch_esp_xtensa
