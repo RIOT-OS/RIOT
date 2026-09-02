@@ -48,6 +48,8 @@
 #  define ADC_NEG_INPUT (0)
 #endif
 
+#define ADC_DMA_DEST_MAX    2
+
 /* Prototypes */
 static void _adc_poweroff(Adc *dev);
 static void _setup_clock(Adc *dev);
@@ -58,6 +60,8 @@ static mutex_t _lock = MUTEX_INIT;
 #if MODULE_PERIPH_ADC_DMA
 /* Designated Array Range Initializer */
 static dma_t tx_dma[ADC_NUMOF] = { [0 ... ADC_NUMOF - 1] = UINT8_MAX };
+/* extra descriptors to append destination buffers in circular DMA transfers */
+static DmacDescriptor DMA_DESCRIPTOR_ATTRS _tx_dma_next[(ADC_DMA_DEST_MAX - 1) * ADC_NUMOF];
 #endif
 
 static inline void _wait_syncbusy(Adc *dev)
@@ -556,10 +560,13 @@ int adc_dma_setup(adc_t line, dma_cb_t cb, void *arg, adc_res_t res)
     return 0;
 }
 
-int adc_dma_start(adc_t line, uint16_t *dst, size_t num)
+int adc_dma_start(adc_t line, uint16_t *dst[], size_t dst_size, unsigned dst_numof)
 {
     if (tx_dma[line] == UINT8_MAX) {
         return -EINVAL;
+    }
+    if (dst_numof < 1 || dst_numof > ADC_DMA_DEST_MAX) {
+        return -ENOTSUP;
     }
     Adc *dev = _dev(line);
 
@@ -572,7 +579,8 @@ int adc_dma_start(adc_t line, uint16_t *dst, size_t num)
     /* Set DMA transfer descriptors */
     const volatile void *src = &dev->RESULT.reg;
     /* enable block interrupt and suspend DMA on block completion */
-    dma_prepare(tx_dma[line], DMAC_BTCTRL_BEATSIZE_HWORD_Val, (const void *)src, dst + num, num,
+    dma_prepare(tx_dma[line], DMAC_BTCTRL_BEATSIZE_HWORD_Val,
+                (const void *)src, dst[0] + dst_size, dst_size,
                 DMA_INCR_DEST, DMA_BLOCKACT_BOTH);
 
     /* Enable FREERUN */
@@ -583,6 +591,12 @@ int adc_dma_start(adc_t line, uint16_t *dst, size_t num)
 #endif
     _wait_syncbusy(dev);
 
+    if (dst_numof > 1) {
+        for (unsigned i = 0; i < dst_numof - 1; ++i) {
+            dma_append_dst(tx_dma[line], &_tx_dma_next[line * (ADC_DMA_DEST_MAX - 1) + i],
+                           dst[i + 1] + dst_size, dst_size, true);
+        }
+    }
     dma_enable_loop(tx_dma[line]);
     /* Start DMA channel first */
     dma_start(tx_dma[line]);
