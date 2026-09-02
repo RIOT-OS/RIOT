@@ -315,6 +315,20 @@ void dma_cancel(dma_t dma)
 #endif
 }
 
+void dma_resume(dma_t dma)
+{
+    DEBUG("[dma]: resuming: %u\n", dma);
+
+#ifdef REG_DMAC_CHID
+    unsigned state = irq_disable();
+    DMAC->CHID.reg = DMAC_CHID_ID(dma);
+    DMAC->CHCTRLB.reg |= DMAC_CHCTRLB_CMD_RESUME;
+    irq_restore(state);
+#else
+    DMAC->Channel[dma].CHCTRLB.reg |= DMAC_CHCTRLB_CMD_RESUME;
+#endif
+}
+
 void isr_dmac(void)
 {
     /* Always holds the interrupt status for the highest priority channel with
