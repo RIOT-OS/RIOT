@@ -36,8 +36,12 @@ extern "C" {
 #ifndef ADS131M02_PARAM_SPI_CLK
 /**
  * @brief   Default SPI clock speed
+ *
+ * This must be fast enough to support at least 12 byte frame transfer at the desired sample rate.
+ * Example: 24 bit word length and 32KHz desired sampling frequency:
+ * 96 bits * 32000 Hz = 3072000 bits/sec
  */
-#  define ADS131M02_PARAM_SPI_CLK       (SPI_CLK_1MHZ)
+#  define ADS131M02_PARAM_SPI_CLK       (SPI_CLK_5MHZ)
 #endif
 #ifndef ADS131M02_PARAM_CS
 /**
