@@ -42,8 +42,7 @@
 typedef struct {
     event_t ev;
     ads131m02_t dev;
-    int32_t chan0[ADS131M02_FIFO_LEN + 1];
-    int32_t chan1[ADS131M02_FIFO_LEN + 1];
+    int32_t chan[ADS131M02_CHANNELS_NUMOF][ADS131M02_FIFO_LEN + 1];
 } ads131m02_event_t;
 
 static void _drdy_event_handler(event_t *ev);
@@ -67,19 +66,21 @@ static void _drdy_isr(ads131m02_t *dev)
 static void _drdy_event_handler(event_t *ev)
 {
     ads131m02_event_t *ads_ev = container_of(ev, ads131m02_event_t, ev);
-    unsigned chan0_numof = 0, chan1_numof = 0;
+    unsigned chan_numof[ADS131M02_CHANNELS_NUMOF] = {0};
+
     int res;
     do {
-        res = ads131m02_sample(&ads_ev->dev, ads_ev->chan0, ads_ev->chan1,
-                               &chan0_numof, &chan1_numof);
-        for (unsigned i = 0; i < chan0_numof; ++i) {
-            DEBUG("chan0[%u] = %" PRId32 " nV\n", i, ads_ev->chan0[i]);
+        int32_t *chan_ptr[ADS131M02_CHANNELS_NUMOF];
+        for (unsigned i = 0; i < ADS131M02_CHANNELS_NUMOF; ++i) {
+            chan_ptr[i] = ads_ev->chan[i];
         }
-        for (unsigned i = 0; i < chan1_numof; ++i) {
-            DEBUG("chan1[%u] = %" PRId32 " nV\n", i, ads_ev->chan1[i]);
-        }
-        if (res < 0) {
+        if ((res = ads131m02_sample(&ads_ev->dev, chan_ptr, chan_numof, true)) < 0) {
             printf("ads131m02_sample: %d\n", res);
+        }
+        for (unsigned i = 0; i < ADS131M02_CHANNELS_NUMOF; i++) {
+            for (unsigned j = 0; j < chan_numof[i]; ++j) {
+                DEBUG("chan[%u][%u] = %" PRId32 " nV\n", i, j, ads_ev->chan[i][j]);
+            }
         }
     } while (res == -EAGAIN);
 }
@@ -103,7 +104,7 @@ help:
         printf("usage: ads start|stop|resume|standby|wakeup\n");
         return 1;
     }
-    else if (strcmp(argv[1], "start") == 0) {
+    if (strcmp(argv[1], "start") == 0) {
         if (argc < 5) {
             printf("usage: ads start <channel> <sps> <abs_mv>\n");
             return 1;
@@ -111,9 +112,9 @@ help:
         long channel = strtol(argv[2], NULL, 10);
         ads131m02_start_t start;
         start.ch_mask = ADS131M02_CHANNEL_MASK(channel);
-        start.sps = ADS131M02_SPS(strtol(argv[3], NULL, 10));
+        start.sps = strtol(argv[3], NULL, 10);
         start.ch[ADS131M02_CHANNEL(channel)].abs_mv = strtoul(argv[4], NULL, 10);
-        if ((ret = ads131m02_start(&_ads_ev.dev, &start, ADS131M02_TEST_CLOCK_HZ)) != 0) {
+        if ((ret = ads131m02_start(&_ads_ev.dev, &start, ADS131M02_TEST_CLOCK_HZ, true)) != 0) {
             printf("ads131m02_start: %d\n", ret);
             return ret;
         }
@@ -186,20 +187,18 @@ int main(void)
     event_queue_init(&_ads_ev_queue);
     ads131m02_start_t start = {
         .ch_mask = ADS131M02_CHANNEL_MASK(0) | ADS131M02_CHANNEL_MASK(1),
-        .sps = ADS131M02_SPS(ADS131M02_TEST_SPS),
+        .sps = ADS131M02_TEST_SPS,
         .ch[0].abs_mv = ADS131M02_VREF_NV / 1000 / 1000,
         .ch[1].abs_mv = ADS131M02_VREF_NV / 1000 / 1000,
     };
-    if ((res = ads131m02_start(&_ads_ev.dev, &start, ADS131M02_TEST_CLOCK_HZ))) {
+    if ((res = ads131m02_start(&_ads_ev.dev, &start, ADS131M02_TEST_CLOCK_HZ, true))) {
         printf("ads131m02: start: %d\n", res);
         goto failure;
     }
 
     event_t *ev;
-    unsigned ch0_out_of_range = 0;
-    unsigned ch1_out_of_range = 0;
-    uint32_t ch0_rmse = 0;
-    uint32_t ch1_rmse = 0;
+    unsigned ch_out_of_range[ADS131M02_CHANNELS_NUMOF] = {0};
+    uint32_t ch_rmse[ADS131M02_CHANNELS_NUMOF] = {0};
     for (unsigned i = 0; i < ADS131M02_TEST_SAMPLES_NUMOF; ++i) {
         if (!(ev = event_wait_timeout(&_ads_ev_queue,
                                       (MS_PER_SEC * US_PER_MS) / ADS131M02_TEST_SPS))) {
@@ -208,35 +207,28 @@ int main(void)
         }
         ev->handler(ev);
         int32_t test_signal_nv = (2 * ADS131M02_VREF_NV) / 15 / _ads_ev.dev.gain[0];
-        int32_t ch0_nv = _ads_ev.chan0[0];
-        int32_t ch1_nv = _ads_ev.chan1[0];
         int32_t tolerance_nv = 10 * 1000 * 1000; /* 10 mV */
-        ch0_rmse += (ch0_nv - test_signal_nv) * (ch0_nv - test_signal_nv);
-        ch1_rmse += (ch1_nv - test_signal_nv) * (ch1_nv - test_signal_nv);
-        if (ch0_nv < test_signal_nv - tolerance_nv || ch0_nv > test_signal_nv + tolerance_nv) {
-            printf("ads131m02: channel 0 not in expected range: "
-                   "%" PRId32 " nV [%" PRId32 " nV, %" PRId32 " nV]\n",
-                   ch0_nv, test_signal_nv - tolerance_nv, test_signal_nv + tolerance_nv);
-            ch0_out_of_range++;
-        }
-        if (ch1_nv < test_signal_nv - tolerance_nv || ch1_nv > test_signal_nv + tolerance_nv) {
-            printf("ads131m02: channel 1 not in expected range: "
-                   "%" PRId32 " nV [%" PRId32 " nV, %" PRId32 " nV]\n",
-                   ch1_nv, test_signal_nv - tolerance_nv, test_signal_nv + tolerance_nv);
-            ch1_out_of_range++;
+        for (unsigned ch = 0; ch < ADS131M02_CHANNELS_NUMOF; ++ch) {
+            ch_rmse[ch] += ((_ads_ev.chan[ch][0] - test_signal_nv) *
+                            (_ads_ev.chan[ch][0] - test_signal_nv));
+            if (_ads_ev.chan[ch][0] < test_signal_nv - tolerance_nv ||
+                _ads_ev.chan[ch][0] > test_signal_nv + tolerance_nv) {
+                printf("ads131m02: channel %u not in expected range: "
+                       "%" PRId32 " nV [%" PRId32 " nV, %" PRId32 " nV]\n",
+                       ch, _ads_ev.chan[ch][0],
+                       test_signal_nv - tolerance_nv,
+                       test_signal_nv + tolerance_nv);
+                ch_out_of_range[ch]++;
+            }
         }
     }
-    ch0_rmse = (uint32_t)sqrt((double)ch0_rmse / ADS131M02_TEST_SAMPLES_NUMOF);
-    ch1_rmse = (uint32_t)sqrt((double)ch1_rmse / ADS131M02_TEST_SAMPLES_NUMOF);
-    printf("ads131m02: channel 0 RMSE = %" PRIu32 " nV\n", ch0_rmse);
-    printf("ads131m02: channel 1 RMSE = %" PRIu32 " nV\n", ch1_rmse);
-    if (ch0_out_of_range > ADS131M02_TEST_OUTLIERS_NUMOF) {
-        printf("ads131m02: channel 0 out of range %u times\n", ch0_out_of_range);
-        goto failure;
-    }
-    if (ch1_out_of_range > ADS131M02_TEST_OUTLIERS_NUMOF) {
-        printf("ads131m02: channel 1 out of range %u times\n", ch1_out_of_range);
-        goto failure;
+    for (unsigned ch = 0; ch < ADS131M02_CHANNELS_NUMOF; ++ch) {
+        ch_rmse[ch] = (uint32_t)sqrt((double)ch_rmse[ch] / ADS131M02_TEST_SAMPLES_NUMOF);
+        printf("ads131m02: channel %u RMSE = %" PRIu32 " nV\n", ch, ch_rmse[ch]);
+        if (ch_out_of_range[ch] > ADS131M02_TEST_OUTLIERS_NUMOF) {
+            printf("ads131m02: channel %u out of range %u times\n", ch, ch_out_of_range[ch]);
+            goto failure;
+        }
     }
 
     if ((res = ads131m02_standby(&_ads_ev.dev))) {
