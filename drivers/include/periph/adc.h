@@ -190,15 +190,19 @@ int adc_dma_setup(adc_t line, dma_cb_t cb, void *arg);
  * @brief   Start DMA transfer for ADC sampling
  *
  * This requires the `periph_adc_dma` feature.
+ * Currently only 1 or 2 destination buffers are supported.
+ * 2 destination buffers allow for double buffer sampling.
  *
  * @param[in] line          ADC line to start DMA transfer for
- * @param[in] dst           Destination buffer for the sampled data
- * @param[in] num           Number of samples to transfer
+ * @param[in] dst           Array of destination buffers for sampled data
+ * @param[in] dst_size      Number of samples per buffer
+ * @param[in] dst_numof     Number of destination buffers
  *
  * @return    0             success
  * @return   -EINVAL        DMA channel not set up
+ * @return   -ENOTSUP       Unsupported number of destination buffers
  */
-int adc_dma_start(adc_t line, uint16_t *dst, size_t num);
+int adc_dma_start(adc_t line, uint16_t *dst[], size_t dst_size, unsigned dst_numof);
 
 /**
  * @brief   Stop DMA transfer for ADC sampling

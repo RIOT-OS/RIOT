@@ -56,8 +56,9 @@ typedef struct adc_process_event {
 } adc_process_event_t;
 
 static event_queue_t *_adc_process_ev_queue = EVENT_PRIO_MEDIUM;
-static uint16_t _buf[CONFIG_TEST_ADC_BUF_SAMPLES] __attribute__((aligned(4)));
-static uint16_t _buf_process[CONFIG_TEST_ADC_BUF_SAMPLES];
+/* double buffering */
+static uint16_t _buf[2][CONFIG_TEST_ADC_BUF_SAMPLES] __attribute__((aligned(4)));
+static uint16_t *_buf_process = _buf[1];
 static uint32_t _processed_numof;
 
 static void _adc_process(event_t *arg)
@@ -79,13 +80,23 @@ static void _adc_process(event_t *arg)
           adc_arg->adc, (mean * ADC_VREF_MV) / ((1 << adc_arg->bits) - 1));
 }
 
+static void _swap_buffers(void)
+{
+    if (_buf_process == _buf[0]) {
+        _buf_process = _buf[1];
+    }
+    else {
+        _buf_process = _buf[0];
+    }
+}
+
 static void _adc_process_cb(void *arg)
 {
     adc_process_event_t *adc_arg = (adc_process_event_t *)arg;
     if (event_is_queued(_adc_process_ev_queue, &adc_arg->ev)) {
         printf("ADC: processing too slow\n");
     }
-    memcpy(_buf_process, _buf, adc_arg->avg_samples_numof * sizeof(uint16_t));
+    _swap_buffers();
     event_post(_adc_process_ev_queue, &adc_arg->ev);
     adc_dma_continue(adc_arg->adc);
 }
@@ -114,7 +125,8 @@ int main(void)
            adc_get_freq());
 
     adc_dma_setup(adc_arg.adc, _adc_dma_cb, &adc_arg);
-    adc_dma_start(adc_arg.adc, _buf, adc_arg.avg_samples_numof);
+    uint16_t *dst[] = {_buf[0], _buf[1]};
+    adc_dma_start(adc_arg.adc, dst, adc_arg.avg_samples_numof, 2);
 
     xtimer_msleep(CONFIG_TEST_ADC_SLEEP_SEC * MS_PER_SEC);
 
