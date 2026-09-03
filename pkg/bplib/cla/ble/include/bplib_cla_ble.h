@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
+ * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 #pragma once
@@ -8,7 +8,7 @@
  * @ingroup pkg_bplib_cla
  * @brief Implementation of a basic CLA over BLE L2CAP.
  *
- * # About
+ * ## About
  * Sends bundles via BLE between two statically connected devices.
  *
  * To use this, call bplib_cla_ble_start(). The remote MAC address of the

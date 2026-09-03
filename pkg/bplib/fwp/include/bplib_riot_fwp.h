@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
+ * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 #pragma once
@@ -9,14 +9,14 @@
  * @ingroup pkg_bplib
  * @brief A default implementation of FWP callbacks which are needed for bplib.
  *
- * # About
+ * ## About
  * A FWP provides callbacks for certain events happening in bplib.
  *
  * Many of the callbacks are not used, since the configuration of bplib is
  * different in this port from how bplib is used in NASA's bpnode. What this
  * module does provide is the following:
  *
- * ## Time
+ * ### Time
  * The bundle protocol essentially knows two operating modes:
  * 1. An accurate DTN time clock is present. All timestamps are absolute times,
  *    and no bundle age block will be inserted.
@@ -32,14 +32,14 @@
  * time. In the case the current time can not reliably be maintained, this
  * module should not be selected, then the second operating mode will be used.
  *
- * ## Optimizations
+ * ### Optimizations
  *
  * bplib adds AS (Admin Statistics), which includes counters of bundle
  * operations (ingress, forwarding and the like). These are several KB large
  * and thus disabled by default in the port. You can enable them again using
  * the `bplib_include_as` pseudomodule.
  *
- * ## Overriding the default FWP
+ * ### Overriding the default FWP
  *
  * bplib_riot_fwp_init() is called in @ref pkg_bplib_init, so if this module
  * is not enabled with `bplib_default_fwp`, a function with the signature of
