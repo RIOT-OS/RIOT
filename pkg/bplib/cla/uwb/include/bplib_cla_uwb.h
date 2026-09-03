@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
+ * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
@@ -12,10 +12,14 @@
  *
  * ## Usage
  *
- * To use this, call bplib_cla_uwb_start(). The remote short address will
- * be taken from the @ref pkg_bplib_nc tables, so bplib_contact_set_out_addr()
- * needs to be configured before. The remote PAN is set as the port.
- * The local address and PAN is set with the corresponding
+ * To use this, call bplib_cla_uwb_start(). The decadriver UWB module should
+ * already be in a started state and decive configuration should already have
+ * happened (with dwt_configure()). The other settings, like auto ACKs will be
+ * enabled during the initialization of the CLA.
+ * 
+ * The remote short address will be taken from the @ref pkg_bplib_nc tables, so
+ * bplib_contact_set_out_addr() needs to be configured before. The remote PAN is
+ * set as the port. The local address and PAN is set with the corresponding
  * bplib_contact_set_in_addr() function.
  * Any incoming transmissions are accepted currently.
  *
