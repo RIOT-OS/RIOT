@@ -165,7 +165,7 @@ def _sufficient_memory(board, env, cwd):
     insufficient_memory = __exec_cmd(cmd, env=env, cwd=cwd).split()
 
     # Has the board sufficient memory (not listed in BOARD_INSUFFICIENT_MEMORY)?
-    return not board in insufficient_memory
+    return board not in insufficient_memory
 
 
 def _supported_boards_from_cpu(cpu, env, cwd):
