@@ -149,10 +149,7 @@ def _supported_by_toolchain(app, toolchain, env, cwd):
     cmd = ('make', 'info-toolchains-supported', '--no-print-directory')
     toolchains = __exec_cmd(cmd, env=env, cwd=cwd).split()
 
-    if toolchain in toolchains:
-        return True
-    else:
-        return False
+    return toolchain in toolchains
 
 
 def _supported_boards(boards, env, cwd, all_boards=False):
@@ -167,11 +164,8 @@ def _sufficient_memory(board, env, cwd):
     cmd = ('make', 'info-debug-variable-BOARD_INSUFFICIENT_MEMORY', '--no-print-directory')
     insufficient_memory = __exec_cmd(cmd, env=env, cwd=cwd).split()
 
-    # Has the board sufficient memory?
-    if board in insufficient_memory:
-        return False
-    else:
-        return True
+    # Has the board sufficient memory (not listed in BOARD_INSUFFICIENT_MEMORY)?
+    return not board in insufficient_memory
 
 
 def _supported_boards_from_cpu(cpu, env, cwd):
