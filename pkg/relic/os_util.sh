@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+
 OSNAME=`uname -s`
 SEDBIN="sed -i"
 if [ "${OSNAME}" = "Darwin" ] ; then
