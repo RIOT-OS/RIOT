@@ -12,20 +12,21 @@ More information about the module can be found on this
 
 ## Hardware
 
-##
+### MCU
 
 | MCU             | EFR32MG1P132F256GM32                                                                    |
 |-----------------|-----------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M4F                                                                          |
+| Series          | Series 1                                                                                |
 | Vendor          | Silicon Labs                                                                            |
 | Vendor Family   | EFR32 Mighty Gecko 1P                                                                   |
-| RAM             | 32.0 KiB (1.0 KiB reserved)                                                             |
+| RAM             | 32.0 KiB (1.0 KiB reserved for the radio blob)                                          |
 | Flash           | 256.0 KiB                                                                               |
 | EEPROM          | no                                                                                      |
 | Frequency       | up to 38.4 MHz                                                                          |
 | FPU             | yes                                                                                     |
 | MPU             | yes                                                                                     |
-| DMA             | 12 channels                                                                             |
+| DMA             | 8 channels                                                                              |
 | Timers          | 2x 16-bit + 1x 16-bit (low power)                                                       |
 | ADCs            | 12-bit ADC                                                                              |
 | UARTs           | 2x USART, 1x LEUART                                                                     |
@@ -62,24 +63,23 @@ Pin 1 is on the top-left side with only 6 contacts.
 
 ### Peripheral mapping
 
-| Peripheral | Number  | Hardware        | Pins                              | Comments                                            |
-|------------|---------|-----------------|-----------------------------------|-----------------------------------------------------|
-| ADC        | 0       | ADC0            | CHAN0: internal temperature       | Ports are fixed, 14/16-bit resolution not supported |
-| HWCRYPTO   | &mdash; | &mdash;         |                                   | AES128/AES256, SHA1, SHA256                         |
-| RTT        | &mdash; | RTCC            |                                   | 1 Hz interval. Either RTT or RTC (see below)        |
-| RTC        | &mdash; | RTCC            |                                   | 1 Hz interval. Either RTC or RTT (see below)        |
-| SPI        | 0       | USART1          | MOSI: PD15, MISO: PD14, CLK: PD13 |                                                     |
-| Timer      | 0       | TIMER0 + TIMER1 |                                   | TIMER0 is used as prescaler (must be adjacent)      |
-|            | 1       | LETIMER0        |                                   |                                                     |
-| UART       | 0       | USART0          | RX: PB15, TX: PB14                | Default STDIO output                                |
-|            | 1       | LEUART0         | RX: PB15, TX: PB14                | Baud rate limited (see below)                       |
+| Peripheral | Number | Hardware        | Pins                              | Comments                                            |
+|------------|--------|-----------------|-----------------------------------|-----------------------------------------------------|
+| ADC        | 0      | ADC0            | CHAN0: internal temperature       | Ports are fixed, 14/16-bit resolution not supported |
+| RTT        | -      | RTCC            |                                   | 1 Hz interval. Either RTT or RTC (see below)        |
+| RTC        | -      | RTCC            |                                   | 1 Hz interval. Either RTC or RTT (see below)        |
+| SPI        | 0      | USART1          | MOSI: PD15, MISO: PD14, CLK: PD13 |                                                     |
+| Timer      | 0      | TIMER0 + TIMER1 |                                   | TIMER0 is used as prescaler (must be adjacent)      |
+|            | 1      | LETIMER0        |                                   |                                                     |
+| UART       | 0      | USART0          | RX: PB15, TX: PB14                | Default STDIO output                                |
+|            | 1      | LEUART0         | RX: PB15, TX: PB14                | Baud rate limited (see below)                       |
 
 ### User interface
 
-| Peripheral | Mapped to | Pin  | Comments |
-|------------|-----------|------|----------|
-| LED        | LED0      | PB13 |          |
-|            | LED1      | PA1  |          |
+| Peripheral | Number | Mapped to | Pin  | Comments |
+|------------|--------|-----------|------|----------|
+| LED        | 0      | LED0_PIN  | PA1  |          |
+|            | 1      | LED1_PIN  | PB13 |          |
 
 ## Implementation Status
 
@@ -89,11 +89,10 @@ Pin 1 is on the top-left side with only 6 contacts.
 | Low-level driver | ADC        | yes       |                                                                |
 |                  | Flash      | yes       |                                                                |
 |                  | GPIO       | yes       | Interrupts are shared across pins (see reference manual)       |
-|                  | HW Crypto  | yes       |                                                                |
 |                  | I2C        | yes       |                                                                |
 |                  | PWM        | yes       |                                                                |
 |                  | RTCC       | yes       | As RTT or RTC                                                  |
-|                  | SPI        | partially | Only master mode                                               |
+|                  | SPI        | yes       | Only master mode                                               |
 |                  | Timer      | yes       |                                                                |
 |                  | UART       | yes       | USART is shared with SPI. LEUART baud rate limited (see below) |
 | SPI NOR Flash    | IS25LQ020B | yes       | 2MBit flash. Can be used with the MTD API.                     |
@@ -166,17 +165,9 @@ Therefore, only one of both peripherals can be enabled at the same time.
 
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
 
-### Hardware crypto
-
-This MCU is equipped with a hardware-accelerated crypto peripheral that can
-speed up AES128, AES256, SHA1, SHA256 and several other cryptographic
-computations.
-
-A peripheral driver interface is proposed, but not yet implemented.
-
 ### Usage of EMLIB
 
-This port makes uses of EMLIB by Silicon Labs to abstract peripheral registers.
+This port makes use of EMLIB by Silicon Labs to abstract peripheral registers.
 While some overhead is to be expected, it ensures proper setup of devices,
 provides chip errata and simplifies development. The exact overhead depends on
 the application and peripheral usage, but the largest overhead is expected
@@ -185,7 +176,10 @@ inline methods or macros (which have no overhead).
 
 Another advantage of EMLIB are the included assertions. These assertions ensure
 that peripherals are used properly. To enable this, pass `DEBUG_EFM` to your
-compiler.
+compiler defines.
+
+EMLIB is licensed by Silicon Labs under the zlib-style license, which permits
+distribution of source.
 
 ### Pin locations
 
@@ -229,7 +223,3 @@ Some boards have (limited) support for emulation, which can be started with:
 ```shell
 BOARD=ikea-tradfri make emulate
 ```
-
-## License information
-
-Silicon Labs' EMLIB: zlib-style license (permits distribution of source).

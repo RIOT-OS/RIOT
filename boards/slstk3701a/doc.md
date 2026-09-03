@@ -18,6 +18,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 | MCU             | EFM32GG11B820F2048GL192                              |
 |-----------------|------------------------------------------------------|
 | Family          | ARM Cortex-M4F                                       |
+| Series          | Series 1                                             |
 | Vendor          | Silicon Labs                                         |
 | Vendor Family   | EFM32 Giant Gecko 11B                                |
 | RAM             | 512.0 KiB                                            |
@@ -44,7 +45,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 ### Pinout
 
 This is the pinout of the expansion header on the right side of the board.
-PIN 1 is the bottom-left contact when the header faces  you horizontally.
+PIN 1 is the bottom-left contact when the header faces you horizontally.
 
 | RIOT Peripheral | Name | PIN | PIN | Name   | RIOT Peripheral |
 |-----------------|------|-----|-----|--------|-----------------|
@@ -73,8 +74,7 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | I2C         | 0       | I2C0       | SDA:PC0, SCL:PC1 | Normal speed                        |
 | I2C         | 1       | I2C1       | SDA:PC4, SCL:PC5 | Normal speed                        |
 | I2C         | 2       | I2C2       | SDA:PI4, SCL:PI5 | Normal speed, Sensor I2C bus        |
-| HWCRYPTO    | -       | -          |                  | AES128/AES256, SHA1, SHA224/SHA256  |
-| HWRNG       | -       | TNRG0      |                  | True Random Number Generator (TRNG) |
+| HWRNG       | -       | TRNG0      |                  | True Random Number Generator (TRNG) |
 | RTT         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
 | RTC         | -       | RTCC       |                  | 1 Hz interval, either RTT or RTC    |
 | SPI         | 0       | USART0     | MOSI:PE10, MISO:PE11, CLK:PE12 |                       |
@@ -87,18 +87,18 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 
 ### User interface
 
-| Peripheral | Mapped to | Pin       | Comments   |
-|------------|-----------|-----------|------------|
-| Button     | PB0_PIN   | PC8       |            |
-|            | PB1_PIN   | PC9       |            |
-| LED        | LED0R_PIN | PH10      | Active low |
-|            | LED0G_PIN | PH11      | Active low |
-|            | LED0B_PIN | PH12      | Active low |
-|            | LED1R_PIN | PH13      | Active low |
-|            | LED1G_PIN | PH14      | Active low |
-|            | LED1B_PIN | PH15      | Active low |
-|            | LED0_PIN  | LED0R_PIN | Active low |
-|            | LED1_PIN  | LED1R_PIN | Active low |
+| Peripheral | Number | Mapped to | Pin       | Comments   |
+|------------|--------|-----------|-----------|------------|
+| Button     | 0      | PB0_PIN   | PC8       |            |
+|            | 1      | PB1_PIN   | PC9       |            |
+| LED        | 0      | LED0R_PIN | PH10      | Active low |
+|            |        | LED0G_PIN | PH11      | Active low |
+|            |        | LED0B_PIN | PH12      | Active low |
+|            |        | LED0_PIN  | LED0R_PIN | Active low |
+|            | 1      | LED1R_PIN | PH13      | Active low |
+|            |        | LED1G_PIN | PH14      | Active low |
+|            |        | LED1B_PIN | PH15      | Active low |
+|            |        | LED1_PIN  | LED1R_PIN | Active low |
 
 ## Implementation Status
 
@@ -110,13 +110,12 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |                               | Ethernet    | no        |                                                       |
 |                               | Flash       | yes       |                                                       |
 |                               | GPIO        | yes       | Interrupts are shared across pins (see ref manual)    |
-|                               | HW Crypto   | yes       |                                                       |
+|                               | HWRNG       | yes       | True Random Number Generator                          |
 |                               | I2C         | yes       |                                                       |
 |                               | PWM         | yes       |                                                       |
 |                               | RTCC        | yes       | As RTT or RTC                                         |
 |                               | SPI         | yes       | Only master mode                                      |
 |                               | Timer       | yes       |                                                       |
-|                               | TRNG        | yes       | True Random Number Generator                          |
 |                               | UART        | yes       | USART is shared with SPI. LEUART baud rate limited    |
 |                               | USB         | yes       | Device mode                                           |
 | LCD driver                    | LS013B7DH06 | no        | Sharp Low Power Memory color LCD (Rev. A0 - A5 board) |
@@ -163,7 +162,7 @@ symbols (`-gdwarf-2` for GCC).
 
 There are several clock sources that are available for the different
 peripherals. You are advised to read
-[AN0004.0](https://www.silabs.com/documents/public/application-notes/an0004.0-efm32-cmu.pdf)
+[AN0004.1](https://www.silabs.com/documents/public/application-notes/an0004.1-efm32-cmu.pdf)
 to get familiar with the different clocks.
 
 | Source | Internal | Speed      | Comments                           |
@@ -218,17 +217,9 @@ Therefore, only one of both peripherals can be enabled at the same time.
 
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
 
-### Hardware crypto
-
-This MCU is equipped with a hardware-accelerated crypto peripheral that can
-speed up AES128, AES256, SHA1, SHA256 and several other cryptographic
-computations.
-
-A peripheral driver interface is proposed, but not yet implemented.
-
 ### Usage of EMLIB
 
-This port makes uses of EMLIB by Silicon Labs to abstract peripheral registers.
+This port makes use of EMLIB by Silicon Labs to abstract peripheral registers.
 While some overhead is to be expected, it ensures proper setup of devices,
 provides chip errata and simplifies development. The exact overhead depends on
 the application and peripheral usage, but the largest overhead is expected
@@ -237,7 +228,10 @@ inline methods or macros (which have no overhead).
 
 Another advantage of EMLIB are the included assertions. These assertions ensure
 that peripherals are used properly. To enable this, pass `DEBUG_EFM` to your
-compiler.
+compiler defines.
+
+EMLIB is licensed by Silicon Labs under the zlib-style license, which permits
+distribution of source.
 
 ### Pin locations
 
@@ -281,7 +275,3 @@ Some boards have (limited) support for emulation, which can be started with:
 ```shell
 BOARD=slstk3701a make emulate
 ```
-
-## License information
-
-Silicon Labs' EMLIB: zlib-style license (permits distribution of source).

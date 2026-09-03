@@ -1,6 +1,6 @@
-@defgroup    boards_stk3600 Silicon Labs STK3600 starter kit
-@ingroup     boards
-@brief       Support for Silicon Labs STK3600 starter kit
+@defgroup   boards_stk3600 Silicon Labs STK3600 starter kit
+@ingroup    boards
+@brief      Support for Silicon Labs STK3600 starter kit
 
 ## Overview
 
@@ -18,8 +18,9 @@ actively measure the power consumption of your hardware and code, in real-time.
 | MCU             | EFM32LG990F256                                                                             |
 |-----------------|--------------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M3                                                                              |
+| Series          | Series 0                                                                                   |
 | Vendor          | Silicon Labs                                                                               |
-| Vendor Family   | EFM32 Leoppard Gecko                                                                       |
+| Vendor Family   | EFM32 Leopard Gecko                                                                       |
 | RAM             | 32.0 KiB                                                                                   |
 | Flash           | 256.0 KiB                                                                                  |
 | EEPROM          | no                                                                                         |
@@ -41,7 +42,7 @@ actively measure the power consumption of your hardware and code, in real-time.
 ### Pinout
 
 This is the pinout of the expansion header on the right side of the board.
-PIN 1 is the bottom-left contact when the header faces  you horizontally.
+PIN 1 is the bottom-left contact when the header faces you horizontally.
 
 |      | PIN | PIN |      |
 |------|-----|-----|------|
@@ -62,31 +63,30 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 
 ### Peripheral mapping
 
-| Peripheral | Number  | Hardware        | Pins                           | Comments                                                 |
-|------------|---------|-----------------|--------------------------------|----------------------------------------------------------|
-| ADC        | 0       | ADC0            | CHAN0: internal temperature    | Ports are fixed, 14/16-bit resolution not supported      |
-| DAC        | 0       | DAC0            | CHAN0: PB11                    | Ports are fixed, shared with I2C                         |
-| HWCRYPTO   | &mdash; | &mdash;         |                                | AES128/AES256 only                                       |
-| I2C        | 0       | I2C0            | SDA: PD6, SCL: PD7             | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
-|            | 1       | I2C1            | SDA: PC4, SCL: PC5             | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
-| PWM        | 0       | TIMER3          | CHAN0: PE2                     | Mapped to LED0                                           |
-| RTT        | &mdash; | RTC             |                                | Either RTT or RTC (see below)                            |
-| RTC        | &mdash; | RTC             |                                | Either RTC or RTT (see below)                            |
-| SPI        | 0       | USART1          | MOSI: PD0, MISO: PD1, CLK: PD2 |                                                          |
-|            | 1       | USART2          | MOSI: NC, MISO: PC3, CLK: PC4  |                                                          |
-| Timer      | 0       | TIMER0 + TIMER1 |                                | TIMER0 is used as prescaler (must be adjacent)           |
-|            | 1       | LETIMER0        |                                |                                                          |
-| UART       | 0       | UART0           | RX: PE1, TX: PE0               | STDIO output                                             |
-|            | 1       | LEUART0         | RX: PD5, TX: PD4               | Baud rate limited (see below)                            |
+| Peripheral | Number | Hardware        | Pins                           | Comments                                                 |
+|------------|--------|-----------------|--------------------------------|----------------------------------------------------------|
+| ADC        | 0      | ADC0            | CHAN0: internal temperature    | Ports are fixed, 14/16-bit resolution not supported      |
+| DAC        | 0      | DAC0            | CHAN0: PB11                    | Ports are fixed, shared with I2C                         |
+| I2C        | 0      | I2C0            | SDA: PD6, SCL: PD7             | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
+|            | 1      | I2C1            | SDA: PC4, SCL: PC5             | `I2C_SPEED_LOW` and `I2C_SPEED_HIGH` clock speed deviate |
+| PWM        | 0      | TIMER3          | CHAN0: PE2                     | Mapped to LED0                                           |
+| RTT        | -      | RTC             |                                | Either RTT or RTC (see below)                            |
+| RTC        | -      | RTC             |                                | Either RTC or RTT (see below)                            |
+| SPI        | 0      | USART1          | MOSI: PD0, MISO: PD1, CLK: PD2 |                                                          |
+|            | 1      | USART2          | MOSI: NC, MISO: PC3, CLK: PC4  |                                                          |
+| Timer      | 0      | TIMER0 + TIMER1 |                                | TIMER0 is used as prescaler (must be adjacent)           |
+|            | 1      | LETIMER0        |                                |                                                          |
+| UART       | 0      | UART0           | RX: PE1, TX: PE0               | STDIO output                                             |
+|            | 1      | LEUART0         | RX: PD5, TX: PD4               | Baud rate limited (see below)                            |
 
 ### User interface
 
-| Peripheral | Mapped to | Pin  | Comments   |
-|------------|-----------|------|------------|
-| Button     | PB0       | PB9  |            |
-|            | PB1       | PB10 |            |
-| LED        | LED0      | PE2  | Yellow LED |
-|            | LED1      | PE3  | Yellow LED |
+| Peripheral | Number | Mapped to | Pin  | Comments   |
+|------------|--------|-----------|------|------------|
+| Button     | 0      | PB0_PIN   | PB9  |            |
+|            | 1      | PB1_PIN   | PB10 |            |
+| LED        | 0      | LED0_PIN  | PE2  | Yellow LED |
+|            | 1      | LED1_PIN  | PE3  | Yellow LED |
 
 ## Implementation Status
 
@@ -97,11 +97,10 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 |                  | DAC       | yes       |                                                                |
 |                  | Flash     | yes       |                                                                |
 |                  | GPIO      | yes       | Interrupts are shared across pins (see reference manual)       |
-|                  | HW Crypto | yes       |                                                                |
 |                  | I2C       | yes       |                                                                |
 |                  | PWM       | yes       |                                                                |
 |                  | RTC       | yes       | As RTT or RTC                                                  |
-|                  | SPI       | partially | Only master mode                                               |
+|                  | SPI       | yes       | Only master mode                                               |
 |                  | Timer     | yes       |                                                                |
 |                  | UART      | yes       | USART is shared with SPI. LEUART baud rate limited (see below) |
 |                  | USB       | no        |                                                                |
@@ -201,15 +200,9 @@ structures and visa versa.
 Configured at 1 Hz interval, the RTC will overflow each 194 days. When using
 the ticker-to-calendar mode, this interval is extended artificially.
 
-### Hardware crypto
-
-This MCUs has support for hardware-accelerated AES128 and AES256.
-
-A peripheral driver interface is proposed, but not yet implemented.
-
 ### Usage of EMLIB
 
-This port makes uses of EMLIB by Silicon Labs to abstract peripheral registers.
+This port makes use of EMLIB by Silicon Labs to abstract peripheral registers.
 While some overhead is to be expected, it ensures proper setup of devices,
 provides chip errata and simplifies development. The exact overhead depends on
 the application and peripheral usage, but the largest overhead is expected
@@ -218,7 +211,10 @@ inline methods or macros (which have no overhead).
 
 Another advantage of EMLIB are the included assertions. These assertions ensure
 that peripherals are used properly. To enable this, pass `DEBUG_EFM` to your
-compiler.
+compiler defines.
+
+EMLIB is licensed by Silicon Labs under the zlib-style license, which permits
+distribution of source.
 
 ### Pin locations
 
@@ -259,7 +255,3 @@ Some boards have (limited) support for emulation, which can be started with:
 ```shell
 BOARD=stk3600 make emulate
 ```
-
-## License information
-
-Silicon Labs' EMLIB: zlib-style license (permits distribution of source).
