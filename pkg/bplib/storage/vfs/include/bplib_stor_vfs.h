@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
+ * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 

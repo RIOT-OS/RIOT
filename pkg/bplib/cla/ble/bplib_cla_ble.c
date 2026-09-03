@@ -1,6 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2019 Freie Universität Berlin
- * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
+ * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  *
  * This file is largely based on the [RIOT]/tests/pkg/nible_l2cap* tests.
