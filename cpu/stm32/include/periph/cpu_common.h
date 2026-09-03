@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-#ifdef Doxygen
+#ifdef DOXYGEN
 /**
  * @brief   Starting address of the ROM bootloader
  *          see application note AN2606
