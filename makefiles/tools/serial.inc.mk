@@ -119,4 +119,7 @@ else ifeq (${RIOT_TERMINAL},bootterm)
   TERMDEPS += $(TERMPROG)
 else ifeq (${RIOT_TERMINAL},native)
   TERMPROG ?= $(ELFFILE)
+else ifeq (${RIOT_TERMINAL},jelly)
+  TERMPROG = Jelly
+  TERMFLAGS += $(PORT)
 endif

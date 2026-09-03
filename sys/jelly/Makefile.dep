@@ -1,0 +1,31 @@
+# Jelly speaks slipmux so we can do stdio/coap/network over serial.
+
+# Networking is a big dependency from which this module has no direct benefit.
+# Therefore we don't enable network by default.
+# Add the following line to your Makefile if you want or need networking through Jelly:
+# USEMODULE += slipdev_net
+
+# Enable stdio via slipmux.
+# This allows us to use Jelly with printf-debugging or to access the classic RIOT shell.
+USEMODULE += stdio_slipdev
+
+# Enable coap via slipmux (called configuration messages).
+USEMODULE += slipdev_config
+
+# We are using unicoap, because that is the coap implementation used by the slipmux driver.
+USEMODULE += unicoap
+
+# We are using the macro based resource declartions.
+USEMODULE += unicoap_server_resource_declarations
+
+# We want to reply to incoming requests => we are the server.
+USEMODULE += unicoap_server
+
+# Already imported by the slipmux driver when using slipdev_config but sometimes
+# the dependency resolution is slower than the unicoap warning on missing drivers.
+# This silences it.
+USEMODULE += unicoap_driver_slipmux
+
+# If we are preparing for Jelly, we should use Jelly.
+# This sets up "make term" to use Jelly.
+RIOT_TERMINAL = jelly
