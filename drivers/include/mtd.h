@@ -253,6 +253,11 @@ struct mtd_desc {
      *
      * @p offset should not exceed the page size
      *
+     * A write may write fewer bytes than requested. A driver that maps to a
+     * memory with a page-wise write granularity writes at most up to the end
+     * of the page. The number of bytes written is returned, so that the caller
+     * can continue with the next page.
+     *
      * @param[in]  dev      Pointer to the selected driver
      * @param[out] buff     Pointer to the data to be written
      * @param[in]  page     Page number to start writing to
