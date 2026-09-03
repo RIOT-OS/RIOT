@@ -6,7 +6,7 @@
 #pragma once
 
 /**
- * @ingroup     cpu_lpc1768
+ * @addtogroup  cpu_lpc1768_drivers_eth
  * @{
  *
  * @file
@@ -55,8 +55,8 @@ int lpc1768_eth_send(const iolist_t *iolist);
  *
  * Behaviour mirrors the netdev `recv()` contract:
  *  - `buf == NULL && max_len == 0`: return the length of the frame at head.
- *  - `buf == NULL && max_len > 0` : drop the head frame, return its length.
- *  - `buf != NULL`                : copy `min(len, max_len)` bytes into
+ *  - `buf == NULL && max_len > 0`:  drop the head frame, return its length.
+ *  - `buf != NULL`:                 copy `min(len, max_len)` bytes into
  *                                   @p buf, advance the ring, return the
  *                                   number of bytes copied.
  *
