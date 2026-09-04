@@ -60,19 +60,18 @@ welcome to Rshell, the RIOTos shell\n\
 #include "ztimer.h"
 #include "net/gnrc/pktdump.h"
 #include "net/gnrc.h"
-#include "neofetch.h"
+#include "infocommand.h"
 #include "auto_init_utils.h"
 SHELL_COMMAND(info, "gives information about the OS and (soon) the hardware", infofetch);
 void rshell(void)
 {
 
-    ztimer_sleep(ZTIMER_MSEC, 5000);
+    ztimer_sleep(ZTIMER_MSEC, 500);
     (void) puts(rshell_logo);
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
     while (true) {
-        
     }
 }
 AUTO_INIT(rshell, 9999);
