@@ -1,0 +1,166 @@
+/*
+ * SPDX-FileCopyrightText: 2026 ML!PA Consulting GmbH
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
+/**
+@defgroup    drivers_sht4x   SHT4x Humidity and Temperature Sensor Series
+@ingroup     drivers_sensors
+@ingroup     drivers_saul
+@brief       Device Driver for Sensirion SHT40/SHT41/SHT45 Humidity and Temperature Sensors
+
+# Driver for SHT4x Digital Temperature and Humidity Sensors
+
+The driver is for the usage with [RIOT-OS](https://github.com/RIOT-OS/RIOT). It supports the Sensirion SHT40, SHT41, and SHT45 digital temperature and humidity sensors.
+
+## About the sensors
+
+SHT4x are digital temperature and humidity sensors that use an I2C interface. They only support a **single shot data acquisition mode**: each measurement command triggers exactly one measurement, after which the sensor returns to its low power idle state.
+
+They can operate with **three levels of repeatability** (#sht4x_repeat_t)
+
+- low,
+- medium, and
+- high.
+
+SHT4x sensors also feature an integrated heater that can be used to drive off condensation or check sensor functionality. The heater can be operated with **three power levels** (#sht4x_heater_power_t) and **two durations** (#sht4x_heater_duration_t).
+
+## Measurement process
+
+Once a SHT4x sensor is initialized using the ::sht4x_init function, it can be used for measurements.
+
+The sensor always measures both temperature and humidity in a single I2C transaction. Due to the measurement duration of up to 8.3 ms depending on the configured repeatability, the measurement process is separated into steps to avoid blocking of the system for longer than necessary:
+
+1. Send a measurement command to the sensor to start exactly one single measurement.
+2. Wait for the sensor to complete the measurement depending on the configured repeatability.
+3. Fetch and validate the results.
+
+For convenience the high level function ::sht4x_read comprises all three steps above in only one function to perform a measurement.
+
+@note Since the measurement is only started when ::sht4x_read is called, it delays the calling task up to 8.3 ms, depending on the configured repeatability, in order to wait for the results of the measurement.
+
+## Measurement results
+
+Once a measurement is triggered, the ::sht4x_read function
+
+- fetches raw sensor data,
+- checks the CRC checksums,
+- converts raw data to measured data, and
+- returns the measured data.
+
+These measured data are:
+
+- the temperature given in hundredths of degree Celsius
+- the relative humidity in whole percent
+
+For either the \p temp or \p hum parameter also ```NULL``` can be passed, if only one value is of interest.
+
+## Error Handling
+
+All driver functions return 0 on success or one of a negative error code defined by the error codes in ```sht4x.h```.
+
+## Repeatability
+
+The SHT4x sensor supports **three levels of repeatability** (low, medium and high). The stated repeatability is a measure for the noise on the physical sensor output. Higher repeatability reduces measurement noise, but increases the measurement duration.
+
+Repeatability | Maximum Measurement Duration
+:-------------|:----------------------------:
+high          | 8.3 ms
+medium        | 4.5 ms
+low           | 1.6 ms
+
+Possible repeatabilities are defined by #sht4x_repeat_t.
+
+## On-chip Heater
+
+SHT4x sensors have an integrated heater that can be enabled for a single measurement using ::sht4x_read_with_heater. The heater power and duration used by that function are configured beforehand with ::sht4x_set_heater_power and ::sht4x_set_heater_duration.
+
+@note Using the heater is intended for diagnostic purposes (e.g. de-condensation), the temperature and humidity readings taken while the heater is active are not representative of the ambient conditions.
+
+## Usage
+
+Before using the SHT4x driver, the configuration has to be defined and the ::sht4x_init function needs to be called to initialize and configure the sensor device of type #sht4x_dev_t.
+
+The structure of a configuration is defined in #sht4x_params_t and consists of the following parameters:
+
+Parameter        | Symbol               | Default
+:----------------|:---------------------|:------------------
+I2C device       | SHT4X_PARAM_I2C_DEV  | I2C_DEV(0)
+I2C address      | SHT4X_PARAM_I2C_ADDR | SHT4X_I2C_ADDR_1
+Repeatability    | SHT4X_PARAM_REPEAT   | SHT4X_HIGH
+
+The default configuration is defined in ```sht4x_params.h``` and can be overridden by the application before including ```sht4x_params.h```.
+
+Example:
+```
+#define SHT4X_PARAM_REPEAT      (SHT4X_MEDIUM)
+...
+#include "sht4x.h"
+#include "sht4x_params.h"
+...
+```
+
+The ::sht4x_init function has to be called for each SHT4x sensor to initialize the sensor and to check its availability as well as its error state.
+
+```
+sht4x_dev_t dev;
+
+if ((res = sht4x_init(&dev, &sht4x_params[0])) != SHT4X_OK) {
+    ... /* error handling */
+}
+```
+
+Parameter ```sht4x_params``` is also defined by default in file ```sht4x_params.h``` and can be overridden by the application before including ```sht4x_params.h```.
+
+Example:
+```
+...
+#include "sht4x.h"
+#include "sht4x_params.h"
+...
+#define SHT4X_PARAMS    { .i2c_dev  = I2C_DEV(0),          \
+                          .i2c_addr = SHT4X_I2C_ADDR_1,    \
+                          .repeat   = SHT4X_HIGH           \
+                        }, \
+                        { .i2c_dev  = I2C_DEV(0),          \
+                          .i2c_addr = SHT4X_I2C_ADDR_2,    \
+                          .repeat   = SHT4X_LOW            \
+                        }, \
+...
+sht4x_dev_t dev1;
+sht4x_dev_t dev2;
+
+if ((res = sht4x_init(&dev1, &sht4x_params[0])) != SHT4X_OK) {
+    ... /* error handling */
+}
+
+if ((res = sht4x_init(&dev2, &sht4x_params[1])) != SHT4X_OK) {
+    ... /* error handling */
+}
+
+```
+In this example the configuration for two devices is defined.
+
+Once the sensor devices are initialized and configured, the ::sht4x_read function can be used to read measurement results from the sensor.
+
+Example:
+```
+while (1) {
+    int16_t temp;
+    int16_t hum;
+
+    if ((res = sht4x_read(&dev, &temp, &hum)) == SHT4X_OK) {
+        printf("Temperature [°C]: %d.%d\n"
+               "Relative Humidity [%%]: %d\n"
+               "+-------------------------------------+\n",
+               temp / 100, temp % 100,
+               hum);
+    }
+    else {
+        printf("Could not read data from sensor, error %d\n", res);
+    }
+    ztimer_sleep(ZTIMER_MSEC, 1000);
+}
+
+```
+*/
