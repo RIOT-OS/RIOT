@@ -194,6 +194,7 @@ static int _handle_fsm_ev_tx_ack(ieee802154_submac_t *submac, uint8_t seq_num)
     if (_does_send_ack(dev)) {
         return 0;
     }
+    /* TODO: set pending bit accordingly, currently always 0 */
     uint8_t ack[] = { IEEE802154_FCF_TYPE_ACK, 0x00,  seq_num };
     iolist_t iolist = {
         .iol_base = ack,
@@ -250,8 +251,8 @@ static ieee802154_fsm_state_t _fsm_state_rx(ieee802154_submac_t *submac, ieee802
                 if ((submac->rx_buf[0] & IEEE802154_FCF_ACK_REQ) &&
                     (ieee802154_radio_get_frame_filter_mode(dev, &mode) < 0 ||
                     mode == IEEE802154_FILTER_ACCEPT)) {
-                    if ((res = _handle_fsm_ev_tx_ack(submac, 
-                                                                          ieee802154_get_seq(submac->rx_buf))) < 0) {
+                    if ((res = _handle_fsm_ev_tx_ack(submac,
+                        ieee802154_get_seq(submac->rx_buf))) < 0) {
                         DEBUG("IEEE802154 submac: Sending ACK failed with status: %d\n", res);
                     }
                     else {
