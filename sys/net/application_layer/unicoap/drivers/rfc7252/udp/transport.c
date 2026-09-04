@@ -95,8 +95,8 @@ static void _udp_on_event(sock_udp_t* sock, sock_async_flags_t type, void* arg)
         }
 #endif
 
-        unicoap_messaging_process_rfc7252(pdu, (size_t)received, 
-        UNICOAP_MESSAGING_RFC7252_EVENT_RX | (truncated ? UNICOAP_MESSAGING_RFC7252_EVENT_TRUNCATED : 0), 
+        unicoap_messaging_process_rfc7252(pdu, (size_t)received,
+        UNICOAP_MESSAGING_RFC7252_EVENT_RX | (truncated ? UNICOAP_MESSAGING_RFC7252_EVENT_TRUNCATED : 0),
         &packet);
 
         if (IS_ACTIVE(CONFIG_UNICOAP_SOCK_ZERO_COPY_GUARANTEES)) {

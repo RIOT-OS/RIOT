@@ -402,7 +402,7 @@ static int _connect(unicoap_packet_t* packet, _transmission_t** transmission) {
             return -ENOBUFS;
         }
         if ((res = unicoap_transport_connect_dtls(
-            unicoap_endpoint_get_dtls((unicoap_endpoint_t*)packet->remote), 
+            unicoap_endpoint_get_dtls((unicoap_endpoint_t*)packet->remote),
             _transmission_get_session(*transmission)
         )) < 0) {
             if (res == -EEXIST) {
@@ -414,7 +414,7 @@ static int _connect(unicoap_packet_t* packet, _transmission_t** transmission) {
         }
         (*transmission)->delayed = true;
         /* Session does not already exist, so we have to delay it. */
-        MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT 
+        MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT
                                 "delaying until connected\n", _get_id(packet));
         if (!(*transmission)->pdu) {
             uint8_t* carbon_copy = NULL;
@@ -428,7 +428,7 @@ static int _connect(unicoap_packet_t* packet, _transmission_t** transmission) {
 }
 
 static ssize_t _build_and_send_pdu(
-    unicoap_packet_t* packet, 
+    unicoap_packet_t* packet,
     _transmission_t** transmission
 ) {
     assert(packet);
@@ -452,7 +452,7 @@ static ssize_t _build_and_send_pdu(
      * the iolists anyway. If we wanted to avoid this, we would need to dynamically allocate memory.
      */
 
-    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS) 
+    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
         && transmission
         && unicoap_packet_proto(packet) == UNICOAP_PROTO_DTLS) {
         if ((res = _connect(packet, transmission)) < 0) {
@@ -479,7 +479,7 @@ static ssize_t _build_and_send_pdu(
         }
     }
 
-    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS) 
+    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
         && transmission
         && unicoap_packet_proto(packet) == UNICOAP_PROTO_DTLS) {
         if (*transmission && (*transmission)->delayed) {
@@ -517,7 +517,7 @@ static void _handle_reset(const unicoap_endpoint_t* remote, uint16_t id)
 
     if (transmission) {
         DEBUG("\n");
-        _transmission_free_notif(transmission, 
+        _transmission_free_notif(transmission,
             unicoap_layer_notification_async_failure_from_errno(ECONNRESET));
     }
     else {
@@ -534,12 +534,12 @@ static int _send_carbon_copy(_transmission_t* transmission) {
     bool confirmable = _pdu_get_type(transmission->pdu) == UNICOAP_TYPE_CON;
     /* Must not rely on transmission->remaining_retransmissions here to determine if
      * this is a confirmable message. This function is called at two sites:
-     *  - _on_ack_timeout: already know message is confirmable 
+     *  - _on_ack_timeout: already know message is confirmable
      *  - _resume: DTLS driver has established session, now telling us to send.
      * In the latter case the message may be a NON or CON, and remaining_retransmissions can be
-     * zero in both instances: always zero if NON, zero if CON and if 
+     * zero in both instances: always zero if NON, zero if CON and if
      * CONFIG_UNICOAP_RETRANSMISSIONS_MAX had been configured to be zero. */
-    if (confirmable) {  
+    if (confirmable) {
         unsigned int i = CONFIG_UNICOAP_RETRANSMISSIONS_MAX - transmission->remaining_retransmissions;
         duration = (uint32_t)CONFIG_UNICOAP_TIMEOUT_ACK_MS << i;
         if (CONFIG_UNICOAP_RANDOM_FACTOR_1000 > 1000) {
@@ -560,7 +560,7 @@ static int _send_carbon_copy(_transmission_t* transmission) {
 
     if (confirmable) {
         /* Only schedule ACK timeout if */
-        unicoap_event_schedule(&transmission->ack_timeout, _on_ack_timeout, duration, 
+        unicoap_event_schedule(&transmission->ack_timeout, _on_ack_timeout, duration,
                                "messaging.7252.ack-timeout");
     }
     return res;
@@ -583,7 +583,7 @@ static void _on_ack_timeout(unicoap_scheduled_event_t* _event) {
     /* reduce retries remaining, double timeout and resend */
     transmission->remaining_retransmissions -= 1;
 
-    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS) && 
+    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS) &&
         _transmission_get_endpoint(transmission)->proto == UNICOAP_PROTO_DTLS) {
         unicoap_packet_t packet = {
             .remote = _transmission_get_endpoint(transmission),
@@ -790,7 +790,7 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, unicoap_m
     unicoap_exchange_arg_t arg;
     unicoap_messaging_flags_t flags;
 
-    switch ((res = unicoap_exchange_preprocess(packet, &flags, &arg, 
+    switch ((res = unicoap_exchange_preprocess(packet, &flags, &arg,
         event & UNICOAP_MESSAGING_RFC7252_EVENT_TRUNCATED))) {
     case UNICOAP_PREPROCESSING_SUCCESS_REQUEST:
         break;
@@ -954,7 +954,7 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
         assert(false);
         break;
     }
-     
+
     if ((res = (int)_build_and_send_pdu(packet, &transmission)) < 0) {
         goto error;
     }
@@ -965,7 +965,7 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
             if (CONFIG_UNICOAP_RANDOM_FACTOR_1000 > 1000) {
                 duration = random_uint32_range(duration, UNICOAP_TIMEOUT_ACK_RANGE_UPPER);
             }
-            unicoap_event_schedule(&transmission->ack_timeout, _on_ack_timeout, duration, 
+            unicoap_event_schedule(&transmission->ack_timeout, _on_ack_timeout, duration,
                                    "messaging.7252.ack-timeout");
         }
         /* Only set PDU size and notify exchange layer if sending went well. */

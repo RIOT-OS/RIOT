@@ -49,7 +49,7 @@ static const credman_credential_t credential = {
 #endif /* IS_USED(MODULE_UNICOAP_DRIVER_DTLS) */
 
 static int _print_usage(char** argv) {
-    printf("usage: %s <get|post|put> [-r] <URI> [<POST/PUT text payload>]\n", argv[0]);  
+    printf("usage: %s <get|post|put> [-r] <URI> [<POST/PUT text payload>]\n", argv[0]);
     printf("Options: (default: unreliable)\n");
     printf("    -r   send reliably (send CON instead of NON over RFC7252 over UDP/DTLS)\n");
     return 1;
@@ -80,7 +80,7 @@ static int _on_response(
     if ((error = unicoap_options_get_content_format(response->options, &format)) >= 0
          && unicoap_content_format_is_human_readable(format)) {
         printf("text response: '%.*s'\n", (int)response->payload_size, (char*)response->payload);
-    } 
+    }
     else if (response->payload_size > 0) {
         /* Other format, dump as hex in this case. */
         od_hex_dump(response->payload, response->payload_size, 16);
@@ -139,7 +139,7 @@ static int _cli(int argc, char** argv) {
 
     /* Prepare request message. */
     unicoap_message_t request;
-    unicoap_request_init_string(&request, method, payload);  
+    unicoap_request_init_string(&request, method, payload);
 
     /* Set destination to URI passed over CLI. */
     unicoap_destination_t destination = unicoap_destination_uri_string(uri);
@@ -159,7 +159,7 @@ help:
 
 SHELL_COMMAND(unicoap, "unicoap sample client", _cli)
 
-int main(void) 
+int main(void)
 {
     /* By default, unicoap_init() is automatically called for you before main().
      * This is because auto_init_unicoap is part of the DEFAULT_MODULE makefile variable.

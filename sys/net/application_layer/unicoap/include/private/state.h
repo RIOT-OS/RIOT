@@ -180,8 +180,8 @@ void unicoap_event_cancel(unicoap_scheduled_event_t* event);
     IS_USED(MODULE_UNICOAP_DRIVER_RFC7252_COMMON)
 /* MARK: unicoap_driver_extension_point */
 
-/** 
-  * @brief A feature check macro that determines whether client state objects are supported 
+/**
+  * @brief A feature check macro that determines whether client state objects are supported
   */
 #define UNICOAP_HAVE_CLIENT_STATE \
     IS_USED(MODULE_UNICOAP_CLIENT) && CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY > 0
@@ -211,8 +211,8 @@ typedef struct {
      * @brief Messaging state
      *
      * @note There's no union for the underlying pointer type as drivers are allowed to keep their
-     *       data structures private.  
-     *       This design avoids the need to expose every driver data structure. 
+     *       data structures private.
+     *       This design avoids the need to expose every driver data structure.
      */
     union {
 #if UNICOAP_HAVE_MESSAGING_STATE || defined(DOXYGEN)
@@ -302,7 +302,7 @@ static inline unicoap_layer_notification_t unicoap_layer_notification_async_fail
 
 /**
  * @brief Event indicating a layer is finished and is releasing its allocated
- *        state objects of this exchange/transmission  
+ *        state objects of this exchange/transmission
  *
  * The recipient layer must determine whether it still needs to retain its allocated
  * state objects.
@@ -317,16 +317,16 @@ static inline unicoap_layer_notification_t unicoap_layer_notification_async_fail
 #define UNICOAP_LAYER_NOTIFICATION_STATE_ALLOC (1)
 
 /**
- * @brief Informs messaging layer of event  
- *  
- * @param state Messaging-layer state reference  
- * @param type Event type  
- * @param[in] arg Optional opaque state object in this layer the notification relates to.  
- * @param proto The protocol number for the underlying CoAP driver  
+ * @brief Informs messaging layer of event
+ *
+ * @param state Messaging-layer state reference
+ * @param type Event type
+ * @param[in] arg Optional opaque state object in this layer the notification relates to.
+ * @param proto The protocol number for the underlying CoAP driver
  *
  * Usually called from exchange layer.
  */
-void unicoap_messaging_notify(void* state, unicoap_layer_notification_t type, 
+void unicoap_messaging_notify(void* state, unicoap_layer_notification_t type,
                               void* arg, unicoap_proto_t proto);
 
 /**
@@ -490,7 +490,7 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
  *
  * @param refno Reference number associated with client memo
  * @returns Client state object or `NULL` if memo is no longer associated with reference number
- * @note Requires @ref net_unicoap_client_cancellation 
+ * @note Requires @ref net_unicoap_client_cancellation
  *
  * This function may be used to find client exchange-layer state objects without keeping a pointer
  * to it. This is useful for handing public API callers a reference to, e.g., cancellable state

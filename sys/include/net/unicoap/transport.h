@@ -296,8 +296,8 @@ static inline struct _sock_tl_ep* _unicoap_endpoint_get_tl(unicoap_endpoint_t* e
 static inline ipv6_addr_t* unicoap_endpoint_get_ipv6_addr(unicoap_endpoint_t* endpoint) {
     (void)endpoint;
 #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
-    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) && 
-        (_unicoap_endpoint_get_tl(endpoint)->family == AF_INET6 || 
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) &&
+        (_unicoap_endpoint_get_tl(endpoint)->family == AF_INET6 ||
          _unicoap_endpoint_get_tl(endpoint)->family == AF_UNSPEC)) {
         return (ipv6_addr_t*)_unicoap_endpoint_get_tl(endpoint)->addr.ipv6;
     } else {
@@ -318,8 +318,8 @@ static inline ipv6_addr_t* unicoap_endpoint_get_ipv6_addr(unicoap_endpoint_t* en
 static inline ipv4_addr_t* unicoap_endpoint_get_ipv4_addr(unicoap_endpoint_t* endpoint) {
     (void)endpoint;
 #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
-    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) && 
-        (_unicoap_endpoint_get_tl(endpoint)->family == AF_INET || 
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) &&
+        (_unicoap_endpoint_get_tl(endpoint)->family == AF_INET ||
          _unicoap_endpoint_get_tl(endpoint)->family == AF_UNSPEC)) {
         return (ipv4_addr_t*)_unicoap_endpoint_get_tl(endpoint)->addr.ipv4;
     } else {
@@ -434,7 +434,7 @@ typedef struct {
      * a separate bitfield; but the goal is to utilise the trailing 2 bytes (at least). */
 
     /** @brief Number of ASCII code units (bytes) */
-    uint16_t _string_length : 10; 
+    uint16_t _string_length : 10;
 
 #if !defined(DOXYGEN)
     /* Placeholder for wider type field below and future flags. */
@@ -498,7 +498,7 @@ static inline unicoap_destination_t unicoap_destination_host_string(const char* 
  * @brief Creates destination identifier from URI string
  *
  * @param uri Null-terminated Uniform Resource Identifier
- * @param length Number of ASCII code units (bytes) in @p uri, excluding potential null-terminator 
+ * @param length Number of ASCII code units (bytes) in @p uri, excluding potential null-terminator
  *
  * @pre @p length must not be greater than 1023
  *
@@ -545,7 +545,7 @@ static inline unicoap_destination_t unicoap_destination_uri_string(const char* u
  * @retval `0` for valid schemes
  * @retval `-1` if the scheme is invalid or unknown
  */
-int unicoap_proto_from_scheme_and_host(const char* scheme, size_t scheme_length, 
+int unicoap_proto_from_scheme_and_host(const char* scheme, size_t scheme_length,
                                        const char* host, size_t length);
 
 /**

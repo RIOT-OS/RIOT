@@ -13,24 +13,24 @@
   }${
     c.name
   }${
-    c.type.includes("cose-type=\"cose-") ? 
-      ("_" + c.type.replace(/"/g, "").replace("application/cose; cose-type=cose-", "").toUpperCase()) : 
+    c.type.includes("cose-type=\"cose-") ?
+      ("_" + c.type.replace(/"/g, "").replace("application/cose; cose-type=cose-", "").toUpperCase()) :
       ""
   }${
-    c.type.includes("application/pkcs7-mime; smime-type=") ? 
-      ("_" + c.type.replace("application/pkcs7-mime; smime-type=", "").replace(/-/g, "_").toUpperCase()) : 
+    c.type.includes("application/pkcs7-mime; smime-type=") ?
+      ("_" + c.type.replace("application/pkcs7-mime; smime-type=", "").replace(/-/g, "_").toUpperCase()) :
       ""
   }${
-    c.type.includes("application/aif") && c.type.includes("toid=") ? 
-      ("_" + c.type.split("toid=")[1].split(";")[0].replace(/-/g, "_").toUpperCase()) : 
+    c.type.includes("application/aif") && c.type.includes("toid=") ?
+      ("_" + c.type.split("toid=")[1].split(";")[0].replace(/-/g, "_").toUpperCase()) :
       ""
   }${
-    c.type.includes("application/aif") && c.type.includes("tperm=") ? 
-      ("_" + c.type.split("tperm=")[1].split(";")[0].replace(/-/g, "_").toUpperCase()) : 
+    c.type.includes("application/aif") && c.type.includes("tperm=") ?
+      ("_" + c.type.split("tperm=")[1].split(";")[0].replace(/-/g, "_").toUpperCase()) :
       ""
   }${
-    c.type.includes("application/yang-data+cbor; id=") ? 
-      ("_" + c.type.replace("application/yang-data+cbor; id=", "").replace(/-/g, "_").toUpperCase()) : 
+    c.type.includes("application/yang-data+cbor; id=") ?
+      ("_" + c.type.replace("application/yang-data+cbor; id=", "").replace(/-/g, "_").toUpperCase()) :
       ""
   }${
     c.type.includes("application/eat+cwt; eat_profile=\"tag:psacertified.org,2019") ? "_PSA2019" : ""
@@ -95,7 +95,7 @@ ${c.links.join("\n")}
  */
 typedef enum {
 `
-+ formats.map(enumCase).join("\n") 
++ formats.map(enumCase).join("\n")
 + `} __attribute__((__packed__)) unicoap_content_format_t;
 
 `
@@ -112,6 +112,6 @@ ${formats.filter(c => c.type.includes(name)).map(c => `      format == ${enumCas
 
 `
 
-  return enumeration 
+  return enumeration
     + formatBaseHelper("json") + formatBaseHelper("cbor") + formatBaseHelper("xml")
 })()

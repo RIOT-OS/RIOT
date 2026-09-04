@@ -7,7 +7,7 @@
 /**
  * @file
  * @ingroup sys_shell_commands
- * @brief   `coap` client shell command using @ref unicoap  
+ * @brief   `coap` client shell command using @ref unicoap
  * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
@@ -160,4 +160,4 @@ help:
     return _print_usage(argv);
 }
 
-SHELL_COMMAND(coap, "unicoap client", _cli) 
+SHELL_COMMAND(coap, "unicoap client", _cli)

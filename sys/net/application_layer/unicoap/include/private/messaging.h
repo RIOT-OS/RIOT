@@ -252,14 +252,14 @@ int unicoap_exchange_process(unicoap_packet_t* packet, unicoap_exchange_arg_t ar
 typedef enum {
     /**
      * @brief 'Received' event
-     * 
+     *
      * The attached packet contains a message that has been received.
      */
     UNICOAP_MESSAGING_RFC7252_EVENT_RX = 1,
 
     /**
      * @brief 'Truncated' event
-     * 
+     *
      * The attached packet contains a message that has been truncated.
      * This event will always occur in conjunction with @ref UNICOAP_MESSAGING_RFC7252_EVENT_RX.
      */
@@ -267,7 +267,7 @@ typedef enum {
 
     /**
      * @brief 'Session established' event
-     * 
+     *
      * A DTLS session with the remote endpoint has been establishment.
      * The messaging layer may resume sending any delayed transmissions now.
      */
@@ -290,7 +290,7 @@ typedef enum {
  * @remark While it is not advised to call private API, you might want to consider calling this
  * function in a very constrained environment or when using `sock` is not an option.
  */
-int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, 
+int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size,
     unicoap_messaging_rfc7252_event_type_t event,  unicoap_packet_t* packet);
 
 /* MARK: unicoap_driver_extension_point */
@@ -306,7 +306,7 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size,
  *
  * @param[in,out] packet Packet to send
  * @param flags Messaging flags
- * @param[in,out] exchange Exchange-layer state object associated with this attempted 
+ * @param[in,out] exchange Exchange-layer state object associated with this attempted
  *.                        messaging-layer transmission
  * @returns Zero on success or negative error value. See @ref unicoap_messaging_send_rfc7252.
  */
@@ -425,7 +425,7 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
  */
 int unicoap_client_send_request_body(unicoap_message_t* request,
                                      unicoap_endpoint_t* endpoint,
-                                     unicoap_callback_t callback, 
+                                     unicoap_callback_t callback,
                                      unicoap_request_parameters_t* parameters,
                                      unicoap_request_flags_t flags);
 /** @} */
