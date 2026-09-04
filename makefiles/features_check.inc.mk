@@ -1,5 +1,11 @@
 # Check if all required FEATURES are provided
 
+# Features that are required for every build. Please only add entries if it is
+# absolutely necessary.
+FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED)) # Architectural features
+FEATURES_REQUIRED += $(filter bug_%,$(FEATURES_PROVIDED)) # Bugs that might affect the build
+FEATURES_REQUIRED += $(filter cpu_%,$(FEATURES_PROVIDED)) # CPU and CPU Core features
+
 # Features that are used without taking "one out of" dependencies into account
 FEATURES_USED_SO_FAR := $(sort $(FEATURES_REQUIRED) $(FEATURES_OPTIONAL_USED))
 

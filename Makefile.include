@@ -406,13 +406,6 @@ include $(RIOTMAKE)/defaultmodules_regular.inc.mk
 # Include Kconfig functionalities
 include $(RIOTMAKE)/kconfig.mk
 
-# always select provided architecture features
-FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
-# always select CPU core features
-FEATURES_REQUIRED += $(filter cpu_core_%,$(FEATURES_PROVIDED))
-# always "select" bug affecting the current build
-FEATURES_REQUIRED += $(filter bug_%,$(FEATURES_PROVIDED))
-
 # check if required features are provided and update $(FEATURES_USED)
 include $(RIOTMAKE)/features_check.inc.mk
 
