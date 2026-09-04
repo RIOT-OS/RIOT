@@ -146,7 +146,8 @@ USEMODULE += unicoap_client_uri
 (FQDN) using the Domain Name System (DNS), but we want users of our shell command to be able
 to type a string like they would in a web browser starting with the URI scheme `coap://`.
 The URI way of addressing a resource also saves us the trouble of having to add the URI path
-manually as CoAP options to the message, e.g., using @ref unicoap_options_add_uri_path.
+manually as CoAP options to the message, e.g., using
+@ref unicoap_options_t::unicoap_options_add_uri_path.
 
 As we will only be sending requests through a tap interface to the Python server script
 running on your linux host, we will use an IP address. If you want to use a domain name instead
@@ -190,7 +191,7 @@ static int _on_response(
 ```
 
 Inside `_on_response` we're going to log the request initially. We use
-@ref unicoap_print_ccode to get a string representation of the CoAP status, i.e., the CoAP
+@ref unicoap_print_code to get a string representation of the CoAP status, i.e., the CoAP
 message code, and @ref unicoap_message_t::unicoap_message_payload_get_size
 for the number of payload bytes.
 This will log a string like `response 2.05 Content (42 bytes)`.

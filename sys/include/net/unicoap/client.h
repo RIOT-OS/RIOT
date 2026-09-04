@@ -134,8 +134,9 @@ typedef int (*unicoap_response_callback_t)(const unicoap_message_t* response,
  * sent rather than a non-confirmable message.
  *
  * @param[in,out] request Initialized request message to send
- * @param destination URI or endpoint. Use @ref unicoap_destination::unicoap_destination_uri_string
- *                    or @ref unicoap_destination_endpoint
+ * @param destination URI or endpoint. Use
+ *                    @ref unicoap_destination_t::unicoap_destination_uri_string or
+ *                    @ref unicoap_destination_t::unicoap_destination_endpoint
  * @param callback Function executed when the entire response is available or if an error occurred
  * @param parameters Optional parameters (nullable)
  * @param flags Request flags
@@ -165,8 +166,9 @@ int unicoap_send_request_async(unicoap_message_t* request,
  * sent rather than a non-confirmable message.
  *
  * @param[in,out] request Initialized request message to send
- * @param destination URI or endpoint. Use @ref unicoap_destination_t::unicoap_destination_uri_string
- *                    or @ref unicoap_destination_endpoint
+ * @param destination URI or endpoint. Use
+ *                    @ref unicoap_destination_t::unicoap_destination_uri_string or
+ *                    @ref unicoap_destination_t::unicoap_destination_endpoint
  * @param callback Function executed when the entire response is available or if an error occurred
  * @param parameters Optional parameters (nullable)
  * @param flags Request flags
@@ -210,8 +212,8 @@ int unicoap_send_request_sync(unicoap_message_t* request,
  * sent rather than a non-confirmable message.
  *
  * @param[in,out] request Initialized request message to send
- * @param destination URI or endpoint. Use @ref unicoap_destination::unicoap_destination_uri_string
- *                    or @ref unicoap_destination_endpoint
+ * @param destination URI or endpoint. Use @ref unicoap_destination_t::unicoap_destination_uri_string
+ *                    or @ref unicoap_destination_t::unicoap_destination_endpoint
  * @param[in,out] response Partially initialized response message
  * @param parameters Optional parameters (nullable)
  * @param flags Request flags

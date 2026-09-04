@@ -15,7 +15,7 @@ unicoap_request_init_empty(&request, UNICOAP_METHOD_GET);
 
 `unicoap` supports multiple ways of addressing a server. @ref unicoap_destination_t supports
 Uniform Resource Identifiers (URIs) and sock endpoints. To use URI and DNS functionality in
-`unicoap`, import @ref unicoap_client_uri.
+`unicoap`, import @ref net_unicoap_client_uri.
 
 ```c
 /* Set destination to URI passed over CLI. */
@@ -93,7 +93,7 @@ implementation will use a confirmable (`CON`) message rather than a non-confirma
 @ref unicoap_request_parameters_t are optional parameters.
 Set @ref unicoap_request_parameters_t::timeout_ms to set a custom timeout for the request
 that differs from @ref CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS. You can also pass a custom
-argument to the response handler using @ref unicoap_request_parameters_t::handler_arg
+argument to the response handler using @ref unicoap_request_parameters_t::callback_arg
 to provide additional context, e.g., when you use the response handler across multiple requests.
 
 Requests will be sent from the same default port the server uses (@ref CONFIG_UNICOAP_UDP_PORT

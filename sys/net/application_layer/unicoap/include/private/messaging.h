@@ -146,6 +146,7 @@ typedef enum {
 typedef union {
     /** @brief Resource */
     const unicoap_resource_t* resource;
+    /** @brief Client memo */
     unicoap_client_memo_t* client;
 } unicoap_exchange_arg_t;
 
