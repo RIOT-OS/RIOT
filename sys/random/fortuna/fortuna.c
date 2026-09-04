@@ -15,15 +15,15 @@
  */
 
 #include <string.h>
+
 #include "fortuna.h"
 #include "kernel_defines.h"
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
-#include "atomic_utils.h"
-#if IS_USED(MODULE_ZTIMER_MSEC)
-#include "ztimer.h"
-#else
-#include "xtimer.h"
+#if FORTUNA_CLEANUP
+#  include "crypto/helper.h"
 #endif
+#if IS_USED(MODULE_FORTUNA_RESEED) && FORTUNA_RESEED_INTERVAL_MS > 0
+#  include "atomic_utils.h"
+#  include "ztimer.h"
 #endif
 
 /**
@@ -40,23 +40,33 @@ static inline void fortuna_increment_counter(fortuna_state_t *state)
 }
 
 /*
- * Corresponds to section 9.4.2.
+ * Corresponds to section 9.4.2 (step 1/3).
  */
-static void fortuna_reseed(fortuna_state_t *state, const uint8_t *seed,
-                           size_t length)
+static void fortuna_reseed_init(fortuna_state_t *state)
 {
-    sha256_context_t ctx;
+    sha256_init(&state->scratchpad.sha256);
+    sha256_update(&state->scratchpad.sha256, state->gen.key, 32);
+}
 
-    sha256_init(&ctx);
-    sha256_update(&ctx, state->gen.key, 32);
-    sha256_update(&ctx, seed, length);
-    sha256_final(&ctx, state->gen.key);
+/*
+ * Corresponds to section 9.4.2 (step 2/3).
+ */
+static void fortuna_reseed_update(fortuna_state_t *state, const uint8_t *seed,
+                                  size_t length)
+{
+    sha256_update(&state->scratchpad.sha256, seed, length);
+}
 
-    /* if the generator was unseeded, this will mark it as seeded */
+/*
+ * Corresponds to section 9.4.2 (step 3/3).
+ */
+static void fortuna_reseed_finish(fortuna_state_t *state)
+{
+    sha256_final(&state->scratchpad.sha256, state->gen.key);
     fortuna_increment_counter(state);
 
 #if FORTUNA_CLEANUP
-    memset(&ctx, 0, sizeof(ctx));
+    crypto_secure_wipe(&state->scratchpad, sizeof(state->scratchpad));
 #endif
 }
 
@@ -67,25 +77,25 @@ static void fortuna_reseed(fortuna_state_t *state, const uint8_t *seed,
 static int fortuna_generate_blocks(fortuna_state_t *state, uint8_t *out,
                                    size_t blocks)
 {
-    cipher_context_t cipher;
-
     /* check if generator has been seeded */
     if (state->gen.counter.split.l == 0 && state->gen.counter.split.h == 0) {
         return -1;
     }
 
     /* initialize cipher based on state */
-    int res = aes_init(&cipher, state->gen.key, FORTUNA_AES_KEY_SIZE);
+    int res = aes_init(&state->scratchpad.cipher, state->gen.key,
+                       FORTUNA_AES_KEY_SIZE);
 
     if (res != CIPHER_INIT_SUCCESS) {
 #if FORTUNA_CLEANUP
-        memset(&cipher, 0, sizeof(cipher));
+        crypto_secure_wipe(&state->scratchpad, sizeof(state->scratchpad));
 #endif
         return -2;
     }
 
     for (size_t i = 0; i < blocks; i++) {
-        res = aes_encrypt(&cipher, state->gen.counter.bytes, out + (i * 16));
+        res = aes_encrypt(&state->scratchpad.cipher, state->gen.counter.bytes,
+                          out + (i * 16));
         if (res != 1) {
             return -3;
         }
@@ -93,7 +103,7 @@ static int fortuna_generate_blocks(fortuna_state_t *state, uint8_t *out,
     }
 
 #if FORTUNA_CLEANUP
-    memset(&cipher, 0, sizeof(cipher));
+    crypto_secure_wipe(&state->scratchpad, sizeof(state->scratchpad));
 #endif
 
     return 0;
@@ -124,7 +134,7 @@ static int fortuna_pseudo_random_data(fortuna_state_t *state, uint8_t *out,
 
     if (fortuna_generate_blocks(state, out, blocks)) {
 #if FORTUNA_CLEANUP
-        memset(buf, 0, sizeof(buf));
+        crypto_secure_wipe(buf, sizeof(buf));
 #endif
         return -3;
     }
@@ -135,7 +145,7 @@ static int fortuna_pseudo_random_data(fortuna_state_t *state, uint8_t *out,
     if (remaining) {
         if (fortuna_generate_blocks(state, buf, 1)) {
 #if FORTUNA_CLEANUP
-            memset(buf, 0, sizeof(buf));
+            crypto_secure_wipe(buf, sizeof(buf));
 #endif
             return -3;
         }
@@ -146,33 +156,29 @@ static int fortuna_pseudo_random_data(fortuna_state_t *state, uint8_t *out,
     /* switch to a new key to avoid later compromises of this output */
     if (fortuna_generate_blocks(state, state->gen.key, 2)) {
 #if FORTUNA_CLEANUP
-        memset(buf, 0, sizeof(buf));
+        crypto_secure_wipe(buf, sizeof(buf));
 #endif
         return -3;
     }
 
 #if FORTUNA_CLEANUP
-    memset(buf, 0, sizeof(buf));
+    crypto_secure_wipe(buf, sizeof(buf));
 #endif
 
     return 0;
 }
 
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
-void _reseed_callback(void *arg)
+#if IS_USED(MODULE_FORTUNA_RESEED) && FORTUNA_RESEED_INTERVAL_MS > 0
+static void _reseed_callback(void *arg)
 {
     fortuna_state_t *state = (fortuna_state_t *) arg;
-    state->needs_reseed = 1;
+    atomic_store_u8(&state->needs_reseed, 1);
 }
 
 static void _reseed_timer_set(fortuna_state_t *state)
 {
     atomic_store_u8(&state->needs_reseed, 0);
-#if IS_USED(MODULE_ZTIMER_MSEC)
     ztimer_set(ZTIMER_MSEC, &state->reseed_timer, FORTUNA_RESEED_INTERVAL_MS);
-#else
-    xtimer_set(&state->reseed_timer, FORTUNA_RESEED_INTERVAL_MS * US_PER_MS);
-#endif
 }
 
 static void _reseed_timer_init(fortuna_state_t *state) {
@@ -195,8 +201,8 @@ int fortuna_init(fortuna_state_t *state)
         sha256_init(&state->pools[i].ctx);
     }
 
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
-    /* reseed time init if required */
+#if IS_USED(MODULE_FORTUNA_RESEED) && FORTUNA_RESEED_INTERVAL_MS > 0
+    /* reseed timer init if required */
     _reseed_timer_init(state);
 #endif
 
@@ -213,41 +219,42 @@ int fortuna_init(fortuna_state_t *state)
  */
 int fortuna_random_data(fortuna_state_t *state, uint8_t *out, size_t bytes)
 {
-    uint8_t buf[FORTUNA_POOLS * 32];
+    uint8_t buf[32];
 
 #if FORTUNA_LOCK
     mutex_lock(&state->lock);
 #endif
 
     /* reseed the generator if needed, before returning data */
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+#if IS_USED(MODULE_FORTUNA_RESEED) && FORTUNA_RESEED_INTERVAL_MS > 0
     if (state->pools[0].len >= FORTUNA_MIN_POOL_SIZE &&
         atomic_load_u8(&state->needs_reseed)) {
 #else
     if (state->pools[0].len >= FORTUNA_MIN_POOL_SIZE) {
 #endif
         state->reseeds++;
-        size_t len = 0;
+
+        fortuna_reseed_init(state);
 
         for (int i = 0; i < (int) FORTUNA_POOLS; i++) {
-            if (state->reseeds | ((uint32_t)1 << i)) {
-                sha256_final(&state->pools[i].ctx, &buf[len]);
+            /* pool i is included if 2^i divides the reseed counter */
+            if ((state->reseeds & (((uint32_t)1 << i) - 1)) == 0) {
+                /* pools are written to via fortuna_add_random_event */
+                sha256_final(&state->pools[i].ctx, buf);
                 sha256_init(&state->pools[i].ctx);
                 state->pools[i].len = 0;
-
-                /* append length of SHA-256 hash */
-                len += 32;
+                fortuna_reseed_update(state, buf, 32);
             }
         }
 
-        fortuna_reseed(state, buf, len);
+        fortuna_reseed_finish(state);
 
-#if FORTUNA_RESEED_INTERVAL_MS > 0 && IS_USED(MODULE_FORTUNA_RESEED)
+#if IS_USED(MODULE_FORTUNA_RESEED) && FORTUNA_RESEED_INTERVAL_MS > 0
         _reseed_timer_set(state);
 #endif
 
 #if FORTUNA_CLEANUP
-        memset(buf, 0, sizeof(buf));
+        crypto_secure_wipe(buf, sizeof(buf));
 #endif
     }
 
@@ -294,7 +301,7 @@ int fortuna_add_random_event(fortuna_state_t *state, const uint8_t *data,
 }
 
 /*
- * Corresponds to section 9.6.2.
+ * Corresponds to section 9.6.1.
  */
 int fortuna_write_seed(fortuna_state_t *state, fortuna_seed_t *out)
 {
@@ -311,7 +318,9 @@ int fortuna_update_seed(fortuna_state_t *state, fortuna_seed_t *inout)
 #endif
 
     /* reseed using the provided seed */
-    fortuna_reseed(state, (uint8_t *)inout, FORTUNA_SEED_SIZE);
+    fortuna_reseed_init(state);
+    fortuna_reseed_update(state, (uint8_t *)inout, FORTUNA_SEED_SIZE);
+    fortuna_reseed_finish(state);
 
 #if FORTUNA_LOCK
     mutex_unlock(&state->lock);
