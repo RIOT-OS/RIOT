@@ -83,7 +83,7 @@ you can choose any name you would like. `_cli` is very similar to the way `main(
 command-line arguments: it accepts an `argc` function parameter (number of whitespace-separated
 command-line arguments) and an `argv` function parameter (pointer to an array of strings).
 For brevity, we will omit all the sanity checks on arguments, but you can look up the full
-implementation in `examples/networking/coap/unicoap_client.
+implementation in `examples/networking/coap/unicoap_client`.
 
 ## Creating a custom command-line interface
 
