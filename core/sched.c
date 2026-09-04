@@ -24,7 +24,6 @@
 #include "bitarithm.h"
 #include "clist.h"
 #include "irq.h"
-#include "log.h"
 #include "sched.h"
 #include "thread.h"
 #include "panic.h"
@@ -34,7 +33,7 @@
 #endif
 
 #define ENABLE_DEBUG 0
-#define DEBUG_UNIT "sched"
+#include "log.h"
 #include "debug.h"
 
 #ifdef PICOLIBC_TLS

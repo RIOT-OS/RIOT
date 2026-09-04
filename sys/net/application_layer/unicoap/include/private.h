@@ -45,7 +45,7 @@ extern "C" {
  * @{
  */
 /** @brief Debug log prefix */
-#define UNICOAP_DEBUG_UNIT "coap"
+#define UNICOAP_LOG_UNIT "coap"
 
 #ifndef DOXYGEN
 #  define _UNICOAP_NEED_HAVE "(need %" PRIuSIZE ", have %" PRIuSIZE ")"

@@ -9,4 +9,6 @@ BASE_MODULE = core
 # exclude submodule sources from *.c wildcard source selection
 SRC := $(filter-out panic.c init.c,$(wildcard *.c))
 
+LOG_UNIT_BASE = core
+
 include $(RIOTBASE)/Makefile.base

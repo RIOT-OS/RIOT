@@ -19,7 +19,7 @@
 #define CONFIG_DEBUG_SHOW_THREAD 1
 
 #define ENABLE_DEBUG 1
-#define DEBUG_UNIT "prefix"
+#define LOG_UNIT "prefix"
 #include "debug.h"
 
 void prefix_thread(void)

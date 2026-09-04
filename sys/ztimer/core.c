@@ -32,10 +32,9 @@
 #include "pm_layered.h"
 #endif
 #include "ztimer.h"
-#include "log.h"
 
 #define ENABLE_DEBUG 0
-#define DEBUG_UNIT "ztimer.core"
+#include "log.h"
 #include "debug.h"
 
 static void _add_entry_to_list(ztimer_clock_t *clock, ztimer_base_t *entry);

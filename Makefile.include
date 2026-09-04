@@ -293,7 +293,23 @@ endif
 # a LOG_LEVEL config
 ifdef LOG_LEVEL
   ifeq (,$(filter -DLOG_LEVEL=%,$(CFLAGS)))
-    CFLAGS += -DLOG_LEVEL=$(LOG_LEVEL)
+    ifneq (,$(filter 0 1 2 3 4 5 6 7 8 9 10,$(strip $(LOG_LEVEL))))
+      CFLAGS += -DLOG_LEVEL=$(LOG_LEVEL)
+    else
+      CFLAGS += -DLOG_LEVEL=LOG_$(patsubst LOG_%,%,$(LOG_LEVEL))
+      $(info -DLOG_LEVEL=LOG_$(patsubst LOG_%,%,$(LOG_LEVEL)))
+    endif
+  endif
+endif
+
+# Set log unit prefixes from "core.sched ztimer" to "core.sched", "ztimer"s
+ifneq ($(origin LOG), undefined)
+  # Turn on new selective logging system only if LOG is present
+  CFLAGS += -DLOG_UNITS_SELECTIVE=1
+  ifeq (ALL,$(strip $(LOG)))
+    CFLAGS += -DLOG_UNITS_SELECTIVE_ALL=1
+  else ifneq (,$(strip $(LOG)))
+    CFLAGS_WITH_MACROS += -DLOG_UNITS_SELECTIVE_PATTERNS=\"$(shell echo '$(sort $(LOG))' | sed 's/ /\\",\\"/g')\"
   endif
 endif
 
@@ -1072,9 +1088,6 @@ CFLAGS_WITH_MACROS += -DRIOT_VERSION_CODE=$(RIOT_VERSION_CODE)
 CFLAGS_WITH_MACROS += -DRIOT_OS=1
 ifneq (,$(RIOT_VERSION_EXTRA))
   CFLAGS_WITH_MACROS += -DCONFIG_RIOT_VERSION_EXTRA=\""$(RIOT_VERSION_EXTRA)"\"
-endif
-ifneq ($(strip $(LOGUNIT)),)
-CFLAGS_WITH_MACROS += -DLOG_UNITS=\"$(shell echo '$(sort $(LOGUNIT))' | sed 's/ /\\",\\"/g')\"
 endif
 # MODULE_NAME defines. Declared in 'makefiles/modules.inc.mk'
 CFLAGS_WITH_MACROS += $(EXTDEFINES)

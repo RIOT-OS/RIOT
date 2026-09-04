@@ -1,0 +1,14 @@
+ifneq (,$(filter log_color,$(USEMODULE)))
+  include $(RIOTBASE)/sys/log/color/Makefile.include
+endif
+
+ifneq (,$(filter log_printfnoformat,$(USEMODULE)))
+  include $(RIOTBASE)/sys/log/printfnoformat/Makefile.include
+endif
+
+ifneq (,$(filter log_clownfish,$(USEMODULE)))
+  include $(RIOTBASE)/sys/log/clownfish/Makefile.include
+endif
+
+
+$(info hello from makefile include $(USEMODULE_INCLUDES))

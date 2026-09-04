@@ -1,9 +1,9 @@
 include ../Makefile.sys_common
 
-USEMODULE += log_color
+USEMODULE += log_clownfish
 
 # Enable debug log level
-CFLAGS += -DLOG_LEVEL=4
+LOG_LEVEL ?= ALL
 
 # microbit qemu failing currently
 TEST_ON_CI_BLACKLIST += microbit

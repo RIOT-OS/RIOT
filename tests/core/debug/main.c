@@ -21,7 +21,7 @@
 #define CONFIG_DEBUG_SHOW_THREAD 1
 
 #define ENABLE_DEBUG 1
-#define DEBUG_UNIT "main"
+#define LOG_UNIT "main"
 #include "debug.h"
 
 #define MY_DEBUG(...) DEBUG_("custom", __VA_ARGS__)

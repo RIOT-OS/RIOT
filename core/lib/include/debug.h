@@ -33,6 +33,7 @@
 #include "irq.h"
 #include "sched.h"
 #include "thread.h"
+#include "log.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -85,7 +86,7 @@ extern "C" {
 #if ENABLE_DEBUG
 #  define DEBUG_EXTRA_STACKSIZE THREAD_EXTRA_STACKSIZE_PRINTF
 #else
-#  define DEBUG_EXTRA_STACKSIZE (0)
+#  define DEBUG_EXTRA_STACKSIZE THREAD_EXTRA_STACKSIZE_PRINTF
 #endif
 
 /**
@@ -102,25 +103,9 @@ extern "C" {
 #  endif
 #endif
 
-#ifndef DOXYGEN
-#  ifdef LOG_UNITS
-#    define FORCE_DEBUG(unit) (                                                                      \
-        (strlen(unit) > 0) && ({                                                                   \
-            bool forced = false;                                                                   \
-            for (unsigned int i = 0; i < ARRAY_SIZE((const char *[]){ LOG_UNITS }); i += 1) {      \
-                forced |= strncmp(((const char*[]){ LOG_UNITS })[i], unit,                         \
-                           strlen(((const char*[]){ LOG_UNITS })[i])) == 0;                        \
-            }                                                                                      \
-            forced;                                                                                \
-        }))
-#  else
-#    define FORCE_DEBUG(unit) (false)
-#  endif
-#endif
-
 
 /**
- * @brief   Contains the function name if given compiler supports it.
+ * @brief   Contains the function name if compiler supports it.
  *          Otherwise it is an empty string.
  */
 #if defined(__cplusplus) && defined(__GNUC__)
@@ -134,53 +119,37 @@ extern "C" {
 #endif
 
 /**
- * @brief   Specify whether calls to @ref DEBUG and @ref DEBUG_PUTS automatically
- *          include the calling thread name.
- *
- * @warning Only applies to files where @ref DEBUG_UNIT is non-empty.
- *
- * **Default**: disabled
+ * @brief   Contains the file path if compiler supports it.
+ *          Otherwise it is an empty string.
  */
-#ifndef CONFIG_DEBUG_SHOW_THREAD
-#  define CONFIG_DEBUG_SHOW_THREAD 0
-#endif
-
-#if IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD) && !defined(CONFIG_THREAD_NAMES)
-#  error "CONFIG_DEBUG_SHOW_THREAD requires CONFIG_THREAD_NAMES to be set"
+#if defined(__FILE__) || defined(DOXYGEN)
+#  define DEBUG_FILE_PATH __FILE__
+#else
+#  define DEBUG_FILE_PATH ""
 #endif
 
 /**
- * @brief   Specify whether calls to @ref DEBUG and @ref DEBUG_PUTS automatically
- *          include the current function name.
- *
- * @warning Only applies to files where @ref DEBUG_UNIT is non-empty.
- *
- * **Default**: disabled
+ * @brief   Contains the file name if compiler supports it.
+ *          Otherwise it is an empty string.
  */
-#if !defined(CONFIG_DEBUG_SHOW_FUNC) || defined(DOXYGEN)
-#  define CONFIG_DEBUG_SHOW_FUNC 0
+#if defined(__FILE_NAME__) || defined(DOXYGEN)
+#  define DEBUG_FILE_NAME __FILE_NAME__
+#else
+#  define DEBUG_FILE_NAME ""
 #endif
 
+
 /**
- * @brief   Determines whether debug messages are printed like @ref LOG_DEBUG messages for visual
- *          consistency
- *
- * **Default**: enabled if @ref CONFIG_STDIO_ANSI_STYLING is
+ * @brief   Contains the file line number if compiler supports it.
+ *          Otherwise it is an empty string.
  */
-#if !defined(CONFIG_DEBUG_LOG_COLOR_COMPAT) || defined(DOXYGEN)
-#  define CONFIG_DEBUG_LOG_COLOR_COMPAT CONFIG_STDIO_ANSI_STYLING
+#if defined(__LINE__) || defined(DOXYGEN)
+#  define DEBUG_LINE __LINE__
+#else
+#  define DEBUG_LINE ""
 #endif
+
 /** @} */ /* end of section */
-
-#if !defined(DOXYGEN)
-#  define _DEBUG_STYLE_FOR_PREFIX                ANSI_STYLE(FOREGROUND_BRIGHT(CYAN), BOLD)
-#  define _DEBUG_STYLE_FOR_THREAD_FUNC           ANSI_STYLE(FOREGROUND(WHITE), DIM)
-#  if MODULE_LOG_COLOR
-#    define _DEBUG_PREFIX                        ANSI_STYLE(BOLD) "DEBUG " ANSI_STYLE_RESET "# "
-#  else
-#    define _DEBUG_PREFIX                        ""
-#  endif
-#endif
 
 /**
  * @name Debug print implementation details
@@ -201,6 +170,7 @@ extern "C" {
  */
 static inline bool __debug_sufficient_stack(bool print)
 {
+    /* DO NOT call any function here that invokes DEBUG OR LOG in here. */
 #if IS_ACTIVE(DEVELHELP)
     const thread_t *thread = thread_get_active();
     if (((thread != NULL) && (thread->stack_size < THREAD_EXTRA_STACKSIZE_PRINTF)) ||
@@ -210,9 +180,8 @@ static inline bool __debug_sufficient_stack(bool print)
         false) {
 #  endif
         if (print) {
-            fputs("Cannot debug, stack too small."
-                  "Consider using DEBUG_PUTS() or increasing the stack size.\n",
-                  stdout);
+            puts("Cannot debug, stack too small."
+                 "Consider using DEBUG_PUTS() or increasing the stack size.");
         }
         return false;
     }
@@ -234,145 +203,6 @@ static inline const char *__debug_thread_name_or_isr(void)
     return (irq_is_in() || thread == NULL) ? "<isr>" : thread_get_name(thread);
 }
 
-/**
- * @brief Debug print implementation for `printf`-like functions
- *
- * @private
- * @experimental
- *
- * @param func Printf macro or function to use to to print
- * @param prefix String literal to be used as line prefix
- * @param ... Variadic arguments to `printf`
- *
- * Use this internal macro if you want to use a custom print function to debug. This implementation
- * expects a `print` function handling format strings. @p func is called once with a format string
- * for the entire line prefix and once for your message.
- * You may use your own print function, e.g., to send logs over the network.
- * Treat the remaining variadic arguments like you would treat `printf` arguments: format string
- * followed by format arguments.
- *
- * @remark If you intend to use this macro with `printf` as @p func,
- *         use @ref DEBUG or @ref DEBUG_ instead.
- *
- * ## Example
- * ```c
- * #define __fprintf_err(...) fprintf(stderr, __VA_ARGS__)
- * #define COMPLAIN(...) __DEBUG_IMPL_FORMATTED(__fprintf_err, "custom-prefix", __VA_ARGS__)
- * ```
- *
- * Experimentally, you can also define @ref DEBUG_ to customize the function used, in which
- * case `debug.h` will not define @ref DEBUG_, defaulting to your provided definition. @ref DEBUG
- * always uses your implementation via @ref DEBUG_.
- *
- * ```c
- * #define DEBUG_(prefix, ...) __DEBUG_IMPL_FORMATTED(__fprintf_err, prefix, __VA_ARGS__)
- * ```
- */
-#define __DEBUG_IMPL_FORMATTED(func, prefix, ...)                                                                     \
-    do {                                                                                        \
-        if ((ENABLE_DEBUG || FORCE_DEBUG(prefix)) && __debug_sufficient_stack(true)) {                                   \
-            if (strlen(prefix) > 0) {                                                           \
-                if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) && IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) { \
-                    func(_DEBUG_PREFIX _DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC            \
-                           " (%s@%s): " ANSI_STYLE_RESET,                                       \
-                           DEBUG_FUNC, __debug_thread_name_or_isr());                           \
-                }                                                                               \
-                else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {                                   \
-                    func(_DEBUG_PREFIX _DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC            \
-                           " (%s): " ANSI_STYLE_RESET,                                          \
-                           DEBUG_FUNC);                                                         \
-                }                                                                               \
-                else if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {                                 \
-                    func(_DEBUG_PREFIX _DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC            \
-                           " (@%s): " ANSI_STYLE_RESET,                                         \
-                           __debug_thread_name_or_isr());                                       \
-                }                                                                               \
-                else {                                                                          \
-                    func(_DEBUG_PREFIX _DEBUG_STYLE_FOR_PREFIX prefix _DEBUG_STYLE_FOR_THREAD_FUNC            \
-                           ": " ANSI_STYLE_RESET);                                              \
-                }                                                                               \
-            }                                                                                   \
-            func(__VA_ARGS__);                                                                  \
-        }                                                                                       \
-    } while (0)
-
-/**
- * @brief Debug print implementation for continuing debug message without printing prefix again
- *
- * @private
- * @experimental
- *
- * @param func Printf macro or function to use to to print
- * @param ... Variadic arguments to `printf`
- *
- * Use this macro the same way as `printf` if you want to continue printing to the
- * same line that has been started with @ref DEBUG previously. For this to work, do not append
- * newline sequence (`\n`) in previous @ref DEBUG call.
- */
-#define __DEBUG_IMPL_CONT(func, ...)                                        \
-    do {                                                       \
-        if (ENABLE_DEBUG && __debug_sufficient_stack(false)) { \
-            func(__VA_ARGS__);                               \
-        }                                                      \
-    } while (0)
-
-/**
- * @brief Debug print implementation for `puts`-like functions
- *
- * @private
- * @experimental
- *
- * @param func Printf macro or function to use to to print
- * @param prefix String literal to be used as line prefix
- * @param str A message string, does not need to be constant
- * @param ... Variadic arguments passed to @p on every invocation
- *
- * Use this internal macro if you want to use a custom print function to debug. This implementation
- * expects a function that accepts a string literal, and optionally the variadic arguments passed.
- * @p func is called for each piece of the debug message printed, depending on internal formatting
- * of the prefix printed. You may use your own print function, e.g., to send logs over the network.
- *
- * @remark If you intend to use this macro with `puts` as @p func,
- *         use @ref DEBUG_PUTS or @ref DEBUG_PUTS_ instead.
- *
- * ## Example
- * ```c
- * #define COMPLAIN_PUTS(str) __DEBUG_IMPL_PIECEWISE(fputs, "custom-prefix", str, stderr)
- * ```
- *
- * Experimentally, you can also define @ref DEBUG_PUTS_ to customize the function used, in which
- * case `debug.h` will not define @ref DEBUG_PUTS_, defaulting to your provided definition.
- * @ref DEBUG_PUTS always uses your implementation via @ref DEBUG_PUTS_.
- *
- * ```c
- * #define DEBUG_PUTS_(prefix, str) __DEBUG_IMPL_PIECEWISE(fputs, prefix, str, stderr)
- * ```
- */
-#define __DEBUG_IMPL_PIECEWISE(func, prefix, str, ...)                                          \
-    do {                                                                                        \
-        if (ENABLE_DEBUG || FORCE_DEBUG(prefix)) {                                                                     \
-            if (strlen(prefix) > 0) {                                                           \
-                func(_DEBUG_PREFIX _DEBUG_STYLE_FOR_PREFIX prefix, ##__VA_ARGS__);                            \
-                if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) || IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) { \
-                    func(_DEBUG_STYLE_FOR_THREAD_FUNC " (", ##__VA_ARGS__);                     \
-                }                                                                               \
-                if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC)) {                                        \
-                    func(DEBUG_FUNC, ##__VA_ARGS__);                                            \
-                }                                                                               \
-                if (IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) {                                      \
-                    func("@", ##__VA_ARGS__);                                                   \
-                    func(__debug_thread_name_or_isr(), ##__VA_ARGS__);                          \
-                }                                                                               \
-                if (IS_ACTIVE(CONFIG_DEBUG_SHOW_FUNC) || IS_ACTIVE(CONFIG_DEBUG_SHOW_THREAD)) { \
-                    func(")", ##__VA_ARGS__);                                                   \
-                }                                                                               \
-                func(": " ANSI_STYLE_RESET, ##__VA_ARGS__);                                     \
-            }                                                                                   \
-            func(str, ##__VA_ARGS__);                                                           \
-            func("\n", ##__VA_ARGS__);                                                          \
-        }                                                                                       \
-    } while (0)
-
 /** @} */ /* end of section */
 
 /**
@@ -380,53 +210,11 @@ static inline const char *__debug_thread_name_or_isr(void)
  * @{
  */
 
-/**
- * @brief Print debug information to the standard output stream with a custom prefix
- *
- * @param prefix String literal to be used as line prefix
- * @param ... Variadic arguments compatible with `printf`
- *
- * Use this internal macro if you want to have something more fine-grained than
- * the file-wide @ref DEBUG_UNIT, to define your own debug function like
- *
- * ```c
- * #define CUSTOM_DEBUG(...) DEBUG_("custom-prefix", __VA_ARGS__)
- * ```
- *
- * Otherwise, just use @ref DEBUG.
- *
- * Experimentally, you may define your own version of this macro to provide a custom debug printing
- * backend, in which case this function will not be defined by `debug.h`. This must be done
- * in conjunction with defining @ref DEBUG_CONT.
- */
-#if !defined(DEBUG_) || defined(DOXYGEN)
-#  define DEBUG_(prefix, ...) __DEBUG_IMPL_FORMATTED(printf, prefix, __VA_ARGS__)
-#endif
-
-/**
- * @brief Print debug information to the standard output stream
- *
- * Use this macro similarly to `printf` when starting a new line.
- * Remember to end the line with an explicit newline character `\n`.
- * This will prefix the print with @ref DEBUG_UNIT. Therefore,
- * if you want to continue writing to the same line afterwards,
- * use @ref DEBUG_CONT for subsequent calls (and end the line there).
- *
- * DEBUG macros will perform a crude check whether the current stack may be
- * big enough for a call to `printf` when `DEVELHELP` is defined.
- *
- * @note    This looks similar to the @ref LOG_DEBUG() function. However, it is
- *          enabled on a per-file basis. Prefer @ref DEBUG for debug output
- *          relevant for debugging a module in RIOT. Prefer @ref LOG_DEBUG() for
- *          debug output relevant for application developers using your module
- *          (e.g. to hint potentially incorrect / inefficient use of your
- *          library).
- * @warning If a variable is only accessed by `DEBUG()`, the compiler will
- *          warn about unused variables when `ENABLE_DEBUG` is set to `0`.
- *
- * Make use of @ref DEBUG_ if you need to use a custom prefix.
- */
-#define DEBUG(...) DEBUG_(DEBUG_UNIT, __VA_ARGS__)
+#define DEBUG(...) do { __LOG_PROLOGUE                                                                 \
+        if ((ENABLE_DEBUG || _CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT)) && __debug_sufficient_stack(false)) {        \
+            log_write(LOG_DEBUG, LOG_UNIT, __VA_ARGS__);                                                                \
+        }                                                                                          \
+    } while (0) __LOG_EPILOGUE
 
 /**
  * @brief Continue printing debug information to stdout, without repeating the prefix
@@ -438,41 +226,18 @@ static inline const char *__debug_thread_name_or_isr(void)
  * backend, in which case this function will not be defined by `debug.h`. This must be done
  * in conjunction with defining @ref DEBUG_.
  */
-#if !defined(DEBUG_CONT) || defined(DOXYGEN)
-#  define DEBUG_CONT(...) __DEBUG_IMPL_CONT(printf, __VA_ARGS__)
-#endif
+#define DEBUG_CONT(...) do { __LOG_PROLOGUE                                                                      \
+        if ((ENABLE_DEBUG || _CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT)) && __debug_sufficient_stack(false)) {\
+            log_write_continue(LOG_DEBUG, LOG_UNIT, __VA_ARGS__);                                                      \
+        }                                                                                          \
+    } while (0) __LOG_EPILOGUE
 
-/**
- * @brief Print debug information to the standard output stream using puts() with a custom prefix.
- *
- * @param prefix String literal to be used as line prefix
- * @param str A message string, does not need to be constant
- *
- * Use this internal macro if you want to have something more fine-grained than
- * the file-wide @ref DEBUG_UNIT, to define your own debug function like
- *
- * ```c
- * #define CUSTOM_DEBUG_PUTS(str) DEBUG_PUTS_("custom-prefix", str)
- * ```
- *
- * Otherwise, just use @ref DEBUG_PUTS.
- *
- * Experimentally, you may define your own version of this macro to provide a custom debug printing
- * backend, in which case this function will not be defined by `debug.h`.
- */
-#if !defined(DEBUG_PUTS_) || defined(DOXYGEN)
-#  define DEBUG_PUTS_(prefix, str) __DEBUG_IMPL_PIECEWISE(fputs, prefix, str, stdout)
-#endif
 
-/**
- * @brief Print debug information to standard output stream using puts(), so no stack size
- *        restrictions do apply.
- *
- * @param str A message string, does not need to be constant
- *
- * Make use of @ref DEBUG_PUTS_ if you need to use a custom prefix.
- */
-#define DEBUG_PUTS(str) DEBUG_PUTS_(DEBUG_UNIT, str)
+#define DEBUG_PUTS(str) do { __LOG_PROLOGUE                                                                \
+        if ((ENABLE_DEBUG || _CAN_DEBUG_H(LOG_DEBUG, LOG_UNIT)) && __debug_sufficient_stack(false)) {\
+            log_write(LOG_DEBUG, LOG_UNIT, str "\n");                                                           \
+        }                                                                                          \
+    } while (0) __LOG_EPILOGUE
 
 /**
  * @deprecated use @ref DEBUG instead. Will be removed after release 2027.04.
