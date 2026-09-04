@@ -10,7 +10,7 @@
  * @{
  *
  * @file
- * @brief       Board specific definitions for the Arduino Uno board
+ * @brief       Board specific definitions for the Arduino Nano board
  *
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
  */

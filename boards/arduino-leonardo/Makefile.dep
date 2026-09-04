@@ -1,3 +1,7 @@
 USEMODULE += boards_common_arduino-atmega
 
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.dep
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_eeprom
+endif
