@@ -59,9 +59,6 @@ static void _dtls_session_triage(unicoap_scheduled_event_t* event)
 }
 
 static void _dtls_pander_and_spoonfeed_session_mgmt(void) {
-    if (IS_ACTIVE(CONFIG_UNICOAP_DTLS_UNSAFE_PREVENT_TRIAGE)) {
-        return;
-    }
     if (dsm_get_num_available_slots() < CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS) {
         /* If not enough session slots left: set timeout to free session. */
         _DTLS_DEBUG("session triage: fewer than %u session slots available,"
