@@ -44,6 +44,48 @@ unicoap_scheduled_event_t _dtls_session_triage_event = { 0 };
            CONFIG_UNICOAP_GET_LOCAL_ENDPOINTS will be ignored for the dtls transport"
 #endif
 
+int unicoap_transport_connect_dtls(const sock_udp_ep_t* remote, sock_dtls_session_t* session) {
+    assert(remote);
+    assert(session);
+    int res = 0;
+    _DTLS_AUTH_DEBUG("connecting...\n");
+    sock_dtls_session_set_udp_ep(session, remote);
+    dsm_state_t session_state = dsm_store(&_dtls_socket, session, SESSION_STATE_HANDSHAKE, true);
+    switch (session_state) {
+        case SESSION_STATE_ESTABLISHED:
+            _DTLS_AUTH_DEBUG("session established\n");
+            return -EEXIST;
+        case SESSION_STATE_NONE:
+            _DTLS_AUTH_DEBUG("session not established\n");
+            if ((res = sock_dtls_session_init(&_dtls_socket, remote, session)) < 0) {
+                _DTLS_AUTH_DEBUG("init DTLS session failed: %i (%s)\n", (int)res, strerror(-(int)res));
+                return res;
+            }
+            /* Need to wait until session is established. */
+            return 0;
+        case SESSION_STATE_HANDSHAKE:
+            _DTLS_AUTH_DEBUG("handshaking\n");
+            /* Need to wait until handshake is done. */
+            return 0;
+        case NO_SPACE:
+            _DTLS_AUTH_DEBUG("DTLS session mgmt full\n");
+            return -ENOBUFS;
+        default:
+            UNREACHABLE();
+            assert(false);
+            return -1;
+    }
+}
+
+int unicoap_transport_disconnect_dtls(sock_dtls_session_t* session) {
+    assert(session);
+    _DTLS_AUTH_DEBUG("disconnecting\n");
+    /* TODO: Need to get correct socket given just session to support adding multiple sockets. */
+    dsm_remove(&_dtls_socket, session);
+    sock_dtls_session_destroy(&_dtls_socket, session);
+    return 0;
+}
+
 /* Timeout function to free a session when too many session slots are occupied */
 static void _dtls_session_triage(unicoap_scheduled_event_t* event)
 {
@@ -52,8 +94,7 @@ static void _dtls_session_triage(unicoap_scheduled_event_t* event)
     if (dsm_get_num_available_slots() < CONFIG_UNICOAP_DTLS_MINIMUM_AVAILABLE_SESSION_SLOTS) {
         if (dsm_get_least_recently_used_session(&_dtls_socket, &session) != -1) {
             _DTLS_DEBUG("session triage: freeing least recently used session\n");
-            dsm_remove(&_dtls_socket, &session);
-            sock_dtls_session_destroy(&_dtls_socket, &session);
+            unicoap_transport_disconnect_dtls(&session);
         }
     }
 }
@@ -199,40 +240,8 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
     return;
 
 error:
+    dsm_remove(sock, &session);
     sock_dtls_session_destroy(sock, &session);
-}
-
-int unicoap_transport_connect_dtls(const sock_udp_ep_t* remote, sock_dtls_session_t* session) {
-    assert(remote);
-    assert(session);
-    int res = 0;
-    _DTLS_AUTH_DEBUG("connecting...\n");
-    sock_dtls_session_set_udp_ep(session, remote);
-    dsm_state_t session_state = dsm_store(&_dtls_socket, session, SESSION_STATE_HANDSHAKE, true);
-    switch (session_state) {
-        case SESSION_STATE_ESTABLISHED:
-            _DTLS_AUTH_DEBUG("session established\n");
-            return -EEXIST;
-        case SESSION_STATE_NONE:
-            _DTLS_AUTH_DEBUG("session not established\n");
-            if ((res = sock_dtls_session_init(&_dtls_socket, remote, session)) < 0) {
-                _DTLS_AUTH_DEBUG("init DTLS session failed: %i (%s)\n", (int)res, strerror(-(int)res));
-                return res;
-            }
-            /* Need to wait until session is established. */
-            return 0;
-        case SESSION_STATE_HANDSHAKE:
-            _DTLS_AUTH_DEBUG("handshaking\n");
-            /* Need to wait until handshake is done. */
-            return 0;
-        case NO_SPACE:
-            _DTLS_AUTH_DEBUG("DTLS session mgmt full\n");
-            return -ENOBUFS;
-        default:
-            UNREACHABLE();
-            assert(false);
-            return -1;
-    }
 }
 
 int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
@@ -267,8 +276,7 @@ int unicoap_transport_sendv_dtls(iolist_t* iolist, const sock_udp_ep_t* remote,
         case -ENOTCONN:
         case 0:
             _DTLS_DEBUG("sock not connected or remote unreachable, tearing down session\n");
-            dsm_remove(&_dtls_socket, session);
-            sock_dtls_session_destroy(&_dtls_socket, session);
+            unicoap_transport_disconnect_dtls(session);
             break;
         default:
             /* Temporary error, keep DTLS session. */
@@ -327,7 +335,12 @@ sock_dtls_t* unicoap_transport_dtls_get_socket(void)
 int unicoap_transport_dtls_add_socket(sock_dtls_t* socket,
                                       sock_udp_t* base_socket,
                                       sock_udp_ep_t* local) {
-    return _add_socket(sock_dtls_get_async_ctx(&_dtls_socket)->queue, socket, base_socket, local);
+    if (IS_ACTIVE(0)) {
+        _add_socket(sock_dtls_get_async_ctx(&_dtls_socket)->queue, socket, base_socket, local);
+    }
+    /* TODO: sock_dtls_session_destroy requires socket, but unclear where to get socket. */
+    _DTLS_DEBUG("Adding DTLS sockets not fully implemented.");
+    return -ENOTSUP;
 }
 
 int unicoap_transport_dtls_remove_socket(sock_dtls_t* socket) {

@@ -521,8 +521,16 @@ int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo);
  * @brief Frees memo and associated buffers
  *
  * @param[in,out] memo Memo state bucket to discard and free
+ * @param error And error number indicating a failure on the exchange layer to propagate to the
+ *              messaging layer, instructing it to release state.
+ *
+ * You do not need to forward every error indicating on the exchange layer to the messaging layer
+ * when calling this function. For example, when cancelling a pending request,
+ * you can treat this as an `-ECANCELED` error on the exchange layer and call the client callback
+ * with said error, but you may still pass 0 for @p error as propagating the error down
+ * will indicate a hard failure and make the messaging layer release state including connections.
  */
-void unicoap_client_memo_free(unicoap_client_memo_t* memo);
+void unicoap_client_memo_free(unicoap_client_memo_t* memo, int error);
 /** @} */
 
 /* TODO: Client and advanced server features: Elaborate state management */

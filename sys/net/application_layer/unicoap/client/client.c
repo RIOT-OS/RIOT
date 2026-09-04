@@ -28,7 +28,7 @@
 
 static void _on_response_timeout(unicoap_scheduled_event_t* timeout) {
     unicoap_client_callback_failure(unicoap_client_memo_of_timeout(timeout), -ETIMEDOUT);
-    unicoap_client_memo_free(unicoap_client_memo_of_timeout(timeout));
+    unicoap_client_memo_free(unicoap_client_memo_of_timeout(timeout), -ETIMEDOUT);
 }
 
 int unicoap_client_callback_success(unicoap_client_memo_t* memo, const unicoap_packet_t* packet,
@@ -71,7 +71,7 @@ int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_mem
     /* TODO: Block-wise */
     res = unicoap_client_callback_success(memo, packet, UNICOAP_BLOCK_OPTION_NONE);
 
-    unicoap_client_memo_free(memo);
+    unicoap_client_memo_free(memo, 0);
     return res;
 }
 
@@ -147,7 +147,7 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
     return 0;
 
 error:
-    unicoap_client_memo_free(memo);
+    unicoap_client_memo_free(memo, 0);
     return res;
 }
 
@@ -163,7 +163,7 @@ int unicoap_cancel_request(int refno) {
         }
         _CLIENT_DEBUG("cancelling request with refno %i\n", refno);
         unicoap_client_callback_failure(memo, -ECANCELED);
-        unicoap_client_memo_free(memo);
+        unicoap_client_memo_free(memo, 0);
         return 0;
     } else {
         if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
