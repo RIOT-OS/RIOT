@@ -213,7 +213,7 @@ static bool _parse_endpoint(sock_udp_ep_t *remote,
         ipv6_addr_is_link_local(&addr)) {
         return false;
     }
-    memcpy(&remote->addr.ipv6[0], &addr.u8[0], sizeof(addr.u8));
+    remote->ip.addr.v6 = addr;
 
     if (urip->port != 0) {
         remote->port = urip->port;

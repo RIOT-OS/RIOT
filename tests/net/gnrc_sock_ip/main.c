@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "net/ipv6/addr.h"
 #include "net/sock/ip.h"
 #include "test_utils/expect.h"
 #include "xtimer.h"
@@ -91,8 +92,7 @@ static void test_sock_ip_create__only_local(void)
                                SOCK_FLAGS_REUSE_EP));
     expect(0 == sock_ip_get_local(&_sock, &ep));
     expect(AF_INET6 == ep.family);
-    expect(memcmp(&ipv6_addr_unspecified, &ep.addr.ipv6,
-                  sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&ipv6_addr_unspecified, &ep.addr.v6));
     expect(SOCK_ADDR_ANY_NETIF == ep.netif);
     expect(-ENOTCONN == sock_ip_get_remote(&_sock, &ep));
 }
@@ -109,13 +109,11 @@ static void test_sock_ip_create__only_local_reuse_ep(void)
     expect(0 == sock_ip_get_local(&_sock, &ep));
     expect(0 == sock_ip_get_local(&_sock2, &ep2));
     expect(AF_INET6 == ep.family);
-    expect(memcmp(&ipv6_addr_unspecified, &ep.addr.ipv6,
-                  sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&ipv6_addr_unspecified, &ep.addr.v6));
     expect(SOCK_ADDR_ANY_NETIF == ep.netif);
     expect(-ENOTCONN == sock_ip_get_remote(&_sock, &ep));
     expect(AF_INET6 == ep2.family);
-    expect(memcmp(&ipv6_addr_unspecified, &ep2.addr.ipv6,
-                  sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&ipv6_addr_unspecified, &ep2.addr.v6));
     expect(SOCK_ADDR_ANY_NETIF == ep2.netif);
     expect(-ENOTCONN == sock_ip_get_remote(&_sock, &ep2));
     sock_ip_close(&_sock2);
@@ -133,7 +131,7 @@ static void test_sock_ip_create__only_remote(void)
     expect(-EADDRNOTAVAIL == sock_ip_get_local(&_sock, &ep));
     expect(0 == sock_ip_get_remote(&_sock, &ep));
     expect(AF_INET6 == ep.family);
-    expect(memcmp(&remote_addr, &ep.addr.ipv6, sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&remote_addr, &ep.addr.v6));
     expect(SOCK_ADDR_ANY_NETIF == ep.netif);
 }
 
@@ -149,12 +147,11 @@ static void test_sock_ip_create__full(void)
                                SOCK_FLAGS_REUSE_EP));
     expect(0 == sock_ip_get_local(&_sock, &ep));
     expect(AF_INET6 == ep.family);
-    expect(memcmp(&ipv6_addr_unspecified, &ep.addr.ipv6,
-                  sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&ipv6_addr_unspecified, &ep.addr.v6));
     expect(_TEST_NETIF == ep.netif);
     expect(0 == sock_ip_get_remote(&_sock, &ep));
     expect(AF_INET6 == ep.family);
-    expect(memcmp(&remote_addr, &ep.addr.ipv6, sizeof(ipv6_addr_t)) == 0);
+    expect(ipv6_addr_equal(&remote_addr, &ep.addr.v6));
     expect(SOCK_ADDR_ANY_NETIF == ep.netif);
 }
 

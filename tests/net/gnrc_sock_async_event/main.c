@@ -78,7 +78,7 @@ static void _recv_udp(sock_udp_t *sock, sock_async_flags_t flags, void *arg)
         if ((res = sock_udp_recv(sock, _buffer, sizeof(_buffer), 0,
                                  &remote)) >= 0) {
             printf("Received UDP packet from [%s]:%u:\n",
-                   ipv6_addr_to_str(_addr_str, (ipv6_addr_t *)remote.addr.ipv6,
+                   ipv6_addr_to_str(_addr_str, &remote.ip.addr.v6,
                                     sizeof(_addr_str)),
                    remote.port);
             od_hex_dump(_buffer, res, OD_WIDTH_DEFAULT);
@@ -100,7 +100,7 @@ static void _recv_ip(sock_ip_t *sock, sock_async_flags_t flags, void *arg)
         if ((res = sock_ip_recv(sock, _buffer, sizeof(_buffer), 0,
                                 &remote)) >= 0) {
             printf("Received IP packet from [%s]:\n",
-                   ipv6_addr_to_str(_addr_str, (ipv6_addr_t *)remote.addr.ipv6,
+                   ipv6_addr_to_str(_addr_str, &remote.addr.v6,
                                     sizeof(_addr_str)));
             od_hex_dump(_buffer, res, OD_WIDTH_DEFAULT);
         }

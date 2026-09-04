@@ -84,7 +84,7 @@ int bplib_cla_udp_start(bplib_cla_udp_t* cla, uint32_t contact_id)
     sock_udp_ep_t local_ep = SOCK_IPV6_EP_ANY;
     sock_udp_ep_t remote_ep = SOCK_IPV6_EP_ANY;
 
-    if (ipv6_addr_from_str((ipv6_addr_t*) &remote_ep.addr.ipv6, bplib_instance_data.ConfigPtrs.
+    if (ipv6_addr_from_str(&remote_ep.ip.addr.v6, bplib_instance_data.ConfigPtrs.
                            ContactsConfigPtr->ContactSet[contact_id].ClaOutAddr) == NULL) {
         DEBUG("Failed to convert IP address [%s]\n",
             bplib_instance_data.ConfigPtrs.ContactsConfigPtr->ContactSet[contact_id].ClaOutAddr);
@@ -94,7 +94,7 @@ int bplib_cla_udp_start(bplib_cla_udp_t* cla, uint32_t contact_id)
     remote_ep.port = bplib_instance_data.ConfigPtrs.
                         ContactsConfigPtr->ContactSet[contact_id].ClaOutPort;
 
-    if (ipv6_addr_from_str((ipv6_addr_t*) &local_ep.addr.ipv6, bplib_instance_data.ConfigPtrs.
+    if (ipv6_addr_from_str(&local_ep.ip.addr.v6, bplib_instance_data.ConfigPtrs.
                            ContactsConfigPtr->ContactSet[contact_id].ClaInAddr) == NULL) {
         DEBUG("Failed to convert IP address [%s]\n",
             bplib_instance_data.ConfigPtrs.ContactsConfigPtr->ContactSet[contact_id].ClaInAddr);

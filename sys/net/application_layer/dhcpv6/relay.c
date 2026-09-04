@@ -290,9 +290,7 @@ static void _forward_msg(const sock_udp_ep_t *remote, const uint8_t *in_msg,
     /* set link-address to unspecified address, we will provide an Interface-ID
      * option instead */
     memset(&out_fwd->link_address, 0, sizeof(out_fwd->link_address));
-    assert(sizeof(out_fwd->peer_address) == sizeof(remote->addr.ipv6));
-    memcpy(&out_fwd->peer_address, &remote->addr.ipv6,
-           sizeof(out_fwd->peer_address));
+    out_fwd->peer_address = remote->ip.addr.v6;
 
     /* set mandatory options */
     out_fwd_len += _compose_iid_opt(
@@ -393,9 +391,7 @@ static void _forward_reply(const uint8_t *in_msg, size_t in_msg_size)
         /* out message is heading for the client it is destined to */
         target.port = DHCPV6_CLIENT_PORT;
     }
-    assert(sizeof(in_reply->peer_address) == sizeof(target.addr.ipv6));
-
-    memcpy(&target.addr.ipv6, &in_reply->peer_address, sizeof(target.addr.ipv6));
+    target.ip.addr.v6 = in_reply->peer_address;
     if (IS_USED(MODULE_SOCK_UTIL) && ENABLE_DEBUG) {
         static char addr_str[IPV6_ADDR_MAX_STR_LEN];
         uint16_t port;

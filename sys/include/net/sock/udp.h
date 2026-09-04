@@ -160,7 +160,7 @@
  *         ssize_t res;
  *
  *         remote.port = 12345;
- *         ipv6_addr_set_all_nodes_multicast((ipv6_addr_t *)&remote.addr.ipv6,
+ *         ipv6_addr_set_all_nodes_multicast(&remote.ip.addr.v6,
  *                                           IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
  *         if (sock_udp_send(&sock, "Hello!", sizeof("Hello!"), &remote) < 0) {
  *             puts("Error sending message");
@@ -219,7 +219,7 @@
  *         ssize_t res;
  *
  *         remote.port = 12345;
- *         ipv6_addr_set_all_nodes_multicast((ipv6_addr_t *)&remote.addr.ipv6,
+ *         ipv6_addr_set_all_nodes_multicast(&remote.ip.addr.v6,
  *                                           IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
  *         if (sock_udp_send(&sock, "Hello!", sizeof("Hello!"), &remote) < 0) {
  *             puts("Error sending message");
@@ -808,11 +808,11 @@ static inline bool sock_udp_ep_is_multicast(const sock_udp_ep_t *ep)
     switch (ep->family) {
 #ifdef SOCK_HAS_IPV6
     case AF_INET6:
-        return ipv6_addr_is_multicast((const ipv6_addr_t *)&ep->addr.ipv6);
+        return ipv6_addr_is_multicast(&ep->ip.addr.v6);
 #endif
 #ifdef SOCK_HAS_IPV4
     case AF_INET:
-        return ipv4_addr_is_multicast((const ipv4_addr_t *)&ep->addr.ipv4);
+        return ipv4_addr_is_multicast(&ep->ip.addr.v4);
 #endif
     default:
         assert(0);

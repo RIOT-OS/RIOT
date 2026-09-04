@@ -407,7 +407,7 @@ static int _set_remote(const uri_parser_result_t *uri_comp,
     memset(remote, 0, sizeof(*remote));
 
     if (uri_comp->ipv6addr != NULL) {
-        if (ipv6_addr_from_buf((ipv6_addr_t *)remote->addr.ipv6,
+        if (ipv6_addr_from_buf(&remote->ip.addr.v6,
                                uri_comp->ipv6addr,
                                uri_comp->ipv6addr_len) == NULL) {
             DEBUG("gcoap_dns: unable to parse IPv6 address %*.s\n",
@@ -429,7 +429,7 @@ static int _set_remote(const uri_parser_result_t *uri_comp,
             remote->netif = SOCK_ADDR_ANY_NETIF;
         }
     }
-    else if (ipv4_addr_from_buf((ipv4_addr_t *)remote->addr.ipv4,
+    else if (ipv4_addr_from_buf(&remote->ip.addr.v4,
                                 uri_comp->host, uri_comp->host_len) != NULL) {
         remote->family = AF_INET;
     }
@@ -655,9 +655,8 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
 
     if ((remote->port != _remote.port) ||
         (remote->family != _remote.family) ||
-        (!ipv6_addr_is_unspecified((ipv6_addr_t *)_remote.addr.ipv6) &&
-         (memcmp(remote->addr.ipv6, _remote.addr.ipv6,
-                 sizeof(_remote.addr.ipv6)) != 0))) {
+        (!ipv6_addr_is_unspecified(&_remote.ip.addr.v6) &&
+         !ipv6_addr_equal(&remote->ip.addr.v6, &_remote.ip.addr.v6))) {
         DEBUG("gcoap_dns: unexpected remote for reply\n");
         context->res = -EDESTADDRREQ;
         goto unlock;

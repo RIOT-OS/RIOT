@@ -197,7 +197,7 @@ static void test_sock_tl_name2ep__ip_if_port(void)
     TEST_ASSERT_EQUAL_INT(AF_INET6, ep.family);
     TEST_ASSERT_EQUAL_INT(1234, ep.port);
     TEST_ASSERT_EQUAL_INT(1, ep.netif);
-    TEST_ASSERT(ipv6_addr_equal(&a, (ipv6_addr_t *)&ep.addr.ipv6));
+    TEST_ASSERT(ipv6_addr_equal(&a, &ep.ip.addr.v6));
 }
 
 static void test_sock_tl_name2ep__name_port(void)
@@ -213,7 +213,7 @@ static void test_sock_tl_name2ep__name_port(void)
     TEST_ASSERT_EQUAL_INT(0, res);
     TEST_ASSERT_EQUAL_INT(AF_INET6, ep.family);
     TEST_ASSERT_EQUAL_INT(1234, ep.port);
-    TEST_ASSERT(ipv6_addr_equal(&a, (ipv6_addr_t *)&ep.addr.ipv6));
+    TEST_ASSERT(ipv6_addr_equal(&a, &ep.ip.addr.v6));
 }
 
 static void test_sock_tl_name2ep__name_only(void)
@@ -229,7 +229,7 @@ static void test_sock_tl_name2ep__name_only(void)
     TEST_ASSERT_EQUAL_INT(0, res);
     TEST_ASSERT_EQUAL_INT(AF_INET6, ep.family);
     TEST_ASSERT_EQUAL_INT(0, ep.port);
-    TEST_ASSERT(ipv6_addr_equal(&a, (ipv6_addr_t *)&ep.addr.ipv6));
+    TEST_ASSERT(ipv6_addr_equal(&a, &ep.ip.addr.v6));
 }
 
 Test *tests_netutils_ipv6_tests(void)

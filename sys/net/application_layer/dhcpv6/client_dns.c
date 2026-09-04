@@ -35,10 +35,9 @@ void dhcpv6_client_dns_rns_conf(const dhcpv6_opt_dns_rns_t *opt, uint16_t netif)
     DEBUG("Overriding sock_dns_server with %s\n",
           ipv6_addr_to_str(addr_str, opt->dns_rns, sizeof(addr_str)));
     sock_dns_server.port = SOCK_DNS_PORT;
-    sock_dns_server.family = AF_INET6;
-    sock_dns_server.netif = netif;
-    memcpy(sock_dns_server.addr.ipv6, opt->dns_rns,
-           sizeof(sock_dns_server.addr.ipv6));
+    sock_dns_server.ip.family = AF_INET6;
+    sock_dns_server.ip.netif = netif;
+    sock_dns_server.ip.addr.v6 = opt->dns_rns;
     return;
 #endif
 }

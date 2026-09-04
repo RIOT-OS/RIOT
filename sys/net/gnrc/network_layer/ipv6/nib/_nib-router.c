@@ -237,7 +237,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
 
     /* with auto_init_sock_dns we always have a valid (static) DNS server */
     if (((rdnss_ltime < UINT32_MAX) || IS_USED(MODULE_AUTO_INIT_SOCK_DNS)) &&
-        (!ipv6_addr_is_link_local((ipv6_addr_t *)sock_dns_server.addr.ipv6))) {
+        (!ipv6_addr_is_link_local(&sock_dns_server.ip.addr.v6))) {
         gnrc_pktsnip_t *rdnsso = gnrc_ndp_opt_rdnss_build(
                 rdnss_ltime * MS_PER_SEC,
                 (ipv6_addr_t *)&sock_dns_server.addr,

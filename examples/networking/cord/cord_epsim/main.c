@@ -87,7 +87,7 @@ int main(void)
 
     /* if netif is not specified in addr and it's link local */
     if ((rd_ep.netif == SOCK_ADDR_ANY_NETIF) &&
-         ipv6_addr_is_link_local((ipv6_addr_t *) &rd_ep.addr.ipv6)) {
+         ipv6_addr_is_link_local(&rd_ep.ip.addr.v6)) {
         /* if there is only one interface we use that */
         if (gnrc_netif_numof() == 1) {
             rd_ep.netif = (uint16_t)gnrc_netif_iter(NULL)->pid;

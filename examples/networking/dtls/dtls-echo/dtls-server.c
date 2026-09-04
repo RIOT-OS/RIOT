@@ -115,14 +115,14 @@ static int dtls_handle_read(dtls_context_t *ctx)
     dtls_session_init(&session);
     session.addr.port = remote_peer->remote->port;
     session.addr.family = AF_INET6;
-    if (remote_peer->remote->netif ==  SOCK_ADDR_ANY_NETIF) {
+    if (remote_peer->remote->ip.netif == SOCK_ADDR_ANY_NETIF) {
         session.ifindex = SOCK_ADDR_ANY_NETIF;
     }
     else {
-        session.ifindex = remote_peer->remote->netif;
+        session.ifindex = remote_peer->remote->ip.netif;
     }
 
-    memcpy(&session.addr.ipv6, &remote_peer->remote->addr.ipv6, sizeof(session.addr.ipv6));
+    session.addr.ipv6 = remote_peer->remote->ip.addr.v6;
     return dtls_handle_message(ctx, &session, packet_rcvd, res);
 }
 

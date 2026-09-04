@@ -144,7 +144,7 @@ int gnrc_tcp_ep_init(gnrc_tcp_ep_t *ep, int family, const uint8_t *addr, size_t 
     }
 
     if (addr == NULL && addr_size == 0) {
-        ipv6_addr_set_unspecified((ipv6_addr_t *) ep->addr.ipv6);
+        ipv6_addr_set_unspecified((ipv6_addr_t *)ep->addr.ipv6);
     }
     else if (addr_size == sizeof(ipv6_addr_t)) {
         memcpy(ep->addr.ipv6, addr, sizeof(ipv6_addr_t));
@@ -268,7 +268,7 @@ int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
     }
 
     /* 5.2) Try to read address into endpoint. */
-    if (ipv6_addr_from_str((ipv6_addr_t *) ep->addr.ipv6, tmp) == NULL) {
+    if (ipv6_addr_from_str((ipv6_addr_t *)&ep->addr.ipv6, tmp) == NULL) {
         TCP_DEBUG_ERROR("-EINVAL: Invalid address string.");
         TCP_DEBUG_LEAVE;
         return -EINVAL;
@@ -1071,7 +1071,7 @@ int gnrc_tcp_queue_get_local(gnrc_tcp_tcb_queue_t *queue, gnrc_tcp_ep_t *ep)
 #ifdef MODULE_GNRC_IPV6
         if (ep->family == AF_INET6) {
             if (tcb->status & STATUS_ALLOW_ANY_ADDR) {
-                ipv6_addr_set_unspecified((ipv6_addr_t *) ep->addr.ipv6);
+                ipv6_addr_set_unspecified((ipv6_addr_t *)&ep->addr.ipv6);
             } else {
                 memcpy(ep->addr.ipv6, tcb->local_addr, sizeof(ep->addr.ipv6));
             }
