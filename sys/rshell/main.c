@@ -62,7 +62,7 @@ welcome to Rshell, the RIOTos shell\n\
 #include "net/gnrc.h"
 #include "neofetch.h"
 #include "auto_init_utils.h"
-SHELL_COMMAND(neofetch, "gives information about the OS and (soon) the hardware", infofetch);
+SHELL_COMMAND(info, "gives information about the OS and (soon) the hardware", infofetch);
 void rshell(void)
 {
 
