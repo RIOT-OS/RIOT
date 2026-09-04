@@ -49,6 +49,7 @@ PSEUDOMODULES += auto_init_%
 NO_PSEUDOMODULES += auto_init_can
 NO_PSEUDOMODULES += auto_init_loramac
 NO_PSEUDOMODULES += auto_init_multimedia
+NO_PSEUDOMODULES += auto_init_radiolib
 NO_PSEUDOMODULES += auto_init_screen
 NO_PSEUDOMODULES += auto_init_security
 NO_PSEUDOMODULES += auto_init_usbus
@@ -435,6 +436,13 @@ PSEUDOMODULES += psa_riot_hashes_sha_512
 PSEUDOMODULES += psa_riot_hashes_sha_512_224
 PSEUDOMODULES += psa_riot_hashes_sha_512_256
 
+## @addtogroup pkg_radiolib
+## @{
+## @brief RadioLib driver package
+PSEUDOMODULES += radiolib
+## @brief RadioLib driver for the Semtech SX127x radio family
+PSEUDOMODULES += radiolib_sx127x
+## @}
 PSEUDOMODULES += riotboot_%
 PSEUDOMODULES += rtt_cmd
 
