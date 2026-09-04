@@ -86,7 +86,8 @@ static void _dtls_on_event(sock_dtls_t* sock, sock_async_flags_t type, void* arg
      * this logic needs to be adjusted to strictly follow the sock_dtls API.
      * For now, we need work around tinydtls quirks. */
 
-    if ((type & SOCK_ASYNC_MSG_SENT) || (type & SOCK_ASYNC_MSG_RECV) || (type & SOCK_ASYNC_CONN_RECV) || (type & SOCK_ASYNC_CONN_READY)) {
+    if ((type & SOCK_ASYNC_MSG_SENT) || (type & SOCK_ASYNC_MSG_RECV) || 
+        (type & SOCK_ASYNC_CONN_RECV) || (type & SOCK_ASYNC_CONN_RDY)) {
         _dtls_pander_and_spoonfeed_session_mgmt();
     }
 
