@@ -3,6 +3,10 @@ PKG_URL=https://github.com/adamdunkels/ubasic
 PKG_VERSION=cc07193c231e21ecb418335aba5b199a08d4685c
 PKG_LICENSE=BSD-3-Clause
 
+include $(RIOTBASE)/makefiles/color.inc.mk
+
+$(call echowarn,("pkg/ubasic is deprecated and will be removed after the 2027.04 Release!"))
+
 include $(RIOTBASE)/pkg/pkg.mk
 
 UBASIC_MODULES   = ubasic_tests
