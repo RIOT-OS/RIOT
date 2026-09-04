@@ -10,13 +10,14 @@
         "astro": "astro"
     },
     "dependencies": {
+        "@astrojs/markdown-satteri": "^0.4.0",
         "@astrojs/rss": "^4.0.19",
-        "@astrojs/starlight": "^0.41.3",
-        "astro": "^7.1.1",
-        "rehype-github-emoji": "1.0.0",
-        "sharp": "0.35.3",
-        "starlight-image-zoom": "0.15.0",
-        "starlight-sidebar-topics": "^0.8.0"
+        "@astrojs/starlight": "^0.42.0",
+        "astro": "^7.3.1",
+        "node-emoji": "^2.2.0",
+        "sharp": "0.35.4",
+        "starlight-image-zoom": "0.16.0",
+        "starlight-sidebar-topics": "^0.9.0"
     },
     "devDependencies": {
         "typescript": "7.0.2"
