@@ -100,8 +100,6 @@ static int _init(netdev_t *netdev)
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
-    (void)netdev;
-
     TRACE("[eth-netdev] _send: sending packet, length=%" PRIuSIZE " bytes\n", iolist_size(iolist));
 
     netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);

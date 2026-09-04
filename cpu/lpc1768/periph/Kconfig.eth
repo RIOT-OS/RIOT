@@ -15,12 +15,12 @@ config LPC1768_ETH_LINK_POLL_MS
     help
         Poll interval for checking the link state, in milliseconds.
 
-config LPC1768_ETH_PHY_TIMEOUT_US
+config LPC1768_ETH_PHY_TIMEOUT_MS
     int "PHY operations timeout"
     depends on CPU_MODEL_LPC1768 && USEMODULE_LPC1768_ETH
-    default 1000
+    default 1
     help
-        Timeout for PHY operations, in microseconds.
+        Timeout for PHY operations, in milliseconds.
 
 config LPC1768_ETH_RX_BUF_NUMOF
     int "Receive buffers"

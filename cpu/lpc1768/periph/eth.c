@@ -199,7 +199,7 @@ static void _filter_error_frames(void)
      * which is not an error, but only an indication that the frame exceeds
      * 1500 bytes */
     const uint32_t error_mask = RX_INFO_CRC_ERROR | RX_INFO_SYMBOL_ERROR | RX_INFO_ALIGNMENT_ERROR
-                              | RX_INFO_OVERRUN | RX_INFO_NO_DESCRIPTOR | RX_INFO_FAIL_FILTER;
+                                | RX_INFO_OVERRUN | RX_INFO_NO_DESCRIPTOR | RX_INFO_FAIL_FILTER;
 
     uint32_t produce = LPC_EMAC->RxProduceIndex;
     uint32_t consume = LPC_EMAC->RxConsumeIndex;
@@ -220,10 +220,10 @@ static void _filter_error_frames(void)
 
 static bool _mii_wait_idle(void)
 {
-    uint32_t start = ztimer_now(ZTIMER_USEC);
+    uint32_t start = ztimer_now(ZTIMER_MSEC);
 
     while (LPC_EMAC->MIND & MIND_BUSY) {
-        if (ztimer_now(ZTIMER_USEC) - start > CONFIG_LPC1768_ETH_PHY_TIMEOUT_US) {
+        if ((ztimer_now(ZTIMER_MSEC) - start) > CONFIG_LPC1768_ETH_PHY_TIMEOUT_MS) {
             DEBUG_PUTS("[eth] _mii_wait_idle: timeout");
             return false;
         }
@@ -282,7 +282,7 @@ static int _phy_detect(void)
 {
     uint16_t bmsr = _mii_read(MII_BMSR);
 
-    if (bmsr == 0x0000 || bmsr == 0xFFFF) {
+    if ((bmsr == 0x0000) || (bmsr == 0xFFFF)) {
         DEBUG_PUTS("[eth] _phy_detect: PHY not detected");
         return -EIO;
     }
@@ -414,7 +414,7 @@ int lpc1768_eth_init(const uint8_t *mac)
     _init_pins();
 
     LPC_EMAC->MAC1 = MAC1_RESET_TX | MAC1_RESET_MCS_TX | MAC1_RESET_RX | MAC1_RESET_MCS_RX
-                   | MAC1_SIMUL_RESET | MAC1_SOFT_RESET;
+                     | MAC1_SIMUL_RESET | MAC1_SOFT_RESET;
     LPC_EMAC->Command = COMMAND_REG_RESET | COMMAND_TX_RESET | COMMAND_RX_RESET;
 
     ztimer_sleep(ZTIMER_MSEC, 10);
@@ -459,7 +459,7 @@ int lpc1768_eth_init(const uint8_t *mac)
     /* configure interrupts */
     LPC_EMAC->IntClear = 0xFFFFFFFFUL;
     LPC_EMAC->IntEnable = INT_RX_DONE | INT_RX_OVERRUN | INT_RX_ERROR
-                        | INT_TX_DONE | INT_TX_UNDERRUN | INT_TX_ERROR;
+                          | INT_TX_DONE | INT_TX_UNDERRUN | INT_TX_ERROR;
 
     NVIC_ClearPendingIRQ(ENET_IRQn);
     NVIC_EnableIRQ(ENET_IRQn);
@@ -489,7 +489,7 @@ int lpc1768_eth_send(const iolist_t *iolist)
     size_t len = 0;
 
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
-        if (len + iol->iol_len > LPC1768_ETH_BUF_LEN) {
+        if ((len + iol->iol_len) > LPC1768_ETH_BUF_LEN) {
             return -EOVERFLOW;
         }
         if (iol->iol_len) {
@@ -505,7 +505,7 @@ int lpc1768_eth_send(const iolist_t *iolist)
 
     /* start transmission */
     _tx_desc[produce].control = ((len - 1) & TX_CTRL_SIZE_MASK) | TX_CTRL_LAST | TX_CTRL_INT
-                              | TX_CTRL_PAD | TX_CTRL_CRC;
+                                | TX_CTRL_PAD | TX_CTRL_CRC;
     __DMB();
 
     /* store the index and length for status checking after transmission */
@@ -539,7 +539,7 @@ int lpc1768_eth_recv(void *buf, size_t max_len)
 
     DEBUG("[eth] lpc1768_eth_recv: frame length %d bytes\n", len);
 
-    if (buf == NULL && max_len == 0) {
+    if ((buf == NULL) && (max_len == 0)) {
         return len;
     }
 
@@ -670,7 +670,8 @@ int lpc1768_eth_start_auto_negotiation(void)
 
     /* advertise all capabilities and restart auto-negotiation */
     _mii_write(MII_ADVERTISE,
-               MII_ADVERTISE_10_F | MII_ADVERTISE_10_H | MII_ADVERTISE_100_F | MII_ADVERTISE_100_H);
+               MII_ADVERTISE_10_F | MII_ADVERTISE_10_H
+               | MII_ADVERTISE_100_F | MII_ADVERTISE_100_H);
     _mii_write(MII_BMCR, MII_BMCR_AN_ENABLE | MII_BMCR_AN_RESTART);
 
     return 0;
