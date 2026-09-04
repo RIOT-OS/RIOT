@@ -11,8 +11,10 @@
  * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
+#include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "iolist.h"
 
@@ -226,6 +228,10 @@ bool unicoap_path_matches_options(const unicoap_pathspec_t* path,
 
 size_t unicoap_cfspec_len(const unicoap_cfspec_t *cfspec) {
     const unicoap_content_format_code_t *cur = cfspec->_formats;
+    if (cur == NULL) {
+        /* Unitialized */
+        return 0;
+    }
     ssize_t s = 0;
     for (; *cur != UNICOAP_FORMAT_TERMINATOR; cur++, s++) {}
     return s;
@@ -233,7 +239,7 @@ size_t unicoap_cfspec_len(const unicoap_cfspec_t *cfspec) {
 
 size_t unicoap_content_format_string_len(unicoap_content_format_code_t cf) {
     unsigned int remaining = (unsigned int)cf;
-    ssize_t s = 1;
+    size_t s = 1;
     while (remaining >= 10) {
         remaining /= 10;
         s++;
@@ -269,8 +275,6 @@ ssize_t unicoap_content_format_stringify(const unicoap_cfspec_t* cfspec, char* b
             return -ENOBUFS;
         }
         size_t n = (size_t)sprintf(buffer + written, "%s%d", first ? "" : " ", *cur);
-        // TODO remove sanity check
-        assert(n == str_len);
         written += n;
         first = false;
     }

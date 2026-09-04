@@ -113,6 +113,7 @@ ssize_t unicoap_resource_encode_link(const unicoap_resource_t* resource, char* b
     if ((written = unicoap_content_format_stringify(&resource->formats.respond, buffer, capacity)) < 0) {
         return written;
     }
+    buffer+=written;
     return (ssize_t)(buffer - start);
 }
 
