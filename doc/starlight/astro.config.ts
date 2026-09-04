@@ -7,15 +7,37 @@
 
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
-import rehypeGithubEmoji from "rehype-github-emoji";
 import starlightImageZoom from "starlight-image-zoom";
 import starlightSidebarTopics from "starlight-sidebar-topics";
+import { satteri, type SatteriProcessorOptions } from '@astrojs/markdown-satteri';
+import * as emoji from 'node-emoji'
+
+type SatteriMdastPlugin = Extract<
+  NonNullable<SatteriProcessorOptions["mdastPlugins"]>[number],
+  { name: string }
+>;
+
+function satteriEmoji(): SatteriMdastPlugin {
+  return {
+    name: 'satteri-emoji',
+    text(node, ctx) {
+      if (node.value && node.value.includes(':')) {
+        const emojified = emoji.emojify(node.value)
+        if (emojified !== node.value) {
+          ctx.setProperty(node, 'value', emojified)
+        }
+      }
+    }
+  }
+}
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://guide.riot-os.org",
   markdown: {
-    rehypePlugins: [rehypeGithubEmoji],
+    processor: satteri({
+      mdastPlugins: [satteriEmoji],
+    })
   },
   integrations: [
     starlight({
