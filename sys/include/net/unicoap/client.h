@@ -56,6 +56,15 @@ typedef enum {
      * **Default**: disabled
      */
     UNICOAP_CLIENT_FLAG_RELIABLE = 0x0001,
+
+    /**
+     * @brief Sets the type of the message to multicast.
+     *
+     * This flag will be set if the destination address for a request is an
+     * IP multicast address.
+     * It is not compatible with @ref UNICOAP_CLIENT_FLAG_RELIABLE.
+     */
+    UNICOAP_CLIENT_FLAG_MULTICAST = 0x8000,
 } unicoap_request_flags_t;
 
 /**
@@ -64,18 +73,18 @@ typedef enum {
 void unicoap_print_client_flags(unicoap_request_flags_t flags);
 
 
-/** 
+/**
  * @brief Additional parameters to customize request behavior
  */
 typedef struct {
     /**
-     * @brief Opaque argument passed to callback both in success and failure cases 
+     * @brief Opaque argument passed to callback both in success and failure cases
      */
     void* callback_arg;
 
     /**
      * @brief Response timeout in milliseconds
-     * 
+     *
      * Leave set to zero to fall back to @ref CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS
      */
     uint32_t timeout_ms;
@@ -140,13 +149,13 @@ typedef int (*unicoap_response_callback_t)(const unicoap_message_t* response,
  * @param parameters Optional parameters (nullable)
  * @param flags Client flags
  *
- * @returns Zero on success or positive refno if [cancellable requests](@ref unicoap_cancel_request) 
+ * @returns Zero on success or positive refno if [cancellable requests](@ref unicoap_cancel_request)
  *          are enabled
  * @returns Negative integer on failure
  */
 int unicoap_send_request_async(unicoap_message_t* request,
                                unicoap_destination_t* destination,
-                               unicoap_response_callback_t callback, 
+                               unicoap_response_callback_t callback,
                                unicoap_request_parameters_t* parameters,
                                unicoap_request_flags_t flags);
 
@@ -165,7 +174,7 @@ int unicoap_send_request_async(unicoap_message_t* request,
  * sent rather than a non-confirmable message.
  *
  * @param[in,out] request Initialized request message to send
- * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or 
+ * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or
  *                    @ref unicoap_destination_endpoint
  * @param callback Function executed when the entire response is available or if an error occurred
  * @param parameters Optional parameters (nullable)
@@ -176,7 +185,7 @@ int unicoap_send_request_async(unicoap_message_t* request,
  */
 int unicoap_send_request_sync(unicoap_message_t* request,
                               unicoap_destination_t* destination,
-                              unicoap_response_callback_t callback, 
+                              unicoap_response_callback_t callback,
                               unicoap_request_parameters_t* parameters,
                               unicoap_request_flags_t flags);
 
@@ -221,7 +230,7 @@ int unicoap_send_request_sync(unicoap_message_t* request,
  */
 int unicoap_send_request_sync_copy(unicoap_message_t* request,
                                    unicoap_destination_t* destination,
-                                   unicoap_message_t* response, 
+                                   unicoap_message_t* response,
                                    unicoap_request_parameters_t* parameters,
                                    unicoap_request_flags_t flags,
                                    unicoap_aux_t* aux);

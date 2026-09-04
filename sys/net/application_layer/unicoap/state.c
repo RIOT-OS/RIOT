@@ -89,6 +89,11 @@ static unicoap_client_memo_t* _alloc_client(void) {
     return NULL;
 }
 
+static inline bool _is_multicast(unicoap_client_memo_t *memo)
+{
+    return memo->flags && UNICOAP_CLIENT_FLAG_MULTICAST > 0;
+}
+
 static inline bool _is_client(const unicoap_memo_t* memo) {
     (void)memo;
 #if UNICOAP_HAVE_CLIENT_STATE
@@ -162,7 +167,7 @@ void unicoap_client_memo_free(unicoap_client_memo_t* memo) {
      * the state object is released as usual. Should the messaging layer rely on this
      * information, the exchange-messaging abstraction has a design flaw. */
     if (unicoap_memo_messaging_state(&memo->super)) {
-        unicoap_messaging_notify(unicoap_memo_messaging_state(&memo->super), 
+        unicoap_messaging_notify(unicoap_memo_messaging_state(&memo->super),
             UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE, NULL, proto);
     }
 #endif
@@ -180,9 +185,13 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
     for (size_t i = 0; i < (size_t)ARRAY_SIZE(_state.client_memos); i += 1) {
         unicoap_client_memo_t* memo = &_state.client_memos[i];
 
-        if ((!endpoint || unicoap_endpoint_is_equal(&memo->super.endpoint, endpoint)) &&
-            token_length == sizeof(memo->token) &&
-            memcmp(memo->token, token, token_length) == 0) {
+
+        if (endpoint && !unicoap_endpoint_is_equal(&memo->super.endpoint,
+                                                   endpoint) && !_is_multicast(memo)) {
+            continue;
+        }
+
+        if (token_length == sizeof(memo->token) && memcmp(memo->token, token, token_length) == 0) {
             return memo;
         }
     }
@@ -221,7 +230,7 @@ int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo) {
      * exchange. Should the memo struct in the memo array get reused for another exchange,
      * the refno can be detected to be obsolete. */
 #if IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION)
-    /* Memos require a unique reference ID and array index for fast lookup. Because functions return 
+    /* Memos require a unique reference ID and array index for fast lookup. Because functions return
      * the refno as an int where negative values represent errors, we assume a minimum 16-bit int
      * and use the 15 positive bits.
      * 15 available bits  =  12 bits (reference ID) + 3 bits (minimum index)
@@ -230,7 +239,7 @@ int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo) {
      * arrays. */
     memo->reference_id = random_uint32_range(1, 0xfff); /* 12 bits for reference ID */
     int refno = memo->reference_id | (MIN(_client_index(memo), 0x7) << 12); /* 3 bits min index */
-    _STATE_DEBUG("refno=%i (min_client_ix=#%" PRIuSIZE ", refid=%u)\n", 
+    _STATE_DEBUG("refno=%i (min_client_ix=#%" PRIuSIZE ", refid=%u)\n",
         refno, MIN(_client_index(memo), 0x7), memo->reference_id);
     return refno;
 #else
@@ -340,7 +349,7 @@ void unicoap_event_schedule(unicoap_scheduled_event_t* event, unicoap_event_call
 
 void unicoap_event_reschedule(unicoap_scheduled_event_t* event, uint32_t duration) {
     if (IS_ACTIVE(DEVELHELP)) {
-        _STATE_EVENT_DEBUG("%s in %"PRIu32"ms (rescheduled)\n", 
+        _STATE_EVENT_DEBUG("%s in %"PRIu32"ms (rescheduled)\n",
                            unicoap_scheduled_event_name(event), duration);
     }
     ztimer_set(UNICOAP_CLOCK, &event->ztimer, duration);
@@ -648,7 +657,11 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
                 unicoap_client_memo_free(memo);
                 return UNICOAP_PREPROCESSING_ERROR_TRUNCATED;
             }
-            unicoap_event_cancel(&memo->super.exchange.timeout);
+
+            if (!_is_multicast(memo)) {
+                unicoap_event_cancel(&memo->super.exchange.timeout);
+            }
+
             arg->client = memo;
             *flags = _messaging_flags_client(memo->flags);
             return UNICOAP_PREPROCESSING_SUCCESS_RESPONSE;
