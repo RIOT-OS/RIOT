@@ -14,6 +14,7 @@
 #include <string.h>
 #include <errno.h>
 
+#include "net/unicoap/transport.h"
 #include "ztimer.h"
 #include "mutex.h"
 #include "compiler_hints.h"
@@ -71,7 +72,10 @@ int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_mem
     /* TODO: Block-wise */
     res = unicoap_client_callback_success(memo, packet, UNICOAP_BLOCK_OPTION_NONE);
 
-    unicoap_client_memo_free(memo);
+    if ((memo->flags && UNICOAP_CLIENT_FLAG_MULTICAST) == 0 ) {
+        unicoap_client_memo_free(memo);
+    }
+
     return res;
 }
 
@@ -104,7 +108,7 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
 
 int unicoap_client_send_request_body(unicoap_message_t* request,
                                      unicoap_endpoint_t* endpoint,
-                                     unicoap_callback_t callback, 
+                                     unicoap_callback_t callback,
                                      unicoap_request_parameters_t* parameters,
                                      unicoap_request_flags_t flags)
 {
@@ -123,6 +127,16 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
                                     .token_length = sizeof(token),
                                 } };
 
+    bool multicast = unicoap_endpoint_is_multicast(endpoint);
+
+    if (multicast) {
+        if (flags && UNICOAP_CLIENT_FLAG_RELIABLE) {
+            _CLIENT_DEBUG("error trying to send reliable datagram via multicast\n");
+            return -EINVAL;
+        }
+        flags |= UNICOAP_CLIENT_FLAG_MULTICAST;
+    }
+
     if (unicoap_callback_is_present(callback)) {
         _CLIENT_DEBUG("need a memo\n");
         if (!(memo = unicoap_client_memo_create(endpoint))) {
@@ -132,11 +146,22 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
         memo->callback_arg = parameters ? parameters->callback_arg : NULL;
         memo->flags = flags;
 
-        unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
-                               (parameters && parameters->timeout_ms > 0) ? 
-                               parameters->timeout_ms : CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS, 
-                               "client.resp-timeout");
+        if (!multicast) {
+            unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
+                                    (parameters && parameters->timeout_ms > 0) ?
+                                   parameters->timeout_ms :
+                                   CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS,
+                                    "client.resp-timeout");
+        }
+        else if (CONFIG_UNICOAP_TIMEOUT_CLIENT_MULTICAST_RESPONSE_MS > 0) {
+            unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
+                                    (parameters && parameters->timeout_ms > 0) ?
+                                   parameters->timeout_ms :
+                                   CONFIG_UNICOAP_TIMEOUT_CLIENT_MULTICAST_RESPONSE_MS,
+                                    "client.resp-timeout");
+        }
     }
+
     /* TODO: OSCORE */
     if ((res = unicoap_client_send_request_part(&packet, memo, flags)) < 0) {
         goto error;
@@ -178,7 +203,7 @@ int unicoap_cancel_request(int refno) {
 
 static int _open_request(unicoap_message_t* request,
                          unicoap_destination_t* destination,
-                         unicoap_callback_t callback, 
+                         unicoap_callback_t callback,
                          unicoap_request_parameters_t* parameters,
                          unicoap_request_flags_t flags)
 {
@@ -193,7 +218,7 @@ static int _open_request(unicoap_message_t* request,
                 request->options = options;
             }
             unicoap_endpoint_t endpoint = { 0 };
-            assert(uri_parser_is_absolute(destination->remote.uri, 
+            assert(uri_parser_is_absolute(destination->remote.uri,
                 strlen(destination->remote.uri)));
 
             uri_parser_result_t parsed = { 0 };
@@ -273,7 +298,7 @@ static int _copy_callback(const unicoap_message_t* response, const unicoap_aux_t
         }
 
         if (unicoap_options_size(response->options) > response->options->storage_capacity) {
-            _CLIENT_DEBUG("not enough buffer space to copy options, " _UNICOAP_NEED_HAVE "\n",  
+            _CLIENT_DEBUG("not enough buffer space to copy options, " _UNICOAP_NEED_HAVE "\n",
                      unicoap_options_size(response->options), dest_options->storage_capacity);
             error = -ENOBUFS;
             goto out;
@@ -286,14 +311,14 @@ static int _copy_callback(const unicoap_message_t* response, const unicoap_aux_t
     }
 
     if (response->payload) {
-        if (!dest_payload) {  
+        if (!dest_payload) {
             _CLIENT_DEBUG("no payload buffer provided\n");
             error = -ENOBUFS;
             goto out;
         }
 
-        if (dest_payload_capacity < response->payload_size) {  
-            _CLIENT_DEBUG("not enough buffer space to copy payload, " _UNICOAP_NEED_HAVE "\n",  
+        if (dest_payload_capacity < response->payload_size) {
+            _CLIENT_DEBUG("not enough buffer space to copy payload, " _UNICOAP_NEED_HAVE "\n",
                           response->payload_size, dest_payload_capacity);
         }
         memcpy(dest_payload, response->payload, response->payload_size);
@@ -318,7 +343,7 @@ out:
 
 int unicoap_send_request_sync_copy(unicoap_message_t* request,
                                    unicoap_destination_t* destination,
-                                   unicoap_message_t* response, 
+                                   unicoap_message_t* response,
                                    unicoap_request_parameters_t* parameters,
                                    unicoap_request_flags_t flags,
                                    unicoap_aux_t* aux)
@@ -343,7 +368,7 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
         assert(false);
         return -1;
     }
-    
+
     _sync_copy_args_t args = (_sync_copy_args_t) {
         .response = response,
         .aux = aux,
@@ -385,7 +410,7 @@ static int _sync_callback(const unicoap_message_t *response, const unicoap_aux_t
 
 int unicoap_send_request_sync(unicoap_message_t* request,
                               unicoap_destination_t* destination,
-                              unicoap_response_callback_t callback, 
+                              unicoap_response_callback_t callback,
                               unicoap_request_parameters_t* parameters,
                               unicoap_request_flags_t flags)
 {
@@ -407,9 +432,9 @@ int unicoap_send_request_sync(unicoap_message_t* request,
         return -1;
     }
 
-    _sync_args_t args = { 
-        .callback = callback, 
-        .roadblock = MUTEX_INIT_LOCKED 
+    _sync_args_t args = {
+        .callback = callback,
+        .roadblock = MUTEX_INIT_LOCKED
     };
 
     unicoap_request_parameters_t sync_parameters = {};
@@ -419,7 +444,7 @@ int unicoap_send_request_sync(unicoap_message_t* request,
     }
     sync_parameters.callback_arg = &args;
 
-    int res = _open_request(request, destination, 
+    int res = _open_request(request, destination,
         (unicoap_callback_t) { .response = _sync_callback }, &sync_parameters, flags);
 
     if (res < 0) {
@@ -432,9 +457,9 @@ int unicoap_send_request_sync(unicoap_message_t* request,
 
 int unicoap_send_request_async(unicoap_message_t* request,
                                unicoap_destination_t* destination,
-                               unicoap_response_callback_t callback, 
+                               unicoap_response_callback_t callback,
                                unicoap_request_parameters_t* parameters,
                                unicoap_request_flags_t flags) {
-    return _open_request(request, destination, 
+    return _open_request(request, destination,
         (unicoap_callback_t) { .response = callback }, parameters, flags);
 }
