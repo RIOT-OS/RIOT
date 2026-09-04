@@ -221,7 +221,7 @@ static int _open_request(unicoap_message_t* request,
                 && ipv6_addr_is_link_local(unicoap_endpoint_get_ipv6_addr(&endpoint))
             ) {
                 _CLIENT_DEBUG("warning: v6 link-local with netif id unset, "
-                              "tinydtls handshake can fail\n");
+                              "tinydtls handshake will fail\n");
                 netif_t* iface = netif_iter(NULL);
                 if (netif_iter(iface)) {
                     _CLIENT_DEBUG("warning: more than 1 netif, refusing to infer netif for dtls\n");
