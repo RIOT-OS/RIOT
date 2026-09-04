@@ -134,8 +134,8 @@ typedef int (*unicoap_response_callback_t)(const unicoap_message_t* response,
  * sent rather than a non-confirmable message.
  *
  * @param[in,out] request Initialized request message to send
- * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or
- *                    @ref unicoap_destination_endpoint
+ * @param destination URI or endpoint. Use @ref unicoap_destination::unicoap_destination_uri_string
+ *                    or @ref unicoap_destination_endpoint
  * @param callback Function executed when the entire response is available or if an error occurred
  * @param parameters Optional parameters (nullable)
  * @param flags Request flags
@@ -165,8 +165,8 @@ int unicoap_send_request_async(unicoap_message_t* request,
  * sent rather than a non-confirmable message.
  *
  * @param[in,out] request Initialized request message to send
- * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or
- *                    @ref unicoap_destination_endpoint
+ * @param destination URI or endpoint. Use @ref unicoap_destination_t::unicoap_destination_uri_string
+ *                    or @ref unicoap_destination_endpoint
  * @param callback Function executed when the entire response is available or if an error occurred
  * @param parameters Optional parameters (nullable)
  * @param flags Request flags
@@ -195,7 +195,7 @@ int unicoap_send_request_sync(unicoap_message_t* request,
  * set @ref unicoap_message_t::options accordingly. To read from the response payload, allocate a
  * a buffer and set @ref unicoap_message_t::payload, @ref unicoap_message_t::payload_size,
  * and @ref unicoap_message_t::payload_representation to
- * @ref UNICOAP_PAYLOAD_REPRESENTATION_CONTIGUOUS. Non-contiguous payload buffers are not supported
+ * @ref UNICOAP_PAYLOAD_CONTIGUOUS. Non-contiguous payload buffers are not supported
  * by this function. When this function returns, the @ref unicoap_message_t::payload_size property
  * will have been updated to reflect the received payload length and options.
  *
@@ -210,7 +210,8 @@ int unicoap_send_request_sync(unicoap_message_t* request,
  * sent rather than a non-confirmable message.
  *
  * @param[in,out] request Initialized request message to send
- * @param destination URI or endpoint. Use @ref unicoap_destination_uri_string or @ref unicoap_destination_endpoint
+ * @param destination URI or endpoint. Use @ref unicoap_destination::unicoap_destination_uri_string
+ *                    or @ref unicoap_destination_endpoint
  * @param[in,out] response Partially initialized response message
  * @param parameters Optional parameters (nullable)
  * @param flags Request flags
@@ -225,8 +226,20 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
                                    unicoap_request_parameters_t* parameters,
                                    unicoap_request_flags_t flags,
                                    unicoap_aux_t* aux);
+/** @} */ /* end of section */
+/** @} */ /* end of group */
 
+/* MARK: - Cancellation */
 /**
+ * @addtogroup net_unicoap_client_cancellation
+ * @{
+ */
+/**
+ * @name Cancelling a request
+ * @{
+ */
+
+ /**
  * @brief Cancels request with reference number
  *
  * @param refno Reference number
@@ -239,9 +252,9 @@ int unicoap_send_request_sync_copy(unicoap_message_t* request,
  * The client callback will be called with `-ECANCELLED`
  */
 int unicoap_cancel_request(int refno);
-/** @} */
 
-/** @} */
+/** @} */ /* end of section */
+/** @} */ /* end of group */
 
 #ifdef __cplusplus
 }

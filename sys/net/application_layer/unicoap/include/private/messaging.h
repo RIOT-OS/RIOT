@@ -278,8 +278,7 @@ typedef enum {
  * @brief Internal RFC 7252 messaging inbound processor
  * @param[in] pdu Buffer containing PDU
  * @param size Size of PDU in bytes
- * @param truncated A boolean value indicating whether the message has been truncated by the
- *                  transport layer
+ * @param event Event the messaging layer must process
  * @param[in] packet Packet to process
  *
  * @returns Negative error number in case of a failure, zero otherwise.
@@ -392,7 +391,6 @@ int unicoap_server_send_response_body(unicoap_packet_t* packet,
  *
  * @param[in,out] packet Packet that will be processed by the client
  * @param[in,out] memo Mandatory pointer to memo variable, memo itself can be `NULL`
- * @param[in] arg Resource
  *
  * @return `0` on success
  * @returns Negative errno on failure
@@ -419,7 +417,6 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
  * @param callback Optional application callback
  * @param parameters Optional parameters (nullable)
  * @param flags Request flags
- * @param profile Optional profile, such as OSCORE security context
  *
  * @returns Zero on success, negative integer otherwise
  */

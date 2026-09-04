@@ -398,6 +398,7 @@ static inline bool unicoap_callback_is_present(const unicoap_callback_t callback
  * @brief Client exchange
  */
 typedef struct {
+    /** @brief Common client/server memo super struct */
     unicoap_memo_t super;
 
     /** @brief Callback function registered by the client API */
@@ -439,7 +440,7 @@ static inline unicoap_client_memo_t* unicoap_client_memo_of_event(event_t* event
 
 /**
  * @brief Returns client memo of scheduled event
- * @param[in] event Superclass event
+ * @param[in] timeout Timeout event
  * @returns Client memo state object
  */
 static inline unicoap_client_memo_t* unicoap_client_memo_of_timeout(unicoap_scheduled_event_t* timeout) {
@@ -501,6 +502,19 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
  */
 unicoap_client_memo_t* unicoap_client_memo_find_refno(int refno);
 
+/**
+ * @brief Assigns a refno to the given client memo
+ *
+ * @param[in,out] memo Client memo
+ *
+ * @returns Refno assigned
+ *
+ * Requires @ref net_unicoap_client_cancellation.
+ *
+ * Constructs a refno, a stable reference to a memo while it is being used for a specific
+ * exchange. Should the memo struct in the memo array get reused for another exchange,
+ * the refno can be detected to be obsolete.
+ */
 int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo);
 
 /**

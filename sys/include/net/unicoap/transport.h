@@ -448,6 +448,8 @@ typedef struct {
 /**
  * @brief Creates destination identifier from endpoint
  *
+ * @memberof unicoap_destination_t
+ *
  * @param endpoint Endpoint to create destination from
  *
  * @returns New resource identifier from endpoint
@@ -464,6 +466,8 @@ static inline unicoap_destination_t unicoap_destination_endpoint(unicoap_endpoin
 
 /**
  * @brief Creates destination identifier from hostname string
+ *
+ * @memberof unicoap_destination_t
  *
  * @param host Host to create destination from
  * @param length Number of ASCII code units (bytes) in @p host, excluding potential null-terminator
@@ -483,6 +487,8 @@ static inline unicoap_destination_t unicoap_destination_host(const char* host, s
 /**
  * @brief Creates destination identifier from null-terminated hostname string
  *
+ * @memberof unicoap_destination_t
+ *
  * @param host Host to create destination from
  *
  * @returns New resource identifier from endpoint
@@ -496,6 +502,8 @@ static inline unicoap_destination_t unicoap_destination_host_string(const char* 
 
 /**
  * @brief Creates destination identifier from URI string
+ *
+ * @memberof unicoap_destination_t
  *
  * @param uri Null-terminated Uniform Resource Identifier
  * @param length Number of ASCII code units (bytes) in @p uri, excluding potential null-terminator
@@ -514,6 +522,8 @@ static inline unicoap_destination_t unicoap_destination_uri(const char* uri, siz
 
 /**
  * @brief Creates destination identifier from URI string
+ *
+ * @memberof unicoap_destination_t
  *
  * @param uri Null-terminated Uniform Resource Identifier
  *

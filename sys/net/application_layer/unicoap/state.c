@@ -217,9 +217,6 @@ unicoap_client_memo_t* unicoap_client_memo_find_refno(int refno) {
 int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo) {
     (void)memo;
     assert(memo);
-    /* Here, we build a refno, a stable reference to a memo while it is being used for a specific
-     * exchange. Should the memo struct in the memo array get reused for another exchange,
-     * the refno can be detected to be obsolete. */
 #if IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION)
     /* Memos require a unique reference ID and array index for fast lookup. Because functions return
      * the refno as an int where negative values represent errors, we assume a minimum 16-bit int
