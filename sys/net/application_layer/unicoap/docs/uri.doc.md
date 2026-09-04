@@ -13,16 +13,6 @@ supported. Zone identifiers are supported too.
 unicoap_destination_t = unicoap_destination_uri("coap://[2008:db8::1]/foo/bar?a=1&b=2");
 ```
 
-@attention If you are using @ref net_unicoap_drivers_dtls and are sending a request over DTLS
-(`coaps://`): Due to the current DTLS implementation, @ref pkg_tinydtls, `unicoap` must
-set a network interface (netif) identifier to make sure the DTLS session handshake works.
-If your RIOT instance has only a single netif (you can check this by running `ifconfig` in
-the `examples/basic/default` shell), `unicoap` will experimentally assume this interface.
-**If there're two or more interfaces, you MUST provide a netif, either as a zone identifier in
-the URI (e.g., `%7` if 7 is the netif id), or by setting
-@ref unicoap_endpoint_t `.udp_ep.netif` if you are using
-@ref unicoap_destination_t::unicoap_destination_endpoint.
-
 ## DNS
 
 To be able to use the Domain Name System (DNS) to resolve names such as
