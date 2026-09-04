@@ -74,16 +74,16 @@ Place this static definition for the command at the top-level (outside any funct
 SHELL_COMMAND(unicoap, "unicoap sample client", _cli);
 ```
 
-```c
-static int _cli(int argc, char** argv) {}
-```
-
 The `unicoap` shell command and its arguments will be handled by a function called `_cli`, but
 you can choose any name you would like. `_cli` is very similar to the way `main()` handles
 command-line arguments: it accepts an `argc` function parameter (number of whitespace-separated
 command-line arguments) and an `argv` function parameter (pointer to an array of strings).
 For brevity, we will omit all the sanity checks on arguments, but you can look up the full
 implementation in `examples/networking/coap/unicoap_client`.
+
+```c
+static int _cli(int argc, char** argv) {}
+```
 
 ## Creating a custom command-line interface
 
