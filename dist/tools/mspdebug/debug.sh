@@ -9,7 +9,7 @@ DEBUG_TARGET_ID="$6"
 GDBPORT="$7"
 ELFFILE="$8"
 PREFIX="$9"
-RIOTBASE="$10"
+RIOTBASE="${10}"
 
 # The setsid command is needed so that Ctrl+C in GDB doesn't kill mspdebug
 : "${SETSID:=setsid}"
