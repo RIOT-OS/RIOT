@@ -455,7 +455,7 @@ typedef struct {
 typedef enum {
     PWM_LEFT = timerModeUp,           /**< use left aligned PWM */
     PWM_RIGHT = timerModeDown,        /**< use right aligned PWM */
-    PWM_CENTER = timerModeUp          /**< not supported, use left aligned */
+    PWM_CENTER = timerModeUpDown      /**< use center aligned PWM */
 } pwm_mode_t;
 /** @} */
 #endif /* ndef DOXYGEN */
