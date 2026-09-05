@@ -56,10 +56,10 @@ const char *thread_getname(kernel_pid_t pid)
 {
 #ifdef CONFIG_THREAD_NAMES
     thread_t *thread = thread_get(pid);
-    return thread ? thread->name : NULL;
+    return thread ? thread->name : "?";
 #else
     (void)pid;
-    return NULL;
+    return "?";
 #endif
 }
 
