@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2018       HAW Hamburg
- * Copyright (C) 2015–2017  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
- * Copyright (C) 2013–2014  INRIA.
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * SPDX-FileCopyrightText: 2018 HAW Hamburg
+ * SPDX-FileCopyrightText: 2015-2017 Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
+ * SPDX-FileCopyrightText: 2013–2014 INRIA
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
