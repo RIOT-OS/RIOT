@@ -3,10 +3,6 @@ BOARD ?= nucleo-f767zi
 include ../Makefile.pkg_common
 
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(3*THREAD_STACKSIZE_DEFAULT\)
-# Test fails to build for these boards fails due to
-# redefinition of define AES_COUNT in library, which
-# is also defined in board header files
-BOARDS_UNSUPPORTED := stk3200 stk3600 stk3700
 
 # Native boards are blacklisted due to a bug in cryptoauthlib's cmd-processor.c
 # The file checks for __linux__ before checking for RIOT_APPLICATION, causing it
