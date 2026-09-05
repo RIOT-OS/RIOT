@@ -281,7 +281,7 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
 #endif
 
 /**
- * @brief Default time to wait for a response.
+ * @brief Default time to wait for a multicast response.
  *
  * Setting the timeout to zero will disable it.
  *

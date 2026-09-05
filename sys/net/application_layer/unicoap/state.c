@@ -91,7 +91,7 @@ static unicoap_client_memo_t* _alloc_client(void) {
 
 static inline bool _is_multicast(unicoap_client_memo_t *memo)
 {
-    return memo->flags && UNICOAP_CLIENT_FLAG_MULTICAST > 0;
+    return (memo->flags & UNICOAP_CLIENT_FLAG_MULTICAST) != 0;
 }
 
 static inline bool _is_client(const unicoap_memo_t* memo) {

@@ -72,7 +72,7 @@ int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_mem
     /* TODO: Block-wise */
     res = unicoap_client_callback_success(memo, packet, UNICOAP_BLOCK_OPTION_NONE);
 
-    if ((memo->flags && UNICOAP_CLIENT_FLAG_MULTICAST) == 0 ) {
+    if ((memo->flags & UNICOAP_CLIENT_FLAG_MULTICAST) == 0 ) {
         unicoap_client_memo_free(memo);
     }
 
@@ -130,7 +130,7 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
     bool multicast = unicoap_endpoint_is_multicast(endpoint);
 
     if (multicast) {
-        if (flags && UNICOAP_CLIENT_FLAG_RELIABLE) {
+        if (flags & UNICOAP_CLIENT_FLAG_RELIABLE) {
             _CLIENT_DEBUG("error trying to send reliable datagram via multicast\n");
             return -EINVAL;
         }
