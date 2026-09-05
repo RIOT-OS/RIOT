@@ -1,90 +1,197 @@
 /*
- * Copyright (C) 2017 Fundacion Inria Chile
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2019 The OpenThread Authors
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 /**
- * @{
  * @ingroup     net
  * @file
- * @brief       Implementation of OpenThread settings platform abstraction
- *
- * @author      Jose Ignacio Alamos <jialamos@uc.cl>
- * @}
+ * @brief       Implementation of OpenThread radio platform abstraction
  */
 
-#include "openthread/error.h"
-#include "openthread/instance.h"
+#include <assert.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 
-#define ENABLE_DEBUG 0
-#include "debug.h"
+#include <openthread/instance.h>
+#include <openthread/platform/settings.h>
 
-void otPlatSettingsInit(otInstance *aInstance)
+#define SETTINGS_BUFFER_SIZE 1024
+
+static uint8_t sSettingsBuf[SETTINGS_BUFFER_SIZE];
+static uint16_t sSettingsBufLength;
+
+OT_TOOL_PACKED_BEGIN
+struct settingsBlock {
+    uint16_t key;
+    uint16_t length;
+} OT_TOOL_PACKED_END;
+
+// settings API
+void otPlatSettingsInit(otInstance *aInstance, const uint16_t *aSensitiveKeys,
+                        uint16_t aSensitiveKeysLength)
 {
-    (void)aInstance;
+    OT_UNUSED_VARIABLE(aInstance);
+    OT_UNUSED_VARIABLE(aSensitiveKeys);
+    OT_UNUSED_VARIABLE(aSensitiveKeysLength);
+
+    sSettingsBufLength = 0;
 }
 
-otError otPlatSettingsBeginChange(otInstance *aInstance)
+void otPlatSettingsDeinit(otInstance *aInstance)
 {
-    (void)aInstance;
-    return OT_ERROR_NONE;
+    OT_UNUSED_VARIABLE(aInstance);
 }
 
-otError otPlatSettingsCommitChange(otInstance *aInstance)
+otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex, uint8_t *aValue,
+                          uint16_t *aValueLength)
 {
-    DEBUG("openthread: otPlatSettingsCommitChange\n");
-    (void)aInstance;
-    return OT_ERROR_NONE;
+    OT_UNUSED_VARIABLE(aInstance);
+
+    uint16_t i = 0;
+    uint16_t valueLength = 0;
+    uint16_t readLength;
+    int currentIndex = 0;
+    const struct settingsBlock *currentBlock;
+    otError error = OT_ERROR_NOT_FOUND;
+
+    while (i < sSettingsBufLength) {
+        currentBlock = (struct settingsBlock *)&sSettingsBuf[i];
+
+        if (aKey == currentBlock->key) {
+            if (currentIndex == aIndex) {
+                readLength = currentBlock->length;
+
+                // Perform read only if an input buffer was passed in
+                if (aValue != NULL && aValueLength != NULL) {
+                    // Adjust read length if input buffer size is smaller
+                    if (readLength > *aValueLength) {
+                        readLength = *aValueLength;
+                    }
+
+                    memcpy(aValue, &sSettingsBuf[i + sizeof(struct settingsBlock)], readLength);
+                }
+
+                valueLength = currentBlock->length;
+                error = OT_ERROR_NONE;
+                break;
+            }
+
+            currentIndex++;
+        }
+
+        i += sizeof(struct settingsBlock) + currentBlock->length;
+    }
+
+    if (aValueLength != NULL) {
+        *aValueLength = valueLength;
+    }
+
+    return error;
 }
 
-otError otPlatSettingsAbandonChange(otInstance *aInstance)
+otError otPlatSettingsSet(otInstance *aInstance, uint16_t aKey, const uint8_t *aValue,
+                          uint16_t aValueLength)
 {
-    (void)aInstance;
-    return OT_ERROR_NONE;
+    uint16_t i = 0;
+    uint16_t currentBlockLength;
+    uint16_t nextBlockStart;
+    const struct settingsBlock *currentBlock;
+
+    // Delete all entries of aKey
+    while (i < sSettingsBufLength) {
+        currentBlock = (struct settingsBlock *)&sSettingsBuf[i];
+        currentBlockLength = sizeof(struct settingsBlock) + currentBlock->length;
+
+        if (aKey == currentBlock->key) {
+            nextBlockStart = i + currentBlockLength;
+
+            if (nextBlockStart < sSettingsBufLength) {
+                memmove(&sSettingsBuf[i], &sSettingsBuf[nextBlockStart],
+                        sSettingsBufLength - nextBlockStart);
+            }
+
+            assert(sSettingsBufLength >= currentBlockLength);
+            sSettingsBufLength -= currentBlockLength;
+        }
+        else {
+            i += currentBlockLength;
+        }
+    }
+
+    return otPlatSettingsAdd(aInstance, aKey, aValue, aValueLength);
 }
 
-otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex, uint8_t *aValue, uint16_t *aValueLength)
+otError otPlatSettingsAdd(otInstance *aInstance, uint16_t aKey, const uint8_t *aValue,
+                          uint16_t aValueLength)
 {
-    (void)aInstance;
-    (void)aKey;
-    (void)aIndex;
-    (void)aValue;
+    OT_UNUSED_VARIABLE(aInstance);
 
-    DEBUG("openthread: otPlatSettingsGet\n");
-    *aValueLength = 0;
-    return OT_ERROR_NOT_IMPLEMENTED;
-}
+    otError error;
+    struct settingsBlock *currentBlock;
+    const uint16_t newBlockLength = sizeof(struct settingsBlock) + aValueLength;
 
-otError otPlatSettingsSet(otInstance *aInstance, uint16_t aKey, const uint8_t *aValue, uint16_t aValueLength)
-{
-    (void)aInstance;
-    (void)aKey;
-    (void)aValue;
-    (void)aValueLength;
-    return OT_ERROR_NONE;
-}
+    if (sSettingsBufLength + newBlockLength <= sizeof(sSettingsBuf)) {
+        currentBlock = (struct settingsBlock *)&sSettingsBuf[sSettingsBufLength];
+        currentBlock->key = aKey;
+        currentBlock->length = aValueLength;
 
-otError otPlatSettingsAdd(otInstance *aInstance, uint16_t aKey, const uint8_t *aValue, uint16_t aValueLength)
-{
-    (void)aInstance;
-    (void)aKey;
-    (void)aValue;
-    (void)aValueLength;
-    return OT_ERROR_NONE;
+        memcpy(&sSettingsBuf[sSettingsBufLength + sizeof(struct settingsBlock)], aValue,
+               aValueLength);
+        sSettingsBufLength += newBlockLength;
+
+        error = OT_ERROR_NONE;
+    }
+    else {
+        error = OT_ERROR_NO_BUFS;
+    }
+
+    return error;
 }
 
 otError otPlatSettingsDelete(otInstance *aInstance, uint16_t aKey, int aIndex)
 {
-    (void)aInstance;
-    (void)aKey;
-    (void)aIndex;
-    return OT_ERROR_NONE;
+    OT_UNUSED_VARIABLE(aInstance);
+
+    uint16_t i = 0;
+    int currentIndex = 0;
+    uint16_t nextBlockStart;
+    uint16_t currentBlockLength;
+    const struct settingsBlock *currentBlock;
+    otError error = OT_ERROR_NOT_FOUND;
+
+    while (i < sSettingsBufLength) {
+        currentBlock = (struct settingsBlock *)&sSettingsBuf[i];
+        currentBlockLength = sizeof(struct settingsBlock) + currentBlock->length;
+
+        if (aKey == currentBlock->key) {
+            if (currentIndex == aIndex) {
+                nextBlockStart = i + currentBlockLength;
+
+                if (nextBlockStart < sSettingsBufLength) {
+                    memmove(&sSettingsBuf[i], &sSettingsBuf[nextBlockStart],
+                            sSettingsBufLength - nextBlockStart);
+                }
+
+                assert(sSettingsBufLength >= currentBlockLength);
+                sSettingsBufLength -= currentBlockLength;
+
+                error = OT_ERROR_NONE;
+                break;
+            }
+            else {
+                currentIndex++;
+            }
+        }
+        i += currentBlockLength;
+    }
+
+    return error;
 }
 
 void otPlatSettingsWipe(otInstance *aInstance)
 {
-    (void)aInstance;
+    otPlatSettingsInit(aInstance, NULL, 0);
 }
