@@ -149,6 +149,13 @@ static inline bool _use_dma(spi_t bus)
 #endif
 }
 
+#ifdef MODULE_PERIPH_DMA
+static void _unlock(void *ctx)
+{
+    mutex_unlock(ctx);
+}
+#endif
+
 static inline void _init_dma(spi_t bus, const volatile void *reg_rx, volatile void *reg_tx)
 {
     if (!_use_dma(bus)) {
@@ -160,9 +167,9 @@ static inline void _init_dma(spi_t bus, const volatile void *reg_rx, volatile vo
     _dma_state[bus].tx_dma = dma_acquire_channel();
 
     dma_setup(_dma_state[bus].tx_dma,
-              spi_config[bus].tx_trigger, 0, false);
+              spi_config[bus].tx_trigger, 0, NULL, NULL);
     dma_setup(_dma_state[bus].rx_dma,
-              spi_config[bus].rx_trigger, 1, true);
+              spi_config[bus].rx_trigger, 1, _unlock, NULL);
 
     dma_prepare(_dma_state[bus].rx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
                 (void*)reg_rx, NULL, 1, 0);
@@ -468,10 +475,14 @@ static void _dma_execute(spi_t bus)
 #if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_SPI_PM_BLOCK)
     pm_block(SAM0_SPI_PM_BLOCK);
 #endif
+
+    mutex_t lock = MUTEX_INIT_LOCKED;
+    dma_set_cb_arg(_dma_state[bus].rx_dma, &lock);
+
     dma_start(_dma_state[bus].rx_dma);
     dma_start(_dma_state[bus].tx_dma);
 
-    dma_wait(_dma_state[bus].rx_dma);
+    mutex_lock(&lock);
 #if IS_ACTIVE(MODULE_PM_LAYERED) && defined(SAM0_SPI_PM_BLOCK)
     pm_unblock(SAM0_SPI_PM_BLOCK);
 #endif
