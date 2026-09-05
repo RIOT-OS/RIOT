@@ -18,16 +18,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "shell.h"
-
 int main(void)
 {
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-
     puts("STM32 bootloader test application.");
 
-    /* bootloader command is provided by default */
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-
+    /* bootloader command is provided by default,
+     * and shell starts implicitly after returning */
     return 0;
 }
