@@ -76,10 +76,12 @@ static const uint8_t payload[] =
     "lacinia mi elementum interdum ligula.";
 
 static int print_addr(int argc, char **argv);
+static int print_submac_state(int argc, char **argv);
 static int txtsnd(int argc, char **argv);
 static const shell_command_t shell_commands[] = {
     { "print_addr", "Print IEEE802.15.4 addresses", print_addr },
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
+    { "print_state", "Print current submac state", print_submac_state },
     { NULL, NULL, NULL }
 };
 
@@ -190,6 +192,9 @@ static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
         break;
     case IEEE802154_DEV_TYPE_MRF24J40:
         printf("mrf24j40");
+        break;
+    case IEEE802154_DEV_TYPE_AT86RF215:
+        printf("at86rf215");
         break;
     case IEEE802154_DEV_TYPE_ESP_IEEE802154:
         printf("esp_ieee802154");
@@ -426,6 +431,23 @@ static int txtsnd(int argc, char **argv)
     }
     len = atoi(argv[2]);
     return send(addr, res, len);
+}
+
+static char *str_states[IEEE802154_FSM_STATE_NUMOF] = {
+    "INVALID",
+    "RX",
+    "IDLE",
+    "PREPARE",
+    "TX",
+    "WAIT_FOR_ACK",
+};
+
+static int print_submac_state(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+    printf("%s\n", str_states[submac.fsm_state]);
+    return 0;
 }
 
 static int _init(void)

@@ -52,26 +52,26 @@ void netdev_ieee802154_reset(netdev_ieee802154_t *dev)
 
 static inline uint16_t _get_ieee802154_pdu(netdev_ieee802154_t *dev)
 {
-#if defined(MODULE_NETDEV_IEEE802154_MR_OQPSK) || \
-    defined(MODULE_NETDEV_IEEE802154_MR_OFDM)  || \
-    defined(MODULE_NETDEV_IEEE802154_MR_FSK)
+#if defined(MODULE_IEEE802154_PHY_MR_OQPSK) || \
+    defined(MODULE_IEEE802154_PHY_MR_OFDM)  || \
+    defined(MODULE_IEEE802154_PHY_MR_FSK)
     uint8_t type = IEEE802154_PHY_DISABLED;
     dev->netdev.driver->get(&dev->netdev, NETOPT_IEEE802154_PHY, &type, sizeof(type));
 #else
     (void) dev;
 #endif
 
-#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+#ifdef MODULE_IEEE802154_PHY_MR_OQPSK
     if (type == IEEE802154_PHY_MR_OQPSK) {
         return IEEE802154G_FRAME_LEN_MAX;
     }
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
+#ifdef MODULE_IEEE802154_PHY_MR_OFDM
     if (type == IEEE802154_PHY_MR_OFDM) {
         return IEEE802154G_FRAME_LEN_MAX;
     }
 #endif
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
     if (type == IEEE802154_PHY_MR_FSK) {
         return IEEE802154G_FRAME_LEN_MAX;
     }

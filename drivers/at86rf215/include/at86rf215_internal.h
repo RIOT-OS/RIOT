@@ -28,7 +28,7 @@ extern "C" {
  * @brief Minimum reset pulse width (tRST) in µs
  */
 #ifndef CONFIG_AT86RF215_RESET_PULSE_WIDTH_US
-#define CONFIG_AT86RF215_RESET_PULSE_WIDTH_US  (16U)
+#  define CONFIG_AT86RF215_RESET_PULSE_WIDTH_US  (16U)
 #endif
 
 /**
@@ -110,7 +110,7 @@ void at86rf215_reg_read_bytes(const at86rf215_t *dev, uint16_t reg, void *data, 
  * @param[in] on    if true, only ACK frames are received
  *                  if false, only non-ACK frames are received
  */
-void at86rf215_filter_ack(at86rf215_t *dev, bool on);
+void at86rf215_filter_ack_only(at86rf215_t *dev, bool on);
 
 /**
  * @brief   Read random data from the RNG

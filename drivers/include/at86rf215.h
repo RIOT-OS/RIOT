@@ -23,12 +23,12 @@
 #include <stdbool.h>
 
 #include "board.h"
+#include "event.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "net/netdev.h"
-#include "net/netdev/ieee802154.h"
-#include "net/gnrc/nettype.h"
-#include "xtimer.h"
+#include "at86rf215_registers.h"
+#include "net/ieee802154.h"
+#include "net/ieee802154/radio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -78,7 +78,7 @@ enum {
  *          Otherwise it is turned off to save energy.
  */
 #ifdef DOXYGEN
-#define CONFIG_AT86RF215_USE_CLOCK_OUTPUT
+#  define CONFIG_AT86RF215_USE_CLOCK_OUTPUT
 #endif
 
 #if defined(DOXYGEN) && !defined(CONFIG_AT86RF215_TRIM_VAL)
@@ -94,28 +94,15 @@ enum {
  *          meter connected to the clock output pin of the AT86RF215.
  *          Tweak the value until the measured clock output matches 26 MHz the best.
  */
-#define CONFIG_AT86RF215_TRIM_VAL              (0)
+#  define CONFIG_AT86RF215_TRIM_VAL              (0)
 #endif
-
-/**
- * @name    Channel configuration
- * @{
- */
-#ifndef CONFIG_AT86RF215_DEFAULT_CHANNEL
-#define CONFIG_AT86RF215_DEFAULT_CHANNEL        (CONFIG_IEEE802154_DEFAULT_CHANNEL)
-#endif
-
-#ifndef CONFIG_AT86RF215_DEFAULT_SUBGHZ_CHANNEL
-#define CONFIG_AT86RF215_DEFAULT_SUBGHZ_CHANNEL (CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL)
-#endif
-/** @} */
 
 /**
  * @name    Enable Reduced Power Consumption
  * @{
  */
 #ifndef CONFIG_AT86RF215_RPC_EN
-#define CONFIG_AT86RF215_RPC_EN                 (0)
+#  define CONFIG_AT86RF215_RPC_EN                 (0)
 #endif
 /** @} */
 
@@ -125,24 +112,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_BATMON_THRESHOLD
-#define CONFIG_AT86RF215_BATMON_THRESHOLD       (1800)
-#endif
-/** @} */
-
-/**
- * @name    Default PHY Mode
- * @{
- */
-#if IS_ACTIVE(CONFIG_AT86RF215_DEFAULT_LEGACY_OQPSK)
-#define CONFIG_AT86RF215_DEFAULT_PHY_MODE   (IEEE802154_PHY_OQPSK)
-#elif IS_ACTIVE(CONFIG_AT86RF215_DEFAULT_MR_OQPSK)
-#define CONFIG_AT86RF215_DEFAULT_PHY_MODE   (IEEE802154_PHY_MR_OQPSK)
-#elif IS_ACTIVE(CONFIG_AT86RF215_DEFAULT_MR_OFDM)
-#define CONFIG_AT86RF215_DEFAULT_PHY_MODE   (IEEE802154_PHY_MR_OFDM)
-#endif
-
-#ifndef CONFIG_AT86RF215_DEFAULT_PHY_MODE
-#define CONFIG_AT86RF215_DEFAULT_PHY_MODE   (IEEE802154_PHY_OQPSK)
+#  define CONFIG_AT86RF215_BATMON_THRESHOLD       (1800)
 #endif
 /** @} */
 
@@ -152,7 +122,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_OQPSK_RATE
-#define CONFIG_AT86RF215_DEFAULT_OQPSK_RATE     (0)
+#  define CONFIG_AT86RF215_DEFAULT_OQPSK_RATE     (0)
 #endif
 /** @} */
 
@@ -161,17 +131,17 @@ enum {
  * @{
  */
 #if IS_ACTIVE(CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS_100)
-#define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_100)
+#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_100)
 #elif IS_ACTIVE(CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS_200)
-#define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_200)
+#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_200)
 #elif IS_ACTIVE(CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS_1000)
-#define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_1000)
+#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_1000)
 #elif IS_ACTIVE(CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS_2000)
-#define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_2000)
+#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_2000)
 #endif
 
 #ifndef CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS
-#define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_1000)
+#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_1000)
 #endif
 /** @} */
 
@@ -180,7 +150,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_MR_OQPSK_RATE
-#define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_RATE  (2)
+#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_RATE  (2)
 #endif
 /** @} */
 
@@ -189,7 +159,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_MR_OFDM_OPT
-#define CONFIG_AT86RF215_DEFAULT_MR_OFDM_OPT    (2)
+#  define CONFIG_AT86RF215_DEFAULT_MR_OFDM_OPT    (2)
 #endif
 /** @} */
 
@@ -198,7 +168,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_MR_OFDM_MCS
-#define CONFIG_AT86RF215_DEFAULT_MR_OFDM_MCS    (2)
+#  define CONFIG_AT86RF215_DEFAULT_MR_OFDM_MCS    (2)
 #endif
 /** @} */
 
@@ -207,7 +177,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_MR_FSK_SRATE
-#define CONFIG_AT86RF215_DEFAULT_MR_FSK_SRATE   FSK_SRATE_200K
+#  define CONFIG_AT86RF215_DEFAULT_MR_FSK_SRATE   FSK_SRATE_200K
 #endif
 /** @} */
 
@@ -216,7 +186,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_MR_FSK_MOD_IDX
-#define CONFIG_AT86RF215_DEFAULT_MR_FSK_MOD_IDX (64)
+#  define CONFIG_AT86RF215_DEFAULT_MR_FSK_MOD_IDX (64)
 #endif
 /** @} */
 
@@ -225,7 +195,7 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_MR_FSK_MORD
-#define CONFIG_AT86RF215_DEFAULT_MR_FSK_MORD    FSK_MORD_4SFK
+#  define CONFIG_AT86RF215_DEFAULT_MR_FSK_MORD    FSK_MORD_4SFK
 #endif
 /** @} */
 
@@ -234,16 +204,9 @@ enum {
  * @{
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_MR_FSK_FEC
-#define CONFIG_AT86RF215_DEFAULT_MR_FSK_FEC     IEEE802154_FEC_NONE
+#  define CONFIG_AT86RF215_DEFAULT_MR_FSK_FEC     IEEE802154_FEC_NONE
 #endif
 /** @} */
-
-/**
- * @brief   Default TX power (0dBm)
- */
-#ifndef CONFIG_AT86RF215_DEFAULT_TXPOWER
-#define CONFIG_AT86RF215_DEFAULT_TXPOWER       (CONFIG_IEEE802154_DEFAULT_TXPOWER)
-#endif
 
 /** @} */
 
@@ -252,21 +215,19 @@ enum {
  * @{
  */
 typedef enum {
-    AT86RF215_STATE_OFF,        /**< radio not configured */
-    AT86RF215_STATE_IDLE,       /**< idle state, listening */
-    AT86RF215_STATE_RX_SEND_ACK,/**< receiving frame, sending ACK */
-    AT86RF215_STATE_TX,         /**< sending frame */
-    AT86RF215_STATE_TX_WAIT_ACK,/**< sending frame, wait for ACK */
-    AT86RF215_STATE_SLEEP       /**< sleep mode, not listening */
+    AT86RF215_STATE_OFF,         /**< radio not configured */
+    AT86RF215_STATE_TRXOFF,      /**< idle state, low power consumption */
+    AT86RF215_STATE_IDLE,        /**< idle state waiting for upper layer */
+    AT86RF215_STATE_TX,          /**< sending frame */
+    AT86RF215_STATE_TX_WAIT_ACK, /**< sending frame, wait for ack */
+    AT86RF215_STATE_RX,          /**< listening for frame */
+    AT86RF215_STATE_RX_START,    /**< receiving frame */
+    AT86RF215_STATE_RX_SEND_ACK, /**< receiving frame, sending ACK */
+    AT86RF215_STATE_CCA_RX,      /**< performing CCA from RX */
+    AT86RF215_STATE_CCA_IDLE,    /**< performing CCA from IDLE */
+    AT86RF215_STATE_CCATX,       /**< performing CCA before TX */
 } at86rf215_state_t;
 /** @} */
-
-enum {
-    AT86RF215_MODE_LEGACY_OQPSK,
-    AT86RF215_MODE_MR_OQPSK,
-    AT86RF215_MODE_MR_OFDM,
-    AT86RF215_MODE_MR_FSK
-};
 
 /**
  * @name    Clock Output Driver Strength
@@ -297,27 +258,15 @@ typedef enum {
 /** @} */
 
 /**
- * @name    Internal device option flags
+ * @brief    Automatic Modes
  * @{
  */
-#define AT86RF215_OPT_CSMA           (0x0010)       /**< CSMA active */
-#define AT86RF215_OPT_PROMISCUOUS    (0x0020)       /**< promiscuous mode active */
-#define AT86RF215_OPT_PRELOADING     (0x0040)       /**< preloading enabled */
-#define AT86RF215_OPT_AUTOACK        (0x0080)       /**< Auto ACK active */
-#define AT86RF215_OPT_ACK_REQUESTED  (0x0100)       /**< ACK requested for current frame */
-#define AT86RF215_OPT_AGCH           (0x0200)       /**< AGC Hold active */
-#define AT86RF215_OPT_TX_PENDING     (0x0400)       /**< Frame is loaded into TX buffer */
-#define AT86RF215_OPT_CCA_PENDING    (0x0800)       /**< CCA needs to be done for the current frame */
-#define AT86RF215_OPT_RPC            (0x1000)       /**< Enable Reduced Power Consumption */
-#define AT86RF215_OPT_CCATX          (0x2000)       /**< TX after CCA performd automatically */
-/** @} */
-
-/**
- * @name    Internal timeout flags
- * @{
- */
-#define AT86RF215_TIMEOUT_ACK        (0x0001)       /**< ACK timeout */
-#define AT86RF215_TIMEOUT_CSMA       (0x0002)       /**< CMSA timeout */
+typedef enum {
+    AT86RF215_AM_BASIC    = 0,                  /**< Disable all auto modes */
+    AT86RF215_AM_AUTO_ACK = AMCS_AACK_MASK,     /**< Auto acks for received frames */
+    AT86RF215_AM_TX2RX    = AMCS_TX2RX_MASK,    /**< Auto switch to rx after frame transmission */
+    AT86RF215_AM_CCATX    = AMCS_CCATX_MASK,    /**< Auto cca before frame transmission */
+} at86rf215_auto_mode_t;
 /** @} */
 
 /**
@@ -337,49 +286,35 @@ typedef struct at86rf215_params {
  * @extends netdev_ieee802154_t
  */
 typedef struct at86rf215 {
-    netdev_ieee802154_t netdev;             /**< netdev parent struct */
     /* device specific fields */
     at86rf215_params_t params;              /**< parameters for initialization */
-    struct at86rf215 *sibling;              /**< The other radio */
+    ieee802154_dev_t *sibling;              /**< The other radio */
     const at86rf215_RF_regs_t  *RF;         /**< Radio Frontend Registers */
     const at86rf215_BBC_regs_t *BBC;        /**< Baseband Registers */
-    xtimer_t timer;                         /**< timer for ACK & CSMA timeout */
-    uint32_t ack_timeout_usec;              /**< time to wait before retransmission in µs */
-    uint32_t csma_backoff_period;           /**< CSMA Backoff period */
-    uint16_t flags;                         /**< Device specific flags */
     uint16_t num_chans;                     /**< Number of legal channel at current modulation */
-    uint16_t tx_frame_len;                  /**< length of the current TX frame */
-    uint8_t timeout;                        /**< indicates which timeout was reached */
-    uint8_t state;                          /**< current state of the radio */
-    uint8_t retries_max;                    /**< number of retries until ACK is received */
-    uint8_t retries;                        /**< retries left */
-    uint8_t csma_retries_max;               /**< number of retries until channel is clear */
-    uint8_t csma_retries;                   /**< CSMA retries left */
-#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+    bool rpc_enable;                        /**< Flag for reduced power consumption option */
+    uint16_t channel;                       /**< Current channel of the device */
+    at86rf215_state_t state;                /**< Current state of the radio */
+#ifdef MODULE_IEEE802154_PHY_MR_FSK
     uint8_t fsk_pl;                         /**< FSK Preamble Length */
 #endif
-    uint8_t csma_minbe;                     /**< CSMA minimum backoff exponent */
-    uint8_t csma_maxbe;                     /**< CSMA maximum backoff exponent */
-    int8_t  csma_ed;                        /**< CSMA energy detect threshold */
+    int8_t cca_thresh;                      /**< CCA energy detection threshold */
+    bool cca_busy;                          /**< Flag for cca status */
+    bool cca_tx;                            /**< Flag if the radio should perform cca before tx */
+    ieee802154_filter_mode_t filter_mode;   /**< Current filter mode of the device */
+    bool tx_ack_req;                        /**< Flag if an ACK was requested for the frame */
+    at86rf215_auto_mode_t auto_mode;        /**< Active automatic mode of the radio */
 } at86rf215_t;
 
 /**
- * @brief   Setup an AT86RF215 based device state
- *
- * @param[out] dev_09       sub-GHz device descriptor
- * @param[out] dev_24       2.4 GHz device descriptor
- * @param[in]  params       parameters for device initialization
- * @param[in]  index        index of @p params in a global parameter struct array.
- *                          If initialized manually, pass a unique identifier instead.
+ * @brief Event Bottom Half Processor descriptor for AT86RF215 transceiver.
  */
-void at86rf215_setup(at86rf215_t *dev_09, at86rf215_t *dev_24, const at86rf215_params_t *params, uint8_t index);
-
-/**
- * @brief   Trigger a hardware reset and configure radio with default values.
- *
- * @param[in,out] dev       device to configure
- */
-void at86rf215_reset_and_cfg(at86rf215_t *dev);
+typedef struct {
+    ieee802154_dev_t *hal_09;   /**< Pointer to the SubGHz Radio HAL descriptor */
+    ieee802154_dev_t *hal_24;   /**< Pointer to the 2.4GHz Radio HAL descriptor */
+    event_queue_t *evq;         /**< Pointer to the event queue */
+    event_t ev;                 /**< ISR offload event */
+} at86rf215_bhp_ev_t;
 
 /**
  * @brief   Trigger a hardware reset, configuration is retained.
@@ -537,15 +472,6 @@ void at86rf215_set_cca_threshold(at86rf215_t *dev, int8_t value);
 int8_t at86rf215_get_ed_level(at86rf215_t *dev);
 
 /**
- * @brief   Enable or disable driver specific options
- *
- * @param[in,out] dev       device to set/clear option flag for
- * @param[in] option        option to enable/disable
- * @param[in] state         true for enable, false for disable
- */
-void at86rf215_set_option(at86rf215_t *dev, uint16_t option, bool state);
-
-/**
  * @brief   Set crystal oscillator trim value.
  *
  *          An internal capacitance array is connected to the
@@ -582,59 +508,14 @@ void at86rf215_set_clock_output(at86rf215_t *dev,
                                 at86rf215_clko_cur_t cur, at86rf215_clko_freq_t freq);
 
 /**
- * @brief   Convenience function for simply sending data
- *
- * @note This function ignores the PRELOADING option
- *
- * @param[in,out] dev       device to use for sending
- * @param[in] data          data to send (must include IEEE802.15.4 header)
- * @param[in] len           length of @p data
- *
- * @return                  number of bytes that were actually send
- * @return                  or negative error code
- */
-ssize_t at86rf215_send(at86rf215_t *dev, const void *data, size_t len);
-
-/**
- * @brief   Prepare for sending of data
- *
- * This function puts the given device into the TX state, so no receiving of
- * data is possible after it was called.
- *
- * @param[in,out] dev       device to prepare for sending
- *
- * @return                  0 on success, error otherwise
- */
-int at86rf215_tx_prepare(at86rf215_t *dev);
-
-/**
- * @brief   Load chunks of data into the transmit buffer of the given device
- *
- * @param[in,out] dev       device to write data to
- * @param[in] data          buffer containing the data to load
- * @param[in] len           number of bytes in @p buffer
- * @param[in] offset        offset used when writing data to internal buffer
- *
- * @return                  offset + number of bytes written
- */
-size_t at86rf215_tx_load(at86rf215_t *dev, const uint8_t *data,
-                         size_t len, size_t offset);
-
-/**
  * @brief   Trigger sending of data previously loaded into transmit buffer
  *
  * @param[in] dev           device to trigger
  *
- * @return                  0 on success, error otherwise
+ * @retval                  0 on success
+ * @retval                  Negative error otherwise
  */
 int at86rf215_tx_exec(at86rf215_t *dev);
-
-/**
- * @brief   Abort sending of data previously loaded into transmit buffer
- *
- * @param[in] dev           device to abort TX on
- */
-void at86rf215_tx_abort(at86rf215_t *dev);
 
 /**
  * @brief   Signal that the transfer of the frame (and optional ACK reception)
@@ -645,25 +526,14 @@ void at86rf215_tx_abort(at86rf215_t *dev);
 void at86rf215_tx_done(at86rf215_t *dev);
 
 /**
- * @brief   Perform one manual channel clear assessment (CCA)
- *
- * The CCA mode and threshold level depends on the current transceiver settings.
- *
- * @param[in]  dev          device to use
- *
- * @return                  true if channel is determined clear
- * @return                  false if channel is determined busy
- */
-bool at86rf215_cca(at86rf215_t *dev);
-
-/**
  * @brief   Generate an interrupt if supply voltage drops below the configured
  *          threshold.
  *
  * @param[in] dev           device to configure
  * @param[in] voltage       Threshold voltage in mV
  *
- * @return                  0 on success, error otherwise
+ * @retval                  0 on success
+ * @retval                  Negative error otherwise
  */
 int at86rf215_enable_batmon(at86rf215_t *dev, unsigned voltage);
 
@@ -673,6 +543,64 @@ int at86rf215_enable_batmon(at86rf215_t *dev, unsigned voltage);
  * @param[in] dev           device to configure
  */
 void at86rf215_disable_batmon(at86rf215_t *dev);
+
+/**
+ * @brief   Enable or disable promiscuous mode
+ *
+ * @param[in,out] dev       Device descriptor
+ * @param[in]     enable    true for enable, false to disable it
+ */
+void at86rf215_set_promisc(at86rf215_t *dev, bool enable);
+
+/**
+ * @brief Configure the automatic mode of the radio
+ *
+ * Automatic modes are mutually exclusive. Enabling a mode automatically
+ * disables any previously enabled automatic mode. Disabling a mode
+ * return the transceiver to basic mode.
+ *
+ * @param[in,out] dev       Device descriptor
+ * @param[in]     mode      Automatic mode to use
+ * @param[in]     enable    true to enable the selected mode,
+ *                          false to disable it
+ */
+void at86rf215_set_auto_mode(at86rf215_t *dev, at86rf215_auto_mode_t mode, bool enable);
+
+/**
+ * @brief Init an AT86RF215 device with an event based Bottom Half Processor.
+ *
+ * @param[in,out] bhp   Pointer to the event BHP descriptor
+ * @param[in] hal_09    HAL descriptor for the SubGHz interface
+ * @param[in] hal_24    HAL descriptor for the 2.4GHz interface
+ * @param[in] evq       Pointer to the event queue
+ *
+ * @retval 0 on success
+ * @retval negative errno on failure
+ */
+int at86rf215_init_event(at86rf215_bhp_ev_t *bhp, ieee802154_dev_t *hal_09,
+                         ieee802154_dev_t *hal_24, event_queue_t *evq);
+
+/**
+ * @brief   Initialize the AT86RF215 transceiver.
+ *
+ * Sets up the device descriptors of both interfaces.
+ *
+ * @param[out] dev_09   Device descriptor of the SubGHz interface
+ * @param[out] dev_24   Device descriptor of the 2.4GHz interface
+ * @param[out] hal_09   HAL descriptor for the SubGHz interface
+ * @param[out] hal_24   HAL descriptor for the 2.4GHz interface
+ * @param[in]  params   Hardware configuration of the device
+ * @param[in]  ctx      Context passed to the interrupt handler
+ *
+ * @retval 0 on success
+ * @retval -ENOTSUP if the part number of the device is not supported
+ */
+int at86rf215_init(at86rf215_t *dev_09,
+                   at86rf215_t *dev_24,
+                   ieee802154_dev_t *hal_09,
+                   ieee802154_dev_t *hal_24,
+                   const at86rf215_params_t *params,
+                   void *ctx);
 
 #ifdef __cplusplus
 }

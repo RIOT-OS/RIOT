@@ -161,6 +161,17 @@ typedef enum {
      * set if the source address matches one from the table.
      */
     IEEE802154_CAP_SRC_ADDR_MATCH       = BIT19,
+    /**
+     * @brief the device supports auto RX after a transmission
+     *
+     * The device automatically goes to state RX after a transmission
+     * with ACK Req bit set.
+     */
+    IEEE802154_CAP_AUTO_TX2RX           = BIT20,
+    /**
+     * @brief The device records timestamps of received frames
+     */
+    IEEE802154_CAP_RX_TIMESTAMP         = BIT21,
 } ieee802154_rf_caps_t;
 
 /**
@@ -387,7 +398,10 @@ typedef struct {
      * The minimum and maximum values are 0 (-174 dBm) and 254 (80 dBm).
      */
     uint8_t rssi;
-    uint8_t lqi;    /**< LQI of the received frame */
+    uint8_t lqi;        /**< LQI of the received frame */
+#if IS_USED(MODULE_IEEEE802154_RX_TIMESTAMP)
+    uint64_t timestamp; /**< Timestamp value of a received frame in ns */
+#endif
 } ieee802154_rx_info_t;
 
 /**
