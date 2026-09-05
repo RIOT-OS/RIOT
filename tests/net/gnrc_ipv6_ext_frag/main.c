@@ -656,7 +656,7 @@ static int mock_send(netdev_t *dev, const iolist_t *iolist)
 {
     (void)dev;
     int res = 0;
-    while(iolist != NULL) {
+    while (iolist != NULL) {
         od_hex_dump(iolist->iol_base, iolist->iol_len,
                     OD_WIDTH_DEFAULT);
         res += iolist->iol_len;

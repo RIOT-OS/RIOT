@@ -35,28 +35,28 @@
 
 #define MAX_LINE    (80)
 
-ieee802154_submac_t submac;                                             /**< IEEE 802.15.4 SubMAC descriptor */
-mutex_t lock;                                                           /**< lock used to synchronize SubMAC operation */
-ztimer_t ack_timer;                                                     /**< required for the ACK timer */
-eui64_t long_addr;                                                      /**< SubMAC extended address */
-network_uint16_t short_addr;                                            /**< SubMAC short address */
+ieee802154_submac_t submac;                     /**< IEEE 802.15.4 SubMAC descriptor */
+mutex_t lock;                                   /**< lock used to synchronize SubMAC operation */
+ztimer_t ack_timer;                             /**< required for the ACK timer */
+eui64_t long_addr;                              /**< SubMAC extended address */
+network_uint16_t short_addr;                    /**< SubMAC short address */
 
-static void _ev_tx_done_handler(event_t *event);                        /**< TX Done event handler */
-static void _ev_rx_done_handler(event_t *event);                        /**< RX Done event handler */
-static void _ev_crc_error_handler(event_t *event);                      /**< CRC Error event handler */
-static void _ev_bh_request_handler(event_t *event);                     /**< BH Request event handler */
-static void _ev_ack_timeout_handler(event_t *event);                    /**< ACK Timeout event handler */
+static void _ev_tx_done_handler(event_t *event);        /**< TX Done event handler */
+static void _ev_rx_done_handler(event_t *event);        /**< RX Done event handler */
+static void _ev_crc_error_handler(event_t *event);      /**< CRC Error event handler */
+static void _ev_bh_request_handler(event_t *event);     /**< BH Request event handler */
+static void _ev_ack_timeout_handler(event_t *event);    /**< ACK Timeout event handler */
 static void _ev_set_rx_handler(event_t *event);                         /**< Set RX event handler */
 
 static event_t ev_tx_done = { .handler = _ev_tx_done_handler };         /**< TX Done descriptor */
 static event_t ev_rx_done = { .handler = _ev_rx_done_handler };         /**< RX Done descriptor */
 static event_t ev_crc_error = { .handler = _ev_crc_error_handler };     /**< CRC Error descriptor */
-static event_t ev_bh_request = { .handler = _ev_bh_request_handler };   /**< BH Request descriptor */
+static event_t ev_bh_request = { .handler = _ev_bh_request_handler }; /**< BH Request descriptor */
 static event_t ev_ack_timeout = { .handler = _ev_ack_timeout_handler }; /**< ACK TO descriptor */
 static event_t ev_set_rx = { .handler = _ev_set_rx_handler };           /**< Set RX descriptor */
 
-uint8_t buffer[IEEE802154_FRAME_LEN_MAX];                               /* buffer to store IEEE 802.15.4 frames */
-uint8_t seq;                                                            /* sequence number of IEEE 802.15.4 frame */
+uint8_t buffer[IEEE802154_FRAME_LEN_MAX];   /**< buffer to store IEEE 802.15.4 frames */
+uint8_t seq;                                /**< sequence number of IEEE 802.15.4 frame */
 
 struct _reg_container {
     int count;  /* device index */

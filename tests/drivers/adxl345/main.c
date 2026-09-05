@@ -40,7 +40,7 @@ int main(void)
         return -1;
     }
 
-   while(1) {
+   while (1) {
         adxl345_read(&dev, &data);
         printf("Acceleration [in mg]: X axis:%d Y axis:%d Z axis:%d\n",
                (int)data.x, (int)data.y, (int)data.z);

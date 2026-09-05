@@ -96,15 +96,13 @@ int main(void)
     frac_part = fabsf(modff(diff, &int_part));
     printf("     diff: %3d.%09d\n", (int) int_part, (int) (frac_part * 1.0e9f + 0.5f));
     /* Comparison of variance value with reference */
-    if(fabsf(diff) > DELTA) {
+    if (fabsf(diff) > DELTA) {
         status = ARM_MATH_TEST_FAILURE;
     }
-    if(status != ARM_MATH_SUCCESS) {
+    if (status != ARM_MATH_SUCCESS) {
         puts("Test failed");
-        while(1)
-            ;
+        while (1) {};
     }
     puts("Test done");
-    while(1)
-        ; /* main function does not return */
+    while (1) {}; /* main function does not return */
 }

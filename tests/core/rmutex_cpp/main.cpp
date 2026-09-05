@@ -43,8 +43,9 @@ static void lock_recursive(char n, char depth)
     printf("T%i (prio %i, depth %i): locked rmutex now\n",
            (int)t->pid, (int)t->priority, (int)n);
 
-    if (n + 1 < depth)
+    if (n + 1 < depth) {
         lock_recursive(n + 1, depth);
+    }
 
     thread_yield();
 

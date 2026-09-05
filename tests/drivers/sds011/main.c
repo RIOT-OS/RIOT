@@ -206,7 +206,7 @@ int main(void)
 
     /* wait a little bit so the callback gets executed a few times */
     msg_t msg;
-    for(unsigned msg_cnt = 0; msg_cnt < ACTIVE_REPORTING_TEST_CNT; msg_cnt++){
+    for (unsigned msg_cnt = 0; msg_cnt < ACTIVE_REPORTING_TEST_CNT; msg_cnt++) {
         msg_receive(&msg);
         sds011_data_t data;
         data.pm_10 = msg.content.value >> 16;

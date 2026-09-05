@@ -402,7 +402,7 @@ int main(void)
 #elif defined(MODULE_MTD_SDMMC)
     fatfs.dev = &mtd_sdmmc_dev0.base;
 #elif defined(MODULE_MTD_SDCARD)
-    for(unsigned int i = 0; i < SDCARD_SPI_NUM; i++){
+    for (unsigned int i = 0; i < SDCARD_SPI_NUM; i++) {
         mtd_sdcard_devs[i].base.driver = &mtd_sdcard_driver;
         mtd_sdcard_devs[i].sd_card = &sdcard_spi_devs[i];
         mtd_sdcard_devs[i].params = &sdcard_spi_params[i];

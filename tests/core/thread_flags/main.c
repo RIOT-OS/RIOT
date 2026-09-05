@@ -84,7 +84,7 @@ int main(void)
     _set(thread, 0x2);
     _set(thread, 0x4);
 
-    while(!done) {};
+    while (!done) {};
 
     puts("main: setting 100ms timeout...");
     xtimer_t t;

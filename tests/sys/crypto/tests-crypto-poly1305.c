@@ -213,7 +213,8 @@ static const uint8_t tag_11[] = {
     0x13, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-static void _test_poly1305(const uint8_t *key, const uint8_t *msg, size_t msglen, const uint8_t *tag)
+static void _test_poly1305(const uint8_t *key, const uint8_t *msg, size_t msglen,
+                           const uint8_t *tag)
 {
     uint8_t gen_tag[16];
 
