@@ -65,6 +65,14 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     init_channel.mode = timerCCModePWM;
 
+    if (mode == PWM_RIGHT) {
+        /* down counting sets the output at the start of the period and clears
+         * it on compare match, so the output has to be inverted to obtain a
+         * right aligned pulse with the requested duty cycle. */
+        init_channel.coist = true;
+        init_channel.outInvert = true;
+    }
+
     for (int i = 0; i < pwm_config[dev].channels; i++) {
         pwm_chan_conf_t channel = pwm_config[dev].channel[i];
 
