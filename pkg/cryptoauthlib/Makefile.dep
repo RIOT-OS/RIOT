@@ -16,10 +16,6 @@ ifneq (,$(filter cryptoauthlib_test,$(USEMODULE)))
   USEMODULE += cryptoauthlib_test_third_party_unity
 endif
 
-# Some EFM32 CPU families define AES_COUNT, which is also defined by this
-# library.
-FEATURES_BLACKLIST += arch_efm32
-
 ifneq (,$(filter psa_crypto,$(USEMODULE)))
   USEMODULE += psa_atca_driver
 endif

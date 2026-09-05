@@ -9,7 +9,6 @@ FEATURES_EXISTING := \
     arch_arm \
     arch_arm7 \
     arch_avr8 \
-    arch_efm32 \
     arch_esp \
     arch_esp32 \
     arch_esp32_xtensa \

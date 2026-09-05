@@ -2,5 +2,5 @@ FEATURES_REQUIRED += periph_gpio
 FEATURES_REQUIRED += periph_i2c
 USEMODULE += xtimer
 
-# efm32 CPU doesn't support PWM_RIGHT
-FEATURES_BLACKLIST += arch_efm32
+# efm32 CPU doesn't support PWM_LEFT
+FEATURES_BLACKLIST += cpu_efm32

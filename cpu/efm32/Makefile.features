@@ -11,7 +11,6 @@ ifeq (,$(filter efm32hg efm32tg11b efm32zg, $(CPU_FAM)))
   FEATURES_PROVIDED += cortexm_mpu
 endif
 
-FEATURES_PROVIDED += arch_efm32
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_in_address_space
