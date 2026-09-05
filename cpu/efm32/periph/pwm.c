@@ -37,9 +37,12 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     CMU_ClockEnable(cmuClock_HFPER, true);
     CMU_ClockEnable(pwm_config[dev].cmu, true);
 
+    /* in up/down counting mode a full period takes twice the number of ticks */
+    uint32_t ticks = (mode == PWM_CENTER) ? ((uint32_t)res * 2) : res;
+
     /* calculate the prescaler by determining the best prescaler */
     uint32_t freq_timer = CMU_ClockFreqGet(pwm_config[dev].cmu);
-    TIMER_Prescale_TypeDef prescaler = TIMER_PrescalerCalc(freq * res,
+    TIMER_Prescale_TypeDef prescaler = TIMER_PrescalerCalc(freq * ticks,
                                                            freq_timer);
 
     if (prescaler > timerPrescale1024) {
@@ -84,7 +87,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     /* enable peripheral */
     TIMER_Enable(pwm_config[dev].dev, true);
 
-    return freq_timer / TIMER_Prescaler2Div(prescaler) / res;
+    return freq_timer / TIMER_Prescaler2Div(prescaler) / ticks;
 }
 
 uint8_t pwm_channels(pwm_t dev)
