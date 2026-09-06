@@ -1,4 +1,4 @@
-MODULE ?= $(shell basename $(CURDIR))
+MODULE ?= $(notdir $(CURDIR))
 TOUCH_DEV_INTERFACE ?= $(MODULE)_touch_dev.c
 
 # by default include all .c files except <module>_touch_dev.c
