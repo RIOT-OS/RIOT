@@ -11,7 +11,6 @@
  * @brief       __FILE__ test application
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
- *
  * @}
  */
 
@@ -20,7 +19,6 @@
 int main(void)
 {
     printf("__FILE__: %s\n", __FILE__);
-
     puts("[SUCCESS]");
 
     return 0;
