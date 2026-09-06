@@ -3,7 +3,7 @@ include $(RIOTCPU)/avr8_common/Makefile.features
 # common feature are defined in avr8_common/Makefile.features
 # Only add Additional features
 
-ifneq (,$(findstring a1,$(shell echo $(CPU_MODEL) | cut -c8-)))
+ifneq (,$(findstring a1,$(call chars_from,8,$(CPU_MODEL))))
   FEATURES_PROVIDED += atxmega_ebi
 endif
 

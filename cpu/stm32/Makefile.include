@@ -9,19 +9,19 @@ include $(RIOTCPU)/stm32/stm32_riotboot.mk
 # Compute ROM_LEN and RAM_LEN
 include $(RIOTCPU)/stm32/stm32_mem_lengths.mk
 KB := 1024
-ROM_LEN_K := $(shell echo $(ROM_LEN) | sed 's/K//')
-RAM_LEN_K := $(shell echo $(RAM_LEN) | sed 's/K//')
+ROM_LEN_K := $(subst K,,$(ROM_LEN))
+RAM_LEN_K := $(subst K,,$(RAM_LEN))
 
 ifneq (,$(filter w%,$(CPU_FAM)))
   ifneq (,$(CPU2_RAM_LEN))
     # adjust RAM_LEN and ROM_LEN according to CPU2 RAM_LEN and ROM_LEN
-    CPU2_RAM_LEN_K := $(shell echo $(CPU2_RAM_LEN) | sed 's/K//')
+    CPU2_RAM_LEN_K := $(subst K,,$(CPU2_RAM_LEN))
     RAM_LEN := $(shell echo $$(( ($(RAM_LEN_K) - $(CPU2_RAM_LEN_K) ) * $(KB) )))
   else
     RAM_LEN := $(shell echo $$(( $(RAM_LEN_K) * $(KB) )) )
   endif
   ifneq (,$(CPU2_ROM_LEN))
-    CPU2_ROM_LEN_K := $(shell echo $(CPU2_ROM_LEN) | sed 's/K//')
+    CPU2_ROM_LEN_K := $(subst K,,$(CPU2_ROM_LEN))
     FLASHSIZE := $(shell echo $$(( ($(ROM_LEN_K) - $(CPU2_ROM_LEN_K) )* $(KB) )) )
     ROM_LEN := $(shell echo $$(( ($(ROM_LEN_K) - $(CPU2_ROM_LEN_K) ) ))K)
   else
@@ -34,7 +34,7 @@ endif
 
 # Get CPU_LINE_ variable
 include $(RIOTCPU)/stm32/stm32_line.mk
-CPU_LINE ?= $(shell echo $(CPU_MODEL) | cut -c -9 | tr 'a-z-' 'A-Z_')xx
+CPU_LINE ?= $(call uppercase_and_underscore,$(call first_chars,9,$(CPU_MODEL)))xx
 
 ifeq ($(CONFIG_RDP0),y)
   CFLAGS += -DCONFIG_STM32_RDP=0
