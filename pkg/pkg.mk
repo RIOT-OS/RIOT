@@ -10,6 +10,8 @@
 RIOTMAKE ?= $(RIOTBASE)/makefiles
 
 include $(RIOTMAKE)/utils/ansi.mk
+include $(RIOTMAKE)/utils/variables.mk
+include $(RIOTMAKE)/utils/strings.mk
 include $(RIOTMAKE)/color.inc.mk
 
 ifneq (,$(.DEFAULT_GOAL))
@@ -68,7 +70,7 @@ ifeq ("environment", "$(origin PKG_SOURCE_LOCAL)")
 	 PKG_SOURCE_LOCAL_$(PKG_NAME) instead!$(COLOR_RESET))
 endif
 
-PKG_SOURCE_LOCAL ?= $(PKG_SOURCE_LOCAL_$(shell echo $(PKG_NAME) | tr a-z- A-Z_))
+PKG_SOURCE_LOCAL ?= $(PKG_SOURCE_LOCAL_$(call uppercase_and_underscore,$(PKG_NAME)))
 
 ifneq (,$(PKG_SOURCE_LOCAL))
   $(info $(COLOR_YELLOW)Warning: PKG_SOURCE_LOCAL in use! Remember to remove it\
@@ -227,7 +229,6 @@ ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-documentation
 endif
 
-include $(RIOTBASE)/makefiles/utils/strings.mk
 # Disabling -Wunterminated-string-initialization on toolchains that support this
 # warning
 ifeq (1,$(call version_is_greater_or_equal,$(GCC_VERSION),15))
