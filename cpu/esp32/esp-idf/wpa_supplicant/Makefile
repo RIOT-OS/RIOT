@@ -1,6 +1,6 @@
 MODULE = esp_idf_wpa_supplicant
 
-export ESP_IDF_WPA_SUPPLICANT_PATH = $(shell pwd)
+export ESP_IDF_WPA_SUPPLICANT_PATH = $(CURDIR)
 
 DIRS += esp_supplicant
 DIRS += port
