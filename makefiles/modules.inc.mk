@@ -14,6 +14,9 @@ REALMODULES += $(filter $(NO_PSEUDOMODULES), $(_ALLMODULES))
 BASELIBS += $(REALMODULES:%=%.module)
 
 # Add modules compiled with Makefile.base and extra archives
-GENERATED_MODULES = $(notdir $(shell find $(BINDIR) -type d)) $(basename $(notdir $(ARCHIVES)))
+# The 'find' has to run after the modules have been built, so it cannot be
+# evaluated immediately. Memoizing it keeps every user of this variable from
+# running 'find' again.
+GENERATED_MODULES = $(call memoized,GENERATED_MODULES,$(notdir $(shell find $(BINDIR) -type d)) $(basename $(notdir $(ARCHIVES))))
 
 NON_GENERATED_MODULES = $(filter-out $(GENERATED_MODULES),$(REALMODULES))
