@@ -45,7 +45,7 @@ static void auto_init_mrf24j40(void)
 
 
         netdev_register(&mrf24j40_netdev[i].dev.netdev, NETDEV_MRF24J40, i);
-        netdev_ieee802154_submac_init(&mrf24j40_netdev[i]);
+        netdev_ieee802154_submac_init(&mrf24j40_netdev[i], NULL);
 
         if (lwip_add_6lowpan(&netif[i], &mrf24j40_netdev[i].dev.netdev) == NULL) {
             DEBUG("Could not add mrf24j40 device\n");

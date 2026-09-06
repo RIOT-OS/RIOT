@@ -50,7 +50,7 @@ void auto_init_esp_ieee802154(void)
     esp_ieee802154_init();
 
     netdev_register(&esp_ieee802154_netdev.dev.netdev, NETDEV_ESP_IEEE802154, 0);
-    netdev_ieee802154_submac_init(&esp_ieee802154_netdev);
+    netdev_ieee802154_submac_init(&esp_ieee802154_netdev, NULL);
 
     esp_ieee802154_setup(&esp_ieee802154_netdev.submac.dev);
 
