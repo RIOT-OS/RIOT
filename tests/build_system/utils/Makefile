@@ -16,15 +16,18 @@ endef
 
 MAKEFILES_UTILS = $(RIOTMAKE)/utils
 
+COMPILE_TESTS += test-chars_from
 COMPILE_TESTS += test-ensure_value test-ensure_value-negative
 COMPILE_TESTS += test-exported-variables
-COMPILE_TESTS += test-memoized-variables
+COMPILE_TESTS += test-first_chars
 COMPILE_TESTS += test-lowercase
+COMPILE_TESTS += test-max_number
+COMPILE_TESTS += test-memoized-variables
+COMPILE_TESTS += test-split_chars
 COMPILE_TESTS += test-uppercase
 COMPILE_TESTS += test-uppercase_and_underscore
 COMPILE_TESTS += test-version_is_greater
 COMPILE_TESTS += test-version_is_greater_or_equal
-COMPILE_TESTS += test-max_number
 
 # Tests will be run both in the host machine and in `docker`
 all: build-system-utils-tests
@@ -54,6 +57,15 @@ test-uppercase:
 
 test-uppercase_and_underscore:
 	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-uppercase_and_underscore)
+
+test-split_chars:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-split_chars)
+
+test-first_chars:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-first_chars)
+
+test-chars_from:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-chars_from)
 
 test-version_is_greater:
 	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-version_is_greater)
