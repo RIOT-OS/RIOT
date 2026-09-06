@@ -99,7 +99,7 @@ LINKFLAGS += -ffunction-sections
 
 
 ASFLAGS =
-ifeq ($(shell basename $(DEBUGGER)),lldb)
+ifeq ($(notdir $(DEBUGGER)),lldb)
   DEBUGGER_FLAGS = -- $(ELFFILE) $(TERMFLAGS)
 else
   DEBUGGER_FLAGS = -q --args $(ELFFILE) $(TERMFLAGS)
