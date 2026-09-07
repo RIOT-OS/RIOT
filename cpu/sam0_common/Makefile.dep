@@ -1,3 +1,8 @@
+ifneq (,$(filter periph_dac_play,$(USEMODULE)))
+  USEMODULE += periph_dma
+  FEATURES_REQUIRED += periph_dac
+endif
+
 ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
   USEMODULE += tsrb
 endif
