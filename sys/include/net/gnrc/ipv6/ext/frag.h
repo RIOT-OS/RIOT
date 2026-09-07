@@ -150,11 +150,11 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_frag_reass(gnrc_pktsnip_t *pkt);
  * @internal
  * @see     [RFC 8200, section 4.5](https://tools.ietf.org/html/rfc8200#section-4.5)
  *
- * @param[in] hdr   IPv6 header to get source and destination address from.
+ * @param[in] ipv6  IPv6 header to get source and destination address from.
  * @param[in] id    The identification from the fragment header.
  *
  * @return  A reassembly buffer matching @p id ipv6_hdr_t::src and ipv6_hdr::dst
- *          of @p hdr or first free reassembly buffer. Will never be NULL, as
+ *          of @p ipv6 or first free reassembly buffer. Will never be NULL, as
  *          in the case of the reassembly buffer being full, the entry with the
  *          lowest gnrc_ipv6_ext_frag_rbuf_t::arrival (serial-number-like) is
  *          removed.
