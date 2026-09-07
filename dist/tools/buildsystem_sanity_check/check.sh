@@ -390,10 +390,19 @@ check_pinned_docker_version_is_up_to_date() {
     fi
     local pinned_repo_digest
     local upstream_repo_digest
+    local -a version_args=()
+
+    # Check if a VERSION file exists (and we therefore are on a Release branch).
+    # If we are, use the version tag instead of "latest" to compare to the
+    # hash stored in $RIOTMAKE/docker.inc.mk.
+    if [ -f "${RIOTBASE}/VERSION" ]; then
+        version_args=("$(awk -F' *= *' '/^RIOT_VERSION/ { print $2; exit }' "${RIOTBASE}/VERSION")")
+    fi
+
     pinned_repo_digest="$(awk '/^DOCKER_TESTED_IMAGE_REPO_DIGEST := (.*)$/ { print substr($0, index($0, $3)); exit }' "$RIOTMAKE/docker.inc.mk")"
     # not using docker and jq here but a python script to not have to install
     # more stuff for the static test docker image
-    IFS=' ' read -r upstream_repo_digest <<< "$("$RIOTTOOLS/buildsystem_sanity_check/get_dockerhub_digests.py" "riot/riotbuild")"
+    IFS=' ' read -r upstream_repo_digest <<< "$("$RIOTTOOLS/buildsystem_sanity_check/get_dockerhub_digests.py" "riot/riotbuild" "${version_args[@]}")"
 
     if [ "$pinned_repo_digest" != "$upstream_repo_digest" ]; then
         git -C "${RIOTBASE}" grep -n '^DOCKER_TESTED_IMAGE_REPO_DIGEST :=' "$RIOTMAKE/docker.inc.mk" \

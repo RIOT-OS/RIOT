@@ -84,8 +84,11 @@ def get_upstream_digests(repo, tag="latest", token=None):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
+    if (len(sys.argv) == 2):
+        _, repo_digest = get_upstream_digests(sys.argv[1])
+    elif (len(sys.argv) == 3):
+        _, repo_digest = get_upstream_digests(sys.argv[1], sys.argv[2])
+    else:
         sys.exit(f"Usage {sys.argv[0]} <REPO_NAME>")
 
-    _, repo_digest = get_upstream_digests(sys.argv[1])
     print(f"{repo_digest}")
