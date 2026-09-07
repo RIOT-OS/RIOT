@@ -1,10 +1,8 @@
 /*
- * Copyright (C) 2024 HAW Hamburg
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2024 HAW Hamburg
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
+
 /**
  * @{
  * @ingroup     lwm2m_objects_light_control
@@ -352,7 +350,6 @@ static void _mark_resource_changed(uint16_t instance_id, uint16_t resource_id)
     client_data = (lwm2m_client_data_t *)_light_control_object.wakaama_object.userData;
     lwm2m_resource_value_changed(client_data->lwm2m_ctx, &uri);
 }
-
 
 lwm2m_object_t *lwm2m_object_light_control_init(lwm2m_client_data_t *client_data)
 {

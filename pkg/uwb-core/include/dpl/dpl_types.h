@@ -107,9 +107,11 @@ typedef double dpl_float64_t;
 #define DPL_FLOAT32_DIV(__X, __Y) ((__X)/(__Y))
 #define DPL_FLOAT64_DIV(__X, __Y) ((__X)/(__Y))
 #define DPL_FLOAT32_PRINTF_PRIM "%s%d.%03d"
-#define DPL_FLOAT32_PRINTF_VALS(__X) (__X)<0?"-":"", (int)(fabsf(__X)), (int)(fabsf((__X)-(int)(__X))*1000)
+#define DPL_FLOAT32_PRINTF_VALS(__X) (__X)<0?"-":"", (int)(fabsf(__X)), (int)(fabsf((__X)\
+                                                                        -(int)(__X))*1000)
 #define DPL_FLOAT64_PRINTF_PRIM "%s%d.%06d"
-#define DPL_FLOAT64_PRINTF_VALS(__X) (__X)<0?"-":"", (int)(fabs(__X)), (int)(fabs((__X)-(int)(__X))*1000000)
+#define DPL_FLOAT64_PRINTF_VALS(__X) (__X)<0?"-":"", (int)(fabs(__X)), (int)(fabs((__X)\
+                                                                       -(int)(__X))*1000000)
 /** @} */
 
 #ifdef __cplusplus

@@ -221,7 +221,7 @@ psa_status_t SaSi_to_psa_error(SaSiStatus error)
 
 const char *cryptocell310_status_to_humanly_readable(uint32_t status)
 {
-    switch(status) {
+    switch (status) {
         case CRYS_ECDH_SVDP_DH_NOT_CONCENT_PUBL_AND_PRIV_DOMAIN_ID_ERROR:
             return "CRYS_ECDH_SVDP_DH_NOT_CONCENT_PUBL_AND_PRIV_DOMAIN_ID_ERROR";
         case CRYS_ECDSA_SIGN_INVALID_IS_EPHEMER_KEY_INTERNAL_ERROR:

@@ -56,7 +56,7 @@
      (CONFIG_TUSBD_HID_NUMOF > 2) || \
      (CONFIG_TUSBD_MSC_NUMOF > 1) || \
      (CONFIG_TUSBD_VENDOR_NUMOF > 1))
-#error Using generic descriptors is not possible for the selected combination \
+#error Using generic descriptors is not possible in the selected combination \
        of device class interfaces. Custom descriptors have to be implemented.
 #endif
 
