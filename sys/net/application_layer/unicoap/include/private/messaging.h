@@ -146,6 +146,7 @@ typedef enum {
 typedef union {
     /** @brief Resource */
     const unicoap_resource_t* resource;
+    /** @brief Client memo */
     unicoap_client_memo_t* client;
 } unicoap_exchange_arg_t;
 
@@ -252,14 +253,14 @@ int unicoap_exchange_process(unicoap_packet_t* packet, unicoap_exchange_arg_t ar
 typedef enum {
     /**
      * @brief 'Received' event
-     * 
+     *
      * The attached packet contains a message that has been received.
      */
     UNICOAP_MESSAGING_RFC7252_EVENT_RX = 1,
 
     /**
      * @brief 'Truncated' event
-     * 
+     *
      * The attached packet contains a message that has been truncated.
      * This event will always occur in conjunction with @ref UNICOAP_MESSAGING_RFC7252_EVENT_RX.
      */
@@ -267,7 +268,7 @@ typedef enum {
 
     /**
      * @brief 'Session established' event
-     * 
+     *
      * A DTLS session with the remote endpoint has been establishment.
      * The messaging layer may resume sending any delayed transmissions now.
      */
@@ -278,8 +279,7 @@ typedef enum {
  * @brief Internal RFC 7252 messaging inbound processor
  * @param[in] pdu Buffer containing PDU
  * @param size Size of PDU in bytes
- * @param truncated A boolean value indicating whether the message has been truncated by the
- *                  transport layer
+ * @param event Event the messaging layer must process
  * @param[in] packet Packet to process
  *
  * @returns Negative error number in case of a failure, zero otherwise.
@@ -290,7 +290,7 @@ typedef enum {
  * @remark While it is not advised to call private API, you might want to consider calling this
  * function in a very constrained environment or when using `sock` is not an option.
  */
-int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, 
+int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size,
     unicoap_messaging_rfc7252_event_type_t event,  unicoap_packet_t* packet);
 
 /* MARK: unicoap_driver_extension_point */
@@ -306,7 +306,7 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size,
  *
  * @param[in,out] packet Packet to send
  * @param flags Messaging flags
- * @param[in,out] exchange Exchange-layer state object associated with this attempted 
+ * @param[in,out] exchange Exchange-layer state object associated with this attempted
  *.                        messaging-layer transmission
  * @returns Zero on success or negative error value. See @ref unicoap_messaging_send_rfc7252.
  */
@@ -340,15 +340,15 @@ _messaging_flags_resource(unicoap_resource_flags_t resource_flags)
 }
 
 /**
- * @brief Retrieves the part of a client flags bitfield relevant for the messaging driver.
+ * @brief Retrieves the part of a request flags bitfield relevant for the messaging driver.
  *
- * @param client_flags Client flags
+ * @param request_flags Request flags
  * @return Messaging flags extracted from the given bitfield
  */
-static inline unicoap_messaging_flags_t _messaging_flags_client(unicoap_request_flags_t client_flags) {
+static inline unicoap_messaging_flags_t _messaging_flags_client(unicoap_request_flags_t request_flags) {
     /* We documented other flags are RFU, hence downcasting to the messaging
      flags bitfield width is fine here */
-    return (unicoap_messaging_flags_t)client_flags;
+    return (unicoap_messaging_flags_t)request_flags;
 }
 /** @}  */
 
@@ -392,7 +392,6 @@ int unicoap_server_send_response_body(unicoap_packet_t* packet,
  *
  * @param[in,out] packet Packet that will be processed by the client
  * @param[in,out] memo Mandatory pointer to memo variable, memo itself can be `NULL`
- * @param[in] arg Resource
  *
  * @return `0` on success
  * @returns Negative errno on failure
@@ -404,12 +403,12 @@ int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_mem
  *
  * @param packet Packet to send
  * @param memo Optional memo
- * @param client_flags Request flags
+ * @param request_flags Request flags
  *
  * @returns Zero on success or negative integer on error
  */
 int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_memo_t* memo,
-                                     unicoap_request_flags_t client_flags);
+                                     unicoap_request_flags_t request_flags);
 
 /**
  * @brief Sends entire request body, may be split into parts and then sent
@@ -419,13 +418,12 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
  * @param callback Optional application callback
  * @param parameters Optional parameters (nullable)
  * @param flags Request flags
- * @param profile Optional profile, such as OSCORE security context
  *
  * @returns Zero on success, negative integer otherwise
  */
 int unicoap_client_send_request_body(unicoap_message_t* request,
                                      unicoap_endpoint_t* endpoint,
-                                     unicoap_callback_t callback, 
+                                     unicoap_callback_t callback,
                                      unicoap_request_parameters_t* parameters,
                                      unicoap_request_flags_t flags);
 /** @} */

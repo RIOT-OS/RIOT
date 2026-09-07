@@ -298,11 +298,16 @@ static _transmission_t* _transmission_find(const unicoap_endpoint_t* endpoint, u
     return NULL;
 }
 
-static inline void _transmission_free(_transmission_t* transmission)
+static int _disconnect(_transmission_t* transmission);
+
+static inline void _transmission_free(_transmission_t* transmission, bool failure)
 {
     MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "transmission ended\n", transmission->id);
     if (transmission->pdu) {
         _carbon_copy_free(transmission->pdu);
+    }
+    if (failure) {
+        _disconnect(transmission);
     }
     unicoap_event_cancel(&transmission->ack_timeout);
     memset(transmission, 0, sizeof(_transmission_t));
@@ -310,10 +315,13 @@ static inline void _transmission_free(_transmission_t* transmission)
      * session establishments. */
 }
 
-static inline void _transmission_free_notif(_transmission_t* transmission, unicoap_layer_notification_t type)
-{
+static inline void _transmission_free_notif(
+    _transmission_t* transmission, 
+    unicoap_layer_notification_t type,
+    bool failure
+) {
     void* exchange = transmission->exchange;
-    _transmission_free(transmission);
+    _transmission_free(transmission, failure);
     if (exchange) {
         unicoap_exchange_notify(exchange, type, NULL);
     }
@@ -323,18 +331,19 @@ void unicoap_messaging_notify_rfc7252(void* state, unicoap_layer_notification_t 
     _transmission_t* transmission = (_transmission_t*)state;
     if ((type & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE)
         || (type == UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE)) {
-        MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "exchange layer released state\n",
-                             transmission->id);
+        MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "exchange layer released state (type %i)\n",
+                             transmission->id, type);
         transmission->exchange = NULL;
         /* TODO: Advanced features: cannot _always_ release transmission if exchange layer releases. */
         /* For example, if we never see an ACK for a CON request,
          * but then get response (CON or NON), the exchange layer will handle the response and
          * thereby cancel any retransmissions of the request because we release state here once
          * the exchange layer does. */
-        _transmission_free_notif(transmission, UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE);
+        _transmission_free_notif(transmission, UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE, 
+            type & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE);
     } else if (type == UNICOAP_LAYER_NOTIFICATION_STATE_ALLOC) {
-        MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "exchange layer allocated state\n",
-                             transmission->id);
+        MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT "exchange layer alloc'd state (type %i)\n",
+                             transmission->id, type);
         transmission->exchange = arg;
     }
 }
@@ -388,6 +397,17 @@ static int _sendv(iolist_t* list, const unicoap_endpoint_t* remote, const unicoa
     }
 }
 
+static int _disconnect(_transmission_t* transmission) {
+    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS)) {
+        extern int unicoap_transport_disconnect_dtls(sock_dtls_session_t* session);
+        unicoap_sock_dtls_session_t* session = _transmission_get_session(transmission);
+        if (session) {
+            return unicoap_transport_disconnect_dtls(session);
+        }
+    }
+    return 0;
+}
+
 static int _connect(unicoap_packet_t* packet, _transmission_t** transmission) {
     if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS) && unicoap_packet_proto(packet) == UNICOAP_PROTO_DTLS) {
         int res = 0;
@@ -402,7 +422,7 @@ static int _connect(unicoap_packet_t* packet, _transmission_t** transmission) {
             return -ENOBUFS;
         }
         if ((res = unicoap_transport_connect_dtls(
-            unicoap_endpoint_get_dtls((unicoap_endpoint_t*)packet->remote), 
+            unicoap_endpoint_get_dtls((unicoap_endpoint_t*)packet->remote),
             _transmission_get_session(*transmission)
         )) < 0) {
             if (res == -EEXIST) {
@@ -414,7 +434,7 @@ static int _connect(unicoap_packet_t* packet, _transmission_t** transmission) {
         }
         (*transmission)->delayed = true;
         /* Session does not already exist, so we have to delay it. */
-        MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT 
+        MESSAGING_7252_DEBUG(UNICOAP_MESSAGE_ID_FORMAT
                                 "delaying until connected\n", _get_id(packet));
         if (!(*transmission)->pdu) {
             uint8_t* carbon_copy = NULL;
@@ -428,7 +448,7 @@ static int _connect(unicoap_packet_t* packet, _transmission_t** transmission) {
 }
 
 static ssize_t _build_and_send_pdu(
-    unicoap_packet_t* packet, 
+    unicoap_packet_t* packet,
     _transmission_t** transmission
 ) {
     assert(packet);
@@ -452,7 +472,7 @@ static ssize_t _build_and_send_pdu(
      * the iolists anyway. If we wanted to avoid this, we would need to dynamically allocate memory.
      */
 
-    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS) 
+    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
         && transmission
         && unicoap_packet_proto(packet) == UNICOAP_PROTO_DTLS) {
         if ((res = _connect(packet, transmission)) < 0) {
@@ -460,7 +480,7 @@ static ssize_t _build_and_send_pdu(
         }
     }
 
-    uint8_t* carbon_copy = transmission ? (*transmission)->pdu : NULL;
+    uint8_t* carbon_copy = transmission && *transmission ? (*transmission)->pdu : NULL;
     if (carbon_copy) {
         if ((size = unicoap_pdu_build_rfc7252(carbon_copy, sizeof(_state.carbon_copies[0]),
                                               packet->message, &packet->properties)) < 0) {
@@ -479,7 +499,7 @@ static ssize_t _build_and_send_pdu(
         }
     }
 
-    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS) 
+    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
         && transmission
         && unicoap_packet_proto(packet) == UNICOAP_PROTO_DTLS) {
         if (*transmission && (*transmission)->delayed) {
@@ -501,7 +521,7 @@ static inline void _handle_ack(const unicoap_endpoint_t* remote, uint16_t id)
     _transmission_t* transmission = _transmission_find(remote, id);
     if (transmission) {
         DEBUG("stopping retransmission\n");
-        _transmission_free_notif(transmission, UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE);
+        _transmission_free_notif(transmission, UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE, false);
 
     }
     else {
@@ -517,8 +537,8 @@ static void _handle_reset(const unicoap_endpoint_t* remote, uint16_t id)
 
     if (transmission) {
         DEBUG("\n");
-        _transmission_free_notif(transmission, 
-            unicoap_layer_notification_async_failure_from_errno(ECONNRESET));
+        _transmission_free_notif(transmission,
+            unicoap_layer_notification_async_failure_from_errno(ECONNRESET), false);
     }
     else {
         DEBUG(", no message with ID, ignoring\n");
@@ -534,12 +554,12 @@ static int _send_carbon_copy(_transmission_t* transmission) {
     bool confirmable = _pdu_get_type(transmission->pdu) == UNICOAP_TYPE_CON;
     /* Must not rely on transmission->remaining_retransmissions here to determine if
      * this is a confirmable message. This function is called at two sites:
-     *  - _on_ack_timeout: already know message is confirmable 
+     *  - _on_ack_timeout: already know message is confirmable
      *  - _resume: DTLS driver has established session, now telling us to send.
      * In the latter case the message may be a NON or CON, and remaining_retransmissions can be
-     * zero in both instances: always zero if NON, zero if CON and if 
+     * zero in both instances: always zero if NON, zero if CON and if
      * CONFIG_UNICOAP_RETRANSMISSIONS_MAX had been configured to be zero. */
-    if (confirmable) {  
+    if (confirmable) {
         unsigned int i = CONFIG_UNICOAP_RETRANSMISSIONS_MAX - transmission->remaining_retransmissions;
         duration = (uint32_t)CONFIG_UNICOAP_TIMEOUT_ACK_MS << i;
         if (CONFIG_UNICOAP_RANDOM_FACTOR_1000 > 1000) {
@@ -560,7 +580,7 @@ static int _send_carbon_copy(_transmission_t* transmission) {
 
     if (confirmable) {
         /* Only schedule ACK timeout if */
-        unicoap_event_schedule(&transmission->ack_timeout, _on_ack_timeout, duration, 
+        unicoap_event_schedule(&transmission->ack_timeout, _on_ack_timeout, duration,
                                "messaging.7252.ack-timeout");
     }
     return res;
@@ -583,7 +603,7 @@ static void _on_ack_timeout(unicoap_scheduled_event_t* _event) {
     /* reduce retries remaining, double timeout and resend */
     transmission->remaining_retransmissions -= 1;
 
-    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS) && 
+    if (IS_USED(MODULE_UNICOAP_DRIVER_DTLS) &&
         _transmission_get_endpoint(transmission)->proto == UNICOAP_PROTO_DTLS) {
         unicoap_packet_t packet = {
             .remote = _transmission_get_endpoint(transmission),
@@ -609,7 +629,7 @@ error:
     /* As per unicoap notification rules do not send ASYNC_FAILURE notification when
      * still in synchronous call from exchange layer. Hence, _transmission_free instead
      * of _transmission_free_notif. */
-    _transmission_free(transmission);
+    _transmission_free(transmission, false);
     return;
 }
 
@@ -790,7 +810,7 @@ int unicoap_messaging_process_rfc7252(const uint8_t* pdu, size_t size, unicoap_m
     unicoap_exchange_arg_t arg;
     unicoap_messaging_flags_t flags;
 
-    switch ((res = unicoap_exchange_preprocess(packet, &flags, &arg, 
+    switch ((res = unicoap_exchange_preprocess(packet, &flags, &arg,
         event & UNICOAP_MESSAGING_RFC7252_EVENT_TRUNCATED))) {
     case UNICOAP_PREPROCESSING_SUCCESS_REQUEST:
         break;
@@ -954,7 +974,7 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
         assert(false);
         break;
     }
-     
+
     if ((res = (int)_build_and_send_pdu(packet, &transmission)) < 0) {
         goto error;
     }
@@ -965,7 +985,7 @@ int unicoap_messaging_send_rfc7252(unicoap_packet_t* packet, unicoap_messaging_f
             if (CONFIG_UNICOAP_RANDOM_FACTOR_1000 > 1000) {
                 duration = random_uint32_range(duration, UNICOAP_TIMEOUT_ACK_RANGE_UPPER);
             }
-            unicoap_event_schedule(&transmission->ack_timeout, _on_ack_timeout, duration, 
+            unicoap_event_schedule(&transmission->ack_timeout, _on_ack_timeout, duration,
                                    "messaging.7252.ack-timeout");
         }
         /* Only set PDU size and notify exchange layer if sending went well. */
@@ -985,7 +1005,10 @@ error:
     MESSAGING_7252_DEBUG("sending failed (%i, %s)\n", res, strerror(-res));
     if (transmission) {
         assert(transmission->exchange == NULL);
-        _transmission_free_notif(transmission, unicoap_layer_notification_async_failure_from_errno(-res));
+        _transmission_free_notif(transmission, 
+            unicoap_layer_notification_async_failure_from_errno(-res),
+            true
+        );
     }
     return res;
 }

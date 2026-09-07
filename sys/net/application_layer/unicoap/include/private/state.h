@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <stdlib.h>
 #include "ztimer.h"
 #include "random.h"
 #include "event.h"
@@ -179,8 +180,8 @@ void unicoap_event_cancel(unicoap_scheduled_event_t* event);
     IS_USED(MODULE_UNICOAP_DRIVER_RFC7252_COMMON)
 /* MARK: unicoap_driver_extension_point */
 
-/** 
-  * @brief A feature check macro that determines whether client state objects are supported 
+/**
+  * @brief A feature check macro that determines whether client state objects are supported
   */
 #define UNICOAP_HAVE_CLIENT_STATE \
     IS_USED(MODULE_UNICOAP_CLIENT) && CONFIG_UNICOAP_CLIENT_MEMOS_CAPACITY > 0
@@ -210,8 +211,8 @@ typedef struct {
      * @brief Messaging state
      *
      * @note There's no union for the underlying pointer type as drivers are allowed to keep their
-     *       data structures private.  
-     *       This design avoids the need to expose every driver data structure. 
+     *       data structures private.
+     *       This design avoids the need to expose every driver data structure.
      */
     union {
 #if UNICOAP_HAVE_MESSAGING_STATE || defined(DOXYGEN)
@@ -291,19 +292,17 @@ static inline int unicoap_layer_notification_async_failure_to_errno(unicoap_laye
 }
 
 /**
- * @brief Converts positive error number into notification
- * @param error Negative integer indicating error
+ * @brief Converts error number into notification
+ * @param error Positive or negative integer indicating error, e.g., `-ETIMEDOUT` or `ETIMEDOUT`
  * @returns Notification
  */
 static inline unicoap_layer_notification_t unicoap_layer_notification_async_failure_from_errno(int error) {
-    assert(error > 0);
-    assert((-error) & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE);
-    return -error;
+    return -abs(error);
 }
 
 /**
  * @brief Event indicating a layer is finished and is releasing its allocated
- *        state objects of this exchange/transmission  
+ *        state objects of this exchange/transmission
  *
  * The recipient layer must determine whether it still needs to retain its allocated
  * state objects.
@@ -318,16 +317,16 @@ static inline unicoap_layer_notification_t unicoap_layer_notification_async_fail
 #define UNICOAP_LAYER_NOTIFICATION_STATE_ALLOC (1)
 
 /**
- * @brief Informs messaging layer of event  
- *  
- * @param state Messaging-layer state reference  
- * @param type Event type  
- * @param[in] arg Optional opaque state object in this layer the notification relates to.  
- * @param proto The protocol number for the underlying CoAP driver  
+ * @brief Informs messaging layer of event
+ *
+ * @param state Messaging-layer state reference
+ * @param type Event type
+ * @param[in] arg Optional opaque state object in this layer the notification relates to.
+ * @param proto The protocol number for the underlying CoAP driver
  *
  * Usually called from exchange layer.
  */
-void unicoap_messaging_notify(void* state, unicoap_layer_notification_t type, 
+void unicoap_messaging_notify(void* state, unicoap_layer_notification_t type,
                               void* arg, unicoap_proto_t proto);
 
 /**
@@ -399,6 +398,7 @@ static inline bool unicoap_callback_is_present(const unicoap_callback_t callback
  * @brief Client exchange
  */
 typedef struct {
+    /** @brief Common client/server memo super struct */
     unicoap_memo_t super;
 
     /** @brief Callback function registered by the client API */
@@ -440,7 +440,7 @@ static inline unicoap_client_memo_t* unicoap_client_memo_of_event(event_t* event
 
 /**
  * @brief Returns client memo of scheduled event
- * @param[in] event Superclass event
+ * @param[in] timeout Timeout event
  * @returns Client memo state object
  */
 static inline unicoap_client_memo_t* unicoap_client_memo_of_timeout(unicoap_scheduled_event_t* timeout) {
@@ -491,7 +491,7 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
  *
  * @param refno Reference number associated with client memo
  * @returns Client state object or `NULL` if memo is no longer associated with reference number
- * @note Requires @ref net_unicoap_client_cancellation 
+ * @note Requires @ref net_unicoap_client_cancellation
  *
  * This function may be used to find client exchange-layer state objects without keeping a pointer
  * to it. This is useful for handing public API callers a reference to, e.g., cancellable state
@@ -502,14 +502,35 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
  */
 unicoap_client_memo_t* unicoap_client_memo_find_refno(int refno);
 
+/**
+ * @brief Assigns a refno to the given client memo
+ *
+ * @param[in,out] memo Client memo
+ *
+ * @returns Refno assigned
+ *
+ * Requires @ref net_unicoap_client_cancellation.
+ *
+ * Constructs a refno, a stable reference to a memo while it is being used for a specific
+ * exchange. Should the memo struct in the memo array get reused for another exchange,
+ * the refno can be detected to be obsolete.
+ */
 int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo);
 
 /**
  * @brief Frees memo and associated buffers
  *
  * @param[in,out] memo Memo state bucket to discard and free
+ * @param error And error number indicating a failure on the exchange layer to propagate to the
+ *              messaging layer, instructing it to release state.
+ *
+ * You do not need to forward every error indicating on the exchange layer to the messaging layer
+ * when calling this function. For example, when cancelling a pending request,
+ * you can treat this as an `-ECANCELED` error on the exchange layer and call the client callback
+ * with said error, but you may still pass 0 for @p error as propagating the error down
+ * will indicate a hard failure and make the messaging layer release state including connections.
  */
-void unicoap_client_memo_free(unicoap_client_memo_t* memo);
+void unicoap_client_memo_free(unicoap_client_memo_t* memo, int error);
 /** @} */
 
 /* TODO: Client and advanced server features: Elaborate state management */

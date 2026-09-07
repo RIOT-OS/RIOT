@@ -18,7 +18,6 @@ from argparse import ArgumentParser
 import aiocoap.resource as resource
 from aiocoap.numbers.contentformat import ContentFormat
 import aiocoap
-import sys
 
 
 class Welcome(resource.Resource):
@@ -97,7 +96,7 @@ class SeparateLargeResource(resource.Resource):
 
 class TimeResource(resource.ObservableResource):
     """Example resource that can be observed. The `notify` method keeps
-    scheduling itself, and calles `update_state` to trigger sending
+    scheduling itself, and calls `update_state` to trigger sending
     notifications."""
 
     def __init__(self):
@@ -168,7 +167,7 @@ async def main():
     args = parser.parse_args()
 
     addr = "::"
-    if args.interface != None:
+    if args.interface is not None:
         os.environ["AIOCOAP_DTLSSERVER_ENABLED"] = "1"
         addr = os.popen("ip addr show " + args.interface).read().split("inet6 ")[1].split("/")[0]
         addr += "%" + args.interface

@@ -296,8 +296,8 @@ static inline struct _sock_tl_ep* _unicoap_endpoint_get_tl(unicoap_endpoint_t* e
 static inline ipv6_addr_t* unicoap_endpoint_get_ipv6_addr(unicoap_endpoint_t* endpoint) {
     (void)endpoint;
 #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
-    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) && 
-        (_unicoap_endpoint_get_tl(endpoint)->family == AF_INET6 || 
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) &&
+        (_unicoap_endpoint_get_tl(endpoint)->family == AF_INET6 ||
          _unicoap_endpoint_get_tl(endpoint)->family == AF_UNSPEC)) {
         return (ipv6_addr_t*)_unicoap_endpoint_get_tl(endpoint)->addr.ipv6;
     } else {
@@ -318,8 +318,8 @@ static inline ipv6_addr_t* unicoap_endpoint_get_ipv6_addr(unicoap_endpoint_t* en
 static inline ipv4_addr_t* unicoap_endpoint_get_ipv4_addr(unicoap_endpoint_t* endpoint) {
     (void)endpoint;
 #if IS_USED(MODULE_UNICOAP_SOCK_SUPPORT)
-    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) && 
-        (_unicoap_endpoint_get_tl(endpoint)->family == AF_INET || 
+    if (unicoap_transport_uses_sock_tl_ep(endpoint->proto) &&
+        (_unicoap_endpoint_get_tl(endpoint)->family == AF_INET ||
          _unicoap_endpoint_get_tl(endpoint)->family == AF_UNSPEC)) {
         return (ipv4_addr_t*)_unicoap_endpoint_get_tl(endpoint)->addr.ipv4;
     } else {
@@ -429,12 +429,26 @@ typedef struct {
         const char* host;
     } remote;
 
+    /* Note that the string length is placed here rather than being in a union with uri and one
+     * one with host inside the remote union above. This way, the string length would be considered
+     * a separate bitfield; but the goal is to utilise the trailing 2 bytes (at least). */
+
+    /** @brief Number of ASCII code units (bytes) */
+    uint16_t _string_length : 10;
+
+#if !defined(DOXYGEN)
+    /* Placeholder for wider type field below and future flags. */
+    uint8_t _rfu : 3;
+#endif
+
     /** @brief The type of this identifier */
     unicoap_destination_type_t type : 3;
 } unicoap_destination_t;
 
 /**
  * @brief Creates destination identifier from endpoint
+ *
+ * @memberof unicoap_destination_t
  *
  * @param endpoint Endpoint to create destination from
  *
@@ -446,21 +460,70 @@ static inline unicoap_destination_t unicoap_destination_endpoint(unicoap_endpoin
                                     .remote.endpoint = endpoint };
 }
 
+#if !defined(DOXYGEN)
+#  define _UNICOAP_DESTINATION_STRING_LENGTH_MAX ((1 << 10) - 1)
+#endif
+
 /**
- * @brief Creates destination identifier from hostname
+ * @brief Creates destination identifier from hostname string
  *
- * @param host Null-terminated host to create destination from
+ * @memberof unicoap_destination_t
+ *
+ * @param host Host to create destination from
+ * @param length Number of ASCII code units (bytes) in @p host, excluding potential null-terminator
+ *
+ * @pre @p length must not be greater than 1023
+ *
+ * @returns New resource identifier from endpoint
+ */
+static inline unicoap_destination_t unicoap_destination_host(const char* host, size_t length)
+{
+    assert(length < _UNICOAP_DESTINATION_STRING_LENGTH_MAX);
+    return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_HOST,
+                                    .remote.host = host,
+                                    ._string_length = (uint16_t)length };
+}
+
+/**
+ * @brief Creates destination identifier from null-terminated hostname string
+ *
+ * @memberof unicoap_destination_t
+ *
+ * @param host Host to create destination from
  *
  * @returns New resource identifier from endpoint
  */
 static inline unicoap_destination_t unicoap_destination_host_string(const char* host)
 {
     return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_HOST,
-                                    .remote.host = host };
+                                    .remote.host = host,
+                                    ._string_length = strlen(host) };
 }
 
 /**
  * @brief Creates destination identifier from URI string
+ *
+ * @memberof unicoap_destination_t
+ *
+ * @param uri Null-terminated Uniform Resource Identifier
+ * @param length Number of ASCII code units (bytes) in @p uri, excluding potential null-terminator
+ *
+ * @pre @p length must not be greater than 1023
+ *
+ * @returns New resource identifier from URI
+ */
+static inline unicoap_destination_t unicoap_destination_uri(const char* uri, size_t length)
+{
+    assert(length < _UNICOAP_DESTINATION_STRING_LENGTH_MAX);
+    return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_URI,
+                                    .remote.uri = uri,
+                                    ._string_length = (uint16_t)length };
+}
+
+/**
+ * @brief Creates destination identifier from URI string
+ *
+ * @memberof unicoap_destination_t
  *
  * @param uri Null-terminated Uniform Resource Identifier
  *
@@ -469,7 +532,8 @@ static inline unicoap_destination_t unicoap_destination_host_string(const char* 
 static inline unicoap_destination_t unicoap_destination_uri_string(const char* uri)
 {
     return (unicoap_destination_t){ .type = UNICOAP_DESTINATION_URI,
-                                    .remote.uri = uri };
+                                    .remote.uri = uri,
+                                    ._string_length = strlen(uri) };
 }
 /** @} */
 
@@ -491,7 +555,7 @@ static inline unicoap_destination_t unicoap_destination_uri_string(const char* u
  * @retval `0` for valid schemes
  * @retval `-1` if the scheme is invalid or unknown
  */
-int unicoap_proto_from_scheme_and_host(const char* scheme, size_t scheme_length, 
+int unicoap_proto_from_scheme_and_host(const char* scheme, size_t scheme_length,
                                        const char* host, size_t length);
 
 /**

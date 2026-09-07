@@ -352,6 +352,8 @@ static inline bool unicoap_transport_truncate_received(size_t* chunk_size, size_
     return false;
 }
 
+/** @} */
+
 #ifndef DOXYGEN
 static inline void __debug_hex(const uint8_t* buffer, size_t size)
 {

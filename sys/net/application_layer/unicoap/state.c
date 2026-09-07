@@ -91,7 +91,7 @@ static unicoap_client_memo_t* _alloc_client(void) {
 
 static inline bool _is_multicast(unicoap_client_memo_t *memo)
 {
-    return (memo->flags & UNICOAP_CLIENT_FLAG_MULTICAST) != 0;
+    return (memo->flags & UNICOAP_REQUEST_FLAG_MULTICAST) != 0;
 }
 
 static inline bool _is_client(const unicoap_memo_t* memo) {
@@ -149,7 +149,7 @@ static void _free(unicoap_memo_t* memo) {
     memset(memo, 0, sizeof(*memo));
 }
 
-void unicoap_client_memo_free(unicoap_client_memo_t* memo) {
+void unicoap_client_memo_free(unicoap_client_memo_t* memo, int error) {
     if (!UNICOAP_HAVE_CLIENT_STATE) {
         return;
     }
@@ -167,8 +167,11 @@ void unicoap_client_memo_free(unicoap_client_memo_t* memo) {
      * the state object is released as usual. Should the messaging layer rely on this
      * information, the exchange-messaging abstraction has a design flaw. */
     if (unicoap_memo_messaging_state(&memo->super)) {
-        unicoap_messaging_notify(unicoap_memo_messaging_state(&memo->super),
-            UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE, NULL, proto);
+        unicoap_messaging_notify(
+            unicoap_memo_messaging_state(&memo->super),
+            error ? unicoap_layer_notification_async_failure_from_errno(error)
+                  : UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE,
+            NULL, proto);
     }
 #endif
     _free(&memo->super);
@@ -224,9 +227,6 @@ unicoap_client_memo_t* unicoap_client_memo_find_refno(int refno) {
 int unicoap_client_memo_assign_refno(unicoap_client_memo_t* memo) {
     (void)memo;
     assert(memo);
-    /* Here, we build a refno, a stable reference to a memo while it is being used for a specific
-     * exchange. Should the memo struct in the memo array get reused for another exchange,
-     * the refno can be detected to be obsolete. */
 #if IS_USED(MODULE_UNICOAP_CLIENT_CANCELLATION)
     /* Memos require a unique reference ID and array index for fast lookup. Because functions return
      * the refno as an int where negative values represent errors, we assume a minimum 16-bit int
@@ -255,18 +255,18 @@ void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, voi
     }
     _lock();
     if (type & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE) {
-        _STATE_NOTIF_DEBUG("messaging layer encountered error %i\n",
-                     unicoap_layer_notification_async_failure_to_errno(type));
+        _STATE_NOTIF_DEBUG("messaging layer encountered error %i (type %i)\n",
+            unicoap_layer_notification_async_failure_to_errno(type), type);
 #if UNICOAP_HAVE_MESSAGING_STATE
         memo->messaging.state = NULL;
 #endif
     } else if (type == UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE) {
-        _STATE_NOTIF_DEBUG("messaging layer released state\n");
+        _STATE_NOTIF_DEBUG("messaging layer released state (type %i)\n", type);
 #if UNICOAP_HAVE_MESSAGING_STATE
         memo->messaging.state = NULL;
 #endif
     } else if (type == UNICOAP_LAYER_NOTIFICATION_STATE_ALLOC) {
-        _STATE_NOTIF_DEBUG("messaging layer allocated state\n");
+        _STATE_NOTIF_DEBUG("messaging layer allocated state (type %i)\n", type);
         assert(arg);
 #if UNICOAP_HAVE_MESSAGING_STATE
         memo->messaging.state = arg;
@@ -277,8 +277,11 @@ void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, voi
     if (IS_USED(MODULE_UNICOAP_CLIENT) && _is_client(memo)) {
         if (type & UNICOAP_LAYER_NOTIFICATION_ASYNC_FAILURE) {
             unicoap_client_callback_failure(unicoap_client_memo_of_super(memo),
-                                          unicoap_layer_notification_async_failure_to_errno(type));
-            unicoap_client_memo_free(unicoap_client_memo_of_super(memo));
+                unicoap_layer_notification_async_failure_to_errno(type));
+
+            /* Messaging layer failed, our signal to release state. Error occurred on messaging
+             * layer and not on exchange layer, so use 0 instead of error number here. */
+            unicoap_client_memo_free(unicoap_client_memo_of_super(memo), 0);
         }
     }
 }
@@ -652,7 +655,7 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
             if (truncated) {
                 _CLIENT_DEBUG("truncated, not processing\n");
                 unicoap_client_callback_failure(memo, -ENOBUFS);
-                unicoap_client_memo_free(memo);
+                unicoap_client_memo_free(memo, 0);
                 return UNICOAP_PREPROCESSING_ERROR_TRUNCATED;
             }
 

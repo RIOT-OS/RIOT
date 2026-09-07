@@ -7,7 +7,7 @@
 /**
  * @file
  * @ingroup sys_shell_commands
- * @brief   `coap` client shell command using @ref unicoap  
+ * @brief   `coap` client shell command using @ref unicoap
  * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
@@ -42,22 +42,34 @@ static int _on_response(
 
     printf("response ");
     unicoap_print_code(response->code);
-    printf(" (%" PRIuSIZE " bytes)\n", response->payload_size);
+
+    /* Print length of response payload in bytes. */
+    printf(" %s (%" PRIuSIZE " bytes)\n",
+        unicoap_string_from_status(unicoap_response_get_status(response)),
+        unicoap_message_payload_get_size(response));
 
     unicoap_content_format_t format;
-    if (((error = unicoap_options_get_content_format(response->options, &format)) >= 0
-         && unicoap_content_format_is_human_readable(format))
-        || (error == -ENOENT && (((uint8_t)(uintptr_t)arg) & _SHELL_FLAG_TEXT))) {
-        printf("text response: '%.*s'\n", (int)response->payload_size, (char*)response->payload);
-    } else if (response->payload_size > 0) {
-        od_hex_dump(response->payload, response->payload_size, 16);
+    if ((error = unicoap_options_get_content_format(response->options, &format)) >= 0
+        && unicoap_content_format_is_human_readable(format)) {
+        printf("text response: '%.*s'\n", 
+            (int)unicoap_message_payload_get_size(response), 
+            (char*)unicoap_message_payload_get((unicoap_message_t*)response));
+    }
+    else if (IS_USED(MODULE_OD)
+            && response->payload_representation == UNICOAP_PAYLOAD_CONTIGUOUS
+            && unicoap_message_payload_get_size(response) > 0
+    ) {
+        od_hex_dump(
+                unicoap_message_payload_get((unicoap_message_t*)response), 
+                unicoap_message_payload_get_size(response), 
+                16);
     }
     return 0;
 }
 
 static int _set_flags(char* opt, unicoap_request_flags_t* flags, uint8_t* shell_flags) {
     if (strcmp(opt, "-r") == 0) {
-        *flags |= UNICOAP_CLIENT_FLAG_RELIABLE;
+        *flags |= UNICOAP_REQUEST_FLAG_RELIABLE;
     } else if (strcmp(opt, "-t") == 0) {
         *shell_flags |= _SHELL_FLAG_TEXT;
     } else {
@@ -160,4 +172,4 @@ help:
     return _print_usage(argv);
 }
 
-SHELL_COMMAND(coap, "unicoap client", _cli) 
+SHELL_COMMAND(coap, "unicoap client", _cli)

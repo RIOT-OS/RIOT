@@ -453,7 +453,7 @@ static inline ssize_t unicoap_options_get_next_${suffix(o)}_by_name${nullTermina
  * ${docRetCorrupted(o)}
  * ${docRetNoBufSCopy(o, o.continuous)}
  * ${o.prefix ? `* @pre @p capacity must be greater than zero\n *` : ""}
- * This function creates a string from all \`${o.name}\` options by joining them with the \`${o.separator}\` separator. ${o.prefix ? `\n * The string will bear the \`${o.prefix}\` prefix even if there is no \`${o.name}\` option.`: ""}
+ * This function creates a string from all \`${o.name}\` options by joining them with the \`${o.separator}\` separator.${o.prefix ? `\n * The string will bear the \`${o.prefix}\` prefix even if there is no \`${o.name}\` option.`: ""}
  * The string will not be null-terminated. The resulting string uses UTF-8 encoding.
  */
 static inline ssize_t unicoap_options_copy_${suffixPlural(o)}(

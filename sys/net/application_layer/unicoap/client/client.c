@@ -29,7 +29,7 @@
 
 static void _on_response_timeout(unicoap_scheduled_event_t* timeout) {
     unicoap_client_callback_failure(unicoap_client_memo_of_timeout(timeout), -ETIMEDOUT);
-    unicoap_client_memo_free(unicoap_client_memo_of_timeout(timeout));
+    unicoap_client_memo_free(unicoap_client_memo_of_timeout(timeout), -ETIMEDOUT);
 }
 
 int unicoap_client_callback_success(unicoap_client_memo_t* memo, const unicoap_packet_t* packet,
@@ -72,15 +72,15 @@ int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_mem
     /* TODO: Block-wise */
     res = unicoap_client_callback_success(memo, packet, UNICOAP_BLOCK_OPTION_NONE);
 
-    if ((memo->flags & UNICOAP_CLIENT_FLAG_MULTICAST) == 0 ) {
-        unicoap_client_memo_free(memo);
+    if ((memo->flags & UNICOAP_REQUEST_FLAG_MULTICAST) == 0 ) {
+        unicoap_client_memo_free(memo, 0);
     }
 
     return res;
 }
 
 int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_memo_t* memo,
-                                     unicoap_request_flags_t client_flags) {
+                                     unicoap_request_flags_t request_flags) {
     int res = 0;
 
     if (memo) {
@@ -91,7 +91,7 @@ int unicoap_client_send_request_part(unicoap_packet_t* packet, unicoap_client_me
     assert(packet->properties.token);
     unicoap_generate_token(packet->properties.token);
     packet->properties.token_length = CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH;
-    unicoap_messaging_flags_t messaging_flags = _messaging_flags_client(client_flags);
+    unicoap_messaging_flags_t messaging_flags = _messaging_flags_client(request_flags);
     if (memo) {
         /* State has been allocated, instruct the messaging layer to track success/failures
          * with this transmission. If a NON is sent, this flag tells the RFC 7252 driver
@@ -130,7 +130,7 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
     bool multicast = unicoap_endpoint_is_multicast(endpoint);
 
     if (multicast) {
-        if (flags & UNICOAP_CLIENT_FLAG_RELIABLE) {
+        if (flags & UNICOAP_REQUEST_FLAG_RELIABLE) {
             _CLIENT_DEBUG("error: reliable datagrams are not supported for multicast requests\n");
             return -EINVAL;
         }
@@ -140,7 +140,7 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
             return -EINVAL;
         }
 
-        flags |= UNICOAP_CLIENT_FLAG_MULTICAST;
+        flags |= UNICOAP_REQUEST_FLAG_MULTICAST;
     }
 
     if (unicoap_callback_is_present(callback)) {
@@ -154,17 +154,15 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
 
         if (!multicast) {
             unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
-                                    (parameters && parameters->timeout_ms > 0) ?
-                                   parameters->timeout_ms :
-                                   CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS,
-                                    "client.resp-timeout");
+                                   (parameters && parameters->timeout_ms > 0) ?
+                                   parameters->timeout_ms : CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS,
+                                   "client.resp-timeout");
         }
         else if (CONFIG_UNICOAP_TIMEOUT_CLIENT_MULTICAST_RESPONSE_MS > 0) {
             unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
-                                    (parameters && parameters->timeout_ms > 0) ?
-                                   parameters->timeout_ms :
-                                   CONFIG_UNICOAP_TIMEOUT_CLIENT_MULTICAST_RESPONSE_MS,
-                                    "client.resp-timeout");
+                                   (parameters && parameters->timeout_ms > 0) ?
+                                   parameters->timeout_ms : CONFIG_UNICOAP_TIMEOUT_CLIENT_MULTICAST_RESPONSE_MS,
+                                   "client.resp-timeout");
         }
     }
 
@@ -178,7 +176,7 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
     return 0;
 
 error:
-    unicoap_client_memo_free(memo);
+    unicoap_client_memo_free(memo, 0);
     return res;
 }
 
@@ -194,7 +192,7 @@ int unicoap_cancel_request(int refno) {
         }
         _CLIENT_DEBUG("cancelling request with refno %i\n", refno);
         unicoap_client_callback_failure(memo, -ECANCELED);
-        unicoap_client_memo_free(memo);
+        unicoap_client_memo_free(memo, 0);
         return 0;
     } else {
         if (IS_ACTIVE(CONFIG_UNICOAP_ASSIST)) {
@@ -224,12 +222,11 @@ static int _open_request(unicoap_message_t* request,
                 request->options = options;
             }
             unicoap_endpoint_t endpoint = { 0 };
-            assert(uri_parser_is_absolute(destination->remote.uri,
-                strlen(destination->remote.uri)));
+            assert(uri_parser_is_absolute(destination->remote.uri, destination->_string_length));
 
             uri_parser_result_t parsed = { 0 };
             if ((res = uri_parser_process(
-                &parsed, destination->remote.uri, strlen(destination->remote.uri)
+                &parsed, destination->remote.uri, destination->_string_length
             )) < 0) {
                 _URI_DEBUG("URI malformed: %i (%s)\n", res, strerror(-res));
                 return res;
@@ -242,6 +239,28 @@ static int _open_request(unicoap_message_t* request,
             if ((res = unicoap_uri_populate(&parsed, &endpoint, request->options)) < 0) {
                 return res;
             }
+
+            uint16_t* netif_id = unicoap_endpoint_get_netif_id(&endpoint);
+            if (endpoint.proto == UNICOAP_PROTO_DTLS
+                && IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
+                && IS_ACTIVE(SOCK_HAS_IPV6)
+                && netif_id
+                && *netif_id == 0
+                && sock_udp_ep_is_v6(unicoap_endpoint_get_dtls(&endpoint))
+                && ipv6_addr_is_link_local(unicoap_endpoint_get_ipv6_addr(&endpoint))
+            ) {
+                _CLIENT_DEBUG("warning: v6 link-local with netif id unset, "
+                              "tinydtls handshake will fail\n");
+                netif_t* iface = netif_iter(NULL);
+                if (netif_iter(iface)) {
+                    _CLIENT_DEBUG("warning: more than 1 netif, refusing to infer netif for dtls\n");
+                } else {
+                    *netif_id = netif_get_id(iface);
+                    _CLIENT_DEBUG("warning: missing netif id, assuming single netif %"PRIu16"\n",
+                        *netif_id);
+                }
+            }
+
             return unicoap_client_send_request_body(request, &endpoint, callback,
                                                     parameters, flags);
         } else {

@@ -207,7 +207,7 @@ static int _populate_address(uri_parser_result_t* parsed, unicoap_endpoint_t* en
     } else {
 #if IS_USED(MODULE_DNS)
         /* Only thing left to try is DNS resolution */
-        /* FIXME: DNS query function requires null-terminated string, 
+        /* FIXME: DNS query function requires null-terminated string,
                     forcing us to copy the URI host */
         if (parsed->host_len > CONFIG_UNICOAP_URI_HOST_PART_LENGTH_MAX) {
             _URI_DEBUG("no buffer space to copy '%.*s', " _UNICOAP_NEED_HAVE "\n",
@@ -233,7 +233,7 @@ static int _populate_address(uri_parser_result_t* parsed, unicoap_endpoint_t* en
 }
 
 int unicoap_uri_populate(
-    uri_parser_result_t* parsed, 
+    uri_parser_result_t* parsed,
     unicoap_endpoint_t* endpoint,
     unicoap_options_t* options
 ) {
@@ -287,7 +287,7 @@ int unicoap_uri_populate(
     }
 
     if (parsed->path && (parsed->path_len > 0)) {
-        if ((res = 
+        if ((res =
             unicoap_options_add_uri_path(options, (char*)parsed->path, parsed->path_len)) < 0) {
             return res;
         }
