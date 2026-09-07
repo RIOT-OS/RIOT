@@ -18,11 +18,34 @@
  */
 
 #include <assert.h>
+
+#include "log.h"
+#include "net/lora.h"
 #include "sx126x.h"
+#include "thread.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   Get the current chip state
+ *
+ * @param[in]   dev                     Device descriptor of the driver
+ *
+ * @return  Chip state
+ */
+sx126x_chip_modes_t sx126x_get_state(const sx126x_t *dev);
+
+/**
+ * @brief   Set the internal chip state
+ *
+ * @param[in]   dev                     Device descriptor of the driver
+ * @param[in]   state                   State to set
+ * @retval      0                       Success
+ * @retval      -EIO                    Chip reported back an error
+ */
+int sx126x_set_state(sx126x_t *dev, sx126x_chip_modes_t state);
 
 /**
  * @brief   Check whether the device model is sx1261
@@ -120,21 +143,168 @@ static inline bool sx126x_is_stm32wl(sx126x_t *dev)
 }
 
 /**
- * @brief   Get the current chip state
+ * @brief   Mapping of general LoRA bandwidth in lora.h to sx126x_lora_bw_t
  *
- * @param[in]   dev                     Device descriptor of the driver
+ * @param[in]   lora_bw     LoRa bandwidth LORA_BW_
  *
- * @return  Chip state
+ * @return  Corresponding sx126x_lora_bw_t value or default value
  */
-sx126x_chip_modes_t sx126x_get_state(const sx126x_t *dev);
+static inline sx126x_lora_bw_t _sx126x_lora_bw_from(int lora_bw)
+{
+    switch (lora_bw) {
+        case LORA_BW_125_KHZ: return SX126X_LORA_BW_125;
+        case LORA_BW_250_KHZ: return SX126X_LORA_BW_250;
+        case LORA_BW_500_KHZ: return SX126X_LORA_BW_500;
+        default:
+            return SX126X_LORA_BW_125;
+    }
+}
 
 /**
- * @brief   Set the internal chip state
+ * @brief   Mapping of sx126x_lora_bw_t to general LoRA bandwidth in lora.h
  *
- * @param[in]   dev                     Device descriptor of the driver
- * @param[in]   state                   State to set
+ * @param[in]   bw      sx126x_lora_bw_t
+ *
+ * @return  Corresponding LoRa bandwidth
  */
-void sx126x_set_state(sx126x_t *dev, sx126x_chip_modes_t state);
+static inline int _sx126x_lora_bw_to(sx126x_lora_bw_t bw)
+{
+    switch (bw) {
+        case SX126X_LORA_BW_125: return LORA_BW_125_KHZ;
+        case SX126X_LORA_BW_250: return LORA_BW_250_KHZ;
+        case SX126X_LORA_BW_500: return LORA_BW_500_KHZ;
+        default:
+            return -1;
+    }
+}
+
+/**
+ * @brief   Mapping of general LoRA spreading factor in lora.h to sx126x_lora_sf_t
+ *
+ * @param[in]   lora_sf     LoRa spreading factor LORA_SF
+ *
+ * @return  Corresponding sx126x_lora_sf_t value or default value
+ */
+static inline sx126x_lora_sf_t _sx126x_lora_sf_from(int lora_sf)
+{
+    switch (lora_sf) {
+        case LORA_SF5: return SX126X_LORA_SF5;
+        case LORA_SF6: return SX126X_LORA_SF6;
+        case LORA_SF7: return SX126X_LORA_SF7;
+        case LORA_SF8: return SX126X_LORA_SF8;
+        case LORA_SF9: return SX126X_LORA_SF9;
+        case LORA_SF10: return SX126X_LORA_SF10;
+        case LORA_SF11: return SX126X_LORA_SF11;
+        case LORA_SF12: return SX126X_LORA_SF12;
+        default:
+            return SX126X_LORA_SF7;
+    }
+}
+
+/**
+ * @brief   Mapping of sx126x_lora_sf_t to general LoRA spreading factor in lora.h
+ *
+ * @param[in]   sf      sx126x_lora_sf_t
+ *
+ * @return  Corresponding LoRa spreading factor
+ */
+static inline int _sx126x_lora_sf_to(sx126x_lora_sf_t sf)
+{
+    switch (sf) {
+        case SX126X_LORA_SF5: return LORA_SF5;
+        case SX126X_LORA_SF6: return LORA_SF6;
+        case SX126X_LORA_SF7: return LORA_SF7;
+        case SX126X_LORA_SF8: return LORA_SF8;
+        case SX126X_LORA_SF9: return LORA_SF9;
+        case SX126X_LORA_SF10: return LORA_SF10;
+        case SX126X_LORA_SF11: return LORA_SF11;
+        case SX126X_LORA_SF12: return LORA_SF12;
+        default:
+            return -1;
+    }
+}
+
+/**
+ * @brief   Mapping of general LoRA coding rate in lora.h to sx126x_lora_cr_t
+ *
+ * @param[in]   lora_cr     LoRa coding rate LORA_CR_
+ *
+ * @return  Corresponding sx126x_lora_cr_t value or default value
+ */
+static inline sx126x_lora_cr_t _sx126x_lora_cr_from(int lora_cr)
+{
+    switch (lora_cr) {
+        case LORA_CR_4_5: return SX126X_LORA_CR_4_5;
+        case LORA_CR_4_6: return SX126X_LORA_CR_4_6;
+        case LORA_CR_4_7: return SX126X_LORA_CR_4_7;
+        case LORA_CR_4_8: return SX126X_LORA_CR_4_8;
+        default:
+            return SX126X_LORA_CR_4_5;
+    }
+}
+
+/**
+ * @brief   Mapping of sx126x_lora_cr_t to general LoRA coding rate in lora.h
+ *
+ * @param[in]   cr      sx126x_lora_cr_t
+ *
+ * @return  Corresponding LoRa coding rate
+ */
+static inline int _sx126x_lora_cr_to(sx126x_lora_cr_t cr)
+{
+    switch (cr) {
+        case SX126X_LORA_CR_4_5: return LORA_CR_4_5;
+        case SX126X_LORA_CR_4_6: return LORA_CR_4_6;
+        case SX126X_LORA_CR_4_7: return LORA_CR_4_7;
+        case SX126X_LORA_CR_4_8: return LORA_CR_4_8;
+        default:
+            return -1;
+    }
+}
+
+/**
+ * @name    Internal debug macros for sx126x identification
+ * @{
+ */
+/**
+ * @brief   Get sx126x device ID to distinguish between multiple devices when printing
+ *          debug messages.
+ */
+#define SX126X_ID(d)                    thread_getpid()
+/**
+ * @brief   Internal device driver DEBUG() macro
+ */
+#define SX126X_DEBUG(d, msg, ...)       DEBUG("[sx126x %i] " msg, SX126X_ID(d), ##__VA_ARGS__)
+/**
+ * @brief   Internal device driver LOG_INFO() macro
+ */
+#define SX126X_LOG_INFO(d, msg, ...)    LOG_INFO("[sx126x %i] " msg, SX126X_ID(d), ##__VA_ARGS__)
+/**
+ * @brief   Internal device driver LOG_WARNING() macro
+ */
+#define SX126X_LOG_WARNING(d, msg, ...) LOG_WARNING("[sx126x %i] " msg, SX126X_ID(d), ##__VA_ARGS__)
+/**
+ * @brief   Internal device driver LOG_ERROR() macro
+ */
+#define SX126X_LOG_ERROR(d, msg, ...)   LOG_ERROR("[sx126x %i] " msg, SX126X_ID(d), ##__VA_ARGS__)
+/** @} */
+
+/**
+ * @brief   Check sx126x API return values.
+ *
+ * API return value is of type sx126x_status_t.
+ * The RIOT HAL always returns 0 as SPI transfer currently is not expected to fail.
+ * However checking return values will not hide potential errors in the future.
+ *
+ * @param[in]   func_call      Function call with arguments to check
+ * @param[in]   return_val     Returned value if the function call does not return SX126X_STATUS_OK
+ *
+ */
+#define SX126X_CHECK_API(func_call, return_val) \
+if (func_call != SX126X_STATUS_OK) { \
+    SX126X_DEBUG(dev, "[%s] API call failed: %s\n", __func__, #func_call); \
+    return_val; \
+}
 
 #ifdef __cplusplus
 }

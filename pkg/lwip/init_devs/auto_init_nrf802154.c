@@ -31,7 +31,7 @@ static netdev_ieee802154_submac_t nrf802154_netdev;
 static void auto_init_nrf802154(void)
 {
     netdev_register(&nrf802154_netdev.dev.netdev, NETDEV_NRF802154, 0);
-    netdev_ieee802154_submac_init(&nrf802154_netdev);
+    netdev_ieee802154_submac_init(&nrf802154_netdev, NULL);
 
     nrf802154_hal_setup(&nrf802154_netdev.submac.dev);
     nrf802154_init();

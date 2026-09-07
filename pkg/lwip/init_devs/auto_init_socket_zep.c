@@ -36,7 +36,7 @@ static void auto_init_socket_zep(void)
 {
     for (unsigned i = 0; i < NETIF_SOCKET_ZEP_NUMOF; i++) {
         netdev_register(&socket_zep_netdev[i].dev.netdev, NETDEV_SOCKET_ZEP, i);
-        netdev_ieee802154_submac_init(&socket_zep_netdev[i]);
+        netdev_ieee802154_submac_init(&socket_zep_netdev[i], NULL);
         socket_zep_hal_setup(&socket_zep_devs[i], &socket_zep_netdev[i].submac.dev);
 
         socket_zep_setup(&socket_zep_devs[i], &socket_zep_params[i]);
