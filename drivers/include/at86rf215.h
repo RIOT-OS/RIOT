@@ -53,16 +53,6 @@ typedef struct at86rf215_BBC_regs at86rf215_BBC_regs_t;
 typedef void (*at86rf215_batmon_cb_t)(void *arg);
 
 /**
- * @brief MR-O-QPSK chip rates (kChip/s)
- */
-enum {
-    AT86RF215_FCHIP_100,
-    AT86RF215_FCHIP_200,
-    AT86RF215_FCHIP_1000,
-    AT86RF215_FCHIP_2000,
-};
-
-/**
  * @brief   Maximum possible packet size in byte
  */
 #define AT86RF215_MAX_PKT_LENGTH        (2047)
@@ -114,100 +104,6 @@ enum {
 #ifndef CONFIG_AT86RF215_BATMON_THRESHOLD
 #  define CONFIG_AT86RF215_BATMON_THRESHOLD       (1800)
 #endif
-/** @} */
-
-/**
- * @name    Default O-QPSK Rate Mode
- *          Non-zero value enables proprietary high data rate by default
- * @{
- */
-#ifndef CONFIG_AT86RF215_DEFAULT_OQPSK_RATE
-#  define CONFIG_AT86RF215_DEFAULT_OQPSK_RATE     (0)
-#endif
-/** @} */
-
-/**
- * @name    Default MR-O-QPSK Chip Rate
- * @{
- */
-#if IS_ACTIVE(CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS_100)
-#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_100)
-#elif IS_ACTIVE(CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS_200)
-#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_200)
-#elif IS_ACTIVE(CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS_1000)
-#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_1000)
-#elif IS_ACTIVE(CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS_2000)
-#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_2000)
-#endif
-
-#ifndef CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS
-#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS (AT86RF215_FCHIP_1000)
-#endif
-/** @} */
-
-/**
- * @name    Default MR-O-QPSK Rate Mode
- * @{
- */
-#ifndef CONFIG_AT86RF215_DEFAULT_MR_OQPSK_RATE
-#  define CONFIG_AT86RF215_DEFAULT_MR_OQPSK_RATE  (2)
-#endif
-/** @} */
-
-/**
- * @name    Default MR-OFDM Option
- * @{
- */
-#ifndef CONFIG_AT86RF215_DEFAULT_MR_OFDM_OPT
-#  define CONFIG_AT86RF215_DEFAULT_MR_OFDM_OPT    (2)
-#endif
-/** @} */
-
-/**
- * @name    Default MR-OFDM Modulation & Coding Scheme
- * @{
- */
-#ifndef CONFIG_AT86RF215_DEFAULT_MR_OFDM_MCS
-#  define CONFIG_AT86RF215_DEFAULT_MR_OFDM_MCS    (2)
-#endif
-/** @} */
-
-/**
- * @name    Default MR-FSK Symbol Rate
- * @{
- */
-#ifndef CONFIG_AT86RF215_DEFAULT_MR_FSK_SRATE
-#  define CONFIG_AT86RF215_DEFAULT_MR_FSK_SRATE   FSK_SRATE_200K
-#endif
-/** @} */
-
-/**
- * @name    Default MR-FSK Modulation Index, fraction of 64
- * @{
- */
-#ifndef CONFIG_AT86RF215_DEFAULT_MR_FSK_MOD_IDX
-#  define CONFIG_AT86RF215_DEFAULT_MR_FSK_MOD_IDX (64)
-#endif
-/** @} */
-
-/**
- * @name    Default MR-FSK Modulation Order
- * @{
- */
-#ifndef CONFIG_AT86RF215_DEFAULT_MR_FSK_MORD
-#  define CONFIG_AT86RF215_DEFAULT_MR_FSK_MORD    FSK_MORD_4SFK
-#endif
-/** @} */
-
-/**
- * @name    Default MR-FSK Forward Error Correction Scheme
- * @{
- */
-#ifndef CONFIG_AT86RF215_DEFAULT_MR_FSK_FEC
-#  define CONFIG_AT86RF215_DEFAULT_MR_FSK_FEC     IEEE802154_FEC_NONE
-#endif
-/** @} */
-
 /** @} */
 
 /**
@@ -581,7 +477,7 @@ int at86rf215_init_event(at86rf215_bhp_ev_t *bhp, ieee802154_dev_t *hal_09,
                          ieee802154_dev_t *hal_24, event_queue_t *evq);
 
 /**
- * @brief   Initialize the AT86RF215 transceiver.
+ * @brief Initialize the AT86RF215 transceiver.
  *
  * Sets up the device descriptors of both interfaces.
  *
