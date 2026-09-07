@@ -337,18 +337,15 @@ APPLICATION := $(strip $(APPLICATION))
 
 DOWNLOAD_TO_FILE ?= $(DLCACHE)
 
-# Check whether `which` is installed
-ifeq ($(shell command -v which 2>/dev/null),)
-  $(error 'which' is required but not found in PATH.)
-endif
-
 # Check whether unzip or 7z is installed, and set UNZIP_HERE to the command to use
 ifeq (,$(UNZIP_HERE))
-  ifeq (0,$(shell which unzip > /dev/null 2>&1 ; echo $$?))
-    UNZIP_HERE = $(call memoized,UNZIP_HERE,$(shell which unzip) -q)
+  _UNZIP := $(shell command -v unzip 2>/dev/null)
+  ifneq (,$(_UNZIP))
+    UNZIP_HERE := $(_UNZIP) -q
   else
-    ifeq (0,$(shell which 7z > /dev/null 2>&1 ; echo $$?))
-      UNZIP_HERE = $(call memoized,UNZIP_HERE,$(shell which 7z) x -bd)
+    _7Z := $(shell command -v 7z 2>/dev/null)
+    ifneq (,$(_7Z))
+      UNZIP_HERE := $(_7Z) x -bd
     else
       $(warning Neither unzip nor 7z is installed.)
     endif
