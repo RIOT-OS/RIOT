@@ -17,21 +17,25 @@
 
 #include <stdio.h>
 
-#include "at86rf215.h"
-#include "at86rf215_internal.h"
-#include "at86rf215_params.h"
-#include "init_dev.h"
 #include "shell.h"
-#include "test_utils/netdev_ieee802154_minimal.h"
-
-#include "thread.h"
 #include "event.h"
 #include "event/thread.h"
+#include "thread.h"
+#include "init_dev.h"
 #include "sys/bus.h"
 #include "od.h"
 
-static at86rf215_t at86rf215[NETDEV_IEEE802154_MINIMAL_NUMOF];
+#include "at86rf215.h"
+#include "at86rf215_internal.h"
+#include "at86rf215_params.h"
 
+#include "net/netdev/ieee802154_submac.h"
+
+#include "test_utils/netdev_ieee802154_minimal.h"
+
+static at86rf215_t at86rf215_devs[NETDEV_IEEE802154_MINIMAL_NUMOF];
+static at86rf215_bhp_ev_t at86rf215_bhp[NETDEV_IEEE802154_MINIMAL_NUMOF];
+static netdev_ieee802154_submac_t at86rf215_netdev[NETDEV_IEEE802154_MINIMAL_NUMOF];
 static char batmon_stack[THREAD_STACKSIZE_MAIN];
 
 void *batmon_thread(void *arg)
@@ -55,7 +59,7 @@ static int cmd_enable_batmon(int argc, char **argv)
 {
     int res;
     uint16_t voltage;
-    netdev_t *netdev = &(at86rf215[0].netdev.netdev);
+    netdev_t *netdev = &(at86rf215_netdev[0].dev.netdev);
 
     if (argc < 2) {
         printf("usage: %s <treshold_mV>\n", argv[0]);
@@ -80,7 +84,7 @@ static int cmd_set_trim(int argc, char **argv)
     }
 
     uint8_t trim = atoi(argv[1]);
-    at86rf215_t *dev = at86rf215;
+    at86rf215_t *dev = &at86rf215_devs[0];
 
     if (trim > 0xF) {
         puts("Trim value out of range");
@@ -107,7 +111,7 @@ static int cmd_set_clock_out(int argc, char **argv)
     };
 
     at86rf215_clko_freq_t freq = AT86RF215_CLKO_26_MHz;
-    at86rf215_t *dev = at86rf215;
+    at86rf215_t *dev = &at86rf215_devs[0];
 
     if (argc > 1) {
         unsigned tmp = 0xFF;
@@ -141,7 +145,7 @@ static int cmd_get_random(int argc, char **argv)
 {
     uint8_t values;
     uint8_t buffer[256];
-    at86rf215_t *dev = at86rf215;
+    at86rf215_t *dev = at86rf215_bhp[0].hal_24->priv;
 
     if (argc > 1) {
         values = atoi(argv[1]);
@@ -185,36 +189,57 @@ int netdev_ieee802154_minimal_init_devs(netdev_event_cb_t cb) {
     puts("Initializing AT86RF215 at86rf215");
 
     for (unsigned i = 0; i < AT86RF215_NUM; i++) {
-        at86rf215_t *at86rf215_subghz = NULL;
-        at86rf215_t *at86rf215_24ghz = NULL;
+        at86rf215_t *dev_09 = NULL;
+        at86rf215_t *dev_24 = NULL;
+        ieee802154_dev_t *hal_09 = NULL;
+        ieee802154_dev_t *hal_24 = NULL;
+        netdev_ieee802154_submac_t *netdev_09 = NULL;
+        netdev_ieee802154_submac_t *netdev_24 = NULL;
 
         printf("%d out of %u\n", i + 1, (unsigned)AT86RF215_NUM);
 
         if (IS_USED(MODULE_AT86RF215_SUBGHZ)) {
             puts("Sub-GHz");
-            at86rf215_subghz = &at86rf215[idx];
+            dev_09    = &at86rf215_devs[idx];
+            hal_09    = &at86rf215_netdev[idx].submac.dev;
+            netdev_09 = &at86rf215_netdev[idx];
             idx++;
         }
 
         if (IS_USED(MODULE_AT86RF215_24GHZ)) {
             puts("2.4 GHz");
-            at86rf215_24ghz = &at86rf215[idx];
+            dev_24    = &at86rf215_devs[idx];
+            hal_24    = &at86rf215_netdev[idx].submac.dev;
+            netdev_24 = &at86rf215_netdev[idx];
             idx++;
         }
 
         /* setup the specific driver */
-        at86rf215_setup(at86rf215_subghz, at86rf215_24ghz, &at86rf215_params[i], i);
+        at86rf215_init_event(&at86rf215_bhp[i], hal_09, hal_24, EVENT_PRIO_HIGHEST);
+        at86rf215_init(dev_09, dev_24, hal_09, hal_24, &at86rf215_params[i], &at86rf215_bhp[i]);
 
-        int res = 0;
-        if (at86rf215_subghz) {
-            res = _init_driver(&at86rf215_subghz->netdev.netdev, cb);
+        int index = 2 * i;
+        if (IS_USED(MODULE_AT86RF215_SUBGHZ)) {
+            netdev_register(&netdev_09->dev.netdev, NETDEV_AT86RF215, index);
+            netdev_ieee802154_submac_init(netdev_09);
+            ++index;
+        }
+
+        if (IS_USED(MODULE_AT86RF215_24GHZ)) {
+            netdev_register(&netdev_24->dev.netdev, NETDEV_AT86RF215, index);
+            netdev_ieee802154_submac_init(netdev_24);
+        }
+
+        int res;
+        if (dev_09) {
+            res = _init_driver(&netdev_09->dev.netdev, cb);
             if (res) {
                 return res;
             }
         }
 
-        if (at86rf215_24ghz) {
-            res = _init_driver(&at86rf215_24ghz->netdev.netdev, cb);
+        if (dev_24) {
+            res = _init_driver(&netdev_24->dev.netdev, cb);
             if (res) {
                 return res;
             }

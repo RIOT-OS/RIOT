@@ -14,12 +14,11 @@
  * @}
  */
 
+#include "at86rf215.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "at86rf215_internal.h"
-
-#include <string.h>
 
 #define SPIDEV          (dev->params.spi)
 #define CSPIN           (dev->params.cs_pin)
@@ -46,9 +45,9 @@ int at86rf215_hardware_reset(at86rf215_t *dev)
 
     /* trigger hardware reset */
     gpio_clear(dev->params.reset_pin);
-    xtimer_usleep(CONFIG_AT86RF215_RESET_PULSE_WIDTH_US);
+    ztimer_sleep(ZTIMER_USEC, CONFIG_AT86RF215_RESET_PULSE_WIDTH_US);
     gpio_set(dev->params.reset_pin);
-    xtimer_usleep(AT86RF215_RESET_DELAY_US);
+    ztimer_sleep(ZTIMER_USEC, AT86RF215_RESET_DELAY_US);
 
     /* While the device is in RESET / DEEP SLEEP, all registers
        but STATE will read 0xFF.
@@ -124,13 +123,14 @@ void at86rf215_reg_read_bytes(const at86rf215_t *dev, uint16_t reg, void *data, 
     spi_release(SPIDEV);
 }
 
-void at86rf215_filter_ack(at86rf215_t *dev, bool on)
+void at86rf215_filter_ack_only(at86rf215_t *dev, bool on)
 {
     /* only listen for ACK frames */
     uint8_t val = on ? (1 << IEEE802154_FCF_TYPE_ACK)
                      : (1 << IEEE802154_FCF_TYPE_BEACON)
                      | (1 << IEEE802154_FCF_TYPE_DATA)
-                     | (1 << IEEE802154_FCF_TYPE_MACCMD);
+                     | (1 << IEEE802154_FCF_TYPE_MACCMD)
+                     | (1 << IEEE802154_FCF_TYPE_ACK);
 
     at86rf215_reg_write(dev, dev->BBC->RG_AFFTM, val);
 }
@@ -193,14 +193,20 @@ const char* at86rf215_hw_state2a(uint8_t state)
     }
 }
 
-const char* at86rf215_sw_state2a(at86rf215_state_t state) {
+const char* at86rf215_sw_state2a(at86rf215_state_t state)
+{
     switch (state) {
     case AT86RF215_STATE_OFF: return "OFF";
     case AT86RF215_STATE_IDLE: return "IDLE";
     case AT86RF215_STATE_RX_SEND_ACK: return "RX (sending ACK)";
+    case AT86RF215_STATE_RX: return "RX";
+    case AT86RF215_STATE_RX_START: return "RX_START";
     case AT86RF215_STATE_TX: return "TX";
-    case AT86RF215_STATE_TX_WAIT_ACK: return "TX (wait for ACK)";
-    case AT86RF215_STATE_SLEEP: return "SLEEP";
+    case AT86RF215_STATE_TX_WAIT_ACK: return "TX_WAIT_ACK";
+    case AT86RF215_STATE_CCA_RX: return "CCA_RX";
+    case AT86RF215_STATE_CCA_IDLE: return "CCA_IDLE";
+    case AT86RF215_STATE_CCATX: return "CCATX";
+    case AT86RF215_STATE_TRXOFF: return "TRXOFF";
     default: return "invalid";
     }
 }

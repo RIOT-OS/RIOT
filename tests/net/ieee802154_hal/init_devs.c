@@ -58,6 +58,18 @@ static mrf24j40_t mrf24j40_dev[MRF24J40_NUM];
 static bhp_event_t mrf24j40_bhp[MRF24J40_NUM];
 #endif
 
+#ifdef MODULE_AT86RF215
+#  include "at86rf215.h"
+#  include "at86rf215_params.h"
+#  include "event/thread.h"
+
+#  define USED_BANDS (IS_USED(MODULE_AT86RF215_SUBGHZ) + IS_USED(MODULE_AT86RF215_24GHZ))
+#  define AT86RF215_NUM ARRAY_SIZE(at86rf215_params)
+#  define USE_24GHZ 1
+static at86rf215_t at86rf215_devs[AT86RF215_NUM * USED_BANDS];
+static at86rf215_bhp_ev_t at86rf215_bhp[AT86RF215_NUM * USED_BANDS];
+#endif
+
 void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
 {
     if (IS_USED(MODULE_EVENT_THREAD)) {
@@ -124,6 +136,29 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
             mrf24j40_init(&mrf24j40_dev[i], p, radio, bhp_event_isr_cb, &mrf24j40_bhp[i]);
             break;
         }
+    }
+#endif
+
+#ifdef MODULE_AT86RF215
+    at86rf215_t *dev_09 = NULL;
+    at86rf215_t *dev_24 = NULL;
+    ieee802154_dev_t *hal_09 = NULL;
+    ieee802154_dev_t *hal_24 = NULL;
+
+    if ((radio = cb(IEEE802154_DEV_TYPE_AT86RF215, opaque)) ){
+
+        /* HAL Test supports only one interface at the time */
+        if (IS_USED(MODULE_AT86RF215_24GHZ) && USE_24GHZ) {
+            dev_24    = &at86rf215_devs[0];
+            hal_24    = radio;
+        }
+        else if(IS_USED(MODULE_AT86RF215_SUBGHZ) && !USE_24GHZ) {
+            dev_09    = &at86rf215_devs[0];
+            hal_09    = radio;
+        }
+
+        at86rf215_init_event(&at86rf215_bhp[0], hal_09, hal_24, EVENT_PRIO_HIGHEST);
+        at86rf215_init(dev_09, dev_24, hal_09, hal_24, &at86rf215_params[0], &at86rf215_bhp[0]);
     }
 #endif
 }

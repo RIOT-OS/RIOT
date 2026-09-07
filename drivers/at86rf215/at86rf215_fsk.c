@@ -20,9 +20,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-/* symbol time is always 20 µs for MR-FSK (table 0, pg. 7) */
-#define FSK_SYMBOL_TIME_US  20
-
 /* also used by at86rf215_netdev.c */
 const uint8_t _at86rf215_fsk_srate_10kHz[] = {
     [FSK_SRATE_50K]  = 5,
@@ -392,40 +389,6 @@ static void _set_srate(at86rf215_t *dev, uint8_t srate, bool mod_idx_half)
     at86rf215_reg_write(dev, dev->BBC->RG_FSKC1, srate);
 }
 
-static void _set_ack_timeout(at86rf215_t *dev, bool mord4, bool fec)
-{
-    uint8_t ack_len = AT86RF215_ACK_PSDU_BYTES;
-
-    /* PHR uses same data rate as PSDU */
-    ack_len += 2;
-
-    /* 4-FSK doubles data rate */
-    if (mord4) {
-        ack_len /= 2;
-    }
-
-    /* forward error correction halves data rate */
-    if (fec) {
-        ack_len *= 2;
-    }
-
-    dev->ack_timeout_usec = dev->csma_backoff_period
-                          + IEEE802154G_ATURNAROUNDTIME_US
-                          /* long Preamble + SFD; SFD=2 */
-                          + ((dev->fsk_pl * 8 + 2)
-                          + ack_len) * 8 * FSK_SYMBOL_TIME_US;
-
-    DEBUG("[%s] ACK timeout: %"PRIu32" µs\n", "FSK", dev->ack_timeout_usec);
-}
-
-static void _set_csma_backoff_period(at86rf215_t *dev)
-{
-    dev->csma_backoff_period = IEEE802154_CCA_DURATION_IN_SYMBOLS * FSK_SYMBOL_TIME_US
-                             + IEEE802154G_ATURNAROUNDTIME_US;
-
-    DEBUG("[%s] CSMA BACKOFF: %"PRIu32" µs\n", "FSK", dev->csma_backoff_period);
-}
-
 int at86rf215_configure_FSK(at86rf215_t *dev, uint8_t srate, uint8_t mod_idx, uint8_t mod_order, uint8_t fec)
 {
     if (srate > FSK_SRATE_400K) {
@@ -454,7 +417,7 @@ int at86rf215_configure_FSK(at86rf215_t *dev, uint8_t srate, uint8_t mod_idx, ui
     at86rf215_reg_write(dev, dev->BBC->RG_FSKC0, FSK_BT_20
                                                | (_mod_idx << FSKC0_MIDX_SHIFT)
                                                | (_mod_idx_scale << FSKC0_MIDXS_SHIFT)
-                                               | mod_order
+                                               | (mod_order << FSKC0_MORD_SHIFT)
                                                );
 
     /* enable direct modulation */
@@ -464,7 +427,7 @@ int at86rf215_configure_FSK(at86rf215_t *dev, uint8_t srate, uint8_t mod_idx, ui
     uint8_t fskrpc = 0x5;
 
     /* Enable / Disable Reduced Power Consumption */
-    if (dev->flags & AT86RF215_OPT_RPC) {
+    if (dev->rpc_enable) {
         fskrpc |= FSKRPC_EN_MASK;
     }
     at86rf215_reg_write(dev, dev->BBC->RG_FSKRPC, fskrpc);
@@ -494,7 +457,6 @@ int at86rf215_FSK_set_mod_order(at86rf215_t *dev, uint8_t mod_order) {
         at86rf215_reg_and(dev, dev->BBC->RG_FSKC0, ~FSK_MORD_4SFK);
     }
 
-    _set_ack_timeout(dev, mod_order, at86rf215_FSK_get_fec(dev));
     return 0;
 }
 
@@ -532,13 +494,12 @@ uint8_t at86rf215_FSK_get_srate(at86rf215_t *dev)
 int at86rf215_FSK_set_srate(at86rf215_t *dev, uint8_t srate)
 {
     if (srate > FSK_SRATE_400K) {
-        return -1;
+        return -ERANGE;
     }
 
     at86rf215_await_state_end(dev, RF_STATE_TX);
 
     _set_srate(dev, srate, at86rf215_FSK_get_mod_idx(dev) <= 32);
-    _set_csma_backoff_period(dev);
 
     return 0;
 }
@@ -562,9 +523,6 @@ int at86rf215_FSK_set_fec(at86rf215_t *dev, uint8_t mode)
     default:
         return -1;
     }
-
-    _set_ack_timeout(dev, mode, at86rf215_FSK_get_mod_order(dev));
-    _set_csma_backoff_period(dev);
 
     return 0;
 }
@@ -607,8 +565,8 @@ int at86rf215_FSK_set_channel_spacing(at86rf215_t *dev, uint8_t ch_space)
 
     /* adjust channel spacing */
     dev->num_chans = is_subGHz(dev) ? 34 / (ch_space + 1) : (416 / (ch_space + 1)) - (ch_space * 2);
-    dev->netdev.chan = at86rf215_chan_valid(dev, dev->netdev.chan);
-    at86rf215_reg_write16(dev, dev->RF->RG_CNL, dev->netdev.chan);
+    dev->channel = at86rf215_chan_valid(dev, dev->channel);
+    at86rf215_reg_write16(dev, dev->RF->RG_CNL, dev->channel);
 
     return 0;
 }
