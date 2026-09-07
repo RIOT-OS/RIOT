@@ -354,7 +354,9 @@ compile() {
     # set build directory. CI ensures only one build at a time in $(pwd).
     export BINDIR="$(pwd)/build"
 
-    # Pre-build cleanup
+    # pre-build cleanup: this is effectively a superset of "make clean" that
+    # will not cost a full parse of the build system as well as one sub-make
+    # per package.
     rm -rf ${BINDIR}
 
     print_worker
@@ -368,7 +370,6 @@ compile() {
     # reduces disk IO.
     export CCACHE_TEMPDIR="$(pwd)/.ccache/tmp"
 
-    BOARD=${board} make -C${appdir} clean
     CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
         make -C${appdir} all test-input-hash -j${JOBS:-4}
     RES=$?
