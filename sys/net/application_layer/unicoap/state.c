@@ -186,12 +186,10 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
         unicoap_client_memo_t* memo = &_state.client_memos[i];
 
 
-        if (endpoint && !unicoap_endpoint_is_equal(&memo->super.endpoint,
-                                                   endpoint) && !_is_multicast(memo)) {
-            continue;
-        }
-
-        if (token_length == sizeof(memo->token) && memcmp(memo->token, token, token_length) == 0) {
+        if ((_is_multicast(memo)
+             || (endpoint && unicoap_endpoint_is_equal(&memo->super.endpoint, endpoint)))
+            && (token_length == sizeof(memo->token))
+            && memcmp(memo->token, token, token_length) == 0) {
             return memo;
         }
     }
@@ -658,6 +656,9 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
                 return UNICOAP_PREPROCESSING_ERROR_TRUNCATED;
             }
 
+            /* For multicast requests, the timeout is used to limit the
+             *              time during which a client accepts server responses. Hence it
+             *              should continue running even after receiving one response. */
             if (!_is_multicast(memo)) {
                 unicoap_event_cancel(&memo->super.exchange.timeout);
             }

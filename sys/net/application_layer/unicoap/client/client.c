@@ -131,9 +131,15 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
 
     if (multicast) {
         if (flags & UNICOAP_CLIENT_FLAG_RELIABLE) {
-            _CLIENT_DEBUG("error trying to send reliable datagram via multicast\n");
+            _CLIENT_DEBUG("error: reliable datagrams are not supported for multicast requests\n");
             return -EINVAL;
         }
+
+        if (endpoint->proto == UNICOAP_PROTO_DTLS) {
+            _CLIENT_DEBUG("error: DTLS is not supported for multicast requests\n");
+            return -EINVAL;
+        }
+
         flags |= UNICOAP_CLIENT_FLAG_MULTICAST;
     }
 
