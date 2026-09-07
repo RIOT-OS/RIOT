@@ -188,7 +188,7 @@ static int _on_l2cap_evt(struct ble_l2cap_event *event, void *arg)
 
 static void try_connect_gap(void)
 {
-    if(_is_client) {
+    if (_is_client) {
         DEBUG("Trying to connect to remote\n");
         ble_gap_connect(nimble_riot_own_addr_type, &_peer_addr, CONFIG_BPLIB_CLA_BLE_TIMEOUT,
             NULL, _on_gap_evt, NULL);

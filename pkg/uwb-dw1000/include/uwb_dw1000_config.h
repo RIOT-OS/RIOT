@@ -144,7 +144,9 @@ extern "C" {
  *
  */
 #ifndef CONFIG_DW1000_RX_SFD_TO_DEFAULT
-#define CONFIG_DW1000_RX_SFD_TO_DEFAULT   (128 + 1 + 8 - 8) /* (preamble length + 1 + SFD length - PAC size) */
+
+/* (preamble length + 1 + SFD length - PAC size) */
+#define CONFIG_DW1000_RX_SFD_TO_DEFAULT   (128 + 1 + 8 - 8)
 #endif
 
 /**

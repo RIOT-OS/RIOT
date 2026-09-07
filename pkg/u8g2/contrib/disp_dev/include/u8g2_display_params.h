@@ -102,7 +102,6 @@ extern "C" {
 #  define U8G2_DISPLAY_PARAM_ROTATION_FUNCTION U8G2_R0
 #endif
 
-
 /**
  * @brief   Default configuration struct
  */

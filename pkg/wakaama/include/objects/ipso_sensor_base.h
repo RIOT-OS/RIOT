@@ -25,15 +25,15 @@
  * ## Resources
  * Given that IPSO sensors share a common set of resources, these are implemented by this module.
  *
- |                 Name                |  ID  | Mandatory |  Type  | Range |   Units  | Implemented |
- |:-----------------------------------:|:----:|:---------:|:------:|:-----:|:--------:|:-----------:|
- |             Sensor Value            | 5700 |    Yes    |  Float |   -   | See 5701 |     Yes     |
- |         Min. Measured Value         | 5601 |     No    |  Float |   -   | See 5701 |     Yes     |
- |         Max. Measured Value         | 5602 |     No    |  Float |   -   | See 5701 |     Yes     |
- |           Min. Range Value          | 5603 |     No    |  Float |   -   | See 5701 |     Yes     |
- |           Max. Range Value          | 5604 |     No    |  Float |   -   | See 5701 |     Yes     |
- | Reset Min. and Max. Measured Values | 5605 |     No    |    -   |   -   |     -    |     Yes     |
- |             Sensor Units            | 5701 |     No    | String |   -   |     -    |     Yes     |
+ |                 Name                |  ID  | Mandatory |  Type  | Range |   Units  |Implemented|
+ |:-----------------------------------:|:----:|:---------:|:------:|:-----:|:--------:|:---------:|
+ |             Sensor Value            | 5700 |    Yes    |  Float |   -   | See 5701 |    Yes    |
+ |         Min. Measured Value         | 5601 |     No    |  Float |   -   | See 5701 |    Yes    |
+ |         Max. Measured Value         | 5602 |     No    |  Float |   -   | See 5701 |    Yes    |
+ |           Min. Range Value          | 5603 |     No    |  Float |   -   | See 5701 |    Yes    |
+ |           Max. Range Value          | 5604 |     No    |  Float |   -   | See 5701 |    Yes    |
+ | Reset Min. and Max. Measured Values | 5605 |     No    |    -   |   -   |     -    |    Yes    |
+ |             Sensor Units            | 5701 |     No    | String |   -   |     -    |    Yes    |
  *
  * @{
  *

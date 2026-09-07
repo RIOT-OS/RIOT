@@ -1,8 +1,11 @@
 /*
+ * SPDX-FileCopyrightText:  2017 - 2021, Nordic Semiconductor ASA
+ * SPDX-License-Identifier:  BSD-3-Clause
+ */
+
+/*
  * Copyright (c) 2017 - 2021, Nordic Semiconductor ASA
  * All rights reserved.
- *
- * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -254,27 +257,40 @@ extern "C" {
  */
 #define NRFX_EVENT_READBACK_ENABLED 1
 
-/** @brief Bitmask that defines DPPI channels that are reserved for use outside of the nrfx library. */
+/** @brief Bitmask that defines DPPI channels that are reserved for use outside
+ * of the nrfx library.
+ */
 #define NRFX_DPPI_CHANNELS_USED   0
 
-/** @brief Bitmask that defines DPPI groups that are reserved for use outside of the nrfx library. */
+/** @brief Bitmask that defines DPPI groups that are reserved for use outside
+ * of the nrfx library.
+ */
 #define NRFX_DPPI_GROUPS_USED     0
 
-/** @brief Bitmask that defines PPI channels that are reserved for use outside of the nrfx library. */
+/** @brief Bitmask that defines PPI channels that are reserved for use outside
+ * of the nrfx library.
+ */
 #define NRFX_PPI_CHANNELS_USED    0
 
-/** @brief Bitmask that defines PPI groups that are reserved for use outside of the nrfx library. */
+/** @brief Bitmask that defines PPI groups that are reserved for use outside
+ * of the nrfx library.
+ */
 #define NRFX_PPI_GROUPS_USED      0
 
-/** @brief Bitmask that defines GPIOTE channels that are reserved for use outside of the nrfx library. */
+/** @brief Bitmask that defines GPIOTE channels that are reserved for use outside
+ * of the nrfx library.
+ */
 #define NRFX_GPIOTE_CHANNELS_USED 0
 
-/** @brief Bitmask that defines EGU instances that are reserved for use outside of the nrfx library. */
+/** @brief Bitmask that defines EGU instances that are reserved for use outside
+ * of the nrfx library.
+ */
 #define NRFX_EGUS_USED            0
 
-/** @brief Bitmask that defines TIMER instances that are reserved for use outside of the nrfx library. */
+/** @brief Bitmask that defines TIMER instances that are reserved for use outside
+ * of the nrfx library.
+ */
 #define NRFX_TIMERS_USED          0
-
 
 #ifdef __cplusplus
 }

@@ -265,8 +265,9 @@ extern "C" {
  *                      wolfSSL currently supports DTLS 1.0, and DTLS 1.2. Each of these
  *                      protocols have a corresponding function that can be used as last
  *                      argument to `sock_dtls_create`. The possible client and server
- *                      protocol options are: `wolfDTLSv1_client_method()`, `wolfDTLSv1_server_method()`,
- *                      `wolfDTLSv1_2_client_method()` and `wolfDTLSv1_server_method`.
+ *                      protocol options are: `wolfDTLSv1_client_method()`,
+ *                      `wolfDTLSv1_server_method()`, `wolfDTLSv1_2_client_method()` and
+ *                      `wolfDTLSv1_server_method`.
  *
  * @return  0 on success.
  * @return  -EADDRINUSE, if `local != NULL` and @p local is already used
@@ -283,7 +284,8 @@ extern "C" {
  * @return  -ENOMEM, if not enough resources can be provided for `sock` to be
  *          created.
  */
-int sock_dtls_create(sock_tls_t *sock, const sock_udp_ep_t *local, const sock_udp_ep_t *remote, uint16_t flags, WOLFSSL_METHOD *method);
+int sock_dtls_create(sock_tls_t *sock, const sock_udp_ep_t *local,
+                     const sock_udp_ep_t *remote, uint16_t flags, WOLFSSL_METHOD *method);
 
 /**
  * @brief   Sets the endpoint address for the remote DTLS peer associated to this sock object
@@ -332,7 +334,7 @@ void sock_dtls_session_destroy(sock_tls_t *sk);
 void sock_dtls_close(sock_tls_t *sk);
 
 #ifdef MODULE_SOCK_TCP
-#   error Only support for UDP/IP provided via GNRC stack.
+#   error Supports only UDP/IP provided via GNRC stack.
 #endif
 
 #ifdef __cplusplus
