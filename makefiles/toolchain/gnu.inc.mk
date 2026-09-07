@@ -26,10 +26,8 @@ OBJDUMP   ?= $(_OBJDUMP)
 GCC_VERSION := $(shell command -v $(CC) > /dev/null && $(CC) -dumpversion | cut -d . -f 1)
 
 # -fmacro-prefix-map requires GCC 8
-ifneq (,$(GCC_VERSION))
-  ifneq (1,$(call version_is_greater_or_equal,$(GCC_VERSION),8))
-    OPTIONAL_CFLAGS_BLACKLIST += -fmacro-prefix-map=$(RIOTBASE)/=
-  endif
+ifneq (1,$(call version_is_greater_or_equal,$(GCC_VERSION),8))
+  OPTIONAL_CFLAGS_BLACKLIST += -fmacro-prefix-map=$(RIOTBASE)/=
 endif
 
 # GCC does not warn about documentation (yet)
