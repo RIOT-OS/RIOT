@@ -1150,6 +1150,35 @@ typedef enum {
 } dma_incr_t;
 
 /**
+ * @brief   Available DMA block action modes after block completion
+ */
+typedef enum {
+    /**
+     * @brief   No action on block completion
+     */
+    DMA_BLOCKACT_NONE    = DMAC_BTCTRL_BLOCKACT_NOACT_Val, /**<  */
+    /**
+     * @brief   Interrupt on block completion
+     */
+    DMA_BLOCKACT_INT     = DMAC_BTCTRL_BLOCKACT_INT_Val,
+    /**
+     * @brief   Suspend the DMA on block completion
+     */
+    DMA_BLOCKACT_SUSPEND = DMAC_BTCTRL_BLOCKACT_SUSPEND_Val,
+    /**
+     * @brief   Interrupt and suspend the DMA on block completion
+     */
+    DMA_BLOCKACT_BOTH    = DMAC_BTCTRL_BLOCKACT_BOTH_Val,
+} dma_blockact_t;
+
+/**
+ * @brief   Signature of event callback functions triggered from interrupts
+ *
+ * @param[in] arg       optional context for the callback
+ */
+typedef void (*dma_cb_t)(void *arg);
+
+/**
  * @brief   Initialize DMA
  */
 void dma_init(void);
@@ -1179,9 +1208,18 @@ void dma_release_channel(dma_t dma);
  * @param   dma     DMA channel reference
  * @param   trigger Trigger to use for this DMA channel
  * @param   prio    Channel priority
- * @param   irq     Whether to enable the interrupt handler for this channel
+ * @param   cb      Callback to call when DMA transfer is done, may be NULL
+ * @param   ctx     Callback context
  */
-void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, bool irq);
+void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, dma_cb_t cb, void *ctx);
+
+/**
+ * @brief   Update the DMA Completion callback context
+ *
+ * @param   dma[in] DMA channel to release
+ * @param   ctx[in] DMA complete callback context
+ */
+void dma_set_cb_arg(dma_t dma, void *ctx);
 
 /**
  * @brief   Prepare the DMA channel for an individual transfer.
@@ -1195,9 +1233,11 @@ void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, bool irq);
  * @param   dst     Destination address for the transfer
  * @param   num     Number of beats to transfer
  * @param   incr    Which of the addresses to increment after a beat
+ * @param   blockact Action to take when the block transfer is complete
+ *                   (e.g., suspend, interrupt, etc.)
  */
 void dma_prepare(dma_t dma, uint8_t width, const void *src, void *dst,
-                 size_t num, dma_incr_t incr);
+                 size_t num, dma_incr_t incr, dma_blockact_t blockact);
 
 /**
  * @brief   Prepare a transfer without modifying the destination address
@@ -1308,22 +1348,35 @@ void dma_append_dst(dma_t dma, DmacDescriptor *next, void *dst, size_t num,
                     bool incr);
 
 /**
+ * @brief   Make the DMA transfer repeat indefinitely
+ *
+ * @param[in]   dma     DMA channel reference
+ */
+void dma_enable_loop(dma_t dma);
+
+/**
+ * @brief   Disable DMA transfer looping
+ *
+ * @param[in]   dma     DMA channel reference
+ */
+void dma_disable_loop(dma_t dma);
+
+/**
  * @brief   Start a DMA transfer.
  *
- * @param   dma     DMA channel reference
+ * @param[in]   dma     DMA channel reference
  */
 void dma_start(dma_t dma);
 
 /**
- * @brief   Wait for a DMA channel to finish the transfer.
+ * @brief   Resume a suspended DMA transfer
  *
- * This function uses a blocking mutex to wait for the transfer to finish
+ * This is intended to be called from an DMA ISR, when DMA was prepared with
+ * @ref DMA_BLOCKACT_SUSPEND or @ref DMA_BLOCKACT_BOTH.
  *
- * @note Use only with DMA channels of which the interrupt is enabled
- *
- * @param   dma     DMA channel reference
+ * @param[in]   dma     DMA channel reference
  */
-void dma_wait(dma_t dma);
+void dma_resume(dma_t dma);
 
 /**
  * @brief   Cancel an active DMA transfer
@@ -1331,7 +1384,7 @@ void dma_wait(dma_t dma);
  * It is not harmful to call this on an inactive channel, but it will waste some
  * processing time
  *
- * @param   dma     DMA channel reference
+ * @param[in]   dma     DMA channel reference
  */
 void dma_cancel(dma_t dma);
 /** @} */

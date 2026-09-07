@@ -51,11 +51,13 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
+#include <inttypes.h>
 #include <limits.h>
 #include <stdint.h>
+#include <stddef.h>
 
 #include "periph_cpu.h"
-#include "periph_conf.h"
+#include "periph_cpu_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -109,6 +111,23 @@ typedef enum {
 int adc_init(adc_t line);
 
 /**
+ * @brief   Get the frequency of the ADC peripheral
+ *
+ * @return frequency in Hz
+ */
+uint32_t adc_get_freq(void);
+
+/**
+ * @brief   Get the maximum sample rate of the given ADC line at the given resolution
+ *
+ * @param[in] line          line to get sample rate for
+ * @param[in] bits          resolution to use for conversion
+ *
+ * @return                  sample rate in Hz
+ */
+uint32_t adc_get_sample_rate(adc_t line, unsigned bits);
+
+/**
  * @brief   Sample a value from the given ADC line
  *
  * This function blocks until the conversion has finished. Please note, that if
@@ -148,6 +167,76 @@ int32_t adc_continuous_sample(adc_t line);
  * @note requires the `periph_adc_continuous` feature
  */
 void adc_continuous_stop(void);
+
+/**
+ * @brief   Setup DMA for ADC sampling
+ *
+ * This requires the `periph_adc_dma` feature.
+ *
+ * @param[in] line          ADC line to setup DMA for
+ * @param[in] cb            DMA callback function
+ * @param[in] arg           Argument to pass to the callback function
+ * @param[in] res           Bit resolution to use for conversion
+ *
+ * @retval    0             success
+ * @retval   -EEXIST        DMA channel already in use
+ * @retval   -ENOMEM        No DMA channel available
+ */
+int adc_dma_setup(adc_t line, dma_cb_t cb, void *arg, adc_res_t res);
+
+/**
+ * @brief   Start DMA transfer for ADC sampling
+ *
+ * This requires the `periph_adc_dma` feature.
+ * Currently only 1 or 2 destination buffers are supported.
+ * 2 destination buffers allow for double buffer sampling.
+ *
+ * @param[in] line          ADC line to start DMA transfer for
+ * @param[in] dst           Array of destination buffers for sampled data
+ * @param[in] dst_size      Number of samples per buffer
+ * @param[in] dst_numof     Number of destination buffers
+ *
+ * @return    0             success
+ * @return   -EINVAL        DMA channel not set up
+ * @return   -ENOTSUP       Unsupported number of destination buffers
+ */
+int adc_dma_start(adc_t line, uint16_t *dst[], size_t dst_size, unsigned dst_numof);
+
+/**
+ * @brief   Stop DMA transfer for ADC sampling
+ *
+ * This requires the `periph_adc_dma` feature.
+ *
+ * @param[in] line          ADC line to stop DMA transfer for
+ *
+ * @return    0             success
+ * @return   -EINVAL        DMA channel not set up
+ */
+int adc_dma_stop(adc_t line);
+
+/**
+ * @brief   Continue a suspended DMA transfer for ADC sampling
+ *
+ * This requires the `periph_adc_dma` feature.
+ *
+ * @param[in] line          ADC line to continue DMA transfer for
+ *
+ * @return    0             success
+ * @return   -EINVAL        DMA channel not set up
+ */
+int adc_dma_continue(adc_t line);
+
+/**
+ * @brief   Release DMA channel for ADC sampling
+ *
+ * This requires the `periph_adc_dma` feature.
+ *
+ * @param[in] line          ADC line to release DMA channel for
+ *
+ * @return     0            success
+ * @return    -EINVAL       DMA channel not set up
+ */
+int adc_dma_release(adc_t line);
 
 #ifdef __cplusplus
 }

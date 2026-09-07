@@ -16,6 +16,7 @@
  * @}
  */
 
+#include <errno.h>
 #include <stdint.h>
 
 #include "macros/utils.h"
@@ -47,6 +48,8 @@
 #  define ADC_NEG_INPUT (0)
 #endif
 
+#define ADC_DMA_DEST_MAX    2
+
 /* Prototypes */
 static void _adc_poweroff(Adc *dev);
 static void _setup_clock(Adc *dev);
@@ -54,6 +57,10 @@ static void _setup_calibration(Adc *dev);
 static int _adc_configure(Adc *dev, adc_res_t res);
 
 static mutex_t _lock = MUTEX_INIT;
+/* Designated Array Range Initializer */
+static dma_t tx_dma[ADC_NUMOF] = { [0 ... ADC_NUMOF - 1] = UINT8_MAX };
+/* extra descriptors to append destination buffers in circular DMA transfers */
+static DmacDescriptor DMA_DESCRIPTOR_ATTRS _tx_dma_next[(ADC_DMA_DEST_MAX - 1) * ADC_NUMOF];
 
 static inline void _wait_syncbusy(Adc *dev)
 {
@@ -346,7 +353,37 @@ static Adc *_adc(uint8_t dev)
 #endif
 }
 
-static int32_t _sample(adc_t line)
+uint32_t adc_get_freq(void)
+{
+    /*
+    * In free running mode, the sampling rate RS is calculated by
+    * RS = fCLK_ADC / ( nSAMPLING + nOFFCOMP + nDATA)
+    * Here, nSAMPLING is the sampling duration in CLK_ADC cycles, nOFFCOMP is the offset compensation duration in clock
+    * cycles, and nDATA is the bit resolution. fCLK_ADC is the ADC clock frequency from the internal prescaler:
+    * fCLK_ADC = fGCLK_ADC / 2^(1 + CTRLA.PRESCALER)
+    */
+    return sam0_gclk_freq(ADC_GCLK_SRC) / ((uint32_t)1 << ((ADC_PRESCALER >> ADC_CTRLA_PRESCALER_Pos) + 1));
+}
+
+uint32_t adc_get_sample_rate(adc_t line, unsigned bits)
+{
+    Adc *dev = _dev(line);
+    /*
+     * Bit 7 – OFFCOMP Comparator Offset Compensation Enable
+     * Setting this bit enables the offset compensation for each sampling period to ensure low offset and immunity to
+     * temperature or voltage drift. This compensation increases the sampling time by three clock cycles that results in a
+     * fixed sampling duration of 4 CLK_ADC cycles.
+     * This bit must be set to zero to validate the SAMPLEN value. It’s not possible to use OFFCOMP=1 and SAMPLEN>0.
+    */
+    bool offcomp = dev->SAMPCTRL.reg & (1u << ADC_SAMPCTRL_OFFCOMP_Pos);
+    unsigned n_sampling = ((dev->SAMPCTRL.reg & ADC_SAMPCTRL_SAMPLEN_Msk) >> ADC_SAMPCTRL_SAMPLEN_Pos) + 1;
+    if (offcomp) {
+        n_sampling = 4;
+    }
+    return adc_get_freq() / (n_sampling + bits);
+}
+
+static void _sample_setup(adc_t line)
 {
     Adc *dev = _dev(line);
     bool diffmode = adc_channels[line].inputctrl & ADC_INPUTCTRL_DIFFMODE;
@@ -363,9 +400,18 @@ static int32_t _sample(adc_t line)
     }
 #endif
     _wait_syncbusy(dev);
+}
 
-    /* Start the conversion */
+static void _sample_start(adc_t line)
+{
+    Adc *dev = _dev(line);
     dev->SWTRIG.reg = ADC_SWTRIG_START;
+}
+
+static int32_t _sample_read(adc_t line)
+{
+    Adc *dev = _dev(line);
+    bool diffmode = adc_channels[line].inputctrl & ADC_INPUTCTRL_DIFFMODE;
 
     /* Wait for the result */
     while (!(dev->INTFLAG.reg & ADC_INTFLAG_RESRDY)) {}
@@ -381,6 +427,13 @@ static int32_t _sample(adc_t line)
     }
 
     return result;
+}
+
+static int32_t _sample(adc_t line)
+{
+    _sample_setup(line);
+    _sample_start(line);
+    return _sample_read(line);
 }
 
 static uint8_t _shift_from_res(adc_res_t res)
@@ -476,4 +529,112 @@ int32_t adc_sample(adc_t line, adc_res_t res)
     mutex_unlock(&_lock);
 
     return val;
+}
+
+int adc_dma_setup(adc_t line, dma_cb_t cb, void *arg, adc_res_t res)
+{
+    uint8_t dmac_id;
+#ifdef ADC1_DMAC_ID_RESRDY
+    dmac_id = (_dev(line) == ADC1) ? ADC1_DMAC_ID_RESRDY : ADC0_DMAC_ID_RESRDY;
+#else
+    dmac_id = ADC_DMAC_ID_RESRDY;
+#endif
+    if (tx_dma[line] != UINT8_MAX) {
+        return -EEXIST;
+    }
+    tx_dma[line] = dma_acquire_channel();
+    if (tx_dma[line] == UINT8_MAX) {
+        return -ENOMEM;
+    }
+    _adc_configure(_dev(line), res);
+    dma_setup(tx_dma[line], dmac_id, 0, cb, arg);
+    return 0;
+}
+
+int adc_dma_start(adc_t line, uint16_t *dst[], size_t dst_size, unsigned dst_numof)
+{
+    if (tx_dma[line] == UINT8_MAX) {
+        return -EINVAL;
+    }
+    if (dst_numof < 1 || dst_numof > ADC_DMA_DEST_MAX) {
+        return -ENOTSUP;
+    }
+    Adc *dev = _dev(line);
+
+    /* Clear any pending flags (like OVERRUN) before starting */
+    dev->INTFLAG.reg = dev->INTFLAG.reg;
+
+    /* Setup input pins/mux BEFORE entering freerun */
+    _sample_setup(line);
+
+    /* Set DMA transfer descriptors */
+    const volatile void *src = &dev->RESULT.reg;
+    /* enable block interrupt and suspend DMA on block completion */
+    dma_prepare(tx_dma[line], DMAC_BTCTRL_BEATSIZE_HWORD_Val,
+                (const void *)src, dst[0] + dst_size, dst_size,
+                DMA_INCR_DEST, DMA_BLOCKACT_BOTH);
+
+    /* Enable FREERUN */
+#ifdef ADC_CTRLB_FREERUN
+    dev->CTRLB.reg |= ADC_CTRLB_FREERUN;
+#else
+    dev->CTRLA.reg |= ADC_CTRLA_FREERUN;
+#endif
+    _wait_syncbusy(dev);
+
+    if (dst_numof > 1) {
+        for (unsigned i = 0; i < dst_numof - 1; ++i) {
+            dma_append_dst(tx_dma[line], &_tx_dma_next[line * (ADC_DMA_DEST_MAX - 1) + i],
+                           dst[i + 1] + dst_size, dst_size, true);
+        }
+    }
+    dma_enable_loop(tx_dma[line]);
+    /* Start DMA channel first */
+    dma_start(tx_dma[line]);
+
+    /* Kickoff first conversion */
+    _sample_start(line);
+
+    return 0;
+}
+
+int adc_dma_stop(adc_t line)
+{
+    if (tx_dma[line] == UINT8_MAX) {
+        return -EINVAL;
+    }
+    dma_cancel(tx_dma[line]);
+    dma_disable_loop(tx_dma[line]);
+
+    Adc *dev = _dev(line);
+#ifdef ADC_CTRLB_FREERUN
+    dev->CTRLB.reg &= ~ADC_CTRLB_FREERUN;
+#else
+    dev->CTRLA.reg &= ~ADC_CTRLA_FREERUN;
+#endif
+    _wait_syncbusy(dev);
+
+    return 0;
+}
+
+int adc_dma_continue(adc_t line)
+{
+    if (tx_dma[line] == UINT8_MAX) {
+        return -EINVAL;
+    }
+    dma_resume(tx_dma[line]);
+
+    return 0;
+}
+
+int adc_dma_release(adc_t line)
+{
+    if (tx_dma[line] == UINT8_MAX) {
+        return 0;
+    }
+    adc_dma_stop(line);
+    dma_release_channel(tx_dma[line]);
+    tx_dma[line] = UINT8_MAX;
+
+    return 0;
 }
