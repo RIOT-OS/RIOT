@@ -43,8 +43,9 @@ extern "C" {
 #endif
 #endif
 
-/** Will be added where memories needs to be aligned (with -Os data might not be aligned
- *  to boundary by default). E.g. __attribute__((aligned(4)))
+/** Added to memories with alignment requirement.
+ *
+ * With -Os data might not be aligned to a boundary by default.
  */
 #define LV_ATTRIBUTE_MEM_ALIGN  __attribute__((aligned(4)))
 
