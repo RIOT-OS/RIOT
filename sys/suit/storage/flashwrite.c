@@ -101,7 +101,29 @@ static int _flashwrite_install(suit_storage_t *storage,
     (void)manifest;
     suit_storage_flashwrite_t *fw = _get_fw(storage);
 
-    return riotboot_flashwrite_finish(&fw->writer);
+#if CONFIG_SUIT_STORAGE_FLASHWRITE_SEQ_FROM_MANIFEST
+    riotboot_hdr_t *hdr = (void *)fw->writer.firstblock_buf;
+    uint32_t old_version = hdr->version;
+    uint32_t old_chksum = hdr->chksum;
+
+    LOG_INFO("_flashwrite_install: patch header version %"PRIu32" -> %"PRIu32"\n",
+             hdr->version, manifest->seq_number);
+
+    hdr->version = manifest->seq_number;
+    hdr->magic_number = RIOTBOOT_MAGIC;
+    hdr->chksum = riotboot_hdr_checksum(hdr);
+#endif
+
+    int res = riotboot_flashwrite_finish(&fw->writer);
+
+#if CONFIG_SUIT_STORAGE_FLASHWRITE_SEQ_FROM_MANIFEST
+    /* _dtv_verify_image_match() is called again after install, but will read from
+       cached RAM, not flash */
+    hdr->version = old_version;
+    hdr->chksum = old_chksum;
+#endif
+
+    return res;
 }
 
 static int _flashwrite_read(suit_storage_t *storage, uint8_t *buf,
