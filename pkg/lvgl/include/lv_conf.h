@@ -89,7 +89,7 @@ extern "C" {
 #  if (__SIZEOF_POINTER__ > 4)
 /* 64-bit platforms require additional space because a lot of pointers are stored on the lvgl heap. */
 #    if IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW)
-#    define LV_MEM_SIZE    (9U * 1024U)          /* [bytes] */
+#    define LV_MEM_SIZE    (9U * 1024U)
 #    else
 #    define LV_MEM_SIZE    (8U * 1024U)          /* [bytes] */
 #    endif
