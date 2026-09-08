@@ -208,10 +208,14 @@ extern "C" {
 /** Use NXP's PXP GPU iMX RTxxx platforms */
 #define LV_USE_GPU_NXP_PXP      0
 #if LV_USE_GPU_NXP_PXP
-/** 1: Add default bare metal and FreeRTOS interrupt handling routines for PXP (lv_gpu_nxp_pxp_osa.c)
- *   and call lv_gpu_nxp_pxp_init() automatically during lv_init(). Note that symbol SDK_OS_FREE_RTOS
- *   has to be defined in order to use FreeRTOS OSA, otherwise bare-metal implementation is selected.
- * 0: lv_gpu_nxp_pxp_init() has to be called manually before lv_init() */
+
+/** Auto initialization for interrupt handling.
+ *
+ * - 1: Add default bare metal and FreeRTOS interrupt handling routines for PXP (`lv_gpu_nxp_pxp_osa.c`)
+ *    and call `lv_gpu_nxp_pxp_init()` automatically during `lv_init()`. Note that symbol `SDK_OS_FREE_RTOS`
+ *    has to be defined in order to use FreeRTOS OSA, otherwise bare-metal implementation is selected.
+ * - 0: `lv_gpu_nxp_pxp_init()` has to be called manually before `lv_init()`.
+ */
 #define LV_USE_GPU_NXP_PXP_AUTO_INIT 0
 #endif
 
