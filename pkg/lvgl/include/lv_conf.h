@@ -303,7 +303,7 @@ extern "C" {
 #  define LV_SPRINTF_INCLUDE <stdio.h>
 #  define lv_snprintf     snprintf
 #  define lv_vsnprintf    vsnprintf
-#else   /* LV_SPRINTF_CUSTOM */
+#else
 #  define LV_SPRINTF_USE_FLOAT 0  /**< Don't use float with sprintf */
 #endif  /* LV_SPRINTF_CUSTOM */
 
