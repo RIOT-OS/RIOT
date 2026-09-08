@@ -187,7 +187,7 @@ extern "C" {
 #endif
 #else
 #warning Configuration problem: Flash mode is qio or qout, \
-         GPIO9 and GPIO10 are not available for UART1 as configured
+         GPIO9 and GPIO10 are not available to UART1 as configured
 #endif
 /** @} */
 
