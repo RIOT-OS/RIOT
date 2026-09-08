@@ -126,7 +126,7 @@ extern "C" {
    HAL SETTINGS
  *====================*/
 
-/** Default display refresh period. LVG will redraw changed ares with this period time */
+/** Default display refresh period. LVGL will redraw changed ares with this period time */
 #define LV_DISP_DEF_REFR_PERIOD     30      /* [ms] */
 
 /** Input device read period in milliseconds*/
