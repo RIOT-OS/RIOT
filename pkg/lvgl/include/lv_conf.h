@@ -439,7 +439,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  *  WIDGET USAGE
  *================*/
 
-/** Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html */
+/* Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html */
 #define LV_USE_ARC          IS_USED(MODULE_LVGL_WIDGET_ARC)
 
 #define LV_USE_ANIMIMG      IS_USED(MODULE_LVGL_EXTRA_WIDGET_ANIMIMG)
