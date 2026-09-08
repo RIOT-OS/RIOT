@@ -176,7 +176,8 @@ extern "C" {
 /** Number of stops allowed per gradient.
  *
  * Increase this to allow more stops.
- *  This adds `sizeof(lv_color_t) + 1` bytes per additional stop */
+ *  This adds `sizeof(lv_color_t) + 1` bytes per additional stop.
+ */
 #define LV_GRADIENT_MAX_STOPS       2
 
 /** Default gradient buffer size.
