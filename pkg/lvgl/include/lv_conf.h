@@ -415,7 +415,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  *  Depends on LV_TXT_LINE_BREAK_LONG_LEN. */
 #define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3
 
-/** The control character to use for signalling text recoloring. */
+/** The control character used to signal text recoloring. */
 #define LV_TXT_COLOR_CMD "#"
 
 /** Support bidirectional texts.
