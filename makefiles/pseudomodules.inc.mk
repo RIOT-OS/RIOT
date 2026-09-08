@@ -478,6 +478,7 @@ PSEUDOMODULES += shell_builtin_cmd_help_json
 PSEUDOMODULES += shell_cmd_app_metadata
 PSEUDOMODULES += shell_cmd_at30tse75x
 PSEUDOMODULES += shell_cmd_benchmark_udp
+PSEUDOMODULES += shell_cmd_bplib
 PSEUDOMODULES += shell_cmd_ccn-lite-utils
 PSEUDOMODULES += shell_cmd_conn_can
 PSEUDOMODULES += shell_cmd_cord_ep
