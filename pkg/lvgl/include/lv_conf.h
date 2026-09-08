@@ -226,13 +226,15 @@ extern "C" {
 #define LV_USE_LOG      0
 #if LV_USE_LOG
 
-/** How important log should be added:
- *  LV_LOG_LEVEL_TRACE       A lot of logs to give detailed information
- *  LV_LOG_LEVEL_INFO        Log important events
- *  LV_LOG_LEVEL_WARN        Log if something unwanted happened but didn't cause a problem
- *  LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
- *  LV_LOG_LEVEL_USER        Only logs added by the user
- *  LV_LOG_LEVEL_NONE        Do not log anything */
+/** How important log should be added
+ *
+ * - LV_LOG_LEVEL_TRACE:      A lot of logs to give detailed information
+ * - LV_LOG_LEVEL_INFO:       Log important events
+ * - LV_LOG_LEVEL_WARN:       Log if something unwanted happened but didn't cause a problem
+ * - LV_LOG_LEVEL_ERROR:      Only critical issue, when the system may fail
+ * - LV_LOG_LEVEL_USER:       Only logs added by the user
+ * - LV_LOG_LEVEL_NONE:       Do not log anything
+ */
 #  define LV_LOG_LEVEL    LV_LOG_LEVEL_WARN
 
 /** 1: Print the log with 'printf';
