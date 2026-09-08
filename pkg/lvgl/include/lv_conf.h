@@ -49,7 +49,11 @@ extern "C" {
 #define LV_COLOR_16_SWAP   1
 #else
 #define LV_COLOR_16_SWAP   0
-#endif
+#  if IS_USED(MODULE_LCD)
+#    define LV_COLOR_16_SWAP   1
+#  else
+#    define LV_COLOR_16_SWAP   0
+#  endif
 #endif
 
 /* Enable more complex drawing routines to manage screens transparency.
