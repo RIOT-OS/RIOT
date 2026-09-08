@@ -310,7 +310,9 @@ extern "C" {
 #define LV_USE_USER_DATA      1
 
 /** Garbage Collector settings
- *  Used if lvgl is binded to higher level language and the memory is managed by that language */
+ *
+ * Used if LVGL is bound to a higher level language and the memory is managed by that language.
+ */
 #define LV_ENABLE_GC 0
 #if LV_ENABLE_GC != 0
 #  define LV_GC_INCLUDE "gc.h"   /* Include Garbage Collector related things */
