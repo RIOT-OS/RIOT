@@ -91,7 +91,7 @@ extern "C" {
 #    if IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW)
 #    define LV_MEM_SIZE    (9U * 1024U)
 #    else
-#    define LV_MEM_SIZE    (8U * 1024U)          /* [bytes] */
+#    define LV_MEM_SIZE    (8U * 1024U)
 #    endif
 #  else
 #    if IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW)
