@@ -111,8 +111,11 @@ extern "C" {
 #  define LV_MEM_CUSTOM_FREE      free
 #endif     /* LV_MEM_CUSTOM */
 
-/** Number of the intermediate memory buffer used during rendering and other internal processing
- *  mechanisms. You will see an error log message if there wasn't enough buffers. */
+/** Number of the intermediate memory buffers.
+ *
+ * These are used during rendering and other internal processing
+ *  mechanisms. You will see an error log message if there weren't enough buffers.
+ */
 #define LV_MEM_BUF_MAX_NUM      16
 
 /** Use the standard `memcpy` and `memset` instead of LVGL's own functions.
