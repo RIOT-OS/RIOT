@@ -384,9 +384,13 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 /** Enable subpixel rendering */
 #define LV_USE_FONT_SUBPX       0
 #if LV_USE_FONT_SUBPX
-/** Set the pixel order of the display. Physical order of RGB channels.
- *  Doesn't matter with "normal" fonts.*/
-#define LV_FONT_SUBPX_BGR       0  /* 0: RGB; 1:BGR order */
+/** Set the pixel order of the display (physical order of RGB channels).
+ *
+ * 0: RGB; 1: BGR order
+ *
+ * Doesn't matter with "normal" fonts.
+ */
+#define LV_FONT_SUBPX_BGR       0
 #endif
 
 /*=================
