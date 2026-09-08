@@ -173,7 +173,9 @@ extern "C" {
  */
 #define LV_IMG_CACHE_DEF_SIZE       0
 
-/** Number of stops allowed per gradient. Increase this to allow more stops.
+/** Number of stops allowed per gradient.
+ *
+ * Increase this to allow more stops.
  *  This adds `sizeof(lv_color_t) + 1` bytes per additional stop */
 #define LV_GRADIENT_MAX_STOPS       2
 
