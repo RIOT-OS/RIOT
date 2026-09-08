@@ -42,7 +42,7 @@ extern "C" {
  * @brief TOA timeout delay for SS TWR (usec)
  */
 #ifndef MYNEWT_VAL_TWR_SS_ACK_TX_HOLDOFF
-#define MYNEWT_VAL_TWR_SS_ACK_TX_HOLDOFF (((uint32_t)0x800 + 0xA0\
+#define MYNEWT_VAL_TWR_SS_ACK_TX_HOLDOFF (((uint32_t)0x800 + 0xA0 \
                                          * IS_USED(MODULE_UWB_CORE_RNG_TRX_INFO)))
 #endif
 
