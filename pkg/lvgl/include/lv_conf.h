@@ -67,8 +67,11 @@ extern "C" {
  */
 #define LV_COLOR_SCREEN_TRANSP    0
 
-/** Image pixels with this color will not be drawn if they are chroma keyed */
-#define LV_COLOR_CHROMA_KEY    lv_color_hex(0x00ff00)         /* pure green */
+/** Image pixels with this color will not be drawn if they are chroma keyed.
+ *
+ * Default: pure green
+ */
+#define LV_COLOR_CHROMA_KEY    lv_color_hex(0x00ff00)
 
 /*=========================
    MEMORY SETTINGS
