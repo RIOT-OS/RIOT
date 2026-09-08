@@ -73,7 +73,7 @@ extern "C" {
 #define OPENTHREAD_SERIAL_BUFFER_SIZE                       OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF\
                                                             + 100
 /** @brief   sizeof the spinel payload data */
-#define OPENTHREAD_SERIAL_BUFFER__PAYLOAD_SIZE              OPENTHREAD_SERIAL_BUFFER_SIZE\
+#define OPENTHREAD_SERIAL_BUFFER__PAYLOAD_SIZE              OPENTHREAD_SERIAL_BUFFER_SIZE \
                                                             - OPENTHREAD_SIZEOF_LENGTH_AND_FREEBUFF
 /** @brief   error when no more buffer available */
 #define OPENTHREAD_ERROR_NO_EMPTY_SERIAL_BUFFER             -1
