@@ -129,7 +129,7 @@ extern "C" {
 /** Default display refresh period. LVGL will redraw changed ares with this period time */
 #define LV_DISP_DEF_REFR_PERIOD     30      /* [ms] */
 
-/** Input device read period in milliseconds*/
+/** Input device read period in milliseconds */
 #define LV_INDEV_DEF_READ_PERIOD    30      /* [ms] */
 
 /** Default Dot Per Inch. Used to initialize default sizes such as widget size,
