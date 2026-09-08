@@ -328,7 +328,7 @@ extern "C" {
 /** Define a custom attribute to the `lv_tick_inc()` function */
 #define LV_ATTRIBUTE_TICK_INC
 
-/** Define a custom attribute to `lv_timer_handler` function */
+/** Define a custom attribute to the `lv_timer_handler()` function */
 #define LV_ATTRIBUTE_TIMER_HANDLER
 
 /** Define a custom attribute to `lv_disp_flush_ready` function */
