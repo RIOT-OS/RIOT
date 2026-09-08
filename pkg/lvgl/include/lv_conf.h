@@ -28,7 +28,8 @@ extern "C" {
    COLOR SETTINGS
  *====================*/
 
-/** Color depth:
+/** Color depth
+ *
  *  - 1:  1 bit per pixel
  *  - 8:  RGB233
  *  - 16: RGB565
