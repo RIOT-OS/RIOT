@@ -1,6 +1,6 @@
 /*
  * SPDX-FileCopyrightText: 2017-2021 Nordic Semiconductor ASA
- * SPDX-License-Identifier:  BSD-3-Clause
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #pragma once
