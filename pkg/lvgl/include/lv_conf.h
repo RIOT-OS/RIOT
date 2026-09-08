@@ -261,8 +261,10 @@ extern "C" {
  *-----------*/
 
 /** Enable asserts if an operation is failed or an invalid data is found.
- *  If LV_USE_LOG is enabled an error message will be printed on failure
- *  Check if the parameter is NULL. (Very fast, recommended) */
+ *
+ * If `LV_USE_LOG` is enabled an error message will be printed on failure.
+ * Check if the parameter is NULL. (Very fast, recommended)
+ */
 #define LV_USE_ASSERT_NULL          0
 
 /** Checks is the memory is successfully allocated or no. (Very fast, recommended) */
