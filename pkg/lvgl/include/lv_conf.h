@@ -237,8 +237,11 @@ extern "C" {
  */
 #  define LV_LOG_LEVEL    LV_LOG_LEVEL_WARN
 
-/** 1: Print the log with 'printf';
- *  0: User need to register a callback with `lv_log_register_print_cb()`*/
+/** Function to print the log
+ *
+ * - 1: Print the log with 'printf'
+ * - 0: User need to register a callback with `lv_log_register_print_cb()`
+ */
 #  define LV_LOG_PRINTF   0
 
 /** Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs */
