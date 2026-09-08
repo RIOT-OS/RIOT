@@ -161,12 +161,16 @@ extern "C" {
 #define LV_SHADOW_CACHE_SIZE    0
 #endif /* LV_DRAW_COMPLEX */
 
-/** Default image cache size. Image caching keeps the images opened.
- *  If only the built-in image formats are used there is no real advantage of caching.
- *  (I.e. if no new image decoder is added). With complex image decoders (e.g. PNG or JPG)
- *  caching can save the continuous open/decode of images.
- *  However the opened images might consume additional RAM.
- *  0: to disable caching */
+/** Default image cache size.
+ *
+ * Image caching keeps the images opened.
+ * If only the built-in image formats are used there is no real advantage of caching
+ * (i.e. if no new image decoder is added). With complex image decoders (e.g. PNG or JPG)
+ * caching can save the continuous open/decode of images.
+ * However the opened images might consume additional RAM.
+ *
+ * Set to 0 to disable caching.
+ */
 #define LV_IMG_CACHE_DEF_SIZE       0
 
 /** Number of stops allowed per gradient. Increase this to allow more stops.
