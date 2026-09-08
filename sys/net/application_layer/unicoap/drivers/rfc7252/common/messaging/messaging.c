@@ -198,7 +198,7 @@ static uint16_t _generate_message_id(void)
 
 /* MARK: - (Re-)Transmissions */
 
-static uint8_t* _carbon_copy_alloc_unsafe(void)
+static uint8_t* _carbon_copy_alloc(void)
 {
 #if CONFIG_UNICOAP_CARBON_COPIES_MAX > 0
     /* Find empty slot in list of open requests. */
@@ -215,21 +215,12 @@ static uint8_t* _carbon_copy_alloc_unsafe(void)
     return NULL;
 }
 
-static uint8_t* _carbon_copy_alloc(void)
-{
-    unicoap_state_lock();
-    uint8_t* carbon_copy = _carbon_copy_alloc_unsafe();
-    unicoap_state_unlock();
-    return carbon_copy;
-}
-
 static inline void _carbon_copy_free(uint8_t* carbon_copy)
 {
-    /* Freeing does not require lock. We have sole access until the following line. */
     *carbon_copy = 0;
 }
 
-static inline _transmission_t* _transmission_alloc_unsafe(void)
+static inline _transmission_t* _transmission_alloc(void)
 {
 #if CONFIG_UNICOAP_RFC7252_TRANSMISSIONS_CAPACITY > 0
     /* Find empty slot in list of open requests. */
@@ -249,9 +240,7 @@ static _transmission_t* _transmission_create(const unicoap_endpoint_t* endpoint,
 {
     assert(packet);
 
-    unicoap_state_lock();
-    _transmission_t* transmission = _transmission_alloc_unsafe();
-    unicoap_state_unlock();
+    _transmission_t* transmission = _transmission_alloc();
     if (!transmission) {
         return NULL;
     }

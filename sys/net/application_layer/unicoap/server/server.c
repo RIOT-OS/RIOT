@@ -13,9 +13,7 @@
 
 #include <string.h>
 
-#include "compiler_hints.h"
 #include "net/unicoap/server.h"
-#include "thread.h"
 
 #define ENABLE_DEBUG CONFIG_UNICOAP_DEBUG_LOGGING
 #include "debug.h"

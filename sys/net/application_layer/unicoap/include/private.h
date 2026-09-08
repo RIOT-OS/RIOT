@@ -9,16 +9,14 @@
 #include <stdint.h>
 #include <alloca.h>
 
-#include "mutex.h"
-#include "bitfield.h"
+#include "container.h"
 #include "architecture.h"
-#include "random.h"
 
 #include "net/unicoap.h"
 
-#include "private/state.h"
-#include "private/packet.h"
-#include "private/messaging.h"
+#include "private/state.h"      /* IWYU pragma: export */
+#include "private/packet.h"     /* IWYU pragma: export */
+#include "private/messaging.h"  /* IWYU pragma: export */
 
 /**
  * @defgroup net_unicoap_private Private API
@@ -126,12 +124,6 @@ void unicoap_assist_emit_diagnostic_missing_driver(unicoap_proto_t proto);
 /** @brief Name of background thread spawned upon calls to @ref unicoap_init */
 #define UNICOAP_THREAD_IDENTIFIER "unicoap"
 
-/** @brief Locks internal state lock */
-void unicoap_state_lock(void);
-
-/** @brief Unlocks internal state lock */
-void unicoap_state_unlock(void);
-
 /** @brief PID of `unicoap` thread */
 extern kernel_pid_t _unicoap_pid;
 /** @} */
@@ -142,14 +134,9 @@ extern kernel_pid_t _unicoap_pid;
  * @{
  */
 /**
- * @brief Container the unicoap stacks keeps state in
+ * @brief Container the unicoap stack keeps state in
  */
 typedef struct {
-    /**
-     * @brief Used when allocating listener, transaction, carbon copy, observer, or registration
-     */
-    mutex_t lock;
-
 #if IS_USED(MODULE_UNICOAP_SERVER) || defined(DOXYGEN)
     /** @brief Groups of resources */
     unicoap_listener_t* listeners;
@@ -180,6 +167,26 @@ static inline unicoap_listener_t* unicoap_get_listeners(unicoap_state_t* state) 
 #else
     (void)state;
     return NULL;
+#endif
+}
+
+/** @brief Gets client memo array from @p state object */
+static inline unicoap_client_memo_t *unicoap_state_get_client_memos(unicoap_state_t* state) {
+#if UNICOAP_HAVE_CLIENT_STATE
+    return state->client_memos;
+#else
+    (void)state;
+    return NULL;
+#endif
+}
+
+/** @brief Gets length of client memo array from @p state object */
+static inline size_t unicoap_state_get_client_memos_len(unicoap_state_t* state) {
+#if UNICOAP_HAVE_CLIENT_STATE
+    return ARRAY_SIZE(state->client_memos);
+#else
+    (void)state;
+    return 0;
 #endif
 }
 
