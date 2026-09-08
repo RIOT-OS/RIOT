@@ -185,8 +185,10 @@ extern "C" {
  */
 #define LV_GRAD_CACHE_DEF_SIZE      0
 
-/** Maximum buffer size to allocate for rotation. Only used if software rotation is enabled
- *  in the display driver. */
+/** Maximum buffer size to allocate for rotation.
+ *
+ * Only used if software rotation is enabled in the display driver.
+ */
 #define LV_DISP_ROT_MAX_BUF         (10*1024)
 /*-------------
  * GPU
