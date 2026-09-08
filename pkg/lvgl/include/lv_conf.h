@@ -244,7 +244,7 @@ extern "C" {
  */
 #  define LV_LOG_PRINTF   0
 
-/** Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs */
+/** Enable/disable `LV_LOG_TRACE` in modules that produces a huge number of logs. */
 #  define LV_LOG_TRACE_MEM            1
 #  define LV_LOG_TRACE_TIMER          1
 #  define LV_LOG_TRACE_INDEV          1
