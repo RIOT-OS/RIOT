@@ -329,7 +329,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 
 /** @name Montserrat fonts with ASCII range and some symbols using bpp = 4
  * https://fonts.google.com/specimen/Montserrat
- * @{ */
+ * @{
+ */
 #define LV_FONT_MONTSERRAT_8     0  /**< Montserrat font size 8 */
 #define LV_FONT_MONTSERRAT_10    0  /**< Montserrat font size 10 */
 #define LV_FONT_MONTSERRAT_12    1  /**< Montserrat font size 12 */
