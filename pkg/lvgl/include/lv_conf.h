@@ -366,8 +366,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 /** @} */
 
 /** Optionally declare custom fonts here.
- * You can use these fonts as default font too and they will be available globally.
- * E.g. #define LV_FONT_CUSTOM_DECLARE   LV_FONT_DECLARE(my_font_1) LV_FONT_DECLARE(my_font_2) */
+ *
+ * You can use these fonts as default fonts too and they will be available globally by setting:
+ * ```c
+ * #define LV_FONT_CUSTOM_DECLARE LV_FONT_DECLARE(my_font_1) LV_FONT_DECLARE(my_font_2)
+ * ```
+ */
 #define LV_FONT_CUSTOM_DECLARE
 
 /** Always set a default font */
