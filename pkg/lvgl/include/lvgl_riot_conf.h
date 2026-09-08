@@ -48,7 +48,10 @@ extern "C" {
  */
 #define LV_ATTRIBUTE_MEM_ALIGN  __attribute__((aligned(4)))
 
-/** Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
+/** Type of coordinates
+ *
+ * Should be `int16_t` (or `int32_t` for extreme cases).
+ */
 typedef int16_t lv_coord_t;
 
 #define LV_TICK_CUSTOM     1
