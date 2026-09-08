@@ -552,7 +552,10 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 /** A simple, impressive and very complete theme */
 #define LV_USE_THEME_DEFAULT      IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT)
 
-/** 0: Light mode; 1: Dark mode */
+/** Default lighting mode
+ *
+ * 0: Light mode, 1: Dark mode
+ */
 #define LV_THEME_DEFAULT_DARK     IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_DARK)
 
 /** 1: Enable grow on press */
