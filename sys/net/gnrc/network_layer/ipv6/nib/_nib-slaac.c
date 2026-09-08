@@ -23,6 +23,10 @@
 
 #include "_nib-6ln.h"
 #include "_nib-arsm.h"
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+#include "_nib-slaac.h"
+#include "evtimer.h"
+#endif
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -96,6 +100,174 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 }
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+int32_t _generate_temporary_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
+                                 const uint32_t pfx_pref_ltime,
+                                 const uint8_t retries,
+                                 int *idx)
+{
+    DEBUG("nib: add temporary address based on %s/%u automatically to interface %u\n",
+          ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)),
+          64, netif->pid);
+
+    if (pfx_pref_ltime <= _get_netif_regen_advance(netif)) {
+        /* While RIOT's implementation design differs from the RFC implementation design,
+         * this check is here to fulfill the constraints imposed by
+         * https://www.rfc-editor.org/rfc/rfc8981.html#section-3.4-3.4.2.2
+         * in combination with the next bullet point ("5.")
+         *
+         * It also covers/fulfills the requirement
+         * "Note that if a temporary address becomes deprecated as result of
+         * processing a Prefix Information option with a zero preferred lifetime,
+         * then a new temporary address MUST NOT be generated"
+         */
+        LOG_WARNING("nib: Abort adding temporary address "
+              "because prefix's preferred lifetime too short (%"PRIu32" <= %"PRIu32")\n",
+              pfx_pref_ltime, _get_netif_regen_advance(netif));
+        return -1;
+    }
+    const uint32_t ta_max_pref_lft = TEMP_PREFERRED_LIFETIME
+            - random_uint32_range(0, MAX_DESYNC_FACTOR + 1);
+    if (ta_max_pref_lft <= MS_PER_SEC * _get_netif_regen_advance(netif)) {
+        /* https://www.rfc-editor.org/rfc/rfc8981.html#section-3.4-3.5 */
+        LOG_ERROR("nib: Abort adding temporary address because configured "
+              "TEMP_PREFERRED_LIFETIME (%lu) too short or MAX_DESYNC_FACTOR too high (%lu)\n",
+              TEMP_PREFERRED_LIFETIME, MAX_DESYNC_FACTOR);
+
+        /* in other words, as per
+         * https://www.rfc-editor.org/rfc/rfc8981.html#section-3.8-7.2 */
+        assert(MAX_DESYNC_FACTOR < TEMP_PREFERRED_LIFETIME
+               - MS_PER_SEC * _get_netif_regen_advance(netif));
+
+        return -1;
+    }
+
+    ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
+    ipv6_addr_init_prefix(&addr, pfx, SLAAC_PREFIX_LENGTH);
+    do {
+        _ipv6_get_random_iid((eui64_t *) &addr.u64[1]);
+    } while (gnrc_netif_ipv6_addr_idx(netif, &addr) >= 0);
+
+    _nib_offl_entry_t *ta_pfx = _nib_pl_add(netif->pid, &addr,
+                                            IPV6_ADDR_BIT_LEN,
+                                            TEMP_VALID_LIFETIME,
+                                            ta_max_pref_lft);
+    if (ta_pfx == NULL) {
+        LOG_WARNING("nib: Abort adding temporary address because prefix list full\n");
+        return -1;
+    }
+    _evtimer_add(ta_pfx, GNRC_IPV6_NIB_REGEN_TEMP_ADDR, &ta_pfx->regen_temp_addr,
+                 ta_max_pref_lft - _get_netif_regen_advance(netif)); //add next regen timer
+
+    int index;
+    uint8_t flags = GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE
+            | (retries << GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS);
+    if ((index = gnrc_netif_ipv6_addr_add_internal(netif,
+                                                   &addr,
+                                                   IPV6_ADDR_BIT_LEN,
+                                                   flags)) < 0) {
+        LOG_WARNING("nib: Abort adding temporary address, adding address failed\n");
+        //remove the just created prefix again
+        gnrc_ipv6_nib_pl_del(netif->pid, &addr, IPV6_ADDR_BIT_LEN);
+        return -1;
+    }
+    if (idx != NULL) {
+        *idx = index;
+    }
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
+    if (gnrc_netif_is_6ln(netif) &&
+        !gnrc_netif_is_6lbr(netif)) {
+        _handle_rereg_address(&netif->ipv6.addrs[index]);
+    }
+#endif
+
+    return 0;
+}
+
+int _regen_temp_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr, uint8_t retries,
+                     const char *caller_description) {
+    //find associated prefix
+    uint32_t slaac_prefix_pref_until;
+    if (!_get_slaac_prefix_pref_until(netif, addr, &slaac_prefix_pref_until)) {
+        // at least one match is expected,
+        LOG_WARNING("nib: The temporary address smh outlived the SLAAC prefix valid lft.");
+        assert(false);
+        return -1;
+    }
+
+    uint32_t now = evtimer_now_msec();
+    assert(now < slaac_prefix_pref_until);
+    // else the temporary address smh outlived the SLAAC prefix preferred lft
+
+    if (_generate_temporary_addr(netif, addr,
+                                 slaac_prefix_pref_until - now,
+                                 retries,
+                                 NULL) < 0) {
+        LOG_WARNING("nib: Temporary address regeneration failed%s.\n", caller_description);
+        return -1;
+    }
+
+    return 0;
+}
+
+bool is_temporary_addr(const gnrc_netif_t *netif, const ipv6_addr_t *addr) {
+    return gnrc_ipv6_nib_pl_has_prefix(netif->pid, addr, IPV6_ADDR_BIT_LEN);
+}
+
+bool _iid_is_iana_reserved(const eui64_t *iid)
+{
+    return (iid->uint64.u64 == htonll(0))
+    || (iid->uint32[0].u32 == htonl(0x02005eff) && iid->uint8[4] == 0xfe)
+    || (iid->uint32[0].u32 == htonl(0xfdffffff)
+        && iid->uint16[2].u16 == htons(0xffff)
+        && iid->uint8[6] == 0xff && (iid->uint8[7] & 0x80));
+}
+
+void _ipv6_get_random_iid(eui64_t *iid)
+{
+    do {
+        random_bytes(iid->uint8, 8);
+    } while (_iid_is_iana_reserved(iid));
+}
+
+uint32_t _get_netif_regen_advance(const gnrc_netif_t *netif)
+{
+    return 2 + (TEMP_IDGEN_RETRIES *
+    (gnrc_netif_ipv6_dad_transmits(netif) * (netif->ipv6.retrans_time / 1000))
+    );
+}
+
+bool _get_slaac_prefix_pref_until(const gnrc_netif_t *netif,
+                                  const ipv6_addr_t *addr,
+                                  uint32_t *slaac_prefix_pref_until) {
+    void *state = NULL;
+    gnrc_ipv6_nib_pl_t ple;
+    while (gnrc_ipv6_nib_pl_iter(netif->pid, &state, &ple)) {
+        if (ple.pfx_len == SLAAC_PREFIX_LENGTH
+            && ipv6_addr_match_prefix(&ple.pfx, addr) >= ple.pfx_len) {
+            *slaac_prefix_pref_until = ple.pref_until;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool _iter_slaac_prefix_to_temp_addr(const gnrc_netif_t *netif,
+                                     const ipv6_addr_t *slaac_pfx, void *state,
+                                     ipv6_addr_t *next_temp_addr) {
+    gnrc_ipv6_nib_pl_t ple;
+    while (gnrc_ipv6_nib_pl_iter(netif->pid, &state, &ple)) {
+        if (ple.pfx_len == IPV6_ADDR_BIT_LEN /* is temp addr. prefix */
+            && ipv6_addr_match_prefix(&ple.pfx, slaac_pfx) >= SLAAC_PREFIX_LENGTH) {
+            *next_temp_addr = ple.pfx;
+            return true;
+        }
+    }
+    return false;
+}
+#endif
+
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
 static bool _try_l2addr_reconfiguration(gnrc_netif_t *netif)
 {
@@ -158,7 +330,33 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
     DEBUG("nib: other node has TENTATIVE address %s assigned "
           "=> removing that address\n",
           ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+    bool is_temp_addr = is_temporary_addr(netif, addr);
+    //need to determine before addr removal,
+    //because it deletes the prefix which is used to determine whether it's a temp addr
+    uint8_t retries;
+    if (is_temp_addr) {
+        int idx = gnrc_netif_ipv6_addr_idx(netif, addr);
+        assert(idx >= 0);
+        retries = gnrc_netif_ipv6_addr_gen_retries(netif, idx);
+    }
+#endif
     gnrc_netif_ipv6_addr_remove_internal(netif, addr);
+
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+    if (is_temp_addr) {
+        if (retries >= TEMP_IDGEN_RETRIES) {
+            //https://www.rfc-editor.org/rfc/rfc8981.html#section-3.4-3.7
+            LOG_ERROR("nib: Not regenerating temporary address, retried often enough.\n");
+            return;
+        }
+        retries++;
+        DEBUG("Trying regeneration of temporary address. (%u/%u)\n", retries, TEMP_IDGEN_RETRIES);
+
+        _regen_temp_addr(netif, addr, retries, " after DAD failure");
+        return;
+    }
+#endif
 
     if (!ipv6_addr_is_link_local(addr) ||
         !_try_addr_reconfiguration(netif)) {

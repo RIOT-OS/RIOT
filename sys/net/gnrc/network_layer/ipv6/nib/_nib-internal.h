@@ -212,6 +212,12 @@ typedef struct {
      */
     evtimer_msg_event_t route_timeout;
 #endif
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC_TEMPORARY_ADDRESSES)
+    /**
+     * @brief   Event for @ref GNRC_IPV6_NIB_REGEN_TEMP_ADDR
+     */
+    evtimer_msg_event_t regen_temp_addr;
+#endif
     uint8_t mode;               /**< [mode](@ref net_gnrc_ipv6_nib_mode) of the
                                  *   off-link entry */
     uint8_t pfx_len;            /**< prefix-length in bits of
