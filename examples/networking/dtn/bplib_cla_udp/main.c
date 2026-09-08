@@ -102,33 +102,6 @@ static void _config_nc(void)
     bplib_contact_set_in_addr(0, BPLIB_EXAMPLE_IP_LOCAL, BPLIB_EXAMPLE_PORT);
 }
 
-static int _bp(int argc, char **argv)
-{
-    if (argc != 4) {
-        puts("Usage: bp send <channel> <message>\n"
-             "       bp contact <contact> [0|1]");
-        return 1;
-    }
-
-    int c = atoi(argv[2]);
-
-    if (strcmp(argv[1], "send") == 0) {
-        BPLib_PI_Ingress(&bplib_instance_data.BPLibInst, c, argv[3], strlen(argv[3]));
-    }
-    else if (strcmp(argv[1], "contact") == 0) {
-        int action = atoi(argv[3]);
-        if (action) {
-            BPLib_CLA_ContactStart(c);
-        }
-        else {
-            BPLib_CLA_ContactStop(c);
-        }
-    }
-
-    return 0;
-}
-SHELL_COMMAND(bp, "Send BP Test Bundles / Change contact state", _bp);
-
 int main(void)
 {
     int rv = bplib_init();

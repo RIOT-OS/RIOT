@@ -14,7 +14,7 @@ MAC address to connect to should also be set with the `REMOTE` flag.
 
 So either `make all ROLE=client REMOTE=d8:6b:d5:e9:ca:99` or `make all ROLE=server`.
 
-When both devices are running, bundles can be exchanged by using the `bp` shell command.
+When both devices are running, bundles can be exchanged by using the `bplib` shell command.
 
 In this version no storage is used (`bplib_stor_void`) and bundles that cannot be
 delivered immediately will be dropped. <br>

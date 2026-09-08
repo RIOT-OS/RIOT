@@ -46,7 +46,7 @@ To test simple loopback, nothing needs to be changed, the flags will default
 to the loopback. Simply compile with `make all term`. Make sure a tap device is
 available, since it tries to bind to one anyways.
 
-When using the `bp send 0 "[DATA]"` shell command, the data you entered goes though bplib's
+When using the `bplib send 0 "[DATA]"` shell command, the data you entered goes though bplib's
 internal delivery, since the current node is the destination. The data is never
 passed through gnrc in this case.
 
@@ -67,7 +67,7 @@ make all term PORT=tap0 REMOTE=fe80::d8af:c5ff:febc:a409 LOCAL_EID_NODE=100 REMO
 make all term PORT=tap1 REMOTE=fe80::4832:95ff:feb7:5161 LOCAL_EID_NODE=200 REMOTE_EID_NODE=100
 ```
 
-When running `bp send 0 "[DATA]"` now, the bundle should be delivered to the other instance.
+When running `bplib send 0 "[DATA]"` now, the bundle should be delivered to the other instance.
 Now, data goes through bplib, through gnrc, which sends the bundles as UDP payload.
 The other device receives this and passes it to bplib again, which can deliver it,
 since the channel is active
@@ -75,16 +75,17 @@ since the channel is active
 #### Disruption simulation
 
 Since DTN is made for disruptions and thus employs a storage, this can be tested
-as well in this example. On one (or both) of the nodes, run `bp contact 0 0` to
+as well in this example. On one (or both) of the nodes, run `bplib contact 0 stop` to
 set the contact 0 into the stopped state. In the normal startup in this example
-it will get put into the started state. Now bplib must assume that the contact
-cannot currently serve its destinations.
+it will get put into the started state. You can verify this with `bplib contact 0`
+to get the current state the contact is in. Now in the stopped state bplib must
+assume that the contact cannot currently serve its destinations.
 
-Bundles that are sent *now* with `bp send 0 "[DATA]"` will not be received by the
+Bundles that are sent *now* with `bplib send 0 "[DATA]"` will not be received by the
 other device. Instead, they are placed into the *storage*, which on native is located
 in the `native` subfolder of this example.
 
-When this disruption is over, the contact can be re-enabled with `bp contact 0 1`.
+When this disruption is over, the contact can be re-enabled with `bplib contact 0 start`.
 After some timeout, the bundles will be pulled from storage and are received at
 device B.
 
@@ -115,7 +116,7 @@ This can be seen in Wireshark. The back and forth forwarding of the bundle here
 only stops, because the Hop Limit block is added and the bundle is deleted after
 the specified number of hops (10) is reached.
 
-To now simulate the third node, stop the contact on device B with `bp contact 0 0`
+To now simulate the third node, stop the contact on device B with `bplib contact 0 stop`
 and send a new bundle from A.
 Now in Wireshark, only one bundle is sent and it is stored in the storage of B (`native200/`).
 
@@ -126,7 +127,7 @@ number of the destination that A had previously:
 make all term PORT=tap0 REMOTE=fe80::d8af:c5ff:febc:a409 LOCAL_EID_NODE=300 REMOTE_EID_NODE=100
 ```
 
-When the contact is now enabled again on device B (`bp contact 0 1`), node A, which
+When the contact is now enabled again on device B (`bplib contact 0 start`), node A, which
 now is a different node in the bundle context, receives the bundle after it is pulled
 from the storage of B.
 

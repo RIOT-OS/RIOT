@@ -48,6 +48,7 @@ else
 endif
 
 USEMODULE += shell
+USEMODULE += shell_cmd_bplib
 USEMODULE += shell_cmd_ps
 
 CFLAGS += -DCONFIG_NIMBLE_AUTOADV_DEVICE_NAME='"DTN_ble-cla"'
