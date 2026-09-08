@@ -558,7 +558,10 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  */
 #define LV_THEME_DEFAULT_DARK     IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_DARK)
 
-/** 1: Enable grow on press */
+/** Default grow settings
+ *
+ * 1: Enable grow on press
+ */
 #define LV_THEME_DEFAULT_GROW     IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW)
 
 /** Default transition time in [ms] */
