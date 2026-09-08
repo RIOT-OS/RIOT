@@ -220,6 +220,38 @@ This is why global variables need clear documentation.
 
 [gnumake doc](https://www.gnu.org/software/make/manual/html_node/Variables_002fRecursion.html)
 
+### Prefer Built-in Alternatives Over $(shell)
+
+Every `$(shell ...)` call spawns a subprocess. This is slow compared to `make`
+built-in functions. The cost multiplies quickly when the call is placed in a
+recursively expanded variable (`=`) that gets expanded many times, or in a
+variable that is evaluated during parsing rather than only when its result is
+actually needed.
+
+Before using a `$(shell ...)` call, check whether one of the following
+alternatives already covers the case:
+
+- Use `$(notdir ...)` instead of `$(shell basename ...)` to strip the
+  directory part of a path. Both produce the same result for the paths used
+  in the build system, but `$(notdir)` does not spawn a subprocess.
+
+- Use `command -v` instead of `which` inside a `$(shell ...)` call, e.g.
+  `$(shell command -v $(TOOL) 2> /dev/null)`. `command -v` is a shell
+  built-in, so this avoids spawning an additional process for `which`, and it
+  works on systems where `which` is not installed. A `$(shell ...)` call is
+  still required, since `make` has no built-in way to search the file system
+  for an executable.
+
+- Use the string and version helper functions defined in
+  `makefiles/utils/strings.mk`, such as `lowercase`, `uppercase`,
+  `version_is_greater_or_equal`, and `max_number`, instead of piping a value
+  through `tr`, `sed`, `awk`, or `cut`. These functions are implemented with
+  `make` built-ins only (`$(subst)`, `$(filter)`, `$(sort)`, etc.).
+
+If a `$(shell ...)` call cannot be avoided, for example because it needs to
+run an external tool or the actual file system, follow the memoization
+guidance below to prevent it from being executed more than once.
+
 ### Use Memoized for Variables Referencing a Function or Command
 
 #### Recursively Expanded Variable
