@@ -141,7 +141,6 @@ extern "C" {
 
 /**
  * @brief Default UWB SFD Timeout (-1=auto, timeout in symbols)
- *
  */
 #ifndef CONFIG_DW1000_RX_SFD_TO_DEFAULT
 
