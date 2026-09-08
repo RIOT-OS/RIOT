@@ -87,7 +87,7 @@ extern "C" {
 /* Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB) */
 #ifndef LV_MEM_SIZE
 #  if (__SIZEOF_POINTER__ > 4)
-/* 64-bit platforms require additional space because a lot of pointers are stored on the lvgl heap.*/
+/* 64-bit platforms require additional space because a lot of pointers are stored on the lvgl heap. */
 #    if IS_USED(MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW)
 #    define LV_MEM_SIZE    (9U * 1024U)          /* [bytes] */
 #    else
