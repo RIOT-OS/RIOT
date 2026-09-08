@@ -323,9 +323,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  *  in RAM sections that are DMA accessible */
 #define LV_ATTRIBUTE_DMA
 
-/** Export integer constant to binding. This macro is used with constants in the form of LV_<CONST>
- *  that should also appear on LVGL binding API such as Micropython.
- *  The default value just prevents GCC warning */
+/** Export integer constant to binding.
+ *
+ * This macro is used with constants in the form of `LV_<CONST>`
+ * that should also appear on LVGL binding API such as Micropython.
+ * The default value just prevents the GCC warning.
+ */
 #define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning
 
 /** Extend the default -32k..32k coordinate range to -4M..4M by using int32_t for coordinates
