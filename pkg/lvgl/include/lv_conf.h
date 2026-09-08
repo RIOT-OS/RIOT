@@ -403,8 +403,11 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 /** Can break (wrap) texts on these chars */
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
 
-/** If a word is at least this long, will break wherever "prettiest"
- *  To disable, set to a value <= 0 */
+/** Enable pretty line breaking.
+ *
+ * If a word is at least this long, it will break wherever "prettiest".
+ * To disable this, set to a value <= 0.
+ */
 #define LV_TXT_LINE_BREAK_LONG_LEN          0
 
 /** Minimum number of characters in a long word to put on a line before a break.
