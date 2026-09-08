@@ -154,8 +154,10 @@ extern "C" {
 #if LV_DRAW_COMPLEX != 0
 
 /** Allow buffering some of the shadow calculation.
- *  LV_SHADOW_CACHE_SIZE is the max. shadow size to buffer, where shadow size
- *  is `shadow_width + radius`. Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost. */
+ *
+ *  `LV_SHADOW_CACHE_SIZE` is the max. shadow size to buffer, where shadow size
+ *  is `shadow_width + radius`. Caching has `LV_SHADOW_CACHE_SIZE^2` RAM cost.
+ */
 #define LV_SHADOW_CACHE_SIZE    0
 #endif /* LV_DRAW_COMPLEX */
 
