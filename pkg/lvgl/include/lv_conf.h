@@ -418,9 +418,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 /** The control character to use for signalling text recoloring. */
 #define LV_TXT_COLOR_CMD "#"
 
-/** Support bidirectional texts. Allows mixing Left-to-Right and Right-to-Left texts.
- *  The direction will be processed according to the Unicode Bidirectioanl Algorithm:
- *  https://www.w3.org/International/articles/inline-bidi-markup/uba-basics */
+/** Support bidirectional texts.
+ *
+ * Allows mixing Left-to-Right and Right-to-Left texts.
+ * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
+ * https://www.w3.org/International/articles/inline-bidi-markup/uba-basics
+ */
 #define LV_USE_BIDI         0
 #if LV_USE_BIDI
 /**  Set the default direction.
