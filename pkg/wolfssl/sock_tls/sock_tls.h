@@ -266,8 +266,8 @@ extern "C" {
  *                      protocols have a corresponding function that can be used as last
  *                      argument to `sock_dtls_create`. The possible client and server
  *                      protocol options are: `wolfDTLSv1_client_method()`,
- *                      `wolfDTLSv1_server_method()`, `wolfDTLSv1_2_client_method()` and
- *                      `wolfDTLSv1_server_method`.
+ *                      `wolfDTLSv1_server_method()`, `wolfDTLSv1_2_client_method()`
+ *                      and `wolfDTLSv1_server_method()`.
  *
  * @return  0 on success.
  * @return  -EADDRINUSE, if `local != NULL` and @p local is already used
