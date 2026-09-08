@@ -178,9 +178,10 @@ extern "C" {
 #define LV_GRADIENT_MAX_STOPS       2
 
 /** Default gradient buffer size.
- *  When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating
- *  them again. LV_GRAD_CACHE_DEF_SIZE sets the size of this cache in bytes. If the cache is
- *  too small the map will be allocated only while it's required for the drawing 0 mean no caching.
+ *
+ * When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating
+ * them again. `LV_GRAD_CACHE_DEF_SIZE` sets the size of this cache in bytes. If the cache is
+ * too small the map will be allocated only while it's required for the drawing 0 mean no caching.
  */
 #define LV_GRAD_CACHE_DEF_SIZE      0
 
