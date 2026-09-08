@@ -28,8 +28,10 @@ ifeq ($(PROGRAMMER),)
     # set this to either openocd, jlink or edbg
     PROGRAMMER ?= edbg
   else ifeq ($(OPENOCD_DEBUG_ADAPTER),jlink)
-    # only use JLinkExe if it's installed
-    ifneq (,$(shell command -v JLinkExe 2>/dev/null))
+    # default to JLink as programmer if available
+    JLINK ?= JLinkExe
+
+    ifneq (,$(shell command -v $(JLINK) 2>/dev/null))
       PROGRAMMER ?= jlink
     else
       PROGRAMMER ?= openocd
