@@ -122,8 +122,8 @@ constexpr uint16_t MAX_SUPERFRAMES_PER_MULTI_SUPERFRAME = 1 << (uint16_t)(MAX_MO
 /**
  * @brief Maximum number of GTS slots per superframe
  */
-constexpr uint16_t MAX_OCCUPIED_SLOTS = MAX_SUPERFRAMES_PER_MULTI_SUPERFRAME\
-                                        * MAX_GTSLOTS*MAX_CHANNELS;
+constexpr uint16_t MAX_OCCUPIED_SLOTS = MAX_SUPERFRAMES_PER_MULTI_SUPERFRAME \
+                                        * MAX_GTSLOTS * MAX_CHANNELS;
 
 /**
  * @brief Maximum number of SAB units
