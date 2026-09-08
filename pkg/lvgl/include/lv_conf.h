@@ -505,8 +505,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  define LV_CALENDAR_DEFAULT_DAY_NAMES {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"}
 # endif
 
-# define LV_CALENDAR_DEFAULT_MONTH_NAMES {"January", "February", "March",  "April", "May",\
-                                          "June", "July", "August", "September", "October",\
+# define LV_CALENDAR_DEFAULT_MONTH_NAMES {"January", "February", "March",  "April", "May", \
+                                          "June", "July", "August", "September", "October", \
                                           "November", "December"}
 # define LV_USE_CALENDAR_HEADER_ARROW       1
 # define LV_USE_CALENDAR_HEADER_DROPDOWN    1
