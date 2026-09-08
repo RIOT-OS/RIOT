@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2017 Fundacion Inria Chile
+ * SPDX-FileCopyrightText: 2017 Inria
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
