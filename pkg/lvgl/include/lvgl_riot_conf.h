@@ -52,7 +52,7 @@ extern "C" {
 typedef int16_t lv_coord_t;
 
 #define LV_TICK_CUSTOM     1
-#define LV_TICK_CUSTOM_INCLUDE  "ztimer.h"       /*Header for the sys time function*/
+#define LV_TICK_CUSTOM_INCLUDE  "ztimer.h"       /* Header for the sys time function */
 
 /* Expression evaluating to current systime in ms */
 #define LV_TICK_CUSTOM_SYS_TIME_EXPR (ztimer_now(ZTIMER_MSEC))
