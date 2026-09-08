@@ -561,7 +561,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 /** Default transition time in [ms] */
 # define LV_THEME_DEFAULT_TRANSITON_TIME    80
 
-/** An very simple them that is a good starting point for a custom theme */
+/** An very simple theme that is a good starting point for a custom theme */
 #define LV_USE_THEME_BASIC        IS_USED(MODULE_LVGL_EXTRA_THEME_BASIC)
 
 /** A theme designed for monochrome displays */
