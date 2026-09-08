@@ -408,7 +408,9 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #define LV_TXT_LINE_BREAK_LONG_LEN          0
 
 /** Minimum number of characters in a long word to put on a line before a break.
- *  Depends on LV_TXT_LINE_BREAK_LONG_LEN. */
+ *
+ * Depends on @ref LV_TXT_LINE_BREAK_LONG_LEN.
+ */
 #define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN  3
 
 /** Minimum number of characters in a long word to put on a line after a break.
