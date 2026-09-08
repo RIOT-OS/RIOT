@@ -423,7 +423,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  *  https://www.w3.org/International/articles/inline-bidi-markup/uba-basics */
 #define LV_USE_BIDI         0
 #if LV_USE_BIDI
-/**  Set the default direction. Supported values:
+/**  Set the default direction.
  *
  * - `LV_BASE_DIR_LTR` Left-to-Right
  * - `LV_BASE_DIR_RTL` Right-to-Left
