@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText:  2021 HAW Hamburg
+ * SPDX-FileCopyrightText: 2021 HAW Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
