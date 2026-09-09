@@ -9,6 +9,13 @@
  * @defgroup    net_ipv4_hdr    IPv4 header
  * @ingroup     net_ipv4
  * @brief       IPv4 header types and helper functions
+ *
+ * The authoritative source on the IPv4 header is [RFC 791]. In this RFC, the
+ * bit positions are noted left to right, with the most significant bit on the
+ * left (bit 0). Refer to Appendix B of the RFC for more information.
+ *
+ * [RFC 791]: https://tools.ietf.org/html/rfc791
+ *
  * @{
  *
  * @file
@@ -26,6 +33,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @name    IPv4 Header Flags
+ * @see     [RFC 791, section 3.1](https://tools.ietf.org/html/rfc791#section-3.1)
+ * @{
+ */
+#define IPV4_HDR_FLAGS_RESERVED     (0x04)      /**< reserved */
+#define IPV4_HDR_FLAGS_DF           (0x02)      /**< do not fragment */
+#define IPV4_HDR_FLAGS_MF           (0x01)      /**< more fragments */
+/** @} */
 
 /**
  * @brief   Data type to represent an IPv4 packet header.
@@ -50,9 +67,7 @@ extern "C" {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * @see <a href="https://tools.ietf.org/html/rfc791#section-3.1">
- *              RFC 791, section 3.1
- *      </a>
+ * @see [RFC 791, section 3.1](https://tools.ietf.org/html/rfc791#section-3.1)
  */
 typedef struct __attribute__((packed)) {
     /**
