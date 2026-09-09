@@ -316,10 +316,9 @@ NORETURN void sched_task_exit(void)
     sched_threads[thread_getpid()] = NULL;
     sched_num_threads--;
 
-    sched_set_status(thread_get_active(), STATUS_STOPPED);
-
-    sched_active_thread = NULL;
-    cpu_switch_context_exit();
+    thread_zombify();
+    /* We're in a thread, so thread_zombify is really NORETURN. */
+    UNREACHABLE();
 }
 
 #ifdef MODULE_SCHED_CB
