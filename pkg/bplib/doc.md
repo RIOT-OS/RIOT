@@ -92,6 +92,13 @@ Also the generic bplib config options from [bplib]/inc/bplib_cfg.h. These are cu
 The defaults, i.e. not using `bplib_include_nc_telemetry` and
 `bplib_include_as` save more than 20KB of application size.
 
+## Related Modules
+
+`USEMODULE += shell_cmd_bplib` provides a convenient shell command for configuration
+of bplib. See @ref sys_shell_commands_bplib for more information.
+
+## Related Information
+
 @see https://datatracker.ietf.org/doc/html/rfc9171
 
 @see https://github.com/nasa/bplib
