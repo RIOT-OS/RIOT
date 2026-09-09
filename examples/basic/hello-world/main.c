@@ -85,5 +85,8 @@ int main(void)
     printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
     printf("This board features a(n) %s CPU.\n", RIOT_CPU);
 
+    (void)_fmt_test_positive(3);
+    (void)_fmt_test_negative(-3);
+
     return 0;
 }
