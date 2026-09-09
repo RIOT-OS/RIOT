@@ -32,7 +32,9 @@ enum {
     TMP117_DATAREADY    =  1,       /**< data is ready to be read */
     TMP117_NOI2C        = -EIO,     /**< I2C communication failed */
     TMP117_NODEV        = -ENODEV,  /**< no TMP117 device found on the bus */
-    TMP117_NODATA       = -ENODATA  /**< no data available */
+    TMP117_NODATA       = -ENODATA, /**< no data available */
+	TMP117_BADCFG		= -85,		/**< bad configuration */
+	TMP117_BUSY			= -EBUSY	/**< device is busy */
 };
 
 /**
@@ -87,6 +89,9 @@ typedef struct {
     bool is_initialized;			/**< tmp117 initialization state*/
 } tmp117_t;
 
+
+#define TMP117_CONV_TIME	16 		/**< conversion time for one measure */
+
 /**
  * @brief   Initializes a TMP117 device
  *
@@ -98,6 +103,18 @@ typedef struct {
  * @retval TMP117_NOI2C if other error occurs
  */
 int tmp117_init(tmp117_t *dev, const tmp117_params_t *params);
+
+/**
+ * @brief   Compare the given parameters with the current TMP117 device configuration
+ *
+ * @param[in,out] dev  device descriptor
+ * @param[in] check_params   checking configuration
+ *
+ * @retval TMP117_OK on success (identical configuration)
+ * @retval TMP117_NODATA if the config register is not readable
+ * @retval TMP117_BADCFG if the on-device parameters mismatch the checking configuration
+ */
+int tmp117_check_configuration(tmp117_t *dev, tmp117_params_t *check_params);
 
 /**
  * @brief Reads the temperature from the sensor.

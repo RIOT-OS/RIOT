@@ -17,47 +17,33 @@
 
 #include <assert.h>
 
+#include "ztimer.h"
+
 #include "tmp117.h"
 #include "tmp117_params.h"
 #include "tmp117_regs.h"
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG 1
 #include "debug.h"
+
+#define I2C_GENERAL_CALL_ADDRESS   0x00
 
 #define DEFAULT_CONFIG_VALUE    (dev->params.conv_mode << \
                                  TMP117_CONV_MODE_SHIFT | dev->params.conv_cycle << \
                                  TMP117_CONV_CYCLE_SHIFT | dev->params.avg << TMP117_AVG_SHIFT)
 
-static int _write_16_reg(tmp117_t *dev, uint8_t reg_addr, uint16_t value)
-{
-    uint8_t tmp_buf[2];
+const uint16_t tmp117_avg_value[8] = {1, 8, 32, 64};
 
-    /* reorganising value */
-    tmp_buf[0] = value >> 8;
-    tmp_buf[1] = value & 0xFF;
 
-    if (i2c_write_regs(dev->params.i2c, dev->params.addr, reg_addr, tmp_buf, 2, 0)) {
-        DEBUG("[tmp117] unable to write reg %02X\n", reg_addr);
-        return TMP117_NOI2C;
-    }
+/*
+ * Local functions prototypes
+ */
+static int _write_16_reg(tmp117_t *dev, uint8_t reg_addr, uint16_t value);
+static int _read_16_reg(tmp117_t *dev, uint8_t reg_addr, uint16_t *value);
+static void _general_call_reset(i2c_t dev);
+static int _unlock_EEPROM(tmp117_t *dev);
+static int _is_EEPROM_busy(tmp117_t *dev);
 
-    return TMP117_OK;
-}
-
-static int _read_16_reg(tmp117_t *dev, uint8_t reg_addr, uint16_t *value)
-{
-    uint8_t tmp_buf[2];
-
-    if (i2c_read_regs(dev->params.i2c, dev->params.addr, reg_addr, tmp_buf, 2, 0)) {
-        DEBUG("[tmp117] unable to read reg %02X\n", reg_addr);
-        return TMP117_NOI2C;
-    }
-
-    /* reorganising value */
-    *value = tmp_buf[0] << 8  | tmp_buf[1];
-
-    return TMP117_OK;
-}
 
 int tmp117_init(tmp117_t *dev, const tmp117_params_t *params)
 {
@@ -81,10 +67,32 @@ int tmp117_init(tmp117_t *dev, const tmp117_params_t *params)
         goto release;
     }
 
-    /* writing configuration register */
-    if (_write_16_reg(dev, TMP117_REG_CONFIG, DEFAULT_CONFIG_VALUE)) {
-        DEBUG("[tmp117] init - error: unable to set configuration \n");
-        goto release;
+    /* checking sensor configuration */
+
+    res = tmp117_check_configuration(dev,(tmp117_params_t*)params);
+    if(res == TMP117_NODATA){
+    	goto release;
+    }
+    if(res == TMP117_BADCFG){
+    	DEBUG("[%s] EEPROM config don't match wanted parameters: writing new config in EEPROM\n",__FUNCTION__);
+        /* persist configuration in EEPROM */
+    	_unlock_EEPROM(dev);
+        if (_write_16_reg(dev, TMP117_REG_CONFIG, DEFAULT_CONFIG_VALUE)) {
+            DEBUG("[tmp117] init - error: unable to write configuration in EEPROM\n");
+            res = TMP117_NODATA;
+            goto release;
+        }
+
+        /* wait for the EEPROM write to finish */
+        ztimer_sleep(ZTIMER_MSEC,7);
+        while(_is_EEPROM_busy(dev)){
+        	ztimer_sleep(ZTIMER_MSEC,1);
+        }
+
+        /* reboot the device to get the new configuration */
+        _general_call_reset(dev->params.i2c);
+    }else{
+    	DEBUG("[%s] EEPROM config match wanted parameters !\n",__FUNCTION__);
     }
 
     dev->is_initialized = 1;
@@ -93,6 +101,34 @@ int tmp117_init(tmp117_t *dev, const tmp117_params_t *params)
 release:
     i2c_release(dev->params.i2c);
     return res;
+}
+
+int tmp117_check_configuration(tmp117_t *dev, tmp117_params_t *check_params){
+	if(check_params->conv_mode == TMP117_CONV_OS){
+		check_params->conv_mode = TMP117_CONV_SD;
+	}
+
+	uint16_t check_params_reg =  (check_params->conv_mode << TMP117_CONV_MODE_SHIFT \
+								| check_params->conv_cycle << TMP117_CONV_CYCLE_SHIFT \
+								| check_params->avg << TMP117_AVG_SHIFT);
+	uint16_t check_params_mask = TMP117_CONV_MODE_MASK | TMP117_CONV_CYCLE_MASK | TMP117_AVG_MASK;
+	uint16_t config_reg;
+
+	int status;
+
+	status = _read_16_reg(dev, TMP117_REG_CONFIG, &config_reg);
+	if(status != TMP117_OK){
+		DEBUG("[tmp117] error: unable to read configuration register\n");
+		return TMP117_NODATA;
+	}
+
+	DEBUG("[%s]tmp117 config: %4x   wanted config: %4x",__FUNCTION__,config_reg & check_params_mask,check_params_reg);
+
+	if( (config_reg & check_params_mask) != check_params_reg){
+		return TMP117_BADCFG;
+	}
+
+	return TMP117_OK;
 }
 
 int tmp117_read_temperature(tmp117_t *dev, int16_t *temperature)
@@ -225,3 +261,67 @@ release:
     i2c_release(dev->params.i2c);
     return res;
 }
+
+/*
+ * Local functions
+ */
+
+static int _write_16_reg(tmp117_t *dev, uint8_t reg_addr, uint16_t value)
+{
+    uint8_t tmp_buf[2];
+
+    /* reorganising value */
+    tmp_buf[0] = value >> 8;
+    tmp_buf[1] = value & 0xFF;
+
+    if (i2c_write_regs(dev->params.i2c, dev->params.addr, reg_addr, tmp_buf, 2, 0)) {
+        DEBUG("[tmp117] unable to write reg %02X\n", reg_addr);
+        return TMP117_NOI2C;
+    }
+
+    return TMP117_OK;
+}
+
+static int _read_16_reg(tmp117_t *dev, uint8_t reg_addr, uint16_t *value)
+{
+    uint8_t tmp_buf[2];
+
+    if (i2c_read_regs(dev->params.i2c, dev->params.addr, reg_addr, tmp_buf, 2, 0)) {
+        DEBUG("[tmp117] unable to read reg %02X\n", reg_addr);
+        return TMP117_NOI2C;
+    }
+
+    /* reorganising value */
+    *value = tmp_buf[0] << 8  | tmp_buf[1];
+
+    return TMP117_OK;
+}
+
+static int _unlock_EEPROM(tmp117_t *dev){
+    if (_write_16_reg(dev,TMP117_REG_EEPROM_UNLOCK, (1 << TMP117_EUN_SHIFT))) {
+        DEBUG("[%s] error: unable to write EEPROM unlock register \n",__FUNCTION__);
+        return TMP117_NODATA;
+    }
+
+    return TMP117_OK;
+}
+
+static int _is_EEPROM_busy(tmp117_t *dev){
+	uint16_t eeprom_reg;
+
+    if (_read_16_reg(dev,TMP117_REG_EEPROM_UNLOCK, &eeprom_reg) != TMP117_OK) {
+        DEBUG("[%s] error: unable to read EEPROM unlock register \n",__FUNCTION__);
+        return TMP117_NODATA;
+    }
+
+    if( (eeprom_reg & TMP117_EEPROM_Busy_MASK) != 0 ){
+    	return TMP117_BUSY;
+    }
+
+    return TMP117_OK;
+}
+
+static void _general_call_reset(i2c_t dev){
+	i2c_write_byte(dev, I2C_GENERAL_CALL_ADDRESS, 0x06, 0);
+}
+

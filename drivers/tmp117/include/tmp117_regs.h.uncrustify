@@ -47,11 +47,6 @@ extern "C" {
 #define TMP117_CONV_CYCLE_SHIFT     7
 /** @brief averaging bits shift in configuration register */
 #define TMP117_AVG_SHIFT            5
-
-/** @brief EEPROM_Busy bit shift in EEPROM unlock register */
-#define TMP117_EEPROM_Busy_SHIFT    14
-/** @brief EUN bit shift in EEPROM unlock register */
-#define TMP117_EUN_SHIFT            15
 /** @} */
 
 /**
@@ -67,10 +62,6 @@ extern "C" {
 /** @brief data ready bit mask in configuration register */
 #define TMP117_DATA_READY_MASK      (0x1 << TMP117_DATA_READY_SHIFT)
 
-/** @brief EEPROM_Busy bit mask in EEPROM unlock register */
-#define TMP117_EEPROM_Busy_MASK		(0x1 << TMP117_EEPROM_Busy_SHIFT)
-/** @brief EUN bit mask in EEPROM unlock register */
-#define TMP117_EUN_MASK		        (0x1 << TMP117_EUN_SHIFT)
 /** @} */
 
 /**
