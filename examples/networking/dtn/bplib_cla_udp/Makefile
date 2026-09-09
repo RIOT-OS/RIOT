@@ -48,6 +48,7 @@ endif
 CFLAGS += -DBPLIB_LOCAL_EID_NODE_NUM=$(LOCAL_EID_NODE)
 
 USEMODULE += shell
+USEMODULE += shell_cmd_bplib
 USEMODULE += shell_cmd_ps
 USEMODULE += shell_cmd_gnrc_netif
 
