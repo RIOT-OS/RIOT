@@ -96,8 +96,8 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
     else if (buf) {
         DEBUG("[esp_ieee802154] %s: read packet of length %d\n", __func__, len);
         if (info) {
-            info->rssi = ieee802154_dbm_to_rssi(_rx_frame[len]);
-            info->lqi = _rx_frame[len+1];
+            info->rssi = ieee802154_dbm_to_rssi(_rx_frame_info->rssi);
+            info->lqi = _rx_frame_info->lqi;
         }
         memcpy(buf, &_rx_frame[1], len);
         res = len;
