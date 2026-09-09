@@ -16,6 +16,7 @@
 
 #include "byteorder.h"
 #include "net/ieee802154.h"
+#include "net/ieee802154_security.h"
 
 #include "unittests-constants.h"
 #include "tests-ieee802154.h"
@@ -1161,6 +1162,894 @@ static void test_ieee802154_rssi_to_dbm(void)
     TEST_ASSERT_EQUAL_INT(expected[3], ieee802154_rssi_to_dbm(rssi[3]));
 }
 
+#define _SECRET_MESSAGE "PSSST! Don't tell anyone."
+#define _SEC_SRC_LONG { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef }
+#define _SEC_SRC_SHORT { 0x34, 0x12 }
+#define _SEC_SRC_PAN  0x0012
+#define _SEC_DST_LONG { 0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10 }
+#define _SEC_DST_SHORT { 0x55, 0x66 }
+#define _SEC_DST_PAN  0x2300
+
+static void _test_ieee802154_sec_encrypt_decrypt(ieee802154_sec_context_t *ctx,
+                                                 uint16_t dst_pan, const uint8_t *dst, size_t dst_len,
+                                                 uint16_t src_pan, const uint8_t *src, size_t src_len,
+                                                 const uint8_t *src_long)
+{
+    uint8_t frame[IEEE802154_FRAME_LEN_MAX] = { 0 };
+    uint8_t mic[IEEE802154_SEC_MAX_MAC_SIZE] = { 0 };
+    uint8_t mic_len = sizeof(mic);
+    uint8_t hdr_size = ieee802154_set_frame_hdr(frame,
+                                                src, src_len, dst, dst_len,
+                                                (le_uint16_t){ src_pan }, (le_uint16_t){ dst_pan },
+                                                IEEE802154_FCF_TYPE_DATA | IEEE802154_FCF_SECURITY_EN,
+                                                22);
+    TEST_ASSERT(hdr_size > 0);
+    uint8_t payload_enc[IEEE802154_FRAME_LEN_MAX - IEEE802154_MAX_HDR_LEN - IEEE802154_FCS_LEN];
+    const char *payload = _SECRET_MESSAGE;
+    strcpy((char *)payload_enc, payload);
+    uint16_t payload_size = strlen((char *)payload_enc);
+    int enc = ieee802154_sec_encrypt_frame(ctx,
+                                           frame, &hdr_size,
+                                           payload_enc, payload_size,
+                                           mic, &mic_len,
+                                           src_long);
+    TEST_ASSERT(enc == IEEE802154_SEC_OK);
+    memcpy(frame + hdr_size, payload_enc, payload_size);
+    memcpy(frame + hdr_size + payload_size, mic, mic_len);
+    uint16_t frame_size = hdr_size + payload_size + mic_len;
+
+    hdr_size = ieee802154_get_frame_hdr_len(frame);
+    uint8_t *payload_dec = NULL;
+    uint16_t payload_dec_size = 0;
+    uint8_t *mic_dec = NULL;
+    uint8_t mic_dec_size = 0;
+    int dec = ieee802154_sec_decrypt_frame(ctx,
+                                           frame_size,
+                                           frame, &hdr_size,
+                                           &payload_dec, &payload_dec_size,
+                                           &mic_dec, &mic_dec_size);
+    TEST_ASSERT(dec == IEEE802154_SEC_OK);
+    TEST_ASSERT(!memcmp(payload_dec, payload, strlen(payload)));
+}
+
+static void _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(ieee802154_sec_context_t *ctx,
+                                                               uint16_t dst_pan, const uint8_t *dst, size_t dst_len,
+                                                               uint16_t src_pan, const uint8_t *src, size_t src_len,
+                                                               const uint8_t *src_long)
+{
+    uint8_t frame[IEEE802154_FRAME_LEN_MAX] = { 0 };
+    uint8_t mic[IEEE802154_SEC_MAX_MAC_SIZE] = { 0 };
+    uint8_t mic_len = sizeof(mic);
+    uint8_t hdr_size = ieee802154_set_frame_hdr(frame,
+                                                src, src_len, dst, dst_len,
+                                                (le_uint16_t){ src_pan }, (le_uint16_t){ dst_pan },
+                                                IEEE802154_FCF_TYPE_DATA | IEEE802154_FCF_SECURITY_EN,
+                                                22);
+    TEST_ASSERT(hdr_size > 0);
+    uint8_t payload_enc[IEEE802154_FRAME_LEN_MAX - IEEE802154_MAX_HDR_LEN - IEEE802154_FCS_LEN];
+    const char *payload = _SECRET_MESSAGE;
+    strcpy((char *)payload_enc, payload);
+    uint16_t payload_size = strlen((char *)payload_enc);
+    int enc = ieee802154_sec_encrypt_frame(ctx,
+                                           frame, &hdr_size,
+                                           payload_enc, payload_size,
+                                           mic, &mic_len,
+                                           src_long);
+    TEST_ASSERT(enc == IEEE802154_SEC_OK);
+    /* destroy mic */
+    memset(mic, 0, mic_len);
+    memcpy(frame + hdr_size, payload_enc, payload_size);
+    memcpy(frame + hdr_size + payload_size, mic, mic_len);
+    uint16_t frame_size = hdr_size + payload_size + mic_len;
+
+    hdr_size = ieee802154_get_frame_hdr_len(frame);
+    uint8_t *payload_dec = NULL;
+    uint16_t payload_dec_size = 0;
+    uint8_t *mic_dec = NULL;
+    uint8_t mic_dec_size = 0;
+    int dec = ieee802154_sec_decrypt_frame(ctx,
+                                           frame_size,
+                                           frame, &hdr_size,
+                                           &payload_dec, &payload_dec_size,
+                                           &mic_dec, &mic_dec_size);
+    TEST_ASSERT(dec == -IEEE802154_SEC_MAC_CHECK_FAILURE);
+    TEST_ASSERT(!memcmp(payload_dec, payload, strlen(payload)));
+}
+
+static void _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(ieee802154_sec_context_t *ctx,
+                                                                   uint16_t dst_pan, const uint8_t *dst, size_t dst_len,
+                                                                   uint16_t src_pan, const uint8_t *src, size_t src_len,
+                                                                   const uint8_t *src_long)
+{
+    uint8_t frame[IEEE802154_FRAME_LEN_MAX] = { 0 };
+    uint8_t mic[IEEE802154_SEC_MAX_MAC_SIZE] = { 0 };
+    uint8_t mic_len = sizeof(mic);
+    uint8_t hdr_size = ieee802154_set_frame_hdr(frame,
+                                                src, src_len, dst, dst_len,
+                                                (le_uint16_t){ src_pan }, (le_uint16_t){ dst_pan },
+                                                IEEE802154_FCF_TYPE_DATA | IEEE802154_FCF_SECURITY_EN,
+                                                22);
+    TEST_ASSERT(hdr_size > 0);
+    uint8_t payload_enc[IEEE802154_FRAME_LEN_MAX - IEEE802154_MAX_HDR_LEN - IEEE802154_FCS_LEN];
+    const char *payload = _SECRET_MESSAGE;
+    strcpy((char *)payload_enc, payload);
+    uint16_t payload_size = strlen((char *)payload_enc);
+    int enc = ieee802154_sec_encrypt_frame(ctx,
+                                           frame, &hdr_size,
+                                           payload_enc, payload_size,
+                                           mic, &mic_len,
+                                           src_long);
+    TEST_ASSERT(enc == IEEE802154_SEC_OK);
+    /* destroy payload */
+    memset(payload_enc, 0, payload_size);
+    memcpy(frame + hdr_size, payload_enc, payload_size);
+    memcpy(frame + hdr_size + payload_size, mic, mic_len);
+    uint16_t frame_size = hdr_size + payload_size + mic_len;
+
+    hdr_size = ieee802154_get_frame_hdr_len(frame);
+    uint8_t *payload_dec = NULL;
+    uint16_t payload_dec_size = 0;
+    uint8_t *mic_dec = NULL;
+    uint8_t mic_dec_size = 0;
+    int dec = ieee802154_sec_decrypt_frame(ctx,
+                                           frame_size,
+                                           frame, &hdr_size,
+                                           &payload_dec, &payload_dec_size,
+                                           &mic_dec, &mic_dec_size);
+    (void)dec;
+    /* assume wrong payload */
+    TEST_ASSERT(memcmp(payload_dec, payload, strlen(payload)));
+}
+
+static void _test_ieee802154_sec_encrypt_decrypt_replay_protection(ieee802154_sec_context_t *ctx,
+                                                                   uint16_t dst_pan, const uint8_t *dst, size_t dst_len,
+                                                                   uint16_t src_pan, const uint8_t *src, size_t src_len,
+                                                                   const uint8_t *src_long)
+{
+    (void)ctx;
+    (void)dst_pan;
+    (void)dst;
+    (void)dst_len;
+    (void)src_pan;
+    (void)src;
+    (void)src_len;
+    (void)src_long;
+#if MODULE_IEEE802154_SECURITY_REPLAY_PROTECTION
+    uint8_t frame[IEEE802154_FRAME_LEN_MAX] = { 0 };
+    uint8_t mic[IEEE802154_SEC_MAX_MAC_SIZE] = { 0 };
+    uint8_t mic_len = sizeof(mic);
+    uint8_t hdr_size = ieee802154_set_frame_hdr(frame,
+                                                src, src_len, dst, dst_len,
+                                                (le_uint16_t){ src_pan }, (le_uint16_t){ dst_pan },
+                                                IEEE802154_FCF_TYPE_DATA | IEEE802154_FCF_SECURITY_EN,
+                                                22);
+    TEST_ASSERT(hdr_size > 0);
+    uint8_t payload_enc[IEEE802154_FRAME_LEN_MAX - IEEE802154_MAX_HDR_LEN - IEEE802154_FCS_LEN];
+    const char *payload = _SECRET_MESSAGE;
+    strcpy((char *)payload_enc, payload);
+    uint16_t payload_size = strlen((char *)payload_enc);
+    int enc = ieee802154_sec_encrypt_frame(ctx,
+                                           frame, &hdr_size,
+                                           payload_enc, payload_size,
+                                           mic, &mic_len,
+                                           src_long);
+    TEST_ASSERT(enc == IEEE802154_SEC_OK);
+    memcpy(frame + hdr_size, payload_enc, payload_size);
+    memcpy(frame + hdr_size + payload_size, mic, mic_len);
+    uint16_t frame_size = hdr_size + payload_size + mic_len;
+
+    hdr_size = ieee802154_get_frame_hdr_len(frame);
+    uint8_t *payload_dec = NULL;
+    uint16_t payload_dec_size = 0;
+    uint8_t *mic_dec = NULL;
+    uint8_t mic_dec_size = 0;
+    int dec = ieee802154_sec_decrypt_frame(ctx,
+                                           frame_size,
+                                           frame, &hdr_size,
+                                           &payload_dec, &payload_dec_size,
+                                           &mic_dec, &mic_dec_size);
+    TEST_ASSERT(dec == IEEE802154_SEC_OK);
+    /* trying to decrypt the same frame again to test replay protection */
+    hdr_size = ieee802154_get_frame_hdr_len(frame);
+    dec = ieee802154_sec_decrypt_frame(ctx,
+                                           frame_size,
+                                           frame, &hdr_size,
+                                           &payload_dec, &payload_dec_size,
+                                           &mic_dec, &mic_dec_size);
+    TEST_ASSERT(dec == -IEEE802154_SEC_FRAME_COUNTER_REPLAY);
+#endif
+}
+
+static void test_ieee802154_sec_explicit_default_key_none_long(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_NONE,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX, 1, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, NULL, dst, true);
+    ieee802154_sec_peer(&ctx, src_pan, NULL, src, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+}
+
+static void test_ieee802154_sec_explicit_default_key_mic32_long(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_MIC32,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX, 1, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, NULL, dst, true);
+    ieee802154_sec_peer(&ctx, src_pan, NULL, src, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+}
+
+static void test_ieee802154_sec_explicit_default_key_mic64_long(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_MIC64,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX, 1, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, NULL, dst, true);
+    ieee802154_sec_peer(&ctx, src_pan, NULL, src, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+}
+
+static void test_ieee802154_sec_explicit_default_key_mic128_long(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_MIC128,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX, 1, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, NULL, dst, true);
+    ieee802154_sec_peer(&ctx, src_pan, NULL, src, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+}
+
+static void test_ieee802154_sec_explicit_default_key_enc_long(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX, 1, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, NULL, dst, true);
+    ieee802154_sec_peer(&ctx, src_pan, NULL, src, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+}
+
+static void test_ieee802154_sec_explicit_default_key_enc_mic32_long(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC32,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX, 1, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, NULL, dst, true);
+    ieee802154_sec_peer(&ctx, src_pan, NULL, src, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+}
+
+static void test_ieee802154_sec_explicit_default_key_enc_mic64_long(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC64,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX, 1, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, NULL, dst, true);
+    ieee802154_sec_peer(&ctx, src_pan, NULL, src, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+}
+
+static void test_ieee802154_sec_explicit_default_key_enc_mic128_long(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC128,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX, 1, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, NULL, dst, true);
+    ieee802154_sec_peer(&ctx, src_pan, NULL, src, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+}
+
+static void test_ieee802154_sec_implicit_key_none_long(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_NONE,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    /* need to add implicit keys for sender and receiver because this node mimics both roles */
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, src_pan, src,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, NULL, dst, true);
+    ieee802154_sec_peer(&ctx, src_pan, NULL, src, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+}
+
+static void test_ieee802154_sec_implicit_key_mic32_long(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_MIC32,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    /* need to add implicit keys for sender and receiver because this node mimics both roles */
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, src_pan, src,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, NULL, dst, true);
+    ieee802154_sec_peer(&ctx, src_pan, NULL, src, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+}
+
+static void test_ieee802154_sec_implicit_key_mic64_long(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_MIC64,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    /* need to add implicit keys for sender and receiver because this node mimics both roles */
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, src_pan, src,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, NULL, dst, true);
+    ieee802154_sec_peer(&ctx, src_pan, NULL, src, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+}
+
+static void test_ieee802154_sec_implicit_key_mic128_long(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_MIC128,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    /* need to add implicit keys for sender and receiver because this node mimics both roles */
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, src_pan, src,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, NULL, dst, true);
+    ieee802154_sec_peer(&ctx, src_pan, NULL, src, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+}
+
+static void test_ieee802154_sec_implicit_key_enc_long(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    /* need to add implicit keys for sender and receiver because this node mimics both roles */
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, src_pan, src,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, NULL, dst, true);
+    ieee802154_sec_peer(&ctx, src_pan, NULL, src, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+}
+
+static void test_ieee802154_sec_implicit_key_enc_mic32_long(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC32,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    /* need to add implicit keys for sender and receiver because this node mimics both roles */
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, src_pan, src,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, NULL, dst, true);
+    ieee802154_sec_peer(&ctx, src_pan, NULL, src, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+}
+
+static void test_ieee802154_sec_implicit_key_enc_mic64_long(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC64,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    /* need to add implicit keys for sender and receiver because this node mimics both roles */
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, src_pan, src,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, NULL, dst, true);
+    ieee802154_sec_peer(&ctx, src_pan, NULL, src, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+}
+
+static void test_ieee802154_sec_implicit_key_enc_mic128_long(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC128,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    /* need to add implicit keys for sender and receiver because this node mimics both roles */
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_LONG, src_pan, src,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, NULL, dst, true);
+    ieee802154_sec_peer(&ctx, src_pan, NULL, src, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src);
+}
+
+static void test_ieee802154_sec_explicit_default_key_none_short(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_NONE,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX, 1, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_SHORT;
+    const uint8_t dst_long[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_SHORT;
+    const uint8_t src_long[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, dst, dst_long, true);
+    ieee802154_sec_peer(&ctx, src_pan, src, src_long, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+}
+
+static void test_ieee802154_sec_explicit_default_key_mic32_short(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_MIC32,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX, 1, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_SHORT;
+    const uint8_t dst_long[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_SHORT;
+    const uint8_t src_long[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, dst, dst_long, true);
+    ieee802154_sec_peer(&ctx, src_pan, src, src_long, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+}
+
+static void test_ieee802154_sec_explicit_default_key_mic64_short(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_MIC64,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX, 1, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_SHORT;
+    const uint8_t dst_long[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_SHORT;
+    const uint8_t src_long[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, dst, dst_long, true);
+    ieee802154_sec_peer(&ctx, src_pan, src, src_long, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+}
+
+static void test_ieee802154_sec_explicit_default_key_mic128_short(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_MIC128,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX, 1, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_SHORT;
+    const uint8_t dst_long[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_SHORT;
+    const uint8_t src_long[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, dst, dst_long, true);
+    ieee802154_sec_peer(&ctx, src_pan, src, src_long, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+}
+
+static void test_ieee802154_sec_explicit_default_key_enc_short(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX, 1, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_SHORT;
+    const uint8_t dst_long[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_SHORT;
+    const uint8_t src_long[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, dst, dst_long, true);
+    ieee802154_sec_peer(&ctx, src_pan, src, src_long, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+}
+
+static void test_ieee802154_sec_explicit_default_key_enc_mic32_short(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC32,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX, 1, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_SHORT;
+    const uint8_t dst_long[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_SHORT;
+    const uint8_t src_long[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, dst, dst_long, true);
+    ieee802154_sec_peer(&ctx, src_pan, src, src_long, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+}
+
+static void test_ieee802154_sec_explicit_default_key_enc_mic64_short(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC64,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX, 1, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_SHORT;
+    const uint8_t dst_long[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_SHORT;
+    const uint8_t src_long[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, dst, dst_long, true);
+    ieee802154_sec_peer(&ctx, src_pan, src, src_long, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+}
+
+static void test_ieee802154_sec_explicit_default_key_enc_mic128_short(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC128,
+                        IEEE802154_SEC_SCF_KEYMODE_INDEX, 1, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_SHORT;
+    const uint8_t dst_long[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_SHORT;
+    const uint8_t src_long[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, dst, dst_long, true);
+    ieee802154_sec_peer(&ctx, src_pan, src, src_long, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+}
+
+static void test_ieee802154_sec_implicit_key_none_short(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_NONE,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_SHORT;
+    const uint8_t dst_long[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_SHORT;
+    const uint8_t src_long[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    /* need to add implicit keys for sender and receiver because this node mimics both roles */
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, src_pan, src,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, dst, dst_long, true);
+    ieee802154_sec_peer(&ctx, src_pan, src, src_long, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+}
+
+static void test_ieee802154_sec_implicit_key_mic32_short(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_MIC32,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_SHORT;
+    const uint8_t dst_long[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_SHORT;
+    const uint8_t src_long[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    /* need to add implicit keys for sender and receiver because this node mimics both roles */
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, src_pan, src,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, dst, dst_long, true);
+    ieee802154_sec_peer(&ctx, src_pan, src, src_long, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+}
+
+static void test_ieee802154_sec_implicit_key_mic64_short(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_MIC64,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_SHORT;
+    const uint8_t dst_long[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_SHORT;
+    const uint8_t src_long[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    /* need to add implicit keys for sender and receiver because this node mimics both roles */
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, src_pan, src,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, dst, dst_long, true);
+    ieee802154_sec_peer(&ctx, src_pan, src, src_long, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+}
+
+static void test_ieee802154_sec_implicit_key_mic128_short(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_MIC128,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_SHORT;
+    const uint8_t dst_long[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_SHORT;
+    const uint8_t src_long[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    /* need to add implicit keys for sender and receiver because this node mimics both roles */
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, src_pan, src,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, dst, dst_long, true);
+    ieee802154_sec_peer(&ctx, src_pan, src, src_long, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+}
+
+static void test_ieee802154_sec_implicit_key_enc_short(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_SHORT;
+    const uint8_t dst_long[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_SHORT;
+    const uint8_t src_long[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    /* need to add implicit keys for sender and receiver because this node mimics both roles */
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, src_pan, src,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, dst, dst_long, true);
+    ieee802154_sec_peer(&ctx, src_pan, src, src_long, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+}
+
+static void test_ieee802154_sec_implicit_key_enc_mic32_short(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC32,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_SHORT;
+    const uint8_t dst_long[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_SHORT;
+    const uint8_t src_long[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    /* need to add implicit keys for sender and receiver because this node mimics both roles */
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, src_pan, src,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, dst, dst_long, true);
+    ieee802154_sec_peer(&ctx, src_pan, src, src_long, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+}
+
+static void test_ieee802154_sec_implicit_key_enc_mic64_short(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC64,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_SHORT;
+    const uint8_t dst_long[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_SHORT;
+    const uint8_t src_long[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    /* need to add implicit keys for sender and receiver because this node mimics both roles */
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, src_pan, src,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, dst, dst_long, true);
+    ieee802154_sec_peer(&ctx, src_pan, src, src_long, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+}
+
+static void test_ieee802154_sec_implicit_key_enc_mic128_short(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC128,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint16_t dst_pan = _SEC_DST_PAN;
+    const uint8_t dst[] = _SEC_DST_SHORT;
+    const uint8_t dst_long[] = _SEC_DST_LONG;
+    const uint16_t src_pan = _SEC_SRC_PAN;
+    const uint8_t src[] = _SEC_SRC_SHORT;
+    const uint8_t src_long[] = _SEC_SRC_LONG;
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, dst_pan, dst,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    /* need to add implicit keys for sender and receiver because this node mimics both roles */
+    ieee802154_sec_key_lookup_implicit(&ctx, IEEE802154_SEC_DEV_ADDRMODE_SHORT, src_pan, src,
+                                       (const uint8_t *)CONFIG_IEEE802154_SEC_DEFAULT_KEY, true);
+    ieee802154_sec_peer(&ctx, dst_pan, dst, dst_long, true);
+    ieee802154_sec_peer(&ctx, src_pan, src, src_long, true);
+    _test_ieee802154_sec_encrypt_decrypt(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_mic(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_corrupted_payload(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+    _test_ieee802154_sec_encrypt_decrypt_replay_protection(&ctx, dst_pan, dst, sizeof(dst), src_pan, src, sizeof(src), src_long);
+}
+
+static void test_ieee802154_sec_update(void)
+{
+    ieee802154_sec_context_t ctx;
+    ieee802154_sec_init(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC128,
+                        IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL);
+    const uint8_t new_key[] = { 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10 };
+    const uint8_t new_source[] = { 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8 };
+    int update;
+    update = ieee802154_sec_update(&ctx, IEEE802154_SEC_SCF_SECLEVEL_NONE, IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL, NULL);
+    TEST_ASSERT(update == IEEE802154_SEC_OK);
+    update = ieee802154_sec_update(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC, IEEE802154_SEC_SCF_KEYMODE_IMPLICIT, 0, NULL, new_key);
+    TEST_ASSERT(update == IEEE802154_SEC_OK);
+    update = ieee802154_sec_update(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC32, IEEE802154_SEC_SCF_KEYMODE_INDEX, 0x42, NULL, new_key);
+    TEST_ASSERT(update == IEEE802154_SEC_OK);
+    update = ieee802154_sec_update(&ctx, IEEE802154_SEC_SCF_SECLEVEL_ENC_MIC64, IEEE802154_SEC_SCF_KEYMODE_HW_INDEX, 0x42, new_source, new_key);
+    TEST_ASSERT(update == IEEE802154_SEC_OK);
+}
+
 Test *tests_ieee802154_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -1233,6 +2122,44 @@ Test *tests_ieee802154_tests(void)
         new_TestFixture(test_ieee802154_get_iid_addr_len_8),
         new_TestFixture(test_ieee802154_rssi_to_dbm),
         new_TestFixture(test_ieee802154_dbm_to_rssi),
+
+        new_TestFixture(test_ieee802154_sec_explicit_default_key_none_long),
+        new_TestFixture(test_ieee802154_sec_explicit_default_key_mic32_long),
+        new_TestFixture(test_ieee802154_sec_explicit_default_key_mic64_long),
+        new_TestFixture(test_ieee802154_sec_explicit_default_key_mic128_long),
+        new_TestFixture(test_ieee802154_sec_explicit_default_key_enc_long),
+        new_TestFixture(test_ieee802154_sec_explicit_default_key_enc_mic32_long),
+        new_TestFixture(test_ieee802154_sec_explicit_default_key_enc_mic64_long),
+        new_TestFixture(test_ieee802154_sec_explicit_default_key_enc_mic128_long),
+
+        new_TestFixture(test_ieee802154_sec_implicit_key_none_long),
+        new_TestFixture(test_ieee802154_sec_implicit_key_mic32_long),
+        new_TestFixture(test_ieee802154_sec_implicit_key_mic64_long),
+        new_TestFixture(test_ieee802154_sec_implicit_key_mic128_long),
+        new_TestFixture(test_ieee802154_sec_implicit_key_enc_long),
+        new_TestFixture(test_ieee802154_sec_implicit_key_enc_mic32_long),
+        new_TestFixture(test_ieee802154_sec_implicit_key_enc_mic64_long),
+        new_TestFixture(test_ieee802154_sec_implicit_key_enc_mic128_long),
+
+        new_TestFixture(test_ieee802154_sec_explicit_default_key_none_short),
+        new_TestFixture(test_ieee802154_sec_explicit_default_key_mic32_short),
+        new_TestFixture(test_ieee802154_sec_explicit_default_key_mic64_short),
+        new_TestFixture(test_ieee802154_sec_explicit_default_key_mic128_short),
+        new_TestFixture(test_ieee802154_sec_explicit_default_key_enc_short),
+        new_TestFixture(test_ieee802154_sec_explicit_default_key_enc_mic32_short),
+        new_TestFixture(test_ieee802154_sec_explicit_default_key_enc_mic64_short),
+        new_TestFixture(test_ieee802154_sec_explicit_default_key_enc_mic128_short),
+
+        new_TestFixture(test_ieee802154_sec_implicit_key_none_short),
+        new_TestFixture(test_ieee802154_sec_implicit_key_mic32_short),
+        new_TestFixture(test_ieee802154_sec_implicit_key_mic64_short),
+        new_TestFixture(test_ieee802154_sec_implicit_key_mic128_short),
+        new_TestFixture(test_ieee802154_sec_implicit_key_enc_short),
+        new_TestFixture(test_ieee802154_sec_implicit_key_enc_mic32_short),
+        new_TestFixture(test_ieee802154_sec_implicit_key_enc_mic64_short),
+        new_TestFixture(test_ieee802154_sec_implicit_key_enc_mic128_short),
+
+        new_TestFixture(test_ieee802154_sec_update),
     };
 
     EMB_UNIT_TESTCALLER(ieee802154_tests, NULL, NULL, fixtures);
