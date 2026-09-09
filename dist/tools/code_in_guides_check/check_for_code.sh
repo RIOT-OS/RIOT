@@ -2,20 +2,47 @@
 # This script checks if the code blocks in markdown files under the guides directory
 # are present in the corresponding source files. It looks for code blocks marked with
 # ```c and checks if the code exists in the source files defined by the code_folder
-# variable in the markdown file. If the code block is not found, it will print an error
-# message and exit with a non-zero status.
+# variable in the markdown file. If the code block is not found, an error is
+# reported via GitHub annotations (when run in a GitHub Action) or printed to
+# stdout, and the script exits with a non-zero status.
 
 # Define the guides directory
 BASE_DIR="$(git rev-parse --show-toplevel)"
 GUIDES_DIR="$BASE_DIR/doc/guides"
 
+# shellcheck source=dist/tools/ci/github_annotate.sh
+. "$BASE_DIR"/dist/tools/ci/github_annotate.sh
+
+github_annotate_setup
+
 # Check if directory exists
 if [ ! -d "$GUIDES_DIR" ]; then
-    echo "Error: Guides directory not found at $GUIDES_DIR"
+    if github_annotate_is_on; then
+        github_annotate_error_no_file "Guides directory not found at $GUIDES_DIR"
+    else
+        echo "Error: Guides directory not found at $GUIDES_DIR"
+    fi
+    github_annotate_teardown
     exit 1
 fi
 
 exit_code=0
+
+# Reports an error for a file at a given line
+# Args: $1 -> Line number of the error
+#       $2 -> The file path
+#       $3 -> The error message
+report_error() {
+    line_number=$1
+    file_path=$2
+    message=$3
+    rel_file_path="${file_path#"$BASE_DIR"/}"
+    if github_annotate_is_on; then
+        github_annotate_error "$rel_file_path" "$line_number" "😥 $message"
+    else
+        echo "$rel_file_path:$line_number: $message"
+    fi
+}
 
 # Parses code blocks from within a file
 # Args: $1 -> Line number of the code block
@@ -29,7 +56,6 @@ parse_code_block() {
     # Check whether there is a <!--skip ci--> comment in the line before the code block
     skip_ci=$(sed -n "$((start_line - 1))p" "$file_path" | grep -c '<!--skip ci-->')
     if [ "$skip_ci" -gt 0 ]; then
-        echo "  ✔️ Line $start_line: Code block is skipped due to <!--skip ci--> comment"
         return 0
     fi
 
@@ -51,13 +77,13 @@ parse_code_block() {
         # Check if the code block exists in the current source file
         if [[ "$src_content" == *"$code_block"* ]]; then
             found=1
-            echo "  ✔️ Found Line $start_line in $(basename "$src_file")"
             break
         fi
     done
 
     if [ $found -eq 0 ]; then
-        echo "  ❌ Line $start_line: Code block not found in any source file"
+        report_error "$start_line" "$file_path" \
+            "Code block not found in any source file of $code_folder 📚"
         return 1
     fi
 }
@@ -66,23 +92,19 @@ markdown_files=$(find "$GUIDES_DIR" -type f \( -name "*.md" -o -name "*.mdx" \))
 
 # Find and process all .md and .mdx files
 for file in $markdown_files; do
-    echo "🧐 Processing file: $file"
-
     # Check if there is a code_folder defined in the markdown file
     code_folder=$(grep -oP -m1 'code_folder:\s*\K.+' "$file")
     if [ -z "$code_folder" ]; then
-        echo "  ✔️ File does not specify code_folder, skipping ..."
         continue
     fi
     SOURCE_DIR="$BASE_DIR/$code_folder"
-
-    echo "🔍 Looking for code in $SOURCE_DIR"
 
     # Get all code block start lines
     code_block_starts=$(grep -n '```[cC]' "$file" | cut -d':' -f1)
 
     if [ -z "$code_block_starts" ]; then
-        echo "  ❌ No code blocks found in this file even though code_folder was specified."
+        report_error 1 "$file" \
+            "No code blocks found even though code_folder was specified 📃"
         exit_code=1
     fi
 
@@ -95,10 +117,6 @@ for file in $markdown_files; do
     done
 done
 
-if [ $exit_code -eq 0 ]; then
-    echo "👍 All code blocks found in the source files."
-else
-    echo "👎 Some code blocks were not found in the source files. See the output above."
-fi
+github_annotate_teardown
 
 exit $exit_code
