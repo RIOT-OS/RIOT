@@ -1,0 +1,34 @@
+/**
+@defgroup    boards_pulga Pulga
+@ingroup     boards
+@brief       Support for the Pulga board
+
+This port provides support to the [pulga core v2/v3](https://caninosloucos.org/en/pulgacore-v2-en/).
+
+It also includes default mappings to the LoRa and GPS shield boards
+(still under production and are not on the website yet).
+
+The UART pins are, by default, mapped as follows:
+- RX: P0.25
+- TX: P0.28
+
+### RESET pin configuration
+
+See nrf52840dk's configuration.
+
+## Flash the board
+
+See the `Flashing` section in @ref boards_common_nrf52.
+
+## Accessing STDIO via UART
+
+Currently requires an external adapter, such as those
+based on the cp2102, which on a Linux host is generally
+accessible via `/dev/ttyUSB0`.
+
+Use the `term` target to connect to the board serial port<br/>
+```
+    make BOARD=pulga -C examples/hello-world term
+```
+
+ */
