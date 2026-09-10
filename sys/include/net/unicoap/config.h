@@ -286,7 +286,7 @@ static_assert(CONFIG_UNICOAP_GENERATED_TOKEN_LENGTH > 0,
  * Setting the timeout to zero will disable it.
  *
  * **Unit**: milliseconds
- * **Default**: 10000
+ * **Default**: @ref CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS
  */
 #if !defined(CONFIG_UNICOAP_TIMEOUT_CLIENT_MULTICAST_RESPONSE_MS) || defined(DOXYGEN)
 #  define CONFIG_UNICOAP_TIMEOUT_CLIENT_MULTICAST_RESPONSE_MS CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS
