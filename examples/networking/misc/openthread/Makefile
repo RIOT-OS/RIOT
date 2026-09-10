@@ -3,10 +3,14 @@ APPLICATION = openthread
 # If no BOARD is found in the environment, use this default:
 BOARD ?= nrf52840dk
 
-# These are the boards that OpenThread stack has been tested on
-# Currently disabled boards are missing the Radio HAL port: samr21-xpro, iotlab-m3, iotlab-a8-m3,
-# frdm-kw41z, openlabs-kw41z-mini-256kib, openlabs-kw41z-mini, phynode-kw41z, usb-kw41z
+# Currently disabled boards are missing the Radio HAL port:
+# iotlab-a8-m3, iotlab-m3, samr21-xpro
 BOARDS_SUPPORTED := \
+                    frdm-kw41z \
+                    openlabs-kw41z-mini-256kib \
+                    openlabs-kw41z-mini \
+                    phynode-kw41z \
+                    usb-kw41z \
                     cc2538dk \
                     remote-reva \
                     remote-revb \
