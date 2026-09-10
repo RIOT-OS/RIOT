@@ -14,6 +14,7 @@
 #include <string.h>
 #include <errno.h>
 
+#include "net/unicoap/transport.h"
 #include "ztimer.h"
 #include "mutex.h"
 #include "compiler_hints.h"
@@ -71,7 +72,10 @@ int unicoap_client_process_response(unicoap_packet_t* packet, unicoap_client_mem
     /* TODO: Block-wise */
     res = unicoap_client_callback_success(memo, packet, UNICOAP_BLOCK_OPTION_NONE);
 
-    unicoap_client_memo_free(memo, 0);
+    if ((memo->flags & UNICOAP_REQUEST_FLAG_MULTICAST) == 0 ) {
+        unicoap_client_memo_free(memo, 0);
+    }
+
     return res;
 }
 
@@ -123,6 +127,22 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
                                     .token_length = sizeof(token),
                                 } };
 
+    bool multicast = unicoap_endpoint_is_multicast(endpoint);
+
+    if (multicast) {
+        if (flags & UNICOAP_REQUEST_FLAG_RELIABLE) {
+            _CLIENT_DEBUG("error: reliable datagrams are not supported for multicast requests\n");
+            return -EINVAL;
+        }
+
+        if (endpoint->proto == UNICOAP_PROTO_DTLS) {
+            _CLIENT_DEBUG("error: DTLS is not supported for multicast requests\n");
+            return -EINVAL;
+        }
+
+        flags |= UNICOAP_REQUEST_FLAG_MULTICAST;
+    }
+
     if (unicoap_callback_is_present(callback)) {
         _CLIENT_DEBUG("need a memo\n");
         if (!(memo = unicoap_client_memo_create(endpoint))) {
@@ -132,11 +152,20 @@ int unicoap_client_send_request_body(unicoap_message_t* request,
         memo->callback_arg = parameters ? parameters->callback_arg : NULL;
         memo->flags = flags;
 
-        unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
-                               (parameters && parameters->timeout_ms > 0) ?
-                               parameters->timeout_ms : CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS,
-                               "client.resp-timeout");
+        if (!multicast) {
+            unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
+                                   (parameters && parameters->timeout_ms > 0) ?
+                                   parameters->timeout_ms : CONFIG_UNICOAP_TIMEOUT_CLIENT_RESPONSE_MS,
+                                   "client.resp-timeout");
+        }
+        else if (CONFIG_UNICOAP_TIMEOUT_CLIENT_MULTICAST_RESPONSE_MS > 0) {
+            unicoap_event_schedule(&memo->super.exchange.timeout, _on_response_timeout,
+                                   (parameters && parameters->timeout_ms > 0) ?
+                                   parameters->timeout_ms : CONFIG_UNICOAP_TIMEOUT_CLIENT_MULTICAST_RESPONSE_MS,
+                                   "client.resp-timeout");
+        }
     }
+
     /* TODO: OSCORE */
     if ((res = unicoap_client_send_request_part(&packet, memo, flags)) < 0) {
         goto error;

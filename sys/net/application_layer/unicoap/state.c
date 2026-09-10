@@ -89,6 +89,11 @@ static unicoap_client_memo_t* _alloc_client(void) {
     return NULL;
 }
 
+static inline bool _is_multicast(unicoap_client_memo_t *memo)
+{
+    return (memo->flags & UNICOAP_REQUEST_FLAG_MULTICAST) != 0;
+}
+
 static inline bool _is_client(const unicoap_memo_t* memo) {
     (void)memo;
 #if UNICOAP_HAVE_CLIENT_STATE
@@ -164,8 +169,8 @@ void unicoap_client_memo_free(unicoap_client_memo_t* memo, int error) {
     if (unicoap_memo_messaging_state(&memo->super)) {
         unicoap_messaging_notify(
             unicoap_memo_messaging_state(&memo->super),
-            error ? unicoap_layer_notification_async_failure_from_errno(error) 
-                  : UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE, 
+            error ? unicoap_layer_notification_async_failure_from_errno(error)
+                  : UNICOAP_LAYER_NOTIFICATION_STATE_RELEASE,
             NULL, proto);
     }
 #endif
@@ -183,9 +188,11 @@ unicoap_client_memo_t* unicoap_client_memo_find_token(const unicoap_endpoint_t* 
     for (size_t i = 0; i < (size_t)ARRAY_SIZE(_state.client_memos); i += 1) {
         unicoap_client_memo_t* memo = &_state.client_memos[i];
 
-        if ((!endpoint || unicoap_endpoint_is_equal(&memo->super.endpoint, endpoint)) &&
-            token_length == sizeof(memo->token) &&
-            memcmp(memo->token, token, token_length) == 0) {
+
+        if ((_is_multicast(memo)
+             || (endpoint && unicoap_endpoint_is_equal(&memo->super.endpoint, endpoint)))
+            && (token_length == sizeof(memo->token))
+            && memcmp(memo->token, token, token_length) == 0) {
             return memo;
         }
     }
@@ -272,7 +279,7 @@ void unicoap_exchange_notify(void* state, unicoap_layer_notification_t type, voi
             unicoap_client_callback_failure(unicoap_client_memo_of_super(memo),
                 unicoap_layer_notification_async_failure_to_errno(type));
 
-            /* Messaging layer failed, our signal to release state. Error occurred on messaging 
+            /* Messaging layer failed, our signal to release state. Error occurred on messaging
              * layer and not on exchange layer, so use 0 instead of error number here. */
             unicoap_client_memo_free(unicoap_client_memo_of_super(memo), 0);
         }
@@ -651,7 +658,14 @@ unicoap_preprocessing_result_t unicoap_exchange_preprocess(unicoap_packet_t* pac
                 unicoap_client_memo_free(memo, 0);
                 return UNICOAP_PREPROCESSING_ERROR_TRUNCATED;
             }
-            unicoap_event_cancel(&memo->super.exchange.timeout);
+
+            /* For multicast requests, the timeout is used to limit the
+             *              time during which a client accepts server responses. Hence it
+             *              should continue running even after receiving one response. */
+            if (!_is_multicast(memo)) {
+                unicoap_event_cancel(&memo->super.exchange.timeout);
+            }
+
             arg->client = memo;
             *flags = _messaging_flags_client(memo->flags);
             return UNICOAP_PREPROCESSING_SUCCESS_RESPONSE;

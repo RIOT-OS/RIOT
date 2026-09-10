@@ -56,6 +56,15 @@ typedef enum {
      * **Default**: disabled
      */
     UNICOAP_REQUEST_FLAG_RELIABLE = 0x0001,
+
+    /**
+     * @brief Sets the type of the message to multicast.
+     *
+     * This flag will be set if the destination address for a request is an
+     * IP multicast address.
+     * It is not compatible with @ref UNICOAP_REQUEST_FLAG_RELIABLE.
+     */
+    UNICOAP_REQUEST_FLAG_MULTICAST = 0x8000,
 } unicoap_request_flags_t;
 
 /**
