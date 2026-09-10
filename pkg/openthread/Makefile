@@ -28,7 +28,6 @@ OT_C_FLAGS += -ffunction-sections
 OT_C_FLAGS += -fshort-enums
 OT_C_FLAGS += -Wno-implicit-fallthrough
 OT_C_FLAGS += -Wno-unused-parameter
-OT_CXXFLAGS += -Wno-class-memaccess
 OT_CXXFLAGS += -DOPENTHREAD_TARGET_RIOT
 
 OT_MODULES_ARCHIVES = $(addsuffix .a,$(addprefix $(BINDIR)/,$(OT_MODULES)))
@@ -40,6 +39,8 @@ ifeq (llvm,$(TOOLCHAIN))
   OT_C_FLAGS += -target $(TARGET_ARCH_LLVM)
   OT_C_FLAGS += $(GCC_C_INCLUDES)
   OT_CXXFLAGS += $(GCC_CXX_INCLUDES)
+else
+  OT_CXXFLAGS += -Wno-class-memaccess
 endif
 
 all: $(OT_MODULES_ARCHIVES)
