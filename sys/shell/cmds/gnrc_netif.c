@@ -1769,7 +1769,7 @@ static int _netif_add(char *cmd_name, netif_t *iface, int argc, char **argv)
     (void)iface;
     (void)argc;
     (void)argv;
-    printf("error: GNRC_IPV6 module not enabled.\n");
+    puts("error: no ipv6 support\nUse 'USEMODULE += gnrc_ipv6' to enable it");
 
     return 1;
 #endif
