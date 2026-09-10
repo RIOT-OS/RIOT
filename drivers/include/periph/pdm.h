@@ -92,7 +92,7 @@ typedef struct {
 #endif
 
 /**
- * @brief   Initialize the PDM peripheral
+ * @brief   Initialize and enable the PDM peripheral
  *
  * The requested rate is approximated to the closest rate the hardware can
  * produce. The actually configured rate is returned so the caller can use it
@@ -119,6 +119,11 @@ void pdm_start(void);
  * @brief   Stop the PDM peripheral
  */
 void pdm_stop(void);
+
+/**
+ * @brief   Disable the PDM peripheral
+ */
+void pdm_deinit(void);
 
 #ifdef __cplusplus
 }

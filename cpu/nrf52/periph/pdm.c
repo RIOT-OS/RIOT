@@ -128,14 +128,6 @@ static uint32_t _set_best_pdm_rate(uint32_t rate)
 int32_t pdm_init(pdm_mode_t mode, uint32_t rate, int8_t gain,
                  pdm_data_cb_t cb, void *arg)
 {
-    clock_hfxo_request();
-
-    /* Configure sampling rate */
-    uint32_t real_rate = _set_best_pdm_rate(rate);
-    uint8_t channels = (mode == PDM_MODE_STEREO) ? 2 : 1;
-    uint32_t backoff_samples = (real_rate * PDM_BACKOFF_MS * channels + 999) / 1000;
-    _backoff_buffers = (backoff_samples + PDM_BUF_SIZE - 1) / PDM_BUF_SIZE;
-
     /* Configure mode (Mono or Stereo) */
     switch (mode) {
     case PDM_MODE_MONO:
@@ -148,6 +140,19 @@ int32_t pdm_init(pdm_mode_t mode, uint32_t rate, int8_t gain,
         DEBUG("[pdm] init: mode not supported\n");
         return -ENOTSUP;
     }
+
+    /* Only request if pdm module hasn't already acquired hfxo */
+    if (!(NRF_PDM->ENABLE & PDM_ENABLE_ENABLE_Msk)) {
+        clock_hfxo_request();
+    }
+
+    /* Configure sampling rate */
+    uint32_t real_rate = _set_best_pdm_rate(rate);
+
+    /* Calculate backoff buffers */
+    uint8_t channels = (mode == PDM_MODE_STEREO) ? 2 : 1;
+    uint32_t backoff_samples = (real_rate * PDM_BACKOFF_MS * channels + 999) / 1000;
+    _backoff_buffers = (backoff_samples + PDM_BUF_SIZE - 1) / PDM_BUF_SIZE;
 
     /* Configure gain */
     if (gain > PDM_GAIN_MAX) {
@@ -224,6 +229,26 @@ void pdm_stop(void)
     NRF_PDM->EVENTS_STOPPED = 0;
 
     _pdm_running = false;
+}
+
+void pdm_deinit(void)
+{
+    /* Nothing to do if PDM is not enabled */
+    if (!(NRF_PDM->ENABLE & PDM_ENABLE_ENABLE_Msk)) {
+        return;
+    }
+
+    pdm_stop();
+
+    /* Disable end/started events */
+    NRF_PDM->INTENCLR = (PDM_INTENCLR_END_Msk | PDM_INTENCLR_STARTED_Msk);
+
+    NVIC_DisableIRQ(PDM_IRQn);
+
+    /* Disable PDM */
+    NRF_PDM->ENABLE = (PDM_ENABLE_ENABLE_Disabled << PDM_ENABLE_ENABLE_Pos);
+
+    clock_hfxo_release();
 }
 
 void isr_pdm(void)
