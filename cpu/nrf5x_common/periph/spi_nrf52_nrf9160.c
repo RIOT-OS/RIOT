@@ -30,8 +30,6 @@
 #include "periph_cpu.h"
 #include <string.h>
 
-#define RAM_MASK            (0x20000000)
-
 /**
  * @brief   array holding one pre-initialized mutex for each SPI device
  */

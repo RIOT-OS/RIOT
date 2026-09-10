@@ -5,4 +5,4 @@
 # directory for more details.
 #
 
-rsource "$(RIOTCPU)/nrf52/radio/nrf802154/Kconfig"
+rsource "$(RIOTCPU)/nrf5x_common/radio/nrf802154/Kconfig"

@@ -6,9 +6,9 @@
 #pragma once
 
 /**
- * @defgroup    drivers_nrf52_802154 IEEE802.15.4 Driver for nRF52840 SoCs
+ * @defgroup    drivers_nrf5x_802154 IEEE802.15.4 Driver for nRF5x SoCs
  * @ingroup     drivers_netdev
- * @brief       Driver for using the nRF52's radio in IEEE802.15.4 mode
+ * @brief       Driver for using the nRF5x radio in IEEE802.15.4 mode
  *
  * ## Implementation state ##
  * Netdev events supported:
@@ -26,7 +26,7 @@
  * @{
  *
  * @file
- * @brief       Driver interface for using the nRF52 in IEEE802.15.4 mode
+ * @brief       Driver interface for using the nRF5x radio in IEEE802.15.4 mode
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Semjon Kerner <semjon.kerner@fu-berlin.de>
@@ -44,8 +44,8 @@ extern "C" {
 typedef struct nrf802154 nrf802154_t;
 
 /**
- * @defgroup drivers_nrf52_802154_conf  nrf802154 driver compile configuration
- * @ingroup drivers_nrf52_802154
+ * @defgroup drivers_nrf5x_802154_conf  nrf802154 driver compile configuration
+ * @ingroup drivers_nrf5x_802154
  * @ingroup config_drivers_netdev
  * @{
  */
@@ -80,7 +80,7 @@ typedef struct nrf802154 nrf802154_t;
 void nrf802154_hal_setup(ieee802154_dev_t *hal);
 
 /**
- * @brief Initialize the NRF52840 radio.
+ * @brief Initialize the nRF5x radio.
  *
  * @return 0 on success
  * @return negative errno on error
