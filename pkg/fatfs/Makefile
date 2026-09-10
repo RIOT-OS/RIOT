@@ -3,7 +3,7 @@ PKG_NAME=fatfs
 # .zip file on GitHub and apply only the upstream patches
 PKG_URL=https://github.com/RIOT-OS/FatFS
 # r0.15
-PKG_VERSION=dab28e92fb4a2bea604771ede126251b9d35692a
+PKG_VERSION=0015a2f1f797c59d5f33f2777bb645d185e638d3
 PKG_LICENSE=BSD-1-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
