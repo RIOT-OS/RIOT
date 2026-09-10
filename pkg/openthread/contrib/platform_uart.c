@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2017 Fundacion Inria Chile
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * SPDX-FileCopyrightText: 2017 Fundacion Inria Chile
+ * SPDX-License-Identifier: LGPL-2.1-only
  */
 
 /**
@@ -21,11 +18,13 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "event.h"
 #include "stdio_uart.h"
 #include "periph/uart.h"
-#include "openthread/platform/uart.h"
+
 #include "ot.h"
-#include "event.h"
+/* OpenThread uart header */
+#include "uart.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -37,9 +36,9 @@ static uint16_t frameLength = 0;
 
 static void _ev_serial_handler(event_t *event)
 {
-    (void) event;
+    (void)event;
     /* Tell OpenThread about the reception of a CLI command */
-    otPlatUartReceived((uint8_t*)gSerialMessage[0].buf, gSerialMessage[0].length);
+    otPlatUartReceived((uint8_t *)gSerialMessage[0].buf, gSerialMessage[0].length);
     gSerialMessage[0].serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FREE;
 }
 
@@ -47,29 +46,30 @@ static event_t ev_serial = {
     .handler = _ev_serial_handler
 };
 
-static void uart_handler(void* arg, char c) {
+static void uart_handler(void *arg, char c)
+{
     (void)arg;
 
     if (frameLength == 0) {
         memset(&gSerialMessage[0], 0, sizeof(serial_msg_t));
     }
     switch (c) {
-        case '\r':
-        case '\n':
-            if (frameLength > 0) {
-                gSerialMessage[0].buf[frameLength] = c;
-                frameLength++;
-                gSerialMessage[0].length = frameLength;
-                event_post(openthread_get_evq(), &ev_serial);
-                frameLength = 0;
-            }
-            break;
-        default:
-            if (frameLength < OPENTHREAD_SERIAL_BUFFER_SIZE) {
-                gSerialMessage[0].buf[frameLength] = c;
-                frameLength++;
-            }
-            break;
+    case '\r':
+    case '\n':
+        if (frameLength > 0) {
+            gSerialMessage[0].buf[frameLength] = c;
+            frameLength++;
+            gSerialMessage[0].length = frameLength;
+            event_post(openthread_get_evq(), &ev_serial);
+            frameLength = 0;
+        }
+        break;
+    default:
+        if (frameLength < OPENTHREAD_SERIAL_BUFFER_SIZE) {
+            gSerialMessage[0].buf[frameLength] = c;
+            frameLength++;
+        }
+        break;
     }
 }
 
@@ -80,7 +80,7 @@ otError otPlatUartEnable(void)
         gSerialMessage[i].serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FREE;
     }
 
-    uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, (uart_rx_cb_t) uart_handler, NULL);
+    uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, (uart_rx_cb_t)uart_handler, NULL);
     return OT_ERROR_NONE;
 }
 
@@ -104,5 +104,7 @@ otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
 
 otError otPlatUartFlush(void)
 {
-    return OT_ERROR_NONE;
+    DEBUG("openthread: otPlatUartFlush is not implemented");
+
+    return OT_ERROR_NOT_IMPLEMENTED;
 }

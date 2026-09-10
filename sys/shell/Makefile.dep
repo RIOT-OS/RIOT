@@ -93,7 +93,7 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   ifneq (,$(filter opendsme,$(USEPKG)))
     USEMODULE += shell_cmd_opendsme
   endif
-  ifneq (,$(filter openthread-cli-%,$(USEMODULE)))
+  ifneq (,$(filter openthread_cli_%,$(USEMODULE)))
     USEMODULE += shell_cmd_openthread
   endif
   ifneq (,$(filter openwsn,$(USEPKG)))
