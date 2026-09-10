@@ -24,6 +24,10 @@
 #include "cc2538_rf.h"
 #endif
 
+#ifdef MODULE_KW41ZRF
+#include "kw41zrf.h"
+#endif
+
 #ifdef MODULE_NRF802154
 #include "nrf802154.h"
 #endif
@@ -43,6 +47,10 @@ void openthread_bootstrap(void)
 #ifdef MODULE_CC2538_RF
     cc2538_rf_hal_setup(&dev);
     cc2538_init();
+#endif
+#ifdef MODULE_KW41ZRF
+    kw41zrf_hal_setup(&dev);
+    kw41zrf_init();
 #endif
 #ifdef MODULE_NRF802154
     nrf802154_hal_setup(&dev);
