@@ -2,9 +2,6 @@ include ../Makefile.pkg_common
 
 BOARD ?= nrf52840dk
 
-EXTERNAL_MODULE_DIRS += $(PROJECT_BASE)/modules
-EXTERNAL_BOARD_DIRS += $(PROJECT_BASE)/boards
-
 # Include bplib and the configuration modules
 USEPKG += bplib
 USEMODULE += bplib_stor_void    # No storage, void bundles that can't be used directly
