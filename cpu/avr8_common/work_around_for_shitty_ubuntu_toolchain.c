@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023 Marian Buschsieweke
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 #include <avr/pgmspace.h>
 #include <stdio.h>
 

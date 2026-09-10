@@ -26,6 +26,10 @@
 #  include "net/sock/dtls.h"
 #endif
 
+#if IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX) || defined(DOXYGEN)
+#  include "slipdev.h"
+#endif
+
 /* MARK: unicoap_driver_extension_point */
 
 #include "net/unicoap/message.h"
@@ -97,6 +101,11 @@ extern "C" {
 #define UNICOAP_SCHEME_BLE_GATT               "coap"
 
 /**
+ * @brief URI scheme for CoAP over Slipmux
+ */
+#define UNICOAP_SCHEME_SLIPMUX                "coap+uart"
+
+/**
  * @brief Domain for for CoAP over GATT over Bluetooth Low Energy (BLE)
  *
  * Example URI: `coap://001122334455.ble.arpa/.well-known/core`,
@@ -126,6 +135,8 @@ extern "C" {
 
 /**
  * @brief Transport protocol CoAP is used over.
+ *
+ * The LSB is used to check if the transport is inherently reliable.
  */
 typedef enum {
     /** @brief CoAP over UDP endpoint */
@@ -133,6 +144,9 @@ typedef enum {
 
     /** @brief CoAP over DTLS over UDP endpoint */
     UNICOAP_PROTO_DTLS = 2 << 1,
+
+    /** @brief CoAP over Slipmux endpoint */
+    UNICOAP_PROTO_SLIPMUX = 3 << 1,
 
     /* MARK: unicoap_driver_extension_point */
 } __attribute__((__packed__)) unicoap_proto_t;
@@ -169,11 +183,18 @@ static inline bool unicoap_transport_is_reliable(unicoap_proto_t proto)
  */
 static inline bool unicoap_transport_uses_sock_tl_ep(unicoap_proto_t proto)
 {
-    (void)proto;
+    switch (proto) {
+    case UNICOAP_PROTO_UDP:
+    case UNICOAP_PROTO_DTLS:
+        return true;
+    case UNICOAP_PROTO_SLIPMUX:
+        return false;
     /* If a new transport driver does not use RIOT's socket API,
      * such as CoAP over GATT, return false here. */
     /* MARK: unicoap_driver_extension_point */
-    return true;
+    default:
+        return false;
+    }
 }
 
 /**
@@ -198,7 +219,9 @@ typedef struct {
         /** @brief RIOT sock DTLS endpoint */
         sock_udp_ep_t dtls_ep;
 #endif /* IS_USED(MODULE_UNICOAP_SOCK_SUPPORT) || defined(DOXYGEN) */
-
+#if IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX) || defined(DOXYGEN)
+        slipdev_t *slipmux_ep;
+#endif /* IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX) || defined(DOXYGEN) */
         /* MARK: unicoap_driver_extension_point */
     };
 } unicoap_endpoint_t;
@@ -423,12 +446,11 @@ int unicoap_transport_dtls_add_socket(sock_dtls_t* socket, sock_udp_t* base_sock
                                       sock_udp_ep_t* local);
 #  else
 static inline
-int unicoap_transport_dtls_add_socket(sock_dtls_t* socket, sock_udp_t* base_socket,
-                                      sock_udp_ep_t* local)
+int unicoap_transport_dtls_add_socket(void* socket, void* base_socket, void* local)
 {
-    (void)socket;
-    (void)base_socket;
-    (void)local;
+    (void) socket;
+    (void) base_socket;
+    (void) local;
     return 0;
 }
 #  endif
@@ -446,9 +468,9 @@ int unicoap_transport_dtls_add_socket(sock_dtls_t* socket, sock_udp_t* base_sock
 int unicoap_transport_dtls_remove_socket(sock_dtls_t* socket);
 #  else
 static inline
-int unicoap_transport_dtls_remove_socket(sock_dtls_t* socket)
+int unicoap_transport_dtls_remove_socket(void* socket)
 {
-    (void)socket;
+    (void) socket;
     return 0;
 }
 #  endif

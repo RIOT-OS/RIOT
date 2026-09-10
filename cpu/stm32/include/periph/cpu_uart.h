@@ -39,7 +39,7 @@ typedef enum {
  * @brief   Size of the UART TX buffer for non-blocking mode.
  */
 #ifndef UART_TXBUF_SIZE
-#define UART_TXBUF_SIZE    (64)
+#  define UART_TXBUF_SIZE  (64)
 #endif
 
 #ifndef DOXYGEN
@@ -116,11 +116,11 @@ typedef struct {
     gpio_af_t rts_af;       /**< alternate function for RTS pin */
 #endif
 #endif
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4) || \
-    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32U3) || \
-    defined(CPU_FAM_STM32MP1) || defined(CPU_FAM_STM32U5) || \
-    defined(CPU_FAM_STM32WL)
+#if defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32H7)  || \
+    defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4)  || \
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32MP1) || \
+    defined(CPU_FAM_STM32U3) || defined(CPU_FAM_STM32U5)  || \
+    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
     uart_type_t type;       /**< hardware module type (USART or LPUART) */
     uint32_t clk_src;       /**< clock source used for UART */
 #endif

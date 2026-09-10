@@ -140,17 +140,29 @@ int main(void)
     char line_buf[SHELL_DEFAULT_BUFSIZE];
 
     sys_lock_tcpip_core();
-    struct netif *iface = netif_find("ET0");
+
+    /* According to the RFC 3493 interfaces are indexed from 1 */
+    struct netif *iface = netif_get_by_index(1);
+
+    if (iface == NULL) {
+#ifdef CPU_NATIVE
+        puts("To use the LWIP interface, follow the steps for setting up a tap "
+             "interface outlined in the README.md.");
+#else
+        puts("This board does not support the LWIP interface.");
+#endif
+
+        return -1;
+    }
 
 #ifndef MODULE_LWIP_DHCP_AUTO
     ip4_addr_t ip = _TEST_ADDR4_LOCAL;
     ip4_addr_t subnet = _TEST_ADDR4_MASK;
     netif_set_addr(iface, &ip, &subnet, NULL);
 #else
-    printf("Waiting for DHCP address autoconfiguration ...\n");
+    puts("Waiting for DHCP address autoconfiguration ...");
     ztimer_sleep(ZTIMER_MSEC, CONFIG_DHCP_TIMEOUT_SEC * MS_PER_SEC);
 #endif
-
     /* print network addresses */
     printf("{\"IPv4 addresses\": [\"");
     char buffer[16];

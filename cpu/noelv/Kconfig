@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: 2026 Matvii Ivashchenko
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config CPU_FAM_NOELV
+    bool
+    select CPU_CORE_RV64IMAC
+
+config CPU_MODEL_NOELV_RV64IMAC
+    bool
+    select CPU_FAM_NOELV
+
+config CPU_FAM
+    default "noelv" if CPU_FAM_NOELV
+
+config CPU_MODEL
+    default "noelv_rv64imac" if CPU_MODEL_NOELV_RV64IMAC
+
+config CPU
+    default "noelv" if CPU_FAM_NOELV
+
+config CPU_CORE
+    default "rv64imac" if CPU_CORE_RV64IMAC
+
+source "$(RIOTCPU)/riscv_common/Kconfig"

@@ -1,0 +1,10 @@
+USEMODULE += periph
+
+# PLIC is always required (used by UART and other peripherals)
+FEATURES_REQUIRED += periph_plic
+
+ifneq (,$(filter periph_timer,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_coretimer
+endif
+
+include $(RIOTCPU)/riscv_common/Makefile.dep

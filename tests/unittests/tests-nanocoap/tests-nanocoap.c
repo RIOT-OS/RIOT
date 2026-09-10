@@ -1349,7 +1349,6 @@ static void test_nanocoap__coap_build_reply_header(void)
     };
     const size_t response_expected_hdr_len = sizeof(response_expected);
 
-
     coap_pkt_t pkt;
     TEST_ASSERT_EQUAL_INT(sizeof(request), coap_parse(&pkt, request, sizeof(request)));
 

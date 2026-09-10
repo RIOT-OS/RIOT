@@ -36,6 +36,7 @@
 /* forward declarations, implementation is in net/coap */
 void slipdev_setup_net(slipdev_t *dev, uint8_t index);
 void slipdev_setup_coap(slipdev_t *dev);
+void slipdev_coap_dispatch_recv(event_t *event);
 
 /* For synchronization between stdio/config/net threads */
 mutex_t slipdev_mutex = MUTEX_INIT;
@@ -46,7 +47,7 @@ static inline void _slipdev_stdio_add_to_frame(slipdev_t *dev, uint8_t byte)
         dev->config.uart != slipdev_params[0].uart) {
         return;
     }
-    isrpipe_write_one(&stdin_isrpipe, byte);
+    stdio_rx_write_one(byte);
 }
 
 static inline bool _slipdev_config_start_frame(slipdev_t *dev)
@@ -65,7 +66,7 @@ static inline void _slipdev_config_end_frame(slipdev_t *dev)
 {
 #ifdef MODULE_SLIPDEV_CONFIG
     crb_end_chunk(&dev->rb_config, true);
-    thread_flags_set(thread_get(dev->coap_server_pid), 1);
+    slipdev_coap_dispatch_recv(&dev->rxevent);
 #else
     (void)dev;
 #endif
@@ -301,7 +302,7 @@ void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index
 {
     /* set device descriptor fields */
     dev->config = *params;
-    dev->state = SLIPDEV_STATE_NONE;
+    dev->state = SLIPDEV_STATE_UNKNOWN;
 
     /* we only support one coap server at the moment */
     if ((index == 0) && IS_USED(MODULE_SLIPDEV_CONFIG)) {

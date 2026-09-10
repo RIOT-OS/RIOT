@@ -58,7 +58,8 @@ static int _read_page(mtd_dev_t *dev, void *buff, uint32_t page, uint32_t offset
     return size;
 }
 
-static int _write_page(mtd_dev_t *dev, const void *buff, uint32_t page, uint32_t offset, uint32_t size)
+static int _write_page(mtd_dev_t *dev, const void *buff, uint32_t page, uint32_t offset,
+                       uint32_t size)
 {
     fake_mtd_t *ctx = container_of(dev, fake_mtd_t, mtd);
 

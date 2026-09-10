@@ -177,8 +177,9 @@ static void test_hashes_sha384_hash_clear_ctx(void)
 
     TEST_ASSERT(memcmp(h_empty, hash, SHA384_DIGEST_LENGTH) == 0);
     for (size_t i=0; i<sizeof(sha384_context_t); i++) {
-        if (((uint8_t*)&sha384)[i] != 0)
+        if (((uint8_t*)&sha384)[i] != 0) {
             TEST_FAIL("sha384_context_t not completely cleared.");
+        }
     }
 }
 

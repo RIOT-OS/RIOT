@@ -42,7 +42,7 @@ static int _comp_uncomp(const uint8_t *buf, size_t len)
     uint8_t *outpos = _buf;
 
     /* compress */
-    while(1) {
+    while (1) {
         size_t n_sunk = 0;
         if (n) {
             heatshrink_encoder_sink(&_encoder, inpos, n, &n_sunk);
@@ -69,7 +69,7 @@ static int _comp_uncomp(const uint8_t *buf, size_t len)
     inpos = (uint8_t*) _buf;
     outpos = _buf_res;
 
-    while(1) {
+    while (1) {
         size_t n_sunk = 0;
         if (n) {
             heatshrink_decoder_sink(&_decoder, inpos, n, &n_sunk);

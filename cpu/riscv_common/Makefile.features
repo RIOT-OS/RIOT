@@ -1,8 +1,20 @@
 ifeq ($(findstring rv32,$(CPU_CORE)),rv32)
   CPU_ARCH := rv32
+else ifeq ($(findstring rv64,$(CPU_CORE)),rv64)
+  CPU_ARCH := rv64
 endif
 
-FEATURES_PROVIDED += arch_32bit
+ifeq (rv64,$(CPU_ARCH))
+  FEATURES_PROVIDED += arch_64bit
+  # rust_target is not provided: the riot crate does not support rv64 yet
+else
+  FEATURES_PROVIDED += arch_32bit
+  # picolibc is only shipped/working for rv32 in the RISC-V toolchain; a rv64
+  # target would link the rv32 libc and fail with an ABI mismatch, so only
+  # advertise it for rv32 (rv64 falls back to newlib).
+  FEATURES_PROVIDED += picolibc
+  FEATURES_PROVIDED += rust_target
+endif
 FEATURES_PROVIDED += arch_riscv
 FEATURES_PROVIDED += bug_newlib_broken_stdio
 FEATURES_PROVIDED += cpp
@@ -11,8 +23,4 @@ FEATURES_PROVIDED += newlib
 FEATURES_PROVIDED += periph_coretimer
 FEATURES_PROVIDED += periph_flashpage_aux
 FEATURES_PROVIDED += puf_sram
-FEATURES_PROVIDED += rust_target
 FEATURES_PROVIDED += ssp
-
-# RISC-V toolchain on CI does not work properly with picolibc yet
-FEATURES_PROVIDED += picolibc

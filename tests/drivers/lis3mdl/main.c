@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2015 HAW Hamburg
  *
@@ -43,7 +42,7 @@ int main(void)
         return 1;
     }
 
-    while(1) {
+    while (1) {
         lis3mdl_3d_data_t mag_value;
         lis3mdl_read_mag(&dev, &mag_value);
         printf("Magnetometer [G]:\tX: %2d\tY: %2d\tZ: %2d\n",

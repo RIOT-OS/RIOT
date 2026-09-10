@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023 Marian Buschsieweke
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 #include "macros/math.h"
 #include "mutex.h"
 #include "periph_conf.h"

@@ -291,6 +291,11 @@ static void test_tcp_accept4__ETIMEDOUT(void)
     puts(" * Calling sock_tcp_accept()");
     expect(-ETIMEDOUT == sock_tcp_accept(&_queue, &sock, _TEST_TIMEOUT));
     printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
+
+    /* a timeout below the millisecond resolution of the lwIP backend
+     * must still time out instead of blocking indefinitely */
+    expect(-ETIMEDOUT == sock_tcp_accept(&_queue, &sock, _TEST_TIMEOUT_SUB_MS));
+    printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT_SUB_MS);
 }
 
 static void test_tcp_accept4__success(void)
@@ -395,6 +400,12 @@ static void test_tcp_read4__ETIMEDOUT(void)
     expect(-ETIMEDOUT == sock_tcp_read(&_sock, _test_buffer, sizeof(_test_buffer),
                                        _TEST_TIMEOUT));
     printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
+
+    /* a timeout below the millisecond resolution of the lwIP backend
+     * must still time out instead of blocking indefinitely */
+    expect(-ETIMEDOUT == sock_tcp_read(&_sock, _test_buffer, sizeof(_test_buffer),
+                                       _TEST_TIMEOUT_SUB_MS));
+    printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT_SUB_MS);
 }
 
 static void test_tcp_read4__success(void)
@@ -724,6 +735,11 @@ static void test_tcp_accept6__ETIMEDOUT(void)
     puts(" * Calling sock_tcp_accept()");
     expect(-ETIMEDOUT == sock_tcp_accept(&_queue, &sock, _TEST_TIMEOUT));
     printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
+
+    /* a timeout below the millisecond resolution of the lwIP backend
+     * must still time out instead of blocking indefinitely */
+    expect(-ETIMEDOUT == sock_tcp_accept(&_queue, &sock, _TEST_TIMEOUT_SUB_MS));
+    printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT_SUB_MS);
 }
 
 static void test_tcp_accept6__success(void)
@@ -828,6 +844,12 @@ static void test_tcp_read6__ETIMEDOUT(void)
     expect(-ETIMEDOUT == sock_tcp_read(&_sock, _test_buffer,
                                        sizeof(_test_buffer), _TEST_TIMEOUT));
     printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
+
+    /* a timeout below the millisecond resolution of the lwIP backend
+     * must still time out instead of blocking indefinitely */
+    expect(-ETIMEDOUT == sock_tcp_read(&_sock, _test_buffer,
+                                       sizeof(_test_buffer), _TEST_TIMEOUT_SUB_MS));
+    printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT_SUB_MS);
 }
 static void test_tcp_read6__success(void)
 {

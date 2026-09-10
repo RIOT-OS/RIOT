@@ -1,0 +1,58 @@
+From 82773f5bced2186528c995318a314660995f8149 Mon Sep 17 00:00:00 2001
+From: jhermanowski <>
+Date: Tue, 4 Aug 2026 21:32:02 +0200
+Subject: [PATCH] Repaired unused variable and function warning. Disabled cloexec function ment for unix and apple.
+
+---
+ src/ssl_load.c          | 5 ++++-
+ wolfcrypt/src/wc_port.c | 4 ++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/src/ssl_load.c b/src/ssl_load.c
+index 9831518..f12682d 100644
+--- a/src/ssl_load.c
++++ b/src/ssl_load.c
+@@ -1067,6 +1067,9 @@ static int ProcessBufferTryDecode(WOLFSSL_CTX* ctx, WOLFSSL* ssl,
+     (void)devId;
+     (void)type;
+ 
++    (void)keySz;
++    (void)keyType;
++
+     /* Validate parameters. */
+     if ((der == NULL) || (keyFormat == NULL)) {
+         ret = BAD_FUNC_ARG;
+@@ -1443,7 +1446,7 @@ static int ProcessBufferPrivateKey(WOLFSSL_CTX* ctx, WOLFSSL* ssl,
+  * @param [in, out] ssl     SSL object.
+  * @param [in]      keyOID  OID for public/private key.
+  */
+-static void wolfssl_set_have_from_key_oid(WOLFSSL_CTX* ctx, WOLFSSL* ssl,
++static void __attribute__((unused)) wolfssl_set_have_from_key_oid(WOLFSSL_CTX* ctx, WOLFSSL* ssl,
+     int keyOID)
+ {
+     /* Set which private key algorithm available based on key OID. */
+diff --git a/wolfcrypt/src/wc_port.c b/wolfcrypt/src/wc_port.c
+index 5a734f5..fd7f723 100644
+--- a/wolfcrypt/src/wc_port.c
++++ b/wolfcrypt/src/wc_port.c
+@@ -5435,7 +5435,7 @@ char* wolfSSL_strnstr(const char* s1, const char* s2, size_t n)
+ 
+ #if (defined(__unix__) || defined(__APPLE__)) && \
+     !defined(WOLFSSL_KERNEL_MODE) && !defined(WOLFSSL_ZEPHYR) && \
+-    !defined(WOLFSSL_SGX)
++    !defined(WOLFSSL_SGX) && !defined(WOLFSSL_RIOT_OS)
+ 
+ #include <fcntl.h>
+ #include <errno.h>
+@@ -5505,7 +5505,7 @@ int wc_accept_cloexec(int sockfd, void* addr, void* addrlen)
+ }
+ 
+ #endif /* (__unix__ || __APPLE__) && !WOLFSSL_KERNEL_MODE && !WOLFSSL_ZEPHYR &&
+-        * !WOLFSSL_SGX */
++        * !WOLFSSL_SGX && !WOLFSSL_RIOT_OS */
+ 
+ #if defined(WOLFSSL_LINUXKM) && defined(CONFIG_ARM64) && \
+     defined(WC_SYM_RELOC_TABLES)
+-- 
+2.55.0
+

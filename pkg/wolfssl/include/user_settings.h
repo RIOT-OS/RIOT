@@ -33,6 +33,9 @@ extern "C" {
  * using sockets
  */
 #ifndef MODULE_WOLFSSL_SOCKET
+#ifndef WOLFSSL_NO_SOCK
+#define WOLFSSL_NO_SOCK
+#endif
 #define WOLFSSL_GNRC
 #define WOLFSSL_USER_IO
 #else

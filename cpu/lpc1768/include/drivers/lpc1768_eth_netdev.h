@@ -10,6 +10,8 @@
  * @ingroup     cpu_lpc1768_drivers
  * @ingroup     drivers_netdev
  *
+ * @brief       Driver for the LPC1768 Ethernet peripheral
+ *
  * ## Link State Events
  *
  * To enable Link Events, use the (pseudo) module `lpc1768_eth_link_up`. This

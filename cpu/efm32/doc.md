@@ -13,6 +13,7 @@ The following peripherals are supported (depends on microcontroller):
   - ADC
   - CPUID
   - DAC
+  - Ethernet
   - Flash page
   - GPIO
   - HW RNG

@@ -21,5 +21,9 @@ OPENOCD_DEBUG_ADAPTER   ?= dap
 include $(RIOTMAKE)/arch/cortexm.inc.mk
 
 ifneq (,$(filter periph_pio pio_%,$(USEMODULE)))
-  include $(RIOTMAKE)/tools/pioasm.inc.mk
+  export PIOASM ?= $(RIOTPKG)/picosdk/pioasm
+
+  ifeq ($(RIOTPKG)/picosdk/pioasm,$(PIOASM))
+    BUILDDEPS += $(RIOTPKG)/picosdk/pioasm
+  endif
 endif

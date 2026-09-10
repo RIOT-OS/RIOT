@@ -48,3 +48,8 @@ else ifeq (wb,$(CPU_FAM))
     RIOTBOOT_LEN ?= 0x2000
   endif
 endif
+
+# Set it to at least 2KB if lpuart is used
+ifneq (,$(filter periph_lpuart,$(USEMODULE)))
+  RIOTBOOT_LEN ?= 0x2000
+endif

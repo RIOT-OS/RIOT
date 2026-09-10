@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 Matvii Ivashchenko
+# SPDX-License-Identifier: LGPL-2.1-only
+
+config BOARD
+    default "zedboard-noelv" if BOARD_ZEDBOARD_NOELV
+
+config BOARD_ZEDBOARD_NOELV
+    bool
+    default y
+    select CPU_MODEL_NOELV_RV64IMAC

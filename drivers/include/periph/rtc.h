@@ -10,12 +10,20 @@
  * @ingroup     drivers_periph
  * @brief       Low-level RTC (Real Time Clock) peripheral driver
  *
- * @note
- * The values used for setting and getting the time/alarm should
- * conform to the `struct tm` specification.
- * Compare: http://pubs.opengroup.org/onlinepubs/7908799/xsh/time.h.html
+ * These functions grant a low level access to the system time, if the
+ * microcontroller has a built-in RTC peripheral.
+ * Unless explicitly necessary, it is recommended to use the @ref sys_walltime
+ * module instead.
+ * This allows to write applications that are independent of the RTC
+ * peripheral and allows the implementation of on-time change callbacks.
  *
- * # (Low-) Power Implications
+ * @note The values used for setting and getting the time/alarm should
+ *       conform to the `struct tm` specification.
+ *       You can use the @ref fmt_time_tm_iso8601() and @ref scn_time_tm_iso8601_date()
+ *       functions from the `fmt` package.
+ *       Compare: http://pubs.opengroup.org/onlinepubs/7908799/xsh/time.h.html
+ *
+ * ## (Low-) Power Implications
  *
  * After the RTC has been initialized (i.e. after calling rtc_init()), the RTC
  * should be powered on and running. The RTC can then be powered off manually
@@ -43,7 +51,6 @@
 extern "C" {
 #endif
 
-#if !defined(RIOT_EPOCH) || DOXYGEN
 /**
  * @brief Earliest year of the RTC
  *
@@ -52,7 +59,8 @@ extern "C" {
  * Internal RTC helper functions such as @ref rtc_mktime and @ref rtc_localtime
  * will not work on dates earlier than that.
  */
-#define RIOT_EPOCH (2020)
+#if !defined(RIOT_EPOCH)
+#  define RIOT_EPOCH (2020)
 #endif
 
 /**
@@ -63,45 +71,45 @@ extern "C" {
 typedef void(*rtc_alarm_cb_t)(void *arg);
 
 /**
- * @brief Initialize RTC module
+ * @brief Initialize the RTC module.
  */
 void rtc_init(void);
 
 /**
- * @brief Set RTC to given time.
+ * @brief Set the RTC to a given time.
  *
  * @param[in] time          Pointer to the struct holding the time to set.
  *
- * @return  0 for success
- * @return -1 an error occurred
+ * @retval  0 on success
+ * @retval -1 on error
  */
 int rtc_set_time(struct tm *time);
 
 /**
- * @brief Get current RTC time.
+ * @brief Get the current RTC time.
  *
  * @param[out] time         Pointer to the struct to write the time to.
  *
- * @return  0 for success
- * @return -1 an error occurred
+ * @retval  0 on success
+ * @retval -1 on error
  */
 int rtc_get_time(struct tm *time);
 
 /**
- * @brief Get current RTC time with sub-second component.
+ * @brief Get the current RTC time with a sub-second component.
  *        Requires the `periph_rtc_ms` feature.
  *
  * @param[out] time         Pointer to the struct to write the time to.
  * @param[out] ms           Pointer to a variable to hold the microsecond
  *                          component of the current RTC time.
  *
- * @return  0 for success
- * @return -1 an error occurred
+ * @retval  0 on success
+ * @retval -1 on error
  */
 int rtc_get_time_ms(struct tm *time, uint16_t *ms);
 
 /**
- * @brief Set an alarm for RTC to the specified value.
+ * @brief Set an alarm for the RTC to the specified value.
  *
  * @note Any already set alarm will be overwritten.
  *
@@ -114,34 +122,34 @@ int rtc_get_time_ms(struct tm *time, uint16_t *ms);
  *          keep it denormalized. In either case, the timeout should occur at
  *          the equivalent normalized time.
  *
- * @retval  0           success
- * @return  -EINVAL     @p time was invalid (e.g. in the past, out of range)
- * @return  <0          other error (negative errno code to indicate cause)
+ * @retval  0           on success
+ * @retval  -EINVAL     @p time was invalid (e.g. in the past, out of range)
+ * @retval  <0          other error (negative errno code to indicate cause)
  */
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg);
 
 /**
- * @brief Gets the current alarm setting
+ * @brief Gets the current alarm setting.
  *
  * @param[out]  time        Pointer to structure to receive alarm time
  *
- * @return  0 for success
- * @return -1 an error occurred
+ * @retval  0 on success
+ * @retval -1 on error
  */
 int rtc_get_alarm(struct tm *time);
 
 /**
- * @brief Clear any set alarm, do nothing if nothing set
+ * @brief Clear any set alarm, do nothing if nothing is set.
  */
 void rtc_clear_alarm(void);
 
 /**
- * @brief Turns the RTC hardware module on
+ * @brief Turns the RTC hardware module on.
  */
 void rtc_poweron(void);
 
 /**
- * @brief Turns the RTC hardware module off
+ * @brief Turns the RTC hardware module off.
  */
 void rtc_poweroff(void);
 

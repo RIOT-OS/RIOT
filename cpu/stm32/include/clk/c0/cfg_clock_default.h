@@ -49,13 +49,13 @@ extern "C" {
 
 #endif
 
-#define CLOCK_AHB                       CLOCK_CORECLOCK  /* max: 64MHz (G0), 170MHZ (G4) */
+#define CLOCK_AHB                       CLOCK_CORECLOCK  /* max: 48MHz (C0) */
 
 #ifndef CONFIG_CLOCK_APB1_DIV
 #define CONFIG_CLOCK_APB1_DIV           (1)
 #endif
 #define CLOCK_APB1                      (CLOCK_CORECLOCK / CONFIG_CLOCK_APB1_DIV)  \
-                                        /* max: 64MHz (G0), 170MHZ (G4) */
+                                        /* max: 48MHz (C0) */
 /** @} */
 
 #ifdef __cplusplus

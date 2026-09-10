@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2023 Koen Zandberg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
+
 #pragma once
 
 #ifdef __cplusplus

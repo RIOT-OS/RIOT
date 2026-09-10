@@ -6,7 +6,7 @@ from testrunner import run
 
 def testfunc(child):
     def get_time():
-        child.sendline('utime.time()')
+        child.sendline('time.ticks_ms()')
         child.readline()
         res = int(child.readline().rstrip())
         child.expect_exact('>>>')
@@ -19,6 +19,11 @@ def testfunc(child):
     child.expect_exact('echo this! echo this! echo this! echo this!')
     child.expect_exact('>>>')
 
+    child.sendline('help()')
+    child.expect_exact('Welcome to the MicroPython RIOT port!')
+    child.expect_exact('For further help on a specific object, type help(obj)')
+    child.expect_exact('>>>')
+
     # test riot.thread_getpid()
     child.sendline('import riot')
     child.sendline('print(riot.thread_getpid())')
@@ -29,14 +34,14 @@ def testfunc(child):
     # test xtimer integration
     #
 
-    child.sendline('import utime')
+    child.sendline('import time')
     child.expect_exact('>>>')
 
     # testing timing over serial using the REPL is very inaccurate, thus
     # we allow a *large* overshoot (100 by default).
     def test_sleep(t, slack=100):
         before = get_time()
-        child.sendline('utime.sleep_ms(%s)' % t)
+        child.sendline('time.sleep_ms(%s)' % t)
         child.expect_exact('>>>')
         duration = get_time() - before
         print("test_sleep(%s, %s): slept %sms" % (t, slack, duration))

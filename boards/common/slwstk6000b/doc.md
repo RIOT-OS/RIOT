@@ -1,6 +1,6 @@
-@defgroup    boards_common_slwstk6000b Silicon Labs SLWSTK6000B starter kit
-@ingroup     boards
-@brief       Support for the Silicon Labs SLWSTK6000B starter kit
+@defgroup   boards_common_slwstk6000b Silicon Labs SLWSTK6000B starter kit
+@ingroup    boards
+@brief      Support for the Silicon Labs SLWSTK6000B starter kit
 
 ## Overview
 
@@ -15,7 +15,8 @@ actively measure the power consumption of your hardware and code, in real-time.
 
 ### MCU
 
-The MCU depends on the module used.
+The MCU depends on the module used. All modules are based on an EFR32
+Series 1 MCU.
 
 | Module     | MCU                     |
 |------------|-------------------------|
@@ -47,11 +48,11 @@ The MCU depends on the module used.
 | Low-level driver | ADC                   | yes       |                                                                |
 |                  | Flash                 | yes       |                                                                |
 |                  | GPIO                  | yes       | Interrupts are shared across pins (see reference manual)       |
-|                  | HW Crypto             | yes       |                                                                |
+|                  | HWRNG                 | yes       | Only on the EFR32MG12P, the EFR32MG1P has no TRNG              |
 |                  | I2C                   | yes       |                                                                |
 |                  | PWM                   | yes       |                                                                |
 |                  | RTCC                  | yes       | As RTT or RTC                                                  |
-|                  | SPI                   | partially | Only master mode                                               |
+|                  | SPI                   | yes       | Only master mode                                               |
 |                  | Timer                 | yes       |                                                                |
 |                  | UART                  | yes       | USART is shared with SPI. LEUART baud rate limited (see below) |
 |                  | USB                   | no        |                                                                |
@@ -61,7 +62,7 @@ The MCU depends on the module used.
 ### Board controller
 
 The starter kit is equipped with a Board Controller. This controller provides a
-virtual serial port. The boardcontroller is enabled via a GPIO pin.
+virtual serial port. The board controller is enabled via a GPIO pin.
 
 By default, this pin is enabled. You can disable the board controller module by
 passing `DISABLE_MODULE=silabs_bc` to the `make` command.
@@ -151,17 +152,9 @@ Therefore, only one of both peripherals can be enabled at the same time.
 
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
 
-### Hardware crypto
-
-This MCU is equipped with a hardware accelerated crypto peripheral that can
-speed up AES128, AES256, SHA1, SHA256 and several other cryptographic
-computations.
-
-A peripheral driver interface for RIOT-OS is proposed, but not yet implemented.
-
 ### Usage of EMLIB
 
-This port makes uses of EMLIB by Silicon Labs to abstract peripheral registers.
+This port makes use of EMLIB by Silicon Labs to abstract peripheral registers.
 While some overhead is to be expected, it ensures proper setup of devices,
 provides chip errata and simplifies development. The exact overhead depends on
 the application and peripheral usage, but the largest overhead is expected
@@ -170,7 +163,10 @@ inline methods or macros (which have no overhead).
 
 Another advantage of EMLIB are the included assertions. These assertions ensure
 that peripherals are used properly. To enable this, pass `DEBUG_EFM` to your
-compiler.
+compiler defines.
+
+EMLIB is licensed by Silicon Labs under the zlib-style license, which permits
+distribution of source.
 
 ### Pin locations
 
@@ -214,7 +210,3 @@ Some boards have (limited) support for emulation, which can be started with:
 ```shell
 BOARD=slwstk6000b make emulate
 ```
-
-## License information
-
-Silicon Labs' EMLIB: zlib-style license (permits distribution of source).

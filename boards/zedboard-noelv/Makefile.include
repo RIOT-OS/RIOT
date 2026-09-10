@@ -1,0 +1,14 @@
+# Memory layout for Gaisler NOEL-V ZedBoard reference design
+# Code and rodata go into DDR (loaded by GRMON via JTAG)
+ROM_START_ADDR = 0x00000000
+ROM_LEN        = 0x00800000    # 8 MB for code
+RAM_START_ADDR = 0x00800000
+RAM_LEN        = 0x07800000    # 120 MB for data/stack/heap
+
+# GRMON4 is used for flashing and debugging via JTAG
+# grmon loads ELF files directly, no conversion needed
+PROGRAMMER ?= grmon
+FLASHFILE   ?= $(ELFFILE)
+
+# Tell RIOT's build system the load address
+FLASH_ADDR = $(ROM_START_ADDR)

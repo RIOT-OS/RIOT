@@ -32,10 +32,6 @@ ifneq (, $(filter info-boards-collect,$(MAKECMDGOALS)))
   FEATURES_USED :=
 
   include $(RIOTBASE)/Makefile.features
-  # always select provided architecture features
-  FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
-  # always select CPU core features
-  FEATURES_REQUIRED += $(filter cpu_core_%,$(FEATURES_PROVIDED))
   # FEATURES_USED must be populated first in this case so that dependency
   # resolution can take optional features into account during the first pass.
   # Also: This allows us to skip resolution if already a missing feature is
@@ -121,34 +117,34 @@ info-buildsizes-diff:
 	fi;
 
 
-# Temporary files that contain the information gathered by the submake
-# processes started for each individual board. These reside in the `bin/`
+# Temporary files that contain the information gathered by the submake processes
+# started for each individual board. These reside in the `$(BINDIRBASE)/`
 # subdirectory so they are removed by `make (dist)clean` and ignored by git.
-SUPPORT_FILES := bin/.INFO_BOARDS_SUPPORTED
-SUPPORT_FILES += bin/.INFO_BOARDS_FEATURES_MISSING
-SUPPORT_FILES += bin/.INFO_BOARDS_FEATURES_BLACKLISTED
-SUPPORT_FILES += bin/.INFO_BOARDS_FEATURES_CONFLICTING
+SUPPORT_FILES := $(BINDIRBASE)/.INFO_BOARDS_SUPPORTED
+SUPPORT_FILES += $(BINDIRBASE)/.INFO_BOARDS_FEATURES_MISSING
+SUPPORT_FILES += $(BINDIRBASE)/.INFO_BOARDS_FEATURES_BLACKLISTED
+SUPPORT_FILES += $(BINDIRBASE)/.INFO_BOARDS_FEATURES_CONFLICTING
 
 .PHONY: $(SUPPORT_FILES)
 $(SUPPORT_FILES):
 	@rm -rf $@
-	@mkdir -p bin/
+	@mkdir -p $(BINDIRBASE)/
 	@touch $@
 
 .board-result-%:
 	@$(MAKE) BOARD=$* INFO_OVERRIDE=1 info-boards-collect --no-print-directory
 
-info-boards-supported: bin/.INFO_BOARDS_SUPPORTED $(BOARD_CANDIDATES)
-	@cat bin/.INFO_BOARDS_SUPPORTED | sort | xargs echo
+info-boards-supported: $(BINDIRBASE)/.INFO_BOARDS_SUPPORTED $(BOARD_CANDIDATES)
+	@cat $(BINDIRBASE)/.INFO_BOARDS_SUPPORTED | sort | xargs echo
 
-info-boards-features-missing: bin/.INFO_BOARDS_FEATURES_MISSING $(BOARD_CANDIDATES)
-	@cat bin/.INFO_BOARDS_FEATURES_MISSING | sort | column -t
+info-boards-features-missing: $(BINDIRBASE)/.INFO_BOARDS_FEATURES_MISSING $(BOARD_CANDIDATES)
+	@cat $(BINDIRBASE)/.INFO_BOARDS_FEATURES_MISSING | sort | column -t
 
-info-boards-features-blacklisted: bin/.INFO_BOARDS_FEATURES_BLACKLISTED $(BOARD_CANDIDATES)
-	@cat bin/.INFO_BOARDS_FEATURES_BLACKLISTED | sort | column -t
+info-boards-features-blacklisted: $(BINDIRBASE)/.INFO_BOARDS_FEATURES_BLACKLISTED $(BOARD_CANDIDATES)
+	@cat $(BINDIRBASE)/.INFO_BOARDS_FEATURES_BLACKLISTED | sort | column -t
 
-info-boards-features-conflicting: bin/.INFO_BOARDS_FEATURES_CONFLICTING $(BOARD_CANDIDATES)
-	@cat bin/.INFO_BOARDS_FEATURES_CONFLICTING | sort | column -t
+info-boards-features-conflicting: $(BINDIRBASE)/.INFO_BOARDS_FEATURES_CONFLICTING $(BOARD_CANDIDATES)
+	@cat $(BINDIRBASE)/.INFO_BOARDS_FEATURES_CONFLICTING | sort | column -t
 
 generate-Makefile.ci:
 	@$(RIOTTOOLS)/insufficient_memory/create_makefile.ci.sh
@@ -161,14 +157,14 @@ generate-Makefile.ci:
 PHONY: info-boards-collect
 info-boards-collect:
 	@if [ ! -z '$(BOARDS)' ]; then \
-	  echo '$(BOARDS) ' >> bin/.INFO_BOARDS_SUPPORTED; \
+	  echo '$(BOARDS) ' >> $(BINDIRBASE)/.INFO_BOARDS_SUPPORTED; \
 	fi
 	@if [ ! -z '$(BOARDS_FEATURES_MISSING)' ]; then \
-	  echo $(BOARDS_FEATURES_MISSING) >> bin/.INFO_BOARDS_FEATURES_MISSING; \
+	  echo $(BOARDS_FEATURES_MISSING) >> $(BINDIRBASE)/.INFO_BOARDS_FEATURES_MISSING; \
 	fi;
 	@if [ ! -z '$(BOARDS_FEATURES_USED_BLACKLISTED)' ]; then \
-	  echo $(BOARDS_FEATURES_USED_BLACKLISTED) >> bin/.INFO_BOARDS_FEATURES_BLACKLISTED; \
+	  echo $(BOARDS_FEATURES_USED_BLACKLISTED) >> $(BINDIRBASE)/.INFO_BOARDS_FEATURES_BLACKLISTED; \
 	fi;
 	@if [ ! -z '$(BOARDS_FEATURES_CONFLICTING)' ]; then \
-	  echo $(BOARDS_FEATURES_CONFLICTING) >> bin/.INFO_BOARDS_FEATURES_CONFLICTING; \
+	  echo $(BOARDS_FEATURES_CONFLICTING) >> $(BINDIRBASE)/.INFO_BOARDS_FEATURES_CONFLICTING; \
 	fi;

@@ -515,6 +515,7 @@ int accept(int socket, struct sockaddr *restrict address,
     switch (s->type) {
     case SOCK_STREAM:
         new_s = _get_free_socket();
+        mutex_unlock(&_socket_pool_mutex);
         if (new_s == NULL) {
             errno = ENFILE;
             res = -1;
@@ -567,6 +568,8 @@ int accept(int socket, struct sockaddr *restrict address,
         }
         break;
     default:
+        /* Each case needs to unlock the mutex individually */
+        mutex_unlock(&_socket_pool_mutex);
         errno = EOPNOTSUPP;
         res = -1;
         break;
@@ -574,7 +577,6 @@ int accept(int socket, struct sockaddr *restrict address,
     if ((res < 0) && (sock != NULL)) {
         sock_tcp_disconnect(sock);
     }
-    mutex_unlock(&_socket_pool_mutex);
     return res;
 #else
     (void)socket;

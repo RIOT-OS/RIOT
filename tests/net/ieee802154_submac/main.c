@@ -15,6 +15,7 @@
  * @}
  */
 
+#include <stddef.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -35,28 +36,28 @@
 
 #define MAX_LINE    (80)
 
-ieee802154_submac_t submac;                                             /**< IEEE 802.15.4 SubMAC descriptor */
-mutex_t lock;                                                           /**< lock used to synchronize SubMAC operation */
-ztimer_t ack_timer;                                                     /**< required for the ACK timer */
-eui64_t long_addr;                                                      /**< SubMAC extended address */
-network_uint16_t short_addr;                                            /**< SubMAC short address */
+ieee802154_submac_t submac;                     /**< IEEE 802.15.4 SubMAC descriptor */
+mutex_t lock;                                   /**< lock used to synchronize SubMAC operation */
+ztimer_t ack_timer;                             /**< required for the ACK timer */
+eui64_t long_addr;                              /**< SubMAC extended address */
+network_uint16_t short_addr;                    /**< SubMAC short address */
 
-static void _ev_tx_done_handler(event_t *event);                        /**< TX Done event handler */
-static void _ev_rx_done_handler(event_t *event);                        /**< RX Done event handler */
-static void _ev_crc_error_handler(event_t *event);                      /**< CRC Error event handler */
-static void _ev_bh_request_handler(event_t *event);                     /**< BH Request event handler */
-static void _ev_ack_timeout_handler(event_t *event);                    /**< ACK Timeout event handler */
+static void _ev_tx_done_handler(event_t *event);        /**< TX Done event handler */
+static void _ev_rx_done_handler(event_t *event);        /**< RX Done event handler */
+static void _ev_crc_error_handler(event_t *event);      /**< CRC Error event handler */
+static void _ev_bh_request_handler(event_t *event);     /**< BH Request event handler */
+static void _ev_ack_timeout_handler(event_t *event);    /**< ACK Timeout event handler */
 static void _ev_set_rx_handler(event_t *event);                         /**< Set RX event handler */
 
 static event_t ev_tx_done = { .handler = _ev_tx_done_handler };         /**< TX Done descriptor */
 static event_t ev_rx_done = { .handler = _ev_rx_done_handler };         /**< RX Done descriptor */
 static event_t ev_crc_error = { .handler = _ev_crc_error_handler };     /**< CRC Error descriptor */
-static event_t ev_bh_request = { .handler = _ev_bh_request_handler };   /**< BH Request descriptor */
+static event_t ev_bh_request = { .handler = _ev_bh_request_handler }; /**< BH Request descriptor */
 static event_t ev_ack_timeout = { .handler = _ev_ack_timeout_handler }; /**< ACK TO descriptor */
 static event_t ev_set_rx = { .handler = _ev_set_rx_handler };           /**< Set RX descriptor */
 
-uint8_t buffer[IEEE802154_FRAME_LEN_MAX];                               /* buffer to store IEEE 802.15.4 frames */
-uint8_t seq;                                                            /* sequence number of IEEE 802.15.4 frame */
+uint8_t buffer[IEEE802154_FRAME_LEN_MAX];   /**< buffer to store IEEE 802.15.4 frames */
+uint8_t seq;                                /**< sequence number of IEEE 802.15.4 frame */
 
 struct _reg_container {
     int count;  /* device index */
@@ -77,9 +78,12 @@ static const uint8_t payload[] =
 
 static int print_addr(int argc, char **argv);
 static int txtsnd(int argc, char **argv);
+static int txtsnd_multiple_times(int argc, char **argv);
+
 static const shell_command_t shell_commands[] = {
     { "print_addr", "Print IEEE802.15.4 addresses", print_addr },
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
+    { "txtsnd_n", "Send multiple IEEE 802.15.4 packets", txtsnd_multiple_times },
     { NULL, NULL, NULL }
 };
 
@@ -187,6 +191,9 @@ static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
         break;
     case IEEE802154_DEV_TYPE_KW2XRF:
         printf("kw2xrf");
+        break;
+    case IEEE802154_DEV_TYPE_KW41ZRF:
+        printf("kw41zrf");
         break;
     case IEEE802154_DEV_TYPE_MRF24J40:
         printf("mrf24j40");
@@ -428,6 +435,21 @@ static int txtsnd(int argc, char **argv)
     return send(addr, res, len);
 }
 
+static int txtsnd_multiple_times(int argc, char **argv)
+{
+    if (argc != 5) {
+        puts("Usage: txtsnd_n <long_addr> <len> <times> <interval>\n");
+        return 1;
+    }
+    size_t times = atoi(argv[3]);
+    size_t interval = atoi(argv[4]);
+    for (size_t i = 0; i < times; i++) {
+        txtsnd(3, argv);
+        ztimer_sleep(ZTIMER_MSEC, interval);
+    }
+    return 0;
+}
+
 static int _init(void)
 {
     mutex_init(&lock);
@@ -447,7 +469,6 @@ static int _init(void)
 
     struct _reg_container reg = { 0 };
     ieee802154_hal_test_init_devs(_reg_callback, &reg);
-
     int res = ieee802154_submac_init(&submac, &short_addr, &long_addr);
 
     if (res < 0) {

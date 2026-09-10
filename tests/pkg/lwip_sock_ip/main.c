@@ -199,6 +199,13 @@ static void test_sock_ip_recv4__ETIMEDOUT(void)
                                       sizeof(_test_buffer), _TEST_TIMEOUT,
                                       NULL));
     printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
+
+    /* a timeout below the millisecond resolution of the lwIP backend
+     * must still time out instead of blocking indefinitely */
+    expect(-ETIMEDOUT == sock_ip_recv(&_sock, _test_buffer,
+                                      sizeof(_test_buffer), _TEST_TIMEOUT_SUB_MS,
+                                      NULL));
+    printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT_SUB_MS);
 }
 
 static void test_sock_ip_recv4__socketed(void)
@@ -754,6 +761,13 @@ static void test_sock_ip_recv6__ETIMEDOUT(void)
                                       sizeof(_test_buffer), _TEST_TIMEOUT,
                                       NULL));
     printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
+
+    /* a timeout below the millisecond resolution of the lwIP backend
+     * must still time out instead of blocking indefinitely */
+    expect(-ETIMEDOUT == sock_ip_recv(&_sock, _test_buffer,
+                                      sizeof(_test_buffer), _TEST_TIMEOUT_SUB_MS,
+                                      NULL));
+    printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT_SUB_MS);
 }
 
 static void test_sock_ip_recv6__socketed(void)

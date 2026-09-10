@@ -25,7 +25,6 @@
 #include <sys/types.h>
 
 #include "log.h"
-#include "isrpipe.h"
 #include "stdio_base.h"
 
 #include "usb/usbus.h"
@@ -51,7 +50,7 @@ static void _cdc_acm_rx_pipe(usbus_cdcacm_device_t *cdcacm,
                              uint8_t *data, size_t len)
 {
     (void)cdcacm;
-    isrpipe_write(&stdin_isrpipe, data, len);
+    stdio_rx_write(data, len);
 }
 
 void usb_cdc_acm_stdio_init(usbus_t *usbus)

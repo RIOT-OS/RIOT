@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
+ * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 #pragma once
@@ -9,7 +9,7 @@
  * @ingroup pkg_bplib
  * @brief Initialization wrapper for bplib.
  *
- * # About
+ * ## About
  * Allows initializing and terminating the bplib stack using just two functions
  * bplib_init() and bplib_terminate(). Initialization will init all of bplib's
  * modules and start the generic worker thread.

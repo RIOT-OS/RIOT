@@ -62,6 +62,11 @@ void gnrc_netif_init_devs(void)
         auto_init_cc2420();
     }
 
+    if (IS_USED(MODULE_EFM32_ETH)) {
+        extern void auto_init_efm32_eth(void);
+        auto_init_efm32_eth();
+    }
+
     if (IS_USED(MODULE_ENCX24J600)) {
         extern void auto_init_encx24j600(void);
         auto_init_encx24j600();
@@ -80,6 +85,11 @@ void gnrc_netif_init_devs(void)
     if (IS_USED(MODULE_ESP_IEEE802154)) {
         extern void auto_init_esp_ieee802154(void);
         auto_init_esp_ieee802154();
+    }
+
+    if (IS_USED(MODULE_GRETH)) {
+        extern void auto_init_greth(void);
+        auto_init_greth();
     }
 
     /* don't change the order of auto_init_esp_now and auto_init_esp_wifi */

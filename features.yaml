@@ -41,8 +41,6 @@ groups:
       help: CPU architecture is classic ARM (ARM7)
     - name: arch_avr8
       help: CPU architecture is AVR-8
-    - name: arch_efm32
-      help: FIXME. This is not an architecture. Use cpu_efm32 for this
     - name: arch_esp
       help: "CPU architecture is an ESP. (Fixme: This is not an architecture)"
     - name: arch_esp_xtensa
@@ -127,6 +125,10 @@ groups:
       features:
       - name: efm32_coretemp
         help: Y R U not using `periph_temperature` for this?
+      - name: efm32_eth
+        help: Certain EFM32 MCUs have an Ethernet MAC peripheral. Note that this
+              does not necessarily mean that the board has an Ethernet PHY connected
+              to it.
       - name: gecko_sdk_librail_nonfpu
         help: The CPU offers librail support if the FPU is disabled.
               Librail is shipped as pre-compiled blobs. Thus, we have to adapt to
@@ -252,6 +254,11 @@ groups:
           features:
           - name: cpu_sam4s
             help: The MCU has an Atmel/Microchip SAM 4S CPU
+
+      - title: Frontgrade Gaisler Grouping
+        features:
+        - name: cpu_noelv
+          help: The MCU is a Frontgrade Gaisler NOEL-V RISC-V processor
 
       - title: GigaDevice Semiconductor Inc Grouping
         features:

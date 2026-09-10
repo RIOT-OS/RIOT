@@ -1,5 +1,4 @@
 # include color echo macros
-include $(RIOTMAKE)/utils/ansi.mk
 include $(RIOTMAKE)/color.inc.mk
 
 # The pin configuration depends on the specific board used. Wrong
@@ -21,9 +20,8 @@ else ifeq (nucleo-l452re,$(BOARD))
 
 else ifeq (,$(filter list-% info-% generate-%,$(MAKECMDGOALS)))
   ifeq (,$(DECA_WARNING_PRINTED))
-    MSG="Warning: No default decadriver configuration for \"$(BOARD)\"."\
-        "Make sure to set all CFLAGS manually!"
-    $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)$(MSG)$(COLOR_RESET)" 1>&2)
+    $(call echowarn,("Warning: No default decadriver configuration for \"$(BOARD)\"."\
+                     "Make sure to set all required CFLAGS manually!"))
 
     DECA_WARNING_PRINTED := 1 # print the warning only once
   endif

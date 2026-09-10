@@ -21,6 +21,7 @@ expansion header.
 | MCU             | EFR32ZG23                                                                                        |
 |-----------------|--------------------------------------------------------------------------------------------------|
 | Family          | ARM Cortex-M33                                                                                   |
+| Series          | Series 2                                                                                         |
 | Vendor          | Silicon Labs                                                                                     |
 | Vendor Family   | EFM32 Wireless Gecko                                                                             |
 | RAM             | 64.0 KiB                                                                                         |
@@ -44,7 +45,7 @@ expansion header.
 ### Pinout
 
 This is the pinout of the expansion header on the right side of the board.
-PIN 1 is the bottom-left contact when the header faces  you horizontally.
+PIN 1 is the bottom-left contact when the header faces you horizontally.
 
 |      | PIN | PIN |      |
 |------|-----|-----|------|
@@ -73,12 +74,12 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 
 ### User interface
 
-| Peripheral | Mapped to | Pin  | Comments   |
-|------------|-----------|------|------------|
-| Button     | PB0       | PB1  |            |
-|            | PB1       | PB3  |            |
-| LED        | LED0      | PB2  | Yellow LED |
-|            | LED1      | PD3  | Yellow LED |
+| Peripheral | Number | Mapped to | Pin | Comments   |
+|------------|--------|-----------|-----|------------|
+| Button     | 0      | PB0_PIN   | PB1 |            |
+|            | 1      | PB1_PIN   | PB3 |            |
+| LED        | 0      | LED0_PIN  | PB2 | Yellow LED |
+|            | 1      | LED1_PIN  | PD3 | Yellow LED |
 
 ## Implementation Status
 
@@ -88,11 +89,11 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | Low-level driver              | ADC         | no        |                                                                |
 |                               | Flash       | yes       |                                                                |
 |                               | GPIO        | yes       | Interrupts are shared across pins (see reference manual)       |
-|                               | HW Crypto   | partially | Only hwrng                                                     |
+|                               | HW Crypto   | partially | Only HW RNG                                                    |
 |                               | I2C         | yes       |                                                                |
 |                               | PWM         | no        |                                                                |
 |                               | RTC         | no        | As RTT or RTC                                                  |
-|                               | SPI         | partially | Only master mode                                               |
+|                               | SPI         | yes       | Only master mode                                               |
 |                               | Timer       | yes       |                                                                |
 |                               | UART        | yes       |                                                                |
 | LCD driver                    | LS013B7DH03 | yes       | Sharp Low Power Memory LCD via the U8g2 package                |
@@ -101,8 +102,9 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 ## Board configuration
 
 ### Clock selection
+
 There are several clock sources that are available for the different
-peripherals. You are advised to read [AN0004.0](https://www.silabs.com/documents/public/application-notes/an0004.0-efm32-cmu.pdf)
+peripherals. You are advised to read [AN0004.2](https://www.silabs.com/documents/public/application-notes/an0004.2-efr32-series2-cmu.pdf)
 to get familiar with the different clocks.
 
 | Source | Internal | Speed      | Comments                           |
@@ -114,6 +116,22 @@ It is important that the clock speeds are known to the code, for proper
 calculations of speeds and baud rates. If the HFXO or LFXO are different from
 the speeds above, ensure to pass `HFXO_FREQ=freq_in_hz` and
 `LFXO_FREQ=freq_in_hz` to your compiler defines.
+
+### Usage of EMLIB
+
+This port makes use of EMLIB by Silicon Labs to abstract peripheral registers.
+While some overhead is to be expected, it ensures proper setup of devices,
+provides chip errata and simplifies development. The exact overhead depends on
+the application and peripheral usage, but the largest overhead is expected
+during peripheral setup. A lot of read/write/get/set methods are implemented as
+inline methods or macros (which have no overhead).
+
+Another advantage of EMLIB are the included assertions. These assertions ensure
+that peripherals are used properly. To enable this, pass `DEBUG_EFM` to your
+compiler defines.
+
+EMLIB is licensed by Silicon Labs under the zlib-style license, which permits
+distribution of source.
 
 ## Flashing the device
 
@@ -137,7 +155,3 @@ Or, to connect with your own debugger:
 ```shell
 BOARD=xg23-pk6068a make debug-server
 ```
-
-## License information
-
-Silicon Labs' EMLIB: zlib-style license (permits distribution of source).

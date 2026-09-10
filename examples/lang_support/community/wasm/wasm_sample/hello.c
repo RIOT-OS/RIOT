@@ -1,12 +1,16 @@
-/* Copyright (C) World
- * a native printf is provided by the builtin libc of wamr */
+/*
+ * SPDX-FileCopyrightText: 2020-2022 Karl Fessel
+ * SPDX-FileCopyrightText: World
+ * SPDX-License-Identifier: 0BSD
+ */
 
+/* a native printf is provided by the builtin libc of wamr */
 #ifdef __cplusplus
 extern "C" int printf( const char *, ...);
-#define WASM_EXPORT __attribute__((visibility("default"))) extern "C"
+#  define WASM_EXPORT __attribute__((visibility("default"))) extern "C"
 #else
 extern int printf( const char *, ...);
-#define WASM_EXPORT __attribute__((visibility("default")))
+#  define WASM_EXPORT __attribute__((visibility("default")))
 #endif
 
 WASM_EXPORT int main(int argc, char **argv)

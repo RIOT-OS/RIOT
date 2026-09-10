@@ -28,8 +28,10 @@
     size_t curr = malloc_monitor_get_usage_current(); \
     size_t water = malloc_monitor_get_usage_high_watermark();
 
-#define TEST_ASSERT_CURRENT(num_alloc) TEST_ASSERT_EQUAL_INT(curr+num_alloc*MALLOC_SIZE, malloc_monitor_get_usage_current());
-#define TEST_ASSERT_WATERMARK(num_alloc) TEST_ASSERT_EQUAL_INT(water+num_alloc*MALLOC_SIZE, malloc_monitor_get_usage_high_watermark());
+#define TEST_ASSERT_CURRENT(num_alloc) TEST_ASSERT_EQUAL_INT(curr+num_alloc*MALLOC_SIZE, \
+                                       malloc_monitor_get_usage_current());
+#define TEST_ASSERT_WATERMARK(num_alloc) TEST_ASSERT_EQUAL_INT(water+num_alloc*MALLOC_SIZE, \
+                                         malloc_monitor_get_usage_high_watermark());
 
 /*
  * malloc and free should be reflected by `malloc_monitor_get_usage_current()`.

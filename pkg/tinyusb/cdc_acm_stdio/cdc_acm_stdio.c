@@ -51,7 +51,7 @@ void tud_cdc_rx_cb(uint8_t itf)
 
     uint8_t buffer[64];
     unsigned res = tud_cdc_read(buffer, sizeof(buffer));
-    isrpipe_write(&stdin_isrpipe, buffer, res);
+    stdio_rx_write(buffer, res);
 }
 #endif
 

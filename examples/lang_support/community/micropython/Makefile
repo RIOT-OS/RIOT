@@ -13,9 +13,6 @@ USEPKG += micropython
 # include boot.py as header
 BLOBS += boot.py
 
-# configure MicroPython's heap size
-MP_RIOT_HEAPSIZE ?= 8192U
-
 # MicroPython needs a larger stack
 CFLAGS += '-DTHREAD_STACKSIZE_MAIN=THREAD_STACKSIZE_DEFAULT*4'
 
@@ -31,10 +28,26 @@ FEATURES_OPTIONAL += periph_spi
 # a terminal is opened to synchronize.
 TESTRUNNER_RESET_AFTER_TERM ?= 1
 
-# failing on native with floating point exception (#15870)
-TEST_ON_CI_BLACKLIST += native32 native64
-
 # avoid running Kconfig by default
 SHOULD_RUN_KCONFIG ?=
 
 include $(RIOTBASE)/Makefile.include
+
+# Add target to run MicroPython's own test suite against the RIOT-OS port.
+.PHONY: mpy-test
+.NOTPARALLEL: mpy-test
+
+include $(RIOTBASE)/makefiles/color.inc.mk
+
+# Add support for running MicroPython's own test suite. These tests assume a
+# certain level of functionality, that is provided by this application.
+mpy-test: $(TERMDEPS) pkg-prepare
+	@$(call sh_echowarn,("Running MicroPython\'s own test suite." \
+		"Expect a few tests to fail, especially with a heap size smaller than" \
+		"16 KiB. Refer to \'pkg/micropython/doc.md\' for more information."))
+	$(Q)cd $(RIOTBASE)/build/pkg/micropython/tests && \
+		python3 ./run-tests.py \
+			--test-instance "$(PORT)" \
+			# This test needs the `unittest` module, which requires VFS support. The
+			# test runner does not properly detect this (on v1.29).
+			--exclude "basics/array_int_repr\.py"

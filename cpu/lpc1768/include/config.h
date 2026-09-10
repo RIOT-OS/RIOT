@@ -36,10 +36,13 @@ extern "C" {
 #endif
 
 /**
- * @brief   Timeout for PHY operations, in microseconds.
+ * @brief   Timeout for PHY operations, in milliseconds.
+ *
+ * This is an absolute error timeout. Actual PHY operations are expected to
+ * complete in a few microseconds.
  */
-#ifndef CONFIG_LPC1768_ETH_PHY_TIMEOUT_US
-#  define CONFIG_LPC1768_ETH_PHY_TIMEOUT_US     1000U
+#ifndef CONFIG_LPC1768_ETH_PHY_TIMEOUT_MS
+#  define CONFIG_LPC1768_ETH_PHY_TIMEOUT_MS     1U
 #endif
 
 /**

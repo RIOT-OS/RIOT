@@ -23,6 +23,28 @@
 extern "C" {
 #endif
 
+#define REGSZ (__riscv_xlen / 8)    /**< size of one register in bytes */
+
+#if __riscv_xlen == 64
+/**
+ * @brief   XLEN-sized load instruction mnemonic
+ */
+#  define REG_L ld
+/**
+ * @brief   XLEN-sized store instruction mnemonic
+ */
+#  define REG_S sd
+#else
+/**
+ * @brief   XLEN-sized load instruction mnemonic
+ */
+#  define REG_L lw
+/**
+ * @brief   XLEN-sized store instruction mnemonic
+ */
+#  define REG_S sw
+#endif
+
 #if !defined(__ASSEMBLER__)
 
 /**
@@ -35,38 +57,38 @@ extern "C" {
  */
 struct context_switch_frame {
     /* Callee saved registers */
-    uint32_t s0;                    /**< s0 register */
-    uint32_t s1;                    /**< s1 register */
-    uint32_t s2;                    /**< s2 register */
-    uint32_t s3;                    /**< s3 register */
-    uint32_t s4;                    /**< s4 register */
-    uint32_t s5;                    /**< s5 register */
-    uint32_t s6;                    /**< s6 register */
-    uint32_t s7;                    /**< s7 register */
-    uint32_t s8;                    /**< s8 register */
-    uint32_t s9;                    /**< s9 register */
-    uint32_t s10;                   /**< s10 register */
-    uint32_t s11;                   /**< s11 register */
+    uintptr_t s0;                   /**< s0 register */
+    uintptr_t s1;                   /**< s1 register */
+    uintptr_t s2;                   /**< s2 register */
+    uintptr_t s3;                   /**< s3 register */
+    uintptr_t s4;                   /**< s4 register */
+    uintptr_t s5;                   /**< s5 register */
+    uintptr_t s6;                   /**< s6 register */
+    uintptr_t s7;                   /**< s7 register */
+    uintptr_t s8;                   /**< s8 register */
+    uintptr_t s9;                   /**< s9 register */
+    uintptr_t s10;                  /**< s10 register */
+    uintptr_t s11;                  /**< s11 register */
     /* Caller saved registers */
-    uint32_t ra;                    /**< ra register */
-    uint32_t t0;                    /**< t0 register */
-    uint32_t t1;                    /**< t1 register */
-    uint32_t t2;                    /**< t2 register */
-    uint32_t t3;                    /**< t3 register */
-    uint32_t t4;                    /**< t4 register */
-    uint32_t t5;                    /**< t5 register */
-    uint32_t t6;                    /**< t6 register */
-    uint32_t a0;                    /**< a0 register */
-    uint32_t a1;                    /**< a1 register */
-    uint32_t a2;                    /**< a2 register */
-    uint32_t a3;                    /**< a3 register */
-    uint32_t a4;                    /**< a4 register */
-    uint32_t a5;                    /**< a5 register */
-    uint32_t a6;                    /**< a6 register */
-    uint32_t a7;                    /**< a7 register */
+    uintptr_t ra;                   /**< ra register */
+    uintptr_t t0;                   /**< t0 register */
+    uintptr_t t1;                   /**< t1 register */
+    uintptr_t t2;                   /**< t2 register */
+    uintptr_t t3;                   /**< t3 register */
+    uintptr_t t4;                   /**< t4 register */
+    uintptr_t t5;                   /**< t5 register */
+    uintptr_t t6;                   /**< t6 register */
+    uintptr_t a0;                   /**< a0 register */
+    uintptr_t a1;                   /**< a1 register */
+    uintptr_t a2;                   /**< a2 register */
+    uintptr_t a3;                   /**< a3 register */
+    uintptr_t a4;                   /**< a4 register */
+    uintptr_t a5;                   /**< a5 register */
+    uintptr_t a6;                   /**< a6 register */
+    uintptr_t a7;                   /**< a7 register */
     /* Saved PC for return from ISR */
-    uint32_t pc;                    /**< program counter */
-    uint32_t pad[3];                /**< padding to maintain 16 byte alignment */
+    uintptr_t pc;                   /**< program counter */
+    uintptr_t pad[3];               /**< padding to maintain 16 byte alignment */
 };
 
 #endif /* __ASSEMBLER__ */
@@ -76,42 +98,42 @@ struct context_switch_frame {
  * @{
  */
 /* These values are checked for correctness in context_frame.c */
-#define s0_OFFSET     0
-#define s1_OFFSET     4
-#define s2_OFFSET     8
-#define s3_OFFSET     12
-#define s4_OFFSET     16
-#define s5_OFFSET     20
-#define s6_OFFSET     24
-#define s7_OFFSET     28
-#define s8_OFFSET     32
-#define s9_OFFSET     36
-#define s10_OFFSET    40
-#define s11_OFFSET    44
-#define ra_OFFSET     48
-#define t0_OFFSET     52
-#define t1_OFFSET     56
-#define t2_OFFSET     60
-#define t3_OFFSET     64
-#define t4_OFFSET     68
-#define t5_OFFSET     72
-#define t6_OFFSET     76
-#define a0_OFFSET     80
-#define a1_OFFSET     84
-#define a2_OFFSET     88
-#define a3_OFFSET     92
-#define a4_OFFSET     96
-#define a5_OFFSET     100
-#define a6_OFFSET     104
-#define a7_OFFSET     108
-#define pc_OFFSET     112
-#define pad_OFFSET    116
+#define s0_OFFSET     (0 * REGSZ)
+#define s1_OFFSET     (1 * REGSZ)
+#define s2_OFFSET     (2 * REGSZ)
+#define s3_OFFSET     (3 * REGSZ)
+#define s4_OFFSET     (4 * REGSZ)
+#define s5_OFFSET     (5 * REGSZ)
+#define s6_OFFSET     (6 * REGSZ)
+#define s7_OFFSET     (7 * REGSZ)
+#define s8_OFFSET     (8 * REGSZ)
+#define s9_OFFSET     (9 * REGSZ)
+#define s10_OFFSET    (10 * REGSZ)
+#define s11_OFFSET    (11 * REGSZ)
+#define ra_OFFSET     (12 * REGSZ)
+#define t0_OFFSET     (13 * REGSZ)
+#define t1_OFFSET     (14 * REGSZ)
+#define t2_OFFSET     (15 * REGSZ)
+#define t3_OFFSET     (16 * REGSZ)
+#define t4_OFFSET     (17 * REGSZ)
+#define t5_OFFSET     (18 * REGSZ)
+#define t6_OFFSET     (19 * REGSZ)
+#define a0_OFFSET     (20 * REGSZ)
+#define a1_OFFSET     (21 * REGSZ)
+#define a2_OFFSET     (22 * REGSZ)
+#define a3_OFFSET     (23 * REGSZ)
+#define a4_OFFSET     (24 * REGSZ)
+#define a5_OFFSET     (25 * REGSZ)
+#define a6_OFFSET     (26 * REGSZ)
+#define a7_OFFSET     (27 * REGSZ)
+#define pc_OFFSET     (28 * REGSZ)
+#define pad_OFFSET    (29 * REGSZ)
 /** @} */
 
 /**
  * @brief Size of context switch frame
  */
-#define CONTEXT_FRAME_SIZE (pad_OFFSET + 12)
+#define CONTEXT_FRAME_SIZE (pad_OFFSET + 3 * REGSZ)
 
 /**
  * @brief Offset of stack pointer in struct _thread

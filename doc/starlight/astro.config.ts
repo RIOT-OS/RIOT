@@ -7,15 +7,37 @@
 
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
-import rehypeGithubEmoji from "rehype-github-emoji";
 import starlightImageZoom from "starlight-image-zoom";
 import starlightSidebarTopics from "starlight-sidebar-topics";
+import { satteri, type SatteriProcessorOptions } from '@astrojs/markdown-satteri';
+import * as emoji from 'node-emoji'
+
+type SatteriMdastPlugin = Extract<
+  NonNullable<SatteriProcessorOptions["mdastPlugins"]>[number],
+  { name: string }
+>;
+
+function satteriEmoji(): SatteriMdastPlugin {
+  return {
+    name: 'satteri-emoji',
+    text(node, ctx) {
+      if (node.value && node.value.includes(':')) {
+        const emojified = emoji.emojify(node.value)
+        if (emojified !== node.value) {
+          ctx.setProperty(node, 'value', emojified)
+        }
+      }
+    }
+  }
+}
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://guide.riot-os.org",
   markdown: {
-    rehypePlugins: [rehypeGithubEmoji],
+    processor: satteri({
+      mdastPlugins: [satteriEmoji],
+    })
   },
   integrations: [
     starlight({
@@ -134,6 +156,7 @@ export default defineConfig({
 
           {
             label: "Using RIOT",
+            id: "using-riot",
             link: "/getting-started/installing/",
             icon: "seti:notebook",
             items: [
@@ -160,7 +183,22 @@ export default defineConfig({
               },
               {
                 label: "Networking",
-                items: ["networking/coap"],
+                items: [
+                  "networking/gcoap",
+                  {
+                    label: "CoAP via unicoap",
+                    items: [
+                      "networking/unicoap/introduction",
+                      "networking/unicoap/internals",
+                      "networking/unicoap/pdu",
+                      "networking/unicoap/resources-xfa",
+                      "networking/unicoap/server",
+                      "networking/unicoap/server-tutorial",
+                      "networking/unicoap/message",
+                      "networking/unicoap/message-example",
+                    ]
+                  }
+                ],
               },
               {
                 label: "Advanced",
@@ -230,6 +268,7 @@ export default defineConfig({
                 label: "New Features",
                 items: [
                   "advanced_tutorials/creating_modules",
+                  "advanced_tutorials/porting_cpus",
                   "advanced_tutorials/porting_boards",
                   "advanced_tutorials/porting_packages",
                   "advanced_tutorials/device_drivers",
@@ -255,7 +294,7 @@ export default defineConfig({
             "/boards/**",
             "/changelog/**",
             "/test/**"
-          ]
+          ],
         }
       }),
       ],
@@ -266,7 +305,7 @@ export default defineConfig({
   ],
   redirects: {
     "/misc/io_mapping_and_shields": "/board_specific/io_mapping_and_shields",
-    "/c_tutorials/coap": "/networking/coap",
+    "/c_tutorials/coap": "/networking/unicoap/introduction",
   },
   vite: {
     server: {

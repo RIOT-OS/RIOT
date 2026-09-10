@@ -11,17 +11,17 @@
  * @author  Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
  */
 
+#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <string.h>
 #include <termios.h>
-#include <fcntl.h>
 
-#include "thread.h"
-#include "periph/uart.h"
-#include "native_internal.h"
 #include "async_read.h"
+#include "native_internal.h"
+#include "periph/uart.h"
+#include "thread.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -43,6 +43,8 @@ static int tty_fds[UART_NUMOF];
 
 void tty_uart_setup(uart_t uart, const char *filename)
 {
+    assert(uart < UART_NUMOF);
+
     tty_device_filenames[uart] = strndup(filename, PATH_MAX - 1);
 }
 
@@ -127,22 +129,19 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     case 57600: speed = B57600; break;
     case 115200: speed = B115200; break;
     case 230400: speed = B230400; break;
-    case 460800 : speed =  B460800; break;
-    case 500000 : speed =  B500000; break;
-    case 576000 : speed =  B576000; break;
-    case 921600 : speed =  B921600; break;
-    case 1000000: speed =  B1000000; break;
-    case 1152000: speed =  B1152000; break;
-    case 1500000: speed =  B1500000; break;
-    case 2000000: speed =  B2000000; break;
-    case 2500000: speed =  B2500000; break;
-    case 3000000: speed =  B3000000; break;
-    case 3500000: speed =  B3500000; break;
-    case 4000000: speed =  B4000000; break;
-
-    default:
-        return UART_NOBAUD;
-        break;
+    case 460800: speed = B460800; break;
+    case 500000: speed = B500000; break;
+    case 576000: speed = B576000; break;
+    case 921600: speed = B921600; break;
+    case 1000000: speed = B1000000; break;
+    case 1152000: speed = B1152000; break;
+    case 1500000: speed = B1500000; break;
+    case 2000000: speed = B2000000; break;
+    case 2500000: speed = B2500000; break;
+    case 3000000: speed = B3000000; break;
+    case 3500000: speed = B3500000; break;
+    case 4000000: speed = B4000000; break;
+    default: return UART_NOBAUD;
     }
 
     cfsetospeed(&termios, speed);
@@ -167,6 +166,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
+    assert(uart < UART_NUMOF);
+
     DEBUG("writing to serial port ");
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
@@ -188,11 +189,16 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 void uart_poweron(uart_t uart)
 {
     (void)uart;
+
+    assert(uart < UART_NUMOF);
+
     /* not implemented (yet) */
 }
 
 void uart_poweroff(uart_t uart)
 {
+    assert(uart < UART_NUMOF);
+
     if (tty_fds[uart] >= 0) {
         native_async_read_remove_handler(tty_fds[uart]);
         real_close(tty_fds[uart]);

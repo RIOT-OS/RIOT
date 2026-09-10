@@ -6,6 +6,7 @@
  * directory for more details.
  */
 #include "vendor/riscv_csr.h"
+#include "context_frame.h"
 
 .section .init
 
@@ -37,10 +38,10 @@ _start_real:
     la a2, _edata
     bgeu a1, a2, 2f
 1:
-    lw t0, (a0)
-    sw t0, (a1)
-    addi a0, a0, 4
-    addi a1, a1, 4
+    REG_L t0, (a0)
+    REG_S t0, (a1)
+    addi a0, a0, REGSZ
+    addi a1, a1, REGSZ
     bltu a1, a2, 1b
 2:
 
@@ -50,8 +51,8 @@ _start_real:
     la a1, __bss_end
     bgeu a0, a1, 2f
 1:
-    sw zero, (a0)
-    addi a0, a0, 4
+    REG_S zero, (a0)
+    addi a0, a0, REGSZ
     bltu a0, a1, 1b
 2:
 

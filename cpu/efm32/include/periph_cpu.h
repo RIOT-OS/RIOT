@@ -455,7 +455,7 @@ typedef struct {
 typedef enum {
     PWM_LEFT = timerModeUp,           /**< use left aligned PWM */
     PWM_RIGHT = timerModeDown,        /**< use right aligned PWM */
-    PWM_CENTER = timerModeUp          /**< not supported, use left aligned */
+    PWM_CENTER = timerModeUpDown      /**< use center aligned PWM */
 } pwm_mode_t;
 /** @} */
 #endif /* ndef DOXYGEN */
@@ -650,6 +650,17 @@ typedef struct {
     CMU_Clock_TypeDef cmu;  /**< the device CMU channel */
     IRQn_Type irq;          /**< the devices base IRQ channel */
 } uart_conf_t;
+
+/**
+ * @brief   Ethernet peripheral configuration
+ */
+typedef struct {
+    gpio_t phy_en_pin;      /**< PHY power enable, GPIO_UNDEF if unused */
+    gpio_t phy_rst_pin;     /**< PHY reset, GPIO_UNDEF if unused */
+    uint32_t routeloc1;     /**< Pre-shifted bits for ETH->ROUTELOC1 */
+    uint16_t speed;         /**< Default link speed (MII BMCR speed/duplex bits) */
+    uint8_t phy_addr;       /**< MIIM address */
+} eth_conf_t;
 
 /**
  * @brief   CPU provides own pm_off() function

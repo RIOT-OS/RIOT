@@ -71,9 +71,10 @@ $(RIOTTOOLS)/picotool/picotool: $(RIOTTOOLS)/picotool/Makefile
 	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/picotool
 	@echo "[INFO] picotool successfully fetched!"
 
-$(RIOTTOOLS)/pioasm/pioasm: $(RIOTTOOLS)/pioasm/Makefile
+# pioasm is part of picosdk, therefore it is built from the picosdk package
+$(RIOTPKG)/picosdk/pioasm: $(RIOTPKG)/picosdk/Makefile
 	@echo "[INFO] pioasm not found - fetching it from GitHub now"
-	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/pioasm
+	CC= CFLAGS= $(MAKE) -C $(RIOTPKG)/picosdk pioasm
 	@echo "[INFO] pioasm successfully fetched!"
 
 $(RIOTTOOLS)/PyCortexMDebug/checkout: $(RIOTTOOLS)/PyCortexMDebug/Makefile

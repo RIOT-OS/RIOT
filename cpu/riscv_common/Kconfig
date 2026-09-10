@@ -8,8 +8,13 @@ config CPU_CORE_RV32IMAC
     bool
     select CPU_ARCH_RISCV
 
+config CPU_CORE_RV64IMAC
+    bool
+    select CPU_ARCH_RISCV
+
 config CPU_ARCH
     default "rv32" if CPU_CORE_RV32IMAC
+    default "rv64" if CPU_CORE_RV64IMAC
 
 config PRINT_VERBOSE_TRAP_INFO
     bool "Print verbose trap information"

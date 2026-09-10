@@ -27,10 +27,8 @@ static const coap_endpoint_path_t path_riot_board =
 
 const coap_endpoint_t endpoints[] =
 {
-    { COAP_METHOD_GET,	handle_get_well_known_core,
-        &path_well_known_core, "ct=40" },
-    { COAP_METHOD_GET,	handle_get_riot_board,
-        &path_riot_board,	   "ct=0"  },
+    { COAP_METHOD_GET, handle_get_well_known_core, &path_well_known_core, "ct=40" },
+    { COAP_METHOD_GET, handle_get_riot_board, &path_riot_board, "ct=0" },
     /* marks the end of the endpoints array: */
     { (coap_method_t)0, NULL, NULL, NULL }
 };

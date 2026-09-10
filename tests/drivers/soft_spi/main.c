@@ -58,7 +58,7 @@ int main(void)
     soft_spi_transfer_byte(soft_spi, cs, false, 0xa5);
     soft_spi_release(soft_spi);
 
-    printf("Send %s\n",string);
+    printf("Send %s\n", string);
     soft_spi_acquire(soft_spi, cs, SOFT_SPI_MODE_0, SOFT_SPI_CLK_100KHZ);
     soft_spi_transfer_bytes(soft_spi, cs, false, string, NULL, sizeof string);
     soft_spi_release(soft_spi);

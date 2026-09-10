@@ -11,6 +11,7 @@
  * @author  Carl Seifert <carl.seifert@tu-dresden.de>
  */
 
+#include <stdlib.h>
 #include <errno.h>
 #include <stdbool.h>
 
@@ -407,6 +408,29 @@ bool unicoap_message_code_is_response(uint8_t code) {
     }
 }
 
+unicoap_status_t unicoap_response_status_from_errno(int error) {
+    int e = abs(error);
+    if (e == ENOTSUP || e == EOPNOTSUPP) {
+        return UNICOAP_STATUS_NOT_IMPLEMENTED;
+    } else if (e == EBADMSG || e == EINVAL || e == ERANGE) {
+        return UNICOAP_STATUS_BAD_REQUEST;
+    } else if (e == ENOMSG) {
+        return UNICOAP_STATUS_REQUEST_ENTITY_INCOMPLETE;
+    } else if (e == EACCES) {
+        return UNICOAP_STATUS_FORBIDDEN;
+    } else if (e == EFAULT || e == ENOENT || e == ENODEV || e == ENXIO) {
+        return UNICOAP_STATUS_PATH_NOT_FOUND;
+    } else if (e == EMSGSIZE) {
+        return UNICOAP_STATUS_REQUEST_ENTITY_TOO_LARGE;
+    } else if (e == EADDRNOTAVAIL || e == EAGAIN || e == EBUSY || e == ENETDOWN ||
+        e == ETIMEDOUT || e == EWOULDBLOCK
+    ) {
+        return UNICOAP_STATUS_SERVICE_UNAVAILABLE;
+    } else {
+        return UNICOAP_STATUS_INTERNAL_SERVER_ERROR;
+    }
+}
+
 const char* unicoap_string_from_code_class(uint8_t code) {
     if (code == UNICOAP_CODE_EMPTY) {
         return "EMPTY";
@@ -726,6 +750,11 @@ void unicoap_assist_emit_diagnostic_missing_driver(unicoap_proto_t proto) {
         case UNICOAP_PROTO_DTLS:
             unicoap_assist(API_ERROR("CoAP over DTLS driver missing")
                            FIXIT("USEMODULE += unicoap_driver_dtls"));
+            break;
+
+        case UNICOAP_PROTO_SLIPMUX:
+            unicoap_assist(API_ERROR("CoAP over Slipmux driver missing")
+                           FIXIT("USEMODULE += unicoap_driver_slipmux"));
             break;
 
         default:

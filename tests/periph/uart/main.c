@@ -504,9 +504,10 @@ int main(void)
     }
 
     puts("\nUART INFO:");
-    printf("Available devices:               %i\n", UART_NUMOF);
+    printf("Available devices:               %u\n", (unsigned)UART_NUMOF);
     if (STDIO_UART_DEV != UART_UNDEF) {
-        printf("UART used for STDIO (the shell): UART_DEV(%i)\n\n", STDIO_UART_DEV);
+        printf("UART used for STDIO (the shell): UART_DEV(%u)\n\n",
+               (unsigned)STDIO_UART_DEV);
     }
 
     /* initialize ringbuffers */

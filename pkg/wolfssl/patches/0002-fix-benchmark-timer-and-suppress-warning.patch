@@ -1,0 +1,49 @@
+From fbc7f4597b51d3a8b38cbad9e289a1e7a7e50dba Mon Sep 17 00:00:00 2001
+From: jhermanowski <>
+Date: Wed, 5 Aug 2026 11:26:50 +0200
+Subject: [PATCH] I disabled a warning in settings.h and added a way for
+ wolfcrypt to get the time in the benchmark
+
+---
+ wolfcrypt/benchmark/benchmark.c | 8 ++++++++
+ wolfssl/wolfcrypt/settings.h    | 3 +++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/wolfcrypt/benchmark/benchmark.c b/wolfcrypt/benchmark/benchmark.c
+index 214d873..4898f90 100644
+--- a/wolfcrypt/benchmark/benchmark.c
++++ b/wolfcrypt/benchmark/benchmark.c
+@@ -16888,6 +16888,14 @@ out:
+         (void)reset;
+         return ((double)clock())/CLOCKS_PER_SEC;
+     }
++#elif defined(WOLFSSL_RIOT_OS)
++
++    #include "ztimer.h"
++    double current_time(int reset)
++    {
++        (void)reset;
++        return (double) ztimer_now(ZTIMER_USEC) / 1000000.0;
++    }
+ #else
+ 
+     #include <time.h>
+diff --git a/wolfssl/wolfcrypt/settings.h b/wolfssl/wolfcrypt/settings.h
+index 9f69914..876dc61 100644
+--- a/wolfssl/wolfcrypt/settings.h
++++ b/wolfssl/wolfcrypt/settings.h
+@@ -2899,8 +2899,11 @@
+     #define CURVE448_SMALL
+     #undef ED448_SMALL
+     #define ED448_SMALL
++	#if !defined(WOLFSSL_RIOT_OS)
+     #warning "Contact wolfSSL support for a fast implementation that is " \
+              "constant time"
++    #endif
++	
+ #endif
+ 
+ #if defined(NO_WC_SSIZE_TYPE) || defined(ssize_t)
+-- 
+2.55.0
+

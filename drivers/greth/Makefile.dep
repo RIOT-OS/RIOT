@@ -1,0 +1,6 @@
+USEMODULE += eui_provider
+USEMODULE += iolist
+USEMODULE += netdev_eth
+USEMODULE += netdev_legacy_api
+
+FEATURES_REQUIRED += periph_plic

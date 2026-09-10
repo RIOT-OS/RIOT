@@ -14,7 +14,6 @@ ifneq (,$(filter lpc1768_eth,$(USEMODULE)))
   USEMODULE += netdev_eth
   USEMODULE += netdev_new_api
   USEMODULE += ztimer_msec
-  USEMODULE += ztimer_usec
 endif
 
 include $(RIOTCPU)/cortexm_common/Makefile.dep

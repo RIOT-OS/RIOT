@@ -118,6 +118,11 @@ static inline int _init_drivers(event_queue_t* queue) {
         return -1;
     }
 #endif
+#if IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX)
+    if (unicoap_init_slipmux(queue) < 0) {
+        return -1;
+    }
+#endif
     /* MARK: unicoap_driver_extension_point */
     return 0;
 }
@@ -133,6 +138,9 @@ static inline int _deinit_drivers(event_queue_t* queue) {
 #endif
 #if IS_USED(MODULE_UNICOAP_DRIVER_DTLS)
     res += unicoap_deinit_dtls(queue);
+#endif
+#if IS_USED(MODULE_UNICOAP_DRIVER_SLIPMUX)
+    res += unicoap_deinit_slipmux(queue);
 #endif
     /* MARK: unicoap_driver_extension_point */
     return res;
@@ -295,6 +303,7 @@ int unicoap_messaging_send(unicoap_packet_t* packet, unicoap_messaging_flags_t f
 #if IS_USED(MODULE_UNICOAP_DRIVER_RFC7252_COMMON)
     case UNICOAP_PROTO_UDP:
     case UNICOAP_PROTO_DTLS:
+    case UNICOAP_PROTO_SLIPMUX:
         return unicoap_messaging_send_rfc7252(packet, flags);
 #endif
     /* MARK: unicoap_driver_extension_point */

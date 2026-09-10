@@ -422,6 +422,7 @@ endif
 ifneq (,$(filter gnrc_udp,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_gnrc_udp
   USEMODULE += gnrc_nettype_udp
+  USEMODULE += gnrc_nettype_ipv6
   USEMODULE += inet_csum
   USEMODULE += udp
 endif

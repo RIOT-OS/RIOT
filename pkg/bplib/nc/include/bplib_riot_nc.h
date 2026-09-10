@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
+ * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 #pragma once
@@ -8,7 +8,7 @@
  * @ingroup pkg_bplib
  * @brief A wrapper for the NC operations.
  *
- * # About
+ * ## About
  * The NC contains the configuration of the node. In NASA's bpnode
  * implementations this is done through special tables, here we just use
  * static arrays for every configuration table.
@@ -38,7 +38,7 @@
  *    Now goto 1 if the channel / contact  should be changed, for example when a
  *    new neighbor has been discovered.
  *
- * ## Optimizations
+ * ### Optimizations
  *
  * bplib forces many tables in the NC which are not currently implemented.
  * These have been removed and allowed to be NULL inside of bplib. When the

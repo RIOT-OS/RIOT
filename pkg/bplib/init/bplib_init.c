@@ -4,7 +4,7 @@
  *
  * SPDX-FileCopyrightText: 2025 United States Government as represented by the Administrator of the
  * SPDX-FileCopyrightText: National Aeronautics and Space Administration.
- * SPDX-FileCopyrightText: 2026 Hamburg University of Technology (TUHH)
+ * SPDX-FileCopyrightText: 2026 Technische Universität Hamburg
  * SPDX-License-Identifier: Apache-2.0
  *
  * Based on bplib's example implementation in [bplib]/app/bpcat.c

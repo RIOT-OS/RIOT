@@ -14,6 +14,7 @@
  * @}
  */
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
@@ -74,10 +75,10 @@ char *thread_stack_init(thread_task_func_t task_func,
                         int stack_size)
 {
     struct context_switch_frame *sf;
-    uint32_t *stk_top;
+    uintptr_t *stk_top;
 
     /* calculate the top of the stack */
-    stk_top = (uint32_t *)((uintptr_t)stack_start + stack_size);
+    stk_top = (uintptr_t *)((uintptr_t)stack_start + stack_size);
 
     /* Put a marker at the top of the stack.  This is used by
      * thread_stack_print to determine where to stop dumping the
@@ -87,10 +88,10 @@ char *thread_stack_init(thread_task_func_t task_func,
     *stk_top = STACK_MARKER;
 
     /* per ABI align stack pointer to 16 byte boundary. */
-    stk_top = (uint32_t *)(((uintptr_t)stk_top) & ~((uintptr_t)0xf));
+    stk_top = (uintptr_t *)(((uintptr_t)stk_top) & ~((uintptr_t)0xf));
 
     /* reserve space for the stack frame. */
-    stk_top = (uint32_t *)((uintptr_t)stk_top - sizeof(*sf));
+    stk_top = (uintptr_t *)((uintptr_t)stk_top - sizeof(*sf));
 
     /* populate the stack frame with default values for starting the thread. */
     sf = (struct context_switch_frame *)stk_top;
@@ -120,22 +121,23 @@ void thread_print_stack(void)
     /* thread_init aligns stack pointer to 16 byte boundary, the cast below
      * is therefore safe. Use intermediate cast to uintptr_t to silence
      * -Wcast-align */
-    uint32_t *sp = (uint32_t *)(uintptr_t)active_thread->sp;
+    uintptr_t *sp = (uintptr_t *)(uintptr_t)active_thread->sp;
 
     printf("printing the current stack of thread %" PRIkernel_pid "\n",
            thread_getpid());
 
 #ifdef DEVELHELP
     printf("thread name: %s\n", active_thread->name);
-    printf("stack start: 0x%08x\n", (unsigned)(active_thread->stack_start));
-    printf("stack end  : 0x%08x\n",
-           (unsigned)(active_thread->stack_start + active_thread->stack_size));
+    printf("stack start: 0x%" PRIxPTR "\n",
+           (uintptr_t)(active_thread->stack_start));
+    printf("stack end  : 0x%" PRIxPTR "\n",
+           (uintptr_t)(active_thread->stack_start + active_thread->stack_size));
 #endif
 
     printf("  address:      data:\n");
 
     do {
-        printf("  0x%08x:   0x%08x\n", (unsigned)sp, (unsigned)*sp);
+        printf("  0x%" PRIxPTR ":   0x%" PRIxPTR "\n", (uintptr_t)sp, *sp);
         sp++;
         count++;
     } while (*sp != STACK_MARKER);
@@ -187,6 +189,7 @@ void heap_stats(void)
     long int heap_size = &_eheap - &_sheap;
     struct mallinfo minfo = mallinfo();
 
-    printf("heap: %ld (used %u, free %ld) [bytes]\n",
-           heap_size, minfo.uordblks, heap_size - minfo.uordblks);
+    printf("heap: %ld (used %lu, free %ld) [bytes]\n",
+           heap_size, (unsigned long)minfo.uordblks,
+           heap_size - (long)minfo.uordblks);
 }

@@ -1,4 +1,7 @@
-
+/*
+ * SPDX-FileCopyrightText: 2023 Koen Zandberg
+ * SPDX-License-Identifier: LGPL-2.1-only
+ */
 
 /* Start of automatically generated font definition for DejaVuSans12. */
 
@@ -416,6 +419,5 @@ static const struct mf_font_list_s mf_rlefont_DejaVuSans12_listentry = {
 #undef MF_INCLUDED_FONTS
 #define MF_INCLUDED_FONTS (&mf_rlefont_DejaVuSans12_listentry)
 #endif
-
 
 /* End of automatically generated font definition for DejaVuSans12. */

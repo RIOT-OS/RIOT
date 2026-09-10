@@ -69,7 +69,8 @@ static void print_totals(const matstat_state_t *states, size_t nelem, const stat
     print_statistics(&totals, limits);
 }
 
-static void print_detailed(const matstat_state_t *states, size_t nelem, unsigned int test_min, const stat_limits_t *limits)
+static void print_detailed(const matstat_state_t *states, size_t nelem, unsigned int test_min,
+                           const stat_limits_t *limits)
 {
     if (LOG2_STATS) {
         print_str("   interval     count       sum       sum_sq    min   max  mean  variance\n");
@@ -105,7 +106,8 @@ static void print_detailed(const matstat_state_t *states, size_t nelem, unsigned
     print_totals(states, nelem, limits);
 }
 
-void print_results(const result_presentation_t *pres, const matstat_state_t *ref_states, const matstat_state_t *int_states)
+void print_results(const result_presentation_t *pres, const matstat_state_t *ref_states,
+                   const matstat_state_t *int_states)
 {
     static char buf[48]; /* String formatting temporary buffer, not thread safe */
     print_str("------------- BEGIN STATISTICS --------------\n");

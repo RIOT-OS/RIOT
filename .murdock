@@ -25,7 +25,7 @@ stm32f429i-disc1"
 # this configures boards that are available via pifleet
 case "${CI_MURDOCK_PROJECT}" in
     riot)
-        : ${TEST_BOARDS_AVAILABLE:="samr21-xpro"}
+        : ${TEST_BOARDS_AVAILABLE:=""}
         ;;
     riot-staging)
         : ${TEST_BOARDS_AVAILABLE:=""}
@@ -106,23 +106,6 @@ if [ -z "${QUICK_BUILD}" ]; then
         export QUICK_BUILD=1
     fi
 fi
-
-# This is a work around for a bug in CCACHE which interacts very badly with
-# some features of RIOT and of murdock. The result is that ccache is
-# ineffective (i.e. objects are never reused, resulting in extreme cache miss
-# rate) and murdock becomes slow.
-#
-# - CCACHE thinks that -gz by itself enables debugging, which is not true.
-#   see https://github.com/ccache/ccache/issues/464
-#   - When debug info is included, CCACHE hashes the file paths, as these
-#     influence the debug information (the name of compile units and/or their
-#     "comp_dir" attribute)
-# - Riot does not set -fdebug-prefix-map. This is not that easy as it may not
-#   be supported in every toolchain (some are quite old).
-# - Murdock builds PRs in different directories each time.
-#
-# It is only the combination of these three factors which causes this bug.
-export OPTIONAL_CFLAGS_BLACKLIST="-gz"
 
 DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE
          -E TEST_HASH -E CI_PULL_LABELS -ECI_BASE_BRANCH -ECI_BASE_COMMIT
@@ -353,9 +336,10 @@ compile() {
 
     # set build directory. CI ensures only one build at a time in $(pwd).
     export BINDIR="$(pwd)/build"
-    export PKGDIRBASE="${BINDIR}/pkg"
 
-    # Pre-build cleanup
+    # pre-build cleanup: this is effectively a superset of "make clean" that
+    # will not cost a full parse of the build system as well as one sub-make
+    # per package.
     rm -rf ${BINDIR}
 
     print_worker
@@ -369,7 +353,6 @@ compile() {
     # reduces disk IO.
     export CCACHE_TEMPDIR="$(pwd)/.ccache/tmp"
 
-    BOARD=${board} make -C${appdir} clean
     CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
         make -C${appdir} all test-input-hash -j${JOBS:-4}
     RES=$?

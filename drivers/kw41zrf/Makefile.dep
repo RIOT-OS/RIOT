@@ -1,6 +1,8 @@
-USEMODULE += ieee802154
-USEMODULE += netdev_ieee802154
-USEMODULE += netdev_legacy_api
 USEMODULE += core_thread_flags
 USEMODULE += random
+USEMODULE += iolist
 USEMODULE += mcux_xcvr_mkw41z
+ifneq (,$(filter netdev,$(USEMODULE)))
+  USEMODULE += netdev_ieee802154_submac
+  DEFAULT_MODULE += netdev_ieee802154_oqpsk
+endif
