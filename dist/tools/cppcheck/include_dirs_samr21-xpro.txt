@@ -1,0 +1,4 @@
+boards/samr21-xpro/include
+cpu/samd21/include
+cpu/sam0_common/include
+cpu/cortexm_common/include
