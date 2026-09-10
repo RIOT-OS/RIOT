@@ -13,7 +13,10 @@ else
   # target would link the rv32 libc and fail with an ABI mismatch, so only
   # advertise it for rv32 (rv64 falls back to newlib).
   FEATURES_PROVIDED += picolibc
-  FEATURES_PROVIDED += rust_target
+  # C2Rust 0.22.1 does not implement all the necessary types for RISC-V to work
+  # with newer clang versions (>15). Therefore, the rust_target is temporarily
+  # disabled.
+  #FEATURES_PROVIDED += rust_target
 endif
 FEATURES_PROVIDED += arch_riscv
 FEATURES_PROVIDED += bug_newlib_broken_stdio
