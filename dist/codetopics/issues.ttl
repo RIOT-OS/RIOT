@@ -1,0 +1,52 @@
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix dct: <http://purl.org/dc/terms/>.
+@prefix ont: <ontology.ttl#>.
+@prefix : <#>.
+
+# We may not even need to track these; the labeler also doesn't touch them.
+
+:concepts a skos:ConceptScheme;
+  dct:title "RIOT issue and PR concepts";
+  rdfs:comment "An organization structure of issues and pull requests of the RIOT-OS code base.";
+  skos:hasTopConcept :type.
+
+# Copied over the "Type" as an example; "State", "Reviewed", "Process", "Release notes", "Waiting for", "Community", "Discussion", "Impact" and "CI" would match well, not sure about "TF" and "PR-award-nominee".
+#
+# Not sure if we'd even generate them from our labels (might be convenient to
+# have a single source of truth in labels).
+
+:type a skos:Concept;
+    skos:inScheme :concepts;
+    ont:color "#ffff66";
+    skos:prefLabel "Type".
+:type-bug a skos:Concept;
+    skos:inScheme :concepts;
+    skos:broader :type;
+    skos:prefLabel "bug";
+    skos:scopeNote "The issue reports a bug / The PR fixes a bug (including spelling errors)".
+:type-cleanup a skos:Concept;
+    skos:inScheme :concepts;
+    skos:broader :type;
+    skos:prefLabel "cleanup";
+    skos:scopeNote "The issue proposes a clean-up / The PR cleans-up parts of the codebase / documentation".
+:type-enhancement a skos:Concept;
+    skos:inScheme :concepts;
+    skos:broader :type;
+    skos:prefLabel "enhancement";
+    skos:scopeNote "The issue suggests enhanceable parts / The PR enhances parts of the codebase / documentation".
+:type-new-feature a skos:Concept;
+    skos:inScheme :concepts;
+    skos:broader :type;
+    skos:prefLabel "new feature";
+    skos:scopeNote "The issue requests / The PR implemements a new feature for RIOT".
+:type-question a skos:Concept;
+    skos:inScheme :concepts;
+    skos:broader :type;
+    skos:prefLabel "question";
+    skos:scopeNote "The issue poses a question regarding usage of RIOT".
+:type-tracking a skos:Concept;
+    skos:inScheme :concepts;
+    skos:broader :type;
+    skos:prefLabel "tracking";
+    skos:scopeNote "The issue tracks and organizes the sub-tasks of a larger effort".
