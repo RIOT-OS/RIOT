@@ -502,7 +502,7 @@ static size_t _iphc_ipv6_decode(const uint8_t *iphc_hdr, size_t iphc_hdr_size,
                 ipv6_hdr->dst.u8[3] = ctx->prefix_len;
                 ipv6_addr_init_prefix((ipv6_addr_t *)(ipv6_hdr->dst.u8 + 4),
                                       &ctx->prefix, ctx->prefix_len);
-                memcpy(ipv6_hdr->dst.u8 + 12, iphc_hdr + payload_offset + 2, 4);
+                memcpy(ipv6_hdr->dst.u8 + 12, iphc_hdr + payload_offset, 4);
 
                 payload_offset += 4;
                 ctx->prefix_len = orig_ctx_len;
