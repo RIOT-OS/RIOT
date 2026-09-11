@@ -1504,7 +1504,7 @@ def main(itest=1):
         if len(glob_list) > 0:
             comPort = glob_list[0];
     if comPort is None:
-        glob_list = glob.glob("/dev/tty.usbserial*");
+        glob_list = glob.glob("/dev/cu.usbserial*");
         if len(glob_list) > 0:
             comPort = glob_list[0];
     if comPort is None:
