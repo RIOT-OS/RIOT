@@ -67,7 +67,7 @@ static err_t _eth_link_output(struct netif *netif, struct pbuf *p);
 #ifdef MODULE_LWIP_SIXLOWPAN
 static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p);
 #endif
-#ifdef MODULE_SLIPDEV
+#ifdef MODULE_SLIPDEV_NET
 static err_t _slip_link_output(struct netif *netif, struct pbuf *p);
 #if LWIP_IPV4
 static err_t slip_output4(struct netif *netif, struct pbuf *q, const ip4_addr_t *ipaddr);
@@ -209,7 +209,7 @@ err_t lwip_netdev_init(struct netif *netif)
         break;
     }
 #endif
-#ifdef MODULE_SLIPDEV
+#ifdef MODULE_SLIPDEV_NET
     case NETDEV_TYPE_SLIP:
         netif->name[0] = 'S';
         netif->name[1] = 'L';
@@ -384,7 +384,7 @@ static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p)
 }
 #endif
 
-#ifdef MODULE_SLIPDEV
+#ifdef MODULE_SLIPDEV_NET
 #if LWIP_IPV4
 static err_t slip_output4(struct netif *netif, struct pbuf *q, const ip4_addr_t *ipaddr)
 {
