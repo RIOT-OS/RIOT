@@ -139,6 +139,7 @@ FEATURES_EXISTING := \
     libstdcpp \
     lpc1768_eth \
     motor_driver \
+    msi_arch \
     netif \
     netif_ethernet \
     netif_openwsn \

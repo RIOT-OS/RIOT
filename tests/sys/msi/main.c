@@ -10,8 +10,9 @@
  * @file
  * @brief       MSI-like mailbox: a thread posts, the ISR prints
  *
- * This is not PCI Express MSI. A thread writes a mailbox slot and pends
- * HASH_RNG_IRQn. `isr_hash_rng()` drains the mailbox and prints there.
+ * This is not PCI Express MSI. A thread writes a generic mailbox slot. The
+ * Cortex-M backend pends HASH_RNG_IRQn, and `isr_hash_rng()` drains the
+ * mailbox and prints there.
  *
  * @author      Ajit Upadhyay <u.ajiit@gmail.com>
  *

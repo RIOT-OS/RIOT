@@ -16,10 +16,11 @@
  */
 
 #include <errno.h>
+#include <stdbool.h>
 
-#include "cpu.h"
 #include "irq.h"
 #include "msi.h"
+#include "msi_arch.h"
 
 typedef struct {
     volatile uint32_t valid;
@@ -35,41 +36,41 @@ typedef struct {
 
 static msi_slot_t _slots[MSI_VEC_NUMOF];
 static msi_handler_t _handlers[MSI_VEC_NUMOF];
-static int _irqn = -1;
+static bool _initialized;
 
 /**
- * @brief   Initialize the MSI-like mailbox and its NVIC doorbell
+ * @brief   Initialize the MSI-like mailbox and its doorbell backend
  *
  * @details
- * Validates and stores the Cortex-M interrupt number used as the shared
- * doorbell for all mailbox vectors. Every mailbox slot is reset to the empty
- * state and its sequence number and payload are cleared. The selected NVIC
- * interrupt is then enabled.
+ * Passes the doorbell identifier to the architecture backend. Every mailbox
+ * slot is then reset to the empty state and its sequence number and payload
+ * are cleared.
  *
  * Slot initialization and doorbell configuration are performed with
  * interrupts disabled so that an interrupt cannot observe partially
  * initialized mailbox state.
  *
  * This function does not install the architecture-specific interrupt handler.
- * The application must provide the ISR associated with @p irqn and call
+ * The application must connect the selected doorbell to an ISR that calls
  * @ref msi_isr from it.
  *
  * Calling this function again discards all pending mailbox messages. Existing
  * callback registrations are retained.
  *
- * @param[in] irqn  Non-negative Cortex-M external interrupt number used as
- *                  the mailbox doorbell
+ * @param[in] doorbell  Architecture-specific doorbell identifier
  *
- * @retval  0         The mailbox was initialized and the IRQ was enabled
- * @retval  -EINVAL   @p irqn is negative or outside the CPU IRQ range
+ * @retval  0     The mailbox and doorbell backend were initialized
+ * @retval  <0    The architecture backend rejected the doorbell
  */
-int msi_init(int irqn)
+int msi_init(int doorbell)
 {
-    if ((irqn < 0) || (irqn >= (int)CPU_IRQ_NUMOF)) {
-        return -EINVAL;
-    }
-
     unsigned state = irq_disable();
+    int res = msi_arch_init(doorbell);
+
+    if (res < 0) {
+        irq_restore(state);
+        return res;
+    }
 
     for (unsigned i = 0; i < MSI_VEC_NUMOF; i++) {
         _slots[i].valid = 0;
@@ -78,8 +79,7 @@ int msi_init(int irqn)
         _slots[i].data = 0;
     }
 
-    _irqn = irqn;
-    NVIC_EnableIRQ((IRQn_Type)irqn);
+    _initialized = true;
     irq_restore(state);
 
     return 0;
@@ -125,21 +125,21 @@ int msi_register(unsigned vec, msi_cb_t cb, void *arg)
 }
 
 /**
- * @brief   Post a message to a vector and ring the NVIC doorbell
+ * @brief   Post a message to a vector and ring the doorbell
  *
  * @details
  * Implements the sender side of the MSI-like protocol. The function enters a
  * critical section, verifies that the selected slot is empty, writes the
  * event and payload, increments the slot sequence number, and publishes the
- * message by setting `valid` last. It then pends the IRQ selected by
- * @ref msi_init.
+ * message by setting `valid` last. It then asks the architecture backend to
+ * trigger the doorbell selected by @ref msi_init.
  *
  * Only one message may be outstanding on each vector. If the slot is still
  * occupied, the function returns @c -EBUSY without modifying the existing
- * message. Different vectors have independent slots but share the same NVIC
+ * message. Different vectors have independent slots but share the same
  * doorbell.
  *
- * On a single Cortex-M core, disabling interrupts protects the slot's
+ * On a single-core target, disabling interrupts protects the slot's
  * check-and-publish operation against @ref msi_isr. Restoring interrupts may
  * cause the callback to execute before this function returns.
  *
@@ -154,7 +154,7 @@ int msi_register(unsigned vec, msi_cb_t cb, void *arg)
  */
 int msi_post(unsigned vec, uint32_t event, uint32_t data)
 {
-    if ((vec >= MSI_VEC_NUMOF) || (_irqn < 0)) {
+    if ((vec >= MSI_VEC_NUMOF) || !_initialized) {
         return -EINVAL;
     }
 
@@ -171,7 +171,7 @@ int msi_post(unsigned vec, uint32_t event, uint32_t data)
     slot->seq++;
     /* Publish last: the ISR treats valid != 0 as a posted message. */
     slot->valid = 1;
-    NVIC_SetPendingIRQ((IRQn_Type)_irqn);
+    msi_arch_trigger();
     irq_restore(state);
 
     return 0;
@@ -192,8 +192,8 @@ int msi_post(unsigned vec, uint32_t event, uint32_t data)
  * @c -EBUSY. A posted message with no registered callback is still consumed
  * and acknowledged.
  *
- * This function must be called by the architecture-specific ISR associated
- * with the IRQ passed to @ref msi_init. It executes callbacks directly in
+ * This function must be called by the architecture-specific handler connected
+ * to the doorbell passed to @ref msi_init. It executes callbacks directly in
  * interrupt context; callbacks must remain short, must not block, and should
  * defer lengthy work to a thread.
  */

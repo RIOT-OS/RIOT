@@ -8,18 +8,18 @@
 /**
  * @defgroup    sys_msi MSI-like mailbox doorbell
  * @ingroup     sys
- * @brief       Message-signaled interrupt style mailbox for Cortex-M
+ * @brief       Architecture-independent message-signaled interrupt mailbox
  *
- * This is not PCI Express MSI, and it is not the STM32 MSI oscillator.
- * It copies the PCIe MSI idea: a writer posts a payload into a memory
- * slot, then a doorbell write pends an NVIC IRQ.
+ * This is not PCI Express MSI. It copies the PCIe MSI idea: a writer posts a
+ * payload into a memory slot, then an architecture backend triggers a
+ * doorbell.
  *
  * @code{.unparsed}
- * thread                 mailbox                    NVIC / ISR
- * ------                 -------                    ---------
+ * sender                 mailbox                    backend / ISR
+ * ------                 -------                    -------------
  * write slot.payload --> event, data
  * write slot.valid   --> published
- * NVIC_SetPendingIRQ -->                            msi_isr()
+ * trigger doorbell   -->                            msi_isr()
  *                                                   callback()
  * @endcode
  *
@@ -58,15 +58,17 @@ extern "C" {
 typedef void (*msi_cb_t)(unsigned vec, uint32_t event, uint32_t data, void *arg);
 
 /**
- * @brief   Initialize the mailbox and enable @p irqn as the doorbell
+ * @brief   Initialize the mailbox and architecture doorbell
  *
- * @param[in] irqn  Cortex-M IRQ number (`IRQn_Type`), for example
- *                  `HASH_RNG_IRQn` on STM32F746
+ * The meaning of @p doorbell is defined by the selected architecture
+ * backend. The Cortex-M backend interprets it as an external IRQ number.
  *
- * @return  0 on success
- * @return  -EINVAL if @p irqn is out of range
+ * @param[in] doorbell  Architecture-specific doorbell identifier
+ *
+ * @retval  0     The mailbox and doorbell were initialized
+ * @retval  <0    The backend rejected or could not initialize the doorbell
  */
-int msi_init(int irqn);
+int msi_init(int doorbell);
 
 /**
  * @brief   Register the handler for one vector
@@ -83,8 +85,9 @@ int msi_register(unsigned vec, msi_cb_t cb, void *arg);
 /**
  * @brief   Post a message and ring the doorbell
  *
- * Writes the slot, then pends the IRQ configured in @ref msi_init.
- * The slot must be empty (`valid == 0`).
+ * Writes the slot, then asks the architecture backend to trigger the
+ * doorbell configured in @ref msi_init. The slot must be empty
+ * (`valid == 0`).
  *
  * @param[in] vec    Vector index
  * @param[in] event  Event code
@@ -99,8 +102,7 @@ int msi_post(unsigned vec, uint32_t event, uint32_t data);
 /**
  * @brief   Drain posted slots and invoke registered callbacks
  *
- * Call this from the board/CPU ISR that matches the IRQ given to
- * @ref msi_init. On STM32F746 that is typically `isr_hash_rng()`.
+ * The architecture-specific doorbell handler must call this function.
  */
 void msi_isr(void);
 

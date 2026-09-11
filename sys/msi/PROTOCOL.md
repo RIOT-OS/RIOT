@@ -7,9 +7,9 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 This document specifies the software protocol implemented by `sys/msi`.
 
-The protocol name is **MSI-like mailbox doorbell**. It is a same-CPU
-notification protocol: a writer posts a word into shared memory, then a
-doorbell write asks the NVIC to run an ISR.
+The protocol name is **MSI-like mailbox doorbell**. A writer posts a word into
+shared memory, then asks an architecture backend to trigger a doorbell. The
+backend delivers an interrupt whose handler drains the mailbox.
 
 ## 1. Goal
 
@@ -22,10 +22,10 @@ This protocol does the same job with:
 
 | PCIe MSI | This protocol |
 |---|---|
-| MSI address | mailbox slot + NVIC pending register |
+| MSI address | mailbox slot + architecture doorbell |
 | MSI data | `event` and `data` fields |
 | MSI / MSI-X vector | slot index `vec` |
-| Posted write | `valid = 1` then `NVIC_SetPendingIRQ()` |
+| Posted write | `valid = 1` then `msi_arch_trigger()` |
 | Host ISR | `msi_isr()` + registered callback |
 
 ## 2. Roles
@@ -34,11 +34,12 @@ This protocol does the same job with:
 |---|---|---|
 | Sender | Thread (or other context that may post) | Fill a free slot, then ring the doorbell |
 | Mailbox | Shared SRAM slots | Hold one posted message per vector |
-| Doorbell | One NVIC IRQ line | Turn the write into a CPU interrupt |
+| Doorbell backend | Architecture implementation | Turn the post into a CPU interrupt |
 | Receiver | `msi_isr()` and the vector callback | Consume the slot and handle the event |
 
-On nucleo-f746zg the sender and receiver are the **same Cortex-M7**. The
-protocol still has two contexts: thread mode and handler mode.
+On nucleo-f746zg, the supplied Cortex-M backend uses an NVIC line and the
+sender and receiver are the **same Cortex-M7**. The protocol still has two
+contexts: thread mode and handler mode.
 
 ## 3. Vectors
 
@@ -87,14 +88,25 @@ the address of the message.
 `event` and `data` are opaque to the protocol. The module does not interpret
 them.
 
-## 5. Doorbell
+## 5. Doorbell backend
 
-The doorbell is a single Cortex-M IRQ number stored by `msi_init(irqn)`.
+The generic protocol calls two architecture hooks:
 
-Ringing the doorbell is:
+```c
+int msi_arch_init(int doorbell);
+void msi_arch_trigger(void);
+```
+
+The meaning of `doorbell` is backend-specific. `msi_post()` does not access an
+interrupt controller directly.
+
+### Cortex-M backend
+
+For Cortex-M, the doorbell identifier is an external IRQ number. Ringing it
+uses:
 
 ```text
-NVIC_SetPendingIRQ(irqn)
+NVIC_SetPendingIRQ(doorbell)
 ```
 
 That write is the MSI-like act: a memory-mapped store into the NVIC ISPR
@@ -123,7 +135,7 @@ generated vector table.
                  |
                  |  sender: write event, data, seq
                  |  sender: valid = 1
-                 |  sender: NVIC_SetPendingIRQ
+                 |  sender: msi_arch_trigger
                  v
               POSTED (valid = 1)
                  |
@@ -154,7 +166,7 @@ slot.event = event
 slot.data  = data
 slot.seq   = slot.seq + 1
 slot.valid = 1              # publish last
-NVIC_SetPendingIRQ(irqn)    # doorbell
+msi_arch_trigger()          # architecture doorbell
 restore IRQs
 return 0
 ```
@@ -169,9 +181,9 @@ Rules:
 4. **IRQs disabled during the publish window.** That makes the check-and-set
    of `valid` atomic against `msi_isr()` on the same core.
 
-After `irq_restore()`, the NVIC delivers the IRQ (unless a higher-priority
-interrupt is already running). On success, the callback usually runs before
-`msi_post()` returns to the caller.
+After `irq_restore()`, the backend can deliver the interrupt. With the
+Cortex-M backend, the callback usually runs before `msi_post()` returns to
+the caller.
 
 ## 8. Receive procedure (ISR)
 
@@ -206,30 +218,30 @@ Rules:
 Before any post:
 
 ```text
-msi_init(irqn)                  # clear slots, enable doorbell IRQ
+msi_init(doorbell)              # clear slots, initialize backend
 msi_register(vec, cb, arg)      # optional per vector, but required to handle
-install isr_* that calls msi_isr()
+connect the doorbell handler to msi_isr()
 ```
 
 `msi_register()` may be called again to replace a handler. `cb` must not be
 `NULL`.
 
-`msi_init()` may be called again. It clears every slot and switches the
-doorbell IRQ.
+`msi_init()` may be called again. It clears every slot and asks the backend to
+switch the doorbell.
 
 ## 10. Ordering and memory
 
-On a single Cortex-M core:
+On a single-core target:
 
 - `irq_disable()` / `irq_restore()` give a critical section between thread
   and ISR.
-- NVIC entry and return are hardware barriers.
 - `volatile` on slot fields stops the compiler from caching them.
 
-The implementation does not flush D-cache. That is enough for same-core
-thread-to-ISR use on STM32F746. It is **not** enough for a second CPU or a
-bus-master device writing the mailbox unless those paths use a
-non-cacheable region or explicit cache maintenance.
+The generic implementation does not provide cross-core synchronization or
+flush data caches. It is enough for same-core thread-to-ISR use. It is **not**
+enough for another CPU or a bus-master device writing the mailbox unless a
+future implementation adds atomics, cache maintenance, or places the mailbox
+in coherent/non-cacheable memory.
 
 `seq` is incremented under the same critical section as the post. It is not
 exposed in the callback; it is only stored in the slot.
@@ -239,7 +251,7 @@ exposed in the callback; it is only stored in the slot.
 | Result | When |
 |---|---|
 | `0` | Success |
-| `-EINVAL` | Bad vector, `cb == NULL`, doorbell not initialized, or `irqn` out of range |
+| `-EINVAL` | Bad vector, `cb == NULL`, doorbell not initialized, or backend rejects its identifier |
 | `-EBUSY` | Slot still `POSTED` (`valid == 1`) |
 
 There is no timeout inside `msi_post()`. The sender retries or waits.
@@ -251,8 +263,8 @@ There is no timeout inside `msi_post()`. The sender retries or waits.
 - No addressing beyond `vec`
 - No encryption, authentication, or CRC
 - No PCIe configuration space, MSI enable bit, or MSI-X table
-- No GIC SGI / ITS translation
-- No inter-processor interrupt on a second core
+- No GIC SGI / ITS backend yet
+- No inter-processor interrupt backend yet
 
 Those can be layered later. The protocol itself is only **post one word,
 ring one doorbell, ack by clearing `valid`**.
@@ -271,7 +283,8 @@ post(0, event=4, data=0xA004)
 Each post:
 
 ```text
-[thread]  write slot + NVIC_SetPendingIRQ(HASH_RNG)
+[thread]  write slot + msi_arch_trigger()
+[backend] NVIC_SetPendingIRQ(HASH_RNG)
 [NVIC]    take HASH_RNG
 [isr]     isr_hash_rng() -> msi_isr()
 [ISR]     print doorbell-N, vec, event, data

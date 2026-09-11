@@ -5,12 +5,17 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 # MSI-like Mailbox Doorbell for RIOT
 
-This module is a **software MSI-like protocol** for Cortex-M. A sender writes a
-message into a mailbox slot, then rings a doorbell. The doorbell is an NVIC
-pending bit. The CPU takes the IRQ and the ISR reads the mailbox.
+This module implements an **architecture-independent software MSI-like
+protocol**. A sender writes a message into a mailbox slot, then asks an
+architecture backend to ring a doorbell. The receiving interrupt handler
+reads the mailbox.
 
-It is **not** PCI Express MSI/MSI-X.  
-It is **not** the STM32 MSI (Multi-Speed Internal) oscillator.
+The current backend uses a Cortex-M NVIC pending interrupt. Other
+architectures can provide the same backend interface without changing the
+mailbox protocol.
+
+It is **not** PCI Express MSI/MSI-X. On STM32, it is also unrelated to the MSI
+(Multi-Speed Internal) oscillator.
 
 The idea copied from PCIe MSI is:
 
@@ -22,6 +27,7 @@ The idea copied from PCIe MSI is:
 | [PROTOCOL.md](PROTOCOL.md) | Message format, post/ack rules, error cases |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Layers, components, IRQ path, mapping to real MSI |
 | [msi.h](../include/msi.h) | Public C API |
+| [msi_arch.h](../include/msi_arch.h) | Architecture backend contract |
 
 ## How the protocol works
 
@@ -34,8 +40,8 @@ Sender thread                         Shared mailbox                 Receiver
 1. wait until slot.valid == 0
 2. write event, data, seq
 3. write slot.valid = 1      ------>  payload is published
-4. NVIC_SetPendingIRQ()      ------>  doorbell
-                                                             NVIC delivers IRQ
+4. msi_arch_trigger()        ------>  backend doorbell
+                                                             backend delivers IRQ
                                                              msi_isr()
                                                              copy event/data
                                                              slot.valid = 0
@@ -51,7 +57,7 @@ The important rule is publish-then-notify:
 The ISR treats `valid != 0` as “a message is present”. Clearing `valid` is the
 acknowledgement that frees the slot for the next post.
 
-## Quick example
+## Cortex-M example
 
 ```c
 #include "cpu.h"
@@ -79,8 +85,9 @@ int main(void)
 }
 ```
 
-On STM32F746 the test uses unused `HASH_RNG_IRQn` as the doorbell. Any unused
-NVIC line can be used if you also implement the matching `isr_*` function.
+On STM32F746 the Cortex-M backend interprets `HASH_RNG_IRQn` as the doorbell
+identifier. Any unused NVIC line can be used if the application also
+implements the matching `isr_*` function.
 
 ## Build the demo
 
@@ -94,9 +101,13 @@ payload. Expected result: `TEST PASSED` after four posts.
 
 ## Requirements
 
-- Cortex-M (`cpu_core_cortexm`)
-- An unused NVIC IRQ that the application owns
-- Application provides the CPU ISR and calls `msi_isr()`
+- A CPU architecture providing the `msi_arch` feature
+- An architecture-specific doorbell owned by the application
+- A doorbell handler that calls `msi_isr()`
+
+The provided Cortex-M backend requires an unused NVIC IRQ. Future GIC,
+RISC-V software-interrupt, native, or hardware-mailbox backends can implement
+`msi_arch_init()` and `msi_arch_trigger()` separately.
 
 ## What this is for
 
