@@ -1,4 +1,4 @@
-MODULE ?= $(shell basename $(CURDIR))
+MODULE ?= $(notdir $(CURDIR))
 DISP_DEV_INTERFACE ?= $(MODULE)_disp_dev.c
 
 # by default include all .c files except <module>_disp_dev.c

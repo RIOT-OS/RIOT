@@ -6,7 +6,7 @@ JLINK_PRE_FLASH += r
 OPENOCD_DEBUG_ADAPTER ?= stlink
 
 # default to JLink as programmer, but only if JLinkExe is in $PATH
-ifneq (,$(shell which JLinkExe))
+ifneq (,$(shell command -v JLinkExe 2>/dev/null))
   PROGRAMMER ?= jlink
 else
   PROGRAMMER ?= openocd

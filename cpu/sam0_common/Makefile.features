@@ -1,4 +1,4 @@
-CPU_FAM := $(shell echo $(CPU_MODEL) | cut -c -6)
+CPU_FAM := $(call first_chars,6,$(CPU_MODEL))
 
 FEATURES_PROVIDED += periph_cpuid
 

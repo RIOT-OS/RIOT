@@ -27,12 +27,16 @@ ifeq (1,$(BUILD_IN_DOCKER))
   TARGET_ARCH_RISCV := riscv-none-elf
 endif
 
+# 'command -v' only takes a single name, so the triples are tested one by one.
+# The loop stops at the first hit, which is the most correct triple available.
 TARGET_ARCH_RISCV ?= \
   $(strip \
     $(subst -gcc,,\
       $(notdir \
         $(word 1,\
-          $(shell which $(addsuffix -gcc,$(_TRIPLES_TO_TEST)) 2> /dev/null)))))
+          $(shell for triple in $(addsuffix -gcc,$(_TRIPLES_TO_TEST)); do \
+                    command -v $$triple && break; \
+                  done 2> /dev/null)))))
 
 TARGET_ARCH ?= $(TARGET_ARCH_RISCV)
 

@@ -8,8 +8,34 @@
 #  - STM32_PINCOUNT: R (64)
 #  - STM32_ROMSIZE: G (1024K)
 CPU_MODEL_UPPERCASE = $(call uppercase,$(CPU_MODEL))
-STM32_INFO     := $(shell echo $(CPU_MODEL_UPPERCASE) | sed -E -e \
-'s/^STM32(F|H|L|W|G|MP|U|C)([0-7]|B|L)([A-Z0-9])([0-9])(.)(.)?(_A)?/\1 \2 \2\3\4 \3 \4 \5 \6 \7/')
+
+# Everything behind the 'STM32' prefix, as a list of single characters, e.g.
+# 'STM32L476RG' becomes 'L 4 7 6 R G'.
+_STM32_CHARS   := $(call split_chars,$(CPU_MODEL_UPPERCASE))
+_STM32_SUFFIX  := $(wordlist 6,$(words $(_STM32_CHARS)),$(_STM32_CHARS))
+
+# Every model is 'STM32' followed by at least six characters that encode type,
+# family, model, pin count and ROM size, e.g. 'STM32L476RG'.
+ifneq (STM32,$(subst $(space),,$(wordlist 1,5,$(_STM32_CHARS))))
+  $(error Not a valid STM32 CPU_MODEL: '$(CPU_MODEL)')
+endif
+
+ifeq (,$(word 6,$(_STM32_SUFFIX)))
+  $(error Too short to be a valid STM32 CPU_MODEL: '$(CPU_MODEL)')
+endif
+
+# 'MP' is the only type that is spelled with two characters
+_STM32_TYPE    := $(if $(filter MP,$(subst $(space),,$(wordlist 1,2,$(_STM32_SUFFIX)))),MP,$(firstword $(_STM32_SUFFIX)))
+
+# The characters that follow the type, which encode family, model, pin count
+# and ROM size. Anything left over ('_A' on some models) is kept as is.
+_STM32_REST    := $(wordlist $(words x $(call split_chars,$(_STM32_TYPE))),$(words $(_STM32_SUFFIX)),$(_STM32_SUFFIX))
+
+STM32_INFO     := $(_STM32_TYPE) $(word 1,$(_STM32_REST)) \
+                  $(word 1,$(_STM32_REST))$(word 2,$(_STM32_REST))$(word 3,$(_STM32_REST)) \
+                  $(word 2,$(_STM32_REST)) $(word 3,$(_STM32_REST)) \
+                  $(word 4,$(_STM32_REST)) $(word 5,$(_STM32_REST)) \
+                  $(subst $(space),,$(wordlist 6,$(words $(_STM32_REST)),$(_STM32_REST)))
 STM32_TYPE     = $(word 1, $(STM32_INFO))
 STM32_FAMILY   = $(word 2, $(STM32_INFO))
 STM32_MODEL    = $(word 3, $(STM32_INFO))

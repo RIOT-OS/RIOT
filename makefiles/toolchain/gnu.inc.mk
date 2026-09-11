@@ -23,10 +23,11 @@ endif
 _OBJDUMP         := $(or $(shell command -v $(PREFIX)objdump || command -v gobjdump),objdump)
 OBJDUMP   ?= $(_OBJDUMP)
 
-GCC_VERSION := $(shell command -v $(CC) > /dev/null && $(CC) -dumpversion | cut -d . -f 1)
+# Parse only the major version of GCC
+GCC_VERSION := $(firstword $(subst ., ,$(shell command -v $(CC) > /dev/null && $(CC) -dumpversion)))
 
 # -fmacro-prefix-map requires GCC 8
-ifneq (8, $(firstword $(shell echo 8 $(GCC_VERSION) | tr ' ' '\n' | sort -n)))
+ifneq (1,$(call version_is_greater_or_equal,$(GCC_VERSION),8))
   OPTIONAL_CFLAGS_BLACKLIST += -fmacro-prefix-map=$(RIOTBASE)/=
 endif
 

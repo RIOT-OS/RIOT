@@ -28,7 +28,7 @@ ifeq (,$(filter clean distclean,$(MAKECMDGOALS)))
 
   # If the requested and installed version mismatch, force a rebuild
   # by deleting the binary. `latest` will always force a rebuild.
-  ifneq (,$(shell test -f $(CURDIR)/doxygen && echo exists))
+  ifneq (,$(wildcard $(CURDIR)/doxygen))
     ifneq ($(PKG_VERSION),$(shell $(CURDIR)/doxygen --version | cut -d ' ' -f1))
       REBUILD=clean
     endif
