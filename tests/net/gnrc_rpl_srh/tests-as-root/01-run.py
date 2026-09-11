@@ -160,10 +160,10 @@ def test_wrong_type(child, iface, hw_dst, ll_dst, ll_src):
     p = srp1(Ether(dst=hw_dst) / IPv6(dst=ll_dst, src=ll_src) /
              IPv6ExtHdrRouting(type=255, segleft=1, addresses=["abcd::1"]),
              iface=iface, timeout=1, verbose=0)
-    assert(p is not None)
-    assert(ICMPv6ParamProblem in p)
-    assert(p[ICMPv6ParamProblem].code == 0)     # erroneous header field encountered
-    assert(p[ICMPv6ParamProblem].ptr == 42)     # routing header type field
+    assert (p is not None)
+    assert (ICMPv6ParamProblem in p)
+    assert (p[ICMPv6ParamProblem].code == 0)    # erroneous header field encountered
+    assert (p[ICMPv6ParamProblem].ptr == 42)    # routing header type field
     pktbuf_empty(child)
 
 
@@ -173,10 +173,10 @@ def test_inconsistent_header(child, iface, hw_dst, ll_dst, ll_src):
     p = srp1(Ether(dst=hw_dst) / IPv6(dst=ll_dst, src=ll_src) /
              IPv6ExtHdrRouting(type=3, segleft=18, addresses=[]),
              iface=iface, timeout=1, verbose=0)
-    assert(p is not None)
-    assert(ICMPv6ParamProblem in p)
-    assert(p[ICMPv6ParamProblem].code == 0)     # erroneous header field encountered
-    assert(p[ICMPv6ParamProblem].ptr == 41)     # len field
+    assert (p is not None)
+    assert (ICMPv6ParamProblem in p)
+    assert (p[ICMPv6ParamProblem].code == 0)    # erroneous header field encountered
+    assert (p[ICMPv6ParamProblem].ptr == 41)    # len field
     pktbuf_empty(child)
 
 
@@ -194,7 +194,7 @@ def test_multicast_dst(child, iface, hw_dst, ll_dst, ll_src):
                            (p[IPv6].dst != "ff02::1"))]
     # packet should be discarded silently:
     # see https://tools.ietf.org/html/rfc6554#section-4.2
-    assert(len(p) == 0)
+    assert (len(p) == 0)
     pktbuf_empty(child)
 
 
@@ -212,7 +212,7 @@ def test_multicast_addr(child, iface, hw_dst, ll_dst, ll_src):
                            (p[IPv6].dst != ll_dst))]
     # packet should be discarded silently:
     # see https://tools.ietf.org/html/rfc6554#section-4.2
-    assert(len(p) == 0)
+    assert (len(p) == 0)
     pktbuf_empty(child)
 
 
@@ -225,10 +225,10 @@ def test_multiple_addrs_of_mine_uncomp(child, iface, hw_dst, ll_dst, ll_src):
              IPv6ExtHdrRouting(type=3, segleft=3, addresses=[ll_dst, ll_src,
                                                              dummy]),
              iface=iface, timeout=1, verbose=0)
-    assert(p is not None)
-    assert(ICMPv6ParamProblem in p)
-    assert(p[ICMPv6ParamProblem].code == 0)             # erroneous header field encountered
-    assert(p[ICMPv6ParamProblem].ptr == 40+8+(2 * 16))  # dummy in routing header
+    assert (p is not None)
+    assert (ICMPv6ParamProblem in p)
+    assert (p[ICMPv6ParamProblem].code == 0)                # erroneous header field encountered
+    assert (p[ICMPv6ParamProblem].ptr == 40+8+(2 * 16))     # dummy in routing header
     pktbuf_empty(child)
     del_ipv6_address(child, dst_iface, dummy)
 
@@ -247,15 +247,15 @@ def test_forward_uncomp(child, iface, hw_dst, ll_dst, ll_src):
           iface=iface, verbose=0)
     ps = sniffer.wait_for_sniff_results()
     p = [p for p in ps if p[Ether].src == hw_dst]
-    assert(len(p) > 0)
+    assert (len(p) > 0)
     p = p[0]
-    assert(IPv6 in p)
-    assert(IPv6ExtHdrRouting in p)
-    assert(p[IPv6].src == ll_src)
-    assert(p[IPv6].dst == dummy)
-    assert(p[IPv6].hlim == (hl - 1))
-    assert(p[IPv6ExtHdrRouting].type == 3)
-    assert(p[IPv6ExtHdrRouting].segleft == 0)
+    assert (IPv6 in p)
+    assert (IPv6ExtHdrRouting in p)
+    assert (p[IPv6].src == ll_src)
+    assert (p[IPv6].dst == dummy)
+    assert (p[IPv6].hlim == (hl - 1))
+    assert (p[IPv6ExtHdrRouting].type == 3)
+    assert (p[IPv6ExtHdrRouting].segleft == 0)
     pktbuf_empty(child)
     del_neighbor(child, dst_iface, dummy)
 
@@ -275,15 +275,15 @@ def test_forward_uncomp_not_first_ext_hdr(child, iface, hw_dst, ll_dst, ll_src):
           iface=iface, verbose=0)
     ps = sniffer.wait_for_sniff_results()
     p = [p for p in ps if p[Ether].src == hw_dst]
-    assert(len(p) > 0)
+    assert (len(p) > 0)
     p = p[0]
-    assert(IPv6 in p)
-    assert(IPv6ExtHdrRouting in p)
-    assert(p[IPv6].src == ll_src)
-    assert(p[IPv6].dst == dummy)
-    assert(p[IPv6].hlim == (hl - 1))
-    assert(p[IPv6ExtHdrRouting].type == 3)
-    assert(p[IPv6ExtHdrRouting].segleft == 0)
+    assert (IPv6 in p)
+    assert (IPv6ExtHdrRouting in p)
+    assert (p[IPv6].src == ll_src)
+    assert (p[IPv6].dst == dummy)
+    assert (p[IPv6].hlim == (hl - 1))
+    assert (p[IPv6ExtHdrRouting].type == 3)
+    assert (p[IPv6ExtHdrRouting].segleft == 0)
     pktbuf_empty(child)
     del_neighbor(child, dst_iface, dummy)
 
@@ -316,9 +316,9 @@ def test_time_exc(child, iface, hw_dst, ll_dst, ll_src):
     p = srp1(Ether(dst=hw_dst) / IPv6(dst=ll_dst, hlim=1, src=ll_src) /
              IPv6ExtHdrRouting(type=3, segleft=1, addresses=[dummy]),
              iface=iface, timeout=1, verbose=0)
-    assert(p is not None)
-    assert(ICMPv6TimeExceeded in p)
-    assert(p[ICMPv6TimeExceeded].code == 0)
+    assert (p is not None)
+    assert (ICMPv6TimeExceeded in p)
+    assert (p[ICMPv6TimeExceeded].code == 0)
     pktbuf_empty(child)
 
 

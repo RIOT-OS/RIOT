@@ -160,7 +160,7 @@ class DesVirtTestbed(Testbed):
         pattern = re.compile(pats)
         for line in stream:
             match = pattern.match(line)
-            if(match):
+            if match:
                 tuple = match.groups()
                 self.namePortList.append((tuple[0], int(tuple[1])))
         self.namePortList = sorted(self.namePortList)

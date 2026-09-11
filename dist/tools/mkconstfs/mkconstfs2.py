@@ -121,7 +121,7 @@ def print_file_data(local_fname, varname, target_fname=""):
                                                  ) as bfile:
         yield from map(lambda x: x[1],
                        itertools.chain.from_iterable(
-                            map(lambda l: itertools.chain(l, [(0, "\n")]),
+                            map(lambda y: itertools.chain(y, [(0, "\n")]),
                                 chunk(map(byte2s, bfile), 16)
                                 )
                         )

@@ -318,7 +318,7 @@ class MQTTSNServer(Automaton):
                 tid = pkt.tid
                 topic_name = self._get_topic_name(tid)
             else:
-                assert(False)
+                assert False
             subscription = {"tid": tid, "topic_name": topic_name}
             if subscription not in self.subscriptions:
                 self.subscriptions.append(subscription)

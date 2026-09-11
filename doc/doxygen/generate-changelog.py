@@ -37,7 +37,7 @@ def generate_changelog(template_filename, changelog_filename, output_filename):
             elif release_title.match(line):
                 # if line contains a release title
                 release_match = re.search(r"(\d{4}\.\d{2}(\.\d+)?)", line)
-                assert(release_match is not None)
+                assert (release_match is not None)
                 # parse out release number
                 release = release_match.group(1)
                 title = "Release %s" % release
