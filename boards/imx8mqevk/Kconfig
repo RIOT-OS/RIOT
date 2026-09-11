@@ -1,0 +1,16 @@
+# Copyright (c) 2020 Mesotic SAS
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "imx8mqevk" if BOARD_IMX8MQEVK
+
+config BOARD_IMX8MQEVK
+    bool
+    default y
+    select CPU_MODEL_IMX8MQ
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+

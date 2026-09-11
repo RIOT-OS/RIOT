@@ -1,0 +1,15 @@
+CPU = imx8-m4
+CPU_MODEL = imx8mq
+CPU_CORE = cortex-m4f
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_gpio
+FEATURES_PROVIDED += periph_gpio_irq
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
+
+include $(RIOTCPU)/imx8-m4/Makefile.features
+
+KCONFIG_ADD_CONFIG += $(RIOTCPU)/cortexm_common/cortexm_common.config
+
+-include $(RIOTCPU)/cortexm_common/Makefile.features
