@@ -1,4 +1,4 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 
 linux_checkid() {
     udevinfo -a -n ${1} | grep -q "ATTRS{product}==\"${2}\""
@@ -103,7 +103,7 @@ done
 
 ### wait for all flasher processes to finish
 echo Waiting until all devices have been programmed...
-for pid in "${pids}"; do
+for pid in ${pids}; do
     wait ${pid}
 done
 
